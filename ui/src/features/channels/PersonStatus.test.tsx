@@ -43,7 +43,9 @@ const treeRow = () => screen.getByRole("treeitem", { name: /^Anna/ });
 const memberRow = () => screen.getByRole("button", { name: /^Anna/ });
 const rows = () => [treeRow(), memberRow()];
 const icons = (row: HTMLElement) =>
-  [...row.querySelectorAll(".person-icon")].map((icon) => icon.getAttribute("class"));
+  [...row.querySelectorAll(".person-icon:not(.person-icon--registered)")].map((icon) =>
+    icon.getAttribute("class"),
+  );
 
 describe("voiceState", () => {
   const user = (change: Partial<User>) => ({ ...plain, ...change });
@@ -137,5 +139,32 @@ describe("person status in the tree and member list", () => {
     await act(() => applyLanguage("de"));
     expect(treeRow()).toHaveAccessibleName(/vom Server stummgeschaltet/);
     await act(() => applyLanguage("en"));
+  });
+});
+
+describe("status icon tooltips", () => {
+  const cases: [string, Partial<User>, string][] = [
+    ["registered", { registered: true }, "Registered on this server"],
+    ["guest", { registered: false }, "Not registered on this server (guest)"],
+    ["self-muted", { selfMute: true }, "Muted"],
+    ["self-deafened", { selfDeaf: true }, "Deafened"],
+    ["server-muted", { serverMute: true }, "Muted by the server"],
+    ["server-deafened", { serverDeaf: true }, "Deafened by the server"],
+    ["suppressed", { suppressed: true }, "Suppressed – can't speak in this channel"],
+    ["locally muted", { localMute: true }, "Muted for you"],
+  ];
+  it.each(cases)("%s icon has a tooltip", async (_n, change, text) => {
+    await renderBoth();
+    update({ registered: true, ...change });
+    expect((await screen.findAllByTitle(text)).length).toBeGreaterThan(0);
+  });
+
+  it("shows the guest icon only for unregistered people", async () => {
+    await renderBoth();
+    update({ registered: true });
+    expect(treeRow().querySelector('[data-icon="user-guest"]')).toBeNull();
+    expect(treeRow().querySelector('[data-icon="user-check"]')).not.toBeNull();
+    update({ registered: false });
+    expect(treeRow().querySelector('[data-icon="user-guest"]')).not.toBeNull();
   });
 });

@@ -1,10 +1,12 @@
 /**
  * Mute/deafen/listener/unregistered icons for a person; the spoken equivalent is `useStatusText()`.
  */
+import { useTranslation } from "react-i18next";
 import type { User } from "../../api";
 import { voiceState, type VoiceState } from "./statusText";
 
-type IconName = "mic-off" | "headphones-off" | "ear" | "ban" | "volume-x";
+type IconName =
+  "mic-off" | "headphones-off" | "ear" | "ban" | "volume-x" | "user-guest" | "user-check";
 
 const PATHS: Record<IconName, string> = {
   "mic-off":
@@ -14,6 +16,9 @@ const PATHS: Record<IconName, string> = {
   ear: "M6 8.5a6 6 0 1 1 12 0c0 3-2 4.5-3 5.5s-1.5 2-1.5 3.5a3 3 0 0 1-6 0M9 8.5a3 3 0 0 1 6 0",
   ban: "M12 3a9 9 0 1 0 0 18a9 9 0 1 0 0-18M5.6 5.6l12.8 12.8",
   "volume-x": "M11 5 6 9H3v6h3l5 4V5M22 9l-6 6M16 9l6 6",
+  // Person outline; the guest variant dashes it so it reads as "no account".
+  "user-check": "M12 4a4 4 0 1 0 0 8a4 4 0 1 0 0-8M4 21a8 8 0 0 1 16 0M15 17l1.8 1.8L20 15.5",
+  "user-guest": "M12 4a4 4 0 1 0 0 8a4 4 0 1 0 0-8M4 21a8 8 0 0 1 16 0",
 };
 
 /** Icon and look of each voice state; what the server imposes gets the red "server" chip. */
@@ -25,8 +30,16 @@ const VOICE_ICONS: Record<VoiceState, { name: IconName; variant?: string }> = {
   muted: { name: "mic-off" },
 };
 
-export function Icon({ name, variant }: { name: IconName; variant?: string | undefined }) {
-  return (
+export function Icon({
+  name,
+  variant,
+  tip,
+}: {
+  name: IconName;
+  variant?: string | undefined;
+  tip?: string | undefined;
+}) {
+  const svg = (
     <svg
       className={variant ? `person-icon person-icon--${variant}` : "person-icon"}
       data-icon={name}
@@ -44,27 +57,49 @@ export function Icon({ name, variant }: { name: IconName; variant?: string | und
       <path d={PATHS[name]} />
     </svg>
   );
+  // A wrapper carries the native tooltip: SVG tooltips need a <title>, which would leak into text content.
+  return tip ? (
+    <span className="person-icon-slot" title={tip}>
+      {svg}
+    </span>
+  ) : (
+    svg
+  );
 }
 
-/** Visual status icons; the text equivalent comes from `useStatusText`. */
+/** The icon of a voice state without its look; the avatar stack's badge colours it itself. */
+export function VoiceStateIcon({ state }: { state: VoiceState }) {
+  return <Icon name={VOICE_ICONS[state].name} />;
+}
+
+/** Visual status icons with a hover tooltip; the text equivalent comes from `useStatusText`. */
 export function StatusIcons({ user, listener = false }: { user: User; listener?: boolean }) {
+  const { t } = useTranslation("channels");
   if (listener) {
     return (
       <span className="person-icons">
-        <Icon name="ear" />
+        <Icon name="ear" tip={t("statusTip.listening")} />
       </span>
     );
   }
   const voice = voiceState(user);
   return (
     <span className="person-icons">
-      {!user.registered && (
-        <span className="person-icons__unregistered" aria-hidden="true">
-          ○
-        </span>
+      {user.registered ? (
+        <Icon name="user-check" variant="registered" tip={t("statusTip.registered")} />
+      ) : (
+        <Icon name="user-guest" variant="guest" tip={t("statusTip.unregistered")} />
       )}
-      {voice && <Icon name={VOICE_ICONS[voice].name} variant={VOICE_ICONS[voice].variant} />}
-      {user.localMute && <Icon name="volume-x" variant="local-muted" />}
+      {voice && (
+        <Icon
+          name={VOICE_ICONS[voice].name}
+          variant={VOICE_ICONS[voice].variant}
+          tip={t(`statusTip.${voice}`)}
+        />
+      )}
+      {user.localMute && (
+        <Icon name="volume-x" variant="local-muted" tip={t("statusTip.localMuted")} />
+      )}
     </span>
   );
 }
