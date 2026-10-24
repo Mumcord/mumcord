@@ -10,7 +10,9 @@ use tauri_specta::Event;
 use crate::commands::servers::{DeepLinkOpened, MumbleLink, parse_link};
 use crate::window;
 
-/// URL scheme Mumcord handles (also declared in tauri.conf.json).
+/// URL scheme Mumcord handles (also declared in tauri.conf.json). macOS registers it through
+/// Info.plist, so only the other platforms use it at runtime.
+#[cfg(not(target_os = "macos"))]
 pub const SCHEME: &str = "mumble";
 
 /// Holds links until the UI is ready for them. A link that launches the app arrives before the
