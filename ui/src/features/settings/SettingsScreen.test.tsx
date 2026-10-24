@@ -402,7 +402,7 @@ describe("Identity section", () => {
     savePath.mockResolvedValue("/home/me/id.p12");
     const exportIdentity = vi.spyOn(api, "identityExport");
     await openSection("Identity");
-    expect(await screen.findByText("You")).toBeInTheDocument();
+    expect(await screen.findByText("Zoe")).toBeInTheDocument();
     fireEvent.click(screen.getByRole("button", { name: "Export identity…" }));
     const dialog = await screen.findByRole("dialog", { name: "Export identity" });
     const submit = within(dialog).getByRole("button", { name: "Export" });

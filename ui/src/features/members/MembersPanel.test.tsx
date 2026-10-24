@@ -53,7 +53,7 @@ describe("MembersPanel", () => {
     fireEvent.keyDown(member(/^Anna/), { key: "End" });
     expect(member(/^Carla/)).toHaveFocus();
     fireEvent.keyDown(member(/^Carla/), { key: "ArrowUp" });
-    expect(member(/^You/)).toHaveFocus();
+    expect(member(/^Zoe/)).toHaveFocus();
   });
 
   it("keeps the talking indicator off listener rows", async () => {
@@ -72,7 +72,7 @@ describe("MembersPanel", () => {
       await api.channelFollow(self?.channelId ?? 1);
     });
     expect(screen.getByRole("heading", { name: "Listening (1)" })).toBeInTheDocument();
-    expect(screen.getAllByRole("button", { name: /^You/ })).toHaveLength(1);
+    expect(screen.getAllByRole("button", { name: /^Zoe/ })).toHaveLength(1);
   });
 
   it("opens a profile card with a sanitized comment and local controls", async () => {
@@ -127,8 +127,8 @@ describe("MembersPanel", () => {
     expect(screen.getByText(/only last for this session/)).toBeInTheDocument();
     fireEvent.keyDown(screen.getByRole("dialog"), { key: "Escape" });
 
-    fireEvent.click(member(/^You/));
-    await screen.findByRole("dialog", { name: "You" });
+    fireEvent.click(member(/^Zoe/));
+    await screen.findByRole("dialog", { name: "Zoe" });
     expect(screen.queryByRole("slider")).toBeNull();
     expect(screen.queryByRole("checkbox")).toBeNull();
     expect(screen.queryByRole("button", { name: "Send private message" })).toBeNull();

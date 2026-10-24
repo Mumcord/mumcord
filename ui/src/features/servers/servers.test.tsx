@@ -228,7 +228,7 @@ describe("ServerDialog", () => {
     fireEvent.click(add);
     expect(dialog()).toHaveAccessibleName("Add a server");
     expect(screen.getByLabelText("Port")).toHaveValue("64738");
-    expect(screen.getByLabelText("Your name on this server")).toHaveValue("You");
+    expect(screen.getByLabelText("Your name on this server")).toHaveValue("Zoe");
     fireEvent.change(screen.getByLabelText("Address"), { target: { value: "new.example.org" } });
     fireEvent.change(screen.getByLabelText("Server password (optional)"), {
       target: { value: "secret" },
@@ -242,7 +242,7 @@ describe("ServerDialog", () => {
       label: "new.example.org",
       address: "new.example.org",
       port: 64738,
-      username: "You",
+      username: "Zoe",
       password: { kind: "set", value: "secret" },
     });
     expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
@@ -286,7 +286,7 @@ describe("ServerDialog", () => {
       label: "Locked",
       address: "locked.example.org",
       port: 64738,
-      username: "You",
+      username: "Zoe",
       password: { kind: "set", value: "old" },
     });
     await renderAll();

@@ -190,7 +190,7 @@ export function createMockApi(options: MockOptions = {}): MockApi {
   const failures = new Map<CommandName, ApiError>();
   const certPrompts = new Map<number, string | null>();
 
-  let identity: Identity | null = fresh ? null : { name: "You", certHash: "selfhash" };
+  let identity: Identity | null = fresh ? null : { name: "Zoe", certHash: "selfhash" };
   let settings: Settings = { ...DEFAULT_SETTINGS, wizardCompleted: !fresh };
   let servers: SavedServer[] = fresh
     ? []
@@ -200,7 +200,7 @@ export function createMockApi(options: MockOptions = {}): MockApi {
           label: "Local test server",
           address: "localhost",
           port: 64738,
-          username: "You",
+          username: "Zoe",
           hasPassword: false,
           saveHistory: true,
         },
@@ -566,7 +566,7 @@ export function createMockApi(options: MockOptions = {}): MockApi {
       return Promise.resolve({
         comment: user.hasComment ? `<p>Hi, I am ${user.name}.</p>` : null,
         avatar: user.hasAvatar
-          ? "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciLz4="
+          ? "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAIAAAD8GO2jAAAAd0lEQVR42u3UwQ2AMAwDwE7HGt2DCRmDTdw/KIlFHIRQrHzrE5Qwzn2WzmiggQZoALcoARjRAHCTBUDkOQA6H35FAuCYmz8+EB7/DYCCXJ+gov1dQGiYl1wOSIz4MxW2m3ugavcWTdIeb3Kmmv1VOAxzlgIyUw4sffQx8QiPKKAAAAAASUVORK5CYII="
           : null,
       });
     },
