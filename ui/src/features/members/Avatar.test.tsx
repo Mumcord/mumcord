@@ -6,7 +6,9 @@ import { Avatar } from "./Avatar";
 describe("Avatar", () => {
   it("shows the initial without an image", () => {
     const { container } = render(<Avatar name="anna" />);
-    expect(container.textContent).toBe("A");
+    expect(container.querySelector(".avatar")?.getAttribute("data-initial")).toBe("A");
+    // No DOM text: rows labelled by the name alone must not show extra text (WCAG 2.5.3).
+    expect(container.textContent).toBe("");
     expect(container.querySelector("img")).toBeNull();
   });
 
@@ -16,7 +18,7 @@ describe("Avatar", () => {
     expect(img).not.toBeNull();
     if (img) fireEvent.error(img);
     expect(container.querySelector("img")).toBeNull();
-    expect(container.textContent).toBe("A");
+    expect(container.querySelector(".avatar")?.getAttribute("data-initial")).toBe("A");
   });
 
   it("picks a stable palette color per name, case-insensitively", () => {

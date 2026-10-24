@@ -12,7 +12,11 @@ function avatarColorIndex(name: string): number {
   return (hash % PALETTE_SIZE) + 1;
 }
 
-/** Round avatar: the person's image when known and decodable, otherwise their initial. Decorative. */
+/**
+ * Round avatar: the person's image when known and decodable, otherwise their initial. Decorative.
+ * The initial is drawn by CSS from `data-initial`, not as DOM text: rows named after the person
+ * (aria-labelledby) would otherwise show visible text that is not in their name (WCAG 2.5.3).
+ */
 export function Avatar({
   name,
   src = null,
@@ -32,12 +36,13 @@ export function Avatar({
       className="avatar"
       data-size={size}
       data-talking={talking}
+      data-initial={showImage ? undefined : (name.trim()[0] ?? "?").toUpperCase()}
       style={
         { "--avatar-bg": `var(--color-avatar-${String(avatarColorIndex(name))})` } as CSSProperties
       }
       aria-hidden="true"
     >
-      {showImage ? (
+      {showImage && (
         <img
           src={src}
           alt=""
@@ -45,8 +50,6 @@ export function Avatar({
             setFailedSrc(src);
           }}
         />
-      ) : (
-        (name.trim()[0] ?? "?").toUpperCase()
       )}
     </span>
   );

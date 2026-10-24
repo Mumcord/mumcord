@@ -255,8 +255,7 @@ describe("ChannelsPanel", () => {
     expect(items.length).toBeGreaterThan(0);
     for (const item of items) {
       const clone = item.cloneNode(true) as HTMLElement;
-      // The avatar is decorative (aria-hidden); its initial is not visible label text.
-      clone.querySelectorAll(".visually-hidden, .avatar").forEach((el) => {
+      clone.querySelectorAll(".visually-hidden").forEach((el) => {
         el.remove();
       });
       const visible = words(clone.textContent.replace(/\([^()]*\)/g, " ")).join(" ");

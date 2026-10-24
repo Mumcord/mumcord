@@ -187,7 +187,7 @@ describe("MembersPanel", () => {
     expect(img).toHaveAttribute("src", expect.stringMatching(/^data:image\//));
     expect(img).toHaveAttribute("alt", "");
     expect(avatarImage(/^Ben/)).toBeNull();
-    expect(member(/^Ben/).querySelector(".avatar")).toHaveTextContent("B");
+    expect(member(/^Ben/).querySelector(".avatar")).toHaveAttribute("data-initial", "B");
   });
 
   it("caches avatars and refreshes them when hasAvatar changes", async () => {
@@ -217,7 +217,7 @@ describe("MembersPanel", () => {
       api.mock.emit("userUpserted", { user: { ...ben, hasAvatar: false } });
     });
     expect(avatarImage(/^Ben/)).toBeNull();
-    expect(member(/^Ben/).querySelector(".avatar")).toHaveTextContent("B");
+    expect(member(/^Ben/).querySelector(".avatar")).toHaveAttribute("data-initial", "B");
 
     profile.mockResolvedValueOnce({ comment: null, avatar: "data:image/png;base64,TkVX" });
     act(() => {
@@ -263,7 +263,7 @@ describe("MembersPanel", () => {
       expect(error).toHaveBeenCalled();
     });
     expect(avatarImage(/^Anna/)).toBeNull();
-    expect(member(/^Anna/).querySelector(".avatar")).toHaveTextContent("A");
+    expect(member(/^Anna/).querySelector(".avatar")).toHaveAttribute("data-initial", "A");
     error.mockRestore();
   });
 

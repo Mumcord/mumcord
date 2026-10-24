@@ -12,6 +12,10 @@
   font-weight: var(--font-weight-bold);
 }
 
+.avatar[data-initial]::before {
+  content: attr(data-initial);
+}
+
 .avatar[data-size="sm"] {
   width: 1.5rem;
   height: 1.5rem;
