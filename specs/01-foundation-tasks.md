@@ -156,7 +156,7 @@
 | F66 | Message notifications: in-app toast + desktop, click opens chat (QA.16) | done – toasts, Linux zbus notifications with click-to-open, notify-rust on Win/macOS (no click), mode In-app/Desktop/Both/Off | f66-notifications | – | complex | FR-1.48c | new ui/src/features/notifications, src-tauri notification module + plugin, settings section, locales, e2e |
 | F67 | Autostart at login: wizard step + settings, start minimized (QA.17) | done – own autostart module (XDG/LaunchAgent/HKCU Run), --autostart start hidden, window starts invisible, wizard step 3 + Appearance → Behaviour | f67-autostart | – | complex | FR-1.48d | src-tauri autostart module + plugin, ui/src/features/wizard, settings (general section), locales, e2e wizard |
 | F68 | Highlight own voice channel in channel list (QA.18) | done – data-voice row, green inset bar + speaker icon + bold, none while read-only | f68-voice-highlight | F64 | simple | FR-1.15 | ui/src/features/channels |
-| W2 | Wiki: document F63–F68 when done; switch screenshot URLs from epic-1 to main after merge | partly done – features documented (wiki-update-2); screenshot URLs still on epic-1 until merge | lead | F63–F68, merge | simple | – | wiki |
+| W2 | Wiki: document F63–F68 when done; switch screenshot URLs from epic-1 to main after merge | done – screenshot URLs on main after merge | lead | F63–F68, merge | simple | – | wiki |
 | F69 | Design refresh after mumcord-www: analysis + prototype in separate worktree with preview screenshots (decision for user) | done – prototype on branch design-refresh-proto (worktree f69-wt), screenshots + specs/design-refresh.md there; awaiting user choices | f69-design-proto | – | complex | – | ~/.cache/mumcord-build/f69-wt (worktree), specs/design-refresh.md |
 | F70 | Hang-up sound on disconnect + own join sound (QA.19, QA.23) | done – voice_join + hang_up tones, separate short-lived player for hang-up, per-event toggles | f70-sounds | F66 | simple | FR-1.27 | crates/engine/src/sounds.rs, assets sound, settings Sounds section, locales |
 | F71 | Chat: avatars per message group, indented text, grouping (QA.20) | done – grouping.ts, MessageList avatars + day separators, Cozy/Compact setting (store + preferences) | f71-chat-redesign | F65 | simple | FR-1.48a | ui/src/features/chat |
@@ -199,6 +199,7 @@
 | B36 | Tenor GIF search (FR-1.52) | open | | G1 | complex | AC-1.42 | ui chat input, CI secret |
 | B37 | Code highlighting + formatting toolbar/shortcuts (FR-1.53, 1.54) | open | | G1 | simple | AC-1.43, 1.44 | ui chat |
 | B38 | External images and image links inline (FR-1.55) | open | | B34 | complex | AC-1.45 | crates/engine (image fetch), ui chat |
+| B39 | Bug: unread bubble flashes briefly on the channel whose chat is open when a message arrives (own channel, F93 regression) | open | | – | simple | FR-1.31 | ui/src/features/follow unread, engine chat.rs |
 | D1 | Implementation report | open | | C1–C10 | simple | all | specs/01-foundation-implementation.md |
 
 ## Contracts from finished tasks
