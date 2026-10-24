@@ -1,0 +1,28 @@
+[package]
+name = "mumcord-audio"
+description = "Audio I/O, processing chain, Opus, jitter buffer and mixing"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+
+[dependencies]
+cpal.workspace = true
+opus.workspace = true
+nnnoiseless.workspace = true
+sonora.workspace = true
+rtrb.workspace = true
+rubato.workspace = true
+thiserror.workspace = true
+tracing.workspace = true
+hound = { workspace = true, optional = true }
+
+[features]
+# Env-selected null/WAV-file audio backend for headless tests and E2E; never in release builds.
+test-backend = ["dep:hound"]
+
+[dev-dependencies]
+hound.workspace = true
+
+[lints]
+workspace = true

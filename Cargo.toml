@@ -1,0 +1,127 @@
+[workspace]
+resolver = "3"
+members = [
+    "crates/protocol",
+    "crates/audio",
+    "crates/store",
+    "crates/engine",
+    "crates/bot",
+    "crates/positional",
+    "tools/netsim",
+    "src-tauri",
+]
+
+[workspace.package]
+version = "0.1.0"
+edition = "2024"
+rust-version = "1.90"
+license = "MIT"
+repository = "https://github.com/ToBee94/mumcord"
+
+[workspace.dependencies]
+# Internal crates
+mumcord-protocol = { path = "crates/protocol" }
+mumcord-audio = { path = "crates/audio" }
+mumcord-store = { path = "crates/store" }
+mumcord-engine = { path = "crates/engine" }
+mumcord-positional = { path = "crates/positional" }
+
+# Async, networking, TLS
+tokio = { version = "1.54", features = ["full"] }
+# ring instead of the default aws-lc-rs: no cmake/NASM needed on Windows and macOS.
+rustls = { version = "0.23", default-features = false, features = ["ring", "std", "tls12", "logging"] }
+tokio-rustls = { version = "0.26", default-features = false, features = ["ring", "tls12", "logging"] }
+bytes = "1"
+
+# Protobuf
+prost = "0.14"
+prost-build = "0.14"
+protoc-bin-vendored = "3.3"
+
+# Crypto & certificates
+aes = "0.8"
+rand = "0.9"
+sha1 = "0.10"
+rcgen = "0.14"
+p12-keystore = "0.4"
+# Only used to generate RSA identity keys (ring cannot generate RSA keys); signing stays with ring.
+rsa = { version = "0.9", default-features = false, features = ["std", "getrandom", "u64_digit"] }
+
+# Audio
+cpal = "0.18"
+# opusic-sys builds libopus statically from bundled sources.
+opus = "0.4"
+nnnoiseless = { version = "0.5", default-features = false }
+sonora = "0.2"
+rtrb = "0.3"
+rubato = "0.16"
+hound = "3.5"
+
+# Storage & secrets
+rusqlite = { version = "0.40", features = ["bundled"] }
+keyring = "4.2"
+
+# Sanitizing, own avatar scaling
+ammonia = "4.2"
+image = { version = "0.25", default-features = false, features = ["png", "jpeg", "gif", "webp"] }
+
+# Positional audio / plugin host
+libloading = "0.8"
+libc = "0.2"
+windows-sys = { version = "0.61", features = ["Win32_Foundation", "Win32_System_Memory"] }
+
+# Linux desktop portals (Wayland global shortcuts)
+ashpd = "0.13"
+# XDG activation token so the desktop may raise the window a portal call opens (already in the tree via Tauri)
+gdk = "0.18"
+# Desktop notifications for new messages (FR-1.48c): the freedesktop notification service on D-Bus,
+# talked to directly for click actions and per-channel replacement (zbus and futures-util are
+# already in the tree via ashpd; gtk via Tauri, used to hand the activation token to the window).
+zbus = { version = "5.19", default-features = false, features = ["tokio"] }
+futures-util = { version = "0.3", default-features = false }
+gtk = "0.18"
+# Desktop notifications on Windows and macOS (show only; no click callback there).
+notify-rust = { version = "4.18", default-features = false }
+
+# Mouse-button push-to-talk: X11 XInput2 raw events, macOS event tap (already in the tree)
+x11rb = { version = "0.13", default-features = false }
+core-graphics = "0.25"
+core-foundation = "0.10"
+
+# Errors, logging, serialization, CLI
+thiserror = "2"
+anyhow = "1"
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+tracing-appender = "0.2"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+clap = { version = "4", features = ["derive"] }
+tempfile = "3"
+
+# Tauri
+tauri-build = { version = "2.7", features = [] }
+tauri-plugin-single-instance = { version = "2.5", features = ["deep-link"] }
+tauri-plugin-deep-link = "2.6"
+tauri-plugin-global-shortcut = "2.4"
+tauri-plugin-dialog = "2.8"
+tauri-plugin-opener = "2.7"
+tauri-specta = { version = "=2.0.0-rc.26", features = ["derive", "typescript"] }
+specta = { version = "=2.0.0-rc.26", features = ["derive"] }
+specta-typescript = "0.0.13"
+
+[workspace.lints.rust]
+unsafe_op_in_unsafe_fn = "warn"
+
+[workspace.lints.clippy]
+dbg_macro = "warn"
+todo = "warn"
+unwrap_used = "warn"
+
+# RSA-2048 key generation in the first-start wizard takes seconds to minutes in unoptimised
+# debug builds; optimising just these crates keeps dev and E2E builds responsive.
+[profile.dev.package.rsa]
+opt-level = 3
+
+[profile.dev.package.num-bigint-dig]
+opt-level = 3

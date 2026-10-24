@@ -1,0 +1,30 @@
+[package]
+name = "mumcord-bot"
+description = "Scripted Mumble bot clients for multi-user integration tests"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+publish = false
+
+[[bin]]
+name = "mumcord-bot"
+path = "src/main.rs"
+
+[dependencies]
+mumcord-protocol.workspace = true
+mumcord-audio.workspace = true
+bytes.workspace = true
+tokio.workspace = true
+opus.workspace = true
+hound.workspace = true
+anyhow.workspace = true
+tracing.workspace = true
+rcgen.workspace = true
+clap.workspace = true
+
+[dev-dependencies]
+tempfile.workspace = true
+
+[lints]
+workspace = true

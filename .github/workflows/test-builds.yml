@@ -1,0 +1,19 @@
+name: Test builds
+
+# Unsigned test builds (spec §10, AC-1.30), kept as workflow artifacts only – nothing is
+# published as a GitHub release. The build and smoke jobs live in build-and-smoke.yml.
+on:
+  push:
+    branches: [epic-1]
+  workflow_dispatch:
+
+concurrency:
+  group: test-builds-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    uses: ./.github/workflows/build-and-smoke.yml

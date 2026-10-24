@@ -1,0 +1,29 @@
+[package]
+name = "mumcord-protocol"
+description = "Mumble protocol: TLS control channel, protobuf messages, UDP voice crypto"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+
+[dependencies]
+tokio.workspace = true
+rustls.workspace = true
+tokio-rustls.workspace = true
+bytes.workspace = true
+prost.workspace = true
+aes.workspace = true
+rand.workspace = true
+sha1.workspace = true
+thiserror.workspace = true
+tracing.workspace = true
+
+[dev-dependencies]
+rcgen.workspace = true
+
+[build-dependencies]
+prost-build.workspace = true
+protoc-bin-vendored.workspace = true
+
+[lints]
+workspace = true

@@ -1,6 +1,6 @@
 # Mumcord · Epic 1 – Foundation · Specification
 
-> Status: Final (brainstorming completed) · As of: 2026-10-24
+> Status: Final (brainstorming completed) · As of: 2026-10-24 · Revised 2026-10-24 (Addendum)
 > Sources: `specs/01-foundation-brainstorming.md` (no roadmap existed yet; this spec proposes it, see section 14)
 > Builds on: – (first specification; sets product vision, platforms and tech stack)
 
@@ -38,10 +38,10 @@ Epic 1 is delivered in two stages (Q2.1). Stage 1a must be complete and usable b
 
 ### 2.2 Out of scope / later
 - Anything server-side: companion services, server plugins, server configuration (Q1.13) – **never**, not just later.
-- Connecting to several servers at the same time; rich chat beyond what Mumble supports (reactions, link previews) (Q1.2).
-- Admin features: ACL/permission editing, bans, channel management (Q1.11) → Epic 3.
-- Global hotkeys beyond push-to-talk, full tray menu, notifications, import of official client settings → Epic 2.
-- Signed installers, auto-update, automatic opt-in crash reports → Epic 4 (Q4.2, Q4.9).
+- Connecting to several servers at the same time (read-along on all of them) → own epic after Epic 1, Epic 2 "Multi-server read-along" (QA.1); rich chat beyond what Mumble supports (reactions, link previews) (Q1.2).
+- Admin features: ACL/permission editing, bans, channel management (Q1.11) → Epic 4.
+- Global hotkeys beyond push-to-talk, full tray menu, import of official client settings → Epic 3 (message notifications moved into Epic 1, QA.16).
+- Signed installers, auto-update, automatic opt-in crash reports → Epic 5 (Q4.2, Q4.9).
 - Public server browser (Q5.3), whisper/shout (Q5.8).
 - Mobile apps and web version (Q1.4).
 - Exclusive-fullscreen in-game overlay via game hooking (Q3.10).
@@ -56,7 +56,7 @@ Mumcord enforces nothing itself; the server's ACLs decide. The client reflects p
 | Follow (listen to) a channel | ✅ if "Listen" permitted | ✅ if permitted | ✅ | Server ACL + listener limits |
 | Register own name | ✅ if "Register self" permitted | – | ✅ | Server ACL |
 | Set own avatar/comment | ✅ if permitted | ✅ | ✅ | Server ACL + size limits |
-| Move/kick/ban others, edit ACLs/channels | ❌ in Mumcord (Epic 3) | ❌ | ❌ in Mumcord (Epic 3) | – |
+| Move/kick/ban others, edit ACLs/channels | ❌ in Mumcord (Epic 4) | ❌ | ❌ in Mumcord (Epic 4) | – |
 | Per-person volume, local mute, history deletion | ✅ | ✅ | ✅ | Local only |
 
 ## 4. Functional requirements
@@ -66,42 +66,46 @@ Mumcord enforces nothing itself; the server's ACLs decide. The client reflects p
 - **FR-1.2** Identity step: create a new identity (self-signed client certificate, name chosen by the user) or import an existing one (PKCS#12 file, e.g. exported from the official client). The step reminds the user to back up the identity (Q1.6).
 - **FR-1.3** The identity certificate is stored in the OS secure storage (Q4.3). Settings offer "Export identity" (password-protected PKCS#12 file) and "Import identity" at any time.
 - **FR-1.4** Microphone step: choose input and output device, live level meter and "test playback" of the own voice with noise suppression applied.
-- **FR-1.5** Talk-mode step: voice activation preselected (Q3.3); push-to-talk selectable with key capture. On Wayland without a global-shortcuts interface, push-to-talk is shown as unavailable with an explanation and voice activation is suggested (Q4.11).
+- **FR-1.5** Talk-mode step: voice activation preselected (Q3.3); push-to-talk selectable with key or mouse-button capture (mouse buttons such as side buttons, QA.4; see FR-1.21). On Wayland without a global-shortcuts interface, keyboard push-to-talk is shown as unavailable with an explanation and voice activation is suggested (Q4.11); a mouse button can still be used if the Wayland mouse option (FR-1.21, FR-1.39) is enabled.
 - **FR-1.6** At the end of the wizard Mumcord offers to become the handler for `mumble://` links (Q5.4).
 
 ### 4.2 Servers & connection
 - **FR-1.7** Saved servers appear as icons in the server bar; "+" adds one by address, port (default 64738), username and optional password, or by pasting a `mumble://` link. Servers can be edited, reordered and removed.
 - **FR-1.8** Server passwords are stored in the OS secure storage (Q4.4), never in plain files.
-- **FR-1.9** Only one server is connected at a time. Clicking another saved server asks to disconnect from the current one first.
+- **FR-1.9** Only one server is connected at a time in Epic 1. Clicking another saved server asks to disconnect from the current one first. Connecting to several servers at once to read along is planned as its own epic after Epic 1 (Epic 2, QA.1).
 - **FR-1.10** On first connection to a server with an unknown or self-signed certificate, Mumcord shows the certificate fingerprint and asks whether to trust it; the decision is remembered. If a trusted server's certificate changes, a clear warning blocks the connection until the user decides.
-- **FR-1.11** Opening a `mumble://` link (from a browser or another app) starts Mumcord if needed, offers to save the server and connects, joining the channel in the link if present.
+- **FR-1.11** Opening a `mumble://` link (from a browser or another app) starts Mumcord if needed, offers to save the server and connects, joining the channel in the link if present; the link counts as an explicit Join (FR-1.14).
 - **FR-1.12** Servers 1.4 and newer are fully supported; older servers connect, and features they lack (notably following channels) are hidden with a short hint (Q3.2).
-- **FR-1.13** On connection loss Mumcord shows a "reconnecting…" bar, retries with increasing intervals, and on success rejoins the last channel and restores followed channels (Q3.6). The user can cancel; after a defined number of failed attempts it gives up and shows "Disconnected – Reconnect".
-- **FR-1.14** The last channel per server is remembered and rejoined on the next connection if permitted.
+- **FR-1.13** On connection loss Mumcord shows a "reconnecting…" bar, retries with increasing intervals, and on success restores the previous channel, the voice state (mute/deafen as before the drop) and followed channels (Q3.6, QA.2) – this continuity applies to automatic reconnects only. The user can cancel; after a defined number of failed attempts it gives up and shows "Disconnected – Reconnect".
+- **FR-1.14** Fresh connect = read-only (QA.2): on every fresh, user-initiated connect (including app start and server switch) the user lands in the server's default channel, self-muted and self-deafened; chat (including followed channels) works, voice does not. Other users see the user as present but deafened. Only an explicit Join of a channel (double-click, "Join" button, or a `mumble://` link with a channel path) enables voice: it leaves the read-only state and restores the user's last own mute/deafen setting (QA.7) – the self-mute/self-deafen state the user last chose while joined for voice, persisted across app restarts (default: neither muted nor deafened). If the user quit Mumcord while joined to a channel for voice, the next fresh connect to that server after app start shows a non-blocking prompt "You were in ‹channel› last time – Rejoin?" ("Rejoin" = explicit Join; "Not now"/ignore = stay read-only); no prompt if the channel is gone or the user was not joined for voice (QA.9). The last channel is no longer rejoined automatically on a fresh connect; it is remembered only for automatic reconnect after a dropped connection (FR-1.13). The read-only connect can be switched off with "Connect muted until I join a channel" (Settings → Voice, default on); when off, a fresh connect lands in the default channel with the last own mute/deafen setting applied right away (QA.22).
 
 ### 4.3 Channels & people
-- **FR-1.15** The channel list shows the server's channel tree (collapsible), with people under their channel, talking indicators, mute/deafen icons and an ear icon for listeners. Each channel appears once (Q2.4).
+- **FR-1.15** The channel list shows the server's channel tree (collapsible), with people under their channel, talking indicators and mute/deafen icons. People who only listen to a channel (channel listeners) are not shown in the channel list; they appear only in the member list with the listener marker (QA.11). Each channel appears once (Q2.4). Each person row shows the person's avatar (or a default avatar); while they talk, a green ring surrounds it (QA.6). Listener rows in the member list show only the listener marker, never voice state (talking, mute, deafen). Collapsed channels show a stack of up to 5 overlapping avatars plus "+N" instead of names; expanded channels with more than 5 people show the stack with a "Show all" toggle (threshold lowered from 10, QA.30). The stack sits on its own line under the channel name, with "+N" and "Show all" after the avatars (QA.31). People talking right now are moved to the front of the stack, with the green ring (QA.14). The channel list and the member list can be resized by dragging their border or with the keyboard (15rem–28rem, remembered); the number of stacked avatars adapts to the width (up to 5) (QA.29). The channel the user is joined to for voice is highlighted (green accent bar, speaker icon, bold name), distinct from the selected channel; no highlight while read-only (QA.18). For big servers: a "Jump to my channel" button, collapsed start above ~50 channels (top level and the path to the own channel expanded), reduced indent on deep trees with full names as tooltips, and a search field above the channel list filtering channels and people (QA.27).
 - **FR-1.16** Single-click a channel → shows its chat. Double-click or the "Join" button → enters the channel's voice (if permitted).
 - **FR-1.17** The member list shows the people in the selected channel, plus its listeners, with avatar, name, talking state and registered/unregistered marker.
-- **FR-1.18** Clicking a person opens a profile card: avatar, name, comment, and local controls: volume slider (0–200 %), local mute, "send private message".
-- **FR-1.19** Per-person volume and local mute are stored by the person's certificate hash per server and re-applied when they reappear, even after renaming (Q5.2). People without a certificate are only adjusted for the session.
-- **FR-1.20** The user can set their own avatar (image, scaled to the server's limit) and profile comment (Q5.7).
+- **FR-1.18** Clicking a person opens a profile card: avatar, name, comment, and local controls: volume slider (0–200 %), local mute, "send private message". Hovering a person (member list, channel list, chat avatar/name) for ~0.4 s, or focusing them with the keyboard, shows a read-only profile preview next to them (avatar, name, comment, registered marker, voice state); it stays while the pointer is on the person or the preview and Escape closes it; a click still opens the full card (QA.21). Right-clicking a person (or Shift+F10 / context-menu key) opens a menu with "View profile", "Mute for me"/"Unmute for me", an inline volume slider (0–200 %) and "Send private message"; for the user themselves only "View profile" (QA.32).
+- **FR-1.19** Per-person volume and local mute are stored by the person's certificate hash per server and re-applied when they reappear, even after renaming (Q5.2). People without a certificate are only adjusted for the session. A locally muted person's name is shown in red in the channel list and member list, together with the local-mute icon (QA.28).
+- **FR-1.20** The user can set their own avatar (image, scaled to the server's limit) and profile comment (Q5.7). Mumcord remembers the avatar per saved server (the hand-set one, otherwise the default avatar from FR-1.47) and sends it again on every connect when the server shows no avatar for the user – servers keep avatars only for registered users (QA.10). Registered users keep the server's copy; nothing is re-sent when the server already has an avatar.
 
 ### 4.4 Voice
-- **FR-1.21** Talk modes: voice activation (default) and push-to-talk (global key, also while another app is focused).
+- **FR-1.21** Talk modes: voice activation (default) and push-to-talk (global key or mouse button, also while another app is focused). Mouse buttons (QA.4): Windows, macOS (system Accessibility permission prompt) and X11 are supported natively. On Linux Wayland the desktop portal cannot capture mouse buttons, so Mumcord reads input devices directly (evdev); this path is OFF by default, is enabled by a setting (FR-1.39) and requires the user to be in the `input` group. It opens only mouse-type devices (BTN_LEFT capability, no keyboards), reacts only to the one configured button code and never logs input. If permission is missing, Mumcord shows the exact command (`sudo usermod -aG input $USER`, then log out and in again) and falls back gracefully (mouse button unavailable, nothing else affected). Keyboard push-to-talk on Wayland stays on the portal (Q4.11).
 - **FR-1.22** Self mute and self deafen via buttons in the user panel; deafen implies mute. States are sent to the server so others see them.
 - **FR-1.23** AI-based noise suppression and echo cancellation are on by default; automatic input gain keeps the voice level even (Q3.4). All three can be switched off in settings.
 - **FR-1.24** Audio quality is automatic: the highest bitrate the server allows, lowered automatically when packet loss rises, raised again when it recovers (Q3.5).
 - **FR-1.25** Playback uses an adaptive jitter buffer: minimal delay on stable connections, small extra buffer only when packets arrive unevenly (Q3.7).
 - **FR-1.26** Voice goes via UDP; if UDP is blocked, it falls back to tunnelling through the TCP connection automatically.
-- **FR-1.27** Short, subtle sounds for: someone joins/leaves your channel, self mute/unmute, self deafen/undeafen, new message in a followed channel or private chat. No text-to-speech (Q3.8). Sounds can be toggled per event.
+- **FR-1.27** Short, subtle sounds for: someone joins/leaves your channel, self mute/unmute, self deafen/undeafen, new message in a followed channel or private chat, a short "hang up" sound when the user disconnects (QA.19), and a short join sound when the user joins a channel for voice (QA.23). No text-to-speech (Q3.8). Sounds can be toggled per event.
 
 ### 4.5 Text chat
 - **FR-1.28** Each channel and each private conversation has a chat view with input field. Sending to a channel requires the server's "Text message" permission; denials are shown inline.
 - **FR-1.29** Received messages are displayed with formatting, links and small inline images, sanitized so no scripts, external loads or unsafe markup run (Q5.5). Links open in the system browser after a click.
 - **FR-1.30** The user writes with Markdown shortcuts (bold, italic, code, links) and can paste or drop images; Mumcord converts to Mumble-compatible HTML, scales/compresses images to the server's message size limit and refuses too-large content with a clear message.
-- **FR-1.31** **Follow channels** (Q3.1): any channel can be followed via a "Follow" button. Mumcord starts listening to it with its audio muted locally, so its messages arrive without joining. Followed channels show unread badges. Unfollowing stops listening. If the server denies listening or the listener limit is reached, the user gets a clear message.
+- **FR-1.31** **Follow channels** (Q3.1): any channel can be followed via a "Follow" button. Mumcord starts listening to it with its audio muted locally, so its messages arrive without joining. Followed channels show unread badges. Unfollowing stops listening. If the server denies listening or the listener limit is reached, the user gets a clear message. A star button on each channel row in the channel list follows/unfollows it directly (outlined on hover/focus, filled while followed); the server's context menu in the channel list offers "Follow all channels" and "Unfollow all channels" – follow all skips channels the user may not listen to, stops at the server's listener limit and reports how many were followed (QA.13). Unread counts apply to every channel the user receives messages from while its chat is not on screen, including the own channel; opening the chat marks them read (QA.33).
 - **FR-1.32** All received and sent messages (channels, followed channels, private chats) are stored locally and shown when the chat is reopened, including after restart (Q4.5). History only contains what Mumcord actually received.
+- **FR-1.48a** Chat layout (QA.20): each message group shows the sender's avatar on the left, name and time on the first line, and the text indented after the avatar; consecutive messages from the same sender within a few minutes are grouped without repeating avatar and name, with the same indent. Settings → Appearance → "Message display" offers Cozy (this layout, default) or Compact (no avatars, time + name + text on one line, tighter spacing, continuation lines slightly indented) (QA.25).
+- **FR-1.48b** Pinned info in the chat (QA.15): the top of each channel's chat shows a pinned, collapsible box with the channel description (fetched on demand if the server only sends a hash); the server welcome message (MOTD) is pinned in the root channel's chat and in the default channel's chat when that channel has no description. Long texts start collapsed ("Show more"); content is sanitized like chat HTML; no box when there is no text; the box updates when the description changes.
+- **FR-1.48c** Message notifications (QA.16): for new messages in any channel the user receives (own channel, followed channels) and in private chats, except the chat currently on screen, Mumcord shows an in-app toast (bottom right: channel, sender, short sanitized preview) and, when the window is in the background or minimized, a system desktop notification. Clicking either opens that chat and brings the window to the front. Bursts are grouped per channel. Both can be switched off in Settings (Sounds & notifications). No message content in logs.
+- **FR-1.48d** Autostart (QA.17): the first-start wizard asks "Start Mumcord when I log in" (default off) and Settings offers the same switch plus "Start minimized" (default on). It uses the OS mechanism (Linux XDG autostart entry, Windows login item, macOS login item); when started this way with "Start minimized", Mumcord goes straight to the tray. Turning it off removes the entry.
 - **FR-1.33** History controls: "Clear history" per channel/private chat, per server and all; "Save history" switch per server (default on).
 
 ### 4.6 Registration
@@ -112,7 +116,7 @@ Mumcord enforces nothing itself; the server's ACLs decide. The client reflects p
 - **FR-1.36** UI languages: English, Spanish, German; defaults to the OS language if supported, else English; switchable in settings without restart (Q2.7).
 - **FR-1.37** A tray icon shows the connection and talk state and offers "Show", "Mute", "Deafen", "Quit".
 - **FR-1.38** Closing the window while connected asks once "Minimize to tray or quit?" with "Remember my choice"; changeable in settings (Q2.8).
-- **FR-1.39** Settings screen (Discord-style, sections in a side list): Identity, Audio, Voice, Chat & history, Appearance, Language, Sounds, Overlay & positional audio, Diagnostics, About (incl. licenses).
+- **FR-1.39** Settings screen (Discord-style, sections in a side list): Identity (name, certificate, profile with "Default avatar" and "Send to new servers automatically", FR-1.47), Audio, Voice (incl. the toggle "Allow mouse buttons (requires input group)", Linux Wayland only, default OFF, with a plain-language warning that input-group membership lets any program of the user read all input devices including the keyboard; FR-1.21, QA.4), Chat & history, Appearance, Language, Sounds, Overlay & positional audio, Diagnostics, About (incl. licenses).
 - **FR-1.40** "Save diagnostic file" in Diagnostics writes a file with app version, OS, audio devices, connection statistics and recent log lines – without chat contents, passwords, certificates or personal data (Q4.7).
 
 ### 4.8 Stage 1b – positional audio
@@ -124,6 +128,15 @@ Mumcord enforces nothing itself; the server's ACLs decide. The client reflects p
 - **FR-1.44** The overlay is a separate, transparent, click-through, always-on-top window showing who is talking (avatar + name), and optionally the whole current channel (Q3.10). It does not hook into games.
 - **FR-1.45** Position, size, opacity and content are configurable; the overlay can be toggled from the tray and settings.
 - **FR-1.46** Where the OS or desktop doesn't allow staying on top (some Linux desktops) or a game runs in exclusive fullscreen, settings explain the limitation.
+- **FR-1.49** Link previews (QA.34, stage 1b): links in messages get a preview card (title, description, image, "Open in browser"). Mumcord fetches the page metadata itself; on by default, switchable in the first-start wizard and in settings; fetched data is sanitized and cached; no preview for private/LAN addresses.
+- **FR-1.50** YouTube and Twitch links show an embedded player card with title and "Open in browser"; the player loads only after a click (QA.34).
+- **FR-1.51** Mentions (QA.34): typing `@` in the input autocompletes names of people on the server; a message mentioning the user is highlighted and notifies them even in otherwise quiet channels; the text stays plain `@Name` for other clients.
+- **FR-1.52** GIFs via Tenor (QA.34): a GIF button opens a Tenor search; the chosen GIF is sent as an image link/embed compatible with Mumble's image rules. The Tenor API key comes from a CI secret at build time; builds without a key hide the button.
+- **FR-1.53** Code (QA.34): ``` fenced code blocks (optional language) and `inline code` render with syntax highlighting; other clients see the text.
+- **FR-1.54** Formatting in the input (QA.34): a small toolbar plus shortcuts (Ctrl+B bold, Ctrl+I italic, Ctrl+Shift+X strikethrough, Ctrl+E code, Ctrl+K link inside the input) that insert Markdown.
+- **FR-1.55** External images (QA.35, stage 1b): external images in messages and direct image links (png, jpg, gif, webp) are shown inline, scaled, click to enlarge, with "Open in browser"; loaded via the backend with size and type limits, never from private/LAN addresses; controlled by the same switch as link previews (FR-1.49). With the switch off, AC-1.13 behavior applies.
+- **FR-1.47** Default avatar (QA.3): in Settings → Identity/Profile the user can set (and clear) a default avatar. It is stored locally in the app data directory, scaled to a sensible size (e.g. 128×128 PNG). The first time the user connects to a saved server and has no avatar there yet, and "Send to new servers automatically" is on (default ON), Mumcord sends it once, scaled/compressed to the server's image limits like FR-1.20; if that is impossible it is skipped with a notice. Each saved server remembers `default_avatar_sent`, so it is sent only once per server – never again, even if the user later removes or replaces the avatar on that server manually. Switching the setting off stops automatic sending; the default avatar can still be applied manually as the own avatar (FR-1.20). Exception (QA.10): when the server keeps no avatar for the user (unregistered), the remembered per-server avatar (FR-1.20) is sent again on every connect.
+- **FR-1.48** Compatibility mode for push-to-talk on Linux Wayland (QA.5): Settings → Voice has a switch "Compatibility mode (like TeamSpeak)", shown only on Linux Wayland, default OFF. When on, Mumcord starts through XWayland (takes effect after an app restart, which the switch offers) and uses its X11 push-to-talk path for keyboard keys and mouse buttons, with no portal dialog and no `input` group. The switch explains in plain language that the desktop decides which input X11 apps may see (on KDE: System Settings → Legacy X11 App Support; by default only key combinations and modifier keys, mouse buttons only if enabled there) and that this is less isolated than the modern path. When off, the modern path applies (portal for keys, FR-1.21 evdev option for mouse buttons).
 
 ## 5. UI & UX
 
@@ -161,10 +174,11 @@ flowchart LR
 ```
 
 - **Server bar** (left): saved servers as round icons, connected one highlighted, "+" to add.
-- **Channel list**: tree, unread badge (•2) on followed channels, "Join" button on hover.
+- **Channel list**: tree, unread badge (•2) on followed channels, "Join" button on hover. After a fresh connect the default channel is highlighted as current but not "joined for voice" (read-only state, QA.2); the user panel shows mute and deafen active and a hint "Read-only – Join a channel to talk". Join restores the last own mute/deafen setting (QA.7). While connected, the user panel also shows a "Disconnect" button (hang-up icon) next to mute and deafen (QA.8). The user panel uses two rows – avatar, full own name (never truncated to a few letters; wraps or shrinks slightly, tooltip with the full name) and connection status on top, evenly spaced buttons below – with no separator line, set off by its background; the microphone button shows the live input level as a rising fill while speaking (QA.26).
 - **Chat**: header with channel name and Follow toggle; message list; input with image button.
 - **Member list**: people in the channel, then listeners.
 - **User panel** (bottom of channel list): own avatar/name, mute, deafen, settings.
+- **Settings → Identity → Profile**: "Default avatar" (preview, Choose…, Clear) and toggle "Send to new servers automatically" (QA.3, FR-1.47); a notice appears if the server's limits prevent sending.
 - A thin bar above the chat shows "Reconnecting…" or "Connected via TCP (UDP blocked)" when relevant.
 
 ### 5.3 First-start wizard (Q2.6)
@@ -243,9 +257,11 @@ erDiagram
 | | address, port | text, int | yes | Port default 64738 |
 | | username | text | yes | Defaults to identity name |
 | | password | secret | no | OS secure storage (Q4.4) |
-| | last_channel | channel path | no | For rejoin (FR-1.14) |
+| | last_channel | channel path | no | Used for automatic reconnect only (FR-1.13), not on fresh connect (FR-1.14, QA.2) |
 | | save_history | bool | yes | Default true (FR-1.33) |
 | | sort_order | int | yes | Server bar order |
+| | default_avatar_sent | bool | yes | Default false; set true once the default avatar was sent (or skipped as not needed) – never reset by manual avatar changes (FR-1.47) |
+| | avatar | blob | no | Avatar remembered for this server (hand-set or the sent default avatar, PNG up to 128×128); empty = none or removed by hand. Re-sent on connect when the server shows no avatar for the user (FR-1.20, QA.10) |
 | TrustedCert | fingerprint | text | yes | Server certificate trust decision (FR-1.10) |
 | FollowedChannel | channel_path | text | yes | Path, so it survives channel ID changes where possible |
 | | last_read_at | datetime | yes | For unread badges |
@@ -256,7 +272,7 @@ erDiagram
 | PersonSetting | person_cert_hash | text | yes | Key (Q5.2) |
 | | volume | int 0–200 | yes | Percent |
 | | local_mute | bool | yes | |
-| Settings | theme, language, talk_mode, ptt_key, input/output device, noise_suppression, echo_cancellation, auto_gain, sounds per event, close_behaviour, overlay options, positional options, enabled plugins | various | – | Single settings record |
+| Settings | theme, language, talk_mode, ptt_key, input/output device, noise_suppression, echo_cancellation, auto_gain, sounds per event, close_behaviour, overlay options, positional options, enabled plugins, default_avatar_path (file in app data dir, optional), send_default_avatar (bool, default true) | various | – | Single settings record |
 
 ```mermaid
 stateDiagram-v2
@@ -287,6 +303,7 @@ Talk state (per own user): `Silent → Talking` (VAD/PTT), overridden by `Muted`
 - **Latency:** ≤ 150 ms mouth-to-ear excluding network transit; audio processing adds ≤ 30 ms.
 - **Resources:** idle while connected ≤ 2 % CPU and ≤ 250 MB RAM on a mid-range PC; talking with noise suppression ≤ 5 % CPU.
 - **Security:** TLS always; server certificate pinning on first use with change warning (FR-1.10); all server-provided content (names, comments, messages, images) treated as untrusted and sanitized; links never auto-open. The Mumble protocol's UDP encryption (OCB2-AES128) is used as specified for compatibility – a known weakness of the protocol, not changeable client-side.
+- **Security – mouse buttons on Wayland (QA.4):** the evdev path needs `input` group membership, which lets any program running as the user read all input devices, including the keyboard. Therefore it is opt-in (default OFF) with a warning in the toggle; Mumcord opens only mouse-type devices, evaluates only the one configured button code, keeps no input history and never writes input to logs or diagnostic files.
 - **Privacy (GDPR):** no telemetry or automatic reports in Epic 1 (Q4.7, Q4.9); chat history only local and deletable (Q4.5); no personal data, chat contents or audio in logs or diagnostic files.
 - **Accessibility:** WCAG 2.2 AA (Q4.12).
 - **Platforms:** Linux (X11 and Wayland; KDE and GNOME tested), Windows 10/11, macOS (current and previous major version) (Q1.4).
@@ -296,7 +313,7 @@ Talk state (per own user): `Silent → Talking` (VAD/PTT), overridden by `Muted`
 
 - **Code hosting & CI:** GitHub, GitHub Actions (Q4.10). Every push builds and tests on Linux, Windows and macOS; tests include the automated integration tests against a containerized Mumble server.
 - **Artifacts (Epic 1):** unsigned test builds – Linux AppImage, Windows installer (unsigned), macOS app bundle/DMG (unsigned) (Q4.2). Windows and macOS show security warnings on first launch; documented in the README.
-- **No auto-update, signing or crash-report service** in Epic 1 (→ Epic 4).
+- **No auto-update, signing or crash-report service** in Epic 1 (→ Epic 5).
 - **License:** MIT; `THIRD_PARTY_NOTICES` file with the copyright and license texts of Mumble (BSD, for `Mumble.proto` and the loaded game plugins) and all bundled libraries; shown in Settings → About (Q4.6). README describes Mumcord as "compatible with Mumble" and "not affiliated with the Mumble project"; no Mumble logo.
 - **Test server setup:** a reproducible local Mumble server (Docker, official `mumble-server` image, versions 1.4 and 1.5) plus scripted bot clients for multi-user tests; documented one-command start.
 
@@ -310,12 +327,12 @@ Unless stated otherwise: a fresh Mumcord install, a local test server (1.5) runn
 - **AC-1.3** Wizard step 2 → speak → level meter moves; "Test" plays back the own voice.
 - **AC-1.4** Add server via "+" (address, port, username, password) → it appears in the server bar → restart Mumcord → server still there, password not visible in any settings file.
 - **AC-1.5** Connect to a test server with a self-signed certificate → trust dialog with fingerprint → accept → connected; replace the server certificate → reconnect → warning blocks the connection.
-- **AC-1.6** Click a `mumble://localhost/Raid` link in a browser → Mumcord opens, connects and joins "Raid".
+- **AC-1.6** Click a `mumble://localhost/Raid` link in a browser → Mumcord opens, connects and joins "Raid" (the link counts as an explicit Join: voice is enabled there, Bot sees the user in "Raid" not deafened).
 - **AC-1.7** Connected → channel list shows the full tree and all bot users in the correct channels; Bot talks → talking indicator lights up for Bot within 200 ms.
 - **AC-1.8** Single-click "Raid" → its chat shows, user stays in current channel; double-click → user appears in "Raid" (also seen by Bot).
 - **AC-1.9** Voice activation: speak → Bot receives audio; silence → no audio sent. Switch to push-to-talk → audio is only sent while the key is held, also while another app is focused (Linux: KDE/GNOME Wayland via portal; X11; Windows; macOS).
 - **AC-1.10** Self mute → Bot sees muted state and receives no audio; self deafen → no audio heard, deafen icon shown to Bot.
-- **AC-1.11** Bot plays a reference recording with keyboard and fan noise to Mumcord's input → transmitted audio has the noise strongly reduced (automated level check; 🎧 manual listening check).
+- **AC-1.11** After an explicit Join (also via a `mumble://` link with channel path), Bot plays a reference recording with keyboard and fan noise to Mumcord's input → transmitted audio has the noise strongly reduced (automated level check; 🎧 manual listening check).
 - **AC-1.12** Set Bot's volume to 50 % and local mute → Bot renames itself and reconnects → volume and mute are still applied.
 - **AC-1.13** Bot sends a channel message with bold text, a link and a small image → shown formatted; a message containing a `<script>` tag or external image is shown without executing/loading it; clicking the link opens the system browser.
 - **AC-1.14** Send `**bold**` and a pasted image → Bot (official-client-compatible HTML) receives bold text and the image; an image above the server's limit is compressed or refused with a message.
@@ -325,7 +342,7 @@ Unless stated otherwise: a fresh Mumcord install, a local test server (1.5) runn
 - **AC-1.18** Private message from Bot → private chat opens with notification sound; reply reaches Bot.
 - **AC-1.19** Unregistered user → "Register on this server" → dialog with backup hint → confirm → user shows as registered (also for Bot); option no longer offered.
 - **AC-1.20** Set own avatar and comment → Bot sees them; Bot's avatar and comment are visible in member list and profile card.
-- **AC-1.21** Kill the server connection (stop/restart server container) → "Reconnecting…" bar → server back → user is in the last channel again and followed channels are restored.
+- **AC-1.21** Kill the server connection (stop/restart server container) → "Reconnecting…" bar → server back → user is in the last channel again, with the same mute/deafen state as before, and followed channels are restored.
 - **AC-1.22** Block UDP to the server → voice still works; bar shows "Connected via TCP".
 - **AC-1.23** Add 10 % simulated packet loss → audio continues without dropouts longer than brief glitches; bitrate shown in connection info decreases; removing loss restores it.
 - **AC-1.24** Bot joins/leaves the channel → subtle sound plays; no text-to-speech at any time.
@@ -335,12 +352,23 @@ Unless stated otherwise: a fresh Mumcord install, a local test server (1.5) runn
 - **AC-1.28** "Save diagnostic file" → file contains version, OS, devices, connection stats; contains no chat text, passwords or certificate data.
 - **AC-1.29** Settings → About lists MIT license and third-party notices including Mumble's BSD notice.
 - **AC-1.30** CI on GitHub Actions produces Linux, Windows and macOS builds; each starts and connects to the test server.
+- **AC-1.35** Fresh connect (first connect, app restart, or reconnect via "Disconnected – Reconnect" button) to a server where the user was last in "Raid" → user lands in the default channel, self-muted and self-deafened; Bot sees the user present with a deafen icon and hears nothing from the user; chat works. Double-click "Raid" → the last own mute/deafen setting is restored: if the user was last unmuted, Bot sees the user in "Raid" not deafened and hears them (voice activation); if the user had muted themselves before (also before an app restart), they stay muted but not deafened-by-read-only, and Bot hears nothing until they unmute (QA.7). (added 2026-10-24, Addendum QA.2)
+- **AC-1.36** Settings → Identity: choose a default avatar, "Send to new servers automatically" is on. Connect to a fresh server where the user has no avatar → Bot sees the user's avatar. Remove the avatar manually on that server, disconnect and reconnect → the default avatar is not sent again. Switch the toggle off, then connect to another fresh server → Bot sees no avatar. (added 2026-10-24, Addendum QA.3)
+- **AC-1.37** In the talk-mode step or Settings → Voice, capture a mouse side button as push-to-talk. On X11, Windows and macOS the Bot hears the user only while the button is held. On Linux Wayland with "Allow mouse buttons (requires input group)" switched on and the user in the `input` group, the same works. Without the permission (toggle on, user not in the group) the settings show the command `sudo usermod -aG input $USER` plus the log-out/in hint, the app does not crash and other talk modes keep working. (added 2026-10-24, Addendum QA.4)
+- **AC-1.38** On Linux Wayland (KDE), switch on Settings → Voice → "Compatibility mode (like TeamSpeak)" and restart as offered. Capture a key combination (e.g. Ctrl+Alt+P) as push-to-talk without any KDE dialog; with another app focused, the Bot hears the user only while it is held. With KDE's legacy X11 setting allowing mouse buttons, the same works for a mouse side button without `input` group membership. Switching it off and restarting returns to the modern path. (added 2026-10-24, Addendum QA.5)
 
 **Stage 1b**
 - **AC-1.31** Enable positional audio; two Bots feed Mumble Link positions (left and right of the listener) → voices are heard from the matching side and get quieter with distance (automated channel-level check; 🎧 manual check).
 - **AC-1.32** Enable an official Mumble game plugin with a test harness simulating the game → settings show the plugin as active and positions are applied.
 - **AC-1.33** Enable the overlay → floating window shows the talking Bot's avatar and name while it talks; it stays on top of a borderless-fullscreen app, lets clicks pass through, and position/opacity changes are kept after restart.
 - **AC-1.34** On a desktop where on-top isn't guaranteed, settings show the explanation text.
+- **AC-1.39** Bot posts a web link → a preview card with title and "Open in browser" appears; with previews switched off (wizard or settings) only the plain link shows and no request is made.
+- **AC-1.40** Bot posts a YouTube and a Twitch link → player cards with title appear; nothing loads until the user clicks play; "Open in browser" opens the system browser.
+- **AC-1.41** Typing `@Bo` suggests "Bot"; sending puts `@Bot` in the message; when Bot mentions the user, the message is highlighted and a notification appears.
+- **AC-1.42** In a build with a Tenor key, the GIF button searches Tenor and sends the chosen GIF so Bot receives it; in a build without a key the button is hidden.
+- **AC-1.43** A message with a ```js code block renders highlighted; Bot receives the plain text.
+- **AC-1.44** Ctrl+B / Ctrl+I / toolbar buttons insert bold/italic Markdown around the selection; the sent message renders formatted.
+- **AC-1.45** Bot sends a message with an external image and a direct .png link → both appear inline and enlarge on click; with previews switched off neither is loaded (no request made).
 
 ## 12. Decision log
 
@@ -398,12 +426,46 @@ Unless stated otherwise: a fresh Mumcord install, a local test server (1.5) runn
 | Q5.6 | Register button in user menu | |
 | Q5.7 | Show and set avatars/comments | |
 | Q5.8 | Whisper/shout later | |
+| QA.1 | Multi-server read-along = own epic after Epic 1 | Addendum 2026-10-24; FR-1.9, section 14 |
+| QA.2 | Fresh connect read-only (default channel, muted + deafened); voice only after explicit Join; reconnect restores channel + voice state | Addendum 2026-10-24; FR-1.13/1.14, AC-1.35 |
+| QA.3 | Default avatar set in settings, sent once per server on first connect (if no avatar there); automatic sending switchable (default ON) | Addendum 2026-10-24; FR-1.47, AC-1.36 |
+| QA.4 | Mouse buttons as push-to-talk: native on Windows/macOS/X11; on Wayland via evdev, opt-in (default OFF), needs `input` group, security warning, graceful fallback | Addendum 2026-10-24; FR-1.5/1.21/1.39, section 9, AC-1.37 |
+| QA.5 | Push-to-talk compatibility mode on Linux Wayland (XWayland + X11 path, like TeamSpeak), opt-in switch, default stays the modern path | Addendum 2026-10-24; FR-1.48, AC-1.38 |
+| QA.6 | Channel list person rows: avatar with a green ring while talking; listener rows without voice state | Addendum 2026-10-24; FR-1.15 |
+| QA.7 | Join after a read-only connect restores the last own mute/deafen setting (persisted) instead of always clearing it | Addendum 2026-10-24; FR-1.14, section 6, AC-1.35 |
+| QA.8 | Visible "Disconnect" button in the user panel next to mute/deafen | Addendum 2026-10-24; section 6 |
+| QA.9 | After quitting while joined, the next connect after app start offers to rejoin the last channel (non-blocking prompt) | Addendum 2026-10-24; FR-1.14 |
+| QA.10 | Avatar remembered per saved server and re-sent on connect when the server has none (unregistered users) | Addendum 2026-10-24; FR-1.20, FR-1.47 |
+| QA.11 | Channel listeners hidden from the channel list, shown only in the member list | Addendum 2026-10-24; FR-1.15 |
+| QA.13 | Star button per channel row to follow/unfollow; "Follow all / Unfollow all channels" in the server context menu, respecting the listener limit | Addendum 2026-10-24; FR-1.31 |
+| QA.14 | Avatar stack (5 + "+N") for collapsed or crowded (>10) channels, talking people in front | Addendum 2026-10-24; FR-1.15 |
+| QA.15 | Pinned channel description / server welcome message at the top of the chat | Addendum 2026-10-24; FR-1.48b |
+| QA.16 | In-app toast + desktop notification for new messages in all received channels and private chats (not the open chat), click opens the chat; grouped; switchable | Addendum 2026-10-24; FR-1.48c, out of scope list |
+| QA.17 | Autostart at login (wizard + settings, default off), start minimized to tray | Addendum 2026-10-24; FR-1.48d |
+| QA.18 | Voice channel highlighted in the channel list, distinct from the selected channel | Addendum 2026-10-24; FR-1.15 |
+| QA.19 | "Hang up" sound on user-initiated disconnect, switchable | Addendum 2026-10-24; FR-1.27 |
+| QA.20 | Discord-style chat: avatar per message group, indented text, grouping of consecutive messages | Addendum 2026-10-24; FR-1.48a |
+| QA.21 | Profile preview on hover/focus next to the person; click opens the full card | Addendum 2026-10-24; FR-1.18 |
+| QA.22 | Read-only connect switchable ("Connect muted until I join a channel", default on) | Addendum 2026-10-24; FR-1.14 |
+| QA.23 | Join sound when the user joins a channel for voice, switchable | Addendum 2026-10-24; FR-1.27 |
+| QA.24 | Design refresh after the website: indigo/cream/violet, gradient only on highlights, website fonts, peach links, green ring with glow | Addendum 2026-10-24; section 5 (design) |
+| QA.25 | Chat message display Cozy (default) / Compact in Appearance settings | Addendum 2026-10-24; FR-1.48a |
+| QA.26 | User panel in two rows, name never cut off, no separator line, live input level fill in the mic button | Addendum 2026-10-24; section 6 |
+| QA.27 | Big servers: jump to my channel, collapsed start above ~50 channels, readable deep names, search field | Addendum 2026-10-24; FR-1.15 |
+| QA.28 | Locally muted people: red name plus local-mute icon in channel and member list | Addendum 2026-10-24; FR-1.19 |
+| QA.29 | Resizable channel list and member list (15–28rem, remembered), avatar stack adapts to width | Addendum 2026-10-24; FR-1.15 |
+| QA.30 | Avatar stack on expanded channels from 6 people (was more than 10) | Addendum 2026-10-24; FR-1.15 |
+| QA.31 | Avatar stack on its own line under the channel name | Addendum 2026-10-24; FR-1.15 |
+| QA.32 | Context menu on people: view profile, local mute, volume slider, private message | Addendum 2026-10-24; FR-1.18 |
+| QA.33 | Unread count also for the own channel while its chat is not on screen | Addendum 2026-10-24; FR-1.31 |
+| QA.34 | Stage 1b chat extras: link previews (default on, switchable in wizard/settings), YouTube/Twitch player cards, @mentions with autocomplete, Tenor GIFs (key via CI secret), ``` code highlighting, formatting toolbar/shortcuts | Addendum 2026-10-24; FR-1.49–1.54, AC-1.39–1.44 |
+| QA.35 | Stage 1b: external images and image links shown inline, same privacy switch as link previews | Addendum 2026-10-24; FR-1.55, AC-1.45 |
 
 ## 13. Open points & risks
 
 - **Epic size:** Epic 1 is large (full chat, registration, WCAG AA, stage 1b gaming features). Mitigation: strict 1a/1b staging; 1a is usable on its own.
 - **Official game plugins (Q3.9):** compatibility with Mumble's plugin interface across versions, per-platform plugin builds, and anti-cheat flags for memory-reading plugins. Fallback: Mumble Link only.
-- **Wayland:** global push-to-talk depends on the desktop's global-shortcuts portal; overlay on-top behaviour not guaranteed on every compositor.
+- **Wayland:** global push-to-talk depends on the desktop's global-shortcuts portal; overlay on-top behaviour not guaranteed on every compositor. Mouse-button push-to-talk on Wayland needs the evdev path and `input` group membership (QA.4): a security trade-off, mitigated by opt-in, device filtering and no logging; users who decline can use a keyboard key.
 - **Listening limits:** servers may deny "Listen" or set low listener limits; following then degrades to history only.
 - **Noise suppression quality vs. CPU:** library choice to be validated against the CPU budget (section 9).
 - **UI automation on macOS:** Tauri's WebDriver-based testing doesn't cover macOS; macOS UI checks may need a different tool or manual verification.
@@ -417,8 +479,9 @@ No `specs/roadmap.md` exists yet. This brainstorming proposes it:
 | Epic | Title | Content |
 |---|---|---|
 | 1 | Foundation | This spec (stages 1a + 1b) |
-| 2 | Comfort & polish | Global hotkeys beyond PTT, full tray menu, desktop notifications, import from the official client, whisper/shout (Q5.8), public server browser (Q5.3) |
-| 3 | Admin features | ACL/permission editing, bans, channel management – completes "full replacement" (Q1.3) |
-| 4 | Release & distribution | Signed installers, auto-update, opt-in crash reports (Q4.9), store/package listings |
+| 2 | Multi-server read-along | Connect to several servers at once and read along on all of them (QA.1) |
+| 3 | Comfort & polish | Global hotkeys beyond PTT, full tray menu, desktop notifications, import from the official client, whisper/shout (Q5.8), public server browser (Q5.3) |
+| 4 | Admin features | ACL/permission editing, bans, channel management – completes "full replacement" (Q1.3) |
+| 5 | Release & distribution | Signed installers, auto-update, opt-in crash reports (Q4.9), store/package listings |
 
-Later candidates: multi-server connections, mobile apps (Android/iOS), recording. Creating `specs/roadmap.md` from this table needs the user's go-ahead.
+Renumbering (QA.1): Epic 2 is now Multi-server read-along; Comfort & polish, Admin and Release move to Epics 3, 4 and 5. Later candidates: mobile apps (Android/iOS), recording. Creating `specs/roadmap.md` from this table needs the user's go-ahead.

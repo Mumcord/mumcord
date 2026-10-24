@@ -1,0 +1,126 @@
+/* Avatar stack on its own line under a channel row (QA.14, QA.29). Kept apart from channels.css on purpose. */
+.avatar-stack {
+  /* The ring between avatars takes the sidebar background, so it reads as a gap. */
+  --stack-ring: var(--color-bg-sidebar);
+
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  isolation: isolate;
+}
+
+.avatar-stack__item {
+  position: relative;
+  display: inline-flex;
+  border-radius: var(--radius-full);
+}
+
+/* Each avatar (and the chip) covers about 35% of the previous one. */
+.avatar-stack > * + * {
+  margin-left: calc(-0.35 * 1.5rem);
+}
+
+.avatar-stack__item > .avatar {
+  box-shadow: 0 0 0 2px var(--stack-ring);
+}
+
+.avatar-stack__more {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 1.5rem;
+  height: 1.5rem;
+  padding: 0 var(--space-1);
+  border-radius: var(--radius-full);
+  box-shadow: 0 0 0 2px var(--stack-ring);
+  background: var(--color-bg-elevated);
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-bold);
+}
+
+/* Generated, so the digits are not treeitem text (WCAG 2.5.3); the stack's label says it. */
+.avatar-stack__more::before {
+  content: attr(data-more);
+}
+
+.avatar-stack__toggle {
+  flex: none;
+  /* WCAG 2.2 target size: at least 24px high; the 2rem line has room for it. */
+  min-height: 1.5rem;
+  padding: 0 var(--space-2);
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-full);
+  background: var(--color-bg-elevated);
+  color: var(--color-text);
+  font-size: var(--font-size-xs);
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.avatar-stack__line {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  /* Fixed height (the talking ring included) so avatars coming and going never shift the tree. */
+  height: 2rem;
+  overflow: hidden;
+  /* Indented like the channel's people would be: one tree level plus the row padding. */
+  padding: 0 var(--space-2) 0 calc(var(--space-4) + var(--space-2));
+}
+
+.avatar-stack__toggle::before {
+  content: attr(data-label);
+}
+
+.avatar-stack__toggle:hover {
+  background: var(--color-bg-hover);
+}
+
+.avatar-stack__toggle:focus-visible {
+  outline: var(--focus-ring-width) solid var(--color-focus);
+  outline-offset: 1px;
+}
+
+/* Talking people sit at the front of the stack; their ring stays whole above the next avatar. */
+.avatar-stack__item:has(.avatar[data-talking="true"]) {
+  z-index: 1;
+}
+
+/* Status badge on a stacked avatar (muted, deafened, …), standing in for the row's status icons.
+   Bottom left: the next avatar covers this one's right side. Above talking avatars (z-index 1)
+   by DOM order, so a talking neighbour never hides it. */
+.avatar-stack__badge {
+  position: absolute;
+  bottom: -0.125rem;
+  left: -0.125rem;
+  z-index: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 0.875rem;
+  height: 0.875rem;
+  border-radius: var(--radius-full);
+  box-shadow: 0 0 0 1px var(--stack-ring);
+  background: var(--color-bg-elevated);
+  color: var(--color-text-muted);
+}
+
+.avatar-stack__badge > .person-icon {
+  width: 0.625rem;
+  height: 0.625rem;
+}
+
+/* Imposed by the server or an admin: red, like the row's server chip. */
+.avatar-stack__badge:is(
+  [data-state="serverDeafened"],
+  [data-state="serverMuted"],
+  [data-state="suppressed"]
+) {
+  color: var(--color-danger);
+}
+
+.avatar-stack__badge[data-state="localMuted"] {
+  color: var(--color-local-muted);
+}

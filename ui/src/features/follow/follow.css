@@ -1,0 +1,179 @@
+.follow-toggle[aria-pressed="true"] {
+  color: var(--color-accent-text);
+}
+
+.follow-hint,
+.follow-error {
+  margin: 0;
+  font-size: var(--font-size-sm);
+}
+
+.follow-hint {
+  color: var(--color-text-muted);
+}
+
+.follow-error {
+  color: var(--color-danger);
+}
+
+.unread-badge {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  gap: var(--space-1);
+  padding: 0 var(--space-2);
+  border-radius: var(--radius-full);
+  /* Logo gradient: reserved for highlights (QA.24); --color-on-accent passes on every stop. */
+  background: var(--gradient-accent);
+  color: var(--color-on-accent);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-bold);
+}
+
+/* Generated, so the digits are not badge text: visible text must be part of the name (WCAG 2.5.3). */
+.unread-badge::before {
+  content: attr(data-count);
+}
+
+.direct-messages {
+  padding: var(--space-2);
+}
+
+.direct-messages h2 {
+  margin: 0 0 var(--space-1);
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+  text-transform: uppercase;
+}
+
+.direct-messages ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.direct-messages__item {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  min-height: 2rem;
+  padding: var(--space-1) var(--space-2);
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--color-text);
+  text-align: left;
+  cursor: pointer;
+}
+
+.direct-messages__item:hover {
+  background: var(--color-bg-hover);
+}
+
+/* Same violet selection bar as the channel tree; an inset shadow keeps the row size. */
+.direct-messages__item[aria-current="true"] {
+  background: var(--color-bg-selected);
+  box-shadow: inset 3px 0 0 var(--color-accent);
+}
+
+/* Follow eye in a channel row (QA.13): the 16px icon sits on the person status icon column; the
+   24px click target (WCAG 2.5.8) grows into the row via negative margins, so nothing shifts. */
+.follow-star {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.5rem;
+  height: 1.5rem;
+  margin: -0.25rem;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  opacity: 0;
+}
+
+.follow-star[data-followed="true"] {
+  color: var(--color-accent-text);
+  opacity: 1;
+}
+
+/* Followed = pupil filled in the accent colour; outlined eye = not followed. */
+.follow-eye__pupil {
+  fill: none;
+}
+
+.follow-star[data-followed="true"] .follow-eye__pupil,
+.follow-toggle[aria-pressed="true"] .follow-eye__pupil {
+  fill: currentColor;
+}
+
+.follow-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+/* Only opacity changes, so showing the eye never moves anything in the row. */
+.tree-channel__row:hover .follow-star,
+[role="treeitem"]:focus-visible > .tree-channel__row .follow-star,
+.follow-star:focus-visible {
+  opacity: 1;
+}
+
+.follow-star:hover {
+  color: var(--color-accent-text);
+}
+
+.follow-star[aria-disabled="true"] {
+  cursor: progress;
+}
+
+.follow-server {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: 2rem;
+  padding: 0 var(--space-2);
+}
+
+.follow-server__name {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-bold);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.follow-server__menu {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.75rem;
+  height: 1.75rem;
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+}
+
+.follow-server__menu:hover,
+.follow-server__menu[aria-expanded="true"] {
+  background: var(--color-bg-hover);
+  color: var(--color-text);
+}
+
+.follow-notice__dismiss {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font-size: inherit;
+  text-decoration: underline;
+  cursor: pointer;
+}

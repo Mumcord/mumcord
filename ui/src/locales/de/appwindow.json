@@ -1,0 +1,10 @@
+{
+  "close": {
+    "title": "In den Infobereich minimieren oder beenden?",
+    "description": "Du bist noch verbunden. Minimiert bleibt Mumcord im Sprachkanal und im Infobereich der Taskleiste.",
+    "remember": "Auswahl merken",
+    "minimize": "In den Infobereich",
+    "quit": "Beenden",
+    "failed": "Das hat nicht geklappt. Bitte versuche es erneut."
+  }
+}

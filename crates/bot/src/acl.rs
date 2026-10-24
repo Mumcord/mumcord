@@ -1,0 +1,86 @@
+//! Superuser edits on the local test servers: ACLs (regular protocol `ACL` message) and channel
+//! descriptions (`ChannelState`).
+
+use anyhow::{Result, bail};
+use mumcord_protocol::{permissions, proto};
+
+use crate::Bot;
+
+impl Bot {
+    /// Denies "Listen" for everyone on `channel` and its subchannels (AC-1.16). Replaces the
+    /// channel's own ACL; the test channels have none. Returns once the server applied it
+    /// (needs a 1.4+ server).
+    pub async fn deny_listen(&self, channel: &str) -> Result<()> {
+        self.deny_for_everyone(channel, permissions::LISTEN).await
+    }
+
+    /// Removes the channel's own ACL entries again (back to inheriting from the parent).
+    pub async fn allow_listen(&self, channel: &str) -> Result<()> {
+        self.set_acl(channel, Vec::new()).await
+    }
+
+    /// Denies "Speak" for everyone on `channel` and its subchannels: the server then suppresses
+    /// everyone in it except the superuser. Replaces the channel's own ACL.
+    pub async fn deny_speak(&self, channel: &str) -> Result<()> {
+        self.deny_for_everyone(channel, permissions::SPEAK).await
+    }
+
+    /// Removes the channel's own ACL entries again (back to inheriting from the parent).
+    pub async fn allow_speak(&self, channel: &str) -> Result<()> {
+        self.set_acl(channel, Vec::new()).await
+    }
+
+    async fn deny_for_everyone(&self, channel: &str, permission: u32) -> Result<()> {
+        let deny = proto::acl::ChanAcl {
+            apply_here: Some(true),
+            apply_subs: Some(true),
+            // The server ignores entries marked as inherited.
+            inherited: Some(false),
+            user_id: None,
+            group: Some("all".to_owned()),
+            grant: Some(0),
+            deny: Some(permission),
+        };
+        self.set_acl(channel, vec![deny]).await
+    }
+
+    async fn set_acl(&self, channel: &str, acls: Vec<proto::acl::ChanAcl>) -> Result<()> {
+        if !self.config().superuser {
+            bail!("changing ACLs needs the superuser bot");
+        }
+        let channel_id = self.channel_id(channel)?;
+        let acl = proto::Acl {
+            channel_id,
+            inherit_acls: Some(true),
+            groups: Vec::new(),
+            acls,
+            query: Some(false),
+        };
+        // An ACL write has no reply, but 1.4+ servers then resend the channel's state (enter
+        // restrictions) to everyone, after the new ACL is in effect.
+        self.send_and_await_channel_update(channel_id, "the server to apply the ACL", || {
+            Ok(self.handle().send_acl(acl)?)
+        })
+        .await
+    }
+
+    /// Sets the description of `channel`; an empty `html` removes it (FR-1.48b). Returns once
+    /// the server sent the changed channel state back.
+    pub async fn set_description(&self, channel: &str, html: &str) -> Result<()> {
+        if !self.config().superuser {
+            bail!("changing descriptions needs the superuser bot");
+        }
+        let channel_id = self.channel_id(channel)?;
+        let state = proto::ChannelState {
+            channel_id: Some(channel_id),
+            description: Some(html.to_owned()),
+            ..Default::default()
+        };
+        self.send_and_await_channel_update(
+            channel_id,
+            "the server to apply the description",
+            || Ok(self.handle().send_channel_state(state)?),
+        )
+        .await
+    }
+}

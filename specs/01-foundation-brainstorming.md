@@ -597,3 +597,363 @@ stateDiagram-v2
 ## Closing
 
 2026-10-24: All rounds answered. The specification has been created: `specs/01-foundation-specification.md`.
+
+---
+
+## Addendum – decisions during implementation (2026-10-24)
+
+Three decisions made by the product manager while building. Asked and answered in chat during /dev.
+
+### A · Scope & connect behaviour
+
+#### QA.1 Connecting to several servers at once to read along? `◉`
+
+- [ ] In Epic 1.
+- [x] **Own epic after Epic 1** ("Multi-server read-along"); Epic 1 stays single-server.
+- [ ] Not planned.
+
+✍️ Note: Asked and answered in chat during /dev.
+
+#### QA.2 What happens on a fresh connect? `◉`
+Fresh = user-initiated (app start, server switch, manual reconnect). Automatic reconnect after a dropped connection restores the previous channel and voice state (continuity).
+
+- [ ] Rejoin the last channel with voice on (previous behaviour).
+- [x] **Land in the server's default channel muted and deafened (read-only); talk/listen only after an explicit Join.** Others see the user as present but deafened. A `mumble://` link with a channel path counts as an explicit Join.
+- [ ] Land in the default channel with voice on.
+
+✍️ Note: Asked and answered in chat during /dev.
+
+---
+
+### B · Profile
+
+#### QA.3 Default avatar: when is it sent to a server? `◉`
+
+- [ ] Send on every connect.
+- [x] **Set a default avatar in settings; send it once, the first time you connect to a server where you have no avatar yet.** Switchable off (default on); not re-sent after manual removal.
+- [ ] Never automatic (manual only).
+
+✍️ Note: Asked and answered in chat during /dev.
+
+---
+
+#### QA.4 Mouse buttons (e.g. side buttons) as push-to-talk? `◉`
+Keyboard push-to-talk on Wayland stays on the desktop portal (Q4.11); the portal cannot capture mouse buttons.
+
+- [x] **Native mouse-button support on Windows, macOS (Accessibility permission prompt) and X11, and on Linux Wayland by reading input devices directly (evdev).** The Wayland path is off by default, needs a settings toggle and membership in the `input` group (security warning shown); only mouse-type devices are opened, only the one configured button is used, input is never logged; without permission the exact fix command is shown and Mumcord falls back gracefully.
+- [ ] Native support plus a hint how to remap the mouse button to a key in KDE (no evdev path).
+- [ ] Later (keyboard only for now).
+
+✍️ Note: Asked and answered in chat during /dev.
+
+---
+
+#### QA.5 Push-to-talk on KDE Wayland: compatibility mode like TeamSpeak? `◉`
+TeamSpeak 3 runs through KDE's X11 compatibility layer (XWayland). KDE's "Legacy X11 App Support" setting (default: key combinations with Ctrl/Alt/Meta and modifier keys; mouse buttons off) lets such apps see global input without a dialog or the `input` group. Mumcord already has the X11 push-to-talk path for keys and mouse buttons.
+
+- [ ] Compatibility mode by default on KDE Wayland; modern path as a setting.
+- [ ] Only fix the modern path (portal dialog for keys, evdev + `input` group for mouse buttons).
+- [x] **Both: Settings → Voice offers a "Compatibility mode (like TeamSpeak)" switch on Linux Wayland; the default stays the modern path.** In compatibility mode Mumcord runs through XWayland and uses its X11 push-to-talk for keys and mouse buttons, limited to what the desktop's legacy X11 setting allows; the switch explains that trade-off.
+
+✍️ Note: Asked and answered in chat during /dev.
+
+---
+
+#### QA.6 Talking indicator in the channel list: avatar with a green ring? `◉`
+
+- [x] **Each person row in the channel list shows the person's avatar (default avatar if none); while they talk, a green ring appears around it (Discord style).** Listener rows keep only the listener marker (no ring, no voice-state icons).
+- [ ] Keep the current icon-only indicator.
+
+✍️ Note: Requested in chat during /dev.
+
+---
+
+#### QA.7 Mute/deafen state when joining a channel after a read-only connect? `◉`
+Until now an explicit Join always cleared mute and deafen (QA.2).
+
+- [x] **Connect stays read-only; an explicit Join restores the user's last own mute/deafen setting instead of always clearing it.** The last setting is the self-mute/self-deafen state the user last chose while joined for voice; it is remembered across app restarts.
+- [ ] No read-only mode: the last setting applies right on connect.
+- [ ] Last setting on connect, but never automatically unmuted.
+
+✍️ Note: Asked and answered in chat during /dev.
+
+---
+
+#### QA.8 Visible way to disconnect from the current server? `◉`
+Disconnect exists only in the server icon's context menu.
+
+- [x] **Add a "Disconnect" button (hang-up icon) to the user panel next to mute and deafen, shown while connected.**
+- [ ] Keep it in the context menu only.
+
+✍️ Note: Asked and answered in chat during /dev.
+
+---
+
+#### QA.9 Offer to rejoin the last channel after quitting the app? `◉`
+
+- [x] **If the user quit Mumcord while joined to a channel for voice, the next fresh connect to that server (after app start) shows a non-blocking prompt "You were in ‹channel› last time – Rejoin?" with "Rejoin" and "Not now".** Rejoin is an explicit Join (QA.7 applies); "Not now" or ignoring it keeps the read-only state. No prompt if the channel no longer exists or the user was not joined for voice.
+- [ ] Rejoin automatically without asking.
+- [ ] No prompt (current behavior).
+
+✍️ Note: Requested in chat during /dev.
+
+---
+
+#### QA.10 Avatars on servers where the user is not registered? `◉`
+Mumble servers keep avatars only for registered users; for unregistered users the avatar is lost on disconnect, and the default avatar was sent only once per server (QA.3).
+
+- [ ] Resend only the default avatar on every connect when unregistered.
+- [x] **Remember the avatar per saved server (hand-set avatar, otherwise the default avatar) and send it again on every connect when the server does not have it (unregistered users).** Registered users keep the server's copy; nothing is re-sent when the server already shows an avatar.
+- [ ] Leave as is, only hint to register.
+
+✍️ Note: Asked and answered in chat during /dev.
+
+---
+
+#### QA.11 Listeners in the channel list? `◉`
+
+- [x] **People who only listen to a channel (read-along / channel listener) are not shown in the channel list at all; they appear only in the member list on the right (with the listener marker).**
+- [ ] Show them in both (current behavior).
+
+✍️ Note: Requested in chat during /dev.
+
+---
+
+#### QA.12 Release builds from tags on main? `◉`
+Signed builds and auto-update stay in Epic 5.
+
+- [x] **Pushing a version tag (`v*`, e.g. `v0.1.0`) on `main` builds the Windows installer (.exe), the Linux AppImage and the macOS .dmg and attaches them, with SHA-256 checksums, to a draft GitHub Release that the maintainer reviews and publishes by hand.** Builds are unsigned until Epic 5; the release notes say so. The tag must match the app version, otherwise the workflow fails.
+- [ ] Publish the release automatically.
+
+✍️ Note: Requested in chat during /dev; draft release recommended so nothing goes public without a final look.
+
+---
+
+#### QA.13 Follow channels directly from the channel list, and follow all at once? `◉`
+Until now a channel is followed with the "Follow" button in the chat header (FR-1.31).
+
+- [x] **Each channel row in the channel list gets a star button: outlined on hover/focus to follow, filled while followed (click again to unfollow).** The chat-header button stays.
+- [x] **The server's context menu in the channel list offers "Follow all channels" and "Unfollow all channels".** Follow all follows every channel the user may listen to (excluding the one they are in for voice), stops cleanly at the server's listener limit and says how many were followed and why the rest were skipped.
+- [ ] Not now.
+
+✍️ Note: Requested in chat during /dev.
+
+---
+
+#### QA.14 Crowded channels in the channel list: overlapping avatar stack? `◉`
+
+- [x] **Collapsed channels always show a stack of up to 5 overlapping avatars plus "+N" for the remaining people instead of the names. Expanded channels list names, but above 10 people they show the stack with a "Show all" toggle.** People who are talking right now are moved to the front of the stack (with the green talking ring), so they stay visible.
+- [ ] Only when collapsed.
+- [ ] Always.
+
+✍️ Note: Asked and answered in chat during /dev; "talking people in front" added by the user.
+
+---
+
+#### QA.15 Pinned channel description / server welcome message in the chat? `◉`
+
+- [x] **The chat of each channel shows a pinned, collapsible box at the top with the channel's description. The server's welcome message (MOTD) is pinned in the root channel's chat (and in the default channel if it has no description of its own).** Long texts start collapsed to a few lines with "Show more"; content from the server is sanitized like chat HTML; nothing is shown if there is no text. The box updates when the description changes.
+- [ ] Not now.
+
+✍️ Note: Requested in chat during /dev.
+
+---
+
+#### QA.16 Notifications for new channel messages? `◉`
+Desktop notifications were planned for Epic 3.
+
+- [ ] In-app toast only.
+- [x] **In-app toast plus a system desktop notification.** In-app: a small pop-up inside the window (bottom right) with channel, sender and a short preview. Desktop: a system notification when Mumcord is in the background or minimized. Clicking either opens that channel's chat (and brings the window to the front).
+- [ ] For followed channels and private messages only.
+- [x] **For all channels the user receives messages from (own channel, followed channels) and private messages, except the chat currently on screen.** Bursts are grouped per channel so busy channels don't flood the screen; both kinds can be switched off in settings.
+
+✍️ Note: Asked and answered in chat during /dev; pulls desktop notifications forward from Epic 3.
+
+---
+
+#### QA.17 Start Mumcord with the operating system? `◉`
+
+- [x] **Option "Start Mumcord when I log in", asked in the first-start wizard and changeable in settings; default off. When on, Mumcord starts minimized to the tray (switchable: "Start minimized").** Uses the OS's own mechanism (Linux autostart entry, Windows login item, macOS login item).
+- [ ] Settings only, not in the wizard.
+
+✍️ Note: Requested in chat during /dev.
+
+---
+
+#### QA.18 Highlight the channel the user is in? `◉`
+
+- [x] **The channel the user is joined to for voice is highlighted in the channel list, distinct from the selected (viewed) channel: green accent bar on the left, a small speaker icon and bold name.** While read-only (not joined for voice) no channel gets this highlight. Screen readers hear "you are here (voice)".
+- [ ] Not needed.
+
+✍️ Note: Requested in chat during /dev.
+
+---
+
+#### QA.19 Sound when disconnecting? `◉`
+
+- [x] **A short, subtle "hang up" sound plays when the user disconnects from a server (Disconnect button, context menu, switching server, quitting while connected is excluded), switchable like the other sounds.**
+- [ ] No sound.
+
+✍️ Note: Requested in chat during /dev.
+
+---
+
+#### QA.20 Avatars in the chat? `◉`
+
+- [x] **Discord-style message layout: the sender's avatar on the left of each message group, name and time on the first line, message text indented to start after the avatar. Consecutive messages from the same sender within a few minutes are grouped without repeating avatar and name, and stay indented the same way.**
+- [ ] Keep the current layout.
+
+✍️ Note: Requested in chat during /dev.
+
+---
+
+#### QA.21 Profile on hover? `◉`
+
+- [x] **Hovering a person (member list, channel list, chat avatar/name) for a moment (~0.4 s) shows their profile card next to them: avatar, name, comment, registered marker, voice state.** It stays while the pointer is on the person or the card and closes when it leaves. Keyboard focus shows it too (Escape closes). A click still opens the full card with the local controls (volume, local mute, private message).
+- [ ] Click only (current behavior).
+
+✍️ Note: Requested in chat during /dev.
+
+---
+
+#### QA.22 Make the read-only connect switchable? `◉`
+
+- [x] **Setting "Connect muted until I join a channel" (Settings → Voice, default on). Off: a fresh connect lands in the default channel with the user's last own mute/deafen setting right away (as a normal join).**
+- [ ] Always read-only.
+
+✍️ Note: Asked and answered in chat during /dev.
+
+---
+
+#### QA.23 Sound when the user joins a channel? `◉`
+
+- [x] **A short join sound plays when the user themselves joins a channel for voice (double-click, Join button, link, rejoin prompt), switchable like the other sounds.**
+- [ ] No sound.
+
+✍️ Note: Requested in chat during /dev.
+
+---
+
+#### QA.24 Design refresh after the website (mumcord.app)? `◉`
+Prototype with before/after screenshots on branch `design-refresh-proto` (`specs/design-refresh.md` there).
+
+- [x] **Adopt the website's look: deep indigo backgrounds, cream text, violet accent instead of teal, rounded pill buttons, violet selection bars.**
+- [x] **Logo gradient (peach → pink → violet) only on highlights (connected server, unread badges); primary buttons in plain violet.**
+- [x] **Website fonts bundled (Instrument Sans for text, Bricolage Grotesque for titles; OFL-1.1).**
+- [x] **Peach links in the chat.**
+- [x] **Keep the green talking ring with a soft glow.**
+
+✍️ Note: Asked and answered in chat during /dev.
+
+---
+
+#### QA.25 Compact chat mode? `◉`
+
+- [x] **Settings → Appearance → "Message display": Cozy (default: avatar, name line, indented text) or Compact (no avatars, time + name + text on one line, tighter spacing, text still slightly indented for continuation lines).**
+- [ ] Cozy only.
+
+✍️ Note: Requested in chat during /dev.
+
+---
+
+#### QA.26 Tidy up the user panel? `◉`
+The panel at the bottom of the channel column looks cramped, the line above it looks odd, and the own name gets cut off.
+
+- [x] **Two rows: top row avatar + full own name (wrapping to two lines or shrinking font slightly before ever cutting it off, full name in a tooltip) with the connection status/server underneath; bottom row the buttons (mute, deafen, disconnect, connection quality, settings) evenly spaced.** No separator line above the panel; it is set off by a slightly different background instead. The microphone button shows the live input level as a fill rising from the bottom while the user speaks (not while muted).
+- [ ] Keep one row.
+
+✍️ Note: Requested in chat during /dev.
+
+---
+
+#### QA.27 Usability on big servers (1000 users, 300 channels)? `◉`
+Measured in `specs/01-foundation-scale-report.md`; performance fixes are done without a product decision.
+
+- [x] **"Jump to my channel" button that scrolls to and highlights the user's voice channel.**
+- [x] **Big servers (more than ~50 channels) start collapsed: only the top level and the path to the user's own channel are expanded.**
+- [x] **Readable deep channel names: smaller indent per level on deep trees, full name as tooltip.**
+- [x] **Search field above the channel list that filters channels and people by name.**
+
+✍️ Note: Asked and answered in chat during /dev.
+
+---
+
+#### QA.28 Show locally muted people more clearly? `◉`
+
+- [x] **When the user mutes someone locally (profile card → local mute), that person's name turns red in the channel list and the member list, in addition to the existing local-mute icon (not color alone).**
+- [ ] Icon only.
+
+✍️ Note: Requested in chat during /dev.
+
+---
+
+#### QA.29 Width of the channel list? `◉`
+
+- [x] **The channel list can be resized by dragging its right border (keyboard: focus the handle, arrow keys); the width is remembered. Min = today's 15rem, max ~28rem. Wider lists show up to 5 stacked avatars and longer names; the member list can be resized the same way.**
+- [ ] Fixed wider default.
+- [ ] Keep as is.
+
+✍️ Note: Asked and answered in chat during /dev.
+
+---
+
+#### QA.30 From how many people should an expanded channel show the avatar stack? `◉`
+
+- [x] **More than 5 people (was more than 10).** Collapsed channels always show it.
+- [ ] Always.
+- [ ] Keep more than 10.
+
+✍️ Note: Asked and answered in chat during /dev.
+
+---
+
+#### QA.31 Where does the avatar stack sit? `◉`
+
+- [x] **On its own line under the channel name (indented like members), followed by "+N" and "Show all"; the channel row keeps arrow, name, badges and star.** Beside the name it looked cramped.
+
+✍️ Note: Requested in chat during /dev.
+
+---
+
+#### QA.32 Right-click menu on a person? `◉`
+
+- [x] **Right-clicking a person (member list, channel list, chat avatar/name) opens a context menu: "View profile", "Mute for me" / "Unmute for me" (local mute), a volume slider (0–200 %) inline in the menu, and "Send private message".** Also reachable by keyboard (context-menu key / Shift+F10). Not shown for the user themselves except "View profile".
+- [ ] Profile card only.
+
+✍️ Note: Requested in chat during /dev.
+
+---
+
+#### QA.33 Unread count for the user's own channel? `◉`
+Until now only followed channels counted unread messages.
+
+- [x] **Every channel the user receives messages from counts unread messages while its chat is not on screen – the own channel (voice or read-only landing) as well as followed channels.** Opening the chat marks them read.
+- [ ] Followed channels only.
+
+✍️ Note: Asked in chat during /dev; consistent with the notification rule (QA.16).
+
+---
+
+#### QA.34 Richer chat for stage 1b? `◉`
+Added to stage 1b at the user's request.
+
+- [x] **Link previews:** a card with title, description, image and an "Open in browser" button for links in messages. On by default; can be switched off in the first-start wizard and in settings (Mumcord itself loads the linked page, so that site sees the user's IP address).
+- [x] **YouTube and Twitch:** links show an embedded player card with title and "Open in browser"; the player only loads after a click.
+- [x] **Mentions with autocomplete:** typing `@` suggests people on the server; a mention of the user highlights the message and notifies them (other clients see plain text).
+- [x] **GIFs via Tenor:** a GIF button with Tenor search; the API key is injected at build time from a CI secret (never in the repo); builds without a key hide the button.
+- [x] **Code highlighting:** ``` fenced blocks (optional language) and `inline code` with syntax highlighting.
+- [x] **Formatting shortcuts in the input:** a small toolbar and keyboard shortcuts (bold, italic, strikethrough, code, link).
+
+✍️ Note: Requested in chat during /dev ("1 aber deaktivierbar im wizard"; Tenor instead of Giphy; ``` as code fence).
+
+---
+
+#### QA.35 Load external images in messages (stage 1b)? `◉`
+Until now external images (img tags pointing to web addresses, image links) are never loaded (AC-1.13).
+
+- [x] **Stage 1b: external images in messages and direct image links (png, jpg, gif, webp) are shown inline, scaled down, click to enlarge, with "Open in browser".** Same privacy switch as link previews (default on, switchable in the wizard and settings); fetched through Mumcord's backend with size/type limits, never executing anything; private/LAN addresses are not loaded. Stage 1a behavior (AC-1.13) applies while the switch is off.
+- [ ] Keep blocking external images.
+
+✍️ Note: Requested in chat during /dev.
+
+---

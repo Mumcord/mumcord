@@ -1,0 +1,66 @@
+{
+  "tree": {
+    "label": "Canales",
+    "hint": "Intro: ver chat · Mayús+Intro o doble clic: unirse · Flechas: mover, expandir, contraer",
+    "join": "Unirse",
+    "you": "(tú)",
+    "voiceHere": "estás aquí (voz)",
+    "people_one": "{{count}} persona",
+    "people_other": "{{count}} personas",
+    "stack": {
+      "some": "{{shown}} de {{total}} personas: {{names}} y {{rest}} más",
+      "all_one": "{{count}} persona: {{names}}",
+      "all_other": "{{count}} personas: {{names}}",
+      "person": "{{name}} ({{status}})"
+    },
+    "showAll": "Mostrar todas ({{total}})",
+    "showFewer": "Mostrar menos",
+    "jump": "Ir a mi canal"
+  },
+  "status": {
+    "listening": "escuchando",
+    "talking": "hablando",
+    "muted": "silenciado",
+    "deafened": "ensordecido",
+    "serverMuted": "silenciado por el servidor",
+    "serverDeafened": "ensordecido por el servidor",
+    "suppressed": "suprimido (no puede hablar aquí)",
+    "localMuted": "silenciado para ti",
+    "unregistered": "no registrado"
+  },
+  "statusTip": {
+    "registered": "Registrado en este servidor",
+    "listening": "Escuchando este canal",
+    "muted": "Silenciado",
+    "deafened": "Ensordecido",
+    "serverMuted": "Silenciado por el servidor",
+    "serverDeafened": "Ensordecido por el servidor",
+    "suppressed": "Suprimido: no puede hablar en este canal",
+    "localMuted": "Silenciado para ti",
+    "unregistered": "No registrado en este servidor (invitado)"
+  },
+  "announce": {
+    "joined": "{{name}} se unió a tu canal",
+    "left": "{{name}} salió de tu canal",
+    "talking": "{{name}} está hablando"
+  },
+  "errors": {
+    "joinDenied": "No tienes permiso para entrar en este canal.",
+    "joinFailed": "No se pudo entrar en el canal. Inténtalo de nuevo.",
+    "notConnected": "No estás conectado a un servidor."
+  },
+  "empty": {
+    "disconnected": "Sin conexión. Elige un servidor para ver sus canales.",
+    "loading": "Cargando canales…"
+  },
+  "search": {
+    "label": "Buscar canales y personas",
+    "clear": "Borrar búsqueda",
+    "empty": "Ningún canal ni persona coincide con «{{query}}».",
+    "count": "{{channels}}, {{people}}",
+    "channels_one": "{{count}} canal",
+    "channels_other": "{{count}} canales",
+    "people_one": "{{count}} persona",
+    "people_other": "{{count}} personas"
+  }
+}

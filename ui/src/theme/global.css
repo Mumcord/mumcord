@@ -1,0 +1,105 @@
+@import "@fontsource-variable/instrument-sans";
+@import "@fontsource-variable/bricolage-grotesque";
+@import "./tokens.css";
+
+/* Root size stays at the browser default (100%) so the OS/user font size scales every rem. */
+html {
+  font-size: 100%;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+  margin: 0;
+}
+
+/* The app fills the window exactly; only inner panes scroll, never the document. */
+html,
+body {
+  overflow: hidden;
+  /* clip (unlike hidden) also blocks programmatic scrolling, e.g. focus() on a message. */
+  overflow: clip;
+}
+
+#root {
+  height: 100dvh;
+  overflow: hidden;
+  overflow: clip;
+}
+
+body {
+  background: var(--color-bg-chat);
+  color: var(--color-text);
+  font-family: var(--font-family);
+  font-size: var(--font-size-md);
+  line-height: var(--line-height);
+  -webkit-font-smoothing: antialiased;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+  color: inherit;
+}
+
+/* Display face for titles, as on the website; sizes and line heights stay the same. */
+h1,
+h2,
+h3 {
+  font-family: var(--font-family-display);
+  letter-spacing: var(--letter-spacing-display);
+}
+
+a {
+  color: var(--color-accent-text);
+}
+
+input[type="checkbox"],
+input[type="radio"],
+input[type="range"],
+progress {
+  accent-color: var(--color-accent);
+}
+
+::selection {
+  background: var(--color-accent);
+  color: var(--color-on-accent);
+}
+
+/* One focus style everywhere: visible for keyboard users, not shown on mouse clicks. */
+:focus-visible {
+  outline: var(--focus-ring-width) solid var(--color-focus);
+  outline-offset: 2px;
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

@@ -1,0 +1,128 @@
+{
+  "unknownServer": "the server",
+  "announce": {
+    "connected": "Connected to {{server}}.",
+    "lost": "Connection to {{server}} lost. Reconnecting…",
+    "ended": "Disconnected from {{server}}. See the bar above the chat for what to do next.",
+    "disconnected": "Disconnected from {{server}}.",
+    "tcp": "Voice now runs over TCP because UDP is blocked. Audio may be slightly delayed.",
+    "removed": "{{server}} removed.",
+    "moved": "Moved {{server}} to position {{position}} of {{count}}."
+  },
+  "bar": {
+    "listLabel": "Saved servers",
+    "add": "Add a server",
+    "keyboardHint": "Enter connects. Alt plus Up or Down arrow moves the server. Shift plus F10 opens more options.",
+    "status": {
+      "connected": "{{server}} (connected)",
+      "connecting": "{{server}} (connecting)",
+      "reconnecting": "{{server}} (reconnecting)"
+    }
+  },
+  "menu": {
+    "label": "Options for {{server}}",
+    "connect": "Connect",
+    "disconnect": "Disconnect",
+    "edit": "Edit server",
+    "moveUp": "Move up",
+    "moveDown": "Move down",
+    "remove": "Remove server"
+  },
+  "dialog": {
+    "addTitle": "Add a server",
+    "editTitle": "Edit server",
+    "linkTitle": "Save this server?",
+    "address": "Address",
+    "addressHint": "For example mumble.example.org. You can also paste a mumble:// link here.",
+    "filledFromLink": "Filled in from the mumble:// link.",
+    "port": "Port",
+    "label": "Name in the server bar",
+    "username": "Your name on this server",
+    "password": "Server password (optional)",
+    "passwordHint": "Only needed if the server asks for one. It is kept in your system's secure storage.",
+    "passwordKeepHint": "A password is saved. Leave this empty to keep it, or type a new one.",
+    "clearPassword": "Remove the saved password",
+    "add": "Add server",
+    "saveAndConnect": "Save and connect",
+    "errors": {
+      "address": "Enter the server address.",
+      "port": "Enter a port between 1 and 65535. Most servers use 64738.",
+      "username": "Enter the name you want to use on this server.",
+      "link": "This mumble:// link can't be read. Check that it was copied completely.",
+      "invalid": "The server details aren't valid. Check the address and port."
+    }
+  },
+  "errors": {
+    "serverUnreachable": "The server can't be reached. Check the address and port, and that you are online.",
+    "wrongPassword": "The server password is wrong. Edit the server and enter the right password.",
+    "nameInUse": "Your name is already in use or registered to someone else on this server. Edit the server and choose another name.",
+    "certificateRejected": "The certificate check failed: either the server's certificate was not trusted, or the server did not accept your identity. Try again, or ask the server owner.",
+    "certificateChanged": "The server's certificate has changed and was not trusted. Only trust it after the server owner confirms the change.",
+    "denied": "The server refused the connection.",
+    "deniedWithReason": "The server refused the connection: {{reason}}",
+    "invalidAddress": "The server address isn't valid. Edit the server to fix it.",
+    "secureStorage": "Your system's secure storage isn't available, so the server password could not be read or saved. Unlock it and try again.",
+    "notFound": "This server is no longer saved.",
+    "generic": "Something went wrong. Please try again."
+  },
+  "remove": {
+    "title": "Remove {{server}}?",
+    "message": "Its saved password, certificate decision, followed channels and chat history on this computer are deleted.",
+    "confirm": "Remove"
+  },
+  "switch": {
+    "title": "Switch server?",
+    "message": "You can only be on one server at a time. Disconnect from {{current}} and connect to {{next}}?",
+    "confirm": "Disconnect and switch"
+  },
+  "cert": {
+    "newTitle": "Trust this server?",
+    "newIntro": "Mumcord hasn't seen the certificate of {{server}} before. If the server owner gave you a fingerprint, check that it matches. Your choice is remembered.",
+    "fingerprint": "Certificate fingerprint",
+    "changedTitle": "Warning: the server's certificate changed",
+    "changedWarning": "The certificate of {{server}} is different from the one you trusted before.",
+    "changedAdvice": "This can happen after the server was renewed, but it can also mean someone is intercepting your connection. Only continue if the server owner confirmed the change.",
+    "previousFingerprint": "Previously trusted fingerprint",
+    "newFingerprint": "New fingerprint",
+    "reject": "Don't connect",
+    "trust": "Trust and connect",
+    "trustChanged": "Trust the new certificate"
+  },
+  "rejoin": {
+    "label": "Rejoin last channel",
+    "text": "You were in {{channel}} last time – Rejoin?",
+    "rejoin": "Rejoin",
+    "notNow": "Not now"
+  },
+  "status": {
+    "label": "Connection status",
+    "connecting": "Connecting to {{server}}…",
+    "reconnecting": "Reconnecting… (attempt {{attempt}} of {{max}}, next try in {{seconds}} s)",
+    "tcp": "Connected via TCP (UDP blocked). Voice works but may be slightly delayed.",
+    "disconnected": "Disconnected",
+    "disconnectedReason": "Disconnected – {{reason}}",
+    "failed": "Couldn't connect to {{server}}. {{reason}}",
+    "cancel": "Cancel",
+    "reconnect": "Reconnect",
+    "editServer": "Edit server",
+    "actionFailed": {
+      "reorder": "The new server order couldn't be saved. Please try again.",
+      "remove": "The server couldn't be removed. Please try again.",
+      "disconnect": "Disconnecting failed. Please try again."
+    }
+  },
+  "empty": {
+    "title": "Add your first server",
+    "description": "Enter the address you got from your group, or paste a mumble:// link.",
+    "addressLabel": "Server address or mumble:// link",
+    "addressHint": "For example mumble.example.org or mumble.example.org:64738.",
+    "connect": "Add and connect",
+    "pasteLink": "Paste a mumble:// link",
+    "moreOptions": "More options…",
+    "noLinkInClipboard": "The clipboard doesn't contain a mumble:// link. Paste or type the address above.",
+    "pasteManually": "Mumcord couldn't read the clipboard. Click the field above and press Ctrl+V.",
+    "errors": {
+      "required": "Enter a server address or a mumble:// link."
+    }
+  }
+}

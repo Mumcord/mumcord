@@ -1,0 +1,10 @@
+{
+  "close": {
+    "title": "Minimize to tray or quit?",
+    "description": "You are still connected. Minimized, Mumcord keeps you in voice and stays in the system tray.",
+    "remember": "Remember my choice",
+    "minimize": "Minimize to tray",
+    "quit": "Quit",
+    "failed": "That did not work. Please try again."
+  }
+}

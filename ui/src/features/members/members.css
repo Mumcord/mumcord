@@ -1,0 +1,196 @@
+.avatar {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  overflow: hidden;
+  border-radius: var(--radius-full);
+  background: var(--avatar-bg, var(--color-avatar-1));
+  color: var(--color-avatar-text);
+  font-weight: var(--font-weight-bold);
+}
+
+.avatar[data-initial]::before {
+  content: attr(data-initial);
+}
+
+.avatar[data-size="sm"] {
+  width: 1.5rem;
+  height: 1.5rem;
+  font-size: var(--font-size-xs);
+}
+
+.avatar[data-size="lg"] {
+  width: 4rem;
+  height: 4rem;
+  font-size: var(--font-size-xl);
+}
+
+.avatar[data-talking="true"] {
+  /* Outline, not border: gap and ring sit outside the box, so rows never shift. */
+  outline: 2px solid var(--color-talking);
+  outline-offset: 1px;
+  /* Soft green glow (website "live" style); a shadow paints outside the box, so no shift. */
+  box-shadow: var(--glow-talking);
+}
+
+.avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.members-heading {
+  margin: var(--space-3) 0 var(--space-1);
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-bold);
+  text-transform: uppercase;
+}
+
+.members-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.member {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  width: 100%;
+  padding: var(--space-1) var(--space-2);
+  border: none;
+  border-radius: var(--radius-sm);
+  background: none;
+  color: var(--color-text-secondary);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.member:hover {
+  background: var(--color-bg-hover);
+  color: var(--color-text);
+}
+
+.member[data-talking="true"] {
+  color: var(--color-text);
+}
+
+/* Muted for you (FR-1.19): the name stays red, also while the person talks. */
+.member__name[data-local-muted="true"] {
+  color: var(--color-local-muted);
+}
+
+.member__name {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.member__you,
+.members-empty,
+.members-none {
+  color: var(--color-text-secondary);
+}
+
+.profile-card {
+  width: min(24rem, calc(100vw - 2 * var(--space-4)));
+  padding: var(--space-4);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background: var(--color-bg-elevated);
+  color: var(--color-text);
+  box-shadow: var(--shadow-raised);
+}
+
+.profile-card::backdrop {
+  background: var(--color-backdrop);
+}
+
+.profile-card__header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.profile-card__name {
+  margin: 0;
+  font-size: var(--font-size-lg);
+}
+
+.profile-card__meta,
+.profile-card__note {
+  margin: var(--space-1) 0;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+}
+
+.profile-card__comment {
+  max-height: 12rem;
+  margin: var(--space-3) 0;
+  overflow-y: auto;
+  overflow-wrap: anywhere;
+}
+
+.profile-card__comment img {
+  max-width: 100%;
+}
+
+.profile-card__volume {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: var(--space-1) var(--space-2);
+  margin: var(--space-3) 0;
+}
+
+.profile-card__volume input {
+  grid-column: 1 / -1;
+  accent-color: var(--color-accent);
+}
+
+.profile-card__mute {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.profile-card__pm,
+.profile-card__close {
+  margin-top: var(--space-3);
+  margin-right: var(--space-2);
+  padding: var(--space-1) var(--space-3);
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-full);
+  background: none;
+  color: var(--color-text);
+  font: inherit;
+  cursor: pointer;
+}
+
+.profile-card__pm {
+  border-color: var(--color-accent);
+  background: var(--avatar-bg, var(--color-avatar-1));
+  color: var(--color-avatar-text);
+}
+
+.profile-card__error {
+  color: var(--color-danger);
+}
+
+.person-menu {
+  min-width: 14rem;
+}
+
+.person-menu__volume {
+  padding: 0 var(--space-3);
+}
+
+.person-menu__volume .profile-card__volume {
+  margin: var(--space-2) 0;
+}

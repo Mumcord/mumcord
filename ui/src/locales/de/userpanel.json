@@ -1,0 +1,58 @@
+{
+  "unknownName": "Du",
+  "mute": "Mikrofon stummschalten",
+  "deafen": "Taubschalten",
+  "disconnect": "Verbindung zu {{server}} trennen",
+  "settings": "Einstellungen",
+  "menu": "Benutzermenü",
+  "menuProfile": "Profil bearbeiten",
+  "menuRegister": "Auf diesem Server registrieren",
+  "announce": {
+    "muted": "Mikrofon stummgeschaltet",
+    "unmuted": "Mikrofon wieder aktiv",
+    "deafened": "Taubgeschaltet. Du hörst niemanden und dein Mikrofon ist stumm",
+    "undeafened": "Taubschaltung aufgehoben"
+  },
+  "readOnly": {
+    "text": "Du liest nur mit – tritt einem Kanal bei, um zu sprechen.",
+    "join": "{{channel}} beitreten"
+  },
+  "status": {
+    "connecting": "Verbinde…",
+    "reconnecting": "Verbinde erneut…",
+    "connected": "Verbunden",
+    "readOnly": "Nur lesen",
+    "disconnected": "Nicht verbunden"
+  },
+  "profile": {
+    "title": "Profil bearbeiten",
+    "chooseTitle": "Profilbild auswählen",
+    "chooseAvatar": "Bild auswählen…",
+    "removeAvatar": "Bild entfernen",
+    "avatarHint": "Das Bild wird passend zum Limit des Servers verkleinert.",
+    "avatarUnregistered": "Dieser Server speichert Avatare nur für registrierte Benutzer – Mumcord sendet deinen bei jeder Verbindung erneut.",
+    "avatarChosen": "Ausgewählt: {{name}}",
+    "avatarRemoved": "Das Bild wird beim Speichern entfernt.",
+    "comment": "Über dich"
+  },
+  "register": {
+    "title": "Auf diesem Server registrieren",
+    "explain": "Mit der Registrierung wird dein Name auf diesem Server für dich reserviert. Niemand sonst kann ihn nutzen, und der Server erkennt dich beim nächsten Verbinden wieder.",
+    "backup": "Deine Identität beweist, dass der Name dir gehört. Verlierst du sie, verlierst du den Zugang zum registrierten Namen. Speichere jetzt eine Sicherungskopie und bewahre sie sicher auf.",
+    "password": "Passwort für die Sicherungsdatei",
+    "export": "Identität exportieren",
+    "saveTitle": "Identitätssicherung speichern",
+    "passwordRequired": "Gib ein Passwort ein, um die Sicherungsdatei zu schützen.",
+    "exported": "Identitätssicherung gespeichert.",
+    "confirm": "Registrieren",
+    "done": "Auf diesem Server registriert"
+  },
+  "errors": {
+    "tooLarge": "Das ist zu groß für den Server. Wähle ein kleineres Bild oder schreibe einen kürzeren Text.",
+    "denied": "Der Server erlaubt das nicht.",
+    "deniedWithReason": "Der Server erlaubt das nicht: {{reason}}",
+    "notConnected": "Du bist mit keinem Server verbunden.",
+    "file": "Die Datei konnte nicht gelesen oder geschrieben werden.",
+    "generic": "Etwas ist schiefgelaufen. Bitte versuche es erneut."
+  }
+}

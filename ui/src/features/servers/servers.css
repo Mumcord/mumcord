@@ -1,0 +1,296 @@
+/* Server bar */
+.server-bar {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.server-bar__list {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.server-bar__item {
+  position: relative;
+  display: flex;
+  justify-content: center;
+}
+
+.server-bar__item[data-dragging] {
+  opacity: 0.5;
+}
+
+.server-bar__server {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 3rem;
+  height: 3rem;
+  border: 2px solid transparent;
+  border-radius: var(--radius-full);
+  background: var(--color-bg-elevated);
+  color: var(--color-text);
+  font-family: var(--font-family-display);
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-bold);
+  cursor: pointer;
+  transition:
+    border-radius var(--duration-normal) var(--ease-out),
+    background-color var(--duration-fast);
+}
+
+.server-bar__server:hover {
+  border-radius: var(--radius-tile);
+  background: var(--color-bg-hover);
+}
+
+.server-bar__item[data-status="connected"] .server-bar__server {
+  border-radius: var(--radius-tile);
+  background: var(--gradient-accent) border-box;
+  color: var(--color-on-accent);
+  box-shadow: var(--shadow-glow);
+}
+
+.server-bar__item[data-status="connecting"] .server-bar__server,
+.server-bar__item[data-status="reconnecting"] .server-bar__server {
+  border-color: var(--color-warning);
+}
+
+/* Pill marker left of the connected server, so the state is not shown by colour alone. */
+.server-bar__item[data-status="connected"]::before {
+  position: absolute;
+  top: 25%;
+  left: calc(-1 * var(--space-2));
+  width: 0.25rem;
+  height: 50%;
+  border-radius: var(--radius-full);
+  background: var(--color-text);
+  content: "";
+}
+
+.server-bar__add {
+  color: var(--color-success);
+  font-size: var(--font-size-xl);
+}
+
+.server-bar__tooltip {
+  position: fixed;
+  z-index: 40;
+  margin-left: calc(3rem + var(--space-3));
+  padding: var(--space-1) var(--space-3);
+  border-radius: var(--radius-md);
+  background: var(--color-bg-elevated);
+  color: var(--color-text);
+  font-size: var(--font-size-sm);
+  white-space: nowrap;
+  pointer-events: none;
+  visibility: hidden;
+  box-shadow:
+    0 0 0 1px var(--color-border),
+    var(--shadow-raised);
+}
+
+.server-bar__item:hover .server-bar__tooltip,
+.server-bar__server:focus-visible + .server-bar__tooltip {
+  visibility: visible;
+}
+
+/* Context menu */
+.server-menu {
+  position: fixed;
+  z-index: 45;
+  display: flex;
+  flex-direction: column;
+  min-width: 12rem;
+  padding: var(--space-1);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-bg-elevated);
+  box-shadow: var(--shadow-raised);
+}
+
+.server-menu__item {
+  padding: var(--space-2) var(--space-3);
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--color-text);
+  text-align: start;
+  cursor: pointer;
+}
+
+.server-menu__item:hover,
+.server-menu__item:focus-visible {
+  background: var(--color-bg-hover);
+}
+
+.server-menu__item--danger {
+  color: var(--color-danger);
+}
+
+/* Dialogs */
+.servers-dialog {
+  width: min(28rem, calc(100vw - 2 * var(--space-4)));
+  max-height: calc(100vh - 2 * var(--space-4));
+  padding: var(--space-5);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background: var(--color-bg-chat);
+  color: var(--color-text);
+  box-shadow: var(--shadow-raised);
+  overflow-y: auto;
+}
+
+.servers-dialog::backdrop {
+  background: var(--color-backdrop);
+}
+
+.servers-dialog__title {
+  margin: 0 0 var(--space-4);
+  font-size: var(--font-size-lg);
+}
+
+.servers-dialog__actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-2);
+  margin-top: var(--space-5);
+}
+
+/* Outline style: danger text is contrast-checked on every background, a filled button is not. */
+.servers-button--danger {
+  border-color: var(--color-danger);
+  background: transparent;
+  color: var(--color-danger);
+  font-weight: var(--font-weight-bold);
+}
+
+.servers-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.servers-form__field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.servers-form__field input:not([type="checkbox"]),
+.servers-empty__row input {
+  padding: var(--space-2);
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-md);
+  background: var(--color-bg-sidebar);
+  color: var(--color-text);
+}
+
+.servers-form__hint {
+  margin: 0;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+}
+
+.servers-form__error {
+  margin: 0;
+  color: var(--color-danger);
+  font-size: var(--font-size-sm);
+}
+
+.servers-form__check {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.servers-cert__warning {
+  color: var(--color-warning);
+  font-weight: var(--font-weight-bold);
+}
+
+.servers-cert__fingerprints dd {
+  margin: 0 0 var(--space-3);
+}
+
+.servers-cert__fingerprints code {
+  font-size: var(--font-size-sm);
+  overflow-wrap: anywhere;
+}
+
+/* Status bar above the chat */
+.servers-status {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding: var(--space-2) var(--space-4);
+  border-bottom: 1px solid var(--color-border);
+  background: var(--color-bg-elevated);
+}
+
+.servers-status__text {
+  margin: 0;
+}
+
+.servers-status[data-tone="warning"] .servers-status__text {
+  color: var(--color-warning);
+}
+
+.servers-status[data-tone="danger"] .servers-status__text {
+  color: var(--color-danger);
+}
+
+.servers-status__actions {
+  display: flex;
+  flex-shrink: 0;
+  gap: var(--space-2);
+}
+
+/* First-server panel */
+.servers-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-3);
+  min-height: 60vh;
+  padding: var(--space-6);
+  text-align: center;
+}
+
+.servers-empty h2 {
+  margin: 0;
+  font-size: var(--font-size-xl);
+}
+
+.servers-empty__form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  width: min(28rem, 100%);
+  text-align: start;
+}
+
+.servers-empty__row {
+  display: flex;
+  gap: var(--space-2);
+}
+
+.servers-empty__row input {
+  flex: 1;
+  min-width: 0;
+}
+
+.servers-empty__actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--space-2);
+}

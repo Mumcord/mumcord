@@ -1,0 +1,31 @@
+{
+  "inChannel_one": "In {{channel}} ({{count}})",
+  "inChannel_other": "In {{channel}} ({{count}})",
+  "listening_one": "Hört zu ({{count}})",
+  "listening_other": "Hören zu ({{count}})",
+  "noChannel": "Wähle einen Kanal, um zu sehen, wer darin ist.",
+  "nobody": "Niemand ist hier.",
+  "you": "(du)",
+  "registered": "Registriert",
+  "unregistered": "Nicht registriert",
+  "talking": "Spricht",
+  "card": {
+    "close": "Schließen",
+    "loadFailed": "Profil konnte nicht geladen werden.",
+    "volume": "Lautstärke",
+    "volumeValue": "{{value}} %",
+    "localMute": "Für mich stummschalten",
+    "sessionOnly": "Diese Person hat kein Zertifikat, daher gelten diese Einstellungen nur für diese Sitzung.",
+    "sendPrivateMessage": "Private Nachricht senden"
+  },
+  "errors": {
+    "notConnected": "Nicht mit einem Server verbunden.",
+    "generic": "Das hat nicht geklappt. Bitte versuche es erneut."
+  },
+  "menu": {
+    "label": "Aktionen für {{name}}",
+    "viewProfile": "Profil ansehen",
+    "mute": "Für mich stummschalten",
+    "unmute": "Für mich laut schalten"
+  }
+}

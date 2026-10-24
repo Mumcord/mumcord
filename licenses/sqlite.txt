@@ -1,0 +1,15 @@
+SQLITE (public domain) - bundled C library
+==========================================
+
+Used by: libsqlite3-sys (feature "bundled", via rusqlite), statically linked
+into Mumcord. The amalgamation is SQLite 3.53.2 (https://sqlite.org).
+
+The author disclaims copyright to the SQLite source code. In place of a legal
+notice, here is a blessing:
+
+   * May you do good and not evil.
+   * May you find forgiveness for yourself and forgive others.
+   * May you share freely, never taking more than you give.
+
+SQLite is in the public domain (https://sqlite.org/copyright.html). No license
+is required to use, copy, modify or distribute it.

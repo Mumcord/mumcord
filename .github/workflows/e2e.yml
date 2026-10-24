@@ -1,0 +1,50 @@
+name: E2E
+
+# UI end-to-end tests in the e2e/ Docker image (WebKitWebDriver + tauri-driver, Xvfb) against
+# the local testenv Mumble servers. Slow (first build of the app inside the image), so separate
+# from CI and only on epic-1 pushes or manual runs.
+on:
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: e2e-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  e2e:
+    name: Linux E2E
+    runs-on: ubuntu-24.04
+    timeout-minutes: 90
+    env:
+      MUMCORD_E2E_CACHE: /home/runner/.cache/mumcord-e2e
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Install npm dependencies
+        run: npm ci
+
+      # Cargo registry + target dir of the in-container build.
+      - uses: actions/cache@v4
+        with:
+          path: ${{ env.MUMCORD_E2E_CACHE }}
+          key: e2e-${{ hashFiles('Cargo.lock', 'e2e/Dockerfile') }}
+          restore-keys: e2e-
+
+      # run.sh creates testenv/.env with a random SuperUser password; no secrets needed.
+      - name: Run E2E suite
+        run: npm run e2e
+
+      - name: Upload failure artifacts
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: e2e-artifacts
+          path: e2e/artifacts/
+          if-no-files-found: ignore

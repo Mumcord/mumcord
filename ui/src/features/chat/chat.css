@@ -1,0 +1,392 @@
+.chat {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+}
+
+.chat__none {
+  margin: auto;
+  padding: var(--space-4);
+  color: var(--color-text-muted);
+  text-align: center;
+}
+
+.chat-header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-4);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.chat-header__title {
+  flex: 1;
+  min-width: 0;
+  margin: 0;
+  overflow: hidden;
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-bold);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.chat-header__hash {
+  margin-right: var(--space-1);
+  color: var(--color-text-muted);
+}
+
+.chat-header__actions {
+  display: flex;
+  gap: var(--space-2);
+}
+
+.chat-list {
+  /* Containing block for the absolutely positioned visually-hidden labels; otherwise they stretch the document. */
+  position: relative;
+  flex: 1;
+  min-height: 0;
+  padding: var(--space-2) 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.chat-list__older {
+  display: block;
+  margin: var(--space-2) auto;
+  padding: var(--space-1) var(--space-3);
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-full);
+  background: transparent;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+  cursor: pointer;
+}
+
+.chat-list__older:hover:not(:disabled) {
+  background: var(--color-bg-hover);
+}
+
+.chat-list__notice,
+.chat-list__empty {
+  margin: var(--space-4);
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+  text-align: center;
+}
+
+.chat-list__items {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* Day separator: a centred date between two lines. */
+.chat-day {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  margin: var(--space-4) var(--space-4) var(--space-1);
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-bold);
+}
+
+.chat-day::before,
+.chat-day::after {
+  flex: 1;
+  border-top: 1px solid var(--color-border);
+  content: "";
+}
+
+.chat-message {
+  overflow-wrap: anywhere;
+}
+
+.chat-message:focus-visible {
+  outline-offset: -2px;
+}
+
+/* Cozy (FR-1.48a): avatar column, then the text column indented after it. */
+.chat-message__row {
+  display: grid;
+  grid-template-columns: var(--chat-avatar-size) minmax(0, 1fr);
+  column-gap: var(--space-3);
+  padding: 0.125rem var(--space-4);
+}
+
+.chat-list__items {
+  --chat-avatar-size: 2.5rem;
+}
+
+.chat-message--start .chat-message__row {
+  margin-top: var(--space-3);
+  padding-top: var(--space-1);
+}
+
+.chat-message__row:hover,
+.chat-message:focus-visible .chat-message__row {
+  background: var(--color-bg-hover);
+}
+
+.chat-message__gutter {
+  display: flex;
+  justify-content: center;
+}
+
+/* Fixed box: an avatar image loading in never shifts the text. */
+.chat-message__gutter .avatar {
+  width: var(--chat-avatar-size);
+  height: var(--chat-avatar-size);
+}
+
+.chat-message__content {
+  min-width: 0;
+  max-width: 48rem;
+}
+
+.chat-message__header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--space-2);
+}
+
+.chat-message__sender {
+  color: var(--color-text);
+  font-weight: var(--font-weight-bold);
+}
+
+.chat-message__sender--button {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  font: inherit;
+  font-weight: var(--font-weight-bold);
+  cursor: pointer;
+}
+
+.chat-message__sender--button:hover {
+  text-decoration: underline;
+}
+
+.chat-message__time,
+.chat-message__hover-time {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+  white-space: nowrap;
+}
+
+/* Grouped messages show their time only on hover or focus; it stays in the accessibility tree. */
+.chat-message__hover-time {
+  line-height: calc(var(--line-height) * var(--font-size-md));
+  opacity: 0;
+}
+
+.chat-message__row:hover .chat-message__hover-time,
+.chat-message:focus-visible .chat-message__hover-time {
+  opacity: 1;
+}
+
+/* Compact (QA.25): time, name and text on one line; wrapped lines slightly indented. */
+.chat-list__items[data-display="compact"] .chat-message__row {
+  display: block;
+  padding: 0.0625rem var(--space-4) 0.0625rem calc(var(--space-4) + var(--space-5));
+  line-height: var(--line-height);
+  text-indent: calc(-1 * var(--space-5));
+}
+
+.chat-list__items[data-display="compact"] .profile-preview-trigger {
+  display: inline;
+}
+
+.chat-list__items[data-display="compact"] .chat-message--start .chat-message__row {
+  margin-top: var(--space-2);
+  padding-top: 0.0625rem;
+}
+
+.chat-list__items[data-display="compact"] .chat-message__body,
+.chat-list__items[data-display="compact"] .chat-message__body p {
+  display: inline;
+  text-indent: 0;
+}
+
+.chat-list__items[data-display="compact"] .chat-message__body p + p {
+  display: block;
+}
+
+.chat-list__items[data-display="compact"] .chat-message__time {
+  margin-right: var(--space-1);
+}
+
+.chat-message__body {
+  color: var(--color-text);
+  line-height: var(--line-height);
+}
+
+.chat-message__body p {
+  margin: 0;
+}
+
+.chat-message__body a {
+  color: var(--color-accent-text);
+}
+
+.chat-message__body img {
+  display: block;
+  max-width: min(100%, 25rem);
+  max-height: 20rem;
+  margin: var(--space-1) 0;
+  border-radius: var(--radius-sm);
+}
+
+.chat-message__body code,
+.chat-message__body pre {
+  border-radius: var(--radius-sm);
+  background: var(--color-bg-elevated);
+  font-family: ui-monospace, monospace;
+}
+
+.chat-message__body code {
+  padding: 0 var(--space-1);
+}
+
+.chat-message__body pre {
+  padding: var(--space-2);
+  overflow-x: auto;
+}
+
+.chat-composer {
+  padding: var(--space-2) var(--space-4) var(--space-4);
+}
+
+.chat-composer__row {
+  display: flex;
+  align-items: flex-end;
+  gap: var(--space-1);
+  padding: var(--space-1);
+  border-radius: var(--radius-md);
+  background: var(--color-bg-elevated);
+  /* Inset line, not a border: the composer keeps its height. */
+  box-shadow: inset 0 0 0 1px var(--color-border);
+  transition: box-shadow var(--duration-fast);
+}
+
+.chat-composer__row:focus-within {
+  box-shadow: inset 0 0 0 1px var(--color-accent);
+}
+
+.chat-composer__input {
+  flex: 1;
+  min-height: 2rem;
+  max-height: 10rem;
+  padding: var(--space-1) var(--space-2);
+  border: 0;
+  background: transparent;
+  color: var(--color-text);
+  font: inherit;
+  resize: vertical;
+}
+
+.chat-composer__input::placeholder {
+  color: var(--color-text-muted);
+  opacity: 1;
+}
+
+.chat-composer__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 2rem;
+  min-height: 2rem;
+  padding: var(--space-1);
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+}
+
+.chat-composer__icon:hover:not(:disabled) {
+  background: var(--color-bg-hover);
+  color: var(--color-text);
+}
+
+.chat-composer__icon:disabled,
+.chat-composer__input:disabled {
+  cursor: not-allowed;
+}
+
+.chat-composer__preview {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin-bottom: var(--space-2);
+}
+
+.chat-composer__preview img {
+  max-width: 8rem;
+  max-height: 6rem;
+  border-radius: var(--radius-sm);
+}
+
+.chat-composer__blocked,
+.chat-composer__error {
+  margin: 0 0 var(--space-2);
+  font-size: var(--font-size-sm);
+}
+
+.chat-composer__blocked {
+  color: var(--color-text-secondary);
+}
+
+.chat-composer__error {
+  color: var(--color-danger);
+}
+
+/* Pinned channel info (FR-1.48b): description and welcome text above the messages. */
+.pinned-info {
+  margin: var(--space-2) var(--space-4) 0;
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-bg-elevated);
+  font-size: var(--font-size-sm);
+}
+
+.pinned-info__body {
+  max-height: 40vh;
+  overflow-y: auto;
+}
+
+/* About three lines; the toggle reveals the rest. */
+.pinned-info__body--collapsed {
+  max-height: calc(3 * var(--line-height) * 1em);
+  overflow: hidden;
+}
+
+.pinned-info__block + .pinned-info__block {
+  margin-top: var(--space-2);
+  padding-top: var(--space-2);
+  border-top: 1px solid var(--color-border);
+}
+
+.pinned-info__block ul,
+.pinned-info__block ol {
+  margin: 0;
+  padding-left: var(--space-5);
+}
+
+.pinned-info__toggle {
+  margin-top: var(--space-1);
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: var(--color-accent-text);
+  font-size: var(--font-size-sm);
+  cursor: pointer;
+}
+
+.pinned-info__toggle:hover {
+  text-decoration: underline;
+}

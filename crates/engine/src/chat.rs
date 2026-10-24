@@ -1,0 +1,738 @@
+//! Text chat: routing incoming messages, sending, unread counts and the local history
+//! (FR-1.28–1.30, FR-1.32, FR-1.33).
+//!
+//! Every message body is sanitized before it is stored or emitted. Unread counts live in
+//! memory per server (followed channels are seeded from the store's read markers at sync),
+//! so they also work while "Save history" is off.
+
+mod sanitize;
+
+use std::collections::HashMap;
+use std::sync::atomic::{AtomicU64, Ordering};
+use std::sync::{LazyLock, Mutex};
+use std::time::{SystemTime, UNIX_EPOCH};
+
+use mumcord_protocol::{ServerState, TextMessage, TextTarget};
+use mumcord_store::{ChatMessage, Conversation, NewChatMessage, ServerId, Store, UnixMillis};
+
+use crate::session::convert::{channel_view, command_error, join_path, split_path};
+use crate::session::{
+    ConversationRef, Engine, EngineError, EngineEvent, EngineResult, ErrorKind, SessionCtx,
+    Snapshot, UnreadView, lock, store_error,
+};
+use crate::sounds::Sound;
+
+pub use sanitize::sanitize_html;
+
+/// Size cap for messages with images when the server sets no limit; the UI scales images to
+/// the same target.
+pub const IMAGE_SOFT_CAP: u32 = 128 * 1024;
+/// Upper bound for one `history_load` page.
+const MAX_PAGE: u32 = 500;
+/// Prefix of ids of messages that were shown but not stored.
+const TRANSIENT_PREFIX: &str = "tmp-";
+
+/// A chat message as the UI sees it.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct ChatMessageView {
+    /// Store id, or `tmp-<n>` for messages that were not stored; paging cursor.
+    pub id: String,
+    pub conversation: ConversationRef,
+    pub sender_name: String,
+    pub sender_cert_hash: Option<String>,
+    /// Sender session while connected; `None` for history entries.
+    pub sender_session: Option<u32>,
+    pub own: bool,
+    pub sent_at: UnixMillis,
+    /// Sanitized HTML.
+    pub body: String,
+}
+
+/// What `history_clear` removes.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum HistoryScope {
+    Conversation {
+        server_id: ServerId,
+        conversation: ConversationRef,
+    },
+    Server(ServerId),
+    All,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+enum UnreadKey {
+    Stored(Conversation),
+    /// Private chat with a person without certificate (lasts only for the session).
+    Session(u32),
+}
+
+static UNREAD: LazyLock<Mutex<HashMap<(ServerId, UnreadKey), u32>>> =
+    LazyLock::new(Default::default);
+static TRANSIENT_IDS: AtomicU64 = AtomicU64::new(1);
+
+pub(crate) fn now_millis() -> UnixMillis {
+    SystemTime::now()
+        .duration_since(UNIX_EPOCH)
+        .map(|d| i64::try_from(d.as_millis()).unwrap_or(i64::MAX))
+        .unwrap_or_default()
+}
+
+/// Where an incoming message belongs.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+enum Route {
+    Private { session: u32 },
+    Channel(u32),
+}
+
+fn route(state: &ServerState, msg: &TextMessage) -> Option<Route> {
+    let t = &msg.target;
+    if t.channels.is_empty() && t.trees.is_empty() {
+        // Private messages without a sender come from server scripts; there is no one to
+        // answer, so there is no conversation to put them in.
+        return msg
+            .actor
+            .filter(|_| !t.sessions.is_empty())
+            .map(|session| Route::Private { session });
+    }
+    let own = state.own_user();
+    let own_channel = own.map(|u| u.channel_id);
+    let listens = |c: u32| own.is_some_and(|u| u.listening.contains(&c));
+    let reaches_own = |c: &u32| {
+        Some(*c) == own_channel
+            || (t.trees.contains(c) && own_channel.is_some_and(|o| is_within(state, o, *c)))
+    };
+    let targets = || t.channels.iter().chain(&t.trees);
+    if targets().any(reaches_own) {
+        return own_channel.map(Route::Channel);
+    }
+    targets()
+        .find(|c| listens(**c))
+        .or_else(|| targets().next())
+        .copied()
+        .map(Route::Channel)
+}
+
+/// Unread badges exist for private chats, the own channel and followed channels (FR-1.31).
+fn counts_unread(state: &ServerState, route: Route) -> bool {
+    match route {
+        Route::Private { .. } => true,
+        Route::Channel(c) => state
+            .own_user()
+            .is_some_and(|u| u.channel_id == c || u.listening.contains(&c)),
+    }
+}
+
+/// The message sound stays limited to private chats and followed channels: the own channel's
+/// messages were silent before they counted as unread.
+fn plays_message_sound(state: &ServerState, route: Route) -> bool {
+    match route {
+        Route::Private { .. } => true,
+        Route::Channel(c) => state
+            .own_user()
+            .is_some_and(|u| u.channel_id != c && u.listening.contains(&c)),
+    }
+}
+
+/// Whether `channel` is `root` or one of its sub-channels.
+fn is_within(state: &ServerState, channel: u32, root: u32) -> bool {
+    let mut current = Some(channel);
+    while let Some(id) = current {
+        if id == root {
+            return true;
+        }
+        current = state.channels.get(&id).and_then(|c| c.parent);
+    }
+    false
+}
+
+/// Rejects empty messages and messages above the server limit (FR-1.30). Lengths are in
+/// UTF-16 units like the server counts them; messages with images use the image limit.
+fn check_size(html: &str, max_message: u32, max_image: u32) -> EngineResult<()> {
+    if html.trim().is_empty() {
+        return Err(EngineError::invalid("empty message"));
+    }
+    let len = html.encode_utf16().count();
+    let has_image = html.to_ascii_lowercase().contains("<img");
+    let limit = match (has_image, max_image) {
+        (true, 0) => IMAGE_SOFT_CAP,
+        (true, n) => n,
+        (false, _) => max_message,
+    };
+    if limit > 0 && len > limit as usize {
+        return Err(EngineError::new(
+            ErrorKind::MessageTooLarge,
+            format!("message length {len} exceeds the limit of {limit}"),
+        ));
+    }
+    Ok(())
+}
+
+/// Server limits for text (message, image message) in characters; 0 = none.
+pub(crate) fn text_limits(state: &ServerState) -> (u32, u32) {
+    (
+        state.server.message_length.unwrap_or(0),
+        state.server.image_message_length.unwrap_or(0),
+    )
+}
+
+pub(crate) fn check_text_size(ctx: &SessionCtx, html: &str) -> EngineResult<()> {
+    let (message, image) = ctx.handle.with_state(text_limits);
+    check_size(html, message, image)
+}
+
+fn stored_conversation(
+    ctx: &SessionCtx,
+    conversation: &ConversationRef,
+) -> EngineResult<Option<Conversation>> {
+    Ok(match conversation {
+        ConversationRef::Channel { channel_id } => {
+            let path = ctx
+                .channel_path(*channel_id)
+                .ok_or_else(|| EngineError::new(ErrorKind::NotFound, "unknown channel"))?;
+            Some(Conversation::Channel(join_path(&path)))
+        }
+        ConversationRef::Private { cert_hash } => Some(Conversation::Private(cert_hash.clone())),
+        ConversationRef::PrivateSession { .. } => None,
+    })
+}
+
+fn unread_key(ctx: &SessionCtx, conversation: &ConversationRef) -> EngineResult<UnreadKey> {
+    Ok(match stored_conversation(ctx, conversation)? {
+        Some(c) => UnreadKey::Stored(c),
+        None => match conversation {
+            ConversationRef::PrivateSession { session } => UnreadKey::Session(*session),
+            _ => return Err(EngineError::internal("conversation without key")),
+        },
+    })
+}
+
+/// Conversation reference of an unread key on the connected server, if it still exists.
+fn key_conversation(ctx: &SessionCtx, key: &UnreadKey) -> Option<ConversationRef> {
+    match key {
+        UnreadKey::Stored(Conversation::Channel(path)) => ctx
+            .resolve_channel_path(&split_path(path))
+            .map(|channel_id| ConversationRef::Channel { channel_id }),
+        UnreadKey::Stored(Conversation::Private(cert_hash)) => Some(ConversationRef::Private {
+            cert_hash: cert_hash.clone(),
+        }),
+        UnreadKey::Session(session) => Some(ConversationRef::PrivateSession { session: *session }),
+    }
+}
+
+/// Stores a message (if saving is on and the conversation is storable) and returns its id.
+fn store_message(
+    store: &Store,
+    server_id: ServerId,
+    conversation: Option<Conversation>,
+    message: &ChatMessageView,
+) -> String {
+    let stored = conversation.and_then(|conversation| {
+        let new = NewChatMessage {
+            conversation,
+            sender_name: message.sender_name.clone(),
+            sender_cert_hash: message.sender_cert_hash.clone(),
+            sent_at: message.sent_at,
+            body: message.body.clone(),
+        };
+        store.insert_message(server_id, &new).unwrap_or_else(|e| {
+            tracing::warn!(error = %e, "storing a chat message failed");
+            None
+        })
+    });
+    match stored {
+        Some(id) => id.to_string(),
+        None => format!(
+            "{TRANSIENT_PREFIX}{}",
+            TRANSIENT_IDS.fetch_add(1, Ordering::Relaxed)
+        ),
+    }
+}
+
+/// Incoming text message: route, sanitize, store, emit, count unread (hook from the session).
+pub(crate) fn on_text(ctx: &SessionCtx, msg: &TextMessage) {
+    let routed = ctx.handle.with_state(|s| {
+        let route = route(s, msg)?;
+        let sender = msg.actor.and_then(|a| s.users.get(&a));
+        let unread = counts_unread(s, route);
+        let sound = plays_message_sound(s, route);
+        Some((
+            route,
+            sender.map(|u| u.name.clone()).unwrap_or_default(),
+            sender.and_then(|u| u.cert_hash.clone()),
+            unread,
+            sound,
+        ))
+    });
+    let Some((route, sender_name, sender_cert_hash, counts_unread, plays_sound)) = routed else {
+        return;
+    };
+    let conversation = match route {
+        Route::Channel(channel_id) => ConversationRef::Channel { channel_id },
+        Route::Private { session } => match &sender_cert_hash {
+            Some(cert_hash) => ConversationRef::Private {
+                cert_hash: cert_hash.clone(),
+            },
+            None => ConversationRef::PrivateSession { session },
+        },
+    };
+    let Ok(key) = unread_key(ctx, &conversation) else {
+        return;
+    };
+    let mut message = ChatMessageView {
+        id: String::new(),
+        conversation: conversation.clone(),
+        sender_name,
+        sender_cert_hash,
+        sender_session: msg.actor,
+        own: false,
+        sent_at: now_millis(),
+        body: sanitize_html(&msg.message),
+    };
+    let stored = match &key {
+        UnreadKey::Stored(c) => Some(c.clone()),
+        UnreadKey::Session(_) => None,
+    };
+    message.id = store_message(&ctx.store(), ctx.server_id, stored, &message);
+    ctx.events
+        .emit(EngineEvent::MessageReceived(Box::new(message)));
+    if counts_unread {
+        let count = {
+            let mut unread = lock(&UNREAD);
+            let count = unread.entry((ctx.server_id, key)).or_insert(0);
+            *count = count.saturating_add(1);
+            *count
+        };
+        ctx.events.emit(EngineEvent::UnreadChanged(UnreadView {
+            conversation,
+            count,
+        }));
+        if plays_sound {
+            ctx.events.sounds().play(Sound::Message);
+        }
+    }
+}
+
+/// Fills `snapshot.unread` after a (re)sync. Followed channels start from the store's read
+/// marker the first time; session-bound private chats end with the old session.
+pub(crate) fn on_synced(ctx: &SessionCtx, snapshot: &mut Snapshot) {
+    let server = ctx.server_id;
+    let followed = ctx.store().followed_channels(server).unwrap_or_else(|e| {
+        tracing::warn!(error = %e, "reading followed channels failed");
+        Vec::new()
+    });
+    let mut unread = lock(&UNREAD);
+    unread.retain(|(s, key), _| *s != server || !matches!(key, UnreadKey::Session(_)));
+    for f in followed {
+        let Some(channel_id) = ctx.resolve_channel_path(&split_path(&f.channel_path)) else {
+            continue;
+        };
+        if !snapshot.followed_channel_ids.contains(&channel_id) {
+            continue;
+        }
+        let conversation = Conversation::Channel(f.channel_path.clone());
+        let count = *unread
+            .entry((server, UnreadKey::Stored(conversation.clone())))
+            .or_insert_with(|| {
+                ctx.store()
+                    .count_messages_since(server, &conversation, f.last_read_at)
+                    .map(|n| u32::try_from(n).unwrap_or(u32::MAX))
+                    .unwrap_or_else(|e| {
+                        tracing::warn!(error = %e, "counting unread messages failed");
+                        0
+                    })
+            });
+        if count > 0 {
+            snapshot.unread.push(UnreadView {
+                conversation: ConversationRef::Channel { channel_id },
+                count,
+            });
+        }
+    }
+    for ((s, key), count) in unread.iter() {
+        // Counts of the own channel (not followed) live only in memory.
+        if let (true, UnreadKey::Stored(Conversation::Channel(path))) = (*s == server, key)
+            && *count > 0
+            && let Some(channel_id) = ctx.resolve_channel_path(&split_path(path))
+            && !snapshot
+                .unread
+                .iter()
+                .any(|u| u.conversation == ConversationRef::Channel { channel_id })
+        {
+            snapshot.unread.push(UnreadView {
+                conversation: ConversationRef::Channel { channel_id },
+                count: *count,
+            });
+        }
+        if let (true, UnreadKey::Stored(Conversation::Private(cert_hash))) = (*s == server, key)
+            && *count > 0
+        {
+            snapshot.unread.push(UnreadView {
+                conversation: ConversationRef::Private {
+                    cert_hash: cert_hash.clone(),
+                },
+                count: *count,
+            });
+        }
+    }
+}
+
+/// Drops the unread count of a followed channel path (on unfollow).
+pub(crate) fn forget_unread(server: ServerId, channel_path: &str) -> bool {
+    lock(&UNREAD)
+        .remove(&(
+            server,
+            UnreadKey::Stored(Conversation::Channel(channel_path.to_owned())),
+        ))
+        .is_some_and(|n| n > 0)
+}
+
+fn history_view(
+    m: ChatMessage,
+    conversation: &ConversationRef,
+    own_hash: Option<&str>,
+) -> ChatMessageView {
+    let own = own_hash.is_some() && m.sender_cert_hash.as_deref() == own_hash;
+    ChatMessageView {
+        id: m.id.to_string(),
+        conversation: conversation.clone(),
+        sender_name: m.sender_name,
+        sender_cert_hash: m.sender_cert_hash,
+        sender_session: None,
+        own,
+        sent_at: m.sent_at,
+        body: m.body,
+    }
+}
+
+impl Engine {
+    /// Sends Mumble HTML to a channel (FR-1.28, FR-1.30) and returns the stored own message.
+    pub fn send_channel_message(
+        &self,
+        channel_id: u32,
+        html: &str,
+    ) -> EngineResult<ChatMessageView> {
+        let ctx = self.session_ctx()?;
+        let allowed = ctx.handle.with_state(|s| {
+            s.channels
+                .get(&channel_id)
+                .map(|c| channel_view(s, c).permissions.text_message)
+        });
+        match allowed {
+            None => return Err(EngineError::new(ErrorKind::NotFound, "unknown channel")),
+            Some(false) => {
+                return Err(EngineError::new(
+                    ErrorKind::PermissionDenied,
+                    "no permission to write in this channel",
+                ));
+            }
+            Some(true) => {}
+        }
+        check_text_size(&ctx, html)?;
+        ctx.handle
+            .send_text(&TextTarget::channel(channel_id), html)
+            .map_err(command_error)?;
+        Ok(own_message(
+            &ctx,
+            ConversationRef::Channel { channel_id },
+            html,
+        ))
+    }
+
+    /// Sends Mumble HTML to one person and returns the stored own message.
+    pub fn send_private_message(&self, session: u32, html: &str) -> EngineResult<ChatMessageView> {
+        let ctx = self.session_ctx()?;
+        let recipient = ctx
+            .handle
+            .with_state(|s| s.users.get(&session).map(|u| u.cert_hash.clone()))
+            .ok_or_else(|| EngineError::new(ErrorKind::NotFound, "unknown person"))?;
+        check_text_size(&ctx, html)?;
+        ctx.handle
+            .send_text(&TextTarget::user(session), html)
+            .map_err(command_error)?;
+        let conversation = match recipient {
+            Some(cert_hash) => ConversationRef::Private { cert_hash },
+            None => ConversationRef::PrivateSession { session },
+        };
+        Ok(own_message(&ctx, conversation, html))
+    }
+
+    /// Resets the unread count of a conversation (and the stored read marker of a followed
+    /// channel).
+    pub fn conversation_mark_read(&self, conversation: ConversationRef) -> EngineResult<()> {
+        let ctx = self.session_ctx()?;
+        let key = unread_key(&ctx, &conversation)?;
+        if let UnreadKey::Stored(Conversation::Channel(path)) = &key {
+            ctx.store()
+                .mark_channel_read(ctx.server_id, path, now_millis())
+                .map_err(store_error)?;
+        }
+        lock(&UNREAD).remove(&(ctx.server_id, key));
+        ctx.events.emit(EngineEvent::UnreadChanged(UnreadView {
+            conversation,
+            count: 0,
+        }));
+        Ok(())
+    }
+
+    /// Stored messages of a conversation on the connected server, oldest first; `before`
+    /// pages backwards from a message id.
+    pub fn history_load(
+        &self,
+        conversation: ConversationRef,
+        before: Option<&str>,
+        limit: u32,
+    ) -> EngineResult<Vec<ChatMessageView>> {
+        let ctx = self.session_ctx()?;
+        let Some(stored) = stored_conversation(&ctx, &conversation)? else {
+            return Ok(Vec::new());
+        };
+        let limit = limit.clamp(1, MAX_PAGE);
+        let rows = {
+            let store = ctx.store();
+            match before {
+                None => store.messages(ctx.server_id, &stored, limit),
+                Some(id) if id.starts_with(TRANSIENT_PREFIX) => return Ok(Vec::new()),
+                Some(id) => {
+                    let id = id
+                        .parse::<i64>()
+                        .map_err(|_| EngineError::invalid("unknown message id"))?;
+                    store.messages_before(ctx.server_id, &stored, id, limit)
+                }
+            }
+            .map_err(store_error)?
+        };
+        let own_hash = ctx
+            .handle
+            .with_state(|s| s.own_user().and_then(|u| u.cert_hash.clone()));
+        Ok(rows
+            .into_iter()
+            .map(|m| history_view(m, &conversation, own_hash.as_deref()))
+            .collect())
+    }
+
+    /// Clears local history (FR-1.33); cleared conversations are no longer unread.
+    pub fn history_clear(&self, scope: HistoryScope) -> EngineResult<()> {
+        let ctx = self.session_ctx().ok();
+        let store = self.store_handle();
+        let cleared: Vec<(ServerId, UnreadKey)> = match &scope {
+            HistoryScope::Conversation {
+                server_id,
+                conversation,
+            } => {
+                let key = match conversation {
+                    ConversationRef::Private { cert_hash } => {
+                        UnreadKey::Stored(Conversation::Private(cert_hash.clone()))
+                    }
+                    _ => match &ctx {
+                        Some(ctx) if ctx.server_id == *server_id => unread_key(ctx, conversation)?,
+                        _ => return Err(EngineError::not_connected()),
+                    },
+                };
+                if let UnreadKey::Stored(c) = &key {
+                    lock(&store)
+                        .clear_conversation_history(*server_id, c)
+                        .map_err(store_error)?;
+                }
+                vec![(*server_id, key)]
+            }
+            HistoryScope::Server(server_id) => {
+                lock(&store)
+                    .clear_server_history(*server_id)
+                    .map_err(store_error)?;
+                lock(&UNREAD)
+                    .keys()
+                    .filter(|(s, _)| s == server_id)
+                    .cloned()
+                    .collect()
+            }
+            HistoryScope::All => {
+                lock(&store).clear_all_history().map_err(store_error)?;
+                lock(&UNREAD).keys().cloned().collect()
+            }
+        };
+        let mut unread = lock(&UNREAD);
+        for entry in cleared {
+            let had = unread.remove(&entry).is_some_and(|n| n > 0);
+            if let Some(ctx) = ctx.as_ref().filter(|c| had && c.server_id == entry.0)
+                && let Some(conversation) = key_conversation(ctx, &entry.1)
+            {
+                ctx.events.emit(EngineEvent::UnreadChanged(UnreadView {
+                    conversation,
+                    count: 0,
+                }));
+            }
+        }
+        Ok(())
+    }
+}
+
+/// Stores and returns an own sent message.
+fn own_message(ctx: &SessionCtx, conversation: ConversationRef, html: &str) -> ChatMessageView {
+    let (sender_name, sender_cert_hash, sender_session) = ctx.handle.with_state(|s| {
+        let own = s.own_user();
+        (
+            own.map(|u| u.name.clone()).unwrap_or_default(),
+            own.and_then(|u| u.cert_hash.clone()),
+            s.session,
+        )
+    });
+    let mut message = ChatMessageView {
+        id: String::new(),
+        conversation,
+        sender_name,
+        sender_cert_hash,
+        sender_session,
+        own: true,
+        sent_at: now_millis(),
+        body: sanitize_html(html),
+    };
+    let stored = match &message.conversation {
+        ConversationRef::Channel { channel_id } => ctx
+            .channel_path(*channel_id)
+            .map(|p| Conversation::Channel(join_path(&p))),
+        ConversationRef::Private { cert_hash } => Some(Conversation::Private(cert_hash.clone())),
+        ConversationRef::PrivateSession { .. } => None,
+    };
+    message.id = store_message(&ctx.store(), ctx.server_id, stored, &message);
+    message
+}
+
+#[cfg(test)]
+mod tests {
+    use mumcord_protocol::{Channel, User};
+
+    use super::*;
+
+    /// Root(0) > Lobby(1), Raid(2) > Team(3); own session 10 in Lobby listening to Raid.
+    fn state() -> ServerState {
+        let mut s = ServerState {
+            session: Some(10),
+            ..Default::default()
+        };
+        for (id, parent, name) in [
+            (0, None, "Root"),
+            (1, Some(0), "Lobby"),
+            (2, Some(0), "Raid"),
+            (3, Some(2), "Team"),
+        ] {
+            s.channels.insert(
+                id,
+                Channel {
+                    id,
+                    parent,
+                    name: name.into(),
+                    ..Default::default()
+                },
+            );
+        }
+        s.users.insert(
+            10,
+            User {
+                session: 10,
+                channel_id: 1,
+                listening: [2].into(),
+                ..Default::default()
+            },
+        );
+        s
+    }
+
+    fn text(actor: Option<u32>, target: TextTarget) -> TextMessage {
+        TextMessage {
+            actor,
+            target,
+            message: "hi".into(),
+        }
+    }
+
+    #[test]
+    fn routes_private_channel_followed_and_tree_messages() {
+        let s = state();
+        assert_eq!(
+            route(&s, &text(Some(5), TextTarget::user(10))),
+            Some(Route::Private { session: 5 })
+        );
+        assert_eq!(route(&s, &text(None, TextTarget::user(10))), None);
+        assert_eq!(
+            route(&s, &text(Some(5), TextTarget::channel(1))),
+            Some(Route::Channel(1))
+        );
+        assert_eq!(
+            route(&s, &text(Some(5), TextTarget::channel(2))),
+            Some(Route::Channel(2))
+        );
+        let both = TextTarget {
+            channels: vec![2, 1],
+            ..Default::default()
+        };
+        assert_eq!(route(&s, &text(Some(5), both)), Some(Route::Channel(1)));
+        let tree = TextTarget {
+            trees: vec![0],
+            ..Default::default()
+        };
+        assert_eq!(route(&s, &text(Some(5), tree)), Some(Route::Channel(1)));
+        let other_tree = TextTarget {
+            trees: vec![3],
+            ..Default::default()
+        };
+        assert_eq!(
+            route(&s, &text(Some(5), other_tree)),
+            Some(Route::Channel(3))
+        );
+    }
+
+    #[test]
+    fn unread_counts_private_own_and_followed_channels() {
+        let s = state();
+        assert!(counts_unread(&s, Route::Private { session: 5 }));
+        assert!(counts_unread(&s, Route::Channel(2)));
+        assert!(counts_unread(&s, Route::Channel(1)), "own channel");
+        assert!(!counts_unread(&s, Route::Channel(3)), "not followed");
+        assert!(!plays_message_sound(&s, Route::Channel(1)), "own channel");
+        assert!(plays_message_sound(&s, Route::Channel(2)));
+    }
+
+    #[test]
+    fn size_limits_follow_server_settings() {
+        assert!(check_size("hello", 5, 0).is_ok());
+        let err = check_size("hello!", 5, 0).expect_err("too long");
+        assert_eq!(err.kind, ErrorKind::MessageTooLarge);
+        assert!(check_size(&"x".repeat(100_000), 0, 0).is_ok());
+        // Images use the image limit; 0 falls back to the 128 KiB soft cap.
+        let img = format!("<img src=\"data:image/png;base64,{}\">", "A".repeat(200));
+        assert!(check_size(&img, 10, 1000).is_ok());
+        assert!(check_size(&img, 10, 100).is_err());
+        let big = format!(
+            "<IMG src=\"data:image/png;base64,{}\">",
+            "A".repeat(IMAGE_SOFT_CAP as usize)
+        );
+        assert_eq!(
+            check_size(&big, 0, 0).expect_err("cap").kind,
+            ErrorKind::MessageTooLarge
+        );
+        // UTF-16 units, like the server counts.
+        assert!(check_size("äöü", 3, 0).is_ok());
+        assert!(check_size("😀😀", 3, 0).is_err());
+        assert_eq!(
+            check_size("  ", 0, 0).expect_err("empty").kind,
+            ErrorKind::InvalidInput
+        );
+    }
+
+    #[test]
+    fn history_marks_own_messages_by_certificate() {
+        let conv = ConversationRef::Channel { channel_id: 1 };
+        let row = |hash: Option<&str>| ChatMessage {
+            id: 7,
+            conversation: Conversation::Channel("Lobby".into()),
+            sender_name: "A".into(),
+            sender_cert_hash: hash.map(str::to_owned),
+            sent_at: 1,
+            body: "b".into(),
+        };
+        assert!(history_view(row(Some("aa")), &conv, Some("aa")).own);
+        assert!(!history_view(row(Some("bb")), &conv, Some("aa")).own);
+        assert!(!history_view(row(None), &conv, None).own);
+        assert_eq!(history_view(row(None), &conv, None).id, "7");
+    }
+}

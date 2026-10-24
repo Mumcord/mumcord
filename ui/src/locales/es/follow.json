@@ -1,0 +1,54 @@
+{
+  "follow": "Seguir",
+  "following": "Siguiendo",
+  "unsupported": "Seguir canales requiere un servidor con la versión 1.4 o posterior.",
+  "unread_one": "{{count}} mensaje sin leer",
+  "unread_other": "{{count}} mensajes sin leer",
+  "errors": {
+    "denied": "El servidor no te permite seguir este canal.",
+    "limit": "No puedes seguir más canales en este servidor. Deja de seguir otro canal primero.",
+    "tooOld": "Este servidor es demasiado antiguo para seguir canales (se necesita la versión 1.4 o posterior).",
+    "notConnected": "No estás conectado al servidor.",
+    "generic": "No se pudo seguir el canal. Inténtalo de nuevo."
+  },
+  "dm": {
+    "title": "Mensajes directos",
+    "unknown": "Persona desconocida"
+  },
+  "notify": {
+    "channel": "{{name}} en {{channel}}: {{text}}",
+    "private": "{{name}} (privado): {{text}}",
+    "more_one": "{{count}} mensaje nuevo más",
+    "more_other": "{{count}} mensajes nuevos más"
+  },
+  "history": {
+    "clear": "Borrar historial",
+    "title": "¿Borrar el historial?",
+    "body": "Esto elimina de forma permanente los mensajes guardados de esta conversación en este equipo. Las demás personas conservan sus copias.",
+    "confirm": "Borrar historial",
+    "cancel": "Cancelar",
+    "failed": "No se pudo borrar el historial. Inténtalo de nuevo."
+  },
+  "star": {
+    "follow": "Seguir {{channel}}",
+    "unfollow": "Dejar de seguir {{channel}}"
+  },
+  "all": {
+    "menu": "Opciones del servidor {{server}}",
+    "menuLabel": "Opciones del servidor",
+    "follow": "Seguir todos los canales",
+    "unfollow": "Dejar de seguir todos los canales",
+    "working": "Siguiendo canales…",
+    "followed_one": "Siguiendo {{count}} canal.",
+    "followed_other": "Siguiendo {{count}} canales.",
+    "skipped_one": "{{count}} omitido: {{reasons}}.",
+    "skipped_other": "{{count}} omitidos: {{reasons}}.",
+    "limit": "límite alcanzado",
+    "notAllowed": "no permitido",
+    "noAnswer": "sin respuesta del servidor",
+    "unfollowed": "Has dejado de seguir todos los canales.",
+    "failed": "No se pudieron seguir todos los canales. Inténtalo de nuevo.",
+    "dismiss": "Cerrar",
+    "unfollowFailed": "No se pudo dejar de seguir todos los canales. Inténtalo de nuevo."
+  }
+}

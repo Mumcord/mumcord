@@ -1,0 +1,58 @@
+{
+  "unknownName": "Tú",
+  "mute": "Silenciar micrófono",
+  "deafen": "Ensordecer",
+  "disconnect": "Desconectar de {{server}}",
+  "settings": "Ajustes",
+  "menu": "Menú de usuario",
+  "menuProfile": "Editar perfil",
+  "menuRegister": "Registrarse en este servidor",
+  "announce": {
+    "muted": "Micrófono silenciado",
+    "unmuted": "Micrófono activado",
+    "deafened": "Ensordecido. No oyes a nadie y tu micrófono está silenciado",
+    "undeafened": "Ensordecimiento desactivado"
+  },
+  "readOnly": {
+    "text": "Estás leyendo sin participar: únete a un canal para hablar.",
+    "join": "Unirse a {{channel}}"
+  },
+  "status": {
+    "connecting": "Conectando…",
+    "reconnecting": "Reconectando…",
+    "connected": "Conectado",
+    "readOnly": "Solo lectura",
+    "disconnected": "Sin conexión"
+  },
+  "profile": {
+    "title": "Editar perfil",
+    "chooseTitle": "Elige una imagen de perfil",
+    "chooseAvatar": "Elegir imagen…",
+    "removeAvatar": "Quitar imagen",
+    "avatarHint": "La imagen se reduce para ajustarse al límite del servidor.",
+    "avatarUnregistered": "Este servidor solo guarda avatares de usuarios registrados – Mumcord reenvía el tuyo en cada conexión.",
+    "avatarChosen": "Seleccionada: {{name}}",
+    "avatarRemoved": "La imagen se quitará al guardar.",
+    "comment": "Sobre ti"
+  },
+  "register": {
+    "title": "Registrarse en este servidor",
+    "explain": "Al registrarte, tu nombre queda reservado en este servidor. Nadie más podrá usarlo y el servidor te reconocerá la próxima vez que te conectes.",
+    "backup": "Tu identidad demuestra que el nombre es tuyo. Si la pierdes, pierdes el acceso al nombre registrado. Guarda ahora una copia de seguridad y consérvala en un lugar seguro.",
+    "password": "Contraseña del archivo de copia",
+    "export": "Exportar identidad",
+    "saveTitle": "Guardar copia de la identidad",
+    "passwordRequired": "Escribe una contraseña para proteger el archivo de copia.",
+    "exported": "Copia de la identidad guardada.",
+    "confirm": "Registrarse",
+    "done": "Registrado en este servidor"
+  },
+  "errors": {
+    "tooLarge": "Es demasiado grande para el servidor. Elige una imagen más pequeña o escribe un texto más corto.",
+    "denied": "El servidor no lo permite.",
+    "deniedWithReason": "El servidor no lo permite: {{reason}}",
+    "notConnected": "No estás conectado a ningún servidor.",
+    "file": "No se pudo leer o escribir el archivo.",
+    "generic": "Algo salió mal. Inténtalo de nuevo."
+  }
+}

@@ -1,0 +1,219 @@
+/* --channels-width and --members-width are set by the shell from the resize handles (QA.29). */
+.shell {
+  position: relative;
+  display: grid;
+  grid-template-columns: var(--width-server-bar) var(--channels-width) minmax(0, 1fr) var(
+      --members-width
+    );
+  grid-template-rows: minmax(0, 1fr);
+  height: 100%;
+  overflow: hidden;
+  overflow: clip;
+}
+
+.shell__servers {
+  overflow-y: auto;
+  padding: var(--space-3) var(--space-2);
+  background: var(--color-bg-servers);
+}
+
+.shell__channel-column {
+  display: flex;
+  overflow: hidden;
+  flex-direction: column;
+  min-height: 0;
+  background: var(--color-bg-sidebar);
+}
+
+.shell__channels {
+  flex: 1;
+  overflow-y: auto;
+  padding: var(--space-2);
+}
+
+/* The user panel styles itself (background, padding); no separator line above it (QA.26). */
+.shell__user-panel {
+  min-width: 0;
+}
+
+.shell__chat {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0;
+  background: var(--color-bg-chat);
+}
+
+.shell__chat-body {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.shell__members {
+  overflow-y: auto;
+  padding: var(--space-2);
+  border-left: 1px solid var(--color-border);
+  background: var(--color-bg-sidebar);
+}
+
+.shell__members-toggle {
+  display: none;
+}
+
+.shell > .resize-handle[data-column="channels"] {
+  left: calc(var(--width-server-bar) + var(--channels-width));
+}
+
+.shell > .resize-handle[data-column="members"] {
+  left: calc(100% - var(--members-width));
+}
+
+.shell :is(nav, main)[tabindex="-1"]:focus {
+  outline: none;
+}
+
+/* Narrow windows: the member list becomes an overlay panel opened from the chat column. */
+@media (max-width: 60rem) {
+  .shell {
+    grid-template-columns: var(--width-server-bar) var(--channels-width) minmax(0, 1fr);
+  }
+
+  .shell > .resize-handle[data-column="members"] {
+    display: none;
+  }
+
+  .shell__members-toggle {
+    display: block;
+    align-self: flex-end;
+    margin: var(--space-2);
+    padding: var(--space-1) var(--space-3);
+    border: 1px solid var(--color-border-strong);
+    border-radius: var(--radius-full);
+    background: var(--color-bg-elevated);
+    cursor: pointer;
+  }
+
+  .shell__members {
+    display: none;
+  }
+
+  .shell[data-members-open="true"] .shell__members {
+    display: block;
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: min(var(--members-width), 80vw);
+    z-index: 10;
+    box-shadow: var(--shadow-raised);
+  }
+}
+
+.placeholder {
+  margin: var(--space-2);
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+}
+
+.centered-screen {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-4);
+  min-height: 100%;
+  padding: var(--space-6);
+  background: var(--glow-backdrop);
+  text-align: center;
+}
+
+/* Pill buttons as on the website; padding is unchanged so button sizes stay the same. */
+.button {
+  padding: var(--space-2) var(--space-4);
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-full);
+  background: var(--color-bg-elevated);
+  cursor: pointer;
+  transition:
+    background-color var(--duration-fast),
+    border-color var(--duration-fast),
+    filter var(--duration-fast),
+    transform var(--duration-normal) var(--ease-out);
+}
+
+.button:hover:not(:disabled) {
+  border-color: var(--color-text-secondary);
+  background: var(--color-bg-hover);
+}
+
+/* Plain violet (QA.24): the logo gradient is reserved for highlights such as the connected server. */
+.button--primary {
+  border-color: transparent;
+  background: var(--color-accent);
+  color: var(--color-on-accent);
+  font-weight: var(--font-weight-bold);
+}
+
+.button--primary:hover:not(:disabled) {
+  border-color: transparent;
+  background: var(--color-accent);
+  filter: brightness(1.08);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .button:active:not(:disabled) {
+    transform: scale(0.97);
+  }
+}
+
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: flex;
+  background: var(--color-backdrop);
+}
+
+.overlay__dialog {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  margin: var(--space-4);
+  border-radius: var(--radius-lg);
+  background: var(--color-bg-chat);
+  /* Hairline as a shadow, not a border, so the dialog's content box keeps its size. */
+  box-shadow:
+    0 0 0 1px var(--color-border),
+    var(--shadow-raised);
+  overflow: hidden;
+}
+
+.overlay__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-3) var(--space-4);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.overlay__header h1 {
+  margin: 0;
+  font-size: var(--font-size-lg);
+}
+
+.overlay__close {
+  padding: var(--space-1) var(--space-3);
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-full);
+  background: transparent;
+  cursor: pointer;
+}
+
+.overlay__body {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+}

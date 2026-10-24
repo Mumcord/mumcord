@@ -1,0 +1,53 @@
+{
+  "noConversation": "Verbinde dich mit einem Server und wähle einen Kanal, um zu chatten.",
+  "empty": "Noch keine Nachrichten. Nachrichten, die du hier empfängst, werden auf diesem Computer gespeichert.",
+  "header": {
+    "channel": "#{{name}}",
+    "channelPrefix": "Kanal",
+    "privatePrefix": "Privater Chat mit",
+    "unknownPerson": "Unbekannte Person"
+  },
+  "list": {
+    "today": "Heute",
+    "yesterday": "Gestern",
+    "label": "Nachrichten in {{name}}",
+    "loadOlder": "Ältere Nachrichten laden",
+    "loading": "Nachrichten werden geladen…",
+    "loadFailed": "Ältere Nachrichten konnten nicht geladen werden. Scrolle nach oben, um es erneut zu versuchen."
+  },
+  "composer": {
+    "label": "Nachricht an {{name}}",
+    "hint": "Enter sendet, Umschalt+Enter fügt eine neue Zeile ein. Markdown funktioniert: **fett**, *kursiv*, `Code`, [Link](https://…).",
+    "addImage": "Bild hinzufügen",
+    "removeImage": "Bild entfernen",
+    "imagePreview": "Zu sendendes Bild",
+    "send": "Senden",
+    "noPermission": "Du darfst in diesem Kanal nicht schreiben.",
+    "unavailable": "Dieser Kanal ist nicht mehr verfügbar.",
+    "offline": "{{name}} ist offline. Du kannst wieder schreiben, sobald die Person zurück ist."
+  },
+  "errors": {
+    "tooLong": "Deine Nachricht ist zu lang für diesen Server (höchstens {{max}} Zeichen). Kürze sie und versuche es erneut.",
+    "tooLongNoLimit": "Deine Nachricht ist zu lang für diesen Server. Kürze sie und versuche es erneut.",
+    "imageTooLarge": "Dieses Bild ist selbst komprimiert zu groß für diesen Server. Versuche ein kleineres Bild.",
+    "imageWithTextTooLong": "Die Nachricht mit Bild ist zu groß für diesen Server. Kürze den Text oder entferne das Bild.",
+    "imagesNotAllowed": "Dieser Server erlaubt keine Bilder in Nachrichten.",
+    "notImage": "Diese Datei kann nicht gesendet werden. Verwende ein PNG-, JPEG-, GIF- oder WebP-Bild.",
+    "imageUnreadable": "Das Bild konnte nicht gelesen werden. Versuche eine andere Datei.",
+    "denied": "Der Server hat diese Nachricht nicht erlaubt.",
+    "deniedWithReason": "Der Server hat diese Nachricht nicht erlaubt: {{reason}}",
+    "notConnected": "Du bist nicht verbunden. Verbinde dich neu und versuche es erneut.",
+    "generic": "Die Nachricht konnte nicht gesendet werden. Versuche es erneut."
+  },
+  "announce": {
+    "message": "{{name}}: {{text}}",
+    "image": "{{name}} hat ein Bild gesendet",
+    "more_one": "{{count}} weitere neue Nachricht",
+    "more_other": "{{count}} weitere neue Nachrichten"
+  },
+  "pinned": {
+    "label": "Kanalinfo",
+    "showMore": "Mehr anzeigen",
+    "showLess": "Weniger anzeigen"
+  }
+}

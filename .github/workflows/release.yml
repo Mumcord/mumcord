@@ -1,0 +1,121 @@
+name: Release
+
+# Release builds from version tags on main (decision QA.12). Pushing `vX.Y.Z` checks that the
+# tag matches the app version and points to a commit on main, builds and smoke-tests the
+# bundles (build-and-smoke.yml), and creates a DRAFT GitHub Release with the bundles and
+# SHA256SUMS. The maintainer reviews and publishes it by hand. See RELEASING.md.
+on:
+  push:
+    tags: ["v*"]
+
+# Never build the same tag twice at once; never cancel a running release build.
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  guard:
+    name: Check tag
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    outputs:
+      version: ${{ steps.check.outputs.version }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # Full history, so the tagged commit can be checked against main.
+          fetch-depth: 0
+
+      - name: Check tag against app version and main
+        id: check
+        env:
+          TAG: ${{ github.ref_name }}
+        run: |
+          fail() { echo "::error::$1"; exit 1; }
+          [[ "$TAG" =~ ^v[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z.-]+)?$ ]] \
+            || fail "Tag '$TAG' is not a version tag like v1.2.3."
+          version=${TAG#v}
+
+          # Tauri takes the app version from the src-tauri crate (tauri.conf.json sets none),
+          # which inherits the workspace version in Cargo.toml.
+          check() { [[ "$2" == "$version" ]] || fail "$1 is '$2', but the tag says '$version'."; }
+          check "package.json version" "$(node -p "require('./package.json').version")"
+          check "package-lock.json version" "$(node -p "require('./package-lock.json').version")"
+          conf=$(node -p "require('./src-tauri/tauri.conf.json').version ?? ''")
+          [[ -z "$conf" ]] || check "src-tauri/tauri.conf.json version" "$conf"
+          cargo metadata --no-deps --format-version 1 \
+            | jq -r '.packages[] | "\(.name) \(.version)"' > members.txt
+          while read -r name v; do
+            check "Cargo.toml version of crate $name" "$v"
+            # The builds use --locked, so a stale Cargo.lock would fail late; catch it here.
+            locked=$(awk -v n="$name" '$0 == "name = \"" n "\"" { getline; gsub(/version = |"/, ""); print; exit }' Cargo.lock)
+            check "Cargo.lock version of crate $name (run cargo check after bumping)" "$locked"
+          done < members.txt
+
+          commit=$(git rev-parse HEAD)
+          git merge-base --is-ancestor "$commit" origin/main \
+            || fail "Tag '$TAG' points to $commit, which is not on main. Tag a commit on main."
+
+          echo "Tag $TAG matches the app version and is on main."
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+
+  build:
+    needs: guard
+    uses: ./.github/workflows/build-and-smoke.yml
+    with:
+      release: true
+
+  release:
+    name: Create draft release
+    needs: [guard, build]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: mumcord-*-release
+          path: dist
+          merge-multiple: true
+
+      - name: Write checksums and release notes
+        working-directory: dist
+        env:
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          # Fails if any of the three bundles is missing.
+          ls -l -- *.AppImage *-setup.exe *.dmg
+          sha256sum -- *.AppImage *-setup.exe *.dmg > SHA256SUMS
+          cat SHA256SUMS
+          cat > ../notes.md <<EOF
+          ## Downloads
+
+          - **Windows**: \`*-setup.exe\` (installer)
+          - **macOS** (Apple Silicon and Intel): \`*.dmg\`
+          - **Linux**: \`*.AppImage\` (make it executable, then run it)
+
+          Check a download with \`sha256sum -c SHA256SUMS --ignore-missing\`.
+
+          > [!WARNING]
+          > These builds are **not signed** yet. On first start, Windows SmartScreen shows
+          > "Windows protected your PC": choose **More info → Run anyway**. macOS Gatekeeper says
+          > the app "cannot be opened": open **System Settings → Privacy & Security** and choose
+          > **Open Anyway** (or right-click the app and choose **Open**).
+
+          Built and smoke-tested by [this workflow run]($RUN_URL).
+          EOF
+
+      - name: Create draft release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ github.ref_name }}
+          VERSION: ${{ needs.guard.outputs.version }}
+        # --generate-notes appends GitHub's change list after notes.md.
+        run: |
+          gh release create "$TAG" --repo "$GITHUB_REPOSITORY" --verify-tag --draft \
+            --title "Mumcord $VERSION" --notes-file notes.md --generate-notes \
+            dist/*.AppImage dist/*-setup.exe dist/*.dmg dist/SHA256SUMS

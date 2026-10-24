@@ -1,0 +1,22 @@
+//! Typed commands and events shared with the UI.
+//!
+//! Each area lives in its own file so later tasks can own exactly one file. The
+//! human-readable contract is `docs/engine-api.md`; the TypeScript bindings are generated
+//! into `ui/src/bindings/commands.ts`.
+
+pub mod app;
+pub mod audio;
+pub mod channels;
+pub mod chat;
+pub mod diagnostics;
+pub mod follow;
+pub mod history;
+pub mod identity;
+pub mod notifications;
+pub mod people;
+pub mod profile;
+pub mod ptt;
+pub mod servers;
+pub mod session;
+pub mod settings;
+pub mod types;

@@ -1,0 +1,54 @@
+{
+  "follow": "Follow",
+  "following": "Following",
+  "unsupported": "Following channels needs a server running version 1.4 or newer.",
+  "unread_one": "{{count}} unread message",
+  "unread_other": "{{count}} unread messages",
+  "errors": {
+    "denied": "The server doesn't allow you to follow this channel.",
+    "limit": "You can't follow more channels on this server. Unfollow another channel first.",
+    "tooOld": "This server is too old for following channels (version 1.4 or newer is needed).",
+    "notConnected": "You are not connected to the server.",
+    "generic": "Following this channel didn't work. Please try again."
+  },
+  "dm": {
+    "title": "Direct messages",
+    "unknown": "Unknown person"
+  },
+  "notify": {
+    "channel": "{{name}} in {{channel}}: {{text}}",
+    "private": "{{name}} (private): {{text}}",
+    "more_one": "{{count}} more new message",
+    "more_other": "{{count}} more new messages"
+  },
+  "history": {
+    "clear": "Clear history",
+    "title": "Clear history?",
+    "body": "This permanently deletes the saved messages of this conversation from this computer. Other people keep their copies.",
+    "confirm": "Clear history",
+    "cancel": "Cancel",
+    "failed": "The history couldn't be cleared. Please try again."
+  },
+  "star": {
+    "follow": "Follow {{channel}}",
+    "unfollow": "Unfollow {{channel}}"
+  },
+  "all": {
+    "menu": "Server options for {{server}}",
+    "menuLabel": "Server options",
+    "follow": "Follow all channels",
+    "unfollow": "Unfollow all channels",
+    "working": "Following channels…",
+    "followed_one": "Followed {{count}} channel.",
+    "followed_other": "Followed {{count}} channels.",
+    "skipped_one": "{{count}} skipped: {{reasons}}.",
+    "skipped_other": "{{count}} skipped: {{reasons}}.",
+    "limit": "limit reached",
+    "notAllowed": "not allowed",
+    "noAnswer": "no answer from the server",
+    "unfollowed": "Unfollowed all channels.",
+    "failed": "Following all channels didn't work. Please try again.",
+    "dismiss": "Dismiss",
+    "unfollowFailed": "Unfollowing all channels didn't work. Please try again."
+  }
+}

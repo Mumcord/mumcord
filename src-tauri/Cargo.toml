@@ -1,0 +1,77 @@
+[package]
+name = "mumcord"
+description = "Mumcord desktop app (Tauri shell)"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+publish = false
+
+[lib]
+name = "mumcord_lib"
+crate-type = ["staticlib", "cdylib", "rlib"]
+
+[features]
+# Env-selected null/WAV-file audio backend for E2E runs (e2e/); never in release builds.
+test-backend = ["mumcord-engine/test-backend"]
+
+[build-dependencies]
+tauri-build.workspace = true
+
+[dependencies]
+mumcord-engine.workspace = true
+# Not inherited from the workspace: the Tauri CLI ignores the features of inherited dependencies
+# and only bundles the tray library (libayatana-appindicator3) into the AppImage when it sees
+# `tray-icon` here.
+tauri = { version = "2.12", features = ["tray-icon"] }
+tauri-plugin-deep-link.workspace = true
+tauri-plugin-dialog.workspace = true
+tauri-plugin-opener.workspace = true
+tauri-specta.workspace = true
+specta.workspace = true
+specta-typescript.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+tokio.workspace = true
+tracing.workspace = true
+
+[target.'cfg(any(target_os = "linux", target_os = "windows", target_os = "macos"))'.dependencies]
+tauri-plugin-single-instance.workspace = true
+tauri-plugin-global-shortcut.workspace = true
+
+[target.'cfg(target_os = "linux")'.dependencies]
+ashpd = { workspace = true, features = ["global_shortcuts"] }
+# Activation token for the shortcut settings the portal opens (KDE Wayland focus rules).
+gdk.workspace = true
+# Message notifications (FR-1.48c): D-Bus notification service, window activation token.
+zbus.workspace = true
+futures-util.workspace = true
+gtk.workspace = true
+# Mouse-button push-to-talk: evdev reads on Wayland, XInput2 raw button events on X11.
+libc.workspace = true
+x11rb = { workspace = true, features = ["xinput"] }
+
+[target.'cfg(any(target_os = "windows", target_os = "macos"))'.dependencies]
+# Message notifications (FR-1.48c).
+notify-rust.workspace = true
+
+[target.'cfg(target_os = "windows")'.dependencies]
+# Mouse-button push-to-talk: low-level mouse hook. Registry: the autostart `Run` entry.
+windows-sys = { workspace = true, features = [
+    "Win32_System_LibraryLoader",
+    "Win32_System_Registry",
+    "Win32_System_Threading",
+    "Win32_UI_WindowsAndMessaging",
+] }
+
+[target.'cfg(target_os = "macos")'.dependencies]
+# Mouse-button push-to-talk: listen-only event tap and the Accessibility check.
+core-graphics.workspace = true
+core-foundation.workspace = true
+
+[dev-dependencies]
+# `tauri::test` mock app for the X11 push-to-talk check.
+tauri = { version = "2.12", features = ["test"] }
+
+[lints]
+workspace = true
