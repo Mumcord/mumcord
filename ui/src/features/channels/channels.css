@@ -43,6 +43,32 @@
   font-weight: var(--font-weight-bold);
 }
 
+/* Voice channel: green bar and speaker icon, distinct from the violet selected bar. Both bars
+   stack (voice on the outer edge) as box-shadows, so nothing shifts. */
+.tree-channel__row[data-voice="true"] {
+  box-shadow: inset 3px 0 0 var(--color-talking);
+  font-weight: var(--font-weight-bold);
+}
+
+.tree-channel__row[data-voice="true"][data-selected="true"] {
+  box-shadow:
+    inset 3px 0 0 var(--color-talking),
+    inset 6px 0 0 var(--color-accent);
+}
+
+.tree-channel__row[data-voice="true"] .tree-channel__name::before {
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  margin-right: var(--space-1);
+  background: var(--color-talking);
+  content: "";
+  vertical-align: -0.125em;
+  /* Speaker icon (stroke path, same style as the person icons). */
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M11 5 6 9H2v6h4l5 4zM15.5 8.5a5 5 0 0 1 0 7M19 5a10 10 0 0 1 0 14'/%3E%3C/svg%3E")
+    center / contain no-repeat;
+}
+
 .tree-channel__toggle {
   width: 1rem;
   color: var(--color-text-secondary);
@@ -116,6 +142,11 @@
   color: var(--color-text);
 }
 
+/* Muted for you (FR-1.19): the name stays red, also while the person talks. */
+.tree-person .tree-person__name[data-local-muted="true"] {
+  color: var(--color-local-muted);
+}
+
 .tree-person__you,
 .person-icons {
   color: var(--color-text-muted);
@@ -125,6 +156,18 @@
   display: inline-flex;
   gap: var(--space-1);
   margin-left: auto;
+}
+
+/* Imposed by the server or an admin: red on a tinted chip, so it differs from a self mute by
+   shape as well as colour. Same box size as the other icons, so rows keep their height. */
+.person-icon--server {
+  border-radius: var(--radius-sm);
+  background: color-mix(in srgb, var(--color-danger) 22%, transparent);
+  color: var(--color-danger);
+}
+
+.person-icon--local-muted {
+  color: var(--color-local-muted);
 }
 
 .channel-tree__hint {

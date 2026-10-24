@@ -1,13 +1,14 @@
 import { act, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { subscribeAnnouncements, type Announcement } from "../../a11y/announcer";
-import type { MockApi } from "../../api";
+import { createMockApi, setApi, type MockApi } from "../../api";
+import { applyLanguage } from "../../i18n";
 import { axeViolations } from "../../test/axe";
 import { applyThemeToDocument } from "../../theme/theme";
 import { AnnouncementLimiter, GLOBAL_INTERVAL_MS, TALK_INTERVAL_MS } from "./announcements";
 import { ChannelsPanel } from "./ChannelsPanel";
 import { getSelectedConversation } from "./selection";
-import { getServerState } from "./serverStore";
+import { getServerState, resetServerStore } from "./serverStore";
 import { connectedMock, resetAll, stubDialog } from "./testUtils";
 
 let api: MockApi;
@@ -37,11 +38,12 @@ describe("ChannelsPanel", () => {
 
   it("renders channels with people and their status", async () => {
     await renderPanel();
+    await act(() => api.channelJoin(1));
     const lobby = item(/^Lobby/);
     expect(lobby).toHaveAttribute("aria-expanded", "true");
     expect(lobby).toHaveAttribute("aria-selected", "true");
     expect(lobby).toHaveAttribute("aria-keyshortcuts", "Shift+Enter");
-    expect(lobby).toHaveAccessibleName(/your channel, 3 people/);
+    expect(lobby).toHaveAccessibleName(/you are here \(voice\), 3 people/);
     expect(item(/^Ben/)).toHaveAccessibleName(/not registered/);
     expect(screen.getByText(/Shift\+Enter or double-click: join/)).toBeInTheDocument();
   });
@@ -156,6 +158,46 @@ describe("ChannelsPanel", () => {
     fireEvent.keyDown(raid, { key: "Enter", shiftKey: true });
     await waitFor(() => {
       expect(getServerState().users.get(1)?.channelId).toBe(2);
+    });
+  });
+
+  describe("voice channel highlight (FR-1.15)", () => {
+    const voiceRows = () =>
+      Array.from(document.querySelectorAll(".tree-channel__row[data-voice='true']")).map(
+        (row) => row.querySelector(".tree-channel__name")?.textContent,
+      );
+
+    it("marks the joined channel with a cue for screen readers, apart from the selection", async () => {
+      await renderPanel();
+      await act(() => api.channelJoin(1));
+      expect(voiceRows()).toEqual(["Lobby"]);
+      expect(item(/^Lobby/)).toHaveAccessibleName(/you are here \(voice\)/);
+      expect(item(/^Raid/)).not.toHaveAccessibleName(/you are here/);
+      fireEvent.click(item(/^Raid/));
+      expect(voiceRows()).toEqual(["Lobby"]);
+      expect(item(/^Raid/)).toHaveAttribute("aria-selected", "true");
+    });
+
+    it("moves with the user to the joined channel", async () => {
+      await renderPanel();
+      await act(() => api.channelJoin(1));
+      await act(() => api.channelJoin(2));
+      expect(voiceRows()).toEqual(["Raid"]);
+      expect(item(/^Lobby/)).not.toHaveAccessibleName(/you are here/);
+      expect(item(/^Raid/)).toHaveAccessibleName(/you are here \(voice\)/);
+    });
+
+    it("shows nothing while reading along", async () => {
+      api = createMockApi();
+      setApi(api);
+      resetServerStore();
+      await applyLanguage("en");
+      render(<ChannelsPanel />);
+      await act(() => api.connect(1, null));
+      await screen.findByRole("tree", { name: "Channels" });
+      expect(voiceRows()).toEqual([]);
+      await act(() => api.channelJoin(1));
+      expect(voiceRows()).toEqual(["Lobby"]);
     });
   });
 

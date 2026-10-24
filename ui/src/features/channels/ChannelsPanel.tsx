@@ -4,7 +4,7 @@ import { useTranslation } from "react-i18next";
 import { toEngineError } from "../../api";
 import { useProfileCard } from "../members/useProfileCard";
 import type { SendPrivateMessage } from "../members/privateMessage";
-import { joinChannel } from "../userpanel/readOnly";
+import { joinChannel, useReadOnly } from "../userpanel/readOnly";
 import { useServerAnnouncements } from "./announcements";
 import { ChannelTree, type ChannelAction } from "./ChannelTree";
 import { useSelectedConversation } from "./selection";
@@ -28,6 +28,7 @@ export function ChannelsPanel({
   onSendPrivateMessage,
 }: ChannelsPanelProps) {
   const { t } = useTranslation("channels");
+  const readOnly = useReadOnly();
   const state = useServerState();
   const { conversation, select } = useSelectedConversation();
   const { openProfile, profileCard } = useProfileCard(onSendPrivateMessage);
@@ -75,6 +76,7 @@ export function ChannelsPanel({
       {header}
       <ChannelTree
         state={state}
+        readOnly={readOnly}
         selectedChannelId={conversation?.kind === "channel" ? conversation.channelId : null}
         onSelect={(channelId) => {
           setJoinError(null);
