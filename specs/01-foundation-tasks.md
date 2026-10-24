@@ -117,6 +117,8 @@
 | F37 | PTT key capture rejects every key on KDE Wayland (wizard + settings) | done (open: shortcut filed under launching app until a .desktop file is installed) | f37-ptt-key-rejected | user report | complex | FR-1.5, AC-1.9 | src-tauri ptt, wizard/settings PTT UI |
 | S3 | Spec addendum QA.4: mouse buttons as PTT (native; Wayland via evdev + input group, off by default) → AC-1.37 | done | s3-spec-mouse-ptt | user decision | simple | – | spec + brainstorming |
 | F38 | Implement mouse-button PTT (Windows/macOS/X11 native; Wayland evdev opt-in with permission check + instructions) | done (Linux verified; Windows/macOS via CI + manual) | f38-mouse-ptt | F37, S3 | complex | AC-1.37 | src-tauri ptt, settings/wizard PTT UI |
+| V11 | Workflows (0afb830) | done – Windows UI test + one E2E count flaky | ci11-watch | F38 | simple | §10 | – |
+| F39 | Flaky: Wizard announce test on Windows; VAD packet count off-by-one in voice E2E | done | f39-flaky-tests | V11 | simple | – | Wizard.test.tsx, e2e/specs/voice/voice.e2e.ts |
 | G1 | **Stage 1a gate** (checklist in specs/01-foundation-implementation.md): user manual checklist (Win/macOS, listening, KDE PTT/tray/Orca) + sign-off | open | user | C1–C8 | – | – | – |
 | B30 | Mumble Link + 3D audio | open | | F35 | Avatar image load failure showed empty circle; mock polish + new screenshot | done | f35-avatar-fallback | screenshot | simple | FR-1.17 | members Avatar, mock, docs/images |
 | G1 | complex | FR-1.41, 1.43 | crates/positional/src/link/, crates/audio/src/spatial/ |
@@ -198,3 +200,4 @@
 - **Q1:** E2E suite lint/typecheck clean; AC-1.29 ✅ (Mumble BSD text via app_info); AC-1.35 ✅ new spec e2e/specs/voice/read-only-join.e2e.ts (9/9). Full suite 18/18 after harness fixes (theme allowlist, badge helper, sound-burst limit 1000 ms).
 - **F37:** KDE ignored the pressed key once a 'push-to-talk' entry existed without a key (stored under the launching app, e.g. Konsole, in ~/.config/kglobalshortcutsrc) and returned no trigger → mapped to invalidInput. Now opens KDE shortcut settings (ConfigureShortcuts) and waits for the key; new error code shortcutNotConfirmed. **Next on resume: F38 (mouse-button PTT), then user checklist (G1).**
 - **F38:** mouse PTT keys MouseMiddle/Mouse4/Mouse5; backends Windows WH_MOUSE_LL, macOS CGEventTap (listen-only), X11 XInput2 raw, Wayland evdev opt-in (`allow_mouse_buttons`, default false; sysfs mouse filter excludes keyboards; no grab; no logging); command ptt_mouse_status. User not in input group → only permission-missing path verified locally.
+- **V11:** new Windows/macOS/X11 mouse code compiles + clippy clean on all OS; Test builds all green; two flaky tests → F39.
