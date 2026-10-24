@@ -9,3 +9,5 @@ export {
 export { Avatar } from "./Avatar";
 export { ProfilePreviewHost, ProfilePreviewTrigger } from "./ProfilePreview";
 export { previewOnFocus, releasePreview } from "./profilePreviewStore";
+export { PersonMenuHost } from "./PersonMenu";
+export { openPersonMenuFromEvent } from "./personMenuStore";

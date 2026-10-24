@@ -20,6 +20,7 @@ import { VOICE_STATE_KEY, voiceState } from "../channels/statusText";
 import { useServerState } from "../channels/serverStore";
 import "./profilePreview.css";
 import { Avatar } from "./Avatar";
+import { openPersonMenuFromEvent, openPersonMenuFromKey } from "./personMenuStore";
 import { placeNextTo } from "./placement";
 import {
   closePreview,
@@ -69,6 +70,12 @@ export function ProfilePreviewTrigger({
         previewOnFocus(session, event.currentTarget, event.target);
       }}
       onBlur={releasePreview}
+      onContextMenu={(event) => {
+        openPersonMenuFromEvent(session, event);
+      }}
+      onKeyDown={(event) => {
+        openPersonMenuFromKey(session, event);
+      }}
     >
       {children}
     </span>

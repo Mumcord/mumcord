@@ -169,7 +169,7 @@ function ProfileBody({
   );
 }
 
-function VolumeSlider({ user, onError }: { user: User; onError: (cause: unknown) => void }) {
+export function VolumeSlider({ user, onError }: { user: User; onError: (cause: unknown) => void }) {
   const { t } = useTranslation("members");
   const inputId = useId();
   const [value, setValue] = useState(user.volume);

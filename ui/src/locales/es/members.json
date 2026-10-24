@@ -21,5 +21,11 @@
   "errors": {
     "notConnected": "No estás conectado a un servidor.",
     "generic": "No ha funcionado. Inténtalo de nuevo."
+  },
+  "menu": {
+    "label": "Acciones para {{name}}",
+    "viewProfile": "Ver perfil",
+    "mute": "Silenciar para mí",
+    "unmute": "Dejar de silenciar para mí"
   }
 }

@@ -21,5 +21,11 @@
   "errors": {
     "notConnected": "Not connected to a server.",
     "generic": "That didn't work. Please try again."
+  },
+  "menu": {
+    "label": "Actions for {{name}}",
+    "viewProfile": "View profile",
+    "mute": "Mute for me",
+    "unmute": "Unmute for me"
   }
 }

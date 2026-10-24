@@ -21,5 +21,11 @@
   "errors": {
     "notConnected": "Nicht mit einem Server verbunden.",
     "generic": "Das hat nicht geklappt. Bitte versuche es erneut."
+  },
+  "menu": {
+    "label": "Aktionen für {{name}}",
+    "viewProfile": "Profil ansehen",
+    "mute": "Für mich stummschalten",
+    "unmute": "Für mich laut schalten"
   }
 }
