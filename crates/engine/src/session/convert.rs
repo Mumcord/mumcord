@@ -115,12 +115,7 @@ pub fn server_info_view(state: &ServerState) -> ServerInfoView {
 }
 
 /// Server-provided HTML is untrusted: strip scripts, handlers and remote resources.
-pub fn sanitize_html(html: &str) -> String {
-    ammonia::Builder::default()
-        .url_schemes(["http", "https", "data", "mailto"].into())
-        .clean(html)
-        .to_string()
-}
+pub use crate::chat::sanitize_html;
 
 /// Classifies a failed connection attempt.
 pub fn connect_failure(err: &ConnectError) -> Failure {

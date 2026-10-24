@@ -258,4 +258,19 @@ pub enum EngineEvent {
     AudioDevicesChanged(AudioDeviceList),
     /// Microphone level 0.0–1.0.
     MicLevel(f32),
+    /// The mic test moved to a new phase (FR-1.4).
+    MicTestPhaseChanged(MicTestPhase),
+    /// Incoming channel, followed-channel or private message (own messages are only
+    /// returned by the send call).
+    MessageReceived(Box<crate::chat::ChatMessageView>),
+    UnreadChanged(UnreadView),
+}
+
+/// Phase of the mic test: record, play back, finished or failed to start.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum MicTestPhase {
+    Recording,
+    Playing,
+    Done,
+    Failed,
 }

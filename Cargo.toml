@@ -61,8 +61,9 @@ hound = "3.5"
 rusqlite = { version = "0.40", features = ["bundled"] }
 keyring = "4.2"
 
-# Sanitizing
+# Sanitizing, own avatar scaling
 ammonia = "4.2"
+image = { version = "0.25", default-features = false, features = ["png", "jpeg", "gif", "webp"] }
 
 # Positional audio / plugin host
 libloading = "0.8"

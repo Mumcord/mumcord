@@ -22,7 +22,7 @@ use std::time::{Duration, Instant};
 use mumcord_audio::bitrate::{
     BitrateController, LinkStats as BitrateStats, Transport as BitrateTransport,
 };
-use mumcord_audio::dsp::{DspControls, MicTest, MicTestPhase};
+use mumcord_audio::dsp::{DspControls, MicTest, MicTestPhase as DspPhase};
 use mumcord_audio::mixer::PacketSender;
 use mumcord_protocol::pki_types::{CertificateDer, PrivateKeyDer, PrivatePkcs8KeyDer};
 use mumcord_protocol::{
@@ -38,6 +38,7 @@ pub use machine::MAX_RECONNECT_ATTEMPTS;
 pub use types::*;
 
 use crate::people::{self, People};
+use crate::sounds::SoundHub;
 use crate::voice::{self, Audio, Meter, VoicePipeline, VoiceShared};
 use convert::{channel_path, channel_view, join_path, resolve_path, split_path, user_view};
 use machine::{CertCheck, Failure, Machine, SelfVoice, Step, check_cert, format_fingerprint};
@@ -51,10 +52,16 @@ const PROFILE_WAIT: Duration = Duration::from_secs(3);
 
 /// Event output of the engine; cheap to clone. Extensions (B14) emit through it too.
 #[derive(Clone)]
-pub struct Events(mpsc::UnboundedSender<EngineEvent>);
+pub struct Events(mpsc::UnboundedSender<EngineEvent>, Arc<SoundHub>);
 
 impl Events {
+    /// Notification sounds (B26); also reachable for `Sound::Message` from chat code.
+    pub fn sounds(&self) -> &Arc<SoundHub> {
+        &self.1
+    }
+
     pub fn emit(&self, event: EngineEvent) {
+        self.1.observe(&event);
         // A closed receiver means the app is shutting down; nobody is left to inform.
         let _ = self.0.send(event);
     }
@@ -213,15 +220,16 @@ impl Engine {
         })?;
         let store = Store::open(data_dir).map_err(store_error)?;
         let settings = store.settings().map_err(store_error)?;
+        let store = Arc::new(Mutex::new(store));
         let (tx, rx) = mpsc::unbounded_channel();
-        let events = Events(tx);
+        let events = Events(tx, SoundHub::from_store(store.clone()));
         let controls = Arc::new(DspControls::default());
         local::apply_dsp(&controls, &settings);
         let meter = Arc::new(Meter::default());
         voice::spawn_meter(&rt, controls.clone(), meter.clone(), events.clone());
         let inner = Arc::new(Inner {
             rt,
-            store: Arc::new(Mutex::new(store)),
+            store,
             secrets: Arc::new(secrets),
             identity: Mutex::new(None),
             events,
@@ -246,6 +254,11 @@ impl Engine {
             .as_ref()
             .map(|s| self.inner.ctx(s))
             .ok_or_else(EngineError::not_connected)
+    }
+
+    /// The store, also while disconnected (history commands, B14).
+    pub(crate) fn store_handle(&self) -> Arc<Mutex<Store>> {
+        self.inner.store.clone()
     }
 
     pub fn connection_state(&self) -> ConnState {
@@ -398,8 +411,19 @@ impl Engine {
             .audio
             .as_mut()
             .ok_or_else(|| EngineError::internal("audio not running"))?;
-        let test = voice::start_mic_test(audio, self.inner.controls.clone())?;
+        let test = match voice::start_mic_test(audio, self.inner.controls.clone()) {
+            Ok(test) => test,
+            Err(error) => {
+                self.inner.events.emit(EngineEvent::MicTestPhaseChanged(
+                    types::MicTestPhase::Failed,
+                ));
+                return Err(error);
+            }
+        };
         core.mic_test = Some(test);
+        self.inner.events.emit(EngineEvent::MicTestPhaseChanged(
+            types::MicTestPhase::Recording,
+        ));
         self.inner.meter.test.store(true, Ordering::Relaxed);
         let inner = self.inner.clone();
         self.inner
@@ -1151,14 +1175,22 @@ impl Inner {
     }
 
     async fn watch_mic_test(self: Arc<Self>) {
+        let mut announced = types::MicTestPhase::Recording;
         loop {
             tokio::time::sleep(Duration::from_millis(50)).await;
             let mut core = lock(&self.core);
             match core.mic_test.as_ref().map(MicTest::phase) {
                 None => return,
-                Some(MicTestPhase::Recording) => {}
-                Some(MicTestPhase::Playing) => self.meter.test.store(false, Ordering::Relaxed),
-                Some(MicTestPhase::Done) => {
+                Some(DspPhase::Recording) => {}
+                Some(DspPhase::Playing) => {
+                    self.meter.test.store(false, Ordering::Relaxed);
+                    if announced != types::MicTestPhase::Playing {
+                        announced = types::MicTestPhase::Playing;
+                        self.events
+                            .emit(EngineEvent::MicTestPhaseChanged(announced));
+                    }
+                }
+                Some(DspPhase::Done) => {
                     self.finish_mic_test(&mut core);
                     return;
                 }
@@ -1170,6 +1202,8 @@ impl Inner {
         let Some(test) = core.mic_test.take() else {
             return;
         };
+        self.events
+            .emit(EngineEvent::MicTestPhaseChanged(types::MicTestPhase::Done));
         self.meter.test.store(false, Ordering::Relaxed);
         match (test.finish(), core.audio.as_mut()) {
             (Some((source, sink)), Some(audio)) => audio.return_devices(source, sink),

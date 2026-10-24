@@ -225,6 +225,7 @@ pub(crate) struct VoicePipeline {
     stop: Arc<AtomicBool>,
     capture: Option<JoinHandle<FrameSource>>,
     talk_task: TaskHandle<()>,
+    sounds: Arc<crate::sounds::SoundHub>,
 }
 
 impl VoicePipeline {
@@ -272,6 +273,21 @@ impl VoicePipeline {
                 .map_err(|e| EngineError::internal(format!("capture thread: {e}")))?
         };
 
+        // Notification sounds (B26) go through the mixer's mix-in port while this pipeline lives.
+        let sounds = events.sounds().clone();
+        let mut playback = playback;
+        let _ = playback.set_mix_in_gain(crate::sounds::SOUND_GAIN);
+        let mut mix_in = ports.mix_in;
+        sounds.attach(Box::new(move |samples| {
+            if mix_in.slots() < samples.len() {
+                return false;
+            }
+            samples.iter().for_each(|&s| {
+                let _ = mix_in.push(s);
+            });
+            true
+        }));
+
         let mut talk_events = ports.talk_events;
         let talk_task = rt.spawn(async move {
             let mut own_talking = false;
@@ -302,6 +318,7 @@ impl VoicePipeline {
                 stop,
                 capture: Some(capture),
                 talk_task,
+                sounds,
             },
             ports.packets,
         ))
@@ -341,6 +358,7 @@ impl Drop for VoicePipeline {
     fn drop(&mut self) {
         self.talk_task.abort();
         self.stop.store(true, Ordering::Relaxed);
+        self.sounds.detach();
     }
 }
 
