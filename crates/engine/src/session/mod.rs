@@ -249,6 +249,7 @@ impl Engine {
             )
         })?;
         let store = Store::open(data_dir).map_err(store_error)?;
+        crate::profile::backfill_server_avatars(&store, data_dir);
         let settings = store.settings().map_err(store_error)?;
         let rejoin_offers = store
             .voice_channels()
@@ -856,7 +857,6 @@ impl Inner {
         };
         self.voice.reset_link();
         let (pump_tx, mut pump_rx) = mpsc::unbounded_channel();
-        let fresh = !matches!(arrival, Arrival::Reconnect);
         let (followed, rejoin_offer) = self.post_sync(server_id, &handle, arrival);
 
         let registered = self.transition(generation, |core| {
@@ -890,14 +890,13 @@ impl Inner {
             self.events
                 .emit(EngineEvent::ServerSynced(Box::new(snapshot)));
         }
-        if fresh {
-            // In the background: encoding and the server's confirmation must not hold up
-            // the event pump.
-            self.rt.spawn(crate::profile::send_default_avatar(
-                ctx.clone(),
-                self.data_dir.join(crate::profile::DEFAULT_AVATAR_FILE),
-            ));
-        }
+        // On every sync, reconnects included: the server forgets the avatar of an
+        // unregistered user whenever the connection ends (QA.10). In the background:
+        // encoding and the server's confirmation must not hold up the event pump.
+        self.rt.spawn(crate::profile::restore_avatar(
+            ctx.clone(),
+            self.data_dir.join(crate::profile::DEFAULT_AVATAR_FILE),
+        ));
         // Effective permissions decide which channels the UI offers to join (FR-1.16).
         for id in handle.with_state(|s| s.channels.keys().copied().collect::<Vec<_>>()) {
             let _ = handle.query_permissions(id);

@@ -250,6 +250,7 @@ erDiagram
 | | save_history | bool | yes | Default true (FR-1.33) |
 | | sort_order | int | yes | Server bar order |
 | | default_avatar_sent | bool | yes | Default false; set true once the default avatar was sent (or skipped as not needed) – never reset by manual avatar changes (FR-1.47) |
+| | avatar | blob | no | Avatar remembered for this server (hand-set or the sent default avatar, PNG up to 128×128); empty = none or removed by hand. Re-sent on connect when the server shows no avatar for the user (FR-1.20, QA.10) |
 | TrustedCert | fingerprint | text | yes | Server certificate trust decision (FR-1.10) |
 | FollowedChannel | channel_path | text | yes | Path, so it survives channel ID changes where possible |
 | | last_read_at | datetime | yes | For unread badges |
