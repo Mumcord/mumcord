@@ -667,3 +667,14 @@ TeamSpeak 3 runs through KDE's X11 compatibility layer (XWayland). KDE's "Legacy
 ✍️ Note: Requested in chat during /dev.
 
 ---
+
+#### QA.7 Mute/deafen state when joining a channel after a read-only connect? `◉`
+Until now an explicit Join always cleared mute and deafen (QA.2).
+
+- [x] **Connect stays read-only; an explicit Join restores the user's last own mute/deafen setting instead of always clearing it.** The last setting is the self-mute/self-deafen state the user last chose while joined for voice; it is remembered across app restarts.
+- [ ] No read-only mode: the last setting applies right on connect.
+- [ ] Last setting on connect, but never automatically unmuted.
+
+✍️ Note: Asked and answered in chat during /dev.
+
+---
