@@ -37,7 +37,12 @@ export function MembersPanel({ onSendPrivateMessage }: MembersPanelProps) {
   const users = channel ? [...state.users.values()] : [];
   const people = users.filter((u) => u.channelId === channel?.id).sort(byName);
   const listeners = users
-    .filter((u) => channel !== undefined && u.listeningChannelIds.includes(channel.id))
+    .filter(
+      (u) =>
+        channel !== undefined &&
+        u.channelId !== channel.id &&
+        u.listeningChannelIds.includes(channel.id),
+    )
     .sort(byName);
   const avatarOf = useAvatars([...people, ...listeners]);
 
@@ -69,7 +74,7 @@ export function MembersPanel({ onSendPrivateMessage }: MembersPanelProps) {
   };
 
   const item = (user: User, key: string, listener: boolean) => {
-    const talking = state.talking.has(user.session);
+    const talking = !listener && state.talking.has(user.session);
     const status = statusText(user, talking);
     return (
       <li key={key}>

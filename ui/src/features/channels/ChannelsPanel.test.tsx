@@ -1,3 +1,4 @@
+import { listenerRowId } from "./tree";
 import { act, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { subscribeAnnouncements, type Announcement } from "../../a11y/announcer";
@@ -84,9 +85,26 @@ describe("ChannelsPanel", () => {
     act(() => {
       api.mock.setTalking(4, true);
     });
-    // Carla talks: her own row and her listener row under Lobby, nobody else.
-    expect(lit().filter((n) => n === "Carla")).toHaveLength(2);
-    expect(lit()).toHaveLength(3);
+    // Carla talks: only her own row; her listener row stays quiet.
+    expect(lit().filter((n) => n === "Carla")).toHaveLength(1);
+    expect(lit()).toHaveLength(2);
+    const listenerRows = Array.from(
+      document.querySelectorAll(".tree-person[data-listener='true']"),
+    );
+    expect(listenerRows.length).toBeGreaterThan(0);
+    for (const row of listenerRows) expect(row).toHaveAttribute("data-talking", "false");
+  });
+
+  it("shows no listener row for the channel the person is in", async () => {
+    await renderPanel();
+    const self = getServerState().users.get(getServerState().selfSession ?? -1);
+    await act(async () => {
+      await api.channelFollow(self?.channelId ?? 1);
+    });
+    const own = document.querySelectorAll(
+      `[data-row='${listenerRowId(self?.channelId ?? 1, self?.session ?? -1)}']`,
+    );
+    expect(own).toHaveLength(0);
   });
 
   it("moves with the arrow keys using a single Tab stop", async () => {

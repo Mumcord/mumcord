@@ -41,7 +41,10 @@ export function buildTree(state: Pick<ServerState, "channels" | "users">): Chann
   }
   for (const user of state.users.values()) {
     nodes.get(user.channelId)?.members.push(user);
-    for (const listened of user.listeningChannelIds) nodes.get(listened)?.listeners.push(user);
+    for (const listened of user.listeningChannelIds) {
+      // Listening to the channel you are in is redundant: no extra listener row.
+      if (listened !== user.channelId) nodes.get(listened)?.listeners.push(user);
+    }
   }
   const roots: ChannelNode[] = [];
   for (const node of nodes.values()) {

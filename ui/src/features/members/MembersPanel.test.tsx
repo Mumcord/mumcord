@@ -56,6 +56,25 @@ describe("MembersPanel", () => {
     expect(member(/^You/)).toHaveFocus();
   });
 
+  it("keeps the talking indicator off listener rows", async () => {
+    await renderPanel();
+    act(() => {
+      api.mock.setTalking(4, true);
+    });
+    expect(member(/^Carla/)).toHaveAttribute("data-talking", "false");
+    expect(member(/^Carla/)).not.toHaveAccessibleName(/talking/i);
+  });
+
+  it("omits a listener row for a person already in the channel", async () => {
+    await renderPanel();
+    const self = getServerState().users.get(getServerState().selfSession ?? -1);
+    await act(async () => {
+      await api.channelFollow(self?.channelId ?? 1);
+    });
+    expect(screen.getByRole("heading", { name: "Listening (1)" })).toBeInTheDocument();
+    expect(screen.getAllByRole("button", { name: /^You/ })).toHaveLength(1);
+  });
+
   it("opens a profile card with a sanitized comment and local controls", async () => {
     await renderPanel();
     const anna = member(/^Anna/);

@@ -140,7 +140,7 @@ export function ChannelTree({
   };
 
   const personItem = (user: User, rowId: string, level: number, listener: boolean) => {
-    const talking = state.talking.has(user.session);
+    const talking = !listener && state.talking.has(user.session);
     const labelId = `${hintId}-${rowId}`;
     const status = statusText(user, talking, listener);
     return (
