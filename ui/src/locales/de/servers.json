@@ -1,0 +1,122 @@
+{
+  "unknownServer": "dem Server",
+  "announce": {
+    "connected": "Mit {{server}} verbunden.",
+    "lost": "Verbindung zu {{server}} verloren. Verbinde neu …",
+    "ended": "Von {{server}} getrennt. Die Leiste über dem Chat zeigt, wie es weitergeht.",
+    "disconnected": "Von {{server}} getrennt.",
+    "tcp": "Sprache läuft jetzt über TCP, weil UDP blockiert ist. Der Ton kann leicht verzögert sein.",
+    "removed": "{{server}} entfernt.",
+    "moved": "{{server}} an Position {{position}} von {{count}} verschoben."
+  },
+  "bar": {
+    "listLabel": "Gespeicherte Server",
+    "add": "Server hinzufügen",
+    "keyboardHint": "Eingabe verbindet. Alt plus Pfeil hoch oder runter verschiebt den Server. Umschalt plus F10 öffnet weitere Optionen.",
+    "status": {
+      "connected": "{{server}} (verbunden)",
+      "connecting": "{{server}} (verbindet)",
+      "reconnecting": "{{server}} (verbindet neu)"
+    }
+  },
+  "menu": {
+    "label": "Optionen für {{server}}",
+    "connect": "Verbinden",
+    "disconnect": "Trennen",
+    "edit": "Server bearbeiten",
+    "moveUp": "Nach oben",
+    "moveDown": "Nach unten",
+    "remove": "Server entfernen"
+  },
+  "dialog": {
+    "addTitle": "Server hinzufügen",
+    "editTitle": "Server bearbeiten",
+    "linkTitle": "Diesen Server speichern?",
+    "address": "Adresse",
+    "addressHint": "Zum Beispiel mumble.example.org. Du kannst hier auch einen mumble://-Link einfügen.",
+    "filledFromLink": "Aus dem mumble://-Link ausgefüllt.",
+    "port": "Port",
+    "label": "Name in der Serverleiste",
+    "username": "Dein Name auf diesem Server",
+    "password": "Serverpasswort (optional)",
+    "passwordHint": "Nur nötig, wenn der Server eines verlangt. Es wird im sicheren Speicher deines Systems abgelegt.",
+    "passwordKeepHint": "Ein Passwort ist gespeichert. Leer lassen, um es zu behalten, oder ein neues eingeben.",
+    "clearPassword": "Gespeichertes Passwort entfernen",
+    "add": "Server hinzufügen",
+    "saveAndConnect": "Speichern und verbinden",
+    "errors": {
+      "address": "Gib die Serveradresse ein.",
+      "port": "Gib einen Port zwischen 1 und 65535 ein. Die meisten Server nutzen 64738.",
+      "username": "Gib den Namen ein, den du auf diesem Server nutzen willst.",
+      "link": "Dieser mumble://-Link kann nicht gelesen werden. Prüfe, ob er vollständig kopiert wurde.",
+      "invalid": "Die Serverangaben sind ungültig. Prüfe Adresse und Port."
+    }
+  },
+  "errors": {
+    "serverUnreachable": "Der Server ist nicht erreichbar. Prüfe Adresse und Port und ob du online bist.",
+    "wrongPassword": "Das Serverpasswort ist falsch. Bearbeite den Server und gib das richtige Passwort ein.",
+    "nameInUse": "Dein Name ist auf diesem Server schon vergeben oder für jemand anderen registriert. Bearbeite den Server und wähle einen anderen Namen.",
+    "certificateRejected": "Die Zertifikatsprüfung ist fehlgeschlagen: Entweder wurde dem Serverzertifikat nicht vertraut, oder der Server hat deine Identität nicht akzeptiert. Versuche es erneut oder frage den Serverbetreiber.",
+    "certificateChanged": "Das Zertifikat des Servers hat sich geändert und wurde nicht als vertrauenswürdig bestätigt. Vertraue ihm erst, wenn der Serverbetreiber die Änderung bestätigt.",
+    "denied": "Der Server hat die Verbindung abgelehnt.",
+    "deniedWithReason": "Der Server hat die Verbindung abgelehnt: {{reason}}",
+    "invalidAddress": "Die Serveradresse ist ungültig. Bearbeite den Server, um sie zu korrigieren.",
+    "secureStorage": "Der sichere Speicher deines Systems ist nicht verfügbar, daher konnte das Serverpasswort nicht gelesen oder gespeichert werden. Entsperre ihn und versuche es erneut.",
+    "notFound": "Dieser Server ist nicht mehr gespeichert.",
+    "generic": "Etwas ist schiefgelaufen. Bitte versuche es erneut."
+  },
+  "remove": {
+    "title": "{{server}} entfernen?",
+    "message": "Das gespeicherte Passwort, die Zertifikatsentscheidung, gefolgte Kanäle und der Chatverlauf auf diesem Computer werden gelöscht.",
+    "confirm": "Entfernen"
+  },
+  "switch": {
+    "title": "Server wechseln?",
+    "message": "Du kannst nur mit einem Server gleichzeitig verbunden sein. Von {{current}} trennen und mit {{next}} verbinden?",
+    "confirm": "Trennen und wechseln"
+  },
+  "cert": {
+    "newTitle": "Diesem Server vertrauen?",
+    "newIntro": "Mumcord kennt das Zertifikat von {{server}} noch nicht. Wenn dir der Serverbetreiber einen Fingerabdruck gegeben hat, prüfe, ob er übereinstimmt. Deine Entscheidung wird gespeichert.",
+    "fingerprint": "Fingerabdruck des Zertifikats",
+    "changedTitle": "Warnung: Das Zertifikat des Servers hat sich geändert",
+    "changedWarning": "Das Zertifikat von {{server}} unterscheidet sich von dem, dem du bisher vertraut hast.",
+    "changedAdvice": "Das kann nach einer Erneuerung des Servers passieren, aber auch bedeuten, dass jemand deine Verbindung abfängt. Fahre nur fort, wenn der Serverbetreiber die Änderung bestätigt hat.",
+    "previousFingerprint": "Bisher vertrauter Fingerabdruck",
+    "newFingerprint": "Neuer Fingerabdruck",
+    "reject": "Nicht verbinden",
+    "trust": "Vertrauen und verbinden",
+    "trustChanged": "Dem neuen Zertifikat vertrauen"
+  },
+  "status": {
+    "label": "Verbindungsstatus",
+    "connecting": "Verbinde mit {{server}} …",
+    "reconnecting": "Verbinde neu … (Versuch {{attempt}} von {{max}}, nächster in {{seconds}} s)",
+    "tcp": "Über TCP verbunden (UDP blockiert). Sprache funktioniert, kann aber leicht verzögert sein.",
+    "disconnected": "Getrennt",
+    "disconnectedReason": "Getrennt – {{reason}}",
+    "failed": "Verbindung zu {{server}} fehlgeschlagen. {{reason}}",
+    "cancel": "Abbrechen",
+    "reconnect": "Neu verbinden",
+    "editServer": "Server bearbeiten",
+    "actionFailed": {
+      "reorder": "Die neue Serverreihenfolge konnte nicht gespeichert werden. Bitte versuche es erneut.",
+      "remove": "Der Server konnte nicht entfernt werden. Bitte versuche es erneut.",
+      "disconnect": "Trennen ist fehlgeschlagen. Bitte versuche es erneut."
+    }
+  },
+  "empty": {
+    "title": "Füge deinen ersten Server hinzu",
+    "description": "Gib die Adresse ein, die du von deiner Gruppe bekommen hast, oder füge einen mumble://-Link ein.",
+    "addressLabel": "Serveradresse oder mumble://-Link",
+    "addressHint": "Zum Beispiel mumble.example.org oder mumble.example.org:64738.",
+    "connect": "Hinzufügen und verbinden",
+    "pasteLink": "mumble://-Link einfügen",
+    "moreOptions": "Weitere Optionen …",
+    "noLinkInClipboard": "Die Zwischenablage enthält keinen mumble://-Link. Füge die Adresse oben ein oder tippe sie.",
+    "pasteManually": "Mumcord konnte die Zwischenablage nicht lesen. Klicke in das Feld oben und drücke Strg+V.",
+    "errors": {
+      "required": "Gib eine Serveradresse oder einen mumble://-Link ein."
+    }
+  }
+}
