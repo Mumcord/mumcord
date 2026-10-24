@@ -3,12 +3,12 @@
  * until the user explicitly joins a channel or undeafens. An automatic reconnect keeps the state
  * it had, and a deliberate deafen during a call never counts as read-only. A join restores the
  * user's last own mute/deafen choice (QA.7), which may itself be deafened, so the join is
- * signalled explicitly instead of being inferred from the deafen flag.
+ * signalled explicitly instead of being inferred from the deafen flag. The first sync takes the
+ * engine's own read-only flag from the snapshot, which is false after a `mumble://` link join.
  */
 import { useEffect, useState } from "react";
 import { getApi } from "../../api";
 import {
-  selfUser,
   subscribeServerChanges,
   type ServerChange,
   type ServerState,
@@ -33,9 +33,7 @@ export function nextReadOnly(
         ? INITIAL_READ_ONLY
         : previous;
     case "synced":
-      return previous.synced
-        ? previous
-        : { readOnly: selfUser(state)?.selfDeaf ?? false, synced: true };
+      return previous.synced ? previous : { readOnly: state.readOnly, synced: true };
     case "userUpserted":
       return previous.readOnly && change.user.session === state.selfSession && !change.user.selfDeaf
         ? { ...previous, readOnly: false }
