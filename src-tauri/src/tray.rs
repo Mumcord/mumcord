@@ -188,6 +188,12 @@ pub struct Tray {
 
 /// Creates the tray. Failing to create it is logged; the app works without one.
 pub fn init(app: &AppHandle) {
+    if !indicator_library_present() {
+        tracing::warn!(
+            "no tray library (libayatana-appindicator3 or libappindicator3) found; running without a tray icon"
+        );
+        return;
+    }
     match build(app) {
         Ok(tray) => {
             app.manage(tray);
@@ -327,6 +333,30 @@ fn refresh(app: &AppHandle, texts: bool) {
     if let Err(e) = result {
         tracing::warn!(error = %e, "updating the tray icon failed");
     }
+}
+
+/// The Linux tray loads the AppIndicator library at runtime (libappindicator-sys) and panics
+/// when it is missing, which would crash the app at startup. Probing the same library names up
+/// front lets the app run without a tray instead.
+#[cfg(target_os = "linux")]
+fn indicator_library_present() -> bool {
+    any_library_loadable(&[c"libayatana-appindicator3.so.1", c"libappindicator3.so.1"])
+}
+
+#[cfg(not(target_os = "linux"))]
+fn indicator_library_present() -> bool {
+    true
+}
+
+/// Whether one of `names` can be loaded with the dynamic loader's normal search path.
+#[cfg(target_os = "linux")]
+fn any_library_loadable(names: &[&std::ffi::CStr]) -> bool {
+    names.iter().any(|name| {
+        // SAFETY: `name` is a valid C string. A library found here stays loaded (no dlclose):
+        // the tray loads the very same library right after, so its initialisers run only once.
+        let handle = unsafe { libc::dlopen(name.as_ptr(), libc::RTLD_LAZY | libc::RTLD_LOCAL) };
+        !handle.is_null()
+    })
 }
 
 /// Whether a tray icon is actually on screen to bring a hidden window back.
@@ -511,6 +541,16 @@ mod tests {
         state.apply(&EngineEvent::ServerSynced(Box::new(snapshot)));
         assert_eq!(state.self_session, Some(3));
         assert!(state.deafened && state.muted);
+    }
+
+    #[cfg(target_os = "linux")]
+    #[test]
+    fn library_probe_finds_only_loadable_libraries() {
+        assert!(!any_library_loadable(&[c"libmumcord-does-not-exist.so.1"]));
+        assert!(any_library_loadable(&[
+            c"libmumcord-does-not-exist.so.1",
+            c"libc.so.6"
+        ]));
     }
 
     #[test]
