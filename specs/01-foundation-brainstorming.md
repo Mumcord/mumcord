@@ -770,3 +770,12 @@ Desktop notifications were planned for Epic 3.
 ✍️ Note: Asked and answered in chat during /dev; pulls desktop notifications forward from Epic 3.
 
 ---
+
+#### QA.17 Start Mumcord with the operating system? `◉`
+
+- [x] **Option "Start Mumcord when I log in", asked in the first-start wizard and changeable in settings; default off. When on, Mumcord starts minimized to the tray (switchable: "Start minimized").** Uses the OS's own mechanism (Linux autostart entry, Windows login item, macOS login item).
+- [ ] Settings only, not in the wizard.
+
+✍️ Note: Requested in chat during /dev.
+
+---
