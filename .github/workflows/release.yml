@@ -129,18 +129,31 @@ jobs:
           if (-not $server) { throw 'mumble-server.exe not found after install' }
           $dir = "$env:RUNNER_TEMP\mumble-server"
           New-Item -ItemType Directory -Force $dir | Out-Null
+          # Forward slashes: the ini is parsed by Qt, where a backslash is an escape character.
+          $fdir = $dir -replace '\\', '/'
           @"
-          database=$dir\mumble-server.sqlite
-          logfile=$dir\mumble-server.log
+          database=$fdir/mumble-server.sqlite
+          logfile=$fdir/mumble-server.log
           port=64738
           autobanAttempts=0
           "@ | Set-Content "$dir\mumble-server.ini"
-          Start-Process $server.FullName -ArgumentList '-ini', "$dir\mumble-server.ini"
-          for ($i = 0; $i -lt 60; $i++) {
-            if ((Test-NetConnection 127.0.0.1 -Port 64738 -WarningAction SilentlyContinue).TcpTestSucceeded) { exit 0 }
-            Start-Sleep 1
+          Get-Content "$dir\mumble-server.ini"
+          # Foreground run, output to files; the installer may also have registered a service on 64738.
+          $p = Start-Process $server.FullName -ArgumentList '-fg', '-ini', "$dir\mumble-server.ini" `
+            -WorkingDirectory $server.DirectoryName -PassThru -WindowStyle Hidden `
+            -RedirectStandardOutput "$dir\stdout.log" -RedirectStandardError "$dir\stderr.log"
+          $up = $false
+          for ($i = 0; $i -lt 30 -and -not $up; $i++) {
+            if ($p.HasExited) { break }
+            try { $c = [Net.Sockets.TcpClient]::new(); $c.Connect('127.0.0.1', 64738); $c.Close(); $up = $true }
+            catch { Start-Sleep 1 }
           }
-          Get-Content "$dir\mumble-server.log" -ErrorAction SilentlyContinue
+          if ($up) { exit 0 }
+          Write-Host "server exited: $($p.HasExited) (code $(if ($p.HasExited) { $p.ExitCode }))"
+          foreach ($f in 'stdout.log', 'stderr.log', 'mumble-server.log') {
+            Write-Host "--- $f"; Get-Content "$dir\$f" -ErrorAction SilentlyContinue
+          }
+          Get-ChildItem $server.DirectoryName | Select-Object -First 40 Name | Out-String | Write-Host
           throw 'Mumble server did not open port 64738'
 
       # Homebrew has no Mumble server and the official releases ship none for macOS, so it is
@@ -212,10 +225,15 @@ jobs:
           app=$(ls build/*.AppImage)
           chmod +x "$app"
           # Secret Service (unlocked gnome-keyring) for the identity, and a virtual display.
-          # Empty password unlocks the login keyring non-interactively (as in e2e/container-run.sh).
+          # An EMPTY password creates no `login` collection, so unlock with a fixed non-empty
+          # throwaway password in a fresh D-Bus session; verify with secret-tool before seeding.
           dbus-run-session -- bash -c '
-            printf "" | gnome-keyring-daemon --unlock --components=secrets >/dev/null
+            set -e
+            printf "smoke" | gnome-keyring-daemon --unlock --components=secrets >/dev/null
             gnome-keyring-daemon --start --components=secrets >/dev/null
+            printf "probe" | secret-tool store --label=smoke-probe app mumcord-smoke
+            test "$(secret-tool lookup app mumcord-smoke)" = probe
+            secret-tool clear app mumcord-smoke
             xvfb-run -a scripts/smoke/smoke.sh --app "$0" --seed target/release/mumcord-smoke-seed --bot target/release/mumcord-bot
           ' "$PWD/$app"
 
