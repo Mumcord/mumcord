@@ -135,7 +135,10 @@
     "confirmServer": "All saved messages from {{server}} will be deleted from this computer. This cannot be undone.",
     "confirmAll": "All saved messages from every server will be deleted from this computer. This cannot be undone.",
     "confirm": "Clear history",
-    "cleared": "History cleared."
+    "cleared": "History cleared.",
+    "autoDelete": "Delete chat history older than",
+    "autoDeleteOff": "Never (keep everything)",
+    "autoDeleteHint": "Older messages are deleted from this computer automatically, without asking. This only affects the history saved here, not the server."
   },
   "appearance": {
     "messageDisplay": "Message display",
@@ -232,5 +235,17 @@
     "unsupported": "Not supported on macOS: the system offers no way for apps to read the current track.",
     "current": "Now sharing: {{track}}",
     "nothing": "Nothing is playing right now."
+  },
+  "previewCache": {
+    "title": "Cached previews",
+    "after": "Delete cached previews after",
+    "hint": "Link previews, thumbnails and external images are kept on this computer so they load faster. Old ones are removed automatically.",
+    "never": "Never",
+    "clearNow": "Clear now",
+    "cleared": "Cache cleared, {{size}} freed."
+  },
+  "retention": {
+    "days_one": "{{count}} day",
+    "days_other": "{{count}} days"
   }
 }

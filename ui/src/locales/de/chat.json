@@ -73,6 +73,12 @@
     "player": "Videoplayer: {{title}}",
     "videoTitle": "{{site}}-Video",
     "inBrowser": "Wird im Browser abgespielt",
-    "card": "Linkvorschau: {{title}}"
+    "card": "Linkvorschau: {{title}}",
+    "dismiss": "Vorschau ausblenden"
+  },
+  "image": {
+    "loading": "Bild {{name}} wird geladen",
+    "label": "Bild: {{name}}",
+    "view": "Bild {{name}} ansehen"
   }
 }

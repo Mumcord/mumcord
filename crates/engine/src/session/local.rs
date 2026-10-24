@@ -257,6 +257,11 @@ impl Engine {
             previous
         };
         apply_dsp(&self.inner.controls, &settings);
+        if previous.preview_cache_days != settings.preview_cache_days
+            || previous.history_max_age_days != settings.history_max_age_days
+        {
+            self.run_maintenance_in_background();
+        }
         if previous.now_playing != settings.now_playing {
             self.now_playing_set_enabled(settings.now_playing);
         }

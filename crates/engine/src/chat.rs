@@ -23,6 +23,7 @@ use crate::session::{
 use crate::sounds::Sound;
 
 pub use sanitize::sanitize_html;
+use sanitize::sanitize_message_html;
 
 /// Size cap for messages with images when the server sets no limit; the UI scales images to
 /// the same target.
@@ -46,6 +47,8 @@ pub struct ChatMessageView {
     pub sent_at: UnixMillis,
     /// Sanitized HTML.
     pub body: String,
+    /// Links whose preview card the user dismissed (QA.42).
+    pub dismissed_previews: Vec<String>,
 }
 
 /// What `history_clear` removes.
@@ -302,7 +305,8 @@ pub(crate) fn on_text(ctx: &SessionCtx, msg: &TextMessage) {
         sender_session: msg.actor,
         own: false,
         sent_at: now_millis(),
-        body: sanitize_html(&msg.message),
+        body: sanitize_message_html(&msg.message),
+        dismissed_previews: Vec::new(),
     };
     let stored = match &key {
         UnreadKey::Stored(c) => Some(c.clone()),
@@ -403,6 +407,7 @@ fn history_view(
     m: ChatMessage,
     conversation: &ConversationRef,
     own_hash: Option<&str>,
+    dismissed_previews: Vec<String>,
 ) -> ChatMessageView {
     let own = own_hash.is_some() && m.sender_cert_hash.as_deref() == own_hash;
     ChatMessageView {
@@ -414,6 +419,7 @@ fn history_view(
         own,
         sent_at: m.sent_at,
         body: m.body,
+        dismissed_previews,
     }
 }
 
@@ -536,10 +542,33 @@ impl Engine {
         let own_hash = ctx
             .handle
             .with_state(|s| s.own_user().and_then(|u| u.cert_hash.clone()));
+        let ids: Vec<i64> = rows.iter().map(|m| m.id).collect();
+        let mut dismissed = ctx.store().dismissed_previews(&ids).unwrap_or_else(|e| {
+            // The cards then show again; better than failing to load the history.
+            tracing::warn!(error = %e, "reading dismissed previews failed");
+            Default::default()
+        });
         Ok(rows
             .into_iter()
-            .map(|m| history_view(m, &conversation, own_hash.as_deref()))
+            .map(|m| {
+                let urls = dismissed.remove(&m.id).unwrap_or_default();
+                history_view(m, &conversation, own_hash.as_deref(), urls)
+            })
             .collect())
+    }
+
+    /// Remembers that the preview card of `url` under the message was dismissed (QA.42).
+    /// Messages that were not stored (`tmp-` ids) have nothing to remember it with.
+    pub fn preview_dismiss(&self, message_id: &str, url: &str) -> EngineResult<()> {
+        if message_id.starts_with(TRANSIENT_PREFIX) {
+            return Ok(());
+        }
+        let id = message_id
+            .parse::<i64>()
+            .map_err(|_| EngineError::invalid("unknown message id"))?;
+        lock(&self.store_handle())
+            .dismiss_preview(id, url)
+            .map_err(store_error)
     }
 
     /// Clears local history (FR-1.33); cleared conversations are no longer unread.
@@ -616,7 +645,8 @@ fn own_message(ctx: &SessionCtx, conversation: ConversationRef, html: &str) -> C
         sender_session,
         own: true,
         sent_at: now_millis(),
-        body: sanitize_html(html),
+        body: sanitize_message_html(html),
+        dismissed_previews: Vec::new(),
     };
     let stored = match &message.conversation {
         ConversationRef::Channel { channel_id } => ctx
@@ -782,9 +812,9 @@ mod tests {
             sent_at: 1,
             body: "b".into(),
         };
-        assert!(history_view(row(Some("aa")), &conv, Some("aa")).own);
-        assert!(!history_view(row(Some("bb")), &conv, Some("aa")).own);
-        assert!(!history_view(row(None), &conv, None).own);
-        assert_eq!(history_view(row(None), &conv, None).id, "7");
+        assert!(history_view(row(Some("aa")), &conv, Some("aa"), Vec::new()).own);
+        assert!(!history_view(row(Some("bb")), &conv, Some("aa"), Vec::new()).own);
+        assert!(!history_view(row(None), &conv, None, Vec::new()).own);
+        assert_eq!(history_view(row(None), &conv, None, Vec::new()).id, "7");
     }
 }

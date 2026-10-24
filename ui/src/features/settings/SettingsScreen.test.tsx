@@ -657,6 +657,65 @@ describe("Audio section music quality", () => {
 });
 
 describe("Chat & history section", () => {
+  it("offers the preview cache age with 7 days as the default and saves a change", async () => {
+    const update = vi.spyOn(api, "settingsUpdate");
+    await openSection("Chat & history");
+    const select = screen.getByRole("combobox", { name: "Delete cached previews after" });
+    expect(select).toHaveValue("7");
+    expect(
+      within(select)
+        .getAllByRole("option")
+        .map((o) => o.textContent),
+    ).toEqual(["1 day", "7 days", "30 days", "Never"]);
+    fireEvent.change(select, { target: { value: "30" } });
+    await waitFor(() => {
+      expect(update).toHaveBeenLastCalledWith(expect.objectContaining({ previewCacheDays: 30 }));
+    });
+    fireEvent.change(select, { target: { value: "none" } });
+    await waitFor(() => {
+      expect(update).toHaveBeenLastCalledWith(expect.objectContaining({ previewCacheDays: null }));
+    });
+  });
+
+  it("clears the preview cache now and says how much space it freed", async () => {
+    const clear = vi.spyOn(api, "previewCacheClear").mockResolvedValue(1_468_006);
+    await openSection("Chat & history");
+    fireEvent.click(screen.getByRole("button", { name: "Clear now" }));
+    expect(await screen.findByText("Cache cleared, 1.4 MB freed.")).toBeVisible();
+    expect(clear).toHaveBeenCalledOnce();
+  });
+
+  it("reports a failed cache clean-up", async () => {
+    vi.spyOn(api, "previewCacheClear").mockRejectedValue({ kind: "io", message: "x" });
+    vi.spyOn(console, "error").mockImplementation(() => undefined);
+    await openSection("Chat & history");
+    fireEvent.click(screen.getByRole("button", { name: "Clear now" }));
+    await waitFor(() => {
+      expect(screen.getByRole("status")).not.toBeEmptyDOMElement();
+    });
+    expect(screen.queryByText(/freed/)).toBeNull();
+  });
+
+  it("deletes old history automatically only when asked: off by default, no confirmation", async () => {
+    const update = vi.spyOn(api, "settingsUpdate");
+    await openSection("Chat & history");
+    const select = screen.getByRole("combobox", { name: "Delete chat history older than" });
+    expect(select).toHaveValue("none");
+    expect(
+      within(select)
+        .getAllByRole("option")
+        .map((o) => o.textContent),
+    ).toEqual(["7 days", "30 days", "90 days", "365 days", "Never (keep everything)"]);
+    expect(
+      screen.getByText(/deleted from this computer automatically, without asking/),
+    ).toBeVisible();
+    fireEvent.change(select, { target: { value: "90" } });
+    await waitFor(() => {
+      expect(update).toHaveBeenLastCalledWith(expect.objectContaining({ historyMaxAgeDays: 90 }));
+    });
+    expect(screen.queryByRole("dialog")).toBeNull();
+  });
+
   it("switches history saving per server", async () => {
     const setSaving = vi.spyOn(api, "historySetSaving");
     await openSection("Chat & history");

@@ -69,6 +69,22 @@ export const commands = {
 	 */
 	linkPreview: (url: string) => typedError<LinkPreview | null, ApiError>(__TAURI_INVOKE("link_preview", { url })),
 	/**
+	 *  An external image (`<img src>` in a message) or direct image link, ready to show inline;
+	 *  `null` when previews are switched off in the settings (then nothing is fetched) or the
+	 *  image cannot be shown (blocked address, too large, unsupported format).
+	 */
+	inlineImage: (url: string) => typedError<InlineImage | null, ApiError>(__TAURI_INVOKE("inline_image", { url })),
+	/**
+	 *  Hides the preview card of `url` under a message for good (QA.42). Messages that were not
+	 *  stored (history saving off) keep nothing; the UI hides the card for the session.
+	 */
+	previewDismiss: (messageId: string, url: string) => typedError<null, ApiError>(__TAURI_INVOKE("preview_dismiss", { messageId, url })),
+	/**
+	 *  "Clear now": deletes all cached link previews, thumbnails and images. Returns the freed
+	 *  size in bytes (capped at 4 GB; the cache is far smaller).
+	 */
+	previewCacheClear: () => typedError<number, ApiError>(__TAURI_INVOKE("preview_cache_clear")),
+	/**
 	 *  Starts listening to the channel with its audio muted locally.
 	 *  Fails with `serverTooOld`, `permissionDenied` or `listenerLimitReached`.
 	 */
@@ -289,6 +305,8 @@ export type ChatMessage = {
 	sentAt: string,
 	/**  Sanitized HTML; the UI sanitizes again before rendering. */
 	body: string,
+	/**  Links whose preview card was dismissed by the user (`preview_dismiss`). */
+	dismissedPreviews: string[],
 };
 
 export type CloseBehaviour = "ask" | "minimizeToTray" | "quit";
@@ -413,6 +431,21 @@ export type Identity = {
 	certHash: string,
 };
 
+/**  An external image or image link, ready to show inline (FR-1.55). */
+export type InlineImage = {
+	/**  The image link as posted, without fragment. */
+	url: string,
+	/**
+	 *  The image as a `data:` URL (fetched by the engine; still images re-encoded, animated
+	 *  GIF/WebP unchanged).
+	 */
+	src: string,
+	/**  Size of `src` in pixels. */
+	width: number,
+	height: number,
+	animated: boolean,
+};
+
 export type Language = "en" | "es" | "de";
 
 /**  Preview card of a link. All text is plain text, never HTML. */
@@ -426,6 +459,8 @@ export type LinkPreview = {
 	image: string | null,
 	/**  Set for YouTube and Twitch links: show a player card. */
 	video: VideoEmbed | null,
+	/**  The link serves an image: show it inline (`inline_image`) instead of a card. */
+	isImage: boolean,
 };
 
 export type LogLevel = "error" | "warn" | "info" | "debug";
@@ -517,7 +552,8 @@ export type NowPlaying = {
 };
 
 /**
- *  Another person started, changed or stopped sharing what they listen to (`track: null`).
+ *  A person started, changed or stopped sharing what they listen to (`track: null`). Also sent
+ *  with the own session while the own track is shared (it never comes back from the server).
  *  Forget all tracks on a new `serverSynced` and when a person leaves.
  */
 export type NowPlayingChanged = {
@@ -716,6 +752,16 @@ export type Settings = {
 	 *  and `link_preview` fetches nothing.
 	 */
 	linkPreviews: boolean,
+	/**
+	 *  "Delete cached previews after X days" (default 7; `null` never; QA.42). Previews,
+	 *  thumbnails and images are pruned at start, periodically and when this changes.
+	 */
+	previewCacheDays: number | null,
+	/**
+	 *  "Delete chat history older than X days" (default `null` = keep; QA.42). Local history
+	 *  only; pruned at start, daily and when this changes.
+	 */
+	historyMaxAgeDays: number | null,
 	/**  "Share what I'm listening to" (default off; FR-1.58). Off: the media player is not read. */
 	nowPlaying: boolean,
 };

@@ -15,6 +15,7 @@ import type {
   ErrorCode,
   HistoryScope,
   Identity,
+  InlineImage,
   LinkPreview,
   MumbleLink,
   PttAvailability,
@@ -122,6 +123,8 @@ const DEFAULT_SETTINGS: Settings = {
   startMinimized: true,
   connectMuted: true,
   linkPreviews: true,
+  previewCacheDays: 7,
+  historyMaxAgeDays: null,
   nowPlaying: false,
 };
 
@@ -149,6 +152,7 @@ function mockLinkPreview(url: string): LinkPreview | null {
         playerUrl: `https://www.youtube-nocookie.com/embed/${youtube}?autoplay=1`,
         channel: "Demo channel",
       },
+      isImage: false,
     };
   }
   return {
@@ -158,7 +162,14 @@ function mockLinkPreview(url: string): LinkPreview | null {
     description: "Link previews come from the engine; this is mock data.",
     image: null,
     video: null,
+    isImage: false,
   };
+}
+
+/** Offline stand-in for the engine's inline images: the same small picture for every http(s) URL. */
+function mockInlineImage(url: string): InlineImage | null {
+  if (!/^https?:\/\//i.test(url)) return null;
+  return { url, src: MOCK_DEFAULT_AVATAR, width: 320, height: 180, animated: false };
 }
 
 /** 1×1 PNG standing in for any image chosen as the default avatar. */
@@ -305,6 +316,7 @@ function demoHistory(): ChatMessage[] {
     own: session === SELF_SESSION,
     sentAt: new Date(Date.now() - minutesAgo * 60_000).toISOString(),
     body,
+    dismissedPreviews: [],
   }));
 }
 
@@ -497,6 +509,9 @@ export function createMockApi(options: MockOptions = {}): MockApi {
   function selfUser(): User {
     return requireUser(SELF_SESSION);
   }
+
+  /** Pretend size of the preview cache, freed by `previewCacheClear`. */
+  let cachedPreviewBytes = 1_468_006;
 
   function serverHistory(serverId: number): Map<string, ChatMessage[]> {
     let map = history.get(serverId);
@@ -694,6 +709,7 @@ export function createMockApi(options: MockOptions = {}): MockApi {
       own: true,
       sentAt: new Date().toISOString(),
       body: html,
+      dismissedPreviews: [],
     };
     store(message);
     return message;
@@ -986,6 +1002,22 @@ export function createMockApi(options: MockOptions = {}): MockApi {
 
     // links
     linkPreview: (url) => Promise.resolve(settings.linkPreviews ? mockLinkPreview(url) : null),
+    inlineImage: (url) => Promise.resolve(settings.linkPreviews ? mockInlineImage(url) : null),
+    previewDismiss: (messageId, url) => {
+      for (const conversations of history.values()) {
+        for (const messages of conversations.values()) {
+          const message = messages.find((m) => m.id === messageId);
+          if (message && !message.dismissedPreviews.includes(url))
+            message.dismissedPreviews.push(url);
+        }
+      }
+      return Promise.resolve(null);
+    },
+    previewCacheClear: () => {
+      const freed = cachedPreviewBytes;
+      cachedPreviewBytes = 0;
+      return Promise.resolve(freed);
+    },
 
     // now playing: no media player in the mock; other people's tracks come from `mock.emit`.
     nowPlayingStatus: () => Promise.resolve({ supported: true, track: null }),
@@ -1119,6 +1151,7 @@ export function createMockApi(options: MockOptions = {}): MockApi {
         own: false,
         sentAt: new Date().toISOString(),
         body,
+        dismissedPreviews: [],
       };
       store(message);
       emit("messageReceived", { message });

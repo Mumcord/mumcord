@@ -208,6 +208,20 @@ async fn now_playing_reaches_others_and_goes_away_when_turned_off() {
     assert_eq!(shared.duration_ms, Some(180_000));
     assert!(shared.playing && shared.position_ms >= 30_000);
 
+    // The UI gets the own track as an event with the own session (it never comes back from
+    // the server), for the own rows, preview, card and user panel.
+    let own_session = engine_session(&engine);
+    let own_track = wait_for(&mut rx, "the own track", |e| match e {
+        EngineEvent::NowPlayingChanged { session, track } if *session == own_session => {
+            Some(track.clone())
+        }
+        _ => None,
+    })
+    .await
+    .expect("own track shown");
+    assert_eq!(own_track.title, "Test Song");
+    assert!(own_track.has_cover);
+
     // Official clients: the comment line, next to what the user wrote.
     engine
         .set_own_comment("Hello there".into())
@@ -227,7 +241,6 @@ async fn now_playing_reaches_others_and_goes_away_when_turned_off() {
 
     // The bot shares a track too: the engine reports it.
     let bot_session = bot.own_user().expect("bot user").session;
-    let own_session = engine_session(&engine);
     let data = payload::encode(Some(&SharedTrack {
         title: "Bot Song".into(),
         artist: "Bot".into(),

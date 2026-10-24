@@ -135,7 +135,10 @@
     "confirmServer": "Todos los mensajes guardados de {{server}} se borrarán de este ordenador. No se puede deshacer.",
     "confirmAll": "Todos los mensajes guardados de todos los servidores se borrarán de este ordenador. No se puede deshacer.",
     "confirm": "Borrar historial",
-    "cleared": "Historial borrado."
+    "cleared": "Historial borrado.",
+    "autoDelete": "Eliminar el historial de chat anterior a",
+    "autoDeleteOff": "Nunca (conservar todo)",
+    "autoDeleteHint": "Los mensajes más antiguos se eliminan de este equipo automáticamente, sin preguntar. Solo afecta al historial guardado aquí, no al servidor."
   },
   "appearance": {
     "messageDisplay": "Visualización de mensajes",
@@ -232,5 +235,17 @@
     "unsupported": "No compatible con macOS: el sistema no permite a las apps leer la canción actual.",
     "current": "Compartiendo: {{track}}",
     "nothing": "No se está reproduciendo nada."
+  },
+  "previewCache": {
+    "title": "Vistas previas en caché",
+    "after": "Eliminar las vistas previas en caché después de",
+    "hint": "Las vistas previas de enlaces, miniaturas e imágenes externas se guardan en este equipo para cargar más rápido. Las antiguas se eliminan automáticamente.",
+    "never": "Nunca",
+    "clearNow": "Vaciar ahora",
+    "cleared": "Caché vaciada, se liberaron {{size}}."
+  },
+  "retention": {
+    "days_one": "{{count}} día",
+    "days_other": "{{count}} días"
   }
 }

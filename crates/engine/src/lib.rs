@@ -4,6 +4,7 @@
 pub mod chat;
 pub mod diag;
 pub mod follow;
+mod maintenance;
 pub mod now_playing;
 pub mod people;
 pub mod profile;
@@ -26,4 +27,4 @@ pub use session::{
     ServerFields, ServerInfoView, ServerView, SessionCtx, Snapshot, UnreadView, UserView,
     VoiceTransportKind,
 };
-pub use web::{LinkPreview, VideoEmbed, VideoProvider};
+pub use web::{InlineImage, LinkPreview, VideoEmbed, VideoProvider};

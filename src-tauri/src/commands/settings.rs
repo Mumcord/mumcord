@@ -162,6 +162,12 @@ pub struct Settings {
     /// "Show link previews and embeds" (default on; FR-1.49, QA.34). Off: plain links only
     /// and `link_preview` fetches nothing.
     pub link_previews: bool,
+    /// "Delete cached previews after X days" (default 7; `null` never; QA.42). Previews,
+    /// thumbnails and images are pruned at start, periodically and when this changes.
+    pub preview_cache_days: Option<u32>,
+    /// "Delete chat history older than X days" (default `null` = keep; QA.42). Local history
+    /// only; pruned at start, daily and when this changes.
+    pub history_max_age_days: Option<u32>,
     /// "Share what I'm listening to" (default off; FR-1.58). Off: the media player is not read.
     pub now_playing: bool,
 }
@@ -231,6 +237,8 @@ impl Settings {
             start_minimized: s.start_minimized,
             connect_muted: s.connect_muted,
             link_previews: s.link_previews,
+            preview_cache_days: s.preview_cache_days,
+            history_max_age_days: s.history_max_age_days,
             now_playing: s.now_playing,
         }
     }
@@ -300,6 +308,9 @@ impl Settings {
         s.start_minimized = self.start_minimized;
         s.connect_muted = self.connect_muted;
         s.link_previews = self.link_previews;
+        // 0 days would make every entry expire at once; treat it as 1.
+        s.preview_cache_days = self.preview_cache_days.map(|d| d.max(1));
+        s.history_max_age_days = self.history_max_age_days.map(|d| d.max(1));
         s.now_playing = self.now_playing;
         s
     }
@@ -405,6 +416,10 @@ mod tests {
         ui.start_minimized = false;
         ui.connect_muted = false;
         ui.link_previews = false;
+        assert_eq!(ui.preview_cache_days, Some(7));
+        assert_eq!(ui.history_max_age_days, None);
+        ui.preview_cache_days = Some(14);
+        ui.history_max_age_days = Some(30);
         ui.now_playing = true;
         ui.chat_display = ChatDisplay::Compact;
         let stored = ui.to_store(&base);
@@ -414,6 +429,8 @@ mod tests {
         assert!(stored.autostart && !stored.start_minimized);
         assert!(!stored.connect_muted);
         assert!(!stored.link_previews);
+        assert_eq!(stored.preview_cache_days, Some(14));
+        assert_eq!(stored.history_max_age_days, Some(30));
         assert!(stored.now_playing);
         assert_eq!(stored.voice_activation, store::VoiceActivation::Manual);
         assert_eq!(stored.voice_threshold_dbfs, -25);
@@ -457,5 +474,16 @@ mod tests {
             ..store::Settings::default()
         };
         assert_eq!(Settings::from_store(&s).language, None);
+    }
+
+    #[test]
+    fn zero_day_limits_are_raised_to_one_day() {
+        let base = store::Settings::default();
+        let mut ui = Settings::from_store(&base);
+        ui.preview_cache_days = Some(0);
+        ui.history_max_age_days = Some(0);
+        let stored = ui.to_store(&base);
+        assert_eq!(stored.preview_cache_days, Some(1));
+        assert_eq!(stored.history_max_age_days, Some(1));
     }
 }

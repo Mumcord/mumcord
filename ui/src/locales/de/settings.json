@@ -135,7 +135,10 @@
     "confirmServer": "Alle gespeicherten Nachrichten von {{server}} werden von diesem Computer gelöscht. Das kann nicht rückgängig gemacht werden.",
     "confirmAll": "Alle gespeicherten Nachrichten aller Server werden von diesem Computer gelöscht. Das kann nicht rückgängig gemacht werden.",
     "confirm": "Verlauf löschen",
-    "cleared": "Verlauf gelöscht."
+    "cleared": "Verlauf gelöscht.",
+    "autoDelete": "Chatverlauf löschen, der älter ist als",
+    "autoDeleteOff": "Nie (alles behalten)",
+    "autoDeleteHint": "Ältere Nachrichten werden automatisch und ohne Nachfrage von diesem Computer gelöscht. Das betrifft nur den hier gespeicherten Verlauf, nicht den Server."
   },
   "appearance": {
     "messageDisplay": "Nachrichtenanzeige",
@@ -232,5 +235,17 @@
     "unsupported": "Unter macOS nicht unterstützt: Das System bietet Apps keine Möglichkeit, den aktuellen Titel zu lesen.",
     "current": "Wird geteilt: {{track}}",
     "nothing": "Gerade läuft nichts."
+  },
+  "previewCache": {
+    "title": "Zwischengespeicherte Vorschauen",
+    "after": "Zwischengespeicherte Vorschauen löschen nach",
+    "hint": "Linkvorschauen, Vorschaubilder und externe Bilder werden auf diesem Computer gespeichert, damit sie schneller laden. Alte werden automatisch entfernt.",
+    "never": "Nie",
+    "clearNow": "Jetzt leeren",
+    "cleared": "Zwischenspeicher geleert, {{size}} freigegeben."
+  },
+  "retention": {
+    "days_one": "{{count}} Tag",
+    "days_other": "{{count}} Tage"
   }
 }

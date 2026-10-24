@@ -35,7 +35,8 @@ pub struct NowPlayingStatus {
     pub track: Option<NowPlaying>,
 }
 
-/// Another person started, changed or stopped sharing what they listen to (`track: null`).
+/// A person started, changed or stopped sharing what they listen to (`track: null`). Also sent
+/// with the own session while the own track is shared (it never comes back from the server).
 /// Forget all tracks on a new `serverSynced` and when a person leaves.
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Type, Event)]
 #[serde(rename_all = "camelCase")]

@@ -295,7 +295,12 @@ impl Engine {
             core: Mutex::new(Core::default()),
             now_playing: Mutex::new(crate::now_playing::NowPlaying::new(settings.now_playing)),
         });
-        Ok((Self { inner }, rx))
+        let engine = Self { inner };
+        engine
+            .link_previews()
+            .set_max_age_days(settings.preview_cache_days);
+        engine.start_maintenance();
+        Ok((engine, rx))
     }
 
     /// Shared DSP switches; push-to-talk key state goes to `set_ptt_pressed`.
@@ -321,6 +326,20 @@ impl Engine {
             Ok(_) => None,
             Err(e) => {
                 tracing::warn!(error = %e, "reading the settings for a link preview failed");
+                None
+            }
+        }
+    }
+
+    /// An external image or image link from a message, ready to show inline (FR-1.55); `None`
+    /// when previews are switched off in the settings (then nothing is fetched) or the image
+    /// cannot be shown.
+    pub async fn inline_image(&self, url: &str) -> Option<crate::web::InlineImage> {
+        match self.settings() {
+            Ok(settings) if settings.link_previews => self.inner.previews.inline_image(url).await,
+            Ok(_) => None,
+            Err(e) => {
+                tracing::warn!(error = %e, "reading the settings for an inline image failed");
                 None
             }
         }

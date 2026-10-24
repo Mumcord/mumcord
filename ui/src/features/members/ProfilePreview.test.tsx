@@ -1,7 +1,8 @@
-import { act, fireEvent, render, screen } from "@testing-library/react";
+import { act, fireEvent, render, screen, within } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import type { MockApi } from "../../api";
+import type { MockApi, NowPlaying } from "../../api";
 import { connectedMock, resetAll, stubDialog } from "../channels/testUtils";
+import { resetNowPlayingStore } from "../nowplaying";
 import { MembersPanel } from "./MembersPanel";
 import { placeNextTo } from "./placement";
 import { ProfilePreviewHost } from "./ProfilePreview";
@@ -44,6 +45,7 @@ async function hover(name: RegExp) {
 beforeEach(stubDialog);
 afterEach(() => {
   vi.useRealTimers();
+  resetNowPlayingStore();
   resetAll();
 });
 
@@ -65,6 +67,48 @@ describe("ProfilePreview", () => {
     expect(card).toHaveTextContent("Hi there");
     expect(card.innerHTML).not.toContain("onerror");
     expect(trigger(/^Anna/)).toHaveAttribute("aria-describedby", card.id);
+  });
+
+  it("shows what a person listens to, and the own track on the own entry", async () => {
+    await renderWithPreview();
+    vi.spyOn(api, "nowPlayingCover").mockResolvedValue("data:image/png;base64,AAAA");
+    const snapshot = await api.sessionSnapshot();
+    const own = snapshot?.users.find((u) => u.session === snapshot.selfSession);
+    if (!own) throw new Error("not connected");
+    const song: NowPlaying = {
+      title: "Song",
+      artist: "Band",
+      album: null,
+      hasCover: true,
+      positionMs: 60_000,
+      durationMs: 200_000,
+      playing: true,
+    };
+    act(() => {
+      api.mock.emit("nowPlayingChanged", { session: 2, track: song });
+      api.mock.emit("nowPlayingChanged", {
+        session: own.session,
+        track: { ...song, title: "Own song" },
+      });
+    });
+    // The own entry in the member list carries the music icon like everyone else's.
+    expect(
+      member(new RegExp(`^${own.name}`)).parentElement?.querySelector('[data-icon="music"]'),
+    ).not.toBeNull();
+
+    await hover(/^Anna/);
+    let block = within(screen.getByRole("tooltip")).getByRole("region", { name: "Now playing" });
+    expect(block).toHaveTextContent("Song");
+    expect(block).toHaveTextContent("Band");
+    expect(within(block).getByRole("progressbar")).toHaveAttribute("max", "200000");
+    await wait(0);
+    expect(block.querySelector("img")).toHaveAttribute("src", "data:image/png;base64,AAAA");
+
+    fireEvent.pointerLeave(trigger(/^Anna/), { pointerType: "mouse" });
+    await wait(PREVIEW_CLOSE_GRACE_MS);
+    await hover(new RegExp(`^${own.name}`));
+    block = within(screen.getByRole("tooltip")).getByRole("region", { name: "Now playing" });
+    expect(block).toHaveTextContent("Own song");
   });
 
   it("does not open when the pointer leaves before the delay", async () => {

@@ -73,6 +73,12 @@
     "player": "Reproductor de vídeo: {{title}}",
     "videoTitle": "Vídeo de {{site}}",
     "inBrowser": "Se reproduce en tu navegador",
-    "card": "Vista previa del enlace: {{title}}"
+    "card": "Vista previa del enlace: {{title}}",
+    "dismiss": "Ocultar vista previa"
+  },
+  "image": {
+    "loading": "Cargando la imagen {{name}}",
+    "label": "Imagen: {{name}}",
+    "view": "Ver la imagen {{name}}"
   }
 }

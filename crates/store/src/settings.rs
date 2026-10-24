@@ -38,6 +38,8 @@ pub enum VoiceActivation {
 
 /// Default manual threshold in dBFS.
 pub const DEFAULT_VOICE_THRESHOLD_DBFS: i32 = -40;
+/// Default for `Settings::preview_cache_days` (QA.42).
+pub const DEFAULT_PREVIEW_CACHE_DAYS: u32 = 7;
 
 /// What closing the main window does while connected (FR-1.38).
 #[derive(Debug, Clone, Copy, Default, PartialEq, Eq, Serialize, Deserialize)]
@@ -226,6 +228,11 @@ pub struct Settings {
     /// Show link previews and video player cards in chat; Mumcord then fetches linked pages
     /// itself (FR-1.49, QA.34). Off: plain links only and no requests.
     pub link_previews: bool,
+    /// Cached previews, thumbnails and images are deleted after this many days; `None` keeps
+    /// them (QA.42).
+    pub preview_cache_days: Option<u32>,
+    /// Local chat history older than this many days is deleted; `None` keeps it (QA.42).
+    pub history_max_age_days: Option<u32>,
     /// Share the track playing in the system's media player with others on the server
     /// (FR-1.58). Opt-in: nothing is read from the system while off.
     pub now_playing: bool,
@@ -262,6 +269,8 @@ impl Default for Settings {
             start_minimized: true,
             connect_muted: true,
             link_previews: true,
+            preview_cache_days: Some(DEFAULT_PREVIEW_CACHE_DAYS),
+            history_max_age_days: None,
             now_playing: false,
         }
     }
@@ -407,6 +416,27 @@ mod tests {
     }
 
     #[test]
+    fn now_playing_switch_persists_on_records_saved_before_it_existed() {
+        let (_dir, store) = temp_store();
+        // A record written by a build without the switch (as found on a real install).
+        let old = r#"{"wizard_completed":true,"input_device":"alsa:sysdefault:CARD=II","link_previews":true}"#;
+        let parsed: Settings = serde_json::from_str(old).expect("parse");
+        assert!(!parsed.now_playing, "off until the user turns it on");
+        store
+            .save_settings(&Settings {
+                now_playing: true,
+                ..parsed
+            })
+            .expect("save");
+        let reloaded = store.settings().expect("reload");
+        assert!(reloaded.now_playing);
+        assert_eq!(
+            reloaded.input_device.as_deref(),
+            Some("alsa:sysdefault:CARD=II")
+        );
+    }
+
+    #[test]
     fn partial_json_falls_back_to_defaults() {
         let parsed: Settings =
             serde_json::from_str(r#"{"theme":"dark","sounds":{"user_joined":false}}"#)
@@ -428,6 +458,11 @@ mod tests {
         assert_eq!(parsed.log_level, LogLevel::Info);
         assert_eq!(parsed.notifications, NotificationMode::Both);
         assert!(parsed.link_previews, "link previews are on for old records");
+        assert_eq!(parsed.preview_cache_days, Some(7), "7 days for old records");
+        assert_eq!(
+            parsed.history_max_age_days, None,
+            "history is kept by default"
+        );
         assert!(
             parsed.send_default_avatar,
             "on by default, also for old records"
