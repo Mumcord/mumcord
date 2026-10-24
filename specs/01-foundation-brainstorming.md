@@ -906,3 +906,11 @@ Measured in `specs/01-foundation-scale-report.md`; performance fixes are done wi
 ✍️ Note: Asked and answered in chat during /dev.
 
 ---
+
+#### QA.31 Where does the avatar stack sit? `◉`
+
+- [x] **On its own line under the channel name (indented like members), followed by "+N" and "Show all"; the channel row keeps arrow, name, badges and star.** Beside the name it looked cramped.
+
+✍️ Note: Requested in chat during /dev.
+
+---
