@@ -5,7 +5,7 @@
 }
 
 /* --tree-indent is set per channel (indentRem: smaller on deep levels). The indent also gives way
-   when the column is too narrow for about 8rem of name, count and star (--tree-min-row), but keeps
+   when the column is too narrow for about 8rem of name, count and eye (--tree-min-row), but keeps
    a quarter rem so the nesting stays visible (QA.27). The avatar stack line uses the same value. */
 .channel-tree [role="group"] {
   padding-left: clamp(0.25rem, calc(100% - var(--tree-min-row)), var(--tree-indent));
@@ -13,7 +13,7 @@
 
 .channel-tree {
   /* Smallest row before the indent gives way: padding, toggle and gaps (3rem) plus about 8rem
-     for the name with its count and star. */
+     for the name with its count and eye. */
   --tree-min-row: 11rem;
 }
 
@@ -111,8 +111,15 @@
   white-space: nowrap;
 }
 
+/* Pill after the name (icon + number); the name truncates first, pills never shrink. */
 .tree-channel__count {
-  margin-left: auto;
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  gap: var(--space-1);
+  padding: 0 var(--space-2);
+  border-radius: var(--radius-full);
+  background: var(--color-bg-hover);
   color: var(--color-text-secondary);
   font-size: var(--font-size-sm);
 }
@@ -125,8 +132,9 @@
 .tree-channel__action {
   display: inline-flex;
   flex: none;
-  justify-content: center;
-  width: 1.5rem;
+  justify-content: flex-end;
+  /* Same 16px as a person status icon and right-aligned, so both sit on the same x. */
+  width: 1rem;
 }
 
 /* Shown on hover and while the row has keyboard focus (Shift+Enter is the keyboard route). */

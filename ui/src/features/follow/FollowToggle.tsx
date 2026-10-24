@@ -4,8 +4,9 @@ import { getApi } from "../../api";
 import { useServerState } from "../channels";
 import { describeFollowError } from "./errors";
 import { useFollowState } from "./followStore";
+import { EyeIcon } from "./EyeIcon";
 
-/** ☆ Follow / ★ Following for a channel, or the FR-1.12 hint on servers before 1.4. */
+/** Eye: Follow / Following for a channel, or the FR-1.12 hint on servers before 1.4. */
 export function FollowToggle({ channelId }: { channelId: number }) {
   const { t } = useTranslation("follow");
   const server = useServerState();
@@ -43,7 +44,7 @@ export function FollowToggle({ channelId }: { channelId: number }) {
           void toggle();
         }}
       >
-        <span aria-hidden="true">{following ? "★ " : "☆ "}</span>
+        <EyeIcon />
         {following ? t("following") : t("follow")}
       </button>
       {error && (

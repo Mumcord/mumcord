@@ -17,7 +17,10 @@
 }
 
 .unread-badge {
-  margin-left: auto;
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  gap: var(--space-1);
   padding: 0 var(--space-2);
   border-radius: var(--radius-full);
   /* Logo gradient: reserved for highlights (QA.24); --color-on-accent passes on every stop. */
@@ -73,21 +76,19 @@
   box-shadow: inset 3px 0 0 var(--color-accent);
 }
 
-/* Follow star in a channel row (QA.13). The glyph is generated so it adds no treeitem text. */
+/* Follow eye in a channel row (QA.13): 16px like the person status icons, so it sits on their column. */
 .follow-star {
-  width: 1.5rem;
-  height: 1.5rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1rem;
+  height: 1rem;
   padding: 0;
   border: 0;
-  border-radius: var(--radius-sm);
   background: transparent;
   color: var(--color-text-secondary);
   cursor: pointer;
   opacity: 0;
-}
-
-.follow-star::before {
-  content: "☆";
 }
 
 .follow-star[data-followed="true"] {
@@ -95,11 +96,23 @@
   opacity: 1;
 }
 
-.follow-star[data-followed="true"]::before {
-  content: "★";
+/* Followed = pupil filled in the accent colour; outlined eye = not followed. */
+.follow-eye__pupil {
+  fill: none;
 }
 
-/* Only opacity changes, so showing the star never moves anything in the row. */
+.follow-star[data-followed="true"] .follow-eye__pupil,
+.follow-toggle[aria-pressed="true"] .follow-eye__pupil {
+  fill: currentColor;
+}
+
+.follow-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+/* Only opacity changes, so showing the eye never moves anything in the row. */
 .tree-channel__row:hover .follow-star,
 [role="treeitem"]:focus-visible > .tree-channel__row .follow-star,
 .follow-star:focus-visible {

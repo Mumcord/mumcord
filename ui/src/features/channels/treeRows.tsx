@@ -196,6 +196,20 @@ export const ChannelBranch = memo(function ChannelBranchRow({
               // The digits are CSS-generated (::before) so the row's visible text stays a run of
               // its accessible name (WCAG 2.5.3); the spoken form is the visually hidden phrase.
               <span className="tree-channel__count" data-count={count}>
+                <svg
+                  viewBox="0 0 24 24"
+                  width="12"
+                  height="12"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  aria-hidden="true"
+                  focusable="false"
+                >
+                  <path d="M12 4a4 4 0 1 0 0 8a4 4 0 1 0 0-8M4 21a8 8 0 0 1 16 0" />
+                </svg>
                 <span className="visually-hidden">, {t("tree.people", { count })}</span>
               </span>
             )}

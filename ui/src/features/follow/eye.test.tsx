@@ -52,17 +52,17 @@ afterEach(() => {
   resetAll();
 });
 
-describe("follow star", () => {
+describe("follow eye", () => {
   it("follows and unfollows without selecting or joining the channel", async () => {
     const view = await setup();
     const selectedBefore = getSelectedConversation();
-    const star = within(raidRow()).getByRole("button", { name: "Follow Raid" });
-    expect(star).toHaveAttribute("data-followed", "false");
-    // The star's slot ends the row, so the hover-only Join button cannot push it aside.
-    expect(star.parentElement?.nextElementSibling).toBeNull();
+    const eye = within(raidRow()).getByRole("button", { name: "Follow Raid" });
+    expect(eye).toHaveAttribute("data-followed", "false");
+    // The eye's slot ends the row, so the hover-only Join button cannot push it aside.
+    expect(eye.parentElement?.nextElementSibling).toBeNull();
     const ownChannel = selfUser(getServerState())?.channelId;
-    fireEvent.click(star);
-    fireEvent.doubleClick(star);
+    fireEvent.click(eye);
+    fireEvent.doubleClick(eye);
     const filled = await within(raidRow()).findByRole("button", { name: "Unfollow Raid" });
     expect(filled).toHaveAttribute("data-followed", "true");
     expect(getSelectedConversation()).toEqual(selectedBefore);
@@ -82,20 +82,20 @@ describe("follow star", () => {
       row.focus();
       fireEvent.focus(row);
     });
-    const star = within(row).getByRole("button", { name: "Follow Raid" });
+    const eye = within(row).getByRole("button", { name: "Follow Raid" });
     await waitFor(() => {
-      expect(star).toHaveAttribute("tabindex", "0");
+      expect(eye).toHaveAttribute("tabindex", "0");
     });
     const selectedBefore = getSelectedConversation();
-    star.focus();
-    fireEvent.keyDown(star, { key: "Enter" });
+    eye.focus();
+    fireEvent.keyDown(eye, { key: "Enter" });
     expect(getSelectedConversation()).toEqual(selectedBefore);
-    fireEvent.click(star);
+    fireEvent.click(eye);
     expect(await within(row).findByRole("button", { name: "Unfollow Raid" })).toBeInTheDocument();
-    // Arrow keys still move through the tree from the star.
-    fireEvent.keyDown(star, { key: "ArrowUp" });
+    // Arrow keys still move through the tree from the eye.
+    fireEvent.keyDown(eye, { key: "ArrowUp" });
     await waitFor(() => {
-      expect(document.activeElement).not.toBe(star);
+      expect(document.activeElement).not.toBe(eye);
     });
   });
 
