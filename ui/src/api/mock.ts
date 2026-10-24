@@ -313,7 +313,12 @@ export function createMockApi(options: MockOptions = {}): MockApi {
       target?.id ?? 0,
       "selfhash",
     );
-    const anna = { ...person(2, "Anna", 1, "annahash"), hasComment: true, hasAvatar: true, avatarHash: "a1" };
+    const anna = {
+      ...person(2, "Anna", 1, "annahash"),
+      hasComment: true,
+      hasAvatar: true,
+      avatarHash: "a1",
+    };
     const carla = { ...person(4, "Carla", 2, "carlahash"), listeningChannelIds: [1] };
     const info: ServerInfo = {
       version: serverVersion,
