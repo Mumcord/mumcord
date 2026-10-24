@@ -497,3 +497,38 @@ fn read_wav(path: &Path) -> Vec<f32> {
         .map(|s| f32::from(s.expect("sample")) / 32768.0)
         .collect()
 }
+
+#[test]
+fn manual_threshold_gates_quiet_and_loud_tones_and_ptt_ignores_it() {
+    let (mut chain, _) = chain_with(false, false, false);
+    let controls = chain.controls().clone();
+    controls.set_manual_threshold(true);
+    controls.set_threshold_dbfs(-30.0);
+    let tone = |amplitude: f32| -> Vec<f32> {
+        (0..SAMPLE_RATE as usize / 2)
+            .map(|i| amplitude * (2.0 * PI * 440.0 * i as f32 / SAMPLE_RATE as f32).sin())
+            .collect()
+    };
+    let open_frames = |chain: &mut DspChain, samples: &[f32]| {
+        let mut out = [0.0; FRAME_SAMPLES];
+        samples
+            .as_chunks::<FRAME_SAMPLES>()
+            .0
+            .iter()
+            .filter(|frame| chain.process(frame, &mut out) == Gate::Open)
+            .count()
+    };
+    // -46 dBFS peak is below the -30 dBFS threshold, -12 dBFS above it.
+    assert_eq!(open_frames(&mut chain, &tone(0.005)), 0);
+    assert!(open_frames(&mut chain, &tone(0.25)) >= 49);
+    assert!(controls.voice_active());
+
+    // Push-to-talk ignores the threshold.
+    controls.set_mode(TalkMode::PushToTalk);
+    controls.set_ptt_pressed(false);
+    let mut out = [0.0; FRAME_SAMPLES];
+    for _ in 0..VAD_HANGOVER_FRAMES + 10 {
+        chain.process(&[0.0; FRAME_SAMPLES], &mut out);
+    }
+    assert_eq!(open_frames(&mut chain, &tone(0.25)), 0);
+}
