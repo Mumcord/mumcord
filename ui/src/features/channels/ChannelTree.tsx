@@ -5,47 +5,47 @@
  * button joins.
  */
 import {
-  Fragment,
   useId,
+  useLayoutEffect,
   useMemo,
   useRef,
   useState,
+  useSyncExternalStore,
   type KeyboardEvent,
   type ReactNode,
 } from "react";
 import { useTranslation } from "react-i18next";
-import type { User } from "../../api";
 import "./channels.css";
-import { Avatar } from "../members/Avatar";
-import { ProfilePreviewTrigger } from "../members/ProfilePreview";
-import { previewOnFocus, releasePreview } from "../members/profilePreviewStore";
-import { AvatarStack } from "./AvatarStack";
 import { useAvatars } from "../members/useAvatars";
-import { StatusIcons } from "./PersonStatus";
-import { useStatusText } from "./statusText";
 import type { ServerState } from "./serverStore";
+import { buildTree, channelRowId, visibleRows, visibleStacks, type ChannelNode } from "./tree";
 import {
-  buildTree,
-  channelRowId,
-  CROWDED_CHANNEL_SIZE,
-  isExpandable,
-  memberRowId,
-  visibleRows,
-  visibleStacks,
-  type ChannelNode,
-} from "./tree";
+  onScreenTracker,
+  TreeContext,
+  valueStore,
+  type TreeActions,
+  type TreeContextValue,
+  type TreeUi,
+} from "./treeContext";
+import { ChannelBranch } from "./treeRows";
 
 export interface ChannelTreeProps {
   state: ServerState;
+  /** Reading along (not joined for voice): no channel is highlighted as the voice channel. */
+  readOnly?: boolean;
   selectedChannelId: number | null;
   onSelect: (channelId: number) => void;
   onJoin: (channelId: number) => void;
   onOpenPerson: (session: number, opener: HTMLElement | null) => void;
-  /** Extra content after a channel's people count, e.g. the unread badge (B22). */
+  /**
+   * Extra content after a channel's people count, e.g. the unread badge (B22). Rows call it only
+   * when they re-render, so it must return a component that keeps itself up to date.
+   */
   channelBadge?: ((channelId: number) => ReactNode) | undefined;
   /**
    * A button in a fixed slot of each channel row, e.g. the follow star (QA.13). `tabbable` is true
-   * for the row holding the tree's Tab stop, so Tab reaches the button from that row.
+   * for the row holding the tree's Tab stop, so Tab reaches the button from that row. Like
+   * `channelBadge`, it must return a self-updating component.
    */
   channelAction?: ((channel: ChannelAction) => ReactNode) | undefined;
 }
@@ -58,6 +58,7 @@ export interface ChannelAction {
 
 export function ChannelTree({
   state,
+  readOnly = false,
   selectedChannelId,
   onSelect,
   onJoin,
@@ -66,7 +67,6 @@ export function ChannelTree({
   channelAction,
 }: ChannelTreeProps) {
   const { t } = useTranslation("channels");
-  const statusText = useStatusText();
   const hintId = useId();
   const treeRef = useRef<HTMLDivElement>(null);
   const [collapsed, setCollapsed] = useState<ReadonlySet<number>>(new Set());
@@ -75,28 +75,46 @@ export function ChannelTree({
   const [showAll, setShowAll] = useState<ReadonlySet<number>>(new Set());
 
   // Only channels and people shape the tree; talking changes must not rebuild it (scale report).
-  const roots = useMemo(
-    () => buildTree({ channels: state.channels, users: state.users }),
-    [state.channels, state.users],
-  );
+  // The previous tree lets unchanged channels keep their nodes, so their rows skip re-rendering.
+  const [tree, setTree] = useState<{ source: ServerState | null; roots: ChannelNode[] }>({
+    source: null,
+    roots: [],
+  });
+  let roots = tree.roots;
+  if (
+    tree.source === null ||
+    tree.source.channels !== state.channels ||
+    tree.source.users !== state.users
+  ) {
+    roots = buildTree(state, tree.roots);
+    setTree({ source: state, roots });
+  }
   const rows = useMemo(() => visibleRows(roots, collapsed, showAll), [roots, collapsed, showAll]);
   const stacks = useMemo(
     () => visibleStacks(roots, collapsed, showAll, state.talking),
     [roots, collapsed, showAll, state.talking],
   );
+  // Stable for the tree's lifetime (see `context` below); created first because avatars need it.
+  const [onScreen] = useState(onScreenTracker);
+  const seen = useSyncExternalStore(onScreen.subscribe, onScreen.get);
+  // Avatars load only for people whose rows came near the screen (scale report, P5).
   const visibleUsers = useMemo(
-    () => [
-      ...rows.flatMap((r) => {
-        const user = r.session === null ? undefined : state.users.get(r.session);
-        return user === undefined ? [] : [user];
-      }),
-      ...[...stacks.values()].flat(),
-    ],
-    [rows, stacks, state.users],
+    () =>
+      [
+        ...rows.flatMap((r) => {
+          const user = r.session === null ? undefined : state.users.get(r.session);
+          return user === undefined ? [] : [user];
+        }),
+        ...[...stacks.values()].flat(),
+      ].filter((user) => seen.has(user.session)),
+    [rows, stacks, state.users, seen],
   );
   const avatarOf = useAvatars(visibleUsers);
+  // The voice channel: none while reading along, since no one is in a call yet.
   const selfChannelId =
-    state.selfSession === null ? null : (state.users.get(state.selfSession)?.channelId ?? null);
+    readOnly || state.selfSession === null
+      ? null
+      : (state.users.get(state.selfSession)?.channelId ?? null);
 
   // The Tab stop falls back to the selected channel when the focused row disappears.
   const tabStopId =
@@ -180,214 +198,56 @@ export function ChannelTree({
 
   // click(detail 2) and dblclick both fire for one gesture; join only once.
   const lastJoin = useRef({ id: -1, at: 0 });
-  const joinOnce = (channelId: number, now: number) => {
-    if (lastJoin.current.id === channelId && now - lastJoin.current.at < 600) return;
-    lastJoin.current = { id: channelId, at: now };
-    onJoin(channelId);
+  const actions: TreeActions = {
+    focus: setFocusedId,
+    setExpanded,
+    toggleShowAll,
+    select: onSelect,
+    join: onJoin,
+    joinOnce: (channelId, now) => {
+      if (lastJoin.current.id === channelId && now - lastJoin.current.at < 600) return;
+      lastJoin.current = { id: channelId, at: now };
+      onJoin(channelId);
+    },
+    openPerson: onOpenPerson,
+    channelBadge,
+    channelAction,
   };
-
-  const personItem = (user: User, rowId: string, level: number) => {
-    const talking = state.talking.has(user.session);
-    const labelId = `${hintId}-${rowId}`;
-    const status = statusText(user, talking);
-    return (
-      // Keyboard input is handled once on the tree (roving focus), not per item.
-      // eslint-disable-next-line jsx-a11y/click-events-have-key-events
-      <div
-        key={rowId}
-        role="treeitem"
-        aria-level={level}
-        aria-selected={false}
-        aria-labelledby={labelId}
-        tabIndex={tabStopId === rowId ? 0 : -1}
-        data-row={rowId}
-        className="tree-person"
-        data-talking={talking}
-        onFocus={(event) => {
-          if (event.target !== event.currentTarget) return;
-          setFocusedId(rowId);
-          previewOnFocus(user.session, event.currentTarget);
-        }}
-        onBlur={releasePreview}
-        onClick={(event) => {
-          event.stopPropagation();
-          setFocusedId(rowId);
-          onOpenPerson(user.session, event.currentTarget);
-        }}
-      >
-        <span className="tree-person__row">
-          <ProfilePreviewTrigger session={user.session}>
-            <Avatar name={user.name} src={avatarOf(user)} talking={talking} size="sm" />
-            <span id={labelId} className="tree-person__name">
-              {user.name}
-              {user.session === state.selfSession && (
-                <span className="tree-person__you"> {t("tree.you")}</span>
-              )}
-              {status.length > 0 && <span className="visually-hidden">, {status.join(", ")}</span>}
-            </span>
-          </ProfilePreviewTrigger>
-          <StatusIcons user={user} />
-        </span>
-      </div>
-    );
+  const ui: TreeUi = {
+    collapsed,
+    showAll,
+    tabStopId,
+    selectedChannelId,
+    selfChannelId,
+    selfSession: state.selfSession,
   };
-
-  const channelItem = (node: ChannelNode, level: number): ReactNode => {
-    const { channel } = node;
-    const rowId = channelRowId(channel.id);
-    const labelId = `${hintId}-${rowId}`;
-    const stackId = `${hintId}-stack-${rowId}`;
-    const expandable = isExpandable(node);
-    const expanded = expandable && !collapsed.has(channel.id);
-    const count = node.members.length;
-    const isOwn = channel.id === selfChannelId;
-    const groupId = `${hintId}-group-${rowId}`;
-    const stack = stacks.get(channel.id);
-    const crowded = expanded && count > CROWDED_CHANNEL_SIZE;
-    const listingAll = showAll.has(channel.id);
-    const showAllLabel = listingAll ? t("tree.showFewer") : t("tree.showAll", { total: count });
-    // The group is a DOM sibling (linked via aria-owns) so the treeitem's visible
-    // content is only its own row; WCAG 2.5.3 label-in-name then matches its name.
-    return (
-      <Fragment key={rowId}>
-        {/* Keyboard input is handled once on the tree (roving focus), not per item. */}
-        {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events */}
-        <div
-          role="treeitem"
-          aria-level={level}
-          aria-owns={expanded ? groupId : undefined}
-          aria-selected={channel.id === selectedChannelId}
-          aria-expanded={expandable ? expanded : undefined}
-          aria-labelledby={stack ? `${labelId} ${stackId}` : labelId}
-          aria-keyshortcuts="Shift+Enter"
-          tabIndex={tabStopId === rowId ? 0 : -1}
-          data-row={rowId}
-          className="tree-channel"
-          onFocus={(event) => {
-            if (event.target === event.currentTarget) setFocusedId(rowId);
-          }}
-          onClick={(event) => {
-            event.stopPropagation();
-            setFocusedId(rowId);
-            onSelect(channel.id);
-            // Real mice: the second click (detail >= 2) joins even if the native dblclick lands elsewhere.
-            if (event.detail >= 2) joinOnce(channel.id, event.timeStamp);
-          }}
-          onDoubleClick={(event) => {
-            event.stopPropagation();
-            joinOnce(channel.id, event.timeStamp);
-          }}
-        >
-          <div className="tree-channel__row" data-selected={channel.id === selectedChannelId}>
-            <span
-              className="tree-channel__toggle"
-              data-expandable={expandable}
-              aria-hidden="true"
-              onClick={(event) => {
-                if (!expandable) return;
-                event.stopPropagation();
-                setExpanded(channel.id, !expanded);
-              }}
-              onDoubleClick={(event) => {
-                event.stopPropagation();
-              }}
-            >
-              {expanded ? "▾" : "▸"}
-            </span>
-            <span id={labelId} className="tree-channel__label">
-              <span className="tree-channel__name">{channel.name}</span>
-              {isOwn && <span className="visually-hidden">, {t("tree.yourChannel")}</span>}
-              {count > 0 && (
-                // The digits are CSS-generated (::before) so the row's visible text stays a run of
-                // its accessible name (WCAG 2.5.3); the spoken form is the visually hidden phrase.
-                <span className="tree-channel__count" data-count={count}>
-                  <span className="visually-hidden">, {t("tree.people", { count })}</span>
-                </span>
-              )}
-              {channelBadge?.(channel.id)}
-              {/* The stack's label follows in the name (aria-labelledby); this is its comma. */}
-              {stack && <span className="visually-hidden">,</span>}
-            </span>
-            {!isOwn && channel.permissions.enter && (
-              <button
-                type="button"
-                className="tree-channel__join"
-                // The label is CSS-generated (::before): the button shows only on hover/focus and
-                // its text must not join the treeitem's visible text (WCAG 2.5.3 label-in-name).
-                data-label={t("tree.join")}
-                tabIndex={-1}
-                aria-hidden="true"
-                onClick={(event) => {
-                  event.stopPropagation();
-                  onJoin(channel.id);
-                }}
-                onDoubleClick={(event) => {
-                  event.stopPropagation();
-                }}
-              />
-            )}
-            {channelAction && (
-              // Fixed-width slot at the row's end: the hover-only Join button appears to its left,
-              // so the action never moves under the pointer (moving targets caused misclicks).
-              <span className="tree-channel__action">
-                {channelAction({
-                  channelId: channel.id,
-                  name: channel.name,
-                  tabbable: tabStopId === rowId,
-                })}
-              </span>
-            )}
-          </div>
-          {(stack || crowded) && (
-            // Own line under the row, so the name keeps the row's width (QA.14, QA.29). Inside the
-            // treeitem (a tree group may only hold treeitems), so the toggle's text is
-            // CSS-generated like the Join button's (WCAG 2.5.3 label-in-name).
-            <div className="avatar-stack__line">
-              {stack && (
-                <AvatarStack
-                  id={stackId}
-                  people={stack.map((user) => ({
-                    user,
-                    talking: state.talking.has(user.session),
-                    src: avatarOf(user),
-                  }))}
-                  total={count}
-                />
-              )}
-              {crowded && (
-                <button
-                  type="button"
-                  className="avatar-stack__toggle"
-                  data-label={showAllLabel}
-                  aria-label={showAllLabel}
-                  aria-expanded={listingAll}
-                  tabIndex={tabStopId === rowId ? 0 : -1}
-                  onClick={(event) => {
-                    event.stopPropagation();
-                    toggleShowAll(channel.id);
-                  }}
-                  onDoubleClick={(event) => {
-                    event.stopPropagation();
-                  }}
-                  onKeyDown={(event) => {
-                    // The tree selects the channel on Enter/Space; the toggle must not.
-                    if (event.key === "Enter" || event.key === " ") event.stopPropagation();
-                  }}
-                />
-              )}
-            </div>
-          )}
-        </div>
-        {expanded && (
-          <div role="group" id={groupId}>
-            {(!crowded || listingAll) &&
-              node.members.map((u) => personItem(u, memberRowId(u.session), level + 1))}
-            {node.children.map((child) => channelItem(child, level + 1))}
-          </div>
-        )}
-      </Fragment>
-    );
-  };
+  // Stable for the tree's lifetime: rows read the changing parts through these stores, so a
+  // change re-renders only the rows it concerns (see `treeRows`).
+  const actionsRef = useRef(actions);
+  const [context] = useState<TreeContextValue>(() => ({
+    hintId,
+    server: valueStore(state),
+    ui: valueStore(ui),
+    avatars: valueStore(avatarOf),
+    onScreen,
+    actions: actionsRef,
+  }));
+  useLayoutEffect(() => {
+    actionsRef.current = actions;
+    const current = context.ui.get();
+    if (
+      current.collapsed !== ui.collapsed ||
+      current.showAll !== ui.showAll ||
+      current.tabStopId !== ui.tabStopId ||
+      current.selectedChannelId !== ui.selectedChannelId ||
+      current.selfChannelId !== ui.selfChannelId ||
+      current.selfSession !== ui.selfSession
+    ) {
+      context.ui.set(ui);
+    }
+    context.avatars.set(avatarOf);
+    context.server.set(state);
+  });
 
   return (
     <div className="channel-tree">
@@ -400,7 +260,11 @@ export function ChannelTree({
         aria-describedby={hintId}
         onKeyDown={onKeyDown}
       >
-        {roots.map((root) => channelItem(root, 1))}
+        <TreeContext.Provider value={context}>
+          {roots.map((root) => (
+            <ChannelBranch key={channelRowId(root.channel.id)} node={root} level={1} />
+          ))}
+        </TreeContext.Provider>
       </div>
       <p id={hintId} className="channel-tree__hint">
         {t("tree.hint")}

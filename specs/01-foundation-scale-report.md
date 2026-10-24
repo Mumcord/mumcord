@@ -130,3 +130,63 @@ VITE_MUMCORD_MOCK=1 VITE_MUMCORD_MOCK_SEED=stress npx vite build --outDir /path/
 # window.__mumcordMock.mock.emit(...)
 testenv/scale/down.sh
 ```
+
+## 7. After fixes
+
+**Short answer:** P1, P2, P3 and P5 are done; P4 (virtualisation) turned out not to be needed. Under the measured churn the UI now holds **60 fps** on a fast machine (was 17–19) and 34–41 fps on the slow profile (was 3–6). The **13 s freeze after connecting is gone**: the 305 permission answers now arrive as one event and the UI applies all events once per frame. One person moving costs about **4 ms** of UI work instead of about 44–60 ms. Avatars load only for rows near the screen: **2 requests on connect instead of 98–307**.
+
+### 7.1 What changed
+
+| Proposal | Change |
+|---|---|
+| P2 | The engine collects permission answers and sends one `channelsUpserted { channels }` once they settle (30 ms of quiet, at most 200 ms after the first answer). The views are built when the batch is sent, so it always carries the latest data and cannot bring back a removed channel. `crates/engine/src/session/batch.rs`, documented in `docs/engine-api.md`. |
+| P1 | The UI store queues engine events and applies them once per animation frame (or after 100 ms when the window is hidden): one new state and one render per frame. Maps are copied at most once per batch. A non-React read (`getServerState()`) applies queued events first, so code reacting to other events never sees stale state. Change listeners still get every change in order; runs of channel changes collapse into one. `ui/src/features/channels/serverStore.ts` |
+| P3 | `buildTree` reuses the node of every unchanged channel, and tree rows are memoised components (`treeRows.tsx`) that select only their own data (talking, expanded, selected, Tab stop, avatar). A move re-renders the two channels involved and their parents; a talking change re-renders one row. The per-row follow star now selects only "follow supported" instead of the whole server state. |
+| P5 | Rows report to one IntersectionObserver when they come within 200 px of the screen; only those people's avatars are requested. Avatar answers are applied once per frame. |
+| P4 | Not done: with the above, churn stays at 60 fps (1×) and above 30 fps (4×), so virtualisation is not needed now. Collapsing big servers by default (P6) would shrink the first render further. |
+
+### 7.2 Numbers
+
+Same method as section 2. The "before" column was re-measured on the same day with the same script, because the tree has changed since the first report: crowded channels now show an avatar stack instead of listing everyone (QA.14), so the stress tree has 487 rows instead of 1305. "Work" is main-thread time per event measured with the DevTools performance counters; "script + style + layout" leaves out painting, which headless Chromium does in software.
+
+**UI, 1× CPU**
+
+| Measure | Before | After |
+|---|---|---|
+| First render after connect | 226 ms (frame gap 200 ms) | 194–201 ms (longest frame gap 167 ms) |
+| Avatar requests on connect | 98 | **2** (7 after scrolling to the middle of the tree) |
+| One person moves: all main-thread work, incl. paint | 36–44 ms | 10 ms |
+| One person moves: script + style + layout | not split | **4.4 ms** (script 3.5 ms) |
+| One person moves: event → painted frame (median) | 35 ms | 13 ms |
+| One talking ring: all main-thread work / script + style + layout | 19 ms / not split | 7 ms / **3.1 ms** (script 2.2 ms) |
+| Frame rate at measured churn (40 moves/s + 15 talk/s) | 19 fps (29 frames > 50 ms) | **60 fps** (none > 50 ms) |
+| Frame rate at 5× churn (200 moves/s + 30 talk/s) | 25 fps | **60 fps** |
+| 305 `channelUpserted`, one per task (old engine) | 7.2 s busy | 26–37 ms |
+| One `channelsUpserted` with 305 channels (new engine) | n/a | 29 ms |
+
+**UI, 4× CPU (slow laptop)**
+
+| Measure | Before | After |
+|---|---|---|
+| First render after connect | 863 ms (frame gap 783 ms) | 647–902 ms (frame gap 617–817 ms) |
+| One person moves: all main-thread work | 160 ms | 45–97 ms (script + style + layout 20–37 ms; noisy, other builds were running) |
+| One talking ring: all main-thread work | 82 ms | 26–48 ms (script + style + layout 11–18 ms) |
+| Frame rate at measured churn | 6 fps | **37–41 fps** |
+| Frame rate at 5× churn | 6 fps | 34 fps |
+| 305 `channelUpserted`, one per task | 31.6 s busy | 113–193 ms |
+
+**Engine probe against the load server (1007 users, 305 channels)**
+
+| Measure | Before | After |
+|---|---|---|
+| Permission answers after sync | 305 `channelUpserted` events | **one `channelsUpserted` with 305 channels** in every run (sent 0.9–8 s after the sync: the busy server answers late) |
+| Peak events within 100 ms | ≈ 314 | ≤ 8 |
+| Engine CPU / memory under churn + talk | 3–5 % / 17–18 MiB | 3–3.4 % / 17–18 MiB |
+
+### 7.3 Targets
+
+| Target | Result |
+|---|---|
+| One event redraws in < 8 ms (1×) | **Met**: 4.4 ms for a move, 3.1 ms for a talking ring (script + style + layout). |
+| ≥ 50 fps under churn (1×), ≥ 30 fps (4×) | **Met**: 60 fps at 1×, 34–41 fps at 4×. |
+| No freeze > 200 ms after connect | **Met at 1×** (longest frame gap 167 ms), **not at 4×** (617–817 ms). That is the first render of the whole tree. About a third of it is the avatar stacks measuring their line width one by one (`contentWidth` in `AvatarStack.tsx` forces a layout per stack). Reading the widths from the ResizeObserver entries instead, and P6 (collapse big servers by default), would bring it down. |

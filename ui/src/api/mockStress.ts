@@ -224,6 +224,7 @@ export function stressUsers(self: User, channels: readonly ChannelInfo[]): User[
       selfDeaf: roll < 0.05,
       serverMute: false,
       serverDeaf: false,
+      suppressed: false,
       listeningChannelIds: [],
       hasAvatar,
       avatarHash: hasAvatar ? `stress-${String(session)}` : null,

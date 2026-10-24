@@ -4,6 +4,8 @@
  * entry is dropped when `hasAvatar` or `avatarHash` changes, the person leaves, or the connection is re-synced or
  * lost (sessions are reused across connections).
  *
+ * Answers are applied once per animation frame, so a burst of them re-renders once.
+ *
  * Usage: `const avatarOf = useAvatars(visibleUsers); <Avatar src={avatarOf(user)} … />`.
  */
 import { useCallback, useEffect, useRef, useState } from "react";
@@ -16,6 +18,16 @@ export function useAvatars(users: readonly User[]): (user: User) => string | nul
   const generations = useRef(new Map<number, number>());
   /** Sessions with a request in flight or a cached result for the current generation. */
   const requested = useRef(new Set<number>());
+  /** Answers waiting for the next frame: hundreds can arrive at once on a big server. */
+  const arrived = useRef(new Map<number, { src: string | null; generation: number }>());
+  const flushFrame = useRef<number | null>(null);
+
+  useEffect(
+    () => () => {
+      if (flushFrame.current !== null) cancelAnimationFrame(flushFrame.current);
+    },
+    [],
+  );
 
   useEffect(() => {
     const forget = (sessions: Iterable<number> | "all") => {
@@ -60,7 +72,20 @@ export function useAvatars(users: readonly User[]): (user: User) => string | nul
       const generation = generations.current.get(session) ?? 0;
       const store = (src: string | null) => {
         if ((generations.current.get(session) ?? 0) !== generation) return;
-        setImages((current) => new Map(current).set(session, src));
+        arrived.current.set(session, { src, generation });
+        flushFrame.current ??= requestAnimationFrame(() => {
+          flushFrame.current = null;
+          const batch = arrived.current;
+          arrived.current = new Map();
+          // A session invalidated while its answer waited is fetched again; drop the stale one.
+          setImages((current) => {
+            const next = new Map(current);
+            for (const [s, answer] of batch) {
+              if ((generations.current.get(s) ?? 0) === answer.generation) next.set(s, answer.src);
+            }
+            return next;
+          });
+        });
       };
       getApi()
         .personProfile(session)

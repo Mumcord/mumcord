@@ -1,7 +1,7 @@
 import { useState, type KeyboardEvent, type MouseEvent } from "react";
 import { useTranslation } from "react-i18next";
 import { getApi } from "../../api";
-import { useServerState, type ChannelAction } from "../channels";
+import { useServerSelector, type ChannelAction } from "../channels";
 import { describeFollowError } from "./errors";
 import { useFollowState } from "./followStore";
 import { setFollowNotice } from "./notice";
@@ -13,10 +13,11 @@ import "./follow.css";
  */
 export function FollowStar({ channelId, name, tabbable }: ChannelAction) {
   const { t } = useTranslation("follow");
-  const server = useServerState();
+  // One star per channel row: select only the flag, so server events do not re-render them all.
+  const followSupported = useServerSelector((s) => s.info?.followSupported ?? false);
   const { followed } = useFollowState();
   const [busy, setBusy] = useState(false);
-  if (!server.info?.followSupported) return null;
+  if (!followSupported) return null;
   const following = followed.includes(channelId);
 
   async function toggle() {

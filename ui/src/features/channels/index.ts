@@ -6,6 +6,8 @@
  *   (`info`), channels, users and talking sessions of the connected server (maps keyed by channel
  *   id / session), own session (`selfSession`, `selfUser(state)`). Empty (`serverId === null`)
  *   when not connected or not yet synced; kept during reconnecting.
+ * - `useServerSelector(select, equal?)`: one derived value; re-renders only when it changes. Use it
+ *   in components rendered many times (e.g. per tree row) instead of `useServerState()`.
  * - `subscribeServerChanges(fn)`: semantic changes (synced, connection, channels, user joined/moved/left,
  *   talk) for side effects such as sounds or announcements.
  * - `useSelectedConversation()`: `{ conversation, select }` – the conversation the chat column
@@ -21,6 +23,7 @@ export {
   getServerState,
   selfUser,
   subscribeServerChanges,
+  useServerSelector,
   useServerState,
   type ServerChange,
   type ServerState,

@@ -26,12 +26,22 @@ export interface TreeRow {
 export const channelRowId = (channelId: number) => `c${String(channelId)}`;
 export const memberRowId = (session: number) => `u${String(session)}`;
 
-const byName = (a: { name: string }, b: { name: string }) =>
-  a.name.localeCompare(b.name, undefined, { sensitivity: "base" });
+// One collator instead of `localeCompare` per comparison: sorting 1000 people stays cheap.
+const collator = new Intl.Collator(undefined, { sensitivity: "base" });
+const byName = (a: { name: string }, b: { name: string }) => collator.compare(a.name, b.name);
 
-/** Builds the nested tree. Channel listeners are not part of it; they only show in the member list.
- * Channels whose parent is unknown are shown at the top level. */
-export function buildTree(state: Pick<ServerState, "channels" | "users">): ChannelNode[] {
+/**
+ * Builds the nested tree. Channel listeners are not part of it; they only show in the member list.
+ * Channels whose parent is unknown are shown at the top level.
+ *
+ * With the `previous` tree, every node whose channel, people and sub-channels are unchanged is
+ * the same object as before, so memoised rows of unchanged channels skip re-rendering
+ * (scale report, P3): one person moving re-renders the two channels involved, not the whole tree.
+ */
+export function buildTree(
+  state: Pick<ServerState, "channels" | "users">,
+  previous?: readonly ChannelNode[],
+): ChannelNode[] {
   const nodes = new Map<number, ChannelNode>();
   for (const channel of state.channels.values()) {
     nodes.set(channel.id, { channel, children: [], members: [] });
@@ -54,7 +64,29 @@ export function buildTree(state: Pick<ServerState, "channels" | "users">): Chann
   };
   roots.sort((a, b) => a.channel.position - b.channel.position || byName(a.channel, b.channel));
   roots.forEach(sortNode);
-  return roots;
+  if (previous === undefined) return roots;
+  const before = new Map<number, ChannelNode>();
+  const index = (node: ChannelNode) => {
+    before.set(node.channel.id, node);
+    node.children.forEach(index);
+  };
+  previous.forEach(index);
+  const reuse = (node: ChannelNode): ChannelNode => {
+    node.children = node.children.map(reuse);
+    const old = before.get(node.channel.id);
+    return old !== undefined &&
+      old.channel === node.channel &&
+      sameItems(old.members, node.members) &&
+      sameItems(old.children, node.children)
+      ? old
+      : node;
+  };
+  const next = roots.map(reuse);
+  return sameItems(previous, next) ? (previous as ChannelNode[]) : next;
+}
+
+function sameItems<T>(a: readonly T[], b: readonly T[]): boolean {
+  return a.length === b.length && a.every((item, i) => item === b[i]);
 }
 
 export function isExpandable(node: ChannelNode): boolean {

@@ -22,6 +22,7 @@ function user(session: number, name: string, channelId: number): User {
     selfDeaf: false,
     serverMute: false,
     serverDeaf: false,
+    suppressed: false,
     listeningChannelIds: [],
     hasAvatar: false,
     avatarHash: null,

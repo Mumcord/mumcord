@@ -18,7 +18,9 @@ fn kind(event: &EngineEvent) -> &'static str {
         EngineEvent::UserRemoved(_) => "userRemoved",
         EngineEvent::TalkStateChanged { .. } => "talk",
         EngineEvent::MessageReceived(_) => "message",
-        EngineEvent::ChannelUpserted(_) | EngineEvent::ChannelRemoved(_) => "channel",
+        EngineEvent::ChannelUpserted(_)
+        | EngineEvent::ChannelsUpserted(_)
+        | EngineEvent::ChannelRemoved(_) => "channel",
         EngineEvent::MicLevel(_) => "micLevel",
         EngineEvent::UnreadChanged(_) => "unread",
         _ => "other",
@@ -107,6 +109,7 @@ async fn main() -> anyhow::Result<()> {
     println!(
         "t_s,cpu_pct,rss_mib,events_per_s,max_per_100ms,userUpserted,userRemoved,talk,message,channel,micLevel,other"
     );
+    let synced_at = Instant::now();
     let end = Instant::now() + Duration::from_secs(seconds);
     let mut counts: BTreeMap<&'static str, u64> = BTreeMap::new();
     let mut window_start = Instant::now();
@@ -119,6 +122,14 @@ async fn main() -> anyhow::Result<()> {
         tokio::select! {
             event = rx.recv() => {
                 let Some(event) = event else { break };
+                // Permission answers arrive as batches; show how they were grouped.
+                if let EngineEvent::ChannelsUpserted(channels) = &event {
+                    eprintln!(
+                        "CHANNELS batch of {} at {:.0} ms after sync",
+                        channels.len(),
+                        synced_at.elapsed().as_secs_f64() * 1000.0
+                    );
+                }
                 *counts.entry(kind(&event)).or_default() += 1;
                 if bucket_start.elapsed() >= Duration::from_millis(100) {
                     max_bucket = max_bucket.max(bucket);
