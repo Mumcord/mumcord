@@ -528,6 +528,130 @@ mod tests {
         loopback(44_100, 2);
     }
 
+    fn temp_dir(name: &str) -> std::path::PathBuf {
+        let dir = std::env::temp_dir().join(format!("mumcord-audio-{}-{name}", std::process::id()));
+        std::fs::create_dir_all(&dir).expect("temp dir");
+        dir
+    }
+
+    /// 48 kHz mono 16-bit silence, written directly (hound is slow for minutes of audio).
+    fn write_silence(path: &Path, seconds: u32) {
+        let bytes = 48_000 * 2 * seconds;
+        let mut header = Vec::with_capacity(44);
+        header.extend_from_slice(b"RIFF");
+        header.extend_from_slice(&(36 + bytes).to_le_bytes());
+        header.extend_from_slice(b"WAVEfmt ");
+        header.extend_from_slice(&16u32.to_le_bytes());
+        header.extend_from_slice(&1u16.to_le_bytes());
+        header.extend_from_slice(&1u16.to_le_bytes());
+        header.extend_from_slice(&48_000u32.to_le_bytes());
+        header.extend_from_slice(&96_000u32.to_le_bytes());
+        header.extend_from_slice(&2u16.to_le_bytes());
+        header.extend_from_slice(&16u16.to_le_bytes());
+        header.extend_from_slice(b"data");
+        header.extend_from_slice(&bytes.to_le_bytes());
+        header.resize(44 + bytes as usize, 0);
+        std::fs::write(path, header).expect("write silence");
+    }
+
+    fn wait_active(events: &Receiver<DeviceEvent>, count: usize, within: Duration) {
+        let deadline = Instant::now() + within;
+        let mut active = 0;
+        while active < count {
+            let left = deadline.saturating_duration_since(Instant::now());
+            match events.recv_timeout(left) {
+                Ok(DeviceEvent::Active { .. }) => active += 1,
+                Ok(other) => panic!("unexpected event {other:?}"),
+                Err(_) => panic!("only {active} of {count} streams active after {within:?}"),
+            }
+        }
+    }
+
+    /// Plays `frames` frames of `level` and waits until they reached the output file.
+    fn play(sink: &mut FrameSink, level: f32, frames: usize) {
+        let frame: Frame = [level; FRAME_SAMPLES];
+        let deadline = Instant::now() + Duration::from_secs(10);
+        for _ in 0..frames {
+            while !sink.write_frame(&frame) {
+                assert!(Instant::now() < deadline, "playback stuck");
+                std::thread::sleep(Duration::from_millis(1));
+            }
+        }
+        while sink.queued_samples() > 0 {
+            assert!(Instant::now() < deadline, "playback never drained");
+            std::thread::sleep(Duration::from_millis(5));
+        }
+    }
+
+    fn recorded(path: &Path) -> Vec<f32> {
+        hound::WavReader::open(path)
+            .expect("open out.wav")
+            .samples::<i16>()
+            .map(|s| f32::from(s.expect("sample")) / 32768.0)
+            .collect()
+    }
+
+    /// F23: a long input file (E2E runs use ten minutes of silence) used to be decoded on the
+    /// control thread before the output opened, so speakers started seconds late.
+    #[test]
+    fn file_backend_opens_output_promptly_with_a_long_input() {
+        let dir = temp_dir("long-input");
+        let (input, output) = (dir.join("in.wav"), dir.join("out.wav"));
+        write_silence(&input, 600);
+        let kind = BackendKind::File {
+            input,
+            output: output.clone(),
+        };
+        let handles = AudioIo::start_with(kind, None, None).expect("start");
+        wait_active(&handles.events, 2, Duration::from_secs(2));
+        drop(handles);
+        std::fs::remove_dir_all(&dir).expect("cleanup");
+    }
+
+    /// F23: reopening the output (device switch, or the engine closing and reopening the
+    /// devices between connections) continues the recording instead of starting it anew.
+    #[test]
+    fn file_backend_output_continues_across_reopens() {
+        let dir = temp_dir("reopen");
+        let (input, output) = (dir.join("in.wav"), dir.join("out.wav"));
+        write_silence(&input, 1);
+        let kind = BackendKind::File {
+            input,
+            output: output.clone(),
+        };
+
+        let mut handles = AudioIo::start_with(kind.clone(), None, None).expect("start");
+        wait_active(&handles.events, 2, Duration::from_secs(10));
+        play(&mut handles.sink, 0.5, 20);
+        handles
+            .io
+            .set_output_device(Some(format!("file:{}", output.display())))
+            .expect("switch");
+        wait_active(&handles.events, 1, Duration::from_secs(10));
+        play(&mut handles.sink, 0.25, 20);
+        drop(handles);
+
+        let mut handles = AudioIo::start_with(kind, None, None).expect("restart");
+        wait_active(&handles.events, 2, Duration::from_secs(10));
+        play(&mut handles.sink, 0.125, 20);
+        drop(handles);
+
+        let samples = recorded(&output);
+        for level in [0.5f32, 0.25, 0.125] {
+            let count = samples
+                .iter()
+                .filter(|s| (**s - level).abs() < 0.01)
+                .count();
+            assert!(
+                count >= 20 * FRAME_SAMPLES,
+                "only {count} samples at {level} in the recording"
+            );
+        }
+        let first = |level: f32| samples.iter().position(|s| (*s - level).abs() < 0.01);
+        assert!(first(0.5) < first(0.25) && first(0.25) < first(0.125));
+        std::fs::remove_dir_all(&dir).expect("cleanup");
+    }
+
     #[test]
     fn null_backend_paces_silence_and_survives_device_switch() {
         let handles = AudioIo::start_with(BackendKind::Null, None, None).expect("start");

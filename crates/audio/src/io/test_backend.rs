@@ -57,24 +57,23 @@ impl Backend for TestBackend {
         _id: Option<&str>,
         counters: &Arc<Counters>,
     ) -> Result<Opened<Consumer<f32>>, IoError> {
-        let (samples, rate) = match self {
-            TestBackend::Null => (Vec::new(), SAMPLE_RATE),
-            TestBackend::File { input, .. } => read_wav_mono(input)?,
+        // The WAV is streamed from the capture thread instead of being decoded here: a long
+        // input file (E2E runs use minutes of silence) would otherwise hold up the control
+        // thread for seconds and with it the output stream, which opens right after this one.
+        let mut wav = match self {
+            TestBackend::Null => None,
+            TestBackend::File { input, .. } => Some(WavInput::open(input)?),
         };
+        let rate = wav.as_ref().map_or(SAMPLE_RATE, WavInput::rate);
         let (producer, consumer) = ring::ring(rate);
         let counters = counters.clone();
         let guard = TickThread::spawn("audio-test-capture", move |_| {
             let mut producer = producer;
-            let mut position = 0;
-            let mut silence = vec![0.0f32; rate as usize / 100];
+            let mut block = vec![0.0f32; rate as usize / 100];
             move || {
-                let block = samples
-                    .get(position..)
-                    .map_or(&[][..], |rest| &rest[..rest.len().min(silence.len())]);
-                position += block.len();
-                silence[..block.len()].copy_from_slice(block);
-                silence[block.len()..].fill(0.0);
-                ring::capture(&silence, 1, &mut producer, &counters);
+                let filled = wav.as_mut().map_or(0, |w| w.read(&mut block));
+                block[filled..].fill(0.0);
+                ring::capture(&block, 1, &mut producer, &counters);
                 Ok(())
             }
         })?;
@@ -93,7 +92,7 @@ impl Backend for TestBackend {
     ) -> Result<Opened<Producer<f32>>, IoError> {
         let mut writer = match self {
             TestBackend::Null => None,
-            TestBackend::File { output, .. } => Some(create_wav(output)?),
+            TestBackend::File { output, .. } => Some(open_output_wav(output)?),
         };
         let (producer, consumer) = ring::ring(SAMPLE_RATE);
         let counters = counters.clone();
@@ -231,39 +230,115 @@ impl Drop for TickThread {
     }
 }
 
-/// Reads a whole WAV file as mono `f32` at its own sample rate.
-fn read_wav_mono(path: &Path) -> Result<(Vec<f32>, u32), IoError> {
-    let mut reader = hound::WavReader::open(path).map_err(wav_err)?;
-    let spec = reader.spec();
-    let channels = usize::from(spec.channels.max(1));
-    let interleaved: Vec<f32> = match spec.sample_format {
-        hound::SampleFormat::Float => reader.samples::<f32>().collect::<Result<_, _>>(),
-        hound::SampleFormat::Int => {
-            let scale = 1.0 / (1u64 << (spec.bits_per_sample - 1)) as f32;
-            reader
-                .samples::<i32>()
-                .map(|s| s.map(|s| s as f32 * scale))
-                .collect::<Result<_, _>>()
+type WavFile = std::io::BufReader<std::fs::File>;
+
+enum Samples {
+    /// Integer samples and the factor that maps them to -1.0..1.0.
+    Int(hound::WavIntoSamples<WavFile, i32>, f32),
+    Float(hound::WavIntoSamples<WavFile, f32>),
+}
+
+/// A WAV file read block by block as mono `f32` at its own sample rate.
+struct WavInput {
+    samples: Samples,
+    channels: usize,
+    rate: u32,
+    done: bool,
+}
+
+impl WavInput {
+    fn open(path: &Path) -> Result<Self, IoError> {
+        let reader = hound::WavReader::open(path).map_err(wav_err)?;
+        let spec = reader.spec();
+        let samples = match spec.sample_format {
+            hound::SampleFormat::Float => Samples::Float(reader.into_samples()),
+            hound::SampleFormat::Int => {
+                let scale = 1.0 / (1u64 << (spec.bits_per_sample - 1)) as f32;
+                Samples::Int(reader.into_samples(), scale)
+            }
+        };
+        Ok(Self {
+            samples,
+            channels: usize::from(spec.channels.max(1)),
+            rate: spec.sample_rate,
+            done: false,
+        })
+    }
+
+    fn rate(&self) -> u32 {
+        self.rate
+    }
+
+    fn next_sample(&mut self) -> Option<f32> {
+        let next = match &mut self.samples {
+            Samples::Float(samples) => samples.next(),
+            Samples::Int(samples, scale) => samples.next().map(|s| s.map(|s| s as f32 * *scale)),
+        };
+        match next {
+            Some(Ok(sample)) => Some(sample),
+            Some(Err(e)) => {
+                tracing::warn!("test audio input stopped: {}", wav_err(e));
+                None
+            }
+            None => None,
         }
     }
-    .map_err(wav_err)?;
-    let mono = interleaved
-        .chunks_exact(channels)
-        .map(|frame| frame.iter().sum::<f32>() / channels as f32)
-        .collect();
-    Ok((mono, spec.sample_rate))
+
+    /// Fills `out` with downmixed frames; returns how many were filled (fewer at the end of
+    /// the file, which then plays as silence).
+    fn read(&mut self, out: &mut [f32]) -> usize {
+        if self.done {
+            return 0;
+        }
+        for (filled, slot) in out.iter_mut().enumerate() {
+            let mut sum = 0.0;
+            for _ in 0..self.channels {
+                let Some(sample) = self.next_sample() else {
+                    self.done = true;
+                    return filled;
+                };
+                sum += sample;
+            }
+            *slot = sum / self.channels as f32;
+        }
+        out.len()
+    }
 }
 
 type WavWriter = hound::WavWriter<std::io::BufWriter<std::fs::File>>;
 
-fn create_wav(path: &Path) -> Result<WavWriter, IoError> {
-    let spec = hound::WavSpec {
+/// Output files this process has already recorded to.
+static RECORDED: std::sync::Mutex<Vec<PathBuf>> = std::sync::Mutex::new(Vec::new());
+
+/// Opens the output recording. The first open in a process starts a new file; later opens
+/// (the engine closes and reopens the devices between mic test, connections and device
+/// listings, the controller reopens after errors or device switches) continue it, so
+/// everything played during one app run stays in one recording.
+fn open_output_wav(path: &Path) -> Result<WavWriter, IoError> {
+    let mut recorded = RECORDED
+        .lock()
+        .unwrap_or_else(std::sync::PoisonError::into_inner);
+    if recorded.iter().any(|p| p == path) {
+        match hound::WavWriter::append(path) {
+            Ok(writer) if writer.spec() == output_spec() => return Ok(writer),
+            Ok(_) => tracing::warn!("test audio output has another format; starting it anew"),
+            Err(e) => {
+                tracing::warn!("continuing the test audio output failed ({e}); starting it anew")
+            }
+        }
+    } else {
+        recorded.push(path.to_owned());
+    }
+    hound::WavWriter::create(path, output_spec()).map_err(wav_err)
+}
+
+fn output_spec() -> hound::WavSpec {
+    hound::WavSpec {
         channels: 1,
         sample_rate: SAMPLE_RATE,
         bits_per_sample: 16,
         sample_format: hound::SampleFormat::Int,
-    };
-    hound::WavWriter::create(path, spec).map_err(wav_err)
+    }
 }
 
 fn to_i16(sample: f32) -> i16 {
