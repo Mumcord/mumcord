@@ -134,6 +134,7 @@ describe("voice (AC-1.7 – AC-1.12)", () => {
     writeWav(f("vad-in.wav"), concat(silence(8), speech, silence(14)));
     writeWav(f("mute-in.wav"), concat(silence(5), speech, speech, speech, speech, speech, speech));
     writeWav(f("noise-in.wav"), concat(silence(8), noisy, silence(60)));
+    writeWav(f("volume-in.wav"), silence(2));
     writeWav(f("ptt-in.wav"), concat(noisy, noisy, noisy, noisy, noisy, noisy, noisy));
     await testenv.up("v15");
     // The server may still be starting (another spec may have just reset it).
@@ -351,7 +352,11 @@ describe("voice (AC-1.7 – AC-1.12)", () => {
   });
 
   it("AC-1.12 volume 50 % and local mute survive rename + reconnect", async () => {
-    const out = f("noise-out.wav");
+    // Own launch and output file, so this test does not depend on AC-1.11 having run (or passed).
+    // The microphone plays silence (after the end of the file, too).
+    const out = f("volume-out.wav");
+    await app.restart({ audio: `file:${f("volume-in.wav")}:${out}` });
+    await reconnect();
     await main.do(`expect user Tester --in "${botRoot}"`);
     const l100 = activeLevel(await playAndCapture(main, out), -55);
 
