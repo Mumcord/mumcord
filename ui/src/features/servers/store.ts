@@ -164,6 +164,16 @@ function start(api: MumcordApi): Store {
       openLink(link);
     }),
   ];
+  // A link that launched the app arrived before these listeners existed (B25).
+  void api.deepLinkTakePending().then(
+    (link) => {
+      // Not tied to `created`: React StrictMode restarts the store and the link is handed out once.
+      if (link) openLink(link);
+    },
+    (error: unknown) => {
+      console.error("Reading the start link failed", error);
+    },
+  );
   void Promise.all([api.serversList(), api.connectionState(), api.identityGet()]).then(
     ([servers, connection, identity]) => {
       if (store !== created) return;

@@ -1,0 +1,10 @@
+{
+  "close": {
+    "title": "¿Minimizar a la bandeja o salir?",
+    "description": "Sigues conectado. Minimizado, Mumcord te mantiene en el canal de voz y queda en la bandeja del sistema.",
+    "remember": "Recordar mi elección",
+    "minimize": "Minimizar a la bandeja",
+    "quit": "Salir",
+    "failed": "No ha funcionado. Inténtalo de nuevo."
+  }
+}

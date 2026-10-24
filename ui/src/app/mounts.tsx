@@ -11,6 +11,7 @@ import { ChannelUnreadBadge, DirectMessages, FollowHeaderActions } from "../feat
 import { ChatView } from "../features/chat";
 import { MembersPanel, openPrivateConversation } from "../features/members";
 import { ConnectionStatus, ServersRoot } from "../features/servers";
+import { CloseDialog } from "../features/app";
 
 /** Server bar (B19). */
 export function ServersMount() {
@@ -32,9 +33,17 @@ export function UserPanelMount() {
   return <UserPanel />;
 }
 
-/** Thin status bar above the chat, e.g. "Reconnecting…" (B19). Renders nothing when idle. */
+/**
+ * Thin status bar above the chat, e.g. "Reconnecting…" (B19), plus the close question (B25).
+ * Both render nothing when idle.
+ */
 export function ChatStatusMount() {
-  return <ConnectionStatus />;
+  return (
+    <>
+      <ConnectionStatus />
+      <CloseDialog />
+    </>
+  );
 }
 
 /** Chat header, message list and input (B21). */

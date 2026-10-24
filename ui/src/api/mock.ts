@@ -163,6 +163,9 @@ function parseLink(url: string): MumbleLink {
   };
 }
 
+/** Length of each mic-test phase (recording, playback) in the mock. */
+const MIC_TEST_PHASE_MS = 5000;
+
 export function createMockApi(options: MockOptions = {}): MockApi {
   const fresh = options.seed === "fresh";
   const serverVersion = options.serverVersion ?? "1.5.735";
@@ -194,6 +197,7 @@ export function createMockApi(options: MockOptions = {}): MockApi {
   let state: ConnectionState = { state: "disconnected", error: null };
   let snapshot: ServerSnapshot | null = null;
   let micTimer: ReturnType<typeof setInterval> | undefined;
+  let micPhaseTimer: ReturnType<typeof setTimeout> | undefined;
   let pendingConnect: { serverId: number; channelPath: string[] | null } | null = null;
   let muteBeforeDeaf = false;
   // History per server id, keyed by conversation.
@@ -633,13 +637,24 @@ export function createMockApi(options: MockOptions = {}): MockApi {
     audioDevices: () => Promise.resolve(DEVICES),
     micTestStart: () => {
       clearInterval(micTimer);
+      clearTimeout(micPhaseTimer);
       micTimer = setInterval(() => {
         emit("micLevel", { level: Math.random() * 0.6 });
       }, 50);
+      emit("micTestPhaseChanged", { phase: "recording" });
+      micPhaseTimer = setTimeout(() => {
+        emit("micTestPhaseChanged", { phase: "playing" });
+        micPhaseTimer = setTimeout(() => {
+          clearInterval(micTimer);
+          micTimer = undefined;
+          emit("micTestPhaseChanged", { phase: "done" });
+        }, MIC_TEST_PHASE_MS);
+      }, MIC_TEST_PHASE_MS);
       return Promise.resolve(null);
     },
     micTestStop: () => {
       clearInterval(micTimer);
+      clearTimeout(micPhaseTimer);
       micTimer = undefined;
       return Promise.resolve(null);
     },
@@ -659,6 +674,8 @@ export function createMockApi(options: MockOptions = {}): MockApi {
       linkHandler = true;
       return Promise.resolve(null);
     },
+    // Mock links arrive only via `api.mock.emit("deepLinkOpened", …)`.
+    deepLinkTakePending: () => Promise.resolve(null),
 
     // diagnostics
     diagnosticsSave: () => Promise.resolve(null),
