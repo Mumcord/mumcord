@@ -698,3 +698,23 @@ Disconnect exists only in the server icon's context menu.
 ✍️ Note: Requested in chat during /dev.
 
 ---
+
+#### QA.10 Avatars on servers where the user is not registered? `◉`
+Mumble servers keep avatars only for registered users; for unregistered users the avatar is lost on disconnect, and the default avatar was sent only once per server (QA.3).
+
+- [ ] Resend only the default avatar on every connect when unregistered.
+- [x] **Remember the avatar per saved server (hand-set avatar, otherwise the default avatar) and send it again on every connect when the server does not have it (unregistered users).** Registered users keep the server's copy; nothing is re-sent when the server already shows an avatar.
+- [ ] Leave as is, only hint to register.
+
+✍️ Note: Asked and answered in chat during /dev.
+
+---
+
+#### QA.11 Listeners in the channel list? `◉`
+
+- [x] **People who only listen to a channel (read-along / channel listener) are not shown in the channel list at all; they appear only in the member list on the right (with the listener marker).**
+- [ ] Show them in both (current behavior).
+
+✍️ Note: Requested in chat during /dev.
+
+---
