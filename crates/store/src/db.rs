@@ -71,6 +71,15 @@ const MIGRATIONS: &[&str] = &[
     ALTER TABLE saved_server ADD COLUMN default_avatar_sent INTEGER NOT NULL DEFAULT 0
         CHECK (default_avatar_sent IN (0, 1));
     ",
+    // v3: the user's last own mute/deafen choice, restored on an explicit join (QA.7). Kept
+    // out of the settings JSON so saving settings from the UI can never overwrite it.
+    r"
+    CREATE TABLE own_voice (
+        id   INTEGER PRIMARY KEY CHECK (id = 1),
+        mute INTEGER NOT NULL CHECK (mute IN (0, 1)),
+        deaf INTEGER NOT NULL CHECK (deaf IN (0, 1))
+    );
+    ",
 ];
 
 /// Handle to the local database. Not `Sync`; callers share it behind a mutex.

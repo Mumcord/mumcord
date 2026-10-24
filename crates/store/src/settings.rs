@@ -184,6 +184,14 @@ impl Default for Settings {
     }
 }
 
+/// The user's last own mute/deafen choice while joined for voice (QA.7). `mute` is the mute
+/// choice underneath a deafen, so undeafening after a restore brings it back.
+#[derive(Debug, Clone, Copy, Default, PartialEq, Eq)]
+pub struct OwnVoice {
+    pub mute: bool,
+    pub deaf: bool,
+}
+
 impl Store {
     /// The saved settings, or defaults if none were saved yet.
     pub fn settings(&self) -> Result<Settings> {
@@ -204,6 +212,29 @@ impl Store {
             "INSERT INTO settings (id, data) VALUES (1, ?1)
              ON CONFLICT (id) DO UPDATE SET data = excluded.data",
             params![serde_json::to_string(settings)?],
+        )?;
+        Ok(())
+    }
+
+    /// The remembered own mute/deafen choice; neither muted nor deafened if none was saved yet.
+    pub fn own_voice(&self) -> Result<OwnVoice> {
+        Ok(self
+            .conn
+            .query_row("SELECT mute, deaf FROM own_voice WHERE id = 1", [], |row| {
+                Ok(OwnVoice {
+                    mute: row.get(0)?,
+                    deaf: row.get(1)?,
+                })
+            })
+            .optional()?
+            .unwrap_or_default())
+    }
+
+    pub fn save_own_voice(&self, voice: OwnVoice) -> Result<()> {
+        self.conn.execute(
+            "INSERT INTO own_voice (id, mute, deaf) VALUES (1, ?1, ?2)
+             ON CONFLICT (id) DO UPDATE SET mute = excluded.mute, deaf = excluded.deaf",
+            params![voice.mute, voice.deaf],
         )?;
         Ok(())
     }
@@ -240,6 +271,36 @@ mod tests {
         store.save_settings(&changed).expect("save");
         store.save_settings(&changed).expect("save twice");
         assert_eq!(store.settings().expect("reload"), changed);
+    }
+
+    #[test]
+    fn own_voice_defaults_then_survives_reopen_and_settings_saves() {
+        let dir = tempfile::tempdir().expect("tempdir");
+        {
+            let store = Store::open(dir.path()).expect("open");
+            assert_eq!(store.own_voice().expect("load"), OwnVoice::default());
+            store
+                .save_own_voice(OwnVoice {
+                    mute: true,
+                    deaf: false,
+                })
+                .expect("save");
+            store
+                .save_settings(&Settings::default())
+                .expect("save settings");
+        }
+        let store = Store::open(dir.path()).expect("reopen");
+        let muted = OwnVoice {
+            mute: true,
+            deaf: false,
+        };
+        assert_eq!(store.own_voice().expect("reload"), muted);
+        let both = OwnVoice {
+            mute: true,
+            deaf: true,
+        };
+        store.save_own_voice(both).expect("overwrite");
+        assert_eq!(store.own_voice().expect("reload"), both);
     }
 
     #[test]
