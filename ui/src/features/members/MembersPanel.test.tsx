@@ -1,0 +1,151 @@
+import { act, fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import type { MockApi } from "../../api";
+import { axeViolations } from "../../test/axe";
+import { applyThemeToDocument } from "../../theme/theme";
+import { getSelectedConversation, selectConversation } from "../channels/selection";
+import { getServerState } from "../channels/serverStore";
+import { connectedMock, resetAll, stubDialog } from "../channels/testUtils";
+import { MembersPanel } from "./MembersPanel";
+import { ProfileCard, VOLUME_DEBOUNCE_MS } from "./ProfileCard";
+
+let api: MockApi;
+
+async function renderPanel(props: Parameters<typeof MembersPanel>[0] = {}) {
+  api = await connectedMock();
+  const view = render(<MembersPanel {...props} />);
+  await screen.findByRole("heading", { name: "In Lobby (3)" });
+  return view;
+}
+
+const member = (name: RegExp) => screen.getByRole("button", { name });
+
+beforeEach(stubDialog);
+afterEach(() => {
+  vi.useRealTimers();
+  resetAll();
+});
+
+describe("MembersPanel", () => {
+  it("lists the people of the selected channel, then listeners", async () => {
+    await renderPanel();
+    expect(screen.getByRole("heading", { name: "Listening (1)" })).toBeInTheDocument();
+    const buttons = screen.getAllByRole("button");
+    expect(buttons[0]).toHaveAccessibleName(/^Anna/);
+    expect(buttons[3]).toHaveAccessibleName(/^Carla/);
+    expect(member(/^Ben/)).toHaveAccessibleName(/not registered/);
+
+    act(() => {
+      selectConversation({ kind: "channel", channelId: 2 });
+    });
+    expect(screen.getByRole("heading", { name: "In Raid (1)" })).toBeInTheDocument();
+  });
+
+  it("follows talking state and uses one Tab stop", async () => {
+    await renderPanel();
+    act(() => {
+      api.mock.setTalking(2, true);
+    });
+    expect(member(/^Anna/)).toHaveAttribute("data-talking", "true");
+    expect(screen.getAllByRole("button").filter((b) => b.tabIndex === 0)).toHaveLength(1);
+    member(/^Anna/).focus();
+    fireEvent.keyDown(member(/^Anna/), { key: "End" });
+    expect(member(/^Carla/)).toHaveFocus();
+    fireEvent.keyDown(member(/^Carla/), { key: "ArrowUp" });
+    expect(member(/^You/)).toHaveFocus();
+  });
+
+  it("opens a profile card with a sanitized comment and local controls", async () => {
+    await renderPanel();
+    const anna = member(/^Anna/);
+    fireEvent.click(anna);
+    const dialog = await screen.findByRole("dialog", { name: "Anna" });
+    expect(await screen.findByText("Hi, I am Anna.")).toBeInTheDocument();
+    expect(dialog).toHaveAttribute("open");
+
+    vi.useFakeTimers();
+    const slider = screen.getByRole("slider", { name: "Volume" });
+    fireEvent.change(slider, { target: { value: "150" } });
+    fireEvent.change(slider, { target: { value: "180" } });
+    expect(getServerState().users.get(2)?.volume).toBe(100);
+    await act(() => vi.advanceTimersByTimeAsync(VOLUME_DEBOUNCE_MS));
+    expect(getServerState().users.get(2)?.volume).toBe(180);
+    vi.useRealTimers();
+
+    fireEvent.click(screen.getByRole("checkbox", { name: "Mute for me" }));
+    await waitFor(() => {
+      expect(getServerState().users.get(2)?.localMute).toBe(true);
+    });
+    expect(screen.queryByText(/only last for this session/)).toBeNull();
+
+    fireEvent.click(screen.getByRole("button", { name: "Close" }));
+    expect(screen.queryByRole("dialog")).toBeNull();
+    expect(member(/^Anna/)).toHaveFocus();
+  });
+
+  it("strips unsafe markup from comments", async () => {
+    api = await connectedMock();
+    vi.spyOn(api, "personProfile").mockResolvedValue({
+      comment: '<p>Hello</p><img src="x" onerror="alert(1)"><script>alert(2)</script>',
+      avatar: null,
+    });
+    getServerState();
+    await waitFor(() => {
+      expect(getServerState().serverId).toBe(1);
+    });
+    render(<ProfileCard session={2} onClose={() => undefined} />);
+    expect(await screen.findByText("Hello")).toBeInTheDocument();
+    const dialog = screen.getByRole("dialog");
+    expect(dialog.querySelector("script")).toBeNull();
+    expect(dialog.querySelector("[onerror]")).toBeNull();
+  });
+
+  it("notes session-only settings without a certificate and hides controls on the own card", async () => {
+    await renderPanel();
+    fireEvent.click(member(/^Ben/));
+    await screen.findByRole("dialog", { name: "Ben" });
+    expect(screen.getByText(/only last for this session/)).toBeInTheDocument();
+    fireEvent.keyDown(screen.getByRole("dialog"), { key: "Escape" });
+
+    fireEvent.click(member(/^You/));
+    await screen.findByRole("dialog", { name: "You" });
+    expect(screen.queryByRole("slider")).toBeNull();
+    expect(screen.queryByRole("checkbox")).toBeNull();
+    expect(screen.queryByRole("button", { name: "Send private message" })).toBeNull();
+  });
+
+  it("opens a private conversation by default or calls the override", async () => {
+    await renderPanel();
+    fireEvent.click(member(/^Anna/));
+    fireEvent.click(await screen.findByRole("button", { name: "Send private message" }));
+    expect(getSelectedConversation()).toEqual({ kind: "private", certHash: "annahash" });
+    expect(screen.queryByRole("dialog")).toBeNull();
+  });
+
+  it("calls a custom private-message handler", async () => {
+    const onSend = vi.fn();
+    await renderPanel({ onSendPrivateMessage: onSend });
+    fireEvent.click(member(/^Ben/));
+    fireEvent.click(await screen.findByRole("button", { name: "Send private message" }));
+    expect(onSend).toHaveBeenCalledWith(expect.objectContaining({ session: 3 }));
+  });
+
+  it("closes the card when the person leaves", async () => {
+    await renderPanel();
+    fireEvent.click(member(/^Anna/));
+    await screen.findByRole("dialog", { name: "Anna" });
+    act(() => {
+      api.mock.emit("userRemoved", { session: 2 });
+    });
+    expect(screen.queryByRole("dialog")).toBeNull();
+  });
+
+  it.each(["dark", "light"] as const)("has no axe violations (%s)", async (theme) => {
+    applyThemeToDocument(theme);
+    const { container } = await renderPanel();
+    expect(await axeViolations(container)).toEqual([]);
+    fireEvent.click(member(/^Anna/));
+    await screen.findByText("Hi, I am Anna.");
+    expect(await axeViolations(container)).toEqual([]);
+  });
+});

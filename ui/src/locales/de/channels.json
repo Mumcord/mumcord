@@ -1,0 +1,33 @@
+{
+  "tree": {
+    "label": "Kanäle",
+    "hint": "Enter: Chat anzeigen · Umschalt+Enter oder Doppelklick: beitreten · Pfeiltasten: bewegen, auf- und zuklappen",
+    "join": "Beitreten",
+    "you": "(du)",
+    "yourChannel": "dein Kanal",
+    "people_one": "{{count}} Person",
+    "people_other": "{{count}} Personen"
+  },
+  "status": {
+    "listening": "hört zu",
+    "talking": "spricht",
+    "muted": "stummgeschaltet",
+    "deafened": "taub geschaltet",
+    "localMuted": "für dich stummgeschaltet",
+    "unregistered": "nicht registriert"
+  },
+  "announce": {
+    "joined": "{{name}} ist deinem Kanal beigetreten",
+    "left": "{{name}} hat deinen Kanal verlassen",
+    "talking": "{{name}} spricht"
+  },
+  "errors": {
+    "joinDenied": "Du darfst diesen Kanal nicht betreten.",
+    "joinFailed": "Beitreten fehlgeschlagen. Bitte versuche es erneut.",
+    "notConnected": "Nicht mit einem Server verbunden."
+  },
+  "empty": {
+    "disconnected": "Nicht verbunden. Wähle einen Server, um seine Kanäle zu sehen.",
+    "loading": "Kanäle werden geladen…"
+  }
+}

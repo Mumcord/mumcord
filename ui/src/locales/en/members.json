@@ -1,0 +1,25 @@
+{
+  "inChannel_one": "In {{channel}} ({{count}})",
+  "inChannel_other": "In {{channel}} ({{count}})",
+  "listening_one": "Listening ({{count}})",
+  "listening_other": "Listening ({{count}})",
+  "noChannel": "Select a channel to see who is in it.",
+  "nobody": "Nobody is here.",
+  "you": "(you)",
+  "registered": "Registered",
+  "unregistered": "Not registered",
+  "talking": "Talking",
+  "card": {
+    "close": "Close",
+    "loadFailed": "Could not load the profile.",
+    "volume": "Volume",
+    "volumeValue": "{{value}} %",
+    "localMute": "Mute for me",
+    "sessionOnly": "This person has no certificate, so these settings only last for this session.",
+    "sendPrivateMessage": "Send private message"
+  },
+  "errors": {
+    "notConnected": "Not connected to a server.",
+    "generic": "That didn't work. Please try again."
+  }
+}

@@ -1,0 +1,25 @@
+{
+  "inChannel_one": "En {{channel}} ({{count}})",
+  "inChannel_other": "En {{channel}} ({{count}})",
+  "listening_one": "Escuchando ({{count}})",
+  "listening_other": "Escuchando ({{count}})",
+  "noChannel": "Selecciona un canal para ver quién está.",
+  "nobody": "No hay nadie.",
+  "you": "(tú)",
+  "registered": "Registrado",
+  "unregistered": "No registrado",
+  "talking": "Hablando",
+  "card": {
+    "close": "Cerrar",
+    "loadFailed": "No se pudo cargar el perfil.",
+    "volume": "Volumen",
+    "volumeValue": "{{value}} %",
+    "localMute": "Silenciar para mí",
+    "sessionOnly": "Esta persona no tiene certificado, así que estos ajustes solo duran esta sesión.",
+    "sendPrivateMessage": "Enviar mensaje privado"
+  },
+  "errors": {
+    "notConnected": "No estás conectado a un servidor.",
+    "generic": "No ha funcionado. Inténtalo de nuevo."
+  }
+}

@@ -1,0 +1,152 @@
+.channel-tree ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.channel-tree [role="group"] {
+  padding-left: var(--space-4);
+}
+
+.channel-tree [role="treeitem"]:focus-visible {
+  outline: none;
+}
+
+.channel-tree [role="treeitem"]:focus-visible > .tree-channel__row,
+.channel-tree [role="treeitem"]:focus-visible > .tree-person__row {
+  outline: var(--focus-ring-width) solid var(--color-focus);
+  outline-offset: -2px;
+}
+
+.tree-channel__row,
+.tree-person__row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: 2rem;
+  padding: var(--space-1) var(--space-2);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  user-select: none;
+}
+
+.tree-channel__row:hover,
+.tree-person__row:hover {
+  background: var(--color-bg-hover);
+}
+
+.tree-channel__row[data-selected="true"] {
+  background: var(--color-bg-hover);
+  color: var(--color-text);
+  font-weight: var(--font-weight-bold);
+}
+
+.tree-channel__toggle {
+  width: 1rem;
+  color: var(--color-text-secondary);
+  text-align: center;
+}
+
+.tree-channel__toggle[data-expandable="false"] {
+  visibility: hidden;
+}
+
+.tree-channel__label {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  gap: var(--space-2);
+  min-width: 0;
+}
+
+.tree-channel__name,
+.tree-person__name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.tree-channel__count {
+  margin-left: auto;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+}
+
+/* Shown on hover and while the row has keyboard focus (Shift+Enter is the keyboard route). */
+.tree-channel__join {
+  display: none;
+  padding: 0 var(--space-2);
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-sm);
+  background: var(--color-bg-elevated);
+  color: var(--color-text);
+  font-size: var(--font-size-xs);
+  cursor: pointer;
+}
+
+.tree-channel__row:hover .tree-channel__join,
+[role="treeitem"]:focus-visible > .tree-channel__row .tree-channel__join {
+  display: inline-block;
+}
+
+.tree-person__row {
+  color: var(--color-text-secondary);
+}
+
+.tree-person[data-listener="true"] .tree-person__row {
+  font-style: italic;
+}
+
+.tree-person__dot {
+  width: 0.625rem;
+  height: 0.625rem;
+  border: 2px solid var(--color-border-strong);
+  border-radius: var(--radius-full);
+}
+
+.tree-person[data-talking="true"] .tree-person__dot {
+  border-color: var(--color-talking);
+  background: var(--color-talking);
+}
+
+.tree-person[data-talking="true"] .tree-person__name {
+  color: var(--color-text);
+}
+
+.tree-person__you,
+.person-icons {
+  color: var(--color-text-muted);
+}
+
+.person-icons {
+  display: inline-flex;
+  gap: var(--space-1);
+  margin-left: auto;
+}
+
+.channel-tree__hint {
+  margin: var(--space-2) 0 0;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+}
+
+/* The hint stays available to screen readers via aria-describedby; sighted keyboard users see it
+   while focus is in the tree. */
+.channel-tree:not(:focus-within) .channel-tree__hint {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+.channels-empty {
+  color: var(--color-text-secondary);
+}
+
+.channels-error {
+  margin: var(--space-2) 0 0;
+  color: var(--color-danger);
+  font-size: var(--font-size-sm);
+}

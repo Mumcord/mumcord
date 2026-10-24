@@ -1,0 +1,33 @@
+{
+  "tree": {
+    "label": "Canales",
+    "hint": "Intro: ver chat · Mayús+Intro o doble clic: unirse · Flechas: mover, expandir, contraer",
+    "join": "Unirse",
+    "you": "(tú)",
+    "yourChannel": "tu canal",
+    "people_one": "{{count}} persona",
+    "people_other": "{{count}} personas"
+  },
+  "status": {
+    "listening": "escuchando",
+    "talking": "hablando",
+    "muted": "silenciado",
+    "deafened": "ensordecido",
+    "localMuted": "silenciado para ti",
+    "unregistered": "no registrado"
+  },
+  "announce": {
+    "joined": "{{name}} se unió a tu canal",
+    "left": "{{name}} salió de tu canal",
+    "talking": "{{name}} está hablando"
+  },
+  "errors": {
+    "joinDenied": "No tienes permiso para entrar en este canal.",
+    "joinFailed": "No se pudo entrar en el canal. Inténtalo de nuevo.",
+    "notConnected": "No estás conectado a un servidor."
+  },
+  "empty": {
+    "disconnected": "Sin conexión. Elige un servidor para ver sus canales.",
+    "loading": "Cargando canales…"
+  }
+}

@@ -1,0 +1,33 @@
+{
+  "tree": {
+    "label": "Channels",
+    "hint": "Enter: show chat · Shift+Enter or double-click: join · Arrow keys: move, expand, collapse",
+    "join": "Join",
+    "you": "(you)",
+    "yourChannel": "your channel",
+    "people_one": "{{count}} person",
+    "people_other": "{{count}} people"
+  },
+  "status": {
+    "listening": "listening",
+    "talking": "talking",
+    "muted": "muted",
+    "deafened": "deafened",
+    "localMuted": "muted for you",
+    "unregistered": "not registered"
+  },
+  "announce": {
+    "joined": "{{name}} joined your channel",
+    "left": "{{name}} left your channel",
+    "talking": "{{name}} is talking"
+  },
+  "errors": {
+    "joinDenied": "You are not allowed to enter this channel.",
+    "joinFailed": "Could not join the channel. Please try again.",
+    "notConnected": "Not connected to a server."
+  },
+  "empty": {
+    "disconnected": "Not connected. Pick a server to see its channels.",
+    "loading": "Loading channels…"
+  }
+}

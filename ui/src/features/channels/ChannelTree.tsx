@@ -1,0 +1,279 @@
+/**
+ * ARIA tree of channels with the people in them. One Tab stop (roving tabindex); arrow keys move
+ * and expand/collapse. Enter/Space selects a channel's chat or opens a person's profile card,
+ * Shift+Enter joins a channel; with the mouse a click selects and a double-click or the "Join"
+ * button joins.
+ */
+import { useId, useMemo, useRef, useState, type KeyboardEvent, type ReactNode } from "react";
+import { useTranslation } from "react-i18next";
+import type { User } from "../../api";
+import "./channels.css";
+import { StatusIcons } from "./PersonStatus";
+import { useStatusText } from "./statusText";
+import type { ServerState } from "./serverStore";
+import {
+  buildTree,
+  channelRowId,
+  isExpandable,
+  listenerRowId,
+  memberRowId,
+  visibleRows,
+  type ChannelNode,
+} from "./tree";
+
+export interface ChannelTreeProps {
+  state: ServerState;
+  selectedChannelId: number | null;
+  onSelect: (channelId: number) => void;
+  onJoin: (channelId: number) => void;
+  onOpenPerson: (session: number, opener: HTMLElement | null) => void;
+  /** Extra content after a channel's people count, e.g. the unread badge (B22). */
+  channelBadge?: ((channelId: number) => ReactNode) | undefined;
+}
+
+export function ChannelTree({
+  state,
+  selectedChannelId,
+  onSelect,
+  onJoin,
+  onOpenPerson,
+  channelBadge,
+}: ChannelTreeProps) {
+  const { t } = useTranslation("channels");
+  const statusText = useStatusText();
+  const hintId = useId();
+  const treeRef = useRef<HTMLDivElement>(null);
+  const [collapsed, setCollapsed] = useState<ReadonlySet<number>>(new Set());
+  const [focusedId, setFocusedId] = useState<string | null>(null);
+
+  const roots = useMemo(() => buildTree(state), [state]);
+  const rows = useMemo(() => visibleRows(roots, collapsed), [roots, collapsed]);
+  const selfChannelId =
+    state.selfSession === null ? null : (state.users.get(state.selfSession)?.channelId ?? null);
+
+  // The Tab stop falls back to the selected channel when the focused row disappears.
+  const tabStopId =
+    rows.find((r) => r.id === focusedId)?.id ??
+    rows.find((r) => r.kind === "channel" && r.channelId === selectedChannelId)?.id ??
+    rows[0]?.id;
+
+  const focusRow = (id: string | undefined) => {
+    if (id === undefined) return;
+    setFocusedId(id);
+    treeRef.current?.querySelector<HTMLElement>(`[data-row="${id}"]`)?.focus();
+  };
+
+  const setExpanded = (channelId: number, expanded: boolean) => {
+    setCollapsed((current) => {
+      const next = new Set(current);
+      if (expanded) next.delete(channelId);
+      else next.add(channelId);
+      return next;
+    });
+  };
+
+  const onKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
+    // The row that has focus (the event may come from a nested element such as the Join button).
+    const focused =
+      event.target instanceof HTMLElement
+        ? event.target.closest<HTMLElement>("[data-row]")?.dataset.row
+        : undefined;
+    const currentId = focused ?? tabStopId;
+    const index = rows.findIndex((r) => r.id === currentId);
+    const row = rows[index];
+    if (!row) return;
+    let handled = true;
+    switch (event.key) {
+      case "ArrowDown":
+        focusRow(rows[index + 1]?.id);
+        break;
+      case "ArrowUp":
+        focusRow(rows[index - 1]?.id);
+        break;
+      case "Home":
+        focusRow(rows[0]?.id);
+        break;
+      case "End":
+        focusRow(rows[rows.length - 1]?.id);
+        break;
+      case "ArrowRight":
+        if (row.expandable && !row.expanded) setExpanded(row.channelId, true);
+        else if (row.expanded) focusRow(rows[index + 1]?.id);
+        break;
+      case "ArrowLeft":
+        if (row.expanded) setExpanded(row.channelId, false);
+        else focusRow(row.parentId ?? undefined);
+        break;
+      case "Enter":
+      case " ":
+        if (row.kind === "channel") {
+          if (event.key === "Enter" && event.shiftKey) onJoin(row.channelId);
+          else onSelect(row.channelId);
+        } else if (row.session !== null) {
+          const opener = treeRef.current?.querySelector<HTMLElement>(`[data-row="${row.id}"]`);
+          onOpenPerson(row.session, opener ?? null);
+        }
+        break;
+      default:
+        handled = false;
+    }
+    if (handled) {
+      event.preventDefault();
+      event.stopPropagation();
+    }
+  };
+
+  const personItem = (user: User, rowId: string, level: number, listener: boolean) => {
+    const talking = state.talking.has(user.session);
+    const labelId = `${hintId}-${rowId}`;
+    const status = statusText(user, talking, listener);
+    return (
+      // Keyboard input is handled once on the tree (roving focus), not per item.
+      // eslint-disable-next-line jsx-a11y/click-events-have-key-events
+      <div
+        key={rowId}
+        role="treeitem"
+        aria-level={level}
+        aria-selected={false}
+        aria-labelledby={labelId}
+        tabIndex={tabStopId === rowId ? 0 : -1}
+        data-row={rowId}
+        className="tree-person"
+        data-talking={talking}
+        data-listener={listener}
+        onFocus={(event) => {
+          if (event.target === event.currentTarget) setFocusedId(rowId);
+        }}
+        onClick={(event) => {
+          event.stopPropagation();
+          setFocusedId(rowId);
+          onOpenPerson(user.session, event.currentTarget);
+        }}
+      >
+        <span className="tree-person__row">
+          <span className="tree-person__dot" aria-hidden="true" />
+          <span id={labelId} className="tree-person__name">
+            {user.name}
+            {user.session === state.selfSession && (
+              <span className="tree-person__you"> {t("tree.you")}</span>
+            )}
+            {status.length > 0 && <span className="visually-hidden">, {status.join(", ")}</span>}
+          </span>
+          <StatusIcons user={user} listener={listener} />
+        </span>
+      </div>
+    );
+  };
+
+  const channelItem = (node: ChannelNode, level: number): ReactNode => {
+    const { channel } = node;
+    const rowId = channelRowId(channel.id);
+    const labelId = `${hintId}-${rowId}`;
+    const expandable = isExpandable(node);
+    const expanded = expandable && !collapsed.has(channel.id);
+    const count = node.members.length;
+    const isOwn = channel.id === selfChannelId;
+    return (
+      // Keyboard input is handled once on the tree (roving focus), not per item.
+      // eslint-disable-next-line jsx-a11y/click-events-have-key-events
+      <div
+        key={rowId}
+        role="treeitem"
+        aria-level={level}
+        aria-selected={channel.id === selectedChannelId}
+        aria-expanded={expandable ? expanded : undefined}
+        aria-labelledby={labelId}
+        aria-keyshortcuts="Shift+Enter"
+        tabIndex={tabStopId === rowId ? 0 : -1}
+        data-row={rowId}
+        className="tree-channel"
+        onFocus={(event) => {
+          if (event.target === event.currentTarget) setFocusedId(rowId);
+        }}
+        onClick={(event) => {
+          event.stopPropagation();
+          setFocusedId(rowId);
+          onSelect(channel.id);
+        }}
+        onDoubleClick={(event) => {
+          event.stopPropagation();
+          onJoin(channel.id);
+        }}
+      >
+        <div className="tree-channel__row" data-selected={channel.id === selectedChannelId}>
+          <span
+            className="tree-channel__toggle"
+            data-expandable={expandable}
+            aria-hidden="true"
+            onClick={(event) => {
+              if (!expandable) return;
+              event.stopPropagation();
+              setExpanded(channel.id, !expanded);
+            }}
+            onDoubleClick={(event) => {
+              event.stopPropagation();
+            }}
+          >
+            {expanded ? "▾" : "▸"}
+          </span>
+          <span id={labelId} className="tree-channel__label">
+            <span className="tree-channel__name">{channel.name}</span>
+            {isOwn && <span className="visually-hidden">, {t("tree.yourChannel")}</span>}
+            {count > 0 && (
+              <span className="tree-channel__count">
+                <span aria-hidden="true">{count}</span>
+                <span className="visually-hidden">, {t("tree.people", { count })}</span>
+              </span>
+            )}
+            {channelBadge?.(channel.id)}
+          </span>
+          {!isOwn && channel.permissions.enter && (
+            <button
+              type="button"
+              className="tree-channel__join"
+              tabIndex={-1}
+              aria-hidden="true"
+              onClick={(event) => {
+                event.stopPropagation();
+                onJoin(channel.id);
+              }}
+              onDoubleClick={(event) => {
+                event.stopPropagation();
+              }}
+            >
+              {t("tree.join")}
+            </button>
+          )}
+        </div>
+        {expanded && (
+          <div role="group">
+            {node.members.map((u) => personItem(u, memberRowId(u.session), level + 1, false))}
+            {node.listeners.map((u) =>
+              personItem(u, listenerRowId(channel.id, u.session), level + 1, true),
+            )}
+            {node.children.map((child) => channelItem(child, level + 1))}
+          </div>
+        )}
+      </div>
+    );
+  };
+
+  return (
+    <div className="channel-tree">
+      {/* Focus lives on the items (roving tabindex), as in the WAI-ARIA tree pattern. */}
+      {/* eslint-disable-next-line jsx-a11y/interactive-supports-focus */}
+      <div
+        ref={treeRef}
+        role="tree"
+        aria-label={t("tree.label")}
+        aria-describedby={hintId}
+        onKeyDown={onKeyDown}
+      >
+        {roots.map((root) => channelItem(root, 1))}
+      </div>
+      <p id={hintId} className="channel-tree__hint">
+        {t("tree.hint")}
+      </p>
+    </div>
+  );
+}
