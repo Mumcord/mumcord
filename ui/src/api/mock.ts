@@ -705,7 +705,12 @@ export function createMockApi(options: MockOptions = {}): MockApi {
     // diagnostics
     diagnosticsSave: () => Promise.resolve(null),
     appInfo: () =>
-      Promise.resolve({ version: "0.0.0-mock", os: "mock", thirdPartyNotices: "Mock notices." }),
+      Promise.resolve({
+        version: "0.0.0-mock",
+        os: "mock",
+        thirdPartyNotices:
+          "Mumble\nCopyright (c) The Mumble Developers\nBSD-3-Clause\n\nSome library - Apache-2.0",
+      }),
   };
 
   // Turns synchronous throws into rejections and applies injected failures.

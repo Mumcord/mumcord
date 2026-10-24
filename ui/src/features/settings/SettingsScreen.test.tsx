@@ -495,15 +495,14 @@ describe("About section", () => {
     expect(license.tagName).toBe("PRE");
     expect(license).toHaveAttribute("tabindex", "0");
     expect(license).toHaveTextContent("MIT License");
-    expect(fetch).toHaveBeenCalledWith("/third-party-notices.txt");
-    expect(await screen.findByText("Some library — Apache-2.0")).toHaveAttribute("tabindex", "0");
+    const notices = await screen.findByLabelText("Third-party notices");
+    expect(notices).toHaveTextContent("Mumble");
+    expect(notices).toHaveTextContent("BSD-3-Clause");
+    expect(notices).toHaveAttribute("tabindex", "0");
   });
 
   it("explains when the notices cannot be loaded", async () => {
-    vi.stubGlobal(
-      "fetch",
-      vi.fn(() => Promise.resolve(new Response("", { status: 404 }))),
-    );
+    vi.spyOn(api, "appInfo").mockRejectedValue(new Error("boom"));
     vi.spyOn(console, "error").mockImplementation(() => undefined);
     await openSection("About");
     expect(await screen.findByRole("alert")).toHaveTextContent(
