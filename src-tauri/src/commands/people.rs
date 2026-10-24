@@ -1,10 +1,12 @@
 //! People on the server and local per-person controls (FR-1.17–1.19).
 
+use mumcord_engine::{Engine, ProfileView, UserView};
 use serde::{Deserialize, Serialize};
 use specta::Type;
+use tauri::State;
 use tauri_specta::Event;
 
-use super::types::{ApiResult, ChannelId, SessionId, not_implemented};
+use super::types::{ApiResult, ChannelId, SessionId};
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, Type)]
 #[serde(rename_all = "camelCase")]
@@ -60,25 +62,64 @@ pub struct TalkStateChanged {
     pub talking: bool,
 }
 
+impl From<UserView> for User {
+    fn from(v: UserView) -> Self {
+        Self {
+            session: v.session,
+            channel_id: v.channel_id,
+            name: v.name,
+            cert_hash: v.cert_hash,
+            registered: v.registered,
+            self_mute: v.self_mute,
+            self_deaf: v.self_deaf,
+            server_mute: v.server_mute,
+            server_deaf: v.server_deaf,
+            listening_channel_ids: v.listening_channel_ids,
+            has_avatar: v.has_avatar,
+            has_comment: v.has_comment,
+            volume: v.volume,
+            local_mute: v.local_mute,
+        }
+    }
+}
+
+impl From<ProfileView> for PersonProfile {
+    fn from(v: ProfileView) -> Self {
+        Self {
+            comment: v.comment,
+            avatar: v.avatar,
+        }
+    }
+}
+
 /// Sets local volume (0–200 %); remembered by certificate hash per server.
 #[tauri::command]
 #[specta::specta]
-pub fn person_set_volume(session: SessionId, volume: u16) -> ApiResult<()> {
-    let _ = (session, volume);
-    not_implemented()
+pub fn person_set_volume(
+    engine: State<'_, Engine>,
+    session: SessionId,
+    volume: u16,
+) -> ApiResult<()> {
+    Ok(engine.person_set_volume(session, volume)?)
 }
 
 /// Mutes a person locally; remembered by certificate hash per server.
 #[tauri::command]
 #[specta::specta]
-pub fn person_set_local_mute(session: SessionId, muted: bool) -> ApiResult<()> {
-    let _ = (session, muted);
-    not_implemented()
+pub fn person_set_local_mute(
+    engine: State<'_, Engine>,
+    session: SessionId,
+    muted: bool,
+) -> ApiResult<()> {
+    Ok(engine.person_set_local_mute(session, muted)?)
 }
 
+/// Comment and avatar of a person, fetched from the server when not known yet.
 #[tauri::command]
 #[specta::specta]
-pub fn person_profile(session: SessionId) -> ApiResult<PersonProfile> {
-    let _ = session;
-    not_implemented()
+pub async fn person_profile(
+    engine: State<'_, Engine>,
+    session: SessionId,
+) -> ApiResult<PersonProfile> {
+    Ok(engine.person_profile(session).await?.into())
 }

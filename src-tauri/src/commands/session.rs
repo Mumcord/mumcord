@@ -1,13 +1,17 @@
 //! Connection lifecycle, certificate trust, server snapshot and self mute/deafen
 //! (FR-1.9, FR-1.10, FR-1.12–1.14, FR-1.22, FR-1.26).
 
+use mumcord_engine::{ConnState, Engine, ServerInfoView, Snapshot, UnreadView, VoiceTransportKind};
 use serde::{Deserialize, Serialize};
 use specta::Type;
+use tauri::State;
 use tauri_specta::Event;
 
 use super::channels::ChannelInfo;
 use super::people::User;
-use super::types::{ApiError, ApiResult, ChannelId, ServerId, SessionId, not_implemented};
+use super::types::{
+    ApiError, ApiResult, ChannelId, ServerId, SessionId, to_api_server_id, to_engine_server_id,
+};
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, Type)]
 #[serde(tag = "state", rename_all = "camelCase")]
@@ -111,61 +115,141 @@ pub struct ServerDenied {
     pub channel_id: Option<ChannelId>,
 }
 
+impl From<ConnState> for ConnectionState {
+    fn from(state: ConnState) -> Self {
+        match state {
+            ConnState::Disconnected { error } => Self::Disconnected {
+                error: error.map(ApiError::from),
+            },
+            ConnState::Connecting { server_id } => Self::Connecting {
+                server_id: to_api_server_id(server_id),
+            },
+            ConnState::Connected { server_id } => Self::Connected {
+                server_id: to_api_server_id(server_id),
+            },
+            ConnState::Reconnecting {
+                server_id,
+                attempt,
+                max_attempts,
+                next_retry_secs,
+            } => Self::Reconnecting {
+                server_id: to_api_server_id(server_id),
+                attempt,
+                max_attempts,
+                next_retry_secs,
+            },
+        }
+    }
+}
+
+impl From<ServerInfoView> for ServerInfo {
+    fn from(v: ServerInfoView) -> Self {
+        Self {
+            version: v.version,
+            follow_supported: v.follow_supported,
+            welcome_text: v.welcome_text,
+            max_message_length: v.max_message_length,
+            max_image_message_length: v.max_image_message_length,
+            allow_html: v.allow_html,
+        }
+    }
+}
+
+impl From<UnreadView> for UnreadCount {
+    fn from(v: UnreadView) -> Self {
+        Self {
+            conversation: v.conversation.into(),
+            count: v.count,
+        }
+    }
+}
+
+impl From<Snapshot> for ServerSnapshot {
+    fn from(s: Snapshot) -> Self {
+        Self {
+            server_id: to_api_server_id(s.server_id),
+            self_session: s.self_session,
+            info: s.info.into(),
+            channels: s.channels.into_iter().map(ChannelInfo::from).collect(),
+            users: s.users.into_iter().map(User::from).collect(),
+            followed_channel_ids: s.followed_channel_ids,
+            unread: s.unread.into_iter().map(UnreadCount::from).collect(),
+        }
+    }
+}
+
+impl From<VoiceTransportKind> for Transport {
+    fn from(t: VoiceTransportKind) -> Self {
+        match t {
+            VoiceTransportKind::Udp => Self::Udp,
+            VoiceTransportKind::Tcp => Self::Tcp,
+        }
+    }
+}
+
 /// Connects to a saved server, disconnecting the current one first (the UI confirms that).
 /// `channel_path` (from a `mumble://` link) overrides rejoining the last channel.
 #[tauri::command]
 #[specta::specta]
-pub fn connect(server_id: ServerId, channel_path: Option<Vec<String>>) -> ApiResult<()> {
-    let _ = (server_id, channel_path);
-    not_implemented()
+pub fn connect(
+    engine: State<'_, Engine>,
+    server_id: ServerId,
+    channel_path: Option<Vec<String>>,
+) -> ApiResult<()> {
+    Ok(engine.connect(to_engine_server_id(server_id), channel_path)?)
 }
 
 /// Disconnects, also cancelling any pending reconnect.
 #[tauri::command]
 #[specta::specta]
-pub fn disconnect() -> ApiResult<()> {
-    not_implemented()
+pub fn disconnect(engine: State<'_, Engine>) -> ApiResult<()> {
+    engine.disconnect();
+    Ok(())
 }
 
 /// Stops automatic reconnecting; the state becomes `disconnected`.
 #[tauri::command]
 #[specta::specta]
-pub fn reconnect_cancel() -> ApiResult<()> {
-    not_implemented()
+pub fn reconnect_cancel(engine: State<'_, Engine>) -> ApiResult<()> {
+    engine.reconnect_cancel();
+    Ok(())
 }
 
 #[tauri::command]
 #[specta::specta]
-pub fn connection_state() -> ApiResult<ConnectionState> {
-    not_implemented()
+pub fn connection_state(engine: State<'_, Engine>) -> ApiResult<ConnectionState> {
+    Ok(engine.connection_state().into())
 }
 
 /// Current snapshot, or `null` when not connected.
 #[tauri::command]
 #[specta::specta]
-pub fn session_snapshot() -> ApiResult<Option<ServerSnapshot>> {
-    not_implemented()
+pub fn session_snapshot(engine: State<'_, Engine>) -> ApiResult<Option<ServerSnapshot>> {
+    Ok(engine.snapshot().map(ServerSnapshot::from))
 }
 
 /// Answers a `CertTrustRequired`; trusting is remembered for the server.
 #[tauri::command]
 #[specta::specta]
-pub fn cert_trust_decide(server_id: ServerId, fingerprint: String, trust: bool) -> ApiResult<()> {
-    let _ = (server_id, fingerprint, trust);
-    not_implemented()
+pub fn cert_trust_decide(
+    engine: State<'_, Engine>,
+    server_id: ServerId,
+    fingerprint: String,
+    trust: bool,
+) -> ApiResult<()> {
+    Ok(engine.cert_trust_decide(to_engine_server_id(server_id), &fingerprint, trust)?)
 }
 
+/// Unmuting while deafened also undeafens.
 #[tauri::command]
 #[specta::specta]
-pub fn set_self_mute(muted: bool) -> ApiResult<()> {
-    let _ = muted;
-    not_implemented()
+pub fn set_self_mute(engine: State<'_, Engine>, muted: bool) -> ApiResult<()> {
+    Ok(engine.set_self_mute(muted)?)
 }
 
 /// Deafening also mutes; undeafening restores the previous mute state.
 #[tauri::command]
 #[specta::specta]
-pub fn set_self_deaf(deafened: bool) -> ApiResult<()> {
-    let _ = deafened;
-    not_implemented()
+pub fn set_self_deaf(engine: State<'_, Engine>, deafened: bool) -> ApiResult<()> {
+    Ok(engine.set_self_deaf(deafened)?)
 }

@@ -3081,9 +3081,12 @@ version = "0.1.0"
 dependencies = [
  "ammonia",
  "anyhow",
+ "bytes",
  "mumcord-audio",
+ "mumcord-bot",
  "mumcord-protocol",
  "mumcord-store",
+ "netsim",
  "serde",
  "serde_json",
  "specta",

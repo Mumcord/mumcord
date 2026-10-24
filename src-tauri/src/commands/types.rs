@@ -2,6 +2,7 @@
 
 use std::fmt;
 
+use mumcord_engine::{ConversationRef, EngineError, ErrorKind};
 use serde::{Deserialize, Serialize};
 use specta::Type;
 
@@ -83,6 +84,39 @@ impl fmt::Display for ApiError {
 
 impl std::error::Error for ApiError {}
 
+impl From<EngineError> for ApiError {
+    fn from(err: EngineError) -> Self {
+        let code = match err.kind {
+            ErrorKind::NotConnected => ErrorCode::NotConnected,
+            ErrorKind::ServerUnreachable => ErrorCode::ServerUnreachable,
+            ErrorKind::WrongPassword => ErrorCode::WrongPassword,
+            ErrorKind::NameInUse => ErrorCode::NameInUse,
+            ErrorKind::CertificateRejected => ErrorCode::CertificateRejected,
+            ErrorKind::CertificateChanged => ErrorCode::CertificateChanged,
+            ErrorKind::ServerTooOld => ErrorCode::ServerTooOld,
+            ErrorKind::PermissionDenied => ErrorCode::PermissionDenied,
+            ErrorKind::ListenerLimitReached => ErrorCode::ListenerLimitReached,
+            ErrorKind::MessageTooLarge => ErrorCode::MessageTooLarge,
+            ErrorKind::InvalidInput => ErrorCode::InvalidInput,
+            ErrorKind::NotFound => ErrorCode::NotFound,
+            ErrorKind::SecureStorageUnavailable => ErrorCode::SecureStorageUnavailable,
+            ErrorKind::Io => ErrorCode::Io,
+            ErrorKind::Internal => ErrorCode::Internal,
+        };
+        Self::new(code, err.message)
+    }
+}
+
+/// Engine server id (database row id) as exposed to the UI.
+pub fn to_api_server_id(id: mumcord_engine::ServerId) -> ServerId {
+    // Row ids start at 1 and grow by one per added server; u32 is plenty.
+    ServerId::try_from(id).unwrap_or(ServerId::MAX)
+}
+
+pub fn to_engine_server_id(id: ServerId) -> mumcord_engine::ServerId {
+    id.into()
+}
+
 /// Shared body of all stub handlers until the engine implements them.
 pub fn not_implemented<T>() -> ApiResult<T> {
     Err(ApiError::not_implemented())
@@ -100,4 +134,24 @@ pub enum Conversation {
     /// Private chat with a person without certificate; lives only for this session.
     #[serde(rename_all = "camelCase")]
     PrivateSession { session: SessionId },
+}
+
+impl From<ConversationRef> for Conversation {
+    fn from(c: ConversationRef) -> Self {
+        match c {
+            ConversationRef::Channel { channel_id } => Self::Channel { channel_id },
+            ConversationRef::Private { cert_hash } => Self::Private { cert_hash },
+            ConversationRef::PrivateSession { session } => Self::PrivateSession { session },
+        }
+    }
+}
+
+impl From<Conversation> for ConversationRef {
+    fn from(c: Conversation) -> Self {
+        match c {
+            Conversation::Channel { channel_id } => Self::Channel { channel_id },
+            Conversation::Private { cert_hash } => Self::Private { cert_hash },
+            Conversation::PrivateSession { session } => Self::PrivateSession { session },
+        }
+    }
 }

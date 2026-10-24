@@ -86,7 +86,6 @@ fn state() -> MutexGuard<'static, State> {
 }
 
 /// Installs the sink that receives push-to-talk state changes; replaces any previous one.
-#[allow(dead_code, reason = "called by the engine wiring in lib.rs (task B13)")]
 pub fn set_handler(handler: impl Fn(bool) + Send + Sync + 'static) {
     state().handler = Some(Arc::new(handler));
 }
@@ -109,7 +108,6 @@ fn emit(pressed: bool) {
 /// Switches push-to-talk on with `key` (the stored `pttKey`) or off with `None`.
 ///
 /// On Wayland this may show the portal's consent dialog if the binding is new or changed.
-#[allow(dead_code, reason = "called by the engine wiring in lib.rs (task B13)")]
 pub async fn configure<R: Runtime>(
     app: &AppHandle<R>,
     key: Option<&str>,

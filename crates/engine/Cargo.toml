@@ -11,6 +11,7 @@ mumcord-protocol.workspace = true
 mumcord-audio.workspace = true
 mumcord-store.workspace = true
 tokio.workspace = true
+bytes.workspace = true
 ammonia.workspace = true
 serde.workspace = true
 serde_json.workspace = true
@@ -21,8 +22,15 @@ tracing.workspace = true
 tracing-subscriber.workspace = true
 tracing-appender.workspace = true
 
+[features]
+# Env-selected file/null audio backend for headless tests and E2E; never in release builds.
+test-backend = ["mumcord-audio/test-backend"]
+
 [dev-dependencies]
 tempfile.workspace = true
+mumcord-bot = { path = "../bot" }
+mumcord-store = { workspace = true, features = ["test-util"] }
+netsim = { path = "../../tools/netsim" }
 
 [lints]
 workspace = true

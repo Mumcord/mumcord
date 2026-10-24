@@ -38,6 +38,7 @@ export const commands = {
 	sessionSnapshot: () => typedError<ServerSnapshot | null, ApiError>(__TAURI_INVOKE("session_snapshot")),
 	/**  Answers a `CertTrustRequired`; trusting is remembered for the server. */
 	certTrustDecide: (serverId: number, fingerprint: string, trust: boolean) => typedError<null, ApiError>(__TAURI_INVOKE("cert_trust_decide", { serverId, fingerprint, trust })),
+	/**  Unmuting while deafened also undeafens. */
 	setSelfMute: (muted: boolean) => typedError<null, ApiError>(__TAURI_INVOKE("set_self_mute", { muted })),
 	/**  Deafening also mutes; undeafening restores the previous mute state. */
 	setSelfDeaf: (deafened: boolean) => typedError<null, ApiError>(__TAURI_INVOKE("set_self_deaf", { deafened })),
@@ -47,6 +48,7 @@ export const commands = {
 	personSetVolume: (session: number, volume: number) => typedError<null, ApiError>(__TAURI_INVOKE("person_set_volume", { session, volume })),
 	/**  Mutes a person locally; remembered by certificate hash per server. */
 	personSetLocalMute: (session: number, muted: boolean) => typedError<null, ApiError>(__TAURI_INVOKE("person_set_local_mute", { session, muted })),
+	/**  Comment and avatar of a person, fetched from the server when not known yet. */
 	personProfile: (session: number) => typedError<PersonProfile, ApiError>(__TAURI_INVOKE("person_profile", { session })),
 	/**
 	 *  Sends Mumble-compatible HTML (the UI converts Markdown and scales images).
@@ -80,8 +82,12 @@ export const commands = {
 	/**  Replaces the whole record and applies changes immediately; returns the stored record. */
 	settingsUpdate: (settings: Settings) => typedError<Settings, ApiError>(__TAURI_INVOKE("settings_update", { settings })),
 	audioDevices: () => typedError<AudioDevices, ApiError>(__TAURI_INVOKE("audio_devices")),
-	/**  Starts level metering and plays the processed own voice back on the output device. */
+	/**
+	 *  Records up to 5 s of processed own voice with level metering, then plays it back.
+	 *  Voice of a connected session pauses meanwhile.
+	 */
 	micTestStart: () => typedError<null, ApiError>(__TAURI_INVOKE("mic_test_start")),
+	/**  Ends the test wherever it is (recording or playback). */
 	micTestStop: () => typedError<null, ApiError>(__TAURI_INVOKE("mic_test_stop")),
 	pttAvailability: () => typedError<PttAvailability, ApiError>(__TAURI_INVOKE("ptt_availability")),
 	/**
