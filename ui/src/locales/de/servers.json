@@ -88,6 +88,12 @@
     "trust": "Vertrauen und verbinden",
     "trustChanged": "Dem neuen Zertifikat vertrauen"
   },
+  "rejoin": {
+    "label": "Letzten Kanal wieder betreten",
+    "text": "Du warst zuletzt in {{channel}} – wieder beitreten?",
+    "rejoin": "Beitreten",
+    "notNow": "Jetzt nicht"
+  },
   "status": {
     "label": "Verbindungsstatus",
     "connecting": "Verbinde mit {{server}} …",

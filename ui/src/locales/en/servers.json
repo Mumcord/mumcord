@@ -88,6 +88,12 @@
     "trust": "Trust and connect",
     "trustChanged": "Trust the new certificate"
   },
+  "rejoin": {
+    "label": "Rejoin last channel",
+    "text": "You were in {{channel}} last time – Rejoin?",
+    "rejoin": "Rejoin",
+    "notNow": "Not now"
+  },
   "status": {
     "label": "Connection status",
     "connecting": "Connecting to {{server}}…",

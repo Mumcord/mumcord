@@ -27,6 +27,10 @@ export interface ServerState {
   users: ReadonlyMap<number, User>;
   /** Sessions currently talking (own user included). */
   talking: ReadonlySet<number>;
+  /** The engine's read-only state (fresh connect, QA.2) at the last sync. */
+  readOnly: boolean;
+  /** Channel offered for rejoining at the last sync: the app last quit while in it (QA.9). */
+  rejoinChannelId: number | null;
 }
 
 /** Changes the store reports besides the new state, e.g. for join/leave announcements. */
@@ -47,6 +51,8 @@ const EMPTY: ServerState = {
   channels: new Map(),
   users: new Map(),
   talking: new Set(),
+  readOnly: false,
+  rejoinChannelId: null,
 };
 
 let state: ServerState = EMPTY;
@@ -72,6 +78,8 @@ function fromSnapshot(snapshot: ServerSnapshot, connection: ConnectionState): Se
     channels: new Map(snapshot.channels.map((c) => [c.id, c])),
     users: new Map(snapshot.users.map((u) => [u.session, u])),
     talking: new Set(),
+    readOnly: snapshot.readOnly,
+    rejoinChannelId: snapshot.rejoinChannelId,
   };
 }
 

@@ -10,7 +10,7 @@ import { ChannelsPanel } from "../features/channels";
 import { ChannelUnreadBadge, DirectMessages, FollowHeaderActions } from "../features/follow";
 import { ChatView } from "../features/chat";
 import { MembersPanel, openPrivateConversation } from "../features/members";
-import { ConnectionStatus, ServersRoot } from "../features/servers";
+import { ConnectionStatus, RejoinPrompt, ServersRoot } from "../features/servers";
 import { CloseDialog } from "../features/app";
 
 /** Server bar (B19). */
@@ -34,13 +34,14 @@ export function UserPanelMount() {
 }
 
 /**
- * Thin status bar above the chat, e.g. "Reconnecting…" (B19), plus the close question (B25).
- * Both render nothing when idle.
+ * Thin status bar above the chat, e.g. "Reconnecting…" (B19), the rejoin offer (QA.9) and the
+ * close question (B25). All render nothing when idle.
  */
 export function ChatStatusMount() {
   return (
     <>
       <ConnectionStatus />
+      <RejoinPrompt />
       <CloseDialog />
     </>
   );

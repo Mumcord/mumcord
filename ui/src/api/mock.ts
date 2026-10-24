@@ -60,6 +60,11 @@ export interface MockControls {
   setTalking(session: number, talking: boolean): void;
   /** Changes what `connectionStats` reports while connected (e.g. a lower bitrate). */
   setConnectionStats(stats: Partial<ConnectionStats>): void;
+  /**
+   * Simulates that the app last quit while joined to `channelPath` on `serverId`: the next fresh
+   * connect to that server offers to rejoin it (QA.9).
+   */
+  offerRejoin(serverId: number, channelPath: string[]): void;
 }
 
 export type MockApi = MumcordApi & { readonly mock: MockControls };
@@ -228,6 +233,7 @@ export function createMockApi(options: MockOptions = {}): MockApi {
   // own mute/deafen choice while joined for voice, which a join restores.
   let readOnly = false;
   let ownVoice = { mute: false, deaf: false };
+  const rejoinOffers = new Map<number, string[]>();
   // History per server id, keyed by conversation.
   const history = new Map<number, Map<string, ChatMessage[]>>();
 
@@ -356,6 +362,10 @@ export function createMockApi(options: MockOptions = {}): MockApi {
     const target = (channelPath && findChannelByPath(channels, channelPath)) ?? channels[1];
     // Like the engine: a fresh connect lands read-only (muted + deafened), a link path joins.
     readOnly = channelPath === null;
+    // Like the engine: offered once, on the first fresh connect, if the channel still exists.
+    const offerPath = rejoinOffers.get(serverId);
+    rejoinOffers.delete(serverId);
+    const offer = readOnly && offerPath ? findChannelByPath(channels, offerPath) : undefined;
     const self = {
       ...person(SELF_SESSION, requireServer(serverId).username, target?.id ?? 0, "selfhash"),
       ...(readOnly ? { selfMute: true, selfDeaf: true } : joinedVoice()),
@@ -384,6 +394,8 @@ export function createMockApi(options: MockOptions = {}): MockApi {
       users: [self, anna, person(3, "Ben", 1, null), carla],
       followedChannelIds: [],
       unread: [],
+      readOnly,
+      rejoinChannelId: offer?.id ?? null,
     };
   }
 
@@ -576,6 +588,7 @@ export function createMockApi(options: MockOptions = {}): MockApi {
       }
       // An explicit join turns voice on with the last own mute/deafen choice.
       readOnly = false;
+      if (snapshot) snapshot = { ...snapshot, readOnly: false, rejoinChannelId: null };
       updateUser(SELF_SESSION, { channelId, ...joinedVoice() });
       return Promise.resolve(null);
     },
@@ -826,6 +839,9 @@ export function createMockApi(options: MockOptions = {}): MockApi {
     },
     setConnectionStats: (stats) => {
       connectionStats = { ...connectionStats, ...stats };
+    },
+    offerRejoin: (serverId, channelPath) => {
+      rejoinOffers.set(serverId, channelPath);
     },
   };
 
