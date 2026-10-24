@@ -484,6 +484,8 @@ export type User = {
 	/**  Channels this person listens to (ear icon). */
 	listeningChannelIds: number[],
 	hasAvatar: boolean,
+	/**  Hex of the avatar texture hash; changes when the avatar is replaced. */
+	avatarHash: string | null,
 	hasComment: boolean,
 	/**  Local playback volume in percent, 0–200 (FR-1.18). */
 	volume: number,

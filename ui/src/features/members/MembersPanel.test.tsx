@@ -193,6 +193,30 @@ describe("MembersPanel", () => {
     expect(profile).toHaveBeenCalledTimes(2);
   });
 
+  it("refetches an avatar when only avatarHash changes", async () => {
+    await renderPanel();
+    const profile = vi.spyOn(api, "personProfile");
+    const ben = getServerState().users.get(3);
+    if (!ben) throw new Error("Ben missing");
+
+    profile.mockResolvedValueOnce({ comment: null, avatar: "data:image/png;base64,QkVO" });
+    act(() => {
+      api.mock.emit("userUpserted", { user: { ...ben, hasAvatar: true, avatarHash: "aa" } });
+    });
+    await waitFor(() => {
+      expect(avatarImage(/^Ben/)).toHaveAttribute("src", "data:image/png;base64,QkVO");
+    });
+
+    profile.mockResolvedValueOnce({ comment: null, avatar: "data:image/png;base64,TkVX" });
+    act(() => {
+      api.mock.emit("userUpserted", { user: { ...ben, hasAvatar: true, avatarHash: "bb" } });
+    });
+    await waitFor(() => {
+      expect(avatarImage(/^Ben/)).toHaveAttribute("src", "data:image/png;base64,TkVX");
+    });
+    expect(profile).toHaveBeenCalledTimes(2);
+  });
+
   it("falls back to initials when loading an avatar fails", async () => {
     api = await connectedMock();
     vi.spyOn(api, "personProfile").mockRejectedValue({ code: "notConnected", message: "x" });

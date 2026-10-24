@@ -120,6 +120,7 @@ function person(session: number, name: string, channelId: number, certHash: stri
     serverDeaf: false,
     listeningChannelIds: [],
     hasAvatar: false,
+    avatarHash: null,
     hasComment: false,
     volume: 100,
     localMute: false,
@@ -312,7 +313,7 @@ export function createMockApi(options: MockOptions = {}): MockApi {
       target?.id ?? 0,
       "selfhash",
     );
-    const anna = { ...person(2, "Anna", 1, "annahash"), hasComment: true, hasAvatar: true };
+    const anna = { ...person(2, "Anna", 1, "annahash"), hasComment: true, hasAvatar: true, avatarHash: "a1" };
     const carla = { ...person(4, "Carla", 2, "carlahash"), listeningChannelIds: [1] };
     const info: ServerInfo = {
       version: serverVersion,
@@ -611,7 +612,10 @@ export function createMockApi(options: MockOptions = {}): MockApi {
 
     // profile
     setOwnAvatar: (path) => {
-      updateUser(SELF_SESSION, { hasAvatar: path !== null });
+      updateUser(SELF_SESSION, {
+        hasAvatar: path !== null,
+        avatarHash: path === null ? null : `own-${path}`,
+      });
       return Promise.resolve(null);
     },
     setOwnComment: (html) => {

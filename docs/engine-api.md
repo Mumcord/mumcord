@@ -133,7 +133,7 @@ Payload types:
 
 - `ServerInfo`: `{ version, followSupported, welcomeText, maxMessageLength, maxImageMessageLength, allowHtml }`. Length limits are in characters; 0 means unlimited.
 - `ChannelInfo`: `{ id, parentId, name, position, permissions: { enter, textMessage, listen, registerSelf } }`. `registerSelf` is only meaningful on the root channel.
-- `User`: `{ session, channelId, name, certHash, registered, selfMute, selfDeaf, serverMute, serverDeaf, listeningChannelIds, hasAvatar, hasComment, volume, localMute }`.
+- `User`: `{ session, channelId, name, certHash, registered, selfMute, selfDeaf, serverMute, serverDeaf, listeningChannelIds, hasAvatar, avatarHash (hex texture hash or null; changes when the avatar is replaced), hasComment, volume, localMute }`.
 - `ChatMessage`: `{ id, conversation, senderName, senderCertHash, senderSession, own, sentAt, body }`. `body` is sanitized HTML; the UI sanitizes again before rendering.
 
 ## UI client and mock

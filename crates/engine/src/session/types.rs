@@ -127,6 +127,8 @@ pub struct UserView {
     pub server_deaf: bool,
     pub listening_channel_ids: Vec<u32>,
     pub has_avatar: bool,
+    /// Hex of the avatar texture hash, when the server sent one; changes when the avatar is replaced.
+    pub avatar_hash: Option<String>,
     pub has_comment: bool,
     /// Local volume in percent (0–200).
     pub volume: u16,

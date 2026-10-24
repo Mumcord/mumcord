@@ -25,6 +25,8 @@ pub struct User {
     /// Channels this person listens to (ear icon).
     pub listening_channel_ids: Vec<ChannelId>,
     pub has_avatar: bool,
+    /// Hex of the avatar texture hash; changes when the avatar is replaced.
+    pub avatar_hash: Option<String>,
     pub has_comment: bool,
     /// Local playback volume in percent, 0–200 (FR-1.18).
     pub volume: u16,
@@ -76,6 +78,7 @@ impl From<UserView> for User {
             server_deaf: v.server_deaf,
             listening_channel_ids: v.listening_channel_ids,
             has_avatar: v.has_avatar,
+            avatar_hash: v.avatar_hash,
             has_comment: v.has_comment,
             volume: v.volume,
             local_mute: v.local_mute,

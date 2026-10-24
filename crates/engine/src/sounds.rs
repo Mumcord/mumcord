@@ -308,6 +308,7 @@ mod tests {
             server_deaf: false,
             listening_channel_ids: Vec::new(),
             has_avatar: false,
+            avatar_hash: None,
             has_comment: false,
             volume: 100,
             local_mute: false,

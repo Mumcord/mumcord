@@ -73,6 +73,14 @@ pub fn channel_view(state: &ServerState, channel: &Channel) -> ChannelView {
     }
 }
 
+fn hex(bytes: &[u8]) -> String {
+    use std::fmt::Write as _;
+    bytes.iter().fold(String::new(), |mut out, b| {
+        let _ = write!(out, "{b:02x}");
+        out
+    })
+}
+
 pub fn user_view(user: &User, local: PersonSetting) -> UserView {
     UserView {
         session: user.session,
@@ -85,6 +93,7 @@ pub fn user_view(user: &User, local: PersonSetting) -> UserView {
         server_mute: user.mute || user.suppress,
         server_deaf: user.deaf,
         listening_channel_ids: user.listening.iter().copied().collect(),
+        avatar_hash: user.texture_hash.as_deref().map(hex),
         has_avatar: user.texture_hash.is_some()
             || user.texture.as_ref().is_some_and(|t| !t.is_empty()),
         has_comment: user.comment_hash.is_some()

@@ -1,11 +1,8 @@
 /**
  * Avatar images for a list of people, loaded lazily via `person_profile` and cached per session.
  * Only people with `hasAvatar` are fetched; everyone else gets `null` (initials fallback). An
- * entry is dropped when `hasAvatar` flips, the person leaves, or the connection is re-synced or
+ * entry is dropped when `hasAvatar` or `avatarHash` changes, the person leaves, or the connection is re-synced or
  * lost (sessions are reused across connections).
- *
- * Limitation: `User` carries no texture hash, so replacing one avatar with another (hasAvatar
- * stays true) is not signalled and the cached image stays until the person rejoins.
  *
  * Usage: `const avatarOf = useAvatars(visibleUsers); <Avatar src={avatarOf(user)} … />`.
  */
@@ -41,7 +38,8 @@ export function useAvatars(users: readonly User[]): (user: User) => string | nul
       else if (
         change.kind === "userUpserted" &&
         change.previous !== undefined &&
-        change.previous.hasAvatar !== change.user.hasAvatar
+        (change.previous.hasAvatar !== change.user.hasAvatar ||
+          change.previous.avatarHash !== change.user.avatarHash)
       ) {
         forget([change.user.session]);
       }
