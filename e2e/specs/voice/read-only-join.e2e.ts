@@ -1,6 +1,7 @@
 // AC-1.35 (spec §11, FR-1.13/FR-1.14, QA.2): a fresh connect lands read-only (default channel,
 // self-muted + deafened, "You're reading along…" notice with a Join button); voice only after an
-// explicit Join (notice button, double-click, mumble:// link with a channel path); an automatic
+// explicit Join (notice button, double-click, mumble:// link with a channel path), which restores
+// the user's last own mute/deafen choice, also across an app restart (QA.7); an automatic
 // reconnect after a dropped connection keeps channel and voice state.
 // The app reaches testenv v15 through netsim (127.0.0.1:64800) so the TCP link can be cut; its mic
 // is the file audio backend playing speech, so bots can check whether they hear the app.
@@ -88,6 +89,25 @@ async function botHearsNothing(): Promise<void> {
     heard = true;
   } catch {
     // Timed out without voice from the app: expected.
+  }
+  expect(heard).toBe(false);
+}
+
+/** A bot in `channel` hears nothing from the app for a while. */
+async function botInChannelHearsNothing(channel: string): Promise<void> {
+  const ear = new ScriptBot({ name: "RoEar", timeout: 30 });
+  let heard = false;
+  try {
+    await ear.connected();
+    await ear.run(`join ${channel}`);
+    try {
+      await ear.run(`expect-audio --from ${ME} --min-rms -55 --timeout 8`, 20_000);
+      heard = true;
+    } catch {
+      // Timed out without voice from the app: expected.
+    }
+  } finally {
+    ear.stop();
   }
   expect(heard).toBe(false);
 }
@@ -228,11 +248,35 @@ describe("read-only connect and explicit join (AC-1.35)", () => {
     await $(".servers-status*=Reconnecting").waitForDisplayed({ timeout: 30_000, interval: 50 });
     await $(".servers-status").waitForExist({ reverse: true, timeout: 90_000 });
     await bot(["expect", "user", ME, "--in", "Raid", "--muted", "true", "--deaf", "false"], WATCH);
-    expect(await pressed(muteButton())).toBe(true);
-    expect(await pressed(deafenButton())).toBe(false);
+    // The own user state after a reconnect can reach the UI just after the bot sees it.
+    await browser.waitUntil(
+      async () => (await pressed(muteButton())) && !(await pressed(deafenButton())),
+      { timeout: 15_000, timeoutMsg: "user panel does not show muted after the reconnect" },
+    );
     await notice().waitForExist({ reverse: true, timeout: 5_000 });
     await muteButton().click();
     await bot(["expect", "user", ME, "--in", "Raid", "--muted", "false", "--deaf", "false"], WATCH);
+  });
+
+  it("muted before the restart: join from read-only keeps the mute, not deafened (QA.7)", async () => {
+    await muteButton().click();
+    await bot(["expect", "user", ME, "--in", "Raid", "--muted", "true", "--deaf", "false"], WATCH);
+    await app.restart();
+    await connectSaved();
+    await expectReadOnlyUi();
+    await treeSettled();
+    await channelName("Raid").doubleClick();
+    await bot(["expect", "user", ME, "--in", "Raid", "--muted", "true", "--deaf", "false"], WATCH);
+    await browser.waitUntil(
+      async () => (await pressed(muteButton())) && !(await pressed(deafenButton())),
+      { timeout: 15_000, timeoutMsg: "user panel does not show muted, not deafened" },
+    );
+    await notice().waitForExist({ reverse: true, timeout: 10_000 });
+    await botInChannelHearsNothing("Raid");
+    // Unmuting while joined is the new own choice; the bot hears the app again.
+    await muteButton().click();
+    await expectVoiceOnUi();
+    await botHearsApp("Raid", "RoEar");
   });
 
   it("a mumble:// link with a channel path joins that channel with voice on", async () => {
