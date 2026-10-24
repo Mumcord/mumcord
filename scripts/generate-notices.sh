@@ -75,8 +75,24 @@ the Mumble project.
 PLUGINS
   cat "$tmp/rust.txt"
   printf '\n\n'
+  # Native C/C++ code vendored in Rust crates (libopus, BoringSSL-derived code in ring) is
+  # covered by the license files those crates ship. Texts that no crate ships go into
+  # licenses/*.txt (e.g. SQLite's public-domain statement) and are appended here.
+  cat <<'NATIVE'
+BUNDLED NATIVE LIBRARIES
+========================
+
+C/C++ libraries compiled into Mumcord by Rust crates: libopus (opusic-sys),
+SQLite (libsqlite3-sys) and BoringSSL-derived code (ring). The libopus and
+ring/BoringSSL license texts appear in the Rust section above; the others follow.
+
+NATIVE
+  for f in licenses/*.txt; do
+    cat "$f"
+    printf '\n\n'
+  done
   cat "$tmp/npm.txt"
-} > THIRD_PARTY_NOTICES
+} | tr -d '\r' > THIRD_PARTY_NOTICES
 
 mkdir -p ui/public
 cp THIRD_PARTY_NOTICES ui/public/third-party-notices.txt
