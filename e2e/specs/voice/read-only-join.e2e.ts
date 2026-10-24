@@ -18,7 +18,14 @@ import {
   sendText,
   sleep,
 } from "../../helpers/chat-ui.ts";
-import { launchWithLink } from "../../helpers/servers-ui.ts";
+import {
+  button,
+  dialogTitle,
+  fill,
+  launchWithLink,
+  serverButton,
+  waitServerStatus,
+} from "../../helpers/servers-ui.ts";
 import { concat, readWav, writeWav } from "../../helpers/voice-audio.ts";
 import { ownChannel } from "../../helpers/voice-ui.ts";
 
@@ -26,6 +33,8 @@ const ME = "ReadOnlyQA";
 const VIA_NETSIM = `127.0.0.1:${String(netsim.listenPort)}`;
 const LINK = "mumble://localhost/Raid";
 const WATCH = { name: "RoWatcher", timeout: 30 };
+const OTHER = "SwitchV14";
+const WATCH_OTHER = { ...WATCH, port: testenv.ports.v14 };
 
 const dir = mkdtempSync(join(tmpdir(), "mumcord-readonly-"));
 const inWav = join(dir, "in.wav");
@@ -158,6 +167,7 @@ describe("read-only connect and explicit join (AC-1.35)", () => {
     // ~10 minutes of speech (the file backend plays silence after the end).
     writeWav(inWav, concat(...Array.from({ length: 100 }, () => speech)));
     await testenv.up("v15");
+    await testenv.up("v14");
     await netsim.start("v15");
     await app.restart({ audio: `file:${inWav}:${outWav}` });
   });
@@ -302,5 +312,67 @@ describe("read-only connect and explicit join (AC-1.35)", () => {
     );
     await expectVoiceOnUi();
     await botHearsApp("Raid", "RoEar");
+  });
+
+  it("server switch with voice on: Join on the other server restores the own voice (QA.7)", async () => {
+    // Deafened while joined, then voice on again by undeafening the read-only state of the next
+    // connect: the undeafen, not the earlier deafen, is the own choice a Join restores.
+    await deafenButton().click();
+    await bot(["expect", "user", ME, "--in", "Raid", "--deaf", "true"], WATCH);
+    await $("button[aria-label^='Disconnect from']").click();
+    await $("//button[contains(@aria-label,'(connected)')]").waitForExist({
+      reverse: true,
+      timeout: 15_000,
+    });
+    await connectSaved();
+    await expectReadOnlyUi();
+    await deafenButton().click();
+    await expectVoiceOnUi();
+    await bot(["expect", "user", ME, "--deaf", "false", "--muted", "false"], WATCH);
+
+    await browser.$('button[aria-label="Add a server"]').click();
+    await dialogTitle("Add a server").waitForDisplayed();
+    await fill("Address", "127.0.0.1");
+    await fill("Port", String(testenv.ports.v14));
+    await fill("Name in the server bar", OTHER);
+    await fill("Your name on this server", ME);
+    await button("Add server").click();
+    await serverButton(OTHER).click();
+    await dialogTitle("Switch server?").waitForDisplayed();
+    await button("Disconnect and switch").click();
+    await clickThrough(["Trust and connect"], async () =>
+      (await serverButton(OTHER).getAttribute("aria-label"))?.endsWith("(connected)") ?? false,
+    );
+    await channelName("Raid").waitForDisplayed({ timeout: 15_000 });
+    await expectReadOnlyUi();
+    await bot(["expect", "user", ME, "--deaf", "true"], WATCH_OTHER);
+    await treeSettled();
+    await channelName("Raid").doubleClick();
+    await bot(
+      ["expect", "user", ME, "--in", "Raid", "--deaf", "false", "--muted", "false"],
+      WATCH_OTHER,
+    );
+    await expectVoiceOnUi();
+
+    // Muted there, then switch back: the Join restores muted only.
+    await muteButton().click();
+    await bot(
+      ["expect", "user", ME, "--in", "Raid", "--muted", "true", "--deaf", "false"],
+      WATCH_OTHER,
+    );
+    await serverButton("127.0.0.1").click();
+    await dialogTitle("Switch server?").waitForDisplayed();
+    await button("Disconnect and switch").click();
+    await waitServerStatus(OTHER, null);
+    await waitConnected();
+    await expectReadOnlyUi();
+    await treeSettled();
+    await channelName("Raid").doubleClick();
+    await bot(["expect", "user", ME, "--in", "Raid", "--muted", "true", "--deaf", "false"], WATCH);
+    await browser.waitUntil(
+      async () => (await pressed(muteButton())) && !(await pressed(deafenButton())),
+      { timeout: 15_000, timeoutMsg: "user panel does not show muted, not deafened" },
+    );
+    await notice().waitForExist({ reverse: true, timeout: 10_000 });
   });
 });
