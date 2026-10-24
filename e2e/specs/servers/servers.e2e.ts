@@ -48,7 +48,11 @@ async function serverReachable(): Promise<void> {
   );
 }
 
-describe("servers (AC-1.4, AC-1.5, AC-1.6)", () => {
+describe("servers (AC-1.4, AC-1.5, AC-1.6)", function () {
+  // The tests build on each other (wizard, then saved servers); after the first failure the rest
+  // would only fail with misleading follow-up errors or hang on a dead session.
+  this.bail(true);
+
   before(async () => {
     await testenv.reset("v15", { cert: "A" });
   });

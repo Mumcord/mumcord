@@ -44,7 +44,12 @@ export function button(text: string) {
 export async function completeWizard(name: string): Promise<void> {
   await fill("Name", name);
   await button("Next").click();
-  await browser.$("//h2[normalize-space()='Microphone']").waitForDisplayed();
+  // "Next" generates the RSA-2048 identity; in the unoptimised debug build the random prime search
+  // takes anywhere from about 1 s to well over 15 s on a 2-core runner, so wait far longer than
+  // the default. Failing here used to cascade through the whole spec file.
+  await browser
+    .$("//h2[normalize-space()='Microphone']")
+    .waitForDisplayed({ timeout: 120_000, timeoutMsg: "wizard: identity generation too slow" });
   await button("Next").click();
   await browser.$("//h2[normalize-space()='How do you want to talk?']").waitForDisplayed();
   await button("Finish").click();
