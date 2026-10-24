@@ -49,6 +49,7 @@ function renderScreen() {
     theme: "system",
     resolvedTheme: "dark",
     language: "en",
+    chatDisplay: "cozy",
     applySettings,
   };
   return render(
@@ -126,6 +127,45 @@ describe("SettingsScreen", () => {
     });
   });
 
+  it("switches the message display between cozy and compact and applies it", async () => {
+    const update = vi.spyOn(api, "settingsUpdate");
+    await openSection("Appearance");
+    const cozy = screen.getByRole("radio", { name: /^Cozy/ });
+    expect(cozy).toBeChecked();
+    fireEvent.click(screen.getByRole("radio", { name: /^Compact/ }));
+    await waitFor(() => {
+      expect(applySettings).toHaveBeenCalledWith(
+        expect.objectContaining({ chatDisplay: "compact" }),
+      );
+    });
+    expect(update).toHaveBeenCalledWith(expect.objectContaining({ chatDisplay: "compact" }));
+  });
+
+  it("offers start at login with start minimized enabled only while it is on", async () => {
+    const update = vi.spyOn(api, "settingsUpdate");
+    await openSection("Appearance");
+    const autostart = screen.getByRole("switch", { name: "Start Mumcord when I log in" });
+    const minimized = screen.getByRole("switch", { name: "Start minimized" });
+    expect(autostart).not.toBeChecked();
+    expect(minimized).toBeChecked();
+    expect(minimized).toBeDisabled();
+    expect(minimized).toHaveAccessibleDescription(
+      "When Mumcord starts at login, it waits in the tray instead of opening the window.",
+    );
+
+    fireEvent.click(autostart);
+    await waitFor(() => {
+      expect(update).toHaveBeenLastCalledWith(expect.objectContaining({ autostart: true }));
+    });
+    expect(minimized).toBeEnabled();
+    fireEvent.click(minimized);
+    await waitFor(() => {
+      expect(update).toHaveBeenLastCalledWith(
+        expect.objectContaining({ autostart: true, startMinimized: false }),
+      );
+    });
+  });
+
   it("rolls a failed save back and explains it", async () => {
     await openSection("Language");
     api.mock.failNext("settingsUpdate", "io");
@@ -155,7 +195,7 @@ describe("SettingsScreen", () => {
 
   it("toggles notification sounds", async () => {
     const update = vi.spyOn(api, "settingsUpdate");
-    await openSection("Sounds");
+    await openSection("Sounds & notifications");
     const toggle = screen.getByRole("switch", { name: "You mute or unmute yourself" });
     fireEvent.click(toggle);
     await waitFor(() => {
@@ -164,6 +204,21 @@ describe("SettingsScreen", () => {
           sounds: { joinLeave: true, selfMute: false, selfDeaf: true, messages: true },
         }),
       );
+    });
+  });
+
+  it("chooses how message notifications are shown", async () => {
+    const update = vi.spyOn(api, "settingsUpdate");
+    await openSection("Sounds & notifications");
+    const group = screen.getByRole("group", { name: "Notifications for new messages" });
+    expect(within(group).getByRole("radio", { name: /^Both/ })).toBeChecked();
+    fireEvent.click(within(group).getByRole("radio", { name: "Off" }));
+    await waitFor(() => {
+      expect(update).toHaveBeenLastCalledWith(expect.objectContaining({ notifications: "off" }));
+    });
+    fireEvent.click(within(group).getByRole("radio", { name: /^In-app/ }));
+    await waitFor(() => {
+      expect(update).toHaveBeenLastCalledWith(expect.objectContaining({ notifications: "inApp" }));
     });
   });
 

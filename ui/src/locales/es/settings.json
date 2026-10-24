@@ -10,7 +10,7 @@
     "chatHistory": "Chat e historial",
     "appearance": "Apariencia",
     "language": "Idioma",
-    "sounds": "Sonidos",
+    "sounds": "Sonidos y notificaciones",
     "overlay": "Superposición y audio posicional",
     "diagnostics": "Diagnóstico",
     "about": "Acerca de"
@@ -123,6 +123,10 @@
     "cleared": "Historial borrado."
   },
   "appearance": {
+    "messageDisplay": "Visualización de mensajes",
+    "messageDisplayLegend": "Diseño de los mensajes del chat",
+    "cozy": "Cómodo: avatares, nombres encima de los mensajes",
+    "compact": "Compacto: hora, nombre y mensaje en una línea",
     "theme": "Tema",
     "themeLegend": "Tema de color",
     "system": "Seguir al sistema",
@@ -132,7 +136,10 @@
     "closeLegend": "Al cerrar la ventana mientras estás conectado",
     "closeAsk": "Preguntar siempre",
     "closeTray": "Minimizar a la bandeja",
-    "closeQuit": "Salir de Mumcord"
+    "closeQuit": "Salir de Mumcord",
+    "autostart": "Iniciar Mumcord al iniciar sesión",
+    "startMinimized": "Iniciar minimizado",
+    "startMinimizedHint": "Cuando Mumcord se inicia al iniciar sesión, espera en la bandeja del sistema en lugar de abrir la ventana."
   },
   "language": {
     "legend": "Idioma de la interfaz",
@@ -144,6 +151,15 @@
     "selfMute": "Te silencias o activas el micrófono",
     "selfDeaf": "Te ensordeces o vuelves a oír",
     "messages": "Mensaje nuevo en un canal seguido o chat privado"
+  },
+  "notifications": {
+    "title": "Notificaciones",
+    "legend": "Notificaciones de mensajes nuevos",
+    "explanation": "Para mensajes nuevos en tu canal, en canales seguidos y en chats privados, excepto el chat que estás viendo.",
+    "inApp": "En la app: un aviso pequeño dentro de Mumcord mientras está en primer plano",
+    "desktop": "Escritorio: una notificación del sistema",
+    "both": "Ambas: aviso mientras Mumcord está en primer plano, notificación del sistema si no",
+    "off": "Desactivadas"
   },
   "overlay": {
     "comingLater": "La superposición en juegos y el audio posicional llegarán en una fase posterior. Aquí todavía no hay ajustes."

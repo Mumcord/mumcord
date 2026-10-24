@@ -10,7 +10,7 @@
     "chatHistory": "Chat & history",
     "appearance": "Appearance",
     "language": "Language",
-    "sounds": "Sounds",
+    "sounds": "Sounds & notifications",
     "overlay": "Overlay & positional audio",
     "diagnostics": "Diagnostics",
     "about": "About"
@@ -123,6 +123,10 @@
     "cleared": "History cleared."
   },
   "appearance": {
+    "messageDisplay": "Message display",
+    "messageDisplayLegend": "Chat message layout",
+    "cozy": "Cozy: avatars, names above the messages",
+    "compact": "Compact: time, name and message on one line",
     "theme": "Theme",
     "themeLegend": "Colour theme",
     "system": "Follow system",
@@ -132,7 +136,10 @@
     "closeLegend": "When you close the window while connected",
     "closeAsk": "Ask every time",
     "closeTray": "Minimize to the tray",
-    "closeQuit": "Quit Mumcord"
+    "closeQuit": "Quit Mumcord",
+    "autostart": "Start Mumcord when I log in",
+    "startMinimized": "Start minimized",
+    "startMinimizedHint": "When Mumcord starts at login, it waits in the tray instead of opening the window."
   },
   "language": {
     "legend": "Display language",
@@ -144,6 +151,15 @@
     "selfMute": "You mute or unmute yourself",
     "selfDeaf": "You deafen or undeafen yourself",
     "messages": "New message in a followed channel or private chat"
+  },
+  "notifications": {
+    "title": "Notifications",
+    "legend": "Notifications for new messages",
+    "explanation": "For new messages in your channel, followed channels and private chats, except the chat you are looking at.",
+    "inApp": "In-app: a small pop-up inside Mumcord while it is in front",
+    "desktop": "Desktop: a system notification",
+    "both": "Both: pop-up while Mumcord is in front, system notification otherwise",
+    "off": "Off"
   },
   "overlay": {
     "comingLater": "The in-game overlay and positional audio are coming in a later stage. There are no settings here yet."

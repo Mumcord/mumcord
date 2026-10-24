@@ -10,7 +10,7 @@
     "chatHistory": "Chat & Verlauf",
     "appearance": "Darstellung",
     "language": "Sprache",
-    "sounds": "Töne",
+    "sounds": "Töne & Benachrichtigungen",
     "overlay": "Overlay & Positionsaudio",
     "diagnostics": "Diagnose",
     "about": "Über"
@@ -123,6 +123,10 @@
     "cleared": "Verlauf gelöscht."
   },
   "appearance": {
+    "messageDisplay": "Nachrichtenanzeige",
+    "messageDisplayLegend": "Layout der Chatnachrichten",
+    "cozy": "Gemütlich: Avatare, Namen über den Nachrichten",
+    "compact": "Kompakt: Uhrzeit, Name und Nachricht in einer Zeile",
     "theme": "Design",
     "themeLegend": "Farbschema",
     "system": "Wie das System",
@@ -132,7 +136,10 @@
     "closeLegend": "Wenn du das Fenster schließt, während du verbunden bist",
     "closeAsk": "Jedes Mal fragen",
     "closeTray": "In den Infobereich minimieren",
-    "closeQuit": "Mumcord beenden"
+    "closeQuit": "Mumcord beenden",
+    "autostart": "Mumcord beim Anmelden starten",
+    "startMinimized": "Minimiert starten",
+    "startMinimizedHint": "Startet Mumcord beim Anmelden, wartet es im Infobereich, statt das Fenster zu öffnen."
   },
   "language": {
     "legend": "Sprache der Oberfläche",
@@ -144,6 +151,15 @@
     "selfMute": "Du schaltest dich stumm oder wieder laut",
     "selfDeaf": "Du schaltest den Ton aus oder wieder ein",
     "messages": "Neue Nachricht in einem gefolgten Kanal oder Privatchat"
+  },
+  "notifications": {
+    "title": "Benachrichtigungen",
+    "legend": "Benachrichtigungen bei neuen Nachrichten",
+    "explanation": "Für neue Nachrichten in deinem Kanal, in gefolgten Kanälen und in Privatchats, außer dem Chat, den du gerade ansiehst.",
+    "inApp": "In der App: ein kleines Pop-up in Mumcord, solange es im Vordergrund ist",
+    "desktop": "Desktop: eine Systembenachrichtigung",
+    "both": "Beides: Pop-up, solange Mumcord im Vordergrund ist, sonst Systembenachrichtigung",
+    "off": "Aus"
   },
   "overlay": {
     "comingLater": "Das Spiel-Overlay und Positionsaudio kommen in einer späteren Ausbaustufe. Hier gibt es noch keine Einstellungen."

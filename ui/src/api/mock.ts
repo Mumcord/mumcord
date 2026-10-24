@@ -3,6 +3,7 @@
  * It follows the contract in docs/engine-api.md closely enough for UI flows, not the
  * Mumble protocol: no network, no audio.
  */
+import type { MessageNotice, NotifyOutcome } from "../bindings/commands";
 import type {
   ApiError,
   AudioDevices,
@@ -33,14 +34,17 @@ import {
   type MumcordApi,
   type Unsubscribe,
 } from "./client";
+import { STRESS_SELF_CHANNEL_PATH, stressChannels, stressUsers } from "./mockStress";
 
 export interface MockOptions {
   /**
    * "fresh" simulates the first start (no identity, no servers, wizard pending); "demo" fills
    * the "ready" state with richer fictional data for screenshots, "demoFresh" is the first start
-   * with demo behaviour. Defaults to `VITE_MUMCORD_MOCK_SEED`, then "ready".
+   * with demo behaviour. "stress" is "demo" on a big server (~300 channels, 1000 people) for
+   * scale measurements; it also exposes the API as `window.__mumcordMock` for the measuring
+   * script. Defaults to `VITE_MUMCORD_MOCK_SEED`, then "ready".
    */
-  seed?: "fresh" | "ready" | "demo" | "demoFresh";
+  seed?: "fresh" | "ready" | "demo" | "demoFresh" | "stress";
   /** Simulated server: protocol version and listener limit. */
   serverVersion?: string;
   maxListeners?: number;
@@ -69,6 +73,10 @@ export interface MockControls {
    * connect to that server offers to rejoin it (QA.9).
    */
   offerRejoin(serverId: number, channelPath: string[]): void;
+  /** Whether the main window counts as focused for message notifications (default true). */
+  setWindowFocused(focused: boolean): void;
+  /** System notifications `notifyMessage` "showed", oldest first. */
+  desktopNotices(): readonly MessageNotice[];
 }
 
 export type MockApi = MumcordApi & { readonly mock: MockControls };
@@ -91,8 +99,12 @@ const DEFAULT_SETTINGS: Settings = {
   autoGain: true,
   sounds: { joinLeave: true, selfMute: true, selfDeaf: true, messages: true },
   closeBehaviour: "ask",
+  chatDisplay: "cozy",
+  notifications: "both",
   logLevel: "info",
   sendDefaultAvatar: true,
+  autostart: false,
+  startMinimized: true,
 };
 
 /** 1×1 PNG standing in for any image chosen as the default avatar. */
@@ -130,10 +142,35 @@ function seedChannels(): ChannelInfo[] {
       name: "Root",
       position: 0,
       permissions: { ...allow, registerSelf: true },
+      ...noDescription,
     },
-    { id: 1, parentId: 0, name: "Lobby", position: 0, permissions: { ...allow } },
-    { id: 2, parentId: 0, name: "Raid", position: 1, permissions: { ...allow } },
-    { id: 3, parentId: 0, name: "AFK", position: 2, permissions: { ...allow, textMessage: false } },
+    {
+      id: 1,
+      parentId: 0,
+      name: "Lobby",
+      position: 0,
+      permissions: { ...allow },
+      description: MOCK_LOBBY_DESCRIPTION,
+      hasDescription: true,
+    },
+    // Like a long description on a real server: only announced, fetched on request.
+    {
+      id: 2,
+      parentId: 0,
+      name: "Raid",
+      position: 1,
+      permissions: { ...allow },
+      description: null,
+      hasDescription: true,
+    },
+    {
+      id: 3,
+      parentId: 0,
+      name: "AFK",
+      position: 2,
+      permissions: { ...allow, textMessage: false },
+      ...noDescription,
+    },
   ];
 }
 
@@ -152,6 +189,8 @@ function demoChannels(): ChannelInfo[] {
     name,
     position,
     permissions: { ...allow },
+    description: DEMO_DESCRIPTIONS.get(id) ?? null,
+    hasDescription: DEMO_DESCRIPTIONS.has(id),
   });
   return [
     { ...channel(0, 0, "Night Owls", 0), parentId: null },
@@ -275,7 +314,8 @@ const MIC_TEST_PHASE_MS = 5000;
 export function createMockApi(options: MockOptions = {}): MockApi {
   const seed = options.seed ?? import.meta.env.VITE_MUMCORD_MOCK_SEED ?? "ready";
   const fresh = seed === "fresh" || seed === "demoFresh";
-  const demo = seed === "demo" || seed === "demoFresh";
+  const stress = seed === "stress";
+  const demo = seed === "demo" || seed === "demoFresh" || stress;
   const serverVersion = options.serverVersion ?? "1.5.735";
   const maxListeners = options.maxListeners ?? 2;
   const connectDelayMs = options.connectDelayMs ?? 0;
@@ -324,6 +364,8 @@ export function createMockApi(options: MockOptions = {}): MockApi {
   // own mute/deafen choice while joined for voice, which a join restores.
   let readOnly = false;
   let ownVoice = { mute: false, deaf: false };
+  let windowFocused = true;
+  const desktopNotices: MessageNotice[] = [];
   const rejoinOffers = new Map<number, string[]>();
   // History per server id, keyed by conversation.
   const history = new Map<number, Map<string, ChatMessage[]>>(
@@ -453,8 +495,15 @@ export function createMockApi(options: MockOptions = {}): MockApi {
   }
 
   function buildSnapshot(serverId: number, channelPath: string[] | null): ServerSnapshot {
-    const channels = demo ? demoChannels() : seedChannels();
-    const target = (channelPath && findChannelByPath(channels, channelPath)) ?? channels[1];
+    const channels = stress
+      ? stressChannels(requireServer(serverId).label)
+      : demo
+        ? demoChannels()
+        : seedChannels();
+    const target =
+      (channelPath && findChannelByPath(channels, channelPath)) ??
+      (stress ? findChannelByPath(channels, STRESS_SELF_CHANNEL_PATH) : undefined) ??
+      channels[1];
     // Like the engine: a fresh connect lands read-only (muted + deafened), a link path joins.
     readOnly = channelPath === null;
     // Like the engine: offered once, on the first fresh connect, if the channel still exists.
@@ -479,6 +528,7 @@ export function createMockApi(options: MockOptions = {}): MockApi {
       welcomeText: demo
         ? `Welcome to <b>${requireServer(serverId).label}</b>. Be kind and have fun!`
         : "Welcome to the <b>mock</b> server.",
+      defaultChannelId: target?.id ?? null,
       maxMessageLength: 5000,
       maxImageMessageLength: 131072,
       allowHtml: true,
@@ -488,7 +538,11 @@ export function createMockApi(options: MockOptions = {}): MockApi {
       selfSession: SELF_SESSION,
       info,
       channels,
-      users: demo ? demoUsers(self) : [self, anna, person(3, "Ben", 1, null), carla],
+      users: stress
+        ? stressUsers(self, channels)
+        : demo
+          ? demoUsers(self)
+          : [self, anna, person(3, "Ben", 1, null), carla],
       followedChannelIds: [],
       unread: [],
       readOnly,
@@ -710,6 +764,18 @@ export function createMockApi(options: MockOptions = {}): MockApi {
       return Promise.resolve(null);
     },
 
+    channelDescriptionRequest: (channelId) => {
+      const channel = requireChannel(channelId);
+      const text = MOCK_FETCHED_DESCRIPTIONS.get(channelId);
+      if (channel.description === null && channel.hasDescription && text !== undefined) {
+        const updated = { ...channel, description: text };
+        const snap = requireSnapshot();
+        snap.channels = snap.channels.map((c) => (c.id === channelId ? updated : c));
+        emit("channelUpserted", { channel: updated });
+      }
+      return Promise.resolve(null);
+    },
+
     // people
     personSetVolume: (session, volume) => {
       if (!Number.isInteger(volume) || volume < 0 || volume > 200) {
@@ -727,7 +793,10 @@ export function createMockApi(options: MockOptions = {}): MockApi {
       return Promise.resolve({
         comment: user.hasComment ? `<p>Hi, I am ${user.name}.</p>` : null,
         avatar: user.hasAvatar
-          ? ((demo ? DEMO_AVATARS.get(session) : undefined) ??
+          ? ((stress && session !== SELF_SESSION
+              ? demoAvatar(`hsl(${String((session * 47) % 360)} 70% 55%)`, "#1e293b")
+              : undefined) ??
+            (demo ? DEMO_AVATARS.get(session) : undefined) ??
             "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAIAAAD8GO2jAAAAd0lEQVR42u3UwQ2AMAwDwE7HGt2DCRmDTdw/KIlFHIRQrHzrE5Qwzn2WzmiggQZoALcoARjRAHCTBUDkOQA6H35FAuCYmz8+EB7/DYCCXJ+gov1dQGiYl1wOSIz4MxW2m3ugavcWTdIeb3Kmmv1VOAxzlgIyUw4sffQx8QiPKKAAAAAASUVORK5CYII=")
           : null,
       });
@@ -770,6 +839,35 @@ export function createMockApi(options: MockOptions = {}): MockApi {
       snap.followedChannelIds = snap.followedChannelIds.filter((id) => id !== channelId);
       updateUser(SELF_SESSION, { listeningChannelIds: snap.followedChannelIds });
       emit("followedChannelsChanged", { channelIds: snap.followedChannelIds });
+      return Promise.resolve(null);
+    },
+    channelFollowAll: () => {
+      const snap = requireSnapshot();
+      if (!snap.info.followSupported) fail("serverTooOld", "following needs server 1.4 or newer");
+      const own = snap.users.find((u) => u.session === SELF_SESSION)?.channelId;
+      const summary = { followed: 0, limitReached: 0, notAllowed: 0, noAnswer: 0 };
+      const followed = [...snap.followedChannelIds];
+      for (const channel of snap.channels) {
+        if (channel.id === own || followed.includes(channel.id)) continue;
+        if (!channel.permissions.listen) summary.notAllowed += 1;
+        else if (followed.length >= maxListeners) summary.limitReached += 1;
+        else {
+          followed.push(channel.id);
+          summary.followed += 1;
+        }
+      }
+      if (summary.followed > 0) {
+        snap.followedChannelIds = followed;
+        updateUser(SELF_SESSION, { listeningChannelIds: followed });
+        emit("followedChannelsChanged", { channelIds: followed });
+      }
+      return Promise.resolve(summary);
+    },
+    channelUnfollowAll: () => {
+      const snap = requireSnapshot();
+      snap.followedChannelIds = [];
+      updateUser(SELF_SESSION, { listeningChannelIds: [] });
+      emit("followedChannelsChanged", { channelIds: [] });
       return Promise.resolve(null);
     },
     conversationMarkRead: (conversation) => {
@@ -896,6 +994,20 @@ export function createMockApi(options: MockOptions = {}): MockApi {
                 "Mumble\nCopyright (c) The Mumble Developers\nBSD-3-Clause\n\nSome library - Apache-2.0",
             },
       ),
+
+    // message notifications: same decision as the engine (src-tauri/src/notifications.rs)
+    notifyMessage: (notice) => {
+      const mode = settings.notifications;
+      let outcome: NotifyOutcome;
+      if (windowFocused && notice.onScreen) outcome = "none";
+      else if (mode === "off") outcome = "none";
+      else if (mode === "desktop") outcome = "desktop";
+      else if (windowFocused) outcome = "toast";
+      else outcome = mode === "both" ? "desktop" : "none";
+      if (outcome === "desktop") desktopNotices.push(notice);
+      return Promise.resolve(outcome);
+    },
+    notificationDismiss: () => Promise.resolve(null),
   };
 
   // Turns synchronous throws into rejections and applies injected failures.
@@ -971,7 +1083,37 @@ export function createMockApi(options: MockOptions = {}): MockApi {
     offerRejoin: (serverId, channelPath) => {
       rejoinOffers.set(serverId, channelPath);
     },
+    setWindowFocused: (focused) => {
+      windowFocused = focused;
+    },
+    desktopNotices: () => desktopNotices,
   };
 
-  return { ...guarded, kind: "mock", on, mock };
+  const api: MockApi = { ...guarded, kind: "mock", on, mock };
+  if (stress) window.__mumcordMock = api;
+  return api;
 }
+
+/** Pinned channel info (FR-1.48b): demo descriptions and the text behind a hash-only one. */
+const noDescription = { description: null, hasDescription: false };
+
+const MOCK_LOBBY_DESCRIPTION = "<p><b>Welcome to the Lobby!</b> Say hi and pick a channel.</p>";
+
+const MOCK_FETCHED_DESCRIPTIONS = new Map<number, string>([
+  [
+    2,
+    "<p><b>Raid rules</b></p><ul><li>Be on time: we start at 20:00 sharp.</li>" +
+      "<li>Bring potions and food.</li><li>Push-to-talk during boss fights.</li>" +
+      "<li>Loot is shared by need before greed.</li><li>Have fun and be kind.</li></ul>" +
+      '<p>Guide: <a href="https://example.org/raid">example.org/raid</a></p>',
+  ],
+]);
+
+const DEMO_DESCRIPTIONS = new Map<number, string>([
+  [1, "<p>Hang out here and say hi. New? Check <b>#Gaming</b> for squads.</p>"],
+  [
+    2,
+    "<p><b>Gaming</b>: find your squad below.</p><p>Push-to-talk in Squad channels, " +
+      "and keep it friendly. Event nights are on Fridays at 20:00.</p>",
+  ],
+]);

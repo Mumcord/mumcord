@@ -7,7 +7,14 @@ import { SettingsScreen } from "../features/settings/SettingsScreen";
 import { Wizard } from "../features/wizard";
 import { UserPanel } from "../features/userpanel";
 import { ChannelsPanel } from "../features/channels";
-import { ChannelUnreadBadge, DirectMessages, FollowHeaderActions } from "../features/follow";
+import {
+  ChannelUnreadBadge,
+  DirectMessages,
+  FollowAllMenu,
+  FollowHeaderActions,
+  FollowNoticeLine,
+  FollowStar,
+} from "../features/follow";
 import { ChatView } from "../features/chat";
 import { MembersPanel, openPrivateConversation } from "../features/members";
 import { ConnectionStatus, RejoinPrompt, ServersRoot } from "../features/servers";
@@ -22,7 +29,12 @@ export function ServersMount() {
 export function ChannelsMount() {
   return (
     <>
-      <ChannelsPanel channelBadge={(channelId) => <ChannelUnreadBadge channelId={channelId} />} />
+      <ChannelsPanel
+        header={<FollowAllMenu />}
+        channelBadge={(channelId) => <ChannelUnreadBadge channelId={channelId} />}
+        channelAction={(channel) => <FollowStar {...channel} />}
+      />
+      <FollowNoticeLine />
       <DirectMessages />
     </>
   );
