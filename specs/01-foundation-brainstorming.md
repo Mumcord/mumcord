@@ -886,3 +886,13 @@ Measured in `specs/01-foundation-scale-report.md`; performance fixes are done wi
 ✍️ Note: Requested in chat during /dev.
 
 ---
+
+#### QA.29 Width of the channel list? `◉`
+
+- [x] **The channel list can be resized by dragging its right border (keyboard: focus the handle, arrow keys); the width is remembered. Min = today's 15rem, max ~28rem. Wider lists show up to 5 stacked avatars and longer names; the member list can be resized the same way.**
+- [ ] Fixed wider default.
+- [ ] Keep as is.
+
+✍️ Note: Asked and answered in chat during /dev.
+
+---
