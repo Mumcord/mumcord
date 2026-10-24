@@ -12,7 +12,8 @@
     "lint": "eslint . && prettier --check .",
     "format": "prettier --write .",
     "typecheck": "tsc -b",
-    "test": "vitest run"
+    "test": "vitest run",
+    "e2e": "bash e2e/run.sh"
   },
   "dependencies": {
     "@tauri-apps/api": "^2.12.4",
@@ -37,6 +38,11 @@
     "@types/react": "^19.3.0",
     "@types/react-dom": "^19.3.0",
     "@vitejs/plugin-react": "^6.1.2",
+    "@wdio/cli": "^9.32.0",
+    "@wdio/globals": "^9.31.3",
+    "@wdio/local-runner": "^9.32.0",
+    "@wdio/mocha-framework": "^9.32.0",
+    "@wdio/spec-reporter": "^9.32.0",
     "axe-core": "^4.14.0",
     "eslint": "^9.39.5",
     "eslint-config-prettier": "^10.1.8",
