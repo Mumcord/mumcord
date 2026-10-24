@@ -70,10 +70,6 @@ impl ApiError {
             message: message.into(),
         }
     }
-
-    pub fn not_implemented() -> Self {
-        Self::new(ErrorCode::NotImplemented, "not implemented yet")
-    }
 }
 
 impl fmt::Display for ApiError {
@@ -115,11 +111,6 @@ pub fn to_api_server_id(id: mumcord_engine::ServerId) -> ServerId {
 
 pub fn to_engine_server_id(id: ServerId) -> mumcord_engine::ServerId {
     id.into()
-}
-
-/// Shared body of all stub handlers until the engine implements them.
-pub fn not_implemented<T>() -> ApiResult<T> {
-    Err(ApiError::not_implemented())
 }
 
 /// A chat conversation: a channel or a private chat with one person.

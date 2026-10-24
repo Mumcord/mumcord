@@ -1,6 +1,6 @@
 //! Audio devices and the microphone test (FR-1.4, §6).
 
-use mumcord_engine::{AudioDeviceList, AudioDeviceView, Engine};
+use mumcord_engine::{AudioDeviceList, AudioDeviceView, Engine, MicTestPhase as EnginePhase};
 use serde::{Deserialize, Serialize};
 use specta::Type;
 use tauri::State;
@@ -77,4 +77,33 @@ pub async fn mic_test_start(engine: State<'_, Engine>) -> ApiResult<()> {
 pub fn mic_test_stop(engine: State<'_, Engine>) -> ApiResult<()> {
     engine.mic_test_stop();
     Ok(())
+}
+
+/// Phase of the mic test: `recording`, then `playing` the recording back, then `done`;
+/// `failed` when the test could not start.
+#[derive(Serialize, Deserialize, Clone, Copy, Debug, PartialEq, Eq, Type)]
+#[serde(rename_all = "camelCase")]
+pub enum MicTestPhase {
+    Recording,
+    Playing,
+    Done,
+    Failed,
+}
+
+impl From<EnginePhase> for MicTestPhase {
+    fn from(v: EnginePhase) -> Self {
+        match v {
+            EnginePhase::Recording => Self::Recording,
+            EnginePhase::Playing => Self::Playing,
+            EnginePhase::Done => Self::Done,
+            EnginePhase::Failed => Self::Failed,
+        }
+    }
+}
+
+/// The mic test changed phase.
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, Type, Event)]
+#[serde(rename_all = "camelCase")]
+pub struct MicTestPhaseChanged {
+    pub phase: MicTestPhase,
 }

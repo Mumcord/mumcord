@@ -102,7 +102,13 @@ export const commands = {
 	closeChoice: (choice: CloseChoice, remember: boolean) => typedError<null, ApiError>(__TAURI_INVOKE("close_choice", { choice, remember })),
 	/**  Whether Mumcord is the registered handler for `mumble://` links. */
 	linkHandlerStatus: () => typedError<boolean, ApiError>(__TAURI_INVOKE("link_handler_status")),
+	/**  Makes Mumcord the handler for `mumble://` links (FR-1.6). */
 	linkHandlerRegister: () => typedError<null, ApiError>(__TAURI_INVOKE("link_handler_register")),
+	/**
+	 *  Returns a `mumble://` link that arrived before the UI listened (e.g. the one that launched
+	 *  the app), once. Later links arrive only as `deepLinkOpened`.
+	 */
+	deepLinkTakePending: () => typedError<MumbleLink | null, ApiError>(__TAURI_INVOKE("deep_link_take_pending")),
 	/**  Writes the diagnostic file (no chat contents, passwords, certificates or personal data). */
 	diagnosticsSave: (path: string) => typedError<null, ApiError>(__TAURI_INVOKE("diagnostics_save", { path })),
 	appInfo: () => typedError<AppInfo, ApiError>(__TAURI_INVOKE("app_info")),
@@ -120,6 +126,7 @@ export const events = {
 	followedChannelsChanged: makeEvent<FollowedChannelsChanged, FollowedChannelsChanged>("followed-channels-changed"),
 	messageReceived: makeEvent<MessageReceived, MessageReceived>("message-received"),
 	micLevel: makeEvent<MicLevel, MicLevel>("mic-level"),
+	micTestPhaseChanged: makeEvent<MicTestPhaseChanged, MicTestPhaseChanged>("mic-test-phase-changed"),
 	serverDenied: makeEvent<ServerDenied, ServerDenied>("server-denied"),
 	serverSynced: makeEvent<ServerSynced, ServerSynced>("server-synced"),
 	talkStateChanged: makeEvent<TalkStateChanged, TalkStateChanged>("talk-state-changed"),
@@ -301,6 +308,17 @@ export type MessageReceived = {
 export type MicLevel = {
 	/**  0.0 (silence) to 1.0 (full scale). */
 	level: number | null,
+};
+
+/**
+ *  Phase of the mic test: `recording`, then `playing` the recording back, then `done`;
+ *  `failed` when the test could not start.
+ */
+export type MicTestPhase = "recording" | "playing" | "done" | "failed";
+
+/**  The mic test changed phase. */
+export type MicTestPhaseChanged = {
+	phase: MicTestPhase,
 };
 
 /**  Parsed `mumble://[user[:password]@]host[:port]/[channel/path]` link. */

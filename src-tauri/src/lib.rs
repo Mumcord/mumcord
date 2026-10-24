@@ -72,6 +72,7 @@ fn specta_builder() -> Builder<tauri::Wry> {
             app::close_choice,
             app::link_handler_status,
             app::link_handler_register,
+            app::deep_link_take_pending,
             diagnostics::diagnostics_save,
             diagnostics::app_info,
         ])
@@ -92,6 +93,7 @@ fn specta_builder() -> Builder<tauri::Wry> {
             follow::UnreadChanged,
             audio::AudioDevicesChanged,
             audio::MicLevel,
+            audio::MicTestPhaseChanged,
             app::CloseRequested,
         ])
 }
@@ -112,15 +114,20 @@ pub fn run() {
 
     let app = tauri::Builder::default()
         // Must be registered first so a second launch hands over to the running instance.
-        .plugin(tauri_plugin_single_instance::init(|_app, _argv, _cwd| {}))
+        .plugin(tauri_plugin_single_instance::init(|app, _argv, _cwd| {
+            window::show(app);
+        }))
         .plugin(tauri_plugin_deep_link::init())
         .plugin(tauri_plugin_global_shortcut::Builder::new().build())
         .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_opener::init())
         .invoke_handler(builder.invoke_handler())
+        .on_window_event(window::on_window_event)
         .setup(move |app| {
             builder.mount_events(app);
             start_engine(app.handle())?;
+            tray::init(app.handle());
+            deeplink::init(app.handle());
             Ok(())
         })
         .run(tauri::generate_context!());
@@ -168,6 +175,7 @@ fn start_engine(app: &AppHandle) -> Result<(), Box<dyn std::error::Error>> {
 
 /// Converts an engine event into its UI event and emits it.
 fn emit_engine_event(app: &AppHandle, event: EngineEvent) -> tauri::Result<()> {
+    tray::on_engine_event(app, &event);
     match event {
         EngineEvent::StateChanged(state) => session::ConnectionStateChanged {
             state: state.into(),
@@ -216,6 +224,19 @@ fn emit_engine_event(app: &AppHandle, event: EngineEvent) -> tauri::Result<()> {
         }
         .emit(app),
         EngineEvent::MicLevel(level) => audio::MicLevel { level }.emit(app),
+        EngineEvent::MicTestPhaseChanged(phase) => audio::MicTestPhaseChanged {
+            phase: phase.into(),
+        }
+        .emit(app),
+        EngineEvent::MessageReceived(message) => chat::MessageReceived {
+            message: (*message).into(),
+        }
+        .emit(app),
+        EngineEvent::UnreadChanged(unread) => follow::UnreadChanged {
+            conversation: unread.conversation.into(),
+            count: unread.count,
+        }
+        .emit(app),
     }
 }
 
