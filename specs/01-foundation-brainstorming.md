@@ -758,3 +758,15 @@ Until now a channel is followed with the "Follow" button in the chat header (FR-
 ✍️ Note: Requested in chat during /dev.
 
 ---
+
+#### QA.16 Notifications for new channel messages? `◉`
+Desktop notifications were planned for Epic 3.
+
+- [ ] In-app toast only.
+- [x] **In-app toast plus a system desktop notification.** In-app: a small pop-up inside the window (bottom right) with channel, sender and a short preview. Desktop: a system notification when Mumcord is in the background or minimized. Clicking either opens that channel's chat (and brings the window to the front).
+- [ ] For followed channels and private messages only.
+- [x] **For all channels the user receives messages from (own channel, followed channels) and private messages, except the chat currently on screen.** Bursts are grouped per channel so busy channels don't flood the screen; both kinds can be switched off in settings.
+
+✍️ Note: Asked and answered in chat during /dev; pulls desktop notifications forward from Epic 3.
+
+---

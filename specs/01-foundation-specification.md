@@ -40,7 +40,7 @@ Epic 1 is delivered in two stages (Q2.1). Stage 1a must be complete and usable b
 - Anything server-side: companion services, server plugins, server configuration (Q1.13) – **never**, not just later.
 - Connecting to several servers at the same time (read-along on all of them) → own epic after Epic 1, Epic 2 "Multi-server read-along" (QA.1); rich chat beyond what Mumble supports (reactions, link previews) (Q1.2).
 - Admin features: ACL/permission editing, bans, channel management (Q1.11) → Epic 4.
-- Global hotkeys beyond push-to-talk, full tray menu, notifications, import of official client settings → Epic 3.
+- Global hotkeys beyond push-to-talk, full tray menu, import of official client settings → Epic 3 (message notifications moved into Epic 1, QA.16).
 - Signed installers, auto-update, automatic opt-in crash reports → Epic 5 (Q4.2, Q4.9).
 - Public server browser (Q5.3), whisper/shout (Q5.8).
 - Mobile apps and web version (Q1.4).
@@ -103,6 +103,7 @@ Mumcord enforces nothing itself; the server's ACLs decide. The client reflects p
 - **FR-1.31** **Follow channels** (Q3.1): any channel can be followed via a "Follow" button. Mumcord starts listening to it with its audio muted locally, so its messages arrive without joining. Followed channels show unread badges. Unfollowing stops listening. If the server denies listening or the listener limit is reached, the user gets a clear message. A star button on each channel row in the channel list follows/unfollows it directly (outlined on hover/focus, filled while followed); the server's context menu in the channel list offers "Follow all channels" and "Unfollow all channels" – follow all skips channels the user may not listen to, stops at the server's listener limit and reports how many were followed (QA.13).
 - **FR-1.32** All received and sent messages (channels, followed channels, private chats) are stored locally and shown when the chat is reopened, including after restart (Q4.5). History only contains what Mumcord actually received.
 - **FR-1.48b** Pinned info in the chat (QA.15): the top of each channel's chat shows a pinned, collapsible box with the channel description (fetched on demand if the server only sends a hash); the server welcome message (MOTD) is pinned in the root channel's chat and in the default channel's chat when that channel has no description. Long texts start collapsed ("Show more"); content is sanitized like chat HTML; no box when there is no text; the box updates when the description changes.
+- **FR-1.48c** Message notifications (QA.16): for new messages in any channel the user receives (own channel, followed channels) and in private chats, except the chat currently on screen, Mumcord shows an in-app toast (bottom right: channel, sender, short sanitized preview) and, when the window is in the background or minimized, a system desktop notification. Clicking either opens that chat and brings the window to the front. Bursts are grouped per channel. Both can be switched off in Settings (Sounds & notifications). No message content in logs.
 - **FR-1.33** History controls: "Clear history" per channel/private chat, per server and all; "Save history" switch per server (default on).
 
 ### 4.6 Registration
@@ -423,6 +424,7 @@ Unless stated otherwise: a fresh Mumcord install, a local test server (1.5) runn
 | QA.13 | Star button per channel row to follow/unfollow; "Follow all / Unfollow all channels" in the server context menu, respecting the listener limit | Addendum 2026-10-24; FR-1.31 |
 | QA.14 | Avatar stack (5 + "+N") for collapsed or crowded (>10) channels, talking people in front | Addendum 2026-10-24; FR-1.15 |
 | QA.15 | Pinned channel description / server welcome message at the top of the chat | Addendum 2026-10-24; FR-1.48b |
+| QA.16 | In-app toast + desktop notification for new messages in all received channels and private chats (not the open chat), click opens the chat; grouped; switchable | Addendum 2026-10-24; FR-1.48c, out of scope list |
 
 ## 13. Open points & risks
 
