@@ -5,6 +5,7 @@ import { app, bot, testenv } from "../../helpers/index.ts";
 import { runOk } from "../../helpers/run.ts";
 import {
   button,
+  chooseFileInNativeDialog,
   dumpAppLogs,
   ensureArtifacts,
   finishWizardWithDefaults,
@@ -74,13 +75,7 @@ describe("AC-1.2 wizard imports a PKCS#12 identity", () => {
     await waitForText("Step 1 of 3", 30_000);
     await $('input[name="identity-mode"][value="import"]').click();
     await button("Choose file…").click();
-    // Drive the native GTK file chooser: Ctrl+L opens the location field.
-    await browser.pause(2000);
-    await runOk("xdotool", ["key", "ctrl+l"]);
-    await browser.pause(300);
-    await runOk("xdotool", ["type", "--delay", "15", p12]);
-    await browser.pause(300);
-    await runOk("xdotool", ["key", "Return"]);
+    await chooseFileInNativeDialog(p12);
     await waitForText("Chosen file: c1orig.p12", 10_000);
     const pw = $('input[type="password"]');
     await pw.setValue(P12_PASSWORD);

@@ -3,7 +3,7 @@ import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from 
 import { join } from "node:path";
 import { $, browser } from "@wdio/globals";
 import { artifactsDir, repoRoot } from "./paths.ts";
-import { run } from "./run.ts";
+import { run, runOk } from "./run.ts";
 
 export const wizardArtifacts = join(artifactsDir, "wizard");
 
@@ -35,6 +35,30 @@ export async function waitForText(text: string, timeout = 15_000): Promise<void>
 /** The main window is up once the server bar's "Add a server" button exists. */
 export function mainWindowMarker() {
   return $('button[aria-label="Add a server"]');
+}
+
+/**
+ * Picks `path` in the native GTK "Open File" chooser (rfd's default title). The chooser opens
+ * asynchronously and Xvfb has no window manager, so keys sent before it is mapped and focused hit
+ * an unrealized widget and are lost (seen on loaded CI runners); wait for it and focus it first.
+ */
+export async function chooseFileInNativeDialog(path: string): Promise<void> {
+  let chooser = "";
+  await browser.waitUntil(
+    async () => {
+      const found = await run("xdotool", ["search", "--onlyvisible", "--name", "^Open File$"]);
+      chooser = found.stdout.trim().split("\n")[0] ?? "";
+      return chooser !== "";
+    },
+    { timeout: 20_000, interval: 250, timeoutMsg: "native file chooser never opened" },
+  );
+  await runOk("xdotool", ["windowfocus", "--sync", chooser]);
+  // Ctrl+L opens the location field; give GTK a moment to show it before typing.
+  await runOk("xdotool", ["key", "ctrl+l"]);
+  await browser.pause(300);
+  await runOk("xdotool", ["type", "--delay", "15", path]);
+  await browser.pause(300);
+  await runOk("xdotool", ["key", "Return"]);
 }
 
 /** Wizard step 2 → 3 → Finish with all defaults. */
