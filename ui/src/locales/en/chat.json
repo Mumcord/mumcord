@@ -15,6 +15,15 @@
     "loading": "Loading messages…",
     "loadFailed": "Older messages couldn't be loaded. Scroll up to try again."
   },
+  "format": {
+    "toolbar": "Formatting",
+    "bold": "Bold",
+    "italic": "Italic",
+    "strike": "Strikethrough",
+    "code": "Inline code",
+    "codeBlock": "Code block",
+    "link": "Link"
+  },
   "composer": {
     "label": "Message {{name}}",
     "hint": "Press Enter to send and Shift+Enter for a new line. Markdown works: **bold**, *italic*, `code`, [link](https://…).",

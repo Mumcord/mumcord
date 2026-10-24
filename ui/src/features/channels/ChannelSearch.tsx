@@ -9,7 +9,7 @@ export interface ChannelSearchProps {
   onSubmit: () => void;
 }
 
-/** Ctrl+K and Ctrl+F (Cmd on macOS) focus the field; the app uses neither for anything else. */
+/** Ctrl+K and Ctrl+F (Cmd on macOS) focus the field, except where an input claims the key. */
 const isFocusShortcut = (event: KeyboardEvent) =>
   (event.ctrlKey || event.metaKey) &&
   !event.altKey &&
@@ -25,7 +25,8 @@ export function ChannelSearch({ value, onChange, onClear, onSubmit }: ChannelSea
 
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
-      if (!isFocusShortcut(event)) return;
+      // The chat input uses Ctrl+K for links and marks the key as handled.
+      if (event.defaultPrevented || !isFocusShortcut(event)) return;
       event.preventDefault();
       inputRef.current?.focus();
       inputRef.current?.select();

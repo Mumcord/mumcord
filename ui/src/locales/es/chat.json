@@ -15,6 +15,15 @@
     "loading": "Cargando mensajes…",
     "loadFailed": "No se pudieron cargar los mensajes anteriores. Desplázate hacia arriba para reintentarlo."
   },
+  "format": {
+    "toolbar": "Formato",
+    "bold": "Negrita",
+    "italic": "Cursiva",
+    "strike": "Tachado",
+    "code": "Código en línea",
+    "codeBlock": "Bloque de código",
+    "link": "Enlace"
+  },
   "composer": {
     "label": "Mensaje a {{name}}",
     "hint": "Pulsa Intro para enviar y Mayús+Intro para una nueva línea. Funciona Markdown: **negrita**, *cursiva*, `código`, [enlace](https://…).",

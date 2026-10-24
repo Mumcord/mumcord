@@ -1,10 +1,19 @@
 /**
- * Message input: Markdown shortcuts, Enter to send (Shift+Enter for a new line), images by
+ * Message input: Markdown with a formatting toolbar and shortcuts, Enter to send (Shift+Enter for a new line), images by
  * button, paste or drop, and inline errors such as a denied permission or a too-large image.
  */
-import { useId, useRef, type ClipboardEvent, type DragEvent, type KeyboardEvent } from "react";
+import {
+  useId,
+  useLayoutEffect,
+  useRef,
+  type ClipboardEvent,
+  type DragEvent,
+  type KeyboardEvent,
+} from "react";
 import { useTranslation } from "react-i18next";
 import type { SendTarget } from "./conversationInfo";
+import { FormatToolbar } from "./FormatToolbar";
+import { applyFormat, formatForKey, type Edit, type Format } from "./formatting";
 import type { MessageLimits } from "./images";
 import { useComposer } from "./useComposer";
 
@@ -36,6 +45,9 @@ export function Composer({ target, limits, label, blockedReason }: ComposerProps
   const { t } = useTranslation("chat");
   const composer = useComposer(target, limits);
   const fileInput = useRef<HTMLInputElement>(null);
+  const input = useRef<HTMLTextAreaElement>(null);
+  // Selection to restore once a formatting edit has been rendered into the textarea.
+  const pendingSelection = useRef<Edit | null>(null);
   const hintId = useId();
   const errorId = useId();
   const disabled = blockedReason !== null;
@@ -44,7 +56,38 @@ export function Composer({ target, limits, label, blockedReason }: ComposerProps
     if (file) void composer.addImage(file);
   }
 
+  useLayoutEffect(() => {
+    const pending = pendingSelection.current;
+    const element = input.current;
+    if (pending === null || element === null || element.value !== pending.text) return;
+    pendingSelection.current = null;
+    element.focus();
+    element.setSelectionRange(pending.selectionStart, pending.selectionEnd);
+  }, [composer.text]);
+
+  function format(kind: Format) {
+    const element = input.current;
+    if (element === null) return;
+    const edit = applyFormat(
+      {
+        text: element.value,
+        selectionStart: element.selectionStart,
+        selectionEnd: element.selectionEnd,
+      },
+      kind,
+    );
+    pendingSelection.current = edit;
+    composer.setText(edit.text);
+  }
+
   function onKeyDown(event: KeyboardEvent<HTMLTextAreaElement>) {
+    const shortcut = formatForKey(event);
+    if (shortcut !== null) {
+      // Also tells global shortcuts (Ctrl+K channel search) that the key was handled here.
+      event.preventDefault();
+      format(shortcut);
+      return;
+    }
     if (event.key === "Enter" && !event.shiftKey && !event.nativeEvent.isComposing) {
       event.preventDefault();
       void composer.submit();
@@ -87,6 +130,7 @@ export function Composer({ target, limits, label, blockedReason }: ComposerProps
           </button>
         </div>
       ) : null}
+      <FormatToolbar onFormat={format} disabled={disabled} />
       <div className="chat-composer__row">
         <button
           type="button"
@@ -109,6 +153,7 @@ export function Composer({ target, limits, label, blockedReason }: ComposerProps
           }}
         />
         <textarea
+          ref={input}
           className="chat-composer__input"
           rows={1}
           aria-label={label}

@@ -15,6 +15,15 @@
     "loading": "Nachrichten werden geladen…",
     "loadFailed": "Ältere Nachrichten konnten nicht geladen werden. Scrolle nach oben, um es erneut zu versuchen."
   },
+  "format": {
+    "toolbar": "Formatierung",
+    "bold": "Fett",
+    "italic": "Kursiv",
+    "strike": "Durchgestrichen",
+    "code": "Code im Text",
+    "codeBlock": "Codeblock",
+    "link": "Link"
+  },
   "composer": {
     "label": "Nachricht an {{name}}",
     "hint": "Enter sendet, Umschalt+Enter fügt eine neue Zeile ein. Markdown funktioniert: **fett**, *kursiv*, `Code`, [Link](https://…).",
