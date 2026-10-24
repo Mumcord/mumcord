@@ -976,3 +976,12 @@ Until now external images (img tags pointing to web addresses, image links) are 
 ✍️ Note: Asked and answered in chat during /dev (server limit 558 kbit/s observed, client capped at 96).
 
 ---
+
+#### QA.38 Enlarge and zoom images in the chat (stage 1b)? `◉`
+
+- [x] **Clicking any image in the chat (sent, received, external, GIFs) opens a viewer over the app: fit to window, zoom with mouse wheel / pinch / + and − keys, drag to pan, double-click toggles 100 %, arrow keys step through the images of the conversation, Escape closes; buttons for "Open in browser" (external) and "Save image".**
+- [ ] Only enlarge, no zoom.
+
+✍️ Note: Requested in chat during /dev.
+
+---
