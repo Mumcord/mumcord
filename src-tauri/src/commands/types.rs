@@ -50,6 +50,9 @@ pub enum ErrorCode {
     SecureStorageUnavailable,
     /// Reading or writing a local file failed.
     Io,
+    /// The desktop did not confirm the push-to-talk shortcut (Wayland portal): its dialog was
+    /// dismissed, no key was assigned in time, or the portal failed. `message` has the detail.
+    ShortcutNotConfirmed,
     /// Unexpected internal failure.
     Internal,
 }

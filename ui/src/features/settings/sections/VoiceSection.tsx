@@ -112,6 +112,8 @@ function KeyCapture({ current, onCaptured }: KeyCaptureProps) {
   const [state, setState] = useState<CaptureState>("idle");
   const [problem, setProblem] = useState<string | null>(null);
   const waiting = useRef(false);
+  // Bumped when the user cancels a pending capture, whose failure then shows no error.
+  const attempts = useRef(0);
 
   // A desktop dialog still open when the section goes away is cancelled.
   useEffect(
@@ -124,13 +126,18 @@ function KeyCapture({ current, onCaptured }: KeyCaptureProps) {
   const capture = async (combo: string) => {
     setState("waiting");
     waiting.current = true;
+    const attempt = ++attempts.current;
     try {
       onCaptured(await getApi().pttCaptureKey(combo));
       setProblem(null);
     } catch (error: unknown) {
       const engineError = toEngineError(error);
-      if (engineError.code === "invalidInput") setProblem(t("voice.keyRejected"));
-      else {
+      if (attempt !== attempts.current) setProblem(null);
+      else if (engineError.code === "invalidInput") setProblem(t("voice.keyRejected"));
+      else if (engineError.code === "shortcutNotConfirmed") {
+        console.error("The desktop did not confirm the push-to-talk shortcut", error);
+        setProblem(t("voice.keyNotConfirmed"));
+      } else {
         console.error("Capturing the push-to-talk key failed", error);
         setProblem(errorText(t, error));
       }
@@ -141,6 +148,7 @@ function KeyCapture({ current, onCaptured }: KeyCaptureProps) {
   };
 
   const cancelWaiting = () => {
+    attempts.current++;
     getApi()
       .pttCaptureCancel()
       .catch((error: unknown) => {

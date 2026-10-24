@@ -93,6 +93,16 @@ describe("TalkModeStep", () => {
     );
   });
 
+  it("says when the desktop did not confirm the shortcut", async () => {
+    vi.spyOn(console, "error").mockImplementation(() => undefined);
+    harness.api.mock.failNext("pttCaptureKey", "shortcutNotConfirmed");
+    renderStep();
+    fireEvent.keyDown(startCapture(), { key: "F8", code: "F8" });
+    const alert = await screen.findByRole("alert");
+    expect(alert).toHaveTextContent("The desktop didn't confirm the shortcut");
+    expect(alert).not.toHaveTextContent("can't be used");
+  });
+
   it("cancels listening with Escape without calling the engine", () => {
     const capture = vi.spyOn(harness.api, "pttCaptureKey");
     renderStep();
@@ -113,7 +123,7 @@ describe("TalkModeStep", () => {
     renderStep();
     fireEvent.keyDown(startCapture(), { key: "F13", code: "F13" });
     const pending = await screen.findByRole("button", {
-      name: "Confirm the shortcut in the system dialog…",
+      name: /Confirm the shortcut in the system dialog/,
     });
     fireEvent.keyDown(pending, { key: "Escape", code: "Escape" });
     expect(cancel).toHaveBeenCalled();

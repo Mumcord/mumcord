@@ -309,6 +309,17 @@ describe("Voice section", () => {
     fireEvent.click(screen.getByRole("button", { name: "Cancel" }));
     expect(cancel).toHaveBeenCalled();
     expect(await screen.findByRole("button", { name: "Set key" })).toBeInTheDocument();
+    expect(screen.queryByText(/cannot be used/)).not.toBeInTheDocument();
+  });
+
+  it("says when the desktop did not confirm the shortcut", async () => {
+    vi.spyOn(console, "error").mockImplementation(() => undefined);
+    api.mock.failNext("pttCaptureKey", "shortcutNotConfirmed");
+    const button = await openPushToTalk();
+    fireEvent.click(button);
+    fireEvent.keyDown(button, { key: "F8", code: "F8" });
+    expect(await screen.findByText(/The desktop didn't confirm the shortcut/)).toBeVisible();
+    expect(screen.queryByText(/cannot be used/)).not.toBeInTheDocument();
   });
 
   it("disables push-to-talk with the reason when it is unavailable", async () => {

@@ -103,6 +103,8 @@ export const commands = {
 	 *  Validates a key the UI captured (`KeyboardEvent.code` plus modifiers, e.g. "Ctrl+KeyA")
 	 *  and returns the shortcut string to store as `pttKey` (e.g. "Ctrl+A"). On Wayland the
 	 *  desktop's shortcut dialog opens with `key` preselected and the user's choice is returned.
+	 *  Errors: `invalidInput` for unusable keys or a cancelled capture; `shortcutNotConfirmed`
+	 *  when the desktop did not confirm the shortcut (dialog dismissed, no key, portal failure).
 	 */
 	pttCaptureKey: (key: string) => typedError<string, ApiError>(__TAURI_INVOKE("ptt_capture_key", { key })),
 	/**  Aborts a pending `ptt_capture_key`, which then fails with `invalidInput`. */
@@ -319,6 +321,11 @@ export type ErrorCode =
 "secureStorageUnavailable" | 
 /**  Reading or writing a local file failed. */
 "io" | 
+/**
+ *  The desktop did not confirm the push-to-talk shortcut (Wayland portal): its dialog was
+ *  dismissed, no key was assigned in time, or the portal failed. `message` has the detail.
+ */
+"shortcutNotConfirmed" | 
 /**  Unexpected internal failure. */
 "internal";
 

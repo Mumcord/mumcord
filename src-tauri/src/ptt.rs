@@ -160,7 +160,9 @@ fn availability_from(
 /// Validates a key captured by the UI and returns the string to store as `pttKey`.
 ///
 /// On Wayland the portal binds the shortcut with `key` as the preferred trigger; the user
-/// confirms or changes it in the desktop's dialog and the chosen trigger is returned.
+/// confirms or changes it in the desktop's dialog and the chosen trigger is returned. If the
+/// desktop already knows the shortcut but has no key for it, its shortcut settings open
+/// instead. Desktop failures are `shortcutNotConfirmed`, never `invalidInput`.
 pub async fn capture(key: &str) -> ApiResult<String> {
     let normalized = normalize_key(key)
         .map_err(|err| ApiError::new(ErrorCode::InvalidInput, err.to_string()))?;
@@ -440,7 +442,11 @@ async fn activate_portal(key: &str) -> Result<(), PttUnavailableReason> {
     let preferred = normalize_key(key).ok().and_then(|k| portal_trigger(&k));
     match portal::bind(preferred.as_deref()).await {
         // Keep the user's stored key: it is what `configure` is called with next time.
-        Ok((binding, _trigger)) => {
+        Ok((binding, trigger)) => {
+            if trigger.is_none() {
+                // The session is live; a key assigned later in the desktop settings works.
+                tracing::warn!("the desktop has no key assigned to the push-to-talk shortcut");
+            }
             replace_portal_binding(binding.with_key(key.to_owned()));
             Ok(())
         }
@@ -455,35 +461,73 @@ async fn activate_portal(key: &str) -> Result<(), PttUnavailableReason> {
     }
 }
 
+/// How long the desktop's shortcut settings stay open for the user to assign a key.
+#[cfg(target_os = "linux")]
+const ASSIGN_TIMEOUT: std::time::Duration = std::time::Duration::from_secs(300);
+
 #[cfg(target_os = "linux")]
 async fn capture_portal(normalized: &str) -> ApiResult<String> {
     let _guard = OPERATION.lock().await;
     let (cancel_tx, cancel_rx) = tokio::sync::oneshot::channel();
     state().capture_cancel = Some(cancel_tx);
     let preferred = portal_trigger(normalized);
+    tracing::info!(
+        "binding the push-to-talk shortcut via the portal (preferred trigger {preferred:?})"
+    );
     let result = tokio::select! {
-        result = portal::bind(preferred.as_deref()) => Some(result),
+        result = bind_and_assign(preferred.as_deref()) => Some(result),
         _ = cancel_rx => None,
     };
     state().capture_cancel = None;
+    let not_confirmed = |detail: String| {
+        tracing::warn!("the desktop did not confirm the push-to-talk shortcut: {detail}");
+        Err(ApiError::new(ErrorCode::ShortcutNotConfirmed, detail))
+    };
     match result {
         None => Err(ApiError::new(
             ErrorCode::InvalidInput,
             "key capture cancelled",
         )),
         Some(Ok((binding, trigger))) => {
+            tracing::info!("push-to-talk shortcut bound to {trigger:?}");
             replace_portal_binding(binding.with_key(trigger.clone()));
             Ok(trigger)
         }
-        Some(Err(portal::BindError::Cancelled)) => Err(ApiError::new(
-            ErrorCode::InvalidInput,
-            "shortcut dialog cancelled",
-        )),
-        Some(Err(portal::BindError::NoTrigger)) => Err(ApiError::new(
-            ErrorCode::InvalidInput,
-            "no key was assigned in the shortcut dialog",
-        )),
-        Some(Err(err)) => Err(ApiError::new(ErrorCode::Internal, err.to_string())),
+        Some(Err(portal::BindError::Cancelled)) => {
+            not_confirmed("the shortcut dialog was dismissed".to_owned())
+        }
+        Some(Err(portal::BindError::NoTrigger)) => {
+            not_confirmed("no key was assigned to the shortcut".to_owned())
+        }
+        Some(Err(err)) => not_confirmed(err.to_string()),
+    }
+}
+
+/// Binds the shortcut; if the desktop returns it without a key (KDE does this, without any
+/// dialog, for a shortcut it already knows), opens the desktop's shortcut settings and waits
+/// until the user assigns one.
+#[cfg(target_os = "linux")]
+async fn bind_and_assign(
+    preferred: Option<&str>,
+) -> Result<(portal::Binding, String), portal::BindError> {
+    let (binding, trigger) = portal::bind(preferred).await?;
+    if let Some(trigger) = trigger {
+        return Ok((binding, trigger));
+    }
+    tracing::info!(
+        "the desktop knows the push-to-talk shortcut but has no key assigned; \
+         opening its shortcut settings"
+    );
+    match tokio::time::timeout(ASSIGN_TIMEOUT, portal::assign(&binding)).await {
+        Ok(Ok(trigger)) => Ok((binding, trigger)),
+        Ok(Err(err)) => {
+            binding.close();
+            Err(err)
+        }
+        Err(_elapsed) => {
+            binding.close();
+            Err(portal::BindError::NoTrigger)
+        }
     }
 }
 
@@ -515,7 +559,9 @@ mod portal {
     use std::pin::Pin;
     use std::sync::Arc;
 
-    use ashpd::desktop::global_shortcuts::{BindShortcutsOptions, GlobalShortcuts, NewShortcut};
+    use ashpd::desktop::global_shortcuts::{
+        BindShortcutsOptions, ConfigureShortcutsOptions, GlobalShortcuts, NewShortcut, Shortcut,
+    };
     use ashpd::desktop::{CreateSessionOptions, ResponseError, Session};
     use ashpd::zbus::export::futures_core::Stream;
     use tauri::async_runtime::{self, JoinHandle};
@@ -552,7 +598,7 @@ mod portal {
         Unavailable(ashpd::Error),
         /// The user dismissed the consent dialog.
         Cancelled,
-        /// The dialog was accepted without assigning a key.
+        /// No key was assigned to the shortcut.
         NoTrigger,
         Failed(ashpd::Error),
     }
@@ -570,8 +616,14 @@ mod portal {
 
     /// Opens a new session and binds the push-to-talk shortcut. The desktop shows its consent
     /// dialog unless it remembers an earlier binding. Returns the binding (with an empty
-    /// `key`) and the trigger the user chose.
-    pub async fn bind(preferred_trigger: Option<&str>) -> Result<(Binding, String), BindError> {
+    /// `key`) and the trigger the user chose, or `None` if the desktop has no key assigned
+    /// (the session stays live, so a key assigned later still works).
+    ///
+    /// KDE only shows its dialog for shortcuts it has never seen for this app; for a known
+    /// one it answers at once with the stored key and ignores `preferred_trigger`.
+    pub async fn bind(
+        preferred_trigger: Option<&str>,
+    ) -> Result<(Binding, Option<String>), BindError> {
         let portal = GlobalShortcuts::new()
             .await
             .map_err(BindError::Unavailable)?;
@@ -604,16 +656,7 @@ mod portal {
                 });
             }
         };
-        let trigger = bound
-            .shortcuts()
-            .iter()
-            .find(|s| s.id() == SHORTCUT_ID)
-            .map(|s| s.trigger_description().trim().to_owned())
-            .filter(|t| !t.is_empty());
-        let Some(trigger) = trigger else {
-            close_quietly(&session).await;
-            return Err(BindError::NoTrigger);
-        };
+        let trigger = trigger_of(bound.shortcuts());
         let listener = async_runtime::spawn(async move {
             // The proxy must outlive the signal streams.
             let _portal = portal;
@@ -625,6 +668,41 @@ mod portal {
             listener,
         };
         Ok((binding, trigger))
+    }
+
+    /// Opens the desktop's settings for this session's shortcuts (portal version 2) and waits
+    /// until the push-to-talk shortcut has a key; returns its trigger description.
+    pub async fn assign(binding: &Binding) -> Result<String, BindError> {
+        let portal = GlobalShortcuts::new()
+            .await
+            .map_err(BindError::Unavailable)?;
+        // The portal only sends our own sessions' signals; any session of this app sees the
+        // same shortcut, so the session handle need not be compared.
+        let mut changed = Box::pin(
+            portal
+                .receive_shortcuts_changed()
+                .await
+                .map_err(BindError::Failed)?,
+        );
+        portal
+            .configure_shortcuts(&binding.session, None, ConfigureShortcutsOptions::default())
+            .await
+            .map_err(BindError::Failed)?;
+        while let Some(event) = next(&mut changed).await {
+            if let Some(trigger) = trigger_of(event.shortcuts()) {
+                return Ok(trigger);
+            }
+        }
+        Err(BindError::NoTrigger)
+    }
+
+    /// The push-to-talk trigger description in `shortcuts`, if it has a key.
+    fn trigger_of(shortcuts: &[Shortcut]) -> Option<String> {
+        shortcuts
+            .iter()
+            .find(|s| s.id() == SHORTCUT_ID)
+            .map(|s| s.trigger_description().trim().to_owned())
+            .filter(|t| !t.is_empty())
     }
 
     async fn close_quietly(session: &Session<GlobalShortcuts>) {
@@ -817,6 +895,31 @@ mod tests {
         );
         assert_eq!(portal_trigger("Backquote").as_deref(), Some("grave"));
         assert_eq!(portal_trigger("Unknown"), None);
+    }
+
+    /// Strings exactly as the wizard and settings build them from `KeyboardEvent`, through
+    /// normalisation to the portal trigger (these reached KDE correctly in the field).
+    #[test]
+    fn ui_key_strings_reach_the_portal() {
+        let cases = [
+            ("KeyA", "a"),
+            ("Ctrl+KeyZ", "CTRL+z"),
+            ("Ctrl+Shift+KeyZ", "CTRL+SHIFT+z"),
+            ("Alt+KeyE", "ALT+e"),
+            ("Ctrl+Digit1", "CTRL+1"),
+            ("Digit1", "1"),
+            ("End", "End"),
+            ("Ctrl+End", "CTRL+End"),
+            ("F8", "F8"),
+            ("Shift+F9", "SHIFT+F9"),
+            ("Space", "space"),
+            ("Meta+KeyQ", "LOGO+q"),
+            ("Super+KeyQ", "LOGO+q"),
+        ];
+        for (ui, trigger) in cases {
+            let canonical = normalize_key(ui).unwrap_or_else(|err| panic!("{ui}: {err}"));
+            assert_eq!(portal_trigger(&canonical).as_deref(), Some(trigger), "{ui}");
+        }
     }
 
     #[test]

@@ -65,8 +65,14 @@ export function TalkModeStep({
       setKeyError(null);
     } catch (cause: unknown) {
       if (attempt === captureAttempt.current) {
+        const code = errorCode(cause);
+        if (code !== "invalidInput") console.error("capturing the push-to-talk key failed", cause);
         setKeyError(
-          errorCode(cause) === "invalidInput" ? t("talk.keyInvalid") : t("errors.generic"),
+          code === "invalidInput"
+            ? t("talk.keyInvalid")
+            : code === "shortcutNotConfirmed"
+              ? t("talk.keyNotConfirmed")
+              : t("errors.generic"),
         );
       }
     } finally {

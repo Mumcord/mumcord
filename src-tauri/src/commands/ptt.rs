@@ -31,6 +31,8 @@ pub async fn ptt_availability() -> ApiResult<PttAvailability> {
 /// Validates a key the UI captured (`KeyboardEvent.code` plus modifiers, e.g. "Ctrl+KeyA")
 /// and returns the shortcut string to store as `pttKey` (e.g. "Ctrl+A"). On Wayland the
 /// desktop's shortcut dialog opens with `key` preselected and the user's choice is returned.
+/// Errors: `invalidInput` for unusable keys or a cancelled capture; `shortcutNotConfirmed`
+/// when the desktop did not confirm the shortcut (dialog dismissed, no key, portal failure).
 #[tauri::command]
 #[specta::specta]
 pub async fn ptt_capture_key(key: String) -> ApiResult<String> {
