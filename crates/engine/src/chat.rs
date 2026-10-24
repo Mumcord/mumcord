@@ -133,6 +133,24 @@ fn plays_message_sound(state: &ServerState, route: Route) -> bool {
     }
 }
 
+/// Which sound a new message makes (QA.41): the ping for a mention, wherever it arrives and
+/// even in the chat on screen; otherwise the message sound where it applies. A mention with
+/// the ping switched off falls back to the message sound.
+fn sound_for(
+    state: &ServerState,
+    route: Route,
+    mention: bool,
+    ping_enabled: bool,
+) -> Option<Sound> {
+    if mention && ping_enabled {
+        Some(Sound::Mention)
+    } else if plays_message_sound(state, route) {
+        Some(Sound::Message)
+    } else {
+        None
+    }
+}
+
 /// Whether `channel` is `root` or one of its sub-channels.
 fn is_within(state: &ServerState, channel: u32, root: u32) -> bool {
     let mut current = Some(channel);
@@ -254,16 +272,14 @@ pub(crate) fn on_text(ctx: &SessionCtx, msg: &TextMessage) {
         let route = route(s, msg)?;
         let sender = msg.actor.and_then(|a| s.users.get(&a));
         let unread = counts_unread(s, route);
-        let sound = plays_message_sound(s, route);
         Some((
             route,
             sender.map(|u| u.name.clone()).unwrap_or_default(),
             sender.and_then(|u| u.cert_hash.clone()),
             unread,
-            sound,
         ))
     });
-    let Some((route, sender_name, sender_cert_hash, counts_unread, plays_sound)) = routed else {
+    let Some((route, sender_name, sender_cert_hash, counts_unread)) = routed else {
         return;
     };
     let conversation = match route {
@@ -306,9 +322,6 @@ pub(crate) fn on_text(ctx: &SessionCtx, msg: &TextMessage) {
             conversation,
             count,
         }));
-        if plays_sound {
-            ctx.events.sounds().play(Sound::Message);
-        }
     }
 }
 
@@ -405,6 +418,25 @@ fn history_view(
 }
 
 impl Engine {
+    /// Plays the sound of a new incoming message (FR-1.27, QA.41). The UI calls this per message
+    /// because only it knows the matching rules and the names the user went by: `mention` is
+    /// its verdict. The sound toggles and deafness are applied by the sound hub.
+    pub fn message_sound(&self, conversation: &ConversationRef, mention: bool) -> EngineResult<()> {
+        let ctx = self.session_ctx()?;
+        let route = match conversation {
+            ConversationRef::Channel { channel_id } => Route::Channel(*channel_id),
+            _ => Route::Private { session: 0 },
+        };
+        let ping_enabled = self.settings()?.sounds.mention;
+        let sound = ctx
+            .handle
+            .with_state(|s| sound_for(s, route, mention, ping_enabled));
+        if let Some(sound) = sound {
+            ctx.events.sounds().play(sound);
+        }
+        Ok(())
+    }
+
     /// Sends Mumble HTML to a channel (FR-1.28, FR-1.30) and returns the stored own message.
     pub fn send_channel_message(
         &self,
@@ -690,6 +722,26 @@ mod tests {
         assert!(!counts_unread(&s, Route::Channel(3)), "not followed");
         assert!(!plays_message_sound(&s, Route::Channel(1)), "own channel");
         assert!(plays_message_sound(&s, Route::Channel(2)));
+    }
+
+    #[test]
+    fn mention_ping_replaces_message_sound() {
+        let s = state();
+        let private = Route::Private { session: 5 };
+        assert_eq!(sound_for(&s, private, false, true), Some(Sound::Message));
+        assert_eq!(sound_for(&s, private, true, true), Some(Sound::Mention));
+        assert_eq!(
+            sound_for(&s, Route::Channel(1), true, true),
+            Some(Sound::Mention),
+            "ping even in the own channel"
+        );
+        assert_eq!(sound_for(&s, Route::Channel(1), false, true), None);
+        assert_eq!(
+            sound_for(&s, private, true, false),
+            Some(Sound::Message),
+            "ping switched off"
+        );
+        assert_eq!(sound_for(&s, Route::Channel(1), true, false), None);
     }
 
     #[test]

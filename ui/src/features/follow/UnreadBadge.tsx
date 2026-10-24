@@ -1,19 +1,31 @@
 import { useTranslation } from "react-i18next";
+import { useHasMention } from "../notifications";
 import { useFollowState } from "./followStore";
 
 /** Unread count of the own or a followed channel for the channel tree (`channelBadge`). */
 export function ChannelUnreadBadge({ channelId }: { channelId: number }) {
   const { unread } = useFollowState();
-  return <UnreadBadge count={unread.get(`channel:${String(channelId)}`) ?? 0} />;
+  return (
+    <UnreadBadge
+      count={unread.get(`channel:${String(channelId)}`) ?? 0}
+      mentionKey={`channel:${String(channelId)}`}
+    />
+  );
 }
 
-export function UnreadBadge({ count }: { count: number }) {
+/** `mentionKey`: conversation key; an unseen mention there adds an "@" to the pill. */
+export function UnreadBadge({ count, mentionKey }: { count: number; mentionKey?: string }) {
   const { t } = useTranslation("follow");
+  const mentioned = useHasMention(mentionKey);
   if (count <= 0) return null;
   // The digits are CSS-generated (::before) so the badge adds no DOM text: the visible count stays
   // part of the accessible name (WCAG 2.5.3 label-in-name). The spoken form is the hidden phrase.
   return (
-    <span className="unread-badge" data-count={count > 99 ? "99+" : count}>
+    <span
+      className="unread-badge"
+      data-count={count > 99 ? "99+" : count}
+      data-mention={mentioned || undefined}
+    >
       <svg
         viewBox="0 0 24 24"
         width="12"
@@ -28,7 +40,10 @@ export function UnreadBadge({ count }: { count: number }) {
       >
         <path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.6A8 8 0 1 1 21 12" />
       </svg>
-      <span className="visually-hidden">, {t("unread", { count })}</span>
+      <span className="visually-hidden">
+        , {t("unread", { count })}
+        {mentioned ? `, ${t("mention")}` : ""}
+      </span>
     </span>
   );
 }

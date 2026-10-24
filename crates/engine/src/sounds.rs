@@ -10,7 +10,8 @@
 //!
 //! Self mute/deafen sounds follow the server's echo of your own user state, so they match
 //! what the server (and everyone else) sees. New-message sounds are requested by the chat
-//! code through [`SoundHub::play`] with [`Sound::Message`].
+//! code through [`SoundHub::play`] with [`Sound::Message`], or [`Sound::Mention`] when the
+//! message mentions the user (the UI owns the matching rules and reports the result).
 //!
 //! The own join and hang-up sounds follow the user's action, not the server: the session code
 //! calls [`SoundHub::voice_join`] for an explicit join and [`SoundHub::hang_up`] before it tears
@@ -38,6 +39,8 @@ pub enum Sound {
     Undeafen,
     /// New message in a followed channel or private chat.
     Message,
+    /// A message mentions you; plays in place of [`Sound::Message`] (QA.41).
+    Mention,
     /// You join a channel for voice yourself.
     VoiceJoin,
     /// You disconnect from a server yourself.
@@ -54,6 +57,7 @@ impl Sound {
             Self::Deafen => include_bytes!("../../../assets/sounds/deafen.wav"),
             Self::Undeafen => include_bytes!("../../../assets/sounds/undeafen.wav"),
             Self::Message => include_bytes!("../../../assets/sounds/message.wav"),
+            Self::Mention => include_bytes!("../../../assets/sounds/mention.wav"),
             Self::VoiceJoin => include_bytes!("../../../assets/sounds/voice_join.wav"),
             Self::HangUp => include_bytes!("../../../assets/sounds/hang_up.wav"),
         }
@@ -67,6 +71,7 @@ impl Sound {
             Self::Mute | Self::Unmute => s.self_mute,
             Self::Deafen | Self::Undeafen => s.self_deafen,
             Self::Message => s.new_message,
+            Self::Mention => s.mention,
             Self::VoiceJoin => s.voice_join,
             Self::HangUp => s.hang_up,
         }
@@ -380,7 +385,7 @@ mod tests {
     use mumcord_audio::mixer::{Playback, PlaybackConfig, PlaybackSink};
     use mumcord_audio::{FRAME_SAMPLES, Frame};
 
-    const ALL: [Sound; 9] = [
+    const ALL: [Sound; 10] = [
         Sound::UserJoined,
         Sound::UserLeft,
         Sound::Mute,
@@ -388,6 +393,7 @@ mod tests {
         Sound::Deafen,
         Sound::Undeafen,
         Sound::Message,
+        Sound::Mention,
         Sound::VoiceJoin,
         Sound::HangUp,
     ];
@@ -499,6 +505,8 @@ mod tests {
             self_mute: false,
             self_deafen: false,
             new_message: false,
+            mention: false,
+            mention_notify: false,
             voice_join: false,
             hang_up: false,
         };

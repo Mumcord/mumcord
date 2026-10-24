@@ -5,16 +5,29 @@
 import {
   useId,
   useLayoutEffect,
+  useMemo,
   useRef,
+  useState,
   type ClipboardEvent,
   type DragEvent,
   type KeyboardEvent,
 } from "react";
 import { useTranslation } from "react-i18next";
+import type { User } from "../../api";
+import { selfUser, useServerSelector } from "../channels";
+import { useAvatars } from "../members/useAvatars";
 import type { SendTarget } from "./conversationInfo";
 import { FormatToolbar } from "./FormatToolbar";
 import { applyFormat, formatForKey, type Edit, type Format } from "./formatting";
 import type { MessageLimits } from "./images";
+import {
+  findMentionQuery,
+  insertMention,
+  optionId,
+  rankMentionCandidates,
+  type MentionQuery,
+} from "./mentions";
+import { MentionPicker } from "./MentionPicker";
 import { useComposer } from "./useComposer";
 
 export interface ComposerProps {
@@ -50,7 +63,38 @@ export function Composer({ target, limits, label, blockedReason }: ComposerProps
   const pendingSelection = useRef<Edit | null>(null);
   const hintId = useId();
   const errorId = useId();
+  const pickerId = useId();
   const disabled = blockedReason !== null;
+
+  // Mention autocomplete (FR-1.51).
+  const [caret, setCaret] = useState(0);
+  const [active, setActive] = useState(0);
+  // The `@query` whose list was closed (Escape or a pick); it stays closed while the query still
+  // begins with that text, so a picked "@Ann " does not reopen for the longer name "Ann Lee".
+  const [dismissed, setDismissed] = useState<MentionQuery | null>(null);
+  const users = useServerSelector((state) => state.users);
+  const selfSession = useServerSelector((state) => state.selfSession);
+  const ownChannel = useServerSelector((state) => selfUser(state)?.channelId ?? null);
+  const mention = useMemo(
+    () => (disabled ? null : findMentionQuery(composer.text, caret)),
+    [composer.text, caret, disabled],
+  );
+  const hereChannel = target?.kind === "channel" ? target.channelId : ownChannel;
+  const candidates = useMemo(
+    () =>
+      mention === null
+        ? []
+        : rankMentionCandidates(users.values(), mention.query, hereChannel, selfSession),
+    [mention, users, hereChannel, selfSession],
+  );
+  const isDismissed =
+    mention !== null &&
+    dismissed !== null &&
+    mention.start === dismissed.start &&
+    mention.query.startsWith(dismissed.query);
+  const pickerOpen = mention !== null && !isDismissed && candidates.length > 0;
+  const activeIndex = Math.min(active, Math.max(candidates.length - 1, 0));
+  const avatarOf = useAvatars(pickerOpen ? candidates : []);
 
   function attach(file: File | undefined) {
     if (file) void composer.addImage(file);
@@ -80,7 +124,51 @@ export function Composer({ target, limits, label, blockedReason }: ComposerProps
     composer.setText(edit.text);
   }
 
+  function pick(user: User) {
+    const element = input.current;
+    if (mention === null || element === null) return;
+    const edit = insertMention(element.value, mention.start, element.selectionStart, user.name);
+    pendingSelection.current = {
+      text: edit.text,
+      selectionStart: edit.caret,
+      selectionEnd: edit.caret,
+    };
+    setDismissed({ start: mention.start, query: `${user.name} ` });
+    setCaret(edit.caret);
+    composer.setText(edit.text);
+  }
+
+  /** Handles the keys of the open mention list; true when the key was used. */
+  function onPickerKey(event: KeyboardEvent<HTMLTextAreaElement>): boolean {
+    if (!pickerOpen || event.nativeEvent.isComposing) return false;
+    const count = candidates.length;
+    switch (event.key) {
+      case "ArrowDown":
+        setActive((activeIndex + 1) % count);
+        break;
+      case "ArrowUp":
+        setActive((activeIndex + count - 1) % count);
+        break;
+      case "Enter":
+      case "Tab": {
+        const user = candidates[activeIndex];
+        if (user === undefined || event.shiftKey || event.ctrlKey || event.altKey) return false;
+        pick(user);
+        break;
+      }
+      case "Escape":
+        setDismissed(mention);
+        break;
+      default:
+        return false;
+    }
+    event.preventDefault();
+    event.stopPropagation();
+    return true;
+  }
+
   function onKeyDown(event: KeyboardEvent<HTMLTextAreaElement>) {
+    if (onPickerKey(event)) return;
     const shortcut = formatForKey(event);
     if (shortcut !== null) {
       // Also tells global shortcuts (Ctrl+K channel search) that the key was handled here.
@@ -130,6 +218,18 @@ export function Composer({ target, limits, label, blockedReason }: ComposerProps
           </button>
         </div>
       ) : null}
+      {pickerOpen ? (
+        <MentionPicker
+          id={pickerId}
+          candidates={candidates}
+          active={activeIndex}
+          avatarOf={avatarOf}
+          onPick={pick}
+        />
+      ) : null}
+      <p className="visually-hidden" role="status">
+        {pickerOpen ? t("mention.found", { count: candidates.length }) : ""}
+      </p>
       <FormatToolbar onFormat={format} disabled={disabled} />
       <div className="chat-composer__row">
         <button
@@ -154,6 +254,11 @@ export function Composer({ target, limits, label, blockedReason }: ComposerProps
         />
         <textarea
           ref={input}
+          role={pickerOpen ? "combobox" : undefined}
+          aria-expanded={pickerOpen ? true : undefined}
+          aria-controls={pickerOpen ? pickerId : undefined}
+          aria-activedescendant={pickerOpen ? optionId(pickerId, activeIndex) : undefined}
+          aria-autocomplete={pickerOpen ? "list" : undefined}
           className="chat-composer__input"
           rows={1}
           aria-label={label}
@@ -163,6 +268,11 @@ export function Composer({ target, limits, label, blockedReason }: ComposerProps
           disabled={disabled}
           onChange={(event) => {
             composer.setText(event.target.value);
+            setCaret(event.target.selectionStart);
+            setActive(0);
+          }}
+          onSelect={(event) => {
+            setCaret(event.currentTarget.selectionStart);
           }}
           onKeyDown={onKeyDown}
           onPaste={onPaste}

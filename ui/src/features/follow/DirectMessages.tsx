@@ -88,7 +88,7 @@ export function DirectMessages() {
               }}
             >
               <span>{nameOf(chat)}</span>
-              <UnreadBadge count={follow.unread.get(chat.key) ?? 0} />
+              <UnreadBadge count={follow.unread.get(chat.key) ?? 0} mentionKey={chat.key} />
             </button>
           </li>
         ))}

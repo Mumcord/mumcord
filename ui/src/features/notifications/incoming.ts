@@ -6,8 +6,8 @@
 import type { TFunction } from "i18next";
 import { getApi, type ChatMessage, type Conversation } from "../../api";
 import { getSelectedConversation, getServerState, sameConversation } from "../channels";
-import { conversationKey } from "../chat";
-import { bumpCount, markSeen, showToast } from "./notificationStore";
+import { conversationKey, isMention } from "../chat";
+import { bumpCount, markMention, markSeen, showToast } from "./notificationStore";
 import { hasImage, plainPreview } from "./preview";
 
 export interface IncomingContext {
@@ -26,6 +26,7 @@ export function noticeTexts(
   message: ChatMessage,
   count: number,
   t: TFunction<"notifications">,
+  mentioned = false,
 ): NoticeTexts {
   const { conversation } = message;
   const isChannel = conversation.kind === "channel";
@@ -33,7 +34,9 @@ export function noticeTexts(
   const summary =
     count === 1 ? name : t(isChannel ? "groupedChannel" : "groupedPrivate", { count, name });
   const preview = plainPreview(message.body) || (hasImage(message.body) ? t("image") : "");
-  const body = isChannel ? t("line", { sender: message.senderName, preview }) : preview;
+  let body = preview;
+  if (mentioned) body = t("mentionLine", { sender: message.senderName, preview });
+  else if (isChannel) body = t("line", { sender: message.senderName, preview });
   return { summary, body };
 }
 
@@ -47,6 +50,15 @@ function isOnScreen(conversation: Conversation, overlayOpen: boolean): boolean {
   return !overlayOpen && sameConversation(getSelectedConversation(), conversation);
 }
 
+async function mentionNotifications(): Promise<boolean> {
+  try {
+    return (await getApi().settingsGet()).sounds.mentionNotify;
+  } catch (error) {
+    console.error("Reading the mention notification setting failed", error);
+    return true;
+  }
+}
+
 export async function handleIncoming(
   message: ChatMessage,
   context: IncomingContext,
@@ -56,7 +68,13 @@ export async function handleIncoming(
   const key = conversationKey(conversation);
   const onScreen = isOnScreen(conversation, context.overlayOpen);
   const count = bumpCount(key);
-  const texts = noticeTexts(message, count, context.t);
+  // A mention notifies like a private message: the setting decides how, the chat does not matter.
+  // The ping (engine, in `notifyMessage`) follows the mention itself; only the highlighting of
+  // the notification follows the "Notify when mentioned" switch.
+  const mention = isMention(message);
+  const mentioned = mention && (await mentionNotifications());
+  if (mentioned && !onScreen) markMention(key);
+  const texts = noticeTexts(message, count, context.t, mentioned);
   let outcome;
   try {
     outcome = await getApi().notifyMessage({
@@ -65,6 +83,7 @@ export async function handleIncoming(
       summary: texts.summary,
       body: texts.body,
       actionLabel: context.t("open"),
+      mention,
     });
   } catch (error) {
     console.error("Deciding about a message notification failed", error);
