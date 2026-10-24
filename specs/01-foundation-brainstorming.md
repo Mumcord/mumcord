@@ -896,3 +896,13 @@ Measured in `specs/01-foundation-scale-report.md`; performance fixes are done wi
 ✍️ Note: Asked and answered in chat during /dev.
 
 ---
+
+#### QA.30 From how many people should an expanded channel show the avatar stack? `◉`
+
+- [x] **More than 5 people (was more than 10).** Collapsed channels always show it.
+- [ ] Always.
+- [ ] Keep more than 10.
+
+✍️ Note: Asked and answered in chat during /dev.
+
+---
