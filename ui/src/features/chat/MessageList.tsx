@@ -4,10 +4,18 @@
  * scroll-back paging and a single Tab stop with arrow-key navigation between messages. Links open
  * only on click.
  */
-import { useEffect, useLayoutEffect, useMemo, useRef, useState, type KeyboardEvent } from "react";
+import {
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+  type KeyboardEvent,
+  type ReactNode,
+} from "react";
 import { useTranslation } from "react-i18next";
 import type { ChatDisplay, ChatMessage } from "../../api";
-import { Avatar } from "../members";
+import { Avatar, ProfilePreviewTrigger } from "../members";
 import type { ConversationLog } from "./chatStore";
 import { daysAgo, messageLayout } from "./grouping";
 import { openLink } from "./openLink";
@@ -249,18 +257,27 @@ function MessageItem({
 }: MessageItemProps) {
   const sentAt = new Date(message.sentAt);
   const session = message.senderSession;
+  // Live senders other than oneself get the profile preview on hover/focus of avatar and name.
+  const preview = (content: ReactNode) =>
+    session !== null && !message.own ? (
+      <ProfilePreviewTrigger session={session}>{content}</ProfilePreviewTrigger>
+    ) : (
+      content
+    );
   const sender =
     onOpenProfile && session !== null && !message.own ? (
-      <button
-        type="button"
-        className="chat-message__sender chat-message__sender--button"
-        tabIndex={tabIndex}
-        onClick={(event) => {
-          onOpenProfile(session, event.currentTarget);
-        }}
-      >
-        {message.senderName}
-      </button>
+      preview(
+        <button
+          type="button"
+          className="chat-message__sender chat-message__sender--button"
+          tabIndex={tabIndex}
+          onClick={(event) => {
+            onOpenProfile(session, event.currentTarget);
+          }}
+        >
+          {message.senderName}
+        </button>,
+      )
     ) : (
       <span className="chat-message__sender">{message.senderName}</span>
     );
@@ -281,7 +298,7 @@ function MessageItem({
     row = (
       <div className="chat-message__row">
         <div className="chat-message__gutter">
-          <Avatar name={message.senderName} src={avatar} />
+          {preview(<Avatar name={message.senderName} src={avatar} />)}
         </div>
         <div className="chat-message__content">
           <div className="chat-message__header">

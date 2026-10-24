@@ -6,11 +6,12 @@
 import DOMPurify from "dompurify";
 import { useCallback, useEffect, useId, useRef, useState, type KeyboardEvent } from "react";
 import { useTranslation } from "react-i18next";
-import { getApi, toEngineError, type PersonProfile, type User } from "../../api";
+import { getApi, toEngineError, type User } from "../../api";
 import { useServerState } from "../channels/serverStore";
 import "./members.css";
 import { Avatar } from "./Avatar";
 import { openPrivateConversation, type SendPrivateMessage } from "./privateMessage";
+import { usePersonProfile } from "./usePersonProfile";
 
 /** Delay before a slider change is sent, so dragging doesn't fire a command per pixel. */
 export const VOLUME_DEBOUNCE_MS = 150;
@@ -107,25 +108,8 @@ function ProfileBody({
   onSendPrivateMessage: () => void;
 }) {
   const { t } = useTranslation("members");
-  const [profile, setProfile] = useState<PersonProfile | null>(null);
-  const [loadError, setLoadError] = useState(false);
+  const { profile, loadError } = usePersonProfile(user.session);
   const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    let active = true;
-    getApi()
-      .personProfile(user.session)
-      .then((loaded) => {
-        if (active) setProfile(loaded);
-      })
-      .catch((cause: unknown) => {
-        console.error("Loading a profile failed", toEngineError(cause).code);
-        if (active) setLoadError(true);
-      });
-    return () => {
-      active = false;
-    };
-  }, [user.session]);
 
   const report = (cause: unknown) => {
     const code = toEngineError(cause).code;

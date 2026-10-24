@@ -1,0 +1,78 @@
+/* Box around the person (row, avatar or name) so the preview is placed next to all of it; flex
+   so an inline avatar inside adds no line-height gap. */
+.profile-preview-trigger {
+  display: flex;
+  align-items: center;
+  /* Takes the parent's spacing when it wraps several row parts (avatar and name in the tree). */
+  gap: inherit;
+  min-width: 0;
+}
+
+.profile-preview {
+  /* Fixed in the viewport and out of the flow: opening it never shifts the layout. */
+  position: fixed;
+  z-index: 50;
+  top: 0;
+  left: 0;
+  width: min(18rem, calc(100vw - 2 * var(--space-2)));
+  padding: var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background: var(--color-bg-elevated);
+  color: var(--color-text);
+  box-shadow: var(--shadow-raised);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .profile-preview {
+    animation: profile-preview-in 120ms ease-out;
+  }
+}
+
+@keyframes profile-preview-in {
+  from {
+    opacity: 0;
+  }
+}
+
+.profile-preview__header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.profile-preview__identity {
+  min-width: 0;
+}
+
+.profile-preview__name {
+  margin: 0;
+  overflow: hidden;
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-bold);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.profile-preview__meta,
+.profile-preview__voice {
+  margin: var(--space-1) 0 0;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+}
+
+.profile-preview__voice::first-letter {
+  text-transform: uppercase;
+}
+
+.profile-preview__comment {
+  max-height: 10rem;
+  margin-top: var(--space-3);
+  overflow-y: auto;
+  overflow-wrap: anywhere;
+  font-size: var(--font-size-sm);
+}
+
+.profile-preview__comment img {
+  max-width: 100%;
+}

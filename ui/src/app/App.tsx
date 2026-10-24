@@ -1,5 +1,6 @@
 import { useTranslation } from "react-i18next";
 import { LiveRegions } from "../a11y";
+import { ProfilePreviewHost } from "../features/members";
 import { NotificationsHost } from "../features/notifications";
 import { AppShell } from "./AppShell";
 import {
@@ -32,6 +33,7 @@ function MainScreen() {
         }}
       />
       {overlay === "settings" && <SettingsOverlay onClose={closeOverlay} />}
+      {overlay === null && <ProfilePreviewHost />}
       <NotificationsHost overlayOpen={overlay !== null} onOpenChat={closeOverlay} />
     </>
   );

@@ -196,6 +196,10 @@
   text-indent: calc(-1 * var(--space-5));
 }
 
+.chat-list__items[data-display="compact"] .profile-preview-trigger {
+  display: inline;
+}
+
 .chat-list__items[data-display="compact"] .chat-message--start .chat-message__row {
   margin-top: var(--space-2);
   padding-top: 0.0625rem;

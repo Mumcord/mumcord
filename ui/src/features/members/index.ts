@@ -7,3 +7,5 @@ export {
   type SendPrivateMessage,
 } from "./privateMessage";
 export { Avatar } from "./Avatar";
+export { ProfilePreviewHost, ProfilePreviewTrigger } from "./ProfilePreview";
+export { previewOnFocus, releasePreview } from "./profilePreviewStore";

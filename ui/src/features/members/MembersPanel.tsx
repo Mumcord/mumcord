@@ -1,6 +1,7 @@
 /**
  * Member column: the people in the selected channel, then a "Listening" section. All people
- * share one Tab stop (roving tabindex, Up/Down/Home/End); Enter or click opens the profile card.
+ * share one Tab stop (roving tabindex, Up/Down/Home/End); Enter or click opens the profile card,
+ * hover or keyboard focus shows the profile preview.
  */
 import { useRef, useState, type KeyboardEvent } from "react";
 import { useTranslation } from "react-i18next";
@@ -13,6 +14,7 @@ import "./members.css";
 import { Avatar } from "./Avatar";
 import type { SendPrivateMessage } from "./privateMessage";
 import { useAvatars } from "./useAvatars";
+import { ProfilePreviewTrigger } from "./ProfilePreview";
 import { useProfileCard } from "./useProfileCard";
 
 const byName = (a: User, b: User) =>
@@ -78,27 +80,31 @@ export function MembersPanel({ onSendPrivateMessage }: MembersPanelProps) {
     const status = statusText(user, talking, listener);
     return (
       <li key={key}>
-        <button
-          type="button"
-          className="member"
-          data-key={key}
-          data-talking={talking}
-          tabIndex={key === tabStop ? 0 : -1}
-          onFocus={() => {
-            setFocusedKey(key);
-          }}
-          onClick={(event) => {
-            openProfile(user.session, event.currentTarget);
-          }}
-        >
-          <Avatar name={user.name} src={avatarOf(user)} talking={talking} />
-          <span className="member__name">
-            {user.name}
-            {user.session === state.selfSession && <span className="member__you"> {t("you")}</span>}
-            {status.length > 0 && <span className="visually-hidden">, {status.join(", ")}</span>}
-          </span>
-          <StatusIcons user={user} listener={listener} />
-        </button>
+        <ProfilePreviewTrigger session={user.session}>
+          <button
+            type="button"
+            className="member"
+            data-key={key}
+            data-talking={talking}
+            tabIndex={key === tabStop ? 0 : -1}
+            onFocus={() => {
+              setFocusedKey(key);
+            }}
+            onClick={(event) => {
+              openProfile(user.session, event.currentTarget);
+            }}
+          >
+            <Avatar name={user.name} src={avatarOf(user)} talking={talking} />
+            <span className="member__name">
+              {user.name}
+              {user.session === state.selfSession && (
+                <span className="member__you"> {t("you")}</span>
+              )}
+              {status.length > 0 && <span className="visually-hidden">, {status.join(", ")}</span>}
+            </span>
+            <StatusIcons user={user} listener={listener} />
+          </button>
+        </ProfilePreviewTrigger>
       </li>
     );
   };

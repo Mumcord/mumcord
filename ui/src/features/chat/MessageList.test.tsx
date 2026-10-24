@@ -1,8 +1,13 @@
-import { render, screen, within } from "@testing-library/react";
-import { beforeAll, describe, expect, it } from "vitest";
+import { fireEvent, render, screen, within } from "@testing-library/react";
+import { beforeAll, describe, expect, it, vi } from "vitest";
 import type { ChatDisplay, ChatMessage } from "../../api";
 import { applyLanguage } from "../../i18n";
 import { axeViolations } from "../../test/axe";
+import {
+  closePreview,
+  currentPreview,
+  PREVIEW_OPEN_DELAY_MS,
+} from "../members/profilePreviewStore";
 import { MessageList } from "./MessageList";
 
 const AVATAR = "data:image/png;base64,iVBORw0KGgo=";
@@ -42,6 +47,37 @@ function renderList(display: ChatDisplay, messages = MESSAGES) {
 
 beforeAll(async () => {
   await applyLanguage("en");
+});
+
+describe("MessageList profile preview", () => {
+  it("previews live senders on hover of avatar or name, not oneself", () => {
+    const messages = [
+      { ...message("1", "Maya", 30, "first"), senderSession: 7 },
+      { ...message("2", "Jonas", 28, "mine"), senderSession: 1, own: true },
+    ];
+    const { container } = render(
+      <MessageList
+        log={{ messages, loaded: true, loading: false, hasMore: false, loadFailed: false }}
+        label="Messages in #Lobby"
+        onLoadOlder={() => undefined}
+        onOpenProfile={() => undefined}
+      />,
+    );
+    const triggers = container.querySelectorAll(".profile-preview-trigger");
+    expect(triggers).toHaveLength(2);
+    expect(triggers[0]?.querySelector(".avatar")).not.toBeNull();
+    expect(triggers[1]).toContainElement(screen.getByRole("button", { name: "Maya" }));
+
+    vi.useFakeTimers();
+    try {
+      fireEvent.pointerEnter(triggers[0] as Element, { pointerType: "mouse" });
+      vi.advanceTimersByTime(PREVIEW_OPEN_DELAY_MS);
+      expect(currentPreview()?.session).toBe(7);
+    } finally {
+      closePreview();
+      vi.useRealTimers();
+    }
+  });
 });
 
 describe("MessageList cozy", () => {
