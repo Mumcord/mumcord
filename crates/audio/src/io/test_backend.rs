@@ -124,8 +124,10 @@ impl Backend for TestBackend {
     }
 }
 
-/// A thread that calls a tick function every 10 ms on a fixed schedule,
-/// catching up after oversleeping like a device would.
+/// A thread that calls a tick function once per 10 ms of elapsed wall-clock
+/// time, like a device callback. Sleeps may overshoot (Windows timers tick at
+/// ~15.6 ms, loaded machines preempt), so every wake-up runs all ticks that
+/// came due meanwhile instead of assuming one tick per sleep.
 struct TickThread {
     stop: Arc<AtomicBool>,
     failed: Arc<AtomicBool>,
@@ -145,19 +147,27 @@ impl TickThread {
             .name(name.to_owned())
             .spawn(move || {
                 let mut tick = make_tick(thread_stop.clone());
-                let mut next = Instant::now();
+                let mut schedule = Schedule::new(Instant::now());
                 loop {
+                    // One last tick after the stop request lets it flush.
                     let stopping = thread_stop.load(Ordering::Relaxed);
-                    if let Err(e) = tick() {
-                        tracing::error!("test audio backend failed: {e}");
-                        thread_failed.store(true, Ordering::Relaxed);
-                        return;
+                    let due = if stopping {
+                        1
+                    } else {
+                        schedule.due(Instant::now())
+                    };
+                    for _ in 0..due {
+                        if let Err(e) = tick() {
+                            tracing::error!("test audio backend failed: {e}");
+                            thread_failed.store(true, Ordering::Relaxed);
+                            return;
+                        }
                     }
                     if stopping {
                         return;
                     }
-                    next += TICK;
-                    if let Some(wait) = next.checked_duration_since(Instant::now()) {
+                    schedule.complete(due);
+                    if let Some(wait) = schedule.next_at().checked_duration_since(Instant::now()) {
                         std::thread::sleep(wait);
                     }
                 }
@@ -168,6 +178,39 @@ impl TickThread {
             failed,
             handle: Some(handle),
         })
+    }
+}
+
+/// Fixed 10 ms tick grid anchored at the start time; tick `n` is due at
+/// `start + n * TICK`.
+struct Schedule {
+    start: Instant,
+    done: u64,
+}
+
+impl Schedule {
+    fn new(start: Instant) -> Self {
+        Self { start, done: 0 }
+    }
+
+    /// Ticks due by `now` that have not run yet (0 after an early wake-up).
+    fn due(&self, now: Instant) -> u64 {
+        let elapsed = now.saturating_duration_since(self.start).as_nanos() / TICK.as_nanos();
+        u64::try_from(elapsed + 1)
+            .unwrap_or(u64::MAX)
+            .saturating_sub(self.done)
+    }
+
+    fn complete(&mut self, ticks: u64) {
+        self.done += ticks;
+    }
+
+    /// When the next tick is due.
+    fn next_at(&self) -> Instant {
+        let nanos = u64::try_from(TICK.as_nanos())
+            .unwrap_or(u64::MAX)
+            .saturating_mul(self.done);
+        self.start + Duration::from_nanos(nanos)
     }
 }
 
@@ -229,4 +272,68 @@ fn to_i16(sample: f32) -> i16 {
 
 fn wav_err(err: hound::Error) -> IoError {
     IoError::Backend(format!("wav: {err}"))
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    /// Windows' default timer resolution: sleeps end on a 15.625 ms grid.
+    const GRANULARITY: Duration = Duration::from_micros(15_625);
+
+    /// Wakes at the first timer interrupt at or after `deadline`.
+    fn coarse_wake(start: Instant, deadline: Instant) -> Instant {
+        let wanted = deadline.saturating_duration_since(start).as_nanos();
+        let step = GRANULARITY.as_nanos();
+        let steps = wanted.div_ceil(step) + 1;
+        start + Duration::from_nanos(u64::try_from(steps * step).expect("fits"))
+    }
+
+    #[test]
+    fn schedule_keeps_real_time_pace_with_coarse_sleeps() {
+        let start = Instant::now();
+        let mut schedule = Schedule::new(start);
+        // A producer queues one 10 ms block per 10 ms; the tick drains one
+        // block per due tick, as the playback thread does.
+        let mut produced = 0u64;
+        let mut drained = 0u64;
+        let mut max_queued = 0u64;
+        let mut now = start;
+        while now < start + Duration::from_secs(5) {
+            let due = schedule.due(now);
+            produced = (now - start).as_millis() as u64 / 10 + 1;
+            drained = (drained + due).min(produced);
+            schedule.complete(due);
+            max_queued = max_queued.max(produced - drained);
+            now = coarse_wake(start, schedule.next_at());
+            // Production that happened while asleep, before the drain.
+            let arrived = (now - start).as_millis() as u64 / 10 + 1;
+            max_queued = max_queued.max(arrived - drained);
+        }
+        // One wake-up is at most ~2 timer periods, so the queue never holds
+        // more than a few blocks and never grows over time.
+        assert!(max_queued <= 4, "queue reached {max_queued} blocks");
+        assert!(
+            produced - drained <= 1,
+            "lagging {} blocks",
+            produced - drained
+        );
+    }
+
+    #[test]
+    fn schedule_catches_up_after_a_long_stall_and_ignores_early_wakes() {
+        let start = Instant::now();
+        let mut schedule = Schedule::new(start);
+        assert_eq!(schedule.due(start), 1);
+        schedule.complete(1);
+        // Woken before the next tick: nothing to do yet.
+        assert_eq!(schedule.due(start + Duration::from_millis(9)), 0);
+        assert_eq!(schedule.next_at(), start + TICK);
+        // Descheduled for a second: all 100 missed ticks run at once.
+        let late = start + Duration::from_millis(1_000);
+        assert_eq!(schedule.due(late), 100);
+        schedule.complete(100);
+        assert_eq!(schedule.due(late), 0);
+        assert_eq!(schedule.next_at(), start + Duration::from_millis(1_010));
+    }
 }

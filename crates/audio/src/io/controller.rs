@@ -457,12 +457,24 @@ mod tests {
                 "capture stalled"
             );
             // Paced like a real mixer: the capture and playback threads run
-            // on independent clocks, so after a scheduling hiccup the
-            // playback queue may briefly be full; wait for room instead of
-            // dropping the frame.
-            let deadline = Instant::now() + Duration::from_secs(2);
+            // on independent clocks, and the capture backlog built up while
+            // the output opened keeps the playback queue near full, so wait
+            // for room instead of dropping the frame. A loaded runner can
+            // deschedule the whole process for seconds and wake this thread
+            // before the playback thread catches up, so only fail when the
+            // queue stops draining for a long time, not on wall-clock alone.
+            let mut queued = sink.queued_samples();
+            let mut last_drain = Instant::now();
             while !sink.write_frame(&frame) {
-                assert!(Instant::now() < deadline, "playback queue stuck full");
+                let now_queued = sink.queued_samples();
+                if now_queued < queued {
+                    last_drain = Instant::now();
+                }
+                queued = now_queued;
+                assert!(
+                    last_drain.elapsed() < Duration::from_secs(10),
+                    "playback queue stuck full"
+                );
                 std::thread::sleep(Duration::from_millis(1));
             }
             frames += 1;
