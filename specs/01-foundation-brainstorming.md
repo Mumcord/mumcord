@@ -636,3 +636,14 @@ Fresh = user-initiated (app start, server switch, manual reconnect). Automatic r
 ✍️ Note: Asked and answered in chat during /dev.
 
 ---
+
+#### QA.4 Mouse buttons (e.g. side buttons) as push-to-talk? `◉`
+Keyboard push-to-talk on Wayland stays on the desktop portal (Q4.11); the portal cannot capture mouse buttons.
+
+- [x] **Native mouse-button support on Windows, macOS (Accessibility permission prompt) and X11, and on Linux Wayland by reading input devices directly (evdev).** The Wayland path is off by default, needs a settings toggle and membership in the `input` group (security warning shown); only mouse-type devices are opened, only the one configured button is used, input is never logged; without permission the exact fix command is shown and Mumcord falls back gracefully.
+- [ ] Native support plus a hint how to remap the mouse button to a key in KDE (no evdev path).
+- [ ] Later (keyboard only for now).
+
+✍️ Note: Asked and answered in chat during /dev.
+
+---
