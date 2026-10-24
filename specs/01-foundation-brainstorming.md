@@ -855,3 +855,13 @@ Prototype with before/after screenshots on branch `design-refresh-proto` (`specs
 ✍️ Note: Requested in chat during /dev.
 
 ---
+
+#### QA.26 Tidy up the user panel? `◉`
+The panel at the bottom of the channel column looks cramped, the line above it looks odd, and the own name gets cut off.
+
+- [x] **Two rows: top row avatar + full own name (wrapping to two lines or shrinking font slightly before ever cutting it off, full name in a tooltip) with the connection status/server underneath; bottom row the buttons (mute, deafen, disconnect, connection quality, settings) evenly spaced.** No separator line above the panel; it is set off by a slightly different background instead. The microphone button shows the live input level as a fill rising from the bottom while the user speaks (not while muted).
+- [ ] Keep one row.
+
+✍️ Note: Requested in chat during /dev.
+
+---
