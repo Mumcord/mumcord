@@ -4,7 +4,15 @@
  * Shift+Enter joins a channel; with the mouse a click selects and a double-click or the "Join"
  * button joins.
  */
-import { useId, useMemo, useRef, useState, type KeyboardEvent, type ReactNode } from "react";
+import {
+  Fragment,
+  useId,
+  useMemo,
+  useRef,
+  useState,
+  type KeyboardEvent,
+  type ReactNode,
+} from "react";
 import { useTranslation } from "react-i18next";
 import type { User } from "../../api";
 import "./channels.css";
@@ -181,82 +189,87 @@ export function ChannelTree({
     const expanded = expandable && !collapsed.has(channel.id);
     const count = node.members.length;
     const isOwn = channel.id === selfChannelId;
+    const groupId = `${hintId}-group-${rowId}`;
+    // The group is a DOM sibling (linked via aria-owns) so the treeitem's visible
+    // content is only its own row; WCAG 2.5.3 label-in-name then matches its name.
     return (
-      // Keyboard input is handled once on the tree (roving focus), not per item.
-      // eslint-disable-next-line jsx-a11y/click-events-have-key-events
-      <div
-        key={rowId}
-        role="treeitem"
-        aria-level={level}
-        aria-selected={channel.id === selectedChannelId}
-        aria-expanded={expandable ? expanded : undefined}
-        aria-labelledby={labelId}
-        aria-keyshortcuts="Shift+Enter"
-        tabIndex={tabStopId === rowId ? 0 : -1}
-        data-row={rowId}
-        className="tree-channel"
-        onFocus={(event) => {
-          if (event.target === event.currentTarget) setFocusedId(rowId);
-        }}
-        onClick={(event) => {
-          event.stopPropagation();
-          setFocusedId(rowId);
-          onSelect(channel.id);
-          // Real mice: the second click (detail >= 2) joins even if the native dblclick lands elsewhere.
-          if (event.detail >= 2) joinOnce(channel.id, event.timeStamp);
-        }}
-        onDoubleClick={(event) => {
-          event.stopPropagation();
-          joinOnce(channel.id, event.timeStamp);
-        }}
-      >
-        <div className="tree-channel__row" data-selected={channel.id === selectedChannelId}>
-          <span
-            className="tree-channel__toggle"
-            data-expandable={expandable}
-            aria-hidden="true"
-            onClick={(event) => {
-              if (!expandable) return;
-              event.stopPropagation();
-              setExpanded(channel.id, !expanded);
-            }}
-            onDoubleClick={(event) => {
-              event.stopPropagation();
-            }}
-          >
-            {expanded ? "▾" : "▸"}
-          </span>
-          <span id={labelId} className="tree-channel__label">
-            <span className="tree-channel__name">{channel.name}</span>
-            {isOwn && <span className="visually-hidden">, {t("tree.yourChannel")}</span>}
-            {count > 0 && (
-              <span className="tree-channel__count">
-                <span aria-hidden="true">{count}</span>
-                <span className="visually-hidden">, {t("tree.people", { count })}</span>
-              </span>
-            )}
-            {channelBadge?.(channel.id)}
-          </span>
-          {!isOwn && channel.permissions.enter && (
-            <button
-              type="button"
-              className="tree-channel__join"
-              tabIndex={-1}
+      <Fragment key={rowId}>
+        {/* Keyboard input is handled once on the tree (roving focus), not per item. */}
+        {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events */}
+        <div
+          role="treeitem"
+          aria-level={level}
+          aria-owns={expanded ? groupId : undefined}
+          aria-selected={channel.id === selectedChannelId}
+          aria-expanded={expandable ? expanded : undefined}
+          aria-labelledby={labelId}
+          aria-keyshortcuts="Shift+Enter"
+          tabIndex={tabStopId === rowId ? 0 : -1}
+          data-row={rowId}
+          className="tree-channel"
+          onFocus={(event) => {
+            if (event.target === event.currentTarget) setFocusedId(rowId);
+          }}
+          onClick={(event) => {
+            event.stopPropagation();
+            setFocusedId(rowId);
+            onSelect(channel.id);
+            // Real mice: the second click (detail >= 2) joins even if the native dblclick lands elsewhere.
+            if (event.detail >= 2) joinOnce(channel.id, event.timeStamp);
+          }}
+          onDoubleClick={(event) => {
+            event.stopPropagation();
+            joinOnce(channel.id, event.timeStamp);
+          }}
+        >
+          <div className="tree-channel__row" data-selected={channel.id === selectedChannelId}>
+            <span
+              className="tree-channel__toggle"
+              data-expandable={expandable}
               aria-hidden="true"
               onClick={(event) => {
+                if (!expandable) return;
                 event.stopPropagation();
-                onJoin(channel.id);
+                setExpanded(channel.id, !expanded);
               }}
               onDoubleClick={(event) => {
                 event.stopPropagation();
               }}
             >
-              {t("tree.join")}
-            </button>
-          )}
+              {expanded ? "▾" : "▸"}
+            </span>
+            <span id={labelId} className="tree-channel__label">
+              <span className="tree-channel__name">{channel.name}</span>
+              {isOwn && <span className="visually-hidden">, {t("tree.yourChannel")}</span>}
+              {count > 0 && (
+                <span className="tree-channel__count">
+                  <span aria-hidden="true">{count}</span>
+                  <span className="visually-hidden">, {t("tree.people", { count })}</span>
+                </span>
+              )}
+              {channelBadge?.(channel.id)}
+            </span>
+            {!isOwn && channel.permissions.enter && (
+              <button
+                type="button"
+                className="tree-channel__join"
+                tabIndex={-1}
+                aria-hidden="true"
+                onClick={(event) => {
+                  event.stopPropagation();
+                  onJoin(channel.id);
+                }}
+                onDoubleClick={(event) => {
+                  event.stopPropagation();
+                }}
+              >
+                {t("tree.join")}
+              </button>
+            )}
+          </div>
         </div>
         {expanded && (
-          <div role="group">
+          <div role="group" id={groupId}>
             {node.members.map((u) => personItem(u, memberRowId(u.session), level + 1, false))}
             {node.listeners.map((u) =>
               personItem(u, listenerRowId(channel.id, u.session), level + 1, true),
@@ -264,7 +277,7 @@ export function ChannelTree({
             {node.children.map((child) => channelItem(child, level + 1))}
           </div>
         )}
-      </div>
+      </Fragment>
     );
   };
 

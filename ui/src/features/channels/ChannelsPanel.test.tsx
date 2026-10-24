@@ -43,7 +43,8 @@ describe("ChannelsPanel", () => {
     expect(lobby).toHaveAttribute("aria-keyshortcuts", "Shift+Enter");
     expect(lobby).toHaveAccessibleName(/your channel, 3 people/);
     expect(item(/^Ben/)).toHaveAccessibleName(/not registered/);
-    const carla = within(lobby).getByRole("treeitem", { name: /^Carla/ });
+    const group = document.getElementById(lobby.getAttribute("aria-owns") ?? "") as HTMLElement;
+    const carla = within(group).getByRole("treeitem", { name: /^Carla/ });
     expect(carla).toHaveAccessibleName(/listening/);
     expect(carla.querySelector(".person-icon")).not.toBeNull();
     expect(screen.getByText(/Shift\+Enter or double-click: join/)).toBeInTheDocument();
@@ -183,6 +184,18 @@ describe("ChannelsPanel", () => {
     });
     expect(await axeViolations(container)).toEqual([]);
   });
+
+  it.each(["dark", "light"] as const)(
+    "expanded channels with members keep label-in-name (%s)",
+    async (theme) => {
+      applyThemeToDocument(theme);
+      const { container } = await renderPanel();
+      const expanded = container.querySelector('[role="treeitem"][aria-expanded="true"]');
+      expect(expanded).not.toBeNull();
+      expect(expanded?.textContent).not.toContain("(you)");
+      expect(await axeViolations(container)).toEqual([]);
+    },
+  );
 });
 
 describe("announcements", () => {
