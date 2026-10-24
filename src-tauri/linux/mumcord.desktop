@@ -1,0 +1,12 @@
+[Desktop Entry]
+Type=Application
+Name={{name}}
+{{#if comment}}
+Comment={{comment}}
+{{/if}}
+Exec={{exec}} %u
+Icon={{icon}}
+Terminal=false
+Categories=Network;Chat;AudioVideo;
+MimeType=x-scheme-handler/mumble;
+StartupWMClass=app.mumcord.client

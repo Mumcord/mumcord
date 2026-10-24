@@ -79,7 +79,7 @@ pub fn deep_link_take_pending(app: AppHandle) -> ApiResult<Option<MumbleLink>> {
 }
 
 #[cfg(not(target_os = "macos"))]
-fn link_error(e: &tauri_plugin_deep_link::Error) -> ApiError {
+fn link_error(e: &dyn std::fmt::Display) -> ApiError {
     tracing::warn!(error = %e, "mumble:// handler registration failed");
     ApiError::new(ErrorCode::Internal, e.to_string())
 }
@@ -95,7 +95,7 @@ fn handler_register(_app: &AppHandle) -> ApiResult<()> {
     Ok(())
 }
 
-#[cfg(not(target_os = "macos"))]
+#[cfg(target_os = "windows")]
 fn handler_status(app: &AppHandle) -> ApiResult<bool> {
     use tauri_plugin_deep_link::DeepLinkExt;
     app.deep_link()
@@ -103,10 +103,21 @@ fn handler_status(app: &AppHandle) -> ApiResult<bool> {
         .map_err(|e| link_error(&e))
 }
 
-#[cfg(not(target_os = "macos"))]
+#[cfg(target_os = "windows")]
 fn handler_register(app: &AppHandle) -> ApiResult<()> {
     use tauri_plugin_deep_link::DeepLinkExt;
     app.deep_link()
         .register(deeplink::SCHEME)
         .map_err(|e| link_error(&e))
+}
+
+// Linux uses the app-ID desktop entry, so the handler and the taskbar share one entry.
+#[cfg(target_os = "linux")]
+fn handler_status(app: &AppHandle) -> ApiResult<bool> {
+    crate::desktop_entry::is_handler(app).map_err(|e| link_error(&e))
+}
+
+#[cfg(target_os = "linux")]
+fn handler_register(app: &AppHandle) -> ApiResult<()> {
+    crate::desktop_entry::register_handler(app).map_err(|e| link_error(&e))
 }

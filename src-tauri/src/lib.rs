@@ -2,6 +2,8 @@
 
 mod commands;
 mod deeplink;
+#[cfg(target_os = "linux")]
+mod desktop_entry;
 mod display;
 mod ptt;
 mod tray;
@@ -115,6 +117,13 @@ pub fn run() {
     let context = tauri::generate_context!();
     // Before anything else starts a thread or GTK: it may switch to XWayland (FR-1.48).
     display::prepare(&context.config().identifier);
+    #[cfg(target_os = "linux")]
+    {
+        // The Wayland app ID comes from the program name; it must match the desktop entry
+        // (`desktop_entry`) for the taskbar icon. Set before GTK starts.
+        gdk::glib::set_prgname(Some(context.config().identifier.as_str()));
+        ptt::set_host_app_id(&context.config().identifier);
+    }
 
     let builder = specta_builder();
 
@@ -143,6 +152,8 @@ pub fn run() {
             start_engine(app.handle())?;
             tray::init(app.handle());
             deeplink::init(app.handle());
+            #[cfg(target_os = "linux")]
+            desktop_entry::ensure(app.handle());
             Ok(())
         })
         .run(context);
