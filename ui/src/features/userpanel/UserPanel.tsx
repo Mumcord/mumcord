@@ -4,6 +4,7 @@ import { announce } from "../../a11y";
 import { useView } from "../../app/view";
 import { getApi } from "../../api";
 import { ConnectionInfo } from "../connection";
+import { useAvatars } from "../members/useAvatars";
 import { describeError } from "./errors";
 import { ProfileDialog } from "./ProfileDialog";
 import { RegisterDialog } from "./RegisterDialog";
@@ -31,6 +32,8 @@ export function UserPanel() {
   const { openSettings } = useView();
   const state = useUserPanel();
   const self = state.self;
+  const avatarOf = useAvatars(self ? [self] : []);
+  const avatarSrc = self ? avatarOf(self) : null;
   const [menuOpen, setMenuOpen] = useState(false);
   const [dialog, setDialog] = useState<Dialog>(null);
   const [error, setError] = useState<string | null>(null);
@@ -109,6 +112,7 @@ export function UserPanel() {
           ref={menuButton}
           type="button"
           className="userpanel__user"
+          title={name}
           aria-haspopup="menu"
           aria-expanded={menuOpen}
           aria-controls={menuOpen ? menuId : undefined}
@@ -118,9 +122,15 @@ export function UserPanel() {
           }}
         >
           <span className="userpanel-avatar" aria-hidden="true">
-            {name.slice(0, 1).toUpperCase()}
+            {avatarSrc ? (
+              <img className="userpanel-avatar__img" src={avatarSrc} alt="" />
+            ) : (
+              name.slice(0, 1).toUpperCase()
+            )}
           </span>
-          <span className="userpanel__name">{name}</span>
+          <span className="userpanel__name" title={name}>
+            {name}
+          </span>
         </button>
         <button
           type="button"
