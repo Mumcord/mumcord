@@ -196,7 +196,10 @@ async fn tofu_voice_mute_and_reconnect() {
         .iter()
         .find(|u| u.session == snapshot.self_session)
         .expect("own user");
-    assert!(me.self_mute && me.self_deaf, "read-only after a fresh connect");
+    assert!(
+        me.self_mute && me.self_deaf,
+        "read-only after a fresh connect"
+    );
     bot.wait_user(
         &name,
         &UserCheck {
