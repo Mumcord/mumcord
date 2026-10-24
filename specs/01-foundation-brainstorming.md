@@ -797,3 +797,12 @@ Desktop notifications were planned for Epic 3.
 ✍️ Note: Requested in chat during /dev.
 
 ---
+
+#### QA.20 Avatars in the chat? `◉`
+
+- [x] **Discord-style message layout: the sender's avatar on the left of each message group, name and time on the first line, message text indented to start after the avatar. Consecutive messages from the same sender within a few minutes are grouped without repeating avatar and name, and stay indented the same way.**
+- [ ] Keep the current layout.
+
+✍️ Note: Requested in chat during /dev.
+
+---
