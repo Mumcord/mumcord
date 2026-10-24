@@ -62,6 +62,16 @@ pub struct PttMouseStatus {
     pub state: PttMouseState,
 }
 
+/// The desktop session as far as push-to-talk is concerned (FR-1.48).
+#[derive(Serialize, Deserialize, Clone, Copy, Debug, PartialEq, Eq, Type)]
+#[serde(rename_all = "camelCase")]
+pub struct PttSession {
+    /// Linux with a Wayland desktop: the compatibility mode switch applies.
+    pub wayland_desktop: bool,
+    /// Mumcord currently runs through XWayland and uses the X11 push-to-talk path.
+    pub compatibility_active: bool,
+}
+
 #[tauri::command]
 #[specta::specta]
 pub async fn ptt_availability() -> ApiResult<PttAvailability> {
@@ -73,6 +83,18 @@ pub async fn ptt_availability() -> ApiResult<PttAvailability> {
 #[specta::specta]
 pub async fn ptt_mouse_status() -> ApiResult<PttMouseStatus> {
     Ok(ptt::mouse_status())
+}
+
+/// Whether the compatibility mode switch applies and whether it is in effect right now; the
+/// stored setting only takes effect after `app_restart`.
+#[tauri::command]
+#[specta::specta]
+pub fn ptt_session() -> ApiResult<PttSession> {
+    let env = ptt::SessionEnv::current();
+    Ok(PttSession {
+        wayland_desktop: env.wayland_desktop(),
+        compatibility_active: env.compatibility_active(),
+    })
 }
 
 /// Validates a key the UI captured (`KeyboardEvent.code` plus modifiers, e.g. "Ctrl+KeyA",

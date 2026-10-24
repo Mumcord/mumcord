@@ -113,8 +113,15 @@ export const commands = {
 	pttCaptureCancel: () => typedError<null, ApiError>(__TAURI_INVOKE("ptt_capture_cancel")),
 	/**  Whether mouse buttons can be used for push-to-talk, and why not (FR-1.21, AC-1.37). */
 	pttMouseStatus: () => typedError<PttMouseStatus, ApiError>(__TAURI_INVOKE("ptt_mouse_status")),
+	/**
+	 *  Whether the compatibility mode switch applies and whether it is in effect right now; the
+	 *  stored setting only takes effect after `app_restart`.
+	 */
+	pttSession: () => typedError<PttSession, ApiError>(__TAURI_INVOKE("ptt_session")),
 	/**  Answers `CloseRequested`; `remember` stores the choice as the close behaviour. */
 	closeChoice: (choice: CloseChoice, remember: boolean) => typedError<null, ApiError>(__TAURI_INVOKE("close_choice", { choice, remember })),
+	/**  Disconnects cleanly and starts Mumcord again, e.g. to apply compatibility mode (FR-1.48). */
+	appRestart: () => typedError<null, ApiError>(__TAURI_INVOKE("app_restart")),
 	/**  Whether Mumcord is the registered handler for `mumble://` links. */
 	linkHandlerStatus: () => typedError<boolean, ApiError>(__TAURI_INVOKE("link_handler_status")),
 	/**  Makes Mumcord the handler for `mumble://` links (FR-1.6). */
@@ -420,6 +427,14 @@ export type PttMouseSupport =
 /**  Linux Wayland: input devices are read directly, behind the opt-in setting. */
 "evdev" | "none";
 
+/**  The desktop session as far as push-to-talk is concerned (FR-1.48). */
+export type PttSession = {
+	/**  Linux with a Wayland desktop: the compatibility mode switch applies. */
+	waylandDesktop: boolean,
+	/**  Mumcord currently runs through XWayland and uses the X11 push-to-talk path. */
+	compatibilityActive: boolean,
+};
+
 export type PttUnavailableReason = 
 /**  Wayland session without the global-shortcuts portal. */
 "waylandNoPortal" | 
@@ -503,6 +518,11 @@ export type Settings = {
 	pttKey: string | null,
 	/**  Linux Wayland: "Allow mouse buttons (requires input group)" (default off, FR-1.39). */
 	allowMouseButtons: boolean,
+	/**
+	 *  Linux Wayland: "Compatibility mode (like TeamSpeak)", runs through XWayland with the X11
+	 *  push-to-talk path (default off, FR-1.48). Takes effect after `app_restart`.
+	 */
+	pttCompatibilityMode: boolean,
 	/**  Device ids from `audio_devices`; `null` uses the OS default. */
 	inputDevice: string | null,
 	outputDevice: string | null,

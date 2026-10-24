@@ -48,6 +48,14 @@ pub async fn close_choice(
     Ok(())
 }
 
+/// Disconnects cleanly and starts Mumcord again, e.g. to apply compatibility mode (FR-1.48).
+#[tauri::command]
+#[specta::specta]
+pub fn app_restart(app: AppHandle) -> ApiResult<()> {
+    window::restart(&app);
+    Ok(())
+}
+
 /// Whether Mumcord is the registered handler for `mumble://` links.
 #[tauri::command]
 #[specta::specta]

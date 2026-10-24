@@ -3,8 +3,11 @@
 //! Backends:
 //! - X11, Windows, macOS: `tauri-plugin-global-shortcut`, which reports key press and release.
 //! - Wayland sessions: the XDG desktop portal `GlobalShortcuts` interface (via `ashpd`). X11
-//!   key grabs through XWayland only fire while one of our own windows is focused, so a
-//!   Wayland session always uses the portal.
+//!   key grabs through XWayland only fire for focused windows unless the desktop allows more,
+//!   so the modern path always uses the portal.
+//! - Compatibility mode (FR-1.48): Mumcord itself runs through XWayland (`GDK_BACKEND=x11`,
+//!   see [`crate::display`]) and uses the X11 path; the desktop's legacy X11 setting decides
+//!   which global keys and mouse buttons reach it.
 //! - Mouse buttons (`MouseMiddle`, `Mouse4`, `Mouse5`): [`mouse`] with a native backend per
 //!   platform, or evdev on Wayland behind the opt-in setting (QA.4). Keyboard keys never
 //!   reach the mouse backend and mouse keys never reach the plugin or the portal.
@@ -242,24 +245,70 @@ pub fn cancel_capture() {
 }
 
 fn current_backend() -> Backend {
-    #[cfg(target_os = "linux")]
-    {
-        let session_type = std::env::var("XDG_SESSION_TYPE").ok();
-        let wayland_display = std::env::var("WAYLAND_DISPLAY").ok();
-        detect_backend(session_type.as_deref(), wayland_display.as_deref())
+    if SessionEnv::current().runs_on_wayland() {
+        Backend::Portal
+    } else {
+        Backend::GlobalShortcut
     }
-    #[cfg(not(target_os = "linux"))]
-    Backend::GlobalShortcut
 }
 
-/// Picks the backend from the session environment; `XDG_SESSION_TYPE` wins when set.
-#[cfg_attr(not(any(target_os = "linux", test)), allow(dead_code))]
-fn detect_backend(session_type: Option<&str>, wayland_display: Option<&str>) -> Backend {
-    match session_type.map(str::to_ascii_lowercase).as_deref() {
-        Some("wayland") => Backend::Portal,
-        Some("x11") => Backend::GlobalShortcut,
-        _ if wayland_display.is_some_and(|display| !display.is_empty()) => Backend::Portal,
-        _ => Backend::GlobalShortcut,
+/// The window-system environment this process sees (Linux only; elsewhere always empty).
+#[derive(Clone, Debug, Default, PartialEq, Eq)]
+pub struct SessionEnv {
+    pub session_type: Option<String>,
+    pub wayland_display: Option<String>,
+    pub gdk_backend: Option<String>,
+}
+
+impl SessionEnv {
+    /// Reads `XDG_SESSION_TYPE`, `WAYLAND_DISPLAY` and `GDK_BACKEND` from the environment.
+    pub fn current() -> Self {
+        #[cfg(target_os = "linux")]
+        {
+            Self {
+                session_type: std::env::var("XDG_SESSION_TYPE").ok(),
+                wayland_display: std::env::var("WAYLAND_DISPLAY").ok(),
+                gdk_backend: std::env::var("GDK_BACKEND").ok(),
+            }
+        }
+        #[cfg(not(target_os = "linux"))]
+        Self::default()
+    }
+
+    /// Whether the desktop session is Wayland; `XDG_SESSION_TYPE` wins when set.
+    pub fn wayland_desktop(&self) -> bool {
+        match self
+            .session_type
+            .as_deref()
+            .map(str::to_ascii_lowercase)
+            .as_deref()
+        {
+            Some("wayland") => true,
+            Some("x11") => false,
+            _ => self
+                .wayland_display
+                .as_deref()
+                .is_some_and(|display| !display.is_empty()),
+        }
+    }
+
+    /// Whether GTK is told to use X11 first, i.e. Mumcord runs through XWayland on a Wayland
+    /// desktop. `WAYLAND_DISPLAY` stays set then, so it alone says nothing about our windows.
+    pub fn gdk_prefers_x11(&self) -> bool {
+        self.gdk_backend
+            .as_deref()
+            .and_then(|list| list.split(',').next())
+            .is_some_and(|first| first.trim().eq_ignore_ascii_case("x11"))
+    }
+
+    /// Whether our windows talk to the Wayland compositor directly (portal path).
+    pub fn runs_on_wayland(&self) -> bool {
+        self.wayland_desktop() && !self.gdk_prefers_x11()
+    }
+
+    /// Compatibility mode in effect: a Wayland desktop with Mumcord on XWayland (FR-1.48).
+    pub fn compatibility_active(&self) -> bool {
+        self.wayland_desktop() && self.gdk_prefers_x11()
     }
 }
 
@@ -895,27 +944,45 @@ mod portal {
 mod tests {
     use super::*;
 
+    fn env(session: Option<&str>, display: Option<&str>, gdk: Option<&str>) -> SessionEnv {
+        SessionEnv {
+            session_type: session.map(str::to_owned),
+            wayland_display: display.map(str::to_owned),
+            gdk_backend: gdk.map(str::to_owned),
+        }
+    }
+
     #[test]
     fn wayland_session_uses_portal() {
-        assert_eq!(detect_backend(Some("wayland"), None), Backend::Portal);
-        assert_eq!(detect_backend(Some("Wayland"), Some("")), Backend::Portal);
-        assert_eq!(detect_backend(None, Some("wayland-0")), Backend::Portal);
-        assert_eq!(
-            detect_backend(Some("tty"), Some("wayland-0")),
-            Backend::Portal
-        );
+        assert!(env(Some("wayland"), None, None).runs_on_wayland());
+        assert!(env(Some("Wayland"), Some(""), None).runs_on_wayland());
+        assert!(env(None, Some("wayland-0"), None).runs_on_wayland());
+        assert!(env(Some("tty"), Some("wayland-0"), None).runs_on_wayland());
+        // GTK still picks Wayland first, so the portal stays in charge.
+        assert!(env(Some("wayland"), Some("wayland-0"), Some("wayland,x11")).runs_on_wayland());
+        assert!(env(Some("wayland"), Some("wayland-0"), Some("*")).runs_on_wayland());
     }
 
     #[test]
     fn x11_or_unknown_session_uses_global_shortcut() {
-        assert_eq!(detect_backend(Some("x11"), None), Backend::GlobalShortcut);
+        assert!(!env(Some("x11"), None, None).runs_on_wayland());
         // An explicit X11 session wins over a nested Wayland display.
-        assert_eq!(
-            detect_backend(Some("x11"), Some("wayland-0")),
-            Backend::GlobalShortcut
-        );
-        assert_eq!(detect_backend(None, None), Backend::GlobalShortcut);
-        assert_eq!(detect_backend(None, Some("")), Backend::GlobalShortcut);
+        assert!(!env(Some("x11"), Some("wayland-0"), None).runs_on_wayland());
+        assert!(!env(None, None, None).runs_on_wayland());
+        assert!(!env(None, Some(""), None).runs_on_wayland());
+    }
+
+    #[test]
+    fn xwayland_uses_the_x11_path_although_wayland_display_is_set() {
+        for gdk in ["x11", "X11", " x11 ,wayland"] {
+            let session = env(Some("wayland"), Some("wayland-0"), Some(gdk));
+            assert!(session.wayland_desktop());
+            assert!(!session.runs_on_wayland(), "GDK_BACKEND={gdk}");
+            assert!(session.compatibility_active(), "GDK_BACKEND={gdk}");
+        }
+        // Forcing X11 on a real X11 session is not compatibility mode.
+        assert!(!env(Some("x11"), None, Some("x11")).compatibility_active());
+        assert!(!env(Some("wayland"), Some("wayland-0"), None).compatibility_active());
     }
 
     #[test]

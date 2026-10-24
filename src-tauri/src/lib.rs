@@ -2,6 +2,7 @@
 
 mod commands;
 mod deeplink;
+mod display;
 mod ptt;
 mod tray;
 mod window;
@@ -73,7 +74,9 @@ fn specta_builder() -> Builder<tauri::Wry> {
             commands::ptt::ptt_capture_key,
             commands::ptt::ptt_capture_cancel,
             commands::ptt::ptt_mouse_status,
+            commands::ptt::ptt_session,
             app::close_choice,
+            app::app_restart,
             app::link_handler_status,
             app::link_handler_register,
             app::deep_link_take_pending,
@@ -109,6 +112,10 @@ fn export_bindings(builder: &Builder<tauri::Wry>) -> Result<(), specta_typescrip
 
 /// Starts the desktop app.
 pub fn run() {
+    let context = tauri::generate_context!();
+    // Before anything else starts a thread or GTK: it may switch to XWayland (FR-1.48).
+    display::prepare(&context.config().identifier);
+
     let builder = specta_builder();
 
     // Keep the TypeScript bindings in sync during development.
@@ -138,7 +145,7 @@ pub fn run() {
             deeplink::init(app.handle());
             Ok(())
         })
-        .run(tauri::generate_context!());
+        .run(context);
 
     if let Err(err) = app {
         eprintln!("error while running Mumcord: {err}");

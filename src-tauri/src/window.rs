@@ -111,19 +111,29 @@ pub fn minimize_to_tray(app: &AppHandle) {
 
 /// Disconnects cleanly and exits the app.
 pub fn quit(app: &AppHandle) {
+    after_disconnect(app, |app| app.exit(0));
+}
+
+/// Disconnects cleanly and restarts the app. `request_restart` exits through the event loop,
+/// so the single-instance lock is released before the new process starts.
+pub fn restart(app: &AppHandle) {
+    after_disconnect(app, AppHandle::request_restart);
+}
+
+fn after_disconnect(app: &AppHandle, then: impl FnOnce(&AppHandle) + Send + 'static) {
     let connected = !matches!(
         app.state::<Engine>().connection_state(),
         ConnState::Disconnected { .. }
     );
     if !connected {
-        app.exit(0);
+        then(app);
         return;
     }
     app.state::<Engine>().disconnect();
     let app = app.clone();
     tauri::async_runtime::spawn(async move {
         tokio::time::sleep(DISCONNECT_GRACE).await;
-        app.exit(0);
+        then(&app);
     });
 }
 

@@ -138,6 +138,9 @@ pub struct Settings {
     /// Linux Wayland: read mouse buttons for push-to-talk from input devices (needs the
     /// `input` group; opt-in, FR-1.39, QA.4).
     pub allow_mouse_buttons: bool,
+    /// Linux Wayland: start through XWayland and use the X11 push-to-talk path, like
+    /// TeamSpeak (FR-1.48, QA.5). Read before the window system starts; applies on restart.
+    pub ptt_compatibility_mode: bool,
     /// Device names; `None` uses the system default device.
     pub input_device: Option<String>,
     pub output_device: Option<String>,
@@ -164,6 +167,7 @@ impl Default for Settings {
             talk_mode: TalkMode::default(),
             ptt_key: None,
             allow_mouse_buttons: false,
+            ptt_compatibility_mode: false,
             input_device: None,
             output_device: None,
             noise_suppression: true,
@@ -232,6 +236,7 @@ mod tests {
         changed.enabled_plugins = vec!["gtav".into()];
         changed.wizard_completed = true;
         changed.log_level = LogLevel::Debug;
+        changed.ptt_compatibility_mode = true;
         store.save_settings(&changed).expect("save");
         store.save_settings(&changed).expect("save twice");
         assert_eq!(store.settings().expect("reload"), changed);
@@ -255,6 +260,10 @@ mod tests {
         assert!(
             !parsed.allow_mouse_buttons,
             "reading input devices stays off unless the user opts in"
+        );
+        assert!(
+            !parsed.ptt_compatibility_mode,
+            "the modern Wayland path stays the default"
         );
     }
 }
