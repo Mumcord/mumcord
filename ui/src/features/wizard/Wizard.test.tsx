@@ -62,7 +62,9 @@ describe("Wizard", () => {
     await screen.findByRole("heading", { name: "Your identity" });
     expect(spoken).toEqual([]);
     await createIdentity();
-    expect(spoken).toEqual(["Microphone. Step 2 of 3"]);
+    await waitFor(() => {
+      expect(spoken).toEqual(["Microphone. Step 2 of 3"]);
+    });
     unsubscribe();
   });
 
