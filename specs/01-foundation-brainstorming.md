@@ -806,3 +806,12 @@ Desktop notifications were planned for Epic 3.
 ✍️ Note: Requested in chat during /dev.
 
 ---
+
+#### QA.21 Profile on hover? `◉`
+
+- [x] **Hovering a person (member list, channel list, chat avatar/name) for a moment (~0.4 s) shows their profile card next to them: avatar, name, comment, registered marker, voice state.** It stays while the pointer is on the person or the card and closes when it leaves. Keyboard focus shows it too (Escape closes). A click still opens the full card with the local controls (volume, local mute, private message).
+- [ ] Click only (current behavior).
+
+✍️ Note: Requested in chat during /dev.
+
+---

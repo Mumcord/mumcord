@@ -83,7 +83,7 @@ Mumcord enforces nothing itself; the server's ACLs decide. The client reflects p
 - **FR-1.15** The channel list shows the server's channel tree (collapsible), with people under their channel, talking indicators and mute/deafen icons. People who only listen to a channel (channel listeners) are not shown in the channel list; they appear only in the member list with the listener marker (QA.11). Each channel appears once (Q2.4). Each person row shows the person's avatar (or a default avatar); while they talk, a green ring surrounds it (QA.6). Listener rows in the member list show only the listener marker, never voice state (talking, mute, deafen). Collapsed channels show a stack of up to 5 overlapping avatars plus "+N" instead of names; expanded channels with more than 10 people show the stack with a "Show all" toggle. People talking right now are moved to the front of the stack, with the green ring (QA.14). The channel the user is joined to for voice is highlighted (green accent bar, speaker icon, bold name), distinct from the selected channel; no highlight while read-only (QA.18).
 - **FR-1.16** Single-click a channel → shows its chat. Double-click or the "Join" button → enters the channel's voice (if permitted).
 - **FR-1.17** The member list shows the people in the selected channel, plus its listeners, with avatar, name, talking state and registered/unregistered marker.
-- **FR-1.18** Clicking a person opens a profile card: avatar, name, comment, and local controls: volume slider (0–200 %), local mute, "send private message".
+- **FR-1.18** Clicking a person opens a profile card: avatar, name, comment, and local controls: volume slider (0–200 %), local mute, "send private message". Hovering a person (member list, channel list, chat avatar/name) for ~0.4 s, or focusing them with the keyboard, shows a read-only profile preview next to them (avatar, name, comment, registered marker, voice state); it stays while the pointer is on the person or the preview and Escape closes it; a click still opens the full card (QA.21).
 - **FR-1.19** Per-person volume and local mute are stored by the person's certificate hash per server and re-applied when they reappear, even after renaming (Q5.2). People without a certificate are only adjusted for the session.
 - **FR-1.20** The user can set their own avatar (image, scaled to the server's limit) and profile comment (Q5.7). Mumcord remembers the avatar per saved server (the hand-set one, otherwise the default avatar from FR-1.47) and sends it again on every connect when the server shows no avatar for the user – servers keep avatars only for registered users (QA.10). Registered users keep the server's copy; nothing is re-sent when the server already has an avatar.
 
@@ -431,6 +431,7 @@ Unless stated otherwise: a fresh Mumcord install, a local test server (1.5) runn
 | QA.18 | Voice channel highlighted in the channel list, distinct from the selected channel | Addendum 2026-10-24; FR-1.15 |
 | QA.19 | "Hang up" sound on user-initiated disconnect, switchable | Addendum 2026-10-24; FR-1.27 |
 | QA.20 | Discord-style chat: avatar per message group, indented text, grouping of consecutive messages | Addendum 2026-10-24; FR-1.48a |
+| QA.21 | Profile preview on hover/focus next to the person; click opens the full card | Addendum 2026-10-24; FR-1.18 |
 
 ## 13. Open points & risks
 
