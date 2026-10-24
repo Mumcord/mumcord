@@ -229,6 +229,9 @@ const DEMO_AVATARS = new Map<number, string>([
   [5, demoAvatar("#6366f1", "#06b6d4")],
   [7, demoAvatar("#8b5cf6", "#ec4899")],
   [9, demoAvatar("#0ea5e9", "#22c55e")],
+  [11, demoAvatar("#f43f5e", "#f97316")],
+  [13, demoAvatar("#10b981", "#84cc16")],
+  [15, demoAvatar("#a855f7", "#3b82f6")],
 ]);
 
 function demoHistory(): ChatMessage[] {
@@ -573,6 +576,11 @@ export function createMockApi(options: MockOptions = {}): MockApi {
       person(6, "Leo", 4, "leohash"),
       withAvatar(person(9, "Sam", 4, "samhash")),
       person(8, "Elif", 6, "elifhash"),
+      withAvatar(person(11, "Nora", 6, "norahash")),
+      person(12, "Tim", 6, "timhash"),
+      withAvatar(person(13, "Ana", 6, "anahash")),
+      person(14, "Kai", 6, "kaihash"),
+      withAvatar(person(15, "Lena", 6, "lenahash")),
       { ...person(10, "Noah", 3, "noahhash"), selfMute: true, selfDeaf: true },
     ];
   }
