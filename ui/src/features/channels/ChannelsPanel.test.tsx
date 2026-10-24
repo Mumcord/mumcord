@@ -65,6 +65,21 @@ describe("ChannelsPanel", () => {
     expect(item(/^Anna/)).toHaveAttribute("data-talking", "false");
   });
 
+  it("shows an avatar per person with the ring only while talking, never on listeners", async () => {
+    await renderPanel();
+    const avatarOf = (row: Element | null) => row?.querySelector(".avatar");
+    expect(avatarOf(item(/^Anna/))).toHaveAttribute("data-talking", "false");
+    act(() => {
+      api.mock.setTalking(2, true);
+    });
+    expect(avatarOf(item(/^Anna/))).toHaveAttribute("data-talking", "true");
+    const listeners = Array.from(document.querySelectorAll(".tree-person[data-listener='true']"));
+    expect(listeners.length).toBeGreaterThan(0);
+    for (const row of listeners) {
+      expect(avatarOf(row)).toHaveAttribute("data-talking", "false");
+    }
+  });
+
   it("lights only the speaker, never quiet people or listeners (AC-1.7)", async () => {
     await renderPanel();
     const lit = () =>
@@ -103,7 +118,7 @@ describe("ChannelsPanel", () => {
       await api.setSelfDeaf(true);
     });
     const real = Array.from(document.querySelectorAll(".tree-person[data-listener='false']")).find(
-      (row) => row.textContent.startsWith("Zoe"),
+      (row) => row.textContent.includes("Zoe"),
     );
     const listener = document.querySelector(`[data-row='${listenerRowId(2, self)}']`);
     expect(listener).not.toBeNull();
@@ -269,7 +284,8 @@ describe("ChannelsPanel", () => {
     expect(items.length).toBeGreaterThan(0);
     for (const item of items) {
       const clone = item.cloneNode(true) as HTMLElement;
-      clone.querySelectorAll(".visually-hidden").forEach((el) => {
+      // The avatar is decorative (aria-hidden); its initial is not visible label text.
+      clone.querySelectorAll(".visually-hidden, .avatar").forEach((el) => {
         el.remove();
       });
       const visible = words(clone.textContent.replace(/\([^()]*\)/g, " ")).join(" ");

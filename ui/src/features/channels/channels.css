@@ -107,18 +107,6 @@
   font-style: italic;
 }
 
-.tree-person__dot {
-  width: 0.625rem;
-  height: 0.625rem;
-  border: 2px solid var(--color-border-strong);
-  border-radius: var(--radius-full);
-}
-
-.tree-person[data-talking="true"] .tree-person__dot {
-  border-color: var(--color-talking);
-  background: var(--color-talking);
-}
-
 .tree-person[data-talking="true"] .tree-person__name {
   color: var(--color-text);
 }

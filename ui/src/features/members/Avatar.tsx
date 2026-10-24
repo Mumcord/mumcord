@@ -11,7 +11,7 @@ export function Avatar({
   name: string;
   src?: string | null;
   talking?: boolean;
-  size?: "md" | "lg";
+  size?: "sm" | "md" | "lg";
 }) {
   // Remember which source failed to load; a new src gets a fresh attempt.
   const [failedSrc, setFailedSrc] = useState<string | null>(null);

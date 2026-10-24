@@ -13,6 +13,12 @@
   font-weight: var(--font-weight-bold);
 }
 
+.avatar[data-size="sm"] {
+  width: 1.5rem;
+  height: 1.5rem;
+  font-size: var(--font-size-xs);
+}
+
 .avatar[data-size="lg"] {
   width: 4rem;
   height: 4rem;

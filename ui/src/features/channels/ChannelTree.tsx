@@ -16,6 +16,8 @@ import {
 import { useTranslation } from "react-i18next";
 import type { User } from "../../api";
 import "./channels.css";
+import { Avatar } from "../members/Avatar";
+import { useAvatars } from "../members/useAvatars";
 import { StatusIcons } from "./PersonStatus";
 import { useStatusText } from "./statusText";
 import type { ServerState } from "./serverStore";
@@ -56,6 +58,15 @@ export function ChannelTree({
 
   const roots = useMemo(() => buildTree(state), [state]);
   const rows = useMemo(() => visibleRows(roots, collapsed), [roots, collapsed]);
+  const visibleUsers = useMemo(
+    () =>
+      rows.flatMap((r) => {
+        const user = r.session === null ? undefined : state.users.get(r.session);
+        return user === undefined ? [] : [user];
+      }),
+    [rows, state.users],
+  );
+  const avatarOf = useAvatars(visibleUsers);
   const selfChannelId =
     state.selfSession === null ? null : (state.users.get(state.selfSession)?.channelId ?? null);
 
@@ -167,7 +178,7 @@ export function ChannelTree({
         }}
       >
         <span className="tree-person__row">
-          <span className="tree-person__dot" aria-hidden="true" />
+          <Avatar name={user.name} src={avatarOf(user)} talking={talking} size="sm" />
           <span id={labelId} className="tree-person__name">
             {user.name}
             {user.session === state.selfSession && (
