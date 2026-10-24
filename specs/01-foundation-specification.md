@@ -134,7 +134,7 @@ Mumcord enforces nothing itself; the server's ACLs decide. The client reflects p
 - **FR-1.49** Link previews (QA.34, stage 1b): links in messages get a preview card (title, description, image, "Open in browser"). Mumcord fetches the page metadata itself; on by default, switchable in the first-start wizard and in settings; fetched data is sanitized and cached; no preview for private/LAN addresses. Each preview/embed card can be dismissed (×), remembered per message; previews, thumbnails and external images are cached in memory and on disk and deleted after a configurable number of days (default 7, Settings → Chat & history, with "Clear now") (QA.42).
 - **FR-1.50** YouTube and Twitch links show an embedded player card with title and "Open in browser"; the player loads only after a click (QA.34). Spotify links get the same kind of card (cover, title, artist, "Open in browser", player after a click) (QA.40).
 - **FR-1.51** Mentions (QA.34): typing `@` in the input autocompletes names of people on the server; a message mentioning the user is highlighted and notifies them even in otherwise quiet channels; the text stays plain `@Name` for other clients. Being mentioned also plays a distinct short "ping" sound; both the mention sound and mention notifications have their own switches under Settings → Sounds & notifications (default on) (QA.41).
-- **FR-1.52** GIFs via Tenor (QA.34): a GIF button opens a Tenor search; the chosen GIF is sent as an image link/embed compatible with Mumble's image rules. The Tenor API key comes from a CI secret at build time; builds without a key hide the button.
+- **FR-1.52** GIFs (QA.34, revised by QA.43): no GIF search (it would need an API key shipped in the app). Pasted GIF links play inline (FR-1.55); any GIF in the chat can be saved as a favorite (right-click → "Save as favorite"); the GIF button in the input opens the favorites (stored locally, removable) and sends the chosen one as a link.
 - **FR-1.53** Code (QA.34): ``` fenced code blocks (optional language) and `inline code` render with syntax highlighting; other clients see the text.
 - **FR-1.54** Formatting in the input (QA.34): a small toolbar plus shortcuts (Ctrl+B bold, Ctrl+I italic, Ctrl+Shift+X strikethrough, Ctrl+E code, Ctrl+K link inside the input) that insert Markdown.
 - **FR-1.55** External images (QA.35, stage 1b): external images in messages and direct image links (png, jpg, gif, webp) are shown inline, scaled, click to enlarge, with "Open in browser"; loaded via the backend with size and type limits, never from private/LAN addresses; controlled by the same switch as link previews (FR-1.49). With the switch off, AC-1.13 behavior applies.
@@ -367,7 +367,7 @@ Unless stated otherwise: a fresh Mumcord install, a local test server (1.5) runn
 - **AC-1.39** Bot posts a web link → a preview card with title and "Open in browser" appears; with previews switched off (wizard or settings) only the plain link shows and no request is made.
 - **AC-1.40** Bot posts a YouTube and a Twitch link → player cards with title appear; nothing loads until the user clicks play; "Open in browser" opens the system browser.
 - **AC-1.41** Typing `@Bo` suggests "Bot"; sending puts `@Bot` in the message; when Bot mentions the user, the message is highlighted and a notification appears.
-- **AC-1.42** In a build with a Tenor key, the GIF button searches Tenor and sends the chosen GIF so Bot receives it; in a build without a key the button is hidden.
+- **AC-1.42** Bot posts a GIF link → it plays inline; right-click → "Save as favorite"; the GIF button lists it and sending it delivers the link to Bot; removing the favorite works and survives restart.
 - **AC-1.43** A message with a ```js code block renders highlighted; Bot receives the plain text.
 - **AC-1.44** Ctrl+B / Ctrl+I / toolbar buttons insert bold/italic Markdown around the selection; the sent message renders formatted.
 - **AC-1.45** Bot sends a message with an external image and a direct .png link → both appear inline and enlarge on click; with previews switched off neither is loaded (no request made).
@@ -479,6 +479,7 @@ Unless stated otherwise: a fresh Mumcord install, a local test server (1.5) runn
 | QA.40 | Spotify link cards; opt-in "Now playing" status shared via plugin data (music icon, cover, progress) and comment line for official clients | Addendum 2026-10-25; FR-1.50, FR-1.58, AC-1.48, AC-1.49 |
 | QA.41 | Mention ping sound + separate switches for mention sound and mention notifications | Addendum 2026-10-25; FR-1.51 |
 | QA.42 | Dismiss preview cards; preview cache clean-up after X days (default 7) + Clear now; optional chat history auto-delete | Addendum 2026-10-25; FR-1.49, FR-1.32 |
+| QA.43 | No GIF search (key would be extractable); GIF links inline + favorites instead of Tenor | Addendum 2026-10-25; FR-1.52, AC-1.42 |
 
 ## 13. Open points & risks
 

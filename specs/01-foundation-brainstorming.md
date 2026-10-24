@@ -1022,3 +1022,15 @@ Until now external images (img tags pointing to web addresses, image links) are 
 ✍️ Note: Requested in chat during /dev.
 
 ---
+
+#### QA.43 GIF search needs an API key – which way? `◉`
+An API key shipped inside the app can be extracted by anyone; abuse would use up the quota.
+
+- [x] **No GIF search for now: pasted GIF links play inline (external images, FR-1.55) and GIFs in the chat can be saved as favorites (right-click → "Save as favorite"); the GIF button opens the favorites. No key, no costs, no server.** Replaces the Tenor search from QA.34; a search can come later.
+- [ ] Users bring their own key.
+- [ ] Proxy on mumcord.app.
+- [ ] Key in the app anyway.
+
+✍️ Note: Asked and answered in chat during /dev.
+
+---
