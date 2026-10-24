@@ -1,5 +1,5 @@
 import { join } from "node:path";
-import { browser, expect, $ } from "@wdio/globals";
+import { browser, expect, $, $$ } from "@wdio/globals";
 import { app, artifactsDir, bot, repoRoot, testenv } from "../../helpers/index.ts";
 import {
   addFirstServer,
@@ -25,6 +25,33 @@ function dmItem() {
 
 function privateHeader() {
   return $("//h2[contains(@class,'chat-header__title') and contains(.,'RaidBot')]");
+}
+
+function star(action: "Follow" | "Unfollow", channel: string) {
+  return $(`//button[contains(@class,'follow-star') and @aria-label='${action} ${channel}']`);
+}
+
+/** Clicks a row star and waits for it to flip; retries when a tree reflow made the click miss. */
+async function toggleStar(action: "Follow" | "Unfollow", channel: string) {
+  const flipped = star(action === "Follow" ? "Unfollow" : "Follow", channel);
+  for (let attempt = 0; attempt < 3; attempt++) {
+    await sleep(300);
+    // Hover first: the outlined star is only visible while the row is hovered.
+    await star(action, channel).moveTo();
+    await star(action, channel).click();
+    if (await flipped.waitForExist({ timeout: 3_000 }).catch(() => false)) return;
+    await browser.keys("Escape"); // a miss can open a person's profile card
+  }
+  await flipped.waitForExist();
+}
+
+function followNotice() {
+  return $(".follow-notice[role='status'] p");
+}
+
+async function serverMenu(item: "Follow all channels" | "Unfollow all channels") {
+  await $("//button[contains(@class,'follow-server__menu')]").click();
+  await $(`//button[@role='menuitem' and normalize-space(.)='${item}']`).click();
 }
 
 function followButton() {
@@ -109,6 +136,41 @@ describe("chat: follow and private messages (AC-1.15, AC-1.16, AC-1.18)", () => 
     expect(text).toContain("doesn't allow you to follow");
     await expect(followButton()).toHaveAttribute("aria-pressed", "false");
     await bot(["expect", "user", USER, "--not-listening", "AFK"], { name: "EarBot" });
+  });
+
+  it("QA.13 the star in a channel row unfollows and follows without selecting the channel", async () => {
+    // AFK is selected (previous test); Raid is followed since AC-1.15.
+    const header = $("//h2[contains(@class,'chat-header__title') and contains(.,'AFK')]");
+    await header.waitForDisplayed();
+    await toggleStar("Unfollow", "Raid");
+    await bot(["expect", "user", USER, "--not-listening", "Raid"], { name: "EarBot" });
+    await toggleStar("Follow", "Raid");
+    await bot(["expect", "user", USER, "--listening", "Raid"], { name: "EarBot" });
+    await expect(header).toBeDisplayed();
+  });
+
+  it("QA.13 Follow all skips the denied channel; Unfollow all clears every follow", async () => {
+    await serverMenu("Follow all channels");
+    await browser.waitUntil(async () => /^Followed/.test(await followNotice().getText()), {
+      timeout: 15_000,
+      timeoutMsg: "no follow-all summary",
+    });
+    const summary = await followNotice().getText();
+    console.warn(`QA.13 follow all: ${summary}`);
+    expect(summary).toMatch(/skipped: not allowed/);
+    await star("Unfollow", "Raid").waitForDisplayed();
+    expect(await star("Unfollow", "AFK").isExisting()).toBe(false);
+    expect(await star("Unfollow", "Lobby").isExisting()).toBe(false);
+    await bot(["expect", "user", USER, "--in", "Lobby", "--listening", "Raid"], { name: "EarBot" });
+
+    await serverMenu("Unfollow all channels");
+    await browser.waitUntil(
+      async () => (await followNotice().getText()).startsWith("Unfollowed all channels."),
+      { timeoutMsg: "no unfollow-all confirmation" },
+    );
+    expect(await $$("//button[contains(@class,'follow-star') and @data-followed='true']").length).toBe(0);
+    await bot(["expect", "user", USER, "--not-listening", "Raid"], { name: "EarBot" });
+    await $("button.follow-notice__dismiss").click();
   });
 
   it("AC-1.18 private message opens a private chat with a sound; reply reaches the bot", async () => {

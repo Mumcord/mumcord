@@ -28,5 +28,27 @@
     "confirm": "Clear history",
     "cancel": "Cancel",
     "failed": "The history couldn't be cleared. Please try again."
+  },
+  "star": {
+    "follow": "Follow {{channel}}",
+    "unfollow": "Unfollow {{channel}}"
+  },
+  "all": {
+    "menu": "Server options for {{server}}",
+    "menuLabel": "Server options",
+    "follow": "Follow all channels",
+    "unfollow": "Unfollow all channels",
+    "working": "Following channels…",
+    "followed_one": "Followed {{count}} channel.",
+    "followed_other": "Followed {{count}} channels.",
+    "skipped_one": "{{count}} skipped: {{reasons}}.",
+    "skipped_other": "{{count}} skipped: {{reasons}}.",
+    "limit": "limit reached",
+    "notAllowed": "not allowed",
+    "noAnswer": "no answer from the server",
+    "unfollowed": "Unfollowed all channels.",
+    "failed": "Following all channels didn't work. Please try again.",
+    "dismiss": "Dismiss",
+    "unfollowFailed": "Unfollowing all channels didn't work. Please try again."
   }
 }

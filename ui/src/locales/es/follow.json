@@ -28,5 +28,27 @@
     "confirm": "Borrar historial",
     "cancel": "Cancelar",
     "failed": "No se pudo borrar el historial. Inténtalo de nuevo."
+  },
+  "star": {
+    "follow": "Seguir {{channel}}",
+    "unfollow": "Dejar de seguir {{channel}}"
+  },
+  "all": {
+    "menu": "Opciones del servidor {{server}}",
+    "menuLabel": "Opciones del servidor",
+    "follow": "Seguir todos los canales",
+    "unfollow": "Dejar de seguir todos los canales",
+    "working": "Siguiendo canales…",
+    "followed_one": "Siguiendo {{count}} canal.",
+    "followed_other": "Siguiendo {{count}} canales.",
+    "skipped_one": "{{count}} omitido: {{reasons}}.",
+    "skipped_other": "{{count}} omitidos: {{reasons}}.",
+    "limit": "límite alcanzado",
+    "notAllowed": "no permitido",
+    "noAnswer": "sin respuesta del servidor",
+    "unfollowed": "Has dejado de seguir todos los canales.",
+    "failed": "No se pudieron seguir todos los canales. Inténtalo de nuevo.",
+    "dismiss": "Cerrar",
+    "unfollowFailed": "No se pudo dejar de seguir todos los canales. Inténtalo de nuevo."
   }
 }

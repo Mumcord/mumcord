@@ -1,4 +1,4 @@
-import { expect, $ } from "@wdio/globals";
+import { browser, expect, $ } from "@wdio/globals";
 import { bot, testenv } from "../../helpers/index.ts";
 import { addFirstServer, finishWizard, selectChannel, USER } from "../../helpers/chat-ui.ts";
 
@@ -20,6 +20,23 @@ describe("chat: follow on a server with listener limit 0 (AC-1.16)", () => {
     console.warn(`AC-1.16 limit error: ${text}`);
     expect(text).toMatch(/can't follow more channels|doesn't allow you to follow/);
     await expect(follow).toHaveAttribute("aria-pressed", "false");
+    await bot(["expect", "user", USER, "--not-listening", "Raid"], {
+      name: "LimitBot",
+      port: testenv.ports.limit,
+    });
+  });
+
+  it("QA.13 Follow all stops at the listener limit and says so", async () => {
+    await $("//button[contains(@class,'follow-server__menu')]").click();
+    await $("//button[@role='menuitem' and normalize-space(.)='Follow all channels']").click();
+    const notice = $(".follow-notice[role='status'] p");
+    await browser.waitUntil(async () => /^Followed/.test(await notice.getText()), {
+      timeout: 15_000,
+      timeoutMsg: "no follow-all summary",
+    });
+    const text = await notice.getText();
+    console.warn(`QA.13 follow all on the limit server: ${text}`);
+    expect(text).toMatch(/^Followed 0 channels\. \d+ skipped: limit reached/);
     await bot(["expect", "user", USER, "--not-listening", "Raid"], {
       name: "LimitBot",
       port: testenv.ports.limit,

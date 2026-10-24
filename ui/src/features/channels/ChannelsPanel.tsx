@@ -6,18 +6,27 @@ import { useProfileCard } from "../members/useProfileCard";
 import type { SendPrivateMessage } from "../members/privateMessage";
 import { joinChannel } from "../userpanel/readOnly";
 import { useServerAnnouncements } from "./announcements";
-import { ChannelTree } from "./ChannelTree";
+import { ChannelTree, type ChannelAction } from "./ChannelTree";
 import { useSelectedConversation } from "./selection";
 import { useServerState } from "./serverStore";
 
 export interface ChannelsPanelProps {
   /** Extra content after a channel's people count, e.g. the unread badge (B22). */
   channelBadge?: ((channelId: number) => ReactNode) | undefined;
+  /** Button in a fixed slot of each channel row, e.g. the follow star (QA.13). */
+  channelAction?: ((channel: ChannelAction) => ReactNode) | undefined;
+  /** Row above the tree, e.g. the server name with its menu (QA.13). */
+  header?: ReactNode;
   /** "Send private message" on the profile card; defaults to opening the private chat. */
   onSendPrivateMessage?: SendPrivateMessage | undefined;
 }
 
-export function ChannelsPanel({ channelBadge, onSendPrivateMessage }: ChannelsPanelProps) {
+export function ChannelsPanel({
+  channelBadge,
+  channelAction,
+  header,
+  onSendPrivateMessage,
+}: ChannelsPanelProps) {
   const { t } = useTranslation("channels");
   const state = useServerState();
   const { conversation, select } = useSelectedConversation();
@@ -63,6 +72,7 @@ export function ChannelsPanel({ channelBadge, onSendPrivateMessage }: ChannelsPa
 
   return (
     <div className="channels-panel">
+      {header}
       <ChannelTree
         state={state}
         selectedChannelId={conversation?.kind === "channel" ? conversation.channelId : null}
@@ -73,6 +83,7 @@ export function ChannelsPanel({ channelBadge, onSendPrivateMessage }: ChannelsPa
         onJoin={join}
         onOpenPerson={openProfile}
         channelBadge={channelBadge}
+        channelAction={channelAction}
       />
       {joinError && (
         <p role="alert" className="channels-error">

@@ -28,5 +28,27 @@
     "confirm": "Verlauf löschen",
     "cancel": "Abbrechen",
     "failed": "Der Verlauf konnte nicht gelöscht werden. Bitte versuche es noch einmal."
+  },
+  "star": {
+    "follow": "{{channel}} folgen",
+    "unfollow": "{{channel}} nicht mehr folgen"
+  },
+  "all": {
+    "menu": "Serveroptionen für {{server}}",
+    "menuLabel": "Serveroptionen",
+    "follow": "Allen Kanälen folgen",
+    "unfollow": "Keinem Kanal mehr folgen",
+    "working": "Kanälen wird gefolgt…",
+    "followed_one": "{{count}} Kanal gefolgt.",
+    "followed_other": "{{count}} Kanälen gefolgt.",
+    "skipped_one": "{{count}} übersprungen: {{reasons}}.",
+    "skipped_other": "{{count}} übersprungen: {{reasons}}.",
+    "limit": "Limit erreicht",
+    "notAllowed": "nicht erlaubt",
+    "noAnswer": "keine Antwort vom Server",
+    "unfollowed": "Du folgst keinem Kanal mehr.",
+    "failed": "Das Folgen aller Kanäle hat nicht geklappt. Bitte versuche es erneut.",
+    "dismiss": "Schließen",
+    "unfollowFailed": "Das Entfolgen aller Kanäle hat nicht geklappt. Bitte versuche es erneut."
   }
 }

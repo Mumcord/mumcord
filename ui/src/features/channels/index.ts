@@ -11,8 +11,9 @@
  * - `useSelectedConversation()`: `{ conversation, select }` – the conversation the chat column
  *   shows. Single click on a channel selects it; "Send private message" selects a private one.
  *   Starts at the own channel after each sync, `null` when disconnected.
- * - `ChannelsPanel` props: `channelBadge(channelId)` slot for the unread badge (B22) and
- *   `onSendPrivateMessage(user)` to override the default "open private chat" behaviour.
+ * - `ChannelsPanel` props: `channelBadge(channelId)` slot for the unread badge (B22),
+ *   `channelAction({ channelId, name, tabbable })` fixed slot for a row button such as the follow
+ *   star (QA.13), `header` above the tree, and `onSendPrivateMessage(user)` to override the default "open private chat" behaviour.
  * - `ProfileCard` (`{ session, onClose, returnFocus?, onSendPrivateMessage? }`): modal profile
  *   card of one person.
  */
@@ -31,4 +32,5 @@ export {
   useSelectedConversation,
 } from "./selection";
 export { ChannelsPanel, type ChannelsPanelProps } from "./ChannelsPanel";
+export type { ChannelAction } from "./ChannelTree";
 export { ProfileCard, type ProfileCardProps } from "../members/ProfileCard";

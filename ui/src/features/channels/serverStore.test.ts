@@ -32,6 +32,8 @@ describe("server store", () => {
           name: "Sub",
           position: 0,
           permissions: { enter: true, textMessage: true, listen: true, registerSelf: false },
+          description: null,
+          hasDescription: false,
         },
       });
       api.mock.emit("userRemoved", { session: 2 });

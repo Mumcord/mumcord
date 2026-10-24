@@ -38,6 +38,17 @@ export interface ChannelTreeProps {
   onOpenPerson: (session: number, opener: HTMLElement | null) => void;
   /** Extra content after a channel's people count, e.g. the unread badge (B22). */
   channelBadge?: ((channelId: number) => ReactNode) | undefined;
+  /**
+   * A button in a fixed slot of each channel row, e.g. the follow star (QA.13). `tabbable` is true
+   * for the row holding the tree's Tab stop, so Tab reaches the button from that row.
+   */
+  channelAction?: ((channel: ChannelAction) => ReactNode) | undefined;
+}
+
+export interface ChannelAction {
+  channelId: number;
+  name: string;
+  tabbable: boolean;
 }
 
 export function ChannelTree({
@@ -47,6 +58,7 @@ export function ChannelTree({
   onJoin,
   onOpenPerson,
   channelBadge,
+  channelAction,
 }: ChannelTreeProps) {
   const { t } = useTranslation("channels");
   const statusText = useStatusText();
@@ -276,6 +288,17 @@ export function ChannelTree({
                   event.stopPropagation();
                 }}
               />
+            )}
+            {channelAction && (
+              // Fixed-width slot at the row's end: the hover-only Join button appears to its left,
+              // so the action never moves under the pointer (moving targets caused misclicks).
+              <span className="tree-channel__action">
+                {channelAction({
+                  channelId: channel.id,
+                  name: channel.name,
+                  tabbable: tabStopId === rowId,
+                })}
+              </span>
             )}
           </div>
         </div>
