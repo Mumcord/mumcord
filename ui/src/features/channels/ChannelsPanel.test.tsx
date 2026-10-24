@@ -1,5 +1,4 @@
-import { listenerRowId } from "./tree";
-import { act, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
+import { act, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { subscribeAnnouncements, type Announcement } from "../../a11y/announcer";
 import type { MockApi } from "../../api";
@@ -36,7 +35,7 @@ describe("ChannelsPanel", () => {
     expect(screen.getByText(/Not connected/)).toBeInTheDocument();
   });
 
-  it("renders channels with people, listeners and their status", async () => {
+  it("renders channels with people and their status", async () => {
     await renderPanel();
     const lobby = item(/^Lobby/);
     expect(lobby).toHaveAttribute("aria-expanded", "true");
@@ -44,10 +43,6 @@ describe("ChannelsPanel", () => {
     expect(lobby).toHaveAttribute("aria-keyshortcuts", "Shift+Enter");
     expect(lobby).toHaveAccessibleName(/your channel, 3 people/);
     expect(item(/^Ben/)).toHaveAccessibleName(/not registered/);
-    const group = document.getElementById(lobby.getAttribute("aria-owns") ?? "") as HTMLElement;
-    const carla = within(group).getByRole("treeitem", { name: /^Carla/ });
-    expect(carla).toHaveAccessibleName(/listening/);
-    expect(carla.querySelector(".person-icon")).not.toBeNull();
     expect(screen.getByText(/Shift\+Enter or double-click: join/)).toBeInTheDocument();
   });
 
@@ -65,7 +60,7 @@ describe("ChannelsPanel", () => {
     expect(item(/^Anna/)).toHaveAttribute("data-talking", "false");
   });
 
-  it("shows an avatar per person with the ring only while talking, never on listeners", async () => {
+  it("shows an avatar per person with the ring only while talking", async () => {
     await renderPanel();
     const avatarOf = (row: Element | null) => row?.querySelector(".avatar");
     expect(avatarOf(item(/^Anna/))).toHaveAttribute("data-talking", "false");
@@ -73,14 +68,9 @@ describe("ChannelsPanel", () => {
       api.mock.setTalking(2, true);
     });
     expect(avatarOf(item(/^Anna/))).toHaveAttribute("data-talking", "true");
-    const listeners = Array.from(document.querySelectorAll(".tree-person[data-listener='true']"));
-    expect(listeners.length).toBeGreaterThan(0);
-    for (const row of listeners) {
-      expect(avatarOf(row)).toHaveAttribute("data-talking", "false");
-    }
   });
 
-  it("lights only the speaker, never quiet people or listeners (AC-1.7)", async () => {
+  it("lights only the speaker, never quiet people (AC-1.7)", async () => {
     await renderPanel();
     const lit = () =>
       Array.from(document.querySelectorAll(".tree-person[data-talking='true']")).map(
@@ -100,43 +90,24 @@ describe("ChannelsPanel", () => {
     act(() => {
       api.mock.setTalking(4, true);
     });
-    // Carla talks: only her own row; her listener row stays quiet.
+    // Carla talks: only her own row lights up.
     expect(lit().filter((n) => n === "Carla")).toHaveLength(1);
     expect(lit()).toHaveLength(2);
-    const listenerRows = Array.from(
-      document.querySelectorAll(".tree-person[data-listener='true']"),
-    );
-    expect(listenerRows.length).toBeGreaterThan(0);
-    for (const row of listenerRows) expect(row).toHaveAttribute("data-talking", "false");
   });
 
-  it("keeps voice state off listener rows but on the real row", async () => {
+  it("shows channel listeners nowhere in the tree (QA.11)", async () => {
     await renderPanel();
+    expect(screen.queryByRole("treeitem", { name: /listening/ })).toBeNull();
+    // Carla listens to Lobby and lives in Raid: exactly one row, no ear marker.
+    const carla = screen.getAllByRole("treeitem", { name: /^Carla/ });
+    expect(carla).toHaveLength(1);
+    expect(carla[0]?.querySelector(".person-icon")).toBeNull();
     const self = getServerState().selfSession ?? -1;
     await act(async () => {
       await api.channelFollow(2);
-      await api.setSelfDeaf(true);
     });
-    const real = Array.from(document.querySelectorAll(".tree-person[data-listener='false']")).find(
-      (row) => row.textContent.includes("Zoe"),
-    );
-    const listener = document.querySelector(`[data-row='${listenerRowId(2, self)}']`);
-    expect(listener).not.toBeNull();
-    expect(listener?.querySelectorAll(".person-icon")).toHaveLength(1);
-    expect(listener?.getAttribute("aria-label") ?? "").not.toMatch(/deafened|muted/);
-    expect(real?.querySelectorAll(".person-icon").length ?? 0).toBeGreaterThan(0);
-  });
-
-  it("shows no listener row for the channel the person is in", async () => {
-    await renderPanel();
-    const self = getServerState().users.get(getServerState().selfSession ?? -1);
-    await act(async () => {
-      await api.channelFollow(self?.channelId ?? 1);
-    });
-    const own = document.querySelectorAll(
-      `[data-row='${listenerRowId(self?.channelId ?? 1, self?.session ?? -1)}']`,
-    );
-    expect(own).toHaveLength(0);
+    expect(document.querySelectorAll(`.tree-person[data-row='u${String(self)}']`)).toHaveLength(1);
+    expect(item(/^Lobby/)).toHaveAccessibleName(/3 people/);
   });
 
   it("moves with the arrow keys using a single Tab stop", async () => {

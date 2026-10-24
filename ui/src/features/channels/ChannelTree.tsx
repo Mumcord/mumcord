@@ -25,7 +25,6 @@ import {
   buildTree,
   channelRowId,
   isExpandable,
-  listenerRowId,
   memberRowId,
   visibleRows,
   type ChannelNode,
@@ -150,10 +149,10 @@ export function ChannelTree({
     onJoin(channelId);
   };
 
-  const personItem = (user: User, rowId: string, level: number, listener: boolean) => {
-    const talking = !listener && state.talking.has(user.session);
+  const personItem = (user: User, rowId: string, level: number) => {
+    const talking = state.talking.has(user.session);
     const labelId = `${hintId}-${rowId}`;
-    const status = statusText(user, talking, listener);
+    const status = statusText(user, talking);
     return (
       // Keyboard input is handled once on the tree (roving focus), not per item.
       // eslint-disable-next-line jsx-a11y/click-events-have-key-events
@@ -167,7 +166,6 @@ export function ChannelTree({
         data-row={rowId}
         className="tree-person"
         data-talking={talking}
-        data-listener={listener}
         onFocus={(event) => {
           if (event.target === event.currentTarget) setFocusedId(rowId);
         }}
@@ -186,7 +184,7 @@ export function ChannelTree({
             )}
             {status.length > 0 && <span className="visually-hidden">, {status.join(", ")}</span>}
           </span>
-          <StatusIcons user={user} listener={listener} />
+          <StatusIcons user={user} />
         </span>
       </div>
     );
@@ -283,10 +281,7 @@ export function ChannelTree({
         </div>
         {expanded && (
           <div role="group" id={groupId}>
-            {node.members.map((u) => personItem(u, memberRowId(u.session), level + 1, false))}
-            {node.listeners.map((u) =>
-              personItem(u, listenerRowId(channel.id, u.session), level + 1, true),
-            )}
+            {node.members.map((u) => personItem(u, memberRowId(u.session), level + 1))}
             {node.children.map((child) => channelItem(child, level + 1))}
           </div>
         )}

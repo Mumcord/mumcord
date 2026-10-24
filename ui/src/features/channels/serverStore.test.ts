@@ -105,7 +105,7 @@ describe("tree model", () => {
     expect(roots[0]?.children.map((c) => c.channel.name)).toEqual(["Lobby", "Raid", "AFK"]);
     const lobby = roots[0]?.children[0];
     expect(lobby?.members.map((u) => u.name)).toEqual(["Anna", "Ben", "Zoe"]);
-    expect(lobby?.listeners.map((u) => u.name)).toEqual(["Carla"]);
+    // Carla only listens to Lobby: she is not part of the tree.
 
     expect(visibleRows(roots, new Set()).map((r) => r.id)).toEqual([
       "c0",
@@ -113,7 +113,6 @@ describe("tree model", () => {
       "u2",
       "u3",
       "u1",
-      "l1-4",
       "c2",
       "u4",
       "c3",

@@ -103,10 +103,6 @@
   color: var(--color-text-secondary);
 }
 
-.tree-person[data-listener="true"] .tree-person__row {
-  font-style: italic;
-}
-
 .tree-person[data-talking="true"] .tree-person__name {
   color: var(--color-text);
 }

@@ -88,7 +88,7 @@ export function channelName(name: string) {
 /** Person row in the tree (members, not listeners) by exact name. */
 export function personRow(name: string) {
   return $(
-    `//div[contains(@class,'tree-person') and @data-listener='false'][.//span[contains(@class,'tree-person__name') and text()='${name}']]`,
+    `//div[contains(@class,'tree-person')][.//span[contains(@class,'tree-person__name') and text()='${name}']]`,
   );
 }
 
@@ -110,7 +110,7 @@ export async function readTree(): Promise<TreeChannel[]> {
         ch.querySelector(":scope > [role='group']") ??
         (owns ? document.getElementById(owns) : null);
       const people = group
-        ? Array.from(group.querySelectorAll(":scope > .tree-person[data-listener='false']")).map(
+        ? Array.from(group.querySelectorAll(":scope > .tree-person")).map(
             (p) => p.querySelector(".tree-person__name")?.firstChild?.textContent ?? "",
           )
         : [];
