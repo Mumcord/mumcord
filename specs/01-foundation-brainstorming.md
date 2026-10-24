@@ -914,3 +914,12 @@ Measured in `specs/01-foundation-scale-report.md`; performance fixes are done wi
 ✍️ Note: Requested in chat during /dev.
 
 ---
+
+#### QA.32 Right-click menu on a person? `◉`
+
+- [x] **Right-clicking a person (member list, channel list, chat avatar/name) opens a context menu: "View profile", "Mute for me" / "Unmute for me" (local mute), a volume slider (0–200 %) inline in the menu, and "Send private message".** Also reachable by keyboard (context-menu key / Shift+F10). Not shown for the user themselves except "View profile".
+- [ ] Profile card only.
+
+✍️ Note: Requested in chat during /dev.
+
+---
