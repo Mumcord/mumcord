@@ -815,3 +815,21 @@ Desktop notifications were planned for Epic 3.
 ✍️ Note: Requested in chat during /dev.
 
 ---
+
+#### QA.22 Make the read-only connect switchable? `◉`
+
+- [x] **Setting "Connect muted until I join a channel" (Settings → Voice, default on). Off: a fresh connect lands in the default channel with the user's last own mute/deafen setting right away (as a normal join).**
+- [ ] Always read-only.
+
+✍️ Note: Asked and answered in chat during /dev.
+
+---
+
+#### QA.23 Sound when the user joins a channel? `◉`
+
+- [x] **A short join sound plays when the user themselves joins a channel for voice (double-click, Join button, link, rejoin prompt), switchable like the other sounds.**
+- [ ] No sound.
+
+✍️ Note: Requested in chat during /dev.
+
+---
