@@ -833,3 +833,16 @@ Desktop notifications were planned for Epic 3.
 ✍️ Note: Requested in chat during /dev.
 
 ---
+
+#### QA.24 Design refresh after the website (mumcord.app)? `◉`
+Prototype with before/after screenshots on branch `design-refresh-proto` (`specs/design-refresh.md` there).
+
+- [x] **Adopt the website's look: deep indigo backgrounds, cream text, violet accent instead of teal, rounded pill buttons, violet selection bars.**
+- [x] **Logo gradient (peach → pink → violet) only on highlights (connected server, unread badges); primary buttons in plain violet.**
+- [x] **Website fonts bundled (Instrument Sans for text, Bricolage Grotesque for titles; OFL-1.1).**
+- [x] **Peach links in the chat.**
+- [x] **Keep the green talking ring with a soft glow.**
+
+✍️ Note: Asked and answered in chat during /dev.
+
+---
