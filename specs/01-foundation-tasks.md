@@ -147,13 +147,11 @@
 | F60 | Release workflow: tag v* on main → unsigned .exe/AppImage/.dmg + checksums on a draft GitHub Release (QA.12) | done – release.yml (tag guards: version + on main), shared build-and-smoke.yml, test-builds.yml, universal macOS dmg, draft release + SHA256SUMS, RELEASING.md; untested on GitHub | f60-release-workflow | – | complex | QA.12 | .github/workflows/release*.yml, docs (README/RELEASING) |
 | V19 | Workflows (69c81c1) | done – CI + Test builds green; E2E 18/19, rejoin-prompt: v14 entrypoint "/data/mumble_server_config.ini: Permission denied" | ci19-watch | F59 | simple | §10 | – |
 | F61 | E2E: fresh v14 container in CI cannot write its data dir (permission denied) | done – v14 image ignores PUID, runs as 1000; compose now sets user: PUID:PGID for v14 | f61-v14-perms | V19 | simple | FR-1.14 | testenv/**, e2e/run.sh, e2e/helpers/** (server start), .github/workflows/e2e.yml |
-| F53 | Refresh README screenshot (new logo, avatars, talking ring, disconnect button) | open | – | F49, F51 | simple | – | docs/images/mumcord-main.png |
+| F53 | Refresh README screenshot + website screenshot set (main view, wizard, settings, light/dark) | in progress | f53-screenshots | F49, F51 | simple | – | docs/images/**, ui/src/api/mock.ts (demo data only) |
 | G1 | **Stage 1a gate** (checklist in specs/01-foundation-implementation.md): user manual checklist (Win/macOS, listening, KDE PTT/tray/Orca) + sign-off | open | user | C1–C8 | – | – | – |
-| B30 | Mumble Link + 3D audio | open | | F35 | Avatar image load failure showed empty circle; mock polish + new screenshot | done | f35-avatar-fallback | screenshot | simple | FR-1.17 | members Avatar, mock, docs/images |
-| G1 | complex | FR-1.41, 1.43 | crates/positional/src/link/, crates/audio/src/spatial/ |
+| B30 | Mumble Link + 3D audio | open | | G1 | complex | FR-1.41, 1.43 | crates/positional/src/link/, crates/audio/src/spatial/ |
 | B31 | Game plugin host | open | | B30 | complex | FR-1.42, 1.43 | crates/positional/src/plugins/ |
-| B32 | Overlay window | open | | F35 | Avatar image load failure showed empty circle; mock polish + new screenshot | done | f35-avatar-fallback | screenshot | simple | FR-1.17 | members Avatar, mock, docs/images |
-| G1 | complex | FR-1.44–1.46 | src-tauri/src/overlay.rs, ui/src/overlay/ |
+| B32 | Overlay window | open | | G1 | complex | FR-1.44–1.46 | src-tauri/src/overlay.rs, ui/src/overlay/ |
 | B33 | 1b settings UI | open | | B30, B32 | simple | FR-1.41, 1.43, 1.45, 1.46 | ui/src/features/settings/positional/ |
 | C9 | Verify positional audio | open | | B31, B33 | complex | AC-1.31, 1.32 | e2e/specs/positional |
 | C10 | Verify overlay | open | | B32, B33 | simple | AC-1.33, 1.34 | e2e/specs/overlay |
