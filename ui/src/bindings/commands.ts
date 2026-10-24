@@ -84,8 +84,12 @@ export const commands = {
 	micTestStart: () => typedError<null, ApiError>(__TAURI_INVOKE("mic_test_start")),
 	micTestStop: () => typedError<null, ApiError>(__TAURI_INVOKE("mic_test_stop")),
 	pttAvailability: () => typedError<PttAvailability, ApiError>(__TAURI_INVOKE("ptt_availability")),
-	/**  Waits for the next key press and returns it as a shortcut string (e.g. "Ctrl+F13"). */
-	pttCaptureKey: () => typedError<string, ApiError>(__TAURI_INVOKE("ptt_capture_key")),
+	/**
+	 *  Validates a key the UI captured (`KeyboardEvent.code` plus modifiers, e.g. "Ctrl+KeyA")
+	 *  and returns the shortcut string to store as `pttKey` (e.g. "Ctrl+A"). On Wayland the
+	 *  desktop's shortcut dialog opens with `key` preselected and the user's choice is returned.
+	 */
+	pttCaptureKey: (key: string) => typedError<string, ApiError>(__TAURI_INVOKE("ptt_capture_key", { key })),
 	/**  Aborts a pending `ptt_capture_key`, which then fails with `invalidInput`. */
 	pttCaptureCancel: () => typedError<null, ApiError>(__TAURI_INVOKE("ptt_capture_cancel")),
 	/**  Answers `CloseRequested`; `remember` stores the choice as the close behaviour. */

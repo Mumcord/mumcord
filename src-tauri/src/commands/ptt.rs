@@ -3,7 +3,8 @@
 use serde::{Deserialize, Serialize};
 use specta::Type;
 
-use super::types::{ApiResult, not_implemented};
+use super::types::ApiResult;
+use crate::ptt;
 
 #[derive(Serialize, Deserialize, Clone, Copy, Debug, PartialEq, Eq, Type)]
 #[serde(rename_all = "camelCase")]
@@ -23,20 +24,23 @@ pub enum PttAvailability {
 
 #[tauri::command]
 #[specta::specta]
-pub fn ptt_availability() -> ApiResult<PttAvailability> {
-    not_implemented()
+pub async fn ptt_availability() -> ApiResult<PttAvailability> {
+    Ok(ptt::availability().await)
 }
 
-/// Waits for the next key press and returns it as a shortcut string (e.g. "Ctrl+F13").
+/// Validates a key the UI captured (`KeyboardEvent.code` plus modifiers, e.g. "Ctrl+KeyA")
+/// and returns the shortcut string to store as `pttKey` (e.g. "Ctrl+A"). On Wayland the
+/// desktop's shortcut dialog opens with `key` preselected and the user's choice is returned.
 #[tauri::command]
 #[specta::specta]
-pub async fn ptt_capture_key() -> ApiResult<String> {
-    not_implemented()
+pub async fn ptt_capture_key(key: String) -> ApiResult<String> {
+    ptt::capture(&key).await
 }
 
 /// Aborts a pending `ptt_capture_key`, which then fails with `invalidInput`.
 #[tauri::command]
 #[specta::specta]
 pub fn ptt_capture_cancel() -> ApiResult<()> {
-    not_implemented()
+    ptt::cancel_capture();
+    Ok(())
 }

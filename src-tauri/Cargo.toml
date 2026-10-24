@@ -33,7 +33,11 @@ tauri-plugin-single-instance.workspace = true
 tauri-plugin-global-shortcut.workspace = true
 
 [target.'cfg(target_os = "linux")'.dependencies]
-ashpd.workspace = true
+ashpd = { workspace = true, features = ["global_shortcuts"] }
+
+[dev-dependencies]
+# `tauri::test` mock app for the X11 push-to-talk check.
+tauri = { workspace = true, features = ["test"] }
 
 [lints]
 workspace = true
