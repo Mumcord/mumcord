@@ -957,3 +957,12 @@ Until now external images (img tags pointing to web addresses, image links) are 
 ✍️ Note: Requested in chat during /dev.
 
 ---
+
+#### QA.36 How to stage the remaining Epic 1 work? `◉`
+
+- [x] **Stage 1b = chat features (QA.34, QA.35 and the unread-flash bug); positional audio and the overlay move to a new stage 1c (in-game features).**
+- [ ] Keep everything in stage 1b.
+
+✍️ Note: Requested in chat during /dev ("splitten mal die chat features von ingame overlay. chat features ist 1b").
+
+---

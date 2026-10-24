@@ -188,18 +188,18 @@
 | F95 | Follow eye button target 16px < 24px minimum (axe); check sounds-close E2E with bots in AFK | done – eye 24px target; sounds-close on v14 | f95-eye-target | F92 | simple | AC-1.27 | ui/src/features/follow css, e2e sounds-close |
 | F96 | Flaky audio unit test on macOS CI: null_backend_paces_silence_and_survives_device_switch ("only 19 frames after switch") | done – wait for 50 frames (10 s deadline) and assert ≥250 ms pacing | f96-audio-flake | – | simple | – | crates/audio/src/io/controller.rs tests |
 | G1 | **Stage 1a gate** (checklist in specs/01-foundation-implementation.md): user manual checklist (Win/macOS, listening, KDE PTT/tray/Orca) + sign-off | open | user | C1–C8 | – | – | – |
-| B30 | Mumble Link + 3D audio | open | | G1 | complex | FR-1.41, 1.43 | crates/positional/src/link/, crates/audio/src/spatial/ |
-| B31 | Game plugin host | open | | B30 | complex | FR-1.42, 1.43 | crates/positional/src/plugins/ |
-| B32 | Overlay window | open | | G1 | complex | FR-1.44–1.46 | src-tauri/src/overlay.rs, ui/src/overlay/ |
-| B33 | 1b settings UI | open | | B30, B32 | simple | FR-1.41, 1.43, 1.45, 1.46 | ui/src/features/settings/positional/ |
-| C9 | Verify positional audio | open | | B31, B33 | complex | AC-1.31, 1.32 | e2e/specs/positional |
-| C10 | Verify overlay | open | | B32, B33 | simple | AC-1.33, 1.34 | e2e/specs/overlay |
+| B30 | (1c) Mumble Link + 3D audio | open | | G1 | complex | FR-1.41, 1.43 | crates/positional/src/link/, crates/audio/src/spatial/ |
+| B31 | (1c) Game plugin host | open | | B30 | complex | FR-1.42, 1.43 | crates/positional/src/plugins/ |
+| B32 | (1c) Overlay window | open | | G1 | complex | FR-1.44–1.46 | src-tauri/src/overlay.rs, ui/src/overlay/ |
+| B33 | (1c) positional + overlay settings UI | open | | B30, B32 | simple | FR-1.41, 1.43, 1.45, 1.46 | ui/src/features/settings/positional/ |
+| C9 | (1c) Verify positional audio | open | | B31, B33 | complex | AC-1.31, 1.32 | e2e/specs/positional |
+| C10 | (1c) Verify overlay | open | | B32, B33 | simple | AC-1.33, 1.34 | e2e/specs/overlay |
 | B34 | Link previews + YouTube/Twitch player cards (FR-1.49, 1.50) | open | | G1 | complex | AC-1.39, 1.40 | crates/engine (metadata fetch), ui chat, wizard, settings |
 | B35 | Mentions with autocomplete (FR-1.51) | open | | G1 | simple | AC-1.41 | ui chat input, notifications |
 | B36 | Tenor GIF search (FR-1.52) | open | | G1 | complex | AC-1.42 | ui chat input, CI secret |
-| B37 | Code highlighting + formatting toolbar/shortcuts (FR-1.53, 1.54) | open | | G1 | simple | AC-1.43, 1.44 | ui chat |
+| B37 | Code highlighting + formatting toolbar/shortcuts (FR-1.53, 1.54) | in progress | b37-code-format | G1 | simple | AC-1.43, 1.44 | ui chat |
 | B38 | External images and image links inline (FR-1.55) | open | | B34 | complex | AC-1.45 | crates/engine (image fetch), ui chat |
-| B39 | Bug: unread bubble flashes briefly on the channel whose chat is open when a message arrives (own channel, F93 regression) | open | | – | simple | FR-1.31 | ui/src/features/follow unread, engine chat.rs |
+| B39 | Bug: unread bubble flashes briefly on the channel whose chat is open when a message arrives (own channel, F93 regression) | in progress | b39-unread-flash | – | simple | FR-1.31 | ui/src/features/follow unread, engine chat.rs |
 | D1 | Implementation report | open | | C1–C10 | simple | all | specs/01-foundation-implementation.md |
 
 ## Contracts from finished tasks
