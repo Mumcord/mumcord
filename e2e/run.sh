@@ -16,6 +16,8 @@ fi
 docker build -q -t "$image" "$repo/e2e" >/dev/null
 
 tty=(); [ -t 1 ] && tty=(-t)
+# Extra `docker run` flags, e.g. MUMCORD_E2E_DOCKER_ARGS="--cpus=2" to mimic a 2-core CI runner.
+read -r -a extra <<< "${MUMCORD_E2E_DOCKER_ARGS:-}"
 # Host network: the app, bots and netsim reach the testenv servers on localhost:64738-64741 and
 # netsim on 64800/64801. The repo is mounted at its host path so docker compose (via the host
 # socket) resolves testenv's relative volume paths to real host paths.
@@ -33,4 +35,5 @@ exec docker run --rm -i --init "${tty[@]}" \
   -e HOME=/cache/home -e CARGO_HOME=/cache/cargo -e CARGO_TARGET_DIR=/cache/target \
   -e MUMCORD_SKIP_BINDINGS_EXPORT=1 \
   -e CI \
+  "${extra[@]}" \
   "$image" "$@"

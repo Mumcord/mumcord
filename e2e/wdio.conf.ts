@@ -1,11 +1,12 @@
 import { mkdirSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { browser } from "@wdio/globals";
-import { driverPort, prepareFresh, stopDriver } from "./helpers/app.ts";
+import { driverPort, prepareFresh, stopDriver, withTimeout } from "./helpers/app.ts";
 import { netsim } from "./helpers/index.ts";
 import { artifactsDir, bin } from "./helpers/paths.ts";
 
-// Each spec file = one worker = one fresh install (new profile, empty keyring). Specs run one at a
+// Each spec file = one worker = one fresh install (new profile, empty keyring, and no app or
+// driver process left over from the previous spec – see killStrays). Specs run one at a
 // time because they share the test servers, the keyring and the netsim ports.
 export const config: WebdriverIO.Config = {
   runner: "local",
@@ -35,8 +36,14 @@ export const config: WebdriverIO.Config = {
     if (passed) return;
     mkdirSync(artifactsDir, { recursive: true });
     const name = `${test.parent} ${test.title}`.replace(/[^\w-]+/g, "_").slice(0, 120);
-    await browser.saveScreenshot(join(artifactsDir, `${name}.png`));
-    writeFileSync(join(artifactsDir, `${name}.html`), await browser.getPageSource());
+    // Best effort: after a hang the session may be dead, and every command would wait for
+    // connectionRetryTimeout.
+    try {
+      await withTimeout(browser.saveScreenshot(join(artifactsDir, `${name}.png`)), 10_000, "screenshot");
+      writeFileSync(join(artifactsDir, `${name}.html`), await withTimeout(browser.getPageSource(), 10_000, "page source"));
+    } catch (e) {
+      console.warn(`[e2e] no failure screenshot/page source: ${String(e)}`);
+    }
   },
 
   afterSession: async () => {
