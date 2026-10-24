@@ -1,0 +1,11 @@
+dist
+target
+node_modules
+package-lock.json
+src-tauri/gen
+ui/src/bindings/commands.ts
+proto
+specs
+CLAUDE.md
+.claude
+testenv
