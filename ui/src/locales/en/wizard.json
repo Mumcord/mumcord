@@ -66,6 +66,17 @@
     "linkHandler": "Open mumble:// links with Mumcord",
     "linkHandlerHint": "Clicking a server link on a website then opens it here.",
     "linkHandlerActive": "Mumcord already opens mumble:// links.",
-    "linkHandlerFailed": "Mumcord could not be set up to open mumble:// links. You can try again in Settings."
+    "linkHandlerFailed": "Mumcord could not be set up to open mumble:// links. You can try again in Settings.",
+    "mouseDisabled": "Push to talk isn't available with this mouse button until \"Allow mouse buttons\" is switched on in Settings → Voice.",
+    "mouseNeedsInputGroup": "Push to talk isn't available: Mumcord may not read your mouse. Settings → Voice explains how to allow it.",
+    "mouseNeedsAccessibility": "Push to talk isn't available: Mumcord needs the Accessibility permission to see mouse buttons.",
+    "pressKeyOrMouse": "Press a key or a mouse button (middle or side)… (Escape to cancel)",
+    "mouse": {
+      "middle": "Middle mouse button",
+      "back": "Mouse button 4 (back)",
+      "forward": "Mouse button 5 (forward)"
+    },
+    "mouseStillWorks": "You can still use a mouse button.",
+    "mouseOptIn": "Want to use a mouse side button? Switch on \"Allow mouse buttons\" in Settings → Voice after setup."
   }
 }

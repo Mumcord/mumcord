@@ -66,7 +66,10 @@
     "pushToTalk": "Pulsar para hablar: transmite mientras mantienes una tecla",
     "unavailable": {
       "waylandNoPortal": "Pulsar para hablar no está disponible: tu escritorio no ofrece atajos globales.",
-      "registrationFailed": "Pulsar para hablar no está disponible: no se pudo registrar el atajo."
+      "registrationFailed": "Pulsar para hablar no está disponible: no se pudo registrar el atajo.",
+      "mouseDisabled": "Pulsar para hablar no está disponible: para usar el botón del ratón, activa «Permitir botones del ratón».",
+      "mouseNeedsInputGroup": "Pulsar para hablar no está disponible: Mumcord todavía no puede leer tu ratón (ver abajo).",
+      "mouseNeedsAccessibility": "Pulsar para hablar no está disponible: Mumcord necesita el permiso de Accesibilidad para ver los botones del ratón."
     },
     "suggestVoiceActivation": "Usa la activación por voz en su lugar.",
     "keyCurrent": "Tecla para hablar:",
@@ -85,7 +88,19 @@
     "echoCancellation": "Cancelación de eco",
     "echoCancellationHint": "Evita que los demás se oigan a sí mismos cuando usas altavoces.",
     "autoGain": "Volumen automático",
-    "autoGainHint": "Mantiene tu voz a un nivel uniforme."
+    "autoGainHint": "Mantiene tu voz a un nivel uniforme.",
+    "keyListeningMouse": "Pulsa una tecla o un botón del ratón (central o lateral)… (Escape para cancelar)",
+    "mouse": {
+      "middle": "Botón central del ratón",
+      "back": "Botón 4 del ratón (atrás)",
+      "forward": "Botón 5 del ratón (adelante)"
+    },
+    "mouseToggle": "Permitir botones del ratón (requiere el grupo input)",
+    "mouseToggleWarning": "Te permite usar un botón del ratón para pulsar para hablar. Para ello debes estar en el grupo «input», que permite a cualquier programa que ejecutes leer todos los dispositivos de entrada, incluido el teclado. Mumcord solo abre ratones, solo vigila tu botón de pulsar para hablar y nunca graba ni registra nada.",
+    "mouseInputGroup": "Mumcord todavía no puede leer tu ratón. Añádete al grupo «input» ejecutando este comando en una terminal:",
+    "mouseLogOut": "Después cierra la sesión y vuelve a entrar. Hasta entonces, usa una tecla o la activación por voz.",
+    "mouseNoDevice": "No se encontró ningún ratón. Conecta uno; Mumcord lo detecta automáticamente.",
+    "mouseAccessibility": "Para usar botones del ratón, permite Mumcord en Ajustes del Sistema → Privacidad y seguridad → Accesibilidad y reinicia Mumcord."
   },
   "history": {
     "explanation": "Los mensajes del chat se guardan solo en este ordenador.",

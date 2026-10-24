@@ -66,6 +66,17 @@
     "linkHandler": "Abrir enlaces mumble:// con Mumcord",
     "linkHandlerHint": "Al hacer clic en un enlace de servidor en una web, se abrirá aquí.",
     "linkHandlerActive": "Mumcord ya abre los enlaces mumble://.",
-    "linkHandlerFailed": "No se pudo configurar Mumcord para abrir enlaces mumble://. Puedes intentarlo de nuevo en Ajustes."
+    "linkHandlerFailed": "No se pudo configurar Mumcord para abrir enlaces mumble://. Puedes intentarlo de nuevo en Ajustes.",
+    "mouseDisabled": "Pulsar para hablar no está disponible con este botón del ratón hasta que actives «Permitir botones del ratón» en Ajustes → Voz.",
+    "mouseNeedsInputGroup": "Pulsar para hablar no está disponible: Mumcord no puede leer tu ratón. En Ajustes → Voz se explica cómo permitirlo.",
+    "mouseNeedsAccessibility": "Pulsar para hablar no está disponible: Mumcord necesita el permiso de Accesibilidad para ver los botones del ratón.",
+    "pressKeyOrMouse": "Pulsa una tecla o un botón del ratón (central o lateral)… (Escape para cancelar)",
+    "mouse": {
+      "middle": "Botón central del ratón",
+      "back": "Botón 4 del ratón (atrás)",
+      "forward": "Botón 5 del ratón (adelante)"
+    },
+    "mouseStillWorks": "Aún puedes usar un botón del ratón.",
+    "mouseOptIn": "¿Quieres usar un botón lateral del ratón? Activa «Permitir botones del ratón» en Ajustes → Voz después de la configuración."
   }
 }

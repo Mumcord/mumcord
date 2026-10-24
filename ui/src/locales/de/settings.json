@@ -66,7 +66,10 @@
     "pushToTalk": "Push-to-Talk – sendet, solange du eine Taste hältst",
     "unavailable": {
       "waylandNoPortal": "Push-to-Talk ist nicht verfügbar: Deine Arbeitsumgebung bietet keine globalen Tastenkürzel.",
-      "registrationFailed": "Push-to-Talk ist nicht verfügbar: Das Tastenkürzel konnte nicht registriert werden."
+      "registrationFailed": "Push-to-Talk ist nicht verfügbar: Das Tastenkürzel konnte nicht registriert werden.",
+      "mouseDisabled": "Push-to-Talk ist nicht verfügbar: Für die Maustaste muss „Maustasten erlauben“ eingeschaltet sein.",
+      "mouseNeedsInputGroup": "Push-to-Talk ist nicht verfügbar: Mumcord darf deine Maus noch nicht lesen (siehe unten).",
+      "mouseNeedsAccessibility": "Push-to-Talk ist nicht verfügbar: Mumcord braucht die Bedienungshilfen-Berechtigung, um Maustasten zu sehen."
     },
     "suggestVoiceActivation": "Nutze stattdessen die Sprachaktivierung.",
     "keyCurrent": "Push-to-Talk-Taste:",
@@ -85,7 +88,19 @@
     "echoCancellation": "Echounterdrückung",
     "echoCancellationHint": "Verhindert, dass andere sich selbst hören, wenn du Lautsprecher nutzt.",
     "autoGain": "Automatische Lautstärke",
-    "autoGainHint": "Hält deine Stimme auf gleichmäßigem Pegel."
+    "autoGainHint": "Hält deine Stimme auf gleichmäßigem Pegel.",
+    "keyListeningMouse": "Drücke eine Taste oder Maustaste (Mitte oder Seite)… (Escape zum Abbrechen)",
+    "mouse": {
+      "middle": "Mittlere Maustaste",
+      "back": "Maustaste 4 (zurück)",
+      "forward": "Maustaste 5 (vor)"
+    },
+    "mouseToggle": "Maustasten erlauben (benötigt die Gruppe input)",
+    "mouseToggleWarning": "Damit kannst du eine Maustaste für Push-to-Talk nutzen. Dafür musst du in der Gruppe „input“ sein – dann kann jedes Programm, das du startest, alle Eingabegeräte lesen, auch deine Tastatur. Mumcord selbst öffnet nur Mäuse, beachtet nur deine Push-to-Talk-Taste und zeichnet nichts auf oder protokolliert es.",
+    "mouseInputGroup": "Mumcord darf deine Maus noch nicht lesen. Füge dich mit diesem Befehl in einem Terminal zur Gruppe „input“ hinzu:",
+    "mouseLogOut": "Melde dich danach ab und wieder an. Bis dahin nutze eine Tastaturtaste oder die Sprachaktivierung.",
+    "mouseNoDevice": "Keine Maus gefunden. Schließe eine an; Mumcord erkennt sie automatisch.",
+    "mouseAccessibility": "Um Maustasten zu nutzen, erlaube Mumcord unter Systemeinstellungen → Datenschutz & Sicherheit → Bedienungshilfen und starte Mumcord neu."
   },
   "history": {
     "explanation": "Chatnachrichten werden nur auf diesem Computer gespeichert.",

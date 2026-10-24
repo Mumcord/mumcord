@@ -1,8 +1,14 @@
-import { useId, useRef, useState, type KeyboardEvent } from "react";
+import { useId, useRef, useState, type KeyboardEvent, type MouseEvent } from "react";
 import { useTranslation } from "react-i18next";
-import { getApi, type PttAvailability, type Settings, type TalkMode } from "../../api";
+import {
+  getApi,
+  type PttAvailability,
+  type PttMouseStatus,
+  type Settings,
+  type TalkMode,
+} from "../../api";
 import { errorCode } from "./errors";
-import { keyCombo } from "./keyCombo";
+import { keyCombo, mouseKey, mouseLabel } from "./keyCombo";
 import { StepFrame } from "./StepFrame";
 
 export interface TalkChoice {
@@ -18,6 +24,8 @@ interface TalkModeStepProps {
   settings: Settings;
   /** `null` when availability could not be determined; capture then reports any problem. */
   availability: PttAvailability | null;
+  /** Mouse-button support (FR-1.21); `null` when unknown, then only keys can be captured. */
+  mouseStatus?: PttMouseStatus | null;
   /** Whether Mumcord already handles `mumble://` links; `null` when unknown. */
   linkHandlerActive: boolean | null;
   focusOnMount: boolean;
@@ -30,6 +38,7 @@ interface TalkModeStepProps {
 export function TalkModeStep({
   settings,
   availability,
+  mouseStatus = null,
   linkHandlerActive,
   focusOnMount,
   onBack,
@@ -37,6 +46,11 @@ export function TalkModeStep({
 }: TalkModeStepProps) {
   const { t } = useTranslation("wizard");
   const unavailable = availability?.status === "unavailable" ? availability.reason : null;
+  // Wayland reads mice only after the user opts in under Settings → Voice (QA.4).
+  const mouseAllowed =
+    mouseStatus?.support === "native" ||
+    (mouseStatus?.support === "evdev" && settings.allowMouseButtons);
+  const mouseNeedsOptIn = mouseStatus?.support === "evdev" && !settings.allowMouseButtons;
   const [mode, setMode] = useState<TalkMode>(unavailable ? "voiceActivation" : settings.talkMode);
   const [pttKey, setPttKey] = useState<string | null>(settings.pttKey);
   const [capture, setCapture] = useState<Capture>("off");
@@ -103,6 +117,25 @@ export function TalkModeStep({
     if (combo !== null) void captureKey(combo);
   }
 
+  /** Middle and side buttons while listening; left/right clicks keep working as clicks. */
+  function onCaptureMouseDown(event: MouseEvent<HTMLButtonElement>) {
+    if (capture !== "listening" || !mouseAllowed) return;
+    const key = mouseKey(event.button);
+    if (key === null) return;
+    event.preventDefault();
+    void captureKey(key);
+  }
+
+  /** Keeps side buttons from navigating and the middle button from pasting while capturing. */
+  function suppressMouse(event: MouseEvent<HTMLButtonElement>) {
+    if (capture !== "off" && mouseKey(event.button) !== null) event.preventDefault();
+  }
+
+  function keyName(key: string): string {
+    const mouse = mouseLabel(key);
+    return mouse === null ? key : t(`talk.mouse.${mouse}`);
+  }
+
   async function submit() {
     if (mode === "pushToTalk" && pttKey === null) {
       setKeyError(t("talk.keyRequired"));
@@ -125,7 +158,9 @@ export function TalkModeStep({
 
   const captureLabel =
     capture === "listening"
-      ? t("talk.pressKey")
+      ? mouseAllowed
+        ? t("talk.pressKeyOrMouse")
+        : t("talk.pressKey")
       : capture === "pending"
         ? t("talk.confirmDialog")
         : pttKey === null
@@ -167,7 +202,7 @@ export function TalkModeStep({
             name="talk-mode"
             value="pushToTalk"
             checked={mode === "pushToTalk"}
-            disabled={unavailable !== null}
+            disabled={unavailable !== null && !mouseAllowed}
             aria-describedby={unavailable ? `${ids.pttHint} ${ids.unavailable}` : ids.pttHint}
             onChange={() => {
               setMode("pushToTalk");
@@ -181,7 +216,11 @@ export function TalkModeStep({
         {unavailable && (
           <p id={ids.unavailable} className="wizard-note wizard-indent">
             {t(`talk.${unavailable}`)}
+            {mouseAllowed && ` ${t("talk.mouseStillWorks")}`}
           </p>
+        )}
+        {mode === "pushToTalk" && mouseNeedsOptIn && (
+          <p className="wizard-muted wizard-small wizard-indent">{t("talk.mouseOptIn")}</p>
         )}
         {mode === "pushToTalk" && (
           <div className="wizard-row wizard-indent">
@@ -198,6 +237,9 @@ export function TalkModeStep({
                 }
               }}
               onKeyDown={onCaptureKeyDown}
+              onMouseDown={onCaptureMouseDown}
+              onMouseUp={suppressMouse}
+              onAuxClick={suppressMouse}
               onBlur={() => {
                 if (capture === "listening") setCapture("off");
               }}
@@ -205,7 +247,7 @@ export function TalkModeStep({
               {captureLabel}
             </button>
             <span id={ids.key}>
-              {pttKey === null ? t("talk.noKey") : t("talk.currentKey", { key: pttKey })}
+              {pttKey === null ? t("talk.noKey") : t("talk.currentKey", { key: keyName(pttKey) })}
             </span>
           </div>
         )}

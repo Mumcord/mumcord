@@ -16,6 +16,7 @@ import type {
   Identity,
   MumbleLink,
   PttAvailability,
+  PttMouseStatus,
   SavedServer,
   ServerInfo,
   ServerInput,
@@ -72,6 +73,7 @@ const DEFAULT_SETTINGS: Settings = {
   language: null,
   talkMode: "voiceActivation",
   pttKey: null,
+  allowMouseButtons: false,
   inputDevice: null,
   outputDevice: null,
   noiseSuppression: true,
@@ -701,7 +703,9 @@ export function createMockApi(options: MockOptions = {}): MockApi {
 
     // push-to-talk
     pttAvailability: () => Promise.resolve<PttAvailability>({ status: "available" }),
-    pttCaptureKey: () => Promise.resolve("F13"),
+    // Mouse buttons come back unchanged (no desktop dialog), keyboard keys as "F13".
+    pttCaptureKey: (key) => Promise.resolve(/^Mouse(Middle|4|5)$/.test(key) ? key : "F13"),
+    pttMouseStatus: () => Promise.resolve<PttMouseStatus>({ support: "native", state: "ready" }),
     pttCaptureCancel: () => Promise.resolve(null),
 
     // app

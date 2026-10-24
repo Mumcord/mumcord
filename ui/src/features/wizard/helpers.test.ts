@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { shortDeviceName } from "./deviceName";
-import { keyCombo } from "./keyCombo";
+import { keyCombo, mouseKey, mouseLabel } from "./keyCombo";
 
 const via = (backend: string) => `System default (${backend})`;
 const key = (
@@ -44,5 +44,26 @@ describe("keyCombo", () => {
     expect(keyCombo(key("ControlLeft", { ctrlKey: true }))).toBeNull();
     expect(keyCombo(key("ShiftRight", { shiftKey: true }))).toBeNull();
     expect(keyCombo(key(""))).toBeNull();
+  });
+});
+
+describe("mouseKey", () => {
+  it("maps middle and side buttons to pttKey names", () => {
+    expect(mouseKey(1)).toBe("MouseMiddle");
+    expect(mouseKey(3)).toBe("Mouse4");
+    expect(mouseKey(4)).toBe("Mouse5");
+  });
+
+  it("leaves left and right click alone", () => {
+    expect(mouseKey(0)).toBeNull();
+    expect(mouseKey(2)).toBeNull();
+    expect(mouseKey(7)).toBeNull();
+  });
+
+  it("labels stored mouse keys only", () => {
+    expect(mouseLabel("Mouse4")).toBe("back");
+    expect(mouseLabel("Mouse5")).toBe("forward");
+    expect(mouseLabel("MouseMiddle")).toBe("middle");
+    expect(mouseLabel("Ctrl+A")).toBeNull();
   });
 });

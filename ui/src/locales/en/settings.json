@@ -66,7 +66,10 @@
     "pushToTalk": "Push-to-talk – sends while you hold a key",
     "unavailable": {
       "waylandNoPortal": "Push-to-talk is not available: your desktop does not offer global shortcuts.",
-      "registrationFailed": "Push-to-talk is not available: the shortcut could not be registered."
+      "registrationFailed": "Push-to-talk is not available: the shortcut could not be registered.",
+      "mouseDisabled": "Push-to-talk is not available: your mouse button needs \"Allow mouse buttons\" to be switched on.",
+      "mouseNeedsInputGroup": "Push-to-talk is not available: Mumcord may not read your mouse yet (see below).",
+      "mouseNeedsAccessibility": "Push-to-talk is not available: Mumcord needs the Accessibility permission to see mouse buttons."
     },
     "suggestVoiceActivation": "Use voice activation instead.",
     "keyCurrent": "Push-to-talk key:",
@@ -85,7 +88,19 @@
     "echoCancellation": "Echo cancellation",
     "echoCancellationHint": "Stops others from hearing themselves when you use speakers.",
     "autoGain": "Automatic volume",
-    "autoGainHint": "Keeps your voice at an even level."
+    "autoGainHint": "Keeps your voice at an even level.",
+    "keyListeningMouse": "Press a key or a mouse button (middle or side)… (Escape to cancel)",
+    "mouse": {
+      "middle": "Middle mouse button",
+      "back": "Mouse button 4 (back)",
+      "forward": "Mouse button 5 (forward)"
+    },
+    "mouseToggle": "Allow mouse buttons (requires input group)",
+    "mouseToggleWarning": "Lets you use a mouse button for push-to-talk. For this you must be in the \"input\" group, which lets every program you run read all input devices, including your keyboard. Mumcord itself only opens mice, only watches your push-to-talk button and never records or logs anything.",
+    "mouseInputGroup": "Mumcord may not read your mouse yet. Add yourself to the \"input\" group by running this command in a terminal:",
+    "mouseLogOut": "Then log out and back in. Until then, use a keyboard key or voice activation.",
+    "mouseNoDevice": "No mouse found. Plug one in; Mumcord picks it up automatically.",
+    "mouseAccessibility": "To use mouse buttons, allow Mumcord under System Settings → Privacy & Security → Accessibility, then restart Mumcord."
   },
   "history": {
     "explanation": "Chat messages are saved only on this computer.",

@@ -1,6 +1,6 @@
 import { fireEvent, screen, waitFor } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi, type Mock } from "vitest";
-import { setApi, type PttAvailability, type Settings } from "../../api";
+import { setApi, type PttAvailability, type PttMouseStatus, type Settings } from "../../api";
 import { TalkModeStep, type TalkChoice } from "./TalkModeStep";
 import { renderInWizard, setupWizardTest, type Harness } from "./testUtils";
 
@@ -21,12 +21,14 @@ afterEach(() => {
 function renderStep(
   availability: PttAvailability | null = { status: "available" },
   linkHandlerActive: boolean | null = false,
+  mouseStatus: PttMouseStatus | null = null,
 ) {
   renderInWizard(
     harness,
     <TalkModeStep
       settings={settings}
       availability={availability}
+      mouseStatus={mouseStatus}
       linkHandlerActive={linkHandlerActive}
       focusOnMount={false}
       onBack={vi.fn()}
@@ -184,5 +186,31 @@ describe("TalkModeStep", () => {
     await waitFor(() => {
       expect(onFinish).toHaveBeenCalledTimes(2);
     });
+  });
+
+  it("captures a mouse side button where mouse buttons work natively", async () => {
+    const capture = vi.spyOn(harness.api, "pttCaptureKey");
+    renderStep({ status: "available" }, false, { support: "native", state: "ready" });
+    fireEvent.click(screen.getByRole("radio", { name: /Push to talk/ }));
+    const button = screen.getByRole("button", { name: "Choose key" });
+    fireEvent.click(button);
+    fireEvent.mouseDown(button, { button: 0 });
+    expect(capture).not.toHaveBeenCalled();
+    fireEvent.mouseDown(button, { button: 4 });
+    expect(capture).toHaveBeenCalledWith("Mouse5");
+    expect(await screen.findByText("Key: Mouse button 5 (forward)")).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "Finish" }));
+    await waitFor(() => {
+      expect(onFinish).toHaveBeenCalledWith(expect.objectContaining({ pttKey: "Mouse5" }));
+    });
+  });
+
+  it("points to the opt-in on Wayland and ignores mouse buttons until then", () => {
+    const capture = vi.spyOn(harness.api, "pttCaptureKey");
+    renderStep({ status: "available" }, false, { support: "evdev", state: "ready" });
+    const button = startCapture();
+    expect(screen.getByText(/Allow mouse buttons/)).toBeInTheDocument();
+    fireEvent.mouseDown(button, { button: 3 });
+    expect(capture).not.toHaveBeenCalled();
   });
 });

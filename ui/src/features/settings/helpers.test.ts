@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { readableDeviceName } from "./deviceNames";
-import { keyCombo } from "./pttKey";
+import { keyCombo, mouseKey, mouseLabel } from "./pttKey";
 
 const key = (
   code: string,
@@ -34,5 +34,26 @@ describe("readableDeviceName", () => {
       "Default ALSA Output",
     );
     expect(readableDeviceName("USB Headset")).toBe("USB Headset");
+  });
+});
+
+describe("mouseKey", () => {
+  it("maps middle and side buttons to pttKey names", () => {
+    expect(mouseKey(1)).toBe("MouseMiddle");
+    expect(mouseKey(3)).toBe("Mouse4");
+    expect(mouseKey(4)).toBe("Mouse5");
+  });
+
+  it("leaves left and right click alone", () => {
+    expect(mouseKey(0)).toBeNull();
+    expect(mouseKey(2)).toBeNull();
+    expect(mouseKey(7)).toBeNull();
+  });
+
+  it("labels stored mouse keys only", () => {
+    expect(mouseLabel("Mouse4")).toBe("back");
+    expect(mouseLabel("Mouse5")).toBe("forward");
+    expect(mouseLabel("MouseMiddle")).toBe("middle");
+    expect(mouseLabel("Ctrl+A")).toBeNull();
   });
 });

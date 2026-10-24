@@ -1,7 +1,13 @@
 import { useCallback, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { announce } from "../../a11y";
-import { getApi, type Identity, type PttAvailability, type Settings } from "../../api";
+import {
+  getApi,
+  type Identity,
+  type PttAvailability,
+  type PttMouseStatus,
+  type Settings,
+} from "../../api";
 import { usePreferences } from "../../app/preferences";
 import { useView } from "../../app/view";
 import { IdentityStep } from "./IdentityStep";
@@ -13,6 +19,7 @@ interface Loaded {
   settings: Settings;
   identity: Identity | null;
   availability: PttAvailability | null;
+  mouseStatus: PttMouseStatus | null;
   linkHandlerActive: boolean | null;
 }
 
@@ -28,13 +35,14 @@ function optional<T>(promise: Promise<T>, what: string): Promise<T | null> {
 
 async function loadWizard(): Promise<Loaded> {
   const api = getApi();
-  const [settings, identity, availability, linkHandlerActive] = await Promise.all([
+  const [settings, identity, availability, mouseStatus, linkHandlerActive] = await Promise.all([
     api.settingsGet(),
     api.identityGet(),
     optional(api.pttAvailability(), "ptt availability"),
+    optional(api.pttMouseStatus(), "ptt mouse status"),
     optional(api.linkHandlerStatus(), "link handler status"),
   ]);
-  return { settings, identity, availability, linkHandlerActive };
+  return { settings, identity, availability, mouseStatus, linkHandlerActive };
 }
 
 /** First-start wizard: identity → microphone → talk mode (FR-1.1–FR-1.6). */
@@ -149,6 +157,7 @@ export function Wizard() {
         <TalkModeStep
           settings={settings}
           availability={load.availability}
+          mouseStatus={load.mouseStatus}
           linkHandlerActive={load.linkHandlerActive}
           focusOnMount={navigated}
           onBack={() => {

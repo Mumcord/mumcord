@@ -327,9 +327,83 @@ describe("Voice section", () => {
       status: "unavailable",
       reason: "waylandNoPortal",
     });
+    vi.spyOn(api, "pttMouseStatus").mockResolvedValue({ support: "evdev", state: "ready" });
     await openSection("Voice");
     expect(await screen.findByText(/does not offer global shortcuts/)).toBeInTheDocument();
     expect(screen.getByRole("radio", { name: /Push-to-talk/ })).toBeDisabled();
+  });
+
+  it("captures a mouse side button and shows it by name", async () => {
+    const capture = vi.spyOn(api, "pttCaptureKey");
+    const update = vi.spyOn(api, "settingsUpdate");
+    const button = await openPushToTalk();
+    fireEvent.click(button);
+    expect(button).toHaveAccessibleName(/mouse button/);
+    // Left and right click are never captured.
+    fireEvent.mouseDown(button, { button: 0 });
+    fireEvent.mouseDown(button, { button: 2 });
+    expect(capture).not.toHaveBeenCalled();
+    fireEvent.mouseDown(button, { button: 3 });
+    expect(capture).toHaveBeenCalledWith("Mouse4");
+    await waitFor(() => {
+      expect(update).toHaveBeenLastCalledWith(expect.objectContaining({ pttKey: "Mouse4" }));
+    });
+    expect(await screen.findByText("Mouse button 4 (back)")).toBeInTheDocument();
+  });
+
+  describe("on Wayland", () => {
+    beforeEach(() => {
+      vi.spyOn(api, "pttMouseStatus").mockResolvedValue({
+        support: "evdev",
+        state: "inputGroupMissing",
+      });
+    });
+
+    it("keeps mouse buttons off until the user opts in, with a warning", async () => {
+      const capture = vi.spyOn(api, "pttCaptureKey");
+      const update = vi.spyOn(api, "settingsUpdate");
+      const button = await openPushToTalk();
+      const toggle = screen.getByRole("switch", { name: /Allow mouse buttons/ });
+      expect(toggle).not.toBeChecked();
+      expect(toggle).toHaveAccessibleDescription(/read all input devices, including your keyboard/);
+      expect(screen.queryByText("sudo usermod -aG input $USER")).not.toBeInTheDocument();
+      fireEvent.click(button);
+      fireEvent.mouseDown(button, { button: 4 });
+      expect(capture).not.toHaveBeenCalled();
+      fireEvent.click(toggle);
+      await waitFor(() => {
+        expect(update).toHaveBeenLastCalledWith(
+          expect.objectContaining({ allowMouseButtons: true }),
+        );
+      });
+    });
+
+    it("shows the input group command when permission is missing", async () => {
+      await api.settingsUpdate({ ...(await api.settingsGet()), allowMouseButtons: true });
+      await openSection("Voice");
+      expect(await screen.findByText("sudo usermod -aG input $USER")).toBeInTheDocument();
+      expect(screen.getByText(/log out and back in/)).toBeInTheDocument();
+    });
+
+    it("offers push-to-talk without the portal once mouse buttons are allowed", async () => {
+      vi.spyOn(api, "pttAvailability").mockResolvedValue({
+        status: "unavailable",
+        reason: "waylandNoPortal",
+      });
+      await api.settingsUpdate({ ...(await api.settingsGet()), allowMouseButtons: true });
+      await openSection("Voice");
+      await screen.findByText(/does not offer global shortcuts/);
+      expect(screen.getByRole("radio", { name: /Push-to-talk/ })).toBeEnabled();
+    });
+  });
+
+  it("explains the missing Accessibility permission on macOS", async () => {
+    vi.spyOn(api, "pttMouseStatus").mockResolvedValue({
+      support: "native",
+      state: "accessibilityMissing",
+    });
+    await openSection("Voice");
+    expect(await screen.findByText(/Privacy & Security → Accessibility/)).toBeInTheDocument();
   });
 
   it("saves the voice processing switches", async () => {

@@ -1,17 +1,34 @@
-import { useEffect, useRef, useState, type KeyboardEvent } from "react";
+import { useEffect, useRef, useState, type KeyboardEvent, type MouseEvent } from "react";
 import { useTranslation } from "react-i18next";
-import { getApi, toEngineError, type PttAvailability } from "../../../api";
+import {
+  getApi,
+  toEngineError,
+  type PttAvailability,
+  type PttMouseStatus,
+  type Settings,
+} from "../../../api";
 import { RadioGroup } from "../components/RadioGroup";
 import { Group, Section } from "../components/Section";
 import { Switch } from "../components/Switch";
 import { errorText } from "../errors";
-import { keyCombo } from "../pttKey";
+import { keyCombo, mouseKey, mouseLabel } from "../pttKey";
 import type { SettingsSectionProps } from "./types";
+
+/** The command that adds the user to the `input` group (FR-1.21, AC-1.37). */
+const INPUT_GROUP_COMMAND = "sudo usermod -aG input $USER";
+
+/** Whether mouse buttons may be captured: natively, or on Wayland after opting in (QA.4). */
+function mouseAllowed(status: PttMouseStatus | null, settings: Settings): boolean {
+  return (
+    status?.support === "native" || (status?.support === "evdev" && settings.allowMouseButtons)
+  );
+}
 
 /** Voice: talk mode with push-to-talk key capture, and the voice processing switches. */
 export function VoiceSection({ settings, update }: SettingsSectionProps) {
   const { t } = useTranslation("settings");
   const [availability, setAvailability] = useState<PttAvailability | null>(null);
+  const [mouseStatus, setMouseStatus] = useState<PttMouseStatus | null>(null);
 
   useEffect(() => {
     let active = true;
@@ -30,8 +47,27 @@ export function VoiceSection({ settings, update }: SettingsSectionProps) {
     };
   }, []);
 
+  // Re-checked when the opt-in or the key changes (the macOS permission shows up on use).
+  useEffect(() => {
+    let active = true;
+    getApi()
+      .pttMouseStatus()
+      .then(
+        (result) => {
+          if (active) setMouseStatus(result);
+        },
+        (error: unknown) => {
+          console.error("Checking mouse push-to-talk support failed", error);
+        },
+      );
+    return () => {
+      active = false;
+    };
+  }, [settings.allowMouseButtons, settings.pttKey]);
+
   const unavailable = availability?.status === "unavailable" ? availability.reason : null;
   const ptt = settings.talkMode === "pushToTalk";
+  const mouse = mouseAllowed(mouseStatus, settings);
 
   return (
     <Section title={t("sections.voice")}>
@@ -45,7 +81,7 @@ export function VoiceSection({ settings, update }: SettingsSectionProps) {
             {
               value: "pushToTalk",
               label: t("voice.pushToTalk"),
-              disabled: unavailable !== null && !ptt,
+              disabled: unavailable !== null && !ptt && !mouse,
             },
           ]}
           onChange={(talkMode) => {
@@ -60,10 +96,38 @@ export function VoiceSection({ settings, update }: SettingsSectionProps) {
         {ptt && (
           <KeyCapture
             current={settings.pttKey}
+            mouseAllowed={mouse}
             onCaptured={(pttKey) => {
               update({ pttKey });
             }}
           />
+        )}
+        {mouseStatus?.support === "evdev" && (
+          <>
+            <Switch
+              label={t("voice.mouseToggle")}
+              description={t("voice.mouseToggleWarning")}
+              checked={settings.allowMouseButtons}
+              onChange={(allowMouseButtons) => {
+                update({ allowMouseButtons });
+              }}
+            />
+            {settings.allowMouseButtons && mouseStatus.state === "inputGroupMissing" && (
+              <div className="settings-warning" role="status">
+                <p>{t("voice.mouseInputGroup")}</p>
+                <p>
+                  <code className="settings-kbd">{INPUT_GROUP_COMMAND}</code>
+                </p>
+                <p>{t("voice.mouseLogOut")}</p>
+              </div>
+            )}
+            {settings.allowMouseButtons && mouseStatus.state === "noDevice" && (
+              <p className="settings-hint">{t("voice.mouseNoDevice")}</p>
+            )}
+          </>
+        )}
+        {mouseStatus?.state === "accessibilityMissing" && (
+          <p className="settings-warning">{t("voice.mouseAccessibility")}</p>
         )}
       </Group>
       <Group title={t("voice.processing")}>
@@ -100,6 +164,8 @@ type CaptureState = "idle" | "listening" | "waiting";
 
 interface KeyCaptureProps {
   current: string | null;
+  /** Also accept the middle and side mouse buttons while listening. */
+  mouseAllowed: boolean;
   onCaptured: (key: string) => void;
 }
 
@@ -107,7 +173,7 @@ interface KeyCaptureProps {
  * Push-to-talk key capture: the button listens for the next key (with modifiers) and hands it
  * to the engine, which validates it or, on Wayland, opens the desktop's shortcut dialog.
  */
-function KeyCapture({ current, onCaptured }: KeyCaptureProps) {
+function KeyCapture({ current, mouseAllowed, onCaptured }: KeyCaptureProps) {
   const { t } = useTranslation("settings");
   const [state, setState] = useState<CaptureState>("idle");
   const [problem, setProblem] = useState<string | null>(null);
@@ -176,9 +242,28 @@ function KeyCapture({ current, onCaptured }: KeyCaptureProps) {
     if (combo !== null) void capture(combo);
   };
 
+  /** Middle and side buttons while listening; left/right clicks keep working as clicks. */
+  const onMouseDown = (event: MouseEvent<HTMLButtonElement>) => {
+    if (state !== "listening" || !mouseAllowed) return;
+    const key = mouseKey(event.button);
+    if (key === null) return;
+    event.preventDefault();
+    void capture(key);
+  };
+
+  /** Keeps side buttons from navigating and the middle button from pasting while capturing. */
+  const suppressMouse = (event: MouseEvent<HTMLButtonElement>) => {
+    if (state !== "idle" && mouseKey(event.button) !== null) event.preventDefault();
+  };
+
+  const mouseName = current === null ? null : mouseLabel(current);
+  const shown = mouseName === null ? current : t(`voice.mouse.${mouseName}`);
+
   const label =
     state === "listening"
-      ? t("voice.keyListening")
+      ? mouseAllowed
+        ? t("voice.keyListeningMouse")
+        : t("voice.keyListening")
       : state === "waiting"
         ? t("voice.keyWaiting")
         : current === null
@@ -188,7 +273,7 @@ function KeyCapture({ current, onCaptured }: KeyCaptureProps) {
   return (
     <div className="settings-field-row">
       <p className="settings-value">
-        {t("voice.keyCurrent")} <kbd className="settings-kbd">{current ?? t("voice.keyNone")}</kbd>
+        {t("voice.keyCurrent")} <kbd className="settings-kbd">{shown ?? t("voice.keyNone")}</kbd>
       </p>
       <div className="settings-actions">
         <button
@@ -202,6 +287,9 @@ function KeyCapture({ current, onCaptured }: KeyCaptureProps) {
             setState(state === "listening" ? "idle" : "listening");
           }}
           onKeyDown={onKeyDown}
+          onMouseDown={onMouseDown}
+          onMouseUp={suppressMouse}
+          onAuxClick={suppressMouse}
           onBlur={() => {
             if (state === "listening") setState("idle");
           }}
