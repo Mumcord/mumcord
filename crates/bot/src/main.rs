@@ -10,6 +10,7 @@ use std::time::Duration;
 use anyhow::{Context, Result, bail};
 use clap::{Parser, Subcommand};
 use mumcord_bot::samples::{PNG, Sample};
+use mumcord_bot::voice::{BotVoice, PlayOptions};
 use mumcord_bot::{Bot, BotConfig, MessageCheck, UserCheck, env};
 use mumcord_protocol::{DenyKind, permissions};
 
@@ -92,6 +93,37 @@ enum Command {
     /// Wait for a condition; exits non-zero on timeout.
     #[command(subcommand)]
     Expect(Expect),
+    /// Play a WAV file as voice into the current channel (terminator sent at the end).
+    Play {
+        file: PathBuf,
+        /// Repeat until --seconds is over (forever without it).
+        #[arg(long = "loop")]
+        looping: bool,
+        /// Stop after this many seconds.
+        #[arg(long)]
+        seconds: Option<f64>,
+    },
+    /// Record received voice for --seconds into a 48 kHz mono WAV (sum of all speakers, or
+    /// only --from).
+    Record {
+        out: PathBuf,
+        #[arg(long)]
+        seconds: f64,
+        #[arg(long)]
+        from: Option<String>,
+    },
+    /// Wait until a user's voice reaches --min-rms dBFS (100 ms window); prints
+    /// "<level dB> <latency ms>". Only audio after this command (or the first voice command of
+    /// a script) is considered, so start it before the sender plays.
+    ExpectAudio {
+        #[arg(long)]
+        from: Option<String>,
+        #[arg(long, default_value_t = -40.0, allow_negative_numbers = true)]
+        min_rms: f32,
+        /// Seconds to wait (default: the global --timeout).
+        #[arg(long)]
+        timeout: Option<f64>,
+    },
     /// Wait a number of seconds (pacing in scripts).
     Sleep { seconds: f64 },
     /// Run subcommands from stdin, one per line (shell-like quoting, # comments), on one
@@ -145,15 +177,16 @@ async fn main() -> Result<()> {
         timeout: Duration::from_secs(cli.timeout),
     })
     .await?;
+    let mut voice = None;
     match cli.command {
-        Command::Script => run_script(&mut bot).await?,
-        command => run(&mut bot, command).await?,
+        Command::Script => run_script(&mut bot, &mut voice).await?,
+        command => run(&mut bot, &mut voice, command).await?,
     }
     tokio::time::sleep(Duration::from_secs(cli.hold)).await;
     Ok(())
 }
 
-async fn run_script(bot: &mut Bot) -> Result<()> {
+async fn run_script(bot: &mut Bot, voice: &mut Option<BotVoice>) -> Result<()> {
     for (number, line) in std::io::stdin().lock().lines().enumerate() {
         let line = line.context("reading stdin")?;
         let words = split_words(&line).with_context(|| format!("line {}", number + 1))?;
@@ -165,7 +198,7 @@ async fn run_script(bot: &mut Bot) -> Result<()> {
         if matches!(parsed.command, Command::Script) {
             bail!("line {}: script cannot be nested", number + 1);
         }
-        run(bot, parsed.command)
+        run(bot, voice, parsed.command)
             .await
             .with_context(|| format!("line {}: {line}", number + 1))?;
         println!("ok {line}");
@@ -179,7 +212,7 @@ struct ScriptLine {
     command: Command,
 }
 
-async fn run(bot: &mut Bot, command: Command) -> Result<()> {
+async fn run(bot: &mut Bot, voice: &mut Option<BotVoice>, command: Command) -> Result<()> {
     match command {
         Command::Connect => print_identity(bot)?,
         Command::Join { channel } => bot.join(&channel).await?,
@@ -215,6 +248,44 @@ async fn run(bot: &mut Bot, command: Command) -> Result<()> {
         Command::Deaf { on } => bot.set_deaf(matches!(on, Toggle::On))?,
         Command::DenyListen { channel } => bot.deny_listen(&channel).await?,
         Command::AllowListen { channel } => bot.allow_listen(&channel).await?,
+        Command::Play {
+            file,
+            looping,
+            seconds,
+        } => {
+            let opts = PlayOptions {
+                forever: looping,
+                max_duration: seconds.map(secs).transpose()?,
+                ..Default::default()
+            };
+            let report = voice_of(bot, voice).await?.play_file(&file, opts).await?;
+            println!(
+                "played {} packets in {} ms",
+                report.packets,
+                report.finished.duration_since(report.started).as_millis()
+            );
+        }
+        Command::Record { out, seconds, from } => {
+            let v = voice_of(bot, voice).await?;
+            let session = from.as_deref().map(|n| v.session_of(n)).transpose()?;
+            v.record_to_wav(&out, session, secs(seconds)?).await?;
+            println!("recorded {seconds} s to {}", out.display());
+        }
+        Command::ExpectAudio {
+            from,
+            min_rms,
+            timeout,
+        } => {
+            let wait = match timeout {
+                Some(t) => secs(t)?,
+                None => bot.config().timeout,
+            };
+            let v = voice_of(bot, voice).await?;
+            let hit = v
+                .wait_audio(from.as_deref(), min_rms, std::time::Instant::now(), wait)
+                .await?;
+            println!("{:.1} {}", hit.level_db, hit.latency.as_millis());
+        }
         Command::Expect(expect) => run_expect(bot, expect).await?,
         Command::Sleep { seconds } => {
             tokio::time::sleep(Duration::try_from_secs_f64(seconds).context("bad duration")?).await;
@@ -222,6 +293,18 @@ async fn run(bot: &mut Bot, command: Command) -> Result<()> {
         Command::Script => bail!("script is only valid as the top-level command"),
     }
     Ok(())
+}
+
+fn secs(seconds: f64) -> Result<Duration> {
+    Duration::try_from_secs_f64(seconds).context("bad duration")
+}
+
+/// Voice is started on first use and kept for the rest of the run.
+async fn voice_of<'a>(bot: &Bot, voice: &'a mut Option<BotVoice>) -> Result<&'a BotVoice> {
+    if voice.is_none() {
+        *voice = Some(BotVoice::start(bot).await?);
+    }
+    voice.as_ref().context("voice not started")
 }
 
 async fn run_expect(bot: &Bot, expect: Expect) -> Result<()> {
