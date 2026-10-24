@@ -355,7 +355,7 @@ describe("UserPanel", () => {
       return el;
     };
     expect(userButton().querySelector("img")).toBeNull();
-    expect(userButton().querySelector(".userpanel-avatar")?.textContent).not.toBe("");
+    expect(userButton().querySelector(".userpanel-avatar")).toHaveAttribute("data-initial");
     const personProfile = vi.spyOn(api, "personProfile");
     await act(async () => {
       await api.setOwnAvatar("/a.png");
@@ -384,8 +384,8 @@ describe("UserPanel", () => {
     if (!name) throw new Error("name missing");
     expect(name).toHaveAttribute("title", name.textContent);
     const button = document.querySelector<HTMLElement>('[aria-haspopup="menu"]');
-    expect(button).toHaveAccessibleName(name.textContent);
-    expect(button).toHaveAccessibleDescription("Read-only");
+    // The visible name and status line are the button's accessible name (WCAG 2.5.3).
+    expect(button).toHaveAccessibleName(`${name.textContent} Read-only`);
     expect(button?.closest(".userpanel__identity")).not.toBeNull();
     const row = document.querySelector(".userpanel__row");
     if (!row) throw new Error("button row missing");

@@ -134,6 +134,9 @@
 }
 
 .follow-server__menu {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   width: 1.75rem;
   height: 1.75rem;
   padding: 0;

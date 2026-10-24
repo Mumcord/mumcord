@@ -48,7 +48,6 @@ export function UserPanel() {
   const menuRef = useRef<HTMLDivElement>(null);
   const previous = useRef<{ mute: boolean; deaf: boolean } | null>(null);
   const micButton = useRef<HTMLButtonElement>(null);
-  const statusId = useId();
 
   const mute = self?.selfMute ?? false;
   const deaf = self?.selfDeaf ?? false;
@@ -141,13 +140,12 @@ export function UserPanel() {
   return (
     <div className="userpanel">
       <div className="userpanel__identity">
+        {/* Named by its content, the visible name and status line, so speech input users can say
+            what they see (WCAG 2.5.3 label in name). */}
         <button
           ref={menuButton}
           type="button"
           className="userpanel__user"
-          title={name}
-          aria-label={name}
-          aria-describedby={statusId}
           aria-haspopup="menu"
           aria-expanded={menuOpen}
           aria-controls={menuOpen ? menuId : undefined}
@@ -156,18 +154,20 @@ export function UserPanel() {
             setMenuOpen((o) => !o);
           }}
         >
-          <span className="userpanel-avatar" aria-hidden="true">
-            {avatarSrc ? (
-              <img className="userpanel-avatar__img" src={avatarSrc} alt="" />
-            ) : (
-              name.slice(0, 1).toUpperCase()
-            )}
+          {/* The initial is drawn by CSS from data-initial, not as DOM text, so the button shows no
+              visible text that is missing from its name (WCAG 2.5.3). */}
+          <span
+            className="userpanel-avatar"
+            data-initial={avatarSrc ? undefined : name.slice(0, 1).toUpperCase()}
+            aria-hidden="true"
+          >
+            {avatarSrc ? <img className="userpanel-avatar__img" src={avatarSrc} alt="" /> : null}
           </span>
           <span className="userpanel__text">
             <span className="userpanel__name" title={name}>
               {name}
-            </span>
-            <span id={statusId} className="userpanel__status" title={status}>
+            </span>{" "}
+            <span className="userpanel__status" title={status}>
               {status}
             </span>
           </span>

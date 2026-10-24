@@ -92,7 +92,13 @@ export function FollowAllMenu() {
           else openAtButton();
         }}
       >
-        <span aria-hidden="true">⋯</span>
+        {/* An SVG rather than a "⋯" glyph: the button's name is its translated aria-label, and a
+            text glyph would leak into the UI text as an untranslated string. */}
+        <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" focusable="false">
+          <circle cx="5" cy="12" r="1.75" fill="currentColor" />
+          <circle cx="12" cy="12" r="1.75" fill="currentColor" />
+          <circle cx="19" cy="12" r="1.75" fill="currentColor" />
+        </svg>
       </button>
       {menuAt && !busy && (
         <ServerMenu
