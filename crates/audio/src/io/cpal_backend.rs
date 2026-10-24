@@ -70,7 +70,11 @@ impl Backend for CpalBackend {
             Direction::Input => self.host.input_devices().map_err(backend_err)?.collect(),
             Direction::Output => self.host.output_devices().map_err(backend_err)?.collect(),
         };
-        devices.iter().map(|d| self.info(direction, d)).collect()
+        let infos = devices
+            .iter()
+            .map(|d| self.info(direction, d))
+            .collect::<Result<Vec<_>, _>>()?;
+        Ok(super::devices::filter(infos))
     }
 
     fn polls_devices(&self) -> bool {

@@ -32,6 +32,7 @@
 
 mod controller;
 mod cpal_backend;
+mod devices;
 mod frames;
 mod resample;
 mod ring;
