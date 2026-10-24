@@ -110,7 +110,7 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y --no-install-recommends \
-            libasound2-dev cmake sqlite3 xvfb dbus-x11 gnome-keyring \
+            libasound2-dev cmake sqlite3 xvfb dbus-x11 gnome-keyring libsecret-tools \
             libwebkit2gtk-4.1-0 libayatana-appindicator3-1
           # Throwaway SuperUser password for this runner only (same as e2e/run.sh).
           printf 'SUPERUSER_PASSWORD=%s\nSERVER_PASSWORD=\n' "$(openssl rand -hex 16)" > testenv/.env
@@ -138,23 +138,8 @@ jobs:
           autobanAttempts=0
           "@ | Set-Content "$dir\mumble-server.ini"
           Get-Content "$dir\mumble-server.ini"
-          # Foreground run, output to files; the installer may also have registered a service on 64738.
-          $p = Start-Process $server.FullName -ArgumentList '-fg', '-ini', "$dir\mumble-server.ini" `
-            -WorkingDirectory $server.DirectoryName -PassThru -WindowStyle Hidden `
-            -RedirectStandardOutput "$dir\stdout.log" -RedirectStandardError "$dir\stderr.log"
-          $up = $false
-          for ($i = 0; $i -lt 30 -and -not $up; $i++) {
-            if ($p.HasExited) { break }
-            try { $c = [Net.Sockets.TcpClient]::new(); $c.Connect('127.0.0.1', 64738); $c.Close(); $up = $true }
-            catch { Start-Sleep 1 }
-          }
-          if ($up) { exit 0 }
-          Write-Host "server exited: $($p.HasExited) (code $(if ($p.HasExited) { $p.ExitCode }))"
-          foreach ($f in 'stdout.log', 'stderr.log', 'mumble-server.log') {
-            Write-Host "--- $f"; Get-Content "$dir\$f" -ErrorAction SilentlyContinue
-          }
-          Get-ChildItem $server.DirectoryName | Select-Object -First 40 Name | Out-String | Write-Host
-          throw 'Mumble server did not open port 64738'
+          # Started in the smoke step below: runner processes do not survive the end of a step.
+          "MUMBLE_SERVER_EXE=$($server.FullName)" | Out-File -Append -Encoding utf8 $env:GITHUB_ENV
 
       # Homebrew has no Mumble server and the official releases ship none for macOS, so it is
       # built from the release source (server only) and cached. If this fails, the macOS smoke
@@ -248,7 +233,13 @@ jobs:
           "$installer" /S
           app=$(find "$(cygpath -u "$LOCALAPPDATA")" -maxdepth 3 -iname 'mumcord.exe' | head -n 1)
           test -n "$app" || { echo "Mumcord.exe not found after install" >&2; exit 1; }
-          scripts/smoke/smoke.sh --app "$app" --seed target/release/mumcord-smoke-seed.exe --bot target/release/mumcord-bot.exe
+          dir=$(cygpath -w "$RUNNER_TEMP")\\mumble-server
+          dump() { powershell -NoProfile -File scripts/smoke/dump-win-server.ps1 "$dir" || true; }
+          # Same step as the smoke run, so the server process stays alive for it.
+          powershell -NoProfile -File scripts/smoke/start-win-server.ps1 "$MUMBLE_SERVER_EXE" "$dir" || { dump; exit 1; }
+          powershell -NoProfile -Command "if (-not (Get-Process -Id (Get-Content '$dir\\server.pid') -ErrorAction SilentlyContinue)) { exit 1 }" \
+            || { echo "server process is gone before seeding" >&2; dump; exit 1; }
+          scripts/smoke/smoke.sh --app "$app" --seed target/release/mumcord-smoke-seed.exe --bot target/release/mumcord-bot.exe || { dump; exit 1; }
 
       - name: Smoke test (macOS)
         if: runner.os == 'macOS'
