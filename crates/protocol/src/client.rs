@@ -754,6 +754,12 @@ impl Handle {
         self.send(Frame::from_message(MessageType::Acl, &acl))
     }
 
+    /// Creates or edits a channel (admin tooling such as test bots; needs the matching
+    /// permissions, e.g. as SuperUser). Without `channel_id` the server creates a new channel.
+    pub fn send_channel_state(&self, state: proto::ChannelState) -> Result<(), CommandError> {
+        self.send(Frame::from_message(MessageType::ChannelState, &state))
+    }
+
     /// Voice hook: sends a raw Mumble UDP packet through the TCP tunnel.
     pub fn send_tunnel(&self, packet: Bytes) -> Result<(), CommandError> {
         self.send(Frame {

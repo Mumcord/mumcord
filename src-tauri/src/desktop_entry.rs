@@ -18,7 +18,7 @@ use tauri::{AppHandle, Manager};
 const NAME: &str = "Mumcord";
 const MIME_TYPE: &str = "x-scheme-handler/mumble";
 /// Marks entries Mumcord wrote itself, so it never overwrites or deletes one the user edited.
-const MANAGED_KEY: &str = "X-Mumcord-Managed=true";
+pub(crate) const MANAGED_KEY: &str = "X-Mumcord-Managed=true";
 /// Entry the deep-link plugin used to write; replaced by the app-ID entry.
 const LEGACY_HANDLER: &str = "mumcord-handler.desktop";
 
@@ -37,7 +37,7 @@ fn file_name(app_id: &str) -> String {
 
 /// Quotes the program path for `Exec` (desktop entry spec: reserved characters inside double
 /// quotes get a backslash, and the value itself escapes every backslash once more).
-fn exec_program(path: &str) -> String {
+pub(crate) fn exec_program(path: &str) -> String {
     let mut quoted = String::from("\"");
     for c in path.chars() {
         if matches!(c, '"' | '`' | '$' | '\\') {
@@ -117,7 +117,7 @@ fn system_data_dirs(xdg_data_dirs: Option<OsString>) -> Vec<PathBuf> {
 /// Paths and names for one Mumcord installation.
 struct Install {
     app_id: String,
-    /// The program to start: the AppImage file, else the running binary.
+    /// The program to start (`autostart::program`).
     program: PathBuf,
     /// `$XDG_DATA_HOME`.
     data_home: PathBuf,
@@ -126,10 +126,7 @@ struct Install {
 
 impl Install {
     fn from_app(app: &AppHandle) -> io::Result<Self> {
-        let program = match app.env().appimage {
-            Some(appimage) => PathBuf::from(appimage),
-            None => tauri::utils::platform::current_exe()?,
-        };
+        let program = crate::autostart::program(app)?;
         let data_home = app.path().data_dir().map_err(io::Error::other)?;
         Ok(Self {
             app_id: app.config().identifier.clone(),

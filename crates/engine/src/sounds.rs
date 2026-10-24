@@ -323,6 +323,7 @@ mod tests {
                 version: String::new(),
                 follow_supported: true,
                 welcome_text: None,
+                default_channel_id: None,
                 max_message_length: 5000,
                 max_image_message_length: 0,
                 allow_html: false,

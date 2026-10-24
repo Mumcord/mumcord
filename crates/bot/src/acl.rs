@@ -1,4 +1,5 @@
-//! Superuser ACL edits on the local test servers (regular protocol `ACL` message).
+//! Superuser edits on the local test servers: ACLs (regular protocol `ACL` message) and channel
+//! descriptions (`ChannelState`).
 
 use anyhow::{Result, bail};
 use mumcord_protocol::{permissions, proto};
@@ -45,6 +46,26 @@ impl Bot {
         self.send_and_await_channel_update(channel_id, "the server to apply the ACL", || {
             Ok(self.handle().send_acl(acl)?)
         })
+        .await
+    }
+
+    /// Sets the description of `channel`; an empty `html` removes it (FR-1.48b). Returns once
+    /// the server sent the changed channel state back.
+    pub async fn set_description(&self, channel: &str, html: &str) -> Result<()> {
+        if !self.config().superuser {
+            bail!("changing descriptions needs the superuser bot");
+        }
+        let channel_id = self.channel_id(channel)?;
+        let state = proto::ChannelState {
+            channel_id: Some(channel_id),
+            description: Some(html.to_owned()),
+            ..Default::default()
+        };
+        self.send_and_await_channel_update(
+            channel_id,
+            "the server to apply the description",
+            || Ok(self.handle().send_channel_state(state)?),
+        )
         .await
     }
 }

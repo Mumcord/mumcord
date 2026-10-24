@@ -11,6 +11,7 @@ pub mod sounds;
 pub mod voice;
 
 pub use chat::{ChatMessageView, HistoryScope};
+pub use follow::FollowAllSummary;
 /// Stored types (settings record etc.) as the engine hands them out.
 pub use mumcord_store as store;
 pub use mumcord_store::{SecretStore, ServerId, Settings};

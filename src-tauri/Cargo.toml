@@ -40,14 +40,23 @@ tauri-plugin-global-shortcut.workspace = true
 ashpd = { workspace = true, features = ["global_shortcuts"] }
 # Activation token for the shortcut settings the portal opens (KDE Wayland focus rules).
 gdk.workspace = true
+# Message notifications (FR-1.48c): D-Bus notification service, window activation token.
+zbus.workspace = true
+futures-util.workspace = true
+gtk.workspace = true
 # Mouse-button push-to-talk: evdev reads on Wayland, XInput2 raw button events on X11.
 libc.workspace = true
 x11rb = { workspace = true, features = ["xinput"] }
 
+[target.'cfg(any(target_os = "windows", target_os = "macos"))'.dependencies]
+# Message notifications (FR-1.48c).
+notify-rust.workspace = true
+
 [target.'cfg(target_os = "windows")'.dependencies]
-# Mouse-button push-to-talk: low-level mouse hook.
+# Mouse-button push-to-talk: low-level mouse hook. Registry: the autostart `Run` entry.
 windows-sys = { workspace = true, features = [
     "Win32_System_LibraryLoader",
+    "Win32_System_Registry",
     "Win32_System_Threading",
     "Win32_UI_WindowsAndMessaging",
 ] }

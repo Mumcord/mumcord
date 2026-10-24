@@ -112,6 +112,11 @@ pub struct ChannelView {
     pub name: String,
     pub position: i32,
     pub permissions: ChannelPermissions,
+    /// Sanitized description HTML; `None` when there is none or only its hash is known yet.
+    pub description: Option<String>,
+    /// True when the channel has a description, even if its text still has to be requested
+    /// (`Engine::channel_description_request`, FR-1.48b).
+    pub has_description: bool,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -141,6 +146,9 @@ pub struct ServerInfoView {
     pub follow_supported: bool,
     /// Sanitized HTML.
     pub welcome_text: Option<String>,
+    /// The channel the server put the user in when connecting (its default channel, or the
+    /// remembered one for registered users); the welcome text is pinned there too (FR-1.48b).
+    pub default_channel_id: Option<u32>,
     pub max_message_length: u32,
     pub max_image_message_length: u32,
     pub allow_html: bool,

@@ -44,6 +44,9 @@ pub struct ServerInfo {
     pub follow_supported: bool,
     /// Sanitized HTML.
     pub welcome_text: Option<String>,
+    /// Channel the server put the user in on connect; its chat also shows the welcome text
+    /// when the channel has no description (FR-1.48b).
+    pub default_channel_id: Option<super::types::ChannelId>,
     /// Maximum text message length in characters (0 = unlimited).
     pub max_message_length: u32,
     /// Maximum length of messages containing images in characters (0 = unlimited).
@@ -176,6 +179,7 @@ impl From<ServerInfoView> for ServerInfo {
             version: v.version,
             follow_supported: v.follow_supported,
             welcome_text: v.welcome_text,
+            default_channel_id: v.default_channel_id,
             max_message_length: v.max_message_length,
             max_image_message_length: v.max_image_message_length,
             allow_html: v.allow_html,

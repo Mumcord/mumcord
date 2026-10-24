@@ -46,6 +46,11 @@ export const commands = {
 	setSelfDeaf: (deafened: boolean) => typedError<null, ApiError>(__TAURI_INVOKE("set_self_deaf", { deafened })),
 	/**  Enters the channel's voice; fails with `permissionDenied` if not permitted. */
 	channelJoin: (channelId: number) => typedError<null, ApiError>(__TAURI_INVOKE("channel_join", { channelId })),
+	/**
+	 *  Fetches a description the server announced only by its hash (FR-1.48b). The text arrives
+	 *  as `ChannelUpserted`; repeated calls for the same description send nothing.
+	 */
+	channelDescriptionRequest: (channelId: number) => typedError<null, ApiError>(__TAURI_INVOKE("channel_description_request", { channelId })),
 	/**  Sets local volume (0–200 %); remembered by certificate hash per server. */
 	personSetVolume: (session: number, volume: number) => typedError<null, ApiError>(__TAURI_INVOKE("person_set_volume", { session, volume })),
 	/**  Mutes a person locally; remembered by certificate hash per server. */
@@ -64,6 +69,12 @@ export const commands = {
 	 */
 	channelFollow: (channelId: number) => typedError<null, ApiError>(__TAURI_INVOKE("channel_follow", { channelId })),
 	channelUnfollow: (channelId: number) => typedError<null, ApiError>(__TAURI_INVOKE("channel_unfollow", { channelId })),
+	/**
+	 *  Follows every channel the user may listen to, except the own voice channel; stops at the
+	 *  server's listener limit. Fails with `serverTooOld`.
+	 */
+	channelFollowAll: () => typedError<FollowAllSummary, ApiError>(__TAURI_INVOKE("channel_follow_all")),
+	channelUnfollowAll: () => typedError<null, ApiError>(__TAURI_INVOKE("channel_unfollow_all")),
 	/**  Resets the unread count of a conversation. */
 	conversationMarkRead: (conversation: Conversation) => typedError<null, ApiError>(__TAURI_INVOKE("conversation_mark_read", { conversation })),
 	/**
@@ -134,6 +145,10 @@ export const commands = {
 	/**  Writes the diagnostic file (no chat contents, passwords, certificates or personal data). */
 	diagnosticsSave: (path: string) => typedError<null, ApiError>(__TAURI_INVOKE("diagnostics_save", { path })),
 	appInfo: () => typedError<AppInfo, ApiError>(__TAURI_INVOKE("app_info")),
+	/**  Decides by window focus and the notification setting; shows the system notification itself. */
+	notifyMessage: (notice: MessageNotice) => typedError<NotifyOutcome, ApiError>(__TAURI_INVOKE("notify_message", { notice })),
+	/**  The user opened this chat: its system notification is outdated. */
+	notificationDismiss: (conversation: Conversation) => typedError<null, ApiError>(__TAURI_INVOKE("notification_dismiss", { conversation })),
 };
 
 /** Events */
@@ -150,6 +165,7 @@ export const events = {
 	messageReceived: makeEvent<MessageReceived, MessageReceived>("message-received"),
 	micLevel: makeEvent<MicLevel, MicLevel>("mic-level"),
 	micTestPhaseChanged: makeEvent<MicTestPhaseChanged, MicTestPhaseChanged>("mic-test-phase-changed"),
+	notificationActivated: makeEvent<NotificationActivated, NotificationActivated>("notification-activated"),
 	serverDenied: makeEvent<ServerDenied, ServerDenied>("server-denied"),
 	serverSynced: makeEvent<ServerSynced, ServerSynced>("server-synced"),
 	talkStateChanged: makeEvent<TalkStateChanged, TalkStateChanged>("talk-state-changed"),
@@ -207,6 +223,13 @@ export type ChannelInfo = {
 	/**  Sort position among siblings (ties sorted by name). */
 	position: number,
 	permissions: ChannelPermissions,
+	/**  Sanitized description HTML; `null` when there is none or it has not been fetched yet. */
+	description: string | null,
+	/**
+	 *  True when the channel has a description, even if only its hash is known yet; then
+	 *  `channel_description_request` fetches the text (FR-1.48b).
+	 */
+	hasDescription: boolean,
 };
 
 /**  What the server's ACL allows the own user in a channel (from PermissionQuery). */
@@ -226,6 +249,9 @@ export type ChannelRemoved = {
 export type ChannelUpserted = {
 	channel: ChannelInfo,
 };
+
+/**  "Message display: Cozy / Compact" (default cozy, FR-1.48a, QA.25). */
+export type ChatDisplay = "cozy" | "compact";
 
 export type ChatMessage = {
 	/**  Locally unique id; also the paging cursor for `history_load`. */
@@ -340,6 +366,17 @@ export type ErrorCode =
 /**  Unexpected internal failure. */
 "internal";
 
+/**  Outcome of "Follow all channels" (QA.13); already followed channels are not counted. */
+export type FollowAllSummary = {
+	followed: number,
+	/**  Skipped because the server's listener limit was reached. */
+	limitReached: number,
+	/**  Skipped because the user may not listen to them. */
+	notAllowed: number,
+	/**  Skipped because the server did not answer in time. */
+	noAnswer: number,
+};
+
 export type FollowedChannelsChanged = {
 	channelIds: number[],
 };
@@ -357,6 +394,19 @@ export type Identity = {
 export type Language = "en" | "es" | "de";
 
 export type LogLevel = "error" | "warn" | "info" | "debug";
+
+/**  One new message as the UI would announce it. Texts are translated and plain (no HTML). */
+export type MessageNotice = {
+	conversation: Conversation,
+	/**  The UI currently shows this chat (selected, not covered by settings). */
+	onScreen: boolean,
+	/**  Notification title, e.g. "#Raid" or "5 new messages in #Raid". */
+	summary: string,
+	/**  E.g. "Alice: see you at eight". */
+	body: string,
+	/**  Label of the click action, e.g. "Open chat" (some desktops show it as a button). */
+	actionLabel: string,
+};
 
 export type MessageReceived = {
 	message: ChatMessage,
@@ -388,6 +438,29 @@ export type MumbleLink = {
 	/**  Channel names from the root down; empty for no channel. */
 	channelPath: string[],
 };
+
+/**  The user clicked a system notification; the window is already in front. Open this chat. */
+export type NotificationActivated = {
+	conversation: Conversation,
+};
+
+/**  Which message notifications are shown (FR-1.48c, QA.16). */
+export type NotificationMode = 
+/**  In-app toasts only, while the window has focus. */
+"inApp" | 
+/**  System notifications only, also while the window has focus. */
+"desktop" | 
+/**  Toasts while the window has focus, system notifications otherwise. */
+"both" | "off";
+
+/**  What became of a new message. */
+export type NotifyOutcome = 
+/**  Nothing to show (chat on screen, setting, or window in the background with "In-app"). */
+"none" | 
+/**  The UI shows its in-app toast. */
+"toast" | 
+/**  A system notification was shown. */
+"desktop";
 
 /**  How a server edit treats the stored password. */
 export type PasswordUpdate = 
@@ -474,6 +547,11 @@ export type ServerInfo = {
 	followSupported: boolean,
 	/**  Sanitized HTML. */
 	welcomeText: string | null,
+	/**
+	 *  Channel the server put the user in on connect; its chat also shows the welcome text
+	 *  when the channel has no description (FR-1.48b).
+	 */
+	defaultChannelId: number | null,
 	/**  Maximum text message length in characters (0 = unlimited). */
 	maxMessageLength: number,
 	/**  Maximum length of messages containing images in characters (0 = unlimited). */
@@ -537,10 +615,20 @@ export type Settings = {
 	echoCancellation: boolean,
 	autoGain: boolean,
 	sounds: SoundSettings,
+	/**  "Notifications: In-app / Desktop / Both / Off" (default both, FR-1.48c). */
+	notifications: NotificationMode,
 	closeBehaviour: CloseBehaviour,
+	chatDisplay: ChatDisplay,
 	logLevel: LogLevel,
 	/**  Send the default avatar to servers connected to for the first time (FR-1.47). */
 	sendDefaultAvatar: boolean,
+	/**
+	 *  "Start Mumcord when I log in" (default off, FR-1.48d). Changing it adds or removes the
+	 *  OS autostart entry; the update fails without saving if that is not possible.
+	 */
+	autostart: boolean,
+	/**  "Start minimized": a start at login goes straight to the tray (default on). */
+	startMinimized: boolean,
 };
 
 /**  Notification sound toggles per event (FR-1.27). */

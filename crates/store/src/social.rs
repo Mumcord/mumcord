@@ -82,6 +82,36 @@ impl Store {
         Ok(())
     }
 
+    /// Follows several channels in one transaction ("Follow all channels", QA.13).
+    pub fn follow_channels(
+        &self,
+        server: ServerId,
+        channel_paths: &[String],
+        now: UnixMillis,
+    ) -> Result<()> {
+        let tx = self.conn.unchecked_transaction()?;
+        {
+            let mut stmt = tx.prepare(
+                "INSERT INTO followed_channel (server_id, channel_path, last_read_at)
+                 VALUES (?1, ?2, ?3) ON CONFLICT DO NOTHING",
+            )?;
+            for path in channel_paths {
+                stmt.execute(params![server, path, now])?;
+            }
+        }
+        tx.commit()?;
+        Ok(())
+    }
+
+    /// Unfollows every channel of a server ("Unfollow all channels", QA.13).
+    pub fn unfollow_all_channels(&self, server: ServerId) -> Result<()> {
+        self.conn.execute(
+            "DELETE FROM followed_channel WHERE server_id = ?1",
+            [server],
+        )?;
+        Ok(())
+    }
+
     pub fn unfollow_channel(&self, server: ServerId, channel_path: &str) -> Result<()> {
         self.conn.execute(
             "DELETE FROM followed_channel WHERE server_id = ?1 AND channel_path = ?2",
@@ -192,6 +222,31 @@ mod tests {
         );
         store.unfollow_channel(id, "Root/A").expect("unfollow");
         assert_eq!(store.followed_channels(id).expect("list").len(), 1);
+    }
+
+    #[test]
+    fn follow_many_and_unfollow_all_per_server() {
+        let (_dir, store) = temp_store();
+        let a = store
+            .add_server(&NewServer::new("A", "a", "u"))
+            .expect("add")
+            .id;
+        let b = store
+            .add_server(&NewServer::new("B", "b", "u"))
+            .expect("add")
+            .id;
+        store.follow_channel(a, "Root/A", 5).expect("follow");
+        store.follow_channel(b, "Root/A", 5).expect("follow");
+        store
+            .follow_channels(a, &["Root/A".into(), "Root/B".into(), "Root/C".into()], 10)
+            .expect("follow many");
+        let followed = store.followed_channels(a).expect("list");
+        assert_eq!(followed.len(), 3);
+        // Already followed channels keep their read marker.
+        assert_eq!(followed[0].last_read_at, 5);
+        store.unfollow_all_channels(a).expect("unfollow all");
+        assert!(store.followed_channels(a).expect("list").is_empty());
+        assert_eq!(store.followed_channels(b).expect("list").len(), 1);
     }
 
     #[test]

@@ -70,6 +70,12 @@ pub fn channel_view(state: &ServerState, channel: &Channel) -> ChannelView {
             register_self: channel.id == ROOT_CHANNEL
                 && bits.is_some_and(|b| b & permissions::SELF_REGISTER != 0),
         },
+        description: channel
+            .description
+            .as_deref()
+            .filter(|t| !t.trim().is_empty())
+            .map(sanitize_html),
+        has_description: super::description::has_description(channel),
     }
 }
 
@@ -117,6 +123,7 @@ pub fn server_info_view(state: &ServerState) -> ServerInfoView {
             .as_deref()
             .filter(|t| !t.is_empty())
             .map(sanitize_html),
+        default_channel_id: None,
         max_message_length: info.message_length.unwrap_or(0),
         max_image_message_length: info.image_message_length.unwrap_or(0),
         allow_html: info.allow_html.unwrap_or(true),

@@ -9,6 +9,7 @@
 //! Lock order: `core` before `store`. Neither lock is held across an `.await`.
 
 pub mod convert;
+mod description;
 pub mod extension;
 mod local;
 mod machine;
@@ -163,6 +164,9 @@ struct Session {
     pump: mpsc::UnboundedSender<PumpCmd>,
     /// Channel offered for rejoining until the user turns voice on (QA.9).
     rejoin_offer: Option<u32>,
+    /// Where the server put the user on connect, before any rejoin (FR-1.48b).
+    default_channel_id: Option<u32>,
+    description_requests: description::DescriptionRequests,
 }
 
 /// Commands to the session task.
@@ -432,6 +436,27 @@ impl Engine {
 
     pub fn person_set_local_mute(&self, session: u32, muted: bool) -> EngineResult<()> {
         self.inner.change_person(session, |s| s.local_mute = muted)
+    }
+
+    /// Asks the server for a channel description announced only by its hash (FR-1.48b). The
+    /// text arrives as a `ChannelUpserted` event; asking again for the same hash is a no-op.
+    pub fn channel_description_request(&self, channel_id: u32) -> EngineResult<()> {
+        let mut core = lock(&self.inner.core);
+        let session = core
+            .session
+            .as_mut()
+            .ok_or_else(EngineError::not_connected)?;
+        let channel = session
+            .handle
+            .with_state(|s| s.channels.get(&channel_id).cloned())
+            .ok_or_else(|| EngineError::new(ErrorKind::NotFound, "unknown channel"))?;
+        if session.description_requests.should_request(&channel) {
+            session
+                .handle
+                .request_blobs(&[], &[], &[channel_id])
+                .map_err(convert::command_error)?;
+        }
+        Ok(())
     }
 
     /// Avatar and comment of a person, fetched from the server if only announced by hash.
@@ -857,6 +882,7 @@ impl Inner {
         };
         self.voice.reset_link();
         let (pump_tx, mut pump_rx) = mpsc::unbounded_channel();
+        let default_channel_id = handle.with_state(|s| s.own_user().map(|u| u.channel_id));
         let (followed, rejoin_offer) = self.post_sync(server_id, &handle, arrival);
 
         let registered = self.transition(generation, |core| {
@@ -867,6 +893,8 @@ impl Inner {
                 transport: transport.clone(),
                 pump: pump_tx,
                 rejoin_offer,
+                default_channel_id,
+                description_requests: description::DescriptionRequests::default(),
             });
             self.start_pipeline(core);
             core.machine.synced();
@@ -1214,7 +1242,10 @@ impl Inner {
             Some(Snapshot {
                 server_id: session.server_id,
                 self_session: s.session?,
-                info: convert::server_info_view(s),
+                info: ServerInfoView {
+                    default_channel_id: session.default_channel_id,
+                    ..convert::server_info_view(s)
+                },
                 channels: s.channels.values().map(|c| channel_view(s, c)).collect(),
                 users: s
                     .users
@@ -1257,11 +1288,11 @@ impl Inner {
             }
             self.remember_voice_channel(&core);
         }
-        // Only the user's own toggles while joined for voice are remembered, never the forced
-        // read-only state or leaving it (QA.7).
-        if before.own().is_some()
-            && let Some(own) = after.own()
-            && after != before
+        // The user's own choice while voice is on is remembered, never the forced read-only
+        // state (QA.7). Leaving read-only by undeafening or unmuting is such a choice too:
+        // otherwise the next Join would restore an older, possibly deafened, setting.
+        if let Some(own) = after.own()
+            && before.own() != Some(own)
             && let Err(e) = lock(&self.store).save_own_voice(own)
         {
             tracing::warn!(error = %e, "remembering the mute state failed");

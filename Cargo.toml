@@ -74,6 +74,14 @@ windows-sys = { version = "0.61", features = ["Win32_Foundation", "Win32_System_
 ashpd = "0.13"
 # XDG activation token so the desktop may raise the window a portal call opens (already in the tree via Tauri)
 gdk = "0.18"
+# Desktop notifications for new messages (FR-1.48c): the freedesktop notification service on D-Bus,
+# talked to directly for click actions and per-channel replacement (zbus and futures-util are
+# already in the tree via ashpd; gtk via Tauri, used to hand the activation token to the window).
+zbus = { version = "5.19", default-features = false, features = ["tokio"] }
+futures-util = { version = "0.3", default-features = false }
+gtk = "0.18"
+# Desktop notifications on Windows and macOS (show only; no click callback there).
+notify-rust = { version = "4.18", default-features = false }
 
 # Mouse-button push-to-talk: X11 XInput2 raw events, macOS event tap (already in the tree)
 x11rb = { version = "0.13", default-features = false }

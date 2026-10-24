@@ -597,3 +597,111 @@ async fn quitting_while_joined_offers_a_rejoin_once_after_the_restart() {
     );
     disconnected(&engine, &mut rx).await;
 }
+
+/// QA.7: switching servers while joined for voice lands read-only on the new server, and a Join
+/// there restores the own mute/deafen choice from the previous server, not the forced state,
+/// also when voice was turned on by undeafening the read-only state instead of a Join.
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+#[ignore = "needs testenv v14 and v15 (MUMCORD_LIVE=1)"]
+async fn join_after_a_server_switch_restores_the_own_mute() {
+    if !live() {
+        return;
+    }
+    let dir = work_dir("engine-live-switch-voice");
+    let name = unique("mc-switch");
+    let bot_on = |port: u16, dir: PathBuf| {
+        Bot::connect(BotConfig {
+            data_dir: Some(dir),
+            ..BotConfig::new(&unique("mc-switchear"), port)
+        })
+    };
+    let bot14 = bot_on(env::PORT_V14, dir.join("bot14"))
+        .await
+        .expect("bot v14");
+    let bot15 = bot_on(env::PORT_V15, dir.join("bot15"))
+        .await
+        .expect("bot v15");
+    let in_raid = |muted: bool, deaf: bool| UserCheck {
+        in_channel: Some("Raid".into()),
+        muted: Some(muted),
+        deaf: Some(deaf),
+        ..UserCheck::default()
+    };
+    let (engine, mut rx) = Engine::new(
+        &dir.join("data"),
+        SecretStore::in_memory(),
+        tokio::runtime::Handle::current(),
+    )
+    .expect("engine");
+    engine
+        .identity_create(name.clone())
+        .await
+        .expect("identity");
+    let mut fields = server_fields(&name);
+    fields.port = env::PORT_V14;
+    let v14 = engine.server_add(fields).await.expect("server v14").id;
+    let mut fields = server_fields(&name);
+    fields.label = "v15".into();
+    fields.port = env::PORT_V15;
+    let v15 = engine.server_add(fields).await.expect("server v15").id;
+
+    // An earlier session ended deafened while joined.
+    let snapshot = connect_synced(&engine, &mut rx, v14).await;
+    engine
+        .join_channel(channel_id(&snapshot, "Raid"))
+        .expect("join Raid on v14");
+    engine.set_self_deaf(true).expect("deafen");
+    bot14
+        .wait_user(&name, &in_raid(true, true))
+        .await
+        .expect("deafened at v14");
+    disconnected(&engine, &mut rx).await;
+
+    // Voice on at v14 by undeafening the read-only state: that is the new own choice.
+    connect_synced(&engine, &mut rx, v14).await;
+    engine.set_self_deaf(false).expect("undeafen");
+    let voice_on = UserCheck {
+        muted: Some(false),
+        deaf: Some(false),
+        ..UserCheck::default()
+    };
+    bot14
+        .wait_user(&name, &voice_on)
+        .await
+        .expect("voice on at v14");
+
+    // Switch to v15 without disconnecting first.
+    let snapshot = connect_synced(&engine, &mut rx, v15).await;
+    assert!(snapshot.read_only, "read-only after the switch");
+    engine
+        .join_channel(channel_id(&snapshot, "Raid"))
+        .expect("join Raid on v15");
+    bot15
+        .wait_user(&name, &in_raid(false, false))
+        .await
+        .expect("voice fully on after joining v15");
+    let snapshot = engine.snapshot().expect("snapshot");
+    let me = snapshot
+        .users
+        .iter()
+        .find(|u| u.session == snapshot.self_session)
+        .expect("own user");
+    assert!(!me.self_mute && !me.self_deaf, "the app shows voice on");
+
+    // Muted on v15, then switch back: the join on v14 restores muted only.
+    engine.set_self_mute(true).expect("mute");
+    bot15
+        .wait_user(&name, &in_raid(true, false))
+        .await
+        .expect("muted at v15");
+    let snapshot = connect_synced(&engine, &mut rx, v14).await;
+    assert!(snapshot.read_only, "read-only after switching back");
+    engine
+        .join_channel(channel_id(&snapshot, "Raid"))
+        .expect("join Raid on v14 again");
+    bot14
+        .wait_user(&name, &in_raid(true, false))
+        .await
+        .expect("muted, not deafened after joining v14");
+    disconnected(&engine, &mut rx).await;
+}

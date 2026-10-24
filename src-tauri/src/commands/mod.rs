@@ -12,6 +12,7 @@ pub mod diagnostics;
 pub mod follow;
 pub mod history;
 pub mod identity;
+pub mod notifications;
 pub mod people;
 pub mod profile;
 pub mod ptt;

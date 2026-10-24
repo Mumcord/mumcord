@@ -21,7 +21,7 @@ pub use identity::{Identity, cert_hash};
 pub use secrets::{KEYRING_SERVICE, SecretStore};
 pub use servers::{DEFAULT_PORT, NewServer, SavedServer, ServerId};
 pub use settings::{
-    CloseBehaviour, LogLevel, OverlayBounds, OverlaySettings, OwnVoice, PositionalSettings,
-    Settings, SoundSettings, TalkMode, ThemePreference,
+    ChatDisplay, CloseBehaviour, LogLevel, NotificationMode, OverlayBounds, OverlaySettings,
+    OwnVoice, PositionalSettings, Settings, SoundSettings, TalkMode, ThemePreference,
 };
 pub use social::{FollowedChannel, PersonSetting};

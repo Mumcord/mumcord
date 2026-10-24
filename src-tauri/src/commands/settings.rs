@@ -5,7 +5,7 @@ use serde::{Deserialize, Serialize};
 use specta::Type;
 use tauri::{AppHandle, State};
 
-use super::types::ApiResult;
+use super::types::{ApiError, ApiResult, ErrorCode};
 
 #[derive(Serialize, Deserialize, Clone, Copy, Debug, PartialEq, Eq, Type)]
 #[serde(rename_all = "camelCase")]
@@ -38,6 +38,14 @@ pub enum CloseBehaviour {
     Quit,
 }
 
+/// "Message display: Cozy / Compact" (default cozy, FR-1.48a, QA.25).
+#[derive(Serialize, Deserialize, Clone, Copy, Debug, PartialEq, Eq, Type)]
+#[serde(rename_all = "camelCase")]
+pub enum ChatDisplay {
+    Cozy,
+    Compact,
+}
+
 #[derive(Serialize, Deserialize, Clone, Copy, Debug, PartialEq, Eq, Type)]
 #[serde(rename_all = "camelCase")]
 pub enum LogLevel {
@@ -45,6 +53,41 @@ pub enum LogLevel {
     Warn,
     Info,
     Debug,
+}
+
+/// Which message notifications are shown (FR-1.48c, QA.16).
+#[derive(Serialize, Deserialize, Clone, Copy, Debug, PartialEq, Eq, Type)]
+#[serde(rename_all = "camelCase")]
+pub enum NotificationMode {
+    /// In-app toasts only, while the window has focus.
+    InApp,
+    /// System notifications only, also while the window has focus.
+    Desktop,
+    /// Toasts while the window has focus, system notifications otherwise.
+    Both,
+    Off,
+}
+
+impl From<store::NotificationMode> for NotificationMode {
+    fn from(mode: store::NotificationMode) -> Self {
+        match mode {
+            store::NotificationMode::InApp => Self::InApp,
+            store::NotificationMode::Desktop => Self::Desktop,
+            store::NotificationMode::Both => Self::Both,
+            store::NotificationMode::Off => Self::Off,
+        }
+    }
+}
+
+impl From<NotificationMode> for store::NotificationMode {
+    fn from(mode: NotificationMode) -> Self {
+        match mode {
+            NotificationMode::InApp => Self::InApp,
+            NotificationMode::Desktop => Self::Desktop,
+            NotificationMode::Both => Self::Both,
+            NotificationMode::Off => Self::Off,
+        }
+    }
 }
 
 /// Notification sound toggles per event (FR-1.27).
@@ -80,10 +123,18 @@ pub struct Settings {
     pub echo_cancellation: bool,
     pub auto_gain: bool,
     pub sounds: SoundSettings,
+    /// "Notifications: In-app / Desktop / Both / Off" (default both, FR-1.48c).
+    pub notifications: NotificationMode,
     pub close_behaviour: CloseBehaviour,
+    pub chat_display: ChatDisplay,
     pub log_level: LogLevel,
     /// Send the default avatar to servers connected to for the first time (FR-1.47).
     pub send_default_avatar: bool,
+    /// "Start Mumcord when I log in" (default off, FR-1.48d). Changing it adds or removes the
+    /// OS autostart entry; the update fails without saving if that is not possible.
+    pub autostart: bool,
+    /// "Start minimized": a start at login goes straight to the tray (default on).
+    pub start_minimized: bool,
 }
 
 impl Settings {
@@ -120,10 +171,15 @@ impl Settings {
                 self_deaf: s.sounds.self_deafen,
                 messages: s.sounds.new_message,
             },
+            notifications: s.notifications.into(),
             close_behaviour: match s.close_behaviour {
                 store::CloseBehaviour::Ask => CloseBehaviour::Ask,
                 store::CloseBehaviour::MinimizeToTray => CloseBehaviour::MinimizeToTray,
                 store::CloseBehaviour::Quit => CloseBehaviour::Quit,
+            },
+            chat_display: match s.chat_display {
+                store::ChatDisplay::Cozy => ChatDisplay::Cozy,
+                store::ChatDisplay::Compact => ChatDisplay::Compact,
             },
             log_level: match s.log_level {
                 store::LogLevel::Error => LogLevel::Error,
@@ -132,6 +188,8 @@ impl Settings {
                 store::LogLevel::Debug => LogLevel::Debug,
             },
             send_default_avatar: s.send_default_avatar,
+            autostart: s.autostart,
+            start_minimized: s.start_minimized,
         }
     }
 
@@ -169,10 +227,15 @@ impl Settings {
         s.sounds.self_mute = self.sounds.self_mute;
         s.sounds.self_deafen = self.sounds.self_deaf;
         s.sounds.new_message = self.sounds.messages;
+        s.notifications = self.notifications.into();
         s.close_behaviour = match self.close_behaviour {
             CloseBehaviour::Ask => store::CloseBehaviour::Ask,
             CloseBehaviour::MinimizeToTray => store::CloseBehaviour::MinimizeToTray,
             CloseBehaviour::Quit => store::CloseBehaviour::Quit,
+        };
+        s.chat_display = match self.chat_display {
+            ChatDisplay::Cozy => store::ChatDisplay::Cozy,
+            ChatDisplay::Compact => store::ChatDisplay::Compact,
         };
         s.log_level = match self.log_level {
             LogLevel::Error => store::LogLevel::Error,
@@ -181,6 +244,8 @@ impl Settings {
             LogLevel::Debug => store::LogLevel::Debug,
         };
         s.send_default_avatar = self.send_default_avatar;
+        s.autostart = self.autostart;
+        s.start_minimized = self.start_minimized;
         s
     }
 }
@@ -228,6 +293,13 @@ pub async fn settings_update(
     settings: Settings,
 ) -> ApiResult<Settings> {
     let previous = engine.settings()?;
+    // The OS entry first: if it cannot be changed, the stored choice must not claim otherwise.
+    if settings.autostart != previous.autostart
+        && let Err(e) = crate::autostart::apply(&app, settings.autostart)
+    {
+        tracing::warn!(error = %e, "changing the autostart entry failed");
+        return Err(ApiError::new(ErrorCode::Internal, e.to_string()));
+    }
     let stored = engine.update_settings(settings.to_store(&previous)).await?;
     if stored.log_level != previous.log_level
         && let Err(e) = diag::set_log_level(diag_level(stored.log_level))
@@ -261,6 +333,7 @@ mod tests {
         assert!(!ui.wizard_completed);
         assert_eq!(ui.log_level, LogLevel::Info);
         assert!(ui.send_default_avatar);
+        assert_eq!(ui.notifications, NotificationMode::Both);
 
         ui.wizard_completed = true;
         ui.talk_mode = TalkMode::PushToTalk;
@@ -270,9 +343,14 @@ mod tests {
         ui.input_device = Some(String::new());
         ui.send_default_avatar = false;
         ui.ptt_compatibility_mode = true;
+        ui.autostart = true;
+        ui.start_minimized = false;
+        ui.chat_display = ChatDisplay::Compact;
         let stored = ui.to_store(&base);
+        assert_eq!(stored.chat_display, store::ChatDisplay::Compact);
         assert!(!stored.send_default_avatar);
         assert!(stored.ptt_compatibility_mode);
+        assert!(stored.autostart && !stored.start_minimized);
         assert!(stored.overlay.enabled);
         assert_eq!(stored.enabled_plugins, ["gtav"]);
         assert!(stored.wizard_completed);

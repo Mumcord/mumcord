@@ -89,6 +89,30 @@ pub fn show(app: &AppHandle) {
     }
 }
 
+/// The window starts invisible (tauri.conf.json) so a start at login can stay in the tray
+/// without flashing up first. Without a visible tray it goes to the taskbar instead, so it can
+/// never get lost.
+pub fn reveal_at_start(app: &AppHandle, start_hidden: bool) {
+    if !start_hidden {
+        show(app);
+        return;
+    }
+    let app = app.clone();
+    tauri::async_runtime::spawn(async move {
+        if crate::tray::is_visible(&app).await {
+            tracing::info!("started at login; staying in the tray");
+            return;
+        }
+        let Some(window) = main_window(&app) else {
+            return;
+        };
+        tracing::warn!("no system tray available; starting minimized to the taskbar instead");
+        if let Err(e) = window.show().and_then(|()| window.minimize()) {
+            tracing::warn!(error = %e, "minimizing the main window failed");
+        }
+    });
+}
+
 /// Hides the window while staying connected. Without a tray to bring it back, the window is
 /// only minimized to the taskbar so it can never get lost.
 pub fn minimize_to_tray(app: &AppHandle) {

@@ -90,6 +90,8 @@ enum Command {
     DenyListen { channel: String },
     /// Undo deny-listen (needs --superuser).
     AllowListen { channel: String },
+    /// Set a channel's description; an empty HTML removes it (needs --superuser).
+    Describe { channel: String, html: String },
     /// Wait for a condition; exits non-zero on timeout.
     #[command(subcommand)]
     Expect(Expect),
@@ -248,6 +250,7 @@ async fn run(bot: &mut Bot, voice: &mut Option<BotVoice>, command: Command) -> R
         Command::Deaf { on } => bot.set_deaf(matches!(on, Toggle::On))?,
         Command::DenyListen { channel } => bot.deny_listen(&channel).await?,
         Command::AllowListen { channel } => bot.allow_listen(&channel).await?,
+        Command::Describe { channel, html } => bot.set_description(&channel, &html).await?,
         Command::Play {
             file,
             looping,

@@ -469,3 +469,82 @@ async fn follow_needs_server_1_4() {
         .expect("send");
     engine.disconnect();
 }
+
+#[tokio::test(flavor = "multi_thread", worker_threads = 4)]
+#[ignore = "needs testenv v15 (MUMCORD_LIVE=1)"]
+async fn follow_all_and_unfollow_all() {
+    if !live() {
+        return;
+    }
+    null_audio();
+    let dir = work_dir("engine-live-follow-all");
+    let name = unique("mc-all");
+    let (engine, mut rx) = start_engine(&dir).await;
+    engine
+        .identity_create(name.clone())
+        .await
+        .expect("identity");
+    let server = add_server(&engine, &name, env::PORT_V15).await;
+    let snapshot = connect(&engine, &mut rx, &server).await;
+    let own = snapshot
+        .users
+        .iter()
+        .find(|u| u.session == snapshot.self_session)
+        .map(|u| u.channel_id)
+        .expect("own user");
+
+    let summary = engine.channel_follow_all().await.expect("follow all");
+    let followed = wait_for(&mut rx, "FollowedChannelsChanged", |e| match e {
+        EngineEvent::FollowedChannelsChanged(ids) => Some(ids.clone()),
+        _ => None,
+    })
+    .await;
+    assert!(summary.followed > 0, "{summary:?}");
+    assert_eq!(summary.limit_reached + summary.no_answer, 0, "{summary:?}");
+    assert_eq!(followed.len(), summary.followed as usize);
+    assert!(!followed.contains(&own), "own voice channel is skipped");
+    assert_eq!(
+        (summary.followed + summary.not_allowed) as usize,
+        snapshot.channels.len() - 1
+    );
+
+    // A second run finds nothing new.
+    let again = engine.channel_follow_all().await.expect("follow all again");
+    assert_eq!(again.followed, 0, "{again:?}");
+
+    engine.channel_unfollow_all().expect("unfollow all");
+    let followed = wait_for(&mut rx, "FollowedChannelsChanged", |e| match e {
+        EngineEvent::FollowedChannelsChanged(ids) => Some(ids.clone()),
+        _ => None,
+    })
+    .await;
+    assert!(followed.is_empty());
+    engine.disconnect();
+}
+
+#[tokio::test(flavor = "multi_thread", worker_threads = 4)]
+#[ignore = "needs testenv limit (MUMCORD_LIVE=1)"]
+async fn follow_all_stops_at_the_listener_limit() {
+    if !live() {
+        return;
+    }
+    null_audio();
+    let dir = work_dir("engine-live-limit-all");
+    let name = unique("mc-limall");
+    let (engine, mut rx) = start_engine(&dir).await;
+    engine
+        .identity_create(name.clone())
+        .await
+        .expect("identity");
+    let server = add_server(&engine, &name, env::PORT_LIMIT).await;
+    let snapshot = connect(&engine, &mut rx, &server).await;
+    let summary = engine.channel_follow_all().await.expect("follow all");
+    assert_eq!(summary.followed, 0, "{summary:?}");
+    assert!(summary.limit_reached > 0, "{summary:?}");
+    assert_eq!(summary.no_answer, 0, "{summary:?}");
+    assert_eq!(
+        (summary.limit_reached + summary.not_allowed) as usize,
+        snapshot.channels.len() - 1
+    );
+    engine.disconnect();
+}

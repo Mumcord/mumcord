@@ -35,6 +35,17 @@ pub enum CloseBehaviour {
     Quit,
 }
 
+/// How chat messages are laid out (FR-1.48a, QA.25).
+#[derive(Debug, Clone, Copy, Default, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum ChatDisplay {
+    /// Avatar per message group, name and time above the indented text.
+    #[default]
+    Cozy,
+    /// No avatars; time, name and text on one line.
+    Compact,
+}
+
 /// Detail of the local log files (FR-1.40).
 #[derive(Debug, Clone, Copy, Default, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "snake_case")]
@@ -44,6 +55,20 @@ pub enum LogLevel {
     #[default]
     Info,
     Debug,
+}
+
+/// Which message notifications are shown (FR-1.48c, QA.16).
+#[derive(Debug, Clone, Copy, Default, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum NotificationMode {
+    /// In-app toasts only, while the window has focus.
+    InApp,
+    /// System notifications only, also while the window has focus.
+    Desktop,
+    /// Toasts while the window has focus, system notifications otherwise.
+    #[default]
+    Both,
+    Off,
 }
 
 /// Per-event sound toggles (FR-1.27).
@@ -148,7 +173,9 @@ pub struct Settings {
     pub echo_cancellation: bool,
     pub auto_gain: bool,
     pub sounds: SoundSettings,
+    pub notifications: NotificationMode,
     pub close_behaviour: CloseBehaviour,
+    pub chat_display: ChatDisplay,
     pub log_level: LogLevel,
     pub overlay: OverlaySettings,
     pub positional: PositionalSettings,
@@ -156,6 +183,10 @@ pub struct Settings {
     pub enabled_plugins: Vec<String>,
     /// Send the default avatar to servers connected to for the first time (FR-1.47).
     pub send_default_avatar: bool,
+    /// Start Mumcord when the user logs in (FR-1.48d, QA.17). The OS entry follows this value.
+    pub autostart: bool,
+    /// When started at login, go straight to the tray instead of showing the window.
+    pub start_minimized: bool,
 }
 
 impl Default for Settings {
@@ -174,12 +205,16 @@ impl Default for Settings {
             echo_cancellation: true,
             auto_gain: true,
             sounds: SoundSettings::default(),
+            notifications: NotificationMode::default(),
             close_behaviour: CloseBehaviour::default(),
+            chat_display: ChatDisplay::default(),
             log_level: LogLevel::default(),
             overlay: OverlaySettings::default(),
             positional: PositionalSettings::default(),
             enabled_plugins: Vec::new(),
             send_default_avatar: true,
+            autostart: false,
+            start_minimized: true,
         }
     }
 }
@@ -268,6 +303,7 @@ mod tests {
         changed.wizard_completed = true;
         changed.log_level = LogLevel::Debug;
         changed.ptt_compatibility_mode = true;
+        changed.notifications = NotificationMode::InApp;
         store.save_settings(&changed).expect("save");
         store.save_settings(&changed).expect("save twice");
         assert_eq!(store.settings().expect("reload"), changed);
@@ -309,11 +345,13 @@ mod tests {
             serde_json::from_str(r#"{"theme":"dark","sounds":{"user_joined":false}}"#)
                 .expect("parse");
         assert_eq!(parsed.theme, ThemePreference::Dark);
+        assert_eq!(parsed.chat_display, ChatDisplay::Cozy);
         assert!(!parsed.sounds.user_joined);
         assert!(parsed.sounds.user_left);
         assert!(parsed.noise_suppression);
         assert!(!parsed.wizard_completed);
         assert_eq!(parsed.log_level, LogLevel::Info);
+        assert_eq!(parsed.notifications, NotificationMode::Both);
         assert!(
             parsed.send_default_avatar,
             "on by default, also for old records"
@@ -326,5 +364,7 @@ mod tests {
             !parsed.ptt_compatibility_mode,
             "the modern Wayland path stays the default"
         );
+        assert!(!parsed.autostart, "starting at login is opt-in");
+        assert!(parsed.start_minimized);
     }
 }

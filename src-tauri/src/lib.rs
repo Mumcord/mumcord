@@ -1,10 +1,12 @@
 //! Tauri shell: registers plugins and exposes the engine to the UI via typed commands.
 
+mod autostart;
 mod commands;
 mod deeplink;
 #[cfg(target_os = "linux")]
 mod desktop_entry;
 mod display;
+mod notifications;
 mod ptt;
 mod tray;
 mod window;
@@ -14,8 +16,8 @@ use tauri::{AppHandle, Manager};
 use tauri_specta::{Builder, Event, collect_commands, collect_events};
 
 use commands::{
-    app, audio, channels, chat, diagnostics, follow, history, identity, people, profile, servers,
-    session, settings,
+    app, audio, channels, chat, diagnostics, follow, history, identity, notifications as notify,
+    people, profile, servers, session, settings,
 };
 
 /// Path of the generated TypeScript bindings, relative to this crate.
@@ -51,6 +53,7 @@ fn specta_builder() -> Builder<tauri::Wry> {
             session::set_self_mute,
             session::set_self_deaf,
             channels::channel_join,
+            channels::channel_description_request,
             people::person_set_volume,
             people::person_set_local_mute,
             people::person_profile,
@@ -58,6 +61,8 @@ fn specta_builder() -> Builder<tauri::Wry> {
             chat::send_private_message,
             follow::channel_follow,
             follow::channel_unfollow,
+            follow::channel_follow_all,
+            follow::channel_unfollow_all,
             follow::conversation_mark_read,
             history::history_load,
             history::history_clear,
@@ -84,6 +89,8 @@ fn specta_builder() -> Builder<tauri::Wry> {
             app::deep_link_take_pending,
             diagnostics::diagnostics_save,
             diagnostics::app_info,
+            notify::notify_message,
+            notify::notification_dismiss,
         ])
         .events(collect_events![
             servers::DeepLinkOpened,
@@ -105,6 +112,7 @@ fn specta_builder() -> Builder<tauri::Wry> {
             audio::MicTestPhaseChanged,
             app::CloseRequested,
             profile::DefaultAvatarSkipped,
+            notify::NotificationActivated,
         ])
 }
 
@@ -138,8 +146,11 @@ pub fn run() {
 
     let app = tauri::Builder::default()
         // Must be registered first so a second launch hands over to the running instance.
-        .plugin(tauri_plugin_single_instance::init(|app, _argv, _cwd| {
-            window::show(app);
+        .plugin(tauri_plugin_single_instance::init(|app, argv, _cwd| {
+            // A login start while Mumcord already runs must not pop the window up.
+            if !autostart::launched_at_login(&argv) {
+                window::show(app);
+            }
         }))
         .plugin(tauri_plugin_deep_link::init())
         .plugin(tauri_plugin_global_shortcut::Builder::new().build())
@@ -149,7 +160,10 @@ pub fn run() {
         .on_window_event(window::on_window_event)
         .setup(move |app| {
             builder.mount_events(app);
+            // Before the engine: its event hook uses the notifier.
+            notifications::init(app.handle());
             start_engine(app.handle())?;
+            start_window_and_autostart(app.handle());
             tray::init(app.handle());
             deeplink::init(app.handle());
             #[cfg(target_os = "linux")]
@@ -200,9 +214,26 @@ fn start_engine(app: &AppHandle) -> Result<(), Box<dyn std::error::Error>> {
     Ok(())
 }
 
+/// Shows the window (or keeps it in the tray after a start at login) and brings the OS
+/// autostart entry in line with the stored setting (FR-1.48d).
+fn start_window_and_autostart(app: &AppHandle) {
+    match app.state::<Engine>().settings() {
+        Ok(stored) => {
+            let at_login = autostart::launched_at_login(std::env::args_os());
+            window::reveal_at_start(app, autostart::start_hidden(at_login, &stored));
+            autostart::sync(app, stored.autostart);
+        }
+        Err(e) => {
+            tracing::warn!(error = %e, "reading the start-up settings failed; showing the window");
+            window::reveal_at_start(app, false);
+        }
+    }
+}
+
 /// Converts an engine event into its UI event and emits it.
 fn emit_engine_event(app: &AppHandle, event: EngineEvent) -> tauri::Result<()> {
     tray::on_engine_event(app, &event);
+    notifications::on_engine_event(app, &event);
     match event {
         EngineEvent::StateChanged(state) => session::ConnectionStateChanged {
             state: state.into(),
