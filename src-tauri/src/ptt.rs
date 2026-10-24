@@ -111,6 +111,47 @@ fn state() -> MutexGuard<'static, State> {
     STATE.lock().unwrap_or_else(PoisonError::into_inner)
 }
 
+/// App ID the portal files the shortcut under; set once at start-up.
+#[cfg(target_os = "linux")]
+static HOST_APP_ID: std::sync::OnceLock<String> = std::sync::OnceLock::new();
+
+/// Registration with the portal's host registry; done once, before the first portal call.
+#[cfg(target_os = "linux")]
+static HOST_APP_REGISTERED: tokio::sync::OnceCell<()> = tokio::sync::OnceCell::const_new();
+
+/// Sets the app ID (the desktop entry name) the portal should see. Without it the portal guesses
+/// the app from the process tree and files the shortcut under e.g. the terminal that started
+/// Mumcord.
+#[cfg(target_os = "linux")]
+pub fn set_host_app_id(app_id: &str) {
+    if HOST_APP_ID.set(app_id.to_owned()).is_err() {
+        tracing::warn!("portal app ID was already set");
+    }
+}
+
+/// Registers Mumcord with `org.freedesktop.host.portal.Registry`. The portal only accepts this
+/// as the first call on the D-Bus connection, so every portal path awaits it first.
+#[cfg(target_os = "linux")]
+async fn register_host_app() {
+    HOST_APP_REGISTERED
+        .get_or_init(|| async {
+            let Some(app_id) = HOST_APP_ID.get() else {
+                tracing::warn!("portal app ID not set; skipping host registration");
+                return;
+            };
+            let result = match ashpd::AppID::try_from(app_id.as_str()) {
+                Ok(id) => ashpd::register_host_app(id).await,
+                Err(e) => Err(e),
+            };
+            match result {
+                Ok(()) => tracing::info!("registered with the portal host registry"),
+                // Older portals lack the registry; they fall back to guessing the app.
+                Err(e) => tracing::info!(error = %e, "portal host registration unavailable"),
+            }
+        })
+        .await;
+}
+
 /// Installs the sink that receives push-to-talk state changes; replaces any previous one.
 pub fn set_handler(handler: impl Fn(bool) + Send + Sync + 'static) {
     state().handler = Some(Arc::new(handler));
@@ -549,6 +590,7 @@ fn unregister_global<R: Runtime>(app: &AppHandle<R>) {
 
 #[cfg(target_os = "linux")]
 async fn portal_reachable() -> bool {
+    register_host_app().await;
     match ashpd::desktop::global_shortcuts::GlobalShortcuts::new().await {
         Ok(_) => true,
         Err(err) => {
@@ -818,6 +860,7 @@ mod portal {
     pub async fn bind(
         preferred_trigger: Option<&str>,
     ) -> Result<(Binding, Option<String>), BindError> {
+        super::register_host_app().await;
         let portal = GlobalShortcuts::new()
             .await
             .map_err(BindError::Unavailable)?;
@@ -871,6 +914,7 @@ mod portal {
         binding: &Binding,
         activation_token: Option<String>,
     ) -> Result<String, BindError> {
+        super::register_host_app().await;
         let portal = GlobalShortcuts::new()
             .await
             .map_err(BindError::Unavailable)?;
