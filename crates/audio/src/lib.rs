@@ -10,6 +10,7 @@
 //! packets carry 20 ms (two frames) by default, see [`codec`].
 
 pub mod codec;
+pub mod dsp;
 pub mod io;
 
 /// Internal sample rate of all audio frames, in Hz.
