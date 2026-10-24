@@ -51,6 +51,7 @@ pub struct Groups {
 
 impl Groups {
     /// Notification id to replace for this chat; 0 asks for a new one.
+    #[cfg(any(target_os = "linux", test))]
     pub fn replaces(&self, conversation: &Conversation) -> u32 {
         self.by_key.get(&key(conversation)).map_or(0, |(_, id)| *id)
     }
@@ -59,6 +60,7 @@ impl Groups {
         self.by_key.insert(key(&conversation), (conversation, id));
     }
 
+    #[cfg(any(target_os = "linux", test))]
     fn take_id(&mut self, id: u32) -> Option<Conversation> {
         let key = self
             .by_key
@@ -70,6 +72,7 @@ impl Groups {
     }
 
     /// A notification action: the chat to open for a click ("default"), else `None`.
+    #[cfg(any(target_os = "linux", test))]
     pub fn action(&mut self, id: u32, action_key: &str) -> Option<Conversation> {
         if action_key == "default" {
             self.take_id(id)
@@ -79,6 +82,7 @@ impl Groups {
     }
 
     /// The notification went away (expired, dismissed or clicked).
+    #[cfg(any(target_os = "linux", test))]
     pub fn closed(&mut self, id: u32) {
         self.take_id(id);
     }
@@ -95,6 +99,7 @@ impl Groups {
 }
 
 /// Body text for notification services that interpret a subset of HTML.
+#[cfg(any(target_os = "linux", test))]
 pub fn escape_markup(text: &str) -> String {
     let mut out = String::with_capacity(text.len());
     for c in text.chars() {
@@ -260,6 +265,7 @@ async fn show(
 async fn close(_notifier: &Notifier, _ids: Vec<u32>) {}
 
 /// A click on a notification: brings the window to the front and tells the UI which chat to open.
+#[cfg(target_os = "linux")]
 fn activate(app: &AppHandle, conversation: Conversation, activation_token: Option<String>) {
     use tauri_specta::Event;
 
@@ -290,11 +296,6 @@ fn present(app: &AppHandle, activation_token: Option<String>) {
     if let Err(e) = result {
         tracing::warn!(error = %e, "bringing the window to the front failed");
     }
-}
-
-#[cfg(not(target_os = "linux"))]
-fn present(app: &AppHandle, _activation_token: Option<String>) {
-    crate::window::show(app);
 }
 
 #[cfg(target_os = "linux")]
