@@ -18,6 +18,7 @@ import type { ChatDisplay, ChatMessage } from "../../api";
 import { Avatar, ProfilePreviewTrigger } from "../members";
 import type { ConversationLog } from "./chatStore";
 import { daysAgo, messageLayout } from "./grouping";
+import { highlightCode } from "./highlight";
 import { openLink } from "./openLink";
 import { sanitizeHtml } from "./sanitize";
 
@@ -39,10 +40,10 @@ export interface MessageListProps {
 
 const noAvatar = (): null => null;
 
-/** Sanitized message HTML. Its links are Tab stops only while the message is the active one. */
+/** Sanitized message HTML with highlighted code. Its links are Tab stops only while the message is the active one. */
 function Body({ html, tabIndex }: { html: string; tabIndex: number }) {
   const ref = useRef<HTMLDivElement>(null);
-  const sanitized = useMemo(() => sanitizeHtml(html), [html]);
+  const sanitized = useMemo(() => highlightCode(sanitizeHtml(html)), [html]);
   useEffect(() => {
     for (const link of ref.current?.querySelectorAll("a") ?? []) {
       link.tabIndex = tabIndex;

@@ -256,8 +256,96 @@
   overflow-x: auto;
 }
 
+.chat-message__body pre > code {
+  padding: 0;
+  background: none;
+}
+
+/* Syntax colors (FR-1.53) reuse theme tokens so both themes keep readable contrast. */
+.hljs-keyword,
+.hljs-selector-tag,
+.hljs-meta .hljs-keyword,
+.hljs-doctag {
+  color: var(--color-accent);
+}
+
+.hljs-string,
+.hljs-regexp,
+.hljs-addition,
+.hljs-attr,
+.hljs-selector-attr {
+  color: var(--color-success);
+}
+
+.hljs-number,
+.hljs-literal,
+.hljs-symbol,
+.hljs-variable,
+.hljs-template-variable,
+.hljs-selector-class,
+.hljs-selector-id {
+  color: var(--color-accent-text);
+}
+
+.hljs-title,
+.hljs-built_in,
+.hljs-type,
+.hljs-section,
+.hljs-name,
+.hljs-attribute {
+  color: var(--color-warning);
+}
+
+.hljs-deletion {
+  color: var(--color-danger);
+}
+
+.hljs-comment,
+.hljs-quote,
+.hljs-meta {
+  color: var(--color-text-muted);
+  font-style: italic;
+}
+
+.hljs-emphasis {
+  font-style: italic;
+}
+
+.hljs-strong {
+  font-weight: var(--font-weight-bold);
+}
+
 .chat-composer {
   padding: var(--space-2) var(--space-4) var(--space-4);
+}
+
+.chat-format {
+  display: flex;
+  gap: 0.125rem;
+  margin-bottom: var(--space-1);
+}
+
+.chat-format__button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 1.75rem;
+  min-height: 1.75rem;
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--color-text-muted);
+  cursor: pointer;
+}
+
+.chat-format__button:hover:not(:disabled) {
+  background: var(--color-bg-hover);
+  color: var(--color-text);
+}
+
+.chat-format__button:disabled {
+  cursor: not-allowed;
 }
 
 .chat-composer__row {
