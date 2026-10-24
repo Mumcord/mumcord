@@ -35,6 +35,18 @@
 | V6 | CI check (feabbf8) | done | ci6-watch | F9 | simple | §10 | – |
 | F10 | Prettier flags tsconfig.json (UI lint, all OS) | done | f10-prettier-tsconfig | V6 | simple | – | tsconfig.json, e2e/tsconfig.json |
 | F11 | E2E CI: dbus can't start (runtime uid without passwd entry) | done | f11-e2e-dbus | V6 | simple | – | e2e/{Dockerfile,run.sh,container-run.sh}, e2e.yml |
+| V7 | CI + E2E check (f481cdf) | done | ci7-watch | F10, F11 | simple | §10 | – |
+| F12 | macOS clippy: unused `SCHEME` in deeplink.rs (cfg) | done | f12-macos-scheme | V7 | simple | – | src-tauri deeplink/tray/window/app.rs |
+| F13 | Flaky Wizard focus test | done | f13-wizard-flaky | V7 | simple | – | ui/src/features/wizard |
+| F14 | Member list doesn't show other people's avatars (AC-1.20) | done (+F14b avatarHash) | f14-member-avatars | C5 | simple | AC-1.20 | ui/src/features/members |
+| F15 | Declined changed cert shows generic text instead of 'certificate has changed' | done | f15-cert-changed-msg | C2 | simple | AC-1.5 | servers UI / engine error mapping |
+| F16 | E2E: stale shared keyring breaks runs; app debug start rewrites tracked bindings file | done (2× smoke pass pending) | f16-e2e-keyring | C2 | simple | – | e2e/*.sh, Dockerfile, export guard in src-tauri/src/lib.rs |
+| F17 | Test builds: Linux smoke keyring (empty unlock), Windows mumble-server doesn't start | done | f17-release-smoke | C8 | simple | AC-1.30 | release.yml, scripts/smoke |
+| V8 | CI/E2E/Test builds check (c0259dc) | done | ci8-watch | F17 | simple | §10 | – |
+| F18 | Prettier on mock.ts; smoke Linux needs libsecret-tools; Windows server gone before seeding | done | f18-ci-followups | V8 | simple | AC-1.30 | mock.ts (format), release.yml, scripts/smoke |
+| F19 | Connection info (transport, latency, loss, bitrate) in UI + diagnostics (AC-1.23) | done | f19-conn-info | C6 | complex | AC-1.23, AC-1.28 | engine stats, commands, diag provider, ui/src/features/connection |
+| F20 | Bitrate controller too aggressive (7 kbps at 10 % loss, ~90 s recovery, gaps during recovery) | done (live netsim check pending → C6b) | f20-bitrate-tuning | C6 | simple | AC-1.23 | crates/audio/src/bitrate, encoder, engine voice apply |
+| V9 | All workflows (098ef6a) | done – all green | ci9-watch | F18 | simple | §10 | – |
 | B2 | Test server kit | done | b2-testenv | – | simple | §10, AC-1.5/1.16/1.21 infra | testenv/ |
 | B3 | Engine API contract + UI mock | done | b3-contract | B1 | complex | §8 | src-tauri/src/lib.rs, src-tauri/src/commands/*, ui/src/api/, ui/src/bindings/ |
 | B4 | Protocol: control channel | done | b4-protocol | B1 | complex | FR-1.7–1.12, 1.14, 1.15, 1.22 | crates/protocol (except voice/) |
@@ -68,15 +80,18 @@
 | F8 | Add e2e/tsconfig.json reference to root tsconfig so `npm run typecheck` covers e2e | done | f8-tsconfig | B27 | simple | – | tsconfig.json |
 | B28c | Regenerate THIRD_PARTY_NOTICES after new deps (image crate, wdio devDeps) | done | b28c-notices | B14, B27 | simple | AC-1.29 | THIRD_PARTY_NOTICES, ui/public/third-party-notices.txt, about.toml |
 | I1 | Integration check after B13b/B14/B25/B26 (workspace clippy/tests incl. doc-tests, npm checks, --locked) before committing the shared engine/src-tauri files | done | i1-integration | B13b, B14, B25, B26 | simple | – | read-only |
-| B29 | Packaging & cross-OS smoke | done (CI confirmation pending) | b29-packaging | B13, B27 | complex | AC-1.30, §10 | .github/workflows/release.yml, smoke script |
-| C1 | Verify wizard & identity | open | | B18, B24, B27 | simple | AC-1.1–1.3 | e2e/specs/wizard |
-| C2 | Verify servers, trust, links | open | | B19, B25, B27 | simple | AC-1.4–1.6 | e2e/specs/servers |
-| C3 | Verify channels & voice | open | | B11, B13, B15, B20, B23, B27 | complex | AC-1.7–1.12 | e2e/specs/voice |
-| C4 | Verify chat & follow | open | | B14, B21, B22, B26, B27 | complex | AC-1.13–1.18 | e2e/specs/chat |
-| C5 | Verify registration & profiles | open | | B14, B20, B23, B27 | simple | AC-1.19, 1.20 | e2e/specs/profile |
-| C6 | Verify network resilience | open | | B12, B13, B19, B27 | simple | AC-1.21–1.23 | e2e/specs/network |
-| C7 | Verify app behaviour, theme, language, a11y | open | | B17, B24, B25, B26, B27 | complex | AC-1.24–1.27 | e2e/specs/app |
-| C8 | Verify diagnostics, About, CI builds | open | | B16, B28, B29 | simple | AC-1.28–1.30 | e2e/specs/misc |
+| B29 | Packaging & cross-OS smoke | done | b29-packaging | B13, B27 | complex | AC-1.30, §10 | .github/workflows/release.yml, smoke script |
+| C1 | Verify wizard & identity | done (AC-1.1–1.3 ✅) | c1-qa | B18, B24, B27 | simple | AC-1.1–1.3 | e2e/specs/wizard |
+| C2 | Verify servers, trust, links | done (AC-1.4–1.6 ✅) | c2-qa | B19, B25, B27 | simple | AC-1.4–1.6 | e2e/specs/servers |
+| C3 | Verify channels & voice | in progress | c3-qa | B11, B13, B15, B20, B23, B27 | complex | AC-1.7–1.12 | e2e/specs/voice |
+| C4 | Verify chat & follow | in progress | c4-qa | B14, B21, B22, B26, B27 | complex | AC-1.13–1.18 | e2e/specs/chat |
+| C5 | Verify registration & profiles | done (AC-1.19 ✅, AC-1.20 ❌ member-list avatar → F14) | c5-qa | B14, B20, B23, B27 | simple | AC-1.19, 1.20 | e2e/specs/profile |
+| C6 | Verify network resilience | done (AC-1.21 ✅, AC-1.22 ✅, AC-1.23 audio ✅ / UI bitrate ❌ → F19, tuning → F20) | c6-qa | B12, B13, B19, B27 | simple | AC-1.21–1.23 | e2e/specs/network |
+| C7 | Verify app behaviour, theme, language, a11y | in progress | c7-qa | B17, B24, B25, B26, B27 | complex | AC-1.24–1.27 | e2e/specs/app |
+| C8 | Verify diagnostics, About, CI builds | done (AC-1.30 ✅ via V9; AC-1.28/1.29 blocked → C8b) | c8-qa | B16, B28, B29 | simple | AC-1.28–1.30 | e2e/specs/misc |
+| C8b | Re-verify AC-1.28, AC-1.29 after F16 (keyring) and F19 (stats in diagnostics) | open | | F16, F19 | simple | AC-1.28, AC-1.29 | e2e/specs/misc |
+| F21 | Voice falls back to TCP tunnel under 10 % packet loss (UDP→TCP hysteresis too sensitive) | open | | C6 | simple | AC-1.23, FR-1.26 | crates/protocol/src/voice/link.rs |
+| C6b | Re-verify AC-1.23 after F19/F20/F21 (bitrate visible + gentler, no TCP fallback at 10 % loss) | open | | F19, F20, F21 | simple | AC-1.23 | e2e/specs/network |
 | G1 | **Stage 1a gate**: user manual checklist (Win/macOS, listening, KDE PTT/tray/Orca) + sign-off | open | user | C1–C8 | – | – | – |
 | B30 | Mumble Link + 3D audio | open | | G1 | complex | FR-1.41, 1.43 | crates/positional/src/link/, crates/audio/src/spatial/ |
 | B31 | Game plugin host | open | | B30 | complex | FR-1.42, 1.43 | crates/positional/src/plugins/ |
@@ -131,3 +146,16 @@
 - **B29:** `.github/workflows/release.yml` (build AppImage/NSIS/DMG as workflow artifacts `mumcord-<os>-unsigned-test-build` + smoke per OS), `scripts/smoke/smoke.sh` + `scripts/smoke/seed/` (standalone seeder: identity in keyring, wizardCompleted, saved server, trusted cert). Smoke = start with `mumble://127.0.0.1:64738/`, log `connected server_id=` + bot sees `SmokeTester`. Connect works without audio devices. First CI run must confirm: macOS mumble-server source build, Windows server `/quiet` install path, NSIS `/S`, headless DMG, macOS keychain.
 - **B14:** engine chat.rs (+chat/sanitize.rs strict ammonia, used everywhere via convert.rs), follow.rs, profile.rs; events MessageReceived (+Sound::Message for followed/private), UnreadChanged, FollowedChannelsChanged; snapshot.unread filled on sync; store `insert_message`, `messages_before`; `image` dep. Open: text sends don't await server; refused follow may show twice (command error + ServerDenied); comment/avatar accepted after 3 s silence; server messages have empty sender.
 - **B25:** tray (status dot grey/amber/blue/green/red + menu status line, Show/Mute/Deafen/Quit), close ask/minimize/quit (taskbar fallback without tray), `mumble://` incl. second-launch forwarding, `deep_link_take_pending`, CloseDialog in ChatStatusMount (appwindow locales). Live-verified on KDE. User checklist: dialog buttons/Remember/Esc on screen, xdg-open after enabling handler in wizard, no-tray fallback, Windows/macOS; Linux tray tooltips not shown.
+- **QA runs:** all E2E runs go through `flock ~/.cache/mumcord-build/e2e.lock` (shared test servers).
+- **V7:** f481cdf: E2E Linux ✅; CI Linux ✅, Windows ✅ (PKCS#12 fix confirmed), macOS ❌ clippy dead_code `SCHEME` → F12; Wizard focus test flaked once → F13.
+- **C5:** AC-1.19 ✅; AC-1.20 own avatar/comment ✅ (native file picker 🖐 manual), others' avatar missing in member list ❌ → F14 (decision: avatar in list rows, comment stays in profile card). Spec e2e/specs/profile/profile.e2e.ts.
+- **F14/F14b:** member list shows avatars (lazy via personProfile, cache per session); `User.avatarHash` (hex) invalidates on change.
+- **C2:** AC-1.4 ✅ (password only in keyring), AC-1.5 ✅ (SHA-256 fingerprint; changed cert blocks), AC-1.6 ✅ (link launch running/not running; real browser click 🖐). Specs e2e/specs/servers/servers.e2e.ts + e2e/helpers/servers-ui.ts.
+- **C8 interim:** AC-1.30 builds+artifacts ✅ on all OS, smoke macOS ✅, Linux ❌ (keyring), Windows ❌ (server start) → F17. AC-1.28/1.29 blocked by E2E keyring (empty unlock creates no login collection) → F16.
+- **C1:** AC-1.1 ✅ (main window 3.8–4.9 s; identity only in keyring), AC-1.2 ✅ (openssl PKCS#12 import via real GTK chooser, same cert hash/registered), AC-1.3 ✅ (meter moves, ~3.9 s playback in output WAV). Specs e2e/specs/wizard/* + e2e/helpers/wizard-util.ts. Note: v15 refuses TLS for a few s after reset.
+- **V8:** c0259dc: E2E ✅; CI ❌ only Prettier on ui/src/api/mock.ts; Test builds: builds ✅ all, smoke macOS ✅, Linux ❌ secret-tool missing, Windows ❌ server not listening at seed time → F18.
+- **C6:** AC-1.21 ✅ (restart + kill-tcp → reconnect, Raid + follow restored), AC-1.22 ✅ (TCP fallback in 4.6 s, voice both ways, back in 4.9 s), AC-1.23: longest gap at 10 % loss 60 ms ✅, but bitrate not shown anywhere ❌ (F19) and controller too aggressive (F20); 🎧 listening. Spec e2e/specs/network/network-resilience.e2e.ts.
+- **V9:** 098ef6a: CI ✅ (Linux/Windows/macOS), E2E ✅, Test builds ✅ (build + smoke on all 3 OS) → AC-1.30 satisfied by CI.
+- **C8:** spec e2e/specs/misc/diagnostics-about.e2e.ts written but blocked by E2E keyring; AC-1.30 satisfied by V9 (all smoke green).
+- **F19:** command `connection_stats` (polled 1/s by the popover; null when not connected): transport, rtt, loss % (integer), send bitrate, server max, packets sent/received; diagnostic file includes them; UI popover `ui/src/features/connection/` via signal button in user panel; mock `setConnectionStats`.
+- **F20:** floors: ≥32 kbps under 25 % loss, 20 kbps at 25–40 %, 12 kbps only >40 %; FEC hint cap 30 %; recovery +25 %/s after 3 s clean (~13 s); ceiling keeps 10 % below server limit (server drops bursts over its 7.2 s average). Side finding: app fell back to TCP during 10 % loss → F21.
