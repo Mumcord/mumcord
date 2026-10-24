@@ -7,7 +7,6 @@ import { axeViolations } from "../../test/axe";
 import { applyThemeToDocument } from "../../theme/theme";
 import { pickOpenPath, pickSavePath } from "./fileDialogs";
 import { SettingsScreen } from "./SettingsScreen";
-import { MIC_TEST_MS } from "./sections/AudioSection";
 
 vi.mock("./fileDialogs", () => ({
   pickSavePath: vi.fn(),
@@ -213,7 +212,7 @@ describe("Audio section", () => {
     expect(screen.getByRole("option", { name: "Webcam Mic" })).toBeInTheDocument();
   });
 
-  it("runs the microphone test for at most five seconds with a level meter", async () => {
+  it("runs the microphone test through the engine's phases with a level meter", async () => {
     const start = vi.spyOn(api, "micTestStart").mockResolvedValue(null);
     const stop = vi.spyOn(api, "micTestStop");
     await openSection("Audio");
@@ -232,9 +231,13 @@ describe("Audio section", () => {
       "50",
     );
     act(() => {
-      vi.advanceTimersByTime(MIC_TEST_MS);
+      api.mock.emit("micTestPhaseChanged", { phase: "playing" });
     });
-    expect(stop).toHaveBeenCalledTimes(1);
+    expect(screen.getByText("Playing back your voice…")).toBeInTheDocument();
+    act(() => {
+      api.mock.emit("micTestPhaseChanged", { phase: "done" });
+    });
+    expect(stop).not.toHaveBeenCalled();
     expect(screen.getByRole("button", { name: "Start test" })).toBeInTheDocument();
   });
 

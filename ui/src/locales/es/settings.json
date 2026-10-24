@@ -56,7 +56,8 @@
     "level": "Nivel del micrófono",
     "testStart": "Iniciar prueba",
     "testStop": "Detener grabación",
-    "testRecording": "Grabando… habla ahora."
+    "testRecording": "Grabando… habla ahora.",
+    "testPlaying": "Reproduciendo tu voz…"
   },
   "voice": {
     "talkMode": "Modo de habla",

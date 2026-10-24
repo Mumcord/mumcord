@@ -56,7 +56,8 @@
     "level": "Microphone level",
     "testStart": "Start test",
     "testStop": "Stop recording",
-    "testRecording": "Recording… speak now."
+    "testRecording": "Recording… speak now.",
+    "testPlaying": "Playing back your voice…"
   },
   "voice": {
     "talkMode": "Talk mode",

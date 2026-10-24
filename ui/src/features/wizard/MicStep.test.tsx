@@ -1,7 +1,7 @@
 import { act, fireEvent, screen, waitFor } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi, type Mock } from "vitest";
 import { setApi, type Settings } from "../../api";
-import { MicStep, PLAYBACK_MS, RECORD_MS } from "./MicStep";
+import { MicStep } from "./MicStep";
 import { renderInWizard, setupWizardTest, type Harness } from "./testUtils";
 
 let harness: Harness;
@@ -100,13 +100,14 @@ describe("MicStep", () => {
     expect(screen.getByRole("button", { name: "Next" })).toBeEnabled();
   });
 
-  it("records, plays back and stops the test on its own", async () => {
-    vi.useFakeTimers();
-    const stop = vi.spyOn(harness.api, "micTestStop");
+  it("follows the engine's mic test phases", async () => {
     renderStep();
     await act(async () => {
       fireEvent.click(screen.getByRole("button", { name: "Test" }));
       await Promise.resolve();
+    });
+    act(() => {
+      harness.api.mock.emit("micTestPhaseChanged", { phase: "recording" });
     });
     expect(screen.getByRole("status")).toHaveTextContent("Speak now…");
 
@@ -119,17 +120,26 @@ describe("MicStep", () => {
     );
 
     act(() => {
-      vi.advanceTimersByTime(RECORD_MS);
+      harness.api.mock.emit("micTestPhaseChanged", { phase: "playing" });
     });
     expect(screen.getByRole("status")).toHaveTextContent("Playing back your voice…");
 
-    await act(async () => {
-      vi.advanceTimersByTime(PLAYBACK_MS);
-      await Promise.resolve();
+    act(() => {
+      harness.api.mock.emit("micTestPhaseChanged", { phase: "done" });
     });
-    expect(stop).toHaveBeenCalled();
     expect(screen.getByRole("button", { name: "Test" })).toBeInTheDocument();
     expect(screen.getByRole("meter")).toHaveAttribute("aria-valuenow", "0");
+  });
+
+  it("explains a test that failed after starting", async () => {
+    renderStep();
+    fireEvent.click(screen.getByRole("button", { name: "Test" }));
+    await screen.findByRole("button", { name: "Stop" });
+    act(() => {
+      harness.api.mock.emit("micTestPhaseChanged", { phase: "failed" });
+    });
+    expect(screen.getByRole("alert")).toHaveTextContent("could not start");
+    expect(screen.getByRole("button", { name: "Test" })).toBeInTheDocument();
   });
 
   it("stops the test with the Stop button and when leaving the step", async () => {

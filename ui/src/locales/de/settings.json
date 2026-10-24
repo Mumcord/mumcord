@@ -56,7 +56,8 @@
     "level": "Mikrofonpegel",
     "testStart": "Test starten",
     "testStop": "Aufnahme beenden",
-    "testRecording": "Aufnahme läuft… sprich jetzt."
+    "testRecording": "Aufnahme läuft… sprich jetzt.",
+    "testPlaying": "Wiedergabe deiner Stimme…"
   },
   "voice": {
     "talkMode": "Sprechmodus",

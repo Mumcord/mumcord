@@ -7,8 +7,7 @@ import { readableDeviceName } from "../deviceNames";
 import { errorText } from "../errors";
 import type { SettingsSectionProps } from "./types";
 
-/** Recording phase of the mic test; the engine then plays the recording back (B8: ≤ 5 s). */
-export const MIC_TEST_MS = 5000;
+type MicTestPhaseName = "recording" | "playing" | "done" | "failed";
 
 /** Audio: input/output device, level meter and record-then-play-back test. */
 export function AudioSection({ settings, update }: SettingsSectionProps) {
@@ -109,6 +108,7 @@ function MicTest() {
   const { t } = useTranslation("settings");
   const [running, setRunning] = useState(false);
   const [level, setLevel] = useState(0);
+  const [phase, setPhase] = useState<MicTestPhaseName>("recording");
   const [problem, setProblem] = useState<string | null>(null);
   const runningRef = useRef(false);
   const mounted = useRef(true);
@@ -132,13 +132,19 @@ function MicTest() {
       });
   }, []);
 
-  useEffect(() => {
-    if (!running) return;
-    const timer = setTimeout(stop, MIC_TEST_MS);
-    return () => {
-      clearTimeout(timer);
-    };
-  }, [running, stop]);
+  // The engine ends the test on its own: recording, then playback, then `done` (or `failed`).
+  useEffect(
+    () =>
+      getApi().on("micTestPhaseChanged", (payload) => {
+        setPhase(payload.phase);
+        if (payload.phase === "done" || payload.phase === "failed") {
+          runningRef.current = false;
+          setRunning(false);
+          setLevel(0);
+        }
+      }),
+    [],
+  );
 
   // Leaving the section ends a running test.
   useEffect(() => {
@@ -151,6 +157,7 @@ function MicTest() {
 
   const start = async () => {
     setProblem(null);
+    setPhase("recording");
     try {
       await getApi().micTestStart();
       runningRef.current = true;
@@ -181,7 +188,7 @@ function MicTest() {
         )}
       </div>
       <p role="status" className="settings-hint">
-        {running ? t("audio.testRecording") : ""}
+        {running ? t(phase === "playing" ? "audio.testPlaying" : "audio.testRecording") : ""}
       </p>
       {problem !== null && (
         <p role="alert" className="settings-error">

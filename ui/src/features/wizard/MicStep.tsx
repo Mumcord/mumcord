@@ -5,13 +5,6 @@ import { shortDeviceName } from "./deviceName";
 import { LevelMeter } from "./LevelMeter";
 import { StepFrame } from "./StepFrame";
 
-/**
- * The engine records up to 5 s and then plays the recording back, but reports no phase changes.
- * The status text therefore follows these durations.
- */
-export const RECORD_MS = 5000;
-export const PLAYBACK_MS = 5000;
-
 type TestPhase = "idle" | "recording" | "playing";
 
 interface MicStepProps {
@@ -30,7 +23,6 @@ export function MicStep({ settings, focusOnMount, onDevicesChange, onBack, onNex
   const [error, setError] = useState<string | null>(null);
   const [phase, setPhase] = useState<TestPhase>("idle");
   const [level, setLevel] = useState(0);
-  const timers = useRef<ReturnType<typeof setTimeout>[]>([]);
   const running = useRef(false);
   const inputId = useId();
   const outputId = useId();
@@ -52,17 +44,29 @@ export function MicStep({ settings, focusOnMount, onDevicesChange, onBack, onNex
     const offLevel = getApi().on("micLevel", (event) => {
       if (running.current) setLevel(event.level ?? 0);
     });
+    // The engine reports the test's progress: recording, then playback, then done.
+    const offPhase = getApi().on("micTestPhaseChanged", (event) => {
+      if (event.phase === "recording" || event.phase === "playing") {
+        running.current = true;
+        setPhase(event.phase);
+        return;
+      }
+      running.current = false;
+      setPhase("idle");
+      setLevel(0);
+      if (event.phase === "failed") setError(t("mic.testFailed"));
+    });
     return () => {
       active = false;
       offDevices();
       offLevel();
+      offPhase();
     };
   }, [t]);
 
   // Leaving the step (Back/Next or unmount) always ends a running test.
   useEffect(
     () => () => {
-      for (const timer of timers.current) clearTimeout(timer);
       if (running.current) {
         running.current = false;
         getApi()
@@ -75,13 +79,7 @@ export function MicStep({ settings, focusOnMount, onDevicesChange, onBack, onNex
     [],
   );
 
-  function clearTimers() {
-    for (const timer of timers.current) clearTimeout(timer);
-    timers.current = [];
-  }
-
   async function stopTest() {
-    clearTimers();
     running.current = false;
     setPhase("idle");
     setLevel(0);
@@ -101,14 +99,9 @@ export function MicStep({ settings, focusOnMount, onDevicesChange, onBack, onNex
       setError(t("mic.testFailed"));
       return;
     }
+    // Normally the engine's `recording` event already arrived; never move a phase backwards.
     running.current = true;
-    setPhase("recording");
-    timers.current = [
-      setTimeout(() => {
-        setPhase("playing");
-      }, RECORD_MS),
-      setTimeout(() => void stopTest(), RECORD_MS + PLAYBACK_MS),
-    ];
+    setPhase((current) => (current === "idle" ? "recording" : current));
   }
 
   async function changeDevice(key: "inputDevice" | "outputDevice", value: string) {
