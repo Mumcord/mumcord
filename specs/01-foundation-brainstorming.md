@@ -647,3 +647,14 @@ Keyboard push-to-talk on Wayland stays on the desktop portal (Q4.11); the portal
 ✍️ Note: Asked and answered in chat during /dev.
 
 ---
+
+#### QA.5 Push-to-talk on KDE Wayland: compatibility mode like TeamSpeak? `◉`
+TeamSpeak 3 runs through KDE's X11 compatibility layer (XWayland). KDE's "Legacy X11 App Support" setting (default: key combinations with Ctrl/Alt/Meta and modifier keys; mouse buttons off) lets such apps see global input without a dialog or the `input` group. Mumcord already has the X11 push-to-talk path for keys and mouse buttons.
+
+- [ ] Compatibility mode by default on KDE Wayland; modern path as a setting.
+- [ ] Only fix the modern path (portal dialog for keys, evdev + `input` group for mouse buttons).
+- [x] **Both: Settings → Voice offers a "Compatibility mode (like TeamSpeak)" switch on Linux Wayland; the default stays the modern path.** In compatibility mode Mumcord runs through XWayland and uses its X11 push-to-talk for keys and mouse buttons, limited to what the desktop's legacy X11 setting allows; the switch explains that trade-off.
+
+✍️ Note: Asked and answered in chat during /dev.
+
+---
