@@ -149,5 +149,18 @@
     "noticesHint": "Mumcord is built on open-source software, including code from the Mumble project.",
     "noticesFailed": "The third-party notices could not be loaded.",
     "loading": "Loading…"
+  },
+  "profile": {
+    "title": "Profile",
+    "defaultAvatar": "Default avatar",
+    "preview": "Default avatar preview",
+    "none": "No default avatar set.",
+    "choose": "Choose…",
+    "clear": "Clear",
+    "chooseTitle": "Choose a default avatar",
+    "imageType": "Images",
+    "sendToNew": "Send to new servers automatically",
+    "sendToNewHint": "Sent once, the first time you connect to a server where you have no avatar yet. Never sent again to that server, even if you change or remove your avatar there.",
+    "skipped": "Your default avatar was not sent: it is too large for this server."
   }
 }

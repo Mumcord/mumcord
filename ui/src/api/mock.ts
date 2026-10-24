@@ -80,7 +80,12 @@ const DEFAULT_SETTINGS: Settings = {
   sounds: { joinLeave: true, selfMute: true, selfDeaf: true, messages: true },
   closeBehaviour: "ask",
   logLevel: "info",
+  sendDefaultAvatar: true,
 };
+
+/** 1×1 PNG standing in for any image chosen as the default avatar. */
+const MOCK_DEFAULT_AVATAR =
+  "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==";
 
 const DEVICES: AudioDevices = {
   inputs: [
@@ -192,6 +197,7 @@ export function createMockApi(options: MockOptions = {}): MockApi {
 
   let identity: Identity | null = fresh ? null : { name: "Zoe", certHash: "selfhash" };
   let settings: Settings = { ...DEFAULT_SETTINGS, wizardCompleted: !fresh };
+  let defaultAvatar: string | null = null;
   let servers: SavedServer[] = fresh
     ? []
     : [
@@ -647,6 +653,11 @@ export function createMockApi(options: MockOptions = {}): MockApi {
       checkSize(html);
       updateUser(SELF_SESSION, { hasComment: html !== "" });
       return Promise.resolve(null);
+    },
+    defaultAvatarGet: () => Promise.resolve(defaultAvatar),
+    defaultAvatarSet: (path) => {
+      defaultAvatar = path === null ? null : MOCK_DEFAULT_AVATAR;
+      return Promise.resolve(defaultAvatar);
     },
     registerSelf: () => {
       const root = requireSnapshot().channels.find((c) => c.parentId === null);

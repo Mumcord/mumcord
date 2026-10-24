@@ -149,5 +149,18 @@
     "noticesHint": "Mumcord basiert auf Open-Source-Software, darunter Code aus dem Mumble-Projekt.",
     "noticesFailed": "Die Hinweise zu Drittanbietern konnten nicht geladen werden.",
     "loading": "Wird geladen…"
+  },
+  "profile": {
+    "title": "Profil",
+    "defaultAvatar": "Standard-Avatar",
+    "preview": "Vorschau des Standard-Avatars",
+    "none": "Kein Standard-Avatar festgelegt.",
+    "choose": "Auswählen…",
+    "clear": "Entfernen",
+    "chooseTitle": "Standard-Avatar auswählen",
+    "imageType": "Bilder",
+    "sendToNew": "Automatisch an neue Server senden",
+    "sendToNewHint": "Wird einmal gesendet, wenn du dich zum ersten Mal mit einem Server verbindest, auf dem du noch keinen Avatar hast. Danach nie wieder an diesen Server, auch wenn du deinen Avatar dort änderst oder entfernst.",
+    "skipped": "Dein Standard-Avatar wurde nicht gesendet: Er ist zu groß für diesen Server."
   }
 }

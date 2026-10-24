@@ -398,6 +398,39 @@ describe("Chat & history section", () => {
 });
 
 describe("Identity section", () => {
+  it("sets, previews and clears the default avatar and toggles automatic sending", async () => {
+    openPath.mockResolvedValue("/home/me/me.png");
+    const setDefault = vi.spyOn(api, "defaultAvatarSet");
+    await openSection("Identity");
+    expect(await screen.findByText("No default avatar set.")).toBeInTheDocument();
+    const clear = screen.getByRole("button", { name: "Clear" });
+    expect(clear).toBeDisabled();
+
+    fireEvent.click(screen.getByRole("button", { name: "Choose…" }));
+    expect(await screen.findByRole("img", { name: "Default avatar preview" })).toBeInTheDocument();
+    expect(setDefault).toHaveBeenCalledWith("/home/me/me.png");
+
+    fireEvent.click(clear);
+    expect(await screen.findByText("No default avatar set.")).toBeInTheDocument();
+    expect(setDefault).toHaveBeenLastCalledWith(null);
+
+    const toggle = screen.getByRole("switch", { name: "Send to new servers automatically" });
+    expect(toggle).toBeChecked();
+    fireEvent.click(toggle);
+    await waitFor(async () => {
+      expect((await api.settingsGet()).sendDefaultAvatar).toBe(false);
+    });
+  });
+
+  it("shows a plain error when the default avatar is not an image", async () => {
+    openPath.mockResolvedValue("/home/me/notes.txt");
+    api.mock.failNext("defaultAvatarSet", "invalidInput", "not an image");
+    await openSection("Identity");
+    fireEvent.click(await screen.findByRole("button", { name: "Choose…" }));
+    expect(await screen.findByRole("alert")).toBeInTheDocument();
+    expect(screen.queryByRole("img", { name: "Default avatar preview" })).not.toBeInTheDocument();
+  });
+
   it("exports the identity with a password entered twice", async () => {
     savePath.mockResolvedValue("/home/me/id.p12");
     const exportIdentity = vi.spyOn(api, "identityExport");

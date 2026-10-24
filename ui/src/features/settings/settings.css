@@ -69,6 +69,14 @@
   margin: var(--space-1) 0;
 }
 
+.settings-avatar__image {
+  display: block;
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
 .settings-error {
   color: var(--color-danger);
 }

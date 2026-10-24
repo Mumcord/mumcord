@@ -61,6 +61,15 @@ export function UserPanel() {
     else if (before.mute !== mute) announce(mute ? t("announce.muted") : t("announce.unmuted"));
   }, [present, mute, deaf, t]);
 
+  // FR-1.47: the default avatar could not fit this server's image limit.
+  useEffect(
+    () =>
+      getApi().on("defaultAvatarSkipped", () => {
+        setError(t("profile.skipped", { ns: "settings" }));
+      }),
+    [t],
+  );
+
   useEffect(() => {
     if (menuOpen) menuRef.current?.querySelector<HTMLElement>('[role="menuitem"]')?.focus();
   }, [menuOpen]);

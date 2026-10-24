@@ -5,13 +5,18 @@ import { PasswordDialog } from "../components/PasswordDialog";
 import { Group, Section } from "../components/Section";
 import { errorText } from "../errors";
 import { pickOpenPath, pickSavePath } from "../fileDialogs";
+import { DefaultAvatarGroup } from "./DefaultAvatarGroup";
+import type { SettingsSectionProps } from "./types";
 
 const IDENTITY_FILTER_EXTENSIONS = ["p12", "pfx"];
 
 type Status = { kind: "success" | "error"; text: string } | null;
 
-/** Identity: shows the name and offers export/import of the PKCS#12 identity (FR-1.3). */
-export function IdentitySection() {
+/**
+ * Identity: shows the name, offers export/import of the PKCS#12 identity (FR-1.3) and the
+ * profile's default avatar (FR-1.47).
+ */
+export function IdentitySection({ settings, update }: SettingsSectionProps) {
   const { t } = useTranslation("settings");
   const [identity, setIdentity] = useState<Identity | null>(null);
   const [exportPath, setExportPath] = useState<string | null>(null);
@@ -80,6 +85,7 @@ export function IdentitySection() {
           </button>
         </div>
       </Group>
+      <DefaultAvatarGroup settings={settings} update={update} />
       <p role="status" className={status?.kind === "error" ? "settings-error" : "settings-success"}>
         {status?.text}
       </p>

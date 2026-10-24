@@ -86,6 +86,16 @@ async function openMenuItem(name: string) {
 }
 
 describe("UserPanel", () => {
+  it("shows a notice when the default avatar was too large for the server", async () => {
+    await setup();
+    act(() => {
+      api.mock.emit("defaultAvatarSkipped", { serverId: 1 });
+    });
+    expect(await screen.findByRole("alert")).toHaveTextContent(
+      "Your default avatar was not sent: it is too large for this server.",
+    );
+  });
+
   it("toggles mute and reflects it", async () => {
     await setup();
     await joinVoice();

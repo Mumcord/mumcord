@@ -29,7 +29,7 @@ function renderSection(id: SectionId, settings: Settings, update: UpdateSettings
   const props = { settings, update };
   switch (id) {
     case "identity":
-      return <IdentitySection />;
+      return <IdentitySection {...props} />;
     case "audio":
       return <AudioSection {...props} />;
     case "voice":

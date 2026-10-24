@@ -149,5 +149,18 @@
     "noticesHint": "Mumcord se basa en software de código abierto, incluido código del proyecto Mumble.",
     "noticesFailed": "No se pudieron cargar los avisos de terceros.",
     "loading": "Cargando…"
+  },
+  "profile": {
+    "title": "Perfil",
+    "defaultAvatar": "Avatar predeterminado",
+    "preview": "Vista previa del avatar predeterminado",
+    "none": "No hay avatar predeterminado.",
+    "choose": "Elegir…",
+    "clear": "Quitar",
+    "chooseTitle": "Elegir un avatar predeterminado",
+    "imageType": "Imágenes",
+    "sendToNew": "Enviar automáticamente a servidores nuevos",
+    "sendToNewHint": "Se envía una sola vez, la primera vez que te conectas a un servidor donde aún no tienes avatar. No se vuelve a enviar a ese servidor, aunque cambies o quites tu avatar allí.",
+    "skipped": "Tu avatar predeterminado no se envió: es demasiado grande para este servidor."
   }
 }
