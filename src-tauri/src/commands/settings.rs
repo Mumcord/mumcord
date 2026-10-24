@@ -126,6 +126,9 @@ pub struct Settings {
     pub noise_suppression: bool,
     pub echo_cancellation: bool,
     pub auto_gain: bool,
+    /// "Music quality" (default off; FR-1.24, QA.37): bitrate cap up to the server limit (max
+    /// 510 kbit/s), music-tuned encoder, noise suppression and automatic volume bypassed.
+    pub music_quality: bool,
     pub sounds: SoundSettings,
     /// "Notifications: In-app / Desktop / Both / Off" (default both, FR-1.48c).
     pub notifications: NotificationMode,
@@ -171,6 +174,7 @@ impl Settings {
             noise_suppression: s.noise_suppression,
             echo_cancellation: s.echo_cancellation,
             auto_gain: s.auto_gain,
+            music_quality: s.music_quality,
             sounds: SoundSettings {
                 join_leave: s.sounds.user_joined || s.sounds.user_left,
                 self_mute: s.sounds.self_mute,
@@ -231,6 +235,7 @@ impl Settings {
         s.noise_suppression = self.noise_suppression;
         s.echo_cancellation = self.echo_cancellation;
         s.auto_gain = self.auto_gain;
+        s.music_quality = self.music_quality;
         s.sounds.user_joined = self.sounds.join_leave;
         s.sounds.user_left = self.sounds.join_leave;
         s.sounds.self_mute = self.sounds.self_mute;

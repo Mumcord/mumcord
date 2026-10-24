@@ -161,13 +161,14 @@ impl DspChain {
             *scaled = sample * I16_SCALE;
         }
         let speech_probability = self.denoise.process_frame(&mut self.ns_out, &self.ns_in);
-        if self.force_noise_suppression || controls.noise_suppression() {
+        let music = controls.music_quality();
+        if self.force_noise_suppression || (controls.noise_suppression() && !music) {
             for (sample, &denoised) in out.iter_mut().zip(self.ns_out.iter()) {
                 *sample = denoised / I16_SCALE;
             }
         }
 
-        if controls.auto_gain() {
+        if controls.auto_gain() && !music {
             self.scratch = *out;
             if self
                 .agc

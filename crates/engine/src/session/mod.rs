@@ -971,6 +971,7 @@ impl Inner {
         }
 
         let mut bitrate = BitrateController::new();
+        bitrate.set_music_quality(self.controls.music_quality());
         bitrate.set_server_max_bandwidth(handle.with_state(|s| s.server.max_bandwidth));
         let epoch = Instant::now();
         let mut tick = tokio::time::interval(BITRATE_INTERVAL);
@@ -1034,6 +1035,7 @@ impl Inner {
                 },
                 Some(PumpCmd::Packets(sender)) = pump_rx.recv() => packets = sender,
                 _ = tick.tick() => {
+                    bitrate.set_music_quality(self.controls.music_quality());
                     if let Some(t) = &transport {
                         let stats = t.stats();
                         let target = bitrate.update(

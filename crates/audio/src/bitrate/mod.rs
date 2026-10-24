@@ -15,6 +15,8 @@
 /// Ceiling even when the server allows more: mono Opus voice gains next to
 /// nothing above this, and it stays below typical server limits.
 pub const MAX_BITRATE_BPS: u32 = 96_000;
+/// Ceiling with "Music quality" on (QA.37): the Opus maximum.
+pub const MUSIC_MAX_BITRATE_BPS: u32 = 510_000;
 /// Absolute floor, only for servers whose limit leaves less; below this Opus
 /// voice becomes hard to understand.
 pub const MIN_BITRATE_BPS: u32 = 8_000;
@@ -105,6 +107,7 @@ pub struct BitrateController {
     server_max_bps: Option<u32>,
     transport: Transport,
     positional: bool,
+    music_quality: bool,
     frames_per_packet: u32,
     bitrate: u32,
     smoothed_loss: f32,
@@ -126,6 +129,7 @@ impl BitrateController {
             server_max_bps: None,
             transport: Transport::Udp,
             positional: false,
+            music_quality: false,
             frames_per_packet: 2,
             bitrate: MAX_BITRATE_BPS,
             smoothed_loss: 0.0,
@@ -153,6 +157,14 @@ impl BitrateController {
         self.clamp();
     }
 
+    /// "Music quality" (QA.37): raises the ceiling from the speech cap to the server limit,
+    /// at most [`MUSIC_MAX_BITRATE_BPS`]. Turning it on lets the normal recovery steps climb
+    /// there; turning it off lowers the bitrate to the speech cap at once.
+    pub fn set_music_quality(&mut self, on: bool) {
+        self.music_quality = on;
+        self.clamp();
+    }
+
     pub fn set_frames_per_packet(&mut self, frames: u32) {
         self.frames_per_packet = frames.max(1);
         self.clamp();
@@ -162,12 +174,17 @@ impl BitrateController {
     pub fn ceiling(&self) -> u32 {
         let overhead =
             network_overhead_bps(self.frames_per_packet, self.transport, self.positional);
+        let cap = if self.music_quality {
+            MUSIC_MAX_BITRATE_BPS
+        } else {
+            MAX_BITRATE_BPS
+        };
         self.server_max_bps
-            .map_or(MAX_BITRATE_BPS, |max| {
+            .map_or(cap, |max| {
                 let usable = (max as f32 * (1.0 - SERVER_HEADROOM)) as u32;
                 usable.saturating_sub(overhead)
             })
-            .clamp(MIN_BITRATE_BPS, MAX_BITRATE_BPS)
+            .clamp(MIN_BITRATE_BPS, cap)
     }
 
     /// Lowest bitrate the current (smoothed) loss justifies.
@@ -424,5 +441,48 @@ mod tests {
         c.set_server_max_bandwidth(Some(40_000));
         let t = feed(&mut c, 0.1, 0, 60);
         assert_eq!(t.bitrate_bps, 36_000 - 14_800);
+    }
+
+    #[test]
+    fn music_quality_cap_follows_the_server_limit() {
+        let mut c = BitrateController::new();
+        c.set_server_max_bandwidth(Some(558_000));
+        assert_eq!(c.ceiling(), MAX_BITRATE_BPS, "off: speech cap");
+        c.set_music_quality(true);
+        // 558 kbit/s − 10 % headroom − 14.8 kbit/s of headers for 20 ms packets over UDP.
+        assert_eq!(c.ceiling(), 487_400);
+        c.set_server_max_bandwidth(Some(2_000_000));
+        assert_eq!(c.ceiling(), MUSIC_MAX_BITRATE_BPS);
+        c.set_server_max_bandwidth(None);
+        assert_eq!(c.ceiling(), MUSIC_MAX_BITRATE_BPS);
+        c.set_server_max_bandwidth(Some(72_000));
+        assert_eq!(
+            c.ceiling(),
+            72_000 * 9 / 10 - 14_800,
+            "a low server limit still wins"
+        );
+    }
+
+    #[test]
+    fn music_quality_switch_off_returns_to_the_speech_cap() {
+        let mut c = BitrateController::new();
+        c.set_music_quality(true);
+        c.set_server_max_bandwidth(Some(558_000));
+        assert_eq!(c.target().bitrate_bps, 487_400);
+        c.set_music_quality(false);
+        assert_eq!(c.target().bitrate_bps, MAX_BITRATE_BPS);
+    }
+
+    #[test]
+    fn music_quality_still_drops_on_loss_and_recovers() {
+        let mut c = BitrateController::new();
+        c.set_music_quality(true);
+        c.set_server_max_bandwidth(Some(558_000));
+        let start = c.target().bitrate_bps;
+        let lossy = feed(&mut c, 0.15, 0, 20);
+        assert!(lossy.bitrate_bps < start / 2, "{}", lossy.bitrate_bps);
+        assert!(lossy.bitrate_bps >= MODERATE_FLOOR_BPS);
+        let recovered = feed(&mut c, 0.0, 20, 40);
+        assert_eq!(recovered.bitrate_bps, 487_400);
     }
 }

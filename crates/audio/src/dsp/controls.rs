@@ -36,6 +36,7 @@ pub struct DspControls {
     echo_cancellation: AtomicBool,
     noise_suppression: AtomicBool,
     auto_gain: AtomicBool,
+    music_quality: AtomicBool,
     push_to_talk: AtomicBool,
     ptt_pressed: AtomicBool,
     voice_active: AtomicBool,
@@ -53,6 +54,7 @@ impl Default for DspControls {
             echo_cancellation: AtomicBool::new(true),
             noise_suppression: AtomicBool::new(true),
             auto_gain: AtomicBool::new(true),
+            music_quality: AtomicBool::new(false),
             push_to_talk: AtomicBool::new(false),
             ptt_pressed: AtomicBool::new(false),
             voice_active: AtomicBool::new(false),
@@ -87,6 +89,16 @@ impl DspControls {
 
     pub fn auto_gain(&self) -> bool {
         self.auto_gain.load(Ordering::Relaxed)
+    }
+
+    /// "Music quality" (QA.37): the chain skips noise suppression and automatic gain, which
+    /// damage music, and the engine tunes the encoder for music and lifts the bitrate cap.
+    pub fn set_music_quality(&self, on: bool) {
+        self.music_quality.store(on, Ordering::Relaxed);
+    }
+
+    pub fn music_quality(&self) -> bool {
+        self.music_quality.load(Ordering::Relaxed)
     }
 
     pub fn set_mode(&self, mode: TalkMode) {
