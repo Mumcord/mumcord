@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="assets/brand/mumcord-logo.png" alt="Mumcord logo" width="160" />
+</p>
+
 # Mumcord
 
 Mumcord is a modern, Discord-style desktop voice chat client for gaming groups and online communities. It is built with Rust, Tauri 2 and React/TypeScript.
