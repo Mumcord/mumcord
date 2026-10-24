@@ -23,7 +23,13 @@ Superuser name is `SuperUser`, password is `SUPERUSER_PASSWORD` from `.env`. `SE
 
 ## Channels
 
-On the first start of each service, `up.sh` writes the channels Lobby, Raid and AFK (under Root) directly into the server's SQLite database while the server is stopped, then restarts it. No client is needed. State lives in `testenv/data/<service>/` (git-ignored). To reset a server: `down.sh <service>`, then `rm -rf testenv/data/<service>`.
+On the first start of each service, `up.sh` writes the channels Lobby, Raid and AFK (under Root) directly into the server's SQLite database while the server is stopped, then restarts it. No client is needed. State lives in `testenv/data/<service>/` (git-ignored). Autoban is disabled on all servers (`autobanAttempts=0`), so tests can reconnect as often as they like.
+
+## Reset to the fresh state
+
+    testenv/reset.sh [v15|v14|v13|limit] [--cert A|B]   # no service resets all four
+
+Live tests leave self-registered users behind. `reset.sh` stops the service, deletes its database and restarts it via `up.sh`: only SuperUser is registered, channels are Lobby, Raid and AFK. It interrupts connected clients, so do not run it during another test. Cert set defaults to A; pass `--cert B` to keep B.
 
 ## Certificates
 
