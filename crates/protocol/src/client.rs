@@ -187,7 +187,7 @@ async fn connect_inner(config: ConnectConfig) -> Result<Connection, ConnectError
     let tcp = TcpStream::connect((config.host.as_str(), config.port)).await?;
     // Small control messages (and tunnelled voice) must not wait for Nagle.
     tcp.set_nodelay(true)?;
-    let stream = match TlsConnector::from(tls_config)
+    let mut stream = match TlsConnector::from(tls_config)
         .connect(server_name, tcp)
         .await
     {
@@ -209,6 +209,20 @@ async fn connect_inner(config: ConnectConfig) -> Result<Connection, ConnectError
             });
         }
     };
+    // Version must reach the server before Authenticate: the server judges the client by the
+    // version it knows when handling Authenticate (e.g. the "client does not support
+    // ChannelListener" warning for clients it takes as pre-1.4). Version is a rate-limited type,
+    // so the paced write loop would let the unlimited Authenticate overtake it; both are
+    // therefore written here, in order, before the write loop starts.
+    let mut handshake = BytesMut::new();
+    for frame in handshake_frames(config.username, config.password) {
+        frame.encode(&mut handshake);
+    }
+    async {
+        stream.write_all(&handshake).await?;
+        stream.flush().await
+    }
+    .await?;
     let (mut reader, writer) = tokio::io::split(stream);
 
     let (tx, rx) = mpsc::unbounded_channel();
@@ -224,26 +238,6 @@ async fn connect_inner(config: ConnectConfig) -> Result<Connection, ConnectError
         tx,
         shared: shared.clone(),
     };
-
-    let version = proto::Version {
-        version_v1: Some(MumbleVersion::CLIENT.to_v1()),
-        version_v2: Some(MumbleVersion::CLIENT.to_v2()),
-        release: Some(format!("Mumcord {}", env!("CARGO_PKG_VERSION"))),
-        os: Some(std::env::consts::OS.to_owned()),
-        os_version: None,
-    };
-    let auth = proto::Authenticate {
-        username: Some(config.username),
-        password: config.password,
-        opus: Some(true),
-        ..Default::default()
-    };
-    for frame in [
-        Frame::from_message(MessageType::Version, &version),
-        Frame::from_message(MessageType::Authenticate, &auth),
-    ] {
-        handle.send(frame).map_err(|_| ConnectError::Closed)?;
-    }
 
     let mut dispatcher = Dispatcher {
         shared: shared.clone(),
@@ -279,6 +273,27 @@ async fn connect_inner(config: ConnectConfig) -> Result<Connection, ConnectError
             }
         }
     }
+}
+
+/// The login messages in the order the server must receive them: Version, then Authenticate.
+fn handshake_frames(username: String, password: Option<String>) -> [Frame; 2] {
+    let version = proto::Version {
+        version_v1: Some(MumbleVersion::CLIENT.to_v1()),
+        version_v2: Some(MumbleVersion::CLIENT.to_v2()),
+        release: Some(format!("Mumcord {}", env!("CARGO_PKG_VERSION"))),
+        os: Some(std::env::consts::OS.to_owned()),
+        os_version: None,
+    };
+    let auth = proto::Authenticate {
+        username: Some(username),
+        password,
+        opus: Some(true),
+        ..Default::default()
+    };
+    [
+        Frame::from_message(MessageType::Version, &version),
+        Frame::from_message(MessageType::Authenticate, &auth),
+    ]
 }
 
 async fn write_loop(
@@ -789,5 +804,31 @@ mod tests {
         };
         assert_eq!(frame.kind, MessageType::Acl as u16);
         assert_eq!(proto::Acl::decode(frame.payload).expect("decode"), acl);
+    }
+}
+
+#[cfg(test)]
+mod handshake_tests {
+    use super::*;
+
+    #[test]
+    fn version_precedes_authenticate_with_both_encodings() {
+        let [version, auth] = handshake_frames("alice".to_owned(), None);
+        assert_eq!(version.message_type(), Some(MessageType::Version));
+        assert_eq!(auth.message_type(), Some(MessageType::Authenticate));
+
+        let v = proto::Version::decode(version.payload).expect("version");
+        // Server 1.5 reads version_v2 (major << 48 | minor << 32 | patch << 16), older ones v1.
+        assert_eq!(v.version_v2, Some(0x0001_0005_0000_0000));
+        assert_eq!(v.version_v1, Some(0x0001_0500));
+        assert!(
+            MumbleVersion::from_wire(v.version_v1, v.version_v2)
+                .is_some_and(|v| v.supports_listening())
+        );
+        assert!(v.release.is_some_and(|r| r.starts_with("Mumcord ")));
+
+        let a = proto::Authenticate::decode(auth.payload).expect("authenticate");
+        assert_eq!(a.username.as_deref(), Some("alice"));
+        assert_eq!(a.opus, Some(true));
     }
 }

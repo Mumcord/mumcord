@@ -296,3 +296,33 @@ async fn rejected_certificate_reports_fingerprint() {
         other => panic!("expected CertificateRejected, got {:?}", other.err()),
     }
 }
+
+/// The server warns clients it believes predate 1.4 ("ChannelListener feature enabled but your
+/// client version does not support it"); that happens when it handles Authenticate before our
+/// Version message, so the warning must never arrive.
+async fn no_old_client_warning(port: u16) {
+    let mut conn = login(port, "ver").await;
+    let deadline = tokio::time::Instant::now() + Duration::from_secs(2);
+    while let Ok(Some(event)) = tokio::time::timeout_at(deadline, conn.events.recv()).await {
+        if let Event::TextMessage(m) = &event {
+            assert!(
+                !m.message.contains("ChannelListener"),
+                "server treated us as an old client: {}",
+                m.message
+            );
+        }
+    }
+    conn.handle.disconnect();
+}
+
+#[tokio::test]
+#[ignore = "needs testenv/up.sh v15"]
+async fn v15_sees_client_version_before_authenticate() {
+    no_old_client_warning(V15).await;
+}
+
+#[tokio::test]
+#[ignore = "needs testenv/up.sh v14"]
+async fn v14_sees_client_version_before_authenticate() {
+    no_old_client_warning(V14).await;
+}
