@@ -12,6 +12,10 @@
     "deafened": "Deafened. You cannot hear others and your microphone is muted",
     "undeafened": "Undeafened"
   },
+  "readOnly": {
+    "text": "You're reading along – join a channel to talk.",
+    "join": "Join {{channel}}"
+  },
   "profile": {
     "title": "Edit profile",
     "chooseTitle": "Choose a profile picture",

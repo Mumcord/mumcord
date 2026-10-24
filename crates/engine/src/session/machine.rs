@@ -189,6 +189,20 @@ impl SelfVoice {
         }
         self.deaf = deaf;
     }
+
+    /// Fresh connect: read along only. Undeafening later leaves the microphone on.
+    pub fn read_only() -> Self {
+        Self {
+            mute: true,
+            deaf: true,
+            mute_before_deaf: false,
+        }
+    }
+
+    /// Explicit join of a channel: voice on.
+    pub fn join(&mut self) {
+        *self = Self::default();
+    }
 }
 
 #[cfg(test)]
@@ -322,6 +336,21 @@ mod tests {
         v.set_deaf(true);
         v.set_deaf(false);
         assert!(v.mute && !v.deaf, "previous mute state restored");
+    }
+
+    #[test]
+    fn read_only_until_join() {
+        let mut v = SelfVoice::read_only();
+        assert!(v.mute && v.deaf);
+        v.join();
+        assert!(!v.mute && !v.deaf);
+
+        let mut v = SelfVoice::read_only();
+        v.set_deaf(false);
+        assert!(
+            !v.mute && !v.deaf,
+            "undeafening read-only turns the microphone on"
+        );
     }
 
     #[test]

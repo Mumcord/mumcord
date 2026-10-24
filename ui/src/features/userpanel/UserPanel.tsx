@@ -7,6 +7,7 @@ import { ConnectionInfo } from "../connection";
 import { useAvatars } from "../members/useAvatars";
 import { describeError } from "./errors";
 import { ProfileDialog } from "./ProfileDialog";
+import { useReadOnly } from "./readOnly";
 import { RegisterDialog } from "./RegisterDialog";
 import { useUserPanel } from "./useUserPanel";
 import "./userpanel.css";
@@ -31,6 +32,7 @@ export function UserPanel() {
   const { t } = useTranslation("userpanel");
   const { openSettings } = useView();
   const state = useUserPanel();
+  const readOnly = useReadOnly();
   const self = state.self;
   const avatarOf = useAvatars(self ? [self] : []);
   const avatarSrc = self ? avatarOf(self) : null;
@@ -207,6 +209,22 @@ export function UserPanel() {
                 {t("menuRegister")}
               </button>
             </div>
+          ) : null}
+        </div>
+      ) : null}
+      {connected && readOnly && self ? (
+        <div className="userpanel-readonly" role="status">
+          <p className="userpanel-readonly__text">{t("readOnly.text")}</p>
+          {state.channelName !== null ? (
+            <button
+              type="button"
+              className="button userpanel-readonly__join"
+              onClick={() => {
+                run(getApi().channelJoin(self.channelId));
+              }}
+            >
+              {t("readOnly.join", { channel: state.channelName })}
+            </button>
           ) : null}
         </div>
       ) : null}

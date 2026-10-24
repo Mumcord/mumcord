@@ -190,8 +190,29 @@ async fn tofu_voice_mute_and_reconnect() {
         .expect("Raid channel")
         .id;
 
+    // A fresh connect lands read-only: self-muted and deafened, until an explicit join.
+    let me = snapshot
+        .users
+        .iter()
+        .find(|u| u.session == snapshot.self_session)
+        .expect("own user");
+    assert!(me.self_mute && me.self_deaf, "read-only after a fresh connect");
+    bot.wait_user(
+        &name,
+        &UserCheck {
+            deaf: Some(true),
+            muted: Some(true),
+            ..UserCheck::default()
+        },
+    )
+    .await
+    .expect("deafened on the server after connecting");
+
     engine.join_channel(raid).expect("join Raid");
     wait_own_channel(&mut rx, snapshot.self_session, raid).await;
+    bot.wait_user(&name, &muted(false))
+        .await
+        .expect("voice on after the explicit join");
 
     // The bot hears our microphone (WAV through DSP, Opus and the voice transport).
     let hit = voice

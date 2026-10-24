@@ -321,12 +321,14 @@ export function createMockApi(options: MockOptions = {}): MockApi {
   function buildSnapshot(serverId: number, channelPath: string[] | null): ServerSnapshot {
     const channels = seedChannels();
     const target = (channelPath && findChannelByPath(channels, channelPath)) ?? channels[1];
-    const self = person(
-      SELF_SESSION,
-      requireServer(serverId).username,
-      target?.id ?? 0,
-      "selfhash",
-    );
+    // Like the engine: a fresh connect lands read-only (muted + deafened), a link path joins.
+    const readOnly = channelPath === null;
+    muteBeforeDeaf = false;
+    const self = {
+      ...person(SELF_SESSION, requireServer(serverId).username, target?.id ?? 0, "selfhash"),
+      selfMute: readOnly,
+      selfDeaf: readOnly,
+    };
     const anna = {
       ...person(2, "Anna", 1, "annahash"),
       hasComment: true,
@@ -541,7 +543,9 @@ export function createMockApi(options: MockOptions = {}): MockApi {
       if (!requireChannel(channelId).permissions.enter) {
         fail("permissionDenied", "You may not enter this channel.");
       }
-      updateUser(SELF_SESSION, { channelId });
+      // An explicit join turns voice on (undeafen + unmute).
+      muteBeforeDeaf = false;
+      updateUser(SELF_SESSION, { channelId, selfMute: false, selfDeaf: false });
       return Promise.resolve(null);
     },
 

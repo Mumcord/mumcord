@@ -190,6 +190,14 @@ enum AttemptError {
     Failure(Failure),
 }
 
+/// How a synced connection came about.
+enum Arrival {
+    /// The user connected (server click, app start, link with an optional channel path).
+    Fresh(Option<Vec<String>>),
+    /// Automatic reconnect after the connection was lost.
+    Reconnect,
+}
+
 /// How an established connection ended.
 enum Ended {
     Lost,
@@ -277,7 +285,8 @@ impl Engine {
     }
 
     /// Connects to a saved server, replacing any current connection (FR-1.9).
-    /// `channel_path` (from a link) overrides rejoining the last channel.
+    /// Lands read-only (self-muted and deafened) where the server puts the user; a
+    /// `channel_path` (from a link) counts as an explicit join instead.
     pub fn connect(
         &self,
         server_id: ServerId,
@@ -362,17 +371,24 @@ impl Engine {
         self.inner.change_self_voice(|v| v.set_deaf(deaf))
     }
 
+    /// Explicit join: moves there (unless already there) and turns voice on.
     pub fn join_channel(&self, channel_id: u32) -> EngineResult<()> {
         let ctx = self.session_ctx()?;
-        if !ctx
-            .handle
-            .with_state(|s| s.channels.contains_key(&channel_id))
-        {
+        let (known, here) = ctx.handle.with_state(|s| {
+            (
+                s.channels.contains_key(&channel_id),
+                s.own_user().map(|u| u.channel_id) == Some(channel_id),
+            )
+        });
+        if !known {
             return Err(EngineError::new(ErrorKind::NotFound, "unknown channel"));
         }
-        ctx.handle
-            .join_channel(channel_id)
-            .map_err(convert::command_error)
+        if !here {
+            ctx.handle
+                .join_channel(channel_id)
+                .map_err(convert::command_error)?;
+        }
+        self.inner.change_self_voice(SelfVoice::join)
     }
 
     pub fn person_set_volume(&self, session: u32, volume: u16) -> EngineResult<()> {
@@ -611,14 +627,23 @@ impl Inner {
         server_id: ServerId,
         mut path: Option<Vec<String>>,
     ) {
+        let mut synced_before = false;
         loop {
             let step = match self.attempt(server_id).await {
                 Ok((connection, host, port)) => {
+                    let arrival = if synced_before {
+                        Arrival::Reconnect
+                    } else {
+                        Arrival::Fresh(path.take())
+                    };
                     match self
-                        .run_connection(generation, server_id, connection, &host, port, path.take())
+                        .run_connection(generation, server_id, connection, &host, port, arrival)
                         .await
                     {
-                        Ended::Lost => self.transition(generation, |c| c.machine.lost()),
+                        Ended::Lost => {
+                            synced_before = true;
+                            self.transition(generation, |c| c.machine.lost())
+                        }
                         Ended::Final(error) => {
                             self.transition(generation, |c| c.machine.end(error));
                             return;
@@ -756,7 +781,7 @@ impl Inner {
         connection: Connection,
         host: &str,
         port: u16,
-        path_override: Option<Vec<String>>,
+        arrival: Arrival,
     ) -> Ended {
         let Connection { handle, mut events } = connection;
         let (transport, mut voice_rx) = match start_voice(&handle, host, port).await {
@@ -765,7 +790,7 @@ impl Inner {
         };
         self.voice.reset_link();
         let (pump_tx, mut pump_rx) = mpsc::unbounded_channel();
-        let followed = self.post_sync(server_id, &handle, path_override);
+        let followed = self.post_sync(server_id, &handle, arrival);
 
         let registered = self.transition(generation, |core| {
             core.people.clear();
@@ -898,15 +923,12 @@ impl Inner {
         }
     }
 
-    /// Rejoins the last (or linked) channel, restores followed channels and the own
-    /// mute/deafen state. At most three rate-limited messages, inside the server's burst.
-    /// Returns the followed channel ids.
-    fn post_sync(
-        &self,
-        server_id: ServerId,
-        handle: &Handle,
-        path_override: Option<Vec<String>>,
-    ) -> Vec<u32> {
+    /// Restores followed channels. A fresh connect stays where the server put the user,
+    /// read-only (self-muted and deafened), unless a link names a channel: that is an explicit
+    /// join with voice on. A reconnect rejoins the last channel and restores the own
+    /// mute/deafen state (continuity). At most three rate-limited messages, inside the
+    /// server's burst. Returns the followed channel ids.
+    fn post_sync(&self, server_id: ServerId, handle: &Handle, arrival: Arrival) -> Vec<u32> {
         let (last, followed_paths) = {
             let store = lock(&self.store);
             let last = store
@@ -920,7 +942,11 @@ impl Inner {
             });
             (last, followed)
         };
-        let target = path_override.or_else(|| last.as_deref().map(split_path));
+        let (target, voice) = match arrival {
+            Arrival::Fresh(Some(path)) => (Some(path), Some(SelfVoice::default())),
+            Arrival::Fresh(None) => (None, Some(SelfVoice::read_only())),
+            Arrival::Reconnect => (last.as_deref().map(split_path), None),
+        };
         let (join, followed) = handle.with_state(|s| {
             let own = s.own_user().map(|u| u.channel_id);
             let join = target
@@ -941,7 +967,7 @@ impl Inner {
         if let Some(id) = join
             && let Err(e) = handle.join_channel(id)
         {
-            tracing::warn!(error = %e, "rejoining the last channel failed");
+            tracing::warn!(error = %e, "joining the channel failed");
         }
         let followed =
             if !followed.is_empty() && handle.with_state(|s| s.server.supports_listening()) {
@@ -955,7 +981,16 @@ impl Inner {
             } else {
                 Vec::new()
             };
-        let voice = lock(&self.core).self_voice;
+        let voice = {
+            let mut core = lock(&self.core);
+            if let Some(voice) = voice {
+                core.self_voice = voice;
+                self.voice.muted.store(voice.mute, Ordering::Relaxed);
+                self.voice.deaf.store(voice.deaf, Ordering::Relaxed);
+            }
+            core.self_voice
+        };
+        // A fresh login starts unmuted on the server, so only a set state needs sending.
         let sent = if voice.deaf {
             handle.set_self_deaf(true)
         } else if voice.mute {
@@ -1060,7 +1095,16 @@ impl Inner {
                 users: s
                     .users
                     .values()
-                    .map(|u| user_view(u, core.people.setting(&store, session.server_id, u)))
+                    .map(|u| {
+                        let mut view =
+                            user_view(u, core.people.setting(&store, session.server_id, u));
+                        // The server's echo of the mute/deafen just sent may still be on its way.
+                        if Some(u.session) == s.session {
+                            view.self_mute = core.self_voice.mute;
+                            view.self_deaf = core.self_voice.deaf;
+                        }
+                        view
+                    })
                     .collect(),
                 followed_channel_ids: followed_ids(&store, session.server_id, s),
                 unread: Vec::new(),

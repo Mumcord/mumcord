@@ -12,6 +12,10 @@
     "deafened": "Taubgeschaltet. Du hörst niemanden und dein Mikrofon ist stumm",
     "undeafened": "Taubschaltung aufgehoben"
   },
+  "readOnly": {
+    "text": "Du liest nur mit – tritt einem Kanal bei, um zu sprechen.",
+    "join": "{{channel}} beitreten"
+  },
   "profile": {
     "title": "Profil bearbeiten",
     "chooseTitle": "Profilbild auswählen",

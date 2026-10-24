@@ -10,6 +10,8 @@ export interface UserPanelState {
   info: ServerInfo | null;
   /** The server lets the own, not yet registered user register (root channel permission). */
   canRegister: boolean;
+  /** Name of the own channel, for the read-only notice's join button. */
+  channelName: string | null;
 }
 
 export function useUserPanel(): UserPanelState {
@@ -41,5 +43,6 @@ export function useUserPanel(): UserPanelState {
     self,
     info: server.info,
     canRegister: connected && !registered && root?.permissions.registerSelf === true,
+    channelName: self ? (server.channels.get(self.channelId)?.name ?? null) : null,
   };
 }

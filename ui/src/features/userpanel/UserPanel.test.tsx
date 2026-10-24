@@ -68,6 +68,15 @@ afterEach(() => {
 
 const mute = () => screen.getByRole("button", { name: "Mute microphone" });
 const deafen = () => screen.getByRole("button", { name: "Deafen" });
+const READ_ONLY = /reading along/;
+
+/** Leaves the read-only start of a fresh connect through the notice's join button. */
+async function joinVoice() {
+  fireEvent.click(await screen.findByRole("button", { name: /^Join / }));
+  await waitFor(() => {
+    expect(screen.queryByText(READ_ONLY)).not.toBeInTheDocument();
+  });
+}
 
 async function openMenuItem(name: string) {
   const opener = document.querySelector('[aria-haspopup="menu"]');
@@ -79,6 +88,7 @@ async function openMenuItem(name: string) {
 describe("UserPanel", () => {
   it("toggles mute and reflects it", async () => {
     await setup();
+    await joinVoice();
     expect(mute()).toHaveAttribute("aria-pressed", "false");
     fireEvent.click(mute());
     await waitFor(() => {
@@ -89,6 +99,7 @@ describe("UserPanel", () => {
 
   it("deafen implies mute and undeafen restores it", async () => {
     await setup();
+    await joinVoice();
     fireEvent.click(deafen());
     await waitFor(() => {
       expect(deafen()).toHaveAttribute("aria-pressed", "true");
@@ -104,6 +115,7 @@ describe("UserPanel", () => {
 
   it("unmuting while deafened undeafens", async () => {
     await setup();
+    await joinVoice();
     fireEvent.click(deafen());
     await waitFor(() => {
       expect(deafen()).toHaveAttribute("aria-pressed", "true");
@@ -113,6 +125,52 @@ describe("UserPanel", () => {
       expect(deafen()).toHaveAttribute("aria-pressed", "false");
     });
     expect(mute()).toHaveAttribute("aria-pressed", "false");
+  });
+
+  it("starts read-only after a fresh connect; the notice's join button turns voice on", async () => {
+    await setup();
+    expect(screen.getByText(READ_ONLY)).toBeInTheDocument();
+    expect(mute()).toHaveAttribute("aria-pressed", "true");
+    expect(deafen()).toHaveAttribute("aria-pressed", "true");
+    const spy = vi.spyOn(api, "channelJoin");
+    const snapshot = await api.sessionSnapshot();
+    const self = snapshot?.users.find((u) => u.session === snapshot.selfSession);
+    await joinVoice();
+    expect(spy).toHaveBeenCalledWith(self?.channelId);
+    expect(mute()).toHaveAttribute("aria-pressed", "false");
+    expect(deafen()).toHaveAttribute("aria-pressed", "false");
+  });
+
+  it("undeafening ends read-only; a deliberate deafen later shows no notice", async () => {
+    await setup();
+    fireEvent.click(deafen());
+    await waitFor(() => {
+      expect(screen.queryByText(READ_ONLY)).not.toBeInTheDocument();
+    });
+    fireEvent.click(deafen());
+    await waitFor(() => {
+      expect(deafen()).toHaveAttribute("aria-pressed", "true");
+    });
+    expect(screen.queryByText(READ_ONLY)).not.toBeInTheDocument();
+  });
+
+  it("an automatic reconnect keeps the read-only state as it was", async () => {
+    await setup();
+    act(() => {
+      api.mock.loseConnection();
+      api.mock.completeReconnect();
+    });
+    expect(screen.getByText(READ_ONLY)).toBeInTheDocument();
+    await joinVoice();
+    fireEvent.click(deafen());
+    await waitFor(() => {
+      expect(deafen()).toHaveAttribute("aria-pressed", "true");
+    });
+    act(() => {
+      api.mock.loseConnection();
+      api.mock.completeReconnect();
+    });
+    expect(screen.queryByText(READ_ONLY)).not.toBeInTheDocument();
   });
 
   it("offers connection info only while connected", async () => {

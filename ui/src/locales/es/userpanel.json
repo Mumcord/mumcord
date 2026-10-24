@@ -12,6 +12,10 @@
     "deafened": "Ensordecido. No oyes a nadie y tu micrófono está silenciado",
     "undeafened": "Ensordecimiento desactivado"
   },
+  "readOnly": {
+    "text": "Estás leyendo sin participar: únete a un canal para hablar.",
+    "join": "Unirse a {{channel}}"
+  },
   "profile": {
     "title": "Editar perfil",
     "chooseTitle": "Elige una imagen de perfil",
