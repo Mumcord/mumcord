@@ -54,6 +54,9 @@ jobs:
             locked=$(awk -v n="$name" '$0 == "name = \"" n "\"" { getline; gsub(/version = |"/, ""); print; exit }' Cargo.lock)
             check "Cargo.lock version of crate $name (run cargo check after bumping)" "$locked"
           done < members.txt
+          # The smoke-test seeder is a separate Cargo project that also pins workspace crates.
+          cargo metadata --manifest-path scripts/smoke/seed/Cargo.toml --locked --format-version 1 >/dev/null \
+            || fail "scripts/smoke/seed/Cargo.lock is stale (run cargo check --manifest-path scripts/smoke/seed/Cargo.toml)."
 
           commit=$(git rev-parse HEAD)
           git merge-base --is-ancestor "$commit" origin/main \
