@@ -84,7 +84,7 @@ Mumcord enforces nothing itself; the server's ACLs decide. The client reflects p
 - **FR-1.16** Single-click a channel → shows its chat. Double-click or the "Join" button → enters the channel's voice (if permitted).
 - **FR-1.17** The member list shows the people in the selected channel, plus its listeners, with avatar, name, talking state and registered/unregistered marker.
 - **FR-1.18** Clicking a person opens a profile card: avatar, name, comment, and local controls: volume slider (0–200 %), local mute, "send private message". Hovering a person (member list, channel list, chat avatar/name) for ~0.4 s, or focusing them with the keyboard, shows a read-only profile preview next to them (avatar, name, comment, registered marker, voice state); it stays while the pointer is on the person or the preview and Escape closes it; a click still opens the full card (QA.21).
-- **FR-1.19** Per-person volume and local mute are stored by the person's certificate hash per server and re-applied when they reappear, even after renaming (Q5.2). People without a certificate are only adjusted for the session.
+- **FR-1.19** Per-person volume and local mute are stored by the person's certificate hash per server and re-applied when they reappear, even after renaming (Q5.2). People without a certificate are only adjusted for the session. A locally muted person's name is shown in red in the channel list and member list, together with the local-mute icon (QA.28).
 - **FR-1.20** The user can set their own avatar (image, scaled to the server's limit) and profile comment (Q5.7). Mumcord remembers the avatar per saved server (the hand-set one, otherwise the default avatar from FR-1.47) and sends it again on every connect when the server shows no avatar for the user – servers keep avatars only for registered users (QA.10). Registered users keep the server's copy; nothing is re-sent when the server already has an avatar.
 
 ### 4.4 Voice
@@ -438,6 +438,7 @@ Unless stated otherwise: a fresh Mumcord install, a local test server (1.5) runn
 | QA.25 | Chat message display Cozy (default) / Compact in Appearance settings | Addendum 2026-10-24; FR-1.48a |
 | QA.26 | User panel in two rows, name never cut off, no separator line, live input level fill in the mic button | Addendum 2026-10-24; section 6 |
 | QA.27 | Big servers: jump to my channel, collapsed start above ~50 channels, readable deep names, search field | Addendum 2026-10-24; FR-1.15 |
+| QA.28 | Locally muted people: red name plus local-mute icon in channel and member list | Addendum 2026-10-24; FR-1.19 |
 
 ## 13. Open points & risks
 

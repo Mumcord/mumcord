@@ -877,3 +877,12 @@ Measured in `specs/01-foundation-scale-report.md`; performance fixes are done wi
 ✍️ Note: Asked and answered in chat during /dev.
 
 ---
+
+#### QA.28 Show locally muted people more clearly? `◉`
+
+- [x] **When the user mutes someone locally (profile card → local mute), that person's name turns red in the channel list and the member list, in addition to the existing local-mute icon (not color alone).**
+- [ ] Icon only.
+
+✍️ Note: Requested in chat during /dev.
+
+---
