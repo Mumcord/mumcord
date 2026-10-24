@@ -80,7 +80,7 @@ Mumcord enforces nothing itself; the server's ACLs decide. The client reflects p
 - **FR-1.14** Fresh connect = read-only (QA.2): on every fresh, user-initiated connect (including app start and server switch) the user lands in the server's default channel, self-muted and self-deafened; chat (including followed channels) works, voice does not. Other users see the user as present but deafened. Only an explicit Join of a channel (double-click, "Join" button, or a `mumble://` link with a channel path) enables voice: it leaves the muted/deafened state and talks/listens in that channel. The last channel is no longer rejoined automatically on a fresh connect; it is remembered only for automatic reconnect after a dropped connection (FR-1.13).
 
 ### 4.3 Channels & people
-- **FR-1.15** The channel list shows the server's channel tree (collapsible), with people under their channel, talking indicators, mute/deafen icons and an ear icon for listeners. Each channel appears once (Q2.4).
+- **FR-1.15** The channel list shows the server's channel tree (collapsible), with people under their channel, talking indicators, mute/deafen icons and an ear icon for listeners. Each channel appears once (Q2.4). Each person row shows the person's avatar (or a default avatar); while they talk, a green ring surrounds it (QA.6). Listener rows show only the listener marker, never voice state (talking, mute, deafen).
 - **FR-1.16** Single-click a channel → shows its chat. Double-click or the "Join" button → enters the channel's voice (if permitted).
 - **FR-1.17** The member list shows the people in the selected channel, plus its listeners, with avatar, name, talking state and registered/unregistered marker.
 - **FR-1.18** Clicking a person opens a profile card: avatar, name, comment, and local controls: volume slider (0–200 %), local mute, "send private message".
@@ -412,6 +412,7 @@ Unless stated otherwise: a fresh Mumcord install, a local test server (1.5) runn
 | QA.3 | Default avatar set in settings, sent once per server on first connect (if no avatar there); automatic sending switchable (default ON) | Addendum 2026-10-24; FR-1.47, AC-1.36 |
 | QA.4 | Mouse buttons as push-to-talk: native on Windows/macOS/X11; on Wayland via evdev, opt-in (default OFF), needs `input` group, security warning, graceful fallback | Addendum 2026-10-24; FR-1.5/1.21/1.39, section 9, AC-1.37 |
 | QA.5 | Push-to-talk compatibility mode on Linux Wayland (XWayland + X11 path, like TeamSpeak), opt-in switch, default stays the modern path | Addendum 2026-10-24; FR-1.48, AC-1.38 |
+| QA.6 | Channel list person rows: avatar with a green ring while talking; listener rows without voice state | Addendum 2026-10-24; FR-1.15 |
 
 ## 13. Open points & risks
 

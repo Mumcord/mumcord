@@ -658,3 +658,12 @@ TeamSpeak 3 runs through KDE's X11 compatibility layer (XWayland). KDE's "Legacy
 ✍️ Note: Asked and answered in chat during /dev.
 
 ---
+
+#### QA.6 Talking indicator in the channel list: avatar with a green ring? `◉`
+
+- [x] **Each person row in the channel list shows the person's avatar (default avatar if none); while they talk, a green ring appears around it (Discord style).** Listener rows keep only the listener marker (no ring, no voice-state icons).
+- [ ] Keep the current icon-only indicator.
+
+✍️ Note: Requested in chat during /dev.
+
+---
