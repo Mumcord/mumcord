@@ -47,6 +47,16 @@ describe("mock engine", () => {
     expect(await api.sessionSnapshot()).toEqual(snapshot);
   });
 
+  it("reports connection stats only while connected", async () => {
+    const api = createMockApi();
+    expect(await api.connectionStats()).toBeNull();
+    await api.connect(1, null);
+    api.mock.setConnectionStats({ sendBitrateKbps: 40 });
+    expect(await api.connectionStats()).toMatchObject({ transport: "udp", sendBitrateKbps: 40 });
+    await api.disconnect();
+    expect(await api.connectionStats()).toBeNull();
+  });
+
   it("asks for certificate trust and fails with certificateRejected when declined", async () => {
     const api = createMockApi();
     api.mock.requireCertTrust(1, "OLD:FINGERPRINT");
