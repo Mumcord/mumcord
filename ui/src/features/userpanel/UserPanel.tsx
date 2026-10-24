@@ -4,6 +4,7 @@ import { announce } from "../../a11y";
 import { useView } from "../../app/view";
 import { getApi } from "../../api";
 import { ConnectionInfo } from "../connection";
+import { disconnect, useServers } from "../servers";
 import { useAvatars } from "../members/useAvatars";
 import { describeError } from "./errors";
 import { ProfileDialog } from "./ProfileDialog";
@@ -26,6 +27,7 @@ const MIC = "M12 3a3 3 0 0 0-3 3v6a3 3 0 0 0 6 0V6a3 3 0 0 0-3-3zM6 11a6 6 0 0 0
 const HEADPHONES = "M4 15v-3a8 8 0 0 1 16 0v3M4 15h3v5H4zM17 15h3v5h-3z";
 const GEAR =
   "M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8zM12 2v3M12 19v3M2 12h3M19 12h3M5 5l2 2M17 17l2 2M19 5l-2 2M7 17l-2 2";
+const HANG_UP = "M3 14c5-5 13-5 18 0l-2.5 2.5-3-1.5v-2.5a9 9 0 0 0-5 0V15l-3 1.5z";
 const SLASH = "M4 4l16 16";
 
 export function UserPanel() {
@@ -39,6 +41,7 @@ export function UserPanel() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [dialog, setDialog] = useState<Dialog>(null);
   const [error, setError] = useState<string | null>(null);
+  const servers = useServers();
   const menuId = useId();
   const menuButton = useRef<HTMLButtonElement>(null);
   const menuRef = useRef<HTMLDivElement>(null);
@@ -115,6 +118,9 @@ export function UserPanel() {
 
   const name = self?.name ?? state.identityName ?? t("unknownName");
   const connected = state.connected;
+  const link = servers.connection.state === "disconnected" ? null : servers.connection.serverId;
+  const linked = servers.servers.find((s) => s.id === link);
+  const serverLabel = linked ? linked.label || linked.address : "";
 
   return (
     <div className="userpanel">
@@ -174,6 +180,19 @@ export function UserPanel() {
           </span>
         </button>
         {connected ? <ConnectionInfo className="userpanel__toggle" /> : null}
+        {link !== null ? (
+          <button
+            type="button"
+            className="userpanel__toggle userpanel__toggle--hangup"
+            aria-label={t("disconnect", { server: serverLabel })}
+            title={t("disconnect", { server: serverLabel })}
+            onClick={() => {
+              void disconnect();
+            }}
+          >
+            <Icon d={HANG_UP} />
+          </button>
+        ) : null}
         <button
           type="button"
           className="userpanel__toggle"

@@ -94,6 +94,25 @@ async function openMenuItem(name: string) {
 }
 
 describe("UserPanel", () => {
+  it("offers a named disconnect button only while connected and calls disconnect", async () => {
+    await setup();
+    const button = await screen.findByRole("button", { name: /^Disconnect from / });
+    expect(button).toHaveAttribute("title", button.getAttribute("aria-label"));
+    const spy = vi.spyOn(api, "disconnect");
+    fireEvent.click(button);
+    await waitFor(() => {
+      expect(spy).toHaveBeenCalled();
+    });
+    await waitFor(() => {
+      expect(screen.queryByRole("button", { name: /^Disconnect from / })).not.toBeInTheDocument();
+    });
+  });
+
+  it("hides the disconnect button while disconnected", async () => {
+    await setup(false);
+    expect(screen.queryByRole("button", { name: /^Disconnect from / })).not.toBeInTheDocument();
+  });
+
   it("shows a notice when the default avatar was too large for the server", async () => {
     await setup();
     act(() => {

@@ -2,6 +2,7 @@
   "unknownName": "Du",
   "mute": "Mikrofon stummschalten",
   "deafen": "Taubschalten",
+  "disconnect": "Verbindung zu {{server}} trennen",
   "settings": "Einstellungen",
   "menu": "Benutzermenü",
   "menuProfile": "Profil bearbeiten",

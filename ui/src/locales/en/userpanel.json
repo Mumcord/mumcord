@@ -2,6 +2,7 @@
   "unknownName": "You",
   "mute": "Mute microphone",
   "deafen": "Deafen",
+  "disconnect": "Disconnect from {{server}}",
   "settings": "Settings",
   "menu": "User menu",
   "menuProfile": "Edit profile",

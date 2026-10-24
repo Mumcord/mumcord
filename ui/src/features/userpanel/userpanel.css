@@ -206,3 +206,7 @@
   justify-content: flex-end;
   margin-top: var(--space-3);
 }
+
+.userpanel__toggle--hangup:hover:not(:disabled) {
+  color: var(--color-danger);
+}
