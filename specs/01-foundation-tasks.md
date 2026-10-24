@@ -197,7 +197,7 @@
 | B34 | Link previews + YouTube/Twitch player cards (FR-1.49, 1.50) | open | | G1 | complex | AC-1.39, 1.40 | crates/engine (metadata fetch), ui chat, wizard, settings |
 | B35 | Mentions with autocomplete (FR-1.51) | open | | G1 | simple | AC-1.41 | ui chat input, notifications |
 | B36 | Tenor GIF search (FR-1.52) | open | | G1 | complex | AC-1.42 | ui chat input, CI secret |
-| B37 | Code highlighting + formatting toolbar/shortcuts (FR-1.53, 1.54) | in progress | b37-code-format | G1 | simple | AC-1.43, 1.44 | ui chat |
+| B37 | Code highlighting + formatting toolbar/shortcuts (FR-1.53, 1.54) | done – highlight.js core (17 langs, language guessed since sanitizer strips tag), FormatToolbar + shortcuts, Ctrl+K yields in input | b37-code-format | G1 | simple | AC-1.43, 1.44 | ui chat |
 | B38 | External images and image links inline (FR-1.55) | open | | B34 | complex | AC-1.45 | crates/engine (image fetch), ui chat |
 | B39 | Bug: unread bubble flashes briefly on the channel whose chat is open when a message arrives (own channel, F93 regression) | done – followStore drops unread for the on-screen chat and marks read immediately | b39-unread-flash | – | simple | FR-1.31 | ui/src/features/follow unread, engine chat.rs |
 | D1 | Implementation report | open | | C1–C10 | simple | all | specs/01-foundation-implementation.md |

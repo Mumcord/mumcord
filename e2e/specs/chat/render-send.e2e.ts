@@ -8,6 +8,7 @@ import {
   joinChannel,
   messageBodies,
   pasteImage,
+  composer,
   ScriptBot,
   selectChannel,
   sendText,
@@ -17,7 +18,7 @@ import {
 } from "../../helpers/chat-ui.ts";
 
 // AC-1.13 (rendering + sanitizing + links) and AC-1.14 (sending Markdown and pasted images).
-describe("chat: rendering and sending (AC-1.13, AC-1.14)", () => {
+describe("chat: rendering and sending (AC-1.13, AC-1.14, AC-1.43)", () => {
   let opener: { log: string; binDir: string };
 
   before(async () => {
@@ -102,6 +103,32 @@ describe("chat: rendering and sending (AC-1.13, AC-1.14)", () => {
       const got = await listener.run(`expect message --from ${USER} --contains "<img"`);
       expect(got).toMatch(/<(b|strong)>bold<\/(b|strong)>/);
       expect(got).toMatch(/<img src="data:image\/(png|jpeg);base64,/);
+    } finally {
+      listener.stop();
+    }
+  });
+
+  it("AC-1.43 a code block from Ctrl+Shift+E renders highlighted; the bot gets plain <pre><code>", async () => {
+    const listener = new ScriptBot({ name: "CodeBot" });
+    try {
+      await listener.connected();
+      await listener.run("join Lobby");
+      const box = composer();
+      await box.waitForEnabled();
+      await box.setValue("const answer = 42; function show() { return answer; }");
+      await browser.keys(["Control", "a"]);
+      await browser.keys(["Control", "Shift", "e"]);
+      expect(await box.getValue()).toBe(
+        "```\nconst answer = 42; function show() { return answer; }\n```",
+      );
+      await browser.keys("Enter");
+      const got = await listener.run(`expect message --from ${USER} --contains "<pre>"`);
+      expect(got).toMatch(/<pre><code>const answer = 42;/);
+      expect(got).not.toContain("hljs");
+      await waitMessage("const answer = 42;");
+      const own = (await messageBodies()).find((body) => body.includes("answer"));
+      expect(own).toMatch(/<code class="hljs">/);
+      expect(own).toMatch(/<span class="hljs-keyword">const<\/span>/);
     } finally {
       listener.stop();
     }
