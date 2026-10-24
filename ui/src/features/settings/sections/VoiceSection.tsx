@@ -155,6 +155,16 @@ export function VoiceSection({ settings, update }: SettingsSectionProps) {
           <p className="settings-warning">{t("voice.mouseAccessibility")}</p>
         )}
       </Group>
+      <Group title={t("voice.connecting")}>
+        <Switch
+          label={t("voice.connectMuted")}
+          description={t("voice.connectMutedHint")}
+          checked={settings.connectMuted}
+          onChange={(connectMuted) => {
+            update({ connectMuted });
+          }}
+        />
+      </Group>
       <Group title={t("voice.processing")}>
         <Switch
           label={t("voice.noiseSuppression")}

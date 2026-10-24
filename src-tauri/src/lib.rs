@@ -100,6 +100,7 @@ fn specta_builder() -> Builder<tauri::Wry> {
             session::TransportChanged,
             session::ServerDenied,
             channels::ChannelUpserted,
+            channels::ChannelsUpserted,
             channels::ChannelRemoved,
             people::UserUpserted,
             people::UserRemoved,
@@ -264,6 +265,10 @@ fn emit_engine_event(app: &AppHandle, event: EngineEvent) -> tauri::Result<()> {
         .emit(app),
         EngineEvent::ChannelUpserted(channel) => channels::ChannelUpserted {
             channel: channel.into(),
+        }
+        .emit(app),
+        EngineEvent::ChannelsUpserted(channels) => channels::ChannelsUpserted {
+            channels: channels.into_iter().map(Into::into).collect(),
         }
         .emit(app),
         EngineEvent::ChannelRemoved(channel_id) => {

@@ -112,6 +112,7 @@ const DEFAULT_SETTINGS: Settings = {
   sendDefaultAvatar: true,
   autostart: false,
   startMinimized: true,
+  connectMuted: true,
 };
 
 /** 1×1 PNG standing in for any image chosen as the default avatar. */
@@ -272,6 +273,7 @@ function person(session: number, name: string, channelId: number, certHash: stri
     selfDeaf: false,
     serverMute: false,
     serverDeaf: false,
+    suppressed: false,
     listeningChannelIds: [],
     hasAvatar: false,
     avatarHash: null,

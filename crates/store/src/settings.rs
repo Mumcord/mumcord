@@ -193,6 +193,9 @@ pub struct Settings {
     pub autostart: bool,
     /// When started at login, go straight to the tray instead of showing the window.
     pub start_minimized: bool,
+    /// A fresh connect lands read-only (muted and deafened) until the user joins a channel.
+    /// Off: it applies the last own mute/deafen choice right away (FR-1.14, QA.22).
+    pub connect_muted: bool,
 }
 
 impl Default for Settings {
@@ -221,6 +224,7 @@ impl Default for Settings {
             send_default_avatar: true,
             autostart: false,
             start_minimized: true,
+            connect_muted: true,
         }
     }
 }
@@ -312,6 +316,7 @@ mod tests {
         changed.log_level = LogLevel::Debug;
         changed.ptt_compatibility_mode = true;
         changed.notifications = NotificationMode::InApp;
+        changed.connect_muted = false;
         store.save_settings(&changed).expect("save");
         store.save_settings(&changed).expect("save twice");
         assert_eq!(store.settings().expect("reload"), changed);
@@ -378,5 +383,6 @@ mod tests {
         );
         assert!(!parsed.autostart, "starting at login is opt-in");
         assert!(parsed.start_minimized);
+        assert!(parsed.connect_muted, "read-only connect stays the default");
     }
 }

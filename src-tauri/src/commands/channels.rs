@@ -43,6 +43,14 @@ pub struct ChannelUpserted {
     pub channel: ChannelInfo,
 }
 
+/// Several channels changed at once, e.g. a burst of permission answers after connecting; sent
+/// as one event so the UI updates once instead of once per channel.
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, Type, Event)]
+#[serde(rename_all = "camelCase")]
+pub struct ChannelsUpserted {
+    pub channels: Vec<ChannelInfo>,
+}
+
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, Type, Event)]
 #[serde(rename_all = "camelCase")]
 pub struct ChannelRemoved {

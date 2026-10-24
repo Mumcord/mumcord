@@ -88,6 +88,9 @@
     "echoCancellation": "Echo cancellation",
     "echoCancellationHint": "Stops others from hearing themselves when you use speakers.",
     "autoGain": "Automatic volume",
+    "connecting": "Connecting",
+    "connectMuted": "Connect muted until I join a channel",
+    "connectMutedHint": "When off, you connect with your last mute and deafen setting right away instead of listening only.",
     "autoGainHint": "Keeps your voice at an even level.",
     "keyListeningMouse": "Press a key or a mouse button (middle or side)… (Escape to cancel)",
     "mouse": {

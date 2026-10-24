@@ -495,6 +495,7 @@ mod tests {
                 self_deaf: true,
                 server_mute: false,
                 server_deaf: false,
+                suppressed: false,
                 listening_channel_ids: vec![],
                 has_avatar: false,
                 avatar_hash: None,

@@ -157,6 +157,7 @@ export const events = {
 	certTrustRequired: makeEvent<CertTrustRequired, CertTrustRequired>("cert-trust-required"),
 	channelRemoved: makeEvent<ChannelRemoved, ChannelRemoved>("channel-removed"),
 	channelUpserted: makeEvent<ChannelUpserted, ChannelUpserted>("channel-upserted"),
+	channelsUpserted: makeEvent<ChannelsUpserted, ChannelsUpserted>("channels-upserted"),
 	closeRequested: makeEvent<CloseRequested, CloseRequested>("close-requested"),
 	connectionStateChanged: makeEvent<ConnectionStateChanged, ConnectionStateChanged>("connection-state-changed"),
 	deepLinkOpened: makeEvent<DeepLinkOpened, DeepLinkOpened>("deep-link-opened"),
@@ -248,6 +249,14 @@ export type ChannelRemoved = {
 /**  A channel was added or changed. */
 export type ChannelUpserted = {
 	channel: ChannelInfo,
+};
+
+/**
+ *  Several channels changed at once, e.g. a burst of permission answers after connecting; sent
+ *  as one event so the UI updates once instead of once per channel.
+ */
+export type ChannelsUpserted = {
+	channels: ChannelInfo[],
 };
 
 /**  "Message display: Cozy / Compact" (default cozy, FR-1.48a, QA.25). */
@@ -629,6 +638,8 @@ export type Settings = {
 	autostart: boolean,
 	/**  "Start minimized": a start at login goes straight to the tray (default on). */
 	startMinimized: boolean,
+	/**  "Connect muted until I join a channel" (default on; QA.22). */
+	connectMuted: boolean,
 };
 
 /**  Notification sound toggles per event (FR-1.27). */
@@ -681,9 +692,11 @@ export type User = {
 	registered: boolean,
 	selfMute: boolean,
 	selfDeaf: boolean,
-	/**  Muted or suppressed by the server/an admin. */
+	/**  Muted by the server/an admin. */
 	serverMute: boolean,
 	serverDeaf: boolean,
+	/**  May not speak in the current channel (no Speak permission or suppressed by an admin). */
+	suppressed: boolean,
 	/**  Channels this person listens to (ear icon). */
 	listeningChannelIds: number[],
 	hasAvatar: boolean,

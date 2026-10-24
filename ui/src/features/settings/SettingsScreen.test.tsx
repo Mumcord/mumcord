@@ -166,6 +166,17 @@ describe("SettingsScreen", () => {
     });
   });
 
+  it("lets the user turn off the read-only connect", async () => {
+    const update = vi.spyOn(api, "settingsUpdate");
+    await openSection("Voice");
+    const toggle = screen.getByRole("switch", { name: "Connect muted until I join a channel" });
+    expect(toggle).toBeChecked();
+    fireEvent.click(toggle);
+    await waitFor(() => {
+      expect(update).toHaveBeenLastCalledWith(expect.objectContaining({ connectMuted: false }));
+    });
+  });
+
   it("rolls a failed save back and explains it", async () => {
     await openSection("Language");
     api.mock.failNext("settingsUpdate", "io");

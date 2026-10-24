@@ -139,6 +139,8 @@ pub struct Settings {
     pub autostart: bool,
     /// "Start minimized": a start at login goes straight to the tray (default on).
     pub start_minimized: bool,
+    /// "Connect muted until I join a channel" (default on; QA.22).
+    pub connect_muted: bool,
 }
 
 impl Settings {
@@ -196,6 +198,7 @@ impl Settings {
             send_default_avatar: s.send_default_avatar,
             autostart: s.autostart,
             start_minimized: s.start_minimized,
+            connect_muted: s.connect_muted,
         }
     }
 
@@ -254,6 +257,7 @@ impl Settings {
         s.send_default_avatar = self.send_default_avatar;
         s.autostart = self.autostart;
         s.start_minimized = self.start_minimized;
+        s.connect_muted = self.connect_muted;
         s
     }
 }
@@ -354,12 +358,14 @@ mod tests {
         ui.ptt_compatibility_mode = true;
         ui.autostart = true;
         ui.start_minimized = false;
+        ui.connect_muted = false;
         ui.chat_display = ChatDisplay::Compact;
         let stored = ui.to_store(&base);
         assert_eq!(stored.chat_display, store::ChatDisplay::Compact);
         assert!(!stored.send_default_avatar);
         assert!(stored.ptt_compatibility_mode);
         assert!(stored.autostart && !stored.start_minimized);
+        assert!(!stored.connect_muted);
         assert!(stored.overlay.enabled);
         assert_eq!(stored.enabled_plugins, ["gtav"]);
         assert!(stored.wizard_completed);

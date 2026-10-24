@@ -88,6 +88,9 @@
     "echoCancellation": "Cancelación de eco",
     "echoCancellationHint": "Evita que los demás se oigan a sí mismos cuando usas altavoces.",
     "autoGain": "Volumen automático",
+    "connecting": "Conexión",
+    "connectMuted": "Conectar en silencio hasta unirme a un canal",
+    "connectMutedHint": "Si se desactiva, te conectas de inmediato con tu último ajuste de silencio y ensordecimiento, en vez de solo escuchar.",
     "autoGainHint": "Mantiene tu voz a un nivel uniforme.",
     "keyListeningMouse": "Pulsa una tecla o un botón del ratón (central o lateral)… (Escape para cancelar)",
     "mouse": {

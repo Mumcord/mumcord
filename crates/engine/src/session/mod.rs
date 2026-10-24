@@ -8,6 +8,7 @@
 //!
 //! Lock order: `core` before `store`. Neither lock is held across an `.await`.
 
+mod batch;
 pub mod convert;
 mod description;
 pub mod extension;
@@ -974,7 +975,9 @@ impl Inner {
         let epoch = Instant::now();
         let mut tick = tokio::time::interval(BITRATE_INTERVAL);
         let mut packets: Option<PacketSender> = None;
+        let mut permissions = batch::PermissionBatch::default();
         loop {
+            let permissions_due = permissions.deadline();
             let voice_event = async {
                 match voice_rx.as_mut() {
                     Some(rx) => rx.recv().await,
@@ -990,10 +993,23 @@ impl Inner {
                         None => return self.end_connection(generation, server_id, DisconnectReason::Closed),
                         Some(event) => event,
                     };
-                    if let Event::ServerConfigUpdated(info) = &event {
-                        bitrate.set_server_max_bandwidth(info.max_bandwidth);
+                    match &event {
+                        Event::ServerConfigUpdated(info) => {
+                            bitrate.set_server_max_bandwidth(info.max_bandwidth);
+                        }
+                        Event::PermissionsUpdated { channel_id } => {
+                            permissions.add(*channel_id, tokio::time::Instant::now());
+                        }
+                        _ => {}
                     }
                     self.on_event(&ctx, transport.as_deref(), event);
+                }
+                _ = tokio::time::sleep_until(permissions_due.unwrap_or_else(tokio::time::Instant::now)),
+                    if permissions_due.is_some() =>
+                {
+                    if let Some(channels) = permissions.take() {
+                        self.emit_permissions(&ctx, &channels);
+                    }
                 }
                 Some(event) = voice_event => match event {
                     VoiceEvent::Packet(packet) => {
@@ -1092,16 +1108,17 @@ impl Inner {
             (last, followed)
         };
         let mut offer_path = None;
+        let landing_voice = || self.landing_voice();
         let (target, voice) = match arrival {
             Arrival::Fresh(Some(path)) => {
                 let mut voice = SelfVoice::read_only();
                 voice.join(self.own_voice());
                 (Some(path), Some(voice))
             }
-            Arrival::Fresh(None) => (None, Some(SelfVoice::read_only())),
+            Arrival::Fresh(None) => (None, Some(landing_voice())),
             Arrival::FreshWithRejoin(path) => {
                 offer_path = Some(split_path(&path));
-                (None, Some(SelfVoice::read_only()))
+                (None, Some(landing_voice()))
             }
             Arrival::Reconnect => (last.as_deref().map(split_path), None),
         };
@@ -1209,18 +1226,8 @@ impl Inner {
                     channel_id: denied.channel_id,
                 });
             }
-            Event::PermissionsUpdated { channel_id } => {
-                let views = ctx.handle.with_state(|s| {
-                    s.channels
-                        .values()
-                        .filter(|c| channel_id.is_none_or(|id| id == c.id))
-                        .map(|c| channel_view(s, c))
-                        .collect::<Vec<_>>()
-                });
-                for view in views {
-                    self.events.emit(EngineEvent::ChannelUpserted(view));
-                }
-            }
+            // Collected by the session loop and emitted in batches (`emit_permissions`).
+            Event::PermissionsUpdated { .. } => {}
             Event::CryptSetup(setup) => {
                 if let Some(t) = transport {
                     t.on_crypt_setup(setup.clone());
@@ -1234,6 +1241,20 @@ impl Inner {
             Event::TextMessage(_) | Event::ServerConfigUpdated(_) | Event::Disconnected(_) => {}
         }
         extension::on_event(ctx, &event);
+    }
+
+    /// One `ChannelsUpserted` for a settled burst of permission answers (see `batch`).
+    fn emit_permissions(&self, ctx: &SessionCtx, channels: &batch::Channels) {
+        let views = ctx.handle.with_state(|s| {
+            s.channels
+                .values()
+                .filter(|c| channels.contains(c.id))
+                .map(|c| channel_view(s, c))
+                .collect::<Vec<_>>()
+        });
+        if !views.is_empty() {
+            self.events.emit(EngineEvent::ChannelsUpserted(views));
+        }
     }
 
     /// Remembers the own channel for the next connection (FR-1.14).
@@ -1306,6 +1327,19 @@ impl Inner {
                 rejoin_channel_id: session.rejoin_offer,
             })
         })
+    }
+
+    /// Voice state of a fresh connect without a link: read-only, or (setting "Connect muted
+    /// until I join a channel" off, QA.22) the last own mute/deafen choice right away.
+    fn landing_voice(&self) -> SelfVoice {
+        let connect_muted = lock(&self.store)
+            .settings()
+            .map(|s| s.connect_muted)
+            .unwrap_or_else(|e| {
+                tracing::warn!(error = %e, "reading the settings failed");
+                true
+            });
+        fresh_voice(connect_muted, self.own_voice())
     }
 
     /// The remembered own mute/deafen choice; neither if it cannot be read.
@@ -1567,9 +1601,31 @@ fn joins_voice(moves: bool, voice: SelfVoice) -> bool {
     moves || voice.own().is_none()
 }
 
+/// The voice state a fresh connect without a link starts with (QA.22).
+fn fresh_voice(connect_muted: bool, own: OwnVoice) -> SelfVoice {
+    let mut voice = SelfVoice::read_only();
+    if !connect_muted {
+        voice.join(own);
+    }
+    voice
+}
+
 #[cfg(test)]
 mod declined_kind_tests {
     use super::*;
+
+    #[test]
+    fn fresh_connect_is_read_only_unless_the_setting_is_off() {
+        let own = OwnVoice {
+            mute: true,
+            deaf: false,
+        };
+        let on = fresh_voice(true, own);
+        assert!(on.mute && on.deaf && on.own().is_none());
+        let off = fresh_voice(false, own);
+        assert_eq!(off.own(), Some(own), "last own choice, no read-only hint");
+        assert!(off.mute && !off.deaf);
+    }
 
     #[test]
     fn declined_changed_cert_keeps_its_kind() {

@@ -403,6 +403,7 @@ mod tests {
             self_deaf: deaf,
             server_mute: false,
             server_deaf: false,
+            suppressed: false,
             listening_channel_ids: Vec::new(),
             has_avatar: false,
             avatar_hash: None,

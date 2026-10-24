@@ -88,6 +88,9 @@
     "echoCancellation": "Echounterdrückung",
     "echoCancellationHint": "Verhindert, dass andere sich selbst hören, wenn du Lautsprecher nutzt.",
     "autoGain": "Automatische Lautstärke",
+    "connecting": "Verbinden",
+    "connectMuted": "Stumm verbinden, bis ich einem Kanal beitrete",
+    "connectMutedHint": "Wenn aus, verbindest du dich sofort mit deiner letzten Stumm- und Taubschaltung statt nur zuzuhören.",
     "autoGainHint": "Hält deine Stimme auf gleichmäßigem Pegel.",
     "keyListeningMouse": "Drücke eine Taste oder Maustaste (Mitte oder Seite)… (Escape zum Abbrechen)",
     "mouse": {
