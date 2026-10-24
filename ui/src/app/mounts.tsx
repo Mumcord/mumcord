@@ -3,49 +3,42 @@
  * with its root component; the shell layout itself stays untouched.
  */
 import { useTranslation } from "react-i18next";
-
-function Placeholder({ label }: { label: string }) {
-  const { t } = useTranslation("app");
-  return (
-    <p className="placeholder">
-      {label}: {t("placeholder")}
-    </p>
-  );
-}
+import { SettingsScreen } from "../features/settings/SettingsScreen";
+import { Wizard } from "../features/wizard";
+import { UserPanel } from "../features/userpanel";
+import { ChannelsPanel } from "../features/channels";
+import { ChatView } from "../features/chat";
+import { MembersPanel } from "../features/members";
+import { ConnectionStatus, ServersRoot } from "../features/servers";
 
 /** Server bar (B19). */
 export function ServersMount() {
-  const { t } = useTranslation("app");
-  return <Placeholder label={t("regions.servers")} />;
+  return <ServersRoot />;
 }
 
 /** Channel tree (B20). */
 export function ChannelsMount() {
-  const { t } = useTranslation("app");
-  return <Placeholder label={t("regions.channels")} />;
+  return <ChannelsPanel />;
 }
 
 /** User panel at the bottom of the channel column (B23). */
 export function UserPanelMount() {
-  const { t } = useTranslation("app");
-  return <Placeholder label={t("regions.userPanel")} />;
+  return <UserPanel />;
 }
 
 /** Thin status bar above the chat, e.g. "Reconnecting…" (B19). Renders nothing when idle. */
 export function ChatStatusMount() {
-  return null;
+  return <ConnectionStatus />;
 }
 
 /** Chat header, message list and input (B21). */
 export function ChatMount() {
-  const { t } = useTranslation("app");
-  return <Placeholder label={t("regions.chat")} />;
+  return <ChatView />;
 }
 
 /** Member list (B20). */
 export function MembersMount() {
-  const { t } = useTranslation("app");
-  return <Placeholder label={t("regions.members")} />;
+  return <MembersPanel />;
 }
 
 /** First-start wizard content (B18); calls `useView().finishWizard()` when done. */
@@ -54,13 +47,12 @@ export function WizardMount() {
   return (
     <>
       <h1>{t("wizard.title")}</h1>
-      <Placeholder label={t("wizard.title")} />
+      <Wizard />
     </>
   );
 }
 
 /** Settings content inside the settings overlay (B24). */
 export function SettingsMount() {
-  const { t } = useTranslation("app");
-  return <Placeholder label={t("settings.title")} />;
+  return <SettingsScreen />;
 }
