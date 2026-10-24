@@ -663,14 +663,25 @@ mod tests {
             .io
             .set_input_device(Some("null".to_owned()))
             .expect("switch");
+        // Count to a fixed number of frames under a generous deadline instead of counting
+        // frames in a fixed window: a loaded CI runner may deliver them late, never early.
+        const WANTED: u32 = 50;
         let started = Instant::now();
+        let deadline = started + Duration::from_secs(10);
         let mut count = 0;
-        while started.elapsed() < Duration::from_millis(300) {
+        while count < WANTED && Instant::now() < deadline {
             if source.wait_frame(&mut frame, Duration::from_millis(100)) {
                 count += 1;
             }
         }
-        assert!(count >= 20, "only {count} frames after switch");
+        assert_eq!(count, WANTED, "only {count} frames after switch");
+        // Nominal 500 ms at 10 ms per frame; the margin allows for catch-up after a stall
+        // while still failing if silence is delivered unpaced.
+        assert!(
+            started.elapsed() >= Duration::from_millis(250),
+            "{WANTED} frames in {:?}: not paced",
+            started.elapsed()
+        );
     }
 
     /// Lists this machine's real devices: `cargo test -p mumcord-audio -- --ignored --nocapture list_devices`.
