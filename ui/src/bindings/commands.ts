@@ -64,6 +64,11 @@ export const commands = {
 	sendChannelMessage: (channelId: number, html: string) => typedError<ChatMessage, ApiError>(__TAURI_INVOKE("send_channel_message", { channelId, html })),
 	sendPrivateMessage: (session: number, html: string) => typedError<ChatMessage, ApiError>(__TAURI_INVOKE("send_private_message", { session, html })),
 	/**
+	 *  Preview of an http(s) link in a message; `null` when previews are switched off in the
+	 *  settings (then nothing is fetched) or there is nothing to show.
+	 */
+	linkPreview: (url: string) => typedError<LinkPreview | null, ApiError>(__TAURI_INVOKE("link_preview", { url })),
+	/**
 	 *  Starts listening to the channel with its audio muted locally.
 	 *  Fails with `serverTooOld`, `permissionDenied` or `listenerLimitReached`.
 	 */
@@ -149,6 +154,13 @@ export const commands = {
 	notifyMessage: (notice: MessageNotice) => typedError<NotifyOutcome, ApiError>(__TAURI_INVOKE("notify_message", { notice })),
 	/**  The user opened this chat: its system notification is outdated. */
 	notificationDismiss: (conversation: Conversation) => typedError<null, ApiError>(__TAURI_INVOKE("notification_dismiss", { conversation })),
+	/**  Platform support and the own shared track (for the settings). */
+	nowPlayingStatus: () => typedError<NowPlayingStatus, ApiError>(__TAURI_INVOKE("now_playing_status")),
+	/**
+	 *  Cover of a person's track (or the own one) as a small `data:` URL, fetched and re-encoded
+	 *  by the engine; `null` when link previews are off (nothing is fetched then) or there is none.
+	 */
+	nowPlayingCover: (session: number) => typedError<string | null, ApiError>(__TAURI_INVOKE("now_playing_cover", { session })),
 };
 
 /** Events */
@@ -167,6 +179,7 @@ export const events = {
 	micLevel: makeEvent<MicLevel, MicLevel>("mic-level"),
 	micTestPhaseChanged: makeEvent<MicTestPhaseChanged, MicTestPhaseChanged>("mic-test-phase-changed"),
 	notificationActivated: makeEvent<NotificationActivated, NotificationActivated>("notification-activated"),
+	nowPlayingChanged: makeEvent<NowPlayingChanged, NowPlayingChanged>("now-playing-changed"),
 	serverDenied: makeEvent<ServerDenied, ServerDenied>("server-denied"),
 	serverSynced: makeEvent<ServerSynced, ServerSynced>("server-synced"),
 	talkStateChanged: makeEvent<TalkStateChanged, TalkStateChanged>("talk-state-changed"),
@@ -402,6 +415,19 @@ export type Identity = {
 
 export type Language = "en" | "es" | "de";
 
+/**  Preview card of a link. All text is plain text, never HTML. */
+export type LinkPreview = {
+	/**  The link as posted, without fragment. */
+	url: string,
+	siteName: string | null,
+	title: string | null,
+	description: string | null,
+	/**  Preview image as a `data:` URL (fetched and re-encoded by the engine). */
+	image: string | null,
+	/**  Set for YouTube and Twitch links: show a player card. */
+	video: VideoEmbed | null,
+};
+
 export type LogLevel = "error" | "warn" | "info" | "debug";
 
 /**  One new message as the UI would announce it. Texts are translated and plain (no HTML). */
@@ -415,6 +441,8 @@ export type MessageNotice = {
 	body: string,
 	/**  Label of the click action, e.g. "Open chat" (some desktops show it as a button). */
 	actionLabel: string,
+	/**  The message mentions the user: plays the mention ping instead of the message sound. */
+	mention: boolean,
 };
 
 export type MessageReceived = {
@@ -470,6 +498,40 @@ export type NotifyOutcome =
 "toast" | 
 /**  A system notification was shown. */
 "desktop";
+
+/**
+ *  A track someone listens to. All text is plain text, never HTML. `positionMs` is the
+ *  position when the event or answer was sent; while `playing`, advance it with the local
+ *  clock from the moment it arrived, up to `durationMs`.
+ */
+export type NowPlaying = {
+	title: string,
+	/**  Empty when the player does not report one. */
+	artist: string,
+	album: string | null,
+	/**  A cover can be loaded with `now_playing_cover`. */
+	hasCover: boolean,
+	positionMs: number,
+	durationMs: number | null,
+	playing: boolean,
+};
+
+/**
+ *  Another person started, changed or stopped sharing what they listen to (`track: null`).
+ *  Forget all tracks on a new `serverSynced` and when a person leaves.
+ */
+export type NowPlayingChanged = {
+	session: number,
+	track: NowPlaying | null,
+};
+
+/**  Whether this platform can read the media player, and the own track as currently shared. */
+export type NowPlayingStatus = {
+	/**  `false` on macOS: there is no public API for the system's media information. */
+	supported: boolean,
+	/**  `null` while the setting is off or nothing plays. */
+	track: NowPlaying | null,
+};
 
 /**  How a server edit treats the stored password. */
 export type PasswordUpdate = 
@@ -608,6 +670,10 @@ export type Settings = {
 	/**  `null` follows the OS language (English if unsupported). */
 	language: Language | null,
 	talkMode: TalkMode,
+	/**  Voice activation: speech detection or a manual level threshold (FR-1.57). */
+	voiceActivation: VoiceActivation,
+	/**  Manual threshold in dBFS, -60 to 0 (FR-1.57); clamped on save. */
+	voiceThresholdDbfs: number,
 	/**  Shortcut as returned by `ptt_capture_key`; `null` if none bound. */
 	pttKey: string | null,
 	/**  Linux Wayland: "Allow mouse buttons (requires input group)" (default off, FR-1.39). */
@@ -623,6 +689,11 @@ export type Settings = {
 	noiseSuppression: boolean,
 	echoCancellation: boolean,
 	autoGain: boolean,
+	/**
+	 *  "Music quality" (default off; FR-1.24, QA.37): bitrate cap up to the server limit (max
+	 *  510 kbit/s), music-tuned encoder, noise suppression and automatic volume bypassed.
+	 */
+	musicQuality: boolean,
 	sounds: SoundSettings,
 	/**  "Notifications: In-app / Desktop / Both / Off" (default both, FR-1.48c). */
 	notifications: NotificationMode,
@@ -640,6 +711,13 @@ export type Settings = {
 	startMinimized: boolean,
 	/**  "Connect muted until I join a channel" (default on; QA.22). */
 	connectMuted: boolean,
+	/**
+	 *  "Show link previews and embeds" (default on; FR-1.49, QA.34). Off: plain links only
+	 *  and `link_preview` fetches nothing.
+	 */
+	linkPreviews: boolean,
+	/**  "Share what I'm listening to" (default off; FR-1.58). Off: the media player is not read. */
+	nowPlaying: boolean,
 };
 
 /**  Notification sound toggles per event (FR-1.27). */
@@ -648,6 +726,10 @@ export type SoundSettings = {
 	selfMute: boolean,
 	selfDeaf: boolean,
 	messages: boolean,
+	/**  The "ping" when a message mentions you, in place of the message sound (QA.41). */
+	mention: boolean,
+	/**  A mention is announced as such in notifications (QA.41). */
+	mentionNotify: boolean,
 	/**  You join a channel for voice yourself (QA.23). */
 	voiceJoin: boolean,
 	/**  You disconnect from a server yourself (QA.19). */
@@ -716,6 +798,21 @@ export type UserRemoved = {
 export type UserUpserted = {
 	user: User,
 };
+
+export type VideoEmbed = {
+	site: VideoSite,
+	/**
+	 *  Embedded player URL; load it only after the user clicks play. Twitch needs
+	 *  `&parent=<host of the page>` appended.
+	 */
+	playerUrl: string,
+	/**  Channel or uploader name. */
+	channel: string | null,
+};
+
+export type VideoSite = "youtube" | "twitch";
+
+export type VoiceActivation = "automatic" | "manual";
 
 /* Tauri Specta runtime */
 async function typedError<T, E>(result: Promise<T>): Promise<{ status: "ok"; data: T } | { status: "error"; error: E }> {

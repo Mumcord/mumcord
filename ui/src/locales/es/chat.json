@@ -58,5 +58,21 @@
     "label": "Información del canal",
     "showMore": "Mostrar más",
     "showLess": "Mostrar menos"
+  },
+  "mention": {
+    "list": "Personas que se pueden mencionar",
+    "found_one": "{{count}} persona sugerida. Usa las flechas y Enter para insertar.",
+    "found_other": "{{count}} personas sugeridas. Usa las flechas y Enter para insertar.",
+    "none": "No se encontró a nadie",
+    "mentionsYou": "Te menciona"
+  },
+  "preview": {
+    "open": "Abrir en el navegador",
+    "openLabel": "Abrir {{title}} en el navegador",
+    "play": "Reproducir {{title}}",
+    "player": "Reproductor de vídeo: {{title}}",
+    "videoTitle": "Vídeo de {{site}}",
+    "inBrowser": "Se reproduce en tu navegador",
+    "card": "Vista previa del enlace: {{title}}"
   }
 }

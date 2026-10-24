@@ -58,5 +58,21 @@
     "label": "Channel info",
     "showMore": "Show more",
     "showLess": "Show less"
+  },
+  "mention": {
+    "list": "Mentionable people",
+    "found_one": "{{count}} person suggested. Use the arrow keys, then Enter to insert.",
+    "found_other": "{{count}} people suggested. Use the arrow keys, then Enter to insert.",
+    "none": "No one found",
+    "mentionsYou": "Mentions you"
+  },
+  "preview": {
+    "open": "Open in browser",
+    "openLabel": "Open {{title}} in browser",
+    "play": "Play {{title}}",
+    "player": "Video player: {{title}}",
+    "videoTitle": "{{site}} video",
+    "inBrowser": "Plays in your browser",
+    "card": "Link preview: {{title}}"
   }
 }

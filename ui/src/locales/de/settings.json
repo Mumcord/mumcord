@@ -57,7 +57,10 @@
     "testStart": "Test starten",
     "testStop": "Aufnahme beenden",
     "testRecording": "Aufnahme läuft… sprich jetzt.",
-    "testPlaying": "Wiedergabe deiner Stimme…"
+    "testPlaying": "Wiedergabe deiner Stimme…",
+    "quality": "Qualität",
+    "musicQuality": "Musikqualität",
+    "musicQualityHint": "Braucht mehr Bandbreite und schaltet Rauschunterdrückung und automatische Lautstärke ab; für Musik. Push-to-Talk funktioniert am besten."
   },
   "voice": {
     "talkMode": "Sprechmodus",
@@ -109,7 +112,16 @@
     "compatRestartNeeded": "Wirkt nach einem Neustart von Mumcord. Die Verbindung wird kurz getrennt.",
     "compatRestart": "Jetzt neu starten",
     "compatRestartFailed": "Mumcord konnte nicht neu starten. Bitte schließe und öffne es selbst.",
-    "compatActive": "Der Kompatibilitätsmodus ist an: Push-to-Talk nutzt den X11-Weg. Tasten funktionieren ohne Desktop-Dialog; Maustasten, wenn die X11-Einstellung deines Desktops sie erlaubt."
+    "compatActive": "Der Kompatibilitätsmodus ist an: Push-to-Talk nutzt den X11-Weg. Tasten funktionieren ohne Desktop-Dialog; Maustasten, wenn die X11-Einstellung deines Desktops sie erlaubt.",
+    "sensitivityLegend": "Empfindlichkeit der Sprachaktivierung",
+    "automatic": "Automatisch – erkennt deine Stimme",
+    "manual": "Manueller Schwellwert – sendet über einem selbst gewählten Pegel",
+    "level": "Mikrofonpegel",
+    "threshold": "Schwellwert der Sprachaktivierung",
+    "thresholdValue": "{{value}} dBFS",
+    "thresholdHint": "Ziehe den Regler über die Anzeige. Mumcord sendet, solange der Pegel über der Linie liegt, und einen kurzen Moment danach.",
+    "measure": "Live-Pegel anzeigen",
+    "measuring": "Messe… sprich jetzt"
   },
   "history": {
     "explanation": "Chatnachrichten werden nur auf diesem Computer gespeichert.",
@@ -155,7 +167,9 @@
     "selfMute": "Du schaltest dich stumm oder wieder laut",
     "selfDeaf": "Du schaltest den Ton aus oder wieder ein",
     "hangUp": "Du trennst die Verbindung zu einem Server",
-    "messages": "Neue Nachricht in einem gefolgten Kanal oder Privatchat"
+    "messages": "Neue Nachricht in einem gefolgten Kanal oder Privatchat",
+    "mention": "Ton bei Erwähnung",
+    "mentionNotify": "Benachrichtigen bei Erwähnung"
   },
   "notifications": {
     "title": "Benachrichtigungen",
@@ -205,5 +219,18 @@
     "sendToNew": "Automatisch an neue Server senden",
     "sendToNewHint": "Wird einmal gesendet, wenn du dich zum ersten Mal mit einem Server verbindest, auf dem du noch keinen Avatar hast. Danach nie wieder an diesen Server, auch wenn du deinen Avatar dort änderst oder entfernst.",
     "skipped": "Dein Standard-Avatar wurde nicht gesendet: Er ist zu groß für diesen Server."
+  },
+  "linkPreviews": {
+    "title": "Linkvorschauen",
+    "switch": "Linkvorschauen und eingebettete Videos anzeigen",
+    "hint": "Mumcord lädt verlinkte Seiten für Vorschauen und Videoplayer; diese Seiten sehen deine IP-Adresse."
+  },
+  "nowPlaying": {
+    "title": "Läuft gerade",
+    "switch": "Teilen, was ich höre",
+    "hint": "Mumcord liest den aktuellen Titel aus dem Mediaplayer deines Systems (zum Beispiel Spotify) – ohne Spotify-Anmeldung. Andere Mumcord-Nutzer sehen Titel, Interpret, Cover und Fortschritt; offizielle Mumble-Clients sehen am Ende deines Kommentars eine Zeile „🎵 Interpret – Titel“.",
+    "unsupported": "Unter macOS nicht unterstützt: Das System bietet Apps keine Möglichkeit, den aktuellen Titel zu lesen.",
+    "current": "Wird geteilt: {{track}}",
+    "nothing": "Gerade läuft nichts."
   }
 }

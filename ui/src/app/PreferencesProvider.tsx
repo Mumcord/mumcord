@@ -8,14 +8,17 @@ interface StoredPreferences {
   theme: Theme;
   language: Language | null;
   chatDisplay: ChatDisplay;
+  linkPreviews: boolean;
 }
 
-/** Keeps the document theme, UI language and chat layout in sync with the settings record and the OS. */
+/** Keeps the document theme, UI language, chat layout and link previews in sync with the settings record and the OS. */
 export function PreferencesProvider({ children }: { children: ReactNode }) {
   const [stored, setStored] = useState<StoredPreferences>({
     theme: "system",
     language: null,
     chatDisplay: "cozy",
+    // Nothing is fetched before the stored choice is known.
+    linkPreviews: false,
   });
   const [prefersDark, setPrefersDark] = useState(osPrefersDark);
 
@@ -36,11 +39,12 @@ export function PreferencesProvider({ children }: { children: ReactNode }) {
   }, [language]);
 
   const applySettings = useCallback(
-    (settings: Pick<Settings, "theme" | "language" | "chatDisplay">) => {
+    (settings: Pick<Settings, "theme" | "language" | "chatDisplay" | "linkPreviews">) => {
       setStored({
         theme: settings.theme,
         language: settings.language,
         chatDisplay: settings.chatDisplay,
+        linkPreviews: settings.linkPreviews,
       });
     },
     [],
@@ -52,9 +56,10 @@ export function PreferencesProvider({ children }: { children: ReactNode }) {
       resolvedTheme,
       language,
       chatDisplay: stored.chatDisplay,
+      linkPreviews: stored.linkPreviews,
       applySettings,
     }),
-    [stored.theme, resolvedTheme, language, stored.chatDisplay, applySettings],
+    [stored.theme, resolvedTheme, language, stored.chatDisplay, stored.linkPreviews, applySettings],
   );
 
   return <PreferencesContext value={value}>{children}</PreferencesContext>;

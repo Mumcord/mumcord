@@ -307,6 +307,11 @@ pub enum EngineEvent {
     DefaultAvatarSkipped {
         server_id: ServerId,
     },
+    /// Another person started, changed or stopped sharing what they listen to (FR-1.58).
+    NowPlayingChanged {
+        session: u32,
+        track: Option<crate::now_playing::NowPlayingView>,
+    },
 }
 
 /// Phase of the mic test: record, play back, finished or failed to start.

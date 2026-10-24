@@ -57,7 +57,10 @@
     "testStart": "Start test",
     "testStop": "Stop recording",
     "testRecording": "Recording… speak now.",
-    "testPlaying": "Playing back your voice…"
+    "testPlaying": "Playing back your voice…",
+    "quality": "Quality",
+    "musicQuality": "Music quality",
+    "musicQualityHint": "Uses more bandwidth and turns off noise suppression and automatic volume; for music. Push-to-talk works best."
   },
   "voice": {
     "talkMode": "Talk mode",
@@ -109,7 +112,16 @@
     "compatRestartNeeded": "Takes effect after Mumcord restarts. You will be disconnected briefly.",
     "compatRestart": "Restart now",
     "compatRestartFailed": "Mumcord could not restart. Please close and open it yourself.",
-    "compatActive": "Compatibility mode is on: push-to-talk uses the X11 way. Keys work without a desktop dialog; mouse buttons work if your desktop's legacy X11 setting allows them."
+    "compatActive": "Compatibility mode is on: push-to-talk uses the X11 way. Keys work without a desktop dialog; mouse buttons work if your desktop's legacy X11 setting allows them.",
+    "sensitivityLegend": "Voice activation sensitivity",
+    "automatic": "Automatic – detects your voice",
+    "manual": "Manual threshold – sends above a level you set",
+    "level": "Microphone level",
+    "threshold": "Voice activation threshold",
+    "thresholdValue": "{{value}} dBFS",
+    "thresholdHint": "Drag the slider over the meter. Mumcord sends while the level is above the line, plus a short moment after.",
+    "measure": "Show live level",
+    "measuring": "Measuring… speak now"
   },
   "history": {
     "explanation": "Chat messages are saved only on this computer.",
@@ -155,7 +167,9 @@
     "selfMute": "You mute or unmute yourself",
     "selfDeaf": "You deafen or undeafen yourself",
     "hangUp": "You disconnect from a server",
-    "messages": "New message in a followed channel or private chat"
+    "messages": "New message in a followed channel or private chat",
+    "mention": "Sound when mentioned",
+    "mentionNotify": "Notify when mentioned"
   },
   "notifications": {
     "title": "Notifications",
@@ -205,5 +219,18 @@
     "sendToNew": "Send to new servers automatically",
     "sendToNewHint": "Sent once, the first time you connect to a server where you have no avatar yet. Never sent again to that server, even if you change or remove your avatar there.",
     "skipped": "Your default avatar was not sent: it is too large for this server."
+  },
+  "linkPreviews": {
+    "title": "Link previews",
+    "switch": "Show link previews and embeds",
+    "hint": "Mumcord loads linked pages to show previews and video players; those sites see your IP address."
+  },
+  "nowPlaying": {
+    "title": "Now playing",
+    "switch": "Share what I'm listening to",
+    "hint": "Mumcord reads the current track from your system's media player (for example Spotify) – no Spotify login needed. Other Mumcord users see title, artist, cover and progress; official Mumble clients see a \"🎵 Artist – Title\" line at the end of your comment.",
+    "unsupported": "Not supported on macOS: the system offers no way for apps to read the current track.",
+    "current": "Now sharing: {{track}}",
+    "nothing": "Nothing is playing right now."
   }
 }

@@ -11,11 +11,15 @@ export interface Preferences {
   language: Language;
   /** Chat message layout (FR-1.48a, QA.25). */
   chatDisplay: ChatDisplay;
+  /** Show link previews and video player cards in chat (FR-1.49, QA.34). */
+  linkPreviews: boolean;
   /**
-   * Applies theme, language and chat layout from a settings record immediately. The engine sends no event
+   * Applies theme, language, chat layout and link previews from a settings record immediately. The engine sends no event
    * when settings change, so whoever calls `settingsUpdate` passes the result here.
    */
-  applySettings: (settings: Pick<Settings, "theme" | "language" | "chatDisplay">) => void;
+  applySettings: (
+    settings: Pick<Settings, "theme" | "language" | "chatDisplay" | "linkPreviews">,
+  ) => void;
 }
 
 export const PreferencesContext = createContext<Preferences | null>(null);

@@ -22,6 +22,8 @@ pub struct MessageNotice {
     pub body: String,
     /// Label of the click action, e.g. "Open chat" (some desktops show it as a button).
     pub action_label: String,
+    /// The message mentions the user: plays the mention ping instead of the message sound.
+    pub mention: bool,
 }
 
 /// What became of a new message.
@@ -52,6 +54,10 @@ pub async fn notify_message(
     notice: MessageNotice,
 ) -> ApiResult<NotifyOutcome> {
     let mode = engine.settings()?.notifications;
+    // The sound is independent of the notification mode; no session just means no sound.
+    if let Err(e) = engine.message_sound(&notice.conversation.clone().into(), notice.mention) {
+        tracing::debug!(error = %e, "message sound skipped");
+    }
     Ok(notifications::notify(&app, mode, notice).await)
 }
 

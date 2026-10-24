@@ -32,6 +32,13 @@ pub enum TalkMode {
 
 #[derive(Serialize, Deserialize, Clone, Copy, Debug, PartialEq, Eq, Type)]
 #[serde(rename_all = "camelCase")]
+pub enum VoiceActivation {
+    Automatic,
+    Manual,
+}
+
+#[derive(Serialize, Deserialize, Clone, Copy, Debug, PartialEq, Eq, Type)]
+#[serde(rename_all = "camelCase")]
 pub enum CloseBehaviour {
     Ask,
     MinimizeToTray,
@@ -98,6 +105,10 @@ pub struct SoundSettings {
     pub self_mute: bool,
     pub self_deaf: bool,
     pub messages: bool,
+    /// The "ping" when a message mentions you, in place of the message sound (QA.41).
+    pub mention: bool,
+    /// A mention is announced as such in notifications (QA.41).
+    pub mention_notify: bool,
     /// You join a channel for voice yourself (QA.23).
     pub voice_join: bool,
     /// You disconnect from a server yourself (QA.19).
@@ -113,6 +124,10 @@ pub struct Settings {
     /// `null` follows the OS language (English if unsupported).
     pub language: Option<Language>,
     pub talk_mode: TalkMode,
+    /// Voice activation: speech detection or a manual level threshold (FR-1.57).
+    pub voice_activation: VoiceActivation,
+    /// Manual threshold in dBFS, -60 to 0 (FR-1.57); clamped on save.
+    pub voice_threshold_dbfs: i32,
     /// Shortcut as returned by `ptt_capture_key`; `null` if none bound.
     pub ptt_key: Option<String>,
     /// Linux Wayland: "Allow mouse buttons (requires input group)" (default off, FR-1.39).
@@ -126,6 +141,9 @@ pub struct Settings {
     pub noise_suppression: bool,
     pub echo_cancellation: bool,
     pub auto_gain: bool,
+    /// "Music quality" (default off; FR-1.24, QA.37): bitrate cap up to the server limit (max
+    /// 510 kbit/s), music-tuned encoder, noise suppression and automatic volume bypassed.
+    pub music_quality: bool,
     pub sounds: SoundSettings,
     /// "Notifications: In-app / Desktop / Both / Off" (default both, FR-1.48c).
     pub notifications: NotificationMode,
@@ -141,6 +159,11 @@ pub struct Settings {
     pub start_minimized: bool,
     /// "Connect muted until I join a channel" (default on; QA.22).
     pub connect_muted: bool,
+    /// "Show link previews and embeds" (default on; FR-1.49, QA.34). Off: plain links only
+    /// and `link_preview` fetches nothing.
+    pub link_previews: bool,
+    /// "Share what I'm listening to" (default off; FR-1.58). Off: the media player is not read.
+    pub now_playing: bool,
 }
 
 impl Settings {
@@ -163,6 +186,11 @@ impl Settings {
                 store::TalkMode::VoiceActivation => TalkMode::VoiceActivation,
                 store::TalkMode::PushToTalk => TalkMode::PushToTalk,
             },
+            voice_activation: match s.voice_activation {
+                store::VoiceActivation::Automatic => VoiceActivation::Automatic,
+                store::VoiceActivation::Manual => VoiceActivation::Manual,
+            },
+            voice_threshold_dbfs: s.voice_threshold_dbfs,
             ptt_key: s.ptt_key.clone(),
             allow_mouse_buttons: s.allow_mouse_buttons,
             ptt_compatibility_mode: s.ptt_compatibility_mode,
@@ -171,11 +199,14 @@ impl Settings {
             noise_suppression: s.noise_suppression,
             echo_cancellation: s.echo_cancellation,
             auto_gain: s.auto_gain,
+            music_quality: s.music_quality,
             sounds: SoundSettings {
                 join_leave: s.sounds.user_joined || s.sounds.user_left,
                 self_mute: s.sounds.self_mute,
                 self_deaf: s.sounds.self_deafen,
                 messages: s.sounds.new_message,
+                mention: s.sounds.mention,
+                mention_notify: s.sounds.mention_notify,
                 voice_join: s.sounds.voice_join,
                 hang_up: s.sounds.hang_up,
             },
@@ -199,6 +230,8 @@ impl Settings {
             autostart: s.autostart,
             start_minimized: s.start_minimized,
             connect_muted: s.connect_muted,
+            link_previews: s.link_previews,
+            now_playing: s.now_playing,
         }
     }
 
@@ -223,6 +256,11 @@ impl Settings {
             TalkMode::VoiceActivation => store::TalkMode::VoiceActivation,
             TalkMode::PushToTalk => store::TalkMode::PushToTalk,
         };
+        s.voice_activation = match self.voice_activation {
+            VoiceActivation::Automatic => store::VoiceActivation::Automatic,
+            VoiceActivation::Manual => store::VoiceActivation::Manual,
+        };
+        s.voice_threshold_dbfs = self.voice_threshold_dbfs.clamp(-60, 0);
         s.ptt_key = self.ptt_key.clone().filter(|k| !k.is_empty());
         s.allow_mouse_buttons = self.allow_mouse_buttons;
         s.ptt_compatibility_mode = self.ptt_compatibility_mode;
@@ -231,11 +269,14 @@ impl Settings {
         s.noise_suppression = self.noise_suppression;
         s.echo_cancellation = self.echo_cancellation;
         s.auto_gain = self.auto_gain;
+        s.music_quality = self.music_quality;
         s.sounds.user_joined = self.sounds.join_leave;
         s.sounds.user_left = self.sounds.join_leave;
         s.sounds.self_mute = self.sounds.self_mute;
         s.sounds.self_deafen = self.sounds.self_deaf;
         s.sounds.new_message = self.sounds.messages;
+        s.sounds.mention = self.sounds.mention;
+        s.sounds.mention_notify = self.sounds.mention_notify;
         s.sounds.voice_join = self.sounds.voice_join;
         s.sounds.hang_up = self.sounds.hang_up;
         s.notifications = self.notifications.into();
@@ -258,6 +299,8 @@ impl Settings {
         s.autostart = self.autostart;
         s.start_minimized = self.start_minimized;
         s.connect_muted = self.connect_muted;
+        s.link_previews = self.link_previews;
+        s.now_playing = self.now_playing;
         s
     }
 }
@@ -350,6 +393,8 @@ mod tests {
         ui.wizard_completed = true;
         ui.talk_mode = TalkMode::PushToTalk;
         ui.ptt_key = Some("Ctrl+A".into());
+        ui.voice_activation = VoiceActivation::Manual;
+        ui.voice_threshold_dbfs = -25;
         ui.sounds.join_leave = false;
         ui.sounds.hang_up = false;
         ui.log_level = LogLevel::Debug;
@@ -359,6 +404,8 @@ mod tests {
         ui.autostart = true;
         ui.start_minimized = false;
         ui.connect_muted = false;
+        ui.link_previews = false;
+        ui.now_playing = true;
         ui.chat_display = ChatDisplay::Compact;
         let stored = ui.to_store(&base);
         assert_eq!(stored.chat_display, store::ChatDisplay::Compact);
@@ -366,6 +413,15 @@ mod tests {
         assert!(stored.ptt_compatibility_mode);
         assert!(stored.autostart && !stored.start_minimized);
         assert!(!stored.connect_muted);
+        assert!(!stored.link_previews);
+        assert!(stored.now_playing);
+        assert_eq!(stored.voice_activation, store::VoiceActivation::Manual);
+        assert_eq!(stored.voice_threshold_dbfs, -25);
+        let too_loud = Settings {
+            voice_threshold_dbfs: 12,
+            ..ui.clone()
+        };
+        assert_eq!(too_loud.to_store(&base).voice_threshold_dbfs, 0);
         assert!(stored.overlay.enabled);
         assert_eq!(stored.enabled_plugins, ["gtav"]);
         assert!(stored.wizard_completed);

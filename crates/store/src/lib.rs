@@ -23,5 +23,6 @@ pub use servers::{DEFAULT_PORT, NewServer, SavedServer, ServerId};
 pub use settings::{
     ChatDisplay, CloseBehaviour, LogLevel, NotificationMode, OverlayBounds, OverlaySettings,
     OwnVoice, PositionalSettings, Settings, SoundSettings, TalkMode, ThemePreference,
+    VoiceActivation,
 };
 pub use social::{FollowedChannel, PersonSetting};

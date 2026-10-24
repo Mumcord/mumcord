@@ -50,5 +50,6 @@
     "failed": "Das Folgen aller Kanäle hat nicht geklappt. Bitte versuche es erneut.",
     "dismiss": "Schließen",
     "unfollowFailed": "Das Entfolgen aller Kanäle hat nicht geklappt. Bitte versuche es erneut."
-  }
+  },
+  "mention": "enthält eine Erwähnung von dir"
 }

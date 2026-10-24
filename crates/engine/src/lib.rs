@@ -4,17 +4,20 @@
 pub mod chat;
 pub mod diag;
 pub mod follow;
+pub mod now_playing;
 pub mod people;
 pub mod profile;
 pub mod session;
 pub mod sounds;
 pub mod voice;
+pub mod web;
 
 pub use chat::{ChatMessageView, HistoryScope};
 pub use follow::FollowAllSummary;
 /// Stored types (settings record etc.) as the engine hands them out.
 pub use mumcord_store as store;
 pub use mumcord_store::{SecretStore, ServerId, Settings};
+pub use now_playing::{LocalTrack, NowPlayingView};
 pub use session::Engine;
 pub use session::{
     AudioDeviceList, AudioDeviceView, ChannelPermissions, ChannelView, ConnState,
@@ -23,3 +26,4 @@ pub use session::{
     ServerFields, ServerInfoView, ServerView, SessionCtx, Snapshot, UnreadView, UserView,
     VoiceTransportKind,
 };
+pub use web::{LinkPreview, VideoEmbed, VideoProvider};

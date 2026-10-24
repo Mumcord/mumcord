@@ -141,6 +141,10 @@ struct Inner {
     /// offered for rejoining once, on the first fresh connect to its server (QA.9).
     rejoin_offers: Mutex<HashMap<ServerId, String>>,
     core: Mutex<Core>,
+    /// Link previews and video cards for chat links (FR-1.49, FR-1.50).
+    previews: crate::web::LinkPreviews,
+    /// Shared "now playing" status (FR-1.58).
+    now_playing: Mutex<crate::now_playing::NowPlaying>,
 }
 
 #[derive(Default)]
@@ -283,7 +287,13 @@ impl Engine {
             voice: Arc::new(VoiceShared::default()),
             reconnects: AtomicU32::new(0),
             rejoin_offers: Mutex::new(rejoin_offers),
+            previews: crate::web::LinkPreviews::new(
+                Some(data_dir.join("link-previews")),
+                crate::web::LinkPreviews::app_policy(),
+                crate::web::fetch::Timeouts::default(),
+            ),
             core: Mutex::new(Core::default()),
+            now_playing: Mutex::new(crate::now_playing::NowPlaying::new(settings.now_playing)),
         });
         Ok((Self { inner }, rx))
     }
@@ -302,9 +312,37 @@ impl Engine {
             .ok_or_else(EngineError::not_connected)
     }
 
+    /// Preview card for a link in a message (FR-1.49, FR-1.50); `None` when previews are
+    /// switched off in the settings or there is nothing to show. Nothing is fetched while the
+    /// switch is off.
+    pub async fn link_preview(&self, url: &str) -> Option<crate::web::LinkPreview> {
+        match self.settings() {
+            Ok(settings) if settings.link_previews => self.inner.previews.preview(url).await,
+            Ok(_) => None,
+            Err(e) => {
+                tracing::warn!(error = %e, "reading the settings for a link preview failed");
+                None
+            }
+        }
+    }
+
     /// The app data directory given to `Engine::new`.
     pub(crate) fn data_dir(&self) -> &Path {
         &self.inner.data_dir
+    }
+
+    /// Background task runtime.
+    pub(crate) fn runtime(&self) -> &Runtime {
+        &self.inner.rt
+    }
+
+    /// The guarded web fetcher and preview cache (also used for now-playing covers).
+    pub(crate) fn link_previews(&self) -> &crate::web::LinkPreviews {
+        &self.inner.previews
+    }
+
+    pub(crate) fn now_playing_state(&self) -> &Mutex<crate::now_playing::NowPlaying> {
+        &self.inner.now_playing
     }
 
     /// The store, also while disconnected (history commands, B14).
@@ -497,7 +535,15 @@ impl Engine {
                 current = user(&ctx)?;
             }
         }
-        Ok(people::profile(&current))
+        let mut profile = people::profile(&current);
+        // The own profile is edited from here; the now-playing line is not part of it.
+        if ctx.handle.with_state(|s| s.session) == Some(session) {
+            profile.comment = profile
+                .comment
+                .map(|c| crate::now_playing::comment::strip(&c).to_owned())
+                .filter(|c| !c.is_empty());
+        }
+        Ok(profile)
     }
 
     /// Microphone test: record up to 5 s, then play back (FR-1.4). Voice pauses meanwhile.
@@ -715,6 +761,7 @@ impl Inner {
         core.pending_trust = None;
         self.stop_pipeline(core);
         if let Some(session) = core.session.take() {
+            crate::now_playing::on_disconnect(&self.now_playing, &session.handle);
             session.handle.disconnect();
         }
         self.meter.voice.store(false, Ordering::Relaxed);
@@ -947,6 +994,7 @@ impl Inner {
             store: self.store.clone(),
             events: self.events.clone(),
         };
+        crate::now_playing::on_synced(&self.now_playing);
         if let Some(mut snapshot) = self.snapshot(&lock(&self.core)) {
             extension::on_synced(&ctx, &mut snapshot);
             self.events
@@ -971,6 +1019,7 @@ impl Inner {
         }
 
         let mut bitrate = BitrateController::new();
+        bitrate.set_music_quality(self.controls.music_quality());
         bitrate.set_server_max_bandwidth(handle.with_state(|s| s.server.max_bandwidth));
         let epoch = Instant::now();
         let mut tick = tokio::time::interval(BITRATE_INTERVAL);
@@ -1034,6 +1083,7 @@ impl Inner {
                 },
                 Some(PumpCmd::Packets(sender)) = pump_rx.recv() => packets = sender,
                 _ = tick.tick() => {
+                    bitrate.set_music_quality(self.controls.music_quality());
                     if let Some(t) = &transport {
                         let stats = t.stats();
                         let target = bitrate.update(
@@ -1205,6 +1255,9 @@ impl Inner {
                 }
                 drop(core);
                 let own = ctx.handle.with_state(|s| s.session) == Some(user.session);
+                if change.joined {
+                    crate::now_playing::on_user_joined(&self.now_playing, ctx, user.session);
+                }
                 if own && change.moved_from.is_some() {
                     self.remember_channel(ctx, user.channel_id);
                 }
@@ -1218,6 +1271,7 @@ impl Inner {
                     pipeline.forget(user.session);
                 }
                 drop(core);
+                crate::now_playing::on_user_removed(&self.now_playing, user.session);
                 self.events.emit(EngineEvent::UserRemoved(user.session));
             }
             Event::PermissionDenied(denied) => {
@@ -1237,6 +1291,9 @@ impl Inner {
                 if let Some(t) = transport {
                     t.on_tunnel(packet.clone());
                 }
+            }
+            Event::PluginData(data) => {
+                crate::now_playing::on_plugin_data(&self.now_playing, ctx, data);
             }
             Event::TextMessage(_) | Event::ServerConfigUpdated(_) | Event::Disconnected(_) => {}
         }

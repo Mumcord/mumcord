@@ -58,5 +58,21 @@
     "label": "Kanalinfo",
     "showMore": "Mehr anzeigen",
     "showLess": "Weniger anzeigen"
+  },
+  "mention": {
+    "list": "Erwähnbare Personen",
+    "found_one": "{{count}} Person vorgeschlagen. Mit den Pfeiltasten wählen, mit Enter einfügen.",
+    "found_other": "{{count}} Personen vorgeschlagen. Mit den Pfeiltasten wählen, mit Enter einfügen.",
+    "none": "Niemand gefunden",
+    "mentionsYou": "Erwähnt dich"
+  },
+  "preview": {
+    "open": "Im Browser öffnen",
+    "openLabel": "{{title}} im Browser öffnen",
+    "play": "{{title}} abspielen",
+    "player": "Videoplayer: {{title}}",
+    "videoTitle": "{{site}}-Video",
+    "inBrowser": "Wird im Browser abgespielt",
+    "card": "Linkvorschau: {{title}}"
   }
 }

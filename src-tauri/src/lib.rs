@@ -7,6 +7,7 @@ mod deeplink;
 mod desktop_entry;
 mod display;
 mod notifications;
+mod now_playing;
 mod ptt;
 mod tray;
 mod window;
@@ -16,8 +17,8 @@ use tauri::{AppHandle, Manager};
 use tauri_specta::{Builder, Event, collect_commands, collect_events};
 
 use commands::{
-    app, audio, channels, chat, diagnostics, follow, history, identity, notifications as notify,
-    people, profile, servers, session, settings,
+    app, audio, channels, chat, diagnostics, follow, history, identity, links,
+    notifications as notify, people, profile, servers, session, settings,
 };
 
 /// Path of the generated TypeScript bindings, relative to this crate.
@@ -59,6 +60,7 @@ fn specta_builder() -> Builder<tauri::Wry> {
             people::person_profile,
             chat::send_channel_message,
             chat::send_private_message,
+            links::link_preview,
             follow::channel_follow,
             follow::channel_unfollow,
             follow::channel_follow_all,
@@ -91,6 +93,8 @@ fn specta_builder() -> Builder<tauri::Wry> {
             diagnostics::app_info,
             notify::notify_message,
             notify::notification_dismiss,
+            commands::now_playing::now_playing_status,
+            commands::now_playing::now_playing_cover,
         ])
         .events(collect_events![
             servers::DeepLinkOpened,
@@ -114,6 +118,7 @@ fn specta_builder() -> Builder<tauri::Wry> {
             app::CloseRequested,
             profile::DefaultAvatarSkipped,
             notify::NotificationActivated,
+            commands::now_playing::NowPlayingChanged,
         ])
 }
 
@@ -202,6 +207,7 @@ fn start_engine(app: &AppHandle) -> Result<(), Box<dyn std::error::Error>> {
     ptt::set_evdev_mouse_allowed(stored.allow_mouse_buttons);
     settings::configure_ptt(app, settings::active_ptt_key(&stored));
 
+    now_playing::start(engine.clone());
     app.manage(engine);
 
     let handle = app.clone();
@@ -304,6 +310,13 @@ fn emit_engine_event(app: &AppHandle, event: EngineEvent) -> tauri::Result<()> {
             server_id: commands::types::to_api_server_id(server_id),
         }
         .emit(app),
+        EngineEvent::NowPlayingChanged { session, track } => {
+            commands::now_playing::NowPlayingChanged {
+                session,
+                track: track.map(Into::into),
+            }
+            .emit(app)
+        }
     }
 }
 

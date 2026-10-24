@@ -50,5 +50,6 @@
     "failed": "No se pudieron seguir todos los canales. Inténtalo de nuevo.",
     "dismiss": "Cerrar",
     "unfollowFailed": "No se pudo dejar de seguir todos los canales. Inténtalo de nuevo."
-  }
+  },
+  "mention": "incluye una mención a ti"
 }

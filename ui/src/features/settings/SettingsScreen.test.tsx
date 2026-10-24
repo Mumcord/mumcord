@@ -50,6 +50,7 @@ function renderScreen() {
     resolvedTheme: "dark",
     language: "en",
     chatDisplay: "cozy",
+    linkPreviews: true,
     applySettings,
   };
   return render(
@@ -177,6 +178,23 @@ describe("SettingsScreen", () => {
     });
   });
 
+  it("switches link previews off and applies it to the chat right away", async () => {
+    const update = vi.spyOn(api, "settingsUpdate");
+    await openSection("Chat & history");
+    const toggle = screen.getByRole("switch", { name: "Show link previews and embeds" });
+    expect(toggle).toBeChecked();
+    expect(toggle).toHaveAccessibleDescription(/see your IP address/);
+    fireEvent.click(toggle);
+    await waitFor(() => {
+      expect(update).toHaveBeenLastCalledWith(expect.objectContaining({ linkPreviews: false }));
+    });
+    await waitFor(() => {
+      expect(applySettings).toHaveBeenLastCalledWith(
+        expect.objectContaining({ linkPreviews: false }),
+      );
+    });
+  });
+
   it("rolls a failed save back and explains it", async () => {
     await openSection("Language");
     api.mock.failNext("settingsUpdate", "io");
@@ -217,11 +235,29 @@ describe("SettingsScreen", () => {
             selfMute: false,
             selfDeaf: true,
             messages: true,
+            mention: true,
+            mentionNotify: true,
             voiceJoin: true,
             hangUp: true,
           },
         }),
       );
+    });
+  });
+
+  it("has separate mention sound and notification switches, both on by default", async () => {
+    const update = vi.spyOn(api, "settingsUpdate");
+    await openSection("Sounds & notifications");
+    const sound = screen.getByRole("switch", { name: "Sound when mentioned" });
+    const notify = screen.getByRole("switch", { name: "Notify when mentioned" });
+    expect(sound).toBeChecked();
+    expect(notify).toBeChecked();
+    fireEvent.click(notify);
+    await waitFor(() => {
+      expect(update.mock.lastCall?.[0].sounds).toMatchObject({
+        mention: true,
+        mentionNotify: false,
+      });
     });
   });
 
@@ -554,6 +590,41 @@ describe("Voice section", () => {
     expect(await screen.findByText(/Privacy & Security → Accessibility/)).toBeInTheDocument();
   });
 
+  it("offers a manual voice threshold as a slider over the live level meter", async () => {
+    const update = vi.spyOn(api, "settingsUpdate");
+    await openSection("Voice");
+    expect(screen.queryByRole("slider")).not.toBeInTheDocument();
+    fireEvent.click(screen.getByRole("radio", { name: /Manual threshold/ }));
+    const slider = await screen.findByRole("slider", { name: "Voice activation threshold" });
+    expect(slider).toHaveValue("-40");
+    expect(screen.getByText("-40 dBFS")).toBeInTheDocument();
+    act(() => {
+      api.mock.emit("micLevel", { level: 0.5 });
+    });
+    expect(screen.getByRole("meter", { name: "Microphone level" })).toHaveAttribute(
+      "aria-valuenow",
+      "50",
+    );
+    fireEvent.change(slider, { target: { value: "-30" } });
+    await waitFor(() => {
+      expect(update).toHaveBeenLastCalledWith(
+        expect.objectContaining({ voiceActivation: "manual", voiceThresholdDbfs: -30 }),
+      );
+    });
+    expect(await screen.findByText("-30 dBFS")).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("radio", { name: /Automatic/ }));
+    await waitFor(() => {
+      expect(screen.queryByRole("slider")).not.toBeInTheDocument();
+    });
+  });
+
+  it("hides the threshold in push-to-talk mode", async () => {
+    await openSection("Voice");
+    fireEvent.click(screen.getByRole("radio", { name: /Push-to-talk/ }));
+    await screen.findByRole("button", { name: "Set key" });
+    expect(screen.queryByRole("radio", { name: /Manual threshold/ })).not.toBeInTheDocument();
+  });
+
   it("saves the voice processing switches", async () => {
     const update = vi.spyOn(api, "settingsUpdate");
     await openSection("Voice");
@@ -568,6 +639,19 @@ describe("Voice section", () => {
           autoGain: false,
         }),
       );
+    });
+  });
+});
+
+describe("Audio section music quality", () => {
+  it("is off by default and saves the switch", async () => {
+    const update = vi.spyOn(api, "settingsUpdate");
+    await openSection("Audio");
+    const toggle = screen.getByRole("switch", { name: "Music quality" });
+    expect(toggle).not.toBeChecked();
+    fireEvent.click(toggle);
+    await waitFor(() => {
+      expect(update).toHaveBeenLastCalledWith(expect.objectContaining({ musicQuality: true }));
     });
   });
 });

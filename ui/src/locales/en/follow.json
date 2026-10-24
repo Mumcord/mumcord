@@ -50,5 +50,6 @@
     "failed": "Following all channels didn't work. Please try again.",
     "dismiss": "Dismiss",
     "unfollowFailed": "Unfollowing all channels didn't work. Please try again."
-  }
+  },
+  "mention": "includes a mention of you"
 }

@@ -194,12 +194,20 @@
 | B33 | (1c) positional + overlay settings UI | open | | B30, B32 | simple | FR-1.41, 1.43, 1.45, 1.46 | ui/src/features/settings/positional/ |
 | C9 | (1c) Verify positional audio | open | | B31, B33 | complex | AC-1.31, 1.32 | e2e/specs/positional |
 | C10 | (1c) Verify overlay | open | | B32, B33 | simple | AC-1.33, 1.34 | e2e/specs/overlay |
-| B34 | Link previews + YouTube/Twitch player cards (FR-1.49, 1.50) | open | | G1 | complex | AC-1.39, 1.40 | crates/engine (metadata fetch), ui chat, wizard, settings |
-| B35 | Mentions with autocomplete (FR-1.51) | open | | G1 | simple | AC-1.41 | ui chat input, notifications |
+| B34 | Link previews + YouTube/Twitch player cards (FR-1.49, 1.50) | done (uncommitted) – engine web module (SSRF guard, caps, 24 h disk cache), player cards (inline only YouTube on Windows, else browser), wizard + settings switch | b34-link-previews | G1 | complex | AC-1.39, 1.40 | crates/engine (metadata fetch), ui chat, wizard, settings |
+| B35 | Mentions with autocomplete (FR-1.51) | done (uncommitted; E2E mentions.e2e.ts not yet run – blocked by B34 Cargo.lock) – MentionPicker, ownMention highlight, mention notifications, @ on unread pill | b35-mentions | G1 | simple | AC-1.41 | ui chat input, notifications |
 | B36 | Tenor GIF search (FR-1.52) | open | | G1 | complex | AC-1.42 | ui chat input, CI secret |
 | B37 | Code highlighting + formatting toolbar/shortcuts (FR-1.53, 1.54) | done – highlight.js core (17 langs, language guessed since sanitizer strips tag), FormatToolbar + shortcuts, Ctrl+K yields in input | b37-code-format | G1 | simple | AC-1.43, 1.44 | ui chat |
 | B38 | External images and image links inline (FR-1.55) | open | | B34 | complex | AC-1.45 | crates/engine (image fetch), ui chat |
 | B39 | Bug: unread bubble flashes briefly on the channel whose chat is open when a message arrives (own channel, F93 regression) | done – followStore drops unread for the on-screen chat and marks read immediately | b39-unread-flash | – | simple | FR-1.31 | ui/src/features/follow unread, engine chat.rs |
+| B40 | Bug: in push-to-talk mode the mic in the user panel must show crossed out while the key is not held | done – talkStateChanged + usePushToTalk, crossed neutral mic while idle | b40-ptt-mic | – | simple | FR-1.21 | ui/src/features/userpanel, engine talk state event |
+| B41 | "Music quality" switch: bitrate cap up to server limit (max 510 kbit/s), music-tuned encoder (QA.37) | done (uncommitted, shared files with b34) – cap 487 kbit/s at 558 limit, Opus audio/music mode, NS+AGC bypassed | b41-music-quality | – | simple | FR-1.24 | crates/audio bitrate controller + encoder, store settings, settings Audio section |
+| B42 | Image viewer with zoom, pan, navigation and save (FR-1.56) | open | | B34 | simple | AC-1.46 | ui/src/features/chat (new ImageViewer), save via Tauri dialog |
+| B43 | Manual voice activation threshold with live meter (FR-1.57) | done (uncommitted, shared files with b34/b45) – processed-peak gate, 300 ms hold, 3 dB hysteresis, ThresholdMeter; live test on v14 | b43-vad-threshold | – | simple | AC-1.47 | crates/audio VAD gate, store settings, settings Voice section |
+| B44 | Spotify link cards (FR-1.50) | open | | B34 | simple | AC-1.48 | engine web previews, chat cards |
+| B45 | "Now playing" status: OS media info, plugin-data sync, music icon, profile cover + progress, comment line (FR-1.58) | done – MPRIS (Linux, verified), SMTC (Windows, compile-checked), macOS unsupported; plugin data sync, comment line, music icon, profile block | b45-now-playing | – | complex | AC-1.49 | new crates/engine media module, src-tauri platform code, members profile, PersonStatus, settings |
+| B46 | Mention ping sound + switches for mention sound/notification (QA.41) | done (uncommitted) – mention.wav, notifyMessage carries mention, engine plays ping, two switches | b46-mention-ping | B35 | simple | FR-1.51 | crates/engine sounds + assets, settings Sounds section, store settings, notifications |
+| B47 | Dismiss preview cards, preview cache clean-up after X days + Clear now, optional chat history auto-delete (QA.42) | open | | B34, B45, B46 | simple | FR-1.49, FR-1.32 | engine web cache, store history pruning, chat cards, settings Chat |
 | D1 | Implementation report | open | | C1–C10 | simple | all | specs/01-foundation-implementation.md |
 
 ## Contracts from finished tasks
