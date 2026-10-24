@@ -754,6 +754,13 @@ impl Handle {
         self.send(Frame::from_message(MessageType::Acl, &acl))
     }
 
+    /// Changes another person's state, e.g. server mute, deafen or suppress (admin tooling such
+    /// as test bots; needs the MuteDeafen permission, e.g. as SuperUser). `m.session` names the
+    /// person and is sent as given.
+    pub fn send_admin_user_state(&self, m: proto::UserState) -> Result<(), CommandError> {
+        self.send(Frame::from_message(MessageType::UserState, &m))
+    }
+
     /// Creates or edits a channel (admin tooling such as test bots; needs the matching
     /// permissions, e.g. as SuperUser). Without `channel_id` the server creates a new channel.
     pub fn send_channel_state(&self, state: proto::ChannelState) -> Result<(), CommandError> {

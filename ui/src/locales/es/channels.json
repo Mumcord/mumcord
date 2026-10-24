@@ -4,7 +4,7 @@
     "hint": "Intro: ver chat · Mayús+Intro o doble clic: unirse · Flechas: mover, expandir, contraer",
     "join": "Unirse",
     "you": "(tú)",
-    "yourChannel": "tu canal",
+    "voiceHere": "estás aquí (voz)",
     "people_one": "{{count}} persona",
     "people_other": "{{count}} personas",
     "stack": {
@@ -21,6 +21,9 @@
     "talking": "hablando",
     "muted": "silenciado",
     "deafened": "ensordecido",
+    "serverMuted": "silenciado por el servidor",
+    "serverDeafened": "ensordecido por el servidor",
+    "suppressed": "suprimido (no puede hablar aquí)",
     "localMuted": "silenciado para ti",
     "unregistered": "no registrado"
   },

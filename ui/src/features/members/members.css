@@ -80,6 +80,11 @@
   color: var(--color-text);
 }
 
+/* Muted for you (FR-1.19): the name stays red, also while the person talks. */
+.member__name[data-local-muted="true"] {
+  color: var(--color-local-muted);
+}
+
 .member__name {
   overflow: hidden;
   text-overflow: ellipsis;

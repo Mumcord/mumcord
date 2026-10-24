@@ -96,8 +96,9 @@ pub fn user_view(user: &User, local: PersonSetting) -> UserView {
         registered: user.user_id.is_some(),
         self_mute: user.self_mute,
         self_deaf: user.self_deaf,
-        server_mute: user.mute || user.suppress,
+        server_mute: user.mute,
         server_deaf: user.deaf,
+        suppressed: user.suppress,
         listening_channel_ids: user.listening.iter().copied().collect(),
         avatar_hash: user.texture_hash.as_deref().map(hex),
         has_avatar: user.texture_hash.is_some()

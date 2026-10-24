@@ -128,8 +128,11 @@ pub struct UserView {
     pub registered: bool,
     pub self_mute: bool,
     pub self_deaf: bool,
+    /// Muted by the server/an admin.
     pub server_mute: bool,
     pub server_deaf: bool,
+    /// May not speak in the current channel (no Speak permission or suppressed by an admin).
+    pub suppressed: bool,
     pub listening_channel_ids: Vec<u32>,
     pub has_avatar: bool,
     /// Hex of the avatar texture hash, when the server sent one; changes when the avatar is replaced.
@@ -280,6 +283,8 @@ pub enum EngineEvent {
         channel_id: Option<u32>,
     },
     ChannelUpserted(ChannelView),
+    /// Several channels changed at once, e.g. a burst of permission answers after a sync.
+    ChannelsUpserted(Vec<ChannelView>),
     ChannelRemoved(u32),
     UserUpserted(UserView),
     UserRemoved(u32),

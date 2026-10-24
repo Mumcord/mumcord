@@ -11,7 +11,7 @@ use anyhow::{Context, Result, bail};
 use clap::{Parser, Subcommand};
 use mumcord_bot::samples::{PNG, Sample};
 use mumcord_bot::voice::{BotVoice, PlayOptions};
-use mumcord_bot::{Bot, BotConfig, MessageCheck, UserCheck, env};
+use mumcord_bot::{Bot, BotConfig, MessageCheck, Moderation, UserCheck, env};
 use mumcord_protocol::{DenyKind, permissions};
 
 #[derive(Parser, Debug)]
@@ -86,6 +86,20 @@ enum Command {
     Mute { on: Toggle },
     /// Self deafen on/off.
     Deaf { on: Toggle },
+    /// Server-mute or -deafen another user (needs --superuser).
+    Moderate {
+        user: String,
+        #[arg(long)]
+        mute: Option<Toggle>,
+        #[arg(long)]
+        deaf: Option<Toggle>,
+    },
+    /// Move another user into a channel (needs --superuser).
+    Move { user: String, channel: String },
+    /// Deny "Speak" for everyone on a channel, which suppresses them (needs --superuser).
+    DenySpeak { channel: String },
+    /// Undo deny-speak (needs --superuser).
+    AllowSpeak { channel: String },
     /// Deny "Listen" for everyone on a channel (needs --superuser).
     DenyListen { channel: String },
     /// Undo deny-listen (needs --superuser).
@@ -248,6 +262,19 @@ async fn run(bot: &mut Bot, voice: &mut Option<BotVoice>, command: Command) -> R
         Command::Unlisten { channels } => bot.unlisten(&as_strs(&channels))?,
         Command::Mute { on } => bot.set_mute(matches!(on, Toggle::On))?,
         Command::Deaf { on } => bot.set_deaf(matches!(on, Toggle::On))?,
+        Command::Moderate { user, mute, deaf } => {
+            let on = |t: Option<Toggle>| t.map(|t| matches!(t, Toggle::On));
+            bot.moderate(
+                &user,
+                Moderation {
+                    mute: on(mute),
+                    deaf: on(deaf),
+                },
+            )?;
+        }
+        Command::Move { user, channel } => bot.move_user(&user, &channel)?,
+        Command::DenySpeak { channel } => bot.deny_speak(&channel).await?,
+        Command::AllowSpeak { channel } => bot.allow_speak(&channel).await?,
         Command::DenyListen { channel } => bot.deny_listen(&channel).await?,
         Command::AllowListen { channel } => bot.allow_listen(&channel).await?,
         Command::Describe { channel, html } => bot.set_description(&channel, &html).await?,

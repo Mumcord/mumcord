@@ -95,7 +95,7 @@ export function MembersPanel({ onSendPrivateMessage }: MembersPanelProps) {
             }}
           >
             <Avatar name={user.name} src={avatarOf(user)} talking={talking} />
-            <span className="member__name">
+            <span className="member__name" data-local-muted={user.localMute}>
               {user.name}
               {user.session === state.selfSession && (
                 <span className="member__you"> {t("you")}</span>

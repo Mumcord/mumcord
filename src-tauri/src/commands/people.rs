@@ -19,9 +19,11 @@ pub struct User {
     pub registered: bool,
     pub self_mute: bool,
     pub self_deaf: bool,
-    /// Muted or suppressed by the server/an admin.
+    /// Muted by the server/an admin.
     pub server_mute: bool,
     pub server_deaf: bool,
+    /// May not speak in the current channel (no Speak permission or suppressed by an admin).
+    pub suppressed: bool,
     /// Channels this person listens to (ear icon).
     pub listening_channel_ids: Vec<ChannelId>,
     pub has_avatar: bool,
@@ -76,6 +78,7 @@ impl From<UserView> for User {
             self_deaf: v.self_deaf,
             server_mute: v.server_mute,
             server_deaf: v.server_deaf,
+            suppressed: v.suppressed,
             listening_channel_ids: v.listening_channel_ids,
             has_avatar: v.has_avatar,
             avatar_hash: v.avatar_hash,

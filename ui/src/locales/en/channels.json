@@ -4,7 +4,7 @@
     "hint": "Enter: show chat · Shift+Enter or double-click: join · Arrow keys: move, expand, collapse",
     "join": "Join",
     "you": "(you)",
-    "yourChannel": "your channel",
+    "voiceHere": "you are here (voice)",
     "people_one": "{{count}} person",
     "people_other": "{{count}} people",
     "stack": {
@@ -21,6 +21,9 @@
     "talking": "talking",
     "muted": "muted",
     "deafened": "deafened",
+    "serverMuted": "muted by server",
+    "serverDeafened": "deafened by server",
+    "suppressed": "suppressed (cannot speak here)",
     "localMuted": "muted for you",
     "unregistered": "not registered"
   },

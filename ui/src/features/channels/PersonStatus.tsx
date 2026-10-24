@@ -2,9 +2,9 @@
  * Mute/deafen/listener/unregistered icons for a person; the spoken equivalent is `useStatusText()`.
  */
 import type { User } from "../../api";
-import { isDeafened, isMuted } from "./statusText";
+import { voiceState, type VoiceState } from "./statusText";
 
-type IconName = "mic-off" | "headphones-off" | "ear";
+type IconName = "mic-off" | "headphones-off" | "ear" | "ban" | "volume-x";
 
 const PATHS: Record<IconName, string> = {
   "mic-off":
@@ -12,12 +12,24 @@ const PATHS: Record<IconName, string> = {
   "headphones-off":
     "M3 18v-6a9 9 0 0 1 14.4-7.2M21 12v6M21 18a2 2 0 0 1-2 2h-1v-6h3M3 18a2 2 0 0 0 2 2h1v-6H3M3 3l18 18",
   ear: "M6 8.5a6 6 0 1 1 12 0c0 3-2 4.5-3 5.5s-1.5 2-1.5 3.5a3 3 0 0 1-6 0M9 8.5a3 3 0 0 1 6 0",
+  ban: "M12 3a9 9 0 1 0 0 18a9 9 0 1 0 0-18M5.6 5.6l12.8 12.8",
+  "volume-x": "M11 5 6 9H3v6h3l5 4V5M22 9l-6 6M16 9l6 6",
 };
 
-export function Icon({ name }: { name: IconName }) {
+/** Icon and look of each voice state; what the server imposes gets the red "server" chip. */
+const VOICE_ICONS: Record<VoiceState, { name: IconName; variant?: string }> = {
+  serverDeafened: { name: "headphones-off", variant: "server" },
+  deafened: { name: "headphones-off" },
+  serverMuted: { name: "mic-off", variant: "server" },
+  suppressed: { name: "ban", variant: "suppressed" },
+  muted: { name: "mic-off" },
+};
+
+export function Icon({ name, variant }: { name: IconName; variant?: string | undefined }) {
   return (
     <svg
-      className="person-icon"
+      className={variant ? `person-icon person-icon--${variant}` : "person-icon"}
+      data-icon={name}
       viewBox="0 0 24 24"
       width="16"
       height="16"
@@ -43,6 +55,7 @@ export function StatusIcons({ user, listener = false }: { user: User; listener?:
       </span>
     );
   }
+  const voice = voiceState(user);
   return (
     <span className="person-icons">
       {!user.registered && (
@@ -50,7 +63,8 @@ export function StatusIcons({ user, listener = false }: { user: User; listener?:
           ○
         </span>
       )}
-      {isDeafened(user) ? <Icon name="headphones-off" /> : isMuted(user) && <Icon name="mic-off" />}
+      {voice && <Icon name={VOICE_ICONS[voice].name} variant={VOICE_ICONS[voice].variant} />}
+      {user.localMute && <Icon name="volume-x" variant="local-muted" />}
     </span>
   );
 }

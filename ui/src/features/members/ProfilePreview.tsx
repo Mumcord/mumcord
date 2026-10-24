@@ -16,7 +16,7 @@ import {
 import { createPortal } from "react-dom";
 import { useTranslation } from "react-i18next";
 import type { User } from "../../api";
-import { isDeafened, isMuted } from "../channels/statusText";
+import { VOICE_STATE_KEY, voiceState } from "../channels/statusText";
 import { useServerState } from "../channels/serverStore";
 import "./profilePreview.css";
 import { Avatar } from "./Avatar";
@@ -151,9 +151,10 @@ function PreviewBody({ user, talking }: { user: User; talking: boolean }) {
   const { profile } = usePersonProfile(user.session);
   // Sanitized here like on the full card: server comments are untrusted.
   const comment = profile?.comment ? DOMPurify.sanitize(profile.comment) : "";
+  const state = voiceState(user);
   const voice = [
     talking && tStatus("status.talking"),
-    isDeafened(user) ? tStatus("status.deafened") : isMuted(user) && tStatus("status.muted"),
+    state && tStatus(VOICE_STATE_KEY[state]),
     user.localMute && tStatus("status.localMuted"),
   ].filter((part): part is string => typeof part === "string");
 

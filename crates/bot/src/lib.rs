@@ -12,6 +12,6 @@ pub mod env;
 pub mod samples;
 pub mod voice;
 
-pub use bot::{Bot, BotConfig, DEFAULT_TIMEOUT};
+pub use bot::{Bot, BotConfig, DEFAULT_TIMEOUT, Moderation};
 pub use checks::{MessageCheck, UserCheck};
 pub use mumcord_protocol as protocol;

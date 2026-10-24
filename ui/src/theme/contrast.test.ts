@@ -39,6 +39,7 @@ const TEXT = [
   "success",
   "warning",
   "danger",
+  "local-muted",
 ];
 // WCAG 1.4.11: focus indicators and control boundaries need 3:1 against adjacent colours.
 const NON_TEXT = ["focus", "border-strong", "accent", "talking"];

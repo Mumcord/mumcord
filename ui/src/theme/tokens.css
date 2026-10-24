@@ -59,6 +59,8 @@
   --color-success: #3ee39e;
   --color-warning: #fbbf24;
   --color-danger: #ff8f8f;
+  /* Names of people the user muted for themselves (FR-1.19); readable on every row state. */
+  --color-local-muted: #ff7b7b;
   --color-talking: #3ee39e;
   /* Every stop keeps --color-on-accent at >= 4.5:1 (checked in contrast.test.ts). */
   --color-accent-stop-1: #ffb08a;
@@ -111,6 +113,7 @@
   --color-success: #136634;
   --color-warning: #7f4d00;
   --color-danger: #b01c1c;
+  --color-local-muted: #b3121f;
   --color-talking: #15803d;
   --color-accent-stop-1: #c2410c;
   --color-accent-stop-2: #c21f62;

@@ -11,6 +11,26 @@ impl Bot {
     /// channel's own ACL; the test channels have none. Returns once the server applied it
     /// (needs a 1.4+ server).
     pub async fn deny_listen(&self, channel: &str) -> Result<()> {
+        self.deny_for_everyone(channel, permissions::LISTEN).await
+    }
+
+    /// Removes the channel's own ACL entries again (back to inheriting from the parent).
+    pub async fn allow_listen(&self, channel: &str) -> Result<()> {
+        self.set_acl(channel, Vec::new()).await
+    }
+
+    /// Denies "Speak" for everyone on `channel` and its subchannels: the server then suppresses
+    /// everyone in it except the superuser. Replaces the channel's own ACL.
+    pub async fn deny_speak(&self, channel: &str) -> Result<()> {
+        self.deny_for_everyone(channel, permissions::SPEAK).await
+    }
+
+    /// Removes the channel's own ACL entries again (back to inheriting from the parent).
+    pub async fn allow_speak(&self, channel: &str) -> Result<()> {
+        self.set_acl(channel, Vec::new()).await
+    }
+
+    async fn deny_for_everyone(&self, channel: &str, permission: u32) -> Result<()> {
         let deny = proto::acl::ChanAcl {
             apply_here: Some(true),
             apply_subs: Some(true),
@@ -19,14 +39,9 @@ impl Bot {
             user_id: None,
             group: Some("all".to_owned()),
             grant: Some(0),
-            deny: Some(permissions::LISTEN),
+            deny: Some(permission),
         };
         self.set_acl(channel, vec![deny]).await
-    }
-
-    /// Removes the channel's own ACL entries again (back to inheriting from the parent).
-    pub async fn allow_listen(&self, channel: &str) -> Result<()> {
-        self.set_acl(channel, Vec::new()).await
     }
 
     async fn set_acl(&self, channel: &str, acls: Vec<proto::acl::ChanAcl>) -> Result<()> {

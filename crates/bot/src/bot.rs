@@ -8,7 +8,7 @@ use std::time::Duration;
 use anyhow::{Context, Result, anyhow, bail};
 use mumcord_protocol::{
     ConnectConfig, DisconnectReason, Event, Handle, PermissionDenied, ServerState, TextMessage,
-    TextTarget, User, connect,
+    TextTarget, User, connect, proto,
 };
 use tokio::sync::{broadcast, mpsc, watch};
 use tokio::task::JoinHandle;
@@ -92,6 +92,15 @@ impl BotConfig {
             login_timeout: self.timeout,
         })
     }
+}
+
+/// Admin changes to another user's voice state; `None` leaves a flag as it is. Suppression is
+/// not here: servers refuse to suppress by request, it follows from a missing Speak permission
+/// (see [`Bot::deny_speak`]).
+#[derive(Debug, Clone, Copy, Default)]
+pub struct Moderation {
+    pub mute: Option<bool>,
+    pub deaf: Option<bool>,
 }
 
 /// What the bot has received since it connected.
@@ -242,6 +251,42 @@ impl Bot {
 
     pub fn set_deaf(&self, deaf: bool) -> Result<()> {
         Ok(self.handle.set_self_deaf(deaf)?)
+    }
+
+    /// Server-mutes or -deafens the user `name` as an admin (needs the superuser bot).
+    pub fn moderate(&self, name: &str, moderation: Moderation) -> Result<()> {
+        self.send_admin_user_state(
+            name,
+            proto::UserState {
+                mute: moderation.mute,
+                deaf: moderation.deaf,
+                ..Default::default()
+            },
+        )
+    }
+
+    /// Moves the user `name` into `channel` as an admin (needs the superuser bot).
+    pub fn move_user(&self, name: &str, channel: &str) -> Result<()> {
+        let channel_id = self.channel_id(channel)?;
+        self.send_admin_user_state(
+            name,
+            proto::UserState {
+                channel_id: Some(channel_id),
+                ..Default::default()
+            },
+        )
+    }
+
+    fn send_admin_user_state(&self, name: &str, mut m: proto::UserState) -> Result<()> {
+        if !self.config.superuser {
+            bail!("changing other users needs the superuser bot");
+        }
+        m.session = Some(
+            find_user(&self.state(), name)
+                .with_context(|| format!("no user {name:?}"))?
+                .session,
+        );
+        Ok(self.handle.send_admin_user_state(m)?)
     }
 
     /// Requests listening; a refusal arrives as a denial (see [`Bot::wait_denied`]).

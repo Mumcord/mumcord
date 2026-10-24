@@ -4,7 +4,7 @@
     "hint": "Enter: Chat anzeigen · Umschalt+Enter oder Doppelklick: beitreten · Pfeiltasten: bewegen, auf- und zuklappen",
     "join": "Beitreten",
     "you": "(du)",
-    "yourChannel": "dein Kanal",
+    "voiceHere": "du bist hier (Sprache)",
     "people_one": "{{count}} Person",
     "people_other": "{{count}} Personen",
     "stack": {
@@ -21,6 +21,9 @@
     "talking": "spricht",
     "muted": "stummgeschaltet",
     "deafened": "taub geschaltet",
+    "serverMuted": "vom Server stummgeschaltet",
+    "serverDeafened": "vom Server taub geschaltet",
+    "suppressed": "unterdrückt (darf hier nicht sprechen)",
     "localMuted": "für dich stummgeschaltet",
     "unregistered": "nicht registriert"
   },
