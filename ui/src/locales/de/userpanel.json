@@ -17,6 +17,13 @@
     "text": "Du liest nur mit – tritt einem Kanal bei, um zu sprechen.",
     "join": "{{channel}} beitreten"
   },
+  "status": {
+    "connecting": "Verbinde…",
+    "reconnecting": "Verbinde erneut…",
+    "connected": "Verbunden",
+    "readOnly": "Nur lesen",
+    "disconnected": "Nicht verbunden"
+  },
   "profile": {
     "title": "Profil bearbeiten",
     "chooseTitle": "Profilbild auswählen",

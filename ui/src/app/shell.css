@@ -3,8 +3,10 @@
   grid-template-columns: var(--width-server-bar) var(--width-channels) minmax(0, 1fr) var(
       --width-members
     );
+  grid-template-rows: minmax(0, 1fr);
   height: 100%;
   overflow: hidden;
+  overflow: clip;
 }
 
 .shell__servers {
@@ -15,6 +17,7 @@
 
 .shell__channel-column {
   display: flex;
+  overflow: hidden;
   flex-direction: column;
   min-height: 0;
   background: var(--color-bg-sidebar);
@@ -26,10 +29,9 @@
   padding: var(--space-2);
 }
 
+/* The user panel styles itself (background, padding); no separator line above it (QA.26). */
 .shell__user-panel {
-  padding: var(--space-2);
-  border-top: 1px solid var(--color-border);
-  background: var(--color-bg-elevated);
+  min-width: 0;
 }
 
 .shell__chat {
@@ -41,9 +43,11 @@
 }
 
 .shell__chat-body {
+  display: flex;
+  flex-direction: column;
   flex: 1;
   min-height: 0;
-  overflow-y: auto;
+  overflow: hidden;
 }
 
 .shell__members {

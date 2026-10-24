@@ -17,6 +17,13 @@
     "text": "You're reading along – join a channel to talk.",
     "join": "Join {{channel}}"
   },
+  "status": {
+    "connecting": "Connecting…",
+    "reconnecting": "Reconnecting…",
+    "connected": "Connected",
+    "readOnly": "Read-only",
+    "disconnected": "Not connected"
+  },
   "profile": {
     "title": "Edit profile",
     "chooseTitle": "Choose a profile picture",

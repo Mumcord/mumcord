@@ -10,6 +10,7 @@ import { describeError } from "./errors";
 import { ProfileDialog } from "./ProfileDialog";
 import { joinChannel, useReadOnly } from "./readOnly";
 import { RegisterDialog } from "./RegisterDialog";
+import { useMicLevelFill } from "./useMicLevelFill";
 import { useUserPanel } from "./useUserPanel";
 import "./userpanel.css";
 
@@ -46,10 +47,14 @@ export function UserPanel() {
   const menuButton = useRef<HTMLButtonElement>(null);
   const menuRef = useRef<HTMLDivElement>(null);
   const previous = useRef<{ mute: boolean; deaf: boolean } | null>(null);
+  const micButton = useRef<HTMLButtonElement>(null);
+  const statusId = useId();
 
   const mute = self?.selfMute ?? false;
   const deaf = self?.selfDeaf ?? false;
   const present = self !== null;
+  const showLevel = state.connected && !mute && !deaf;
+  useMicLevelFill(micButton, showLevel);
 
   // Announce state changes (also those made elsewhere, e.g. the server or a shortcut).
   useEffect(() => {
@@ -121,15 +126,28 @@ export function UserPanel() {
   const link = servers.connection.state === "disconnected" ? null : servers.connection.serverId;
   const linked = servers.servers.find((s) => s.id === link);
   const serverLabel = linked ? linked.label || linked.address : "";
+  const connection = servers.connection.state;
+  const status =
+    connection === "reconnecting"
+      ? t("status.reconnecting")
+      : connection === "connecting"
+        ? t("status.connecting")
+        : !connected
+          ? t("status.disconnected")
+          : readOnly
+            ? t("status.readOnly")
+            : serverLabel || t("status.connected");
 
   return (
     <div className="userpanel">
-      <div className="userpanel__row">
+      <div className="userpanel__identity">
         <button
           ref={menuButton}
           type="button"
           className="userpanel__user"
           title={name}
+          aria-label={name}
+          aria-describedby={statusId}
           aria-haspopup="menu"
           aria-expanded={menuOpen}
           aria-controls={menuOpen ? menuId : undefined}
@@ -145,13 +163,21 @@ export function UserPanel() {
               name.slice(0, 1).toUpperCase()
             )}
           </span>
-          <span className="userpanel__name" title={name}>
-            {name}
+          <span className="userpanel__text">
+            <span className="userpanel__name" title={name}>
+              {name}
+            </span>
+            <span id={statusId} className="userpanel__status" title={status}>
+              {status}
+            </span>
           </span>
         </button>
+      </div>
+      <div className="userpanel__row">
         <button
+          ref={micButton}
           type="button"
-          className="userpanel__toggle"
+          className="userpanel__toggle userpanel__toggle--mic"
           aria-pressed={mute}
           aria-label={t("mute")}
           disabled={!connected}
@@ -159,6 +185,7 @@ export function UserPanel() {
             run(getApi().setSelfMute(!mute));
           }}
         >
+          {showLevel ? <span className="userpanel__level" aria-hidden="true" /> : null}
           <span className="userpanel__icon">
             <Icon d={MIC} />
             {mute ? <Icon d={SLASH} /> : null}
@@ -179,7 +206,6 @@ export function UserPanel() {
             {deaf ? <Icon d={SLASH} /> : null}
           </span>
         </button>
-        {connected ? <ConnectionInfo className="userpanel__toggle" /> : null}
         {link !== null ? (
           <button
             type="button"
@@ -193,6 +219,7 @@ export function UserPanel() {
             <Icon d={HANG_UP} />
           </button>
         ) : null}
+        {connected ? <ConnectionInfo className="userpanel__toggle" /> : null}
         <button
           type="button"
           className="userpanel__toggle"

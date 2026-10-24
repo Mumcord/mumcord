@@ -9,6 +9,7 @@ import "../../i18n";
 import { axeViolations } from "../../test/axe";
 import { resetServerStore } from "../channels/serverStore";
 import { UserPanel } from "./UserPanel";
+import { LEVEL_FRAME_MS } from "./useMicLevelFill";
 
 const files = vi.hoisted(() => ({
   pickImagePath: vi.fn<() => Promise<string | null>>(),
@@ -377,13 +378,43 @@ describe("UserPanel", () => {
     });
   });
 
-  it("gives the name the available width and exposes it in full", async () => {
+  it("shows the name with a status line in the top row and the buttons below", async () => {
     await setup();
     const name = document.querySelector<HTMLElement>(".userpanel__name");
     if (!name) throw new Error("name missing");
     expect(name).toHaveAttribute("title", name.textContent);
     const button = document.querySelector<HTMLElement>('[aria-haspopup="menu"]');
     expect(button).toHaveAccessibleName(name.textContent);
+    expect(button).toHaveAccessibleDescription("Read-only");
+    expect(button?.closest(".userpanel__identity")).not.toBeNull();
+    const row = document.querySelector(".userpanel__row");
+    if (!row) throw new Error("button row missing");
+    expect(row.contains(button)).toBe(false);
+    const labels = [...row.querySelectorAll("button")].map((b) => b.getAttribute("aria-label"));
+    expect(labels).toEqual([
+      "Mute microphone",
+      "Deafen",
+      expect.stringMatching(/^Disconnect from /),
+      "Connection info",
+      "Settings",
+    ]);
+    await joinVoice();
+    expect(button).not.toHaveAccessibleDescription("Read-only");
+    expect(button?.querySelector(".userpanel__status")?.textContent).not.toBe("");
+  });
+
+  it("lets a long name wrap to two lines instead of cutting it off", async () => {
+    await setup();
+    const snapshot = await api.sessionSnapshot();
+    const self = snapshot?.users.find((u) => u.session === snapshot.selfSession);
+    if (!self) throw new Error("self missing");
+    const long = "Maximilian Schmi";
+    act(() => {
+      api.mock.emit("userUpserted", { user: { ...self, name: long } });
+    });
+    const name = await screen.findByText(long);
+    expect(name).toHaveClass("userpanel__name");
+    expect(name).toHaveAttribute("title", long);
     // jsdom does not apply the stylesheet, so assert the rules themselves.
     const css = readFileSync(
       resolve(process.cwd(), "ui/src/features/userpanel/userpanel.css"),
@@ -391,10 +422,50 @@ describe("UserPanel", () => {
     );
     const rule = (selector: string) =>
       new RegExp(`^${selector.replace(".", "\\.")} \\{([^}]*)\\}`, "m").exec(css)?.[1] ?? "";
-    expect(rule(".userpanel__name")).toMatch(/flex: 1 1 auto;/);
-    expect(rule(".userpanel__name")).toMatch(/min-width: 0;/);
-    expect(rule(".userpanel__name")).toMatch(/text-overflow: ellipsis;/);
+    expect(rule(".userpanel__name")).toMatch(/-webkit-line-clamp: 2;/);
+    expect(rule(".userpanel__name")).toMatch(/overflow-wrap: anywhere;/);
+    expect(rule(".userpanel__name")).not.toMatch(/nowrap/);
+    expect(rule(".userpanel__text")).toMatch(/min-width: 0;/);
     expect(rule(".userpanel__toggle")).toMatch(/flex: none;/);
+    expect(rule(".userpanel")).not.toMatch(/border-top/);
+  });
+
+  it("fills the mic button with the live input level, throttled, and hides it while muted", async () => {
+    await setup();
+    await joinVoice();
+    vi.useFakeTimers();
+    try {
+      const fill = () => mute().querySelector(".userpanel__level");
+      expect(fill()).not.toBeNull();
+      act(() => {
+        api.mock.emit("micLevel", { level: 0.8 });
+        api.mock.emit("micLevel", { level: 0.6 });
+        vi.advanceTimersByTime(LEVEL_FRAME_MS);
+      });
+      // Several events within one frame give a single paint with the newest level.
+      expect(mute().style.getPropertyValue("--mic-level")).toBe("0.600");
+      expect(mute()).toHaveAttribute("data-active");
+      act(() => {
+        for (let i = 0; i < 20; i++) {
+          api.mock.emit("micLevel", { level: 0 });
+          vi.advanceTimersByTime(LEVEL_FRAME_MS);
+        }
+      });
+      expect(mute().style.getPropertyValue("--mic-level")).toBe("0.000");
+      expect(mute()).not.toHaveAttribute("data-active");
+    } finally {
+      vi.useRealTimers();
+    }
+    fireEvent.click(mute());
+    await waitFor(() => {
+      expect(mute()).toHaveAttribute("aria-pressed", "true");
+    });
+    expect(mute().querySelector(".userpanel__level")).toBeNull();
+    act(() => {
+      api.mock.emit("micLevel", { level: 0.9 });
+    });
+    await new Promise((r) => setTimeout(r, LEVEL_FRAME_MS + 10));
+    expect(mute().style.getPropertyValue("--mic-level")).toBe("");
   });
 
   it("has no accessibility violations (panel, menu and dialog)", async () => {
