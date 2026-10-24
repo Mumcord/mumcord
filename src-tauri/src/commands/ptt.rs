@@ -2,6 +2,7 @@
 
 use serde::{Deserialize, Serialize};
 use specta::Type;
+use tauri::AppHandle;
 
 use super::types::ApiResult;
 use crate::ptt;
@@ -83,8 +84,8 @@ pub async fn ptt_mouse_status() -> ApiResult<PttMouseStatus> {
 /// when the desktop did not confirm the shortcut (dialog dismissed, no key, portal failure).
 #[tauri::command]
 #[specta::specta]
-pub async fn ptt_capture_key(key: String) -> ApiResult<String> {
-    ptt::capture(&key).await
+pub async fn ptt_capture_key(app: AppHandle, key: String) -> ApiResult<String> {
+    ptt::capture(&app, &key).await
 }
 
 /// Aborts a pending `ptt_capture_key`, which then fails with `invalidInput`.

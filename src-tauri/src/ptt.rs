@@ -217,7 +217,7 @@ fn availability_from(
 /// confirms or changes it in the desktop's dialog and the chosen trigger is returned. If the
 /// desktop already knows the shortcut but has no key for it, its shortcut settings open
 /// instead. Desktop failures are `shortcutNotConfirmed`, never `invalidInput`.
-pub async fn capture(key: &str) -> ApiResult<String> {
+pub async fn capture<R: Runtime>(app: &AppHandle<R>, key: &str) -> ApiResult<String> {
     let invalid = |err: KeyError| ApiError::new(ErrorCode::InvalidInput, err.to_string());
     match parse_key(key).map_err(invalid)? {
         PttKey::Mouse(button) if mouse::capturable() => Ok(button.name().to_owned()),
@@ -227,7 +227,7 @@ pub async fn capture(key: &str) -> ApiResult<String> {
         )),
         PttKey::Keyboard(normalized) => match current_backend() {
             Backend::GlobalShortcut => Ok(normalized),
-            Backend::Portal => capture_portal(&normalized).await,
+            Backend::Portal => capture_portal(app, &normalized).await,
         },
     }
 }
@@ -542,7 +542,7 @@ async fn activate_portal(key: &str) -> Result<(), PttUnavailableReason> {
 const ASSIGN_TIMEOUT: std::time::Duration = std::time::Duration::from_secs(300);
 
 #[cfg(target_os = "linux")]
-async fn capture_portal(normalized: &str) -> ApiResult<String> {
+async fn capture_portal<R: Runtime>(app: &AppHandle<R>, normalized: &str) -> ApiResult<String> {
     let _guard = OPERATION.lock().await;
     let (cancel_tx, cancel_rx) = tokio::sync::oneshot::channel();
     state().capture_cancel = Some(cancel_tx);
@@ -551,7 +551,7 @@ async fn capture_portal(normalized: &str) -> ApiResult<String> {
         "binding the push-to-talk shortcut via the portal (preferred trigger {preferred:?})"
     );
     let result = tokio::select! {
-        result = bind_and_assign(preferred.as_deref()) => Some(result),
+        result = bind_and_assign(app, preferred.as_deref()) => Some(result),
         _ = cancel_rx => None,
     };
     state().capture_cancel = None;
@@ -583,7 +583,8 @@ async fn capture_portal(normalized: &str) -> ApiResult<String> {
 /// dialog, for a shortcut it already knows), opens the desktop's shortcut settings and waits
 /// until the user assigns one.
 #[cfg(target_os = "linux")]
-async fn bind_and_assign(
+async fn bind_and_assign<R: Runtime>(
+    app: &AppHandle<R>,
     preferred: Option<&str>,
 ) -> Result<(portal::Binding, String), portal::BindError> {
     let (binding, trigger) = portal::bind(preferred).await?;
@@ -594,7 +595,14 @@ async fn bind_and_assign(
         "the desktop knows the push-to-talk shortcut but has no key assigned; \
          opening its shortcut settings"
     );
-    match tokio::time::timeout(ASSIGN_TIMEOUT, portal::assign(&binding)).await {
+    let token = activation_token(app).await;
+    if token.is_none() {
+        tracing::warn!(
+            "no activation token from the compositor; the desktop may keep its shortcut \
+             settings in the background"
+        );
+    }
+    match tokio::time::timeout(ASSIGN_TIMEOUT, portal::assign(&binding, token)).await {
         Ok(Ok(trigger)) => Ok((binding, trigger)),
         Ok(Err(err)) => {
             binding.close();
@@ -605,6 +613,55 @@ async fn bind_and_assign(
             Err(portal::BindError::NoTrigger)
         }
     }
+}
+
+/// Asks the compositor (through GTK) for an XDG activation token for our focused window.
+///
+/// The portal opens the shortcut settings as a separate app (on KDE: System Settings, often
+/// already running). Wayland compositors only bring another app's window to the front with
+/// a token tied to the user's latest input in our window; without one KDE merely flags
+/// System Settings in the task bar and the user never sees it. Must run while our window
+/// still has focus, right after the user's key press.
+#[cfg(target_os = "linux")]
+async fn activation_token<R: Runtime>(app: &AppHandle<R>) -> Option<String> {
+    let (tx, rx) = tokio::sync::oneshot::channel();
+    // GTK may only be used on its main thread.
+    if let Err(err) = app.run_on_main_thread(move || {
+        // The receiver only goes away if the capture was cancelled meanwhile.
+        let _ = tx.send(gtk_activation_token());
+    }) {
+        tracing::warn!("requesting an activation token failed: {err}");
+        return None;
+    }
+    rx.await.ok().flatten()
+}
+
+#[cfg(target_os = "linux")]
+fn gtk_activation_token() -> Option<String> {
+    use gdk::gio::prelude::AppLaunchContextExt;
+
+    let context = gdk::Display::default()?.app_launch_context()?;
+    // GDK's Wayland backend ignores the app info; GIO's API merely requires one.
+    let info = match gdk::gio::AppInfo::create_from_commandline(
+        "true",
+        None,
+        gdk::gio::AppInfoCreateFlags::SUPPORTS_STARTUP_NOTIFICATION,
+    ) {
+        Ok(info) => info,
+        Err(err) => {
+            tracing::warn!("preparing the activation token request failed: {err}");
+            return None;
+        }
+    };
+    usable_token(context.startup_notify_id(&info, &[]).as_deref())
+}
+
+/// An empty startup id means the display has no way to hand out tokens.
+#[cfg(target_os = "linux")]
+fn usable_token(raw: Option<&str>) -> Option<String> {
+    raw.map(str::trim)
+        .filter(|token| !token.is_empty())
+        .map(str::to_owned)
 }
 
 /// Closes the live portal session, if any (a mouse button replaces the keyboard shortcut).
@@ -637,7 +694,7 @@ async fn activate_portal(_key: &str) -> Result<(), PttUnavailableReason> {
 }
 
 #[cfg(not(target_os = "linux"))]
-async fn capture_portal(normalized: &str) -> ApiResult<String> {
+async fn capture_portal<R: Runtime>(_app: &AppHandle<R>, normalized: &str) -> ApiResult<String> {
     Ok(normalized.to_owned())
 }
 
@@ -646,6 +703,7 @@ mod portal {
     use std::pin::Pin;
     use std::sync::Arc;
 
+    use ashpd::ActivationToken;
     use ashpd::desktop::global_shortcuts::{
         BindShortcutsOptions, ConfigureShortcutsOptions, GlobalShortcuts, NewShortcut, Shortcut,
     };
@@ -759,7 +817,11 @@ mod portal {
 
     /// Opens the desktop's settings for this session's shortcuts (portal version 2) and waits
     /// until the push-to-talk shortcut has a key; returns its trigger description.
-    pub async fn assign(binding: &Binding) -> Result<String, BindError> {
+    /// `activation_token` lets the desktop bring those settings to the front.
+    pub async fn assign(
+        binding: &Binding,
+        activation_token: Option<String>,
+    ) -> Result<String, BindError> {
         let portal = GlobalShortcuts::new()
             .await
             .map_err(BindError::Unavailable)?;
@@ -771,8 +833,10 @@ mod portal {
                 .await
                 .map_err(BindError::Failed)?,
         );
+        let options = ConfigureShortcutsOptions::default()
+            .set_activation_token(activation_token.map(ActivationToken::from));
         portal
-            .configure_shortcuts(&binding.session, None, ConfigureShortcutsOptions::default())
+            .configure_shortcuts(&binding.session, None, options)
             .await
             .map_err(BindError::Failed)?;
         while let Some(event) = next(&mut changed).await {
@@ -1037,18 +1101,31 @@ mod tests {
 
     #[test]
     fn mouse_capture_returns_the_stored_name_without_the_portal() {
+        let app = tauri::test::mock_app();
         let runtime = tokio::runtime::Builder::new_current_thread()
             .build()
             .expect("runtime");
         // Native backends (X11, Windows, macOS) always accept mouse buttons.
         if current_backend() == Backend::GlobalShortcut {
             assert_eq!(
-                runtime.block_on(capture("Mouse4")).ok().as_deref(),
+                runtime
+                    .block_on(capture(app.handle(), "Mouse4"))
+                    .ok()
+                    .as_deref(),
                 Some("Mouse4")
             );
         }
-        let err = runtime.block_on(capture("MouseRight")).err();
+        let err = runtime.block_on(capture(app.handle(), "MouseRight")).err();
         assert_eq!(err.map(|e| e.code), Some(ErrorCode::InvalidInput));
+    }
+
+    #[cfg(target_os = "linux")]
+    #[test]
+    fn empty_activation_tokens_are_dropped() {
+        assert_eq!(usable_token(None), None);
+        assert_eq!(usable_token(Some("")), None);
+        assert_eq!(usable_token(Some("  ")), None);
+        assert_eq!(usable_token(Some("kwin-7")).as_deref(), Some("kwin-7"));
     }
 
     #[cfg(target_os = "linux")]
@@ -1057,11 +1134,12 @@ mod tests {
         if current_backend() != Backend::Portal {
             return;
         }
+        let app = tauri::test::mock_app();
         let runtime = tokio::runtime::Builder::new_current_thread()
             .build()
             .expect("runtime");
         set_evdev_mouse_allowed(false);
-        let err = runtime.block_on(capture("Mouse5")).err();
+        let err = runtime.block_on(capture(app.handle(), "Mouse5")).err();
         assert_eq!(err.map(|e| e.code), Some(ErrorCode::InvalidInput));
         assert_eq!(
             mouse_status().support,
@@ -1069,7 +1147,10 @@ mod tests {
         );
         set_evdev_mouse_allowed(true);
         assert_eq!(
-            runtime.block_on(capture("Mouse5")).ok().as_deref(),
+            runtime
+                .block_on(capture(app.handle(), "Mouse5"))
+                .ok()
+                .as_deref(),
             Some("Mouse5")
         );
         set_evdev_mouse_allowed(false);

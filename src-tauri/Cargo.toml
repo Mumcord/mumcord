@@ -38,6 +38,8 @@ tauri-plugin-global-shortcut.workspace = true
 
 [target.'cfg(target_os = "linux")'.dependencies]
 ashpd = { workspace = true, features = ["global_shortcuts"] }
+# Activation token for the shortcut settings the portal opens (KDE Wayland focus rules).
+gdk.workspace = true
 # Mouse-button push-to-talk: evdev reads on Wayland, XInput2 raw button events on X11.
 libc.workspace = true
 x11rb = { workspace = true, features = ["xinput"] }

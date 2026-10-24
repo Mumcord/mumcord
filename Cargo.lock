@@ -3088,6 +3088,7 @@ dependencies = [
  "ashpd",
  "core-foundation",
  "core-graphics",
+ "gdk",
  "libc",
  "mumcord-engine",
  "serde",
