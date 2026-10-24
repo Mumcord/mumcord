@@ -24,6 +24,9 @@ services:
   v14:
     <<: *mumble
     image: mumblevoip/mumble-server:v1.4.230
+    # This image has no PUID/PGID support and runs as a fixed uid 1000, which cannot write to a
+    # data dir owned by another host user (e.g. uid 1001 on CI runners).
+    user: "${PUID:-1000}:${PGID:-1000}"
     ports: ["64739:64738/tcp", "64739:64738/udp"]
     volumes: ["./data/v14:/data", "./certs/${CERT_SET:-A}:/certs:ro"]
 
