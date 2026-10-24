@@ -1068,7 +1068,9 @@ export function createMockApi(options: MockOptions = {}): MockApi {
       const snap = requireSnapshot();
       const followed =
         conversation.kind === "channel" && snap.followedChannelIds.includes(conversation.channelId);
-      if (followed || conversation.kind !== "channel") {
+      const inOwnChannel =
+        conversation.kind === "channel" && conversation.channelId === selfUser().channelId;
+      if (followed || inOwnChannel || conversation.kind !== "channel") {
         const key = conversationKey(conversation);
         const current = snap.unread.find((u) => conversationKey(u.conversation) === key);
         setUnread(conversation, (current?.count ?? 0) + 1);

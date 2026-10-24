@@ -112,8 +112,19 @@ fn route(state: &ServerState, msg: &TextMessage) -> Option<Route> {
         .map(Route::Channel)
 }
 
-/// Unread badges exist for private chats and followed channels other than the own one.
+/// Unread badges exist for private chats, the own channel and followed channels (FR-1.31).
 fn counts_unread(state: &ServerState, route: Route) -> bool {
+    match route {
+        Route::Private { .. } => true,
+        Route::Channel(c) => state
+            .own_user()
+            .is_some_and(|u| u.channel_id == c || u.listening.contains(&c)),
+    }
+}
+
+/// The message sound stays limited to private chats and followed channels: the own channel's
+/// messages were silent before they counted as unread.
+fn plays_message_sound(state: &ServerState, route: Route) -> bool {
     match route {
         Route::Private { .. } => true,
         Route::Channel(c) => state
@@ -243,14 +254,16 @@ pub(crate) fn on_text(ctx: &SessionCtx, msg: &TextMessage) {
         let route = route(s, msg)?;
         let sender = msg.actor.and_then(|a| s.users.get(&a));
         let unread = counts_unread(s, route);
+        let sound = plays_message_sound(s, route);
         Some((
             route,
             sender.map(|u| u.name.clone()).unwrap_or_default(),
             sender.and_then(|u| u.cert_hash.clone()),
             unread,
+            sound,
         ))
     });
-    let Some((route, sender_name, sender_cert_hash, counts_unread)) = routed else {
+    let Some((route, sender_name, sender_cert_hash, counts_unread, plays_sound)) = routed else {
         return;
     };
     let conversation = match route {
@@ -293,7 +306,9 @@ pub(crate) fn on_text(ctx: &SessionCtx, msg: &TextMessage) {
             conversation,
             count,
         }));
-        ctx.events.sounds().play(Sound::Message);
+        if plays_sound {
+            ctx.events.sounds().play(Sound::Message);
+        }
     }
 }
 
@@ -334,6 +349,20 @@ pub(crate) fn on_synced(ctx: &SessionCtx, snapshot: &mut Snapshot) {
         }
     }
     for ((s, key), count) in unread.iter() {
+        // Counts of the own channel (not followed) live only in memory.
+        if let (true, UnreadKey::Stored(Conversation::Channel(path))) = (*s == server, key)
+            && *count > 0
+            && let Some(channel_id) = ctx.resolve_channel_path(&split_path(path))
+            && !snapshot
+                .unread
+                .iter()
+                .any(|u| u.conversation == ConversationRef::Channel { channel_id })
+        {
+            snapshot.unread.push(UnreadView {
+                conversation: ConversationRef::Channel { channel_id },
+                count: *count,
+            });
+        }
         if let (true, UnreadKey::Stored(Conversation::Private(cert_hash))) = (*s == server, key)
             && *count > 0
         {
@@ -653,12 +682,14 @@ mod tests {
     }
 
     #[test]
-    fn unread_counts_only_private_and_followed_channels() {
+    fn unread_counts_private_own_and_followed_channels() {
         let s = state();
         assert!(counts_unread(&s, Route::Private { session: 5 }));
         assert!(counts_unread(&s, Route::Channel(2)));
-        assert!(!counts_unread(&s, Route::Channel(1)), "own channel");
+        assert!(counts_unread(&s, Route::Channel(1)), "own channel");
         assert!(!counts_unread(&s, Route::Channel(3)), "not followed");
+        assert!(!plays_message_sound(&s, Route::Channel(1)), "own channel");
+        assert!(plays_message_sound(&s, Route::Channel(2)));
     }
 
     #[test]

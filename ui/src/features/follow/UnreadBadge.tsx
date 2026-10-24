@@ -1,20 +1,15 @@
 import { useTranslation } from "react-i18next";
 import { useFollowState } from "./followStore";
 
-/** Unread count of a followed channel for the channel tree (`channelBadge`). */
+/** Unread count of the own or a followed channel for the channel tree (`channelBadge`). */
 export function ChannelUnreadBadge({ channelId }: { channelId: number }) {
-  const { followed, unread } = useFollowState();
-  return (
-    <UnreadBadge
-      count={unread.get(`channel:${String(channelId)}`) ?? 0}
-      following={followed.includes(channelId)}
-    />
-  );
+  const { unread } = useFollowState();
+  return <UnreadBadge count={unread.get(`channel:${String(channelId)}`) ?? 0} />;
 }
 
-export function UnreadBadge({ count, following = true }: { count: number; following?: boolean }) {
+export function UnreadBadge({ count }: { count: number }) {
   const { t } = useTranslation("follow");
-  if (!following || count <= 0) return null;
+  if (count <= 0) return null;
   // The digits are CSS-generated (::before) so the badge adds no DOM text: the visible count stays
   // part of the accessible name (WCAG 2.5.3 label-in-name). The spoken form is the hidden phrase.
   return (

@@ -109,6 +109,29 @@ describe("follow", () => {
     });
   });
 
+  it("counts unread in the own channel while another chat is open and not for own messages", async () => {
+    await setup();
+    const LOBBY = { kind: "channel", channelId: 1 } as const;
+    act(() => {
+      selectConversation(RAID);
+    });
+    act(() => {
+      api.mock.receiveMessage(LOBBY, "psst", 2);
+    });
+    expect(await screen.findByText(/1 unread message/)).toBeInTheDocument();
+    act(() => {
+      selectConversation(LOBBY);
+    });
+    await waitFor(() => {
+      expect(screen.queryByText(/unread message/)).toBeNull();
+    });
+    act(() => {
+      selectConversation(RAID);
+    });
+    await act(() => api.sendChannelMessage(1, "mine"));
+    expect(screen.queryByText(/unread message/)).toBeNull();
+  });
+
   // The count is CSS-generated, so the badge adds no visible DOM text beyond its accessible name.
   it("keeps the unread count out of DOM text but inside the treeitem's name", async () => {
     await setup();
