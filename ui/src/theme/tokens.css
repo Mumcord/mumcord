@@ -54,6 +54,16 @@
   --color-warning: #fbbf24;
   --color-danger: #fb8b8b;
   --color-talking: #4ade80;
+  /* Initials avatar backgrounds: no greens or teals (talking ring); white text >= 4.5:1. */
+  --color-avatar-text: #ffffff;
+  --color-avatar-1: #4f46e5;
+  --color-avatar-2: #7c3aed;
+  --color-avatar-3: #a21caf;
+  --color-avatar-4: #db2777;
+  --color-avatar-5: #dc2626;
+  --color-avatar-6: #c2410c;
+  --color-avatar-7: #b45309;
+  --color-avatar-8: #2563eb;
   --color-border: #2e3553;
   --color-border-strong: #7b83a9;
   --color-focus: #fcd34d;
@@ -77,6 +87,16 @@
   --color-warning: #8a5300;
   --color-danger: #b01c1c;
   --color-talking: #15803d;
+  /* Initials avatar backgrounds: no greens or teals (talking ring); white text >= 4.5:1. */
+  --color-avatar-text: #ffffff;
+  --color-avatar-1: #4f46e5;
+  --color-avatar-2: #7c3aed;
+  --color-avatar-3: #a21caf;
+  --color-avatar-4: #db2777;
+  --color-avatar-5: #dc2626;
+  --color-avatar-6: #c2410c;
+  --color-avatar-7: #b45309;
+  --color-avatar-8: #2563eb;
   --color-border: #c6cbdc;
   --color-border-strong: #6f7593;
   --color-focus: #6d28d9;

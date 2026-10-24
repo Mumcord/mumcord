@@ -6,10 +6,9 @@
   width: 2rem;
   height: 2rem;
   overflow: hidden;
-  border: 2px solid transparent;
   border-radius: var(--radius-full);
-  background: var(--color-accent);
-  color: var(--color-on-accent);
+  background: var(--avatar-bg, var(--color-avatar-1));
+  color: var(--color-avatar-text);
   font-weight: var(--font-weight-bold);
 }
 
@@ -26,7 +25,9 @@
 }
 
 .avatar[data-talking="true"] {
-  box-shadow: 0 0 0 2px var(--color-talking);
+  /* Outline, not border: gap and ring sit outside the box, so rows never shift. */
+  outline: 2px solid var(--color-talking);
+  outline-offset: 1px;
 }
 
 .avatar img {
@@ -160,8 +161,8 @@
 
 .profile-card__pm {
   border-color: var(--color-accent);
-  background: var(--color-accent);
-  color: var(--color-on-accent);
+  background: var(--avatar-bg, var(--color-avatar-1));
+  color: var(--color-avatar-text);
 }
 
 .profile-card__error {
