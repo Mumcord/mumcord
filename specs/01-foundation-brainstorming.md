@@ -923,3 +923,13 @@ Measured in `specs/01-foundation-scale-report.md`; performance fixes are done wi
 ✍️ Note: Requested in chat during /dev.
 
 ---
+
+#### QA.33 Unread count for the user's own channel? `◉`
+Until now only followed channels counted unread messages.
+
+- [x] **Every channel the user receives messages from counts unread messages while its chat is not on screen – the own channel (voice or read-only landing) as well as followed channels.** Opening the chat marks them read.
+- [ ] Followed channels only.
+
+✍️ Note: Asked in chat during /dev; consistent with the notification rule (QA.16).
+
+---
