@@ -194,6 +194,11 @@
 | B33 | 1b settings UI | open | | B30, B32 | simple | FR-1.41, 1.43, 1.45, 1.46 | ui/src/features/settings/positional/ |
 | C9 | Verify positional audio | open | | B31, B33 | complex | AC-1.31, 1.32 | e2e/specs/positional |
 | C10 | Verify overlay | open | | B32, B33 | simple | AC-1.33, 1.34 | e2e/specs/overlay |
+| B34 | Link previews + YouTube/Twitch player cards (FR-1.49, 1.50) | open | | G1 | complex | AC-1.39, 1.40 | crates/engine (metadata fetch), ui chat, wizard, settings |
+| B35 | Mentions with autocomplete (FR-1.51) | open | | G1 | simple | AC-1.41 | ui chat input, notifications |
+| B36 | Tenor GIF search (FR-1.52) | open | | G1 | complex | AC-1.42 | ui chat input, CI secret |
+| B37 | Code highlighting + formatting toolbar/shortcuts (FR-1.53, 1.54) | open | | G1 | simple | AC-1.43, 1.44 | ui chat |
+| B38 | External images and image links inline (FR-1.55) | open | | B34 | complex | AC-1.45 | crates/engine (image fetch), ui chat |
 | D1 | Implementation report | open | | C1–C10 | simple | all | specs/01-foundation-implementation.md |
 
 ## Contracts from finished tasks
