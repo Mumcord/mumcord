@@ -1,0 +1,45 @@
+{
+  "unknownName": "You",
+  "mute": "Mute microphone",
+  "deafen": "Deafen",
+  "settings": "Settings",
+  "menu": "User menu",
+  "menuProfile": "Edit profile",
+  "menuRegister": "Register on this server",
+  "announce": {
+    "muted": "Microphone muted",
+    "unmuted": "Microphone unmuted",
+    "deafened": "Deafened. You cannot hear others and your microphone is muted",
+    "undeafened": "Undeafened"
+  },
+  "profile": {
+    "title": "Edit profile",
+    "chooseTitle": "Choose a profile picture",
+    "chooseAvatar": "Choose picture…",
+    "removeAvatar": "Remove picture",
+    "avatarHint": "The picture is scaled down to fit the server's limit.",
+    "avatarChosen": "Selected: {{name}}",
+    "avatarRemoved": "The picture will be removed when you save.",
+    "comment": "About you"
+  },
+  "register": {
+    "title": "Register on this server",
+    "explain": "Registering reserves your name on this server. Nobody else can use it, and the server remembers you the next time you connect.",
+    "backup": "Your identity is what proves that the name is yours. If you lose it, you lose access to the registered name. Save a backup copy now and keep it safe.",
+    "password": "Password for the backup file",
+    "export": "Export identity",
+    "saveTitle": "Save identity backup",
+    "passwordRequired": "Enter a password to protect the backup file.",
+    "exported": "Identity backup saved.",
+    "confirm": "Register",
+    "done": "Registered on this server"
+  },
+  "errors": {
+    "tooLarge": "This is too large for the server. Choose a smaller picture or write a shorter text.",
+    "denied": "The server does not allow this.",
+    "deniedWithReason": "The server does not allow this: {{reason}}",
+    "notConnected": "You are not connected to a server.",
+    "file": "The file could not be read or written.",
+    "generic": "Something went wrong. Please try again."
+  }
+}
