@@ -35,8 +35,12 @@ import {
 } from "./client";
 
 export interface MockOptions {
-  /** "fresh" simulates the first start (no identity, no servers, wizard pending). */
-  seed?: "fresh" | "ready";
+  /**
+   * "fresh" simulates the first start (no identity, no servers, wizard pending); "demo" fills
+   * the "ready" state with richer fictional data for screenshots, "demoFresh" is the first start
+   * with demo behaviour. Defaults to `VITE_MUMCORD_MOCK_SEED`, then "ready".
+   */
+  seed?: "fresh" | "ready" | "demo" | "demoFresh";
   /** Simulated server: protocol version and listener limit. */
   serverVersion?: string;
   maxListeners?: number;
@@ -133,6 +137,81 @@ function seedChannels(): ChannelInfo[] {
   ];
 }
 
+/** Fictional demo data for screenshots (seed "demo"); example.org addresses only. */
+const DEMO_SERVERS: [string, string][] = [
+  ["Night Owls", "voice.example.org"],
+  ["Studio Crew", "studio.example.org"],
+  ["Weekend League", "league.example.net"],
+  ["Book Club", "books.example.com"],
+];
+
+function demoChannels(): ChannelInfo[] {
+  const channel = (id: number, parentId: number, name: string, position: number) => ({
+    id,
+    parentId,
+    name,
+    position,
+    permissions: { ...allow },
+  });
+  return [
+    { ...channel(0, 0, "Night Owls", 0), parentId: null },
+    channel(1, 0, "Lobby", 0),
+    channel(2, 0, "Gaming", 1),
+    channel(4, 2, "Squad A", 0),
+    channel(5, 2, "Squad B", 1),
+    channel(6, 0, "Music Room", 2),
+    channel(7, 0, "Study Hall", 3),
+    { ...channel(3, 0, "AFK", 4), permissions: { ...allow, textMessage: false } },
+  ];
+}
+
+/** Abstract head-and-shoulders picture on a gradient, standing in for an uploaded avatar. */
+function demoAvatar(from: string, to: string): string {
+  const svg =
+    `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">` +
+    `<defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1">` +
+    `<stop offset="0" stop-color="${from}"/><stop offset="1" stop-color="${to}"/></linearGradient></defs>` +
+    `<rect width="64" height="64" fill="url(#g)"/>` +
+    `<circle cx="32" cy="25" r="11" fill="#fff" fill-opacity=".85"/>` +
+    `<path d="M10 64c2-14 11-21 22-21s20 7 22 21z" fill="#fff" fill-opacity=".85"/></svg>`;
+  return `data:image/svg+xml,${encodeURIComponent(svg)}`;
+}
+
+const DEMO_AVATARS = new Map<number, string>([
+  [SELF_SESSION, demoAvatar("#14b8a6", "#3b82f6")],
+  [2, demoAvatar("#f59e0b", "#db2777")],
+  [5, demoAvatar("#6366f1", "#06b6d4")],
+  [7, demoAvatar("#8b5cf6", "#ec4899")],
+  [9, demoAvatar("#0ea5e9", "#22c55e")],
+]);
+
+function demoHistory(): ChatMessage[] {
+  const lines: [number, string, string, number][] = [
+    [2, "Maya", "Evening everyone! Anyone up for a round later?", 34],
+    [5, "Jonas", "Count me in. Give me twenty minutes to finish dinner.", 31],
+    [7, "Priya", "I'm in too. Same squads as last week?", 29],
+    [SELF_SESSION, "Zoe", "Sounds good. I'll open <b>Squad A</b> once we're all here.", 27],
+    [
+      2,
+      "Maya",
+      `Perfect. Here are the notes from last time: <a href="https://example.org/notes">example.org/notes</a>`,
+      12,
+    ],
+    [2, "Maya", "Also: new mics sound great, thanks for the tips!", 11],
+    [5, "Jonas", "Back. Who's hosting?", 2],
+  ];
+  return lines.map(([session, name, body, minutesAgo], index) => ({
+    id: `demo-${String(index)}`,
+    conversation: { kind: "channel", channelId: 1 },
+    senderName: name,
+    senderCertHash: `${name.toLowerCase()}hash`,
+    senderSession: session,
+    own: session === SELF_SESSION,
+    sentAt: new Date(Date.now() - minutesAgo * 60_000).toISOString(),
+    body,
+  }));
+}
+
 function person(session: number, name: string, channelId: number, certHash: string | null): User {
   return {
     session,
@@ -194,7 +273,9 @@ function parseLink(url: string): MumbleLink {
 const MIC_TEST_PHASE_MS = 5000;
 
 export function createMockApi(options: MockOptions = {}): MockApi {
-  const fresh = options.seed === "fresh";
+  const seed = options.seed ?? import.meta.env.VITE_MUMCORD_MOCK_SEED ?? "ready";
+  const fresh = seed === "fresh" || seed === "demoFresh";
+  const demo = seed === "demo" || seed === "demoFresh";
   const serverVersion = options.serverVersion ?? "1.5.735";
   const maxListeners = options.maxListeners ?? 2;
   const connectDelayMs = options.connectDelayMs ?? 0;
@@ -205,21 +286,31 @@ export function createMockApi(options: MockOptions = {}): MockApi {
 
   let identity: Identity | null = fresh ? null : { name: "Zoe", certHash: "selfhash" };
   let settings: Settings = { ...DEFAULT_SETTINGS, wizardCompleted: !fresh };
-  let defaultAvatar: string | null = null;
+  let defaultAvatar: string | null = demo ? demoAvatar("#14b8a6", "#3b82f6") : null;
   let servers: SavedServer[] = fresh
     ? []
-    : [
-        {
-          id: 1,
-          label: "Local test server",
-          address: "localhost",
+    : demo
+      ? DEMO_SERVERS.map(([label, address], index) => ({
+          id: index + 1,
+          label,
+          address,
           port: 64738,
           username: "Zoe",
           hasPassword: false,
           saveHistory: true,
-        },
-      ];
-  let nextServerId = 2;
+        }))
+      : [
+          {
+            id: 1,
+            label: "Local test server",
+            address: "localhost",
+            port: 64738,
+            username: "Zoe",
+            hasPassword: false,
+            saveHistory: true,
+          },
+        ];
+  let nextServerId = servers.length + 1;
   let nextMessageId = 1;
   let linkHandler = false;
   let state: ConnectionState = { state: "disconnected", error: null };
@@ -235,7 +326,11 @@ export function createMockApi(options: MockOptions = {}): MockApi {
   let ownVoice = { mute: false, deaf: false };
   const rejoinOffers = new Map<number, string[]>();
   // History per server id, keyed by conversation.
-  const history = new Map<number, Map<string, ChatMessage[]>>();
+  const history = new Map<number, Map<string, ChatMessage[]>>(
+    demo
+      ? [[1, new Map([[conversationKey({ kind: "channel", channelId: 1 }), demoHistory()]])]]
+      : [],
+  );
 
   function emit<K extends EventName>(event: K, payload: EventPayloads[K]): void {
     const set = listeners.get(event);
@@ -358,7 +453,7 @@ export function createMockApi(options: MockOptions = {}): MockApi {
   }
 
   function buildSnapshot(serverId: number, channelPath: string[] | null): ServerSnapshot {
-    const channels = seedChannels();
+    const channels = demo ? demoChannels() : seedChannels();
     const target = (channelPath && findChannelByPath(channels, channelPath)) ?? channels[1];
     // Like the engine: a fresh connect lands read-only (muted + deafened), a link path joins.
     readOnly = channelPath === null;
@@ -381,7 +476,9 @@ export function createMockApi(options: MockOptions = {}): MockApi {
     const info: ServerInfo = {
       version: serverVersion,
       followSupported: !serverVersion.startsWith("1.3") && !serverVersion.startsWith("1.2"),
-      welcomeText: "Welcome to the <b>mock</b> server.",
+      welcomeText: demo
+        ? `Welcome to <b>${requireServer(serverId).label}</b>. Be kind and have fun!`
+        : "Welcome to the <b>mock</b> server.",
       maxMessageLength: 5000,
       maxImageMessageLength: 131072,
       allowHtml: true,
@@ -391,12 +488,32 @@ export function createMockApi(options: MockOptions = {}): MockApi {
       selfSession: SELF_SESSION,
       info,
       channels,
-      users: [self, anna, person(3, "Ben", 1, null), carla],
+      users: demo ? demoUsers(self) : [self, anna, person(3, "Ben", 1, null), carla],
       followedChannelIds: [],
       unread: [],
       readOnly,
       rejoinChannelId: offer?.id ?? null,
     };
+  }
+
+  function demoUsers(self: User): User[] {
+    const withAvatar = (user: User): User => ({
+      ...user,
+      hasAvatar: true,
+      avatarHash: `demo-${String(user.session)}`,
+    });
+    return [
+      withAvatar(self),
+      withAvatar({ ...person(2, "Maya", 1, "mayahash"), hasComment: true }),
+      withAvatar(person(5, "Jonas", 1, "jonashash")),
+      withAvatar(person(7, "Priya", 1, "priyahash")),
+      { ...person(3, "Ben", 1, null), selfMute: true },
+      { ...person(4, "Carla", 7, "carlahash"), listeningChannelIds: [1] },
+      person(6, "Leo", 4, "leohash"),
+      withAvatar(person(9, "Sam", 4, "samhash")),
+      person(8, "Elif", 6, "elifhash"),
+      { ...person(10, "Noah", 3, "noahhash"), selfMute: true, selfDeaf: true },
+    ];
   }
 
   function finishConnect(serverId: number, channelPath: string[] | null): void {
@@ -610,7 +727,8 @@ export function createMockApi(options: MockOptions = {}): MockApi {
       return Promise.resolve({
         comment: user.hasComment ? `<p>Hi, I am ${user.name}.</p>` : null,
         avatar: user.hasAvatar
-          ? "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAIAAAD8GO2jAAAAd0lEQVR42u3UwQ2AMAwDwE7HGt2DCRmDTdw/KIlFHIRQrHzrE5Qwzn2WzmiggQZoALcoARjRAHCTBUDkOQA6H35FAuCYmz8+EB7/DYCCXJ+gov1dQGiYl1wOSIz4MxW2m3ugavcWTdIeb3Kmmv1VOAxzlgIyUw4sffQx8QiPKKAAAAAASUVORK5CYII="
+          ? ((demo ? DEMO_AVATARS.get(session) : undefined) ??
+            "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAIAAAD8GO2jAAAAd0lEQVR42u3UwQ2AMAwDwE7HGt2DCRmDTdw/KIlFHIRQrHzrE5Qwzn2WzmiggQZoALcoARjRAHCTBUDkOQA6H35FAuCYmz8+EB7/DYCCXJ+gov1dQGiYl1wOSIz4MxW2m3ugavcWTdIeb3Kmmv1VOAxzlgIyUw4sffQx8QiPKKAAAAAASUVORK5CYII=")
           : null,
       });
     },
@@ -739,8 +857,9 @@ export function createMockApi(options: MockOptions = {}): MockApi {
 
     // push-to-talk
     pttAvailability: () => Promise.resolve<PttAvailability>({ status: "available" }),
-    // Mouse buttons come back unchanged (no desktop dialog), keyboard keys as "F13".
-    pttCaptureKey: (key) => Promise.resolve(/^Mouse(Middle|4|5)$/.test(key) ? key : "F13"),
+    // Mouse buttons come back unchanged (no desktop dialog), keyboard keys as "F13" (the demo
+    // keeps the pressed key so screenshots show a realistic shortcut).
+    pttCaptureKey: (key) => Promise.resolve(demo || /^Mouse(Middle|4|5)$/.test(key) ? key : "F13"),
     pttMouseStatus: () => Promise.resolve<PttMouseStatus>({ support: "native", state: "ready" }),
     pttCaptureCancel: () => Promise.resolve(null),
     pttSession: () => Promise.resolve({ waylandDesktop: false, compatibilityActive: false }),
@@ -762,12 +881,21 @@ export function createMockApi(options: MockOptions = {}): MockApi {
     // diagnostics
     diagnosticsSave: () => Promise.resolve(null),
     appInfo: () =>
-      Promise.resolve({
-        version: "0.0.0-mock",
-        os: "mock",
-        thirdPartyNotices:
-          "Mumble\nCopyright (c) The Mumble Developers\nBSD-3-Clause\n\nSome library - Apache-2.0",
-      }),
+      Promise.resolve(
+        demo
+          ? {
+              version: "0.1.0",
+              os: "Linux x86_64",
+              thirdPartyNotices:
+                "Mumble\nCopyright (c) The Mumble Developers\nBSD-3-Clause\n\nTauri - Apache-2.0 OR MIT\n\nReact - MIT",
+            }
+          : {
+              version: "0.0.0-mock",
+              os: "mock",
+              thirdPartyNotices:
+                "Mumble\nCopyright (c) The Mumble Developers\nBSD-3-Clause\n\nSome library - Apache-2.0",
+            },
+      ),
   };
 
   // Turns synchronous throws into rejections and applies injected failures.
