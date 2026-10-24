@@ -94,7 +94,7 @@ Mumcord enforces nothing itself; the server's ACLs decide. The client reflects p
 - **FR-1.24** Audio quality is automatic: the highest bitrate the server allows, lowered automatically when packet loss rises, raised again when it recovers (Q3.5).
 - **FR-1.25** Playback uses an adaptive jitter buffer: minimal delay on stable connections, small extra buffer only when packets arrive unevenly (Q3.7).
 - **FR-1.26** Voice goes via UDP; if UDP is blocked, it falls back to tunnelling through the TCP connection automatically.
-- **FR-1.27** Short, subtle sounds for: someone joins/leaves your channel, self mute/unmute, self deafen/undeafen, new message in a followed channel or private chat. No text-to-speech (Q3.8). Sounds can be toggled per event.
+- **FR-1.27** Short, subtle sounds for: someone joins/leaves your channel, self mute/unmute, self deafen/undeafen, new message in a followed channel or private chat, and a short "hang up" sound when the user disconnects (QA.19). No text-to-speech (Q3.8). Sounds can be toggled per event.
 
 ### 4.5 Text chat
 - **FR-1.28** Each channel and each private conversation has a chat view with input field. Sending to a channel requires the server's "Text message" permission; denials are shown inline.
@@ -428,6 +428,7 @@ Unless stated otherwise: a fresh Mumcord install, a local test server (1.5) runn
 | QA.16 | In-app toast + desktop notification for new messages in all received channels and private chats (not the open chat), click opens the chat; grouped; switchable | Addendum 2026-10-24; FR-1.48c, out of scope list |
 | QA.17 | Autostart at login (wizard + settings, default off), start minimized to tray | Addendum 2026-10-24; FR-1.48d |
 | QA.18 | Voice channel highlighted in the channel list, distinct from the selected channel | Addendum 2026-10-24; FR-1.15 |
+| QA.19 | "Hang up" sound on user-initiated disconnect, switchable | Addendum 2026-10-24; FR-1.27 |
 
 ## 13. Open points & risks
 

@@ -788,3 +788,12 @@ Desktop notifications were planned for Epic 3.
 ✍️ Note: Requested in chat during /dev.
 
 ---
+
+#### QA.19 Sound when disconnecting? `◉`
+
+- [x] **A short, subtle "hang up" sound plays when the user disconnects from a server (Disconnect button, context menu, switching server, quitting while connected is excluded), switchable like the other sounds.**
+- [ ] No sound.
+
+✍️ Note: Requested in chat during /dev.
+
+---
