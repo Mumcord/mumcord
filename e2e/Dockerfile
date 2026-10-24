@@ -10,7 +10,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
       ca-certificates curl gnupg git build-essential pkg-config cmake file \
       libwebkit2gtk-4.1-dev libayatana-appindicator3-dev librsvg2-dev libxdo-dev libasound2-dev \
       libssl-dev webkit2gtk-driver \
-      xvfb xauth dbus dbus-x11 gnome-keyring libsecret-tools xdotool \
+      xvfb xauth dbus dbus-x11 libnss-wrapper gnome-keyring libsecret-tools xdotool \
       sqlite3 openssl \
     && rm -rf /var/lib/apt/lists/*
 

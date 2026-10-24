@@ -3,6 +3,18 @@
 # Xvfb, then builds the app (debug, feature test-backend), bot and netsim, then runs WebdriverIO.
 set -euo pipefail
 
+# The container runs as the host uid (e.g. 1001 on GitHub runners), which has no /etc/passwd entry
+# here; dbus-daemon refuses to start without one. Fake the entry with nss_wrapper.
+if ! getent passwd "$(id -u)" >/dev/null; then
+  nss_dir="$(mktemp -d)"
+  cat /etc/passwd > "$nss_dir/passwd"
+  echo "e2e:x:$(id -u):$(id -g):e2e:${HOME:-/cache/home}:/bin/bash" >> "$nss_dir/passwd"
+  cat /etc/group > "$nss_dir/group"
+  getent group "$(id -g)" >/dev/null || echo "e2e:x:$(id -g):" >> "$nss_dir/group"
+  export NSS_WRAPPER_PASSWD="$nss_dir/passwd" NSS_WRAPPER_GROUP="$nss_dir/group"
+  export LD_PRELOAD="$(ls /usr/lib/*/libnss_wrapper.so | head -n1)${LD_PRELOAD:+:$LD_PRELOAD}"
+fi
+
 if [ -z "${DBUS_SESSION_BUS_ADDRESS:-}" ]; then
   exec dbus-run-session -- "$0" "$@"
 fi
