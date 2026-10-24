@@ -1,5 +1,7 @@
 {
   "compilerOptions": {
+    "composite": true,
+    "tsBuildInfoFile": "../node_modules/.tmp/e2e.tsbuildinfo",
     "target": "ES2023",
     "lib": ["ES2023", "DOM"],
     "module": "ESNext",
