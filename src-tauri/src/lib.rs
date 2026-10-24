@@ -60,6 +60,8 @@ fn specta_builder() -> Builder<tauri::Wry> {
             history::history_clear,
             history::history_set_saving,
             profile::set_own_avatar,
+            profile::default_avatar_get,
+            profile::default_avatar_set,
             profile::set_own_comment,
             profile::register_self,
             settings::settings_get,
@@ -96,6 +98,7 @@ fn specta_builder() -> Builder<tauri::Wry> {
             audio::MicLevel,
             audio::MicTestPhaseChanged,
             app::CloseRequested,
+            profile::DefaultAvatarSkipped,
         ])
 }
 
@@ -239,6 +242,10 @@ fn emit_engine_event(app: &AppHandle, event: EngineEvent) -> tauri::Result<()> {
         EngineEvent::UnreadChanged(unread) => follow::UnreadChanged {
             conversation: unread.conversation.into(),
             count: unread.count,
+        }
+        .emit(app),
+        EngineEvent::DefaultAvatarSkipped { server_id } => profile::DefaultAvatarSkipped {
+            server_id: commands::types::to_api_server_id(server_id),
         }
         .emit(app),
     }

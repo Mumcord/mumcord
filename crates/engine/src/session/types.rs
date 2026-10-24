@@ -284,6 +284,11 @@ pub enum EngineEvent {
     /// returned by the send call).
     MessageReceived(Box<crate::chat::ChatMessageView>),
     UnreadChanged(UnreadView),
+    /// The default avatar could not be sent to this server because it cannot fit the
+    /// server's image limit (FR-1.47).
+    DefaultAvatarSkipped {
+        server_id: ServerId,
+    },
 }
 
 /// Phase of the mic test: record, play back, finished or failed to start.

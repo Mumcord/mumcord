@@ -1,0 +1,188 @@
+//! Default avatar sent once per saved server (FR-1.47, AC-1.36) against the local test
+//! server, checked by a bot. `testenv/up.sh v14`, then:
+//! `MUMCORD_LIVE=1 cargo test -p mumcord-engine --features test-backend --test live_default_avatar -- --ignored --test-threads=1`
+#![cfg(feature = "test-backend")]
+
+use std::path::{Path, PathBuf};
+use std::time::Duration;
+
+use mumcord_bot::samples::PNG;
+use mumcord_bot::{Bot, BotConfig, UserCheck, env};
+use mumcord_engine::{
+    ConnState, Engine, EngineEvent, PasswordChange, SecretStore, ServerFields, ServerView,
+};
+use tokio::sync::mpsc::UnboundedReceiver;
+
+const PORT: u16 = 64739;
+const WAIT: Duration = Duration::from_secs(20);
+/// Time the engine gets to (wrongly) send an avatar before the bot checks there is none.
+const SETTLE: Duration = Duration::from_secs(3);
+
+fn live() -> bool {
+    let on = std::env::var("MUMCORD_LIVE").is_ok_and(|v| v == "1");
+    if !on {
+        eprintln!("skipped: set MUMCORD_LIVE=1 and start the test servers");
+    }
+    on
+}
+
+fn unique(prefix: &str) -> String {
+    let nanos = std::time::SystemTime::now()
+        .duration_since(std::time::UNIX_EPOCH)
+        .map(|d| d.subsec_nanos())
+        .unwrap_or(0);
+    format!("{prefix}-{:06x}", (nanos ^ std::process::id()) & 0xff_ffff)
+}
+
+fn work_dir(name: &str) -> PathBuf {
+    let dir = Path::new(env!("CARGO_TARGET_TMPDIR")).join(name);
+    let _ = std::fs::remove_dir_all(&dir);
+    std::fs::create_dir_all(&dir).expect("work dir");
+    dir
+}
+
+async fn wait_for<T>(
+    rx: &mut UnboundedReceiver<EngineEvent>,
+    what: &str,
+    mut pick: impl FnMut(&EngineEvent) -> Option<T>,
+) -> T {
+    let deadline = tokio::time::Instant::now() + WAIT;
+    loop {
+        let event = tokio::time::timeout_at(deadline, rx.recv())
+            .await
+            .unwrap_or_else(|_| panic!("timed out waiting for {what}"))
+            .expect("event stream open");
+        if let Some(found) = pick(&event) {
+            return found;
+        }
+    }
+}
+
+async fn add_server(engine: &Engine, name: &str) -> ServerView {
+    engine
+        .server_add(ServerFields {
+            label: format!("test {PORT} {name}"),
+            address: "127.0.0.1".into(),
+            port: PORT,
+            username: name.into(),
+            password: match env::testenv_var("SERVER_PASSWORD") {
+                Some(p) => PasswordChange::Set(p),
+                None => PasswordChange::Keep,
+            },
+        })
+        .await
+        .expect("server")
+}
+
+/// Fresh connect, trusting the server certificate on first use.
+async fn connect(engine: &Engine, rx: &mut UnboundedReceiver<EngineEvent>, server: &ServerView) {
+    engine.connect(server.id, None).expect("connect");
+    loop {
+        let event = wait_for(rx, "sync", |e| match e {
+            EngineEvent::CertTrustRequired { .. } | EngineEvent::ServerSynced(_) => Some(e.clone()),
+            _ => None,
+        })
+        .await;
+        match event {
+            EngineEvent::CertTrustRequired {
+                server_id,
+                fingerprint,
+                ..
+            } => engine
+                .cert_trust_decide(server_id, &fingerprint, true)
+                .expect("trust"),
+            EngineEvent::ServerSynced(_) => return,
+            _ => unreachable!(),
+        }
+    }
+}
+
+async fn disconnect(engine: &Engine, rx: &mut UnboundedReceiver<EngineEvent>) {
+    engine.disconnect();
+    wait_for(rx, "disconnected", |e| {
+        matches!(e, EngineEvent::StateChanged(ConnState::Disconnected { .. })).then_some(())
+    })
+    .await;
+}
+
+fn avatar(has: bool) -> UserCheck {
+    UserCheck {
+        has_avatar: Some(has),
+        ..UserCheck::default()
+    }
+}
+
+#[tokio::test(flavor = "multi_thread", worker_threads = 4)]
+#[ignore = "needs testenv v14 (MUMCORD_LIVE=1)"]
+async fn default_avatar_is_sent_once_per_server() {
+    if !live() {
+        return;
+    }
+    // SAFETY: set before any audio thread exists; tests run with --test-threads=1.
+    unsafe { std::env::set_var("MUMCORD_AUDIO_BACKEND", "null") };
+    let dir = work_dir("live_default_avatar");
+    let (engine, mut rx) = Engine::new(
+        &dir.join("data"),
+        SecretStore::in_memory(),
+        tokio::runtime::Handle::current(),
+    )
+    .expect("engine");
+    engine
+        .identity_create("Avatar Tester".into())
+        .await
+        .expect("identity");
+    assert!(engine.settings().expect("settings").send_default_avatar);
+    let source = dir.join("me.png");
+    std::fs::write(&source, PNG).expect("image");
+    let preview = engine
+        .default_avatar_set(Some(source))
+        .await
+        .expect("set default avatar");
+    assert!(preview.is_some_and(|p| p.starts_with("data:image/png;base64,")));
+
+    let bot = Bot::connect(BotConfig {
+        data_dir: Some(dir.join("bot")),
+        ..BotConfig::new(&unique("f32-bot"), PORT)
+    })
+    .await
+    .expect("bot");
+
+    // Fresh server without an avatar there: the default avatar is sent.
+    let first_name = unique("f32-first");
+    let first = add_server(&engine, &first_name).await;
+    connect(&engine, &mut rx, &first).await;
+    bot.wait_user(&first_name, &avatar(true))
+        .await
+        .expect("bot sees the default avatar");
+
+    // The engine remembers the server once the server confirmed the avatar; a human never
+    // removes it faster than that.
+    tokio::time::sleep(SETTLE).await;
+
+    // Removed manually, then disconnect and connect again: not sent a second time.
+    engine.set_own_avatar(None).await.expect("remove avatar");
+    bot.wait_user(&first_name, &avatar(false))
+        .await
+        .expect("bot sees the removal");
+    disconnect(&engine, &mut rx).await;
+    bot.wait_user_gone(&first_name).await.expect("gone");
+    connect(&engine, &mut rx, &first).await;
+    tokio::time::sleep(SETTLE).await;
+    bot.wait_user(&first_name, &avatar(false))
+        .await
+        .expect("not re-sent after manual removal");
+    disconnect(&engine, &mut rx).await;
+
+    // Setting off, another fresh server: nothing is sent.
+    let mut settings = engine.settings().expect("settings");
+    settings.send_default_avatar = false;
+    engine.update_settings(settings).await.expect("toggle off");
+    let second_name = unique("f32-second");
+    let second = add_server(&engine, &second_name).await;
+    connect(&engine, &mut rx, &second).await;
+    tokio::time::sleep(SETTLE).await;
+    bot.wait_user(&second_name, &avatar(false))
+        .await
+        .expect("no avatar with the setting off");
+    disconnect(&engine, &mut rx).await;
+}

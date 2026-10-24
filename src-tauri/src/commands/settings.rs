@@ -77,6 +77,8 @@ pub struct Settings {
     pub sounds: SoundSettings,
     pub close_behaviour: CloseBehaviour,
     pub log_level: LogLevel,
+    /// Send the default avatar to servers connected to for the first time (FR-1.47).
+    pub send_default_avatar: bool,
 }
 
 impl Settings {
@@ -122,6 +124,7 @@ impl Settings {
                 store::LogLevel::Info => LogLevel::Info,
                 store::LogLevel::Debug => LogLevel::Debug,
             },
+            send_default_avatar: s.send_default_avatar,
         }
     }
 
@@ -168,6 +171,7 @@ impl Settings {
             LogLevel::Info => store::LogLevel::Info,
             LogLevel::Debug => store::LogLevel::Debug,
         };
+        s.send_default_avatar = self.send_default_avatar;
         s
     }
 }
@@ -243,6 +247,7 @@ mod tests {
         assert_eq!(ui.language, Some(Language::De));
         assert!(!ui.wizard_completed);
         assert_eq!(ui.log_level, LogLevel::Info);
+        assert!(ui.send_default_avatar);
 
         ui.wizard_completed = true;
         ui.talk_mode = TalkMode::PushToTalk;
@@ -250,7 +255,9 @@ mod tests {
         ui.sounds.join_leave = false;
         ui.log_level = LogLevel::Debug;
         ui.input_device = Some(String::new());
+        ui.send_default_avatar = false;
         let stored = ui.to_store(&base);
+        assert!(!stored.send_default_avatar);
         assert!(stored.overlay.enabled);
         assert_eq!(stored.enabled_plugins, ["gtav"]);
         assert!(stored.wizard_completed);

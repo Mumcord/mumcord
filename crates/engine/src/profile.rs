@@ -1,7 +1,7 @@
-//! Own avatar, comment and self-registration (FR-1.20, FR-1.34).
+//! Own avatar, default avatar, comment and self-registration (FR-1.20, FR-1.34, FR-1.47).
 
 use std::io::Cursor;
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 
 use image::codecs::jpeg::JpegEncoder;
 use image::{DynamicImage, ImageFormat};
@@ -9,8 +9,12 @@ use mumcord_protocol::{DenyKind, PermissionDenied, permissions};
 
 use crate::chat::{IMAGE_SOFT_CAP, check_text_size};
 use crate::follow::{OnTimeout, confirm, subscribe_denials};
+use crate::people::avatar_data_url;
 use crate::session::convert::{ROOT_CHANNEL, command_error};
-use crate::session::{Engine, EngineError, EngineResult, ErrorKind};
+use crate::session::{Engine, EngineError, EngineEvent, EngineResult, ErrorKind, SessionCtx};
+
+/// File name of the default avatar inside the app data directory (FR-1.47).
+pub const DEFAULT_AVATAR_FILE: &str = "default_avatar.png";
 
 /// Largest avatar edge in pixels (what Mumble clients display).
 const AVATAR_SIZE: u32 = 128;
@@ -71,51 +75,219 @@ fn is_profile_denial(denied: &PermissionDenied, own: Option<u32>) -> bool {
     }
 }
 
+/// The server's image size limit in bytes.
+fn image_limit(ctx: &SessionCtx) -> usize {
+    let limit = match ctx.handle.with_state(|s| s.server.image_message_length) {
+        Some(0) | None => IMAGE_SOFT_CAP,
+        Some(n) => n,
+    };
+    limit as usize
+}
+
+/// Reads an image file and encodes it with `encode_avatar` off the async runtime.
+async fn encode_avatar_file(path: PathBuf, limit: usize) -> EngineResult<Vec<u8>> {
+    tokio::task::spawn_blocking(move || {
+        let bytes = std::fs::read(&path).map_err(|e| {
+            EngineError::new(ErrorKind::Io, format!("reading the image failed: {e}"))
+        })?;
+        encode_avatar(&bytes, limit)
+    })
+    .await
+    .map_err(|e| EngineError::internal(e.to_string()))?
+}
+
+/// Sends `texture` as the own avatar (empty removes it) and waits for the server's answer.
+async fn apply_texture(ctx: &SessionCtx, texture: Vec<u8>) -> EngineResult<()> {
+    let (own, before) = ctx
+        .handle
+        .with_state(|s| (s.session, s.own_user().and_then(|u| u.texture_hash.clone())));
+    let denials = subscribe_denials();
+    ctx.handle
+        .set_texture(texture.clone())
+        .map_err(command_error)?;
+    confirm(
+        ctx,
+        denials,
+        |s| {
+            s.own_user().is_some_and(|u| {
+                if texture.is_empty() {
+                    u.texture.is_none() && u.texture_hash.is_none()
+                } else {
+                    u.texture.as_ref() == Some(&texture)
+                        || (u.texture_hash.is_some() && u.texture_hash != before)
+                }
+            })
+        },
+        |d| is_profile_denial(d, own),
+        OnTimeout::Accept,
+    )
+    .await
+}
+
+/// What to do with the default avatar after the first sync of a fresh connect.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+enum DefaultAvatarStep {
+    /// Already handled on this server before: never touch it again.
+    Skip,
+    /// Not needed (setting off, no default avatar, or the user has an avatar there); the
+    /// server still counts as seen so turning the setting on later only affects new servers.
+    MarkOnly,
+    Send,
+}
+
+fn default_avatar_step(
+    already_sent: bool,
+    enabled: bool,
+    has_default: bool,
+    has_avatar: bool,
+) -> DefaultAvatarStep {
+    if already_sent {
+        DefaultAvatarStep::Skip
+    } else if !enabled || !has_default || has_avatar {
+        DefaultAvatarStep::MarkOnly
+    } else {
+        DefaultAvatarStep::Send
+    }
+}
+
+/// Whether a send attempt settles the server: success, or the image can never fit its
+/// limit. Other failures (connection lost, denied, …) are retried on the next fresh connect.
+fn send_settles(result: &EngineResult<()>) -> bool {
+    match result {
+        Ok(()) => true,
+        Err(e) => e.kind == ErrorKind::MessageTooLarge,
+    }
+}
+
+fn mark_default_avatar_sent(ctx: &SessionCtx) {
+    if let Err(e) = ctx.store().set_default_avatar_sent(ctx.server_id) {
+        tracing::warn!(error = %e, "remembering the default avatar failed");
+    }
+}
+
+/// Sends the default avatar once per saved server (FR-1.47). Called in the background after
+/// the first sync of a fresh connect, never after a reconnect.
+pub(crate) async fn send_default_avatar(ctx: SessionCtx, file: PathBuf) {
+    let state = {
+        let store = ctx.store();
+        store
+            .default_avatar_sent(ctx.server_id)
+            .and_then(|sent| Ok((sent, store.settings()?.send_default_avatar)))
+    };
+    let (already_sent, enabled) = match state {
+        Ok(state) => state,
+        Err(e) => {
+            tracing::warn!(error = %e, "reading the default avatar state failed");
+            return;
+        }
+    };
+    if already_sent {
+        return;
+    }
+    let has_default = match std::fs::metadata(&file) {
+        Ok(_) => true,
+        Err(e) if e.kind() == std::io::ErrorKind::NotFound => false,
+        Err(e) => {
+            tracing::warn!(error = %e, "checking the default avatar failed");
+            return;
+        }
+    };
+    let has_avatar = ctx.handle.with_state(|s| {
+        s.own_user().is_some_and(|u| {
+            u.texture_hash.is_some() || u.texture.as_ref().is_some_and(|t| !t.is_empty())
+        })
+    });
+    match default_avatar_step(already_sent, enabled, has_default, has_avatar) {
+        DefaultAvatarStep::Skip => {}
+        DefaultAvatarStep::MarkOnly => mark_default_avatar_sent(&ctx),
+        DefaultAvatarStep::Send => {
+            let result = match encode_avatar_file(file, image_limit(&ctx)).await {
+                Ok(texture) => apply_texture(&ctx, texture).await,
+                Err(e) => Err(e),
+            };
+            match &result {
+                Ok(()) => tracing::info!(server_id = ctx.server_id, "default avatar sent"),
+                Err(e) if e.kind == ErrorKind::MessageTooLarge => {
+                    tracing::info!(server_id = ctx.server_id, "default avatar too large");
+                    ctx.events.emit(EngineEvent::DefaultAvatarSkipped {
+                        server_id: ctx.server_id,
+                    });
+                }
+                Err(e) => tracing::warn!(error = %e, "sending the default avatar failed"),
+            }
+            if send_settles(&result) {
+                mark_default_avatar_sent(&ctx);
+            }
+        }
+    }
+}
+
+/// Reads the stored default avatar as a `data:` URL; `None` if none is set.
+fn read_default_avatar(file: &Path) -> EngineResult<Option<String>> {
+    match std::fs::read(file) {
+        Ok(bytes) => Ok(avatar_data_url(&bytes)),
+        Err(e) if e.kind() == std::io::ErrorKind::NotFound => Ok(None),
+        Err(e) => Err(EngineError::new(
+            ErrorKind::Io,
+            format!("reading the default avatar failed: {e}"),
+        )),
+    }
+}
+
+/// Stores `source` scaled to a PNG of at most `AVATAR_SIZE` pixels as `file`; `None` removes it.
+fn write_default_avatar(file: &Path, source: Option<&Path>) -> EngineResult<Option<String>> {
+    let io = |what: &str, e: std::io::Error| {
+        EngineError::new(
+            ErrorKind::Io,
+            format!("{what} the default avatar failed: {e}"),
+        )
+    };
+    let Some(source) = source else {
+        return match std::fs::remove_file(file) {
+            Ok(()) => Ok(None),
+            Err(e) if e.kind() == std::io::ErrorKind::NotFound => Ok(None),
+            Err(e) => Err(io("removing", e)),
+        };
+    };
+    let bytes = std::fs::read(source)
+        .map_err(|e| EngineError::new(ErrorKind::Io, format!("reading the image failed: {e}")))?;
+    // Without a size limit `encode_avatar` always settles on a PNG.
+    let png = encode_avatar(&bytes, usize::MAX)?;
+    // Write next to the target and rename, so a crash never leaves half an image behind.
+    let partial = file.with_extension("png.partial");
+    std::fs::write(&partial, &png).map_err(|e| io("saving", e))?;
+    std::fs::rename(&partial, file).map_err(|e| io("saving", e))?;
+    Ok(avatar_data_url(&png))
+}
+
 impl Engine {
+    fn default_avatar_file(&self) -> PathBuf {
+        self.data_dir().join(DEFAULT_AVATAR_FILE)
+    }
+
+    /// The default avatar as a `data:` URL, or `None` if none is set (FR-1.47).
+    pub fn default_avatar_get(&self) -> EngineResult<Option<String>> {
+        read_default_avatar(&self.default_avatar_file())
+    }
+
+    /// Sets the default avatar from an image file (scaled to a 128×128 PNG) or removes it
+    /// with `None`; returns the stored image as a `data:` URL. Avatars already on servers
+    /// stay untouched.
+    pub async fn default_avatar_set(&self, path: Option<PathBuf>) -> EngineResult<Option<String>> {
+        let file = self.default_avatar_file();
+        tokio::task::spawn_blocking(move || write_default_avatar(&file, path.as_deref()))
+            .await
+            .map_err(|e| EngineError::internal(e.to_string()))?
+    }
+
     /// Sets the own avatar from an image file, scaled to the server limit; `None` removes it.
     pub async fn set_own_avatar(&self, path: Option<PathBuf>) -> EngineResult<()> {
         let ctx = self.session_ctx()?;
         let texture = match path {
             None => Vec::new(),
-            Some(path) => {
-                let limit = match ctx.handle.with_state(|s| s.server.image_message_length) {
-                    Some(0) | None => IMAGE_SOFT_CAP,
-                    Some(n) => n,
-                } as usize;
-                tokio::task::spawn_blocking(move || {
-                    let bytes = std::fs::read(&path).map_err(|e| {
-                        EngineError::new(ErrorKind::Io, format!("reading the image failed: {e}"))
-                    })?;
-                    encode_avatar(&bytes, limit)
-                })
-                .await
-                .map_err(|e| EngineError::internal(e.to_string()))??
-            }
+            Some(path) => encode_avatar_file(path, image_limit(&ctx)).await?,
         };
-        let (own, before) = ctx
-            .handle
-            .with_state(|s| (s.session, s.own_user().and_then(|u| u.texture_hash.clone())));
-        let denials = subscribe_denials();
-        ctx.handle
-            .set_texture(texture.clone())
-            .map_err(command_error)?;
-        confirm(
-            &ctx,
-            denials,
-            |s| {
-                s.own_user().is_some_and(|u| {
-                    if texture.is_empty() {
-                        u.texture.is_none() && u.texture_hash.is_none()
-                    } else {
-                        u.texture.as_ref() == Some(&texture)
-                            || (u.texture_hash.is_some() && u.texture_hash != before)
-                    }
-                })
-            },
-            |d| is_profile_denial(d, own),
-            OnTimeout::Accept,
-        )
-        .await
+        apply_texture(&ctx, texture).await
     }
 
     /// Sets the own profile comment (Mumble HTML); empty removes it.
@@ -215,6 +387,74 @@ mod tests {
         let out = encode_avatar(&noisy_png(300, 300), 6_000).expect("encode");
         assert!(out.len() <= 6_000);
         assert!(out.starts_with(&[0xFF, 0xD8, 0xFF]), "jpeg");
+    }
+
+    #[test]
+    fn default_avatar_is_handled_once_per_server() {
+        use DefaultAvatarStep::{MarkOnly, Send, Skip};
+        // First fresh connect, setting on, default set, no avatar there yet.
+        assert_eq!(default_avatar_step(false, true, true, false), Send);
+        // Already has an avatar there: never send, but remember the server.
+        assert_eq!(default_avatar_step(false, true, true, true), MarkOnly);
+        // Setting off or no default avatar: the server still counts as seen.
+        assert_eq!(default_avatar_step(false, false, true, false), MarkOnly);
+        assert_eq!(default_avatar_step(false, true, false, false), MarkOnly);
+        // Once handled (e.g. the user removed the avatar manually afterwards): never again.
+        for (enabled, has_default, has_avatar) in [
+            (true, true, false),
+            (true, true, true),
+            (false, false, false),
+        ] {
+            assert_eq!(
+                default_avatar_step(true, enabled, has_default, has_avatar),
+                Skip
+            );
+        }
+    }
+
+    #[test]
+    fn only_success_or_an_impossible_size_settles_the_server() {
+        assert!(send_settles(&Ok(())));
+        assert!(send_settles(&Err(EngineError::new(
+            ErrorKind::MessageTooLarge,
+            "too large"
+        ))));
+        assert!(!send_settles(&Err(EngineError::not_connected())));
+        assert!(!send_settles(&Err(EngineError::new(
+            ErrorKind::PermissionDenied,
+            "denied"
+        ))));
+    }
+
+    #[test]
+    fn default_avatar_is_stored_as_scaled_png_and_cleared() {
+        let dir = tempfile::tempdir().expect("tempdir");
+        let file = dir.path().join(DEFAULT_AVATAR_FILE);
+        let source = dir.path().join("source.png");
+        std::fs::write(&source, noisy_png(300, 600)).expect("write source");
+
+        assert_eq!(read_default_avatar(&file).expect("empty"), None);
+        let url = write_default_avatar(&file, Some(&source)).expect("set");
+        assert!(url.is_some_and(|u| u.starts_with("data:image/png;base64,")));
+        let stored = image::open(&file).expect("stored image");
+        assert_eq!((stored.width(), stored.height()), (64, 128));
+        assert!(read_default_avatar(&file).expect("read").is_some());
+
+        assert_eq!(write_default_avatar(&file, None).expect("clear"), None);
+        assert!(!file.exists());
+        assert_eq!(
+            write_default_avatar(&file, None).expect("clear twice"),
+            None
+        );
+
+        std::fs::write(&source, b"not an image").expect("write source");
+        assert_eq!(
+            write_default_avatar(&file, Some(&source))
+                .expect_err("invalid")
+                .kind,
+            ErrorKind::InvalidInput
+        );
+        assert!(!file.exists(), "a failed set keeps the previous state");
     }
 
     #[test]

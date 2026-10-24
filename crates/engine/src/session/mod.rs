@@ -14,7 +14,7 @@ mod local;
 mod machine;
 mod types;
 
-use std::path::Path;
+use std::path::{Path, PathBuf};
 use std::sync::atomic::{AtomicU32, Ordering};
 use std::sync::{Arc, Mutex, MutexGuard, PoisonError};
 use std::time::{Duration, Instant};
@@ -124,6 +124,7 @@ pub struct Engine {
 
 struct Inner {
     rt: Runtime,
+    data_dir: PathBuf,
     store: Arc<Mutex<Store>>,
     secrets: Arc<SecretStore>,
     /// `None` until loaded from secure storage; then `Some(None)` before the wizard ran.
@@ -248,6 +249,7 @@ impl Engine {
         voice::spawn_meter(&rt, controls.clone(), meter.clone(), events.clone());
         let inner = Arc::new(Inner {
             rt,
+            data_dir: data_dir.to_path_buf(),
             store,
             secrets: Arc::new(secrets),
             identity: Mutex::new(None),
@@ -273,6 +275,11 @@ impl Engine {
             .as_ref()
             .map(|s| self.inner.ctx(s))
             .ok_or_else(EngineError::not_connected)
+    }
+
+    /// The app data directory given to `Engine::new`.
+    pub(crate) fn data_dir(&self) -> &Path {
+        &self.inner.data_dir
     }
 
     /// The store, also while disconnected (history commands, B14).
@@ -790,6 +797,7 @@ impl Inner {
         };
         self.voice.reset_link();
         let (pump_tx, mut pump_rx) = mpsc::unbounded_channel();
+        let fresh = matches!(arrival, Arrival::Fresh(_));
         let followed = self.post_sync(server_id, &handle, arrival);
 
         let registered = self.transition(generation, |core| {
@@ -820,6 +828,14 @@ impl Inner {
             extension::on_synced(&ctx, &mut snapshot);
             self.events
                 .emit(EngineEvent::ServerSynced(Box::new(snapshot)));
+        }
+        if fresh {
+            // In the background: encoding and the server's confirmation must not hold up
+            // the event pump.
+            self.rt.spawn(crate::profile::send_default_avatar(
+                ctx.clone(),
+                self.data_dir.join(crate::profile::DEFAULT_AVATAR_FILE),
+            ));
         }
         // Effective permissions decide which channels the UI offers to join (FR-1.16).
         for id in handle.with_state(|s| s.channels.keys().copied().collect::<Vec<_>>()) {

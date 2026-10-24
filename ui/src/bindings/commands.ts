@@ -76,6 +76,13 @@ export const commands = {
 	historySetSaving: (serverId: number, enabled: boolean) => typedError<null, ApiError>(__TAURI_INVOKE("history_set_saving", { serverId, enabled })),
 	/**  Sets the own avatar from an image file, scaled to the server limit; `null` removes it. */
 	setOwnAvatar: (path: string | null) => typedError<null, ApiError>(__TAURI_INVOKE("set_own_avatar", { path })),
+	/**  The default avatar as a `data:` URL, or `null` if none is set. */
+	defaultAvatarGet: () => typedError<string | null, ApiError>(__TAURI_INVOKE("default_avatar_get")),
+	/**
+	 *  Sets the default avatar from an image file (stored as a 128×128 PNG) or clears it with
+	 *  `null`; returns the stored image as a `data:` URL.
+	 */
+	defaultAvatarSet: (path: string | null) => typedError<string | null, ApiError>(__TAURI_INVOKE("default_avatar_set", { path })),
 	/**  Sets the own profile comment (Mumble-compatible HTML; empty removes it). */
 	setOwnComment: (html: string) => typedError<null, ApiError>(__TAURI_INVOKE("set_own_comment", { html })),
 	/**  Registers the current name on the connected server with the current identity. */
@@ -125,6 +132,7 @@ export const events = {
 	closeRequested: makeEvent<CloseRequested, CloseRequested>("close-requested"),
 	connectionStateChanged: makeEvent<ConnectionStateChanged, ConnectionStateChanged>("connection-state-changed"),
 	deepLinkOpened: makeEvent<DeepLinkOpened, DeepLinkOpened>("deep-link-opened"),
+	defaultAvatarSkipped: makeEvent<DefaultAvatarSkipped, DefaultAvatarSkipped>("default-avatar-skipped"),
 	followedChannelsChanged: makeEvent<FollowedChannelsChanged, FollowedChannelsChanged>("followed-channels-changed"),
 	messageReceived: makeEvent<MessageReceived, MessageReceived>("message-received"),
 	micLevel: makeEvent<MicLevel, MicLevel>("mic-level"),
@@ -269,6 +277,14 @@ export type Conversation = { kind: "channel"; channelId: number } |
 /**  A `mumble://` link was opened from outside (startup argument or second launch). */
 export type DeepLinkOpened = {
 	link: MumbleLink,
+};
+
+/**
+ *  The default avatar was not sent to a server because it cannot fit the server's image
+ *  limit (FR-1.47).
+ */
+export type DefaultAvatarSkipped = {
+	serverId: number,
 };
 
 /**  Machine-readable error category; the UI maps it to a plain-language message. */
@@ -454,6 +470,8 @@ export type Settings = {
 	sounds: SoundSettings,
 	closeBehaviour: CloseBehaviour,
 	logLevel: LogLevel,
+	/**  Send the default avatar to servers connected to for the first time (FR-1.47). */
+	sendDefaultAvatar: boolean,
 };
 
 /**  Notification sound toggles per event (FR-1.27). */
