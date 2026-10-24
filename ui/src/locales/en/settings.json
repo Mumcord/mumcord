@@ -100,7 +100,13 @@
     "mouseInputGroup": "Mumcord may not read your mouse yet. Add yourself to the \"input\" group by running this command in a terminal:",
     "mouseLogOut": "Then log out and back in. Until then, use a keyboard key or voice activation.",
     "mouseNoDevice": "No mouse found. Plug one in; Mumcord picks it up automatically.",
-    "mouseAccessibility": "To use mouse buttons, allow Mumcord under System Settings → Privacy & Security → Accessibility, then restart Mumcord."
+    "mouseAccessibility": "To use mouse buttons, allow Mumcord under System Settings → Privacy & Security → Accessibility, then restart Mumcord.",
+    "compatMode": "Compatibility mode (like TeamSpeak)",
+    "compatModeHint": "Mumcord runs through your desktop's X11 compatibility layer, like TeamSpeak, so push-to-talk works without a desktop dialog and without the \"input\" group. Your desktop decides what Mumcord may see: on KDE under System Settings → Legacy X11 App Support. By default only key combinations and modifier keys work; mouse buttons only if you allow them there. This is less isolated than the modern way.",
+    "compatRestartNeeded": "Takes effect after Mumcord restarts. You will be disconnected briefly.",
+    "compatRestart": "Restart now",
+    "compatRestartFailed": "Mumcord could not restart. Please close and open it yourself.",
+    "compatActive": "Compatibility mode is on: push-to-talk uses the X11 way. Keys work without a desktop dialog; mouse buttons work if your desktop's legacy X11 setting allows them."
   },
   "history": {
     "explanation": "Chat messages are saved only on this computer.",

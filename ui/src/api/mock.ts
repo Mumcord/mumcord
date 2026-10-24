@@ -74,6 +74,7 @@ const DEFAULT_SETTINGS: Settings = {
   talkMode: "voiceActivation",
   pttKey: null,
   allowMouseButtons: false,
+  pttCompatibilityMode: false,
   inputDevice: null,
   outputDevice: null,
   noiseSuppression: true,
@@ -707,8 +708,10 @@ export function createMockApi(options: MockOptions = {}): MockApi {
     pttCaptureKey: (key) => Promise.resolve(/^Mouse(Middle|4|5)$/.test(key) ? key : "F13"),
     pttMouseStatus: () => Promise.resolve<PttMouseStatus>({ support: "native", state: "ready" }),
     pttCaptureCancel: () => Promise.resolve(null),
+    pttSession: () => Promise.resolve({ waylandDesktop: false, compatibilityActive: false }),
 
     // app
+    appRestart: () => Promise.resolve(null),
     closeChoice: (choice, remember) => {
       if (remember) settings = { ...settings, closeBehaviour: choice };
       return Promise.resolve(null);

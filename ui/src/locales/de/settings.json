@@ -100,7 +100,13 @@
     "mouseInputGroup": "Mumcord darf deine Maus noch nicht lesen. Füge dich mit diesem Befehl in einem Terminal zur Gruppe „input“ hinzu:",
     "mouseLogOut": "Melde dich danach ab und wieder an. Bis dahin nutze eine Tastaturtaste oder die Sprachaktivierung.",
     "mouseNoDevice": "Keine Maus gefunden. Schließe eine an; Mumcord erkennt sie automatisch.",
-    "mouseAccessibility": "Um Maustasten zu nutzen, erlaube Mumcord unter Systemeinstellungen → Datenschutz & Sicherheit → Bedienungshilfen und starte Mumcord neu."
+    "mouseAccessibility": "Um Maustasten zu nutzen, erlaube Mumcord unter Systemeinstellungen → Datenschutz & Sicherheit → Bedienungshilfen und starte Mumcord neu.",
+    "compatMode": "Kompatibilitätsmodus (wie TeamSpeak)",
+    "compatModeHint": "Mumcord läuft über die X11-Kompatibilitätsschicht deines Desktops, wie TeamSpeak. So funktioniert Push-to-Talk ohne Desktop-Dialog und ohne die Gruppe \"input\". Dein Desktop entscheidet, was Mumcord sehen darf: bei KDE unter Systemeinstellungen → Unterstützung für ältere X11-Anwendungen. Standardmäßig funktionieren nur Tastenkombinationen und Zusatztasten; Maustasten nur, wenn du sie dort erlaubst. Das ist weniger abgeschottet als der moderne Weg.",
+    "compatRestartNeeded": "Wirkt nach einem Neustart von Mumcord. Die Verbindung wird kurz getrennt.",
+    "compatRestart": "Jetzt neu starten",
+    "compatRestartFailed": "Mumcord konnte nicht neu starten. Bitte schließe und öffne es selbst.",
+    "compatActive": "Der Kompatibilitätsmodus ist an: Push-to-Talk nutzt den X11-Weg. Tasten funktionieren ohne Desktop-Dialog; Maustasten, wenn die X11-Einstellung deines Desktops sie erlaubt."
   },
   "history": {
     "explanation": "Chatnachrichten werden nur auf diesem Computer gespeichert.",

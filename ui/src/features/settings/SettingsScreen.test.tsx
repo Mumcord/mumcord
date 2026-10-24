@@ -397,6 +397,64 @@ describe("Voice section", () => {
     });
   });
 
+  describe("compatibility mode (FR-1.48)", () => {
+    it("is hidden outside Linux Wayland", async () => {
+      await openSection("Voice");
+      await screen.findByRole("switch", { name: /Noise suppression/ });
+      expect(screen.queryByRole("switch", { name: /Compatibility mode/ })).not.toBeInTheDocument();
+    });
+
+    it("is off by default on Wayland and offers a restart when switched on", async () => {
+      vi.spyOn(api, "pttSession").mockResolvedValue({
+        waylandDesktop: true,
+        compatibilityActive: false,
+      });
+      vi.spyOn(api, "pttMouseStatus").mockResolvedValue({ support: "evdev", state: "ready" });
+      const update = vi.spyOn(api, "settingsUpdate");
+      const restart = vi.spyOn(api, "appRestart");
+      await openSection("Voice");
+      const toggle = await screen.findByRole("switch", { name: /Compatibility mode/ });
+      expect(toggle).not.toBeChecked();
+      expect(toggle).toHaveAccessibleDescription(/Legacy X11 App Support/);
+      expect(screen.queryByRole("button", { name: "Restart now" })).not.toBeInTheDocument();
+      fireEvent.click(toggle);
+      await waitFor(() => {
+        expect(update).toHaveBeenLastCalledWith(
+          expect.objectContaining({ pttCompatibilityMode: true }),
+        );
+      });
+      fireEvent.click(await screen.findByRole("button", { name: "Restart now" }));
+      expect(restart).toHaveBeenCalledOnce();
+    });
+
+    it("hides the input group option and explains the X11 path while active", async () => {
+      vi.spyOn(api, "pttSession").mockResolvedValue({
+        waylandDesktop: true,
+        compatibilityActive: true,
+      });
+      vi.spyOn(api, "pttMouseStatus").mockResolvedValue({ support: "evdev", state: "ready" });
+      await api.settingsUpdate({ ...(await api.settingsGet()), pttCompatibilityMode: true });
+      await openSection("Voice");
+      expect(await screen.findByRole("switch", { name: /Compatibility mode/ })).toBeChecked();
+      expect(screen.getByText(/Compatibility mode is on/)).toBeInTheDocument();
+      expect(screen.queryByRole("switch", { name: /Allow mouse buttons/ })).not.toBeInTheDocument();
+      expect(screen.queryByRole("button", { name: "Restart now" })).not.toBeInTheDocument();
+    });
+
+    it("reports a failed restart", async () => {
+      vi.spyOn(api, "pttSession").mockResolvedValue({
+        waylandDesktop: true,
+        compatibilityActive: true,
+      });
+      api.mock.failNext("appRestart", "internal");
+      // Running in compatibility mode with the setting off: switching back is pending.
+      await openSection("Voice");
+      vi.spyOn(console, "error").mockImplementation(() => undefined);
+      fireEvent.click(await screen.findByRole("button", { name: "Restart now" }));
+      expect(await screen.findByText(/could not restart/)).toBeInTheDocument();
+    });
+  });
+
   it("explains the missing Accessibility permission on macOS", async () => {
     vi.spyOn(api, "pttMouseStatus").mockResolvedValue({
       support: "native",

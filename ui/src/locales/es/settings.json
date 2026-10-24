@@ -100,7 +100,13 @@
     "mouseInputGroup": "Mumcord todavía no puede leer tu ratón. Añádete al grupo «input» ejecutando este comando en una terminal:",
     "mouseLogOut": "Después cierra la sesión y vuelve a entrar. Hasta entonces, usa una tecla o la activación por voz.",
     "mouseNoDevice": "No se encontró ningún ratón. Conecta uno; Mumcord lo detecta automáticamente.",
-    "mouseAccessibility": "Para usar botones del ratón, permite Mumcord en Ajustes del Sistema → Privacidad y seguridad → Accesibilidad y reinicia Mumcord."
+    "mouseAccessibility": "Para usar botones del ratón, permite Mumcord en Ajustes del Sistema → Privacidad y seguridad → Accesibilidad y reinicia Mumcord.",
+    "compatMode": "Modo de compatibilidad (como TeamSpeak)",
+    "compatModeHint": "Mumcord funciona a través de la capa de compatibilidad X11 de tu escritorio, como TeamSpeak, así que pulsar para hablar funciona sin diálogo del escritorio y sin el grupo \"input\". Tu escritorio decide qué puede ver Mumcord: en KDE en Preferencias del sistema → Compatibilidad con aplicaciones X11 heredadas. Por defecto solo funcionan combinaciones de teclas y teclas modificadoras; los botones del ratón solo si los permites allí. Esto está menos aislado que la forma moderna.",
+    "compatRestartNeeded": "Se aplica cuando Mumcord se reinicie. Te desconectarás un momento.",
+    "compatRestart": "Reiniciar ahora",
+    "compatRestartFailed": "Mumcord no pudo reiniciarse. Ciérralo y ábrelo tú mismo.",
+    "compatActive": "El modo de compatibilidad está activado: pulsar para hablar usa la forma X11. Las teclas funcionan sin diálogo del escritorio; los botones del ratón funcionan si el ajuste X11 heredado de tu escritorio lo permite."
   },
   "history": {
     "explanation": "Los mensajes del chat se guardan solo en este ordenador.",

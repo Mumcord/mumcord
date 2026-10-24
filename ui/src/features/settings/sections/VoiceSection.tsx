@@ -5,10 +5,12 @@ import {
   toEngineError,
   type PttAvailability,
   type PttMouseStatus,
+  type PttSession,
   type Settings,
 } from "../../../api";
 import { RadioGroup } from "../components/RadioGroup";
 import { Group, Section } from "../components/Section";
+import { CompatibilityModeSwitch } from "./CompatibilityModeSwitch";
 import { Switch } from "../components/Switch";
 import { errorText } from "../errors";
 import { keyCombo, mouseKey, mouseLabel } from "../pttKey";
@@ -29,6 +31,24 @@ export function VoiceSection({ settings, update }: SettingsSectionProps) {
   const { t } = useTranslation("settings");
   const [availability, setAvailability] = useState<PttAvailability | null>(null);
   const [mouseStatus, setMouseStatus] = useState<PttMouseStatus | null>(null);
+  const [session, setSession] = useState<PttSession | null>(null);
+
+  useEffect(() => {
+    let active = true;
+    getApi()
+      .pttSession()
+      .then(
+        (result) => {
+          if (active) setSession(result);
+        },
+        (error: unknown) => {
+          console.error("Checking the desktop session failed", error);
+        },
+      );
+    return () => {
+      active = false;
+    };
+  }, []);
 
   useEffect(() => {
     let active = true;
@@ -68,6 +88,8 @@ export function VoiceSection({ settings, update }: SettingsSectionProps) {
   const unavailable = availability?.status === "unavailable" ? availability.reason : null;
   const ptt = settings.talkMode === "pushToTalk";
   const mouse = mouseAllowed(mouseStatus, settings);
+  // In compatibility mode the X11 path handles mouse buttons; the evdev opt-in does not apply.
+  const compatibilityActive = session?.compatibilityActive === true;
 
   return (
     <Section title={t("sections.voice")}>
@@ -102,7 +124,10 @@ export function VoiceSection({ settings, update }: SettingsSectionProps) {
             }}
           />
         )}
-        {mouseStatus?.support === "evdev" && (
+        {session?.waylandDesktop === true && (
+          <CompatibilityModeSwitch session={session} settings={settings} update={update} />
+        )}
+        {mouseStatus?.support === "evdev" && !compatibilityActive && (
           <>
             <Switch
               label={t("voice.mouseToggle")}
