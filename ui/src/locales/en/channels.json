@@ -6,7 +6,15 @@
     "you": "(you)",
     "yourChannel": "your channel",
     "people_one": "{{count}} person",
-    "people_other": "{{count}} people"
+    "people_other": "{{count}} people",
+    "stack": {
+      "some": "{{shown}} of {{total}} people: {{names}} and {{rest}} more",
+      "all_one": "{{count}} person: {{names}}",
+      "all_other": "{{count}} people: {{names}}",
+      "talking": "{{name}} (talking)"
+    },
+    "showAll": "Show all ({{total}})",
+    "showFewer": "Show fewer"
   },
   "status": {
     "listening": "listening",

@@ -61,8 +61,73 @@ export function isExpandable(node: ChannelNode): boolean {
   return node.children.length + node.members.length > 0;
 }
 
-/** Rows in display order, skipping the contents of collapsed channels. */
-export function visibleRows(roots: ChannelNode[], collapsed: ReadonlySet<number>): TreeRow[] {
+/** Above this many people an expanded channel shows the avatar stack instead of names (QA.14). */
+export const CROWDED_CHANNEL_SIZE = 10;
+/** Most avatars shown in a stack before the "+N" chip (QA.14). */
+export const STACK_SIZE = 5;
+
+/**
+ * Avatars that fit beside a readable channel name at a tree level: the channel list is 15rem wide
+ * and every level indents by 1rem, so deeper rows show fewer avatars (and a bigger "+N").
+ */
+export function stackSize(level: number): number {
+  return Math.max(1, Math.min(STACK_SIZE, 5 - level));
+}
+
+const NONE: ReadonlySet<number> = new Set();
+
+/** Whether an expanded channel lists its people by name: not when crowded, unless "Show all" is on. */
+export function listsMembers(node: ChannelNode, showAll: ReadonlySet<number>): boolean {
+  return node.members.length <= CROWDED_CHANNEL_SIZE || showAll.has(node.channel.id);
+}
+
+/**
+ * The people shown in a channel's avatar stack: talking people first so they stay visible, then
+ * the name-sorted member order, so avatars only move when someone starts or stops talking.
+ */
+export function stackPeople(
+  members: readonly User[],
+  talking: ReadonlySet<number>,
+  size = STACK_SIZE,
+): User[] {
+  const speaking: User[] = [];
+  const quiet: User[] = [];
+  for (const user of members) {
+    if (talking.has(user.session)) {
+      speaking.push(user);
+      if (speaking.length === size) break;
+    } else if (quiet.length < size) {
+      quiet.push(user);
+    }
+  }
+  return [...speaking, ...quiet].slice(0, size);
+}
+
+/** Avatar stacks of the visible channels that show one: collapsed with people, or crowded. */
+export function visibleStacks(
+  roots: ChannelNode[],
+  collapsed: ReadonlySet<number>,
+  showAll: ReadonlySet<number>,
+  talking: ReadonlySet<number>,
+): Map<number, User[]> {
+  const stacks = new Map<number, User[]>();
+  const walk = (node: ChannelNode, level: number) => {
+    const expanded = isExpandable(node) && !collapsed.has(node.channel.id);
+    if (node.members.length > 0 && (!expanded || !listsMembers(node, showAll))) {
+      stacks.set(node.channel.id, stackPeople(node.members, talking, stackSize(level)));
+    }
+    if (expanded) for (const child of node.children) walk(child, level + 1);
+  };
+  for (const root of roots) walk(root, 1);
+  return stacks;
+}
+
+/** Rows in display order, skipping the contents of collapsed channels and unlisted crowded ones. */
+export function visibleRows(
+  roots: ChannelNode[],
+  collapsed: ReadonlySet<number>,
+  showAll: ReadonlySet<number> = NONE,
+): TreeRow[] {
   const rows: TreeRow[] = [];
   const walk = (node: ChannelNode, parentId: string | null) => {
     const id = channelRowId(node.channel.id);
@@ -78,7 +143,7 @@ export function visibleRows(roots: ChannelNode[], collapsed: ReadonlySet<number>
       expanded,
     });
     if (!expanded) return;
-    for (const user of node.members) {
+    for (const user of listsMembers(node, showAll) ? node.members : []) {
       rows.push({
         id: memberRowId(user.session),
         kind: "member",

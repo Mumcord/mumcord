@@ -17,6 +17,7 @@ import { useTranslation } from "react-i18next";
 import type { User } from "../../api";
 import "./channels.css";
 import { Avatar } from "../members/Avatar";
+import { AvatarStack } from "./AvatarStack";
 import { useAvatars } from "../members/useAvatars";
 import { StatusIcons } from "./PersonStatus";
 import { useStatusText } from "./statusText";
@@ -24,9 +25,11 @@ import type { ServerState } from "./serverStore";
 import {
   buildTree,
   channelRowId,
+  CROWDED_CHANNEL_SIZE,
   isExpandable,
   memberRowId,
   visibleRows,
+  visibleStacks,
   type ChannelNode,
 } from "./tree";
 
@@ -66,16 +69,28 @@ export function ChannelTree({
   const treeRef = useRef<HTMLDivElement>(null);
   const [collapsed, setCollapsed] = useState<ReadonlySet<number>>(new Set());
   const [focusedId, setFocusedId] = useState<string | null>(null);
+  /** Crowded channels whose people are listed by name for this session ("Show all", QA.14). */
+  const [showAll, setShowAll] = useState<ReadonlySet<number>>(new Set());
 
-  const roots = useMemo(() => buildTree(state), [state]);
-  const rows = useMemo(() => visibleRows(roots, collapsed), [roots, collapsed]);
+  // Only channels and people shape the tree; talking changes must not rebuild it (scale report).
+  const roots = useMemo(
+    () => buildTree({ channels: state.channels, users: state.users }),
+    [state.channels, state.users],
+  );
+  const rows = useMemo(() => visibleRows(roots, collapsed, showAll), [roots, collapsed, showAll]);
+  const stacks = useMemo(
+    () => visibleStacks(roots, collapsed, showAll, state.talking),
+    [roots, collapsed, showAll, state.talking],
+  );
   const visibleUsers = useMemo(
-    () =>
-      rows.flatMap((r) => {
+    () => [
+      ...rows.flatMap((r) => {
         const user = r.session === null ? undefined : state.users.get(r.session);
         return user === undefined ? [] : [user];
       }),
-    [rows, state.users],
+      ...[...stacks.values()].flat(),
+    ],
+    [rows, stacks, state.users],
   );
   const avatarOf = useAvatars(visibleUsers);
   const selfChannelId =
@@ -98,6 +113,14 @@ export function ChannelTree({
       const next = new Set(current);
       if (expanded) next.delete(channelId);
       else next.add(channelId);
+      return next;
+    });
+  };
+
+  const toggleShowAll = (channelId: number) => {
+    setShowAll((current) => {
+      const next = new Set(current);
+      if (!next.delete(channelId)) next.add(channelId);
       return next;
     });
   };
@@ -211,6 +234,10 @@ export function ChannelTree({
     const count = node.members.length;
     const isOwn = channel.id === selfChannelId;
     const groupId = `${hintId}-group-${rowId}`;
+    const stack = stacks.get(channel.id);
+    const crowded = expanded && count > CROWDED_CHANNEL_SIZE;
+    const listingAll = showAll.has(channel.id);
+    const showAllLabel = listingAll ? t("tree.showFewer") : t("tree.showAll", { total: count });
     // The group is a DOM sibling (linked via aria-owns) so the treeitem's visible
     // content is only its own row; WCAG 2.5.3 label-in-name then matches its name.
     return (
@@ -262,6 +289,16 @@ export function ChannelTree({
             <span id={labelId} className="tree-channel__label">
               <span className="tree-channel__name">{channel.name}</span>
               {isOwn && <span className="visually-hidden">, {t("tree.yourChannel")}</span>}
+              {stack && (
+                <AvatarStack
+                  people={stack.map((user) => ({
+                    user,
+                    talking: state.talking.has(user.session),
+                    src: avatarOf(user),
+                  }))}
+                  total={count}
+                />
+              )}
               {count > 0 && (
                 // The digits are CSS-generated (::before) so the row's visible text stays a run of
                 // its accessible name (WCAG 2.5.3); the spoken form is the visually hidden phrase.
@@ -301,10 +338,37 @@ export function ChannelTree({
               </span>
             )}
           </div>
+          {crowded && (
+            // Own line under the row: the row has no room beside the name and the stack. Inside
+            // the treeitem (a tree group may only hold treeitems), so the text is CSS-generated
+            // like the Join button's (WCAG 2.5.3 label-in-name).
+            <div className="avatar-stack__show-all">
+              <button
+                type="button"
+                className="avatar-stack__toggle"
+                data-label={showAllLabel}
+                aria-label={showAllLabel}
+                aria-expanded={listingAll}
+                tabIndex={tabStopId === rowId ? 0 : -1}
+                onClick={(event) => {
+                  event.stopPropagation();
+                  toggleShowAll(channel.id);
+                }}
+                onDoubleClick={(event) => {
+                  event.stopPropagation();
+                }}
+                onKeyDown={(event) => {
+                  // The tree selects the channel on Enter/Space; the toggle must not.
+                  if (event.key === "Enter" || event.key === " ") event.stopPropagation();
+                }}
+              />
+            </div>
+          )}
         </div>
         {expanded && (
           <div role="group" id={groupId}>
-            {node.members.map((u) => personItem(u, memberRowId(u.session), level + 1))}
+            {(!crowded || listingAll) &&
+              node.members.map((u) => personItem(u, memberRowId(u.session), level + 1))}
             {node.children.map((child) => channelItem(child, level + 1))}
           </div>
         )}

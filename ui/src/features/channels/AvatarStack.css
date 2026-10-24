@@ -1,0 +1,109 @@
+/* Avatar stack on channel rows (QA.14). Kept apart from channels.css on purpose. */
+.avatar-stack {
+  /* The ring between avatars takes the row's background, so it reads as a gap. */
+  --stack-ring: var(--color-bg-sidebar);
+
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  margin-left: auto;
+  isolation: isolate;
+}
+
+.tree-channel__row:hover .avatar-stack {
+  --stack-ring: var(--color-bg-hover);
+}
+
+.tree-channel__row[data-selected="true"] .avatar-stack {
+  --stack-ring: var(--color-bg-selected);
+}
+
+/* The stack's label and "+N" already give the total; the separate count would only crowd the row. */
+.avatar-stack + .tree-channel__count {
+  display: none;
+}
+
+/*
+ * The stack never shrinks; when the hover-only Join button needs room, the label clips instead of
+ * overflowing into it. The padding keeps the talking ring inside the clip without changing height.
+ */
+.tree-channel__label:has(.avatar-stack) {
+  overflow: hidden;
+  margin-block: calc(-1 * var(--space-1));
+  padding-block: var(--space-1);
+  padding-right: var(--space-1);
+}
+
+.avatar-stack__item {
+  position: relative;
+  display: inline-flex;
+  border-radius: var(--radius-full);
+}
+
+/* Each avatar (and the chip) covers about 35% of the previous one. */
+.avatar-stack > * + * {
+  margin-left: calc(-0.35 * 1.5rem);
+}
+
+.avatar-stack__item > .avatar {
+  box-shadow: 0 0 0 2px var(--stack-ring);
+}
+
+.avatar-stack__more {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 1.5rem;
+  height: 1.5rem;
+  padding: 0 var(--space-1);
+  border-radius: var(--radius-full);
+  box-shadow: 0 0 0 2px var(--stack-ring);
+  background: var(--color-bg-elevated);
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-bold);
+}
+
+/* Generated, so the digits are not treeitem text (WCAG 2.5.3); the stack's label says it. */
+.avatar-stack__more::before {
+  content: attr(data-more);
+}
+
+.avatar-stack__toggle {
+  flex: none;
+  padding: 0 var(--space-2);
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-full);
+  background: var(--color-bg-elevated);
+  color: var(--color-text);
+  font-size: var(--font-size-xs);
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.avatar-stack__show-all {
+  display: flex;
+  align-items: center;
+  min-height: 2rem;
+  /* Lines up with the channel name, past the row's expand arrow. */
+  padding: var(--space-1) var(--space-2) var(--space-1) calc(1rem + 2 * var(--space-2));
+}
+
+.avatar-stack__toggle::before {
+  content: attr(data-label);
+}
+
+.avatar-stack__toggle:hover {
+  background: var(--color-bg-hover);
+}
+
+.avatar-stack__toggle:focus-visible {
+  outline: var(--focus-ring-width) solid var(--color-focus);
+  outline-offset: 1px;
+}
+
+/* Talking people sit at the front of the stack; their ring stays whole above the next avatar. */
+.avatar-stack__item:has(.avatar[data-talking="true"]) {
+  z-index: 1;
+}
