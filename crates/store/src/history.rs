@@ -71,6 +71,16 @@ impl Store {
     /// Stores a message unless the server's "Save history" switch is off (or the
     /// server is unknown). Returns whether the message was stored.
     pub fn append_message(&self, server: ServerId, message: &NewChatMessage) -> Result<bool> {
+        Ok(self.insert_message(server, message)?.is_some())
+    }
+
+    /// Like [`Store::append_message`], but returns the new message id (`None` when the
+    /// message was not stored).
+    pub fn insert_message(
+        &self,
+        server: ServerId,
+        message: &NewChatMessage,
+    ) -> Result<Option<i64>> {
         let (kind, key) = message.conversation.parts();
         // The save-history check is part of the INSERT so it cannot race a toggle.
         let inserted = self.conn.execute(
@@ -89,7 +99,7 @@ impl Store {
                 message.body
             ],
         )?;
-        Ok(inserted == 1)
+        Ok((inserted == 1).then(|| self.conn.last_insert_rowid()))
     }
 
     /// The newest `limit` messages of a conversation, oldest first.
@@ -115,6 +125,32 @@ impl Store {
     }
 
     /// Number of stored messages in a conversation newer than `since` (unread badges).
+    /// Up to `limit` messages of a conversation older than message `before` (by send time,
+    /// then id), oldest first. Used to page backwards through history.
+    pub fn messages_before(
+        &self,
+        server: ServerId,
+        conversation: &Conversation,
+        before: i64,
+        limit: u32,
+    ) -> Result<Vec<ChatMessage>> {
+        let (kind, key) = conversation.parts();
+        let mut stmt = self.conn.prepare(
+            "SELECT * FROM (
+                 SELECT m.id, m.conversation_kind, m.conversation_key, m.sender_name,
+                        m.sender_cert_hash, m.sent_at, m.body
+                 FROM chat_message m, chat_message c
+                 WHERE c.id = ?4 AND m.server_id = ?1 AND m.conversation_kind = ?2
+                   AND m.conversation_key = ?3
+                   AND (m.sent_at < c.sent_at OR (m.sent_at = c.sent_at AND m.id < c.id))
+                 ORDER BY m.sent_at DESC, m.id DESC
+                 LIMIT ?5)
+             ORDER BY sent_at, id",
+        )?;
+        let rows = stmt.query_map(params![server, kind, key, before, limit], message_from_row)?;
+        Ok(rows.collect::<rusqlite::Result<_>>()?)
+    }
+
     pub fn count_messages_since(
         &self,
         server: ServerId,
@@ -206,6 +242,33 @@ mod tests {
         assert_eq!(last3[0].sender_cert_hash.as_deref(), Some("aa"));
         assert_eq!(store.messages(id, &private, 10).expect("private").len(), 1);
         assert_eq!(store.count_messages_since(id, &lobby, 2).expect("count"), 3);
+    }
+
+    #[test]
+    fn paging_backwards_from_a_message() {
+        let (_dir, store) = temp_store();
+        let id = store
+            .add_server(&NewServer::new("A", "a", "u"))
+            .expect("add")
+            .id;
+        let lobby = Conversation::Channel("Lobby".into());
+        let ids: Vec<i64> = (1..=5)
+            .map(|t| {
+                store
+                    .insert_message(id, &msg(&lobby, t, &format!("m{t}")))
+                    .expect("insert")
+                    .expect("stored")
+            })
+            .collect();
+        let page = store.messages_before(id, &lobby, ids[3], 2).expect("page");
+        let bodies: Vec<_> = page.iter().map(|m| m.body.as_str()).collect();
+        assert_eq!(bodies, ["m2", "m3"]);
+        assert!(
+            store
+                .messages_before(id, &lobby, ids[0], 10)
+                .expect("page")
+                .is_empty()
+        );
     }
 
     #[test]
