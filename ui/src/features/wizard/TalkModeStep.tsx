@@ -18,6 +18,8 @@ export interface TalkChoice {
   registerLinkHandler: boolean;
   /** Start Mumcord when the user logs in (FR-1.48d). */
   autostart: boolean;
+  /** Show link previews and embeds in chat (FR-1.49). */
+  linkPreviews: boolean;
 }
 
 type Capture = "off" | "listening" | "pending";
@@ -37,8 +39,8 @@ interface TalkModeStepProps {
 }
 
 /**
- * Step 3: voice activation or push-to-talk with key capture, then the link handler and
- * start-at-login offers.
+ * Step 3: voice activation or push-to-talk with key capture, then the link handler,
+ * start-at-login and link-preview choices.
  */
 export function TalkModeStep({
   settings,
@@ -63,6 +65,7 @@ export function TalkModeStep({
   const [error, setError] = useState<string | null>(null);
   const [registerLink, setRegisterLink] = useState(true);
   const [autostart, setAutostart] = useState(settings.autostart);
+  const [linkPreviews, setLinkPreviews] = useState(settings.linkPreviews);
   const [busy, setBusy] = useState(false);
   // Bumped on cancel so a late failure of the cancelled capture shows no error.
   const captureAttempt = useRef(0);
@@ -75,6 +78,7 @@ export function TalkModeStep({
     keyError: useId(),
     linkHint: useId(),
     autostartHint: useId(),
+    linkPreviewsHint: useId(),
   };
 
   async function captureKey(combo: string) {
@@ -157,6 +161,7 @@ export function TalkModeStep({
         pttKey,
         registerLinkHandler: linkHandlerActive !== true && registerLink,
         autostart,
+        linkPreviews,
       });
     } catch {
       setBusy(false);
@@ -299,6 +304,22 @@ export function TalkModeStep({
         </label>
         <p id={ids.autostartHint} className="wizard-muted wizard-small wizard-indent">
           {t("talk.autostartHint")}
+        </p>
+      </div>
+      <div>
+        <label className="wizard-radio">
+          <input
+            type="checkbox"
+            checked={linkPreviews}
+            aria-describedby={ids.linkPreviewsHint}
+            onChange={(event) => {
+              setLinkPreviews(event.target.checked);
+            }}
+          />
+          {t("talk.linkPreviews")}
+        </label>
+        <p id={ids.linkPreviewsHint} className="wizard-muted wizard-small wizard-indent">
+          {t("talk.linkPreviewsHint")}
         </p>
       </div>
       {error && (

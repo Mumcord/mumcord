@@ -19,3 +19,4 @@ export {
   type ConversationLog,
 } from "./chatStore";
 export { sanitizeHtml } from "./sanitize";
+export { isMention } from "./ownMention";

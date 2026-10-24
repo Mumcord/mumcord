@@ -19,7 +19,9 @@ import { Avatar, ProfilePreviewTrigger } from "../members";
 import type { ConversationLog } from "./chatStore";
 import { daysAgo, messageLayout } from "./grouping";
 import { highlightCode } from "./highlight";
+import { LinkPreviews } from "./LinkPreviewCard";
 import { openLink } from "./openLink";
+import { useIsMention } from "./ownMention";
 import { sanitizeHtml } from "./sanitize";
 
 /** Within this distance of the top, older history is loaded; of the bottom, new messages scroll. */
@@ -36,12 +38,17 @@ export interface MessageListProps {
   display?: ChatDisplay;
   /** Avatar image of a message's sender, `null` for the initials fallback. */
   avatarFor?: (message: ChatMessage) => string | null;
+  /** Show preview cards for links (FR-1.49); off means plain links and no requests. */
+  linkPreviews?: boolean;
 }
 
 const noAvatar = (): null => null;
 
-/** Sanitized message HTML with highlighted code. Its links are Tab stops only while the message is the active one. */
-function Body({ html, tabIndex }: { html: string; tabIndex: number }) {
+/**
+ * Sanitized message HTML with highlighted code, plus preview cards for its links when enabled.
+ * Its links are Tab stops only while the message is the active one.
+ */
+function Body({ html, tabIndex, previews }: { html: string; tabIndex: number; previews: boolean }) {
   const ref = useRef<HTMLDivElement>(null);
   const sanitized = useMemo(() => highlightCode(sanitizeHtml(html)), [html]);
   useEffect(() => {
@@ -49,8 +56,15 @@ function Body({ html, tabIndex }: { html: string; tabIndex: number }) {
       link.tabIndex = tabIndex;
     }
   }, [sanitized, tabIndex]);
-  return (
+  const body = (
     <div ref={ref} className="chat-message__body" dangerouslySetInnerHTML={{ __html: sanitized }} />
+  );
+  if (!previews) return body;
+  return (
+    <>
+      {body}
+      <LinkPreviews html={sanitized} tabIndex={tabIndex} />
+    </>
   );
 }
 
@@ -61,6 +75,7 @@ export function MessageList({
   onOpenProfile,
   display = "cozy",
   avatarFor = noAvatar,
+  linkPreviews = false,
 }: MessageListProps) {
   const { t, i18n } = useTranslation("chat");
   const { messages } = log;
@@ -222,6 +237,7 @@ export function MessageList({
                 itemRefs.current[index] = element;
               }}
               onOpenProfile={onOpenProfile}
+              linkPreviews={linkPreviews}
             />
           ))}
         </ol>
@@ -242,6 +258,7 @@ interface MessageItemProps {
   tabIndex: number;
   itemRef: (element: HTMLLIElement | null) => void;
   onOpenProfile: MessageListProps["onOpenProfile"];
+  linkPreviews: boolean;
 }
 
 function MessageItem({
@@ -255,7 +272,10 @@ function MessageItem({
   tabIndex,
   itemRef,
   onOpenProfile,
+  linkPreviews,
 }: MessageItemProps) {
+  const { t } = useTranslation("chat");
+  const mentioned = useIsMention(message);
   const sentAt = new Date(message.sentAt);
   const session = message.senderSession;
   // Avatar and name of every sender open the preview and the context menu. Someone who left (or
@@ -290,7 +310,8 @@ function MessageItem({
   if (display === "compact") {
     row = (
       <div className="chat-message__row">
-        {stamp("chat-message__time")} {sender} <Body html={message.body} tabIndex={tabIndex} />
+        {stamp("chat-message__time")} {sender}{" "}
+        <Body html={message.body} tabIndex={tabIndex} previews={linkPreviews} />
       </div>
     );
   } else if (start) {
@@ -304,7 +325,7 @@ function MessageItem({
             {sender}
             {stamp("chat-message__time")}
           </div>
-          <Body html={message.body} tabIndex={tabIndex} />
+          <Body html={message.body} tabIndex={tabIndex} previews={linkPreviews} />
         </div>
       </div>
     );
@@ -315,7 +336,7 @@ function MessageItem({
         <span className="chat-message__sender visually-hidden">{message.senderName} </span>
         <div className="chat-message__gutter">{stamp("chat-message__hover-time")}</div>
         <div className="chat-message__content">
-          <Body html={message.body} tabIndex={tabIndex} />
+          <Body html={message.body} tabIndex={tabIndex} previews={linkPreviews} />
         </div>
       </div>
     );
@@ -325,9 +346,13 @@ function MessageItem({
     // Roving tab stop so screen-reader and keyboard users can step through messages.
     <li
       ref={itemRef}
-      className={start ? "chat-message chat-message--start" : "chat-message"}
+      className={
+        (start ? "chat-message chat-message--start" : "chat-message") +
+        (mentioned ? " chat-message--mention" : "")
+      }
       tabIndex={tabIndex}
     >
+      {mentioned ? <span className="visually-hidden">{t("mention.mentionsYou")}. </span> : null}
       {day !== null ? <div className="chat-day">{day}</div> : null}
       {row}
     </li>

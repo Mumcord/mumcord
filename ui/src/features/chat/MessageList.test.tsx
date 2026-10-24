@@ -1,8 +1,9 @@
-import { fireEvent, render, screen, within } from "@testing-library/react";
-import { beforeAll, describe, expect, it, vi } from "vitest";
+import { fireEvent, render, screen, waitFor, within } from "@testing-library/react";
+import { afterEach, beforeAll, describe, expect, it, vi } from "vitest";
 import type { ChatDisplay, ChatMessage } from "../../api";
 import { applyLanguage } from "../../i18n";
 import { axeViolations } from "../../test/axe";
+import { connectedMock, resetAll } from "../channels/testUtils";
 import { closePersonMenu, currentPersonMenu } from "../members/personMenuStore";
 import {
   closePreview,
@@ -153,5 +154,25 @@ describe("MessageList compact", () => {
     expect(items[1]).toHaveTextContent(/^\d\d:\d\d(\s[AP]M)?\s*Maya\s*second$/);
     expect(within(items[1] as HTMLElement).getByText("Maya")).not.toHaveClass("visually-hidden");
     expect(await axeViolations(document.body)).toEqual([]);
+  });
+});
+
+describe("MessageList mentions", () => {
+  afterEach(() => {
+    resetAll();
+  });
+
+  it("highlights messages that mention the user, and only those", async () => {
+    await connectedMock();
+    renderList("cozy", [
+      message("1", "Maya", 5, "<p>hello @zoe</p>"),
+      message("2", "Maya", 4, "<p>mail zoe@example.com</p>"),
+    ]);
+    const items = await screen.findAllByRole("listitem");
+    await waitFor(() => {
+      expect(items[0]).toHaveClass("chat-message--mention");
+    });
+    expect(items[0]).toHaveTextContent("Mentions you");
+    expect(items[1]).not.toHaveClass("chat-message--mention");
   });
 });

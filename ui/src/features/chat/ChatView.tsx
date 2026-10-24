@@ -71,7 +71,9 @@ function ConversationChat({ conversation, renderHeaderActions }: ConversationCha
   const pinned = pinnedInfo(server, conversation);
   const pinnedChannelId = conversation.kind === "channel" ? conversation.channelId : null;
   // Outside the app shell (isolated feature tests) there are no preferences: the default applies.
-  const display = useContext(PreferencesContext)?.chatDisplay ?? "cozy";
+  const preferences = useContext(PreferencesContext);
+  const display = preferences?.chatDisplay ?? "cozy";
+  const linkPreviews = preferences?.linkPreviews ?? false;
   const { users, selfSession } = server;
 
   // The person behind a message while they are still connected. Sessions are reused after
@@ -177,6 +179,7 @@ function ConversationChat({ conversation, renderHeaderActions }: ConversationCha
         onOpenProfile={openProfile}
         display={display}
         avatarFor={avatarFor}
+        linkPreviews={linkPreviews}
       />
       <Composer
         target={info.target}

@@ -118,6 +118,7 @@ export function Wizard() {
       ...settings,
       talkMode: choice.talkMode,
       pttKey: choice.pttKey,
+      linkPreviews: choice.linkPreviews,
       wizardCompleted: true,
     });
     if (choice.autostart !== saved.autostart) {

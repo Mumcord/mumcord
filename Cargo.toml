@@ -32,6 +32,10 @@ tokio = { version = "1.54", features = ["full"] }
 rustls = { version = "0.23", default-features = false, features = ["ring", "std", "tls12", "logging"] }
 tokio-rustls = { version = "0.26", default-features = false, features = ["ring", "tls12", "logging"] }
 bytes = "1"
+# Link previews (FR-1.49): HTTP/1.1 client on the same rustls/ring stack as the Mumble
+# connection, with the OS certificate store for web sites.
+reqwest = { version = "0.13", default-features = false, features = ["rustls-no-provider"] }
+rustls-platform-verifier = "0.6"
 
 # Protobuf
 prost = "0.14"
@@ -63,6 +67,8 @@ keyring = "4.2"
 
 # Sanitizing, own avatar scaling
 ammonia = "4.2"
+# Tokenizer for page metadata; the same version ammonia already uses.
+html5ever = "0.40"
 image = { version = "0.25", default-features = false, features = ["png", "jpeg", "gif", "webp"] }
 
 # Positional audio / plugin host

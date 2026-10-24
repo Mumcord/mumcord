@@ -83,6 +83,8 @@ export async function startDriver(): Promise<void> {
       XDG_CONFIG_HOME: join(profileDir, "config"),
       XDG_CACHE_HOME: join(profileDir, "cache"),
       MUMCORD_AUDIO_BACKEND: audio,
+      // Link previews may only fetch the local test page, never the internet (FR-1.49).
+      MUMCORD_TEST_PREVIEW_ADDRESSES: "127.0.0.1",
     },
   });
   await waitPort(driverPort, true);

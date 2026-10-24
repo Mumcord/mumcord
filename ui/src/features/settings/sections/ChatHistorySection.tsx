@@ -5,11 +5,15 @@ import { ConfirmDialog } from "../components/ConfirmDialog";
 import { Group, Section } from "../components/Section";
 import { Switch } from "../components/Switch";
 import { errorText } from "../errors";
+import type { SettingsSectionProps } from "./types";
 
 type Status = { kind: "success" | "error"; text: string } | null;
 
-/** Chat & history: "Save history" and "Clear history" per server, plus clearing everything. */
-export function ChatHistorySection() {
+/**
+ * Chat & history: link previews (FR-1.49), "Save history" and "Clear history" per server, plus
+ * clearing everything.
+ */
+export function ChatHistorySection({ settings, update }: SettingsSectionProps) {
   const { t } = useTranslation("settings");
   const [servers, setServers] = useState<SavedServer[] | null>(null);
   const [clearing, setClearing] = useState<{ scope: HistoryScope; label: string | null } | null>(
@@ -64,6 +68,16 @@ export function ChatHistorySection() {
 
   return (
     <Section title={t("sections.chatHistory")}>
+      <Group title={t("linkPreviews.title")}>
+        <Switch
+          label={t("linkPreviews.switch")}
+          description={t("linkPreviews.hint")}
+          checked={settings.linkPreviews}
+          onChange={(linkPreviews) => {
+            update({ linkPreviews });
+          }}
+        />
+      </Group>
       <p className="settings-hint">{t("history.explanation")}</p>
       <Group title={t("history.perServer")}>
         {servers?.length === 0 && <p className="settings-hint">{t("history.noServers")}</p>}
