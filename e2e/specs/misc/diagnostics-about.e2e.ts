@@ -1,8 +1,8 @@
-import { spawn } from "node:child_process";
 import { readFileSync, readdirSync, statSync } from "node:fs";
 import { join } from "node:path";
 import { browser, $, expect } from "@wdio/globals";
 import { app, bot, testenv } from "../../helpers/index.ts";
+import { run, runOk } from "../../helpers/run.ts";
 import { waitConnected } from "../../helpers/chat-ui.ts";
 import { typeInto } from "../../helpers/servers-ui.ts";
 import { button, finishWizardWithDefaults, waitForText } from "../../helpers/wizard-util.ts";
@@ -17,26 +17,31 @@ const BOT_NAME = "Qa-Bot-Pelican";
 async function dumpDiagnostics(path: string): Promise<void> {
   // The native save dialog cannot be driven by WebDriver: type the path into the GTK dialog.
   await $("button=Save diagnostic file…").click();
-  await browser.pause(2500);
-  await new Promise<void>((resolve) => {
-    const p = spawn("xdotool", ["key", "ctrl+l"], { env: process.env });
-    p.on("close", () => {
-      resolve();
-    });
-  });
-  await browser.pause(400);
-  await new Promise<void>((resolve) => {
-    const p = spawn("xdotool", ["type", "--delay", "30", path], { env: process.env });
-    p.on("close", () => {
-      resolve();
-    });
-  });
-  await new Promise<void>((resolve) => {
-    const p = spawn("xdotool", ["key", "Return"], { env: process.env });
-    p.on("close", () => {
-      resolve();
-    });
-  });
+  // The dialog opens asynchronously and Xvfb has no window manager: keys sent before it is
+  // mapped and focused are lost (same flake as the wizard's file chooser), so wait and focus it.
+  // xdotool's own name search skips titles with a non-ASCII character such as the "…" of this
+  // dialog's title, so find the app's windows by class and compare their names ourselves.
+  let dialog = "";
+  await browser.waitUntil(
+    async () => {
+      const windows = await run("xdotool", ["search", "--class", "mumcord"]);
+      for (const id of windows.stdout.split("\n").filter((line) => line !== "")) {
+        const name = await run("xdotool", ["getwindowname", id]);
+        if (name.stdout.startsWith("Save diagnostic file")) {
+          dialog = id;
+          return true;
+        }
+      }
+      return false;
+    },
+    { timeout: 20_000, interval: 250, timeoutMsg: "native save dialog never opened" },
+  );
+  await runOk("xdotool", ["windowfocus", "--sync", dialog]);
+  await runOk("xdotool", ["key", "ctrl+l"]);
+  await browser.pause(300);
+  await runOk("xdotool", ["type", "--delay", "30", path]);
+  await browser.pause(300);
+  await runOk("xdotool", ["key", "Return"]);
 }
 
 describe("diagnostics and about (AC-1.28, AC-1.29)", () => {
