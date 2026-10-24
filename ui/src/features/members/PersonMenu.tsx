@@ -15,6 +15,7 @@ import { useTranslation } from "react-i18next";
 import { getApi, toEngineError } from "../../api";
 import { useServerState } from "../channels/serverStore";
 import "./members.css";
+import { findPerson } from "./personLookup";
 import { VolumeSlider } from "./ProfileCard";
 import { openPrivateConversation } from "./privateMessage";
 import {
@@ -53,7 +54,7 @@ function PersonMenu({
 }) {
   const { t } = useTranslation("members");
   const state = useServerState();
-  const user = state.users.get(open.session);
+  const user = findPerson(state.users, open.session, open.name);
   const ref = useRef<HTMLDivElement>(null);
 
   const close = (returnFocus: boolean) => {
@@ -61,9 +62,11 @@ function PersonMenu({
     if (returnFocus && open.opener?.isConnected) open.opener.focus();
   };
 
+  // Without a stored name there is nothing to show for a person who left.
+  const gone = !user && open.name === undefined;
   useEffect(() => {
-    if (!user) closePersonMenu();
-  }, [user]);
+    if (gone) closePersonMenu();
+  }, [gone]);
 
   useEffect(() => {
     const dismiss = () => {
@@ -72,16 +75,23 @@ function PersonMenu({
     const onPointerDown = (event: PointerEvent) => {
       if (!(event.target instanceof Node && ref.current?.contains(event.target))) dismiss();
     };
+    // Containers scrolling by themselves (the chat list following a new message) keep it open;
+    // the page scrolling or the user using the wheel elsewhere closes it.
     const onScroll = (event: Event) => {
+      if (event.target === document || event.target instanceof Window) dismiss();
+    };
+    const onWheel = (event: Event) => {
       if (!(event.target instanceof Node && ref.current?.contains(event.target))) dismiss();
     };
     document.addEventListener("pointerdown", onPointerDown, true);
     window.addEventListener("scroll", onScroll, true);
+    window.addEventListener("wheel", onWheel, { capture: true, passive: true });
     window.addEventListener("blur", dismiss);
     window.addEventListener("resize", dismiss);
     return () => {
       document.removeEventListener("pointerdown", onPointerDown, true);
       window.removeEventListener("scroll", onScroll, true);
+      window.removeEventListener("wheel", onWheel, true);
       window.removeEventListener("blur", dismiss);
       window.removeEventListener("resize", dismiss);
     };
@@ -98,8 +108,8 @@ function PersonMenu({
     element.querySelector<HTMLElement>('[role="menuitem"]')?.focus();
   }, [open]);
 
-  if (!user) return null;
-  const isSelf = user.session === state.selfSession;
+  if (gone) return null;
+  const isSelf = user?.session === state.selfSession;
 
   const report = (cause: unknown) => {
     console.error("Changing a person's local settings failed", toEngineError(cause).code);
@@ -157,15 +167,28 @@ function PersonMenu({
       ref={ref}
       className="server-menu person-menu"
       role="menu"
-      aria-label={t("menu.label", { name: user.name })}
+      aria-label={t("menu.label", { name: user?.name ?? open.name })}
       tabIndex={-1}
       onKeyDown={onKeyDown}
     >
-      {item("profile", t("menu.viewProfile"), () => {
-        closePersonMenu();
-        onViewProfile(user.session, open.opener);
-      })}
-      {!isSelf && (
+      {user ? (
+        item("profile", t("menu.viewProfile"), () => {
+          closePersonMenu();
+          onViewProfile(user.session, open.opener);
+        })
+      ) : (
+        // Not on the server: there is no profile to open and nothing to mute.
+        <button
+          type="button"
+          role="menuitem"
+          aria-disabled="true"
+          tabIndex={-1}
+          className="server-menu__item"
+        >
+          {t("menu.viewProfile")}
+        </button>
+      )}
+      {user && !isSelf && (
         <>
           {item("mute", user.localMute ? t("menu.unmute") : t("menu.mute"), () => {
             closePersonMenu();

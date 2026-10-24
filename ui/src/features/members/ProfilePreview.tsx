@@ -21,6 +21,7 @@ import { useServerState } from "../channels/serverStore";
 import "./profilePreview.css";
 import { Avatar } from "./Avatar";
 import { openPersonMenuFromEvent, openPersonMenuFromKey } from "./personMenuStore";
+import { findPerson } from "./personLookup";
 import { placeNextTo } from "./placement";
 import {
   closePreview,
@@ -48,9 +49,13 @@ const anchorOf = (trigger: HTMLElement) =>
 /** Reports hover and keyboard focus on a person to the shared preview. Stateless, so cheap per row. */
 export function ProfilePreviewTrigger({
   session,
+  name,
   children,
 }: {
-  session: number;
+  /** `null` when the person has no live session (chat history). */
+  session: number | null;
+  /** Stored sender name (chat): finds the person again and labels the limited preview. */
+  name?: string;
   children: ReactNode;
 }) {
   return (
@@ -58,8 +63,11 @@ export function ProfilePreviewTrigger({
     // eslint-disable-next-line jsx-a11y/no-static-element-interactions
     <span
       className="profile-preview-trigger"
+      data-person-session={session ?? undefined}
       onPointerEnter={(event) => {
-        if (isHoverPointer(event)) requestPreview(session, anchorOf(event.currentTarget));
+        if (isHoverPointer(event)) {
+          requestPreview(session, anchorOf(event.currentTarget), undefined, name);
+        }
       }}
       onPointerLeave={(event) => {
         if (isHoverPointer(event)) releasePreview();
@@ -67,14 +75,14 @@ export function ProfilePreviewTrigger({
       // Closes before the click lands, so the full card opens without the preview in the way.
       onPointerDown={closePreview}
       onFocus={(event: FocusEvent<HTMLSpanElement>) => {
-        previewOnFocus(session, event.currentTarget, event.target);
+        previewOnFocus(session, event.currentTarget, event.target, name);
       }}
       onBlur={releasePreview}
       onContextMenu={(event) => {
-        openPersonMenuFromEvent(session, event);
+        openPersonMenuFromEvent(session, event, name);
       }}
       onKeyDown={(event) => {
-        openPersonMenuFromKey(session, event);
+        openPersonMenuFromKey(session, event, name);
       }}
     >
       {children}
@@ -93,41 +101,72 @@ export function ProfilePreviewHost() {
 
 function Preview({ open }: { open: OpenPreview }) {
   const state = useServerState();
-  const user = state.users.get(open.session);
+  const user = findPerson(state.users, open.session, open.name);
   const ref = useRef<HTMLDivElement>(null);
+  // The trigger may be re-created by a re-render (tree rows, chat list); follow it by session.
+  const anchorRef = useRef(open.anchor);
+  useLayoutEffect(() => {
+    anchorRef.current = open.anchor;
+  }, [open.anchor]);
+  const placeRef = useRef<() => void>(() => undefined);
 
+  // Without a stored name there is nothing to show for a person who left.
+  const gone = !user && open.name === undefined;
   useEffect(() => {
-    if (!user) closePreview();
-  }, [user]);
+    if (gone) closePreview();
+  }, [gone]);
 
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
       if (event.key === "Escape") closePreview();
     };
     const onScroll = (event: Event) => {
-      // Scrolling a long comment inside the preview keeps it open.
+      const target = event.target;
+      if (target === document || target instanceof Window) {
+        closePreview();
+        return;
+      }
+      if (!(target instanceof Node) || ref.current?.contains(target)) return;
+      // Only the page itself closes it; a container scrolling by itself (the chat list following
+      // a new message) just moves the person, so the preview follows.
+      if (target.contains(anchorRef.current)) placeRef.current();
+    };
+    // The user scrolling with the wheel elsewhere closes it, like moving away.
+    const onWheel = (event: Event) => {
       if (!(event.target instanceof Node && ref.current?.contains(event.target))) closePreview();
     };
     document.addEventListener("keydown", onKeyDown);
     window.addEventListener("scroll", onScroll, true);
+    window.addEventListener("wheel", onWheel, { capture: true, passive: true });
     window.addEventListener("blur", closePreview);
     return () => {
       document.removeEventListener("keydown", onKeyDown);
       window.removeEventListener("scroll", onScroll, true);
+      window.removeEventListener("wheel", onWheel, true);
       window.removeEventListener("blur", closePreview);
     };
   }, []);
 
-  // Runs after every render: the size changes when the comment arrives.
-  useLayoutEffect(() => {
+  function place() {
     const element = ref.current;
     if (!element) return;
-    if (!open.anchor.isConnected) {
-      closePreview();
-      return;
+    let anchor = anchorRef.current;
+    if (!anchor.isConnected) {
+      const again =
+        open.session === null
+          ? null
+          : document.querySelector<HTMLElement>(
+              `.profile-preview-trigger[data-person-session="${String(open.session)}"]`,
+            );
+      if (!again) {
+        closePreview();
+        return;
+      }
+      anchor = anchorOf(again);
+      anchorRef.current = anchor;
     }
     const { left, top } = placeNextTo(
-      open.anchor.getBoundingClientRect(),
+      anchor.getBoundingClientRect(),
       element.offsetWidth,
       element.offsetHeight,
       window.innerWidth,
@@ -135,9 +174,15 @@ function Preview({ open }: { open: OpenPreview }) {
     );
     element.style.left = `${String(left)}px`;
     element.style.top = `${String(top)}px`;
+  }
+
+  // Runs after every render: the size changes when the comment arrives.
+  useLayoutEffect(() => {
+    placeRef.current = place;
+    place();
   });
 
-  if (!user) return null;
+  if (gone) return null;
   return (
     <div
       ref={ref}
@@ -147,7 +192,16 @@ function Preview({ open }: { open: OpenPreview }) {
       onPointerEnter={holdPreview}
       onPointerLeave={releasePreview}
     >
-      <PreviewBody key={user.session} user={user} talking={state.talking.has(user.session)} />
+      {user ? (
+        <PreviewBody key={user.session} user={user} talking={state.talking.has(user.session)} />
+      ) : (
+        <div className="profile-preview__header">
+          <Avatar name={open.name ?? ""} src={null} size="lg" />
+          <div className="profile-preview__identity">
+            <p className="profile-preview__name">{open.name}</p>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -3,6 +3,7 @@ import { beforeAll, describe, expect, it, vi } from "vitest";
 import type { ChatDisplay, ChatMessage } from "../../api";
 import { applyLanguage } from "../../i18n";
 import { axeViolations } from "../../test/axe";
+import { closePersonMenu, currentPersonMenu } from "../members/personMenuStore";
 import {
   closePreview,
   currentPreview,
@@ -50,7 +51,7 @@ beforeAll(async () => {
 });
 
 describe("MessageList profile preview", () => {
-  it("previews live senders on hover of avatar or name, not oneself", () => {
+  it("previews every sender on hover of avatar or name, oneself included", () => {
     const messages = [
       { ...message("1", "Maya", 30, "first"), senderSession: 7 },
       { ...message("2", "Jonas", 28, "mine"), senderSession: 1, own: true },
@@ -64,7 +65,7 @@ describe("MessageList profile preview", () => {
       />,
     );
     const triggers = container.querySelectorAll(".profile-preview-trigger");
-    expect(triggers).toHaveLength(2);
+    expect(triggers).toHaveLength(4);
     expect(triggers[0]?.querySelector(".avatar")).not.toBeNull();
     expect(triggers[1]).toContainElement(screen.getByRole("button", { name: "Maya" }));
 
@@ -78,6 +79,35 @@ describe("MessageList profile preview", () => {
       vi.useRealTimers();
     }
   });
+
+  it.each<ChatDisplay>(["cozy", "compact"])(
+    "opens preview and menu for a sender who is not on the server (%s)",
+    (display) => {
+      const messages = [message("1", "Ghost", 5, "boo")];
+      const { container } = render(
+        <MessageList
+          log={{ messages, loaded: true, loading: false, hasMore: false, loadFailed: false }}
+          label="Messages"
+          onLoadOlder={() => undefined}
+          display={display}
+        />,
+      );
+      const triggers = container.querySelectorAll(".profile-preview-trigger");
+      expect(triggers).toHaveLength(display === "cozy" ? 2 : 1);
+      vi.useFakeTimers();
+      try {
+        fireEvent.pointerEnter(triggers[0] as Element, { pointerType: "mouse" });
+        vi.advanceTimersByTime(PREVIEW_OPEN_DELAY_MS);
+        expect(currentPreview()).toMatchObject({ session: null, name: "Ghost" });
+        fireEvent.contextMenu(triggers[triggers.length - 1] as Element, { clientX: 5, clientY: 5 });
+        expect(currentPersonMenu()).toMatchObject({ session: null, name: "Ghost" });
+      } finally {
+        closePreview();
+        closePersonMenu();
+        vi.useRealTimers();
+      }
+    },
+  );
 });
 
 describe("MessageList cozy", () => {

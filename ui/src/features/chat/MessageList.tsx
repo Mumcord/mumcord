@@ -257,30 +257,28 @@ function MessageItem({
 }: MessageItemProps) {
   const sentAt = new Date(message.sentAt);
   const session = message.senderSession;
-  // Live senders other than oneself get the profile preview on hover/focus of avatar and name.
-  const preview = (content: ReactNode) =>
-    session !== null && !message.own ? (
-      <ProfilePreviewTrigger session={session}>{content}</ProfilePreviewTrigger>
-    ) : (
-      content
-    );
+  // Avatar and name of every sender open the preview and the context menu. Someone who left (or
+  // history without a session) still gets them, limited to the stored name.
+  const preview = (content: ReactNode) => (
+    <ProfilePreviewTrigger session={session} name={message.senderName}>
+      {content}
+    </ProfilePreviewTrigger>
+  );
   const sender =
-    onOpenProfile && session !== null && !message.own ? (
-      preview(
-        <button
-          type="button"
-          className="chat-message__sender chat-message__sender--button"
-          tabIndex={tabIndex}
-          onClick={(event) => {
-            onOpenProfile(session, event.currentTarget);
-          }}
-        >
-          {message.senderName}
-        </button>,
-      )
-    ) : (
-      <span className="chat-message__sender">{message.senderName}</span>
-    );
+    onOpenProfile && session !== null
+      ? preview(
+          <button
+            type="button"
+            className="chat-message__sender chat-message__sender--button"
+            tabIndex={tabIndex}
+            onClick={(event) => {
+              onOpenProfile(session, event.currentTarget);
+            }}
+          >
+            {message.senderName}
+          </button>,
+        )
+      : preview(<span className="chat-message__sender">{message.senderName}</span>);
   const stamp = (className: string) => (
     <time className={className} dateTime={message.sentAt} title={fullTime.format(sentAt)}>
       {time.format(sentAt)}

@@ -175,4 +175,25 @@ describe("placeNextTo", () => {
     const low = { left: 100, right: 300, top: 760, bottom: 790 };
     expect(placeNextTo(low, 200, 300, 1200, 800)).toEqual({ left: 308, top: 492 });
   });
+
+  it("stays open when another container scrolls (chat following a message), closes on page scroll", async () => {
+    await renderWithPreview();
+    await hover(/^Anna/);
+    expect(preview()).not.toBeNull();
+    const other = document.createElement("div");
+    document.body.append(other);
+    act(() => {
+      other.dispatchEvent(new Event("scroll"));
+    });
+    expect(preview()).not.toBeNull();
+    act(() => {
+      api.mock.receiveMessage({ kind: "channel", channelId: 1 }, "hello", 3);
+    });
+    expect(preview()).not.toBeNull();
+    act(() => {
+      document.dispatchEvent(new Event("scroll"));
+    });
+    expect(preview()).toBeNull();
+    other.remove();
+  });
 });

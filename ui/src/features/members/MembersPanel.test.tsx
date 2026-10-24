@@ -267,6 +267,16 @@ describe("MembersPanel", () => {
     error.mockRestore();
   });
 
+  it("shows the status icons at the end of every row", async () => {
+    await renderPanel();
+    const rows = screen.getAllByRole("button").filter((b) => b.classList.contains("member"));
+    expect(rows.length).toBeGreaterThan(0);
+    for (const row of rows) {
+      expect(row.lastElementChild).toHaveClass("person-icons");
+      expect(row.querySelectorAll(".person-icon").length).toBeGreaterThan(0);
+    }
+  });
+
   it.each(["dark", "light"] as const)("has no axe violations (%s)", async (theme) => {
     applyThemeToDocument(theme);
     const { container } = await renderPanel();

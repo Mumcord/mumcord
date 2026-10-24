@@ -12,7 +12,10 @@ export const PREVIEW_CLOSE_GRACE_MS = 150;
 export const PREVIEW_ID = "profile-preview";
 
 export interface OpenPreview {
-  session: number;
+  /** Session of the person; `null` for someone who is not on the server (history). */
+  session: number | null;
+  /** Name stored with a chat message; used to find the person and as the fallback label. */
+  name?: string | undefined;
   /** Element the preview is placed next to. */
   anchor: HTMLElement;
   /** Element that gets `aria-describedby` pointing at the preview (the focused one, if any). */
@@ -59,10 +62,15 @@ export function currentPreview(): OpenPreview | null {
  * The pointer or focus arrived on a person. Opens after the delay; while another preview is open
  * it switches right away, so moving down a list doesn't wait at every row.
  */
-export function requestPreview(session: number, anchor: HTMLElement, described = anchor): void {
+export function requestPreview(
+  session: number | null,
+  anchor: HTMLElement,
+  described = anchor,
+  name?: string,
+): void {
   clearTimer();
-  if (current?.session === session && current.anchor === anchor) return;
-  const next = { session, anchor, described };
+  if (current?.session === session && current.name === name && current.anchor === anchor) return;
+  const next = { session, name, anchor, described };
   if (current) set(next);
   else
     timer = setTimeout(() => {
@@ -96,7 +104,12 @@ export function closePreview(): void {
  * Shows the preview for keyboard focus on `focused` (placed next to `anchor`). For rows that take
  * focus themselves (tree items); pair with `onBlur={releasePreview}`.
  */
-export function previewOnFocus(session: number, anchor: HTMLElement, focused = anchor): void {
+export function previewOnFocus(
+  session: number | null,
+  anchor: HTMLElement,
+  focused = anchor,
+  name?: string,
+): void {
   // Focus from a mouse click is not keyboard focus; the click opens the full card instead.
-  if (focused.matches(":focus-visible")) requestPreview(session, anchor, focused);
+  if (focused.matches(":focus-visible")) requestPreview(session, anchor, focused, name);
 }

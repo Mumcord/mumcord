@@ -6,7 +6,10 @@ import type { KeyboardEvent, MouseEvent } from "react";
 import { closePreview } from "./profilePreviewStore";
 
 export interface OpenPersonMenu {
-  session: number;
+  /** `null` for someone who is not on the server (chat history). */
+  session: number | null;
+  /** Name stored with a chat message; used to find the person and as the fallback label. */
+  name?: string | undefined;
   /** Viewport position of the pointer (or of the person for keyboard use). */
   x: number;
   y: number;
@@ -52,7 +55,11 @@ function openerOf(element: HTMLElement): HTMLElement {
 }
 
 /** Right-click, or the ContextMenu key (browsers send `contextmenu` for it, without a pointer). */
-export function openPersonMenuFromEvent(session: number, event: MouseEvent<HTMLElement>): void {
+export function openPersonMenuFromEvent(
+  session: number | null,
+  event: MouseEvent<HTMLElement>,
+  name?: string,
+): void {
   event.preventDefault();
   const element = event.currentTarget;
   const opener = openerOf(element);
@@ -60,6 +67,7 @@ export function openPersonMenuFromEvent(session: number, event: MouseEvent<HTMLE
   const rect = (fromKeyboard ? opener : element).getBoundingClientRect();
   openPersonMenu({
     session,
+    name,
     x: fromKeyboard ? rect.left : event.clientX,
     y: fromKeyboard ? rect.bottom : event.clientY,
     opener,
@@ -67,10 +75,14 @@ export function openPersonMenuFromEvent(session: number, event: MouseEvent<HTMLE
 }
 
 /** Keyboard fallback for engines that don't turn ContextMenu / Shift+F10 into `contextmenu`. */
-export function openPersonMenuFromKey(session: number, event: KeyboardEvent<HTMLElement>): void {
+export function openPersonMenuFromKey(
+  session: number | null,
+  event: KeyboardEvent<HTMLElement>,
+  name?: string,
+): void {
   if (event.key !== "ContextMenu" && !(event.key === "F10" && event.shiftKey)) return;
   event.preventDefault();
   const opener = event.target instanceof HTMLElement ? event.target : openerOf(event.currentTarget);
   const rect = opener.getBoundingClientRect();
-  openPersonMenu({ session, x: rect.left, y: rect.bottom, opener });
+  openPersonMenu({ session, name, x: rect.left, y: rect.bottom, opener });
 }

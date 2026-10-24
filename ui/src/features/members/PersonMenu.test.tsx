@@ -152,4 +152,18 @@ describe("PersonMenu", () => {
     fireEvent.contextMenu(trigger, { clientX: 1, clientY: 1 });
     expect(screen.queryByRole("tooltip")).not.toBeInTheDocument();
   });
+
+  it("stays open when a message arrives or another container scrolls", async () => {
+    await renderPanel();
+    fireEvent.contextMenu(member(/^Anna/), { clientX: 30, clientY: 40 });
+    act(() => {
+      api.mock.receiveMessage({ kind: "channel", channelId: 1 }, "hello", 3);
+      document.body.dispatchEvent(new Event("scroll"));
+    });
+    expect(menu()).toBeInTheDocument();
+    act(() => {
+      document.dispatchEvent(new Event("scroll"));
+    });
+    expect(menu()).not.toBeInTheDocument();
+  });
 });
