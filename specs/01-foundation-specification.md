@@ -133,7 +133,7 @@ Mumcord enforces nothing itself; the server's ACLs decide. The client reflects p
 - **FR-1.46** Where the OS or desktop doesn't allow staying on top (some Linux desktops) or a game runs in exclusive fullscreen, settings explain the limitation.
 - **FR-1.49** Link previews (QA.34, stage 1b): links in messages get a preview card (title, description, image, "Open in browser"). Mumcord fetches the page metadata itself; on by default, switchable in the first-start wizard and in settings; fetched data is sanitized and cached; no preview for private/LAN addresses.
 - **FR-1.50** YouTube and Twitch links show an embedded player card with title and "Open in browser"; the player loads only after a click (QA.34). Spotify links get the same kind of card (cover, title, artist, "Open in browser", player after a click) (QA.40).
-- **FR-1.51** Mentions (QA.34): typing `@` in the input autocompletes names of people on the server; a message mentioning the user is highlighted and notifies them even in otherwise quiet channels; the text stays plain `@Name` for other clients.
+- **FR-1.51** Mentions (QA.34): typing `@` in the input autocompletes names of people on the server; a message mentioning the user is highlighted and notifies them even in otherwise quiet channels; the text stays plain `@Name` for other clients. Being mentioned also plays a distinct short "ping" sound; both the mention sound and mention notifications have their own switches under Settings → Sounds & notifications (default on) (QA.41).
 - **FR-1.52** GIFs via Tenor (QA.34): a GIF button opens a Tenor search; the chosen GIF is sent as an image link/embed compatible with Mumble's image rules. The Tenor API key comes from a CI secret at build time; builds without a key hide the button.
 - **FR-1.53** Code (QA.34): ``` fenced code blocks (optional language) and `inline code` render with syntax highlighting; other clients see the text.
 - **FR-1.54** Formatting in the input (QA.34): a small toolbar plus shortcuts (Ctrl+B bold, Ctrl+I italic, Ctrl+Shift+X strikethrough, Ctrl+E code, Ctrl+K link inside the input) that insert Markdown.
@@ -477,6 +477,7 @@ Unless stated otherwise: a fresh Mumcord install, a local test server (1.5) runn
 | QA.38 | Image viewer with zoom/pan/navigation/save for chat images | Addendum 2026-10-25; FR-1.56, AC-1.46 |
 | QA.39 | Manual voice activation threshold with live meter (stage 1b) | Addendum 2026-10-25; FR-1.57, AC-1.47 |
 | QA.40 | Spotify link cards; opt-in "Now playing" status shared via plugin data (music icon, cover, progress) and comment line for official clients | Addendum 2026-10-25; FR-1.50, FR-1.58, AC-1.48, AC-1.49 |
+| QA.41 | Mention ping sound + separate switches for mention sound and mention notifications | Addendum 2026-10-25; FR-1.51 |
 
 ## 13. Open points & risks
 

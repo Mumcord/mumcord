@@ -1004,3 +1004,11 @@ Until now external images (img tags pointing to web addresses, image links) are 
 ✍️ Note: Asked and answered in chat during /dev ("status of now playing synced with other user … should be activated in the settings").
 
 ---
+
+#### QA.41 Ping when mentioned? `◉`
+
+- [x] **A distinct short "ping" sound when the user is mentioned, plus separate switches for "Sound when mentioned" and "Notify when mentioned" under Settings → Sounds & notifications (both default on).**
+
+✍️ Note: Requested in chat during /dev.
+
+---
