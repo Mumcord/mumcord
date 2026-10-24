@@ -164,7 +164,7 @@ fn password_account(server: ServerId) -> String {
     format!("server-password/{server}")
 }
 
-#[cfg(test)]
+#[cfg(any(test, feature = "test-util"))]
 mod memory {
     use std::collections::HashMap;
     use std::sync::Mutex;
@@ -192,8 +192,8 @@ mod memory {
     }
 
     impl SecretStore {
-        /// In-memory store for unit tests in this crate.
-        pub(crate) fn in_memory() -> Self {
+        /// In-memory store for tests, so they never touch the user's OS secure storage.
+        pub fn in_memory() -> Self {
             Self {
                 backend: Box::new(MemoryBackend::default()),
             }

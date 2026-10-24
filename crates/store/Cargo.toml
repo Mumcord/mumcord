@@ -18,6 +18,10 @@ serde_json.workspace = true
 thiserror.workspace = true
 tracing.workspace = true
 
+[features]
+# Public in-memory `SecretStore` for tests in other crates.
+test-util = []
+
 [dev-dependencies]
 tempfile.workspace = true
 

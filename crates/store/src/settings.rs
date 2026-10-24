@@ -35,6 +35,17 @@ pub enum CloseBehaviour {
     Quit,
 }
 
+/// Detail of the local log files (FR-1.40).
+#[derive(Debug, Clone, Copy, Default, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum LogLevel {
+    Error,
+    Warn,
+    #[default]
+    Info,
+    Debug,
+}
+
 /// Per-event sound toggles (FR-1.27).
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(default)]
@@ -117,6 +128,8 @@ impl Default for PositionalSettings {
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 #[serde(default)]
 pub struct Settings {
+    /// The first-start wizard was finished (FR-1.1).
+    pub wizard_completed: bool,
     pub theme: ThemePreference,
     /// UI language code (`en`, `es`, `de`); `None` follows the OS language.
     pub language: Option<String>,
@@ -130,6 +143,7 @@ pub struct Settings {
     pub auto_gain: bool,
     pub sounds: SoundSettings,
     pub close_behaviour: CloseBehaviour,
+    pub log_level: LogLevel,
     pub overlay: OverlaySettings,
     pub positional: PositionalSettings,
     /// Identifiers of individually enabled game plugins (FR-1.42).
@@ -139,6 +153,7 @@ pub struct Settings {
 impl Default for Settings {
     fn default() -> Self {
         Self {
+            wizard_completed: false,
             theme: ThemePreference::default(),
             language: None,
             talk_mode: TalkMode::default(),
@@ -150,6 +165,7 @@ impl Default for Settings {
             auto_gain: true,
             sounds: SoundSettings::default(),
             close_behaviour: CloseBehaviour::default(),
+            log_level: LogLevel::default(),
             overlay: OverlaySettings::default(),
             positional: PositionalSettings::default(),
             enabled_plugins: Vec::new(),
@@ -207,6 +223,8 @@ mod tests {
             height: 400,
         });
         changed.enabled_plugins = vec!["gtav".into()];
+        changed.wizard_completed = true;
+        changed.log_level = LogLevel::Debug;
         store.save_settings(&changed).expect("save");
         store.save_settings(&changed).expect("save twice");
         assert_eq!(store.settings().expect("reload"), changed);
@@ -221,5 +239,7 @@ mod tests {
         assert!(!parsed.sounds.user_joined);
         assert!(parsed.sounds.user_left);
         assert!(parsed.noise_suppression);
+        assert!(!parsed.wizard_completed);
+        assert_eq!(parsed.log_level, LogLevel::Info);
     }
 }
