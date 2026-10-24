@@ -54,5 +54,7 @@
     "notConnected": "Du bist mit keinem Server verbunden.",
     "file": "Die Datei konnte nicht gelesen oder geschrieben werden.",
     "generic": "Etwas ist schiefgelaufen. Bitte versuche es erneut."
-  }
+  },
+  "ptt": "Push-to-Talk: {{key}} gedrückt halten zum Sprechen",
+  "pttNoKey": "Push-to-Talk: keine Taste festgelegt"
 }

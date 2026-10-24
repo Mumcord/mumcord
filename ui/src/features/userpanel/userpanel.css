@@ -130,6 +130,12 @@
   color: var(--color-danger);
 }
 
+/* Push-to-talk key not held: crossed out in the muted text colour, so it differs from the red
+   self-muted state. */
+.userpanel__toggle--mic[data-ptt-idle] {
+  color: var(--color-text-muted);
+}
+
 .userpanel__icon {
   position: relative;
   display: inline-flex;

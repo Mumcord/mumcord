@@ -3,7 +3,7 @@ import { resolve } from "node:path";
 import { act, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { ViewContext, type View } from "../../app/view";
-import { createMockApi, setApi, type MockApi } from "../../api";
+import { createMockApi, setApi, type MockApi, type Settings } from "../../api";
 import { subscribeAnnouncements } from "../../a11y/announcer";
 import "../../i18n";
 import { axeViolations } from "../../test/axe";
@@ -30,9 +30,10 @@ let api: MockApi;
 let announcements: string[];
 let stopAnnouncements: () => void;
 
-async function setup(connect = true, registered = false) {
+async function setup(connect = true, registered = false, talk?: Partial<Settings>) {
   api = createMockApi({ seed: "ready" });
   setApi(api);
+  if (talk) await api.settingsUpdate({ ...(await api.settingsGet()), ...talk });
   resetServerStore();
   if (connect) {
     const [server] = await api.serversList();
@@ -477,5 +478,66 @@ describe("UserPanel", () => {
       await Promise.resolve();
     });
     expect(await axeViolations(container)).toEqual([]);
+  });
+
+  describe("push-to-talk", () => {
+    const pttSettings: Partial<Settings> = { talkMode: "pushToTalk", pttKey: "Ctrl+KeyA" };
+    const mic = () => screen.getByRole("button", { name: "Mute microphone" });
+    const crossed = () => mic().querySelectorAll("svg").length === 2;
+    const selfSession = async () => (await api.sessionSnapshot())?.selfSession ?? -1;
+
+    it("shows a crossed-out mic without level while the key is not held", async () => {
+      await setup(true, false, pttSettings);
+      await joinVoice();
+      await waitFor(() => {
+        expect(mic()).toHaveAttribute("title", "Push-to-talk: hold Ctrl+A to talk");
+      });
+      expect(crossed()).toBe(true);
+      expect(mic()).toHaveAttribute("aria-pressed", "false");
+      expect(mic()).toHaveAttribute("data-ptt-idle");
+      expect(mic().querySelector(".userpanel__level")).toBeNull();
+    });
+
+    it("shows the normal mic with level while the key is held", async () => {
+      await setup(true, false, pttSettings);
+      await joinVoice();
+      await waitFor(() => {
+        expect(mic()).toHaveAttribute("data-ptt-idle");
+      });
+      const session = await selfSession();
+      act(() => {
+        api.mock.emit("talkStateChanged", { session, talking: true });
+      });
+      expect(crossed()).toBe(false);
+      expect(mic()).not.toHaveAttribute("data-ptt-idle");
+      expect(mic().querySelector(".userpanel__level")).not.toBeNull();
+      act(() => {
+        api.mock.emit("talkStateChanged", { session, talking: false });
+      });
+      expect(crossed()).toBe(true);
+    });
+
+    it("keeps the muted look distinct from the idle look", async () => {
+      await setup(true, false, pttSettings);
+      await joinVoice();
+      await waitFor(() => {
+        expect(mic()).toHaveAttribute("data-ptt-idle");
+      });
+      fireEvent.click(mic());
+      await waitFor(() => {
+        expect(mic()).toHaveAttribute("aria-pressed", "true");
+      });
+      expect(crossed()).toBe(true);
+      expect(mic()).not.toHaveAttribute("data-ptt-idle");
+    });
+
+    it("leaves voice activation unchanged", async () => {
+      await setup();
+      await joinVoice();
+      expect(crossed()).toBe(false);
+      expect(mic()).not.toHaveAttribute("data-ptt-idle");
+      expect(mic()).not.toHaveAttribute("title");
+      expect(mic().querySelector(".userpanel__level")).not.toBeNull();
+    });
   });
 });

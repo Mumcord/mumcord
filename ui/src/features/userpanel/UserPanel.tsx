@@ -11,6 +11,7 @@ import { ProfileDialog } from "./ProfileDialog";
 import { joinChannel, useReadOnly } from "./readOnly";
 import { RegisterDialog } from "./RegisterDialog";
 import { useMicLevelFill } from "./useMicLevelFill";
+import { usePushToTalk } from "./usePushToTalk";
 import { useUserPanel } from "./useUserPanel";
 import "./userpanel.css";
 
@@ -52,7 +53,16 @@ export function UserPanel() {
   const mute = self?.selfMute ?? false;
   const deaf = self?.selfDeaf ?? false;
   const present = self !== null;
-  const showLevel = state.connected && !mute && !deaf;
+  const ptt = usePushToTalk();
+  const transmitting = self !== null && state.talking.has(self.session);
+  // Push-to-talk and not held: the mic is closed, so show it crossed out and hide the level.
+  const pttIdle = ptt.active && !transmitting && !mute && !deaf;
+  const showLevel = state.connected && !mute && !deaf && !pttIdle;
+  const micTitle = ptt.active
+    ? ptt.key === null
+      ? t("pttNoKey")
+      : t("ptt", { key: ptt.key })
+    : undefined;
   useMicLevelFill(micButton, showLevel);
 
   // Announce state changes (also those made elsewhere, e.g. the server or a shortcut).
@@ -178,8 +188,10 @@ export function UserPanel() {
           ref={micButton}
           type="button"
           className="userpanel__toggle userpanel__toggle--mic"
+          data-ptt-idle={pttIdle ? "" : undefined}
           aria-pressed={mute}
           aria-label={t("mute")}
+          title={micTitle}
           disabled={!connected}
           onClick={() => {
             run(getApi().setSelfMute(!mute));
@@ -188,7 +200,7 @@ export function UserPanel() {
           {showLevel ? <span className="userpanel__level" aria-hidden="true" /> : null}
           <span className="userpanel__icon">
             <Icon d={MIC} />
-            {mute ? <Icon d={SLASH} /> : null}
+            {mute || pttIdle ? <Icon d={SLASH} /> : null}
           </span>
         </button>
         <button
