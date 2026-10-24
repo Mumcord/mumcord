@@ -64,6 +64,31 @@ describe("ChannelsPanel", () => {
     expect(item(/^Anna/)).toHaveAttribute("data-talking", "false");
   });
 
+  it("lights only the speaker, never quiet people or listeners (AC-1.7)", async () => {
+    await renderPanel();
+    const lit = () =>
+      Array.from(document.querySelectorAll(".tree-person[data-talking='true']")).map(
+        (row) => row.querySelector(".tree-person__name")?.firstChild?.textContent,
+      );
+    expect(lit()).toEqual([]);
+    act(() => {
+      api.mock.setTalking(2, true);
+    });
+    expect(lit()).toEqual(["Anna"]);
+    act(() => {
+      api.mock.setTalking(2, false);
+      api.mock.setTalking(getServerState().selfSession ?? -1, true);
+    });
+    expect(lit()).toHaveLength(1);
+    expect(lit()).not.toContain("Anna");
+    act(() => {
+      api.mock.setTalking(4, true);
+    });
+    // Carla talks: her own row and her listener row under Lobby, nobody else.
+    expect(lit().filter((n) => n === "Carla")).toHaveLength(2);
+    expect(lit()).toHaveLength(3);
+  });
+
   it("moves with the arrow keys using a single Tab stop", async () => {
     await renderPanel();
     const tabStops = screen.getAllByRole("treeitem").filter((el) => el.tabIndex === 0);
