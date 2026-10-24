@@ -148,6 +148,8 @@ pub struct Settings {
     pub positional: PositionalSettings,
     /// Identifiers of individually enabled game plugins (FR-1.42).
     pub enabled_plugins: Vec<String>,
+    /// Send the default avatar to servers connected to for the first time (FR-1.47).
+    pub send_default_avatar: bool,
 }
 
 impl Default for Settings {
@@ -169,6 +171,7 @@ impl Default for Settings {
             overlay: OverlaySettings::default(),
             positional: PositionalSettings::default(),
             enabled_plugins: Vec::new(),
+            send_default_avatar: true,
         }
     }
 }
@@ -241,5 +244,9 @@ mod tests {
         assert!(parsed.noise_suppression);
         assert!(!parsed.wizard_completed);
         assert_eq!(parsed.log_level, LogLevel::Info);
+        assert!(
+            parsed.send_default_avatar,
+            "on by default, also for old records"
+        );
     }
 }

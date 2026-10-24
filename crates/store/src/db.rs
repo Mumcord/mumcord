@@ -66,6 +66,11 @@ const MIGRATIONS: &[&str] = &[
         data TEXT    NOT NULL
     );
     ",
+    // v2: remember per server whether the default avatar was handled (FR-1.47).
+    r"
+    ALTER TABLE saved_server ADD COLUMN default_avatar_sent INTEGER NOT NULL DEFAULT 0
+        CHECK (default_avatar_sent IN (0, 1));
+    ",
 ];
 
 /// Handle to the local database. Not `Sync`; callers share it behind a mutex.
@@ -152,6 +157,32 @@ pub(crate) mod tests {
             store.schema_version().expect("version"),
             MIGRATIONS.len() as i64
         );
+    }
+
+    #[test]
+    fn version_1_database_upgrades_and_keeps_servers() {
+        let dir = tempfile::tempdir().expect("tempdir");
+        {
+            let mut conn = Connection::open(dir.path().join(DB_FILE_NAME)).expect("open");
+            let tx = conn.transaction().expect("tx");
+            tx.execute_batch(MIGRATIONS[0]).expect("v1");
+            tx.pragma_update(None, "user_version", 1).expect("pragma");
+            tx.execute(
+                "INSERT INTO saved_server (label, address, username, sort_order)
+                 VALUES ('Old', 'localhost', 'Tester', 0)",
+                [],
+            )
+            .expect("insert");
+            tx.commit().expect("commit");
+        }
+        let store = Store::open(dir.path()).expect("upgrade");
+        assert_eq!(
+            store.schema_version().expect("version"),
+            MIGRATIONS.len() as i64
+        );
+        let servers = store.servers().expect("servers");
+        assert_eq!(servers.len(), 1);
+        assert!(!store.default_avatar_sent(servers[0].id).expect("flag"));
     }
 
     #[test]

@@ -147,6 +147,28 @@ impl Store {
         expect_one(changed, id)
     }
 
+    /// Whether the default avatar was already handled for this server (FR-1.47).
+    pub fn default_avatar_sent(&self, id: ServerId) -> Result<bool> {
+        self.conn
+            .query_row(
+                "SELECT default_avatar_sent FROM saved_server WHERE id = ?1",
+                [id],
+                |row| row.get(0),
+            )
+            .optional()?
+            .ok_or(Error::UnknownServer(id))
+    }
+
+    /// Marks the default avatar as handled for this server. Never reset: manual avatar
+    /// changes on the server must not make it send again (FR-1.47).
+    pub fn set_default_avatar_sent(&self, id: ServerId) -> Result<()> {
+        let changed = self.conn.execute(
+            "UPDATE saved_server SET default_avatar_sent = 1 WHERE id = ?1",
+            [id],
+        )?;
+        expect_one(changed, id)
+    }
+
     /// Sets the server-bar order to the given sequence of ids. Servers not listed
     /// keep their relative order after the listed ones.
     pub fn reorder_servers(&self, ordered_ids: &[ServerId]) -> Result<()> {
@@ -228,6 +250,33 @@ mod tests {
         );
         assert!(matches!(
             store.set_save_history(999, false),
+            Err(Error::UnknownServer(999))
+        ));
+    }
+
+    #[test]
+    fn default_avatar_flag_starts_unset_and_sticks() {
+        let (_dir, store) = temp_store();
+        let a = store
+            .add_server(&NewServer::new("A", "a.example", "Tester"))
+            .expect("add");
+        let b = store
+            .add_server(&NewServer::new("B", "b.example", "Tester"))
+            .expect("add");
+        assert!(!store.default_avatar_sent(a.id).expect("flag"));
+        store.set_default_avatar_sent(a.id).expect("set");
+        store.set_default_avatar_sent(a.id).expect("set twice");
+        let mut edited = store.server(a.id).expect("load").expect("exists");
+        edited.label = "A2".into();
+        store.update_server(&edited).expect("update");
+        assert!(store.default_avatar_sent(a.id).expect("flag"));
+        assert!(!store.default_avatar_sent(b.id).expect("flag"));
+        assert!(matches!(
+            store.default_avatar_sent(999),
+            Err(Error::UnknownServer(999))
+        ));
+        assert!(matches!(
+            store.set_default_avatar_sent(999),
             Err(Error::UnknownServer(999))
         ));
     }
