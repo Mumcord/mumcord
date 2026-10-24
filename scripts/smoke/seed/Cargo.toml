@@ -1,0 +1,15 @@
+# Prepares a Mumcord profile for the packaging smoke test (scripts/smoke/smoke.sh).
+# Standalone on purpose: it is a CI helper, not part of the app workspace.
+[package]
+name = "mumcord-smoke-seed"
+version = "0.1.0"
+edition = "2024"
+license = "MIT"
+publish = false
+
+[dependencies]
+mumcord-store = { path = "../../../crates/store" }
+mumcord-protocol = { path = "../../../crates/protocol" }
+tokio = { version = "1.54", features = ["rt", "macros", "time"] }
+
+[workspace]

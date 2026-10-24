@@ -25,7 +25,13 @@
   },
   "bundle": {
     "active": true,
-    "targets": "all",
+    "targets": ["appimage", "nsis", "app", "dmg"],
+    "publisher": "Mumcord contributors",
+    "copyright": "Copyright (c) Mumcord contributors. MIT License.",
+    "license": "MIT",
+    "category": "SocialNetworking",
+    "shortDescription": "Voice chat client compatible with Mumble (unsigned test build)",
+    "longDescription": "Mumcord is a modern voice chat client compatible with Mumble. It is not affiliated with the Mumble project. This is an unsigned test build: Windows and macOS show a security warning on first launch.",
     "icon": [
       "icons/32x32.png",
       "icons/128x128.png",

@@ -1,0 +1,247 @@
+name: Test builds
+
+# Unsigned test builds (spec §10, AC-1.30): Linux AppImage, Windows NSIS installer, macOS DMG.
+# Kept as workflow artifacts only – nothing is published as a GitHub release. No signing keys
+# or secrets are used. Each build is then installed on a fresh runner and smoke-tested against
+# a local Mumble server (scripts/smoke/smoke.sh).
+on:
+  push:
+    branches: [epic-1]
+  workflow_dispatch:
+
+concurrency:
+  group: test-builds-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  CARGO_TERM_COLOR: always
+  # Official Mumble server for the native Windows/macOS smoke servers (Linux uses testenv).
+  MUMBLE_SERVER_VERSION: 1.5.939
+
+jobs:
+  build:
+    name: Build ${{ matrix.name }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { name: linux, os: ubuntu-24.04, bundle: "appimage/*.AppImage" }
+          - { name: windows, os: windows-latest, bundle: "nsis/*-setup.exe" }
+          - { name: macos, os: macos-latest, bundle: "dmg/*.dmg" }
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Linux system libraries
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            libwebkit2gtk-4.1-dev libayatana-appindicator3-dev librsvg2-dev \
+            libxdo-dev libasound2-dev cmake patchelf xdg-utils
+
+      - uses: dtolnay/rust-toolchain@stable
+
+      - uses: Swatinem/rust-cache@v2
+        with:
+          key: release
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Install npm dependencies
+        run: npm ci
+
+      - name: Build bundle
+        run: npm run tauri build -- --bundles ${{ matrix.name == 'linux' && 'appimage' || matrix.name == 'windows' && 'nsis' || 'dmg' }}
+
+      - name: Collect artifact
+        shell: bash
+        run: |
+          mkdir out
+          cp target/release/bundle/${{ matrix.bundle }} out/
+          cat > out/UNSIGNED-TEST-BUILD.txt <<EOF
+          Mumcord unsigned test build
+          Commit: ${{ github.sha }}
+          Workflow run: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+
+          This build is not signed. Windows (SmartScreen) and macOS (Gatekeeper) show a security
+          warning on first launch. For testing only; not a release.
+          EOF
+          ls -l out
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: mumcord-${{ matrix.name }}-unsigned-test-build
+          path: out/
+          if-no-files-found: error
+          retention-days: 14
+
+  smoke:
+    name: Smoke ${{ matrix.name }}
+    needs: build
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { name: linux, os: ubuntu-24.04 }
+          - { name: windows, os: windows-latest }
+          - { name: macos, os: macos-latest }
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 60
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: mumcord-${{ matrix.name }}-unsigned-test-build
+          path: build
+
+      # --- Test server -----------------------------------------------------------------------
+
+      - name: Start test server (Linux, testenv v15)
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            libasound2-dev cmake sqlite3 xvfb dbus-x11 gnome-keyring \
+            libwebkit2gtk-4.1-0 libayatana-appindicator3-1
+          # Throwaway SuperUser password for this runner only (same as e2e/run.sh).
+          printf 'SUPERUSER_PASSWORD=%s\nSERVER_PASSWORD=\n' "$(openssl rand -hex 16)" > testenv/.env
+          testenv/up.sh v15
+
+      - name: Start test server (Windows, official Mumble server)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          $v = $env:MUMBLE_SERVER_VERSION
+          $installer = "$env:RUNNER_TEMP\mumble_server.exe"
+          Invoke-WebRequest "https://github.com/mumble-voip/mumble/releases/download/v$v/mumble_server-$v.x64.exe" -OutFile $installer
+          # WiX burn bundle: /quiet installs without UI.
+          Start-Process $installer -ArgumentList '/quiet', '/norestart' -Wait
+          $server = Get-ChildItem 'C:\Program Files\Mumble*' -Recurse -Filter 'mumble-server.exe' | Select-Object -First 1
+          if (-not $server) { throw 'mumble-server.exe not found after install' }
+          $dir = "$env:RUNNER_TEMP\mumble-server"
+          New-Item -ItemType Directory -Force $dir | Out-Null
+          @"
+          database=$dir\mumble-server.sqlite
+          logfile=$dir\mumble-server.log
+          port=64738
+          autobanAttempts=0
+          "@ | Set-Content "$dir\mumble-server.ini"
+          Start-Process $server.FullName -ArgumentList '-ini', "$dir\mumble-server.ini"
+          for ($i = 0; $i -lt 60; $i++) {
+            if ((Test-NetConnection 127.0.0.1 -Port 64738 -WarningAction SilentlyContinue).TcpTestSucceeded) { exit 0 }
+            Start-Sleep 1
+          }
+          Get-Content "$dir\mumble-server.log" -ErrorAction SilentlyContinue
+          throw 'Mumble server did not open port 64738'
+
+      # Homebrew has no Mumble server and the official releases ship none for macOS, so it is
+      # built from the release source (server only) and cached. If this fails, the macOS smoke
+      # falls back to a start-only check and "connects" stays on the manual checklist.
+      - name: Cache Mumble server (macOS)
+        if: runner.os == 'macOS'
+        id: server-cache
+        uses: actions/cache@v4
+        with:
+          path: ~/mumble-server
+          key: mumble-server-${{ env.MUMBLE_SERVER_VERSION }}-${{ runner.os }}-${{ runner.arch }}
+
+      - name: Build Mumble server (macOS)
+        if: runner.os == 'macOS' && steps.server-cache.outputs.cache-hit != 'true'
+        continue-on-error: true
+        run: |
+          brew install qt@5 protobuf@21 openssl@3 pkgconf
+          v=$MUMBLE_SERVER_VERSION
+          curl -fsSL "https://github.com/mumble-voip/mumble/releases/download/v$v/mumble-$v.tar.gz" | tar -xz -C "$RUNNER_TEMP"
+          cmake -S "$RUNNER_TEMP/mumble-$v" -B "$RUNNER_TEMP/mumble-build" -DCMAKE_BUILD_TYPE=Release \
+            -Dclient=OFF -Dserver=ON -Dice=OFF -Dzeroconf=OFF -Dtests=OFF -Dplugins=OFF \
+            -Dwarnings-as-errors=OFF \
+            -DCMAKE_PREFIX_PATH="$(brew --prefix qt@5);$(brew --prefix protobuf@21);$(brew --prefix openssl@3)"
+          cmake --build "$RUNNER_TEMP/mumble-build" -j "$(sysctl -n hw.ncpu)"
+          mkdir -p ~/mumble-server
+          cp "$(find "$RUNNER_TEMP/mumble-build" -type f -perm -u+x -name 'mumble-server' | head -n 1)" ~/mumble-server/
+
+      - name: Start test server (macOS)
+        if: runner.os == 'macOS'
+        id: mac-server
+        continue-on-error: true
+        run: |
+          test -x ~/mumble-server/mumble-server
+          # Runtime libraries of the cached binary.
+          brew install qt@5 protobuf@21 openssl@3
+          dir=$RUNNER_TEMP/mumble-server-data
+          mkdir -p "$dir"
+          printf 'database=%s\nport=64738\nautobanAttempts=0\n' "$dir/mumble-server.sqlite" > "$dir/mumble-server.ini"
+          ~/mumble-server/mumble-server -ini "$dir/mumble-server.ini" -fg > "$dir/server.log" 2>&1 &
+          for i in $(seq 60); do nc -z 127.0.0.1 64738 && exit 0; sleep 1; done
+          cat "$dir/server.log"
+          exit 1
+
+      # --- Smoke helpers ---------------------------------------------------------------------
+
+      - uses: dtolnay/rust-toolchain@stable
+
+      - uses: Swatinem/rust-cache@v2
+        with:
+          key: smoke
+          workspaces: |
+            . -> target
+            scripts/smoke/seed -> target
+
+      - name: Build seeder and mumcord-bot
+        run: |
+          cargo build --release --locked -p mumcord-bot
+          CARGO_TARGET_DIR="$PWD/target" cargo build --release --locked --manifest-path scripts/smoke/seed/Cargo.toml
+
+      # --- Install the build and run the smoke test ------------------------------------------
+
+      - name: Smoke test (Linux)
+        if: runner.os == 'Linux'
+        env:
+          # No FUSE needed on the runner.
+          APPIMAGE_EXTRACT_AND_RUN: "1"
+        run: |
+          app=$(ls build/*.AppImage)
+          chmod +x "$app"
+          # Secret Service (unlocked gnome-keyring) for the identity, and a virtual display.
+          # Empty password unlocks the login keyring non-interactively (as in e2e/container-run.sh).
+          dbus-run-session -- bash -c '
+            printf "" | gnome-keyring-daemon --unlock --components=secrets >/dev/null
+            gnome-keyring-daemon --start --components=secrets >/dev/null
+            xvfb-run -a scripts/smoke/smoke.sh --app "$0" --seed target/release/mumcord-smoke-seed --bot target/release/mumcord-bot
+          ' "$PWD/$app"
+
+      - name: Smoke test (Windows)
+        if: runner.os == 'Windows'
+        env:
+          # Keep Git Bash from rewriting "/S" and the mumble:// link into Windows paths.
+          MSYS2_ARG_CONV_EXCL: "*"
+        run: |
+          installer=$(ls build/*-setup.exe)
+          # NSIS silent install for the current user.
+          "$installer" /S
+          app=$(find "$(cygpath -u "$LOCALAPPDATA")" -maxdepth 3 -iname 'mumcord.exe' | head -n 1)
+          test -n "$app" || { echo "Mumcord.exe not found after install" >&2; exit 1; }
+          scripts/smoke/smoke.sh --app "$app" --seed target/release/mumcord-smoke-seed.exe --bot target/release/mumcord-bot.exe
+
+      - name: Smoke test (macOS)
+        if: runner.os == 'macOS'
+        run: |
+          dmg=$(ls build/*.dmg)
+          mount=$(hdiutil attach -nobrowse -readonly "$dmg" | awk -F'\t' '/\/Volumes\//{print $NF}')
+          cp -R "$mount/Mumcord.app" /Applications/
+          hdiutil detach "$mount"
+          if [[ "${{ steps.mac-server.outcome }}" == "success" ]]; then
+            scripts/smoke/smoke.sh --app /Applications/Mumcord.app --seed target/release/mumcord-smoke-seed --bot target/release/mumcord-bot
+          else
+            echo "::warning::No Mumble server on macOS – start-only check; 'connects' is a manual checklist item (AC-1.30)."
+            scripts/smoke/smoke.sh --app /Applications/Mumcord.app --start-only
+          fi
