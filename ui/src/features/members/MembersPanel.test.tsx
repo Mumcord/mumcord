@@ -19,6 +19,7 @@ async function renderPanel(props: Parameters<typeof MembersPanel>[0] = {}) {
 }
 
 const member = (name: RegExp) => screen.getByRole("button", { name });
+const avatarImage = (name: RegExp) => member(name).querySelector(".avatar img");
 
 beforeEach(stubDialog);
 afterEach(() => {
@@ -140,9 +141,78 @@ describe("MembersPanel", () => {
     expect(screen.queryByRole("dialog")).toBeNull();
   });
 
+  it("shows avatar images when people have one, initials otherwise", async () => {
+    await renderPanel();
+    const img = await waitFor(() => {
+      const found = avatarImage(/^Anna/);
+      expect(found).not.toBeNull();
+      return found;
+    });
+    expect(img).toHaveAttribute("src", expect.stringMatching(/^data:image\//));
+    expect(img).toHaveAttribute("alt", "");
+    expect(avatarImage(/^Ben/)).toBeNull();
+    expect(member(/^Ben/).querySelector(".avatar")).toHaveTextContent("B");
+  });
+
+  it("caches avatars and refreshes them when hasAvatar changes", async () => {
+    await renderPanel();
+    const profile = vi.spyOn(api, "personProfile");
+    const ben = getServerState().users.get(3);
+    if (!ben) throw new Error("Ben missing");
+
+    act(() => {
+      api.mock.setTalking(2, true);
+    });
+    await waitFor(() => {
+      expect(avatarImage(/^Anna/)).not.toBeNull();
+    });
+    expect(profile).not.toHaveBeenCalled();
+
+    profile.mockResolvedValueOnce({ comment: null, avatar: "data:image/png;base64,QkVO" });
+    act(() => {
+      api.mock.emit("userUpserted", { user: { ...ben, hasAvatar: true } });
+    });
+    await waitFor(() => {
+      expect(avatarImage(/^Ben/)).toHaveAttribute("src", "data:image/png;base64,QkVO");
+    });
+    expect(profile).toHaveBeenCalledExactlyOnceWith(3);
+
+    act(() => {
+      api.mock.emit("userUpserted", { user: { ...ben, hasAvatar: false } });
+    });
+    expect(avatarImage(/^Ben/)).toBeNull();
+    expect(member(/^Ben/).querySelector(".avatar")).toHaveTextContent("B");
+
+    profile.mockResolvedValueOnce({ comment: null, avatar: "data:image/png;base64,TkVX" });
+    act(() => {
+      api.mock.emit("userUpserted", { user: { ...ben, hasAvatar: true } });
+    });
+    await waitFor(() => {
+      expect(avatarImage(/^Ben/)).toHaveAttribute("src", "data:image/png;base64,TkVX");
+    });
+    expect(profile).toHaveBeenCalledTimes(2);
+  });
+
+  it("falls back to initials when loading an avatar fails", async () => {
+    api = await connectedMock();
+    vi.spyOn(api, "personProfile").mockRejectedValue({ code: "notConnected", message: "x" });
+    const error = vi.spyOn(console, "error").mockImplementation(() => undefined);
+    render(<MembersPanel />);
+    await screen.findByRole("heading", { name: "In Lobby (3)" });
+    await waitFor(() => {
+      expect(error).toHaveBeenCalled();
+    });
+    expect(avatarImage(/^Anna/)).toBeNull();
+    expect(member(/^Anna/).querySelector(".avatar")).toHaveTextContent("A");
+    error.mockRestore();
+  });
+
   it.each(["dark", "light"] as const)("has no axe violations (%s)", async (theme) => {
     applyThemeToDocument(theme);
     const { container } = await renderPanel();
+    await waitFor(() => {
+      expect(avatarImage(/^Anna/)).not.toBeNull();
+    });
     expect(await axeViolations(container)).toEqual([]);
     fireEvent.click(member(/^Anna/));
     await screen.findByText("Hi, I am Anna.");

@@ -12,6 +12,7 @@ import { useServerState } from "../channels/serverStore";
 import "./members.css";
 import { Avatar } from "./Avatar";
 import type { SendPrivateMessage } from "./privateMessage";
+import { useAvatars } from "./useAvatars";
 import { useProfileCard } from "./useProfileCard";
 
 const byName = (a: User, b: User) =>
@@ -33,13 +34,17 @@ export function MembersPanel({ onSendPrivateMessage }: MembersPanelProps) {
 
   const channel =
     conversation?.kind === "channel" ? state.channels.get(conversation.channelId) : undefined;
+  const users = channel ? [...state.users.values()] : [];
+  const people = users.filter((u) => u.channelId === channel?.id).sort(byName);
+  const listeners = users
+    .filter((u) => channel !== undefined && u.listeningChannelIds.includes(channel.id))
+    .sort(byName);
+  const avatarOf = useAvatars([...people, ...listeners]);
+
   if (!channel) {
     return <p className="members-empty">{t("noChannel")}</p>;
   }
 
-  const users = [...state.users.values()];
-  const people = users.filter((u) => u.channelId === channel.id).sort(byName);
-  const listeners = users.filter((u) => u.listeningChannelIds.includes(channel.id)).sort(byName);
   const keys = [
     ...people.map((u) => `p${String(u.session)}`),
     ...listeners.map((u) => `l${String(u.session)}`),
@@ -81,7 +86,7 @@ export function MembersPanel({ onSendPrivateMessage }: MembersPanelProps) {
             openProfile(user.session, event.currentTarget);
           }}
         >
-          <Avatar name={user.name} talking={talking} />
+          <Avatar name={user.name} src={avatarOf(user)} talking={talking} />
           <span className="member__name">
             {user.name}
             {user.session === state.selfSession && <span className="member__you"> {t("you")}</span>}
