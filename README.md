@@ -21,6 +21,12 @@ Early development (Epic 1). Expect missing features and rough edges. See `specs/
 
 Test builds for Windows and macOS are unsigned. The operating system will show a security warning when you start them.
 
+## Download
+
+Installers for Windows (`.exe`), macOS (`.dmg`, Apple Silicon and Intel) and Linux (`.AppImage`) are on the [Releases page](https://github.com/ToBee94/mumcord/releases), each with a `SHA256SUMS` file to check the download. They are unsigned for now, so Windows and macOS show a security warning on first start; the release notes explain how to open the app anyway.
+
+Maintainers: how to cut a release is described in [RELEASING.md](RELEASING.md).
+
 ## Building from source
 
 ### Prerequisites
