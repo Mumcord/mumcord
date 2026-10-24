@@ -10,3 +10,4 @@ CLAUDE.md
 .claude
 testenv
 about.hbs
+e2e/artifacts
