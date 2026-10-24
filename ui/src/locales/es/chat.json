@@ -8,6 +8,8 @@
     "unknownPerson": "Persona desconocida"
   },
   "list": {
+    "today": "Hoy",
+    "yesterday": "Ayer",
     "label": "Mensajes en {{name}}",
     "loadOlder": "Cargar mensajes anteriores",
     "loading": "Cargando mensajes…",
@@ -42,5 +44,10 @@
     "image": "{{name}} envió una imagen",
     "more_one": "{{count}} mensaje nuevo más",
     "more_other": "{{count}} mensajes nuevos más"
+  },
+  "pinned": {
+    "label": "Información del canal",
+    "showMore": "Mostrar más",
+    "showLess": "Mostrar menos"
   }
 }

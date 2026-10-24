@@ -18,6 +18,20 @@ body,
   margin: 0;
 }
 
+/* The app fills the window exactly; only inner panes scroll, never the document. */
+html,
+body {
+  overflow: hidden;
+  /* clip (unlike hidden) also blocks programmatic scrolling, e.g. focus() on a message. */
+  overflow: clip;
+}
+
+#root {
+  height: 100dvh;
+  overflow: hidden;
+  overflow: clip;
+}
+
 body {
   background: var(--color-bg-chat);
   color: var(--color-text);

@@ -1,14 +1,17 @@
 /**
  * Chat column (FR-1.28–FR-1.30): header, message list and input for the selected conversation
  * (channel or private chat). B22 adds the Follow toggle through `renderHeaderActions`. Sender
- * names open B20's profile card; focus returns to the name when it closes.
+ * names open B20's profile card; focus returns to the name when it closes. Channel chats pin the
+ * description and welcome text at the top (FR-1.48b).
  */
-import { useEffect, useMemo, type ReactNode } from "react";
+import { useCallback, useContext, useEffect, useMemo, type ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 import { announce } from "../../a11y";
-import type { Conversation } from "../../api";
+import { getApi, type ChatMessage, type Conversation, type User } from "../../api";
+import { PreferencesContext } from "../../app/preferences";
 import { useSelectedConversation, useServerState } from "../channels";
 import { useProfileCard } from "../members";
+import { useAvatars } from "../members/useAvatars";
 import {
   conversationKey,
   ensureLoaded,
@@ -21,6 +24,8 @@ import { conversationInfo } from "./conversationInfo";
 import { messageLimits } from "./images";
 import { createMessageAnnouncer } from "./messageAnnouncer";
 import { MessageList } from "./MessageList";
+import { PinnedInfoBox } from "./PinnedInfo";
+import { pinnedInfo } from "./pinnedInfo";
 import { hasImage, htmlToText } from "./sanitize";
 import "./chat.css";
 
@@ -63,6 +68,39 @@ function ConversationChat({ conversation, renderHeaderActions }: ConversationCha
   const info = conversationInfo(server, conversation, log.messages);
   const limits = useMemo(() => messageLimits(server.info), [server.info]);
   const { openProfile, profileCard } = useProfileCard();
+  const pinned = pinnedInfo(server, conversation);
+  const pinnedChannelId = conversation.kind === "channel" ? conversation.channelId : null;
+  // Outside the app shell (isolated feature tests) there are no preferences: the default applies.
+  const display = useContext(PreferencesContext)?.chatDisplay ?? "cozy";
+  const { users, selfSession } = server;
+
+  // The person behind a message while they are still connected. Sessions are reused after
+  // someone leaves, so a different name means the sender is gone (initials fallback).
+  const senderOf = useCallback(
+    (message: ChatMessage): User | undefined => {
+      const session = message.own ? selfSession : message.senderSession;
+      const user = session === null ? undefined : users.get(session);
+      return user && (message.own || user.name === message.senderName) ? user : undefined;
+    },
+    [users, selfSession],
+  );
+  const senders = useMemo(() => {
+    if (display !== "cozy") return [];
+    const found = new Map<number, User>();
+    for (const message of log.messages) {
+      const user = senderOf(message);
+      if (user) found.set(user.session, user);
+    }
+    return [...found.values()];
+  }, [display, log.messages, senderOf]);
+  const avatarOf = useAvatars(senders);
+  const avatarFor = useCallback(
+    (message: ChatMessage) => {
+      const user = senderOf(message);
+      return user ? avatarOf(user) : null;
+    },
+    [senderOf, avatarOf],
+  );
 
   const name = info.name ?? t("header.unknownPerson");
   const title = info.isChannel ? t("header.channel", { name }) : name;
@@ -70,6 +108,17 @@ function ConversationChat({ conversation, renderHeaderActions }: ConversationCha
   useEffect(() => {
     if (!log.loaded && !log.loading) ensureLoaded(conversation);
   }, [conversation, log.loaded, log.loading]);
+
+  // Long descriptions are only announced by hash: fetch the text once the chat is open. The
+  // engine sends each request only once per description; the text arrives as a channel update.
+  useEffect(() => {
+    if (!pinned.needsFetch || pinnedChannelId === null) return;
+    getApi()
+      .channelDescriptionRequest(pinnedChannelId)
+      .catch((error: unknown) => {
+        console.error("Fetching the channel description failed", error);
+      });
+  }, [pinned.needsFetch, pinnedChannelId]);
 
   useEffect(() => {
     const key = conversationKey(conversation);
@@ -118,6 +167,7 @@ function ConversationChat({ conversation, renderHeaderActions }: ConversationCha
           <div className="chat-header__actions">{renderHeaderActions(conversation)}</div>
         ) : null}
       </header>
+      <PinnedInfoBox blocks={pinned.blocks} />
       <MessageList
         log={log}
         label={t("list.label", { name: title })}
@@ -125,6 +175,8 @@ function ConversationChat({ conversation, renderHeaderActions }: ConversationCha
           void loadOlder(conversation);
         }}
         onOpenProfile={openProfile}
+        display={display}
+        avatarFor={avatarFor}
       />
       <Composer
         target={info.target}

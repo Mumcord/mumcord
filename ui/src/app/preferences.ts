@@ -1,5 +1,5 @@
 import { createContext, useContext } from "react";
-import type { Language, Settings, Theme } from "../api";
+import type { ChatDisplay, Language, Settings, Theme } from "../api";
 import type { ResolvedTheme } from "../theme/theme";
 
 export interface Preferences {
@@ -9,11 +9,13 @@ export interface Preferences {
   resolvedTheme: ResolvedTheme;
   /** UI language actually shown. */
   language: Language;
+  /** Chat message layout (FR-1.48a, QA.25). */
+  chatDisplay: ChatDisplay;
   /**
-   * Applies theme and language from a settings record immediately. The engine sends no event
+   * Applies theme, language and chat layout from a settings record immediately. The engine sends no event
    * when settings change, so whoever calls `settingsUpdate` passes the result here.
    */
-  applySettings: (settings: Pick<Settings, "theme" | "language">) => void;
+  applySettings: (settings: Pick<Settings, "theme" | "language" | "chatDisplay">) => void;
 }
 
 export const PreferencesContext = createContext<Preferences | null>(null);

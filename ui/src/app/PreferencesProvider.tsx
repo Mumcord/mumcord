@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useLayoutEffect, useMemo, useState, type ReactNode } from "react";
-import type { Language, Settings, Theme } from "../api";
+import type { ChatDisplay, Language, Settings, Theme } from "../api";
 import { applyLanguage, osLanguages, resolveLanguage } from "../i18n";
 import { applyThemeToDocument, osPrefersDark, resolveTheme, watchOsTheme } from "../theme/theme";
 import { PreferencesContext, type Preferences } from "./preferences";
@@ -7,11 +7,16 @@ import { PreferencesContext, type Preferences } from "./preferences";
 interface StoredPreferences {
   theme: Theme;
   language: Language | null;
+  chatDisplay: ChatDisplay;
 }
 
-/** Keeps the document theme and UI language in sync with the settings record and the OS. */
+/** Keeps the document theme, UI language and chat layout in sync with the settings record and the OS. */
 export function PreferencesProvider({ children }: { children: ReactNode }) {
-  const [stored, setStored] = useState<StoredPreferences>({ theme: "system", language: null });
+  const [stored, setStored] = useState<StoredPreferences>({
+    theme: "system",
+    language: null,
+    chatDisplay: "cozy",
+  });
   const [prefersDark, setPrefersDark] = useState(osPrefersDark);
 
   useEffect(() => watchOsTheme(setPrefersDark), []);
@@ -30,13 +35,26 @@ export function PreferencesProvider({ children }: { children: ReactNode }) {
     });
   }, [language]);
 
-  const applySettings = useCallback((settings: Pick<Settings, "theme" | "language">) => {
-    setStored({ theme: settings.theme, language: settings.language });
-  }, []);
+  const applySettings = useCallback(
+    (settings: Pick<Settings, "theme" | "language" | "chatDisplay">) => {
+      setStored({
+        theme: settings.theme,
+        language: settings.language,
+        chatDisplay: settings.chatDisplay,
+      });
+    },
+    [],
+  );
 
   const value = useMemo<Preferences>(
-    () => ({ theme: stored.theme, resolvedTheme, language, applySettings }),
-    [stored.theme, resolvedTheme, language, applySettings],
+    () => ({
+      theme: stored.theme,
+      resolvedTheme,
+      language,
+      chatDisplay: stored.chatDisplay,
+      applySettings,
+    }),
+    [stored.theme, resolvedTheme, language, stored.chatDisplay, applySettings],
   );
 
   return <PreferencesContext value={value}>{children}</PreferencesContext>;

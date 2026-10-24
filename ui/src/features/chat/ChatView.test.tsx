@@ -160,4 +160,35 @@ describe("ChatView", () => {
     await screen.findByText("there", { exact: false });
     expect(await axeViolations(document.body)).toEqual([]);
   });
+
+  it("pins the channel description and fetches a hash-only one when the chat opens", async () => {
+    const api = await renderChat();
+    expect(screen.getByRole("region", { name: "Channel info" })).toHaveTextContent(
+      "Welcome to the Lobby!",
+    );
+    const request = vi.spyOn(api, "channelDescriptionRequest");
+    act(() => {
+      selectConversation({ kind: "channel", channelId: 2 });
+    });
+    expect(await screen.findByRole("region", { name: "Channel info" })).toHaveTextContent(
+      "Raid rules",
+    );
+    expect(request).toHaveBeenCalledWith(2);
+  });
+
+  it("pins the welcome text in the root channel and nothing where there is no text", async () => {
+    await renderChat();
+    act(() => {
+      selectConversation({ kind: "channel", channelId: 0 });
+    });
+    expect(await screen.findByRole("region", { name: "Channel info" })).toHaveTextContent(
+      "Welcome to the mock server.",
+    );
+    act(() => {
+      selectConversation({ kind: "channel", channelId: 3 });
+    });
+    await waitFor(() => {
+      expect(screen.queryByRole("region", { name: "Channel info" })).toBeNull();
+    });
+  });
 });

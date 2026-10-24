@@ -1,12 +1,15 @@
 /**
- * Scrollable message list: sender/time groups, sanitized bodies, scroll-back paging and a single
- * Tab stop with arrow-key navigation between messages. Links open only on click.
+ * Scrollable message list (FR-1.48a): Discord-style groups (avatar, name and time once per group,
+ * text indented after the avatar) or a compact one-line layout, day separators, sanitized bodies,
+ * scroll-back paging and a single Tab stop with arrow-key navigation between messages. Links open
+ * only on click.
  */
 import { useEffect, useLayoutEffect, useMemo, useRef, useState, type KeyboardEvent } from "react";
 import { useTranslation } from "react-i18next";
-import type { ChatMessage } from "../../api";
+import type { ChatDisplay, ChatMessage } from "../../api";
+import { Avatar } from "../members";
 import type { ConversationLog } from "./chatStore";
-import { groupStarts } from "./grouping";
+import { daysAgo, messageLayout } from "./grouping";
 import { openLink } from "./openLink";
 import { sanitizeHtml } from "./sanitize";
 
@@ -20,7 +23,13 @@ export interface MessageListProps {
   onLoadOlder: () => void;
   /** Opens the sender's profile card; without it, sender names are plain text. */
   onOpenProfile?: ((session: number, trigger: HTMLElement) => void) | undefined;
+  /** Cozy (avatars, grouped) or compact (one line per message). */
+  display?: ChatDisplay;
+  /** Avatar image of a message's sender, `null` for the initials fallback. */
+  avatarFor?: (message: ChatMessage) => string | null;
 }
+
+const noAvatar = (): null => null;
 
 /** Sanitized message HTML. Its links are Tab stops only while the message is the active one. */
 function Body({ html, tabIndex }: { html: string; tabIndex: number }) {
@@ -36,7 +45,14 @@ function Body({ html, tabIndex }: { html: string; tabIndex: number }) {
   );
 }
 
-export function MessageList({ log, label, onLoadOlder, onOpenProfile }: MessageListProps) {
+export function MessageList({
+  log,
+  label,
+  onLoadOlder,
+  onOpenProfile,
+  display = "cozy",
+  avatarFor = noAvatar,
+}: MessageListProps) {
   const { t, i18n } = useTranslation("chat");
   const { messages } = log;
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -47,7 +63,7 @@ export function MessageList({ log, label, onLoadOlder, onOpenProfile }: MessageL
     height: 0,
   });
   const [focusIndex, setFocusIndex] = useState<number | null>(null);
-  const starts = useMemo(() => groupStarts(messages), [messages]);
+  const layout = useMemo(() => messageLayout(messages), [messages]);
   const time = useMemo(
     () => new Intl.DateTimeFormat(i18n.language, { hour: "2-digit", minute: "2-digit" }),
     [i18n.language],
@@ -56,6 +72,17 @@ export function MessageList({ log, label, onLoadOlder, onOpenProfile }: MessageL
     () => new Intl.DateTimeFormat(i18n.language, { dateStyle: "full", timeStyle: "short" }),
     [i18n.language],
   );
+  const dayFormat = useMemo(
+    () => new Intl.DateTimeFormat(i18n.language, { dateStyle: "long" }),
+    [i18n.language],
+  );
+  const now = new Date();
+  const dayLabel = (date: Date): string => {
+    const ago = daysAgo(date, now);
+    if (ago === 0) return t("list.today");
+    if (ago === 1) return t("list.yesterday");
+    return dayFormat.format(date);
+  };
   const active = Math.min(focusIndex ?? messages.length - 1, messages.length - 1);
 
   // Keep the reading position when older messages are prepended; follow new ones at the bottom.
@@ -93,6 +120,12 @@ export function MessageList({ log, label, onLoadOlder, onOpenProfile }: MessageL
     };
   }, []);
 
+  // Images load after render and grow the list; keep following the bottom by scrolling only the list.
+  function onMediaLoad() {
+    const element = scrollRef.current;
+    if (element && atBottom.current) element.scrollTop = element.scrollHeight;
+  }
+
   function onScroll() {
     const element = scrollRef.current;
     if (!element) return;
@@ -129,7 +162,7 @@ export function MessageList({ log, label, onLoadOlder, onOpenProfile }: MessageL
   }
 
   return (
-    <div className="chat-list" ref={scrollRef} onScroll={onScroll}>
+    <div className="chat-list" ref={scrollRef} onScroll={onScroll} onLoadCapture={onMediaLoad}>
       {log.hasMore ? (
         <button
           type="button"
@@ -156,6 +189,7 @@ export function MessageList({ log, label, onLoadOlder, onOpenProfile }: MessageL
         // eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions
         <ol
           className="chat-list__items"
+          data-display={display}
           aria-label={label}
           onKeyDown={onKeyDown}
           onFocus={(event) => {
@@ -168,7 +202,10 @@ export function MessageList({ log, label, onLoadOlder, onOpenProfile }: MessageL
             <MessageItem
               key={message.id}
               message={message}
-              start={starts[index] ?? true}
+              start={layout[index]?.start ?? true}
+              day={layout[index]?.newDay ? dayLabel(new Date(message.sentAt)) : null}
+              display={display}
+              avatar={display === "cozy" && layout[index]?.start ? avatarFor(message) : null}
               time={time}
               fullTime={fullTime}
               tabIndex={index === active ? 0 : -1}
@@ -187,6 +224,10 @@ export function MessageList({ log, label, onLoadOlder, onOpenProfile }: MessageL
 interface MessageItemProps {
   message: ChatMessage;
   start: boolean;
+  /** Day separator label above this message, if it is the first of its day. */
+  day: string | null;
+  display: ChatDisplay;
+  avatar: string | null;
   time: Intl.DateTimeFormat;
   fullTime: Intl.DateTimeFormat;
   tabIndex: number;
@@ -197,6 +238,9 @@ interface MessageItemProps {
 function MessageItem({
   message,
   start,
+  day,
+  display,
+  avatar,
   time,
   fullTime,
   tabIndex,
@@ -220,11 +264,47 @@ function MessageItem({
     ) : (
       <span className="chat-message__sender">{message.senderName}</span>
     );
-  const stamp = (
-    <time dateTime={message.sentAt} title={fullTime.format(sentAt)}>
+  const stamp = (className: string) => (
+    <time className={className} dateTime={message.sentAt} title={fullTime.format(sentAt)}>
       {time.format(sentAt)}
     </time>
   );
+
+  let row;
+  if (display === "compact") {
+    row = (
+      <div className="chat-message__row">
+        {stamp("chat-message__time")} {sender} <Body html={message.body} tabIndex={tabIndex} />
+      </div>
+    );
+  } else if (start) {
+    row = (
+      <div className="chat-message__row">
+        <div className="chat-message__gutter">
+          <Avatar name={message.senderName} src={avatar} />
+        </div>
+        <div className="chat-message__content">
+          <div className="chat-message__header">
+            {sender}
+            {stamp("chat-message__time")}
+          </div>
+          <Body html={message.body} tabIndex={tabIndex} />
+        </div>
+      </div>
+    );
+  } else {
+    // Grouped: the sender stays readable for screen readers; the time shows on hover/focus.
+    row = (
+      <div className="chat-message__row">
+        <span className="chat-message__sender visually-hidden">{message.senderName} </span>
+        <div className="chat-message__gutter">{stamp("chat-message__hover-time")}</div>
+        <div className="chat-message__content">
+          <Body html={message.body} tabIndex={tabIndex} />
+        </div>
+      </div>
+    );
+  }
+
   return (
     // Roving tab stop so screen-reader and keyboard users can step through messages.
     <li
@@ -232,17 +312,8 @@ function MessageItem({
       className={start ? "chat-message chat-message--start" : "chat-message"}
       tabIndex={tabIndex}
     >
-      {start ? (
-        <div className="chat-message__header">
-          {sender}
-          <span className="chat-message__time">{stamp}</span>
-        </div>
-      ) : (
-        <span className="visually-hidden">
-          {message.senderName} {stamp}
-        </span>
-      )}
-      <Body html={message.body} tabIndex={tabIndex} />
+      {day !== null ? <div className="chat-day">{day}</div> : null}
+      {row}
     </li>
   );
 }
