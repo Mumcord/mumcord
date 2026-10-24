@@ -11,6 +11,10 @@ publish = false
 name = "mumcord_lib"
 crate-type = ["staticlib", "cdylib", "rlib"]
 
+[features]
+# Env-selected null/WAV-file audio backend for E2E runs (e2e/); never in release builds.
+test-backend = ["mumcord-engine/test-backend"]
+
 [build-dependencies]
 tauri-build.workspace = true
 
