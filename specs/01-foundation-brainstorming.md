@@ -728,3 +728,14 @@ Signed builds and auto-update stay in Epic 5.
 ✍️ Note: Requested in chat during /dev; draft release recommended so nothing goes public without a final look.
 
 ---
+
+#### QA.13 Follow channels directly from the channel list, and follow all at once? `◉`
+Until now a channel is followed with the "Follow" button in the chat header (FR-1.31).
+
+- [x] **Each channel row in the channel list gets a star button: outlined on hover/focus to follow, filled while followed (click again to unfollow).** The chat-header button stays.
+- [x] **The server's context menu in the channel list offers "Follow all channels" and "Unfollow all channels".** Follow all follows every channel the user may listen to (excluding the one they are in for voice), stops cleanly at the server's listener limit and says how many were followed and why the rest were skipped.
+- [ ] Not now.
+
+✍️ Note: Requested in chat during /dev.
+
+---

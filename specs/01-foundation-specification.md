@@ -100,7 +100,7 @@ Mumcord enforces nothing itself; the server's ACLs decide. The client reflects p
 - **FR-1.28** Each channel and each private conversation has a chat view with input field. Sending to a channel requires the server's "Text message" permission; denials are shown inline.
 - **FR-1.29** Received messages are displayed with formatting, links and small inline images, sanitized so no scripts, external loads or unsafe markup run (Q5.5). Links open in the system browser after a click.
 - **FR-1.30** The user writes with Markdown shortcuts (bold, italic, code, links) and can paste or drop images; Mumcord converts to Mumble-compatible HTML, scales/compresses images to the server's message size limit and refuses too-large content with a clear message.
-- **FR-1.31** **Follow channels** (Q3.1): any channel can be followed via a "Follow" button. Mumcord starts listening to it with its audio muted locally, so its messages arrive without joining. Followed channels show unread badges. Unfollowing stops listening. If the server denies listening or the listener limit is reached, the user gets a clear message.
+- **FR-1.31** **Follow channels** (Q3.1): any channel can be followed via a "Follow" button. Mumcord starts listening to it with its audio muted locally, so its messages arrive without joining. Followed channels show unread badges. Unfollowing stops listening. If the server denies listening or the listener limit is reached, the user gets a clear message. A star button on each channel row in the channel list follows/unfollows it directly (outlined on hover/focus, filled while followed); the server's context menu in the channel list offers "Follow all channels" and "Unfollow all channels" – follow all skips channels the user may not listen to, stops at the server's listener limit and reports how many were followed (QA.13).
 - **FR-1.32** All received and sent messages (channels, followed channels, private chats) are stored locally and shown when the chat is reopened, including after restart (Q4.5). History only contains what Mumcord actually received.
 - **FR-1.33** History controls: "Clear history" per channel/private chat, per server and all; "Save history" switch per server (default on).
 
@@ -419,6 +419,7 @@ Unless stated otherwise: a fresh Mumcord install, a local test server (1.5) runn
 | QA.9 | After quitting while joined, the next connect after app start offers to rejoin the last channel (non-blocking prompt) | Addendum 2026-10-24; FR-1.14 |
 | QA.10 | Avatar remembered per saved server and re-sent on connect when the server has none (unregistered users) | Addendum 2026-10-24; FR-1.20, FR-1.47 |
 | QA.11 | Channel listeners hidden from the channel list, shown only in the member list | Addendum 2026-10-24; FR-1.15 |
+| QA.13 | Star button per channel row to follow/unfollow; "Follow all / Unfollow all channels" in the server context menu, respecting the listener limit | Addendum 2026-10-24; FR-1.31 |
 
 ## 13. Open points & risks
 
