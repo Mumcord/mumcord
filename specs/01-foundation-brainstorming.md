@@ -865,3 +865,15 @@ The panel at the bottom of the channel column looks cramped, the line above it l
 ✍️ Note: Requested in chat during /dev.
 
 ---
+
+#### QA.27 Usability on big servers (1000 users, 300 channels)? `◉`
+Measured in `specs/01-foundation-scale-report.md`; performance fixes are done without a product decision.
+
+- [x] **"Jump to my channel" button that scrolls to and highlights the user's voice channel.**
+- [x] **Big servers (more than ~50 channels) start collapsed: only the top level and the path to the user's own channel are expanded.**
+- [x] **Readable deep channel names: smaller indent per level on deep trees, full name as tooltip.**
+- [x] **Search field above the channel list that filters channels and people by name.**
+
+✍️ Note: Asked and answered in chat during /dev.
+
+---
