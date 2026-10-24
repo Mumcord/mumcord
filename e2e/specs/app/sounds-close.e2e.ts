@@ -27,6 +27,9 @@ const outWav = join(dir, "speaker-out.wav");
 const me = "C7Snd";
 const peer = "C7SndPeer";
 const CHANNEL = "AFK";
+// v14, not v15: bots that stay connected on v15 join and leave on their own, and every one of
+// them in the spec's channel would add a cue the measurements cannot tell from the spec's own.
+const PORT = testenv.ports.v14;
 
 function silenceWav(seconds: number): Buffer {
   const n = RATE * seconds;
@@ -114,7 +117,7 @@ describe("AC-1.24 join/leave sounds", () => {
   const log: Record<string, unknown> = {};
 
   before(async () => {
-    await testenv.up("v15");
+    await testenv.up("v14");
     mkdirSync(dir, { recursive: true });
     writeFileSync(inWav, silenceWav(5));
     await app.restart({ audio: `file:${inWav}:${outWav}` });
@@ -124,9 +127,9 @@ describe("AC-1.24 join/leave sounds", () => {
       dumpAppLogs(app.profile());
       throw e;
     }
-    await connectFromEmptyState();
+    await connectFromEmptyState(undefined, `localhost:${String(PORT)}`);
     await joinChannel(CHANNEL);
-    await bot(["expect", "user", me, "--in", CHANNEL], { name: peer, timeout: 20 });
+    await bot(["expect", "user", me, "--in", CHANNEL], { name: peer, port: PORT, timeout: 20 });
   });
 
   after(() => {
@@ -143,7 +146,7 @@ describe("AC-1.24 join/leave sounds", () => {
   it("plays a short subtle sound when a bot joins and when it leaves the channel", async () => {
     const a = await settle(500);
     // Connects into Root, moves into the channel (join), stays 3 s, disconnects (leave).
-    await bot(["join", CHANNEL], { name: peer, hold: 3, timeout: 20 });
+    await bot(["join", CHANNEL], { name: peer, port: PORT, hold: 3, timeout: 20 });
     const b = await settle(2500);
     const found = bursts(a, b);
     log.joinLeave = found;
@@ -159,7 +162,7 @@ describe("AC-1.24 join/leave sounds", () => {
 
   it("plays nothing for a bot that joins another channel (no TTS / no speech at any time)", async () => {
     const a = await settle(500);
-    await bot(["join", "Raid"], { name: peer, hold: 2, timeout: 20 });
+    await bot(["join", "Raid"], { name: peer, port: PORT, hold: 2, timeout: 20 });
     const b = await settle(2000);
     log.otherChannel = bursts(a, b);
     expect(bursts(a, b)).toEqual([]);
@@ -197,7 +200,7 @@ describe("AC-1.25 close while connected", () => {
   it("stays connected while hidden", async () => {
     await browser.pause(4000);
     expect(await windowVisible()).toBe(false);
-    await bot(["expect", "user", me, "--in", CHANNEL], { name: peer, timeout: 15 });
+    await bot(["expect", "user", me, "--in", CHANNEL], { name: peer, port: PORT, timeout: 15 });
   });
 
   it("next close hides again without asking", async () => {
@@ -209,7 +212,7 @@ describe("AC-1.25 close while connected", () => {
     await browser.waitUntil(async () => !(await windowVisible()), { timeout: 10_000, timeoutMsg: "window not hidden on second close" });
     const dialog = await browser.execute(() => document.querySelector("dialog.app-dialog[open]") !== null);
     expect(dialog).toBe(false);
-    await bot(["expect", "user", me, "--in", CHANNEL], { name: peer, timeout: 15 });
+    await bot(["expect", "user", me, "--in", CHANNEL], { name: peer, port: PORT, timeout: 15 });
   });
 
   it("remembered choice survives a restart (close hides without asking)", async () => {
@@ -223,10 +226,10 @@ describe("AC-1.25 close while connected", () => {
       await browser.keys(["Enter"]);
     }
     await waitFor('.server-bar__item[data-status="connected"]', 30_000);
-    await bot(["expect", "user", me], { name: peer, timeout: 20 });
+    await bot(["expect", "user", me], { name: peer, port: PORT, timeout: 20 });
     await closeWindowLikeUser();
     await browser.waitUntil(async () => !(await windowVisible()), { timeout: 10_000, timeoutMsg: "window not hidden after restart" });
     expect(await browser.execute(() => document.querySelector("dialog.app-dialog[open]") !== null)).toBe(false);
-    await bot(["expect", "user", me], { name: peer, timeout: 15 });
+    await bot(["expect", "user", me], { name: peer, port: PORT, timeout: 15 });
   });
 });

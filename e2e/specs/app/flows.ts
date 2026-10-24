@@ -171,10 +171,10 @@ export async function wizard(name: string, onStep?: (step: number) => Promise<vo
 }
 
 /** Empty state: type the address, Enter (Add and connect), trust the certificate. */
-export async function connectFromEmptyState(onCert?: () => Promise<void>): Promise<void> {
+export async function connectFromEmptyState(onCert?: () => Promise<void>, address = SERVER): Promise<void> {
   await waitFor(".servers-empty input");
   await tabTo((f) => f.tag === "input" && f.where.includes("servers-empty"), "empty-state address field");
-  await typeText(SERVER);
+  await typeText(address);
   await browser.keys(["Enter"]);
   await waitFor("dialog[open] .servers-dialog__actions", 30_000);
   await onCert?.();
