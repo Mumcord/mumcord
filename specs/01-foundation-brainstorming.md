@@ -1012,3 +1012,13 @@ Until now external images (img tags pointing to web addresses, image links) are 
 ✍️ Note: Requested in chat during /dev.
 
 ---
+
+#### QA.42 Dismiss previews and automatic clean-up (stage 1b)? `◉`
+
+- [x] **Each preview/embed card has a dismiss (×) button; the dismissal is remembered for that message.**
+- [x] **Settings → Chat & history: "Delete cached previews after X days" (default 7) with a "Clear now" button – covers link previews, thumbnails and external images (previews are cached in memory and on disk).**
+- [x] **Settings → Chat & history: "Delete chat history older than X days" (default off).**
+
+✍️ Note: Requested in chat during /dev.
+
+---
