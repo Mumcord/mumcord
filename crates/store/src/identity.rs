@@ -267,6 +267,22 @@ mod tests {
     /// Re-encodes our identity with the OpenSSL CLI the way the official client's
     /// exports look (legacy 3DES/RC2 + SHA-1 MAC from OpenSSL 1.x, AES from 3.x) and
     /// checks we import it with the same hash. Skipped if `openssl` is not installed.
+    /// Whether the `openssl` CLI can write legacy-format PKCS#12 (`-legacy`). Set
+    /// `MUMCORD_TEST_NO_OPENSSL_LEGACY=1` to simulate a missing legacy provider.
+    fn legacy_supported(pem: &std::path::Path, dir: &std::path::Path) -> bool {
+        if std::env::var_os("MUMCORD_TEST_NO_OPENSSL_LEGACY").is_some() {
+            return false;
+        }
+        Command::new("openssl")
+            .args(["pkcs12", "-export", "-legacy", "-passout", "pass:pw", "-in"])
+            .arg(pem)
+            .arg("-out")
+            .arg(dir.join("probe.p12"))
+            .output()
+            .map(|o| o.status.success())
+            .unwrap_or(false)
+    }
+
     #[test]
     fn imports_openssl_encoded_files() {
         if Command::new("openssl").arg("version").output().is_err() {
@@ -312,6 +328,12 @@ mod tests {
             (&[][..], "pw"),
             (&[][..], ""),
         ] {
+            if extra == ["-legacy"] && !legacy_supported(&pem_path, dir.path()) {
+                eprintln!(
+                    "NOTE: skipping legacy-format PKCS#12 case: this openssl lacks `-legacy`/legacy provider"
+                );
+                continue;
+            }
             let out = dir.path().join("identity.p12");
             let status = Command::new("openssl")
                 .args(["pkcs12", "-export", "-name", "Tester", "-in"])
