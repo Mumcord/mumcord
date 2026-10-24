@@ -15,6 +15,7 @@ import {
   type User,
 } from "../../api";
 import { cachedSelector } from "./cachedSelector";
+import { resetCollapseMemory } from "./collapseMemory";
 
 export interface ServerState {
   connection: ConnectionState;
@@ -365,8 +366,12 @@ export function selfUser(s: ServerState): User | undefined {
   return s.selfSession === null ? undefined : s.users.get(s.selfSession);
 }
 
-/** Test helper: drops the binding so the next use binds to the then-active client. */
+/**
+ * Test helper: drops the binding so the next use binds to the then-active client, and forgets the
+ * remembered expand/collapse choices of the old session.
+ */
 export function resetServerStore(): void {
+  resetCollapseMemory();
   for (const unsubscribe of unsubscribers) unsubscribe();
   unsubscribers = [];
   changeListeners.clear();

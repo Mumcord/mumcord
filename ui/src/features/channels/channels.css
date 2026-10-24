@@ -4,8 +4,25 @@
   list-style: none;
 }
 
+/* --tree-indent is set per channel (indentRem: smaller on deep levels). The indent also gives way
+   when the column is too narrow for about 8rem of name, count and star (--tree-min-row), but keeps
+   a quarter rem so the nesting stays visible (QA.27). The avatar stack line uses the same value. */
 .channel-tree [role="group"] {
-  padding-left: var(--space-4);
+  padding-left: clamp(0.25rem, calc(100% - var(--tree-min-row)), var(--tree-indent));
+}
+
+.channel-tree {
+  /* Smallest row before the indent gives way: padding, toggle and gaps (3rem) plus about 8rem
+     for the name with its count and star. */
+  --tree-min-row: 11rem;
+}
+
+/* The avatar stack line sits where the channel's people would: their indent (same base width as
+   the group, both are children of the same parent) plus the row padding. */
+.channel-tree .avatar-stack__line {
+  padding-left: calc(
+    clamp(0.25rem, calc(100% - var(--tree-min-row)), var(--tree-indent)) + var(--space-2)
+  );
 }
 
 .channel-tree [role="treeitem"]:focus-visible {
@@ -166,6 +183,16 @@
   color: var(--color-danger);
 }
 
+.person-icon--registered {
+  color: var(--color-accent);
+  opacity: 0.8;
+}
+
+.person-icon--guest {
+  stroke-dasharray: 3 2.5;
+  opacity: 0.8;
+}
+
 .person-icon--local-muted {
   color: var(--color-local-muted);
 }
@@ -191,4 +218,145 @@
   margin: var(--space-2) 0 0;
   color: var(--color-danger);
   font-size: var(--font-size-sm);
+}
+
+/* Row above the tree: the server name with its menu (if any), then "Jump to my channel". */
+.channels-header {
+  display: flex;
+  align-items: center;
+  min-height: 2rem;
+}
+
+.channels-header > :not(.jump-to-channel) {
+  flex: 1;
+  min-width: 0;
+}
+
+.jump-to-channel {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: 1.75rem;
+  height: 1.75rem;
+  margin-left: auto;
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+}
+
+.jump-to-channel:hover:not([aria-disabled="true"]) {
+  background: var(--color-bg-hover);
+  color: var(--color-text);
+}
+
+.jump-to-channel[aria-disabled="true"] {
+  cursor: default;
+  opacity: 0.45;
+}
+
+/* Brief highlight of the channel "Jump to my channel" scrolled to (QA.27): a green frame that
+   fades, so it shows on top of the selected and voice styles. */
+.tree-channel[data-flash] > .tree-channel__row {
+  outline: 2px solid transparent;
+  outline-offset: -2px;
+  animation: tree-flash 1.6s ease-out;
+}
+
+@keyframes tree-flash {
+  0%,
+  50% {
+    outline-color: var(--color-talking);
+    background: var(--color-bg-hover);
+  }
+}
+
+/* Without motion the frame is static and simply ends (the global rule shortens animations). */
+@media (prefers-reduced-motion: reduce) {
+  .tree-channel[data-flash] > .tree-channel__row {
+    animation: none;
+    outline-color: var(--color-talking);
+  }
+}
+
+/* Search field above the tree (QA.27). Sticky, so it stays reachable while scrolling results;
+   the negative top covers the column's padding. */
+.channel-search {
+  position: sticky;
+  z-index: 1;
+  top: calc(-1 * var(--space-2));
+  display: flex;
+  align-items: center;
+  margin: var(--space-1) 0 var(--space-2);
+  padding: var(--space-1) 0;
+  background: var(--color-bg-sidebar);
+}
+
+.channel-search__input {
+  width: 100%;
+  min-width: 0;
+  padding: var(--space-1) 1.75rem var(--space-1) var(--space-2);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: var(--color-bg-servers);
+  color: var(--color-text);
+  font-size: var(--font-size-sm);
+}
+
+.channel-search__input::placeholder {
+  color: var(--color-text-muted);
+}
+
+.channel-search__input:focus-visible {
+  outline: var(--focus-ring-width) solid var(--color-focus);
+  outline-offset: -1px;
+}
+
+/* Own clear button instead of the engine's, which looks different per platform. */
+.channel-search__input::-webkit-search-cancel-button {
+  display: none;
+}
+
+.channel-search__clear {
+  position: absolute;
+  right: var(--space-1);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.5rem;
+  height: 1.5rem;
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-md);
+  cursor: pointer;
+}
+
+.channel-search__clear:hover {
+  background: var(--color-bg-hover);
+  color: var(--color-text);
+}
+
+/* Matched part of a name while searching; bold and underlined as well, not colour alone. */
+.tree-match {
+  border-radius: 2px;
+  background: color-mix(in srgb, var(--color-accent) 35%, transparent);
+  color: inherit;
+  font-weight: 700;
+  text-decoration: underline;
+}
+
+.channel-tree__empty {
+  margin: var(--space-2) 0 0;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+}
+
+.person-icon-slot {
+  display: inline-flex;
 }

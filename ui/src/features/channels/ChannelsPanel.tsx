@@ -1,21 +1,25 @@
 /** Channel column content: the channel tree of the connected server, or an empty state. */
-import { useCallback, useEffect, useState, type ReactNode } from "react";
+import { useCallback, useEffect, useRef, useState, type ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 import { toEngineError } from "../../api";
 import { useProfileCard } from "../members/useProfileCard";
 import type { SendPrivateMessage } from "../members/privateMessage";
 import { joinChannel, useReadOnly } from "../userpanel/readOnly";
 import { useServerAnnouncements } from "./announcements";
-import { ChannelTree, type ChannelAction } from "./ChannelTree";
+import { ChannelSearch } from "./ChannelSearch";
+import { ChannelTree, type ChannelAction, type ChannelTreeHandle } from "./ChannelTree";
+import { JumpToChannelButton } from "./JumpToChannelButton";
 import { useSelectedConversation } from "./selection";
-import { useServerState } from "./serverStore";
+import { selfUser, useServerState } from "./serverStore";
+
+const SEARCH_DEBOUNCE_MS = 100;
 
 export interface ChannelsPanelProps {
   /** Extra content after a channel's people count, e.g. the unread badge (B22). */
   channelBadge?: ((channelId: number) => ReactNode) | undefined;
   /** Button in a fixed slot of each channel row, e.g. the follow star (QA.13). */
   channelAction?: ((channel: ChannelAction) => ReactNode) | undefined;
-  /** Row above the tree, e.g. the server name with its menu (QA.13). */
+  /** Row above the tree, e.g. the server name with its menu (QA.13); "Jump to my channel" follows it. */
   header?: ReactNode;
   /** "Send private message" on the profile card; defaults to opening the private chat. */
   onSendPrivateMessage?: SendPrivateMessage | undefined;
@@ -33,7 +37,27 @@ export function ChannelsPanel({
   const { conversation, select } = useSelectedConversation();
   const { openProfile, profileCard } = useProfileCard(onSendPrivateMessage);
   const [joinError, setJoinError] = useState<string | null>(null);
+  const treeRef = useRef<ChannelTreeHandle>(null);
+  // What the search field shows, and the query the tree filters by: the query follows ~100 ms
+  // later, so typing quickly filters a big tree once instead of on every key (QA.27).
+  const [searchText, setSearchText] = useState("");
+  const [filter, setFilter] = useState("");
   useServerAnnouncements();
+
+  useEffect(() => {
+    if (searchText === filter) return;
+    const timer = setTimeout(() => {
+      setFilter(searchText);
+    }, SEARCH_DEBOUNCE_MS);
+    return () => {
+      clearTimeout(timer);
+    };
+  }, [searchText, filter]);
+
+  const clearSearch = () => {
+    setSearchText("");
+    setFilter("");
+  };
 
   useEffect(() => {
     if (import.meta.env.DEV) {
@@ -73,8 +97,35 @@ export function ChannelsPanel({
 
   return (
     <div className="channels-panel">
-      {header}
+      <div className="channels-header">
+        {header}
+        <JumpToChannelButton
+          disabled={readOnly || selfUser(state) === undefined}
+          onJump={() => {
+            // The own channel may be filtered out; jumping shows the whole tree again.
+            clearSearch();
+            treeRef.current?.jumpToVoice();
+          }}
+        />
+      </div>
+      <ChannelSearch
+        value={searchText}
+        onChange={setSearchText}
+        onClear={clearSearch}
+        onSubmit={() => {
+          if (searchText === filter) {
+            treeRef.current?.openFirstMatch();
+            return;
+          }
+          // Apply the pending query now; the tree shows its matches after this event's render.
+          setFilter(searchText);
+          requestAnimationFrame(() => treeRef.current?.openFirstMatch());
+        }}
+      />
       <ChannelTree
+        // A fresh tree per server, so its expand/collapse state starts from that server's (QA.27).
+        key={state.serverId}
+        ref={treeRef}
         state={state}
         readOnly={readOnly}
         selectedChannelId={conversation?.kind === "channel" ? conversation.channelId : null}
@@ -86,6 +137,7 @@ export function ChannelsPanel({
         onOpenPerson={openProfile}
         channelBadge={channelBadge}
         channelAction={channelAction}
+        filter={filter}
       />
       {joinError && (
         <p role="alert" className="channels-error">

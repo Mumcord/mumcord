@@ -5,23 +5,35 @@
  * Tab stop) or the loaded avatars. With 1000 people, one person moving or talking then redraws a
  * few rows instead of all of them.
  */
-import { memo, useContext, useEffect, useMemo, useRef, useSyncExternalStore } from "react";
+import {
+  memo,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useSyncExternalStore,
+  type CSSProperties,
+} from "react";
 import { useTranslation } from "react-i18next";
 import type { User } from "../../api";
 import { Avatar } from "../members/Avatar";
 import { ProfilePreviewTrigger } from "../members/ProfilePreview";
+import { openPersonMenuFromEvent } from "../members/personMenuStore";
 import { previewOnFocus, releasePreview } from "../members/profilePreviewStore";
 import { AvatarStack, type StackPerson } from "./AvatarStack";
 import { StatusIcons } from "./PersonStatus";
 import type { ServerState } from "./serverStore";
 import { useStatusText } from "./statusText";
 import { cachedSelector, sameValue } from "./cachedSelector";
+import { foldName, matchRange } from "./search";
 import { TreeContext, type TreeContextValue, type ValueStore } from "./treeContext";
 import {
   channelRowId,
   CROWDED_CHANNEL_SIZE,
+  indentRem,
   isExpandable,
   memberRowId,
+  shownMembers,
   stackPeople,
   type ChannelNode,
 } from "./tree";
@@ -48,6 +60,22 @@ function useWatchOnScreen(tree: TreeContextValue, sessions: readonly number[]) {
     return tree.onScreen.watch(element, key.split(",").map(Number));
   }, [tree, key]);
   return ref;
+}
+
+/** `text` with the part matching the search `query` (folded) marked (QA.27). */
+function Highlighted({ text, query }: { text: string; query: string }) {
+  const range = useMemo(
+    () => (query === "" ? null : matchRange(foldName(text), query)),
+    [text, query],
+  );
+  if (range === null) return text;
+  return (
+    <>
+      {text.slice(0, range.start)}
+      <mark className="tree-match">{text.slice(range.start, range.end)}</mark>
+      {text.slice(range.end)}
+    </>
+  );
 }
 
 const NO_STACK: readonly User[] = [];
@@ -77,9 +105,12 @@ export const ChannelBranch = memo(function ChannelBranchRow({
   const selected = useSelect(tree.ui, (ui) => ui.selectedChannelId === id);
   const tabbable = useSelect(tree.ui, (ui) => ui.tabStopId === rowId);
   const isOwn = useSelect(tree.ui, (ui) => ui.selfChannelId === id);
+  const query = useSelect(tree.ui, (ui) => ui.query);
   const count = node.members.length;
-  const crowded = expanded && count > CROWDED_CHANNEL_SIZE;
-  const hasStack = count > 0 && (!expanded || (count > CROWDED_CHANNEL_SIZE && !listingAll));
+  // While searching, a channel lists only its matching people, never its stack (QA.27).
+  const shown = shownMembers(node);
+  const crowded = expanded && count > CROWDED_CHANNEL_SIZE && shown === null;
+  const hasStack = count > 0 && (!expanded || (crowded && !listingAll));
   const stack = useSelect(tree.server, (s: ServerState) =>
     hasStack ? stackPeople(node.members, s.talking) : NO_STACK,
   );
@@ -103,6 +134,9 @@ export const ChannelBranch = memo(function ChannelBranchRow({
   const showStack = stack.length > 0;
   const showAllLabel = listingAll ? t("tree.showFewer") : t("tree.showAll", { total: count });
   const actions = tree.actions;
+  // Indent of the channel's people and sub-channels; also read by its avatar stack line, which is
+  // indented like its people (QA.27).
+  const indent = { "--tree-indent": `${String(indentRem(level + 1))}rem` } as CSSProperties;
   // The group is a DOM sibling (linked via aria-owns) so the treeitem's visible
   // content is only its own row; WCAG 2.5.3 label-in-name then matches its name.
   return (
@@ -121,6 +155,7 @@ export const ChannelBranch = memo(function ChannelBranchRow({
         tabIndex={tabbable ? 0 : -1}
         data-row={rowId}
         className="tree-channel"
+        style={indent}
         onFocus={(event) => {
           if (event.target === event.currentTarget) actions.current.focus(rowId);
         }}
@@ -153,7 +188,9 @@ export const ChannelBranch = memo(function ChannelBranchRow({
             {expanded ? "▾" : "▸"}
           </span>
           <span id={labelId} className="tree-channel__label">
-            <span className="tree-channel__name">{channel.name}</span>
+            <span className="tree-channel__name" title={channel.name}>
+              <Highlighted text={channel.name} query={query} />
+            </span>
             {isOwn && <span className="visually-hidden">, {t("tree.voiceHere")}</span>}
             {count > 0 && (
               // The digits are CSS-generated (::before) so the row's visible text stays a run of
@@ -223,11 +260,10 @@ export const ChannelBranch = memo(function ChannelBranchRow({
         )}
       </div>
       {expanded && (
-        <div role="group" id={groupId}>
-          {(!crowded || listingAll) &&
-            node.members.map((user) => (
-              <PersonRow key={memberRowId(user.session)} user={user} level={level + 1} />
-            ))}
+        <div role="group" id={groupId} style={indent}>
+          {(shown ?? (!crowded || listingAll ? node.members : NO_STACK)).map((user) => (
+            <PersonRow key={memberRowId(user.session)} user={user} level={level + 1} />
+          ))}
           {node.children.map((child) => (
             <ChannelBranch key={channelRowId(child.channel.id)} node={child} level={level + 1} />
           ))}
@@ -248,6 +284,7 @@ const PersonRow = memo(function PersonTreeRow({ user, level }: { user: User; lev
   const talking = useSelect(tree.server, (s: ServerState) => s.talking.has(session));
   const tabbable = useSelect(tree.ui, (ui) => ui.tabStopId === rowId);
   const isSelf = useSelect(tree.ui, (ui) => ui.selfSession === session);
+  const query = useSelect(tree.ui, (ui) => ui.query);
   const src = useSelect(tree.avatars, (avatarOf) => avatarOf(user));
   const rowRef = useWatchOnScreen(tree, user.hasAvatar ? [session] : NO_SESSIONS);
   const status = statusText(user, talking);
@@ -271,6 +308,9 @@ const PersonRow = memo(function PersonTreeRow({ user, level }: { user: User; lev
         previewOnFocus(session, event.currentTarget);
       }}
       onBlur={releasePreview}
+      onContextMenu={(event) => {
+        openPersonMenuFromEvent(session, event);
+      }}
       onClick={(event) => {
         event.stopPropagation();
         actions.current.focus(rowId);
@@ -281,7 +321,7 @@ const PersonRow = memo(function PersonTreeRow({ user, level }: { user: User; lev
         <ProfilePreviewTrigger session={session}>
           <Avatar name={user.name} src={src} talking={talking} size="sm" />
           <span id={labelId} className="tree-person__name" data-local-muted={user.localMute}>
-            {user.name}
+            <Highlighted text={user.name} query={query} />
             {isSelf && <span className="tree-person__you"> {t("tree.you")}</span>}
             {status.length > 0 && <span className="visually-hidden">, {status.join(", ")}</span>}
           </span>

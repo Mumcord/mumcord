@@ -37,6 +37,8 @@ export interface TreeUi {
   selectedChannelId: number | null;
   selfChannelId: number | null;
   selfSession: number | null;
+  /** The search query, folded (see `foldQuery`); empty when not searching (QA.27). */
+  query: string;
 }
 
 /** Handlers of `ChannelTree`, read when an event fires (always the latest ones). */

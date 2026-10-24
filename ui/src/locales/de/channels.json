@@ -11,10 +11,11 @@
       "some": "{{shown}} von {{total}} Personen: {{names}} und {{rest}} weitere",
       "all_one": "{{count}} Person: {{names}}",
       "all_other": "{{count}} Personen: {{names}}",
-      "talking": "{{name}} (spricht)"
+      "person": "{{name}} ({{status}})"
     },
     "showAll": "Alle anzeigen ({{total}})",
-    "showFewer": "Weniger anzeigen"
+    "showFewer": "Weniger anzeigen",
+    "jump": "Zu meinem Kanal springen"
   },
   "status": {
     "listening": "hört zu",
@@ -26,6 +27,17 @@
     "suppressed": "unterdrückt (darf hier nicht sprechen)",
     "localMuted": "für dich stummgeschaltet",
     "unregistered": "nicht registriert"
+  },
+  "statusTip": {
+    "registered": "Auf diesem Server registriert",
+    "listening": "Hört diesen Kanal mit",
+    "muted": "Stummgeschaltet",
+    "deafened": "Taub geschaltet",
+    "serverMuted": "Vom Server stummgeschaltet",
+    "serverDeafened": "Vom Server taub geschaltet",
+    "suppressed": "Unterdrückt – darf in diesem Kanal nicht sprechen",
+    "localMuted": "Für dich stummgeschaltet",
+    "unregistered": "Auf diesem Server nicht registriert (Gast)"
   },
   "announce": {
     "joined": "{{name}} ist deinem Kanal beigetreten",
@@ -40,5 +52,15 @@
   "empty": {
     "disconnected": "Nicht verbunden. Wähle einen Server, um seine Kanäle zu sehen.",
     "loading": "Kanäle werden geladen…"
+  },
+  "search": {
+    "label": "Kanäle und Personen suchen",
+    "clear": "Suche löschen",
+    "empty": "Keine Kanäle oder Personen passen zu „{{query}}“.",
+    "count": "{{channels}}, {{people}}",
+    "channels_one": "{{count}} Kanal",
+    "channels_other": "{{count}} Kanäle",
+    "people_one": "{{count}} Person",
+    "people_other": "{{count}} Personen"
   }
 }

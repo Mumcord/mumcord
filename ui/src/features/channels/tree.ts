@@ -7,6 +7,11 @@ export interface ChannelNode {
   children: ChannelNode[];
   /** People whose current channel this is. */
   members: User[];
+  /**
+   * While searching: the only people the channel lists, by name even when it is crowded (QA.27).
+   * Absent: the channel's people show as usual.
+   */
+  shown?: User[] | undefined;
 }
 
 export type RowKind = "channel" | "member";
@@ -122,7 +127,16 @@ const NONE: ReadonlySet<number> = new Set();
 
 /** Whether an expanded channel lists its people by name: not when crowded, unless "Show all" is on. */
 export function listsMembers(node: ChannelNode, showAll: ReadonlySet<number>): boolean {
-  return node.members.length <= CROWDED_CHANNEL_SIZE || showAll.has(node.channel.id);
+  return (
+    shownMembers(node) !== null ||
+    node.members.length <= CROWDED_CHANNEL_SIZE ||
+    showAll.has(node.channel.id)
+  );
+}
+
+/** The people a channel lists while searching, or null when it shows its people as usual. */
+export function shownMembers(node: ChannelNode): readonly User[] | null {
+  return node.shown ?? null;
 }
 
 /**
@@ -190,7 +204,8 @@ export function visibleRows(
       expanded,
     });
     if (!expanded) return;
-    for (const user of listsMembers(node, showAll) ? node.members : []) {
+    const listed = listsMembers(node, showAll) ? (shownMembers(node) ?? node.members) : [];
+    for (const user of listed) {
       rows.push({
         id: memberRowId(user.session),
         kind: "member",
@@ -205,4 +220,48 @@ export function visibleRows(
   };
   for (const root of roots) walk(root, null);
   return rows;
+}
+
+/** Servers with more channels than this start collapsed (QA.27). */
+export const BIG_SERVER_CHANNELS = 50;
+
+/** Channel ids from the top level down to `channelId`, both included; empty if it is not in the tree. */
+export function channelPath(roots: readonly ChannelNode[], channelId: number): number[] {
+  const path: number[] = [];
+  const walk = (node: ChannelNode): boolean => {
+    path.push(node.channel.id);
+    if (node.channel.id === channelId || node.children.some(walk)) return true;
+    path.pop();
+    return false;
+  };
+  return roots.some(walk) ? path : [];
+}
+
+/**
+ * Collapsed channels when a server is first shown (QA.27). Small servers show everything; on big
+ * ones only the top level and the path to the user's own channel (voice or landing) are open, so
+ * the user sees their place instead of hundreds of rows.
+ */
+export function initialCollapsed(
+  roots: readonly ChannelNode[],
+  channelCount: number,
+  ownChannelId: number | null,
+): ReadonlySet<number> {
+  const collapsed = new Set<number>();
+  if (channelCount <= BIG_SERVER_CHANNELS) return collapsed;
+  const open = new Set(ownChannelId === null ? [] : channelPath(roots, ownChannelId));
+  const walk = (node: ChannelNode, level: number) => {
+    if (level > 1 && !open.has(node.channel.id)) collapsed.add(node.channel.id);
+    for (const child of node.children) walk(child, level + 1);
+  };
+  for (const root of roots) walk(root, 1);
+  return collapsed;
+}
+
+/**
+ * Indent of a row at `level` (1 = top level) against its parent, in rem: full for the first two
+ * nested levels, half below, so deep names keep their width (QA.27).
+ */
+export function indentRem(level: number): number {
+  return level <= 3 ? 1 : 0.5;
 }

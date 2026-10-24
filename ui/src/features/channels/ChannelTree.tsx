@@ -5,7 +5,9 @@
  * button joins.
  */
 import {
+  useEffect,
   useId,
+  useImperativeHandle,
   useLayoutEffect,
   useMemo,
   useRef,
@@ -13,12 +15,24 @@ import {
   useSyncExternalStore,
   type KeyboardEvent,
   type ReactNode,
+  type Ref,
 } from "react";
 import { useTranslation } from "react-i18next";
 import "./channels.css";
+import { announce } from "../../a11y/announcer";
 import { useAvatars } from "../members/useAvatars";
+import { rememberCollapsed, rememberedCollapsed } from "./collapseMemory";
+import { buildSearchIndex, foldQuery, searchTree, type SearchResult } from "./search";
 import type { ServerState } from "./serverStore";
-import { buildTree, channelRowId, visibleRows, visibleStacks, type ChannelNode } from "./tree";
+import {
+  buildTree,
+  channelPath,
+  channelRowId,
+  initialCollapsed,
+  visibleRows,
+  visibleStacks,
+  type ChannelNode,
+} from "./tree";
 import {
   onScreenTracker,
   TreeContext,
@@ -48,6 +62,57 @@ export interface ChannelTreeProps {
    * `channelBadge`, it must return a self-updating component.
    */
   channelAction?: ((channel: ChannelAction) => ReactNode) | undefined;
+  /**
+   * Search text (QA.27): the tree shows only matching channels and channels with matching people,
+   * opened up to the matches. The remembered expand state stays as it was for when it is cleared.
+   */
+  filter?: string | undefined;
+  ref?: Ref<ChannelTreeHandle> | undefined;
+}
+
+export interface ChannelTreeHandle {
+  /** Shows the user's voice channel: expands its path, scrolls to it and highlights it (QA.27). */
+  jumpToVoice: () => void;
+  /** While searching: selects the first matching channel, or focuses the first matching person. */
+  openFirstMatch: () => void;
+}
+
+/** How long a jumped-to channel stays highlighted. */
+const FLASH_MS = 1600;
+
+/**
+ * Scrolls the nearest scrollable ancestor so `element` is centred in it. Unlike
+ * `scrollIntoView`, it never scrolls the document or clipping ancestors: the app must not move
+ * as a whole.
+ */
+function scrollIntoContainer(element: HTMLElement, smooth: boolean) {
+  let container = element.parentElement;
+  while (
+    container !== null &&
+    !["auto", "scroll"].includes(getComputedStyle(container).overflowY)
+  ) {
+    container = container.parentElement;
+  }
+  if (container === null) return;
+  const box = element.getBoundingClientRect();
+  const outer = container.getBoundingClientRect();
+  const top = container.scrollTop + box.top - outer.top - (outer.height - box.height) / 2;
+  container.scrollTo({ top: Math.max(0, top), behavior: smooth ? "smooth" : "auto" });
+}
+
+const prefersReducedMotion = () =>
+  typeof matchMedia === "function" && matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+/** Highlights a row briefly (CSS `[data-flash]`); returns a function that ends it early. */
+function flash(row: HTMLElement): () => void {
+  row.setAttribute("data-flash", "");
+  const timer = setTimeout(() => {
+    row.removeAttribute("data-flash");
+  }, FLASH_MS);
+  return () => {
+    clearTimeout(timer);
+    row.removeAttribute("data-flash");
+  };
 }
 
 export interface ChannelAction {
@@ -65,11 +130,12 @@ export function ChannelTree({
   onOpenPerson,
   channelBadge,
   channelAction,
+  filter = "",
+  ref,
 }: ChannelTreeProps) {
   const { t } = useTranslation("channels");
   const hintId = useId();
   const treeRef = useRef<HTMLDivElement>(null);
-  const [collapsed, setCollapsed] = useState<ReadonlySet<number>>(new Set());
   const [focusedId, setFocusedId] = useState<string | null>(null);
   /** Crowded channels whose people are listed by name for this session ("Show all", QA.14). */
   const [showAll, setShowAll] = useState<ReadonlySet<number>>(new Set());
@@ -89,10 +155,60 @@ export function ChannelTree({
     roots = buildTree(state, tree.roots);
     setTree({ source: state, roots });
   }
-  const rows = useMemo(() => visibleRows(roots, collapsed, showAll), [roots, collapsed, showAll]);
+  // The own channel (voice, or the landing channel while reading along) decides which path a big
+  // server opens on first display; the user's later choices win from then on (QA.27).
+  const ownChannelId =
+    state.selfSession === null ? null : (state.users.get(state.selfSession)?.channelId ?? null);
+  const [collapsed, setCollapsed] = useState<ReadonlySet<number>>(
+    () =>
+      rememberedCollapsed(state.serverId) ??
+      initialCollapsed(roots, state.channels.size, ownChannelId),
+  );
+  const [jump, setJump] = useState<{ rowId: string } | null>(null);
+
+  // Search (QA.27). Without a query the tree below is the full one, so rows keep their memoised
+  // nodes. The index of folded names is built once per tree, only while searching.
+  const query = foldQuery(filter);
+  const searching = query !== "";
+  const index = useMemo(() => (searching ? buildSearchIndex(roots) : null), [roots, searching]);
+  const [found, setFound] = useState<{
+    roots: ChannelNode[];
+    query: string;
+    result: SearchResult;
+  } | null>(null);
+  /** Channels the user collapsed in the search results; dropped when the query changes. */
+  const [searchCollapsed, setSearchCollapsed] = useState<ReadonlySet<number>>(new Set());
+  let result: SearchResult | null = null;
+  if (index === null) {
+    if (found !== null) setFound(null);
+  } else if (found?.roots === roots && found.query === query) {
+    result = found.result;
+  } else {
+    result = searchTree(roots, index, query, found?.result);
+    if (found?.query !== query && searchCollapsed.size > 0) setSearchCollapsed(new Set());
+    setFound({ roots, query, result });
+  }
+  const shownRoots = result?.roots ?? roots;
+  // Result counts go to the app's polite live region, e.g. "12 channels, 3 people".
+  const resultCount =
+    result === null
+      ? null
+      : t("search.count", {
+          channels: t("search.channels", { count: result.channels }),
+          people: t("search.people", { count: result.people }),
+        });
+  useEffect(() => {
+    if (resultCount !== null) announce(resultCount);
+  }, [resultCount, query]);
+  const shownCollapsed = result === null ? collapsed : searchCollapsed;
+
+  const rows = useMemo(
+    () => visibleRows(shownRoots, shownCollapsed, showAll),
+    [shownRoots, shownCollapsed, showAll],
+  );
   const stacks = useMemo(
-    () => visibleStacks(roots, collapsed, showAll, state.talking),
-    [roots, collapsed, showAll, state.talking],
+    () => visibleStacks(shownRoots, shownCollapsed, showAll, state.talking),
+    [shownRoots, shownCollapsed, showAll, state.talking],
   );
   // Stable for the tree's lifetime (see `context` below); created first because avatars need it.
   const [onScreen] = useState(onScreenTracker);
@@ -111,10 +227,7 @@ export function ChannelTree({
   );
   const avatarOf = useAvatars(visibleUsers);
   // The voice channel: none while reading along, since no one is in a call yet.
-  const selfChannelId =
-    readOnly || state.selfSession === null
-      ? null
-      : (state.users.get(state.selfSession)?.channelId ?? null);
+  const selfChannelId = readOnly ? null : ownChannelId;
 
   // The Tab stop falls back to the selected channel when the focused row disappears.
   const tabStopId =
@@ -128,14 +241,67 @@ export function ChannelTree({
     treeRef.current?.querySelector<HTMLElement>(`[data-row="${id}"]`)?.focus();
   };
 
-  const setExpanded = (channelId: number, expanded: boolean) => {
+  /** Applies a user's expand/collapse choice and remembers it for the server (QA.27). */
+  const changeCollapsed = (update: (current: ReadonlySet<number>) => ReadonlySet<number>) => {
     setCollapsed((current) => {
+      const next = update(current);
+      rememberCollapsed(state.serverId, next);
+      return next;
+    });
+  };
+
+  const setExpanded = (channelId: number, expanded: boolean) => {
+    const update = (current: ReadonlySet<number>) => {
       const next = new Set(current);
       if (expanded) next.delete(channelId);
       else next.add(channelId);
       return next;
-    });
+    };
+    // Expanding or collapsing search results must not change the remembered state (QA.27).
+    if (searching) setSearchCollapsed(update);
+    else changeCollapsed(update);
   };
+
+  useImperativeHandle(ref, () => ({
+    jumpToVoice: () => {
+      if (selfChannelId === null) return;
+      const path = channelPath(roots, selfChannelId);
+      if (path.length === 0) return;
+      changeCollapsed((current) =>
+        path.some((id) => current.has(id))
+          ? new Set([...current].filter((id) => !path.includes(id)))
+          : current,
+      );
+      // A new object each time, so jumping again to the same channel highlights it again.
+      setJump({ rowId: channelRowId(selfChannelId) });
+    },
+    openFirstMatch: () => {
+      const byId = new Map(rows.map((row) => [row.id, row]));
+      const first = result?.matches.map((id) => byId.get(id)).find((row) => row !== undefined);
+      if (first === undefined) return;
+      if (first.kind === "channel") onSelect(first.channelId);
+      // Focusing a person shows their profile preview (QA.21).
+      else focusRow(first.id);
+    },
+  }));
+
+  // Focus, scroll to and highlight the row once the expanded path is on screen. A frame later:
+  // rows pick up the new expand state in a render of their own, after this effect.
+  useEffect(() => {
+    if (jump === null) return;
+    let endFlash: (() => void) | undefined;
+    const frame = requestAnimationFrame(() => {
+      const row = treeRef.current?.querySelector<HTMLElement>(`[data-row="${jump.rowId}"]`);
+      if (!row) return;
+      row.focus({ preventScroll: true });
+      scrollIntoContainer(row, !prefersReducedMotion());
+      endFlash = flash(row);
+    });
+    return () => {
+      cancelAnimationFrame(frame);
+      endFlash?.();
+    };
+  }, [jump]);
 
   const toggleShowAll = (channelId: number) => {
     setShowAll((current) => {
@@ -214,12 +380,13 @@ export function ChannelTree({
     channelAction,
   };
   const ui: TreeUi = {
-    collapsed,
+    collapsed: shownCollapsed,
     showAll,
     tabStopId,
     selectedChannelId,
     selfChannelId,
     selfSession: state.selfSession,
+    query,
   };
   // Stable for the tree's lifetime: rows read the changing parts through these stores, so a
   // change re-renders only the rows it concerns (see `treeRows`).
@@ -241,7 +408,8 @@ export function ChannelTree({
       current.tabStopId !== ui.tabStopId ||
       current.selectedChannelId !== ui.selectedChannelId ||
       current.selfChannelId !== ui.selfChannelId ||
-      current.selfSession !== ui.selfSession
+      current.selfSession !== ui.selfSession ||
+      current.query !== ui.query
     ) {
       context.ui.set(ui);
     }
@@ -261,11 +429,15 @@ export function ChannelTree({
         onKeyDown={onKeyDown}
       >
         <TreeContext.Provider value={context}>
-          {roots.map((root) => (
+          {shownRoots.map((root) => (
             <ChannelBranch key={channelRowId(root.channel.id)} node={root} level={1} />
           ))}
         </TreeContext.Provider>
       </div>
+      {result !== null && result.roots.length === 0 && (
+        <p className="channel-tree__empty">{t("search.empty", { query: filter.trim() })}</p>
+      )}
+
       <p id={hintId} className="channel-tree__hint">
         {t("tree.hint")}
       </p>

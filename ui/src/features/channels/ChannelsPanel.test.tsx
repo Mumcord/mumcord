@@ -103,7 +103,7 @@ describe("ChannelsPanel", () => {
     // Carla listens to Lobby and lives in Raid: exactly one row, no ear marker.
     const carla = screen.getAllByRole("treeitem", { name: /^Carla/ });
     expect(carla).toHaveLength(1);
-    expect(carla[0]?.querySelector(".person-icon")).toBeNull();
+    expect(carla[0]?.querySelector(".person-icon:not(.person-icon--registered)")).toBeNull();
     const self = getServerState().selfSession ?? -1;
     await act(async () => {
       await api.channelFollow(2);
