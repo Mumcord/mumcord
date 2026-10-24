@@ -1,0 +1,46 @@
+{
+  "noConversation": "Conéctate a un servidor y elige un canal para empezar a chatear.",
+  "empty": "Aún no hay mensajes. Los mensajes que recibas aquí se guardan en este ordenador.",
+  "header": {
+    "channel": "#{{name}}",
+    "channelPrefix": "Canal",
+    "privatePrefix": "Chat privado con",
+    "unknownPerson": "Persona desconocida"
+  },
+  "list": {
+    "label": "Mensajes en {{name}}",
+    "loadOlder": "Cargar mensajes anteriores",
+    "loading": "Cargando mensajes…",
+    "loadFailed": "No se pudieron cargar los mensajes anteriores. Desplázate hacia arriba para reintentarlo."
+  },
+  "composer": {
+    "label": "Mensaje a {{name}}",
+    "hint": "Pulsa Intro para enviar y Mayús+Intro para una nueva línea. Funciona Markdown: **negrita**, *cursiva*, `código`, [enlace](https://…).",
+    "addImage": "Añadir imagen",
+    "removeImage": "Quitar imagen",
+    "imagePreview": "Imagen para enviar",
+    "send": "Enviar",
+    "noPermission": "No tienes permiso para escribir en este canal.",
+    "unavailable": "Este canal ya no está disponible.",
+    "offline": "{{name}} no está conectado. Podrás escribir de nuevo cuando vuelva."
+  },
+  "errors": {
+    "tooLong": "Tu mensaje es demasiado largo para este servidor (máximo {{max}} caracteres). Acórtalo e inténtalo de nuevo.",
+    "tooLongNoLimit": "Tu mensaje es demasiado largo para este servidor. Acórtalo e inténtalo de nuevo.",
+    "imageTooLarge": "Esta imagen es demasiado grande para este servidor, incluso comprimida. Prueba con una imagen más pequeña.",
+    "imageWithTextTooLong": "El mensaje con la imagen es demasiado grande para este servidor. Acorta el texto o quita la imagen.",
+    "imagesNotAllowed": "Este servidor no permite imágenes en los mensajes.",
+    "notImage": "Este archivo no se puede enviar. Usa una imagen PNG, JPEG, GIF o WebP.",
+    "imageUnreadable": "No se pudo leer la imagen. Prueba con otro archivo.",
+    "denied": "El servidor no permitió este mensaje.",
+    "deniedWithReason": "El servidor no permitió este mensaje: {{reason}}",
+    "notConnected": "No estás conectado. Vuelve a conectarte e inténtalo de nuevo.",
+    "generic": "No se pudo enviar el mensaje. Inténtalo de nuevo."
+  },
+  "announce": {
+    "message": "{{name}}: {{text}}",
+    "image": "{{name}} envió una imagen",
+    "more_one": "{{count}} mensaje nuevo más",
+    "more_other": "{{count}} mensajes nuevos más"
+  }
+}

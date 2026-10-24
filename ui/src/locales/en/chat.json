@@ -1,0 +1,46 @@
+{
+  "noConversation": "Connect to a server and pick a channel to start chatting.",
+  "empty": "No messages yet. Messages you receive here are saved on this computer.",
+  "header": {
+    "channel": "#{{name}}",
+    "channelPrefix": "Channel",
+    "privatePrefix": "Private chat with",
+    "unknownPerson": "Unknown person"
+  },
+  "list": {
+    "label": "Messages in {{name}}",
+    "loadOlder": "Load older messages",
+    "loading": "Loading messages…",
+    "loadFailed": "Older messages couldn't be loaded. Scroll up to try again."
+  },
+  "composer": {
+    "label": "Message {{name}}",
+    "hint": "Press Enter to send and Shift+Enter for a new line. Markdown works: **bold**, *italic*, `code`, [link](https://…).",
+    "addImage": "Add image",
+    "removeImage": "Remove image",
+    "imagePreview": "Image to send",
+    "send": "Send",
+    "noPermission": "You don't have permission to write in this channel.",
+    "unavailable": "This channel is no longer available.",
+    "offline": "{{name}} is offline. You can write again when they are back."
+  },
+  "errors": {
+    "tooLong": "Your message is too long for this server (at most {{max}} characters). Shorten it and try again.",
+    "tooLongNoLimit": "Your message is too long for this server. Shorten it and try again.",
+    "imageTooLarge": "This image is too large for this server, even after compressing it. Try a smaller image.",
+    "imageWithTextTooLong": "The message with the image is too large for this server. Shorten the text or remove the image.",
+    "imagesNotAllowed": "This server doesn't allow images in messages.",
+    "notImage": "This file can't be sent. Use a PNG, JPEG, GIF or WebP image.",
+    "imageUnreadable": "The image couldn't be read. Try another file.",
+    "denied": "The server didn't allow this message.",
+    "deniedWithReason": "The server didn't allow this message: {{reason}}",
+    "notConnected": "You're not connected. Reconnect and try again.",
+    "generic": "The message couldn't be sent. Try again."
+  },
+  "announce": {
+    "message": "{{name}}: {{text}}",
+    "image": "{{name}} sent an image",
+    "more_one": "{{count}} more new message",
+    "more_other": "{{count}} more new messages"
+  }
+}
