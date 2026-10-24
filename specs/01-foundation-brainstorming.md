@@ -718,3 +718,13 @@ Mumble servers keep avatars only for registered users; for unregistered users th
 ✍️ Note: Requested in chat during /dev.
 
 ---
+
+#### QA.12 Release builds from tags on main? `◉`
+Signed builds and auto-update stay in Epic 5.
+
+- [x] **Pushing a version tag (`v*`, e.g. `v0.1.0`) on `main` builds the Windows installer (.exe), the Linux AppImage and the macOS .dmg and attaches them, with SHA-256 checksums, to a draft GitHub Release that the maintainer reviews and publishes by hand.** Builds are unsigned until Epic 5; the release notes say so. The tag must match the app version, otherwise the workflow fails.
+- [ ] Publish the release automatically.
+
+✍️ Note: Requested in chat during /dev; draft release recommended so nothing goes public without a final look.
+
+---
