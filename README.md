@@ -4,6 +4,8 @@ Mumcord is a modern, Discord-style desktop voice chat client for gaming groups a
 
 Mumcord is **compatible with Mumble**. It is **not affiliated with or endorsed by the Mumble project**. "Mumble" is the name of that project; Mumcord does not use the Mumble logo.
 
+![Mumcord main window: channel tree, chat and member list (dark theme, demo data)](docs/images/mumcord-main.png)
+
 ## What it is
 
 - A pure client: it speaks the Mumble protocol and works with unmodified, standard Mumble servers. Nothing needs to be installed or changed on the server.
@@ -15,14 +17,55 @@ Early development (Epic 1). Expect missing features and rough edges. See `specs/
 
 Test builds for Windows and macOS are unsigned. The operating system will show a security warning when you start them.
 
-## Development setup
+## Building from source
 
+### Prerequisites
+
+- Rust, stable toolchain, 1.90 or newer (`rustup`), with the `rustfmt` and `clippy` components.
+- Node.js 24 (the version CI uses) and npm.
+- No `protoc` is needed: the protobuf compiler is vendored (`protoc-bin-vendored`).
+- Linux, Debian/Ubuntu (24.04 in CI):
+
+      sudo apt-get install -y --no-install-recommends \
+        libwebkit2gtk-4.1-dev libayatana-appindicator3-dev librsvg2-dev \
+        libxdo-dev libasound2-dev cmake patchelf xdg-utils build-essential pkg-config libssl-dev
+
+- Linux, Arch/CachyOS:
+
+      sudo pacman -S --needed base-devel webkit2gtk-4.1 libayatana-appindicator librsvg \
+        xdotool alsa-lib cmake openssl pkgconf patchelf xdg-utils
+
+- Windows: Visual Studio Build Tools with the "Desktop development with C++" workload (MSVC), and the WebView2 runtime (preinstalled on Windows 11).
+- macOS: Xcode command line tools (`xcode-select --install`).
+
+### Get the code and run
+
+    git clone <repository-url> mumcord && cd mumcord
     npm ci
     npm run tauri dev
 
-Other useful commands: `npm run build`, `npm test`, `npm run lint`, `npm run typecheck`.
+### Build release packages
 
-Local Mumble servers for manual and automated tests are described in [`testenv/README.md`](testenv/README.md). Do not test against public servers.
+    npm run tauri build
+
+Bundles land in `target/release/bundle/`: `appimage/*.AppImage` (Linux), `nsis/*-setup.exe` (Windows), `dmg/*.dmg` and `macos/*.app` (macOS). Each OS builds only its own formats. To build a single format, pass `-- --bundles appimage` (or `nsis`, `dmg`). The packages are unsigned; Windows and macOS show a security warning on first start.
+
+### Checks
+
+    cargo fmt --all --check
+    cargo clippy --workspace --all-targets --locked -- -D warnings
+    cargo test --workspace --locked
+    npm run lint
+    npm run typecheck
+    npm test
+
+`npm run build` type-checks and builds the frontend only.
+
+### Optional
+
+- Local Mumble servers for manual and automated tests: [`testenv/README.md`](testenv/README.md). Do not test against public servers.
+- UI end-to-end tests (`npm run e2e`, needs Docker): [`e2e/README.md`](e2e/README.md).
+- After dependency changes, regenerate the third-party notices with `scripts/generate-notices.sh`.
 
 ## Licenses
 
