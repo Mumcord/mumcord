@@ -72,6 +72,11 @@
   font-size: var(--font-size-sm);
 }
 
+/* Generated, so the digit is not treeitem text: visible text must be part of the name (WCAG 2.5.3). */
+.tree-channel__count::before {
+  content: attr(data-count);
+}
+
 /* Shown on hover and while the row has keyboard focus (Shift+Enter is the keyboard route). */
 .tree-channel__join {
   display: none;
@@ -82,6 +87,11 @@
   color: var(--color-text);
   font-size: var(--font-size-xs);
   cursor: pointer;
+}
+
+/* Generated text is not part of the treeitem's text content, so its name still contains all of it. */
+.tree-channel__join::before {
+  content: attr(data-label);
 }
 
 .tree-channel__row:hover .tree-channel__join,

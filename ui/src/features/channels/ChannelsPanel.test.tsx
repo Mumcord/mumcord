@@ -128,6 +128,9 @@ describe("ChannelsPanel", () => {
     const afk = item(/^AFK/);
     const join = afk.querySelector("button") as HTMLButtonElement;
     expect(join.tabIndex).toBe(-1);
+    // The label is CSS-generated so the (focus-visible) button adds no text to the treeitem (WCAG 2.5.3).
+    expect(join.dataset.label).toBe("Join");
+    expect(afk.textContent).not.toContain("Join");
     fireEvent.click(join);
     await waitFor(() => {
       expect(getServerState().users.get(1)?.channelId).toBe(3);
@@ -196,6 +199,28 @@ describe("ChannelsPanel", () => {
       expect(await axeViolations(container)).toEqual([]);
     },
   );
+
+  // jsdom axe treats visually hidden text as visible; WebKit doesn't. Check what a sighted user sees
+  // (DOM text minus visually hidden spans) is a contiguous run of the name, as axe does in WebKit.
+  it("keeps each treeitem's visible text inside its accessible name", async () => {
+    const { container } = await renderPanel();
+    const words = (text: string) => text.toLowerCase().match(/[\p{L}\p{N}]+/gu) ?? [];
+    const items = Array.from(container.querySelectorAll<HTMLElement>('[role="treeitem"]'));
+    expect(items.length).toBeGreaterThan(0);
+    for (const item of items) {
+      const clone = item.cloneNode(true) as HTMLElement;
+      clone.querySelectorAll(".visually-hidden").forEach((el) => {
+        el.remove();
+      });
+      const visible = words(clone.textContent.replace(/\([^()]*\)/g, " ")).join(" ");
+      const labelId = item.getAttribute("aria-labelledby") ?? "";
+      const name = words(document.getElementById(labelId)?.textContent ?? "").join(" ");
+      expect(` ${name} `).toContain(` ${visible} `);
+    }
+    expect(container.querySelector(".tree-channel__count")?.getAttribute("data-count")).toMatch(
+      /^\d+$/,
+    );
+  });
 });
 
 describe("announcements", () => {

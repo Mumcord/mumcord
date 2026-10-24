@@ -242,8 +242,9 @@ export function ChannelTree({
               <span className="tree-channel__name">{channel.name}</span>
               {isOwn && <span className="visually-hidden">, {t("tree.yourChannel")}</span>}
               {count > 0 && (
-                <span className="tree-channel__count">
-                  <span aria-hidden="true">{count}</span>
+                // The digits are CSS-generated (::before) so the row's visible text stays a run of
+                // its accessible name (WCAG 2.5.3); the spoken form is the visually hidden phrase.
+                <span className="tree-channel__count" data-count={count}>
                   <span className="visually-hidden">, {t("tree.people", { count })}</span>
                 </span>
               )}
@@ -253,6 +254,9 @@ export function ChannelTree({
               <button
                 type="button"
                 className="tree-channel__join"
+                // The label is CSS-generated (::before): the button shows only on hover/focus and
+                // its text must not join the treeitem's visible text (WCAG 2.5.3 label-in-name).
+                data-label={t("tree.join")}
                 tabIndex={-1}
                 aria-hidden="true"
                 onClick={(event) => {
@@ -262,9 +266,7 @@ export function ChannelTree({
                 onDoubleClick={(event) => {
                   event.stopPropagation();
                 }}
-              >
-                {t("tree.join")}
-              </button>
+              />
             )}
           </div>
         </div>
