@@ -966,3 +966,13 @@ Until now external images (img tags pointing to web addresses, image links) are 
 ✍️ Note: Requested in chat during /dev ("splitten mal die chat features von ingame overlay. chat features ist 1b").
 
 ---
+
+#### QA.37 Allow more than 96 kbit/s? `◉`
+
+- [x] **Settings → Audio: "Music quality" switch (default off). Off: automatic bitrate capped at 96 kbit/s (speech). On: the cap rises to the server limit, at most 510 kbit/s (Opus maximum), with the Opus encoder tuned for music; still lowered automatically on packet loss.**
+- [ ] Always use the server limit.
+- [ ] Keep 96 kbit/s.
+
+✍️ Note: Asked and answered in chat during /dev (server limit 558 kbit/s observed, client capped at 96).
+
+---
