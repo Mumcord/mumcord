@@ -361,6 +361,8 @@ impl Engine {
     /// Sets the own profile comment (Mumble HTML); empty removes it.
     pub async fn set_own_comment(&self, html: String) -> EngineResult<()> {
         let ctx = self.session_ctx()?;
+        // The now-playing line stays at the end while it is shown (FR-1.58).
+        let html = self.with_now_playing_line(&html);
         if !html.trim().is_empty() {
             check_text_size(&ctx, &html)?;
         }

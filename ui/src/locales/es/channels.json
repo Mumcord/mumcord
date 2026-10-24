@@ -37,7 +37,8 @@
     "serverDeafened": "Ensordecido por el servidor",
     "suppressed": "Suprimido: no puede hablar en este canal",
     "localMuted": "Silenciado para ti",
-    "unregistered": "No registrado en este servidor (invitado)"
+    "unregistered": "No registrado en este servidor (invitado)",
+    "nowPlaying": "Escuchando {{track}}"
   },
   "announce": {
     "joined": "{{name}} se unió a tu canal",

@@ -18,6 +18,7 @@ import { useTranslation } from "react-i18next";
 import type { User } from "../../api";
 import { VOICE_STATE_KEY, voiceState } from "../channels/statusText";
 import { useServerState } from "../channels/serverStore";
+import { NowPlayingFor } from "../nowplaying";
 import "./profilePreview.css";
 import { Avatar } from "./Avatar";
 import { openPersonMenuFromEvent, openPersonMenuFromKey } from "./personMenuStore";
@@ -231,6 +232,7 @@ function PreviewBody({ user, talking }: { user: User; talking: boolean }) {
           {voice.length > 0 && <p className="profile-preview__voice">{voice.join(", ")}</p>}
         </div>
       </div>
+      <NowPlayingFor session={user.session} compact />
       {comment && (
         <div className="profile-preview__comment" dangerouslySetInnerHTML={{ __html: comment }} />
       )}

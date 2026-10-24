@@ -6,6 +6,7 @@ import { Group, Section } from "../components/Section";
 import { errorText } from "../errors";
 import { pickOpenPath, pickSavePath } from "../fileDialogs";
 import { DefaultAvatarGroup } from "./DefaultAvatarGroup";
+import { NowPlayingGroup } from "./NowPlayingGroup";
 import type { SettingsSectionProps } from "./types";
 
 const IDENTITY_FILTER_EXTENSIONS = ["p12", "pfx"];
@@ -86,6 +87,7 @@ export function IdentitySection({ settings, update }: SettingsSectionProps) {
         </div>
       </Group>
       <DefaultAvatarGroup settings={settings} update={update} />
+      <NowPlayingGroup settings={settings} update={update} />
       <p role="status" className={status?.kind === "error" ? "settings-error" : "settings-success"}>
         {status?.text}
       </p>
