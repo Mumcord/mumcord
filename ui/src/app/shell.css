@@ -1,0 +1,173 @@
+.shell {
+  display: grid;
+  grid-template-columns: var(--width-server-bar) var(--width-channels) minmax(0, 1fr) var(
+      --width-members
+    );
+  height: 100%;
+  overflow: hidden;
+}
+
+.shell__servers {
+  overflow-y: auto;
+  padding: var(--space-3) var(--space-2);
+  background: var(--color-bg-servers);
+}
+
+.shell__channel-column {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  background: var(--color-bg-sidebar);
+}
+
+.shell__channels {
+  flex: 1;
+  overflow-y: auto;
+  padding: var(--space-2);
+}
+
+.shell__user-panel {
+  padding: var(--space-2);
+  border-top: 1px solid var(--color-border);
+  background: var(--color-bg-elevated);
+}
+
+.shell__chat {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0;
+  background: var(--color-bg-chat);
+}
+
+.shell__chat-body {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+}
+
+.shell__members {
+  overflow-y: auto;
+  padding: var(--space-2);
+  border-left: 1px solid var(--color-border);
+  background: var(--color-bg-sidebar);
+}
+
+.shell__members-toggle {
+  display: none;
+}
+
+.shell :is(nav, main)[tabindex="-1"]:focus {
+  outline: none;
+}
+
+/* Narrow windows: the member list becomes an overlay panel opened from the chat column. */
+@media (max-width: 60rem) {
+  .shell {
+    grid-template-columns: var(--width-server-bar) var(--width-channels) minmax(0, 1fr);
+  }
+
+  .shell__members-toggle {
+    display: block;
+    align-self: flex-end;
+    margin: var(--space-2);
+    padding: var(--space-1) var(--space-3);
+    border: 1px solid var(--color-border-strong);
+    border-radius: var(--radius-md);
+    background: var(--color-bg-elevated);
+    cursor: pointer;
+  }
+
+  .shell__members {
+    display: none;
+  }
+
+  .shell[data-members-open="true"] .shell__members {
+    display: block;
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: min(var(--width-members), 80vw);
+    z-index: 10;
+    box-shadow: 0 0 1.5rem var(--color-backdrop);
+  }
+}
+
+.placeholder {
+  margin: var(--space-2);
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+}
+
+.centered-screen {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-4);
+  min-height: 100%;
+  padding: var(--space-6);
+  text-align: center;
+}
+
+.button {
+  padding: var(--space-2) var(--space-4);
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-md);
+  background: var(--color-bg-elevated);
+  cursor: pointer;
+  transition: background-color var(--duration-fast);
+}
+
+.button--primary {
+  border-color: transparent;
+  background: var(--color-accent);
+  color: var(--color-on-accent);
+  font-weight: var(--font-weight-bold);
+}
+
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: flex;
+  background: var(--color-backdrop);
+}
+
+.overlay__dialog {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  margin: var(--space-4);
+  border-radius: var(--radius-lg);
+  background: var(--color-bg-chat);
+  overflow: hidden;
+}
+
+.overlay__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-3) var(--space-4);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.overlay__header h1 {
+  margin: 0;
+  font-size: var(--font-size-lg);
+}
+
+.overlay__close {
+  padding: var(--space-1) var(--space-3);
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-md);
+  background: transparent;
+  cursor: pointer;
+}
+
+.overlay__body {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+}

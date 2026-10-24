@@ -1,0 +1,23 @@
+/* Out of the layout flow so the links never take up a grid cell in the shell. */
+.skip-links {
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+.skip-links__link {
+  position: absolute;
+  top: var(--space-2);
+  left: var(--space-2);
+  z-index: 100;
+  padding: var(--space-2) var(--space-4);
+  border-radius: var(--radius-md);
+  background: var(--color-accent);
+  color: var(--color-on-accent);
+  font-weight: var(--font-weight-bold);
+  transform: translateY(-200%);
+}
+
+.skip-links__link:focus {
+  transform: none;
+}

@@ -1,0 +1,29 @@
+{
+  "regions": {
+    "servers": "Server",
+    "channels": "Kanäle",
+    "chat": "Chat",
+    "members": "Mitglieder",
+    "userPanel": "Dein Status"
+  },
+  "skipLinks": {
+    "label": "Sprunglinks",
+    "chat": "Zum Chat springen",
+    "channels": "Zu den Kanälen springen"
+  },
+  "members": {
+    "show": "Mitglieder anzeigen",
+    "hide": "Mitglieder ausblenden"
+  },
+  "settings": {
+    "title": "Einstellungen"
+  },
+  "wizard": {
+    "title": "Willkommen bei Mumcord"
+  },
+  "placeholder": "Folgt bald",
+  "startupError": {
+    "title": "Mumcord konnte nicht starten",
+    "description": "Die App konnte deine Einstellungen nicht laden. Versuche es erneut; wenn es weiter fehlschlägt, starte Mumcord neu."
+  }
+}

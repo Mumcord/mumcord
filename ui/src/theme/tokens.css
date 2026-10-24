@@ -1,0 +1,91 @@
+/*
+ * Mumcord design tokens. Components use only these variables, never raw colours, so both
+ * themes stay complete. Colour values are checked for WCAG contrast in contrast.test.ts.
+ * Dark is the designed default and also applies before the theme is resolved.
+ */
+:root {
+  --font-family:
+    "Inter", "Segoe UI", system-ui, -apple-system, "Noto Sans", "Helvetica Neue", Arial, sans-serif;
+  --font-size-xs: 0.75rem;
+  --font-size-sm: 0.875rem;
+  --font-size-md: 1rem;
+  --font-size-lg: 1.25rem;
+  --font-size-xl: 1.5rem;
+  --font-weight-normal: 400;
+  --font-weight-bold: 600;
+  --line-height: 1.4;
+
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.5rem;
+  --space-6: 2rem;
+
+  --radius-sm: 0.25rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 1rem;
+  --radius-full: 9999px;
+
+  --focus-ring-width: 0.1875rem;
+  --duration-fast: 120ms;
+  --duration-normal: 200ms;
+
+  --width-server-bar: 4.5rem;
+  --width-channels: 15rem;
+  --width-members: 15rem;
+}
+
+:root,
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --color-bg-servers: #0e1120;
+  --color-bg-sidebar: #151a2c;
+  --color-bg-chat: #1b2035;
+  --color-bg-elevated: #232a43;
+  --color-bg-hover: #2b3351;
+  --color-text: #e9ebf5;
+  --color-text-secondary: #b9bed6;
+  --color-text-muted: #9aa1c2;
+  --color-accent: #2dd4bf;
+  --color-on-accent: #062621;
+  --color-accent-text: #5eead4;
+  --color-success: #4ade80;
+  --color-warning: #fbbf24;
+  --color-danger: #fb8b8b;
+  --color-talking: #4ade80;
+  --color-border: #2e3553;
+  --color-border-strong: #7b83a9;
+  --color-focus: #fcd34d;
+  --color-backdrop: rgb(5 7 15 / 70%);
+}
+
+:root[data-theme="light"] {
+  color-scheme: light;
+  --color-bg-servers: #dde1ee;
+  --color-bg-sidebar: #eef0f7;
+  --color-bg-chat: #ffffff;
+  --color-bg-elevated: #e5e8f2;
+  --color-bg-hover: #d7dbea;
+  --color-text: #141a2e;
+  --color-text-secondary: #3b4262;
+  --color-text-muted: #525a7a;
+  --color-accent: #0f766e;
+  --color-on-accent: #ffffff;
+  --color-accent-text: #0b6560;
+  --color-success: #136634;
+  --color-warning: #8a5300;
+  --color-danger: #b01c1c;
+  --color-talking: #15803d;
+  --color-border: #c6cbdc;
+  --color-border-strong: #6f7593;
+  --color-focus: #6d28d9;
+  --color-backdrop: rgb(20 26 46 / 45%);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --duration-fast: 0ms;
+    --duration-normal: 0ms;
+  }
+}
