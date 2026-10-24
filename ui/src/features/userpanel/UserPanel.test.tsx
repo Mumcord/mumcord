@@ -319,6 +319,19 @@ describe("UserPanel", () => {
     expect(comment).toHaveBeenCalledWith("a &lt; b<br>line");
   });
 
+  it("explains the avatar re-send only to unregistered users", async () => {
+    const hint = /keeps avatars only for registered users/;
+    await setup();
+    await openMenuItem("Edit profile");
+    expect(await screen.findByRole("dialog")).toHaveTextContent(hint);
+    fireEvent.click(screen.getByRole("button", { name: "Cancel" }));
+    await act(async () => {
+      await api.registerSelf();
+    });
+    await openMenuItem("Edit profile");
+    expect(await screen.findByRole("dialog")).not.toHaveTextContent(hint);
+  });
+
   it("shows the size limit error and keeps the dialog open", async () => {
     await setup();
     await openMenuItem("Edit profile");

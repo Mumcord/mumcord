@@ -262,7 +262,12 @@ export function UserPanel() {
         </p>
       ) : null}
       {dialog === "profile" && self ? (
-        <ProfileDialog session={self.session} hasAvatar={self.hasAvatar} onClose={closeDialog} />
+        <ProfileDialog
+          session={self.session}
+          hasAvatar={self.hasAvatar}
+          registered={self.registered}
+          onClose={closeDialog}
+        />
       ) : null}
       {dialog === "register" ? <RegisterDialog onClose={closeDialog} /> : null}
     </div>

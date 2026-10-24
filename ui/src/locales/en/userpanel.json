@@ -23,6 +23,7 @@
     "chooseAvatar": "Choose picture…",
     "removeAvatar": "Remove picture",
     "avatarHint": "The picture is scaled down to fit the server's limit.",
+    "avatarUnregistered": "This server keeps avatars only for registered users – Mumcord re-sends yours on each connect.",
     "avatarChosen": "Selected: {{name}}",
     "avatarRemoved": "The picture will be removed when you save.",
     "comment": "About you"

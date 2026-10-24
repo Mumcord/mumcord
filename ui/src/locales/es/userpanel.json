@@ -23,6 +23,7 @@
     "chooseAvatar": "Elegir imagen…",
     "removeAvatar": "Quitar imagen",
     "avatarHint": "La imagen se reduce para ajustarse al límite del servidor.",
+    "avatarUnregistered": "Este servidor solo guarda avatares de usuarios registrados – Mumcord reenvía el tuyo en cada conexión.",
     "avatarChosen": "Seleccionada: {{name}}",
     "avatarRemoved": "La imagen se quitará al guardar.",
     "comment": "Sobre ti"

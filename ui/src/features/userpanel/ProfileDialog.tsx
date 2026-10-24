@@ -11,10 +11,11 @@ type AvatarChange = { kind: "keep" } | { kind: "remove" } | { kind: "set"; path:
 interface ProfileDialogProps {
   session: number;
   hasAvatar: boolean;
+  registered: boolean;
   onClose: () => void;
 }
 
-export function ProfileDialog({ session, hasAvatar, onClose }: ProfileDialogProps) {
+export function ProfileDialog({ session, hasAvatar, registered, onClose }: ProfileDialogProps) {
   const { t } = useTranslation(["userpanel", "common"]);
   const commentId = useId();
   const errorId = useId();
@@ -107,6 +108,7 @@ export function ProfileDialog({ session, hasAvatar, onClose }: ProfileDialogProp
               ? t("profile.avatarRemoved")
               : t("profile.avatarHint")}
         </p>
+        {registered ? null : <p className="userpanel-hint">{t("profile.avatarUnregistered")}</p>}
         <label htmlFor={commentId}>{t("profile.comment")}</label>
         <textarea
           id={commentId}
