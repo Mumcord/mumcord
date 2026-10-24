@@ -6,6 +6,8 @@
 
 Mumcord is a modern, Discord-style desktop voice chat client for gaming groups and online communities. It is built with Rust, Tauri 2 and React/TypeScript.
 
+Website: **[mumcord.app](https://mumcord.app)** · Wiki: [github.com/ToBee94/mumcord/wiki](https://github.com/ToBee94/mumcord/wiki) · Website source: [mumcord-www](https://github.com/ToBee94/mumcord-www)
+
 Mumcord is **compatible with Mumble**. It is **not affiliated with or endorsed by the Mumble project**. "Mumble" is the name of that project; Mumcord does not use the Mumble logo.
 
 ![Mumcord main window: channel tree, chat and member list (dark theme, demo data)](docs/images/mumcord-main.png)
