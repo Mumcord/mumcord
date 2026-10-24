@@ -126,6 +126,8 @@
 | V14 | Workflows (f13e2f3) | done – CI + Test builds green; E2E 17/18, servers.e2e.ts AC-1.4 "Save this server?" dialog missing, cascade | ci14-watch | F41 | simple | §10 | – |
 | F42 | E2E servers.e2e.ts AC-1.4 save dialog not shown in CI, cascade | done – root cause slow RSA keygen in debug build (wizard step 1); wizard wait 120 s, bail on first failure, rsa/num-bigint-dig opt-level 3 in dev | f42-servers-ci | V14 | simple | AC-1.4–1.6 | e2e/** |
 | V15 | Workflows (77818e3) | done – CI, E2E 18/18 and Test builds all green | ci15-watch | F42 | simple | §10 | – |
+| F43 | KDE Wayland: shortcut configure dialog never appears when setting PTT key (user report, Plasma 6.8.1) | done – portal call lacked an activation token, so KWin kept System Settings in the background; token now requested via GTK and passed | f43-kde-dialog | F37 | complex | AC-1.9 | src-tauri/src/ptt*, ui/src/features/settings, ui/src/features/wizard |
+| F44 | Wayland PTT compatibility mode switch (XWayland + X11 path) | open | – | F43 | complex | FR-1.48, AC-1.38 | src-tauri/src/ptt*, src-tauri/src/lib.rs, ui/src/features/settings |
 | G1 | **Stage 1a gate** (checklist in specs/01-foundation-implementation.md): user manual checklist (Win/macOS, listening, KDE PTT/tray/Orca) + sign-off | open | user | C1–C8 | – | – | – |
 | B30 | Mumble Link + 3D audio | open | | F35 | Avatar image load failure showed empty circle; mock polish + new screenshot | done | f35-avatar-fallback | screenshot | simple | FR-1.17 | members Avatar, mock, docs/images |
 | G1 | complex | FR-1.41, 1.43 | crates/positional/src/link/, crates/audio/src/spatial/ |
