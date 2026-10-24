@@ -503,5 +503,6 @@ No `specs/roadmap.md` exists yet. This brainstorming proposes it:
 | 3 | Comfort & polish | Global hotkeys beyond PTT, full tray menu, desktop notifications, import from the official client, whisper/shout (Q5.8), public server browser (Q5.3) |
 | 4 | Admin features | ACL/permission editing, bans, channel management – completes "full replacement" (Q1.3) |
 | 5 | Release & distribution | Signed installers, auto-update, opt-in crash reports (Q4.9), store/package listings |
+| 6 | GIF search | GIF search (Tenor/Giphy or similar) without shipping an extractable API key – e.g. a small proxy or user-provided keys; decided later (QA.43) |
 
 Renumbering (QA.1): Epic 2 is now Multi-server read-along; Comfort & polish, Admin and Release move to Epics 3, 4 and 5. Later candidates: mobile apps (Android/iOS), recording. Creating `specs/roadmap.md` from this table needs the user's go-ahead.
