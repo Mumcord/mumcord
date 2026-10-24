@@ -678,3 +678,13 @@ Until now an explicit Join always cleared mute and deafen (QA.2).
 ✍️ Note: Asked and answered in chat during /dev.
 
 ---
+
+#### QA.8 Visible way to disconnect from the current server? `◉`
+Disconnect exists only in the server icon's context menu.
+
+- [x] **Add a "Disconnect" button (hang-up icon) to the user panel next to mute and deafen, shown while connected.**
+- [ ] Keep it in the context menu only.
+
+✍️ Note: Asked and answered in chat during /dev.
+
+---

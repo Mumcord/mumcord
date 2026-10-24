@@ -163,7 +163,7 @@ flowchart LR
 ```
 
 - **Server bar** (left): saved servers as round icons, connected one highlighted, "+" to add.
-- **Channel list**: tree, unread badge (•2) on followed channels, "Join" button on hover. After a fresh connect the default channel is highlighted as current but not "joined for voice" (read-only state, QA.2); the user panel shows mute and deafen active and a hint "Read-only – Join a channel to talk". Join restores the last own mute/deafen setting (QA.7).
+- **Channel list**: tree, unread badge (•2) on followed channels, "Join" button on hover. After a fresh connect the default channel is highlighted as current but not "joined for voice" (read-only state, QA.2); the user panel shows mute and deafen active and a hint "Read-only – Join a channel to talk". Join restores the last own mute/deafen setting (QA.7). While connected, the user panel also shows a "Disconnect" button (hang-up icon) next to mute and deafen (QA.8).
 - **Chat**: header with channel name and Follow toggle; message list; input with image button.
 - **Member list**: people in the channel, then listeners.
 - **User panel** (bottom of channel list): own avatar/name, mute, deafen, settings.
@@ -414,6 +414,7 @@ Unless stated otherwise: a fresh Mumcord install, a local test server (1.5) runn
 | QA.5 | Push-to-talk compatibility mode on Linux Wayland (XWayland + X11 path, like TeamSpeak), opt-in switch, default stays the modern path | Addendum 2026-10-24; FR-1.48, AC-1.38 |
 | QA.6 | Channel list person rows: avatar with a green ring while talking; listener rows without voice state | Addendum 2026-10-24; FR-1.15 |
 | QA.7 | Join after a read-only connect restores the last own mute/deafen setting (persisted) instead of always clearing it | Addendum 2026-10-24; FR-1.14, section 6, AC-1.35 |
+| QA.8 | Visible "Disconnect" button in the user panel next to mute/deafen | Addendum 2026-10-24; section 6 |
 
 ## 13. Open points & risks
 
