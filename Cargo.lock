@@ -3097,7 +3097,7 @@ checksum = "1d87ecb2933e8aeadb3e3a02b828fed80a7528047e68b4f424523a0981a3a084"
 
 [[package]]
 name = "mumcord"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "ashpd",
  "core-foundation",
@@ -3129,7 +3129,7 @@ dependencies = [
 
 [[package]]
 name = "mumcord-audio"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "cpal",
  "hound",
@@ -3144,7 +3144,7 @@ dependencies = [
 
 [[package]]
 name = "mumcord-bot"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "anyhow",
  "bytes",
@@ -3161,7 +3161,7 @@ dependencies = [
 
 [[package]]
 name = "mumcord-engine"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "ammonia",
  "anyhow",
@@ -3185,7 +3185,7 @@ dependencies = [
 
 [[package]]
 name = "mumcord-positional"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "libc",
  "libloading 0.8.9",
@@ -3196,7 +3196,7 @@ dependencies = [
 
 [[package]]
 name = "mumcord-protocol"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "aes 0.8.4",
  "bytes",
@@ -3215,7 +3215,7 @@ dependencies = [
 
 [[package]]
 name = "mumcord-store"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "keyring",
  "p12-keystore",
@@ -3262,7 +3262,7 @@ dependencies = [
 
 [[package]]
 name = "netsim"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "anyhow",
  "clap",

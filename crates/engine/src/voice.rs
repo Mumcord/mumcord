@@ -423,7 +423,8 @@ fn capture_loop(
         }
     };
     let frames_per_packet = encoder.packet_duration().frames() as u8;
-    let mut chain = DspChain::new(controls, echo);
+    let mut music = false;
+    let mut chain = DspChain::new(controls.clone(), echo);
     let mut input: Frame = [0.0; FRAME_SAMPLES];
     let mut output: Frame = [0.0; FRAME_SAMPLES];
     let silence: Frame = [0.0; FRAME_SAMPLES];
@@ -447,6 +448,17 @@ fn capture_loop(
         let target = shared.bitrate_bps.load(Ordering::Relaxed);
         if target != bitrate && encoder.set_bitrate(target as i32).is_ok() {
             bitrate = target;
+        }
+        let want_music = controls.music_quality();
+        if want_music != music {
+            match encoder.set_music(want_music) {
+                Ok(()) => music = want_music,
+                Err(e) => {
+                    // Retrying every frame would flood the log; stay on the current tuning.
+                    tracing::warn!(error = %e, "switching the encoder tuning failed");
+                    music = want_music;
+                }
+            }
         }
         let target_loss = shared.loss_percent.load(Ordering::Relaxed);
         if target_loss != loss && encoder.set_packet_loss_percent(target_loss as i32).is_ok() {

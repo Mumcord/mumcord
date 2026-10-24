@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import { getApi, type AudioDevice, type AudioDevices } from "../../../api";
 import { LevelMeter } from "../components/LevelMeter";
 import { Group, Section } from "../components/Section";
+import { Switch } from "../components/Switch";
 import { readableDeviceName } from "../deviceNames";
 import { errorText } from "../errors";
 import type { SettingsSectionProps } from "./types";
@@ -60,6 +61,16 @@ export function AudioSection({ settings, update }: SettingsSectionProps) {
             {problem}
           </p>
         )}
+      </Group>
+      <Group title={t("audio.quality")}>
+        <Switch
+          label={t("audio.musicQuality")}
+          description={t("audio.musicQualityHint")}
+          checked={settings.musicQuality}
+          onChange={(musicQuality) => {
+            update({ musicQuality });
+          }}
+        />
       </Group>
       <MicTest />
     </Section>

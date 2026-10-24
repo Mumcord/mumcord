@@ -178,6 +178,10 @@ pub struct Settings {
     pub noise_suppression: bool,
     pub echo_cancellation: bool,
     pub auto_gain: bool,
+    /// "Music quality" (Settings → Audio, FR-1.24, QA.37): the bitrate cap rises from 96 kbit/s to
+    /// the server limit (at most 510 kbit/s), the encoder is tuned for music and noise
+    /// suppression and automatic gain are bypassed. Off by default.
+    pub music_quality: bool,
     pub sounds: SoundSettings,
     pub notifications: NotificationMode,
     pub close_behaviour: CloseBehaviour,
@@ -213,6 +217,7 @@ impl Default for Settings {
             noise_suppression: true,
             echo_cancellation: true,
             auto_gain: true,
+            music_quality: false,
             sounds: SoundSettings::default(),
             notifications: NotificationMode::default(),
             close_behaviour: CloseBehaviour::default(),
@@ -353,6 +358,18 @@ mod tests {
     }
 
     #[test]
+    fn music_quality_is_off_by_default_and_persists() {
+        let (_dir, store) = temp_store();
+        assert!(!store.settings().expect("load").music_quality);
+        let settings = Settings {
+            music_quality: true,
+            ..Settings::default()
+        };
+        store.save_settings(&settings).expect("save");
+        assert!(store.settings().expect("reload").music_quality);
+    }
+
+    #[test]
     fn partial_json_falls_back_to_defaults() {
         let parsed: Settings =
             serde_json::from_str(r#"{"theme":"dark","sounds":{"user_joined":false}}"#)
@@ -366,6 +383,10 @@ mod tests {
             "new sounds are on for settings saved before they existed"
         );
         assert!(parsed.noise_suppression);
+        assert!(
+            !parsed.music_quality,
+            "music quality is off for old records"
+        );
         assert!(!parsed.wizard_completed);
         assert_eq!(parsed.log_level, LogLevel::Info);
         assert_eq!(parsed.notifications, NotificationMode::Both);

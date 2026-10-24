@@ -57,7 +57,10 @@
     "testStart": "Test starten",
     "testStop": "Aufnahme beenden",
     "testRecording": "Aufnahme läuft… sprich jetzt.",
-    "testPlaying": "Wiedergabe deiner Stimme…"
+    "testPlaying": "Wiedergabe deiner Stimme…",
+    "quality": "Qualität",
+    "musicQuality": "Musikqualität",
+    "musicQualityHint": "Braucht mehr Bandbreite und schaltet Rauschunterdrückung und automatische Lautstärke ab; für Musik. Push-to-Talk funktioniert am besten."
   },
   "voice": {
     "talkMode": "Sprechmodus",

@@ -572,6 +572,19 @@ describe("Voice section", () => {
   });
 });
 
+describe("Audio section music quality", () => {
+  it("is off by default and saves the switch", async () => {
+    const update = vi.spyOn(api, "settingsUpdate");
+    await openSection("Audio");
+    const toggle = screen.getByRole("switch", { name: "Music quality" });
+    expect(toggle).not.toBeChecked();
+    fireEvent.click(toggle);
+    await waitFor(() => {
+      expect(update).toHaveBeenLastCalledWith(expect.objectContaining({ musicQuality: true }));
+    });
+  });
+});
+
 describe("Chat & history section", () => {
   it("switches history saving per server", async () => {
     const setSaving = vi.spyOn(api, "historySetSaving");

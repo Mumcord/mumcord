@@ -623,6 +623,11 @@ export type Settings = {
 	noiseSuppression: boolean,
 	echoCancellation: boolean,
 	autoGain: boolean,
+	/**
+	 *  "Music quality" (default off; FR-1.24, QA.37): bitrate cap up to the server limit (max
+	 *  510 kbit/s), music-tuned encoder, noise suppression and automatic volume bypassed.
+	 */
+	musicQuality: boolean,
 	sounds: SoundSettings,
 	/**  "Notifications: In-app / Desktop / Both / Off" (default both, FR-1.48c). */
 	notifications: NotificationMode,

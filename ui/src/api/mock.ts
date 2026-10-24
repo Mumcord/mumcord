@@ -97,6 +97,7 @@ const DEFAULT_SETTINGS: Settings = {
   noiseSuppression: true,
   echoCancellation: true,
   autoGain: true,
+  musicQuality: false,
   sounds: {
     joinLeave: true,
     selfMute: true,

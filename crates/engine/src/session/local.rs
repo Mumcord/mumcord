@@ -15,6 +15,7 @@ pub(crate) fn apply_dsp(controls: &DspControls, settings: &Settings) {
     controls.set_echo_cancellation(settings.echo_cancellation);
     controls.set_noise_suppression(settings.noise_suppression);
     controls.set_auto_gain(settings.auto_gain);
+    controls.set_music_quality(settings.music_quality);
     controls.set_mode(match settings.talk_mode {
         TalkMode::VoiceActivation => DspTalkMode::VoiceActivation,
         TalkMode::PushToTalk => DspTalkMode::PushToTalk,

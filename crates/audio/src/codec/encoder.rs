@@ -1,4 +1,4 @@
-use opus::{Application, Bitrate, Channels, Encoder};
+use opus::{Application, Bitrate, Channels, Encoder, Signal};
 
 use super::CodecError;
 use crate::{FRAME_SAMPLES, Frame, SAMPLE_RATE};
@@ -100,6 +100,25 @@ impl OpusEncoder {
         })
     }
 
+    /// Switches between the voice tuning (VoIP, voice signal) and the music tuning (audio
+    /// application, music signal) used by "Music quality" (QA.37).
+    pub fn set_music(&mut self, music: bool) -> Result<(), CodecError> {
+        let (application, signal) = if music {
+            (Application::Audio, Signal::Music)
+        } else {
+            (Application::Voip, Signal::Voice)
+        };
+        self.encoder.set_application(application)?;
+        self.encoder.set_signal(signal)?;
+        Ok(())
+    }
+
+    /// Whether the music tuning is active.
+    pub fn is_music(&mut self) -> Result<bool, CodecError> {
+        Ok(self.encoder.get_application()? == Application::Audio
+            && self.encoder.get_signal()? == Signal::Music)
+    }
+
     /// Expected packet loss (0–100); makes in-band FEC spend bits on redundancy.
     pub fn set_packet_loss_percent(&mut self, percent: i32) -> Result<(), CodecError> {
         Ok(self.encoder.set_packet_loss_perc(percent.clamp(0, 100))?)
@@ -119,5 +138,22 @@ impl OpusEncoder {
     pub fn reset(&mut self) -> Result<(), CodecError> {
         self.pending_len = 0;
         Ok(self.encoder.reset_state()?)
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn music_tuning_switches_both_ways() {
+        let mut encoder = OpusEncoder::new(64_000, PacketDuration::Ms20).expect("encoder");
+        assert!(!encoder.is_music().expect("read"));
+        encoder.set_music(true).expect("music on");
+        assert!(encoder.is_music().expect("read"));
+        encoder.set_bitrate(500_000).expect("high bitrate");
+        assert_eq!(encoder.bitrate().expect("read"), 500_000);
+        encoder.set_music(false).expect("music off");
+        assert!(!encoder.is_music().expect("read"));
     }
 }

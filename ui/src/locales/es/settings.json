@@ -57,7 +57,10 @@
     "testStart": "Iniciar prueba",
     "testStop": "Detener grabación",
     "testRecording": "Grabando… habla ahora.",
-    "testPlaying": "Reproduciendo tu voz…"
+    "testPlaying": "Reproduciendo tu voz…",
+    "quality": "Calidad",
+    "musicQuality": "Calidad de música",
+    "musicQualityHint": "Usa más ancho de banda y desactiva la supresión de ruido y el volumen automático; para música. Pulsar para hablar funciona mejor."
   },
   "voice": {
     "talkMode": "Modo de habla",
