@@ -1,0 +1,5 @@
+# Keep LF everywhere so formatters agree across operating systems.
+* text=auto eol=lf
+*.png binary
+*.ico binary
+*.icns binary

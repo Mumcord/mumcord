@@ -1,0 +1,21 @@
+# Build output
+/target/
+/dist/
+/src-tauri/gen/schemas/
+node_modules/
+*.tsbuildinfo
+
+# Local secrets and test environment state
+.env
+.env.*
+testenv/.env
+*.p12
+*.pfx
+*.pem
+*.key
+
+# Logs and editor/OS clutter
+*.log
+.DS_Store
+.idea/
+.vscode/
