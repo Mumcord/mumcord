@@ -597,3 +597,42 @@ stateDiagram-v2
 ## Closing
 
 2026-10-24: All rounds answered. The specification has been created: `specs/01-foundation-specification.md`.
+
+---
+
+## Addendum – decisions during implementation (2026-10-24)
+
+Three decisions made by the product manager while building. Asked and answered in chat during /dev.
+
+### A · Scope & connect behaviour
+
+#### QA.1 Connecting to several servers at once to read along? `◉`
+
+- [ ] In Epic 1.
+- [x] **Own epic after Epic 1** ("Multi-server read-along"); Epic 1 stays single-server.
+- [ ] Not planned.
+
+✍️ Note: Asked and answered in chat during /dev.
+
+#### QA.2 What happens on a fresh connect? `◉`
+Fresh = user-initiated (app start, server switch, manual reconnect). Automatic reconnect after a dropped connection restores the previous channel and voice state (continuity).
+
+- [ ] Rejoin the last channel with voice on (previous behaviour).
+- [x] **Land in the server's default channel muted and deafened (read-only); talk/listen only after an explicit Join.** Others see the user as present but deafened. A `mumble://` link with a channel path counts as an explicit Join.
+- [ ] Land in the default channel with voice on.
+
+✍️ Note: Asked and answered in chat during /dev.
+
+---
+
+### B · Profile
+
+#### QA.3 Default avatar: when is it sent to a server? `◉`
+
+- [ ] Send on every connect.
+- [x] **Set a default avatar in settings; send it once, the first time you connect to a server where you have no avatar yet.** Switchable off (default on); not re-sent after manual removal.
+- [ ] Never automatic (manual only).
+
+✍️ Note: Asked and answered in chat during /dev.
+
+---
