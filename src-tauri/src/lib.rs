@@ -72,6 +72,7 @@ fn specta_builder() -> Builder<tauri::Wry> {
             commands::ptt::ptt_availability,
             commands::ptt::ptt_capture_key,
             commands::ptt::ptt_capture_cancel,
+            commands::ptt::ptt_mouse_status,
             app::close_choice,
             app::link_handler_status,
             app::link_handler_register,
@@ -165,6 +166,7 @@ fn start_engine(app: &AppHandle) -> Result<(), Box<dyn std::error::Error>> {
 
     let controls = engine.dsp_controls();
     ptt::set_handler(move |pressed| controls.set_ptt_pressed(pressed));
+    ptt::set_evdev_mouse_allowed(stored.allow_mouse_buttons);
     settings::configure_ptt(app, settings::active_ptt_key(&stored));
 
     app.manage(engine);

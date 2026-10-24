@@ -100,15 +100,19 @@ export const commands = {
 	micTestStop: () => typedError<null, ApiError>(__TAURI_INVOKE("mic_test_stop")),
 	pttAvailability: () => typedError<PttAvailability, ApiError>(__TAURI_INVOKE("ptt_availability")),
 	/**
-	 *  Validates a key the UI captured (`KeyboardEvent.code` plus modifiers, e.g. "Ctrl+KeyA")
-	 *  and returns the shortcut string to store as `pttKey` (e.g. "Ctrl+A"). On Wayland the
+	 *  Validates a key the UI captured (`KeyboardEvent.code` plus modifiers, e.g. "Ctrl+KeyA",
+	 *  or a mouse button: "MouseMiddle", "Mouse4", "Mouse5") and returns the string to store as
+	 *  `pttKey` (e.g. "Ctrl+A"). Mouse buttons never open a desktop dialog. On Wayland the
 	 *  desktop's shortcut dialog opens with `key` preselected and the user's choice is returned.
-	 *  Errors: `invalidInput` for unusable keys or a cancelled capture; `shortcutNotConfirmed`
+	 *  Errors: `invalidInput` for unusable keys (incl. left/right click, or a mouse button on
+	 *  Wayland while the mouse setting is off) or a cancelled capture; `shortcutNotConfirmed`
 	 *  when the desktop did not confirm the shortcut (dialog dismissed, no key, portal failure).
 	 */
 	pttCaptureKey: (key: string) => typedError<string, ApiError>(__TAURI_INVOKE("ptt_capture_key", { key })),
 	/**  Aborts a pending `ptt_capture_key`, which then fails with `invalidInput`. */
 	pttCaptureCancel: () => typedError<null, ApiError>(__TAURI_INVOKE("ptt_capture_cancel")),
+	/**  Whether mouse buttons can be used for push-to-talk, and why not (FR-1.21, AC-1.37). */
+	pttMouseStatus: () => typedError<PttMouseStatus, ApiError>(__TAURI_INVOKE("ptt_mouse_status")),
 	/**  Answers `CloseRequested`; `remember` stores the choice as the close behaviour. */
 	closeChoice: (choice: CloseChoice, remember: boolean) => typedError<null, ApiError>(__TAURI_INVOKE("close_choice", { choice, remember })),
 	/**  Whether Mumcord is the registered handler for `mumble://` links. */
@@ -393,11 +397,40 @@ export type PersonProfile = {
 
 export type PttAvailability = { status: "available" } | { status: "unavailable"; reason: PttUnavailableReason };
 
+export type PttMouseState = "ready" | 
+/**  Wayland: mice exist but may not be read; show `sudo usermod -aG input $USER`. */
+"inputGroupMissing" | 
+/**  macOS: the Accessibility permission is missing. */
+"accessibilityMissing" | 
+/**  Wayland: no mouse is connected (one plugged in later is picked up). */
+"noDevice" | 
+/**  No mouse backend on this platform. */
+"unsupported";
+
+export type PttMouseStatus = {
+	support: PttMouseSupport,
+	/**  On Wayland this is the device permission, also while `allowMouseButtons` is off. */
+	state: PttMouseState,
+};
+
+/**  How mouse buttons reach push-to-talk on this system (FR-1.21, QA.4). */
+export type PttMouseSupport = 
+/**  Windows, macOS, X11: always available. */
+"native" | 
+/**  Linux Wayland: input devices are read directly, behind the opt-in setting. */
+"evdev" | "none";
+
 export type PttUnavailableReason = 
 /**  Wayland session without the global-shortcuts portal. */
 "waylandNoPortal" | 
 /**  Global shortcuts could not be registered for another reason. */
-"registrationFailed";
+"registrationFailed" | 
+/**  A mouse button is configured but "Allow mouse buttons" is off (Linux Wayland). */
+"mouseDisabled" | 
+/**  Linux Wayland: the user is not in the `input` group, so mice cannot be read. */
+"mouseNeedsInputGroup" | 
+/**  macOS: Mumcord lacks the Accessibility permission for the mouse event tap. */
+"mouseNeedsAccessibility";
 
 /**  A saved server as shown in the server bar; the list order is the bar order. */
 export type SavedServer = {
@@ -468,6 +501,8 @@ export type Settings = {
 	talkMode: TalkMode,
 	/**  Shortcut as returned by `ptt_capture_key`; `null` if none bound. */
 	pttKey: string | null,
+	/**  Linux Wayland: "Allow mouse buttons (requires input group)" (default off, FR-1.39). */
+	allowMouseButtons: boolean,
 	/**  Device ids from `audio_devices`; `null` uses the OS default. */
 	inputDevice: string | null,
 	outputDevice: string | null,

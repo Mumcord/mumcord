@@ -5,6 +5,9 @@
 //! - Wayland sessions: the XDG desktop portal `GlobalShortcuts` interface (via `ashpd`). X11
 //!   key grabs through XWayland only fire while one of our own windows is focused, so a
 //!   Wayland session always uses the portal.
+//! - Mouse buttons (`MouseMiddle`, `Mouse4`, `Mouse5`): [`mouse`] with a native backend per
+//!   platform, or evdev on Wayland behind the opt-in setting (QA.4). Keyboard keys never
+//!   reach the mouse backend and mouse keys never reach the plugin or the portal.
 //!
 //! Engine hook: this module knows nothing about audio. The engine installs a sink with
 //! [`set_handler`] (typically `move |pressed| controls.set_ptt_pressed(pressed)`) and turns
@@ -15,8 +18,20 @@ use std::sync::{Arc, Mutex, MutexGuard, PoisonError};
 
 use tauri::{AppHandle, Runtime};
 
-use crate::commands::ptt::{PttAvailability, PttUnavailableReason};
+use crate::commands::ptt::{PttAvailability, PttMouseStatus, PttUnavailableReason};
 use crate::commands::types::{ApiError, ApiResult, ErrorCode};
+
+mod mouse;
+#[cfg(target_os = "linux")]
+mod mouse_evdev;
+#[cfg(target_os = "macos")]
+mod mouse_macos;
+#[cfg(target_os = "windows")]
+mod mouse_windows;
+#[cfg(target_os = "linux")]
+mod mouse_x11;
+
+use mouse::MouseButton;
 
 /// Sink for push-to-talk state changes (`true` = key held).
 pub type PttHandler = dyn Fn(bool) + Send + Sync;
@@ -34,8 +49,10 @@ pub enum KeyError {
     /// Only modifiers were pressed; global shortcuts need a main key.
     ModifierOnly,
     UnknownKey(String),
-    /// More than one main key, or a modifier after the main key.
+    /// More than one main key, or a modifier after the main key (or with a mouse button).
     InvalidFormat,
+    /// Left or right click: never usable as push-to-talk.
+    PrimaryMouseButton,
 }
 
 impl std::fmt::Display for KeyError {
@@ -45,6 +62,9 @@ impl std::fmt::Display for KeyError {
             Self::ModifierOnly => f.write_str("a key other than a modifier is required"),
             Self::UnknownKey(key) => write!(f, "unsupported key: {key}"),
             Self::InvalidFormat => f.write_str("expected modifiers followed by one key"),
+            Self::PrimaryMouseButton => {
+                f.write_str("left and right click cannot be used for push-to-talk")
+            }
         }
     }
 }
@@ -55,6 +75,8 @@ struct State {
     forwarding: bool,
     pressed: bool,
     last_failure: Option<PttUnavailableReason>,
+    /// The configured key is a mouse button.
+    mouse_key: bool,
     /// Shortcut currently registered with the global-shortcut plugin.
     #[cfg(any(target_os = "linux", target_os = "windows", target_os = "macos"))]
     registered: Option<String>,
@@ -69,6 +91,7 @@ static STATE: Mutex<State> = Mutex::new(State {
     forwarding: false,
     pressed: false,
     last_failure: None,
+    mouse_key: false,
     #[cfg(any(target_os = "linux", target_os = "windows", target_os = "macos"))]
     registered: None,
     #[cfg(target_os = "linux")]
@@ -117,11 +140,24 @@ pub async fn configure<R: Runtime>(
         deactivate(app);
         return Ok(());
     };
-    let result = match current_backend() {
-        Backend::GlobalShortcut => register_global(app, key),
-        Backend::Portal => activate_portal(key).await,
+    let mouse_button = match parse_key(key) {
+        Ok(PttKey::Mouse(button)) => Some(button),
+        _ => None,
+    };
+    let result = if let Some(button) = mouse_button {
+        // Only one trigger at a time: drop the keyboard shortcut first.
+        unregister_global(app);
+        close_portal();
+        mouse::start(button)
+    } else {
+        mouse::stop();
+        match current_backend() {
+            Backend::GlobalShortcut => register_global(app, key),
+            Backend::Portal => activate_portal(key).await,
+        }
     };
     let mut state = state();
+    state.mouse_key = mouse_button.is_some();
     state.last_failure = result.err();
     state.forwarding = result.is_ok();
     result
@@ -130,23 +166,41 @@ pub async fn configure<R: Runtime>(
 fn deactivate<R: Runtime>(app: &AppHandle<R>) {
     state().forwarding = false;
     unregister_global(app);
+    mouse::stop();
     // Never leave the engine transmitting because the key was held while switching off.
     emit(false);
+}
+
+/// Applies "Allow mouse buttons (requires input group)" (Linux Wayland only, FR-1.39). Call
+/// [`configure`] afterwards so a configured mouse button starts or stops.
+pub fn set_evdev_mouse_allowed(allowed: bool) {
+    mouse::set_evdev_allowed(allowed);
+}
+
+/// Whether and how mouse buttons can be used for push-to-talk (AC-1.37).
+pub fn mouse_status() -> PttMouseStatus {
+    mouse::status()
 }
 
 /// Current availability for the UI (FR-1.5).
 pub async fn availability() -> PttAvailability {
     let backend = current_backend();
-    let portal_reachable = backend == Backend::Portal && portal_reachable().await;
-    availability_from(backend, portal_reachable, state().last_failure)
+    let (mouse_key, last_failure) = {
+        let state = state();
+        (state.mouse_key, state.last_failure)
+    };
+    // A mouse button does not need the portal.
+    let uses_portal = backend == Backend::Portal && !mouse_key;
+    let portal_reachable = uses_portal && portal_reachable().await;
+    availability_from(uses_portal, portal_reachable, last_failure)
 }
 
 fn availability_from(
-    backend: Backend,
+    uses_portal: bool,
     portal_reachable: bool,
     last_failure: Option<PttUnavailableReason>,
 ) -> PttAvailability {
-    let reason = if backend == Backend::Portal && !portal_reachable {
+    let reason = if uses_portal && !portal_reachable {
         Some(PttUnavailableReason::WaylandNoPortal)
     } else {
         last_failure
@@ -164,11 +218,17 @@ fn availability_from(
 /// desktop already knows the shortcut but has no key for it, its shortcut settings open
 /// instead. Desktop failures are `shortcutNotConfirmed`, never `invalidInput`.
 pub async fn capture(key: &str) -> ApiResult<String> {
-    let normalized = normalize_key(key)
-        .map_err(|err| ApiError::new(ErrorCode::InvalidInput, err.to_string()))?;
-    match current_backend() {
-        Backend::GlobalShortcut => Ok(normalized),
-        Backend::Portal => capture_portal(&normalized).await,
+    let invalid = |err: KeyError| ApiError::new(ErrorCode::InvalidInput, err.to_string());
+    match parse_key(key).map_err(invalid)? {
+        PttKey::Mouse(button) if mouse::capturable() => Ok(button.name().to_owned()),
+        PttKey::Mouse(_) => Err(ApiError::new(
+            ErrorCode::InvalidInput,
+            "mouse buttons are not enabled for push-to-talk",
+        )),
+        PttKey::Keyboard(normalized) => match current_backend() {
+            Backend::GlobalShortcut => Ok(normalized),
+            Backend::Portal => capture_portal(&normalized).await,
+        },
     }
 }
 
@@ -283,6 +343,22 @@ const NAMED_KEYS: [(&str, &str); 52] = [
     ("AudioVolumeMute", "XF86AudioMute"),
     ("MediaPlayPause", "XF86AudioPlay"),
 ];
+
+/// A validated push-to-talk key.
+#[derive(Debug, PartialEq, Eq)]
+enum PttKey {
+    /// Canonical keyboard shortcut, e.g. `"Ctrl+A"`.
+    Keyboard(String),
+    Mouse(MouseButton),
+}
+
+/// Parses a stored or captured key: mouse buttons (`"Mouse4"`) or keyboard shortcuts.
+fn parse_key(raw: &str) -> Result<PttKey, KeyError> {
+    match mouse::parse(raw) {
+        Some(result) => result.map(PttKey::Mouse),
+        None => normalize_key(raw).map(PttKey::Keyboard),
+    }
+}
 
 /// Normalises a shortcut such as `"control+KeyA"` or `"Ctrl+F13"` to the canonical form
 /// `"Ctrl+A"` (modifiers in the order Ctrl, Alt, Shift, Super; then exactly one key).
@@ -531,6 +607,17 @@ async fn bind_and_assign(
     }
 }
 
+/// Closes the live portal session, if any (a mouse button replaces the keyboard shortcut).
+#[cfg(target_os = "linux")]
+fn close_portal() {
+    if let Some(old) = state().portal.take() {
+        old.close();
+    }
+}
+
+#[cfg(not(target_os = "linux"))]
+fn close_portal() {}
+
 /// Makes `binding` the live portal session and closes the previous one.
 #[cfg(target_os = "linux")]
 fn replace_portal_binding(binding: portal::Binding) {
@@ -770,24 +857,20 @@ mod tests {
     #[test]
     fn availability_reports_missing_portal() {
         assert_eq!(
-            availability_from(Backend::Portal, false, None),
+            availability_from(true, false, None),
             PttAvailability::Unavailable {
                 reason: PttUnavailableReason::WaylandNoPortal
             }
         );
         // A missing portal explains more than an earlier failed bind.
         assert_eq!(
-            availability_from(
-                Backend::Portal,
-                false,
-                Some(PttUnavailableReason::RegistrationFailed)
-            ),
+            availability_from(true, false, Some(PttUnavailableReason::RegistrationFailed)),
             PttAvailability::Unavailable {
                 reason: PttUnavailableReason::WaylandNoPortal
             }
         );
         assert_eq!(
-            availability_from(Backend::Portal, true, None),
+            availability_from(true, true, None),
             PttAvailability::Available
         );
     }
@@ -795,25 +878,17 @@ mod tests {
     #[test]
     fn availability_reports_failed_registration() {
         assert_eq!(
-            availability_from(Backend::GlobalShortcut, false, None),
+            availability_from(false, false, None),
             PttAvailability::Available
         );
         assert_eq!(
-            availability_from(
-                Backend::GlobalShortcut,
-                false,
-                Some(PttUnavailableReason::RegistrationFailed)
-            ),
+            availability_from(false, false, Some(PttUnavailableReason::RegistrationFailed)),
             PttAvailability::Unavailable {
                 reason: PttUnavailableReason::RegistrationFailed
             }
         );
         assert_eq!(
-            availability_from(
-                Backend::Portal,
-                true,
-                Some(PttUnavailableReason::RegistrationFailed)
-            ),
+            availability_from(true, true, Some(PttUnavailableReason::RegistrationFailed)),
             PttAvailability::Unavailable {
                 reason: PttUnavailableReason::RegistrationFailed
             }
@@ -920,6 +995,84 @@ mod tests {
             let canonical = normalize_key(ui).unwrap_or_else(|err| panic!("{ui}: {err}"));
             assert_eq!(portal_trigger(&canonical).as_deref(), Some(trigger), "{ui}");
         }
+    }
+
+    #[test]
+    fn mouse_key_needs_no_portal() {
+        // `availability` passes `uses_portal = false` for a mouse key, even on Wayland.
+        assert_eq!(
+            availability_from(false, false, None),
+            PttAvailability::Available
+        );
+        assert_eq!(
+            availability_from(
+                false,
+                false,
+                Some(PttUnavailableReason::MouseNeedsInputGroup)
+            ),
+            PttAvailability::Unavailable {
+                reason: PttUnavailableReason::MouseNeedsInputGroup
+            }
+        );
+    }
+
+    #[test]
+    fn routes_mouse_and_keyboard_keys() {
+        assert_eq!(parse_key("Mouse4"), Ok(PttKey::Mouse(MouseButton::Back)));
+        assert_eq!(parse_key("Mouse5"), Ok(PttKey::Mouse(MouseButton::Forward)));
+        assert_eq!(
+            parse_key("MouseMiddle"),
+            Ok(PttKey::Mouse(MouseButton::Middle))
+        );
+        assert_eq!(
+            parse_key("Ctrl+KeyA"),
+            Ok(PttKey::Keyboard("Ctrl+A".into()))
+        );
+        assert_eq!(parse_key("F13"), Ok(PttKey::Keyboard("F13".into())));
+        assert_eq!(parse_key("MouseLeft"), Err(KeyError::PrimaryMouseButton));
+        assert_eq!(parse_key("Shift+Mouse4"), Err(KeyError::InvalidFormat));
+        // Mouse keys never reach the keyboard path (plugin or portal).
+        assert!(normalize_key("Mouse4").is_err());
+    }
+
+    #[test]
+    fn mouse_capture_returns_the_stored_name_without_the_portal() {
+        let runtime = tokio::runtime::Builder::new_current_thread()
+            .build()
+            .expect("runtime");
+        // Native backends (X11, Windows, macOS) always accept mouse buttons.
+        if current_backend() == Backend::GlobalShortcut {
+            assert_eq!(
+                runtime.block_on(capture("Mouse4")).ok().as_deref(),
+                Some("Mouse4")
+            );
+        }
+        let err = runtime.block_on(capture("MouseRight")).err();
+        assert_eq!(err.map(|e| e.code), Some(ErrorCode::InvalidInput));
+    }
+
+    #[cfg(target_os = "linux")]
+    #[test]
+    fn wayland_mouse_capture_needs_the_opt_in() {
+        if current_backend() != Backend::Portal {
+            return;
+        }
+        let runtime = tokio::runtime::Builder::new_current_thread()
+            .build()
+            .expect("runtime");
+        set_evdev_mouse_allowed(false);
+        let err = runtime.block_on(capture("Mouse5")).err();
+        assert_eq!(err.map(|e| e.code), Some(ErrorCode::InvalidInput));
+        assert_eq!(
+            mouse_status().support,
+            crate::commands::ptt::PttMouseSupport::Evdev
+        );
+        set_evdev_mouse_allowed(true);
+        assert_eq!(
+            runtime.block_on(capture("Mouse5")).ok().as_deref(),
+            Some("Mouse5")
+        );
+        set_evdev_mouse_allowed(false);
     }
 
     #[test]

@@ -38,6 +38,22 @@ tauri-plugin-global-shortcut.workspace = true
 
 [target.'cfg(target_os = "linux")'.dependencies]
 ashpd = { workspace = true, features = ["global_shortcuts"] }
+# Mouse-button push-to-talk: evdev reads on Wayland, XInput2 raw button events on X11.
+libc.workspace = true
+x11rb = { workspace = true, features = ["xinput"] }
+
+[target.'cfg(target_os = "windows")'.dependencies]
+# Mouse-button push-to-talk: low-level mouse hook.
+windows-sys = { workspace = true, features = [
+    "Win32_System_LibraryLoader",
+    "Win32_System_Threading",
+    "Win32_UI_WindowsAndMessaging",
+] }
+
+[target.'cfg(target_os = "macos")'.dependencies]
+# Mouse-button push-to-talk: listen-only event tap and the Accessibility check.
+core-graphics.workspace = true
+core-foundation.workspace = true
 
 [dev-dependencies]
 # `tauri::test` mock app for the X11 push-to-talk check.

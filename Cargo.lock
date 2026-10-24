@@ -3086,6 +3086,9 @@ name = "mumcord"
 version = "0.1.0"
 dependencies = [
  "ashpd",
+ "core-foundation",
+ "core-graphics",
+ "libc",
  "mumcord-engine",
  "serde",
  "serde_json",
@@ -3101,6 +3104,8 @@ dependencies = [
  "tauri-specta",
  "tokio",
  "tracing",
+ "windows-sys 0.61.2",
+ "x11rb",
 ]
 
 [[package]]

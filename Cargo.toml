@@ -73,6 +73,11 @@ windows-sys = { version = "0.61", features = ["Win32_Foundation", "Win32_System_
 # Linux desktop portals (Wayland global shortcuts)
 ashpd = "0.13"
 
+# Mouse-button push-to-talk: X11 XInput2 raw events, macOS event tap (already in the tree)
+x11rb = { version = "0.13", default-features = false }
+core-graphics = "0.25"
+core-foundation = "0.10"
+
 # Errors, logging, serialization, CLI
 thiserror = "2"
 anyhow = "1"

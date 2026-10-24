@@ -68,6 +68,8 @@ pub struct Settings {
     pub talk_mode: TalkMode,
     /// Shortcut as returned by `ptt_capture_key`; `null` if none bound.
     pub ptt_key: Option<String>,
+    /// Linux Wayland: "Allow mouse buttons (requires input group)" (default off, FR-1.39).
+    pub allow_mouse_buttons: bool,
     /// Device ids from `audio_devices`; `null` uses the OS default.
     pub input_device: Option<String>,
     pub output_device: Option<String>,
@@ -102,6 +104,7 @@ impl Settings {
                 store::TalkMode::PushToTalk => TalkMode::PushToTalk,
             },
             ptt_key: s.ptt_key.clone(),
+            allow_mouse_buttons: s.allow_mouse_buttons,
             input_device: s.input_device.clone(),
             output_device: s.output_device.clone(),
             noise_suppression: s.noise_suppression,
@@ -150,6 +153,7 @@ impl Settings {
             TalkMode::PushToTalk => store::TalkMode::PushToTalk,
         };
         s.ptt_key = self.ptt_key.clone().filter(|k| !k.is_empty());
+        s.allow_mouse_buttons = self.allow_mouse_buttons;
         s.input_device = self.input_device.clone().filter(|d| !d.is_empty());
         s.output_device = self.output_device.clone().filter(|d| !d.is_empty());
         s.noise_suppression = self.noise_suppression;
@@ -226,7 +230,11 @@ pub async fn settings_update(
         tracing::warn!(error = %e, "changing the log level failed");
     }
     let key = active_ptt_key(&stored);
-    if key != active_ptt_key(&previous) {
+    let mouse_changed = stored.allow_mouse_buttons != previous.allow_mouse_buttons;
+    if mouse_changed {
+        crate::ptt::set_evdev_mouse_allowed(stored.allow_mouse_buttons);
+    }
+    if mouse_changed || key != active_ptt_key(&previous) {
         configure_ptt(&app, key);
     }
     Ok(Settings::from_store(&stored))
