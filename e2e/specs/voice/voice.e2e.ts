@@ -25,6 +25,7 @@ import {
   addAndConnect,
   channelName,
   completeWizard,
+  doubleClickRow,
   personRow,
   readTree,
   reconnect,
@@ -180,7 +181,9 @@ describe("voice (AC-1.7 – AC-1.12)", () => {
       expect(tree.find((t) => t.name === c)?.level).toBe(2);
     }
     expect(root?.people).toContain("Tester");
-    expect(tree.find((t) => t.name === "AFK")?.people ?? []).toHaveLength(0);
+    // Other people (manual testing, scale bots) may sit in AFK; none of this spec's belong there.
+    const afk = tree.find((t) => t.name === "AFK")?.people ?? [];
+    for (const name of ["Tester", "Bot", "Bot2"]) expect(afk).not.toContain(name);
     await browser.saveScreenshot(f("tree.png"));
   });
 
@@ -218,7 +221,7 @@ describe("voice (AC-1.7 – AC-1.12)", () => {
         );
       }
     });
-    await channelName("Raid").doubleClick();
+    await doubleClickRow(channelName("Raid"));
     await sleep(2000);
     const dbl = await browser.execute(() => (window as unknown as { __dbl: number }).__dbl);
     const ev = await browser.execute(() => (window as unknown as { __ev: string[] }).__ev);
@@ -264,7 +267,7 @@ describe("voice (AC-1.7 – AC-1.12)", () => {
       timeoutMsg: "Checker still shown",
     });
     await sleep(1000);
-    await channelName(rootName).doubleClick();
+    await doubleClickRow(channelName(rootName));
     await main.do(`expect user Tester --in "${botRoot}"`);
     await app.restart({ audio: `file:${f("vad-in.wav")}:${f("vad-out.wav")}` });
     const rec = `record ${f("vad-rec.wav")} --seconds 32`;

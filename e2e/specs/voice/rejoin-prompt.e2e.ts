@@ -6,7 +6,7 @@
 import { $, browser, expect } from "@wdio/globals";
 import { app, bot, testenv } from "../../helpers/index.ts";
 import { addFirstServer, channelName, finishWizard, reconnectSaved } from "../../helpers/chat-ui.ts";
-import { ownChannel } from "../../helpers/voice-ui.ts";
+import { doubleClickRow, ownChannel } from "../../helpers/voice-ui.ts";
 
 const ME = "RejoinQA";
 const PORT = testenv.ports.v14;
@@ -22,7 +22,7 @@ async function deafened(): Promise<boolean> {
 }
 
 async function joinRaid(): Promise<void> {
-  await channelName("Raid").doubleClick();
+  await doubleClickRow(channelName("Raid"));
   await bot(["expect", "user", ME, "--in", "Raid", "--deaf", "false"], WATCH);
   await browser.waitUntil(async () => (await ownChannel()) === "Raid", {
     timeout: 15_000,

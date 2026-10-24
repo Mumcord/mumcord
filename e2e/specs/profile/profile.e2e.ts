@@ -5,7 +5,9 @@ import { browser, expect, $ } from "@wdio/globals";
 import { bot, botInBackground, testenv } from "../../helpers/index.ts";
 
 // AC-1.19 (register on this server) and AC-1.20 (own/bot avatar + comment), spec 01 §11.
-const ME = "Tester";
+// A name no other spec uses: this spec registers it on v15, and a registered name rejects every
+// other identity ("wrong certificate or password"), which broke later specs connecting as "Tester".
+const ME = "ProfileQA";
 const PNG_1X1 =
   "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==";
 
@@ -100,10 +102,10 @@ describe("profile: register, avatar, comment", () => {
     await clickItem("Edit profile");
     const area = $("textarea");
     await browser.waitUntil(async () => await area.isEnabled());
-    await area.setValue("Hello from Tester");
+    await area.setValue(`Hello from ${ME}`);
     await clickText("button", "Save");
     await bot(
-      ["expect", "user", ME, "--has-avatar", "true", "--comment-contains", "Hello from Tester"],
+      ["expect", "user", ME, "--has-avatar", "true", "--comment-contains", `Hello from ${ME}`],
       { name: "Checker" },
     );
   });
@@ -117,7 +119,13 @@ describe("profile: register, avatar, comment", () => {
         ["expect", "user", "Bot", "--has-avatar", "true", "--comment-contains", "XYZ"],
         { name: "Checker" },
       );
-      const row = $("button.member*=Bot");
+      // Exact name (the name's own text, not its hidden status): other people on the server, e.g.
+      // scale bots, may have "Bot" in theirs, and the list may need scrolling to reach the row.
+      const row = $(
+        "//button[contains(@class,'member')][.//span[contains(@class,'member__name') and normalize-space(text()[1])='Bot']]",
+      );
+      await row.waitForExist();
+      await row.scrollIntoView({ block: "center" });
       await row.waitForDisplayed();
       // Member list: a picture (or comment) for the bot.
       const listImg = row.$("img");

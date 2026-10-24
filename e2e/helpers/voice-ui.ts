@@ -33,6 +33,31 @@ export async function addAndConnect(address = `${SERVER}:64738`): Promise<void> 
 export async function waitConnected(): Promise<void> {
   await $(`button[aria-label="${SERVER} (connected)"]`).waitForExist({ timeout: 30_000 });
   await $("[role='tree']").waitForExist({ timeout: 15_000 });
+  await showAllPeople();
+}
+
+/**
+ * Keeps every channel listing its people by name. A crowded channel (more than five people) shows
+ * an avatar stack instead (QA.14, QA.30), and the test servers may hold any number of extra people
+ * (manual testing, scale bots), so this clicks each "Show all" toggle now and whenever one appears
+ * (until the page reloads on an app restart). Person rows and "(you)" are then always findable.
+ */
+export async function showAllPeople(): Promise<void> {
+  await browser.execute(() => {
+    const w = window as unknown as { __showAllObs?: MutationObserver };
+    const expand = () => {
+      document
+        .querySelectorAll<HTMLButtonElement>(".avatar-stack__toggle[aria-expanded='false']")
+        .forEach((toggle) => {
+          toggle.click();
+        });
+    };
+    if (!w.__showAllObs) {
+      w.__showAllObs = new MutationObserver(expand);
+      w.__showAllObs.observe(document.body, { subtree: true, childList: true });
+    }
+    expand();
+  });
 }
 
 /** Connects to the saved server from the server bar (after a restart). */
@@ -46,6 +71,7 @@ export async function reconnect(): Promise<void> {
 
 /** Name of the channel the own user is in (from the rendered tree). */
 export async function ownChannel(): Promise<string> {
+  await showAllPeople();
   return browser.execute(() => {
     const you = document.querySelector("[role='tree'] .tree-person__you");
     const group = you?.closest("[role='group']");
@@ -66,7 +92,7 @@ export async function joinIfReadOnly(): Promise<void> {
   await browser.pause(500);
   if ((await deafen.getAttribute("aria-pressed")) !== "true") return;
   await browser.waitUntil(async () => (await ownChannel()) !== "", { timeout: 15_000 });
-  await channelName(await ownChannel()).doubleClick();
+  await doubleClickRow(channelName(await ownChannel()));
   await browser.waitUntil(async () => (await deafen.getAttribute("aria-pressed")) !== "true", {
     timeout: 15_000,
     timeoutMsg: "still deafened after explicit join",
@@ -78,6 +104,29 @@ export async function joinIfReadOnly(): Promise<void> {
   });
 }
 
+/**
+ * Double-clicks a tree row once it is on screen and has stopped moving. With crowded channels
+ * listed in full (`showAllPeople`) the tree can be taller than the window, WebDriver actions don't
+ * scroll on their own, and a slow CPU may still be laying out rows that just appeared.
+ */
+export async function doubleClickRow(row: ReturnType<typeof $>): Promise<void> {
+  const el = await row.getElement();
+  await browser.execute((e: HTMLElement) => {
+    e.scrollIntoView({ block: "center" });
+  }, el);
+  let last = "";
+  await browser.waitUntil(
+    async () => {
+      const at = JSON.stringify(await el.getLocation());
+      const still = at === last;
+      last = at;
+      return still;
+    },
+    { timeout: 10_000, interval: 300, timeoutMsg: "tree row kept moving" },
+  );
+  await el.doubleClick();
+}
+
 /** Channel name span (click target) of a channel row. */
 export function channelName(name: string) {
   return $(
@@ -85,7 +134,10 @@ export function channelName(name: string) {
   );
 }
 
-/** Person row in the tree (members, not listeners) by exact name. */
+/**
+ * Person row in the tree (members, not listeners) by exact name. Crowded channels list names only
+ * once `showAllPeople` ran (`waitConnected` does it).
+ */
 export function personRow(name: string) {
   return $(
     `//div[contains(@class,'tree-person')][.//span[contains(@class,'tree-person__name') and text()='${name}']]`,
@@ -100,6 +152,7 @@ export interface TreeChannel {
 
 /** The rendered tree: every channel with the people directly in it. */
 export async function readTree(): Promise<TreeChannel[]> {
+  await showAllPeople();
   return browser.execute(() => {
     const out: { name: string; level: number; people: string[] }[] = [];
     document.querySelectorAll<HTMLElement>("[role='tree'] .tree-channel").forEach((ch) => {

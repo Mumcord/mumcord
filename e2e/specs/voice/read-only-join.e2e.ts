@@ -27,7 +27,7 @@ import {
   waitServerStatus,
 } from "../../helpers/servers-ui.ts";
 import { concat, readWav, writeWav } from "../../helpers/voice-audio.ts";
-import { ownChannel } from "../../helpers/voice-ui.ts";
+import { doubleClickRow, ownChannel, showAllPeople } from "../../helpers/voice-ui.ts";
 
 const ME = "ReadOnlyQA";
 const VIA_NETSIM = `127.0.0.1:${String(netsim.listenPort)}`;
@@ -123,6 +123,7 @@ async function botInChannelHearsNothing(channel: string): Promise<void> {
 
 /** Waits until no helper bot is listed in the tree, so a double-click lands on a settled layout. */
 async function treeSettled(): Promise<void> {
+  await showAllPeople();
   await browser.waitUntil(
     async () =>
       !(await browser.execute(() =>
@@ -146,6 +147,7 @@ async function connectSaved(): Promise<void> {
 async function waitConnected(): Promise<void> {
   await $("//button[contains(@aria-label,'(connected)')]").waitForExist({ timeout: 30_000 });
   await channelName("Raid").waitForDisplayed({ timeout: 15_000 });
+  await showAllPeople();
 }
 
 /** Clicks whichever of the given dialog buttons shows up until `done` resolves true. */
@@ -215,7 +217,7 @@ describe("read-only connect and explicit join (AC-1.35)", () => {
 
   it("double-clicking Raid moves there with voice on", async () => {
     await treeSettled();
-    await channelName("Raid").doubleClick();
+    await doubleClickRow(channelName("Raid"));
     await bot(["expect", "user", ME, "--in", "Raid", "--deaf", "false", "--muted", "false"], WATCH);
     await browser.waitUntil(async () => (await ownChannel()) === "Raid", {
       timeout: 15_000,
@@ -236,7 +238,7 @@ describe("read-only connect and explicit join (AC-1.35)", () => {
 
   it("double-click from read-only joins Raid with voice on; the bot hears the app", async () => {
     await treeSettled();
-    await channelName("Raid").doubleClick();
+    await doubleClickRow(channelName("Raid"));
     await bot(["expect", "user", ME, "--in", "Raid", "--deaf", "false", "--muted", "false"], WATCH);
     await expectVoiceOnUi();
     await botHearsApp("Raid", "RoEar");
@@ -275,7 +277,7 @@ describe("read-only connect and explicit join (AC-1.35)", () => {
     await connectSaved();
     await expectReadOnlyUi();
     await treeSettled();
-    await channelName("Raid").doubleClick();
+    await doubleClickRow(channelName("Raid"));
     await bot(["expect", "user", ME, "--in", "Raid", "--muted", "true", "--deaf", "false"], WATCH);
     await browser.waitUntil(
       async () => (await pressed(muteButton())) && !(await pressed(deafenButton())),
@@ -347,7 +349,7 @@ describe("read-only connect and explicit join (AC-1.35)", () => {
     await expectReadOnlyUi();
     await bot(["expect", "user", ME, "--deaf", "true"], WATCH_OTHER);
     await treeSettled();
-    await channelName("Raid").doubleClick();
+    await doubleClickRow(channelName("Raid"));
     await bot(
       ["expect", "user", ME, "--in", "Raid", "--deaf", "false", "--muted", "false"],
       WATCH_OTHER,
@@ -367,7 +369,7 @@ describe("read-only connect and explicit join (AC-1.35)", () => {
     await waitConnected();
     await expectReadOnlyUi();
     await treeSettled();
-    await channelName("Raid").doubleClick();
+    await doubleClickRow(channelName("Raid"));
     await bot(["expect", "user", ME, "--in", "Raid", "--muted", "true", "--deaf", "false"], WATCH);
     await browser.waitUntil(
       async () => (await pressed(muteButton())) && !(await pressed(deafenButton())),

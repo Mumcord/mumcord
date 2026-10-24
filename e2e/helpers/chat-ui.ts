@@ -4,6 +4,7 @@ import { join } from "node:path";
 import { browser, $, $$ } from "@wdio/globals";
 import { botInBackground, type BackgroundBot, type BotOptions } from "./bot.ts";
 import { artifactsDir } from "./paths.ts";
+import { doubleClickRow, showAllPeople } from "./voice-ui.ts";
 
 export const USER = "ChatQA";
 
@@ -44,6 +45,7 @@ export async function trustIfAsked(): Promise<void> {
 export async function waitConnected(): Promise<void> {
   await $("//button[contains(@aria-label,'(connected)')]").waitForExist({ timeout: 30_000 });
   await channelName("Lobby").waitForDisplayed({ timeout: 15_000 });
+  await showAllPeople();
 }
 
 /** Clicks the saved server in the server bar (after a restart nothing auto-connects). */
@@ -81,7 +83,8 @@ export async function selectChannel(name: string): Promise<void> {
 
 /** Joins a channel (double-click) and waits until "(you)" is listed under it. */
 export async function joinChannel(name: string): Promise<void> {
-  await channelName(name).doubleClick();
+  await showAllPeople();
+  await doubleClickRow(channelName(name));
   await browser.waitUntil(
     async () =>
       (await $$(
