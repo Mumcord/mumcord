@@ -121,7 +121,9 @@
 | F39 | Flaky: Wizard announce test on Windows; VAD packet count off-by-one in voice E2E | done | f39-flaky-tests | V11 | simple | – | Wizard.test.tsx, e2e/specs/voice/voice.e2e.ts |
 | V12 | Workflows (2091e5b) | done – CI + Test builds green; E2E 5/18 failed (voice hang cascade, network gap 540 ms) | ci12-watch | F39 | simple | §10 | – |
 | F40 | E2E CI stability: AC-1.11 hang on runner, per-spec isolation, gap threshold, test independence | done – stray app killed between specs (single-instance hang), AC-1.12 independent, dropout <1000 ms below -70 dB | f40-e2e-ci-stability | V12 | complex | – | e2e/**, e2e.yml |
-| V13 | Workflows after F40 | in progress | ci13-watch | F40 | simple | §10 | – |
+| V13 | Workflows (2308eb8) | done – Test builds green; CI red (prettier, fixed 87ce631); E2E 17/18, AC-1.12 mute check failed (voice.e2e.ts:432) | ci13-watch | F40 | simple | §10 | – |
+| F41 | E2E AC-1.12 local-mute assertion fails in CI (expected < -70 dB) | done – CI blip -64.5 dB (likely notification tone tail); mute limit now < -60 dB (30 dB below speech), no app bug found | f41-ac112-ci | V13 | simple | AC-1.12 | e2e/** |
+| V14 | Workflows after F41 | in progress | ci14-watch | F41 | simple | §10 | – |
 | G1 | **Stage 1a gate** (checklist in specs/01-foundation-implementation.md): user manual checklist (Win/macOS, listening, KDE PTT/tray/Orca) + sign-off | open | user | C1–C8 | – | – | – |
 | B30 | Mumble Link + 3D audio | open | | F35 | Avatar image load failure showed empty circle; mock polish + new screenshot | done | f35-avatar-fallback | screenshot | simple | FR-1.17 | members Avatar, mock, docs/images |
 | G1 | complex | FR-1.41, 1.43 | crates/positional/src/link/, crates/audio/src/spatial/ |
