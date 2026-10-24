@@ -5,12 +5,14 @@
 //! the `input` group. GTK reads `GDK_BACKEND` once at start-up, so the choice is made here
 //! from the settings database and only changes with a restart.
 
+#[cfg(target_os = "linux")]
 use crate::ptt::SessionEnv;
 
 /// Whether `GDK_BACKEND=x11` should be set for this start.
 ///
 /// Only on a Wayland desktop with the setting on, and never over a `GDK_BACKEND` the user
 /// set themselves.
+#[cfg(target_os = "linux")]
 fn wants_xwayland(env: &SessionEnv, compatibility_mode: bool) -> bool {
     compatibility_mode && env.gdk_backend.is_none() && env.wayland_desktop()
 }
@@ -77,7 +79,8 @@ fn data_dir(
     }
 }
 
-#[cfg(test)]
+// Everything here is Linux-only; on other systems `prepare` does nothing.
+#[cfg(all(test, target_os = "linux"))]
 mod tests {
     use super::*;
 
@@ -117,7 +120,6 @@ mod tests {
         assert!(session.compatibility_active());
     }
 
-    #[cfg(target_os = "linux")]
     #[test]
     fn data_dir_follows_xdg() {
         use std::ffi::OsStr;
@@ -140,7 +142,6 @@ mod tests {
         assert_eq!(data_dir(None, None), None);
     }
 
-    #[cfg(target_os = "linux")]
     #[test]
     fn reads_the_stored_setting() {
         use mumcord_engine::store::Store;
