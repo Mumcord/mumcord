@@ -25,7 +25,7 @@ import { messageLimits } from "./images";
 import { createMessageAnnouncer } from "./messageAnnouncer";
 import { MessageList } from "./MessageList";
 import { PinnedInfoBox } from "./PinnedInfo";
-import { pinnedInfo } from "./pinnedInfo";
+import { pinnedInfo } from "./pinnedInfoModel";
 import { hasImage, htmlToText } from "./sanitize";
 import "./chat.css";
 

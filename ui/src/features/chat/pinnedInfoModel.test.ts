@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import type { ChannelInfo, ServerInfo } from "../../api";
 import { getServerState, resetServerStore, type ServerState } from "../channels/serverStore";
-import { pinnedInfo } from "./pinnedInfo";
+import { pinnedInfo } from "./pinnedInfoModel";
 
 const allow = { enter: true, textMessage: true, listen: true, registerSelf: false };
 
