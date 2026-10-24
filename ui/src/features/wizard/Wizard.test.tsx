@@ -26,12 +26,12 @@ describe("Wizard", () => {
   it("finishes with the defaults in three steps and saves wizardCompleted", async () => {
     renderInWizard(harness, <Wizard />);
     const micHeading = await createIdentity();
-    expect(micHeading).toHaveFocus();
+    await waitFor(() => expect(micHeading).toHaveFocus());
     expect(await harness.api.identityGet()).toEqual({ name: "Tobias", certHash: "selfhash" });
 
     fireEvent.click(screen.getByRole("button", { name: "Next" }));
     const talkHeading = await screen.findByRole("heading", { name: "How do you want to talk?" });
-    expect(talkHeading).toHaveFocus();
+    await waitFor(() => expect(talkHeading).toHaveFocus());
     expect(screen.getByRole("radio", { name: "Voice activation" })).toBeChecked();
     expect(
       screen.getByRole("checkbox", { name: "Open mumble:// links with Mumcord" }),
@@ -75,10 +75,12 @@ describe("Wizard", () => {
     name.focus();
     fireEvent.change(name, { target: { value: "Kim" } });
     fireEvent.submit(form());
-    expect(await screen.findByRole("heading", { name: "Microphone" })).toHaveFocus();
+    const micH = await screen.findByRole("heading", { name: "Microphone" });
+    await waitFor(() => expect(micH).toHaveFocus());
 
     fireEvent.submit(form());
-    expect(await screen.findByRole("heading", { name: "How do you want to talk?" })).toHaveFocus();
+    const talkH = await screen.findByRole("heading", { name: "How do you want to talk?" });
+    await waitFor(() => expect(talkH).toHaveFocus());
 
     // Arrow keys select radios natively; jsdom only simulates the resulting click.
     fireEvent.click(screen.getByRole("radio", { name: /Push to talk/ }));
@@ -105,7 +107,8 @@ describe("Wizard", () => {
     renderInWizard(harness, <Wizard />);
     await createIdentity("Anna");
     fireEvent.click(screen.getByRole("button", { name: "Back" }));
-    expect(await screen.findByRole("heading", { name: "Your identity" })).toHaveFocus();
+    const h = await screen.findByRole("heading", { name: "Your identity" });
+    await waitFor(() => expect(h).toHaveFocus());
     expect(screen.getByText("Using identity Anna.")).toBeInTheDocument();
   });
 
