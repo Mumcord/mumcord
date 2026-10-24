@@ -688,3 +688,13 @@ Disconnect exists only in the server icon's context menu.
 ✍️ Note: Asked and answered in chat during /dev.
 
 ---
+
+#### QA.9 Offer to rejoin the last channel after quitting the app? `◉`
+
+- [x] **If the user quit Mumcord while joined to a channel for voice, the next fresh connect to that server (after app start) shows a non-blocking prompt "You were in ‹channel› last time – Rejoin?" with "Rejoin" and "Not now".** Rejoin is an explicit Join (QA.7 applies); "Not now" or ignoring it keeps the read-only state. No prompt if the channel no longer exists or the user was not joined for voice.
+- [ ] Rejoin automatically without asking.
+- [ ] No prompt (current behavior).
+
+✍️ Note: Requested in chat during /dev.
+
+---
