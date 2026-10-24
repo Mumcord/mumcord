@@ -7,7 +7,7 @@ import { ConnectionInfo } from "../connection";
 import { useAvatars } from "../members/useAvatars";
 import { describeError } from "./errors";
 import { ProfileDialog } from "./ProfileDialog";
-import { useReadOnly } from "./readOnly";
+import { joinChannel, useReadOnly } from "./readOnly";
 import { RegisterDialog } from "./RegisterDialog";
 import { useUserPanel } from "./useUserPanel";
 import "./userpanel.css";
@@ -229,7 +229,7 @@ export function UserPanel() {
               type="button"
               className="button userpanel-readonly__join"
               onClick={() => {
-                run(getApi().channelJoin(self.channelId));
+                run(joinChannel(self.channelId));
               }}
             >
               {t("readOnly.join", { channel: state.channelName })}

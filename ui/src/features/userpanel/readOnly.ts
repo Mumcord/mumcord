@@ -1,9 +1,12 @@
 /**
  * Read-only state of the user panel: a fresh connect lands self-muted and deafened (reading along)
  * until the user explicitly joins a channel or undeafens. An automatic reconnect keeps the state
- * it had, and a deliberate deafen during a call never counts as read-only.
+ * it had, and a deliberate deafen during a call never counts as read-only. A join restores the
+ * user's last own mute/deafen choice (QA.7), which may itself be deafened, so the join is
+ * signalled explicitly instead of being inferred from the deafen flag.
  */
 import { useEffect, useState } from "react";
+import { getApi } from "../../api";
 import {
   selfUser,
   subscribeServerChanges,
@@ -42,14 +45,28 @@ export function nextReadOnly(
   }
 }
 
+const joinListeners = new Set<() => void>();
+
+/** Explicit join of a channel (double-click, Join button): leaves the read-only state. */
+export async function joinChannel(channelId: number): Promise<void> {
+  await getApi().channelJoin(channelId);
+  for (const listener of joinListeners) listener();
+}
+
 export function useReadOnly(): boolean {
   const [state, setState] = useState(INITIAL_READ_ONLY);
-  useEffect(
-    () =>
-      subscribeServerChanges((change, server) => {
-        setState((previous) => nextReadOnly(previous, change, server));
-      }),
-    [],
-  );
+  useEffect(() => {
+    const unsubscribe = subscribeServerChanges((change, server) => {
+      setState((previous) => nextReadOnly(previous, change, server));
+    });
+    const joined = () => {
+      setState((previous) => ({ ...previous, readOnly: false }));
+    };
+    joinListeners.add(joined);
+    return () => {
+      unsubscribe();
+      joinListeners.delete(joined);
+    };
+  }, []);
   return state.readOnly;
 }

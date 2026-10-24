@@ -224,6 +224,10 @@ export function createMockApi(options: MockOptions = {}): MockApi {
   let micPhaseTimer: ReturnType<typeof setTimeout> | undefined;
   let pendingConnect: { serverId: number; channelPath: string[] | null } | null = null;
   let muteBeforeDeaf = false;
+  // Like the engine (QA.7): the forced read-only state of a fresh connect, and the user's last
+  // own mute/deafen choice while joined for voice, which a join restores.
+  let readOnly = false;
+  let ownVoice = { mute: false, deaf: false };
   // History per server id, keyed by conversation.
   const history = new Map<number, Map<string, ChatMessage[]>>();
 
@@ -327,17 +331,36 @@ export function createMockApi(options: MockOptions = {}): MockApi {
     return current;
   }
 
+  /** Voice state after a join: the remembered own choice. */
+  function joinedVoice(): { selfMute: boolean; selfDeaf: boolean } {
+    muteBeforeDeaf = ownVoice.deaf && ownVoice.mute;
+    return { selfMute: ownVoice.mute || ownVoice.deaf, selfDeaf: ownVoice.deaf };
+  }
+
+  /** Applies an own mute/deafen toggle; only toggles while joined for voice are remembered. */
+  function changeSelfVoice(change: { selfMute: boolean; selfDeaf?: boolean }): void {
+    const remember = !readOnly;
+    updateUser(SELF_SESSION, change);
+    const self = selfUser();
+    if (!self.selfDeaf) readOnly = false;
+    if (remember) {
+      ownVoice = {
+        mute: self.selfDeaf ? muteBeforeDeaf : self.selfMute,
+        deaf: self.selfDeaf,
+      };
+    }
+  }
+
   function buildSnapshot(serverId: number, channelPath: string[] | null): ServerSnapshot {
     const channels = seedChannels();
     const target = (channelPath && findChannelByPath(channels, channelPath)) ?? channels[1];
     // Like the engine: a fresh connect lands read-only (muted + deafened), a link path joins.
-    const readOnly = channelPath === null;
-    muteBeforeDeaf = false;
+    readOnly = channelPath === null;
     const self = {
       ...person(SELF_SESSION, requireServer(serverId).username, target?.id ?? 0, "selfhash"),
-      selfMute: readOnly,
-      selfDeaf: readOnly,
+      ...(readOnly ? { selfMute: true, selfDeaf: true } : joinedVoice()),
     };
+    if (readOnly) muteBeforeDeaf = false;
     const anna = {
       ...person(2, "Anna", 1, "annahash"),
       hasComment: true,
@@ -530,8 +553,7 @@ export function createMockApi(options: MockOptions = {}): MockApi {
     },
     setSelfMute: (muted) => {
       const self = selfUser();
-      updateUser(
-        SELF_SESSION,
+      changeSelfVoice(
         muted || !self.selfDeaf ? { selfMute: muted } : { selfMute: false, selfDeaf: false },
       );
       return Promise.resolve(null);
@@ -540,9 +562,9 @@ export function createMockApi(options: MockOptions = {}): MockApi {
       const self = selfUser();
       if (deafened) {
         if (!self.selfDeaf) muteBeforeDeaf = self.selfMute;
-        updateUser(SELF_SESSION, { selfDeaf: true, selfMute: true });
+        changeSelfVoice({ selfDeaf: true, selfMute: true });
       } else {
-        updateUser(SELF_SESSION, { selfDeaf: false, selfMute: muteBeforeDeaf });
+        changeSelfVoice({ selfDeaf: false, selfMute: muteBeforeDeaf });
       }
       return Promise.resolve(null);
     },
@@ -552,9 +574,9 @@ export function createMockApi(options: MockOptions = {}): MockApi {
       if (!requireChannel(channelId).permissions.enter) {
         fail("permissionDenied", "You may not enter this channel.");
       }
-      // An explicit join turns voice on (undeafen + unmute).
-      muteBeforeDeaf = false;
-      updateUser(SELF_SESSION, { channelId, selfMute: false, selfDeaf: false });
+      // An explicit join turns voice on with the last own mute/deafen choice.
+      readOnly = false;
+      updateUser(SELF_SESSION, { channelId, ...joinedVoice() });
       return Promise.resolve(null);
     },
 

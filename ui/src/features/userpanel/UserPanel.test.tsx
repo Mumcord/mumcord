@@ -78,6 +78,14 @@ async function joinVoice() {
   });
 }
 
+/** Disconnects and connects again: a fresh, user-initiated connect. */
+async function freshConnect() {
+  const [server] = await api.serversList();
+  await act(() => api.disconnect());
+  await act(() => api.connect((server ?? { id: 0 }).id, null));
+  await screen.findByRole("button", { name: "Mute microphone" });
+}
+
 async function openMenuItem(name: string) {
   const opener = document.querySelector('[aria-haspopup="menu"]');
   if (!opener) throw new Error("user menu button missing");
@@ -149,6 +157,34 @@ describe("UserPanel", () => {
     expect(spy).toHaveBeenCalledWith(self?.channelId);
     expect(mute()).toHaveAttribute("aria-pressed", "false");
     expect(deafen()).toHaveAttribute("aria-pressed", "false");
+  });
+
+  it("a join after a fresh connect restores the last own mute choice (QA.7)", async () => {
+    await setup();
+    await joinVoice();
+    fireEvent.click(mute());
+    await waitFor(() => {
+      expect(mute()).toHaveAttribute("aria-pressed", "true");
+    });
+    await freshConnect();
+    expect(await screen.findByText(READ_ONLY)).toBeInTheDocument();
+    await joinVoice();
+    expect(mute()).toHaveAttribute("aria-pressed", "true");
+    expect(deafen()).toHaveAttribute("aria-pressed", "false");
+  });
+
+  it("a join restoring a deafened choice still ends read-only", async () => {
+    await setup();
+    await joinVoice();
+    fireEvent.click(deafen());
+    await waitFor(() => {
+      expect(deafen()).toHaveAttribute("aria-pressed", "true");
+    });
+    await freshConnect();
+    expect(await screen.findByText(READ_ONLY)).toBeInTheDocument();
+    await joinVoice();
+    expect(deafen()).toHaveAttribute("aria-pressed", "true");
+    expect(mute()).toHaveAttribute("aria-pressed", "true");
   });
 
   it("undeafening ends read-only; a deliberate deafen later shows no notice", async () => {

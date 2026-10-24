@@ -1,9 +1,10 @@
 /** Channel column content: the channel tree of the connected server, or an empty state. */
 import { useCallback, useEffect, useState, type ReactNode } from "react";
 import { useTranslation } from "react-i18next";
-import { getApi, toEngineError } from "../../api";
+import { toEngineError } from "../../api";
 import { useProfileCard } from "../members/useProfileCard";
 import type { SendPrivateMessage } from "../members/privateMessage";
+import { joinChannel } from "../userpanel/readOnly";
 import { useServerAnnouncements } from "./announcements";
 import { ChannelTree } from "./ChannelTree";
 import { useSelectedConversation } from "./selection";
@@ -35,21 +36,19 @@ export function ChannelsPanel({ channelBadge, onSendPrivateMessage }: ChannelsPa
   const join = useCallback(
     (channelId: number) => {
       setJoinError(null);
-      getApi()
-        .channelJoin(channelId)
-        .catch((cause: unknown) => {
-          const { code } = toEngineError(cause);
-          if (code !== "permissionDenied" && code !== "notConnected") {
-            console.error("Joining a channel failed", code);
-          }
-          setJoinError(
-            code === "permissionDenied"
-              ? t("errors.joinDenied")
-              : code === "notConnected"
-                ? t("errors.notConnected")
-                : t("errors.joinFailed"),
-          );
-        });
+      joinChannel(channelId).catch((cause: unknown) => {
+        const { code } = toEngineError(cause);
+        if (code !== "permissionDenied" && code !== "notConnected") {
+          console.error("Joining a channel failed", code);
+        }
+        setJoinError(
+          code === "permissionDenied"
+            ? t("errors.joinDenied")
+            : code === "notConnected"
+              ? t("errors.notConnected")
+              : t("errors.joinFailed"),
+        );
+      });
     },
     [t],
   );
