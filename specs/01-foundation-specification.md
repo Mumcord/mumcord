@@ -102,6 +102,7 @@ Mumcord enforces nothing itself; the server's ACLs decide. The client reflects p
 - **FR-1.30** The user writes with Markdown shortcuts (bold, italic, code, links) and can paste or drop images; Mumcord converts to Mumble-compatible HTML, scales/compresses images to the server's message size limit and refuses too-large content with a clear message.
 - **FR-1.31** **Follow channels** (Q3.1): any channel can be followed via a "Follow" button. Mumcord starts listening to it with its audio muted locally, so its messages arrive without joining. Followed channels show unread badges. Unfollowing stops listening. If the server denies listening or the listener limit is reached, the user gets a clear message. A star button on each channel row in the channel list follows/unfollows it directly (outlined on hover/focus, filled while followed); the server's context menu in the channel list offers "Follow all channels" and "Unfollow all channels" – follow all skips channels the user may not listen to, stops at the server's listener limit and reports how many were followed (QA.13).
 - **FR-1.32** All received and sent messages (channels, followed channels, private chats) are stored locally and shown when the chat is reopened, including after restart (Q4.5). History only contains what Mumcord actually received.
+- **FR-1.48b** Pinned info in the chat (QA.15): the top of each channel's chat shows a pinned, collapsible box with the channel description (fetched on demand if the server only sends a hash); the server welcome message (MOTD) is pinned in the root channel's chat and in the default channel's chat when that channel has no description. Long texts start collapsed ("Show more"); content is sanitized like chat HTML; no box when there is no text; the box updates when the description changes.
 - **FR-1.33** History controls: "Clear history" per channel/private chat, per server and all; "Save history" switch per server (default on).
 
 ### 4.6 Registration
@@ -421,6 +422,7 @@ Unless stated otherwise: a fresh Mumcord install, a local test server (1.5) runn
 | QA.11 | Channel listeners hidden from the channel list, shown only in the member list | Addendum 2026-10-24; FR-1.15 |
 | QA.13 | Star button per channel row to follow/unfollow; "Follow all / Unfollow all channels" in the server context menu, respecting the listener limit | Addendum 2026-10-24; FR-1.31 |
 | QA.14 | Avatar stack (5 + "+N") for collapsed or crowded (>10) channels, talking people in front | Addendum 2026-10-24; FR-1.15 |
+| QA.15 | Pinned channel description / server welcome message at the top of the chat | Addendum 2026-10-24; FR-1.48b |
 
 ## 13. Open points & risks
 

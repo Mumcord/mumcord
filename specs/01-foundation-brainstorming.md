@@ -749,3 +749,12 @@ Until now a channel is followed with the "Follow" button in the chat header (FR-
 ✍️ Note: Asked and answered in chat during /dev; "talking people in front" added by the user.
 
 ---
+
+#### QA.15 Pinned channel description / server welcome message in the chat? `◉`
+
+- [x] **The chat of each channel shows a pinned, collapsible box at the top with the channel's description. The server's welcome message (MOTD) is pinned in the root channel's chat (and in the default channel if it has no description of its own).** Long texts start collapsed to a few lines with "Show more"; content from the server is sanitized like chat HTML; nothing is shown if there is no text. The box updates when the description changes.
+- [ ] Not now.
+
+✍️ Note: Requested in chat during /dev.
+
+---
