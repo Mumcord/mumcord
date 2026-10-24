@@ -66,7 +66,7 @@ Mumcord enforces nothing itself; the server's ACLs decide. The client reflects p
 - **FR-1.2** Identity step: create a new identity (self-signed client certificate, name chosen by the user) or import an existing one (PKCS#12 file, e.g. exported from the official client). The step reminds the user to back up the identity (Q1.6).
 - **FR-1.3** The identity certificate is stored in the OS secure storage (Q4.3). Settings offer "Export identity" (password-protected PKCS#12 file) and "Import identity" at any time.
 - **FR-1.4** Microphone step: choose input and output device, live level meter and "test playback" of the own voice with noise suppression applied.
-- **FR-1.5** Talk-mode step: voice activation preselected (Q3.3); push-to-talk selectable with key capture. On Wayland without a global-shortcuts interface, push-to-talk is shown as unavailable with an explanation and voice activation is suggested (Q4.11).
+- **FR-1.5** Talk-mode step: voice activation preselected (Q3.3); push-to-talk selectable with key or mouse-button capture (mouse buttons such as side buttons, QA.4; see FR-1.21). On Wayland without a global-shortcuts interface, keyboard push-to-talk is shown as unavailable with an explanation and voice activation is suggested (Q4.11); a mouse button can still be used if the Wayland mouse option (FR-1.21, FR-1.39) is enabled.
 - **FR-1.6** At the end of the wizard Mumcord offers to become the handler for `mumble://` links (Q5.4).
 
 ### 4.2 Servers & connection
@@ -88,7 +88,7 @@ Mumcord enforces nothing itself; the server's ACLs decide. The client reflects p
 - **FR-1.20** The user can set their own avatar (image, scaled to the server's limit) and profile comment (Q5.7).
 
 ### 4.4 Voice
-- **FR-1.21** Talk modes: voice activation (default) and push-to-talk (global key, also while another app is focused).
+- **FR-1.21** Talk modes: voice activation (default) and push-to-talk (global key or mouse button, also while another app is focused). Mouse buttons (QA.4): Windows, macOS (system Accessibility permission prompt) and X11 are supported natively. On Linux Wayland the desktop portal cannot capture mouse buttons, so Mumcord reads input devices directly (evdev); this path is OFF by default, is enabled by a setting (FR-1.39) and requires the user to be in the `input` group. It opens only mouse-type devices (BTN_LEFT capability, no keyboards), reacts only to the one configured button code and never logs input. If permission is missing, Mumcord shows the exact command (`sudo usermod -aG input $USER`, then log out and in again) and falls back gracefully (mouse button unavailable, nothing else affected). Keyboard push-to-talk on Wayland stays on the portal (Q4.11).
 - **FR-1.22** Self mute and self deafen via buttons in the user panel; deafen implies mute. States are sent to the server so others see them.
 - **FR-1.23** AI-based noise suppression and echo cancellation are on by default; automatic input gain keeps the voice level even (Q3.4). All three can be switched off in settings.
 - **FR-1.24** Audio quality is automatic: the highest bitrate the server allows, lowered automatically when packet loss rises, raised again when it recovers (Q3.5).
@@ -112,7 +112,7 @@ Mumcord enforces nothing itself; the server's ACLs decide. The client reflects p
 - **FR-1.36** UI languages: English, Spanish, German; defaults to the OS language if supported, else English; switchable in settings without restart (Q2.7).
 - **FR-1.37** A tray icon shows the connection and talk state and offers "Show", "Mute", "Deafen", "Quit".
 - **FR-1.38** Closing the window while connected asks once "Minimize to tray or quit?" with "Remember my choice"; changeable in settings (Q2.8).
-- **FR-1.39** Settings screen (Discord-style, sections in a side list): Identity (name, certificate, profile with "Default avatar" and "Send to new servers automatically", FR-1.47), Audio, Voice, Chat & history, Appearance, Language, Sounds, Overlay & positional audio, Diagnostics, About (incl. licenses).
+- **FR-1.39** Settings screen (Discord-style, sections in a side list): Identity (name, certificate, profile with "Default avatar" and "Send to new servers automatically", FR-1.47), Audio, Voice (incl. the toggle "Allow mouse buttons (requires input group)", Linux Wayland only, default OFF, with a plain-language warning that input-group membership lets any program of the user read all input devices including the keyboard; FR-1.21, QA.4), Chat & history, Appearance, Language, Sounds, Overlay & positional audio, Diagnostics, About (incl. licenses).
 - **FR-1.40** "Save diagnostic file" in Diagnostics writes a file with app version, OS, audio devices, connection statistics and recent log lines – without chat contents, passwords, certificates or personal data (Q4.7).
 
 ### 4.8 Stage 1b – positional audio
@@ -290,6 +290,7 @@ Talk state (per own user): `Silent → Talking` (VAD/PTT), overridden by `Muted`
 - **Latency:** ≤ 150 ms mouth-to-ear excluding network transit; audio processing adds ≤ 30 ms.
 - **Resources:** idle while connected ≤ 2 % CPU and ≤ 250 MB RAM on a mid-range PC; talking with noise suppression ≤ 5 % CPU.
 - **Security:** TLS always; server certificate pinning on first use with change warning (FR-1.10); all server-provided content (names, comments, messages, images) treated as untrusted and sanitized; links never auto-open. The Mumble protocol's UDP encryption (OCB2-AES128) is used as specified for compatibility – a known weakness of the protocol, not changeable client-side.
+- **Security – mouse buttons on Wayland (QA.4):** the evdev path needs `input` group membership, which lets any program running as the user read all input devices, including the keyboard. Therefore it is opt-in (default OFF) with a warning in the toggle; Mumcord opens only mouse-type devices, evaluates only the one configured button code, keeps no input history and never writes input to logs or diagnostic files.
 - **Privacy (GDPR):** no telemetry or automatic reports in Epic 1 (Q4.7, Q4.9); chat history only local and deletable (Q4.5); no personal data, chat contents or audio in logs or diagnostic files.
 - **Accessibility:** WCAG 2.2 AA (Q4.12).
 - **Platforms:** Linux (X11 and Wayland; KDE and GNOME tested), Windows 10/11, macOS (current and previous major version) (Q1.4).
@@ -340,6 +341,7 @@ Unless stated otherwise: a fresh Mumcord install, a local test server (1.5) runn
 - **AC-1.30** CI on GitHub Actions produces Linux, Windows and macOS builds; each starts and connects to the test server.
 - **AC-1.35** Fresh connect (first connect, app restart, or reconnect via "Disconnected – Reconnect" button) to a server where the user was last in "Raid" → user lands in the default channel, self-muted and self-deafened; Bot sees the user present with a deafen icon and hears nothing from the user; chat works. Double-click "Raid" → mute/deafen are cleared, Bot sees the user in "Raid" not deafened and hears them (voice activation). (added 2026-10-24, Addendum QA.2)
 - **AC-1.36** Settings → Identity: choose a default avatar, "Send to new servers automatically" is on. Connect to a fresh server where the user has no avatar → Bot sees the user's avatar. Remove the avatar manually on that server, disconnect and reconnect → the default avatar is not sent again. Switch the toggle off, then connect to another fresh server → Bot sees no avatar. (added 2026-10-24, Addendum QA.3)
+- **AC-1.37** In the talk-mode step or Settings → Voice, capture a mouse side button as push-to-talk. On X11, Windows and macOS the Bot hears the user only while the button is held. On Linux Wayland with "Allow mouse buttons (requires input group)" switched on and the user in the `input` group, the same works. Without the permission (toggle on, user not in the group) the settings show the command `sudo usermod -aG input $USER` plus the log-out/in hint, the app does not crash and other talk modes keep working. (added 2026-10-24, Addendum QA.4)
 
 **Stage 1b**
 - **AC-1.31** Enable positional audio; two Bots feed Mumble Link positions (left and right of the listener) → voices are heard from the matching side and get quieter with distance (automated channel-level check; 🎧 manual check).
@@ -406,12 +408,13 @@ Unless stated otherwise: a fresh Mumcord install, a local test server (1.5) runn
 | QA.1 | Multi-server read-along = own epic after Epic 1 | Addendum 2026-10-24; FR-1.9, section 14 |
 | QA.2 | Fresh connect read-only (default channel, muted + deafened); voice only after explicit Join; reconnect restores channel + voice state | Addendum 2026-10-24; FR-1.13/1.14, AC-1.35 |
 | QA.3 | Default avatar set in settings, sent once per server on first connect (if no avatar there); automatic sending switchable (default ON) | Addendum 2026-10-24; FR-1.47, AC-1.36 |
+| QA.4 | Mouse buttons as push-to-talk: native on Windows/macOS/X11; on Wayland via evdev, opt-in (default OFF), needs `input` group, security warning, graceful fallback | Addendum 2026-10-24; FR-1.5/1.21/1.39, section 9, AC-1.37 |
 
 ## 13. Open points & risks
 
 - **Epic size:** Epic 1 is large (full chat, registration, WCAG AA, stage 1b gaming features). Mitigation: strict 1a/1b staging; 1a is usable on its own.
 - **Official game plugins (Q3.9):** compatibility with Mumble's plugin interface across versions, per-platform plugin builds, and anti-cheat flags for memory-reading plugins. Fallback: Mumble Link only.
-- **Wayland:** global push-to-talk depends on the desktop's global-shortcuts portal; overlay on-top behaviour not guaranteed on every compositor.
+- **Wayland:** global push-to-talk depends on the desktop's global-shortcuts portal; overlay on-top behaviour not guaranteed on every compositor. Mouse-button push-to-talk on Wayland needs the evdev path and `input` group membership (QA.4): a security trade-off, mitigated by opt-in, device filtering and no logging; users who decline can use a keyboard key.
 - **Listening limits:** servers may deny "Listen" or set low listener limits; following then degrades to history only.
 - **Noise suppression quality vs. CPU:** library choice to be validated against the CPU budget (section 9).
 - **UI automation on macOS:** Tauri's WebDriver-based testing doesn't cover macOS; macOS UI checks may need a different tool or manual verification.
