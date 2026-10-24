@@ -500,6 +500,13 @@ export type ServerSnapshot = {
 	users: User[],
 	followedChannelIds: number[],
 	unread: UnreadCount[],
+	/**  Self-muted and deafened by a fresh connect, until an explicit join or undeafen. */
+	readOnly: boolean,
+	/**
+	 *  Channel the user was joined to for voice when the app last quit; offer "Rejoin?"
+	 *  (only on the first fresh connect to this server after app start).
+	 */
+	rejoinChannelId: number | null,
 };
 
 /**  Sent once the server finished syncing (ServerSync) and after a reconnect. */

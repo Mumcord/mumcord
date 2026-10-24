@@ -503,6 +503,8 @@ mod tests {
             }],
             followed_channel_ids: vec![],
             unread: vec![],
+            read_only: false,
+            rejoin_channel_id: None,
         };
         state.apply(&EngineEvent::ServerSynced(Box::new(snapshot)));
         assert_eq!(state.self_session, Some(3));

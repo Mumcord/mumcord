@@ -169,6 +169,11 @@ pub struct Snapshot {
     pub users: Vec<UserView>,
     pub followed_channel_ids: Vec<u32>,
     pub unread: Vec<UnreadView>,
+    /// Self-muted and deafened by a fresh connect, until an explicit join or undeafen (QA.2).
+    pub read_only: bool,
+    /// Channel the user was joined to for voice when the app last quit, offered for
+    /// rejoining on the first fresh connect after app start (QA.9).
+    pub rejoin_channel_id: Option<u32>,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

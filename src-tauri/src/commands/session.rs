@@ -70,6 +70,11 @@ pub struct ServerSnapshot {
     pub users: Vec<User>,
     pub followed_channel_ids: Vec<ChannelId>,
     pub unread: Vec<UnreadCount>,
+    /// Self-muted and deafened by a fresh connect, until an explicit join or undeafen.
+    pub read_only: bool,
+    /// Channel the user was joined to for voice when the app last quit; offer "Rejoin?"
+    /// (only on the first fresh connect to this server after app start).
+    pub rejoin_channel_id: Option<ChannelId>,
 }
 
 #[derive(Serialize, Deserialize, Clone, Copy, Debug, PartialEq, Eq, Type)]
@@ -197,6 +202,8 @@ impl From<Snapshot> for ServerSnapshot {
             users: s.users.into_iter().map(User::from).collect(),
             followed_channel_ids: s.followed_channel_ids,
             unread: s.unread.into_iter().map(UnreadCount::from).collect(),
+            read_only: s.read_only,
+            rejoin_channel_id: s.rejoin_channel_id,
         }
     }
 }

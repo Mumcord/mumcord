@@ -129,7 +129,8 @@ fn after_disconnect(app: &AppHandle, then: impl FnOnce(&AppHandle) + Send + 'sta
         then(app);
         return;
     }
-    app.state::<Engine>().disconnect();
+    // Keeps the voice channel so the next start can offer to rejoin it (QA.9).
+    app.state::<Engine>().shutdown();
     let app = app.clone();
     tauri::async_runtime::spawn(async move {
         tokio::time::sleep(DISCONNECT_GRACE).await;

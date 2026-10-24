@@ -490,3 +490,110 @@ async fn join_restores_the_last_own_mute_after_a_restart() {
         .expect("voice on: the unmute was remembered");
     disconnected(&engine, &mut rx).await;
 }
+
+async fn restarted_engine(
+    data: &Path,
+    identity: &Path,
+) -> (Engine, UnboundedReceiver<EngineEvent>) {
+    let (engine, rx) = Engine::new(
+        data,
+        SecretStore::in_memory(),
+        tokio::runtime::Handle::current(),
+    )
+    .expect("engine restart");
+    engine
+        .identity_import(identity.to_path_buf(), Some("export".into()))
+        .await
+        .expect("import identity");
+    (engine, rx)
+}
+
+/// QA.9 / FR-1.14: quitting while joined for voice offers the channel once after the restart;
+/// a deliberate disconnect before quitting offers nothing.
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+#[ignore = "needs testenv v14 (MUMCORD_LIVE=1)"]
+async fn quitting_while_joined_offers_a_rejoin_once_after_the_restart() {
+    if !live() {
+        return;
+    }
+    let dir = work_dir("engine-live-rejoin");
+    let name = unique("mc-rejoin");
+    let data = dir.join("data");
+    let identity = dir.join("identity.p12");
+    let bot = Bot::connect(BotConfig {
+        data_dir: Some(dir.join("bot")),
+        ..BotConfig::new(&unique("mc-rejoinear"), env::PORT_V14)
+    })
+    .await
+    .expect("bot");
+    let in_raid = UserCheck {
+        in_channel: Some("Raid".into()),
+        ..UserCheck::default()
+    };
+
+    let (server, raid) = {
+        let (engine, mut rx) = Engine::new(
+            &data,
+            SecretStore::in_memory(),
+            tokio::runtime::Handle::current(),
+        )
+        .expect("engine");
+        engine
+            .identity_create(name.clone())
+            .await
+            .expect("identity");
+        let mut fields = server_fields(&name);
+        fields.port = env::PORT_V14;
+        let server = engine.server_add(fields).await.expect("server");
+        let snapshot = connect_synced(&engine, &mut rx, server.id).await;
+        assert!(snapshot.read_only);
+        assert_eq!(snapshot.rejoin_channel_id, None, "nothing to offer yet");
+        let raid = channel_id(&snapshot, "Raid");
+        engine.join_channel(raid).expect("join Raid");
+        bot.wait_user(&name, &in_raid).await.expect("in Raid");
+        // Quit while joined.
+        engine.shutdown();
+        wait_for(&mut rx, "Disconnected", |e| match e {
+            EngineEvent::StateChanged(ConnState::Disconnected { error: None }) => Some(()),
+            _ => None,
+        })
+        .await;
+        engine
+            .identity_export(identity.clone(), "export".into())
+            .await
+            .expect("export identity");
+        (server.id, raid)
+    };
+
+    let (engine, mut rx) = restarted_engine(&data, &identity).await;
+    let snapshot = connect_synced(&engine, &mut rx, server).await;
+    assert!(snapshot.read_only, "still read-only until Rejoin");
+    assert_eq!(snapshot.rejoin_channel_id, Some(raid), "Raid offered");
+    let me = snapshot
+        .users
+        .iter()
+        .find(|u| u.session == snapshot.self_session)
+        .expect("own user");
+    assert_ne!(me.channel_id, raid, "no automatic rejoin");
+    disconnected(&engine, &mut rx).await;
+    let snapshot = connect_synced(&engine, &mut rx, server).await;
+    assert_eq!(
+        snapshot.rejoin_channel_id, None,
+        "offered once per app start"
+    );
+    engine.join_channel(raid).expect("rejoin Raid");
+    bot.wait_user(&name, &in_raid).await.expect("back in Raid");
+    let snapshot = engine.snapshot().expect("snapshot");
+    assert!(!snapshot.read_only, "voice on after the join");
+    // Deliberate disconnect, then quit.
+    disconnected(&engine, &mut rx).await;
+    drop(engine);
+
+    let (engine, mut rx) = restarted_engine(&data, &identity).await;
+    let snapshot = connect_synced(&engine, &mut rx, server).await;
+    assert_eq!(
+        snapshot.rejoin_channel_id, None,
+        "not joined for voice when the app quit"
+    );
+    disconnected(&engine, &mut rx).await;
+}

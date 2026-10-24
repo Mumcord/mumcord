@@ -14,6 +14,7 @@ mod local;
 mod machine;
 mod types;
 
+use std::collections::HashMap;
 use std::path::{Path, PathBuf};
 use std::sync::atomic::{AtomicU32, Ordering};
 use std::sync::{Arc, Mutex, MutexGuard, PoisonError};
@@ -134,6 +135,9 @@ struct Inner {
     meter: Arc<Meter>,
     voice: Arc<VoiceShared>,
     reconnects: AtomicU32,
+    /// Voice channels the user was joined to when the app last quit, per server. Each is
+    /// offered for rejoining once, on the first fresh connect to its server (QA.9).
+    rejoin_offers: Mutex<HashMap<ServerId, String>>,
     core: Mutex<Core>,
 }
 
@@ -157,6 +161,8 @@ struct Session {
     handle: Handle,
     transport: Option<Arc<VoiceTransport>>,
     pump: mpsc::UnboundedSender<PumpCmd>,
+    /// Channel offered for rejoining until the user turns voice on (QA.9).
+    rejoin_offer: Option<u32>,
 }
 
 /// Commands to the session task.
@@ -171,6 +177,7 @@ struct PendingTrust {
     /// The server presented a different certificate than the one trusted before.
     changed: bool,
     channel_path: Option<Vec<String>>,
+    rejoin: Option<String>,
 }
 
 /// The error kind for a declined trust question.
@@ -195,6 +202,9 @@ enum AttemptError {
 enum Arrival {
     /// The user connected (server click, app start, link with an optional channel path).
     Fresh(Option<Vec<String>>),
+    /// First fresh connect to the server since app start, which quit while joined to this
+    /// channel path for voice: offer to rejoin it (QA.9).
+    FreshWithRejoin(String),
     /// Automatic reconnect after the connection was lost.
     Reconnect,
 }
@@ -240,6 +250,14 @@ impl Engine {
         })?;
         let store = Store::open(data_dir).map_err(store_error)?;
         let settings = store.settings().map_err(store_error)?;
+        let rejoin_offers = store
+            .voice_channels()
+            .unwrap_or_else(|e| {
+                tracing::warn!(error = %e, "reading the voice channels to rejoin failed");
+                Vec::new()
+            })
+            .into_iter()
+            .collect();
         let store = Arc::new(Mutex::new(store));
         let (tx, rx) = mpsc::unbounded_channel();
         let events = Events(tx, SoundHub::from_store(store.clone()));
@@ -258,6 +276,7 @@ impl Engine {
             meter,
             voice: Arc::new(VoiceShared::default()),
             reconnects: AtomicU32::new(0),
+            rejoin_offers: Mutex::new(rejoin_offers),
             core: Mutex::new(Core::default()),
         });
         Ok((Self { inner }, rx))
@@ -306,21 +325,22 @@ impl Engine {
         {
             return Err(EngineError::new(ErrorKind::NotFound, "unknown server"));
         }
-        let mut core = lock(&self.inner.core);
-        let generation = self.inner.reset(&mut core);
-        core.machine.connect(server_id);
-        self.inner.emit_state(&mut core);
-        let inner = self.inner.clone();
-        core.supervisor = Some(
-            self.inner
-                .rt
-                .spawn(async move { inner.supervise(generation, server_id, channel_path).await }),
-        );
+        // Taken even when a link joins a channel: the offer is for the first connect only.
+        let rejoin = lock(&self.inner.rejoin_offers).remove(&server_id);
+        let rejoin = rejoin.filter(|_| channel_path.is_none());
+        self.inner.start(server_id, channel_path, rejoin);
         Ok(())
     }
 
     /// Disconnects and cancels reconnecting or a pending trust question.
     pub fn disconnect(&self) {
+        self.shutdown();
+        self.inner.forget_voice_channel();
+    }
+
+    /// Disconnects for quitting or restarting the app. Unlike [`Engine::disconnect`] it keeps
+    /// the voice channel, so the next start offers to rejoin it (QA.9).
+    pub fn shutdown(&self) {
         let mut core = lock(&self.inner.core);
         self.inner.reset(&mut core);
         core.machine.cancel();
@@ -362,7 +382,9 @@ impl Engine {
         lock(&self.inner.store)
             .set_trusted_cert(server_id, &pending.fingerprint)
             .map_err(store_error)?;
-        self.connect(server_id, pending.channel_path)
+        self.inner
+            .start(server_id, pending.channel_path, pending.rejoin);
+        Ok(())
     }
 
     pub fn snapshot(&self) -> Option<Snapshot> {
@@ -604,6 +626,27 @@ impl Inner {
         }
     }
 
+    /// Starts a fresh connection, replacing any current one. Voice of the previous connection
+    /// ends here, so no voice channel is remembered until the user joins again.
+    fn start(
+        self: &Arc<Self>,
+        server_id: ServerId,
+        channel_path: Option<Vec<String>>,
+        rejoin: Option<String>,
+    ) {
+        self.forget_voice_channel();
+        let mut core = lock(&self.core);
+        let generation = self.reset(&mut core);
+        core.machine.connect(server_id);
+        self.emit_state(&mut core);
+        let inner = self.clone();
+        core.supervisor = Some(self.rt.spawn(async move {
+            inner
+                .supervise(generation, server_id, channel_path, rejoin)
+                .await
+        }));
+    }
+
     /// Ends the current connection and its tasks; returns the new generation.
     fn reset(&self, core: &mut Core) -> u64 {
         core.generation += 1;
@@ -635,6 +678,7 @@ impl Inner {
         generation: u64,
         server_id: ServerId,
         mut path: Option<Vec<String>>,
+        mut rejoin: Option<String>,
     ) {
         let mut synced_before = false;
         loop {
@@ -642,6 +686,8 @@ impl Inner {
                 Ok((connection, host, port)) => {
                     let arrival = if synced_before {
                         Arrival::Reconnect
+                    } else if let Some(rejoin) = rejoin.take() {
+                        Arrival::FreshWithRejoin(rejoin)
                     } else {
                         Arrival::Fresh(path.take())
                     };
@@ -654,7 +700,12 @@ impl Inner {
                             self.transition(generation, |c| c.machine.lost())
                         }
                         Ended::Final(error) => {
-                            self.transition(generation, |c| c.machine.end(error));
+                            if self
+                                .transition(generation, |c| c.machine.end(error))
+                                .is_some()
+                            {
+                                self.forget_voice_channel();
+                            }
                             return;
                         }
                         Ended::Stale => return,
@@ -671,6 +722,7 @@ impl Inner {
                             fingerprint: fingerprint.clone(),
                             changed: previous.is_some(),
                             channel_path: path.take(),
+                            rejoin: rejoin.take(),
                         });
                     });
                     if current.is_some() {
@@ -698,7 +750,12 @@ impl Inner {
                     tracing::info!(server_id, delay_secs = delay.as_secs(), "reconnecting");
                     tokio::time::sleep(delay).await;
                 }
-                Some(Step::Stop) | None => return,
+                // Gave up: voice ended without the app quitting.
+                Some(Step::Stop) => {
+                    self.forget_voice_channel();
+                    return;
+                }
+                None => return,
             }
         }
     }
@@ -799,8 +856,8 @@ impl Inner {
         };
         self.voice.reset_link();
         let (pump_tx, mut pump_rx) = mpsc::unbounded_channel();
-        let fresh = matches!(arrival, Arrival::Fresh(_));
-        let followed = self.post_sync(server_id, &handle, arrival);
+        let fresh = !matches!(arrival, Arrival::Reconnect);
+        let (followed, rejoin_offer) = self.post_sync(server_id, &handle, arrival);
 
         let registered = self.transition(generation, |core| {
             core.people.clear();
@@ -809,9 +866,11 @@ impl Inner {
                 handle: handle.clone(),
                 transport: transport.clone(),
                 pump: pump_tx,
+                rejoin_offer,
             });
             self.start_pipeline(core);
             core.machine.synced();
+            self.remember_voice_channel(core);
         });
         if registered.is_none() {
             handle.disconnect();
@@ -945,8 +1004,14 @@ impl Inner {
     /// read-only (self-muted and deafened), unless a link names a channel: that is an explicit
     /// join with the user's last own mute/deafen choice. A reconnect rejoins the last channel and restores the own
     /// mute/deafen state (continuity). At most three rate-limited messages, inside the
-    /// server's burst. Returns the followed channel ids.
-    fn post_sync(&self, server_id: ServerId, handle: &Handle, arrival: Arrival) -> Vec<u32> {
+    /// server's burst. Returns the followed channel ids and the channel to offer for
+    /// rejoining (QA.9).
+    fn post_sync(
+        &self,
+        server_id: ServerId,
+        handle: &Handle,
+        arrival: Arrival,
+    ) -> (Vec<u32>, Option<u32>) {
         let (last, followed_paths) = {
             let store = lock(&self.store);
             let last = store
@@ -960,6 +1025,7 @@ impl Inner {
             });
             (last, followed)
         };
+        let mut offer_path = None;
         let (target, voice) = match arrival {
             Arrival::Fresh(Some(path)) => {
                 let mut voice = SelfVoice::read_only();
@@ -967,24 +1033,33 @@ impl Inner {
                 (Some(path), Some(voice))
             }
             Arrival::Fresh(None) => (None, Some(SelfVoice::read_only())),
+            Arrival::FreshWithRejoin(path) => {
+                offer_path = Some(split_path(&path));
+                (None, Some(SelfVoice::read_only()))
+            }
             Arrival::Reconnect => (last.as_deref().map(split_path), None),
         };
-        let (join, followed) = handle.with_state(|s| {
+        let (join, offer, followed) = handle.with_state(|s| {
+            let enterable = |id: &u32| {
+                s.channels
+                    .get(id)
+                    .is_some_and(|c| c.can_enter != Some(false))
+            };
             let own = s.own_user().map(|u| u.channel_id);
             let join = target
                 .as_deref()
                 .and_then(|p| resolve_path(s, p))
                 .filter(|id| Some(*id) != own)
-                .filter(|id| {
-                    s.channels
-                        .get(id)
-                        .is_some_and(|c| c.can_enter != Some(false))
-                });
+                .filter(enterable);
+            let offer = offer_path
+                .as_deref()
+                .and_then(|p| resolve_path(s, p))
+                .filter(enterable);
             let followed: Vec<u32> = followed_paths
                 .iter()
                 .filter_map(|f| resolve_path(s, &split_path(&f.channel_path)))
                 .collect();
-            (join, followed)
+            (join, offer, followed)
         });
         if let Some(id) = join
             && let Err(e) = handle.join_channel(id)
@@ -1023,7 +1098,7 @@ impl Inner {
         if let Err(e) = sent {
             tracing::warn!(error = %e, "restoring mute state failed");
         }
-        followed
+        (followed, offer)
     }
 
     fn on_event(&self, ctx: &SessionCtx, transport: Option<&VoiceTransport>, event: Event) {
@@ -1103,6 +1178,34 @@ impl Inner {
         if let Err(e) = lock(&self.store).set_last_channel(ctx.server_id, Some(&join_path(&path))) {
             tracing::warn!(error = %e, "saving the last channel failed");
         }
+        self.remember_voice_channel(&lock(&self.core));
+    }
+
+    /// While voice is on, remembers the own channel so a restart can offer to rejoin it (QA.9).
+    /// Unlike `last_channel` it is never the read-only channel of a fresh connect.
+    fn remember_voice_channel(&self, core: &Core) {
+        let Some(session) = &core.session else {
+            return;
+        };
+        if core.self_voice.own().is_none() {
+            return;
+        }
+        let Some(path) = session
+            .handle
+            .with_state(|s| s.own_user().and_then(|u| channel_path(s, u.channel_id)))
+        else {
+            return;
+        };
+        if let Err(e) = lock(&self.store).set_voice_channel(session.server_id, &join_path(&path)) {
+            tracing::warn!(error = %e, "saving the voice channel failed");
+        }
+    }
+
+    /// Voice ended other than by quitting the app: nothing to offer on the next start.
+    fn forget_voice_channel(&self) {
+        if let Err(e) = lock(&self.store).clear_voice_channels() {
+            tracing::warn!(error = %e, "clearing the voice channel failed");
+        }
     }
 
     fn snapshot(&self, core: &Core) -> Option<Snapshot> {
@@ -1130,6 +1233,8 @@ impl Inner {
                     .collect(),
                 followed_channel_ids: followed_ids(&store, session.server_id, s),
                 unread: Vec::new(),
+                read_only: core.self_voice.own().is_none(),
+                rejoin_channel_id: session.rejoin_offer,
             })
         })
     }
@@ -1147,6 +1252,12 @@ impl Inner {
         let before = core.self_voice;
         change(&mut core.self_voice);
         let after = core.self_voice;
+        if before.own().is_none() && after.own().is_some() {
+            if let Some(session) = core.session.as_mut() {
+                session.rejoin_offer = None;
+            }
+            self.remember_voice_channel(&core);
+        }
         // Only the user's own toggles while joined for voice are remembered, never the forced
         // read-only state or leaving it (QA.7).
         if before.own().is_some()

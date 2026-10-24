@@ -331,6 +331,8 @@ mod tests {
             users,
             followed_channel_ids: Vec::new(),
             unread: Vec::new(),
+            read_only: false,
+            rejoin_channel_id: None,
         }))
     }
 
