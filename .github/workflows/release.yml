@@ -1,256 +1,121 @@
-name: Test builds
+name: Release
 
-# Unsigned test builds (spec §10, AC-1.30): Linux AppImage, Windows NSIS installer, macOS DMG.
-# Kept as workflow artifacts only – nothing is published as a GitHub release. No signing keys
-# or secrets are used. Each build is then installed on a fresh runner and smoke-tested against
-# a local Mumble server (scripts/smoke/smoke.sh).
+# Release builds from version tags on main (decision QA.12). Pushing `vX.Y.Z` checks that the
+# tag matches the app version and points to a commit on main, builds and smoke-tests the
+# bundles (build-and-smoke.yml), and creates a DRAFT GitHub Release with the bundles and
+# SHA256SUMS. The maintainer reviews and publishes it by hand. See RELEASING.md.
 on:
   push:
-    branches: [epic-1]
-  workflow_dispatch:
+    tags: ["v*"]
 
+# Never build the same tag twice at once; never cancel a running release build.
 concurrency:
-  group: test-builds-${{ github.ref }}
-  cancel-in-progress: true
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
 
-env:
-  CARGO_TERM_COLOR: always
-  # Official Mumble server for the native Windows/macOS smoke servers (Linux uses testenv).
-  MUMBLE_SERVER_VERSION: 1.5.939
+permissions:
+  contents: read
 
 jobs:
+  guard:
+    name: Check tag
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    outputs:
+      version: ${{ steps.check.outputs.version }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # Full history, so the tagged commit can be checked against main.
+          fetch-depth: 0
+
+      - name: Check tag against app version and main
+        id: check
+        env:
+          TAG: ${{ github.ref_name }}
+        run: |
+          fail() { echo "::error::$1"; exit 1; }
+          [[ "$TAG" =~ ^v[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z.-]+)?$ ]] \
+            || fail "Tag '$TAG' is not a version tag like v1.2.3."
+          version=${TAG#v}
+
+          # Tauri takes the app version from the src-tauri crate (tauri.conf.json sets none),
+          # which inherits the workspace version in Cargo.toml.
+          check() { [[ "$2" == "$version" ]] || fail "$1 is '$2', but the tag says '$version'."; }
+          check "package.json version" "$(node -p "require('./package.json').version")"
+          check "package-lock.json version" "$(node -p "require('./package-lock.json').version")"
+          conf=$(node -p "require('./src-tauri/tauri.conf.json').version ?? ''")
+          [[ -z "$conf" ]] || check "src-tauri/tauri.conf.json version" "$conf"
+          cargo metadata --no-deps --format-version 1 \
+            | jq -r '.packages[] | "\(.name) \(.version)"' > members.txt
+          while read -r name v; do
+            check "Cargo.toml version of crate $name" "$v"
+            # The builds use --locked, so a stale Cargo.lock would fail late; catch it here.
+            locked=$(awk -v n="$name" '$0 == "name = \"" n "\"" { getline; gsub(/version = |"/, ""); print; exit }' Cargo.lock)
+            check "Cargo.lock version of crate $name (run cargo check after bumping)" "$locked"
+          done < members.txt
+
+          commit=$(git rev-parse HEAD)
+          git merge-base --is-ancestor "$commit" origin/main \
+            || fail "Tag '$TAG' points to $commit, which is not on main. Tag a commit on main."
+
+          echo "Tag $TAG matches the app version and is on main."
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+
   build:
-    name: Build ${{ matrix.name }}
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - { name: linux, os: ubuntu-24.04, bundle: "appimage/*.AppImage" }
-          - { name: windows, os: windows-latest, bundle: "nsis/*-setup.exe" }
-          - { name: macos, os: macos-latest, bundle: "dmg/*.dmg" }
-    runs-on: ${{ matrix.os }}
-    timeout-minutes: 60
+    needs: guard
+    uses: ./.github/workflows/build-and-smoke.yml
+    with:
+      release: true
+
+  release:
+    name: Create draft release
+    needs: [guard, build]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      contents: write
     steps:
-      - uses: actions/checkout@v4
-
-      - name: Install Linux system libraries
-        if: runner.os == 'Linux'
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y --no-install-recommends \
-            libwebkit2gtk-4.1-dev libayatana-appindicator3-dev librsvg2-dev \
-            libxdo-dev libasound2-dev cmake patchelf xdg-utils
-
-      - uses: dtolnay/rust-toolchain@stable
-
-      - uses: Swatinem/rust-cache@v2
-        with:
-          key: release
-
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 24
-          cache: npm
-
-      - name: Install npm dependencies
-        run: npm ci
-
-      - name: Build bundle
-        run: npm run tauri build -- --bundles ${{ matrix.name == 'linux' && 'appimage' || matrix.name == 'windows' && 'nsis' || 'dmg' }}
-
-      - name: Collect artifact
-        shell: bash
-        run: |
-          mkdir out
-          cp target/release/bundle/${{ matrix.bundle }} out/
-          cat > out/UNSIGNED-TEST-BUILD.txt <<EOF
-          Mumcord unsigned test build
-          Commit: ${{ github.sha }}
-          Workflow run: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
-
-          This build is not signed. Windows (SmartScreen) and macOS (Gatekeeper) show a security
-          warning on first launch. For testing only; not a release.
-          EOF
-          ls -l out
-
-      - uses: actions/upload-artifact@v4
-        with:
-          name: mumcord-${{ matrix.name }}-unsigned-test-build
-          path: out/
-          if-no-files-found: error
-          retention-days: 14
-
-  smoke:
-    name: Smoke ${{ matrix.name }}
-    needs: build
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - { name: linux, os: ubuntu-24.04 }
-          - { name: windows, os: windows-latest }
-          - { name: macos, os: macos-latest }
-    runs-on: ${{ matrix.os }}
-    timeout-minutes: 60
-    defaults:
-      run:
-        shell: bash
-    steps:
-      - uses: actions/checkout@v4
-
       - uses: actions/download-artifact@v4
         with:
-          name: mumcord-${{ matrix.name }}-unsigned-test-build
-          path: build
+          pattern: mumcord-*-release
+          path: dist
+          merge-multiple: true
 
-      # --- Test server -----------------------------------------------------------------------
-
-      - name: Start test server (Linux, testenv v15)
-        if: runner.os == 'Linux'
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y --no-install-recommends \
-            libasound2-dev cmake sqlite3 xvfb dbus-x11 gnome-keyring libsecret-tools \
-            libwebkit2gtk-4.1-0 libayatana-appindicator3-1
-          # Throwaway SuperUser password for this runner only (same as e2e/run.sh).
-          printf 'SUPERUSER_PASSWORD=%s\nSERVER_PASSWORD=\n' "$(openssl rand -hex 16)" > testenv/.env
-          testenv/up.sh v15
-
-      - name: Start test server (Windows, official Mumble server)
-        if: runner.os == 'Windows'
-        shell: pwsh
-        run: |
-          $v = $env:MUMBLE_SERVER_VERSION
-          $installer = "$env:RUNNER_TEMP\mumble_server.exe"
-          Invoke-WebRequest "https://github.com/mumble-voip/mumble/releases/download/v$v/mumble_server-$v.x64.exe" -OutFile $installer
-          # WiX burn bundle: /quiet installs without UI.
-          Start-Process $installer -ArgumentList '/quiet', '/norestart' -Wait
-          $server = Get-ChildItem 'C:\Program Files\Mumble*' -Recurse -Filter 'mumble-server.exe' | Select-Object -First 1
-          if (-not $server) { throw 'mumble-server.exe not found after install' }
-          $dir = "$env:RUNNER_TEMP\mumble-server"
-          New-Item -ItemType Directory -Force $dir | Out-Null
-          # Forward slashes: the ini is parsed by Qt, where a backslash is an escape character.
-          $fdir = $dir -replace '\\', '/'
-          @"
-          database=$fdir/mumble-server.sqlite
-          logfile=$fdir/mumble-server.log
-          port=64738
-          autobanAttempts=0
-          "@ | Set-Content "$dir\mumble-server.ini"
-          Get-Content "$dir\mumble-server.ini"
-          # Started in the smoke step below: runner processes do not survive the end of a step.
-          "MUMBLE_SERVER_EXE=$($server.FullName)" | Out-File -Append -Encoding utf8 $env:GITHUB_ENV
-
-      # Homebrew has no Mumble server and the official releases ship none for macOS, so it is
-      # built from the release source (server only) and cached. If this fails, the macOS smoke
-      # falls back to a start-only check and "connects" stays on the manual checklist.
-      - name: Cache Mumble server (macOS)
-        if: runner.os == 'macOS'
-        id: server-cache
-        uses: actions/cache@v4
-        with:
-          path: ~/mumble-server
-          key: mumble-server-${{ env.MUMBLE_SERVER_VERSION }}-${{ runner.os }}-${{ runner.arch }}
-
-      - name: Build Mumble server (macOS)
-        if: runner.os == 'macOS' && steps.server-cache.outputs.cache-hit != 'true'
-        continue-on-error: true
-        run: |
-          brew install qt@5 protobuf@21 openssl@3 pkgconf
-          v=$MUMBLE_SERVER_VERSION
-          curl -fsSL "https://github.com/mumble-voip/mumble/releases/download/v$v/mumble-$v.tar.gz" | tar -xz -C "$RUNNER_TEMP"
-          cmake -S "$RUNNER_TEMP/mumble-$v" -B "$RUNNER_TEMP/mumble-build" -DCMAKE_BUILD_TYPE=Release \
-            -Dclient=OFF -Dserver=ON -Dice=OFF -Dzeroconf=OFF -Dtests=OFF -Dplugins=OFF \
-            -Dwarnings-as-errors=OFF \
-            -DCMAKE_PREFIX_PATH="$(brew --prefix qt@5);$(brew --prefix protobuf@21);$(brew --prefix openssl@3)"
-          cmake --build "$RUNNER_TEMP/mumble-build" -j "$(sysctl -n hw.ncpu)"
-          mkdir -p ~/mumble-server
-          cp "$(find "$RUNNER_TEMP/mumble-build" -type f -perm -u+x -name 'mumble-server' | head -n 1)" ~/mumble-server/
-
-      - name: Start test server (macOS)
-        if: runner.os == 'macOS'
-        id: mac-server
-        continue-on-error: true
-        run: |
-          test -x ~/mumble-server/mumble-server
-          # Runtime libraries of the cached binary.
-          brew install qt@5 protobuf@21 openssl@3
-          dir=$RUNNER_TEMP/mumble-server-data
-          mkdir -p "$dir"
-          printf 'database=%s\nport=64738\nautobanAttempts=0\n' "$dir/mumble-server.sqlite" > "$dir/mumble-server.ini"
-          ~/mumble-server/mumble-server -ini "$dir/mumble-server.ini" -fg > "$dir/server.log" 2>&1 &
-          for i in $(seq 60); do nc -z 127.0.0.1 64738 && exit 0; sleep 1; done
-          cat "$dir/server.log"
-          exit 1
-
-      # --- Smoke helpers ---------------------------------------------------------------------
-
-      - uses: dtolnay/rust-toolchain@stable
-
-      - uses: Swatinem/rust-cache@v2
-        with:
-          key: smoke
-          workspaces: |
-            . -> target
-            scripts/smoke/seed -> target
-
-      - name: Build seeder and mumcord-bot
-        run: |
-          cargo build --release --locked -p mumcord-bot
-          CARGO_TARGET_DIR="$PWD/target" cargo build --release --locked --manifest-path scripts/smoke/seed/Cargo.toml
-
-      # --- Install the build and run the smoke test ------------------------------------------
-
-      - name: Smoke test (Linux)
-        if: runner.os == 'Linux'
+      - name: Write checksums and release notes
+        working-directory: dist
         env:
-          # No FUSE needed on the runner.
-          APPIMAGE_EXTRACT_AND_RUN: "1"
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
         run: |
-          app=$(ls build/*.AppImage)
-          chmod +x "$app"
-          # Secret Service (unlocked gnome-keyring) for the identity, and a virtual display.
-          # An EMPTY password creates no `login` collection, so unlock with a fixed non-empty
-          # throwaway password in a fresh D-Bus session; verify with secret-tool before seeding.
-          dbus-run-session -- bash -c '
-            set -e
-            printf "smoke" | gnome-keyring-daemon --unlock --components=secrets >/dev/null
-            gnome-keyring-daemon --start --components=secrets >/dev/null
-            printf "probe" | secret-tool store --label=smoke-probe app mumcord-smoke
-            test "$(secret-tool lookup app mumcord-smoke)" = probe
-            secret-tool clear app mumcord-smoke
-            xvfb-run -a scripts/smoke/smoke.sh --app "$0" --seed target/release/mumcord-smoke-seed --bot target/release/mumcord-bot
-          ' "$PWD/$app"
+          # Fails if any of the three bundles is missing.
+          ls -l -- *.AppImage *-setup.exe *.dmg
+          sha256sum -- *.AppImage *-setup.exe *.dmg > SHA256SUMS
+          cat SHA256SUMS
+          cat > ../notes.md <<EOF
+          ## Downloads
 
-      - name: Smoke test (Windows)
-        if: runner.os == 'Windows'
+          - **Windows**: \`*-setup.exe\` (installer)
+          - **macOS** (Apple Silicon and Intel): \`*.dmg\`
+          - **Linux**: \`*.AppImage\` (make it executable, then run it)
+
+          Check a download with \`sha256sum -c SHA256SUMS --ignore-missing\`.
+
+          > [!WARNING]
+          > These builds are **not signed** yet. On first start, Windows SmartScreen shows
+          > "Windows protected your PC": choose **More info → Run anyway**. macOS Gatekeeper says
+          > the app "cannot be opened": open **System Settings → Privacy & Security** and choose
+          > **Open Anyway** (or right-click the app and choose **Open**).
+
+          Built and smoke-tested by [this workflow run]($RUN_URL).
+          EOF
+
+      - name: Create draft release
         env:
-          # Keep Git Bash from rewriting "/S" and the mumble:// link into Windows paths.
-          MSYS2_ARG_CONV_EXCL: "*"
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ github.ref_name }}
+          VERSION: ${{ needs.guard.outputs.version }}
+        # --generate-notes appends GitHub's change list after notes.md.
         run: |
-          installer=$(ls build/*-setup.exe)
-          # NSIS silent install for the current user.
-          "$installer" /S
-          app=$(find "$(cygpath -u "$LOCALAPPDATA")" -maxdepth 3 -iname 'mumcord.exe' | head -n 1)
-          test -n "$app" || { echo "Mumcord.exe not found after install" >&2; exit 1; }
-          dir=$(cygpath -w "$RUNNER_TEMP")\\mumble-server
-          dump() { powershell -NoProfile -File scripts/smoke/dump-win-server.ps1 "$dir" || true; }
-          # Same step as the smoke run, so the server process stays alive for it.
-          powershell -NoProfile -File scripts/smoke/start-win-server.ps1 "$MUMBLE_SERVER_EXE" "$dir" || { dump; exit 1; }
-          powershell -NoProfile -Command "if (-not (Get-Process -Id (Get-Content '$dir\\server.pid') -ErrorAction SilentlyContinue)) { exit 1 }" \
-            || { echo "server process is gone before seeding" >&2; dump; exit 1; }
-          scripts/smoke/smoke.sh --app "$app" --seed target/release/mumcord-smoke-seed.exe --bot target/release/mumcord-bot.exe || { dump; exit 1; }
-
-      - name: Smoke test (macOS)
-        if: runner.os == 'macOS'
-        run: |
-          dmg=$(ls build/*.dmg)
-          mount=$(hdiutil attach -nobrowse -readonly "$dmg" | awk -F'\t' '/\/Volumes\//{print $NF}')
-          cp -R "$mount/Mumcord.app" /Applications/
-          hdiutil detach "$mount"
-          if [[ "${{ steps.mac-server.outcome }}" == "success" ]]; then
-            scripts/smoke/smoke.sh --app /Applications/Mumcord.app --seed target/release/mumcord-smoke-seed --bot target/release/mumcord-bot
-          else
-            echo "::warning::No Mumble server on macOS – start-only check; 'connects' is a manual checklist item (AC-1.30)."
-            scripts/smoke/smoke.sh --app /Applications/Mumcord.app --start-only
-          fi
+          gh release create "$TAG" --repo "$GITHUB_REPOSITORY" --verify-tag --draft \
+            --title "Mumcord $VERSION" --notes-file notes.md --generate-notes \
+            dist/*.AppImage dist/*-setup.exe dist/*.dmg dist/SHA256SUMS
