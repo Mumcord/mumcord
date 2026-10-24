@@ -985,3 +985,12 @@ Until now external images (img tags pointing to web addresses, image links) are 
 ✍️ Note: Requested in chat during /dev.
 
 ---
+
+#### QA.39 Manual voice activation threshold (stage 1b)? `◉`
+
+- [x] **Settings → Voice: voice activation "Automatic" (default, today's detection) or "Manual threshold" with a slider over a live input level meter (the threshold line is drawn on the meter; speech above it opens the mic, plus a short hold time so words aren't cut).** The music-quality switch (QA.37) also belongs to stage 1b.
+- [ ] Automatic only.
+
+✍️ Note: Requested in chat during /dev.
+
+---
