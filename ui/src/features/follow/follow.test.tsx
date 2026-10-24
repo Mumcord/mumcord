@@ -109,6 +109,27 @@ describe("follow", () => {
     });
   });
 
+  // The count is CSS-generated, so the badge adds no visible DOM text beyond its accessible name.
+  it("keeps the unread count out of DOM text but inside the treeitem's name", async () => {
+    await setup();
+    await act(() => api.channelFollow(2));
+    act(() => {
+      api.mock.receiveMessage(RAID, "hello", 2);
+    });
+    await screen.findByText(/1 unread message/);
+    const badge = document.querySelector<HTMLElement>(".unread-badge");
+    expect(badge?.getAttribute("data-count")).toBe("1");
+    expect(badge?.textContent).toBe(", 1 unread message");
+    const raid = screen.getByRole("treeitem", { name: /^Raid/ });
+    expect(raid).toHaveAccessibleName(/1 unread message/);
+    const clone = badge?.cloneNode(true) as HTMLElement;
+    clone.querySelectorAll(".visually-hidden").forEach((el) => {
+      el.remove();
+    });
+    expect(clone.textContent).toBe("");
+    expect(await axeViolations(raid.parentElement ?? document.body)).toEqual([]);
+  });
+
   it("lists private chats and clears a conversation after confirmation", async () => {
     await setup();
     const users = (await api.sessionSnapshot())?.users ?? [];

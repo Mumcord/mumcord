@@ -15,9 +15,10 @@ export function ChannelUnreadBadge({ channelId }: { channelId: number }) {
 export function UnreadBadge({ count, following = true }: { count: number; following?: boolean }) {
   const { t } = useTranslation("follow");
   if (!following || count <= 0) return null;
+  // The digits are CSS-generated (::before) so the badge adds no DOM text: the visible count stays
+  // part of the accessible name (WCAG 2.5.3 label-in-name). The spoken form is the hidden phrase.
   return (
-    <span className="unread-badge">
-      <span aria-hidden="true">{count > 99 ? "99+" : count}</span>
+    <span className="unread-badge" data-count={count > 99 ? "99+" : count}>
       <span className="visually-hidden">, {t("unread", { count })}</span>
     </span>
   );

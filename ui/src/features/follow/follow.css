@@ -26,6 +26,11 @@
   font-weight: var(--font-weight-bold);
 }
 
+/* Generated, so the digits are not badge text: visible text must be part of the name (WCAG 2.5.3). */
+.unread-badge::before {
+  content: attr(data-count);
+}
+
 .direct-messages {
   padding: var(--space-2);
 }
