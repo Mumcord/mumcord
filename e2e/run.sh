@@ -31,5 +31,6 @@ exec docker run --rm -i --init "${tty[@]}" \
   -v "$cache/cargo:/cache/cargo" \
   -v "$cache/home:/cache/home" \
   -e HOME=/cache/home -e CARGO_HOME=/cache/cargo -e CARGO_TARGET_DIR=/cache/target \
+  -e MUMCORD_SKIP_BINDINGS_EXPORT=1 \
   -e CI \
   "$image" "$@"

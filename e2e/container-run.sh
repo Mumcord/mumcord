@@ -19,10 +19,12 @@ if [ -z "${DBUS_SESSION_BUS_ADDRESS:-}" ]; then
   exec dbus-run-session -- "$0" "$@"
 fi
 
-# Empty password unlocks the login keyring non-interactively; the keyring crate talks to it via
+# A fixed non-empty password unlocks (an empty one creates no login collection) the login keyring non-interactively; the keyring crate talks to it via
 # the Secret Service D-Bus API, exactly like on a desktop.
 export XDG_RUNTIME_DIR="${XDG_RUNTIME_DIR:-$(mktemp -d)}"
-printf '' | gnome-keyring-daemon --unlock --components=secrets >/dev/null
+# Fresh keyring per run so state cannot leak between runs.
+rm -f "$HOME"/.local/share/keyrings/*.keyring "$HOME"/.local/share/keyrings/default
+printf 'e2e' | gnome-keyring-daemon --unlock --components=secrets >/dev/null
 gnome-keyring-daemon --start --components=secrets >/dev/null
 
 export DISPLAY=:99
