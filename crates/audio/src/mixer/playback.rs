@@ -1,0 +1,352 @@
+//! The playback thread: drains incoming packets and control commands, mixes
+//! and keeps the sink's queue at the target latency.
+
+use std::sync::Arc;
+use std::sync::atomic::{AtomicBool, AtomicU64, Ordering};
+use std::thread::JoinHandle;
+use std::time::{Duration, Instant};
+
+use super::{Mixer, TalkEvent, VoicePacket};
+use crate::codec::CodecError;
+use crate::io::FrameSink;
+use crate::{FRAME_SAMPLES, Frame, SAMPLE_RATE};
+
+/// Queued incoming packets (≈ 2.5 s of 20 ms packets from 2 speakers).
+const PACKET_QUEUE: usize = 256;
+const COMMAND_QUEUE: usize = 64;
+const EVENT_QUEUE: usize = 256;
+/// Mix-in samples that can be queued ahead (2 s).
+const MIX_IN_QUEUE: usize = 2 * SAMPLE_RATE as usize;
+/// Polling interval of the playback thread. Coarse OS timers (up to ~15 ms on
+/// Windows) are absorbed by the 25 ms default queue target.
+const POLL_INTERVAL: Duration = Duration::from_millis(2);
+/// Upper bound of frames mixed per poll, so a sink that never fills (no
+/// device) cannot make the thread drain the jitter buffers faster than real time.
+const MAX_FRAMES_PER_POLL: u32 = 4;
+const FRAME_DURATION: Duration = Duration::from_millis(10);
+
+/// Where mixed frames go; implemented by [`FrameSink`] and by test doubles.
+pub trait PlaybackSink: Send + 'static {
+    /// Queues a frame; `false` if it was dropped (queue full or no device).
+    fn write_frame(&mut self, frame: &Frame) -> bool;
+    /// Audio queued but not yet played, in 48 kHz samples.
+    fn queued_samples(&mut self) -> usize;
+}
+
+impl PlaybackSink for FrameSink {
+    fn write_frame(&mut self, frame: &Frame) -> bool {
+        FrameSink::write_frame(self, frame)
+    }
+
+    fn queued_samples(&mut self) -> usize {
+        FrameSink::queued_samples(self)
+    }
+}
+
+/// Far-end reference hook: called on the playback thread with every final
+/// frame right before it is written to the sink. Must not block or allocate.
+pub type FarEndTap = Box<dyn FnMut(&Frame) + Send>;
+
+pub struct PlaybackConfig {
+    /// Output latency the sink queue is kept at, in ms (20–30 recommended).
+    pub target_queue_ms: u32,
+    /// Receives every played frame, e.g. as echo-cancellation reference.
+    pub far_end_tap: Option<FarEndTap>,
+}
+
+impl Default for PlaybackConfig {
+    fn default() -> Self {
+        Self {
+            target_queue_ms: 25,
+            far_end_tap: None,
+        }
+    }
+}
+
+#[derive(Debug, thiserror::Error)]
+pub enum PlaybackError {
+    #[error("creating decoders: {0}")]
+    Codec(#[from] CodecError),
+    #[error("spawning playback thread: {0}")]
+    Thread(#[from] std::io::Error),
+}
+
+/// Diagnostics counters of the playback thread.
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
+pub struct PlaybackStats {
+    /// Packets dropped because the packet queue was full or no slot was free.
+    pub packets_dropped: u64,
+    pub late_packets: u64,
+    pub concealed_frames: u64,
+    /// Frames the sink refused (queue full or no output device).
+    pub frames_refused: u64,
+}
+
+#[derive(Default)]
+struct Counters {
+    queue_full: AtomicU64,
+    no_slot: AtomicU64,
+    late: AtomicU64,
+    concealed: AtomicU64,
+    refused: AtomicU64,
+}
+
+enum Command {
+    SetVolume(u32, f32),
+    SetMuted(u32, bool),
+    Forget(u32),
+    DiscardListenerAudio(bool),
+    MixInGain(f32),
+}
+
+/// Producer side of the incoming packet queue. Single producer: route UDP
+/// and TCP-tunnelled voice through one thread.
+pub struct PacketSender {
+    producer: rtrb::Producer<VoicePacket>,
+    counters: Arc<Counters>,
+}
+
+impl PacketSender {
+    /// Queues a packet without blocking; `false` (and counted) if the queue is full.
+    pub fn push(&mut self, packet: VoicePacket) -> bool {
+        let pushed = self.producer.push(packet).is_ok();
+        if !pushed {
+            self.counters.queue_full.fetch_add(1, Ordering::Relaxed);
+        }
+        pushed
+    }
+}
+
+/// Endpoints handed to the engine; each can live on a different thread.
+pub struct PlaybackPorts {
+    /// Incoming voice packets.
+    pub packets: PacketSender,
+    /// Talking start/stop per speaker.
+    pub talk_events: rtrb::Consumer<TalkEvent>,
+    /// 48 kHz mono samples mixed into the output (notification sounds,
+    /// mic-test loopback). Write whole sounds; underflow plays silence.
+    pub mix_in: rtrb::Producer<f32>,
+}
+
+/// Owns the playback thread; dropping it stops the thread.
+pub struct Playback {
+    commands: rtrb::Producer<Command>,
+    counters: Arc<Counters>,
+    stop: Arc<AtomicBool>,
+    thread: Option<JoinHandle<()>>,
+}
+
+impl Playback {
+    pub fn start<S: PlaybackSink>(
+        sink: S,
+        config: PlaybackConfig,
+    ) -> Result<(Self, PlaybackPorts), PlaybackError> {
+        let mixer = Mixer::new()?;
+        let (packet_tx, packet_rx) = rtrb::RingBuffer::new(PACKET_QUEUE);
+        let (command_tx, command_rx) = rtrb::RingBuffer::new(COMMAND_QUEUE);
+        let (event_tx, event_rx) = rtrb::RingBuffer::new(EVENT_QUEUE);
+        let (mix_in_tx, mix_in_rx) = rtrb::RingBuffer::new(MIX_IN_QUEUE);
+        let counters = Arc::new(Counters::default());
+        let stop = Arc::new(AtomicBool::new(false));
+
+        let worker = Worker {
+            mixer,
+            sink,
+            config,
+            packets: packet_rx,
+            commands: command_rx,
+            events: event_tx,
+            mix_in: mix_in_rx,
+            mix_in_gain: 1.0,
+            counters: Arc::clone(&counters),
+            stop: Arc::clone(&stop),
+        };
+        let thread = std::thread::Builder::new()
+            .name("mumcord-playback".into())
+            .spawn(move || worker.run())?;
+
+        let ports = PlaybackPorts {
+            packets: PacketSender {
+                producer: packet_tx,
+                counters: Arc::clone(&counters),
+            },
+            talk_events: event_rx,
+            mix_in: mix_in_tx,
+        };
+        let playback = Self {
+            commands: command_tx,
+            counters,
+            stop,
+            thread: Some(thread),
+        };
+        Ok((playback, ports))
+    }
+
+    /// Local volume of a person, 0.0–2.0 (0–200 %).
+    pub fn set_volume(&mut self, session: u32, volume: f32) -> bool {
+        self.send(Command::SetVolume(session, volume))
+    }
+
+    pub fn set_muted(&mut self, session: u32, muted: bool) -> bool {
+        self.send(Command::SetMuted(session, muted))
+    }
+
+    /// The person left: drop their settings and buffer.
+    pub fn forget_speaker(&mut self, session: u32) -> bool {
+        self.send(Command::Forget(session))
+    }
+
+    /// Silences audio received only via channel listening (default on).
+    pub fn set_discard_listener_audio(&mut self, discard: bool) -> bool {
+        self.send(Command::DiscardListenerAudio(discard))
+    }
+
+    /// Gain of the mix-in input (default 1.0).
+    pub fn set_mix_in_gain(&mut self, gain: f32) -> bool {
+        self.send(Command::MixInGain(gain.max(0.0)))
+    }
+
+    pub fn stats(&self) -> PlaybackStats {
+        let c = &self.counters;
+        PlaybackStats {
+            packets_dropped: c.queue_full.load(Ordering::Relaxed)
+                + c.no_slot.load(Ordering::Relaxed),
+            late_packets: c.late.load(Ordering::Relaxed),
+            concealed_frames: c.concealed.load(Ordering::Relaxed),
+            frames_refused: c.refused.load(Ordering::Relaxed),
+        }
+    }
+
+    /// `false` if the command queue is full (the caller may retry).
+    fn send(&mut self, command: Command) -> bool {
+        self.commands.push(command).is_ok()
+    }
+}
+
+impl Drop for Playback {
+    fn drop(&mut self) {
+        self.stop.store(true, Ordering::Relaxed);
+        if let Some(thread) = self.thread.take()
+            && thread.join().is_err()
+        {
+            tracing::error!("playback thread panicked");
+        }
+    }
+}
+
+struct Worker<S> {
+    mixer: Mixer,
+    sink: S,
+    config: PlaybackConfig,
+    packets: rtrb::Consumer<VoicePacket>,
+    commands: rtrb::Consumer<Command>,
+    events: rtrb::Producer<TalkEvent>,
+    mix_in: rtrb::Consumer<f32>,
+    mix_in_gain: f32,
+    counters: Arc<Counters>,
+    stop: Arc<AtomicBool>,
+}
+
+impl<S: PlaybackSink> Worker<S> {
+    fn run(mut self) {
+        let epoch = Instant::now();
+        let target_samples = self.config.target_queue_ms as usize * SAMPLE_RATE as usize / 1000;
+        let mut frame = [0.0; FRAME_SAMPLES];
+        let mut extra = [0.0; FRAME_SAMPLES];
+        // When the sink refuses frames (no device), pace by the wall clock.
+        let mut next_frame_due = Instant::now();
+        let mut sink_refusing = false;
+
+        while !self.stop.load(Ordering::Relaxed) {
+            self.apply_commands();
+            while let Ok(packet) = self.packets.pop() {
+                let arrival_ms = millis_since(epoch, packet.arrival);
+                self.mixer.push_packet(&packet, arrival_ms);
+            }
+
+            let mut mixed = 0;
+            while mixed < MAX_FRAMES_PER_POLL {
+                let now = Instant::now();
+                let due = if sink_refusing {
+                    now >= next_frame_due
+                } else {
+                    self.sink.queued_samples() < target_samples
+                };
+                if !due {
+                    break;
+                }
+                let has_extra = self.read_mix_in(&mut extra);
+                let events = &mut self.events;
+                self.mixer.mix(
+                    &mut frame,
+                    has_extra.then_some(&extra),
+                    millis_since(epoch, now),
+                    &mut |event| {
+                        // A full queue means the engine stopped reading; the
+                        // indicator state resyncs with the next event.
+                        let _ = events.push(event);
+                    },
+                );
+                if let Some(tap) = &mut self.config.far_end_tap {
+                    tap(&frame);
+                }
+                sink_refusing = !self.sink.write_frame(&frame);
+                if sink_refusing {
+                    self.counters.refused.fetch_add(1, Ordering::Relaxed);
+                    next_frame_due = now.max(next_frame_due) + FRAME_DURATION;
+                }
+                mixed += 1;
+            }
+            self.publish_stats();
+            std::thread::sleep(POLL_INTERVAL);
+        }
+    }
+
+    fn apply_commands(&mut self) {
+        while let Ok(command) = self.commands.pop() {
+            match command {
+                Command::SetVolume(session, volume) => {
+                    self.mixer.set_volume(session, volume);
+                }
+                Command::SetMuted(session, muted) => {
+                    self.mixer.set_muted(session, muted);
+                }
+                Command::Forget(session) => self.mixer.forget_speaker(session),
+                Command::DiscardListenerAudio(discard) => {
+                    self.mixer.set_discard_listener_audio(discard);
+                }
+                Command::MixInGain(gain) => self.mix_in_gain = gain,
+            }
+        }
+    }
+
+    /// Reads up to one frame of mix-in samples; `false` if none were queued.
+    fn read_mix_in(&mut self, extra: &mut Frame) -> bool {
+        let n = self.mix_in.slots().min(FRAME_SAMPLES);
+        if n == 0 {
+            return false;
+        }
+        let Ok(chunk) = self.mix_in.read_chunk(n) else {
+            return false;
+        };
+        let (a, b) = chunk.as_slices();
+        for (dst, src) in extra.iter_mut().zip(a.iter().chain(b)) {
+            *dst = src * self.mix_in_gain;
+        }
+        chunk.commit_all();
+        extra[n..].fill(0.0);
+        true
+    }
+
+    fn publish_stats(&self) {
+        let stats = self.mixer.stats();
+        let c = &self.counters;
+        c.no_slot.store(stats.packets_no_slot, Ordering::Relaxed);
+        c.late.store(stats.late_packets, Ordering::Relaxed);
+        c.concealed.store(stats.concealed_frames, Ordering::Relaxed);
+    }
+}
+
+fn millis_since(epoch: Instant, at: Instant) -> u64 {
+    at.saturating_duration_since(epoch).as_millis() as u64
+}

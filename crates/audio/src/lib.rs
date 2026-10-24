@@ -9,9 +9,12 @@
 //! ([`io`]), so processing code never sees anything else. Outgoing Opus
 //! packets carry 20 ms (two frames) by default, see [`codec`].
 
+pub mod bitrate;
 pub mod codec;
 pub mod dsp;
 pub mod io;
+pub mod jitter;
+pub mod mixer;
 
 /// Internal sample rate of all audio frames, in Hz.
 pub const SAMPLE_RATE: u32 = 48_000;
