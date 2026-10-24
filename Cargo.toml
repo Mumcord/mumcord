@@ -100,7 +100,6 @@ clap = { version = "4", features = ["derive"] }
 tempfile = "3"
 
 # Tauri
-tauri = { version = "2.12", features = ["tray-icon"] }
 tauri-build = { version = "2.7", features = [] }
 tauri-plugin-single-instance = { version = "2.5", features = ["deep-link"] }
 tauri-plugin-deep-link = "2.6"
