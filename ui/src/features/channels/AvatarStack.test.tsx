@@ -141,6 +141,36 @@ describe("AvatarStack", () => {
     expect(screen.getByRole("img")).toHaveAccessibleName("2 people: Ana, Ben (talking)");
   });
 
+  it("badges muted, deafened and locally muted avatars and names their state", () => {
+    const [ana, ben, cara, dan, eve] = people(5);
+    if (!ana || !ben || !cara || !dan || !eve) throw new Error("people(5) has five people");
+    const stacked = [
+      { ...ana, user: { ...ana.user, selfMute: true } },
+      { ...ben, user: { ...ben.user, serverMute: true, localMute: true } },
+      { ...cara, user: { ...cara.user, selfDeaf: true, localMute: true } },
+      { ...dan, user: { ...dan.user, suppressed: true } },
+      eve,
+    ];
+    const { container } = render(<AvatarStack people={stacked} total={5} />);
+    const badges = Array.from(container.querySelectorAll(".avatar-stack__badge"));
+    expect(badges.map((b) => b.getAttribute("data-state"))).toEqual([
+      "self",
+      "serverMuted",
+      "localMuted",
+      "suppressed",
+    ]);
+    expect(badges.map((b) => b.querySelector("svg")?.getAttribute("data-icon"))).toEqual([
+      "mic-off",
+      "mic-off",
+      "volume-x",
+      "ban",
+    ]);
+    expect(screen.getByRole("img")).toHaveAccessibleName(
+      "5 people: Ana (muted), Ben (muted by server, muted for you), " +
+        "Cara (deafened, muted for you), Dan (suppressed (cannot speak here)), Eve",
+    );
+  });
+
   describe("on a measured line", () => {
     let report: () => void = () => undefined;
 
@@ -192,6 +222,57 @@ describe("AvatarStack", () => {
       );
       layOut(container, 19, 7);
       expect(container.querySelectorAll(".avatar")).toHaveLength(5);
+    });
+
+    it("measures the tree once and each tree level once, not every line", () => {
+      const observed: Element[] = [];
+      vi.stubGlobal(
+        "ResizeObserver",
+        class {
+          observe(target: Element) {
+            observed.push(target);
+          }
+          unobserve() {}
+          disconnect() {}
+        },
+      );
+      // Widths come from data attributes: refs attach only after the stacks' layout effects ran.
+      const reads: Record<string, number> = {};
+      const original = Object.getOwnPropertyDescriptor(HTMLElement.prototype, "clientWidth");
+      Object.defineProperty(HTMLElement.prototype, "clientWidth", {
+        configurable: true,
+        get(this: HTMLElement) {
+          const { key, rem } = this.dataset;
+          if (key) reads[key] = (reads[key] ?? 0) + 1;
+          return Number(rem ?? 0) * 16;
+        },
+      });
+      const line = (key: string, rem: number, total: number) => (
+        <div className="avatar-stack__line" data-key={key} data-rem={rem}>
+          <AvatarStack people={people(5)} total={total} />
+        </div>
+      );
+      let container: HTMLElement;
+      try {
+        ({ container } = render(
+          <div role="tree" data-rem={20}>
+            <div aria-level={2}>{line("a", 12, 9)}</div>
+            <div aria-level={2}>{line("b", 12, 9)}</div>
+            <div aria-level={3}>{line("c", 5, 14)}</div>
+          </div>,
+        ));
+      } finally {
+        // jsdom defines clientWidth on Element.prototype; the override shadows it until removed.
+        if (original) Object.defineProperty(HTMLElement.prototype, "clientWidth", original);
+        else Reflect.deleteProperty(HTMLElement.prototype, "clientWidth");
+      }
+      expect(observed).toHaveLength(1);
+      expect(observed[0]).toHaveAttribute("role", "tree");
+      expect(reads).toEqual({ a: 1, c: 1 });
+      const counts = Array.from(container.querySelectorAll(".avatar-stack")).map(
+        (stack) => stack.querySelectorAll(".avatar").length,
+      );
+      expect(counts).toEqual([5, 5, 3]);
     });
   });
 });
