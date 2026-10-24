@@ -72,7 +72,10 @@ export function VoiceStateIcon({ state }: { state: VoiceState }) {
   return <Icon name={VOICE_ICONS[state].name} />;
 }
 
-/** Visual status icons with a hover tooltip; the text equivalent comes from `useStatusText`. */
+/**
+ * Visual status icons with a hover tooltip; the text equivalent comes from `useStatusText`.
+ * Voice states come first so they line up; the registered/guest marker sits last.
+ */
 export function StatusIcons({ user, listener = false }: { user: User; listener?: boolean }) {
   const { t } = useTranslation("channels");
   if (listener) {
@@ -85,11 +88,6 @@ export function StatusIcons({ user, listener = false }: { user: User; listener?:
   const voice = voiceState(user);
   return (
     <span className="person-icons">
-      {user.registered ? (
-        <Icon name="user-check" variant="registered" tip={t("statusTip.registered")} />
-      ) : (
-        <Icon name="user-guest" variant="guest" tip={t("statusTip.unregistered")} />
-      )}
       {voice && (
         <Icon
           name={VOICE_ICONS[voice].name}
@@ -99,6 +97,11 @@ export function StatusIcons({ user, listener = false }: { user: User; listener?:
       )}
       {user.localMute && (
         <Icon name="volume-x" variant="local-muted" tip={t("statusTip.localMuted")} />
+      )}
+      {user.registered ? (
+        <Icon name="user-check" variant="registered" tip={t("statusTip.registered")} />
+      ) : (
+        <Icon name="user-guest" variant="guest" tip={t("statusTip.unregistered")} />
       )}
     </span>
   );
