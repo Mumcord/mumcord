@@ -44,6 +44,8 @@ rand = "0.9"
 sha1 = "0.10"
 rcgen = "0.14"
 p12-keystore = "0.4"
+# Only used to generate RSA identity keys (ring cannot generate RSA keys); signing stays with ring.
+rsa = { version = "0.9", default-features = false, features = ["std", "getrandom", "u64_digit"] }
 
 # Audio
 cpal = "0.18"

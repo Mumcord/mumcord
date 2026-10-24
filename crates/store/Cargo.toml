@@ -11,6 +11,7 @@ rusqlite.workspace = true
 keyring.workspace = true
 rcgen.workspace = true
 p12-keystore.workspace = true
+rsa.workspace = true
 sha1.workspace = true
 serde.workspace = true
 serde_json.workspace = true

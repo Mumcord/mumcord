@@ -1,0 +1,225 @@
+//! The single app settings record. Every field has a serde default so settings saved
+//! by an older version load cleanly and new fields need no database migration.
+
+use rusqlite::{OptionalExtension, params};
+use serde::{Deserialize, Serialize};
+
+use crate::db::Store;
+use crate::error::Result;
+
+#[derive(Debug, Clone, Copy, Default, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum ThemePreference {
+    /// Follow the OS setting (FR-1.35).
+    #[default]
+    System,
+    Dark,
+    Light,
+}
+
+#[derive(Debug, Clone, Copy, Default, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum TalkMode {
+    #[default]
+    VoiceActivation,
+    PushToTalk,
+}
+
+/// What closing the main window does while connected (FR-1.38).
+#[derive(Debug, Clone, Copy, Default, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum CloseBehaviour {
+    #[default]
+    Ask,
+    MinimizeToTray,
+    Quit,
+}
+
+/// Per-event sound toggles (FR-1.27).
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(default)]
+pub struct SoundSettings {
+    pub user_joined: bool,
+    pub user_left: bool,
+    pub self_mute: bool,
+    pub self_deafen: bool,
+    /// New message in a followed channel or private chat.
+    pub new_message: bool,
+}
+
+impl Default for SoundSettings {
+    fn default() -> Self {
+        Self {
+            user_joined: true,
+            user_left: true,
+            self_mute: true,
+            self_deafen: true,
+            new_message: true,
+        }
+    }
+}
+
+/// Overlay window placement in screen pixels.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+pub struct OverlayBounds {
+    pub x: i32,
+    pub y: i32,
+    pub width: u32,
+    pub height: u32,
+}
+
+/// Overlay options (FR-1.44, FR-1.45).
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[serde(default)]
+pub struct OverlaySettings {
+    pub enabled: bool,
+    /// Show the whole current channel instead of only who is talking.
+    pub show_whole_channel: bool,
+    /// 0.0 (transparent) – 1.0 (opaque).
+    pub opacity: f32,
+    /// `None` until the user moves or resizes the overlay.
+    pub bounds: Option<OverlayBounds>,
+}
+
+impl Default for OverlaySettings {
+    fn default() -> Self {
+        Self {
+            enabled: false,
+            show_whole_channel: false,
+            opacity: 0.9,
+            bounds: None,
+        }
+    }
+}
+
+/// Positional audio options (FR-1.41).
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[serde(default)]
+pub struct PositionalSettings {
+    pub enabled: bool,
+    /// Metres; voices are at full volume up to this distance.
+    pub min_distance: f32,
+    /// Metres; voices are fully attenuated beyond this distance.
+    pub max_distance: f32,
+}
+
+impl Default for PositionalSettings {
+    // Same defaults as the official Mumble client.
+    fn default() -> Self {
+        Self {
+            enabled: false,
+            min_distance: 1.0,
+            max_distance: 15.0,
+        }
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[serde(default)]
+pub struct Settings {
+    pub theme: ThemePreference,
+    /// UI language code (`en`, `es`, `de`); `None` follows the OS language.
+    pub language: Option<String>,
+    pub talk_mode: TalkMode,
+    pub ptt_key: Option<String>,
+    /// Device names; `None` uses the system default device.
+    pub input_device: Option<String>,
+    pub output_device: Option<String>,
+    pub noise_suppression: bool,
+    pub echo_cancellation: bool,
+    pub auto_gain: bool,
+    pub sounds: SoundSettings,
+    pub close_behaviour: CloseBehaviour,
+    pub overlay: OverlaySettings,
+    pub positional: PositionalSettings,
+    /// Identifiers of individually enabled game plugins (FR-1.42).
+    pub enabled_plugins: Vec<String>,
+}
+
+impl Default for Settings {
+    fn default() -> Self {
+        Self {
+            theme: ThemePreference::default(),
+            language: None,
+            talk_mode: TalkMode::default(),
+            ptt_key: None,
+            input_device: None,
+            output_device: None,
+            noise_suppression: true,
+            echo_cancellation: true,
+            auto_gain: true,
+            sounds: SoundSettings::default(),
+            close_behaviour: CloseBehaviour::default(),
+            overlay: OverlaySettings::default(),
+            positional: PositionalSettings::default(),
+            enabled_plugins: Vec::new(),
+        }
+    }
+}
+
+impl Store {
+    /// The saved settings, or defaults if none were saved yet.
+    pub fn settings(&self) -> Result<Settings> {
+        let json: Option<String> = self
+            .conn
+            .query_row("SELECT data FROM settings WHERE id = 1", [], |row| {
+                row.get(0)
+            })
+            .optional()?;
+        match json {
+            Some(json) => Ok(serde_json::from_str(&json)?),
+            None => Ok(Settings::default()),
+        }
+    }
+
+    pub fn save_settings(&self, settings: &Settings) -> Result<()> {
+        self.conn.execute(
+            "INSERT INTO settings (id, data) VALUES (1, ?1)
+             ON CONFLICT (id) DO UPDATE SET data = excluded.data",
+            params![serde_json::to_string(settings)?],
+        )?;
+        Ok(())
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::db::tests::temp_store;
+
+    #[test]
+    fn defaults_then_round_trip() {
+        let (_dir, store) = temp_store();
+        let defaults = store.settings().expect("load");
+        assert_eq!(defaults, Settings::default());
+        assert!(defaults.noise_suppression && defaults.echo_cancellation && defaults.auto_gain);
+        assert_eq!(defaults.talk_mode, TalkMode::VoiceActivation);
+
+        let mut changed = defaults;
+        changed.theme = ThemePreference::Light;
+        changed.talk_mode = TalkMode::PushToTalk;
+        changed.ptt_key = Some("F13".into());
+        changed.sounds.user_left = false;
+        changed.overlay.bounds = Some(OverlayBounds {
+            x: 1,
+            y: 2,
+            width: 300,
+            height: 400,
+        });
+        changed.enabled_plugins = vec!["gtav".into()];
+        store.save_settings(&changed).expect("save");
+        store.save_settings(&changed).expect("save twice");
+        assert_eq!(store.settings().expect("reload"), changed);
+    }
+
+    #[test]
+    fn partial_json_falls_back_to_defaults() {
+        let parsed: Settings =
+            serde_json::from_str(r#"{"theme":"dark","sounds":{"user_joined":false}}"#)
+                .expect("parse");
+        assert_eq!(parsed.theme, ThemePreference::Dark);
+        assert!(!parsed.sounds.user_joined);
+        assert!(parsed.sounds.user_left);
+        assert!(parsed.noise_suppression);
+    }
+}
