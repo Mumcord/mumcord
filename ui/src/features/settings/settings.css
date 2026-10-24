@@ -28,8 +28,10 @@
   color: var(--color-text);
 }
 
+/* Same violet selection bar as the channel tree; an inset shadow keeps the tab size. */
 .settings__tab[aria-selected="true"] {
-  background: var(--color-bg-hover);
+  background: var(--color-bg-selected);
+  box-shadow: inset 3px 0 0 var(--color-accent);
   color: var(--color-text);
   font-weight: var(--font-weight-bold);
 }
@@ -191,16 +193,29 @@
   margin-top: var(--space-4);
 }
 
+/* Pill buttons like .button in the shell; same padding, so the size is unchanged. */
 .settings-button {
   padding: var(--space-2) var(--space-4);
   border: 1px solid var(--color-border-strong);
-  border-radius: var(--radius-md);
+  border-radius: var(--radius-full);
   background: var(--color-bg-elevated);
   cursor: pointer;
+  transition:
+    background-color var(--duration-fast),
+    border-color var(--duration-fast),
+    filter var(--duration-fast),
+    transform var(--duration-normal) var(--ease-out);
 }
 
 .settings-button:hover {
+  border-color: var(--color-text-secondary);
   background: var(--color-bg-hover);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .settings-button:active:not(:disabled) {
+    transform: scale(0.97);
+  }
 }
 
 .settings-button:disabled {
@@ -212,13 +227,17 @@
   border-color: var(--color-accent);
   background: var(--color-accent);
   color: var(--color-on-accent);
+  font-weight: var(--font-weight-bold);
 }
 
 .settings-button--primary:hover {
+  border-color: var(--color-accent);
   background: var(--color-accent);
+  filter: brightness(1.08);
 }
 
-.settings-button--danger {
+.settings-button--danger,
+.settings-button--danger:hover {
   border-color: var(--color-danger);
   color: var(--color-danger);
 }
@@ -300,6 +319,7 @@
   overflow-y: auto;
   background: var(--color-bg-elevated);
   color: var(--color-text);
+  box-shadow: var(--shadow-raised);
 }
 
 .settings-dialog__backdrop {

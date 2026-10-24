@@ -56,7 +56,7 @@
   margin: var(--space-2) auto;
   padding: var(--space-1) var(--space-3);
   border: 1px solid var(--color-border-strong);
-  border-radius: var(--radius-md);
+  border-radius: var(--radius-full);
   background: transparent;
   color: var(--color-text-secondary);
   font-size: var(--font-size-sm);
@@ -263,6 +263,13 @@
   padding: var(--space-1);
   border-radius: var(--radius-md);
   background: var(--color-bg-elevated);
+  /* Inset line, not a border: the composer keeps its height. */
+  box-shadow: inset 0 0 0 1px var(--color-border);
+  transition: box-shadow var(--duration-fast);
+}
+
+.chat-composer__row:focus-within {
+  box-shadow: inset 0 0 0 1px var(--color-accent);
 }
 
 .chat-composer__input {

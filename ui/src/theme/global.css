@@ -1,3 +1,5 @@
+@import "@fontsource-variable/instrument-sans";
+@import "@fontsource-variable/bricolage-grotesque";
 @import "./tokens.css";
 
 /* Root size stays at the browser default (100%) so the OS/user font size scales every rem. */
@@ -49,8 +51,28 @@ textarea {
   color: inherit;
 }
 
+/* Display face for titles, as on the website; sizes and line heights stay the same. */
+h1,
+h2,
+h3 {
+  font-family: var(--font-family-display);
+  letter-spacing: var(--letter-spacing-display);
+}
+
 a {
   color: var(--color-accent-text);
+}
+
+input[type="checkbox"],
+input[type="radio"],
+input[type="range"],
+progress {
+  accent-color: var(--color-accent);
+}
+
+::selection {
+  background: var(--color-accent);
+  color: var(--color-on-accent);
 }
 
 /* One focus style everywhere: visible for keyboard users, not shown on mouse clicks. */

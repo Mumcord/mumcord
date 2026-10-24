@@ -5,16 +5,17 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgb(0 0 0 / 55%);
+  background: var(--color-backdrop);
 }
 
 .history-modal__dialog {
   max-width: 24rem;
   padding: var(--space-4);
   border: 1px solid var(--color-border-strong);
-  border-radius: var(--radius-md);
+  border-radius: var(--radius-lg);
   background: var(--color-bg-elevated);
   color: var(--color-text);
+  box-shadow: var(--shadow-raised);
 }
 
 .history-modal__dialog h2 {
@@ -32,7 +33,7 @@
 .follow-toggle {
   padding: var(--space-1) var(--space-3);
   border: 1px solid var(--color-border-strong);
-  border-radius: var(--radius-md);
+  border-radius: var(--radius-full);
   background: transparent;
   color: var(--color-text-secondary);
   font-size: var(--font-size-sm);

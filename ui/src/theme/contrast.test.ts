@@ -23,7 +23,14 @@ function colorTokens(selector: string): Map<string, string> {
   throw new Error(`No token block for ${selector}`);
 }
 
-const BACKGROUNDS = ["bg-servers", "bg-sidebar", "bg-chat", "bg-elevated", "bg-hover"];
+const BACKGROUNDS = [
+  "bg-servers",
+  "bg-sidebar",
+  "bg-chat",
+  "bg-elevated",
+  "bg-hover",
+  "bg-selected",
+];
 const TEXT = [
   "text",
   "text-secondary",
@@ -63,6 +70,14 @@ describe.each([':root[data-theme="dark"]', ':root[data-theme="light"]'])(
     it("text on the accent colour has at least 4.5:1", () => {
       expect(contrastRatio(color("on-accent"), color("accent"))).toBeGreaterThanOrEqual(4.5);
     });
+
+    // Primary buttons, the connected server and badges sit on the gradient, so every stop counts.
+    it.each(["accent-stop-1", "accent-stop-2", "accent-stop-3"])(
+      "text on gradient %s has at least 4.5:1",
+      (stop) => {
+        expect(contrastRatio(color("on-accent"), color(stop))).toBeGreaterThanOrEqual(4.5);
+      },
+    );
 
     it("defines the same colour tokens as the other theme", () => {
       const other = selector.includes("dark")

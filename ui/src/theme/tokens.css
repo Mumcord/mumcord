@@ -4,8 +4,12 @@
  * Dark is the designed default and also applies before the theme is resolved.
  */
 :root {
+  /* Same type pair as mumcord.app; both are bundled (OFL-1.1) and cover Latin only, so other
+     scripts fall back to the system font. */
   --font-family:
-    "Inter", "Segoe UI", system-ui, -apple-system, "Noto Sans", "Helvetica Neue", Arial, sans-serif;
+    "Instrument Sans Variable", "Segoe UI", system-ui, -apple-system, "Noto Sans", Arial, sans-serif;
+  --font-family-display: "Bricolage Grotesque Variable", var(--font-family);
+  --letter-spacing-display: -0.01em;
   --font-size-xs: 0.75rem;
   --font-size-sm: 0.875rem;
   --font-size-md: 1rem;
@@ -22,14 +26,16 @@
   --space-5: 1.5rem;
   --space-6: 2rem;
 
-  --radius-sm: 0.25rem;
-  --radius-md: 0.5rem;
-  --radius-lg: 1rem;
+  --radius-sm: 0.375rem;
+  --radius-md: 0.625rem;
+  --radius-tile: 0.875rem;
+  --radius-lg: 1.375rem;
   --radius-full: 9999px;
 
   --focus-ring-width: 0.1875rem;
   --duration-fast: 120ms;
   --duration-normal: 200ms;
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
 
   --width-server-bar: 4.5rem;
   --width-channels: 15rem;
@@ -39,21 +45,39 @@
 :root,
 :root[data-theme="dark"] {
   color-scheme: dark;
-  --color-bg-servers: #0e1120;
-  --color-bg-sidebar: #151a2c;
-  --color-bg-chat: #1b2035;
-  --color-bg-elevated: #232a43;
-  --color-bg-hover: #2b3351;
-  --color-text: #e9ebf5;
-  --color-text-secondary: #b9bed6;
-  --color-text-muted: #9aa1c2;
-  --color-accent: #2dd4bf;
-  --color-on-accent: #062621;
-  --color-accent-text: #5eead4;
-  --color-success: #4ade80;
+  /* Deep indigo surfaces, warm cream text and the logo's peach → pink → violet, as on mumcord.app. */
+  --color-bg-servers: #0e0a26;
+  --color-bg-sidebar: #150f38;
+  --color-bg-chat: #1a1342;
+  --color-bg-elevated: #231b55;
+  --color-bg-hover: #2c2366;
+  --color-bg-selected: #2a1f5e;
+  --color-text: #f6f0e8;
+  --color-text-secondary: #cbc3e3;
+  --color-text-muted: #aaa2cc;
+  --color-accent: #a78bff;
+  --color-on-accent: #0e0a26;
+  --color-accent-text: #ffb08a;
+  --color-success: #3ee39e;
   --color-warning: #fbbf24;
-  --color-danger: #fb8b8b;
-  --color-talking: #4ade80;
+  --color-danger: #ff8f8f;
+  --color-talking: #3ee39e;
+  /* Every stop keeps --color-on-accent at >= 4.5:1 (checked in contrast.test.ts). */
+  --color-accent-stop-1: #ffb08a;
+  --color-accent-stop-2: #ff6fa8;
+  --color-accent-stop-3: #9b7bff;
+  --gradient-accent: linear-gradient(
+    135deg,
+    var(--color-accent-stop-1),
+    var(--color-accent-stop-2) 50%,
+    var(--color-accent-stop-3)
+  );
+  --shadow-glow: 0 0.75rem 2rem -0.75rem rgb(255 111 168 / 55%);
+  --shadow-raised: 0 1rem 2.5rem -0.75rem rgb(0 0 0 / 60%);
+  --glow-talking: 0 0 0.625rem rgb(62 227 158 / 45%);
+  --glow-backdrop:
+    radial-gradient(60rem 40rem at 85% -10%, rgb(155 123 255 / 18%), transparent 60%),
+    radial-gradient(50rem 36rem at -10% 10%, rgb(255 140 120 / 10%), transparent 60%);
   /* Initials avatar backgrounds: no greens or teals (talking ring); white text >= 4.5:1. */
   --color-avatar-text: #ffffff;
   --color-avatar-1: #4f46e5;
@@ -64,29 +88,47 @@
   --color-avatar-6: #c2410c;
   --color-avatar-7: #b45309;
   --color-avatar-8: #2563eb;
-  --color-border: #2e3553;
-  --color-border-strong: #7b83a9;
-  --color-focus: #fcd34d;
-  --color-backdrop: rgb(5 7 15 / 70%);
+  --color-border: #31285f;
+  --color-border-strong: #8a80b8;
+  --color-focus: #ffb08a;
+  --color-backdrop: rgb(7 5 20 / 72%);
 }
 
 :root[data-theme="light"] {
   color-scheme: light;
-  --color-bg-servers: #dde1ee;
-  --color-bg-sidebar: #eef0f7;
+  /* Not on the website (dark only): lavender-tinted paper with the brand colours deepened for
+     contrast on white. */
+  --color-bg-servers: #dfd8f1;
+  --color-bg-sidebar: #f5f2fb;
   --color-bg-chat: #ffffff;
-  --color-bg-elevated: #e5e8f2;
-  --color-bg-hover: #d7dbea;
-  --color-text: #141a2e;
-  --color-text-secondary: #3b4262;
-  --color-text-muted: #525a7a;
-  --color-accent: #0f766e;
+  --color-bg-elevated: #eee9f8;
+  --color-bg-hover: #e2daf3;
+  --color-bg-selected: #e6dcfa;
+  --color-text: #17113a;
+  --color-text-secondary: #3d3566;
+  --color-text-muted: #544c7c;
+  --color-accent: #6a40e0;
   --color-on-accent: #ffffff;
-  --color-accent-text: #0b6560;
+  --color-accent-text: #5b34d6;
   --color-success: #136634;
-  --color-warning: #8a5300;
+  --color-warning: #7f4d00;
   --color-danger: #b01c1c;
   --color-talking: #15803d;
+  --color-accent-stop-1: #c2410c;
+  --color-accent-stop-2: #c21f62;
+  --color-accent-stop-3: #6a40e0;
+  --gradient-accent: linear-gradient(
+    135deg,
+    var(--color-accent-stop-1),
+    var(--color-accent-stop-2) 50%,
+    var(--color-accent-stop-3)
+  );
+  --shadow-glow: 0 0.75rem 1.75rem -0.75rem rgb(194 31 98 / 45%);
+  --shadow-raised: 0 1rem 2.5rem -0.75rem rgb(23 17 58 / 25%);
+  --glow-talking: 0 0 0.5rem rgb(21 128 61 / 35%);
+  --glow-backdrop:
+    radial-gradient(60rem 40rem at 85% -10%, rgb(106 64 224 / 10%), transparent 60%),
+    radial-gradient(50rem 36rem at -10% 10%, rgb(255 140 120 / 12%), transparent 60%);
   /* Initials avatar backgrounds: no greens or teals (talking ring); white text >= 4.5:1. */
   --color-avatar-text: #ffffff;
   --color-avatar-1: #4f46e5;
@@ -97,10 +139,10 @@
   --color-avatar-6: #c2410c;
   --color-avatar-7: #b45309;
   --color-avatar-8: #2563eb;
-  --color-border: #c6cbdc;
-  --color-border-strong: #6f7593;
-  --color-focus: #6d28d9;
-  --color-backdrop: rgb(20 26 46 / 45%);
+  --color-border: #d6cfe8;
+  --color-border-strong: #716894;
+  --color-focus: #c21f62;
+  --color-backdrop: rgb(23 17 58 / 45%);
 }
 
 @media (prefers-reduced-motion: reduce) {

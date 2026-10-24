@@ -19,8 +19,9 @@
 .unread-badge {
   margin-left: auto;
   padding: 0 var(--space-2);
-  border-radius: var(--radius-md);
-  background: var(--color-accent);
+  border-radius: var(--radius-full);
+  /* Logo gradient: reserved for highlights (QA.24); --color-on-accent passes on every stop. */
+  background: var(--gradient-accent);
   color: var(--color-on-accent);
   font-size: var(--font-size-sm);
   font-weight: var(--font-weight-bold);
@@ -62,9 +63,14 @@
   cursor: pointer;
 }
 
-.direct-messages__item:hover,
-.direct-messages__item[aria-current="true"] {
+.direct-messages__item:hover {
   background: var(--color-bg-hover);
+}
+
+/* Same violet selection bar as the channel tree; an inset shadow keeps the row size. */
+.direct-messages__item[aria-current="true"] {
+  background: var(--color-bg-selected);
+  box-shadow: inset 3px 0 0 var(--color-accent);
 }
 
 /* Follow star in a channel row (QA.13). The glyph is generated so it adds no treeitem text. */

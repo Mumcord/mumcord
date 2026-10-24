@@ -109,7 +109,8 @@
   overflow: hidden;
   padding: 0;
   border: 0;
-  border-radius: var(--radius-md);
+  /* Round like the website's icon buttons; the size stays 2rem. */
+  border-radius: var(--radius-full);
   background: transparent;
   color: var(--color-text);
   cursor: pointer;
@@ -130,7 +131,9 @@
   display: inline-flex;
 }
 
-/* Live input level: a fill rising from the bottom, height driven by --mic-level. */
+/* Live input level: a fill rising from the bottom, height driven by --mic-level. Green like the
+   talking ring and the settings meter: it shows the same signal (your voice), while violet means
+   selection and would read as a pressed state. */
 .userpanel__level {
   position: absolute;
   right: 0;
@@ -170,6 +173,7 @@
   border: 1px solid var(--color-border-strong);
   border-radius: var(--radius-md);
   background: var(--color-bg-elevated);
+  box-shadow: var(--shadow-raised);
   list-style: none;
 }
 
@@ -232,6 +236,9 @@
   border-radius: var(--radius-lg);
   background: var(--color-bg-chat);
   color: var(--color-text);
+  box-shadow:
+    0 0 0 1px var(--color-border),
+    var(--shadow-raised);
 }
 
 .userpanel-modal__dialog h2 {

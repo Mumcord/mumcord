@@ -6,6 +6,9 @@
   padding: var(--space-5);
   border-radius: var(--radius-lg);
   background: var(--color-bg-elevated);
+  box-shadow:
+    0 0 0 1px var(--color-border),
+    var(--shadow-raised);
   text-align: start;
 }
 
