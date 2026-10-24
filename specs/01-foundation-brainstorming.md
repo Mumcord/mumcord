@@ -994,3 +994,13 @@ Until now external images (img tags pointing to web addresses, image links) are 
 ✍️ Note: Requested in chat during /dev.
 
 ---
+
+#### QA.40 Spotify (stage 1b)? `◉`
+
+- [x] **Spotify links in the chat show a card (cover, title, artist) with "Open in browser" and an embedded player after a click, like YouTube/Twitch.**
+- [x] **"Now playing" status (opt-in in settings, default off): Mumcord reads what the user is listening to from the system's media information (Linux MPRIS, Windows media session, macOS where possible — no Spotify login) and shares it: other Mumcord users see a music icon next to the user and, in the profile, the cover (if available), title, artist and the position/progress in the song, kept in sync; official Mumble clients see a short "🎵 Artist – Title" line in the user's comment.**
+- [ ] Spotify controls inside Mumcord (needs Spotify login and a developer key) – later.
+
+✍️ Note: Asked and answered in chat during /dev ("status of now playing synced with other user … should be activated in the settings").
+
+---
