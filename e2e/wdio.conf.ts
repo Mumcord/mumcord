@@ -39,8 +39,15 @@ export const config: WebdriverIO.Config = {
     // Best effort: after a hang the session may be dead, and every command would wait for
     // connectionRetryTimeout.
     try {
-      await withTimeout(browser.saveScreenshot(join(artifactsDir, `${name}.png`)), 10_000, "screenshot");
-      writeFileSync(join(artifactsDir, `${name}.html`), await withTimeout(browser.getPageSource(), 10_000, "page source"));
+      await withTimeout(
+        browser.saveScreenshot(join(artifactsDir, `${name}.png`)),
+        10_000,
+        "screenshot",
+      );
+      writeFileSync(
+        join(artifactsDir, `${name}.html`),
+        await withTimeout(browser.getPageSource(), 10_000, "page source"),
+      );
     } catch (e) {
       console.warn(`[e2e] no failure screenshot/page source: ${String(e)}`);
     }

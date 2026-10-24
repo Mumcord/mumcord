@@ -1,5 +1,12 @@
 import { spawn, type ChildProcess } from "node:child_process";
-import { mkdtempSync, mkdirSync, readFileSync, readdirSync, readlinkSync, realpathSync } from "node:fs";
+import {
+  mkdtempSync,
+  mkdirSync,
+  readFileSync,
+  readdirSync,
+  readlinkSync,
+  realpathSync,
+} from "node:fs";
 import { createConnection } from "node:net";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
@@ -96,7 +103,8 @@ function strayPids(): { app: number[]; drivers: number[] } {
     try {
       const comm = readFileSync(`/proc/${name}/comm`, "utf8").trim();
       if (comm === "tauri-driver" || comm === "WebKitWebDriver") found.drivers.push(pid);
-      else if (readlinkSync(`/proc/${name}/exe`).replace(/ \(deleted\)$/, "") === appExe) found.app.push(pid);
+      else if (readlinkSync(`/proc/${name}/exe`).replace(/ \(deleted\)$/, "") === appExe)
+        found.app.push(pid);
     } catch {
       // Process gone or not ours.
     }
@@ -129,7 +137,10 @@ export async function killStrays(graceMs = 5_000): Promise<void> {
   }
   const all = [...pids.app, ...pids.drivers].filter(alive);
   if (!all.length) return;
-  if (pids.app.some(alive)) console.warn(`[e2e] app still running after its session ended (pids ${pids.app.join(",")}); killing it`);
+  if (pids.app.some(alive))
+    console.warn(
+      `[e2e] app still running after its session ended (pids ${pids.app.join(",")}); killing it`,
+    );
   for (const sig of ["SIGTERM", "SIGKILL"] as const) {
     for (const pid of all) {
       try {
