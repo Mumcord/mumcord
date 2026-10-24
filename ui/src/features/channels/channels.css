@@ -172,37 +172,8 @@
   color: var(--color-local-muted);
 }
 
-.tree-person__you,
-.person-icons {
+.tree-person__you {
   color: var(--color-text-muted);
-}
-
-.person-icons {
-  display: inline-flex;
-  gap: var(--space-1);
-  margin-left: auto;
-}
-
-/* Imposed by the server or an admin: red on a tinted chip, so it differs from a self mute by
-   shape as well as colour. Same box size as the other icons, so rows keep their height. */
-.person-icon--server {
-  border-radius: var(--radius-sm);
-  background: color-mix(in srgb, var(--color-danger) 22%, transparent);
-  color: var(--color-danger);
-}
-
-.person-icon--registered {
-  color: var(--color-accent);
-  opacity: 0.8;
-}
-
-.person-icon--guest {
-  stroke-dasharray: 3 2.5;
-  opacity: 0.8;
-}
-
-.person-icon--local-muted {
-  color: var(--color-local-muted);
 }
 
 .channel-tree__hint {
@@ -363,8 +334,4 @@
   margin: var(--space-2) 0 0;
   color: var(--color-text-secondary);
   font-size: var(--font-size-sm);
-}
-
-.person-icon-slot {
-  display: inline-flex;
 }

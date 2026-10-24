@@ -1,0 +1,34 @@
+/* Status icons shared by the channel tree and the member list. */
+.person-icons {
+  display: inline-flex;
+  flex: none;
+  gap: var(--space-1);
+  margin-left: auto;
+  color: var(--color-text-muted);
+}
+
+/* Imposed by the server or an admin: red on a tinted chip, so it differs from a self mute by
+   shape as well as colour. Same box size as the other icons, so rows keep their height. */
+.person-icon--server {
+  border-radius: var(--radius-sm);
+  background: color-mix(in srgb, var(--color-danger) 22%, transparent);
+  color: var(--color-danger);
+}
+
+.person-icon--registered {
+  color: var(--color-accent);
+  opacity: 0.8;
+}
+
+.person-icon--guest {
+  stroke-dasharray: 3 2.5;
+  opacity: 0.8;
+}
+
+.person-icon--local-muted {
+  color: var(--color-local-muted);
+}
+
+.person-icon-slot {
+  display: inline-flex;
+}
