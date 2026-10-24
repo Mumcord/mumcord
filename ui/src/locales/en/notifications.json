@@ -1,0 +1,13 @@
+{
+  "region": "Notifications",
+  "channel": "#{{name}}",
+  "unknownChannel": "A channel",
+  "line": "{{sender}}: {{preview}}",
+  "groupedChannel_one": "{{count}} new message in {{name}}",
+  "groupedChannel_other": "{{count}} new messages in {{name}}",
+  "groupedPrivate_one": "{{count}} new message from {{name}}",
+  "groupedPrivate_other": "{{count}} new messages from {{name}}",
+  "image": "Sent an image",
+  "open": "Open chat",
+  "close": "Dismiss notification"
+}

@@ -1,5 +1,6 @@
 import { useTranslation } from "react-i18next";
 import { LiveRegions } from "../a11y";
+import { NotificationsHost } from "../features/notifications";
 import { AppShell } from "./AppShell";
 import {
   ChannelsMount,
@@ -31,6 +32,7 @@ function MainScreen() {
         }}
       />
       {overlay === "settings" && <SettingsOverlay onClose={closeOverlay} />}
+      <NotificationsHost overlayOpen={overlay !== null} onOpenChat={closeOverlay} />
     </>
   );
 }
