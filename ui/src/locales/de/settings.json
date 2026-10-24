@@ -148,8 +148,10 @@
   "sounds": {
     "explanation": "Kurze Töne für diese Ereignisse:",
     "joinLeave": "Jemand betritt oder verlässt deinen Kanal",
+    "voiceJoin": "Du betrittst einen Sprachkanal",
     "selfMute": "Du schaltest dich stumm oder wieder laut",
     "selfDeaf": "Du schaltest den Ton aus oder wieder ein",
+    "hangUp": "Du trennst die Verbindung zu einem Server",
     "messages": "Neue Nachricht in einem gefolgten Kanal oder Privatchat"
   },
   "notifications": {

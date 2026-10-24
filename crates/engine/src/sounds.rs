@@ -1,5 +1,6 @@
 //! Notification sounds (FR-1.27): short, soft tones for people joining or leaving your channel,
-//! your own mute/deafen changes and new messages. No speech.
+//! your own mute/deafen changes, new messages, your own join of a channel for voice (QA.23) and
+//! hanging up (QA.19). No speech.
 //!
 //! The [`SoundHub`] observes the engine's own event flow ([`crate::session::Events::emit`]),
 //! tracks who is in your channel, maps events to a [`Sound`] and, if the per-event toggle in
@@ -10,6 +11,11 @@
 //! Self mute/deafen sounds follow the server's echo of your own user state, so they match
 //! what the server (and everyone else) sees. New-message sounds are requested by the chat
 //! code through [`SoundHub::play`] with [`Sound::Message`].
+//!
+//! The own join and hang-up sounds follow the user's action, not the server: the session code
+//! calls [`SoundHub::voice_join`] for an explicit join and [`SoundHub::hang_up`] before it tears
+//! down voice for a user-initiated disconnect. Automatic arrivals (read-only landing, reconnect
+//! restore) and quitting never call them.
 
 use std::collections::HashMap;
 use std::sync::{Arc, Mutex, PoisonError};
@@ -32,6 +38,10 @@ pub enum Sound {
     Undeafen,
     /// New message in a followed channel or private chat.
     Message,
+    /// You join a channel for voice yourself.
+    VoiceJoin,
+    /// You disconnect from a server yourself.
+    HangUp,
 }
 
 impl Sound {
@@ -44,6 +54,8 @@ impl Sound {
             Self::Deafen => include_bytes!("../../../assets/sounds/deafen.wav"),
             Self::Undeafen => include_bytes!("../../../assets/sounds/undeafen.wav"),
             Self::Message => include_bytes!("../../../assets/sounds/message.wav"),
+            Self::VoiceJoin => include_bytes!("../../../assets/sounds/voice_join.wav"),
+            Self::HangUp => include_bytes!("../../../assets/sounds/hang_up.wav"),
         }
     }
 
@@ -55,12 +67,24 @@ impl Sound {
             Self::Mute | Self::Unmute => s.self_mute,
             Self::Deafen | Self::Undeafen => s.self_deafen,
             Self::Message => s.new_message,
+            Self::VoiceJoin => s.voice_join,
+            Self::HangUp => s.hang_up,
         }
     }
 
     /// 48 kHz mono samples of the sound.
     pub fn samples(self) -> Vec<f32> {
         decode_wav(self.wav())
+    }
+
+    /// Samples with the mix-in gain applied.
+    fn mixed(self) -> Vec<f32> {
+        self.samples().into_iter().map(|s| s * SOUND_GAIN).collect()
+    }
+
+    /// Feedback for the user's own action, so it plays even while deafened.
+    fn own_action(self) -> bool {
+        matches!(self, Self::Undeafen | Self::VoiceJoin | Self::HangUp)
     }
 }
 
@@ -97,11 +121,22 @@ struct Known {
     deaf: bool,
 }
 
+/// The own mute/deafen state an explicit join is heading for. The server echoes the join's
+/// voice change in up to two steps (undeafen, then unmute); their cues are replaced by the
+/// join sound.
+#[derive(Clone, Copy)]
+struct Joining {
+    mute: bool,
+    deaf: bool,
+    echoes_left: u8,
+}
+
 /// Follows users and the own state to turn events into sounds.
 #[derive(Default)]
 struct Tracker {
     own: Option<u32>,
     users: HashMap<u32, Known>,
+    joining: Option<Joining>,
 }
 
 impl Tracker {
@@ -109,10 +144,37 @@ impl Tracker {
         self.own.and_then(|s| self.users.get(&s)).map(|k| k.channel)
     }
 
+    fn own_known(&self) -> Option<Known> {
+        self.own.and_then(|s| self.users.get(&s)).copied()
+    }
+
     fn own_deaf(&self) -> bool {
-        self.own
-            .and_then(|s| self.users.get(&s))
-            .is_some_and(|k| k.deaf)
+        self.own_known().is_some_and(|k| k.deaf)
+    }
+
+    /// An explicit join to `mute`/`deaf` was requested: the echoes of that change stay silent.
+    fn expect_join(&mut self, mute: bool, deaf: bool) {
+        let unchanged = self
+            .own_known()
+            .is_some_and(|k| k.mute == mute && k.deaf == deaf);
+        self.joining = (!unchanged).then_some(Joining {
+            mute,
+            deaf,
+            echoes_left: 2,
+        });
+    }
+
+    /// Whether an own voice change to `mute`/`deaf` is an echo of the pending join.
+    fn join_echo(&mut self, mute: bool, deaf: bool) -> bool {
+        let Some(mut joining) = self.joining.take() else {
+            return false;
+        };
+        joining.echoes_left -= 1;
+        let reached = joining.mute == mute && joining.deaf == deaf;
+        if !reached && joining.echoes_left > 0 {
+            self.joining = Some(joining);
+        }
+        true
     }
 
     /// Updates the state from `event`; returns the sound it calls for and whether the own
@@ -121,6 +183,7 @@ impl Tracker {
         match event {
             EngineEvent::ServerSynced(snapshot) => {
                 self.own = Some(snapshot.self_session);
+                self.joining = None;
                 self.users = snapshot
                     .users
                     .iter()
@@ -163,6 +226,9 @@ impl Tracker {
                     } else {
                         return None;
                     };
+                    if self.join_echo(u.self_mute, u.self_deaf) {
+                        return None;
+                    }
                     return Some((sound, was_deaf));
                 }
                 let own_channel = own_channel?;
@@ -192,6 +258,8 @@ pub type SampleSink = Box<dyn FnMut(&[f32]) -> bool + Send>;
 struct State {
     tracker: Tracker,
     out: Option<SampleSink>,
+    /// The own join sound, waiting for audio that is still starting (link join on connect).
+    pending_join: bool,
 }
 
 /// Maps engine events to sounds and plays them. Cheap to share.
@@ -208,6 +276,7 @@ impl SoundHub {
             state: Mutex::new(State {
                 tracker: Tracker::default(),
                 out: None,
+                pending_join: false,
             }),
         })
     }
@@ -233,7 +302,11 @@ impl SoundHub {
 
     /// Audio is open: sounds go to `out` from now on.
     pub fn attach(&self, out: SampleSink) {
-        self.state().out = Some(out);
+        let mut state = self.state();
+        state.out = Some(out);
+        if std::mem::take(&mut state.pending_join) {
+            self.play_locked(&mut state, Sound::VoiceJoin, false);
+        }
     }
 
     /// Audio closed: no sounds until the next [`attach`](Self::attach).
@@ -244,6 +317,9 @@ impl SoundHub {
     /// Feeds one engine event (called for every emitted event).
     pub fn observe(&self, event: &EngineEvent) {
         let mut state = self.state();
+        if matches!(event, EngineEvent::ServerSynced(_)) {
+            state.pending_join = false;
+        }
         if let Some((sound, was_deaf)) = state.tracker.observe(event) {
             self.play_locked(&mut state, sound, was_deaf);
         }
@@ -257,22 +333,41 @@ impl SoundHub {
         self.play_locked(&mut state, sound, deaf);
     }
 
+    /// The user joins a channel for voice themselves (QA.23); `mute`/`deaf` is the own state
+    /// the join turns on. Plays the join sound in place of the mute/deafen cues the server's
+    /// echo of that change would cause. If audio is still starting, it plays once it is up.
+    pub fn voice_join(&self, mute: bool, deaf: bool) {
+        let mut state = self.state();
+        state.tracker.expect_join(mute, deaf);
+        if state.out.is_some() {
+            self.play_locked(&mut state, Sound::VoiceJoin, false);
+        } else {
+            state.pending_join = true;
+        }
+    }
+
+    /// The user is about to end the connection themselves (QA.19). Returns the hang-up samples
+    /// (gain applied) if voice is on and the toggle allows it. The caller plays them on a path
+    /// that outlives the voice pipeline, which is torn down right after.
+    pub fn hang_up(&self) -> Option<Vec<f32>> {
+        let mut state = self.state();
+        state.pending_join = false;
+        state.tracker.joining = None;
+        (state.out.is_some() && Sound::HangUp.enabled(&(self.settings)()))
+            .then(|| Sound::HangUp.mixed())
+    }
+
     fn play_locked(&self, state: &mut State, sound: Sound, was_deaf: bool) {
-        if was_deaf && sound != Sound::Undeafen {
+        if was_deaf && !sound.own_action() {
             return;
         }
         if !sound.enabled(&(self.settings)()) {
             return;
         }
-        if let Some(out) = state.out.as_mut() {
-            let samples: Vec<f32> = sound
-                .samples()
-                .into_iter()
-                .map(|s| s * SOUND_GAIN)
-                .collect();
-            if !out(&samples) {
-                tracing::debug!("notification sound skipped: mixer input is full");
-            }
+        if let Some(out) = state.out.as_mut()
+            && !out(&sound.mixed())
+        {
+            tracing::debug!("notification sound skipped: mixer input is full");
         }
     }
 }
@@ -285,7 +380,7 @@ mod tests {
     use mumcord_audio::mixer::{Playback, PlaybackConfig, PlaybackSink};
     use mumcord_audio::{FRAME_SAMPLES, Frame};
 
-    const ALL: [Sound; 7] = [
+    const ALL: [Sound; 9] = [
         Sound::UserJoined,
         Sound::UserLeft,
         Sound::Mute,
@@ -293,6 +388,8 @@ mod tests {
         Sound::Deafen,
         Sound::Undeafen,
         Sound::Message,
+        Sound::VoiceJoin,
+        Sound::HangUp,
     ];
 
     fn user(session: u32, channel_id: u32, mute: bool, deaf: bool) -> UserView {
@@ -401,6 +498,8 @@ mod tests {
             self_mute: false,
             self_deafen: false,
             new_message: false,
+            voice_join: false,
+            hang_up: false,
         };
         for s in ALL {
             assert!(s.enabled(&SoundSettings::default()), "{s:?}");
@@ -484,6 +583,179 @@ mod tests {
             assert!(peak_dbfs(&samples) <= -12.0, "{s:?} too loud");
             assert!(peak_dbfs(&samples) > -40.0, "{s:?} inaudible");
         }
+    }
+
+    /// Lengths of the played sounds; compared with [`lens`] of the expected ones. Paired
+    /// sounds (mute/unmute …) share a length, the join and hang-up sounds have their own.
+    fn played(log: &Mutex<Vec<usize>>) -> Vec<usize> {
+        log.lock().unwrap().clone()
+    }
+
+    fn lens(sounds: &[Sound]) -> Vec<usize> {
+        sounds.iter().map(|s| s.samples().len()).collect()
+    }
+
+    #[test]
+    fn own_and_join_sounds_are_distinct() {
+        let len = |s: Sound| s.samples().len();
+        for s in [
+            Sound::UserJoined,
+            Sound::Mute,
+            Sound::Deafen,
+            Sound::Message,
+            Sound::HangUp,
+        ] {
+            assert_ne!(len(s), len(Sound::VoiceJoin), "{s:?}");
+        }
+        for s in [
+            Sound::UserJoined,
+            Sound::Mute,
+            Sound::Deafen,
+            Sound::Message,
+        ] {
+            assert_ne!(len(s), len(Sound::HangUp), "{s:?}");
+        }
+    }
+
+    /// Joining from the read-only landing: the join sound plays although still deafened, and
+    /// replaces the undeafen and unmute cues of the server's two-step echo.
+    #[test]
+    fn join_from_read_only_plays_join_instead_of_echo_cues() {
+        let (hub, log) = hub_with_log(SoundSettings::default());
+        hub.observe(&synced(vec![
+            user(1, 10, true, true),
+            user(2, 11, false, false),
+        ]));
+        hub.voice_join(false, false);
+        assert_eq!(played(&log), lens(&[Sound::VoiceJoin]));
+        hub.observe(&EngineEvent::UserUpserted(user(1, 11, true, true)));
+        hub.observe(&EngineEvent::UserUpserted(user(1, 11, true, false)));
+        hub.observe(&EngineEvent::UserUpserted(user(1, 11, false, false)));
+        assert_eq!(
+            played(&log),
+            lens(&[Sound::VoiceJoin]),
+            "echo cues replaced"
+        );
+        hub.observe(&EngineEvent::UserUpserted(user(1, 11, true, false)));
+        assert_eq!(
+            played(&log),
+            lens(&[Sound::VoiceJoin, Sound::Mute]),
+            "later own changes sound again"
+        );
+    }
+
+    #[test]
+    fn join_without_voice_change_keeps_later_cues() {
+        let (hub, log) = hub_with_log(SoundSettings::default());
+        hub.observe(&synced(vec![user(1, 10, false, false)]));
+        hub.voice_join(false, false);
+        hub.observe(&EngineEvent::UserUpserted(user(1, 12, false, false)));
+        hub.observe(&EngineEvent::UserUpserted(user(1, 12, true, false)));
+        assert_eq!(played(&log), lens(&[Sound::VoiceJoin, Sound::Mute]));
+    }
+
+    #[test]
+    fn unreached_join_stops_swallowing_after_two_echoes() {
+        let (hub, log) = hub_with_log(SoundSettings::default());
+        hub.observe(&synced(vec![user(1, 10, true, true)]));
+        hub.voice_join(false, false);
+        hub.observe(&EngineEvent::UserUpserted(user(1, 10, true, false)));
+        hub.observe(&EngineEvent::UserUpserted(user(1, 10, true, true)));
+        hub.observe(&EngineEvent::UserUpserted(user(1, 10, true, false)));
+        assert_eq!(played(&log), lens(&[Sound::VoiceJoin, Sound::Undeafen]));
+    }
+
+    /// Arrivals the user did not ask for never play the join sound: the read-only landing of a
+    /// fresh connect and the restore of channel and mute state after a reconnect.
+    #[test]
+    fn no_join_sound_for_read_only_landing_or_reconnect_restore() {
+        let (hub, log) = hub_with_log(SoundSettings::default());
+        hub.observe(&synced(vec![user(1, 10, false, false)]));
+        hub.observe(&EngineEvent::UserUpserted(user(1, 10, true, true)));
+        hub.observe(&synced(vec![user(1, 10, false, false)]));
+        hub.observe(&EngineEvent::UserUpserted(user(1, 14, false, false)));
+        hub.observe(&EngineEvent::UserUpserted(user(1, 14, true, false)));
+        assert!(!played(&log).contains(&Sound::VoiceJoin.samples().len()));
+    }
+
+    #[test]
+    fn join_sound_waits_for_starting_audio() {
+        let hub = SoundHub::new(SoundSettings::default);
+        let log = Arc::new(Mutex::new(Vec::new()));
+        let attach = |hub: &SoundHub| {
+            let l = log.clone();
+            hub.attach(Box::new(move |s| {
+                l.lock().unwrap().push(s.len());
+                true
+            }));
+        };
+        hub.observe(&synced(vec![user(1, 10, false, false)]));
+        hub.voice_join(true, false);
+        attach(&hub);
+        assert_eq!(
+            played(&log),
+            lens(&[Sound::VoiceJoin]),
+            "plays once audio is up"
+        );
+        hub.detach();
+        attach(&hub);
+        assert_eq!(played(&log), lens(&[Sound::VoiceJoin]), "only once");
+
+        hub.detach();
+        hub.voice_join(false, false);
+        hub.observe(&synced(vec![user(1, 10, false, false)]));
+        attach(&hub);
+        assert_eq!(
+            played(&log),
+            lens(&[Sound::VoiceJoin]),
+            "a new connection drops a stale join"
+        );
+    }
+
+    #[test]
+    fn join_sound_toggle() {
+        let (hub, log) = hub_with_log(SoundSettings {
+            voice_join: false,
+            ..SoundSettings::default()
+        });
+        hub.observe(&synced(vec![user(1, 10, true, true)]));
+        hub.voice_join(false, false);
+        hub.observe(&EngineEvent::UserUpserted(user(1, 10, true, false)));
+        assert!(
+            played(&log).is_empty(),
+            "off: no join sound, echo still replaced"
+        );
+    }
+
+    #[test]
+    fn hang_up_needs_voice_and_toggle() {
+        let (hub, _log) = hub_with_log(SoundSettings::default());
+        hub.observe(&synced(vec![user(1, 10, true, true)]));
+        let samples = hub.hang_up().expect("voice on, toggle on, also read-only");
+        assert_eq!(samples.len(), Sound::HangUp.samples().len());
+
+        let (off, _log) = hub_with_log(SoundSettings {
+            hang_up: false,
+            ..SoundSettings::default()
+        });
+        assert!(off.hang_up().is_none(), "toggle off");
+
+        hub.detach();
+        assert!(hub.hang_up().is_none(), "no voice, nothing to hang up");
+    }
+
+    #[test]
+    fn hang_up_drops_a_pending_join() {
+        let hub = SoundHub::new(SoundSettings::default);
+        hub.voice_join(false, false);
+        assert!(hub.hang_up().is_none());
+        let log = Arc::new(Mutex::new(Vec::new()));
+        let l = log.clone();
+        hub.attach(Box::new(move |s| {
+            l.lock().unwrap().push(s.len());
+            true
+        }));
+        assert!(log.lock().unwrap().is_empty());
     }
 
     struct Capture(Arc<Mutex<Vec<f32>>>);

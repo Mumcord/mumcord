@@ -116,7 +116,7 @@ Some server denials arrive later, not as a reply to a command. Those come as the
 - `pttCompatibilityMode`: boolean, default `false`. Linux Wayland only: "Compatibility mode (like TeamSpeak)". Read before GTK starts: when on, Mumcord sets `GDK_BACKEND=x11` (unless the user set it), runs through XWayland and uses the X11 push-to-talk path for keys and mouse buttons (no portal, no evdev). Takes effect after `app_restart` (FR-1.48).
 - `inputDevice`, `outputDevice`: device id, or `null` for the OS default.
 - `noiseSuppression`, `echoCancellation`, `autoGain`: boolean.
-- `sounds`: `{ joinLeave, selfMute, selfDeaf, messages }`.
+- `sounds`: `{ joinLeave, selfMute, selfDeaf, messages, voiceJoin, hangUp }`. `voiceJoin` plays when the user joins a channel for voice themselves (join command or a link with a channel; not the read-only landing or a reconnect). `hangUp` plays on `disconnect` and when `connect` replaces a connection with voice on, not on quit or connection loss.
 - `notifications`: `"inApp" | "desktop" | "both" | "off"` (default `"both"`, FR-1.48c). In-app: toasts while the window has focus, nothing otherwise. Desktop: system notifications, also while focused. Both: toasts while focused, system notifications otherwise. Never for the chat on screen while focused.
 - `closeBehaviour`: `ask` / `minimizeToTray` / `quit`.
 - `chatDisplay`: `"cozy" | "compact"` (default `"cozy"`, FR-1.48a, QA.25). Cozy: avatar per message group, name and time above the indented text. Compact: no avatars, time, name and text on one line.

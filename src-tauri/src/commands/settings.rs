@@ -98,6 +98,10 @@ pub struct SoundSettings {
     pub self_mute: bool,
     pub self_deaf: bool,
     pub messages: bool,
+    /// You join a channel for voice yourself (QA.23).
+    pub voice_join: bool,
+    /// You disconnect from a server yourself (QA.19).
+    pub hang_up: bool,
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, Type)]
@@ -170,6 +174,8 @@ impl Settings {
                 self_mute: s.sounds.self_mute,
                 self_deaf: s.sounds.self_deafen,
                 messages: s.sounds.new_message,
+                voice_join: s.sounds.voice_join,
+                hang_up: s.sounds.hang_up,
             },
             notifications: s.notifications.into(),
             close_behaviour: match s.close_behaviour {
@@ -227,6 +233,8 @@ impl Settings {
         s.sounds.self_mute = self.sounds.self_mute;
         s.sounds.self_deafen = self.sounds.self_deaf;
         s.sounds.new_message = self.sounds.messages;
+        s.sounds.voice_join = self.sounds.voice_join;
+        s.sounds.hang_up = self.sounds.hang_up;
         s.notifications = self.notifications.into();
         s.close_behaviour = match self.close_behaviour {
             CloseBehaviour::Ask => store::CloseBehaviour::Ask,
@@ -339,6 +347,7 @@ mod tests {
         ui.talk_mode = TalkMode::PushToTalk;
         ui.ptt_key = Some("Ctrl+A".into());
         ui.sounds.join_leave = false;
+        ui.sounds.hang_up = false;
         ui.log_level = LogLevel::Debug;
         ui.input_device = Some(String::new());
         ui.send_default_avatar = false;
@@ -355,6 +364,7 @@ mod tests {
         assert_eq!(stored.enabled_plugins, ["gtav"]);
         assert!(stored.wizard_completed);
         assert!(!stored.sounds.user_joined && !stored.sounds.user_left);
+        assert!(!stored.sounds.hang_up && stored.sounds.voice_join);
         assert_eq!(stored.log_level, store::LogLevel::Debug);
         assert_eq!(
             stored.input_device, None,

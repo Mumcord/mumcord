@@ -19,7 +19,7 @@ use mumcord_audio::codec::{MAX_PACKET_BYTES, OpusEncoder, PacketDuration};
 use mumcord_audio::dsp::{DspChain, DspControls, EchoRefConsumer, Gate, MicTest, echo_reference};
 use mumcord_audio::io::{AudioIo, DeviceEvent, DeviceInfo, Direction, FrameSink, FrameSource};
 use mumcord_audio::mixer::{PacketSender, Playback, PlaybackConfig, PlaybackSink};
-use mumcord_audio::{FRAME_SAMPLES, Frame};
+use mumcord_audio::{FRAME_SAMPLES, Frame, SAMPLE_RATE};
 use mumcord_protocol::{OutgoingAudio, VoiceTransport};
 use tokio::runtime::Handle as Runtime;
 use tokio::task::JoinHandle as TaskHandle;
@@ -34,6 +34,8 @@ const METER_INTERVAL: Duration = Duration::from_millis(50);
 const TALK_POLL: Duration = Duration::from_millis(20);
 /// Longest mic-test recording (B8: record, then play back).
 pub const MIC_TEST_MAX: Duration = Duration::from_secs(5);
+/// How long the hang-up player outlives its sound: covers the mixer's and the device's queues.
+const TAIL_MARGIN: Duration = Duration::from_millis(250);
 /// Initial encoder bitrate until the bitrate controller reports a target.
 const START_BITRATE_BPS: u32 = 72_000;
 
@@ -123,6 +125,32 @@ impl Audio {
     pub fn return_devices(&mut self, source: FrameSource, sink: FrameSink) {
         self.source = Some(source);
         self.sink.with(|slot| *slot = Some(sink));
+    }
+
+    /// Plays `samples` independent of any voice pipeline (the hang-up sound, QA.19): a
+    /// short-lived mixer feeds the shared sink and, together with the devices, lives until the
+    /// sound is through, even if this `Audio` is released right after. Call it once the voice
+    /// pipeline has stopped, so only one mixer writes to the sink. Never blocks.
+    pub fn play_tail(&self, rt: &Runtime, samples: &[f32]) {
+        let (playback, ports) = match Playback::start(self.sink.clone(), PlaybackConfig::default())
+        {
+            Ok(started) => started,
+            Err(e) => {
+                tracing::warn!(error = %e, "hang-up sound: starting playback failed");
+                return;
+            }
+        };
+        let mut mix_in = ports.mix_in;
+        if samples.iter().any(|&s| mix_in.push(s).is_err()) {
+            tracing::debug!("hang-up sound cut short: mixer input is full");
+        }
+        let io = self.io.clone();
+        let linger =
+            Duration::from_secs_f64(samples.len() as f64 / f64::from(SAMPLE_RATE)) + TAIL_MARGIN;
+        rt.spawn(async move {
+            tokio::time::sleep(linger).await;
+            drop((playback, mix_in, io));
+        });
     }
 }
 

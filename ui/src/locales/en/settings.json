@@ -148,8 +148,10 @@
   "sounds": {
     "explanation": "Short sounds for these events:",
     "joinLeave": "Someone joins or leaves your channel",
+    "voiceJoin": "You join a channel for voice",
     "selfMute": "You mute or unmute yourself",
     "selfDeaf": "You deafen or undeafen yourself",
+    "hangUp": "You disconnect from a server",
     "messages": "New message in a followed channel or private chat"
   },
   "notifications": {

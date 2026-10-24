@@ -201,9 +201,33 @@ describe("SettingsScreen", () => {
     await waitFor(() => {
       expect(update).toHaveBeenCalledWith(
         expect.objectContaining({
-          sounds: { joinLeave: true, selfMute: false, selfDeaf: true, messages: true },
+          sounds: {
+            joinLeave: true,
+            selfMute: false,
+            selfDeaf: true,
+            messages: true,
+            voiceJoin: true,
+            hangUp: true,
+          },
         }),
       );
+    });
+  });
+
+  it("toggles the own join and hang-up sounds separately", async () => {
+    const update = vi.spyOn(api, "settingsUpdate");
+    await openSection("Sounds & notifications");
+    const join = screen.getByRole("switch", { name: "You join a channel for voice" });
+    const hangUp = screen.getByRole("switch", { name: "You disconnect from a server" });
+    expect(join).toBeChecked();
+    expect(hangUp).toBeChecked();
+    fireEvent.click(hangUp);
+    await waitFor(() => {
+      expect(update.mock.lastCall?.[0].sounds).toMatchObject({ voiceJoin: true, hangUp: false });
+    });
+    fireEvent.click(screen.getByRole("switch", { name: "You join a channel for voice" }));
+    await waitFor(() => {
+      expect(update.mock.lastCall?.[0].sounds).toMatchObject({ voiceJoin: false, hangUp: false });
     });
   });
 

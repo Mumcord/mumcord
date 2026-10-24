@@ -333,12 +333,15 @@ impl Engine {
         // Taken even when a link joins a channel: the offer is for the first connect only.
         let rejoin = lock(&self.inner.rejoin_offers).remove(&server_id);
         let rejoin = rejoin.filter(|_| channel_path.is_none());
+        // Switching servers ends the current connection on the user's request.
+        self.inner.hang_up(&mut lock(&self.inner.core));
         self.inner.start(server_id, channel_path, rejoin);
         Ok(())
     }
 
     /// Disconnects and cancels reconnecting or a pending trust question.
     pub fn disconnect(&self) {
+        self.inner.hang_up(&mut lock(&self.inner.core));
         self.shutdown();
         self.inner.forget_voice_channel();
     }
@@ -424,6 +427,19 @@ impl Engine {
                 .map_err(convert::command_error)?;
         }
         let own = self.inner.own_voice();
+        let joined = {
+            let mut voice = lock(&self.inner.core).self_voice;
+            let joins = joins_voice(!here, voice);
+            voice.join(own);
+            joins.then_some(voice)
+        };
+        // Before the voice change is sent, so the hub knows its echo when it arrives.
+        if let Some(voice) = joined {
+            self.inner
+                .events
+                .sounds()
+                .voice_join(voice.mute, voice.deaf);
+        }
         self.inner.change_self_voice(|v| v.join(own))
     }
 
@@ -644,6 +660,22 @@ impl Inner {
         }
         self.events
             .emit(EngineEvent::StateChanged(core.machine.state().clone()));
+    }
+
+    /// The user ends the connection (disconnect or server switch, not quitting): plays the
+    /// hang-up sound (QA.19) if voice is on. The pipeline stops first and the sound runs on its
+    /// own short-lived player, so tearing down voice and closing the devices cannot cut it off.
+    fn hang_up(&self, core: &mut Core) {
+        if core.session.is_none() {
+            return;
+        }
+        let Some(samples) = self.events.sounds().hang_up() else {
+            return;
+        };
+        self.stop_pipeline(core);
+        if let Some(audio) = core.audio.as_ref() {
+            audio.play_tail(&self.rt, &samples);
+        }
     }
 
     fn release_audio_if_idle(&self, core: &mut Core) {
@@ -883,6 +915,7 @@ impl Inner {
         self.voice.reset_link();
         let (pump_tx, mut pump_rx) = mpsc::unbounded_channel();
         let default_channel_id = handle.with_state(|s| s.own_user().map(|u| u.channel_id));
+        let link_join = matches!(arrival, Arrival::Fresh(Some(_)));
         let (followed, rejoin_offer) = self.post_sync(server_id, &handle, arrival);
 
         let registered = self.transition(generation, |core| {
@@ -917,6 +950,12 @@ impl Inner {
             extension::on_synced(&ctx, &mut snapshot);
             self.events
                 .emit(EngineEvent::ServerSynced(Box::new(snapshot)));
+        }
+        // A link naming a channel is an explicit join (QA.23); after `ServerSynced`, which
+        // resets the sound hub's view of the own state.
+        if link_join {
+            let voice = lock(&self.core).self_voice;
+            self.events.sounds().voice_join(voice.mute, voice.deaf);
         }
         // On every sync, reconnects included: the server forgets the avatar of an
         // unregistered user whenever the connection ends (QA.10). In the background:
@@ -1521,6 +1560,13 @@ async fn start_voice(
     }
 }
 
+/// Whether an explicit join turns voice on in a new way and so gets the join sound (QA.23):
+/// moving to another channel, or leaving read-only in the current one. Re-joining the channel
+/// one already talks in changes nothing audible.
+fn joins_voice(moves: bool, voice: SelfVoice) -> bool {
+    moves || voice.own().is_none()
+}
+
 #[cfg(test)]
 mod declined_kind_tests {
     use super::*;
@@ -1529,5 +1575,25 @@ mod declined_kind_tests {
     fn declined_changed_cert_keeps_its_kind() {
         assert_eq!(declined_kind(true), ErrorKind::CertificateChanged);
         assert_eq!(declined_kind(false), ErrorKind::CertificateRejected);
+    }
+
+    #[test]
+    fn join_sound_only_when_voice_changes() {
+        let read_only = SelfVoice::read_only();
+        let mut talking = SelfVoice::read_only();
+        talking.join(OwnVoice::default());
+        assert!(joins_voice(true, read_only), "joining another channel");
+        assert!(
+            joins_voice(false, read_only),
+            "leaving read-only by joining here"
+        );
+        assert!(
+            joins_voice(true, talking),
+            "moving to another channel with voice on"
+        );
+        assert!(
+            !joins_voice(false, talking),
+            "re-joining the channel one talks in"
+        );
     }
 }

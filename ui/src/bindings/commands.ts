@@ -637,6 +637,10 @@ export type SoundSettings = {
 	selfMute: boolean,
 	selfDeaf: boolean,
 	messages: boolean,
+	/**  You join a channel for voice yourself (QA.23). */
+	voiceJoin: boolean,
+	/**  You disconnect from a server yourself (QA.19). */
+	hangUp: boolean,
 };
 
 export type TalkMode = "voiceActivation" | "pushToTalk";

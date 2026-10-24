@@ -5,7 +5,14 @@ import { Group, Section } from "../components/Section";
 import { Switch } from "../components/Switch";
 import type { SettingsSectionProps } from "./types";
 
-const EVENTS: (keyof SoundSettings)[] = ["joinLeave", "selfMute", "selfDeaf", "messages"];
+const EVENTS: (keyof SoundSettings)[] = [
+  "joinLeave",
+  "voiceJoin",
+  "selfMute",
+  "selfDeaf",
+  "hangUp",
+  "messages",
+];
 const NOTIFICATION_MODES: NotificationMode[] = ["both", "inApp", "desktop", "off"];
 
 /**

@@ -81,6 +81,10 @@ pub struct SoundSettings {
     pub self_deafen: bool,
     /// New message in a followed channel or private chat.
     pub new_message: bool,
+    /// You join a channel for voice yourself (QA.23).
+    pub voice_join: bool,
+    /// You disconnect from a server yourself (QA.19).
+    pub hang_up: bool,
 }
 
 impl Default for SoundSettings {
@@ -91,6 +95,8 @@ impl Default for SoundSettings {
             self_mute: true,
             self_deafen: true,
             new_message: true,
+            voice_join: true,
+            hang_up: true,
         }
     }
 }
@@ -293,6 +299,8 @@ mod tests {
         changed.talk_mode = TalkMode::PushToTalk;
         changed.ptt_key = Some("F13".into());
         changed.sounds.user_left = false;
+        changed.sounds.voice_join = false;
+        changed.sounds.hang_up = false;
         changed.overlay.bounds = Some(OverlayBounds {
             x: 1,
             y: 2,
@@ -348,6 +356,10 @@ mod tests {
         assert_eq!(parsed.chat_display, ChatDisplay::Cozy);
         assert!(!parsed.sounds.user_joined);
         assert!(parsed.sounds.user_left);
+        assert!(
+            parsed.sounds.voice_join && parsed.sounds.hang_up,
+            "new sounds are on for settings saved before they existed"
+        );
         assert!(parsed.noise_suppression);
         assert!(!parsed.wizard_completed);
         assert_eq!(parsed.log_level, LogLevel::Info);
