@@ -86,6 +86,16 @@ const MIGRATIONS: &[&str] = &[
     r"
     ALTER TABLE saved_server ADD COLUMN voice_channel TEXT;
     ",
+    // v5: the avatar remembered per server (hand-set or the default avatar, as a scaled PNG),
+    // sent again on connect when the server keeps none for the user (FR-1.20, QA.10).
+    // Servers that already got the default avatar are marked for a one-time backfill with
+    // it; the image lives in a file, so the engine fills it in at start.
+    r"
+    ALTER TABLE saved_server ADD COLUMN avatar BLOB;
+    ALTER TABLE saved_server ADD COLUMN avatar_backfill INTEGER NOT NULL DEFAULT 0
+        CHECK (avatar_backfill IN (0, 1));
+    UPDATE saved_server SET avatar_backfill = 1 WHERE default_avatar_sent = 1;
+    ",
 ];
 
 /// Handle to the local database. Not `Sync`; callers share it behind a mutex.
@@ -198,6 +208,72 @@ pub(crate) mod tests {
         let servers = store.servers().expect("servers");
         assert_eq!(servers.len(), 1);
         assert!(!store.default_avatar_sent(servers[0].id).expect("flag"));
+        assert_eq!(store.server_avatar(servers[0].id).expect("avatar"), None);
+    }
+
+    #[test]
+    fn version_4_servers_with_the_default_avatar_sent_are_backfilled_once() {
+        let dir = tempfile::tempdir().expect("tempdir");
+        {
+            let mut conn = Connection::open(dir.path().join(DB_FILE_NAME)).expect("open");
+            let tx = conn.transaction().expect("tx");
+            for sql in &MIGRATIONS[..4] {
+                tx.execute_batch(sql).expect("old schema");
+            }
+            tx.pragma_update(None, "user_version", 4).expect("pragma");
+            tx.execute_batch(
+                "INSERT INTO saved_server (label, address, username, sort_order, default_avatar_sent)
+                 VALUES ('Sent', 'localhost', 'Tester', 0, 1), ('Fresh', 'other', 'Tester', 1, 0);",
+            )
+            .expect("insert");
+            tx.commit().expect("commit");
+        }
+        let store = Store::open(dir.path()).expect("upgrade");
+        let ids: Vec<_> = store
+            .servers()
+            .expect("servers")
+            .iter()
+            .map(|s| s.id)
+            .collect();
+        let (sent, fresh) = (ids[0], ids[1]);
+
+        assert_eq!(
+            store
+                .backfill_server_avatars(Some(b"default"))
+                .expect("backfill"),
+            1
+        );
+        assert_eq!(
+            store.server_avatar(sent).expect("avatar").as_deref(),
+            Some(&b"default"[..])
+        );
+        assert_eq!(store.server_avatar(fresh).expect("avatar"), None);
+        assert!(!store.default_avatar_sent(fresh).expect("flag"));
+
+        // Only once: a later removal by hand is not undone by the next start.
+        store.set_server_avatar(sent, None).expect("remove");
+        assert_eq!(
+            store.backfill_server_avatars(Some(b"new")).expect("again"),
+            0
+        );
+        assert_eq!(store.server_avatar(sent).expect("avatar"), None);
+    }
+
+    #[test]
+    fn backfill_without_a_default_avatar_remembers_nothing() {
+        let (_dir, store) = temp_store();
+        let id = store
+            .add_server(&crate::NewServer::new("A", "a", "Tester"))
+            .expect("add")
+            .id;
+        store.set_default_avatar_sent(id).expect("sent");
+        store
+            .conn
+            .execute("UPDATE saved_server SET avatar_backfill = 1", [])
+            .expect("mark");
+        assert_eq!(store.backfill_server_avatars(None).expect("backfill"), 1);
+        assert_eq!(store.server_avatar(id).expect("avatar"), None);
+        assert_eq!(store.backfill_server_avatars(Some(b"x")).expect("again"), 0);
     }
 
     #[test]

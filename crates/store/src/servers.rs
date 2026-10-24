@@ -196,6 +196,41 @@ impl Store {
         expect_one(changed, id)
     }
 
+    /// The avatar remembered for this server as image bytes; `None` if there is none
+    /// (FR-1.20, QA.10).
+    pub fn server_avatar(&self, id: ServerId) -> Result<Option<Vec<u8>>> {
+        self.conn
+            .query_row(
+                "SELECT avatar FROM saved_server WHERE id = ?1",
+                [id],
+                |row| row.get(0),
+            )
+            .optional()?
+            .ok_or(Error::UnknownServer(id))
+    }
+
+    /// Remembers the avatar the user has on this server; `None` remembers "no avatar". Also
+    /// marks the default avatar as handled, so it never replaces a choice made here.
+    pub fn set_server_avatar(&self, id: ServerId, avatar: Option<&[u8]>) -> Result<()> {
+        let changed = self.conn.execute(
+            "UPDATE saved_server SET avatar = ?2, default_avatar_sent = 1, avatar_backfill = 0
+             WHERE id = ?1",
+            params![id, avatar],
+        )?;
+        expect_one(changed, id)
+    }
+
+    /// One-time backfill for servers that got the default avatar before avatars were
+    /// remembered per server: they remember `default` (the current default avatar; `None`
+    /// if none is set). Returns how many servers were handled (QA.10).
+    pub fn backfill_server_avatars(&self, default: Option<&[u8]>) -> Result<usize> {
+        Ok(self.conn.execute(
+            "UPDATE saved_server SET avatar = COALESCE(avatar, ?1), avatar_backfill = 0
+             WHERE avatar_backfill = 1",
+            [default],
+        )?)
+    }
+
     /// Sets the server-bar order to the given sequence of ids. Servers not listed
     /// keep their relative order after the listed ones.
     pub fn reorder_servers(&self, ordered_ids: &[ServerId]) -> Result<()> {
@@ -330,6 +365,45 @@ mod tests {
         ));
         assert!(matches!(
             store.set_default_avatar_sent(999),
+            Err(Error::UnknownServer(999))
+        ));
+    }
+
+    #[test]
+    fn server_avatar_is_remembered_per_server_and_marks_the_default_handled() {
+        let (_dir, store) = temp_store();
+        let a = store
+            .add_server(&NewServer::new("A", "a.example", "Tester"))
+            .expect("add");
+        let b = store
+            .add_server(&NewServer::new("B", "b.example", "Tester"))
+            .expect("add");
+        assert_eq!(store.server_avatar(a.id).expect("avatar"), None);
+
+        store.set_server_avatar(a.id, Some(b"png")).expect("set");
+        assert_eq!(
+            store.server_avatar(a.id).expect("avatar").as_deref(),
+            Some(&b"png"[..])
+        );
+        assert!(store.default_avatar_sent(a.id).expect("flag"));
+        let mut edited = store.server(a.id).expect("load").expect("exists");
+        edited.label = "A2".into();
+        store.update_server(&edited).expect("update");
+        assert!(store.server_avatar(a.id).expect("avatar").is_some());
+        assert_eq!(store.server_avatar(b.id).expect("avatar"), None);
+        assert!(!store.default_avatar_sent(b.id).expect("flag"));
+
+        // Removed by hand: "no avatar" is remembered and the default stays handled.
+        store.set_server_avatar(a.id, None).expect("clear");
+        assert_eq!(store.server_avatar(a.id).expect("avatar"), None);
+        assert!(store.default_avatar_sent(a.id).expect("flag"));
+
+        assert!(matches!(
+            store.server_avatar(999),
+            Err(Error::UnknownServer(999))
+        ));
+        assert!(matches!(
+            store.set_server_avatar(999, None),
             Err(Error::UnknownServer(999))
         ));
     }
