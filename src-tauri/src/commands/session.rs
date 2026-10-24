@@ -1,7 +1,10 @@
 //! Connection lifecycle, certificate trust, server snapshot and self mute/deafen
 //! (FR-1.9, FR-1.10, FR-1.12–1.14, FR-1.22, FR-1.26).
 
-use mumcord_engine::{ConnState, Engine, ServerInfoView, Snapshot, UnreadView, VoiceTransportKind};
+use mumcord_engine::{
+    ConnState, ConnectionStatsView, Engine, ServerInfoView, Snapshot, UnreadView,
+    VoiceTransportKind,
+};
 use serde::{Deserialize, Serialize};
 use specta::Type;
 use tauri::State;
@@ -75,6 +78,26 @@ pub enum Transport {
     Udp,
     /// UDP blocked; voice tunnelled through the TCP connection.
     Tcp,
+}
+
+/// Live link figures for the connection info panel (AC-1.23). Polled by the UI while the
+/// panel is open; counters restart with every (re)connection.
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Type)]
+#[serde(rename_all = "camelCase")]
+pub struct ConnectionStats {
+    /// `null` when the voice transport could not be started.
+    pub transport: Option<Transport>,
+    /// Smoothed UDP ping; `null` until measured and while tunnelling over TCP.
+    pub rtt_ms: Option<f32>,
+    /// Recent packet loss in whole percent, 0–100 (an integer, because specta exports floats
+    /// as nullable).
+    pub loss_percent: u8,
+    /// Current Opus encoder target set by the adaptive bitrate controller.
+    pub send_bitrate_kbps: u32,
+    /// The server's bandwidth limit per user, if announced.
+    pub server_max_bandwidth_kbps: Option<u32>,
+    pub packets_sent: u32,
+    pub packets_received: u32,
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, Type, Event)]
@@ -187,6 +210,22 @@ impl From<VoiceTransportKind> for Transport {
     }
 }
 
+impl From<ConnectionStatsView> for ConnectionStats {
+    fn from(v: ConnectionStatsView) -> Self {
+        // 64-bit integers are not exported to TS; a session never gets near u32::MAX packets.
+        let count = |n: u64| u32::try_from(n).unwrap_or(u32::MAX);
+        Self {
+            transport: v.transport.map(Transport::from),
+            rtt_ms: v.rtt_ms,
+            loss_percent: v.loss_percent.round().clamp(0.0, 100.0) as u8,
+            send_bitrate_kbps: v.send_bitrate_bps / 1000,
+            server_max_bandwidth_kbps: v.server_max_bandwidth_bps.map(|b| b / 1000),
+            packets_sent: count(v.packets_sent),
+            packets_received: count(v.packets_received),
+        }
+    }
+}
+
 /// Connects to a saved server, disconnecting the current one first (the UI confirms that).
 /// `channel_path` (from a `mumble://` link) overrides rejoining the last channel.
 #[tauri::command]
@@ -226,6 +265,13 @@ pub fn connection_state(engine: State<'_, Engine>) -> ApiResult<ConnectionState>
 #[specta::specta]
 pub fn session_snapshot(engine: State<'_, Engine>) -> ApiResult<Option<ServerSnapshot>> {
     Ok(engine.snapshot().map(ServerSnapshot::from))
+}
+
+/// Live link figures, or `null` when not connected (AC-1.23).
+#[tauri::command]
+#[specta::specta]
+pub fn connection_stats(engine: State<'_, Engine>) -> ApiResult<Option<ConnectionStats>> {
+    Ok(engine.connection_stats().map(ConnectionStats::from))
 }
 
 /// Answers a `CertTrustRequired`; trusting is remembered for the server.

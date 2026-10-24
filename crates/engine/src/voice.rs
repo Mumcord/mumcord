@@ -9,7 +9,7 @@
 //! - Incoming packets are pushed by the session task, the single producer for UDP and TCP.
 //! - Talk indicators and the level meter are polled by small async tasks.
 
-use std::sync::atomic::{AtomicBool, AtomicU32, Ordering};
+use std::sync::atomic::{AtomicBool, AtomicU32, AtomicU64, Ordering};
 use std::sync::{Arc, Mutex, PoisonError, Weak};
 use std::thread::JoinHandle;
 use std::time::{Duration, Instant};
@@ -180,6 +180,19 @@ pub(crate) struct VoiceShared {
     pub deaf: AtomicBool,
     pub bitrate_bps: AtomicU32,
     pub loss_percent: AtomicU32,
+    /// Voice packets handed to the transport / received, for the connection info.
+    pub packets_sent: AtomicU64,
+    pub packets_received: AtomicU64,
+}
+
+impl VoiceShared {
+    /// A new connection starts with the start bitrate and fresh counters.
+    pub fn reset_link(&self) {
+        self.bitrate_bps.store(START_BITRATE_BPS, Ordering::Relaxed);
+        self.loss_percent.store(0, Ordering::Relaxed);
+        self.packets_sent.store(0, Ordering::Relaxed);
+        self.packets_received.store(0, Ordering::Relaxed);
+    }
 }
 
 impl Default for VoiceShared {
@@ -189,6 +202,8 @@ impl Default for VoiceShared {
             deaf: AtomicBool::new(false),
             bitrate_bps: AtomicU32::new(START_BITRATE_BPS),
             loss_percent: AtomicU32::new(0),
+            packets_sent: AtomicU64::new(0),
+            packets_received: AtomicU64::new(0),
         }
     }
 }
@@ -392,6 +407,7 @@ fn capture_loop(
             frames_per_packet,
             is_last,
         ));
+        shared.packets_sent.fetch_add(1, Ordering::Relaxed);
     };
 
     // Drop audio captured before this connection started.

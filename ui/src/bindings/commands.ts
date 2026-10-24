@@ -36,6 +36,8 @@ export const commands = {
 	connectionState: () => typedError<ConnectionState, ApiError>(__TAURI_INVOKE("connection_state")),
 	/**  Current snapshot, or `null` when not connected. */
 	sessionSnapshot: () => typedError<ServerSnapshot | null, ApiError>(__TAURI_INVOKE("session_snapshot")),
+	/**  Live link figures, or `null` when not connected (AC-1.23). */
+	connectionStats: () => typedError<ConnectionStats | null, ApiError>(__TAURI_INVOKE("connection_stats")),
 	/**  Answers a `CertTrustRequired`; trusting is remembered for the server. */
 	certTrustDecide: (serverId: number, fingerprint: string, trust: boolean) => typedError<null, ApiError>(__TAURI_INVOKE("cert_trust_decide", { serverId, fingerprint, trust })),
 	/**  Unmuting while deafened also undeafens. */
@@ -233,6 +235,28 @@ export type ConnectionState =
 
 export type ConnectionStateChanged = {
 	state: ConnectionState,
+};
+
+/**
+ *  Live link figures for the connection info panel (AC-1.23). Polled by the UI while the
+ *  panel is open; counters restart with every (re)connection.
+ */
+export type ConnectionStats = {
+	/**  `null` when the voice transport could not be started. */
+	transport: Transport | null,
+	/**  Smoothed UDP ping; `null` until measured and while tunnelling over TCP. */
+	rttMs: number | null,
+	/**
+	 *  Recent packet loss in whole percent, 0–100 (an integer, because specta exports floats
+	 *  as nullable).
+	 */
+	lossPercent: number,
+	/**  Current Opus encoder target set by the adaptive bitrate controller. */
+	sendBitrateKbps: number,
+	/**  The server's bandwidth limit per user, if announced. */
+	serverMaxBandwidthKbps: number | null,
+	packetsSent: number,
+	packetsReceived: number,
 };
 
 /**  A chat conversation: a channel or a private chat with one person. */

@@ -43,6 +43,7 @@ fn specta_builder() -> Builder<tauri::Wry> {
             session::reconnect_cancel,
             session::connection_state,
             session::session_snapshot,
+            session::connection_stats,
             session::cert_trust_decide,
             session::set_self_mute,
             session::set_self_deaf,
@@ -107,8 +108,11 @@ pub fn run() {
     let builder = specta_builder();
 
     // Keep the TypeScript bindings in sync during development.
+    // E2E runs set MUMCORD_SKIP_BINDINGS_EXPORT so they never rewrite the tracked file.
     #[cfg(debug_assertions)]
-    if let Err(err) = export_bindings(&builder) {
+    if std::env::var_os("MUMCORD_SKIP_BINDINGS_EXPORT").is_none()
+        && let Err(err) = export_bindings(&builder)
+    {
         eprintln!("failed to export TypeScript bindings: {err}");
     }
 

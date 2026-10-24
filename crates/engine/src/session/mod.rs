@@ -481,6 +481,26 @@ impl Engine {
             .map_err(|e| EngineError::internal(e.to_string()))?
     }
 
+    /// Live link figures of the current connection, `None` when not connected (AC-1.23).
+    pub fn connection_stats(&self) -> Option<ConnectionStatsView> {
+        let core = lock(&self.inner.core);
+        let session = core.session.as_ref()?;
+        let link = session.transport.as_ref().map(|t| t.stats());
+        let voice = &self.inner.voice;
+        Some(ConnectionStatsView {
+            transport: link.map(|l| match l.transport {
+                Transport::Udp => VoiceTransportKind::Udp,
+                Transport::Tcp => VoiceTransportKind::Tcp,
+            }),
+            rtt_ms: link.and_then(|l| l.rtt).map(|d| d.as_secs_f32() * 1000.0),
+            loss_percent: link.map_or(0.0, |l| l.loss.clamp(0.0, 1.0) * 100.0),
+            send_bitrate_bps: voice.bitrate_bps.load(Ordering::Relaxed),
+            server_max_bandwidth_bps: session.handle.with_state(|s| s.server.max_bandwidth),
+            packets_sent: voice.packets_sent.load(Ordering::Relaxed),
+            packets_received: voice.packets_received.load(Ordering::Relaxed),
+        })
+    }
+
     /// Devices and connection counters for the diagnostic file (no names or addresses
     /// beyond device names, which the diagnostics module documents).
     pub fn diagnostic_info(&self, app_version: &str) -> crate::diag::DiagnosticInfo {
@@ -501,22 +521,33 @@ impl Engine {
             }
         }
         info.connection.reconnect_count = self.inner.reconnects.load(Ordering::Relaxed);
-        if let Some(session) = &core.session {
-            info.connection.connected = true;
-            if let Some(transport) = &session.transport {
-                let stats = transport.stats();
-                info.connection.transport = Some(
-                    match stats.transport {
-                        Transport::Udp => "udp",
-                        Transport::Tcp => "tcp",
-                    }
-                    .to_owned(),
-                );
-                info.connection.ping_ms = stats.rtt.map(|d| d.as_secs_f32() * 1000.0);
-                info.connection.packets_good = stats.crypt.good.into();
-                info.connection.packets_late = stats.crypt.late.into();
-                info.connection.packets_lost = stats.crypt.lost.into();
-            }
+        let crypt = core
+            .session
+            .as_ref()
+            .and_then(|s| s.transport.as_ref())
+            .map(|t| t.stats().crypt);
+        drop(core);
+        if let Some(stats) = self.connection_stats() {
+            let c = &mut info.connection;
+            c.connected = true;
+            c.transport = stats.transport.map(|t| {
+                match t {
+                    VoiceTransportKind::Udp => "udp",
+                    VoiceTransportKind::Tcp => "tcp",
+                }
+                .to_owned()
+            });
+            c.ping_ms = stats.rtt_ms;
+            c.loss_percent = stats.loss_percent;
+            c.send_bitrate_kbps = Some(stats.send_bitrate_bps / 1000);
+            c.server_max_bandwidth_kbps = stats.server_max_bandwidth_bps.map(|b| b / 1000);
+            c.packets_sent = stats.packets_sent;
+            c.packets_received = stats.packets_received;
+        }
+        if let Some(crypt) = crypt {
+            info.connection.packets_good = crypt.good.into();
+            info.connection.packets_late = crypt.late.into();
+            info.connection.packets_lost = crypt.lost.into();
         }
         info
     }
@@ -732,6 +763,7 @@ impl Inner {
             Some((transport, rx)) => (Some(Arc::new(transport)), Some(rx)),
             None => (None, None),
         };
+        self.voice.reset_link();
         let (pump_tx, mut pump_rx) = mpsc::unbounded_channel();
         let followed = self.post_sync(server_id, &handle, path_override);
 
@@ -797,6 +829,7 @@ impl Inner {
                 }
                 Some(event) = voice_event => match event {
                     VoiceEvent::Packet(packet) => {
+                        self.voice.packets_received.fetch_add(1, Ordering::Relaxed);
                         if !self.voice.deaf.load(Ordering::Relaxed)
                             && let (Some(tx), Some(p)) = (packets.as_mut(), voice::playback_packet(&packet))
                         {

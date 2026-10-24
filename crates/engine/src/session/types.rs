@@ -177,6 +177,24 @@ pub enum VoiceTransportKind {
     Tcp,
 }
 
+/// Live figures of the current connection for the connection info panel (AC-1.23) and the
+/// diagnostic file. Counters start at zero with every (re)connection.
+#[derive(Debug, Clone, PartialEq)]
+pub struct ConnectionStatsView {
+    /// `None` when the voice transport could not be started (no voice at all).
+    pub transport: Option<VoiceTransportKind>,
+    /// Smoothed UDP ping; `None` until measured and while tunnelling over TCP.
+    pub rtt_ms: Option<f32>,
+    /// Recent packet loss, 0–100.
+    pub loss_percent: f32,
+    /// Current encoder target set by the bitrate controller (FR-1.24).
+    pub send_bitrate_bps: u32,
+    /// The server's per-user bandwidth limit, if it announced one.
+    pub server_max_bandwidth_bps: Option<u32>,
+    pub packets_sent: u64,
+    pub packets_received: u64,
+}
+
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct AudioDeviceView {
     pub id: String,

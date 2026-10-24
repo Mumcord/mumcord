@@ -61,6 +61,7 @@ Some server denials arrive later, not as a reply to a command. Those come as the
 |             | `reconnect_cancel`                 | → `null`                                                             | Stops retrying, state becomes `disconnected`.                                                                                                                                                                                                                                                                                       |
 |             | `connection_state`                 | → `ConnectionState`                                                  | For UI start-up.                                                                                                                                                                                                                                                                                                                    |
 |             | `session_snapshot`                 | → `ServerSnapshot \| null`                                           | `null` when not connected.                                                                                                                                                                                                                                                                                                          |
+|             | `connection_stats`                 | → `ConnectionStats \| null`                                          | `null` when not connected. Live link figures for the connection info panel, see [Connection statistics](#connection-statistics).                                                                                                                                                                                                    |
 |             | `cert_trust_decide`                | `serverId, fingerprint, trust` → `null`                              | Answers `certTrustRequired`; trusting is remembered.                                                                                                                                                                                                                                                                                |
 |             | `set_self_mute`                    | `muted` → `null`                                                     | Unmuting while deafened also undeafens.                                                                                                                                                                                                                                                                                             |
 |             | `set_self_deaf`                    | `deafened` → `null`                                                  | Deafen implies mute; undeafen restores the previous mute state.                                                                                                                                                                                                                                                                     |
@@ -105,6 +106,19 @@ Some server denials arrive later, not as a reply to a command. Those come as the
 - `sounds`: `{ joinLeave, selfMute, selfDeaf, messages }`.
 - `closeBehaviour`: `ask` / `minimizeToTray` / `quit`.
 - `logLevel`: `error` / `warn` / `info` / `debug`.
+
+## Connection statistics
+
+`connection_stats` returns `ConnectionStats`:
+
+- `transport`: `udp` / `tcp`, or `null` if the voice transport could not be started.
+- `rttMs`: smoothed UDP ping round-trip time, or `null` until measured and while voice is tunnelled over TCP.
+- `lossPercent`: recent packet loss in whole percent, 0–100 (the larger of the server → client loss and unanswered UDP pings; always 0 on TCP).
+- `sendBitrateKbps`: the current Opus encoder target set by the adaptive bitrate controller (FR-1.24). It drops when the link is lossy (AC-1.23) and recovers when it is clean again.
+- `serverMaxBandwidthKbps`: the server's per-user bandwidth limit, or `null` if it announced none.
+- `packetsSent` / `packetsReceived`: voice packets sent and received since the current connection (or reconnect) started.
+
+It is a command the UI polls about once per second while the connection info panel is open, not a periodic event: nothing is computed or sent while nobody looks, and the event stream stays free of noise. The same figures, plus the crypto good/late/lost counters, are written to the diagnostic file (`diagnostics_save`).
 
 ## Events
 

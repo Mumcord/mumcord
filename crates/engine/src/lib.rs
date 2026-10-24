@@ -16,8 +16,9 @@ pub use mumcord_store as store;
 pub use mumcord_store::{SecretStore, ServerId, Settings};
 pub use session::Engine;
 pub use session::{
-    AudioDeviceList, AudioDeviceView, ChannelPermissions, ChannelView, ConnState, ConversationRef,
-    EngineError, EngineEvent, EngineResult, ErrorKind, Events, IdentityView,
-    MAX_RECONNECT_ATTEMPTS, MicTestPhase, PasswordChange, ProfileView, ServerFields,
-    ServerInfoView, ServerView, SessionCtx, Snapshot, UnreadView, UserView, VoiceTransportKind,
+    AudioDeviceList, AudioDeviceView, ChannelPermissions, ChannelView, ConnState,
+    ConnectionStatsView, ConversationRef, EngineError, EngineEvent, EngineResult, ErrorKind,
+    Events, IdentityView, MAX_RECONNECT_ATTEMPTS, MicTestPhase, PasswordChange, ProfileView,
+    ServerFields, ServerInfoView, ServerView, SessionCtx, Snapshot, UnreadView, UserView,
+    VoiceTransportKind,
 };

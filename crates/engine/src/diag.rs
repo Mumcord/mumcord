@@ -128,6 +128,13 @@ pub struct DiagConnectionStats {
     pub packets_good: u64,
     pub packets_late: u64,
     pub packets_lost: u64,
+    /// Recent packet loss, 0–100.
+    pub loss_percent: f32,
+    /// Current encoder target of the bitrate controller.
+    pub send_bitrate_kbps: Option<u32>,
+    pub server_max_bandwidth_kbps: Option<u32>,
+    pub packets_sent: u64,
+    pub packets_received: u64,
     pub reconnect_count: u32,
 }
 
@@ -365,6 +372,19 @@ fn write_diagnostic(path: &Path, info: &DiagnosticInfo, lines: &[String]) -> io:
         "  packets good/late/lost: {}/{}/{}",
         c.packets_good, c.packets_late, c.packets_lost
     );
+    let _ = writeln!(out, "  loss: {:.1} %", c.loss_percent);
+    let kbps = |v: Option<u32>| v.map_or_else(|| "-".to_owned(), |v| format!("{v} kbit/s"));
+    let _ = writeln!(out, "  send bitrate: {}", kbps(c.send_bitrate_kbps));
+    let _ = writeln!(
+        out,
+        "  server max bandwidth: {}",
+        kbps(c.server_max_bandwidth_kbps)
+    );
+    let _ = writeln!(
+        out,
+        "  packets sent/received: {}/{}",
+        c.packets_sent, c.packets_received
+    );
     let _ = writeln!(out, "  reconnects: {}", c.reconnect_count);
     let _ = writeln!(out, "\nRecent log lines:");
     for line in lines {
@@ -423,6 +443,34 @@ mod tests {
         assert!(on_disk.contains("chat received"));
         for secret in [PASSWORD, MESSAGE, USER, "MIIFAKE"] {
             assert!(!on_disk.contains(secret), "leaked {secret} to log file");
+        }
+    }
+
+    #[test]
+    fn diagnostic_file_lists_link_figures() {
+        let dir = tempfile::tempdir().unwrap();
+        let mut info = DiagnosticInfo::new("1.2.3");
+        info.connection = DiagConnectionStats {
+            connected: true,
+            transport: Some("udp".to_owned()),
+            loss_percent: 12.5,
+            send_bitrate_kbps: Some(40),
+            server_max_bandwidth_kbps: Some(72),
+            packets_sent: 7,
+            packets_received: 9,
+            ..DiagConnectionStats::default()
+        };
+        let file = dir.path().join("diag.txt");
+        write_diagnostic(&file, &info, &[]).unwrap();
+        let text = std::fs::read_to_string(&file).unwrap();
+        for line in [
+            "transport: udp",
+            "loss: 12.5 %",
+            "send bitrate: 40 kbit/s",
+            "server max bandwidth: 72 kbit/s",
+            "packets sent/received: 7/9",
+        ] {
+            assert!(text.contains(line), "missing {line}");
         }
     }
 
