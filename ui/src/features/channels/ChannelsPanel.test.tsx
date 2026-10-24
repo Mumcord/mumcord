@@ -135,6 +135,23 @@ describe("ChannelsPanel", () => {
     expect(getSelectedConversation()).toEqual({ kind: "channel", channelId: 2 });
   });
 
+  it("joins exactly once on a realistic double-click sequence", async () => {
+    await renderPanel();
+    const spy = vi.spyOn(api, "channelJoin");
+    const name = () => item(/^Raid/).querySelector(".tree-channel__name") as HTMLElement;
+    for (const detail of [1, 2]) {
+      const el = name();
+      fireEvent.mouseDown(el, { detail });
+      fireEvent.mouseUp(el, { detail });
+      fireEvent.click(el, { detail });
+      if (detail === 2) fireEvent.doubleClick(el, { detail });
+    }
+    await waitFor(() => {
+      expect(getServerState().users.get(1)?.channelId).toBe(2);
+    });
+    expect(spy).toHaveBeenCalledTimes(1);
+  });
+
   it("shows an error when joining is denied", async () => {
     await renderPanel();
     api.mock.failNext("channelJoin", "permissionDenied");

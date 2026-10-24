@@ -123,6 +123,14 @@ export function ChannelTree({
     }
   };
 
+  // click(detail 2) and dblclick both fire for one gesture; join only once.
+  const lastJoin = useRef({ id: -1, at: 0 });
+  const joinOnce = (channelId: number, now: number) => {
+    if (lastJoin.current.id === channelId && now - lastJoin.current.at < 600) return;
+    lastJoin.current = { id: channelId, at: now };
+    onJoin(channelId);
+  };
+
   const personItem = (user: User, rowId: string, level: number, listener: boolean) => {
     const talking = state.talking.has(user.session);
     const labelId = `${hintId}-${rowId}`;
@@ -194,10 +202,12 @@ export function ChannelTree({
           event.stopPropagation();
           setFocusedId(rowId);
           onSelect(channel.id);
+          // Real mice: the second click (detail >= 2) joins even if the native dblclick lands elsewhere.
+          if (event.detail >= 2) joinOnce(channel.id, event.timeStamp);
         }}
         onDoubleClick={(event) => {
           event.stopPropagation();
-          onJoin(channel.id);
+          joinOnce(channel.id, event.timeStamp);
         }}
       >
         <div className="tree-channel__row" data-selected={channel.id === selectedChannelId}>
