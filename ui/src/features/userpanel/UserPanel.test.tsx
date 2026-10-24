@@ -113,6 +113,17 @@ describe("UserPanel", () => {
     expect(mute()).toHaveAttribute("aria-pressed", "false");
   });
 
+  it("offers connection info only while connected", async () => {
+    await setup();
+    fireEvent.click(screen.getByRole("button", { name: "Connection info" }));
+    expect(await screen.findByRole("dialog", { name: "Connection info" })).toBeInTheDocument();
+  });
+
+  it("hides connection info when not connected", async () => {
+    await setup(false);
+    expect(screen.queryByRole("button", { name: "Connection info" })).not.toBeInTheDocument();
+  });
+
   it("opens settings", async () => {
     await setup();
     fireEvent.click(screen.getByRole("button", { name: "Settings" }));

@@ -9,6 +9,7 @@ import type {
   ChannelInfo,
   ChatMessage,
   ConnectionState,
+  ConnectionStats,
   Conversation,
   ErrorCode,
   HistoryScope,
@@ -56,6 +57,8 @@ export interface MockControls {
   /** Ends a reconnect attempt successfully. */
   completeReconnect(): void;
   setTalking(session: number, talking: boolean): void;
+  /** Changes what `connectionStats` reports while connected (e.g. a lower bitrate). */
+  setConnectionStats(stats: Partial<ConnectionStats>): void;
 }
 
 export type MockApi = MumcordApi & { readonly mock: MockControls };
@@ -88,6 +91,16 @@ const DEVICES: AudioDevices = {
     { id: "out-default", name: "Built-in Speakers", isDefault: true },
     { id: "out-usb", name: "USB Headset", isDefault: false },
   ],
+};
+
+const DEFAULT_CONNECTION_STATS: ConnectionStats = {
+  transport: "udp",
+  rttMs: 24.5,
+  lossPercent: 0,
+  sendBitrateKbps: 72,
+  serverMaxBandwidthKbps: 558,
+  packetsSent: 0,
+  packetsReceived: 0,
 };
 
 const allow = { enter: true, textMessage: true, listen: true, registerSelf: false };
@@ -197,6 +210,7 @@ export function createMockApi(options: MockOptions = {}): MockApi {
   let linkHandler = false;
   let state: ConnectionState = { state: "disconnected", error: null };
   let snapshot: ServerSnapshot | null = null;
+  let connectionStats: ConnectionStats = { ...DEFAULT_CONNECTION_STATS };
   let micTimer: ReturnType<typeof setInterval> | undefined;
   let micPhaseTimer: ReturnType<typeof setTimeout> | undefined;
   let pendingConnect: { serverId: number; channelPath: string[] | null } | null = null;
@@ -486,6 +500,8 @@ export function createMockApi(options: MockOptions = {}): MockApi {
     },
     connectionState: () => Promise.resolve(state),
     sessionSnapshot: () => Promise.resolve(snapshot),
+    connectionStats: () =>
+      Promise.resolve(state.state === "connected" ? { ...connectionStats } : null),
     certTrustDecide: (serverId, _fingerprint, trust) => {
       const pending = pendingConnect;
       if (pending?.serverId !== serverId) fail("invalidInput", "no trust decision pending");
@@ -758,6 +774,9 @@ export function createMockApi(options: MockOptions = {}): MockApi {
     },
     setTalking: (session, talking) => {
       emit("talkStateChanged", { session, talking });
+    },
+    setConnectionStats: (stats) => {
+      connectionStats = { ...connectionStats, ...stats };
     },
   };
 

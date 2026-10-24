@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import { announce } from "../../a11y";
 import { useView } from "../../app/view";
 import { getApi } from "../../api";
+import { ConnectionInfo } from "../connection";
 import { describeError } from "./errors";
 import { ProfileDialog } from "./ProfileDialog";
 import { RegisterDialog } from "./RegisterDialog";
@@ -151,6 +152,7 @@ export function UserPanel() {
             {deaf ? <Icon d={SLASH} /> : null}
           </span>
         </button>
+        {connected ? <ConnectionInfo className="userpanel__toggle" /> : null}
         <button
           type="button"
           className="userpanel__toggle"
