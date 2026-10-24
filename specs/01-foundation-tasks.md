@@ -113,8 +113,8 @@
 | Q1 | Finalize E2E suite: lint-clean all QA specs/helpers, add AC-1.35 spec, re-run AC-1.29, full suite run | done (AC-1.29 ✅, AC-1.35 ✅, suite 18/18 after harness fixes) | q1-e2e-final | C*, F26, F30 | simple | AC-1.29, AC-1.35 | e2e/ |
 | F35 | Avatar image load failure showed empty circle; mock polish + new screenshot | done | f35-avatar-fallback | screenshot | simple | FR-1.17 | members Avatar, mock, docs/images |
 | V10 | All workflows (04fadec) | done – all green | ci10-watch | F32 | simple | §10 | – |
-| D1a | Interim implementation report for stage 1a + user manual checklist | in progress | d1a-report | Q1, V10 | simple | all 1a ACs | specs/01-foundation-implementation.md |
-| G1 | **Stage 1a gate**: user manual checklist (Win/macOS, listening, KDE PTT/tray/Orca) + sign-off | open | user | C1–C8 | – | – | – |
+| D1a | Interim implementation report for stage 1a + user manual checklist | done | d1a-report | Q1, V10 | simple | all 1a ACs | specs/01-foundation-implementation.md |
+| G1 | **Stage 1a gate** (checklist in specs/01-foundation-implementation.md): user manual checklist (Win/macOS, listening, KDE PTT/tray/Orca) + sign-off | open | user | C1–C8 | – | – | – |
 | B30 | Mumble Link + 3D audio | open | | F35 | Avatar image load failure showed empty circle; mock polish + new screenshot | done | f35-avatar-fallback | screenshot | simple | FR-1.17 | members Avatar, mock, docs/images |
 | G1 | complex | FR-1.41, 1.43 | crates/positional/src/link/, crates/audio/src/spatial/ |
 | B31 | Game plugin host | open | | B30 | complex | FR-1.42, 1.43 | crates/positional/src/plugins/ |
