@@ -3063,9 +3063,12 @@ name = "mumcord-bot"
 version = "0.1.0"
 dependencies = [
  "anyhow",
+ "clap",
  "hound",
  "mumcord-protocol",
  "opus",
+ "rcgen",
+ "tempfile",
  "tokio",
  "tracing",
 ]

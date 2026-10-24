@@ -733,6 +733,12 @@ impl Handle {
         self.send(Frame::from_message(MessageType::PermissionQuery, &m))
     }
 
+    /// Replaces a channel's ACL and groups (admin tooling such as test bots; needs the Write
+    /// permission, e.g. as SuperUser). Unset groups/ACL entries are removed by the server.
+    pub fn send_acl(&self, acl: proto::Acl) -> Result<(), CommandError> {
+        self.send(Frame::from_message(MessageType::Acl, &acl))
+    }
+
     /// Voice hook: sends a raw Mumble UDP packet through the TCP tunnel.
     pub fn send_tunnel(&self, packet: Bytes) -> Result<(), CommandError> {
         self.send(Frame {
@@ -751,5 +757,37 @@ impl Handle {
     /// Closes the connection; an [`Event::Disconnected`] with `Requested` follows.
     pub fn disconnect(&self) {
         self.close();
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use prost::Message;
+
+    use super::*;
+
+    #[test]
+    fn send_acl_queues_an_acl_frame() {
+        let (tx, mut rx) = mpsc::unbounded_channel();
+        let handle = Handle {
+            tx,
+            shared: Arc::new(Shared {
+                state: Mutex::new(ServerState::default()),
+                shutdown: Notify::new(),
+                reason: Mutex::new(None),
+                connected: AtomicBool::new(true),
+            }),
+        };
+        let acl = proto::Acl {
+            channel_id: 3,
+            inherit_acls: Some(true),
+            ..Default::default()
+        };
+        handle.send_acl(acl.clone()).expect("queued");
+        let Ok(Outgoing::Frame(frame)) = rx.try_recv() else {
+            panic!("expected a frame");
+        };
+        assert_eq!(frame.kind, MessageType::Acl as u16);
+        assert_eq!(proto::Acl::decode(frame.payload).expect("decode"), acl);
     }
 }

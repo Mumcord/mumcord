@@ -7,6 +7,10 @@ rust-version.workspace = true
 license.workspace = true
 publish = false
 
+[[bin]]
+name = "mumcord-bot"
+path = "src/main.rs"
+
 [dependencies]
 mumcord-protocol.workspace = true
 tokio.workspace = true
@@ -14,6 +18,11 @@ opus.workspace = true
 hound.workspace = true
 anyhow.workspace = true
 tracing.workspace = true
+rcgen.workspace = true
+clap.workspace = true
+
+[dev-dependencies]
+tempfile.workspace = true
 
 [lints]
 workspace = true
