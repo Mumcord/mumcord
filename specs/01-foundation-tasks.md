@@ -173,6 +173,9 @@
 | F82 | Fix CI 1e90d93: Windows/macOS builds and macOS CI fail (likely notifications/autostart platform code) | done – notifications.rs click handling Linux-only; pinnedInfo.ts vs PinnedInfo.tsx case clash renamed to pinnedInfoModel.ts | f82-ci-platforms | – | complex | – | src-tauri (platform cfg code), Cargo |
 | F84 | Avatar stack threshold 10 → 5 (QA.30); committed together with F83 (shared tree.ts) | done | lead | F64 | simple | FR-1.15 | ui/src/features/channels/tree.ts |
 | F83 | Resizable channel list + member list, avatar stack adapts to width (QA.29) | done – ResizeHandle + columnWidths (15–28rem, chat ≥360px, localStorage), stack on own line with 1–5 avatars by width | f83-resizable-columns | F64 | simple | FR-1.15 | ui/src/app (shell layout), ui/src/features/channels/AvatarStack*, settings/preferences storage |
+| V22 | Workflows (d98b951) | done – CI + Test builds green on all OS (platform fix works); E2E 18/20: AC-1.27 axe, AC-1.26 untranslated "⋯" | ci22-watch | F82 | simple | §10 | – |
+| F85 | Fix V22: axe violations (new design/features) and "⋯" counted as untranslated text; port demo mock (Music Room +5) | done – user panel name button label from visible text, Show all ≥24px, ⋯ as hidden SVG, demo Music Room +5 | f85-a11y-i18n | V22 | simple | AC-1.26, AC-1.27 | ui (owning feature files), e2e app specs, ui/src/api/mock.ts |
+| F86 | Re-capture channel tree screenshots after stack CSS fix (838c0f2) and F85 mock port | open | – | F85 | simple | – | docs/images |
 | G1 | **Stage 1a gate** (checklist in specs/01-foundation-implementation.md): user manual checklist (Win/macOS, listening, KDE PTT/tray/Orca) + sign-off | open | user | C1–C8 | – | – | – |
 | B30 | Mumble Link + 3D audio | open | | G1 | complex | FR-1.41, 1.43 | crates/positional/src/link/, crates/audio/src/spatial/ |
 | B31 | Game plugin host | open | | B30 | complex | FR-1.42, 1.43 | crates/positional/src/plugins/ |
