@@ -1,0 +1,599 @@
+# Mumcord · Epic 1 – Foundation · Brainstorming
+
+> Basis: Standalone feature, not part of a roadmap (no roadmap exists yet). This is the first spec, so it also sets the product vision, target platforms and overall tech stack.
+> Process: We work in several rounds. Each round contains questions; you answer directly in this file.
+> Once all questions are answered, `specs/01-foundation-specification.md` is created from it.
+> Already settled (not asked again): The product is called **Mumcord**. The only fixed rule is that the client must work with standard Mumble servers (murmur / mumble-server).
+
+## How to answer
+
+- **Single choice** (`◉`): Exactly **one** box has an `[x]`. To change your choice, just move the `x`.
+- **Multiple choice** (`☑`): Tick as many boxes as you like.
+- ⭐ marks my **recommendation**. It is already preselected. If you agree, you don't need to change anything.
+- Below each question there is `✍️ Note:`. Add anything there, e.g. questions back, edge cases or "not sure, explain this to me".
+- I explain technical terms briefly. For purely technical questions (audio, network, protocol) it's perfectly fine to follow my recommendation.
+
+## Planned rounds
+
+1. Vision, platforms & scope of the foundation
+2. UI & UX
+3. Audio & network
+4. Technology, distribution & security
+5. Data/state model & open points
+
+(The plan may change depending on the answers.)
+
+---
+
+## Round 1 – Vision, platforms & scope of the foundation
+
+This round sets the big picture: who the client is for, where it runs, and what the very first usable version (the "foundation") can do. Everything after that builds on it.
+
+```mermaid
+flowchart LR
+    A[Start client] --> B[Pick or add server]
+    B --> C[Connect]
+    C --> D[See channels & people]
+    D --> E[Join a channel]
+    E --> F[Talk & listen]
+```
+
+*The flow above is the minimum a voice client must do. The questions below decide what else belongs in the first version.*
+
+### A · Vision
+
+#### Q1.1 Who is the main audience? `◉`
+This shapes defaults (e.g. push-to-talk vs. open mic), wording and which features come first.
+
+- [x] ⭐ **Gaming groups and online communities.** Mumble's core audience today; they value low latency, good audio and self-hosted servers.
+- [ ] Teams and companies (internal voice rooms). Needs more admin/onboarding features early.
+- [ ] Clubs and non-technical groups (families, associations). Needs the simplest possible setup, everything else secondary.
+- [ ] Everyone equally. Risk: no clear priorities.
+
+✍️ Note:
+
+#### Q1.2 What should make it "modern" compared to the official Mumble client? `☑`
+The official client works well but looks and feels dated and is hard to set up for newcomers.
+
+- [x] ⭐ **Clean, current look** (light/dark theme, clear layout, good scaling on high-resolution screens).
+- [x] ⭐ **Easy first start**: no certificate wizard, no audio wizard marathon – sensible defaults, connect within a minute.
+- [x] ⭐ **Great audio out of the box**: modern noise suppression and auto volume, so people sound good without tweaking.
+- [x] Connected to several servers at the same time. Later.
+- [x] Rich chat (images, link previews, reactions) – parts need server support. Later.
+
+✍️ Note: Design like Discord. I want to see text channels without having to join them.
+
+#### Q1.3 How does it relate to the official client? `◉`
+
+- [ ] ⭐ **A full alternative for everyday users.** People can use it instead of the official client for joining servers, talking and chatting. Admin tasks (e.g. editing permissions) can still be done with the official client at first.
+- [x] A complete replacement including all admin features from day one. Much bigger first version.
+- [ ] A lightweight companion (e.g. only quick-join and talk). Smaller, but people would keep needing the official client.
+
+✍️ Note:
+
+### B · Platforms
+
+#### Q1.4 Which platforms does the first version support? `☑`
+More platforms mean more testing effort. Mobile apps also need app-store accounts and review.
+
+- [x] ⭐ **Linux** – your own system, easiest to develop and test on.
+- [x] ⭐ **Windows** – where most gamers are.
+- [x] ⭐ **macOS**
+- [ ] Android. Later – the technology choice (Q1.7) keeps this door open.
+- [ ] iOS. Later – same as Android, plus Apple's stricter rules for background audio.
+- [ ] Web browser. Not recommended: browsers can't talk to Mumble servers directly, so it would need an extra relay server.
+
+✍️ Note:
+
+### C · Scope of the foundation
+
+#### Q1.5 What must the foundation version be able to do? `☑`
+The foundation should be small but genuinely usable: you can join a real Mumble server and talk with people.
+
+- [x] ⭐ **Connect to a server** (address, port, username, optional server password).
+- [x] ⭐ **Server list / favorites** to save servers and reconnect with one click.
+- [x] ⭐ **Channel tree** showing channels and who is in them, including who is currently talking.
+- [x] ⭐ **Join channels** by double-click or drag.
+- [x] ⭐ **Talk and listen** with push-to-talk or voice activation.
+- [x] ⭐ **Mute and deafen yourself**, adjust the volume of individual people.
+- [x] ⭐ **Basic audio settings**: choose microphone and speakers, test your mic.
+- [x] Text chat in channels and private messages. Recommended for Epic 2, together with richer channel features.
+- [x] Register your account on the server. Later.
+- [x] Positional audio (voices come from the direction of the player in-game). Later.
+- [x] In-game overlay. Later.
+
+✍️ Note:
+
+#### Q1.6 How should the user's identity (certificate) be handled? `◉`
+On Mumble, your identity is a small digital certificate stored on your computer – like a key. Whoever has it "is" you on servers where you registered. Losing it means losing your registered name.
+
+- [ ] ⭐ **Created automatically on first start, with an easy "export / back up identity" button.** Zero setup; backup is there when people care.
+- [x] Guided setup wizard on first start (like the official client). More control, but the first start gets longer.
+- [ ] Import an existing certificate from the official Mumble client on first start, otherwise create one. Nice for people switching over – could also be added on top of the recommendation later.
+
+✍️ Note:
+
+### D · Big-picture direction
+
+#### Q1.7 Which technical approach should the client be built on? `◉`
+This is the most important technical decision; details follow in round 4. In short: the "engine" (audio and network) must be very fast and reliable, while the "face" (the user interface) should be easy to make modern and pretty.
+
+| | Engine | User interface | Modern look | Path to mobile | Risk |
+|---|---|---|---|---|---|
+| A | Rust | Web technology in a lightweight app shell (Tauri) | Very easy | Yes | Low–medium |
+| B | C++ | Qt (same as the official client) | Medium | Hard | Low, but dated feel |
+| C | Rust | Native Rust UI toolkit | Medium | Partly | Medium (young toolkits) |
+| D | Node/TypeScript | Electron (like Discord) | Very easy | No | High memory use, audio harder |
+
+- [x] ⭐ **A – Rust engine + web-based UI in Tauri.** Rust is fast and safe (fewer crashes and security holes) for audio and networking; the UI uses the same technology as modern websites, so it's quick to build and easy to make beautiful. Much lighter than Electron, and Tauri can later target Android/iOS.
+- [ ] B – C++ with Qt. Proven, close to the official client, but harder to make feel modern and slower to develop.
+- [ ] C – Rust with a native Rust UI toolkit. Very lightweight, but UI toolkits are less mature and take longer for polished designs.
+- [ ] D – Electron/TypeScript. Fast UI development, but heavy on memory and the real-time audio part becomes awkward.
+
+✍️ Note:
+
+#### Q1.8 Is the project open source? `◉`
+Mumble itself is open source (BSD license). This affects whether others can see, use and contribute to the code.
+
+- [ ] ⭐ **Private for now, decide before the first public release.** Keeps all options open; nothing to manage yet.
+- [x] Open source from day one with a permissive license (MIT / Apache 2.0). Others can contribute and reuse it freely.
+- [ ] Open source with a "copyleft" license (GPL). Others may reuse it only if their version is open source too.
+
+✍️ Note: Open source. Keep in mind any rights from Mumble itself that may need to be respected. Otherwise MIT.
+
+#### Q1.9 What should come after the foundation? (rough roadmap) `☑`
+This only sketches the order of later epics; each one gets its own brainstorming. Ticked items become the first draft of `specs/roadmap.md`.
+
+- [x] ⭐ **Epic 2 – Text chat & richer channel features** (channel/private messages, user comments and avatars, channel descriptions).
+- [x] ⭐ **Epic 3 – Comfort & polish** (global hotkeys, system tray, notifications, import from official client).
+- [x] ⭐ **Epic 4 – Release & distribution** (installers, auto-update, signed builds for Windows/macOS).
+- [ ] Positional audio for games.
+- [ ] In-game overlay.
+- [x] Server admin features (permissions, bans, channel management).
+- [ ] Mobile apps (Android/iOS).
+- [ ] Recording.
+
+✍️ Note:
+
+---
+
+> Round 1 was answered interactively in chat on 2026-10-24. The answers above reflect that conversation; the follow-ups below were asked and answered in the same session.
+
+### E · Follow-ups asked during round 1
+
+#### Q1.10 Q1.5 lists both a small core and all extras – what does the first version contain? `◉`
+
+- [ ] ⭐ **Core only.** Chat, registration, positional audio and overlay in later epics.
+- [ ] Core + text chat.
+- [ ] Core + text chat + account registration.
+- [x] Everything ticked in Q1.5, including positional audio and overlay.
+
+✍️ Note:
+
+#### Q1.11 When do the admin features needed for "full replacement" (Q1.3) come? `◉`
+
+- [x] ⭐ **Full replacement is the goal across epics.** Admin features get their own epic.
+- [ ] Already in the first version.
+
+✍️ Note:
+
+#### Q1.12 How are Discord-like text channels (readable without joining) handled? `◉`
+Standard Mumble servers only deliver channel messages to people inside that channel and store no chat history. Reading without joining therefore needs a "Mumcord companion" service installed next to the Mumble server.
+
+- [ ] ⭐ **Discord-like design now, companion later.** On plain servers: own channel and private messages only.
+- [x] Companion service in the first version. Read-without-joining and history on servers that run it.
+- [ ] Plain Mumble behaviour only, never a companion.
+
+✍️ Note:
+
+---
+
+### Correction to round 1 (stated by the user in chat, 2026-10-24)
+
+#### Q1.13 May Mumcord rely on anything installed or changed on the server side? `◉`
+This overrides Q1.12.
+
+- [x] **No. Mumcord is a pure client. The server is never touched** – no companion service, no server plugins, no server configuration changes. Everything must work against unmodified standard Mumble servers.
+- [ ] Optional server-side companion (Q1.12).
+
+✍️ Note: "The server must never be touched, this is supposed to be a client."
+
+---
+
+#### Q1.14 Without a companion, how do Discord-like text channels work? `◉`
+Standard Mumble servers deliver channel messages only to users inside that channel and keep no chat history.
+
+- [x] ⭐ **Best possible as a pure client.** Discord-like layout. Every received message is stored locally, so users can scroll back through what they have seen. If Mumble's "listen to channel" feature (hearing a channel without joining it) also delivers text messages, use it to read channels without joining; otherwise users join a channel to read it live. Whether listening delivers text is checked in round 3.
+- [ ] Join to read, Discord look, local history.
+- [ ] Plain Mumble text behaviour, no local history.
+
+✍️ Note:
+
+---
+
+## Round 2 – UI & UX (and staging of Epic 1)
+
+> Asked and answered interactively in chat on 2026-10-24.
+
+### A · Staging & roadmap
+
+#### Q2.1 How is the big first version (Q1.10) staged? `◉`
+Positional audio and the overlay each need operating-system-specific code.
+
+- [x] ⭐ **Two stages within Epic 1.** Stage 1a: voice, text channels, registration, setup wizard – usable day to day. Stage 1b: positional audio and overlay.
+- [ ] Separate "Gaming" epic for positional audio and overlay, right after Epic 1.
+- [ ] Everything in one release.
+
+✍️ Note:
+
+#### Q2.2 Chat moved into Epic 1 – what order for the later epics? `◉`
+
+- [x] ⭐ **Comfort & polish → Admin features → Release & distribution.**
+- [ ] Admin → Comfort → Release.
+- [ ] Comfort → Release → Admin.
+
+✍️ Note:
+
+### B · Main window
+
+#### Q2.3 Which main window layout? `◉`
+
+```text
+┌────┬────────────┬──────────────────┬──────────┐
+│ ◉  │ Gaming Srv │ # Lobby          │ In Lobby │
+│ ○  │────────────│──────────────────│──────────│
+│ ○  │ ▾ Lobby  3 │ Anna: hi all     │ 🟢 Anna  │
+│    │   Anna 🎙  │ Ben: hey         │ ⚪ Ben   │
+│ +  │   Ben      │                  │ ⚪ You   │
+│    │ ▸ Raid   5 │                  │          │
+│    │ ▸ AFK    1 │                  │          │
+│    │────────────│ Message #Lobby…  │          │
+│    │ You 🎙 🎧 ⚙│                  │          │
+└────┴────────────┴──────────────────┴──────────┘
+```
+
+- [x] ⭐ **Discord-style, 4 columns:** server bar with saved servers (one connected at a time), channel list, chat, member list.
+- [ ] 3 columns, servers chosen from a start screen.
+- [ ] Compact Mumble-like tree with chat on the right.
+
+✍️ Note:
+
+#### Q2.4 Mumble channels are voice and text at once – how are they shown? `◉`
+
+- [x] ⭐ **One entry per channel.** Single-click shows the channel's chat (live via "listen" if possible, otherwise saved history); double-click or "Join" enters voice.
+- [ ] Each channel shown twice (# text and 🔊 voice), Discord-style.
+- [ ] Clicking always joins; chat shows the current channel only.
+
+✍️ Note:
+
+### C · Look, first start & behaviour
+
+#### Q2.5 Light or dark? `◉`
+
+- [x] ⭐ **Follow the system setting, dark first.** Manually switchable; dark is the polished default.
+- [ ] Dark only.
+- [ ] Light and dark equally designed and tested from day one.
+
+✍️ Note:
+
+#### Q2.6 What does the first-start wizard (Q1.6) cover? `◉`
+
+- [x] ⭐ **Short, 3 steps:** create or import identity (with backup hint), pick and test the microphone, choose push-to-talk key or voice activation.
+- [ ] Identity only.
+- [ ] Full wizard like the official client, including detailed audio tuning.
+
+✍️ Note:
+
+#### Q2.7 Which interface languages? `◉`
+
+- [ ] ⭐ **English, prepared for more.**
+- [ ] English + German.
+- [ ] English only, no preparation.
+
+✍️ Note: English, Spanish and German.
+
+#### Q2.8 What happens when the window is closed while connected? `◉`
+
+- [x] ⭐ **Ask once ("minimize to tray or quit?") and remember the choice.**
+- [ ] Always minimize to tray.
+- [ ] Always quit.
+
+✍️ Note:
+
+---
+
+## Round 3 – Audio & network
+
+> Asked and answered interactively in chat on 2026-10-24.
+
+**Check from round 1 (Q1.14):** The Mumble server source code (`src/murmur/Messages.cpp`, `Server::msgTextMessage`, versions 1.4.230, 1.5.735 and current master) sends channel text messages to users *in* the channel **and** to users only *listening* to it. Reading channels without joining therefore works as a pure client on servers 1.4 and newer. Limits: listening needs the server's "Listen" permission, servers cap the number of listeners per user/channel, and other users see an ear icon for listeners.
+
+### A · Channels & servers
+
+#### Q3.1 How does Mumcord use "listen" to read channels without joining? `◉`
+
+- [x] ⭐ **Follow chosen channels.** The user clicks "Follow" on text channels; Mumcord listens with the audio muted locally and shows unread badges. Few ear icons, stays within server limits.
+- [ ] Auto-listen while viewing a channel.
+- [ ] Don't use listening; other channels show saved history only.
+
+✍️ Note:
+
+#### Q3.2 Which server versions are supported? `◉`
+
+- [x] ⭐ **1.4 and newer fully, older servers best-effort.** Mumcord connects to older servers and hides features they lack.
+- [ ] 1.4+ only.
+- [ ] 1.5+ only.
+
+✍️ Note:
+
+### B · Voice
+
+#### Q3.3 Which talk mode is preselected in the wizard? `◉`
+
+- [x] ⭐ **Voice activation.** Push-to-talk one click away.
+- [ ] Push-to-talk.
+
+✍️ Note:
+
+#### Q3.4 Noise suppression? `◉`
+
+- [x] ⭐ **Modern AI-based noise suppression plus echo cancellation, on by default.**
+- [ ] Basic noise filter only.
+- [ ] Off by default.
+
+✍️ Note:
+
+#### Q3.5 Default audio quality? `◉`
+
+- [x] ⭐ **Automatic:** best quality the server allows, lowered automatically on bad connections.
+- [ ] Fixed high quality.
+- [ ] Save bandwidth.
+
+✍️ Note:
+
+#### Q3.6 Connection drops? `◉`
+
+- [x] ⭐ **Auto-reconnect in the background, rejoin last channel, restore followed channels**, with a small "reconnecting…" bar.
+- [ ] Ask first.
+- [ ] Just disconnect.
+
+✍️ Note:
+
+#### Q3.7 Latency vs. smoothness? `◉`
+
+- [x] ⭐ **Adaptive buffer:** as low as possible, small buffer only when packets arrive unevenly.
+- [ ] Lowest latency, fixed.
+- [ ] Extra smooth, larger buffer.
+
+✍️ Note:
+
+#### Q3.8 Sounds and notifications? `◉`
+
+- [x] ⭐ **Subtle sounds** (join/leave, mute/unmute, new message in followed channels), **no text-to-speech.**
+- [ ] Sounds plus text-to-speech.
+- [ ] Silent.
+
+✍️ Note:
+
+### C · Gaming features (stage 1b)
+
+#### Q3.9 Where do positional audio positions come from? `◉`
+
+- [ ] ⭐ **Mumble Link first**, per-game support later.
+- [x] Mumble Link plus the official Mumble game plugins (more games, more work, occasional anti-cheat concerns).
+- [ ] Postpone positional audio.
+
+✍️ Note:
+
+#### Q3.10 How does the overlay work? `◉`
+
+- [x] ⭐ **Floating, transparent on-top window.** No game hooking, no anti-cheat risk; works in windowed/borderless fullscreen, not exclusive fullscreen; staying on top isn't guaranteed on some Linux desktops.
+- [ ] In-game hook like the official client.
+- [ ] Postpone the overlay.
+
+✍️ Note:
+
+---
+
+## Round 4 – Technology, distribution & security
+
+> Asked and answered interactively in chat on 2026-10-24.
+
+### A · Technology & builds
+
+#### Q4.1 UI framework inside Tauri? `◉`
+
+- [x] ⭐ **React + TypeScript.**
+- [ ] Svelte + TypeScript.
+- [ ] Vue + TypeScript.
+
+✍️ Note:
+
+#### Q4.2 What builds does Epic 1 produce? `◉`
+
+- [x] ⭐ **Simple unsigned test builds for Linux, Windows and macOS.** Installers, signing and auto-update stay in the release epic.
+- [ ] Linux builds only.
+- [ ] Signed installers and auto-update now.
+
+✍️ Note:
+
+#### Q4.10 Where does the code live and get built? `◉`
+
+- [x] ⭐ **GitHub + GitHub Actions** (build machines for all three OS).
+- [ ] GitLab + GitLab CI.
+- [ ] Decide later.
+
+✍️ Note:
+
+#### Q4.8 How is Mumcord tested? `◉`
+
+- [x] ⭐ **Automated tests against a local Mumble server (Docker) with scripted bot users, plus UI tests.** Only sound quality needs a human ear.
+- [ ] Unit tests plus manual checks.
+
+✍️ Note:
+
+### B · Security & privacy
+
+#### Q4.3 Where is the identity certificate stored? `◉`
+
+- [x] ⭐ **OS secure storage** (Windows Credential Manager, macOS Keychain, Linux Secret Service). Export/backup from Q1.6 remains possible.
+- [ ] File in the settings folder.
+- [ ] Password-protected file.
+
+✍️ Note:
+
+#### Q4.4 Saved server passwords? `◉`
+
+- [x] ⭐ **OS secure storage.**
+- [ ] Never save.
+- [ ] In the settings file.
+
+✍️ Note:
+
+#### Q4.5 Local chat history? `◉`
+
+- [x] ⭐ **Kept until deleted**, with "clear history" per channel, per server or all, and saving switchable off per server.
+- [ ] Auto-delete after 30 days.
+- [ ] Don't store.
+
+✍️ Note:
+
+#### Q4.7 Crash reports and usage data? `◉`
+
+- [ ] ⭐ **None.** Manual diagnostic file only.
+- [x] Opt-in crash reports.
+- [ ] Opt-out crash reports.
+
+✍️ Note:
+
+#### Q4.9 Where are opt-in crash reports received? `◉`
+
+- [ ] ⭐ **Sentry, EU region.**
+- [ ] Self-hosted (e.g. GlitchTip).
+- [x] Later – Epic 1 only offers "save diagnostic file"; automatic opt-in reports come with the release epic.
+
+✍️ Note:
+
+#### Q4.6 Mumble rights for open source (note on Q1.8)? `◉`
+Mumble's code and game plugins are BSD-licensed; reuse in MIT projects is allowed if Mumble's copyright notice is kept. "Mumble" is the project's name, so Mumcord must not look official. (Not legal advice.)
+
+- [x] ⭐ **MIT license + third-party notices file** (Mumble and all other libraries) + "compatible with Mumble" wording, no Mumble logo, clear "not affiliated" note.
+- [ ] Apache 2.0 instead of MIT.
+- [ ] Get legal advice first.
+
+✍️ Note:
+
+### C · Platform details
+
+#### Q4.11 Push-to-talk on Wayland Linux desktops? `◉`
+
+- [x] ⭐ **Use the desktop's global-shortcuts interface** (current KDE and GNOME); where missing, explain it and suggest voice activation.
+- [ ] Read the keyboard directly (extra system permissions).
+- [ ] Voice activation only on Wayland.
+
+✍️ Note:
+
+#### Q4.12 Accessibility in Epic 1? `◉`
+
+- [ ] ⭐ **Solid basics:** keyboard, screen-reader labels, contrast, system font size.
+- [x] Full WCAG AA.
+- [ ] Minimal.
+
+✍️ Note:
+
+---
+
+## Round 5 – Data/state model & open points
+
+> Asked and answered interactively in chat on 2026-10-24.
+
+### A · Data & state model
+
+#### Q5.1 Is the local data model right? `◉`
+Everything not listed here comes live from the server.
+
+```mermaid
+erDiagram
+    IDENTITY { string name  string certificate_in_os_secure_storage }
+    SAVED_SERVER ||--o{ FOLLOWED_CHANNEL : "has"
+    SAVED_SERVER ||--o{ CHAT_MESSAGE : "has"
+    SAVED_SERVER ||--o{ PERSON_SETTING : "has"
+    SAVED_SERVER { string label  string address  int port  string username  string password_in_os_secure_storage  string last_channel  bool save_history }
+    FOLLOWED_CHANNEL { string channel  int unread_count }
+    CHAT_MESSAGE { string channel_or_private_chat  string sender  datetime time  string text }
+    PERSON_SETTING { string person_certificate  int my_volume  bool muted }
+    SETTINGS { string theme  string language  string talk_mode  string ptt_key  string devices  bool noise_suppression  bool sounds  string close_behaviour  string overlay_positional_options }
+```
+
+```mermaid
+stateDiagram-v2
+    [*] --> Disconnected
+    Disconnected --> Connecting
+    Connecting --> Connected
+    Connected --> Reconnecting : connection lost
+    Reconnecting --> Connected
+    Reconnecting --> Disconnected : gave up
+```
+
+- [x] ⭐ **Looks right.**
+- [ ] Something is missing or wrong.
+
+✍️ Note:
+
+#### Q5.2 Is the volume/mute set for a person remembered? `◉`
+
+- [x] ⭐ **Remembered per person**, recognized by their certificate (survives renames).
+- [ ] Only for the current session.
+
+✍️ Note:
+
+### B · Remaining features
+
+#### Q5.3 Public server browser in Epic 1? `◉`
+
+- [x] ⭐ **Later.** Adding by address or link is enough at first.
+- [ ] Yes, in Epic 1.
+
+✍️ Note:
+
+#### Q5.4 Should Mumcord open `mumble://` links? `◉`
+
+- [x] ⭐ **Yes – offered on first start** to become the handler for `mumble://` links; clicking a link opens Mumcord and connects.
+- [ ] Later.
+
+✍️ Note:
+
+#### Q5.5 Chat formatting? `◉`
+
+- [x] ⭐ **Display formatting, links and small images safely (sanitized); write with Markdown shortcuts and pasted images**, converted so the official client displays them correctly.
+- [ ] Plain text only.
+
+✍️ Note:
+
+#### Q5.6 How is server registration offered? `◉`
+
+- [x] ⭐ **"Register on this server" in the user menu**, with a short explanation and a reminder to back up the identity.
+- [ ] Prompt automatically after joining.
+
+✍️ Note:
+
+#### Q5.7 Avatars and profile comments? `◉`
+
+- [x] ⭐ **Show them, and let users set their own avatar and comment.**
+- [ ] Show only.
+- [ ] Later.
+
+✍️ Note:
+
+#### Q5.8 Whisper/shout? `◉`
+
+- [x] ⭐ **Later** (comfort or admin epic).
+- [ ] Epic 1.
+
+✍️ Note:
+
+---
+
+## Closing
+
+2026-10-24: All rounds answered. The specification has been created: `specs/01-foundation-specification.md`.
