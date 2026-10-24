@@ -4,8 +4,8 @@ name: E2E
 # the local testenv Mumble servers. Slow (first build of the app inside the image), so separate
 # from CI and only on epic-1 pushes or manual runs.
 on:
-  push:
-    branches: [epic-1]
+  pull_request:
+    branches: [main]
   workflow_dispatch:
 
 concurrency:
