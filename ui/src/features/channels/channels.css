@@ -130,15 +130,11 @@
   font-size: var(--font-size-xs);
 }
 
-/* The hint stays available to screen readers via aria-describedby; sighted keyboard users see it
-   while focus is in the tree. */
+/* The hint always occupies its layout space so focus changes never shift the tree's siblings
+   (a mouse-down that blurs the tree must not move its click target). Only opacity toggles; the text
+   stays in the accessibility tree for aria-describedby. */
 .channel-tree:not(:focus-within) .channel-tree__hint {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  overflow: hidden;
-  clip: rect(0 0 0 0);
-  white-space: nowrap;
+  opacity: 0;
 }
 
 .channels-empty {
