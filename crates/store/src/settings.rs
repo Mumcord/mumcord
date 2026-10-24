@@ -135,6 +135,9 @@ pub struct Settings {
     pub language: Option<String>,
     pub talk_mode: TalkMode,
     pub ptt_key: Option<String>,
+    /// Linux Wayland: read mouse buttons for push-to-talk from input devices (needs the
+    /// `input` group; opt-in, FR-1.39, QA.4).
+    pub allow_mouse_buttons: bool,
     /// Device names; `None` uses the system default device.
     pub input_device: Option<String>,
     pub output_device: Option<String>,
@@ -160,6 +163,7 @@ impl Default for Settings {
             language: None,
             talk_mode: TalkMode::default(),
             ptt_key: None,
+            allow_mouse_buttons: false,
             input_device: None,
             output_device: None,
             noise_suppression: true,
@@ -247,6 +251,10 @@ mod tests {
         assert!(
             parsed.send_default_avatar,
             "on by default, also for old records"
+        );
+        assert!(
+            !parsed.allow_mouse_buttons,
+            "reading input devices stays off unless the user opts in"
         );
     }
 }
