@@ -12,6 +12,7 @@ mod ratelimit;
 pub mod state;
 pub mod tls;
 pub mod version;
+pub mod voice;
 
 pub use client::{
     ConnectConfig, Connection, DisconnectReason, Event, Handle, TextMessage, TextTarget, connect,
@@ -24,6 +25,9 @@ pub use rustls::pki_types;
 pub use state::{Channel, CryptSetup, ServerInfo, ServerState, User, UserChange};
 pub use tls::{CertVerifier, ClientIdentity, ServerCert, cert_hash};
 pub use version::MumbleVersion;
+pub use voice::{
+    CryptStats, LinkStats, OutgoingAudio, Transport, VoiceEvent, VoicePacket, VoiceTransport,
+};
 
 /// Control-channel messages generated from the vendored `Mumble.proto`.
 #[allow(clippy::all, missing_docs)]
