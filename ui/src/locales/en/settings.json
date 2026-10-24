@@ -1,0 +1,152 @@
+{
+  "sectionList": "Settings sections",
+  "loading": "Loading settings…",
+  "loadFailed": "Your settings could not be loaded. Close the settings and try again.",
+  "saveFailed": "The last change could not be saved. Please try again.",
+  "sections": {
+    "identity": "Identity",
+    "audio": "Audio",
+    "voice": "Voice",
+    "chatHistory": "Chat & history",
+    "appearance": "Appearance",
+    "language": "Language",
+    "sounds": "Sounds",
+    "overlay": "Overlay & positional audio",
+    "diagnostics": "Diagnostics",
+    "about": "About"
+  },
+  "errors": {
+    "secureStorage": "Your system's secure storage is not available or access was refused.",
+    "io": "The file could not be read or written. Check the location and try again.",
+    "invalidInput": "That did not work: the file or password is not valid.",
+    "notFound": "The file or item could not be found.",
+    "generic": "Something went wrong. Please try again."
+  },
+  "identity": {
+    "current": "Your identity",
+    "none": "No identity yet",
+    "explanation": "Your identity is a certificate stored in your system's secure storage. Servers recognise you by it.",
+    "backup": "Back up or replace",
+    "exportHint": "Export your identity to a password-protected file and keep it safe. Without it you lose registered names and permissions if this computer breaks.",
+    "export": "Export identity…",
+    "import": "Import identity…",
+    "fileType": "Identity file (PKCS#12)",
+    "exportTitle": "Export identity",
+    "exportPasswordHint": "Choose a password to protect the file. You need it to import the identity again.",
+    "password": "Password",
+    "passwordRepeat": "Repeat password",
+    "passwordEmpty": "Please enter a password.",
+    "passwordMismatch": "The passwords do not match.",
+    "exportConfirm": "Export",
+    "exported": "Identity exported.",
+    "importTitle": "Import identity",
+    "importWarning": "Importing replaces your current identity. Export it first if you may need it again.",
+    "importPassword": "File password (leave empty if none)",
+    "importConfirm": "Replace and import",
+    "imported": "Identity \"{{name}}\" imported."
+  },
+  "audio": {
+    "devices": "Devices",
+    "input": "Microphone",
+    "output": "Speakers or headphones",
+    "systemDefault": "System default",
+    "unavailableDevice": "Saved device (not connected)",
+    "test": "Microphone test",
+    "testHint": "Speak for a few seconds. Your voice is recorded with noise suppression applied and then played back to you.",
+    "level": "Microphone level",
+    "testStart": "Start test",
+    "testStop": "Stop recording",
+    "testRecording": "Recording… speak now."
+  },
+  "voice": {
+    "talkMode": "Talk mode",
+    "talkModeLegend": "How do you want to talk?",
+    "voiceActivation": "Voice activation – sends when you speak",
+    "pushToTalk": "Push-to-talk – sends while you hold a key",
+    "unavailable": {
+      "waylandNoPortal": "Push-to-talk is not available: your desktop does not offer global shortcuts.",
+      "registrationFailed": "Push-to-talk is not available: the shortcut could not be registered."
+    },
+    "suggestVoiceActivation": "Use voice activation instead.",
+    "keyCurrent": "Push-to-talk key:",
+    "keyNone": "none",
+    "keySet": "Set key",
+    "keyChange": "Change key",
+    "keyListening": "Press a key… (Escape to cancel)",
+    "keyWaiting": "Confirm the shortcut in your desktop's dialog…",
+    "keyCancel": "Cancel",
+    "keyMissing": "Set a key, otherwise nobody can hear you.",
+    "keyRejected": "That key cannot be used. Try another key, optionally with Ctrl, Alt or Shift.",
+    "processing": "Voice processing",
+    "noiseSuppression": "Noise suppression",
+    "noiseSuppressionHint": "Filters out background noise like keyboards and fans.",
+    "echoCancellation": "Echo cancellation",
+    "echoCancellationHint": "Stops others from hearing themselves when you use speakers.",
+    "autoGain": "Automatic volume",
+    "autoGainHint": "Keeps your voice at an even level."
+  },
+  "history": {
+    "explanation": "Chat messages are saved only on this computer.",
+    "perServer": "Servers",
+    "noServers": "No saved servers yet.",
+    "save": "Save history on {{server}}",
+    "clearServer": "Clear history of {{server}}…",
+    "all": "All servers",
+    "clearAll": "Clear all history…",
+    "confirmTitle": "Clear history?",
+    "confirmServer": "All saved messages from {{server}} will be deleted from this computer. This cannot be undone.",
+    "confirmAll": "All saved messages from every server will be deleted from this computer. This cannot be undone.",
+    "confirm": "Clear history",
+    "cleared": "History cleared."
+  },
+  "appearance": {
+    "theme": "Theme",
+    "themeLegend": "Colour theme",
+    "system": "Follow system",
+    "dark": "Dark",
+    "light": "Light",
+    "behaviour": "Behaviour",
+    "closeLegend": "When you close the window while connected",
+    "closeAsk": "Ask every time",
+    "closeTray": "Minimize to the tray",
+    "closeQuit": "Quit Mumcord"
+  },
+  "language": {
+    "legend": "Display language",
+    "system": "Follow system"
+  },
+  "sounds": {
+    "explanation": "Short sounds for these events:",
+    "joinLeave": "Someone joins or leaves your channel",
+    "selfMute": "You mute or unmute yourself",
+    "selfDeaf": "You deafen or undeafen yourself",
+    "messages": "New message in a followed channel or private chat"
+  },
+  "overlay": {
+    "comingLater": "The in-game overlay and positional audio are coming in a later stage. There are no settings here yet."
+  },
+  "diagnostics": {
+    "logging": "Logging",
+    "logLevel": "Log detail",
+    "levels": {
+      "error": "Errors only",
+      "warn": "Warnings",
+      "info": "Normal",
+      "debug": "Detailed (for troubleshooting)"
+    },
+    "file": "Diagnostic file",
+    "fileHint": "Saves app version, system, audio devices, connection statistics and recent log lines to a file you can share when reporting a problem. It contains no chat messages, passwords, certificates or personal data.",
+    "save": "Save diagnostic file…",
+    "fileType": "Text file",
+    "saved": "Diagnostic file saved."
+  },
+  "about": {
+    "version": "Version",
+    "os": "System",
+    "license": "Mumcord license (MIT)",
+    "notices": "Third-party notices",
+    "noticesHint": "Mumcord is built on open-source software, including code from the Mumble project.",
+    "noticesFailed": "The third-party notices could not be loaded.",
+    "loading": "Loading…"
+  }
+}

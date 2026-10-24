@@ -1,0 +1,152 @@
+{
+  "sectionList": "Einstellungsbereiche",
+  "loading": "Einstellungen werden geladen…",
+  "loadFailed": "Deine Einstellungen konnten nicht geladen werden. Schließe die Einstellungen und versuche es erneut.",
+  "saveFailed": "Die letzte Änderung konnte nicht gespeichert werden. Bitte versuche es erneut.",
+  "sections": {
+    "identity": "Identität",
+    "audio": "Audio",
+    "voice": "Stimme",
+    "chatHistory": "Chat & Verlauf",
+    "appearance": "Darstellung",
+    "language": "Sprache",
+    "sounds": "Töne",
+    "overlay": "Overlay & Positionsaudio",
+    "diagnostics": "Diagnose",
+    "about": "Über"
+  },
+  "errors": {
+    "secureStorage": "Der sichere Speicher deines Systems ist nicht verfügbar oder der Zugriff wurde verweigert.",
+    "io": "Die Datei konnte nicht gelesen oder geschrieben werden. Prüfe den Speicherort und versuche es erneut.",
+    "invalidInput": "Das hat nicht geklappt: Datei oder Passwort sind ungültig.",
+    "notFound": "Die Datei oder das Element wurde nicht gefunden.",
+    "generic": "Etwas ist schiefgelaufen. Bitte versuche es erneut."
+  },
+  "identity": {
+    "current": "Deine Identität",
+    "none": "Noch keine Identität",
+    "explanation": "Deine Identität ist ein Zertifikat im sicheren Speicher deines Systems. Server erkennen dich daran.",
+    "backup": "Sichern oder ersetzen",
+    "exportHint": "Exportiere deine Identität in eine passwortgeschützte Datei und bewahre sie sicher auf. Ohne sie verlierst du registrierte Namen und Rechte, wenn dieser Computer kaputtgeht.",
+    "export": "Identität exportieren…",
+    "import": "Identität importieren…",
+    "fileType": "Identitätsdatei (PKCS#12)",
+    "exportTitle": "Identität exportieren",
+    "exportPasswordHint": "Wähle ein Passwort zum Schutz der Datei. Du brauchst es, um die Identität wieder zu importieren.",
+    "password": "Passwort",
+    "passwordRepeat": "Passwort wiederholen",
+    "passwordEmpty": "Bitte gib ein Passwort ein.",
+    "passwordMismatch": "Die Passwörter stimmen nicht überein.",
+    "exportConfirm": "Exportieren",
+    "exported": "Identität exportiert.",
+    "importTitle": "Identität importieren",
+    "importWarning": "Der Import ersetzt deine aktuelle Identität. Exportiere sie vorher, falls du sie noch brauchst.",
+    "importPassword": "Dateipasswort (leer lassen, falls keines)",
+    "importConfirm": "Ersetzen und importieren",
+    "imported": "Identität „{{name}}“ importiert."
+  },
+  "audio": {
+    "devices": "Geräte",
+    "input": "Mikrofon",
+    "output": "Lautsprecher oder Kopfhörer",
+    "systemDefault": "Systemstandard",
+    "unavailableDevice": "Gespeichertes Gerät (nicht verbunden)",
+    "test": "Mikrofontest",
+    "testHint": "Sprich ein paar Sekunden. Deine Stimme wird mit Rauschunterdrückung aufgenommen und dir danach vorgespielt.",
+    "level": "Mikrofonpegel",
+    "testStart": "Test starten",
+    "testStop": "Aufnahme beenden",
+    "testRecording": "Aufnahme läuft… sprich jetzt."
+  },
+  "voice": {
+    "talkMode": "Sprechmodus",
+    "talkModeLegend": "Wie möchtest du sprechen?",
+    "voiceActivation": "Sprachaktivierung – sendet, wenn du sprichst",
+    "pushToTalk": "Push-to-Talk – sendet, solange du eine Taste hältst",
+    "unavailable": {
+      "waylandNoPortal": "Push-to-Talk ist nicht verfügbar: Deine Arbeitsumgebung bietet keine globalen Tastenkürzel.",
+      "registrationFailed": "Push-to-Talk ist nicht verfügbar: Das Tastenkürzel konnte nicht registriert werden."
+    },
+    "suggestVoiceActivation": "Nutze stattdessen die Sprachaktivierung.",
+    "keyCurrent": "Push-to-Talk-Taste:",
+    "keyNone": "keine",
+    "keySet": "Taste festlegen",
+    "keyChange": "Taste ändern",
+    "keyListening": "Drücke eine Taste… (Escape zum Abbrechen)",
+    "keyWaiting": "Bestätige das Tastenkürzel im Dialog deiner Arbeitsumgebung…",
+    "keyCancel": "Abbrechen",
+    "keyMissing": "Lege eine Taste fest, sonst hört dich niemand.",
+    "keyRejected": "Diese Taste kann nicht verwendet werden. Versuche eine andere, optional mit Strg, Alt oder Umschalt.",
+    "processing": "Sprachverarbeitung",
+    "noiseSuppression": "Rauschunterdrückung",
+    "noiseSuppressionHint": "Filtert Hintergrundgeräusche wie Tastaturen und Lüfter heraus.",
+    "echoCancellation": "Echounterdrückung",
+    "echoCancellationHint": "Verhindert, dass andere sich selbst hören, wenn du Lautsprecher nutzt.",
+    "autoGain": "Automatische Lautstärke",
+    "autoGainHint": "Hält deine Stimme auf gleichmäßigem Pegel."
+  },
+  "history": {
+    "explanation": "Chatnachrichten werden nur auf diesem Computer gespeichert.",
+    "perServer": "Server",
+    "noServers": "Noch keine gespeicherten Server.",
+    "save": "Verlauf von {{server}} speichern",
+    "clearServer": "Verlauf von {{server}} löschen…",
+    "all": "Alle Server",
+    "clearAll": "Gesamten Verlauf löschen…",
+    "confirmTitle": "Verlauf löschen?",
+    "confirmServer": "Alle gespeicherten Nachrichten von {{server}} werden von diesem Computer gelöscht. Das kann nicht rückgängig gemacht werden.",
+    "confirmAll": "Alle gespeicherten Nachrichten aller Server werden von diesem Computer gelöscht. Das kann nicht rückgängig gemacht werden.",
+    "confirm": "Verlauf löschen",
+    "cleared": "Verlauf gelöscht."
+  },
+  "appearance": {
+    "theme": "Design",
+    "themeLegend": "Farbschema",
+    "system": "Wie das System",
+    "dark": "Dunkel",
+    "light": "Hell",
+    "behaviour": "Verhalten",
+    "closeLegend": "Wenn du das Fenster schließt, während du verbunden bist",
+    "closeAsk": "Jedes Mal fragen",
+    "closeTray": "In den Infobereich minimieren",
+    "closeQuit": "Mumcord beenden"
+  },
+  "language": {
+    "legend": "Sprache der Oberfläche",
+    "system": "Wie das System"
+  },
+  "sounds": {
+    "explanation": "Kurze Töne für diese Ereignisse:",
+    "joinLeave": "Jemand betritt oder verlässt deinen Kanal",
+    "selfMute": "Du schaltest dich stumm oder wieder laut",
+    "selfDeaf": "Du schaltest den Ton aus oder wieder ein",
+    "messages": "Neue Nachricht in einem gefolgten Kanal oder Privatchat"
+  },
+  "overlay": {
+    "comingLater": "Das Spiel-Overlay und Positionsaudio kommen in einer späteren Ausbaustufe. Hier gibt es noch keine Einstellungen."
+  },
+  "diagnostics": {
+    "logging": "Protokoll",
+    "logLevel": "Detailgrad des Protokolls",
+    "levels": {
+      "error": "Nur Fehler",
+      "warn": "Warnungen",
+      "info": "Normal",
+      "debug": "Ausführlich (zur Fehlersuche)"
+    },
+    "file": "Diagnosedatei",
+    "fileHint": "Speichert App-Version, System, Audiogeräte, Verbindungsstatistiken und die letzten Protokollzeilen in einer Datei, die du bei Problemen weitergeben kannst. Sie enthält keine Chatnachrichten, Passwörter, Zertifikate oder persönlichen Daten.",
+    "save": "Diagnosedatei speichern…",
+    "fileType": "Textdatei",
+    "saved": "Diagnosedatei gespeichert."
+  },
+  "about": {
+    "version": "Version",
+    "os": "System",
+    "license": "Mumcord-Lizenz (MIT)",
+    "notices": "Hinweise zu Drittanbietern",
+    "noticesHint": "Mumcord basiert auf Open-Source-Software, darunter Code aus dem Mumble-Projekt.",
+    "noticesFailed": "Die Hinweise zu Drittanbietern konnten nicht geladen werden.",
+    "loading": "Wird geladen…"
+  }
+}
