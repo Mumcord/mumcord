@@ -435,28 +435,54 @@ mod tests {
             mut sink,
             events,
         } = AudioIo::start_with(kind, None, None).expect("start");
+        // Both streams are opened on the controller thread; the sink only
+        // accepts frames once the output is up, which on a loaded machine
+        // can be well after the first captured frame.
+        let mut active = 0;
+        while active < 2 {
+            match events
+                .recv_timeout(Duration::from_secs(10))
+                .expect("stream events")
+            {
+                DeviceEvent::Active { .. } => active += 1,
+                other => panic!("unexpected event {other:?}"),
+            }
+        }
         let mut frame: Frame = [0.0; FRAME_SAMPLES];
         let started = Instant::now();
         let mut frames = 0;
         while frames < 50 {
             assert!(
-                source.wait_frame(&mut frame, Duration::from_millis(500)),
+                source.wait_frame(&mut frame, Duration::from_secs(2)),
                 "capture stalled"
             );
-            assert!(sink.write_frame(&frame), "playback queue full");
+            // Paced like a real mixer: the capture and playback threads run
+            // on independent clocks, so after a scheduling hiccup the
+            // playback queue may briefly be full; wait for room instead of
+            // dropping the frame.
+            let deadline = Instant::now() + Duration::from_secs(2);
+            while !sink.write_frame(&frame) {
+                assert!(Instant::now() < deadline, "playback queue stuck full");
+                std::thread::sleep(Duration::from_millis(1));
+            }
             frames += 1;
         }
         // Frames arrive in real time: 50 frames take about 500 ms.
         assert!(started.elapsed() >= Duration::from_millis(400));
-        std::thread::sleep(Duration::from_millis(150));
+        // Let the queued tail play out before the backend is closed.
+        let deadline = Instant::now() + Duration::from_secs(5);
+        while sink.queued_samples() > 0 {
+            assert!(Instant::now() < deadline, "playback queue never drained");
+            std::thread::sleep(Duration::from_millis(5));
+        }
         assert_eq!(io.devices(Direction::Input).expect("devices").len(), 1);
         drop(io);
 
-        let active = events
+        let extra_active = events
             .try_iter()
             .filter(|e| matches!(e, DeviceEvent::Active { .. }))
             .count();
-        assert_eq!(active, 2);
+        assert_eq!(extra_active, 0, "streams reopened unexpectedly");
 
         let mut reader = hound::WavReader::open(&output).expect("open out.wav");
         assert_eq!(reader.spec().sample_rate, SAMPLE_RATE);

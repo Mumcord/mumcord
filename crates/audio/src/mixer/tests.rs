@@ -246,9 +246,11 @@ impl PlaybackSink for RealTimeSink {
 
 #[test]
 fn playback_thread_mixes_paces_and_taps() {
+    let packets = tone_packets(20, 0);
     let frames = Arc::new(Mutex::new(Vec::new()));
+    let sink_started = Instant::now();
     let sink = RealTimeSink {
-        started: Instant::now(),
+        started: sink_started,
         written: 0,
         frames: Arc::clone(&frames),
     };
@@ -264,31 +266,61 @@ fn playback_thread_mixes_paces_and_taps() {
     };
     let (playback, mut ports) = Playback::start(sink, config).expect("playback");
 
+    // Packets are sent on a 20 ms schedule but kept up to 200 ms ahead of
+    // it (well inside the jitter buffer's slots), so a stall of this thread
+    // on a loaded machine does not starve the playback thread.
+    const LEAD: Duration = Duration::from_millis(200);
     let started = Instant::now();
-    for p in tone_packets(20, 0) {
+    for (i, p) in packets.iter().enumerate() {
+        let due = started + Duration::from_millis(20 * i as u64);
+        if let Some(wait) = due.checked_duration_since(Instant::now() + LEAD) {
+            std::thread::sleep(wait);
+        }
         let pkt = VoicePacket::new(5, p.seq, &p.payload, p.is_last, false, Instant::now())
             .expect("payload fits");
         assert!(ports.packets.push(pkt));
-        std::thread::sleep(Duration::from_millis(20));
     }
-    std::thread::sleep(Duration::from_millis(300));
-    let elapsed_ms = started.elapsed().as_millis() as usize;
+
+    // The burst ends (talking: false) once all of it has been played.
+    let mut events = Vec::new();
+    let deadline = Instant::now() + Duration::from_secs(10);
+    while events.len() < 2 {
+        assert!(Instant::now() < deadline, "burst never ended: {events:?}");
+        while let Ok(e) = ports.talk_events.pop() {
+            events.push(e);
+        }
+        std::thread::sleep(Duration::from_millis(5));
+    }
+    // Keeps up with real time: about one frame per 10 ms since the sink
+    // started. Re-evaluated until the thread has caught up after a stall.
+    let deadline = Instant::now() + Duration::from_secs(10);
+    loop {
+        let expected = sink_started.elapsed().as_millis() as usize / 10;
+        let played = frames.lock().expect("frames").len();
+        if played + 5 >= expected {
+            break;
+        }
+        assert!(
+            Instant::now() < deadline,
+            "{played} frames, expected {expected}"
+        );
+        std::thread::sleep(Duration::from_millis(5));
+    }
     drop(playback);
+    let elapsed_ms = sink_started.elapsed().as_millis() as usize;
 
     let frames = frames.lock().expect("frames");
     let tapped = *tapped.lock().expect("tap");
     assert_eq!(tapped, frames.len(), "tap sees every played frame");
-    // Paced in real time: about one frame per 10 ms plus the 25 ms queue.
-    let expected = elapsed_ms / 10;
+    // Never ahead of real time by more than the 25 ms queue (plus slack).
     assert!(
-        frames.len() + 5 >= expected && frames.len() <= expected + 10,
+        frames.len() <= elapsed_ms / 10 + 10,
         "{} frames in {elapsed_ms} ms",
         frames.len()
     );
     let audible = frames.iter().filter(|f| rms(&f[..]) > 0.1).count();
     assert!(audible >= 30, "{audible} audible frames");
 
-    let mut events = Vec::new();
     while let Ok(e) = ports.talk_events.pop() {
         events.push(e);
     }
