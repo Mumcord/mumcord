@@ -108,3 +108,11 @@ unsafe_op_in_unsafe_fn = "warn"
 dbg_macro = "warn"
 todo = "warn"
 unwrap_used = "warn"
+
+# RSA-2048 key generation in the first-start wizard takes seconds to minutes in unoptimised
+# debug builds; optimising just these crates keeps dev and E2E builds responsive.
+[profile.dev.package.rsa]
+opt-level = 3
+
+[profile.dev.package.num-bigint-dig]
+opt-level = 3
