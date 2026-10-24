@@ -947,3 +947,13 @@ Added to stage 1b at the user's request.
 ✍️ Note: Requested in chat during /dev ("1 aber deaktivierbar im wizard"; Tenor instead of Giphy; ``` as code fence).
 
 ---
+
+#### QA.35 Load external images in messages (stage 1b)? `◉`
+Until now external images (img tags pointing to web addresses, image links) are never loaded (AC-1.13).
+
+- [x] **Stage 1b: external images in messages and direct image links (png, jpg, gif, webp) are shown inline, scaled down, click to enlarge, with "Open in browser".** Same privacy switch as link previews (default on, switchable in the wizard and settings); fetched through Mumcord's backend with size/type limits, never executing anything; private/LAN addresses are not loaded. Stage 1a behavior (AC-1.13) applies while the switch is off.
+- [ ] Keep blocking external images.
+
+✍️ Note: Requested in chat during /dev.
+
+---
