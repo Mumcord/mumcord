@@ -8,6 +8,7 @@ import { subscribeAnnouncements } from "../../a11y/announcer";
 import "../../i18n";
 import { axeViolations } from "../../test/axe";
 import { resetServerStore } from "../channels/serverStore";
+import { resetNowPlayingStore } from "../nowplaying";
 import { UserPanel } from "./UserPanel";
 import { LEVEL_FRAME_MS } from "./useMicLevelFill";
 
@@ -66,6 +67,7 @@ afterEach(() => {
   stopAnnouncements();
   setApi(undefined);
   resetServerStore();
+  resetNowPlayingStore();
 });
 
 const mute = () => screen.getByRole("button", { name: "Mute microphone" });
@@ -402,6 +404,62 @@ describe("UserPanel", () => {
     await joinVoice();
     expect(button).not.toHaveAccessibleDescription("Read-only");
     expect(button?.querySelector(".userpanel__status")?.textContent).not.toBe("");
+  });
+
+  it("shows the own playing track in the status line, with the full text as tooltip", async () => {
+    await setup();
+    await joinVoice();
+    const status = () => document.querySelector<HTMLElement>(".userpanel__status");
+    const normal = status()?.textContent ?? "";
+    const self = (await api.sessionSnapshot())?.selfSession ?? -1;
+    const track = {
+      title: "A very long song title",
+      artist: "Band",
+      album: null,
+      hasCover: false,
+      positionMs: 1000,
+      durationMs: 200_000,
+      playing: true,
+    };
+    act(() => {
+      api.mock.emit("nowPlayingChanged", { session: self, track });
+    });
+    expect(status()).toHaveTextContent("Band – A very long song title");
+    expect(status()).toHaveAttribute("title", "Band – A very long song title");
+    expect(status()?.querySelector("svg.userpanel__status-icon")).not.toBeNull();
+    // Paused or stopped: the usual status line again.
+    act(() => {
+      api.mock.emit("nowPlayingChanged", { session: self, track: { ...track, playing: false } });
+    });
+    expect(status()?.textContent).toBe(normal);
+    expect(status()?.querySelector("svg")).toBeNull();
+    act(() => {
+      api.mock.emit("nowPlayingChanged", { session: self, track });
+    });
+    act(() => {
+      api.mock.emit("nowPlayingChanged", { session: self, track: null });
+    });
+    expect(status()?.textContent).toBe(normal);
+  });
+
+  it("keeps important states over the own track", async () => {
+    await setup();
+    const self = (await api.sessionSnapshot())?.selfSession ?? -1;
+    act(() => {
+      api.mock.emit("nowPlayingChanged", {
+        session: self,
+        track: {
+          title: "Song",
+          artist: "",
+          album: null,
+          hasCover: false,
+          positionMs: 0,
+          durationMs: null,
+          playing: true,
+        },
+      });
+    });
+    expect(document.querySelector(".userpanel__status")).toHaveTextContent("Read-only");
   });
 
   it("lets a long name wrap to two lines instead of cutting it off", async () => {

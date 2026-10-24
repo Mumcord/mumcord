@@ -70,6 +70,17 @@ describe("music icon", () => {
     expect(treeRow().querySelector('[data-icon="music"]')).toBeNull();
   });
 
+  it("shows on the own row too, from the own track", async () => {
+    const own = await self();
+    const ownRow = screen.getByRole("treeitem", { name: new RegExp(`^${own.name}`) });
+    expect(ownRow.querySelector('[data-icon="music"]')).toBeNull();
+    share(song, own.session);
+    const icon = within(ownRow).getByRole("img", { name: "Listening to Band – Song" });
+    expect(icon).toHaveAttribute("title", "Listening to Band – Song");
+    share(null, own.session);
+    expect(ownRow.querySelector('[data-icon="music"]')).toBeNull();
+  });
+
   it("goes away when sharing stops, the person leaves or the server resyncs", async () => {
     share(song);
     share(null);
@@ -85,12 +96,20 @@ describe("music icon", () => {
   });
 });
 
-async function renderCard() {
+/** The own session and name; the engine reports the own track with the own session. */
+async function self(): Promise<{ session: number; name: string }> {
+  const snapshot = await api.sessionSnapshot();
+  const own = snapshot?.users.find((u) => u.session === snapshot.selfSession);
+  if (!own) throw new Error("not connected");
+  return { session: own.session, name: own.name };
+}
+
+async function renderCard(session = ANNA, name = "Anna") {
   await waitFor(() => {
     expect(getServerState().serverId).toBe(1);
   });
-  render(<ProfileCard session={ANNA} onClose={() => undefined} />);
-  await screen.findByRole("dialog", { name: "Anna" });
+  render(<ProfileCard session={session} onClose={() => undefined} />);
+  await screen.findByRole("dialog", { name });
 }
 
 describe("profile block", () => {
@@ -119,6 +138,17 @@ describe("profile block", () => {
 
     share(null);
     expect(screen.queryByRole("region", { name: "Now playing" })).toBeNull();
+  });
+
+  it("shows the own track on the own card", async () => {
+    api = await connectedMock();
+    const own = await self();
+    const cover = vi.spyOn(api, "nowPlayingCover").mockResolvedValue(null);
+    await renderCard(own.session, own.name);
+    share(song, own.session);
+    const block = await screen.findByRole("region", { name: "Now playing" });
+    expect(within(block).getByText("Song")).toBeInTheDocument();
+    expect(cover).toHaveBeenCalledWith(own.session);
   });
 
   it("loads no cover when the track has none and freezes while paused", async () => {

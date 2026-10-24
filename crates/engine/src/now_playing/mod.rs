@@ -8,7 +8,8 @@
 //! comment instead (see [`comment`]); it changes only after a track has played for a few
 //! seconds, so skipping through a playlist does not flood the server with comment updates.
 //!
-//! Received payloads become [`EngineEvent::NowPlayingChanged`] right away. Receivers anchor the
+//! Received payloads become [`EngineEvent::NowPlayingChanged`] right away; the own track is
+//! reported the same way (with the own session) whenever it is shared. Receivers anchor the
 //! position to their own time of arrival, not the sender's clock (`ts`), so clock differences
 //! between computers do not skew the progress bar; [`extrapolate`] advances it while playing. Covers are fetched
 //! on request through the guarded link-preview fetcher, only while link previews are on.
@@ -110,6 +111,8 @@ pub(crate) struct NowPlaying {
     remote: HashMap<u32, SharedTrack>,
     /// Cover link → thumbnail `data:` URL (`None`: could not be loaded).
     covers: HashMap<String, Option<String>>,
+    /// Whether a failed send was already logged on this connection.
+    send_failure_logged: bool,
 }
 
 #[derive(Default)]
@@ -133,6 +136,7 @@ impl NowPlaying {
     fn reset_session(&mut self) {
         self.sent = None;
         self.joined.clear();
+        self.send_failure_logged = false;
         self.comment = CommentSync::default();
         self.remote.clear();
     }
@@ -149,13 +153,33 @@ impl NowPlaying {
                     .filter(|id| Some(*id) != own)
                     .collect()
             });
-            send(&ctx.handle, &everyone, current.as_ref());
+            let changed = match (self.sent.as_ref(), current.as_ref()) {
+                (Some((sent, _)), Some(current)) => !same_track(sent, current),
+                (None, None) => false,
+                _ => true,
+            };
+            if changed {
+                tracing::info!(
+                    receivers = everyone.len(),
+                    playing = current.as_ref().map(|t| t.playing),
+                    "now playing: sharing a changed track state"
+                );
+            }
+            self.send(&ctx.handle, &everyone, current.as_ref());
             self.sent = current.clone().map(|t| (t, now));
+            // The own track never comes back as plugin data; the UI gets it the same way as
+            // everyone else's, so the own rows, preview, card and user panel can show it.
+            if let Some(own) = own {
+                ctx.events.emit(EngineEvent::NowPlayingChanged {
+                    session: own,
+                    track: current.as_ref().map(|t| view(&shared(t))),
+                });
+            }
             self.joined.clear();
         } else if !self.joined.is_empty() {
             let joined = std::mem::take(&mut self.joined);
             if current.is_some() {
-                send(&ctx.handle, &joined, current.as_ref());
+                self.send(&ctx.handle, &joined, current.as_ref());
             }
         }
 
@@ -178,6 +202,20 @@ impl NowPlaying {
         }
         None
     }
+
+    fn send(&mut self, handle: &Handle, receivers: &[u32], track: Option<&LocalTrack>) {
+        if receivers.is_empty() {
+            return;
+        }
+        let data = payload::encode(track.map(shared).as_ref());
+        if let Err(e) = handle.send_plugin_data(receivers, DATA_ID, data) {
+            // Old servers (< 1.4) cannot forward plugin data; the comment line still works there.
+            if !self.send_failure_logged {
+                self.send_failure_logged = true;
+                tracing::info!(error = %e, "now playing: plugin data not sent; comment line only");
+            }
+        }
+    }
 }
 
 /// `track` with its position moved from `read_at` to `now`.
@@ -190,6 +228,21 @@ fn advanced(track: &LocalTrack, read_at: Instant, now: Instant) -> LocalTrack {
             millis(now.saturating_duration_since(read_at)),
         ),
         ..track.clone()
+    }
+}
+
+/// Logs when the detected track changes; never titles or names (personal data).
+fn log_local_change(before: Option<&LocalTrack>, after: Option<&LocalTrack>) {
+    match (before, after) {
+        (_, Some(after)) if before.is_none_or(|b| !same_track(b, after)) => tracing::info!(
+            duration_s = after.duration_ms.map(|d| d / 1000),
+            playing = after.playing,
+            has_artist = !after.artist.is_empty(),
+            has_cover = after.art_url.is_some(),
+            "now playing: track detected"
+        ),
+        (Some(_), None) => tracing::info!("now playing: nothing playing"),
+        _ => {}
     }
 }
 
@@ -232,17 +285,6 @@ fn shared(track: &LocalTrack) -> SharedTrack {
         duration_ms: track.duration_ms,
         playing: track.playing,
         ts_ms: unix_ms(),
-    }
-}
-
-fn send(handle: &Handle, receivers: &[u32], track: Option<&LocalTrack>) {
-    if receivers.is_empty() {
-        return;
-    }
-    let data = payload::encode(track.map(shared).as_ref());
-    if let Err(e) = handle.send_plugin_data(receivers, DATA_ID, data) {
-        // Old servers (< 1.4) cannot forward plugin data; the comment line still works there.
-        tracing::debug!(error = %e, "sharing the current track failed");
     }
 }
 
@@ -370,8 +412,9 @@ async fn apply_comment(ctx: SessionCtx, line: Option<String>) {
         tracing::info!("comment too long for the server with the now-playing line; left out");
         return;
     }
-    if let Err(e) = ctx.handle.set_comment(next) {
-        tracing::warn!(error = %e, "updating the now-playing line failed");
+    match ctx.handle.set_comment(next) {
+        Ok(()) => tracing::info!(line = line.is_some(), "now playing: comment line updated"),
+        Err(e) => tracing::warn!(error = %e, "updating the now-playing line failed"),
     }
 }
 
@@ -389,6 +432,7 @@ impl Engine {
         let job = {
             let mut state = lock(self.now_playing_state());
             let track = track.filter(|_| state.enabled);
+            log_local_change(state.local.as_ref().map(|(t, _)| t), track.as_ref());
             state.local = track.map(|t| (t, now));
             ctx.as_ref().and_then(|ctx| state.tick(ctx, now))
         };
@@ -399,6 +443,7 @@ impl Engine {
 
     /// Applies the setting; turning it off stops sharing and removes the comment line now.
     pub(crate) fn now_playing_set_enabled(&self, enabled: bool) {
+        tracing::info!(enabled, "now playing setting changed");
         lock(self.now_playing_state()).enabled = enabled;
         if !enabled {
             self.now_playing_update(None);

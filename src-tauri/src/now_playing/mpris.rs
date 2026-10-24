@@ -22,6 +22,8 @@ pub struct Reader {
     connection: Option<Connection>,
     /// The session bus could not be reached; reported once.
     reported: bool,
+    /// Player names seen last time, to log only when the set of players changes.
+    players: Vec<String>,
 }
 
 impl Reader {
@@ -48,7 +50,14 @@ impl Reader {
             },
         };
         match current(&connection).await {
-            Ok(track) => track,
+            Ok((names, track)) => {
+                if names != self.players {
+                    // Bus names identify the player application, not what plays.
+                    tracing::info!(players = ?names, "now playing: media players found");
+                    self.players = names;
+                }
+                track
+            }
             Err(e) => {
                 tracing::debug!(error = %e, "listing media players failed");
                 self.connection = None;
@@ -58,9 +67,17 @@ impl Reader {
     }
 }
 
-async fn current(connection: &Connection) -> zbus::Result<Option<LocalTrack>> {
+/// The MPRIS players on the bus (sorted) and the track to share.
+async fn current(connection: &Connection) -> zbus::Result<(Vec<String>, Option<LocalTrack>)> {
     let names = DBusProxy::new(connection).await?.list_names().await?;
     let mut players = Vec::new();
+    let mut found: Vec<String> = names
+        .iter()
+        .map(|n| n.as_str())
+        .filter(|n| n.starts_with(PREFIX))
+        .map(|n| n.trim_start_matches(PREFIX).to_owned())
+        .collect();
+    found.sort();
     for name in names.iter().map(|n| n.as_str()) {
         if !name.starts_with(PREFIX) {
             continue;
@@ -75,7 +92,7 @@ async fn current(connection: &Connection) -> zbus::Result<Option<LocalTrack>> {
             Err(_) => tracing::debug!("a media player did not answer"),
         }
     }
-    Ok(pick(players))
+    Ok((found, pick(players)))
 }
 
 async fn properties(
@@ -238,6 +255,44 @@ mod tests {
                 playing: true,
             }
         );
+    }
+
+    /// The shape Spotify's Linux client reports: track id as a plain string, extra keys with
+    /// other types, artists as a one-element list and (in some versions) position 0.
+    #[test]
+    fn reads_spotify_metadata_with_extra_keys_and_zero_position() {
+        let metadata = HashMap::from([
+            (
+                "mpris:trackid",
+                Value::from("/com/spotify/track/19nAFg6Mb6jXN3yxPC2sSk"),
+            ),
+            ("mpris:length", Value::from(225_080_000_u64)),
+            (
+                "mpris:artUrl",
+                Value::from("https://i.scdn.co/image/ab67616d0000b273"),
+            ),
+            ("xesam:album", Value::from("Record")),
+            ("xesam:albumArtist", Value::from(vec!["Band"])),
+            ("xesam:artist", Value::from(vec!["Band"])),
+            ("xesam:autoRating", Value::from(0.51_f64)),
+            ("xesam:discNumber", Value::from(1_i32)),
+            ("xesam:title", Value::from("Song")),
+            ("xesam:trackNumber", Value::from(3_i32)),
+            (
+                "xesam:url",
+                Value::from("https://open.spotify.com/track/19nAFg6Mb6jXN3yxPC2sSk"),
+            ),
+        ]);
+        let track = parse_player(&player("Playing", metadata, 0)).expect("track");
+        assert_eq!(track.title, "Song");
+        assert_eq!(track.artist, "Band");
+        assert_eq!(track.duration_ms, Some(225_080));
+        assert_eq!(track.position_ms, 0);
+        assert_eq!(
+            track.art_url.as_deref(),
+            Some("https://i.scdn.co/image/ab67616d0000b273")
+        );
+        assert!(track.playing);
     }
 
     #[test]

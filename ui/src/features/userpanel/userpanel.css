@@ -68,6 +68,14 @@
   white-space: nowrap;
 }
 
+/* The icon is no taller than the text, so the line keeps its height (no layout shift). */
+.userpanel__status-icon {
+  width: 1em;
+  height: 1em;
+  margin-inline-end: 0.25em;
+  vertical-align: -0.125em;
+}
+
 .userpanel-avatar {
   display: inline-flex;
   flex: none;

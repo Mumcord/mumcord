@@ -6,6 +6,7 @@ import { getApi } from "../../api";
 import { ConnectionInfo } from "../connection";
 import { disconnect, useServers } from "../servers";
 import { useAvatars } from "../members/useAvatars";
+import { trackLabel, useNowPlaying } from "../nowplaying";
 import { describeError } from "./errors";
 import { ProfileDialog } from "./ProfileDialog";
 import { joinChannel, useReadOnly } from "./readOnly";
@@ -26,6 +27,7 @@ function Icon({ d }: { d: string }) {
 }
 
 const MIC = "M12 3a3 3 0 0 0-3 3v6a3 3 0 0 0 6 0V6a3 3 0 0 0-3-3zM6 11a6 6 0 0 0 12 0M12 17v4";
+const MUSIC = "M9 18V5l12-2v13M9 18a3 3 0 1 1-6 0a3 3 0 1 1 6 0M21 16a3 3 0 1 1-6 0a3 3 0 1 1 6 0";
 const HEADPHONES = "M4 15v-3a8 8 0 0 1 16 0v3M4 15h3v5H4zM17 15h3v5h-3z";
 const GEAR =
   "M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8zM12 2v3M12 19v3M2 12h3M19 12h3M5 5l2 2M17 17l2 2M19 5l-2 2M7 17l-2 2";
@@ -55,6 +57,8 @@ export function UserPanel() {
   const present = self !== null;
   const ptt = usePushToTalk();
   const transmitting = self !== null && state.talking.has(self.session);
+  // The own shared track (only reported while "Now playing" is on); no session matches -1.
+  const ownTrack = useNowPlaying(self?.session ?? -1);
   // Push-to-talk and not held: the mic is closed, so show it crossed out and hide the level.
   const pttIdle = ptt.active && !transmitting && !mute && !deaf;
   const showLevel = state.connected && !mute && !deaf && !pttIdle;
@@ -145,7 +149,10 @@ export function UserPanel() {
           ? t("status.disconnected")
           : readOnly
             ? t("status.readOnly")
-            : serverLabel || t("status.connected");
+            : null;
+  // In the normal connected state the status line shows the own playing track, if any.
+  const track = status === null && ownTrack?.track.playing ? trackLabel(ownTrack.track) : null;
+  const statusText = status ?? track ?? (serverLabel || t("status.connected"));
 
   return (
     <div className="userpanel">
@@ -177,8 +184,18 @@ export function UserPanel() {
             <span className="userpanel__name" title={name}>
               {name}
             </span>{" "}
-            <span className="userpanel__status" title={status}>
-              {status}
+            <span className="userpanel__status" title={statusText}>
+              {track && (
+                <svg
+                  className="userpanel__status-icon"
+                  viewBox="0 0 24 24"
+                  aria-hidden="true"
+                  focusable="false"
+                >
+                  <path d={MUSIC} fill="none" stroke="currentColor" strokeWidth="2" />
+                </svg>
+              )}
+              {statusText}
             </span>
           </span>
         </button>
