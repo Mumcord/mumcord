@@ -167,7 +167,18 @@ enum PumpCmd {
 struct PendingTrust {
     server_id: ServerId,
     fingerprint: String,
+    /// The server presented a different certificate than the one trusted before.
+    changed: bool,
     channel_path: Option<Vec<String>>,
+}
+
+/// The error kind for a declined trust question.
+fn declined_kind(changed: bool) -> ErrorKind {
+    if changed {
+        ErrorKind::CertificateChanged
+    } else {
+        ErrorKind::CertificateRejected
+    }
 }
 
 /// How a connection attempt ended.
@@ -326,7 +337,7 @@ impl Engine {
             let mut core = lock(&self.inner.core);
             self.inner.reset(&mut core);
             core.machine.end(Some(EngineError::new(
-                ErrorKind::CertificateRejected,
+                declined_kind(pending.changed),
                 "server certificate not trusted",
             )));
             self.inner.emit_state(&mut core);
@@ -593,6 +604,7 @@ impl Inner {
                         c.pending_trust = Some(PendingTrust {
                             server_id,
                             fingerprint: fingerprint.clone(),
+                            changed: previous.is_some(),
                             channel_path: path.take(),
                         });
                     });
@@ -1249,5 +1261,16 @@ async fn start_voice(
             tracing::error!(error = %e, "starting the voice transport failed");
             None
         }
+    }
+}
+
+#[cfg(test)]
+mod declined_kind_tests {
+    use super::*;
+
+    #[test]
+    fn declined_changed_cert_keeps_its_kind() {
+        assert_eq!(declined_kind(true), ErrorKind::CertificateChanged);
+        assert_eq!(declined_kind(false), ErrorKind::CertificateRejected);
     }
 }
