@@ -846,3 +846,12 @@ Prototype with before/after screenshots on branch `design-refresh-proto` (`specs
 ✍️ Note: Asked and answered in chat during /dev.
 
 ---
+
+#### QA.25 Compact chat mode? `◉`
+
+- [x] **Settings → Appearance → "Message display": Cozy (default: avatar, name line, indented text) or Compact (no avatars, time + name + text on one line, tighter spacing, text still slightly indented for continuation lines).**
+- [ ] Cozy only.
+
+✍️ Note: Requested in chat during /dev.
+
+---
