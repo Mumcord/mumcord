@@ -1,0 +1,24 @@
+[package]
+name = "mumcord-store"
+description = "Local database, identity certificates and OS secure storage"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+
+[dependencies]
+rusqlite.workspace = true
+keyring.workspace = true
+rcgen.workspace = true
+p12-keystore.workspace = true
+sha1.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+thiserror.workspace = true
+tracing.workspace = true
+
+[dev-dependencies]
+tempfile.workspace = true
+
+[lints]
+workspace = true

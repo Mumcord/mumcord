@@ -1,0 +1,28 @@
+[package]
+name = "mumcord-engine"
+description = "App state, sessions, chat and diagnostics; the only layer the UI talks to"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+
+[dependencies]
+mumcord-protocol.workspace = true
+mumcord-audio.workspace = true
+mumcord-store.workspace = true
+tokio.workspace = true
+ammonia.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+specta.workspace = true
+thiserror.workspace = true
+anyhow.workspace = true
+tracing.workspace = true
+tracing-subscriber.workspace = true
+tracing-appender.workspace = true
+
+[dev-dependencies]
+tempfile.workspace = true
+
+[lints]
+workspace = true
