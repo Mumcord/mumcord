@@ -83,19 +83,43 @@
 | B29 | Packaging & cross-OS smoke | done | b29-packaging | B13, B27 | complex | AC-1.30, §10 | .github/workflows/release.yml, smoke script |
 | C1 | Verify wizard & identity | done (AC-1.1–1.3 ✅) | c1-qa | B18, B24, B27 | simple | AC-1.1–1.3 | e2e/specs/wizard |
 | C2 | Verify servers, trust, links | done (AC-1.4–1.6 ✅) | c2-qa | B19, B25, B27 | simple | AC-1.4–1.6 | e2e/specs/servers |
-| C3 | Verify channels & voice | in progress | c3-qa | B11, B13, B15, B20, B23, B27 | complex | AC-1.7–1.12 | e2e/specs/voice |
-| C4 | Verify chat & follow | in progress | c4-qa | B14, B21, B22, B26, B27 | complex | AC-1.13–1.18 | e2e/specs/chat |
+| C3 | Verify channels & voice | done (partial: AC-1.7 ✅, 1.8 single ✅/double ❌→F24, 1.9 VAD ✅/PTT ?, 1.10 ✅, 1.11 ?, 1.12 50 % ✅/persist ? → C3b) | c3-qa | B11, B13, B15, B20, B23, B27 | complex | AC-1.7–1.12 | e2e/specs/voice |
+| C4 | Verify chat & follow | done (AC-1.13–1.17 ✅, AC-1.18 ❌ misclick → F22) | c4-qa | B14, B21, B22, B26, B27 | complex | AC-1.13–1.18 | e2e/specs/chat |
 | C5 | Verify registration & profiles | done (AC-1.19 ✅, AC-1.20 ❌ member-list avatar → F14) | c5-qa | B14, B20, B23, B27 | simple | AC-1.19, 1.20 | e2e/specs/profile |
 | C6 | Verify network resilience | done (AC-1.21 ✅, AC-1.22 ✅, AC-1.23 audio ✅ / UI bitrate ❌ → F19, tuning → F20) | c6-qa | B12, B13, B19, B27 | simple | AC-1.21–1.23 | e2e/specs/network |
-| C7 | Verify app behaviour, theme, language, a11y | in progress | c7-qa | B17, B24, B25, B26, B27 | complex | AC-1.24–1.27 | e2e/specs/app |
+| C7 | Verify app behaviour, theme, language, a11y | done (AC-1.24 ✅🎧, 1.25 ✅🖐 tray, 1.26 ✅, 1.27 keyboard ✅ / axe ❌ → F25, screen reader 🖐) | c7-qa | B17, B24, B25, B26, B27 | complex | AC-1.24–1.27 | e2e/specs/app |
 | C8 | Verify diagnostics, About, CI builds | done (AC-1.30 ✅ via V9; AC-1.28/1.29 blocked → C8b) | c8-qa | B16, B28, B29 | simple | AC-1.28–1.30 | e2e/specs/misc |
-| C8b | Re-verify AC-1.28, AC-1.29 after F16 (keyring) and F19 (stats in diagnostics) | open | | F16, F19 | simple | AC-1.28, AC-1.29 | e2e/specs/misc |
-| F21 | Voice falls back to TCP tunnel under 10 % packet loss (UDP→TCP hysteresis too sensitive) | open | | C6 | simple | AC-1.23, FR-1.26 | crates/protocol/src/voice/link.rs |
-| C6b | Re-verify AC-1.23 after F19/F20/F21 (bitrate visible + gentler, no TCP fallback at 10 % loss) | open | | F19, F20, F21 | simple | AC-1.23 | e2e/specs/network |
+| C8b | Re-verify AC-1.28, AC-1.29 after F16 (keyring) and F19 (stats in diagnostics) | done (AC-1.28 ✅; AC-1.29 ✅ after F26 via Q1) | c8b-qa | F16, F19 | simple | AC-1.28, AC-1.29 | e2e/specs/misc |
+| F21 | Voice falls back to TCP tunnel under 10 % packet loss (UDP→TCP hysteresis too sensitive) | done | f21-tcp-fallback | C6 | simple | AC-1.23, FR-1.26 | crates/protocol/src/voice/link.rs |
+| C6b | Re-verify AC-1.23 after F19/F20/F21 (bitrate visible + gentler, no TCP fallback at 10 % loss) | done (AC-1.23 ✅) | c6b-qa | F19, F20, F21 | simple | AC-1.23 | e2e/specs/network |
+| F22 | Channel tree hint shows/hides on focus and shifts layout → clicks below miss (AC-1.18) | done | f22-tree-hint | C4 | simple | AC-1.18 | ui/src/features/channels |
+| F23 | Audio output restarts when first incoming voice arrives | done (test backend only; real devices unaffected) | f23-output-reopen | C4 | simple | FR-1.25 | engine voice.rs lifecycle, crates/audio/src/io |
+| C4b | Re-verify AC-1.18 after F22 | done (AC-1.18 ✅ 5/5) | c7b-qa | F22 | simple | AC-1.18 | e2e/specs/chat |
+| F24 | Double-click on channel row doesn't join with real (WebDriver) double-click | done | f24-dblclick-join | C3 | simple | AC-1.8 | ui/src/features/channels click handling |
+| C3b | Re-verify AC-1.8 (double-click), AC-1.9 PTT (with focused-app control), AC-1.11 (full clip), AC-1.12 persistence (bot reconnect workaround) | done (all ✅) | c3b-qa | F23, F24 | simple | AC-1.8, 1.9, 1.11, 1.12 | e2e/specs/voice |
+| F25 | axe label-content-name-mismatch on expanded channel treeitems (WCAG 2.5.3) | done | f25-tree-a11y | C7 | simple | AC-1.27 | ui/src/features/channels/ChannelTree.tsx |
+| C7b | Re-run C7 axe gate (keyboard-a11y spec) after F25 | done (axe still ❌ in WebKit → F27; keyboard 20/20 ✅) | c7b-qa | F25 | simple | AC-1.27 | e2e/specs/app |
+| F26 | About: third-party notices don't load (CSP blocks fetch); diagnostic save dialog yields .txt.txt | done (C8 re-run of AC-1.29 pending) | f26-about-notices | C8b | simple | AC-1.29 | ui/src/features/settings, mock app_info |
+| F27 | axe label-content-name-mismatch persists in WebKit (treeitem visible text vs name) | done (axe 0 violations in real WebKit) | f27-tree-a11y2 | C7b | simple | AC-1.27 | ui/src/features/channels, e2e/helpers/chat-ui.ts |
+| F28 | User-reported: when anyone talks, all clients in the channel (incl. listeners) show as talking | not reproduced (regression tests added; likely QA bots talking on v15) | f28-talking-all | – | simple | FR-1.15, AC-1.7 | engine talk events / UI talking state |
+| F29 | Unread badge has visible number + hidden text (same label-in-name issue) | done | f29-badge-a11y | F27 | simple | AC-1.27 | ui/src/features/follow/UnreadBadge.tsx |
+| S1 | Spec addendum: connect read-only until explicit Join; multi-server read-along as own epic after Epic 1 | done | s1-spec-addendum | user decision 2026-10-24 | simple | FR-1.9, FR-1.13, FR-1.14, AC-1.21, §14 | specs/01-foundation-brainstorming.md, specs/01-foundation-specification.md |
+| F30 | Implement: fresh connect lands in default channel muted+deafened (read-only), voice only after explicit Join; reconnect after a drop restores channel + voice state | done | f30-readonly-connect | S1 | complex | FR-1.13, FR-1.14 | engine session, servers/channels UI, e2e specs touching rejoin |
+| F31 | User panel: own name cut off; own server avatar not shown | done | f31-userpanel-name-avatar | user report | simple | FR-1.20, §5.2 | ui/src/features/userpanel |
+| S2 | Spec addendum QA.3: default avatar sent once per server (opt-out) → FR-1.47, AC-1.36 | done | s2-spec-default-avatar | user decision | simple | – | spec + brainstorming |
+| F32 | Implement default avatar (settings, local storage, send once per server on first connect, opt-out) | done (AC-1.36 live-verified) | f32-default-avatar | S2, F30 | complex | FR-1.47, AC-1.36 | engine profile/session hook, store, settings UI |
+| F33 | Talking ring on listener rows; redundant listener row in own channel | done | f33-listener-talking | user report | simple | FR-1.15 | ui/src/features/channels, members |
+| F34 | User panel name still shows only first letter at 15rem (real WebKit) | done (names up to ~8 chars fit at 15rem) | f34-userpanel-layout | user screenshot | simple | §5.2 | ui/src/features/userpanel |
+| Q1 | Finalize E2E suite: lint-clean all QA specs/helpers, add AC-1.35 spec, re-run AC-1.29, full suite run | done (AC-1.29 ✅, AC-1.35 ✅, suite 18/18 after harness fixes) | q1-e2e-final | C*, F26, F30 | simple | AC-1.29, AC-1.35 | e2e/ |
+| F35 | Avatar image load failure showed empty circle; mock polish + new screenshot | done | f35-avatar-fallback | screenshot | simple | FR-1.17 | members Avatar, mock, docs/images |
+| V10 | All workflows (04fadec) | done – all green | ci10-watch | F32 | simple | §10 | – |
+| D1a | Interim implementation report for stage 1a + user manual checklist | in progress | d1a-report | Q1, V10 | simple | all 1a ACs | specs/01-foundation-implementation.md |
 | G1 | **Stage 1a gate**: user manual checklist (Win/macOS, listening, KDE PTT/tray/Orca) + sign-off | open | user | C1–C8 | – | – | – |
-| B30 | Mumble Link + 3D audio | open | | G1 | complex | FR-1.41, 1.43 | crates/positional/src/link/, crates/audio/src/spatial/ |
+| B30 | Mumble Link + 3D audio | open | | F35 | Avatar image load failure showed empty circle; mock polish + new screenshot | done | f35-avatar-fallback | screenshot | simple | FR-1.17 | members Avatar, mock, docs/images |
+| G1 | complex | FR-1.41, 1.43 | crates/positional/src/link/, crates/audio/src/spatial/ |
 | B31 | Game plugin host | open | | B30 | complex | FR-1.42, 1.43 | crates/positional/src/plugins/ |
-| B32 | Overlay window | open | | G1 | complex | FR-1.44–1.46 | src-tauri/src/overlay.rs, ui/src/overlay/ |
+| B32 | Overlay window | open | | F35 | Avatar image load failure showed empty circle; mock polish + new screenshot | done | f35-avatar-fallback | screenshot | simple | FR-1.17 | members Avatar, mock, docs/images |
+| G1 | complex | FR-1.44–1.46 | src-tauri/src/overlay.rs, ui/src/overlay/ |
 | B33 | 1b settings UI | open | | B30, B32 | simple | FR-1.41, 1.43, 1.45, 1.46 | ui/src/features/settings/positional/ |
 | C9 | Verify positional audio | open | | B31, B33 | complex | AC-1.31, 1.32 | e2e/specs/positional |
 | C10 | Verify overlay | open | | B32, B33 | simple | AC-1.33, 1.34 | e2e/specs/overlay |
@@ -159,3 +183,13 @@
 - **C8:** spec e2e/specs/misc/diagnostics-about.e2e.ts written but blocked by E2E keyring; AC-1.30 satisfied by V9 (all smoke green).
 - **F19:** command `connection_stats` (polled 1/s by the popover; null when not connected): transport, rtt, loss % (integer), send bitrate, server max, packets sent/received; diagnostic file includes them; UI popover `ui/src/features/connection/` via signal button in user panel; mock `setConnectionStats`.
 - **F20:** floors: ≥32 kbps under 25 % loss, 20 kbps at 25–40 %, 12 kbps only >40 %; FEC hint cap 30 %; recovery +25 %/s after 3 s clean (~13 s); ceiling keeps 10 % below server limit (server drops bursts over its 7.2 s average). Side finding: app fell back to TCP during 10 % loss → F21.
+- **C4:** AC-1.13 ✅, AC-1.14 ✅ (2000² image → ~102 KB JPEG), AC-1.15 ✅ (badge, ear icon, followed audio silent), AC-1.16 ✅, AC-1.17 ✅, AC-1.18 ❌ only the misclick (PM, sound −30.5 dBFS, reply OK; DM entry counts as 'opens'). Specs e2e/specs/chat/* + e2e/helpers/chat-ui.ts. Harness: bot `say` needs `hold: 1`; sample name `external-image`.
+- **C3:** AC-1.7 ✅ (talking indicator 74–85 ms), AC-1.8 single ✅ / double ❌ (F24), AC-1.9 VAD ✅ / PTT unverified (xdotool F9 with other window focused sent nothing; control run missing), AC-1.10 ✅, AC-1.11 SNR +9.1 dB on truncated recording (unreliable) + 🎧, AC-1.12 50 % ✅ / persistence unverified (bot rename keeps old voice connection). Spec e2e/specs/voice/voice.e2e.ts + helpers voice-audio.ts, voice-ui.ts; root channel lookup bug in spec.
+- **C7:** AC-1.24 ✅ (240 ms chime, −18.4 dBFS peak; 🎧 subtlety, file e2e/artifacts/c7-audio/speaker-out.wav), AC-1.25 ✅ (ask → minimize + remember, stays connected; tray 🖐), AC-1.26 ✅ (themes + live es/de), AC-1.27 keyboard-only flows ✅, axe ❌ only label-content-name-mismatch in ChannelTree (F25); screen reader 🖐. Specs e2e/specs/app/* (+ flows.ts, x11-close.py, fake-sni-watcher.py). WebKitWebDriver drops repeated chars → type char by char.
+- **C8b:** AC-1.28 ✅ (diag file has version/OS/devices/connection stats; no canary, password, PEM, names; 2 consecutive runs), keyring stable ✅; AC-1.29 ❌ notices blocked by CSP → F26.
+- **C7b/C4b:** AC-1.18 ✅ (5/5 incl. DM click); keyboard flows 20/20 ✅; axe still 6× label-content-name-mismatch on treeitems in real WebKit (jsdom passes) → F27 verifies in the E2E spec.
+- **C6b:** AC-1.23 ✅: popover bitrate 50 → 32 kbps under 10 % loss (one 2 s dip to 22 kbps when measured loss spiked to 40 % – by design), back to 50 in ~13 s; UDP throughout; longest gap 280–300 ms; AC-1.21/1.22 no regression.
+- **F27:** counts/Join label drawn via CSS `::before` (data-count/data-label); axe 0 violations in WebKit (21 tests). **User decisions 2026-10-24:** multi-server read-along = own epic after Epic 1; on connect: read-only (default channel, muted+deafened), voice only after explicit Join.
+- **C3b:** AC-1.8 ✅ (real double-click 9/9), AC-1.9 PTT X11 ✅ (focused + unfocused; bare Xvfb fine), AC-1.11 ✅ SNR +21 dB, noise floor −18 dB in pauses (🎧 e2e/artifacts/voice/noise-rec.wav), AC-1.12 ✅ (50 % and local mute persist across rename+reconnect; flakes from an outside user on shared v15). Voice helper handles read-only connect.
+- **F32:** default avatar `<data_dir>/default_avatar.png` (128 px), commands default_avatar_get/set, setting sendDefaultAvatar (default on), store flag default_avatar_sent set on first fresh connect regardless of outcome (send / mark-only / too large → DefaultAvatarSkipped notice); live test crates/engine/tests/live_default_avatar.rs passes AC-1.36 steps.
+- **Q1:** E2E suite lint/typecheck clean; AC-1.29 ✅ (Mumble BSD text via app_info); AC-1.35 ✅ new spec e2e/specs/voice/read-only-join.e2e.ts (9/9). Full suite 18/18 after harness fixes (theme allowlist, badge helper, sound-burst limit 1000 ms).
