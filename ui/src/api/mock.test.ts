@@ -144,7 +144,7 @@ describe("mock engine", () => {
       label: "Raid night",
       address: "voice.example.test",
       port: 64738,
-      username: "You",
+      username: "Zoe",
       password: { kind: "set", value: "secret" },
     });
     expect(added).not.toHaveProperty("password");
