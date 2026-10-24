@@ -739,3 +739,13 @@ Until now a channel is followed with the "Follow" button in the chat header (FR-
 ✍️ Note: Requested in chat during /dev.
 
 ---
+
+#### QA.14 Crowded channels in the channel list: overlapping avatar stack? `◉`
+
+- [x] **Collapsed channels always show a stack of up to 5 overlapping avatars plus "+N" for the remaining people instead of the names. Expanded channels list names, but above 10 people they show the stack with a "Show all" toggle.** People who are talking right now are moved to the front of the stack (with the green talking ring), so they stay visible.
+- [ ] Only when collapsed.
+- [ ] Always.
+
+✍️ Note: Asked and answered in chat during /dev; "talking people in front" added by the user.
+
+---
