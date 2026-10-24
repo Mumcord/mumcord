@@ -36,9 +36,15 @@ export function Icon({ name }: { name: IconName }) {
 
 /** Visual status icons; the text equivalent comes from `useStatusText`. */
 export function StatusIcons({ user, listener = false }: { user: User; listener?: boolean }) {
+  if (listener) {
+    return (
+      <span className="person-icons">
+        <Icon name="ear" />
+      </span>
+    );
+  }
   return (
     <span className="person-icons">
-      {listener && <Icon name="ear" />}
       {!user.registered && (
         <span className="person-icons__unregistered" aria-hidden="true">
           ○

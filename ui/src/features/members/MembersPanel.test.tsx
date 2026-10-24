@@ -65,6 +65,23 @@ describe("MembersPanel", () => {
     expect(member(/^Carla/)).not.toHaveAccessibleName(/talking/i);
   });
 
+  it("keeps voice state off listener rows", async () => {
+    await renderPanel();
+    await act(async () => {
+      await api.channelFollow(2);
+      await api.setSelfDeaf(true);
+    });
+    act(() => {
+      selectConversation({ kind: "channel", channelId: 2 });
+    });
+    await screen.findByRole("heading", { name: "Listening (1)" });
+    const listeners = screen.getAllByRole("button", { name: /listening/i });
+    const zoe = listeners.find((b) => b.getAttribute("data-key") === "l1");
+    expect(zoe).toBeDefined();
+    expect(zoe).not.toHaveAccessibleName(/deafened|muted/);
+    expect(zoe?.querySelectorAll(".person-icon")).toHaveLength(1);
+  });
+
   it("omits a listener row for a person already in the channel", async () => {
     await renderPanel();
     const self = getServerState().users.get(getServerState().selfSession ?? -1);

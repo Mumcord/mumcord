@@ -75,7 +75,7 @@ export function MembersPanel({ onSendPrivateMessage }: MembersPanelProps) {
 
   const item = (user: User, key: string, listener: boolean) => {
     const talking = !listener && state.talking.has(user.session);
-    const status = statusText(user, talking);
+    const status = statusText(user, talking, listener);
     return (
       <li key={key}>
         <button

@@ -15,7 +15,8 @@ export function useStatusText() {
   const { t } = useTranslation("channels");
   return (user: User, talking: boolean, listener = false): string[] => {
     const parts: string[] = [];
-    if (listener) parts.push(t("status.listening"));
+    // A listener row only marks the listening; the person's voice state belongs to their real row.
+    if (listener) return [t("status.listening")];
     if (talking) parts.push(t("status.talking"));
     if (isDeafened(user)) parts.push(t("status.deafened"));
     else if (isMuted(user)) parts.push(t("status.muted"));

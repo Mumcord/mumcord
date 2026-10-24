@@ -95,6 +95,23 @@ describe("ChannelsPanel", () => {
     for (const row of listenerRows) expect(row).toHaveAttribute("data-talking", "false");
   });
 
+  it("keeps voice state off listener rows but on the real row", async () => {
+    await renderPanel();
+    const self = getServerState().selfSession ?? -1;
+    await act(async () => {
+      await api.channelFollow(2);
+      await api.setSelfDeaf(true);
+    });
+    const real = Array.from(document.querySelectorAll(".tree-person[data-listener='false']")).find(
+      (row) => row.textContent.startsWith("Zoe"),
+    );
+    const listener = document.querySelector(`[data-row='${listenerRowId(2, self)}']`);
+    expect(listener).not.toBeNull();
+    expect(listener?.querySelectorAll(".person-icon")).toHaveLength(1);
+    expect(listener?.getAttribute("aria-label") ?? "").not.toMatch(/deafened|muted/);
+    expect(real?.querySelectorAll(".person-icon").length ?? 0).toBeGreaterThan(0);
+  });
+
   it("shows no listener row for the channel the person is in", async () => {
     await renderPanel();
     const self = getServerState().users.get(getServerState().selfSession ?? -1);
