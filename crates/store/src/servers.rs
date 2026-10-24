@@ -137,6 +137,33 @@ impl Store {
         expect_one(changed, id)
     }
 
+    /// Servers with a remembered voice channel and its path (QA.9).
+    pub fn voice_channels(&self) -> Result<Vec<(ServerId, String)>> {
+        let mut stmt = self.conn.prepare(
+            "SELECT id, voice_channel FROM saved_server WHERE voice_channel IS NOT NULL",
+        )?;
+        let rows = stmt.query_map([], |row| Ok((row.get(0)?, row.get(1)?)))?;
+        Ok(rows.collect::<rusqlite::Result<_>>()?)
+    }
+
+    /// The channel the user is joined to for voice on this server (QA.9).
+    pub fn set_voice_channel(&self, id: ServerId, channel_path: &str) -> Result<()> {
+        let changed = self.conn.execute(
+            "UPDATE saved_server SET voice_channel = ?2 WHERE id = ?1",
+            params![id, channel_path],
+        )?;
+        expect_one(changed, id)
+    }
+
+    /// Forgets the voice channel on every server: voice is on for at most one connection.
+    pub fn clear_voice_channels(&self) -> Result<()> {
+        self.conn.execute(
+            "UPDATE saved_server SET voice_channel = NULL WHERE voice_channel IS NOT NULL",
+            [],
+        )?;
+        Ok(())
+    }
+
     /// The per-server "Save history" switch (FR-1.33). Turning it off stops storing
     /// new messages; existing history stays until cleared.
     pub fn set_save_history(&self, id: ServerId, save: bool) -> Result<()> {
@@ -219,6 +246,32 @@ fn expect_one(changed: usize, id: ServerId) -> Result<()> {
 mod tests {
     use super::*;
     use crate::db::tests::temp_store;
+
+    #[test]
+    fn voice_channel_is_set_kept_by_edits_and_cleared_everywhere() {
+        let (_dir, store) = temp_store();
+        let a = store
+            .add_server(&NewServer::new("A", "localhost", "Tester"))
+            .expect("add");
+        let b = store
+            .add_server(&NewServer::new("B", "localhost", "Tester"))
+            .expect("add");
+        assert!(store.voice_channels().expect("read").is_empty());
+        store.set_voice_channel(a.id, "Root/Raid").expect("set");
+        store.set_voice_channel(b.id, "Root").expect("set");
+        store.update_server(&a).expect("edit");
+        store.set_last_channel(a.id, Some("Root")).expect("last");
+        assert_eq!(
+            store.voice_channels().expect("read"),
+            [(a.id, "Root/Raid".to_owned()), (b.id, "Root".to_owned())]
+        );
+        store.clear_voice_channels().expect("clear");
+        assert!(store.voice_channels().expect("read").is_empty());
+        assert!(matches!(
+            store.set_voice_channel(999, "Root"),
+            Err(Error::UnknownServer(999))
+        ));
+    }
 
     #[test]
     fn add_list_update_and_defaults() {

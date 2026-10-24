@@ -80,6 +80,12 @@ const MIGRATIONS: &[&str] = &[
         deaf INTEGER NOT NULL CHECK (deaf IN (0, 1))
     );
     ",
+    // v4: the channel the user is joined to for voice, kept when the app quits so the next
+    // start can offer to rejoin it (QA.9). `last_channel` also follows the read-only default
+    // channel, so it cannot tell whether voice was on.
+    r"
+    ALTER TABLE saved_server ADD COLUMN voice_channel TEXT;
+    ",
 ];
 
 /// Handle to the local database. Not `Sync`; callers share it behind a mutex.
