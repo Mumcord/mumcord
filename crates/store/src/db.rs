@@ -96,6 +96,16 @@ const MIGRATIONS: &[&str] = &[
         CHECK (avatar_backfill IN (0, 1));
     UPDATE saved_server SET avatar_backfill = 1 WHERE default_avatar_sent = 1;
     ",
+    // v6: preview cards the user dismissed (QA.42), per message and link; they go away with
+    // the message. The timestamp index makes deleting old history an index range scan.
+    r"
+    CREATE TABLE dismissed_preview (
+        message_id INTEGER NOT NULL REFERENCES chat_message (id) ON DELETE CASCADE,
+        url        TEXT    NOT NULL,
+        PRIMARY KEY (message_id, url)
+    );
+    CREATE INDEX chat_message_sent_at ON chat_message (sent_at);
+    ",
 ];
 
 /// Handle to the local database. Not `Sync`; callers share it behind a mutex.
@@ -182,6 +192,42 @@ pub(crate) mod tests {
             store.schema_version().expect("version"),
             MIGRATIONS.len() as i64
         );
+    }
+
+    #[test]
+    fn version_5_database_upgrades_and_keeps_messages() {
+        let dir = tempfile::tempdir().expect("tempdir");
+        {
+            let mut conn = Connection::open(dir.path().join(DB_FILE_NAME)).expect("open");
+            let tx = conn.transaction().expect("tx");
+            for sql in &MIGRATIONS[..5] {
+                tx.execute_batch(sql).expect("migration");
+            }
+            tx.pragma_update(None, "user_version", 5).expect("pragma");
+            tx.execute(
+                "INSERT INTO saved_server (label, address, username, sort_order)
+                 VALUES ('Old', 'localhost', 'Tester', 0)",
+                [],
+            )
+            .expect("server");
+            tx.execute(
+                "INSERT INTO chat_message
+                     (server_id, conversation_kind, conversation_key, sender_name, sent_at, body)
+                 VALUES (1, 'channel', 'Lobby', 'Alice', 5, 'hi')",
+                [],
+            )
+            .expect("message");
+            tx.commit().expect("commit");
+        }
+        let store = Store::open(dir.path()).expect("upgrade");
+        assert_eq!(
+            store.schema_version().expect("version"),
+            MIGRATIONS.len() as i64
+        );
+        store
+            .dismiss_preview(1, "https://example.org/")
+            .expect("dismiss");
+        assert_eq!(store.dismissed_previews(&[1]).expect("flags")[&1].len(), 1);
     }
 
     #[test]

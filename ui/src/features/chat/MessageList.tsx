@@ -48,7 +48,14 @@ const noAvatar = (): null => null;
  * Sanitized message HTML with highlighted code, plus preview cards for its links when enabled.
  * Its links are Tab stops only while the message is the active one.
  */
-function Body({ html, tabIndex, previews }: { html: string; tabIndex: number; previews: boolean }) {
+interface BodyProps {
+  message: ChatMessage;
+  tabIndex: number;
+  previews: boolean;
+}
+
+function Body({ message, tabIndex, previews }: BodyProps) {
+  const html = message.body;
   const ref = useRef<HTMLDivElement>(null);
   const sanitized = useMemo(() => highlightCode(sanitizeHtml(html)), [html]);
   useEffect(() => {
@@ -63,7 +70,13 @@ function Body({ html, tabIndex, previews }: { html: string; tabIndex: number; pr
   return (
     <>
       {body}
-      <LinkPreviews html={sanitized} tabIndex={tabIndex} />
+      <LinkPreviews
+        messageId={message.id}
+        dismissed={message.dismissedPreviews}
+        html={sanitized}
+        body={html}
+        tabIndex={tabIndex}
+      />
     </>
   );
 }
@@ -311,7 +324,7 @@ function MessageItem({
     row = (
       <div className="chat-message__row">
         {stamp("chat-message__time")} {sender}{" "}
-        <Body html={message.body} tabIndex={tabIndex} previews={linkPreviews} />
+        <Body message={message} tabIndex={tabIndex} previews={linkPreviews} />
       </div>
     );
   } else if (start) {
@@ -325,7 +338,7 @@ function MessageItem({
             {sender}
             {stamp("chat-message__time")}
           </div>
-          <Body html={message.body} tabIndex={tabIndex} previews={linkPreviews} />
+          <Body message={message} tabIndex={tabIndex} previews={linkPreviews} />
         </div>
       </div>
     );
@@ -336,7 +349,7 @@ function MessageItem({
         <span className="chat-message__sender visually-hidden">{message.senderName} </span>
         <div className="chat-message__gutter">{stamp("chat-message__hover-time")}</div>
         <div className="chat-message__content">
-          <Body html={message.body} tabIndex={tabIndex} previews={linkPreviews} />
+          <Body message={message} tabIndex={tabIndex} previews={linkPreviews} />
         </div>
       </div>
     );

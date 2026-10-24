@@ -21,6 +21,31 @@ fn png(width: u32, height: u32) -> Vec<u8> {
     out
 }
 
+/// A GIF of `frames` frames (two colours alternating).
+fn gif(width: u32, height: u32, frames: usize) -> Vec<u8> {
+    use image::codecs::gif::GifEncoder;
+    use image::{Delay, Frame, Rgba, RgbaImage};
+    let mut out = Vec::new();
+    {
+        let mut encoder = GifEncoder::new(&mut out);
+        let frames = (0..frames).map(|i| {
+            let colour = if i % 2 == 0 {
+                [255, 0, 0, 255]
+            } else {
+                [0, 0, 255, 255]
+            };
+            Frame::from_parts(
+                RgbaImage::from_pixel(width, height, Rgba(colour)),
+                0,
+                0,
+                Delay::from_numer_denom_ms(100, 1),
+            )
+        });
+        encoder.encode_frames(frames).expect("encode gif");
+    }
+    out
+}
+
 fn response(status: &str, headers: &[(&str, String)], body: &[u8]) -> Vec<u8> {
     let mut out = format!("HTTP/1.1 {status}\r\nConnection: close\r\n");
     for (k, v) in headers {
@@ -124,6 +149,49 @@ fn route(path: &str, addr: SocketAddr) -> Vec<u8> {
             body.push_str(&"a".repeat(fetch::PAGE_LIMIT * 2));
             html(&body)
         }
+        "/anim.gif" => response(
+            "200 OK",
+            &[("Content-Type", "image/gif".into())],
+            &gif(64, 32, 3),
+        ),
+        "/wide-anim.gif" => response(
+            "200 OK",
+            &[("Content-Type", "image/gif".into())],
+            &gif(inline::ANIMATED_MAX_SIDE + 1, 1, 2),
+        ),
+        "/still.gif" => response(
+            "200 OK",
+            &[("Content-Type", "image/gif".into())],
+            &gif(1600, 900, 1),
+        ),
+        // The server's content type is ignored: the bytes decide.
+        "/claims-text" => response(
+            "200 OK",
+            &[("Content-Type", "text/plain".into())],
+            &png(20, 10),
+        ),
+        "/fake.png" => response(
+            "200 OK",
+            &[("Content-Type", "image/png".into())],
+            b"<html><script>alert(1)</script></html>",
+        ),
+        "/wide.png" => response(
+            "200 OK",
+            &[("Content-Type", "image/png".into())],
+            &png(DECODE_MAX_SIDE + 1, 1),
+        ),
+        // Above the preview image limit but within the inline limit (trailing bytes are ignored).
+        "/big.png" => {
+            let mut body = png(40, 30);
+            body.resize(fetch::IMAGE_LIMIT * 2, 0);
+            response("200 OK", &[("Content-Type", "image/png".into())], &body)
+        }
+        "/too-big.png" => {
+            let mut body = png(40, 30);
+            body.resize(inline::INLINE_IMAGE_LIMIT + 1, 0);
+            response("200 OK", &[("Content-Type", "image/png".into())], &body)
+        }
+        "/to-private-image" => redirect("http://192.168.1.10/anim.gif".into()),
         "/text" => response("200 OK", &[("Content-Type", "text/plain".into())], b"hello"),
         "/to-loopback-2" => redirect(format!("http://127.0.0.2:{port}/page")),
         "/to-private" => redirect("http://10.1.2.3/page".into()),
@@ -313,4 +381,271 @@ fn thumbnails_are_scaled_and_reencoded() {
         bytes: b"\x89PNG\r\n\x1a\ngarbage".to_vec(),
     };
     assert_eq!(thumbnail_data_url(&broken, 480), None);
+}
+
+fn json_files(dir: &std::path::Path) -> Vec<std::path::PathBuf> {
+    std::fs::read_dir(dir)
+        .expect("read dir")
+        .filter_map(Result::ok)
+        .map(|e| e.path())
+        .filter(|p| p.extension().is_some_and(|x| x == "json"))
+        .collect()
+}
+
+/// Pretends the cache file was written `days` days ago.
+fn age_file(path: &std::path::Path, days: u64) {
+    let old = SystemTime::now() - Duration::from_secs(days * 24 * 60 * 60 + 60);
+    std::fs::File::options()
+        .write(true)
+        .open(path)
+        .expect("open")
+        .set_modified(old)
+        .expect("set mtime");
+}
+
+async fn cached_page(server: &TestServer, dir: &std::path::Path) -> LinkPreviews {
+    let previews = LinkPreviews::new(
+        Some(dir.to_path_buf()),
+        only_loopback(),
+        Timeouts::default(),
+    );
+    assert!(previews.preview(&server.url("/page")).await.is_some());
+    assert_eq!(json_files(dir).len(), 1);
+    previews
+}
+
+#[tokio::test]
+async fn expired_previews_are_pruned_by_max_age() {
+    let server = TestServer::start().await;
+    let dir = tempfile::tempdir().expect("dir");
+    let previews = cached_page(&server, dir.path()).await;
+    let file = json_files(dir.path()).remove(0);
+    let size = std::fs::metadata(&file).expect("meta").len();
+
+    age_file(&file, 6);
+    assert_eq!(
+        previews.prune_expired(),
+        0,
+        "6 days is within the default 7"
+    );
+    assert_eq!(json_files(dir.path()).len(), 1);
+
+    age_file(&file, 8);
+    assert_eq!(previews.prune_expired(), size, "reports the freed bytes");
+    assert!(json_files(dir.path()).is_empty());
+    let hits = server.hits();
+    let restarted = LinkPreviews::new(
+        Some(dir.path().to_path_buf()),
+        only_loopback(),
+        Timeouts::default(),
+    );
+    assert!(restarted.preview(&server.url("/page")).await.is_some());
+    assert!(server.hits() > hits, "an expired preview is fetched again");
+}
+
+#[tokio::test]
+async fn max_age_is_configurable_and_never_keeps_everything() {
+    let server = TestServer::start().await;
+    let dir = tempfile::tempdir().expect("dir");
+    let previews = cached_page(&server, dir.path()).await;
+    let file = json_files(dir.path()).remove(0);
+
+    age_file(&file, 40);
+    previews.set_max_age_days(None);
+    assert_eq!(previews.prune_expired(), 0, "never deletes nothing");
+    assert_eq!(json_files(dir.path()).len(), 1);
+
+    age_file(&file, 2);
+    previews.set_max_age_days(Some(1));
+    assert!(previews.prune_expired() > 0, "1 day drops a 2 day old file");
+    assert!(json_files(dir.path()).is_empty());
+}
+
+#[tokio::test]
+async fn clear_now_removes_everything_and_reports_the_size() {
+    let server = TestServer::start().await;
+    let dir = tempfile::tempdir().expect("dir");
+    let previews = cached_page(&server, dir.path()).await;
+    let size = std::fs::metadata(json_files(dir.path()).remove(0))
+        .expect("meta")
+        .len();
+    assert!(size > 0);
+    std::fs::write(dir.path().join("keep.txt"), b"not a cache file").expect("write");
+
+    assert_eq!(previews.clear_cache(), size);
+    assert!(json_files(dir.path()).is_empty());
+    assert!(dir.path().join("keep.txt").exists());
+    assert_eq!(previews.clear_cache(), 0, "nothing left to free");
+}
+
+#[tokio::test]
+async fn image_links_are_flagged_instead_of_carded() {
+    let server = TestServer::start().await;
+    let previews = LinkPreviews::new(None, only_loopback(), Timeouts::default());
+    let preview = previews
+        .preview(&server.url("/cover.png"))
+        .await
+        .expect("an image link yields a flagged preview");
+    assert!(preview.image_link);
+    assert_eq!(preview.title, None);
+    let page = previews.preview(&server.url("/page")).await.expect("page");
+    assert!(!page.image_link);
+}
+
+#[tokio::test]
+async fn still_images_are_reencoded_at_display_size() {
+    let server = TestServer::start().await;
+    let previews = LinkPreviews::new(None, only_loopback(), Timeouts::default());
+    let image = previews
+        .inline_image(&server.url("/cover.png#frag"))
+        .await
+        .expect("image");
+    assert_eq!(image.url, server.url("/cover.png"));
+    assert!(!image.animated);
+    assert_eq!((image.width, image.height), (inline::STILL_MAX_SIDE, 400));
+    assert!(image.data_url.starts_with("data:image/jpeg;base64,"));
+
+    // A single-frame GIF is a still image as well.
+    let still = previews
+        .inline_image(&server.url("/still.gif"))
+        .await
+        .expect("still gif");
+    assert!(!still.animated);
+    assert_eq!((still.width, still.height), (800, 450));
+    assert!(!still.data_url.starts_with("data:image/gif"), "re-encoded");
+}
+
+#[tokio::test]
+async fn animated_gifs_pass_through_unchanged() {
+    let server = TestServer::start().await;
+    let previews = LinkPreviews::new(None, only_loopback(), Timeouts::default());
+    let image = previews
+        .inline_image(&server.url("/anim.gif"))
+        .await
+        .expect("animated gif");
+    assert!(image.animated);
+    assert_eq!((image.width, image.height), (64, 32));
+    let expected = format!(
+        "data:image/gif;base64,{}",
+        crate::people::base64(&gif(64, 32, 3))
+    );
+    assert_eq!(
+        image.data_url, expected,
+        "the original bytes, every frame kept"
+    );
+
+    assert_eq!(
+        previews.inline_image(&server.url("/wide-anim.gif")).await,
+        None,
+        "oversized animations are refused"
+    );
+}
+
+#[tokio::test]
+async fn inline_images_are_sniffed_from_the_bytes() {
+    let server = TestServer::start().await;
+    let previews = LinkPreviews::new(None, only_loopback(), Timeouts::default());
+    let image = previews
+        .inline_image(&server.url("/claims-text"))
+        .await
+        .expect("png bytes count, whatever the server claims");
+    assert_eq!((image.width, image.height), (20, 10));
+    assert_eq!(previews.inline_image(&server.url("/fake.png")).await, None);
+    assert_eq!(previews.inline_image(&server.url("/page")).await, None);
+}
+
+#[tokio::test]
+async fn inline_images_have_size_and_dimension_caps() {
+    let server = TestServer::start().await;
+    let previews = LinkPreviews::new(None, only_loopback(), Timeouts::default());
+    assert!(
+        previews
+            .inline_image(&server.url("/big.png"))
+            .await
+            .is_some(),
+        "inline images may exceed the preview image limit"
+    );
+    assert_eq!(
+        previews.inline_image(&server.url("/too-big.png")).await,
+        None
+    );
+    assert_eq!(previews.inline_image(&server.url("/wide.png")).await, None);
+    let fetched = FetchedImage {
+        kind: fetch::ImageKind::Png,
+        bytes: png(DECODE_MAX_SIDE + 1, 1),
+    };
+    assert_eq!(
+        inline::prepare("https://e.org/x.png", &fetched).err(),
+        Some(FetchError::TooLarge)
+    );
+}
+
+#[tokio::test]
+async fn inline_images_never_come_from_local_addresses() {
+    let server = TestServer::start().await;
+    let public = LinkPreviews::new(None, AddressPolicy::PublicOnly, Timeouts::default());
+    assert_eq!(public.inline_image(&server.url("/anim.gif")).await, None);
+    assert_eq!(public.inline_image("file:///etc/passwd").await, None);
+    assert_eq!(server.hits(), 0);
+
+    let previews = LinkPreviews::new(None, only_loopback(), Timeouts::default());
+    assert_eq!(
+        previews
+            .inline_image(&server.url("/to-private-image"))
+            .await,
+        None
+    );
+    assert_eq!(
+        server.hits(),
+        1,
+        "the redirect to a LAN address is not followed"
+    );
+}
+
+#[tokio::test]
+async fn inline_images_share_the_preview_cache_clean_up() {
+    let server = TestServer::start().await;
+    let dir = tempfile::tempdir().expect("dir");
+    let previews = LinkPreviews::new(
+        Some(dir.path().to_path_buf()),
+        only_loopback(),
+        Timeouts::default(),
+    );
+    assert!(
+        previews
+            .inline_image(&server.url("/anim.gif"))
+            .await
+            .is_some()
+    );
+    let images = dir.path().join("images");
+    let file = json_files(&images).remove(0);
+    let hits = server.hits();
+    let restarted = LinkPreviews::new(
+        Some(dir.path().to_path_buf()),
+        only_loopback(),
+        Timeouts::default(),
+    );
+    assert!(
+        restarted
+            .inline_image(&server.url("/anim.gif"))
+            .await
+            .is_some()
+    );
+    assert_eq!(server.hits(), hits, "served from the disk cache");
+
+    age_file(&file, 8);
+    assert!(
+        restarted.prune_expired() > 0,
+        "pruned with the previews' maximum age"
+    );
+    assert!(json_files(&images).is_empty());
+
+    let fresh = LinkPreviews::new(
+        Some(dir.path().to_path_buf()),
+        only_loopback(),
+        Timeouts::default(),
+    );
+    assert!(fresh.inline_image(&server.url("/anim.gif")).await.is_some());
+    assert!(fresh.clear_cache() > 0, "Clear now removes images too");
+    assert!(json_files(&images).is_empty());
 }

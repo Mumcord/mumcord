@@ -21,6 +21,8 @@ use reqwest::{Client, Url, redirect};
 pub const PAGE_LIMIT: usize = 512 * 1024;
 /// Larger images are refused.
 pub const IMAGE_LIMIT: usize = 2 * 1024 * 1024;
+/// Image formats shown in chat, for the `Accept` header.
+pub const IMAGE_ACCEPT: &str = "image/png,image/jpeg,image/gif,image/webp";
 const MAX_REDIRECTS: usize = 3;
 /// Generic on purpose: says what is asking without fingerprinting the user's system.
 const AGENT: &str = "Mozilla/5.0 (compatible; Mumcord link preview)";
@@ -279,7 +281,7 @@ impl Fetcher {
                 true,
             )
             .await?;
-        if page.media_type == "text/html" || page.media_type == "application/xhtml+xml" {
+        if is_html(&page.media_type) {
             Ok(page)
         } else {
             Err(FetchError::UnsupportedType)
@@ -288,20 +290,24 @@ impl Fetcher {
 
     /// Fetches an image of at most [`IMAGE_LIMIT`] bytes in a supported format.
     pub async fn image(&self, url: &str) -> Result<FetchedImage, FetchError> {
-        let fetched = self
-            .get(
-                url,
-                "image/png,image/jpeg,image/gif,image/webp",
-                IMAGE_LIMIT,
-                false,
-            )
-            .await?;
+        self.image_up_to(url, IMAGE_LIMIT).await
+    }
+
+    /// Fetches an image of at most `limit` bytes in a supported format. The format is sniffed
+    /// from the bytes; the server's content type is ignored.
+    pub async fn image_up_to(&self, url: &str, limit: usize) -> Result<FetchedImage, FetchError> {
+        let fetched = self.get(url, IMAGE_ACCEPT, limit, false).await?;
         let kind = ImageKind::sniff(&fetched.body).ok_or(FetchError::UnsupportedType)?;
         Ok(FetchedImage {
             kind,
             bytes: fetched.body,
         })
     }
+}
+
+/// Whether a media type (lower case, without parameters) is an HTML page.
+pub fn is_html(media_type: &str) -> bool {
+    media_type == "text/html" || media_type == "application/xhtml+xml"
 }
 
 /// Only http(s) URLs with a host; IP literals must be allowed by the policy. Host names are

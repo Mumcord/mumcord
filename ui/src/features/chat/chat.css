@@ -537,7 +537,12 @@
   margin-top: var(--space-1);
 }
 
+.link-previews:empty {
+  display: none;
+}
+
 .link-card {
+  position: relative;
   display: flex;
   flex-wrap: wrap;
   gap: var(--space-3);
@@ -589,6 +594,36 @@
   align-items: stretch;
 }
 
+/* In a column the 12rem flex basis of the text would become its height: a large empty gap
+   above the player. */
+.link-card--video .link-card__text {
+  flex: 0 0 auto;
+  padding-right: 1.75rem;
+}
+
+/* Sits in the corner without taking part in the layout, so hiding the card moves nothing else. */
+.link-card__dismiss {
+  position: absolute;
+  top: var(--space-1);
+  right: var(--space-1);
+  display: grid;
+  place-items: center;
+  width: 1.5rem;
+  height: 1.5rem;
+  padding: 0;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-full);
+  background: var(--color-bg-elevated);
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+  line-height: 1;
+  cursor: pointer;
+}
+
+.link-card__dismiss:hover {
+  background: var(--color-bg-hover);
+}
+
 .link-card__play {
   position: relative;
   display: grid;
@@ -633,6 +668,60 @@
   aspect-ratio: 16 / 9;
   border: 0;
   border-radius: var(--radius-md);
+}
+
+/* Inline images (FR-1.55): scaled into a 400×300 box, aspect ratio kept. The loading
+   placeholder has a fixed size so the list does not jump while images arrive. */
+.inline-image {
+  position: relative;
+  max-width: 100%;
+  margin: 0;
+  overflow: hidden;
+  border-radius: var(--radius-md);
+}
+
+.inline-image--loading {
+  border: 1px solid var(--color-border);
+  background: var(--color-bg-elevated);
+}
+
+.inline-image__view {
+  display: block;
+  width: 100%;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: zoom-in;
+}
+
+.inline-image__img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+/* Shown on hover and keyboard focus only, so it does not cover the picture. */
+.inline-image__open {
+  position: absolute;
+  bottom: var(--space-2);
+  left: var(--space-2);
+  padding: var(--space-1) var(--space-3);
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-full);
+  background: var(--color-bg-elevated);
+  color: var(--color-text);
+  font-size: var(--font-size-sm);
+  cursor: pointer;
+  opacity: 0;
+}
+
+.inline-image:hover .inline-image__open,
+.inline-image:focus-within .inline-image__open {
+  opacity: 1;
+}
+
+.inline-image__open:hover {
+  background: var(--color-bg-hover);
 }
 
 .link-card__open {

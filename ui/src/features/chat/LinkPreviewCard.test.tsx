@@ -10,6 +10,7 @@ import {
 } from "../../api";
 import { applyLanguage } from "../../i18n";
 import { axeViolations } from "../../test/axe";
+import { clearDismissedPreviews } from "./dismissedPreviews";
 import { clearPreviews, playerUrl, previewableLinks } from "./links";
 import { MessageList } from "./MessageList";
 
@@ -25,6 +26,7 @@ const PAGE: LinkPreview = {
   description: "What happened today.",
   image: IMAGE,
   video: null,
+  isImage: false,
 };
 
 const YOUTUBE: VideoEmbed = {
@@ -40,9 +42,10 @@ const VIDEO: LinkPreview = {
   description: null,
   image: IMAGE,
   video: YOUTUBE,
+  isImage: false,
 };
 
-function message(body: string): ChatMessage {
+function message(body: string, dismissedPreviews: string[] = []): ChatMessage {
   return {
     id: "1",
     conversation: { kind: "channel", channelId: 1 },
@@ -52,15 +55,16 @@ function message(body: string): ChatMessage {
     own: false,
     sentAt: new Date().toISOString(),
     body,
+    dismissedPreviews,
   };
 }
 
-function renderMessage(body: string, linkPreviews: boolean) {
+function renderMessage(body: string, linkPreviews: boolean, dismissed: string[] = []) {
   return render(
     <main>
       <MessageList
         log={{
-          messages: [message(body)],
+          messages: [message(body, dismissed)],
           loaded: true,
           loading: false,
           hasMore: false,
@@ -82,6 +86,7 @@ beforeAll(async () => {
 
 beforeEach(() => {
   clearPreviews();
+  clearDismissedPreviews();
   api = createMockApi();
   setApi(api);
   opener.openUrl.mockClear();
@@ -197,6 +202,69 @@ describe("link preview cards", () => {
     renderMessage(`<a href="${PAGE.url}">story</a>`, true);
     await waitFor(() => {
       expect(lookup).toHaveBeenCalledOnce();
+    });
+    expect(screen.queryByRole("article")).toBeNull();
+  });
+});
+
+describe("dismissing preview cards", () => {
+  it("hides the card with the x button and tells the engine", async () => {
+    vi.spyOn(api, "linkPreview").mockResolvedValue(PAGE);
+    const dismiss = vi.spyOn(api, "previewDismiss");
+    const { container } = renderMessage(`<a href="${PAGE.url}">story</a>`, true);
+    await screen.findByRole("article");
+    expect(await axeViolations(container)).toEqual([]);
+
+    fireEvent.click(screen.getByRole("button", { name: "Hide preview" }));
+    expect(dismiss).toHaveBeenCalledWith("1", PAGE.url);
+    expect(screen.queryByRole("article")).toBeNull();
+    expect(container.querySelector(".link-previews")).toBeNull();
+    expect(screen.getByRole("link", { name: "story" })).toBeVisible();
+  });
+
+  it("hides only the dismissed card of a message with several links", async () => {
+    vi.spyOn(api, "linkPreview").mockImplementation((url) =>
+      Promise.resolve({ ...PAGE, url, title: url }),
+    );
+    renderMessage(`<a href="https://a.example/">a</a> <a href="https://b.example/">b</a>`, true);
+    await waitFor(() => {
+      expect(screen.getAllByRole("article")).toHaveLength(2);
+    });
+    fireEvent.click(screen.getAllByRole("button", { name: "Hide preview" })[0] as HTMLElement);
+    const left = screen.getAllByRole("article");
+    expect(left).toHaveLength(1);
+    expect(left[0]).toHaveAccessibleName("Link preview: https://b.example/");
+  });
+
+  it("keeps cards hidden that were dismissed earlier, without loading them", async () => {
+    const lookup = vi.spyOn(api, "linkPreview").mockResolvedValue(PAGE);
+    renderMessage(`<a href="${PAGE.url}">story</a>`, true, [PAGE.url]);
+    await new Promise((resolve) => setTimeout(resolve, 20));
+    expect(screen.queryByRole("article")).toBeNull();
+    expect(lookup).not.toHaveBeenCalled();
+  });
+
+  it("hides video cards too and survives a re-render of the list", async () => {
+    vi.spyOn(api, "linkPreview").mockResolvedValue(VIDEO);
+    const view = renderMessage(`<a href="${VIDEO.url}">video</a>`, true);
+    await screen.findByRole("article", { name: "Link preview: Never gonna" });
+    fireEvent.click(screen.getByRole("button", { name: "Hide preview" }));
+    expect(screen.queryByRole("article")).toBeNull();
+    view.unmount();
+    renderMessage(`<a href="${VIDEO.url}">video</a>`, true);
+    await new Promise((resolve) => setTimeout(resolve, 20));
+    expect(screen.queryByRole("article")).toBeNull();
+  });
+
+  it("keeps a failed save to the engine from bringing the card back", async () => {
+    vi.spyOn(api, "linkPreview").mockResolvedValue(PAGE);
+    vi.spyOn(api, "previewDismiss").mockRejectedValue(new Error("disk full"));
+    const log = vi.spyOn(console, "error").mockImplementation(() => undefined);
+    renderMessage(`<a href="${PAGE.url}">story</a>`, true);
+    await screen.findByRole("article");
+    fireEvent.click(screen.getByRole("button", { name: "Hide preview" }));
+    await waitFor(() => {
+      expect(log).toHaveBeenCalled();
     });
     expect(screen.queryByRole("article")).toBeNull();
   });

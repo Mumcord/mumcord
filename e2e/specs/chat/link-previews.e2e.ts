@@ -8,6 +8,7 @@ import {
   finishWizard,
   installOpenerStub,
   joinChannel,
+  reconnectSaved,
   selectChannel,
   sleep,
   waitMessage,
@@ -18,6 +19,23 @@ const PNG = Buffer.from(
   "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAIAAACQd1PeAAAADElEQVR4nGP4z8AAAAMBAQDJ/pLvAAAAAElFTkSuQmCC",
   "base64",
 );
+
+/** Two-frame 1×1 GIF (red, then blue), looping: an animation that must stay a GIF. */
+const ANIMATED_GIF = Buffer.from([
+  // Header, 1×1 screen, global colour table with red and blue
+  0x47, 0x49, 0x46, 0x38, 0x39, 0x61, 0x01, 0x00, 0x01, 0x00, 0x80, 0x00, 0x00, 0xff, 0x00, 0x00,
+  0x00, 0x00, 0xff,
+  // NETSCAPE2.0 loop extension
+  0x21, 0xff, 0x0b, 0x4e, 0x45, 0x54, 0x53, 0x43, 0x41, 0x50, 0x45, 0x32, 0x2e, 0x30, 0x03, 0x01,
+  0x00, 0x00, 0x00,
+  // Frame 1: colour 0
+  0x21, 0xf9, 0x04, 0x00, 0x0a, 0x00, 0x00, 0x00, 0x2c, 0x00, 0x00, 0x00, 0x00, 0x01, 0x00, 0x01,
+  0x00, 0x00, 0x02, 0x02, 0x44, 0x01, 0x00,
+  // Frame 2: colour 1
+  0x21, 0xf9, 0x04, 0x00, 0x0a, 0x00, 0x00, 0x00, 0x2c, 0x00, 0x00, 0x00, 0x00, 0x01, 0x00, 0x01,
+  0x00, 0x00, 0x02, 0x02, 0x4c, 0x01, 0x00,
+  0x3b,
+]);
 
 function page(title: string): string {
   return `<!doctype html><html><head><title>fallback</title>
@@ -33,8 +51,10 @@ function startSite(): Promise<{ server: Server; port: number; requests: string[]
   const server = createServer((req, res) => {
     const path = req.url ?? "/";
     requests.push(path);
-    if (path === "/cover.png") {
+    if (path === "/cover.png" || path.startsWith("/photo")) {
       res.writeHead(200, { "Content-Type": "image/png" }).end(PNG);
+    } else if (path.startsWith("/anim")) {
+      res.writeHead(200, { "Content-Type": "image/gif" }).end(ANIMATED_GIF);
     } else if (path.startsWith("/page")) {
       res
         .writeHead(200, { "Content-Type": "text/html; charset=utf-8" })
@@ -54,6 +74,10 @@ function card(title: string) {
   return $(`//article[contains(@class,'link-card')][.//p[@class='link-card__title' and .='${title}']]`);
 }
 
+function inlineImage(name: string) {
+  return $(`figure.inline-image[aria-label='Image: ${name}']`);
+}
+
 async function say(html: string): Promise<void> {
   await bot(["say", "--channel", "Lobby", html], { name: "LinkBot", hold: 1 });
 }
@@ -65,9 +89,10 @@ async function openChatSettings(): Promise<void> {
   await $("//button[@role='tab' and .='Chat & history']").click();
 }
 
-// AC-1.39 (link preview card, switch off → plain link and no request) and AC-1.40 (YouTube and
-// Twitch player cards that load nothing before a click).
-describe("chat: link previews and player cards (AC-1.39, AC-1.40)", () => {
+// AC-1.39 (link preview card, switch off → plain link and no request), AC-1.40 (YouTube and
+// Twitch player cards that load nothing before a click) and AC-1.45 (external images and image
+// links inline, nothing loaded with the switch off).
+describe("chat: link previews, player cards and inline images (AC-1.39, AC-1.40, AC-1.45)", () => {
   let site: Awaited<ReturnType<typeof startSite>>;
   let opener: { log: string; binDir: string };
 
@@ -133,6 +158,60 @@ describe("chat: link previews and player cards (AC-1.39, AC-1.40)", () => {
     await expect($$("iframe")).toBeElementsArrayOfSize(0);
   });
 
+  it("QA.42 hides a card with the x button and keeps it hidden after a restart", async () => {
+    const url = `http://127.0.0.1:${String(site.port)}/page-three`;
+    await say(`dismiss me <a href="${url}">${url}</a>`);
+    await waitMessage("dismiss me");
+    const preview = card("Preview page-three");
+    await preview.waitForDisplayed({ timeout: 15_000 });
+    await preview.$("button[aria-label='Hide preview']").click();
+    await preview.waitForExist({ reverse: true });
+    await expect($(`//li[contains(@class,'chat-message')]//a[@href='${url}']`)).toBeDisplayed();
+
+    await app.restart();
+    await reconnectSaved();
+    await joinChannel("Lobby");
+    await selectChannel("Lobby");
+    await waitMessage("dismiss me");
+    // Other cards load again, so the missing one is the dismissal and not a failed preview.
+    await card("Preview page-one").waitForDisplayed({ timeout: 15_000 });
+    await expect(card("Preview page-three")).not.toExist();
+  });
+
+  it("AC-1.45 shows an external image and a direct .png link inline via the engine", async () => {
+    const base = `http://127.0.0.1:${String(site.port)}`;
+    const before = site.requests.length;
+    await say(
+      `pictures <img src="${base}/anim.gif"> and <a href="${base}/photo.png">${base}/photo.png</a>`,
+    );
+    await waitMessage("pictures");
+    const gif = inlineImage("anim.gif");
+    const png = inlineImage("photo.png");
+    await gif.waitForDisplayed({ timeout: 15_000 });
+    await png.waitForDisplayed({ timeout: 15_000 });
+    // The animation reaches the webview unchanged; the still image is re-encoded by the engine.
+    await expect(gif.$("img")).toHaveAttribute("src", expect.stringMatching(/^data:image\/gif;base64,/));
+    await expect(png.$("img")).toHaveAttribute(
+      "src",
+      expect.stringMatching(/^data:image\/(png|jpeg);base64,/),
+    );
+    const remote = await browser.execute(
+      () =>
+        Array.from(document.querySelectorAll(".chat-list__items img")).filter(
+          (i) => !(i.getAttribute("src") ?? "").startsWith("data:"),
+        ).length,
+    );
+    expect(remote).toBe(0);
+    expect(site.requests.slice(before).sort()).toEqual(["/anim.gif", "/photo.png"]);
+
+    // Until the image viewer exists (B42), a click opens the image in the system browser.
+    await png.$("button.inline-image__view").click();
+    await browser.waitUntil(() => readFileSync(opener.log, "utf8").includes(`${base}/photo.png`), {
+      timeout: 10_000,
+      timeoutMsg: "clicking the image did not open it in the system browser",
+    });
+  });
+
   it("AC-1.39 with previews switched off shows only the plain link and makes no request", async () => {
     await openChatSettings();
     const toggle = $(
@@ -149,10 +228,17 @@ describe("chat: link previews and player cards (AC-1.39, AC-1.40)", () => {
     await say(`plain <a href="${url}">${url}</a>`);
     await waitMessage("plain");
     await expect($(`//li[contains(@class,'chat-message')]//a[@href='${url}']`)).toBeDisplayed();
+    // AC-1.45: neither an external image nor an image link is loaded.
+    await say(
+      `no pictures <img src="http://127.0.0.1:${String(site.port)}/anim-off.gif"> ` +
+        `<a href="http://127.0.0.1:${String(site.port)}/photo-off.png">photo</a>`,
+    );
+    await waitMessage("no pictures");
     await sleep(2000);
     await expect(card("Preview page-two")).not.toExist();
-    // Earlier cards are gone too: off means plain links everywhere.
+    // Earlier cards and images are gone too: off means plain links everywhere.
     await expect($$("article.link-card")).toBeElementsArrayOfSize(0);
+    await expect($$("figure.inline-image")).toBeElementsArrayOfSize(0);
     expect(site.requests.length).toBe(before);
   });
 });

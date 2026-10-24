@@ -24,6 +24,7 @@ function message(id: string, sender: string, minutesAgo: number, body: string): 
     own: false,
     sentAt: new Date(Date.now() - minutesAgo * 60_000).toISOString(),
     body,
+    dismissedPreviews: [],
   };
 }
 

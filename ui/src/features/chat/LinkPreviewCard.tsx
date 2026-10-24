@@ -1,20 +1,25 @@
 /**
- * Preview cards under a message (FR-1.49, FR-1.50): a page card with site, title, description
- * and image, or a player card for YouTube and Twitch whose player loads only after a click.
- * All text arrives as plain text and is rendered as such; images are `data:` URLs from the
- * engine, so the webview never contacts the linked site.
+ * Cards under a message (FR-1.49, FR-1.50, FR-1.55): a page card with site, title, description
+ * and image, a player card for YouTube and Twitch whose player loads only after a click, or
+ * the image itself for external images and image links. All text arrives as plain text and is
+ * rendered as such; images are `data:` URLs from the engine, so the webview never contacts the
+ * linked site.
  */
 import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import type { LinkPreview, VideoEmbed } from "../../api";
-import { loadPreview, playerUrl, previewableLinks } from "./links";
-import { openLink } from "./openLink";
-
-function open(url: string) {
-  openLink(url).catch((error: unknown) => {
-    console.error("Opening a link failed", error);
-  });
-}
+import { dismissPreview, useDismissedPreviews } from "./dismissedPreviews";
+import {
+  externalImages,
+  isImageLink,
+  loadPreview,
+  playerUrl,
+  previewableLinks,
+  type ImageClickHandler,
+} from "./links";
+import { openInBrowser } from "./openLink";
+import { DismissButton, OpenButton } from "./cardButtons";
+import { InlineImageCard } from "./InlineImageCard";
 
 /** Only images the engine produced; anything else would make the webview load from the web. */
 function safeImage(src: string | null): string | null {
@@ -22,26 +27,72 @@ function safeImage(src: string | null): string | null {
 }
 
 interface LinkPreviewsProps {
+  /** The message the cards belong to; dismissals are remembered per message. */
+  messageId: string;
+  /** Links of the message whose cards were dismissed earlier. */
+  dismissed: readonly string[];
   /** Sanitized message HTML. */
   html: string;
+  /** Message HTML as the engine delivered it; still holds external `<img src>` URLs. */
+  body: string;
   /** Roving tab stop of the message the cards belong to. */
   tabIndex: number;
+  /** Click on an inline image; without it the image opens in the browser. */
+  onImageClick?: ImageClickHandler | undefined;
 }
 
-/** Cards for the links of one message; renders nothing until (and unless) a preview exists. */
-export function LinkPreviews({ html, tabIndex }: LinkPreviewsProps) {
+/**
+ * Cards for the external images and links of one message; renders nothing until (and unless)
+ * a preview or image exists.
+ */
+export function LinkPreviews({
+  messageId,
+  dismissed,
+  html,
+  body,
+  tabIndex,
+  onImageClick,
+}: LinkPreviewsProps) {
   const links = useMemo(() => previewableLinks(html), [html]);
-  if (links.length === 0) return null;
+  const images = useMemo(() => externalImages(body), [body]);
+  const hidden = useDismissedPreviews(messageId, dismissed);
+  const shown = [...images, ...links.filter((url) => !images.includes(url))].filter(
+    (url) => !hidden.has(url),
+  );
+  if (shown.length === 0) return null;
   return (
     <div className="link-previews">
-      {links.map((url) => (
-        <LinkPreviewCard key={url} url={url} tabIndex={tabIndex} />
-      ))}
+      {shown.map((url) =>
+        images.includes(url) || isImageLink(url) ? (
+          <InlineImageCard
+            key={url}
+            url={url}
+            messageId={messageId}
+            tabIndex={tabIndex}
+            onImageClick={onImageClick}
+          />
+        ) : (
+          <LinkPreviewCard
+            key={url}
+            url={url}
+            messageId={messageId}
+            tabIndex={tabIndex}
+            onImageClick={onImageClick}
+          />
+        ),
+      )}
     </div>
   );
 }
 
-function LinkPreviewCard({ url, tabIndex }: { url: string; tabIndex: number }) {
+interface CardProps {
+  url: string;
+  messageId: string;
+  tabIndex: number;
+  onImageClick: ImageClickHandler | undefined;
+}
+
+function LinkPreviewCard({ url, messageId, tabIndex, onImageClick }: CardProps) {
   const [preview, setPreview] = useState<LinkPreview | null>(null);
   useEffect(() => {
     let active = true;
@@ -53,31 +104,33 @@ function LinkPreviewCard({ url, tabIndex }: { url: string; tabIndex: number }) {
     };
   }, [url]);
   if (preview === null) return null;
+  // The link turned out to serve an image (by content type): show the image itself.
+  if (preview.isImage)
+    return (
+      <InlineImageCard
+        url={url}
+        messageId={messageId}
+        tabIndex={tabIndex}
+        onImageClick={onImageClick}
+      />
+    );
+  const dismiss = () => {
+    dismissPreview(messageId, url);
+  };
   return preview.video ? (
-    <VideoCard preview={preview} video={preview.video} tabIndex={tabIndex} />
+    <VideoCard preview={preview} video={preview.video} tabIndex={tabIndex} onDismiss={dismiss} />
   ) : (
-    <PageCard preview={preview} tabIndex={tabIndex} />
+    <PageCard preview={preview} tabIndex={tabIndex} onDismiss={dismiss} />
   );
 }
 
-function OpenButton({ url, title, tabIndex }: { url: string; title: string; tabIndex: number }) {
-  const { t } = useTranslation("chat");
-  return (
-    <button
-      type="button"
-      className="link-card__open"
-      tabIndex={tabIndex}
-      aria-label={t("preview.openLabel", { title })}
-      onClick={() => {
-        open(url);
-      }}
-    >
-      {t("preview.open")}
-    </button>
-  );
+interface PageCardProps {
+  preview: LinkPreview;
+  tabIndex: number;
+  onDismiss: () => void;
 }
 
-function PageCard({ preview, tabIndex }: { preview: LinkPreview; tabIndex: number }) {
+function PageCard({ preview, tabIndex, onDismiss }: PageCardProps) {
   const { t } = useTranslation("chat");
   const title = preview.title ?? preview.siteName ?? preview.url;
   const image = safeImage(preview.image);
@@ -92,6 +145,7 @@ function PageCard({ preview, tabIndex }: { preview: LinkPreview; tabIndex: numbe
         <OpenButton url={preview.url} title={title} tabIndex={tabIndex} />
       </div>
       {image !== null && <img className="link-card__image" src={image} alt="" />}
+      <DismissButton onDismiss={onDismiss} tabIndex={tabIndex} />
     </article>
   );
 }
@@ -100,9 +154,10 @@ interface VideoCardProps {
   preview: LinkPreview;
   video: VideoEmbed;
   tabIndex: number;
+  onDismiss: () => void;
 }
 
-function VideoCard({ preview, video, tabIndex }: VideoCardProps) {
+function VideoCard({ preview, video, tabIndex, onDismiss }: VideoCardProps) {
   const { t } = useTranslation("chat");
   const [playing, setPlaying] = useState(false);
   const player = playerUrl(video);
@@ -134,7 +189,7 @@ function VideoCard({ preview, video, tabIndex }: VideoCardProps) {
           aria-label={t("preview.play", { title })}
           title={player === null ? t("preview.inBrowser") : undefined}
           onClick={() => {
-            if (player === null) open(preview.url);
+            if (player === null) openInBrowser(preview.url);
             else setPlaying(true);
           }}
         >
@@ -145,6 +200,7 @@ function VideoCard({ preview, video, tabIndex }: VideoCardProps) {
         </button>
       )}
       <OpenButton url={preview.url} title={title} tabIndex={tabIndex} />
+      <DismissButton onDismiss={onDismiss} tabIndex={tabIndex} />
     </article>
   );
 }

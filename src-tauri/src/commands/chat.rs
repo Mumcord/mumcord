@@ -24,6 +24,8 @@ pub struct ChatMessage {
     pub sent_at: String,
     /// Sanitized HTML; the UI sanitizes again before rendering.
     pub body: String,
+    /// Links whose preview card was dismissed by the user (`preview_dismiss`).
+    pub dismissed_previews: Vec<String>,
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, Type, Event)]
@@ -65,6 +67,7 @@ impl From<ChatMessageView> for ChatMessage {
             own: v.own,
             sent_at: rfc3339(v.sent_at),
             body: v.body,
+            dismissed_previews: v.dismissed_previews,
         }
     }
 }
