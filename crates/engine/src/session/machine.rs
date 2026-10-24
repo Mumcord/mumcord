@@ -3,7 +3,7 @@
 
 use std::time::Duration;
 
-use mumcord_store::ServerId;
+use mumcord_store::{OwnVoice, ServerId};
 
 use super::types::{ConnState, EngineError, ErrorKind};
 
@@ -167,12 +167,14 @@ pub struct SelfVoice {
     pub mute: bool,
     pub deaf: bool,
     mute_before_deaf: bool,
+    /// Forced mute/deafen of a fresh connect (QA.2); not the user's own choice.
+    read_only: bool,
 }
 
 impl SelfVoice {
     pub fn set_mute(&mut self, mute: bool) {
         if !mute && self.deaf {
-            self.deaf = false;
+            self.set_deaf(false);
         }
         self.mute = mute;
     }
@@ -186,6 +188,7 @@ impl SelfVoice {
             self.mute = true;
         } else {
             self.mute = self.mute_before_deaf;
+            self.read_only = false;
         }
         self.deaf = deaf;
     }
@@ -196,12 +199,31 @@ impl SelfVoice {
             mute: true,
             deaf: true,
             mute_before_deaf: false,
+            read_only: true,
         }
     }
 
-    /// Explicit join of a channel: voice on.
-    pub fn join(&mut self) {
-        *self = Self::default();
+    /// Explicit join of a channel: leaves read-only and restores the user's last own
+    /// mute/deafen choice (QA.7).
+    pub fn join(&mut self, own: OwnVoice) {
+        *self = Self {
+            mute: own.mute || own.deaf,
+            deaf: own.deaf,
+            mute_before_deaf: own.deaf && own.mute,
+            read_only: false,
+        };
+    }
+
+    /// The user's own choice to remember, or `None` while the state is the forced read-only one.
+    pub fn own(&self) -> Option<OwnVoice> {
+        (!self.read_only).then_some(OwnVoice {
+            mute: if self.deaf {
+                self.mute_before_deaf
+            } else {
+                self.mute
+            },
+            deaf: self.deaf,
+        })
     }
 }
 
@@ -342,7 +364,8 @@ mod tests {
     fn read_only_until_join() {
         let mut v = SelfVoice::read_only();
         assert!(v.mute && v.deaf);
-        v.join();
+        assert_eq!(v.own(), None, "the forced state is not the user's choice");
+        v.join(OwnVoice::default());
         assert!(!v.mute && !v.deaf);
 
         let mut v = SelfVoice::read_only();
@@ -351,6 +374,54 @@ mod tests {
             !v.mute && !v.deaf,
             "undeafening read-only turns the microphone on"
         );
+        assert_eq!(v.own(), Some(OwnVoice::default()));
+    }
+
+    #[test]
+    fn join_restores_the_last_own_choice() {
+        let muted = OwnVoice {
+            mute: true,
+            deaf: false,
+        };
+        let mut v = SelfVoice::read_only();
+        v.join(muted);
+        assert!(v.mute && !v.deaf, "muted before, still muted, not deafened");
+        assert_eq!(v.own(), Some(muted));
+
+        let both = OwnVoice {
+            mute: true,
+            deaf: true,
+        };
+        let mut v = SelfVoice::read_only();
+        v.join(both);
+        assert!(v.mute && v.deaf);
+        assert_eq!(v.own(), Some(both));
+        v.set_deaf(false);
+        assert!(v.mute && !v.deaf, "the mute under the deafen comes back");
+
+        let mut v = SelfVoice::read_only();
+        v.join(OwnVoice {
+            mute: false,
+            deaf: true,
+        });
+        v.set_deaf(false);
+        assert!(!v.mute && !v.deaf);
+    }
+
+    #[test]
+    fn own_choice_follows_toggles_while_joined() {
+        let mut v = SelfVoice::default();
+        v.set_mute(true);
+        v.set_deaf(true);
+        assert_eq!(
+            v.own(),
+            Some(OwnVoice {
+                mute: true,
+                deaf: true
+            })
+        );
+        v.set_mute(false);
+        assert_eq!(v.own(), Some(OwnVoice::default()));
     }
 
     #[test]

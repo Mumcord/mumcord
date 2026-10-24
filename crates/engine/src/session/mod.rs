@@ -29,7 +29,7 @@ use mumcord_protocol::{
     ClientIdentity, ConnectConfig, ConnectError, Connection, DisconnectReason, Event, Handle,
     ServerState, Transport, VoiceEvent, VoiceTransport,
 };
-use mumcord_store::{Identity, SecretStore, ServerId, Store};
+use mumcord_store::{Identity, OwnVoice, SecretStore, ServerId, Store};
 use tokio::runtime::Handle as Runtime;
 use tokio::sync::mpsc;
 use tokio::task::JoinHandle;
@@ -378,7 +378,8 @@ impl Engine {
         self.inner.change_self_voice(|v| v.set_deaf(deaf))
     }
 
-    /// Explicit join: moves there (unless already there) and turns voice on.
+    /// Explicit join: moves there (unless already there) and turns voice on with the user's last
+    /// own mute/deafen choice (QA.7).
     pub fn join_channel(&self, channel_id: u32) -> EngineResult<()> {
         let ctx = self.session_ctx()?;
         let (known, here) = ctx.handle.with_state(|s| {
@@ -395,7 +396,8 @@ impl Engine {
                 .join_channel(channel_id)
                 .map_err(convert::command_error)?;
         }
-        self.inner.change_self_voice(SelfVoice::join)
+        let own = self.inner.own_voice();
+        self.inner.change_self_voice(|v| v.join(own))
     }
 
     pub fn person_set_volume(&self, session: u32, volume: u16) -> EngineResult<()> {
@@ -941,7 +943,7 @@ impl Inner {
 
     /// Restores followed channels. A fresh connect stays where the server put the user,
     /// read-only (self-muted and deafened), unless a link names a channel: that is an explicit
-    /// join with voice on. A reconnect rejoins the last channel and restores the own
+    /// join with the user's last own mute/deafen choice. A reconnect rejoins the last channel and restores the own
     /// mute/deafen state (continuity). At most three rate-limited messages, inside the
     /// server's burst. Returns the followed channel ids.
     fn post_sync(&self, server_id: ServerId, handle: &Handle, arrival: Arrival) -> Vec<u32> {
@@ -959,7 +961,11 @@ impl Inner {
             (last, followed)
         };
         let (target, voice) = match arrival {
-            Arrival::Fresh(Some(path)) => (Some(path), Some(SelfVoice::default())),
+            Arrival::Fresh(Some(path)) => {
+                let mut voice = SelfVoice::read_only();
+                voice.join(self.own_voice());
+                (Some(path), Some(voice))
+            }
             Arrival::Fresh(None) => (None, Some(SelfVoice::read_only())),
             Arrival::Reconnect => (last.as_deref().map(split_path), None),
         };
@@ -1128,11 +1134,28 @@ impl Inner {
         })
     }
 
+    /// The remembered own mute/deafen choice; neither if it cannot be read.
+    fn own_voice(&self) -> OwnVoice {
+        lock(&self.store).own_voice().unwrap_or_else(|e| {
+            tracing::warn!(error = %e, "reading the remembered mute state failed");
+            OwnVoice::default()
+        })
+    }
+
     fn change_self_voice(&self, change: impl FnOnce(&mut SelfVoice)) -> EngineResult<()> {
         let mut core = lock(&self.core);
         let before = core.self_voice;
         change(&mut core.self_voice);
         let after = core.self_voice;
+        // Only the user's own toggles while joined for voice are remembered, never the forced
+        // read-only state or leaving it (QA.7).
+        if before.own().is_some()
+            && let Some(own) = after.own()
+            && after != before
+            && let Err(e) = lock(&self.store).save_own_voice(own)
+        {
+            tracing::warn!(error = %e, "remembering the mute state failed");
+        }
         self.voice.muted.store(after.mute, Ordering::Relaxed);
         self.voice.deaf.store(after.deaf, Ordering::Relaxed);
         let Some(session) = &core.session else {

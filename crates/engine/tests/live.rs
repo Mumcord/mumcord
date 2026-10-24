@@ -344,3 +344,149 @@ async fn declining_the_certificate_disconnects() {
     assert_eq!(error.map(|e| e.kind), Some(ErrorKind::CertificateRejected));
     assert!(engine.snapshot().is_none());
 }
+
+/// Connects `server` (trusting its certificate if asked) and returns the synced snapshot.
+async fn connect_synced(
+    engine: &Engine,
+    rx: &mut UnboundedReceiver<EngineEvent>,
+    server: mumcord_engine::ServerId,
+) -> Snapshot {
+    engine.connect(server, None).expect("connect");
+    loop {
+        match wait_for(rx, "ServerSynced or CertTrustRequired", |e| match e {
+            EngineEvent::ServerSynced(s) => Some(Ok((**s).clone())),
+            EngineEvent::CertTrustRequired { fingerprint, .. } => Some(Err(fingerprint.clone())),
+            _ => None,
+        })
+        .await
+        {
+            Ok(snapshot) => return snapshot,
+            Err(fingerprint) => engine
+                .cert_trust_decide(server, &fingerprint, true)
+                .expect("trust"),
+        }
+    }
+}
+
+async fn disconnected(engine: &Engine, rx: &mut UnboundedReceiver<EngineEvent>) {
+    engine.disconnect();
+    wait_for(rx, "Disconnected", |e| match e {
+        EngineEvent::StateChanged(ConnState::Disconnected { error: None }) => Some(()),
+        _ => None,
+    })
+    .await;
+}
+
+fn channel_id(snapshot: &Snapshot, name: &str) -> u32 {
+    snapshot
+        .channels
+        .iter()
+        .find(|c| c.name == name)
+        .unwrap_or_else(|| panic!("{name} channel"))
+        .id
+}
+
+/// QA.7 / AC-1.35: a Join after the read-only connect restores the user's last own mute choice,
+/// also after an app restart; the forced read-only state never overwrites it.
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+#[ignore = "needs testenv v14 (MUMCORD_LIVE=1)"]
+async fn join_restores_the_last_own_mute_after_a_restart() {
+    if !live() {
+        return;
+    }
+    let dir = work_dir("engine-live-own-voice");
+    let name = unique("mc-ownvoice");
+    let data = dir.join("data");
+    // The identity lives in (in-memory) secure storage, so it moves to the restarted engine
+    // through an export file; the database stays in `data`.
+    let identity = dir.join("identity.p12");
+    let bot = Bot::connect(BotConfig {
+        data_dir: Some(dir.join("bot")),
+        ..BotConfig::new(&unique("mc-ownear"), env::PORT_V14)
+    })
+    .await
+    .expect("bot");
+    let in_raid = |muted: bool, deaf: bool| UserCheck {
+        in_channel: Some("Raid".into()),
+        muted: Some(muted),
+        deaf: Some(deaf),
+        ..UserCheck::default()
+    };
+
+    let server = {
+        let (engine, mut rx) = Engine::new(
+            &data,
+            SecretStore::in_memory(),
+            tokio::runtime::Handle::current(),
+        )
+        .expect("engine");
+        engine
+            .identity_create(name.clone())
+            .await
+            .expect("identity");
+        let mut fields = server_fields(&name);
+        fields.port = env::PORT_V14;
+        let server = engine.server_add(fields).await.expect("server");
+        let snapshot = connect_synced(&engine, &mut rx, server.id).await;
+        let raid = channel_id(&snapshot, "Raid");
+
+        // Never muted before: Join turns voice fully on.
+        engine.join_channel(raid).expect("join Raid");
+        bot.wait_user(&name, &in_raid(false, false))
+            .await
+            .expect("voice on after the first join");
+        engine.set_self_mute(true).expect("mute");
+        bot.wait_user(&name, &in_raid(true, false))
+            .await
+            .expect("muted");
+        disconnected(&engine, &mut rx).await;
+        engine
+            .identity_export(identity.clone(), "export".into())
+            .await
+            .expect("export identity");
+        server.id
+    };
+
+    // App restart: a new engine on the same data directory.
+    let (engine, mut rx) = Engine::new(
+        &data,
+        SecretStore::in_memory(),
+        tokio::runtime::Handle::current(),
+    )
+    .expect("engine restart");
+    engine
+        .identity_import(identity, Some("export".into()))
+        .await
+        .expect("import identity");
+    let snapshot = connect_synced(&engine, &mut rx, server).await;
+    let me = snapshot
+        .users
+        .iter()
+        .find(|u| u.session == snapshot.self_session)
+        .expect("own user");
+    assert!(me.self_mute && me.self_deaf, "read-only after the restart");
+    // Toggling while read-only is no own choice: deafen stays forced, mute is unchanged.
+    engine.set_self_mute(true).expect("mute while read-only");
+
+    engine
+        .join_channel(channel_id(&snapshot, "Raid"))
+        .expect("join Raid after restart");
+    bot.wait_user(&name, &in_raid(true, false))
+        .await
+        .expect("still muted, not deafened after the join");
+
+    // Unmuting while joined is remembered for the next join.
+    engine.set_self_mute(false).expect("unmute");
+    bot.wait_user(&name, &in_raid(false, false))
+        .await
+        .expect("unmuted");
+    disconnected(&engine, &mut rx).await;
+    let snapshot = connect_synced(&engine, &mut rx, server).await;
+    engine
+        .join_channel(channel_id(&snapshot, "Raid"))
+        .expect("join Raid again");
+    bot.wait_user(&name, &in_raid(false, false))
+        .await
+        .expect("voice on: the unmute was remembered");
+    disconnected(&engine, &mut rx).await;
+}
