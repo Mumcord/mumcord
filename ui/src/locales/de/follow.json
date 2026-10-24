@@ -1,0 +1,32 @@
+{
+  "follow": "Folgen",
+  "following": "Folge ich",
+  "unsupported": "Kanälen folgen funktioniert erst mit einem Server ab Version 1.4.",
+  "unread_one": "{{count}} ungelesene Nachricht",
+  "unread_other": "{{count}} ungelesene Nachrichten",
+  "errors": {
+    "denied": "Der Server erlaubt dir nicht, diesem Kanal zu folgen.",
+    "limit": "Du kannst auf diesem Server keinen weiteren Kanälen folgen. Entfolge zuerst einem anderen Kanal.",
+    "tooOld": "Dieser Server ist zu alt, um Kanälen zu folgen (ab Version 1.4).",
+    "notConnected": "Du bist nicht mit dem Server verbunden.",
+    "generic": "Das Folgen hat nicht geklappt. Bitte versuche es noch einmal."
+  },
+  "dm": {
+    "title": "Direktnachrichten",
+    "unknown": "Unbekannte Person"
+  },
+  "notify": {
+    "channel": "{{name}} in {{channel}}: {{text}}",
+    "private": "{{name}} (privat): {{text}}",
+    "more_one": "{{count}} weitere neue Nachricht",
+    "more_other": "{{count}} weitere neue Nachrichten"
+  },
+  "history": {
+    "clear": "Verlauf löschen",
+    "title": "Verlauf löschen?",
+    "body": "Die gespeicherten Nachrichten dieser Unterhaltung werden dauerhaft von diesem Computer gelöscht. Andere behalten ihre eigenen Kopien.",
+    "confirm": "Verlauf löschen",
+    "cancel": "Abbrechen",
+    "failed": "Der Verlauf konnte nicht gelöscht werden. Bitte versuche es noch einmal."
+  }
+}

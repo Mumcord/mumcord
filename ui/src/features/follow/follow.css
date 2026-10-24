@@ -1,0 +1,63 @@
+.follow-toggle[aria-pressed="true"] {
+  color: var(--color-accent-text);
+}
+
+.follow-hint,
+.follow-error {
+  margin: 0;
+  font-size: var(--font-size-sm);
+}
+
+.follow-hint {
+  color: var(--color-text-muted);
+}
+
+.follow-error {
+  color: var(--color-danger);
+}
+
+.unread-badge {
+  margin-left: auto;
+  padding: 0 var(--space-2);
+  border-radius: var(--radius-md);
+  background: var(--color-accent);
+  color: var(--color-on-accent);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-bold);
+}
+
+.direct-messages {
+  padding: var(--space-2);
+}
+
+.direct-messages h2 {
+  margin: 0 0 var(--space-1);
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+  text-transform: uppercase;
+}
+
+.direct-messages ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.direct-messages__item {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  min-height: 2rem;
+  padding: var(--space-1) var(--space-2);
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--color-text);
+  text-align: left;
+  cursor: pointer;
+}
+
+.direct-messages__item:hover,
+.direct-messages__item[aria-current="true"] {
+  background: var(--color-bg-hover);
+}

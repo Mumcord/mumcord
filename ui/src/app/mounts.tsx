@@ -7,8 +7,9 @@ import { SettingsScreen } from "../features/settings/SettingsScreen";
 import { Wizard } from "../features/wizard";
 import { UserPanel } from "../features/userpanel";
 import { ChannelsPanel } from "../features/channels";
+import { ChannelUnreadBadge, DirectMessages, FollowHeaderActions } from "../features/follow";
 import { ChatView } from "../features/chat";
-import { MembersPanel } from "../features/members";
+import { MembersPanel, openPrivateConversation } from "../features/members";
 import { ConnectionStatus, ServersRoot } from "../features/servers";
 
 /** Server bar (B19). */
@@ -18,7 +19,12 @@ export function ServersMount() {
 
 /** Channel tree (B20). */
 export function ChannelsMount() {
-  return <ChannelsPanel />;
+  return (
+    <>
+      <ChannelsPanel channelBadge={(channelId) => <ChannelUnreadBadge channelId={channelId} />} />
+      <DirectMessages />
+    </>
+  );
 }
 
 /** User panel at the bottom of the channel column (B23). */
@@ -33,12 +39,12 @@ export function ChatStatusMount() {
 
 /** Chat header, message list and input (B21). */
 export function ChatMount() {
-  return <ChatView />;
+  return <ChatView renderHeaderActions={(conv) => <FollowHeaderActions conversation={conv} />} />;
 }
 
 /** Member list (B20). */
 export function MembersMount() {
-  return <MembersPanel />;
+  return <MembersPanel onSendPrivateMessage={openPrivateConversation} />;
 }
 
 /** First-start wizard content (B18); calls `useView().finishWizard()` when done. */
