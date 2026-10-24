@@ -45,6 +45,7 @@ describe("Wizard", () => {
     expect(saved).toMatchObject({ wizardCompleted: true, talkMode: "voiceActivation" });
     expect(harness.applySettings).toHaveBeenCalledWith(saved);
     expect(await harness.api.linkHandlerStatus()).toBe(true);
+    expect(saved.autostart).toBe(false);
   });
 
   it("announces the step through the focused heading's description", async () => {
@@ -180,6 +181,42 @@ describe("Wizard", () => {
       expect(harness.finishWizard).toHaveBeenCalledOnce();
     });
     expect(await harness.api.linkHandlerStatus()).toBe(false);
+  });
+
+  it("turns on start at login when ticked", async () => {
+    renderInWizard(harness, <Wizard />);
+    await createIdentity();
+    fireEvent.click(screen.getByRole("button", { name: "Next" }));
+    fireEvent.click(await screen.findByRole("checkbox", { name: "Start Mumcord when I log in" }));
+    fireEvent.click(screen.getByRole("button", { name: "Finish" }));
+    await waitFor(() => {
+      expect(harness.finishWizard).toHaveBeenCalledOnce();
+    });
+    const saved = await harness.api.settingsGet();
+    expect(saved).toMatchObject({ wizardCompleted: true, autostart: true, startMinimized: true });
+    expect(harness.applySettings).toHaveBeenCalledWith(saved);
+  });
+
+  it("finishes even when start at login cannot be set up, and says so", async () => {
+    const spoken: string[] = [];
+    const unsubscribe = subscribeAnnouncements((a) => spoken.push(a.message));
+    vi.spyOn(console, "error").mockImplementation(() => undefined);
+    const api = harness.api;
+    const original = api.settingsUpdate.bind(api);
+    vi.spyOn(api, "settingsUpdate").mockImplementation((next) =>
+      next.autostart ? Promise.reject(new Error("refused")) : original(next),
+    );
+    renderInWizard(harness, <Wizard />);
+    await createIdentity();
+    fireEvent.click(screen.getByRole("button", { name: "Next" }));
+    fireEvent.click(await screen.findByRole("checkbox", { name: "Start Mumcord when I log in" }));
+    fireEvent.click(screen.getByRole("button", { name: "Finish" }));
+    await waitFor(() => {
+      expect(harness.finishWizard).toHaveBeenCalledOnce();
+    });
+    expect(await api.settingsGet()).toMatchObject({ wizardCompleted: true, autostart: false });
+    expect(spoken.join(" ")).toContain("start when you log in");
+    unsubscribe();
   });
 
   it.each(["dark", "light"] as const)("has no axe violations on any step (%s)", async (theme) => {

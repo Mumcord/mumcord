@@ -45,7 +45,7 @@ async function loadWizard(): Promise<Loaded> {
   return { settings, identity, availability, mouseStatus, linkHandlerActive };
 }
 
-/** First-start wizard: identity → microphone → talk mode (FR-1.1–FR-1.6). */
+/** First-start wizard: identity → microphone → talk mode and start options (FR-1.1–FR-1.6, FR-1.48d). */
 export function Wizard() {
   const { t } = useTranslation("wizard");
   const { finishWizard } = useView();
@@ -114,12 +114,21 @@ export function Wizard() {
         announce(t("talk.linkHandlerFailed"), "polite");
       }
     }
-    const saved = await saveSettings({
+    let saved = await saveSettings({
       ...settings,
       talkMode: choice.talkMode,
       pttKey: choice.pttKey,
       wizardCompleted: true,
     });
+    if (choice.autostart !== saved.autostart) {
+      // Saved on its own: if the OS refuses the login entry, the wizard still finishes.
+      try {
+        saved = await saveSettings({ ...saved, autostart: choice.autostart });
+      } catch (cause: unknown) {
+        console.error("setting up start at login failed", cause);
+        announce(t("talk.autostartFailed"), "polite");
+      }
+    }
     applySettings(saved);
     finishWizard();
   }

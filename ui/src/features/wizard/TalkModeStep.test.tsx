@@ -55,7 +55,22 @@ describe("TalkModeStep", () => {
         talkMode: "voiceActivation",
         pttKey: null,
         registerLinkHandler: true,
+        autostart: false,
       });
+    });
+  });
+
+  it("offers start at login, off by default, and passes the choice on", async () => {
+    renderStep();
+    const autostart = screen.getByRole("checkbox", { name: "Start Mumcord when I log in" });
+    expect(autostart).not.toBeChecked();
+    expect(autostart).toHaveAccessibleDescription(
+      "You can change this later in Settings → Appearance.",
+    );
+    fireEvent.click(autostart);
+    fireEvent.click(screen.getByRole("button", { name: "Finish" }));
+    await waitFor(() => {
+      expect(onFinish).toHaveBeenCalledWith(expect.objectContaining({ autostart: true }));
     });
   });
 
@@ -81,6 +96,7 @@ describe("TalkModeStep", () => {
         talkMode: "pushToTalk",
         pttKey: "Ctrl+A",
         registerLinkHandler: true,
+        autostart: false,
       });
     });
   });
@@ -167,7 +183,9 @@ describe("TalkModeStep", () => {
 
   it("skips the link offer when Mumcord already handles mumble:// links", async () => {
     renderStep({ status: "available" }, true);
-    expect(screen.queryByRole("checkbox")).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole("checkbox", { name: "Open mumble:// links with Mumcord" }),
+    ).not.toBeInTheDocument();
     expect(screen.getByText("Mumcord already opens mumble:// links.")).toBeInTheDocument();
     fireEvent.click(screen.getByRole("button", { name: "Finish" }));
     await waitFor(() => {

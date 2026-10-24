@@ -16,6 +16,8 @@ export interface TalkChoice {
   pttKey: string | null;
   /** Register Mumcord as the `mumble://` handler (FR-1.6). */
   registerLinkHandler: boolean;
+  /** Start Mumcord when the user logs in (FR-1.48d). */
+  autostart: boolean;
 }
 
 type Capture = "off" | "listening" | "pending";
@@ -34,7 +36,10 @@ interface TalkModeStepProps {
   onFinish: (choice: TalkChoice) => Promise<void>;
 }
 
-/** Step 3: voice activation or push-to-talk with key capture, then the link handler offer. */
+/**
+ * Step 3: voice activation or push-to-talk with key capture, then the link handler and
+ * start-at-login offers.
+ */
 export function TalkModeStep({
   settings,
   availability,
@@ -57,6 +62,7 @@ export function TalkModeStep({
   const [keyError, setKeyError] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [registerLink, setRegisterLink] = useState(true);
+  const [autostart, setAutostart] = useState(settings.autostart);
   const [busy, setBusy] = useState(false);
   // Bumped on cancel so a late failure of the cancelled capture shows no error.
   const captureAttempt = useRef(0);
@@ -68,6 +74,7 @@ export function TalkModeStep({
     key: useId(),
     keyError: useId(),
     linkHint: useId(),
+    autostartHint: useId(),
   };
 
   async function captureKey(combo: string) {
@@ -149,6 +156,7 @@ export function TalkModeStep({
         talkMode: mode,
         pttKey,
         registerLinkHandler: linkHandlerActive !== true && registerLink,
+        autostart,
       });
     } catch {
       setBusy(false);
@@ -277,6 +285,22 @@ export function TalkModeStep({
           </p>
         </div>
       )}
+      <div>
+        <label className="wizard-radio">
+          <input
+            type="checkbox"
+            checked={autostart}
+            aria-describedby={ids.autostartHint}
+            onChange={(event) => {
+              setAutostart(event.target.checked);
+            }}
+          />
+          {t("talk.autostart")}
+        </label>
+        <p id={ids.autostartHint} className="wizard-muted wizard-small wizard-indent">
+          {t("talk.autostartHint")}
+        </p>
+      </div>
       {error && (
         <p role="alert" className="wizard-error">
           {error}
