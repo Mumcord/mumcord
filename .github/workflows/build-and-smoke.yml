@@ -126,7 +126,14 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y --no-install-recommends \
             libasound2-dev cmake sqlite3 xvfb dbus-x11 gnome-keyring libsecret-tools \
-            libwebkit2gtk-4.1-0 libayatana-appindicator3-1
+            libwebkit2gtk-4.1-0
+          # The AppImage must bring its own tray library (it is loaded at runtime, so a missing
+          # one only shows on machines without it). Keep it off the runner so the smoke test
+          # exercises the bundled copy.
+          sudo apt-get purge -y 'libayatana-appindicator3-*' 'libappindicator3-*' || true
+          if ldconfig -p | grep -qE 'lib(ayatana-)?appindicator3\.so\.1'; then
+            echo "an AppIndicator library is still installed on the runner" >&2; exit 1
+          fi
           # Throwaway SuperUser password for this runner only (same as e2e/run.sh).
           printf 'SUPERUSER_PASSWORD=%s\nSERVER_PASSWORD=\n' "$(openssl rand -hex 16)" > testenv/.env
           testenv/up.sh v15
@@ -224,6 +231,12 @@ jobs:
         run: |
           app=$(ls build/*.AppImage)
           chmod +x "$app"
+          # The tray library is loaded with dlopen, so the bundler's dependency scan cannot be
+          # trusted to have picked it up: check the AppImage contents directly.
+          (cd "$RUNNER_TEMP" && "$GITHUB_WORKSPACE/$app" --appimage-extract >/dev/null)
+          test -e "$RUNNER_TEMP/squashfs-root/usr/lib/libayatana-appindicator3.so.1" \
+            || { echo "libayatana-appindicator3.so.1 is missing from the AppImage" >&2; exit 1; }
+          rm -rf "$RUNNER_TEMP/squashfs-root"
           # Secret Service (unlocked gnome-keyring) for the identity, and a virtual display.
           # An EMPTY password creates no `login` collection, so unlock with a fixed non-empty
           # throwaway password in a fresh D-Bus session; verify with secret-tool before seeding.
@@ -236,6 +249,12 @@ jobs:
             secret-tool clear app mumcord-smoke
             xvfb-run -a scripts/smoke/smoke.sh --app "$0" --seed target/release/mumcord-smoke-seed --bot target/release/mumcord-bot
           ' "$PWD/$app"
+          # The app runs without a tray when the library cannot be loaded; in the AppImage that
+          # means the bundled copy is broken (e.g. a dependency of it is missing).
+          logs="${XDG_DATA_HOME:-$HOME/.local/share}/app.mumcord.client/logs"
+          if grep -qs 'no tray library' "$logs"/*; then
+            echo "the AppImage could not load its bundled tray library" >&2; exit 1
+          fi
 
       - name: Smoke test (Windows)
         if: runner.os == 'Windows'
