@@ -779,3 +779,12 @@ Desktop notifications were planned for Epic 3.
 ✍️ Note: Requested in chat during /dev.
 
 ---
+
+#### QA.18 Highlight the channel the user is in? `◉`
+
+- [x] **The channel the user is joined to for voice is highlighted in the channel list, distinct from the selected (viewed) channel: green accent bar on the left, a small speaker icon and bold name.** While read-only (not joined for voice) no channel gets this highlight. Screen readers hear "you are here (voice)".
+- [ ] Not needed.
+
+✍️ Note: Requested in chat during /dev.
+
+---
