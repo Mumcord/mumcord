@@ -18,10 +18,16 @@ docker compose up -d --build --force-recreate "$svc"
 
 if [ ! -f "data/$svc/.seeded" ]; then
   db="data/$svc/murmur.sqlite"; [ "$svc" = v13 ] || db="data/$svc/mumble-server.sqlite"
-  for _ in $(seq 60); do
-    [ -f "$db" ] && sqlite3 "$db" "select 1 from channels limit 1" >/dev/null 2>&1 && break
+  # The schema appears early but is rolled back if the container is stopped mid-initialisation
+  # (slow runner). The root channel row is written once the server has booted its virtual server.
+  ready=0
+  for _ in $(seq 120); do
+    if [ -f "$db" ] && [ "$(sqlite3 "$db" "select count(*) from channels where channel_id = 0" 2>/dev/null)" = 1 ]; then
+      ready=1; break
+    fi
     sleep 1
   done
+  [ "$ready" = 1 ] || { echo "$svc did not initialise its database within 120s" >&2; docker compose logs --tail 20 "$svc" >&2; exit 1; }
   # The server only reads channels at startup, so seed while it is stopped.
   docker compose stop "$svc" >/dev/null
   sqlite3 "$db" "insert or ignore into channels (server_id, channel_id, parent_id, name, inheritacl) values
