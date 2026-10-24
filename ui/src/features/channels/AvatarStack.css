@@ -1,37 +1,12 @@
-/* Avatar stack on channel rows (QA.14). Kept apart from channels.css on purpose. */
+/* Avatar stack on its own line under a channel row (QA.14, QA.29). Kept apart from channels.css on purpose. */
 .avatar-stack {
-  /* The ring between avatars takes the row's background, so it reads as a gap. */
+  /* The ring between avatars takes the sidebar background, so it reads as a gap. */
   --stack-ring: var(--color-bg-sidebar);
 
   display: inline-flex;
   flex: none;
   align-items: center;
-  margin-left: auto;
   isolation: isolate;
-}
-
-.tree-channel__row:hover .avatar-stack {
-  --stack-ring: var(--color-bg-hover);
-}
-
-.tree-channel__row[data-selected="true"] .avatar-stack {
-  --stack-ring: var(--color-bg-selected);
-}
-
-/* The stack's label and "+N" already give the total; the separate count would only crowd the row. */
-.avatar-stack + .tree-channel__count {
-  display: none;
-}
-
-/*
- * The stack never shrinks; when the hover-only Join button needs room, the label clips instead of
- * overflowing into it. The padding keeps the talking ring inside the clip without changing height.
- */
-.tree-channel__label:has(.avatar-stack) {
-  overflow: hidden;
-  margin-block: calc(-1 * var(--space-1));
-  padding-block: var(--space-1);
-  padding-right: var(--space-1);
 }
 
 .avatar-stack__item {
@@ -82,12 +57,15 @@
   cursor: pointer;
 }
 
-.avatar-stack__show-all {
+.avatar-stack__line {
   display: flex;
   align-items: center;
-  min-height: 2rem;
-  /* Lines up with the channel name, past the row's expand arrow. */
-  padding: var(--space-1) var(--space-2) var(--space-1) calc(1rem + 2 * var(--space-2));
+  gap: var(--space-2);
+  /* Fixed height (the talking ring included) so avatars coming and going never shift the tree. */
+  height: 2rem;
+  overflow: hidden;
+  /* Indented like the channel's people would be: one tree level plus the row padding. */
+  padding: 0 var(--space-2) 0 calc(var(--space-4) + var(--space-2));
 }
 
 .avatar-stack__toggle::before {
