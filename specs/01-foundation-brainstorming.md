@@ -933,3 +933,17 @@ Until now only followed channels counted unread messages.
 ✍️ Note: Asked in chat during /dev; consistent with the notification rule (QA.16).
 
 ---
+
+#### QA.34 Richer chat for stage 1b? `◉`
+Added to stage 1b at the user's request.
+
+- [x] **Link previews:** a card with title, description, image and an "Open in browser" button for links in messages. On by default; can be switched off in the first-start wizard and in settings (Mumcord itself loads the linked page, so that site sees the user's IP address).
+- [x] **YouTube and Twitch:** links show an embedded player card with title and "Open in browser"; the player only loads after a click.
+- [x] **Mentions with autocomplete:** typing `@` suggests people on the server; a mention of the user highlights the message and notifies them (other clients see plain text).
+- [x] **GIFs via Tenor:** a GIF button with Tenor search; the API key is injected at build time from a CI secret (never in the repo); builds without a key hide the button.
+- [x] **Code highlighting:** ``` fenced blocks (optional language) and `inline code` with syntax highlighting.
+- [x] **Formatting shortcuts in the input:** a small toolbar and keyboard shortcuts (bold, italic, strikethrough, code, link).
+
+✍️ Note: Requested in chat during /dev ("1 aber deaktivierbar im wizard"; Tenor instead of Giphy; ``` as code fence).
+
+---

@@ -128,6 +128,12 @@ Mumcord enforces nothing itself; the server's ACLs decide. The client reflects p
 - **FR-1.44** The overlay is a separate, transparent, click-through, always-on-top window showing who is talking (avatar + name), and optionally the whole current channel (Q3.10). It does not hook into games.
 - **FR-1.45** Position, size, opacity and content are configurable; the overlay can be toggled from the tray and settings.
 - **FR-1.46** Where the OS or desktop doesn't allow staying on top (some Linux desktops) or a game runs in exclusive fullscreen, settings explain the limitation.
+- **FR-1.49** Link previews (QA.34, stage 1b): links in messages get a preview card (title, description, image, "Open in browser"). Mumcord fetches the page metadata itself; on by default, switchable in the first-start wizard and in settings; fetched data is sanitized and cached; no preview for private/LAN addresses.
+- **FR-1.50** YouTube and Twitch links show an embedded player card with title and "Open in browser"; the player loads only after a click (QA.34).
+- **FR-1.51** Mentions (QA.34): typing `@` in the input autocompletes names of people on the server; a message mentioning the user is highlighted and notifies them even in otherwise quiet channels; the text stays plain `@Name` for other clients.
+- **FR-1.52** GIFs via Tenor (QA.34): a GIF button opens a Tenor search; the chosen GIF is sent as an image link/embed compatible with Mumble's image rules. The Tenor API key comes from a CI secret at build time; builds without a key hide the button.
+- **FR-1.53** Code (QA.34): ``` fenced code blocks (optional language) and `inline code` render with syntax highlighting; other clients see the text.
+- **FR-1.54** Formatting in the input (QA.34): a small toolbar plus shortcuts (Ctrl+B bold, Ctrl+I italic, Ctrl+Shift+X strikethrough, Ctrl+E code, Ctrl+K link inside the input) that insert Markdown.
 - **FR-1.47** Default avatar (QA.3): in Settings → Identity/Profile the user can set (and clear) a default avatar. It is stored locally in the app data directory, scaled to a sensible size (e.g. 128×128 PNG). The first time the user connects to a saved server and has no avatar there yet, and "Send to new servers automatically" is on (default ON), Mumcord sends it once, scaled/compressed to the server's image limits like FR-1.20; if that is impossible it is skipped with a notice. Each saved server remembers `default_avatar_sent`, so it is sent only once per server – never again, even if the user later removes or replaces the avatar on that server manually. Switching the setting off stops automatic sending; the default avatar can still be applied manually as the own avatar (FR-1.20). Exception (QA.10): when the server keeps no avatar for the user (unregistered), the remembered per-server avatar (FR-1.20) is sent again on every connect.
 - **FR-1.48** Compatibility mode for push-to-talk on Linux Wayland (QA.5): Settings → Voice has a switch "Compatibility mode (like TeamSpeak)", shown only on Linux Wayland, default OFF. When on, Mumcord starts through XWayland (takes effect after an app restart, which the switch offers) and uses its X11 push-to-talk path for keyboard keys and mouse buttons, with no portal dialog and no `input` group. The switch explains in plain language that the desktop decides which input X11 apps may see (on KDE: System Settings → Legacy X11 App Support; by default only key combinations and modifier keys, mouse buttons only if enabled there) and that this is less isolated than the modern path. When off, the modern path applies (portal for keys, FR-1.21 evdev option for mouse buttons).
 
@@ -355,6 +361,12 @@ Unless stated otherwise: a fresh Mumcord install, a local test server (1.5) runn
 - **AC-1.32** Enable an official Mumble game plugin with a test harness simulating the game → settings show the plugin as active and positions are applied.
 - **AC-1.33** Enable the overlay → floating window shows the talking Bot's avatar and name while it talks; it stays on top of a borderless-fullscreen app, lets clicks pass through, and position/opacity changes are kept after restart.
 - **AC-1.34** On a desktop where on-top isn't guaranteed, settings show the explanation text.
+- **AC-1.39** Bot posts a web link → a preview card with title and "Open in browser" appears; with previews switched off (wizard or settings) only the plain link shows and no request is made.
+- **AC-1.40** Bot posts a YouTube and a Twitch link → player cards with title appear; nothing loads until the user clicks play; "Open in browser" opens the system browser.
+- **AC-1.41** Typing `@Bo` suggests "Bot"; sending puts `@Bot` in the message; when Bot mentions the user, the message is highlighted and a notification appears.
+- **AC-1.42** In a build with a Tenor key, the GIF button searches Tenor and sends the chosen GIF so Bot receives it; in a build without a key the button is hidden.
+- **AC-1.43** A message with a ```js code block renders highlighted; Bot receives the plain text.
+- **AC-1.44** Ctrl+B / Ctrl+I / toolbar buttons insert bold/italic Markdown around the selection; the sent message renders formatted.
 
 ## 12. Decision log
 
@@ -444,6 +456,7 @@ Unless stated otherwise: a fresh Mumcord install, a local test server (1.5) runn
 | QA.31 | Avatar stack on its own line under the channel name | Addendum 2026-10-24; FR-1.15 |
 | QA.32 | Context menu on people: view profile, local mute, volume slider, private message | Addendum 2026-10-24; FR-1.18 |
 | QA.33 | Unread count also for the own channel while its chat is not on screen | Addendum 2026-10-24; FR-1.31 |
+| QA.34 | Stage 1b chat extras: link previews (default on, switchable in wizard/settings), YouTube/Twitch player cards, @mentions with autocomplete, Tenor GIFs (key via CI secret), ``` code highlighting, formatting toolbar/shortcuts | Addendum 2026-10-24; FR-1.49–1.54, AC-1.39–1.44 |
 
 ## 13. Open points & risks
 
