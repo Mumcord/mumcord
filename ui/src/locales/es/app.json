@@ -15,6 +15,10 @@
     "show": "Mostrar miembros",
     "hide": "Ocultar miembros"
   },
+  "resize": {
+    "channels": "Cambiar el ancho de la lista de canales",
+    "members": "Cambiar el ancho de la lista de miembros"
+  },
   "settings": {
     "title": "Ajustes"
   },

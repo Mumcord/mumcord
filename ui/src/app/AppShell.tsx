@@ -1,6 +1,8 @@
-import { useState, type ReactNode } from "react";
+import { useRef, useState, type CSSProperties, type ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 import { SkipLinks } from "../a11y";
+import { ResizeHandle } from "./ResizeHandle";
+import { useColumnWidths } from "./useColumnWidths";
 import "./shell.css";
 
 export interface ShellSlots {
@@ -18,20 +20,35 @@ const SHELL_IDS = { channels: "channels", chat: "chat", members: "members" } as 
 /**
  * Four-column main window frame (server bar, channels + user panel, chat, members). Purely
  * presentational: features fill the slots. Narrow windows hide the member column behind a toggle.
+ * The channel and member columns are resizable by their inner border (QA.29).
  */
 export function AppShell({ slots, inert = false }: { slots: ShellSlots; inert?: boolean }) {
   const { t } = useTranslation("app");
   const [membersOpen, setMembersOpen] = useState(false);
+  const shellRef = useRef<HTMLDivElement>(null);
+  const serverBarRef = useRef<HTMLElement>(null);
+  const widths = useColumnWidths(shellRef, serverBarRef);
+  // Custom properties are not part of React's style type.
+  const style = {
+    "--channels-width": `${String(widths.shown.channels)}rem`,
+    "--members-width": `${String(widths.shown.members)}rem`,
+  } as CSSProperties;
 
   return (
-    <div className="shell" data-members-open={membersOpen} inert={inert}>
+    <div
+      ref={shellRef}
+      className="shell"
+      style={style}
+      data-members-open={membersOpen}
+      inert={inert}
+    >
       <SkipLinks
         targets={[
           { id: SHELL_IDS.chat, label: t("skipLinks.chat") },
           { id: SHELL_IDS.channels, label: t("skipLinks.channels") },
         ]}
       />
-      <nav className="shell__servers" aria-label={t("regions.servers")}>
+      <nav ref={serverBarRef} className="shell__servers" aria-label={t("regions.servers")}>
         {slots.servers}
       </nav>
       <div className="shell__channel-column">
@@ -47,6 +64,20 @@ export function AppShell({ slots, inert = false }: { slots: ShellSlots; inert?: 
           {slots.userPanel}
         </section>
       </div>
+      <ResizeHandle
+        column="channels"
+        label={t("resize.channels")}
+        controls={SHELL_IDS.channels}
+        value={widths.shown.channels}
+        max={widths.max.channels}
+        onResize={(rem) => {
+          widths.resize("channels", rem);
+        }}
+        onCommit={widths.commit}
+        onReset={() => {
+          widths.reset("channels");
+        }}
+      />
       <main
         id={SHELL_IDS.chat}
         className="shell__chat"
@@ -67,6 +98,20 @@ export function AppShell({ slots, inert = false }: { slots: ShellSlots; inert?: 
         {slots.chatStatus}
         <div className="shell__chat-body">{slots.chat}</div>
       </main>
+      <ResizeHandle
+        column="members"
+        label={t("resize.members")}
+        controls={SHELL_IDS.members}
+        value={widths.shown.members}
+        max={widths.max.members}
+        onResize={(rem) => {
+          widths.resize("members", rem);
+        }}
+        onCommit={widths.commit}
+        onReset={() => {
+          widths.reset("members");
+        }}
+      />
       <aside id={SHELL_IDS.members} className="shell__members" aria-label={t("regions.members")}>
         {slots.members}
       </aside>

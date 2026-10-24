@@ -1,0 +1,46 @@
+/*
+ * Border handle of a resizable side column (QA.29). The hit area is wider than the visible line,
+ * which only appears on hover, focus and while dragging. Positioned by the shell over the border.
+ */
+.resize-handle {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  z-index: 5;
+  width: 0.5rem;
+  translate: -50% 0;
+  cursor: col-resize;
+  touch-action: none;
+}
+
+.resize-handle::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  width: 2px;
+  translate: -50% 0;
+  background: transparent;
+  transition: background-color var(--duration-fast);
+}
+
+.resize-handle:hover::after,
+.resize-handle:active::after {
+  background: var(--color-accent);
+}
+
+.resize-handle:focus-visible {
+  outline: none;
+}
+
+.resize-handle:focus-visible::after {
+  width: var(--focus-ring-width);
+  background: var(--color-focus);
+}
+
+:root[data-column-resizing],
+:root[data-column-resizing] * {
+  cursor: col-resize;
+  user-select: none;
+}

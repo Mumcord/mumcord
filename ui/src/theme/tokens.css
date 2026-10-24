@@ -38,8 +38,6 @@
   --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
 
   --width-server-bar: 4.5rem;
-  --width-channels: 15rem;
-  --width-members: 15rem;
 }
 
 :root,

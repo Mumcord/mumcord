@@ -1,5 +1,5 @@
-import { fireEvent, render, screen, within } from "@testing-library/react";
-import { afterEach, beforeEach, describe, expect, it } from "vitest";
+import { act, fireEvent, render, screen, within } from "@testing-library/react";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { createMockApi, setApi, type User } from "../../api";
 import { applyLanguage } from "../../i18n";
 import { axeViolations } from "../../test/axe";
@@ -7,7 +7,7 @@ import { AvatarStack } from "./AvatarStack";
 import { ChannelTree } from "./ChannelTree";
 import { getServerState, type ServerState } from "./serverStore";
 import { resetAll } from "./testUtils";
-import { stackPeople, stackSize } from "./tree";
+import { stackFit, stackPeople } from "./tree";
 
 const NAMES = "Ana Ben Cara Dan Eve Finn Gus Hana Ivo Jade Kai Lou Mia Ned".split(" ");
 
@@ -84,8 +84,36 @@ describe("stackPeople", () => {
   });
 });
 
-it("shows fewer avatars on deeper tree levels", () => {
-  expect([1, 2, 3, 4, 8].map(stackSize)).toEqual([4, 3, 2, 1, 1]);
+describe("stackFit", () => {
+  // At the 15rem default a top-level stack line has a 12rem content box (1.5rem indent).
+  it("shows five avatars and the chip on a full line at the default width", () => {
+    expect(stackFit(12, 9)).toBe(5);
+    expect(stackFit(12, 3)).toBe(3);
+  });
+
+  it("leaves room for the Show all toggle and the chip on narrower lines", () => {
+    // 12rem minus a ~6.5rem toggle and the gap.
+    expect(stackFit(5, 14)).toBe(3);
+    // Without the chip one more fits.
+    expect(stackFit(5, 4)).toBe(4);
+  });
+
+  it("maps width to count in avatar steps, up to five", () => {
+    expect([2, 3, 4, 5, 6, 7, 20].map((rem) => stackFit(rem, 20))).toEqual([1, 1, 2, 3, 4, 5, 5]);
+    // When everyone fits, no room is kept for the chip.
+    const exact: [number, number][] = [
+      [1.5, 1],
+      [2.5, 2],
+      [3.5, 3],
+      [4.5, 4],
+      [5.5, 5],
+    ];
+    expect(exact.map(([rem, total]) => stackFit(rem, total))).toEqual([1, 2, 3, 4, 5]);
+  });
+
+  it("never shows fewer than one avatar", () => {
+    expect([0, 1].map((rem) => stackFit(rem, 5))).toEqual([1, 1]);
+  });
 });
 
 describe("AvatarStack", () => {
@@ -111,6 +139,60 @@ describe("AvatarStack", () => {
     expect(container.querySelector(".avatar[data-talking='true']")).not.toBeNull();
     expect(screen.getByRole("img")).toHaveAccessibleName("2 people: Ana, Ben (talking)");
   });
+
+  describe("on a measured line", () => {
+    let report: () => void = () => undefined;
+
+    beforeEach(() => {
+      vi.stubGlobal(
+        "ResizeObserver",
+        class {
+          constructor(callback: ResizeObserverCallback) {
+            report = () => {
+              const line = document.querySelector(".avatar-stack__line");
+              callback([{ target: line } as ResizeObserverEntry], this);
+            };
+          }
+          observe() {}
+          unobserve() {}
+          disconnect() {}
+        },
+      );
+    });
+    afterEach(() => {
+      vi.unstubAllGlobals();
+    });
+
+    /** Lays the line out `rem` wide, with an optional toggle beside the stack. */
+    function layOut(container: HTMLElement, rem: number, toggleRem = 0) {
+      const line = container.querySelector(".avatar-stack__line") as HTMLElement;
+      Object.defineProperty(line, "clientWidth", { configurable: true, value: rem * 16 });
+      const toggle = line.querySelector("button");
+      if (toggle) {
+        toggle.getBoundingClientRect = () => ({ width: toggleRem * 16 }) as DOMRect;
+      }
+      act(() => {
+        report();
+      });
+    }
+
+    it("shows as many avatars as fit beside the toggle and counts the rest in the chip", () => {
+      const { container } = render(
+        <div className="avatar-stack__line">
+          <AvatarStack people={people(5)} total={9} />
+          <button type="button">Show all</button>
+        </div>,
+      );
+      layOut(container, 12, 7);
+      expect(container.querySelectorAll(".avatar")).toHaveLength(3);
+      expect(container.querySelector(".avatar-stack__more")).toHaveAttribute("data-more", "+6");
+      expect(screen.getByRole("img")).toHaveAccessibleName(
+        "3 of 9 people: Ana, Ben, Cara and 6 more",
+      );
+      layOut(container, 19, 7);
+      expect(container.querySelectorAll(".avatar")).toHaveLength(5);
+    });
+  });
 });
 
 describe("ChannelTree avatar stack", () => {
@@ -135,7 +217,7 @@ describe("ChannelTree avatar stack", () => {
     const crowd = item(/^Raid/);
     expect(crowd).toHaveAttribute("aria-expanded", "true");
     expect(within(crowd).getByRole("img")).toHaveAccessibleName(
-      "3 of 14 people: Lou (talking), Ana, Ben and 11 more",
+      "5 of 14 people: Lou (talking), Ana, Ben, Cara, Dan and 9 more",
     );
     expect(crowd.querySelector(".avatar[data-talking='true']")).not.toBeNull();
     expect(screen.queryByRole("treeitem", { name: /^Ana/ })).toBeNull();

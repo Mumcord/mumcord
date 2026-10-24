@@ -62,16 +62,28 @@ export function isExpandable(node: ChannelNode): boolean {
 }
 
 /** Above this many people an expanded channel shows the avatar stack instead of names (QA.14). */
-export const CROWDED_CHANNEL_SIZE = 10;
+export const CROWDED_CHANNEL_SIZE = 5;
 /** Most avatars shown in a stack before the "+N" chip (QA.14). */
 export const STACK_SIZE = 5;
 
+/** Width of one stack avatar, in rem (see AvatarStack.css). */
+const STACK_AVATAR_REM = 1.5;
+/** Each further avatar overlaps the previous one by 35%, so it adds this much width. */
+const STACK_STEP_REM = STACK_AVATAR_REM * 0.65;
+/** What the overlapping "+N" chip adds after the last avatar, with room for two digits. */
+const STACK_CHIP_REM = 1.25;
+
+const avatarsIn = (rem: number) =>
+  rem < STACK_AVATAR_REM ? 0 : 1 + Math.floor((rem - STACK_AVATAR_REM) / STACK_STEP_REM + 1e-9);
+
 /**
- * Avatars that fit beside a readable channel name at a tree level: the channel list is 15rem wide
- * and every level indents by 1rem, so deeper rows show fewer avatars (and a bigger "+N").
+ * How many of a channel's `total` people fit in `availableRem` of the stack's line, up to five
+ * (QA.29), leaving room for the "+N" chip whenever not everyone fits. At least one is shown.
  */
-export function stackSize(level: number): number {
-  return Math.max(1, Math.min(STACK_SIZE, 5 - level));
+export function stackFit(availableRem: number, total: number): number {
+  const all = Math.min(STACK_SIZE, total, avatarsIn(availableRem));
+  const fit = all < total ? Math.min(all, avatarsIn(availableRem - STACK_CHIP_REM)) : all;
+  return Math.max(1, fit);
 }
 
 const NONE: ReadonlySet<number> = new Set();
@@ -103,7 +115,10 @@ export function stackPeople(
   return [...speaking, ...quiet].slice(0, size);
 }
 
-/** Avatar stacks of the visible channels that show one: collapsed with people, or crowded. */
+/**
+ * Avatar stacks of the visible channels that show one: collapsed with people, or crowded. Each
+ * holds up to five people; the stack itself shows as many as fit its line (`stackFit`).
+ */
 export function visibleStacks(
   roots: ChannelNode[],
   collapsed: ReadonlySet<number>,
@@ -111,14 +126,14 @@ export function visibleStacks(
   talking: ReadonlySet<number>,
 ): Map<number, User[]> {
   const stacks = new Map<number, User[]>();
-  const walk = (node: ChannelNode, level: number) => {
+  const walk = (node: ChannelNode) => {
     const expanded = isExpandable(node) && !collapsed.has(node.channel.id);
     if (node.members.length > 0 && (!expanded || !listsMembers(node, showAll))) {
-      stacks.set(node.channel.id, stackPeople(node.members, talking, stackSize(level)));
+      stacks.set(node.channel.id, stackPeople(node.members, talking));
     }
-    if (expanded) for (const child of node.children) walk(child, level + 1);
+    if (expanded) for (const child of node.children) walk(child);
   };
-  for (const root of roots) walk(root, 1);
+  for (const root of roots) walk(root);
   return stacks;
 }
 

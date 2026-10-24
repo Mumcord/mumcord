@@ -15,6 +15,10 @@
     "show": "Mitglieder anzeigen",
     "hide": "Mitglieder ausblenden"
   },
+  "resize": {
+    "channels": "Breite der Kanalliste ändern",
+    "members": "Breite der Mitgliederliste ändern"
+  },
   "settings": {
     "title": "Einstellungen"
   },

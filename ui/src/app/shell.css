@@ -1,7 +1,9 @@
+/* --channels-width and --members-width are set by the shell from the resize handles (QA.29). */
 .shell {
+  position: relative;
   display: grid;
-  grid-template-columns: var(--width-server-bar) var(--width-channels) minmax(0, 1fr) var(
-      --width-members
+  grid-template-columns: var(--width-server-bar) var(--channels-width) minmax(0, 1fr) var(
+      --members-width
     );
   grid-template-rows: minmax(0, 1fr);
   height: 100%;
@@ -61,6 +63,14 @@
   display: none;
 }
 
+.shell > .resize-handle[data-column="channels"] {
+  left: calc(var(--width-server-bar) + var(--channels-width));
+}
+
+.shell > .resize-handle[data-column="members"] {
+  left: calc(100% - var(--members-width));
+}
+
 .shell :is(nav, main)[tabindex="-1"]:focus {
   outline: none;
 }
@@ -68,7 +78,11 @@
 /* Narrow windows: the member list becomes an overlay panel opened from the chat column. */
 @media (max-width: 60rem) {
   .shell {
-    grid-template-columns: var(--width-server-bar) var(--width-channels) minmax(0, 1fr);
+    grid-template-columns: var(--width-server-bar) var(--channels-width) minmax(0, 1fr);
+  }
+
+  .shell > .resize-handle[data-column="members"] {
+    display: none;
   }
 
   .shell__members-toggle {
@@ -92,7 +106,7 @@
     top: 0;
     right: 0;
     bottom: 0;
-    width: min(var(--width-members), 80vw);
+    width: min(var(--members-width), 80vw);
     z-index: 10;
     box-shadow: var(--shadow-raised);
   }

@@ -17,6 +17,8 @@ import { useTranslation } from "react-i18next";
 import type { User } from "../../api";
 import "./channels.css";
 import { Avatar } from "../members/Avatar";
+import { ProfilePreviewTrigger } from "../members/ProfilePreview";
+import { previewOnFocus, releasePreview } from "../members/profilePreviewStore";
 import { AvatarStack } from "./AvatarStack";
 import { useAvatars } from "../members/useAvatars";
 import { StatusIcons } from "./PersonStatus";
@@ -202,8 +204,11 @@ export function ChannelTree({
         className="tree-person"
         data-talking={talking}
         onFocus={(event) => {
-          if (event.target === event.currentTarget) setFocusedId(rowId);
+          if (event.target !== event.currentTarget) return;
+          setFocusedId(rowId);
+          previewOnFocus(user.session, event.currentTarget);
         }}
+        onBlur={releasePreview}
         onClick={(event) => {
           event.stopPropagation();
           setFocusedId(rowId);
@@ -211,14 +216,16 @@ export function ChannelTree({
         }}
       >
         <span className="tree-person__row">
-          <Avatar name={user.name} src={avatarOf(user)} talking={talking} size="sm" />
-          <span id={labelId} className="tree-person__name">
-            {user.name}
-            {user.session === state.selfSession && (
-              <span className="tree-person__you"> {t("tree.you")}</span>
-            )}
-            {status.length > 0 && <span className="visually-hidden">, {status.join(", ")}</span>}
-          </span>
+          <ProfilePreviewTrigger session={user.session}>
+            <Avatar name={user.name} src={avatarOf(user)} talking={talking} size="sm" />
+            <span id={labelId} className="tree-person__name">
+              {user.name}
+              {user.session === state.selfSession && (
+                <span className="tree-person__you"> {t("tree.you")}</span>
+              )}
+              {status.length > 0 && <span className="visually-hidden">, {status.join(", ")}</span>}
+            </span>
+          </ProfilePreviewTrigger>
           <StatusIcons user={user} />
         </span>
       </div>
@@ -229,6 +236,7 @@ export function ChannelTree({
     const { channel } = node;
     const rowId = channelRowId(channel.id);
     const labelId = `${hintId}-${rowId}`;
+    const stackId = `${hintId}-stack-${rowId}`;
     const expandable = isExpandable(node);
     const expanded = expandable && !collapsed.has(channel.id);
     const count = node.members.length;
@@ -250,7 +258,7 @@ export function ChannelTree({
           aria-owns={expanded ? groupId : undefined}
           aria-selected={channel.id === selectedChannelId}
           aria-expanded={expandable ? expanded : undefined}
-          aria-labelledby={labelId}
+          aria-labelledby={stack ? `${labelId} ${stackId}` : labelId}
           aria-keyshortcuts="Shift+Enter"
           tabIndex={tabStopId === rowId ? 0 : -1}
           data-row={rowId}
@@ -289,16 +297,6 @@ export function ChannelTree({
             <span id={labelId} className="tree-channel__label">
               <span className="tree-channel__name">{channel.name}</span>
               {isOwn && <span className="visually-hidden">, {t("tree.yourChannel")}</span>}
-              {stack && (
-                <AvatarStack
-                  people={stack.map((user) => ({
-                    user,
-                    talking: state.talking.has(user.session),
-                    src: avatarOf(user),
-                  }))}
-                  total={count}
-                />
-              )}
               {count > 0 && (
                 // The digits are CSS-generated (::before) so the row's visible text stays a run of
                 // its accessible name (WCAG 2.5.3); the spoken form is the visually hidden phrase.
@@ -307,6 +305,8 @@ export function ChannelTree({
                 </span>
               )}
               {channelBadge?.(channel.id)}
+              {/* The stack's label follows in the name (aria-labelledby); this is its comma. */}
+              {stack && <span className="visually-hidden">,</span>}
             </span>
             {!isOwn && channel.permissions.enter && (
               <button
@@ -338,30 +338,43 @@ export function ChannelTree({
               </span>
             )}
           </div>
-          {crowded && (
-            // Own line under the row: the row has no room beside the name and the stack. Inside
-            // the treeitem (a tree group may only hold treeitems), so the text is CSS-generated
-            // like the Join button's (WCAG 2.5.3 label-in-name).
-            <div className="avatar-stack__show-all">
-              <button
-                type="button"
-                className="avatar-stack__toggle"
-                data-label={showAllLabel}
-                aria-label={showAllLabel}
-                aria-expanded={listingAll}
-                tabIndex={tabStopId === rowId ? 0 : -1}
-                onClick={(event) => {
-                  event.stopPropagation();
-                  toggleShowAll(channel.id);
-                }}
-                onDoubleClick={(event) => {
-                  event.stopPropagation();
-                }}
-                onKeyDown={(event) => {
-                  // The tree selects the channel on Enter/Space; the toggle must not.
-                  if (event.key === "Enter" || event.key === " ") event.stopPropagation();
-                }}
-              />
+          {(stack || crowded) && (
+            // Own line under the row, so the name keeps the row's width (QA.14, QA.29). Inside the
+            // treeitem (a tree group may only hold treeitems), so the toggle's text is
+            // CSS-generated like the Join button's (WCAG 2.5.3 label-in-name).
+            <div className="avatar-stack__line">
+              {stack && (
+                <AvatarStack
+                  id={stackId}
+                  people={stack.map((user) => ({
+                    user,
+                    talking: state.talking.has(user.session),
+                    src: avatarOf(user),
+                  }))}
+                  total={count}
+                />
+              )}
+              {crowded && (
+                <button
+                  type="button"
+                  className="avatar-stack__toggle"
+                  data-label={showAllLabel}
+                  aria-label={showAllLabel}
+                  aria-expanded={listingAll}
+                  tabIndex={tabStopId === rowId ? 0 : -1}
+                  onClick={(event) => {
+                    event.stopPropagation();
+                    toggleShowAll(channel.id);
+                  }}
+                  onDoubleClick={(event) => {
+                    event.stopPropagation();
+                  }}
+                  onKeyDown={(event) => {
+                    // The tree selects the channel on Enter/Space; the toggle must not.
+                    if (event.key === "Enter" || event.key === " ") event.stopPropagation();
+                  }}
+                />
+              )}
             </div>
           )}
         </div>
