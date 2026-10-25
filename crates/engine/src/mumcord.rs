@@ -24,7 +24,7 @@ pub const VERSION: u32 = 1;
 /// The `app` value of every hello.
 const APP: &str = "mumcord";
 /// What this client can do for other Mumcord clients.
-pub const FEATURES: &[&str] = &["now-playing", "now-gaming"];
+pub const FEATURES: &[&str] = &["now-playing", "now-gaming", crate::full_image::FEATURE];
 const MAX_FEATURES: usize = 16;
 const MAX_FEATURE_LEN: usize = 32;
 
@@ -240,7 +240,7 @@ mod tests {
     #[test]
     fn hello_round_trips() {
         let features = decode(&encode()).expect("own hello decodes");
-        assert_eq!(features, ["now-gaming", "now-playing"]);
+        assert_eq!(features, ["full-image", "now-gaming", "now-playing"]);
         assert!(encode().len() <= PLUGIN_DATA_MAX);
     }
 

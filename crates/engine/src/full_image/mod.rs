@@ -9,7 +9,7 @@
 //! When a Mumcord user opens such a thumbnail in the image viewer, [`Engine::full_image_fetch`]
 //! asks the original sender for the full image over plugin data ([`transfer`]); the received
 //! bytes must match the announced hash and pass [`check::check`] before they are cached and
-//! shown. If the sender is offline, not a Mumcord client, no longer has the image, or the
+//! shown. If the sender is offline, did not announce [`FEATURE`] in the Mumcord hello, no longer has the image, or the
 //! transfer fails, the viewer keeps the thumbnail. Both sent and received full images live in
 //! the link-preview image cache and follow its clean-up rules (QA.42).
 
@@ -26,6 +26,10 @@ use crate::web::{FullImage, LinkPreviews};
 pub use transfer::FetchError;
 use transfer::{Link, Originals, Transfers};
 pub use wire::FullRef;
+
+/// Feature announced in the Mumcord hello; full images are only requested from peers that
+/// announced it, so older Mumcord clients and official clients are never asked.
+pub const FEATURE: &str = "full-image";
 
 /// Sends transfer messages as plugin data on the current connection.
 struct HandleLink(Handle);
@@ -154,6 +158,9 @@ impl Engine {
         }
         let ctx = self.session_ctx().ok()?;
         let from = online_sender(&ctx.handle, sender_session, sender_cert_hash.as_deref())?;
+        if !self.mumcord_user_has_feature(from, FEATURE) {
+            return None;
+        }
         let events = ctx.events.clone();
         let progress_ref = reference.to_owned();
         let bytes = self
