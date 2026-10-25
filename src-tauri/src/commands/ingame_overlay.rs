@@ -122,6 +122,8 @@ pub struct InGameOverlayState {
     pub games: Vec<GameOverlayEntry>,
     /// Games the user could add: ones running now or on the blocklist, minus the configured ones.
     pub known: Vec<KnownGame>,
+    /// Keys of every game running right now, configured or not.
+    pub running: Vec<GameKey>,
 }
 
 /// The in-game overlay settings changed.
@@ -243,6 +245,8 @@ fn state_of(engine: &Engine, runtime: &Runtime) -> ApiResult<InGameOverlayState>
         }
     }
 
+    let running_keys = running.iter().map(|(key, _)| from_store_key(key)).collect();
+
     Ok(InGameOverlayState {
         supported: support.supported,
         explanation_key: support.explanation_key.map(str::to_owned),
@@ -252,6 +256,7 @@ fn state_of(engine: &Engine, runtime: &Runtime) -> ApiResult<InGameOverlayState>
         },
         games,
         known,
+        running: running_keys,
     })
 }
 

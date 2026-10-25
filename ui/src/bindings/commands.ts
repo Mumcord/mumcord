@@ -698,6 +698,8 @@ export type InGameOverlayState = {
 	games: GameOverlayEntry[],
 	/**  Games the user could add: ones running now or on the blocklist, minus the configured ones. */
 	known: KnownGame[],
+	/**  Keys of every game running right now, configured or not. */
+	running: GameKey[],
 };
 
 /**  An external image or image link, ready to show inline (FR-1.55). */

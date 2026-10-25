@@ -496,6 +496,7 @@ export function createMockApi(options: MockOptions = {}): MockApi {
     mode: "off",
     games: [],
     known: [],
+    running: [],
   };
   const setIngameOverlay = (next: InGameOverlayState) => {
     ingameOverlay = next;
