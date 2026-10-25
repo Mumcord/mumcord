@@ -197,6 +197,8 @@
 | B61 | (1c) Bug: dragging images (in chat / image viewer / drop into input) freezes the UI | done (not reproduced; likely native drag of data-URL images) – images not draggable, Composer onDragOver, dragDropEnabled false, 25 MB cap; user check pending | b61-drag-freeze | – | simple | – | ui/src/features/chat |
 | B63 | Quick settings polish: card, pill switches, theme segmented control | done | b63-quick-settings-polish | B56 | simple | FR-1.66 | ui/src/features/userpanel |
 | B65 | Sent images are pixelated: fixed 600 px edge + JPEG only; use the server limit fully (bigger edge, PNG for screenshots, quality search) | done – edge binary search up to 1920 px, PNG vs JPEG choice, 1 MiB fallback without limit | b65-image-quality | – | simple | FR-1.30 | ui/src/features/chat/images.ts |
+| B67 | Bug: dragging a GIF (to the GIF favorites) lags and freezes; picker with many animated GIFs is slow | done – global img drag none + document dragstart guard, lazy picker thumbnails | b67-gif-drag | B61 | simple | FR-1.52 | ui/src/features/chat |
+| B68 | (1c) @mentions as interactive chips: hover preview, click profile, right-click menu | done – mentionChips.ts, delegated hover/click/menu in MessageList | b68-mention-profile | B35 | simple | FR-1.51 | ui/src/features/chat |
 | B64 | (1c) In-game overlay: Linux Vulkan layer + GL preload, Windows graphics hook, per-game config, anti-cheat warning (FR-1.46b) | open | | B32 | complex | AC-1.34b | new crates (overlay layer/hook), src-tauri, settings |
 | C9 | (1c) Verify positional audio | open | | B31, B33 | complex | AC-1.31, 1.32 | e2e/specs/positional |
 | C10 | (1c) Verify overlay | open | | B32, B33 | simple | AC-1.33, 1.34 | e2e/specs/overlay |

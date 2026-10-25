@@ -16,13 +16,23 @@ import {
 } from "react";
 import { useTranslation } from "react-i18next";
 import type { ChatDisplay, ChatMessage } from "../../api";
-import { Avatar, ProfilePreviewTrigger } from "../members";
+import { useServerSelector } from "../channels";
+import {
+  Avatar,
+  closePreview,
+  openPersonMenu,
+  previewOnFocus,
+  ProfilePreviewTrigger,
+  releasePreview,
+  requestPreview,
+} from "../members";
 import type { ConversationLog } from "./chatStore";
 import { daysAgo, messageLayout } from "./grouping";
 import { highlightCode } from "./highlight";
 import { hideShownLinks, useInlineShown } from "./inlineLinks";
 import { ImageViewer, type ViewerImage } from "./ImageViewer";
 import { LinkPreviews } from "./LinkPreviewCard";
+import { linkMentions, MENTION_CLASS, mentionPeople } from "./mentionChips";
 import { imageName, type ImageClickHandler } from "./links";
 import { openLink } from "./openLink";
 import { useIsMention } from "./ownMention";
@@ -57,20 +67,41 @@ interface BodyProps {
   tabIndex: number;
   previews: boolean;
   onImageClick: ImageClickHandler;
+  onOpenProfile: MessageListProps["onOpenProfile"];
 }
 
-function Body({ message, tabIndex, previews, onImageClick }: BodyProps) {
+/** The mention chip an event happened on, with the person it stands for. */
+function chipOf(target: EventTarget): { chip: HTMLElement; session: number; name: string } | null {
+  const chip = target instanceof Element ? target.closest<HTMLElement>(`.${MENTION_CLASS}`) : null;
+  const session = Number(chip?.dataset["mentionSession"]);
+  if (!chip || Number.isNaN(session)) return null;
+  return { chip, session, name: chip.dataset["mentionName"] ?? "" };
+}
+
+function Body({ message, tabIndex, previews, onImageClick, onOpenProfile }: BodyProps) {
   const { t } = useTranslation("chat");
   const html = message.body;
   const ref = useRef<HTMLDivElement>(null);
   const cleaned = useMemo(() => highlightCode(sanitizeHtml(html)), [html]);
   const inlineShown = useInlineShown(message.id);
+  const users = useServerSelector((state) => state.users);
   // A link whose image is shown below gives way to the image (QA.43).
-  const sanitized = useMemo(
+  const withoutLinks = useMemo(
     () => (previews ? hideShownLinks(cleaned, inlineShown) : cleaned),
     [cleaned, inlineShown, previews],
   );
+  // Mentions of people on the server become chips; added after sanitizing, from text nodes only.
+  const sanitized = useMemo(
+    () =>
+      linkMentions(withoutLinks, mentionPeople(users.values()), (name) =>
+        t("mention.chipLabel", { name }),
+      ),
+    [withoutLinks, users, t],
+  );
   useEffect(() => {
+    for (const chip of ref.current?.querySelectorAll(`.${MENTION_CLASS}`) ?? []) {
+      chip.setAttribute("tabindex", String(tabIndex));
+    }
     for (const link of ref.current?.querySelectorAll("a") ?? []) {
       link.tabIndex = tabIndex;
     }
@@ -84,7 +115,61 @@ function Body({ message, tabIndex, previews, onImageClick }: BodyProps) {
     }
   }, [sanitized, tabIndex, t, message.senderName]);
   const body = (
-    <div ref={ref} className="chat-message__body" dangerouslySetInnerHTML={{ __html: sanitized }} />
+    // Delegated handlers for the mention chips inside the sanitized HTML; keyboard use is below.
+    // eslint-disable-next-line jsx-a11y/no-static-element-interactions
+    <div
+      ref={ref}
+      className="chat-message__body"
+      dangerouslySetInnerHTML={{ __html: sanitized }}
+      onPointerOver={(event) => {
+        const hit = chipOf(event.target);
+        if (hit && event.pointerType !== "touch") {
+          requestPreview(hit.session, hit.chip, undefined, hit.name);
+        }
+      }}
+      onPointerOut={(event) => {
+        const hit = chipOf(event.target);
+        const into = event.relatedTarget instanceof Node ? event.relatedTarget : null;
+        if (hit && !hit.chip.contains(into) && event.pointerType !== "touch") releasePreview();
+      }}
+      onPointerDown={(event) => {
+        if (chipOf(event.target)) closePreview();
+      }}
+      onFocus={(event) => {
+        const hit = chipOf(event.target);
+        if (hit) previewOnFocus(hit.session, hit.chip, event.target, hit.name);
+      }}
+      onBlur={(event) => {
+        if (chipOf(event.target)) releasePreview();
+      }}
+      onClick={(event) => {
+        const hit = chipOf(event.target);
+        if (hit) onOpenProfile?.(hit.session, hit.chip);
+      }}
+      onContextMenu={(event) => {
+        const hit = chipOf(event.target);
+        if (!hit) return;
+        event.preventDefault();
+        const rect = hit.chip.getBoundingClientRect();
+        const keyboard = event.clientX === 0 && event.clientY === 0;
+        openPersonMenu({
+          session: hit.session,
+          name: hit.name,
+          x: keyboard ? rect.left : event.clientX,
+          y: keyboard ? rect.bottom : event.clientY,
+          opener: hit.chip,
+        });
+      }}
+      onKeyDown={(event) => {
+        const hit = chipOf(event.target);
+        if (!hit || event.target !== hit.chip) return;
+        if (event.key === "Enter" || event.key === " ") {
+          event.preventDefault();
+          event.stopPropagation();
+          onOpenProfile?.(hit.session, hit.chip);
+        }
+      }}
+    />
   );
   if (!previews) return body;
   return (
@@ -434,6 +519,7 @@ function MessageItem({
           tabIndex={tabIndex}
           previews={linkPreviews}
           onImageClick={onImageClick}
+          onOpenProfile={onOpenProfile}
         />
       </div>
     );
@@ -453,6 +539,7 @@ function MessageItem({
             tabIndex={tabIndex}
             previews={linkPreviews}
             onImageClick={onImageClick}
+            onOpenProfile={onOpenProfile}
           />
         </div>
       </div>
@@ -469,6 +556,7 @@ function MessageItem({
             tabIndex={tabIndex}
             previews={linkPreviews}
             onImageClick={onImageClick}
+            onOpenProfile={onOpenProfile}
           />
         </div>
       </div>

@@ -94,18 +94,21 @@ export function mentionsName(text: string, name: string): boolean {
   if (needle.length < 2) return false;
   const haystack = foldName(text);
   for (let from = haystack.indexOf(needle); from >= 0; from = haystack.indexOf(needle, from + 1)) {
-    const before = haystack[from - 1];
-    if (before !== undefined && WORD.test(before)) continue;
-    const end = from + needle.length;
-    const next = haystack[end];
-    if (next === undefined) return true;
-    if (WORD.test(next)) continue;
-    // "@Bob.com" is a web name, "@Bob." at a sentence end is a mention.
-    const afterNext = haystack[end + 1];
-    if ((next === "." || next === "-") && afterNext !== undefined && WORD.test(afterNext)) continue;
-    return true;
+    if (isWholeMention(haystack, from, from + needle.length)) return true;
   }
   return false;
+}
+
+/** Whether `haystack[from, end)` (an `@name`) is a whole-word mention; `haystack` is folded. */
+export function isWholeMention(haystack: string, from: number, end: number): boolean {
+  const before = haystack[from - 1];
+  if (before !== undefined && WORD.test(before)) return false;
+  const next = haystack[end];
+  if (next === undefined) return true;
+  if (WORD.test(next)) return false;
+  // "@Bob.com" is a web name, "@Bob." at a sentence end is a mention.
+  const afterNext = haystack[end + 1];
+  return !((next === "." || next === "-") && afterNext !== undefined && WORD.test(afterNext));
 }
 
 const BLOCKS = "br, p, div, li, tr, h1, h2, h3, h4, h5, h6, blockquote, pre";

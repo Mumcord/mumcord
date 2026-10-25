@@ -64,7 +64,8 @@
     "found_one": "{{count}} person suggested. Use the arrow keys, then Enter to insert.",
     "found_other": "{{count}} people suggested. Use the arrow keys, then Enter to insert.",
     "none": "No one found",
-    "mentionsYou": "Mentions you"
+    "mentionsYou": "Mentions you",
+    "chipLabel": "{{name}}, mention"
   },
   "preview": {
     "open": "Open in browser",

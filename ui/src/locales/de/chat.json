@@ -64,7 +64,8 @@
     "found_one": "{{count}} Person vorgeschlagen. Mit den Pfeiltasten wählen, mit Enter einfügen.",
     "found_other": "{{count}} Personen vorgeschlagen. Mit den Pfeiltasten wählen, mit Enter einfügen.",
     "none": "Niemand gefunden",
-    "mentionsYou": "Erwähnt dich"
+    "mentionsYou": "Erwähnt dich",
+    "chipLabel": "{{name}}, Erwähnung"
   },
   "preview": {
     "open": "Im Browser öffnen",

@@ -189,3 +189,51 @@ describe("MessageList mentions", () => {
     expect(items[1]).not.toHaveClass("chat-message--mention");
   });
 });
+
+describe("MessageList mention chips", () => {
+  afterEach(() => {
+    resetAll();
+    closePreview();
+    closePersonMenu();
+  });
+
+  async function renderMention(onOpenProfile = vi.fn()) {
+    await connectedMock();
+    render(
+      <MessageList
+        log={{
+          messages: [message("1", "Maya", 5, "<p>hi @Anna and @Nobody</p>")],
+          loaded: true,
+          loading: false,
+          hasMore: false,
+          loadFailed: false,
+        }}
+        label="Messages in #Lobby"
+        onLoadOlder={() => undefined}
+        onOpenProfile={onOpenProfile}
+      />,
+    );
+    return { chip: await screen.findByRole("button", { name: "Anna, mention" }), onOpenProfile };
+  }
+
+  it("makes only people on the server interactive", async () => {
+    await renderMention();
+    expect(screen.queryByRole("button", { name: /Nobody/ })).toBeNull();
+  });
+
+  it("previews on hover, opens the profile on click and the menu on right-click", async () => {
+    const { chip, onOpenProfile } = await renderMention();
+    vi.useFakeTimers();
+    try {
+      fireEvent.pointerOver(chip);
+      vi.advanceTimersByTime(PREVIEW_OPEN_DELAY_MS);
+      expect(currentPreview()?.session).toBe(2);
+      fireEvent.click(chip);
+      expect(onOpenProfile).toHaveBeenCalledWith(2, chip);
+      fireEvent.contextMenu(chip, { clientX: 5, clientY: 6 });
+      expect(currentPersonMenu()?.session).toBe(2);
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+});

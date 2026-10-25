@@ -64,7 +64,8 @@
     "found_one": "{{count}} persona sugerida. Usa las flechas y Enter para insertar.",
     "found_other": "{{count}} personas sugeridas. Usa las flechas y Enter para insertar.",
     "none": "No se encontró a nadie",
-    "mentionsYou": "Te menciona"
+    "mentionsYou": "Te menciona",
+    "chipLabel": "{{name}}, mención"
   },
   "preview": {
     "open": "Abrir en el navegador",
