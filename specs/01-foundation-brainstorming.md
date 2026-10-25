@@ -1142,3 +1142,11 @@ Research: Discord and Overwolf inject code into the game and draw into its frame
 ✍️ Note: Requested in chat during /dev ("auf linux wie mit mangohud, windows wie bei discord, aber pro spiel konfigurierbar und das soll auch nur in spielen passieren").
 
 ---
+
+#### QA.55 Turning the in-game overlay on (stage 1c)? `◉`
+
+- [x] **The in-game overlay starts automatically when a game starts. A global setting decides: "Off" (it never starts, no layer/hook is active) or "On" (it starts in every game unless that game is switched off in its per-game settings). The first-start wizard offers the choice (default off) with an example screenshot of the overlay in a game; the anti-cheat note is shown there too.**
+
+✍️ Note: Requested in chat during /dev.
+
+---
