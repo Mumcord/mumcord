@@ -1,16 +1,6 @@
 import { useState, type CSSProperties } from "react";
 import "./members.css";
-
-const PALETTE_SIZE = 8;
-
-/** Stable per-name palette index (FNV-1a), so a user keeps their color everywhere. */
-function avatarColorIndex(name: string): number {
-  let hash = 0x811c9dc5;
-  for (const ch of name.trim().toLowerCase()) {
-    hash = Math.imul(hash ^ (ch.codePointAt(0) ?? 0), 0x01000193) >>> 0;
-  }
-  return (hash % PALETTE_SIZE) + 1;
-}
+import { avatarColorVar } from "./avatarColor";
 
 /**
  * Round avatar: the person's image when known and decodable, otherwise their initial. Decorative.
@@ -37,9 +27,7 @@ export function Avatar({
       data-size={size}
       data-talking={talking}
       data-initial={showImage ? undefined : (name.trim()[0] ?? "?").toUpperCase()}
-      style={
-        { "--avatar-bg": `var(--color-avatar-${String(avatarColorIndex(name))})` } as CSSProperties
-      }
+      style={{ "--avatar-bg": avatarColorVar(name) } as CSSProperties}
       aria-hidden="true"
     >
       {showImage && (

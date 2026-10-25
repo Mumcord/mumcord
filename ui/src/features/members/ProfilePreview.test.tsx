@@ -15,6 +15,7 @@ async function renderWithPreview() {
   vi.spyOn(api, "personProfile").mockResolvedValue({
     comment: '<p>Hi there</p><img src="x" onerror="alert(1)">',
     avatar: null,
+    note: "",
   });
   render(
     <>
@@ -182,7 +183,8 @@ describe("ProfilePreview", () => {
     fireEvent.click(member(/^Anna/));
     await wait(PIN_DELAY_MS);
     fireEvent.click(screen.getByRole("button", { name: "Full profile" }));
-    expect(screen.queryByRole("button", { name: "Private message" })).toBeNull();
+    // The pinned card is gone; the dialog has its own "Private message" header action.
+    expect(screen.queryByRole("button", { name: "Full profile" })).toBeNull();
     expect(screen.getByRole("dialog", { name: "Anna" })).toHaveAttribute("open");
   });
 

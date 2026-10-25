@@ -1,8 +1,8 @@
 //! Per-person local settings (FR-1.19) and profile cards (FR-1.18).
 //!
 //! Volume and local mute are stored by certificate hash per server, so they follow a person
-//! across renames and reconnects. People without a certificate are adjusted for the session
-//! only.
+//! across renames and reconnects, like the private note (FR-1.63). People without a
+//! certificate are adjusted for the session only.
 
 use std::collections::HashMap;
 
@@ -11,10 +11,14 @@ use mumcord_store::{PersonSetting, ServerId, Store};
 
 use crate::session::{EngineError, EngineResult, ProfileView, convert::sanitize_html};
 
-/// Session-only settings of people without a certificate.
+/// Longest private note, in characters; enough for a few lines about someone.
+pub(crate) const MAX_NOTE_CHARS: usize = 1000;
+
+/// Session-only settings and notes of people without a certificate.
 #[derive(Debug, Default)]
 pub(crate) struct People {
     by_session: HashMap<u32, PersonSetting>,
+    notes_by_session: HashMap<u32, String>,
 }
 
 impl People {
@@ -58,12 +62,51 @@ impl People {
         }
     }
 
+    /// The private note about `user`; empty when there is none.
+    pub fn note(&self, store: &Store, server: ServerId, user: &User) -> String {
+        match &user.cert_hash {
+            Some(hash) => store.person_note(server, hash).unwrap_or_else(|e| {
+                tracing::warn!(error = %e, "reading person note failed");
+                String::new()
+            }),
+            None => self
+                .notes_by_session
+                .get(&user.session)
+                .cloned()
+                .unwrap_or_default(),
+        }
+    }
+
+    /// Stores the private note under the person's certificate, or for the session.
+    pub fn save_note(
+        &mut self,
+        store: &Store,
+        server: ServerId,
+        user: &User,
+        note: &str,
+    ) -> EngineResult<()> {
+        if note.chars().count() > MAX_NOTE_CHARS {
+            return Err(EngineError::invalid("note is too long"));
+        }
+        match &user.cert_hash {
+            Some(hash) => store
+                .set_person_note(server, hash, note)
+                .map_err(crate::session::store_error),
+            None => {
+                self.notes_by_session.insert(user.session, note.to_owned());
+                Ok(())
+            }
+        }
+    }
+
     pub fn forget(&mut self, session: u32) {
         self.by_session.remove(&session);
+        self.notes_by_session.remove(&session);
     }
 
     pub fn clear(&mut self) {
         self.by_session.clear();
+        self.notes_by_session.clear();
     }
 }
 
@@ -82,6 +125,7 @@ pub(crate) fn profile(user: &User) -> ProfileView {
             .filter(|c| !c.is_empty())
             .map(sanitize_html),
         avatar: user.texture.as_deref().and_then(avatar_data_url),
+        note: String::new(),
     }
 }
 
@@ -198,6 +242,39 @@ mod tests {
                         local_mute: false
                     }
                 )
+                .is_err()
+        );
+    }
+
+    #[test]
+    fn notes_follow_certificate_and_are_limited() {
+        let dir = tempfile::tempdir().expect("tempdir");
+        let store = Store::open(dir.path()).expect("store");
+        let server = store
+            .add_server(&mumcord_store::NewServer::new("t", "localhost", "me"))
+            .expect("server")
+            .id;
+        let mut people = People::default();
+
+        people
+            .save_note(&store, server, &user(5, Some("abc")), "plays bass")
+            .expect("save");
+        assert_eq!(
+            people.note(&store, server, &user(9, Some("abc"))),
+            "plays bass"
+        );
+
+        people
+            .save_note(&store, server, &user(6, None), "guest")
+            .expect("save");
+        assert_eq!(people.note(&store, server, &user(6, None)), "guest");
+        people.forget(6);
+        assert_eq!(people.note(&store, server, &user(6, None)), "");
+
+        let too_long = "x".repeat(MAX_NOTE_CHARS + 1);
+        assert!(
+            people
+                .save_note(&store, server, &user(5, Some("abc")), &too_long)
                 .is_err()
         );
     }

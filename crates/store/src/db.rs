@@ -116,6 +116,16 @@ const MIGRATIONS: &[&str] = &[
     );
     CREATE INDEX gif_favorite_last_used ON gif_favorite (last_used_at DESC);
     ",
+    // v8: private notes about people (FR-1.63), keyed like the person settings. Kept apart
+    // from them because a note is free text and has nothing to do with playback.
+    r"
+    CREATE TABLE person_note (
+        server_id        INTEGER NOT NULL REFERENCES saved_server (id) ON DELETE CASCADE,
+        person_cert_hash TEXT    NOT NULL,
+        note             TEXT    NOT NULL,
+        PRIMARY KEY (server_id, person_cert_hash)
+    );
+    ",
 ];
 
 /// Handle to the local database. Not `Sync`; callers share it behind a mutex.
@@ -238,6 +248,49 @@ pub(crate) mod tests {
             .dismiss_preview(1, "https://example.org/")
             .expect("dismiss");
         assert_eq!(store.dismissed_previews(&[1]).expect("flags")[&1].len(), 1);
+    }
+
+    #[test]
+    fn version_7_database_upgrades_with_empty_notes_and_keeps_person_settings() {
+        let dir = tempfile::tempdir().expect("tempdir");
+        {
+            let mut conn = Connection::open(dir.path().join(DB_FILE_NAME)).expect("open");
+            let tx = conn.transaction().expect("tx");
+            for sql in &MIGRATIONS[..7] {
+                tx.execute_batch(sql).expect("migration");
+            }
+            tx.pragma_update(None, "user_version", 7).expect("pragma");
+            tx.execute(
+                "INSERT INTO saved_server (label, address, username, sort_order)
+                 VALUES ('Old', 'localhost', 'Tester', 0)",
+                [],
+            )
+            .expect("server");
+            tx.execute(
+                "INSERT INTO person_setting (server_id, person_cert_hash, volume, local_mute)
+                 VALUES (1, 'h1', 50, 1)",
+                [],
+            )
+            .expect("person setting");
+            tx.commit().expect("commit");
+        }
+        let store = Store::open(dir.path()).expect("upgrade");
+        assert_eq!(
+            store.schema_version().expect("version"),
+            MIGRATIONS.len() as i64
+        );
+        assert_eq!(
+            store.person_setting(1, "h1").expect("setting"),
+            Some(crate::PersonSetting {
+                volume: 50,
+                local_mute: true
+            })
+        );
+        assert_eq!(store.person_note(1, "h1").expect("note"), "");
+        store
+            .set_person_note(1, "h1", "plays bass")
+            .expect("set note");
+        assert_eq!(store.person_note(1, "h1").expect("note"), "plays bass");
     }
 
     #[test]

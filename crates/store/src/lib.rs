@@ -23,8 +23,9 @@ pub use identity::{Identity, cert_hash};
 pub use secrets::{KEYRING_SERVICE, SecretStore};
 pub use servers::{DEFAULT_PORT, NewServer, SavedServer, ServerId};
 pub use settings::{
-    ChatDisplay, CloseBehaviour, LogLevel, NotificationMode, OverlayCorner, OverlayPoint,
-    OverlaySettings, OwnVoice, PositionalSettings, Settings, SoundSettings, TalkMode,
-    ThemePreference, VoiceActivation,
+    ChatDisplay, CloseBehaviour, DEFAULT_INGAME_OPACITY_PERCENT, DEFAULT_INGAME_SIZE_PERCENT,
+    GameKey, GameOverlayEntry, InGameOverlayMode, InGameOverlaySettings, LogLevel,
+    NotificationMode, OverlayCorner, OverlayPoint, OverlaySettings, OwnVoice, PositionalSettings,
+    Settings, SoundSettings, TalkMode, ThemePreference, VoiceActivation,
 };
 pub use social::{FollowedChannel, PersonSetting};
