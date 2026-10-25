@@ -244,8 +244,8 @@
 | B100 | Wizard privacy step (summary + link to PRIVACY.md) before the link-preview choice, all 24 languages | done | | L2a–d, R4 | simple | QA.78 | ui wizard, locales |
 | R3 | v0.3.0 release notes + wiki: positional audio, plugins and full-size images Beta, Windows in-game overlay coming later | done – bump, notes, screenshots committed; wiki prepared (push after release) | r3-release-030 | B95 | simple | FR-1.73 | release notes, wiki |
 | R7 | CHANGELOG.md (Common Changelog) for 0.1.0, 0.1.1, 0.2.0, 0.3.0; linked from README and release notes | done | r7-changelog | R3 | simple | – | CHANGELOG.md, README.md |
-| H2 | Hotfix 0.3.1 (issue #7): music bitrate cap so voice packets fit 1024 bytes, no silent drops; branch from main, PR to main, merge back into epic-1 | done – pushed hotfix/0.3.1 | h2-hotfix-031 | – | simple | QA.82 | crates/audio bitrate, crates/protocol voice |
-| H3 | Hotfix 0.3.1 (issue #9): chat links don't open – find cause, test first, fix on hotfix/0.3.1 | done – pushed fix/chat-links | h3-chat-links | – | simple | QA.86 | ui chat, src-tauri opener |
+| H2 | Hotfix 0.3.1 (issue #7): music bitrate cap so voice packets fit 1024 bytes, no silent drops; branch from main, PR to main, merge back into epic-1 | done – released 0.3.1 | h2-hotfix-031 | – | simple | QA.82 | crates/audio bitrate, crates/protocol voice |
+| H3 | Hotfix 0.3.1 (issue #9): chat links don't open – find cause, test first, fix on hotfix/0.3.1 | done – released 0.3.1 | h3-chat-links | – | simple | QA.86 | ui chat, src-tauri opener |
 | H5 | Test isolation: now_gaming::linux::tests::finds_fake_games_in_proc reads the real /proc and fails when a real game (e.g. Tyr) runs on the host – make it hermetic | open | | – | simple | – | src-tauri/src/now_gaming |
 | H6 | Flaky UI test on Windows CI: UserPanel.test.tsx Beta group keyboard focus (ArrowDown → Positional row) intermittently loses focus – make deterministic | open | | – | simple | – | ui/src/features/userpanel |
 | C9 | (1c) Verify positional audio | done – AC-1.31/1.32/1.55 automated; 🎧 listening manual | | B31, B33 | complex | AC-1.31, 1.32 | e2e/specs/positional |
