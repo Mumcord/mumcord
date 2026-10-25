@@ -20,7 +20,7 @@ Epic 2 is built as **one stage and shipped as one release, 0.4.0**, when everyth
 - **Website look:** glowing primary button, gradient accents, glass popovers and film grain with a switch (Q2.6, Q4.7).
 - **UI polish:** styled dropdowns (QA.84), consistent settings layout with audit (QA.85), progress bar under chat images while the full image loads (QA.87).
 - **Connection quality (issue #8, QA.83):** ping, packet loss, bandwidth, UDP/TCP in profile and person menu; a signal icon next to people whose connection is weak (Q3.8).
-- **Overlay:** Windows in-game overlay; HDR10 colours; borderless-fullscreen check on KDE/GNOME; Flatpak Steam; fix for the game crash on Mumcord exit (QA.92); window overlay removed with a one-time notice (QA.91, Q2.9).
+- **Overlay:** Windows in-game overlay; HDR10 colours; borderless-fullscreen check on KDE/GNOME; Flatpak Steam; fix for the game crash on Mumcord exit (QA.92); window overlay removed with a one-time notice (QA.91, Q2.9); Steam launch option for native OpenGL games on Linux (issue #11, FR-2.57).
 - **Carried over from Epic 1 (QA.74):** "Now gaming" join target from the Mumble Link context; cancelling a running full-size image transfer when the viewer closes.
 - **Epic 1 leftovers (Q1.13):** open manual checks, flaky tests, known bugs, big-server first-draw freeze, rich-text comment editor, Linux tray tooltips.
 - **Big servers (Q1.14):** calmer talking-ring updates, "Syncing big server…" state, "Hide empty channels" and "Talking people first" switches.
@@ -105,6 +105,7 @@ Nothing changes on the server side. The server keeps enforcing ACLs on every con
 - **FR-2.32** Crash fix (QA.92): closing or updating Mumcord never crashes a running game. The layer library is copied to a fixed per-version folder in the app data directory and the Vulkan manifest points there; when the connection to Mumcord is lost, the layer draws nothing and the game keeps running.
 - **FR-2.33** Window overlay removed (QA.91): the floating overlay window, the KDE window-rule helper, its settings and tray item are removed. Users who had the window overlay switched on see a one-time notice after updating that explains the change and opens the in-game overlay settings (Q2.9).
 - **FR-2.34** "Now gaming" join target (QA.74): when the Mumble Link context of the running game contains a joinable server address, "Join game" opens it (FR-1.59).
+- **FR-2.57** OpenGL games on Linux (issue [#11](https://github.com/ToBee94/mumcord/issues/11)): native OpenGL games (e.g. Unity games that force OpenGL) are not hooked by the Vulkan layer, so they need the preload path of the same library. Mumcord makes that usable with a fixed path: (a) the layer library lives in the per-version folder from FR-2.32 (not duplicated) and Mumcord also keeps a stable `current` path in the app data directory that always points to the library of the installed version, so a Steam launch option survives updates and AppImage restarts (the AppImage mount path is never used); (b) Settings → Overlay shows, on Linux while the in-game overlay is on, the exact Steam launch option `LD_PRELOAD=<current path> %command%` with a **Copy** button and a one-line explanation ("Only needed for OpenGL games: paste into the game's Steam launch options."); (c) a troubleshooting entry "OpenGL games need a launch option" in the repo docs and wiki texts (not the website). Out of scope: any automatic or global `LD_PRELOAD` (system-wide preload is risky and would affect every process on the system).
 
 ### 4.6 Peer-to-peer layer & full-size images
 
@@ -359,6 +360,7 @@ Overlay:
 - **AC-2.22** Game started from Flatpak Steam → in-game overlay shows.
 - **AC-2.23** Linux: a Vulkan test program with the overlay running, quit Mumcord → the program keeps running, overlay disappears; start Mumcord again → overlay comes back.
 - **AC-2.24** Update from 0.3.x with the window overlay on → one-time notice; no window overlay settings or tray item exist anymore.
+- **AC-2.38** Linux, OpenGL (issue #11): Settings → Overlay with the in-game overlay on shows the Steam launch option and a Copy button; the copied text points to the stable `current` path, which exists and stays the same after restarting Mumcord (also from the AppImage). Start a headless/windowed GL test program (e.g. `glxgears`) with the copied `LD_PRELOAD=… ` prefix → Mumcord's log shows `a game connected api=OpenGL` and the overlay draws the talking people in it. Start it without the prefix → no connection. The troubleshooting entry "OpenGL games need a launch option" exists in the repo docs.
 
 Peer-to-peer, watch party, screen sharing (two Mumcord clients on a local test server):
 - **AC-2.25** First full-size image request → consent dialog; Yes → image loads over the direct connection (visibly faster than plugin data); No → loads over plugin data; the choice is remembered and changeable.
