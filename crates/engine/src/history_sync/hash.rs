@@ -14,6 +14,8 @@ use super::wire::{HASH_LEN, Hash};
 
 /// Prefix that versions the hash input.
 const DOMAIN: &[u8] = b"mumcord-history-v1";
+/// Prefix of [`text_key`], kept apart from the content hashes.
+const TEXT_DOMAIN: &[u8] = b"mumcord-history-text-v1";
 
 /// What identifies a message for deduplication.
 pub struct Content<'a> {
@@ -40,19 +42,39 @@ pub fn variants(content: &Content<'_>) -> [Hash; 3] {
     [-1, 0, 1].map(|d| hash_at(content, &body, second + d))
 }
 
-fn hash_at(content: &Content<'_>, body: &str, second: i64) -> Hash {
-    let sender = match content.sender_cert_hash {
+/// A message without its time: channel, sender and normalized body. Clients whose clocks
+/// are off by more than [`variants`] covers stamp the same message seconds apart; the sync
+/// compares this key within a small time window to catch those duplicates.
+pub fn text_key(content: &Content<'_>) -> Hash {
+    let body = normalize(content.body);
+    digest(&[
+        TEXT_DOMAIN,
+        content.channel.as_bytes(),
+        sender(content).as_bytes(),
+        body.as_bytes(),
+    ])
+}
+
+fn sender(content: &Content<'_>) -> String {
+    match content.sender_cert_hash {
         Some(cert) => format!("cert:{cert}"),
         None => format!("name:{}", content.sender_name),
-    };
-    let mut sha = Sha1::new();
-    for part in [
+    }
+}
+
+fn hash_at(content: &Content<'_>, body: &str, second: i64) -> Hash {
+    digest(&[
         DOMAIN,
         content.channel.as_bytes(),
-        sender.as_bytes(),
+        sender(content).as_bytes(),
         second.to_string().as_bytes(),
         body.as_bytes(),
-    ] {
+    ])
+}
+
+fn digest(parts: &[&[u8]]) -> Hash {
+    let mut sha = Sha1::new();
+    for part in parts {
         sha.update(part);
         sha.update([0]);
     }
@@ -147,6 +169,23 @@ mod tests {
         let seen_there = content(11_001, "hi");
         assert!(variants(&seen_here).contains(&content_hash(&seen_there)));
         assert!(!variants(&content(8_999, "hi")).contains(&content_hash(&seen_there)));
+    }
+
+    #[test]
+    fn text_key_ignores_time_but_not_sender_channel_or_text() {
+        let key = text_key(&content(1_000, "<b>hi</b>"));
+        assert_eq!(key, text_key(&content(9_000, "hi")));
+        assert_ne!(key, text_key(&content(1_000, "hey")));
+        let other_sender = Content {
+            sender_cert_hash: Some("bb"),
+            ..content(1_000, "hi")
+        };
+        assert_ne!(key, text_key(&other_sender));
+        let other_channel = Content {
+            channel: "Raid",
+            ..content(1_000, "hi")
+        };
+        assert_ne!(key, text_key(&other_channel));
     }
 
     #[test]
