@@ -28,12 +28,18 @@
     "label": "Message {{name}}",
     "hint": "Press Enter to send and Shift+Enter for a new line. Markdown works: **bold**, *italic*, `code`, [link](https://…).",
     "addImage": "Add image",
-    "removeImage": "Remove image",
-    "imagePreview": "Image to send",
+    "removeImage": "Remove image {{name}}",
+    "imagePreview": "Image to send: {{name}}",
     "send": "Send",
     "noPermission": "You don't have permission to write in this channel.",
     "unavailable": "This channel is no longer available.",
-    "offline": "{{name}} is offline. You can write again when they are back."
+    "offline": "{{name}} is offline. You can write again when they are back.",
+    "unnamedImage": "Pasted image"
+  },
+  "tray": {
+    "label": "Images to send",
+    "processing": "Preparing image",
+    "scaled": "Scaled to {{width}}×{{height}} to fit the server limit"
   },
   "errors": {
     "tooLong": "Your message is too long for this server (at most {{max}} characters). Shorten it and try again.",
@@ -46,7 +52,9 @@
     "denied": "The server didn't allow this message.",
     "deniedWithReason": "The server didn't allow this message: {{reason}}",
     "notConnected": "You're not connected. Reconnect and try again.",
-    "generic": "The message couldn't be sent. Try again."
+    "generic": "The message couldn't be sent. Try again.",
+    "onlyImages": "Only images can be sent.",
+    "sourceTooLarge": "This file is too large to send (over 25 MB)."
   },
   "announce": {
     "message": "{{name}}: {{text}}",

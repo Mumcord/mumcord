@@ -10,7 +10,6 @@ import { announce } from "../../a11y";
 import { getApi, type ChatMessage, type Conversation, type User } from "../../api";
 import { PreferencesContext } from "../../app/preferences";
 import { useSelectedConversation, useServerState } from "../channels";
-import { useProfileCard } from "../members";
 import { useAvatars } from "../members/useAvatars";
 import {
   conversationKey,
@@ -67,7 +66,6 @@ function ConversationChat({ conversation, renderHeaderActions }: ConversationCha
   const log = useConversationLog(conversation);
   const info = conversationInfo(server, conversation, log.messages);
   const limits = useMemo(() => messageLimits(server.info), [server.info]);
-  const { openProfile, profileCard } = useProfileCard();
   const pinned = pinnedInfo(server, conversation);
   const pinnedChannelId = conversation.kind === "channel" ? conversation.channelId : null;
   // Outside the app shell (isolated feature tests) there are no preferences: the default applies.
@@ -176,7 +174,7 @@ function ConversationChat({ conversation, renderHeaderActions }: ConversationCha
         onLoadOlder={() => {
           void loadOlder(conversation);
         }}
-        onOpenProfile={openProfile}
+        clickablePeople
         display={display}
         avatarFor={avatarFor}
         linkPreviews={linkPreviews}
@@ -188,7 +186,6 @@ function ConversationChat({ conversation, renderHeaderActions }: ConversationCha
         blockedReason={blockedReason}
         linkPreviews={linkPreviews}
       />
-      {profileCard}
     </div>
   );
 }

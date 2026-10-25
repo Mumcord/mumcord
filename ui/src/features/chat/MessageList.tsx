@@ -17,10 +17,14 @@ import {
 import { useTranslation } from "react-i18next";
 import type { ChatDisplay, ChatMessage } from "../../api";
 import { useServerSelector } from "../channels";
+import { MumcordBadge } from "../channels/MumcordBadge";
 import {
   Avatar,
-  closePreview,
+  clickPerson,
+  doubleClickPerson,
   openPersonMenu,
+  pinPerson,
+  pointerDownOnPerson,
   previewOnFocus,
   ProfilePreviewTrigger,
   releasePreview,
@@ -46,8 +50,11 @@ export interface MessageListProps {
   /** Accessible name of the list, e.g. "Messages in Lobby". */
   label: string;
   onLoadOlder: () => void;
-  /** Opens the sender's profile card; without it, sender names are plain text. */
-  onOpenProfile?: ((session: number, trigger: HTMLElement) => void) | undefined;
+  /**
+   * Senders and mention chips react to clicks (pinned card, double click opens the private chat,
+   * FR-1.62); without it, sender names are plain text.
+   */
+  clickablePeople?: boolean | undefined;
   /** Cozy (avatars, grouped) or compact (one line per message). */
   display?: ChatDisplay;
   /** Avatar image of a message's sender, `null` for the initials fallback. */
@@ -67,7 +74,7 @@ interface BodyProps {
   tabIndex: number;
   previews: boolean;
   onImageClick: ImageClickHandler;
-  onOpenProfile: MessageListProps["onOpenProfile"];
+  clickablePeople: boolean;
 }
 
 /** The mention chip an event happened on, with the person it stands for. */
@@ -78,7 +85,7 @@ function chipOf(target: EventTarget): { chip: HTMLElement; session: number; name
   return { chip, session, name: chip.dataset["mentionName"] ?? "" };
 }
 
-function Body({ message, tabIndex, previews, onImageClick, onOpenProfile }: BodyProps) {
+function Body({ message, tabIndex, previews, onImageClick, clickablePeople }: BodyProps) {
   const { t } = useTranslation("chat");
   const html = message.body;
   const ref = useRef<HTMLDivElement>(null);
@@ -133,7 +140,8 @@ function Body({ message, tabIndex, previews, onImageClick, onOpenProfile }: Body
         if (hit && !hit.chip.contains(into) && event.pointerType !== "touch") releasePreview();
       }}
       onPointerDown={(event) => {
-        if (chipOf(event.target)) closePreview();
+        const hit = chipOf(event.target);
+        if (hit) pointerDownOnPerson(hit.session, hit.name);
       }}
       onFocus={(event) => {
         const hit = chipOf(event.target);
@@ -144,7 +152,11 @@ function Body({ message, tabIndex, previews, onImageClick, onOpenProfile }: Body
       }}
       onClick={(event) => {
         const hit = chipOf(event.target);
-        if (hit) onOpenProfile?.(hit.session, hit.chip);
+        if (hit && clickablePeople) clickPerson(event.detail, hit.session, hit.chip, hit.name);
+      }}
+      onDoubleClick={(event) => {
+        const hit = chipOf(event.target);
+        if (hit && clickablePeople) doubleClickPerson(hit.session, hit.name);
       }}
       onContextMenu={(event) => {
         const hit = chipOf(event.target);
@@ -166,7 +178,7 @@ function Body({ message, tabIndex, previews, onImageClick, onOpenProfile }: Body
         if (event.key === "Enter" || event.key === " ") {
           event.preventDefault();
           event.stopPropagation();
-          onOpenProfile?.(hit.session, hit.chip);
+          if (clickablePeople) pinPerson(hit.session, hit.chip, hit.name);
         }
       }}
     />
@@ -191,7 +203,7 @@ export function MessageList({
   log,
   label,
   onLoadOlder,
-  onOpenProfile,
+  clickablePeople = false,
   display = "cozy",
   avatarFor = noAvatar,
   linkPreviews = false,
@@ -425,7 +437,7 @@ export function MessageList({
                 itemRef={(element) => {
                   itemRefs.current[index] = element;
                 }}
-                onOpenProfile={onOpenProfile}
+                clickablePeople={clickablePeople}
                 linkPreviews={linkPreviews}
                 onImageClick={openViewer}
               />
@@ -458,7 +470,7 @@ interface MessageItemProps {
   fullTime: Intl.DateTimeFormat;
   tabIndex: number;
   itemRef: (element: HTMLLIElement | null) => void;
-  onOpenProfile: MessageListProps["onOpenProfile"];
+  clickablePeople: boolean;
   linkPreviews: boolean;
   onImageClick: ImageClickHandler;
 }
@@ -473,7 +485,7 @@ function MessageItem({
   fullTime,
   tabIndex,
   itemRef,
-  onOpenProfile,
+  clickablePeople,
   linkPreviews,
   onImageClick,
 }: MessageItemProps) {
@@ -488,21 +500,33 @@ function MessageItem({
       {content}
     </ProfilePreviewTrigger>
   );
+  const senderUser = useServerSelector((state) =>
+    session === null ? undefined : state.users.get(session),
+  );
   const sender =
-    onOpenProfile && session !== null
+    clickablePeople && session !== null
       ? preview(
           <button
             type="button"
             className="chat-message__sender chat-message__sender--button"
             tabIndex={tabIndex}
             onClick={(event) => {
-              onOpenProfile(session, event.currentTarget);
+              clickPerson(event.detail, session, event.currentTarget, message.senderName);
+            }}
+            onDoubleClick={() => {
+              doubleClickPerson(session, message.senderName);
             }}
           >
             {message.senderName}
+            <MumcordBadge user={senderUser} />
           </button>,
         )
-      : preview(<span className="chat-message__sender">{message.senderName}</span>);
+      : preview(
+          <span className="chat-message__sender">
+            {message.senderName}
+            <MumcordBadge user={senderUser} />
+          </span>,
+        );
   const stamp = (className: string) => (
     <time className={className} dateTime={message.sentAt} title={fullTime.format(sentAt)}>
       {time.format(sentAt)}
@@ -519,7 +543,7 @@ function MessageItem({
           tabIndex={tabIndex}
           previews={linkPreviews}
           onImageClick={onImageClick}
-          onOpenProfile={onOpenProfile}
+          clickablePeople={clickablePeople}
         />
       </div>
     );
@@ -527,7 +551,24 @@ function MessageItem({
     row = (
       <div className="chat-message__row">
         <div className="chat-message__gutter">
-          {preview(<Avatar name={message.senderName} src={avatar} />)}
+          {preview(
+            clickablePeople && session !== null ? (
+              // Mouse shortcut only; the sender name next to it is the keyboard route.
+              // eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions
+              <span
+                onClick={(event) => {
+                  clickPerson(event.detail, session, event.currentTarget, message.senderName);
+                }}
+                onDoubleClick={() => {
+                  doubleClickPerson(session, message.senderName);
+                }}
+              >
+                <Avatar name={message.senderName} src={avatar} />
+              </span>
+            ) : (
+              <Avatar name={message.senderName} src={avatar} />
+            ),
+          )}
         </div>
         <div className="chat-message__content">
           <div className="chat-message__header">
@@ -539,7 +580,7 @@ function MessageItem({
             tabIndex={tabIndex}
             previews={linkPreviews}
             onImageClick={onImageClick}
-            onOpenProfile={onOpenProfile}
+            clickablePeople={clickablePeople}
           />
         </div>
       </div>
@@ -556,7 +597,7 @@ function MessageItem({
             tabIndex={tabIndex}
             previews={linkPreviews}
             onImageClick={onImageClick}
-            onOpenProfile={onOpenProfile}
+            clickablePeople={clickablePeople}
           />
         </div>
       </div>

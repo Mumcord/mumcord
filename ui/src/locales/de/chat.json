@@ -28,12 +28,18 @@
     "label": "Nachricht an {{name}}",
     "hint": "Enter sendet, Umschalt+Enter fügt eine neue Zeile ein. Markdown funktioniert: **fett**, *kursiv*, `Code`, [Link](https://…).",
     "addImage": "Bild hinzufügen",
-    "removeImage": "Bild entfernen",
-    "imagePreview": "Zu sendendes Bild",
+    "removeImage": "Bild {{name}} entfernen",
+    "imagePreview": "Zu sendendes Bild: {{name}}",
     "send": "Senden",
     "noPermission": "Du darfst in diesem Kanal nicht schreiben.",
     "unavailable": "Dieser Kanal ist nicht mehr verfügbar.",
-    "offline": "{{name}} ist offline. Du kannst wieder schreiben, sobald die Person zurück ist."
+    "offline": "{{name}} ist offline. Du kannst wieder schreiben, sobald die Person zurück ist.",
+    "unnamedImage": "Eingefügtes Bild"
+  },
+  "tray": {
+    "label": "Zu sendende Bilder",
+    "processing": "Bild wird vorbereitet",
+    "scaled": "Auf {{width}}×{{height}} verkleinert, damit es zum Serverlimit passt"
   },
   "errors": {
     "tooLong": "Deine Nachricht ist zu lang für diesen Server (höchstens {{max}} Zeichen). Kürze sie und versuche es erneut.",
@@ -46,7 +52,9 @@
     "denied": "Der Server hat diese Nachricht nicht erlaubt.",
     "deniedWithReason": "Der Server hat diese Nachricht nicht erlaubt: {{reason}}",
     "notConnected": "Du bist nicht verbunden. Verbinde dich neu und versuche es erneut.",
-    "generic": "Die Nachricht konnte nicht gesendet werden. Versuche es erneut."
+    "generic": "Die Nachricht konnte nicht gesendet werden. Versuche es erneut.",
+    "onlyImages": "Es können nur Bilder gesendet werden.",
+    "sourceTooLarge": "Diese Datei ist zu groß zum Senden (über 25 MB)."
   },
   "announce": {
     "message": "{{name}}: {{text}}",

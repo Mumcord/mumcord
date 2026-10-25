@@ -28,12 +28,18 @@
     "label": "Mensaje a {{name}}",
     "hint": "Pulsa Intro para enviar y Mayús+Intro para una nueva línea. Funciona Markdown: **negrita**, *cursiva*, `código`, [enlace](https://…).",
     "addImage": "Añadir imagen",
-    "removeImage": "Quitar imagen",
-    "imagePreview": "Imagen para enviar",
+    "removeImage": "Quitar la imagen {{name}}",
+    "imagePreview": "Imagen para enviar: {{name}}",
     "send": "Enviar",
     "noPermission": "No tienes permiso para escribir en este canal.",
     "unavailable": "Este canal ya no está disponible.",
-    "offline": "{{name}} no está conectado. Podrás escribir de nuevo cuando vuelva."
+    "offline": "{{name}} no está conectado. Podrás escribir de nuevo cuando vuelva.",
+    "unnamedImage": "Imagen pegada"
+  },
+  "tray": {
+    "label": "Imágenes para enviar",
+    "processing": "Preparando la imagen",
+    "scaled": "Reducida a {{width}}×{{height}} para ajustarse al límite del servidor"
   },
   "errors": {
     "tooLong": "Tu mensaje es demasiado largo para este servidor (máximo {{max}} caracteres). Acórtalo e inténtalo de nuevo.",
@@ -46,7 +52,9 @@
     "denied": "El servidor no permitió este mensaje.",
     "deniedWithReason": "El servidor no permitió este mensaje: {{reason}}",
     "notConnected": "No estás conectado. Vuelve a conectarte e inténtalo de nuevo.",
-    "generic": "No se pudo enviar el mensaje. Inténtalo de nuevo."
+    "generic": "No se pudo enviar el mensaje. Inténtalo de nuevo.",
+    "onlyImages": "Solo se pueden enviar imágenes.",
+    "sourceTooLarge": "Este archivo es demasiado grande para enviarlo (más de 25 MB)."
   },
   "announce": {
     "message": "{{name}}: {{text}}",

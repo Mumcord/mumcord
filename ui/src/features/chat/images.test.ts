@@ -86,6 +86,6 @@ describe("messageLimits", () => {
 describe("prepareImage size cap", () => {
   it("refuses huge files without reading them", async () => {
     const big = { type: "image/png", size: MAX_SOURCE_BYTES + 1 } as Blob;
-    expect(await prepareImage(big, 1000)).toEqual({ ok: false, reason: "tooLarge" });
+    expect(await prepareImage(big, 1000)).toEqual({ ok: false, reason: "sourceTooLarge" });
   });
 });

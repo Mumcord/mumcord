@@ -119,7 +119,8 @@ export async function fitImage(
 }
 
 export type ImageResult =
-  { ok: true; dataUrl: string } | { ok: false; reason: "notImage" | "unreadable" | "tooLarge" };
+  | { ok: true; dataUrl: string; width: number; height: number; scaled: boolean }
+  | { ok: false; reason: "notImage" | "unreadable" | "tooLarge" | "sourceTooLarge" };
 
 function readAsDataUrl(file: Blob): Promise<string> {
   return new Promise((resolve, reject) => {
@@ -170,7 +171,7 @@ function canvasEncoder(image: HTMLImageElement): Encoder {
  */
 export async function prepareImage(file: Blob, budget: number): Promise<ImageResult> {
   if (!SENDABLE_TYPES.includes(file.type)) return { ok: false, reason: "notImage" };
-  if (file.size > MAX_SOURCE_BYTES) return { ok: false, reason: "tooLarge" };
+  if (file.size > MAX_SOURCE_BYTES) return { ok: false, reason: "sourceTooLarge" };
   let original: string;
   let image: HTMLImageElement;
   try {
@@ -182,11 +183,18 @@ export async function prepareImage(file: Blob, budget: number): Promise<ImageRes
   }
   const { naturalWidth: width, naturalHeight: height } = image;
   if (Math.max(width, height) <= MAX_IMAGE_EDGE && original.length <= budget) {
-    return { ok: true, dataUrl: original };
+    return { ok: true, dataUrl: original, width, height, scaled: false };
   }
   try {
     const fitted = await fitImage({ width, height }, canvasEncoder(image), budget);
-    return fitted ? { ok: true, dataUrl: fitted.url } : { ok: false, reason: "tooLarge" };
+    if (!fitted) return { ok: false, reason: "tooLarge" };
+    return {
+      ok: true,
+      dataUrl: fitted.url,
+      width: fitted.width,
+      height: fitted.height,
+      scaled: fitted.width !== width || fitted.height !== height,
+    };
   } catch (error) {
     console.error("Compressing an image for a chat message failed", error);
     return { ok: false, reason: "unreadable" };

@@ -98,10 +98,12 @@ describe("chat: rendering and sending (AC-1.13, AC-1.14, AC-1.43)", () => {
       await listener.connected();
       await listener.run("join Lobby");
       await pasteImage(32, 32, false);
-      await $("//*[@aria-label='Image to send' or @alt='Image to send']").waitForExist({ timeout: 10_000 });
+      await $("//*[starts-with(@alt,'Image to send')]").waitForExist({ timeout: 10_000 });
       await sendText("**bold** words");
+      // The text and the image are separate messages (the server limit is per message), text first.
+      const text = await listener.run(`expect message --from ${USER} --contains "words"`);
+      expect(text).toMatch(/<(b|strong)>bold<\/(b|strong)>/);
       const got = await listener.run(`expect message --from ${USER} --contains "<img"`);
-      expect(got).toMatch(/<(b|strong)>bold<\/(b|strong)>/);
       expect(got).toMatch(/<img src="data:image\/(png|jpeg);base64,/);
     } finally {
       listener.stop();
@@ -141,7 +143,7 @@ describe("chat: rendering and sending (AC-1.13, AC-1.14, AC-1.43)", () => {
       await listener.run("join Lobby");
       // 2000x2000 random noise ≈ 16 MB as PNG; v15's image limit is 128 KiB.
       await pasteImage(2000, 2000, true);
-      const preview = $("//*[@aria-label='Image to send' or @alt='Image to send']");
+      const preview = $("//*[starts-with(@alt,'Image to send')]");
       const refused = $("//*[@role='alert' and contains(.,'too large')]");
       await browser.waitUntil(async () => (await preview.isExisting()) || (await refused.isExisting()), {
         timeout: 30_000,

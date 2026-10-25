@@ -8,8 +8,10 @@ import { closePersonMenu, currentPersonMenu } from "../members/personMenuStore";
 import {
   closePreview,
   currentPreview,
+  PIN_DELAY_MS,
   PREVIEW_OPEN_DELAY_MS,
 } from "../members/profilePreviewStore";
+import { getSelectedConversation } from "../channels/selection";
 import { MessageList } from "./MessageList";
 
 // Fixed local noon: messages dated "minutes ago" must never straddle midnight.
@@ -66,7 +68,7 @@ describe("MessageList profile preview", () => {
         log={{ messages, loaded: true, loading: false, hasMore: false, loadFailed: false }}
         label="Messages in #Lobby"
         onLoadOlder={() => undefined}
-        onOpenProfile={() => undefined}
+        clickablePeople
       />,
     );
     const triggers = container.querySelectorAll(".profile-preview-trigger");
@@ -197,7 +199,7 @@ describe("MessageList mention chips", () => {
     closePersonMenu();
   });
 
-  async function renderMention(onOpenProfile = vi.fn()) {
+  async function renderMention() {
     await connectedMock();
     render(
       <MessageList
@@ -210,10 +212,10 @@ describe("MessageList mention chips", () => {
         }}
         label="Messages in #Lobby"
         onLoadOlder={() => undefined}
-        onOpenProfile={onOpenProfile}
+        clickablePeople
       />,
     );
-    return { chip: await screen.findByRole("button", { name: "Anna, mention" }), onOpenProfile };
+    return { chip: await screen.findByRole("button", { name: "Anna, mention" }) };
   }
 
   it("makes only people on the server interactive", async () => {
@@ -221,15 +223,22 @@ describe("MessageList mention chips", () => {
     expect(screen.queryByRole("button", { name: /Nobody/ })).toBeNull();
   });
 
-  it("previews on hover, opens the profile on click and the menu on right-click", async () => {
-    const { chip, onOpenProfile } = await renderMention();
+  it("opens the private chat on double click", async () => {
+    const { chip } = await renderMention();
+    fireEvent.doubleClick(chip);
+    expect(getSelectedConversation()).toEqual({ kind: "private", certHash: "annahash" });
+  });
+
+  it("previews on hover, pins on click and opens the menu on right-click", async () => {
+    const { chip } = await renderMention();
     vi.useFakeTimers();
     try {
       fireEvent.pointerOver(chip);
       vi.advanceTimersByTime(PREVIEW_OPEN_DELAY_MS);
       expect(currentPreview()?.session).toBe(2);
       fireEvent.click(chip);
-      expect(onOpenProfile).toHaveBeenCalledWith(2, chip);
+      vi.advanceTimersByTime(PIN_DELAY_MS);
+      expect(currentPreview()?.pinned).toBe(true);
       fireEvent.contextMenu(chip, { clientX: 5, clientY: 6 });
       expect(currentPersonMenu()?.session).toBe(2);
     } finally {
