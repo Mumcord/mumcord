@@ -1168,3 +1168,11 @@ The server's image message limit (default 128 KB) caps what can be sent through 
 ✍️ Note: Requested in chat during /dev.
 
 ---
+
+#### QA.58 Overlay on macOS? `◉`
+
+- [x] **No overlay on macOS at all – neither in-game nor the window overlay. The overlay settings section, tray item and wizard choice are hidden on macOS.**
+
+✍️ Note: Requested in chat during /dev ("auch kein Fenster").
+
+---
