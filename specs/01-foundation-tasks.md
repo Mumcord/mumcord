@@ -194,6 +194,7 @@
 | B33 | (1c) positional + overlay settings UI | open | | B30, B32 | simple | FR-1.41, 1.43, 1.45, 1.46 | ui/src/features/settings/positional/ |
 | B49 | (1c) "Now gaming" status + best-effort Join game (FR-1.59) | open | | B30 | complex | AC-1.50 | engine now_gaming, src-tauri process/steam detection, PersonStatus, profile, userpanel |
 | B56 | (1c) Quick settings on right-click of the settings button (FR-1.66) | open | | B49 | simple | – | userpanel, settings store |
+| B61 | (1c) Bug: dragging images (in chat / image viewer / drop into input) freezes the UI | open | | – | simple | – | ui/src/features/chat |
 | C9 | (1c) Verify positional audio | open | | B31, B33 | complex | AC-1.31, 1.32 | e2e/specs/positional |
 | C10 | (1c) Verify overlay | open | | B32, B33 | simple | AC-1.33, 1.34 | e2e/specs/overlay |
 | B34 | Link previews + YouTube/Twitch player cards (FR-1.49, 1.50) | done – engine web module (SSRF guard, caps, 24 h disk cache), player cards (inline only YouTube on Windows, else browser), wizard + settings switch | b34-link-previews | G1 | complex | AC-1.39, 1.40 | crates/engine (metadata fetch), ui chat, wizard, settings |
