@@ -1,16 +1,18 @@
 //! Position sources for positional audio (FR-1.41–1.43).
 //!
 //! A [`PositionSource`] reports where the player's avatar and camera are while a game delivers
-//! positions. Today's source is the Mumble Link shared memory ([`link`]); the official game
-//! plugins (B31) plug in as further sources. Coordinates follow Mumble's convention:
+//! positions: the Mumble Link shared memory ([`link`]) and the official Mumble game plugins
+//! ([`plugins`]). Coordinates follow Mumble's convention:
 //! left-handed, X to the right, Y up, Z forward, in metres.
 
 pub mod link;
+pub mod plugins;
 mod shm;
 
 use std::time::Instant;
 
 pub use link::LinkSource;
+pub use plugins::{PluginHost, PluginInfo, PluginProblem};
 
 /// Position and orientation (unit vectors) of the avatar or the camera.
 #[derive(Debug, Clone, Copy, PartialEq, Default)]
