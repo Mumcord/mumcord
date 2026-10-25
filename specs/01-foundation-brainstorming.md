@@ -1176,3 +1176,19 @@ The server's image message limit (default 128 KB) caps what can be sent through 
 ✍️ Note: Requested in chat during /dev ("auch kein Fenster").
 
 ---
+
+#### QA.59 Polish requested during stage 1c (recorded together)? `◉`
+These requests were built as tasks and are recorded here so the specification matches.
+
+- [x] **@mentions as interactive chips** (stage 1c): mentions of people on the server render as chips with hover preview, click for the profile card and right-click for the person menu.
+- [x] **Quick settings:** a normal click on the gear opens them (right-click too); rows for link previews, now playing, now gaming, overlay, theme (System/Dark/Light), "Edit profile" and "Register on this server" (only when allowed; "Registered ✓" afterwards); the full settings via "All settings…". Clicking the own name in the user panel no longer opens anything.
+- [x] **Pinned person card:** private message and full profile as icon buttons next to the close ×.
+- [x] **Less rounded design:** smaller corner radii for cards and panels (buttons keep pill shapes).
+- [x] **KDE Wayland window overlay helper:** one-click KWin window rule ("Mumcord overlay": keep above, position, size), remove it again, open KDE window rules, or jump to compatibility mode.
+- [x] **Sent images use the server limit fully:** largest edge that fits (up to 1920 px), PNG or JPEG – whichever gives the bigger image.
+- [x] **Own entry shows the Mumcord badge.**
+- [x] **Settings:** a search field for sections and individual settings (jumps to and highlights the control), a sidebar that does not scroll with the content, and an "Accessibility" section with switches for visible keyboard hints, screen-reader announcements and skip links (all on by default).
+
+✍️ Note: Requested in chat during /dev.
+
+---
