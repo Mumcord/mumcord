@@ -1,4 +1,4 @@
-import { useEffect, useId, useRef, useState, type KeyboardEvent } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { announce } from "../../a11y";
 import { useView } from "../../app/view";
@@ -44,14 +44,11 @@ export function UserPanel() {
   const self = state.self;
   const avatarOf = useAvatars(self ? [self] : []);
   const avatarSrc = self ? avatarOf(self) : null;
-  const [menuOpen, setMenuOpen] = useState(false);
   const [quick, setQuick] = useState<QuickSettingsState | null>(null);
   const [dialog, setDialog] = useState<Dialog>(null);
   const [error, setError] = useState<string | null>(null);
   const servers = useServers();
-  const menuId = useId();
-  const menuButton = useRef<HTMLButtonElement>(null);
-  const menuRef = useRef<HTMLDivElement>(null);
+  const settingsButton = useRef<HTMLButtonElement>(null);
   const previous = useRef<{ mute: boolean; deaf: boolean } | null>(null);
   const micButton = useRef<HTMLButtonElement>(null);
 
@@ -95,10 +92,6 @@ export function UserPanel() {
     [t],
   );
 
-  useEffect(() => {
-    if (menuOpen) menuRef.current?.querySelector<HTMLElement>('[role="menuitem"]')?.focus();
-  }, [menuOpen]);
-
   const run = (action: Promise<unknown>) => {
     setError(null);
     action.catch((e: unknown) => {
@@ -106,36 +99,9 @@ export function UserPanel() {
     });
   };
 
-  const closeMenu = () => {
-    setMenuOpen(false);
-    menuButton.current?.focus();
-  };
-
   const closeDialog = () => {
     setDialog(null);
-    menuButton.current?.focus();
-  };
-
-  const open = (which: Dialog) => {
-    setMenuOpen(false);
-    setDialog(which);
-  };
-
-  const onMenuKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
-    const items = [...event.currentTarget.querySelectorAll<HTMLElement>('[role="menuitem"]')];
-    const index = items.indexOf(document.activeElement as HTMLElement);
-    const move = (to: number) => {
-      event.preventDefault();
-      items[(to + items.length) % items.length]?.focus();
-    };
-    if (event.key === "ArrowDown") move(index + 1);
-    else if (event.key === "ArrowUp") move(index - 1);
-    else if (event.key === "Home") move(0);
-    else if (event.key === "End") move(items.length - 1);
-    else if (event.key === "Escape" || event.key === "Tab") {
-      if (event.key === "Escape") event.preventDefault();
-      closeMenu();
-    }
+    settingsButton.current?.focus();
   };
 
   const name = self?.name ?? state.identityName ?? t("unknownName");
@@ -167,22 +133,13 @@ export function UserPanel() {
   return (
     <div className="userpanel">
       <div className="userpanel__identity">
-        {/* Named by its content, the visible name and status line, so speech input users can say
-            what they see (WCAG 2.5.3 label in name). */}
-        <button
-          ref={menuButton}
-          type="button"
-          className="userpanel__user"
-          aria-haspopup="menu"
-          aria-expanded={menuOpen}
-          aria-controls={menuOpen ? menuId : undefined}
-          disabled={!connected}
-          onClick={() => {
-            setMenuOpen((o) => !o);
-          }}
+        {/* Plain text, not a control: profile edits live in the quick settings (gear). */}
+        <div
+          className={
+            connected ? "userpanel__profile" : "userpanel__profile userpanel__profile--offline"
+          }
         >
-          {/* The initial is drawn by CSS from data-initial, not as DOM text, so the button shows no
-              visible text that is missing from its name (WCAG 2.5.3). */}
+          {/* The initial is drawn by CSS from data-initial, not as DOM text. */}
           <span
             className="userpanel-avatar"
             data-initial={avatarSrc ? undefined : name.slice(0, 1).toUpperCase()}
@@ -215,7 +172,7 @@ export function UserPanel() {
               {statusText}
             </span>
           </span>
-        </button>
+        </div>
       </div>
       <div className="userpanel__row">
         <button
@@ -267,6 +224,7 @@ export function UserPanel() {
         ) : null}
         {connected ? <ConnectionInfo className="userpanel__toggle" /> : null}
         <button
+          ref={settingsButton}
           type="button"
           className="userpanel__toggle"
           aria-label={t("settings")}
@@ -298,10 +256,10 @@ export function UserPanel() {
             registered: self?.registered ?? false,
             canRegister: state.canRegister,
             onEditProfile: () => {
-              open("profile");
+              setDialog("profile");
             },
             onRegister: () => {
-              open("register");
+              setDialog("register");
             },
           }}
           onOpenSettings={openSettings}
@@ -309,44 +267,6 @@ export function UserPanel() {
             setQuick(null);
           }}
         />
-      ) : null}
-      {menuOpen ? (
-        <div
-          tabIndex={-1}
-          id={menuId}
-          ref={menuRef}
-          role="menu"
-          className="userpanel__menu"
-          aria-label={t("menu")}
-          onKeyDown={onMenuKeyDown}
-        >
-          <div role="none">
-            <button
-              type="button"
-              role="menuitem"
-              tabIndex={-1}
-              onClick={() => {
-                open("profile");
-              }}
-            >
-              {t("menuProfile")}
-            </button>
-          </div>
-          {state.canRegister ? (
-            <div role="none">
-              <button
-                type="button"
-                role="menuitem"
-                tabIndex={-1}
-                onClick={() => {
-                  open("register");
-                }}
-              >
-                {t("menuRegister")}
-              </button>
-            </div>
-          ) : null}
-        </div>
       ) : null}
       {connected && readOnly && self ? (
         <div className="userpanel-readonly" role="status">

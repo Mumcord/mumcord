@@ -45,7 +45,10 @@ async function setup(connect = true, registered = false, talk?: Partial<Settings
   render(
     <PreferencesProvider>
       <ViewContext.Provider value={view}>
-        <UserPanel />
+        {/* The app mounts the panel in a labelled section (AppShell); axe's region rule needs it. */}
+        <section aria-label="User panel">
+          <UserPanel />
+        </section>
       </ViewContext.Provider>
     </PreferencesProvider>,
   );
@@ -96,10 +99,8 @@ async function freshConnect() {
 }
 
 async function openMenuItem(name: string) {
-  const opener = document.querySelector('[aria-haspopup="menu"]');
-  if (!opener) throw new Error("user menu button missing");
-  fireEvent.click(opener);
-  fireEvent.click(await screen.findByRole("menuitem", { name }));
+  fireEvent.click(screen.getByRole("button", { name: "Quick settings" }));
+  fireEvent.click(await screen.findByRole("menuitem", { name: new RegExp(`^${name}`, "u") }));
 }
 
 describe("UserPanel", () => {
@@ -292,11 +293,9 @@ describe("UserPanel", () => {
     await waitFor(() => {
       expect(screen.queryByRole("dialog")).toBeNull();
     });
-    const opener = document.querySelector('[aria-haspopup="menu"]');
-    if (!opener) throw new Error("user menu button missing");
-    fireEvent.click(opener);
-    await screen.findByRole("menuitem", { name: "Edit profile" });
-    expect(screen.queryByRole("menuitem", { name: "Register on this server" })).toBeNull();
+    fireEvent.click(screen.getByRole("button", { name: "Quick settings" }));
+    await screen.findByRole("menuitem", { name: /^Edit profile/u });
+    expect(screen.queryByRole("menuitem", { name: /^Register on this server/u })).toBeNull();
   });
 
   it("shows a plain error when registering is refused", async () => {
@@ -359,8 +358,8 @@ describe("UserPanel", () => {
   it("shows the own avatar when the server has one and refreshes on a hash change", async () => {
     await setup();
     const userButton = () => {
-      const el = document.querySelector<HTMLElement>('[aria-haspopup="menu"]');
-      if (!el) throw new Error("user button missing");
+      const el = document.querySelector<HTMLElement>(".userpanel__profile");
+      if (!el) throw new Error("user name area missing");
       return el;
     };
     expect(userButton().querySelector("img")).toBeNull();
@@ -392,13 +391,14 @@ describe("UserPanel", () => {
     const name = document.querySelector<HTMLElement>(".userpanel__name");
     if (!name) throw new Error("name missing");
     expect(name).toHaveAttribute("title", name.textContent);
-    const button = document.querySelector<HTMLElement>('[aria-haspopup="menu"]');
-    // The visible name and status line are the button's accessible name (WCAG 2.5.3).
-    expect(button).toHaveAccessibleName(`${name.textContent} Read-only`);
-    expect(button?.closest(".userpanel__identity")).not.toBeNull();
+    const profile = document.querySelector<HTMLElement>(".userpanel__profile");
+    // Plain text, not a control: the name area offers no button or menu (edits live in quick settings).
+    expect(profile?.tagName).toBe("DIV");
+    expect(profile?.querySelector("button, [aria-haspopup]")).toBeNull();
+    expect(profile?.closest(".userpanel__identity")).not.toBeNull();
     const row = document.querySelector(".userpanel__row");
     if (!row) throw new Error("button row missing");
-    expect(row.contains(button)).toBe(false);
+    expect(row.contains(profile)).toBe(false);
     const labels = [...row.querySelectorAll("button")].map((b) => b.getAttribute("aria-label"));
     expect(labels).toEqual([
       "Mute microphone",
@@ -408,8 +408,8 @@ describe("UserPanel", () => {
       "Quick settings",
     ]);
     await joinVoice();
-    expect(button).not.toHaveAccessibleDescription("Read-only");
-    expect(button?.querySelector(".userpanel__status")?.textContent).not.toBe("");
+    expect(profile?.querySelector(".userpanel__status")).not.toHaveTextContent("Read-only");
+    expect(profile?.querySelector(".userpanel__status")?.textContent).not.toBe("");
   });
 
   it("shows the own playing track in the status line, with the full text as tooltip", async () => {
