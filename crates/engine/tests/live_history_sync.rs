@@ -212,6 +212,21 @@ async fn late_joiner_receives_missed_lobby_messages() {
             .all(|m| m.synced_from.as_deref() == Some(a_name.as_str()))
     );
     assert!(synced.iter().all(|m| m.sender_name == bot_name));
+    // The stored copies keep their origin, so the marker survives reopening the chat.
+    let stored = b
+        .history_load(
+            mumcord_engine::ConversationRef::Channel { channel_id: lobby },
+            None,
+            50,
+        )
+        .expect("history");
+    assert_eq!(
+        stored
+            .iter()
+            .filter(|m| m.synced_from.as_deref() == Some(a_name.as_str()))
+            .count(),
+        3
+    );
 
     // A message after B's join arrives live and is not synced again by "load earlier".
     bot.send_channel(Some("Lobby"), "live after join")

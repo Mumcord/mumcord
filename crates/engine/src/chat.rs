@@ -858,9 +858,12 @@ mod tests {
             sent_at: 1,
             body: "b".into(),
         };
-        assert!(history_view(row(Some("aa")), &conv, Some("aa"), Vec::new()).own);
-        assert!(!history_view(row(Some("bb")), &conv, Some("aa"), Vec::new()).own);
-        assert!(!history_view(row(None), &conv, None, Vec::new()).own);
-        assert_eq!(history_view(row(None), &conv, None, Vec::new()).id, "7");
+        assert!(history_view(row(Some("aa")), &conv, Some("aa"), Vec::new(), None).own);
+        assert!(!history_view(row(Some("bb")), &conv, Some("aa"), Vec::new(), None).own);
+        assert!(!history_view(row(None), &conv, None, Vec::new(), None).own);
+        assert_eq!(
+            history_view(row(None), &conv, None, Vec::new(), None).id,
+            "7"
+        );
     }
 }
