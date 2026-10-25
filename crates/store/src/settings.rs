@@ -356,6 +356,12 @@ pub struct Settings {
     /// Answer history sync requests of other Mumcord users with the stored channel messages
     /// (FR-1.60). On by default; private chats are never shared.
     pub history_sharing: bool,
+    /// Show keyboard hints next to controls (FR-1.69). On by default.
+    pub keyboard_hints: bool,
+    /// Announce events to screen readers through live regions (FR-1.69). On by default.
+    pub announcements: bool,
+    /// Offer "skip to" links for keyboard users (FR-1.69). On by default.
+    pub skip_links: bool,
 }
 
 impl Default for Settings {
@@ -395,6 +401,9 @@ impl Default for Settings {
             now_playing: false,
             now_gaming: false,
             history_sharing: true,
+            keyboard_hints: true,
+            announcements: true,
+            skip_links: true,
         }
     }
 }
@@ -596,6 +605,10 @@ mod tests {
         assert!(!parsed.now_playing, "off until the user turns it on");
         assert!(!parsed.now_gaming, "off until the user turns it on");
         assert!(parsed.history_sharing, "history sharing is on by default");
+        assert!(
+            parsed.keyboard_hints && parsed.announcements && parsed.skip_links,
+            "accessibility switches are on for old records"
+        );
         store
             .save_settings(&Settings {
                 now_playing: true,

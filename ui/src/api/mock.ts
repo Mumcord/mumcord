@@ -147,6 +147,9 @@ const DEFAULT_SETTINGS: Settings = {
   nowPlaying: false,
   nowGaming: false,
   historySharing: true,
+  keyboardHints: true,
+  announcements: true,
+  skipLinks: true,
 };
 
 const DEFAULT_OVERLAY: OverlaySettings = {

@@ -1160,6 +1160,12 @@ export type Settings = {
 	 *  other Mumcord users with the stored channel messages (never private chats).
 	 */
 	historySharing: boolean,
+	/**  Accessibility: "Show keyboard hints" (default on; FR-1.69). */
+	keyboardHints: boolean,
+	/**  Accessibility: "Screen reader announcements" (default on; FR-1.69). */
+	announcements: boolean,
+	/**  Accessibility: "Skip links" (default on; FR-1.69). */
+	skipLinks: boolean,
 };
 
 /**  Notification sound toggles per event (FR-1.27). */

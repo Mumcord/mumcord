@@ -176,6 +176,12 @@ pub struct Settings {
     /// "Share my channel history" (default on; FR-1.60): answer history sync requests of
     /// other Mumcord users with the stored channel messages (never private chats).
     pub history_sharing: bool,
+    /// Accessibility: "Show keyboard hints" (default on; FR-1.69).
+    pub keyboard_hints: bool,
+    /// Accessibility: "Screen reader announcements" (default on; FR-1.69).
+    pub announcements: bool,
+    /// Accessibility: "Skip links" (default on; FR-1.69).
+    pub skip_links: bool,
 }
 
 impl Settings {
@@ -248,6 +254,9 @@ impl Settings {
             now_playing: s.now_playing,
             now_gaming: s.now_gaming,
             history_sharing: s.history_sharing,
+            keyboard_hints: s.keyboard_hints,
+            announcements: s.announcements,
+            skip_links: s.skip_links,
         }
     }
 
@@ -322,6 +331,9 @@ impl Settings {
         s.now_playing = self.now_playing;
         s.now_gaming = self.now_gaming;
         s.history_sharing = self.history_sharing;
+        s.keyboard_hints = self.keyboard_hints;
+        s.announcements = self.announcements;
+        s.skip_links = self.skip_links;
         s
     }
 }
@@ -438,6 +450,8 @@ mod tests {
         ui.now_gaming = true;
         assert!(ui.history_sharing, "history sharing is on by default");
         ui.history_sharing = false;
+        assert!(ui.keyboard_hints && ui.announcements && ui.skip_links);
+        ui.skip_links = false;
         ui.chat_display = ChatDisplay::Compact;
         let stored = ui.to_store(&base);
         assert_eq!(stored.chat_display, store::ChatDisplay::Compact);
@@ -451,6 +465,7 @@ mod tests {
         assert!(stored.now_playing);
         assert!(stored.now_gaming);
         assert!(!stored.history_sharing);
+        assert!(stored.keyboard_hints && stored.announcements && !stored.skip_links);
         assert_eq!(stored.voice_activation, store::VoiceActivation::Manual);
         assert_eq!(stored.voice_threshold_dbfs, -25);
         let too_loud = Settings {
