@@ -15,6 +15,7 @@
       "specs/app/theme-language.e2e.ts",
       "specs/chat/follow-limit.e2e.ts",
       "specs/chat/follow-pm.e2e.ts",
+      "specs/positional/positional.e2e.ts",
       "specs/servers/servers.e2e.ts",
       "specs/smoke/app.e2e.ts",
       "specs/voice/read-only-join.e2e.ts",

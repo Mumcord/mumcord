@@ -189,3 +189,15 @@ export function speechAndGap(
     gapSentWindows: sent,
   };
 }
+
+/** Splits interleaved stereo samples (the `file-stereo` backend's output) into left and right. */
+export function splitStereo(x: Float32Array): [Float32Array, Float32Array] {
+  const n = Math.floor(x.length / 2);
+  const left = new Float32Array(n);
+  const right = new Float32Array(n);
+  for (let i = 0; i < n; i++) {
+    left[i] = x[2 * i] ?? 0;
+    right[i] = x[2 * i + 1] ?? 0;
+  }
+  return [left, right];
+}

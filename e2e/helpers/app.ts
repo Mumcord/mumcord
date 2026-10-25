@@ -209,3 +209,20 @@ export function withTimeout<T>(p: Promise<T>, ms: number, what: string): Promise
     clearTimeout(timer);
   });
 }
+
+/**
+ * Calls a Tauri command of the app in the current window and returns its result, for state the
+ * UI does not show (or to switch features without their own UI, like the overlay).
+ */
+export async function invoke<T>(command: string, args: object = {}): Promise<T> {
+  return browser.execute(
+    async (c: string, a: object) => {
+      const w = window as unknown as {
+        __TAURI_INTERNALS__: { invoke: (c: string, a: object) => Promise<unknown> };
+      };
+      return w.__TAURI_INTERNALS__.invoke(c, a);
+    },
+    command,
+    args,
+  ) as Promise<T>;
+}
