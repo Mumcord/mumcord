@@ -1,8 +1,10 @@
 name: E2E
 
 # UI end-to-end tests in the e2e/ Docker image (WebKitWebDriver + tauri-driver, Xvfb) against
-# the local testenv Mumble servers. Slow (first build of the app inside the image), so separate
-# from CI and only on epic-1 pushes or manual runs.
+# the local testenv Mumble servers. Slow, so separate from CI: on pull requests to main and manual
+# runs. One job builds the image and the debug binaries once, four shard jobs run the spec files
+# of e2e/shards.json in parallel (each runner has its own test servers), and "Linux E2E" (the
+# check main's branch protection requires) passes only when all of them passed.
 on:
   pull_request:
     branches: [main]
@@ -12,13 +14,14 @@ concurrency:
   group: e2e-${{ github.ref }}
   cancel-in-progress: true
 
+env:
+  MUMCORD_E2E_CACHE: /home/runner/.cache/mumcord-e2e
+
 jobs:
-  e2e:
-    name: Linux E2E
+  build:
+    name: E2E build
     runs-on: ubuntu-24.04
-    timeout-minutes: 90
-    env:
-      MUMCORD_E2E_CACHE: /home/runner/.cache/mumcord-e2e
+    timeout-minutes: 45
     steps:
       - uses: actions/checkout@v4
 
@@ -37,14 +40,90 @@ jobs:
           key: e2e-${{ hashFiles('Cargo.lock', 'e2e/Dockerfile') }}
           restore-keys: e2e-
 
-      # run.sh creates testenv/.env with a random SuperUser password; no secrets needed.
-      - name: Run E2E suite
+      - name: Build image and binaries
         run: npm run e2e
+        env:
+          MUMCORD_E2E_STEP: build
+
+      # zstd instead of the artifact zip: much faster for the ~3 GB image. tar keeps the
+      # executable bits that artifacts would drop.
+      - name: Package image and binaries
+        run: |
+          docker save mumcord-e2e | zstd -T0 -3 -q -o e2e-image.tar.zst
+          tar -C "$MUMCORD_E2E_CACHE/target/debug" -cf - mumcord mumcord-bot netsim \
+            | zstd -T0 -3 -q -o e2e-bin.tar.zst
+          ls -lh e2e-image.tar.zst e2e-bin.tar.zst
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: e2e-build
+          path: |
+            e2e-image.tar.zst
+            e2e-bin.tar.zst
+          compression-level: 0
+          retention-days: 1
+          if-no-files-found: error
+
+  shard:
+    name: E2E shard ${{ matrix.shard }}
+    needs: build
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        # Must match the number of shards in e2e/shards.json.
+        shard: [1, 2, 3, 4]
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Install npm dependencies
+        run: npm ci
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: e2e-build
+
+      - name: Load image and binaries
+        run: |
+          zstd -dc e2e-image.tar.zst | docker load -q
+          mkdir -p "$MUMCORD_E2E_CACHE/target/debug"
+          zstd -dc e2e-bin.tar.zst | tar -C "$MUMCORD_E2E_CACHE/target/debug" -xf -
+          rm e2e-image.tar.zst e2e-bin.tar.zst
+
+      # run.sh creates testenv/.env with a random SuperUser password; no secrets needed.
+      - name: Run E2E shard
+        run: npm run e2e
+        env:
+          MUMCORD_E2E_STEP: test
+          MUMCORD_E2E_SHARD: ${{ matrix.shard }}
 
       - name: Upload failure artifacts
         if: failure()
         uses: actions/upload-artifact@v4
         with:
-          name: e2e-artifacts
+          name: e2e-artifacts-shard-${{ matrix.shard }}
           path: e2e/artifacts/
           if-no-files-found: ignore
+
+  # Required status check. always(): a skipped check counts as passed for branch protection, so
+  # this job must run and fail when the build failed and the shards were skipped.
+  e2e:
+    name: Linux E2E
+    needs: [build, shard]
+    if: always()
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - name: Check build and shard results
+        run: |
+          echo "build: $BUILD, shards: $SHARDS"
+          [ "$BUILD" = success ] && [ "$SHARDS" = success ]
+        env:
+          BUILD: ${{ needs.build.result }}
+          SHARDS: ${{ needs.shard.result }}
