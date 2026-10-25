@@ -1478,6 +1478,7 @@ Requested after v0.3.0; both go to the end of Epic 2 and ship as Beta.
 Requested after v0.3.0: full-size images over plugin data are slow (about 2.7 KB/s because of the server's rate limit).
 
 - [x] **Epic 2:** full-size images first try a direct peer-to-peer connection between the two Mumcord users (same P2P layer as screen sharing, signalling over plugin data); if no direct connection can be made, the existing plugin-data transfer is used. Integrity and size checks stay the same.
+- [x] **Switchable:** a setting "Allow direct connections to other Mumcord users" (explains that a direct connection reveals your IP address to them); when off, only plugin data is used.
 
 ✍️ Note: Requested in chat during /dev.
 
