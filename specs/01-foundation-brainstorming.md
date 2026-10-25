@@ -1397,3 +1397,13 @@ Decided before the v0.3.0 release; supersedes QA.76.
 ✍️ Note: Requested in chat during /dev.
 
 ---
+
+#### QA.80 Friends placement and joining people? `◉`
+Requested while testing stage 1d.
+
+- [x] **Friends in the right column:** the Friends list sits in the right-hand column with the member list and shows "In ‹channel›" for online friends (plus the server name if it's another server).
+- [x] **Join channel:** the right-click menu on another person (and on friends) offers "Join ‹channel›"; hidden when already there, disabled with a reason when not permitted; switches server first for friends elsewhere.
+
+✍️ Note: Requested in chat during /dev.
+
+---

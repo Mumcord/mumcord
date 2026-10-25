@@ -234,6 +234,8 @@
 | L2c | Translations fi, cs, sk, sl, hr, hu, ro | done | l2-tr-b | – | simple | FR-1.36 | ui/src/locales |
 | L2d | Translations bg, el, et, lv, lt, mt, ga | done | l2-tr-c | – | simple | FR-1.36 | ui/src/locales |
 | L2e | Tray menu texts (src-tauri/src/tray.rs, hardcoded en/es/de) for all 24 languages | done | | L2a | simple | FR-1.36 | src-tauri/src/tray.rs |
+| B102 | Friends list in the right column with "In ‹channel›" (+ server) | done – other-server friends show "Online on ‹server›" (channel unknown) | b102-friends-right | B54 | simple | FR-1.64 | ui members/friends, layout |
+| B103 | Person menu: "Join ‹channel›" (hidden if already there, disabled if denied, server switch for friends elsewhere) | done – other-server join needs an active-server switch → Epic 2 (multi-server) | b103-join-channel | – | simple | FR-1.75 | ui PersonMenu, engine join |
 | R4 | SignPath preparation: CODE_SIGNING.md, PRIVACY.md, README/release-notes links, Windows exe metadata, release step gated on secrets | done – SignPath flow superseded by R6 (QA.79) | r4-signpath | – | simple | QA.76 | docs, .github/workflows/release.yml, tauri.conf.json |
 | R5 | macOS signing + notarization in release.yml gated on Apple secrets; maintainer guide for certificate/API key/secrets | done (untested until secrets exist) | r5-apple-signing | R4 | simple | QA.77 | .github/workflows/release.yml, docs |
 | R6 | Azure Artifact Signing for Windows (exe + installer via Tauri signCommand, GitHub OIDC), replace SignPath steps, maintainer guide | done – untested until Azure is set up (environment `release`) | r6-azure-signing | R4 | simple | QA.79 | release workflows, tauri.conf.json, docs |
