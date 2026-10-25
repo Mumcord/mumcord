@@ -198,6 +198,11 @@ export function Composer({
     attach(file);
   }
 
+  function onDragOver(event: DragEvent<HTMLTextAreaElement>) {
+    // Marks the textarea as a drop target; without it the drop never reaches onDrop.
+    if (event.dataTransfer.types.includes("Files")) event.preventDefault();
+  }
+
   function onDrop(event: DragEvent<HTMLTextAreaElement>) {
     const file = firstImage(event.dataTransfer.files);
     if (!file) return;
@@ -290,6 +295,7 @@ export function Composer({
           }}
           onKeyDown={onKeyDown}
           onPaste={onPaste}
+          onDragOver={onDragOver}
           onDrop={onDrop}
         />
         <button

@@ -13,6 +13,8 @@ export const UNLIMITED_IMAGE_FALLBACK = 128 * 1024;
 
 /** Largest edge of a sent image; bigger pictures are scaled down first. */
 export const MAX_IMAGE_EDGE = 600;
+/** Larger files are refused before reading; decoding them would stall the UI. */
+export const MAX_SOURCE_BYTES = 25 * 1024 * 1024;
 const MIN_IMAGE_EDGE = 64;
 const QUALITIES = [0.85, 0.7, 0.55, 0.4];
 const SHRINK = 0.75;
@@ -107,6 +109,7 @@ function canvasEncoder(image: HTMLImageElement): Encoder {
  */
 export async function prepareImage(file: Blob, budget: number): Promise<ImageResult> {
   if (!SENDABLE_TYPES.includes(file.type)) return { ok: false, reason: "notImage" };
+  if (file.size > MAX_SOURCE_BYTES) return { ok: false, reason: "tooLarge" };
   let original: string;
   let image: HTMLImageElement;
   try {

@@ -2,6 +2,8 @@ import { describe, expect, it } from "vitest";
 import {
   fitImage,
   MAX_IMAGE_EDGE,
+  MAX_SOURCE_BYTES,
+  prepareImage,
   messageLimits,
   UNLIMITED_IMAGE_FALLBACK,
   type Encoder,
@@ -48,5 +50,12 @@ describe("messageLimits", () => {
       allowHtml: true,
     } as Parameters<typeof messageLimits>[0]);
     expect(limits).toEqual({ text: 5000, image: UNLIMITED_IMAGE_FALLBACK, allowHtml: true });
+  });
+});
+
+describe("prepareImage size cap", () => {
+  it("refuses huge files without reading them", async () => {
+    const big = { type: "image/png", size: MAX_SOURCE_BYTES + 1 } as Blob;
+    expect(await prepareImage(big, 1000)).toEqual({ ok: false, reason: "tooLarge" });
   });
 });

@@ -77,6 +77,8 @@ function Body({ message, tabIndex, previews, onImageClick }: BodyProps) {
     // Images sent inside the message open the viewer; the click is handled on the list.
     for (const image of ref.current?.querySelectorAll("img") ?? []) {
       image.tabIndex = tabIndex;
+      // A native drag would serialise the whole data: URL into the drag payload and freeze WebKitGTK.
+      image.draggable = false;
       image.setAttribute("role", "button");
       image.setAttribute("aria-label", t("image.viewMessage", { name: message.senderName }));
     }
