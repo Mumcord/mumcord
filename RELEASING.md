@@ -2,7 +2,7 @@
 
 Releases are built by GitHub Actions (`.github/workflows/release.yml`). Pushing a version tag such as `v0.1.0` that points to a commit on `main` builds the Windows installer (`.exe`), the macOS disk image (`.dmg`, universal for Apple Silicon and Intel) and the Linux AppImage, smoke-tests each one against a local Mumble server, and creates a **draft** GitHub Release with the files and a `SHA256SUMS` checksum file. Nothing becomes public until you publish the draft.
 
-Builds are unsigned until code signing is set up (Windows via SignPath, macOS via an Apple Developer ID: see [docs/release-signing.md](docs/release-signing.md) and the [code signing policy](CODE_SIGNING.md)). The release notes say per platform whether the build is signed and explain the SmartScreen and Gatekeeper warnings for unsigned ones.
+Builds are unsigned until code signing is set up (Windows via Azure Artifact Signing, macOS via an Apple Developer ID: see [docs/release-signing.md](docs/release-signing.md) and the [code signing policy](CODE_SIGNING.md)). The release notes say per platform whether the build is signed and explain the SmartScreen and Gatekeeper warnings for unsigned ones.
 
 ## 1. Bump the version
 
@@ -46,7 +46,7 @@ The tag must be `v` plus exactly the version from step 1, and it must point to a
 Open the **Actions** tab and follow the **Release** run for the tag. It takes roughly as long as the Test builds workflow (up to about an hour). It runs:
 
 1. **Check tag**: the tag matches the version in all files above and the commit is on `main`.
-2. **Build** on Linux, Windows and macOS. With Windows signing set up, the Windows build waits for you to **approve two signing requests in SignPath** (first the app, then the installer) at <https://app.signpath.io>. Each request waits up to 90 minutes.
+2. **Build** on Linux, Windows and macOS. With signing set up, the Windows app and installer and the macOS app are signed automatically; nothing needs your approval.
 3. **Smoke** test: each build is installed on a fresh machine and connects to a local test server.
 4. **Create draft release**: attaches the files and `SHA256SUMS` and writes the release notes.
 

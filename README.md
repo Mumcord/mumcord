@@ -29,7 +29,7 @@ Installers for Windows (`.exe`), macOS (`.dmg`, Apple Silicon and Intel) and Lin
 
 ## Code signing policy
 
-Windows releases are signed through SignPath once the SignPath Foundation setup is active. Free code signing provided by [SignPath.io](https://about.signpath.io), certificate by [SignPath Foundation](https://signpath.org). Who builds, reviews and approves signed releases is described in the [code signing policy](CODE_SIGNING.md).
+Windows releases are signed with Azure Artifact Signing once the setup is active. What is signed, and who builds, reviews and publishes signed releases, is described in the [code signing policy](CODE_SIGNING.md).
 
 ## Privacy
 

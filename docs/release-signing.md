@@ -1,69 +1,86 @@
 # Release signing
 
-Release builds (`vX.Y.Z` tags) sign the Windows and macOS bundles only when the matching secrets exist; otherwise they are built unsigned, exactly as before, and the release notes tell users how to open an unsigned app. Test builds are never signed. No signing key, certificate or token is ever stored in this repository.
+Release builds (`vX.Y.Z` tags) sign the Windows and macOS bundles only when the matching settings exist; otherwise they are built unsigned, exactly as before, and the release notes tell users how to open an unsigned app. Test builds are never signed. No signing key, certificate, password or token is ever stored in this repository.
 
-- [Windows signing (SignPath Foundation)](#windows-signing-signpath-foundation)
+- [Windows signing (Azure Artifact Signing)](#windows-signing-azure-artifact-signing)
 - [macOS signing and notarization](#macos-signing-and-notarization)
 
-## Windows signing (SignPath Foundation)
+## Windows signing (Azure Artifact Signing)
 
-SignPath Foundation signs open-source projects for free; the certificate is issued to SignPath Foundation. Its conditions are at <https://signpath.org/terms>. The public side of those conditions lives in [CODE_SIGNING.md](../CODE_SIGNING.md) (roles, release process, MFA) and [PRIVACY.md](../PRIVACY.md).
+Windows releases are signed with [Azure Artifact Signing](https://learn.microsoft.com/azure/artifact-signing/) (formerly Azure Trusted Signing) under the maintainer's company. Microsoft validates the company and issues short-lived certificates in its name; the private keys never leave Microsoft's hardware. Users see the company's validated legal name, "Tobias Vorwachs Einzelunternehmen", as the publisher in the Windows security prompt and under _Properties → Digital Signatures_.
+
+Artifact Signing is open to organizations in the EU; individuals outside the US and Canada are not eligible, which is why the account belongs to the company (fuewa.systems) and not to a private person. The public side of the policy lives in [CODE_SIGNING.md](../CODE_SIGNING.md) and [PRIVACY.md](../PRIVACY.md).
+
+**Costs:** the Basic plan costs about 10 USD per month (5,000 signatures included; a release uses fewer than ten) and needs a paid Azure subscription. Identity validation is free.
 
 ### How the workflow signs
 
-When `SIGNPATH_API_TOKEN` and `SIGNPATH_ORGANIZATION_ID` are set, the Windows job in `.github/workflows/build-and-smoke.yml` (release builds only):
+When all six repository variables below are set, the Windows job in `.github/workflows/build-and-smoke.yml` (release builds only):
 
-1. builds the app without an installer (`tauri build --no-bundle`) and uploads `mumcord.exe` as a workflow artifact,
-2. submits it to SignPath (`signpath/github-action-submit-signing-request`) and waits for your approval,
-3. bundles the NSIS installer around the signed exe (`tauri bundle --bundles nsis`),
-4. uploads the installer, submits it as a second signing request and waits again,
-5. replaces the unsigned installer with the signed one. The smoke test and the draft release then use the signed installer, and the release notes say it is signed.
+1. compiles the app (`tauri build --no-bundle`),
+2. downloads pinned versions of Microsoft's `signtool` and the Artifact Signing plugin it loads, and writes a CI-only Tauri config overlay that sets `bundle.windows.signCommand`,
+3. logs in to Azure with GitHub OpenID Connect (`azure/login`): Azure trusts the workflow run itself, so no client secret or password exists anywhere,
+4. bundles the NSIS installer with that overlay (`tauri bundle --bundles nsis --config …`). Tauri signs `mumcord.exe` first, then the uninstaller and finally the installer, so the installer contains the signed app. Every file is time-stamped by Microsoft, so signatures stay valid after the short-lived certificate expires.
 
-Two passes are needed because SignPath cannot sign files inside a finished NSIS installer. If either secret is missing, the job warns and builds the installer unsigned as before. If a request is denied or not approved within 90 minutes, the release fails and nothing is published.
+The smoke test and the draft release then use the signed installer, and the release notes say it is signed. The signing command is never in `src-tauri/tauri.conf.json`, so local and test builds stay unsigned and need no Azure access. If any variable is missing, the job warns and builds the installer unsigned as before. If the Azure login or a signature fails, the release fails and nothing is published.
+
+Signing needs no manual approval: the job can only sign when it runs in the `release` environment of this repository, which only accepts version tags.
 
 ### One-time setup (maintainer)
 
-1. **Turn on MFA** for your GitHub account and, after step 2, for your SignPath account. Both are required by SignPath Foundation for every team member.
-2. **Apply** at <https://signpath.org/apply> with the repository `https://github.com/ToBee94/mumcord`, the homepage `https://mumcord.app` and the code signing policy URL `https://github.com/ToBee94/mumcord/blob/main/CODE_SIGNING.md`. Wait for approval; SignPath then creates the organization.
-3. **Link the code signing policy on the website**: the home page and the download page of mumcord.app must show a "Code signing policy" link to `CODE_SIGNING.md` (the README and the release notes already do).
-4. **Set up the project in SignPath** (<https://app.signpath.io>):
-   - Trusted build system: add the predefined **GitHub.com** trusted build system to the organization and link it to the project.
-   - Project slug: `mumcord`, repository URL `https://github.com/ToBee94/mumcord`.
-   - Artifact configuration slug: `initial`, with the content below. It is used for both requests: each workflow artifact is a ZIP holding exactly one `.exe`.
-   - Signing policy slug: `release-signing`, with the SignPath Foundation certificate, **manual approval** and yourself as the only approver.
-   - Create a CI user (or API token) with _submitter_ permission for the `release-signing` policy.
+All steps happen in the [Azure portal](https://portal.azure.com) and on GitHub. Turn on multi-factor authentication for your Microsoft (Azure) account and your GitHub account first.
 
-   ```xml
-   <?xml version="1.0" encoding="utf-8"?>
-   <artifact-configuration xmlns="http://signpath.io/artifact-configuration/v1">
-     <parameters>
-       <parameter name="version" required="true" />
-     </parameters>
-     <zip-file>
-       <pe-file path="*.exe" product-name="Mumcord" product-version="${version}">
-         <authenticode-sign />
-       </pe-file>
-     </zip-file>
-   </artifact-configuration>
-   ```
+1. **Paid Azure subscription.** Create an Azure account for the company with a pay-as-you-go subscription (a free trial subscription cannot use Artifact Signing). Note the **Subscription ID** (_Subscriptions_) and the **Tenant ID** (_Microsoft Entra ID → Overview_).
+2. **Register the resource provider.** _Subscriptions → your subscription → Resource providers_, search `Microsoft.CodeSigning` and choose **Register**.
+3. **Create the Artifact Signing account.** Search the portal for _Artifact Signing accounts → Create_: a new resource group (for example `mumcord-signing`), a globally unique account name (3 to 24 letters and digits, for example `fuewasigning`), region **West Europe**, pricing tier **Basic**. Note the account name and the **Account URI** on its overview page (`https://weu.codesigning.azure.net/` for West Europe).
+4. **Give yourself the identity role.** On the signing account: _Access control (IAM) → Add role assignment_ → **Artifact Signing Identity Verifier** for your own user. Without it the next step is greyed out.
+5. **Validate the organization.** On the signing account: _Identity validations_ → **Organization** → _New identity → Public_, then enter exactly as in the official register or trade registration:
+   - legal name: `Tobias Vorwachs Einzelunternehmen`,
+   - business identifier (for example the trade registration, VAT ID or tax number the form asks for) and the registered address,
+   - primary and secondary email on the company domain (addresses ending in `@fuewa.systems`); Microsoft sends verification links there,
+   - website: `https://fuewa.systems`,
+   - first and last name of the person representing the company, exactly as on your ID card.
 
-   The workflow passes the app version (for example `0.3.0`) as `version`, so SignPath refuses any file whose product name or product version does not match.
+   Use **Certificate subject preview** to check the publisher name before choosing **Create**. When the status changes to **Action Required**, follow the link (also sent to the primary email) to verify yourself with your ID through Microsoft's partner and the Microsoft Authenticator app. Microsoft may also ask for documents (trade registration, domain invoice for fuewa.systems), all issued within the last 12 months. Validation takes 1 to 20 business days; wait for the status **Completed**. The legal name validated here is what users see as the publisher.
 
-5. **Add the GitHub settings** (repository _Settings → Secrets and variables → Actions_):
+6. **Create the certificate profile.** On the signing account: _Certificate profiles → Create → Public Trust_, a name (for example `mumcord`), and the identity validation from step 5. Note the profile name.
+7. **Create the app registration for GitHub.** _Microsoft Entra ID → App registrations → New registration_, name `mumcord-github-signing`, single tenant, no redirect URI. Note its **Application (client) ID**. Do not create a client secret.
+8. **Trust GitHub (federated credential).** In the app registration: _Certificates & secrets → Federated credentials → Add credential_ → scenario **GitHub Actions deploying Azure resources**:
+   - organization `ToBee94`, repository `mumcord`,
+   - entity type **Environment**, environment name `release`,
+   - name `mumcord-release`.
 
-   | Name                       | Kind                                   | Value                                |
-   | -------------------------- | -------------------------------------- | ------------------------------------ |
-   | `SIGNPATH_API_TOKEN`       | secret                                 | API token of the CI user from step 4 |
-   | `SIGNPATH_ORGANIZATION_ID` | variable (or secret, either one works) | organization ID shown in SignPath    |
+   This lets only workflow jobs in the `release` environment of `ToBee94/mumcord` sign.
+
+9. **Allow the app to sign.** On the signing account (or only the certificate profile from step 6): _Access control (IAM) → Add role assignment_ → **Artifact Signing Certificate Profile Signer** → members: the app registration `mumcord-github-signing`.
+10. **Create the GitHub environment.** Repository _Settings → Environments → New environment_ `release`. Under _Deployment branches and tags_ choose **Selected branches and tags** and add the tag rule `v*`, so only release tags can sign.
+11. **Add the GitHub variables.** Repository _Settings → Secrets and variables → Actions → Variables → New repository variable_. These are identifiers, not secrets; exact names:
+
+    | Variable                 | Value                                                                    |
+    | ------------------------ | ------------------------------------------------------------------------ |
+    | `AZURE_CLIENT_ID`        | Application (client) ID of the app registration (step 7)                 |
+    | `AZURE_TENANT_ID`        | Tenant ID (step 1)                                                       |
+    | `AZURE_SUBSCRIPTION_ID`  | Subscription ID (step 1)                                                 |
+    | `AZURE_SIGNING_ENDPOINT` | Account URI from step 3, for example `https://weu.codesigning.azure.net` |
+    | `AZURE_SIGNING_ACCOUNT`  | Artifact Signing account name (step 3)                                   |
+    | `AZURE_CERT_PROFILE`     | certificate profile name (step 6)                                        |
+
+    All six must exist. If any is missing, the build warns and produces an unsigned installer. The endpoint must match the account's region, otherwise signing fails with "403 Forbidden".
 
 ### Test with a pre-release tag
 
-1. Push a pre-release tag as described under macOS below.
-2. Approve both signing requests in SignPath while the Windows build waits.
-3. On Windows, right-click the downloaded installer → _Properties → Digital Signatures_: the signer is SignPath Foundation. After installing, check `mumcord.exe` in the install folder the same way, and that _Details_ shows product name "Mumcord" and the version.
+1. Push a pre-release tag as described under macOS below (for example `v0.3.0-rc.1`).
+2. In the Windows build log, check that "Log in to Azure" succeeds and that "Bundle and sign Windows installer" shows signtool reporting "Successfully signed" for each file. The draft release notes then say the Windows build is signed.
+3. On Windows, right-click the downloaded installer → _Properties → Digital Signatures_: the signer is "Tobias Vorwachs Einzelunternehmen" and the signature has a time stamp. After installing, check `mumcord.exe` in the install folder the same way, and that _Details_ shows product name "Mumcord" and the version.
 4. Delete the draft release and the test tag afterwards.
 
 New certificates have no SmartScreen reputation yet, so the first signed releases may still show a SmartScreen warning until enough users have downloaded them.
+
+### Notes
+
+- Nothing to renew: Microsoft rotates the short-lived certificates automatically. The identity validation must be renewed when Microsoft asks (by email), usually once a year.
+- Removing access: delete the federated credential or the role assignment; no secret needs to be revoked.
+- The Azure login token is short-lived, so the workflow compiles first and logs in right before signing.
 
 ## macOS signing and notarization
 
