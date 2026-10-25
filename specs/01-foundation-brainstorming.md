@@ -1436,3 +1436,12 @@ Feature request after v0.3.0.
 ✍️ Note: Requested in chat during /dev.
 
 ---
+
+#### QA.84 Dropdown styling? `◉`
+Requested after v0.3.0.
+
+- [x] **Epic 2:** replace the native-looking dropdowns (settings, dialogs, wizard) with one themed select component that matches the design tokens in light and dark mode and stays keyboard and screen-reader accessible.
+
+✍️ Note: Requested in chat during /dev.
+
+---
