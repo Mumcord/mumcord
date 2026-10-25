@@ -1299,3 +1299,13 @@ Requested for stage 1c (positional audio).
 ✍️ Note: Requested in chat during /dev.
 
 ---
+
+#### QA.71 How to ship positional audio and plugins? `◉`
+Decided before the v0.3.0 release.
+
+- [x] **Beta:** positional audio and the game plugins carry a "Beta" badge in settings and quick settings, with a short hint that results depend on the game.
+- [x] **Communication:** release notes and wiki call both Beta and say the in-game overlay on Windows is coming later; until then Windows uses the window overlay.
+
+✍️ Note: Requested in chat during /dev.
+
+---
