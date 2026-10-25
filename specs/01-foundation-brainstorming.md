@@ -1495,3 +1495,13 @@ Decided after v0.3.0 for Epic 2.
 ✍️ Note: Requested in chat during /dev.
 
 ---
+
+#### QA.91 Keep the window overlay? `◉`
+Decided after v0.3.0.
+
+- [x] **Only the in-game overlay in Epic 2:** the window overlay (floating on-top window, KDE window rule helper, its settings and tray item) is removed.
+- [x] **Order:** removal happens once the Windows in-game overlay ships, because Windows uses the window overlay until then. macOS keeps having no overlay.
+
+✍️ Note: Requested in chat during /dev.
+
+---
