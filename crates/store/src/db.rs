@@ -126,6 +126,11 @@ const MIGRATIONS: &[&str] = &[
         PRIMARY KEY (server_id, person_cert_hash)
     );
     ",
+    // v9: history sync between Mumcord clients (FR-1.60, QA.48): the display name of the
+    // person whose history a channel message came from; NULL for messages received live.
+    r"
+    ALTER TABLE chat_message ADD COLUMN synced_from TEXT;
+    ",
 ];
 
 /// Handle to the local database. Not `Sync`; callers share it behind a mutex.
@@ -291,6 +296,47 @@ pub(crate) mod tests {
             .set_person_note(1, "h1", "plays bass")
             .expect("set note");
         assert_eq!(store.person_note(1, "h1").expect("note"), "plays bass");
+    }
+
+    #[test]
+    fn version_8_database_upgrades_and_marks_old_messages_as_live() {
+        let dir = tempfile::tempdir().expect("tempdir");
+        {
+            let mut conn = Connection::open(dir.path().join(DB_FILE_NAME)).expect("open");
+            let tx = conn.transaction().expect("tx");
+            for sql in &MIGRATIONS[..8] {
+                tx.execute_batch(sql).expect("migration");
+            }
+            tx.pragma_update(None, "user_version", 8).expect("pragma");
+            tx.execute(
+                "INSERT INTO saved_server (label, address, username, sort_order)
+                 VALUES ('Old', 'localhost', 'Tester', 0)",
+                [],
+            )
+            .expect("server");
+            tx.execute(
+                "INSERT INTO chat_message
+                     (server_id, conversation_kind, conversation_key, sender_name, sent_at, body)
+                 VALUES (1, 'channel', 'Lobby', 'Alice', 5, 'hi')",
+                [],
+            )
+            .expect("message");
+            tx.commit().expect("commit");
+        }
+        let store = Store::open(dir.path()).expect("upgrade");
+        assert_eq!(
+            store.schema_version().expect("version"),
+            MIGRATIONS.len() as i64
+        );
+        let lobby = crate::Conversation::Channel("Lobby".into());
+        let kept = store.messages(1, &lobby, 10).expect("messages");
+        assert_eq!(kept.len(), 1);
+        assert!(
+            store
+                .synced_origins(&[kept[0].id])
+                .expect("origins")
+                .is_empty()
+        );
     }
 
     #[test]

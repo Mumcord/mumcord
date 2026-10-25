@@ -149,6 +149,8 @@ struct Inner {
     now_gaming: Mutex<crate::now_gaming::NowGaming>,
     /// Other Mumcord users on the server (FR-1.61).
     mumcord: Mutex<crate::mumcord::Peers>,
+    /// History sync with other Mumcord users (FR-1.60).
+    history_sync: Arc<Mutex<crate::history_sync::HistorySync>>,
 }
 
 #[derive(Default)]
@@ -300,6 +302,7 @@ impl Engine {
             now_playing: Mutex::new(crate::now_playing::NowPlaying::new(settings.now_playing)),
             now_gaming: Mutex::new(crate::now_gaming::NowGaming::new(settings.now_gaming)),
             mumcord: Mutex::default(),
+            history_sync: Arc::default(),
         });
         let engine = Self { inner };
         engine
@@ -376,6 +379,10 @@ impl Engine {
 
     pub(crate) fn now_gaming_state(&self) -> &Mutex<crate::now_gaming::NowGaming> {
         &self.inner.now_gaming
+    }
+
+    pub(crate) fn history_sync_state(&self) -> &Mutex<crate::history_sync::HistorySync> {
+        &self.inner.history_sync
     }
 
     /// The store, also while disconnected (history commands, B14).
@@ -811,6 +818,7 @@ impl Inner {
             crate::now_playing::on_disconnect(&self.now_playing, &session.handle);
             crate::now_gaming::on_disconnect(&self.now_gaming, &session.handle);
             crate::mumcord::on_disconnect(&self.mumcord);
+            crate::history_sync::on_disconnect(&self.history_sync);
             session.handle.disconnect();
         }
         self.meter.voice.store(false, Ordering::Relaxed);
@@ -1046,6 +1054,7 @@ impl Inner {
         crate::now_playing::on_synced(&self.now_playing);
         crate::now_gaming::on_synced(&self.now_gaming);
         crate::mumcord::on_synced(&self.mumcord, &ctx);
+        crate::history_sync::on_synced(&self.history_sync, &ctx, &self.rt);
         if let Some(mut snapshot) = self.snapshot(&lock(&self.core)) {
             extension::on_synced(&ctx, &mut snapshot);
             self.events
@@ -1166,6 +1175,7 @@ impl Inner {
         core.session = None;
         self.meter.voice.store(false, Ordering::Relaxed);
         drop(core);
+        crate::history_sync::on_disconnect(&self.history_sync);
         match reason {
             DisconnectReason::Requested => Ended::Final(None),
             DisconnectReason::Kicked { reason, ban, .. } => {
@@ -1311,6 +1321,7 @@ impl Inner {
                     crate::now_gaming::on_user_joined(&self.now_gaming, ctx, user.session);
                     crate::mumcord::on_user_joined(&self.mumcord, ctx, user.session);
                 }
+                crate::history_sync::on_user(&self.history_sync, ctx, user);
                 if own && change.moved_from.is_some() {
                     self.remember_channel(ctx, user.channel_id);
                 }
@@ -1327,6 +1338,7 @@ impl Inner {
                 crate::now_playing::on_user_removed(&self.now_playing, user.session);
                 crate::now_gaming::on_user_removed(&self.now_gaming, user.session);
                 crate::mumcord::on_user_removed(&self.mumcord, user.session);
+                crate::history_sync::on_user_removed(&self.history_sync, user.session);
                 self.events.emit(EngineEvent::UserRemoved(user.session));
             }
             Event::PermissionDenied(denied) => {
@@ -1353,6 +1365,7 @@ impl Inner {
                 if let Some(session) = crate::mumcord::on_plugin_data(&self.mumcord, ctx, data) {
                     self.republish_user(ctx, session);
                 }
+                crate::history_sync::on_plugin_data(&self.history_sync, ctx, data);
             }
             Event::TextMessage(_) | Event::ServerConfigUpdated(_) | Event::Disconnected(_) => {}
         }

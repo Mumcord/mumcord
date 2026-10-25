@@ -353,6 +353,9 @@ pub struct Settings {
     /// Share the game being played with others on the server (FR-1.59). Opt-in: no programs
     /// or Steam files are read while off.
     pub now_gaming: bool,
+    /// Answer history sync requests of other Mumcord users with the stored channel messages
+    /// (FR-1.60). On by default; private chats are never shared.
+    pub history_sharing: bool,
 }
 
 impl Default for Settings {
@@ -391,6 +394,7 @@ impl Default for Settings {
             history_max_age_days: None,
             now_playing: false,
             now_gaming: false,
+            history_sharing: true,
         }
     }
 }
@@ -591,6 +595,7 @@ mod tests {
         let parsed: Settings = serde_json::from_str(old).expect("parse");
         assert!(!parsed.now_playing, "off until the user turns it on");
         assert!(!parsed.now_gaming, "off until the user turns it on");
+        assert!(parsed.history_sharing, "history sharing is on by default");
         store
             .save_settings(&Settings {
                 now_playing: true,

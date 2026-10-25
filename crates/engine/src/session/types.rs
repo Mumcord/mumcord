@@ -323,6 +323,18 @@ pub enum EngineEvent {
         session: u32,
         game: Option<crate::now_gaming::NowGamingView>,
     },
+    /// Messages from another Mumcord user's history were added to a channel (FR-1.60), in
+    /// send-time order; insert them by `sent_at` (ties by order here).
+    HistorySynced {
+        channel_id: u32,
+        messages: Vec<crate::history_sync::SyncedMessage>,
+    },
+    /// A history sync of a channel started (`running`) or ended with `added` new messages.
+    HistorySyncStatus {
+        channel_id: u32,
+        running: bool,
+        added: u32,
+    },
 }
 
 /// Phase of the mic test: record, play back, finished or failed to start.

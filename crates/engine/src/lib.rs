@@ -4,6 +4,7 @@
 pub mod chat;
 pub mod diag;
 pub mod follow;
+pub mod history_sync;
 pub mod ingame_overlay;
 mod maintenance;
 pub mod mumcord;
@@ -18,6 +19,7 @@ pub mod web;
 
 pub use chat::{ChatMessageView, HistoryScope};
 pub use follow::FollowAllSummary;
+pub use history_sync::SyncedMessage;
 pub use ingame_overlay::{
     BlockedGame, Blocklist, OverlayDecision, blocklist, decide as decide_overlay,
 };
