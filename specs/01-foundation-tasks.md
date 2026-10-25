@@ -193,6 +193,7 @@
 | B32 | (1c) Overlay window | open | | G1 | complex | FR-1.44–1.46 | src-tauri/src/overlay.rs, ui/src/overlay/ |
 | B33 | (1c) positional + overlay settings UI | open | | B30, B32 | simple | FR-1.41, 1.43, 1.45, 1.46 | ui/src/features/settings/positional/ |
 | B49 | (1c) "Now gaming" status + best-effort Join game (FR-1.59) | open | | B30 | complex | AC-1.50 | engine now_gaming, src-tauri process/steam detection, PersonStatus, profile, userpanel |
+| B56 | (1c) Quick settings on right-click of the settings button (FR-1.66) | open | | B49 | simple | – | userpanel, settings store |
 | C9 | (1c) Verify positional audio | open | | B31, B33 | complex | AC-1.31, 1.32 | e2e/specs/positional |
 | C10 | (1c) Verify overlay | open | | B32, B33 | simple | AC-1.33, 1.34 | e2e/specs/overlay |
 | B34 | Link previews + YouTube/Twitch player cards (FR-1.49, 1.50) | done – engine web module (SSRF guard, caps, 24 h disk cache), player cards (inline only YouTube on Windows, else browser), wizard + settings switch | b34-link-previews | G1 | complex | AC-1.39, 1.40 | crates/engine (metadata fetch), ui chat, wizard, settings |
@@ -217,6 +218,7 @@
 | B53 | (1d) Full profile redesign (FR-1.63) | open | | B52 | simple | AC-1.53 | members ProfileCard |
 | B54 | (1d) Friends by cert hash with online state (FR-1.64) | open | | B53 | complex | AC-1.54 | store, engine, members, follow DM list |
 | B55 | (1d) Kept friend DM history + online state in DMs (FR-1.65) | open | | B54 | simple | AC-1.54 | store history, chat DM header |
+| B57 | Gear icon for the settings button (QA.47) | done | b57-gear-icon | – | simple | – | ui/src/features/userpanel |
 | D1 | Implementation report | open | | C1–C10 | simple | all | specs/01-foundation-implementation.md |
 
 ## Contracts from finished tasks
