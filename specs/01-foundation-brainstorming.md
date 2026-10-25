@@ -1473,3 +1473,12 @@ Requested after v0.3.0; both go to the end of Epic 2 and ship as Beta.
 ✍️ Note: Requested in chat during /dev.
 
 ---
+
+#### QA.89 Send images peer-to-peer? `◉`
+Requested after v0.3.0: full-size images over plugin data are slow (about 2.7 KB/s because of the server's rate limit).
+
+- [x] **Epic 2:** full-size images first try a direct peer-to-peer connection between the two Mumcord users (same P2P layer as screen sharing, signalling over plugin data); if no direct connection can be made, the existing plugin-data transfer is used. Integrity and size checks stay the same.
+
+✍️ Note: Requested in chat during /dev.
+
+---
