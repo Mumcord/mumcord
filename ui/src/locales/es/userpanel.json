@@ -56,5 +56,15 @@
     "generic": "Algo salió mal. Inténtalo de nuevo."
   },
   "ptt": "Pulsar para hablar: mantén {{key}} para hablar",
-  "pttNoKey": "Pulsar para hablar: sin tecla asignada"
+  "pttNoKey": "Pulsar para hablar: sin tecla asignada",
+  "quickSettings": {
+    "label": "Ajustes rápidos",
+    "linkPreviews": "Vistas previas de enlaces y contenido incrustado",
+    "nowPlaying": "Compartir lo que estoy escuchando",
+    "unsupported": "no disponible en macOS",
+    "theme": "Tema",
+    "theme_system": "Tema: seguir el sistema",
+    "theme_dark": "Tema: oscuro",
+    "theme_light": "Tema: claro"
+  }
 }

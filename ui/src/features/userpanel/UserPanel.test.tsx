@@ -2,6 +2,7 @@ import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { act, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { PreferencesProvider } from "../../app/PreferencesProvider";
 import { ViewContext, type View } from "../../app/view";
 import { createMockApi, setApi, type MockApi, type Settings } from "../../api";
 import { subscribeAnnouncements } from "../../a11y/announcer";
@@ -41,9 +42,11 @@ async function setup(connect = true, registered = false, talk?: Partial<Settings
     await api.connect((server ?? { id: 0 }).id, null);
   }
   render(
-    <ViewContext.Provider value={view}>
-      <UserPanel />
-    </ViewContext.Provider>,
+    <PreferencesProvider>
+      <ViewContext.Provider value={view}>
+        <UserPanel />
+      </ViewContext.Provider>
+    </PreferencesProvider>,
   );
   if (connect) {
     await screen.findByRole("button", { name: "Mute microphone" });
@@ -597,5 +600,53 @@ describe("UserPanel", () => {
       expect(mic()).not.toHaveAttribute("title");
       expect(mic().querySelector(".userpanel__level")).not.toBeNull();
     });
+  });
+});
+
+describe("quick settings (FR-1.66)", () => {
+  const gear = () => screen.getByRole("button", { name: "Settings" });
+
+  it("opens on right-click and saves a switch right away", async () => {
+    await setup();
+    fireEvent.contextMenu(gear(), { clientX: 10, clientY: 10 });
+    const links = await screen.findByRole("menuitemcheckbox", { name: "Link previews and embeds" });
+    expect(links).toHaveAttribute("aria-checked", "true");
+    fireEvent.click(links);
+    await waitFor(async () => {
+      expect((await api.settingsGet()).linkPreviews).toBe(false);
+    });
+    expect(links).toHaveAttribute("aria-checked", "false");
+    expect(openSettings).not.toHaveBeenCalled();
+  });
+
+  it("opens with Shift+F10, applies the theme at once and Escape returns focus", async () => {
+    await setup();
+    gear().focus();
+    fireEvent.keyDown(gear(), { key: "F10", shiftKey: true });
+    const dark = await screen.findByRole("menuitemradio", { name: "Theme: dark" });
+    fireEvent.click(dark);
+    await waitFor(() => {
+      expect(document.documentElement.dataset.theme).toBe("dark");
+    });
+    await waitFor(() => {
+      expect(dark).toHaveAttribute("aria-checked", "true");
+    });
+    fireEvent.keyDown(screen.getByRole("menu"), { key: "Escape" });
+    expect(screen.queryByRole("menu", { name: "Quick settings" })).toBeNull();
+    expect(gear()).toHaveFocus();
+  });
+
+  it("toggles now playing and leaves a normal click on the full settings", async () => {
+    await setup();
+    fireEvent.contextMenu(gear());
+    fireEvent.click(
+      await screen.findByRole("menuitemcheckbox", { name: "Share what I'm listening to" }),
+    );
+    await waitFor(async () => {
+      expect((await api.settingsGet()).nowPlaying).toBe(true);
+    });
+    fireEvent.keyDown(screen.getByRole("menu"), { key: "Escape" });
+    fireEvent.click(gear());
+    expect(openSettings).toHaveBeenCalled();
   });
 });

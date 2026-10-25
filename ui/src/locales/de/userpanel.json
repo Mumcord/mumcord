@@ -56,5 +56,15 @@
     "generic": "Etwas ist schiefgelaufen. Bitte versuche es erneut."
   },
   "ptt": "Push-to-Talk: {{key}} gedrückt halten zum Sprechen",
-  "pttNoKey": "Push-to-Talk: keine Taste festgelegt"
+  "pttNoKey": "Push-to-Talk: keine Taste festgelegt",
+  "quickSettings": {
+    "label": "Schnelleinstellungen",
+    "linkPreviews": "Link-Vorschauen und Einbettungen",
+    "nowPlaying": "Teilen, was ich gerade höre",
+    "unsupported": "unter macOS nicht verfügbar",
+    "theme": "Design",
+    "theme_system": "Design: System folgen",
+    "theme_dark": "Design: dunkel",
+    "theme_light": "Design: hell"
+  }
 }

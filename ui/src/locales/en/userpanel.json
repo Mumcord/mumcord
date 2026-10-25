@@ -56,5 +56,15 @@
     "generic": "Something went wrong. Please try again."
   },
   "ptt": "Push-to-talk: hold {{key}} to talk",
-  "pttNoKey": "Push-to-talk: no key set"
+  "pttNoKey": "Push-to-talk: no key set",
+  "quickSettings": {
+    "label": "Quick settings",
+    "linkPreviews": "Link previews and embeds",
+    "nowPlaying": "Share what I'm listening to",
+    "unsupported": "not available on macOS",
+    "theme": "Theme",
+    "theme_system": "Theme: follow system",
+    "theme_dark": "Theme: dark",
+    "theme_light": "Theme: light"
+  }
 }

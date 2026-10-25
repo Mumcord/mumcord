@@ -10,6 +10,7 @@ import { trackLabel, useNowPlaying } from "../nowplaying";
 import { describeError } from "./errors";
 import { ProfileDialog } from "./ProfileDialog";
 import { joinChannel, useReadOnly } from "./readOnly";
+import { QuickSettings, type QuickSettingsState } from "./QuickSettings";
 import { RegisterDialog } from "./RegisterDialog";
 import { useMicLevelFill } from "./useMicLevelFill";
 import { usePushToTalk } from "./usePushToTalk";
@@ -43,6 +44,7 @@ export function UserPanel() {
   const avatarOf = useAvatars(self ? [self] : []);
   const avatarSrc = self ? avatarOf(self) : null;
   const [menuOpen, setMenuOpen] = useState(false);
+  const [quick, setQuick] = useState<QuickSettingsState | null>(null);
   const [dialog, setDialog] = useState<Dialog>(null);
   const [error, setError] = useState<string | null>(null);
   const servers = useServers();
@@ -254,10 +256,28 @@ export function UserPanel() {
           className="userpanel__toggle"
           aria-label={t("settings")}
           onClick={openSettings}
+          onContextMenu={(event) => {
+            event.preventDefault();
+            setQuick({ x: event.clientX, y: event.clientY, opener: event.currentTarget });
+          }}
+          onKeyDown={(event) => {
+            if (event.key !== "ContextMenu" && !(event.key === "F10" && event.shiftKey)) return;
+            event.preventDefault();
+            const box = event.currentTarget.getBoundingClientRect();
+            setQuick({ x: box.left, y: box.bottom, opener: event.currentTarget });
+          }}
         >
           <Icon d={GEAR} />
         </button>
       </div>
+      {quick ? (
+        <QuickSettings
+          menu={quick}
+          onClose={() => {
+            setQuick(null);
+          }}
+        />
+      ) : null}
       {menuOpen ? (
         <div
           tabIndex={-1}
