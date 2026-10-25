@@ -247,8 +247,8 @@
 | B51 | (1d) Mumcord badge (FR-1.61) | done – mumcord.hello plugin data, isMumcord/features, badge everywhere, live test on v14 | b51-badge | – | simple | AC-1.52 | engine hello, PersonStatus |
 | B52 | (1d) Double-click DM + pinned person card with DM and full-profile buttons (FR-1.62) | done (uncommitted) – personClick.ts (200 ms pin delay, dblclick DM), pinned card with DM + Full profile, ProfilePreviewHost owns full card | b52-person-card | – | simple | AC-1.53 | members, channels, chat |
 | B53 | (1c, moved from 1d – QA.63) Full profile redesign (FR-1.63): instant-apply settings with "Saved", private message as header action; friend switch comes with B54 | done (uncommitted) | b53-profile-redesign | B52 | simple | AC-1.53 | members ProfileCard |
-| B54 | (1d) Friends by cert hash with online state (FR-1.64) | in progress (worktree) | b54-friends | B53 | complex | AC-1.54 | store, engine, members, follow DM list |
-| B55 | (1d) Kept friend DM history + online state in DMs (FR-1.65) | open | | B54 | simple | AC-1.54 | store history, chat DM header |
+| B54 | (1d) Friends by cert hash with online state (FR-1.64) | done – merged (migration v10) | b54-friends | B53 | complex | AC-1.54 | store, engine, members, follow DM list |
+| B55 | (1d) Kept friend DM history + online state in DMs (FR-1.65) | done – merged (migration v10) | | B54 | simple | AC-1.54 | store history, chat DM header |
 | B57 | Gear icon for the settings button (QA.47) | done | b57-gear-icon | – | simple | – | ui/src/features/userpanel |
 | L1 | License switch to AGPL-3.0-only + commercial license note, CLA in CONTRIBUTING, About page, package metadata, wiki (QA.51) | done – AGPL text, NOTICE, COMMERCIAL.md, CONTRIBUTING (CLA), PR template, metadata, About page, notices | l1-license | – | simple | AC-1.29 | LICENSE, COMMERCIAL.md, CONTRIBUTING.md, README, Cargo/package metadata, settings About, notices |
 | B58 | "via GIPHY" / "via Tenor" attribution labels (QA.52) | done – GifAttribution label (text = accessible name), gifSource helper | b58-gif-attribution | B36 | simple | FR-1.52 | ui/src/features/chat |
