@@ -33,6 +33,9 @@
 
 .quick-settings__row {
   display: flex;
+  /* Buttons shrink-to-fit in block parents (the Beta group); full width keeps every switch in one column. */
+  box-sizing: border-box;
+  width: 100%;
   align-items: center;
   gap: var(--space-3);
   padding: var(--space-2);
