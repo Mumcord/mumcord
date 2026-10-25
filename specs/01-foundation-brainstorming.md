@@ -1124,3 +1124,11 @@ Findings (not legal advice): GIPHY requires a visible "Powered by GIPHY" mark wh
 ✍️ Note: Requested in chat during /dev ("guck bitte in die Lizenzen").
 
 ---
+
+#### QA.53 Custom themes (roadmap)? `◉`
+
+- [x] **Epic 2 also covers custom themes: colour settings with presets (dark, light, a few curated ones), and sharing a theme as a compact config string; a pasted string renders in the chat as a theme preview card (mini mock-up in those colours) with an "Import theme" button; imported themes are validated (contrast check, only colour values) before use.** Details go into the Epic 2 specification.
+
+✍️ Note: Requested in chat during /dev.
+
+---

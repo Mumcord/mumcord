@@ -223,6 +223,7 @@
 | B58 | "via GIPHY" / "via Tenor" attribution labels (QA.52) | done – GifAttribution label (text = accessible name), gifSource helper | b58-gif-attribution | B36 | simple | FR-1.52 | ui/src/features/chat |
 | B59 | Bug: in compact chat layout the link-preview card's left bar overlaps its text | open | | – | simple | – | ui/src/features/chat css |
 | B60 | Port the demo-mock additions used for the 0.2.0 screenshots (demoPicture, demo link previews/inline images) | open | | – | simple | – | ui/src/api/mock.ts |
+| CI1 | Parallelize E2E in CI: build once, shard spec files across matrix jobs, aggregator job keeps the required "Linux E2E" check name | in progress | ci1-e2e-shards | – | complex | – | .github/workflows/e2e.yml, e2e/run.sh, wdio config |
 | D1 | Implementation report | open | | C1–C10 | simple | all | specs/01-foundation-implementation.md |
 
 ## Contracts from finished tasks

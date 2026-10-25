@@ -515,6 +515,7 @@ Unless stated otherwise: a fresh Mumcord install, a local test server (1.5) runn
 | QA.50 | Correct ordering of synced messages with stable scroll; Jump to newest button | Addendum 2026-10-25; FR-1.60b, AC-1.51d |
 | QA.51 | License: AGPL-3.0-only plus commercial license on request (contact tobias@vorwachs.com) from v0.2.0; earlier versions stay MIT; CLA for contributions | Addendum 2026-10-25; supersedes the MIT decision |
 | QA.52 | "via GIPHY" / "via Tenor" attribution label on such GIFs and favorites | Addendum 2026-10-25; FR-1.52 |
+| QA.53 | Roadmap: custom themes (colour settings, presets, share as config string with chat preview + import) added to Epic 2 | Addendum 2026-10-25; section 14 |
 
 ## 13. Open points & risks
 
@@ -534,7 +535,7 @@ No `specs/roadmap.md` exists yet. This brainstorming proposes it:
 | Epic | Title | Content |
 |---|---|---|
 | 1 | Foundation | This spec (stages 1a + 1b) |
-| 2 | Multi-server read-along | Connect to several servers at once and read along on all of them (QA.1) |
+| 2 | Multi-server read-along + themes | Connect to several servers at once and read along on all of them (QA.1); custom themes: colour settings with presets, shareable as a config string that renders as a theme preview card in the chat and can be imported with one click (QA.53) |
 | 3 | Comfort & polish | Global hotkeys beyond PTT, full tray menu, desktop notifications, import from the official client, whisper/shout (Q5.8), public server browser (Q5.3) |
 | 4 | Admin features | ACL/permission editing, bans, channel management – completes "full replacement" (Q1.3) |
 | 5 | Release & distribution | Signed installers, auto-update, opt-in crash reports (Q4.9), store/package listings |
