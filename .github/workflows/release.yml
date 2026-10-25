@@ -70,6 +70,8 @@ jobs:
     uses: ./.github/workflows/build-and-smoke.yml
     with:
       release: true
+    # Passes the optional Apple signing secrets (docs/release-signing.md).
+    secrets: inherit
 
   release:
     name: Create draft release
@@ -94,6 +96,11 @@ jobs:
           ls -l -- *.AppImage *-setup.exe *.dmg
           sha256sum -- *.AppImage *-setup.exe *.dmg > SHA256SUMS
           cat SHA256SUMS
+          if [[ -f MACOS-SIGNED ]]; then
+            macos_note="macOS: the app is signed and notarized by Apple and opens normally."
+          else
+            macos_note="macOS Gatekeeper says the app \"cannot be opened\": open **System Settings → Privacy & Security** and choose **Open Anyway** (or right-click the app and choose **Open**)."
+          fi
           cat > ../notes.md <<EOF
           ## Downloads
 
@@ -104,10 +111,8 @@ jobs:
           Check a download with \`sha256sum -c SHA256SUMS --ignore-missing\`.
 
           > [!WARNING]
-          > These builds are **not signed** yet. On first start, Windows SmartScreen shows
-          > "Windows protected your PC": choose **More info → Run anyway**. macOS Gatekeeper says
-          > the app "cannot be opened": open **System Settings → Privacy & Security** and choose
-          > **Open Anyway** (or right-click the app and choose **Open**).
+          > Windows is **not signed** yet. On first start, SmartScreen shows "Windows protected
+          > your PC": choose **More info → Run anyway**. $macos_note
 
           Built and smoke-tested by [this workflow run]($RUN_URL).
 

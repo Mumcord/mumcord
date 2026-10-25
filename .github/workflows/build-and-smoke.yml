@@ -3,9 +3,24 @@ name: Build and smoke
 # Reusable: builds the unsigned bundles (Linux AppImage, Windows NSIS installer, macOS universal
 # DMG), uploads them as workflow artifacts, then installs each one on a fresh runner and
 # smoke-tests it against a local Mumble server (scripts/smoke/smoke.sh). Called by
-# test-builds.yml (spec §10, AC-1.30) and release.yml (QA.12). No signing keys or secrets.
+# test-builds.yml (spec §10, AC-1.30) and release.yml (QA.12). Test builds are never signed.
+# Release builds sign and notarize the macOS DMG only when the Apple secrets exist
+# (docs/release-signing.md); without them the DMG is built unsigned.
 on:
   workflow_call:
+    secrets:
+      APPLE_CERTIFICATE:
+        required: false
+      APPLE_CERTIFICATE_PASSWORD:
+        required: false
+      APPLE_SIGNING_IDENTITY:
+        required: false
+      APPLE_API_ISSUER:
+        required: false
+      APPLE_API_KEY:
+        required: false
+      APPLE_API_KEY_P8:
+        required: false
     inputs:
       release:
         description: Build for a tagged release instead of a test build.
@@ -68,6 +83,37 @@ jobs:
       - name: Install npm dependencies
         run: npm ci
 
+      # Tauri imports the certificate into a temporary keychain, signs with the hardened runtime
+      # and entitlements, then notarizes and staples. All of that is switched on by these env vars.
+      - name: Prepare Apple signing and notarization
+        if: runner.os == 'macOS' && inputs.release
+        env:
+          APPLE_CERTIFICATE: ${{ secrets.APPLE_CERTIFICATE }}
+          APPLE_CERTIFICATE_PASSWORD: ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
+          APPLE_SIGNING_IDENTITY: ${{ secrets.APPLE_SIGNING_IDENTITY }}
+          APPLE_API_ISSUER: ${{ secrets.APPLE_API_ISSUER }}
+          APPLE_API_KEY: ${{ secrets.APPLE_API_KEY }}
+          APPLE_API_KEY_P8: ${{ secrets.APPLE_API_KEY_P8 }}
+        run: |
+          for v in APPLE_CERTIFICATE APPLE_CERTIFICATE_PASSWORD APPLE_SIGNING_IDENTITY APPLE_API_ISSUER APPLE_API_KEY APPLE_API_KEY_P8; do
+            if [[ -z "${!v}" ]]; then
+              echo "::warning::Apple secret $v is not set: building the macOS DMG unsigned."
+              exit 0
+            fi
+          done
+          key_path="$RUNNER_TEMP/AuthKey_$APPLE_API_KEY.p8"
+          printf '%s' "$APPLE_API_KEY_P8" > "$key_path"
+          chmod 600 "$key_path"
+          {
+            echo "APPLE_CERTIFICATE=$APPLE_CERTIFICATE"
+            echo "APPLE_CERTIFICATE_PASSWORD=$APPLE_CERTIFICATE_PASSWORD"
+            echo "APPLE_SIGNING_IDENTITY=$APPLE_SIGNING_IDENTITY"
+            echo "APPLE_API_ISSUER=$APPLE_API_ISSUER"
+            echo "APPLE_API_KEY=$APPLE_API_KEY"
+            echo "APPLE_API_KEY_PATH=$key_path"
+            echo "MUMCORD_MACOS_SIGNED=true"
+          } >> "$GITHUB_ENV"
+
       - name: Build bundle
         run: npm run tauri build -- ${{ matrix.args }}
 
@@ -76,6 +122,8 @@ jobs:
         run: |
           mkdir out
           cp ${{ matrix.bundle }} out/
+          # Tells the release job to describe the DMG as signed and notarized.
+          if [[ "${MUMCORD_MACOS_SIGNED:-}" == "true" ]]; then touch out/MACOS-SIGNED; fi
           # Releases carry this note in the release text instead.
           if [[ "${{ inputs.release }}" == "true" ]]; then ls -l out; exit 0; fi
           cat > out/UNSIGNED-TEST-BUILD.txt <<EOF
