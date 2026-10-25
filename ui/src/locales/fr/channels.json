@@ -1,4 +1,5 @@
 {
+  "serverOverview": "Vue d'ensemble du serveur",
   "tree": {
     "label": "Canaux",
     "hint": "Entrée : afficher la discussion · Maj+Entrée ou double-clic : rejoindre · Flèches : se déplacer, développer, réduire",

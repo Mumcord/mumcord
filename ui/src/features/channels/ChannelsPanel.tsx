@@ -113,6 +113,9 @@ export function ChannelsPanel({ channelBadge, channelAction, header }: ChannelsP
           requestAnimationFrame(() => treeRef.current?.openFirstMatch());
         }}
       />
+      <section className="server-overview" aria-labelledby="server-overview-title">
+        <h2 id="server-overview-title">{t("serverOverview")}</h2>
+      </section>
       <ChannelTree
         // A fresh tree per server, so its expand/collapse state starts from that server's (QA.27).
         key={state.serverId}

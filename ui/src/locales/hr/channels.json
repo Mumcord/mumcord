@@ -1,4 +1,5 @@
 {
+  "serverOverview": "Pregled poslužitelja",
   "tree": {
     "label": "Kanali",
     "hint": "Enter: prikaži chat · Shift+Enter ili dvoklik: pridruži se · Strelice: pomicanje, proširivanje, sažimanje",

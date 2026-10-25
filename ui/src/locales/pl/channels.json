@@ -1,4 +1,5 @@
 {
+  "serverOverview": "Przegląd serwera",
   "tree": {
     "label": "Kanały",
     "hint": "Enter: pokaż czat · Shift+Enter lub dwuklik: dołącz · Strzałki: przesuwanie, rozwijanie, zwijanie",

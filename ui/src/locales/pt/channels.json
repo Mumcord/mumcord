@@ -1,4 +1,5 @@
 {
+  "serverOverview": "Visão geral do servidor",
   "tree": {
     "label": "Canais",
     "hint": "Enter: mostrar chat · Shift+Enter ou duplo clique: entrar · Setas: mover, expandir, recolher",

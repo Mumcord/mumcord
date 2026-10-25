@@ -1,4 +1,5 @@
 {
+  "serverOverview": "Resumen del servidor",
   "tree": {
     "label": "Canales",
     "hint": "Intro: ver chat · Mayús+Intro o doble clic: unirse · Flechas: mover, expandir, contraer",

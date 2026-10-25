@@ -1,4 +1,5 @@
 {
+  "serverOverview": "Panoramica del server",
   "tree": {
     "label": "Canali",
     "hint": "Invio: mostra la chat · Maiusc+Invio o doppio clic: entra · Frecce: sposta, espandi, comprimi",

@@ -1,4 +1,5 @@
 {
+  "serverOverview": "Palvelimen yleiskatsaus",
   "tree": {
     "label": "Kanavat",
     "hint": "Enter: näytä chat · Shift+Enter tai kaksoisnapsautus: liity · Nuolinäppäimet: liiku, laajenna, supista",

@@ -1,4 +1,5 @@
 {
+  "serverOverview": "Pregled strežnika",
   "tree": {
     "label": "Kanali",
     "hint": "Enter: pokaži klepet · Shift+Enter ali dvoklik: pridruži se · Puščice: premikanje, razširi, strni",

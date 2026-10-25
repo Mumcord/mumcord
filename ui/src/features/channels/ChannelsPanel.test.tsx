@@ -55,6 +55,11 @@ describe("ChannelsPanel", () => {
     expect(screen.getByText(/Shift\+Enter or double-click: join/)).toBeInTheDocument();
   });
 
+  it("labels the channel tree with a server overview heading", async () => {
+    await renderPanel();
+    expect(screen.getByRole("heading", { level: 2, name: "Server overview" })).toBeInTheDocument();
+  });
+
   it("updates the talking ring and spoken status", async () => {
     await renderPanel();
     act(() => {

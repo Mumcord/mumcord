@@ -1,4 +1,5 @@
 {
+  "serverOverview": "Prezentare generală a serverului",
   "tree": {
     "label": "Canale",
     "hint": "Enter: arată chatul · Shift+Enter sau dublu clic: intră · Săgeți: mută, extinde, restrânge",

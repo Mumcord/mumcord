@@ -1,4 +1,5 @@
 {
+  "serverOverview": "Přehled serveru",
   "tree": {
     "label": "Kanály",
     "hint": "Enter: zobrazit chat · Shift+Enter nebo dvojklik: připojit se · Šipky: pohyb, rozbalit, sbalit",

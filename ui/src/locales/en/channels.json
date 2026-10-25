@@ -1,4 +1,5 @@
 {
+  "serverOverview": "Server overview",
   "tree": {
     "label": "Channels",
     "hint": "Enter: show chat · Shift+Enter or double-click: join · Arrow keys: move, expand, collapse",

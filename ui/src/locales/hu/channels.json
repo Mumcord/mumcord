@@ -1,4 +1,5 @@
 {
+  "serverOverview": "Szerver áttekintése",
   "tree": {
     "label": "Csatornák",
     "hint": "Enter: chat megjelenítése · Shift+Enter vagy dupla kattintás: belépés · Nyílbillentyűk: mozgás, kibontás, összecsukás",
