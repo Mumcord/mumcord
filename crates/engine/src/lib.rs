@@ -4,6 +4,7 @@
 pub mod chat;
 pub mod diag;
 pub mod follow;
+pub mod history_sync;
 mod maintenance;
 pub mod now_playing;
 pub mod people;
@@ -15,6 +16,7 @@ pub mod web;
 
 pub use chat::{ChatMessageView, HistoryScope};
 pub use follow::FollowAllSummary;
+pub use history_sync::SyncedMessage;
 /// Stored types (settings record etc.) as the engine hands them out.
 pub use mumcord_store as store;
 pub use mumcord_store::{SecretStore, ServerId, Settings};

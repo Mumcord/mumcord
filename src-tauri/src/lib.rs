@@ -325,6 +325,8 @@ fn emit_engine_event(app: &AppHandle, event: EngineEvent) -> tauri::Result<()> {
             }
             .emit(app)
         }
+        // History sync (FR-1.60) reaches the UI in its own step; the store already has them.
+        EngineEvent::HistorySynced { .. } | EngineEvent::HistorySyncStatus { .. } => Ok(()),
     }
 }
 

@@ -23,7 +23,7 @@ use crate::session::{
 use crate::sounds::Sound;
 
 pub use sanitize::sanitize_html;
-use sanitize::sanitize_message_html;
+pub(crate) use sanitize::sanitize_message_html;
 
 /// Size cap for messages with images when the server sets no limit; the UI scales images to
 /// the same target.
@@ -260,13 +260,15 @@ fn store_message(
             None
         })
     });
-    match stored {
-        Some(id) => id.to_string(),
-        None => format!(
-            "{TRANSIENT_PREFIX}{}",
-            TRANSIENT_IDS.fetch_add(1, Ordering::Relaxed)
-        ),
-    }
+    stored.map_or_else(transient_id, |id| id.to_string())
+}
+
+/// A fresh id for a message that was shown but not stored.
+pub(crate) fn transient_id() -> String {
+    format!(
+        "{TRANSIENT_PREFIX}{}",
+        TRANSIENT_IDS.fetch_add(1, Ordering::Relaxed)
+    )
 }
 
 /// Incoming text message: route, sanitize, store, emit, count unread (hook from the session).
