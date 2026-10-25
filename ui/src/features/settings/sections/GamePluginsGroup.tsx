@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { getApi, type GamePlugin, type PositionalStatus } from "../../../api";
+import { BetaBadge } from "../../../components/BetaBadge";
 import { Group } from "../components/Section";
 import { Switch } from "../components/Switch";
 
@@ -70,7 +71,7 @@ export function GamePluginsGroup() {
   };
 
   return (
-    <Group title={t("gamePlugins.title")}>
+    <Group title={t("gamePlugins.title")} badge={<BetaBadge />}>
       <p className="settings-hint">{t("gamePlugins.explanation")}</p>
       <p className="settings-hint">{t("gamePlugins.antiCheat")}</p>
       {plugins === null && error === null && (

@@ -362,7 +362,8 @@
     "invalid": "Introduce las distancias en metros: mínimo de 0 o más, máximo al menos 1 por encima del mínimo y como mucho 1000.",
     "sourceGame": "Posiciones de: {{source}} – {{game}}",
     "source": "Posiciones de: {{source}}",
-    "none": "No se detecta ningún juego"
+    "none": "No se detecta ningún juego",
+    "betaHint": "El resultado depende del juego y de su compatibilidad con plugins."
   },
   "gamePlugins": {
     "title": "Audio posicional: fuentes",

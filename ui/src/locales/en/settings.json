@@ -362,7 +362,8 @@
     "invalid": "Enter distances in metres: minimum at least 0, maximum at least 1 above the minimum and at most 1000.",
     "sourceGame": "Positions from: {{source}} – {{game}}",
     "source": "Positions from: {{source}}",
-    "none": "No game detected"
+    "none": "No game detected",
+    "betaHint": "Results depend on the game and its plugin support."
   },
   "gamePlugins": {
     "title": "Positional audio: sources",

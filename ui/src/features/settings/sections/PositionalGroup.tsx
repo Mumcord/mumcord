@@ -1,5 +1,6 @@
 import { useId, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { BetaBadge } from "../../../components/BetaBadge";
 import { usePositionalStatus } from "../../positional/usePositionalStatus";
 import { Group } from "../components/Section";
 import { Switch } from "../components/Switch";
@@ -59,7 +60,8 @@ export function PositionalGroup({ settings, update }: SettingsSectionProps) {
   };
 
   return (
-    <Group title={t("positional.title")}>
+    <Group title={t("positional.title")} badge={<BetaBadge />}>
+      <p className="settings-hint">{t("positional.betaHint")}</p>
       <Switch
         label={t("positional.switch")}
         description={t("positional.hint")}

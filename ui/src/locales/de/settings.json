@@ -362,7 +362,8 @@
     "invalid": "Entfernungen in Metern angeben: Minimum mindestens 0, Maximum mindestens 1 über dem Minimum und höchstens 1000.",
     "sourceGame": "Positionen von: {{source}} – {{game}}",
     "source": "Positionen von: {{source}}",
-    "none": "Kein Spiel erkannt"
+    "none": "Kein Spiel erkannt",
+    "betaHint": "Das Ergebnis hängt vom Spiel und seiner Plugin-Unterstützung ab."
   },
   "gamePlugins": {
     "title": "Positionsabhängiges Audio: Quellen",

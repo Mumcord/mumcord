@@ -16,6 +16,7 @@ import { createPortal } from "react-dom";
 import { useTranslation } from "react-i18next";
 import { useIsMacos } from "../../api/useIsMacos";
 import { getApi, type OverlayState, type Theme } from "../../api";
+import { BetaBadge } from "../../components/BetaBadge";
 import { useSettings } from "../settings/useSettings";
 import "./quicksettings.css";
 
@@ -239,6 +240,7 @@ export function QuickSettings({
     checked: boolean,
     onToggle: () => void,
     disabled = false,
+    beta = false,
   ): ReactNode => (
     <button
       type="button"
@@ -251,7 +253,10 @@ export function QuickSettings({
     >
       <Glyph d={icon} />
       <span className="quick-settings__text">
-        <span className="quick-settings__label">{label}</span>
+        <span className="quick-settings__label">
+          {label}
+          {beta && <BetaBadge />}
+        </span>
         <span className="quick-settings__hint">{hint}</span>
       </span>
       <span className="quick-settings__switch" aria-hidden="true" />
@@ -344,6 +349,8 @@ export function QuickSettings({
                 positional: { ...settings.positional, enabled: !settings.positional.enabled },
               });
             },
+            false,
+            true,
           )}
           {overlayShown &&
             row(

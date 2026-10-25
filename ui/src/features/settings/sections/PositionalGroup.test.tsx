@@ -1,4 +1,4 @@
-import { act, fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { act, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi, type MockInstance } from "vitest";
 import { PreferencesProvider } from "../../../app/PreferencesProvider";
 import { createMockApi, setApi, type MockApi, type Settings } from "../../../api";
@@ -103,6 +103,35 @@ describe("PositionalGroup", () => {
       });
     });
     expect(screen.getByText("No game detected")).toBeInTheDocument();
+  });
+
+  it("marks the group as beta with a hint", () => {
+    render(<PositionalGroup settings={settings} update={vi.fn()} />);
+    const heading = screen.getByRole("heading", { name: /Positional audio/u });
+    expect(within(heading).getByText("Beta")).toBeInTheDocument();
+    expect(within(heading).getByText("Beta feature")).toBeInTheDocument();
+    expect(screen.getByText(/depend on the game/u)).toBeInTheDocument();
+  });
+
+  it("marks the quick settings row as beta", async () => {
+    render(
+      <PreferencesProvider>
+        <QuickSettings
+          menu={{ x: 0, y: 0, opener: null }}
+          account={{
+            connected: false,
+            registered: false,
+            canRegister: false,
+            onEditProfile: vi.fn(),
+            onRegister: vi.fn(),
+          }}
+          onClose={vi.fn()}
+          onOpenSettings={vi.fn()}
+        />
+      </PreferencesProvider>,
+    );
+    const row = await screen.findByRole("menuitemcheckbox", { name: /^Positional audio/u });
+    expect(within(row).getByText("Beta")).toBeInTheDocument();
   });
 
   it("keeps the quick settings switch and the settings switch in step", async () => {

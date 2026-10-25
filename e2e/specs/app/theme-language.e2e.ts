@@ -77,6 +77,8 @@ const neutral = (t: string) =>
   // A single letter (avatar initial), the test audio backend's device name, the OS string.
   /^\p{L}$/u.test(t) ||
   /^(null|linux \S+|windows \S+|macos \S+)$/i.test(t) ||
+  // "Beta" is the same word in English, German and Spanish.
+  /^Beta$/.test(t) ||
   // "Link" is also the German word; its tooltip adds the shortcut.
   /^Link( \(Ctrl\+K\))?$/.test(t) ||
   // "In <channel> (<count>)" reads the same in English and German.

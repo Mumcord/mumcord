@@ -1,4 +1,4 @@
-import { act, fireEvent, render, screen } from "@testing-library/react";
+import { act, fireEvent, render, screen, within } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { createMockApi, EngineError, setApi, type MockApi } from "../../../api";
 import { applyLanguage } from "../../../i18n";
@@ -86,5 +86,11 @@ describe("GamePluginsGroup", () => {
     expect(await screen.findByRole("alert")).toHaveTextContent(
       "The game plugins could not be listed.",
     );
+  });
+
+  it("marks the group as beta", () => {
+    render(<GamePluginsGroup />);
+    const heading = screen.getByRole("heading", { name: /Positional audio: sources/u });
+    expect(within(heading).getByText("Beta")).toBeInTheDocument();
   });
 });
