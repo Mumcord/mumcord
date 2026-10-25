@@ -16,7 +16,14 @@
     "volumeValue": "{{value}} %",
     "localMute": "Für mich stummschalten",
     "sessionOnly": "Diese Person hat kein Zertifikat, daher gelten diese Einstellungen nur für diese Sitzung.",
-    "sendPrivateMessage": "Private Nachricht senden"
+    "sendPrivateMessage": "Private Nachricht senden",
+    "privateMessage": "Private Nachricht",
+    "localSettings": "Deine Einstellungen",
+    "localSettingsHint": "Nur du siehst sie. Änderungen werden sofort gespeichert.",
+    "localMuteHint": "Du hörst diese Person nicht mehr.",
+    "privateNote": "Private Notiz",
+    "privateNoteHint": "Nur du kannst diese Notiz sehen.",
+    "saved": "Gespeichert"
   },
   "errors": {
     "notConnected": "Nicht mit einem Server verbunden.",
@@ -25,8 +32,7 @@
   "menu": {
     "label": "Aktionen für {{name}}",
     "viewProfile": "Profil ansehen",
-    "mute": "Für mich stummschalten",
-    "unmute": "Für mich laut schalten"
+    "mute": "Für mich stummschalten"
   },
   "nowPlaying": {
     "label": "Läuft gerade",

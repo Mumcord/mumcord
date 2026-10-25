@@ -4,9 +4,6 @@
   "deafen": "Ensordecer",
   "disconnect": "Desconectar de {{server}}",
   "settings": "Ajustes rápidos",
-  "menu": "Menú de usuario",
-  "menuProfile": "Editar perfil",
-  "menuRegister": "Registrarse en este servidor",
   "announce": {
     "muted": "Micrófono silenciado",
     "unmuted": "Micrófono activado",

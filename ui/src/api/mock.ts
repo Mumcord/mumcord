@@ -18,6 +18,9 @@ import type {
   InlineImage,
   LinkPreview,
   MumbleLink,
+  GameKey,
+  GameOverlayEntry,
+  InGameOverlayState,
   OverlaySettings,
   OverlayState,
   PttAvailability,
@@ -407,6 +410,8 @@ export function createMockApi(options: MockOptions = {}): MockApi {
   const connectDelayMs = options.connectDelayMs ?? 0;
 
   const listeners = new Map<EventName, Set<(payload: never) => void>>();
+  /** Private notes by session (FR-1.63); the engine keys them by certificate hash. */
+  const notes = new Map<number, string>();
   const failures = new Map<CommandName, ApiError>();
   const certPrompts = new Map<number, string | null>();
 
@@ -457,6 +462,8 @@ export function createMockApi(options: MockOptions = {}): MockApi {
     onTopSupported: true,
     positionSupported: true,
     explanationKey: null,
+    kdeWayland: false,
+    kwinRuleInstalled: false,
     language: null,
   };
   const setOverlay = (next: OverlayState) => {
@@ -464,6 +471,30 @@ export function createMockApi(options: MockOptions = {}): MockApi {
     emit("overlayChanged", { state: overlay });
     return Promise.resolve(overlay);
   };
+  let ingameOverlay: InGameOverlayState = {
+    supported: true,
+    explanationKey: null,
+    mode: "off",
+    games: [],
+    known: [],
+  };
+  const setIngameOverlay = (next: InGameOverlayState) => {
+    ingameOverlay = next;
+    emit("inGameOverlayChanged", { state: ingameOverlay });
+    return Promise.resolve(ingameOverlay);
+  };
+  const effectOf = (entry: GameOverlayEntry): InGameOverlayState["games"][number]["effective"] => {
+    if (ingameOverlay.mode === "off") return "globalOff";
+    if (entry.blocklist && !entry.riskConfirmed) return "blocked";
+    if (entry.enabled === false) return "gameOff";
+    if (entry.enabled === null && entry.blocklist) return "blocked";
+    return "show";
+  };
+  const sameKey = (a: GameKey, b: GameKey) =>
+    a.kind === b.kind &&
+    (a.kind === "steam"
+      ? a.value === (b as { value: number }).value
+      : a.value.toLowerCase() === (b as { value: string }).value.toLowerCase());
   const desktopNotices: MessageNotice[] = [];
   const messageSounds: ("message" | "mention")[] = [];
   const rejoinOffers = new Map<number, string[]>();
@@ -899,6 +930,12 @@ export function createMockApi(options: MockOptions = {}): MockApi {
       updateUser(session, { localMute: muted });
       return Promise.resolve(null);
     },
+    personSetNote: (session, note) => {
+      requireUser(session);
+      if (Array.from(note).length > 1000) fail("invalidInput", "note is too long");
+      notes.set(session, note);
+      return Promise.resolve(null);
+    },
     personProfile: (session) => {
       const user = requireUser(session);
       return Promise.resolve({
@@ -910,6 +947,7 @@ export function createMockApi(options: MockOptions = {}): MockApi {
             (demo ? DEMO_AVATARS.get(session) : undefined) ??
             "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAIAAAD8GO2jAAAAd0lEQVR42u3UwQ2AMAwDwE7HGt2DCRmDTdw/KIlFHIRQrHzrE5Qwzn2WzmiggQZoALcoARjRAHCTBUDkOQA6H35FAuCYmz8+EB7/DYCCXJ+gov1dQGiYl1wOSIz4MxW2m3ugavcWTdIeb3Kmmv1VOAxzlgIyUw4sffQx8QiPKKAAAAAASUVORK5CYII=")
           : null,
+        note: notes.get(session) ?? "",
       });
     },
 
@@ -1060,6 +1098,9 @@ export function createMockApi(options: MockOptions = {}): MockApi {
       return Promise.resolve(null);
     },
     saveImage: () => Promise.resolve(null),
+    // The browser has no native file drops; dropped files arrive as `File` objects instead.
+    readDroppedImage: () =>
+      Promise.reject(new EngineError("notFound", "no native file drops in the mock")),
     previewCacheClear: () => {
       const freed = cachedPreviewBytes;
       cachedPreviewBytes = 0;
@@ -1089,8 +1130,30 @@ export function createMockApi(options: MockOptions = {}): MockApi {
         settings: { ...overlay.settings, enabled },
         moveMode: enabled && overlay.moveMode,
       }),
+    overlayKwinRuleInstall: () => setOverlay({ ...overlay, kwinRuleInstalled: true }),
+    overlayKwinRuleRemove: () => setOverlay({ ...overlay, kwinRuleInstalled: false }),
+    overlayOpenKdeWindowRules: () => Promise.resolve(null),
     overlayMoveMode: (active) =>
       setOverlay({ ...overlay, moveMode: overlay.settings.enabled && active }),
+
+    // in-game overlay (FR-1.46b)
+    ingameOverlayState: () => Promise.resolve(ingameOverlay),
+    ingameOverlaySetMode: (mode) => {
+      const games = ingameOverlay.games.map((g) => ({ ...g, effective: effectOf({ ...g }) }));
+      return setIngameOverlay({ ...ingameOverlay, mode, games });
+    },
+    ingameOverlaySetGame: (entry) => {
+      const withEffect = { ...entry, effective: effectOf(entry) };
+      const games = ingameOverlay.games.filter((g) => !sameKey(g.key, entry.key));
+      games.push(withEffect);
+      const known = ingameOverlay.known.filter((k) => !sameKey(k.key, entry.key));
+      return setIngameOverlay({ ...ingameOverlay, games, known });
+    },
+    ingameOverlayRemoveGame: (key) =>
+      setIngameOverlay({
+        ...ingameOverlay,
+        games: ingameOverlay.games.filter((g) => !sameKey(g.key, key)),
+      }),
 
     // settings
     settingsGet: () => Promise.resolve({ ...settings }),
@@ -1132,7 +1195,12 @@ export function createMockApi(options: MockOptions = {}): MockApi {
     pttCaptureKey: (key) => Promise.resolve(demo || /^Mouse(Middle|4|5)$/.test(key) ? key : "F13"),
     pttMouseStatus: () => Promise.resolve<PttMouseStatus>({ support: "native", state: "ready" }),
     pttCaptureCancel: () => Promise.resolve(null),
-    pttSession: () => Promise.resolve({ waylandDesktop: false, compatibilityActive: false }),
+    pttSession: () =>
+      Promise.resolve({ waylandDesktop: false, compatibilityActive: false, kde: false }),
+    pttOpenKdeX11Settings: () => Promise.resolve(null),
+    pttKdeX11Access: () => Promise.resolve({ allowed: false, undoAvailable: false }),
+    pttKdeX11AllowMouse: () => Promise.resolve({ allowed: true, undoAvailable: true }),
+    pttKdeX11Undo: () => Promise.resolve({ allowed: false, undoAvailable: false }),
 
     // app
     appRestart: () => Promise.resolve(null),

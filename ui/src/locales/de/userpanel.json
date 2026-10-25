@@ -4,9 +4,6 @@
   "deafen": "Taubschalten",
   "disconnect": "Verbindung zu {{server}} trennen",
   "settings": "Schnelleinstellungen",
-  "menu": "Benutzermenü",
-  "menuProfile": "Profil bearbeiten",
-  "menuRegister": "Auf diesem Server registrieren",
   "announce": {
     "muted": "Mikrofon stummgeschaltet",
     "unmuted": "Mikrofon wieder aktiv",

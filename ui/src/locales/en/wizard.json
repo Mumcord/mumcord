@@ -82,6 +82,10 @@
     "autostartHint": "You can change this later in Settings → Appearance.",
     "autostartFailed": "Mumcord could not be set to start when you log in. You can try again in Settings.",
     "linkPreviews": "Show link previews and embeds",
-    "linkPreviewsHint": "Mumcord loads linked pages to show previews and video players; those sites see your IP address."
+    "linkPreviewsHint": "Mumcord loads linked pages to show previews and video players; those sites see your IP address.",
+    "ingameOverlay": "Show the overlay inside games",
+    "ingameOverlayHint": "Draws who is talking on top of your game (Linux). You can turn it on or off per game later in Settings.",
+    "ingameOverlayWarning": "Some games with anti-cheat may flag or block in-game overlays. Mumcord keeps known-risky games (such as Valorant or League of Legends) off by default. Enable it only for games you trust.",
+    "ingameOverlayAlt": "Example of the in-game overlay showing who is talking"
   }
 }

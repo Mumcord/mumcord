@@ -55,6 +55,11 @@ export const commands = {
 	personSetVolume: (session: number, volume: number) => typedError<null, ApiError>(__TAURI_INVOKE("person_set_volume", { session, volume })),
 	/**  Mutes a person locally; remembered by certificate hash per server. */
 	personSetLocalMute: (session: number, muted: boolean) => typedError<null, ApiError>(__TAURI_INVOKE("person_set_local_mute", { session, muted })),
+	/**
+	 *  Saves the private note about a person (at most 1000 characters; empty removes it);
+	 *  remembered by certificate hash per server.
+	 */
+	personSetNote: (session: number, note: string) => typedError<null, ApiError>(__TAURI_INVOKE("person_set_note", { session, note })),
 	/**  Comment and avatar of a person, fetched from the server when not known yet. */
 	personProfile: (session: number) => typedError<PersonProfile, ApiError>(__TAURI_INVOKE("person_profile", { session })),
 	/**
@@ -68,6 +73,12 @@ export const commands = {
 	 *  already in the UI, so nothing is fetched again.
 	 */
 	saveImage: (path: string, dataUrl: string) => typedError<null, ApiError>(__TAURI_INVOKE("save_image", { path, dataUrl })),
+	/**
+	 *  Reads an image file that was just dropped onto the window (once per drop). Fails with
+	 *  `notFound` for any other path, `messageTooLarge` above 25 MB and `invalidInput` when the
+	 *  file is not a PNG, JPEG, GIF or WebP image.
+	 */
+	readDroppedImage: (path: string) => typedError<DroppedImage, ApiError>(__TAURI_INVOKE("read_dropped_image", { path })),
 	/**
 	 *  Preview of an http(s) link in a message; `null` when previews are switched off in the
 	 *  settings (then nothing is fetched) or there is nothing to show.
@@ -162,6 +173,27 @@ export const commands = {
 	 *  stored setting only takes effect after `app_restart`.
 	 */
 	pttSession: () => typedError<PttSession, ApiError>(__TAURI_INVOKE("ptt_session")),
+	/**
+	 *  KDE only: opens System Settings → Legacy X11 App Support (`kcmshell6 kwinxwayland`, else
+	 *  `systemsettings kcm_kwinxwayland`). `invalidInput` outside KDE, `io` if neither started.
+	 */
+	pttOpenKdeX11Settings: () => typedError<null, ApiError>(__TAURI_INVOKE("ptt_open_kde_x11_settings")),
+	/**
+	 *  KDE only: whether KWin lets X11 apps see mouse buttons. `invalidInput` outside KDE, `io`
+	 *  if the KDE settings cannot be read.
+	 */
+	pttKdeX11Access: () => typedError<KdeX11Access, ApiError>(__TAURI_INVOKE("ptt_kde_x11_access")),
+	/**
+	 *  KDE only: allows mouse buttons for X11 apps in KDE's settings and asks KWin to reload.
+	 *  `io` if the settings cannot be written, `internal` if KWin cannot be reached (the setting
+	 *  is written; it applies at the next login). A Mumcord restart is needed afterwards.
+	 */
+	pttKdeX11AllowMouse: () => typedError<KdeX11Access, ApiError>(__TAURI_INVOKE("ptt_kde_x11_allow_mouse")),
+	/**
+	 *  KDE only: puts back the settings from before `ptt_kde_x11_allow_mouse`. `invalidInput` if
+	 *  there is nothing to undo; other errors as for allowing.
+	 */
+	pttKdeX11Undo: () => typedError<KdeX11Access, ApiError>(__TAURI_INVOKE("ptt_kde_x11_undo")),
 	/**  Answers `CloseRequested`; `remember` stores the choice as the close behaviour. */
 	closeChoice: (choice: CloseChoice, remember: boolean) => typedError<null, ApiError>(__TAURI_INVOKE("close_choice", { choice, remember })),
 	/**  Disconnects cleanly and starts Mumcord again, e.g. to apply compatibility mode (FR-1.48). */
@@ -217,6 +249,30 @@ export const commands = {
 	 *  again; a dragged place is stored as `customPosition`). Ignored while the overlay is off.
 	 */
 	overlayMoveMode: (active: boolean) => typedError<OverlayState, ApiError>(__TAURI_INVOKE("overlay_move_mode", { active })),
+	/**
+	 *  KDE Wayland only: adds or updates the KWin window rule that keeps the overlay on top and
+	 *  in its corner, and asks KWin to reload its rules. `invalidInput` elsewhere, `io` if the
+	 *  rules file cannot be written, `internal` if KWin cannot be reached (the rule is written).
+	 */
+	overlayKwinRuleInstall: () => typedError<OverlayState, ApiError>(__TAURI_INVOKE("overlay_kwin_rule_install")),
+	/**  KDE Wayland only: removes Mumcord's KWin window rule again and asks KWin to reload. */
+	overlayKwinRuleRemove: () => typedError<OverlayState, ApiError>(__TAURI_INVOKE("overlay_kwin_rule_remove")),
+	/**
+	 *  KDE only: opens System Settings → Window Rules (`systemsettings kcm_kwinrules`, else
+	 *  `kcmshell6 kwinrules`). `io` if neither could be started.
+	 */
+	overlayOpenKdeWindowRules: () => typedError<null, ApiError>(__TAURI_INVOKE("overlay_open_kde_window_rules")),
+	/**  Current in-game overlay settings, platform support and the games that can be configured. */
+	ingameOverlayState: () => typedError<InGameOverlayState, ApiError>(__TAURI_INVOKE("ingame_overlay_state")),
+	/**  Sets the global mode (off/on). */
+	ingameOverlaySetMode: (mode: InGameOverlayMode) => typedError<InGameOverlayState, ApiError>(__TAURI_INVOKE("ingame_overlay_set_mode", { mode })),
+	/**
+	 *  Adds or replaces a game's options. Enabling a blocklisted game needs `riskConfirmed`; without
+	 *  it the engine keeps the overlay off for that game (the command still stores the choice).
+	 */
+	ingameOverlaySetGame: (entry: GameOverlayEntry) => typedError<InGameOverlayState, ApiError>(__TAURI_INVOKE("ingame_overlay_set_game", { entry })),
+	/**  Removes a game's options (it then follows the global mode again, or the blocklist default). */
+	ingameOverlayRemoveGame: (key: GameKey) => typedError<InGameOverlayState, ApiError>(__TAURI_INVOKE("ingame_overlay_remove_game", { key })),
 };
 
 /** Events */
@@ -231,6 +287,7 @@ export const events = {
 	deepLinkOpened: makeEvent<DeepLinkOpened, DeepLinkOpened>("deep-link-opened"),
 	defaultAvatarSkipped: makeEvent<DefaultAvatarSkipped, DefaultAvatarSkipped>("default-avatar-skipped"),
 	followedChannelsChanged: makeEvent<FollowedChannelsChanged, FollowedChannelsChanged>("followed-channels-changed"),
+	inGameOverlayChanged: makeEvent<InGameOverlayChanged, InGameOverlayChanged>("in-game-overlay-changed"),
 	messageReceived: makeEvent<MessageReceived, MessageReceived>("message-received"),
 	micLevel: makeEvent<MicLevel, MicLevel>("mic-level"),
 	micTestPhaseChanged: makeEvent<MicTestPhaseChanged, MicTestPhaseChanged>("mic-test-phase-changed"),
@@ -276,6 +333,14 @@ export type AudioDevices = {
 /**  Device list changed (hot-plug). */
 export type AudioDevicesChanged = {
 	devices: AudioDevices,
+};
+
+/**  A game on the bundled blocklist (QA.56), shown read-only in the settings. */
+export type BlocklistInfo = {
+	name: string,
+	antiCheat: string,
+	reason: string,
+	source: string,
 };
 
 /**  The server's certificate is unknown or changed; the connection waits for `cert_trust_decide`. */
@@ -395,6 +460,9 @@ export type Conversation = { kind: "channel"; channelId: number } |
 /**  Private chat with a person without certificate; lives only for this session. */
 { kind: "privateSession"; session: number };
 
+/**  Screen corner (same values as the window overlay). */
+export type Corner = "topLeft" | "topRight" | "bottomLeft" | "bottomRight";
+
 /**  A `mumble://` link was opened from outside (startup argument or second launch). */
 export type DeepLinkOpened = {
 	link: MumbleLink,
@@ -407,6 +475,27 @@ export type DeepLinkOpened = {
 export type DefaultAvatarSkipped = {
 	serverId: number,
 };
+
+/**  A dropped image file, ready to go into the attachment tray. */
+export type DroppedImage = {
+	/**  File name without the folder. */
+	name: string,
+	/**  MIME type detected from the file contents, not the extension. */
+	mime: string,
+	/**  The file contents, base64-encoded. */
+	data: string,
+};
+
+/**  Why a game shows the overlay or not. */
+export type Effect = 
+/**  Drawn in this game. */
+"show" | 
+/**  Global mode is off. */
+"globalOff" | 
+/**  Switched off for this game. */
+"gameOff" | 
+/**  On the blocklist and not confirmed. */
+"blocked";
 
 /**  Machine-readable error category; the UI maps it to a plain-language message. */
 export type ErrorCode = 
@@ -463,6 +552,34 @@ export type FollowedChannelsChanged = {
 	channelIds: number[],
 };
 
+/**  How a game is identified: its Steam app id, or its executable name. */
+export type GameKey = { kind: "steam"; value: number } | { kind: "exe"; value: string };
+
+/**  Per-game options sent from the settings page. Ranges are clamped on save. */
+export type GameOverlayEntry = {
+	key: GameKey,
+	/**  Display name; plain text. */
+	name: string,
+	/**  `null` follows the global mode; `true`/`false` overrides it for this game. */
+	enabled: boolean | null,
+	/**
+	 *  The stronger anti-cheat warning was confirmed for this game (needed to enable a
+	 *  blocklisted game, QA.56).
+	 */
+	riskConfirmed: boolean,
+	corner: Corner,
+	/**  Percent of the default size, 50–200. */
+	sizePercent: number,
+	/**  Percent, 20–100. */
+	opacityPercent: number,
+	showWholeChannel: boolean,
+	showChannelName: boolean,
+	/**  Blocklist entry when the game is on the bundled blocklist, else `null` (read-only). */
+	blocklist: BlocklistInfo | null,
+	/**  What the overlay currently does for this game given the whole settings (read-only). */
+	effective: Effect,
+};
+
 export type HistoryScope = { kind: "conversation"; serverId: number; conversation: Conversation } | { kind: "server"; serverId: number } | { kind: "all" };
 
 /**  Public view of the identity; the certificate itself never leaves the engine. */
@@ -471,6 +588,27 @@ export type Identity = {
 	name: string,
 	/**  SHA-1 hash of the certificate, as Mumble servers identify it. */
 	certHash: string,
+};
+
+/**  The in-game overlay settings changed. */
+export type InGameOverlayChanged = {
+	state: InGameOverlayState,
+};
+
+/**  Global switch of the in-game overlay. */
+export type InGameOverlayMode = "off" | "on";
+
+/**  Everything the settings page needs. */
+export type InGameOverlayState = {
+	/**  This platform can draw inside games. */
+	supported: boolean,
+	/**  i18n key (namespace `settings`) explaining a platform limitation, or `null`. */
+	explanationKey: string | null,
+	mode: InGameOverlayMode,
+	/**  Games the user configured, each annotated with its blocklist status and current effect. */
+	games: GameOverlayEntry[],
+	/**  Games the user could add: ones running now or on the blocklist, minus the configured ones. */
+	known: KnownGame[],
 };
 
 /**  An external image or image link, ready to show inline (FR-1.55). */
@@ -486,6 +624,21 @@ export type InlineImage = {
 	width: number,
 	height: number,
 	animated: boolean,
+};
+
+/**  KDE only: whether X11 apps may see mouse buttons now, and whether Mumcord can undo its change. */
+export type KdeX11Access = {
+	allowed: boolean,
+	undoAvailable: boolean,
+};
+
+/**  A game offered to the user to configure: one it ran this session, or one on the blocklist. */
+export type KnownGame = {
+	key: GameKey,
+	name: string,
+	/**  It is running right now (connected to the overlay this session). */
+	running: boolean,
+	blocklist: BlocklistInfo | null,
 };
 
 export type Language = "en" | "es" | "de";
@@ -698,6 +851,13 @@ export type OverlayState = {
 	 *  applies everywhere and is not repeated here.
 	 */
 	explanationKey: string | null,
+	/**  KDE Plasma on native Wayland: the settings offer a KWin window rule for the overlay. */
+	kdeWayland: boolean,
+	/**
+	 *  Whether Mumcord's KWin window rule is in the user's `kwinrulesrc` (only checked on
+	 *  KDE Wayland, else `false`).
+	 */
+	kwinRuleInstalled: boolean,
 	/**  UI language from the settings, for the overlay page (`null` follows the OS). */
 	language: Language | null,
 };
@@ -707,12 +867,14 @@ export type PasswordUpdate =
 /**  Leave the stored password as it is (on add: no password). */
 { kind: "keep" } | { kind: "clear" } | { kind: "set"; value: string };
 
-/**  Comment and avatar, fetched on demand when the profile card opens. */
+/**  Comment, avatar and private note, fetched on demand when the profile card opens. */
 export type PersonProfile = {
 	/**  Sanitized HTML. */
 	comment: string | null,
 	/**  `data:` URL of the avatar image. */
 	avatar: string | null,
+	/**  The user's private note about this person; empty when there is none. */
+	note: string,
 };
 
 export type PttAvailability = { status: "available" } | { status: "unavailable"; reason: PttUnavailableReason };
@@ -746,6 +908,8 @@ export type PttSession = {
 	waylandDesktop: boolean,
 	/**  Mumcord currently runs through XWayland and uses the X11 push-to-talk path. */
 	compatibilityActive: boolean,
+	/**  KDE Plasma: the settings can open KDE's Legacy X11 App Support page. */
+	kde: boolean,
 };
 
 export type PttUnavailableReason = 

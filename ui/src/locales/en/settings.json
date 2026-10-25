@@ -9,11 +9,19 @@
     "voice": "Voice",
     "chatHistory": "Chat & history",
     "appearance": "Appearance",
+    "accessibility": "Accessibility",
     "language": "Language",
     "sounds": "Sounds & notifications",
     "overlay": "Overlay",
     "diagnostics": "Diagnostics",
     "about": "About"
+  },
+  "search": {
+    "label": "Search settings",
+    "results": "Search results",
+    "empty": "No settings match “{{query}}”.",
+    "count_one": "{{count}} setting found",
+    "count_other": "{{count}} settings found"
   },
   "errors": {
     "secureStorage": "Your system's secure storage is not available or access was refused.",
@@ -112,6 +120,17 @@
     "compatRestartNeeded": "Takes effect after Mumcord restarts. You will be disconnected briefly.",
     "compatRestart": "Restart now",
     "compatRestartFailed": "Mumcord could not restart. Please close and open it yourself.",
+    "compatKdeHint": "Mouse buttons for push-to-talk only work while Mumcord is in the background if KDE allows them for X11 apps.",
+    "compatKdeAllowed": "KDE already allows mouse buttons for X11 apps, so the push-to-talk mouse button also works in the background.",
+    "compatKdeAllow": "Allow mouse buttons",
+    "compatKdeUndo": "Undo",
+    "compatKdeRestart": "Done. Restart Mumcord for it to take effect.",
+    "compatKdeConfirmTitle": "Allow mouse buttons?",
+    "compatKdeConfirm": "This lets X11 apps running in the background see your mouse button presses. It changes a setting in KDE (System Settings → Legacy X11 App Support). You can undo it here at any time.",
+    "compatKdeConfirmButton": "Allow",
+    "compatKdeChangeFailed": "Mumcord could not change the KDE setting. Use \"Open KDE X11 settings\" instead.",
+    "compatKdeOpen": "Open KDE X11 settings",
+    "compatKdeFailed": "Mumcord could not open the KDE settings. Open System Settings → Legacy X11 App Support yourself.",
     "compatActive": "Compatibility mode is on: push-to-talk uses the X11 way. Keys work without a desktop dialog; mouse buttons work if your desktop's legacy X11 setting allows them.",
     "sensitivityLegend": "Voice activation sensitivity",
     "automatic": "Automatic – detects your voice",
@@ -159,6 +178,15 @@
     "startMinimized": "Start minimized",
     "startMinimizedHint": "When Mumcord starts at login, it waits in the tray instead of opening the window."
   },
+  "accessibility": {
+    "hints": "Hints",
+    "keyboardHints": "Show keyboard hints",
+    "keyboardHintsHint": "Short on-screen tips like “Arrow keys: move” below the channel list and in the GIF favorites. Screen readers still read them when this is off.",
+    "announcements": "Screen reader announcements",
+    "announcementsHint": "Your screen reader reads out events such as people joining, leaving or starting to talk.",
+    "skipLinks": "Skip links",
+    "skipLinksHint": "Links at the start of the window that jump straight to the chat or the channel list when you press Tab."
+  },
   "language": {
     "legend": "Display language",
     "system": "Follow system"
@@ -196,7 +224,16 @@
       "wholeChannelHint": "Off: only people who are talking.",
       "channelName": "Show the channel name",
       "loadFailed": "The overlay options could not be loaded.",
-      "saveFailed": "The overlay change could not be applied."
+      "saveFailed": "The overlay change could not be applied.",
+      "kwin": {
+        "setUp": "Set up automatically",
+        "done": "Done: the KDE window rule “Mumcord overlay” is active.",
+        "removed": "The KDE window rule was removed.",
+        "remove": "Remove rule",
+        "openRules": "Open KDE window rules",
+        "compat": "Use compatibility mode instead",
+        "failed": "The KDE window rule could not be changed. Open the KDE window rules to add it by hand."
+      }
     },
     "corner": {
       "label": "Position",
@@ -229,7 +266,12 @@
       "saveFailed": "The in-game overlay change could not be applied.",
       "confirmTitle": "Enable the overlay for {{game}}?",
       "confirmMessage": "Warning: {{game}} uses anti-cheat protection ({{reason}}). Overlays can be detected as cheating and your account may be banned. Mumcord is not responsible for that. Only continue if you accept this risk.",
-      "confirmEnable": "Enable anyway"
+      "confirmEnable": "Enable anyway",
+      "limits": {
+        "libraryMissing": "The in-game overlay is not available: its overlay library (libmumcord_overlay_layer.so) was not found next to Mumcord. Reinstall Mumcord to restore it. The window overlay above is used instead.",
+        "windowsPending": "The in-game overlay is not available on Windows yet. The window overlay above is used instead.",
+        "macos": "macOS does not support in-game overlays. The window overlay above is used instead."
+      }
     }
   },
   "diagnostics": {
@@ -251,7 +293,10 @@
     "version": "Version",
     "os": "System",
     "license": "Mumcord license (AGPL-3.0)",
-    "commercial": "Commercial licenses: tobias@vorwachs.com",
+    "whatsNew": "What's new",
+    "support": "Support",
+    "reportBug": "Report a bug",
+    "requestFeature": "Request a feature",
     "notices": "Third-party notices",
     "noticesHint": "Mumcord is built on open-source software, including code from the Mumble project.",
     "noticesFailed": "The third-party notices could not be loaded.",

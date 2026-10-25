@@ -16,7 +16,14 @@
     "volumeValue": "{{value}} %",
     "localMute": "Silenciar para mí",
     "sessionOnly": "Esta persona no tiene certificado, así que estos ajustes solo duran esta sesión.",
-    "sendPrivateMessage": "Enviar mensaje privado"
+    "sendPrivateMessage": "Enviar mensaje privado",
+    "privateMessage": "Mensaje privado",
+    "localSettings": "Tus ajustes",
+    "localSettingsHint": "Solo tú los ves. Los cambios se guardan al instante.",
+    "localMuteHint": "No oirás a esta persona.",
+    "privateNote": "Nota privada",
+    "privateNoteHint": "Solo tú puedes ver esta nota.",
+    "saved": "Guardado"
   },
   "errors": {
     "notConnected": "No estás conectado a un servidor.",
@@ -25,8 +32,7 @@
   "menu": {
     "label": "Acciones para {{name}}",
     "viewProfile": "Ver perfil",
-    "mute": "Silenciar para mí",
-    "unmute": "Dejar de silenciar para mí"
+    "mute": "Silenciar para mí"
   },
   "nowPlaying": {
     "label": "Reproduciendo",

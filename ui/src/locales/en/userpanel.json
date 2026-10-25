@@ -4,9 +4,6 @@
   "deafen": "Deafen",
   "disconnect": "Disconnect from {{server}}",
   "settings": "Quick settings",
-  "menu": "User menu",
-  "menuProfile": "Edit profile",
-  "menuRegister": "Register on this server",
   "announce": {
     "muted": "Microphone muted",
     "unmuted": "Microphone unmuted",

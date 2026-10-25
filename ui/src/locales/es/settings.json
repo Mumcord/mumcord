@@ -9,11 +9,19 @@
     "voice": "Voz",
     "chatHistory": "Chat e historial",
     "appearance": "Apariencia",
+    "accessibility": "Accesibilidad",
     "language": "Idioma",
     "sounds": "Sonidos y notificaciones",
     "overlay": "Superposición",
     "diagnostics": "Diagnóstico",
     "about": "Acerca de"
+  },
+  "search": {
+    "label": "Buscar ajustes",
+    "results": "Resultados de búsqueda",
+    "empty": "Ningún ajuste coincide con «{{query}}».",
+    "count_one": "{{count}} ajuste encontrado",
+    "count_other": "{{count}} ajustes encontrados"
   },
   "errors": {
     "secureStorage": "El almacenamiento seguro del sistema no está disponible o se denegó el acceso.",
@@ -112,6 +120,17 @@
     "compatRestartNeeded": "Se aplica cuando Mumcord se reinicie. Te desconectarás un momento.",
     "compatRestart": "Reiniciar ahora",
     "compatRestartFailed": "Mumcord no pudo reiniciarse. Ciérralo y ábrelo tú mismo.",
+    "compatKdeHint": "Los botones del ratón para pulsar para hablar solo funcionan en segundo plano si KDE los permite para aplicaciones X11.",
+    "compatKdeAllowed": "KDE ya permite los botones del ratón para aplicaciones X11, así que el botón del ratón para pulsar para hablar también funciona en segundo plano.",
+    "compatKdeAllow": "Permitir botones del ratón",
+    "compatKdeUndo": "Deshacer",
+    "compatKdeRestart": "Hecho. Reinicia Mumcord para que surta efecto.",
+    "compatKdeConfirmTitle": "¿Permitir los botones del ratón?",
+    "compatKdeConfirm": "Esto permite que las aplicaciones X11 en segundo plano vean tus pulsaciones del ratón. Cambia un ajuste de KDE (Preferencias del sistema → Compatibilidad con aplicaciones X11 heredadas). Puedes deshacerlo aquí en cualquier momento.",
+    "compatKdeConfirmButton": "Permitir",
+    "compatKdeChangeFailed": "Mumcord no pudo cambiar el ajuste de KDE. Usa en su lugar \"Abrir ajustes X11 de KDE\".",
+    "compatKdeOpen": "Abrir ajustes X11 de KDE",
+    "compatKdeFailed": "Mumcord no pudo abrir los ajustes de KDE. Abre tú mismo Preferencias del sistema → Compatibilidad con aplicaciones X11 heredadas.",
     "compatActive": "El modo de compatibilidad está activado: pulsar para hablar usa la forma X11. Las teclas funcionan sin diálogo del escritorio; los botones del ratón funcionan si el ajuste X11 heredado de tu escritorio lo permite.",
     "sensitivityLegend": "Sensibilidad de la activación por voz",
     "automatic": "Automática – detecta tu voz",
@@ -159,6 +178,15 @@
     "startMinimized": "Iniciar minimizado",
     "startMinimizedHint": "Cuando Mumcord se inicia al iniciar sesión, espera en la bandeja del sistema en lugar de abrir la ventana."
   },
+  "accessibility": {
+    "hints": "Indicaciones",
+    "keyboardHints": "Mostrar indicaciones de teclado",
+    "keyboardHintsHint": "Consejos breves como «Flechas: mover» debajo de la lista de canales y en los GIF favoritos. Los lectores de pantalla los siguen leyendo aunque esté desactivado.",
+    "announcements": "Avisos del lector de pantalla",
+    "announcementsHint": "Tu lector de pantalla anuncia eventos como cuando alguien entra, sale o empieza a hablar.",
+    "skipLinks": "Enlaces de salto",
+    "skipLinksHint": "Enlaces al principio de la ventana que, con la tecla Tab, saltan directamente al chat o a la lista de canales."
+  },
   "language": {
     "legend": "Idioma de la interfaz",
     "system": "Seguir al sistema"
@@ -196,7 +224,16 @@
       "wholeChannelHint": "Desactivado: solo quienes hablan.",
       "channelName": "Mostrar el nombre del canal",
       "loadFailed": "No se pudieron cargar las opciones de la superposición.",
-      "saveFailed": "No se pudo aplicar el cambio de la superposición."
+      "saveFailed": "No se pudo aplicar el cambio de la superposición.",
+      "kwin": {
+        "setUp": "Configurar automáticamente",
+        "done": "Listo: la regla de ventana de KDE «Mumcord overlay» está activa.",
+        "removed": "Se quitó la regla de ventana de KDE.",
+        "remove": "Quitar regla",
+        "openRules": "Abrir reglas de ventana de KDE",
+        "compat": "Usar el modo de compatibilidad",
+        "failed": "No se pudo cambiar la regla de ventana de KDE. Abre las reglas de ventana de KDE para crearla a mano."
+      }
     },
     "corner": {
       "label": "Posición",
@@ -229,7 +266,12 @@
       "saveFailed": "No se pudo aplicar el cambio de la superposición en el juego.",
       "confirmTitle": "¿Activar la superposición en {{game}}?",
       "confirmMessage": "Advertencia: {{game}} usa protección anti-trampas ({{reason}}). Las superposiciones pueden detectarse como trampas y tu cuenta podría ser baneada. Mumcord no se hace responsable. Continúa solo si aceptas este riesgo.",
-      "confirmEnable": "Activar de todos modos"
+      "confirmEnable": "Activar de todos modos",
+      "limits": {
+        "libraryMissing": "La superposición en el juego no está disponible: no se encontró su biblioteca (libmumcord_overlay_layer.so) junto a Mumcord. Reinstala Mumcord para restaurarla. Se usa la superposición en ventana de arriba.",
+        "windowsPending": "La superposición en el juego aún no está disponible en Windows. Se usa la superposición en ventana de arriba.",
+        "macos": "macOS no admite superposiciones en el juego. Se usa la superposición en ventana de arriba."
+      }
     }
   },
   "diagnostics": {
@@ -251,7 +293,10 @@
     "version": "Versión",
     "os": "Sistema",
     "license": "Licencia de Mumcord (AGPL-3.0)",
-    "commercial": "Licencias comerciales: tobias@vorwachs.com",
+    "whatsNew": "Novedades",
+    "support": "Soporte",
+    "reportBug": "Informar de un error",
+    "requestFeature": "Solicitar una función",
     "notices": "Avisos de terceros",
     "noticesHint": "Mumcord se basa en software de código abierto, incluido código del proyecto Mumble.",
     "noticesFailed": "No se pudieron cargar los avisos de terceros.",

@@ -6,7 +6,7 @@
   },
   "limits": {
     "wayland": "En este escritorio Wayland, las aplicaciones no pueden mantener una ventana encima ni elegir dónde aparece, así que la superposición puede quedar detrás de otras ventanas y las posiciones de esquina no tienen efecto. Activa «Modo de compatibilidad (como TeamSpeak)» en los ajustes de Voz y reinicia Mumcord: así la superposición se mantiene encima.",
-    "waylandKde": "En KDE Plasma con Wayland, las aplicaciones no pueden mantener una ventana encima ni elegir dónde aparece por sí mismas. Activa «Modo de compatibilidad (como TeamSpeak)» en los ajustes de Voz y reinicia Mumcord, o añade una regla de ventana de KDE para la ventana «Mumcord overlay» (Preferencias del sistema → Gestión de ventanas → Reglas de ventanas) con «Mantener encima de las demás» y una posición fija.",
+    "waylandKde": "En KDE Plasma con Wayland, las aplicaciones no pueden mantener una ventana encima ni elegir dónde aparece. Hay dos soluciones: dejar que Mumcord añada una regla de ventana de KDE para el overlay («Configurar automáticamente») o activar el «Modo de compatibilidad (como TeamSpeak)» en los ajustes de Voz y reiniciar Mumcord.",
     "exclusiveFullscreen": "La superposición se muestra sobre juegos en ventana y en pantalla completa sin bordes. Los juegos en pantalla completa exclusiva se dibujan encima de todas las ventanas; cámbialos a «sin bordes» o «pantalla completa en ventana» para ver la superposición."
   }
 }
