@@ -1483,3 +1483,15 @@ Requested after v0.3.0: full-size images over plugin data are slow (about 2.7 KB
 ✍️ Note: Requested in chat during /dev.
 
 ---
+
+#### QA.90 How does peer-to-peer work? `◉`
+Decided after v0.3.0 for Epic 2.
+
+- [x] **Introduction via the Mumble server:** both clients exchange their reachable addresses over plugin data, then try to connect directly at the same time.
+- [x] **Ways to connect:** IPv6 (often public anyway), asking the home router for its public address and a port (UPnP / NAT-PMP / PCP) and the local network. **No STUN/TURN or other external server in Epic 2.**
+- [x] **Security:** the direct connection is encrypted and both sides verify each other with the Mumble certificate hashes they already know.
+- [x] **Fallback:** if no direct path works, full-size images use plugin data as today; screen sharing is unavailable in that case.
+
+✍️ Note: Requested in chat during /dev.
+
+---
