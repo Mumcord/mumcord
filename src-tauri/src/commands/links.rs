@@ -6,7 +6,7 @@ use serde::{Deserialize, Serialize};
 use specta::Type;
 use tauri::State;
 
-use super::types::ApiResult;
+use super::types::{ApiError, ApiResult, ErrorCode};
 
 /// Preview card of a link. All text is plain text, never HTML.
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, Type)]
@@ -58,6 +58,21 @@ pub struct VideoEmbed {
     /// Channel or uploader name; for Spotify the kind of item (`track`, `album`, `playlist`,
     /// `artist`, `episode`, `show`).
     pub channel: Option<String>,
+}
+
+/// Opens a link from a message in the system browser after the user clicked it. Only
+/// http(s) and mailto links open.
+#[tauri::command]
+#[specta::specta]
+pub fn open_link(url: String) -> ApiResult<()> {
+    if !crate::browser::is_openable(&url) {
+        return Err(ApiError::new(
+            ErrorCode::InvalidInput,
+            "only http(s) and mailto links open",
+        ));
+    }
+    crate::browser::open_url(url.trim())
+        .map_err(|error| ApiError::new(ErrorCode::Io, error.to_string()))
 }
 
 /// Preview of an http(s) link in a message; `null` when previews are switched off in the

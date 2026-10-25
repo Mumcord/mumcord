@@ -6,6 +6,13 @@ use crate::{FRAME_SAMPLES, Frame, SAMPLE_RATE};
 /// Largest possible Opus packet for a single frame (RFC 6716, 3.2.1).
 pub const MAX_PACKET_BYTES: usize = 1275;
 
+/// Largest Opus payload that still fits one Mumble voice packet: the server accepts at most
+/// 1024 bytes of plaintext (`Mumble::Protocol::MAX_UDP_PACKET_SIZE`), and the voice header
+/// (legacy or protobuf format, with positional data and the largest sequence number) takes up
+/// to 34 bytes. The rest is a safety margin. `mumcord_protocol::MAX_VOICE_PAYLOAD` is the same
+/// budget seen from the packet side; the engine checks at compile time that both agree.
+pub const MAX_VOICE_PAYLOAD_BYTES: usize = 958;
+
 /// Audio duration carried by one outgoing Opus packet.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
 pub enum PacketDuration {
@@ -81,9 +88,15 @@ impl OpusEncoder {
     }
 
     fn encode_pending(&mut self, out: &mut [u8]) -> Result<usize, CodecError> {
+        // libopus treats the output size as a hard per-packet limit and spends fewer bits on
+        // a frame that would not fit, so VBR peaks (music, transients) can never produce a
+        // packet the server would refuse, whatever bitrate is set. Plain VBR keeps its
+        // quality otherwise; CBR or constrained VBR would only cost quality and still need
+        // this limit to be certain.
+        let cap = out.len().min(MAX_VOICE_PAYLOAD_BYTES);
         let len = self
             .encoder
-            .encode_float(&self.pending[..self.pending_len], out)?;
+            .encode_float(&self.pending[..self.pending_len], &mut out[..cap])?;
         self.pending_len = 0;
         Ok(len)
     }
@@ -155,5 +168,27 @@ mod tests {
         assert_eq!(encoder.bitrate().expect("read"), 500_000);
         encoder.set_music(false).expect("music off");
         assert!(!encoder.is_music().expect("read"));
+    }
+
+    /// Issue #7: music at the Opus maximum used to produce 20 ms packets of up to 1275 bytes,
+    /// which the voice sender had to drop.
+    #[test]
+    fn packets_fit_a_voice_packet_even_at_the_opus_maximum() {
+        let mut noise = 0x1234_5678_u32;
+        let mut frame: Frame = [0.0; FRAME_SAMPLES];
+        let mut out = [0u8; MAX_PACKET_BYTES];
+        for duration in [PacketDuration::Ms10, PacketDuration::Ms20] {
+            let mut encoder = OpusEncoder::new(510_000, duration).expect("encoder");
+            encoder.set_music(true).expect("music on");
+            for _ in 0..200 {
+                for s in &mut frame {
+                    noise = noise.wrapping_mul(1_664_525).wrapping_add(1_013_904_223);
+                    *s = (noise >> 8) as f32 / (1 << 23) as f32 - 1.0;
+                }
+                if let Some(len) = encoder.push_frame(&frame, &mut out).expect("encode") {
+                    assert!(len <= MAX_VOICE_PAYLOAD_BYTES, "{duration:?}: {len} bytes");
+                }
+            }
+        }
     }
 }

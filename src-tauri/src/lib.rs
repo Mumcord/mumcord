@@ -1,6 +1,7 @@
 //! Tauri shell: registers plugins and exposes the engine to the UI via typed commands.
 
 mod autostart;
+mod browser;
 mod commands;
 mod deeplink;
 #[cfg(target_os = "linux")]
@@ -78,6 +79,7 @@ fn specta_builder() -> Builder<tauri::Wry> {
             commands::full_image::full_image_keep,
             commands::full_image::full_image_fetch,
             links::link_preview,
+            links::open_link,
             links::inline_image,
             links::preview_dismiss,
             links::gif_favorites,
@@ -218,7 +220,6 @@ pub fn run() {
         .plugin(tauri_plugin_deep_link::init())
         .plugin(tauri_plugin_global_shortcut::Builder::new().build())
         .plugin(tauri_plugin_dialog::init())
-        .plugin(tauri_plugin_opener::init())
         .invoke_handler(move |call| {
             // The overlay page gets only the few commands it needs (least privilege).
             if !overlay::may_invoke(call.message.webview_ref().label(), call.message.command()) {
