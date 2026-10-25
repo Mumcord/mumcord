@@ -71,7 +71,7 @@ pub struct OutgoingAudio {
     pub is_last: bool,
     /// Voice target: 0 = normal talking to the own channel.
     pub target: u8,
-    /// Optional positional data (x, y, z); not used yet.
+    /// The sender's avatar position (x, y, z) for positional audio.
     pub positional: Option<[f32; 3]>,
 }
 
@@ -85,6 +85,12 @@ impl OutgoingAudio {
             target: 0,
             positional: None,
         }
+    }
+
+    /// The same packet carrying the sender's position.
+    pub fn with_position(mut self, positional: Option<[f32; 3]>) -> Self {
+        self.positional = positional;
+        self
     }
 }
 

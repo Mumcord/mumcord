@@ -718,6 +718,21 @@ impl Handle {
         })
     }
 
+    /// Announces the game context and player identity for positional audio, like the official
+    /// client: the server exchanges positions only between users with the same context. Empty
+    /// values mean "no game".
+    pub fn set_plugin_context(
+        &self,
+        context: Vec<u8>,
+        identity: String,
+    ) -> Result<(), CommandError> {
+        self.send_user_state(proto::UserState {
+            plugin_context: Some(context),
+            plugin_identity: Some(identity),
+            ..Default::default()
+        })
+    }
+
     /// Sets the own comment (HTML); an empty string removes it.
     pub fn set_comment(&self, comment: String) -> Result<(), CommandError> {
         self.send_user_state(proto::UserState {
