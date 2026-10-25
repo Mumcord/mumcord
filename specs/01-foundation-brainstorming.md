@@ -1505,3 +1505,14 @@ Decided after v0.3.0.
 ✍️ Note: Requested in chat during /dev.
 
 ---
+
+#### QA.92 Game crashes when Mumcord closes? `◉`
+Reported after v0.3.0 with the in-game overlay on Linux.
+
+- [x] **Likely cause:** the overlay library runs inside the game but is loaded from Mumcord's own folder (the AppImage mount, or the build folder in development), which disappears or is replaced when Mumcord exits or updates.
+- [x] **Fix in Epic 2:** copy the library to a fixed per-version folder in the user's data directory and point the Vulkan manifest there; the layer keeps running without Mumcord (lost connection = draw nothing). Verify with a test that exits Mumcord while a Vulkan program runs.
+- [x] **Until then:** close the game before Mumcord, or turn the in-game overlay off.
+
+✍️ Note: Requested in chat during /dev.
+
+---
