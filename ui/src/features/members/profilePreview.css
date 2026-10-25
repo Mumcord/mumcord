@@ -113,6 +113,15 @@
   cursor: pointer;
 }
 
+.profile-preview__icon[aria-pressed="true"] {
+  color: var(--color-accent);
+}
+
+.profile-preview__icon[aria-disabled="true"] {
+  cursor: default;
+  opacity: 0.55;
+}
+
 .profile-preview__icon:hover {
   background: var(--color-bg-hover, var(--color-border));
   color: var(--color-text);

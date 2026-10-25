@@ -1,6 +1,6 @@
 /**
- * Context menu on a person (FR-1.18, QA.32): View profile, local mute, volume slider and
- * private message. Reuses the profile card's volume slider and local-mute action, so both
+ * Context menu on a person (FR-1.18, QA.32): View profile, local mute, friend (FR-1.64), volume
+ * slider and private message. Reuses the profile card's volume slider and local-mute action, so both
  * places store the same per-certificate settings. Yourself only gets "View profile".
  */
 import {
@@ -15,6 +15,7 @@ import { createPortal } from "react-dom";
 import { useTranslation } from "react-i18next";
 import { getApi, toEngineError } from "../../api";
 import { useServerState } from "../channels/serverStore";
+import { setFriend, useFriend } from "../friends";
 import "../userpanel/quicksettings.css";
 import "./members.css";
 import { findPerson } from "./personLookup";
@@ -79,8 +80,10 @@ function PersonMenu({
   onViewProfile: (session: number, opener: HTMLElement | null) => void;
 }) {
   const { t } = useTranslation("members");
+  const { t: tFriends } = useTranslation("friends");
   const state = useServerState();
   const user = findPerson(state.users, open.session, open.name);
+  const friend = useFriend(user?.certHash ?? null);
   const ref = useRef<HTMLDivElement>(null);
 
   const close = (returnFocus: boolean) => {
@@ -241,6 +244,30 @@ function PersonMenu({
             </MenuIcon>
             <span className="quick-settings__text">
               <span className="quick-settings__label">{t("menu.mute")}</span>
+            </span>
+            <span className="quick-settings__switch" aria-hidden="true" />
+          </button>
+          {/* People without a certificate can't be recognised again, so they can't be friends. */}
+          <button
+            type="button"
+            role="menuitemcheckbox"
+            aria-checked={friend !== undefined}
+            aria-disabled={user.certHash === null}
+            tabIndex={-1}
+            className="quick-settings__row"
+            onClick={() => {
+              if (user.certHash === null) return;
+              setFriend(user, friend === undefined).catch(report);
+            }}
+          >
+            <MenuIcon>
+              <path d="M12 21s-7-4.5-9.5-9A5.5 5.5 0 0 1 12 6a5.5 5.5 0 0 1 9.5 6c-2.5 4.5-9.5 9-9.5 9z" />
+            </MenuIcon>
+            <span className="quick-settings__text">
+              <span className="quick-settings__label">{tFriends("friend")}</span>
+              {user.certHash === null && (
+                <span className="quick-settings__hint">{tFriends("noCertificate")}</span>
+              )}
             </span>
             <span className="quick-settings__switch" aria-hidden="true" />
           </button>

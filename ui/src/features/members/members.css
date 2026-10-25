@@ -345,8 +345,14 @@
   }
 }
 
+.profile-card__mute[aria-disabled="true"] {
+  cursor: default;
+  opacity: 0.55;
+}
+
 .person-menu {
   min-width: 14rem;
+  max-width: 20rem;
 }
 
 .person-menu__item {

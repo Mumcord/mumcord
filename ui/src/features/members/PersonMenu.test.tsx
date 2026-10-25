@@ -61,7 +61,14 @@ describe("PersonMenu", () => {
     ];
     expect(
       entries.map((entry) => entry.getAttribute("role") ?? entry.getAttribute("type")),
-    ).toEqual(["menuitem", "menuitem", "separator", "menuitemcheckbox", "range"]);
+    ).toEqual([
+      "menuitem",
+      "menuitem",
+      "separator",
+      "menuitemcheckbox",
+      "menuitemcheckbox",
+      "range",
+    ]);
     expect(entries[0]).toHaveTextContent("View profile");
     expect(entries[1]).toHaveTextContent("Send private message");
   });
@@ -70,7 +77,7 @@ describe("PersonMenu", () => {
     await renderPanel();
     fireEvent.contextMenu(member(/^Anna/), { clientX: 30, clientY: 40 });
     const icons = [...(menu()?.querySelectorAll("svg") ?? [])];
-    expect(icons).toHaveLength(4);
+    expect(icons).toHaveLength(5);
     for (const icon of icons) expect(icon).toHaveAttribute("aria-hidden", "true");
   });
 
@@ -95,6 +102,8 @@ describe("PersonMenu", () => {
     keys("ArrowDown");
     expect(screen.getByRole("menuitemcheckbox", { name: "Mute for me" })).toHaveFocus();
     keys("ArrowDown");
+    expect(screen.getByRole("menuitemcheckbox", { name: /^Friend/ })).toHaveFocus();
+    keys("ArrowDown");
     expect(screen.getByRole("slider")).toHaveFocus();
     keys("ArrowDown");
     expect(screen.getByRole("menuitem", { name: "View profile" })).toHaveFocus();
@@ -117,6 +126,33 @@ describe("PersonMenu", () => {
     );
     fireEvent.click(screen.getByRole("menuitemcheckbox", { name: "Mute for me" }));
     expect(spy).toHaveBeenLastCalledWith(2, false);
+  });
+
+  it("adds and removes a friend in place", async () => {
+    await renderPanel();
+    const add = vi.spyOn(api, "friendAdd");
+    const remove = vi.spyOn(api, "friendRemove");
+    fireEvent.contextMenu(member(/^Anna/), { clientX: 1, clientY: 1 });
+    fireEvent.click(screen.getByRole("menuitemcheckbox", { name: /^Friend/ }));
+    expect(add).toHaveBeenCalledWith(2);
+    await act(async () => {
+      await Promise.resolve();
+    });
+    const row = screen.getByRole("menuitemcheckbox", { name: /^Friend/ });
+    expect(row).toHaveAttribute("aria-checked", "true");
+    fireEvent.click(row);
+    expect(remove).toHaveBeenCalledWith("annahash");
+  });
+
+  it("explains why people without a certificate can't be friends", async () => {
+    await renderPanel();
+    const add = vi.spyOn(api, "friendAdd");
+    fireEvent.contextMenu(member(/^Ben/), { clientX: 1, clientY: 1 });
+    const row = screen.getByRole("menuitemcheckbox", { name: /^Friend/ });
+    expect(row).toHaveAttribute("aria-disabled", "true");
+    expect(row).toHaveTextContent("without a certificate");
+    fireEvent.click(row);
+    expect(add).not.toHaveBeenCalled();
   });
 
   it("changes the volume with the slider", async () => {
