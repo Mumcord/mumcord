@@ -63,7 +63,7 @@ function renderSection(id: SectionId, settings: Settings, update: UpdateSettings
     case "appearance":
       return <AppearanceSection {...props} />;
     case "accessibility":
-      return <AccessibilitySection />;
+      return <AccessibilitySection {...props} />;
     case "language":
       return <LanguageSection {...props} />;
     case "sounds":

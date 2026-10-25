@@ -1,11 +1,11 @@
 import { act, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it } from "vitest";
 import { announce, LiveRegions, setHintPreference, SkipLinks } from ".";
-import { DEFAULT_HINT_PREFERENCES, loadHintPreferences } from "./hintPreferences";
+import { createMockApi, setApi } from "../api";
+import { DEFAULT_HINT_PREFERENCES, applyHintPreferences, hintPreferences } from "./hintPreferences";
+import { migrateLegacyHintPreferences } from "./legacyHintPreferences";
 
-function memoryStorage(value: string | null): Storage {
-  return { getItem: () => value } as unknown as Storage;
-}
+const LEGACY_KEY = "mumcord.accessibilityHints";
 
 afterEach(() => {
   setHintPreference("keyboardHints", true);
@@ -14,24 +14,22 @@ afterEach(() => {
 });
 
 describe("hint preferences", () => {
-  it("default to on and ignore broken or partial records", () => {
+  it("default to on", () => {
     expect(DEFAULT_HINT_PREFERENCES).toEqual({
       keyboardHints: true,
       announcements: true,
       skipLinks: true,
     });
-    expect(loadHintPreferences(memoryStorage(null))).toEqual(DEFAULT_HINT_PREFERENCES);
-    expect(loadHintPreferences(memoryStorage("not json"))).toEqual(DEFAULT_HINT_PREFERENCES);
-    expect(loadHintPreferences(memoryStorage('{"skipLinks":false,"announcements":"no"}'))).toEqual({
-      keyboardHints: true,
+    expect(hintPreferences()).toEqual(DEFAULT_HINT_PREFERENCES);
+  });
+
+  it("are taken over from a settings record", () => {
+    applyHintPreferences({ keyboardHints: false, announcements: true, skipLinks: false });
+    expect(hintPreferences()).toEqual({
+      keyboardHints: false,
       announcements: true,
       skipLinks: false,
     });
-  });
-
-  it("are saved in the window's storage", () => {
-    setHintPreference("announcements", false);
-    expect(loadHintPreferences()).toEqual({ ...DEFAULT_HINT_PREFERENCES, announcements: false });
   });
 
   it("keep the announcer silent while announcements are off", () => {
@@ -55,5 +53,42 @@ describe("hint preferences", () => {
       setHintPreference("skipLinks", false);
     });
     expect(screen.queryByRole("link", { name: "Skip to chat" })).toBeNull();
+  });
+});
+
+describe("migration of the old window storage", () => {
+  afterEach(() => {
+    localStorage.removeItem(LEGACY_KEY);
+    setApi(undefined);
+  });
+
+  it("writes stored values into the settings once and removes the key", async () => {
+    const api = createMockApi();
+    setApi(api);
+    localStorage.setItem(LEGACY_KEY, '{"skipLinks":false,"announcements":"no"}');
+    const migrated = await migrateLegacyHintPreferences(await api.settingsGet());
+    expect(migrated).toMatchObject({ keyboardHints: true, announcements: true, skipLinks: false });
+    expect((await api.settingsGet()).skipLinks).toBe(false);
+    expect(localStorage.getItem(LEGACY_KEY)).toBeNull();
+  });
+
+  it("does nothing without old values and drops a broken entry", async () => {
+    const api = createMockApi();
+    setApi(api);
+    const before = await api.settingsGet();
+    expect(await migrateLegacyHintPreferences(before)).toEqual(before);
+    localStorage.setItem(LEGACY_KEY, "not json");
+    expect(await migrateLegacyHintPreferences(before)).toEqual(before);
+    expect(localStorage.getItem(LEGACY_KEY)).toBeNull();
+  });
+
+  it("keeps the old values when saving fails", async () => {
+    const api = createMockApi();
+    setApi(api);
+    const before = await api.settingsGet();
+    api.settingsUpdate = () => Promise.reject(new Error("write failed"));
+    localStorage.setItem(LEGACY_KEY, '{"keyboardHints":false}');
+    expect(await migrateLegacyHintPreferences(before)).toEqual(before);
+    expect(localStorage.getItem(LEGACY_KEY)).not.toBeNull();
   });
 });

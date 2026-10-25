@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useLayoutEffect, useMemo, useState, type ReactNode } from "react";
+import { applyHintPreferences, type HintPreference } from "../a11y";
 import type { ChatDisplay, Language, Settings, Theme } from "../api";
 import { applyLanguage, osLanguages, resolveLanguage } from "../i18n";
 import { applyThemeToDocument, osPrefersDark, resolveTheme, watchOsTheme } from "../theme/theme";
@@ -39,7 +40,13 @@ export function PreferencesProvider({ children }: { children: ReactNode }) {
   }, [language]);
 
   const applySettings = useCallback(
-    (settings: Pick<Settings, "theme" | "language" | "chatDisplay" | "linkPreviews">) => {
+    (
+      settings: Pick<
+        Settings,
+        "theme" | "language" | "chatDisplay" | "linkPreviews" | HintPreference
+      >,
+    ) => {
+      applyHintPreferences(settings);
       setStored({
         theme: settings.theme,
         language: settings.language,

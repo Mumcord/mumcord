@@ -1,17 +1,25 @@
+import { useEffect } from "react";
 import { useTranslation } from "react-i18next";
-import { setHintPreference, useHintPreferences, type HintPreference } from "../../../a11y";
+import { applyHintPreferences, type HintPreference } from "../../../a11y";
 import { Group, Section } from "../components/Section";
 import { Switch } from "../components/Switch";
+import type { SettingsSectionProps } from "./types";
 
 const SWITCHES: HintPreference[] = ["keyboardHints", "announcements", "skipLinks"];
 
 /**
  * Accessibility: switches for the on-screen keyboard hints, screen-reader announcements and skip
- * links. Saved in this window's storage, not the settings record, and applied immediately.
+ * links (FR-1.69). Saved in the settings record and applied immediately.
  */
-export function AccessibilitySection() {
+export function AccessibilitySection({ settings, update }: SettingsSectionProps) {
   const { t } = useTranslation("settings");
-  const preferences = useHintPreferences();
+  const { keyboardHints, announcements, skipLinks } = settings;
+
+  // Instant effect; a failed save that rolls the record back rolls the switches back too.
+  useEffect(() => {
+    applyHintPreferences({ keyboardHints, announcements, skipLinks });
+  }, [keyboardHints, announcements, skipLinks]);
+
   return (
     <Section title={t("sections.accessibility")}>
       <Group title={t("accessibility.hints")}>
@@ -20,9 +28,9 @@ export function AccessibilitySection() {
             key={key}
             label={t(`accessibility.${key}`)}
             description={t(`accessibility.${key}Hint`)}
-            checked={preferences[key]}
+            checked={settings[key]}
             onChange={(value) => {
-              setHintPreference(key, value);
+              update({ [key]: value });
             }}
           />
         ))}
