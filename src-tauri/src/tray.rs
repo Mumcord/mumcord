@@ -5,7 +5,7 @@ use std::sync::Mutex;
 
 use mumcord_engine::{ConnState, Engine, EngineEvent, UserView};
 use tauri::image::Image;
-use tauri::menu::{CheckMenuItem, Menu, MenuEvent, MenuItem, PredefinedMenuItem};
+use tauri::menu::{CheckMenuItem, IsMenuItem, Menu, MenuEvent, MenuItem, PredefinedMenuItem};
 use tauri::tray::{MouseButton, MouseButtonState, TrayIcon, TrayIconBuilder, TrayIconEvent};
 use tauri::{AppHandle, Manager, Wry};
 
@@ -223,19 +223,13 @@ fn build(app: &AppHandle) -> tauri::Result<Tray> {
     let quit = MenuItem::with_id(app, QUIT, "", true, None::<&str>)?;
     let separator = PredefinedMenuItem::separator(app)?;
     let separator2 = PredefinedMenuItem::separator(app)?;
-    let menu = Menu::with_items(
-        app,
-        &[
-            &status,
-            &separator,
-            &show,
-            &mute,
-            &deafen,
-            &overlay,
-            &separator2,
-            &quit,
-        ],
-    )?;
+    // macOS has no overlay at all (QA.58), so its item stays out of the menu there.
+    let mut items: Vec<&dyn IsMenuItem<Wry>> = vec![&status, &separator, &show, &mute, &deafen];
+    if !cfg!(target_os = "macos") {
+        items.push(&overlay);
+    }
+    items.extend([&separator2 as &dyn IsMenuItem<Wry>, &quit]);
+    let menu = Menu::with_items(app, &items)?;
     let base = app.default_window_icon().map(|i| scale(i, ICON_SIZE));
     let mut builder = TrayIconBuilder::with_id("main")
         .menu(&menu)

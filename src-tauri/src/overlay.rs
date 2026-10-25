@@ -244,6 +244,10 @@ pub fn support() -> Support {
 /// Registers the overlay state and opens the overlay if it was enabled at the last quit.
 pub fn init(app: &AppHandle) {
     app.manage(Runtime::default());
+    // macOS has no overlay at all (QA.58): the window is never created there.
+    if cfg!(target_os = "macos") {
+        return;
+    }
     match app.state::<Engine>().settings() {
         Ok(stored) if stored.overlay.enabled => {
             apply(app, &stored);
@@ -269,6 +273,9 @@ fn set_move_flag(app: &AppHandle, on: bool) {
 /// and tells both pages. Window failures are logged: the options stay stored either way.
 pub fn apply(app: &AppHandle, stored: &store::Settings) -> OverlayState {
     let overlay = &stored.overlay;
+    if cfg!(target_os = "macos") {
+        return state_of(stored, false);
+    }
     let existing = app.get_webview_window(LABEL);
     if overlay.enabled {
         let result = match existing {
