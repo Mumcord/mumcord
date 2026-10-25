@@ -1,6 +1,10 @@
 //! Strict HTML policy for everything a server or another person sends (FR-1.29, spec §9):
 //! basic formatting, links to http(s)/mailto, and inline images only as embedded
 //! `data:image/(png|jpeg|gif|webp);base64` URLs, so nothing ever loads from the network.
+//!
+//! Chat messages additionally keep absolute http(s) image sources ([`sanitize_message_html`]):
+//! the UI never puts them into the page but asks the engine to fetch them (FR-1.55, QA.35)
+//! when link previews are on. Comments and welcome texts never keep them.
 
 use std::borrow::Cow;
 use std::collections::{HashMap, HashSet};
@@ -48,7 +52,10 @@ const TAGS: &[&str] = &[
 
 const IMAGE_TYPES: &[&str] = &["png", "jpeg", "gif", "webp"];
 
-static POLICY: LazyLock<Builder<'static>> = LazyLock::new(|| {
+static POLICY: LazyLock<Builder<'static>> = LazyLock::new(|| policy(false));
+static MESSAGE_POLICY: LazyLock<Builder<'static>> = LazyLock::new(|| policy(true));
+
+fn policy(external_images: bool) -> Builder<'static> {
     let mut builder = Builder::empty();
     builder
         .tags(TAGS.iter().copied().collect())
@@ -63,17 +70,34 @@ static POLICY: LazyLock<Builder<'static>> = LazyLock::new(|| {
         .url_relative(UrlRelative::Deny)
         .link_rel(Some("noopener noreferrer nofollow"))
         .clean_content_tags(HashSet::from(["script", "style"]))
-        .attribute_filter(|element, attribute, value| match (element, attribute) {
-            ("img", "src") => is_embedded_image(value).then_some(Cow::Borrowed(value)),
-            ("a", "href") if value.trim_start().to_ascii_lowercase().starts_with("data:") => None,
-            _ => Some(Cow::Borrowed(value)),
-        });
+        .attribute_filter(
+            move |element, attribute, value| match (element, attribute) {
+                ("img", "src") => (is_embedded_image(value)
+                    || (external_images && is_external_image(value)))
+                .then_some(Cow::Borrowed(value)),
+                ("a", "href") if value.trim_start().to_ascii_lowercase().starts_with("data:") => {
+                    None
+                }
+                _ => Some(Cow::Borrowed(value)),
+            },
+        );
     builder
-});
+}
 
-/// Sanitizes untrusted HTML (messages, comments, welcome texts).
+/// Sanitizes untrusted HTML (comments, welcome texts): embedded images only.
 pub fn sanitize_html(html: &str) -> String {
     POLICY.clean(html).to_string()
+}
+
+/// Sanitizes a chat message: like [`sanitize_html`], but absolute http(s) image sources stay
+/// so the UI can show them through the engine's guarded fetch.
+pub fn sanitize_message_html(html: &str) -> String {
+    MESSAGE_POLICY.clean(html).to_string()
+}
+
+fn is_external_image(src: &str) -> bool {
+    reqwest::Url::parse(src.trim())
+        .is_ok_and(|u| matches!(u.scheme(), "http" | "https") && u.host().is_some())
 }
 
 fn is_embedded_image(src: &str) -> bool {
@@ -136,6 +160,32 @@ mod tests {
             let clean = sanitize_html(&format!("<img src=\"{src}\">"));
             assert_eq!(clean, "<img>", "{src}");
         }
+    }
+
+    #[test]
+    fn messages_keep_absolute_http_image_sources_only() {
+        for src in ["https://e.org/a.gif", "http://e.org/b.png?x=1"] {
+            let clean = sanitize_message_html(&format!("<img src=\"{src}\" onerror=\"x()\">"));
+            assert_eq!(
+                clean,
+                format!("<img src=\"{}\">", src.replace('&', "&amp;"))
+            );
+            assert_eq!(sanitize_html(&format!("<img src=\"{src}\">")), "<img>");
+        }
+        for src in [
+            "//e.org/a.gif",
+            "/local.png",
+            "javascript:alert(1)",
+            "file:///etc/passwd",
+            "ftp://e.org/a.png",
+        ] {
+            let clean = sanitize_message_html(&format!("<img src=\"{src}\">"));
+            assert_eq!(clean, "<img>", "{src}");
+        }
+        assert_eq!(
+            sanitize_message_html("<script>x</script><b>hi</b>"),
+            "<b>hi</b>"
+        );
     }
 
     #[test]

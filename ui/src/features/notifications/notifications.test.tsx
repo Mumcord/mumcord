@@ -69,10 +69,11 @@ describe("message toasts", () => {
     await setup();
     receive(LOBBY, "visible already");
     await act(async () => {
-      await api.sendChannelMessage(2, "mine");
+      await api.sendChannelMessage(2, "mine @zoe");
     });
     await act(() => Promise.resolve());
     expect(within(toastRegion()).queryByRole("button")).toBeNull();
+    expect(api.mock.messageSounds()).toEqual(["message"]);
   });
 
   it("notifies for the selected chat while settings cover it", async () => {
@@ -202,5 +203,50 @@ describe("plain preview", () => {
     const long = plainPreview(`<p>${"x".repeat(500)}</p>`);
     expect(Array.from(long)).toHaveLength(MAX_PREVIEW);
     expect(long.endsWith("…")).toBe(true);
+  });
+});
+
+describe("mentions", () => {
+  it("notifies with a mention line for a channel the user does not follow", async () => {
+    await setup();
+    receive(AFK, "<p>hey @zoe, look</p>");
+    const toast = await within(toastRegion()).findByRole("button", { name: /#AFK/ });
+    expect(toast).toHaveTextContent("Anna mentioned you: hey @zoe, look");
+  });
+
+  it("plays the ping instead of the message sound, also in the chat on screen", async () => {
+    await setup();
+    receive(LOBBY, "<p>hi @zoe</p>");
+    receive(RAID, "<p>no mention</p>");
+    await waitFor(() => {
+      expect([...api.mock.messageSounds()].sort()).toEqual(["mention", "message"]);
+    });
+  });
+
+  it("plays the message sound for a mention when the ping is off", async () => {
+    await setup();
+    const settings = await api.settingsGet();
+    await api.settingsUpdate({ ...settings, sounds: { ...settings.sounds, mention: false } });
+    receive(RAID, "<p>hi @zoe</p>");
+    await waitFor(() => {
+      expect(api.mock.messageSounds()).toEqual(["message"]);
+    });
+  });
+
+  it("keeps the plain notification when notifying on mentions is off", async () => {
+    await setup();
+    const settings = await api.settingsGet();
+    await api.settingsUpdate({ ...settings, sounds: { ...settings.sounds, mentionNotify: false } });
+    receive(AFK, "<p>hey @zoe, look</p>");
+    const toast = await within(toastRegion()).findByRole("button", { name: /#AFK/ });
+    expect(toast).toHaveTextContent("Anna: hey @zoe, look");
+    expect(api.mock.messageSounds()).toEqual(["mention"]);
+  });
+
+  it("does not treat an email address as a mention", async () => {
+    await setup();
+    receive(AFK, "<p>write to zoe@example.com</p>");
+    const toast = await within(toastRegion()).findByRole("button", { name: /#AFK/ });
+    expect(toast).toHaveTextContent("Anna: write to zoe@example.com");
   });
 });

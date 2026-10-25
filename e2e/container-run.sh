@@ -1,6 +1,7 @@
 #!/bin/bash
 # Runs inside the E2E container: session D-Bus with an unlocked Secret Service (gnome-keyring),
 # Xvfb, then builds the app (debug, feature test-backend), bot and netsim, then runs WebdriverIO.
+# MUMCORD_E2E_SHARD=<n> limits the run to one shard of e2e/shards.json (see wdio.conf.ts).
 set -euo pipefail
 
 # The container runs as the host uid (e.g. 1001 on GitHub runners), which has no /etc/passwd entry
@@ -37,8 +38,14 @@ export WEBKIT_DISABLE_SANDBOX_THIS_IS_DANGEROUS=1 WEBKIT_DISABLE_DMABUF_RENDERER
 export LIBGL_ALWAYS_SOFTWARE=1 NO_AT_BRIDGE=1
 
 [ -d node_modules ] || npm ci --no-audit --no-fund
-echo "building app (debug, test-backend), mumcord-bot, netsim..."
-npx tauri build --debug --no-bundle --features test-backend -- --locked
-cargo build --locked --quiet -p mumcord-bot -p netsim
+# MUMCORD_E2E_STEP=build|test splits the run for CI: one job builds, shard jobs test the binaries
+# it shared. Unset = both.
+step="${MUMCORD_E2E_STEP:-}"
+if [ "$step" != test ]; then
+  echo "building app (debug, test-backend), mumcord-bot, netsim..."
+  npx tauri build --debug --no-bundle --features test-backend -- --locked
+  cargo build --locked --quiet -p mumcord-bot -p netsim
+fi
+[ "$step" = build ] && exit 0
 
 exec npx wdio run e2e/wdio.conf.ts "$@"

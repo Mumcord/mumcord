@@ -8,6 +8,7 @@ import { useCallback, useEffect, useId, useRef, useState, type KeyboardEvent } f
 import { useTranslation } from "react-i18next";
 import { getApi, toEngineError, type User } from "../../api";
 import { useServerState } from "../channels/serverStore";
+import { NowPlayingFor } from "../nowplaying";
 import "./members.css";
 import { Avatar } from "./Avatar";
 import { openPrivateConversation, type SendPrivateMessage } from "./privateMessage";
@@ -133,6 +134,7 @@ function ProfileBody({
         </div>
       </div>
       {loadError && <p className="profile-card__note">{t("card.loadFailed")}</p>}
+      <NowPlayingFor session={user.session} />
       {comment && (
         <div
           className="profile-card__comment"

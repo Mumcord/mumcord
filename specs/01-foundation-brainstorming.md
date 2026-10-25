@@ -958,6 +958,15 @@ Until now external images (img tags pointing to web addresses, image links) are 
 
 ---
 
+#### QA.36 How to stage the remaining Epic 1 work? `◉`
+
+- [x] **Stage 1b = chat features (QA.34, QA.35 and the unread-flash bug); positional audio and the overlay move to a new stage 1c (in-game features).**
+- [ ] Keep everything in stage 1b.
+
+✍️ Note: Requested in chat during /dev ("splitten mal die chat features von ingame overlay. chat features ist 1b").
+
+---
+
 #### QA.37 Allow more than 96 kbit/s? `◉`
 
 - [x] **Settings → Audio: "Music quality" switch (default off). Off: automatic bitrate capped at 96 kbit/s (speech). On: the cap rises to the server limit, at most 510 kbit/s (Opus maximum), with the Opus encoder tuned for music; still lowered automatically on packet loss.**
@@ -965,5 +974,161 @@ Until now external images (img tags pointing to web addresses, image links) are 
 - [ ] Keep 96 kbit/s.
 
 ✍️ Note: Asked and answered in chat during /dev (server limit 558 kbit/s observed, client capped at 96).
+
+---
+
+#### QA.38 Enlarge and zoom images in the chat (stage 1b)? `◉`
+
+- [x] **Clicking any image in the chat (sent, received, external, GIFs) opens a viewer over the app: fit to window, zoom with mouse wheel / pinch / + and − keys, drag to pan, double-click toggles 100 %, arrow keys step through the images of the conversation, Escape closes; buttons for "Open in browser" (external) and "Save image".**
+- [ ] Only enlarge, no zoom.
+
+✍️ Note: Requested in chat during /dev.
+
+---
+
+#### QA.39 Manual voice activation threshold (stage 1b)? `◉`
+
+- [x] **Settings → Voice: voice activation "Automatic" (default, today's detection) or "Manual threshold" with a slider over a live input level meter (the threshold line is drawn on the meter; speech above it opens the mic, plus a short hold time so words aren't cut).** The music-quality switch (QA.37) also belongs to stage 1b.
+- [ ] Automatic only.
+
+✍️ Note: Requested in chat during /dev.
+
+---
+
+#### QA.40 Spotify (stage 1b)? `◉`
+
+- [x] **Spotify links in the chat show a card (cover, title, artist) with "Open in browser" and an embedded player after a click, like YouTube/Twitch.**
+- [x] **"Now playing" status (opt-in in settings, default off): Mumcord reads what the user is listening to from the system's media information (Linux MPRIS, Windows media session, macOS where possible — no Spotify login) and shares it: other Mumcord users see a music icon next to the user and, in the profile, the cover (if available), title, artist and the position/progress in the song, kept in sync; official Mumble clients see a short "🎵 Artist – Title" line in the user's comment.**
+- [ ] Spotify controls inside Mumcord (needs Spotify login and a developer key) – later.
+
+✍️ Note: Asked and answered in chat during /dev ("status of now playing synced with other user … should be activated in the settings").
+
+---
+
+#### QA.41 Ping when mentioned? `◉`
+
+- [x] **A distinct short "ping" sound when the user is mentioned, plus separate switches for "Sound when mentioned" and "Notify when mentioned" under Settings → Sounds & notifications (both default on).**
+
+✍️ Note: Requested in chat during /dev.
+
+---
+
+#### QA.42 Dismiss previews and automatic clean-up (stage 1b)? `◉`
+
+- [x] **Each preview/embed card has a dismiss (×) button; the dismissal is remembered for that message.**
+- [x] **Settings → Chat & history: "Delete cached previews after X days" (default 7) with a "Clear now" button – covers link previews, thumbnails and external images (previews are cached in memory and on disk).**
+- [x] **Settings → Chat & history: "Delete chat history older than X days" (default off).**
+
+✍️ Note: Requested in chat during /dev.
+
+---
+
+#### QA.43 GIF search needs an API key – which way? `◉`
+An API key shipped inside the app can be extracted by anyone; abuse would use up the quota.
+
+- [x] **No GIF search for now: pasted GIF links play inline (external images, FR-1.55) and GIFs in the chat can be saved as favorites (right-click → "Save as favorite"); the GIF button opens the favorites. No key, no costs, no server.** Replaces the Tenor search from QA.34; a search can come later.
+- [ ] Users bring their own key.
+- [ ] Proxy on mumcord.app.
+- [ ] Key in the app anyway.
+
+✍️ Note: Asked and answered in chat during /dev.
+
+---
+
+#### QA.44 Share which game the user is playing (stage 1c)? `◉`
+Requested by the user; how Discord does it was explained: Discord recognises games by matching running programs against its own game database, and "Join" only works for games that integrate Discord's SDK (Rich Presence) and hand over a join secret.
+
+- [x] **"Now gaming" status, opt-in (default off), stage 1c.** Detection: (1) Mumble Link – games with positional audio report their name and context; (2) running programs matched against a small bundled list of known games plus Steam games detected from the running Steam client (app id). Shared like "Now playing" (plugin data to Mumcord users, short "🎮 Game" line in the comment for official clients): a game-controller icon next to the person, game name + game icon (Steam app icon via the backend image proxy when an app id is known, otherwise a generic icon) and "playing for 1 h 20 min" in the profile/preview, and in the own user panel's status line.
+- [x] **"Join game", best effort:** offered only when another Mumcord user plays the same game and the game exposes a join target – a Steam game with a server address from the Mumble Link context (steam://connect/…) or a Steam lobby link. Otherwise no join button. A full Discord-style join needs the game's cooperation and is out of scope.
+- [ ] Not needed.
+
+✍️ Note: Requested in chat during /dev ("eventuell auch so ein join game, weiß nicht wie das discord implementiert hat").
+
+---
+
+#### QA.45 Message sync between Mumcord clients and marking Mumcord users (stage 1d)? `◉`
+Mumble servers keep no chat history; Mumcord clients can fill gaps for each other (client-only, via Mumble plugin data).
+
+- [x] **Stage 1d – history sync:** when a client joins a channel (or on demand, "Load earlier messages"), it asks other Mumcord users who can read that channel for its messages from a time range – up to 7 days back and at most 500 messages per request. Answering clients send their stored channel messages; private chats are never shared. Sharing the own history is on by default and switchable in the first-start wizard and in settings. Synced messages are deduplicated, merged in time order and marked "from ‹name›'s history", because they cannot be verified.
+- [x] **Stage 1d – mark Mumcord users:** a small Mumcord badge next to people who use Mumcord (detected via the plugin-data hello), with a tooltip.
+- [ ] Not now.
+
+✍️ Note: Requested in chat during /dev; answers: sharing on by default and configurable in the wizard; 7 days / 500 messages.
+
+---
+
+#### QA.46 People interactions, profile redesign and friends (stage 1d)? `◉`
+
+- [x] **Double-click on a person opens the private chat with them.**
+- [x] **Single click opens the same card as the hover preview, pinned (stays until closed); top right a "Private message" button and a settings/expand button that opens the full profile with all local settings (volume, local mute, friend, notes) – replaces the current click card.**
+- [x] **Profile redesign:** larger header with avatar and banner colour from the avatar, name, registered/guest, Mumcord badge, now playing / now gaming, comment, and sections for the local settings.
+- [x] **Friends:** "Add friend" in the card, menu and full profile; friends are stored locally by certificate hash (works across servers and name changes), shown in a "Friends" list with online state (online on any connected server, offline otherwise).
+- [x] **Private chat history with friends is kept** (linked by certificate hash across servers and renames, excluded from automatic history deletion unless the user deletes it), and the private chat header and list show whether the other person is online.
+- [ ] Not now.
+
+✍️ Note: Requested in chat during /dev.
+
+---
+
+#### QA.47 Settings icon and quick settings? `◉`
+
+- [x] **The settings button in the user panel gets a clear gear icon (the current one looks like a theme toggle).**
+- [x] **Stage 1c: right-clicking the settings button opens quick settings – switches for link previews, theme (system/dark/light) and now-playing sharing (plus now-gaming once it exists), applied immediately.**
+
+✍️ Note: Requested in chat during /dev.
+
+---
+
+#### QA.48 History sync details (stage 1d)? `◉`
+
+- [x] **Availability announcements:** each Mumcord client that shares history publishes a small summary to other Mumcord users – per channel the time range it holds and the message count (no content) – on connect, when it changes, and on request. A joining client uses these summaries to ask only the clients that cover the missing range (fewest requests, spread across several holders).
+- [x] **Duplicate check by hash:** every message gets a content hash (channel, sender certificate hash or name, server timestamp rounded to the second, normalized body). Requests include the hashes already held for the range so holders send only missing messages, and received messages are dropped if their hash already exists – no duplicates, also across several holders.
+
+✍️ Note: Requested in chat during /dev.
+
+---
+
+#### QA.49 Which messages may be synced? `◉`
+
+- [x] **Only messages older than the moment the requesting client started receiving that channel live: for the own channel the join time, for a followed channel the time the user started following it.** Messages after that point are never requested or sent (the client received them live). Following a new channel therefore syncs that channel's earlier history up to the follow time.
+
+✍️ Note: Requested in chat during /dev.
+
+---
+
+#### QA.50 Ordering synced messages and jumping to the newest (stage 1d)? `◉`
+
+- [x] **Synced messages are inserted at their correct place by server timestamp (tie-break by hash), day separators and grouping are recomputed, and the scroll position stays where the user is reading (no jump when older messages are inserted above).**
+- [x] **"Jump to newest" button:** appears at the bottom right of the chat when the user has scrolled up or new messages arrived below, shows the count of new messages, jumps to the latest message on click (also End / Ctrl+End).
+
+✍️ Note: Requested in chat during /dev.
+
+---
+
+#### QA.51 License change? `◉`
+Earlier decision: MIT. The user wants everyone (including companies) to be able to use Mumcord, but not to turn the code into their own commercial product without permission.
+
+- [x] **From the next version on: AGPL-3.0-only plus a commercial license on request (dual licensing; contact tobias@vorwachs.com).** Mumcord stays open source; derived products must be published under the AGPL unless a commercial license is agreed. Versions already published (up to 0.1.1) remain MIT for those who obtained them. Outside contributions require a contributor licence agreement so they can be dual-licensed.
+- [ ] PolyForm Shield 1.0.0 (source-available, competing products forbidden).
+- [ ] Keep MIT.
+
+✍️ Note: Asked and answered in chat during /dev.
+
+---
+
+#### QA.52 Attribution for Giphy and Tenor GIFs? `◉`
+Findings (not legal advice): GIPHY requires a visible "Powered by GIPHY" mark wherever its API is used; Tenor requires attribution for all content retrieved from it ("Via Tenor" on a shared GIF, "Powered by Tenor" in a browsing view). Mumcord uses neither API (no search), but it loads their media and resolves their page links.
+
+- [x] **GIFs from Giphy or Tenor show a small, unobtrusive label "via GIPHY" / "via Tenor" (official wording, plain text or their attribution logo where the license allows) linking to the original page; the GIF favorites picker shows the label on such items too.** If a GIF search is added later (Epic 6), the full API attribution rules apply.
+
+✍️ Note: Requested in chat during /dev ("guck bitte in die Lizenzen").
+
+---
+
+#### QA.53 Custom themes (roadmap)? `◉`
+
+- [x] **Epic 2 also covers custom themes: colour settings with presets (dark, light, a few curated ones), and sharing a theme as a compact config string; a pasted string renders in the chat as a theme preview card (mini mock-up in those colours) with an "Import theme" button; imported themes are validated (contrast check, only colour values) before use.** Details go into the Epic 2 specification.
+
+✍️ Note: Requested in chat during /dev.
 
 ---

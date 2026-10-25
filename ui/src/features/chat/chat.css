@@ -256,8 +256,97 @@
   overflow-x: auto;
 }
 
+.chat-message__body pre > code {
+  padding: 0;
+  background: none;
+}
+
+/* Syntax colors (FR-1.53) reuse theme tokens so both themes keep readable contrast. */
+.hljs-keyword,
+.hljs-selector-tag,
+.hljs-meta .hljs-keyword,
+.hljs-doctag {
+  color: var(--color-accent);
+}
+
+.hljs-string,
+.hljs-regexp,
+.hljs-addition,
+.hljs-attr,
+.hljs-selector-attr {
+  color: var(--color-success);
+}
+
+.hljs-number,
+.hljs-literal,
+.hljs-symbol,
+.hljs-variable,
+.hljs-template-variable,
+.hljs-selector-class,
+.hljs-selector-id {
+  color: var(--color-accent-text);
+}
+
+.hljs-title,
+.hljs-built_in,
+.hljs-type,
+.hljs-section,
+.hljs-name,
+.hljs-attribute {
+  color: var(--color-warning);
+}
+
+.hljs-deletion {
+  color: var(--color-danger);
+}
+
+.hljs-comment,
+.hljs-quote,
+.hljs-meta {
+  color: var(--color-text-muted);
+  font-style: italic;
+}
+
+.hljs-emphasis {
+  font-style: italic;
+}
+
+.hljs-strong {
+  font-weight: var(--font-weight-bold);
+}
+
 .chat-composer {
+  position: relative;
   padding: var(--space-2) var(--space-4) var(--space-4);
+}
+
+.chat-format {
+  display: flex;
+  gap: 0.125rem;
+  margin-bottom: var(--space-1);
+}
+
+.chat-format__button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 1.75rem;
+  min-height: 1.75rem;
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--color-text-muted);
+  cursor: pointer;
+}
+
+.chat-format__button:hover:not(:disabled) {
+  background: var(--color-bg-hover);
+  color: var(--color-text);
+}
+
+.chat-format__button:disabled {
+  cursor: not-allowed;
 }
 
 .chat-composer__row {
@@ -388,5 +477,566 @@
 }
 
 .pinned-info__toggle:hover {
+  text-decoration: underline;
+}
+
+/* Floats above the input, so opening it never moves the layout. */
+.mention-picker {
+  position: absolute;
+  bottom: 100%;
+  left: var(--space-4);
+  z-index: 5;
+  min-width: 14rem;
+  max-width: calc(100% - 2 * var(--space-4));
+  margin: 0 0 var(--space-1);
+  padding: var(--space-1);
+  list-style: none;
+  border-radius: var(--radius-md);
+  background: var(--color-bg-elevated);
+  box-shadow:
+    inset 0 0 0 1px var(--color-border),
+    0 4px 16px rgb(0 0 0 / 0.25);
+  max-height: 16rem;
+  overflow-y: auto;
+}
+
+.mention-picker__option {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-1) var(--space-2);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+}
+
+.mention-picker__option:hover,
+.mention-picker__option[aria-selected="true"] {
+  background: var(--color-bg-hover);
+}
+
+.mention-picker__option[aria-selected="true"] {
+  box-shadow: inset 2px 0 0 var(--color-accent);
+}
+
+.mention-picker__name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.chat-message--mention {
+  background: color-mix(in srgb, var(--color-accent) 12%, transparent);
+  box-shadow: inset 3px 0 0 var(--color-accent);
+}
+
+/* Link preview and video player cards (FR-1.49, FR-1.50). */
+.link-previews {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin-top: var(--space-1);
+}
+
+.link-previews:empty {
+  display: none;
+}
+
+.link-card {
+  position: relative;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  align-items: flex-start;
+  max-width: 32rem;
+  padding: var(--space-3);
+  border: 1px solid var(--color-border);
+  border-left: 4px solid var(--color-border-strong);
+  border-radius: var(--radius-md);
+  background: var(--color-bg-elevated);
+}
+
+.link-card__text {
+  display: flex;
+  flex: 1 1 12rem;
+  flex-direction: column;
+  gap: var(--space-1);
+  min-width: 0;
+}
+
+.link-card__text p {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.link-card__site {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+}
+
+.link-card__title {
+  font-weight: var(--font-weight-bold);
+}
+
+.link-card__description {
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+}
+
+.link-card__image {
+  max-width: 8rem;
+  max-height: 8rem;
+  border-radius: var(--radius-md);
+  object-fit: cover;
+}
+
+.link-card--video {
+  flex-direction: column;
+  align-items: stretch;
+}
+
+/* In a column the 12rem flex basis of the text would become its height: a large empty gap
+   above the player. */
+.link-card--video .link-card__text {
+  flex: 0 0 auto;
+  padding-right: 1.75rem;
+}
+
+/* Sits in the corner without taking part in the layout, so hiding the card moves nothing else. */
+.link-card__dismiss {
+  position: absolute;
+  top: var(--space-1);
+  right: var(--space-1);
+  display: grid;
+  place-items: center;
+  width: 1.5rem;
+  height: 1.5rem;
+  padding: 0;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-full);
+  background: var(--color-bg-elevated);
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+  line-height: 1;
+  cursor: pointer;
+}
+
+.link-card__dismiss:hover {
+  background: var(--color-bg-hover);
+}
+
+.link-card__play {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  padding: 0;
+  overflow: hidden;
+  border: 0;
+  border-radius: var(--radius-md);
+  background: #000;
+  cursor: pointer;
+}
+
+.link-card__thumbnail {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.link-card__play-icon {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 3.5rem;
+  height: 3.5rem;
+  border-radius: var(--radius-full);
+  background: rgb(0 0 0 / 70%);
+  color: #fff;
+  font-size: 1.5rem;
+}
+
+.link-card__play:hover .link-card__play-icon,
+.link-card__play:focus-visible .link-card__play-icon {
+  background: rgb(0 0 0 / 90%);
+}
+
+.link-card__player {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  border: 0;
+  border-radius: var(--radius-md);
+}
+
+/* Spotify's embed is a fixed-height widget, not a 16:9 video. */
+.link-card__player--audio {
+  aspect-ratio: auto;
+  height: 152px;
+}
+
+/* Inline images (FR-1.55): scaled into a 400×300 box, aspect ratio kept. The loading
+   placeholder has a fixed size so the list does not jump while images arrive. */
+.inline-image {
+  position: relative;
+  max-width: 100%;
+  margin: 0;
+  overflow: hidden;
+  border-radius: var(--radius-md);
+}
+
+.inline-image--loading {
+  border: 1px solid var(--color-border);
+  background: var(--color-bg-elevated);
+}
+
+.inline-image__view {
+  display: block;
+  width: 100%;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: zoom-in;
+}
+
+.inline-image__img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+/* Shown on hover and keyboard focus only, so it does not cover the picture. */
+.inline-image__open {
+  position: absolute;
+  bottom: var(--space-2);
+  left: var(--space-2);
+  padding: var(--space-1) var(--space-3);
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-full);
+  background: var(--color-bg-elevated);
+  color: var(--color-text);
+  font-size: var(--font-size-sm);
+  cursor: pointer;
+  opacity: 0;
+}
+
+.inline-image:hover .inline-image__open,
+.inline-image:focus-within .inline-image__open,
+.inline-image:hover .inline-image__favorite,
+.inline-image:focus-within .inline-image__favorite {
+  opacity: 1;
+}
+
+/* Star next to "Open": save the image as a GIF favorite (QA.43). */
+.inline-image__favorite {
+  position: absolute;
+  bottom: var(--space-2);
+  right: var(--space-2);
+  padding: var(--space-1) var(--space-3);
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-full);
+  background: var(--color-bg-elevated);
+  color: var(--color-text);
+  font-size: var(--font-size-sm);
+  cursor: pointer;
+  opacity: 0;
+}
+
+.inline-image__favorite:hover {
+  background: var(--color-bg-hover);
+}
+
+.inline-image__open:hover {
+  background: var(--color-bg-hover);
+}
+
+.link-card__open {
+  align-self: flex-start;
+  padding: var(--space-1) var(--space-3);
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-full);
+  background: transparent;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+  cursor: pointer;
+}
+
+.link-card__open:hover {
+  background: var(--color-bg-hover);
+}
+
+/* Image viewer (FR-1.56) */
+.chat-message__body img {
+  cursor: zoom-in;
+}
+
+.image-viewer__backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  background: rgb(0 0 0 / 82%);
+}
+
+.image-viewer {
+  position: absolute;
+  inset: 0;
+  outline: none;
+}
+
+.image-viewer__stage {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  touch-action: none;
+  cursor: default;
+}
+
+.image-viewer__stage[data-zoomed="true"] {
+  cursor: grab;
+}
+
+.image-viewer__stage--panning[data-zoomed="true"] {
+  cursor: grabbing;
+}
+
+.image-viewer__img {
+  flex: none;
+  max-width: none;
+  user-select: none;
+  /* The transform scales from the image's own centre, which sits on the stage's centre. */
+  transform-origin: center;
+  image-rendering: auto;
+}
+
+.image-viewer__bar {
+  position: absolute;
+  top: var(--space-3);
+  right: var(--space-3);
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2);
+  border-radius: var(--radius-md);
+  background: var(--color-bg-elevated);
+  color: var(--color-text);
+}
+
+.image-viewer__counter,
+.image-viewer__zoom {
+  min-width: 3.5em;
+  text-align: center;
+  font-size: var(--font-size-sm);
+  font-variant-numeric: tabular-nums;
+}
+
+.image-viewer__button,
+.image-viewer__nav {
+  min-width: 2.25rem;
+  min-height: 2.25rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: var(--color-bg-hover);
+  color: var(--color-text);
+  cursor: pointer;
+}
+
+.image-viewer__button:hover,
+.image-viewer__nav:hover:not(:disabled) {
+  border-color: var(--color-border-strong);
+}
+
+.image-viewer__nav {
+  position: absolute;
+  top: 50%;
+  z-index: 1;
+  transform: translateY(-50%);
+  border-radius: var(--radius-full);
+  font-size: 1.5rem;
+}
+
+.image-viewer__nav--prev {
+  left: var(--space-3);
+}
+
+.image-viewer__nav--next {
+  right: var(--space-3);
+}
+
+.image-viewer__nav:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+.image-viewer__status {
+  position: absolute;
+  bottom: var(--space-4);
+  left: 50%;
+  z-index: 1;
+  transform: translateX(-50%);
+  margin: 0;
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-md);
+  background: var(--color-bg-elevated);
+  color: var(--color-text);
+  font-size: var(--font-size-sm);
+}
+
+/* GIF favorites picker above the GIF button (QA.43). */
+.gif-picker {
+  position: relative;
+  display: flex;
+}
+
+.gif-picker__popover {
+  position: absolute;
+  bottom: calc(100% + var(--space-2));
+  left: 0;
+  z-index: 10;
+  width: min(30rem, calc(100vw - 2 * var(--space-4)));
+  max-height: 20rem;
+  padding: var(--space-3);
+  overflow-y: auto;
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-md);
+  background: var(--color-bg-elevated);
+  color: var(--color-text);
+  box-shadow: 0 4px 16px rgb(0 0 0 / 0.3);
+}
+
+.gif-picker__empty,
+.gif-picker__hint {
+  margin: 0 0 var(--space-2);
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+}
+
+.gif-picker__empty {
+  margin: 0;
+}
+
+.gif-picker__grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.gif-picker__cell {
+  position: relative;
+}
+
+.gif-picker__choose {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  aspect-ratio: 1;
+  padding: 0;
+  overflow: hidden;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: var(--color-bg-hover);
+  color: var(--color-text);
+  cursor: pointer;
+}
+
+.gif-picker__choose:hover {
+  border-color: var(--color-border-strong);
+}
+
+.gif-picker__img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.gif-picker__placeholder {
+  padding: var(--space-1);
+  overflow: hidden;
+  font-size: var(--font-size-sm);
+  overflow-wrap: anywhere;
+}
+
+.gif-picker__remove {
+  position: absolute;
+  top: var(--space-1);
+  right: var(--space-1);
+  width: 1.5rem;
+  height: 1.5rem;
+  padding: 0;
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-full);
+  background: var(--color-bg-elevated);
+  color: var(--color-text);
+  cursor: pointer;
+  opacity: 0;
+}
+
+.gif-picker__cell:hover .gif-picker__remove,
+.gif-picker__cell:focus-within .gif-picker__remove,
+.gif-picker__remove:focus-visible {
+  opacity: 1;
+}
+
+/* An image that cannot be shown: a compact note with the way out to the browser. */
+.inline-image--failed {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  max-width: 28rem;
+  padding: var(--space-2) var(--space-4);
+  padding-right: 2.5rem;
+  border: 1px solid var(--color-border);
+  background: var(--color-bg-elevated);
+  font-size: var(--font-size-sm);
+}
+
+.inline-image__failed-open {
+  flex: none;
+  padding: var(--space-1) var(--space-3);
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-full);
+  background: none;
+  color: var(--color-text);
+  cursor: pointer;
+}
+
+/* "via GIPHY" / "via Tenor" credit (QA.52): a small chip in the top-left corner of the image,
+   absolutely placed so it never moves the layout. */
+.inline-image__attribution,
+.gif-picker__attribution {
+  position: absolute;
+  left: var(--space-1);
+  padding: 0 var(--space-2);
+  border-radius: var(--radius-full);
+  background: var(--color-bg-elevated);
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+  line-height: 1.4;
+  text-decoration: none;
+}
+
+.inline-image__attribution {
+  top: var(--space-2);
+  left: var(--space-2);
+}
+
+.gif-picker__attribution {
+  bottom: var(--space-1);
+  max-width: calc(100% - var(--space-2));
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.inline-image__attribution:hover,
+.gif-picker__attribution:hover {
+  background: var(--color-bg-hover);
   text-decoration: underline;
 }

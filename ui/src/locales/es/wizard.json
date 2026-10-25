@@ -80,6 +80,8 @@
     "mouseOptIn": "¿Quieres usar un botón lateral del ratón? Activa «Permitir botones del ratón» en Ajustes → Voz después de la configuración.",
     "autostart": "Iniciar Mumcord al iniciar sesión",
     "autostartHint": "Puedes cambiarlo más tarde en Ajustes → Apariencia.",
-    "autostartFailed": "No se pudo configurar Mumcord para que se inicie al iniciar sesión. Puedes intentarlo de nuevo en Ajustes."
+    "autostartFailed": "No se pudo configurar Mumcord para que se inicie al iniciar sesión. Puedes intentarlo de nuevo en Ajustes.",
+    "linkPreviews": "Mostrar vistas previas de enlaces y vídeos incrustados",
+    "linkPreviewsHint": "Mumcord carga las páginas enlazadas para mostrar vistas previas y reproductores; esos sitios ven tu dirección IP."
   }
 }

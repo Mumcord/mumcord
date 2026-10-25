@@ -12,6 +12,7 @@ function message(sender: string, sentAt: Date, patch: Partial<ChatMessage> = {})
     own: false,
     sentAt: sentAt.toISOString(),
     body: "hi",
+    dismissedPreviews: [],
     ...patch,
   };
 }

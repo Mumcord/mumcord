@@ -15,6 +15,15 @@
     "loading": "Nachrichten werden geladen…",
     "loadFailed": "Ältere Nachrichten konnten nicht geladen werden. Scrolle nach oben, um es erneut zu versuchen."
   },
+  "format": {
+    "toolbar": "Formatierung",
+    "bold": "Fett",
+    "italic": "Kursiv",
+    "strike": "Durchgestrichen",
+    "code": "Code im Text",
+    "codeBlock": "Codeblock",
+    "link": "Link"
+  },
   "composer": {
     "label": "Nachricht an {{name}}",
     "hint": "Enter sendet, Umschalt+Enter fügt eine neue Zeile ein. Markdown funktioniert: **fett**, *kursiv*, `Code`, [Link](https://…).",
@@ -49,5 +58,72 @@
     "label": "Kanalinfo",
     "showMore": "Mehr anzeigen",
     "showLess": "Weniger anzeigen"
+  },
+  "mention": {
+    "list": "Erwähnbare Personen",
+    "found_one": "{{count}} Person vorgeschlagen. Mit den Pfeiltasten wählen, mit Enter einfügen.",
+    "found_other": "{{count}} Personen vorgeschlagen. Mit den Pfeiltasten wählen, mit Enter einfügen.",
+    "none": "Niemand gefunden",
+    "mentionsYou": "Erwähnt dich"
+  },
+  "preview": {
+    "open": "Im Browser öffnen",
+    "openLabel": "{{title}} im Browser öffnen",
+    "play": "{{title}} abspielen",
+    "player": "Videoplayer: {{title}}",
+    "videoTitle": "{{site}}-Video",
+    "spotifyTitle": "{{site}}-Link",
+    "audioPlayer": "Spotify-Player: {{title}}",
+    "kind": {
+      "track": "Titel",
+      "album": "Album",
+      "playlist": "Playlist",
+      "artist": "Interpret",
+      "episode": "Folge",
+      "show": "Podcast"
+    },
+    "inBrowser": "Wird im Browser abgespielt",
+    "card": "Linkvorschau: {{title}}",
+    "dismiss": "Vorschau ausblenden"
+  },
+  "image": {
+    "loading": "Bild {{name}} wird geladen",
+    "label": "Bild: {{name}}",
+    "view": "Bild {{name}} ansehen",
+    "viewMessage": "Bild von {{name}}, im Betrachter öffnen",
+    "failed": "Das Bild kann nicht angezeigt werden (zu groß oder nicht erreichbar)."
+  },
+  "viewer": {
+    "label": "Bildbetrachter",
+    "counter": "{{current}} / {{total}}",
+    "zoomIn": "Vergrößern",
+    "zoomOut": "Verkleinern",
+    "fit": "An Fenster anpassen",
+    "save": "Bild speichern",
+    "saved": "Bild gespeichert",
+    "saveFailed": "Das Bild konnte nicht gespeichert werden",
+    "fileFilter": "Bild",
+    "openInBrowser": "Im Browser öffnen",
+    "close": "Schließen",
+    "previous": "Vorheriges Bild",
+    "next": "Nächstes Bild",
+    "unnamed": "bild"
+  },
+  "favorites": {
+    "open": "GIF-Favoriten",
+    "title": "GIF-Favoriten",
+    "save": "Als Favorit speichern",
+    "remove": "Aus Favoriten entfernen",
+    "removeNamed": "{{name}} aus den Favoriten entfernen",
+    "send": "{{name}} senden",
+    "hint": "Pfeiltasten bewegen, Eingabe sendet, Entf entfernt, Escape schließt.",
+    "empty": "Noch keine Favoriten. Rechtsklick auf ein GIF im Chat oder der Stern darauf, dann \"Als Favorit speichern\". Es erscheint dann hier."
+  },
+  "imageMenu": {
+    "label": "Bild {{name}}"
+  },
+  "attribution": {
+    "via": "via {{brand}}",
+    "view": "Auf {{brand}} ansehen"
   }
 }

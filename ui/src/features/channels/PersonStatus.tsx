@@ -1,13 +1,16 @@
 /**
  * Mute/deafen/listener/unregistered icons for a person; the spoken equivalent is `useStatusText()`.
+ * The "now playing" note carries its own label (FR-1.58).
  */
 import { useTranslation } from "react-i18next";
 import type { User } from "../../api";
+import { trackLabel } from "../nowplaying/progress";
+import { useNowPlaying } from "../nowplaying/nowPlayingStore";
 import "./PersonStatus.css";
 import { voiceState, type VoiceState } from "./statusText";
 
 type IconName =
-  "mic-off" | "headphones-off" | "ear" | "ban" | "volume-x" | "user-guest" | "user-check";
+  "mic-off" | "headphones-off" | "ear" | "ban" | "volume-x" | "user-guest" | "user-check" | "music";
 
 const PATHS: Record<IconName, string> = {
   "mic-off":
@@ -17,6 +20,7 @@ const PATHS: Record<IconName, string> = {
   ear: "M6 8.5a6 6 0 1 1 12 0c0 3-2 4.5-3 5.5s-1.5 2-1.5 3.5a3 3 0 0 1-6 0M9 8.5a3 3 0 0 1 6 0",
   ban: "M12 3a9 9 0 1 0 0 18a9 9 0 1 0 0-18M5.6 5.6l12.8 12.8",
   "volume-x": "M11 5 6 9H3v6h3l5 4V5M22 9l-6 6M16 9l6 6",
+  music: "M9 18V5l12-2v13M9 18a3 3 0 1 1-6 0a3 3 0 1 1 6 0M21 16a3 3 0 1 1-6 0a3 3 0 1 1 6 0",
   // Person outline; the guest variant dashes it so it reads as "no account".
   "user-check": "M12 4a4 4 0 1 0 0 8a4 4 0 1 0 0-8M4 21a8 8 0 0 1 16 0M15 17l1.8 1.8L20 15.5",
   "user-guest": "M12 4a4 4 0 1 0 0 8a4 4 0 1 0 0-8M4 21a8 8 0 0 1 16 0",
@@ -35,10 +39,13 @@ export function Icon({
   name,
   variant,
   tip,
+  label,
 }: {
   name: IconName;
   variant?: string | undefined;
   tip?: string | undefined;
+  /** Spoken text for icons that `useStatusText` does not cover. */
+  label?: string | undefined;
 }) {
   const svg = (
     <svg
@@ -60,7 +67,11 @@ export function Icon({
   );
   // A wrapper carries the native tooltip: SVG tooltips need a <title>, which would leak into text content.
   return tip ? (
-    <span className="person-icon-slot" title={tip}>
+    <span
+      className="person-icon-slot"
+      title={tip}
+      {...(label ? { role: "img", "aria-label": label } : {})}
+    >
       {svg}
     </span>
   ) : (
@@ -99,6 +110,7 @@ export function StatusIcons({ user, listener = false }: { user: User; listener?:
       {user.localMute && (
         <Icon name="volume-x" variant="local-muted" tip={t("statusTip.localMuted")} />
       )}
+      <NowPlayingIcon session={user.session} />
       {user.registered ? (
         <Icon name="user-check" variant="registered" tip={t("statusTip.registered")} />
       ) : (
@@ -106,4 +118,13 @@ export function StatusIcons({ user, listener = false }: { user: User; listener?:
       )}
     </span>
   );
+}
+
+/** Music note while the person shares a playing track (FR-1.58). */
+function NowPlayingIcon({ session }: { session: number }) {
+  const { t } = useTranslation("channels");
+  const live = useNowPlaying(session);
+  if (!live?.track.playing) return null;
+  const tip = t("statusTip.nowPlaying", { track: trackLabel(live.track) });
+  return <Icon name="music" variant="music" tip={tip} label={tip} />;
 }

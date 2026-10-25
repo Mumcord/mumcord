@@ -15,6 +15,8 @@ import type {
   ErrorCode,
   HistoryScope,
   Identity,
+  InlineImage,
+  LinkPreview,
   MumbleLink,
   PttAvailability,
   PttMouseStatus,
@@ -77,6 +79,8 @@ export interface MockControls {
   setWindowFocused(focused: boolean): void;
   /** System notifications `notifyMessage` "showed", oldest first. */
   desktopNotices(): readonly MessageNotice[];
+  /** Sounds `notifyMessage` played for incoming messages, oldest first (QA.41). */
+  messageSounds(): readonly ("message" | "mention")[];
 }
 
 export type MockApi = MumcordApi & { readonly mock: MockControls };
@@ -89,6 +93,8 @@ const DEFAULT_SETTINGS: Settings = {
   theme: "system",
   language: null,
   talkMode: "voiceActivation",
+  voiceActivation: "automatic",
+  voiceThresholdDbfs: -40,
   pttKey: null,
   allowMouseButtons: false,
   pttCompatibilityMode: false,
@@ -103,6 +109,8 @@ const DEFAULT_SETTINGS: Settings = {
     selfMute: true,
     selfDeaf: true,
     messages: true,
+    mention: true,
+    mentionNotify: true,
     voiceJoin: true,
     hangUp: true,
   },
@@ -114,7 +122,55 @@ const DEFAULT_SETTINGS: Settings = {
   autostart: false,
   startMinimized: true,
   connectMuted: true,
+  linkPreviews: true,
+  previewCacheDays: 7,
+  historyMaxAgeDays: null,
+  nowPlaying: false,
 };
+
+/** Offline stand-in for the engine's link previews: a YouTube player card or a page card. */
+function mockLinkPreview(url: string): LinkPreview | null {
+  let parsed: URL;
+  try {
+    parsed = new URL(url);
+  } catch {
+    return null;
+  }
+  if (parsed.protocol !== "http:" && parsed.protocol !== "https:") return null;
+  const youtube = /^(?:www\.)?youtu(?:\.be|be\.com)$/.test(parsed.hostname)
+    ? (parsed.searchParams.get("v") ?? parsed.pathname.split("/").pop() ?? "")
+    : "";
+  if (/^[\w-]{11}$/.test(youtube)) {
+    return {
+      url,
+      siteName: "YouTube",
+      title: "Demo video",
+      description: null,
+      image: null,
+      video: {
+        site: "youtube",
+        playerUrl: `https://www.youtube-nocookie.com/embed/${youtube}?autoplay=1`,
+        channel: "Demo channel",
+      },
+      isImage: false,
+    };
+  }
+  return {
+    url,
+    siteName: parsed.hostname,
+    title: `Preview of ${parsed.hostname}`,
+    description: "Link previews come from the engine; this is mock data.",
+    image: null,
+    video: null,
+    isImage: false,
+  };
+}
+
+/** Offline stand-in for the engine's inline images: the same small picture for every http(s) URL. */
+function mockInlineImage(url: string): InlineImage | null {
+  if (!/^https?:\/\//i.test(url)) return null;
+  return { url, src: MOCK_DEFAULT_AVATAR, width: 320, height: 180, animated: false };
+}
 
 /** 1×1 PNG standing in for any image chosen as the default avatar. */
 const MOCK_DEFAULT_AVATAR =
@@ -260,6 +316,7 @@ function demoHistory(): ChatMessage[] {
     own: session === SELF_SESSION,
     sentAt: new Date(Date.now() - minutesAgo * 60_000).toISOString(),
     body,
+    dismissedPreviews: [],
   }));
 }
 
@@ -379,6 +436,7 @@ export function createMockApi(options: MockOptions = {}): MockApi {
   let ownVoice = { mute: false, deaf: false };
   let windowFocused = true;
   const desktopNotices: MessageNotice[] = [];
+  const messageSounds: ("message" | "mention")[] = [];
   const rejoinOffers = new Map<number, string[]>();
   // History per server id, keyed by conversation.
   const history = new Map<number, Map<string, ChatMessage[]>>(
@@ -451,6 +509,11 @@ export function createMockApi(options: MockOptions = {}): MockApi {
   function selfUser(): User {
     return requireUser(SELF_SESSION);
   }
+
+  /** Pretend size of the preview cache, freed by `previewCacheClear`. */
+  let cachedPreviewBytes = 1_468_006;
+  // GIF favorites, most recently used first.
+  let gifFavorites: string[] = [];
 
   function serverHistory(serverId: number): Map<string, ChatMessage[]> {
     let map = history.get(serverId);
@@ -648,6 +711,7 @@ export function createMockApi(options: MockOptions = {}): MockApi {
       own: true,
       sentAt: new Date().toISOString(),
       body: html,
+      dismissedPreviews: [],
     };
     store(message);
     return message;
@@ -938,6 +1002,45 @@ export function createMockApi(options: MockOptions = {}): MockApi {
       return Promise.resolve(null);
     },
 
+    // links
+    linkPreview: (url) => Promise.resolve(settings.linkPreviews ? mockLinkPreview(url) : null),
+    inlineImage: (url) => Promise.resolve(settings.linkPreviews ? mockInlineImage(url) : null),
+    previewDismiss: (messageId, url) => {
+      for (const conversations of history.values()) {
+        for (const messages of conversations.values()) {
+          const message = messages.find((m) => m.id === messageId);
+          if (message && !message.dismissedPreviews.includes(url))
+            message.dismissedPreviews.push(url);
+        }
+      }
+      return Promise.resolve(null);
+    },
+    gifFavorites: () => Promise.resolve([...gifFavorites]),
+    gifFavoriteAdd: (url) => {
+      if (!/^https?:\/\//i.test(url)) fail("invalidInput", "favorites need an http(s) link");
+      gifFavorites = [url, ...gifFavorites.filter((u) => u !== url)].slice(0, 200);
+      return Promise.resolve(null);
+    },
+    gifFavoriteRemove: (url) => {
+      gifFavorites = gifFavorites.filter((u) => u !== url);
+      return Promise.resolve(null);
+    },
+    gifFavoriteUse: (url) => {
+      if (gifFavorites.includes(url))
+        gifFavorites = [url, ...gifFavorites.filter((u) => u !== url)];
+      return Promise.resolve(null);
+    },
+    saveImage: () => Promise.resolve(null),
+    previewCacheClear: () => {
+      const freed = cachedPreviewBytes;
+      cachedPreviewBytes = 0;
+      return Promise.resolve(freed);
+    },
+
+    // now playing: no media player in the mock; other people's tracks come from `mock.emit`.
+    nowPlayingStatus: () => Promise.resolve({ supported: true, track: null }),
+    nowPlayingCover: () => Promise.resolve(null),
+
     // settings
     settingsGet: () => Promise.resolve({ ...settings }),
     settingsUpdate: (next) => {
@@ -1016,6 +1119,9 @@ export function createMockApi(options: MockOptions = {}): MockApi {
     // message notifications: same decision as the engine (src-tauri/src/notifications.rs)
     notifyMessage: (notice) => {
       const mode = settings.notifications;
+      // Same choice as the engine: the ping replaces the message sound (gating by chat omitted).
+      if (notice.mention && settings.sounds.mention) messageSounds.push("mention");
+      else if (settings.sounds.messages) messageSounds.push("message");
       let outcome: NotifyOutcome;
       if (windowFocused && notice.onScreen) outcome = "none";
       else if (mode === "off") outcome = "none";
@@ -1063,6 +1169,7 @@ export function createMockApi(options: MockOptions = {}): MockApi {
         own: false,
         sentAt: new Date().toISOString(),
         body,
+        dismissedPreviews: [],
       };
       store(message);
       emit("messageReceived", { message });
@@ -1107,6 +1214,7 @@ export function createMockApi(options: MockOptions = {}): MockApi {
       windowFocused = focused;
     },
     desktopNotices: () => desktopNotices,
+    messageSounds: () => messageSounds,
   };
 
   const api: MockApi = { ...guarded, kind: "mock", on, mock };

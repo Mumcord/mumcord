@@ -12,6 +12,7 @@ import { RadioGroup } from "../components/RadioGroup";
 import { Group, Section } from "../components/Section";
 import { CompatibilityModeSwitch } from "./CompatibilityModeSwitch";
 import { Switch } from "../components/Switch";
+import { ThresholdMeter } from "../components/ThresholdMeter";
 import { errorText } from "../errors";
 import { keyCombo, mouseKey, mouseLabel } from "../pttKey";
 import type { SettingsSectionProps } from "./types";
@@ -114,6 +115,29 @@ export function VoiceSection({ settings, update }: SettingsSectionProps) {
           <p className="settings-warning">
             {t(`voice.unavailable.${unavailable}`)} {t("voice.suggestVoiceActivation")}
           </p>
+        )}
+        {!ptt && (
+          <>
+            <RadioGroup
+              legend={t("voice.sensitivityLegend")}
+              value={settings.voiceActivation}
+              options={[
+                { value: "automatic", label: t("voice.automatic") },
+                { value: "manual", label: t("voice.manual") },
+              ]}
+              onChange={(voiceActivation) => {
+                update({ voiceActivation });
+              }}
+            />
+            {settings.voiceActivation === "manual" && (
+              <ThresholdMeter
+                value={settings.voiceThresholdDbfs}
+                onChange={(voiceThresholdDbfs) => {
+                  update({ voiceThresholdDbfs });
+                }}
+              />
+            )}
+          </>
         )}
         {ptt && (
           <KeyCapture

@@ -40,6 +40,7 @@ export function renderInWizard(harness: Harness, ui: ReactNode) {
     resolvedTheme: "dark",
     language: "en",
     chatDisplay: "cozy",
+    linkPreviews: true,
     applySettings: harness.applySettings,
   };
   return render(

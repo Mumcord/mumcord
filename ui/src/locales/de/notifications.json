@@ -9,5 +9,6 @@
   "groupedPrivate_other": "{{count}} neue Nachrichten von {{name}}",
   "image": "Hat ein Bild gesendet",
   "open": "Chat öffnen",
-  "close": "Benachrichtigung schließen"
+  "close": "Benachrichtigung schließen",
+  "mentionLine": "{{sender}} hat dich erwähnt: {{preview}}"
 }

@@ -3,6 +3,12 @@
 
 use std::sync::atomic::{AtomicBool, AtomicU32, Ordering};
 
+/// Lowest and highest manual voice-activation threshold, in dBFS.
+pub const THRESHOLD_MIN_DBFS: f32 = -60.0;
+pub const THRESHOLD_MAX_DBFS: f32 = 0.0;
+/// Threshold used until a setting is applied.
+pub const THRESHOLD_DEFAULT_DBFS: f32 = -40.0;
+
 /// How the send gate decides when to transmit (FR-1.21).
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
 pub enum TalkMode {
@@ -38,6 +44,8 @@ pub struct DspControls {
     auto_gain: AtomicBool,
     music_quality: AtomicBool,
     push_to_talk: AtomicBool,
+    manual_threshold: AtomicBool,
+    threshold_dbfs: AtomicF32,
     ptt_pressed: AtomicBool,
     voice_active: AtomicBool,
     transmitting: AtomicBool,
@@ -56,6 +64,8 @@ impl Default for DspControls {
             auto_gain: AtomicBool::new(true),
             music_quality: AtomicBool::new(false),
             push_to_talk: AtomicBool::new(false),
+            manual_threshold: AtomicBool::new(false),
+            threshold_dbfs: AtomicF32::new(THRESHOLD_DEFAULT_DBFS),
             ptt_pressed: AtomicBool::new(false),
             voice_active: AtomicBool::new(false),
             transmitting: AtomicBool::new(false),
@@ -112,6 +122,26 @@ impl DspControls {
         } else {
             TalkMode::VoiceActivation
         }
+    }
+
+    /// Manual voice-activation threshold (FR-1.57): on, the voice-activation gate opens when the
+    /// processed input level reaches `threshold_dbfs` instead of following the speech model.
+    pub fn set_manual_threshold(&self, on: bool) {
+        self.manual_threshold.store(on, Ordering::Relaxed);
+    }
+
+    pub fn manual_threshold(&self) -> bool {
+        self.manual_threshold.load(Ordering::Relaxed)
+    }
+
+    /// Sets the manual threshold, clamped to the slider range.
+    pub fn set_threshold_dbfs(&self, dbfs: f32) {
+        self.threshold_dbfs
+            .store(dbfs.clamp(THRESHOLD_MIN_DBFS, THRESHOLD_MAX_DBFS));
+    }
+
+    pub fn threshold_dbfs(&self) -> f32 {
+        self.threshold_dbfs.load()
     }
 
     /// Push-to-talk key state, set by the global-shortcut handler.
@@ -183,5 +213,20 @@ impl AtomicF32 {
 
     fn store(&self, value: f32) {
         self.0.store(value.to_bits(), Ordering::Relaxed);
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn threshold_is_clamped_to_the_slider_range() {
+        let controls = DspControls::default();
+        assert_eq!(controls.threshold_dbfs(), THRESHOLD_DEFAULT_DBFS);
+        controls.set_threshold_dbfs(-120.0);
+        assert_eq!(controls.threshold_dbfs(), THRESHOLD_MIN_DBFS);
+        controls.set_threshold_dbfs(6.0);
+        assert_eq!(controls.threshold_dbfs(), THRESHOLD_MAX_DBFS);
     }
 }

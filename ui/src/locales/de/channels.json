@@ -37,7 +37,8 @@
     "serverDeafened": "Vom Server taub geschaltet",
     "suppressed": "Unterdrückt – darf in diesem Kanal nicht sprechen",
     "localMuted": "Für dich stummgeschaltet",
-    "unregistered": "Auf diesem Server nicht registriert (Gast)"
+    "unregistered": "Auf diesem Server nicht registriert (Gast)",
+    "nowPlaying": "Hört {{track}}"
   },
   "announce": {
     "joined": "{{name}} ist deinem Kanal beigetreten",

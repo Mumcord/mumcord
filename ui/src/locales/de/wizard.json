@@ -80,6 +80,8 @@
     "mouseOptIn": "Möchtest du eine seitliche Maustaste nutzen? Schalte nach der Einrichtung unter Einstellungen → Stimme „Maustasten erlauben“ ein.",
     "autostart": "Mumcord beim Anmelden starten",
     "autostartHint": "Du kannst das später unter Einstellungen → Darstellung ändern.",
-    "autostartFailed": "Mumcord konnte nicht für den Start beim Anmelden eingerichtet werden. Du kannst es in den Einstellungen erneut versuchen."
+    "autostartFailed": "Mumcord konnte nicht für den Start beim Anmelden eingerichtet werden. Du kannst es in den Einstellungen erneut versuchen.",
+    "linkPreviews": "Linkvorschauen und eingebettete Videos anzeigen",
+    "linkPreviewsHint": "Mumcord lädt verlinkte Seiten für Vorschauen und Videoplayer; diese Seiten sehen deine IP-Adresse."
   }
 }

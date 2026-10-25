@@ -80,6 +80,8 @@
     "mouseOptIn": "Want to use a mouse side button? Switch on \"Allow mouse buttons\" in Settings → Voice after setup.",
     "autostart": "Start Mumcord when I log in",
     "autostartHint": "You can change this later in Settings → Appearance.",
-    "autostartFailed": "Mumcord could not be set to start when you log in. You can try again in Settings."
+    "autostartFailed": "Mumcord could not be set to start when you log in. You can try again in Settings.",
+    "linkPreviews": "Show link previews and embeds",
+    "linkPreviewsHint": "Mumcord loads linked pages to show previews and video players; those sites see your IP address."
   }
 }

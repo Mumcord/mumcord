@@ -12,6 +12,8 @@ const EVENTS: (keyof SoundSettings)[] = [
   "selfDeaf",
   "hangUp",
   "messages",
+  "mention",
+  "mentionNotify",
 ];
 const NOTIFICATION_MODES: NotificationMode[] = ["both", "inApp", "desktop", "off"];
 

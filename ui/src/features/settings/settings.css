@@ -350,3 +350,66 @@
     padding: var(--space-4);
   }
 }
+
+.settings-meter__threshold {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  margin-left: -1px;
+  background: var(--color-danger);
+}
+
+.settings-threshold {
+  position: relative;
+  max-width: 28rem;
+}
+
+.settings-threshold .settings-meter {
+  position: relative;
+  margin: var(--space-2) 0;
+}
+
+/* The slider sits on top of the meter: invisible track, visible thumb. */
+.settings-threshold__slider {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  margin: 0;
+  background: transparent;
+  appearance: none;
+  cursor: pointer;
+}
+
+.settings-threshold__slider::-webkit-slider-runnable-track {
+  height: 100%;
+  background: transparent;
+}
+
+.settings-threshold__slider::-moz-range-track {
+  height: 100%;
+  background: transparent;
+}
+
+.settings-threshold__slider::-webkit-slider-thumb {
+  width: 0.5rem;
+  height: 1.25rem;
+  margin-top: -0.25rem;
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-sm);
+  background: var(--color-text);
+  appearance: none;
+}
+
+.settings-threshold__slider::-moz-range-thumb {
+  width: 0.5rem;
+  height: 1.25rem;
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-sm);
+  background: var(--color-text);
+}
+
+.settings-threshold__slider:focus-visible {
+  outline: 2px solid var(--color-focus, currentColor);
+  outline-offset: 2px;
+}

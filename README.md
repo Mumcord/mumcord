@@ -81,4 +81,6 @@ Bundles land in `target/release/bundle/`: `appimage/*.AppImage` (Linux), `nsis/*
 
 ## Licenses
 
-Mumcord is released under the [MIT License](LICENSE). Third-party licenses, including Mumble's BSD license for the protocol definitions in `proto/`, are listed in [`THIRD_PARTY_NOTICES`](THIRD_PARTY_NOTICES). Regenerate it with `scripts/generate-notices.sh` when dependencies change.
+Mumcord is licensed under the [GNU AGPL v3 only](LICENSE) from version 0.2.0. A [commercial license](COMMERCIAL.md) is available on request (tobias@vorwachs.com). Contributions require agreeing to the CLA described in [CONTRIBUTING.md](CONTRIBUTING.md). Versions up to and including 0.1.1 were released under the MIT License and stay MIT for those who have them.
+
+Third-party licenses, including Mumble's BSD license for the protocol definitions in `proto/`, are listed in [`THIRD_PARTY_NOTICES`](THIRD_PARTY_NOTICES). Regenerate it with `scripts/generate-notices.sh` when dependencies change.

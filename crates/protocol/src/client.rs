@@ -78,6 +78,19 @@ pub struct TextMessage {
     pub message: String,
 }
 
+/// Largest plugin data payload a standard server forwards (murmur's `MAX_DATA_LENGTH`).
+pub const PLUGIN_DATA_MAX: usize = 1000;
+
+/// Data another client sent through the server's plugin data channel.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct PluginData {
+    /// Sender session as stamped by the server.
+    pub sender: Option<u32>,
+    /// What the data is; receivers ignore ids they do not know.
+    pub data_id: String,
+    pub data: Bytes,
+}
+
 /// Why the connection ended.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum DisconnectReason {
@@ -122,6 +135,8 @@ pub enum Event {
     CryptSetup(CryptSetup),
     /// A voice packet tunnelled through TCP (raw, unencrypted Mumble UDP packet).
     UdpTunnel(Bytes),
+    /// Plugin data from another client (server 1.4+). `data` is untrusted and unvalidated.
+    PluginData(PluginData),
     /// Final event; the handle stops working afterwards.
     Disconnected(DisconnectReason),
 }
@@ -536,6 +551,14 @@ impl Dispatcher {
                     message: m.message,
                 }));
             }
+            MessageType::PluginDataTransmission => {
+                let m: proto::PluginDataTransmission = decode("PluginDataTransmission", payload)?;
+                self.emit(Event::PluginData(PluginData {
+                    sender: m.sender_session,
+                    data_id: m.data_id.unwrap_or_default(),
+                    data: m.data.map(Bytes::from).unwrap_or_default(),
+                }));
+            }
             MessageType::PermissionDenied => {
                 let m: proto::PermissionDenied = decode("PermissionDenied", payload)?;
                 self.emit(Event::PermissionDenied(m.into()));
@@ -724,6 +747,24 @@ impl Handle {
         self.send(Frame::from_message(MessageType::TextMessage, &m))
     }
 
+    /// Sends plugin data to the given sessions (server 1.4+). The server drops data over
+    /// [`PLUGIN_DATA_MAX`] bytes and rate-limits senders, so keep it small and infrequent.
+    pub fn send_plugin_data(
+        &self,
+        receivers: &[u32],
+        data_id: &str,
+        data: Vec<u8>,
+    ) -> Result<(), CommandError> {
+        self.require("plugin data", MumbleVersion::PLUGIN_DATA)?;
+        let m = proto::PluginDataTransmission {
+            sender_session: self.shared.state().session,
+            receiver_sessions: receivers.to_vec(),
+            data: Some(data),
+            data_id: Some(data_id.to_owned()),
+        };
+        self.send(Frame::from_message(MessageType::PluginDataTransmission, &m))
+    }
+
     /// Asks for full avatars/comments/descriptions that were announced only by hash.
     pub fn request_blobs(
         &self,
@@ -817,6 +858,41 @@ mod tests {
         };
         assert_eq!(frame.kind, MessageType::Acl as u16);
         assert_eq!(proto::Acl::decode(frame.payload).expect("decode"), acl);
+    }
+
+    #[test]
+    fn plugin_data_needs_a_1_4_server_and_names_the_receivers() {
+        let (tx, mut rx) = mpsc::unbounded_channel();
+        let state = ServerState {
+            session: Some(7),
+            ..Default::default()
+        };
+        let handle = Handle {
+            tx,
+            shared: Arc::new(Shared {
+                state: Mutex::new(state),
+                shutdown: Notify::new(),
+                reason: Mutex::new(None),
+                connected: AtomicBool::new(true),
+            }),
+        };
+        assert!(matches!(
+            handle.send_plugin_data(&[3], "id", vec![1]),
+            Err(CommandError::Unsupported { .. })
+        ));
+        handle.shared.state().server.version = Some(MumbleVersion::new(1, 4, 0));
+        handle
+            .send_plugin_data(&[3, 4], "mumcord.test", b"{}".to_vec())
+            .expect("queued");
+        let Ok(Outgoing::Frame(frame)) = rx.try_recv() else {
+            panic!("expected a frame");
+        };
+        assert_eq!(frame.kind, MessageType::PluginDataTransmission as u16);
+        let m = proto::PluginDataTransmission::decode(frame.payload).expect("decode");
+        assert_eq!(m.sender_session, Some(7));
+        assert_eq!(m.receiver_sessions, vec![3, 4]);
+        assert_eq!(m.data_id.as_deref(), Some("mumcord.test"));
+        assert_eq!(m.data.as_deref(), Some(&b"{}"[..]));
     }
 }
 

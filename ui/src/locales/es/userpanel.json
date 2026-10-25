@@ -54,5 +54,7 @@
     "notConnected": "No estás conectado a ningún servidor.",
     "file": "No se pudo leer o escribir el archivo.",
     "generic": "Algo salió mal. Inténtalo de nuevo."
-  }
+  },
+  "ptt": "Pulsar para hablar: mantén {{key}} para hablar",
+  "pttNoKey": "Pulsar para hablar: sin tecla asignada"
 }

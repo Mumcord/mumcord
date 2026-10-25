@@ -25,6 +25,22 @@ pub enum TalkMode {
     PushToTalk,
 }
 
+/// How voice activation decides to open the mic (FR-1.57, QA.39).
+#[derive(Debug, Clone, Copy, Default, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum VoiceActivation {
+    /// Speech detection (default).
+    #[default]
+    Automatic,
+    /// Opens when the input level reaches `voice_threshold_dbfs`.
+    Manual,
+}
+
+/// Default manual threshold in dBFS.
+pub const DEFAULT_VOICE_THRESHOLD_DBFS: i32 = -40;
+/// Default for `Settings::preview_cache_days` (QA.42).
+pub const DEFAULT_PREVIEW_CACHE_DAYS: u32 = 7;
+
 /// What closing the main window does while connected (FR-1.38).
 #[derive(Debug, Clone, Copy, Default, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "snake_case")]
@@ -81,6 +97,10 @@ pub struct SoundSettings {
     pub self_deafen: bool,
     /// New message in a followed channel or private chat.
     pub new_message: bool,
+    /// A message mentions you: the "ping" in place of the message sound (QA.41).
+    pub mention: bool,
+    /// A mention gets its own highlighted notification (QA.41).
+    pub mention_notify: bool,
     /// You join a channel for voice yourself (QA.23).
     pub voice_join: bool,
     /// You disconnect from a server yourself (QA.19).
@@ -95,6 +115,8 @@ impl Default for SoundSettings {
             self_mute: true,
             self_deafen: true,
             new_message: true,
+            mention: true,
+            mention_notify: true,
             voice_join: true,
             hang_up: true,
         }
@@ -165,6 +187,9 @@ pub struct Settings {
     /// UI language code (`en`, `es`, `de`); `None` follows the OS language.
     pub language: Option<String>,
     pub talk_mode: TalkMode,
+    pub voice_activation: VoiceActivation,
+    /// Manual voice-activation threshold in dBFS, -60 to 0 (FR-1.57). Used in manual mode only.
+    pub voice_threshold_dbfs: i32,
     pub ptt_key: Option<String>,
     /// Linux Wayland: read mouse buttons for push-to-talk from input devices (needs the
     /// `input` group; opt-in, FR-1.39, QA.4).
@@ -200,6 +225,17 @@ pub struct Settings {
     /// A fresh connect lands read-only (muted and deafened) until the user joins a channel.
     /// Off: it applies the last own mute/deafen choice right away (FR-1.14, QA.22).
     pub connect_muted: bool,
+    /// Show link previews and video player cards in chat; Mumcord then fetches linked pages
+    /// itself (FR-1.49, QA.34). Off: plain links only and no requests.
+    pub link_previews: bool,
+    /// Cached previews, thumbnails and images are deleted after this many days; `None` keeps
+    /// them (QA.42).
+    pub preview_cache_days: Option<u32>,
+    /// Local chat history older than this many days is deleted; `None` keeps it (QA.42).
+    pub history_max_age_days: Option<u32>,
+    /// Share the track playing in the system's media player with others on the server
+    /// (FR-1.58). Opt-in: nothing is read from the system while off.
+    pub now_playing: bool,
 }
 
 impl Default for Settings {
@@ -209,6 +245,8 @@ impl Default for Settings {
             theme: ThemePreference::default(),
             language: None,
             talk_mode: TalkMode::default(),
+            voice_activation: VoiceActivation::default(),
+            voice_threshold_dbfs: DEFAULT_VOICE_THRESHOLD_DBFS,
             ptt_key: None,
             allow_mouse_buttons: false,
             ptt_compatibility_mode: false,
@@ -230,6 +268,10 @@ impl Default for Settings {
             autostart: false,
             start_minimized: true,
             connect_muted: true,
+            link_previews: true,
+            preview_cache_days: Some(DEFAULT_PREVIEW_CACHE_DAYS),
+            history_max_age_days: None,
+            now_playing: false,
         }
     }
 }
@@ -302,11 +344,15 @@ mod tests {
         assert_eq!(defaults, Settings::default());
         assert!(defaults.noise_suppression && defaults.echo_cancellation && defaults.auto_gain);
         assert_eq!(defaults.talk_mode, TalkMode::VoiceActivation);
+        assert_eq!(defaults.voice_activation, VoiceActivation::Automatic);
+        assert_eq!(defaults.voice_threshold_dbfs, -40);
 
         let mut changed = defaults;
         changed.theme = ThemePreference::Light;
         changed.talk_mode = TalkMode::PushToTalk;
         changed.ptt_key = Some("F13".into());
+        changed.voice_activation = VoiceActivation::Manual;
+        changed.voice_threshold_dbfs = -25;
         changed.sounds.user_left = false;
         changed.sounds.voice_join = false;
         changed.sounds.hang_up = false;
@@ -370,6 +416,27 @@ mod tests {
     }
 
     #[test]
+    fn now_playing_switch_persists_on_records_saved_before_it_existed() {
+        let (_dir, store) = temp_store();
+        // A record written by a build without the switch (as found on a real install).
+        let old = r#"{"wizard_completed":true,"input_device":"alsa:sysdefault:CARD=II","link_previews":true}"#;
+        let parsed: Settings = serde_json::from_str(old).expect("parse");
+        assert!(!parsed.now_playing, "off until the user turns it on");
+        store
+            .save_settings(&Settings {
+                now_playing: true,
+                ..parsed
+            })
+            .expect("save");
+        let reloaded = store.settings().expect("reload");
+        assert!(reloaded.now_playing);
+        assert_eq!(
+            reloaded.input_device.as_deref(),
+            Some("alsa:sysdefault:CARD=II")
+        );
+    }
+
+    #[test]
     fn partial_json_falls_back_to_defaults() {
         let parsed: Settings =
             serde_json::from_str(r#"{"theme":"dark","sounds":{"user_joined":false}}"#)
@@ -390,6 +457,12 @@ mod tests {
         assert!(!parsed.wizard_completed);
         assert_eq!(parsed.log_level, LogLevel::Info);
         assert_eq!(parsed.notifications, NotificationMode::Both);
+        assert!(parsed.link_previews, "link previews are on for old records");
+        assert_eq!(parsed.preview_cache_days, Some(7), "7 days for old records");
+        assert_eq!(
+            parsed.history_max_age_days, None,
+            "history is kept by default"
+        );
         assert!(
             parsed.send_default_avatar,
             "on by default, also for old records"

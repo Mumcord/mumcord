@@ -46,6 +46,7 @@ describe("Wizard", () => {
     expect(harness.applySettings).toHaveBeenCalledWith(saved);
     expect(await harness.api.linkHandlerStatus()).toBe(true);
     expect(saved.autostart).toBe(false);
+    expect(saved.linkPreviews).toBe(true);
   });
 
   it("announces the step through the focused heading's description", async () => {
@@ -194,6 +195,23 @@ describe("Wizard", () => {
     });
     const saved = await harness.api.settingsGet();
     expect(saved).toMatchObject({ wizardCompleted: true, autostart: true, startMinimized: true });
+    expect(harness.applySettings).toHaveBeenCalledWith(saved);
+  });
+
+  it("turns link previews off when unticked", async () => {
+    renderInWizard(harness, <Wizard />);
+    await createIdentity();
+    fireEvent.click(screen.getByRole("button", { name: "Next" }));
+    const previews = await screen.findByRole("checkbox", { name: "Show link previews and embeds" });
+    expect(previews).toBeChecked();
+    expect(previews).toHaveAccessibleDescription(/see your IP address/);
+    fireEvent.click(previews);
+    fireEvent.click(screen.getByRole("button", { name: "Finish" }));
+    await waitFor(() => {
+      expect(harness.finishWizard).toHaveBeenCalledOnce();
+    });
+    const saved = await harness.api.settingsGet();
+    expect(saved).toMatchObject({ wizardCompleted: true, linkPreviews: false });
     expect(harness.applySettings).toHaveBeenCalledWith(saved);
   });
 

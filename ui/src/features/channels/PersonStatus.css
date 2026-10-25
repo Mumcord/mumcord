@@ -29,6 +29,10 @@
   color: var(--color-local-muted);
 }
 
+.person-icon--music {
+  color: var(--color-accent);
+}
+
 .person-icon-slot {
   display: inline-flex;
 }

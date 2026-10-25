@@ -6,7 +6,7 @@ use specta::Type;
 use tauri::State;
 use tauri_specta::Event;
 
-use super::types::{ApiResult, ChannelId, Conversation, SessionId};
+use super::types::{ApiError, ApiResult, ChannelId, Conversation, ErrorCode, SessionId};
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, Type)]
 #[serde(rename_all = "camelCase")]
@@ -24,6 +24,8 @@ pub struct ChatMessage {
     pub sent_at: String,
     /// Sanitized HTML; the UI sanitizes again before rendering.
     pub body: String,
+    /// Links whose preview card was dismissed by the user (`preview_dismiss`).
+    pub dismissed_previews: Vec<String>,
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, Type, Event)]
@@ -65,6 +67,7 @@ impl From<ChatMessageView> for ChatMessage {
             own: v.own,
             sent_at: rfc3339(v.sent_at),
             body: v.body,
+            dismissed_previews: v.dismissed_previews,
         }
     }
 }
@@ -93,14 +96,45 @@ fn rfc3339(millis: i64) -> String {
     )
 }
 
+/// Writes the image of a `data:` URL to `path` (the viewer's "Save image", FR-1.56). The data is
+/// already in the UI, so nothing is fetched again.
+#[tauri::command]
+#[specta::specta]
+pub async fn save_image(path: String, data_url: String) -> ApiResult<()> {
+    let bytes = decode_image_data_url(&data_url)?;
+    std::fs::write(&path, bytes).map_err(|err| ApiError::new(ErrorCode::Io, err.to_string()))
+}
+
+/// The bytes of a base64 `data:image/...` URL; anything else is rejected.
+fn decode_image_data_url(data_url: &str) -> Result<Vec<u8>, ApiError> {
+    use base64::Engine as _;
+    let invalid = || ApiError::new(ErrorCode::InvalidInput, "not an image data URL");
+    let rest = data_url.strip_prefix("data:image/").ok_or_else(invalid)?;
+    let (_, payload) = rest.split_once(";base64,").ok_or_else(invalid)?;
+    base64::engine::general_purpose::STANDARD
+        .decode(payload)
+        .map_err(|_| invalid())
+}
+
 #[cfg(test)]
 mod tests {
-    use super::rfc3339;
+    use super::{decode_image_data_url, rfc3339};
 
     #[test]
     fn formats_rfc3339() {
         assert_eq!(rfc3339(0), "1970-01-01T00:00:00.000Z");
         assert_eq!(rfc3339(951_782_400_123), "2000-02-29T00:00:00.123Z");
         assert_eq!(rfc3339(1_792_829_730_250), "2026-10-24T08:15:30.250Z");
+    }
+
+    #[test]
+    fn decodes_image_data_urls_only() {
+        assert_eq!(
+            decode_image_data_url("data:image/png;base64,AQID").expect("valid data URL"),
+            vec![1, 2, 3]
+        );
+        assert!(decode_image_data_url("data:text/html;base64,AQID").is_err());
+        assert!(decode_image_data_url("https://example.com/a.png").is_err());
+        assert!(decode_image_data_url("data:image/png;base64,***").is_err());
     }
 }

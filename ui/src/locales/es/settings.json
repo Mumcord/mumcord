@@ -112,7 +112,16 @@
     "compatRestartNeeded": "Se aplica cuando Mumcord se reinicie. Te desconectarás un momento.",
     "compatRestart": "Reiniciar ahora",
     "compatRestartFailed": "Mumcord no pudo reiniciarse. Ciérralo y ábrelo tú mismo.",
-    "compatActive": "El modo de compatibilidad está activado: pulsar para hablar usa la forma X11. Las teclas funcionan sin diálogo del escritorio; los botones del ratón funcionan si el ajuste X11 heredado de tu escritorio lo permite."
+    "compatActive": "El modo de compatibilidad está activado: pulsar para hablar usa la forma X11. Las teclas funcionan sin diálogo del escritorio; los botones del ratón funcionan si el ajuste X11 heredado de tu escritorio lo permite.",
+    "sensitivityLegend": "Sensibilidad de la activación por voz",
+    "automatic": "Automática – detecta tu voz",
+    "manual": "Umbral manual – envía por encima de un nivel que fijas",
+    "level": "Nivel del micrófono",
+    "threshold": "Umbral de activación por voz",
+    "thresholdValue": "{{value}} dBFS",
+    "thresholdHint": "Arrastra el control deslizante sobre el medidor. Mumcord envía mientras el nivel esté por encima de la línea, y un instante después.",
+    "measure": "Mostrar nivel en vivo",
+    "measuring": "Midiendo… habla ahora"
   },
   "history": {
     "explanation": "Los mensajes del chat se guardan solo en este ordenador.",
@@ -126,7 +135,10 @@
     "confirmServer": "Todos los mensajes guardados de {{server}} se borrarán de este ordenador. No se puede deshacer.",
     "confirmAll": "Todos los mensajes guardados de todos los servidores se borrarán de este ordenador. No se puede deshacer.",
     "confirm": "Borrar historial",
-    "cleared": "Historial borrado."
+    "cleared": "Historial borrado.",
+    "autoDelete": "Eliminar el historial de chat anterior a",
+    "autoDeleteOff": "Nunca (conservar todo)",
+    "autoDeleteHint": "Los mensajes más antiguos se eliminan de este equipo automáticamente, sin preguntar. Solo afecta al historial guardado aquí, no al servidor."
   },
   "appearance": {
     "messageDisplay": "Visualización de mensajes",
@@ -158,7 +170,9 @@
     "selfMute": "Te silencias o activas el micrófono",
     "selfDeaf": "Te ensordeces o vuelves a oír",
     "hangUp": "Te desconectas de un servidor",
-    "messages": "Mensaje nuevo en un canal seguido o chat privado"
+    "messages": "Mensaje nuevo en un canal seguido o chat privado",
+    "mention": "Sonido al ser mencionado",
+    "mentionNotify": "Notificar al ser mencionado"
   },
   "notifications": {
     "title": "Notificaciones",
@@ -190,7 +204,8 @@
   "about": {
     "version": "Versión",
     "os": "Sistema",
-    "license": "Licencia de Mumcord (MIT)",
+    "license": "Licencia de Mumcord (AGPL-3.0)",
+    "commercial": "Licencias comerciales: tobias@vorwachs.com",
     "notices": "Avisos de terceros",
     "noticesHint": "Mumcord se basa en software de código abierto, incluido código del proyecto Mumble.",
     "noticesFailed": "No se pudieron cargar los avisos de terceros.",
@@ -208,5 +223,30 @@
     "sendToNew": "Enviar automáticamente a servidores nuevos",
     "sendToNewHint": "Se envía una sola vez, la primera vez que te conectas a un servidor donde aún no tienes avatar. No se vuelve a enviar a ese servidor, aunque cambies o quites tu avatar allí.",
     "skipped": "Tu avatar predeterminado no se envió: es demasiado grande para este servidor."
+  },
+  "linkPreviews": {
+    "title": "Vistas previas de enlaces",
+    "switch": "Mostrar vistas previas de enlaces y vídeos incrustados",
+    "hint": "Mumcord carga las páginas enlazadas para mostrar vistas previas y reproductores; esos sitios ven tu dirección IP."
+  },
+  "nowPlaying": {
+    "title": "Reproduciendo ahora",
+    "switch": "Compartir lo que escucho",
+    "hint": "Mumcord lee la canción actual del reproductor multimedia de tu sistema (por ejemplo Spotify), sin iniciar sesión en Spotify. Otros usuarios de Mumcord ven título, artista, portada y progreso; los clientes oficiales de Mumble ven una línea «🎵 Artista – Título» al final de tu comentario.",
+    "unsupported": "No compatible con macOS: el sistema no permite a las apps leer la canción actual.",
+    "current": "Compartiendo: {{track}}",
+    "nothing": "No se está reproduciendo nada."
+  },
+  "previewCache": {
+    "title": "Vistas previas en caché",
+    "after": "Eliminar las vistas previas en caché después de",
+    "hint": "Las vistas previas de enlaces, miniaturas e imágenes externas se guardan en este equipo para cargar más rápido. Las antiguas se eliminan automáticamente.",
+    "never": "Nunca",
+    "clearNow": "Vaciar ahora",
+    "cleared": "Caché vaciada, se liberaron {{size}}."
+  },
+  "retention": {
+    "days_one": "{{count}} día",
+    "days_other": "{{count}} días"
   }
 }

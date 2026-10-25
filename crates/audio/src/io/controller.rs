@@ -15,6 +15,10 @@ use super::{BackendKind, DeviceEvent, DeviceInfo, Direction, IoError, IoStats};
 
 /// How often the control thread checks for device changes and failed streams.
 const POLL_INTERVAL: Duration = Duration::from_secs(2);
+/// While on the fallback, a chosen device that is listed but does not open is tried again
+/// after this delay, doubling up to `RETRY_MAX`. A device that newly appears is tried at once.
+const RETRY_MIN: Duration = POLL_INTERVAL;
+const RETRY_MAX: Duration = Duration::from_secs(60);
 
 /// Keeps a device stream alive; dropping it stops the stream.
 pub(crate) trait StreamGuard {
@@ -180,6 +184,23 @@ struct Slot {
     active: Option<Active>,
     /// Whether the last open attempt failed (to report it only once).
     unavailable: bool,
+    /// Whether "chosen device unavailable" was already logged for the current choice.
+    chosen_reported: bool,
+    /// Whether the chosen device was in the last device list (to notice it reappearing).
+    chosen_listed: bool,
+    /// While on the fallback: the current retry delay and when to try the chosen device again.
+    retry_delay: Duration,
+    retry_at: Option<Instant>,
+}
+
+/// What a poll decided for one direction.
+#[derive(Debug, PartialEq, Eq)]
+enum Action {
+    Keep,
+    /// Stop the stream and open the chosen device, else the default.
+    Reopen,
+    /// Try the chosen device while the fallback keeps running; switch only if it opens.
+    TryChosen,
 }
 
 struct Active {
@@ -194,7 +215,20 @@ impl Slot {
             preferred,
             active: None,
             unavailable: false,
+            chosen_reported: false,
+            chosen_listed: false,
+            retry_delay: RETRY_MIN,
+            retry_at: None,
         }
+    }
+
+    /// A new choice: report and retry it afresh.
+    fn choose(&mut self, preferred: Option<String>) {
+        self.preferred = preferred;
+        self.chosen_reported = false;
+        self.chosen_listed = false;
+        self.retry_delay = RETRY_MIN;
+        self.retry_at = None;
     }
 }
 
@@ -212,15 +246,15 @@ struct Control<'a> {
 
 impl Control<'_> {
     fn run(&mut self, commands: Receiver<Command>) {
-        self.reopen(Direction::Input);
-        self.reopen(Direction::Output);
+        self.reopen(Direction::Input, Instant::now());
+        self.reopen(Direction::Output, Instant::now());
         let mut next_poll = Instant::now() + POLL_INTERVAL;
         loop {
             let wait = next_poll.saturating_duration_since(Instant::now());
             match commands.recv_timeout(wait) {
                 Ok(Command::SetDevice(direction, id)) => {
-                    self.slot(direction).preferred = id;
-                    self.reopen(direction);
+                    self.slot(direction).choose(id);
+                    self.reopen(direction, Instant::now());
                 }
                 Ok(Command::Devices(direction, reply)) => {
                     // The caller may have given up waiting; nothing to do then.
@@ -230,7 +264,7 @@ impl Control<'_> {
                 Err(RecvTimeoutError::Timeout) => {}
             }
             if Instant::now() >= next_poll {
-                self.poll();
+                self.poll(Instant::now());
                 next_poll = Instant::now() + POLL_INTERVAL;
             }
         }
@@ -246,7 +280,7 @@ impl Control<'_> {
     /// Detects device list changes and reopens streams that failed, lost
     /// their device, run on a fallback whose preferred device came back, or
     /// follow an OS default that moved.
-    fn poll(&mut self) {
+    fn poll(&mut self, now: Instant) {
         let lists = if self.backend.polls_devices() {
             match (
                 self.backend.devices(Direction::Input),
@@ -281,37 +315,79 @@ impl Control<'_> {
                 Direction::Input => inputs.as_slice(),
                 Direction::Output => outputs.as_slice(),
             });
-            if self.needs_reopen(direction, list) {
-                self.reopen(direction);
+            match self.check(direction, list, now) {
+                Action::Keep => {}
+                Action::Reopen => self.reopen(direction, now),
+                Action::TryChosen => self.try_chosen(direction, now),
             }
         }
     }
 
-    fn needs_reopen(&mut self, direction: Direction, list: Option<&[DeviceInfo]>) -> bool {
+    fn check(&mut self, direction: Direction, list: Option<&[DeviceInfo]>, now: Instant) -> Action {
         let slot = self.slot(direction);
+        // Whether the chosen device just appeared in the list (it was missing before).
+        let mut reappeared = false;
+        if let (Some(list), Some(chosen)) = (list, slot.preferred.as_deref()) {
+            let listed = list.iter().any(|d| d.id == chosen);
+            reappeared = listed && !slot.chosen_listed;
+            slot.chosen_listed = listed;
+        }
         let Some(active) = &slot.active else {
-            return true;
+            return Action::Reopen;
         };
         if active.guard.failed() {
             tracing::warn!("{direction:?} audio stream failed; reopening");
-            return true;
+            return Action::Reopen;
         }
         let Some(list) = list else {
-            return false;
+            return Action::Keep;
         };
-        let present = |id: &str| list.iter().any(|d| d.id == id);
         let follows_default = active.fallback || slot.preferred.is_none();
         let default_moved = list
             .iter()
             .any(|d| d.is_default && d.id != active.device.id);
-        !present(&active.device.id)
-            || (active.fallback && slot.preferred.as_deref().is_some_and(present))
-            || (follows_default && default_moved)
+        if !list.iter().any(|d| d.id == active.device.id) || (follows_default && default_moved) {
+            return Action::Reopen;
+        }
+        // Listed is not the same as usable: a listed device that fails to open must not tear
+        // down the running fallback every poll, so it is retried with a growing delay.
+        let retry_due = slot.retry_at.is_none_or(|at| now >= at);
+        if active.fallback && slot.chosen_listed && (reappeared || retry_due) {
+            if reappeared {
+                slot.retry_delay = RETRY_MIN;
+            }
+            return Action::TryChosen;
+        }
+        Action::Keep
+    }
+
+    /// While on the fallback: opens the chosen device and switches to it only if that works,
+    /// so the fallback stream keeps running when the chosen device is still unusable.
+    fn try_chosen(&mut self, direction: Direction, now: Instant) {
+        let Some(chosen) = self.slot(direction).preferred.clone() else {
+            return;
+        };
+        match self.open(direction, Some(&chosen)) {
+            Ok((guard, device)) => {
+                tracing::info!("chosen {direction:?} device is back; switched to it");
+                self.started(direction, guard, device, false);
+            }
+            Err(e) => {
+                tracing::debug!("chosen {direction:?} device still unavailable ({e})");
+                self.schedule_retry(direction, now);
+            }
+        }
+    }
+
+    fn schedule_retry(&mut self, direction: Direction, now: Instant) {
+        let slot = self.slot(direction);
+        slot.retry_at = Some(now + slot.retry_delay);
+        slot.retry_delay = (slot.retry_delay * 2).min(RETRY_MAX);
     }
 
     /// (Re)opens the stream for `direction`: the preferred device, else the
     /// OS default. Hands the new ring to the frame handle and reports it.
-    fn reopen(&mut self, direction: Direction) {
+    fn reopen(&mut self, direction: Direction, now: Instant) {
         // Stop the old stream first; some devices allow only one stream.
         self.slot(direction).active = None;
         let preferred = self.slot(direction).preferred.clone();
@@ -320,29 +396,20 @@ impl Control<'_> {
                 .open(direction, Some(id))
                 .map(|a| (a, false))
                 .or_else(|e| {
-                    tracing::warn!(
-                        "chosen {direction:?} device unavailable ({e}); using the default"
-                    );
+                    let slot = self.slot(direction);
+                    if !slot.chosen_reported {
+                        slot.chosen_reported = true;
+                        tracing::warn!(
+                            "chosen {direction:?} device unavailable ({e}); using the default"
+                        );
+                    }
+                    self.schedule_retry(direction, now);
                     self.open(direction, None).map(|a| (a, true))
                 }),
             None => self.open(direction, None).map(|a| (a, false)),
         };
         match result {
-            Ok(((guard, device), fallback)) => {
-                tracing::info!("{direction:?} audio stream started (fallback: {fallback})");
-                let slot = self.slot(direction);
-                slot.unavailable = false;
-                slot.active = Some(Active {
-                    guard,
-                    device: device.clone(),
-                    fallback,
-                });
-                self.emit(DeviceEvent::Active {
-                    direction,
-                    device,
-                    fallback,
-                });
-            }
+            Ok(((guard, device), fallback)) => self.started(direction, guard, device, fallback),
             Err(e) => {
                 let slot = self.slot(direction);
                 if !slot.unavailable {
@@ -355,6 +422,34 @@ impl Control<'_> {
                 }
             }
         }
+    }
+
+    /// Records a newly started stream (replacing and stopping the old one) and reports it.
+    fn started(
+        &mut self,
+        direction: Direction,
+        guard: Box<dyn StreamGuard>,
+        device: DeviceInfo,
+        fallback: bool,
+    ) {
+        tracing::info!("{direction:?} audio stream started (fallback: {fallback})");
+        let slot = self.slot(direction);
+        slot.unavailable = false;
+        if !fallback {
+            slot.chosen_reported = false;
+            slot.retry_delay = RETRY_MIN;
+            slot.retry_at = None;
+        }
+        slot.active = Some(Active {
+            guard,
+            device: device.clone(),
+            fallback,
+        });
+        self.emit(DeviceEvent::Active {
+            direction,
+            device,
+            fallback,
+        });
     }
 
     fn open(
@@ -684,6 +779,24 @@ mod tests {
         );
     }
 
+    /// Opens a real device by the id the device list shows (as saved in the settings); a sound
+    /// card that PipeWire or PulseAudio holds reports "busy" here, not "not found":
+    /// `MUMCORD_TEST_DEVICE=alsa:sysdefault:CARD=X cargo test -p mumcord-audio -- --ignored
+    /// --nocapture opens_listed_device_by_id`.
+    #[test]
+    #[ignore = "needs audio hardware and MUMCORD_TEST_DEVICE"]
+    fn opens_listed_device_by_id() {
+        let id = std::env::var("MUMCORD_TEST_DEVICE").expect("MUMCORD_TEST_DEVICE");
+        let backend = CpalBackend::new();
+        let counters = Arc::new(Counters::default());
+        if let Err(e) = backend.open_input(Some(&id), &counters) {
+            panic!("opening the input failed: {e}");
+        }
+        if let Err(e) = backend.open_output(Some(&id), &counters) {
+            panic!("opening the output failed: {e}");
+        }
+    }
+
     /// Lists this machine's real devices: `cargo test -p mumcord-audio -- --ignored --nocapture list_devices`.
     #[test]
     #[ignore = "needs audio hardware"]
@@ -716,5 +829,192 @@ mod tests {
             println!("event: {event:?}");
         }
         println!("stats: {:?}", handles.io.stats());
+    }
+
+    mod fallback {
+        use std::cell::{Cell, RefCell};
+        use std::rc::Rc;
+
+        use rtrb::RingBuffer;
+
+        use super::*;
+
+        const CHOSEN: &str = "alsa:sysdefault:CARD=II";
+        const DEFAULT: &str = "alsa:default";
+
+        /// A backend whose device list and openable devices the test controls.
+        #[derive(Default)]
+        struct Fake {
+            listed: RefCell<Vec<String>>,
+            openable: RefCell<Vec<String>>,
+            /// Input open attempts, by device id.
+            attempts: RefCell<Vec<String>>,
+            /// Streams currently running.
+            live: Rc<Cell<usize>>,
+        }
+
+        struct Guard(Rc<Cell<usize>>);
+
+        impl StreamGuard for Guard {
+            fn failed(&self) -> bool {
+                false
+            }
+        }
+
+        impl Drop for Guard {
+            fn drop(&mut self) {
+                self.0.set(self.0.get() - 1);
+            }
+        }
+
+        impl Fake {
+            fn new(listed: &[&str], openable: &[&str]) -> Self {
+                let fake = Self::default();
+                fake.set(listed, openable);
+                fake
+            }
+
+            fn set(&self, listed: &[&str], openable: &[&str]) {
+                *self.listed.borrow_mut() = listed.iter().map(|s| (*s).to_owned()).collect();
+                *self.openable.borrow_mut() = openable.iter().map(|s| (*s).to_owned()).collect();
+            }
+
+            fn attempts(&self, id: &str) -> usize {
+                self.attempts.borrow().iter().filter(|a| *a == id).count()
+            }
+
+            fn open<R>(
+                &self,
+                direction: Direction,
+                id: Option<&str>,
+                ring: R,
+            ) -> Result<Opened<R>, IoError> {
+                let id = id.unwrap_or(DEFAULT).to_owned();
+                if direction == Direction::Input {
+                    self.attempts.borrow_mut().push(id.clone());
+                }
+                if !self.openable.borrow().contains(&id) {
+                    return Err(IoError::DeviceNotFound);
+                }
+                self.live.set(self.live.get() + 1);
+                Ok(Opened {
+                    guard: Box::new(Guard(self.live.clone())),
+                    ring,
+                    rate: SAMPLE_RATE,
+                    device: DeviceInfo {
+                        is_default: id == DEFAULT,
+                        name: id.clone(),
+                        id,
+                    },
+                })
+            }
+        }
+
+        impl Backend for Fake {
+            fn devices(&self, _direction: Direction) -> Result<Vec<DeviceInfo>, IoError> {
+                Ok(self
+                    .listed
+                    .borrow()
+                    .iter()
+                    .map(|id| DeviceInfo {
+                        id: id.clone(),
+                        name: id.clone(),
+                        is_default: id == DEFAULT,
+                    })
+                    .collect())
+            }
+
+            fn polls_devices(&self) -> bool {
+                true
+            }
+
+            fn open_input(
+                &self,
+                id: Option<&str>,
+                _counters: &Arc<Counters>,
+            ) -> Result<Opened<Consumer<f32>>, IoError> {
+                self.open(Direction::Input, id, RingBuffer::new(64).1)
+            }
+
+            fn open_output(
+                &self,
+                id: Option<&str>,
+                _counters: &Arc<Counters>,
+            ) -> Result<Opened<Producer<f32>>, IoError> {
+                self.open(Direction::Output, id, RingBuffer::new(64).0)
+            }
+        }
+
+        /// A control thread state whose input prefers `CHOSEN` and output follows the default.
+        fn control(fake: &Fake) -> (Control<'_>, Receiver<DeviceEvent>) {
+            let (events, events_rx) = mpsc::channel();
+            let control = Control {
+                backend: fake,
+                counters: Arc::new(Counters::default()),
+                events,
+                capture: mpsc::channel().0,
+                playback: mpsc::channel().0,
+                input: Slot::new(Some(CHOSEN.to_owned())),
+                output: Slot::new(None),
+                known_devices: None,
+            };
+            (control, events_rx)
+        }
+
+        fn actives(events: &Receiver<DeviceEvent>) -> Vec<bool> {
+            events
+                .try_iter()
+                .filter_map(|e| match e {
+                    DeviceEvent::Active {
+                        direction: Direction::Input,
+                        fallback,
+                        ..
+                    } => Some(fallback),
+                    _ => None,
+                })
+                .collect()
+        }
+
+        #[test]
+        fn listed_but_unusable_choice_keeps_the_fallback_running() {
+            let fake = Fake::new(&[DEFAULT, CHOSEN], &[DEFAULT]);
+            let (mut control, events) = control(&fake);
+            let t0 = Instant::now();
+            control.reopen(Direction::Input, t0);
+            assert_eq!(actives(&events), [true]);
+            // Two minutes of polls: the fallback is never restarted and the chosen device is
+            // retried with a growing delay instead of on every poll.
+            for step in 1..=60 {
+                control.poll(t0 + POLL_INTERVAL * step);
+            }
+            assert_eq!(fake.attempts(DEFAULT), 1, "fallback opened once");
+            assert!(actives(&events).is_empty(), "no stream restarts");
+            let retries = fake.attempts(CHOSEN);
+            assert!(
+                (2..=8).contains(&retries),
+                "backoff, got {retries} attempts"
+            );
+            assert_eq!(fake.live.get(), 2, "one input and one output stream run");
+        }
+
+        #[test]
+        fn switches_back_once_the_choice_reappears_and_opens() {
+            let fake = Fake::new(&[DEFAULT], &[DEFAULT]);
+            let (mut control, events) = control(&fake);
+            let t0 = Instant::now();
+            control.reopen(Direction::Input, t0);
+            for step in 1..=5 {
+                control.poll(t0 + POLL_INTERVAL * step);
+            }
+            assert_eq!(fake.attempts(CHOSEN), 1, "missing device is not retried");
+            assert_eq!(actives(&events), [true]);
+            fake.set(&[DEFAULT, CHOSEN], &[DEFAULT, CHOSEN]);
+            control.poll(t0 + POLL_INTERVAL * 6);
+            assert_eq!(actives(&events), [false], "back on the chosen device");
+            assert_eq!(fake.attempts(DEFAULT), 1);
+            assert_eq!(fake.live.get(), 2, "the fallback input stream was stopped");
+            control.poll(t0 + POLL_INTERVAL * 7);
+            assert!(actives(&events).is_empty());
+        }
     }
 }

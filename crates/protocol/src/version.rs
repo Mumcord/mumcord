@@ -15,6 +15,8 @@ impl MumbleVersion {
     pub const CLIENT: Self = Self::new(1, 5, 0);
     /// First version with channel listeners ("following" channels).
     pub const LISTENING: Self = Self::new(1, 4, 0);
+    /// First version that forwards plugin data between clients.
+    pub const PLUGIN_DATA: Self = Self::new(1, 4, 0);
     /// First version that stores listener volume adjustments on the server.
     pub const LISTENER_VOLUME: Self = Self::new(1, 5, 0);
 

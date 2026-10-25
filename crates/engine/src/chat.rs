@@ -23,6 +23,7 @@ use crate::session::{
 use crate::sounds::Sound;
 
 pub use sanitize::sanitize_html;
+use sanitize::sanitize_message_html;
 
 /// Size cap for messages with images when the server sets no limit; the UI scales images to
 /// the same target.
@@ -46,6 +47,8 @@ pub struct ChatMessageView {
     pub sent_at: UnixMillis,
     /// Sanitized HTML.
     pub body: String,
+    /// Links whose preview card the user dismissed (QA.42).
+    pub dismissed_previews: Vec<String>,
 }
 
 /// What `history_clear` removes.
@@ -130,6 +133,24 @@ fn plays_message_sound(state: &ServerState, route: Route) -> bool {
         Route::Channel(c) => state
             .own_user()
             .is_some_and(|u| u.channel_id != c && u.listening.contains(&c)),
+    }
+}
+
+/// Which sound a new message makes (QA.41): the ping for a mention, wherever it arrives and
+/// even in the chat on screen; otherwise the message sound where it applies. A mention with
+/// the ping switched off falls back to the message sound.
+fn sound_for(
+    state: &ServerState,
+    route: Route,
+    mention: bool,
+    ping_enabled: bool,
+) -> Option<Sound> {
+    if mention && ping_enabled {
+        Some(Sound::Mention)
+    } else if plays_message_sound(state, route) {
+        Some(Sound::Message)
+    } else {
+        None
     }
 }
 
@@ -254,16 +275,14 @@ pub(crate) fn on_text(ctx: &SessionCtx, msg: &TextMessage) {
         let route = route(s, msg)?;
         let sender = msg.actor.and_then(|a| s.users.get(&a));
         let unread = counts_unread(s, route);
-        let sound = plays_message_sound(s, route);
         Some((
             route,
             sender.map(|u| u.name.clone()).unwrap_or_default(),
             sender.and_then(|u| u.cert_hash.clone()),
             unread,
-            sound,
         ))
     });
-    let Some((route, sender_name, sender_cert_hash, counts_unread, plays_sound)) = routed else {
+    let Some((route, sender_name, sender_cert_hash, counts_unread)) = routed else {
         return;
     };
     let conversation = match route {
@@ -286,7 +305,8 @@ pub(crate) fn on_text(ctx: &SessionCtx, msg: &TextMessage) {
         sender_session: msg.actor,
         own: false,
         sent_at: now_millis(),
-        body: sanitize_html(&msg.message),
+        body: sanitize_message_html(&msg.message),
+        dismissed_previews: Vec::new(),
     };
     let stored = match &key {
         UnreadKey::Stored(c) => Some(c.clone()),
@@ -306,9 +326,6 @@ pub(crate) fn on_text(ctx: &SessionCtx, msg: &TextMessage) {
             conversation,
             count,
         }));
-        if plays_sound {
-            ctx.events.sounds().play(Sound::Message);
-        }
     }
 }
 
@@ -390,6 +407,7 @@ fn history_view(
     m: ChatMessage,
     conversation: &ConversationRef,
     own_hash: Option<&str>,
+    dismissed_previews: Vec<String>,
 ) -> ChatMessageView {
     let own = own_hash.is_some() && m.sender_cert_hash.as_deref() == own_hash;
     ChatMessageView {
@@ -401,10 +419,30 @@ fn history_view(
         own,
         sent_at: m.sent_at,
         body: m.body,
+        dismissed_previews,
     }
 }
 
 impl Engine {
+    /// Plays the sound of a new incoming message (FR-1.27, QA.41). The UI calls this per message
+    /// because only it knows the matching rules and the names the user went by: `mention` is
+    /// its verdict. The sound toggles and deafness are applied by the sound hub.
+    pub fn message_sound(&self, conversation: &ConversationRef, mention: bool) -> EngineResult<()> {
+        let ctx = self.session_ctx()?;
+        let route = match conversation {
+            ConversationRef::Channel { channel_id } => Route::Channel(*channel_id),
+            _ => Route::Private { session: 0 },
+        };
+        let ping_enabled = self.settings()?.sounds.mention;
+        let sound = ctx
+            .handle
+            .with_state(|s| sound_for(s, route, mention, ping_enabled));
+        if let Some(sound) = sound {
+            ctx.events.sounds().play(sound);
+        }
+        Ok(())
+    }
+
     /// Sends Mumble HTML to a channel (FR-1.28, FR-1.30) and returns the stored own message.
     pub fn send_channel_message(
         &self,
@@ -504,10 +542,64 @@ impl Engine {
         let own_hash = ctx
             .handle
             .with_state(|s| s.own_user().and_then(|u| u.cert_hash.clone()));
+        let ids: Vec<i64> = rows.iter().map(|m| m.id).collect();
+        let mut dismissed = ctx.store().dismissed_previews(&ids).unwrap_or_else(|e| {
+            // The cards then show again; better than failing to load the history.
+            tracing::warn!(error = %e, "reading dismissed previews failed");
+            Default::default()
+        });
         Ok(rows
             .into_iter()
-            .map(|m| history_view(m, &conversation, own_hash.as_deref()))
+            .map(|m| {
+                let urls = dismissed.remove(&m.id).unwrap_or_default();
+                history_view(m, &conversation, own_hash.as_deref(), urls)
+            })
             .collect())
+    }
+
+    /// Remembers that the preview card of `url` under the message was dismissed (QA.42).
+    /// Messages that were not stored (`tmp-` ids) have nothing to remember it with.
+    pub fn preview_dismiss(&self, message_id: &str, url: &str) -> EngineResult<()> {
+        if message_id.starts_with(TRANSIENT_PREFIX) {
+            return Ok(());
+        }
+        let id = message_id
+            .parse::<i64>()
+            .map_err(|_| EngineError::invalid("unknown message id"))?;
+        lock(&self.store_handle())
+            .dismiss_preview(id, url)
+            .map_err(store_error)
+    }
+
+    /// The saved GIF favorites, most recently used first (FR-1.52).
+    pub fn gif_favorites(&self) -> EngineResult<Vec<mumcord_store::GifFavorite>> {
+        lock(&self.store_handle())
+            .gif_favorites()
+            .map_err(store_error)
+    }
+
+    /// Saves an image link as a favorite; only http(s) links are accepted.
+    pub fn gif_favorite_add(&self, url: &str) -> EngineResult<()> {
+        let url = url.trim();
+        if !(url.starts_with("http://") || url.starts_with("https://")) {
+            return Err(EngineError::invalid("favorites need an http(s) link"));
+        }
+        lock(&self.store_handle())
+            .add_gif_favorite(url, now_millis())
+            .map_err(store_error)
+    }
+
+    pub fn gif_favorite_remove(&self, url: &str) -> EngineResult<()> {
+        lock(&self.store_handle())
+            .remove_gif_favorite(url)
+            .map_err(store_error)
+    }
+
+    /// Moves a favorite to the front after it was sent.
+    pub fn gif_favorite_use(&self, url: &str) -> EngineResult<()> {
+        lock(&self.store_handle())
+            .use_gif_favorite(url, now_millis())
+            .map_err(store_error)
     }
 
     /// Clears local history (FR-1.33); cleared conversations are no longer unread.
@@ -584,7 +676,8 @@ fn own_message(ctx: &SessionCtx, conversation: ConversationRef, html: &str) -> C
         sender_session,
         own: true,
         sent_at: now_millis(),
-        body: sanitize_html(html),
+        body: sanitize_message_html(html),
+        dismissed_previews: Vec::new(),
     };
     let stored = match &message.conversation {
         ConversationRef::Channel { channel_id } => ctx
@@ -693,6 +786,26 @@ mod tests {
     }
 
     #[test]
+    fn mention_ping_replaces_message_sound() {
+        let s = state();
+        let private = Route::Private { session: 5 };
+        assert_eq!(sound_for(&s, private, false, true), Some(Sound::Message));
+        assert_eq!(sound_for(&s, private, true, true), Some(Sound::Mention));
+        assert_eq!(
+            sound_for(&s, Route::Channel(1), true, true),
+            Some(Sound::Mention),
+            "ping even in the own channel"
+        );
+        assert_eq!(sound_for(&s, Route::Channel(1), false, true), None);
+        assert_eq!(
+            sound_for(&s, private, true, false),
+            Some(Sound::Message),
+            "ping switched off"
+        );
+        assert_eq!(sound_for(&s, Route::Channel(1), true, false), None);
+    }
+
+    #[test]
     fn size_limits_follow_server_settings() {
         assert!(check_size("hello", 5, 0).is_ok());
         let err = check_size("hello!", 5, 0).expect_err("too long");
@@ -730,9 +843,9 @@ mod tests {
             sent_at: 1,
             body: "b".into(),
         };
-        assert!(history_view(row(Some("aa")), &conv, Some("aa")).own);
-        assert!(!history_view(row(Some("bb")), &conv, Some("aa")).own);
-        assert!(!history_view(row(None), &conv, None).own);
-        assert_eq!(history_view(row(None), &conv, None).id, "7");
+        assert!(history_view(row(Some("aa")), &conv, Some("aa"), Vec::new()).own);
+        assert!(!history_view(row(Some("bb")), &conv, Some("aa"), Vec::new()).own);
+        assert!(!history_view(row(None), &conv, None, Vec::new()).own);
+        assert_eq!(history_view(row(None), &conv, None, Vec::new()).id, "7");
     }
 }

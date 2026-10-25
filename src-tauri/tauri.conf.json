@@ -21,15 +21,15 @@
       }
     ],
     "security": {
-      "csp": "default-src 'self'; img-src 'self' data: blob:; style-src 'self' 'unsafe-inline'; connect-src ipc: http://ipc.localhost"
+      "csp": "default-src 'self'; img-src 'self' data: blob:; style-src 'self' 'unsafe-inline'; connect-src ipc: http://ipc.localhost; frame-src https://www.youtube-nocookie.com https://player.twitch.tv https://clips.twitch.tv https://open.spotify.com/embed/"
     }
   },
   "bundle": {
     "active": true,
     "targets": ["appimage", "nsis", "app", "dmg"],
     "publisher": "Mumcord contributors",
-    "copyright": "Copyright (c) Mumcord contributors. MIT License.",
-    "license": "MIT",
+    "copyright": "Copyright (c) Mumcord contributors. AGPL-3.0-only; commercial license on request.",
+    "license": "AGPL-3.0-only",
     "category": "SocialNetworking",
     "shortDescription": "Voice chat client compatible with Mumble (unsigned test build)",
     "longDescription": "Mumcord is a modern voice chat client compatible with Mumble. It is not affiliated with the Mumble project. This is an unsigned test build: Windows and macOS show a security warning on first launch.",

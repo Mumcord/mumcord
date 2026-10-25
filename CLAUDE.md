@@ -24,6 +24,7 @@ Everything is in English: chat, specs, docs, code, comments, commit messages and
 ## Way of working
 
 - Specs are the truth: only build what the specification says. Unclear or contradictory → ask instead of guessing. No scope creep.
+- Delete your own build cache in ~/.cache/mumcord-build/<agent> when done (Rust targets are 10–20 GB each).
 - One task = small, verifiable steps. Every epic must be verifiable in the running client against a local test server (acceptance criteria of the spec).
 - One fresh agent per subtask with a self-contained brief. Never bundle several tasks into one agent. The agent ends after its final report; follow-up work gets a new agent.
 - Commit only on request (exception: `/spec` commits the finished spec). Never `git add -A`. Never push without being asked.

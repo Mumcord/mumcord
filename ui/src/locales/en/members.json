@@ -27,5 +27,12 @@
     "viewProfile": "View profile",
     "mute": "Mute for me",
     "unmute": "Unmute for me"
+  },
+  "nowPlaying": {
+    "label": "Now playing",
+    "listening": "Listening to",
+    "paused": "Paused",
+    "progress": "Playback progress",
+    "position": "{{position}} of {{duration}}"
   }
 }

@@ -1,8 +1,8 @@
 {
   "name": "mumcord",
   "private": true,
-  "version": "0.1.1",
-  "license": "MIT",
+  "version": "0.2.0",
+  "license": "AGPL-3.0-only",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -24,6 +24,7 @@
     "@tauri-apps/plugin-global-shortcut": "^2.4.1",
     "@tauri-apps/plugin-opener": "^2.7.2",
     "dompurify": "^3.4.17",
+    "highlight.js": "^11.12.0",
     "i18next": "^26.5.7",
     "marked": "^18.1.1",
     "react": "^19.3.1",

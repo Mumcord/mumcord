@@ -14,3 +14,10 @@ export async function openLink(href: string): Promise<void> {
     window.open(href, "_blank", "noopener,noreferrer");
   }
 }
+
+/** {@link openLink} for click handlers: failures are logged. */
+export function openInBrowser(url: string): void {
+  openLink(url).catch((error: unknown) => {
+    console.error("Opening a link failed", error);
+  });
+}

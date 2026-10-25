@@ -1,0 +1,59 @@
+name: Bug report
+description: Something in Mumcord doesn't work as expected.
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for reporting! Please never post passwords, server passwords or your identity file.
+        The diagnostic file (Settings → Diagnostics → Save diagnostic file) contains no chat, passwords or certificates.
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened?
+      description: What did you see, and what did you expect instead?
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      placeholder: |
+        1. Connect to …
+        2. Click …
+        3. …
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Mumcord version
+      description: Settings → About
+      placeholder: "0.2.0"
+    validations:
+      required: true
+  - type: dropdown
+    id: os
+    attributes:
+      label: Operating system
+      options:
+        - Linux
+        - Windows
+        - macOS
+    validations:
+      required: true
+  - type: input
+    id: desktop
+    attributes:
+      label: Linux desktop and session (if Linux)
+      placeholder: "KDE Plasma 6 on Wayland"
+  - type: input
+    id: server
+    attributes:
+      label: Mumble server version (if known)
+      placeholder: "1.5.735"
+  - type: textarea
+    id: logs
+    attributes:
+      label: Diagnostic file, logs or screenshots
+      description: Drag files here. Remove anything private first.

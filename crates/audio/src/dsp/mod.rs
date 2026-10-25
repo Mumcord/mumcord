@@ -39,11 +39,13 @@ use sonora::{AudioProcessing, Config, StreamConfig};
 
 use crate::{FRAME_SAMPLES, Frame, SAMPLE_RATE};
 
-pub use controls::{DspControls, Level, TalkMode};
+pub use controls::{
+    DspControls, Level, THRESHOLD_DEFAULT_DBFS, THRESHOLD_MAX_DBFS, THRESHOLD_MIN_DBFS, TalkMode,
+};
 pub use echo_ref::{EchoRefConsumer, EchoRefProducer, echo_reference};
 pub use mic_test::{MicTest, MicTestPhase};
 
-use gate::{PttGate, VoiceDetector};
+use gate::{PttGate, ThresholdGate, VoiceDetector};
 
 /// nnnoiseless expects samples in 16-bit integer range.
 const I16_SCALE: f32 = 32_768.0;
@@ -66,6 +68,7 @@ pub struct DspChain {
     denoise: Box<DenoiseState<'static>>,
     vad: VoiceDetector,
     ptt: PttGate,
+    threshold: ThresholdGate,
     /// Set by [`MicTest`]: the wizard always demonstrates noise suppression.
     force_noise_suppression: bool,
     scratch: Frame,
@@ -108,6 +111,7 @@ impl DspChain {
             denoise: DenoiseState::new(),
             vad: VoiceDetector::default(),
             ptt: PttGate::default(),
+            threshold: ThresholdGate::default(),
             force_noise_suppression: false,
             scratch: [0.0; FRAME_SAMPLES],
             render: [0.0; FRAME_SAMPLES],
@@ -189,7 +193,23 @@ impl DspChain {
         }
         let rms = (sum_sq / FRAME_SAMPLES as f32).sqrt();
 
-        let voice = self.vad.update(speech_probability, rms);
+        // Both detectors run every frame so switching modes starts from a warm state. The manual
+        // threshold looks at the processed peak, the same value the settings meter draws, so the
+        // line the user sets is exactly the level that opens the gate.
+        let automatic = self.vad.update(speech_probability, rms);
+        let manual = self.threshold.update(
+            if peak > 0.0 {
+                20.0 * peak.log10()
+            } else {
+                f32::NEG_INFINITY
+            },
+            controls.threshold_dbfs(),
+        );
+        let voice = if controls.manual_threshold() {
+            manual
+        } else {
+            automatic
+        };
         let open = match controls.mode() {
             TalkMode::VoiceActivation => voice,
             TalkMode::PushToTalk => self.ptt.update(controls.ptt_pressed()),

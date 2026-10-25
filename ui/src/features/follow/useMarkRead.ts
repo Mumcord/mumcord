@@ -1,11 +1,17 @@
 import { useEffect } from "react";
 import { getApi, type Conversation } from "../../api";
-import { unreadOf, useFollowState } from "./followStore";
+import { setConversationOnScreen, unreadOf, useFollowState } from "./followStore";
 
 /** Resets the unread count while the conversation is open in the chat column. */
 export function useMarkRead(conversation: Conversation): void {
   const state = useFollowState();
   const count = unreadOf(state, conversation);
+  useEffect(() => {
+    setConversationOnScreen(conversation, true);
+    return () => {
+      setConversationOnScreen(conversation, false);
+    };
+  }, [conversation]);
   useEffect(() => {
     if (count <= 0) return;
     getApi()

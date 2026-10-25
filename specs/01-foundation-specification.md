@@ -32,9 +32,17 @@ Epic 1 is delivered in two stages (Q2.1). Stage 1a must be complete and usable b
 - Diagnostic file export (Q4.7, Q4.9).
 - Unsigned test builds for Linux, Windows, macOS via GitHub Actions (Q4.2, Q4.10).
 
-**Stage 1b – gaming features**
+**Stage 1b – chat features** (QA.34, QA.35, QA.36)
+- Link previews, YouTube/Twitch player cards, external images, @mentions with autocomplete, Tenor GIFs, code highlighting, formatting toolbar and shortcuts.
+
+**Stage 1c – in-game features** (moved from stage 1b, QA.36)
 - Positional audio via Mumble Link and the official Mumble game plugins (Q3.9).
 - Overlay as a floating, transparent on-top window (Q3.10).
+
+**Stage 1d – Mumcord-to-Mumcord and people** (QA.45, QA.46)
+- Chat history sync between Mumcord clients (up to 7 days / 500 messages per request, channel messages only, marked as unverified).
+- Badge for people who use Mumcord.
+- Double-click for private chat, pinned person card, redesigned full profile, friends with online state, kept private history with friends.
 
 ### 2.2 Out of scope / later
 - Anything server-side: companion services, server plugins, server configuration (Q1.13) – **never**, not just later.
@@ -101,7 +109,7 @@ Mumcord enforces nothing itself; the server's ACLs decide. The client reflects p
 - **FR-1.29** Received messages are displayed with formatting, links and small inline images, sanitized so no scripts, external loads or unsafe markup run (Q5.5). Links open in the system browser after a click.
 - **FR-1.30** The user writes with Markdown shortcuts (bold, italic, code, links) and can paste or drop images; Mumcord converts to Mumble-compatible HTML, scales/compresses images to the server's message size limit and refuses too-large content with a clear message.
 - **FR-1.31** **Follow channels** (Q3.1): any channel can be followed via a "Follow" button. Mumcord starts listening to it with its audio muted locally, so its messages arrive without joining. Followed channels show unread badges. Unfollowing stops listening. If the server denies listening or the listener limit is reached, the user gets a clear message. A star button on each channel row in the channel list follows/unfollows it directly (outlined on hover/focus, filled while followed); the server's context menu in the channel list offers "Follow all channels" and "Unfollow all channels" – follow all skips channels the user may not listen to, stops at the server's listener limit and reports how many were followed (QA.13). Unread counts apply to every channel the user receives messages from while its chat is not on screen, including the own channel; opening the chat marks them read (QA.33).
-- **FR-1.32** All received and sent messages (channels, followed channels, private chats) are stored locally and shown when the chat is reopened, including after restart (Q4.5). History only contains what Mumcord actually received.
+- **FR-1.32** All received and sent messages (channels, followed channels, private chats) are stored locally and shown when the chat is reopened, including after restart (Q4.5). History only contains what Mumcord actually received. Optionally, history older than a configurable number of days is deleted automatically (default off, Settings → Chat & history) (QA.42).
 - **FR-1.48a** Chat layout (QA.20): each message group shows the sender's avatar on the left, name and time on the first line, and the text indented after the avatar; consecutive messages from the same sender within a few minutes are grouped without repeating avatar and name, with the same indent. Settings → Appearance → "Message display" offers Cozy (this layout, default) or Compact (no avatars, time + name + text on one line, tighter spacing, continuation lines slightly indented) (QA.25).
 - **FR-1.48b** Pinned info in the chat (QA.15): the top of each channel's chat shows a pinned, collapsible box with the channel description (fetched on demand if the server only sends a hash); the server welcome message (MOTD) is pinned in the root channel's chat and in the default channel's chat when that channel has no description. Long texts start collapsed ("Show more"); content is sanitized like chat HTML; no box when there is no text; the box updates when the description changes.
 - **FR-1.48c** Message notifications (QA.16): for new messages in any channel the user receives (own channel, followed channels) and in private chats, except the chat currently on screen, Mumcord shows an in-app toast (bottom right: channel, sender, short sanitized preview) and, when the window is in the background or minimized, a system desktop notification. Clicking either opens that chat and brings the window to the front. Bursts are grouped per channel. Both can be switched off in Settings (Sounds & notifications). No message content in logs.
@@ -119,22 +127,36 @@ Mumcord enforces nothing itself; the server's ACLs decide. The client reflects p
 - **FR-1.39** Settings screen (Discord-style, sections in a side list): Identity (name, certificate, profile with "Default avatar" and "Send to new servers automatically", FR-1.47), Audio, Voice (incl. the toggle "Allow mouse buttons (requires input group)", Linux Wayland only, default OFF, with a plain-language warning that input-group membership lets any program of the user read all input devices including the keyboard; FR-1.21, QA.4), Chat & history, Appearance, Language, Sounds, Overlay & positional audio, Diagnostics, About (incl. licenses).
 - **FR-1.40** "Save diagnostic file" in Diagnostics writes a file with app version, OS, audio devices, connection statistics and recent log lines – without chat contents, passwords, certificates or personal data (Q4.7).
 
-### 4.8 Stage 1b – positional audio
+### 4.8 Stage 1c – positional audio
 - **FR-1.41** Positional audio can be enabled in settings (default off). When enabled, voices of people who send positional data in the same game context are placed in 3D around the listener (headphone-optimized panning and distance attenuation, configurable min/max distance).
 - **FR-1.42** Position sources (Q3.9): (a) the **Mumble Link** shared-memory interface used by games and mods; (b) the **official Mumble game plugins**, loaded as plugin libraries via Mumble's plugin interface. Plugins can be enabled individually; a notice explains that some anti-cheat systems may flag memory-reading plugins.
 - **FR-1.43** The settings show which game/plugin is currently delivering positions, so users can tell whether it works.
 
-### 4.9 Stage 1b – overlay
+### 4.9 Stage 1c – overlay
 - **FR-1.44** The overlay is a separate, transparent, click-through, always-on-top window showing who is talking (avatar + name), and optionally the whole current channel (Q3.10). It does not hook into games.
 - **FR-1.45** Position, size, opacity and content are configurable; the overlay can be toggled from the tray and settings.
 - **FR-1.46** Where the OS or desktop doesn't allow staying on top (some Linux desktops) or a game runs in exclusive fullscreen, settings explain the limitation.
-- **FR-1.49** Link previews (QA.34, stage 1b): links in messages get a preview card (title, description, image, "Open in browser"). Mumcord fetches the page metadata itself; on by default, switchable in the first-start wizard and in settings; fetched data is sanitized and cached; no preview for private/LAN addresses.
-- **FR-1.50** YouTube and Twitch links show an embedded player card with title and "Open in browser"; the player loads only after a click (QA.34).
-- **FR-1.51** Mentions (QA.34): typing `@` in the input autocompletes names of people on the server; a message mentioning the user is highlighted and notifies them even in otherwise quiet channels; the text stays plain `@Name` for other clients.
-- **FR-1.52** GIFs via Tenor (QA.34): a GIF button opens a Tenor search; the chosen GIF is sent as an image link/embed compatible with Mumble's image rules. The Tenor API key comes from a CI secret at build time; builds without a key hide the button.
+- **FR-1.59** "Now gaming" (QA.44, stage 1c): opt-in status (default off). Detects the game via Mumble Link (name/context) or running programs matched against a bundled list of known games and the running Steam game (app id). Shared like "Now playing" (plugin data to Mumcord users; "🎮 Game" comment line for official clients): game-controller icon next to the person, game name, game icon (Steam app icon through the backend image proxy, else generic) and play time in the profile/preview and in the own user panel status line. "Join game" appears only when the same game exposes a join target (Steam server address from the Mumble Link context via steam://connect/…, or a Steam lobby link); otherwise no button.
+- **FR-1.66** Quick settings (QA.47, stage 1c): right-clicking the settings button in the user panel opens a small menu with switches for link previews, theme (system/dark/light), now-playing sharing and now-gaming sharing, applied immediately and saved like the full settings.
+
+### 4.10 Stage 1d – Mumcord-to-Mumcord (QA.45)
+- **FR-1.60** History sync: on joining a channel or via "Load earlier messages", Mumcord asks other Mumcord users who may read the channel (via plugin data) for its messages in a time range (max 7 days back, max 500 messages per request, chunked under the server's plugin-data limits, rate-limited). Answering clients send stored channel messages only, never private chats. Sharing the own history is on by default and switchable in the first-start wizard and in settings. Received messages are sanitized, deduplicated, merged by time and marked "from ‹name›'s history". Clients that share history publish per-channel availability summaries (time range and message count, no content) on connect, on change and on request; a joining client asks only holders that cover the missing range. Each message carries a content hash (channel, sender certificate hash or name, server timestamp to the second, normalized body); requests list the hashes already held so only missing messages are sent, and received messages with a known hash are discarded (QA.48). Only messages older than the moment the requesting client started receiving the channel live are synced: the join time for the own channel, the follow time for a followed channel (so following a new channel fetches its earlier history up to that moment); holders reject requests reaching past that cutoff (QA.49).
+- **FR-1.60b** Synced messages are inserted by server timestamp (tie-break by hash), day separators and grouping are recomputed, and the reading position is kept when older messages are inserted above. A "Jump to newest" button (bottom right, with the count of unseen new messages; End / Ctrl+End) appears whenever the user is scrolled away from the latest message (QA.50).
+- **FR-1.61** Mumcord users are recognised through a plugin-data hello and get a small Mumcord badge with tooltip next to their name.
+- **FR-1.62** Double-clicking a person opens the private chat with them; a single click opens the hover card pinned, with "Private message" (top right) and a button for the full profile (QA.46).
+- **FR-1.63** Redesigned full profile: header with avatar and avatar-derived banner colour, name, registered/guest, Mumcord badge, now playing / now gaming, comment; sections with all local settings (volume, local mute, friend, private note).
+- **FR-1.64** Friends: added from the card, menu or profile; stored locally by certificate hash (across servers and renames); a "Friends" list shows each friend's online state (online on any connected server).
+- **FR-1.65** Private chat history with friends is kept, linked by certificate hash across servers and renames, and excluded from automatic history deletion (manual deletion still possible); private chat header and list show whether the other person is online.
+- **FR-1.49** Link previews (QA.34, stage 1b): links in messages get a preview card (title, description, image, "Open in browser"). Mumcord fetches the page metadata itself; on by default, switchable in the first-start wizard and in settings; fetched data is sanitized and cached; no preview for private/LAN addresses. Each preview/embed card can be dismissed (×), remembered per message; previews, thumbnails and external images are cached in memory and on disk and deleted after a configurable number of days (default 7, Settings → Chat & history, with "Clear now") (QA.42).
+- **FR-1.50** YouTube and Twitch links show an embedded player card with title and "Open in browser"; the player loads only after a click (QA.34). Spotify links get the same kind of card (cover, title, artist, "Open in browser", player after a click) (QA.40).
+- **FR-1.51** Mentions (QA.34): typing `@` in the input autocompletes names of people on the server; a message mentioning the user is highlighted and notifies them even in otherwise quiet channels; the text stays plain `@Name` for other clients. Being mentioned also plays a distinct short "ping" sound; both the mention sound and mention notifications have their own switches under Settings → Sounds & notifications (default on) (QA.41).
+- **FR-1.52** GIFs (QA.34, revised by QA.43): no GIF search (it would need an API key shipped in the app). Pasted GIF links play inline (FR-1.55); any GIF in the chat can be saved as a favorite (right-click → "Save as favorite"); the GIF button in the input opens the favorites (stored locally, removable) and sends the chosen one as a link. GIFs from Giphy or Tenor carry a small "via GIPHY" / "via Tenor" label linking to the original page, also in the favorites picker (QA.52).
 - **FR-1.53** Code (QA.34): ``` fenced code blocks (optional language) and `inline code` render with syntax highlighting; other clients see the text.
 - **FR-1.54** Formatting in the input (QA.34): a small toolbar plus shortcuts (Ctrl+B bold, Ctrl+I italic, Ctrl+Shift+X strikethrough, Ctrl+E code, Ctrl+K link inside the input) that insert Markdown.
 - **FR-1.55** External images (QA.35, stage 1b): external images in messages and direct image links (png, jpg, gif, webp) are shown inline, scaled, click to enlarge, with "Open in browser"; loaded via the backend with size and type limits, never from private/LAN addresses; controlled by the same switch as link previews (FR-1.49). With the switch off, AC-1.13 behavior applies.
+- **FR-1.56** Image viewer (QA.38, stage 1b): clicking an image in the chat opens a viewer over the app with fit-to-window, zoom (wheel, pinch, +/−), pan by dragging, double-click for 100 %, arrow keys through the conversation's images, Escape to close, "Save image" and, for external images, "Open in browser".
+- **FR-1.57** Voice activation threshold (QA.39, stage 1b): Settings → Voice offers "Automatic" (default) or "Manual threshold": a slider drawn over a live input level meter; input above the threshold opens the mic, with a short hold time (~300 ms) so word endings aren't cut.
+- **FR-1.58** "Now playing" (QA.40, stage 1b): opt-in setting (default off). Mumcord reads the current track from the system media information (Linux MPRIS, Windows media session, macOS where possible; no Spotify login) and shares title, artist, cover reference, position and duration with other Mumcord users through Mumble plugin data (no server changes); they see a music icon next to the user and, in the profile/preview, cover (if available), title, artist and a live progress bar. Official clients see a short "🎵 Artist – Title" line in the user's comment, which Mumcord removes again when playback stops or the setting is turned off. Covers are loaded through the backend under the link-preview privacy switch.
 - **FR-1.47** Default avatar (QA.3): in Settings → Identity/Profile the user can set (and clear) a default avatar. It is stored locally in the app data directory, scaled to a sensible size (e.g. 128×128 PNG). The first time the user connects to a saved server and has no avatar there yet, and "Send to new servers automatically" is on (default ON), Mumcord sends it once, scaled/compressed to the server's image limits like FR-1.20; if that is impossible it is skipped with a notice. Each saved server remembers `default_avatar_sent`, so it is sent only once per server – never again, even if the user later removes or replaces the avatar on that server manually. Switching the setting off stops automatic sending; the default avatar can still be applied manually as the own avatar (FR-1.20). Exception (QA.10): when the server keeps no avatar for the user (unregistered), the remembered per-server avatar (FR-1.20) is sent again on every connect.
 - **FR-1.48** Compatibility mode for push-to-talk on Linux Wayland (QA.5): Settings → Voice has a switch "Compatibility mode (like TeamSpeak)", shown only on Linux Wayland, default OFF. When on, Mumcord starts through XWayland (takes effect after an app restart, which the switch offers) and uses its X11 push-to-talk path for keyboard keys and mouse buttons, with no portal dialog and no `input` group. The switch explains in plain language that the desktop decides which input X11 apps may see (on KDE: System Settings → Legacy X11 App Support; by default only key combinations and modifier keys, mouse buttons only if enabled there) and that this is less isolated than the modern path. When off, the modern path applies (portal for keys, FR-1.21 evdev option for mouse buttons).
 
@@ -152,7 +174,7 @@ flowchart LR
     M --> C[Certificate trust dialog]
     T[Tray icon] --> M
     L[mumble:// link] --> M
-    M -. stage 1b .-> O[Overlay window]
+    M -. stage 1c .-> O[Overlay window]
 ```
 
 ### 5.2 Main window (Q2.3)
@@ -174,7 +196,7 @@ flowchart LR
 ```
 
 - **Server bar** (left): saved servers as round icons, connected one highlighted, "+" to add.
-- **Channel list**: tree, unread badge (•2) on followed channels, "Join" button on hover. After a fresh connect the default channel is highlighted as current but not "joined for voice" (read-only state, QA.2); the user panel shows mute and deafen active and a hint "Read-only – Join a channel to talk". Join restores the last own mute/deafen setting (QA.7). While connected, the user panel also shows a "Disconnect" button (hang-up icon) next to mute and deafen (QA.8). The user panel uses two rows – avatar, full own name (never truncated to a few letters; wraps or shrinks slightly, tooltip with the full name) and connection status on top, evenly spaced buttons below – with no separator line, set off by its background; the microphone button shows the live input level as a rising fill while speaking (QA.26).
+- **Channel list**: tree, unread badge (•2) on followed channels, "Join" button on hover. After a fresh connect the default channel is highlighted as current but not "joined for voice" (read-only state, QA.2); the user panel shows mute and deafen active and a hint "Read-only – Join a channel to talk". Join restores the last own mute/deafen setting (QA.7). While connected, the user panel also shows a "Disconnect" button (hang-up icon) next to mute and deafen (QA.8). The settings button uses a gear icon (QA.47). The user panel uses two rows – avatar, full own name (never truncated to a few letters; wraps or shrinks slightly, tooltip with the full name) and connection status on top, evenly spaced buttons below – with no separator line, set off by its background; the microphone button shows the live input level as a rising fill while speaking (QA.26).
 - **Chat**: header with channel name and Follow toggle; message list; input with image button.
 - **Member list**: people in the channel, then listeners.
 - **User panel** (bottom of channel list): own avatar/name, mute, deafen, settings.
@@ -295,7 +317,7 @@ Talk state (per own user): `Silent → Talking` (VAD/PTT), overridden by `Muted`
 - **UI: React + TypeScript (strict)** inside Tauri (Q4.1); state and data access separated from presentation; HTML sanitization of all server content; i18n with translation files for en/es/de.
 - **Key libraries (to be confirmed during build):** `tokio` (async networking), `rustls` (TLS with client certificates), `prost` (protobuf, using Mumble's BSD-licensed `Mumble.proto`), `opus` bindings, `cpal` (audio I/O), an RNNoise-class AI noise suppressor and WebRTC audio processing (echo cancellation, gain), `keyring` (OS secure storage), SQLite (local data), Tauri plugins for tray, deep links (`mumble://`) and global shortcuts, XDG desktop portal (Wayland global shortcuts, Q4.11).
 - **Threads:** dedicated real-time audio threads that never block (no allocation, locks or I/O in the audio callback); networking on the async runtime; UI communicates only with the engine, never with the network.
-- **Plugins (stage 1b):** a plugin host loading the official Mumble game plugins (C plugin interface) in a contained way; Mumble Link via shared memory.
+- **Plugins (stage 1c):** a plugin host loading the official Mumble game plugins (C plugin interface) in a contained way; Mumble Link via shared memory.
 - **Configuration & secrets:** settings and history in the OS-standard app data folder; certificate and passwords only in OS secure storage; no secrets in the repository or builds.
 
 ## 9. Non-functional requirements
@@ -314,7 +336,7 @@ Talk state (per own user): `Silent → Talking` (VAD/PTT), overridden by `Muted`
 - **Code hosting & CI:** GitHub, GitHub Actions (Q4.10). Every push builds and tests on Linux, Windows and macOS; tests include the automated integration tests against a containerized Mumble server.
 - **Artifacts (Epic 1):** unsigned test builds – Linux AppImage, Windows installer (unsigned), macOS app bundle/DMG (unsigned) (Q4.2). Windows and macOS show security warnings on first launch; documented in the README.
 - **No auto-update, signing or crash-report service** in Epic 1 (→ Epic 5).
-- **License:** MIT; `THIRD_PARTY_NOTICES` file with the copyright and license texts of Mumble (BSD, for `Mumble.proto` and the loaded game plugins) and all bundled libraries; shown in Settings → About (Q4.6). README describes Mumcord as "compatible with Mumble" and "not affiliated with the Mumble project"; no Mumble logo.
+- **License:** AGPL-3.0-only plus a commercial license on request (QA.51; up to v0.1.1: MIT); `THIRD_PARTY_NOTICES` file with the copyright and license texts of Mumble (BSD, for `Mumble.proto` and the loaded game plugins) and all bundled libraries; shown in Settings → About (Q4.6). README describes Mumcord as "compatible with Mumble" and "not affiliated with the Mumble project"; no Mumble logo.
 - **Test server setup:** a reproducible local Mumble server (Docker, official `mumble-server` image, versions 1.4 and 1.5) plus scripted bot clients for multi-user tests; documented one-command start.
 
 ## 11. Acceptance criteria (verifiable in the running client)
@@ -350,25 +372,41 @@ Unless stated otherwise: a fresh Mumcord install, a local test server (1.5) runn
 - **AC-1.26** OS in light mode → Mumcord light; OS dark → dark; manual override works. Switch language to Spanish and German → all UI texts translated without restart.
 - **AC-1.27** Complete the main flows (wizard, connect, join, chat, follow, settings) using only the keyboard; screen reader (NVDA/VoiceOver/Orca) announces controls and talking events; automated accessibility scan reports no WCAG 2.2 AA violations.
 - **AC-1.28** "Save diagnostic file" → file contains version, OS, devices, connection stats; contains no chat text, passwords or certificate data.
-- **AC-1.29** Settings → About lists MIT license and third-party notices including Mumble's BSD notice.
+- **AC-1.29** Settings → About lists the AGPL-3.0 license with the commercial-license note (QA.51) and third-party notices including Mumble's BSD notice.
 - **AC-1.30** CI on GitHub Actions produces Linux, Windows and macOS builds; each starts and connects to the test server.
 - **AC-1.35** Fresh connect (first connect, app restart, or reconnect via "Disconnected – Reconnect" button) to a server where the user was last in "Raid" → user lands in the default channel, self-muted and self-deafened; Bot sees the user present with a deafen icon and hears nothing from the user; chat works. Double-click "Raid" → the last own mute/deafen setting is restored: if the user was last unmuted, Bot sees the user in "Raid" not deafened and hears them (voice activation); if the user had muted themselves before (also before an app restart), they stay muted but not deafened-by-read-only, and Bot hears nothing until they unmute (QA.7). (added 2026-10-24, Addendum QA.2)
 - **AC-1.36** Settings → Identity: choose a default avatar, "Send to new servers automatically" is on. Connect to a fresh server where the user has no avatar → Bot sees the user's avatar. Remove the avatar manually on that server, disconnect and reconnect → the default avatar is not sent again. Switch the toggle off, then connect to another fresh server → Bot sees no avatar. (added 2026-10-24, Addendum QA.3)
 - **AC-1.37** In the talk-mode step or Settings → Voice, capture a mouse side button as push-to-talk. On X11, Windows and macOS the Bot hears the user only while the button is held. On Linux Wayland with "Allow mouse buttons (requires input group)" switched on and the user in the `input` group, the same works. Without the permission (toggle on, user not in the group) the settings show the command `sudo usermod -aG input $USER` plus the log-out/in hint, the app does not crash and other talk modes keep working. (added 2026-10-24, Addendum QA.4)
 - **AC-1.38** On Linux Wayland (KDE), switch on Settings → Voice → "Compatibility mode (like TeamSpeak)" and restart as offered. Capture a key combination (e.g. Ctrl+Alt+P) as push-to-talk without any KDE dialog; with another app focused, the Bot hears the user only while it is held. With KDE's legacy X11 setting allowing mouse buttons, the same works for a mouse side button without `input` group membership. Switching it off and restarting returns to the modern path. (added 2026-10-24, Addendum QA.5)
 
-**Stage 1b**
+**Stage 1b – chat**
+- **AC-1.39** Bot posts a web link → a preview card with title and "Open in browser" appears; with previews switched off (wizard or settings) only the plain link shows and no request is made.
+- **AC-1.40** Bot posts a YouTube and a Twitch link → player cards with title appear; nothing loads until the user clicks play; "Open in browser" opens the system browser.
+- **AC-1.41** Typing `@Bo` suggests "Bot"; sending puts `@Bot` in the message; when Bot mentions the user, the message is highlighted and a notification appears.
+- **AC-1.42** Bot posts a GIF link → it plays inline; right-click → "Save as favorite"; the GIF button lists it and sending it delivers the link to Bot; removing the favorite works and survives restart.
+- **AC-1.43** A message with a ```js code block renders highlighted; Bot receives the plain text.
+- **AC-1.44** Ctrl+B / Ctrl+I / toolbar buttons insert bold/italic Markdown around the selection; the sent message renders formatted.
+- **AC-1.45** Bot sends a message with an external image and a direct .png link → both appear inline and enlarge on click; with previews switched off neither is loaded (no request made).
+- **AC-1.46** Bot sends two images → clicking the first opens the viewer; zoom with the wheel and +/−, pan by dragging, → shows the second image, "Save image" writes the file, Escape closes and focus returns to the message.
+- **AC-1.47** Set a manual threshold above the level of a quiet test tone and below a loud one (file audio backend) → the Bot hears only the loud tone; switching back to Automatic restores the previous behaviour.
+- **AC-1.48** Bot posts a Spotify track link → a card with cover, title and artist appears; the player loads only after a click.
+- **AC-1.49** With "Now playing" on and a test media player publishing a track (MPRIS test player on Linux), a second Mumcord instance/bot sees the music icon and, in the profile, title, artist and an advancing progress bar; the official client sees the comment line; turning the setting off removes icon and comment line.
+
+**Stage 1c – in-game**
 - **AC-1.31** Enable positional audio; two Bots feed Mumble Link positions (left and right of the listener) → voices are heard from the matching side and get quieter with distance (automated channel-level check; 🎧 manual check).
 - **AC-1.32** Enable an official Mumble game plugin with a test harness simulating the game → settings show the plugin as active and positions are applied.
 - **AC-1.33** Enable the overlay → floating window shows the talking Bot's avatar and name while it talks; it stays on top of a borderless-fullscreen app, lets clicks pass through, and position/opacity changes are kept after restart.
 - **AC-1.34** On a desktop where on-top isn't guaranteed, settings show the explanation text.
-- **AC-1.39** Bot posts a web link → a preview card with title and "Open in browser" appears; with previews switched off (wizard or settings) only the plain link shows and no request is made.
-- **AC-1.40** Bot posts a YouTube and a Twitch link → player cards with title appear; nothing loads until the user clicks play; "Open in browser" opens the system browser.
-- **AC-1.41** Typing `@Bo` suggests "Bot"; sending puts `@Bot` in the message; when Bot mentions the user, the message is highlighted and a notification appears.
-- **AC-1.42** In a build with a Tenor key, the GIF button searches Tenor and sends the chosen GIF so Bot receives it; in a build without a key the button is hidden.
-- **AC-1.43** A message with a ```js code block renders highlighted; Bot receives the plain text.
-- **AC-1.44** Ctrl+B / Ctrl+I / toolbar buttons insert bold/italic Markdown around the selection; the sent message renders formatted.
-- **AC-1.45** Bot sends a message with an external image and a direct .png link → both appear inline and enlarge on click; with previews switched off neither is loaded (no request made).
+- **AC-1.50** With "Now gaming" on and a test program from the bundled list running (or a fake Mumble Link game), a second Mumcord instance sees the game icon next to the user and name/icon/play time in the profile; the own user panel shows the game; turning it off removes everything incl. the comment line. With a fake Link context containing a server address for a Steam game, "Join game" appears and opens steam://connect/<address>.
+
+**Stage 1d – Mumcord-to-Mumcord**
+- **AC-1.51** Client A stays in Lobby while messages are sent; client B joins later → B receives the missed Lobby messages (≤7 days, ≤500), marked "from A's history", in correct order without duplicates; private messages are not transferred; with sharing off on A, B gets nothing.
+- **AC-1.51b** Clients A and C both hold overlapping Lobby history; B joins → B sees both availability summaries, receives each missing message exactly once (no duplicates by hash), and messages B already had are not transferred again.
+- **AC-1.51c** B joins Lobby at time T → only messages before T are synced; messages after T arrive live only once. B then follows Raid at time F → Raid messages before F are synced, none after F.
+- **AC-1.51d** Synced older messages appear in correct time order between existing ones without moving the visible message; scrolled up with 3 new messages arriving, the "Jump to newest" button shows 3 and jumps to the latest message.
+- **AC-1.52** Two Mumcord clients and one official client on the server → the Mumcord clients show each other with the Mumcord badge; the official client has none.
+- **AC-1.53** Double-click on Bot opens the private chat; single click shows the pinned card with "Private message" and "Full profile"; the full profile shows the redesigned header and local settings.
+- **AC-1.54** Add Bot as a friend → Bot appears in Friends as online; Bot disconnects → offline in the list and in the private chat header; Bot reconnects with another name → still the same friend and the earlier private chat history is shown; automatic history deletion leaves it untouched.
 
 ## 12. Decision log
 
@@ -460,17 +498,34 @@ Unless stated otherwise: a fresh Mumcord install, a local test server (1.5) runn
 | QA.33 | Unread count also for the own channel while its chat is not on screen | Addendum 2026-10-24; FR-1.31 |
 | QA.34 | Stage 1b chat extras: link previews (default on, switchable in wizard/settings), YouTube/Twitch player cards, @mentions with autocomplete, Tenor GIFs (key via CI secret), ``` code highlighting, formatting toolbar/shortcuts | Addendum 2026-10-24; FR-1.49–1.54, AC-1.39–1.44 |
 | QA.35 | Stage 1b: external images and image links shown inline, same privacy switch as link previews | Addendum 2026-10-24; FR-1.55, AC-1.45 |
-| QA.37 | "Music quality" switch: bitrate cap 96 kbit/s by default, up to the server limit (max 510) when on | Addendum 2026-10-25; FR-1.24 |
+| QA.36 | Stage split: chat features are stage 1b; positional audio and overlay move to stage 1c | Addendum 2026-10-25; section 2.1, 4.8, 4.9, 11 |
+| QA.37 | (stage 1b) "Music quality" switch: bitrate cap 96 kbit/s by default, up to the server limit (max 510) when on | Addendum 2026-10-25; FR-1.24 |
+| QA.38 | Image viewer with zoom/pan/navigation/save for chat images | Addendum 2026-10-25; FR-1.56, AC-1.46 |
+| QA.39 | Manual voice activation threshold with live meter (stage 1b) | Addendum 2026-10-25; FR-1.57, AC-1.47 |
+| QA.40 | Spotify link cards; opt-in "Now playing" status shared via plugin data (music icon, cover, progress) and comment line for official clients | Addendum 2026-10-25; FR-1.50, FR-1.58, AC-1.48, AC-1.49 |
+| QA.41 | Mention ping sound + separate switches for mention sound and mention notifications | Addendum 2026-10-25; FR-1.51 |
+| QA.42 | Dismiss preview cards; preview cache clean-up after X days (default 7) + Clear now; optional chat history auto-delete | Addendum 2026-10-25; FR-1.49, FR-1.32 |
+| QA.43 | No GIF search (key would be extractable); GIF links inline + favorites instead of Tenor | Addendum 2026-10-25; FR-1.52, AC-1.42 |
+| QA.44 | Stage 1c: opt-in "Now gaming" status (Mumble Link + known programs + Steam), shared like Now playing; best-effort Join game via Steam connect/lobby | Addendum 2026-10-25; FR-1.59, AC-1.50 |
+| QA.45 | Stage 1d: history sync between Mumcord clients (7 days / 500 msgs, sharing on by default, wizard + settings) and Mumcord badge | Addendum 2026-10-25; scope 2.1, FR-1.60, FR-1.61, AC-1.51, AC-1.52 |
+| QA.46 | Stage 1d: double-click DM, pinned card with DM + full profile, profile redesign, friends by cert hash with online state, kept friend DM history | Addendum 2026-10-25; FR-1.62–1.65, AC-1.53, AC-1.54 |
+| QA.47 | Gear icon for the settings button; stage 1c quick settings on right-click (previews, theme, now playing/gaming) | Addendum 2026-10-25; section 6, FR-1.66 |
+| QA.48 | History sync: availability summaries per channel/range, content hashes for dedup and delta requests | Addendum 2026-10-25; FR-1.60, AC-1.51b |
+| QA.49 | Sync cutoff: only messages older than join time (own channel) or follow time (followed channel) | Addendum 2026-10-25; FR-1.60, AC-1.51c |
+| QA.50 | Correct ordering of synced messages with stable scroll; Jump to newest button | Addendum 2026-10-25; FR-1.60b, AC-1.51d |
+| QA.51 | License: AGPL-3.0-only plus commercial license on request (contact tobias@vorwachs.com) from v0.2.0; earlier versions stay MIT; CLA for contributions | Addendum 2026-10-25; supersedes the MIT decision |
+| QA.52 | "via GIPHY" / "via Tenor" attribution label on such GIFs and favorites | Addendum 2026-10-25; FR-1.52 |
+| QA.53 | Roadmap: custom themes (colour settings, presets, share as config string with chat preview + import) added to Epic 2 | Addendum 2026-10-25; section 14 |
 
 ## 13. Open points & risks
 
-- **Epic size:** Epic 1 is large (full chat, registration, WCAG AA, stage 1b gaming features). Mitigation: strict 1a/1b staging; 1a is usable on its own.
+- **Epic size:** Epic 1 is large (full chat, registration, WCAG AA, stage 1b chat features, stage 1c in-game features). Mitigation: strict 1a/1b/1c staging; 1a is usable on its own.
 - **Official game plugins (Q3.9):** compatibility with Mumble's plugin interface across versions, per-platform plugin builds, and anti-cheat flags for memory-reading plugins. Fallback: Mumble Link only.
 - **Wayland:** global push-to-talk depends on the desktop's global-shortcuts portal; overlay on-top behaviour not guaranteed on every compositor. Mouse-button push-to-talk on Wayland needs the evdev path and `input` group membership (QA.4): a security trade-off, mitigated by opt-in, device filtering and no logging; users who decline can use a keyboard key.
 - **Listening limits:** servers may deny "Listen" or set low listener limits; following then degrades to history only.
 - **Noise suppression quality vs. CPU:** library choice to be validated against the CPU budget (section 9).
 - **UI automation on macOS:** Tauri's WebDriver-based testing doesn't cover macOS; macOS UI checks may need a different tool or manual verification.
-- **Legal:** MIT/BSD handling and "Mumble" naming are based on the licenses' plain terms, not legal advice (Q4.6).
+- **Legal:** AGPL/BSD handling and "Mumble" naming are based on the licenses' plain terms, not legal advice (Q4.6).
 - **Protocol crypto:** Mumble's UDP encryption has known weaknesses; it can't be changed without server changes, which are out of scope forever.
 
 ## 14. Impact on the roadmap
@@ -480,9 +535,10 @@ No `specs/roadmap.md` exists yet. This brainstorming proposes it:
 | Epic | Title | Content |
 |---|---|---|
 | 1 | Foundation | This spec (stages 1a + 1b) |
-| 2 | Multi-server read-along | Connect to several servers at once and read along on all of them (QA.1) |
+| 2 | Multi-server read-along + themes | Connect to several servers at once and read along on all of them (QA.1); custom themes: colour settings with presets, shareable as a config string that renders as a theme preview card in the chat and can be imported with one click (QA.53) |
 | 3 | Comfort & polish | Global hotkeys beyond PTT, full tray menu, desktop notifications, import from the official client, whisper/shout (Q5.8), public server browser (Q5.3) |
 | 4 | Admin features | ACL/permission editing, bans, channel management – completes "full replacement" (Q1.3) |
 | 5 | Release & distribution | Signed installers, auto-update, opt-in crash reports (Q4.9), store/package listings |
+| 6 | GIF search | GIF search (Tenor/Giphy or similar) without shipping an extractable API key – e.g. a small proxy or user-provided keys; decided later (QA.43) |
 
 Renumbering (QA.1): Epic 2 is now Multi-server read-along; Comfort & polish, Admin and Release move to Epics 3, 4 and 5. Later candidates: mobile apps (Android/iOS), recording. Creating `specs/roadmap.md` from this table needs the user's go-ahead.

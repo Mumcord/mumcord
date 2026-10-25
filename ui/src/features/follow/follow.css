@@ -31,6 +31,10 @@
 }
 
 /* Generated, so the digits are not badge text: visible text must be part of the name (WCAG 2.5.3). */
+.unread-badge[data-mention]::before {
+  content: "@ " attr(data-count);
+}
+
 .unread-badge::before {
   content: attr(data-count);
 }

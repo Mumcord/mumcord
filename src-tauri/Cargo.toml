@@ -20,6 +20,7 @@ tauri-build.workspace = true
 
 [dependencies]
 mumcord-engine.workspace = true
+base64 = "0.23"
 # Not inherited from the workspace: the Tauri CLI ignores the features of inherited dependencies
 # and only bundles the tray library (libayatana-appindicator3) into the AppImage when it sees
 # `tray-icon` here.
@@ -63,6 +64,8 @@ windows-sys = { workspace = true, features = [
     "Win32_System_Threading",
     "Win32_UI_WindowsAndMessaging",
 ] }
+# "Now playing" (FR-1.58): the system media session. Same version as Tauri's own `windows`.
+windows = { version = "0.62", features = ["Foundation", "Media_Control"] }
 
 [target.'cfg(target_os = "macos")'.dependencies]
 # Mouse-button push-to-talk: listen-only event tap and the Accessibility check.

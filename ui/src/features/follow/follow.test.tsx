@@ -132,6 +132,30 @@ describe("follow", () => {
     expect(screen.queryByText(/unread message/)).toBeNull();
   });
 
+  it("never renders a badge for a message in the chat that is on screen", async () => {
+    await setup();
+    const LOBBY = { kind: "channel", channelId: 1 } as const;
+    let seen = false;
+    const observer = new MutationObserver((records) => {
+      for (const record of records) {
+        for (const node of record.addedNodes) {
+          if (node instanceof Element && node.matches(".unread-badge, :has(.unread-badge)")) {
+            seen = true;
+          }
+        }
+      }
+    });
+    observer.observe(document.body, { childList: true, subtree: true });
+    act(() => {
+      api.mock.receiveMessage(LOBBY, "psst", 2);
+    });
+    await screen.findByText("psst");
+    await new Promise((resolve) => setTimeout(resolve, 20));
+    observer.disconnect();
+    expect(seen).toBe(false);
+    expect(document.querySelector(".unread-badge")).toBeNull();
+  });
+
   // The count is CSS-generated, so the badge adds no visible DOM text beyond its accessible name.
   it("keeps the unread count out of DOM text but inside the treeitem's name", async () => {
     await setup();

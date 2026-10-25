@@ -27,5 +27,12 @@
     "viewProfile": "Ver perfil",
     "mute": "Silenciar para mí",
     "unmute": "Dejar de silenciar para mí"
+  },
+  "nowPlaying": {
+    "label": "Reproduciendo",
+    "listening": "Escuchando",
+    "paused": "En pausa",
+    "progress": "Progreso de reproducción",
+    "position": "{{position}} de {{duration}}"
   }
 }

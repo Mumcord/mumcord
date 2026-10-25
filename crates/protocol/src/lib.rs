@@ -15,7 +15,8 @@ pub mod version;
 pub mod voice;
 
 pub use client::{
-    ConnectConfig, Connection, DisconnectReason, Event, Handle, TextMessage, TextTarget, connect,
+    ConnectConfig, Connection, DisconnectReason, Event, Handle, PLUGIN_DATA_MAX, PluginData,
+    TextMessage, TextTarget, connect,
 };
 pub use error::{
     CommandError, ConnectError, DenyKind, PermissionDenied, ProtocolError, RejectReason,

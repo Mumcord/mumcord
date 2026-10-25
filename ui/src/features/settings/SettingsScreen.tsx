@@ -35,7 +35,7 @@ function renderSection(id: SectionId, settings: Settings, update: UpdateSettings
     case "voice":
       return <VoiceSection {...props} />;
     case "chatHistory":
-      return <ChatHistorySection />;
+      return <ChatHistorySection {...props} />;
     case "appearance":
       return <AppearanceSection {...props} />;
     case "language":

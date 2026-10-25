@@ -54,5 +54,7 @@
     "notConnected": "You are not connected to a server.",
     "file": "The file could not be read or written.",
     "generic": "Something went wrong. Please try again."
-  }
+  },
+  "ptt": "Push-to-talk: hold {{key}} to talk",
+  "pttNoKey": "Push-to-talk: no key set"
 }

@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 use rusqlite::{Row, params};
 
 use crate::db::{Store, UnixMillis};
@@ -166,6 +168,43 @@ impl Store {
             |row| row.get(0),
         )?;
         Ok(count.unsigned_abs())
+    }
+
+    /// Remembers that the preview card of `url` under message `message_id` was dismissed
+    /// (QA.42). Unknown messages are ignored.
+    pub fn dismiss_preview(&self, message_id: i64, url: &str) -> Result<()> {
+        self.conn.execute(
+            "INSERT OR IGNORE INTO dismissed_preview (message_id, url)
+             SELECT id, ?2 FROM chat_message WHERE id = ?1",
+            params![message_id, url],
+        )?;
+        Ok(())
+    }
+
+    /// The dismissed preview links of the given messages (messages without any are absent).
+    pub fn dismissed_previews(&self, message_ids: &[i64]) -> Result<HashMap<i64, Vec<String>>> {
+        let mut stmt = self
+            .conn
+            .prepare("SELECT url FROM dismissed_preview WHERE message_id = ?1 ORDER BY url")?;
+        let mut found = HashMap::new();
+        for &id in message_ids {
+            let urls = stmt
+                .query_map([id], |row| row.get::<_, String>(0))?
+                .collect::<rusqlite::Result<Vec<_>>>()?;
+            if !urls.is_empty() {
+                found.insert(id, urls);
+            }
+        }
+        Ok(found)
+    }
+
+    /// Deletes every message sent before `cutoff` on all servers, with its dismissed-preview
+    /// flags (QA.42). Returns the number of deleted messages.
+    pub fn delete_messages_before(&self, cutoff: UnixMillis) -> Result<usize> {
+        // Foreign keys cascade to `dismissed_preview`; `sent_at` is indexed.
+        Ok(self
+            .conn
+            .execute("DELETE FROM chat_message WHERE sent_at < ?1", [cutoff])?)
     }
 
     /// "Clear history" for one channel or private chat.
@@ -338,5 +377,105 @@ mod tests {
 
         store.clear_all_history().expect("clear all");
         assert_eq!(count(&store), 0);
+    }
+
+    #[test]
+    fn pruning_deletes_only_older_messages_and_their_dismissals() {
+        let (_dir, store) = temp_store();
+        let a = store
+            .add_server(&NewServer::new("A", "a", "u"))
+            .expect("a")
+            .id;
+        let b = store
+            .add_server(&NewServer::new("B", "b", "u"))
+            .expect("b")
+            .id;
+        let lobby = Conversation::Channel("Lobby".into());
+        let insert = |server, at| {
+            store
+                .insert_message(server, &msg(&lobby, at, "x"))
+                .expect("insert")
+                .expect("stored")
+        };
+        let old_a = insert(a, 99);
+        let old_b = insert(b, 50);
+        let boundary = insert(a, 100);
+        let newer = insert(b, 101);
+        for id in [old_a, boundary] {
+            store
+                .dismiss_preview(id, "https://example.org/")
+                .expect("dismiss");
+        }
+
+        assert_eq!(store.delete_messages_before(100).expect("prune"), 2);
+        let left: Vec<i64> = store
+            .messages(a, &lobby, 10)
+            .expect("a")
+            .into_iter()
+            .chain(store.messages(b, &lobby, 10).expect("b"))
+            .map(|m| m.id)
+            .collect();
+        assert_eq!(
+            left,
+            [boundary, newer],
+            "a message exactly at the cutoff stays"
+        );
+        let flags = store
+            .dismissed_previews(&[old_a, old_b, boundary])
+            .expect("flags");
+        assert_eq!(flags.keys().copied().collect::<Vec<_>>(), [boundary]);
+        let orphans: i64 = store
+            .conn
+            .query_row("SELECT COUNT(*) FROM dismissed_preview", [], |r| r.get(0))
+            .expect("count");
+        assert_eq!(orphans, 1, "flags of deleted messages are gone");
+        assert_eq!(store.delete_messages_before(100).expect("again"), 0);
+    }
+
+    #[test]
+    fn dismissed_previews_persist_per_message_and_link() {
+        let dir = tempfile::tempdir().expect("dir");
+        let (id, other) = {
+            let store = Store::open(dir.path()).expect("open");
+            let server = store
+                .add_server(&NewServer::new("A", "a", "u"))
+                .expect("add")
+                .id;
+            let lobby = Conversation::Channel("Lobby".into());
+            let ids: Vec<i64> = (1..=2)
+                .map(|t| {
+                    store
+                        .insert_message(server, &msg(&lobby, t, "x"))
+                        .expect("insert")
+                        .expect("stored")
+                })
+                .collect();
+            store
+                .dismiss_preview(ids[0], "https://b.example/")
+                .expect("dismiss");
+            store
+                .dismiss_preview(ids[0], "https://a.example/")
+                .expect("dismiss");
+            store
+                .dismiss_preview(ids[0], "https://a.example/")
+                .expect("twice");
+            store
+                .dismiss_preview(9999, "https://a.example/")
+                .expect("unknown message");
+            (ids[0], ids[1])
+        };
+        let store = Store::open(dir.path()).expect("reopen");
+        let flags = store.dismissed_previews(&[id, other]).expect("flags");
+        assert_eq!(
+            flags.get(&id).map(Vec::as_slice),
+            Some(
+                [
+                    "https://a.example/".to_owned(),
+                    "https://b.example/".to_owned()
+                ]
+                .as_slice()
+            )
+        );
+        assert!(!flags.contains_key(&other));
     }
 }

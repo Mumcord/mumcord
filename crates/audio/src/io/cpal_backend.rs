@@ -36,14 +36,34 @@ impl CpalBackend {
 
     fn device(&self, direction: Direction, id: Option<&str>) -> Result<Device, IoError> {
         match id {
-            Some(id) => DeviceId::from_str(id)
-                .ok()
-                .and_then(|parsed| self.host.device_by_id(&parsed))
+            // Match the ids exactly as the device list reports them first: cpal's ALSA
+            // `device_by_id` rewrites `sysdefault:CARD=X` to `sysdefault:CARD=X,DEV=0`, which
+            // matches no listed device, so a saved card id would never open.
+            Some(id) => self
+                .listed(direction)
+                .find(|d| d.id().is_ok_and(|listed| listed.to_string() == id))
+                .or_else(|| {
+                    DeviceId::from_str(id)
+                        .ok()
+                        .and_then(|parsed| self.host.device_by_id(&parsed))
+                })
                 .ok_or(IoError::DeviceNotFound),
             None => self
                 .default_device(direction)
                 .ok_or(IoError::DeviceNotFound),
         }
+    }
+
+    /// The devices for `direction` as cpal enumerates them (empty if listing fails).
+    fn listed(&self, direction: Direction) -> impl Iterator<Item = Device> {
+        let devices = match direction {
+            Direction::Input => self.host.input_devices().map(|d| d.collect::<Vec<_>>()),
+            Direction::Output => self.host.output_devices().map(|d| d.collect::<Vec<_>>()),
+        };
+        devices
+            .inspect_err(|e| tracing::debug!("listing audio devices failed: {e}"))
+            .unwrap_or_default()
+            .into_iter()
     }
 
     fn info(&self, direction: Direction, device: &Device) -> Result<DeviceInfo, IoError> {

@@ -37,7 +37,8 @@
     "serverDeafened": "Deafened by the server",
     "suppressed": "Suppressed – can't speak in this channel",
     "localMuted": "Muted for you",
-    "unregistered": "Not registered on this server (guest)"
+    "unregistered": "Not registered on this server (guest)",
+    "nowPlaying": "Listening to {{track}}"
   },
   "announce": {
     "joined": "{{name}} joined your channel",

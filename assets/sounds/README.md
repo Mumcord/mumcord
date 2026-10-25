@@ -11,11 +11,12 @@ Format: 48 kHz, mono, 16-bit PCM. Peak about -18 dBFS, all under 400 ms. Embedde
 engine with `include_bytes!` (`crates/engine/src/sounds.rs`); regenerate with
 `python3 generate.py`.
 
-| File                            | Event                                                  |
-| ------------------------------- | ------------------------------------------------------ |
-| user_joined.wav / user_left.wav | someone joins / leaves your channel (rising / falling) |
-| mute.wav / unmute.wav           | you mute / unmute                                      |
-| deafen.wav / undeafen.wav       | you deafen / undeafen                                  |
-| message.wav                     | new message in a followed channel or private chat      |
-| voice_join.wav                  | you join a channel for voice (QA.23)                   |
-| hang_up.wav                     | you disconnect from a server (QA.19)                   |
+| File                            | Event                                                        |
+| ------------------------------- | ------------------------------------------------------------ |
+| user_joined.wav / user_left.wav | someone joins / leaves your channel (rising / falling)       |
+| mute.wav / unmute.wav           | you mute / unmute                                            |
+| deafen.wav / undeafen.wav       | you deafen / undeafen                                        |
+| message.wav                     | new message in a followed channel or private chat            |
+| mention.wav                     | someone mentions you (`@Name`); replaces message.wav (QA.41) |
+| voice_join.wav                  | you join a channel for voice (QA.23)                         |
+| hang_up.wav                     | you disconnect from a server (QA.19)                         |

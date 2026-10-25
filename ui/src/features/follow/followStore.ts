@@ -34,6 +34,16 @@ let unsubscribers: Unsubscribe[] = [];
 let generation = 0;
 const listeners = new Set<() => void>();
 
+/** Conversations currently shown in the chat column; their messages are read on arrival. */
+const onScreen = new Map<string, Conversation>();
+
+/** Marks a conversation as shown (or no longer shown) so incoming messages never raise its badge. */
+export function setConversationOnScreen(conversation: Conversation, shown: boolean): void {
+  const key = conversationKey(conversation);
+  if (shown) onScreen.set(key, conversation);
+  else onScreen.delete(key);
+}
+
 function set(next: FollowState): void {
   state = next;
   for (const listener of listeners) listener();
@@ -86,6 +96,14 @@ function bind(api: MumcordApi): void {
       set({ ...state, followed: channelIds });
     }),
     api.on("unreadChanged", ({ conversation, count }) => {
+      // Dropped before the store changes: rendering the count first would flash the badge until
+      // the mark-read round trip comes back.
+      if (count > 0 && onScreen.has(conversationKey(conversation))) {
+        api.conversationMarkRead(conversation).catch((error: unknown) => {
+          console.error("Marking a conversation as read failed", error);
+        });
+        return;
+      }
       const unread = new Map(state.unread);
       unread.set(conversationKey(conversation), count);
       set({ ...state, unread });

@@ -50,6 +50,7 @@ function renderScreen() {
     resolvedTheme: "dark",
     language: "en",
     chatDisplay: "cozy",
+    linkPreviews: true,
     applySettings,
   };
   return render(
@@ -177,6 +178,23 @@ describe("SettingsScreen", () => {
     });
   });
 
+  it("switches link previews off and applies it to the chat right away", async () => {
+    const update = vi.spyOn(api, "settingsUpdate");
+    await openSection("Chat & history");
+    const toggle = screen.getByRole("switch", { name: "Show link previews and embeds" });
+    expect(toggle).toBeChecked();
+    expect(toggle).toHaveAccessibleDescription(/see your IP address/);
+    fireEvent.click(toggle);
+    await waitFor(() => {
+      expect(update).toHaveBeenLastCalledWith(expect.objectContaining({ linkPreviews: false }));
+    });
+    await waitFor(() => {
+      expect(applySettings).toHaveBeenLastCalledWith(
+        expect.objectContaining({ linkPreviews: false }),
+      );
+    });
+  });
+
   it("rolls a failed save back and explains it", async () => {
     await openSection("Language");
     api.mock.failNext("settingsUpdate", "io");
@@ -217,11 +235,29 @@ describe("SettingsScreen", () => {
             selfMute: false,
             selfDeaf: true,
             messages: true,
+            mention: true,
+            mentionNotify: true,
             voiceJoin: true,
             hangUp: true,
           },
         }),
       );
+    });
+  });
+
+  it("has separate mention sound and notification switches, both on by default", async () => {
+    const update = vi.spyOn(api, "settingsUpdate");
+    await openSection("Sounds & notifications");
+    const sound = screen.getByRole("switch", { name: "Sound when mentioned" });
+    const notify = screen.getByRole("switch", { name: "Notify when mentioned" });
+    expect(sound).toBeChecked();
+    expect(notify).toBeChecked();
+    fireEvent.click(notify);
+    await waitFor(() => {
+      expect(update.mock.lastCall?.[0].sounds).toMatchObject({
+        mention: true,
+        mentionNotify: false,
+      });
     });
   });
 
@@ -554,6 +590,41 @@ describe("Voice section", () => {
     expect(await screen.findByText(/Privacy & Security → Accessibility/)).toBeInTheDocument();
   });
 
+  it("offers a manual voice threshold as a slider over the live level meter", async () => {
+    const update = vi.spyOn(api, "settingsUpdate");
+    await openSection("Voice");
+    expect(screen.queryByRole("slider")).not.toBeInTheDocument();
+    fireEvent.click(screen.getByRole("radio", { name: /Manual threshold/ }));
+    const slider = await screen.findByRole("slider", { name: "Voice activation threshold" });
+    expect(slider).toHaveValue("-40");
+    expect(screen.getByText("-40 dBFS")).toBeInTheDocument();
+    act(() => {
+      api.mock.emit("micLevel", { level: 0.5 });
+    });
+    expect(screen.getByRole("meter", { name: "Microphone level" })).toHaveAttribute(
+      "aria-valuenow",
+      "50",
+    );
+    fireEvent.change(slider, { target: { value: "-30" } });
+    await waitFor(() => {
+      expect(update).toHaveBeenLastCalledWith(
+        expect.objectContaining({ voiceActivation: "manual", voiceThresholdDbfs: -30 }),
+      );
+    });
+    expect(await screen.findByText("-30 dBFS")).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("radio", { name: /Automatic/ }));
+    await waitFor(() => {
+      expect(screen.queryByRole("slider")).not.toBeInTheDocument();
+    });
+  });
+
+  it("hides the threshold in push-to-talk mode", async () => {
+    await openSection("Voice");
+    fireEvent.click(screen.getByRole("radio", { name: /Push-to-talk/ }));
+    await screen.findByRole("button", { name: "Set key" });
+    expect(screen.queryByRole("radio", { name: /Manual threshold/ })).not.toBeInTheDocument();
+  });
+
   it("saves the voice processing switches", async () => {
     const update = vi.spyOn(api, "settingsUpdate");
     await openSection("Voice");
@@ -586,6 +657,65 @@ describe("Audio section music quality", () => {
 });
 
 describe("Chat & history section", () => {
+  it("offers the preview cache age with 7 days as the default and saves a change", async () => {
+    const update = vi.spyOn(api, "settingsUpdate");
+    await openSection("Chat & history");
+    const select = screen.getByRole("combobox", { name: "Delete cached previews after" });
+    expect(select).toHaveValue("7");
+    expect(
+      within(select)
+        .getAllByRole("option")
+        .map((o) => o.textContent),
+    ).toEqual(["1 day", "7 days", "30 days", "Never"]);
+    fireEvent.change(select, { target: { value: "30" } });
+    await waitFor(() => {
+      expect(update).toHaveBeenLastCalledWith(expect.objectContaining({ previewCacheDays: 30 }));
+    });
+    fireEvent.change(select, { target: { value: "none" } });
+    await waitFor(() => {
+      expect(update).toHaveBeenLastCalledWith(expect.objectContaining({ previewCacheDays: null }));
+    });
+  });
+
+  it("clears the preview cache now and says how much space it freed", async () => {
+    const clear = vi.spyOn(api, "previewCacheClear").mockResolvedValue(1_468_006);
+    await openSection("Chat & history");
+    fireEvent.click(screen.getByRole("button", { name: "Clear now" }));
+    expect(await screen.findByText("Cache cleared, 1.4 MB freed.")).toBeVisible();
+    expect(clear).toHaveBeenCalledOnce();
+  });
+
+  it("reports a failed cache clean-up", async () => {
+    vi.spyOn(api, "previewCacheClear").mockRejectedValue({ kind: "io", message: "x" });
+    vi.spyOn(console, "error").mockImplementation(() => undefined);
+    await openSection("Chat & history");
+    fireEvent.click(screen.getByRole("button", { name: "Clear now" }));
+    await waitFor(() => {
+      expect(screen.getByRole("status")).not.toBeEmptyDOMElement();
+    });
+    expect(screen.queryByText(/freed/)).toBeNull();
+  });
+
+  it("deletes old history automatically only when asked: off by default, no confirmation", async () => {
+    const update = vi.spyOn(api, "settingsUpdate");
+    await openSection("Chat & history");
+    const select = screen.getByRole("combobox", { name: "Delete chat history older than" });
+    expect(select).toHaveValue("none");
+    expect(
+      within(select)
+        .getAllByRole("option")
+        .map((o) => o.textContent),
+    ).toEqual(["7 days", "30 days", "90 days", "365 days", "Never (keep everything)"]);
+    expect(
+      screen.getByText(/deleted from this computer automatically, without asking/),
+    ).toBeVisible();
+    fireEvent.change(select, { target: { value: "90" } });
+    await waitFor(() => {
+      expect(update).toHaveBeenLastCalledWith(expect.objectContaining({ historyMaxAgeDays: 90 }));
+    });
+    expect(screen.queryByRole("dialog")).toBeNull();
+  });
+
   it("switches history saving per server", async () => {
     const setSaving = vi.spyOn(api, "historySetSaving");
     await openSection("Chat & history");
@@ -766,14 +896,15 @@ describe("Diagnostics section", () => {
 });
 
 describe("About section", () => {
-  it("shows version, system, the MIT license and the third-party notices", async () => {
+  it("shows version, system, the AGPL license, the commercial-license contact and the third-party notices", async () => {
     await openSection("About");
     expect(await screen.findByText("0.0.0-mock")).toBeInTheDocument();
     expect(screen.getByText("mock")).toBeInTheDocument();
-    const license = screen.getByLabelText("Mumcord license (MIT)");
+    const license = screen.getByLabelText("Mumcord license (AGPL-3.0)");
     expect(license.tagName).toBe("PRE");
     expect(license).toHaveAttribute("tabindex", "0");
-    expect(license).toHaveTextContent("MIT License");
+    expect(license).toHaveTextContent("GNU AFFERO GENERAL PUBLIC LICENSE");
+    expect(screen.getByText("Commercial licenses: tobias@vorwachs.com")).toBeInTheDocument();
     const notices = await screen.findByLabelText("Third-party notices");
     expect(notices).toHaveTextContent("Mumble");
     expect(notices).toHaveTextContent("BSD-3-Clause");

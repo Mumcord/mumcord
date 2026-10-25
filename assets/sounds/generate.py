@@ -44,6 +44,8 @@ SOUNDS = {
     "deafen": [(440.0, 0.11, 0.0), (330.0, 0.11, 0.07), (247.0, 0.15, 0.14)],
     "undeafen": [(247.0, 0.11, 0.0), (330.0, 0.11, 0.07), (440.0, 0.15, 0.14)],
     "message": [(1046.5, 0.18, 0.0)],
+    # you are mentioned: two quick high notes, clearly different from the single message tone
+    "mention": [(1318.5, 0.09, 0.0), (1760.0, 0.20, 0.09)],
     # you join a channel for voice: rising major arpeggio, brighter than user_joined
     "voice_join": [(523.3, 0.10, 0.0), (659.3, 0.10, 0.07), (784.0, 0.17, 0.14)],
     # you disconnect: a low falling fifth, like putting down a phone

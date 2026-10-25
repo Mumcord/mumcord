@@ -15,6 +15,15 @@
     "loading": "Cargando mensajes…",
     "loadFailed": "No se pudieron cargar los mensajes anteriores. Desplázate hacia arriba para reintentarlo."
   },
+  "format": {
+    "toolbar": "Formato",
+    "bold": "Negrita",
+    "italic": "Cursiva",
+    "strike": "Tachado",
+    "code": "Código en línea",
+    "codeBlock": "Bloque de código",
+    "link": "Enlace"
+  },
   "composer": {
     "label": "Mensaje a {{name}}",
     "hint": "Pulsa Intro para enviar y Mayús+Intro para una nueva línea. Funciona Markdown: **negrita**, *cursiva*, `código`, [enlace](https://…).",
@@ -49,5 +58,72 @@
     "label": "Información del canal",
     "showMore": "Mostrar más",
     "showLess": "Mostrar menos"
+  },
+  "mention": {
+    "list": "Personas que se pueden mencionar",
+    "found_one": "{{count}} persona sugerida. Usa las flechas y Enter para insertar.",
+    "found_other": "{{count}} personas sugeridas. Usa las flechas y Enter para insertar.",
+    "none": "No se encontró a nadie",
+    "mentionsYou": "Te menciona"
+  },
+  "preview": {
+    "open": "Abrir en el navegador",
+    "openLabel": "Abrir {{title}} en el navegador",
+    "play": "Reproducir {{title}}",
+    "player": "Reproductor de vídeo: {{title}}",
+    "videoTitle": "Vídeo de {{site}}",
+    "spotifyTitle": "Enlace de {{site}}",
+    "audioPlayer": "Reproductor de Spotify: {{title}}",
+    "kind": {
+      "track": "Canción",
+      "album": "Álbum",
+      "playlist": "Lista de reproducción",
+      "artist": "Artista",
+      "episode": "Episodio",
+      "show": "Podcast"
+    },
+    "inBrowser": "Se reproduce en tu navegador",
+    "card": "Vista previa del enlace: {{title}}",
+    "dismiss": "Ocultar vista previa"
+  },
+  "image": {
+    "loading": "Cargando la imagen {{name}}",
+    "label": "Imagen: {{name}}",
+    "view": "Ver la imagen {{name}}",
+    "viewMessage": "Imagen de {{name}}, abrir en el visor",
+    "failed": "No se puede mostrar la imagen (demasiado grande o no disponible)."
+  },
+  "viewer": {
+    "label": "Visor de imágenes",
+    "counter": "{{current}} / {{total}}",
+    "zoomIn": "Acercar",
+    "zoomOut": "Alejar",
+    "fit": "Ajustar a la ventana",
+    "save": "Guardar imagen",
+    "saved": "Imagen guardada",
+    "saveFailed": "No se pudo guardar la imagen",
+    "fileFilter": "Imagen",
+    "openInBrowser": "Abrir en el navegador",
+    "close": "Cerrar",
+    "previous": "Imagen anterior",
+    "next": "Imagen siguiente",
+    "unnamed": "imagen"
+  },
+  "favorites": {
+    "open": "GIF favoritos",
+    "title": "GIF favoritos",
+    "save": "Guardar como favorito",
+    "remove": "Quitar de favoritos",
+    "removeNamed": "Quitar {{name}} de favoritos",
+    "send": "Enviar {{name}}",
+    "hint": "Las flechas se mueven, Intro envía, Supr quita, Escape cierra.",
+    "empty": "Aún no hay favoritos. Haz clic derecho en un GIF del chat o usa su estrella y elige \"Guardar como favorito\". Aparecerá aquí."
+  },
+  "imageMenu": {
+    "label": "Imagen {{name}}"
+  },
+  "attribution": {
+    "via": "vía {{brand}}",
+    "view": "Ver en {{brand}}"
   }
 }

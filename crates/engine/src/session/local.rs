@@ -5,7 +5,9 @@ use std::path::PathBuf;
 use std::sync::Arc;
 
 use mumcord_audio::dsp::{DspControls, TalkMode as DspTalkMode};
-use mumcord_store::{Identity, NewServer, SavedServer, SecretStore, ServerId, Settings, TalkMode};
+use mumcord_store::{
+    Identity, NewServer, SavedServer, SecretStore, ServerId, Settings, TalkMode, VoiceActivation,
+};
 
 use super::{Engine, EngineError, EngineResult, ErrorKind, lock, store_error};
 use super::{IdentityView, PasswordChange, ServerFields, ServerView};
@@ -16,6 +18,8 @@ pub(crate) fn apply_dsp(controls: &DspControls, settings: &Settings) {
     controls.set_noise_suppression(settings.noise_suppression);
     controls.set_auto_gain(settings.auto_gain);
     controls.set_music_quality(settings.music_quality);
+    controls.set_manual_threshold(settings.voice_activation == VoiceActivation::Manual);
+    controls.set_threshold_dbfs(settings.voice_threshold_dbfs as f32);
     controls.set_mode(match settings.talk_mode {
         TalkMode::VoiceActivation => DspTalkMode::VoiceActivation,
         TalkMode::PushToTalk => DspTalkMode::PushToTalk,
@@ -253,6 +257,14 @@ impl Engine {
             previous
         };
         apply_dsp(&self.inner.controls, &settings);
+        if previous.preview_cache_days != settings.preview_cache_days
+            || previous.history_max_age_days != settings.history_max_age_days
+        {
+            self.run_maintenance_in_background();
+        }
+        if previous.now_playing != settings.now_playing {
+            self.now_playing_set_enabled(settings.now_playing);
+        }
         if settings.talk_mode != TalkMode::PushToTalk {
             self.inner.controls.set_ptt_pressed(false);
         }

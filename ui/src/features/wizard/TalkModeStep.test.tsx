@@ -56,6 +56,7 @@ describe("TalkModeStep", () => {
         pttKey: null,
         registerLinkHandler: true,
         autostart: false,
+        linkPreviews: true,
       });
     });
   });
@@ -97,6 +98,7 @@ describe("TalkModeStep", () => {
         pttKey: "Ctrl+A",
         registerLinkHandler: true,
         autostart: false,
+        linkPreviews: true,
       });
     });
   });

@@ -6,11 +6,13 @@ import { getApi } from "../../api";
 import { ConnectionInfo } from "../connection";
 import { disconnect, useServers } from "../servers";
 import { useAvatars } from "../members/useAvatars";
+import { trackLabel, useNowPlaying } from "../nowplaying";
 import { describeError } from "./errors";
 import { ProfileDialog } from "./ProfileDialog";
 import { joinChannel, useReadOnly } from "./readOnly";
 import { RegisterDialog } from "./RegisterDialog";
 import { useMicLevelFill } from "./useMicLevelFill";
+import { usePushToTalk } from "./usePushToTalk";
 import { useUserPanel } from "./useUserPanel";
 import "./userpanel.css";
 
@@ -25,9 +27,10 @@ function Icon({ d }: { d: string }) {
 }
 
 const MIC = "M12 3a3 3 0 0 0-3 3v6a3 3 0 0 0 6 0V6a3 3 0 0 0-3-3zM6 11a6 6 0 0 0 12 0M12 17v4";
+const MUSIC = "M9 18V5l12-2v13M9 18a3 3 0 1 1-6 0a3 3 0 1 1 6 0M21 16a3 3 0 1 1-6 0a3 3 0 1 1 6 0";
 const HEADPHONES = "M4 15v-3a8 8 0 0 1 16 0v3M4 15h3v5H4zM17 15h3v5h-3z";
 const GEAR =
-  "M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8zM12 2v3M12 19v3M2 12h3M19 12h3M5 5l2 2M17 17l2 2M19 5l-2 2M7 17l-2 2";
+  "M10.47 5.37L10.9 3.07L13.1 3.07L13.53 5.37L14.6 5.72L15.6 6.23L17.54 4.91L19.09 6.46L17.77 8.4L18.28 9.4L18.63 10.47L20.93 10.9L20.93 13.1L18.63 13.53L18.28 14.6L17.77 15.6L19.09 17.54L17.54 19.09L15.6 17.77L14.6 18.28L13.53 18.63L13.1 20.93L10.9 20.93L10.47 18.63L9.4 18.28L8.4 17.77L6.46 19.09L4.91 17.54L6.23 15.6L5.72 14.6L5.37 13.53L3.07 13.1L3.07 10.9L5.37 10.47L5.72 9.4L6.23 8.4L4.91 6.46L6.46 4.91L8.4 6.23L9.4 5.72ZM9 12a3 3 0 1 0 6 0a3 3 0 1 0-6 0";
 const HANG_UP = "M3 14c5-5 13-5 18 0l-2.5 2.5-3-1.5v-2.5a9 9 0 0 0-5 0V15l-3 1.5z";
 const SLASH = "M4 4l16 16";
 
@@ -52,7 +55,18 @@ export function UserPanel() {
   const mute = self?.selfMute ?? false;
   const deaf = self?.selfDeaf ?? false;
   const present = self !== null;
-  const showLevel = state.connected && !mute && !deaf;
+  const ptt = usePushToTalk();
+  const transmitting = self !== null && state.talking.has(self.session);
+  // The own shared track (only reported while "Now playing" is on); no session matches -1.
+  const ownTrack = useNowPlaying(self?.session ?? -1);
+  // Push-to-talk and not held: the mic is closed, so show it crossed out and hide the level.
+  const pttIdle = ptt.active && !transmitting && !mute && !deaf;
+  const showLevel = state.connected && !mute && !deaf && !pttIdle;
+  const micTitle = ptt.active
+    ? ptt.key === null
+      ? t("pttNoKey")
+      : t("ptt", { key: ptt.key })
+    : undefined;
   useMicLevelFill(micButton, showLevel);
 
   // Announce state changes (also those made elsewhere, e.g. the server or a shortcut).
@@ -135,7 +149,10 @@ export function UserPanel() {
           ? t("status.disconnected")
           : readOnly
             ? t("status.readOnly")
-            : serverLabel || t("status.connected");
+            : null;
+  // In the normal connected state the status line shows the own playing track, if any.
+  const track = status === null && ownTrack?.track.playing ? trackLabel(ownTrack.track) : null;
+  const statusText = status ?? track ?? (serverLabel || t("status.connected"));
 
   return (
     <div className="userpanel">
@@ -167,8 +184,18 @@ export function UserPanel() {
             <span className="userpanel__name" title={name}>
               {name}
             </span>{" "}
-            <span className="userpanel__status" title={status}>
-              {status}
+            <span className="userpanel__status" title={statusText}>
+              {track && (
+                <svg
+                  className="userpanel__status-icon"
+                  viewBox="0 0 24 24"
+                  aria-hidden="true"
+                  focusable="false"
+                >
+                  <path d={MUSIC} fill="none" stroke="currentColor" strokeWidth="2" />
+                </svg>
+              )}
+              {statusText}
             </span>
           </span>
         </button>
@@ -178,8 +205,10 @@ export function UserPanel() {
           ref={micButton}
           type="button"
           className="userpanel__toggle userpanel__toggle--mic"
+          data-ptt-idle={pttIdle ? "" : undefined}
           aria-pressed={mute}
           aria-label={t("mute")}
+          title={micTitle}
           disabled={!connected}
           onClick={() => {
             run(getApi().setSelfMute(!mute));
@@ -188,7 +217,7 @@ export function UserPanel() {
           {showLevel ? <span className="userpanel__level" aria-hidden="true" /> : null}
           <span className="userpanel__icon">
             <Icon d={MIC} />
-            {mute ? <Icon d={SLASH} /> : null}
+            {mute || pttIdle ? <Icon d={SLASH} /> : null}
           </span>
         </button>
         <button

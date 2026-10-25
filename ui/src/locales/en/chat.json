@@ -15,6 +15,15 @@
     "loading": "Loading messages…",
     "loadFailed": "Older messages couldn't be loaded. Scroll up to try again."
   },
+  "format": {
+    "toolbar": "Formatting",
+    "bold": "Bold",
+    "italic": "Italic",
+    "strike": "Strikethrough",
+    "code": "Inline code",
+    "codeBlock": "Code block",
+    "link": "Link"
+  },
   "composer": {
     "label": "Message {{name}}",
     "hint": "Press Enter to send and Shift+Enter for a new line. Markdown works: **bold**, *italic*, `code`, [link](https://…).",
@@ -49,5 +58,72 @@
     "label": "Channel info",
     "showMore": "Show more",
     "showLess": "Show less"
+  },
+  "mention": {
+    "list": "Mentionable people",
+    "found_one": "{{count}} person suggested. Use the arrow keys, then Enter to insert.",
+    "found_other": "{{count}} people suggested. Use the arrow keys, then Enter to insert.",
+    "none": "No one found",
+    "mentionsYou": "Mentions you"
+  },
+  "preview": {
+    "open": "Open in browser",
+    "openLabel": "Open {{title}} in browser",
+    "play": "Play {{title}}",
+    "player": "Video player: {{title}}",
+    "videoTitle": "{{site}} video",
+    "spotifyTitle": "{{site}} link",
+    "audioPlayer": "Spotify player: {{title}}",
+    "kind": {
+      "track": "Track",
+      "album": "Album",
+      "playlist": "Playlist",
+      "artist": "Artist",
+      "episode": "Episode",
+      "show": "Show"
+    },
+    "inBrowser": "Plays in your browser",
+    "card": "Link preview: {{title}}",
+    "dismiss": "Hide preview"
+  },
+  "image": {
+    "loading": "Loading image {{name}}",
+    "label": "Image: {{name}}",
+    "view": "View image {{name}}",
+    "viewMessage": "Image from {{name}}, open in viewer",
+    "failed": "Image can't be shown (too large or unavailable)."
+  },
+  "viewer": {
+    "label": "Image viewer",
+    "counter": "{{current}} / {{total}}",
+    "zoomIn": "Zoom in",
+    "zoomOut": "Zoom out",
+    "fit": "Fit to window",
+    "save": "Save image",
+    "saved": "Image saved",
+    "saveFailed": "The image could not be saved",
+    "fileFilter": "Image",
+    "openInBrowser": "Open in browser",
+    "close": "Close",
+    "previous": "Previous image",
+    "next": "Next image",
+    "unnamed": "image"
+  },
+  "favorites": {
+    "open": "GIF favorites",
+    "title": "GIF favorites",
+    "save": "Save as favorite",
+    "remove": "Remove from favorites",
+    "removeNamed": "Remove {{name}} from favorites",
+    "send": "Send {{name}}",
+    "hint": "Arrow keys move, Enter sends, Delete removes, Escape closes.",
+    "empty": "No favorites yet. Right-click a GIF in the chat, or use the star on it, and choose \"Save as favorite\". It will show up here."
+  },
+  "imageMenu": {
+    "label": "Image {{name}}"
+  },
+  "attribution": {
+    "via": "via {{brand}}",
+    "view": "View on {{brand}}"
   }
 }
