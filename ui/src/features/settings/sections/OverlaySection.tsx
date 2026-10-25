@@ -8,7 +8,7 @@ import { WindowOverlayGroup } from "./WindowOverlayGroup";
 
 /**
  * Overlay settings (FR-1.44 – FR-1.46b): the window overlay and the in-game overlay.
- * Positional audio is a later stage and has no settings yet. `inGameApi` defaults to the
+ * Positional audio lives in the audio section. `inGameApi` defaults to the
  * engine's in-game overlay commands; tests pass their own.
  */
 export function OverlaySection({ inGameApi }: { inGameApi?: InGameOverlayApi }) {

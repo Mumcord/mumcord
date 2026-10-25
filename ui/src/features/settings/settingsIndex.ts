@@ -55,6 +55,14 @@ export const SETTINGS_INDEX: readonly SettingEntry[] = [
     control: "audio.musicQuality",
     terms: ["audio.musicQualityHint"],
   },
+  {
+    section: "audio",
+    group: "positional.title",
+    control: "positional.switch",
+    terms: ["positional.hint"],
+  },
+  { section: "audio", group: "positional.title", control: "positional.minDistance" },
+  { section: "audio", group: "positional.title", control: "positional.maxDistance" },
   { section: "audio", group: "audio.test", terms: ["audio.testHint", "audio.testStart"] },
   {
     section: "voice",

@@ -77,6 +77,8 @@
     "registered": "Registered on this server ✓",
     "registerHint": "Keeps your name and avatar on this server",
     "allSettings": "All settings…",
-    "label": "Quick settings"
+    "label": "Quick settings",
+    "positional": "Positional audio",
+    "positionalHint": "Voices placed in 3D around you"
   }
 }

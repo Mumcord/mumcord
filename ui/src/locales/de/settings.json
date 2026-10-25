@@ -352,5 +352,16 @@
     "unsupported": "Auf diesem System nicht unterstützt.",
     "current": "Wird geteilt: {{game}}",
     "nothing": "Gerade wird kein Spiel erkannt."
+  },
+  "positional": {
+    "title": "Positionsabhängiger Ton",
+    "switch": "Positionsabhängiger Ton",
+    "hint": "Die Stimmen von Leuten im selben Spiel werden in 3D um dich verteilt. Braucht ein Spiel, das seine Positionen teilt.",
+    "minDistance": "Volle Lautstärke bis (Meter)",
+    "maxDistance": "Stille ab (Meter)",
+    "invalid": "Entfernungen in Metern angeben: Minimum mindestens 0, Maximum mindestens 1 über dem Minimum und höchstens 1000.",
+    "sourceGame": "Positionen von: {{source}} – {{game}}",
+    "source": "Positionen von: {{source}}",
+    "none": "Kein Spiel erkannt"
   }
 }

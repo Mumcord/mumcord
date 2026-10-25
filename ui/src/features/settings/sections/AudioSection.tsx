@@ -6,6 +6,7 @@ import { Group, Section } from "../components/Section";
 import { Switch } from "../components/Switch";
 import { readableDeviceName } from "../deviceNames";
 import { errorText } from "../errors";
+import { PositionalGroup } from "./PositionalGroup";
 import type { SettingsSectionProps } from "./types";
 
 type MicTestPhaseName = "recording" | "playing" | "done" | "failed";
@@ -72,6 +73,7 @@ export function AudioSection({ settings, update }: SettingsSectionProps) {
           }}
         />
       </Group>
+      <PositionalGroup settings={settings} update={update} />
       <MicTest />
     </Section>
   );

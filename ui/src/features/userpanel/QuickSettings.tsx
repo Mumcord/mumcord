@@ -39,6 +39,7 @@ const ICON = {
   overlay: "M12 3l9 5-9 5-9-5zM3 13l9 5 9-5",
   profile: "M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2M12 3a4 4 0 1 0 0 8a4 4 0 0 0 0-8z",
   register: "M12 2l8 3v6c0 5-3.5 9-8 11c-4.5-2-8-6-8-11V5zM9 12l2 2l4-4",
+  positional: "M3 18v-6a9 9 0 0 1 18 0v6M3 18a2 2 0 0 0 2 2h1v-6H3M21 18a2 2 0 0 1-2 2h-1v-6h3",
   chevron: "M9 6l6 6l-6 6",
 } as const;
 
@@ -332,6 +333,17 @@ export function QuickSettings({
               update({ nowGaming: !settings.nowGaming });
             },
             !gamingSupported,
+          )}
+          {row(
+            ICON.positional,
+            t("quickSettings.positional"),
+            t("quickSettings.positionalHint"),
+            settings.positional.enabled,
+            () => {
+              update({
+                positional: { ...settings.positional, enabled: !settings.positional.enabled },
+              });
+            },
           )}
           {overlayShown &&
             row(
