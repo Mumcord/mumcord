@@ -1078,3 +1078,12 @@ Mumble servers keep no chat history; Mumcord clients can fill gaps for each othe
 ✍️ Note: Requested in chat during /dev.
 
 ---
+
+#### QA.48 History sync details (stage 1d)? `◉`
+
+- [x] **Availability announcements:** each Mumcord client that shares history publishes a small summary to other Mumcord users – per channel the time range it holds and the message count (no content) – on connect, when it changes, and on request. A joining client uses these summaries to ask only the clients that cover the missing range (fewest requests, spread across several holders).
+- [x] **Duplicate check by hash:** every message gets a content hash (channel, sender certificate hash or name, server timestamp rounded to the second, normalized body). Requests include the hashes already held for the range so holders send only missing messages, and received messages are dropped if their hash already exists – no duplicates, also across several holders.
+
+✍️ Note: Requested in chat during /dev.
+
+---

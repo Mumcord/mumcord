@@ -140,7 +140,7 @@ Mumcord enforces nothing itself; the server's ACLs decide. The client reflects p
 - **FR-1.66** Quick settings (QA.47, stage 1c): right-clicking the settings button in the user panel opens a small menu with switches for link previews, theme (system/dark/light), now-playing sharing and now-gaming sharing, applied immediately and saved like the full settings.
 
 ### 4.10 Stage 1d – Mumcord-to-Mumcord (QA.45)
-- **FR-1.60** History sync: on joining a channel or via "Load earlier messages", Mumcord asks other Mumcord users who may read the channel (via plugin data) for its messages in a time range (max 7 days back, max 500 messages per request, chunked under the server's plugin-data limits, rate-limited). Answering clients send stored channel messages only, never private chats. Sharing the own history is on by default and switchable in the first-start wizard and in settings. Received messages are sanitized, deduplicated, merged by time and marked "from ‹name›'s history".
+- **FR-1.60** History sync: on joining a channel or via "Load earlier messages", Mumcord asks other Mumcord users who may read the channel (via plugin data) for its messages in a time range (max 7 days back, max 500 messages per request, chunked under the server's plugin-data limits, rate-limited). Answering clients send stored channel messages only, never private chats. Sharing the own history is on by default and switchable in the first-start wizard and in settings. Received messages are sanitized, deduplicated, merged by time and marked "from ‹name›'s history". Clients that share history publish per-channel availability summaries (time range and message count, no content) on connect, on change and on request; a joining client asks only holders that cover the missing range. Each message carries a content hash (channel, sender certificate hash or name, server timestamp to the second, normalized body); requests list the hashes already held so only missing messages are sent, and received messages with a known hash are discarded (QA.48).
 - **FR-1.61** Mumcord users are recognised through a plugin-data hello and get a small Mumcord badge with tooltip next to their name.
 - **FR-1.62** Double-clicking a person opens the private chat with them; a single click opens the hover card pinned, with "Private message" (top right) and a button for the full profile (QA.46).
 - **FR-1.63** Redesigned full profile: header with avatar and avatar-derived banner colour, name, registered/guest, Mumcord badge, now playing / now gaming, comment; sections with all local settings (volume, local mute, friend, private note).
@@ -400,6 +400,7 @@ Unless stated otherwise: a fresh Mumcord install, a local test server (1.5) runn
 
 **Stage 1d – Mumcord-to-Mumcord**
 - **AC-1.51** Client A stays in Lobby while messages are sent; client B joins later → B receives the missed Lobby messages (≤7 days, ≤500), marked "from A's history", in correct order without duplicates; private messages are not transferred; with sharing off on A, B gets nothing.
+- **AC-1.51b** Clients A and C both hold overlapping Lobby history; B joins → B sees both availability summaries, receives each missing message exactly once (no duplicates by hash), and messages B already had are not transferred again.
 - **AC-1.52** Two Mumcord clients and one official client on the server → the Mumcord clients show each other with the Mumcord badge; the official client has none.
 - **AC-1.53** Double-click on Bot opens the private chat; single click shows the pinned card with "Private message" and "Full profile"; the full profile shows the redesigned header and local settings.
 - **AC-1.54** Add Bot as a friend → Bot appears in Friends as online; Bot disconnects → offline in the list and in the private chat header; Bot reconnects with another name → still the same friend and the earlier private chat history is shown; automatic history deletion leaves it untouched.
@@ -506,6 +507,7 @@ Unless stated otherwise: a fresh Mumcord install, a local test server (1.5) runn
 | QA.45 | Stage 1d: history sync between Mumcord clients (7 days / 500 msgs, sharing on by default, wizard + settings) and Mumcord badge | Addendum 2026-10-25; scope 2.1, FR-1.60, FR-1.61, AC-1.51, AC-1.52 |
 | QA.46 | Stage 1d: double-click DM, pinned card with DM + full profile, profile redesign, friends by cert hash with online state, kept friend DM history | Addendum 2026-10-25; FR-1.62–1.65, AC-1.53, AC-1.54 |
 | QA.47 | Gear icon for the settings button; stage 1c quick settings on right-click (previews, theme, now playing/gaming) | Addendum 2026-10-25; section 6, FR-1.66 |
+| QA.48 | History sync: availability summaries per channel/range, content hashes for dedup and delta requests | Addendum 2026-10-25; FR-1.60, AC-1.51b |
 
 ## 13. Open points & risks
 
