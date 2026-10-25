@@ -1,13 +1,16 @@
 import { act, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi, type Mock } from "vitest";
+import { hintPreferences, setHintPreference } from "../../a11y/hintPreferences";
 import { createMockApi, setApi, type MockApi } from "../../api";
 import { PreferencesContext, type Preferences } from "../../app/preferences";
 import { applyLanguage } from "../../i18n";
+import { openInBrowser } from "../chat/openLink";
 import { axeViolations } from "../../test/axe";
 import { applyThemeToDocument } from "../../theme/theme";
 import { pickOpenPath, pickSavePath } from "./fileDialogs";
 import { SettingsScreen } from "./SettingsScreen";
 
+vi.mock("../chat/openLink", () => ({ openInBrowser: vi.fn() }));
 vi.mock("./fileDialogs", () => ({
   pickSavePath: vi.fn(),
   pickOpenPath: vi.fn(),
@@ -78,7 +81,7 @@ describe("SettingsScreen", () => {
     const list = screen.getByRole("tablist", { name: "Settings sections" });
     expect(list).toHaveAttribute("aria-orientation", "vertical");
     const tabs = within(list).getAllByRole("tab");
-    expect(tabs).toHaveLength(10);
+    expect(tabs).toHaveLength(11);
     const identity = screen.getByRole("tab", { name: "Identity" });
     expect(identity).toHaveAttribute("aria-selected", "true");
     expect(identity).toHaveAttribute("tabindex", "0");
@@ -296,6 +299,30 @@ describe("SettingsScreen", () => {
   it("shows the overlay section", async () => {
     await openSection("Overlay");
     expect(await screen.findByRole("switch", { name: "Show the overlay" })).toBeInTheDocument();
+  });
+
+  it("offers the in-game overlay through the engine", async () => {
+    const setMode = vi.spyOn(api, "ingameOverlaySetMode");
+    await openSection("Overlay");
+    fireEvent.click(await screen.findByRole("radio", { name: "On" }));
+    expect(setMode).toHaveBeenCalledWith("on");
+    expect(screen.queryByText(/not available on this system/)).not.toBeInTheDocument();
+  });
+
+  it("jumps from the KDE overlay help to the compatibility mode switch", async () => {
+    const state = await api.overlayState();
+    vi.spyOn(api, "overlayState").mockResolvedValue({ ...state, kdeWayland: true });
+    vi.spyOn(api, "pttSession").mockResolvedValue({
+      waylandDesktop: true,
+      compatibilityActive: false,
+      kde: false,
+    });
+    await openSection("Overlay");
+    fireEvent.click(await screen.findByRole("button", { name: "Use compatibility mode instead" }));
+    const toggle = await screen.findByRole("switch", { name: /Compatibility mode/ });
+    await waitFor(() => {
+      expect(toggle).toHaveFocus();
+    });
   });
 });
 
@@ -534,6 +561,7 @@ describe("Voice section", () => {
       vi.spyOn(api, "pttSession").mockResolvedValue({
         waylandDesktop: true,
         compatibilityActive: false,
+        kde: false,
       });
       vi.spyOn(api, "pttMouseStatus").mockResolvedValue({ support: "evdev", state: "ready" });
       const update = vi.spyOn(api, "settingsUpdate");
@@ -557,6 +585,7 @@ describe("Voice section", () => {
       vi.spyOn(api, "pttSession").mockResolvedValue({
         waylandDesktop: true,
         compatibilityActive: true,
+        kde: false,
       });
       vi.spyOn(api, "pttMouseStatus").mockResolvedValue({ support: "evdev", state: "ready" });
       await api.settingsUpdate({ ...(await api.settingsGet()), pttCompatibilityMode: true });
@@ -567,10 +596,93 @@ describe("Voice section", () => {
       expect(screen.queryByRole("button", { name: "Restart now" })).not.toBeInTheDocument();
     });
 
+    it("offers the KDE X11 settings only on KDE and reports a failure", async () => {
+      vi.spyOn(api, "pttSession").mockResolvedValue({
+        waylandDesktop: true,
+        compatibilityActive: true,
+        kde: true,
+      });
+      const open = vi.spyOn(api, "pttOpenKdeX11Settings");
+      await openSection("Voice");
+      const button = await screen.findByRole("button", { name: "Open KDE X11 settings" });
+      fireEvent.click(button);
+      expect(open).toHaveBeenCalledOnce();
+      vi.spyOn(console, "error").mockImplementation(() => undefined);
+      api.mock.failNext("pttOpenKdeX11Settings", "io");
+      fireEvent.click(button);
+      expect(await screen.findByText(/could not open the KDE settings/)).toBeInTheDocument();
+    });
+
+    it("asks before allowing mouse buttons on KDE, then offers a restart and undo", async () => {
+      vi.spyOn(api, "pttSession").mockResolvedValue({
+        waylandDesktop: true,
+        compatibilityActive: true,
+        kde: true,
+      });
+      const allow = vi.spyOn(api, "pttKdeX11AllowMouse");
+      const undo = vi.spyOn(api, "pttKdeX11Undo");
+      await openSection("Voice");
+      fireEvent.click(await screen.findByRole("button", { name: "Allow mouse buttons" }));
+      expect(allow).not.toHaveBeenCalled();
+      fireEvent.click(await screen.findByRole("button", { name: "Cancel" }));
+      expect(allow).not.toHaveBeenCalled();
+      fireEvent.click(await screen.findByRole("button", { name: "Allow mouse buttons" }));
+      fireEvent.click(await screen.findByRole("button", { name: "Allow" }));
+      expect(await screen.findByText(/Restart Mumcord for it to take effect/)).toBeInTheDocument();
+      expect(allow).toHaveBeenCalledOnce();
+      expect(screen.queryByRole("button", { name: "Allow mouse buttons" })).toBeNull();
+      fireEvent.click(screen.getByRole("button", { name: "Undo" }));
+      await waitFor(() => {
+        expect(undo).toHaveBeenCalledOnce();
+      });
+      expect(
+        await screen.findByRole("button", { name: "Allow mouse buttons" }),
+      ).toBeInTheDocument();
+    });
+
+    it("shows no allow button when KDE already allows mouse buttons", async () => {
+      vi.spyOn(api, "pttSession").mockResolvedValue({
+        waylandDesktop: true,
+        compatibilityActive: true,
+        kde: true,
+      });
+      vi.spyOn(api, "pttKdeX11Access").mockResolvedValue({ allowed: true, undoAvailable: false });
+      await openSection("Voice");
+      expect(await screen.findByText(/already allows mouse buttons/)).toBeInTheDocument();
+      expect(screen.queryByRole("button", { name: "Allow mouse buttons" })).toBeNull();
+      expect(screen.queryByRole("button", { name: "Undo" })).toBeNull();
+    });
+
+    it("reports a failed change", async () => {
+      vi.spyOn(api, "pttSession").mockResolvedValue({
+        waylandDesktop: true,
+        compatibilityActive: true,
+        kde: true,
+      });
+      vi.spyOn(console, "error").mockImplementation(() => undefined);
+      await openSection("Voice");
+      fireEvent.click(await screen.findByRole("button", { name: "Allow mouse buttons" }));
+      api.mock.failNext("pttKdeX11AllowMouse", "io");
+      fireEvent.click(await screen.findByRole("button", { name: "Allow" }));
+      expect(await screen.findByText(/could not change the KDE setting/)).toBeInTheDocument();
+    });
+
+    it("hides the KDE X11 settings on other desktops", async () => {
+      vi.spyOn(api, "pttSession").mockResolvedValue({
+        waylandDesktop: true,
+        compatibilityActive: true,
+        kde: false,
+      });
+      await openSection("Voice");
+      await screen.findByRole("switch", { name: /Compatibility mode/ });
+      expect(screen.queryByRole("button", { name: "Open KDE X11 settings" })).toBeNull();
+    });
+
     it("reports a failed restart", async () => {
       vi.spyOn(api, "pttSession").mockResolvedValue({
         waylandDesktop: true,
         compatibilityActive: true,
+        kde: false,
       });
       api.mock.failNext("appRestart", "internal");
       // Running in compatibility mode with the setting off: switching back is pending.
@@ -896,7 +1008,7 @@ describe("Diagnostics section", () => {
 });
 
 describe("About section", () => {
-  it("shows version, system, the AGPL license, the commercial-license contact and the third-party notices", async () => {
+  it("shows version, system, the AGPL license and the third-party notices", async () => {
     await openSection("About");
     expect(await screen.findByText("0.0.0-mock")).toBeInTheDocument();
     expect(screen.getByText("mock")).toBeInTheDocument();
@@ -904,11 +1016,33 @@ describe("About section", () => {
     expect(license.tagName).toBe("PRE");
     expect(license).toHaveAttribute("tabindex", "0");
     expect(license).toHaveTextContent("GNU AFFERO GENERAL PUBLIC LICENSE");
-    expect(screen.getByText("Commercial licenses: tobias@vorwachs.com")).toBeInTheDocument();
     const notices = await screen.findByLabelText("Third-party notices");
     expect(notices).toHaveTextContent("Mumble");
     expect(notices).toHaveTextContent("BSD-3-Clause");
     expect(notices).toHaveAttribute("tabindex", "0");
+  });
+
+  it("opens the changelog for the shown version and the support links in the browser", async () => {
+    await openSection("About");
+    await screen.findByText("0.0.0-mock");
+    fireEvent.click(screen.getByRole("button", { name: "What's new" }));
+    expect(openInBrowser).toHaveBeenLastCalledWith("https://mumcord.app/en/changelog#v0.0.0-mock");
+    fireEvent.click(screen.getByRole("button", { name: "Report a bug" }));
+    expect(openInBrowser).toHaveBeenLastCalledWith(
+      "https://github.com/ToBee94/mumcord/issues/new?template=bug_report.yml",
+    );
+    fireEvent.click(screen.getByRole("button", { name: "Request a feature" }));
+    expect(openInBrowser).toHaveBeenLastCalledWith(
+      "https://github.com/ToBee94/mumcord/issues/new?template=feature_request.yml",
+    );
+  });
+
+  it("links the German changelog for the German UI", async () => {
+    await applyLanguage("de");
+    await openSection("Über");
+    await screen.findByText("0.0.0-mock");
+    fireEvent.click(screen.getByRole("button", { name: "Neuigkeiten" }));
+    expect(openInBrowser).toHaveBeenLastCalledWith("https://mumcord.app/changelog#v0.0.0-mock");
   });
 
   it("explains when the notices cannot be loaded", async () => {
@@ -918,5 +1052,104 @@ describe("About section", () => {
     expect(await screen.findByRole("alert")).toHaveTextContent(
       "The third-party notices could not be loaded.",
     );
+  });
+});
+
+describe("Settings search", () => {
+  const search = () => screen.getByRole("searchbox", { name: "Search settings" });
+
+  it("lists matching settings as Section › Setting and jumps to the control", async () => {
+    renderScreen();
+    fireEvent.change(search(), { target: { value: "noise" } });
+    expect(screen.getByRole("tablist", { hidden: true })).not.toBeVisible();
+    const results = screen.getByRole("list", { name: "Search results" });
+    fireEvent.click(within(results).getByRole("button", { name: "Voice › Noise suppression" }));
+    const toggle = await screen.findByRole("switch", { name: "Noise suppression" });
+    await waitFor(() => {
+      expect(toggle).toHaveFocus();
+    });
+    expect(toggle.closest(".settings-switch")).toHaveClass("settings-highlight");
+    expect(search()).toHaveValue("");
+    expect(screen.getByRole("tab", { name: "Voice" })).toHaveAttribute("aria-selected", "true");
+  });
+
+  it("finds settings by their hint, ignoring accents", async () => {
+    await applyLanguage("de");
+    renderScreen();
+    const field = screen.getByRole("searchbox", { name: "Einstellungen durchsuchen" });
+    fireEvent.change(field, { target: { value: "sprunglinks" } });
+    expect(
+      screen.getByRole("button", { name: "Barrierefreiheit › Sprunglinks" }),
+    ).toBeInTheDocument();
+    fireEvent.change(field, { target: { value: "screenreader ansagen" } });
+    expect(
+      screen.getByRole("button", { name: "Barrierefreiheit › Screenreader-Ansagen" }),
+    ).toBeInTheDocument();
+  });
+
+  it("opens a matching section and focuses its tab", async () => {
+    renderScreen();
+    fireEvent.change(search(), { target: { value: "sounds" } });
+    fireEvent.click(screen.getByRole("button", { name: "Sounds & notifications" }));
+    await waitFor(() => {
+      expect(screen.getByRole("tab", { name: "Sounds & notifications" })).toHaveFocus();
+    });
+  });
+
+  it("shows an empty state and clears with Escape without closing the settings", () => {
+    const closed = vi.fn();
+    document.addEventListener("keydown", closed);
+    renderScreen();
+    fireEvent.change(search(), { target: { value: "xyz" } });
+    expect(screen.getByText("No settings match “xyz”.")).toBeInTheDocument();
+    fireEvent.keyDown(search(), { key: "Escape" });
+    expect(search()).toHaveValue("");
+    expect(closed).not.toHaveBeenCalled();
+    expect(screen.getByRole("tablist")).toBeVisible();
+    document.removeEventListener("keydown", closed);
+  });
+
+  it("focuses the search field with Ctrl+F", () => {
+    renderScreen();
+    const outside = vi.fn((event: KeyboardEvent) => event.defaultPrevented);
+    window.addEventListener("keydown", outside);
+    fireEvent.keyDown(screen.getByRole("tab", { name: "Identity" }), { key: "f", ctrlKey: true });
+    expect(search()).toHaveFocus();
+    // The channel search behind the overlay sees the key as handled.
+    expect(outside).toHaveReturnedWith(true);
+    window.removeEventListener("keydown", outside);
+  });
+
+  it("keeps the section list in its own scrolling column", async () => {
+    renderScreen();
+    const sidebar = screen.getByRole("tablist").parentElement;
+    expect(sidebar).toHaveClass("settings__sidebar");
+    expect(sidebar).toContainElement(search());
+    const { readFileSync } = await import("node:fs");
+    const css = readFileSync("ui/src/features/settings/settings.css", "utf8");
+    const rule = (selector: string) =>
+      css.match(new RegExp(`(?:^|\\n)${selector.replace(".", "\\.")} \\{([^}]*)\\}`))?.[1] ?? "";
+    expect(rule(".settings")).toMatch(/height:\s*100%/);
+    expect(rule(".settings__sidebar")).toMatch(/overflow-y:\s*auto/);
+    expect(rule(".settings__panel")).toMatch(/overflow-y:\s*auto/);
+  });
+});
+
+describe("Accessibility section", () => {
+  afterEach(() => {
+    setHintPreference("keyboardHints", true);
+    setHintPreference("announcements", true);
+    setHintPreference("skipLinks", true);
+  });
+
+  it("offers the three hint switches, all on by default, and applies a change at once", async () => {
+    await openSection("Accessibility");
+    const names = ["Show keyboard hints", "Screen reader announcements", "Skip links"];
+    for (const name of names) {
+      expect(screen.getByRole("switch", { name })).toBeChecked();
+    }
+    fireEvent.click(screen.getByRole("switch", { name: "Skip links" }));
+    expect(screen.getByRole("switch", { name: "Skip links" })).not.toBeChecked();
+    expect(hintPreferences().skipLinks).toBe(false);
   });
 });
