@@ -560,6 +560,7 @@ Unless stated otherwise: a fresh Mumcord install, a local test server (1.5) runn
 | QA.80 | Friends list moves to the right-hand column and shows "In ‹channel›"; person menu gets "Join channel" | Addendum 2026-10-25; FR-1.64, FR-1.75 |
 | QA.81 | Member column: collapsible "In ‹channel›" like Friends, plus "In other channels" (collapsed by default) | Addendum 2026-10-25; FR-1.76 |
 | QA.82 | Bug #7 (hotfix 0.3.1): Music quality caps the bitrate so every voice packet incl. header fits Mumble's 1024-byte limit; oversized packets lower the bitrate instead of being dropped silently | Addendum 2026-10-25; music quality (QA.37) |
+| QA.86 | Bug #9 (hotfix 0.3.1): links in chat messages open in the system browser again | Addendum 2026-10-25; chat links |
 | QA.83 | Issue #8: other people's connection quality (UserStats: ping, loss, bandwidth) moves to Epic 2 | Addendum 2026-10-25; roadmap row Epic 2 |
 | QA.84 | Styled dropdowns (one themed, accessible select component for the whole app) move to Epic 2 | Addendum 2026-10-25; roadmap row Epic 2 |
 | QA.85 | Settings inputs right-aligned consistently (positional distance fields and an audit of all sections) move to Epic 2 | Addendum 2026-10-25; roadmap row Epic 2 |
