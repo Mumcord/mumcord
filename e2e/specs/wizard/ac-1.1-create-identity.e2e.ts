@@ -8,7 +8,9 @@ import {
   keyringDump,
   labelled,
   mainWindowMarker,
+  nextToLastWizardStep,
   waitForText,
+  wizardStep,
 } from "../../helpers/wizard-util.ts";
 
 // AC-1.1: First start → wizard → create identity "Tester", keep defaults, finish → main window
@@ -27,12 +29,10 @@ describe("AC-1.1 wizard creates identity", () => {
     const t0 = Date.now();
     await app.restart({ freshProfile: true });
     await waitForText("Your identity", 30_000);
-    await waitForText("Step 1 of 3");
+    await waitForText(wizardStep(1));
     await (await labelled("Name")).setValue("Tester");
     await button("Next").click();
-    await waitForText("Step 2 of 3");
-    await button("Next").click();
-    await waitForText("Step 3 of 3");
+    await nextToLastWizardStep();
     await $('//label[normalize-space(.)="Start Mumcord when I log in"]//input').click();
     await button("Finish").click();
     await mainWindowMarker().waitForExist({ timeout: 30_000 });

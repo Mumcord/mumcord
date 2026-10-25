@@ -5,7 +5,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { $, browser, expect } from "@wdio/globals";
 import { app, bot, botInBackground, netsim, testenv, type BackgroundBot } from "../../helpers/index.ts";
-import { readWavPcm, waitForText, writeWavPcm } from "../../helpers/wizard-util.ts";
+import { finishWizardWithDefaults, readWavPcm, writeWavPcm } from "../../helpers/wizard-util.ts";
 
 // AC-1.21 (reconnect), AC-1.22 (UDP blocked -> TCP), AC-1.23 (10 % loss -> bitrate adapts).
 // The app talks to a counting relay (64802) that forwards to netsim (64800) -> test server v15.
@@ -251,10 +251,7 @@ describe("network resilience (AC-1.21, AC-1.22, AC-1.23)", () => {
     await $("#root").waitForDisplayed();
     await $("input[type=text]").setValue(ME);
     await $("button=Next").click();
-    await waitForText("Step 2 of 3");
-    await $("button=Next").click();
-    await waitForText("Step 3 of 3");
-    await $("button=Finish").click();
+    await finishWizardWithDefaults();
     const address = $("input[placeholder='mumble.example.org']");
     await address.waitForDisplayed();
     await address.setValue(LINK);

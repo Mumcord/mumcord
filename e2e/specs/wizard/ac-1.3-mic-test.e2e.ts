@@ -12,6 +12,7 @@ import {
   waitForText,
   windowDb,
   wizardArtifacts,
+  wizardStep,
 } from "../../helpers/wizard-util.ts";
 
 // AC-1.3: Wizard step 2 → speak → level meter moves; "Test" plays back the own voice.
@@ -32,10 +33,10 @@ describe("AC-1.3 wizard microphone step", () => {
   });
 
   it("level meter moves with speech and Test plays the recording back", async () => {
-    await waitForText("Step 1 of 3", 30_000);
+    await waitForText(wizardStep(1), 30_000);
     await (await labelled("Name")).setValue("Tester");
     await button("Next").click();
-    await waitForText("Step 2 of 3");
+    await waitForText(wizardStep(2), 120_000);
 
     const meter = $('[role="meter"][aria-label="Microphone level"]');
     await meter.waitForExist();

@@ -4,6 +4,7 @@ import { join } from "node:path";
 import { browser, $, $$ } from "@wdio/globals";
 import { botInBackground, type BackgroundBot, type BotOptions } from "./bot.ts";
 import { artifactsDir } from "./paths.ts";
+import { nextToLastWizardStep } from "./wizard-util.ts";
 import { doubleClickRow, showAllPeople } from "./voice-ui.ts";
 
 export const USER = "ChatQA";
@@ -14,9 +15,7 @@ export async function finishWizard(name = USER): Promise<void> {
   await nameInput.waitForDisplayed({ timeout: 30_000 });
   await nameInput.setValue(name);
   await clickButton("Next");
-  await $("h2=Microphone").waitForDisplayed();
-  await clickButton("Next");
-  await $("h2=How do you want to talk?").waitForDisplayed();
+  await nextToLastWizardStep();
   await $("input[value='voiceActivation']").click();
   await clickButton("Finish");
 }

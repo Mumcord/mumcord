@@ -1,5 +1,6 @@
 // UI steps shared by the voice specs: first-start wizard, connecting, reading the channel tree.
 import { browser, $ } from "@wdio/globals";
+import { nextToLastWizardStep } from "./wizard-util.ts";
 
 export const SERVER = "localhost";
 
@@ -9,9 +10,7 @@ export async function completeWizard(name: string): Promise<void> {
   await nameInput.waitForDisplayed({ timeout: 30_000 });
   await nameInput.setValue(name);
   await $("button=Next").click();
-  await $("h2=Microphone").waitForDisplayed({ timeout: 30_000 });
-  await $("button=Next").click();
-  await $("h2=How do you want to talk?").waitForDisplayed();
+  await nextToLastWizardStep();
   // Keep voice activation; don't touch the system's mumble:// handler from a test.
   const link = $("//label[contains(., 'Open mumble:// links')]/input");
   if ((await link.isExisting()) && (await link.isSelected())) await link.click();
