@@ -41,11 +41,37 @@ describe("PersonMenu", () => {
     expect(menu()).toHaveAccessibleName(/Anna/);
     expect(screen.getAllByRole("menuitem").map((i) => i.textContent)).toEqual([
       "View profile",
-      "Mute for me",
       "Send private message",
     ]);
+    expect(screen.getByRole("menuitemcheckbox", { name: "Mute for me" })).toHaveAttribute(
+      "aria-checked",
+      "false",
+    );
     expect(screen.getByRole("slider", { name: "Volume" })).toBeInTheDocument();
     expect(screen.getByRole("menuitem", { name: "View profile" })).toHaveFocus();
+  });
+
+  it("lists profile and message first, then a separator, then the settings", async () => {
+    await renderPanel();
+    fireEvent.contextMenu(member(/^Anna/), { clientX: 30, clientY: 40 });
+    const entries = [
+      ...(menu()?.querySelectorAll(
+        '[role="menuitem"], [role="menuitemcheckbox"], [role="separator"], input[type="range"]',
+      ) ?? []),
+    ];
+    expect(
+      entries.map((entry) => entry.getAttribute("role") ?? entry.getAttribute("type")),
+    ).toEqual(["menuitem", "menuitem", "separator", "menuitemcheckbox", "range"]);
+    expect(entries[0]).toHaveTextContent("View profile");
+    expect(entries[1]).toHaveTextContent("Send private message");
+  });
+
+  it("shows a decorative icon on every entry", async () => {
+    await renderPanel();
+    fireEvent.contextMenu(member(/^Anna/), { clientX: 30, clientY: 40 });
+    const icons = [...(menu()?.querySelectorAll("svg") ?? [])];
+    expect(icons).toHaveLength(4);
+    for (const icon of icons) expect(icon).toHaveAttribute("aria-hidden", "true");
   });
 
   it("opens from the ContextMenu key and Shift+F10, Escape returns focus", async () => {
@@ -65,27 +91,32 @@ describe("PersonMenu", () => {
     fireEvent.contextMenu(member(/^Anna/), { clientX: 1, clientY: 1 });
     const keys = (key: string) => fireEvent.keyDown(document.activeElement as Element, { key });
     keys("ArrowDown");
-    expect(screen.getByRole("menuitem", { name: "Mute for me" })).toHaveFocus();
+    expect(screen.getByRole("menuitem", { name: "Send private message" })).toHaveFocus();
+    keys("ArrowDown");
+    expect(screen.getByRole("menuitemcheckbox", { name: "Mute for me" })).toHaveFocus();
     keys("ArrowDown");
     expect(screen.getByRole("slider")).toHaveFocus();
-    keys("ArrowDown");
-    expect(screen.getByRole("menuitem", { name: "Send private message" })).toHaveFocus();
     keys("ArrowDown");
     expect(screen.getByRole("menuitem", { name: "View profile" })).toHaveFocus();
   });
 
-  it("mutes locally and offers unmute afterwards", async () => {
+  it("toggles local mute in place and keeps the menu open", async () => {
     await renderPanel();
     const spy = vi.spyOn(api, "personSetLocalMute");
     fireEvent.contextMenu(member(/^Anna/), { clientX: 1, clientY: 1 });
-    fireEvent.click(screen.getByRole("menuitem", { name: "Mute for me" }));
+    const row = screen.getByRole("menuitemcheckbox", { name: "Mute for me" });
+    fireEvent.click(row);
     expect(spy).toHaveBeenCalledWith(2, true);
-    expect(menu()).not.toBeInTheDocument();
     await act(async () => {
       await Promise.resolve();
     });
-    fireEvent.contextMenu(member(/^Anna/), { clientX: 1, clientY: 1 });
-    expect(screen.getByRole("menuitem", { name: "Unmute for me" })).toBeInTheDocument();
+    expect(menu()).toBeInTheDocument();
+    expect(screen.getByRole("menuitemcheckbox", { name: "Mute for me" })).toHaveAttribute(
+      "aria-checked",
+      "true",
+    );
+    fireEvent.click(screen.getByRole("menuitemcheckbox", { name: "Mute for me" }));
+    expect(spy).toHaveBeenLastCalledWith(2, false);
   });
 
   it("changes the volume with the slider", async () => {

@@ -130,7 +130,7 @@ describe("MembersPanel", () => {
     expect(getServerState().users.get(2)?.volume).toBe(180);
     vi.useRealTimers();
 
-    fireEvent.click(screen.getByRole("checkbox", { name: "Mute for me" }));
+    fireEvent.click(screen.getByRole("switch", { name: "Mute for me" }));
     await waitFor(() => {
       expect(getServerState().users.get(2)?.localMute).toBe(true);
     });
@@ -146,6 +146,7 @@ describe("MembersPanel", () => {
     vi.spyOn(api, "personProfile").mockResolvedValue({
       comment: '<p>Hello</p><img src="x" onerror="alert(1)"><script>alert(2)</script>',
       avatar: null,
+      note: "",
     });
     getServerState();
     await waitFor(() => {
@@ -168,8 +169,8 @@ describe("MembersPanel", () => {
     openFullProfile(/^Zoe/);
     await screen.findByRole("dialog", { name: "Zoe" });
     expect(screen.queryByRole("slider")).toBeNull();
-    expect(screen.queryByRole("checkbox")).toBeNull();
-    expect(screen.queryByRole("button", { name: "Send private message" })).toBeNull();
+    expect(screen.queryByRole("switch")).toBeNull();
+    expect(screen.queryByRole("button", { name: "Private message" })).toBeNull();
   });
 
   it("opens the private chat on double click, or calls the override", async () => {
@@ -278,7 +279,11 @@ describe("MembersPanel", () => {
     });
     expect(profile).not.toHaveBeenCalled();
 
-    profile.mockResolvedValueOnce({ comment: null, avatar: "data:image/png;base64,QkVO" });
+    profile.mockResolvedValueOnce({
+      comment: null,
+      avatar: "data:image/png;base64,QkVO",
+      note: "",
+    });
     act(() => {
       api.mock.emit("userUpserted", { user: { ...ben, hasAvatar: true } });
     });
@@ -293,7 +298,11 @@ describe("MembersPanel", () => {
     expect(avatarImage(/^Ben/)).toBeNull();
     expect(member(/^Ben/).querySelector(".avatar")).toHaveAttribute("data-initial", "B");
 
-    profile.mockResolvedValueOnce({ comment: null, avatar: "data:image/png;base64,TkVX" });
+    profile.mockResolvedValueOnce({
+      comment: null,
+      avatar: "data:image/png;base64,TkVX",
+      note: "",
+    });
     act(() => {
       api.mock.emit("userUpserted", { user: { ...ben, hasAvatar: true } });
     });
@@ -309,7 +318,11 @@ describe("MembersPanel", () => {
     const ben = getServerState().users.get(3);
     if (!ben) throw new Error("Ben missing");
 
-    profile.mockResolvedValueOnce({ comment: null, avatar: "data:image/png;base64,QkVO" });
+    profile.mockResolvedValueOnce({
+      comment: null,
+      avatar: "data:image/png;base64,QkVO",
+      note: "",
+    });
     act(() => {
       api.mock.emit("userUpserted", { user: { ...ben, hasAvatar: true, avatarHash: "aa" } });
     });
@@ -317,7 +330,11 @@ describe("MembersPanel", () => {
       expect(avatarImage(/^Ben/)).toHaveAttribute("src", "data:image/png;base64,QkVO");
     });
 
-    profile.mockResolvedValueOnce({ comment: null, avatar: "data:image/png;base64,TkVX" });
+    profile.mockResolvedValueOnce({
+      comment: null,
+      avatar: "data:image/png;base64,TkVX",
+      note: "",
+    });
     act(() => {
       api.mock.emit("userUpserted", { user: { ...ben, hasAvatar: true, avatarHash: "bb" } });
     });
