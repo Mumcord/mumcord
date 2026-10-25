@@ -44,6 +44,15 @@
     "devicesFailed": "Tvoje audiouređaje nije bilo moguće izlistati. Možeš nastaviti i odabrati ih kasnije u postavkama.",
     "testFailed": "Test nije mogao početi. Provjeri je li mikrofon priključen."
   },
+  "privacy": {
+    "title": "Vaša privatnost",
+    "noTelemetry": "Mumcord ne šalje telemetriju, analitiku ni izvješća o rušenju.",
+    "ownServers": "Povezuje se samo s poslužiteljima koje dodate.",
+    "linkPreviews": "Pregledi poveznica te slike ili GIF-ovi iz poveznica u chatu učitavaju se s povezanih stranica. To možete isključiti u sljedećem koraku ili kasnije u postavkama.",
+    "mumcordUsers": "Značajke samo za Mumcord razmjenjuju podatke isključivo s drugim korisnicima Mumcorda na istom poslužitelju.",
+    "local": "Sve što Mumcord sprema ostaje na vašem računalu.",
+    "statement": "Cjelovita izjava o privatnosti"
+  },
   "talk": {
     "title": "Kako želiš govoriti?",
     "mode": "Način govora",

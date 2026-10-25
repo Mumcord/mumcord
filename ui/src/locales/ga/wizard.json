@@ -44,6 +44,15 @@
     "devicesFailed": "Níorbh fhéidir do fheistí fuaime a liostú. Is féidir leat leanúint ar aghaidh agus iad a roghnú níos déanaí i Socruithe.",
     "testFailed": "Níorbh fhéidir an tástáil a thosú. Seiceáil go bhfuil an micreafón ceangailte."
   },
+  "privacy": {
+    "title": "Do phríobháideachas",
+    "noTelemetry": "Ní sheolann Mumcord aon telemetry, anailísíocht ná tuairiscí tuairteála.",
+    "ownServers": "Ní cheanglaíonn sé ach leis na freastalaithe a chuireann tú leis.",
+    "linkPreviews": "Luchtaítear réamhamhairc nasc agus íomhánna nó GIFanna ó naisc sa chomhrá ó na suíomhanna nasctha. Is féidir leat é seo a chur as sa chéad chéim eile nó níos déanaí sna Socruithe.",
+    "mumcordUsers": "Ní chomhlálann gnéithe Mumcord amháin sonraí ach le húsáideoirí eile Mumcord ar an bhfreastalaí céanna.",
+    "local": "Fanann gach rud a stórálann Mumcord ar do ríomhaire.",
+    "statement": "Ráiteas iomlán príobháideachais"
+  },
   "talk": {
     "title": "Conas ba mhaith leat labhairt?",
     "mode": "Mód cainte",

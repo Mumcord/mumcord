@@ -44,6 +44,15 @@
     "devicesFailed": "Tvoje zvuková zařízení se nepodařilo zjistit. Můžeš pokračovat a vybrat je později v Nastavení.",
     "testFailed": "Test se nepodařilo spustit. Zkontroluj, že je mikrofon připojený."
   },
+  "privacy": {
+    "title": "Vaše soukromí",
+    "noTelemetry": "Mumcord neodesílá žádnou telemetrii, analytiku ani hlášení o pádech.",
+    "ownServers": "Připojuje se jen k serverům, které přidáte.",
+    "linkPreviews": "Náhledy odkazů a obrázky či GIFy z odkazů v chatu se načítají z odkazovaných webů. Můžete to vypnout v dalším kroku nebo později v Nastavení.",
+    "mumcordUsers": "Funkce jen pro Mumcord vyměňují data pouze s ostatními uživateli Mumcordu na stejném serveru.",
+    "local": "Vše, co Mumcord ukládá, zůstává ve vašem počítači.",
+    "statement": "Úplné prohlášení o ochraně soukromí"
+  },
   "talk": {
     "title": "Jak chceš mluvit?",
     "mode": "Režim mluvení",

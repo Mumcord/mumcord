@@ -44,6 +44,15 @@
     "devicesFailed": "Sinu heliseadmeid ei õnnestunud loetleda. Võid jätkata ja need hiljem seadetes valida.",
     "testFailed": "Testi ei õnnestunud käivitada. Kontrolli, et mikrofon on ühendatud."
   },
+  "privacy": {
+    "title": "Teie privaatsus",
+    "noTelemetry": "Mumcord ei saada telemeetriat, analüütikat ega kokkuvarisemisaruandeid.",
+    "ownServers": "See ühendub ainult teie lisatud serveritega.",
+    "linkPreviews": "Linkide eelvaated ning vestluse linkide pildid või GIF-id laaditakse lingitud saitidelt. Saate selle välja lülitada järgmises sammus või hiljem seadetes.",
+    "mumcordUsers": "Ainult Mumcordi funktsioonid vahetavad andmeid vaid teiste Mumcordi kasutajatega samas serveris.",
+    "local": "Kõik, mida Mumcord salvestab, jääb teie arvutisse.",
+    "statement": "Täielik privaatsusavaldus"
+  },
   "talk": {
     "title": "Kuidas soovid rääkida?",
     "mode": "Rääkimisrežiim",

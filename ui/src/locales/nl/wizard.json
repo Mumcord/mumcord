@@ -44,6 +44,15 @@
     "devicesFailed": "Je audioapparaten konden niet worden opgesomd. Je kunt doorgaan en ze later kiezen in de instellingen.",
     "testFailed": "De test kon niet starten. Controleer of de microfoon is aangesloten."
   },
+  "privacy": {
+    "title": "Je privacy",
+    "noTelemetry": "Mumcord stuurt geen telemetrie, analyses of crashrapporten.",
+    "ownServers": "Het maakt alleen verbinding met de servers die je toevoegt.",
+    "linkPreviews": "Linkvoorbeelden en afbeeldingen of GIF's uit chatlinks worden geladen van de gelinkte sites. Je kunt dit uitzetten in de volgende stap of later in de Instellingen.",
+    "mumcordUsers": "Functies alleen voor Mumcord wisselen alleen gegevens uit met andere Mumcord-gebruikers op dezelfde server.",
+    "local": "Alles wat Mumcord opslaat, blijft op je computer.",
+    "statement": "Volledige privacyverklaring"
+  },
   "talk": {
     "title": "Hoe wil je praten?",
     "mode": "Praatmodus",

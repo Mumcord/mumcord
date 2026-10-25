@@ -12,6 +12,7 @@ import { usePreferences } from "../../app/preferences";
 import { useView } from "../../app/view";
 import { IdentityStep } from "./IdentityStep";
 import { MicStep } from "./MicStep";
+import { PrivacyStep } from "./PrivacyStep";
 import { TalkModeStep, type TalkChoice } from "./TalkModeStep";
 import "./wizard.css";
 
@@ -55,7 +56,7 @@ async function loadWizard(): Promise<Loaded> {
   };
 }
 
-/** First-start wizard: identity → microphone → talk mode and start options (FR-1.1–FR-1.6, FR-1.48d). */
+/** First-start wizard: identity → microphone → privacy → talk mode and start options (FR-1.1–FR-1.6, FR-1.48d). */
 export function Wizard() {
   const { t } = useTranslation("wizard");
   const { finishWizard } = useView();
@@ -181,6 +182,18 @@ export function Wizard() {
           }}
         />
       );
+    case 3:
+      return (
+        <PrivacyStep
+          focusOnMount={navigated}
+          onBack={() => {
+            goTo(2);
+          }}
+          onNext={() => {
+            goTo(4);
+          }}
+        />
+      );
     default:
       return (
         <TalkModeStep
@@ -191,7 +204,7 @@ export function Wizard() {
           ingameOverlaySupported={load.ingameOverlaySupported}
           focusOnMount={navigated}
           onBack={() => {
-            goTo(2);
+            goTo(3);
           }}
           onFinish={finish}
         />

@@ -44,6 +44,15 @@
     "devicesFailed": "Az audioeszközeidet nem sikerült listázni. Folytathatod, és később kiválaszthatod őket a Beállításokban.",
     "testFailed": "A teszt nem indult el. Ellenőrizd, hogy a mikrofon csatlakoztatva van-e."
   },
+  "privacy": {
+    "title": "Az Ön adatvédelme",
+    "noTelemetry": "A Mumcord nem küld telemetriát, analitikát vagy összeomlási jelentést.",
+    "ownServers": "Csak az Ön által hozzáadott szerverekhez csatlakozik.",
+    "linkPreviews": "A hivatkozások előnézetei, valamint a csevegésbeli hivatkozásokból származó képek és GIF-ek a hivatkozott oldalakról töltődnek be. Ezt a következő lépésben vagy később a Beállításokban kikapcsolhatja.",
+    "mumcordUsers": "A csak Mumcordot érintő funkciók kizárólag ugyanazon a szerveren lévő többi Mumcord-felhasználóval cserélnek adatokat.",
+    "local": "Minden, amit a Mumcord tárol, az Ön számítógépén marad.",
+    "statement": "Teljes adatvédelmi nyilatkozat"
+  },
   "talk": {
     "title": "Hogyan szeretnél beszélni?",
     "mode": "Beszédmód",

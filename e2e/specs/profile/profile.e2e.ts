@@ -45,7 +45,7 @@ describe("profile: register, avatar, comment", () => {
     avatarPath = join(mkdtempSync(join(tmpdir(), "mumcord-avatar-")), "me.png");
     writeFileSync(avatarPath, Buffer.from(PNG_1X1, "base64"));
 
-    // Wizard: identity -> mic -> talk mode.
+    // Wizard: identity -> mic -> privacy -> talk mode.
     await $("#root").waitForDisplayed();
     const name = $('input[type="text"]');
     await name.waitForDisplayed();
@@ -54,6 +54,8 @@ describe("profile: register, avatar, comment", () => {
     await onStep(2);
     await clickText("button", "Next");
     await onStep(3);
+    await clickText("button", "Next");
+    await onStep(4);
     await clickText("button", "Finish");
 
     // First server, then trust its certificate.

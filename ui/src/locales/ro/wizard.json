@@ -44,6 +44,15 @@
     "devicesFailed": "Dispozitivele audio nu au putut fi listate. Poți continua și le alegi mai târziu în Setări.",
     "testFailed": "Testul nu a putut porni. Verifică dacă microfonul e conectat."
   },
+  "privacy": {
+    "title": "Confidențialitatea ta",
+    "noTelemetry": "Mumcord nu trimite telemetrie, analize sau rapoarte de erori.",
+    "ownServers": "Se conectează doar la serverele pe care le adaugi.",
+    "linkPreviews": "Previzualizările linkurilor și imaginile sau GIF-urile din linkurile din chat sunt încărcate de pe site-urile cu linkuri. Poți dezactiva acest lucru la pasul următor sau mai târziu în Setări.",
+    "mumcordUsers": "Funcțiile doar pentru Mumcord schimbă date numai cu alți utilizatori Mumcord de pe același server.",
+    "local": "Tot ce salvează Mumcord rămâne pe calculatorul tău.",
+    "statement": "Declarația completă de confidențialitate"
+  },
   "talk": {
     "title": "Cum vrei să vorbești?",
     "mode": "Mod de vorbire",

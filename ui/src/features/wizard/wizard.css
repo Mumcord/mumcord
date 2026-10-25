@@ -118,3 +118,11 @@
   border-radius: 8px;
   border: 1px solid var(--color-border, rgba(255, 255, 255, 0.12));
 }
+
+.wizard-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin: 0;
+  padding-inline-start: var(--space-5);
+}

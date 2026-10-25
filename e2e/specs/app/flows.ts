@@ -157,6 +157,10 @@ export async function wizard(name: string, onStep?: (step: number) => Promise<vo
   await browser.keys(["Enter"]);
   await waitText("p.wizard-progress", "3");
   await onStep?.(3);
+  await tabTo((f) => f.tag === "button" && f.cls.includes("button--primary"), "wizard Next");
+  await browser.keys(["Enter"]);
+  await waitText("p.wizard-progress", "4");
+  await onStep?.(4);
   const box = await browser.execute(() => {
     const c = document.querySelector<HTMLInputElement>("form.wizard-step input[type=checkbox]");
     return c ? c.checked : null;

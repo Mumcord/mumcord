@@ -44,6 +44,15 @@
     "devicesFailed": "L-apparati tal-awdjo tiegħek ma setgħux jiġu elenkati. Tista' tkompli u tagħżilhom aktar tard f'Settings.",
     "testFailed": "It-test ma setax jibda. Iċċekkja li l-mikrofonu huwa konness."
   },
+  "privacy": {
+    "title": "Il-privatezza tiegħek",
+    "noTelemetry": "Mumcord ma jibgħat l-ebda telemetrija, analitika jew rapporti ta' ċraxxijiet.",
+    "ownServers": "Jikkonnettja biss mas-servers li iżżid int.",
+    "linkPreviews": "Il-previews tal-links u x-xbihat jew il-GIFs mil-links taċ-chat jiġu mgħobbija mis-siti marbuta. Tista' ttifihom fil-pass li jmiss jew aktar tard fis-Settings.",
+    "mumcordUsers": "Il-karatteristiċi ta' Mumcord biss jiskambjaw data biss ma' utenti oħra ta' Mumcord fl-istess server.",
+    "local": "Kull ma jaħżen Mumcord jibqa' fuq il-kompjuter tiegħek.",
+    "statement": "Dikjarazzjoni sħiħa tal-privatezza"
+  },
   "talk": {
     "title": "Kif trid titkellem?",
     "mode": "Mod tat-tkellim",

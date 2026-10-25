@@ -46,7 +46,7 @@ interface TalkModeStepProps {
 }
 
 /**
- * Step 3: voice activation or push-to-talk with key capture, then the link handler,
+ * Step 4: voice activation or push-to-talk with key capture, then the link handler,
  * start-at-login and link-preview choices.
  */
 export function TalkModeStep({
@@ -197,7 +197,7 @@ export function TalkModeStep({
 
   return (
     <StepFrame
-      step={3}
+      step={4}
       title={t("talk.title")}
       focusOnMount={focusOnMount}
       busy={busy}

@@ -44,6 +44,15 @@
     "devicesFailed": "Não foi possível listar os teus dispositivos de áudio. Podes continuar e escolhê-los mais tarde nas Definições.",
     "testFailed": "Não foi possível iniciar o teste. Verifica se o microfone está ligado."
   },
+  "privacy": {
+    "title": "A sua privacidade",
+    "noTelemetry": "O Mumcord não envia telemetria, análises nem relatórios de falhas.",
+    "ownServers": "Liga-se apenas aos servidores que adicionar.",
+    "linkPreviews": "As pré-visualizações de ligações e as imagens ou GIFs de ligações no chat são carregados dos sites ligados. Pode desativar isto no passo seguinte ou mais tarde nas Definições.",
+    "mumcordUsers": "As funcionalidades exclusivas do Mumcord só trocam dados com outros utilizadores do Mumcord no mesmo servidor.",
+    "local": "Tudo o que o Mumcord guarda fica no seu computador.",
+    "statement": "Declaração de privacidade completa"
+  },
   "talk": {
     "title": "Como queres falar?",
     "mode": "Modo de fala",

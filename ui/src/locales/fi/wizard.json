@@ -44,6 +44,15 @@
     "devicesFailed": "Äänilaitteitasi ei voitu listata. Voit jatkaa ja valita ne myöhemmin asetuksista.",
     "testFailed": "Testiä ei voitu aloittaa. Tarkista, että mikrofoni on kytketty."
   },
+  "privacy": {
+    "title": "Yksityisyytesi",
+    "noTelemetry": "Mumcord ei lähetä telemetriaa, analytiikkaa eikä kaatumisraportteja.",
+    "ownServers": "Se yhdistää vain lisäämiisi palvelimiin.",
+    "linkPreviews": "Linkkien esikatselut sekä chatin linkkien kuvat tai GIF-kuvat ladataan linkitetyiltä sivustoilta. Voit poistaa tämän käytöstä seuraavassa vaiheessa tai myöhemmin asetuksissa.",
+    "mumcordUsers": "Vain Mumcordin ominaisuudet vaihtavat tietoja ainoastaan muiden Mumcord-käyttäjien kanssa samalla palvelimella.",
+    "local": "Kaikki, mitä Mumcord tallentaa, pysyy tietokoneellasi.",
+    "statement": "Täydellinen tietosuojaseloste"
+  },
   "talk": {
     "title": "Miten haluat puhua?",
     "mode": "Puhetila",

@@ -44,6 +44,15 @@
     "devicesFailed": "Tavas audio ierīces neizdevās uzskaitīt. Vari turpināt un izvēlēties tās vēlāk iestatījumos.",
     "testFailed": "Pārbaudi neizdevās sākt. Pārbaudi, vai mikrofons ir pievienots."
   },
+  "privacy": {
+    "title": "Jūsu privātums",
+    "noTelemetry": "Mumcord nesūta telemetriju, analītiku vai avāriju pārskatus.",
+    "ownServers": "Tas savienojas tikai ar jūsu pievienotajiem serveriem.",
+    "linkPreviews": "Saišu priekšskatījumi un attēli vai GIF no tērzēšanas saitēm tiek ielādēti no saistītajām vietnēm. To var izslēgt nākamajā solī vai vēlāk iestatījumos.",
+    "mumcordUsers": "Tikai Mumcord funkcijas apmainās ar datiem tikai ar citiem Mumcord lietotājiem tajā pašā serverī.",
+    "local": "Viss, ko Mumcord saglabā, paliek jūsu datorā.",
+    "statement": "Pilns privātuma paziņojums"
+  },
   "talk": {
     "title": "Kā tu vēlies runāt?",
     "mode": "Runāšanas režīms",

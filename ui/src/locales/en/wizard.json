@@ -44,6 +44,15 @@
     "devicesFailed": "Your audio devices could not be listed. You can continue and pick them later in Settings.",
     "testFailed": "The test could not start. Check that the microphone is connected."
   },
+  "privacy": {
+    "title": "Your privacy",
+    "noTelemetry": "Mumcord sends no telemetry, analytics or crash reports.",
+    "ownServers": "It connects only to the servers you add.",
+    "linkPreviews": "Link previews and images or GIFs from chat links are loaded from the linked sites. You can turn this off in the next step or later in Settings.",
+    "mumcordUsers": "Mumcord-only features exchange data only with other Mumcord users on the same server.",
+    "local": "Everything Mumcord stores stays on your computer.",
+    "statement": "Full privacy statement"
+  },
   "talk": {
     "title": "How do you want to talk?",
     "mode": "Talk mode",

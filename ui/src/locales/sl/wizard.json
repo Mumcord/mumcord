@@ -44,6 +44,15 @@
     "devicesFailed": "Tvojih zvočnih naprav ni bilo mogoče našteti. Lahko nadaljuješ in jih izbereš pozneje v nastavitvah.",
     "testFailed": "Preizkusa ni bilo mogoče začeti. Preveri, ali je mikrofon priključen."
   },
+  "privacy": {
+    "title": "Vaša zasebnost",
+    "noTelemetry": "Mumcord ne pošilja telemetrije, analitike ali poročil o zrušitvah.",
+    "ownServers": "Povezuje se samo s strežniki, ki jih dodate.",
+    "linkPreviews": "Predogledi povezav ter slike ali GIF-i iz povezav v klepetu se naložijo s povezanih strani. To lahko izklopite v naslednjem koraku ali pozneje v nastavitvah.",
+    "mumcordUsers": "Funkcije samo za Mumcord izmenjujejo podatke le z drugimi uporabniki Mumcorda na istem strežniku.",
+    "local": "Vse, kar Mumcord shrani, ostane v vašem računalniku.",
+    "statement": "Celotna izjava o zasebnosti"
+  },
   "talk": {
     "title": "Kako želiš govoriti?",
     "mode": "Način govora",

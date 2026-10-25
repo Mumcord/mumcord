@@ -44,6 +44,15 @@
     "devicesFailed": "Dine lydenheder kunne ikke vises. Du kan fortsætte og vælge dem senere i Indstillinger.",
     "testFailed": "Testen kunne ikke starte. Tjek, at mikrofonen er tilsluttet."
   },
+  "privacy": {
+    "title": "Dit privatliv",
+    "noTelemetry": "Mumcord sender ingen telemetri, analyser eller nedbrudsrapporter.",
+    "ownServers": "Den forbinder kun til de servere, du tilføjer.",
+    "linkPreviews": "Linkforhåndsvisninger og billeder eller GIF'er fra links i chatten indlæses fra de linkede websteder. Du kan slå det fra i næste trin eller senere i Indstillinger.",
+    "mumcordUsers": "Funktioner kun for Mumcord udveksler kun data med andre Mumcord-brugere på samme server.",
+    "local": "Alt, hvad Mumcord gemmer, bliver på din computer.",
+    "statement": "Fuld privatlivserklæring"
+  },
   "talk": {
     "title": "Hvordan vil du tale?",
     "mode": "Taletilstand",

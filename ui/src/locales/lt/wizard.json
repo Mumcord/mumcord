@@ -44,6 +44,15 @@
     "devicesFailed": "Nepavyko išvardyti tavo garso įrenginių. Gali tęsti ir pasirinkti juos vėliau nustatymuose.",
     "testFailed": "Nepavyko paleisti bandymo. Patikrink, ar mikrofonas prijungtas."
   },
+  "privacy": {
+    "title": "Jūsų privatumas",
+    "noTelemetry": "„Mumcord“ nesiunčia telemetrijos, analitikos ar strigčių ataskaitų.",
+    "ownServers": "Jis jungiasi tik prie jūsų pridėtų serverių.",
+    "linkPreviews": "Nuorodų peržiūros ir paveikslėliai ar GIF iš pokalbio nuorodų įkeliami iš susietų svetainių. Tai galite išjungti kitame žingsnyje arba vėliau nustatymuose.",
+    "mumcordUsers": "Tik „Mumcord“ funkcijos keičiasi duomenimis tik su kitais „Mumcord“ naudotojais tame pačiame serveryje.",
+    "local": "Viskas, ką saugo „Mumcord“, lieka jūsų kompiuteryje.",
+    "statement": "Pilnas privatumo pareiškimas"
+  },
   "talk": {
     "title": "Kaip nori kalbėti?",
     "mode": "Kalbėjimo režimas",
