@@ -40,10 +40,13 @@ function readAsDataUrl(file: Blob): Promise<string> {
 /**
  * Lets the engine keep the original of a picture whose thumbnail had to be shrunk. Returns the
  * reference for the thumbnail, or `null` when the thumbnail already is the original or the
- * original cannot be kept (the message then simply carries the thumbnail).
+ * original cannot be kept (the message then simply carries the thumbnail), also while
+ * "Offer my full-size images" is off (FR-1.74).
  */
 export async function keepFullImage(file: Blob, thumbnail: string): Promise<string | null> {
   try {
+    // Read at send time so a change in Settings applies to the very next picture.
+    if (!(await getApi().settingsGet()).offerFullImages) return null;
     const original = await readAsDataUrl(file);
     if (original === thumbnail) return null;
     const reference = await getApi().fullImageKeep(original);
@@ -94,6 +97,16 @@ function fetchFullImage(source: FullImageSource): Promise<string | null> {
   return started;
 }
 
+/** "Load full-size images from others" (FR-1.74); on when the setting cannot be read. */
+async function loadAllowed(): Promise<boolean> {
+  try {
+    return (await getApi().settingsGet()).loadFullImages;
+  } catch (error) {
+    console.error("Reading the settings failed; loading full images", error);
+    return true;
+  }
+}
+
 /** Forgets finished and running fetches (tests). */
 export function resetFullImages(): void {
   fetches.clear();
@@ -121,13 +134,22 @@ export function useFullImage(source: FullImageSource | undefined): FullImageStat
       const progress = Math.min(1, event.received / event.total);
       setState({ reference, value: { status: "loading", progress } });
     });
-    void fetchFullImage({ reference, senderSession, senderCertHash }).then((src) => {
-      if (!active) return;
-      setState({
-        reference,
-        value: src === null ? { status: "failed" } : { status: "done", src },
+    void loadAllowed()
+      .then((allowed) =>
+        allowed ? fetchFullImage({ reference, senderSession, senderCertHash }) : undefined,
+      )
+      .then((src) => {
+        if (!active) return;
+        setState({
+          reference,
+          value:
+            src === undefined
+              ? { status: "none" }
+              : src === null
+                ? { status: "failed" }
+                : { status: "done", src },
+        });
       });
-    });
     return () => {
       active = false;
       stop();
