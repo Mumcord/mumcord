@@ -21,6 +21,7 @@ import type {
   MumbleLink,
   GameKey,
   GameOverlayEntry,
+  GamePlugin,
   InGameOverlayState,
   OverlaySettings,
   OverlayState,
@@ -440,6 +441,17 @@ export function createMockApi(options: MockOptions = {}): MockApi {
 
   let identity: Identity | null = fresh ? null : { name: "Zoe", certHash: "selfhash" };
   let settings: Settings = { ...DEFAULT_SETTINGS, wizardCompleted: !fresh };
+  // One official game plugin as found in a Mumble installation; no game runs in the mock.
+  let gamePlugins: GamePlugin[] = [
+    {
+      id: "gtav",
+      name: "Grand Theft Auto V",
+      version: "1.0.0",
+      enabled: false,
+      active: false,
+      problem: null,
+    },
+  ];
   let defaultAvatar: string | null = demo ? demoAvatar("#14b8a6", "#3b82f6") : null;
   let servers: SavedServer[] = fresh
     ? []
@@ -1286,6 +1298,13 @@ export function createMockApi(options: MockOptions = {}): MockApi {
         game: null,
         senders: [],
       }),
+
+    pluginsList: () => Promise.resolve(gamePlugins.map((p) => ({ ...p }))),
+    pluginSetEnabled: (id, enabled) => {
+      if (!gamePlugins.some((p) => p.id === id)) fail("notFound", "no such game plugin");
+      gamePlugins = gamePlugins.map((p) => (p.id === id ? { ...p, enabled } : p));
+      return Promise.resolve(gamePlugins.map((p) => ({ ...p })));
+    },
 
     // overlay: no window in the mock; the state round-trips like the engine's.
     overlayState: () => Promise.resolve(overlay),

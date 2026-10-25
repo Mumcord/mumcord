@@ -266,6 +266,10 @@ export const commands = {
 	nowGamingJoin: (session: number) => typedError<null, ApiError>(__TAURI_INVOKE("now_gaming_join", { session })),
 	/**  The current positional audio status. */
 	positionalStatus: () => typedError<PositionalStatus, ApiError>(__TAURI_INVOKE("positional_status")),
+	/**  The official Mumble game plugins found in Mumcord's and Mumble's plugin folders. */
+	pluginsList: () => typedError<GamePlugin[], ApiError>(__TAURI_INVOKE("plugins_list")),
+	/**  Enables or disables one game plugin and stores the choice; returns the updated list. */
+	pluginSetEnabled: (id: string, enabled: boolean) => typedError<GamePlugin[], ApiError>(__TAURI_INVOKE("plugin_set_enabled", { id, enabled })),
 	/**  Current overlay options, move mode and what this desktop supports. */
 	overlayState: () => typedError<OverlayState, ApiError>(__TAURI_INVOKE("overlay_state")),
 	/**
@@ -655,6 +659,31 @@ export type GameOverlayEntry = {
 	/**  What the overlay currently does for this game given the whole settings (read-only). */
 	effective: Effect,
 };
+
+/**  An official Mumble game plugin found on this computer (FR-1.42b). */
+export type GamePlugin = {
+	/**  Stable identifier (the file name), as stored in the settings. */
+	id: string,
+	/**  Name the plugin reports. Plain text from a third-party library. */
+	name: string,
+	/**  Version the plugin reports. Plain text. */
+	version: string | null,
+	enabled: boolean,
+	/**  The plugin found its game and delivers positions. */
+	active: boolean,
+	problem: GamePluginProblem | null,
+};
+
+/**  Why a listed game plugin delivers no positions. */
+export type GamePluginProblem = 
+/**  Built for a plugin interface Mumcord does not implement. */
+"incompatible" | 
+/**  The plugin failed to start. */
+"initFailed" | 
+/**  The plugin cannot work on this system. */
+"unsupported" | 
+/**  The plugin failed and is not used until it is enabled again. */
+"failed";
 
 export type HistoryScope = { kind: "conversation"; serverId: number; conversation: Conversation } | { kind: "server"; serverId: number } | { kind: "all" };
 

@@ -128,6 +128,8 @@ fn specta_builder() -> Builder<tauri::Wry> {
             commands::now_gaming::now_gaming_icon,
             commands::now_gaming::now_gaming_join,
             commands::positional::positional_status,
+            commands::positional::plugins_list,
+            commands::positional::plugin_set_enabled,
             commands::overlay::overlay_state,
             commands::overlay::overlay_update,
             commands::overlay::overlay_set_enabled,
@@ -281,6 +283,7 @@ fn start_engine(app: &AppHandle) -> Result<(), Box<dyn std::error::Error>> {
 
     now_playing::start(engine.clone());
     now_gaming::start(engine.clone());
+    start_plugin_host(app, &engine, &data_dir, &stored.enabled_plugins);
     app.manage(engine);
 
     let handle = app.clone();
@@ -292,6 +295,26 @@ fn start_engine(app: &AppHandle) -> Result<(), Box<dyn std::error::Error>> {
         }
     });
     Ok(())
+}
+
+/// Starts the host for the official Mumble game plugins (FR-1.42b) and applies the enabled
+/// ones. Without it positional audio still works through Mumble Link.
+fn start_plugin_host(
+    app: &AppHandle,
+    engine: &Engine,
+    data_dir: &std::path::Path,
+    enabled: &[String],
+) {
+    let dirs = mumcord_engine::positional_sources::plugins::plugin_dirs(data_dir.join("plugins"));
+    match mumcord_engine::positional_sources::PluginHost::start(dirs) {
+        Ok(host) => {
+            if let Err(e) = commands::positional::apply_plugins(engine, &host, enabled) {
+                tracing::warn!(error = %e, "enabling the game plugins failed");
+            }
+            app.manage(host);
+        }
+        Err(e) => tracing::error!(error = %e, "starting the game plugin host failed"),
+    }
 }
 
 /// Sets up the in-game overlay (FR-1.46b): starts its IPC server, installs the Vulkan layer
