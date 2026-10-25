@@ -1150,3 +1150,11 @@ Research: Discord and Overwolf inject code into the game and draw into its frame
 ✍️ Note: Requested in chat during /dev.
 
 ---
+
+#### QA.56 Games that forbid overlays (stage 1c)? `◉`
+
+- [x] **A bundled list of games known to ban or block third-party overlays/injection (typically kernel-level anti-cheat: e.g. Riot Vanguard, FACEIT, Ricochet, EasyAntiCheat/BattlEye titles with explicit overlay rules) – with a source/reason per entry. These games have the in-game overlay off by default even when the global setting is "On"; the per-game settings show why, and turning it on requires an explicit confirmation with a stronger warning.** The list is curated and updatable with releases.
+
+✍️ Note: Requested in chat during /dev.
+
+---
