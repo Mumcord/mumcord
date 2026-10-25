@@ -33,11 +33,12 @@ Epic 1 is delivered in two stages (Q2.1). Stage 1a must be complete and usable b
 - Unsigned test builds for Linux, Windows, macOS via GitHub Actions (Q4.2, Q4.10).
 
 **Stage 1b – chat features** (QA.34, QA.35, QA.36)
-- Link previews, YouTube/Twitch player cards, external images, @mentions with autocomplete, Tenor GIFs, code highlighting, formatting toolbar and shortcuts.
+- Link previews, YouTube/Twitch/Spotify cards, external images and image viewer, @mentions with autocomplete, GIF links and favorites (no keyed GIF search, QA.43), code highlighting, formatting toolbar and shortcuts, music quality, manual voice activation threshold, now playing. Released as v0.2.0.
 
-**Stage 1c – in-game features** (moved from stage 1b, QA.36)
+**Stage 1c – in-game features** (moved from stage 1b, QA.36; released together with stage 1d as v0.3.0)
 - Positional audio via Mumble Link and the official Mumble game plugins (Q3.9).
-- Overlay as a floating, transparent on-top window (Q3.10).
+- Overlay as a floating, transparent on-top window (Q3.10), plus an in-game overlay drawn inside games (Linux Vulkan layer, Windows graphics hook; per game, anti-cheat blocklist, QA.54–QA.56). No overlay on macOS (QA.58).
+- Now gaming status with best-effort Join game (QA.44), quick settings (QA.47, QA.59).
 
 **Stage 1d – Mumcord-to-Mumcord and people** (QA.45, QA.46)
 - Chat history sync between Mumcord clients (up to 7 days / 500 messages per request, channel messages only, marked as unverified).
@@ -52,7 +53,7 @@ Epic 1 is delivered in two stages (Q2.1). Stage 1a must be complete and usable b
 - Signed installers, auto-update, automatic opt-in crash reports → Epic 5 (Q4.2, Q4.9).
 - Public server browser (Q5.3), whisper/shout (Q5.8).
 - Mobile apps and web version (Q1.4).
-- Exclusive-fullscreen in-game overlay via game hooking (Q3.10).
+- ~~Exclusive-fullscreen in-game overlay via game hooking (Q3.10)~~ – moved into stage 1c by QA.54 (opt-in per game, anti-cheat blocklist); still out of scope on macOS (QA.58).
 
 ## 3. Roles & permissions
 
@@ -546,7 +547,7 @@ No `specs/roadmap.md` exists yet. This brainstorming proposes it:
 
 | Epic | Title | Content |
 |---|---|---|
-| 1 | Foundation | This spec (stages 1a + 1b) |
+| 1 | Foundation | This spec (stages 1a, 1b, 1c, 1d; releases 0.1.x, 0.2.0, 0.3.0) |
 | 2 | Multi-server read-along + themes | Connect to several servers at once and read along on all of them (QA.1); custom themes: colour settings with presets, shareable as a config string that renders as a theme preview card in the chat and can be imported with one click (QA.53) |
 | 3 | Comfort & polish | Global hotkeys beyond PTT, full tray menu, desktop notifications, import from the official client, whisper/shout (Q5.8), public server browser (Q5.3) |
 | 4 | Admin features | ACL/permission editing, bans, channel management – completes "full replacement" (Q1.3) |
