@@ -110,6 +110,8 @@ jobs:
           > **Open Anyway** (or right-click the app and choose **Open**).
 
           Built and smoke-tested by [this workflow run]($RUN_URL).
+
+          These binaries are licensed under the [GNU AGPL-3.0](https://github.com/ToBee94/mumcord/blob/main/LICENSE) only.
           EOF
 
       - name: Create draft release
