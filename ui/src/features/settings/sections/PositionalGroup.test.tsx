@@ -12,6 +12,7 @@ let settings: Settings;
 let saves: MockInstance<MockApi["settingsUpdate"]>;
 
 beforeEach(async () => {
+  localStorage.clear();
   await applyLanguage("en");
   api = createMockApi();
   setApi(api);
@@ -113,7 +114,7 @@ describe("PositionalGroup", () => {
     expect(screen.getByText(/depend on the game/u)).toBeInTheDocument();
   });
 
-  it("marks the quick settings row as beta", async () => {
+  it("puts the quick settings row in the collapsed Beta group", async () => {
     render(
       <PreferencesProvider>
         <QuickSettings
@@ -130,8 +131,11 @@ describe("PositionalGroup", () => {
         />
       </PreferencesProvider>,
     );
-    const row = await screen.findByRole("menuitemcheckbox", { name: /^Positional audio/u });
-    expect(within(row).getByText("Beta")).toBeInTheDocument();
+    const head = await screen.findByRole("menuitem", { name: "Beta" });
+    expect(screen.queryByRole("menuitemcheckbox", { name: /^Positional audio/u })).toBeNull();
+    fireEvent.click(head);
+    const row = screen.getByRole("menuitemcheckbox", { name: /^Positional audio/u });
+    expect(within(row).queryByText("Beta")).toBeNull();
   });
 
   it("keeps the quick settings switch and the settings switch in step", async () => {
@@ -151,7 +155,8 @@ describe("PositionalGroup", () => {
         />
       </PreferencesProvider>,
     );
-    const quickSwitch = await screen.findByRole("menuitemcheckbox", { name: /^Positional audio/u });
+    fireEvent.click(await screen.findByRole("menuitem", { name: "Beta" }));
+    const quickSwitch = screen.getByRole("menuitemcheckbox", { name: /^Positional audio/u });
     expect(quickSwitch).toHaveAttribute("aria-checked", "false");
     fireEvent.click(quickSwitch);
     await waitFor(() => {

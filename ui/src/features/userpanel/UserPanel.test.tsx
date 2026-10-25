@@ -724,6 +724,68 @@ describe("quick settings (FR-1.66)", () => {
     });
   });
 
+  describe("Beta group (FR-1.73)", () => {
+    beforeEach(() => {
+      localStorage.clear();
+    });
+
+    const header = () => screen.findByRole("menuitem", { name: "Beta" });
+
+    it("is collapsed by default and expands and collapses", async () => {
+      await setup();
+      fireEvent.contextMenu(gear());
+      const head = await header();
+      expect(head).toHaveAttribute("aria-expanded", "false");
+      expect(screen.queryByRole("menuitemcheckbox", { name: /^Positional audio/u })).toBeNull();
+      fireEvent.click(head);
+      expect(head).toHaveAttribute("aria-expanded", "true");
+      expect(head).toHaveAttribute("aria-controls", screen.getByRole("group", { name: "Beta" }).id);
+      expect(screen.getByRole("menuitemcheckbox", { name: /^Positional audio/u })).toBeVisible();
+      fireEvent.click(head);
+      expect(screen.queryByRole("menuitemcheckbox", { name: /^Positional audio/u })).toBeNull();
+    });
+
+    it("remembers the open state", async () => {
+      await setup();
+      fireEvent.contextMenu(gear());
+      fireEvent.click(await header());
+      fireEvent.keyDown(screen.getByRole("menu"), { key: "Escape" });
+      fireEvent.click(gear());
+      expect(await header()).toHaveAttribute("aria-expanded", "true");
+    });
+
+    it("binds the three switches to the settings", async () => {
+      await setup();
+      fireEvent.contextMenu(gear());
+      fireEvent.click(await header());
+      const positional = screen.getByRole("menuitemcheckbox", { name: /^Positional audio/u });
+      const offer = screen.getByRole("menuitemcheckbox", { name: /^Offer full-size images/u });
+      const load = screen.getByRole("menuitemcheckbox", { name: /^Load full-size images/u });
+      const before = await api.settingsGet();
+      fireEvent.click(positional);
+      fireEvent.click(offer);
+      fireEvent.click(load);
+      await waitFor(async () => {
+        const after = await api.settingsGet();
+        expect(after.positional.enabled).toBe(!before.positional.enabled);
+        expect(after.offerFullImages).toBe(!before.offerFullImages);
+        expect(after.loadFullImages).toBe(!before.loadFullImages);
+      });
+    });
+
+    it("is keyboard operable and takes part in arrow navigation", async () => {
+      await setup();
+      fireEvent.contextMenu(gear());
+      const head = await header();
+      head.focus();
+      fireEvent.click(head);
+      fireEvent.keyDown(head, { key: "ArrowDown" });
+      expect(screen.getByRole("menuitemcheckbox", { name: /^Positional audio/u })).toHaveFocus();
+      fireEvent.keyDown(document.activeElement ?? head, { key: "ArrowUp" });
+      expect(head).toHaveFocus();
+    });
+  });
+
   it("switches the window overlay on and follows its changes", async () => {
     await setup();
     const spy = vi.spyOn(api, "overlaySetEnabled");

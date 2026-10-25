@@ -175,3 +175,23 @@
     transition: none;
   }
 }
+
+.quick-settings__group {
+  gap: var(--space-2);
+  color: var(--color-text-secondary);
+}
+
+.quick-settings__chevron {
+  display: flex;
+  transition: transform var(--duration-normal) var(--ease-out);
+}
+
+.quick-settings__group[aria-expanded="true"] .quick-settings__chevron {
+  transform: rotate(90deg);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .quick-settings__chevron {
+    transition: none;
+  }
+}

@@ -16,9 +16,27 @@ import { createPortal } from "react-dom";
 import { useTranslation } from "react-i18next";
 import { useIsMacos } from "../../api/useIsMacos";
 import { getApi, type OverlayState, type Theme } from "../../api";
-import { BetaBadge } from "../../components/BetaBadge";
 import { useSettings } from "../settings/useSettings";
 import "./quicksettings.css";
+
+const BETA_OPEN_KEY = "mumcord.quickSettings.betaOpen";
+
+/** Remembered per viewer; a UI convenience, so storage failures just fall back to collapsed. */
+function readBetaOpen(): boolean {
+  try {
+    return localStorage.getItem(BETA_OPEN_KEY) === "1";
+  } catch {
+    return false;
+  }
+}
+
+function writeBetaOpen(open: boolean): void {
+  try {
+    localStorage.setItem(BETA_OPEN_KEY, open ? "1" : "0");
+  } catch (error) {
+    console.error("Saving the Beta group state failed", error);
+  }
+}
 
 /** Gap kept between the menu and the window edge. */
 const EDGE = 8;
@@ -42,6 +60,7 @@ const ICON = {
   register: "M12 2l8 3v6c0 5-3.5 9-8 11c-4.5-2-8-6-8-11V5zM9 12l2 2l4-4",
   positional: "M3 18v-6a9 9 0 0 1 18 0v6M3 18a2 2 0 0 0 2 2h1v-6H3M21 18a2 2 0 0 1-2 2h-1v-6h3",
   chevron: "M9 6l6 6l-6 6",
+  image: "M3 5h18v14H3zM3 16l5-5l4 4l3-3l6 6M9 9.5a1 1 0 1 0 0 .01",
 } as const;
 
 function Glyph({ d }: { d: string }) {
@@ -100,8 +119,10 @@ export function QuickSettings({
   const [supported, setSupported] = useState(true);
   const [gamingSupported, setGamingSupported] = useState(true);
   const [overlay, setOverlay] = useState<OverlayState | null>(null);
+  const [betaOpen, setBetaOpen] = useState(readBetaOpen);
   const ref = useRef<HTMLDivElement>(null);
   const titleId = useId();
+  const betaId = useId();
   const ready = settings !== null;
 
   const close = (returnFocus: boolean) => {
@@ -185,7 +206,7 @@ export function QuickSettings({
     const top = Math.max(EDGE, Math.min(menu.y, window.innerHeight - element.offsetHeight - EDGE));
     element.style.left = `${String(left)}px`;
     element.style.top = `${String(top)}px`;
-  }, [menu, ready, supported, overlayShown, account.connected, account.canRegister]);
+  }, [menu, ready, supported, overlayShown, betaOpen, account.connected, account.canRegister]);
 
   // Focus the first item once the settings have loaded and the items are enabled.
   useEffect(() => {
@@ -240,7 +261,6 @@ export function QuickSettings({
     checked: boolean,
     onToggle: () => void,
     disabled = false,
-    beta = false,
   ): ReactNode => (
     <button
       type="button"
@@ -253,10 +273,7 @@ export function QuickSettings({
     >
       <Glyph d={icon} />
       <span className="quick-settings__text">
-        <span className="quick-settings__label">
-          {label}
-          {beta && <BetaBadge />}
-        </span>
+        <span className="quick-settings__label">{label}</span>
         <span className="quick-settings__hint">{hint}</span>
       </span>
       <span className="quick-settings__switch" aria-hidden="true" />
@@ -339,19 +356,6 @@ export function QuickSettings({
             },
             !gamingSupported,
           )}
-          {row(
-            ICON.positional,
-            t("quickSettings.positional"),
-            t("quickSettings.positionalHint"),
-            settings.positional.enabled,
-            () => {
-              update({
-                positional: { ...settings.positional, enabled: !settings.positional.enabled },
-              });
-            },
-            false,
-            true,
-          )}
           {overlayShown &&
             row(
               ICON.overlay,
@@ -366,6 +370,57 @@ export function QuickSettings({
                   });
               },
             )}
+          <button
+            type="button"
+            role="menuitem"
+            aria-expanded={betaOpen}
+            aria-controls={betaId}
+            tabIndex={-1}
+            className="quick-settings__row quick-settings__group"
+            onClick={() => {
+              const next = !betaOpen;
+              setBetaOpen(next);
+              writeBetaOpen(next);
+            }}
+          >
+            <span className="quick-settings__chevron" aria-hidden="true">
+              <Glyph d={ICON.chevron} />
+            </span>
+            <span className="quick-settings__label">{t("beta", { ns: "common" })}</span>
+          </button>
+          {betaOpen && (
+            <div id={betaId} role="group" aria-label={t("beta", { ns: "common" })}>
+              {row(
+                ICON.positional,
+                t("quickSettings.positional"),
+                t("quickSettings.positionalHint"),
+                settings.positional.enabled,
+                () => {
+                  update({
+                    positional: { ...settings.positional, enabled: !settings.positional.enabled },
+                  });
+                },
+              )}
+              {row(
+                ICON.image,
+                t("quickSettings.offerImages"),
+                t("quickSettings.offerImagesHint"),
+                settings.offerFullImages,
+                () => {
+                  update({ offerFullImages: !settings.offerFullImages });
+                },
+              )}
+              {row(
+                ICON.image,
+                t("quickSettings.loadImages"),
+                t("quickSettings.loadImagesHint"),
+                settings.loadFullImages,
+                () => {
+                  update({ loadFullImages: !settings.loadFullImages });
+                },
+              )}
+            </div>
+          )}
           <div className="quick-settings__theme">
             <span className="quick-settings__label">{t("quickSettings.theme")}</span>
             <div

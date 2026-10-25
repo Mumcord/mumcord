@@ -79,6 +79,10 @@
     "allSettings": "All settings…",
     "label": "Quick settings",
     "positional": "Positional audio",
-    "positionalHint": "Voices placed in 3D around you"
+    "positionalHint": "Voices placed in 3D around you",
+    "offerImages": "Offer full-size images",
+    "offerImagesHint": "Let others load your original images",
+    "loadImages": "Load full-size images",
+    "loadImagesHint": "Fetch original images from others"
   }
 }

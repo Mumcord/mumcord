@@ -79,6 +79,10 @@
     "allSettings": "Alle Einstellungen…",
     "label": "Schnelleinstellungen",
     "positional": "Positionsabhängiger Ton",
-    "positionalHint": "Stimmen werden in 3D um dich verteilt"
+    "positionalHint": "Stimmen werden in 3D um dich verteilt",
+    "offerImages": "Originalbilder anbieten",
+    "offerImagesHint": "Andere dürfen deine Originalbilder laden",
+    "loadImages": "Originalbilder laden",
+    "loadImagesHint": "Originalbilder von anderen abrufen"
   }
 }

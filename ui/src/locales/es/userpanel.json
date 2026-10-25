@@ -79,6 +79,10 @@
     "allSettings": "Todos los ajustes…",
     "label": "Ajustes rápidos",
     "positional": "Audio posicional",
-    "positionalHint": "Voces colocadas en 3D a tu alrededor"
+    "positionalHint": "Voces colocadas en 3D a tu alrededor",
+    "offerImages": "Ofrecer imágenes originales",
+    "offerImagesHint": "Otros pueden cargar tus imágenes originales",
+    "loadImages": "Cargar imágenes originales",
+    "loadImagesHint": "Obtener las imágenes originales de otros"
   }
 }
