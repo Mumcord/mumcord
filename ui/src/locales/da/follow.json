@@ -1,0 +1,55 @@
+{
+  "follow": "Følg",
+  "following": "Følger",
+  "unsupported": "For at følge kanaler skal serveren køre version 1.4 eller nyere.",
+  "unread_one": "{{count}} ulæst besked",
+  "unread_other": "{{count}} ulæste beskeder",
+  "errors": {
+    "denied": "Serveren tillader ikke, at du følger denne kanal.",
+    "limit": "Du kan ikke følge flere kanaler på denne server. Stop med at følge en anden kanal først.",
+    "tooOld": "Denne server er for gammel til at følge kanaler (kræver version 1.4 eller nyere).",
+    "notConnected": "Du er ikke forbundet til serveren.",
+    "generic": "Det lykkedes ikke at følge denne kanal. Prøv igen."
+  },
+  "dm": {
+    "title": "Direkte beskeder",
+    "unknown": "Ukendt person"
+  },
+  "notify": {
+    "channel": "{{name}} i {{channel}}: {{text}}",
+    "private": "{{name}} (privat): {{text}}",
+    "more_one": "{{count}} ny besked mere",
+    "more_other": "{{count}} nye beskeder mere"
+  },
+  "history": {
+    "clear": "Ryd historik",
+    "title": "Ryd historik?",
+    "body": "Dette sletter permanent de gemte beskeder fra denne samtale på denne computer. Andre beholder deres kopier.",
+    "confirm": "Ryd historik",
+    "cancel": "Annullér",
+    "failed": "Historikken kunne ikke ryddes. Prøv igen."
+  },
+  "star": {
+    "follow": "Følg {{channel}}",
+    "unfollow": "Stop med at følge {{channel}}"
+  },
+  "all": {
+    "menu": "Serverindstillinger for {{server}}",
+    "menuLabel": "Serverindstillinger",
+    "follow": "Følg alle kanaler",
+    "unfollow": "Stop med at følge alle kanaler",
+    "working": "Følger kanaler…",
+    "followed_one": "Følger {{count}} kanal.",
+    "followed_other": "Følger {{count}} kanaler.",
+    "skipped_one": "{{count}} sprunget over: {{reasons}}.",
+    "skipped_other": "{{count}} sprunget over: {{reasons}}.",
+    "limit": "grænsen er nået",
+    "notAllowed": "ikke tilladt",
+    "noAnswer": "intet svar fra serveren",
+    "unfollowed": "Følger ikke længere nogen kanaler.",
+    "failed": "Det lykkedes ikke at følge alle kanaler. Prøv igen.",
+    "dismiss": "Afvis",
+    "unfollowFailed": "Det lykkedes ikke at stoppe med at følge alle kanaler. Prøv igen."
+  },
+  "mention": "indeholder en omtale af dig"
+}

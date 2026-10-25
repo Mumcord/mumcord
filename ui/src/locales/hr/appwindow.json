@@ -1,0 +1,10 @@
+{
+  "close": {
+    "title": "Smanjiti u traku ili izaći?",
+    "description": "Još si povezan. Kad je smanjen, Mumcord te drži u glasovnom kanalu i ostaje u traci sustava.",
+    "remember": "Zapamti moj izbor",
+    "minimize": "Smanji u traku",
+    "quit": "Izađi",
+    "failed": "To nije uspjelo. Pokušaj ponovno."
+  }
+}

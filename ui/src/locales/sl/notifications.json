@@ -1,0 +1,18 @@
+{
+  "region": "Obvestila",
+  "channel": "#{{name}}",
+  "unknownChannel": "Kanal",
+  "line": "{{sender}}: {{preview}}",
+  "groupedChannel_one": "{{count}} novo sporočilo v {{name}}",
+  "groupedChannel_two": "{{count}} novi sporočili v {{name}}",
+  "groupedChannel_few": "{{count}} nova sporočila v {{name}}",
+  "groupedChannel_other": "{{count}} novih sporočil v {{name}}",
+  "groupedPrivate_one": "{{count}} novo sporočilo od {{name}}",
+  "groupedPrivate_two": "{{count}} novi sporočili od {{name}}",
+  "groupedPrivate_few": "{{count}} nova sporočila od {{name}}",
+  "groupedPrivate_other": "{{count}} novih sporočil od {{name}}",
+  "image": "Poslal sliko",
+  "open": "Odpri klepet",
+  "close": "Opusti obvestilo",
+  "mentionLine": "{{sender}} te je omenil: {{preview}}"
+}

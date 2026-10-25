@@ -1,0 +1,14 @@
+{
+  "title": "Prijatelji",
+  "item": "{{name}}, {{status}}",
+  "online": "Na spletu",
+  "onlineIn": "Na spletu v {{channel}}",
+  "offline": "Brez povezave",
+  "lastSeen": "Brez povezave, nazadnje viden {{when}}",
+  "friend": "Prijatelj",
+  "friendHint": "Pokaže, kdaj je na spletu, in ohrani tvoj zasebni klepet z njim.",
+  "noCertificate": "Osebe brez certifikata ne morejo biti prijatelji, ker jih Mumcord ne bi mogel znova prepoznati.",
+  "add": "Dodaj prijatelja",
+  "remove": "Odstrani prijatelja",
+  "failed": "Spreminjanje prijatelja ni uspelo. Poskusi znova."
+}

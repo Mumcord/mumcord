@@ -1,0 +1,70 @@
+{
+  "inChannel_one": "F'{{channel}} ({{count}})",
+  "inChannel_two": "F'{{channel}} ({{count}})",
+  "inChannel_few": "F'{{channel}} ({{count}})",
+  "inChannel_many": "F'{{channel}} ({{count}})",
+  "inChannel_other": "F'{{channel}} ({{count}})",
+  "listening_one": "Qed jisimgħu ({{count}})",
+  "listening_two": "Qed jisimgħu ({{count}})",
+  "listening_few": "Qed jisimgħu ({{count}})",
+  "listening_many": "Qed jisimgħu ({{count}})",
+  "listening_other": "Qed jisimgħu ({{count}})",
+  "noChannel": "Agħżel kanal biex tara min hemm.",
+  "nobody": "Ħadd mhu hawn.",
+  "you": "(int)",
+  "registered": "Irreġistrat",
+  "unregistered": "Mhux irreġistrat",
+  "talking": "Qed jitkellem",
+  "card": {
+    "close": "Agħlaq",
+    "loadFailed": "Ma setax jitgħabba l-profil.",
+    "volume": "Volum",
+    "volumeValue": "{{value}} %",
+    "localMute": "Mutja għalija",
+    "sessionOnly": "Din il-persuna m'għandhiex ċertifikat, għalhekk dawn is-settings idumu biss għal din is-sessjoni.",
+    "sendPrivateMessage": "Ibgħat messaġġ privat",
+    "privateMessage": "Messaġġ privat",
+    "localSettings": "Is-settings tiegħek",
+    "localSettingsHint": "Int biss tarahom. It-tibdil jiġi ssejvjat immedjatament.",
+    "localMuteHint": "Ma tisimax lil din il-persuna.",
+    "privateNote": "Nota privata",
+    "privateNoteHint": "Int biss tista' tara din in-nota.",
+    "saved": "Issejvjat"
+  },
+  "errors": {
+    "notConnected": "Mhux konness ma' server.",
+    "generic": "Dan ma ħadimx. Erġa' pprova."
+  },
+  "menu": {
+    "label": "Azzjonijiet għal {{name}}",
+    "viewProfile": "Ara l-profil",
+    "mute": "Mutja għalija"
+  },
+  "nowPlaying": {
+    "label": "Qed jindaqq issa",
+    "listening": "Qed jisma'",
+    "paused": "Sospiż",
+    "progress": "Progress tat-tindiq",
+    "position": "{{position}} minn {{duration}}"
+  },
+  "nowGaming": {
+    "label": "Qed jilgħab issa",
+    "playing": "Qed jilgħab",
+    "playedFor": "għal {{time}}",
+    "hoursMinutes": "{{hours}} h {{minutes}} min",
+    "minutes_one": "{{count}} min",
+    "minutes_two": "{{count}} min",
+    "minutes_few": "{{count}} min",
+    "minutes_many": "{{count}} min",
+    "minutes_other": "{{count}} min",
+    "join": "Ingħaqad mal-logħba",
+    "joinTitle": "Tingħaqad mal-logħba?",
+    "joinMessage": "Steam se jiftaħ u jikkonnettja mas-server li fuqu din il-persuna qed tilgħab {{game}}. Ingħaqad biss ma' servers li tafda.",
+    "joinConfirm": "Iftaħ Steam",
+    "joinFailed": "Steam ma setax jinfetaħ."
+  },
+  "preview": {
+    "privateMessage": "Messaġġ privat",
+    "fullProfile": "Profil sħiħ"
+  }
+}

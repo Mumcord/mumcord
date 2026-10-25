@@ -1,0 +1,12 @@
+{
+  "listLabel": "Nu aan het praten",
+  "move": {
+    "hint": "Sleep om de overlay te verplaatsen",
+    "done": "Klaar"
+  },
+  "limits": {
+    "wayland": "Op deze Wayland-desktop kunnen apps een venster niet bovenaan houden of kiezen waar het verschijnt. Daardoor kan de overlay achter andere vensters belanden en hebben hoekposities geen effect. Zet “Compatibiliteitsmodus (zoals TeamSpeak)” aan in de spraakinstellingen en start Mumcord opnieuw op: dan blijft de overlay bovenaan.",
+    "waylandKde": "Op KDE Plasma met Wayland kunnen apps een venster niet bovenaan houden of kiezen waar het verschijnt. Er zijn twee oplossingen: laat Mumcord een KDE-vensterregel voor de overlay toevoegen (“Automatisch instellen”), of zet “Compatibiliteitsmodus (zoals TeamSpeak)” aan in de spraakinstellingen en start Mumcord opnieuw op.",
+    "exclusiveFullscreen": "De overlay wordt getoond boven games in een venster of in randloos volledig scherm. Games in exclusief volledig scherm tekenen over elk venster heen, dus schakel ze over naar “randloos” of “venster op volledig scherm” om de overlay te zien."
+  }
+}

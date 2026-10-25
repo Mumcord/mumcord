@@ -1,0 +1,12 @@
+{
+  "listLabel": "Pratar nu",
+  "move": {
+    "hint": "Dra för att flytta overlayen",
+    "done": "Klar"
+  },
+  "limits": {
+    "wayland": "På det här Wayland-skrivbordet kan appar inte hålla ett fönster överst eller välja var det visas, så overlayen kan hamna bakom andra fönster och hörnpositioner har ingen effekt. Slå på ”Kompatibilitetsläge (som TeamSpeak)” i röstinställningarna och starta om Mumcord, så ligger overlayen överst.",
+    "waylandKde": "På KDE Plasma med Wayland kan appar inte hålla ett fönster överst eller välja var det visas. Det finns två sätt att lösa det: låt Mumcord lägga till en KDE-fönsterregel för overlayen (”Ställ in automatiskt”), eller slå på ”Kompatibilitetsläge (som TeamSpeak)” i röstinställningarna och starta om Mumcord.",
+    "exclusiveFullscreen": "Overlayen visas över spel i fönsterläge och kantlöst helskärmsläge. Spel i exklusivt helskärmsläge ritar över alla fönster, så byt till ”kantlöst” eller ”helskärm i fönster” för att se overlayen."
+  }
+}

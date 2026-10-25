@@ -1,0 +1,74 @@
+{
+  "tree": {
+    "label": "Canais",
+    "hint": "Enter: mostrar chat · Shift+Enter ou duplo clique: entrar · Setas: mover, expandir, recolher",
+    "join": "Entrar",
+    "you": "(tu)",
+    "voiceHere": "estás aqui (voz)",
+    "people_one": "{{count}} pessoa",
+    "people_many": "{{count}} pessoas",
+    "people_other": "{{count}} pessoas",
+    "stack": {
+      "some": "{{shown}} de {{total}} pessoas: {{names}} e mais {{rest}}",
+      "all_one": "{{count}} pessoa: {{names}}",
+      "all_many": "{{count}} pessoas: {{names}}",
+      "all_other": "{{count}} pessoas: {{names}}",
+      "person": "{{name}} ({{status}})"
+    },
+    "showAll": "Mostrar tudo ({{total}})",
+    "showFewer": "Mostrar menos",
+    "jump": "Ir para o meu canal"
+  },
+  "status": {
+    "listening": "a ouvir",
+    "talking": "a falar",
+    "muted": "sem microfone",
+    "deafened": "sem áudio",
+    "serverMuted": "silenciado pelo servidor",
+    "serverDeafened": "sem áudio pelo servidor",
+    "suppressed": "suprimido (não pode falar aqui)",
+    "localMuted": "silenciado para ti",
+    "unregistered": "não registado"
+  },
+  "mumcordBadge": "Usa o Mumcord",
+  "statusTip": {
+    "registered": "Registado neste servidor",
+    "listening": "A ouvir este canal",
+    "muted": "Sem microfone",
+    "deafened": "Sem áudio",
+    "serverMuted": "Silenciado pelo servidor",
+    "serverDeafened": "Sem áudio pelo servidor",
+    "suppressed": "Suprimido – não pode falar neste canal",
+    "localMuted": "Silenciado para ti",
+    "unregistered": "Não registado neste servidor (convidado)",
+    "nowPlaying": "A ouvir {{track}}",
+    "nowGaming": "A jogar {{game}}",
+    "positional": "Áudio posicional ativo"
+  },
+  "announce": {
+    "joined": "{{name}} entrou no teu canal",
+    "left": "{{name}} saiu do teu canal",
+    "talking": "{{name}} está a falar"
+  },
+  "errors": {
+    "joinDenied": "Não tens permissão para entrar neste canal.",
+    "joinFailed": "Não foi possível entrar no canal. Tenta novamente.",
+    "notConnected": "Sem ligação a um servidor."
+  },
+  "empty": {
+    "disconnected": "Sem ligação. Escolhe um servidor para ver os respetivos canais.",
+    "loading": "A carregar canais…"
+  },
+  "search": {
+    "label": "Pesquisar canais e pessoas",
+    "clear": "Limpar pesquisa",
+    "empty": "Nenhum canal ou pessoa corresponde a “{{query}}”.",
+    "count": "{{channels}}, {{people}}",
+    "channels_one": "{{count}} canal",
+    "channels_many": "{{count}} canais",
+    "channels_other": "{{count}} canais",
+    "people_one": "{{count}} pessoa",
+    "people_many": "{{count}} pessoas",
+    "people_other": "{{count}} pessoas"
+  }
+}

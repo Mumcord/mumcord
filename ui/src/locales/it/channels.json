@@ -1,0 +1,74 @@
+{
+  "tree": {
+    "label": "Canali",
+    "hint": "Invio: mostra la chat · Maiusc+Invio o doppio clic: entra · Frecce: sposta, espandi, comprimi",
+    "join": "Entra",
+    "you": "(tu)",
+    "voiceHere": "sei qui (vocale)",
+    "people_one": "{{count}} persona",
+    "people_many": "{{count}} persone",
+    "people_other": "{{count}} persone",
+    "stack": {
+      "some": "{{shown}} di {{total}} persone: {{names}} e altre {{rest}}",
+      "all_one": "{{count}} persona: {{names}}",
+      "all_many": "{{count}} persone: {{names}}",
+      "all_other": "{{count}} persone: {{names}}",
+      "person": "{{name}} ({{status}})"
+    },
+    "showAll": "Mostra tutti ({{total}})",
+    "showFewer": "Mostra meno",
+    "jump": "Vai al mio canale"
+  },
+  "status": {
+    "listening": "in ascolto",
+    "talking": "sta parlando",
+    "muted": "microfono disattivato",
+    "deafened": "audio disattivato",
+    "serverMuted": "silenziato dal server",
+    "serverDeafened": "audio disattivato dal server",
+    "suppressed": "soppresso (non può parlare qui)",
+    "localMuted": "silenziato per te",
+    "unregistered": "non registrato"
+  },
+  "mumcordBadge": "Usa Mumcord",
+  "statusTip": {
+    "registered": "Registrato su questo server",
+    "listening": "In ascolto in questo canale",
+    "muted": "Microfono disattivato",
+    "deafened": "Audio disattivato",
+    "serverMuted": "Silenziato dal server",
+    "serverDeafened": "Audio disattivato dal server",
+    "suppressed": "Soppresso – non può parlare in questo canale",
+    "localMuted": "Silenziato per te",
+    "unregistered": "Non registrato su questo server (ospite)",
+    "nowPlaying": "Ascolta {{track}}",
+    "nowGaming": "Gioca a {{game}}",
+    "positional": "Audio posizionale attivo"
+  },
+  "announce": {
+    "joined": "{{name}} è entrato nel tuo canale",
+    "left": "{{name}} ha lasciato il tuo canale",
+    "talking": "{{name}} sta parlando"
+  },
+  "errors": {
+    "joinDenied": "Non hai il permesso di entrare in questo canale.",
+    "joinFailed": "Impossibile entrare nel canale. Riprova.",
+    "notConnected": "Non sei connesso a un server."
+  },
+  "empty": {
+    "disconnected": "Non connesso. Scegli un server per vederne i canali.",
+    "loading": "Caricamento dei canali…"
+  },
+  "search": {
+    "label": "Cerca canali e persone",
+    "clear": "Cancella ricerca",
+    "empty": "Nessun canale o persona corrisponde a “{{query}}”.",
+    "count": "{{channels}}, {{people}}",
+    "channels_one": "{{count}} canale",
+    "channels_many": "{{count}} canali",
+    "channels_other": "{{count}} canali",
+    "people_one": "{{count}} persona",
+    "people_many": "{{count}} persone",
+    "people_other": "{{count}} persone"
+  }
+}

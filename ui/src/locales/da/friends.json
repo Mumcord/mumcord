@@ -1,0 +1,14 @@
+{
+  "title": "Venner",
+  "item": "{{name}}, {{status}}",
+  "online": "Online",
+  "onlineIn": "Online i {{channel}}",
+  "offline": "Offline",
+  "lastSeen": "Offline, sidst set {{when}}",
+  "friend": "Ven",
+  "friendHint": "Viser, når de er online, og gemmer din private chat med dem.",
+  "noCertificate": "Personer uden certifikat kan ikke være venner, fordi Mumcord ikke kan genkende dem igen.",
+  "add": "Tilføj ven",
+  "remove": "Fjern ven",
+  "failed": "Det lykkedes ikke at ændre vennen. Prøv igen."
+}

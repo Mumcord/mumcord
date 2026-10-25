@@ -1,0 +1,22 @@
+{
+  "open": "Informații despre conexiune",
+  "title": "Informații despre conexiune",
+  "loading": "Se încarcă…",
+  "notConnected": "Nu ești conectat.",
+  "error": "Informațiile despre conexiune nu sunt disponibile acum.",
+  "none": "–",
+  "transport": "Transport",
+  "transportValue": {
+    "udp": "UDP",
+    "tcp": "TCP (prin tunel)"
+  },
+  "latency": "Latență",
+  "latencyValue": "{{value}} ms",
+  "loss": "Pierdere de pachete",
+  "lossValue": "{{value}} %",
+  "bitrate": "Bitrate de trimitere",
+  "bitrateValue": "{{value}} kbit/s",
+  "serverLimit": "Limita serverului",
+  "packets": "Pachete trimise / primite",
+  "packetsValue": "{{sent}} / {{received}}"
+}

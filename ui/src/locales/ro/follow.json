@@ -1,0 +1,59 @@
+{
+  "follow": "Urmărește",
+  "following": "Urmărești",
+  "unsupported": "Urmărirea canalelor necesită un server cu versiunea 1.4 sau mai nouă.",
+  "unread_one": "{{count}} mesaj necitit",
+  "unread_few": "{{count}} mesaje necitite",
+  "unread_other": "{{count}} de mesaje necitite",
+  "errors": {
+    "denied": "Serverul nu îți permite să urmărești acest canal.",
+    "limit": "Nu mai poți urmări alte canale pe acest server. Renunță mai întâi la alt canal.",
+    "tooOld": "Acest server e prea vechi pentru urmărirea canalelor (e nevoie de versiunea 1.4 sau mai nouă).",
+    "notConnected": "Nu ești conectat la server.",
+    "generic": "Urmărirea acestui canal nu a mers. Încearcă din nou."
+  },
+  "dm": {
+    "title": "Mesaje directe",
+    "unknown": "Persoană necunoscută"
+  },
+  "notify": {
+    "channel": "{{name}} în {{channel}}: {{text}}",
+    "private": "{{name}} (privat): {{text}}",
+    "more_one": "Încă {{count}} mesaj nou",
+    "more_few": "Încă {{count}} mesaje noi",
+    "more_other": "Încă {{count}} de mesaje noi"
+  },
+  "history": {
+    "clear": "Șterge istoricul",
+    "title": "Ștergi istoricul?",
+    "body": "Aceasta șterge definitiv de pe acest computer mesajele salvate ale acestei conversații. Ceilalți își păstrează copiile.",
+    "confirm": "Șterge istoricul",
+    "cancel": "Anulează",
+    "failed": "Istoricul nu a putut fi șters. Încearcă din nou."
+  },
+  "star": {
+    "follow": "Urmărește {{channel}}",
+    "unfollow": "Nu mai urmări {{channel}}"
+  },
+  "all": {
+    "menu": "Opțiuni server pentru {{server}}",
+    "menuLabel": "Opțiuni server",
+    "follow": "Urmărește toate canalele",
+    "unfollow": "Nu mai urmări niciun canal",
+    "working": "Se urmăresc canalele…",
+    "followed_one": "Urmărești {{count}} canal.",
+    "followed_few": "Urmărești {{count}} canale.",
+    "followed_other": "Urmărești {{count}} de canale.",
+    "skipped_one": "{{count}} omis: {{reasons}}.",
+    "skipped_few": "{{count}} omise: {{reasons}}.",
+    "skipped_other": "{{count}} de omise: {{reasons}}.",
+    "limit": "limită atinsă",
+    "notAllowed": "nepermis",
+    "noAnswer": "niciun răspuns de la server",
+    "unfollowed": "Nu mai urmărești niciun canal.",
+    "failed": "Urmărirea tuturor canalelor nu a mers. Încearcă din nou.",
+    "dismiss": "Închide",
+    "unfollowFailed": "Renunțarea la toate canalele nu a mers. Încearcă din nou."
+  },
+  "mention": "conține o mențiune a ta"
+}

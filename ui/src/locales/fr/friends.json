@@ -1,0 +1,14 @@
+{
+  "title": "Amis",
+  "item": "{{name}}, {{status}}",
+  "online": "En ligne",
+  "onlineIn": "En ligne dans {{channel}}",
+  "offline": "Hors ligne",
+  "lastSeen": "Hors ligne, vu pour la dernière fois {{when}}",
+  "friend": "Ami",
+  "friendHint": "Indique quand cette personne est en ligne et conserve votre discussion privée avec elle.",
+  "noCertificate": "Les personnes sans certificat ne peuvent pas être ajoutées en ami, car Mumcord ne pourrait pas les reconnaître.",
+  "add": "Ajouter en ami",
+  "remove": "Retirer des amis",
+  "failed": "La modification n’a pas fonctionné. Veuillez réessayer."
+}

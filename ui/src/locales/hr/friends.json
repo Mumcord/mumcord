@@ -1,0 +1,14 @@
+{
+  "title": "Prijatelji",
+  "item": "{{name}}, {{status}}",
+  "online": "Na mreži",
+  "onlineIn": "Na mreži u {{channel}}",
+  "offline": "Izvan mreže",
+  "lastSeen": "Izvan mreže, zadnji put viđen {{when}}",
+  "friend": "Prijatelj",
+  "friendHint": "Prikazuje kad je na mreži i čuva tvoj privatni chat s njim.",
+  "noCertificate": "Osobe bez certifikata ne mogu biti prijatelji jer ih Mumcord ne bi mogao ponovno prepoznati.",
+  "add": "Dodaj prijatelja",
+  "remove": "Ukloni prijatelja",
+  "failed": "Promjena prijatelja nije uspjela. Pokušaj ponovno."
+}

@@ -1,0 +1,10 @@
+{
+  "close": {
+    "title": "Minimalizovat do lišty, nebo ukončit?",
+    "description": "Stále jsi připojen. Po minimalizaci tě Mumcord nechá v hlasovém kanálu a zůstane v systémové liště.",
+    "remember": "Zapamatovat volbu",
+    "minimize": "Minimalizovat do lišty",
+    "quit": "Ukončit",
+    "failed": "To se nepovedlo. Zkus to prosím znovu."
+  }
+}

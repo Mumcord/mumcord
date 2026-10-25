@@ -1,0 +1,14 @@
+{
+  "title": "Vänner",
+  "item": "{{name}}, {{status}}",
+  "online": "Online",
+  "onlineIn": "Online i {{channel}}",
+  "offline": "Offline",
+  "lastSeen": "Offline, senast sedd {{when}}",
+  "friend": "Vän",
+  "friendHint": "Visar när personen är online och sparar din privata chatt med personen.",
+  "noCertificate": "Personer utan certifikat kan inte vara vänner, eftersom Mumcord inte skulle känna igen dem igen.",
+  "add": "Lägg till vän",
+  "remove": "Ta bort vän",
+  "failed": "Det gick inte att ändra vänlistan. Försök igen."
+}

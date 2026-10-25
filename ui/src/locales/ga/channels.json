@@ -1,0 +1,82 @@
+{
+  "tree": {
+    "label": "Cainéil",
+    "hint": "Enter: taispeáin an comhrá · Shift+Enter nó dúbailt-chliceáil: téigh isteach · Eochracha saigheada: bog, leathnaigh, laghdaigh",
+    "join": "Téigh isteach",
+    "you": "(tusa)",
+    "voiceHere": "tá tú anseo (guth)",
+    "people_one": "{{count}} duine",
+    "people_two": "{{count}} dhuine",
+    "people_few": "{{count}} dhuine",
+    "people_many": "{{count}} nduine",
+    "people_other": "{{count}} duine",
+    "stack": {
+      "some": "{{shown}} as {{total}} duine: {{names}} agus {{rest}} eile",
+      "all_one": "{{count}} duine: {{names}}",
+      "all_two": "{{count}} dhuine: {{names}}",
+      "all_few": "{{count}} dhuine: {{names}}",
+      "all_many": "{{count}} nduine: {{names}}",
+      "all_other": "{{count}} duine: {{names}}",
+      "person": "{{name}} ({{status}})"
+    },
+    "showAll": "Taispeáin gach ceann ({{total}})",
+    "showFewer": "Taispeáin níos lú",
+    "jump": "Léim go dtí mo chainéal"
+  },
+  "status": {
+    "listening": "ag éisteacht",
+    "talking": "ag caint",
+    "muted": "balbhaithe",
+    "deafened": "bodhraithe",
+    "serverMuted": "balbhaithe ag an bhfreastalaí",
+    "serverDeafened": "bodhraithe ag an bhfreastalaí",
+    "suppressed": "faoi chois (ní féidir labhairt anseo)",
+    "localMuted": "balbhaithe duitse",
+    "unregistered": "gan chlárú"
+  },
+  "mumcordBadge": "Úsáideann sé Mumcord",
+  "statusTip": {
+    "registered": "Cláraithe ar an bhfreastalaí seo",
+    "listening": "Ag éisteacht leis an gcainéal seo",
+    "muted": "Balbhaithe",
+    "deafened": "Bodhraithe",
+    "serverMuted": "Balbhaithe ag an bhfreastalaí",
+    "serverDeafened": "Bodhraithe ag an bhfreastalaí",
+    "suppressed": "Faoi chois – ní féidir labhairt sa chainéal seo",
+    "localMuted": "Balbhaithe duitse",
+    "unregistered": "Gan chlárú ar an bhfreastalaí seo (aoi)",
+    "nowPlaying": "Ag éisteacht le {{track}}",
+    "nowGaming": "Ag imirt {{game}}",
+    "positional": "Fuaim shuímh gníomhach"
+  },
+  "announce": {
+    "joined": "Chuaigh {{name}} isteach i do chainéal",
+    "left": "D'imigh {{name}} ó do chainéal",
+    "talking": "Tá {{name}} ag caint"
+  },
+  "errors": {
+    "joinDenied": "Níl cead agat dul isteach sa chainéal seo.",
+    "joinFailed": "Níorbh fhéidir dul isteach sa chainéal. Bain triail eile as.",
+    "notConnected": "Gan ceangal le freastalaí."
+  },
+  "empty": {
+    "disconnected": "Gan ceangal. Roghnaigh freastalaí chun a chainéil a fheiceáil.",
+    "loading": "Ag luchtú cainéal…"
+  },
+  "search": {
+    "label": "Cuardaigh cainéil agus daoine",
+    "clear": "Glan an cuardach",
+    "empty": "Níl aon chainéal ná duine ag teacht le “{{query}}”.",
+    "count": "{{channels}}, {{people}}",
+    "channels_one": "{{count}} cainéal",
+    "channels_two": "{{count}} chainéal",
+    "channels_few": "{{count}} chainéal",
+    "channels_many": "{{count}} gcainéal",
+    "channels_other": "{{count}} cainéal",
+    "people_one": "{{count}} duine",
+    "people_two": "{{count}} dhuine",
+    "people_few": "{{count}} dhuine",
+    "people_many": "{{count}} nduine",
+    "people_other": "{{count}} duine"
+  }
+}

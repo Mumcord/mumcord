@@ -1,0 +1,33 @@
+{
+  "regions": {
+    "servers": "Servrar",
+    "channels": "Kanaler",
+    "chat": "Chatt",
+    "members": "Medlemmar",
+    "userPanel": "Din status"
+  },
+  "skipLinks": {
+    "label": "Hoppa-länkar",
+    "chat": "Hoppa till chatten",
+    "channels": "Hoppa till kanalerna"
+  },
+  "members": {
+    "show": "Visa medlemmar",
+    "hide": "Dölj medlemmar"
+  },
+  "resize": {
+    "channels": "Ändra storlek på kanallistan",
+    "members": "Ändra storlek på medlemslistan"
+  },
+  "settings": {
+    "title": "Inställningar"
+  },
+  "wizard": {
+    "title": "Välkommen till Mumcord"
+  },
+  "placeholder": "Kommer snart",
+  "startupError": {
+    "title": "Mumcord kunde inte startas",
+    "description": "Appen kunde inte läsa in dina inställningar. Försök igen. Om det fortfarande inte fungerar, starta om Mumcord."
+  }
+}

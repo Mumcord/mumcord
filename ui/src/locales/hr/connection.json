@@ -1,0 +1,22 @@
+{
+  "open": "Podaci o vezi",
+  "title": "Podaci o vezi",
+  "loading": "Učitavanje…",
+  "notConnected": "Nisi povezan.",
+  "error": "Podaci o vezi trenutno nisu dostupni.",
+  "none": "–",
+  "transport": "Prijenos",
+  "transportValue": {
+    "udp": "UDP",
+    "tcp": "TCP (tunelirano)"
+  },
+  "latency": "Kašnjenje",
+  "latencyValue": "{{value}} ms",
+  "loss": "Gubitak paketa",
+  "lossValue": "{{value}} %",
+  "bitrate": "Brzina slanja",
+  "bitrateValue": "{{value}} kbit/s",
+  "serverLimit": "Ograničenje poslužitelja",
+  "packets": "Paketi poslani / primljeni",
+  "packetsValue": "{{sent}} / {{received}}"
+}

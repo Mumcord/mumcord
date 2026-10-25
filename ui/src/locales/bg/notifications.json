@@ -1,0 +1,14 @@
+{
+  "region": "Известия",
+  "channel": "#{{name}}",
+  "unknownChannel": "Канал",
+  "line": "{{sender}}: {{preview}}",
+  "groupedChannel_one": "{{count}} ново съобщение в {{name}}",
+  "groupedChannel_other": "{{count}} нови съобщения в {{name}}",
+  "groupedPrivate_one": "{{count}} ново съобщение от {{name}}",
+  "groupedPrivate_other": "{{count}} нови съобщения от {{name}}",
+  "image": "Изпрати изображение",
+  "open": "Отвори чата",
+  "close": "Затвори известието",
+  "mentionLine": "{{sender}} те спомена: {{preview}}"
+}

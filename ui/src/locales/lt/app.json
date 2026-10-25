@@ -1,0 +1,33 @@
+{
+  "regions": {
+    "servers": "Serveriai",
+    "channels": "Kanalai",
+    "chat": "Pokalbis",
+    "members": "Nariai",
+    "userPanel": "Tavo būsena"
+  },
+  "skipLinks": {
+    "label": "Praleidimo nuorodos",
+    "chat": "Pereiti į pokalbį",
+    "channels": "Pereiti į kanalus"
+  },
+  "members": {
+    "show": "Rodyti narius",
+    "hide": "Slėpti narius"
+  },
+  "resize": {
+    "channels": "Keisti kanalų sąrašo dydį",
+    "members": "Keisti narių sąrašo dydį"
+  },
+  "settings": {
+    "title": "Nustatymai"
+  },
+  "wizard": {
+    "title": "Sveiki atvykę į Mumcord"
+  },
+  "placeholder": "Netrukus",
+  "startupError": {
+    "title": "Mumcord nepavyko paleisti",
+    "description": "Programai nepavyko įkelti tavo nustatymų. Bandyk dar kartą; jei vis tiek nepavyksta, iš naujo paleisk Mumcord."
+  }
+}

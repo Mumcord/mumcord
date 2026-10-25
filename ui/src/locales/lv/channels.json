@@ -1,0 +1,74 @@
+{
+  "tree": {
+    "label": "Kanāli",
+    "hint": "Enter: rādīt čatu · Shift+Enter vai dubultklikšķis: pievienoties · Bulttaustiņi: pārvietoties, izvērst, sakļaut",
+    "join": "Pievienoties",
+    "you": "(tu)",
+    "voiceHere": "tu esi šeit (balss)",
+    "people_zero": "{{count}} cilvēku",
+    "people_one": "{{count}} cilvēks",
+    "people_other": "{{count}} cilvēki",
+    "stack": {
+      "some": "{{shown}} no {{total}} cilvēkiem: {{names}} un vēl {{rest}}",
+      "all_zero": "{{count}} cilvēku: {{names}}",
+      "all_one": "{{count}} cilvēks: {{names}}",
+      "all_other": "{{count}} cilvēki: {{names}}",
+      "person": "{{name}} ({{status}})"
+    },
+    "showAll": "Rādīt visus ({{total}})",
+    "showFewer": "Rādīt mazāk",
+    "jump": "Pāriet uz manu kanālu"
+  },
+  "status": {
+    "listening": "klausās",
+    "talking": "runā",
+    "muted": "izslēgts mikrofons",
+    "deafened": "izslēgta skaņa",
+    "serverMuted": "servera izslēgts mikrofons",
+    "serverDeafened": "servera izslēgta skaņa",
+    "suppressed": "apspiests (šeit nevar runāt)",
+    "localMuted": "izslēgts tev",
+    "unregistered": "nereģistrēts"
+  },
+  "mumcordBadge": "Izmanto Mumcord",
+  "statusTip": {
+    "registered": "Reģistrēts šajā serverī",
+    "listening": "Klausās šo kanālu",
+    "muted": "Mikrofons izslēgts",
+    "deafened": "Skaņa izslēgta",
+    "serverMuted": "Servera izslēgts mikrofons",
+    "serverDeafened": "Servera izslēgta skaņa",
+    "suppressed": "Apspiests – šajā kanālā nevar runāt",
+    "localMuted": "Izslēgts tev",
+    "unregistered": "Nav reģistrēts šajā serverī (viesis)",
+    "nowPlaying": "Klausās {{track}}",
+    "nowGaming": "Spēlē {{game}}",
+    "positional": "Pozicionālā skaņa ir aktīva"
+  },
+  "announce": {
+    "joined": "{{name}} pievienojās tavam kanālam",
+    "left": "{{name}} pameta tavu kanālu",
+    "talking": "{{name}} runā"
+  },
+  "errors": {
+    "joinDenied": "Tev nav atļaujas ieiet šajā kanālā.",
+    "joinFailed": "Neizdevās pievienoties kanālam. Lūdzu, mēģini vēlreiz.",
+    "notConnected": "Nav savienojuma ar serveri."
+  },
+  "empty": {
+    "disconnected": "Nav savienots. Izvēlies serveri, lai redzētu tā kanālus.",
+    "loading": "Ielādē kanālus…"
+  },
+  "search": {
+    "label": "Meklēt kanālus un cilvēkus",
+    "clear": "Notīrīt meklēšanu",
+    "empty": "Neviens kanāls vai cilvēks neatbilst “{{query}}”.",
+    "count": "{{channels}}, {{people}}",
+    "channels_zero": "{{count}} kanālu",
+    "channels_one": "{{count}} kanāls",
+    "channels_other": "{{count}} kanāli",
+    "people_zero": "{{count}} cilvēku",
+    "people_one": "{{count}} cilvēks",
+    "people_other": "{{count}} cilvēki"
+  }
+}

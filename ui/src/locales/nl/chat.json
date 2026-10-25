@@ -1,0 +1,151 @@
+{
+  "noConversation": "Maak verbinding met een server en kies een kanaal om te chatten.",
+  "empty": "Nog geen berichten. Berichten die je hier ontvangt, worden op deze computer opgeslagen.",
+  "header": {
+    "channel": "#{{name}}",
+    "channelPrefix": "Kanaal",
+    "privatePrefix": "Privéchat met",
+    "unknownPerson": "Onbekende persoon"
+  },
+  "list": {
+    "today": "Vandaag",
+    "yesterday": "Gisteren",
+    "label": "Berichten in {{name}}",
+    "loadOlder": "Oudere berichten laden",
+    "loading": "Berichten laden…",
+    "loadFailed": "Oudere berichten konden niet worden geladen. Scroll omhoog om het opnieuw te proberen.",
+    "loadEarlier": "Eerdere berichten laden",
+    "syncing": "Zoeken naar eerdere berichten van andere Mumcord-gebruikers…",
+    "syncAdded_one": "{{count}} eerder bericht toegevoegd van andere Mumcord-gebruikers.",
+    "syncAdded_other": "{{count}} eerdere berichten toegevoegd van andere Mumcord-gebruikers.",
+    "syncNone": "Geen eerdere berichten gevonden.",
+    "syncFailed": "Eerdere berichten kunnen hier niet worden geladen.",
+    "syncedFrom": "uit de geschiedenis van {{name}}",
+    "jumpToNewest": "Naar het nieuwste",
+    "jumpToNewestUnseen_one": "Naar het nieuwste, {{count}} nieuw bericht",
+    "jumpToNewestUnseen_other": "Naar het nieuwste, {{count}} nieuwe berichten"
+  },
+  "format": {
+    "toolbar": "Opmaak",
+    "bold": "Vet",
+    "italic": "Cursief",
+    "strike": "Doorhalen",
+    "code": "Inlinecode",
+    "codeBlock": "Codeblok",
+    "link": "Link"
+  },
+  "composer": {
+    "label": "Bericht aan {{name}}",
+    "hint": "Druk op Enter om te verzenden en op Shift+Enter voor een nieuwe regel. Markdown werkt: **vet**, *cursief*, `code`, [link](https://…).",
+    "addImage": "Afbeelding toevoegen",
+    "removeImage": "Afbeelding {{name}} verwijderen",
+    "imagePreview": "Afbeelding om te verzenden: {{name}}",
+    "send": "Verzenden",
+    "noPermission": "Je hebt geen toestemming om in dit kanaal te schrijven.",
+    "unavailable": "Dit kanaal is niet meer beschikbaar.",
+    "offline": "{{name}} is offline. Je kunt weer schrijven zodra die terug is.",
+    "unnamedImage": "Geplakte afbeelding"
+  },
+  "tray": {
+    "label": "Afbeeldingen om te verzenden",
+    "processing": "Afbeelding voorbereiden",
+    "scaled": "Verkleind naar {{width}}×{{height}} om binnen de serverlimiet te passen"
+  },
+  "errors": {
+    "tooLong": "Je bericht is te lang voor deze server (maximaal {{max}} tekens). Kort het in en probeer het opnieuw.",
+    "tooLongNoLimit": "Je bericht is te lang voor deze server. Kort het in en probeer het opnieuw.",
+    "imageTooLarge": "Deze afbeelding is te groot voor deze server, zelfs na compressie. Probeer een kleinere afbeelding.",
+    "imageWithTextTooLong": "Het bericht met de afbeelding is te groot voor deze server. Kort de tekst in of verwijder de afbeelding.",
+    "imagesNotAllowed": "Deze server staat geen afbeeldingen in berichten toe.",
+    "notImage": "Dit bestand kan niet worden verzonden. Gebruik een PNG-, JPEG-, GIF- of WebP-afbeelding.",
+    "imageUnreadable": "De afbeelding kon niet worden gelezen. Probeer een ander bestand.",
+    "denied": "De server heeft dit bericht niet toegestaan.",
+    "deniedWithReason": "De server heeft dit bericht niet toegestaan: {{reason}}",
+    "notConnected": "Je bent niet verbonden. Maak opnieuw verbinding en probeer het nog eens.",
+    "generic": "Het bericht kon niet worden verzonden. Probeer het opnieuw.",
+    "onlyImages": "Er kunnen alleen afbeeldingen worden verzonden.",
+    "sourceTooLarge": "Dit bestand is te groot om te verzenden (meer dan 25 MB)."
+  },
+  "announce": {
+    "message": "{{name}}: {{text}}",
+    "image": "{{name}} heeft een afbeelding gestuurd",
+    "more_one": "{{count}} nieuw bericht meer",
+    "more_other": "{{count}} nieuwe berichten meer"
+  },
+  "pinned": {
+    "label": "Kanaalinfo",
+    "showMore": "Meer tonen",
+    "showLess": "Minder tonen"
+  },
+  "mention": {
+    "list": "Vermeldbare personen",
+    "found_one": "{{count}} persoon voorgesteld. Gebruik de pijltjestoetsen en druk op Enter om in te voegen.",
+    "found_other": "{{count}} personen voorgesteld. Gebruik de pijltjestoetsen en druk op Enter om in te voegen.",
+    "none": "Niemand gevonden",
+    "mentionsYou": "Vermeldt jou",
+    "chipLabel": "{{name}}, vermelding"
+  },
+  "preview": {
+    "open": "Openen in browser",
+    "openLabel": "{{title}} openen in browser",
+    "play": "{{title}} afspelen",
+    "player": "Videospeler: {{title}}",
+    "videoTitle": "{{site}}-video",
+    "spotifyTitle": "{{site}}-link",
+    "audioPlayer": "Spotify-speler: {{title}}",
+    "kind": {
+      "track": "Nummer",
+      "album": "Album",
+      "playlist": "Afspeellijst",
+      "artist": "Artiest",
+      "episode": "Aflevering",
+      "show": "Show"
+    },
+    "inBrowser": "Wordt afgespeeld in je browser",
+    "card": "Linkvoorbeeld: {{title}}",
+    "dismiss": "Voorbeeld verbergen"
+  },
+  "image": {
+    "loading": "Afbeelding {{name}} laden",
+    "label": "Afbeelding: {{name}}",
+    "view": "Afbeelding {{name}} bekijken",
+    "viewMessage": "Afbeelding van {{name}}, openen in viewer",
+    "failed": "Afbeelding kan niet worden getoond (te groot of niet beschikbaar)."
+  },
+  "viewer": {
+    "label": "Afbeeldingsviewer",
+    "counter": "{{current}} / {{total}}",
+    "zoomIn": "Inzoomen",
+    "zoomOut": "Uitzoomen",
+    "fit": "Aanpassen aan venster",
+    "save": "Afbeelding opslaan",
+    "saved": "Afbeelding opgeslagen",
+    "saveFailed": "De afbeelding kon niet worden opgeslagen",
+    "fileFilter": "Afbeelding",
+    "openInBrowser": "Openen in browser",
+    "close": "Sluiten",
+    "previous": "Vorige afbeelding",
+    "next": "Volgende afbeelding",
+    "unnamed": "afbeelding",
+    "fullLoading": "Volledige grootte laden…",
+    "fullProgress": "Volledige grootte laden… {{percent}} %",
+    "fullUnavailable": "Volledige grootte niet beschikbaar – het voorbeeld wordt getoond"
+  },
+  "favorites": {
+    "open": "GIF-favorieten",
+    "title": "GIF-favorieten",
+    "save": "Opslaan als favoriet",
+    "remove": "Uit favorieten verwijderen",
+    "removeNamed": "{{name}} uit favorieten verwijderen",
+    "send": "{{name}} verzenden",
+    "hint": "Pijltjestoetsen bewegen, Enter verzendt, Delete verwijdert, Escape sluit.",
+    "empty": "Nog geen favorieten. Klik met de rechtermuisknop op een GIF in de chat, of gebruik de ster erop, en kies \"Opslaan als favoriet\". Hij verschijnt dan hier."
+  },
+  "imageMenu": {
+    "label": "Afbeelding {{name}}"
+  },
+  "attribution": {
+    "via": "via {{brand}}",
+    "view": "Bekijken op {{brand}}"
+  }
+}

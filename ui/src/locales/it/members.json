@@ -1,0 +1,64 @@
+{
+  "inChannel_one": "In {{channel}} ({{count}})",
+  "inChannel_many": "In {{channel}} ({{count}})",
+  "inChannel_other": "In {{channel}} ({{count}})",
+  "listening_one": "In ascolto ({{count}})",
+  "listening_many": "In ascolto ({{count}})",
+  "listening_other": "In ascolto ({{count}})",
+  "noChannel": "Seleziona un canale per vedere chi c'è.",
+  "nobody": "Non c'è nessuno.",
+  "you": "(tu)",
+  "registered": "Registrato",
+  "unregistered": "Non registrato",
+  "talking": "Sta parlando",
+  "card": {
+    "close": "Chiudi",
+    "loadFailed": "Impossibile caricare il profilo.",
+    "volume": "Volume",
+    "volumeValue": "{{value}} %",
+    "localMute": "Silenzia per me",
+    "sessionOnly": "Questa persona non ha un certificato, quindi queste impostazioni valgono solo per questa sessione.",
+    "sendPrivateMessage": "Invia messaggio privato",
+    "privateMessage": "Messaggio privato",
+    "localSettings": "Le tue impostazioni",
+    "localSettingsHint": "Le vedi solo tu. Le modifiche vengono salvate subito.",
+    "localMuteHint": "Non sentirai questa persona.",
+    "privateNote": "Nota privata",
+    "privateNoteHint": "Solo tu puoi vedere questa nota.",
+    "saved": "Salvato"
+  },
+  "errors": {
+    "notConnected": "Non sei connesso a un server.",
+    "generic": "Non ha funzionato. Riprova."
+  },
+  "menu": {
+    "label": "Azioni per {{name}}",
+    "viewProfile": "Vedi profilo",
+    "mute": "Silenzia per me"
+  },
+  "nowPlaying": {
+    "label": "In riproduzione",
+    "listening": "Ascolta",
+    "paused": "In pausa",
+    "progress": "Avanzamento della riproduzione",
+    "position": "{{position}} di {{duration}}"
+  },
+  "nowGaming": {
+    "label": "In gioco",
+    "playing": "Gioca a",
+    "playedFor": "da {{time}}",
+    "hoursMinutes": "{{hours}} h {{minutes}} min",
+    "minutes_one": "{{count}} min",
+    "minutes_many": "{{count}} min",
+    "minutes_other": "{{count}} min",
+    "join": "Unisciti al gioco",
+    "joinTitle": "Unirti al gioco?",
+    "joinMessage": "Steam si aprirà e si collegherà al server su cui questa persona gioca a {{game}}. Unisciti solo a server di cui ti fidi.",
+    "joinConfirm": "Apri Steam",
+    "joinFailed": "Impossibile aprire Steam."
+  },
+  "preview": {
+    "privateMessage": "Messaggio privato",
+    "fullProfile": "Profilo completo"
+  }
+}

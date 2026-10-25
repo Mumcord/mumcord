@@ -1,0 +1,14 @@
+{
+  "title": "Prieteni",
+  "item": "{{name}}, {{status}}",
+  "online": "Online",
+  "onlineIn": "Online în {{channel}}",
+  "offline": "Offline",
+  "lastSeen": "Offline, văzut ultima dată {{when}}",
+  "friend": "Prieten",
+  "friendHint": "Arată când e online și îți păstrează chatul privat cu el.",
+  "noCertificate": "Persoanele fără certificat nu pot fi prieteni, pentru că Mumcord nu le-ar putea recunoaște din nou.",
+  "add": "Adaugă prieten",
+  "remove": "Elimină prietenul",
+  "failed": "Modificarea prietenului nu a mers. Încearcă din nou."
+}

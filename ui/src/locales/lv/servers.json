@@ -1,0 +1,128 @@
+{
+  "unknownServer": "serveris",
+  "announce": {
+    "connected": "Savienots ar {{server}}.",
+    "lost": "Savienojums ar {{server}} pārtrūka. Atjauno savienojumu…",
+    "ended": "Atvienots no {{server}}. Skaties joslu virs čata, lai uzzinātu, ko darīt tālāk.",
+    "disconnected": "Atvienots no {{server}}.",
+    "tcp": "Balss tagad darbojas pa TCP, jo UDP ir bloķēts. Skaņa var būt nedaudz aizkavēta.",
+    "removed": "{{server}} noņemts.",
+    "moved": "{{server}} pārvietots uz {{position}}. vietu no {{count}}."
+  },
+  "bar": {
+    "listLabel": "Saglabātie serveri",
+    "add": "Pievienot serveri",
+    "keyboardHint": "Enter izveido savienojumu. Alt plus augšupvērstā vai lejupvērstā bultiņa pārvieto serveri. Shift plus F10 atver papildu opcijas.",
+    "status": {
+      "connected": "{{server}} (savienots)",
+      "connecting": "{{server}} (savienojas)",
+      "reconnecting": "{{server}} (atjauno savienojumu)"
+    }
+  },
+  "menu": {
+    "label": "Opcijas: {{server}}",
+    "connect": "Savienoties",
+    "disconnect": "Atvienoties",
+    "edit": "Rediģēt serveri",
+    "moveUp": "Pārvietot uz augšu",
+    "moveDown": "Pārvietot uz leju",
+    "remove": "Noņemt serveri"
+  },
+  "dialog": {
+    "addTitle": "Pievienot serveri",
+    "editTitle": "Rediģēt serveri",
+    "linkTitle": "Saglabāt šo serveri?",
+    "address": "Adrese",
+    "addressHint": "Piemēram, mumble.example.org. Šeit vari arī ielīmēt mumble:// saiti.",
+    "filledFromLink": "Aizpildīts no mumble:// saites.",
+    "port": "Ports",
+    "label": "Nosaukums servera joslā",
+    "username": "Tavs vārds šajā serverī",
+    "password": "Servera parole (neobligāta)",
+    "passwordHint": "Vajadzīga tikai tad, ja serveris to prasa. Tā tiek glabāta tavas sistēmas drošajā krātuvē.",
+    "passwordKeepHint": "Parole ir saglabāta. Atstāj lauku tukšu, lai to paturētu, vai ieraksti jaunu.",
+    "clearPassword": "Noņemt saglabāto paroli",
+    "add": "Pievienot serveri",
+    "saveAndConnect": "Saglabāt un savienoties",
+    "errors": {
+      "address": "Ievadi servera adresi.",
+      "port": "Ievadi portu no 1 līdz 65535. Lielākā daļa serveru izmanto 64738.",
+      "username": "Ievadi vārdu, ko vēlies izmantot šajā serverī.",
+      "link": "Šo mumble:// saiti nevar nolasīt. Pārbaudi, vai tā ir nokopēta pilnībā.",
+      "invalid": "Servera dati nav derīgi. Pārbaudi adresi un portu."
+    }
+  },
+  "errors": {
+    "serverUnreachable": "Serveris nav sasniedzams. Pārbaudi adresi un portu un to, vai esi tiešsaistē.",
+    "wrongPassword": "Servera parole ir nepareiza. Rediģē serveri un ievadi pareizo paroli.",
+    "nameInUse": "Tavs vārds šajā serverī jau tiek izmantots vai ir reģistrēts citam. Rediģē serveri un izvēlies citu vārdu.",
+    "certificateRejected": "Sertifikāta pārbaude neizdevās: vai nu servera sertifikātam netika uzticēts, vai serveris nepieņēma tavu identitāti. Mēģini vēlreiz vai jautā servera īpašniekam.",
+    "certificateChanged": "Servera sertifikāts ir mainījies, un tam netika uzticēts. Uzticies tam tikai pēc tam, kad servera īpašnieks apstiprina izmaiņas.",
+    "denied": "Serveris noraidīja savienojumu.",
+    "deniedWithReason": "Serveris noraidīja savienojumu: {{reason}}",
+    "invalidAddress": "Servera adrese nav derīga. Rediģē serveri, lai to labotu.",
+    "secureStorage": "Tavas sistēmas drošā krātuve nav pieejama, tāpēc servera paroli nevarēja nolasīt vai saglabāt. Atbloķē to un mēģini vēlreiz.",
+    "notFound": "Šis serveris vairs nav saglabāts.",
+    "generic": "Kaut kas nogāja greizi. Lūdzu, mēģini vēlreiz."
+  },
+  "remove": {
+    "title": "Noņemt {{server}}?",
+    "message": "Tā saglabātā parole, sertifikāta lēmums, sekotie kanāli un čata vēsture šajā datorā tiks dzēsti.",
+    "confirm": "Noņemt"
+  },
+  "switch": {
+    "title": "Pārslēgt serveri?",
+    "message": "Vienlaikus vari būt tikai vienā serverī. Atvienoties no {{current}} un savienoties ar {{next}}?",
+    "confirm": "Atvienoties un pārslēgt"
+  },
+  "cert": {
+    "newTitle": "Uzticēties šim serverim?",
+    "newIntro": "Mumcord iepriekš nav redzējis {{server}} sertifikātu. Ja servera īpašnieks tev iedeva pirkstu nospiedumu, pārbaudi, vai tas sakrīt. Tava izvēle tiks atcerēta.",
+    "fingerprint": "Sertifikāta pirkstu nospiedums",
+    "changedTitle": "Brīdinājums: servera sertifikāts ir mainījies",
+    "changedWarning": "{{server}} sertifikāts atšķiras no tā, kuram iepriekš uzticējies.",
+    "changedAdvice": "Tā var notikt pēc servera atjaunošanas, bet tas var nozīmēt arī to, ka kāds pārtver tavu savienojumu. Turpini tikai tad, ja servera īpašnieks apstiprināja izmaiņas.",
+    "previousFingerprint": "Iepriekš uzticētais pirkstu nospiedums",
+    "newFingerprint": "Jaunais pirkstu nospiedums",
+    "reject": "Nesavienoties",
+    "trust": "Uzticēties un savienoties",
+    "trustChanged": "Uzticēties jaunajam sertifikātam"
+  },
+  "rejoin": {
+    "label": "Atgriezties pēdējā kanālā",
+    "text": "Pēdējoreiz biji kanālā {{channel}} – atgriezties?",
+    "rejoin": "Atgriezties",
+    "notNow": "Ne tagad"
+  },
+  "status": {
+    "label": "Savienojuma statuss",
+    "connecting": "Savienojas ar {{server}}…",
+    "reconnecting": "Atjauno savienojumu… ({{attempt}}. mēģinājums no {{max}}, nākamais pēc {{seconds}} s)",
+    "tcp": "Savienots pa TCP (UDP bloķēts). Balss darbojas, bet var būt nedaudz aizkavēta.",
+    "disconnected": "Atvienots",
+    "disconnectedReason": "Atvienots – {{reason}}",
+    "failed": "Neizdevās savienoties ar {{server}}. {{reason}}",
+    "cancel": "Atcelt",
+    "reconnect": "Savienoties vēlreiz",
+    "editServer": "Rediģēt serveri",
+    "actionFailed": {
+      "reorder": "Jauno serveru secību neizdevās saglabāt. Lūdzu, mēģini vēlreiz.",
+      "remove": "Serveri neizdevās noņemt. Lūdzu, mēģini vēlreiz.",
+      "disconnect": "Atvienošanās neizdevās. Lūdzu, mēģini vēlreiz."
+    }
+  },
+  "empty": {
+    "title": "Pievieno savu pirmo serveri",
+    "description": "Ievadi adresi, ko saņēmi no savas grupas, vai ielīmē mumble:// saiti.",
+    "addressLabel": "Servera adrese vai mumble:// saite",
+    "addressHint": "Piemēram, mumble.example.org vai mumble.example.org:64738.",
+    "connect": "Pievienot un savienoties",
+    "pasteLink": "Ielīmēt mumble:// saiti",
+    "moreOptions": "Papildu opcijas…",
+    "noLinkInClipboard": "Starpliktuvē nav mumble:// saites. Ielīmē vai ieraksti adresi augstāk.",
+    "pasteManually": "Mumcord nevarēja nolasīt starpliktuvi. Noklikšķini uz lauka augstāk un nospied Ctrl+V.",
+    "errors": {
+      "required": "Ievadi servera adresi vai mumble:// saiti."
+    }
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "listLabel": "Parlent en ce moment",
+  "move": {
+    "hint": "Faites glisser pour déplacer l’overlay",
+    "done": "Terminé"
+  },
+  "limits": {
+    "wayland": "Sur ce bureau Wayland, les applications ne peuvent ni garder une fenêtre au premier plan ni choisir où elle s’affiche : l’overlay peut donc passer derrière d’autres fenêtres et les positions dans les coins n’ont aucun effet. Activez « Mode de compatibilité (comme TeamSpeak) » dans les paramètres Voix et redémarrez Mumcord : l’overlay restera alors au premier plan.",
+    "waylandKde": "Sur KDE Plasma avec Wayland, les applications ne peuvent ni garder une fenêtre au premier plan ni choisir où elle s’affiche. Deux solutions : laisser Mumcord ajouter une règle de fenêtre KDE pour l’overlay (« Configurer automatiquement »), ou activer « Mode de compatibilité (comme TeamSpeak) » dans les paramètres Voix et redémarrer Mumcord.",
+    "exclusiveFullscreen": "L’overlay s’affiche par-dessus les jeux en mode fenêtré et plein écran sans bordure. Les jeux en plein écran exclusif s’affichent par-dessus toutes les fenêtres : passez-les en « sans bordure » ou « plein écran fenêtré » pour voir l’overlay."
+  }
+}

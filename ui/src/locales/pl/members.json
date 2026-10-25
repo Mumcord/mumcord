@@ -1,0 +1,67 @@
+{
+  "inChannel_one": "Na {{channel}} ({{count}})",
+  "inChannel_few": "Na {{channel}} ({{count}})",
+  "inChannel_many": "Na {{channel}} ({{count}})",
+  "inChannel_other": "Na {{channel}} ({{count}})",
+  "listening_one": "Słuchają ({{count}})",
+  "listening_few": "Słuchają ({{count}})",
+  "listening_many": "Słuchają ({{count}})",
+  "listening_other": "Słuchają ({{count}})",
+  "noChannel": "Wybierz kanał, aby zobaczyć, kto na nim jest.",
+  "nobody": "Nikogo tu nie ma.",
+  "you": "(Ty)",
+  "registered": "Zarejestrowany(-a)",
+  "unregistered": "Niezarejestrowany(-a)",
+  "talking": "Mówi",
+  "card": {
+    "close": "Zamknij",
+    "loadFailed": "Nie udało się wczytać profilu.",
+    "volume": "Głośność",
+    "volumeValue": "{{value}} %",
+    "localMute": "Wycisz dla mnie",
+    "sessionOnly": "Ta osoba nie ma certyfikatu, więc te ustawienia obowiązują tylko w tej sesji.",
+    "sendPrivateMessage": "Wyślij wiadomość prywatną",
+    "privateMessage": "Wiadomość prywatna",
+    "localSettings": "Twoje ustawienia",
+    "localSettingsHint": "Widzisz je tylko Ty. Zmiany zapisują się od razu.",
+    "localMuteHint": "Nie będziesz słyszeć tej osoby.",
+    "privateNote": "Prywatna notatka",
+    "privateNoteHint": "Tylko Ty widzisz tę notatkę.",
+    "saved": "Zapisano"
+  },
+  "errors": {
+    "notConnected": "Brak połączenia z serwerem.",
+    "generic": "To się nie udało. Spróbuj ponownie."
+  },
+  "menu": {
+    "label": "Akcje dla {{name}}",
+    "viewProfile": "Zobacz profil",
+    "mute": "Wycisz dla mnie"
+  },
+  "nowPlaying": {
+    "label": "Teraz gra",
+    "listening": "Słucha",
+    "paused": "Wstrzymano",
+    "progress": "Postęp odtwarzania",
+    "position": "{{position}} z {{duration}}"
+  },
+  "nowGaming": {
+    "label": "Teraz w grze",
+    "playing": "Gra w",
+    "playedFor": "od {{time}}",
+    "hoursMinutes": "{{hours}} godz. {{minutes}} min",
+    "minutes_one": "{{count}} min",
+    "minutes_few": "{{count}} min",
+    "minutes_many": "{{count}} min",
+    "minutes_other": "{{count}} min",
+    "join": "Dołącz do gry",
+    "joinTitle": "Dołączyć do gry?",
+    "joinMessage": "Steam się otworzy i połączy z serwerem, na którym ta osoba gra w {{game}}. Dołączaj tylko do serwerów, którym ufasz.",
+    "joinConfirm": "Otwórz Steam",
+    "joinFailed": "Nie udało się otworzyć Steam."
+  },
+  "preview": {
+    "privateMessage": "Wiadomość prywatna",
+    "fullProfile": "Pełny profil"
+  }
+}

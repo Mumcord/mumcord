@@ -1,0 +1,88 @@
+{
+  "unknownName": "Tu",
+  "mute": "Nutildyti mikrofoną",
+  "deafen": "Išjungti garsą",
+  "disconnect": "Atsijungti nuo {{server}}",
+  "settings": "Greitieji nustatymai",
+  "announce": {
+    "muted": "Mikrofonas nutildytas",
+    "unmuted": "Mikrofonas įjungtas",
+    "deafened": "Garsas išjungtas. Negirdi kitų, o tavo mikrofonas nutildytas",
+    "undeafened": "Garsas įjungtas"
+  },
+  "readOnly": {
+    "text": "Tu tik skaitai – prisijunk prie kanalo, kad kalbėtum.",
+    "join": "Prisijungti prie {{channel}}"
+  },
+  "status": {
+    "connecting": "Jungiamasi…",
+    "reconnecting": "Jungiamasi iš naujo…",
+    "connected": "Prisijungta",
+    "readOnly": "Tik skaitymas",
+    "disconnected": "Neprisijungta",
+    "playing": "Žaidžia: {{game}}",
+    "listening": "Klauso: {{track}}"
+  },
+  "profile": {
+    "title": "Redaguoti profilį",
+    "chooseTitle": "Pasirink profilio nuotrauką",
+    "chooseAvatar": "Pasirinkti nuotrauką…",
+    "removeAvatar": "Pašalinti nuotrauką",
+    "avatarHint": "Nuotrauka sumažinama, kad tilptų į serverio ribą.",
+    "avatarUnregistered": "Šis serveris avatarus saugo tik registruotiems naudotojams – Mumcord išsiunčia tavo avatarą iš naujo kiekvieną kartą prisijungus.",
+    "avatarChosen": "Pasirinkta: {{name}}",
+    "avatarRemoved": "Nuotrauka bus pašalinta, kai įrašysi.",
+    "comment": "Apie tave"
+  },
+  "register": {
+    "title": "Registruotis šiame serveryje",
+    "explain": "Registracija rezervuoja tavo vardą šiame serveryje. Niekas kitas jo negalės naudoti, o serveris tave atsimins kitą kartą prisijungus.",
+    "backup": "Tavo tapatybė įrodo, kad vardas tavo. Ją praradęs (-usi), prarasi prieigą prie registruoto vardo. Įrašyk atsarginę kopiją dabar ir saugok ją.",
+    "password": "Atsarginio failo slaptažodis",
+    "export": "Eksportuoti tapatybę",
+    "saveTitle": "Įrašyti tapatybės atsarginę kopiją",
+    "passwordRequired": "Įvesk slaptažodį atsarginiam failui apsaugoti.",
+    "exported": "Tapatybės atsarginė kopija įrašyta.",
+    "confirm": "Registruotis",
+    "done": "Registruotas (-a) šiame serveryje"
+  },
+  "errors": {
+    "tooLarge": "Tai per didelis serveriui. Pasirink mažesnę nuotrauką arba trumpesnį tekstą.",
+    "denied": "Serveris to neleidžia.",
+    "deniedWithReason": "Serveris to neleidžia: {{reason}}",
+    "notConnected": "Neprisijungta prie serverio.",
+    "file": "Nepavyko nuskaityti ar įrašyti failo.",
+    "generic": "Kažkas nepavyko. Bandyk dar kartą."
+  },
+  "ptt": "Spausk ir kalbėk: laikyk {{key}}, kad kalbėtum",
+  "pttNoKey": "Spausk ir kalbėk: klavišas nenustatytas",
+  "quickSettings": {
+    "linkPreviews": "Nuorodų peržiūros ir įterpiniai",
+    "linkPreviewsHint": "Svetainės mato tavo IP adresą",
+    "nowPlaying": "Dalintis, ką klausau",
+    "nowPlayingHint": "Kiti mato tavo dabartinį kūrinį",
+    "unsupported": "Nepasiekiama macOS sistemoje",
+    "theme": "Tema",
+    "theme_system": "Sistemos",
+    "theme_dark": "Tamsi",
+    "theme_light": "Šviesi",
+    "nowGaming": "Dalintis, kokį žaidimą žaidžiu",
+    "nowGamingHint": "Kiti mato tavo dabartinį žaidimą",
+    "unavailable": "Šioje sistemoje nepasiekiama",
+    "overlay": "Perdanga",
+    "overlayHint": "Rodo, kas kalba, virš žaidimų",
+    "editProfile": "Redaguoti profilį",
+    "editProfileHint": "Vardas, avataras ir komentaras",
+    "register": "Registruotis šiame serveryje",
+    "registered": "Registruotas (-a) šiame serveryje ✓",
+    "registerHint": "Išsaugo tavo vardą ir avatarą šiame serveryje",
+    "allSettings": "Visi nustatymai…",
+    "label": "Greitieji nustatymai",
+    "positional": "Pozicinis garsas",
+    "positionalHint": "Balsai išdėstomi 3D erdvėje aplink tave",
+    "offerImages": "Siūlyti pilno dydžio paveikslėlius",
+    "offerImagesHint": "Leisti kitiems įkelti tavo originalius paveikslėlius",
+    "loadImages": "Įkelti pilno dydžio paveikslėlius",
+    "loadImagesHint": "Gauti originalius paveikslėlius iš kitų"
+  }
+}

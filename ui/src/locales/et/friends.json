@@ -1,0 +1,14 @@
+{
+  "title": "Sõbrad",
+  "item": "{{name}}, {{status}}",
+  "online": "Võrgus",
+  "onlineIn": "Võrgus kanalis {{channel}}",
+  "offline": "Võrgust väljas",
+  "lastSeen": "Võrgust väljas, viimati nähtud {{when}}",
+  "friend": "Sõber",
+  "friendHint": "Näitab, millal ta on võrgus, ja hoiab sinu privaatset vestlust temaga.",
+  "noCertificate": "Sertifikaadita inimesi ei saa sõbraks lisada, sest Mumcord ei suudaks neid uuesti ära tunda.",
+  "add": "Lisa sõber",
+  "remove": "Eemalda sõber",
+  "failed": "Sõbra muutmine ei õnnestunud. Proovi palun uuesti."
+}

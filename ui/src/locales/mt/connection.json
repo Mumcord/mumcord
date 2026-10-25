@@ -1,0 +1,22 @@
+{
+  "open": "Info tal-konnessjoni",
+  "title": "Info tal-konnessjoni",
+  "loading": "Qed jitgħabba…",
+  "notConnected": "Mhux konness.",
+  "error": "L-info tal-konnessjoni mhix disponibbli bħalissa.",
+  "none": "–",
+  "transport": "Trasport",
+  "transportValue": {
+    "udp": "UDP",
+    "tcp": "TCP (tunnelled)"
+  },
+  "latency": "Latenza",
+  "latencyValue": "{{value}} ms",
+  "loss": "Telf tal-pakketti",
+  "lossValue": "{{value}} %",
+  "bitrate": "Bitrate tat-tbaghix",
+  "bitrateValue": "{{value}} kbit/s",
+  "serverLimit": "Limitu tas-server",
+  "packets": "Pakketti mibgħuta / riċevuti",
+  "packetsValue": "{{sent}} / {{received}}"
+}

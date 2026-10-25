@@ -1,0 +1,70 @@
+{
+  "tree": {
+    "label": "Kanavat",
+    "hint": "Enter: näytä chat · Shift+Enter tai kaksoisnapsautus: liity · Nuolinäppäimet: liiku, laajenna, supista",
+    "join": "Liity",
+    "you": "(sinä)",
+    "voiceHere": "olet täällä (puhe)",
+    "people_one": "{{count}} henkilö",
+    "people_other": "{{count}} henkilöä",
+    "stack": {
+      "some": "{{shown}}/{{total}} henkilöä: {{names}} ja {{rest}} muuta",
+      "all_one": "{{count}} henkilö: {{names}}",
+      "all_other": "{{count}} henkilöä: {{names}}",
+      "person": "{{name}} ({{status}})"
+    },
+    "showAll": "Näytä kaikki ({{total}})",
+    "showFewer": "Näytä vähemmän",
+    "jump": "Siirry omalle kanavalleni"
+  },
+  "status": {
+    "listening": "kuuntelee",
+    "talking": "puhuu",
+    "muted": "mykistetty",
+    "deafened": "kuulokkeet mykistetty",
+    "serverMuted": "palvelimen mykistämä",
+    "serverDeafened": "palvelimen kuurouttama",
+    "suppressed": "vaimennettu (ei voi puhua täällä)",
+    "localMuted": "mykistetty sinulta",
+    "unregistered": "ei rekisteröitynyt"
+  },
+  "mumcordBadge": "Käyttää Mumcordia",
+  "statusTip": {
+    "registered": "Rekisteröitynyt tälle palvelimelle",
+    "listening": "Kuuntelee tätä kanavaa",
+    "muted": "Mykistetty",
+    "deafened": "Kuulokkeet mykistetty",
+    "serverMuted": "Palvelimen mykistämä",
+    "serverDeafened": "Palvelimen kuurouttama",
+    "suppressed": "Vaimennettu – ei voi puhua tällä kanavalla",
+    "localMuted": "Mykistetty sinulta",
+    "unregistered": "Ei rekisteröitynyt tälle palvelimelle (vieras)",
+    "nowPlaying": "Kuuntelee: {{track}}",
+    "nowGaming": "Pelaa: {{game}}",
+    "positional": "Sijaintiääni käytössä"
+  },
+  "announce": {
+    "joined": "{{name}} liittyi kanavallesi",
+    "left": "{{name}} poistui kanavaltasi",
+    "talking": "{{name}} puhuu"
+  },
+  "errors": {
+    "joinDenied": "Sinulla ei ole lupaa liittyä tälle kanavalle.",
+    "joinFailed": "Kanavalle liittyminen epäonnistui. Yritä uudelleen.",
+    "notConnected": "Ei yhteyttä palvelimeen."
+  },
+  "empty": {
+    "disconnected": "Ei yhteyttä. Valitse palvelin nähdäksesi sen kanavat.",
+    "loading": "Ladataan kanavia…"
+  },
+  "search": {
+    "label": "Hae kanavia ja henkilöitä",
+    "clear": "Tyhjennä haku",
+    "empty": "Haulla ”{{query}}” ei löytynyt kanavia tai henkilöitä.",
+    "count": "{{channels}}, {{people}}",
+    "channels_one": "{{count}} kanava",
+    "channels_other": "{{count}} kanavaa",
+    "people_one": "{{count}} henkilö",
+    "people_other": "{{count}} henkilöä"
+  }
+}

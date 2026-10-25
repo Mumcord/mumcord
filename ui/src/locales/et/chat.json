@@ -1,0 +1,151 @@
+{
+  "noConversation": "Ühendu serveriga ja vali kanal, et vestlust alustada.",
+  "empty": "Sõnumeid pole veel. Siin saadud sõnumid salvestatakse sellesse arvutisse.",
+  "header": {
+    "channel": "#{{name}}",
+    "channelPrefix": "Kanal",
+    "privatePrefix": "Privaatvestlus kasutajaga",
+    "unknownPerson": "Tundmatu inimene"
+  },
+  "list": {
+    "today": "Täna",
+    "yesterday": "Eile",
+    "label": "Sõnumid: {{name}}",
+    "loadOlder": "Laadi vanemad sõnumid",
+    "loading": "Laadin sõnumeid…",
+    "loadFailed": "Vanemaid sõnumeid ei õnnestunud laadida. Keri üles, et uuesti proovida.",
+    "loadEarlier": "Laadi varasemad sõnumid",
+    "syncing": "Otsin teiste Mumcordi kasutajate varasemaid sõnumeid…",
+    "syncAdded_one": "Lisati {{count}} varasem sõnum teistelt Mumcordi kasutajatelt.",
+    "syncAdded_other": "Lisati {{count}} varasemat sõnumit teistelt Mumcordi kasutajatelt.",
+    "syncNone": "Varasemaid sõnumeid ei leitud.",
+    "syncFailed": "Varasemaid sõnumeid ei saa siin laadida.",
+    "syncedFrom": "kasutaja {{name}} ajaloost",
+    "jumpToNewest": "Hüppa uusimate juurde",
+    "jumpToNewestUnseen_one": "Hüppa uusimate juurde, {{count}} uus sõnum",
+    "jumpToNewestUnseen_other": "Hüppa uusimate juurde, {{count}} uut sõnumit"
+  },
+  "format": {
+    "toolbar": "Vormindus",
+    "bold": "Paks",
+    "italic": "Kursiiv",
+    "strike": "Läbijoonitud",
+    "code": "Reasisene kood",
+    "codeBlock": "Koodiplokk",
+    "link": "Link"
+  },
+  "composer": {
+    "label": "Sõnum: {{name}}",
+    "hint": "Saatmiseks vajuta Enter, uue rea jaoks Shift+Enter. Markdown töötab: **paks**, *kursiiv*, `kood`, [link](https://…).",
+    "addImage": "Lisa pilt",
+    "removeImage": "Eemalda pilt {{name}}",
+    "imagePreview": "Saadetav pilt: {{name}}",
+    "send": "Saada",
+    "noPermission": "Sul pole luba selles kanalis kirjutada.",
+    "unavailable": "See kanal pole enam saadaval.",
+    "offline": "{{name}} on võrgust väljas. Saad uuesti kirjutada, kui ta tagasi tuleb.",
+    "unnamedImage": "Kleebitud pilt"
+  },
+  "tray": {
+    "label": "Saadetavad pildid",
+    "processing": "Valmistan pilti ette",
+    "scaled": "Skaleeritud suuruseni {{width}}×{{height}}, et mahtuda serveri piirangusse"
+  },
+  "errors": {
+    "tooLong": "Sinu sõnum on sellele serverile liiga pikk (kuni {{max}} märki). Lühenda seda ja proovi uuesti.",
+    "tooLongNoLimit": "Sinu sõnum on sellele serverile liiga pikk. Lühenda seda ja proovi uuesti.",
+    "imageTooLarge": "See pilt on sellele serverile liiga suur, isegi pärast pakkimist. Proovi väiksemat pilti.",
+    "imageWithTextTooLong": "Pildiga sõnum on sellele serverile liiga suur. Lühenda teksti või eemalda pilt.",
+    "imagesNotAllowed": "See server ei luba sõnumites pilte.",
+    "notImage": "Seda faili ei saa saata. Kasuta PNG-, JPEG-, GIF- või WebP-pilti.",
+    "imageUnreadable": "Pilti ei õnnestunud lugeda. Proovi mõnda teist faili.",
+    "denied": "Server ei lubanud seda sõnumit.",
+    "deniedWithReason": "Server ei lubanud seda sõnumit: {{reason}}",
+    "notConnected": "Ühendus puudub. Ühendu uuesti ja proovi veel.",
+    "generic": "Sõnumit ei õnnestunud saata. Proovi uuesti.",
+    "onlyImages": "Saata saab ainult pilte.",
+    "sourceTooLarge": "See fail on saatmiseks liiga suur (üle 25 MB)."
+  },
+  "announce": {
+    "message": "{{name}}: {{text}}",
+    "image": "{{name}} saatis pildi",
+    "more_one": "veel {{count}} uus sõnum",
+    "more_other": "veel {{count}} uut sõnumit"
+  },
+  "pinned": {
+    "label": "Kanali info",
+    "showMore": "Näita rohkem",
+    "showLess": "Näita vähem"
+  },
+  "mention": {
+    "list": "Mainitavad inimesed",
+    "found_one": "Pakuti {{count}} inimest. Kasuta nooleklahve ja lisamiseks vajuta Enter.",
+    "found_other": "Pakuti {{count}} inimest. Kasuta nooleklahve ja lisamiseks vajuta Enter.",
+    "none": "Kedagi ei leitud",
+    "mentionsYou": "Mainib sind",
+    "chipLabel": "{{name}}, mainimine"
+  },
+  "preview": {
+    "open": "Ava brauseris",
+    "openLabel": "Ava {{title}} brauseris",
+    "play": "Esita {{title}}",
+    "player": "Videopleier: {{title}}",
+    "videoTitle": "{{site}} video",
+    "spotifyTitle": "{{site}} link",
+    "audioPlayer": "Spotify pleier: {{title}}",
+    "kind": {
+      "track": "Lugu",
+      "album": "Album",
+      "playlist": "Esitusloend",
+      "artist": "Esitaja",
+      "episode": "Episood",
+      "show": "Saade"
+    },
+    "inBrowser": "Mängib sinu brauseris",
+    "card": "Lingi eelvaade: {{title}}",
+    "dismiss": "Peida eelvaade"
+  },
+  "image": {
+    "loading": "Laadin pilti {{name}}",
+    "label": "Pilt: {{name}}",
+    "view": "Vaata pilti {{name}}",
+    "viewMessage": "Pilt kasutajalt {{name}}, ava vaaturis",
+    "failed": "Pilti ei saa näidata (liiga suur või pole saadaval)."
+  },
+  "viewer": {
+    "label": "Pildivaatur",
+    "counter": "{{current}} / {{total}}",
+    "zoomIn": "Suurenda",
+    "zoomOut": "Vähenda",
+    "fit": "Mahuta aknasse",
+    "save": "Salvesta pilt",
+    "saved": "Pilt salvestatud",
+    "saveFailed": "Pilti ei õnnestunud salvestada",
+    "fileFilter": "Pilt",
+    "openInBrowser": "Ava brauseris",
+    "close": "Sulge",
+    "previous": "Eelmine pilt",
+    "next": "Järgmine pilt",
+    "unnamed": "pilt",
+    "fullLoading": "Laadin täissuuruses…",
+    "fullProgress": "Laadin täissuuruses… {{percent}} %",
+    "fullUnavailable": "Täissuurus pole saadaval – näitan eelvaadet"
+  },
+  "favorites": {
+    "open": "GIF-i lemmikud",
+    "title": "GIF-i lemmikud",
+    "save": "Salvesta lemmikuks",
+    "remove": "Eemalda lemmikutest",
+    "removeNamed": "Eemalda {{name}} lemmikutest",
+    "send": "Saada {{name}}",
+    "hint": "Nooleklahvid liigutavad, Enter saadab, Delete eemaldab, Escape sulgeb.",
+    "empty": "Lemmikuid pole veel. Tee vestluses GIF-il paremklõps või kasuta selle tärni ning vali „Salvesta lemmikuks“. Siis ilmub see siia."
+  },
+  "imageMenu": {
+    "label": "Pilt {{name}}"
+  },
+  "attribution": {
+    "via": "allikas {{brand}}",
+    "view": "Vaata: {{brand}}"
+  }
+}

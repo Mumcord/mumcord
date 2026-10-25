@@ -1,0 +1,22 @@
+{
+  "open": "Informácie o pripojení",
+  "title": "Informácie o pripojení",
+  "loading": "Načítava sa…",
+  "notConnected": "Nepripojené.",
+  "error": "Informácie o pripojení momentálne nie sú dostupné.",
+  "none": "–",
+  "transport": "Prenos",
+  "transportValue": {
+    "udp": "UDP",
+    "tcp": "TCP (tunelované)"
+  },
+  "latency": "Odozva",
+  "latencyValue": "{{value}} ms",
+  "loss": "Strata paketov",
+  "lossValue": "{{value}} %",
+  "bitrate": "Bitová rýchlosť odosielania",
+  "bitrateValue": "{{value}} kbit/s",
+  "serverLimit": "Limit servera",
+  "packets": "Pakety odoslané / prijaté",
+  "packetsValue": "{{sent}} / {{received}}"
+}

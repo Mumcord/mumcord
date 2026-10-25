@@ -1,0 +1,88 @@
+{
+  "unknownName": "Ti",
+  "mute": "Isključi mikrofon",
+  "deafen": "Isključi zvuk",
+  "disconnect": "Odspoji se s {{server}}",
+  "settings": "Brze postavke",
+  "announce": {
+    "muted": "Mikrofon isključen",
+    "unmuted": "Mikrofon uključen",
+    "deafened": "Zvuk isključen. Ne čuješ druge i mikrofon ti je isključen",
+    "undeafened": "Zvuk uključen"
+  },
+  "readOnly": {
+    "text": "Samo čitaš – pridruži se kanalu da razgovaraš.",
+    "join": "Pridruži se {{channel}}"
+  },
+  "status": {
+    "connecting": "Povezivanje…",
+    "reconnecting": "Ponovno povezivanje…",
+    "connected": "Povezan",
+    "readOnly": "Samo čitanje",
+    "disconnected": "Nisi povezan",
+    "playing": "Igra {{game}}",
+    "listening": "Sluša {{track}}"
+  },
+  "profile": {
+    "title": "Uredi profil",
+    "chooseTitle": "Odaberi profilnu sliku",
+    "chooseAvatar": "Odaberi sliku…",
+    "removeAvatar": "Ukloni sliku",
+    "avatarHint": "Slika se smanjuje prema ograničenju poslužitelja.",
+    "avatarUnregistered": "Ovaj poslužitelj čuva avatare samo za registrirane korisnike – Mumcord ponovno šalje tvoj pri svakom povezivanju.",
+    "avatarChosen": "Odabrano: {{name}}",
+    "avatarRemoved": "Slika će biti uklonjena kad spremiš.",
+    "comment": "O tebi"
+  },
+  "register": {
+    "title": "Registriraj se na ovom poslužitelju",
+    "explain": "Registracijom rezerviraš svoje ime na ovom poslužitelju. Nitko ga drugi ne može koristiti, a poslužitelj te pamti kad se idući put povežeš.",
+    "backup": "Tvoj identitet dokazuje da je ime tvoje. Ako ga izgubiš, gubiš pristup registriranom imenu. Spremi sigurnosnu kopiju sada i čuvaj je na sigurnom.",
+    "password": "Lozinka za datoteku sigurnosne kopije",
+    "export": "Izvezi identitet",
+    "saveTitle": "Spremi sigurnosnu kopiju identiteta",
+    "passwordRequired": "Unesi lozinku za zaštitu datoteke sigurnosne kopije.",
+    "exported": "Sigurnosna kopija identiteta spremljena.",
+    "confirm": "Registriraj se",
+    "done": "Registriran na ovom poslužitelju"
+  },
+  "errors": {
+    "tooLarge": "Ovo je preveliko za poslužitelj. Odaberi manju sliku ili napiši kraći tekst.",
+    "denied": "Poslužitelj to ne dopušta.",
+    "deniedWithReason": "Poslužitelj to ne dopušta: {{reason}}",
+    "notConnected": "Nisi povezan s poslužiteljem.",
+    "file": "Datoteku nije bilo moguće pročitati ni zapisati.",
+    "generic": "Nešto je pošlo po zlu. Pokušaj ponovno."
+  },
+  "ptt": "Pritisni za govor: drži {{key}} za govor",
+  "pttNoKey": "Pritisni za govor: tipka nije postavljena",
+  "quickSettings": {
+    "linkPreviews": "Pregledi i ugradnje poveznica",
+    "linkPreviewsHint": "Stranice vide tvoju IP adresu",
+    "nowPlaying": "Dijeli što slušam",
+    "nowPlayingHint": "Drugi vide tvoju trenutnu pjesmu",
+    "unsupported": "Nije dostupno na macOS-u",
+    "theme": "Tema",
+    "theme_system": "Sustav",
+    "theme_dark": "Tamna",
+    "theme_light": "Svijetla",
+    "nowGaming": "Dijeli igru koju igram",
+    "nowGamingHint": "Drugi vide tvoju trenutnu igru",
+    "unavailable": "Nije dostupno na ovom sustavu",
+    "overlay": "Overlay",
+    "overlayHint": "Prikazuje tko govori preko igara",
+    "editProfile": "Uredi profil",
+    "editProfileHint": "Ime, avatar i komentar",
+    "register": "Registriraj se na ovom poslužitelju",
+    "registered": "Registriran na ovom poslužitelju ✓",
+    "registerHint": "Čuva tvoje ime i avatar na ovom poslužitelju",
+    "allSettings": "Sve postavke…",
+    "label": "Brze postavke",
+    "positional": "Pozicijski zvuk",
+    "positionalHint": "Glasovi raspoređeni u 3D oko tebe",
+    "offerImages": "Nudi slike pune veličine",
+    "offerImagesHint": "Dopusti drugima da učitaju tvoje originalne slike",
+    "loadImages": "Učitavaj slike pune veličine",
+    "loadImagesHint": "Dohvaćaj originalne slike od drugih"
+  }
+}

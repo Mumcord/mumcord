@@ -1,0 +1,163 @@
+{
+  "noConversation": "Ceangail le freastalaí agus roghnaigh cainéal chun comhrá a thosú.",
+  "empty": "Gan teachtaireachtaí fós. Sábhálfar na teachtaireachtaí a gheobhaidh tú anseo ar an ríomhaire seo.",
+  "header": {
+    "channel": "#{{name}}",
+    "channelPrefix": "Cainéal",
+    "privatePrefix": "Comhrá príobháideach le",
+    "unknownPerson": "Duine anaithnid"
+  },
+  "list": {
+    "today": "Inniu",
+    "yesterday": "Inné",
+    "label": "Teachtaireachtaí i {{name}}",
+    "loadOlder": "Luchtaigh teachtaireachtaí níos sine",
+    "loading": "Ag luchtú teachtaireachtaí…",
+    "loadFailed": "Níorbh fhéidir teachtaireachtaí níos sine a luchtú. Scrollaigh suas chun triail eile a bhaint as.",
+    "loadEarlier": "Luchtaigh teachtaireachtaí níos luaithe",
+    "syncing": "Ag lorg teachtaireachtaí níos luaithe ó úsáideoirí Mumcord eile…",
+    "syncAdded_one": "Cuireadh {{count}} teachtaireacht níos luaithe le ó úsáideoirí Mumcord eile.",
+    "syncAdded_two": "Cuireadh {{count}} theachtaireacht níos luaithe le ó úsáideoirí Mumcord eile.",
+    "syncAdded_few": "Cuireadh {{count}} theachtaireacht níos luaithe le ó úsáideoirí Mumcord eile.",
+    "syncAdded_many": "Cuireadh {{count}} dteachtaireacht níos luaithe le ó úsáideoirí Mumcord eile.",
+    "syncAdded_other": "Cuireadh {{count}} teachtaireacht níos luaithe le ó úsáideoirí Mumcord eile.",
+    "syncNone": "Níor aimsíodh aon teachtaireacht níos luaithe.",
+    "syncFailed": "Ní féidir teachtaireachtaí níos luaithe a luchtú anseo.",
+    "syncedFrom": "ó stair {{name}}",
+    "jumpToNewest": "Léim go dtí an ceann is nuaí",
+    "jumpToNewestUnseen_one": "Léim go dtí an ceann is nuaí, {{count}} teachtaireacht nua",
+    "jumpToNewestUnseen_two": "Léim go dtí an ceann is nuaí, {{count}} theachtaireacht nua",
+    "jumpToNewestUnseen_few": "Léim go dtí an ceann is nuaí, {{count}} theachtaireacht nua",
+    "jumpToNewestUnseen_many": "Léim go dtí an ceann is nuaí, {{count}} dteachtaireacht nua",
+    "jumpToNewestUnseen_other": "Léim go dtí an ceann is nuaí, {{count}} teachtaireacht nua"
+  },
+  "format": {
+    "toolbar": "Formáidiú",
+    "bold": "Trom",
+    "italic": "Iodálach",
+    "strike": "Líne tríd",
+    "code": "Cód inlíne",
+    "codeBlock": "Bloc cóid",
+    "link": "Nasc"
+  },
+  "composer": {
+    "label": "Seol teachtaireacht chuig {{name}}",
+    "hint": "Brúigh Enter chun seoladh agus Shift+Enter le haghaidh líne nua. Oibríonn Markdown: **trom**, *iodálach*, `cód`, [nasc](https://…).",
+    "addImage": "Cuir íomhá leis",
+    "removeImage": "Bain an íomhá {{name}}",
+    "imagePreview": "Íomhá le seoladh: {{name}}",
+    "send": "Seol",
+    "noPermission": "Níl cead agat scríobh sa chainéal seo.",
+    "unavailable": "Níl an cainéal seo ar fáil a thuilleadh.",
+    "offline": "Tá {{name}} as líne. Beidh tú in ann scríobh arís nuair a thiocfaidh siad ar ais.",
+    "unnamedImage": "Íomhá greamaithe"
+  },
+  "tray": {
+    "label": "Íomhánna le seoladh",
+    "processing": "Ag ullmhú íomhá",
+    "scaled": "Athraíodh an méid go {{width}}×{{height}} chun teorainn an fhreastalaí a chomhlíonadh"
+  },
+  "errors": {
+    "tooLong": "Tá do theachtaireacht rófhada don fhreastalaí seo ({{max}} carachtar ar a mhéad). Giorraigh í agus bain triail eile as.",
+    "tooLongNoLimit": "Tá do theachtaireacht rófhada don fhreastalaí seo. Giorraigh í agus bain triail eile as.",
+    "imageTooLarge": "Tá an íomhá seo rómhór don fhreastalaí seo, fiú tar éis í a chomhbhrú. Bain triail as íomhá níos lú.",
+    "imageWithTextTooLong": "Tá an teachtaireacht leis an íomhá rómhór don fhreastalaí seo. Giorraigh an téacs nó bain an íomhá.",
+    "imagesNotAllowed": "Ní cheadaíonn an freastalaí seo íomhánna i dteachtaireachtaí.",
+    "notImage": "Ní féidir an comhad seo a sheoladh. Úsáid íomhá PNG, JPEG, GIF nó WebP.",
+    "imageUnreadable": "Níorbh fhéidir an íomhá a léamh. Bain triail as comhad eile.",
+    "denied": "Níor cheadaigh an freastalaí an teachtaireacht seo.",
+    "deniedWithReason": "Níor cheadaigh an freastalaí an teachtaireacht seo: {{reason}}",
+    "notConnected": "Níl tú ceangailte. Athcheangail agus bain triail eile as.",
+    "generic": "Níorbh fhéidir an teachtaireacht a sheoladh. Bain triail eile as.",
+    "onlyImages": "Ní féidir ach íomhánna a sheoladh.",
+    "sourceTooLarge": "Tá an comhad seo rómhór le seoladh (os cionn 25 MB)."
+  },
+  "announce": {
+    "message": "{{name}}: {{text}}",
+    "image": "Sheol {{name}} íomhá",
+    "more_one": "{{count}} teachtaireacht nua eile",
+    "more_two": "{{count}} theachtaireacht nua eile",
+    "more_few": "{{count}} theachtaireacht nua eile",
+    "more_many": "{{count}} dteachtaireacht nua eile",
+    "more_other": "{{count}} teachtaireacht nua eile"
+  },
+  "pinned": {
+    "label": "Eolas faoin gcainéal",
+    "showMore": "Taispeáin tuilleadh",
+    "showLess": "Taispeáin níos lú"
+  },
+  "mention": {
+    "list": "Daoine ar féidir iad a lua",
+    "found_one": "Moladh {{count}} duine. Úsáid na heochracha saigheada, ansin Enter chun é a chur isteach.",
+    "found_two": "Moladh {{count}} dhuine. Úsáid na heochracha saigheada, ansin Enter chun iad a chur isteach.",
+    "found_few": "Moladh {{count}} dhuine. Úsáid na heochracha saigheada, ansin Enter chun iad a chur isteach.",
+    "found_many": "Moladh {{count}} nduine. Úsáid na heochracha saigheada, ansin Enter chun iad a chur isteach.",
+    "found_other": "Moladh {{count}} duine. Úsáid na heochracha saigheada, ansin Enter chun iad a chur isteach.",
+    "none": "Níor aimsíodh aon duine",
+    "mentionsYou": "Luann sé thú",
+    "chipLabel": "{{name}}, lua"
+  },
+  "preview": {
+    "open": "Oscail sa bhrabhsálaí",
+    "openLabel": "Oscail {{title}} sa bhrabhsálaí",
+    "play": "Seinn {{title}}",
+    "player": "Seinnteoir físe: {{title}}",
+    "videoTitle": "Físeán {{site}}",
+    "spotifyTitle": "Nasc {{site}}",
+    "audioPlayer": "Seinnteoir Spotify: {{title}}",
+    "kind": {
+      "track": "Rian",
+      "album": "Albam",
+      "playlist": "Seinnliosta",
+      "artist": "Ealaíontóir",
+      "episode": "Eipeasóid",
+      "show": "Seó"
+    },
+    "inBrowser": "Seinntear i do bhrabhsálaí é",
+    "card": "Réamhamharc ar nasc: {{title}}",
+    "dismiss": "Folaigh an réamhamharc"
+  },
+  "image": {
+    "loading": "Ag luchtú íomhá {{name}}",
+    "label": "Íomhá: {{name}}",
+    "view": "Féach ar íomhá {{name}}",
+    "viewMessage": "Íomhá ó {{name}}, oscail sa amharcóir",
+    "failed": "Ní féidir an íomhá a thaispeáint (rómhór nó ar iarraidh)."
+  },
+  "viewer": {
+    "label": "Amharcóir íomhánna",
+    "counter": "{{current}} / {{total}}",
+    "zoomIn": "Zúmáil isteach",
+    "zoomOut": "Zúmáil amach",
+    "fit": "Feistigh leis an bhfuinneog",
+    "save": "Sábháil an íomhá",
+    "saved": "Sábháladh an íomhá",
+    "saveFailed": "Níorbh fhéidir an íomhá a shábháil",
+    "fileFilter": "Íomhá",
+    "openInBrowser": "Oscail sa bhrabhsálaí",
+    "close": "Dún",
+    "previous": "An íomhá roimhe seo",
+    "next": "An chéad íomhá eile",
+    "unnamed": "íomhá",
+    "fullLoading": "Ag luchtú an mhéid iomláin…",
+    "fullProgress": "Ag luchtú an mhéid iomláin… {{percent}} %",
+    "fullUnavailable": "Níl an méid iomlán ar fáil – ag taispeáint an réamhamhairc"
+  },
+  "favorites": {
+    "open": "GIFanna ceanán",
+    "title": "GIFanna ceanán",
+    "save": "Sábháil mar cheanán",
+    "remove": "Bain de na ceanáin",
+    "removeNamed": "Bain {{name}} de na ceanáin",
+    "send": "Seol {{name}}",
+    "hint": "Bogann na heochracha saigheada, seolann Enter, scriosann Delete, dúnann Escape.",
+    "empty": "Gan ceanáin fós. Cliceáil ar dheis ar GIF sa chomhrá, nó úsáid an réalta air, agus roghnaigh \"Sábháil mar cheanán\". Taispeánfar anseo é."
+  },
+  "imageMenu": {
+    "label": "Íomhá {{name}}"
+  },
+  "attribution": {
+    "via": "trí {{brand}}",
+    "view": "Féach ar {{brand}}"
+  }
+}

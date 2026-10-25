@@ -1,0 +1,14 @@
+{
+  "title": "Znajomi",
+  "item": "{{name}}, {{status}}",
+  "online": "Online",
+  "onlineIn": "Online na kanale {{channel}}",
+  "offline": "Offline",
+  "lastSeen": "Offline, ostatnio widziano {{when}}",
+  "friend": "Znajomy",
+  "friendHint": "Pokazuje, kiedy jest online, i zachowuje Wasz prywatny czat.",
+  "noCertificate": "Osoby bez certyfikatu nie mogą być znajomymi, bo Mumcord nie mógłby ich ponownie rozpoznać.",
+  "add": "Dodaj do znajomych",
+  "remove": "Usuń ze znajomych",
+  "failed": "Nie udało się zmienić statusu znajomego. Spróbuj ponownie."
+}

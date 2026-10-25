@@ -1,0 +1,22 @@
+{
+  "open": "Savienojuma informācija",
+  "title": "Savienojuma informācija",
+  "loading": "Ielādē…",
+  "notConnected": "Nav savienots.",
+  "error": "Savienojuma informācija šobrīd nav pieejama.",
+  "none": "–",
+  "transport": "Pārraide",
+  "transportValue": {
+    "udp": "UDP",
+    "tcp": "TCP (tunelēts)"
+  },
+  "latency": "Aizkave",
+  "latencyValue": "{{value}} ms",
+  "loss": "Pakešu zudumi",
+  "lossValue": "{{value}} %",
+  "bitrate": "Sūtīšanas datu pārraides ātrums",
+  "bitrateValue": "{{value}} kbit/s",
+  "serverLimit": "Servera ierobežojums",
+  "packets": "Pakešu nosūtīts / saņemts",
+  "packetsValue": "{{sent}} / {{received}}"
+}

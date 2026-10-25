@@ -1,0 +1,128 @@
+{
+  "unknownServer": "an freastalaí",
+  "announce": {
+    "connected": "Ceangailte le {{server}}.",
+    "lost": "Cailleadh an ceangal le {{server}}. Ag athcheangal…",
+    "ended": "Dícheangailte ó {{server}}. Féach ar an mbarra os cionn an chomhrá chun a fheiceáil cad atá le déanamh ansin.",
+    "disconnected": "Dícheangailte ó {{server}}.",
+    "tcp": "Ritheann an guth anois thar TCP toisc go bhfuil UDP blocáilte. D'fhéadfadh moill bheag a bheith ar an bhfuaim.",
+    "removed": "Baineadh {{server}}.",
+    "moved": "Bogadh {{server}} go suíomh {{position}} as {{count}}."
+  },
+  "bar": {
+    "listLabel": "Freastalaithe sábháilte",
+    "add": "Cuir freastalaí leis",
+    "keyboardHint": "Ceanglaíonn Enter. Bogann Alt móide an tsaighead suas nó síos an freastalaí. Osclaíonn Shift móide F10 tuilleadh roghanna.",
+    "status": {
+      "connected": "{{server}} (ceangailte)",
+      "connecting": "{{server}} (ag ceangal)",
+      "reconnecting": "{{server}} (ag athcheangal)"
+    }
+  },
+  "menu": {
+    "label": "Roghanna do {{server}}",
+    "connect": "Ceangail",
+    "disconnect": "Dícheangail",
+    "edit": "Cuir an freastalaí in eagar",
+    "moveUp": "Bog suas",
+    "moveDown": "Bog síos",
+    "remove": "Bain an freastalaí"
+  },
+  "dialog": {
+    "addTitle": "Cuir freastalaí leis",
+    "editTitle": "Cuir an freastalaí in eagar",
+    "linkTitle": "Sábháil an freastalaí seo?",
+    "address": "Seoladh",
+    "addressHint": "Mar shampla mumble.example.org. Is féidir nasc mumble:// a ghreamú anseo freisin.",
+    "filledFromLink": "Líonta isteach ón nasc mumble://.",
+    "port": "Port",
+    "label": "Ainm sa bharra freastalaithe",
+    "username": "D'ainm ar an bhfreastalaí seo",
+    "password": "Pasfhocal an fhreastalaí (roghnach)",
+    "passwordHint": "Ní bhíonn sé de dhíth ach má iarrann an freastalaí ceann. Coinnítear é i stóras slán do chórais.",
+    "passwordKeepHint": "Tá pasfhocal sábháilte. Fág folamh é chun é a choinneáil, nó clóscríobh ceann nua.",
+    "clearPassword": "Bain an pasfhocal sábháilte",
+    "add": "Cuir freastalaí leis",
+    "saveAndConnect": "Sábháil agus ceangail",
+    "errors": {
+      "address": "Cuir seoladh an fhreastalaí isteach.",
+      "port": "Cuir port idir 1 agus 65535 isteach. Úsáideann formhór na bhfreastalaithe 64738.",
+      "username": "Cuir isteach an t-ainm ar mhaith leat a úsáid ar an bhfreastalaí seo.",
+      "link": "Ní féidir an nasc mumble:// seo a léamh. Seiceáil gur cóipeáladh go hiomlán é.",
+      "invalid": "Níl sonraí an fhreastalaí bailí. Seiceáil an seoladh agus an port."
+    }
+  },
+  "errors": {
+    "serverUnreachable": "Ní féidir an freastalaí a shroicheadh. Seiceáil an seoladh agus an port, agus go bhfuil tú ar líne.",
+    "wrongPassword": "Tá pasfhocal an fhreastalaí mícheart. Cuir an freastalaí in eagar agus cuir isteach an pasfhocal ceart.",
+    "nameInUse": "Tá d'ainm in úsáid cheana nó cláraithe do dhuine eile ar an bhfreastalaí seo. Cuir an freastalaí in eagar agus roghnaigh ainm eile.",
+    "certificateRejected": "Theip ar sheiceáil an teastais: níor iontaoibh teastas an fhreastalaí, nó níor ghlac an freastalaí le d'aitheantas. Bain triail eile as, nó fiafraigh d'úinéir an fhreastalaí.",
+    "certificateChanged": "D'athraigh teastas an fhreastalaí agus níor iontaoibh é. Ná cuir iontaoibh ann ach tar éis d'úinéir an fhreastalaí an t-athrú a dheimhniú.",
+    "denied": "Dhiúltaigh an freastalaí don cheangal.",
+    "deniedWithReason": "Dhiúltaigh an freastalaí don cheangal: {{reason}}",
+    "invalidAddress": "Níl seoladh an fhreastalaí bailí. Cuir an freastalaí in eagar chun é a cheartú.",
+    "secureStorage": "Níl stóras slán do chórais ar fáil, mar sin níorbh fhéidir pasfhocal an fhreastalaí a léamh ná a shábháil. Díghlasáil é agus bain triail eile as.",
+    "notFound": "Níl an freastalaí seo sábháilte a thuilleadh.",
+    "generic": "Chuaigh rud éigin amú. Bain triail eile as."
+  },
+  "remove": {
+    "title": "Bain {{server}}?",
+    "message": "Scriostar a phasfhocal sábháilte, a chinneadh teastais, a chainéil leanta agus a stair comhrá ar an ríomhaire seo.",
+    "confirm": "Bain"
+  },
+  "switch": {
+    "title": "Athraigh freastalaí?",
+    "message": "Ní féidir leat a bheith ach ar fhreastalaí amháin ag an am. An ndícheanglóidh tú ó {{current}} agus an gceanglóidh tú le {{next}}?",
+    "confirm": "Dícheangail agus athraigh"
+  },
+  "cert": {
+    "newTitle": "Cuir iontaoibh sa fhreastalaí seo?",
+    "newIntro": "Ní fhaca Mumcord teastas {{server}} roimhe seo. Má thug úinéir an fhreastalaí méarlorg duit, seiceáil go bhfuil sé ag teacht. Cuimhneofar ar do rogha.",
+    "fingerprint": "Méarlorg an teastais",
+    "changedTitle": "Rabhadh: d'athraigh teastas an fhreastalaí",
+    "changedWarning": "Tá teastas {{server}} difriúil ón gceann ar chuir tú iontaoibh ann roimhe seo.",
+    "changedAdvice": "Is féidir é seo a tharlú tar éis don fhreastalaí a bheith athnuaite, ach d'fhéadfadh sé go bhfuil duine éigin ag idircheapadh do cheangail freisin. Ná lean ar aghaidh ach má dheimhnigh úinéir an fhreastalaí an t-athrú.",
+    "previousFingerprint": "An mhéarlorg ar chuir tú iontaoibh inti roimhe",
+    "newFingerprint": "Méarlorg nua",
+    "reject": "Ná ceangail",
+    "trust": "Cuir iontaoibh ann agus ceangail",
+    "trustChanged": "Cuir iontaoibh sa teastas nua"
+  },
+  "rejoin": {
+    "label": "Téigh isteach arís sa chainéal deireanach",
+    "text": "Bhí tú i {{channel}} an uair dheireanach – Téigh isteach arís?",
+    "rejoin": "Téigh isteach arís",
+    "notNow": "Ní anois"
+  },
+  "status": {
+    "label": "Stádas ceangail",
+    "connecting": "Ag ceangal le {{server}}…",
+    "reconnecting": "Ag athcheangal… (iarracht {{attempt}} as {{max}}, an chéad iarracht eile i gceann {{seconds}} s)",
+    "tcp": "Ceangailte trí TCP (UDP blocáilte). Oibríonn an guth ach d'fhéadfadh moill bheag a bheith air.",
+    "disconnected": "Dícheangailte",
+    "disconnectedReason": "Dícheangailte – {{reason}}",
+    "failed": "Níorbh fhéidir ceangal le {{server}}. {{reason}}",
+    "cancel": "Cealaigh",
+    "reconnect": "Athcheangail",
+    "editServer": "Cuir an freastalaí in eagar",
+    "actionFailed": {
+      "reorder": "Níorbh fhéidir ord nua na bhfreastalaithe a shábháil. Bain triail eile as.",
+      "remove": "Níorbh fhéidir an freastalaí a bhaint. Bain triail eile as.",
+      "disconnect": "Theip ar an dícheangal. Bain triail eile as."
+    }
+  },
+  "empty": {
+    "title": "Cuir do chéad fhreastalaí leis",
+    "description": "Cuir isteach an seoladh a fuair tú ó do ghrúpa, nó greamaigh nasc mumble://.",
+    "addressLabel": "Seoladh an fhreastalaí nó nasc mumble://",
+    "addressHint": "Mar shampla mumble.example.org nó mumble.example.org:64738.",
+    "connect": "Cuir leis agus ceangail",
+    "pasteLink": "Greamaigh nasc mumble://",
+    "moreOptions": "Tuilleadh roghanna…",
+    "noLinkInClipboard": "Níl nasc mumble:// sa ghearrthaisce. Greamaigh nó clóscríobh an seoladh thuas.",
+    "pasteManually": "Níorbh fhéidir le Mumcord an gearrthaisce a léamh. Cliceáil ar an réimse thuas agus brúigh Ctrl+V.",
+    "errors": {
+      "required": "Cuir isteach seoladh freastalaí nó nasc mumble://."
+    }
+  }
+}

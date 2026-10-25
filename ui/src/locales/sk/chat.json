@@ -1,0 +1,159 @@
+{
+  "noConversation": "Pripoj sa k serveru a vyber kanál, aby si mohol začať chatovať.",
+  "empty": "Zatiaľ žiadne správy. Správy, ktoré tu dostaneš, sa ukladajú v tomto počítači.",
+  "header": {
+    "channel": "#{{name}}",
+    "channelPrefix": "Kanál",
+    "privatePrefix": "Súkromný chat s",
+    "unknownPerson": "Neznáma osoba"
+  },
+  "list": {
+    "today": "Dnes",
+    "yesterday": "Včera",
+    "label": "Správy v {{name}}",
+    "loadOlder": "Načítať staršie správy",
+    "loading": "Načítavam správy…",
+    "loadFailed": "Staršie správy sa nepodarilo načítať. Posuň sa hore a skús to znova.",
+    "loadEarlier": "Načítať skoršie správy",
+    "syncing": "Hľadám skoršie správy od ostatných používateľov Mumcordu…",
+    "syncAdded_one": "Pridaná {{count}} skoršia správa od ostatných používateľov Mumcordu.",
+    "syncAdded_few": "Pridané {{count}} skoršie správy od ostatných používateľov Mumcordu.",
+    "syncAdded_many": "Pridanej {{count}} skoršej správy od ostatných používateľov Mumcordu.",
+    "syncAdded_other": "Pridaných {{count}} skorších správ od ostatných používateľov Mumcordu.",
+    "syncNone": "Nenašli sa žiadne skoršie správy.",
+    "syncFailed": "Skoršie správy sa tu nedajú načítať.",
+    "syncedFrom": "z histórie používateľa {{name}}",
+    "jumpToNewest": "Prejsť na najnovšie",
+    "jumpToNewestUnseen_one": "Prejsť na najnovšie, {{count}} nová správa",
+    "jumpToNewestUnseen_few": "Prejsť na najnovšie, {{count}} nové správy",
+    "jumpToNewestUnseen_many": "Prejsť na najnovšie, {{count}} novej správy",
+    "jumpToNewestUnseen_other": "Prejsť na najnovšie, {{count}} nových správ"
+  },
+  "format": {
+    "toolbar": "Formátovanie",
+    "bold": "Tučné",
+    "italic": "Kurzíva",
+    "strike": "Prečiarknuté",
+    "code": "Kód v riadku",
+    "codeBlock": "Blok kódu",
+    "link": "Odkaz"
+  },
+  "composer": {
+    "label": "Správa pre {{name}}",
+    "hint": "Enter odošle, Shift+Enter vloží nový riadok. Funguje Markdown: **tučné**, *kurzíva*, `kód`, [odkaz](https://…).",
+    "addImage": "Pridať obrázok",
+    "removeImage": "Odstrániť obrázok {{name}}",
+    "imagePreview": "Obrázok na odoslanie: {{name}}",
+    "send": "Odoslať",
+    "noPermission": "Nemáš povolenie písať do tohto kanála.",
+    "unavailable": "Tento kanál už nie je dostupný.",
+    "offline": "{{name}} je offline. Napísať budeš môcť znova, keď sa vráti.",
+    "unnamedImage": "Vložený obrázok"
+  },
+  "tray": {
+    "label": "Obrázky na odoslanie",
+    "processing": "Pripravujem obrázok",
+    "scaled": "Zmenšené na {{width}}×{{height}}, aby sa zmestilo do limitu servera"
+  },
+  "errors": {
+    "tooLong": "Tvoja správa je pre tento server príliš dlhá (najviac {{max}} znakov). Skráť ju a skús to znova.",
+    "tooLongNoLimit": "Tvoja správa je pre tento server príliš dlhá. Skráť ju a skús to znova.",
+    "imageTooLarge": "Tento obrázok je pre tento server príliš veľký, aj po kompresii. Skús menší obrázok.",
+    "imageWithTextTooLong": "Správa s obrázkom je pre tento server príliš veľká. Skráť text alebo odstráň obrázok.",
+    "imagesNotAllowed": "Tento server nepovoľuje obrázky v správach.",
+    "notImage": "Tento súbor sa nedá odoslať. Použi obrázok PNG, JPEG, GIF alebo WebP.",
+    "imageUnreadable": "Obrázok sa nepodarilo prečítať. Skús iný súbor.",
+    "denied": "Server túto správu nepovolil.",
+    "deniedWithReason": "Server túto správu nepovolil: {{reason}}",
+    "notConnected": "Nie si pripojený. Pripoj sa znova a skús to ešte raz.",
+    "generic": "Správu sa nepodarilo odoslať. Skús to znova.",
+    "onlyImages": "Odoslať sa dajú len obrázky.",
+    "sourceTooLarge": "Tento súbor je na odoslanie príliš veľký (viac ako 25 MB)."
+  },
+  "announce": {
+    "message": "{{name}}: {{text}}",
+    "image": "{{name}} poslal(a) obrázok",
+    "more_one": "Ešte {{count}} nová správa",
+    "more_few": "Ešte {{count}} nové správy",
+    "more_many": "Ešte {{count}} novej správy",
+    "more_other": "Ešte {{count}} nových správ"
+  },
+  "pinned": {
+    "label": "Informácie o kanáli",
+    "showMore": "Zobraziť viac",
+    "showLess": "Zobraziť menej"
+  },
+  "mention": {
+    "list": "Ľudia, ktorých môžeš spomenúť",
+    "found_one": "Navrhnutá {{count}} osoba. Vyber šípkami a vlož klávesom Enter.",
+    "found_few": "Navrhnuté {{count}} osoby. Vyber šípkami a vlož klávesom Enter.",
+    "found_many": "Navrhnutej {{count}} osoby. Vyber šípkami a vlož klávesom Enter.",
+    "found_other": "Navrhnutých {{count}} osôb. Vyber šípkami a vlož klávesom Enter.",
+    "none": "Nikto sa nenašiel",
+    "mentionsYou": "Spomína ťa",
+    "chipLabel": "{{name}}, zmienka"
+  },
+  "preview": {
+    "open": "Otvoriť v prehliadači",
+    "openLabel": "Otvoriť {{title}} v prehliadači",
+    "play": "Prehrať {{title}}",
+    "player": "Prehrávač videa: {{title}}",
+    "videoTitle": "Video {{site}}",
+    "spotifyTitle": "Odkaz {{site}}",
+    "audioPlayer": "Prehrávač Spotify: {{title}}",
+    "kind": {
+      "track": "Skladba",
+      "album": "Album",
+      "playlist": "Playlist",
+      "artist": "Interpret",
+      "episode": "Epizóda",
+      "show": "Relácia"
+    },
+    "inBrowser": "Prehrá sa v tvojom prehliadači",
+    "card": "Náhľad odkazu: {{title}}",
+    "dismiss": "Skryť náhľad"
+  },
+  "image": {
+    "loading": "Načítavam obrázok {{name}}",
+    "label": "Obrázok: {{name}}",
+    "view": "Zobraziť obrázok {{name}}",
+    "viewMessage": "Obrázok od {{name}}, otvoriť v prehliadači obrázkov",
+    "failed": "Obrázok sa nedá zobraziť (je príliš veľký alebo nedostupný)."
+  },
+  "viewer": {
+    "label": "Prehliadač obrázkov",
+    "counter": "{{current}} / {{total}}",
+    "zoomIn": "Priblížiť",
+    "zoomOut": "Oddialiť",
+    "fit": "Prispôsobiť oknu",
+    "save": "Uložiť obrázok",
+    "saved": "Obrázok uložený",
+    "saveFailed": "Obrázok sa nepodarilo uložiť",
+    "fileFilter": "Obrázok",
+    "openInBrowser": "Otvoriť v prehliadači",
+    "close": "Zavrieť",
+    "previous": "Predchádzajúci obrázok",
+    "next": "Ďalší obrázok",
+    "unnamed": "obrázok",
+    "fullLoading": "Načítavam plnú veľkosť…",
+    "fullProgress": "Načítavam plnú veľkosť… {{percent}} %",
+    "fullUnavailable": "Plná veľkosť nie je dostupná – zobrazuje sa náhľad"
+  },
+  "favorites": {
+    "open": "Obľúbené GIFy",
+    "title": "Obľúbené GIFy",
+    "save": "Uložiť medzi obľúbené",
+    "remove": "Odstrániť z obľúbených",
+    "removeNamed": "Odstrániť {{name}} z obľúbených",
+    "send": "Odoslať {{name}}",
+    "hint": "Šípky presúvajú, Enter odošle, Delete odstráni, Escape zavrie.",
+    "empty": "Zatiaľ žiadne obľúbené. Klikni pravým tlačidlom na GIF v chate alebo použi hviezdičku na ňom a vyber „Uložiť medzi obľúbené“. Potom sa zobrazí tu."
+  },
+  "imageMenu": {
+    "label": "Obrázok {{name}}"
+  },
+  "attribution": {
+    "via": "cez {{brand}}",
+    "view": "Zobraziť na {{brand}}"
+  }
+}

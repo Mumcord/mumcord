@@ -1,0 +1,16 @@
+{
+  "region": "Obavijesti",
+  "channel": "#{{name}}",
+  "unknownChannel": "Neki kanal",
+  "line": "{{sender}}: {{preview}}",
+  "groupedChannel_one": "{{count}} nova poruka u {{name}}",
+  "groupedChannel_few": "{{count}} nove poruke u {{name}}",
+  "groupedChannel_other": "{{count}} novih poruka u {{name}}",
+  "groupedPrivate_one": "{{count}} nova poruka od {{name}}",
+  "groupedPrivate_few": "{{count}} nove poruke od {{name}}",
+  "groupedPrivate_other": "{{count}} novih poruka od {{name}}",
+  "image": "Poslao je sliku",
+  "open": "Otvori chat",
+  "close": "Odbaci obavijest",
+  "mentionLine": "{{sender}} te spomenuo: {{preview}}"
+}

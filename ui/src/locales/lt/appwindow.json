@@ -1,0 +1,10 @@
+{
+  "close": {
+    "title": "Suskleisti į dėklą ar išeiti?",
+    "description": "Tu vis dar prisijungęs (-usi). Suskleistas Mumcord palaiko tave balso kanale ir lieka sistemos dėkle.",
+    "remember": "Prisiminti mano pasirinkimą",
+    "minimize": "Suskleisti į dėklą",
+    "quit": "Išeiti",
+    "failed": "Nepavyko. Bandyk dar kartą."
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "region": "Notifikationer",
+  "channel": "#{{name}}",
+  "unknownChannel": "En kanal",
+  "line": "{{sender}}: {{preview}}",
+  "groupedChannel_one": "{{count}} ny besked i {{name}}",
+  "groupedChannel_other": "{{count}} nye beskeder i {{name}}",
+  "groupedPrivate_one": "{{count}} ny besked fra {{name}}",
+  "groupedPrivate_other": "{{count}} nye beskeder fra {{name}}",
+  "image": "Sendte et billede",
+  "open": "Åbn chat",
+  "close": "Afvis notifikation",
+  "mentionLine": "{{sender}} omtalte dig: {{preview}}"
+}

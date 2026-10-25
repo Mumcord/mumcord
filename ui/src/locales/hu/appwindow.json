@@ -1,0 +1,10 @@
+{
+  "close": {
+    "title": "Kicsinyítés a tálcára vagy kilépés?",
+    "description": "Még kapcsolódva vagy. Kicsinyítve a Mumcord bent tart a hangcsatornában, és a rendszertálcán marad.",
+    "remember": "Választás megjegyzése",
+    "minimize": "Kicsinyítés a tálcára",
+    "quit": "Kilépés",
+    "failed": "Ez nem sikerült. Próbáld újra."
+  }
+}

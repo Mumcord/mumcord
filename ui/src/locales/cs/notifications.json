@@ -1,0 +1,18 @@
+{
+  "region": "Oznámení",
+  "channel": "#{{name}}",
+  "unknownChannel": "Kanál",
+  "line": "{{sender}}: {{preview}}",
+  "groupedChannel_one": "{{count}} nová zpráva v {{name}}",
+  "groupedChannel_few": "{{count}} nové zprávy v {{name}}",
+  "groupedChannel_many": "{{count}} nových zpráv v {{name}}",
+  "groupedChannel_other": "{{count}} nových zpráv v {{name}}",
+  "groupedPrivate_one": "{{count}} nová zpráva od {{name}}",
+  "groupedPrivate_few": "{{count}} nové zprávy od {{name}}",
+  "groupedPrivate_many": "{{count}} nových zpráv od {{name}}",
+  "groupedPrivate_other": "{{count}} nových zpráv od {{name}}",
+  "image": "Poslal(a) obrázek",
+  "open": "Otevřít chat",
+  "close": "Zavřít oznámení",
+  "mentionLine": "{{sender}} tě zmínil(a): {{preview}}"
+}

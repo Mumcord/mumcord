@@ -1,0 +1,33 @@
+{
+  "regions": {
+    "servers": "Freastalaithe",
+    "channels": "Cainéil",
+    "chat": "Comhrá",
+    "members": "Baill",
+    "userPanel": "Do stádas"
+  },
+  "skipLinks": {
+    "label": "Léim naisc",
+    "chat": "Léim go dtí an comhrá",
+    "channels": "Léim go dtí na cainéil"
+  },
+  "members": {
+    "show": "Taispeáin baill",
+    "hide": "Folaigh baill"
+  },
+  "resize": {
+    "channels": "Athraigh méid liosta na gcainéal",
+    "members": "Athraigh méid liosta na mball"
+  },
+  "settings": {
+    "title": "Socruithe"
+  },
+  "wizard": {
+    "title": "Fáilte go Mumcord"
+  },
+  "placeholder": "Ag teacht go luath",
+  "startupError": {
+    "title": "Níorbh fhéidir Mumcord a thosú",
+    "description": "Níorbh fhéidir leis an aip do shocruithe a luchtú. Bain triail eile as; má theipeann air arís, atosaigh Mumcord."
+  }
+}

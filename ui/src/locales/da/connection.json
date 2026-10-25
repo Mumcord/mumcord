@@ -1,0 +1,22 @@
+{
+  "open": "Forbindelsesinfo",
+  "title": "Forbindelsesinfo",
+  "loading": "Indlæser…",
+  "notConnected": "Ikke forbundet.",
+  "error": "Forbindelsesinfo er ikke tilgængelig lige nu.",
+  "none": "–",
+  "transport": "Transport",
+  "transportValue": {
+    "udp": "UDP",
+    "tcp": "TCP (tunnelleret)"
+  },
+  "latency": "Latenstid",
+  "latencyValue": "{{value}} ms",
+  "loss": "Pakketab",
+  "lossValue": "{{value}} %",
+  "bitrate": "Sendebitrate",
+  "bitrateValue": "{{value}} kbit/s",
+  "serverLimit": "Serverens grænse",
+  "packets": "Pakker sendt / modtaget",
+  "packetsValue": "{{sent}} / {{received}}"
+}

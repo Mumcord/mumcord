@@ -1,0 +1,22 @@
+{
+  "open": "Podatki o povezavi",
+  "title": "Podatki o povezavi",
+  "loading": "Nalaganje …",
+  "notConnected": "Ni povezave.",
+  "error": "Podatki o povezavi trenutno niso na voljo.",
+  "none": "–",
+  "transport": "Prenos",
+  "transportValue": {
+    "udp": "UDP",
+    "tcp": "TCP (tunelirano)"
+  },
+  "latency": "Zakasnitev",
+  "latencyValue": "{{value}} ms",
+  "loss": "Izguba paketov",
+  "lossValue": "{{value}} %",
+  "bitrate": "Bitna hitrost pošiljanja",
+  "bitrateValue": "{{value}} kbit/s",
+  "serverLimit": "Omejitev strežnika",
+  "packets": "Poslani / prejeti paketi",
+  "packetsValue": "{{sent}} / {{received}}"
+}

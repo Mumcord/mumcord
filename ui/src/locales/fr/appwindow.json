@@ -1,0 +1,10 @@
+{
+  "close": {
+    "title": "Réduire dans la zone de notification ou quitter ?",
+    "description": "Vous êtes toujours connecté. Une fois réduit, Mumcord vous garde en vocal et reste dans la zone de notification.",
+    "remember": "Se souvenir de mon choix",
+    "minimize": "Réduire dans la zone de notification",
+    "quit": "Quitter",
+    "failed": "Cela n’a pas fonctionné. Veuillez réessayer."
+  }
+}

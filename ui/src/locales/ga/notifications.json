@@ -1,0 +1,20 @@
+{
+  "region": "Fógraí",
+  "channel": "#{{name}}",
+  "unknownChannel": "Cainéal",
+  "line": "{{sender}}: {{preview}}",
+  "groupedChannel_one": "{{count}} teachtaireacht nua i {{name}}",
+  "groupedChannel_two": "{{count}} theachtaireacht nua i {{name}}",
+  "groupedChannel_few": "{{count}} theachtaireacht nua i {{name}}",
+  "groupedChannel_many": "{{count}} dteachtaireacht nua i {{name}}",
+  "groupedChannel_other": "{{count}} teachtaireacht nua i {{name}}",
+  "groupedPrivate_one": "{{count}} teachtaireacht nua ó {{name}}",
+  "groupedPrivate_two": "{{count}} theachtaireacht nua ó {{name}}",
+  "groupedPrivate_few": "{{count}} theachtaireacht nua ó {{name}}",
+  "groupedPrivate_many": "{{count}} dteachtaireacht nua ó {{name}}",
+  "groupedPrivate_other": "{{count}} teachtaireacht nua ó {{name}}",
+  "image": "Sheol sé íomhá",
+  "open": "Oscail an comhrá",
+  "close": "Díbir an fógra",
+  "mentionLine": "Luaigh {{sender}} thú: {{preview}}"
+}

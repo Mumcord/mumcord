@@ -1,0 +1,128 @@
+{
+  "unknownServer": "serwer",
+  "announce": {
+    "connected": "Połączono z {{server}}.",
+    "lost": "Utracono połączenie z {{server}}. Ponowne łączenie…",
+    "ended": "Rozłączono z {{server}}. Zobacz pasek nad czatem, aby dowiedzieć się, co dalej.",
+    "disconnected": "Rozłączono z {{server}}.",
+    "tcp": "Głos działa teraz przez TCP, ponieważ UDP jest zablokowany. Dźwięk może być lekko opóźniony.",
+    "removed": "Usunięto {{server}}.",
+    "moved": "Przeniesiono {{server}} na pozycję {{position}} z {{count}}."
+  },
+  "bar": {
+    "listLabel": "Zapisane serwery",
+    "add": "Dodaj serwer",
+    "keyboardHint": "Enter łączy. Alt plus strzałka w górę lub w dół przesuwa serwer. Shift plus F10 otwiera więcej opcji.",
+    "status": {
+      "connected": "{{server}} (połączono)",
+      "connecting": "{{server}} (łączenie)",
+      "reconnecting": "{{server}} (ponowne łączenie)"
+    }
+  },
+  "menu": {
+    "label": "Opcje dla {{server}}",
+    "connect": "Połącz",
+    "disconnect": "Rozłącz",
+    "edit": "Edytuj serwer",
+    "moveUp": "Przesuń w górę",
+    "moveDown": "Przesuń w dół",
+    "remove": "Usuń serwer"
+  },
+  "dialog": {
+    "addTitle": "Dodaj serwer",
+    "editTitle": "Edytuj serwer",
+    "linkTitle": "Zapisać ten serwer?",
+    "address": "Adres",
+    "addressHint": "Na przykład mumble.example.org. Możesz też wkleić tutaj link mumble://.",
+    "filledFromLink": "Uzupełniono na podstawie linku mumble://.",
+    "port": "Port",
+    "label": "Nazwa na pasku serwerów",
+    "username": "Twoja nazwa na tym serwerze",
+    "password": "Hasło serwera (opcjonalnie)",
+    "passwordHint": "Potrzebne tylko, jeśli serwer o nie prosi. Jest przechowywane w bezpiecznym magazynie systemu.",
+    "passwordKeepHint": "Hasło jest zapisane. Zostaw to pole puste, aby je zachować, lub wpisz nowe.",
+    "clearPassword": "Usuń zapisane hasło",
+    "add": "Dodaj serwer",
+    "saveAndConnect": "Zapisz i połącz",
+    "errors": {
+      "address": "Podaj adres serwera.",
+      "port": "Podaj port od 1 do 65535. Większość serwerów używa 64738.",
+      "username": "Podaj nazwę, której chcesz używać na tym serwerze.",
+      "link": "Nie można odczytać tego linku mumble://. Sprawdź, czy został skopiowany w całości.",
+      "invalid": "Dane serwera są nieprawidłowe. Sprawdź adres i port."
+    }
+  },
+  "errors": {
+    "serverUnreachable": "Nie można połączyć się z serwerem. Sprawdź adres i port oraz czy masz dostęp do internetu.",
+    "wrongPassword": "Hasło serwera jest nieprawidłowe. Edytuj serwer i wpisz właściwe hasło.",
+    "nameInUse": "Twoja nazwa jest już używana lub zarejestrowana przez kogoś innego na tym serwerze. Edytuj serwer i wybierz inną nazwę.",
+    "certificateRejected": "Weryfikacja certyfikatu nie powiodła się: certyfikat serwera nie został zaufany albo serwer nie zaakceptował Twojej tożsamości. Spróbuj ponownie lub zapytaj właściciela serwera.",
+    "certificateChanged": "Certyfikat serwera się zmienił i nie został zaufany. Zaufaj mu dopiero, gdy właściciel serwera potwierdzi zmianę.",
+    "denied": "Serwer odrzucił połączenie.",
+    "deniedWithReason": "Serwer odrzucił połączenie: {{reason}}",
+    "invalidAddress": "Adres serwera jest nieprawidłowy. Edytuj serwer, aby go poprawić.",
+    "secureStorage": "Bezpieczny magazyn systemu jest niedostępny, więc nie udało się odczytać ani zapisać hasła serwera. Odblokuj go i spróbuj ponownie.",
+    "notFound": "Ten serwer nie jest już zapisany.",
+    "generic": "Coś poszło nie tak. Spróbuj ponownie."
+  },
+  "remove": {
+    "title": "Usunąć {{server}}?",
+    "message": "Zapisane hasło, decyzja o certyfikacie, obserwowane kanały i historia czatu na tym komputerze zostaną usunięte.",
+    "confirm": "Usuń"
+  },
+  "switch": {
+    "title": "Zmienić serwer?",
+    "message": "Możesz być na jednym serwerze naraz. Rozłączyć się z {{current}} i połączyć z {{next}}?",
+    "confirm": "Rozłącz i zmień"
+  },
+  "cert": {
+    "newTitle": "Zaufać temu serwerowi?",
+    "newIntro": "Mumcord nie widział wcześniej certyfikatu serwera {{server}}. Jeśli właściciel serwera podał Ci odcisk, sprawdź, czy się zgadza. Twój wybór zostanie zapamiętany.",
+    "fingerprint": "Odcisk certyfikatu",
+    "changedTitle": "Uwaga: certyfikat serwera się zmienił",
+    "changedWarning": "Certyfikat serwera {{server}} różni się od tego, któremu wcześniej zaufano.",
+    "changedAdvice": "Może się tak zdarzyć po odnowieniu certyfikatu serwera, ale może też oznaczać, że ktoś przechwytuje Twoje połączenie. Kontynuuj tylko, jeśli właściciel serwera potwierdził zmianę.",
+    "previousFingerprint": "Poprzednio zaufany odcisk",
+    "newFingerprint": "Nowy odcisk",
+    "reject": "Nie łącz",
+    "trust": "Zaufaj i połącz",
+    "trustChanged": "Zaufaj nowemu certyfikatowi"
+  },
+  "rejoin": {
+    "label": "Wróć na ostatni kanał",
+    "text": "Ostatnio byłeś(-aś) na {{channel}} – wrócić?",
+    "rejoin": "Wróć",
+    "notNow": "Nie teraz"
+  },
+  "status": {
+    "label": "Stan połączenia",
+    "connecting": "Łączenie z {{server}}…",
+    "reconnecting": "Ponowne łączenie… (próba {{attempt}} z {{max}}, następna za {{seconds}} s)",
+    "tcp": "Połączono przez TCP (UDP zablokowany). Głos działa, ale może być lekko opóźniony.",
+    "disconnected": "Rozłączono",
+    "disconnectedReason": "Rozłączono – {{reason}}",
+    "failed": "Nie udało się połączyć z {{server}}. {{reason}}",
+    "cancel": "Anuluj",
+    "reconnect": "Połącz ponownie",
+    "editServer": "Edytuj serwer",
+    "actionFailed": {
+      "reorder": "Nie udało się zapisać nowej kolejności serwerów. Spróbuj ponownie.",
+      "remove": "Nie udało się usunąć serwera. Spróbuj ponownie.",
+      "disconnect": "Rozłączanie nie powiodło się. Spróbuj ponownie."
+    }
+  },
+  "empty": {
+    "title": "Dodaj swój pierwszy serwer",
+    "description": "Wpisz adres otrzymany od swojej grupy lub wklej link mumble://.",
+    "addressLabel": "Adres serwera lub link mumble://",
+    "addressHint": "Na przykład mumble.example.org lub mumble.example.org:64738.",
+    "connect": "Dodaj i połącz",
+    "pasteLink": "Wklej link mumble://",
+    "moreOptions": "Więcej opcji…",
+    "noLinkInClipboard": "Schowek nie zawiera linku mumble://. Wklej lub wpisz adres powyżej.",
+    "pasteManually": "Mumcord nie mógł odczytać schowka. Kliknij pole powyżej i naciśnij Ctrl+V.",
+    "errors": {
+      "required": "Podaj adres serwera lub link mumble://."
+    }
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "title": "Ħbieb",
+  "item": "{{name}}, {{status}}",
+  "online": "Online",
+  "onlineIn": "Online f'{{channel}}",
+  "offline": "Offline",
+  "lastSeen": "Offline, dehru l-aħħar {{when}}",
+  "friend": "Ħabib",
+  "friendHint": "Juri meta jkun online u jżomm iċ-chat privat tiegħek miegħu.",
+  "noCertificate": "Persuni mingħajr ċertifikat ma jistgħux ikunu ħbieb, għax Mumcord ma jkunx jista' jagħrafhom mill-ġdid.",
+  "add": "Żid ħabib",
+  "remove": "Neħħi ħabib",
+  "failed": "It-tibdil tal-ħabib ma ħadimx. Erġa' pprova."
+}

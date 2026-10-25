@@ -1,0 +1,82 @@
+{
+  "tree": {
+    "label": "Kanali",
+    "hint": "Enter: uri ċ-chat · Shift+Enter jew double-click: ingħaqad · Vireg: mexxi, wessa', ikkollassa",
+    "join": "Ingħaqad",
+    "you": "(int)",
+    "voiceHere": "int hawn (vuċi)",
+    "people_one": "{{count}} persuna",
+    "people_two": "{{count}} persuni",
+    "people_few": "{{count}} persuni",
+    "people_many": "{{count}} persuna",
+    "people_other": "{{count}} persuna",
+    "stack": {
+      "some": "{{shown}} minn {{total}} persuni: {{names}} u {{rest}} oħra",
+      "all_one": "{{count}} persuna: {{names}}",
+      "all_two": "{{count}} persuni: {{names}}",
+      "all_few": "{{count}} persuni: {{names}}",
+      "all_many": "{{count}} persuna: {{names}}",
+      "all_other": "{{count}} persuna: {{names}}",
+      "person": "{{name}} ({{status}})"
+    },
+    "showAll": "Uri kollha ({{total}})",
+    "showFewer": "Uri inqas",
+    "jump": "Mur għall-kanal tiegħi"
+  },
+  "status": {
+    "listening": "qed jisma'",
+    "talking": "qed jitkellem",
+    "muted": "mutat",
+    "deafened": "bla smigħ",
+    "serverMuted": "mutat mis-server",
+    "serverDeafened": "bla smigħ mis-server",
+    "suppressed": "soppress (ma jistax jitkellem hawn)",
+    "localMuted": "mutat għalik",
+    "unregistered": "mhux irreġistrat"
+  },
+  "mumcordBadge": "Juża Mumcord",
+  "statusTip": {
+    "registered": "Irreġistrat fuq dan is-server",
+    "listening": "Qed jisma' dan il-kanal",
+    "muted": "Mutat",
+    "deafened": "Bla smigħ",
+    "serverMuted": "Mutat mis-server",
+    "serverDeafened": "Bla smigħ mis-server",
+    "suppressed": "Soppress – ma jistax jitkellem f'dan il-kanal",
+    "localMuted": "Mutat għalik",
+    "unregistered": "Mhux irreġistrat fuq dan is-server (mistieden)",
+    "nowPlaying": "Qed jisma' {{track}}",
+    "nowGaming": "Qed jilgħab {{game}}",
+    "positional": "L-awdjo posizzjonali huwa attiv"
+  },
+  "announce": {
+    "joined": "{{name}} ingħaqad mal-kanal tiegħek",
+    "left": "{{name}} ħareġ mill-kanal tiegħek",
+    "talking": "{{name}} qed jitkellem"
+  },
+  "errors": {
+    "joinDenied": "Ma tistax tidħol f'dan il-kanal.",
+    "joinFailed": "Ma stajtx tingħaqad mal-kanal. Erġa' pprova.",
+    "notConnected": "Mhux konness ma' server."
+  },
+  "empty": {
+    "disconnected": "Mhux konness. Agħżel server biex tara l-kanali tiegħu.",
+    "loading": "Qed jitgħabbew il-kanali…"
+  },
+  "search": {
+    "label": "Fittex kanali u persuni",
+    "clear": "Ħassar it-tiftix",
+    "empty": "L-ebda kanal jew persuna ma jaqblu ma' “{{query}}”.",
+    "count": "{{channels}}, {{people}}",
+    "channels_one": "{{count}} kanal",
+    "channels_two": "{{count}} kanali",
+    "channels_few": "{{count}} kanali",
+    "channels_many": "{{count}} kanal",
+    "channels_other": "{{count}} kanal",
+    "people_one": "{{count}} persuna",
+    "people_two": "{{count}} persuni",
+    "people_few": "{{count}} persuni",
+    "people_many": "{{count}} persuna",
+    "people_other": "{{count}} persuna"
+  }
+}

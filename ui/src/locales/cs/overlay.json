@@ -1,0 +1,12 @@
+{
+  "listLabel": "Právě mluví",
+  "move": {
+    "hint": "Přetažením přesuneš overlay",
+    "done": "Hotovo"
+  },
+  "limits": {
+    "wayland": "Na tomto desktopu s Waylandem aplikace nemůžou držet okno navrchu ani určit, kde se zobrazí, takže overlay může skončit za jinými okny a umístění do rohů nemá žádný účinek. Zapni „Režim kompatibility (jako TeamSpeak)“ v nastavení Hlasu a restartuj Mumcord: pak overlay zůstane navrchu.",
+    "waylandKde": "V KDE Plasma s Waylandem aplikace nemůžou držet okno navrchu ani určit, kde se zobrazí. Dá se to vyřešit dvěma způsoby: nech Mumcord přidat pro overlay pravidlo okna KDE („Nastavit automaticky“), nebo zapni „Režim kompatibility (jako TeamSpeak)“ v nastavení Hlasu a restartuj Mumcord.",
+    "exclusiveFullscreen": "Overlay se zobrazuje nad hrami v okně a v celoobrazovkovém režimu bez okraje. Hry ve výhradním celoobrazovkovém režimu se vykreslují přes všechna okna, takže je přepni na „bez okraje“ nebo „celá obrazovka v okně“, abys overlay viděl."
+  }
+}

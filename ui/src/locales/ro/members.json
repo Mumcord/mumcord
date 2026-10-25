@@ -1,0 +1,64 @@
+{
+  "inChannel_one": "În {{channel}} ({{count}})",
+  "inChannel_few": "În {{channel}} ({{count}})",
+  "inChannel_other": "În {{channel}} ({{count}})",
+  "listening_one": "Ascultă ({{count}})",
+  "listening_few": "Ascultă ({{count}})",
+  "listening_other": "Ascultă ({{count}})",
+  "noChannel": "Selectează un canal ca să vezi cine e în el.",
+  "nobody": "Nu e nimeni aici.",
+  "you": "(tu)",
+  "registered": "Înregistrat",
+  "unregistered": "Neînregistrat",
+  "talking": "Vorbește",
+  "card": {
+    "close": "Închide",
+    "loadFailed": "Profilul nu a putut fi încărcat.",
+    "volume": "Volum",
+    "volumeValue": "{{value}} %",
+    "localMute": "Fără sunet pentru mine",
+    "sessionOnly": "Această persoană nu are certificat, așa că aceste setări durează doar în această sesiune.",
+    "sendPrivateMessage": "Trimite mesaj privat",
+    "privateMessage": "Mesaj privat",
+    "localSettings": "Setările tale",
+    "localSettingsHint": "Doar tu le vezi. Modificările se salvează imediat.",
+    "localMuteHint": "Nu vei auzi această persoană.",
+    "privateNote": "Notă privată",
+    "privateNoteHint": "Doar tu poți vedea această notă.",
+    "saved": "Salvat"
+  },
+  "errors": {
+    "notConnected": "Nu ești conectat la un server.",
+    "generic": "Nu a mers. Încearcă din nou."
+  },
+  "menu": {
+    "label": "Acțiuni pentru {{name}}",
+    "viewProfile": "Vezi profilul",
+    "mute": "Fără sunet pentru mine"
+  },
+  "nowPlaying": {
+    "label": "Ascultă acum",
+    "listening": "Ascultă",
+    "paused": "În pauză",
+    "progress": "Progresul redării",
+    "position": "{{position}} din {{duration}}"
+  },
+  "nowGaming": {
+    "label": "Joacă acum",
+    "playing": "Joacă",
+    "playedFor": "de {{time}}",
+    "hoursMinutes": "{{hours}} h {{minutes}} min",
+    "minutes_one": "{{count}} min",
+    "minutes_few": "{{count}} min",
+    "minutes_other": "{{count}} min",
+    "join": "Intră în joc",
+    "joinTitle": "Intri în joc?",
+    "joinMessage": "Steam se va deschide și se va conecta la serverul pe care această persoană joacă {{game}}. Intră doar pe servere în care ai încredere.",
+    "joinConfirm": "Deschide Steam",
+    "joinFailed": "Steam nu a putut fi deschis."
+  },
+  "preview": {
+    "privateMessage": "Mesaj privat",
+    "fullProfile": "Profil complet"
+  }
+}

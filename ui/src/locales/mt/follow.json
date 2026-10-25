@@ -1,0 +1,67 @@
+{
+  "follow": "Segwi",
+  "following": "Qed issegwi",
+  "unsupported": "Is-segwiment tal-kanali jeħtieġ server bil-verżjoni 1.4 jew aktar ġdida.",
+  "unread_one": "{{count}} messaġġ mhux moqri",
+  "unread_two": "{{count}} messaġġi mhux moqrija",
+  "unread_few": "{{count}} messaġġi mhux moqrija",
+  "unread_many": "{{count}} messaġġ mhux moqri",
+  "unread_other": "{{count}} messaġġ mhux moqri",
+  "errors": {
+    "denied": "Is-server ma jħallikx issegwi dan il-kanal.",
+    "limit": "Ma tistax issegwi aktar kanali fuq dan is-server. Ieqaf segwi kanal ieħor l-ewwel.",
+    "tooOld": "Dan is-server huwa qadim wisq għas-segwiment tal-kanali (meħtieġa verżjoni 1.4 jew aktar ġdida).",
+    "notConnected": "Mhux konness mas-server.",
+    "generic": "Is-segwiment ta' dan il-kanal ma ħadimx. Erġa' pprova."
+  },
+  "dm": {
+    "title": "Messaġġi diretti",
+    "unknown": "Persuna mhux magħrufa"
+  },
+  "notify": {
+    "channel": "{{name}} f'{{channel}}: {{text}}",
+    "private": "{{name}} (privat): {{text}}",
+    "more_one": "{{count}} messaġġ ġdid ieħor",
+    "more_two": "{{count}} messaġġi ġodda oħra",
+    "more_few": "{{count}} messaġġi ġodda oħra",
+    "more_many": "{{count}} messaġġ ġdid ieħor",
+    "more_other": "{{count}} messaġġ ġdid ieħor"
+  },
+  "history": {
+    "clear": "Ħassar l-istorja",
+    "title": "Tħassar l-istorja?",
+    "body": "Dan iħassar b'mod permanenti l-messaġġi ssejvjati ta' din il-konversazzjoni minn dan il-kompjuter. Il-persuni l-oħra jżommu l-kopji tagħhom.",
+    "confirm": "Ħassar l-istorja",
+    "cancel": "Ikkanċella",
+    "failed": "L-istorja ma setgħetx titħassar. Erġa' pprova."
+  },
+  "star": {
+    "follow": "Segwi {{channel}}",
+    "unfollow": "Ieqaf segwi {{channel}}"
+  },
+  "all": {
+    "menu": "Għażliet tas-server għal {{server}}",
+    "menuLabel": "Għażliet tas-server",
+    "follow": "Segwi l-kanali kollha",
+    "unfollow": "Ieqaf segwi l-kanali kollha",
+    "working": "Qed jiġu segwiti l-kanali…",
+    "followed_one": "Qed issegwi {{count}} kanal.",
+    "followed_two": "Qed issegwi {{count}} kanali.",
+    "followed_few": "Qed issegwi {{count}} kanali.",
+    "followed_many": "Qed issegwi {{count}} kanal.",
+    "followed_other": "Qed issegwi {{count}} kanal.",
+    "skipped_one": "{{count}} maqbuż: {{reasons}}.",
+    "skipped_two": "{{count}} maqbużin: {{reasons}}.",
+    "skipped_few": "{{count}} maqbużin: {{reasons}}.",
+    "skipped_many": "{{count}} maqbuż: {{reasons}}.",
+    "skipped_other": "{{count}} maqbuż: {{reasons}}.",
+    "limit": "intlaħaq il-limitu",
+    "notAllowed": "mhux permess",
+    "noAnswer": "l-ebda tweġiba mis-server",
+    "unfollowed": "Ma għadekx issegwi l-kanali kollha.",
+    "failed": "Is-segwiment tal-kanali kollha ma ħadimx. Erġa' pprova.",
+    "dismiss": "Ormi",
+    "unfollowFailed": "It-twaqqif tas-segwiment tal-kanali kollha ma ħadimx. Erġa' pprova."
+  },
+  "mention": "jinkludi semmija tiegħek"
+}

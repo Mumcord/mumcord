@@ -1,0 +1,128 @@
+{
+  "unknownServer": "de server",
+  "announce": {
+    "connected": "Verbonden met {{server}}.",
+    "lost": "Verbinding met {{server}} verbroken. Opnieuw verbinden…",
+    "ended": "Verbinding met {{server}} verbroken. Kijk in de balk boven de chat wat je nu kunt doen.",
+    "disconnected": "Verbinding met {{server}} verbroken.",
+    "tcp": "Voice loopt nu via TCP omdat UDP is geblokkeerd. Audio kan iets vertraagd zijn.",
+    "removed": "{{server}} verwijderd.",
+    "moved": "{{server}} verplaatst naar positie {{position}} van {{count}}."
+  },
+  "bar": {
+    "listLabel": "Opgeslagen servers",
+    "add": "Server toevoegen",
+    "keyboardHint": "Enter maakt verbinding. Alt plus pijl omhoog of omlaag verplaatst de server. Shift plus F10 opent meer opties.",
+    "status": {
+      "connected": "{{server}} (verbonden)",
+      "connecting": "{{server}} (verbinden)",
+      "reconnecting": "{{server}} (opnieuw verbinden)"
+    }
+  },
+  "menu": {
+    "label": "Opties voor {{server}}",
+    "connect": "Verbinden",
+    "disconnect": "Verbinding verbreken",
+    "edit": "Server bewerken",
+    "moveUp": "Omhoog",
+    "moveDown": "Omlaag",
+    "remove": "Server verwijderen"
+  },
+  "dialog": {
+    "addTitle": "Server toevoegen",
+    "editTitle": "Server bewerken",
+    "linkTitle": "Deze server opslaan?",
+    "address": "Adres",
+    "addressHint": "Bijvoorbeeld mumble.example.org. Je kunt hier ook een mumble://-link plakken.",
+    "filledFromLink": "Ingevuld vanuit de mumble://-link.",
+    "port": "Poort",
+    "label": "Naam in de serverbalk",
+    "username": "Je naam op deze server",
+    "password": "Serverwachtwoord (optioneel)",
+    "passwordHint": "Alleen nodig als de server erom vraagt. Het wordt bewaard in de beveiligde opslag van je systeem.",
+    "passwordKeepHint": "Er is een wachtwoord opgeslagen. Laat dit leeg om het te behouden, of typ een nieuw wachtwoord.",
+    "clearPassword": "Opgeslagen wachtwoord verwijderen",
+    "add": "Server toevoegen",
+    "saveAndConnect": "Opslaan en verbinden",
+    "errors": {
+      "address": "Voer het serveradres in.",
+      "port": "Voer een poort in tussen 1 en 65535. De meeste servers gebruiken 64738.",
+      "username": "Voer de naam in die je op deze server wilt gebruiken.",
+      "link": "Deze mumble://-link kan niet worden gelezen. Controleer of hij volledig is gekopieerd.",
+      "invalid": "De servergegevens zijn ongeldig. Controleer het adres en de poort."
+    }
+  },
+  "errors": {
+    "serverUnreachable": "De server is niet bereikbaar. Controleer het adres en de poort, en of je online bent.",
+    "wrongPassword": "Het serverwachtwoord is onjuist. Bewerk de server en voer het juiste wachtwoord in.",
+    "nameInUse": "Je naam is al in gebruik of op deze server geregistreerd door iemand anders. Bewerk de server en kies een andere naam.",
+    "certificateRejected": "De certificaatcontrole is mislukt: het certificaat van de server werd niet vertrouwd, of de server accepteerde je identiteit niet. Probeer het opnieuw of vraag de servereigenaar.",
+    "certificateChanged": "Het certificaat van de server is gewijzigd en werd niet vertrouwd. Vertrouw het alleen als de servereigenaar de wijziging bevestigt.",
+    "denied": "De server heeft de verbinding geweigerd.",
+    "deniedWithReason": "De server heeft de verbinding geweigerd: {{reason}}",
+    "invalidAddress": "Het serveradres is ongeldig. Bewerk de server om het te herstellen.",
+    "secureStorage": "De beveiligde opslag van je systeem is niet beschikbaar, dus het serverwachtwoord kon niet worden gelezen of opgeslagen. Ontgrendel de opslag en probeer het opnieuw.",
+    "notFound": "Deze server is niet meer opgeslagen.",
+    "generic": "Er is iets misgegaan. Probeer het opnieuw."
+  },
+  "remove": {
+    "title": "{{server}} verwijderen?",
+    "message": "Het opgeslagen wachtwoord, de certificaatkeuze, gevolgde kanalen en de chatgeschiedenis op deze computer worden verwijderd.",
+    "confirm": "Verwijderen"
+  },
+  "switch": {
+    "title": "Van server wisselen?",
+    "message": "Je kunt maar op één server tegelijk zijn. Verbinding met {{current}} verbreken en verbinden met {{next}}?",
+    "confirm": "Verbreken en wisselen"
+  },
+  "cert": {
+    "newTitle": "Deze server vertrouwen?",
+    "newIntro": "Mumcord heeft het certificaat van {{server}} nog niet eerder gezien. Als de servereigenaar je een vingerafdruk heeft gegeven, controleer dan of die overeenkomt. Je keuze wordt onthouden.",
+    "fingerprint": "Certificaatvingerafdruk",
+    "changedTitle": "Waarschuwing: het certificaat van de server is gewijzigd",
+    "changedWarning": "Het certificaat van {{server}} verschilt van het certificaat dat je eerder vertrouwde.",
+    "changedAdvice": "Dit kan gebeuren nadat de server is vernieuwd, maar het kan ook betekenen dat iemand je verbinding onderschept. Ga alleen verder als de servereigenaar de wijziging heeft bevestigd.",
+    "previousFingerprint": "Eerder vertrouwde vingerafdruk",
+    "newFingerprint": "Nieuwe vingerafdruk",
+    "reject": "Niet verbinden",
+    "trust": "Vertrouwen en verbinden",
+    "trustChanged": "Het nieuwe certificaat vertrouwen"
+  },
+  "rejoin": {
+    "label": "Laatste kanaal opnieuw betreden",
+    "text": "Je zat de vorige keer in {{channel}} – opnieuw deelnemen?",
+    "rejoin": "Opnieuw deelnemen",
+    "notNow": "Nu niet"
+  },
+  "status": {
+    "label": "Verbindingsstatus",
+    "connecting": "Verbinden met {{server}}…",
+    "reconnecting": "Opnieuw verbinden… (poging {{attempt}} van {{max}}, volgende poging over {{seconds}} s)",
+    "tcp": "Verbonden via TCP (UDP geblokkeerd). Voice werkt, maar kan iets vertraagd zijn.",
+    "disconnected": "Verbinding verbroken",
+    "disconnectedReason": "Verbinding verbroken – {{reason}}",
+    "failed": "Kon geen verbinding maken met {{server}}. {{reason}}",
+    "cancel": "Annuleren",
+    "reconnect": "Opnieuw verbinden",
+    "editServer": "Server bewerken",
+    "actionFailed": {
+      "reorder": "De nieuwe servervolgorde kon niet worden opgeslagen. Probeer het opnieuw.",
+      "remove": "De server kon niet worden verwijderd. Probeer het opnieuw.",
+      "disconnect": "Verbinding verbreken is mislukt. Probeer het opnieuw."
+    }
+  },
+  "empty": {
+    "title": "Voeg je eerste server toe",
+    "description": "Voer het adres in dat je van je groep hebt gekregen, of plak een mumble://-link.",
+    "addressLabel": "Serveradres of mumble://-link",
+    "addressHint": "Bijvoorbeeld mumble.example.org of mumble.example.org:64738.",
+    "connect": "Toevoegen en verbinden",
+    "pasteLink": "Een mumble://-link plakken",
+    "moreOptions": "Meer opties…",
+    "noLinkInClipboard": "Het klembord bevat geen mumble://-link. Plak of typ hierboven het adres.",
+    "pasteManually": "Mumcord kon het klembord niet lezen. Klik op het veld hierboven en druk op Ctrl+V.",
+    "errors": {
+      "required": "Voer een serveradres of een mumble://-link in."
+    }
+  }
+}

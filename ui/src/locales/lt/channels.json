@@ -1,0 +1,78 @@
+{
+  "tree": {
+    "label": "Kanalai",
+    "hint": "Enter: rodyti pokalbį · Shift+Enter arba dukart spustelėti: prisijungti · Rodyklių klavišai: judėti, išskleisti, suskleisti",
+    "join": "Prisijungti",
+    "you": "(tu)",
+    "voiceHere": "tu čia (balsas)",
+    "people_one": "{{count}} žmogus",
+    "people_few": "{{count}} žmonės",
+    "people_many": "{{count}} žmogaus",
+    "people_other": "{{count}} žmonių",
+    "stack": {
+      "some": "{{shown}} iš {{total}} žmonių: {{names}} ir dar {{rest}}",
+      "all_one": "{{count}} žmogus: {{names}}",
+      "all_few": "{{count}} žmonės: {{names}}",
+      "all_many": "{{count}} žmogaus: {{names}}",
+      "all_other": "{{count}} žmonių: {{names}}",
+      "person": "{{name}} ({{status}})"
+    },
+    "showAll": "Rodyti visus ({{total}})",
+    "showFewer": "Rodyti mažiau",
+    "jump": "Pereiti į mano kanalą"
+  },
+  "status": {
+    "listening": "klauso",
+    "talking": "kalba",
+    "muted": "nutildytas (-a)",
+    "deafened": "išjungtas (-a) garsas",
+    "serverMuted": "nutildė serveris",
+    "serverDeafened": "garsą išjungė serveris",
+    "suppressed": "užtildytas (-a) (čia kalbėti negali)",
+    "localMuted": "nutildytas (-a) tau",
+    "unregistered": "neregistruotas (-a)"
+  },
+  "mumcordBadge": "Naudoja Mumcord",
+  "statusTip": {
+    "registered": "Registruotas (-a) šiame serveryje",
+    "listening": "Klauso šio kanalo",
+    "muted": "Nutildytas (-a)",
+    "deafened": "Išjungtas garsas",
+    "serverMuted": "Nutildė serveris",
+    "serverDeafened": "Garsą išjungė serveris",
+    "suppressed": "Užtildytas (-a) – šiame kanale kalbėti negali",
+    "localMuted": "Nutildytas (-a) tau",
+    "unregistered": "Neregistruotas (-a) šiame serveryje (svečias)",
+    "nowPlaying": "Klauso: {{track}}",
+    "nowGaming": "Žaidžia: {{game}}",
+    "positional": "Pozicinis garsas įjungtas"
+  },
+  "announce": {
+    "joined": "{{name}} prisijungė prie tavo kanalo",
+    "left": "{{name}} paliko tavo kanalą",
+    "talking": "{{name}} kalba"
+  },
+  "errors": {
+    "joinDenied": "Tau neleidžiama įeiti į šį kanalą.",
+    "joinFailed": "Nepavyko prisijungti prie kanalo. Bandyk dar kartą.",
+    "notConnected": "Neprisijungta prie serverio."
+  },
+  "empty": {
+    "disconnected": "Neprisijungta. Pasirink serverį, kad pamatytum jo kanalus.",
+    "loading": "Įkeliami kanalai…"
+  },
+  "search": {
+    "label": "Ieškoti kanalų ir žmonių",
+    "clear": "Išvalyti paiešką",
+    "empty": "Nėra kanalų ar žmonių, atitinkančių „{{query}}“.",
+    "count": "{{channels}}, {{people}}",
+    "channels_one": "{{count}} kanalas",
+    "channels_few": "{{count}} kanalai",
+    "channels_many": "{{count}} kanalo",
+    "channels_other": "{{count}} kanalų",
+    "people_one": "{{count}} žmogus",
+    "people_few": "{{count}} žmonės",
+    "people_many": "{{count}} žmogaus",
+    "people_other": "{{count}} žmonių"
+  }
+}

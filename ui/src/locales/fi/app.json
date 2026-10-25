@@ -1,0 +1,33 @@
+{
+  "regions": {
+    "servers": "Palvelimet",
+    "channels": "Kanavat",
+    "chat": "Chat",
+    "members": "Jäsenet",
+    "userPanel": "Tilasi"
+  },
+  "skipLinks": {
+    "label": "Ohituslinkit",
+    "chat": "Siirry chattiin",
+    "channels": "Siirry kanaviin"
+  },
+  "members": {
+    "show": "Näytä jäsenet",
+    "hide": "Piilota jäsenet"
+  },
+  "resize": {
+    "channels": "Muuta kanavalistan kokoa",
+    "members": "Muuta jäsenlistan kokoa"
+  },
+  "settings": {
+    "title": "Asetukset"
+  },
+  "wizard": {
+    "title": "Tervetuloa Mumcordiin"
+  },
+  "placeholder": "Tulossa pian",
+  "startupError": {
+    "title": "Mumcord ei käynnistynyt",
+    "description": "Sovellus ei voinut ladata asetuksiasi. Yritä uudelleen; jos ongelma jatkuu, käynnistä Mumcord uudelleen."
+  }
+}

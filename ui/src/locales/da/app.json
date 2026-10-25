@@ -1,0 +1,33 @@
+{
+  "regions": {
+    "servers": "Servere",
+    "channels": "Kanaler",
+    "chat": "Chat",
+    "members": "Medlemmer",
+    "userPanel": "Din status"
+  },
+  "skipLinks": {
+    "label": "Spring-links",
+    "chat": "Spring til chat",
+    "channels": "Spring til kanaler"
+  },
+  "members": {
+    "show": "Vis medlemmer",
+    "hide": "Skjul medlemmer"
+  },
+  "resize": {
+    "channels": "Tilpas størrelsen på kanallisten",
+    "members": "Tilpas størrelsen på medlemslisten"
+  },
+  "settings": {
+    "title": "Indstillinger"
+  },
+  "wizard": {
+    "title": "Velkommen til Mumcord"
+  },
+  "placeholder": "Kommer snart",
+  "startupError": {
+    "title": "Mumcord kunne ikke starte",
+    "description": "Appen kunne ikke indlæse dine indstillinger. Prøv igen. Hvis det bliver ved med at fejle, så genstart Mumcord."
+  }
+}

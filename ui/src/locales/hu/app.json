@@ -1,0 +1,33 @@
+{
+  "regions": {
+    "servers": "Szerverek",
+    "channels": "Csatornák",
+    "chat": "Chat",
+    "members": "Tagok",
+    "userPanel": "Állapotod"
+  },
+  "skipLinks": {
+    "label": "Ugrás linkek",
+    "chat": "Ugrás a chathez",
+    "channels": "Ugrás a csatornákhoz"
+  },
+  "members": {
+    "show": "Tagok megjelenítése",
+    "hide": "Tagok elrejtése"
+  },
+  "resize": {
+    "channels": "Csatornalista átméretezése",
+    "members": "Taglista átméretezése"
+  },
+  "settings": {
+    "title": "Beállítások"
+  },
+  "wizard": {
+    "title": "Üdv a Mumcordban"
+  },
+  "placeholder": "Hamarosan",
+  "startupError": {
+    "title": "A Mumcord nem tudott elindulni",
+    "description": "Az alkalmazás nem tudta betölteni a beállításaidat. Próbáld újra; ha továbbra sem sikerül, indítsd újra a Mumcordot."
+  }
+}

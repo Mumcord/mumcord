@@ -1,0 +1,55 @@
+{
+  "follow": "Jälgi",
+  "following": "Jälgin",
+  "unsupported": "Kanalite jälgimiseks on vaja serverit versiooniga 1.4 või uuemat.",
+  "unread_one": "{{count}} lugemata sõnum",
+  "unread_other": "{{count}} lugemata sõnumit",
+  "errors": {
+    "denied": "Server ei luba sul seda kanalit jälgida.",
+    "limit": "Sel serveril ei saa rohkem kanaleid jälgida. Lõpeta esmalt mõne teise kanali jälgimine.",
+    "tooOld": "See server on kanalite jälgimiseks liiga vana (vaja on versiooni 1.4 või uuemat).",
+    "notConnected": "Sa pole serveriga ühendatud.",
+    "generic": "Selle kanali jälgimine ei õnnestunud. Proovi palun uuesti."
+  },
+  "dm": {
+    "title": "Otsesõnumid",
+    "unknown": "Tundmatu inimene"
+  },
+  "notify": {
+    "channel": "{{name}} kanalis {{channel}}: {{text}}",
+    "private": "{{name}} (privaatne): {{text}}",
+    "more_one": "veel {{count}} uus sõnum",
+    "more_other": "veel {{count}} uut sõnumit"
+  },
+  "history": {
+    "clear": "Tühjenda ajalugu",
+    "title": "Tühjendan ajaloo?",
+    "body": "See kustutab selle vestluse salvestatud sõnumid sellest arvutist jäädavalt. Teistel jäävad nende koopiad alles.",
+    "confirm": "Tühjenda ajalugu",
+    "cancel": "Tühista",
+    "failed": "Ajaloo tühjendamine ei õnnestunud. Proovi palun uuesti."
+  },
+  "star": {
+    "follow": "Jälgi kanalit {{channel}}",
+    "unfollow": "Lõpeta kanali {{channel}} jälgimine"
+  },
+  "all": {
+    "menu": "Serveri {{server}} valikud",
+    "menuLabel": "Serveri valikud",
+    "follow": "Jälgi kõiki kanaleid",
+    "unfollow": "Lõpeta kõigi kanalite jälgimine",
+    "working": "Jälgin kanaleid…",
+    "followed_one": "Jälgin {{count}} kanalit.",
+    "followed_other": "Jälgin {{count}} kanalit.",
+    "skipped_one": "{{count}} jäeti vahele: {{reasons}}.",
+    "skipped_other": "{{count}} jäeti vahele: {{reasons}}.",
+    "limit": "piir täis",
+    "notAllowed": "pole lubatud",
+    "noAnswer": "server ei vastanud",
+    "unfollowed": "Kõigi kanalite jälgimine lõpetatud.",
+    "failed": "Kõigi kanalite jälgimine ei õnnestunud. Proovi palun uuesti.",
+    "dismiss": "Sulge",
+    "unfollowFailed": "Kõigi kanalite jälgimise lõpetamine ei õnnestunud. Proovi palun uuesti."
+  },
+  "mention": "sisaldab sinu mainimist"
+}

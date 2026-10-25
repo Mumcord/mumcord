@@ -1,0 +1,16 @@
+{
+  "region": "Paziņojumi",
+  "channel": "#{{name}}",
+  "unknownChannel": "Kanāls",
+  "line": "{{sender}}: {{preview}}",
+  "groupedChannel_zero": "{{count}} jaunu ziņu kanālā {{name}}",
+  "groupedChannel_one": "{{count}} jauna ziņa kanālā {{name}}",
+  "groupedChannel_other": "{{count}} jaunas ziņas kanālā {{name}}",
+  "groupedPrivate_zero": "{{count}} jaunu ziņu no {{name}}",
+  "groupedPrivate_one": "{{count}} jauna ziņa no {{name}}",
+  "groupedPrivate_other": "{{count}} jaunas ziņas no {{name}}",
+  "image": "Nosūtīja attēlu",
+  "open": "Atvērt čatu",
+  "close": "Aizvērt paziņojumu",
+  "mentionLine": "{{sender}} tevi pieminēja: {{preview}}"
+}

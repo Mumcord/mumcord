@@ -1,0 +1,128 @@
+{
+  "unknownServer": "is-server",
+  "announce": {
+    "connected": "Konness ma' {{server}}.",
+    "lost": "Intilfet il-konnessjoni ma' {{server}}. Qed terġa' tikkonnettja…",
+    "ended": "Skonnettjat minn {{server}}. Ara l-bar fuq iċ-chat biex tkun taf x'tagħmel wara.",
+    "disconnected": "Skonnettjat minn {{server}}.",
+    "tcp": "Il-vuċi issa taħdem fuq TCP għax UDP huwa mblukkat. L-awdjo jista' jkollu ftit dewmien.",
+    "removed": "{{server}} tneħħa.",
+    "moved": "{{server}} tmexxa għall-pożizzjoni {{position}} minn {{count}}."
+  },
+  "bar": {
+    "listLabel": "Servers ssejvjati",
+    "add": "Żid server",
+    "keyboardHint": "Enter jikkonnettja. Alt flimkien mal-vireg Up jew Down jmexxi s-server. Shift flimkien ma' F10 jiftaħ aktar għażliet.",
+    "status": {
+      "connected": "{{server}} (konness)",
+      "connecting": "{{server}} (qed jikkonnettja)",
+      "reconnecting": "{{server}} (qed jerġa' jikkonnettja)"
+    }
+  },
+  "menu": {
+    "label": "Għażliet għal {{server}}",
+    "connect": "Ikkonnettja",
+    "disconnect": "Skonnettja",
+    "edit": "Editja s-server",
+    "moveUp": "Mexxi 'l fuq",
+    "moveDown": "Mexxi 'l isfel",
+    "remove": "Neħħi s-server"
+  },
+  "dialog": {
+    "addTitle": "Żid server",
+    "editTitle": "Editja s-server",
+    "linkTitle": "Issejvja dan is-server?",
+    "address": "Indirizz",
+    "addressHint": "Pereżempju mumble.example.org. Tista' wkoll twaħħal link mumble:// hawn.",
+    "filledFromLink": "Imtela mil-link mumble://.",
+    "port": "Port",
+    "label": "Isem fil-bar tas-servers",
+    "username": "Ismek fuq dan is-server",
+    "password": "Password tas-server (mhux obbligatorja)",
+    "passwordHint": "Meħtieġa biss jekk is-server jitlobha. Tinżamm fl-ħażna sigura tas-sistema tiegħek.",
+    "passwordKeepHint": "Password hija ssejvjata. Ħalli dan vojt biex iżżommha, jew ikteb waħda ġdida.",
+    "clearPassword": "Neħħi l-password ssejvjata",
+    "add": "Żid is-server",
+    "saveAndConnect": "Issejvja u ikkonnettja",
+    "errors": {
+      "address": "Daħħal l-indirizz tas-server.",
+      "port": "Daħħal port bejn 1 u 65535. Ħafna servers jużaw 64738.",
+      "username": "Daħħal l-isem li trid tuża fuq dan is-server.",
+      "link": "Dan il-link mumble:// ma jistax jinqara. Iċċekkja li ġie kkupjat kollu.",
+      "invalid": "Id-dettalji tas-server mhumiex validi. Iċċekkja l-indirizz u l-port."
+    }
+  },
+  "errors": {
+    "serverUnreachable": "Is-server ma jistax jintlaħaq. Iċċekkja l-indirizz u l-port, u li int online.",
+    "wrongPassword": "Il-password tas-server hija ħażina. Editja s-server u daħħal il-password t-tajba.",
+    "nameInUse": "Ismek diġà qed jintuża jew huwa rreġistrat minn xi ħadd ieħor fuq dan is-server. Editja s-server u agħżel isem ieħor.",
+    "certificateRejected": "Il-verifika taċ-ċertifikat falliet: jew iċ-ċertifikat tas-server ma ġiex fdat, jew is-server ma aċċettax l-identità tiegħek. Erġa' pprova, jew staqsi lis-sid tas-server.",
+    "certificateChanged": "Iċ-ċertifikat tas-server inbidel u ma ġiex fdat. Afdah biss wara li s-sid tas-server jikkonferma t-tibdil.",
+    "denied": "Is-server irrifjuta l-konnessjoni.",
+    "deniedWithReason": "Is-server irrifjuta l-konnessjoni: {{reason}}",
+    "invalidAddress": "L-indirizz tas-server mhuwiex validu. Editja s-server biex tirranġah.",
+    "secureStorage": "L-ħażna sigura tas-sistema tiegħek mhix disponibbli, għalhekk il-password tas-server ma setgħetx tinqara jew tiġi ssejvjata. Ħoll il-lock u erġa' pprova.",
+    "notFound": "Dan is-server m'għadux issejvjat.",
+    "generic": "Xi ħaġa marret ħażin. Erġa' pprova."
+  },
+  "remove": {
+    "title": "Tneħħi {{server}}?",
+    "message": "Il-password ssejvjata tiegħu, id-deċiżjoni dwar iċ-ċertifikat, il-kanali segwiti u l-istorja taċ-chat fuq dan il-kompjuter jitħassru.",
+    "confirm": "Neħħi"
+  },
+  "switch": {
+    "title": "Tbiddel is-server?",
+    "message": "Tista' tkun fuq server wieħed biss kull darba. Tiskonnettja minn {{current}} u tikkonnettja ma' {{next}}?",
+    "confirm": "Skonnettja u biddel"
+  },
+  "cert": {
+    "newTitle": "Tafda dan is-server?",
+    "newIntro": "Mumcord qatt ma ra ċ-ċertifikat ta' {{server}} qabel. Jekk is-sid tas-server tak fingerprint, iċċekkja li jaqbel. L-għażla tiegħek tiġi mfakkra.",
+    "fingerprint": "Fingerprint taċ-ċertifikat",
+    "changedTitle": "Twissija: iċ-ċertifikat tas-server inbidel",
+    "changedWarning": "Iċ-ċertifikat ta' {{server}} huwa differenti minn dak li fdajt qabel.",
+    "changedAdvice": "Dan jista' jiġri wara li s-server jiġi mġedded, imma jista' jfisser ukoll li xi ħadd qed jintercetta l-konnessjoni tiegħek. Kompli biss jekk is-sid tas-server ikkonferma t-tibdil.",
+    "previousFingerprint": "Fingerprint fdat qabel",
+    "newFingerprint": "Fingerprint ġdid",
+    "reject": "Tikkonnettjax",
+    "trust": "Afda u ikkonnettja",
+    "trustChanged": "Afda ċ-ċertifikat il-ġdid"
+  },
+  "rejoin": {
+    "label": "Erġa' ingħaqad mal-aħħar kanal",
+    "text": "L-aħħar darba kont f'{{channel}} – Terġa' tingħaqad?",
+    "rejoin": "Erġa' ingħaqad",
+    "notNow": "Mhux issa"
+  },
+  "status": {
+    "label": "Stat tal-konnessjoni",
+    "connecting": "Qed jikkonnettja ma' {{server}}…",
+    "reconnecting": "Qed jerġa' jikkonnettja… (tentattiv {{attempt}} minn {{max}}, jerġa' jipprova f'{{seconds}} s)",
+    "tcp": "Konness permezz ta' TCP (UDP imblukkat). Il-vuċi taħdem imma jista' jkollha ftit dewmien.",
+    "disconnected": "Skonnettjat",
+    "disconnectedReason": "Skonnettjat – {{reason}}",
+    "failed": "Ma stajtx nikkonnettja ma' {{server}}. {{reason}}",
+    "cancel": "Ikkanċella",
+    "reconnect": "Erġa' ikkonnettja",
+    "editServer": "Editja s-server",
+    "actionFailed": {
+      "reorder": "L-ordni l-ġdida tas-servers ma setgħetx tiġi ssejvjata. Erġa' pprova.",
+      "remove": "Is-server ma setax jitneħħa. Erġa' pprova.",
+      "disconnect": "L-iskonnessjoni falliet. Erġa' pprova."
+    }
+  },
+  "empty": {
+    "title": "Żid l-ewwel server tiegħek",
+    "description": "Daħħal l-indirizz li ksibt mill-grupp tiegħek, jew waħħal link mumble://.",
+    "addressLabel": "Indirizz tas-server jew link mumble://",
+    "addressHint": "Pereżempju mumble.example.org jew mumble.example.org:64738.",
+    "connect": "Żid u ikkonnettja",
+    "pasteLink": "Waħħal link mumble://",
+    "moreOptions": "Aktar għażliet…",
+    "noLinkInClipboard": "Il-clipboard m'għandux link mumble://. Waħħal jew ikteb l-indirizz hawn fuq.",
+    "pasteManually": "Mumcord ma setax jaqra l-clipboard. Ikklikkja l-qasam hawn fuq u agħfas Ctrl+V.",
+    "errors": {
+      "required": "Daħħal indirizz ta' server jew link mumble://."
+    }
+  }
+}

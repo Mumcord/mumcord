@@ -1,0 +1,151 @@
+{
+  "noConversation": "Yhdistä palvelimeen ja valitse kanava aloittaaksesi keskustelun.",
+  "empty": "Ei vielä viestejä. Täällä vastaanottamasi viestit tallennetaan tälle tietokoneelle.",
+  "header": {
+    "channel": "#{{name}}",
+    "channelPrefix": "Kanava",
+    "privatePrefix": "Yksityinen chat:",
+    "unknownPerson": "Tuntematon henkilö"
+  },
+  "list": {
+    "today": "Tänään",
+    "yesterday": "Eilen",
+    "label": "Viestit: {{name}}",
+    "loadOlder": "Lataa vanhempia viestejä",
+    "loading": "Ladataan viestejä…",
+    "loadFailed": "Vanhempia viestejä ei voitu ladata. Yritä uudelleen vierittämällä ylös.",
+    "loadEarlier": "Lataa aiempia viestejä",
+    "syncing": "Etsitään aiempia viestejä muilta Mumcord-käyttäjiltä…",
+    "syncAdded_one": "{{count}} aiempi viesti lisätty muilta Mumcord-käyttäjiltä.",
+    "syncAdded_other": "{{count}} aiempaa viestiä lisätty muilta Mumcord-käyttäjiltä.",
+    "syncNone": "Aiempia viestejä ei löytynyt.",
+    "syncFailed": "Aiempia viestejä ei voi ladata täällä.",
+    "syncedFrom": "käyttäjän {{name}} historiasta",
+    "jumpToNewest": "Siirry uusimpaan",
+    "jumpToNewestUnseen_one": "Siirry uusimpaan, {{count}} uusi viesti",
+    "jumpToNewestUnseen_other": "Siirry uusimpaan, {{count}} uutta viestiä"
+  },
+  "format": {
+    "toolbar": "Muotoilu",
+    "bold": "Lihavointi",
+    "italic": "Kursivointi",
+    "strike": "Yliviivaus",
+    "code": "Koodi tekstissä",
+    "codeBlock": "Koodilohko",
+    "link": "Linkki"
+  },
+  "composer": {
+    "label": "Viesti: {{name}}",
+    "hint": "Lähetä painamalla Enter, uusi rivi Shift+Enterillä. Markdown toimii: **lihavointi**, *kursivointi*, `koodi`, [linkki](https://…).",
+    "addImage": "Lisää kuva",
+    "removeImage": "Poista kuva {{name}}",
+    "imagePreview": "Lähetettävä kuva: {{name}}",
+    "send": "Lähetä",
+    "noPermission": "Sinulla ei ole oikeutta kirjoittaa tälle kanavalle.",
+    "unavailable": "Tämä kanava ei ole enää käytettävissä.",
+    "offline": "{{name}} on offline-tilassa. Voit kirjoittaa taas, kun hän palaa.",
+    "unnamedImage": "Liitetty kuva"
+  },
+  "tray": {
+    "label": "Lähetettävät kuvat",
+    "processing": "Valmistellaan kuvaa",
+    "scaled": "Skaalattu kokoon {{width}}×{{height}} palvelimen rajan mukaan"
+  },
+  "errors": {
+    "tooLong": "Viestisi on liian pitkä tälle palvelimelle (enintään {{max}} merkkiä). Lyhennä sitä ja yritä uudelleen.",
+    "tooLongNoLimit": "Viestisi on liian pitkä tälle palvelimelle. Lyhennä sitä ja yritä uudelleen.",
+    "imageTooLarge": "Kuva on liian suuri tälle palvelimelle pakkaamisen jälkeenkin. Kokeile pienempää kuvaa.",
+    "imageWithTextTooLong": "Viesti kuvineen on liian suuri tälle palvelimelle. Lyhennä tekstiä tai poista kuva.",
+    "imagesNotAllowed": "Tämä palvelin ei salli kuvia viesteissä.",
+    "notImage": "Tätä tiedostoa ei voi lähettää. Käytä PNG-, JPEG-, GIF- tai WebP-kuvaa.",
+    "imageUnreadable": "Kuvaa ei voitu lukea. Kokeile toista tiedostoa.",
+    "denied": "Palvelin ei sallinut tätä viestiä.",
+    "deniedWithReason": "Palvelin ei sallinut tätä viestiä: {{reason}}",
+    "notConnected": "Et ole yhteydessä. Yhdistä uudelleen ja yritä sitten.",
+    "generic": "Viestiä ei voitu lähettää. Yritä uudelleen.",
+    "onlyImages": "Vain kuvia voi lähettää.",
+    "sourceTooLarge": "Tiedosto on liian suuri lähetettäväksi (yli 25 Mt)."
+  },
+  "announce": {
+    "message": "{{name}}: {{text}}",
+    "image": "{{name}} lähetti kuvan",
+    "more_one": "{{count}} uusi viesti lisää",
+    "more_other": "{{count}} uutta viestiä lisää"
+  },
+  "pinned": {
+    "label": "Kanavan tiedot",
+    "showMore": "Näytä lisää",
+    "showLess": "Näytä vähemmän"
+  },
+  "mention": {
+    "list": "Mainittavat henkilöt",
+    "found_one": "{{count}} henkilö ehdotettu. Valitse nuolinäppäimillä ja lisää Enterillä.",
+    "found_other": "{{count}} henkilöä ehdotettu. Valitse nuolinäppäimillä ja lisää Enterillä.",
+    "none": "Ketään ei löytynyt",
+    "mentionsYou": "Mainitsee sinut",
+    "chipLabel": "{{name}}, maininta"
+  },
+  "preview": {
+    "open": "Avaa selaimessa",
+    "openLabel": "Avaa {{title}} selaimessa",
+    "play": "Toista {{title}}",
+    "player": "Videosoitin: {{title}}",
+    "videoTitle": "{{site}}-video",
+    "spotifyTitle": "{{site}}-linkki",
+    "audioPlayer": "Spotify-soitin: {{title}}",
+    "kind": {
+      "track": "Kappale",
+      "album": "Albumi",
+      "playlist": "Soittolista",
+      "artist": "Artisti",
+      "episode": "Jakso",
+      "show": "Ohjelma"
+    },
+    "inBrowser": "Toistetaan selaimessasi",
+    "card": "Linkin esikatselu: {{title}}",
+    "dismiss": "Piilota esikatselu"
+  },
+  "image": {
+    "loading": "Ladataan kuvaa {{name}}",
+    "label": "Kuva: {{name}}",
+    "view": "Näytä kuva {{name}}",
+    "viewMessage": "Kuva lähettäjältä {{name}}, avaa katseluohjelmassa",
+    "failed": "Kuvaa ei voi näyttää (liian suuri tai ei saatavilla)."
+  },
+  "viewer": {
+    "label": "Kuvankatselu",
+    "counter": "{{current}} / {{total}}",
+    "zoomIn": "Lähennä",
+    "zoomOut": "Loitonna",
+    "fit": "Sovita ikkunaan",
+    "save": "Tallenna kuva",
+    "saved": "Kuva tallennettu",
+    "saveFailed": "Kuvaa ei voitu tallentaa",
+    "fileFilter": "Kuva",
+    "openInBrowser": "Avaa selaimessa",
+    "close": "Sulje",
+    "previous": "Edellinen kuva",
+    "next": "Seuraava kuva",
+    "unnamed": "kuva",
+    "fullLoading": "Ladataan täysikokoista…",
+    "fullProgress": "Ladataan täysikokoista… {{percent}} %",
+    "fullUnavailable": "Täysikokoista ei saatavilla – näytetään esikatselu"
+  },
+  "favorites": {
+    "open": "GIF-suosikit",
+    "title": "GIF-suosikit",
+    "save": "Tallenna suosikiksi",
+    "remove": "Poista suosikeista",
+    "removeNamed": "Poista {{name}} suosikeista",
+    "send": "Lähetä {{name}}",
+    "hint": "Nuolinäppäimet liikkuvat, Enter lähettää, Delete poistaa, Escape sulkee.",
+    "empty": "Ei vielä suosikkeja. Napsauta GIFiä chatissa hiiren oikealla painikkeella tai käytä sen tähteä ja valitse ”Tallenna suosikiksi”. Se näkyy sitten täällä."
+  },
+  "imageMenu": {
+    "label": "Kuva {{name}}"
+  },
+  "attribution": {
+    "via": "lähde: {{brand}}",
+    "view": "Näytä palvelussa {{brand}}"
+  }
+}

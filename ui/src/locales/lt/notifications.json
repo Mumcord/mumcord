@@ -1,0 +1,18 @@
+{
+  "region": "Pranešimai",
+  "channel": "#{{name}}",
+  "unknownChannel": "Kanalas",
+  "line": "{{sender}}: {{preview}}",
+  "groupedChannel_one": "{{count}} nauja žinutė kanale {{name}}",
+  "groupedChannel_few": "{{count}} naujos žinutės kanale {{name}}",
+  "groupedChannel_many": "{{count}} naujos žinutės kanale {{name}}",
+  "groupedChannel_other": "{{count}} naujų žinučių kanale {{name}}",
+  "groupedPrivate_one": "{{count}} nauja žinutė nuo {{name}}",
+  "groupedPrivate_few": "{{count}} naujos žinutės nuo {{name}}",
+  "groupedPrivate_many": "{{count}} naujos žinutės nuo {{name}}",
+  "groupedPrivate_other": "{{count}} naujų žinučių nuo {{name}}",
+  "image": "Atsiuntė paveikslėlį",
+  "open": "Atidaryti pokalbį",
+  "close": "Atmesti pranešimą",
+  "mentionLine": "{{sender}} paminėjo tave: {{preview}}"
+}

@@ -1,0 +1,10 @@
+{
+  "close": {
+    "title": "Minimér til bakken eller afslut?",
+    "description": "Du er stadig forbundet. Når Mumcord er minimeret, bliver du i voice og appen forbliver i systembakken.",
+    "remember": "Husk mit valg",
+    "minimize": "Minimér til bakken",
+    "quit": "Afslut",
+    "failed": "Det virkede ikke. Prøv igen."
+  }
+}

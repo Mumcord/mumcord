@@ -1,0 +1,70 @@
+{
+  "tree": {
+    "label": "Kanaler",
+    "hint": "Enter: vis chat · Shift+Enter eller dobbeltklik: join · Piletaster: flyt, udvid, skjul",
+    "join": "Join",
+    "you": "(dig)",
+    "voiceHere": "du er her (voice)",
+    "people_one": "{{count}} person",
+    "people_other": "{{count}} personer",
+    "stack": {
+      "some": "{{shown}} af {{total}} personer: {{names}} og {{rest}} flere",
+      "all_one": "{{count}} person: {{names}}",
+      "all_other": "{{count}} personer: {{names}}",
+      "person": "{{name}} ({{status}})"
+    },
+    "showAll": "Vis alle ({{total}})",
+    "showFewer": "Vis færre",
+    "jump": "Hop til min kanal"
+  },
+  "status": {
+    "listening": "lytter",
+    "talking": "taler",
+    "muted": "mikrofon slået fra",
+    "deafened": "lyd slået fra",
+    "serverMuted": "slået fra af serveren",
+    "serverDeafened": "lyd slået fra af serveren",
+    "suppressed": "undertrykt (kan ikke tale her)",
+    "localMuted": "slået fra for dig",
+    "unregistered": "ikke registreret"
+  },
+  "mumcordBadge": "Bruger Mumcord",
+  "statusTip": {
+    "registered": "Registreret på denne server",
+    "listening": "Lytter til denne kanal",
+    "muted": "Mikrofon slået fra",
+    "deafened": "Lyd slået fra",
+    "serverMuted": "Slået fra af serveren",
+    "serverDeafened": "Lyd slået fra af serveren",
+    "suppressed": "Undertrykt – kan ikke tale i denne kanal",
+    "localMuted": "Slået fra for dig",
+    "unregistered": "Ikke registreret på denne server (gæst)",
+    "nowPlaying": "Lytter til {{track}}",
+    "nowGaming": "Spiller {{game}}",
+    "positional": "Positionslyd er aktiv"
+  },
+  "announce": {
+    "joined": "{{name}} kom ind i din kanal",
+    "left": "{{name}} forlod din kanal",
+    "talking": "{{name}} taler"
+  },
+  "errors": {
+    "joinDenied": "Du har ikke adgang til denne kanal.",
+    "joinFailed": "Kunne ikke joine kanalen. Prøv igen.",
+    "notConnected": "Ikke forbundet til en server."
+  },
+  "empty": {
+    "disconnected": "Ikke forbundet. Vælg en server for at se dens kanaler.",
+    "loading": "Indlæser kanaler…"
+  },
+  "search": {
+    "label": "Søg i kanaler og personer",
+    "clear": "Ryd søgning",
+    "empty": "Ingen kanaler eller personer matcher “{{query}}”.",
+    "count": "{{channels}}, {{people}}",
+    "channels_one": "{{count}} kanal",
+    "channels_other": "{{count}} kanaler",
+    "people_one": "{{count}} person",
+    "people_other": "{{count}} personer"
+  }
+}

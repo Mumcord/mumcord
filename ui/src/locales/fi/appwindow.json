@@ -1,0 +1,10 @@
+{
+  "close": {
+    "title": "Pienennetäänkö ilmoitusalueelle vai lopetetaanko?",
+    "description": "Olet yhä yhteydessä. Pienennettynä Mumcord pitää sinut puhekanavalla ja jää ilmoitusalueelle.",
+    "remember": "Muista valintani",
+    "minimize": "Pienennä ilmoitusalueelle",
+    "quit": "Lopeta",
+    "failed": "Se ei onnistunut. Yritä uudelleen."
+  }
+}

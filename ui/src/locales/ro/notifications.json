@@ -1,0 +1,16 @@
+{
+  "region": "Notificări",
+  "channel": "#{{name}}",
+  "unknownChannel": "Un canal",
+  "line": "{{sender}}: {{preview}}",
+  "groupedChannel_one": "{{count}} mesaj nou în {{name}}",
+  "groupedChannel_few": "{{count}} mesaje noi în {{name}}",
+  "groupedChannel_other": "{{count}} de mesaje noi în {{name}}",
+  "groupedPrivate_one": "{{count}} mesaj nou de la {{name}}",
+  "groupedPrivate_few": "{{count}} mesaje noi de la {{name}}",
+  "groupedPrivate_other": "{{count}} de mesaje noi de la {{name}}",
+  "image": "A trimis o imagine",
+  "open": "Deschide chatul",
+  "close": "Închide notificarea",
+  "mentionLine": "{{sender}} te-a menționat: {{preview}}"
+}

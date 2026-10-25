@@ -1,0 +1,33 @@
+{
+  "regions": {
+    "servers": "Servery",
+    "channels": "Kanály",
+    "chat": "Chat",
+    "members": "Členovia",
+    "userPanel": "Tvoj stav"
+  },
+  "skipLinks": {
+    "label": "Rýchle odkazy",
+    "chat": "Prejsť na chat",
+    "channels": "Prejsť na kanály"
+  },
+  "members": {
+    "show": "Zobraziť členov",
+    "hide": "Skryť členov"
+  },
+  "resize": {
+    "channels": "Zmeniť šírku zoznamu kanálov",
+    "members": "Zmeniť šírku zoznamu členov"
+  },
+  "settings": {
+    "title": "Nastavenia"
+  },
+  "wizard": {
+    "title": "Vitaj v Mumcorde"
+  },
+  "placeholder": "Už čoskoro",
+  "startupError": {
+    "title": "Mumcord sa nepodarilo spustiť",
+    "description": "Aplikácia nedokázala načítať tvoje nastavenia. Skús to znova; ak to stále nefunguje, reštartuj Mumcord."
+  }
+}

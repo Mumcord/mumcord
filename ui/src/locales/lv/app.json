@@ -1,0 +1,33 @@
+{
+  "regions": {
+    "servers": "Serveri",
+    "channels": "Kanāli",
+    "chat": "Čats",
+    "members": "Dalībnieki",
+    "userPanel": "Tavs statuss"
+  },
+  "skipLinks": {
+    "label": "Izlaist saites",
+    "chat": "Pāriet uz čatu",
+    "channels": "Pāriet uz kanāliem"
+  },
+  "members": {
+    "show": "Rādīt dalībniekus",
+    "hide": "Slēpt dalībniekus"
+  },
+  "resize": {
+    "channels": "Mainīt kanālu saraksta izmēru",
+    "members": "Mainīt dalībnieku saraksta izmēru"
+  },
+  "settings": {
+    "title": "Iestatījumi"
+  },
+  "wizard": {
+    "title": "Laipni lūdzam Mumcord"
+  },
+  "placeholder": "Drīzumā",
+  "startupError": {
+    "title": "Mumcord neizdevās startēt",
+    "description": "Lietotne nevarēja ielādēt tavus iestatījumus. Mēģini vēlreiz; ja tas turpina neizdoties, restartē Mumcord."
+  }
+}

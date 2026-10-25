@@ -1,0 +1,155 @@
+{
+  "noConversation": "Liga-te a um servidor e escolhe um canal para começar a conversar.",
+  "empty": "Ainda não há mensagens. As mensagens que recebes aqui são guardadas neste computador.",
+  "header": {
+    "channel": "#{{name}}",
+    "channelPrefix": "Canal",
+    "privatePrefix": "Chat privado com",
+    "unknownPerson": "Pessoa desconhecida"
+  },
+  "list": {
+    "today": "Hoje",
+    "yesterday": "Ontem",
+    "label": "Mensagens em {{name}}",
+    "loadOlder": "Carregar mensagens mais antigas",
+    "loading": "A carregar mensagens…",
+    "loadFailed": "Não foi possível carregar as mensagens mais antigas. Desloca para cima para tentar novamente.",
+    "loadEarlier": "Carregar mensagens anteriores",
+    "syncing": "A procurar mensagens anteriores de outros utilizadores do Mumcord…",
+    "syncAdded_one": "{{count}} mensagem anterior adicionada de outros utilizadores do Mumcord.",
+    "syncAdded_many": "{{count}} mensagens anteriores adicionadas de outros utilizadores do Mumcord.",
+    "syncAdded_other": "{{count}} mensagens anteriores adicionadas de outros utilizadores do Mumcord.",
+    "syncNone": "Não foram encontradas mensagens anteriores.",
+    "syncFailed": "Não é possível carregar aqui as mensagens anteriores.",
+    "syncedFrom": "do histórico de {{name}}",
+    "jumpToNewest": "Ir para as mais recentes",
+    "jumpToNewestUnseen_one": "Ir para as mais recentes, {{count}} mensagem nova",
+    "jumpToNewestUnseen_many": "Ir para as mais recentes, {{count}} mensagens novas",
+    "jumpToNewestUnseen_other": "Ir para as mais recentes, {{count}} mensagens novas"
+  },
+  "format": {
+    "toolbar": "Formatação",
+    "bold": "Negrito",
+    "italic": "Itálico",
+    "strike": "Rasurado",
+    "code": "Código em linha",
+    "codeBlock": "Bloco de código",
+    "link": "Ligação"
+  },
+  "composer": {
+    "label": "Mensagem para {{name}}",
+    "hint": "Prime Enter para enviar e Shift+Enter para uma nova linha. Markdown funciona: **negrito**, *itálico*, `código`, [ligação](https://…).",
+    "addImage": "Adicionar imagem",
+    "removeImage": "Remover imagem {{name}}",
+    "imagePreview": "Imagem a enviar: {{name}}",
+    "send": "Enviar",
+    "noPermission": "Não tens permissão para escrever neste canal.",
+    "unavailable": "Este canal já não está disponível.",
+    "offline": "{{name}} está offline. Podes voltar a escrever quando a pessoa regressar.",
+    "unnamedImage": "Imagem colada"
+  },
+  "tray": {
+    "label": "Imagens a enviar",
+    "processing": "A preparar imagem",
+    "scaled": "Redimensionada para {{width}}×{{height}} para respeitar o limite do servidor"
+  },
+  "errors": {
+    "tooLong": "A tua mensagem é demasiado longa para este servidor (no máximo {{max}} carateres). Encurta-a e tenta novamente.",
+    "tooLongNoLimit": "A tua mensagem é demasiado longa para este servidor. Encurta-a e tenta novamente.",
+    "imageTooLarge": "Esta imagem é demasiado grande para este servidor, mesmo depois de comprimida. Tenta uma imagem mais pequena.",
+    "imageWithTextTooLong": "A mensagem com a imagem é demasiado grande para este servidor. Encurta o texto ou remove a imagem.",
+    "imagesNotAllowed": "Este servidor não permite imagens nas mensagens.",
+    "notImage": "Não é possível enviar este ficheiro. Usa uma imagem PNG, JPEG, GIF ou WebP.",
+    "imageUnreadable": "Não foi possível ler a imagem. Tenta outro ficheiro.",
+    "denied": "O servidor não permitiu esta mensagem.",
+    "deniedWithReason": "O servidor não permitiu esta mensagem: {{reason}}",
+    "notConnected": "Não estás ligado. Volta a ligar-te e tenta novamente.",
+    "generic": "Não foi possível enviar a mensagem. Tenta novamente.",
+    "onlyImages": "Só é possível enviar imagens.",
+    "sourceTooLarge": "Este ficheiro é demasiado grande para enviar (mais de 25 MB)."
+  },
+  "announce": {
+    "message": "{{name}}: {{text}}",
+    "image": "{{name}} enviou uma imagem",
+    "more_one": "mais {{count}} mensagem nova",
+    "more_many": "mais {{count}} mensagens novas",
+    "more_other": "mais {{count}} mensagens novas"
+  },
+  "pinned": {
+    "label": "Informações do canal",
+    "showMore": "Mostrar mais",
+    "showLess": "Mostrar menos"
+  },
+  "mention": {
+    "list": "Pessoas que podes mencionar",
+    "found_one": "{{count}} pessoa sugerida. Usa as setas e depois Enter para inserir.",
+    "found_many": "{{count}} pessoas sugeridas. Usa as setas e depois Enter para inserir.",
+    "found_other": "{{count}} pessoas sugeridas. Usa as setas e depois Enter para inserir.",
+    "none": "Ninguém encontrado",
+    "mentionsYou": "Menciona-te",
+    "chipLabel": "{{name}}, menção"
+  },
+  "preview": {
+    "open": "Abrir no navegador",
+    "openLabel": "Abrir {{title}} no navegador",
+    "play": "Reproduzir {{title}}",
+    "player": "Leitor de vídeo: {{title}}",
+    "videoTitle": "Vídeo de {{site}}",
+    "spotifyTitle": "Ligação de {{site}}",
+    "audioPlayer": "Leitor do Spotify: {{title}}",
+    "kind": {
+      "track": "Faixa",
+      "album": "Álbum",
+      "playlist": "Lista de reprodução",
+      "artist": "Artista",
+      "episode": "Episódio",
+      "show": "Programa"
+    },
+    "inBrowser": "Reproduz no teu navegador",
+    "card": "Pré-visualização da ligação: {{title}}",
+    "dismiss": "Ocultar pré-visualização"
+  },
+  "image": {
+    "loading": "A carregar imagem {{name}}",
+    "label": "Imagem: {{name}}",
+    "view": "Ver imagem {{name}}",
+    "viewMessage": "Imagem de {{name}}, abrir no visualizador",
+    "failed": "Não é possível mostrar a imagem (demasiado grande ou indisponível)."
+  },
+  "viewer": {
+    "label": "Visualizador de imagens",
+    "counter": "{{current}} / {{total}}",
+    "zoomIn": "Aumentar zoom",
+    "zoomOut": "Diminuir zoom",
+    "fit": "Ajustar à janela",
+    "save": "Guardar imagem",
+    "saved": "Imagem guardada",
+    "saveFailed": "Não foi possível guardar a imagem",
+    "fileFilter": "Imagem",
+    "openInBrowser": "Abrir no navegador",
+    "close": "Fechar",
+    "previous": "Imagem anterior",
+    "next": "Imagem seguinte",
+    "unnamed": "imagem",
+    "fullLoading": "A carregar em tamanho original…",
+    "fullProgress": "A carregar em tamanho original… {{percent}} %",
+    "fullUnavailable": "Tamanho original indisponível – a mostrar a pré-visualização"
+  },
+  "favorites": {
+    "open": "GIFs favoritos",
+    "title": "GIFs favoritos",
+    "save": "Guardar como favorito",
+    "remove": "Remover dos favoritos",
+    "removeNamed": "Remover {{name}} dos favoritos",
+    "send": "Enviar {{name}}",
+    "hint": "As setas movem, Enter envia, Delete remove, Escape fecha.",
+    "empty": "Ainda não há favoritos. Clica com o botão direito num GIF no chat, ou usa a estrela nele, e escolhe \"Guardar como favorito\". Vai aparecer aqui."
+  },
+  "imageMenu": {
+    "label": "Imagem {{name}}"
+  },
+  "attribution": {
+    "via": "via {{brand}}",
+    "view": "Ver em {{brand}}"
+  }
+}

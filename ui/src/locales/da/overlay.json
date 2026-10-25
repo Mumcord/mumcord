@@ -1,0 +1,12 @@
+{
+  "listLabel": "Taler nu",
+  "move": {
+    "hint": "Træk for at flytte overlayet",
+    "done": "Færdig"
+  },
+  "limits": {
+    "wayland": "På dette Wayland-skrivebord kan apps ikke holde et vindue øverst eller vælge, hvor det vises, så overlayet kan havne bag andre vinduer, og hjørnepositioner har ingen effekt. Slå “Kompatibilitetstilstand (som TeamSpeak)” til i Voice-indstillingerne, og genstart Mumcord: så bliver overlayet øverst.",
+    "waylandKde": "På KDE Plasma med Wayland kan apps ikke holde et vindue øverst eller vælge, hvor det vises. Der er to løsninger: lad Mumcord tilføje en KDE-vinduesregel til overlayet (“Sæt op automatisk”), eller slå “Kompatibilitetstilstand (som TeamSpeak)” til i Voice-indstillingerne og genstart Mumcord.",
+    "exclusiveFullscreen": "Overlayet vises over spil i vindue og i borderless fuldskærm. Spil i eksklusiv fuldskærm tegner over alle vinduer, så skift dem til “borderless” eller “vindue i fuldskærm” for at se overlayet."
+  }
+}

@@ -1,0 +1,63 @@
+{
+  "follow": "Sekti",
+  "following": "Sekama",
+  "unsupported": "Kanalų sekimui reikalingas 1.4 ar naujesnės versijos serveris.",
+  "unread_one": "{{count}} neskaityta žinutė",
+  "unread_few": "{{count}} neskaitytos žinutės",
+  "unread_many": "{{count}} neskaitytos žinutės",
+  "unread_other": "{{count}} neskaitytų žinučių",
+  "errors": {
+    "denied": "Serveris neleidžia tau sekti šio kanalo.",
+    "limit": "Šiame serveryje daugiau kanalų sekti negali. Pirmiausia nustok sekti kitą kanalą.",
+    "tooOld": "Šis serveris per senas kanalų sekimui (reikia 1.4 ar naujesnės versijos).",
+    "notConnected": "Neprisijungta prie serverio.",
+    "generic": "Nepavyko sekti šio kanalo. Bandyk dar kartą."
+  },
+  "dm": {
+    "title": "Tiesioginės žinutės",
+    "unknown": "Nežinomas žmogus"
+  },
+  "notify": {
+    "channel": "{{name}} kanale {{channel}}: {{text}}",
+    "private": "{{name}} (privati): {{text}}",
+    "more_one": "dar {{count}} nauja žinutė",
+    "more_few": "dar {{count}} naujos žinutės",
+    "more_many": "dar {{count}} naujos žinutės",
+    "more_other": "dar {{count}} naujų žinučių"
+  },
+  "history": {
+    "clear": "Išvalyti istoriją",
+    "title": "Išvalyti istoriją?",
+    "body": "Tai visam laikui ištrins išsaugotas šio pokalbio žinutes iš šio kompiuterio. Kiti žmonės savo kopijas pasilieka.",
+    "confirm": "Išvalyti istoriją",
+    "cancel": "Atšaukti",
+    "failed": "Nepavyko išvalyti istorijos. Bandyk dar kartą."
+  },
+  "star": {
+    "follow": "Sekti kanalą {{channel}}",
+    "unfollow": "Nustoti sekti kanalą {{channel}}"
+  },
+  "all": {
+    "menu": "Serverio parinktys: {{server}}",
+    "menuLabel": "Serverio parinktys",
+    "follow": "Sekti visus kanalus",
+    "unfollow": "Nustoti sekti visus kanalus",
+    "working": "Seka kanalus…",
+    "followed_one": "Pradėta sekti {{count}} kanalą.",
+    "followed_few": "Pradėta sekti {{count}} kanalus.",
+    "followed_many": "Pradėta sekti {{count}} kanalo.",
+    "followed_other": "Pradėta sekti {{count}} kanalų.",
+    "skipped_one": "{{count}} praleistas: {{reasons}}.",
+    "skipped_few": "{{count}} praleisti: {{reasons}}.",
+    "skipped_many": "{{count}} praleisti: {{reasons}}.",
+    "skipped_other": "{{count}} praleista: {{reasons}}.",
+    "limit": "pasiekta riba",
+    "notAllowed": "neleidžiama",
+    "noAnswer": "serveris neatsakė",
+    "unfollowed": "Nustota sekti visus kanalus.",
+    "failed": "Nepavyko sekti visų kanalų. Bandyk dar kartą.",
+    "dismiss": "Atmesti",
+    "unfollowFailed": "Nepavyko nustoti sekti visų kanalų. Bandyk dar kartą."
+  },
+  "mention": "yra tavo paminėjimas"
+}

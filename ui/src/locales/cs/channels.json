@@ -1,0 +1,78 @@
+{
+  "tree": {
+    "label": "Kanály",
+    "hint": "Enter: zobrazit chat · Shift+Enter nebo dvojklik: připojit se · Šipky: pohyb, rozbalit, sbalit",
+    "join": "Připojit se",
+    "you": "(ty)",
+    "voiceHere": "jsi tady (hlas)",
+    "people_one": "{{count}} osoba",
+    "people_few": "{{count}} osoby",
+    "people_many": "{{count}} osob",
+    "people_other": "{{count}} osob",
+    "stack": {
+      "some": "{{shown}} z {{total}} osob: {{names}} a dalších {{rest}}",
+      "all_one": "{{count}} osoba: {{names}}",
+      "all_few": "{{count}} osoby: {{names}}",
+      "all_many": "{{count}} osob: {{names}}",
+      "all_other": "{{count}} osob: {{names}}",
+      "person": "{{name}} ({{status}})"
+    },
+    "showAll": "Zobrazit vše ({{total}})",
+    "showFewer": "Zobrazit méně",
+    "jump": "Přejít na můj kanál"
+  },
+  "status": {
+    "listening": "poslouchá",
+    "talking": "mluví",
+    "muted": "ztlumený mikrofon",
+    "deafened": "ztlumený zvuk",
+    "serverMuted": "mikrofon ztlumen serverem",
+    "serverDeafened": "zvuk ztlumen serverem",
+    "suppressed": "potlačen (tady nemůže mluvit)",
+    "localMuted": "ztlumen pro tebe",
+    "unregistered": "neregistrovaný"
+  },
+  "mumcordBadge": "Používá Mumcord",
+  "statusTip": {
+    "registered": "Registrovaný na tomto serveru",
+    "listening": "Poslouchá tento kanál",
+    "muted": "Ztlumený mikrofon",
+    "deafened": "Ztlumený zvuk",
+    "serverMuted": "Mikrofon ztlumen serverem",
+    "serverDeafened": "Zvuk ztlumen serverem",
+    "suppressed": "Potlačen – v tomto kanálu nemůže mluvit",
+    "localMuted": "Ztlumen pro tebe",
+    "unregistered": "Neregistrovaný na tomto serveru (host)",
+    "nowPlaying": "Poslouchá {{track}}",
+    "nowGaming": "Hraje {{game}}",
+    "positional": "Poziční zvuk aktivní"
+  },
+  "announce": {
+    "joined": "{{name}} se připojil(a) do tvého kanálu",
+    "left": "{{name}} opustil(a) tvůj kanál",
+    "talking": "{{name}} mluví"
+  },
+  "errors": {
+    "joinDenied": "Do tohoto kanálu nemáš povolený vstup.",
+    "joinFailed": "Nepodařilo se připojit do kanálu. Zkus to prosím znovu.",
+    "notConnected": "Nejsi připojen k serveru."
+  },
+  "empty": {
+    "disconnected": "Nepřipojeno. Vyber server, abys viděl jeho kanály.",
+    "loading": "Načítání kanálů…"
+  },
+  "search": {
+    "label": "Hledat kanály a lidi",
+    "clear": "Vymazat hledání",
+    "empty": "Hledání „{{query}}“ neodpovídají žádné kanály ani lidé.",
+    "count": "{{channels}}, {{people}}",
+    "channels_one": "{{count}} kanál",
+    "channels_few": "{{count}} kanály",
+    "channels_many": "{{count}} kanálů",
+    "channels_other": "{{count}} kanálů",
+    "people_one": "{{count}} osoba",
+    "people_few": "{{count}} osoby",
+    "people_many": "{{count}} osob",
+    "people_other": "{{count}} osob"
+  }
+}

@@ -1,0 +1,88 @@
+{
+  "unknownName": "Vous",
+  "mute": "Couper le micro",
+  "deafen": "Couper le son",
+  "disconnect": "Se déconnecter de {{server}}",
+  "settings": "Réglages rapides",
+  "announce": {
+    "muted": "Micro coupé",
+    "unmuted": "Micro réactivé",
+    "deafened": "Son coupé. Vous n’entendez pas les autres et votre micro est coupé",
+    "undeafened": "Son réactivé"
+  },
+  "readOnly": {
+    "text": "Vous suivez en lecture seule – rejoignez un canal pour parler.",
+    "join": "Rejoindre {{channel}}"
+  },
+  "status": {
+    "connecting": "Connexion…",
+    "reconnecting": "Reconnexion…",
+    "connected": "Connecté",
+    "readOnly": "Lecture seule",
+    "disconnected": "Non connecté",
+    "playing": "Joue à {{game}}",
+    "listening": "Écoute {{track}}"
+  },
+  "profile": {
+    "title": "Modifier le profil",
+    "chooseTitle": "Choisir une photo de profil",
+    "chooseAvatar": "Choisir une image…",
+    "removeAvatar": "Supprimer l’image",
+    "avatarHint": "L’image est réduite pour respecter la limite du serveur.",
+    "avatarUnregistered": "Ce serveur ne conserve les avatars que pour les utilisateurs enregistrés – Mumcord renvoie le vôtre à chaque connexion.",
+    "avatarChosen": "Sélectionnée : {{name}}",
+    "avatarRemoved": "L’image sera supprimée lorsque vous enregistrerez.",
+    "comment": "À propos de vous"
+  },
+  "register": {
+    "title": "S’enregistrer sur ce serveur",
+    "explain": "L’enregistrement réserve votre nom sur ce serveur. Personne d’autre ne pourra l’utiliser, et le serveur se souviendra de vous à votre prochaine connexion.",
+    "backup": "Votre identité prouve que ce nom est le vôtre. Si vous la perdez, vous perdez l’accès au nom enregistré. Enregistrez une copie de sauvegarde dès maintenant et conservez-la en lieu sûr.",
+    "password": "Mot de passe du fichier de sauvegarde",
+    "export": "Exporter l’identité",
+    "saveTitle": "Enregistrer la sauvegarde de l’identité",
+    "passwordRequired": "Saisissez un mot de passe pour protéger le fichier de sauvegarde.",
+    "exported": "Sauvegarde de l’identité enregistrée.",
+    "confirm": "S’enregistrer",
+    "done": "Enregistré sur ce serveur"
+  },
+  "errors": {
+    "tooLarge": "C’est trop volumineux pour le serveur. Choisissez une image plus petite ou écrivez un texte plus court.",
+    "denied": "Le serveur ne l’autorise pas.",
+    "deniedWithReason": "Le serveur ne l’autorise pas : {{reason}}",
+    "notConnected": "Vous n’êtes pas connecté à un serveur.",
+    "file": "Le fichier n’a pas pu être lu ou écrit.",
+    "generic": "Une erreur s’est produite. Veuillez réessayer."
+  },
+  "ptt": "Push-to-talk : maintenez {{key}} pour parler",
+  "pttNoKey": "Push-to-talk : aucune touche définie",
+  "quickSettings": {
+    "linkPreviews": "Aperçus et intégrations de liens",
+    "linkPreviewsHint": "Les sites voient votre adresse IP",
+    "nowPlaying": "Partager ce que j’écoute",
+    "nowPlayingHint": "Les autres voient votre titre en cours",
+    "unsupported": "Non disponible sur macOS",
+    "theme": "Thème",
+    "theme_system": "Système",
+    "theme_dark": "Sombre",
+    "theme_light": "Clair",
+    "nowGaming": "Partager le jeu auquel je joue",
+    "nowGamingHint": "Les autres voient votre jeu en cours",
+    "unavailable": "Non disponible sur ce système",
+    "overlay": "Overlay",
+    "overlayHint": "Affiche qui parle par-dessus les jeux",
+    "editProfile": "Modifier le profil",
+    "editProfileHint": "Nom, avatar et commentaire",
+    "register": "S’enregistrer sur ce serveur",
+    "registered": "Enregistré sur ce serveur ✓",
+    "registerHint": "Conserve votre nom et votre avatar sur ce serveur",
+    "allSettings": "Tous les paramètres…",
+    "label": "Réglages rapides",
+    "positional": "Audio positionnel",
+    "positionalHint": "Voix placées en 3D autour de vous",
+    "offerImages": "Proposer les images en taille réelle",
+    "offerImagesHint": "Permet aux autres de charger vos images originales",
+    "loadImages": "Charger les images en taille réelle",
+    "loadImagesHint": "Récupère les images originales des autres"
+  }
+}

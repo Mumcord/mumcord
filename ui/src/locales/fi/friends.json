@@ -1,0 +1,14 @@
+{
+  "title": "Kaverit",
+  "item": "{{name}}, {{status}}",
+  "online": "Paikalla",
+  "onlineIn": "Paikalla kanavalla {{channel}}",
+  "offline": "Poissa",
+  "lastSeen": "Poissa, nähty viimeksi {{when}}",
+  "friend": "Kaveri",
+  "friendHint": "Näyttää, milloin hän on paikalla, ja säilyttää yksityisen chattinne.",
+  "noCertificate": "Ilman varmennetta olevat henkilöt eivät voi olla kavereita, koska Mumcord ei tunnistaisi heitä uudelleen.",
+  "add": "Lisää kaveri",
+  "remove": "Poista kaveri",
+  "failed": "Kaverin muuttaminen ei onnistunut. Yritä uudelleen."
+}

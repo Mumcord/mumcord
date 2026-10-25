@@ -1,0 +1,61 @@
+{
+  "inChannel_one": "Στο {{channel}} ({{count}})",
+  "inChannel_other": "Στο {{channel}} ({{count}})",
+  "listening_one": "Ακούν ({{count}})",
+  "listening_other": "Ακούν ({{count}})",
+  "noChannel": "Διάλεξε ένα κανάλι για να δεις ποιος είναι μέσα.",
+  "nobody": "Δεν υπάρχει κανείς εδώ.",
+  "you": "(εσύ)",
+  "registered": "Εγγεγραμμένος",
+  "unregistered": "Μη εγγεγραμμένος",
+  "talking": "Μιλά",
+  "card": {
+    "close": "Κλείσιμο",
+    "loadFailed": "Το προφίλ δεν μπόρεσε να φορτωθεί.",
+    "volume": "Ένταση",
+    "volumeValue": "{{value}} %",
+    "localMute": "Σίγαση για μένα",
+    "sessionOnly": "Αυτό το άτομο δεν έχει πιστοποιητικό, οπότε αυτές οι ρυθμίσεις ισχύουν μόνο για αυτή τη συνεδρία.",
+    "sendPrivateMessage": "Αποστολή ιδιωτικού μηνύματος",
+    "privateMessage": "Ιδιωτικό μήνυμα",
+    "localSettings": "Οι ρυθμίσεις σου",
+    "localSettingsHint": "Τις βλέπεις μόνο εσύ. Οι αλλαγές αποθηκεύονται αμέσως.",
+    "localMuteHint": "Δεν θα ακούς αυτό το άτομο.",
+    "privateNote": "Ιδιωτική σημείωση",
+    "privateNoteHint": "Μόνο εσύ βλέπεις αυτή τη σημείωση.",
+    "saved": "Αποθηκεύτηκε"
+  },
+  "errors": {
+    "notConnected": "Δεν είσαι συνδεδεμένος σε διακομιστή.",
+    "generic": "Δεν λειτούργησε. Δοκίμασε ξανά."
+  },
+  "menu": {
+    "label": "Ενέργειες για τον/την {{name}}",
+    "viewProfile": "Προβολή προφίλ",
+    "mute": "Σίγαση για μένα"
+  },
+  "nowPlaying": {
+    "label": "Παίζει τώρα",
+    "listening": "Ακούει",
+    "paused": "Σε παύση",
+    "progress": "Πρόοδος αναπαραγωγής",
+    "position": "{{position}} από {{duration}}"
+  },
+  "nowGaming": {
+    "label": "Παίζει παιχνίδι",
+    "playing": "Παίζει",
+    "playedFor": "για {{time}}",
+    "hoursMinutes": "{{hours}} ω {{minutes}} λ",
+    "minutes_one": "{{count}} λ",
+    "minutes_other": "{{count}} λ",
+    "join": "Συμμετοχή στο παιχνίδι",
+    "joinTitle": "Συμμετοχή στο παιχνίδι;",
+    "joinMessage": "Το Steam θα ανοίξει και θα συνδεθεί στον διακομιστή όπου αυτό το άτομο παίζει {{game}}. Συνδέσου μόνο σε διακομιστές που εμπιστεύεσαι.",
+    "joinConfirm": "Άνοιγμα Steam",
+    "joinFailed": "Το Steam δεν μπόρεσε να ανοίξει."
+  },
+  "preview": {
+    "privateMessage": "Ιδιωτικό μήνυμα",
+    "fullProfile": "Πλήρες προφίλ"
+  }
+}

@@ -1,0 +1,159 @@
+{
+  "noConversation": "Připoj se k serveru a vyber kanál, abys mohl chatovat.",
+  "empty": "Zatím žádné zprávy. Zprávy, které tu dostaneš, se ukládají na tomto počítači.",
+  "header": {
+    "channel": "#{{name}}",
+    "channelPrefix": "Kanál",
+    "privatePrefix": "Soukromý chat s",
+    "unknownPerson": "Neznámá osoba"
+  },
+  "list": {
+    "today": "Dnes",
+    "yesterday": "Včera",
+    "label": "Zprávy v {{name}}",
+    "loadOlder": "Načíst starší zprávy",
+    "loading": "Načítání zpráv…",
+    "loadFailed": "Starší zprávy se nepodařilo načíst. Posuň se nahoru a zkus to znovu.",
+    "loadEarlier": "Načíst dřívější zprávy",
+    "syncing": "Hledám dřívější zprávy u ostatních uživatelů Mumcordu…",
+    "syncAdded_one": "Přidána {{count}} dřívější zpráva od ostatních uživatelů Mumcordu.",
+    "syncAdded_few": "Přidány {{count}} dřívější zprávy od ostatních uživatelů Mumcordu.",
+    "syncAdded_many": "Přidáno {{count}} dřívějších zpráv od ostatních uživatelů Mumcordu.",
+    "syncAdded_other": "Přidáno {{count}} dřívějších zpráv od ostatních uživatelů Mumcordu.",
+    "syncNone": "Žádné dřívější zprávy nebyly nalezeny.",
+    "syncFailed": "Dřívější zprávy tu nelze načíst.",
+    "syncedFrom": "z historie uživatele {{name}}",
+    "jumpToNewest": "Přejít na nejnovější",
+    "jumpToNewestUnseen_one": "Přejít na nejnovější, {{count}} nová zpráva",
+    "jumpToNewestUnseen_few": "Přejít na nejnovější, {{count}} nové zprávy",
+    "jumpToNewestUnseen_many": "Přejít na nejnovější, {{count}} nových zpráv",
+    "jumpToNewestUnseen_other": "Přejít na nejnovější, {{count}} nových zpráv"
+  },
+  "format": {
+    "toolbar": "Formátování",
+    "bold": "Tučně",
+    "italic": "Kurzíva",
+    "strike": "Přeškrtnutí",
+    "code": "Kód v textu",
+    "codeBlock": "Blok kódu",
+    "link": "Odkaz"
+  },
+  "composer": {
+    "label": "Zpráva pro {{name}}",
+    "hint": "Enter odešle, Shift+Enter vloží nový řádek. Funguje Markdown: **tučně**, *kurzíva*, `kód`, [odkaz](https://…).",
+    "addImage": "Přidat obrázek",
+    "removeImage": "Odebrat obrázek {{name}}",
+    "imagePreview": "Obrázek k odeslání: {{name}}",
+    "send": "Odeslat",
+    "noPermission": "Nemáš oprávnění psát do tohoto kanálu.",
+    "unavailable": "Tento kanál už není k dispozici.",
+    "offline": "{{name}} je offline. Psát můžeš znovu, až bude zpátky.",
+    "unnamedImage": "Vložený obrázek"
+  },
+  "tray": {
+    "label": "Obrázky k odeslání",
+    "processing": "Připravuji obrázek",
+    "scaled": "Zmenšeno na {{width}}×{{height}} kvůli limitu serveru"
+  },
+  "errors": {
+    "tooLong": "Tvoje zpráva je pro tento server příliš dlouhá (nejvýš {{max}} znaků). Zkrať ji a zkus to znovu.",
+    "tooLongNoLimit": "Tvoje zpráva je pro tento server příliš dlouhá. Zkrať ji a zkus to znovu.",
+    "imageTooLarge": "Tento obrázek je pro tento server příliš velký, i po komprimaci. Zkus menší obrázek.",
+    "imageWithTextTooLong": "Zpráva s obrázkem je pro tento server příliš velká. Zkrať text nebo odeber obrázek.",
+    "imagesNotAllowed": "Tento server nepovoluje obrázky ve zprávách.",
+    "notImage": "Tento soubor nelze odeslat. Použij obrázek PNG, JPEG, GIF nebo WebP.",
+    "imageUnreadable": "Obrázek se nepodařilo přečíst. Zkus jiný soubor.",
+    "denied": "Server tuto zprávu nepovolil.",
+    "deniedWithReason": "Server tuto zprávu nepovolil: {{reason}}",
+    "notConnected": "Nejsi připojen. Připoj se znovu a zkus to ještě jednou.",
+    "generic": "Zprávu se nepodařilo odeslat. Zkus to znovu.",
+    "onlyImages": "Odeslat lze jen obrázky.",
+    "sourceTooLarge": "Tento soubor je na odeslání příliš velký (přes 25 MB)."
+  },
+  "announce": {
+    "message": "{{name}}: {{text}}",
+    "image": "{{name}} poslal(a) obrázek",
+    "more_one": "{{count}} další nová zpráva",
+    "more_few": "{{count}} další nové zprávy",
+    "more_many": "{{count}} dalších nových zpráv",
+    "more_other": "{{count}} dalších nových zpráv"
+  },
+  "pinned": {
+    "label": "Informace o kanálu",
+    "showMore": "Zobrazit více",
+    "showLess": "Zobrazit méně"
+  },
+  "mention": {
+    "list": "Lidé, které lze zmínit",
+    "found_one": "Navržena {{count}} osoba. Vyber šipkami a vlož klávesou Enter.",
+    "found_few": "Navrženy {{count}} osoby. Vyber šipkami a vlož klávesou Enter.",
+    "found_many": "Navrženo {{count}} osob. Vyber šipkami a vlož klávesou Enter.",
+    "found_other": "Navrženo {{count}} osob. Vyber šipkami a vlož klávesou Enter.",
+    "none": "Nikdo nenalezen",
+    "mentionsYou": "Zmiňuje tě",
+    "chipLabel": "{{name}}, zmínka"
+  },
+  "preview": {
+    "open": "Otevřít v prohlížeči",
+    "openLabel": "Otevřít {{title}} v prohlížeči",
+    "play": "Přehrát {{title}}",
+    "player": "Přehrávač videa: {{title}}",
+    "videoTitle": "Video z {{site}}",
+    "spotifyTitle": "Odkaz na {{site}}",
+    "audioPlayer": "Přehrávač Spotify: {{title}}",
+    "kind": {
+      "track": "Skladba",
+      "album": "Album",
+      "playlist": "Playlist",
+      "artist": "Interpret",
+      "episode": "Epizoda",
+      "show": "Pořad"
+    },
+    "inBrowser": "Přehraje se v prohlížeči",
+    "card": "Náhled odkazu: {{title}}",
+    "dismiss": "Skrýt náhled"
+  },
+  "image": {
+    "loading": "Načítání obrázku {{name}}",
+    "label": "Obrázek: {{name}}",
+    "view": "Zobrazit obrázek {{name}}",
+    "viewMessage": "Obrázek od {{name}}, otevřít v prohlížeči obrázků",
+    "failed": "Obrázek nelze zobrazit (je příliš velký nebo nedostupný)."
+  },
+  "viewer": {
+    "label": "Prohlížeč obrázků",
+    "counter": "{{current}} / {{total}}",
+    "zoomIn": "Přiblížit",
+    "zoomOut": "Oddálit",
+    "fit": "Přizpůsobit oknu",
+    "save": "Uložit obrázek",
+    "saved": "Obrázek uložen",
+    "saveFailed": "Obrázek se nepodařilo uložit",
+    "fileFilter": "Obrázek",
+    "openInBrowser": "Otevřít v prohlížeči",
+    "close": "Zavřít",
+    "previous": "Předchozí obrázek",
+    "next": "Další obrázek",
+    "unnamed": "obrazek",
+    "fullLoading": "Načítání plné velikosti…",
+    "fullProgress": "Načítání plné velikosti… {{percent}} %",
+    "fullUnavailable": "Plná velikost není k dispozici – zobrazuje se náhled"
+  },
+  "favorites": {
+    "open": "Oblíbené GIFy",
+    "title": "Oblíbené GIFy",
+    "save": "Uložit do oblíbených",
+    "remove": "Odebrat z oblíbených",
+    "removeNamed": "Odebrat {{name}} z oblíbených",
+    "send": "Odeslat {{name}}",
+    "hint": "Šipky pro pohyb, Enter odešle, Delete odebere, Escape zavře.",
+    "empty": "Zatím žádné oblíbené. Klikni pravým tlačítkem na GIF v chatu nebo na něm použij hvězdičku a zvol „Uložit do oblíbených“. Pak se objeví tady."
+  },
+  "imageMenu": {
+    "label": "Obrázek {{name}}"
+  },
+  "attribution": {
+    "via": "přes {{brand}}",
+    "view": "Zobrazit na {{brand}}"
+  }
+}

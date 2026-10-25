@@ -1,0 +1,61 @@
+{
+  "inChannel_one": "В {{channel}} ({{count}})",
+  "inChannel_other": "В {{channel}} ({{count}})",
+  "listening_one": "Слушат ({{count}})",
+  "listening_other": "Слушат ({{count}})",
+  "noChannel": "Избери канал, за да видиш кой е в него.",
+  "nobody": "Тук няма никой.",
+  "you": "(ти)",
+  "registered": "Регистриран",
+  "unregistered": "Нерегистриран",
+  "talking": "Говори",
+  "card": {
+    "close": "Затвори",
+    "loadFailed": "Профилът не можа да се зареди.",
+    "volume": "Сила на звука",
+    "volumeValue": "{{value}} %",
+    "localMute": "Заглуши за мен",
+    "sessionOnly": "Този човек няма сертификат, затова тези настройки важат само за тази сесия.",
+    "sendPrivateMessage": "Изпрати лично съобщение",
+    "privateMessage": "Лично съобщение",
+    "localSettings": "Твоите настройки",
+    "localSettingsHint": "Само ти ги виждаш. Промените се запазват веднага.",
+    "localMuteHint": "Няма да чуваш този човек.",
+    "privateNote": "Лична бележка",
+    "privateNoteHint": "Само ти виждаш тази бележка.",
+    "saved": "Запазено"
+  },
+  "errors": {
+    "notConnected": "Не си свързан със сървър.",
+    "generic": "Не се получи. Опитай отново."
+  },
+  "menu": {
+    "label": "Действия за {{name}}",
+    "viewProfile": "Виж профила",
+    "mute": "Заглуши за мен"
+  },
+  "nowPlaying": {
+    "label": "Слуша сега",
+    "listening": "Слуша",
+    "paused": "На пауза",
+    "progress": "Напредък на възпроизвеждането",
+    "position": "{{position}} от {{duration}}"
+  },
+  "nowGaming": {
+    "label": "Играе сега",
+    "playing": "Играе",
+    "playedFor": "от {{time}}",
+    "hoursMinutes": "{{hours}} ч {{minutes}} мин",
+    "minutes_one": "{{count}} мин",
+    "minutes_other": "{{count}} мин",
+    "join": "Влез в играта",
+    "joinTitle": "Да влезеш ли в играта?",
+    "joinMessage": "Steam ще се отвори и ще се свърже със сървъра, на който този човек играе {{game}}. Влизай само в сървъри, на които вярваш.",
+    "joinConfirm": "Отвори Steam",
+    "joinFailed": "Steam не можа да се отвори."
+  },
+  "preview": {
+    "privateMessage": "Лично съобщение",
+    "fullProfile": "Пълен профил"
+  }
+}

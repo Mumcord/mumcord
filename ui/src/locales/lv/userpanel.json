@@ -1,0 +1,88 @@
+{
+  "unknownName": "Tu",
+  "mute": "Izslēgt mikrofonu",
+  "deafen": "Izslēgt skaņu",
+  "disconnect": "Atvienoties no {{server}}",
+  "settings": "Ātrie iestatījumi",
+  "announce": {
+    "muted": "Mikrofons izslēgts",
+    "unmuted": "Mikrofons ieslēgts",
+    "deafened": "Skaņa izslēgta. Tu nedzirdi citus, un tavs mikrofons ir izslēgts",
+    "undeafened": "Skaņa ieslēgta"
+  },
+  "readOnly": {
+    "text": "Tu tikai lasi – pievienojies kanālam, lai runātu.",
+    "join": "Pievienoties {{channel}}"
+  },
+  "status": {
+    "connecting": "Savienojas…",
+    "reconnecting": "Atjauno savienojumu…",
+    "connected": "Savienots",
+    "readOnly": "Tikai lasīšana",
+    "disconnected": "Nav savienots",
+    "playing": "Spēlē {{game}}",
+    "listening": "Klausās {{track}}"
+  },
+  "profile": {
+    "title": "Rediģēt profilu",
+    "chooseTitle": "Izvēlies profila attēlu",
+    "chooseAvatar": "Izvēlēties attēlu…",
+    "removeAvatar": "Noņemt attēlu",
+    "avatarHint": "Attēls tiek samazināts, lai atbilstu servera ierobežojumam.",
+    "avatarUnregistered": "Šis serveris glabā avatarus tikai reģistrētiem lietotājiem – Mumcord nosūta tavu atkārtoti katrā savienojumā.",
+    "avatarChosen": "Izvēlēts: {{name}}",
+    "avatarRemoved": "Attēls tiks noņemts, kad saglabāsi.",
+    "comment": "Par tevi"
+  },
+  "register": {
+    "title": "Reģistrēties šajā serverī",
+    "explain": "Reģistrācija rezervē tavu vārdu šajā serverī. Neviens cits to nevarēs izmantot, un serveris atcerēsies tevi nākamreiz, kad savienosies.",
+    "backup": "Tava identitāte pierāda, ka vārds pieder tev. Ja to pazaudēsi, zaudēsi piekļuvi reģistrētajam vārdam. Saglabā rezerves kopiju tagad un glabā to drošībā.",
+    "password": "Rezerves faila parole",
+    "export": "Eksportēt identitāti",
+    "saveTitle": "Saglabāt identitātes rezerves kopiju",
+    "passwordRequired": "Ievadi paroli, lai aizsargātu rezerves failu.",
+    "exported": "Identitātes rezerves kopija saglabāta.",
+    "confirm": "Reģistrēties",
+    "done": "Reģistrēts šajā serverī"
+  },
+  "errors": {
+    "tooLarge": "Tas ir pārāk liels serverim. Izvēlies mazāku attēlu vai uzraksti īsāku tekstu.",
+    "denied": "Serveris to neatļauj.",
+    "deniedWithReason": "Serveris to neatļauj: {{reason}}",
+    "notConnected": "Tu neesi savienots ar serveri.",
+    "file": "Failu neizdevās nolasīt vai ierakstīt.",
+    "generic": "Kaut kas nogāja greizi. Lūdzu, mēģini vēlreiz."
+  },
+  "ptt": "Push-to-talk: turi {{key}}, lai runātu",
+  "pttNoKey": "Push-to-talk: taustiņš nav iestatīts",
+  "quickSettings": {
+    "linkPreviews": "Saišu priekšskatījumi un iegultie elementi",
+    "linkPreviewsHint": "Vietnes redz tavu IP adresi",
+    "nowPlaying": "Dalīties ar to, ko klausos",
+    "nowPlayingHint": "Citi redz tavu pašreizējo dziesmu",
+    "unsupported": "Nav pieejams macOS",
+    "theme": "Motīvs",
+    "theme_system": "Sistēmas",
+    "theme_dark": "Tumšs",
+    "theme_light": "Gaišs",
+    "nowGaming": "Dalīties ar to, ko spēlēju",
+    "nowGamingHint": "Citi redz tavu pašreizējo spēli",
+    "unavailable": "Nav pieejams šajā sistēmā",
+    "overlay": "Pārklājums",
+    "overlayHint": "Rāda, kas runā, virs spēlēm",
+    "editProfile": "Rediģēt profilu",
+    "editProfileHint": "Vārds, avatars un komentārs",
+    "register": "Reģistrēties šajā serverī",
+    "registered": "Reģistrēts šajā serverī ✓",
+    "registerHint": "Saglabā tavu vārdu un avataru šajā serverī",
+    "allSettings": "Visi iestatījumi…",
+    "label": "Ātrie iestatījumi",
+    "positional": "Pozicionālā skaņa",
+    "positionalHint": "Balsis tiek izvietotas 3D telpā ap tevi",
+    "offerImages": "Piedāvāt pilna izmēra attēlus",
+    "offerImagesHint": "Ļauj citiem ielādēt tavus oriģinālos attēlus",
+    "loadImages": "Ielādēt pilna izmēra attēlus",
+    "loadImagesHint": "Iegūt oriģinālos attēlus no citiem"
+  }
+}

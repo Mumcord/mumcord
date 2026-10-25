@@ -1,0 +1,67 @@
+{
+  "inChannel_one": "V {{channel}} ({{count}})",
+  "inChannel_few": "V {{channel}} ({{count}})",
+  "inChannel_many": "V {{channel}} ({{count}})",
+  "inChannel_other": "V {{channel}} ({{count}})",
+  "listening_one": "Počúva ({{count}})",
+  "listening_few": "Počúvajú ({{count}})",
+  "listening_many": "Počúva ({{count}})",
+  "listening_other": "Počúva ({{count}})",
+  "noChannel": "Vyber kanál a uvidíš, kto v ňom je.",
+  "nobody": "Nikto tu nie je.",
+  "you": "(ty)",
+  "registered": "Registrovaný",
+  "unregistered": "Neregistrovaný",
+  "talking": "Hovorí",
+  "card": {
+    "close": "Zavrieť",
+    "loadFailed": "Profil sa nepodarilo načítať.",
+    "volume": "Hlasitosť",
+    "volumeValue": "{{value}} %",
+    "localMute": "Stlmiť pre mňa",
+    "sessionOnly": "Táto osoba nemá certifikát, preto tieto nastavenia platia len pre túto reláciu.",
+    "sendPrivateMessage": "Poslať súkromnú správu",
+    "privateMessage": "Súkromná správa",
+    "localSettings": "Tvoje nastavenia",
+    "localSettingsHint": "Vidíš ich len ty. Zmeny sa ukladajú okamžite.",
+    "localMuteHint": "Túto osobu nebudeš počuť.",
+    "privateNote": "Súkromná poznámka",
+    "privateNoteHint": "Túto poznámku vidíš len ty.",
+    "saved": "Uložené"
+  },
+  "errors": {
+    "notConnected": "Nie si pripojený k serveru.",
+    "generic": "Nepodarilo sa. Skús to znova."
+  },
+  "menu": {
+    "label": "Akcie pre {{name}}",
+    "viewProfile": "Zobraziť profil",
+    "mute": "Stlmiť pre mňa"
+  },
+  "nowPlaying": {
+    "label": "Práve hrá",
+    "listening": "Počúva",
+    "paused": "Pozastavené",
+    "progress": "Priebeh prehrávania",
+    "position": "{{position}} z {{duration}}"
+  },
+  "nowGaming": {
+    "label": "Práve hrá",
+    "playing": "Hrá",
+    "playedFor": "už {{time}}",
+    "hoursMinutes": "{{hours}} h {{minutes}} min",
+    "minutes_one": "{{count}} min",
+    "minutes_few": "{{count}} min",
+    "minutes_many": "{{count}} min",
+    "minutes_other": "{{count}} min",
+    "join": "Pripojiť sa k hre",
+    "joinTitle": "Pripojiť sa k hre?",
+    "joinMessage": "Otvorí sa Steam a pripojí sa k serveru, na ktorom táto osoba hrá {{game}}. Pripájaj sa len k serverom, ktorým dôveruješ.",
+    "joinConfirm": "Otvoriť Steam",
+    "joinFailed": "Steam sa nepodarilo otvoriť."
+  },
+  "preview": {
+    "privateMessage": "Súkromná správa",
+    "fullProfile": "Celý profil"
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "listLabel": "Teraz mówią",
+  "move": {
+    "hint": "Przeciągnij, aby przesunąć nakładkę",
+    "done": "Gotowe"
+  },
+  "limits": {
+    "wayland": "Na tym pulpicie z Waylandem aplikacje nie mogą trzymać okna na wierzchu ani wybierać jego położenia, więc nakładka może znaleźć się za innymi oknami, a pozycje w rogach nie działają. Włącz „Tryb zgodności (jak TeamSpeak)” w ustawieniach głosu i uruchom Mumcord ponownie: nakładka zostanie na wierzchu.",
+    "waylandKde": "W KDE Plasma z Waylandem aplikacje nie mogą trzymać okna na wierzchu ani wybierać jego położenia. Są dwa sposoby: pozwól Mumcord dodać regułę okna KDE dla nakładki („Skonfiguruj automatycznie”) albo włącz „Tryb zgodności (jak TeamSpeak)” w ustawieniach głosu i uruchom Mumcord ponownie.",
+    "exclusiveFullscreen": "Nakładka wyświetla się nad grami w oknie i w trybie pełnoekranowym bez ramki. Gry w trybie wyłącznego pełnego ekranu rysują nad wszystkimi oknami, więc przełącz je na „bez ramki” lub „pełny ekran w oknie”, aby zobaczyć nakładkę."
+  }
+}

@@ -1,0 +1,70 @@
+{
+  "inChannel_one": "In {{channel}} ({{count}})",
+  "inChannel_two": "In {{channel}} ({{count}})",
+  "inChannel_few": "In {{channel}} ({{count}})",
+  "inChannel_many": "In {{channel}} ({{count}})",
+  "inChannel_other": "In {{channel}} ({{count}})",
+  "listening_one": "Ag éisteacht ({{count}})",
+  "listening_two": "Ag éisteacht ({{count}})",
+  "listening_few": "Ag éisteacht ({{count}})",
+  "listening_many": "Ag éisteacht ({{count}})",
+  "listening_other": "Ag éisteacht ({{count}})",
+  "noChannel": "Roghnaigh cainéal chun a fheiceáil cé atá ann.",
+  "nobody": "Níl aon duine anseo.",
+  "you": "(tusa)",
+  "registered": "Cláraithe",
+  "unregistered": "Gan chlárú",
+  "talking": "Ag caint",
+  "card": {
+    "close": "Dún",
+    "loadFailed": "Níorbh fhéidir an próifíl a luchtú.",
+    "volume": "Airde fhuaime",
+    "volumeValue": "{{value}} %",
+    "localMute": "Balbhaigh dom",
+    "sessionOnly": "Níl teastas ag an duine seo, mar sin ní mhaireann na socruithe seo ach don seisiún seo.",
+    "sendPrivateMessage": "Seol teachtaireacht phríobháideach",
+    "privateMessage": "Teachtaireacht phríobháideach",
+    "localSettings": "Do shocruithe",
+    "localSettingsHint": "Ní fheiceann ach tusa iad seo. Sábhálfar na hathruithe láithreach.",
+    "localMuteHint": "Ní chloisfidh tú an duine seo.",
+    "privateNote": "Nóta príobháideach",
+    "privateNoteHint": "Ní fheiceann ach tusa an nóta seo.",
+    "saved": "Sábháilte"
+  },
+  "errors": {
+    "notConnected": "Gan ceangal le freastalaí.",
+    "generic": "Níor oibrigh sé sin. Bain triail eile as."
+  },
+  "menu": {
+    "label": "Gníomhartha do {{name}}",
+    "viewProfile": "Féach ar an bpróifíl",
+    "mute": "Balbhaigh dom"
+  },
+  "nowPlaying": {
+    "label": "Ag seinm anois",
+    "listening": "Ag éisteacht le",
+    "paused": "Curtha ar sos",
+    "progress": "Dul chun cinn an tseinm",
+    "position": "{{position}} as {{duration}}"
+  },
+  "nowGaming": {
+    "label": "Ag imirt anois",
+    "playing": "Ag imirt",
+    "playedFor": "le {{time}}",
+    "hoursMinutes": "{{hours}} u {{minutes}} nóim",
+    "minutes_one": "{{count}} nóim",
+    "minutes_two": "{{count}} nóim",
+    "minutes_few": "{{count}} nóim",
+    "minutes_many": "{{count}} nóim",
+    "minutes_other": "{{count}} nóim",
+    "join": "Téigh isteach sa chluiche",
+    "joinTitle": "Téigh isteach sa chluiche?",
+    "joinMessage": "Osclóidh Steam agus ceanglóidh sé leis an bhfreastalaí a bhfuil an duine seo ag imirt {{game}} air. Ná téigh isteach ach i bhfreastalaithe a bhfuil muinín agat astu.",
+    "joinConfirm": "Oscail Steam",
+    "joinFailed": "Níorbh fhéidir Steam a oscailt."
+  },
+  "preview": {
+    "privateMessage": "Teachtaireacht phríobháideach",
+    "fullProfile": "An phróifíl iomlán"
+  }
+}

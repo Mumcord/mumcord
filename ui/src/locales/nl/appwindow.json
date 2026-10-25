@@ -1,0 +1,10 @@
+{
+  "close": {
+    "title": "Minimaliseren naar het systeemvak of afsluiten?",
+    "description": "Je bent nog verbonden. Als je minimaliseert, blijft Mumcord je in de voicechat houden en draait het in het systeemvak.",
+    "remember": "Mijn keuze onthouden",
+    "minimize": "Naar systeemvak minimaliseren",
+    "quit": "Afsluiten",
+    "failed": "Dat is mislukt. Probeer het opnieuw."
+  }
+}

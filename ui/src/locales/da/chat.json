@@ -1,0 +1,151 @@
+{
+  "noConversation": "Opret forbindelse til en server og vælg en kanal for at begynde at chatte.",
+  "empty": "Ingen beskeder endnu. Beskeder, du modtager her, gemmes på denne computer.",
+  "header": {
+    "channel": "#{{name}}",
+    "channelPrefix": "Kanal",
+    "privatePrefix": "Privat chat med",
+    "unknownPerson": "Ukendt person"
+  },
+  "list": {
+    "today": "I dag",
+    "yesterday": "I går",
+    "label": "Beskeder i {{name}}",
+    "loadOlder": "Indlæs ældre beskeder",
+    "loading": "Indlæser beskeder…",
+    "loadFailed": "Ældre beskeder kunne ikke indlæses. Rul op for at prøve igen.",
+    "loadEarlier": "Indlæs tidligere beskeder",
+    "syncing": "Leder efter tidligere beskeder fra andre Mumcord-brugere…",
+    "syncAdded_one": "{{count}} tidligere besked tilføjet fra andre Mumcord-brugere.",
+    "syncAdded_other": "{{count}} tidligere beskeder tilføjet fra andre Mumcord-brugere.",
+    "syncNone": "Ingen tidligere beskeder fundet.",
+    "syncFailed": "Tidligere beskeder kan ikke indlæses her.",
+    "syncedFrom": "fra {{name}}s historik",
+    "jumpToNewest": "Hop til nyeste",
+    "jumpToNewestUnseen_one": "Hop til nyeste, {{count}} ny besked",
+    "jumpToNewestUnseen_other": "Hop til nyeste, {{count}} nye beskeder"
+  },
+  "format": {
+    "toolbar": "Formatering",
+    "bold": "Fed",
+    "italic": "Kursiv",
+    "strike": "Gennemstreget",
+    "code": "Inline-kode",
+    "codeBlock": "Kodeblok",
+    "link": "Link"
+  },
+  "composer": {
+    "label": "Besked til {{name}}",
+    "hint": "Tryk på Enter for at sende og Shift+Enter for en ny linje. Markdown virker: **fed**, *kursiv*, `kode`, [link](https://…).",
+    "addImage": "Tilføj billede",
+    "removeImage": "Fjern billedet {{name}}",
+    "imagePreview": "Billede, der skal sendes: {{name}}",
+    "send": "Send",
+    "noPermission": "Du har ikke tilladelse til at skrive i denne kanal.",
+    "unavailable": "Denne kanal er ikke længere tilgængelig.",
+    "offline": "{{name}} er offline. Du kan skrive igen, når vedkommende er tilbage.",
+    "unnamedImage": "Indsat billede"
+  },
+  "tray": {
+    "label": "Billeder, der skal sendes",
+    "processing": "Forbereder billede",
+    "scaled": "Skaleret til {{width}}×{{height}} for at holde sig inden for serverens grænse"
+  },
+  "errors": {
+    "tooLong": "Din besked er for lang til denne server (højst {{max}} tegn). Gør den kortere, og prøv igen.",
+    "tooLongNoLimit": "Din besked er for lang til denne server. Gør den kortere, og prøv igen.",
+    "imageTooLarge": "Dette billede er for stort til denne server, selv efter komprimering. Prøv et mindre billede.",
+    "imageWithTextTooLong": "Beskeden med billedet er for stor til denne server. Forkort teksten, eller fjern billedet.",
+    "imagesNotAllowed": "Denne server tillader ikke billeder i beskeder.",
+    "notImage": "Denne fil kan ikke sendes. Brug et PNG-, JPEG-, GIF- eller WebP-billede.",
+    "imageUnreadable": "Billedet kunne ikke læses. Prøv en anden fil.",
+    "denied": "Serveren tillod ikke denne besked.",
+    "deniedWithReason": "Serveren tillod ikke denne besked: {{reason}}",
+    "notConnected": "Du er ikke forbundet. Opret forbindelse igen, og prøv igen.",
+    "generic": "Beskeden kunne ikke sendes. Prøv igen.",
+    "onlyImages": "Kun billeder kan sendes.",
+    "sourceTooLarge": "Denne fil er for stor til at blive sendt (over 25 MB)."
+  },
+  "announce": {
+    "message": "{{name}}: {{text}}",
+    "image": "{{name}} sendte et billede",
+    "more_one": "{{count}} ny besked mere",
+    "more_other": "{{count}} nye beskeder mere"
+  },
+  "pinned": {
+    "label": "Kanalinfo",
+    "showMore": "Vis mere",
+    "showLess": "Vis mindre"
+  },
+  "mention": {
+    "list": "Personer, der kan omtales",
+    "found_one": "{{count}} person foreslået. Brug piletasterne, og tryk derefter på Enter for at indsætte.",
+    "found_other": "{{count}} personer foreslået. Brug piletasterne, og tryk derefter på Enter for at indsætte.",
+    "none": "Ingen fundet",
+    "mentionsYou": "Omtaler dig",
+    "chipLabel": "{{name}}, omtale"
+  },
+  "preview": {
+    "open": "Åbn i browser",
+    "openLabel": "Åbn {{title}} i browser",
+    "play": "Afspil {{title}}",
+    "player": "Videoafspiller: {{title}}",
+    "videoTitle": "{{site}}-video",
+    "spotifyTitle": "{{site}}-link",
+    "audioPlayer": "Spotify-afspiller: {{title}}",
+    "kind": {
+      "track": "Nummer",
+      "album": "Album",
+      "playlist": "Playliste",
+      "artist": "Kunstner",
+      "episode": "Afsnit",
+      "show": "Program"
+    },
+    "inBrowser": "Afspilles i din browser",
+    "card": "Linkvisning: {{title}}",
+    "dismiss": "Skjul visning"
+  },
+  "image": {
+    "loading": "Indlæser billedet {{name}}",
+    "label": "Billede: {{name}}",
+    "view": "Vis billedet {{name}}",
+    "viewMessage": "Billede fra {{name}}, åbn i billedvisning",
+    "failed": "Billedet kan ikke vises (for stort eller utilgængeligt)."
+  },
+  "viewer": {
+    "label": "Billedvisning",
+    "counter": "{{current}} / {{total}}",
+    "zoomIn": "Zoom ind",
+    "zoomOut": "Zoom ud",
+    "fit": "Tilpas til vindue",
+    "save": "Gem billede",
+    "saved": "Billedet er gemt",
+    "saveFailed": "Billedet kunne ikke gemmes",
+    "fileFilter": "Billede",
+    "openInBrowser": "Åbn i browser",
+    "close": "Luk",
+    "previous": "Forrige billede",
+    "next": "Næste billede",
+    "unnamed": "billede",
+    "fullLoading": "Indlæser i fuld størrelse…",
+    "fullProgress": "Indlæser i fuld størrelse… {{percent}} %",
+    "fullUnavailable": "Fuld størrelse er ikke tilgængelig – viser forhåndsvisningen"
+  },
+  "favorites": {
+    "open": "GIF-favoritter",
+    "title": "GIF-favoritter",
+    "save": "Gem som favorit",
+    "remove": "Fjern fra favoritter",
+    "removeNamed": "Fjern {{name}} fra favoritter",
+    "send": "Send {{name}}",
+    "hint": "Piletaster flytter, Enter sender, Delete fjerner, Escape lukker.",
+    "empty": "Ingen favoritter endnu. Højreklik på en GIF i chatten, eller brug stjernen på den, og vælg \"Gem som favorit\". Den vises så her."
+  },
+  "imageMenu": {
+    "label": "Billede {{name}}"
+  },
+  "attribution": {
+    "via": "via {{brand}}",
+    "view": "Se på {{brand}}"
+  }
+}

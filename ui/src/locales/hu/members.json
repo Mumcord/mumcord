@@ -1,0 +1,61 @@
+{
+  "inChannel_one": "Itt: {{channel}} ({{count}})",
+  "inChannel_other": "Itt: {{channel}} ({{count}})",
+  "listening_one": "Hallgat ({{count}})",
+  "listening_other": "Hallgat ({{count}})",
+  "noChannel": "Válassz egy csatornát, hogy lásd, ki van benne.",
+  "nobody": "Senki sincs itt.",
+  "you": "(te)",
+  "registered": "Regisztrált",
+  "unregistered": "Nem regisztrált",
+  "talking": "Beszél",
+  "card": {
+    "close": "Bezárás",
+    "loadFailed": "A profilt nem sikerült betölteni.",
+    "volume": "Hangerő",
+    "volumeValue": "{{value}} %",
+    "localMute": "Némítás nálam",
+    "sessionOnly": "Ennek a személynek nincs tanúsítványa, ezért ezek a beállítások csak erre a munkamenetre érvényesek.",
+    "sendPrivateMessage": "Privát üzenet küldése",
+    "privateMessage": "Privát üzenet",
+    "localSettings": "Saját beállításaid",
+    "localSettingsHint": "Ezeket csak te látod. A változások azonnal mentődnek.",
+    "localMuteHint": "Nem fogod hallani ezt a személyt.",
+    "privateNote": "Privát jegyzet",
+    "privateNoteHint": "Ezt a jegyzetet csak te látod.",
+    "saved": "Mentve"
+  },
+  "errors": {
+    "notConnected": "Nincs kapcsolat szerverrel.",
+    "generic": "Ez nem sikerült. Próbáld újra."
+  },
+  "menu": {
+    "label": "Műveletek: {{name}}",
+    "viewProfile": "Profil megtekintése",
+    "mute": "Némítás nálam"
+  },
+  "nowPlaying": {
+    "label": "Most szól",
+    "listening": "Most hallgatja",
+    "paused": "Szüneteltetve",
+    "progress": "Lejátszás állapota",
+    "position": "{{position}} / {{duration}}"
+  },
+  "nowGaming": {
+    "label": "Most játszik",
+    "playing": "Játszik",
+    "playedFor": "{{time}} ideje",
+    "hoursMinutes": "{{hours}} ó {{minutes}} perc",
+    "minutes_one": "{{count}} perc",
+    "minutes_other": "{{count}} perc",
+    "join": "Csatlakozás a játékhoz",
+    "joinTitle": "Csatlakozol a játékhoz?",
+    "joinMessage": "Megnyílik a Steam, és csatlakozik ahhoz a szerverhez, amelyen ez a személy a(z) {{game}} játékkal játszik. Csak megbízható szerverekhez csatlakozz.",
+    "joinConfirm": "Steam megnyitása",
+    "joinFailed": "A Steamet nem sikerült megnyitni."
+  },
+  "preview": {
+    "privateMessage": "Privát üzenet",
+    "fullProfile": "Teljes profil"
+  }
+}

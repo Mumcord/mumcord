@@ -1,0 +1,128 @@
+{
+  "unknownServer": "server",
+  "announce": {
+    "connected": "Připojeno k {{server}}.",
+    "lost": "Spojení s {{server}} bylo ztraceno. Znovu se připojuji…",
+    "ended": "Odpojeno od {{server}}. Co dál, najdeš v liště nad chatem.",
+    "disconnected": "Odpojeno od {{server}}.",
+    "tcp": "Hlas teď běží přes TCP, protože UDP je blokované. Zvuk může mít mírné zpoždění.",
+    "removed": "{{server}} odebrán.",
+    "moved": "{{server}} přesunut na pozici {{position}} z {{count}}."
+  },
+  "bar": {
+    "listLabel": "Uložené servery",
+    "add": "Přidat server",
+    "keyboardHint": "Enter připojí. Alt a šipka nahoru nebo dolů přesune server. Shift a F10 otevře další možnosti.",
+    "status": {
+      "connected": "{{server}} (připojeno)",
+      "connecting": "{{server}} (připojování)",
+      "reconnecting": "{{server}} (opětovné připojování)"
+    }
+  },
+  "menu": {
+    "label": "Možnosti pro {{server}}",
+    "connect": "Připojit",
+    "disconnect": "Odpojit",
+    "edit": "Upravit server",
+    "moveUp": "Posunout nahoru",
+    "moveDown": "Posunout dolů",
+    "remove": "Odebrat server"
+  },
+  "dialog": {
+    "addTitle": "Přidat server",
+    "editTitle": "Upravit server",
+    "linkTitle": "Uložit tento server?",
+    "address": "Adresa",
+    "addressHint": "Například mumble.example.org. Můžeš sem vložit i odkaz mumble://.",
+    "filledFromLink": "Vyplněno z odkazu mumble://.",
+    "port": "Port",
+    "label": "Název v liště serverů",
+    "username": "Tvoje jméno na tomto serveru",
+    "password": "Heslo serveru (volitelné)",
+    "passwordHint": "Potřeba jen tehdy, když ho server vyžaduje. Uchovává se v zabezpečeném úložišti tvého systému.",
+    "passwordKeepHint": "Heslo je uložené. Nech pole prázdné, pokud ho chceš zachovat, nebo napiš nové.",
+    "clearPassword": "Odebrat uložené heslo",
+    "add": "Přidat server",
+    "saveAndConnect": "Uložit a připojit",
+    "errors": {
+      "address": "Zadej adresu serveru.",
+      "port": "Zadej port mezi 1 a 65535. Většina serverů používá 64738.",
+      "username": "Zadej jméno, které chceš na tomto serveru používat.",
+      "link": "Tento odkaz mumble:// nelze přečíst. Zkontroluj, že byl zkopírován celý.",
+      "invalid": "Údaje o serveru nejsou platné. Zkontroluj adresu a port."
+    }
+  },
+  "errors": {
+    "serverUnreachable": "Server není dostupný. Zkontroluj adresu a port a jestli jsi online.",
+    "wrongPassword": "Heslo serveru je špatně. Uprav server a zadej správné heslo.",
+    "nameInUse": "Tvoje jméno už na tomto serveru někdo používá nebo je registrované na někoho jiného. Uprav server a zvol jiné jméno.",
+    "certificateRejected": "Kontrola certifikátu selhala: buď certifikát serveru nebyl důvěryhodný, nebo server nepřijal tvou identitu. Zkus to znovu, nebo se obrať na správce serveru.",
+    "certificateChanged": "Certifikát serveru se změnil a nebyl označen jako důvěryhodný. Důvěřuj mu, až když správce serveru změnu potvrdí.",
+    "denied": "Server odmítl připojení.",
+    "deniedWithReason": "Server odmítl připojení: {{reason}}",
+    "invalidAddress": "Adresa serveru není platná. Uprav server a oprav ji.",
+    "secureStorage": "Zabezpečené úložiště tvého systému není dostupné, takže heslo serveru nešlo přečíst ani uložit. Odemkni ho a zkus to znovu.",
+    "notFound": "Tento server už není uložený.",
+    "generic": "Něco se pokazilo. Zkus to prosím znovu."
+  },
+  "remove": {
+    "title": "Odebrat {{server}}?",
+    "message": "Uložené heslo, rozhodnutí o certifikátu, sledované kanály a historie chatu na tomto počítači budou smazány.",
+    "confirm": "Odebrat"
+  },
+  "switch": {
+    "title": "Přepnout server?",
+    "message": "Najednou můžeš být jen na jednom serveru. Odpojit se od {{current}} a připojit k {{next}}?",
+    "confirm": "Odpojit a přepnout"
+  },
+  "cert": {
+    "newTitle": "Důvěřovat tomuto serveru?",
+    "newIntro": "Mumcord certifikát serveru {{server}} ještě neviděl. Pokud ti správce serveru dal otisk, zkontroluj, že souhlasí. Tvoje volba se zapamatuje.",
+    "fingerprint": "Otisk certifikátu",
+    "changedTitle": "Varování: certifikát serveru se změnil",
+    "changedWarning": "Certifikát serveru {{server}} se liší od toho, kterému jsi dříve důvěřoval.",
+    "changedAdvice": "To se může stát po obnovení serveru, ale může to také znamenat, že někdo odposlouchává tvé připojení. Pokračuj jen tehdy, když správce serveru změnu potvrdil.",
+    "previousFingerprint": "Dříve důvěryhodný otisk",
+    "newFingerprint": "Nový otisk",
+    "reject": "Nepřipojovat",
+    "trust": "Důvěřovat a připojit",
+    "trustChanged": "Důvěřovat novému certifikátu"
+  },
+  "rejoin": {
+    "label": "Vrátit se do posledního kanálu",
+    "text": "Minule jsi byl v {{channel}} – vrátit se?",
+    "rejoin": "Vrátit se",
+    "notNow": "Teď ne"
+  },
+  "status": {
+    "label": "Stav připojení",
+    "connecting": "Připojování k {{server}}…",
+    "reconnecting": "Znovu se připojuji… (pokus {{attempt}} z {{max}}, další za {{seconds}} s)",
+    "tcp": "Připojeno přes TCP (UDP blokováno). Hlas funguje, ale může mít mírné zpoždění.",
+    "disconnected": "Odpojeno",
+    "disconnectedReason": "Odpojeno – {{reason}}",
+    "failed": "Nepodařilo se připojit k {{server}}. {{reason}}",
+    "cancel": "Zrušit",
+    "reconnect": "Znovu připojit",
+    "editServer": "Upravit server",
+    "actionFailed": {
+      "reorder": "Nové pořadí serverů se nepodařilo uložit. Zkus to prosím znovu.",
+      "remove": "Server se nepodařilo odebrat. Zkus to prosím znovu.",
+      "disconnect": "Odpojení se nepovedlo. Zkus to prosím znovu."
+    }
+  },
+  "empty": {
+    "title": "Přidej svůj první server",
+    "description": "Zadej adresu, kterou máš od své skupiny, nebo vlož odkaz mumble://.",
+    "addressLabel": "Adresa serveru nebo odkaz mumble://",
+    "addressHint": "Například mumble.example.org nebo mumble.example.org:64738.",
+    "connect": "Přidat a připojit",
+    "pasteLink": "Vložit odkaz mumble://",
+    "moreOptions": "Další možnosti…",
+    "noLinkInClipboard": "Schránka neobsahuje odkaz mumble://. Vlož nebo napiš adresu výše.",
+    "pasteManually": "Mumcord nemohl přečíst schránku. Klikni do pole výše a stiskni Ctrl+V.",
+    "errors": {
+      "required": "Zadej adresu serveru nebo odkaz mumble://."
+    }
+  }
+}

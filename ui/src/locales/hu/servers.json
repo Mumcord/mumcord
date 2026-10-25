@@ -1,0 +1,128 @@
+{
+  "unknownServer": "a szerver",
+  "announce": {
+    "connected": "Csatlakozva: {{server}}.",
+    "lost": "Megszakadt a kapcsolat: {{server}}. Újracsatlakozás…",
+    "ended": "Lecsatlakozva: {{server}}. A teendőket a chat feletti sávban találod.",
+    "disconnected": "Lecsatlakozva: {{server}}.",
+    "tcp": "A hang most TCP-n megy, mert az UDP blokkolva van. A hang kissé késhet.",
+    "removed": "{{server}} eltávolítva.",
+    "moved": "{{server}} áthelyezve a(z) {{position}}. helyre ({{count}} közül)."
+  },
+  "bar": {
+    "listLabel": "Mentett szerverek",
+    "add": "Szerver hozzáadása",
+    "keyboardHint": "Enter: csatlakozás. Alt + Fel vagy Le nyíl: a szerver áthelyezése. Shift + F10: további lehetőségek.",
+    "status": {
+      "connected": "{{server}} (csatlakozva)",
+      "connecting": "{{server}} (csatlakozás)",
+      "reconnecting": "{{server}} (újracsatlakozás)"
+    }
+  },
+  "menu": {
+    "label": "Beállítások: {{server}}",
+    "connect": "Csatlakozás",
+    "disconnect": "Lecsatlakozás",
+    "edit": "Szerver szerkesztése",
+    "moveUp": "Mozgatás fel",
+    "moveDown": "Mozgatás le",
+    "remove": "Szerver eltávolítása"
+  },
+  "dialog": {
+    "addTitle": "Szerver hozzáadása",
+    "editTitle": "Szerver szerkesztése",
+    "linkTitle": "Mented ezt a szervert?",
+    "address": "Cím",
+    "addressHint": "Például mumble.example.org. Ide beillesztheted a mumble:// linket is.",
+    "filledFromLink": "Kitöltve a mumble:// link alapján.",
+    "port": "Port",
+    "label": "Név a szerversávban",
+    "username": "A neved ezen a szerveren",
+    "password": "Szerverjelszó (nem kötelező)",
+    "passwordHint": "Csak akkor kell, ha a szerver kéri. A rendszered biztonságos tárolójában marad.",
+    "passwordKeepHint": "Van mentett jelszó. Hagyd üresen a megtartásához, vagy írj be egy újat.",
+    "clearPassword": "Mentett jelszó eltávolítása",
+    "add": "Szerver hozzáadása",
+    "saveAndConnect": "Mentés és csatlakozás",
+    "errors": {
+      "address": "Add meg a szerver címét.",
+      "port": "Adj meg egy portot 1 és 65535 között. A legtöbb szerver a 64738-at használja.",
+      "username": "Add meg a nevet, amelyet ezen a szerveren használni szeretnél.",
+      "link": "Ez a mumble:// link nem olvasható. Ellenőrizd, hogy teljesen kimásoltad-e.",
+      "invalid": "A szerver adatai érvénytelenek. Ellenőrizd a címet és a portot."
+    }
+  },
+  "errors": {
+    "serverUnreachable": "A szerver nem érhető el. Ellenőrizd a címet, a portot és az internetkapcsolatodat.",
+    "wrongPassword": "Hibás a szerverjelszó. Szerkeszd a szervert, és add meg a helyes jelszót.",
+    "nameInUse": "A neved ezen a szerveren már használatban van, vagy más regisztrálta. Szerkeszd a szervert, és válassz másik nevet.",
+    "certificateRejected": "A tanúsítvány-ellenőrzés sikertelen: vagy a szerver tanúsítványa nem volt megbízható, vagy a szerver nem fogadta el az identitásodat. Próbáld újra, vagy kérdezd meg a szerver tulajdonosát.",
+    "certificateChanged": "A szerver tanúsítványa megváltozott, és nem lett megbízhatónak jelölve. Csak akkor bízz meg benne, ha a szerver tulajdonosa megerősíti a változást.",
+    "denied": "A szerver elutasította a kapcsolatot.",
+    "deniedWithReason": "A szerver elutasította a kapcsolatot: {{reason}}",
+    "invalidAddress": "A szerver címe érvénytelen. Szerkeszd a szervert a javításhoz.",
+    "secureStorage": "A rendszered biztonságos tárolója nem érhető el, ezért a szerverjelszót nem sikerült beolvasni vagy menteni. Oldd fel a zárolását, és próbáld újra.",
+    "notFound": "Ez a szerver már nincs elmentve.",
+    "generic": "Valami hiba történt. Próbáld újra."
+  },
+  "remove": {
+    "title": "Eltávolítod: {{server}}?",
+    "message": "A mentett jelszava, a tanúsítványdöntés, a követett csatornák és a chatelőzmények törlődnek erről a számítógépről.",
+    "confirm": "Eltávolítás"
+  },
+  "switch": {
+    "title": "Szervert váltasz?",
+    "message": "Egyszerre csak egy szerveren lehetsz. Lecsatlakozol innen: {{current}}, és csatlakozol ide: {{next}}?",
+    "confirm": "Lecsatlakozás és váltás"
+  },
+  "cert": {
+    "newTitle": "Megbízol ebben a szerverben?",
+    "newIntro": "A Mumcord még nem látta {{server}} tanúsítványát. Ha a szerver tulajdonosa adott ujjlenyomatot, ellenőrizd, hogy egyezik-e. A választásodat megjegyezzük.",
+    "fingerprint": "Tanúsítvány ujjlenyomata",
+    "changedTitle": "Figyelem: a szerver tanúsítványa megváltozott",
+    "changedWarning": "{{server}} tanúsítványa eltér attól, amelyben korábban megbíztál.",
+    "changedAdvice": "Ez előfordulhat a szerver megújítása után, de azt is jelentheti, hogy valaki lehallgatja a kapcsolatodat. Csak akkor folytasd, ha a szerver tulajdonosa megerősítette a változást.",
+    "previousFingerprint": "Korábban elfogadott ujjlenyomat",
+    "newFingerprint": "Új ujjlenyomat",
+    "reject": "Ne csatlakozzon",
+    "trust": "Megbízom, csatlakozás",
+    "trustChanged": "Megbízom az új tanúsítványban"
+  },
+  "rejoin": {
+    "label": "Visszalépés az utolsó csatornába",
+    "text": "Legutóbb itt voltál: {{channel}} – Visszalépsz?",
+    "rejoin": "Visszalépés",
+    "notNow": "Most nem"
+  },
+  "status": {
+    "label": "Kapcsolat állapota",
+    "connecting": "Csatlakozás: {{server}}…",
+    "reconnecting": "Újracsatlakozás… ({{attempt}}. próbálkozás a(z) {{max}}-ból, következő {{seconds}} mp múlva)",
+    "tcp": "Csatlakozva TCP-n (UDP blokkolva). A hang működik, de kissé késhet.",
+    "disconnected": "Lecsatlakozva",
+    "disconnectedReason": "Lecsatlakozva – {{reason}}",
+    "failed": "Nem sikerült csatlakozni: {{server}}. {{reason}}",
+    "cancel": "Mégse",
+    "reconnect": "Újracsatlakozás",
+    "editServer": "Szerver szerkesztése",
+    "actionFailed": {
+      "reorder": "Az új szerversorrendet nem sikerült menteni. Próbáld újra.",
+      "remove": "A szervert nem sikerült eltávolítani. Próbáld újra.",
+      "disconnect": "A lecsatlakozás nem sikerült. Próbáld újra."
+    }
+  },
+  "empty": {
+    "title": "Add hozzá az első szerveredet",
+    "description": "Írd be a csoportodtól kapott címet, vagy illessz be egy mumble:// linket.",
+    "addressLabel": "Szervercím vagy mumble:// link",
+    "addressHint": "Például mumble.example.org vagy mumble.example.org:64738.",
+    "connect": "Hozzáadás és csatlakozás",
+    "pasteLink": "mumble:// link beillesztése",
+    "moreOptions": "További lehetőségek…",
+    "noLinkInClipboard": "A vágólapon nincs mumble:// link. Illeszd be vagy írd be a címet fent.",
+    "pasteManually": "A Mumcord nem tudta beolvasni a vágólapot. Kattints a fenti mezőbe, és nyomd meg a Ctrl+V-t.",
+    "errors": {
+      "required": "Adj meg egy szervercímet vagy mumble:// linket."
+    }
+  }
+}

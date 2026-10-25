@@ -1,0 +1,128 @@
+{
+  "unknownServer": "poslužitelj",
+  "announce": {
+    "connected": "Povezan s {{server}}.",
+    "lost": "Veza s {{server}} je prekinuta. Ponovno povezivanje…",
+    "ended": "Odspojen s {{server}}. Što dalje, pogledaj u traci iznad chata.",
+    "disconnected": "Odspojen s {{server}}.",
+    "tcp": "Glas sada ide preko TCP-a jer je UDP blokiran. Zvuk može malo kasniti.",
+    "removed": "{{server}} uklonjen.",
+    "moved": "{{server}} premješten na mjesto {{position}} od {{count}}."
+  },
+  "bar": {
+    "listLabel": "Spremljeni poslužitelji",
+    "add": "Dodaj poslužitelj",
+    "keyboardHint": "Enter povezuje. Alt i strelica gore ili dolje pomiču poslužitelj. Shift i F10 otvaraju više opcija.",
+    "status": {
+      "connected": "{{server}} (povezan)",
+      "connecting": "{{server}} (povezivanje)",
+      "reconnecting": "{{server}} (ponovno povezivanje)"
+    }
+  },
+  "menu": {
+    "label": "Opcije za {{server}}",
+    "connect": "Poveži se",
+    "disconnect": "Odspoji se",
+    "edit": "Uredi poslužitelj",
+    "moveUp": "Pomakni gore",
+    "moveDown": "Pomakni dolje",
+    "remove": "Ukloni poslužitelj"
+  },
+  "dialog": {
+    "addTitle": "Dodaj poslužitelj",
+    "editTitle": "Uredi poslužitelj",
+    "linkTitle": "Spremiti ovaj poslužitelj?",
+    "address": "Adresa",
+    "addressHint": "Na primjer mumble.example.org. Ovdje možeš zalijepiti i mumble:// poveznicu.",
+    "filledFromLink": "Popunjeno iz mumble:// poveznice.",
+    "port": "Port",
+    "label": "Naziv u traci poslužitelja",
+    "username": "Tvoje ime na ovom poslužitelju",
+    "password": "Lozinka poslužitelja (neobavezno)",
+    "passwordHint": "Potrebna samo ako je poslužitelj traži. Čuva se u sigurnoj pohrani tvog sustava.",
+    "passwordKeepHint": "Lozinka je spremljena. Ostavi prazno da je zadržiš ili upiši novu.",
+    "clearPassword": "Ukloni spremljenu lozinku",
+    "add": "Dodaj poslužitelj",
+    "saveAndConnect": "Spremi i poveži se",
+    "errors": {
+      "address": "Unesi adresu poslužitelja.",
+      "port": "Unesi port između 1 i 65535. Većina poslužitelja koristi 64738.",
+      "username": "Unesi ime koje želiš koristiti na ovom poslužitelju.",
+      "link": "Ovu mumble:// poveznicu nije moguće pročitati. Provjeri je li kopirana u cijelosti.",
+      "invalid": "Podaci o poslužitelju nisu ispravni. Provjeri adresu i port."
+    }
+  },
+  "errors": {
+    "serverUnreachable": "Poslužitelj nije dostupan. Provjeri adresu i port te jesi li na mreži.",
+    "wrongPassword": "Lozinka poslužitelja je pogrešna. Uredi poslužitelj i unesi ispravnu lozinku.",
+    "nameInUse": "Tvoje ime je već u upotrebi ili ga je netko drugi registrirao na ovom poslužitelju. Uredi poslužitelj i odaberi drugo ime.",
+    "certificateRejected": "Provjera certifikata nije uspjela: ili certifikat poslužitelja nije označen kao pouzdan, ili poslužitelj nije prihvatio tvoj identitet. Pokušaj ponovno ili pitaj vlasnika poslužitelja.",
+    "certificateChanged": "Certifikat poslužitelja se promijenio i nije označen kao pouzdan. Vjeruj mu tek kad vlasnik poslužitelja potvrdi promjenu.",
+    "denied": "Poslužitelj je odbio vezu.",
+    "deniedWithReason": "Poslužitelj je odbio vezu: {{reason}}",
+    "invalidAddress": "Adresa poslužitelja nije ispravna. Uredi poslužitelj da je ispraviš.",
+    "secureStorage": "Sigurna pohrana tvog sustava nije dostupna pa lozinku poslužitelja nije bilo moguće pročitati ni spremiti. Otključaj je i pokušaj ponovno.",
+    "notFound": "Ovaj poslužitelj više nije spremljen.",
+    "generic": "Nešto je pošlo po zlu. Pokušaj ponovno."
+  },
+  "remove": {
+    "title": "Ukloniti {{server}}?",
+    "message": "Njegova spremljena lozinka, odluka o certifikatu, praćeni kanali i povijest chata na ovom računalu bit će obrisani.",
+    "confirm": "Ukloni"
+  },
+  "switch": {
+    "title": "Promijeniti poslužitelj?",
+    "message": "Istovremeno možeš biti samo na jednom poslužitelju. Odspojiti se s {{current}} i povezati s {{next}}?",
+    "confirm": "Odspoji se i promijeni"
+  },
+  "cert": {
+    "newTitle": "Vjerovati ovom poslužitelju?",
+    "newIntro": "Mumcord još nije vidio certifikat poslužitelja {{server}}. Ako ti je vlasnik poslužitelja dao otisak, provjeri podudara li se. Tvoj izbor se pamti.",
+    "fingerprint": "Otisak certifikata",
+    "changedTitle": "Upozorenje: certifikat poslužitelja se promijenio",
+    "changedWarning": "Certifikat poslužitelja {{server}} razlikuje se od onoga kojem si prije vjerovao.",
+    "changedAdvice": "To se može dogoditi nakon obnove poslužitelja, ali može značiti i da netko presreće tvoju vezu. Nastavi samo ako je vlasnik poslužitelja potvrdio promjenu.",
+    "previousFingerprint": "Prethodno pouzdan otisak",
+    "newFingerprint": "Novi otisak",
+    "reject": "Nemoj se povezati",
+    "trust": "Vjeruj i poveži se",
+    "trustChanged": "Vjeruj novom certifikatu"
+  },
+  "rejoin": {
+    "label": "Ponovno uđi u zadnji kanal",
+    "text": "Zadnji put si bio u {{channel}} – ući ponovno?",
+    "rejoin": "Uđi ponovno",
+    "notNow": "Ne sada"
+  },
+  "status": {
+    "label": "Stanje veze",
+    "connecting": "Povezivanje s {{server}}…",
+    "reconnecting": "Ponovno povezivanje… (pokušaj {{attempt}} od {{max}}, sljedeći za {{seconds}} s)",
+    "tcp": "Povezan preko TCP-a (UDP blokiran). Glas radi, ali može malo kasniti.",
+    "disconnected": "Odspojen",
+    "disconnectedReason": "Odspojen – {{reason}}",
+    "failed": "Povezivanje s {{server}} nije uspjelo. {{reason}}",
+    "cancel": "Odustani",
+    "reconnect": "Ponovno se poveži",
+    "editServer": "Uredi poslužitelj",
+    "actionFailed": {
+      "reorder": "Novi redoslijed poslužitelja nije bilo moguće spremiti. Pokušaj ponovno.",
+      "remove": "Poslužitelj nije bilo moguće ukloniti. Pokušaj ponovno.",
+      "disconnect": "Odspajanje nije uspjelo. Pokušaj ponovno."
+    }
+  },
+  "empty": {
+    "title": "Dodaj svoj prvi poslužitelj",
+    "description": "Unesi adresu koju si dobio od svoje grupe ili zalijepi mumble:// poveznicu.",
+    "addressLabel": "Adresa poslužitelja ili mumble:// poveznica",
+    "addressHint": "Na primjer mumble.example.org ili mumble.example.org:64738.",
+    "connect": "Dodaj i poveži se",
+    "pasteLink": "Zalijepi mumble:// poveznicu",
+    "moreOptions": "Više opcija…",
+    "noLinkInClipboard": "Međuspremnik ne sadrži mumble:// poveznicu. Zalijepi ili upiši adresu gore.",
+    "pasteManually": "Mumcord nije mogao pročitati međuspremnik. Klikni polje gore i pritisni Ctrl+V.",
+    "errors": {
+      "required": "Unesi adresu poslužitelja ili mumble:// poveznicu."
+    }
+  }
+}

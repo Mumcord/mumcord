@@ -1,0 +1,22 @@
+{
+  "open": "Πληροφορίες σύνδεσης",
+  "title": "Πληροφορίες σύνδεσης",
+  "loading": "Φόρτωση…",
+  "notConnected": "Δεν είσαι συνδεδεμένος.",
+  "error": "Οι πληροφορίες σύνδεσης δεν είναι διαθέσιμες αυτή τη στιγμή.",
+  "none": "–",
+  "transport": "Μεταφορά",
+  "transportValue": {
+    "udp": "UDP",
+    "tcp": "TCP (σε τούνελ)"
+  },
+  "latency": "Καθυστέρηση",
+  "latencyValue": "{{value}} ms",
+  "loss": "Απώλεια πακέτων",
+  "lossValue": "{{value}} %",
+  "bitrate": "Ρυθμός αποστολής",
+  "bitrateValue": "{{value}} kbit/s",
+  "serverLimit": "Όριο διακομιστή",
+  "packets": "Πακέτα που στάλθηκαν / λήφθηκαν",
+  "packetsValue": "{{sent}} / {{received}}"
+}

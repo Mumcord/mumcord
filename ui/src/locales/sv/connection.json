@@ -1,0 +1,22 @@
+{
+  "open": "Anslutningsinfo",
+  "title": "Anslutningsinfo",
+  "loading": "Läser in…",
+  "notConnected": "Inte ansluten.",
+  "error": "Anslutningsinfo är inte tillgänglig just nu.",
+  "none": "–",
+  "transport": "Transport",
+  "transportValue": {
+    "udp": "UDP",
+    "tcp": "TCP (tunnlad)"
+  },
+  "latency": "Latens",
+  "latencyValue": "{{value}} ms",
+  "loss": "Paketförlust",
+  "lossValue": "{{value}} %",
+  "bitrate": "Sändningsbitrate",
+  "bitrateValue": "{{value}} kbit/s",
+  "serverLimit": "Servergräns",
+  "packets": "Paket skickade / mottagna",
+  "packetsValue": "{{sent}} / {{received}}"
+}
