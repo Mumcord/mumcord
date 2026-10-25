@@ -166,6 +166,23 @@ describe("GIF picker", () => {
     return { view, dialog, first };
   }
 
+  it("credits Giphy and Tenor favorites with a link to the original page", async () => {
+    await api.gifFavoriteAdd("https://media.giphy.com/media/1ojn1S7BTXUry8elNi/giphy.gif");
+    await api.gifFavoriteAdd(CAT);
+    renderComposer(true);
+    fireEvent.click(screen.getByRole("button", { name: "GIF favorites" }));
+    const dialog = await screen.findByRole("dialog");
+    const link = await within(dialog).findByRole("link", { name: "via GIPHY" });
+    const open = vi.spyOn(window, "open").mockReturnValue(null);
+    fireEvent.click(link);
+    expect(open).toHaveBeenCalledWith(
+      "https://giphy.com/gifs/1ojn1S7BTXUry8elNi",
+      "_blank",
+      "noopener,noreferrer",
+    );
+    expect(within(dialog).getAllByRole("link")).toHaveLength(1);
+  });
+
   it("moves with the arrow keys and sends the chosen link as a message", async () => {
     const send = vi.spyOn(api, "sendChannelMessage").mockResolvedValue(message("sent"));
     const { dialog, first } = await openWithTwo();

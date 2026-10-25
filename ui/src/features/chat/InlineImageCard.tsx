@@ -9,6 +9,7 @@ import { useTranslation } from "react-i18next";
 import type { InlineImage } from "../../api";
 import { DismissButton, OpenButton } from "./cardButtons";
 import { dismissPreview } from "./dismissedPreviews";
+import { GifAttribution } from "./GifAttribution";
 import { removeFavorite, saveFavorite, useGifFavorites } from "./favorites";
 import { markInlineShown } from "./inlineLinks";
 import { ImageMenu, type ImageMenuState } from "./ImageMenu";
@@ -135,6 +136,7 @@ export function InlineImageCard({ url, messageId, tabIndex, onImageClick }: Inli
           height={size.height}
         />
       </button>
+      <GifAttribution url={image.url} className="inline-image__attribution" tabIndex={tabIndex} />
       <OpenButton url={image.url} title={name} tabIndex={tabIndex} className="inline-image__open" />
       <button
         type="button"

@@ -220,7 +220,7 @@
 | B55 | (1d) Kept friend DM history + online state in DMs (FR-1.65) | open | | B54 | simple | AC-1.54 | store history, chat DM header |
 | B57 | Gear icon for the settings button (QA.47) | done | b57-gear-icon | – | simple | – | ui/src/features/userpanel |
 | L1 | License switch to AGPL-3.0-only + commercial license note, CLA in CONTRIBUTING, About page, package metadata, wiki (QA.51) | done – AGPL text, NOTICE, COMMERCIAL.md, CONTRIBUTING (CLA), PR template, metadata, About page, notices | l1-license | – | simple | AC-1.29 | LICENSE, COMMERCIAL.md, CONTRIBUTING.md, README, Cargo/package metadata, settings About, notices |
-| B58 | "via GIPHY" / "via Tenor" attribution labels (QA.52) | in progress | b58-gif-attribution | B36 | simple | FR-1.52 | ui/src/features/chat |
+| B58 | "via GIPHY" / "via Tenor" attribution labels (QA.52) | done – GifAttribution label (text = accessible name), gifSource helper | b58-gif-attribution | B36 | simple | FR-1.52 | ui/src/features/chat |
 | D1 | Implementation report | open | | C1–C10 | simple | all | specs/01-foundation-implementation.md |
 
 ## Contracts from finished tasks

@@ -7,6 +7,7 @@
 import { useEffect, useId, useRef, useState, type KeyboardEvent } from "react";
 import { useTranslation } from "react-i18next";
 import type { InlineImage } from "../../api";
+import { GifAttribution } from "./GifAttribution";
 import { markFavoriteUsed, removeFavorite, useGifFavorites } from "./favorites";
 import { imageName, loadInlineImage } from "./links";
 
@@ -225,6 +226,7 @@ export function GifPicker({ onSend, disabled, linkPreviews }: GifPickerProps) {
                       >
                         <Thumbnail url={url} linkPreviews={linkPreviews} />
                       </button>
+                      <GifAttribution url={url} className="gif-picker__attribution" tabIndex={-1} />
                       <button
                         type="button"
                         className="gif-picker__remove"

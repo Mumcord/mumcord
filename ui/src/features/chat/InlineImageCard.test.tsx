@@ -117,6 +117,33 @@ describe("inline images", () => {
     expect(await axeViolations(container)).toEqual([]);
   });
 
+  it("credits Giphy and Tenor GIFs with a link to the original page, and no one else", async () => {
+    const media = "https://media2.giphy.com/media/1ojn1S7BTXUry8elNi/giphy.gif";
+    vi.spyOn(api, "inlineImage").mockImplementation((url) => Promise.resolve({ ...GIF, url }));
+    const giphy = renderMessage(`<img src="${media}">`, true);
+    const link = await screen.findByRole("link", { name: "via GIPHY" });
+    expect(link).toHaveTextContent("via GIPHY");
+    const open = vi.spyOn(window, "open").mockReturnValue(null);
+    fireEvent.click(link);
+    expect(open).toHaveBeenCalledWith(
+      "https://giphy.com/gifs/1ojn1S7BTXUry8elNi",
+      "_blank",
+      "noopener,noreferrer",
+    );
+    giphy.unmount();
+    renderMessage('<img src="https://media.tenor.com/abc/cat.gif">', true);
+    expect(await screen.findByRole("link", { name: "via Tenor" })).toHaveTextContent(
+      "via Tenor",
+    );
+  });
+
+  it("shows no credit on other images", async () => {
+    vi.spyOn(api, "inlineImage").mockResolvedValue(GIF);
+    renderMessage(`<img src="${REMOTE}">`, true);
+    await screen.findByRole("figure", { name: "Image: cat.gif" });
+    expect(screen.queryByRole("link", { name: /via / })).toBeNull();
+  });
+
   it("holds a fixed-size placeholder while the image loads", () => {
     vi.spyOn(api, "inlineImage").mockReturnValue(new Promise(() => undefined));
     renderMessage(`<img src="${REMOTE}">`, true);

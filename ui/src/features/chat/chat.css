@@ -1007,3 +1007,36 @@
   color: var(--color-text);
   cursor: pointer;
 }
+
+/* "via GIPHY" / "via Tenor" credit (QA.52): a small chip in the top-left corner of the image,
+   absolutely placed so it never moves the layout. */
+.inline-image__attribution,
+.gif-picker__attribution {
+  position: absolute;
+  left: var(--space-1);
+  padding: 0 var(--space-2);
+  border-radius: var(--radius-full);
+  background: var(--color-bg-elevated);
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+  line-height: 1.4;
+  text-decoration: none;
+}
+
+.inline-image__attribution {
+  top: var(--space-2);
+  left: var(--space-2);
+}
+
+.gif-picker__attribution {
+  bottom: var(--space-1);
+  max-width: calc(100% - var(--space-2));
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.inline-image__attribution:hover,
+.gif-picker__attribution:hover {
+  background: var(--color-bg-hover);
+  text-decoration: underline;
+}

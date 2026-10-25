@@ -121,5 +121,9 @@
   },
   "imageMenu": {
     "label": "Bild {{name}}"
+  },
+  "attribution": {
+    "via": "via {{brand}}",
+    "view": "Auf {{brand}} ansehen"
   }
 }
