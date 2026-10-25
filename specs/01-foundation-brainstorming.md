@@ -1056,3 +1056,16 @@ Mumble servers keep no chat history; Mumcord clients can fill gaps for each othe
 ✍️ Note: Requested in chat during /dev; answers: sharing on by default and configurable in the wizard; 7 days / 500 messages.
 
 ---
+
+#### QA.46 People interactions, profile redesign and friends (stage 1d)? `◉`
+
+- [x] **Double-click on a person opens the private chat with them.**
+- [x] **Single click opens the same card as the hover preview, pinned (stays until closed); top right a "Private message" button and a settings/expand button that opens the full profile with all local settings (volume, local mute, friend, notes) – replaces the current click card.**
+- [x] **Profile redesign:** larger header with avatar and banner colour from the avatar, name, registered/guest, Mumcord badge, now playing / now gaming, comment, and sections for the local settings.
+- [x] **Friends:** "Add friend" in the card, menu and full profile; friends are stored locally by certificate hash (works across servers and name changes), shown in a "Friends" list with online state (online on any connected server, offline otherwise).
+- [x] **Private chat history with friends is kept** (linked by certificate hash across servers and renames, excluded from automatic history deletion unless the user deletes it), and the private chat header and list show whether the other person is online.
+- [ ] Not now.
+
+✍️ Note: Requested in chat during /dev.
+
+---

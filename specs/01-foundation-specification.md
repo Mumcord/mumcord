@@ -39,9 +39,10 @@ Epic 1 is delivered in two stages (Q2.1). Stage 1a must be complete and usable b
 - Positional audio via Mumble Link and the official Mumble game plugins (Q3.9).
 - Overlay as a floating, transparent on-top window (Q3.10).
 
-**Stage 1d – Mumcord-to-Mumcord** (QA.45)
+**Stage 1d – Mumcord-to-Mumcord and people** (QA.45, QA.46)
 - Chat history sync between Mumcord clients (up to 7 days / 500 messages per request, channel messages only, marked as unverified).
 - Badge for people who use Mumcord.
+- Double-click for private chat, pinned person card, redesigned full profile, friends with online state, kept private history with friends.
 
 ### 2.2 Out of scope / later
 - Anything server-side: companion services, server plugins, server configuration (Q1.13) – **never**, not just later.
@@ -140,6 +141,10 @@ Mumcord enforces nothing itself; the server's ACLs decide. The client reflects p
 ### 4.10 Stage 1d – Mumcord-to-Mumcord (QA.45)
 - **FR-1.60** History sync: on joining a channel or via "Load earlier messages", Mumcord asks other Mumcord users who may read the channel (via plugin data) for its messages in a time range (max 7 days back, max 500 messages per request, chunked under the server's plugin-data limits, rate-limited). Answering clients send stored channel messages only, never private chats. Sharing the own history is on by default and switchable in the first-start wizard and in settings. Received messages are sanitized, deduplicated, merged by time and marked "from ‹name›'s history".
 - **FR-1.61** Mumcord users are recognised through a plugin-data hello and get a small Mumcord badge with tooltip next to their name.
+- **FR-1.62** Double-clicking a person opens the private chat with them; a single click opens the hover card pinned, with "Private message" (top right) and a button for the full profile (QA.46).
+- **FR-1.63** Redesigned full profile: header with avatar and avatar-derived banner colour, name, registered/guest, Mumcord badge, now playing / now gaming, comment; sections with all local settings (volume, local mute, friend, private note).
+- **FR-1.64** Friends: added from the card, menu or profile; stored locally by certificate hash (across servers and renames); a "Friends" list shows each friend's online state (online on any connected server).
+- **FR-1.65** Private chat history with friends is kept, linked by certificate hash across servers and renames, and excluded from automatic history deletion (manual deletion still possible); private chat header and list show whether the other person is online.
 - **FR-1.49** Link previews (QA.34, stage 1b): links in messages get a preview card (title, description, image, "Open in browser"). Mumcord fetches the page metadata itself; on by default, switchable in the first-start wizard and in settings; fetched data is sanitized and cached; no preview for private/LAN addresses. Each preview/embed card can be dismissed (×), remembered per message; previews, thumbnails and external images are cached in memory and on disk and deleted after a configurable number of days (default 7, Settings → Chat & history, with "Clear now") (QA.42).
 - **FR-1.50** YouTube and Twitch links show an embedded player card with title and "Open in browser"; the player loads only after a click (QA.34). Spotify links get the same kind of card (cover, title, artist, "Open in browser", player after a click) (QA.40).
 - **FR-1.51** Mentions (QA.34): typing `@` in the input autocompletes names of people on the server; a message mentioning the user is highlighted and notifies them even in otherwise quiet channels; the text stays plain `@Name` for other clients. Being mentioned also plays a distinct short "ping" sound; both the mention sound and mention notifications have their own switches under Settings → Sounds & notifications (default on) (QA.41).
@@ -395,6 +400,8 @@ Unless stated otherwise: a fresh Mumcord install, a local test server (1.5) runn
 **Stage 1d – Mumcord-to-Mumcord**
 - **AC-1.51** Client A stays in Lobby while messages are sent; client B joins later → B receives the missed Lobby messages (≤7 days, ≤500), marked "from A's history", in correct order without duplicates; private messages are not transferred; with sharing off on A, B gets nothing.
 - **AC-1.52** Two Mumcord clients and one official client on the server → the Mumcord clients show each other with the Mumcord badge; the official client has none.
+- **AC-1.53** Double-click on Bot opens the private chat; single click shows the pinned card with "Private message" and "Full profile"; the full profile shows the redesigned header and local settings.
+- **AC-1.54** Add Bot as a friend → Bot appears in Friends as online; Bot disconnects → offline in the list and in the private chat header; Bot reconnects with another name → still the same friend and the earlier private chat history is shown; automatic history deletion leaves it untouched.
 
 ## 12. Decision log
 
@@ -496,6 +503,7 @@ Unless stated otherwise: a fresh Mumcord install, a local test server (1.5) runn
 | QA.43 | No GIF search (key would be extractable); GIF links inline + favorites instead of Tenor | Addendum 2026-10-25; FR-1.52, AC-1.42 |
 | QA.44 | Stage 1c: opt-in "Now gaming" status (Mumble Link + known programs + Steam), shared like Now playing; best-effort Join game via Steam connect/lobby | Addendum 2026-10-25; FR-1.59, AC-1.50 |
 | QA.45 | Stage 1d: history sync between Mumcord clients (7 days / 500 msgs, sharing on by default, wizard + settings) and Mumcord badge | Addendum 2026-10-25; scope 2.1, FR-1.60, FR-1.61, AC-1.51, AC-1.52 |
+| QA.46 | Stage 1d: double-click DM, pinned card with DM + full profile, profile redesign, friends by cert hash with online state, kept friend DM history | Addendum 2026-10-25; FR-1.62–1.65, AC-1.53, AC-1.54 |
 
 ## 13. Open points & risks
 
