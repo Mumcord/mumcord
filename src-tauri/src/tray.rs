@@ -1,4 +1,5 @@
-//! Tray icon showing connection and talk state, with Show / Mute / Deafen / Quit (FR-1.37).
+//! Tray icon showing connection and talk state, with Show / Mute / Deafen / Overlay / Quit
+//! (FR-1.37, FR-1.45).
 
 use std::sync::Mutex;
 
@@ -13,6 +14,7 @@ use crate::window;
 const SHOW: &str = "show";
 const MUTE: &str = "mute";
 const DEAFEN: &str = "deafen";
+const OVERLAY: &str = "overlay";
 const QUIT: &str = "quit";
 
 /// Side length of the generated tray images; trays render at 16–32 px.
@@ -108,6 +110,7 @@ struct Labels {
     show: &'static str,
     mute: &'static str,
     deafen: &'static str,
+    overlay: &'static str,
     quit: &'static str,
     disconnected: &'static str,
     connecting: &'static str,
@@ -120,6 +123,7 @@ const EN: Labels = Labels {
     show: "Show Mumcord",
     mute: "Mute",
     deafen: "Deafen",
+    overlay: "Show overlay",
     quit: "Quit",
     disconnected: "Not connected",
     connecting: "Connecting…",
@@ -132,6 +136,7 @@ const ES: Labels = Labels {
     show: "Mostrar Mumcord",
     mute: "Silenciar micrófono",
     deafen: "Ensordecer",
+    overlay: "Mostrar superposición",
     quit: "Salir",
     disconnected: "Sin conexión",
     connecting: "Conectando…",
@@ -144,6 +149,7 @@ const DE: Labels = Labels {
     show: "Mumcord anzeigen",
     mute: "Stummschalten",
     deafen: "Taub schalten",
+    overlay: "Overlay anzeigen",
     quit: "Beenden",
     disconnected: "Nicht verbunden",
     connecting: "Verbinde…",
@@ -181,6 +187,7 @@ pub struct Tray {
     show: MenuItem<Wry>,
     mute: CheckMenuItem<Wry>,
     deafen: CheckMenuItem<Wry>,
+    overlay: CheckMenuItem<Wry>,
     quit: MenuItem<Wry>,
     base: Option<Image<'static>>,
     state: Mutex<TrayState>,
@@ -208,6 +215,11 @@ fn build(app: &AppHandle) -> tauri::Result<Tray> {
     let show = MenuItem::with_id(app, SHOW, "", true, None::<&str>)?;
     let mute = CheckMenuItem::with_id(app, MUTE, "", false, false, None::<&str>)?;
     let deafen = CheckMenuItem::with_id(app, DEAFEN, "", false, false, None::<&str>)?;
+    let overlay_on = app
+        .state::<Engine>()
+        .settings()
+        .is_ok_and(|s| s.overlay.enabled);
+    let overlay = CheckMenuItem::with_id(app, OVERLAY, "", true, overlay_on, None::<&str>)?;
     let quit = MenuItem::with_id(app, QUIT, "", true, None::<&str>)?;
     let separator = PredefinedMenuItem::separator(app)?;
     let separator2 = PredefinedMenuItem::separator(app)?;
@@ -219,6 +231,7 @@ fn build(app: &AppHandle) -> tauri::Result<Tray> {
             &show,
             &mute,
             &deafen,
+            &overlay,
             &separator2,
             &quit,
         ],
@@ -247,6 +260,7 @@ fn build(app: &AppHandle) -> tauri::Result<Tray> {
         show,
         mute,
         deafen,
+        overlay,
         quit,
         base,
         state: Mutex::new(TrayState::default()),
@@ -266,6 +280,19 @@ fn on_menu_event(app: &AppHandle, event: MenuEvent) {
         }
         MUTE => engine.set_self_mute(!state.muted),
         DEAFEN => engine.set_self_deaf(!state.deafened),
+        OVERLAY => {
+            // The item toggled itself; the stored setting decides, so read it, not the item.
+            let enabled = engine.settings().is_ok_and(|s| s.overlay.enabled);
+            let app = app.clone();
+            tauri::async_runtime::spawn(async move {
+                let engine = app.state::<Engine>();
+                if let Err(e) = crate::overlay::set_enabled(&app, &engine, !enabled).await {
+                    tracing::warn!(error = %e, "toggling the overlay from the tray failed");
+                    overlay_changed(&app, enabled);
+                }
+            });
+            Ok(())
+        }
         QUIT => {
             window::quit(app);
             Ok(())
@@ -291,6 +318,16 @@ pub fn on_engine_event(app: &AppHandle, event: &EngineEvent) {
         .apply(event);
     if changed {
         refresh(app, matches!(event, EngineEvent::StateChanged(_)));
+    }
+}
+
+/// Shows whether the overlay is on in the menu.
+pub fn overlay_changed(app: &AppHandle, enabled: bool) {
+    let Some(tray) = app.try_state::<Tray>() else {
+        return;
+    };
+    if let Err(e) = tray.overlay.set_checked(enabled) {
+        tracing::warn!(error = %e, "updating the tray overlay item failed");
     }
 }
 
@@ -325,6 +362,7 @@ fn refresh(app: &AppHandle, texts: bool) {
             .and_then(|()| tray.show.set_text(labels.show))
             .and_then(|()| tray.mute.set_text(labels.mute))
             .and_then(|()| tray.deafen.set_text(labels.deafen))
+            .and_then(|()| tray.overlay.set_text(labels.overlay))
             .and_then(|()| tray.quit.set_text(labels.quit));
     }
     if let Some(base) = &tray.base {

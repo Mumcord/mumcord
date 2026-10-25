@@ -1,0 +1,110 @@
+/* Overlay window (FR-1.44): transparent page, a small dark panel per person row. */
+html,
+body,
+#root {
+  background: transparent;
+}
+
+body {
+  user-select: none;
+}
+
+.overlay-panel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  max-height: 100%;
+  padding: var(--space-2);
+  overflow: hidden;
+}
+
+.overlay-panel[data-move-mode="true"] {
+  height: 100%;
+  border: 2px dashed var(--color-accent);
+  border-radius: var(--radius-md);
+  background: color-mix(in srgb, var(--color-bg-chat) 70%, transparent);
+  cursor: move;
+}
+
+.overlay-panel__move {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+  color: var(--color-text);
+  font-size: var(--font-size-sm);
+}
+
+.overlay-panel__done {
+  padding: var(--space-1) var(--space-3);
+  border: none;
+  border-radius: var(--radius-sm);
+  background: var(--color-accent);
+  color: var(--color-on-accent);
+  font: inherit;
+  cursor: pointer;
+}
+
+.overlay-panel__done:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 2px;
+}
+
+.overlay-panel__channel {
+  align-self: flex-start;
+  margin: 0;
+  padding: var(--space-1) var(--space-2);
+  border-radius: var(--radius-sm);
+  background: color-mix(in srgb, var(--color-bg-chat) 85%, transparent);
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-bold);
+  text-transform: uppercase;
+}
+
+.overlay-panel__people {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.overlay-person {
+  display: flex;
+  align-items: center;
+  align-self: flex-start;
+  gap: var(--space-2);
+  max-width: 100%;
+  padding: var(--space-1) var(--space-3) var(--space-1) var(--space-1);
+  border-radius: var(--radius-full);
+  background: color-mix(in srgb, var(--color-bg-chat) 85%, transparent);
+  transition: opacity 1.2s ease-in 0.3s;
+}
+
+.overlay-person[data-fading="true"] {
+  opacity: 0;
+}
+
+.overlay-person__name {
+  overflow: hidden;
+  color: var(--color-text);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-bold);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.overlay-person[data-talking="false"] .overlay-person__name {
+  color: var(--color-text-muted);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  /* No fade: the row simply goes when its time is up. */
+  .overlay-person,
+  .overlay-person[data-fading="true"] {
+    opacity: 1;
+    transition: none;
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "listLabel": "Spricht gerade",
+  "move": {
+    "hint": "Ziehen, um das Overlay zu verschieben",
+    "done": "Fertig"
+  },
+  "limits": {
+    "wayland": "Auf diesem Wayland-Desktop können Apps ein Fenster weder im Vordergrund halten noch selbst platzieren. Das Overlay kann daher hinter anderen Fenstern landen, und Eck-Positionen wirken nicht. Schalte in den Spracheinstellungen „Kompatibilitätsmodus (wie TeamSpeak)“ ein und starte Mumcord neu: Dann bleibt das Overlay im Vordergrund.",
+    "waylandKde": "Unter KDE Plasma mit Wayland können Apps ein Fenster weder selbst im Vordergrund halten noch platzieren. Schalte entweder in den Spracheinstellungen „Kompatibilitätsmodus (wie TeamSpeak)“ ein und starte Mumcord neu, oder lege eine KDE-Fensterregel für das Fenster „Mumcord overlay“ an (Systemeinstellungen → Fensterverwaltung → Fensterregeln) mit „Immer im Vordergrund“ und fester Position.",
+    "exclusiveFullscreen": "Das Overlay erscheint über Spielen im Fenster- und randlosen Vollbildmodus. Spiele im exklusiven Vollbild zeichnen über alle Fenster; stelle sie auf „randlos“ oder „Vollbild im Fenster“, um das Overlay zu sehen."
+  }
+}

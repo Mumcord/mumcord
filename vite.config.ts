@@ -1,3 +1,4 @@
+import { fileURLToPath } from "node:url";
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 
@@ -16,5 +17,12 @@ export default defineConfig({
     outDir: "../dist",
     emptyOutDir: true,
     target: "es2022",
+    // Two pages: the main window and the overlay window (FR-1.44).
+    rollupOptions: {
+      input: {
+        main: fileURLToPath(new URL("./ui/index.html", import.meta.url)),
+        overlay: fileURLToPath(new URL("./ui/overlay.html", import.meta.url)),
+      },
+    },
   },
 });

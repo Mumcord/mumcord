@@ -4,6 +4,7 @@
     [
       "specs/chat/notifications.e2e.ts",
       "specs/misc/diagnostics-about.e2e.ts",
+      "specs/overlay/overlay-smoke.e2e.ts",
       "specs/voice/voice.e2e.ts",
       "specs/wizard/ac-1.1-create-identity.e2e.ts"
     ],
