@@ -6,7 +6,7 @@ import { resetNowPlayingStore } from "../nowplaying";
 import { MembersPanel } from "./MembersPanel";
 import { placeNextTo } from "./placement";
 import { ProfilePreviewHost } from "./ProfilePreview";
-import { PREVIEW_CLOSE_GRACE_MS, PREVIEW_OPEN_DELAY_MS } from "./profilePreviewStore";
+import { PIN_DELAY_MS, PREVIEW_CLOSE_GRACE_MS, PREVIEW_OPEN_DELAY_MS } from "./profilePreviewStore";
 
 let api: MockApi;
 
@@ -162,14 +162,28 @@ describe("ProfilePreview", () => {
     expect(screen.getByRole("tooltip")).toHaveTextContent("Ben");
   });
 
-  it("still opens the full profile card on click", async () => {
+  it("converts the hover preview into a pinned card on click, without closing in between", async () => {
     await renderWithPreview();
     await hover(/^Anna/);
+    const hovered = preview();
     fireEvent.pointerDown(member(/^Anna/));
+    expect(preview()).toBe(hovered);
     fireEvent.click(member(/^Anna/));
-    await wait(0);
-    expect(preview()).toBeNull();
-    expect(screen.getByRole("dialog", { name: "Anna" })).toBeInTheDocument();
+    await wait(PIN_DELAY_MS);
+    expect(screen.getByRole("dialog", { name: "Anna" })).toHaveAttribute("data-pinned", "true");
+    // Pinned: leaving the person does not close it.
+    fireEvent.pointerLeave(member(/^Anna/).closest(".profile-preview-trigger") as HTMLElement);
+    await wait(PREVIEW_CLOSE_GRACE_MS * 2);
+    expect(screen.queryByRole("dialog", { name: "Anna" })).not.toBeNull();
+  });
+
+  it("opens the full profile card from the pinned card", async () => {
+    await renderWithPreview();
+    fireEvent.click(member(/^Anna/));
+    await wait(PIN_DELAY_MS);
+    fireEvent.click(screen.getByRole("button", { name: "Full profile" }));
+    expect(screen.queryByRole("button", { name: "Private message" })).toBeNull();
+    expect(screen.getByRole("dialog", { name: "Anna" })).toHaveAttribute("open");
   });
 
   it("opens on keyboard focus, described by the focused person, also for listeners", async () => {

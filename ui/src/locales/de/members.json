@@ -47,5 +47,9 @@
     "joinMessage": "Steam wird geöffnet und verbindet sich mit dem Server, auf dem diese Person {{game}} spielt. Tritt nur Servern bei, denen du vertraust.",
     "joinConfirm": "Steam öffnen",
     "joinFailed": "Steam konnte nicht geöffnet werden."
+  },
+  "preview": {
+    "privateMessage": "Private Nachricht",
+    "fullProfile": "Vollständiges Profil"
   }
 }

@@ -8,8 +8,10 @@ export {
 } from "./privateMessage";
 export { Avatar } from "./Avatar";
 export { ProfilePreviewHost, ProfilePreviewTrigger } from "./ProfilePreview";
+export { clickPerson, doubleClickPerson, pinPerson } from "./personClick";
 export {
   closePreview,
+  pointerDownOnPerson,
   previewOnFocus,
   releasePreview,
   requestPreview,

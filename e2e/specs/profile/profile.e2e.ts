@@ -130,7 +130,11 @@ describe("profile: register, avatar, comment", () => {
       // Member list: a picture (or comment) for the bot.
       const listImg = row.$("img");
       const listHasImg = await listImg.isExisting();
+      // A click pins the preview card (FR-1.62); its "Full profile" button opens the full card.
       await row.click();
+      const full = $("//div[@id='profile-preview']//button[normalize-space(.)='Full profile']");
+      await full.waitForDisplayed();
+      await full.click();
       const card = $("dialog.profile-card");
       await card.waitForDisplayed();
       await browser.waitUntil(async () => (await card.getText()).includes("Bot comment XYZ"), {

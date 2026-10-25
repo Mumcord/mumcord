@@ -8,6 +8,7 @@ import { useCallback, useEffect, useId, useRef, useState, type KeyboardEvent } f
 import { useTranslation } from "react-i18next";
 import { getApi, toEngineError, type User } from "../../api";
 import { useServerState } from "../channels/serverStore";
+import { MumcordBadge } from "../channels/MumcordBadge";
 import { NowGamingFor } from "../nowgaming";
 import { NowPlayingFor } from "../nowplaying";
 import "./members.css";
@@ -127,6 +128,7 @@ function ProfileBody({
         <div>
           <h2 id={titleId} className="profile-card__name">
             {user.name}
+            <MumcordBadge user={user} />
           </h2>
           <p className="profile-card__meta">
             {user.registered ? t("registered") : t("unregistered")}

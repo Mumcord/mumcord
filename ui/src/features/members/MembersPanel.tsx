@@ -7,6 +7,7 @@ import { useRef, useState, type KeyboardEvent } from "react";
 import { useTranslation } from "react-i18next";
 import type { User } from "../../api";
 import { StatusIcons } from "../channels/PersonStatus";
+import { MumcordBadge } from "../channels/MumcordBadge";
 import { useStatusText } from "../channels/statusText";
 import { useSelectedConversation } from "../channels/selection";
 import { useServerState } from "../channels/serverStore";
@@ -15,7 +16,7 @@ import { Avatar } from "./Avatar";
 import type { SendPrivateMessage } from "./privateMessage";
 import { useAvatars } from "./useAvatars";
 import { ProfilePreviewTrigger } from "./ProfilePreview";
-import { useProfileCard } from "./useProfileCard";
+import { clickPerson, doubleClickPerson } from "./personClick";
 
 const byName = (a: User, b: User) =>
   a.name.localeCompare(b.name, undefined, { sensitivity: "base" });
@@ -29,7 +30,6 @@ export function MembersPanel({ onSendPrivateMessage }: MembersPanelProps) {
   const { t } = useTranslation("members");
   const state = useServerState();
   const { conversation } = useSelectedConversation();
-  const { openProfile, profileCard } = useProfileCard(onSendPrivateMessage);
   const statusText = useStatusText();
   const listRef = useRef<HTMLDivElement>(null);
   const [focusedKey, setFocusedKey] = useState<string | null>(null);
@@ -91,12 +91,16 @@ export function MembersPanel({ onSendPrivateMessage }: MembersPanelProps) {
               setFocusedKey(key);
             }}
             onClick={(event) => {
-              openProfile(user.session, event.currentTarget);
+              clickPerson(event.detail, user.session, event.currentTarget);
+            }}
+            onDoubleClick={() => {
+              doubleClickPerson(user.session, undefined, onSendPrivateMessage);
             }}
           >
             <Avatar name={user.name} src={avatarOf(user)} talking={talking} />
             <span className="member__name" data-local-muted={user.localMute}>
               {user.name}
+              <MumcordBadge user={user} />
               {user.session === state.selfSession && (
                 <span className="member__you"> {t("you")}</span>
               )}
@@ -131,7 +135,6 @@ export function MembersPanel({ onSendPrivateMessage }: MembersPanelProps) {
           </ul>
         </>
       )}
-      {profileCard}
     </div>
   );
 }

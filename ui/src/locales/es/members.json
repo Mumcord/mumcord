@@ -47,5 +47,9 @@
     "joinMessage": "Se abrirá Steam y se conectará al servidor en el que esta persona juega a {{game}}. Únete solo a servidores de confianza.",
     "joinConfirm": "Abrir Steam",
     "joinFailed": "No se pudo abrir Steam."
+  },
+  "preview": {
+    "privateMessage": "Mensaje privado",
+    "fullProfile": "Perfil completo"
   }
 }
