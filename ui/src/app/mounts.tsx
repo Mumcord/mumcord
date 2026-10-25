@@ -16,6 +16,7 @@ import {
   FollowStar,
 } from "../features/follow";
 import { ChatView } from "../features/chat";
+import { FriendsList } from "../features/friends";
 import { MembersPanel, openPrivateConversation } from "../features/members";
 import { ConnectionStatus, RejoinPrompt, ServersRoot } from "../features/servers";
 import { CloseDialog } from "../features/app";
@@ -35,6 +36,7 @@ export function ChannelsMount() {
         channelAction={(channel) => <FollowStar {...channel} />}
       />
       <FollowNoticeLine />
+      <FriendsList />
       <DirectMessages />
     </>
   );
