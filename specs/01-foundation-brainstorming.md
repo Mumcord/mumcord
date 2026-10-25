@@ -1087,3 +1087,11 @@ Mumble servers keep no chat history; Mumcord clients can fill gaps for each othe
 ✍️ Note: Requested in chat during /dev.
 
 ---
+
+#### QA.49 Which messages may be synced? `◉`
+
+- [x] **Only messages older than the moment the requesting client started receiving that channel live: for the own channel the join time, for a followed channel the time the user started following it.** Messages after that point are never requested or sent (the client received them live). Following a new channel therefore syncs that channel's earlier history up to the follow time.
+
+✍️ Note: Requested in chat during /dev.
+
+---
