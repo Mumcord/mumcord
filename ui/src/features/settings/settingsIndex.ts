@@ -244,22 +244,28 @@ export function entryLabel(entry: SettingEntry, t: Translate): string {
  * Sections whose name matches, then the settings whose label, group or hints contain every
  * word of the query.
  */
-export function searchSettings(query: string, t: Translate): SearchResult[] {
+export function searchSettings(
+  query: string,
+  t: Translate,
+  hidden: readonly SectionId[] = [],
+): SearchResult[] {
   const words = normalizeSearch(query).split(/\s+/).filter(Boolean);
   if (words.length === 0) return [];
   const matches = (texts: string[]) => {
     const haystack = normalizeSearch(texts.join(" "));
     return words.every((word) => haystack.includes(word));
   };
-  const sections: SearchResult[] = SECTION_IDS.filter((section) =>
-    matches([t(`sections.${section}`)]),
-  ).map((section) => ({ kind: "section", section }));
-  const settings: SearchResult[] = SETTINGS_INDEX.filter((entry) =>
-    matches([
-      entryLabel(entry, t),
-      ...(entry.group === undefined ? [] : [t(entry.group)]),
-      ...(entry.terms ?? []).map(t),
-    ]),
-  ).map((entry) => ({ kind: "setting", entry }));
+  const sections: SearchResult[] = SECTION_IDS.filter((section) => !hidden.includes(section))
+    .filter((section) => matches([t(`sections.${section}`)]))
+    .map((section) => ({ kind: "section", section }));
+  const settings: SearchResult[] = SETTINGS_INDEX.filter((entry) => !hidden.includes(entry.section))
+    .filter((entry) =>
+      matches([
+        entryLabel(entry, t),
+        ...(entry.group === undefined ? [] : [t(entry.group)]),
+        ...(entry.terms ?? []).map(t),
+      ]),
+    )
+    .map((entry) => ({ kind: "setting", entry }));
   return [...sections, ...settings];
 }
