@@ -219,7 +219,7 @@ function mockLinkPreview(url: string, demo: boolean): LinkPreview | null {
 /** Offline stand-in for the engine's inline images: the same small picture for every http(s) URL. */
 function mockInlineImage(url: string, demo: boolean): InlineImage | null {
   if (!/^https?:\/\//i.test(url)) return null;
-  const src = demo ? demoPicture() : MOCK_DEFAULT_AVATAR;
+  const src = demo ? DEMO_PHOTO : MOCK_DEFAULT_AVATAR;
   return { url, src, width: 320, height: 180, animated: false };
 }
 
@@ -355,6 +355,13 @@ function demoPicture(): string {
     `<path d="M0 160 L110 132 L210 158 L320 136 V180 H0Z" fill="#0f172a"/></svg>`;
   return `data:image/svg+xml,${encodeURIComponent(svg)}`;
 }
+
+/**
+ * The landscape of `demoPicture` as a WebP (640×360): inline images only accept raster pictures,
+ * like the engine delivers them.
+ */
+const DEMO_PHOTO =
+  "data:image/webp;base64,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";
 
 function demoHistory(): ChatMessage[] {
   const lines: [number, string, string, number][] = [
@@ -1450,7 +1457,7 @@ export function createMockApi(options: MockOptions = {}): MockApi {
       Promise.resolve(
         demo
           ? {
-              version: "0.1.0",
+              version: "0.3.0",
               os: "Linux x86_64",
               thirdPartyNotices:
                 "Mumble\nCopyright (c) The Mumble Developers\nBSD-3-Clause\n\nTauri - Apache-2.0 OR MIT\n\nReact - MIT",
