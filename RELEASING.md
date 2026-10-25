@@ -13,6 +13,7 @@ The version lives in three places, which must all match the tag (the workflow ch
 | `package.json` and `package-lock.json` | `"version"`; both are updated by the `npm version` command below  |
 | `Cargo.toml` (`[workspace.package]`)   | `version = "…"`; every crate, including the app, inherits it      |
 | `Cargo.lock`                           | updated automatically by `cargo check` after editing `Cargo.toml` |
+| `scripts/smoke/seed/Cargo.lock`        | the smoke-test seeder is its own Cargo project; refresh it too    |
 
 `src-tauri/tauri.conf.json` has no version on purpose: Tauri takes the app version from `Cargo.toml`. Do not add one.
 
@@ -22,7 +23,8 @@ On a branch, for example for version `0.2.0`:
 npm version 0.2.0 --no-git-tag-version   # package.json + package-lock.json
 # edit Cargo.toml: [workspace.package] version = "0.2.0"
 cargo check --workspace                  # refreshes Cargo.lock
-git add package.json package-lock.json Cargo.toml Cargo.lock
+cargo check --manifest-path scripts/smoke/seed/Cargo.toml   # refreshes the seeder's Cargo.lock
+git add package.json package-lock.json Cargo.toml Cargo.lock scripts/smoke/seed/Cargo.lock
 git commit -m "chore: release 0.2.0"
 ```
 
