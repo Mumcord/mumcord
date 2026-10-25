@@ -11,6 +11,9 @@ import {
 } from "../members/profilePreviewStore";
 import { MessageList } from "./MessageList";
 
+// Fixed local noon: messages dated "minutes ago" must never straddle midnight.
+const NOW = new Date(2026, 5, 15, 12, 0, 0);
+
 const AVATAR = "data:image/png;base64,iVBORw0KGgo=";
 
 function message(id: string, sender: string, minutesAgo: number, body: string): ChatMessage {
@@ -21,7 +24,7 @@ function message(id: string, sender: string, minutesAgo: number, body: string): 
     senderCertHash: `${sender}-hash`,
     senderSession: null,
     own: false,
-    sentAt: new Date(Date.now() - minutesAgo * 60_000).toISOString(),
+    sentAt: new Date(NOW.getTime() - minutesAgo * 60_000).toISOString(),
     body,
   };
 }
@@ -131,10 +134,19 @@ describe("MessageList cozy", () => {
   });
 
   it("puts a day separator above the first message of each day", () => {
-    const old = { ...message("0", "Priya", 0, "old"), sentAt: "2020-01-02T12:00:00Z" };
-    renderList("cozy", [old, ...MESSAGES]);
-    const days = document.querySelectorAll(".chat-day");
-    expect([...days].map((d) => d.textContent)).toEqual([expect.stringContaining("2020"), "Today"]);
+    vi.useFakeTimers({ toFake: ["Date"] });
+    vi.setSystemTime(NOW);
+    try {
+      const old = { ...message("0", "Priya", 0, "old"), sentAt: "2020-01-02T12:00:00Z" };
+      renderList("cozy", [old, ...MESSAGES]);
+      const days = document.querySelectorAll(".chat-day");
+      expect([...days].map((d) => d.textContent)).toEqual([
+        expect.stringContaining("2020"),
+        "Today",
+      ]);
+    } finally {
+      vi.useRealTimers();
+    }
   });
 
   it("has no axe violations", async () => {
