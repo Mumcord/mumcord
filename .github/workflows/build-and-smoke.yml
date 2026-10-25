@@ -4,8 +4,9 @@ name: Build and smoke
 # DMG), uploads them as workflow artifacts, then installs each one on a fresh runner and
 # smoke-tests it against a local Mumble server (scripts/smoke/smoke.sh). Called by
 # test-builds.yml (spec §10, AC-1.30) and release.yml (QA.12). Test builds are never signed.
-# Release builds sign and notarize the macOS DMG only when the Apple secrets exist
-# (docs/release-signing.md); without them the DMG is built unsigned.
+# Release builds sign and notarize the macOS DMG only when the Apple secrets exist, and sign the
+# Windows app and installer through SignPath only when the SignPath secrets exist
+# (docs/release-signing.md); without them those bundles are built unsigned.
 on:
   workflow_call:
     secrets:
@@ -20,6 +21,10 @@ on:
       APPLE_API_KEY:
         required: false
       APPLE_API_KEY_P8:
+        required: false
+      SIGNPATH_API_TOKEN:
+        required: false
+      SIGNPATH_ORGANIZATION_ID:
         required: false
     inputs:
       release:
@@ -55,7 +60,8 @@ jobs:
             bundle: target/universal-apple-darwin/release/bundle/dmg/*.dmg
             rust-targets: aarch64-apple-darwin,x86_64-apple-darwin
     runs-on: ${{ matrix.os }}
-    timeout-minutes: 60
+    # A signed Windows release waits for two manual SignPath approvals.
+    timeout-minutes: ${{ (inputs.release && matrix.name == 'windows') && 240 || 60 }}
     steps:
       - uses: actions/checkout@v4
 
@@ -114,8 +120,98 @@ jobs:
             echo "MUMCORD_MACOS_SIGNED=true"
           } >> "$GITHUB_ENV"
 
+      - name: Check Windows signing setup
+        id: signpath
+        if: runner.os == 'Windows' && inputs.release
+        shell: bash
+        env:
+          SIGNPATH_API_TOKEN: ${{ secrets.SIGNPATH_API_TOKEN }}
+          SIGNPATH_ORGANIZATION_ID: ${{ vars.SIGNPATH_ORGANIZATION_ID || secrets.SIGNPATH_ORGANIZATION_ID }}
+        run: |
+          if [[ -z "$SIGNPATH_API_TOKEN" || -z "$SIGNPATH_ORGANIZATION_ID" ]]; then
+            echo "::warning::SIGNPATH_API_TOKEN or SIGNPATH_ORGANIZATION_ID is not set: building the Windows installer unsigned."
+            exit 0
+          fi
+          echo "enabled=true" >> "$GITHUB_OUTPUT"
+          echo "version=$(node -p "require('./package.json').version")" >> "$GITHUB_OUTPUT"
+
       - name: Build bundle
+        if: steps.signpath.outputs.enabled != 'true'
         run: npm run tauri build -- ${{ matrix.args }}
+
+      # Signed Windows release: SignPath cannot sign files inside a finished NSIS installer, so
+      # the app is built and signed first, then the installer is bundled around the signed exe
+      # and signed itself. Each signing request waits for the maintainer's manual approval.
+      - name: Build Windows app for signing
+        if: steps.signpath.outputs.enabled == 'true'
+        run: npm run tauri build -- --no-bundle
+
+      - name: Upload unsigned Windows app
+        id: unsigned-app
+        if: steps.signpath.outputs.enabled == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: mumcord-windows-unsigned-app
+          path: target/release/mumcord.exe
+          if-no-files-found: error
+          retention-days: 1
+
+      - name: Sign Windows app (SignPath)
+        if: steps.signpath.outputs.enabled == 'true'
+        uses: signpath/github-action-submit-signing-request@v3
+        with:
+          api-token: ${{ secrets.SIGNPATH_API_TOKEN }}
+          organization-id: ${{ vars.SIGNPATH_ORGANIZATION_ID || secrets.SIGNPATH_ORGANIZATION_ID }}
+          project-slug: mumcord
+          signing-policy-slug: release-signing
+          artifact-configuration-slug: initial
+          github-artifact-id: ${{ steps.unsigned-app.outputs.artifact-id }}
+          wait-for-completion: true
+          wait-for-completion-timeout-in-seconds: 5400
+          output-artifact-directory: signed-app
+          parameters: |
+            version: "${{ steps.signpath.outputs.version }}"
+
+      - name: Bundle Windows installer around the signed app
+        if: steps.signpath.outputs.enabled == 'true'
+        shell: bash
+        run: |
+          cp signed-app/mumcord.exe target/release/mumcord.exe
+          npm run tauri bundle -- --bundles nsis
+
+      - name: Upload unsigned Windows installer
+        id: unsigned-installer
+        if: steps.signpath.outputs.enabled == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: mumcord-windows-unsigned-installer
+          path: ${{ matrix.bundle }}
+          if-no-files-found: error
+          retention-days: 1
+
+      - name: Sign Windows installer (SignPath)
+        if: steps.signpath.outputs.enabled == 'true'
+        uses: signpath/github-action-submit-signing-request@v3
+        with:
+          api-token: ${{ secrets.SIGNPATH_API_TOKEN }}
+          organization-id: ${{ vars.SIGNPATH_ORGANIZATION_ID || secrets.SIGNPATH_ORGANIZATION_ID }}
+          project-slug: mumcord
+          signing-policy-slug: release-signing
+          artifact-configuration-slug: initial
+          github-artifact-id: ${{ steps.unsigned-installer.outputs.artifact-id }}
+          wait-for-completion: true
+          wait-for-completion-timeout-in-seconds: 5400
+          output-artifact-directory: signed-installer
+          parameters: |
+            version: "${{ steps.signpath.outputs.version }}"
+
+      - name: Replace the unsigned installer with the signed one
+        if: steps.signpath.outputs.enabled == 'true'
+        shell: bash
+        run: |
+          rm target/release/bundle/nsis/*-setup.exe
+          cp signed-installer/*-setup.exe target/release/bundle/nsis/
+          echo "MUMCORD_WINDOWS_SIGNED=true" >> "$GITHUB_ENV"
 
       - name: Collect artifact
         shell: bash
@@ -124,6 +220,7 @@ jobs:
           cp ${{ matrix.bundle }} out/
           # Tells the release job to describe the DMG as signed and notarized.
           if [[ "${MUMCORD_MACOS_SIGNED:-}" == "true" ]]; then touch out/MACOS-SIGNED; fi
+          if [[ "${MUMCORD_WINDOWS_SIGNED:-}" == "true" ]]; then touch out/WINDOWS-SIGNED; fi
           # Releases carry this note in the release text instead.
           if [[ "${{ inputs.release }}" == "true" ]]; then ls -l out; exit 0; fi
           cat > out/UNSIGNED-TEST-BUILD.txt <<EOF
