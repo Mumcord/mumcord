@@ -221,6 +221,8 @@
 | B57 | Gear icon for the settings button (QA.47) | done | b57-gear-icon | – | simple | – | ui/src/features/userpanel |
 | L1 | License switch to AGPL-3.0-only + commercial license note, CLA in CONTRIBUTING, About page, package metadata, wiki (QA.51) | done – AGPL text, NOTICE, COMMERCIAL.md, CONTRIBUTING (CLA), PR template, metadata, About page, notices | l1-license | – | simple | AC-1.29 | LICENSE, COMMERCIAL.md, CONTRIBUTING.md, README, Cargo/package metadata, settings About, notices |
 | B58 | "via GIPHY" / "via Tenor" attribution labels (QA.52) | done – GifAttribution label (text = accessible name), gifSource helper | b58-gif-attribution | B36 | simple | FR-1.52 | ui/src/features/chat |
+| B59 | Bug: in compact chat layout the link-preview card's left bar overlaps its text | open | | – | simple | – | ui/src/features/chat css |
+| B60 | Port the demo-mock additions used for the 0.2.0 screenshots (demoPicture, demo link previews/inline images) | open | | – | simple | – | ui/src/api/mock.ts |
 | D1 | Implementation report | open | | C1–C10 | simple | all | specs/01-foundation-implementation.md |
 
 ## Contracts from finished tasks
