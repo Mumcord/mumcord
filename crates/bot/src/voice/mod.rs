@@ -22,7 +22,7 @@ use anyhow::{Context, Result, anyhow, bail};
 use bytes::Bytes;
 use mumcord_audio::codec::{MAX_PACKET_BYTES, OpusEncoder, PacketDuration};
 use mumcord_audio::{FRAME_SAMPLES, Frame};
-use mumcord_protocol::voice::{OutgoingAudio, VoiceEvent, VoiceTransport};
+use mumcord_protocol::voice::{OutgoingAudio, VoiceEvent, VoicePacket, VoiceTransport};
 use mumcord_protocol::{Event, Handle};
 use tokio::sync::broadcast;
 use tokio::task::JoinHandle;
@@ -50,6 +50,9 @@ pub struct PlayOptions {
     pub forever: bool,
     /// Stop (with terminator) after this much time.
     pub max_duration: Option<Duration>,
+    /// Avatar position sent with every packet (positional audio); only reaches people with
+    /// the same plugin context (`Handle::set_plugin_context`).
+    pub position: Option<[f32; 3]>,
 }
 
 impl Default for PlayOptions {
@@ -58,6 +61,7 @@ impl Default for PlayOptions {
             repeat: 1,
             forever: false,
             max_duration: None,
+            position: None,
         }
     }
 }
@@ -88,6 +92,7 @@ pub struct BotVoice {
     handle: Handle,
     inbox: Arc<Mutex<Inbox>>,
     talk: broadcast::Sender<TalkEvent>,
+    packets: broadcast::Sender<VoicePacket>,
     tasks: Vec<JoinHandle<()>>,
 }
 
@@ -121,6 +126,7 @@ impl BotVoice {
         let transport = Arc::new(transport);
         let inbox = Arc::new(Mutex::new(Inbox::default()));
         let (talk, _) = broadcast::channel(256);
+        let (packets, _) = broadcast::channel(1024);
 
         let forward = {
             let transport = Arc::clone(&transport);
@@ -138,6 +144,7 @@ impl BotVoice {
         let receive = {
             let inbox = Arc::clone(&inbox);
             let talk = talk.clone();
+            let packets = packets.clone();
             tokio::spawn(async move {
                 let mut idle = tokio::time::interval(Duration::from_millis(50));
                 idle.set_missed_tick_behavior(MissedTickBehavior::Delay);
@@ -145,7 +152,9 @@ impl BotVoice {
                     let events = tokio::select! {
                         event = voice_rx.recv() => match event {
                             Some(VoiceEvent::Packet(packet)) => {
-                                lock(&inbox).ingest(&packet, Instant::now())
+                                let events = lock(&inbox).ingest(&packet, Instant::now());
+                                let _ = packets.send(packet);
+                                events
                             }
                             Some(VoiceEvent::TransportChanged(t)) => {
                                 tracing::debug!(?t, "voice transport changed");
@@ -166,6 +175,7 @@ impl BotVoice {
             handle,
             inbox,
             talk,
+            packets,
             tasks: vec![forward, receive],
         })
     }
@@ -206,7 +216,7 @@ impl BotVoice {
                 }
                 ticker.tick().await;
                 let last = !opts.forever && pass + 1 == passes && i + 1 == count;
-                self.send_packet(&mut encoder, pair, last)?;
+                self.send_packet(&mut encoder, pair, last, opts.position)?;
                 packets += 1;
                 terminated = last;
             }
@@ -214,7 +224,7 @@ impl BotVoice {
         if !terminated {
             ticker.tick().await;
             let silence: [Frame; 2] = [[0.0; FRAME_SAMPLES]; 2];
-            self.send_packet(&mut encoder, &silence, true)?;
+            self.send_packet(&mut encoder, &silence, true, opts.position)?;
             packets += 1;
         }
         Ok(PlayReport {
@@ -224,7 +234,13 @@ impl BotVoice {
         })
     }
 
-    fn send_packet(&self, encoder: &mut OpusEncoder, pair: &[Frame], last: bool) -> Result<()> {
+    fn send_packet(
+        &self,
+        encoder: &mut OpusEncoder,
+        pair: &[Frame],
+        last: bool,
+        position: Option<[f32; 3]>,
+    ) -> Result<()> {
         let mut buf = [0u8; MAX_PACKET_BYTES];
         let mut len = None;
         for frame in pair {
@@ -233,11 +249,10 @@ impl BotVoice {
                 .map_err(|e| anyhow!("encode: {e}"))?;
         }
         let len = len.ok_or_else(|| anyhow!("encoder produced no packet"))?;
-        self.transport.send_audio(OutgoingAudio::new(
-            Bytes::copy_from_slice(&buf[..len]),
-            2,
-            last,
-        ));
+        self.transport.send_audio(
+            OutgoingAudio::new(Bytes::copy_from_slice(&buf[..len]), 2, last)
+                .with_position(position),
+        );
         Ok(())
     }
 
@@ -278,6 +293,11 @@ impl BotVoice {
     /// Talking start/stop events so far, oldest first.
     pub fn talk_events(&self) -> Vec<TalkEvent> {
         lock(&self.inbox).talk_log.clone()
+    }
+
+    /// Every received voice packet as it arrived (with its position, if any).
+    pub fn subscribe_packets(&self) -> broadcast::Receiver<VoicePacket> {
+        self.packets.subscribe()
     }
 
     /// Live talking-state events.
