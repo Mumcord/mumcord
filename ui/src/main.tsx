@@ -4,6 +4,7 @@ import "./theme/global.css";
 import "./i18n";
 import { App } from "./app/App";
 import { installNativeMenuSuppression } from "./app/nativeContextMenu";
+import { installNativeDragGuard } from "./app/nativeDrag";
 import { applyThemeToDocument, osPrefersDark, resolveTheme } from "./theme/theme";
 
 const root = document.getElementById("root");
@@ -12,6 +13,7 @@ if (!root) {
 }
 
 installNativeMenuSuppression();
+installNativeDragGuard();
 
 // Paint the OS theme right away; the stored theme setting replaces it once settings load.
 applyThemeToDocument(resolveTheme("system", osPrefersDark()));
