@@ -228,7 +228,7 @@
 | B95 | "Beta" badge for positional audio + game plugins (settings groups, quick-settings row, hint) | done | b95-beta-badge | – | simple | FR-1.73 | ui settings, quick settings |
 | B96 | "Beta" badge for full-size images on demand in the image viewer | done | b96-beta-images | B95 | simple | FR-1.73 | ui chat image viewer |
 | B97 | Settings switches: offer my full-size images / load full-size images from others | done – merged | b97-fullimage-switches | B93 | simple | FR-1.74 | store settings, engine full_images, ui settings Chat |
-| B98 | Quick settings: collapsible "Beta" group (positional audio + full-size image switches), remove row badge | in progress | b98-beta-group | B97 | simple | FR-1.73 | ui QuickSettings |
+| B98 | Quick settings: collapsible "Beta" group (positional audio + full-size image switches), remove row badge | done | b98-beta-group | B97 | simple | FR-1.73 | ui QuickSettings |
 | R3 | v0.3.0 release notes + wiki: positional audio, plugins and full-size images Beta, Windows in-game overlay coming later | open | | B95 | simple | FR-1.73 | release notes, wiki |
 | C9 | (1c) Verify positional audio | done – AC-1.31/1.32/1.55 automated; 🎧 listening manual | | B31, B33 | complex | AC-1.31, 1.32 | e2e/specs/positional |
 | C10 | (1c) Verify overlay | done – AC-1.33/1.34/1.34b automated; borderless-window on-top (WM-dependent), exclusive fullscreen, Windows hook manual | | B32, B33 | simple | AC-1.33, 1.34 | e2e/specs/overlay |

@@ -1319,3 +1319,12 @@ Requested before the v0.3.0 release.
 ✍️ Note: Requested in chat during /dev.
 
 ---
+
+#### QA.73 Beta badge in quick settings looks off? `◉`
+Feedback while testing the Beta labels.
+
+- [x] **Collapsible Beta group:** in quick settings, Beta features (positional audio and the two full-size image switches) move into a collapsible "Beta" group (collapsed by default, state remembered); the rows themselves carry no badge.
+
+✍️ Note: Requested in chat during /dev.
+
+---
