@@ -1328,3 +1328,18 @@ Feedback while testing the Beta labels.
 ✍️ Note: Requested in chat during /dev.
 
 ---
+
+#### QA.74 What moves from Epic 1 to Epic 2? `◉`
+Decided before the v0.3.0 release: everything from Epic 1 that will not make v0.3.0 is carried over to Epic 2.
+
+- [x] **In-game overlay on Windows** (DXGI/D3D11/D3D12 hook; waits for a Windows test PC, QA.68).
+- [x] **HDR10/PQ colours** for the in-game overlay (scRGB is handled; HDR10 shows but too bright).
+- [x] **Borderless fullscreen games:** some window managers stack them above keep-above windows – verify on KDE/GNOME and fix if needed.
+- [x] **Flatpak Steam:** check and support the in-game overlay there.
+- [x] **"Now gaming" join target from Mumble Link** game context.
+- [x] **Cancel full-size image transfers** when the viewer closes.
+- [x] **Leaving Beta:** verify the official game plugins with real games; then positional audio, plugins and full-size images drop the Beta label.
+
+✍️ Note: Requested in chat during /dev.
+
+---

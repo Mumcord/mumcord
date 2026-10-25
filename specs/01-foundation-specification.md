@@ -549,6 +549,7 @@ Unless stated otherwise: a fresh Mumcord install, a local test server (1.5) runn
 | QA.71 | Positional audio, game plugins and full-size images on demand shipped as Beta (badge in the app, noted in release notes/wiki); Windows in-game overlay listed as coming later | Addendum 2026-10-25; FR-1.73 |
 | QA.72 | Sending and receiving full-size images can each be switched off in settings (both on by default) | Addendum 2026-10-25; FR-1.74 |
 | QA.73 | Quick settings: Beta features (positional audio, full-size image switches) in a collapsible "Beta" group, no per-row badge | Addendum 2026-10-25; FR-1.73 |
+| QA.74 | Epic 1 leftovers that do not make v0.3.0 move to Epic 2 (Windows in-game overlay, HDR10 overlay colours, borderless-fullscreen on-top, Flatpak Steam, Link-based join target, full-image transfer cancel, Beta exit checks) | Addendum 2026-10-25; roadmap row Epic 2 |
 
 ## 13. Open points & risks
 
@@ -568,7 +569,7 @@ No `specs/roadmap.md` exists yet. This brainstorming proposes it:
 | Epic | Title | Content |
 |---|---|---|
 | 1 | Foundation | This spec (stages 1a, 1b, 1c, 1d; releases 0.1.x, 0.2.0, 0.3.0) |
-| 2 | Multi-server read-along + themes | Connect to several servers at once and read along on all of them (QA.1); custom themes: colour settings with presets, shareable as a config string that renders as a theme preview card in the chat and can be imported with one click (QA.53) |
+| 2 | Multi-server read-along + themes | Connect to several servers at once and read along on all of them (QA.1); custom themes: colour settings with presets, shareable as a config string that renders as a theme preview card in the chat and can be imported with one click (QA.53). Carried over from Epic 1 (not in v0.3.0, QA.74): Windows in-game overlay (DXGI/D3D11/D3D12 hook, QA.68); in-game overlay colours on HDR10/PQ swapchains; overlay staying on top of borderless fullscreen games where the window manager stacks them above keep-above windows (verify on KDE/GNOME, fix if needed); in-game overlay with Flatpak Steam; "Now gaming" join target from the Mumble Link game context; cancelling a running full-size image transfer when the viewer closes; verifying the official game plugins with real games so positional audio, plugins and full-size images can leave Beta |
 | 3 | Comfort & polish | Global hotkeys beyond PTT, full tray menu, desktop notifications, import from the official client, whisper/shout (Q5.8), public server browser (Q5.3) |
 | 4 | Admin features | ACL/permission editing, bans, channel management – completes "full replacement" (Q1.3) |
 | 5 | Release & distribution | Signed installers, auto-update, opt-in crash reports (Q4.9), store/package listings |
