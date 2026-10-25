@@ -28,7 +28,7 @@
   "bundle": {
     "active": true,
     "targets": ["appimage", "nsis", "app", "dmg"],
-    "publisher": "Tobias Vorwachs",
+    "publisher": "Mumcord contributors",
     "copyright": "Copyright (c) 2026 Tobias Vorwachs and Mumcord contributors. AGPL-3.0-only.",
     "license": "AGPL-3.0-only",
     "category": "SocialNetworking",
