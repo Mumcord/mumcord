@@ -22,6 +22,7 @@ pub mod now_gaming;
 pub mod now_playing;
 pub mod overlay;
 pub mod people;
+pub mod positional;
 pub mod profile;
 pub mod ptt;
 pub mod servers;

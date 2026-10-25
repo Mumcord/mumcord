@@ -84,7 +84,7 @@ ash = { version = "0.38", default-features = false, features = ["std"] }
 # Positional audio / plugin host
 libloading = "0.8"
 libc = "0.2"
-windows-sys = { version = "0.61", features = ["Win32_Foundation", "Win32_System_Memory"] }
+windows-sys = { version = "0.61", features = ["Win32_Foundation", "Win32_Security", "Win32_System_Memory"] }
 
 # Linux desktop portals (Wayland global shortcuts)
 ashpd = "0.13"

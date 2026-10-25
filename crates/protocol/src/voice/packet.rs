@@ -394,6 +394,27 @@ mod tests {
     }
 
     #[test]
+    fn protobuf_positional_roundtrip() {
+        let out = AudioOut {
+            target: 0,
+            seq: 10,
+            payload: &[1; 20],
+            is_last: false,
+            positional: Some([-4.0, 1.5, 12.25]),
+        };
+        let data = encode_audio(Format::Protobuf, &out).expect("encode");
+        let mut m = udp_proto::Audio::decode(&data[1..]).expect("proto");
+        assert_eq!(m.positional_data, [-4.0, 1.5, 12.25]);
+        m.sender_session = 4;
+        m.header = Some(udp_proto::audio::Header::Context(0));
+        let Some(Incoming::Audio(a)) = decode(Format::Protobuf, &with_header(PROTO_AUDIO, &m))
+        else {
+            panic!("not audio");
+        };
+        assert_eq!(a.positional, Some([-4.0, 1.5, 12.25]));
+    }
+
+    #[test]
     fn pings_roundtrip_both_formats() {
         for f in [Format::Legacy, Format::Protobuf] {
             let p = encode_ping(f, 987_654_321);

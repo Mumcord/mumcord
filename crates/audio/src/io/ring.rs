@@ -12,8 +12,14 @@ use super::IoStats;
 /// continuously, so this is headroom for scheduling hiccups, not latency.
 const RING_MS: usize = 100;
 
+/// Mono capture ring.
 pub(crate) fn ring(device_rate: u32) -> (Producer<f32>, Consumer<f32>) {
     RingBuffer::new(device_rate as usize * RING_MS / 1000)
+}
+
+/// Playback ring of interleaved stereo samples (left, right).
+pub(crate) fn stereo_ring(device_rate: u32) -> (Producer<f32>, Consumer<f32>) {
+    RingBuffer::new(2 * device_rate as usize * RING_MS / 1000)
 }
 
 /// Shared counters, updated with relaxed atomics from real-time callbacks.
@@ -71,7 +77,9 @@ pub(crate) fn capture<T>(
     }
 }
 
-/// Real-time playback body: pops mono samples onto every device channel and
+/// Real-time playback body: pops interleaved stereo pairs onto the device
+/// channels (mono devices get the mix of both, channels beyond the first two
+/// get it too, so non-positional audio sounds as before on every layout) and
 /// fills the rest with silence. Only a buffer that runs dry part-way counts as
 /// an underrun; an empty queue is the normal "nobody talks" state.
 pub(crate) fn playback<T>(
@@ -83,16 +91,33 @@ pub(crate) fn playback<T>(
     T: Sample + FromSample<f32>,
 {
     let frames = data.len() / channels;
-    let available = consumer.slots();
+    let available = consumer.slots() / 2;
     let readable = frames.min(available);
     if available > 0 && readable < frames {
         counters.playback_underrun();
     }
     let mut out = data.chunks_exact_mut(channels);
-    if let Ok(chunk) = consumer.read_chunk(readable) {
-        for (sample, frame) in chunk.into_iter().zip(&mut out) {
-            frame.fill(T::from_sample(sample));
+    if let Ok(chunk) = consumer.read_chunk(readable * 2) {
+        let (a, b) = chunk.as_slices();
+        let mut samples = a.iter().chain(b);
+        for _ in 0..readable {
+            let (Some(&left), Some(&right), Some(frame)) =
+                (samples.next(), samples.next(), out.next())
+            else {
+                break;
+            };
+            let mid = T::from_sample((left + right) * 0.5);
+            match frame {
+                [only] => *only = mid,
+                [l, r, rest @ ..] => {
+                    *l = T::from_sample(left);
+                    *r = T::from_sample(right);
+                    rest.fill(mid);
+                }
+                [] => {}
+            }
         }
+        chunk.commit_all();
     }
     for frame in out {
         frame.fill(T::EQUILIBRIUM);
@@ -118,13 +143,14 @@ mod tests {
     }
 
     #[test]
-    fn playback_upmixes_and_pads_with_silence() {
-        let (mut producer, mut consumer) = RingBuffer::new(8);
+    fn playback_maps_stereo_and_pads_with_silence() {
+        let (mut producer, mut consumer) = RingBuffer::new(16);
         let counters = Counters::default();
         producer.push(0.5).expect("push");
+        producer.push(0.25).expect("push");
         let mut out = [1.0f32; 6];
         playback(&mut out, 2, &mut consumer, &counters);
-        assert_eq!(out, [0.5, 0.5, 0.0, 0.0, 0.0, 0.0]);
+        assert_eq!(out, [0.5, 0.25, 0.0, 0.0, 0.0, 0.0]);
         assert_eq!(counters.snapshot().playback_underruns, 1);
 
         playback(&mut out, 2, &mut consumer, &counters);
@@ -134,6 +160,19 @@ mod tests {
             1,
             "empty queue is not an underrun"
         );
+
+        for s in [0.5, 0.25, -0.5, 0.0] {
+            producer.push(s).expect("push");
+        }
+        let mut mono = [1.0f32; 2];
+        playback(&mut mono, 1, &mut consumer, &counters);
+        assert_eq!(mono, [0.375, -0.25], "mono devices get the mix");
+
+        producer.push(0.5).expect("push");
+        producer.push(0.25).expect("push");
+        let mut surround = [1.0f32; 4];
+        playback(&mut surround, 4, &mut consumer, &counters);
+        assert_eq!(surround, [0.5, 0.25, 0.375, 0.375]);
     }
 
     #[test]
@@ -149,9 +188,10 @@ mod tests {
                     next
                 })
                 .collect();
+            // Capture writes mono samples; read back as pairs on a stereo device.
             capture(&block, 1, &mut producer, &counters);
             let mut out = vec![0.0f32; 1000];
-            playback(&mut out, 1, &mut consumer, &counters);
+            playback(&mut out, 2, &mut consumer, &counters);
             for s in out {
                 expected += 1.0;
                 assert_eq!(s, expected);

@@ -115,7 +115,23 @@ pub struct SoundSettings {
     pub hang_up: bool,
 }
 
-#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, Type)]
+/// Positional audio (FR-1.41): voices of people in the same game placed in 3D.
+#[derive(Serialize, Deserialize, Clone, Copy, Debug, PartialEq, Type)]
+#[serde(rename_all = "camelCase")]
+pub struct PositionalSettings {
+    /// Default off.
+    pub enabled: bool,
+    /// Metres (default 1): voices are at full volume up to this distance.
+    pub min_distance: f32,
+    /// Metres (default 15): voices are silent beyond this distance. Kept above `minDistance`
+    /// on save.
+    pub max_distance: f32,
+}
+
+/// Largest accepted distance in metres.
+const MAX_DISTANCE_M: f32 = 1000.0;
+
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Type)]
 #[serde(rename_all = "camelCase")]
 pub struct Settings {
     /// False until the first-start wizard was finished.
@@ -182,6 +198,8 @@ pub struct Settings {
     pub announcements: bool,
     /// Accessibility: "Skip links" (default on; FR-1.69).
     pub skip_links: bool,
+    /// Positional audio (FR-1.41). Off: no game positions are read.
+    pub positional: PositionalSettings,
 }
 
 impl Settings {
@@ -257,6 +275,11 @@ impl Settings {
             keyboard_hints: s.keyboard_hints,
             announcements: s.announcements,
             skip_links: s.skip_links,
+            positional: PositionalSettings {
+                enabled: s.positional.enabled,
+                min_distance: s.positional.min_distance,
+                max_distance: s.positional.max_distance,
+            },
         }
     }
 
@@ -334,7 +357,21 @@ impl Settings {
         s.keyboard_hints = self.keyboard_hints;
         s.announcements = self.announcements;
         s.skip_links = self.skip_links;
+        s.positional = positional_to_store(&self.positional);
         s
+    }
+}
+
+/// Validated distances: finite, `0 ≤ min < max ≤ 1000` m.
+fn positional_to_store(p: &PositionalSettings) -> store::PositionalSettings {
+    let defaults = store::PositionalSettings::default();
+    let finite = |v: f32, default: f32| if v.is_finite() { v } else { default };
+    let min = finite(p.min_distance, defaults.min_distance).clamp(0.0, MAX_DISTANCE_M - 1.0);
+    let max = finite(p.max_distance, defaults.max_distance).clamp(min + 1.0, MAX_DISTANCE_M);
+    store::PositionalSettings {
+        enabled: p.enabled,
+        min_distance: min,
+        max_distance: max,
     }
 }
 
@@ -508,6 +545,32 @@ mod tests {
             ..store::Settings::default()
         };
         assert_eq!(Settings::from_store(&s).language, None);
+    }
+
+    #[test]
+    fn positional_distances_are_kept_valid() {
+        let base = store::Settings::default();
+        let mut ui = Settings::from_store(&base);
+        assert!(!ui.positional.enabled);
+        assert_eq!(
+            (ui.positional.min_distance, ui.positional.max_distance),
+            (1.0, 15.0)
+        );
+        ui.positional = PositionalSettings {
+            enabled: true,
+            min_distance: 5.0,
+            max_distance: 2.0,
+        };
+        let stored = ui.to_store(&base).positional;
+        assert!(stored.enabled);
+        assert_eq!((stored.min_distance, stored.max_distance), (5.0, 6.0));
+        ui.positional.min_distance = f32::NAN;
+        ui.positional.max_distance = 1e9;
+        let stored = ui.to_store(&base).positional;
+        assert_eq!(
+            (stored.min_distance, stored.max_distance),
+            (1.0, MAX_DISTANCE_M)
+        );
     }
 
     #[test]

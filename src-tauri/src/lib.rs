@@ -127,6 +127,7 @@ fn specta_builder() -> Builder<tauri::Wry> {
             commands::now_gaming::now_gaming_status,
             commands::now_gaming::now_gaming_icon,
             commands::now_gaming::now_gaming_join,
+            commands::positional::positional_status,
             commands::overlay::overlay_state,
             commands::overlay::overlay_update,
             commands::overlay::overlay_set_enabled,
@@ -167,6 +168,8 @@ fn specta_builder() -> Builder<tauri::Wry> {
             notify::NotificationActivated,
             commands::now_playing::NowPlayingChanged,
             commands::now_gaming::NowGamingChanged,
+            commands::positional::PositionalStatusChanged,
+            commands::positional::PositionalSendingChanged,
             commands::overlay::OverlayChanged,
             commands::ingame_overlay::InGameOverlayChanged,
         ])
@@ -446,6 +449,15 @@ fn emit_engine_event(app: &AppHandle, event: EngineEvent) -> tauri::Result<()> {
             total,
         }
         .emit(app),
+        EngineEvent::PositionalStatusChanged(status) => {
+            commands::positional::PositionalStatusChanged {
+                status: status.into(),
+            }
+            .emit(app)
+        }
+        EngineEvent::PositionalSendingChanged { session, sending } => {
+            commands::positional::PositionalSendingChanged { session, sending }.emit(app)
+        }
     }
 }
 

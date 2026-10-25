@@ -168,6 +168,8 @@ struct Inner {
     mumcord: Mutex<crate::mumcord::Peers>,
     /// History sync with other Mumcord users (FR-1.60).
     history_sync: Arc<Mutex<crate::history_sync::HistorySync>>,
+    /// Positional audio (FR-1.41).
+    positional: crate::positional::Positional,
 }
 
 #[derive(Default)]
@@ -182,6 +184,15 @@ struct Core {
     audio: Option<Audio>,
     pipeline: Option<VoicePipeline>,
     mic_test: Option<MicTest>,
+}
+
+/// See [`Engine::downgrade`].
+pub(crate) struct WeakEngine(std::sync::Weak<Inner>);
+
+impl WeakEngine {
+    pub fn upgrade(&self) -> Option<Engine> {
+        self.0.upgrade().map(|inner| Engine { inner })
+    }
 }
 
 /// A live connection.
@@ -302,6 +313,7 @@ impl Engine {
         local::apply_dsp(&controls, &settings);
         let meter = Arc::new(Meter::default());
         voice::spawn_meter(&rt, controls.clone(), meter.clone(), events.clone());
+        let voice = Arc::new(VoiceShared::default());
         let inner = Arc::new(Inner {
             rt,
             data_dir: data_dir.to_path_buf(),
@@ -311,7 +323,7 @@ impl Engine {
             events,
             controls,
             meter,
-            voice: Arc::new(VoiceShared::default()),
+            voice: voice.clone(),
             reconnects: AtomicU32::new(0),
             rejoin_offers: Mutex::new(rejoin_offers),
             previews: Arc::new(crate::web::LinkPreviews::new(
@@ -325,8 +337,13 @@ impl Engine {
             now_gaming: Mutex::new(crate::now_gaming::NowGaming::new(settings.now_gaming)),
             mumcord: Mutex::default(),
             history_sync: Arc::default(),
+            positional: crate::positional::Positional::new(
+                voice.positional.clone(),
+                &settings.positional,
+            ),
         });
         let engine = Self { inner };
+        engine.positional_poll_restart();
         engine
             .link_previews()
             .set_max_age_days(settings.preview_cache_days);
@@ -413,6 +430,19 @@ impl Engine {
 
     pub(crate) fn history_sync_state(&self) -> &Mutex<crate::history_sync::HistorySync> {
         &self.inner.history_sync
+    }
+
+    pub(crate) fn positional(&self) -> &crate::positional::Positional {
+        &self.inner.positional
+    }
+
+    pub(crate) fn events(&self) -> &Events {
+        &self.inner.events
+    }
+
+    /// A handle for background tasks that must not keep the engine alive.
+    pub(crate) fn downgrade(&self) -> WeakEngine {
+        WeakEngine(Arc::downgrade(&self.inner))
     }
 
     /// The store, also while disconnected (history commands, B14).
@@ -897,6 +927,7 @@ impl Inner {
             crate::mumcord::on_disconnect(&self.mumcord);
             crate::history_sync::on_disconnect(&self.history_sync);
             self.full_images.reset();
+            self.positional.on_disconnect();
             session.handle.disconnect();
         }
         self.meter.voice.store(false, Ordering::Relaxed);
@@ -1134,6 +1165,7 @@ impl Inner {
         crate::mumcord::on_synced(&self.mumcord, &ctx);
         crate::history_sync::on_synced(&self.history_sync, &ctx, &self.rt);
         self.full_images.reset();
+        self.positional.on_synced();
         if let Some(mut snapshot) = self.snapshot(&lock(&self.core)) {
             extension::on_synced(&ctx, &mut snapshot);
             self.events
@@ -1202,6 +1234,16 @@ impl Inner {
                 Some(event) = voice_event => match event {
                     VoiceEvent::Packet(packet) => {
                         self.voice.packets_received.fetch_add(1, Ordering::Relaxed);
+                        if let Some(sending) = self.positional.on_voice_packet(
+                            packet.session,
+                            packet.positional.is_some(),
+                            Instant::now(),
+                        ) {
+                            self.events.emit(EngineEvent::PositionalSendingChanged {
+                                session: packet.session,
+                                sending,
+                            });
+                        }
                         if !self.voice.deaf.load(Ordering::Relaxed)
                             && let (Some(tx), Some(p)) = (packets.as_mut(), voice::playback_packet(&packet))
                         {
@@ -1222,6 +1264,12 @@ impl Inner {
                 },
                 Some(PumpCmd::Packets(sender)) = pump_rx.recv() => packets = sender,
                 _ = tick.tick() => {
+                    for session in self.positional.expire(Instant::now()) {
+                        self.events.emit(EngineEvent::PositionalSendingChanged {
+                            session,
+                            sending: false,
+                        });
+                    }
                     bitrate.set_music_quality(self.controls.music_quality());
                     if let Some(t) = &transport {
                         let stats = t.stats();
@@ -1419,6 +1467,7 @@ impl Inner {
                 crate::mumcord::on_user_removed(&self.mumcord, user.session);
                 crate::history_sync::on_user_removed(&self.history_sync, user.session);
                 self.full_images.forget(user.session);
+                self.positional.on_user_removed(user.session);
                 self.events.emit(EngineEvent::UserRemoved(user.session));
             }
             Event::PermissionDenied(denied) => {

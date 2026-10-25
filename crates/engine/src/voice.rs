@@ -24,6 +24,7 @@ use mumcord_protocol::{OutgoingAudio, VoiceTransport};
 use tokio::runtime::Handle as Runtime;
 use tokio::task::JoinHandle as TaskHandle;
 
+use crate::positional::PositionalShared;
 use crate::session::{
     AudioDeviceList, AudioDeviceView, EngineError, EngineEvent, EngineResult, Events,
 };
@@ -59,6 +60,10 @@ impl SharedSink {
 impl PlaybackSink for SharedSink {
     fn write_frame(&mut self, frame: &Frame) -> bool {
         self.with(|sink| sink.as_mut().is_some_and(|s| s.write_frame(frame)))
+    }
+
+    fn write_stereo(&mut self, left: &Frame, right: &Frame) -> bool {
+        self.with(|sink| sink.as_mut().is_some_and(|s| s.write_stereo(left, right)))
     }
 
     fn queued_samples(&mut self) -> usize {
@@ -211,6 +216,8 @@ pub(crate) struct VoiceShared {
     /// Voice packets handed to the transport / received, for the connection info.
     pub packets_sent: AtomicU64,
     pub packets_received: AtomicU64,
+    /// Listener pose and own position for positional audio.
+    pub positional: Arc<PositionalShared>,
 }
 
 impl VoiceShared {
@@ -232,6 +239,7 @@ impl Default for VoiceShared {
             loss_percent: AtomicU32::new(0),
             packets_sent: AtomicU64::new(0),
             packets_received: AtomicU64::new(0),
+            positional: Arc::default(),
         }
     }
 }
@@ -293,6 +301,7 @@ impl VoicePipeline {
                 // A full reference queue only degrades echo cancellation briefly.
                 let _ = echo_producer.push(frame);
             })),
+            listener: Some(shared.positional.listener.clone()),
             ..PlaybackConfig::default()
         };
         let (playback, ports) = match Playback::start(audio.sink.clone(), config) {
@@ -431,11 +440,14 @@ fn capture_loop(
     let mut packet = [0u8; MAX_PACKET_BYTES];
     let mut sending = false;
     let send = |len: usize, packet: &[u8], is_last: bool| {
-        transport.send_audio(OutgoingAudio::new(
-            Bytes::copy_from_slice(&packet[..len]),
-            frames_per_packet,
-            is_last,
-        ));
+        transport.send_audio(
+            OutgoingAudio::new(
+                Bytes::copy_from_slice(&packet[..len]),
+                frames_per_packet,
+                is_last,
+            )
+            .with_position(shared.positional.own_position()),
+        );
         shared.packets_sent.fetch_add(1, Ordering::Relaxed);
     };
 
@@ -500,6 +512,7 @@ pub(crate) fn playback_packet(
         packet.via_listener,
         Instant::now(),
     )
+    .map(|p| p.with_position(packet.positional))
 }
 
 /// Starts a mic test on the devices of `audio` (they must not be lent to a pipeline).

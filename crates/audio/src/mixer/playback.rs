@@ -9,6 +9,7 @@ use std::time::{Duration, Instant};
 use super::{Mixer, TalkEvent, VoicePacket};
 use crate::codec::CodecError;
 use crate::io::FrameSink;
+use crate::spatial::Listener;
 use crate::{FRAME_SAMPLES, Frame, SAMPLE_RATE};
 
 /// Queued incoming packets (≈ 2.5 s of 20 ms packets from 2 speakers).
@@ -27,8 +28,14 @@ const FRAME_DURATION: Duration = Duration::from_millis(10);
 
 /// Where mixed frames go; implemented by [`FrameSink`] and by test doubles.
 pub trait PlaybackSink: Send + 'static {
-    /// Queues a frame; `false` if it was dropped (queue full or no device).
+    /// Queues a mono frame; `false` if it was dropped (queue full or no device).
     fn write_frame(&mut self, frame: &Frame) -> bool;
+    /// Queues a stereo frame. Sinks without stereo output play the mix of both channels.
+    fn write_stereo(&mut self, left: &Frame, right: &Frame) -> bool {
+        let mut mono = [0.0; FRAME_SAMPLES];
+        downmix(left, right, &mut mono);
+        self.write_frame(&mono)
+    }
     /// Audio queued but not yet played, in 48 kHz samples.
     fn queued_samples(&mut self) -> usize;
 }
@@ -38,13 +45,24 @@ impl PlaybackSink for FrameSink {
         FrameSink::write_frame(self, frame)
     }
 
+    fn write_stereo(&mut self, left: &Frame, right: &Frame) -> bool {
+        FrameSink::write_stereo(self, left, right)
+    }
+
     fn queued_samples(&mut self) -> usize {
         FrameSink::queued_samples(self)
     }
 }
 
+/// The mono mix of a stereo frame.
+pub fn downmix(left: &Frame, right: &Frame, out: &mut Frame) {
+    for ((o, l), r) in out.iter_mut().zip(left).zip(right) {
+        *o = (l + r) * 0.5;
+    }
+}
+
 /// Far-end reference hook: called on the playback thread with every final
-/// frame right before it is written to the sink. Must not block or allocate.
+/// frame (mono mix) right before it is written to the sink. Must not block or allocate.
 pub type FarEndTap = Box<dyn FnMut(&Frame) + Send>;
 
 pub struct PlaybackConfig {
@@ -52,6 +70,8 @@ pub struct PlaybackConfig {
     pub target_queue_ms: u32,
     /// Receives every played frame, e.g. as echo-cancellation reference.
     pub far_end_tap: Option<FarEndTap>,
+    /// Places voices that carry a position around this listener (positional audio).
+    pub listener: Option<Arc<Listener>>,
 }
 
 impl Default for PlaybackConfig {
@@ -59,6 +79,7 @@ impl Default for PlaybackConfig {
         Self {
             target_queue_ms: 25,
             far_end_tap: None,
+            listener: None,
         }
     }
 }
@@ -141,7 +162,10 @@ impl Playback {
         sink: S,
         config: PlaybackConfig,
     ) -> Result<(Self, PlaybackPorts), PlaybackError> {
-        let mixer = Mixer::new()?;
+        let mut mixer = Mixer::new()?;
+        if let Some(listener) = &config.listener {
+            mixer.set_listener(Arc::clone(listener));
+        }
         let (packet_tx, packet_rx) = rtrb::RingBuffer::new(PACKET_QUEUE);
         let (command_tx, command_rx) = rtrb::RingBuffer::new(COMMAND_QUEUE);
         let (event_tx, event_rx) = rtrb::RingBuffer::new(EVENT_QUEUE);
@@ -251,7 +275,9 @@ impl<S: PlaybackSink> Worker<S> {
     fn run(mut self) {
         let epoch = Instant::now();
         let target_samples = self.config.target_queue_ms as usize * SAMPLE_RATE as usize / 1000;
-        let mut frame = [0.0; FRAME_SAMPLES];
+        let mut left = [0.0; FRAME_SAMPLES];
+        let mut right = [0.0; FRAME_SAMPLES];
+        let mut mono = [0.0; FRAME_SAMPLES];
         let mut extra = [0.0; FRAME_SAMPLES];
         // When the sink refuses frames (no device), pace by the wall clock.
         let mut next_frame_due = Instant::now();
@@ -278,7 +304,8 @@ impl<S: PlaybackSink> Worker<S> {
                 let has_extra = self.read_mix_in(&mut extra);
                 let events = &mut self.events;
                 self.mixer.mix(
-                    &mut frame,
+                    &mut left,
+                    &mut right,
                     has_extra.then_some(&extra),
                     millis_since(epoch, now),
                     &mut |event| {
@@ -288,9 +315,10 @@ impl<S: PlaybackSink> Worker<S> {
                     },
                 );
                 if let Some(tap) = &mut self.config.far_end_tap {
-                    tap(&frame);
+                    downmix(&left, &right, &mut mono);
+                    tap(&mono);
                 }
-                sink_refusing = !self.sink.write_frame(&frame);
+                sink_refusing = !self.sink.write_stereo(&left, &right);
                 if sink_refusing {
                     self.counters.refused.fetch_add(1, Ordering::Relaxed);
                     next_frame_due = now.max(next_frame_due) + FRAME_DURATION;

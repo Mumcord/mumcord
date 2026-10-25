@@ -264,6 +264,8 @@ export const commands = {
 	 *  shares no join target (any more).
 	 */
 	nowGamingJoin: (session: number) => typedError<null, ApiError>(__TAURI_INVOKE("now_gaming_join", { session })),
+	/**  The current positional audio status. */
+	positionalStatus: () => typedError<PositionalStatus, ApiError>(__TAURI_INVOKE("positional_status")),
 	/**  Current overlay options, move mode and what this desktop supports. */
 	overlayState: () => typedError<OverlayState, ApiError>(__TAURI_INVOKE("overlay_state")),
 	/**
@@ -328,6 +330,8 @@ export const events = {
 	nowGamingChanged: makeEvent<NowGamingChanged, NowGamingChanged>("now-gaming-changed"),
 	nowPlayingChanged: makeEvent<NowPlayingChanged, NowPlayingChanged>("now-playing-changed"),
 	overlayChanged: makeEvent<OverlayChanged, OverlayChanged>("overlay-changed"),
+	positionalSendingChanged: makeEvent<PositionalSendingChanged, PositionalSendingChanged>("positional-sending-changed"),
+	positionalStatusChanged: makeEvent<PositionalStatusChanged, PositionalStatusChanged>("positional-status-changed"),
 	serverDenied: makeEvent<ServerDenied, ServerDenied>("server-denied"),
 	serverSynced: makeEvent<ServerSynced, ServerSynced>("server-synced"),
 	talkStateChanged: makeEvent<TalkStateChanged, TalkStateChanged>("talk-state-changed"),
@@ -968,6 +972,50 @@ export type PersonProfile = {
 	note: string,
 };
 
+/**
+ *  A person (or the user, with the own session) started or stopped sending positions: show or
+ *  hide the "3D" icon. Forget all on a new `serverSynced` and when a person leaves.
+ */
+export type PositionalSendingChanged = {
+	session: number,
+	sending: boolean,
+};
+
+/**  Positional audio (FR-1.41): voices of people in the same game placed in 3D. */
+export type PositionalSettings = {
+	/**  Default off. */
+	enabled: boolean,
+	/**  Metres (default 1): voices are at full volume up to this distance. */
+	minDistance: number | null,
+	/**
+	 *  Metres (default 15): voices are silent beyond this distance. Kept above `minDistance`
+	 *  on save.
+	 */
+	maxDistance: number | null,
+};
+
+/**  What the settings show (FR-1.43) and who gets the "3D" icon (FR-1.72). */
+export type PositionalStatus = {
+	enabled: boolean,
+	/**
+	 *  The source delivering positions right now ("Mumble Link" or a plugin name); `null` while
+	 *  no game delivers any. Plain text.
+	 */
+	source: string | null,
+	/**  The game's own name, if it reports one. Plain text. */
+	game: string | null,
+	/**  Sessions currently sending positions, the own one included. */
+	senders: number[],
+};
+
+/**
+ *  Positional audio was switched or the game delivering positions changed. `senders` is a
+ *  snapshot; follow `PositionalSendingChanged` afterwards.
+ */
+export type PositionalStatusChanged = {
+	status: PositionalStatus,
+};
+
 export type PttAvailability = { status: "available" } | { status: "unavailable"; reason: PttUnavailableReason };
 
 export type PttMouseState = "ready" | 
@@ -1168,6 +1216,8 @@ export type Settings = {
 	announcements: boolean,
 	/**  Accessibility: "Skip links" (default on; FR-1.69). */
 	skipLinks: boolean,
+	/**  Positional audio (FR-1.41). Off: no game positions are read. */
+	positional: PositionalSettings,
 };
 
 /**  Notification sound toggles per event (FR-1.27). */
