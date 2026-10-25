@@ -28,6 +28,7 @@
     "localMuted": "muted for you",
     "unregistered": "not registered"
   },
+  "mumcordBadge": "Uses Mumcord",
   "statusTip": {
     "registered": "Registered on this server",
     "listening": "Listening to this channel",

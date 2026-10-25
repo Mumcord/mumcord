@@ -147,6 +147,8 @@ struct Inner {
     now_playing: Mutex<crate::now_playing::NowPlaying>,
     /// Shared "now gaming" status (FR-1.59).
     now_gaming: Mutex<crate::now_gaming::NowGaming>,
+    /// Other Mumcord users on the server (FR-1.61).
+    mumcord: Mutex<crate::mumcord::Peers>,
 }
 
 #[derive(Default)]
@@ -297,6 +299,7 @@ impl Engine {
             core: Mutex::new(Core::default()),
             now_playing: Mutex::new(crate::now_playing::NowPlaying::new(settings.now_playing)),
             now_gaming: Mutex::new(crate::now_gaming::NowGaming::new(settings.now_gaming)),
+            mumcord: Mutex::default(),
         });
         let engine = Self { inner };
         engine
@@ -365,6 +368,10 @@ impl Engine {
 
     pub(crate) fn now_playing_state(&self) -> &Mutex<crate::now_playing::NowPlaying> {
         &self.inner.now_playing
+    }
+
+    pub(crate) fn mumcord_state(&self) -> &Mutex<crate::mumcord::Peers> {
+        &self.inner.mumcord
     }
 
     pub(crate) fn now_gaming_state(&self) -> &Mutex<crate::now_gaming::NowGaming> {
@@ -789,6 +796,7 @@ impl Inner {
         if let Some(session) = core.session.take() {
             crate::now_playing::on_disconnect(&self.now_playing, &session.handle);
             crate::now_gaming::on_disconnect(&self.now_gaming, &session.handle);
+            crate::mumcord::on_disconnect(&self.mumcord);
             session.handle.disconnect();
         }
         self.meter.voice.store(false, Ordering::Relaxed);
@@ -1023,6 +1031,7 @@ impl Inner {
         };
         crate::now_playing::on_synced(&self.now_playing);
         crate::now_gaming::on_synced(&self.now_gaming);
+        crate::mumcord::on_synced(&self.mumcord, &ctx);
         if let Some(mut snapshot) = self.snapshot(&lock(&self.core)) {
             extension::on_synced(&ctx, &mut snapshot);
             self.events
@@ -1286,12 +1295,13 @@ impl Inner {
                 if change.joined {
                     crate::now_playing::on_user_joined(&self.now_playing, ctx, user.session);
                     crate::now_gaming::on_user_joined(&self.now_gaming, ctx, user.session);
+                    crate::mumcord::on_user_joined(&self.mumcord, ctx, user.session);
                 }
                 if own && change.moved_from.is_some() {
                     self.remember_channel(ctx, user.channel_id);
                 }
                 self.events
-                    .emit(EngineEvent::UserUpserted(user_view(user, setting)));
+                    .emit(EngineEvent::UserUpserted(self.user_view_of(user, setting)));
             }
             Event::UserRemoved { user, .. } => {
                 let mut core = lock(&self.core);
@@ -1302,6 +1312,7 @@ impl Inner {
                 drop(core);
                 crate::now_playing::on_user_removed(&self.now_playing, user.session);
                 crate::now_gaming::on_user_removed(&self.now_gaming, user.session);
+                crate::mumcord::on_user_removed(&self.mumcord, user.session);
                 self.events.emit(EngineEvent::UserRemoved(user.session));
             }
             Event::PermissionDenied(denied) => {
@@ -1325,10 +1336,36 @@ impl Inner {
             Event::PluginData(data) => {
                 crate::now_playing::on_plugin_data(&self.now_playing, ctx, data);
                 crate::now_gaming::on_plugin_data(&self.now_gaming, ctx, data);
+                if let Some(session) = crate::mumcord::on_plugin_data(&self.mumcord, ctx, data) {
+                    self.republish_user(ctx, session);
+                }
             }
             Event::TextMessage(_) | Event::ServerConfigUpdated(_) | Event::Disconnected(_) => {}
         }
         extension::on_event(ctx, &event);
+    }
+
+    fn user_view_of(
+        &self,
+        user: &mumcord_protocol::User,
+        setting: mumcord_store::PersonSetting,
+    ) -> UserView {
+        user_view(user, setting, lock(&self.mumcord).features(user.session))
+    }
+
+    /// Emits the person again, e.g. after they were recognised as a Mumcord user.
+    fn republish_user(&self, ctx: &SessionCtx, session: u32) {
+        let Some(user) = ctx.handle.with_state(|s| s.users.get(&session).cloned()) else {
+            return;
+        };
+        let setting = {
+            let store = lock(&self.store);
+            lock(&self.core)
+                .people
+                .setting(&store, ctx.server_id, &user)
+        };
+        self.events
+            .emit(EngineEvent::UserUpserted(self.user_view_of(&user, setting)));
     }
 
     /// One `ChannelsUpserted` for a settled burst of permission answers (see `batch`).
@@ -1400,7 +1437,7 @@ impl Inner {
                     .values()
                     .map(|u| {
                         let mut view =
-                            user_view(u, core.people.setting(&store, session.server_id, u));
+                            self.user_view_of(u, core.people.setting(&store, session.server_id, u));
                         // The server's echo of the mute/deafen just sent may still be on its way.
                         if Some(u.session) == s.session {
                             view.self_mute = core.self_voice.mute;
@@ -1510,7 +1547,7 @@ impl Inner {
         }
         drop(core);
         self.events
-            .emit(EngineEvent::UserUpserted(user_view(&user, setting)));
+            .emit(EngineEvent::UserUpserted(self.user_view_of(&user, setting)));
         Ok(())
     }
 

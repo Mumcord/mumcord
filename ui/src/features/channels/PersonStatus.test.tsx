@@ -66,6 +66,8 @@ describe("voiceState", () => {
     hasComment: false,
     volume: 100,
     localMute: false,
+    isMumcord: false,
+    mumcordFeatures: [],
   };
 
   it("puts what the server imposes before the person's own choice", () => {
@@ -114,6 +116,15 @@ describe("person status in the tree and member list", () => {
     for (const row of rows()) {
       expect(row).toHaveAccessibleName(/, muted$/);
       expect(icons(row)).toEqual(["person-icon"]);
+    }
+  });
+
+  it("shows the Mumcord badge in tree and member list only for Mumcord users", async () => {
+    await renderBoth();
+    for (const row of rows()) expect(row.querySelector(".mumcord-badge")).toBeNull();
+    update({ isMumcord: true, mumcordFeatures: ["now-playing"] });
+    for (const row of rows()) {
+      expect(row.querySelector(".mumcord-badge")).toHaveAttribute("title", "Uses Mumcord");
     }
   });
 

@@ -972,6 +972,10 @@ export type User = {
 	/**  Local playback volume in percent, 0–200 (FR-1.18). */
 	volume: number,
 	localMute: boolean,
+	/**  Another Mumcord client, recognised by its hello (FR-1.61). */
+	isMumcord: boolean,
+	/**  What that client announced it can do (empty for everyone else). */
+	mumcordFeatures: string[],
 };
 
 export type UserRemoved = {

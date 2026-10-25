@@ -141,6 +141,8 @@ pub struct UserView {
     /// Local volume in percent (0–200).
     pub volume: u16,
     pub local_mute: bool,
+    /// Features announced by another Mumcord client (FR-1.61); `None` for everyone else.
+    pub mumcord_features: Option<Vec<String>>,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]

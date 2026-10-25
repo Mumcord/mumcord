@@ -5,6 +5,7 @@ pub mod chat;
 pub mod diag;
 pub mod follow;
 mod maintenance;
+pub mod mumcord;
 pub mod now_gaming;
 pub mod now_playing;
 pub mod people;

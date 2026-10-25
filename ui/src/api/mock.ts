@@ -352,6 +352,8 @@ function person(session: number, name: string, channelId: number, certHash: stri
     hasComment: false,
     volume: 100,
     localMute: false,
+    isMumcord: false,
+    mumcordFeatures: [],
   };
 }
 

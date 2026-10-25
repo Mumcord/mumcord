@@ -29,6 +29,8 @@ function user(session: number, name: string, channelId: number): User {
     hasComment: false,
     volume: 100,
     localMute: false,
+    isMumcord: false,
+    mumcordFeatures: [],
   };
 }
 

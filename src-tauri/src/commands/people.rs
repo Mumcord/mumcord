@@ -33,6 +33,10 @@ pub struct User {
     /// Local playback volume in percent, 0–200 (FR-1.18).
     pub volume: u16,
     pub local_mute: bool,
+    /// Another Mumcord client, recognised by its hello (FR-1.61).
+    pub is_mumcord: bool,
+    /// What that client announced it can do (empty for everyone else).
+    pub mumcord_features: Vec<String>,
 }
 
 /// Comment and avatar, fetched on demand when the profile card opens.
@@ -85,6 +89,8 @@ impl From<UserView> for User {
             has_comment: v.has_comment,
             volume: v.volume,
             local_mute: v.local_mute,
+            is_mumcord: v.mumcord_features.is_some(),
+            mumcord_features: v.mumcord_features.unwrap_or_default(),
         }
     }
 }
