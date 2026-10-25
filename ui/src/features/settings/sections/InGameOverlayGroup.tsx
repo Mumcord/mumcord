@@ -207,6 +207,12 @@ export function InGameOverlayGroup({ api }: { api: InGameOverlayApi }) {
                 run(api.setGameOverride(game.id, null));
               }}
               onOptions={(options) => {
+                // Shown at once: a second change before the save answers builds on this one
+                // instead of the last saved options, which would undo the first change.
+                setState({
+                  ...state,
+                  games: state.games.map((g) => (g.id === game.id ? { ...g, options } : g)),
+                });
                 run(api.setGameOptions(game.id, options));
               }}
             />

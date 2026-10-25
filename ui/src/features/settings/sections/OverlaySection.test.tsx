@@ -209,6 +209,27 @@ describe("In-game overlay", () => {
     });
   });
 
+  it("keeps an option changed while the previous save is still pending", async () => {
+    const fake = fakeInGame({
+      supported: true,
+      mode: "on",
+      games: [game({ id: "f", name: "Factorio", detected: true })],
+    });
+    fake.setGameOptions = vi.fn(() => new Promise<InGameState>(() => undefined));
+    render(<OverlaySection inGameApi={fake} />);
+    fireEvent.click(await screen.findByRole("button", { name: "Options for Factorio" }));
+    const group = screen.getByRole("group", { name: "Factorio" });
+    fireEvent.change(within(group).getByLabelText("Position"), {
+      target: { value: "bottomRight" },
+    });
+    fireEvent.change(within(group).getByLabelText("Opacity"), { target: { value: "80" } });
+    expect(fake.setGameOptions).toHaveBeenLastCalledWith("f", {
+      corner: "bottomRight",
+      size: 100,
+      opacity: 80,
+    });
+  });
+
   it("asks for confirmation before enabling a blocklisted game", async () => {
     const fake = fakeInGame({
       supported: true,
