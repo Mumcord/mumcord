@@ -9,6 +9,7 @@ pub mod mumcord;
 pub mod now_gaming;
 pub mod now_playing;
 pub mod people;
+pub mod positional;
 pub mod profile;
 pub mod session;
 pub mod sounds;
@@ -17,11 +18,14 @@ pub mod web;
 
 pub use chat::{ChatMessageView, HistoryScope};
 pub use follow::FollowAllSummary;
+/// Position sources (Mumble Link, plugin host) as the engine uses them.
+pub use mumcord_positional as positional_sources;
 /// Stored types (settings record etc.) as the engine hands them out.
 pub use mumcord_store as store;
 pub use mumcord_store::{SecretStore, ServerId, Settings};
 pub use now_gaming::{GameSource, LocalGame, NowGamingView};
 pub use now_playing::{LocalTrack, NowPlayingView};
+pub use positional::PositionalStatus;
 pub use session::Engine;
 pub use session::{
     AudioDeviceList, AudioDeviceView, ChannelPermissions, ChannelView, ConnState,

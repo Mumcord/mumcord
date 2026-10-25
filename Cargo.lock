@@ -3187,6 +3187,7 @@ dependencies = [
  "image",
  "mumcord-audio",
  "mumcord-bot",
+ "mumcord-positional",
  "mumcord-protocol",
  "mumcord-store",
  "netsim",

@@ -321,6 +321,14 @@ pub enum EngineEvent {
         session: u32,
         game: Option<crate::now_gaming::NowGamingView>,
     },
+    /// Positional audio was switched, or the game delivering positions changed (FR-1.43).
+    PositionalStatusChanged(crate::positional::PositionalStatus),
+    /// A person (or the user, with the own session) started or stopped sending positions
+    /// (the "3D" icon, FR-1.72).
+    PositionalSendingChanged {
+        session: u32,
+        sending: bool,
+    },
 }
 
 /// Phase of the mic test: record, play back, finished or failed to start.

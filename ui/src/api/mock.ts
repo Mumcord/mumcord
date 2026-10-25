@@ -129,6 +129,7 @@ const DEFAULT_SETTINGS: Settings = {
   historyMaxAgeDays: null,
   nowPlaying: false,
   nowGaming: false,
+  positional: { enabled: false, minDistance: 1, maxDistance: 15 },
 };
 
 const DEFAULT_OVERLAY: OverlaySettings = {
@@ -1075,6 +1076,15 @@ export function createMockApi(options: MockOptions = {}): MockApi {
     nowGamingIcon: () => Promise.resolve(null),
     nowGamingJoin: () => Promise.resolve(null),
 
+    // positional audio: no game delivers positions in the mock; "3D" icons come from `mock.emit`.
+    positionalStatus: () =>
+      Promise.resolve({
+        enabled: settings.positional.enabled,
+        source: null,
+        game: null,
+        senders: [],
+      }),
+
     // overlay: no window in the mock; the state round-trips like the engine's.
     overlayState: () => Promise.resolve(overlay),
     overlayUpdate: (next) =>
@@ -1095,7 +1105,13 @@ export function createMockApi(options: MockOptions = {}): MockApi {
     // settings
     settingsGet: () => Promise.resolve({ ...settings }),
     settingsUpdate: (next) => {
+      const positionalSwitched = next.positional.enabled !== settings.positional.enabled;
       settings = { ...next };
+      if (positionalSwitched) {
+        emit("positionalStatusChanged", {
+          status: { enabled: settings.positional.enabled, source: null, game: null, senders: [] },
+        });
+      }
       return Promise.resolve({ ...settings });
     },
 
