@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { getApi, type HistoryScope, type SavedServer } from "../../../api";
+import { BetaBadge } from "../../../components/BetaBadge";
 import { ConfirmDialog } from "../components/ConfirmDialog";
 import { DaysSelect } from "../components/DaysSelect";
 import { Group, Section } from "../components/Section";
@@ -119,7 +120,7 @@ export function ChatHistorySection({ settings, update }: SettingsSectionProps) {
           {t("previewCache.clearNow")}
         </button>
       </Group>
-      <Group title={t("fullImages.title")}>
+      <Group title={t("fullImages.title")} badge={<BetaBadge />}>
         <Switch
           label={t("fullImages.offer")}
           description={t("fullImages.offerHint")}

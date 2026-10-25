@@ -1,4 +1,4 @@
-import { fireEvent, render, screen } from "@testing-library/react";
+import { fireEvent, render, screen, within } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { createMockApi, setApi, type Settings } from "../../../api";
 import { applyLanguage } from "../../../i18n";
@@ -29,6 +29,14 @@ describe("ChatHistorySection: full-size images (FR-1.74)", () => {
     expect(update).toHaveBeenLastCalledWith({ offerFullImages: false });
     fireEvent.click(load);
     expect(update).toHaveBeenLastCalledWith({ loadFullImages: false });
+    await screen.findByText("Servers");
+  });
+
+  it("marks the group as beta", async () => {
+    render(<ChatHistorySection settings={settings} update={vi.fn()} />);
+    const heading = screen.getByRole("heading", { name: /Full-size images/u });
+    expect(within(heading).getByText("Beta")).toBeInTheDocument();
+    expect(within(heading).getByText("Beta feature")).toBeInTheDocument();
     await screen.findByText("Servers");
   });
 });
