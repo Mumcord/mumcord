@@ -40,6 +40,7 @@ const raw: InGameOverlayState = {
     { key: { kind: "exe", value: "valorant.exe" }, name: "Valorant", running: false, blocklist },
     { key: { kind: "exe", value: "factorio" }, name: "factorio", running: true, blocklist: null },
   ],
+  running: [{ kind: "exe", value: "factorio" }],
 };
 
 beforeEach(() => {
@@ -86,6 +87,15 @@ describe("createInGameOverlayApi", () => {
         options: { corner: "topLeft", size: 100, opacity: 90 },
       },
     ]);
+  });
+
+  it("marks a configured game as running too", async () => {
+    vi.spyOn(api, "ingameOverlayState").mockResolvedValue({
+      ...raw,
+      running: [{ kind: "steam", value: 570 }],
+    });
+    const state = await createInGameOverlayApi(api).state();
+    expect(state.games.find((g) => g.id === "steam:570")?.detected).toBe(true);
   });
 
   it("passes the platform limitation through", async () => {

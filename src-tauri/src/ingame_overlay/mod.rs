@@ -318,13 +318,13 @@ pub fn sync_manifest(mode: InGameOverlayMode) {
         return;
     };
     let result = match mode {
-        InGameOverlayMode::On => match library_path() {
-            Some(lib) => manifest::install_into(&dir, &lib).map(|_| ()),
-            None => {
+        InGameOverlayMode::On => {
+            let lib = library_path();
+            if lib.is_none() {
                 tracing::warn!("the in-game overlay library was not found; no layer installed");
-                Ok(())
             }
-        },
+            manifest::refresh_in(&dir, lib.as_deref())
+        }
         InGameOverlayMode::Off => manifest::uninstall_from(&dir),
     };
     if let Err(e) = result {

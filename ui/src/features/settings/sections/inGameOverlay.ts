@@ -94,7 +94,7 @@ function entriesOf(state: InGameOverlayState): GameOverlayEntry[] {
 }
 
 function toInGameState(state: InGameOverlayState): InGameState {
-  const running = new Set(state.known.filter((g) => g.running).map((g) => idOf(g.key)));
+  const running = new Set(state.running.map(idOf));
   return {
     supported: state.supported,
     explanationKey: state.explanationKey,
