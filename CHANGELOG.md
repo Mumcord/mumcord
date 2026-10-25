@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.3.1] - 2026-10-25
+
+### Fixed
+
+- Keep voice packets within Mumble's size limit with Music quality on, so others keep hearing you on servers with a high bandwidth limit ([`740f784`](https://github.com/ToBee94/mumcord/commit/740f7843773e4d91e42dfc1301ad5dc88836ce16))
+
 ## [0.3.0] - 2026-10-25
 
 _Not in this release: the in-game overlay on Windows (which uses the window overlay until then) and any overlay on macOS._
@@ -74,6 +80,7 @@ _**License change:** Mumcord is licensed under the GNU AGPL-3.0 only from this v
 
 _First release._
 
+[0.3.1]: https://github.com/ToBee94/mumcord/releases/tag/v0.3.1
 [0.3.0]: https://github.com/ToBee94/mumcord/releases/tag/v0.3.0
 [0.2.0]: https://github.com/ToBee94/mumcord/releases/tag/v0.2.0
 [0.1.1]: https://github.com/ToBee94/mumcord/releases/tag/v0.1.1
