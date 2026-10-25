@@ -3,8 +3,7 @@
 use mumcord_engine::Engine;
 use serde::{Deserialize, Serialize};
 use specta::Type;
-use tauri::{AppHandle, State};
-use tauri_plugin_opener::OpenerExt;
+use tauri::State;
 use tauri_specta::Event;
 
 use super::types::{ApiError, ApiResult, ErrorCode};
@@ -76,12 +75,10 @@ pub async fn now_gaming_icon(engine: State<'_, Engine>, session: u32) -> ApiResu
 /// shares no join target (any more).
 #[tauri::command]
 #[specta::specta]
-pub fn now_gaming_join(app: AppHandle, engine: State<'_, Engine>, session: u32) -> ApiResult<()> {
+pub fn now_gaming_join(engine: State<'_, Engine>, session: u32) -> ApiResult<()> {
     let link = engine
         .now_gaming_join_link(session)
         .ok_or_else(|| ApiError::new(ErrorCode::NotFound, "no game to join"))?;
     tracing::info!("now gaming: opening a join link");
-    app.opener()
-        .open_url(link, None::<&str>)
-        .map_err(|e| ApiError::new(ErrorCode::Internal, e.to_string()))
+    crate::browser::open_url(&link).map_err(|e| ApiError::new(ErrorCode::Internal, e.to_string()))
 }

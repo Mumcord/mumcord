@@ -1,11 +1,9 @@
 import { fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, beforeAll, describe, expect, it, vi } from "vitest";
+import { createMockApi, setApi } from "../../api";
 import { applyLanguage } from "../../i18n";
 import { axeViolations } from "../../test/axe";
 import { PinnedInfoBox } from "./PinnedInfo";
-
-const opener = vi.hoisted(() => ({ openUrl: vi.fn(() => Promise.resolve()) }));
-vi.mock("@tauri-apps/plugin-opener", () => opener);
 
 /** jsdom has no layout: pretend the collapsed box hides content (or not). */
 function fakeOverflow(overflows: boolean) {
@@ -18,6 +16,7 @@ beforeAll(async () => {
 });
 
 afterEach(() => {
+  setApi(undefined);
   vi.restoreAllMocks();
 });
 
@@ -75,13 +74,10 @@ describe("PinnedInfoBox", () => {
     expect(region).toHaveTextContent("Welcome");
     expect(screen.getByText("bad")).not.toHaveAttribute("href");
 
-    const internals = window as unknown as Record<string, unknown>;
-    internals.__TAURI_INTERNALS__ = {};
-    try {
-      fireEvent.click(screen.getByRole("link", { name: "guide" }));
-      expect(opener.openUrl).toHaveBeenCalledWith("https://example.org/guide");
-    } finally {
-      delete internals.__TAURI_INTERNALS__;
-    }
+    const api = createMockApi();
+    setApi(api);
+    const openLink = vi.spyOn(api, "openLink").mockResolvedValue(null);
+    fireEvent.click(screen.getByRole("link", { name: "guide" }));
+    expect(openLink).toHaveBeenCalledWith("https://example.org/guide");
   });
 });

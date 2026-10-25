@@ -1237,6 +1237,11 @@ export function createMockApi(options: MockOptions = {}): MockApi {
     },
 
     // links
+    openLink: (url) => {
+      // Browser preview without Tauri: a new tab without access to this page.
+      window.open(url, "_blank", "noopener,noreferrer");
+      return Promise.resolve(null);
+    },
     linkPreview: (url) =>
       Promise.resolve(settings.linkPreviews ? mockLinkPreview(url, demo) : null),
     inlineImage: (url) =>

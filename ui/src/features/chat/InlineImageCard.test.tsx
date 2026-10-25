@@ -15,9 +15,6 @@ import { InlineImageCard } from "./InlineImageCard";
 import { clearPreviews, externalImages, fitImage, IMAGE_BOX, isImageLink } from "./links";
 import { MessageList } from "./MessageList";
 
-const opener = vi.hoisted(() => ({ openUrl: vi.fn(() => Promise.resolve()) }));
-vi.mock("@tauri-apps/plugin-opener", () => opener);
-
 const REMOTE = "https://pics.example/cat.gif";
 const GIF: InlineImage = {
   url: REMOTE,
@@ -75,7 +72,6 @@ beforeEach(() => {
   clearDismissedPreviews();
   api = createMockApi();
   setApi(api);
-  opener.openUrl.mockClear();
 });
 
 afterEach(() => {
@@ -215,26 +211,20 @@ describe("inline images", () => {
 
   it("opens the browser from Open in browser", async () => {
     vi.spyOn(api, "inlineImage").mockResolvedValue(GIF);
-    const internals = window as unknown as Record<string, unknown>;
-    internals.__TAURI_INTERNALS__ = {};
-    try {
-      renderMessage(`<img src="${REMOTE}">`, true);
-      fireEvent.click(await screen.findByRole("button", { name: "Open cat.gif in browser" }));
-      await waitFor(() => {
-        expect(opener.openUrl).toHaveBeenCalledWith(REMOTE);
-      });
-    } finally {
-      delete internals.__TAURI_INTERNALS__;
-    }
+    const openLink = vi.spyOn(api, "openLink").mockResolvedValue(null);
+    renderMessage(`<img src="${REMOTE}">`, true);
+    fireEvent.click(await screen.findByRole("button", { name: "Open cat.gif in browser" }));
+    expect(openLink).toHaveBeenCalledWith(REMOTE);
   });
 
   it("hands a click to onImageClick (the image viewer) instead of the browser", async () => {
     vi.spyOn(api, "inlineImage").mockResolvedValue(GIF);
+    const openLink = vi.spyOn(api, "openLink");
     const onImageClick = vi.fn();
     render(<InlineImageCard url={REMOTE} messageId="3" tabIndex={0} onImageClick={onImageClick} />);
     fireEvent.click(await screen.findByRole("button", { name: "View image cat.gif" }));
     expect(onImageClick).toHaveBeenCalledWith(GIF, expect.any(HTMLElement));
-    expect(opener.openUrl).not.toHaveBeenCalled();
+    expect(openLink).not.toHaveBeenCalled();
   });
 
   it("hides the image with the x button and tells the engine", async () => {

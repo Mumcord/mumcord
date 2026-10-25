@@ -29,7 +29,6 @@ base64 = "0.23"
 tauri = { version = "2.12", features = ["tray-icon", "macos-private-api"] }
 tauri-plugin-deep-link.workspace = true
 tauri-plugin-dialog.workspace = true
-tauri-plugin-opener.workspace = true
 tauri-specta.workspace = true
 specta.workspace = true
 specta-typescript.workspace = true
@@ -49,12 +48,16 @@ gdk.workspace = true
 # Message notifications (FR-1.48c): D-Bus notification service, window activation token.
 zbus.workspace = true
 futures-util.workspace = true
+# Opens links through the desktop launchers (see browser.rs).
+open.workspace = true
 gtk.workspace = true
 # Mouse-button push-to-talk: evdev reads on Wayland, XInput2 raw button events on X11.
 libc.workspace = true
 x11rb = { workspace = true, features = ["xinput"] }
 
 [target.'cfg(any(target_os = "windows", target_os = "macos"))'.dependencies]
+# Opens links in the default browser (see browser.rs; Linux uses the launchers directly).
+tauri-plugin-opener.workspace = true
 # Message notifications (FR-1.48c).
 notify-rust.workspace = true
 

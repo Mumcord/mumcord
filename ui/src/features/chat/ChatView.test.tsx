@@ -1,5 +1,5 @@
 import { act, fireEvent, render, screen, waitFor } from "@testing-library/react";
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import { subscribeAnnouncements } from "../../a11y/announcer";
 import type { MockApi } from "../../api";
 import { axeViolations } from "../../test/axe";
@@ -8,9 +8,6 @@ import { connectedMock, resetAll, stubDialog } from "../channels/testUtils";
 import { resetFriendsStore } from "../friends";
 import { resetChatStore } from "./chatStore";
 import { ChatView } from "./ChatView";
-
-const opener = vi.hoisted(() => ({ openUrl: vi.fn(() => Promise.resolve()) }));
-vi.mock("@tauri-apps/plugin-opener", () => opener);
 
 const LOBBY = { kind: "channel", channelId: 1 } as const;
 
@@ -36,10 +33,6 @@ function send(text: string): void {
   fireEvent.change(composer(), { target: { value: text } });
   fireEvent.keyDown(composer(), { key: "Enter" });
 }
-
-beforeEach(() => {
-  opener.openUrl.mockClear();
-});
 
 afterEach(() => {
   resetChatStore();
@@ -106,27 +99,19 @@ describe("ChatView", () => {
     expect(screen.getByText(/don't have permission to write/)).toBeInTheDocument();
   });
 
-  it("opens links only on click, through the system opener", async () => {
+  it("opens links only on click, through the engine's system opener", async () => {
     const api = await renderChat();
+    const openLink = vi.spyOn(api, "openLink");
     act(() => {
       api.mock.receiveMessage(LOBBY, '<a href="https://example.test/">site</a>', 2);
     });
     const link = await screen.findByText("site");
-    expect(opener.openUrl).not.toHaveBeenCalled();
+    expect(openLink).not.toHaveBeenCalled();
 
-    const internals = window as unknown as Record<string, unknown>;
-    internals.__TAURI_INTERNALS__ = {};
-    try {
-      fireEvent.click(link);
-      await waitFor(() => {
-        expect(opener.openUrl).toHaveBeenCalledWith("https://example.test/");
-      });
-    } finally {
-      delete internals.__TAURI_INTERNALS__;
-    }
-
+    // The mock engine opens a new tab without access to this page.
     const open = vi.spyOn(window, "open").mockReturnValue(null);
     fireEvent.click(link);
+    expect(openLink).toHaveBeenCalledWith("https://example.test/");
     await waitFor(() => {
       expect(open).toHaveBeenCalledWith("https://example.test/", "_blank", "noopener,noreferrer");
     });

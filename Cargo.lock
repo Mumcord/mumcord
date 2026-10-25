@@ -3150,6 +3150,7 @@ dependencies = [
  "mumcord-engine",
  "mumcord-overlay-ipc",
  "notify-rust",
+ "open",
  "serde",
  "serde_json",
  "specta",
