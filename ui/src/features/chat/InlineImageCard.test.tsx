@@ -132,9 +132,7 @@ describe("inline images", () => {
     );
     giphy.unmount();
     renderMessage('<img src="https://media.tenor.com/abc/cat.gif">', true);
-    expect(await screen.findByRole("link", { name: "via Tenor" })).toHaveTextContent(
-      "via Tenor",
-    );
+    expect(await screen.findByRole("link", { name: "via Tenor" })).toHaveTextContent("via Tenor");
   });
 
   it("shows no credit on other images", async () => {
