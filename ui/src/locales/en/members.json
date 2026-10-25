@@ -34,5 +34,18 @@
     "paused": "Paused",
     "progress": "Playback progress",
     "position": "{{position}} of {{duration}}"
+  },
+  "nowGaming": {
+    "label": "Now gaming",
+    "playing": "Playing",
+    "playedFor": "for {{time}}",
+    "hoursMinutes": "{{hours}} h {{minutes}} min",
+    "minutes_one": "{{count}} min",
+    "minutes_other": "{{count}} min",
+    "join": "Join game",
+    "joinTitle": "Join game?",
+    "joinMessage": "Steam will open and connect to the server this person plays {{game}} on. Only join servers you trust.",
+    "joinConfirm": "Open Steam",
+    "joinFailed": "Steam could not be opened."
   }
 }

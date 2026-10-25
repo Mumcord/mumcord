@@ -38,7 +38,8 @@
     "suppressed": "Suprimido: no puede hablar en este canal",
     "localMuted": "Silenciado para ti",
     "unregistered": "No registrado en este servidor (invitado)",
-    "nowPlaying": "Escuchando {{track}}"
+    "nowPlaying": "Escuchando {{track}}",
+    "nowGaming": "Jugando a {{game}}"
   },
   "announce": {
     "joined": "{{name}} se unió a tu canal",

@@ -34,5 +34,18 @@
     "paused": "Pausiert",
     "progress": "Wiedergabefortschritt",
     "position": "{{position}} von {{duration}}"
+  },
+  "nowGaming": {
+    "label": "Spielt gerade",
+    "playing": "Spielt",
+    "playedFor": "seit {{time}}",
+    "hoursMinutes": "{{hours}} Std. {{minutes}} Min.",
+    "minutes_one": "{{count}} Min.",
+    "minutes_other": "{{count}} Min.",
+    "join": "Spiel beitreten",
+    "joinTitle": "Spiel beitreten?",
+    "joinMessage": "Steam wird geöffnet und verbindet sich mit dem Server, auf dem diese Person {{game}} spielt. Tritt nur Servern bei, denen du vertraust.",
+    "joinConfirm": "Steam öffnen",
+    "joinFailed": "Steam konnte nicht geöffnet werden."
   }
 }

@@ -38,7 +38,8 @@
     "suppressed": "Suppressed – can't speak in this channel",
     "localMuted": "Muted for you",
     "unregistered": "Not registered on this server (guest)",
-    "nowPlaying": "Listening to {{track}}"
+    "nowPlaying": "Listening to {{track}}",
+    "nowGaming": "Playing {{game}}"
   },
   "announce": {
     "joined": "{{name}} joined your channel",

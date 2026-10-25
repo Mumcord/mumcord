@@ -38,7 +38,8 @@
     "suppressed": "Unterdrückt – darf in diesem Kanal nicht sprechen",
     "localMuted": "Für dich stummgeschaltet",
     "unregistered": "Auf diesem Server nicht registriert (Gast)",
-    "nowPlaying": "Hört {{track}}"
+    "nowPlaying": "Hört {{track}}",
+    "nowGaming": "Spielt {{game}}"
   },
   "announce": {
     "joined": "{{name}} ist deinem Kanal beigetreten",
