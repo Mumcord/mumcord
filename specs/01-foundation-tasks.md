@@ -12,6 +12,7 @@
 - User installs host tools: `sudo pacman -S github-cli orca xdotool`. tauri-driver via `cargo install`; WebKitWebDriver/xvfb only inside the Ubuntu E2E Docker image.
 - User does a ~10 min headphone listening check at the end of each stage.
 
+- 2026-10-25: Releases – v0.1.x = stage 1a, v0.2.0 = stage 1b; stage 1c is followed directly by stage 1d, released together as v0.3.0.
 ## Tasks
 
 | ID | Title | Status | Owner | Depends on | Cx | Covers | Owned files/areas |
@@ -191,7 +192,7 @@
 | B30 | (1c) Mumble Link + 3D audio | open | | G1 | complex | FR-1.41, 1.43 | crates/positional/src/link/, crates/audio/src/spatial/ |
 | B31 | (1c) Game plugin host | open | | B30 | complex | FR-1.42, 1.43 | crates/positional/src/plugins/ |
 | B32 | (1c) Overlay window | done – overlay.rs + commands, ui/overlay entry, tray toggle, own capability file, Wayland onTop detection; E2E smoke written, not run | b32-overlay | G1 | complex | FR-1.44–1.46 | src-tauri/src/overlay.rs, ui/src/overlay/ |
-| B33 | (1c) positional + overlay settings UI | open | | B30, B32 | simple | FR-1.41, 1.43, 1.45, 1.46 | ui/src/features/settings/positional/ |
+| B33 | (1c) positional + overlay settings UI (overlay part now, positional with B30) | in progress | b33-overlay-settings | B30, B32 | simple | FR-1.41, 1.43, 1.45, 1.46 | ui/src/features/settings/positional/ |
 | B49 | (1c) "Now gaming" status + best-effort Join game (FR-1.59) | done – Steam launcher + 74-game list, plugin data + comment line, controller icon, Steam header image, Join via +connect; Win/mac uncompiled | b49-now-gaming | B56 (Mumble Link source added with B30) | complex | AC-1.50 | engine now_gaming, src-tauri process/steam detection, PersonStatus, profile, userpanel |
 | B56 | (1c) Quick settings on right-click of the settings button (FR-1.66) | done – QuickSettings menu (previews, now playing, theme); game item added with B49 | b56-quick-settings | – | simple | – | userpanel, settings store |
 | B61 | (1c) Bug: dragging images (in chat / image viewer / drop into input) freezes the UI | done (not reproduced; likely native drag of data-URL images) – images not draggable, Composer onDragOver, dragDropEnabled false, 25 MB cap; user check pending | b61-drag-freeze | – | simple | – | ui/src/features/chat |
@@ -199,7 +200,7 @@
 | B65 | Sent images are pixelated: fixed 600 px edge + JPEG only; use the server limit fully (bigger edge, PNG for screenshots, quality search) | done – edge binary search up to 1920 px, PNG vs JPEG choice, 1 MiB fallback without limit | b65-image-quality | – | simple | FR-1.30 | ui/src/features/chat/images.ts |
 | B67 | Bug: dragging a GIF (to the GIF favorites) lags and freezes; picker with many animated GIFs is slow | done – global img drag none + document dragstart guard, lazy picker thumbnails | b67-gif-drag | B61 | simple | FR-1.52 | ui/src/features/chat |
 | B68 | (1c) @mentions as interactive chips: hover preview, click profile, right-click menu | done – mentionChips.ts, delegated hover/click/menu in MessageList | b68-mention-profile | B35 | simple | FR-1.51 | ui/src/features/chat |
-| B64 | (1c) In-game overlay: Linux Vulkan layer + GL preload, Windows graphics hook, per-game config, anti-cheat warning (FR-1.46b) | open | | B32 | complex | AC-1.34b | new crates (overlay layer/hook), src-tauri, settings |
+| B64 | (1c) In-game overlay: Linux Vulkan layer + GL preload, Windows graphics hook, per-game config, anti-cheat warning (FR-1.46b) | in progress | b64-ingame-overlay | B32 | complex | AC-1.34b | new crates (overlay layer/hook), src-tauri, settings |
 | C9 | (1c) Verify positional audio | open | | B31, B33 | complex | AC-1.31, 1.32 | e2e/specs/positional |
 | C10 | (1c) Verify overlay | open | | B32, B33 | simple | AC-1.33, 1.34 | e2e/specs/overlay |
 | B34 | Link previews + YouTube/Twitch player cards (FR-1.49, 1.50) | done – engine web module (SSRF guard, caps, 24 h disk cache), player cards (inline only YouTube on Windows, else browser), wizard + settings switch | b34-link-previews | G1 | complex | AC-1.39, 1.40 | crates/engine (metadata fetch), ui chat, wizard, settings |
