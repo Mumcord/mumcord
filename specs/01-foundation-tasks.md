@@ -201,6 +201,7 @@
 | B67 | Bug: dragging a GIF (to the GIF favorites) lags and freezes; picker with many animated GIFs is slow | done – global img drag none + document dragstart guard, lazy picker thumbnails | b67-gif-drag | B61 | simple | FR-1.52 | ui/src/features/chat |
 | B68 | (1c) @mentions as interactive chips: hover preview, click profile, right-click menu | done – mentionChips.ts, delegated hover/click/menu in MessageList | b68-mention-profile | B35 | simple | FR-1.51 | ui/src/features/chat |
 | B64 | (1c) In-game overlay: Linux Vulkan layer + GL preload, Windows graphics hook, per-game config, anti-cheat warning (FR-1.46b) | in progress | b64-ingame-overlay | B32 | complex | AC-1.34b | new crates (overlay layer/hook), src-tauri, settings |
+| B69 | (1c) Hide all overlay features on macOS: settings section, tray item, wizard choice; no overlay window there (QA.58) | open | | B64 | simple | FR-1.46b | src-tauri overlay/tray cfg, ui settings/wizard |
 | C9 | (1c) Verify positional audio | open | | B31, B33 | complex | AC-1.31, 1.32 | e2e/specs/positional |
 | C10 | (1c) Verify overlay | open | | B32, B33 | simple | AC-1.33, 1.34 | e2e/specs/overlay |
 | B34 | Link previews + YouTube/Twitch player cards (FR-1.49, 1.50) | done – engine web module (SSRF guard, caps, 24 h disk cache), player cards (inline only YouTube on Windows, else browser), wizard + settings switch | b34-link-previews | G1 | complex | AC-1.39, 1.40 | crates/engine (metadata fetch), ui chat, wizard, settings |
@@ -220,8 +221,8 @@
 | M1 | Merge main (v0.1.1 hotfix, version 0.1.1) back into epic-1; resolve music-quality duplicates | done | lead | B47 | simple | – | – |
 | B48 | Bugs: now playing never sends (setting not persisted? no log lines; Spotify MPRIS present) + audio streams restart every 2 s while the chosen device is unavailable | done – NP worked but never saved by an older build; info logs, own track everywhere; cpal id rewrite fixed, background retry with backoff, no stream restarts | b48-np-audio | B45 | complex | FR-1.58 | engine now_playing, src-tauri now_playing, crates/audio io controller |
 | B50 | (1d) History sync between Mumcord clients (FR-1.60) | open | | 1c | complex | AC-1.51 | engine plugin-data sync, store, chat UI, wizard, settings |
-| B51 | (1d) Mumcord badge (FR-1.61) | in progress | b51-badge | – | simple | AC-1.52 | engine hello, PersonStatus |
-| B52 | (1d) Double-click DM + pinned person card with DM and full-profile buttons (FR-1.62) | in progress | b52-person-card | – | simple | AC-1.53 | members, channels, chat |
+| B51 | (1d) Mumcord badge (FR-1.61) | done – mumcord.hello plugin data, isMumcord/features, badge everywhere, live test on v14 | b51-badge | – | simple | AC-1.52 | engine hello, PersonStatus |
+| B52 | (1d) Double-click DM + pinned person card with DM and full-profile buttons (FR-1.62) | done (uncommitted) – personClick.ts (200 ms pin delay, dblclick DM), pinned card with DM + Full profile, ProfilePreviewHost owns full card | b52-person-card | – | simple | AC-1.53 | members, channels, chat |
 | B53 | (1d) Full profile redesign (FR-1.63) | open | | B52 | simple | AC-1.53 | members ProfileCard |
 | B54 | (1d) Friends by cert hash with online state (FR-1.64) | open | | B53 | complex | AC-1.54 | store, engine, members, follow DM list |
 | B55 | (1d) Kept friend DM history + online state in DMs (FR-1.65) | open | | B54 | simple | AC-1.54 | store history, chat DM header |
@@ -231,7 +232,7 @@
 | B59 | Bug: in compact chat layout the link-preview card's left bar overlaps its text | done – text-indent reset on .link-previews | b59-compact-card | – | simple | – | ui/src/features/chat css |
 | B60 | Port the demo-mock additions used for the 0.2.0 screenshots (demoPicture, demo link previews/inline images) | open | | – | simple | – | ui/src/api/mock.ts |
 | CI1 | Parallelize E2E in CI: build once, shard spec files across matrix jobs, aggregator job keeps the required "Linux E2E" check name | done – build job + 4 shards from e2e/shards.json, aggregator "Linux E2E"; ~12–13 min | ci1-e2e-shards | – | complex | – | .github/workflows/e2e.yml, e2e/run.sh, wdio config |
-| B62 | (1d) Drop and paste images reliably: preview before sending, several images, compression to the server limit, no UI freeze (FR-1.30, see B61) | in progress | b62-image-drop | B61 | simple | – | ui/src/features/chat Composer, engine image scaling |
+| B62 | (1d) Drop and paste images reliably: preview before sending, several images, compression to the server limit, no UI freeze (FR-1.30, see B61) | done (uncommitted; E2E render-send updated, not yet run) – AttachmentTray, ordered send, refusals, depth-counted drag highlight | b62-image-drop | B61 | simple | – | ui/src/features/chat Composer, engine image scaling |
 | B66 | (1d) Thumbnail in chat + full image on demand via plugin data for the viewer (FR-1.60c) | open | | B62 | complex | – | engine plugin data transfer, store image cache, chat viewer |
 | D1 | Implementation report | open | | C1–C10 | simple | all | specs/01-foundation-implementation.md |
 
