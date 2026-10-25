@@ -29,6 +29,11 @@ rm -f "$HOME"/.local/share/keyrings/*.keyring "$HOME"/.local/share/keyrings/defa
 printf 'e2e' | gnome-keyring-daemon --unlock --components=secrets >/dev/null
 gnome-keyring-daemon --start --components=secrets >/dev/null
 
+# The in-game overlay listens on an abstract Unix socket, and abstract sockets live in the network
+# namespace the container shares with the host (--network host). A Mumcord running on the host for
+# the same uid holds the default name, so the app under test and the layer use a name of their own.
+export MUMCORD_OVERLAY_SOCKET="mumcord-overlay-e2e-$$"
+
 export DISPLAY=:99
 Xvfb "$DISPLAY" -screen 0 1600x1000x24 -nolisten tcp >/dev/null 2>&1 &
 xvfb_pid=$!
