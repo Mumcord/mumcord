@@ -1115,3 +1115,12 @@ Earlier decision: MIT. The user wants everyone (including companies) to be able 
 ✍️ Note: Asked and answered in chat during /dev.
 
 ---
+
+#### QA.52 Attribution for Giphy and Tenor GIFs? `◉`
+Findings (not legal advice): GIPHY requires a visible "Powered by GIPHY" mark wherever its API is used; Tenor requires attribution for all content retrieved from it ("Via Tenor" on a shared GIF, "Powered by Tenor" in a browsing view). Mumcord uses neither API (no search), but it loads their media and resolves their page links.
+
+- [x] **GIFs from Giphy or Tenor show a small, unobtrusive label "via GIPHY" / "via Tenor" (official wording, plain text or their attribution logo where the license allows) linking to the original page; the GIF favorites picker shows the label on such items too.** If a GIF search is added later (Epic 6), the full API attribution rules apply.
+
+✍️ Note: Requested in chat during /dev ("guck bitte in die Lizenzen").
+
+---
