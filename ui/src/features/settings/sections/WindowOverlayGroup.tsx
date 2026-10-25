@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { getApi, type OverlaySettings, type OverlayState } from "../../../api";
 import { Group } from "../components/Section";
+import { useSettingsNavigation } from "../settingsNavigation";
 import { Switch } from "../components/Switch";
 import { CornerSelect, SliderField } from "./OverlayFields";
 
@@ -10,6 +11,8 @@ export function WindowOverlayGroup() {
   const { t } = useTranslation(["settings", "overlay"]);
   const [state, setState] = useState<OverlayState | null>(null);
   const [failed, setFailed] = useState(false);
+  const [ruleResult, setRuleResult] = useState<"done" | "removed" | "failed" | null>(null);
+  const navigation = useSettingsNavigation();
 
   useEffect(() => {
     let active = true;
@@ -44,6 +47,29 @@ export function WindowOverlayGroup() {
     run(getApi().overlayUpdate({ ...state.settings, ...patch }));
   };
 
+  const changeRule = (call: Promise<OverlayState>, success: "done" | "removed") => {
+    setRuleResult(null);
+    call.then(
+      (next) => {
+        setState(next);
+        setRuleResult(success);
+      },
+      (e: unknown) => {
+        console.error("Changing the KDE window rule failed", e);
+        setRuleResult("failed");
+      },
+    );
+  };
+  const openRules = () => {
+    setRuleResult(null);
+    getApi()
+      .overlayOpenKdeWindowRules()
+      .catch((e: unknown) => {
+        console.error("Opening the KDE window rules failed", e);
+        setRuleResult("failed");
+      });
+  };
+
   if (state === null) {
     return (
       <Group title={t("settings:overlay.window.title")}>
@@ -75,6 +101,50 @@ export function WindowOverlayGroup() {
         <p className="settings-hint" role="note">
           {t("settings:overlay.window.positionUnsupported")}
         </p>
+      )}
+      {state.kdeWayland && (
+        <div className="settings-field">
+          <div className="settings-actions">
+            <button
+              type="button"
+              className="settings-button"
+              onClick={() => {
+                changeRule(getApi().overlayKwinRuleInstall(), "done");
+              }}
+            >
+              {t("settings:overlay.window.kwin.setUp")}
+            </button>
+            {state.kwinRuleInstalled && (
+              <button
+                type="button"
+                className="settings-button"
+                onClick={() => {
+                  changeRule(getApi().overlayKwinRuleRemove(), "removed");
+                }}
+              >
+                {t("settings:overlay.window.kwin.remove")}
+              </button>
+            )}
+            <button type="button" className="settings-button" onClick={openRules}>
+              {t("settings:overlay.window.kwin.openRules")}
+            </button>
+            {navigation !== null && (
+              <button
+                type="button"
+                className="settings-button"
+                onClick={navigation.showCompatibilityMode}
+              >
+                {t("settings:overlay.window.kwin.compat")}
+              </button>
+            )}
+          </div>
+          <p
+            className={ruleResult === "failed" ? "settings-error" : "settings-hint"}
+            role={ruleResult === "failed" ? "alert" : "status"}
+          >
+            {ruleResult === null ? null : t(`settings:overlay.window.kwin.${ruleResult}`)}
+          </p>
+        </div>
       )}
       <p className="settings-hint">{t("overlay:limits.exclusiveFullscreen")}</p>
       <CornerSelect
