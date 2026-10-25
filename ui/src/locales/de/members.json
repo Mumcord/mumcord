@@ -32,6 +32,8 @@
   "menu": {
     "label": "Aktionen für {{name}}",
     "viewProfile": "Profil ansehen",
+    "join": "{{channel}} beitreten",
+    "joinDenied": "Du darfst diesen Kanal nicht betreten.",
     "mute": "Für mich stummschalten"
   },
   "nowPlaying": {

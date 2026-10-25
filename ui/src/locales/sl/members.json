@@ -36,6 +36,8 @@
   "menu": {
     "label": "Dejanja za {{name}}",
     "viewProfile": "Ogled profila",
+    "join": "Pridruži se kanalu {{channel}}",
+    "joinDenied": "Nimate dovoljenja za vstop v ta kanal.",
     "mute": "Utišaj zame"
   },
   "nowPlaying": {

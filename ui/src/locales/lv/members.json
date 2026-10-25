@@ -34,6 +34,8 @@
   "menu": {
     "label": "Darbības: {{name}}",
     "viewProfile": "Skatīt profilu",
+    "join": "Pievienoties kanālam {{channel}}",
+    "joinDenied": "Jums nav atļaujas ieiet šajā kanālā.",
     "mute": "Izslēgt man"
   },
   "nowPlaying": {

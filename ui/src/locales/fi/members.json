@@ -32,6 +32,8 @@
   "menu": {
     "label": "Toiminnot: {{name}}",
     "viewProfile": "Näytä profiili",
+    "join": "Liity kanavalle {{channel}}",
+    "joinDenied": "Sinulla ei ole oikeutta liittyä tälle kanavalle.",
     "mute": "Mykistä minulta"
   },
   "nowPlaying": {

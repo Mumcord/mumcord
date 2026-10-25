@@ -32,6 +32,8 @@
   "menu": {
     "label": "Åtgärder för {{name}}",
     "viewProfile": "Visa profil",
+    "join": "Gå med i {{channel}}",
+    "joinDenied": "Du har inte behörighet att gå in i den här kanalen.",
     "mute": "Stäng av för mig"
   },
   "nowPlaying": {

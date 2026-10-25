@@ -1,12 +1,13 @@
-import { act, fireEvent, render, screen } from "@testing-library/react";
+import { act, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { MockApi } from "../../api";
 import { getServerState } from "../channels/serverStore";
 import { getSelectedConversation, selectConversation } from "../channels/selection";
 import { connectedMock, resetAll, stubDialog } from "../channels/testUtils";
 import { MembersPanel } from "./MembersPanel";
+import { joinTarget } from "./joinTarget";
 import { PersonMenuHost } from "./PersonMenu";
-import { closePersonMenu } from "./personMenuStore";
+import { closePersonMenu, openPersonMenu } from "./personMenuStore";
 import { ProfilePreviewHost } from "./ProfilePreview";
 import { VOLUME_DEBOUNCE_MS } from "./ProfileCard";
 
@@ -232,5 +233,54 @@ describe("PersonMenu", () => {
       document.dispatchEvent(new Event("scroll"));
     });
     expect(menu()).not.toBeInTheDocument();
+  });
+
+  describe("join the person's channel", () => {
+    it("is hidden for someone in the same channel", async () => {
+      await renderPanel();
+      fireEvent.contextMenu(member(/^Anna/), { clientX: 1, clientY: 1 });
+      expect(screen.queryByRole("menuitem", { name: /^Join/ })).not.toBeInTheDocument();
+    });
+
+    it("is hidden for yourself", async () => {
+      await renderPanel();
+      act(() => {
+        openPersonMenu({ session: 1, x: 1, y: 1, opener: null });
+      });
+      expect(screen.queryByRole("menuitem", { name: /^Join/ })).not.toBeInTheDocument();
+    });
+
+    it("sits after the private message and moves you into their channel", async () => {
+      await renderPanel();
+      const join = vi.spyOn(api, "channelJoin");
+      act(() => {
+        openPersonMenu({ session: 4, x: 1, y: 1, opener: null });
+      });
+      const items = screen.getAllByRole("menuitem").map((i) => i.textContent);
+      expect(items).toEqual(["View profile", "Send private message", "Join Raid"]);
+      fireEvent.click(screen.getByRole("menuitem", { name: "Join Raid" }));
+      expect(join).toHaveBeenCalledWith(2);
+      expect(menu()).not.toBeInTheDocument();
+    });
+  });
+});
+
+describe("joinTarget", () => {
+  it("disables the entry when the channel cannot be entered", async () => {
+    api = await connectedMock();
+    await waitFor(() => {
+      expect(getServerState().users.get(4)).toBeDefined();
+    });
+    const state = getServerState();
+    const carla = state.users.get(4);
+    if (!carla) throw new Error("seed user missing");
+    const gaming = state.channels.get(2);
+    if (!gaming) throw new Error("seed channel missing");
+    const denied = new Map(state.channels).set(2, {
+      ...gaming,
+      permissions: { ...gaming.permissions, enter: false },
+    });
+    expect(joinTarget({ ...state, channels: denied }, carla)?.allowed).toBe(false);
+    expect(joinTarget(state, carla)?.allowed).toBe(true);
   });
 });

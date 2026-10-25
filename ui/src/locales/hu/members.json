@@ -32,6 +32,8 @@
   "menu": {
     "label": "Műveletek: {{name}}",
     "viewProfile": "Profil megtekintése",
+    "join": "Csatlakozás: {{channel}}",
+    "joinDenied": "Nincs jogosultságod belépni ebbe a csatornába.",
     "mute": "Némítás nálam"
   },
   "nowPlaying": {

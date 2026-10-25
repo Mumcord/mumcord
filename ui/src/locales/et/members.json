@@ -32,6 +32,8 @@
   "menu": {
     "label": "Toimingud: {{name}}",
     "viewProfile": "Vaata profiili",
+    "join": "Liitu kanaliga {{channel}}",
+    "joinDenied": "Sul pole luba sellesse kanalisse siseneda.",
     "mute": "Vaigista minu jaoks"
   },
   "nowPlaying": {

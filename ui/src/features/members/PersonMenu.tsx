@@ -18,6 +18,7 @@ import { useServerState } from "../channels/serverStore";
 import { setFriend, useFriend } from "../friends";
 import "../userpanel/quicksettings.css";
 import "./members.css";
+import { joinTarget } from "./joinTarget";
 import { findPerson } from "./personLookup";
 import { VolumeSlider } from "./ProfileCard";
 import { openPrivateConversation } from "./privateMessage";
@@ -27,6 +28,7 @@ import {
   subscribePersonMenu,
   type OpenPersonMenu,
 } from "./personMenuStore";
+import { joinChannel } from "../userpanel/readOnly";
 import { useProfileCard } from "./useProfileCard";
 
 /** Gap kept between the menu and the window edge. */
@@ -140,6 +142,8 @@ function PersonMenu({
   if (gone) return null;
   const isSelf = user?.session === state.selfSession;
 
+  const join = user && !isSelf ? joinTarget(state, user) : null;
+
   const report = (cause: unknown) => {
     console.error("Changing a person's local settings failed", toEngineError(cause).code);
   };
@@ -227,6 +231,37 @@ function PersonMenu({
             closePersonMenu();
             openPrivateConversation(user);
           })}
+          {join &&
+            (join.allowed ? (
+              item(
+                "join",
+                <EnterChannelIcon />,
+                t("menu.join", { channel: join.channel.name }),
+                () => {
+                  closePersonMenu();
+                  joinChannel(join.channel.id).catch((cause: unknown) => {
+                    console.error("Joining a person's channel failed", toEngineError(cause).code);
+                  });
+                },
+              )
+            ) : (
+              <button
+                type="button"
+                role="menuitem"
+                aria-disabled="true"
+                aria-describedby="person-menu-join-reason"
+                tabIndex={-1}
+                className="server-menu__item person-menu__item"
+              >
+                <MenuIcon>
+                  <EnterChannelIcon />
+                </MenuIcon>
+                {t("menu.join", { channel: join.channel.name })}
+                <span id="person-menu-join-reason" className="visually-hidden">
+                  {t("menu.joinDenied")}
+                </span>
+              </button>
+            ))}
           <div role="separator" className="person-menu__separator" />
           {/* Same switch row as the quick settings; the menu stays open while it toggles. */}
           <button
@@ -296,4 +331,8 @@ function IdentityCardIcon() {
 
 function ChatBubbleIcon() {
   return <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />;
+}
+
+function EnterChannelIcon() {
+  return <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4M10 17l5-5-5-5M15 12H3" />;
 }

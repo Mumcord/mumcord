@@ -38,6 +38,8 @@
   "menu": {
     "label": "Gníomhartha do {{name}}",
     "viewProfile": "Féach ar an bpróifíl",
+    "join": "Téigh isteach i {{channel}}",
+    "joinDenied": "Níl cead agat dul isteach sa chainéal seo.",
     "mute": "Balbhaigh dom"
   },
   "nowPlaying": {

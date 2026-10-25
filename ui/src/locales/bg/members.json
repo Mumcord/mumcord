@@ -32,6 +32,8 @@
   "menu": {
     "label": "Действия за {{name}}",
     "viewProfile": "Виж профила",
+    "join": "Влизане в {{channel}}",
+    "joinDenied": "Нямате право да влезете в този канал.",
     "mute": "Заглуши за мен"
   },
   "nowPlaying": {

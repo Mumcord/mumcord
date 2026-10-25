@@ -38,6 +38,8 @@
   "menu": {
     "label": "Azzjonijiet għal {{name}}",
     "viewProfile": "Ara l-profil",
+    "join": "Ingħaqad ma' {{channel}}",
+    "joinDenied": "M'intix permess tidħol f'dan il-kanal.",
     "mute": "Mutja għalija"
   },
   "nowPlaying": {

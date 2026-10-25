@@ -36,6 +36,8 @@
   "menu": {
     "label": "Akce pro {{name}}",
     "viewProfile": "Zobrazit profil",
+    "join": "Připojit se k {{channel}}",
+    "joinDenied": "Do tohoto kanálu nemáte přístup.",
     "mute": "Ztlumit pro mě"
   },
   "nowPlaying": {

@@ -32,6 +32,8 @@
   "menu": {
     "label": "Acties voor {{name}}",
     "viewProfile": "Profiel bekijken",
+    "join": "Naar {{channel}} gaan",
+    "joinDenied": "Je mag dit kanaal niet betreden.",
     "mute": "Voor mij dempen"
   },
   "nowPlaying": {

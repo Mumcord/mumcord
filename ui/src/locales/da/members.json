@@ -32,6 +32,8 @@
   "menu": {
     "label": "Handlinger for {{name}}",
     "viewProfile": "Se profil",
+    "join": "Join {{channel}}",
+    "joinDenied": "Du har ikke adgang til denne kanal.",
     "mute": "Slå lyden fra for mig"
   },
   "nowPlaying": {

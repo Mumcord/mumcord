@@ -34,6 +34,8 @@
   "menu": {
     "label": "Actions pour {{name}}",
     "viewProfile": "Voir le profil",
+    "join": "Rejoindre {{channel}}",
+    "joinDenied": "Vous n'êtes pas autorisé à entrer dans ce canal.",
     "mute": "Mettre en sourdine pour moi"
   },
   "nowPlaying": {

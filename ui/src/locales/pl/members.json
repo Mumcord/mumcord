@@ -36,6 +36,8 @@
   "menu": {
     "label": "Akcje dla {{name}}",
     "viewProfile": "Zobacz profil",
+    "join": "Dołącz do {{channel}}",
+    "joinDenied": "Nie masz uprawnień do wejścia na ten kanał.",
     "mute": "Wycisz dla mnie"
   },
   "nowPlaying": {

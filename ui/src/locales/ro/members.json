@@ -34,6 +34,8 @@
   "menu": {
     "label": "Acțiuni pentru {{name}}",
     "viewProfile": "Vezi profilul",
+    "join": "Intră în {{channel}}",
+    "joinDenied": "Nu ai voie să intri pe acest canal.",
     "mute": "Fără sunet pentru mine"
   },
   "nowPlaying": {

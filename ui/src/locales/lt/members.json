@@ -36,6 +36,8 @@
   "menu": {
     "label": "{{name}} veiksmai",
     "viewProfile": "Peržiūrėti profilį",
+    "join": "Prisijungti prie {{channel}}",
+    "joinDenied": "Neturite teisės įeiti į šį kanalą.",
     "mute": "Nutildyti man"
   },
   "nowPlaying": {
