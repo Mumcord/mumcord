@@ -1418,3 +1418,21 @@ Requested while testing stage 1d.
 ✍️ Note: Requested in chat during /dev.
 
 ---
+
+#### QA.82 Music quality drops voice (issue #7)? `◉`
+Bug found after v0.3.0: at high server limits the music bitrate produced Opus frames over Mumble's 1024-byte voice packet limit, and the sender dropped them silently.
+
+- [x] **Hotfix 0.3.1:** cap the music bitrate so one packet including its header stays within the limit (derived from frame size), lower the bitrate instead of dropping, log once instead of per packet, with a test at a 510 kbit/s server limit.
+
+✍️ Note: Requested in chat during /dev.
+
+---
+
+#### QA.83 Connection quality of others (issue #8)? `◉`
+Feature request after v0.3.0.
+
+- [x] **Epic 2:** show ping, packet loss and bandwidth (Mumble UserStats) for others and oneself in the person menu/profile and as an optional signal icon; poll only while visible; hide what the server doesn't return.
+
+✍️ Note: Requested in chat during /dev.
+
+---

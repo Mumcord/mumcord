@@ -244,6 +244,7 @@
 | B100 | Wizard privacy step (summary + link to PRIVACY.md) before the link-preview choice, all 24 languages | done | | L2a–d, R4 | simple | QA.78 | ui wizard, locales |
 | R3 | v0.3.0 release notes + wiki: positional audio, plugins and full-size images Beta, Windows in-game overlay coming later | done – bump, notes, screenshots committed; wiki prepared (push after release) | r3-release-030 | B95 | simple | FR-1.73 | release notes, wiki |
 | R7 | CHANGELOG.md (Common Changelog) for 0.1.0, 0.1.1, 0.2.0, 0.3.0; linked from README and release notes | done | r7-changelog | R3 | simple | – | CHANGELOG.md, README.md |
+| H2 | Hotfix 0.3.1 (issue #7): music bitrate cap so voice packets fit 1024 bytes, no silent drops; branch from main, PR to main, merge back into epic-1 | in progress | h2-hotfix-031 | – | simple | QA.82 | crates/audio bitrate, crates/protocol voice |
 | C9 | (1c) Verify positional audio | done – AC-1.31/1.32/1.55 automated; 🎧 listening manual | | B31, B33 | complex | AC-1.31, 1.32 | e2e/specs/positional |
 | C10 | (1c) Verify overlay | done – AC-1.33/1.34/1.34b automated; borderless-window on-top (WM-dependent), exclusive fullscreen, Windows hook manual | | B32, B33 | simple | AC-1.33, 1.34 | e2e/specs/overlay |
 | B34 | Link previews + YouTube/Twitch player cards (FR-1.49, 1.50) | done – engine web module (SSRF guard, caps, 24 h disk cache), player cards (inline only YouTube on Windows, else browser), wizard + settings switch | b34-link-previews | G1 | complex | AC-1.39, 1.40 | crates/engine (metadata fetch), ui chat, wizard, settings |
