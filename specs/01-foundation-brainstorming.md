@@ -1095,3 +1095,12 @@ Mumble servers keep no chat history; Mumcord clients can fill gaps for each othe
 ✍️ Note: Requested in chat during /dev.
 
 ---
+
+#### QA.50 Ordering synced messages and jumping to the newest (stage 1d)? `◉`
+
+- [x] **Synced messages are inserted at their correct place by server timestamp (tie-break by hash), day separators and grouping are recomputed, and the scroll position stays where the user is reading (no jump when older messages are inserted above).**
+- [x] **"Jump to newest" button:** appears at the bottom right of the chat when the user has scrolled up or new messages arrived below, shows the count of new messages, jumps to the latest message on click (also End / Ctrl+End).
+
+✍️ Note: Requested in chat during /dev.
+
+---
