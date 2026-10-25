@@ -1,14 +1,3 @@
-.friends-list {
-  padding: var(--space-2);
-}
-
-.friends-list h2 {
-  margin: 0 0 var(--space-1);
-  color: var(--color-text-secondary);
-  font-size: var(--font-size-sm);
-  text-transform: uppercase;
-}
-
 .friends-list ul {
   margin: 0;
   padding: 0;
@@ -73,14 +62,4 @@
 .presence-dot[data-online="true"] {
   border-color: var(--color-success);
   background: var(--color-success);
-}
-
-.friends-list__toggle {
-  padding: 0;
-  border: 0;
-  background: transparent;
-  color: inherit;
-  font: inherit;
-  text-transform: inherit;
-  cursor: pointer;
 }

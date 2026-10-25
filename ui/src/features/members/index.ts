@@ -18,3 +18,5 @@ export {
 } from "./profilePreviewStore";
 export { PersonMenuHost } from "./PersonMenu";
 export { openPersonMenu, openPersonMenuFromEvent, openPersonMenuFromKey } from "./personMenuStore";
+export { CollapsibleSection, type CollapsibleSectionProps } from "./CollapsibleSection";
+export { useSectionOpen } from "./useSectionOpen";

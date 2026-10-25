@@ -5,6 +5,8 @@
   "listening_other": "Kuuntelee ({{count}})",
   "noChannel": "Valitse kanava nähdäksesi, keitä siellä on.",
   "nobody": "Täällä ei ole ketään.",
+  "nobodyElse": "Palvelimella ei ole muita.",
+  "inOtherChannels": "Muilla kanavilla",
   "you": "(sinä)",
   "registered": "Rekisteröitynyt",
   "unregistered": "Ei rekisteröitynyt",

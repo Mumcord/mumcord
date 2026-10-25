@@ -420,3 +420,24 @@
   grid-row: 2;
   margin-block-start: var(--space-1);
 }
+
+.collapsible-section {
+  padding: var(--space-2);
+}
+
+.collapsible-section h2 {
+  margin: 0 0 var(--space-1);
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+  text-transform: uppercase;
+}
+
+.collapsible-section__toggle {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  text-transform: inherit;
+  cursor: pointer;
+}

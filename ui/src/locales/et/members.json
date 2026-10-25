@@ -5,6 +5,8 @@
   "listening_other": "Kuulavad ({{count}})",
   "noChannel": "Vali kanal, et näha, kes seal on.",
   "nobody": "Siin pole kedagi.",
+  "nobodyElse": "Serveris pole kedagi teist.",
+  "inOtherChannels": "Teistes kanalites",
   "you": "(sina)",
   "registered": "Registreeritud",
   "unregistered": "Registreerimata",

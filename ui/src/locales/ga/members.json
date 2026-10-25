@@ -11,6 +11,8 @@
   "listening_other": "Ag éisteacht ({{count}})",
   "noChannel": "Roghnaigh cainéal chun a fheiceáil cé atá ann.",
   "nobody": "Níl aon duine anseo.",
+  "nobodyElse": "Níl duine ar bith eile ar an bhfreastalaí.",
+  "inOtherChannels": "In cainéil eile",
   "you": "(tusa)",
   "registered": "Cláraithe",
   "unregistered": "Gan chlárú",

@@ -7,6 +7,8 @@
   "listening_other": "Sluša ({{count}})",
   "noChannel": "Odaberi kanal da vidiš tko je u njemu.",
   "nobody": "Ovdje nema nikoga.",
+  "nobodyElse": "Na poslužitelju nema nikog drugog.",
+  "inOtherChannels": "U drugim kanalima",
   "you": "(ti)",
   "registered": "Registriran",
   "unregistered": "Nije registriran",

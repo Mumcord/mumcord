@@ -7,6 +7,8 @@
   "listening_other": "À l’écoute ({{count}})",
   "noChannel": "Sélectionnez un canal pour voir qui s’y trouve.",
   "nobody": "Personne ici.",
+  "nobodyElse": "Personne d’autre n’est sur le serveur.",
+  "inOtherChannels": "Dans d’autres salons",
   "you": "(vous)",
   "registered": "Enregistré",
   "unregistered": "Non enregistré",

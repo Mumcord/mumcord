@@ -5,6 +5,8 @@
   "listening_other": "Lytter ({{count}})",
   "noChannel": "Vælg en kanal for at se, hvem der er i den.",
   "nobody": "Der er ingen her.",
+  "nobodyElse": "Ingen andre er på serveren.",
+  "inOtherChannels": "I andre kanaler",
   "you": "(dig)",
   "registered": "Registreret",
   "unregistered": "Ikke registreret",

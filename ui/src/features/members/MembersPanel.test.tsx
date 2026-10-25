@@ -53,7 +53,7 @@ describe("MembersPanel", () => {
   it("lists the people of the selected channel, then listeners", async () => {
     await renderPanel();
     expect(screen.getByRole("heading", { name: "Listening (1)" })).toBeInTheDocument();
-    const buttons = screen.getAllByRole("button");
+    const buttons = screen.getAllByRole("button").filter((b) => b.classList.contains("member"));
     expect(buttons[0]).toHaveAccessibleName(/^Anna/);
     expect(buttons[3]).toHaveAccessibleName(/^Carla/);
     expect(member(/^Ben/)).toHaveAccessibleName(/not registered/);
@@ -64,13 +64,35 @@ describe("MembersPanel", () => {
     expect(screen.getByRole("heading", { name: "In Raid (1)" })).toBeInTheDocument();
   });
 
+  it("collapses the sections and lists people of other channels, collapsed at first", async () => {
+    await renderPanel();
+    const others = screen.getByRole("button", { name: "In other channels" });
+    expect(others).toHaveAttribute("aria-expanded", "false");
+    expect(screen.queryByRole("heading", { name: "Raid" })).not.toBeInTheDocument();
+    fireEvent.click(others);
+    expect(screen.getByRole("heading", { name: "Raid" })).toBeInTheDocument();
+    expect(screen.getAllByRole("button", { name: /^Carla/ })).toHaveLength(2);
+
+    const here = screen.getByRole("button", { name: "In Lobby (3)" });
+    fireEvent.click(here);
+    expect(here).toHaveAttribute("aria-expanded", "false");
+    expect(screen.queryByRole("button", { name: /^Anna/ })).not.toBeInTheDocument();
+    // The open state outlives the component, so put both sections back for the other tests.
+    fireEvent.click(here);
+    fireEvent.click(others);
+  });
+
   it("follows talking state and uses one Tab stop", async () => {
     await renderPanel();
     act(() => {
       api.mock.setTalking(2, true);
     });
     expect(member(/^Anna/)).toHaveAttribute("data-talking", "true");
-    expect(screen.getAllByRole("button").filter((b) => b.tabIndex === 0)).toHaveLength(1);
+    expect(
+      screen
+        .getAllByRole("button")
+        .filter((b) => b.classList.contains("member") && b.tabIndex === 0),
+    ).toHaveLength(1);
     member(/^Anna/).focus();
     fireEvent.keyDown(member(/^Anna/), { key: "End" });
     expect(member(/^Carla/)).toHaveFocus();

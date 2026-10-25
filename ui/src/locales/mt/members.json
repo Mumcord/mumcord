@@ -11,6 +11,8 @@
   "listening_other": "Qed jisimgħu ({{count}})",
   "noChannel": "Agħżel kanal biex tara min hemm.",
   "nobody": "Ħadd mhu hawn.",
+  "nobodyElse": "Ħadd ieħor m’huwa fuq is-server.",
+  "inOtherChannels": "Fi kanali oħra",
   "you": "(int)",
   "registered": "Irreġistrat",
   "unregistered": "Mhux irreġistrat",

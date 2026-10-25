@@ -5,6 +5,8 @@
   "listening_other": "Lyssnar ({{count}})",
   "noChannel": "Välj en kanal för att se vem som är med.",
   "nobody": "Ingen är här.",
+  "nobodyElse": "Ingen annan är på servern.",
+  "inOtherChannels": "I andra kanaler",
   "you": "(du)",
   "registered": "Registrerad",
   "unregistered": "Inte registrerad",

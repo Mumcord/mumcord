@@ -5,6 +5,8 @@
   "listening_other": "Luisteren mee ({{count}})",
   "noChannel": "Kies een kanaal om te zien wie erin zit.",
   "nobody": "Er is niemand.",
+  "nobodyElse": "Er is verder niemand op de server.",
+  "inOtherChannels": "In andere kanalen",
   "you": "(jij)",
   "registered": "Geregistreerd",
   "unregistered": "Niet geregistreerd",

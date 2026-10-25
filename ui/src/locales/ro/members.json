@@ -7,6 +7,8 @@
   "listening_other": "Ascultă ({{count}})",
   "noChannel": "Selectează un canal ca să vezi cine e în el.",
   "nobody": "Nu e nimeni aici.",
+  "nobodyElse": "Nu mai este nimeni pe server.",
+  "inOtherChannels": "În alte canale",
   "you": "(tu)",
   "registered": "Înregistrat",
   "unregistered": "Neînregistrat",

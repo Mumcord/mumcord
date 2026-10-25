@@ -5,6 +5,8 @@
   "listening_other": "Слушат ({{count}})",
   "noChannel": "Избери канал, за да видиш кой е в него.",
   "nobody": "Тук няма никой.",
+  "nobodyElse": "Няма никой друг на сървъра.",
+  "inOtherChannels": "В други канали",
   "you": "(ти)",
   "registered": "Регистриран",
   "unregistered": "Нерегистриран",

@@ -9,6 +9,8 @@
   "listening_other": "Počúva ({{count}})",
   "noChannel": "Vyber kanál a uvidíš, kto v ňom je.",
   "nobody": "Nikto tu nie je.",
+  "nobodyElse": "Na serveri nikto iný nie je.",
+  "inOtherChannels": "V iných kanáloch",
   "you": "(ty)",
   "registered": "Registrovaný",
   "unregistered": "Neregistrovaný",

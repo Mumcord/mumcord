@@ -9,6 +9,8 @@
   "listening_other": "Klauso ({{count}})",
   "noChannel": "Pasirink kanalą, kad pamatytum, kas jame yra.",
   "nobody": "Čia nieko nėra.",
+  "nobodyElse": "Serveryje daugiau nieko nėra.",
+  "inOtherChannels": "Kituose kanaluose",
   "you": "(tu)",
   "registered": "Registruotas (-a)",
   "unregistered": "Neregistruotas (-a)",

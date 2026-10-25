@@ -5,6 +5,8 @@
   "listening_other": "Hallgat ({{count}})",
   "noChannel": "Válassz egy csatornát, hogy lásd, ki van benne.",
   "nobody": "Senki sincs itt.",
+  "nobodyElse": "Rajtad kívül senki nincs a szerveren.",
+  "inOtherChannels": "Más csatornákon",
   "you": "(te)",
   "registered": "Regisztrált",
   "unregistered": "Nem regisztrált",

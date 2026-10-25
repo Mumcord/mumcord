@@ -5,6 +5,8 @@
   "listening_other": "Listening ({{count}})",
   "noChannel": "Select a channel to see who is in it.",
   "nobody": "Nobody is here.",
+  "nobodyElse": "Nobody else is on the server.",
+  "inOtherChannels": "In other channels",
   "you": "(you)",
   "registered": "Registered",
   "unregistered": "Not registered",

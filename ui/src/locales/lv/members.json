@@ -7,6 +7,8 @@
   "listening_other": "Klausās ({{count}})",
   "noChannel": "Izvēlies kanālu, lai redzētu, kas tajā ir.",
   "nobody": "Šeit neviena nav.",
+  "nobodyElse": "Serverī nav neviena cita.",
+  "inOtherChannels": "Citos kanālos",
   "you": "(tu)",
   "registered": "Reģistrēts",
   "unregistered": "Nereģistrēts",
