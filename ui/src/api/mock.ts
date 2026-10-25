@@ -165,7 +165,7 @@ const DEFAULT_OVERLAY: OverlaySettings = {
 };
 
 /** Offline stand-in for the engine's link previews: a YouTube player card or a page card. */
-function mockLinkPreview(url: string): LinkPreview | null {
+function mockLinkPreview(url: string, demo: boolean): LinkPreview | null {
   let parsed: URL;
   try {
     parsed = new URL(url);
@@ -191,6 +191,17 @@ function mockLinkPreview(url: string): LinkPreview | null {
       isImage: false,
     };
   }
+  if (demo) {
+    return {
+      url,
+      siteName: parsed.hostname,
+      title: "Squad notes",
+      description: "Fictional notes from last week's session.",
+      image: demoPicture(),
+      video: null,
+      isImage: false,
+    };
+  }
   return {
     url,
     siteName: parsed.hostname,
@@ -203,9 +214,10 @@ function mockLinkPreview(url: string): LinkPreview | null {
 }
 
 /** Offline stand-in for the engine's inline images: the same small picture for every http(s) URL. */
-function mockInlineImage(url: string): InlineImage | null {
+function mockInlineImage(url: string, demo: boolean): InlineImage | null {
   if (!/^https?:\/\//i.test(url)) return null;
-  return { url, src: MOCK_DEFAULT_AVATAR, width: 320, height: 180, animated: false };
+  const src = demo ? demoPicture() : MOCK_DEFAULT_AVATAR;
+  return { url, src, width: 320, height: 180, animated: false };
 }
 
 /** 1×1 PNG standing in for any image chosen as the default avatar. */
@@ -328,6 +340,19 @@ const DEMO_AVATARS = new Map<number, string>([
   [15, demoAvatar("#a855f7", "#3b82f6")],
 ]);
 
+/** Abstract landscape (sun over hills) standing in for a page picture or an inline image. */
+function demoPicture(): string {
+  const svg =
+    `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 180">` +
+    `<defs><linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">` +
+    `<stop offset="0" stop-color="#0f172a"/><stop offset="1" stop-color="#f97316"/></linearGradient></defs>` +
+    `<rect width="320" height="180" fill="url(#sky)"/>` +
+    `<circle cx="236" cy="72" r="26" fill="#fde68a"/>` +
+    `<path d="M0 130 L80 84 L160 128 L230 96 L320 140 V180 H0Z" fill="#1e293b"/>` +
+    `<path d="M0 160 L110 132 L210 158 L320 136 V180 H0Z" fill="#0f172a"/></svg>`;
+  return `data:image/svg+xml,${encodeURIComponent(svg)}`;
+}
+
 function demoHistory(): ChatMessage[] {
   const lines: [number, string, string, number][] = [
     [2, "Maya", "Evening everyone! Anyone up for a round later?", 34],
@@ -341,6 +366,7 @@ function demoHistory(): ChatMessage[] {
       12,
     ],
     [2, "Maya", "Also: new mics sound great, thanks for the tips!", 11],
+    [5, "Jonas", "Photo from the lake trip: https://images.example.org/lake.png", 9],
     [5, "Jonas", "Back. Who's hosting?", 2],
   ];
   return lines.map(([session, name, body, minutesAgo], index) => ({
@@ -1190,8 +1216,10 @@ export function createMockApi(options: MockOptions = {}): MockApi {
     },
 
     // links
-    linkPreview: (url) => Promise.resolve(settings.linkPreviews ? mockLinkPreview(url) : null),
-    inlineImage: (url) => Promise.resolve(settings.linkPreviews ? mockInlineImage(url) : null),
+    linkPreview: (url) =>
+      Promise.resolve(settings.linkPreviews ? mockLinkPreview(url, demo) : null),
+    inlineImage: (url) =>
+      Promise.resolve(settings.linkPreviews ? mockInlineImage(url, demo) : null),
     previewDismiss: (messageId, url) => {
       for (const conversations of history.values()) {
         for (const messages of conversations.values()) {
