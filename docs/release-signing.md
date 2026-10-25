@@ -32,7 +32,7 @@ All steps happen in the [Azure portal](https://portal.azure.com) and on GitHub. 
 
 1. **Paid Azure subscription.** Create an Azure account for the company with a pay-as-you-go subscription (a free trial subscription cannot use Artifact Signing). Note the **Subscription ID** (_Subscriptions_) and the **Tenant ID** (_Microsoft Entra ID → Overview_).
 2. **Register the resource provider.** _Subscriptions → your subscription → Resource providers_, search `Microsoft.CodeSigning` and choose **Register**.
-3. **Create the Artifact Signing account.** Search the portal for _Artifact Signing accounts → Create_: a new resource group (for example `mumcord-signing`), a globally unique account name (3 to 24 letters and digits, for example `fuewasigning`), region **West Europe**, pricing tier **Basic**. Note the account name and the **Account URI** on its overview page (`https://weu.codesigning.azure.net/` for West Europe).
+3. **Create the Artifact Signing account.** Search the portal for _Artifact Signing accounts → Create_: a new resource group (for example `mumcord-signing`), a globally unique account name (3 to 24 letters and digits, for example `fuewasigning`), region **North Europe (or Poland Central; West Europe currently refuses new customers)**, pricing tier **Basic**. Note the account name and the **Account URI** on its overview page (`https://neu.codesigning.azure.net/` for West Europe).
 4. **Give yourself the identity role.** On the signing account: _Access control (IAM) → Add role assignment_ → **Artifact Signing Identity Verifier** for your own user. Without it the next step is greyed out.
 5. **Validate the organization.** On the signing account: _Identity validations_ → **Organization** → _New identity → Public_, then enter exactly as in the official register or trade registration:
    - legal name: `Tobias Vorwachs Einzelunternehmen`,
@@ -61,7 +61,7 @@ All steps happen in the [Azure portal](https://portal.azure.com) and on GitHub. 
     | `AZURE_CLIENT_ID`        | Application (client) ID of the app registration (step 7)                 |
     | `AZURE_TENANT_ID`        | Tenant ID (step 1)                                                       |
     | `AZURE_SUBSCRIPTION_ID`  | Subscription ID (step 1)                                                 |
-    | `AZURE_SIGNING_ENDPOINT` | Account URI from step 3, for example `https://weu.codesigning.azure.net` |
+    | `AZURE_SIGNING_ENDPOINT` | Account URI from step 3, for example `https://neu.codesigning.azure.net` |
     | `AZURE_SIGNING_ACCOUNT`  | Artifact Signing account name (step 3)                                   |
     | `AZURE_CERT_PROFILE`     | certificate profile name (step 6)                                        |
 

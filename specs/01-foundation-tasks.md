@@ -237,7 +237,7 @@
 | R4 | SignPath preparation: CODE_SIGNING.md, PRIVACY.md, README/release-notes links, Windows exe metadata, release step gated on secrets | done – SignPath flow superseded by R6 (QA.79) | r4-signpath | – | simple | QA.76 | docs, .github/workflows/release.yml, tauri.conf.json |
 | R5 | macOS signing + notarization in release.yml gated on Apple secrets; maintainer guide for certificate/API key/secrets | done (untested until secrets exist) | r5-apple-signing | R4 | simple | QA.77 | .github/workflows/release.yml, docs |
 | R6 | Azure Artifact Signing for Windows (exe + installer via Tauri signCommand, GitHub OIDC), replace SignPath steps, maintainer guide | done – untested until Azure is set up (environment `release`) | r6-azure-signing | R4 | simple | QA.79 | release workflows, tauri.conf.json, docs |
-| B100 | Wizard privacy step (summary + link to PRIVACY.md) before the link-preview choice, all 24 languages | in progress | | L2a–d, R4 | simple | QA.78 | ui wizard, locales |
+| B100 | Wizard privacy step (summary + link to PRIVACY.md) before the link-preview choice, all 24 languages | done | | L2a–d, R4 | simple | QA.78 | ui wizard, locales |
 | R3 | v0.3.0 release notes + wiki: positional audio, plugins and full-size images Beta, Windows in-game overlay coming later | open | | B95 | simple | FR-1.73 | release notes, wiki |
 | C9 | (1c) Verify positional audio | done – AC-1.31/1.32/1.55 automated; 🎧 listening manual | | B31, B33 | complex | AC-1.31, 1.32 | e2e/specs/positional |
 | C10 | (1c) Verify overlay | done – AC-1.33/1.34/1.34b automated; borderless-window on-top (WM-dependent), exclusive fullscreen, Windows hook manual | | B32, B33 | simple | AC-1.33, 1.34 | e2e/specs/overlay |
