@@ -168,3 +168,49 @@ async fn mumcord_clients_see_each_other_but_not_official_ones() {
     let (_b2, _b2_rx, b2_name) = start(&dir, "b51c").await;
     wait_badge(&mut a_rx, &b2_name).await;
 }
+
+/// Regression (B85): a Mumcord hello republishes the person while another thread reads the
+/// snapshot (as the in-game overlay does on every engine event). Both paths take the `core` and
+/// `store` locks; in opposite order they deadlocked and the session stopped emitting events.
+#[tokio::test(flavor = "multi_thread", worker_threads = 4)]
+#[ignore = "needs testenv v14 (MUMCORD_LIVE=1)"]
+async fn hellos_while_reading_snapshots_do_not_deadlock() {
+    if !live() {
+        return;
+    }
+    // SAFETY: set before any audio thread exists; tests run with --test-threads=1.
+    unsafe { std::env::set_var("MUMCORD_AUDIO_BACKEND", "null") };
+    let dir = work_dir("live_mumcord_locks");
+    // A deadlock blocks runtime threads for good, so neither a timeout nor the runtime shutdown
+    // would ever end the test: fail the whole process instead of hanging.
+    let done = std::sync::Arc::new(std::sync::atomic::AtomicBool::new(false));
+    {
+        let done = done.clone();
+        std::thread::spawn(move || {
+            std::thread::sleep(Duration::from_secs(90));
+            if !done.load(std::sync::atomic::Ordering::Relaxed) {
+                eprintln!("deadlock: no progress within 90 s");
+                std::process::exit(1);
+            }
+        });
+    }
+    let (a, mut a_rx, _) = start(&dir, "b85a").await;
+
+    let stop = std::sync::Arc::new(std::sync::atomic::AtomicBool::new(false));
+    let reader = {
+        let (a, stop) = (a.clone(), stop.clone());
+        std::thread::spawn(move || {
+            while !stop.load(std::sync::atomic::Ordering::Relaxed) {
+                let _ = a.snapshot();
+            }
+        })
+    };
+    for round in 0..5 {
+        let (b, _b_rx, b_name) = start(&dir, &format!("b85b{round}")).await;
+        wait_badge(&mut a_rx, &b_name).await;
+        b.disconnect();
+    }
+    stop.store(true, std::sync::atomic::Ordering::Relaxed);
+    reader.join().expect("snapshot reader");
+    done.store(true, std::sync::atomic::Ordering::Relaxed);
+}

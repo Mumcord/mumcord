@@ -1,9 +1,9 @@
 // AC-1.26: OS light -> light, OS dark -> dark (WebKitGTK prefers-color-scheme driven by GTK_THEME),
 // manual override; language es/de switch live (no restart) and every UI text is translated.
-import { writeFileSync } from "node:fs";
+import { readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { browser, expect } from "@wdio/globals";
-import { app, artifactsDir, bot, testenv } from "../../helpers/index.ts";
+import { app, artifactsDir, bot, repoRoot, testenv } from "../../helpers/index.ts";
 import {
   chooseRadio,
   connectFromEmptyState,
@@ -18,8 +18,8 @@ import {
 
 const me = "C7Lang";
 const APPEARANCE = 4;
-const LANGUAGE = 5;
-const TABS = 10;
+const LANGUAGE = 6;
+const TABS = 11;
 
 /** All UI strings on screen: text nodes (incl. visually hidden), aria-labels, placeholders, titles. */
 async function uiTexts(): Promise<string[]> {
@@ -62,7 +62,17 @@ async function collect(): Promise<Set<string>> {
 }
 
 // Same in every language: names, numbers, endonyms, units, symbols, product names.
+// Game titles of the in-game overlay blocklist are names, not UI text.
+const gameTitles = new Set(
+  (
+    JSON.parse(
+      readFileSync(join(repoRoot, "crates/engine/src/ingame_overlay/blocklist.json"), "utf8"),
+    ) as { games: { name: string }[] }
+  ).games.map((g) => g.name),
+);
+
 const neutral = (t: string) =>
+  gameTitles.has(t) ||
   /^[\d\s.,:%/#()+–\-·…★☆×▾▸○]*$/.test(t) ||
   // A single letter (avatar initial), the test audio backend's device name, the OS string.
   /^\p{L}$/u.test(t) ||
@@ -71,7 +81,9 @@ const neutral = (t: string) =>
   /^Link( \(Ctrl\+K\))?$/.test(t) ||
   // "In <channel> (<count>)" reads the same in English and German.
   /^In \S+ \(\d+\)$/.test(t) ||
-  /^(Mumcord|English|Español|Deutsch|Lobby|Raid|AFK|Root|Chat|Audio|Normal|Port|Version|System|Name|C7Lang\w*|localhost.*|OK|Opus|UDP|TCP|TLS|mumble:\/\/.*|v?\d[\w.-]*|https?:\/\/.*|\w+@\w+.*)$/i.test(t);
+  // Pixel values like "240 px" (and the bare unit) are not translated.
+  /^(\d+\s*)?px$/.test(t) ||
+  /^(Mumcord|English|Español|Deutsch|Lobby|Raid|AFK|Root|Chat|Audio|Normal|Port|Version|System|Name|Overlay|Position|Support|C7Lang\w*|localhost.*|OK|Opus|UDP|TCP|TLS|mumble:\/\/.*|v?\d[\w.-]*|https?:\/\/.*|\w+@\w+.*)$/i.test(t);
 
 describe("AC-1.26 theme follows OS + manual override", () => {
   before(async () => {
