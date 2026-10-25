@@ -5,7 +5,8 @@
 //! memory and, for successful previews, on disk until they pass the configurable maximum age
 //! (default 7 days, QA.42). Preview images are stored inside the cached previews. Fetching is guarded by
 //! [`fetch::Fetcher`] (limits and SSRF protection), which also loads inline images in messages
-//! ([`inline`], FR-1.55); those are cached the same way and cleaned up with the previews.
+//! ([`inline`], FR-1.55); those are cached the same way and cleaned up with the previews, as are
+//! full-size chat images (sent and received, FR-1.60c).
 
 pub mod embed;
 pub mod fetch;
@@ -49,6 +50,11 @@ const IMAGE_LIMITS: CacheLimits = CacheLimits {
     memory: 48,
     disk: 150,
 };
+/// Full-size chat images are up to 512 KiB each.
+const FULL_IMAGE_LIMITS: CacheLimits = CacheLimits {
+    memory: 16,
+    disk: 100,
+};
 /// Longest side of a preview image after re-encoding.
 const THUMBNAIL_PX: u32 = 480;
 const OEMBED_LIMIT: usize = 64 * 1024;
@@ -91,6 +97,16 @@ pub struct LinkPreviews {
     cache: Cache<LinkPreview>,
     /// Inline images, in the `images` subdirectory of the preview cache.
     images: Cache<InlineImage>,
+    /// Full-size chat images by content hash, in the `full-images` subdirectory.
+    full_images: Cache<FullImage>,
+}
+
+/// A full-size chat image (FR-1.60c), already checked.
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub(crate) struct FullImage {
+    pub data_url: String,
+    /// Sent by this client: only these are handed to others.
+    pub own: bool,
 }
 
 impl LinkPreviews {
@@ -100,6 +116,10 @@ impl LinkPreviews {
             timeouts,
             fetcher: OnceLock::new(),
             images: Cache::new(cache_dir.as_ref().map(|d| d.join("images")), IMAGE_LIMITS),
+            full_images: Cache::new(
+                cache_dir.as_ref().map(|d| d.join("full-images")),
+                FULL_IMAGE_LIMITS,
+            ),
             cache: Cache::new(cache_dir, PREVIEW_LIMITS),
         }
     }
@@ -123,18 +143,29 @@ impl LinkPreviews {
     pub fn set_max_age_days(&self, days: Option<u32>) {
         self.cache.set_max_age_days(days);
         self.images.set_max_age_days(days);
+        self.full_images.set_max_age_days(days);
     }
 
     /// Deletes cached previews and inline images older than the maximum age (memory and
     /// disk); returns the bytes freed on disk. Blocking file access: call it off the UI thread.
     pub fn prune_expired(&self) -> u64 {
-        self.cache.prune_expired() + self.images.prune_expired()
+        self.cache.prune_expired() + self.images.prune_expired() + self.full_images.prune_expired()
     }
 
     /// Deletes every cached preview and inline image (memory and disk); returns the bytes
     /// freed on disk. Blocking file access: call it off the UI thread.
     pub fn clear_cache(&self) -> u64 {
-        self.cache.clear() + self.images.clear()
+        self.cache.clear() + self.images.clear() + self.full_images.clear()
+    }
+
+    /// The full-size chat image with this content hash (hex), if kept. Blocking file access.
+    pub(crate) fn full_image(&self, hash_hex: &str) -> Option<FullImage> {
+        self.full_images.get(hash_hex).flatten()
+    }
+
+    /// Keeps a full-size chat image under its content hash (hex). Blocking file access.
+    pub(crate) fn keep_full_image(&self, hash_hex: &str, image: FullImage) {
+        self.full_images.put(hash_hex, Some(image));
     }
 
     /// The guarded client, shared with other fetchers of web content (inline images).

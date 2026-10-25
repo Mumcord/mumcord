@@ -4,6 +4,7 @@
 pub mod chat;
 pub mod diag;
 pub mod follow;
+pub mod full_image;
 mod maintenance;
 pub mod now_playing;
 pub mod people;

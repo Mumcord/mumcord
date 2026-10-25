@@ -313,6 +313,13 @@ pub enum EngineEvent {
         session: u32,
         track: Option<crate::now_playing::NowPlayingView>,
     },
+    /// Progress of a full-size image being fetched for the viewer (FR-1.60c): `received` of
+    /// `total` bytes of the image with this reference.
+    FullImageProgress {
+        reference: String,
+        received: u32,
+        total: u32,
+    },
 }
 
 /// Phase of the mic test: record, play back, finished or failed to start.

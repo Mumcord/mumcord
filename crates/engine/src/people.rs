@@ -131,6 +131,40 @@ pub(crate) fn base64(data: &[u8]) -> String {
     out
 }
 
+/// Decodes standard base64 with padding (as written by [`base64`]); `None` for anything else.
+pub(crate) fn base64_decode(text: &str) -> Option<Vec<u8>> {
+    fn value(c: u8) -> Option<u32> {
+        match c {
+            b'A'..=b'Z' => Some(u32::from(c - b'A')),
+            b'a'..=b'z' => Some(u32::from(c - b'a') + 26),
+            b'0'..=b'9' => Some(u32::from(c - b'0') + 52),
+            b'+' => Some(62),
+            b'/' => Some(63),
+            _ => None,
+        }
+    }
+    let bytes = text.as_bytes();
+    if !bytes.len().is_multiple_of(4) {
+        return None;
+    }
+    let mut out = Vec::with_capacity(bytes.len() / 4 * 3);
+    let last = bytes.len() / 4;
+    for (i, quad) in bytes.chunks(4).enumerate() {
+        let padding = quad.iter().rev().take_while(|&&c| c == b'=').count();
+        if padding > 2 || (padding > 0 && i + 1 != last) {
+            return None;
+        }
+        let mut n = 0u32;
+        for &c in &quad[..4 - padding] {
+            n = (n << 6) | value(c)?;
+        }
+        n <<= 6 * padding;
+        let decoded = n.to_be_bytes();
+        out.extend_from_slice(&decoded[1..4 - padding]);
+    }
+    Some(out)
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -150,6 +184,25 @@ mod tests {
         assert_eq!(base64(b"fo"), "Zm8=");
         assert_eq!(base64(b"foo"), "Zm9v");
         assert_eq!(base64(b"foobar"), "Zm9vYmFy");
+    }
+
+    #[test]
+    fn base64_decodes_what_it_encodes() {
+        for data in [
+            &b""[..],
+            b"f",
+            b"fo",
+            b"foo",
+            b"foob",
+            b"fooba",
+            b"foobar",
+            &[0, 255, 7],
+        ] {
+            assert_eq!(base64_decode(&base64(data)).as_deref(), Some(data));
+        }
+        for bad in ["Zg=", "Z===", "Zg==Zg==", "Zm9*", "Zm 9"] {
+            assert_eq!(base64_decode(bad), None, "{bad}");
+        }
     }
 
     #[test]
