@@ -189,6 +189,34 @@ export const commands = {
 	 *  by the engine; `null` when link previews are off (nothing is fetched then) or there is none.
 	 */
 	nowPlayingCover: (session: number) => typedError<string | null, ApiError>(__TAURI_INVOKE("now_playing_cover", { session })),
+	/**  Platform support and the own shared game (for the settings). */
+	nowGamingStatus: () => typedError<NowGamingStatus, ApiError>(__TAURI_INVOKE("now_gaming_status")),
+	/**
+	 *  Icon of a person's game (or the own one) as a small `data:` URL, fetched from the Steam CDN
+	 *  and re-encoded by the engine; `null` when link previews are off (nothing is fetched then)
+	 *  or there is none.
+	 */
+	nowGamingIcon: (session: number) => typedError<string | null, ApiError>(__TAURI_INVOKE("now_gaming_icon", { session })),
+	/**
+	 *  Opens the person's game server in Steam (`steam://connect/<host:port>`). Only links the
+	 *  engine validated are opened; ask the user to confirm first. `NotFound` when the person
+	 *  shares no join target (any more).
+	 */
+	nowGamingJoin: (session: number) => typedError<null, ApiError>(__TAURI_INVOKE("now_gaming_join", { session })),
+	/**  Current overlay options, move mode and what this desktop supports. */
+	overlayState: () => typedError<OverlayState, ApiError>(__TAURI_INVOKE("overlay_state")),
+	/**
+	 *  Stores the overlay options and applies them right away (opens, closes, moves or resizes
+	 *  the overlay). Returns the stored state; also emits `overlayChanged`.
+	 */
+	overlayUpdate: (settings: OverlaySettings) => typedError<OverlayState, ApiError>(__TAURI_INVOKE("overlay_update", { settings })),
+	/**  Shows or hides the overlay (same as the tray menu item). */
+	overlaySetEnabled: (enabled: boolean) => typedError<OverlayState, ApiError>(__TAURI_INVOKE("overlay_set_enabled", { enabled })),
+	/**
+	 *  Turns move mode on (the overlay takes clicks and can be dragged) or off (click-through
+	 *  again; a dragged place is stored as `customPosition`). Ignored while the overlay is off.
+	 */
+	overlayMoveMode: (active: boolean) => typedError<OverlayState, ApiError>(__TAURI_INVOKE("overlay_move_mode", { active })),
 };
 
 /** Events */
@@ -207,7 +235,9 @@ export const events = {
 	micLevel: makeEvent<MicLevel, MicLevel>("mic-level"),
 	micTestPhaseChanged: makeEvent<MicTestPhaseChanged, MicTestPhaseChanged>("mic-test-phase-changed"),
 	notificationActivated: makeEvent<NotificationActivated, NotificationActivated>("notification-activated"),
+	nowGamingChanged: makeEvent<NowGamingChanged, NowGamingChanged>("now-gaming-changed"),
 	nowPlayingChanged: makeEvent<NowPlayingChanged, NowPlayingChanged>("now-playing-changed"),
+	overlayChanged: makeEvent<OverlayChanged, OverlayChanged>("overlay-changed"),
 	serverDenied: makeEvent<ServerDenied, ServerDenied>("server-denied"),
 	serverSynced: makeEvent<ServerSynced, ServerSynced>("server-synced"),
 	talkStateChanged: makeEvent<TalkStateChanged, TalkStateChanged>("talk-state-changed"),
@@ -547,6 +577,36 @@ export type NotifyOutcome =
 "desktop";
 
 /**
+ *  A game someone plays. `name` is plain text, never HTML. `playedMs` is the play time when the
+ *  event or answer was sent; advance it with the local clock from the moment it arrived.
+ */
+export type NowGaming = {
+	name: string,
+	/**  An icon can be loaded with `now_gaming_icon`. */
+	hasIcon: boolean,
+	playedMs: number,
+	/**  The person's game exposes a server to join (`now_gaming_join`). */
+	canJoin: boolean,
+};
+
+/**
+ *  A person started, changed or stopped sharing the game they play (`game: null`). Also sent
+ *  with the own session while the own game is shared (it never comes back from the server).
+ *  Forget all games on a new `serverSynced` and when a person leaves.
+ */
+export type NowGamingChanged = {
+	session: number,
+	game: NowGaming | null,
+};
+
+/**  Whether this platform can look for games, and the own game as currently shared. */
+export type NowGamingStatus = {
+	supported: boolean,
+	/**  `null` while the setting is off or no game runs. */
+	game: NowGaming | null,
+};
+
+/**
  *  A track someone listens to. All text is plain text, never HTML. `positionMs` is the
  *  position when the event or answer was sent; while `playing`, advance it with the local
  *  clock from the moment it arrived, up to `durationMs`.
@@ -579,6 +639,67 @@ export type NowPlayingStatus = {
 	supported: boolean,
 	/**  `null` while the setting is off or nothing plays. */
 	track: NowPlaying | null,
+};
+
+/**  The overlay options or move mode changed (also sent when the UI language changes). */
+export type OverlayChanged = {
+	state: OverlayState,
+};
+
+/**  Screen corner the overlay sits in unless it was dragged somewhere else. */
+export type OverlayCorner = "topLeft" | "topRight" | "bottomLeft" | "bottomRight";
+
+/**  Top-left corner of the overlay in physical desktop pixels. */
+export type OverlayPoint = {
+	x: number,
+	y: number,
+};
+
+/**  The stored overlay options (FR-1.45). Out-of-range values are clamped on save. */
+export type OverlaySettings = {
+	enabled: boolean,
+	/**  Show everyone in the own channel (talking ones with the ring) instead of only talkers. */
+	showWholeChannel: boolean,
+	/**  Show the own channel's name above the people. */
+	showChannelName: boolean,
+	/**  Percent, 20 – 100 (whole numbers keep the TypeScript type a plain `number`). */
+	opacity: number,
+	/**  Used while `customPosition` is `null`. */
+	corner: OverlayCorner,
+	/**  Set by dragging in move mode; send `null` to go back to `corner`. */
+	customPosition: OverlayPoint | null,
+	/**  Logical pixels, 160 – 800. */
+	width: number,
+	/**  Logical pixels, 80 – 1200. */
+	height: number,
+};
+
+/**  Everything the settings UI and the overlay page need to know about the overlay. */
+export type OverlayState = {
+	settings: OverlaySettings,
+	/**
+	 *  Move mode: the overlay takes clicks so it can be dragged; ends with
+	 *  `overlay_move_mode(false)`, which stores the new place.
+	 */
+	moveMode: boolean,
+	/**
+	 *  Whether this desktop keeps the overlay above other windows (FR-1.46). False on a
+	 *  native Linux Wayland session.
+	 */
+	onTopSupported: boolean,
+	/**
+	 *  Whether the app can place the overlay (corner presets, restoring a dragged place).
+	 *  False on a native Linux Wayland session, where the compositor decides.
+	 */
+	positionSupported: boolean,
+	/**
+	 *  i18n key (namespace `overlay`) of the text explaining a limitation of this desktop, or
+	 *  `null` if there is none. The exclusive-fullscreen note `overlay:limits.exclusiveFullscreen`
+	 *  applies everywhere and is not repeated here.
+	 */
+	explanationKey: string | null,
+	/**  UI language from the settings, for the overlay page (`null` follows the OS). */
+	language: Language | null,
 };
 
 /**  How a server edit treats the stored password. */
@@ -776,6 +897,11 @@ export type Settings = {
 	historyMaxAgeDays: number | null,
 	/**  "Share what I'm listening to" (default off; FR-1.58). Off: the media player is not read. */
 	nowPlaying: boolean,
+	/**
+	 *  "Share the game I'm playing" (default off; FR-1.59). Off: no programs or Steam files
+	 *  are read.
+	 */
+	nowGaming: boolean,
 };
 
 /**  Notification sound toggles per event (FR-1.27). */

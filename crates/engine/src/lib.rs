@@ -5,6 +5,7 @@ pub mod chat;
 pub mod diag;
 pub mod follow;
 mod maintenance;
+pub mod now_gaming;
 pub mod now_playing;
 pub mod people;
 pub mod profile;
@@ -18,6 +19,7 @@ pub use follow::FollowAllSummary;
 /// Stored types (settings record etc.) as the engine hands them out.
 pub use mumcord_store as store;
 pub use mumcord_store::{SecretStore, ServerId, Settings};
+pub use now_gaming::{GameSource, LocalGame, NowGamingView};
 pub use now_playing::{LocalTrack, NowPlayingView};
 pub use session::Engine;
 pub use session::{

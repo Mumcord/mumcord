@@ -248,5 +248,13 @@
   "retention": {
     "days_one": "{{count}} Tag",
     "days_other": "{{count}} Tage"
+  },
+  "nowGaming": {
+    "title": "Spielt gerade",
+    "switch": "Teilen, was ich gerade spiele",
+    "hint": "Mumcord sucht unter deinen laufenden Programmen nach bekannten Spielen und nach dem Spiel, das Steam gerade ausführt. Andere Mumcord-Nutzer sehen das Spiel, sein Bild und wie lange du schon spielst, und können deinem Server beitreten, wenn das Spiel einen anbietet; offizielle Mumble-Clients sehen eine Zeile „🎮 Spiel“ am Ende deines Kommentars.",
+    "unsupported": "Auf diesem System nicht unterstützt.",
+    "current": "Wird geteilt: {{game}}",
+    "nothing": "Gerade wird kein Spiel erkannt."
   }
 }

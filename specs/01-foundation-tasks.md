@@ -190,11 +190,13 @@
 | G1 | **Stage 1a gate** (checklist in specs/01-foundation-implementation.md): user manual checklist (Win/macOS, listening, KDE PTT/tray/Orca) + sign-off | open | user | C1–C8 | – | – | – |
 | B30 | (1c) Mumble Link + 3D audio | open | | G1 | complex | FR-1.41, 1.43 | crates/positional/src/link/, crates/audio/src/spatial/ |
 | B31 | (1c) Game plugin host | open | | B30 | complex | FR-1.42, 1.43 | crates/positional/src/plugins/ |
-| B32 | (1c) Overlay window | open | | G1 | complex | FR-1.44–1.46 | src-tauri/src/overlay.rs, ui/src/overlay/ |
+| B32 | (1c) Overlay window | done – overlay.rs + commands, ui/overlay entry, tray toggle, own capability file, Wayland onTop detection; E2E smoke written, not run | b32-overlay | G1 | complex | FR-1.44–1.46 | src-tauri/src/overlay.rs, ui/src/overlay/ |
 | B33 | (1c) positional + overlay settings UI | open | | B30, B32 | simple | FR-1.41, 1.43, 1.45, 1.46 | ui/src/features/settings/positional/ |
-| B49 | (1c) "Now gaming" status + best-effort Join game (FR-1.59) | open | | B30 | complex | AC-1.50 | engine now_gaming, src-tauri process/steam detection, PersonStatus, profile, userpanel |
-| B56 | (1c) Quick settings on right-click of the settings button (FR-1.66) | open | | B49 | simple | – | userpanel, settings store |
-| B61 | (1c) Bug: dragging images (in chat / image viewer / drop into input) freezes the UI | open | | – | simple | – | ui/src/features/chat |
+| B49 | (1c) "Now gaming" status + best-effort Join game (FR-1.59) | done – Steam launcher + 74-game list, plugin data + comment line, controller icon, Steam header image, Join via +connect; Win/mac uncompiled | b49-now-gaming | B56 (Mumble Link source added with B30) | complex | AC-1.50 | engine now_gaming, src-tauri process/steam detection, PersonStatus, profile, userpanel |
+| B56 | (1c) Quick settings on right-click of the settings button (FR-1.66) | done – QuickSettings menu (previews, now playing, theme); game item added with B49 | b56-quick-settings | – | simple | – | userpanel, settings store |
+| B61 | (1c) Bug: dragging images (in chat / image viewer / drop into input) freezes the UI | done (not reproduced; likely native drag of data-URL images) – images not draggable, Composer onDragOver, dragDropEnabled false, 25 MB cap; user check pending | b61-drag-freeze | – | simple | – | ui/src/features/chat |
+| B63 | Quick settings polish: card, pill switches, theme segmented control | done | b63-quick-settings-polish | B56 | simple | FR-1.66 | ui/src/features/userpanel |
+| B64 | (1c) In-game overlay: Linux Vulkan layer + GL preload, Windows graphics hook, per-game config, anti-cheat warning (FR-1.46b) | open | | B32 | complex | AC-1.34b | new crates (overlay layer/hook), src-tauri, settings |
 | C9 | (1c) Verify positional audio | open | | B31, B33 | complex | AC-1.31, 1.32 | e2e/specs/positional |
 | C10 | (1c) Verify overlay | open | | B32, B33 | simple | AC-1.33, 1.34 | e2e/specs/overlay |
 | B34 | Link previews + YouTube/Twitch player cards (FR-1.49, 1.50) | done – engine web module (SSRF guard, caps, 24 h disk cache), player cards (inline only YouTube on Windows, else browser), wizard + settings switch | b34-link-previews | G1 | complex | AC-1.39, 1.40 | crates/engine (metadata fetch), ui chat, wizard, settings |
@@ -222,7 +224,7 @@
 | B57 | Gear icon for the settings button (QA.47) | done | b57-gear-icon | – | simple | – | ui/src/features/userpanel |
 | L1 | License switch to AGPL-3.0-only + commercial license note, CLA in CONTRIBUTING, About page, package metadata, wiki (QA.51) | done – AGPL text, NOTICE, COMMERCIAL.md, CONTRIBUTING (CLA), PR template, metadata, About page, notices | l1-license | – | simple | AC-1.29 | LICENSE, COMMERCIAL.md, CONTRIBUTING.md, README, Cargo/package metadata, settings About, notices |
 | B58 | "via GIPHY" / "via Tenor" attribution labels (QA.52) | done – GifAttribution label (text = accessible name), gifSource helper | b58-gif-attribution | B36 | simple | FR-1.52 | ui/src/features/chat |
-| B59 | Bug: in compact chat layout the link-preview card's left bar overlaps its text | open | | – | simple | – | ui/src/features/chat css |
+| B59 | Bug: in compact chat layout the link-preview card's left bar overlaps its text | done – text-indent reset on .link-previews | b59-compact-card | – | simple | – | ui/src/features/chat css |
 | B60 | Port the demo-mock additions used for the 0.2.0 screenshots (demoPicture, demo link previews/inline images) | open | | – | simple | – | ui/src/api/mock.ts |
 | CI1 | Parallelize E2E in CI: build once, shard spec files across matrix jobs, aggregator job keeps the required "Linux E2E" check name | done – build job + 4 shards from e2e/shards.json, aggregator "Linux E2E"; ~12–13 min | ci1-e2e-shards | – | complex | – | .github/workflows/e2e.yml, e2e/run.sh, wdio config |
 | B62 | (1d) Drop and paste images reliably: preview before sending, several images, compression to the server limit, no UI freeze (FR-1.30, see B61) | open | | B61 | simple | – | ui/src/features/chat Composer, engine image scaling |

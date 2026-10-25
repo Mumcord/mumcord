@@ -265,6 +265,9 @@ impl Engine {
         if previous.now_playing != settings.now_playing {
             self.now_playing_set_enabled(settings.now_playing);
         }
+        if previous.now_gaming != settings.now_gaming {
+            self.now_gaming_set_enabled(settings.now_gaming);
+        }
         if settings.talk_mode != TalkMode::PushToTalk {
             self.inner.controls.set_ptt_pressed(false);
         }

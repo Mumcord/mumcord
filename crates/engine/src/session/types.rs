@@ -313,6 +313,12 @@ pub enum EngineEvent {
         session: u32,
         track: Option<crate::now_playing::NowPlayingView>,
     },
+    /// A person (or the user, with the own session) started, changed or stopped sharing the
+    /// game they play (FR-1.59).
+    NowGamingChanged {
+        session: u32,
+        game: Option<crate::now_gaming::NowGamingView>,
+    },
 }
 
 /// Phase of the mic test: record, play back, finished or failed to start.

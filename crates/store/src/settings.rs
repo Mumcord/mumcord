@@ -123,14 +123,27 @@ impl Default for SoundSettings {
     }
 }
 
-/// Overlay window placement in screen pixels.
+/// Screen corner the overlay sits in unless the user dragged it somewhere else (FR-1.45).
+#[derive(Debug, Clone, Copy, Default, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum OverlayCorner {
+    #[default]
+    TopLeft,
+    TopRight,
+    BottomLeft,
+    BottomRight,
+}
+
+/// Top-left corner of the overlay in physical desktop pixels, set by dragging it in move mode.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
-pub struct OverlayBounds {
+pub struct OverlayPoint {
     pub x: i32,
     pub y: i32,
-    pub width: u32,
-    pub height: u32,
 }
+
+/// Default overlay size in logical pixels: room for about six talking people.
+pub const DEFAULT_OVERLAY_WIDTH: u32 = 240;
+pub const DEFAULT_OVERLAY_HEIGHT: u32 = 320;
 
 /// Overlay options (FR-1.44, FR-1.45).
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
@@ -139,10 +152,16 @@ pub struct OverlaySettings {
     pub enabled: bool,
     /// Show the whole current channel instead of only who is talking.
     pub show_whole_channel: bool,
+    /// Show the name of the own channel above the people.
+    pub show_channel_name: bool,
     /// 0.0 (transparent) – 1.0 (opaque).
     pub opacity: f32,
-    /// `None` until the user moves or resizes the overlay.
-    pub bounds: Option<OverlayBounds>,
+    pub corner: OverlayCorner,
+    /// Where the user dragged the overlay; `None` places it in `corner`.
+    pub custom_position: Option<OverlayPoint>,
+    /// Logical pixels.
+    pub width: u32,
+    pub height: u32,
 }
 
 impl Default for OverlaySettings {
@@ -150,8 +169,12 @@ impl Default for OverlaySettings {
         Self {
             enabled: false,
             show_whole_channel: false,
+            show_channel_name: true,
             opacity: 0.9,
-            bounds: None,
+            corner: OverlayCorner::default(),
+            custom_position: None,
+            width: DEFAULT_OVERLAY_WIDTH,
+            height: DEFAULT_OVERLAY_HEIGHT,
         }
     }
 }
@@ -236,6 +259,9 @@ pub struct Settings {
     /// Share the track playing in the system's media player with others on the server
     /// (FR-1.58). Opt-in: nothing is read from the system while off.
     pub now_playing: bool,
+    /// Share the game being played with others on the server (FR-1.59). Opt-in: no programs
+    /// or Steam files are read while off.
+    pub now_gaming: bool,
 }
 
 impl Default for Settings {
@@ -272,6 +298,7 @@ impl Default for Settings {
             preview_cache_days: Some(DEFAULT_PREVIEW_CACHE_DAYS),
             history_max_age_days: None,
             now_playing: false,
+            now_gaming: false,
         }
     }
 }
@@ -356,12 +383,10 @@ mod tests {
         changed.sounds.user_left = false;
         changed.sounds.voice_join = false;
         changed.sounds.hang_up = false;
-        changed.overlay.bounds = Some(OverlayBounds {
-            x: 1,
-            y: 2,
-            width: 300,
-            height: 400,
-        });
+        changed.overlay.corner = OverlayCorner::BottomRight;
+        changed.overlay.custom_position = Some(OverlayPoint { x: -1, y: 2 });
+        changed.overlay.width = 300;
+        changed.overlay.opacity = 0.5;
         changed.enabled_plugins = vec!["gtav".into()];
         changed.wizard_completed = true;
         changed.log_level = LogLevel::Debug;
@@ -404,6 +429,29 @@ mod tests {
     }
 
     #[test]
+    fn overlay_options_load_from_records_saved_before_they_existed() {
+        let (_dir, store) = temp_store();
+        // Shape written by earlier versions: no corner, size or channel name yet.
+        store
+            .conn
+            .execute(
+                "INSERT INTO settings (id, data) VALUES (1, ?1)",
+                params![r#"{"overlay":{"enabled":true,"opacity":0.5,"bounds":null}}"#],
+            )
+            .expect("insert");
+        let overlay = store.settings().expect("load").overlay;
+        assert!(overlay.enabled);
+        assert!((overlay.opacity - 0.5).abs() < f32::EPSILON);
+        assert_eq!(overlay.corner, OverlayCorner::TopLeft);
+        assert_eq!(overlay.custom_position, None);
+        assert_eq!(
+            (overlay.width, overlay.height),
+            (DEFAULT_OVERLAY_WIDTH, DEFAULT_OVERLAY_HEIGHT)
+        );
+        assert!(overlay.show_channel_name);
+    }
+
+    #[test]
     fn music_quality_is_off_by_default_and_persists() {
         let (_dir, store) = temp_store();
         assert!(!store.settings().expect("load").music_quality);
@@ -422,14 +470,17 @@ mod tests {
         let old = r#"{"wizard_completed":true,"input_device":"alsa:sysdefault:CARD=II","link_previews":true}"#;
         let parsed: Settings = serde_json::from_str(old).expect("parse");
         assert!(!parsed.now_playing, "off until the user turns it on");
+        assert!(!parsed.now_gaming, "off until the user turns it on");
         store
             .save_settings(&Settings {
                 now_playing: true,
+                now_gaming: true,
                 ..parsed
             })
             .expect("save");
         let reloaded = store.settings().expect("reload");
         assert!(reloaded.now_playing);
+        assert!(reloaded.now_gaming);
         assert_eq!(
             reloaded.input_device.as_deref(),
             Some("alsa:sysdefault:CARD=II")

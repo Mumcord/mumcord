@@ -18,6 +18,8 @@ import type {
   InlineImage,
   LinkPreview,
   MumbleLink,
+  OverlaySettings,
+  OverlayState,
   PttAvailability,
   PttMouseStatus,
   SavedServer,
@@ -126,6 +128,18 @@ const DEFAULT_SETTINGS: Settings = {
   previewCacheDays: 7,
   historyMaxAgeDays: null,
   nowPlaying: false,
+  nowGaming: false,
+};
+
+const DEFAULT_OVERLAY: OverlaySettings = {
+  enabled: false,
+  showWholeChannel: false,
+  showChannelName: true,
+  opacity: 90,
+  corner: "topLeft",
+  customPosition: null,
+  width: 240,
+  height: 320,
 };
 
 /** Offline stand-in for the engine's link previews: a YouTube player card or a page card. */
@@ -435,6 +449,19 @@ export function createMockApi(options: MockOptions = {}): MockApi {
   let readOnly = false;
   let ownVoice = { mute: false, deaf: false };
   let windowFocused = true;
+  let overlay: OverlayState = {
+    settings: DEFAULT_OVERLAY,
+    moveMode: false,
+    onTopSupported: true,
+    positionSupported: true,
+    explanationKey: null,
+    language: null,
+  };
+  const setOverlay = (next: OverlayState) => {
+    overlay = next;
+    emit("overlayChanged", { state: overlay });
+    return Promise.resolve(overlay);
+  };
   const desktopNotices: MessageNotice[] = [];
   const messageSounds: ("message" | "mention")[] = [];
   const rejoinOffers = new Map<number, string[]>();
@@ -1040,6 +1067,28 @@ export function createMockApi(options: MockOptions = {}): MockApi {
     // now playing: no media player in the mock; other people's tracks come from `mock.emit`.
     nowPlayingStatus: () => Promise.resolve({ supported: true, track: null }),
     nowPlayingCover: () => Promise.resolve(null),
+
+    // now gaming: no game detection in the mock; other people's games come from `mock.emit`.
+    nowGamingStatus: () => Promise.resolve({ supported: true, game: null }),
+    nowGamingIcon: () => Promise.resolve(null),
+    nowGamingJoin: () => Promise.resolve(null),
+
+    // overlay: no window in the mock; the state round-trips like the engine's.
+    overlayState: () => Promise.resolve(overlay),
+    overlayUpdate: (next) =>
+      setOverlay({
+        ...overlay,
+        settings: next,
+        moveMode: next.enabled && overlay.moveMode,
+      }),
+    overlaySetEnabled: (enabled) =>
+      setOverlay({
+        ...overlay,
+        settings: { ...overlay.settings, enabled },
+        moveMode: enabled && overlay.moveMode,
+      }),
+    overlayMoveMode: (active) =>
+      setOverlay({ ...overlay, moveMode: overlay.settings.enabled && active }),
 
     // settings
     settingsGet: () => Promise.resolve({ ...settings }),

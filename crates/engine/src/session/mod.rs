@@ -145,6 +145,8 @@ struct Inner {
     previews: crate::web::LinkPreviews,
     /// Shared "now playing" status (FR-1.58).
     now_playing: Mutex<crate::now_playing::NowPlaying>,
+    /// Shared "now gaming" status (FR-1.59).
+    now_gaming: Mutex<crate::now_gaming::NowGaming>,
 }
 
 #[derive(Default)]
@@ -294,6 +296,7 @@ impl Engine {
             ),
             core: Mutex::new(Core::default()),
             now_playing: Mutex::new(crate::now_playing::NowPlaying::new(settings.now_playing)),
+            now_gaming: Mutex::new(crate::now_gaming::NowGaming::new(settings.now_gaming)),
         });
         let engine = Self { inner };
         engine
@@ -362,6 +365,10 @@ impl Engine {
 
     pub(crate) fn now_playing_state(&self) -> &Mutex<crate::now_playing::NowPlaying> {
         &self.inner.now_playing
+    }
+
+    pub(crate) fn now_gaming_state(&self) -> &Mutex<crate::now_gaming::NowGaming> {
+        &self.inner.now_gaming
     }
 
     /// The store, also while disconnected (history commands, B14).
@@ -555,7 +562,7 @@ impl Engine {
             }
         }
         let mut profile = people::profile(&current);
-        // The own profile is edited from here; the now-playing line is not part of it.
+        // The own profile is edited from here; the status lines are not part of it.
         if ctx.handle.with_state(|s| s.session) == Some(session) {
             profile.comment = profile
                 .comment
@@ -781,6 +788,7 @@ impl Inner {
         self.stop_pipeline(core);
         if let Some(session) = core.session.take() {
             crate::now_playing::on_disconnect(&self.now_playing, &session.handle);
+            crate::now_gaming::on_disconnect(&self.now_gaming, &session.handle);
             session.handle.disconnect();
         }
         self.meter.voice.store(false, Ordering::Relaxed);
@@ -1014,6 +1022,7 @@ impl Inner {
             events: self.events.clone(),
         };
         crate::now_playing::on_synced(&self.now_playing);
+        crate::now_gaming::on_synced(&self.now_gaming);
         if let Some(mut snapshot) = self.snapshot(&lock(&self.core)) {
             extension::on_synced(&ctx, &mut snapshot);
             self.events
@@ -1276,6 +1285,7 @@ impl Inner {
                 let own = ctx.handle.with_state(|s| s.session) == Some(user.session);
                 if change.joined {
                     crate::now_playing::on_user_joined(&self.now_playing, ctx, user.session);
+                    crate::now_gaming::on_user_joined(&self.now_gaming, ctx, user.session);
                 }
                 if own && change.moved_from.is_some() {
                     self.remember_channel(ctx, user.channel_id);
@@ -1291,6 +1301,7 @@ impl Inner {
                 }
                 drop(core);
                 crate::now_playing::on_user_removed(&self.now_playing, user.session);
+                crate::now_gaming::on_user_removed(&self.now_gaming, user.session);
                 self.events.emit(EngineEvent::UserRemoved(user.session));
             }
             Event::PermissionDenied(denied) => {
@@ -1313,6 +1324,7 @@ impl Inner {
             }
             Event::PluginData(data) => {
                 crate::now_playing::on_plugin_data(&self.now_playing, ctx, data);
+                crate::now_gaming::on_plugin_data(&self.now_gaming, ctx, data);
             }
             Event::TextMessage(_) | Event::ServerConfigUpdated(_) | Event::Disconnected(_) => {}
         }

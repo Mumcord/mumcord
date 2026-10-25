@@ -170,6 +170,9 @@ pub struct Settings {
     pub history_max_age_days: Option<u32>,
     /// "Share what I'm listening to" (default off; FR-1.58). Off: the media player is not read.
     pub now_playing: bool,
+    /// "Share the game I'm playing" (default off; FR-1.59). Off: no programs or Steam files
+    /// are read.
+    pub now_gaming: bool,
 }
 
 impl Settings {
@@ -240,6 +243,7 @@ impl Settings {
             preview_cache_days: s.preview_cache_days,
             history_max_age_days: s.history_max_age_days,
             now_playing: s.now_playing,
+            now_gaming: s.now_gaming,
         }
     }
 
@@ -312,6 +316,7 @@ impl Settings {
         s.preview_cache_days = self.preview_cache_days.map(|d| d.max(1));
         s.history_max_age_days = self.history_max_age_days.map(|d| d.max(1));
         s.now_playing = self.now_playing;
+        s.now_gaming = self.now_gaming;
         s
     }
 }
@@ -380,6 +385,10 @@ pub async fn settings_update(
     if mouse_changed || key != active_ptt_key(&previous) {
         configure_ptt(&app, key);
     }
+    // The overlay page shows its texts in the app language.
+    if stored.language != previous.language {
+        crate::overlay::notify(&app);
+    }
     Ok(Settings::from_store(&stored))
 }
 
@@ -421,6 +430,7 @@ mod tests {
         ui.preview_cache_days = Some(14);
         ui.history_max_age_days = Some(30);
         ui.now_playing = true;
+        ui.now_gaming = true;
         ui.chat_display = ChatDisplay::Compact;
         let stored = ui.to_store(&base);
         assert_eq!(stored.chat_display, store::ChatDisplay::Compact);
@@ -432,6 +442,7 @@ mod tests {
         assert_eq!(stored.preview_cache_days, Some(14));
         assert_eq!(stored.history_max_age_days, Some(30));
         assert!(stored.now_playing);
+        assert!(stored.now_gaming);
         assert_eq!(stored.voice_activation, store::VoiceActivation::Manual);
         assert_eq!(stored.voice_threshold_dbfs, -25);
         let too_loud = Settings {

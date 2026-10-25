@@ -248,5 +248,13 @@
   "retention": {
     "days_one": "{{count}} día",
     "days_other": "{{count}} días"
+  },
+  "nowGaming": {
+    "title": "Jugando ahora",
+    "switch": "Compartir a qué estoy jugando",
+    "hint": "Mumcord busca juegos conocidos entre tus programas en ejecución y el juego que Steam está ejecutando. Otros usuarios de Mumcord ven el juego, su imagen y cuánto tiempo llevas jugando, y pueden unirse a tu servidor si el juego lo ofrece; los clientes oficiales de Mumble ven una línea «🎮 Juego» al final de tu comentario.",
+    "unsupported": "No compatible con este sistema.",
+    "current": "Compartiendo: {{game}}",
+    "nothing": "No se detecta ningún juego ahora mismo."
   }
 }

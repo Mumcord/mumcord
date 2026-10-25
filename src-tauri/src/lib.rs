@@ -7,7 +7,9 @@ mod deeplink;
 mod desktop_entry;
 mod display;
 mod notifications;
+mod now_gaming;
 mod now_playing;
+mod overlay;
 mod ptt;
 mod tray;
 mod window;
@@ -105,6 +107,13 @@ fn specta_builder() -> Builder<tauri::Wry> {
             notify::notification_dismiss,
             commands::now_playing::now_playing_status,
             commands::now_playing::now_playing_cover,
+            commands::now_gaming::now_gaming_status,
+            commands::now_gaming::now_gaming_icon,
+            commands::now_gaming::now_gaming_join,
+            commands::overlay::overlay_state,
+            commands::overlay::overlay_update,
+            commands::overlay::overlay_set_enabled,
+            commands::overlay::overlay_move_mode,
         ])
         .events(collect_events![
             servers::DeepLinkOpened,
@@ -129,6 +138,8 @@ fn specta_builder() -> Builder<tauri::Wry> {
             profile::DefaultAvatarSkipped,
             notify::NotificationActivated,
             commands::now_playing::NowPlayingChanged,
+            commands::now_gaming::NowGamingChanged,
+            commands::overlay::OverlayChanged,
         ])
 }
 
@@ -151,6 +162,7 @@ pub fn run() {
     }
 
     let builder = specta_builder();
+    let invoke = builder.invoke_handler();
 
     // Keep the TypeScript bindings in sync during development.
     // E2E runs set MUMCORD_SKIP_BINDINGS_EXPORT so they never rewrite the tracked file.
@@ -173,7 +185,18 @@ pub fn run() {
         .plugin(tauri_plugin_global_shortcut::Builder::new().build())
         .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_opener::init())
-        .invoke_handler(builder.invoke_handler())
+        .invoke_handler(move |call| {
+            // The overlay page gets only the few commands it needs (least privilege).
+            if !overlay::may_invoke(call.message.webview_ref().label(), call.message.command()) {
+                tracing::warn!(
+                    command = call.message.command(),
+                    "command refused for the overlay"
+                );
+                call.resolver.reject("command not available in this window");
+                return true;
+            }
+            invoke(call)
+        })
         .on_window_event(window::on_window_event)
         .setup(move |app| {
             builder.mount_events(app);
@@ -182,6 +205,7 @@ pub fn run() {
             start_engine(app.handle())?;
             start_window_and_autostart(app.handle());
             tray::init(app.handle());
+            overlay::init(app.handle());
             deeplink::init(app.handle());
             #[cfg(target_os = "linux")]
             desktop_entry::ensure(app.handle());
@@ -219,6 +243,7 @@ fn start_engine(app: &AppHandle) -> Result<(), Box<dyn std::error::Error>> {
     settings::configure_ptt(app, settings::active_ptt_key(&stored));
 
     now_playing::start(engine.clone());
+    now_gaming::start(engine.clone());
     app.manage(engine);
 
     let handle = app.clone();
@@ -328,6 +353,11 @@ fn emit_engine_event(app: &AppHandle, event: EngineEvent) -> tauri::Result<()> {
             }
             .emit(app)
         }
+        EngineEvent::NowGamingChanged { session, game } => commands::now_gaming::NowGamingChanged {
+            session,
+            game: game.map(Into::into),
+        }
+        .emit(app),
     }
 }
 
