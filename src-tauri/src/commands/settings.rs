@@ -173,6 +173,9 @@ pub struct Settings {
     /// "Share the game I'm playing" (default off; FR-1.59). Off: no programs or Steam files
     /// are read.
     pub now_gaming: bool,
+    /// "Share my channel history" (default on; FR-1.60): answer history sync requests of
+    /// other Mumcord users with the stored channel messages (never private chats).
+    pub history_sharing: bool,
 }
 
 impl Settings {
@@ -244,6 +247,7 @@ impl Settings {
             history_max_age_days: s.history_max_age_days,
             now_playing: s.now_playing,
             now_gaming: s.now_gaming,
+            history_sharing: s.history_sharing,
         }
     }
 
@@ -317,6 +321,7 @@ impl Settings {
         s.history_max_age_days = self.history_max_age_days.map(|d| d.max(1));
         s.now_playing = self.now_playing;
         s.now_gaming = self.now_gaming;
+        s.history_sharing = self.history_sharing;
         s
     }
 }
@@ -431,6 +436,8 @@ mod tests {
         ui.history_max_age_days = Some(30);
         ui.now_playing = true;
         ui.now_gaming = true;
+        assert!(ui.history_sharing, "history sharing is on by default");
+        ui.history_sharing = false;
         ui.chat_display = ChatDisplay::Compact;
         let stored = ui.to_store(&base);
         assert_eq!(stored.chat_display, store::ChatDisplay::Compact);
@@ -443,6 +450,7 @@ mod tests {
         assert_eq!(stored.history_max_age_days, Some(30));
         assert!(stored.now_playing);
         assert!(stored.now_gaming);
+        assert!(!stored.history_sharing);
         assert_eq!(stored.voice_activation, store::VoiceActivation::Manual);
         assert_eq!(stored.voice_threshold_dbfs, -25);
         let too_loud = Settings {

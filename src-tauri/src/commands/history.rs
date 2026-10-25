@@ -4,9 +4,10 @@ use mumcord_engine::Engine;
 use serde::{Deserialize, Serialize};
 use specta::Type;
 use tauri::State;
+use tauri_specta::Event;
 
 use super::chat::ChatMessage;
-use super::types::{ApiResult, Conversation, ServerId, to_engine_server_id};
+use super::types::{ApiResult, ChannelId, Conversation, ServerId, to_engine_server_id};
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, Type)]
 #[serde(tag = "kind", rename_all = "camelCase")]
@@ -71,4 +72,33 @@ pub fn history_set_saving(
     enabled: bool,
 ) -> ApiResult<()> {
     Ok(engine.set_save_history(to_engine_server_id(server_id), enabled)?)
+}
+
+/// Messages from another Mumcord user's history were added to a channel (FR-1.60), sorted
+/// by `sentAt` (ties by hash), each with `syncedFrom` set. Insert them at their time position
+/// and keep the reading position (FR-1.60b).
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, Type, Event)]
+#[serde(rename_all = "camelCase")]
+pub struct HistorySynced {
+    pub channel_id: ChannelId,
+    pub messages: Vec<ChatMessage>,
+}
+
+/// A channel's history sync started (`running: true`) or ended with `added` new messages.
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, Type, Event)]
+#[serde(rename_all = "camelCase")]
+pub struct HistorySyncStatus {
+    pub channel_id: ChannelId,
+    pub running: bool,
+    pub added: u32,
+}
+
+/// "Load earlier messages" (FR-1.60): asks other Mumcord users for the channel's messages
+/// from before the user started receiving it live. The channel must be the own or a followed
+/// one (`notFound` otherwise); `serverTooOld` on servers that cannot forward plugin data.
+/// Progress arrives as `historySyncStatus`, messages as `historySynced`.
+#[tauri::command]
+#[specta::specta]
+pub fn history_sync_request(engine: State<'_, Engine>, channel_id: ChannelId) -> ApiResult<()> {
+    Ok(engine.history_sync_request(channel_id, None)?)
 }

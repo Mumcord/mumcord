@@ -68,6 +68,15 @@ export interface MockControls {
   requireCertTrust(serverId: number, previousFingerprint?: string): void;
   /** Simulates an incoming message from another person. */
   receiveMessage(conversation: Conversation, body: string, senderSession: number): ChatMessage;
+  /**
+   * What the next `historySyncRequest` for `channelId` finds in `holderName`'s history
+   * (FR-1.60); without it, a sync finds nothing.
+   */
+  offerHistory(
+    channelId: number,
+    holderName: string,
+    lines: readonly { senderName: string; body: string; sentAt: string }[],
+  ): void;
   /** Simulates a dropped connection; the mock enters `reconnecting`. */
   loseConnection(): void;
   /** Ends a reconnect attempt successfully. */
@@ -132,6 +141,7 @@ const DEFAULT_SETTINGS: Settings = {
   historyMaxAgeDays: null,
   nowPlaying: false,
   nowGaming: false,
+  historySharing: true,
 };
 
 const DEFAULT_OVERLAY: OverlaySettings = {
@@ -334,6 +344,7 @@ function demoHistory(): ChatMessage[] {
     sentAt: new Date(Date.now() - minutesAgo * 60_000).toISOString(),
     body,
     dismissedPreviews: [],
+    syncedFrom: null,
   }));
 }
 
@@ -576,6 +587,10 @@ export function createMockApi(options: MockOptions = {}): MockApi {
   let gifFavorites: string[] = [];
   /** Originals kept by `fullImageKeep`, by reference. */
   const fullImages = new Map<string, string>();
+  const offeredHistory = new Map<
+    number,
+    { holderName: string; lines: readonly { senderName: string; body: string; sentAt: string }[] }
+  >();
 
   function serverHistory(serverId: number): Map<string, ChatMessage[]> {
     let map = history.get(serverId);
@@ -592,6 +607,20 @@ export function createMockApi(options: MockOptions = {}): MockApi {
     const map = serverHistory(snap.serverId);
     const key = conversationKey(message.conversation);
     map.set(key, [...(map.get(key) ?? []), message]);
+  }
+
+  /** Stores a synced message at its time position, as the engine's store orders by time. */
+  function storeByTime(message: ChatMessage): void {
+    const snap = requireSnapshot();
+    if (!requireServer(snap.serverId).saveHistory) return;
+    const map = serverHistory(snap.serverId);
+    const key = conversationKey(message.conversation);
+    const list = [...(map.get(key) ?? [])];
+    const time = Date.parse(message.sentAt);
+    let at = list.length;
+    while (at > 0 && Date.parse(list[at - 1]?.sentAt ?? "") > time) at -= 1;
+    list.splice(at, 0, message);
+    map.set(key, list);
   }
 
   function checkSize(html: string): void {
@@ -774,6 +803,7 @@ export function createMockApi(options: MockOptions = {}): MockApi {
       sentAt: new Date().toISOString(),
       body: html,
       dismissedPreviews: [],
+      syncedFrom: null,
     };
     store(message);
     return message;
@@ -1113,6 +1143,33 @@ export function createMockApi(options: MockOptions = {}): MockApi {
       fullImages.set(reference, dataUrl);
       return Promise.resolve(reference);
     },
+    historySyncRequest: (channelId) => {
+      const snap = requireSnapshot();
+      if (!snap.info.followSupported)
+        fail("serverTooOld", "history sync needs a Mumble 1.4+ server");
+      if (channelId !== selfUser().channelId && !snap.followedChannelIds.includes(channelId))
+        fail("notFound", "channel is neither joined nor followed");
+      emit("historySyncStatus", { channelId, running: true, added: 0 });
+      const offer = offeredHistory.get(channelId);
+      offeredHistory.delete(channelId);
+      const messages: ChatMessage[] = (offer?.lines ?? []).map((line) => ({
+        id: String(nextMessageId++),
+        conversation: { kind: "channel", channelId },
+        senderName: line.senderName,
+        senderCertHash: null,
+        senderSession: null,
+        own: false,
+        sentAt: line.sentAt,
+        body: line.body,
+        dismissedPreviews: [],
+        syncedFrom: offer?.holderName ?? null,
+      }));
+      messages.sort((a, b) => Date.parse(a.sentAt) - Date.parse(b.sentAt));
+      for (const message of messages) storeByTime(message);
+      if (messages.length > 0) emit("historySynced", { channelId, messages });
+      emit("historySyncStatus", { channelId, running: false, added: messages.length });
+      return Promise.resolve(null);
+    },
     fullImageFetch: (reference) => {
       const src = fullImages.get(reference) ?? null;
       if (src !== null) emit("fullImageProgress", { reference, received: 1, total: 1 });
@@ -1294,6 +1351,9 @@ export function createMockApi(options: MockOptions = {}): MockApi {
     requireCertTrust: (serverId, previousFingerprint) => {
       certPrompts.set(serverId, previousFingerprint ?? null);
     },
+    offerHistory: (channelId, holderName, lines) => {
+      offeredHistory.set(channelId, { holderName, lines });
+    },
     receiveMessage: (conversation, body, senderSession) => {
       const sender = requireUser(senderSession);
       const message: ChatMessage = {
@@ -1306,6 +1366,7 @@ export function createMockApi(options: MockOptions = {}): MockApi {
         sentAt: new Date().toISOString(),
         body,
         dismissedPreviews: [],
+        syncedFrom: null,
       };
       store(message);
       emit("messageReceived", { message });

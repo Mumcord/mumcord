@@ -142,6 +142,13 @@ export const commands = {
 	historyClear: (scope: HistoryScope) => typedError<null, ApiError>(__TAURI_INVOKE("history_clear", { scope })),
 	/**  "Save history" switch per server (default on). */
 	historySetSaving: (serverId: number, enabled: boolean) => typedError<null, ApiError>(__TAURI_INVOKE("history_set_saving", { serverId, enabled })),
+	/**
+	 *  "Load earlier messages" (FR-1.60): asks other Mumcord users for the channel's messages
+	 *  from before the user started receiving it live. The channel must be the own or a followed
+	 *  one (`notFound` otherwise); `serverTooOld` on servers that cannot forward plugin data.
+	 *  Progress arrives as `historySyncStatus`, messages as `historySynced`.
+	 */
+	historySyncRequest: (channelId: number) => typedError<null, ApiError>(__TAURI_INVOKE("history_sync_request", { channelId })),
 	/**  Sets the own avatar from an image file, scaled to the server limit; `null` removes it. */
 	setOwnAvatar: (path: string | null) => typedError<null, ApiError>(__TAURI_INVOKE("set_own_avatar", { path })),
 	/**  The default avatar as a `data:` URL, or `null` if none is set. */
@@ -301,6 +308,8 @@ export const events = {
 	defaultAvatarSkipped: makeEvent<DefaultAvatarSkipped, DefaultAvatarSkipped>("default-avatar-skipped"),
 	followedChannelsChanged: makeEvent<FollowedChannelsChanged, FollowedChannelsChanged>("followed-channels-changed"),
 	fullImageProgress: makeEvent<FullImageProgress, FullImageProgress>("full-image-progress"),
+	historySyncStatus: makeEvent<HistorySyncStatus, HistorySyncStatus>("history-sync-status"),
+	historySynced: makeEvent<HistorySynced, HistorySynced>("history-synced"),
 	inGameOverlayChanged: makeEvent<InGameOverlayChanged, InGameOverlayChanged>("in-game-overlay-changed"),
 	messageReceived: makeEvent<MessageReceived, MessageReceived>("message-received"),
 	micLevel: makeEvent<MicLevel, MicLevel>("mic-level"),
@@ -428,6 +437,11 @@ export type ChatMessage = {
 	body: string,
 	/**  Links whose preview card was dismissed by the user (`preview_dismiss`). */
 	dismissedPreviews: string[],
+	/**
+	 *  Name of the person whose history this message was synced from (FR-1.60); `null` for
+	 *  messages received or sent here. Show "from ‹name›'s history".
+	 */
+	syncedFrom: string | null,
 };
 
 export type CloseBehaviour = "ask" | "minimizeToTray" | "quit";
@@ -605,6 +619,23 @@ export type GameOverlayEntry = {
 };
 
 export type HistoryScope = { kind: "conversation"; serverId: number; conversation: Conversation } | { kind: "server"; serverId: number } | { kind: "all" };
+
+/**  A channel's history sync started (`running: true`) or ended with `added` new messages. */
+export type HistorySyncStatus = {
+	channelId: number,
+	running: boolean,
+	added: number,
+};
+
+/**
+ *  Messages from another Mumcord user's history were added to a channel (FR-1.60), sorted
+ *  by `sentAt` (ties by hash), each with `syncedFrom` set. Insert them at their time position
+ *  and keep the reading position (FR-1.60b).
+ */
+export type HistorySynced = {
+	channelId: number,
+	messages: ChatMessage[],
+};
 
 /**  Public view of the identity; the certificate itself never leaves the engine. */
 export type Identity = {
@@ -1090,6 +1121,11 @@ export type Settings = {
 	 *  are read.
 	 */
 	nowGaming: boolean,
+	/**
+	 *  "Share my channel history" (default on; FR-1.60): answer history sync requests of
+	 *  other Mumcord users with the stored channel messages (never private chats).
+	 */
+	historySharing: boolean,
 };
 
 /**  Notification sound toggles per event (FR-1.27). */

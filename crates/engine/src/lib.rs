@@ -20,7 +20,6 @@ pub mod web;
 
 pub use chat::{ChatMessageView, HistoryScope};
 pub use follow::FollowAllSummary;
-pub use history_sync::SyncedMessage;
 pub use ingame_overlay::{
     BlockedGame, Blocklist, OverlayDecision, blocklist, decide as decide_overlay,
 };

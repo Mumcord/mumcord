@@ -27,7 +27,6 @@ use std::sync::MutexGuard;
 
 use mumcord_store::{ChatMessage, Conversation, NewChatMessage, ServerId, Store, UnixMillis};
 
-use super::SyncedMessage;
 use super::hash::{Content, content_hash, text_key, variants};
 use super::wire::{self, Hash, MAX_MESSAGES, Packet, WireMessage};
 use crate::chat::{ChatMessageView, sanitize_message_html, transient_id};
@@ -765,7 +764,7 @@ impl Core {
             return;
         }
         accepted.sort_by_key(|(hash, m)| (m.sent_at, *hash));
-        let messages: Vec<SyncedMessage> = {
+        let messages: Vec<ChatMessageView> = {
             let store = env.store();
             accepted
                 .into_iter()
@@ -777,21 +776,19 @@ impl Core {
                             None
                         })
                         .map_or_else(transient_id, |id| id.to_string());
-                    SyncedMessage {
-                        message: ChatMessageView {
-                            id,
-                            conversation: ConversationRef::Channel {
-                                channel_id: job.channel,
-                            },
-                            own: own_cert.is_some() && new.sender_cert_hash == own_cert,
-                            sender_name: new.sender_name,
-                            sender_cert_hash: new.sender_cert_hash,
-                            sender_session: None,
-                            sent_at: new.sent_at,
-                            body: new.body,
-                            dismissed_previews: Vec::new(),
+                    ChatMessageView {
+                        id,
+                        conversation: ConversationRef::Channel {
+                            channel_id: job.channel,
                         },
-                        holder_name: holder_name.clone(),
+                        own: own_cert.is_some() && new.sender_cert_hash == own_cert,
+                        sender_name: new.sender_name,
+                        sender_cert_hash: new.sender_cert_hash,
+                        sender_session: None,
+                        sent_at: new.sent_at,
+                        body: new.body,
+                        dismissed_previews: Vec::new(),
+                        synced_from: Some(holder_name.clone()),
                     }
                 })
                 .collect()
