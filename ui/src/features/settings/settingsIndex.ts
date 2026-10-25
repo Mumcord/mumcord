@@ -209,6 +209,11 @@ export const SETTINGS_INDEX: readonly SettingEntry[] = [
     group: "overlay.inGame.title",
     terms: ["overlay.inGame.explanation", "overlay.inGame.games"],
   },
+  {
+    section: "overlay",
+    group: "gamePlugins.title",
+    terms: ["gamePlugins.explanation", "gamePlugins.antiCheat"],
+  },
   { section: "diagnostics", group: "diagnostics.logging", control: "diagnostics.logLevel" },
   { section: "diagnostics", group: "diagnostics.file", terms: ["diagnostics.fileHint"] },
   { section: "about", group: "about.license" },

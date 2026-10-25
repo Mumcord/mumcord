@@ -352,5 +352,26 @@
     "unsupported": "No compatible con este sistema.",
     "current": "Compartiendo: {{game}}",
     "nothing": "No se detecta ningún juego ahora mismo."
+  },
+  "gamePlugins": {
+    "title": "Audio posicional: fuentes",
+    "explanation": "Los juegos indican a Mumcord dónde estás mediante Mumble Link o mediante los plugins de juego oficiales de Mumble. Mumcord busca los plugins en su propia carpeta de plugins y en una instalación de Mumble existente. Activa solo los plugins de los juegos a los que juegas.",
+    "antiCheat": "Los plugins de juego leen la memoria del juego. Algunos sistemas antitrampas pueden marcarlo; desactiva los plugins en juegos con antitrampas estrictos.",
+    "off": "El audio posicional está desactivado.",
+    "nothing": "Ahora mismo ningún juego envía posiciones.",
+    "delivering": "Posiciones de: {{source}}",
+    "deliveringGame": "Posiciones de: {{source}} ({{game}})",
+    "loading": "Buscando plugins de juego…",
+    "none": "No se encontraron plugins de juego. Instala Mumble o copia los archivos de plugin en la carpeta de plugins de Mumcord.",
+    "loadFailed": "No se pudieron listar los plugins de juego.",
+    "switchFailed": "No se pudo cambiar el plugin de juego.",
+    "version": "Versión {{version}}",
+    "active": "Enviando posiciones",
+    "problem": {
+      "incompatible": "No es compatible con Mumcord.",
+      "initFailed": "No se pudo iniciar.",
+      "unsupported": "No disponible en este sistema.",
+      "failed": "Detenido tras un error. Desactívalo y vuelve a activarlo para reintentar."
+    }
   }
 }
