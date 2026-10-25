@@ -47,6 +47,8 @@ pub struct LinkStats {
     pub rtt: Option<Duration>,
     /// Raw counters of the decrypting side (as Mumble reports them).
     pub crypt: CryptStats,
+    /// Outgoing audio packets dropped so far because they exceeded the voice packet limit.
+    pub oversized: u64,
 }
 
 pub(crate) struct Link {
@@ -185,6 +187,7 @@ impl Link {
             loss,
             rtt: if udp { self.rtt } else { None },
             crypt,
+            oversized: 0,
         }
     }
 

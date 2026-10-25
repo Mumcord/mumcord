@@ -16,6 +16,16 @@ use crate::version::MumbleVersion;
 
 /// Largest plaintext packet Mumble accepts (`Mumble::Protocol::MAX_UDP_PACKET_SIZE`).
 pub(crate) const MAX_PACKET: usize = 1024;
+/// Largest header around the Opus data of an outgoing audio packet, in either format: target
+/// up to 31, any sequence number, terminator flag and positional data. Protobuf is the larger
+/// one: type byte 1, target 2, frame number 11, Opus length 3 (payload < 16 KiB), positional
+/// data 14, terminator 3 (field 16 needs a two-byte tag).
+pub(crate) const MAX_AUDIO_HEADER: usize = 34;
+/// Spare bytes on top of [`MAX_AUDIO_HEADER`], so a small encoding detail can never tip a
+/// packet over [`MAX_PACKET`].
+const SAFETY_MARGIN: usize = 32;
+/// Largest Opus payload per outgoing packet; the encoder must never produce more.
+pub const MAX_VOICE_PAYLOAD: usize = MAX_PACKET - MAX_AUDIO_HEADER - SAFETY_MARGIN;
 
 const LEGACY_PING: u8 = 1;
 const LEGACY_OPUS: u8 = 4;
@@ -331,6 +341,36 @@ mod tests {
         let out = encode_audio(Format::Legacy, &audio).expect("encode");
         // Opus type 4 in the top bits, seq 300, size 3 | terminator 0x2000.
         assert_eq!(out, [0x80, 0x81, 0x2C, 0xA0, 0x03, 1, 2, 3]);
+    }
+
+    /// Issue #7: a payload within the budget must fit a voice packet whatever the header
+    /// carries (both formats, UDP or TCP tunnel use the same bytes).
+    #[test]
+    fn largest_payload_fits_a_voice_packet() {
+        let payload = [0xAB; MAX_VOICE_PAYLOAD];
+        let mut largest_header = 0;
+        for format in [Format::Legacy, Format::Protobuf] {
+            for positional in [None, Some([f32::MAX, -1.5, 1e-30])] {
+                for seq in [0, 300, u64::from(u32::MAX), u64::MAX] {
+                    for (target, is_last) in [(0, false), (31, true)] {
+                        let audio = AudioOut {
+                            target,
+                            seq,
+                            payload: &payload,
+                            is_last,
+                            positional,
+                        };
+                        let len = encode_audio(format, &audio).expect("encode").len();
+                        largest_header = largest_header.max(len - MAX_VOICE_PAYLOAD);
+                        assert!(len <= MAX_PACKET, "{format:?} {audio:?}: {len} bytes");
+                    }
+                }
+            }
+        }
+        assert_eq!(
+            largest_header, MAX_AUDIO_HEADER,
+            "keep the header bound exact"
+        );
     }
 
     /// Server → client legacy packet: like the client's, plus the session after the header.

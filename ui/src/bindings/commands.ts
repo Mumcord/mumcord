@@ -107,6 +107,11 @@ export const commands = {
 	 */
 	linkPreview: (url: string) => typedError<LinkPreview | null, ApiError>(__TAURI_INVOKE("link_preview", { url })),
 	/**
+	 *  Opens a link from a message in the system browser after the user clicked it. Only
+	 *  http(s) and mailto links open.
+	 */
+	openLink: (url: string) => typedError<null, ApiError>(__TAURI_INVOKE("open_link", { url })),
+	/**
 	 *  An external image (`<img src>` in a message) or direct image link, ready to show inline;
 	 *  `null` when previews are switched off in the settings (then nothing is fetched) or the
 	 *  image cannot be shown (blocked address, too large, unsupported format).

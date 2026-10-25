@@ -10,7 +10,7 @@ mod decoder;
 mod encoder;
 
 pub use decoder::{MAX_DECODED_SAMPLES, OpusDecoder};
-pub use encoder::{MAX_PACKET_BYTES, OpusEncoder, PacketDuration};
+pub use encoder::{MAX_PACKET_BYTES, MAX_VOICE_PAYLOAD_BYTES, OpusEncoder, PacketDuration};
 
 /// Errors from the Opus codec.
 #[derive(Debug, thiserror::Error)]

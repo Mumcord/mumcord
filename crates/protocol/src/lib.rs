@@ -27,7 +27,8 @@ pub use state::{Channel, CryptSetup, ServerInfo, ServerState, User, UserChange};
 pub use tls::{CertVerifier, ClientIdentity, ServerCert, cert_hash};
 pub use version::MumbleVersion;
 pub use voice::{
-    CryptStats, LinkStats, OutgoingAudio, Transport, VoiceEvent, VoicePacket, VoiceTransport,
+    CryptStats, LinkStats, MAX_VOICE_PAYLOAD, OutgoingAudio, Transport, VoiceEvent, VoicePacket,
+    VoiceTransport,
 };
 
 /// Control-channel messages generated from the vendored `Mumble.proto`.

@@ -40,7 +40,7 @@ mod packet;
 use std::io;
 use std::net::{Ipv4Addr, Ipv6Addr, SocketAddr};
 use std::sync::{Arc, Mutex, MutexGuard};
-use std::time::Instant;
+use std::time::{Duration, Instant};
 
 use bytes::Bytes;
 use tokio::net::UdpSocket;
@@ -56,6 +56,12 @@ use crate::state::CryptSetup;
 use crypt::{CryptState, OVERHEAD};
 use link::{Link, PING_INTERVAL};
 use packet::{AudioIn, AudioOut, Format, Incoming, MAX_PACKET};
+
+pub use packet::MAX_VOICE_PAYLOAD;
+
+/// Oversized outgoing packets are logged at most this often, with the count since the last
+/// log line, so a misbehaving encoder cannot flood the log.
+const OVERSIZE_LOG_INTERVAL: Duration = Duration::from_secs(10);
 
 /// Legacy target / protobuf context value of audio delivered because we listen to the channel.
 const CONTEXT_LISTEN: u8 = 3;
@@ -169,6 +175,9 @@ impl VoiceTransport {
             link,
             started: now,
             seq: 0,
+            oversized: 0,
+            oversized_logged: 0,
+            oversize_logged_at: None,
             events: events_tx,
             stats: Arc::clone(&stats),
         };
@@ -253,6 +262,11 @@ struct Worker {
     started: Instant,
     /// Sequence number of the next outgoing packet, in 10 ms frames.
     seq: u64,
+    /// Outgoing packets dropped as larger than [`MAX_PACKET`], reported in [`LinkStats`].
+    oversized: u64,
+    /// Value of `oversized` at the last log line, and when it was written.
+    oversized_logged: u64,
+    oversize_logged_at: Option<Instant>,
     events: mpsc::UnboundedSender<VoiceEvent>,
     stats: Arc<Mutex<LinkStats>>,
 }
@@ -287,7 +301,9 @@ impl Worker {
             if result.is_err() || !self.handle.is_connected() {
                 break;
             }
-            *lock(&self.stats) = self.link.stats(self.crypt.stats);
+            let mut stats = self.link.stats(self.crypt.stats);
+            stats.oversized = self.oversized;
+            *lock(&self.stats) = stats;
         }
     }
 
@@ -376,7 +392,10 @@ impl Worker {
         self.seq += u64::from(audio.frames);
         let Some(plain) = packet::encode_audio(self.format, &out).filter(|p| p.len() <= MAX_PACKET)
         else {
-            tracing::warn!(len = audio.payload.len(), "dropping oversized voice packet");
+            // The server would refuse it. The owner lowers the bitrate from the count in
+            // `LinkStats::oversized`; the log line is rate-limited.
+            self.oversized += 1;
+            self.log_oversized(audio.payload.len());
             return Ok(());
         };
         match self.link.transport() {
@@ -386,6 +405,23 @@ impl Worker {
             }
             Transport::Tcp => self.handle.send_tunnel(Bytes::from(plain)),
         }
+    }
+
+    fn log_oversized(&mut self, payload_len: usize) {
+        let now = Instant::now();
+        if self
+            .oversize_logged_at
+            .is_some_and(|at| now.duration_since(at) < OVERSIZE_LOG_INTERVAL)
+        {
+            return;
+        }
+        tracing::warn!(
+            payload_len,
+            dropped = self.oversized - self.oversized_logged,
+            "dropping oversized voice packets; lowering the bitrate"
+        );
+        self.oversized_logged = self.oversized;
+        self.oversize_logged_at = Some(now);
     }
 
     async fn send_udp(&mut self, plain: &[u8]) {

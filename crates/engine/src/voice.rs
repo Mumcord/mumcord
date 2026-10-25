@@ -15,7 +15,9 @@ use std::thread::JoinHandle;
 use std::time::{Duration, Instant};
 
 use bytes::Bytes;
-use mumcord_audio::codec::{MAX_PACKET_BYTES, OpusEncoder, PacketDuration};
+use mumcord_audio::codec::{
+    MAX_PACKET_BYTES, MAX_VOICE_PAYLOAD_BYTES, OpusEncoder, PacketDuration,
+};
 use mumcord_audio::dsp::{DspChain, DspControls, EchoRefConsumer, Gate, MicTest, echo_reference};
 use mumcord_audio::io::{AudioIo, DeviceEvent, DeviceInfo, Direction, FrameSink, FrameSource};
 use mumcord_audio::mixer::{PacketSender, Playback, PlaybackConfig, PlaybackSink};
@@ -30,6 +32,10 @@ use crate::session::{
 };
 
 /// Interval of `MicLevel` events (about 20 per second).
+// The encoder caps every packet at the audio crate's budget; it must be the one the protocol
+// crate derives from Mumble's voice packet limit, or packets would be dropped (issue #7).
+const _: () = assert!(MAX_VOICE_PAYLOAD_BYTES == mumcord_protocol::MAX_VOICE_PAYLOAD);
+
 const METER_INTERVAL: Duration = Duration::from_millis(50);
 /// Poll interval of talk indicators; well inside the 200 ms of AC-1.7.
 const TALK_POLL: Duration = Duration::from_millis(20);
