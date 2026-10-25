@@ -4,7 +4,7 @@ import licenseText from "../../../../../LICENSE?raw";
 import { getApi, type AppInfo } from "../../../api";
 import { Group, Section } from "../components/Section";
 
-/** About: version, OS, Mumcord's MIT license and the third-party notices (AC-1.29). */
+/** About: version, OS, Mumcord's AGPL license and the third-party notices (AC-1.29). */
 export function AboutSection() {
   const { t } = useTranslation("settings");
   const [info, setInfo] = useState<AppInfo | null>(null);
@@ -40,6 +40,7 @@ export function AboutSection() {
         <dd>{info?.os ?? "…"}</dd>
       </dl>
       <Group title={t("about.license")}>
+        <p className="settings-hint">{t("about.commercial")}</p>
         <ScrollableText label={t("about.license")} text={licenseText} />
       </Group>
       <Group title={t("about.notices")}>

@@ -204,7 +204,8 @@
   "about": {
     "version": "Version",
     "os": "System",
-    "license": "Mumcord-Lizenz (MIT)",
+    "license": "Mumcord-Lizenz (AGPL-3.0)",
+    "commercial": "Kommerzielle Lizenzen: tobias@vorwachs.com",
     "notices": "Hinweise zu Drittanbietern",
     "noticesHint": "Mumcord basiert auf Open-Source-Software, darunter Code aus dem Mumble-Projekt.",
     "noticesFailed": "Die Hinweise zu Drittanbietern konnten nicht geladen werden.",

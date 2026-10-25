@@ -896,14 +896,15 @@ describe("Diagnostics section", () => {
 });
 
 describe("About section", () => {
-  it("shows version, system, the MIT license and the third-party notices", async () => {
+  it("shows version, system, the AGPL license, the commercial-license contact and the third-party notices", async () => {
     await openSection("About");
     expect(await screen.findByText("0.0.0-mock")).toBeInTheDocument();
     expect(screen.getByText("mock")).toBeInTheDocument();
-    const license = screen.getByLabelText("Mumcord license (MIT)");
+    const license = screen.getByLabelText("Mumcord license (AGPL-3.0)");
     expect(license.tagName).toBe("PRE");
     expect(license).toHaveAttribute("tabindex", "0");
-    expect(license).toHaveTextContent("MIT License");
+    expect(license).toHaveTextContent("GNU AFFERO GENERAL PUBLIC LICENSE");
+    expect(screen.getByText("Commercial licenses: tobias@vorwachs.com")).toBeInTheDocument();
     const notices = await screen.findByLabelText("Third-party notices");
     expect(notices).toHaveTextContent("Mumble");
     expect(notices).toHaveTextContent("BSD-3-Clause");

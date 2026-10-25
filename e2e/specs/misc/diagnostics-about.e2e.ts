@@ -102,12 +102,12 @@ describe("diagnostics and about (AC-1.28, AC-1.29)", () => {
     // Also scan: no other file with PEM is expected here; nothing else to check.
   });
 
-  it("AC-1.29: About lists MIT license and Mumble's BSD notice", async () => {
+  it("AC-1.29: About lists AGPL license and Mumble's BSD notice", async () => {
     await browser.pause(500);
     await $("//button[@role='tab'][normalize-space()='About']").click();
-    const license = $("pre[aria-label='Mumcord license (MIT)']");
+    const license = $("pre[aria-label='Mumcord license (AGPL-3.0)']");
     await license.waitForDisplayed();
-    expect(await license.getText()).toMatch(/MIT License/i);
+    expect(await license.getText()).toMatch(/GNU AFFERO GENERAL PUBLIC LICENSE/);
     const notices = $("pre[aria-label='Third-party notices']");
     await browser.waitUntil(async () => !(await notices.getText()).startsWith("Loading"), {
       timeoutMsg: "notices not loaded",

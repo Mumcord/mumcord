@@ -204,7 +204,8 @@
   "about": {
     "version": "Version",
     "os": "System",
-    "license": "Mumcord license (MIT)",
+    "license": "Mumcord license (AGPL-3.0)",
+    "commercial": "Commercial licenses: tobias@vorwachs.com",
     "notices": "Third-party notices",
     "noticesHint": "Mumcord is built on open-source software, including code from the Mumble project.",
     "noticesFailed": "The third-party notices could not be loaded.",
