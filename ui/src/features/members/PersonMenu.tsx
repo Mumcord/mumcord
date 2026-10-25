@@ -7,6 +7,7 @@ import {
   useEffect,
   useLayoutEffect,
   useRef,
+  useState,
   useSyncExternalStore,
   type KeyboardEvent,
   type ReactNode,
@@ -83,10 +84,13 @@ function PersonMenu({
 }) {
   const { t } = useTranslation("members");
   const { t: tFriends } = useTranslation("friends");
+  const { t: tChannels } = useTranslation("channels");
   const state = useServerState();
   const user = findPerson(state.users, open.session, open.name);
   const friend = useFriend(user?.certHash ?? null);
   const ref = useRef<HTMLDivElement>(null);
+  // The menu closes once the join succeeds; a failure keeps it open to show why.
+  const [joinError, setJoinError] = useState<string | null>(null);
 
   const close = (returnFocus: boolean) => {
     closePersonMenu();
@@ -238,10 +242,25 @@ function PersonMenu({
                 <EnterChannelIcon />,
                 t("menu.join", { channel: join.channel.name }),
                 () => {
-                  closePersonMenu();
-                  joinChannel(join.channel.id).catch((cause: unknown) => {
-                    console.error("Joining a person's channel failed", toEngineError(cause).code);
-                  });
+                  setJoinError(null);
+                  joinChannel(join.channel.id).then(
+                    () => {
+                      closePersonMenu();
+                    },
+                    (cause: unknown) => {
+                      const { code } = toEngineError(cause);
+                      if (code !== "permissionDenied" && code !== "notConnected") {
+                        console.error("Joining a person's channel failed", code);
+                      }
+                      setJoinError(
+                        code === "permissionDenied"
+                          ? tChannels("errors.joinDenied")
+                          : code === "notConnected"
+                            ? tChannels("errors.notConnected")
+                            : tChannels("errors.joinFailed"),
+                      );
+                    },
+                  );
                 },
               )
             ) : (
@@ -262,6 +281,11 @@ function PersonMenu({
                 </span>
               </button>
             ))}
+          {joinError && (
+            <p role="alert" className="channels-error">
+              {joinError}
+            </p>
+          )}
           <div role="separator" className="person-menu__separator" />
           {/* Same switch row as the quick settings; the menu stays open while it toggles. */}
           <button

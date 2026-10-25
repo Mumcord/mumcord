@@ -260,7 +260,20 @@ describe("PersonMenu", () => {
       expect(items).toEqual(["View profile", "Send private message", "Join Raid"]);
       fireEvent.click(screen.getByRole("menuitem", { name: "Join Raid" }));
       expect(join).toHaveBeenCalledWith(2);
-      expect(menu()).not.toBeInTheDocument();
+      await waitFor(() => {
+        expect(menu()).not.toBeInTheDocument();
+      });
+    });
+
+    it("keeps the menu open and announces why the join failed", async () => {
+      await renderPanel();
+      api.mock.failNext("channelJoin", "permissionDenied");
+      act(() => {
+        openPersonMenu({ session: 4, x: 1, y: 1, opener: null });
+      });
+      fireEvent.click(screen.getByRole("menuitem", { name: "Join Raid" }));
+      expect(await screen.findByRole("alert")).toHaveTextContent(/not allowed/);
+      expect(menu()).toBeInTheDocument();
     });
   });
 });
