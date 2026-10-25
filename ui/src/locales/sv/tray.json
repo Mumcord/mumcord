@@ -1,0 +1,12 @@
+{
+  "show": "Visa Mumcord",
+  "mute": "Stäng av mikrofonen",
+  "deafen": "Stäng av ljudet",
+  "overlay": "Visa overlayen",
+  "quit": "Avsluta",
+  "disconnected": "Inte ansluten",
+  "connecting": "Ansluter…",
+  "connected": "Ansluten",
+  "talking": "Ansluten – pratar",
+  "muted": "Ansluten – mikrofon avstängd"
+}

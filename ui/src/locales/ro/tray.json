@@ -1,0 +1,12 @@
+{
+  "show": "Arată Mumcord",
+  "mute": "Oprește microfonul",
+  "deafen": "Oprește sunetul",
+  "overlay": "Arată overlay-ul",
+  "quit": "Închide",
+  "disconnected": "Neconectat",
+  "connecting": "Se conectează…",
+  "connected": "Conectat",
+  "talking": "Conectat – vorbește",
+  "muted": "Conectat – microfon oprit"
+}

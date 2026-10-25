@@ -1,0 +1,12 @@
+{
+  "show": "Mostra Mumcord",
+  "mute": "Disattiva microfono",
+  "deafen": "Disattiva audio",
+  "overlay": "Mostra l'overlay",
+  "quit": "Esci",
+  "disconnected": "Non connesso",
+  "connecting": "Connessione…",
+  "connected": "Connesso",
+  "talking": "Connesso – sta parlando",
+  "muted": "Connesso – microfono disattivato"
+}

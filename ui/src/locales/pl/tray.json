@@ -1,0 +1,12 @@
+{
+  "show": "Pokaż Mumcord",
+  "mute": "Wycisz mikrofon",
+  "deafen": "Ogłusz",
+  "overlay": "Pokaż nakładkę",
+  "quit": "Zamknij aplikację",
+  "disconnected": "Brak połączenia",
+  "connecting": "Łączenie…",
+  "connected": "Połączono",
+  "talking": "Połączono – mówi",
+  "muted": "Połączono – wyciszony"
+}

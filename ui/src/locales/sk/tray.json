@@ -1,0 +1,12 @@
+{
+  "show": "Zobraziť Mumcord",
+  "mute": "Stlmiť mikrofón",
+  "deafen": "Stlmiť zvuk",
+  "overlay": "Zobraziť overlay",
+  "quit": "Ukončiť",
+  "disconnected": "Nepripojené",
+  "connecting": "Pripájanie…",
+  "connected": "Pripojené",
+  "talking": "Pripojené – hovorí",
+  "muted": "Pripojené – stlmené"
+}
