@@ -1463,3 +1463,13 @@ Requested after v0.3.0.
 ✍️ Note: Requested in chat during /dev.
 
 ---
+
+#### QA.88 Watch party and screen sharing? `◉`
+Requested after v0.3.0; both go to the end of Epic 2 and ship as Beta.
+
+- [x] **YouTube watch party:** Mumcord users in a channel watch the same YouTube video in sync; play, pause and seek are synchronized over plugin data.
+- [x] **Screen sharing:** share a screen or window with other Mumcord users. Mumble servers can't carry video, so this needs a direct peer-to-peer connection (signalling over plugin data); how to get through home routers (NAT/STUN) without any server-side component must be decided in the Epic 2 specification.
+
+✍️ Note: Requested in chat during /dev.
+
+---
