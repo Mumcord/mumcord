@@ -3,7 +3,8 @@
 //! Plays a minimal Mumcord: listens on the overlay socket, answers the layer's hello with an
 //! enabled config and a scene with one talking person. Then it renders frames to a
 //! `VK_EXT_headless_surface` swapchain (cleared to blue), presents them through the loader (and
-//! so through the layer, if the loader picks it up), reads a presented image back and checks that the overlay's green talking dot is in the top-left corner.
+//! so through the layer, if the loader picks it up), reads a presented image back and checks that the overlay's green talking dot is in the
+//! top-left corner.
 //!
 //! Run with an isolated socket name and a data directory that holds the layer manifest, e.g.
 //! `MUMCORD_OVERLAY_SOCKET=test XDG_DATA_HOME=… cargo run -p mumcord-overlay-layer --example headless_check`.
@@ -419,18 +420,23 @@ mod linux {
             if let Ok(out) = std::env::var("MUMCORD_CHECK_PPM") {
                 write_ppm(&out, pixels)?;
             }
-            // BGRA. The talking dot sits 13/21 px into the panel, which starts 16 px in.
+            // BGRA. The panel starts 16 px in; its first row holds the talking dot (13/21 px into
+            // the panel), or the channel name when a real Mumcord shows it, which pushes the
+            // dot further down. So look for the dot in the panel's top-left area.
             let at = |x: u32, y: u32| {
                 let i = ((y * WIDTH + x) * 4) as usize;
                 (pixels[i + 2], pixels[i + 1], pixels[i])
             };
-            let dot = at(16 + 13, 16 + 21);
+            let talking_green = |(r, g, b): (u8, u8, u8)| g > 150 && b < 160 && r < 120;
+            let dot = (16..16 + 120)
+                .flat_map(|y| (16..16 + 60).map(move |x| (x, y)))
+                .find(|&(x, y)| talking_green(at(x, y)));
             let far = at(WIDTH - 20, HEIGHT - 20);
-            println!("pixel at the talking dot: rgb{dot:?}, far away: rgb{far:?}");
+            println!("talking dot at {dot:?}, pixel far away: rgb{far:?}");
             if far != (0, 0, 255) {
                 return Err("the frame was not cleared to blue".into());
             }
-            if !(dot.1 > 150 && dot.2 < 160 && dot.0 < 120) {
+            if dot.is_none() {
                 return Err("no overlay at the expected place (is the layer loaded?)".into());
             }
             Ok(())
