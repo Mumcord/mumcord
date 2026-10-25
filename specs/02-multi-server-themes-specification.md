@@ -92,7 +92,7 @@ Nothing changes on the server side. The server keeps enforcing ACLs on every con
 
 ### 4.4 Connection quality (issue #8, QA.83)
 
-- **FR-2.25** The profile card, hover preview and person menu show the person's ping, packet loss, bandwidth and UDP/TCP from Mumble UserStats, also for the user themselves; fields the server doesn't return are hidden.
+- **FR-2.25** The profile card, hover preview and person menu show the person's ping, packet loss, bandwidth and UDP/TCP from Mumble UserStats, also for the user themselves. They also show the person's client (client release string and version, e.g. "Mumcord 1.2.0" or "Mumble 1.5.0") and operating system with its version, taken from the UserStats `version`, `os` and `os_version` fields (and the Mumble Version message data). Client and OS text comes from the other client and is untrusted: shown as plain text, length-capped. Fields the server doesn't return are hidden.
 - **FR-2.26** A small signal icon appears next to a person in the channel tree and member list automatically when their connection is weak (ping above 250 ms or packet loss above 5 %), with a tooltip (Q3.8). The switch "Show weak connection icon" (Settings → Appearance, default on) turns it off.
 - **FR-2.27** UserStats are requested only for people visible on the shown server, at a slow, paced rate that never interferes with chat or voice (section 6).
 
@@ -122,11 +122,11 @@ Nothing changes on the server side. The server keeps enforcing ACLs on every con
 
 ### 4.8 Screen sharing (Beta)
 
-- **FR-2.42** A user can share a whole screen or one window, chosen through the system picker, optionally with sound (Q3.2). Several people in a channel can share at the same time.
+- **FR-2.42** A user can share a whole screen or one window, optionally with sound (Q3.2). Windows, macOS and Linux Wayland use the system picker (window or screen). Linux X11 shares the whole screen only (no window picker). Several people in a channel can share at the same time. Video is VP9 (software encoding, libvpx) and audio is Opus; hardware encoding is a later item, not part of this epic. Sound: viewers hear only the shared window's or app's sound (per-app capture: Windows process loopback, macOS ScreenCaptureKit app filter, Linux PipeWire node of the shared app); where the OS can't isolate it, no sound is sent and the sharer sees a clear hint. Mumcord's own voice output is never part of the shared sound.
 - **FR-2.43** Viewers: Mumcord users in the same voice channel (Q3.4), up to 8 per sharer (Q3.3). The 9th viewer gets a clear "This share is full" message. The sharer sees who is watching.
-- **FR-2.44** Default quality 720p at 30 fps, lowered automatically when the upload can't keep up (Q5.3).
+- **FR-2.44** Default quality 720p at 30 fps (Q5.3). When the upload can't keep up, quality drops automatically in steps (temporal layers) down to 480p at 15 fps, and rises again when the upload recovers. Viewers decode in the webview with WebCodecs, with a Rust libvpx fallback where the webview lacks it.
 - **FR-2.45** A sharing person shows a "Live" marker in the channel tree and member list; "Watch" opens the stream in the main area, with full-screen and "Stop watching". Sharer controls: pause, stop, sound on/off.
-- **FR-2.46** Screen sharing needs a direct connection (FR-2.35); without one, "Watch" is disabled with the reason. Marked Beta.
+- **FR-2.46** Screen sharing needs a direct connection (FR-2.35); without one, "Watch" is disabled with the reason. Known limit: there is no STUN/TURN relay (client-only rule), so users behind CGNAT may not get a direct connection; the UI says so clearly. Marked Beta.
 
 ### 4.9 Epic 1 leftovers (Q1.13)
 
@@ -220,7 +220,7 @@ flowchart LR
 - **Plugin data:** per server; history sync, now playing/gaming, peer-to-peer signalling, watch party commands and full-size image fallback use the plugin-data channel of the server where the other person is.
 - **UserStats pacing:** requests are spread out (at most one every 2 seconds per server, people in the user's channel first, each person refreshed at most every 30 s while visible) so the server's message rate limit is never hit by them.
 - **Peer-to-peer:** signalling over plugin data; connection attempts over IPv6, UPnP / NAT-PMP / PCP port mapping and LAN; encrypted transport authenticated with the peers' Mumble client certificates and checked against the certificate hash the server reports. One direct connection per pair of users carries images, video and sound.
-- **Screen sharing:** captured through the OS (Linux: desktop portal + PipeWire, Windows: Windows Graphics Capture, macOS: ScreenCaptureKit), encoded as video at 720p30 by default with adaptive bitrate, sound captured with the share when chosen; the sharer sends one stream per viewer (up to 8).
+- **Screen sharing:** captured through the OS (Linux: desktop portal + PipeWire, Windows: Windows Graphics Capture, macOS: ScreenCaptureKit), encoded as VP9 video (software, libvpx) at 720p30 by default with adaptive bitrate down to 480p15 and Opus audio, decoded in the webview via WebCodecs with a Rust libvpx fallback, per-app sound captured with the share when chosen; the sharer sends one stream per viewer (up to 8).
 
 ```mermaid
 sequenceDiagram
@@ -300,7 +300,7 @@ At most one server is in state `Voice` at any time.
 - **Stack unchanged** (Tauri 2, Rust engine, React + TypeScript strict) – see spec 01.
 - **Engine:** holds a set of independent server sessions keyed by saved-server id (today one session) plus one "voice server" pointer; the audio pipeline is connected only to the voice server's session. Every UI command and event carries the server id.
 - **Peer-to-peer module (new, `p2p`):** one encrypted transport between two Mumcord users, using the existing Mumble client certificates for mutual authentication; port mapping through UPnP/NAT-PMP/PCP. Recommended: QUIC over `rustls` (encrypted, works over UDP through mapped ports, one connection carries images and video streams); libraries confirmed during build.
-- **Screen capture & video (new, `screenshare`):** OS capture APIs per platform (portal/PipeWire, Windows Graphics Capture, ScreenCaptureKit), a widely supported video codec with hardware acceleration where available and a software fallback, decoding and display in the UI; libraries confirmed during build with licence check (AGPL-compatible).
+- **Screen capture & video (new, `screenshare`):** OS capture APIs per platform (portal/PipeWire, Windows Graphics Capture, ScreenCaptureKit), VP9 software encoding (libvpx; hardware encoding later), Opus audio, decoding via WebCodecs in the UI with a Rust libvpx fallback; libraries confirmed during build with licence check (AGPL-compatible).
 - **Watch party:** uses the existing YouTube embed (FR-1.50) with the player's control API; only commands go over plugin data.
 - **Themes:** CSS custom properties generated from the theme's key colours; the contrast check runs on the generated values, the same way as the existing contrast test.
 - **Windows overlay:** hook DLL for DXGI (D3D11/D3D12) and injection as designed in `docs/engine-api.md`, sharing the overlay content protocol with the Linux layer.
@@ -310,7 +310,7 @@ At most one server is in state `Voice` at any time.
 ## 9. Non-functional requirements
 
 - **Performance:** idle with 5 connected servers (one voice) ≤ 3 % CPU and ≤ 400 MB RAM on a mid-range PC; no UI freeze > 200 ms when a big server connects (FR-2.24); visual effects keep 60 fps scrolling on a mid-range PC or are reduced.
-- **Screen sharing:** 720p30 to 8 viewers with sound needs about 8–15 Mbit/s upload; the sharer's CPU use while sharing ≤ 25 % with hardware encoding.
+- **Screen sharing:** 720p30 to 8 viewers with sound needs about 8–15 Mbit/s upload; the sharer's CPU use while sharing is measured and reported (software VP9; hardware encoding is a later item).
 - **Voice latency:** unchanged (≤ 150 ms mouth-to-ear excluding network transit), also while screen sharing.
 - **Security:** direct connections always encrypted and authenticated against the certificate hash reported by the server; a mismatch drops the connection. Theme strings accept colour values only. Installer checks release checksums. AUR key stored only as a CI secret.
 - **Privacy (GDPR):** direct connections reveal the IP address only after consent (FR-2.36); the update check contacts GitHub only after consent (FR-2.56) and sends nothing but the request; screen shares and watch parties aren't recorded or stored; PRIVACY.md is updated for direct connections and the update check.
@@ -352,7 +352,7 @@ Themes & look:
 Big servers & quality:
 - **AC-2.17** Connect to the 4× scale test server → "Syncing big server…" shows, no freeze over 200 ms (measured as in the Epic 1 scale report).
 - **AC-2.18** Turn on "Hide empty channels" and "Show talking people first" → empty channels disappear, a talking bot moves to the top of its channel.
-- **AC-2.19** Open a person's profile → ping, loss, bandwidth and UDP/TCP show; simulate a bad connection for a bot (network emulation in the test setup) → signal icon appears next to it; switch off → icon gone.
+- **AC-2.19** Open a person's profile → ping, loss, bandwidth, UDP/TCP, client name and version (a bot using the official Mumble client shows its Mumble version; a second Mumcord client shows "Mumcord <version>") and OS show; a client that reports none shows no client line; simulate a bad connection for a bot (network emulation in the test setup) → signal icon appears next to it; switch off → icon gone.
 
 Overlay:
 - **AC-2.20** Windows: start a D3D11 and a D3D12 game with the in-game overlay on → overlay shows the talking people; a game on the blocklist stays off by default.
@@ -367,7 +367,7 @@ Peer-to-peer, watch party, screen sharing (two Mumcord clients on a local test s
 - **AC-2.26** Block direct paths in the test setup → full-size images still arrive via plugin data; "Watch" shows "needs a direct connection".
 - **AC-2.27** Close the image viewer during a full transfer → the transfer stops (sender log/status shows it cancelled); progress bar under the chat image while loading.
 - **AC-2.28** Start "Watch together" on a YouTube card → the second Mumcord client in the same voice channel joins; pause/seek on either side syncs within 1 s and shows "‹name› paused"; a latecomer starts at the current position; an official client sees nothing.
-- **AC-2.29** Share a window with sound → the viewer sees and hears it at 720p30; a second sharer in the channel can be watched at the same time; a 9th viewer gets "This share is full" (bot viewers).
+- **AC-2.29** Share a window with sound → the viewer sees and hears only that window's sound (not Mumcord's voice output) at 720p30; throttling the sharer's upload in the test setup lowers quality automatically down to 480p15; on X11 only whole-screen sharing is offered; where sound can't be isolated, no sound is sent and the sharer sees a hint; a second sharer in the channel can be watched at the same time; a 9th viewer gets "This share is full" (bot viewers).
 
 Leftovers:
 - **AC-2.30** Send a message into a channel without write permission → marked as refused with reason, retry possible; a refused follow shows its error once; a server message shows the server as sender.
@@ -410,7 +410,7 @@ Linux packages:
 | Q2.8 | Optional theme per server | FR-2.17 |
 | Q2.9 | One-time notice on window-overlay removal | FR-2.33 |
 | Q3.1 | Ask once before the first direct connection | FR-2.36 |
-| Q3.2 | Screen or window, with sound, several sharers | FR-2.42 |
+| Q3.2 | Screen or window, with sound, several sharers; VP9 software + Opus, per-app sound, X11 whole screen only | FR-2.42 |
 | Q3.3 | Up to 8 viewers | FR-2.43 |
 | Q3.4 | Same voice channel | FR-2.39, FR-2.43 |
 | Q3.5 | Everyone controls the watch party | FR-2.40 |
@@ -427,15 +427,15 @@ Linux packages:
 | Q4.8 | Server theme via right-click and edit dialog | FR-2.17 |
 | Q5.1 | Manual checklist, done at the end, never blocks | Section 10 |
 | Q5.2 | One-time update-check prompt for existing users | FR-2.56 |
-| Q5.3 | Screen share 720p30 | FR-2.44 |
+| Q5.3 | Screen share 720p30, adaptive down to 480p15 | FR-2.44 |
 | Q5.4 | Version 0.4.0 | |
 | User input 2026-10-25 | Linux packages, curl installer, desktop shortcut; website redesign adopted in the client; manual tests never block | Round 1, Round 2, Round 4 headers |
 
 ## 13. Open points & risks
 
 - **Epic size and single release:** Epic 2 is very large and ships nothing until all of it is done, including two Beta features with new technology (Q1.1, Q2.2). Risk: a long time without a release; the 0.3.x game-crash bug (QA.92) stays in users' hands until 0.4.0 (workaround: close the game first or turn the in-game overlay off).
-- **Screen sharing technology:** capture, video encoding and decoding inside a Tauri app on three OSes (with sound on Linux and macOS) is the riskiest part; libraries and licences to be confirmed during build.
-- **Direct connections without STUN:** many home networks have no IPv6 and no working port mapping; then screen sharing is unavailable for that pair (by design, QA.90).
+- **Screen sharing technology:** capture, video encoding and decoding inside a Tauri app on three OSes (with sound on Linux and macOS) is the riskiest part; the technology spike settled VP9/Opus and WebCodecs with a libvpx fallback, licences still to be confirmed during build.
+- **Direct connections without STUN:** many home networks have no IPv6 and no working port mapping; then screen sharing is unavailable for that pair (by design, QA.90); this includes users behind CGNAT, and the UI says so.
 - **Upload limits:** 8 viewers per sharer, and several sharers at once, can exceed home upload speeds; quality drops automatically.
 - **UserStats rate limits:** the exact server message limit for UserStats requests must be verified in the Mumble server source during build; pacing (section 6) is adjusted to it.
 - **ARM64:** official Mumble game plugins and some games are x86_64-only; positional audio on ARM64 may be limited. GitHub ARM64 runners are needed in CI.
