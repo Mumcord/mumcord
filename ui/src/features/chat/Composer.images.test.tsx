@@ -168,4 +168,14 @@ describe("Composer image attachments", () => {
     fireEvent.dragLeave(form, { dataTransfer: { types: ["Files"] } });
     expect(form.dataset.dragging).toBeUndefined();
   });
+
+  it("never inserts a dropped file:// link as text", () => {
+    const { input } = setup();
+    // WebKitGTK delivers a file from the file manager only as a link, without File objects.
+    const notCancelled = fireEvent.drop(input, {
+      dataTransfer: { files: [], types: ["text/uri-list", "text/plain"] },
+    });
+    expect(notCancelled).toBe(false);
+    expect(input.value).toBe("");
+  });
 });

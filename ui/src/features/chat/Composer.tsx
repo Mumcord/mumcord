@@ -3,6 +3,7 @@
  * several) by button, paste or drop into an attachment tray, and inline errors such as a denied permission or a too-large image.
  */
 import {
+  useEffect,
   useId,
   useLayoutEffect,
   useMemo,
@@ -14,10 +15,12 @@ import {
 } from "react";
 import { useTranslation } from "react-i18next";
 import type { User } from "../../api";
+import { isFileDrag } from "../../app/nativeDrag";
 import { selfUser, useServerSelector } from "../channels";
 import { useAvatars } from "../members/useAvatars";
 import type { SendTarget } from "./conversationInfo";
 import { AttachmentTray } from "./AttachmentTray";
+import { hasNativeFileDrop, isOverRect, onNativeFileDrop } from "./fileDrop";
 import { FormatToolbar } from "./FormatToolbar";
 import { GifPicker } from "./GifPicker";
 import { applyFormat, formatForKey, type Edit, type Format } from "./formatting";
@@ -64,6 +67,7 @@ export function Composer({
   const { t } = useTranslation("chat");
   const composer = useComposer(target, limits);
   const fileInput = useRef<HTMLInputElement>(null);
+  const formRef = useRef<HTMLFormElement>(null);
   const input = useRef<HTMLTextAreaElement>(null);
   // Selection to restore once a formatting edit has been rendered into the textarea.
   const pendingSelection = useRef<Edit | null>(null);
@@ -105,6 +109,35 @@ export function Composer({
   // Counts nested dragenter/dragleave pairs so the highlight does not flicker over child elements.
   const dragDepth = useRef(0);
   const [dragging, setDragging] = useState(false);
+  // Native file drags (desktop app) over the composer; they bypass the HTML5 drag events.
+  const [nativeOver, setNativeOver] = useState(false);
+  const nativeDrop = useRef({ disabled, addDroppedPaths: composer.addDroppedPaths });
+  useEffect(() => {
+    nativeDrop.current = { disabled, addDroppedPaths: composer.addDroppedPaths };
+  });
+
+  useEffect(() => {
+    if (!hasNativeFileDrop()) return;
+    return onNativeFileDrop((event) => {
+      if (event.type === "leave") {
+        setNativeOver(false);
+        return;
+      }
+      const form = formRef.current;
+      const over =
+        form !== null &&
+        !nativeDrop.current.disabled &&
+        isOverRect(event.position, form.getBoundingClientRect(), window.devicePixelRatio);
+      if (event.type === "drop") {
+        setNativeOver(false);
+        dragDepth.current = 0;
+        setDragging(false);
+        if (over) void nativeDrop.current.addDroppedPaths(event.paths);
+        return;
+      }
+      setNativeOver(over);
+    });
+  }, []);
 
   useLayoutEffect(() => {
     const pending = pendingSelection.current;
@@ -209,7 +242,7 @@ export function Composer({
   }
 
   function hasFiles(event: DragEvent): boolean {
-    return event.dataTransfer.types.includes("Files");
+    return isFileDrag(event.dataTransfer);
   }
 
   function onDragEnter(event: DragEvent) {
@@ -231,18 +264,22 @@ export function Composer({
 
   function onDrop(event: DragEvent) {
     if (!hasFiles(event)) return;
+    // Also keeps the textarea from inserting the dropped `file://` link as text.
     event.preventDefault();
     dragDepth.current = 0;
     setDragging(false);
-    if (!disabled) composer.addFiles(Array.from(event.dataTransfer.files));
+    // In the desktop app the native drop event delivers the files; reading them here too
+    // would attach every image twice.
+    if (!disabled && !hasNativeFileDrop()) composer.addFiles(Array.from(event.dataTransfer.files));
   }
 
   return (
     // Dragging only marks the composer as a drop target; the keyboard path is the image button.
     // eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions
     <form
+      ref={formRef}
       className="chat-composer"
-      data-dragging={dragging ? "true" : undefined}
+      data-dragging={dragging || nativeOver ? "true" : undefined}
       onDragEnter={onDragEnter}
       onDragLeave={onDragLeave}
       onDragOver={onDragOver}

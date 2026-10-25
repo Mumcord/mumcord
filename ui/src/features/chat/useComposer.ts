@@ -8,6 +8,7 @@ import { getApi, type ChatMessage } from "../../api";
 import { addSentMessage } from "./chatStore";
 import type { SendTarget } from "./conversationInfo";
 import { describeSendError } from "./errors";
+import { readDroppedFiles } from "./fileDrop";
 import { imageTag, prepareImage, type MessageLimits } from "./images";
 import { markdownToHtml, plainTextToHtml } from "./markdown";
 
@@ -41,6 +42,8 @@ export interface Composer {
   attachments: Attachment[];
   /** Adds images to the tray; processing runs one by one in the background. */
   addFiles: (files: readonly File[]) => void;
+  /** Adds image files dropped from the file manager (native drag and drop) by their paths. */
+  addDroppedPaths: (paths: readonly string[]) => Promise<void>;
   removeAttachment: (id: number) => void;
   busy: boolean;
   error: string | null;
@@ -134,6 +137,29 @@ export function useComposer(target: SendTarget | null, limits: MessageLimits): C
     [limits.allowHtml, process, t],
   );
 
+  const addDroppedPaths = useCallback(
+    async (paths: readonly string[]) => {
+      setError(null);
+      if (paths.length === 0) return;
+      if (!limits.allowHtml) {
+        setError(t("errors.imagesNotAllowed"));
+        return;
+      }
+      const { files, failures } = await readDroppedFiles(paths);
+      addFiles(files);
+      const failure = failures[0];
+      if (failure !== undefined) {
+        const key = {
+          notImage: "errors.onlyImages",
+          sourceTooLarge: "errors.sourceTooLarge",
+          unreadable: "errors.imageUnreadable",
+        }[failure.reason];
+        setError(t(key, { name: failure.name }));
+      }
+    },
+    [addFiles, limits.allowHtml, t],
+  );
+
   const removeAttachment = useCallback(
     (id: number) => {
       removed.current.add(id);
@@ -207,6 +233,7 @@ export function useComposer(target: SendTarget | null, limits: MessageLimits): C
     setText,
     attachments,
     addFiles,
+    addDroppedPaths,
     removeAttachment,
     busy,
     error,

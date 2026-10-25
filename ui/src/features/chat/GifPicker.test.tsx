@@ -1,5 +1,6 @@
 import { act, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { setHintPreference } from "../../a11y";
 import { applyLanguage } from "../../i18n";
 import { GifPicker } from "./GifPicker";
 import { clearFavorites, saveFavorite } from "./favorites";
@@ -60,5 +61,19 @@ describe("GifPicker thumbnails", () => {
       await Promise.resolve();
     });
     expect(document.querySelector("img.gif-picker__img")).toBeNull();
+  });
+
+  it("keeps the keyboard hint off screen while keyboard hints are turned off", () => {
+    render(<GifPicker onSend={() => Promise.resolve()} disabled={false} linkPreviews />);
+    fireEvent.click(screen.getByRole("button", { name: /favorite/i }));
+    const hint = screen.getByText(/Arrow keys move/);
+    expect(hint).toHaveClass("gif-picker__hint");
+    act(() => {
+      setHintPreference("keyboardHints", false);
+    });
+    expect(hint).toHaveClass("visually-hidden");
+    act(() => {
+      setHintPreference("keyboardHints", true);
+    });
   });
 });

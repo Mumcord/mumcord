@@ -6,6 +6,7 @@
  */
 import { useEffect, useId, useRef, useState, type KeyboardEvent } from "react";
 import { useTranslation } from "react-i18next";
+import { useHintPreferences } from "../../a11y/hintPreferences";
 import type { InlineImage } from "../../api";
 import { GifAttribution } from "./GifAttribution";
 import { markFavoriteUsed, removeFavorite, useGifFavorites } from "./favorites";
@@ -77,6 +78,7 @@ export function GifPicker({ onSend, disabled, linkPreviews }: GifPickerProps) {
   const cells = useRef<(HTMLButtonElement | null)[]>([]);
   const dialogId = useId();
   const hintId = useId();
+  const { keyboardHints } = useHintPreferences();
   const current = Math.min(active, Math.max(favorites.length - 1, 0));
 
   useEffect(() => {
@@ -223,7 +225,7 @@ export function GifPicker({ onSend, disabled, linkPreviews }: GifPickerProps) {
             </p>
           ) : (
             <>
-              <p id={hintId} className="gif-picker__hint">
+              <p id={hintId} className={keyboardHints ? "gif-picker__hint" : "visually-hidden"}>
                 {t("favorites.hint")}
               </p>
               <ul className="gif-picker__grid" aria-label={t("favorites.title")}>
