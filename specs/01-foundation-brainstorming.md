@@ -1034,3 +1034,14 @@ An API key shipped inside the app can be extracted by anyone; abuse would use up
 ✍️ Note: Asked and answered in chat during /dev.
 
 ---
+
+#### QA.44 Share which game the user is playing (stage 1c)? `◉`
+Requested by the user; how Discord does it was explained: Discord recognises games by matching running programs against its own game database, and "Join" only works for games that integrate Discord's SDK (Rich Presence) and hand over a join secret.
+
+- [x] **"Now gaming" status, opt-in (default off), stage 1c.** Detection: (1) Mumble Link – games with positional audio report their name and context; (2) running programs matched against a small bundled list of known games plus Steam games detected from the running Steam client (app id). Shared like "Now playing" (plugin data to Mumcord users, short "🎮 Game" line in the comment for official clients): a game-controller icon next to the person, game name + game icon (Steam app icon via the backend image proxy when an app id is known, otherwise a generic icon) and "playing for 1 h 20 min" in the profile/preview, and in the own user panel's status line.
+- [x] **"Join game", best effort:** offered only when another Mumcord user plays the same game and the game exposes a join target – a Steam game with a server address from the Mumble Link context (steam://connect/…) or a Steam lobby link. Otherwise no join button. A full Discord-style join needs the game's cooperation and is out of scope.
+- [ ] Not needed.
+
+✍️ Note: Requested in chat during /dev ("eventuell auch so ein join game, weiß nicht wie das discord implementiert hat").
+
+---

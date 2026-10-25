@@ -131,6 +131,7 @@ Mumcord enforces nothing itself; the server's ACLs decide. The client reflects p
 - **FR-1.44** The overlay is a separate, transparent, click-through, always-on-top window showing who is talking (avatar + name), and optionally the whole current channel (Q3.10). It does not hook into games.
 - **FR-1.45** Position, size, opacity and content are configurable; the overlay can be toggled from the tray and settings.
 - **FR-1.46** Where the OS or desktop doesn't allow staying on top (some Linux desktops) or a game runs in exclusive fullscreen, settings explain the limitation.
+- **FR-1.59** "Now gaming" (QA.44, stage 1c): opt-in status (default off). Detects the game via Mumble Link (name/context) or running programs matched against a bundled list of known games and the running Steam game (app id). Shared like "Now playing" (plugin data to Mumcord users; "🎮 Game" comment line for official clients): game-controller icon next to the person, game name, game icon (Steam app icon through the backend image proxy, else generic) and play time in the profile/preview and in the own user panel status line. "Join game" appears only when the same game exposes a join target (Steam server address from the Mumble Link context via steam://connect/…, or a Steam lobby link); otherwise no button.
 - **FR-1.49** Link previews (QA.34, stage 1b): links in messages get a preview card (title, description, image, "Open in browser"). Mumcord fetches the page metadata itself; on by default, switchable in the first-start wizard and in settings; fetched data is sanitized and cached; no preview for private/LAN addresses. Each preview/embed card can be dismissed (×), remembered per message; previews, thumbnails and external images are cached in memory and on disk and deleted after a configurable number of days (default 7, Settings → Chat & history, with "Clear now") (QA.42).
 - **FR-1.50** YouTube and Twitch links show an embedded player card with title and "Open in browser"; the player loads only after a click (QA.34). Spotify links get the same kind of card (cover, title, artist, "Open in browser", player after a click) (QA.40).
 - **FR-1.51** Mentions (QA.34): typing `@` in the input autocompletes names of people on the server; a message mentioning the user is highlighted and notifies them even in otherwise quiet channels; the text stays plain `@Name` for other clients. Being mentioned also plays a distinct short "ping" sound; both the mention sound and mention notifications have their own switches under Settings → Sounds & notifications (default on) (QA.41).
@@ -381,6 +382,7 @@ Unless stated otherwise: a fresh Mumcord install, a local test server (1.5) runn
 - **AC-1.32** Enable an official Mumble game plugin with a test harness simulating the game → settings show the plugin as active and positions are applied.
 - **AC-1.33** Enable the overlay → floating window shows the talking Bot's avatar and name while it talks; it stays on top of a borderless-fullscreen app, lets clicks pass through, and position/opacity changes are kept after restart.
 - **AC-1.34** On a desktop where on-top isn't guaranteed, settings show the explanation text.
+- **AC-1.50** With "Now gaming" on and a test program from the bundled list running (or a fake Mumble Link game), a second Mumcord instance sees the game icon next to the user and name/icon/play time in the profile; the own user panel shows the game; turning it off removes everything incl. the comment line. With a fake Link context containing a server address for a Steam game, "Join game" appears and opens steam://connect/<address>.
 
 ## 12. Decision log
 
@@ -480,6 +482,7 @@ Unless stated otherwise: a fresh Mumcord install, a local test server (1.5) runn
 | QA.41 | Mention ping sound + separate switches for mention sound and mention notifications | Addendum 2026-10-25; FR-1.51 |
 | QA.42 | Dismiss preview cards; preview cache clean-up after X days (default 7) + Clear now; optional chat history auto-delete | Addendum 2026-10-25; FR-1.49, FR-1.32 |
 | QA.43 | No GIF search (key would be extractable); GIF links inline + favorites instead of Tenor | Addendum 2026-10-25; FR-1.52, AC-1.42 |
+| QA.44 | Stage 1c: opt-in "Now gaming" status (Mumble Link + known programs + Steam), shared like Now playing; best-effort Join game via Steam connect/lobby | Addendum 2026-10-25; FR-1.59, AC-1.50 |
 
 ## 13. Open points & risks
 
