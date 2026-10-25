@@ -3,6 +3,7 @@
   "item": "{{name}}, {{status}}",
   "online": "Online",
   "onlineIn": "Online în {{channel}}",
+  "onlineOnServer": "Online pe {{server}}",
   "offline": "Offline",
   "lastSeen": "Offline, văzut ultima dată {{when}}",
   "friend": "Prieten",

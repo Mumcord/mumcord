@@ -3,6 +3,7 @@
   "item": "{{name}}, {{status}}",
   "online": "Võrgus",
   "onlineIn": "Võrgus kanalis {{channel}}",
+  "onlineOnServer": "Võrgus serveris {{server}}",
   "offline": "Võrgust väljas",
   "lastSeen": "Võrgust väljas, viimati nähtud {{when}}",
   "friend": "Sõber",

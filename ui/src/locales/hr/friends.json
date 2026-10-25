@@ -3,6 +3,7 @@
   "item": "{{name}}, {{status}}",
   "online": "Na mreži",
   "onlineIn": "Na mreži u {{channel}}",
+  "onlineOnServer": "Na mreži na {{server}}",
   "offline": "Izvan mreže",
   "lastSeen": "Izvan mreže, zadnji put viđen {{when}}",
   "friend": "Prijatelj",

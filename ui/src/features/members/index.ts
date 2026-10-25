@@ -17,4 +17,4 @@ export {
   requestPreview,
 } from "./profilePreviewStore";
 export { PersonMenuHost } from "./PersonMenu";
-export { openPersonMenu, openPersonMenuFromEvent } from "./personMenuStore";
+export { openPersonMenu, openPersonMenuFromEvent, openPersonMenuFromKey } from "./personMenuStore";

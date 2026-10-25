@@ -3,6 +3,7 @@
   "item": "{{name}}, {{status}}",
   "online": "Tiešsaistē",
   "onlineIn": "Tiešsaistē kanālā {{channel}}",
+  "onlineOnServer": "Tiešsaistē serverī {{server}}",
   "offline": "Bezsaistē",
   "lastSeen": "Bezsaistē, pēdējoreiz redzēts {{when}}",
   "friend": "Draugs",

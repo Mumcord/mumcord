@@ -3,6 +3,7 @@
   "item": "{{name}}, {{status}}",
   "online": "Online",
   "onlineIn": "Online in {{channel}}",
+  "onlineOnServer": "Online op {{server}}",
   "offline": "Offline",
   "lastSeen": "Offline, laatst gezien {{when}}",
   "friend": "Vriend",

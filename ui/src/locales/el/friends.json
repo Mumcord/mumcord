@@ -3,6 +3,7 @@
   "item": "{{name}}, {{status}}",
   "online": "Συνδεδεμένος",
   "onlineIn": "Συνδεδεμένος στο {{channel}}",
+  "onlineOnServer": "Συνδεδεμένος στον {{server}}",
   "offline": "Εκτός σύνδεσης",
   "lastSeen": "Εκτός σύνδεσης, τελευταία φορά {{when}}",
   "friend": "Φίλος",

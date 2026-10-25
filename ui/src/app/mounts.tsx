@@ -36,7 +36,6 @@ export function ChannelsMount() {
         channelAction={(channel) => <FollowStar {...channel} />}
       />
       <FollowNoticeLine />
-      <FriendsList />
       <DirectMessages />
     </>
   );
@@ -66,9 +65,14 @@ export function ChatMount() {
   return <ChatView renderHeaderActions={(conv) => <FollowHeaderActions conversation={conv} />} />;
 }
 
-/** Member list (B20). */
+/** Member list (B20) with the friends list below (FR-1.64). */
 export function MembersMount() {
-  return <MembersPanel onSendPrivateMessage={openPrivateConversation} />;
+  return (
+    <>
+      <MembersPanel onSendPrivateMessage={openPrivateConversation} />
+      <FriendsList />
+    </>
+  );
 }
 
 /** First-start wizard content (B18); calls `useView().finishWizard()` when done. */

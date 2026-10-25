@@ -3,6 +3,7 @@
   "item": "{{name}}, {{status}}",
   "online": "Paikalla",
   "onlineIn": "Paikalla kanavalla {{channel}}",
+  "onlineOnServer": "Paikalla palvelimella {{server}}",
   "offline": "Poissa",
   "lastSeen": "Poissa, nähty viimeksi {{when}}",
   "friend": "Kaveri",

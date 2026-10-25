@@ -37,7 +37,7 @@ describe("FriendsList", () => {
       await api.friendAdd(2);
     });
     const list = screen.getByRole("region", { name: "Friends" });
-    const items = within(list).getAllByRole("button");
+    const items = within(list).getAllByRole("button", { name: /,/ });
     expect(items.map((item) => item.getAttribute("aria-label"))).toEqual([
       "Anna, Online in Lobby",
       "Carla, Online in Raid",
@@ -60,13 +60,17 @@ describe("FriendsList", () => {
       api.mock.removeUser(2);
     });
     const list = screen.getByRole("region", { name: "Friends" });
-    expect(within(list).getByRole("button")).toHaveAccessibleName(/^Anna, Offline, last seen /);
+    expect(within(list).getByRole("button", { name: /,/ })).toHaveAccessibleName(
+      /^Anna, Offline, last seen /,
+    );
 
     act(() => {
       api.mock.upsertUser({ ...anna, session: 12, name: "Annabel" });
     });
-    expect(within(list).getAllByRole("button")).toHaveLength(1);
-    expect(within(list).getByRole("button")).toHaveAccessibleName(/^Annabel, Online/);
+    expect(within(list).getAllByRole("button", { name: /,/ })).toHaveLength(1);
+    expect(within(list).getByRole("button", { name: /,/ })).toHaveAccessibleName(
+      /^Annabel, Online/,
+    );
   });
 
   it("removing a friend empties the list", async () => {

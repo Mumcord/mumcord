@@ -3,6 +3,7 @@
   "item": "{{name}}, {{status}}",
   "online": "Online",
   "onlineIn": "Online f'{{channel}}",
+  "onlineOnServer": "Online fuq {{server}}",
   "offline": "Offline",
   "lastSeen": "Offline, dehru l-aħħar {{when}}",
   "friend": "Ħabib",

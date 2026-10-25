@@ -3,6 +3,7 @@
   "item": "{{name}}, {{status}}",
   "online": "На линия",
   "onlineIn": "На линия в {{channel}}",
+  "onlineOnServer": "На линия на {{server}}",
   "offline": "Не е на линия",
   "lastSeen": "Не е на линия, последно видян {{when}}",
   "friend": "Приятел",

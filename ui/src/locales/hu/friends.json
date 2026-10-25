@@ -3,6 +3,7 @@
   "item": "{{name}}, {{status}}",
   "online": "Online",
   "onlineIn": "Online itt: {{channel}}",
+  "onlineOnServer": "Online itt: {{server}}",
   "offline": "Offline",
   "lastSeen": "Offline, utoljára látva: {{when}}",
   "friend": "Barát",

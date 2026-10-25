@@ -16,8 +16,14 @@ export function presenceText(
   friend: Friend,
   server: ServerState,
   locale: string,
+  serverNameOf: (serverId: number) => string | undefined = () => undefined,
 ): string {
   if (friend.online === null) return lastSeenText(t, friend.lastSeenAt, locale);
+  if (friend.online.serverId !== server.serverId) {
+    // Only the connected server's channels are known, so another server is named instead.
+    const name = serverNameOf(friend.online.serverId);
+    return name === undefined ? t("online") : t("onlineOnServer", { server: name });
+  }
   const channel = server.channels.get(friend.online.channelId)?.name;
   return channel ? t("onlineIn", { channel }) : t("online");
 }

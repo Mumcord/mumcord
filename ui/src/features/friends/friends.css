@@ -74,3 +74,13 @@
   border-color: var(--color-success);
   background: var(--color-success);
 }
+
+.friends-list__toggle {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  text-transform: inherit;
+  cursor: pointer;
+}
