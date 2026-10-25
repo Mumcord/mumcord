@@ -44,12 +44,17 @@ struct Wire {
     features: Vec<String>,
 }
 
+/// The features this client announces, as the engine reports them for ourselves too.
+fn own_features() -> Vec<String> {
+    FEATURES.iter().map(|f| (*f).to_owned()).collect()
+}
+
 /// The hello this client sends.
 pub fn encode() -> Vec<u8> {
     let wire = Wire {
         app: APP.to_owned(),
         v: VERSION,
-        features: FEATURES.iter().map(|f| (*f).to_owned()).collect(),
+        features: own_features(),
     };
     serde_json::to_vec(&wire).unwrap_or_default()
 }
@@ -139,11 +144,16 @@ fn others(handle: &Handle) -> Vec<u32> {
 
 /// The connection synced: greet everyone who is already here.
 pub(crate) fn on_synced(state: &std::sync::Mutex<Peers>, ctx: &SessionCtx) {
+    let own = ctx.handle.with_state(|s| s.session);
     let everyone = others(&ctx.handle);
     {
         let mut peers = lock(state);
         peers.reset();
         peers.synced = true;
+        // We are a Mumcord client too: the badge must show on our own entry everywhere.
+        if let Some(own) = own {
+            peers.known.insert(own, own_features());
+        }
         peers.greeted.extend(everyone.iter().copied());
     }
     send(&ctx.handle, &everyone);
@@ -270,6 +280,16 @@ mod tests {
         let features = decode(json.to_string().as_bytes()).expect("valid");
         assert!(features.len() <= MAX_FEATURES);
         assert!(!features.iter().any(|f| f == "BAD NAME" || f.is_empty()));
+    }
+
+    #[test]
+    fn own_entry_reports_our_features_after_sync() {
+        let mut peers = Peers::default();
+        assert!(peers.features(7).is_none());
+        peers.known.insert(7, own_features());
+        assert_eq!(peers.features(7), Some(own_features().as_slice()));
+        peers.reset();
+        assert!(peers.features(7).is_none(), "a reconnect starts without it");
     }
 
     #[test]

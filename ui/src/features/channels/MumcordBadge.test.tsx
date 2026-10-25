@@ -13,6 +13,19 @@ describe("MumcordBadge", () => {
     );
   });
 
+  it("stays a separate word in the name it is part of", () => {
+    // Inline elements join without a space: "MiraUses Mumcord" broke screen readers and axe.
+    render(
+      <div role="treeitem" aria-selected={false} aria-labelledby="name">
+        <span id="name">
+          Mira
+          <MumcordBadge user={{ isMumcord: true }} />
+        </span>
+      </div>,
+    );
+    expect(screen.getByRole("treeitem")).toHaveAccessibleName("Mira Uses Mumcord");
+  });
+
   it("renders nothing for other clients or unknown people", () => {
     const { container, rerender } = render(<MumcordBadge user={{ isMumcord: false }} />);
     expect(container).toBeEmptyDOMElement();
