@@ -57,6 +57,16 @@ describe("settings search index", () => {
     expect(searchSettings("zzzz", t)).toEqual([]);
   });
 
+  it("finds the history sharing switch (FR-1.60)", () => {
+    expect(labels(searchSettings("share my channel history", t))).toEqual([
+      "historySharing.switch",
+    ]);
+    expect(labels(searchSettings("private chats", t))).toContain("historySharing.switch");
+    expect(labels(searchSettings("kanalverlauf", translator(de)))).toContain(
+      "historySharing.switch",
+    );
+  });
+
   it("matches the current language without accents", () => {
     const results = labels(searchSettings("barrierefreiheit", translator(de)));
     expect(results).toContain("accessibility");

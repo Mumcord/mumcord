@@ -21,6 +21,8 @@ export interface TalkChoice {
   autostart: boolean;
   /** Show link previews and embeds in chat (FR-1.49). */
   linkPreviews: boolean;
+  /** Share the own channel history with other Mumcord users (FR-1.60). */
+  historySharing: boolean;
   /** Turn on the in-game overlay globally (FR-1.46b); `null` where it is unsupported. */
   ingameOverlay: boolean | null;
 }
@@ -72,6 +74,7 @@ export function TalkModeStep({
   const [registerLink, setRegisterLink] = useState(true);
   const [autostart, setAutostart] = useState(settings.autostart);
   const [linkPreviews, setLinkPreviews] = useState(settings.linkPreviews);
+  const [historySharing, setHistorySharing] = useState(settings.historySharing);
   // In-game overlay: default off (FR-1.46b, QA.55).
   const [ingameOverlay, setIngameOverlay] = useState(false);
   const [busy, setBusy] = useState(false);
@@ -87,6 +90,7 @@ export function TalkModeStep({
     linkHint: useId(),
     autostartHint: useId(),
     linkPreviewsHint: useId(),
+    historySharingHint: useId(),
     ingameHint: useId(),
   };
 
@@ -171,6 +175,7 @@ export function TalkModeStep({
         registerLinkHandler: linkHandlerActive !== true && registerLink,
         autostart,
         linkPreviews,
+        historySharing,
         ingameOverlay: ingameOverlaySupported ? ingameOverlay : null,
       });
     } catch {
@@ -330,6 +335,22 @@ export function TalkModeStep({
         </label>
         <p id={ids.linkPreviewsHint} className="wizard-muted wizard-small wizard-indent">
           {t("talk.linkPreviewsHint")}
+        </p>
+      </div>
+      <div>
+        <label className="wizard-radio">
+          <input
+            type="checkbox"
+            checked={historySharing}
+            aria-describedby={ids.historySharingHint}
+            onChange={(event) => {
+              setHistorySharing(event.target.checked);
+            }}
+          />
+          {t("talk.historySharing")}
+        </label>
+        <p id={ids.historySharingHint} className="wizard-muted wizard-small wizard-indent">
+          {t("talk.historySharingHint")}
         </p>
       </div>
       {ingameOverlaySupported && (

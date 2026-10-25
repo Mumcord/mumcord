@@ -119,6 +119,12 @@ export const SETTINGS_INDEX: readonly SettingEntry[] = [
   { section: "chatHistory", group: "history.perServer", terms: ["history.explanation"] },
   {
     section: "chatHistory",
+    group: "historySharing.title",
+    control: "historySharing.switch",
+    terms: ["historySharing.hint"],
+  },
+  {
+    section: "chatHistory",
     group: "history.autoDelete",
     control: "history.autoDelete",
     terms: ["history.autoDeleteHint"],

@@ -47,6 +47,7 @@ describe("Wizard", () => {
     expect(await harness.api.linkHandlerStatus()).toBe(true);
     expect(saved.autostart).toBe(false);
     expect(saved.linkPreviews).toBe(true);
+    expect(saved.historySharing).toBe(true);
   });
 
   it("announces the step through the focused heading's description", async () => {
@@ -213,6 +214,24 @@ describe("Wizard", () => {
     const saved = await harness.api.settingsGet();
     expect(saved).toMatchObject({ wizardCompleted: true, linkPreviews: false });
     expect(harness.applySettings).toHaveBeenCalledWith(saved);
+  });
+
+  it("offers channel history sharing, on by default, and turns it off when unticked", async () => {
+    renderInWizard(harness, <Wizard />);
+    await createIdentity();
+    fireEvent.click(screen.getByRole("button", { name: "Next" }));
+    const sharing = await screen.findByRole("checkbox", { name: "Share my channel history" });
+    expect(sharing).toBeChecked();
+    expect(sharing).toHaveAccessibleDescription(/Private chats are never shared/);
+    fireEvent.click(sharing);
+    fireEvent.click(screen.getByRole("button", { name: "Finish" }));
+    await waitFor(() => {
+      expect(harness.finishWizard).toHaveBeenCalledOnce();
+    });
+    expect(await harness.api.settingsGet()).toMatchObject({
+      wizardCompleted: true,
+      historySharing: false,
+    });
   });
 
   it("finishes even when start at login cannot be set up, and says so", async () => {

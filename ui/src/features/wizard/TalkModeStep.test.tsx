@@ -58,6 +58,7 @@ describe("TalkModeStep", () => {
         registerLinkHandler: true,
         autostart: false,
         linkPreviews: true,
+        historySharing: true,
         ingameOverlay: false,
       });
     });
@@ -101,6 +102,7 @@ describe("TalkModeStep", () => {
         registerLinkHandler: true,
         autostart: false,
         linkPreviews: true,
+        historySharing: true,
         ingameOverlay: false,
       });
     });
