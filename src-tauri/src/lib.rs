@@ -24,7 +24,7 @@ use tauri::{AppHandle, Manager};
 use tauri_specta::{Builder, Event, collect_commands, collect_events};
 
 use commands::{
-    app, audio, channels, chat, diagnostics, dropped, follow, history, identity, links,
+    app, audio, channels, chat, diagnostics, dropped, follow, friends, history, identity, links,
     notifications as notify, people, profile, servers, session, settings,
 };
 
@@ -68,6 +68,9 @@ fn specta_builder() -> Builder<tauri::Wry> {
             people::person_set_local_mute,
             people::person_set_note,
             people::person_profile,
+            friends::friends_list,
+            friends::friend_add,
+            friends::friend_remove,
             chat::send_channel_message,
             chat::send_private_message,
             chat::save_image,
@@ -148,6 +151,7 @@ fn specta_builder() -> Builder<tauri::Wry> {
             people::UserUpserted,
             people::UserRemoved,
             people::TalkStateChanged,
+            friends::FriendsChanged,
             chat::MessageReceived,
             commands::full_image::FullImageProgress,
             follow::FollowedChannelsChanged,
@@ -405,6 +409,10 @@ fn emit_engine_event(app: &AppHandle, event: EngineEvent) -> tauri::Result<()> {
         EngineEvent::NowGamingChanged { session, game } => commands::now_gaming::NowGamingChanged {
             session,
             game: game.map(Into::into),
+        }
+        .emit(app),
+        EngineEvent::FriendsChanged(list) => friends::FriendsChanged {
+            friends: friends::to_api_friends(list),
         }
         .emit(app),
         // History sync (FR-1.60) reaches the UI in its own step; the store already has them.

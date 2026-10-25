@@ -73,7 +73,7 @@ impl From<ChatMessageView> for ChatMessage {
 }
 
 /// Unix milliseconds as RFC 3339 in UTC, e.g. `2026-10-24T08:15:30.250Z`.
-fn rfc3339(millis: i64) -> String {
+pub(crate) fn rfc3339(millis: i64) -> String {
     let secs = millis.div_euclid(1000);
     let ms = millis.rem_euclid(1000);
     let days = secs.div_euclid(86_400);

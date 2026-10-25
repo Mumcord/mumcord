@@ -62,6 +62,15 @@ export const commands = {
 	personSetNote: (session: number, note: string) => typedError<null, ApiError>(__TAURI_INVOKE("person_set_note", { session, note })),
 	/**  Comment and avatar of a person, fetched from the server when not known yet. */
 	personProfile: (session: number) => typedError<PersonProfile, ApiError>(__TAURI_INVOKE("person_profile", { session })),
+	/**  Friends with their online state, online first. */
+	friendsList: () => typedError<Friend[], ApiError>(__TAURI_INVOKE("friends_list")),
+	/**
+	 *  Adds a person on the connected server as a friend; fails for people without a
+	 *  certificate.
+	 */
+	friendAdd: (session: number) => typedError<null, ApiError>(__TAURI_INVOKE("friend_add", { session })),
+	/**  Removes a friend by certificate hash. */
+	friendRemove: (certHash: string) => typedError<null, ApiError>(__TAURI_INVOKE("friend_remove", { certHash })),
 	/**
 	 *  Sends Mumble-compatible HTML (the UI converts Markdown and scales images).
 	 *  Fails with `messageTooLarge` above the server limit or `permissionDenied`.
@@ -300,6 +309,7 @@ export const events = {
 	deepLinkOpened: makeEvent<DeepLinkOpened, DeepLinkOpened>("deep-link-opened"),
 	defaultAvatarSkipped: makeEvent<DefaultAvatarSkipped, DefaultAvatarSkipped>("default-avatar-skipped"),
 	followedChannelsChanged: makeEvent<FollowedChannelsChanged, FollowedChannelsChanged>("followed-channels-changed"),
+	friendsChanged: makeEvent<FriendsChanged, FriendsChanged>("friends-changed"),
 	fullImageProgress: makeEvent<FullImageProgress, FullImageProgress>("full-image-progress"),
 	inGameOverlayChanged: makeEvent<InGameOverlayChanged, InGameOverlayChanged>("in-game-overlay-changed"),
 	messageReceived: makeEvent<MessageReceived, MessageReceived>("message-received"),
@@ -564,6 +574,30 @@ export type FollowAllSummary = {
 
 export type FollowedChannelsChanged = {
 	channelIds: number[],
+};
+
+export type Friend = {
+	certHash: string,
+	/**  Current name while online, otherwise the name last seen. */
+	name: string,
+	/**  RFC 3339. */
+	addedAt: string,
+	/**  RFC 3339; `null` if not seen online since adding. */
+	lastSeenAt: string | null,
+	/**  `null` while offline. */
+	online: FriendOnline | null,
+};
+
+/**  Where a friend is online right now. */
+export type FriendOnline = {
+	serverId: number,
+	session: number,
+	channelId: number,
+};
+
+/**  The friends list changed (added, removed, online, moved, renamed, offline). Online first. */
+export type FriendsChanged = {
+	friends: Friend[],
 };
 
 /**
