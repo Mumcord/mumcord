@@ -1,3 +1,4 @@
+import { ENDONYMS } from "../../i18n/resources";
 import { SECTION_IDS, type SectionId } from "./sectionIds";
 
 /**
@@ -12,6 +13,8 @@ export interface SettingEntry {
   control?: string;
   /** Further texts that should find the entry (hints, option names); never shown in the results. */
   terms?: string[];
+  /** Texts matched as they are, not translated: language names are the same in every UI language. */
+  literals?: string[];
 }
 
 /** Static index of the settings screen; keep it in step with the section components. */
@@ -193,7 +196,12 @@ export const SETTINGS_INDEX: readonly SettingEntry[] = [
     control: "accessibility.skipLinks",
     terms: ["accessibility.skipLinksHint"],
   },
-  { section: "language", control: "language.legend" },
+  {
+    section: "language",
+    control: "language.legend",
+    terms: ["language.system"],
+    literals: Object.values(ENDONYMS),
+  },
   { section: "sounds", control: "sounds.joinLeave" },
   { section: "sounds", control: "sounds.voiceJoin" },
   { section: "sounds", control: "sounds.selfMute" },
@@ -289,6 +297,7 @@ export function searchSettings(
         entryLabel(entry, t),
         ...(entry.group === undefined ? [] : [t(entry.group)]),
         ...(entry.terms ?? []).map(t),
+        ...(entry.literals ?? []),
       ]),
     )
     .map((entry) => ({ kind: "setting", entry }));

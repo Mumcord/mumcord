@@ -41,6 +41,12 @@ describe("settings search index", () => {
     }
   });
 
+  it("finds the language picker by any language's own name", () => {
+    expect(labels(searchSettings("gaeilge", t))).toEqual(["language.legend"]);
+    expect(labels(searchSettings("Ελληνικά", t))).toEqual(["language.legend"]);
+    expect(labels(searchSettings("francais", t))).toEqual(["language.legend"]);
+  });
+
   it("ignores case and accents", () => {
     expect(normalizeSearch("  Geräusch Música ")).toBe("gerausch musica");
   });
