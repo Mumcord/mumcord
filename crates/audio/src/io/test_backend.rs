@@ -94,7 +94,7 @@ impl Backend for TestBackend {
             TestBackend::Null => None,
             TestBackend::File { output, .. } => Some(open_output_wav(output)?),
         };
-        let (producer, consumer) = ring::ring(SAMPLE_RATE);
+        let (producer, consumer) = ring::stereo_ring(SAMPLE_RATE);
         let counters = counters.clone();
         let guard = TickThread::spawn("audio-test-playback", move |stop| {
             let mut consumer = consumer;

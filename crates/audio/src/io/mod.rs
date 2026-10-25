@@ -2,7 +2,7 @@
 //!
 //! [`AudioIo::start`] opens capture and playback and returns two stable
 //! handles: a [`FrameSource`] that yields captured 10 ms [`Frame`](crate::Frame)s
-//! and a [`FrameSink`] that accepts frames for playback. Both stay valid
+//! and a [`FrameSink`] that accepts mono or stereo frames for playback. Both stay valid
 //! across device switches and hot-plug recovery, so the processing chain and
 //! mixer never have to re-wire.
 //!
@@ -27,7 +27,7 @@
 //!   real time).
 //! - `file:<in.wav>:<out.wav>` – capture plays `<in.wav>` in real time
 //!   (any rate/channel count, silence after its end); playback is recorded
-//!   to `<out.wav>` (48 kHz mono 16-bit, header refreshed every second so it
+//!   to `<out.wav>` (48 kHz mono 16-bit, the mix of both playback channels, header refreshed every second so it
 //!   stays readable if the process is killed).
 
 mod controller;

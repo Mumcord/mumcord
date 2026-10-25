@@ -31,17 +31,24 @@ impl CaptureEndpoint {
     }
 }
 
-/// Playback side of an opened output stream, handed to [`FrameSink`].
+/// Playback side of an opened output stream, handed to [`FrameSink`]. The ring
+/// carries interleaved stereo samples.
 pub(crate) struct PlaybackEndpoint {
     producer: Producer<f32>,
-    resampler: Option<Resampler>,
+    /// Left and right resampler; fed in lockstep, so their outputs stay aligned.
+    resampler: Option<(Resampler, Resampler)>,
     device_rate: u32,
 }
 
 impl PlaybackEndpoint {
     pub(crate) fn new(producer: Producer<f32>, device_rate: u32) -> Result<Self, IoError> {
         let resampler = (device_rate != SAMPLE_RATE)
-            .then(|| Resampler::new(SAMPLE_RATE, device_rate))
+            .then(|| {
+                Ok::<_, IoError>((
+                    Resampler::new(SAMPLE_RATE, device_rate)?,
+                    Resampler::new(SAMPLE_RATE, device_rate)?,
+                ))
+            })
             .transpose()?;
         Ok(Self {
             producer,
@@ -135,7 +142,7 @@ impl FrameSource {
     }
 }
 
-/// Playback of 48 kHz mono 10 ms frames.
+/// Playback of 48 kHz 10 ms frames, mono or stereo.
 ///
 /// The caller (the mixer) paces itself: keep [`queued_samples`](Self::queued_samples)
 /// around the desired output latency (e.g. 20–30 ms) and write one frame
@@ -156,29 +163,46 @@ impl FrameSink {
         }
     }
 
-    /// Queues a frame for playback. Returns `false` if it was dropped because
-    /// the queue is full or no output device is open.
+    /// Queues a mono frame for playback (same signal on both channels). Returns
+    /// `false` if it was dropped because the queue is full or no output device is open.
     pub fn write_frame(&mut self, frame: &Frame) -> bool {
+        self.write_stereo(frame, frame)
+    }
+
+    /// Queues a stereo frame for playback; see [`write_frame`](Self::write_frame).
+    pub fn write_stereo(&mut self, left: &Frame, right: &Frame) -> bool {
         self.apply_updates();
         let Some(endpoint) = &mut self.endpoint else {
             return false;
         };
+        let interleave = |l: f32, r: f32| [l, r];
         let written = match &mut endpoint.resampler {
-            None => match endpoint.producer.write_chunk_uninit(FRAME_SAMPLES) {
+            None => match endpoint.producer.write_chunk_uninit(2 * FRAME_SAMPLES) {
                 Ok(chunk) => {
-                    chunk.fill_from_iter(frame.iter().copied());
+                    chunk.fill_from_iter(
+                        left.iter().zip(right).flat_map(|(&l, &r)| interleave(l, r)),
+                    );
                     true
                 }
                 Err(_) => false,
             },
-            Some(resampler) => {
-                if resampler.pending() > FRAME_SAMPLES * 2 {
+            Some((resample_left, resample_right)) => {
+                if resample_left.pending() > FRAME_SAMPLES * 2 {
                     false
                 } else {
-                    resampler.push(frame);
-                    let n = resampler.pending().min(endpoint.producer.slots());
-                    if let Ok(chunk) = endpoint.producer.write_chunk_uninit(n) {
-                        chunk.fill_from_iter(resampler.drain(n));
+                    resample_left.push(left);
+                    resample_right.push(right);
+                    let n = resample_left
+                        .pending()
+                        .min(resample_right.pending())
+                        .min(endpoint.producer.slots() / 2);
+                    if let Ok(chunk) = endpoint.producer.write_chunk_uninit(2 * n) {
+                        chunk.fill_from_iter(
+                            resample_left
+                                .drain(n)
+                                .zip(resample_right.drain(n))
+                                .flat_map(|(l, r)| interleave(l, r)),
+                        );
                     }
                     true
                 }
@@ -190,12 +214,12 @@ impl FrameSink {
         written
     }
 
-    /// Audio queued but not yet handed to the device, in 48 kHz samples.
+    /// Audio queued but not yet handed to the device, in 48 kHz samples (per channel).
     pub fn queued_samples(&mut self) -> usize {
         self.apply_updates();
         self.endpoint.as_ref().map_or(0, |e| {
-            let ring = e.producer.buffer().capacity() - e.producer.slots();
-            let pending = e.resampler.as_ref().map_or(0, Resampler::pending);
+            let ring = (e.producer.buffer().capacity() - e.producer.slots()) / 2;
+            let pending = e.resampler.as_ref().map_or(0, |(l, _)| l.pending());
             (ring + pending) * SAMPLE_RATE as usize / e.device_rate as usize
         })
     }

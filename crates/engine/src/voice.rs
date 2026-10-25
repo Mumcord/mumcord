@@ -61,6 +61,10 @@ impl PlaybackSink for SharedSink {
         self.with(|sink| sink.as_mut().is_some_and(|s| s.write_frame(frame)))
     }
 
+    fn write_stereo(&mut self, left: &Frame, right: &Frame) -> bool {
+        self.with(|sink| sink.as_mut().is_some_and(|s| s.write_stereo(left, right)))
+    }
+
     fn queued_samples(&mut self) -> usize {
         self.with(|sink| sink.as_mut().map_or(0, FrameSink::queued_samples))
     }

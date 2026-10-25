@@ -3,8 +3,9 @@
 //! [`Mixer`] is the allocation-free core: per-speaker jitter buffers, local
 //! volume (0–200 %) and mute (FR-1.18/1.19), the global discard switch for
 //! audio that only arrives because we listen to followed channels (FR-1.31),
+//! 3D placement of voices that carry a position (FR-1.41, see [`crate::spatial`]),
 //! talking-state events, an optional mix-in frame (notification sounds,
-//! mic-test loopback) and a limiter. [`Playback`] runs it on its own thread
+//! mic-test loopback) and a limiter. Output is stereo. [`Playback`] runs it on its own thread
 //! and paces it against the [`FrameSink`](crate::io::FrameSink).
 
 mod playback;
@@ -13,13 +14,15 @@ mod tests;
 
 pub use playback::{
     PacketSender, Playback, PlaybackConfig, PlaybackError, PlaybackPorts, PlaybackSink,
-    PlaybackStats,
+    PlaybackStats, downmix,
 };
 
+use std::sync::Arc;
 use std::time::Instant;
 
 use crate::codec::{CodecError, MAX_PACKET_BYTES};
 use crate::jitter::{JitterBuffer, Pull};
+use crate::spatial::{Listener, Placement, Spatializer};
 use crate::{FRAME_SAMPLES, Frame};
 
 /// Speakers that can be buffered at the same time. Slots are created up front
@@ -48,6 +51,8 @@ pub struct VoicePacket {
     pub via_listener: bool,
     /// When the packet was received; drives the jitter estimate.
     pub arrival: Instant,
+    /// The speaker's position (positional audio), if the packet carries one.
+    pub position: Option<[f32; 3]>,
     len: usize,
     payload: [u8; MAX_PACKET_BYTES],
 }
@@ -70,9 +75,16 @@ impl VoicePacket {
             is_last,
             via_listener,
             arrival,
+            position: None,
             len: opus.len(),
             payload,
         })
+    }
+
+    /// The same packet carrying the speaker's position.
+    pub fn with_position(mut self, position: Option<[f32; 3]>) -> Self {
+        self.position = position;
+        self
     }
 
     pub fn payload(&self) -> &[u8] {
@@ -115,6 +127,9 @@ struct Speaker {
     gain: f32,
     talking: bool,
     via_listener: bool,
+    /// Position from the latest packet; `None` plays the voice unplaced.
+    position: Option<[f32; 3]>,
+    spatial: Spatializer,
     /// Forgotten by the caller; freed (with a stop event) on the next mix.
     released: bool,
     /// Stats already folded into the mixer totals.
@@ -126,6 +141,8 @@ pub struct Mixer {
     speakers: Vec<Speaker>,
     settings: Vec<(u32, Settings)>,
     discard_listener_audio: bool,
+    /// Voices with a position are placed around this listener while it has a pose.
+    listener: Option<Arc<Listener>>,
     limiter_gain: f32,
     scratch: Box<Frame>,
     stats: MixerStats,
@@ -141,6 +158,8 @@ impl Mixer {
                     gain: 0.0,
                     talking: false,
                     via_listener: false,
+                    position: None,
+                    spatial: Spatializer::default(),
                     released: false,
                     counted_late: 0,
                     counted_concealed: 0,
@@ -151,6 +170,7 @@ impl Mixer {
             speakers,
             settings: Vec::with_capacity(MAX_SPEAKER_SETTINGS),
             discard_listener_audio: true,
+            listener: None,
             limiter_gain: 1.0,
             scratch: Box::new([0.0; FRAME_SAMPLES]),
             stats: MixerStats::default(),
@@ -166,6 +186,7 @@ impl Mixer {
         };
         let speaker = &mut self.speakers[idx];
         speaker.via_listener = packet.via_listener;
+        speaker.position = packet.position;
         speaker
             .jitter
             .push(packet.seq, packet.payload(), packet.is_last, arrival_ms);
@@ -198,21 +219,29 @@ impl Mixer {
         self.discard_listener_audio = discard;
     }
 
+    /// The listener voices are placed around (positional audio).
+    pub fn set_listener(&mut self, listener: Arc<Listener>) {
+        self.listener = Some(listener);
+    }
+
     pub fn stats(&self) -> MixerStats {
         self.stats
     }
 
-    /// Mixes the next 10 ms into `out`. `mix_in` is added unscaled after the
-    /// speakers (notification sounds, mic-test loopback). Talking changes are
-    /// reported through `on_event`.
+    /// Mixes the next 10 ms into `left`/`right`. `mix_in` is added unscaled to
+    /// both after the speakers (notification sounds, mic-test loopback).
+    /// Talking changes are reported through `on_event`.
     pub fn mix(
         &mut self,
-        out: &mut Frame,
+        left: &mut Frame,
+        right: &mut Frame,
         mix_in: Option<&Frame>,
         now_ms: u64,
         on_event: &mut dyn FnMut(TalkEvent),
     ) {
-        out.fill(0.0);
+        left.fill(0.0);
+        right.fill(0.0);
+        let listener = self.listener.as_ref().and_then(|l| l.state());
         for idx in 0..self.speakers.len() {
             let Some(session) = self.speakers[idx].session else {
                 continue;
@@ -231,8 +260,21 @@ impl Mixer {
                     talking: speaker.talking,
                 });
             }
-            if pull != Pull::Silent {
-                add_ramped(out, &self.scratch, speaker.gain, target_gain);
+            if pull == Pull::Silent {
+                speaker.spatial.silence();
+            } else {
+                let placement = match (&listener, speaker.position) {
+                    (Some(l), Some(p)) => Placement::at(l, p),
+                    _ => Placement::CENTER,
+                };
+                speaker.spatial.render(
+                    &self.scratch,
+                    &placement,
+                    speaker.gain,
+                    target_gain,
+                    left,
+                    right,
+                );
             }
             speaker.gain = target_gain;
 
@@ -244,11 +286,12 @@ impl Mixer {
             speaker.counted_concealed = concealed;
         }
         if let Some(extra) = mix_in {
-            for (o, e) in out.iter_mut().zip(extra.iter()) {
-                *o += e;
+            for ((l, r), e) in left.iter_mut().zip(right.iter_mut()).zip(extra.iter()) {
+                *l += e;
+                *r += e;
             }
         }
-        self.limit(out);
+        self.limit(left, right);
     }
 
     fn target_gain(&self, idx: usize, session: u32) -> f32 {
@@ -307,6 +350,8 @@ impl Mixer {
         speaker.session = Some(session);
         speaker.jitter.reset();
         speaker.gain = 0.0;
+        speaker.position = None;
+        speaker.spatial.reset();
         speaker.counted_late = 0;
         speaker.counted_concealed = 0;
         Some(idx)
@@ -328,10 +373,13 @@ impl Mixer {
         speaker.counted_concealed = 0;
     }
 
-    /// Peak limiter (instant attack, ramped within the frame) followed by a
-    /// soft clipper, so the sum never exceeds full scale.
-    fn limit(&mut self, out: &mut Frame) {
-        let peak = out.iter().fold(0.0f32, |p, s| p.max(s.abs()));
+    /// Peak limiter linked over both channels (instant attack, ramped within
+    /// the frame) followed by a soft clipper, so the sum never exceeds full scale.
+    fn limit(&mut self, left: &mut Frame, right: &mut Frame) {
+        let peak = left
+            .iter()
+            .chain(right.iter())
+            .fold(0.0f32, |p, s| p.max(s.abs()));
         let desired = if peak > LIMIT { LIMIT / peak } else { 1.0 };
         let start = self.limiter_gain;
         let end = if desired < start {
@@ -341,17 +389,11 @@ impl Mixer {
         };
         self.limiter_gain = end;
         let step = (end - start) / FRAME_SAMPLES as f32;
-        for (i, s) in out.iter_mut().enumerate() {
-            *s = soft_clip(*s * (start + step * (i + 1) as f32));
+        for (i, (l, r)) in left.iter_mut().zip(right.iter_mut()).enumerate() {
+            let gain = start + step * (i + 1) as f32;
+            *l = soft_clip(*l * gain);
+            *r = soft_clip(*r * gain);
         }
-    }
-}
-
-/// Adds `src` to `out` with a gain ramping linearly from `from` to `to`.
-fn add_ramped(out: &mut Frame, src: &Frame, from: f32, to: f32) {
-    let step = (to - from) / FRAME_SAMPLES as f32;
-    for (i, (o, s)) in out.iter_mut().zip(src.iter()).enumerate() {
-        *o += s * (from + step * (i + 1) as f32);
     }
 }
 

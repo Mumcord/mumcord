@@ -26,16 +26,31 @@ struct Speech<'a> {
 }
 
 /// Feeds every speaker's packets on a clean 20 ms schedule and mixes until
-/// `end_ms`. Returns the mixed output and the talk events with their time.
+/// `end_ms`. Returns the mixed (mono) output and the talk events with their time.
 fn run(
     mixer: &mut Mixer,
     speech: &[Speech<'_>],
     mix_in: Option<&Frame>,
     end_ms: u64,
 ) -> (Vec<f32>, Vec<(u64, TalkEvent)>) {
+    let (left, right, events) = run_stereo(mixer, speech, &[], mix_in, end_ms);
+    assert_eq!(left, right, "voices without position play centered");
+    (left, events)
+}
+
+/// [`run`] with speaker positions (session, position); returns both channels.
+fn run_stereo(
+    mixer: &mut Mixer,
+    speech: &[Speech<'_>],
+    positions: &[(u32, [f32; 3])],
+    mix_in: Option<&Frame>,
+    end_ms: u64,
+) -> (Vec<f32>, Vec<f32>, Vec<(u64, TalkEvent)>) {
     let mut out = Vec::new();
+    let mut out_right = Vec::new();
     let mut events = Vec::new();
     let mut frame = [0.0; FRAME_SAMPLES];
+    let mut right = [0.0; FRAME_SAMPLES];
     let mut now = 0;
     while now < end_ms {
         for s in speech {
@@ -43,15 +58,23 @@ fn run(
             for p in s.packets {
                 let arrival = s.start_ms + (p.seq - first_seq) * FRAME_MS + 1;
                 if arrival + FRAME_MS > now && arrival <= now {
-                    mixer.push_packet(&packet(s.session, p, s.via_listener), arrival);
+                    let position = positions
+                        .iter()
+                        .find(|(session, _)| *session == s.session)
+                        .map(|(_, p)| *p);
+                    let pkt = packet(s.session, p, s.via_listener).with_position(position);
+                    mixer.push_packet(&pkt, arrival);
                 }
             }
         }
-        mixer.mix(&mut frame, mix_in, now, &mut |e| events.push((now, e)));
+        mixer.mix(&mut frame, &mut right, mix_in, now, &mut |e| {
+            events.push((now, e))
+        });
         out.extend_from_slice(&frame);
+        out_right.extend_from_slice(&right);
         now += FRAME_MS;
     }
-    (out, events)
+    (out, out_right, events)
 }
 
 fn rms(samples: &[f32]) -> f32 {
@@ -139,8 +162,10 @@ fn mix_in_is_added_without_speakers() {
     let mut mixer = Mixer::new().expect("mixer");
     let beep = [0.25; FRAME_SAMPLES];
     let mut out = [0.0; FRAME_SAMPLES];
-    mixer.mix(&mut out, Some(&beep), 0, &mut |_| {});
+    let mut right = [0.0; FRAME_SAMPLES];
+    mixer.mix(&mut out, &mut right, Some(&beep), 0, &mut |_| {});
     assert!(out.iter().all(|s| (s - 0.25).abs() < 1e-6));
+    assert_eq!(out, right);
 }
 
 #[test]
@@ -189,13 +214,14 @@ fn forget_speaker_frees_slot_with_stop_event() {
     let packets = tone_packets(50, 0);
     let mut mixer = Mixer::new().expect("mixer");
     let mut frame = [0.0; FRAME_SAMPLES];
+    let mut right = [0.0; FRAME_SAMPLES];
     let mut events = Vec::new();
     for (i, p) in packets.iter().take(3).enumerate() {
         mixer.push_packet(&packet(9, p, false), i as u64 * 20);
     }
-    mixer.mix(&mut frame, None, 10, &mut |e| events.push(e));
+    mixer.mix(&mut frame, &mut right, None, 10, &mut |e| events.push(e));
     mixer.forget_speaker(9);
-    mixer.mix(&mut frame, None, 20, &mut |e| events.push(e));
+    mixer.mix(&mut frame, &mut right, None, 20, &mut |e| events.push(e));
     assert_eq!(
         events,
         [
@@ -210,6 +236,44 @@ fn forget_speaker_frees_slot_with_stop_event() {
         ]
     );
     assert!(mixer.speakers.iter().all(|s| s.session.is_none()));
+}
+
+#[test]
+fn positional_voices_are_placed_around_the_listener() {
+    let packets = tone_packets(50, 0);
+    let speech = |session| Speech {
+        session,
+        packets: &packets,
+        start_ms: 0,
+        via_listener: false,
+    };
+    let listener = Arc::new(crate::spatial::Listener::default());
+    listener.set_pose([0.0; 3], [0.0, 0.0, 1.0], [0.0, 1.0, 0.0]);
+    let side = |session: u32, position: [f32; 3], listener: &Arc<_>| {
+        let mut mixer = Mixer::new().expect("mixer");
+        mixer.set_listener(Arc::clone(listener));
+        let (left, right, _) = run_stereo(
+            &mut mixer,
+            &[speech(session)],
+            &[(session, position)],
+            None,
+            1_200,
+        );
+        (steady_rms(&left), steady_rms(&right))
+    };
+
+    let (l, r) = side(1, [-3.0, 0.0, 0.0], &listener);
+    assert!(l > 2.0 * r, "left voice: {l} {r}");
+    let (l, r) = side(2, [3.0, 0.0, 0.0], &listener);
+    assert!(r > 2.0 * l, "right voice: {l} {r}");
+    let (near, _) = side(3, [-2.0, 0.0, 0.0], &listener);
+    let (far, _) = side(3, [-10.0, 0.0, 0.0], &listener);
+    assert!(near > 2.0 * far, "distance: {near} {far}");
+
+    // Without a listener pose (no game), positions are ignored.
+    listener.clear();
+    let (l, r) = side(1, [-3.0, 0.0, 0.0], &listener);
+    assert!((l - r).abs() < 1e-6, "unplaced: {l} {r}");
 }
 
 #[test]
