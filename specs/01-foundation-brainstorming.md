@@ -1445,3 +1445,12 @@ Requested after v0.3.0.
 ✍️ Note: Requested in chat during /dev.
 
 ---
+
+#### QA.85 Inputs not right-aligned? `◉`
+Reported after v0.3.0: in Settings → Audio, the positional audio fields "Full volume up to (m)" and "Silent from (m)" are not right-aligned like the other controls.
+
+- [x] **Epic 2:** align all number/text inputs in settings rows to the right like switches and dropdowns, and audit every settings section for the same issue.
+
+✍️ Note: Requested in chat during /dev.
+
+---
