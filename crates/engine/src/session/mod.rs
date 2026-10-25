@@ -141,8 +141,11 @@ struct Inner {
     /// offered for rejoining once, on the first fresh connect to its server (QA.9).
     rejoin_offers: Mutex<HashMap<ServerId, String>>,
     core: Mutex<Core>,
-    /// Link previews and video cards for chat links (FR-1.49, FR-1.50).
-    previews: crate::web::LinkPreviews,
+    /// Link previews and video cards for chat links (FR-1.49, FR-1.50); also the image cache
+    /// of full-size chat images.
+    previews: Arc<crate::web::LinkPreviews>,
+    /// Full-size image transfers with other Mumcord clients (FR-1.60c).
+    full_images: Arc<crate::full_image::transfer::Transfers>,
     /// Shared "now playing" status (FR-1.58).
     now_playing: Mutex<crate::now_playing::NowPlaying>,
     /// Shared "now gaming" status (FR-1.59).
@@ -293,11 +296,12 @@ impl Engine {
             voice: Arc::new(VoiceShared::default()),
             reconnects: AtomicU32::new(0),
             rejoin_offers: Mutex::new(rejoin_offers),
-            previews: crate::web::LinkPreviews::new(
+            previews: Arc::new(crate::web::LinkPreviews::new(
                 Some(data_dir.join("link-previews")),
                 crate::web::LinkPreviews::app_policy(),
                 crate::web::fetch::Timeouts::default(),
-            ),
+            )),
+            full_images: Arc::new(crate::full_image::new_transfers()),
             core: Mutex::new(Core::default()),
             now_playing: Mutex::new(crate::now_playing::NowPlaying::new(settings.now_playing)),
             now_gaming: Mutex::new(crate::now_gaming::NowGaming::new(settings.now_gaming)),
@@ -367,6 +371,14 @@ impl Engine {
     /// The guarded web fetcher and preview cache (also used for now-playing covers).
     pub(crate) fn link_previews(&self) -> &crate::web::LinkPreviews {
         &self.inner.previews
+    }
+
+    pub(crate) fn link_previews_arc(&self) -> Arc<crate::web::LinkPreviews> {
+        self.inner.previews.clone()
+    }
+
+    pub(crate) fn full_image_transfers(&self) -> &Arc<crate::full_image::transfer::Transfers> {
+        &self.inner.full_images
     }
 
     pub(crate) fn now_playing_state(&self) -> &Mutex<crate::now_playing::NowPlaying> {
@@ -819,6 +831,7 @@ impl Inner {
             crate::now_gaming::on_disconnect(&self.now_gaming, &session.handle);
             crate::mumcord::on_disconnect(&self.mumcord);
             crate::history_sync::on_disconnect(&self.history_sync);
+            self.full_images.reset();
             session.handle.disconnect();
         }
         self.meter.voice.store(false, Ordering::Relaxed);
@@ -1055,6 +1068,7 @@ impl Inner {
         crate::now_gaming::on_synced(&self.now_gaming);
         crate::mumcord::on_synced(&self.mumcord, &ctx);
         crate::history_sync::on_synced(&self.history_sync, &ctx, &self.rt);
+        self.full_images.reset();
         if let Some(mut snapshot) = self.snapshot(&lock(&self.core)) {
             extension::on_synced(&ctx, &mut snapshot);
             self.events
@@ -1339,6 +1353,7 @@ impl Inner {
                 crate::now_gaming::on_user_removed(&self.now_gaming, user.session);
                 crate::mumcord::on_user_removed(&self.mumcord, user.session);
                 crate::history_sync::on_user_removed(&self.history_sync, user.session);
+                self.full_images.forget(user.session);
                 self.events.emit(EngineEvent::UserRemoved(user.session));
             }
             Event::PermissionDenied(denied) => {
@@ -1366,6 +1381,7 @@ impl Inner {
                     self.republish_user(ctx, session);
                 }
                 crate::history_sync::on_plugin_data(&self.history_sync, ctx, data);
+                crate::full_image::on_plugin_data(&self.full_images, &self.previews, ctx, data);
             }
             Event::TextMessage(_) | Event::ServerConfigUpdated(_) | Event::Disconnected(_) => {}
         }

@@ -80,6 +80,19 @@ export const commands = {
 	 */
 	readDroppedImage: (path: string) => typedError<DroppedImage, ApiError>(__TAURI_INVOKE("read_dropped_image", { path })),
 	/**
+	 *  Keeps the full image of a picture about to be sent (the original file as a `data:` URL;
+	 *  re-encoded when larger than 512 KiB or 3840 px) and returns the reference to put into the
+	 *  thumbnail's `data-mumcord-full` attribute. Errors: `invalidInput` for anything that is not
+	 *  a usable PNG, JPEG, GIF or WebP image.
+	 */
+	fullImageKeep: (dataUrl: string) => typedError<string, ApiError>(__TAURI_INVOKE("full_image_keep", { dataUrl })),
+	/**
+	 *  The full image behind a thumbnail as a `data:` URL: from the cache, else fetched from the
+	 *  message's sender while they are online (progress as `fullImageProgress`). `null` when it
+	 *  cannot be had; keep showing the thumbnail then.
+	 */
+	fullImageFetch: (reference: string, senderSession: number | null, senderCertHash: string | null) => typedError<string | null, ApiError>(__TAURI_INVOKE("full_image_fetch", { reference, senderSession, senderCertHash })),
+	/**
 	 *  Preview of an http(s) link in a message; `null` when previews are switched off in the
 	 *  settings (then nothing is fetched) or there is nothing to show.
 	 */
@@ -287,6 +300,7 @@ export const events = {
 	deepLinkOpened: makeEvent<DeepLinkOpened, DeepLinkOpened>("deep-link-opened"),
 	defaultAvatarSkipped: makeEvent<DefaultAvatarSkipped, DefaultAvatarSkipped>("default-avatar-skipped"),
 	followedChannelsChanged: makeEvent<FollowedChannelsChanged, FollowedChannelsChanged>("followed-channels-changed"),
+	fullImageProgress: makeEvent<FullImageProgress, FullImageProgress>("full-image-progress"),
 	inGameOverlayChanged: makeEvent<InGameOverlayChanged, InGameOverlayChanged>("in-game-overlay-changed"),
 	messageReceived: makeEvent<MessageReceived, MessageReceived>("message-received"),
 	micLevel: makeEvent<MicLevel, MicLevel>("mic-level"),
@@ -550,6 +564,16 @@ export type FollowAllSummary = {
 
 export type FollowedChannelsChanged = {
 	channelIds: number[],
+};
+
+/**
+ *  Progress of a full image being fetched: `received` of `total` bytes of the image with this
+ *  reference (the `data-mumcord-full` value of the thumbnail).
+ */
+export type FullImageProgress = {
+	reference: string,
+	received: number,
+	total: number,
 };
 
 /**  How a game is identified: its Steam app id, or its executable name. */

@@ -9,6 +9,7 @@ import { addSentMessage } from "./chatStore";
 import type { SendTarget } from "./conversationInfo";
 import { describeSendError } from "./errors";
 import { readDroppedFiles } from "./fileDrop";
+import { FULL_ATTRIBUTE_RESERVE, fullImageTag, keepFullImage } from "./fullImage";
 import { imageTag, prepareImage, type MessageLimits } from "./images";
 import { markdownToHtml, plainTextToHtml } from "./markdown";
 
@@ -23,6 +24,8 @@ export interface Attachment {
   height: number;
   /** True when the picture had to be made smaller to fit the server limit. */
   scaled: boolean;
+  /** Reference of the kept original when the picture had to be shrunk (FR-1.60c). */
+  fullImage: string | null;
 }
 
 function bodyHtml(text: string, limits: MessageLimits): string {
@@ -75,7 +78,11 @@ export function useComposer(target: SendTarget | null, limits: MessageLimits): C
   const process = useCallback(
     async (id: number, file: File) => {
       if (removed.current.has(id)) return;
-      const result = await prepareImage(file, limits.image - imageTag("").length);
+      const result = await prepareImage(
+        file,
+        limits.image - imageTag("").length - FULL_ATTRIBUTE_RESERVE,
+      );
+      const fullImage = result.ok ? await keepFullImage(file, result.dataUrl) : null;
       if (removed.current.has(id)) return;
       if (!result.ok) {
         drop(id);
@@ -98,6 +105,7 @@ export function useComposer(target: SendTarget | null, limits: MessageLimits): C
                 width: result.width,
                 height: result.height,
                 scaled: result.scaled,
+                fullImage,
               }
             : item,
         ),
@@ -128,6 +136,7 @@ export function useComposer(target: SendTarget | null, limits: MessageLimits): C
           width: 0,
           height: 0,
           scaled: false,
+          fullImage: null,
         })),
       ]);
       for (const { id, file } of added) {
@@ -189,7 +198,7 @@ export function useComposer(target: SendTarget | null, limits: MessageLimits): C
         sending = "image";
       }
       for (const item of attachments) {
-        addSentMessage(await send(target, imageTag(item.dataUrl)));
+        addSentMessage(await send(target, fullImageTag(item.dataUrl, item.fullImage)));
         removed.current.add(item.id);
         drop(item.id);
       }

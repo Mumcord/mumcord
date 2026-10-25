@@ -71,6 +71,8 @@ fn specta_builder() -> Builder<tauri::Wry> {
             chat::send_private_message,
             chat::save_image,
             dropped::read_dropped_image,
+            commands::full_image::full_image_keep,
+            commands::full_image::full_image_fetch,
             links::link_preview,
             links::inline_image,
             links::preview_dismiss,
@@ -146,6 +148,7 @@ fn specta_builder() -> Builder<tauri::Wry> {
             people::UserRemoved,
             people::TalkStateChanged,
             chat::MessageReceived,
+            commands::full_image::FullImageProgress,
             follow::FollowedChannelsChanged,
             follow::UnreadChanged,
             audio::AudioDevicesChanged,
@@ -405,6 +408,16 @@ fn emit_engine_event(app: &AppHandle, event: EngineEvent) -> tauri::Result<()> {
         .emit(app),
         // History sync (FR-1.60) reaches the UI in its own step; the store already has them.
         EngineEvent::HistorySynced { .. } | EngineEvent::HistorySyncStatus { .. } => Ok(()),
+        EngineEvent::FullImageProgress {
+            reference,
+            received,
+            total,
+        } => commands::full_image::FullImageProgress {
+            reference,
+            received,
+            total,
+        }
+        .emit(app),
     }
 }
 

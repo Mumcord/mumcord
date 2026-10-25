@@ -4,6 +4,7 @@
  * may run scripts or load anything from the network.
  */
 import DOMPurify from "dompurify";
+import { FULL_ATTRIBUTE, FULL_REFERENCE } from "./fullImage";
 
 const ALLOWED_TAGS = [
   "a",
@@ -53,6 +54,14 @@ const SAFE_IMAGE = /^data:image\/(?:png|jpeg|gif|webp);base64,[a-z0-9+/=\s]+$/i;
 
 // A private instance keeps these hooks away from any other DOMPurify user in the app.
 const purifier = DOMPurify(window);
+
+// The full-image reference of message images (FR-1.60c) survives only in its exact format;
+// data attributes are otherwise not allowed.
+purifier.addHook("uponSanitizeAttribute", (node, data) => {
+  if (node.nodeName === "IMG" && data.attrName === FULL_ATTRIBUTE) {
+    data.forceKeepAttr = FULL_REFERENCE.test(data.attrValue);
+  }
+});
 
 purifier.addHook("afterSanitizeAttributes", (node) => {
   if (node.nodeName === "A") {

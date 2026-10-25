@@ -4,6 +4,7 @@
 pub mod chat;
 pub mod diag;
 pub mod follow;
+pub mod full_image;
 pub mod history_sync;
 pub mod ingame_overlay;
 mod maintenance;

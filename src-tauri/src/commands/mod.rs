@@ -11,6 +11,7 @@ pub mod chat;
 pub mod diagnostics;
 pub mod dropped;
 pub mod follow;
+pub mod full_image;
 pub mod history;
 pub mod identity;
 pub mod ingame_overlay;

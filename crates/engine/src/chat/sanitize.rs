@@ -4,13 +4,17 @@
 //!
 //! Chat messages additionally keep absolute http(s) image sources ([`sanitize_message_html`]):
 //! the UI never puts them into the page but asks the engine to fetch them (FR-1.55, QA.35)
-//! when link previews are on. Comments and welcome texts never keep them.
+//! when link previews are on. Comments and welcome texts never keep them. Message images also
+//! keep a valid full-image reference ([`crate::full_image::wire::ATTRIBUTE`], FR-1.60c).
 
 use std::borrow::Cow;
 use std::collections::{HashMap, HashSet};
 use std::sync::LazyLock;
 
 use ammonia::{Builder, UrlRelative};
+
+use crate::full_image::check::MAX_BYTES;
+use crate::full_image::wire::{ATTRIBUTE as FULL_ATTRIBUTE, FullRef};
 
 const TAGS: &[&str] = &[
     "a",
@@ -55,16 +59,17 @@ const IMAGE_TYPES: &[&str] = &["png", "jpeg", "gif", "webp"];
 static POLICY: LazyLock<Builder<'static>> = LazyLock::new(|| policy(false));
 static MESSAGE_POLICY: LazyLock<Builder<'static>> = LazyLock::new(|| policy(true));
 
-fn policy(external_images: bool) -> Builder<'static> {
+fn policy(message: bool) -> Builder<'static> {
+    let mut image_attributes = HashSet::from(["src", "alt", "title", "width", "height"]);
+    if message {
+        image_attributes.insert(FULL_ATTRIBUTE);
+    }
     let mut builder = Builder::empty();
     builder
         .tags(TAGS.iter().copied().collect())
         .tag_attributes(HashMap::from([
             ("a", HashSet::from(["href", "title"])),
-            (
-                "img",
-                HashSet::from(["src", "alt", "title", "width", "height"]),
-            ),
+            ("img", image_attributes),
         ]))
         .url_schemes(HashSet::from(["http", "https", "mailto", "data"]))
         .url_relative(UrlRelative::Deny)
@@ -73,8 +78,11 @@ fn policy(external_images: bool) -> Builder<'static> {
         .attribute_filter(
             move |element, attribute, value| match (element, attribute) {
                 ("img", "src") => (is_embedded_image(value)
-                    || (external_images && is_external_image(value)))
+                    || (message && is_external_image(value)))
                 .then_some(Cow::Borrowed(value)),
+                ("img", FULL_ATTRIBUTE) => FullRef::parse(value, MAX_BYTES)
+                    .is_some()
+                    .then_some(Cow::Borrowed(value)),
                 ("a", "href") if value.trim_start().to_ascii_lowercase().starts_with("data:") => {
                     None
                 }
@@ -186,6 +194,21 @@ mod tests {
             sanitize_message_html("<script>x</script><b>hi</b>"),
             "<b>hi</b>"
         );
+    }
+
+    #[test]
+    fn messages_keep_valid_full_image_references_only() {
+        let reference = format!("{}:2048", "0f".repeat(32));
+        let html = format!("<img src=\"{PNG}\" data-mumcord-full=\"{reference}\">");
+        assert_eq!(
+            sanitize_message_html(&html),
+            format!("<img src=\"{PNG}\" data-mumcord-full=\"{reference}\">")
+        );
+        assert_eq!(sanitize_html(&html), format!("<img src=\"{PNG}\">"));
+        for bad in ["x", "0f:1", "javascript:alert(1)"] {
+            let html = format!("<img src=\"{PNG}\" data-mumcord-full=\"{bad}\">");
+            assert_eq!(sanitize_message_html(&html), format!("<img src=\"{PNG}\">"));
+        }
     }
 
     #[test]

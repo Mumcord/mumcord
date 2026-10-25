@@ -83,11 +83,10 @@ describe("Composer image attachments", () => {
       expect(sent).toHaveLength(4);
     });
     expect(sent[0]).toContain("hello");
-    expect(sent.slice(1)).toEqual([
-      '<img src="data:image/png;base64,a.png" />',
-      '<img src="data:image/png;base64,b.png" />',
-      '<img src="data:image/png;base64,c.png" />',
-    ]);
+    // Each thumbnail differs from its file, so it carries the kept original's reference (FR-1.60c).
+    const full =
+      /^<img src="data:image\/png;base64,(\w\.png)" data-mumcord-full="[0-9a-f]{64}:\d+" \/>$/;
+    expect(sent.slice(1).map((html) => full.exec(html)?.[1])).toEqual(["a.png", "b.png", "c.png"]);
     await waitFor(() => {
       expect(screen.queryAllByRole("img")).toHaveLength(0);
     });

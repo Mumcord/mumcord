@@ -116,7 +116,10 @@
     "close": "Close",
     "previous": "Previous image",
     "next": "Next image",
-    "unnamed": "image"
+    "unnamed": "image",
+    "fullLoading": "Loading full size…",
+    "fullProgress": "Loading full size… {{percent}} %",
+    "fullUnavailable": "Full size not available – showing the preview"
   },
   "favorites": {
     "open": "GIF favorites",

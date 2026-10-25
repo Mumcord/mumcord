@@ -49,6 +49,8 @@ protoc-bin-vendored = "3.3"
 aes = "0.8"
 rand = "0.9"
 sha1 = "0.10"
+# Content hash of full-size images shared between Mumcord clients (FR-1.60c).
+sha2 = "0.10"
 rcgen = "0.14"
 p12-keystore = "0.4"
 # Only used to generate RSA identity keys (ring cannot generate RSA keys); signing stays with ring.
