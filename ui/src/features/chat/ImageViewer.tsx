@@ -17,6 +17,7 @@ import {
 import { createPortal } from "react-dom";
 import { useTranslation } from "react-i18next";
 import { getApi } from "../../api";
+import { BetaBadge } from "../../components/BetaBadge";
 import { pickSavePath } from "../settings/fileDialogs";
 import { removeFavorite, saveFavorite, useGifFavorites } from "./favorites";
 import { useFullImage, type FullImageSource } from "./fullImage";
@@ -69,11 +70,15 @@ function suggestedName(image: ViewerImage, extension: string): string {
 function FullImageHint({ state }: { state: ReturnType<typeof useFullImage> }) {
   const { t } = useTranslation("chat");
   if (state.status === "loading") {
+    // The badge sits outside the live region so screen readers don't repeat it on every progress tick.
     return (
-      <p className="image-viewer__hint" role="status">
-        {state.progress === null
-          ? t("viewer.fullLoading")
-          : t("viewer.fullProgress", { percent: Math.floor(state.progress * 100) })}
+      <p className="image-viewer__hint">
+        <span role="status">
+          {state.progress === null
+            ? t("viewer.fullLoading")
+            : t("viewer.fullProgress", { percent: Math.floor(state.progress * 100) })}
+        </span>{" "}
+        <BetaBadge />
       </p>
     );
   }

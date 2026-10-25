@@ -243,6 +243,7 @@ describe("full images", () => {
     expect(fetch).toHaveBeenCalledWith(REFERENCE, 4, "cert");
     expect(screen.getByRole("img")).toHaveAttribute("src", PNG);
     expect(screen.getByRole("status")).toHaveTextContent("Loading full size…");
+    expect(screen.getByText("Beta")).toBeInTheDocument();
     act(() => {
       api.mock.emit("fullImageProgress", { reference: REFERENCE, received: 512, total: 2048 });
     });
@@ -287,5 +288,6 @@ describe("full images", () => {
     render(<Harness />);
     expect(fetch).not.toHaveBeenCalled();
     expect(screen.queryByRole("status")).toBeNull();
+    expect(screen.queryByText("Beta")).toBeNull();
   });
 });
