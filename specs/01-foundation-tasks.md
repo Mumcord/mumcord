@@ -229,6 +229,7 @@
 | B60 | Port the demo-mock additions used for the 0.2.0 screenshots (demoPicture, demo link previews/inline images) | open | | – | simple | – | ui/src/api/mock.ts |
 | CI1 | Parallelize E2E in CI: build once, shard spec files across matrix jobs, aggregator job keeps the required "Linux E2E" check name | done – build job + 4 shards from e2e/shards.json, aggregator "Linux E2E"; ~12–13 min | ci1-e2e-shards | – | complex | – | .github/workflows/e2e.yml, e2e/run.sh, wdio config |
 | B62 | (1d) Drop and paste images reliably: preview before sending, several images, compression to the server limit, no UI freeze (FR-1.30, see B61) | open | | B61 | simple | – | ui/src/features/chat Composer, engine image scaling |
+| B66 | (1d) Thumbnail in chat + full image on demand via plugin data for the viewer (FR-1.60c) | open | | B62 | complex | – | engine plugin data transfer, store image cache, chat viewer |
 | D1 | Implementation report | open | | C1–C10 | simple | all | specs/01-foundation-implementation.md |
 
 ## Contracts from finished tasks
