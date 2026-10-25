@@ -11,7 +11,7 @@
     "appearance": "Appearance",
     "language": "Language",
     "sounds": "Sounds & notifications",
-    "overlay": "Overlay & positional audio",
+    "overlay": "Overlay",
     "diagnostics": "Diagnostics",
     "about": "About"
   },
@@ -184,7 +184,53 @@
     "off": "Off"
   },
   "overlay": {
-    "comingLater": "The in-game overlay and positional audio are coming in a later stage. There are no settings here yet."
+    "window": {
+      "title": "Window overlay",
+      "enable": "Show the overlay",
+      "enableHint": "A small transparent window that shows who is talking. Also available from the tray menu.",
+      "positionUnsupported": "This desktop decides where windows appear, so corner positions and moving have no effect.",
+      "move": "Move overlay…",
+      "moveDone": "Done moving",
+      "size": "Width",
+      "wholeChannel": "Show the whole channel",
+      "wholeChannelHint": "Off: only people who are talking.",
+      "channelName": "Show the channel name",
+      "loadFailed": "The overlay options could not be loaded.",
+      "saveFailed": "The overlay change could not be applied."
+    },
+    "corner": {
+      "label": "Position",
+      "topLeft": "Top left",
+      "topRight": "Top right",
+      "bottomLeft": "Bottom left",
+      "bottomRight": "Bottom right",
+      "custom": "Custom (moved)"
+    },
+    "opacity": "Opacity",
+    "inGame": {
+      "title": "In-game overlay",
+      "explanation": "Shows who is talking inside your games. It starts by itself when a game starts and only appears in games.",
+      "mode": "In-game overlay",
+      "off": "Off",
+      "on": "On",
+      "antiCheat": "Some games with anti-cheat protection treat any overlay as cheating and may ban the account. Those games are off by default, even when this is On.",
+      "games": "Games",
+      "noGames": "No games known yet. Games show up here once they are detected.",
+      "running": "Running now",
+      "followsDefault": "Follows the default",
+      "overridden": "Your choice",
+      "blocked": "Blocked by anti-cheat.",
+      "blockedReason": "Reason: {{reason}}",
+      "options": "Options for {{game}}",
+      "reset": "Use default for {{game}}",
+      "size": "Size",
+      "unsupported": "The in-game overlay is not available on this system. The window overlay above is used instead.",
+      "loadFailed": "The in-game overlay settings could not be loaded.",
+      "saveFailed": "The in-game overlay change could not be applied.",
+      "confirmTitle": "Enable the overlay for {{game}}?",
+      "confirmMessage": "Warning: {{game}} uses anti-cheat protection ({{reason}}). Overlays can be detected as cheating and your account may be banned. Mumcord is not responsible for that. Only continue if you accept this risk.",
+      "confirmEnable": "Enable anyway"
+    }
   },
   "diagnostics": {
     "logging": "Logging",

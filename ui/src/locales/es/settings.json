@@ -11,7 +11,7 @@
     "appearance": "Apariencia",
     "language": "Idioma",
     "sounds": "Sonidos y notificaciones",
-    "overlay": "Superposición y audio posicional",
+    "overlay": "Superposición",
     "diagnostics": "Diagnóstico",
     "about": "Acerca de"
   },
@@ -184,7 +184,53 @@
     "off": "Desactivadas"
   },
   "overlay": {
-    "comingLater": "La superposición en juegos y el audio posicional llegarán en una fase posterior. Aquí todavía no hay ajustes."
+    "window": {
+      "title": "Superposición en ventana",
+      "enable": "Mostrar la superposición",
+      "enableHint": "Una pequeña ventana transparente que muestra quién habla. También disponible en el menú de la bandeja.",
+      "positionUnsupported": "Este escritorio decide dónde aparecen las ventanas, así que las esquinas y el movimiento no tienen efecto.",
+      "move": "Mover superposición…",
+      "moveDone": "Terminar de mover",
+      "size": "Ancho",
+      "wholeChannel": "Mostrar todo el canal",
+      "wholeChannelHint": "Desactivado: solo quienes hablan.",
+      "channelName": "Mostrar el nombre del canal",
+      "loadFailed": "No se pudieron cargar las opciones de la superposición.",
+      "saveFailed": "No se pudo aplicar el cambio de la superposición."
+    },
+    "corner": {
+      "label": "Posición",
+      "topLeft": "Arriba a la izquierda",
+      "topRight": "Arriba a la derecha",
+      "bottomLeft": "Abajo a la izquierda",
+      "bottomRight": "Abajo a la derecha",
+      "custom": "Personalizada (movida)"
+    },
+    "opacity": "Opacidad",
+    "inGame": {
+      "title": "Superposición en el juego",
+      "explanation": "Muestra quién habla dentro de tus juegos. Se inicia sola al arrancar un juego y solo aparece en juegos.",
+      "mode": "Superposición en el juego",
+      "off": "Desactivada",
+      "on": "Activada",
+      "antiCheat": "Algunos juegos con protección anti-trampas consideran cualquier superposición una trampa y pueden banear la cuenta. Esos juegos están desactivados por defecto, incluso con la opción activada.",
+      "games": "Juegos",
+      "noGames": "Aún no se conoce ningún juego. Aparecerán aquí cuando se detecten.",
+      "running": "En ejecución",
+      "followsDefault": "Sigue el valor por defecto",
+      "overridden": "Tu elección",
+      "blocked": "Bloqueado por el anti-trampas.",
+      "blockedReason": "Motivo: {{reason}}",
+      "options": "Opciones de {{game}}",
+      "reset": "Usar el valor por defecto en {{game}}",
+      "size": "Tamaño",
+      "unsupported": "La superposición en el juego no está disponible en este sistema. Se usa la superposición en ventana de arriba.",
+      "loadFailed": "No se pudieron cargar los ajustes de la superposición en el juego.",
+      "saveFailed": "No se pudo aplicar el cambio de la superposición en el juego.",
+      "confirmTitle": "¿Activar la superposición en {{game}}?",
+      "confirmMessage": "Advertencia: {{game}} usa protección anti-trampas ({{reason}}). Las superposiciones pueden detectarse como trampas y tu cuenta podría ser baneada. Mumcord no se hace responsable. Continúa solo si aceptas este riesgo.",
+      "confirmEnable": "Activar de todos modos"
+    }
   },
   "diagnostics": {
     "logging": "Registro",

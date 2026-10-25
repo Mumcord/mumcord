@@ -192,7 +192,7 @@
 | B30 | (1c) Mumble Link + 3D audio | open | | G1 | complex | FR-1.41, 1.43 | crates/positional/src/link/, crates/audio/src/spatial/ |
 | B31 | (1c) Game plugin host | open | | B30 | complex | FR-1.42, 1.43 | crates/positional/src/plugins/ |
 | B32 | (1c) Overlay window | done – overlay.rs + commands, ui/overlay entry, tray toggle, own capability file, Wayland onTop detection; E2E smoke written, not run | b32-overlay | G1 | complex | FR-1.44–1.46 | src-tauri/src/overlay.rs, ui/src/overlay/ |
-| B33 | (1c) positional + overlay settings UI (overlay part now, positional with B30) | in progress | b33-overlay-settings | B30, B32 | simple | FR-1.41, 1.43, 1.45, 1.46 | ui/src/features/settings/positional/ |
+| B33 | (1c) positional + overlay settings UI (overlay part now, positional with B30) | partly done – Overlay section (window + in-game UI on an InGameOverlayApi placeholder); wire to b64 commands, positional part with B30 | b33-overlay-settings | B30, B32 | simple | FR-1.41, 1.43, 1.45, 1.46 | ui/src/features/settings/positional/ |
 | B49 | (1c) "Now gaming" status + best-effort Join game (FR-1.59) | done – Steam launcher + 74-game list, plugin data + comment line, controller icon, Steam header image, Join via +connect; Win/mac uncompiled | b49-now-gaming | B56 (Mumble Link source added with B30) | complex | AC-1.50 | engine now_gaming, src-tauri process/steam detection, PersonStatus, profile, userpanel |
 | B56 | (1c) Quick settings on right-click of the settings button (FR-1.66) | done – QuickSettings menu (previews, now playing, theme); game item added with B49 | b56-quick-settings | – | simple | – | userpanel, settings store |
 | B61 | (1c) Bug: dragging images (in chat / image viewer / drop into input) freezes the UI | done (not reproduced; likely native drag of data-URL images) – images not draggable, Composer onDragOver, dragDropEnabled false, 25 MB cap; user check pending | b61-drag-freeze | – | simple | – | ui/src/features/chat |
@@ -220,8 +220,8 @@
 | M1 | Merge main (v0.1.1 hotfix, version 0.1.1) back into epic-1; resolve music-quality duplicates | done | lead | B47 | simple | – | – |
 | B48 | Bugs: now playing never sends (setting not persisted? no log lines; Spotify MPRIS present) + audio streams restart every 2 s while the chosen device is unavailable | done – NP worked but never saved by an older build; info logs, own track everywhere; cpal id rewrite fixed, background retry with backoff, no stream restarts | b48-np-audio | B45 | complex | FR-1.58 | engine now_playing, src-tauri now_playing, crates/audio io controller |
 | B50 | (1d) History sync between Mumcord clients (FR-1.60) | open | | 1c | complex | AC-1.51 | engine plugin-data sync, store, chat UI, wizard, settings |
-| B51 | (1d) Mumcord badge (FR-1.61) | open | | – | simple | AC-1.52 | engine hello, PersonStatus |
-| B52 | (1d) Double-click DM + pinned person card with DM and full-profile buttons (FR-1.62) | open | | – | simple | AC-1.53 | members, channels, chat |
+| B51 | (1d) Mumcord badge (FR-1.61) | in progress | b51-badge | – | simple | AC-1.52 | engine hello, PersonStatus |
+| B52 | (1d) Double-click DM + pinned person card with DM and full-profile buttons (FR-1.62) | in progress | b52-person-card | – | simple | AC-1.53 | members, channels, chat |
 | B53 | (1d) Full profile redesign (FR-1.63) | open | | B52 | simple | AC-1.53 | members ProfileCard |
 | B54 | (1d) Friends by cert hash with online state (FR-1.64) | open | | B53 | complex | AC-1.54 | store, engine, members, follow DM list |
 | B55 | (1d) Kept friend DM history + online state in DMs (FR-1.65) | open | | B54 | simple | AC-1.54 | store history, chat DM header |
@@ -231,7 +231,7 @@
 | B59 | Bug: in compact chat layout the link-preview card's left bar overlaps its text | done – text-indent reset on .link-previews | b59-compact-card | – | simple | – | ui/src/features/chat css |
 | B60 | Port the demo-mock additions used for the 0.2.0 screenshots (demoPicture, demo link previews/inline images) | open | | – | simple | – | ui/src/api/mock.ts |
 | CI1 | Parallelize E2E in CI: build once, shard spec files across matrix jobs, aggregator job keeps the required "Linux E2E" check name | done – build job + 4 shards from e2e/shards.json, aggregator "Linux E2E"; ~12–13 min | ci1-e2e-shards | – | complex | – | .github/workflows/e2e.yml, e2e/run.sh, wdio config |
-| B62 | (1d) Drop and paste images reliably: preview before sending, several images, compression to the server limit, no UI freeze (FR-1.30, see B61) | open | | B61 | simple | – | ui/src/features/chat Composer, engine image scaling |
+| B62 | (1d) Drop and paste images reliably: preview before sending, several images, compression to the server limit, no UI freeze (FR-1.30, see B61) | in progress | b62-image-drop | B61 | simple | – | ui/src/features/chat Composer, engine image scaling |
 | B66 | (1d) Thumbnail in chat + full image on demand via plugin data for the viewer (FR-1.60c) | open | | B62 | complex | – | engine plugin data transfer, store image cache, chat viewer |
 | D1 | Implementation report | open | | C1–C10 | simple | all | specs/01-foundation-implementation.md |
 

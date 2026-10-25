@@ -293,9 +293,9 @@ describe("SettingsScreen", () => {
     });
   });
 
-  it("shows the overlay placeholder", async () => {
-    await openSection("Overlay & positional audio");
-    expect(screen.getByText(/coming in a later stage/)).toBeInTheDocument();
+  it("shows the overlay section", async () => {
+    await openSection("Overlay");
+    expect(await screen.findByRole("switch", { name: "Show the overlay" })).toBeInTheDocument();
   });
 });
 

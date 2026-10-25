@@ -11,7 +11,7 @@
     "appearance": "Darstellung",
     "language": "Sprache",
     "sounds": "Töne & Benachrichtigungen",
-    "overlay": "Overlay & Positionsaudio",
+    "overlay": "Overlay",
     "diagnostics": "Diagnose",
     "about": "Über"
   },
@@ -184,7 +184,53 @@
     "off": "Aus"
   },
   "overlay": {
-    "comingLater": "Das Spiel-Overlay und Positionsaudio kommen in einer späteren Ausbaustufe. Hier gibt es noch keine Einstellungen."
+    "window": {
+      "title": "Fenster-Overlay",
+      "enable": "Overlay anzeigen",
+      "enableHint": "Ein kleines durchsichtiges Fenster, das zeigt, wer spricht. Auch im Tray-Menü verfügbar.",
+      "positionUnsupported": "Dieser Desktop bestimmt, wo Fenster erscheinen. Ecken und Verschieben haben daher keine Wirkung.",
+      "move": "Overlay verschieben…",
+      "moveDone": "Verschieben beenden",
+      "size": "Breite",
+      "wholeChannel": "Ganzen Kanal anzeigen",
+      "wholeChannelHint": "Aus: nur Personen, die sprechen.",
+      "channelName": "Kanalnamen anzeigen",
+      "loadFailed": "Die Overlay-Optionen konnten nicht geladen werden.",
+      "saveFailed": "Die Overlay-Änderung konnte nicht angewendet werden."
+    },
+    "corner": {
+      "label": "Position",
+      "topLeft": "Oben links",
+      "topRight": "Oben rechts",
+      "bottomLeft": "Unten links",
+      "bottomRight": "Unten rechts",
+      "custom": "Eigene (verschoben)"
+    },
+    "opacity": "Deckkraft",
+    "inGame": {
+      "title": "In-Game-Overlay",
+      "explanation": "Zeigt in deinen Spielen, wer spricht. Startet automatisch mit dem Spiel und erscheint nur in Spielen.",
+      "mode": "In-Game-Overlay",
+      "off": "Aus",
+      "on": "Ein",
+      "antiCheat": "Manche Spiele mit Anti-Cheat-Schutz werten jedes Overlay als Betrug und können den Account sperren. Diese Spiele sind standardmäßig aus, auch wenn hier Ein gewählt ist.",
+      "games": "Spiele",
+      "noGames": "Noch keine Spiele bekannt. Sie erscheinen hier, sobald sie erkannt werden.",
+      "running": "Läuft gerade",
+      "followsDefault": "Folgt der Voreinstellung",
+      "overridden": "Deine Wahl",
+      "blocked": "Durch Anti-Cheat blockiert.",
+      "blockedReason": "Grund: {{reason}}",
+      "options": "Optionen für {{game}}",
+      "reset": "Voreinstellung für {{game}} nutzen",
+      "size": "Größe",
+      "unsupported": "Das In-Game-Overlay ist auf diesem System nicht verfügbar. Stattdessen wird das Fenster-Overlay oben genutzt.",
+      "loadFailed": "Die In-Game-Overlay-Einstellungen konnten nicht geladen werden.",
+      "saveFailed": "Die In-Game-Overlay-Änderung konnte nicht angewendet werden.",
+      "confirmTitle": "Overlay für {{game}} aktivieren?",
+      "confirmMessage": "Warnung: {{game}} nutzt Anti-Cheat-Schutz ({{reason}}). Overlays können als Betrug erkannt werden und dein Account kann gesperrt werden. Mumcord haftet dafür nicht. Fahre nur fort, wenn du dieses Risiko akzeptierst.",
+      "confirmEnable": "Trotzdem aktivieren"
+    }
   },
   "diagnostics": {
     "logging": "Protokoll",
