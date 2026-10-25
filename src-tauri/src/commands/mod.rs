@@ -10,6 +10,7 @@ pub mod channels;
 pub mod chat;
 pub mod diagnostics;
 pub mod follow;
+pub mod full_image;
 pub mod history;
 pub mod identity;
 pub mod links;

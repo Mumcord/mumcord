@@ -106,7 +106,7 @@ pub async fn save_image(path: String, data_url: String) -> ApiResult<()> {
 }
 
 /// The bytes of a base64 `data:image/...` URL; anything else is rejected.
-fn decode_image_data_url(data_url: &str) -> Result<Vec<u8>, ApiError> {
+pub(crate) fn decode_image_data_url(data_url: &str) -> Result<Vec<u8>, ApiError> {
     use base64::Engine as _;
     let invalid = || ApiError::new(ErrorCode::InvalidInput, "not an image data URL");
     let rest = data_url.strip_prefix("data:image/").ok_or_else(invalid)?;
