@@ -104,6 +104,19 @@ impl Store {
         Ok((inserted == 1).then(|| self.conn.last_insert_rowid()))
     }
 
+    /// The server whose messages make up `conversation` on `server`; `None` for a private chat
+    /// with a friend, which is linked across servers by certificate hash (FR-1.65).
+    fn history_scope(
+        &self,
+        server: ServerId,
+        conversation: &Conversation,
+    ) -> Result<Option<ServerId>> {
+        Ok(match conversation {
+            Conversation::Private(cert_hash) if self.is_friend(cert_hash)? => None,
+            _ => Some(server),
+        })
+    }
+
     /// The newest `limit` messages of a conversation, oldest first.
     pub fn messages(
         &self,
@@ -112,17 +125,19 @@ impl Store {
         limit: u32,
     ) -> Result<Vec<ChatMessage>> {
         let (kind, key) = conversation.parts();
+        let scope = self.history_scope(server, conversation)?;
         let mut stmt = self.conn.prepare(
             "SELECT * FROM (
                  SELECT id, conversation_kind, conversation_key, sender_name, sender_cert_hash,
                         sent_at, body
                  FROM chat_message
-                 WHERE server_id = ?1 AND conversation_kind = ?2 AND conversation_key = ?3
+                 WHERE (?1 IS NULL OR server_id = ?1) AND conversation_kind = ?2
+                   AND conversation_key = ?3
                  ORDER BY sent_at DESC, id DESC
                  LIMIT ?4)
              ORDER BY sent_at, id",
         )?;
-        let rows = stmt.query_map(params![server, kind, key, limit], message_from_row)?;
+        let rows = stmt.query_map(params![scope, kind, key, limit], message_from_row)?;
         Ok(rows.collect::<rusqlite::Result<_>>()?)
     }
 
@@ -137,19 +152,20 @@ impl Store {
         limit: u32,
     ) -> Result<Vec<ChatMessage>> {
         let (kind, key) = conversation.parts();
+        let scope = self.history_scope(server, conversation)?;
         let mut stmt = self.conn.prepare(
             "SELECT * FROM (
                  SELECT m.id, m.conversation_kind, m.conversation_key, m.sender_name,
                         m.sender_cert_hash, m.sent_at, m.body
                  FROM chat_message m, chat_message c
-                 WHERE c.id = ?4 AND m.server_id = ?1 AND m.conversation_kind = ?2
+                 WHERE c.id = ?4 AND (?1 IS NULL OR m.server_id = ?1) AND m.conversation_kind = ?2
                    AND m.conversation_key = ?3
                    AND (m.sent_at < c.sent_at OR (m.sent_at = c.sent_at AND m.id < c.id))
                  ORDER BY m.sent_at DESC, m.id DESC
                  LIMIT ?5)
              ORDER BY sent_at, id",
         )?;
-        let rows = stmt.query_map(params![server, kind, key, before, limit], message_from_row)?;
+        let rows = stmt.query_map(params![scope, kind, key, before, limit], message_from_row)?;
         Ok(rows.collect::<rusqlite::Result<_>>()?)
     }
 
@@ -199,25 +215,33 @@ impl Store {
     }
 
     /// Deletes every message sent before `cutoff` on all servers, with its dismissed-preview
-    /// flags (QA.42). Returns the number of deleted messages.
+    /// flags (QA.42). Private chats with friends are kept (FR-1.65). Returns the number of
+    /// deleted messages.
     pub fn delete_messages_before(&self, cutoff: UnixMillis) -> Result<usize> {
         // Foreign keys cascade to `dismissed_preview`; `sent_at` is indexed.
-        Ok(self
-            .conn
-            .execute("DELETE FROM chat_message WHERE sent_at < ?1", [cutoff])?)
+        Ok(self.conn.execute(
+            "DELETE FROM chat_message
+             WHERE sent_at < ?1
+               AND NOT (conversation_kind = 'private'
+                        AND conversation_key IN (SELECT cert_hash FROM friend))",
+            [cutoff],
+        )?)
     }
 
-    /// "Clear history" for one channel or private chat.
+    /// "Clear history" for one channel or private chat (a friend's chat on all servers, as it
+    /// is shown).
     pub fn clear_conversation_history(
         &self,
         server: ServerId,
         conversation: &Conversation,
     ) -> Result<()> {
         let (kind, key) = conversation.parts();
+        let scope = self.history_scope(server, conversation)?;
         self.conn.execute(
             "DELETE FROM chat_message
-             WHERE server_id = ?1 AND conversation_kind = ?2 AND conversation_key = ?3",
-            params![server, kind, key],
+             WHERE (?1 IS NULL OR server_id = ?1) AND conversation_kind = ?2
+               AND conversation_key = ?3",
+            params![scope, kind, key],
         )?;
         Ok(())
     }

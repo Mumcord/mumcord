@@ -131,6 +131,19 @@ const MIGRATIONS: &[&str] = &[
     r"
     ALTER TABLE chat_message ADD COLUMN synced_from TEXT;
     ",
+    // v10: friends by certificate hash (FR-1.64), local only and across servers. Private
+    // chats with a friend are read across servers (FR-1.65), so private history also gets an
+    // index that does not start with the server.
+    r"
+    CREATE TABLE friend (
+        cert_hash    TEXT    PRIMARY KEY,
+        name         TEXT    NOT NULL,
+        added_at     INTEGER NOT NULL,
+        last_seen_at INTEGER
+    );
+    CREATE INDEX chat_message_by_key
+        ON chat_message (conversation_kind, conversation_key, sent_at);
+    ",
 ];
 
 /// Handle to the local database. Not `Sync`; callers share it behind a mutex.
@@ -296,6 +309,43 @@ pub(crate) mod tests {
             .set_person_note(1, "h1", "plays bass")
             .expect("set note");
         assert_eq!(store.person_note(1, "h1").expect("note"), "plays bass");
+    }
+
+    #[test]
+    fn version_9_database_upgrades_with_no_friends_and_keeps_private_history() {
+        let dir = tempfile::tempdir().expect("tempdir");
+        {
+            let mut conn = Connection::open(dir.path().join(DB_FILE_NAME)).expect("open");
+            let tx = conn.transaction().expect("tx");
+            for sql in &MIGRATIONS[..9] {
+                tx.execute_batch(sql).expect("migration");
+            }
+            tx.pragma_update(None, "user_version", 9).expect("pragma");
+            tx.execute(
+                "INSERT INTO saved_server (label, address, username, sort_order)
+                 VALUES ('Old', 'localhost', 'Tester', 0)",
+                [],
+            )
+            .expect("server");
+            tx.execute(
+                "INSERT INTO chat_message
+                     (server_id, conversation_kind, conversation_key, sender_name,
+                      sender_cert_hash, sent_at, body)
+                 VALUES (1, 'private', 'h1', 'Bot', 'h1', 5, 'hi')",
+                [],
+            )
+            .expect("message");
+            tx.commit().expect("commit");
+        }
+        let store = Store::open(dir.path()).expect("upgrade");
+        assert_eq!(
+            store.schema_version().expect("version"),
+            MIGRATIONS.len() as i64
+        );
+        assert!(store.friends().expect("friends").is_empty());
+        store.add_friend("h1", "Bot", 6).expect("add");
+        let chat = crate::Conversation::Private("h1".into());
+        assert_eq!(store.messages(1, &chat, 10).expect("messages").len(), 1);
     }
 
     #[test]
