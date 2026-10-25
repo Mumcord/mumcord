@@ -21,7 +21,8 @@
     "results": "Resultados de búsqueda",
     "empty": "Ningún ajuste coincide con «{{query}}».",
     "count_one": "{{count}} ajuste encontrado",
-    "count_other": "{{count}} ajustes encontrados"
+    "count_other": "{{count}} ajustes encontrados",
+    "count_many": "{{count}} ajustes encontrados"
   },
   "errors": {
     "secureStorage": "El almacenamiento seguro del sistema no está disponible o se denegó el acceso.",
@@ -350,7 +351,8 @@
   },
   "retention": {
     "days_one": "{{count}} día",
-    "days_other": "{{count}} días"
+    "days_other": "{{count}} días",
+    "days_many": "{{count}} días"
   },
   "nowGaming": {
     "title": "Jugando ahora",

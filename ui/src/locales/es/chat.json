@@ -18,12 +18,14 @@
     "syncing": "Buscando mensajes anteriores de otros usuarios de Mumcord…",
     "syncAdded_one": "Se añadió {{count}} mensaje anterior de otros usuarios de Mumcord.",
     "syncAdded_other": "Se añadieron {{count}} mensajes anteriores de otros usuarios de Mumcord.",
+    "syncAdded_many": "Se añadieron {{count}} mensajes anteriores de otros usuarios de Mumcord.",
     "syncNone": "No se encontraron mensajes anteriores.",
     "syncFailed": "Aquí no se pueden cargar mensajes anteriores.",
     "syncedFrom": "del historial de {{name}}",
     "jumpToNewest": "Ir a lo más reciente",
     "jumpToNewestUnseen_one": "Ir a lo más reciente, {{count}} mensaje nuevo",
-    "jumpToNewestUnseen_other": "Ir a lo más reciente, {{count}} mensajes nuevos"
+    "jumpToNewestUnseen_other": "Ir a lo más reciente, {{count}} mensajes nuevos",
+    "jumpToNewestUnseen_many": "Ir a lo más reciente, {{count}} mensajes nuevos"
   },
   "format": {
     "toolbar": "Formato",
@@ -70,7 +72,8 @@
     "message": "{{name}}: {{text}}",
     "image": "{{name}} envió una imagen",
     "more_one": "{{count}} mensaje nuevo más",
-    "more_other": "{{count}} mensajes nuevos más"
+    "more_other": "{{count}} mensajes nuevos más",
+    "more_many": "{{count}} mensajes nuevos más"
   },
   "pinned": {
     "label": "Información del canal",
@@ -81,6 +84,7 @@
     "list": "Personas que se pueden mencionar",
     "found_one": "{{count}} persona sugerida. Usa las flechas y Enter para insertar.",
     "found_other": "{{count}} personas sugeridas. Usa las flechas y Enter para insertar.",
+    "found_many": "{{count}} personas sugeridas. Usa las flechas y Enter para insertar.",
     "none": "No se encontró a nadie",
     "mentionsYou": "Te menciona",
     "chipLabel": "{{name}}, mención"

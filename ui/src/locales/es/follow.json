@@ -4,6 +4,7 @@
   "unsupported": "Seguir canales requiere un servidor con la versión 1.4 o posterior.",
   "unread_one": "{{count}} mensaje sin leer",
   "unread_other": "{{count}} mensajes sin leer",
+  "unread_many": "{{count}} mensajes sin leer",
   "errors": {
     "denied": "El servidor no te permite seguir este canal.",
     "limit": "No puedes seguir más canales en este servidor. Deja de seguir otro canal primero.",
@@ -19,7 +20,8 @@
     "channel": "{{name}} en {{channel}}: {{text}}",
     "private": "{{name}} (privado): {{text}}",
     "more_one": "{{count}} mensaje nuevo más",
-    "more_other": "{{count}} mensajes nuevos más"
+    "more_other": "{{count}} mensajes nuevos más",
+    "more_many": "{{count}} mensajes nuevos más"
   },
   "history": {
     "clear": "Borrar historial",
@@ -41,8 +43,10 @@
     "working": "Siguiendo canales…",
     "followed_one": "Siguiendo {{count}} canal.",
     "followed_other": "Siguiendo {{count}} canales.",
+    "followed_many": "Siguiendo {{count}} canales.",
     "skipped_one": "{{count}} omitido: {{reasons}}.",
     "skipped_other": "{{count}} omitidos: {{reasons}}.",
+    "skipped_many": "{{count}} omitidos: {{reasons}}.",
     "limit": "límite alcanzado",
     "notAllowed": "no permitido",
     "noAnswer": "sin respuesta del servidor",

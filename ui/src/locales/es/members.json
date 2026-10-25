@@ -1,8 +1,10 @@
 {
   "inChannel_one": "En {{channel}} ({{count}})",
   "inChannel_other": "En {{channel}} ({{count}})",
+  "inChannel_many": "En {{channel}} ({{count}})",
   "listening_one": "Escuchando ({{count}})",
   "listening_other": "Escuchando ({{count}})",
+  "listening_many": "Escuchando ({{count}})",
   "noChannel": "Selecciona un canal para ver quién está.",
   "nobody": "No hay nadie.",
   "you": "(tú)",
@@ -48,6 +50,7 @@
     "hoursMinutes": "{{hours}} h {{minutes}} min",
     "minutes_one": "{{count}} min",
     "minutes_other": "{{count}} min",
+    "minutes_many": "{{count}} min",
     "join": "Unirse a la partida",
     "joinTitle": "¿Unirse a la partida?",
     "joinMessage": "Se abrirá Steam y se conectará al servidor en el que esta persona juega a {{game}}. Únete solo a servidores de confianza.",

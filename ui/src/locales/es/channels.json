@@ -7,10 +7,12 @@
     "voiceHere": "estás aquí (voz)",
     "people_one": "{{count}} persona",
     "people_other": "{{count}} personas",
+    "people_many": "{{count}} personas",
     "stack": {
       "some": "{{shown}} de {{total}} personas: {{names}} y {{rest}} más",
       "all_one": "{{count}} persona: {{names}}",
       "all_other": "{{count}} personas: {{names}}",
+      "all_many": "{{count}} personas: {{names}}",
       "person": "{{name}} ({{status}})"
     },
     "showAll": "Mostrar todas ({{total}})",
@@ -64,7 +66,9 @@
     "count": "{{channels}}, {{people}}",
     "channels_one": "{{count}} canal",
     "channels_other": "{{count}} canales",
+    "channels_many": "{{count}} canales",
     "people_one": "{{count}} persona",
-    "people_other": "{{count}} personas"
+    "people_other": "{{count}} personas",
+    "people_many": "{{count}} personas"
   }
 }
