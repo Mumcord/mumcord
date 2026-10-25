@@ -765,7 +765,8 @@ export type KnownGame = {
 	blocklist: BlocklistInfo | null,
 };
 
-export type Language = "en" | "es" | "de";
+/**  UI languages: the 24 official EU languages (FR-1.36), serialised as ISO 639-1 codes. */
+export type Language = "bg" | "cs" | "da" | "de" | "el" | "en" | "es" | "et" | "fi" | "fr" | "ga" | "hr" | "hu" | "it" | "lt" | "lv" | "mt" | "nl" | "pl" | "pt" | "ro" | "sk" | "sl" | "sv";
 
 /**  Preview card of a link. All text is plain text, never HTML. */
 export type LinkPreview = {

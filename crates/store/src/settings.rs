@@ -296,7 +296,8 @@ pub struct Settings {
     /// The first-start wizard was finished (FR-1.1).
     pub wizard_completed: bool,
     pub theme: ThemePreference,
-    /// UI language code (`en`, `es`, `de`); `None` follows the OS language.
+    /// UI language as ISO 639-1 code (one of the 24 official EU languages); `None` follows the OS
+    /// language. Kept as a plain string so unknown codes never break loading the settings file.
     pub language: Option<String>,
     pub talk_mode: TalkMode,
     pub voice_activation: VoiceActivation,

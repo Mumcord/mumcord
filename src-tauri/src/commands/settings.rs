@@ -15,12 +15,100 @@ pub enum Theme {
     Light,
 }
 
+/// UI languages: the 24 official EU languages (FR-1.36), serialised as ISO 639-1 codes.
 #[derive(Serialize, Deserialize, Clone, Copy, Debug, PartialEq, Eq, Type)]
 #[serde(rename_all = "camelCase")]
 pub enum Language {
+    Bg,
+    Cs,
+    Da,
+    De,
+    El,
     En,
     Es,
-    De,
+    Et,
+    Fi,
+    Fr,
+    Ga,
+    Hr,
+    Hu,
+    It,
+    Lt,
+    Lv,
+    Mt,
+    Nl,
+    Pl,
+    Pt,
+    Ro,
+    Sk,
+    Sl,
+    Sv,
+}
+
+impl Language {
+    const ALL: [Language; 24] = [
+        Language::Bg,
+        Language::Cs,
+        Language::Da,
+        Language::De,
+        Language::El,
+        Language::En,
+        Language::Es,
+        Language::Et,
+        Language::Fi,
+        Language::Fr,
+        Language::Ga,
+        Language::Hr,
+        Language::Hu,
+        Language::It,
+        Language::Lt,
+        Language::Lv,
+        Language::Mt,
+        Language::Nl,
+        Language::Pl,
+        Language::Pt,
+        Language::Ro,
+        Language::Sk,
+        Language::Sl,
+        Language::Sv,
+    ];
+
+    /// ISO 639-1 code as stored in the settings file.
+    fn code(self) -> &'static str {
+        match self {
+            Language::Bg => "bg",
+            Language::Cs => "cs",
+            Language::Da => "da",
+            Language::De => "de",
+            Language::El => "el",
+            Language::En => "en",
+            Language::Es => "es",
+            Language::Et => "et",
+            Language::Fi => "fi",
+            Language::Fr => "fr",
+            Language::Ga => "ga",
+            Language::Hr => "hr",
+            Language::Hu => "hu",
+            Language::It => "it",
+            Language::Lt => "lt",
+            Language::Lv => "lv",
+            Language::Mt => "mt",
+            Language::Nl => "nl",
+            Language::Pl => "pl",
+            Language::Pt => "pt",
+            Language::Ro => "ro",
+            Language::Sk => "sk",
+            Language::Sl => "sl",
+            Language::Sv => "sv",
+        }
+    }
+
+    /// Unknown codes (e.g. from a newer version) fall back to following the OS language.
+    fn from_code(code: &str) -> Option<Self> {
+        Self::ALL
+            .into_iter()
+            .find(|language| language.code() == code)
+    }
 }
 
 #[derive(Serialize, Deserialize, Clone, Copy, Debug, PartialEq, Eq, Type)]
@@ -218,12 +306,7 @@ impl Settings {
                 store::ThemePreference::Dark => Theme::Dark,
                 store::ThemePreference::Light => Theme::Light,
             },
-            language: s.language.as_deref().and_then(|l| match l {
-                "en" => Some(Language::En),
-                "es" => Some(Language::Es),
-                "de" => Some(Language::De),
-                _ => None,
-            }),
+            language: s.language.as_deref().and_then(Language::from_code),
             talk_mode: match s.talk_mode {
                 store::TalkMode::VoiceActivation => TalkMode::VoiceActivation,
                 store::TalkMode::PushToTalk => TalkMode::PushToTalk,
@@ -300,14 +383,7 @@ impl Settings {
             Theme::Dark => store::ThemePreference::Dark,
             Theme::Light => store::ThemePreference::Light,
         };
-        s.language = self.language.map(|l| {
-            match l {
-                Language::En => "en",
-                Language::Es => "es",
-                Language::De => "de",
-            }
-            .to_owned()
-        });
+        s.language = self.language.map(|l| l.code().to_owned());
         s.talk_mode = match self.talk_mode {
             TalkMode::VoiceActivation => store::TalkMode::VoiceActivation,
             TalkMode::PushToTalk => store::TalkMode::PushToTalk,
@@ -461,6 +537,22 @@ mod tests {
     use super::*;
 
     #[test]
+    fn every_language_code_round_trips_through_the_store() {
+        let base = store::Settings::default();
+        for language in Language::ALL {
+            let stored = Settings {
+                language: Some(language),
+                ..Settings::from_store(&base)
+            }
+            .to_store(&base);
+            assert_eq!(stored.language.as_deref(), Some(language.code()));
+            assert_eq!(Settings::from_store(&stored).language, Some(language));
+            let json = serde_json::to_string(&language).expect("serialise language");
+            assert_eq!(json, format!("\"{}\"", language.code()));
+        }
+    }
+
+    #[test]
     fn round_trip_keeps_stage_1b_fields() {
         let mut base = store::Settings::default();
         base.overlay.enabled = true;
@@ -555,7 +647,7 @@ mod tests {
     #[test]
     fn unknown_language_follows_os() {
         let s = store::Settings {
-            language: Some("fr".into()),
+            language: Some("nb".into()),
             ..store::Settings::default()
         };
         assert_eq!(Settings::from_store(&s).language, None);

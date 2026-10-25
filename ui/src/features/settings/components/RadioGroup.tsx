@@ -4,6 +4,8 @@ interface RadioOption<T extends string> {
   value: T;
   label: string;
   disabled?: boolean;
+  /** Language of the label when it differs from the UI, so screen readers pronounce it right. */
+  lang?: string;
 }
 
 interface RadioGroupProps<T extends string> {
@@ -25,7 +27,7 @@ export function RadioGroup<T extends string>({
     <fieldset className="settings-radios">
       <legend>{legend}</legend>
       {options.map((option) => (
-        <label key={option.value} className="settings-radios__option">
+        <label key={option.value} className="settings-radios__option" lang={option.lang}>
           <input
             type="radio"
             name={name}

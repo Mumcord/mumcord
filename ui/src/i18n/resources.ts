@@ -1,28 +1,99 @@
 import type { Language } from "../api";
 
-export const SUPPORTED_LANGUAGES = ["en", "es", "de"] as const satisfies readonly Language[];
+/** The 24 official EU languages (FR-1.36), ISO 639-1 codes as stored in the settings. */
+export const SUPPORTED_LANGUAGES = [
+  "bg",
+  "cs",
+  "da",
+  "de",
+  "el",
+  "en",
+  "es",
+  "et",
+  "fi",
+  "fr",
+  "ga",
+  "hr",
+  "hu",
+  "it",
+  "lt",
+  "lv",
+  "mt",
+  "nl",
+  "pl",
+  "pt",
+  "ro",
+  "sk",
+  "sl",
+  "sv",
+] as const satisfies readonly Language[];
+
+/** Each language's name in that language, so everyone finds theirs in the picker. */
+export const ENDONYMS: Record<Language, string> = {
+  bg: "Български",
+  cs: "Čeština",
+  da: "Dansk",
+  de: "Deutsch",
+  el: "Ελληνικά",
+  en: "English",
+  es: "Español",
+  et: "Eesti",
+  fi: "Suomi",
+  fr: "Français",
+  ga: "Gaeilge",
+  hr: "Hrvatski",
+  hu: "Magyar",
+  it: "Italiano",
+  lt: "Lietuvių",
+  lv: "Latviešu",
+  mt: "Malti",
+  nl: "Nederlands",
+  pl: "Polski",
+  pt: "Português",
+  ro: "Română",
+  sk: "Slovenčina",
+  sl: "Slovenščina",
+  sv: "Svenska",
+};
 
 export type TranslationTree = { [key: string]: string | TranslationTree };
-export type Resources = Record<Language, Record<string, TranslationTree>>;
+export type Bundles = Record<string, TranslationTree>;
 
 // Every `locales/<language>/<namespace>.json` is picked up automatically, so feature tasks only
-// add files. Eager loading keeps all three languages available for switching without restart.
-const files = import.meta.glob<TranslationTree>("../locales/*/*.json", {
+// add files. English is bundled into the start-up code because it is the fallback for missing
+// keys; the other 23 languages are separate chunks fetched on demand, so neither the main window
+// nor the in-game overlay parses two megabytes of translations it never shows.
+const englishFiles = import.meta.glob<TranslationTree>("../locales/en/*.json", {
   eager: true,
   import: "default",
 });
+const otherFiles = import.meta.glob<TranslationTree>(
+  ["../locales/*/*.json", "!../locales/en/*.json"],
+  { import: "default" },
+);
 
-function buildResources(): Resources {
-  const resources: Resources = { en: {}, es: {}, de: {} };
-  for (const [path, tree] of Object.entries(files)) {
-    const match = /\/locales\/(\w+)\/([\w-]+)\.json$/.exec(path);
-    const language = SUPPORTED_LANGUAGES.find((lang) => lang === match?.[1]);
-    const namespace = match?.[2];
-    if (!language || !namespace) throw new Error(`Unexpected translation file ${path}`);
-    resources[language][namespace] = tree;
-  }
-  return resources;
+function parsePath(path: string): { language: Language; namespace: string } {
+  const match = /\/locales\/(\w+)\/([\w-]+)\.json$/.exec(path);
+  const language = SUPPORTED_LANGUAGES.find((lang) => lang === match?.[1]);
+  const namespace = match?.[2];
+  if (!language || !namespace) throw new Error(`Unexpected translation file ${path}`);
+  return { language, namespace };
 }
 
-export const resources = buildResources();
-export const namespaces = Object.keys(resources.en);
+export const english: Bundles = Object.fromEntries(
+  Object.entries(englishFiles).map(([path, tree]) => [parsePath(path).namespace, tree]),
+);
+export const namespaces = Object.keys(english);
+
+/** All namespaces of one language; a language without files yields none (English fills in). */
+export async function loadBundles(language: Language): Promise<Bundles> {
+  if (language === "en") return english;
+  const entries = Object.entries(otherFiles).filter(
+    ([path]) => parsePath(path).language === language,
+  );
+  return Object.fromEntries(
+    await Promise.all(
+      entries.map(async ([path, load]) => [parsePath(path).namespace, await load()] as const),
+    ),
+  );
+}
