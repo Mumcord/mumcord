@@ -1132,3 +1132,13 @@ Findings (not legal advice): GIPHY requires a visible "Powered by GIPHY" mark wh
 ✍️ Note: Requested in chat during /dev.
 
 ---
+
+#### QA.54 Real in-game overlay (stage 1c)? `◉`
+Research: Discord and Overwolf inject code into the game and draw into its frames (works in exclusive fullscreen, but anti-cheat systems may flag it; Discord has no overlay on Linux/macOS). On Linux, MangoHud uses a Vulkan layer (plus an OpenGL preload) that games load themselves.
+
+- [x] **In-game overlay drawn inside the game: Linux via a Vulkan layer (MangoHud-style, with an OpenGL fallback via preload), Windows via a hook into the game's graphics API (Discord-style). It appears only in games – never on the desktop – and is configurable per game (on/off, position, size, opacity, content); games without an entry follow a default (off). A clear anti-cheat warning is shown before enabling it for a game.** The transparent on-top window (B32) remains the fallback where the in-game overlay is off or unsupported (macOS, unsupported graphics APIs).
+- [ ] Window overlay only.
+
+✍️ Note: Requested in chat during /dev ("auf linux wie mit mangohud, windows wie bei discord, aber pro spiel konfigurierbar und das soll auch nur in spielen passieren").
+
+---
