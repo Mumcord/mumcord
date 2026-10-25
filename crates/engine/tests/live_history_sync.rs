@@ -9,7 +9,7 @@ use std::time::Duration;
 use mumcord_bot::{Bot, BotConfig, UserCheck, env};
 use mumcord_engine::{
     ChatMessageView, Engine, EngineEvent, PasswordChange, SecretStore, ServerFields, ServerView,
-    Snapshot, SyncedMessage,
+    Snapshot,
 };
 use tokio::sync::mpsc::UnboundedReceiver;
 
@@ -67,7 +67,7 @@ async fn wait_message(rx: &mut UnboundedReceiver<EngineEvent>, contains: &str) -
 async fn wait_sync(
     rx: &mut UnboundedReceiver<EngineEvent>,
     channel: u32,
-) -> (Vec<SyncedMessage>, u32) {
+) -> (Vec<ChatMessageView>, u32) {
     let mut synced = Vec::new();
     let added = wait_for(rx, "history sync", |e| match e {
         EngineEvent::HistorySynced {
@@ -203,11 +203,30 @@ async fn late_joiner_receives_missed_lobby_messages() {
     connect(&b, &mut b_rx, &b_server).await;
     b.join_channel(lobby).expect("B joins Lobby");
     let (synced, added) = wait_sync(&mut b_rx, lobby).await;
-    let bodies: Vec<&str> = synced.iter().map(|m| m.message.body.as_str()).collect();
+    let bodies: Vec<&str> = synced.iter().map(|m| m.body.as_str()).collect();
     assert_eq!(bodies, ["first missed", "second missed", "third missed"]);
     assert_eq!(added, 3);
-    assert!(synced.iter().all(|m| m.holder_name == a_name));
-    assert!(synced.iter().all(|m| m.message.sender_name == bot_name));
+    assert!(
+        synced
+            .iter()
+            .all(|m| m.synced_from.as_deref() == Some(a_name.as_str()))
+    );
+    assert!(synced.iter().all(|m| m.sender_name == bot_name));
+    // The stored copies keep their origin, so the marker survives reopening the chat.
+    let stored = b
+        .history_load(
+            mumcord_engine::ConversationRef::Channel { channel_id: lobby },
+            None,
+            50,
+        )
+        .expect("history");
+    assert_eq!(
+        stored
+            .iter()
+            .filter(|m| m.synced_from.as_deref() == Some(a_name.as_str()))
+            .count(),
+        3
+    );
 
     // A message after B's join arrives live and is not synced again by "load earlier".
     bot.send_channel(Some("Lobby"), "live after join")

@@ -129,6 +129,7 @@ export function Wizard() {
       talkMode: choice.talkMode,
       pttKey: choice.pttKey,
       linkPreviews: choice.linkPreviews,
+      historySharing: choice.historySharing,
       wizardCompleted: true,
     });
     if (choice.autostart !== saved.autostart) {

@@ -327,7 +327,7 @@ pub enum EngineEvent {
     /// send-time order; insert them by `sent_at` (ties by order here).
     HistorySynced {
         channel_id: u32,
-        messages: Vec<crate::history_sync::SyncedMessage>,
+        messages: Vec<crate::chat::ChatMessageView>,
     },
     /// A history sync of a channel started (`running`) or ended with `added` new messages.
     HistorySyncStatus {

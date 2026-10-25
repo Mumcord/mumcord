@@ -70,6 +70,7 @@ function message(body: string, dismissedPreviews: string[] = []): ChatMessage {
     sentAt: new Date().toISOString(),
     body,
     dismissedPreviews,
+    syncedFrom: null,
   };
 }
 
@@ -83,6 +84,9 @@ function renderMessage(body: string, linkPreviews: boolean, dismissed: string[] 
           loading: false,
           hasMore: false,
           loadFailed: false,
+          syncing: false,
+          syncResult: null,
+          syncFailed: false,
         }}
         label="Messages in #Lobby"
         onLoadOlder={() => undefined}

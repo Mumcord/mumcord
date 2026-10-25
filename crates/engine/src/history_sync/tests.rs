@@ -7,10 +7,10 @@ use std::sync::{Mutex, MutexGuard};
 
 use mumcord_store::{Conversation, NewChatMessage, NewServer, ServerId, Store, UnixMillis};
 
-use super::SyncedMessage;
 use super::core::{Core, Env, MAX_AGE_MS, RequestError};
 use super::hash::{Content, content_hash};
 use super::wire::{self, Packet, WireMessage};
+use crate::chat::ChatMessageView;
 use crate::session::EngineEvent;
 
 const START: UnixMillis = 1_700_000_000_000;
@@ -176,7 +176,7 @@ impl Net {
         }
     }
 
-    fn synced(&self, session: u32) -> Vec<SyncedMessage> {
+    fn synced(&self, session: u32) -> Vec<ChatMessageView> {
         self.nodes[&session]
             .events
             .iter()
@@ -222,8 +222,8 @@ impl Net {
     }
 }
 
-fn bodies(messages: &[SyncedMessage]) -> Vec<&str> {
-    messages.iter().map(|m| m.message.body.as_str()).collect()
+fn bodies(messages: &[ChatMessageView]) -> Vec<&str> {
+    messages.iter().map(|m| m.body.as_str()).collect()
 }
 
 #[test]
@@ -262,8 +262,12 @@ fn a_late_joiner_gets_missed_channel_messages_but_no_private_ones() {
 
     let synced = net.synced(2);
     assert_eq!(bodies(&synced), ["one", "two", "three"]);
-    assert!(synced.iter().all(|m| m.holder_name == "user1"));
-    assert!(synced.iter().all(|m| !m.message.own));
+    assert!(
+        synced
+            .iter()
+            .all(|m| m.synced_from.as_deref() == Some("user1"))
+    );
+    assert!(synced.iter().all(|m| !m.own));
     assert_eq!(net.finished(2, LOBBY), Some(3));
     let stored = net.stored(2, LOBBY);
     assert_eq!(stored.len(), 3);
@@ -318,8 +322,14 @@ fn overlapping_holders_deliver_each_missing_message_once() {
         net.fetches(2, 1) == 1 && net.fetches(2, 3) == 1,
         "work is spread"
     );
-    let from_1 = synced.iter().filter(|m| m.holder_name == "user1").count();
-    let from_3 = synced.iter().filter(|m| m.holder_name == "user3").count();
+    let from_1 = synced
+        .iter()
+        .filter(|m| m.synced_from.as_deref() == Some("user1"))
+        .count();
+    let from_3 = synced
+        .iter()
+        .filter(|m| m.synced_from.as_deref() == Some("user3"))
+        .count();
     assert!(from_1 >= 1 && from_3 >= 1, "{from_1} / {from_3}");
 }
 
@@ -492,8 +502,124 @@ fn load_earlier_needs_a_live_channel_and_reaches_before_the_given_time() {
     let got: HashMap<_, _> = net
         .synced(2)
         .into_iter()
-        .map(|m| (m.message.body, m.holder_name))
+        .map(|m| (m.body, m.synced_from))
         .collect();
     assert_eq!(got.len(), 1);
     assert!(got.contains_key("older"));
+}
+
+#[test]
+fn copies_stamped_seconds_apart_by_skewed_clocks_are_not_duplicated() {
+    let mut net = Net::new(&[1, 2]);
+    net.place(1, &[LOBBY]);
+    let t = START - 60_000;
+    // Holder 1's clock runs 3 s ahead of the joiner's.
+    net.hold(1, LOBBY, 9, t + 3_000, "<b>seen</b> by both");
+    net.hold(1, LOBBY, 9, t + 20_000, "only at 1");
+    net.hold(2, LOBBY, 9, t, "seen by both");
+    // Same text, but too far apart to be the same message.
+    net.hold(1, LOBBY, 9, t + 40_000, "again");
+    net.hold(2, LOBBY, 9, t + 30_000, "again");
+
+    net.place(2, &[LOBBY]);
+    net.run(10_000);
+
+    let synced = net.synced(2);
+    let mut got = bodies(&synced);
+    got.sort_unstable();
+    assert_eq!(got, ["again", "only at 1"]);
+}
+
+#[test]
+fn skewed_holders_deliver_each_message_once_but_keep_repeats() {
+    let mut net = Net::new(&[1, 2, 3]);
+    net.place(1, &[LOBBY]);
+    net.place(3, &[LOBBY]);
+    let t = START - 60_000;
+    for (i, body) in ["a", "b", "ok", "ok"].iter().enumerate() {
+        let at = t + i64::try_from(i).unwrap_or(0) * 2_000;
+        net.hold(1, LOBBY, 9, at, body);
+        // Holder 3's clock runs 4 s behind holder 1's.
+        net.hold(3, LOBBY, 9, at - 4_000, body);
+    }
+
+    net.place(2, &[LOBBY]);
+    net.run(15_000);
+
+    let synced = net.synced(2);
+    let mut got = bodies(&synced);
+    got.sort_unstable();
+    assert_eq!(
+        got,
+        ["a", "b", "ok", "ok"],
+        "one copy each, the repeat kept"
+    );
+    assert_eq!(net.stored(2, LOBBY).len(), 4);
+}
+
+#[test]
+fn a_holder_leaving_mid_transfer_hands_its_share_to_another() {
+    let mut net = Net::new(&[1, 2, 3]);
+    net.place(1, &[LOBBY]);
+    net.place(3, &[LOBBY]);
+    for i in 0..6 {
+        let t = START - 60_000 + i * 1000;
+        let body = format!("m{i}");
+        net.hold(1, LOBBY, 9, t, &body);
+        net.hold(3, LOBBY, 9, t, &body);
+    }
+    net.place(2, &[LOBBY]);
+    let mut waited = 0;
+    while net.fetches(2, 3) == 0 {
+        assert!(waited < 10_000, "holder 3 was never asked");
+        net.run(100);
+        waited += 100;
+    }
+    // Holder 3 disconnects before sending anything.
+    net.nodes.remove(&3);
+    for node in net.nodes.values_mut() {
+        node.core.user_left(3);
+    }
+    net.run(15_000);
+
+    let synced = net.synced(2);
+    let mut got = bodies(&synced);
+    got.sort_unstable();
+    assert_eq!(got, ["m0", "m1", "m2", "m3", "m4", "m5"]);
+    assert!(
+        synced
+            .iter()
+            .all(|m| m.synced_from.as_deref() == Some("user1"))
+    );
+    assert_eq!(net.fetches(2, 1), 2, "the share of 3 came from 1");
+    assert_eq!(net.finished(2, LOBBY), Some(6));
+}
+
+#[test]
+fn a_silent_holder_times_out_and_its_share_is_fetched_elsewhere() {
+    let mut net = Net::new(&[1, 2, 3]);
+    net.place(1, &[LOBBY]);
+    net.place(3, &[LOBBY]);
+    for i in 0..4 {
+        let t = START - 60_000 + i * 1000;
+        let body = format!("m{i}");
+        net.hold(1, LOBBY, 9, t, &body);
+        net.hold(3, LOBBY, 9, t, &body);
+    }
+    net.place(2, &[LOBBY]);
+    let mut waited = 0;
+    while net.fetches(2, 3) == 0 {
+        assert!(waited < 10_000, "holder 3 was never asked");
+        net.run(100);
+        waited += 100;
+    }
+    // Holder 3 stays connected but stops answering.
+    let silent = net.nodes.remove(&3).expect("node 3");
+    net.run(40_000);
+    net.nodes.insert(3, silent);
+
+    let mut got: Vec<String> = net.synced(2).into_iter().map(|m| m.body).collect();
+    got.sort_unstable();
+    assert_eq!(got, ["m0", "m1", "m2", "m3"]);
+    assert_eq!(net.finished(2, LOBBY), Some(4));
 }

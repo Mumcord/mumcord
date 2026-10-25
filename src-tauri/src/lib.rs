@@ -90,6 +90,7 @@ fn specta_builder() -> Builder<tauri::Wry> {
             history::history_load,
             history::history_clear,
             history::history_set_saving,
+            history::history_sync_request,
             profile::set_own_avatar,
             profile::default_avatar_get,
             profile::default_avatar_set,
@@ -149,6 +150,8 @@ fn specta_builder() -> Builder<tauri::Wry> {
             people::UserRemoved,
             people::TalkStateChanged,
             chat::MessageReceived,
+            history::HistorySynced,
+            history::HistorySyncStatus,
             commands::full_image::FullImageProgress,
             follow::FollowedChannelsChanged,
             follow::UnreadChanged,
@@ -407,8 +410,24 @@ fn emit_engine_event(app: &AppHandle, event: EngineEvent) -> tauri::Result<()> {
             game: game.map(Into::into),
         }
         .emit(app),
-        // History sync (FR-1.60) reaches the UI in its own step; the store already has them.
-        EngineEvent::HistorySynced { .. } | EngineEvent::HistorySyncStatus { .. } => Ok(()),
+        EngineEvent::HistorySynced {
+            channel_id,
+            messages,
+        } => history::HistorySynced {
+            channel_id,
+            messages: messages.into_iter().map(Into::into).collect(),
+        }
+        .emit(app),
+        EngineEvent::HistorySyncStatus {
+            channel_id,
+            running,
+            added,
+        } => history::HistorySyncStatus {
+            channel_id,
+            running,
+            added,
+        }
+        .emit(app),
         EngineEvent::FullImageProgress {
             reference,
             received,

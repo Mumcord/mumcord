@@ -159,6 +159,11 @@
     "autoDeleteOff": "Nie (alles behalten)",
     "autoDeleteHint": "Ältere Nachrichten werden automatisch und ohne Nachfrage von diesem Computer gelöscht. Das betrifft nur den hier gespeicherten Verlauf, nicht den Server."
   },
+  "historySharing": {
+    "title": "Verlauf-Synchronisierung",
+    "switch": "Meinen Kanalverlauf teilen",
+    "hint": "Andere Mumcord-Nutzer, die einen Kanal betreten oder ihm folgen, können seine Nachrichten aus deinem gespeicherten Verlauf abrufen (bis zu 7 Tage, nur von vor ihrem Beitritt). Private Chats werden nie geteilt."
+  },
   "appearance": {
     "messageDisplay": "Nachrichtenanzeige",
     "messageDisplayLegend": "Layout der Chatnachrichten",

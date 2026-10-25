@@ -13,7 +13,17 @@
     "label": "Mensajes en {{name}}",
     "loadOlder": "Cargar mensajes anteriores",
     "loading": "Cargando mensajes…",
-    "loadFailed": "No se pudieron cargar los mensajes anteriores. Desplázate hacia arriba para reintentarlo."
+    "loadFailed": "No se pudieron cargar los mensajes anteriores. Desplázate hacia arriba para reintentarlo.",
+    "loadEarlier": "Cargar mensajes anteriores",
+    "syncing": "Buscando mensajes anteriores de otros usuarios de Mumcord…",
+    "syncAdded_one": "Se añadió {{count}} mensaje anterior de otros usuarios de Mumcord.",
+    "syncAdded_other": "Se añadieron {{count}} mensajes anteriores de otros usuarios de Mumcord.",
+    "syncNone": "No se encontraron mensajes anteriores.",
+    "syncFailed": "Aquí no se pueden cargar mensajes anteriores.",
+    "syncedFrom": "del historial de {{name}}",
+    "jumpToNewest": "Ir a lo más reciente",
+    "jumpToNewestUnseen_one": "Ir a lo más reciente, {{count}} mensaje nuevo",
+    "jumpToNewestUnseen_other": "Ir a lo más reciente, {{count}} mensajes nuevos"
   },
   "format": {
     "toolbar": "Formato",

@@ -5,7 +5,10 @@
 //! [`DISCOVER_MS`], ask the [`MAX_HOLDERS`] largest holders for their hash lists (`hreq`),
 //! subtract what is already stored (±1 s, see [`super::hash`]), assign every missing hash to
 //! exactly one holder (spread evenly) and fetch it (`get`). Received messages are checked
-//! against the requested hashes, sanitized, deduplicated again and inserted.
+//! against the requested hashes, sanitized, deduplicated again (by hash, and by sender and
+//! text within [`SKEW_MS`] for clients with skewed clocks) and inserted. When a holder drops
+//! out mid-transfer, the messages it still owed are fetched from another holder that has
+//! them (after asking it for a fresh hash list).
 //!
 //! **Answering** (only while the "share history" setting is on): channel messages only,
 //! never private chats, and only up to the moment the requester started receiving that
@@ -24,14 +27,16 @@ use std::sync::MutexGuard;
 
 use mumcord_store::{ChatMessage, Conversation, NewChatMessage, ServerId, Store, UnixMillis};
 
-use super::SyncedMessage;
-use super::hash::{Content, content_hash, variants};
+use super::hash::{Content, content_hash, text_key, variants};
 use super::wire::{self, Hash, MAX_MESSAGES, Packet, WireMessage};
 use crate::chat::{ChatMessageView, sanitize_message_html, transient_id};
 use crate::session::{ConversationRef, EngineEvent};
 
 /// How far back a sync reaches (FR-1.60).
 pub const MAX_AGE_MS: i64 = 7 * 24 * 60 * 60 * 1000;
+/// Messages with the same channel, sender and text stamped at most this far apart are the
+/// same message: clients stamp messages with their own clocks, which may be off by seconds.
+pub const SKEW_MS: i64 = 5000;
 /// How long summaries are collected after asking.
 pub const DISCOVER_MS: i64 = 1500;
 /// A holder that stops sending its hash list for this long is given up.
@@ -167,9 +172,40 @@ enum Stage {
     Transfer {
         holders: Vec<Holder>,
         planned: bool,
-        /// Hashes (all ±1 s variants) of the messages already stored or received.
-        known: HashSet<Hash>,
+        /// The messages already stored or received.
+        known: Known,
+        /// Hashes owed by holders that dropped out, waiting for another holder.
+        orphans: HashSet<Hash>,
     },
+}
+
+/// What is already here, for deduplication.
+#[derive(Default)]
+struct Known {
+    /// Hashes (all ±1 s variants).
+    hashes: HashSet<Hash>,
+    /// Send times by [`text_key`], to match copies stamped up to [`SKEW_MS`] apart.
+    texts: HashMap<Hash, Vec<UnixMillis>>,
+}
+
+impl Known {
+    fn add(&mut self, content: &Content<'_>) {
+        self.hashes.extend(variants(content));
+        self.add_text(text_key(content), content.sent_at);
+    }
+
+    fn add_text(&mut self, key: Hash, sent_at: UnixMillis) {
+        self.texts.entry(key).or_default().push(sent_at);
+    }
+
+    fn contains(&self, hash: &Hash, content: &Content<'_>) -> bool {
+        self.hashes.contains(hash)
+            || self.texts.get(&text_key(content)).is_some_and(|times| {
+                times
+                    .iter()
+                    .any(|t| t.abs_diff(content.sent_at) <= SKEW_MS.unsigned_abs())
+            })
+    }
 }
 
 struct Holder {
@@ -177,6 +213,24 @@ struct Holder {
     req: u32,
     deadline: UnixMillis,
     state: HolderState,
+    /// Its latest complete hash list, to find a replacement for a holder that dropped out.
+    list: Vec<Hash>,
+}
+
+impl Holder {
+    /// Gives up on this holder; what it still owed goes to another one.
+    fn drop_out(&mut self) {
+        let orphans = match std::mem::replace(
+            &mut self.state,
+            HolderState::Dropped {
+                orphans: HashSet::new(),
+            },
+        ) {
+            HolderState::Fetching { wanted, .. } => wanted,
+            _ => HashSet::new(),
+        };
+        self.state = HolderState::Dropped { orphans };
+    }
 }
 
 enum HolderState {
@@ -192,7 +246,12 @@ enum HolderState {
         stream: Vec<u8>,
         next: u16,
     },
+    /// Delivered everything asked for (or had nothing to give).
     Done,
+    /// Left, timed out, denied or sent garbage; `orphans` are the hashes it still owed.
+    Dropped {
+        orphans: HashSet<Hash>,
+    },
 }
 
 /// An answer waiting for the requester's `get`.
@@ -273,7 +332,7 @@ impl Core {
         }) = self.job.as_mut()
         {
             for holder in holders.iter_mut().filter(|h| h.session == session) {
-                holder.state = HolderState::Done;
+                holder.drop_out();
             }
         }
     }
@@ -335,8 +394,11 @@ impl Core {
             Some(Stage::Transfer { holders, .. }) => {
                 for holder in holders.iter_mut().filter(|h| now >= h.deadline) {
                     // Listed holders wait for the others; nothing more is expected from them.
-                    if !matches!(holder.state, HolderState::Listed { .. }) {
-                        holder.state = HolderState::Done;
+                    if matches!(
+                        holder.state,
+                        HolderState::Listing { .. } | HolderState::Fetching { .. }
+                    ) {
+                        holder.drop_out();
                     }
                 }
                 None
@@ -435,7 +497,7 @@ impl Core {
             self.finish();
             return;
         }
-        let known = known_hashes(env, &key, from, to);
+        let known = known_messages(env, &key, from, to);
         let mut holders = Vec::new();
         for (session, _) in offers {
             let req = self.take_req();
@@ -456,6 +518,7 @@ impl Core {
                     hashes: Vec::new(),
                     next: 0,
                 },
+                list: Vec::new(),
             });
         }
         if let Some(job) = self.job.as_mut() {
@@ -463,18 +526,22 @@ impl Core {
                 holders,
                 planned: false,
                 known,
+                orphans: HashSet::new(),
             };
         }
     }
 
-    /// Plans the fetch once every hash list is in, and ends the job when all are done.
+    /// Plans the fetch once every hash list is in, hands what dropped-out holders owed to
+    /// another holder, and ends the job when all are done.
     fn advance(&mut self, now: UnixMillis) {
         let mut fetches = Vec::new();
+        let mut relist = None;
         let done = match self.job.as_mut().map(|j| &mut j.stage) {
             Some(Stage::Transfer {
                 holders,
                 planned,
                 known,
+                orphans,
             }) => {
                 if !*planned
                     && holders
@@ -482,18 +549,60 @@ impl Core {
                         .all(|h| !matches!(h.state, HolderState::Listing { .. }))
                 {
                     *planned = true;
-                    fetches = plan_fetch(holders, known, now);
+                    fetches = plan_fetch(holders, &known.hashes, now);
                 }
-                *planned && holders.iter().all(|h| matches!(h.state, HolderState::Done))
+                if *planned {
+                    fetches.extend(reassign(holders, orphans, now));
+                    relist = replacement(holders, orphans);
+                }
+                *planned
+                    && relist.is_none()
+                    && holders
+                        .iter()
+                        .all(|h| matches!(h.state, HolderState::Done | HolderState::Dropped { .. }))
             }
             _ => false,
         };
         for (holder, packet) in fetches {
             self.outbox.push(vec![holder], &packet);
         }
+        if let Some(at) = relist {
+            self.relist(at, now);
+        }
         if done {
             self.finish();
         }
+    }
+
+    /// Asks the holder at `at` for a fresh hash list, to fetch the orphans it has.
+    fn relist(&mut self, at: usize, now: UnixMillis) {
+        let req = self.take_req();
+        let Some(Job {
+            channel,
+            from,
+            to,
+            stage: Stage::Transfer { holders, .. },
+            ..
+        }) = self.job.as_mut()
+        else {
+            return;
+        };
+        let holder = &mut holders[at];
+        tracing::debug!("history sync: asking another holder for what a dropped one owed");
+        holder.req = req;
+        holder.deadline = now + LIST_TIMEOUT_MS;
+        holder.state = HolderState::Listing {
+            hashes: Vec::new(),
+            next: 0,
+        };
+        let packet = Packet::HashRequest {
+            req,
+            channel: *channel,
+            from: *from,
+            to: *to,
+        };
+        let session = holder.session;
+        self.outbox.push(vec![session], &packet);
     }
 
     /// A packet from another person.
@@ -568,7 +677,7 @@ impl Core {
             }
             Packet::Deny { req } => {
                 if let Some(holder) = self.holder(sender, req) {
-                    holder.state = HolderState::Done;
+                    holder.drop_out();
                 }
                 self.advance(now);
             }
@@ -610,6 +719,9 @@ impl Core {
             }
         };
         let mut accepted: Vec<(Hash, NewChatMessage)> = Vec::new();
+        // Text keys of this batch join `known` only afterwards: one holder's repeated
+        // message ("ok", "ok") is two messages, while another source's copy is a duplicate.
+        let mut texts = Vec::new();
         for m in messages.into_iter().take(wanted.len()) {
             if m.ts < job.from || m.ts >= job.to || m.b.len() > MAX_BODY {
                 continue;
@@ -626,10 +738,11 @@ impl Core {
             };
             let hash = content_hash(&content);
             // Only what was asked for, each at most once; and nothing already here.
-            if !wanted.remove(&hash) || known.contains(&hash) {
+            if !wanted.remove(&hash) || known.contains(&hash, &content) {
                 continue;
             }
-            known.extend(variants(&content));
+            known.hashes.extend(variants(&content));
+            texts.push((text_key(&content), m.ts));
             let Some(name) = crate::web::meta::clean(&m.n, MAX_NAME) else {
                 continue;
             };
@@ -644,11 +757,14 @@ impl Core {
                 },
             ));
         }
+        for (key, sent_at) in texts {
+            known.add_text(key, sent_at);
+        }
         if accepted.is_empty() {
             return;
         }
         accepted.sort_by_key(|(hash, m)| (m.sent_at, *hash));
-        let messages: Vec<SyncedMessage> = {
+        let messages: Vec<ChatMessageView> = {
             let store = env.store();
             accepted
                 .into_iter()
@@ -660,21 +776,19 @@ impl Core {
                             None
                         })
                         .map_or_else(transient_id, |id| id.to_string());
-                    SyncedMessage {
-                        message: ChatMessageView {
-                            id,
-                            conversation: ConversationRef::Channel {
-                                channel_id: job.channel,
-                            },
-                            own: own_cert.is_some() && new.sender_cert_hash == own_cert,
-                            sender_name: new.sender_name,
-                            sender_cert_hash: new.sender_cert_hash,
-                            sender_session: None,
-                            sent_at: new.sent_at,
-                            body: new.body,
-                            dismissed_previews: Vec::new(),
+                    ChatMessageView {
+                        id,
+                        conversation: ConversationRef::Channel {
+                            channel_id: job.channel,
                         },
-                        holder_name: holder_name.clone(),
+                        own: own_cert.is_some() && new.sender_cert_hash == own_cert,
+                        sender_name: new.sender_name,
+                        sender_cert_hash: new.sender_cert_hash,
+                        sender_session: None,
+                        sent_at: new.sent_at,
+                        body: new.body,
+                        dismissed_previews: Vec::new(),
+                        synced_from: Some(holder_name.clone()),
                     }
                 })
                 .collect()
@@ -876,25 +990,27 @@ fn stored_content<'a>(key: &'a str, m: &'a ChatMessage) -> Content<'a> {
     }
 }
 
-/// All ±1 s hash variants of the stored messages around `[from, to)`.
-fn known_hashes(env: &impl Env, key: &str, from: UnixMillis, to: UnixMillis) -> HashSet<Hash> {
+/// The stored messages around `[from, to)`.
+fn known_messages(env: &impl Env, key: &str, from: UnixMillis, to: UnixMillis) -> Known {
     let rows = env.store().messages_between(
         env.server_id(),
         &Conversation::Channel(key.to_owned()),
-        from - 2000,
-        to.saturating_add(2000),
+        from - SKEW_MS - 1000,
+        to.saturating_add(SKEW_MS + 1000),
         MAX_KNOWN,
     );
+    let mut known = Known::default();
     match rows {
-        Ok(rows) => rows
-            .iter()
-            .flat_map(|m| variants(&stored_content(key, m)))
-            .collect(),
+        Ok(rows) => {
+            for m in &rows {
+                known.add(&stored_content(key, m));
+            }
+        }
         Err(e) => {
             tracing::warn!(error = %e, "history sync: reading stored messages failed");
-            HashSet::new()
         }
     }
+    known
 }
 
 fn is_cert_hash(value: &str) -> bool {
@@ -906,7 +1022,7 @@ fn receive_hashes(holder: &mut Holder, index: u16, last: bool, chunk: Vec<Hash>,
         return;
     };
     if index != *next || hashes.len() + chunk.len() > MAX_MESSAGES {
-        holder.state = HolderState::Done;
+        holder.drop_out();
         return;
     }
     hashes.extend(chunk);
@@ -936,7 +1052,7 @@ fn receive_part(
         return None;
     };
     if index != *next || stream.len() + data.len() > MAX_STREAM {
-        holder.state = HolderState::Done;
+        holder.drop_out();
         return None;
     }
     stream.extend(data);
@@ -957,7 +1073,7 @@ fn plan_fetch(
     known: &HashSet<Hash>,
     now: UnixMillis,
 ) -> Vec<(u32, Packet)> {
-    let lists: Vec<Vec<Hash>> = holders
+    let mut lists: Vec<Vec<Hash>> = holders
         .iter()
         .map(|h| match &h.state {
             HolderState::Listed { hashes } => hashes.clone(),
@@ -995,6 +1111,7 @@ fn plan_fetch(
     }
     let mut packets = Vec::new();
     for (h, holder) in holders.iter_mut().enumerate() {
+        holder.list = std::mem::take(&mut lists[h]);
         if assigned[h].is_empty() {
             holder.state = HolderState::Done;
             continue;
@@ -1003,7 +1120,7 @@ fn plan_fetch(
             holder.session,
             Packet::Fetch {
                 req: holder.req,
-                wanted: wire::bitmap(lists[h].len(), assigned[h].iter().copied()),
+                wanted: wire::bitmap(holder.list.len(), assigned[h].iter().copied()),
             },
         ));
         holder.state = HolderState::Fetching {
@@ -1014,4 +1131,65 @@ fn plan_fetch(
         holder.deadline = now + FETCH_IDLE_MS;
     }
     packets
+}
+
+/// Collects what dropped-out holders owed into `orphans`, and fetches the orphans that a
+/// re-listed holder has from it.
+fn reassign(
+    holders: &mut [Holder],
+    orphans: &mut HashSet<Hash>,
+    now: UnixMillis,
+) -> Vec<(u32, Packet)> {
+    let mut packets = Vec::new();
+    for holder in holders.iter_mut() {
+        match &mut holder.state {
+            HolderState::Dropped { orphans: owed } => orphans.extend(owed.drain()),
+            HolderState::Listed { hashes } => {
+                holder.list = std::mem::take(hashes);
+                let picks: Vec<usize> = (0..holder.list.len())
+                    .filter(|&k| orphans.remove(&holder.list[k]))
+                    .collect();
+                if picks.is_empty() {
+                    holder.state = HolderState::Done;
+                    continue;
+                }
+                packets.push((
+                    holder.session,
+                    Packet::Fetch {
+                        req: holder.req,
+                        wanted: wire::bitmap(holder.list.len(), picks.iter().copied()),
+                    },
+                ));
+                holder.state = HolderState::Fetching {
+                    wanted: picks.iter().map(|&k| holder.list[k]).collect(),
+                    stream: Vec::new(),
+                    next: 0,
+                };
+                holder.deadline = now + FETCH_IDLE_MS;
+            }
+            _ => {}
+        }
+    }
+    packets
+}
+
+/// The finished holder that has most of the orphans, to ask for a fresh hash list (its
+/// earlier answer is used up). `None` while another holder is being re-listed or no
+/// finished holder has any of them; orphans nobody can serve are given up with the job.
+fn replacement(holders: &[Holder], orphans: &HashSet<Hash>) -> Option<usize> {
+    if orphans.is_empty()
+        || holders
+            .iter()
+            .any(|h| matches!(h.state, HolderState::Listing { .. }))
+    {
+        return None;
+    }
+    holders
+        .iter()
+        .enumerate()
+        .filter(|(_, h)| matches!(h.state, HolderState::Done))
+        .map(|(at, h)| (h.list.iter().filter(|x| orphans.contains(*x)).count(), at))
+        .filter(|&(count, _)| count > 0)
+        .max()
+        .map(|(_, at)| at)
 }

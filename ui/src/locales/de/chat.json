@@ -13,7 +13,17 @@
     "label": "Nachrichten in {{name}}",
     "loadOlder": "Ältere Nachrichten laden",
     "loading": "Nachrichten werden geladen…",
-    "loadFailed": "Ältere Nachrichten konnten nicht geladen werden. Scrolle nach oben, um es erneut zu versuchen."
+    "loadFailed": "Ältere Nachrichten konnten nicht geladen werden. Scrolle nach oben, um es erneut zu versuchen.",
+    "loadEarlier": "Frühere Nachrichten laden",
+    "syncing": "Suche frühere Nachrichten bei anderen Mumcord-Nutzern…",
+    "syncAdded_one": "{{count}} frühere Nachricht von anderen Mumcord-Nutzern hinzugefügt.",
+    "syncAdded_other": "{{count}} frühere Nachrichten von anderen Mumcord-Nutzern hinzugefügt.",
+    "syncNone": "Keine früheren Nachrichten gefunden.",
+    "syncFailed": "Frühere Nachrichten können hier nicht geladen werden.",
+    "syncedFrom": "aus dem Verlauf von {{name}}",
+    "jumpToNewest": "Zu den neuesten springen",
+    "jumpToNewestUnseen_one": "Zu den neuesten springen, {{count}} neue Nachricht",
+    "jumpToNewestUnseen_other": "Zu den neuesten springen, {{count}} neue Nachrichten"
   },
   "format": {
     "toolbar": "Formatierung",

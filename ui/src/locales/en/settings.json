@@ -159,6 +159,11 @@
     "autoDeleteOff": "Never (keep everything)",
     "autoDeleteHint": "Older messages are deleted from this computer automatically, without asking. This only affects the history saved here, not the server."
   },
+  "historySharing": {
+    "title": "History sync",
+    "switch": "Share my channel history",
+    "hint": "Other Mumcord users who join or follow a channel can fetch its messages from your saved history (up to 7 days, only from before they joined). Private chats are never shared."
+  },
   "appearance": {
     "messageDisplay": "Message display",
     "messageDisplayLegend": "Chat message layout",

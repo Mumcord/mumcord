@@ -30,6 +30,7 @@ function message(id: string, sender: string, minutesAgo: number, body: string): 
     sentAt: new Date(NOW.getTime() - minutesAgo * 60_000).toISOString(),
     body,
     dismissedPreviews: [],
+    syncedFrom: null,
   };
 }
 
@@ -43,7 +44,16 @@ function renderList(display: ChatDisplay, messages = MESSAGES) {
   return render(
     <main>
       <MessageList
-        log={{ messages, loaded: true, loading: false, hasMore: false, loadFailed: false }}
+        log={{
+          messages,
+          loaded: true,
+          loading: false,
+          hasMore: false,
+          loadFailed: false,
+          syncing: false,
+          syncResult: null,
+          syncFailed: false,
+        }}
         label="Messages in #Lobby"
         onLoadOlder={() => undefined}
         display={display}
@@ -65,7 +75,16 @@ describe("MessageList profile preview", () => {
     ];
     const { container } = render(
       <MessageList
-        log={{ messages, loaded: true, loading: false, hasMore: false, loadFailed: false }}
+        log={{
+          messages,
+          loaded: true,
+          loading: false,
+          hasMore: false,
+          loadFailed: false,
+          syncing: false,
+          syncResult: null,
+          syncFailed: false,
+        }}
         label="Messages in #Lobby"
         onLoadOlder={() => undefined}
         clickablePeople
@@ -93,7 +112,16 @@ describe("MessageList profile preview", () => {
       const messages = [message("1", "Ghost", 5, "boo")];
       const { container } = render(
         <MessageList
-          log={{ messages, loaded: true, loading: false, hasMore: false, loadFailed: false }}
+          log={{
+            messages,
+            loaded: true,
+            loading: false,
+            hasMore: false,
+            loadFailed: false,
+            syncing: false,
+            syncResult: null,
+            syncFailed: false,
+          }}
           label="Messages"
           onLoadOlder={() => undefined}
           display={display}
@@ -209,6 +237,9 @@ describe("MessageList mention chips", () => {
           loading: false,
           hasMore: false,
           loadFailed: false,
+          syncing: false,
+          syncResult: null,
+          syncFailed: false,
         }}
         label="Messages in #Lobby"
         onLoadOlder={() => undefined}

@@ -23,21 +23,13 @@ use tokio::runtime::Handle as Runtime;
 use tokio::task::JoinHandle;
 
 use self::core::{Core, Env, RequestError};
-use crate::chat::{ChatMessageView, now_millis};
+use crate::chat::now_millis;
 use crate::session::convert::join_path;
 use crate::session::{Engine, EngineError, EngineResult, ErrorKind, SessionCtx, lock};
 pub use wire::DATA_ID;
 
 /// How often timeouts are checked and queued packets go out.
 const TICK: Duration = Duration::from_millis(100);
-
-/// A message that came from another person's history.
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct SyncedMessage {
-    pub message: ChatMessageView,
-    /// Display name of the person whose history it came from ("from ‹name›'s history").
-    pub holder_name: String,
-}
 
 /// The engine's history sync state; one [`Core`] per connection.
 #[derive(Default)]

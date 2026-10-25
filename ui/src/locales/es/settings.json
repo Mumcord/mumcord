@@ -159,6 +159,11 @@
     "autoDeleteOff": "Nunca (conservar todo)",
     "autoDeleteHint": "Los mensajes más antiguos se eliminan de este equipo automáticamente, sin preguntar. Solo afecta al historial guardado aquí, no al servidor."
   },
+  "historySharing": {
+    "title": "Sincronización del historial",
+    "switch": "Compartir mi historial de canales",
+    "hint": "Otros usuarios de Mumcord que entren o sigan un canal pueden obtener sus mensajes de tu historial guardado (hasta 7 días, solo de antes de que entraran). Los chats privados nunca se comparten."
+  },
   "appearance": {
     "messageDisplay": "Visualización de mensajes",
     "messageDisplayLegend": "Diseño de los mensajes del chat",

@@ -83,6 +83,8 @@
     "autostartFailed": "Mumcord konnte nicht für den Start beim Anmelden eingerichtet werden. Du kannst es in den Einstellungen erneut versuchen.",
     "linkPreviews": "Linkvorschauen und eingebettete Videos anzeigen",
     "linkPreviewsHint": "Mumcord lädt verlinkte Seiten für Vorschauen und Videoplayer; diese Seiten sehen deine IP-Adresse.",
+    "historySharing": "Meinen Kanalverlauf teilen",
+    "historySharingHint": "Andere Mumcord-Nutzer, die nach dir einen Kanal betreten, sehen seine früheren Nachrichten aus deinem gespeicherten Verlauf (bis zu 7 Tage). Private Chats werden nie geteilt. Du kannst das später unter Einstellungen → Chat & Verlauf ändern.",
     "ingameOverlay": "Overlay im Spiel anzeigen",
     "ingameOverlayHint": "Zeigt direkt im Spiel an, wer spricht (Linux). Du kannst es später in den Einstellungen pro Spiel ein- oder ausschalten.",
     "ingameOverlayWarning": "Manche Spiele mit Anti-Cheat können In-Game-Overlays melden oder blockieren. Mumcord lässt bekannt riskante Spiele (etwa Valorant oder League of Legends) standardmäßig aus. Aktiviere es nur für Spiele, denen du vertraust.",

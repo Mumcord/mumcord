@@ -15,6 +15,7 @@ import {
   conversationKey,
   ensureLoaded,
   loadOlder,
+  requestSync,
   subscribeIncoming,
   useConversationLog,
 } from "./chatStore";
@@ -174,6 +175,13 @@ function ConversationChat({ conversation, renderHeaderActions }: ConversationCha
         onLoadOlder={() => {
           void loadOlder(conversation);
         }}
+        onSyncEarlier={
+          conversation.kind === "channel"
+            ? () => {
+                void requestSync(conversation);
+              }
+            : undefined
+        }
         clickablePeople
         display={display}
         avatarFor={avatarFor}

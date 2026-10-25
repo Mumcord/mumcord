@@ -26,6 +26,9 @@ pub struct ChatMessage {
     pub body: String,
     /// Links whose preview card was dismissed by the user (`preview_dismiss`).
     pub dismissed_previews: Vec<String>,
+    /// Name of the person whose history this message was synced from (FR-1.60); `null` for
+    /// messages received or sent here. Show "from ‹name›'s history".
+    pub synced_from: Option<String>,
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, Type, Event)]
@@ -68,6 +71,7 @@ impl From<ChatMessageView> for ChatMessage {
             sent_at: rfc3339(v.sent_at),
             body: v.body,
             dismissed_previews: v.dismissed_previews,
+            synced_from: v.synced_from,
         }
     }
 }
