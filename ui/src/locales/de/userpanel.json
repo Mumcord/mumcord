@@ -77,6 +77,8 @@
     "registered": "Auf diesem Server registriert ✓",
     "registerHint": "Behält deinen Namen und Avatar auf diesem Server",
     "allSettings": "Alle Einstellungen…",
-    "label": "Schnelleinstellungen"
+    "label": "Schnelleinstellungen",
+    "positional": "Positionsabhängiger Ton",
+    "positionalHint": "Stimmen werden in 3D um dich verteilt"
   }
 }

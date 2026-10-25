@@ -77,6 +77,8 @@
     "registered": "Registrado en este servidor ✓",
     "registerHint": "Conserva tu nombre y avatar en este servidor",
     "allSettings": "Todos los ajustes…",
-    "label": "Ajustes rápidos"
+    "label": "Ajustes rápidos",
+    "positional": "Audio posicional",
+    "positionalHint": "Voces colocadas en 3D a tu alrededor"
   }
 }

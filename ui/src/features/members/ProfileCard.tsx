@@ -22,6 +22,7 @@ import { useServerState } from "../channels/serverStore";
 import { setFriend, useFriend } from "../friends";
 import { MumcordBadge } from "../channels/MumcordBadge";
 import { NowGamingFor } from "../nowgaming";
+import { PositionalBadge } from "../positional";
 import { NowPlayingFor } from "../nowplaying";
 import "./members.css";
 import { Avatar } from "./Avatar";
@@ -198,6 +199,7 @@ function ProfileBody({
         <h2 id={titleId} className="profile-card__name">
           {user.name}
           <MumcordBadge user={user} />
+          <PositionalBadge session={user.session} />
         </h2>
         <p className="profile-card__meta">
           {user.registered ? t("registered") : t("unregistered")}
