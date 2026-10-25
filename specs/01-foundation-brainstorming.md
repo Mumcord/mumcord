@@ -1304,7 +1304,17 @@ Requested for stage 1c (positional audio).
 Decided before the v0.3.0 release.
 
 - [x] **Beta:** positional audio and the game plugins carry a "Beta" badge in settings and quick settings, with a short hint that results depend on the game.
+- [x] **Full-size images on demand are Beta too:** a "Beta" badge in the image viewer next to the full-size loading/status line.
 - [x] **Communication:** release notes and wiki call both Beta and say the in-game overlay on Windows is coming later; until then Windows uses the window overlay.
+
+✍️ Note: Requested in chat during /dev.
+
+---
+
+#### QA.72 Switch off full-size images? `◉`
+Requested before the v0.3.0 release.
+
+- [x] **Two switches in Settings → Chat:** "Offer my full-size images" (off: only the thumbnail is sent, no original is kept or served) and "Load full-size images from others" (off: never request originals). Both on by default.
 
 ✍️ Note: Requested in chat during /dev.
 
