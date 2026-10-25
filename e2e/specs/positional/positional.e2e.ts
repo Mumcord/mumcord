@@ -78,6 +78,9 @@ async function openQuickSettings(): Promise<ReturnType<typeof $>> {
   const button = $("button[aria-label='Quick settings']");
   await button.waitForClickable();
   await button.click();
+  // Positional audio sits in the collapsible Beta group, which remembers whether it was open.
+  const beta = $("//button[@role='menuitem'][@aria-expanded][contains(., 'Beta')]");
+  if ((await beta.getAttribute("aria-expanded")) === "false") await beta.click();
   const row = $("//button[@role='menuitemcheckbox'][contains(., 'Positional audio')]");
   await row.waitForDisplayed();
   return row;
