@@ -1158,3 +1158,13 @@ Research: Discord and Overwolf inject code into the game and draw into its frame
 ✍️ Note: Requested in chat during /dev.
 
 ---
+
+#### QA.57 Thumbnail in the chat, full image in the viewer (stage 1d)? `◉`
+The server's image message limit (default 128 KB) caps what can be sent through the chat.
+
+- [x] **Stage 1d: the sender's Mumcord sends a thumbnail through the chat (fits the server limit; what official clients see) and keeps the full image locally. When a Mumcord recipient opens it in the image viewer, Mumcord fetches the full-resolution image from the sender on demand via plugin data (chunked, size-capped, rate-limited, checked against a hash announced with the message); while loading, the thumbnail is shown upscaled with a progress hint. If the sender is offline or the transfer fails, the viewer keeps the thumbnail.** A peer-to-peer transfer can replace the plugin-data path later.
+- [ ] Thumbnail only.
+
+✍️ Note: Requested in chat during /dev.
+
+---
