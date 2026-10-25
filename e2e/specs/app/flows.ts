@@ -247,7 +247,8 @@ export async function settingsTab(index: number): Promise<string> {
 export async function chooseRadio(value: string): Promise<void> {
   await tabTo((f) => f.tag === "input" && f.type === "radio" && groupHas(value), `radio group with ${value}`);
   for (const key of ["ArrowDown", "ArrowUp"]) {
-    for (let i = 0; i < 4; i++) {
+    // The language picker has 25 options; arrow keys wrap around, so this reaches every one.
+    for (let i = 0; i < 25; i++) {
       if ((await focus()).value === value) return;
       await browser.keys([key]);
     }
