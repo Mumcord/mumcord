@@ -11,6 +11,7 @@
 //!   is implemented and verified on Windows.
 //! - **macOS:** no overlay at all (QA.58); [`SUPPORTED`] is false.
 
+#[cfg(target_os = "linux")]
 mod manifest;
 mod scene;
 #[cfg(target_os = "linux")]

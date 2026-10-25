@@ -9,6 +9,7 @@ mod display;
 mod ingame_overlay;
 #[cfg(target_os = "linux")]
 mod kde_x11;
+#[cfg(target_os = "linux")]
 mod kwin_rule;
 mod notifications;
 mod now_gaming;

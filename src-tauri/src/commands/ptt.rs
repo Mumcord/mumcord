@@ -121,6 +121,7 @@ pub struct KdeX11Access {
     pub undo_available: bool,
 }
 
+#[cfg(target_os = "linux")]
 impl From<crate::kde_x11::Access> for KdeX11Access {
     fn from(a: crate::kde_x11::Access) -> Self {
         Self {
@@ -130,6 +131,7 @@ impl From<crate::kde_x11::Access> for KdeX11Access {
     }
 }
 
+#[cfg(target_os = "linux")]
 /// Where the values from before Mumcord's change are kept, so it can be undone.
 fn kde_x11_undo_file(app: &AppHandle) -> ApiResult<std::path::PathBuf> {
     let dir = app
@@ -140,11 +142,16 @@ fn kde_x11_undo_file(app: &AppHandle) -> ApiResult<std::path::PathBuf> {
     Ok(dir.join("kde-x11-mouse-undo"))
 }
 
+fn not_kde() -> ApiError {
+    ApiError::new(ErrorCode::InvalidInput, "not KDE Plasma")
+}
+
+#[cfg(target_os = "linux")]
 fn require_kde() -> ApiResult<()> {
     if crate::overlay::kde() {
         Ok(())
     } else {
-        Err(ApiError::new(ErrorCode::InvalidInput, "not KDE Plasma"))
+        Err(not_kde())
     }
 }
 
@@ -153,10 +160,18 @@ fn require_kde() -> ApiResult<()> {
 #[tauri::command]
 #[specta::specta]
 pub fn ptt_kde_x11_access(app: AppHandle) -> ApiResult<KdeX11Access> {
-    require_kde()?;
-    crate::kde_x11::access(&crate::kde_x11::Kde, &kde_x11_undo_file(&app)?)
-        .map(Into::into)
-        .map_err(|e| ApiError::new(ErrorCode::Io, e.to_string()))
+    #[cfg(target_os = "linux")]
+    {
+        require_kde()?;
+        crate::kde_x11::access(&crate::kde_x11::Kde, &kde_x11_undo_file(&app)?)
+            .map(Into::into)
+            .map_err(|e| ApiError::new(ErrorCode::Io, e.to_string()))
+    }
+    #[cfg(not(target_os = "linux"))]
+    {
+        let _ = app;
+        Err(not_kde())
+    }
 }
 
 /// KDE only: allows mouse buttons for X11 apps in KDE's settings and asks KWin to reload.
@@ -165,13 +180,21 @@ pub fn ptt_kde_x11_access(app: AppHandle) -> ApiResult<KdeX11Access> {
 #[tauri::command]
 #[specta::specta]
 pub async fn ptt_kde_x11_allow_mouse(app: AppHandle) -> ApiResult<KdeX11Access> {
-    require_kde()?;
-    let access = crate::kde_x11::allow_mouse(&crate::kde_x11::Kde, &kde_x11_undo_file(&app)?)
-        .map_err(|e| ApiError::new(ErrorCode::Io, e.to_string()))?;
-    crate::kde_x11::reconfigure()
-        .await
-        .map_err(|e| ApiError::new(ErrorCode::Internal, e.to_string()))?;
-    Ok(access.into())
+    #[cfg(target_os = "linux")]
+    {
+        require_kde()?;
+        let access = crate::kde_x11::allow_mouse(&crate::kde_x11::Kde, &kde_x11_undo_file(&app)?)
+            .map_err(|e| ApiError::new(ErrorCode::Io, e.to_string()))?;
+        crate::kde_x11::reconfigure()
+            .await
+            .map_err(|e| ApiError::new(ErrorCode::Internal, e.to_string()))?;
+        Ok(access.into())
+    }
+    #[cfg(not(target_os = "linux"))]
+    {
+        let _ = app;
+        Err(not_kde())
+    }
 }
 
 /// KDE only: puts back the settings from before `ptt_kde_x11_allow_mouse`. `invalidInput` if
@@ -179,19 +202,26 @@ pub async fn ptt_kde_x11_allow_mouse(app: AppHandle) -> ApiResult<KdeX11Access> 
 #[tauri::command]
 #[specta::specta]
 pub async fn ptt_kde_x11_undo(app: AppHandle) -> ApiResult<KdeX11Access> {
-    require_kde()?;
-    let access = crate::kde_x11::undo(&crate::kde_x11::Kde, &kde_x11_undo_file(&app)?).map_err(
-        |e| match e.kind() {
-            std::io::ErrorKind::NotFound => {
-                ApiError::new(ErrorCode::InvalidInput, "nothing to undo")
-            }
-            _ => ApiError::new(ErrorCode::Io, e.to_string()),
-        },
-    )?;
-    crate::kde_x11::reconfigure()
-        .await
-        .map_err(|e| ApiError::new(ErrorCode::Internal, e.to_string()))?;
-    Ok(access.into())
+    #[cfg(target_os = "linux")]
+    {
+        require_kde()?;
+        let access = crate::kde_x11::undo(&crate::kde_x11::Kde, &kde_x11_undo_file(&app)?)
+            .map_err(|e| match e.kind() {
+                std::io::ErrorKind::NotFound => {
+                    ApiError::new(ErrorCode::InvalidInput, "nothing to undo")
+                }
+                _ => ApiError::new(ErrorCode::Io, e.to_string()),
+            })?;
+        crate::kde_x11::reconfigure()
+            .await
+            .map_err(|e| ApiError::new(ErrorCode::Internal, e.to_string()))?;
+        Ok(access.into())
+    }
+    #[cfg(not(target_os = "linux"))]
+    {
+        let _ = app;
+        Err(not_kde())
+    }
 }
 
 /// Validates a key the UI captured (`KeyboardEvent.code` plus modifiers, e.g. "Ctrl+KeyA",
