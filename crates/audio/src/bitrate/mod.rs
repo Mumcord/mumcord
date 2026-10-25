@@ -11,11 +11,18 @@
 //! uses (`AudioInput::getNetworkBandwidth`): IP (20) + UDP (8) + crypto (4) +
 //! voice header (1 + 2) + one byte per frame, +12 when tunnelled through TCP,
 //! +12 with positional data, in bytes per packet.
+//!
+//! A packet must also fit Mumble's 1024-byte voice packet limit, so the bitrate never exceeds
+//! what [`MAX_VOICE_PAYLOAD_BYTES`] allows per packet (only reachable with "Music quality"
+//! and 20 ms packets, about 384 kbit/s). The encoder enforces the same limit per packet.
+
+use crate::codec::MAX_VOICE_PAYLOAD_BYTES;
 
 /// Ceiling even when the server allows more: mono Opus voice gains next to
 /// nothing above this, and it stays below typical server limits.
 pub const MAX_BITRATE_BPS: u32 = 96_000;
-/// Ceiling with "Music quality" on (QA.37): the Opus maximum.
+/// Ceiling with "Music quality" on (QA.37): the Opus maximum, further limited by the voice
+/// packet size (see [`packet_budget_bps`]).
 pub const MUSIC_MAX_BITRATE_BPS: u32 = 510_000;
 /// Absolute floor, only for servers whose limit leaves less; below this Opus
 /// voice becomes hard to understand.
@@ -65,6 +72,8 @@ const LOSS_SMOOTHING: f32 = 0.3;
 /// Extra expected loss reported to the encoder so FEC has some headroom.
 const LOSS_HINT_MARGIN: u8 = 2;
 const MAX_LOSS_HINT: u8 = 30;
+/// Each packet the transport still had to drop as too large lowers the ceiling by this factor.
+const OVERSIZE_CUT: f32 = 0.9;
 
 /// How voice reaches the server.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
@@ -103,8 +112,18 @@ pub fn network_overhead_bps(frames_per_packet: u32, transport: Transport, positi
     bytes * 800 / frames
 }
 
+/// Highest bitrate whose packets of `frames_per_packet` 10 ms frames still fit
+/// [`MAX_VOICE_PAYLOAD_BYTES`].
+pub fn packet_budget_bps(frames_per_packet: u32) -> u32 {
+    // bytes × 8 bit × (100 / frames) packets per second.
+    MAX_VOICE_PAYLOAD_BYTES as u32 * 800 / frames_per_packet.max(1)
+}
+
 pub struct BitrateController {
     server_max_bps: Option<u32>,
+    /// Ceiling learned from packets the transport dropped as too large; only a safety net,
+    /// as the packet budget and the encoder's size limit should already prevent them.
+    oversize_cap: Option<u32>,
     transport: Transport,
     positional: bool,
     music_quality: bool,
@@ -127,6 +146,7 @@ impl BitrateController {
     pub fn new() -> Self {
         Self {
             server_max_bps: None,
+            oversize_cap: None,
             transport: Transport::Udp,
             positional: false,
             music_quality: false,
@@ -170,15 +190,31 @@ impl BitrateController {
         self.clamp();
     }
 
-    /// Highest bitrate the current server limit (minus headroom) and packet overhead allow.
+    /// The transport dropped `count` packets as too large for a voice packet since the last
+    /// call: steps the ceiling (and the bitrate) down so the following packets fit.
+    pub fn on_oversized_packets(&mut self, count: u64) {
+        if count == 0 {
+            return;
+        }
+        let lowered = (self.ceiling() as f32 * OVERSIZE_CUT) as u32;
+        self.oversize_cap = Some(lowered.max(MIN_BITRATE_BPS));
+        self.clamp();
+    }
+
+    /// Highest bitrate the current server limit (minus headroom), packet overhead and voice
+    /// packet size allow.
     pub fn ceiling(&self) -> u32 {
         let overhead =
             network_overhead_bps(self.frames_per_packet, self.transport, self.positional);
-        let cap = if self.music_quality {
+        let quality_cap = if self.music_quality {
             MUSIC_MAX_BITRATE_BPS
         } else {
             MAX_BITRATE_BPS
         };
+        let cap = quality_cap
+            .min(packet_budget_bps(self.frames_per_packet))
+            .min(self.oversize_cap.unwrap_or(u32::MAX))
+            .max(MIN_BITRATE_BPS);
         self.server_max_bps
             .map_or(cap, |max| {
                 let usable = (max as f32 * (1.0 - SERVER_HEADROOM)) as u32;
@@ -443,18 +479,28 @@ mod tests {
         assert_eq!(t.bitrate_bps, 36_000 - 14_800);
     }
 
+    /// 20 ms packets of at most `MAX_VOICE_PAYLOAD_BYTES` (958) bytes.
+    const MUSIC_CEILING_20MS: u32 = 383_200;
+
     #[test]
     fn music_quality_cap_follows_the_server_limit() {
         let mut c = BitrateController::new();
-        c.set_server_max_bandwidth(Some(558_000));
+        c.set_server_max_bandwidth(Some(400_000));
         assert_eq!(c.ceiling(), MAX_BITRATE_BPS, "off: speech cap");
         c.set_music_quality(true);
-        // 558 kbit/s − 10 % headroom − 14.8 kbit/s of headers for 20 ms packets over UDP.
-        assert_eq!(c.ceiling(), 487_400);
+        // 400 kbit/s − 10 % headroom − 14.8 kbit/s of headers for 20 ms packets over UDP.
+        assert_eq!(c.ceiling(), 345_200);
         c.set_server_max_bandwidth(Some(2_000_000));
-        assert_eq!(c.ceiling(), MUSIC_MAX_BITRATE_BPS);
+        assert_eq!(c.ceiling(), MUSIC_CEILING_20MS, "voice packet size");
         c.set_server_max_bandwidth(None);
-        assert_eq!(c.ceiling(), MUSIC_MAX_BITRATE_BPS);
+        assert_eq!(c.ceiling(), MUSIC_CEILING_20MS);
+        c.set_frames_per_packet(1);
+        assert_eq!(
+            c.ceiling(),
+            MUSIC_MAX_BITRATE_BPS,
+            "10 ms packets fit the Opus maximum"
+        );
+        c.set_frames_per_packet(2);
         c.set_server_max_bandwidth(Some(72_000));
         assert_eq!(
             c.ceiling(),
@@ -467,8 +513,8 @@ mod tests {
     fn music_quality_switch_off_returns_to_the_speech_cap() {
         let mut c = BitrateController::new();
         c.set_music_quality(true);
-        c.set_server_max_bandwidth(Some(558_000));
-        assert_eq!(c.target().bitrate_bps, 487_400);
+        c.set_server_max_bandwidth(Some(400_000));
+        assert_eq!(c.target().bitrate_bps, 345_200);
         c.set_music_quality(false);
         assert_eq!(c.target().bitrate_bps, MAX_BITRATE_BPS);
     }
@@ -477,12 +523,62 @@ mod tests {
     fn music_quality_still_drops_on_loss_and_recovers() {
         let mut c = BitrateController::new();
         c.set_music_quality(true);
-        c.set_server_max_bandwidth(Some(558_000));
+        c.set_server_max_bandwidth(Some(400_000));
         let start = c.target().bitrate_bps;
         let lossy = feed(&mut c, 0.15, 0, 20);
         assert!(lossy.bitrate_bps < start / 2, "{}", lossy.bitrate_bps);
         assert!(lossy.bitrate_bps >= MODERATE_FLOOR_BPS);
         let recovered = feed(&mut c, 0.0, 20, 40);
-        assert_eq!(recovered.bitrate_bps, 487_400);
+        assert_eq!(recovered.bitrate_bps, 345_200);
+    }
+
+    /// Issue #7: with Music quality and a 510 kbit/s server limit the bitrate climbed until
+    /// every 20 ms packet was too large for a voice packet and got dropped.
+    #[test]
+    fn music_bitrate_fits_a_voice_packet() {
+        for server in [Some(510_000), Some(2_000_000), None] {
+            for transport in [Transport::Udp, Transport::TcpTunnel] {
+                for positional in [false, true] {
+                    for frames in [1, 2] {
+                        let mut c = BitrateController::new();
+                        c.set_music_quality(true);
+                        c.set_server_max_bandwidth(server);
+                        c.set_transport(transport);
+                        c.set_positional(positional);
+                        c.set_frames_per_packet(frames);
+                        let t = feed(&mut c, 0.0, 0, 120);
+                        let bytes = t.bitrate_bps * frames / 800;
+                        assert!(
+                            bytes <= MAX_VOICE_PAYLOAD_BYTES as u32,
+                            "{server:?} {transport:?} positional={positional} \
+                             frames={frames}: {} bit/s = {bytes} bytes",
+                            t.bitrate_bps
+                        );
+                    }
+                }
+            }
+        }
+    }
+
+    #[test]
+    fn oversized_packets_step_the_ceiling_down() {
+        let mut c = BitrateController::new();
+        c.set_music_quality(true);
+        c.set_server_max_bandwidth(None);
+        c.on_oversized_packets(0);
+        assert_eq!(
+            c.target().bitrate_bps,
+            MUSIC_CEILING_20MS,
+            "nothing dropped"
+        );
+        c.on_oversized_packets(3);
+        let lowered = c.target().bitrate_bps;
+        assert_eq!(lowered, (MUSIC_CEILING_20MS as f32 * OVERSIZE_CUT) as u32);
+        assert_eq!(feed(&mut c, 0.0, 0, 60).bitrate_bps, lowered, "stays down");
+        c.on_oversized_packets(1);
+        assert!(
+            c.target().bitrate_bps < lowered,
+            "each report is one more step"
+        );
     }
 }

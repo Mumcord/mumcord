@@ -1190,6 +1190,7 @@ impl Inner {
         }
 
         let mut bitrate = BitrateController::new();
+        let mut oversized_seen = 0;
         bitrate.set_music_quality(self.controls.music_quality());
         bitrate.set_server_max_bandwidth(handle.with_state(|s| s.server.max_bandwidth));
         let epoch = Instant::now();
@@ -1273,6 +1274,8 @@ impl Inner {
                     bitrate.set_music_quality(self.controls.music_quality());
                     if let Some(t) = &transport {
                         let stats = t.stats();
+                        bitrate.on_oversized_packets(stats.oversized.saturating_sub(oversized_seen));
+                        oversized_seen = stats.oversized;
                         let target = bitrate.update(
                             BitrateStats {
                                 loss_fraction: stats.loss,
