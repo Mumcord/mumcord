@@ -464,3 +464,9 @@ Real automatic updates for .deb/.rpm need our own package repository with a sign
 - [x] Plain text for official clients: `🎨 Mumcord theme "‹name›" – mct1.‹code›`; Mumcord users see a preview card (mini app mock-up, key colours, "Import theme", "Imported ✓" if already imported). The code also contains the Mumcord version that created the theme, so later changes to the theme format can be handled: newer versions read older themes, older versions import what they know and show "Made with Mumcord ‹version› – update to see it fully".
 
 ✍️ Note: (from chat) es sollte auch die mumcord version geteilt werden falls sich was ändert
+
+#### QB.2 Which actions does the theme card offer? `◉`
+
+- [x] Main button "Apply theme" (import + set as app theme, default); an arrow menu with "Apply to ‹server›" for every saved server (sets it as that server's theme, FR-2.17).
+
+✍️ Note: (from chat) Import theme apply default und Apply to server x apply to server y and so on
