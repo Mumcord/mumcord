@@ -1104,3 +1104,14 @@ Mumble servers keep no chat history; Mumcord clients can fill gaps for each othe
 ✍️ Note: Requested in chat during /dev.
 
 ---
+
+#### QA.51 License change? `◉`
+Earlier decision: MIT. The user wants everyone (including companies) to be able to use Mumcord, but not to turn the code into their own commercial product without permission.
+
+- [x] **From the next version on: AGPL-3.0-only plus a commercial license on request (dual licensing; contact tobias@vorwachs.com).** Mumcord stays open source; derived products must be published under the AGPL unless a commercial license is agreed. Versions already published (up to 0.1.1) remain MIT for those who obtained them. Outside contributions require a contributor licence agreement so they can be dual-licensed.
+- [ ] PolyForm Shield 1.0.0 (source-available, competing products forbidden).
+- [ ] Keep MIT.
+
+✍️ Note: Asked and answered in chat during /dev.
+
+---

@@ -336,7 +336,7 @@ Talk state (per own user): `Silent → Talking` (VAD/PTT), overridden by `Muted`
 - **Code hosting & CI:** GitHub, GitHub Actions (Q4.10). Every push builds and tests on Linux, Windows and macOS; tests include the automated integration tests against a containerized Mumble server.
 - **Artifacts (Epic 1):** unsigned test builds – Linux AppImage, Windows installer (unsigned), macOS app bundle/DMG (unsigned) (Q4.2). Windows and macOS show security warnings on first launch; documented in the README.
 - **No auto-update, signing or crash-report service** in Epic 1 (→ Epic 5).
-- **License:** MIT; `THIRD_PARTY_NOTICES` file with the copyright and license texts of Mumble (BSD, for `Mumble.proto` and the loaded game plugins) and all bundled libraries; shown in Settings → About (Q4.6). README describes Mumcord as "compatible with Mumble" and "not affiliated with the Mumble project"; no Mumble logo.
+- **License:** AGPL-3.0-only plus a commercial license on request (QA.51; up to v0.1.1: MIT); `THIRD_PARTY_NOTICES` file with the copyright and license texts of Mumble (BSD, for `Mumble.proto` and the loaded game plugins) and all bundled libraries; shown in Settings → About (Q4.6). README describes Mumcord as "compatible with Mumble" and "not affiliated with the Mumble project"; no Mumble logo.
 - **Test server setup:** a reproducible local Mumble server (Docker, official `mumble-server` image, versions 1.4 and 1.5) plus scripted bot clients for multi-user tests; documented one-command start.
 
 ## 11. Acceptance criteria (verifiable in the running client)
@@ -372,7 +372,7 @@ Unless stated otherwise: a fresh Mumcord install, a local test server (1.5) runn
 - **AC-1.26** OS in light mode → Mumcord light; OS dark → dark; manual override works. Switch language to Spanish and German → all UI texts translated without restart.
 - **AC-1.27** Complete the main flows (wizard, connect, join, chat, follow, settings) using only the keyboard; screen reader (NVDA/VoiceOver/Orca) announces controls and talking events; automated accessibility scan reports no WCAG 2.2 AA violations.
 - **AC-1.28** "Save diagnostic file" → file contains version, OS, devices, connection stats; contains no chat text, passwords or certificate data.
-- **AC-1.29** Settings → About lists MIT license and third-party notices including Mumble's BSD notice.
+- **AC-1.29** Settings → About lists the AGPL-3.0 license with the commercial-license note (QA.51) and third-party notices including Mumble's BSD notice.
 - **AC-1.30** CI on GitHub Actions produces Linux, Windows and macOS builds; each starts and connects to the test server.
 - **AC-1.35** Fresh connect (first connect, app restart, or reconnect via "Disconnected – Reconnect" button) to a server where the user was last in "Raid" → user lands in the default channel, self-muted and self-deafened; Bot sees the user present with a deafen icon and hears nothing from the user; chat works. Double-click "Raid" → the last own mute/deafen setting is restored: if the user was last unmuted, Bot sees the user in "Raid" not deafened and hears them (voice activation); if the user had muted themselves before (also before an app restart), they stay muted but not deafened-by-read-only, and Bot hears nothing until they unmute (QA.7). (added 2026-10-24, Addendum QA.2)
 - **AC-1.36** Settings → Identity: choose a default avatar, "Send to new servers automatically" is on. Connect to a fresh server where the user has no avatar → Bot sees the user's avatar. Remove the avatar manually on that server, disconnect and reconnect → the default avatar is not sent again. Switch the toggle off, then connect to another fresh server → Bot sees no avatar. (added 2026-10-24, Addendum QA.3)
@@ -513,6 +513,7 @@ Unless stated otherwise: a fresh Mumcord install, a local test server (1.5) runn
 | QA.48 | History sync: availability summaries per channel/range, content hashes for dedup and delta requests | Addendum 2026-10-25; FR-1.60, AC-1.51b |
 | QA.49 | Sync cutoff: only messages older than join time (own channel) or follow time (followed channel) | Addendum 2026-10-25; FR-1.60, AC-1.51c |
 | QA.50 | Correct ordering of synced messages with stable scroll; Jump to newest button | Addendum 2026-10-25; FR-1.60b, AC-1.51d |
+| QA.51 | License: AGPL-3.0-only plus commercial license on request (contact tobias@vorwachs.com) from v0.2.0; earlier versions stay MIT; CLA for contributions | Addendum 2026-10-25; supersedes the MIT decision |
 
 ## 13. Open points & risks
 
@@ -522,7 +523,7 @@ Unless stated otherwise: a fresh Mumcord install, a local test server (1.5) runn
 - **Listening limits:** servers may deny "Listen" or set low listener limits; following then degrades to history only.
 - **Noise suppression quality vs. CPU:** library choice to be validated against the CPU budget (section 9).
 - **UI automation on macOS:** Tauri's WebDriver-based testing doesn't cover macOS; macOS UI checks may need a different tool or manual verification.
-- **Legal:** MIT/BSD handling and "Mumble" naming are based on the licenses' plain terms, not legal advice (Q4.6).
+- **Legal:** AGPL/BSD handling and "Mumble" naming are based on the licenses' plain terms, not legal advice (Q4.6).
 - **Protocol crypto:** Mumble's UDP encryption has known weaknesses; it can't be changed without server changes, which are out of scope forever.
 
 ## 14. Impact on the roadmap
