@@ -28,9 +28,11 @@ use mumcord_overlay_ipc::wire::{Config, Corner, Hello, Scene};
 
 /// Whether this platform can draw inside games. Linux only for now (the Windows hook is designed
 /// but not yet built here; macOS is never supported, QA.58).
+#[cfg(any(target_os = "linux", test))]
 pub const SUPPORTED: bool = cfg!(target_os = "linux");
 
 /// The game-side identity reduced to how settings and the blocklist key a game.
+#[cfg(any(target_os = "linux", test))]
 pub fn key_of(hello: &Hello) -> GameKey {
     match hello.steam_app_id {
         Some(id) => GameKey::Steam(id),
@@ -86,6 +88,7 @@ impl Shared {
     }
 
     /// Records a game that connected (deduplicated by key, most recent name kept).
+    #[cfg(any(target_os = "linux", test))]
     pub fn record_seen(&self, game: SeenGame) {
         let mut state = self
             .inner
@@ -170,6 +173,7 @@ impl Shared {
     }
 
     /// The config to send a game: the decision plus its per-game look.
+    #[cfg(any(target_os = "linux", test))]
     pub fn config_for(&self, key: &GameKey) -> Config {
         let state = self
             .inner
@@ -191,6 +195,7 @@ impl Shared {
     }
 
     /// The scene to send a game, filtered by its per-game options.
+    #[cfg(any(target_os = "linux", test))]
     pub fn scene_for(&self, key: &GameKey) -> Scene {
         let state = self
             .inner
@@ -201,6 +206,7 @@ impl Shared {
     }
 }
 
+#[cfg(any(target_os = "linux", test))]
 fn filter_scene(scene: &Scene, entry: &GameOverlayEntry) -> Scene {
     Scene {
         channel: if entry.show_channel_name {
@@ -384,6 +390,7 @@ pub fn on_engine_event(runtime: &Runtime, engine: &Engine, event: &mumcord_engin
     }
 }
 
+#[cfg(any(target_os = "linux", test))]
 fn to_wire_corner(corner: mumcord_engine::store::OverlayCorner) -> Corner {
     use mumcord_engine::store::OverlayCorner as C;
     match corner {

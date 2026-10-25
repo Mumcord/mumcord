@@ -2,7 +2,9 @@
 
 use serde::{Deserialize, Serialize};
 use specta::Type;
-use tauri::{AppHandle, Manager};
+use tauri::AppHandle;
+#[cfg(target_os = "linux")]
+use tauri::Manager;
 
 use super::types::{ApiError, ApiResult, ErrorCode};
 use crate::ptt;

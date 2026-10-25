@@ -103,11 +103,6 @@ pub fn kde_wayland() -> bool {
     crate::ptt::SessionEnv::current().runs_on_wayland() && is_kde(desktop.as_deref())
 }
 
-#[cfg(not(target_os = "linux"))]
-pub fn kde_wayland() -> bool {
-    false
-}
-
 /// `(kde_wayland, our KWin rule exists)` for the settings UI.
 pub fn kwin_rule_state() -> (bool, bool) {
     #[cfg(target_os = "linux")]
