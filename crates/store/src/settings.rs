@@ -179,6 +179,95 @@ impl Default for OverlaySettings {
     }
 }
 
+/// Global switch of the in-game overlay (FR-1.46b, QA.55).
+#[derive(Debug, Clone, Copy, Default, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum InGameOverlayMode {
+    /// Never active: the Linux layer is not registered, nothing is loaded into games.
+    #[default]
+    Off,
+    /// Active in every game unless switched off for that game (or the game is on the bundled
+    /// blocklist and was not explicitly confirmed).
+    On,
+}
+
+/// How a game is recognised: its Steam app id when Steam started it, else its executable name
+/// (compared without regard to case).
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[serde(tag = "kind", content = "value", rename_all = "snake_case")]
+pub enum GameKey {
+    Steam(u32),
+    Exe(String),
+}
+
+impl GameKey {
+    /// Whether this key names the same game, executable names compared ignoring case.
+    pub fn matches(&self, other: &GameKey) -> bool {
+        match (self, other) {
+            (GameKey::Steam(a), GameKey::Steam(b)) => a == b,
+            (GameKey::Exe(a), GameKey::Exe(b)) => a.eq_ignore_ascii_case(b),
+            _ => false,
+        }
+    }
+}
+
+/// Default in-game overlay size and opacity in percent.
+pub const DEFAULT_INGAME_SIZE_PERCENT: u8 = 100;
+pub const DEFAULT_INGAME_OPACITY_PERCENT: u8 = 90;
+
+/// Options of the in-game overlay for one game.
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(default)]
+pub struct GameOverlayEntry {
+    pub key: GameKey,
+    /// Display name (from the game list or the process); plain text.
+    pub name: String,
+    /// `None` follows the global mode, `Some` overrides it for this game.
+    pub enabled: Option<bool>,
+    /// The user confirmed the stronger warning for a game on the blocklist; without it a
+    /// blocklisted game stays off even when `enabled` is `Some(true)` (QA.56).
+    pub risk_confirmed: bool,
+    pub corner: OverlayCorner,
+    /// Percent of the default size, 50–200.
+    pub size_percent: u8,
+    /// Percent, 20–100.
+    pub opacity_percent: u8,
+    pub show_whole_channel: bool,
+    pub show_channel_name: bool,
+}
+
+impl Default for GameOverlayEntry {
+    fn default() -> Self {
+        Self {
+            key: GameKey::Exe(String::new()),
+            name: String::new(),
+            enabled: None,
+            risk_confirmed: false,
+            corner: OverlayCorner::TopLeft,
+            size_percent: DEFAULT_INGAME_SIZE_PERCENT,
+            opacity_percent: DEFAULT_INGAME_OPACITY_PERCENT,
+            show_whole_channel: false,
+            show_channel_name: true,
+        }
+    }
+}
+
+/// In-game overlay options (FR-1.46b).
+#[derive(Debug, Clone, Default, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(default)]
+pub struct InGameOverlaySettings {
+    pub mode: InGameOverlayMode,
+    /// Games with their own options; at most one entry per game.
+    pub games: Vec<GameOverlayEntry>,
+}
+
+impl InGameOverlaySettings {
+    /// The entry for `key`, if the game has one.
+    pub fn entry(&self, key: &GameKey) -> Option<&GameOverlayEntry> {
+        self.games.iter().find(|g| g.key.matches(key))
+    }
+}
+
 /// Positional audio options (FR-1.41).
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 #[serde(default)]
@@ -236,6 +325,8 @@ pub struct Settings {
     pub chat_display: ChatDisplay,
     pub log_level: LogLevel,
     pub overlay: OverlaySettings,
+    /// In-game overlay drawn inside games (FR-1.46b).
+    pub ingame_overlay: InGameOverlaySettings,
     pub positional: PositionalSettings,
     /// Identifiers of individually enabled game plugins (FR-1.42).
     pub enabled_plugins: Vec<String>,
@@ -288,6 +379,7 @@ impl Default for Settings {
             chat_display: ChatDisplay::default(),
             log_level: LogLevel::default(),
             overlay: OverlaySettings::default(),
+            ingame_overlay: InGameOverlaySettings::default(),
             positional: PositionalSettings::default(),
             enabled_plugins: Vec::new(),
             send_default_avatar: true,
@@ -426,6 +518,34 @@ mod tests {
         };
         store.save_own_voice(both).expect("overwrite");
         assert_eq!(store.own_voice().expect("reload"), both);
+    }
+
+    #[test]
+    fn ingame_overlay_options_round_trip_and_default_off() {
+        let (_dir, store) = temp_store();
+        assert_eq!(
+            store.settings().expect("load").ingame_overlay.mode,
+            InGameOverlayMode::Off
+        );
+        let mut settings = Settings::default();
+        settings.ingame_overlay.mode = InGameOverlayMode::On;
+        settings.ingame_overlay.games.push(GameOverlayEntry {
+            key: GameKey::Steam(730),
+            name: "Counter-Strike 2".into(),
+            enabled: Some(false),
+            corner: OverlayCorner::BottomRight,
+            opacity_percent: 40,
+            ..GameOverlayEntry::default()
+        });
+        settings.ingame_overlay.games.push(GameOverlayEntry {
+            key: GameKey::Exe("Game.exe".into()),
+            ..GameOverlayEntry::default()
+        });
+        store.save_settings(&settings).expect("save");
+        let loaded = store.settings().expect("load").ingame_overlay;
+        assert_eq!(loaded, settings.ingame_overlay);
+        assert!(loaded.entry(&GameKey::Exe("game.EXE".into())).is_some());
+        assert!(loaded.entry(&GameKey::Steam(731)).is_none());
     }
 
     #[test]

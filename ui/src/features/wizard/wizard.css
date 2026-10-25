@@ -107,3 +107,14 @@
   gap: var(--space-2);
   margin-top: var(--space-2);
 }
+
+/* In-game overlay example screenshot in the wizard (FR-1.46b). */
+.wizard-overlay-example {
+  display: block;
+  width: 100%;
+  max-width: 360px;
+  height: auto;
+  margin: 8px 0;
+  border-radius: 8px;
+  border: 1px solid var(--color-border, rgba(255, 255, 255, 0.12));
+}

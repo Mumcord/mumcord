@@ -526,6 +526,14 @@ impl Engine {
         self.inner.change_person(session, |s| s.local_mute = muted)
     }
 
+    /// Saves the private note about a person (FR-1.63); an empty note removes it.
+    pub fn person_set_note(&self, session: u32, note: &str) -> EngineResult<()> {
+        let mut core = lock(&self.inner.core);
+        let (server_id, user) = Inner::person_in_session(&core, session)?;
+        let store = lock(&self.inner.store);
+        core.people.save_note(&store, server_id, &user, note)
+    }
+
     /// Asks the server for a channel description announced only by its hash (FR-1.48b). The
     /// text arrives as a `ChannelUpserted` event; asking again for the same hash is a no-op.
     pub fn channel_description_request(&self, channel_id: u32) -> EngineResult<()> {
@@ -569,6 +577,12 @@ impl Engine {
             }
         }
         let mut profile = people::profile(&current);
+        {
+            let core = lock(&self.inner.core);
+            profile.note = core
+                .people
+                .note(&lock(&self.inner.store), ctx.server_id, &current);
+        }
         // The own profile is edited from here; the status lines are not part of it.
         if ctx.handle.with_state(|s| s.session) == Some(session) {
             profile.comment = profile
@@ -1359,10 +1373,10 @@ impl Inner {
             return;
         };
         let setting = {
-            let store = lock(&self.store);
-            lock(&self.core)
-                .people
-                .setting(&store, ctx.server_id, &user)
+            // Lock order (see module docs): taking `store` first deadlocks against `snapshot`.
+            let core = lock(&self.core);
+            core.people
+                .setting(&lock(&self.store), ctx.server_id, &user)
         };
         self.events
             .emit(EngineEvent::UserUpserted(self.user_view_of(&user, setting)));
@@ -1524,17 +1538,7 @@ impl Inner {
         change: impl FnOnce(&mut mumcord_store::PersonSetting),
     ) -> EngineResult<()> {
         let mut core = lock(&self.core);
-        let (server_id, user) = {
-            let s = core
-                .session
-                .as_ref()
-                .ok_or_else(EngineError::not_connected)?;
-            let user = s
-                .handle
-                .with_state(|st| st.users.get(&session).cloned())
-                .ok_or_else(|| EngineError::new(ErrorKind::NotFound, "unknown person"))?;
-            (s.server_id, user)
-        };
+        let (server_id, user) = Self::person_in_session(&core, session)?;
         let setting = {
             let store = lock(&self.store);
             let mut setting = core.people.setting(&store, server_id, &user);
@@ -1549,6 +1553,22 @@ impl Inner {
         self.events
             .emit(EngineEvent::UserUpserted(self.user_view_of(&user, setting)));
         Ok(())
+    }
+
+    /// The server and the person with this session on it.
+    fn person_in_session(
+        core: &Core,
+        session: u32,
+    ) -> EngineResult<(ServerId, mumcord_protocol::User)> {
+        let s = core
+            .session
+            .as_ref()
+            .ok_or_else(EngineError::not_connected)?;
+        let user = s
+            .handle
+            .with_state(|st| st.users.get(&session).cloned())
+            .ok_or_else(|| EngineError::new(ErrorKind::NotFound, "unknown person"))?;
+        Ok((s.server_id, user))
     }
 
     /// Starts the audio devices on first use.

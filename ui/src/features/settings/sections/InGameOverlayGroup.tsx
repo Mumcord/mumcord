@@ -120,6 +120,9 @@ export function InGameOverlayGroup({ api }: { api: InGameOverlayApi }) {
 
   useEffect(() => {
     let active = true;
+    const unsubscribe = api.subscribe((changed) => {
+      if (active) setState(changed);
+    });
     api.state().then(
       (loaded) => {
         if (active) setState(loaded);
@@ -131,6 +134,7 @@ export function InGameOverlayGroup({ api }: { api: InGameOverlayApi }) {
     );
     return () => {
       active = false;
+      unsubscribe();
     };
   }, [api]);
 
@@ -155,7 +159,7 @@ export function InGameOverlayGroup({ api }: { api: InGameOverlayApi }) {
     return (
       <Group title={t("overlay.inGame.title")}>
         <p className="settings-hint" role="note">
-          {t("overlay.inGame.unsupported")}
+          {t(state.explanationKey ?? "overlay.inGame.unsupported")}
         </p>
       </Group>
     );

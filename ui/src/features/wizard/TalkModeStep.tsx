@@ -9,6 +9,7 @@ import {
 } from "../../api";
 import { errorCode } from "./errors";
 import { keyCombo, mouseKey, mouseLabel } from "./keyCombo";
+import ingameOverlayExample from "../../assets/ingame-overlay-example.png";
 import { StepFrame } from "./StepFrame";
 
 export interface TalkChoice {
@@ -20,6 +21,8 @@ export interface TalkChoice {
   autostart: boolean;
   /** Show link previews and embeds in chat (FR-1.49). */
   linkPreviews: boolean;
+  /** Turn on the in-game overlay globally (FR-1.46b); `null` where it is unsupported. */
+  ingameOverlay: boolean | null;
 }
 
 type Capture = "off" | "listening" | "pending";
@@ -32,6 +35,8 @@ interface TalkModeStepProps {
   mouseStatus?: PttMouseStatus | null;
   /** Whether Mumcord already handles `mumble://` links; `null` when unknown. */
   linkHandlerActive: boolean | null;
+  /** Whether the in-game overlay works on this platform (FR-1.46b, QA.58); hides the choice. */
+  ingameOverlaySupported: boolean;
   focusOnMount: boolean;
   onBack: () => void;
   /** Saves the choice and leaves the wizard; rejects when saving failed. */
@@ -47,6 +52,7 @@ export function TalkModeStep({
   availability,
   mouseStatus = null,
   linkHandlerActive,
+  ingameOverlaySupported,
   focusOnMount,
   onBack,
   onFinish,
@@ -66,6 +72,8 @@ export function TalkModeStep({
   const [registerLink, setRegisterLink] = useState(true);
   const [autostart, setAutostart] = useState(settings.autostart);
   const [linkPreviews, setLinkPreviews] = useState(settings.linkPreviews);
+  // In-game overlay: default off (FR-1.46b, QA.55).
+  const [ingameOverlay, setIngameOverlay] = useState(false);
   const [busy, setBusy] = useState(false);
   // Bumped on cancel so a late failure of the cancelled capture shows no error.
   const captureAttempt = useRef(0);
@@ -79,6 +87,7 @@ export function TalkModeStep({
     linkHint: useId(),
     autostartHint: useId(),
     linkPreviewsHint: useId(),
+    ingameHint: useId(),
   };
 
   async function captureKey(combo: string) {
@@ -162,6 +171,7 @@ export function TalkModeStep({
         registerLinkHandler: linkHandlerActive !== true && registerLink,
         autostart,
         linkPreviews,
+        ingameOverlay: ingameOverlaySupported ? ingameOverlay : null,
       });
     } catch {
       setBusy(false);
@@ -322,6 +332,32 @@ export function TalkModeStep({
           {t("talk.linkPreviewsHint")}
         </p>
       </div>
+      {ingameOverlaySupported && (
+        <div>
+          <label className="wizard-radio">
+            <input
+              type="checkbox"
+              checked={ingameOverlay}
+              aria-describedby={ids.ingameHint}
+              onChange={(event) => {
+                setIngameOverlay(event.target.checked);
+              }}
+            />
+            {t("talk.ingameOverlay")}
+          </label>
+          <p id={ids.ingameHint} className="wizard-muted wizard-small wizard-indent">
+            {t("talk.ingameOverlayHint")}
+          </p>
+          <img
+            className="wizard-overlay-example wizard-indent"
+            src={ingameOverlayExample}
+            alt={t("talk.ingameOverlayAlt")}
+            width={360}
+            height={210}
+          />
+          <p className="wizard-note wizard-indent">{t("talk.ingameOverlayWarning")}</p>
+        </div>
+      )}
       {error && (
         <p role="alert" className="wizard-error">
           {error}

@@ -20,6 +20,7 @@ tauri-build.workspace = true
 
 [dependencies]
 mumcord-engine.workspace = true
+mumcord-overlay-ipc = { workspace = true, features = ["render"] }
 base64 = "0.23"
 # Not inherited from the workspace: the Tauri CLI ignores the features of inherited dependencies
 # and only bundles the tray library (libayatana-appindicator3) into the AppImage when it sees
@@ -76,6 +77,7 @@ core-foundation.workspace = true
 [dev-dependencies]
 # `tauri::test` mock app for the X11 push-to-talk check.
 tauri = { version = "2.12", features = ["test"] }
+tempfile.workspace = true
 
 [lints]
 workspace = true

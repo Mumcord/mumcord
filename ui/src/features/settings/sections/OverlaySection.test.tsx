@@ -1,4 +1,4 @@
-import { fireEvent, render, screen, waitFor, within } from "@testing-library/react";
+import { act, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { createMockApi, setApi, type MockApi } from "../../../api";
 import { applyLanguage } from "../../../i18n";
@@ -18,13 +18,14 @@ const game = (over: Partial<InGameGame>): InGameGame => ({
   ...over,
 });
 
-function fakeInGame(initial: InGameState) {
-  const state = { ...initial };
+function fakeInGame(initial: Omit<InGameState, "explanationKey"> & Partial<InGameState>) {
+  const state: InGameState = { explanationKey: null, ...initial };
   const fake: InGameOverlayApi = {
     state: vi.fn(() => Promise.resolve(state)),
     setMode: vi.fn(() => Promise.resolve(state)),
     setGameOverride: vi.fn(() => Promise.resolve(state)),
     setGameOptions: vi.fn(() => Promise.resolve(state)),
+    subscribe: vi.fn(() => () => undefined),
   };
   return fake;
 }
@@ -85,6 +86,54 @@ describe("Window overlay", () => {
   });
 });
 
+describe("KDE window rule", () => {
+  it("is not offered outside KDE Wayland", async () => {
+    render(<OverlaySection />);
+    await screen.findByRole("switch", { name: "Show the overlay" });
+    expect(screen.queryByRole("button", { name: "Set up automatically" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Open KDE window rules" })).not.toBeInTheDocument();
+  });
+
+  it("sets up, removes and opens the rules on KDE Wayland", async () => {
+    const state = await api.overlayState();
+    vi.spyOn(api, "overlayState").mockResolvedValue({ ...state, kdeWayland: true });
+    // The mock's own state is not on KDE Wayland, so answer with KDE states here.
+    const install = vi
+      .spyOn(api, "overlayKwinRuleInstall")
+      .mockResolvedValue({ ...state, kdeWayland: true, kwinRuleInstalled: true });
+    const remove = vi
+      .spyOn(api, "overlayKwinRuleRemove")
+      .mockResolvedValue({ ...state, kdeWayland: true, kwinRuleInstalled: false });
+    const open = vi.spyOn(api, "overlayOpenKdeWindowRules");
+    render(<OverlaySection />);
+    expect(await screen.findByRole("button", { name: "Set up automatically" })).toBeVisible();
+    expect(screen.queryByRole("button", { name: "Remove rule" })).not.toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole("button", { name: "Set up automatically" }));
+    expect(install).toHaveBeenCalledOnce();
+    expect(await screen.findByText(/window rule .* is active/)).toBeVisible();
+
+    fireEvent.click(await screen.findByRole("button", { name: "Remove rule" }));
+    expect(remove).toHaveBeenCalledOnce();
+    await waitFor(() => {
+      expect(screen.queryByRole("button", { name: "Remove rule" })).not.toBeInTheDocument();
+    });
+
+    fireEvent.click(screen.getByRole("button", { name: "Open KDE window rules" }));
+    expect(open).toHaveBeenCalledOnce();
+  });
+
+  it("reports a failed setup", async () => {
+    const state = await api.overlayState();
+    vi.spyOn(api, "overlayState").mockResolvedValue({ ...state, kdeWayland: true });
+    vi.spyOn(console, "error").mockImplementation(() => undefined);
+    vi.spyOn(api, "overlayKwinRuleInstall").mockRejectedValue(new Error("no"));
+    render(<OverlaySection />);
+    fireEvent.click(await screen.findByRole("button", { name: "Set up automatically" }));
+    expect(await screen.findByRole("alert")).toHaveTextContent(/could not be changed/);
+  });
+});
+
 describe("In-game overlay", () => {
   it("sets the global mode", async () => {
     const fake = fakeInGame({ supported: true, mode: "off", games: [] });
@@ -98,6 +147,44 @@ describe("In-game overlay", () => {
     render(<OverlaySection inGameApi={fakeInGame({ supported: false, mode: "off", games: [] })} />);
     expect(await screen.findByText(/not available on this system/)).toBeInTheDocument();
     expect(screen.queryByRole("radio", { name: "On" })).not.toBeInTheDocument();
+  });
+
+  it("names the reason when the overlay library is missing", async () => {
+    render(
+      <OverlaySection
+        inGameApi={fakeInGame({
+          supported: false,
+          explanationKey: "overlay.inGame.limits.libraryMissing",
+          mode: "off",
+          games: [],
+        })}
+      />,
+    );
+    expect(await screen.findByText(/overlay library .* was not found/)).toBeInTheDocument();
+  });
+
+  it("follows changes made elsewhere", async () => {
+    const fake = fakeInGame({ supported: true, mode: "off", games: [] });
+    let push: (state: InGameState) => void = () => undefined;
+    vi.mocked(fake.subscribe).mockImplementation((onChange) => {
+      push = onChange;
+      return () => undefined;
+    });
+    render(<OverlaySection inGameApi={fake} />);
+    await screen.findByRole("radio", { name: "Off", checked: true });
+    act(() => {
+      push({ supported: true, explanationKey: null, mode: "on", games: [] });
+    });
+    expect(screen.getByRole("radio", { name: "On" })).toBeChecked();
+  });
+
+  it("uses the engine commands by default", async () => {
+    render(<OverlaySection />);
+    fireEvent.click(await screen.findByRole("radio", { name: "On" }));
+    await waitFor(() => {
+      expect(screen.getByRole("radio", { name: "On" })).toBeChecked();
+    });
+    expect((await api.ingameOverlayState()).mode).toBe("on");
   });
 
   it("switches a normal game and edits its options", async () => {

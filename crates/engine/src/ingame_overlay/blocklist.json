@@ -1,0 +1,52 @@
+{
+  "_comment": "Games known to block or punish third-party overlays / code drawn into the game (QA.56). Curated by hand and updated with releases. A listed game keeps the in-game overlay off by default even when it is globally on; turning it on needs an explicit, confirmed override. 'reason' is shown to the user (English, plain text). 'source' must point to the publisher's or anti-cheat vendor's statement, or to the best public report available.",
+  "games": [
+    {
+      "name": "VALORANT",
+      "windows": ["VALORANT-Win64-Shipping.exe", "VALORANT.exe"],
+      "anti_cheat": "Riot Vanguard",
+      "reason": "Riot Vanguard is a kernel-level anti-cheat that blocks software it considers unsafe from loading into the game and reports it.",
+      "source": "https://support.riotgames.com/valorant/performance/what-is-vanguard"
+    },
+    {
+      "name": "League of Legends",
+      "windows": ["League of Legends.exe"],
+      "anti_cheat": "Riot Vanguard",
+      "reason": "Since 2024 League of Legends uses Riot Vanguard, which blocks software it considers unsafe from loading into the game.",
+      "source": "https://support-leagueoflegends.riotgames.com/hc/articles/24169857932435"
+    },
+    {
+      "name": "Call of Duty (Modern Warfare II/III, Warzone, Black Ops 6)",
+      "steam": 1938090,
+      "windows": ["cod.exe", "cod24-cod.exe", "cod23-cod.exe"],
+      "anti_cheat": "Ricochet",
+      "reason": "Ricochet's kernel-level driver monitors software that interacts with Call of Duty while the game runs; unknown programs drawing into the game risk being flagged.",
+      "source": "https://www.pcgamer.com/au/call-of-duty-is-getting-kernel-level-anti-cheat/"
+    },
+    {
+      "name": "Counter-Strike 2 (FACEIT matches)",
+      "steam": 730,
+      "windows": ["cs2.exe"],
+      "linux": ["cs2"],
+      "anti_cheat": "FACEIT Anti-Cheat",
+      "reason": "Matches on FACEIT run under FACEIT's kernel-level anti-cheat, which detects overlays and only allows a few known ones (Steam, NVIDIA). Valve's own matchmaking (VAC) does not forbid overlays.",
+      "source": "https://support.faceit.com/hc/en-us/articles/9394666828188"
+    },
+    {
+      "name": "PUBG: BATTLEGROUNDS",
+      "steam": 578080,
+      "windows": ["TslGame.exe"],
+      "anti_cheat": "BattlEye",
+      "reason": "PUBG blocks third-party programs that hook into the game or change its visuals (for example ReShade) through BattlEye.",
+      "source": "https://massivelyop.com/?p=152613"
+    },
+    {
+      "name": "Apex Legends",
+      "steam": 1172470,
+      "windows": ["r5apex.exe", "r5apex_dx12.exe"],
+      "anti_cheat": "Easy Anti-Cheat",
+      "reason": "Easy Anti-Cheat closes Apex Legends when it finds files or programs it cannot verify; EA support advises closing overlays when that happens.",
+      "source": "https://forums.ea.com/discussions/apex-legends-technical-issues-en/untrusted-file-system/5344185"
+    }
+  ]
+}

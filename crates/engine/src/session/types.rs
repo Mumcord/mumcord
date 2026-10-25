@@ -267,6 +267,8 @@ pub struct ProfileView {
     pub comment: Option<String>,
     /// `data:` URL.
     pub avatar: Option<String>,
+    /// The user's private note about this person; empty when there is none (FR-1.63).
+    pub note: String,
 }
 
 /// Everything the engine reports to the UI.

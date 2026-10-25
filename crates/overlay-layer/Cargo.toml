@@ -1,0 +1,26 @@
+[package]
+name = "mumcord-overlay-layer"
+description = "In-game overlay for Linux: Vulkan layer and OpenGL preload library drawn inside games"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+publish = false
+
+[lib]
+# Loaded by the Vulkan loader (implicit layer manifest) or through LD_PRELOAD. Built on every
+# platform so the workspace builds everywhere; it only contains code on Linux.
+name = "mumcord_overlay_layer"
+crate-type = ["cdylib", "rlib"]
+
+[target.'cfg(target_os = "linux")'.dependencies]
+mumcord-overlay-ipc = { workspace = true, features = ["render"] }
+ash.workspace = true
+libc.workspace = true
+
+[target.'cfg(target_os = "linux")'.dev-dependencies]
+# The end-to-end check (`examples/headless_check.rs`) loads the system Vulkan loader.
+ash = { version = "0.38", features = ["loaded"] }
+
+[lints]
+workspace = true

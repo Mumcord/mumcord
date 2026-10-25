@@ -6,6 +6,10 @@ mod deeplink;
 #[cfg(target_os = "linux")]
 mod desktop_entry;
 mod display;
+mod ingame_overlay;
+#[cfg(target_os = "linux")]
+mod kde_x11;
+mod kwin_rule;
 mod notifications;
 mod now_gaming;
 mod now_playing;
@@ -19,7 +23,7 @@ use tauri::{AppHandle, Manager};
 use tauri_specta::{Builder, Event, collect_commands, collect_events};
 
 use commands::{
-    app, audio, channels, chat, diagnostics, follow, history, identity, links,
+    app, audio, channels, chat, diagnostics, dropped, follow, history, identity, links,
     notifications as notify, people, profile, servers, session, settings,
 };
 
@@ -61,10 +65,12 @@ fn specta_builder() -> Builder<tauri::Wry> {
             channels::channel_description_request,
             people::person_set_volume,
             people::person_set_local_mute,
+            people::person_set_note,
             people::person_profile,
             chat::send_channel_message,
             chat::send_private_message,
             chat::save_image,
+            dropped::read_dropped_image,
             links::link_preview,
             links::inline_image,
             links::preview_dismiss,
@@ -96,6 +102,10 @@ fn specta_builder() -> Builder<tauri::Wry> {
             commands::ptt::ptt_capture_cancel,
             commands::ptt::ptt_mouse_status,
             commands::ptt::ptt_session,
+            commands::ptt::ptt_open_kde_x11_settings,
+            commands::ptt::ptt_kde_x11_access,
+            commands::ptt::ptt_kde_x11_allow_mouse,
+            commands::ptt::ptt_kde_x11_undo,
             app::close_choice,
             app::app_restart,
             app::link_handler_status,
@@ -114,6 +124,13 @@ fn specta_builder() -> Builder<tauri::Wry> {
             commands::overlay::overlay_update,
             commands::overlay::overlay_set_enabled,
             commands::overlay::overlay_move_mode,
+            commands::overlay::overlay_kwin_rule_install,
+            commands::overlay::overlay_kwin_rule_remove,
+            commands::overlay::overlay_open_kde_window_rules,
+            commands::ingame_overlay::ingame_overlay_state,
+            commands::ingame_overlay::ingame_overlay_set_mode,
+            commands::ingame_overlay::ingame_overlay_set_game,
+            commands::ingame_overlay::ingame_overlay_remove_game,
         ])
         .events(collect_events![
             servers::DeepLinkOpened,
@@ -140,6 +157,7 @@ fn specta_builder() -> Builder<tauri::Wry> {
             commands::now_playing::NowPlayingChanged,
             commands::now_gaming::NowGamingChanged,
             commands::overlay::OverlayChanged,
+            commands::ingame_overlay::InGameOverlayChanged,
         ])
 }
 
@@ -197,7 +215,11 @@ pub fn run() {
             }
             invoke(call)
         })
-        .on_window_event(window::on_window_event)
+        .manage(dropped::DroppedFiles::default())
+        .on_window_event(|window, event| {
+            dropped::on_window_event(window, event);
+            window::on_window_event(window, event);
+        })
         .setup(move |app| {
             builder.mount_events(app);
             // Before the engine: its event hook uses the notifier.
@@ -206,6 +228,7 @@ pub fn run() {
             start_window_and_autostart(app.handle());
             tray::init(app.handle());
             overlay::init(app.handle());
+            ingame_overlay_init(app.handle());
             deeplink::init(app.handle());
             #[cfg(target_os = "linux")]
             desktop_entry::ensure(app.handle());
@@ -257,6 +280,22 @@ fn start_engine(app: &AppHandle) -> Result<(), Box<dyn std::error::Error>> {
     Ok(())
 }
 
+/// Sets up the in-game overlay (FR-1.46b): starts its IPC server, installs the Vulkan layer
+/// manifest if the overlay is on, and manages the runtime so commands and events can reach it.
+fn ingame_overlay_init(app: &AppHandle) {
+    let ingame = match app.state::<Engine>().settings() {
+        Ok(stored) => stored.ingame_overlay,
+        Err(e) => {
+            tracing::warn!(error = %e, "reading the in-game overlay settings failed");
+            return;
+        }
+    };
+    let shared = std::sync::Arc::new(ingame_overlay::Shared::default());
+    let runtime = ingame_overlay::init(shared, ingame);
+    runtime.shared.rebuild(&app.state::<Engine>());
+    app.manage(runtime);
+}
+
 /// Shows the window (or keeps it in the tray after a start at login) and brings the OS
 /// autostart entry in line with the stored setting (FR-1.48d).
 fn start_window_and_autostart(app: &AppHandle) {
@@ -277,6 +316,12 @@ fn start_window_and_autostart(app: &AppHandle) {
 fn emit_engine_event(app: &AppHandle, event: EngineEvent) -> tauri::Result<()> {
     tray::on_engine_event(app, &event);
     notifications::on_engine_event(app, &event);
+    if let (Some(runtime), Some(engine)) = (
+        app.try_state::<ingame_overlay::Runtime>(),
+        app.try_state::<Engine>(),
+    ) {
+        ingame_overlay::on_engine_event(&runtime, &engine, &event);
+    }
     match event {
         EngineEvent::StateChanged(state) => session::ConnectionStateChanged {
             state: state.into(),

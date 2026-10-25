@@ -4,6 +4,7 @@
 pub mod chat;
 pub mod diag;
 pub mod follow;
+pub mod ingame_overlay;
 mod maintenance;
 pub mod mumcord;
 pub mod now_gaming;
@@ -17,6 +18,9 @@ pub mod web;
 
 pub use chat::{ChatMessageView, HistoryScope};
 pub use follow::FollowAllSummary;
+pub use ingame_overlay::{
+    BlockedGame, Blocklist, OverlayDecision, blocklist, decide as decide_overlay,
+};
 /// Stored types (settings record etc.) as the engine hands them out.
 pub use mumcord_store as store;
 pub use mumcord_store::{SecretStore, ServerId, Settings};

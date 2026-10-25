@@ -21,6 +21,7 @@ interface Loaded {
   availability: PttAvailability | null;
   mouseStatus: PttMouseStatus | null;
   linkHandlerActive: boolean | null;
+  ingameOverlaySupported: boolean;
 }
 
 type Load = { state: "loading" } | { state: "failed" } | ({ state: "ready" } & Loaded);
@@ -35,14 +36,23 @@ function optional<T>(promise: Promise<T>, what: string): Promise<T | null> {
 
 async function loadWizard(): Promise<Loaded> {
   const api = getApi();
-  const [settings, identity, availability, mouseStatus, linkHandlerActive] = await Promise.all([
-    api.settingsGet(),
-    api.identityGet(),
-    optional(api.pttAvailability(), "ptt availability"),
-    optional(api.pttMouseStatus(), "ptt mouse status"),
-    optional(api.linkHandlerStatus(), "link handler status"),
-  ]);
-  return { settings, identity, availability, mouseStatus, linkHandlerActive };
+  const [settings, identity, availability, mouseStatus, linkHandlerActive, ingameOverlay] =
+    await Promise.all([
+      api.settingsGet(),
+      api.identityGet(),
+      optional(api.pttAvailability(), "ptt availability"),
+      optional(api.pttMouseStatus(), "ptt mouse status"),
+      optional(api.linkHandlerStatus(), "link handler status"),
+      optional(api.ingameOverlayState(), "in-game overlay state"),
+    ]);
+  return {
+    settings,
+    identity,
+    availability,
+    mouseStatus,
+    linkHandlerActive,
+    ingameOverlaySupported: ingameOverlay?.supported ?? false,
+  };
 }
 
 /** First-start wizard: identity → microphone → talk mode and start options (FR-1.1–FR-1.6, FR-1.48d). */
@@ -130,6 +140,14 @@ export function Wizard() {
         announce(t("talk.autostartFailed"), "polite");
       }
     }
+    if (choice.ingameOverlay) {
+      try {
+        await getApi().ingameOverlaySetMode("on");
+      } catch (cause: unknown) {
+        // Not worth blocking the first start; Settings offers it again.
+        console.error("turning on the in-game overlay failed", cause);
+      }
+    }
     applySettings(saved);
     finishWizard();
   }
@@ -169,6 +187,7 @@ export function Wizard() {
           availability={load.availability}
           mouseStatus={load.mouseStatus}
           linkHandlerActive={load.linkHandlerActive}
+          ingameOverlaySupported={load.ingameOverlaySupported}
           focusOnMount={navigated}
           onBack={() => {
             goTo(2);

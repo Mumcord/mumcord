@@ -30,6 +30,7 @@ function renderStep(
       availability={availability}
       mouseStatus={mouseStatus}
       linkHandlerActive={linkHandlerActive}
+      ingameOverlaySupported={true}
       focusOnMount={false}
       onBack={vi.fn()}
       onFinish={onFinish}
@@ -57,6 +58,7 @@ describe("TalkModeStep", () => {
         registerLinkHandler: true,
         autostart: false,
         linkPreviews: true,
+        ingameOverlay: false,
       });
     });
   });
@@ -99,6 +101,7 @@ describe("TalkModeStep", () => {
         registerLinkHandler: true,
         autostart: false,
         linkPreviews: true,
+        ingameOverlay: false,
       });
     });
   });

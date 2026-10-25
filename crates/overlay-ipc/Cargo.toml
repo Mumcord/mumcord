@@ -1,0 +1,20 @@
+[package]
+name = "mumcord-overlay-ipc"
+description = "In-game overlay: local IPC protocol between Mumcord and the in-game layer/hook, and the overlay renderer"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+
+[features]
+# The CPU renderer with the bundled font; only the in-game layer/hook needs it, not the app.
+render = ["dep:ab_glyph"]
+
+[dependencies]
+ab_glyph = { workspace = true, optional = true }
+
+[target.'cfg(target_os = "linux")'.dependencies]
+libc.workspace = true
+
+[lints]
+workspace = true

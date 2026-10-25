@@ -7,6 +7,8 @@ members = [
     "crates/engine",
     "crates/bot",
     "crates/positional",
+    "crates/overlay-ipc",
+    "crates/overlay-layer",
     "tools/netsim",
     "src-tauri",
 ]
@@ -25,6 +27,7 @@ mumcord-audio = { path = "crates/audio" }
 mumcord-store = { path = "crates/store" }
 mumcord-engine = { path = "crates/engine" }
 mumcord-positional = { path = "crates/positional" }
+mumcord-overlay-ipc = { path = "crates/overlay-ipc" }
 
 # Async, networking, TLS
 tokio = { version = "1.54", features = ["full"] }
@@ -70,6 +73,11 @@ ammonia = "4.2"
 # Tokenizer for page metadata; the same version ammonia already uses.
 html5ever = "0.40"
 image = { version = "0.25", default-features = false, features = ["png", "jpeg", "gif", "webp"] }
+
+# In-game overlay (FR-1.46b): glyph rasterizing in the game-side renderer, Vulkan bindings for
+# the Linux layer (no loader linking: the layer gets every function from the next layer).
+ab_glyph = "0.2"
+ash = { version = "0.38", default-features = false, features = ["std"] }
 
 # Positional audio / plugin host
 libloading = "0.8"
