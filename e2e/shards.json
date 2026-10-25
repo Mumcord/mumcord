@@ -2,6 +2,7 @@
   "shards": [
     ["specs/network/network-resilience.e2e.ts"],
     [
+      "specs/chat/friends.e2e.ts",
       "specs/chat/notifications.e2e.ts",
       "specs/misc/diagnostics-about.e2e.ts",
       "specs/overlay/overlay-smoke.e2e.ts",
