@@ -236,6 +236,9 @@ pub struct Settings {
     /// Share the track playing in the system's media player with others on the server
     /// (FR-1.58). Opt-in: nothing is read from the system while off.
     pub now_playing: bool,
+    /// Answer history sync requests of other Mumcord users with the stored channel messages
+    /// (FR-1.60). On by default; private chats are never shared.
+    pub history_sharing: bool,
 }
 
 impl Default for Settings {
@@ -272,6 +275,7 @@ impl Default for Settings {
             preview_cache_days: Some(DEFAULT_PREVIEW_CACHE_DAYS),
             history_max_age_days: None,
             now_playing: false,
+            history_sharing: true,
         }
     }
 }
@@ -422,6 +426,7 @@ mod tests {
         let old = r#"{"wizard_completed":true,"input_device":"alsa:sysdefault:CARD=II","link_previews":true}"#;
         let parsed: Settings = serde_json::from_str(old).expect("parse");
         assert!(!parsed.now_playing, "off until the user turns it on");
+        assert!(parsed.history_sharing, "history sharing is on by default");
         store
             .save_settings(&Settings {
                 now_playing: true,

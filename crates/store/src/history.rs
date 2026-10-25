@@ -16,7 +16,7 @@ pub enum Conversation {
 }
 
 impl Conversation {
-    fn parts(&self) -> (&'static str, &str) {
+    pub(crate) fn parts(&self) -> (&'static str, &str) {
         match self {
             Self::Channel(path) => ("channel", path),
             Self::Private(cert_hash) => ("private", cert_hash),
@@ -58,7 +58,7 @@ pub struct ChatMessage {
     pub body: String,
 }
 
-fn message_from_row(row: &Row<'_>) -> rusqlite::Result<ChatMessage> {
+pub(crate) fn message_from_row(row: &Row<'_>) -> rusqlite::Result<ChatMessage> {
     Ok(ChatMessage {
         id: row.get(0)?,
         conversation: Conversation::from_parts(&row.get::<_, String>(1)?, row.get(2)?)?,

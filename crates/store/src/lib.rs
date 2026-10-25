@@ -14,6 +14,7 @@ mod secrets;
 mod servers;
 mod settings;
 mod social;
+mod synced;
 
 pub use db::{DB_FILE_NAME, Store, UnixMillis};
 pub use error::{Error, Result};
@@ -28,3 +29,4 @@ pub use settings::{
     VoiceActivation,
 };
 pub use social::{FollowedChannel, PersonSetting};
+pub use synced::RangeSummary;
