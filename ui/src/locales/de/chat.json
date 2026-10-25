@@ -90,7 +90,8 @@
     "loading": "Bild {{name}} wird geladen",
     "label": "Bild: {{name}}",
     "view": "Bild {{name}} ansehen",
-    "viewMessage": "Bild von {{name}}, im Betrachter öffnen"
+    "viewMessage": "Bild von {{name}}, im Betrachter öffnen",
+    "failed": "Das Bild kann nicht angezeigt werden (zu groß oder nicht erreichbar)."
   },
   "viewer": {
     "label": "Bildbetrachter",
@@ -107,5 +108,18 @@
     "previous": "Vorheriges Bild",
     "next": "Nächstes Bild",
     "unnamed": "bild"
+  },
+  "favorites": {
+    "open": "GIF-Favoriten",
+    "title": "GIF-Favoriten",
+    "save": "Als Favorit speichern",
+    "remove": "Aus Favoriten entfernen",
+    "removeNamed": "{{name}} aus den Favoriten entfernen",
+    "send": "{{name}} senden",
+    "hint": "Pfeiltasten bewegen, Eingabe sendet, Entf entfernt, Escape schließt.",
+    "empty": "Noch keine Favoriten. Rechtsklick auf ein GIF im Chat oder der Stern darauf, dann \"Als Favorit speichern\". Es erscheint dann hier."
+  },
+  "imageMenu": {
+    "label": "Bild {{name}}"
   }
 }

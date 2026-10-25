@@ -571,6 +571,37 @@ impl Engine {
             .map_err(store_error)
     }
 
+    /// The saved GIF favorites, most recently used first (FR-1.52).
+    pub fn gif_favorites(&self) -> EngineResult<Vec<mumcord_store::GifFavorite>> {
+        lock(&self.store_handle())
+            .gif_favorites()
+            .map_err(store_error)
+    }
+
+    /// Saves an image link as a favorite; only http(s) links are accepted.
+    pub fn gif_favorite_add(&self, url: &str) -> EngineResult<()> {
+        let url = url.trim();
+        if !(url.starts_with("http://") || url.starts_with("https://")) {
+            return Err(EngineError::invalid("favorites need an http(s) link"));
+        }
+        lock(&self.store_handle())
+            .add_gif_favorite(url, now_millis())
+            .map_err(store_error)
+    }
+
+    pub fn gif_favorite_remove(&self, url: &str) -> EngineResult<()> {
+        lock(&self.store_handle())
+            .remove_gif_favorite(url)
+            .map_err(store_error)
+    }
+
+    /// Moves a favorite to the front after it was sent.
+    pub fn gif_favorite_use(&self, url: &str) -> EngineResult<()> {
+        lock(&self.store_handle())
+            .use_gif_favorite(url, now_millis())
+            .map_err(store_error)
+    }
+
     /// Clears local history (FR-1.33); cleared conversations are no longer unread.
     pub fn history_clear(&self, scope: HistoryScope) -> EngineResult<()> {
         let ctx = self.session_ctx().ok();

@@ -106,6 +106,16 @@ const MIGRATIONS: &[&str] = &[
     );
     CREATE INDEX chat_message_sent_at ON chat_message (sent_at);
     ",
+    // v7: GIF favorites (FR-1.52, QA.43): saved image links the user can send again. The
+    // image itself comes from the link-preview image cache, so only the link is stored.
+    r"
+    CREATE TABLE gif_favorite (
+        url          TEXT    PRIMARY KEY,
+        added_at     INTEGER NOT NULL,
+        last_used_at INTEGER NOT NULL
+    );
+    CREATE INDEX gif_favorite_last_used ON gif_favorite (last_used_at DESC);
+    ",
 ];
 
 /// Handle to the local database. Not `Sync`; callers share it behind a mutex.

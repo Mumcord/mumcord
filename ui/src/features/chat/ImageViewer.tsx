@@ -17,6 +17,7 @@ import { createPortal } from "react-dom";
 import { useTranslation } from "react-i18next";
 import { getApi } from "../../api";
 import { pickSavePath } from "../settings/fileDialogs";
+import { removeFavorite, saveFavorite, useGifFavorites } from "./favorites";
 import { openInBrowser } from "./openLink";
 import {
   clampView,
@@ -63,6 +64,7 @@ function suggestedName(image: ViewerImage, extension: string): string {
 export function ImageViewer({ images, index, onIndexChange, onClose }: ImageViewerProps) {
   const { t } = useTranslation("chat");
   const current = images[index];
+  const favorites = useGifFavorites();
   const dialogRef = useRef<HTMLDivElement>(null);
   const stageRef = useRef<HTMLDivElement>(null);
   const imgRef = useRef<HTMLImageElement>(null);
@@ -353,6 +355,17 @@ export function ImageViewer({ images, index, onIndexChange, onClose }: ImageView
           )}
           {button(t("viewer.fit"), fit, "⤢")}
           {button(t("viewer.save"), () => void save(), "⬇")}
+          {current.url !== undefined
+            ? button(
+                favorites.includes(current.url) ? t("favorites.remove") : t("favorites.save"),
+                () => {
+                  if (current.url === undefined) return;
+                  if (favorites.includes(current.url)) removeFavorite(current.url);
+                  else saveFavorite(current.url);
+                },
+                favorites.includes(current.url) ? "★" : "☆",
+              )
+            : null}
           {current.url !== undefined
             ? button(
                 t("viewer.openInBrowser"),

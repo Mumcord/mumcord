@@ -90,7 +90,8 @@
     "loading": "Loading image {{name}}",
     "label": "Image: {{name}}",
     "view": "View image {{name}}",
-    "viewMessage": "Image from {{name}}, open in viewer"
+    "viewMessage": "Image from {{name}}, open in viewer",
+    "failed": "Image can't be shown (too large or unavailable)."
   },
   "viewer": {
     "label": "Image viewer",
@@ -107,5 +108,18 @@
     "previous": "Previous image",
     "next": "Next image",
     "unnamed": "image"
+  },
+  "favorites": {
+    "open": "GIF favorites",
+    "title": "GIF favorites",
+    "save": "Save as favorite",
+    "remove": "Remove from favorites",
+    "removeNamed": "Remove {{name}} from favorites",
+    "send": "Send {{name}}",
+    "hint": "Arrow keys move, Enter sends, Delete removes, Escape closes.",
+    "empty": "No favorites yet. Right-click a GIF in the chat, or use the star on it, and choose \"Save as favorite\". It will show up here."
+  },
+  "imageMenu": {
+    "label": "Image {{name}}"
   }
 }

@@ -2,7 +2,7 @@ import { createServer, type Server } from "node:http";
 import { readFileSync } from "node:fs";
 import type { AddressInfo } from "node:net";
 import { browser, expect, $, $$ } from "@wdio/globals";
-import { app, bot, testenv } from "../../helpers/index.ts";
+import { app, bot, botInBackground, testenv } from "../../helpers/index.ts";
 import {
   addFirstServer,
   finishWizard,
@@ -237,6 +237,53 @@ describe("chat: link previews, player cards and inline images (AC-1.39, AC-1.40,
         ),
       { timeoutMsg: "focus did not return to the clicked image" },
     );
+  });
+
+  // FR-1.52 / AC-1.42 (QA.43): no GIF search; GIFs from the chat are saved as favorites and sent
+  // again from the GIF button as a plain link.
+  it("AC-1.42 saves a GIF as favorite, sends it from the GIF button, keeps it across a restart", async () => {
+    const url = `http://127.0.0.1:${String(site.port)}/anim.gif`;
+    const gif = inlineImage("anim.gif");
+    await gif.waitForDisplayed({ timeout: 15_000 });
+    // The test GIF is 1×1 px, too small for the hover buttons; the viewer toolbar has the star.
+    await gif.$("button.inline-image__view").click();
+    const viewer = $("[role='dialog'][aria-label='Image viewer']");
+    await viewer.waitForDisplayed();
+    await viewer.$("button[aria-label='Save as favorite']").click();
+    await viewer.$("button[aria-label='Remove from favorites']").waitForExist();
+    await browser.keys("Escape");
+    await viewer.waitForDisplayed({ reverse: true });
+
+    // A channel message only reaches people in that channel, so the bot joins Lobby first.
+    const listener = botInBackground(["script"], { name: "GifListener", timeout: 30 });
+    listener.send("join Lobby");
+    listener.send(`expect message --channel Lobby --contains ${url}`);
+    listener.process.stdin?.end();
+    await sleep(3000);
+    await $("button[aria-label='GIF favorites']").click();
+    const picker = $("[role='dialog'][aria-label='GIF favorites']");
+    await picker.waitForDisplayed();
+    const choose = picker.$("button[aria-label='Send anim.gif']");
+    await expect(choose.$("img")).toHaveAttribute(
+      "src",
+      expect.stringMatching(/^data:image\/gif;base64,/),
+    );
+    await choose.click();
+    await listener.done;
+    await picker.waitForDisplayed({ reverse: true });
+
+    await app.restart();
+    await reconnectSaved();
+    await joinChannel("Lobby");
+    await selectChannel("Lobby");
+    await $("button[aria-label='GIF favorites']").click();
+    const again = $("[role='dialog'][aria-label='GIF favorites']");
+    await again.waitForDisplayed();
+    await again.$("button[aria-label='Send anim.gif']").waitForDisplayed();
+    await again.$("button[aria-label='Remove anim.gif from favorites']").click();
+    await expect(again).toHaveText(expect.stringContaining("No favorites yet"));
+    await browser.keys("Escape");
+    await again.waitForDisplayed({ reverse: true });
   });
 
   it("AC-1.39 with previews switched off shows only the plain link and makes no request", async () => {

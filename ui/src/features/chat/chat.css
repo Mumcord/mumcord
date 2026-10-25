@@ -722,8 +722,29 @@
 }
 
 .inline-image:hover .inline-image__open,
-.inline-image:focus-within .inline-image__open {
+.inline-image:focus-within .inline-image__open,
+.inline-image:hover .inline-image__favorite,
+.inline-image:focus-within .inline-image__favorite {
   opacity: 1;
+}
+
+/* Star next to "Open": save the image as a GIF favorite (QA.43). */
+.inline-image__favorite {
+  position: absolute;
+  bottom: var(--space-2);
+  right: var(--space-2);
+  padding: var(--space-1) var(--space-3);
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-full);
+  background: var(--color-bg-elevated);
+  color: var(--color-text);
+  font-size: var(--font-size-sm);
+  cursor: pointer;
+  opacity: 0;
+}
+
+.inline-image__favorite:hover {
+  background: var(--color-bg-hover);
 }
 
 .inline-image__open:hover {
@@ -863,4 +884,126 @@
   background: var(--color-bg-elevated);
   color: var(--color-text);
   font-size: var(--font-size-sm);
+}
+
+/* GIF favorites picker above the GIF button (QA.43). */
+.gif-picker {
+  position: relative;
+  display: flex;
+}
+
+.gif-picker__popover {
+  position: absolute;
+  bottom: calc(100% + var(--space-2));
+  left: 0;
+  z-index: 10;
+  width: min(30rem, calc(100vw - 2 * var(--space-4)));
+  max-height: 20rem;
+  padding: var(--space-3);
+  overflow-y: auto;
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-md);
+  background: var(--color-bg-elevated);
+  color: var(--color-text);
+  box-shadow: 0 4px 16px rgb(0 0 0 / 0.3);
+}
+
+.gif-picker__empty,
+.gif-picker__hint {
+  margin: 0 0 var(--space-2);
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+}
+
+.gif-picker__empty {
+  margin: 0;
+}
+
+.gif-picker__grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.gif-picker__cell {
+  position: relative;
+}
+
+.gif-picker__choose {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  aspect-ratio: 1;
+  padding: 0;
+  overflow: hidden;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: var(--color-bg-hover);
+  color: var(--color-text);
+  cursor: pointer;
+}
+
+.gif-picker__choose:hover {
+  border-color: var(--color-border-strong);
+}
+
+.gif-picker__img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.gif-picker__placeholder {
+  padding: var(--space-1);
+  overflow: hidden;
+  font-size: var(--font-size-sm);
+  overflow-wrap: anywhere;
+}
+
+.gif-picker__remove {
+  position: absolute;
+  top: var(--space-1);
+  right: var(--space-1);
+  width: 1.5rem;
+  height: 1.5rem;
+  padding: 0;
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-full);
+  background: var(--color-bg-elevated);
+  color: var(--color-text);
+  cursor: pointer;
+  opacity: 0;
+}
+
+.gif-picker__cell:hover .gif-picker__remove,
+.gif-picker__cell:focus-within .gif-picker__remove,
+.gif-picker__remove:focus-visible {
+  opacity: 1;
+}
+
+/* An image that cannot be shown: a compact note with the way out to the browser. */
+.inline-image--failed {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  max-width: 28rem;
+  padding: var(--space-2) var(--space-4);
+  padding-right: 2.5rem;
+  border: 1px solid var(--color-border);
+  background: var(--color-bg-elevated);
+  font-size: var(--font-size-sm);
+}
+
+.inline-image__failed-open {
+  flex: none;
+  padding: var(--space-1) var(--space-3);
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-full);
+  background: none;
+  color: var(--color-text);
+  cursor: pointer;
 }

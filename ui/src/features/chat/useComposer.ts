@@ -40,6 +40,8 @@ export interface Composer {
   busy: boolean;
   error: string | null;
   submit: () => Promise<void>;
+  /** Sends a link as its own message right away (GIF favorites); the typed text stays. */
+  sendLink: (url: string) => Promise<void>;
 }
 
 export function useComposer(target: SendTarget | null, limits: MessageLimits): Composer {
@@ -115,5 +117,27 @@ export function useComposer(target: SendTarget | null, limits: MessageLimits): C
     }
   }, [busy, image, limits, t, target, text]);
 
-  return { text, setText, image, addImage, removeImage, busy, error, submit };
+  const sendLink = useCallback(
+    async (url: string) => {
+      if (busy || target === null) return;
+      const html = bodyHtml(url, limits);
+      if (limits.text > 0 && html.length > limits.text) {
+        setError(t("errors.tooLong", { max: limits.text }));
+        throw new Error("link too long");
+      }
+      setBusy(true);
+      setError(null);
+      try {
+        addSentMessage(await send(target, html));
+      } catch (err) {
+        setError(describeSendError(t, err, t("errors.tooLongNoLimit")));
+        throw err;
+      } finally {
+        setBusy(false);
+      }
+    },
+    [busy, limits, t, target],
+  );
+
+  return { text, setText, image, addImage, removeImage, busy, error, submit, sendLink };
 }

@@ -131,3 +131,30 @@ impl From<mumcord_engine::LinkPreview> for LinkPreview {
         }
     }
 }
+
+/// Links of the saved GIF favorites, most recently used first.
+#[tauri::command]
+#[specta::specta]
+pub fn gif_favorites(engine: State<'_, Engine>) -> ApiResult<Vec<String>> {
+    Ok(engine.gif_favorites()?.into_iter().map(|f| f.url).collect())
+}
+
+/// Saves an http(s) image link as a favorite (at most 200; the least recently used go first).
+#[tauri::command]
+#[specta::specta]
+pub fn gif_favorite_add(engine: State<'_, Engine>, url: String) -> ApiResult<()> {
+    Ok(engine.gif_favorite_add(&url)?)
+}
+
+#[tauri::command]
+#[specta::specta]
+pub fn gif_favorite_remove(engine: State<'_, Engine>, url: String) -> ApiResult<()> {
+    Ok(engine.gif_favorite_remove(&url)?)
+}
+
+/// Moves a favorite to the front of the list after it was sent.
+#[tauri::command]
+#[specta::specta]
+pub fn gif_favorite_use(engine: State<'_, Engine>, url: String) -> ApiResult<()> {
+    Ok(engine.gif_favorite_use(&url)?)
+}

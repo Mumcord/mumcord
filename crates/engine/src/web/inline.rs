@@ -17,7 +17,7 @@ use serde::{Deserialize, Serialize};
 use super::fetch::{FetchError, FetchedImage, Fetcher, ImageKind};
 
 /// Larger images are refused; animated GIFs are often several megabytes.
-pub const INLINE_IMAGE_LIMIT: usize = 8 * 1024 * 1024;
+pub const INLINE_IMAGE_LIMIT: usize = 16 * 1024 * 1024;
 /// Animations reach the webview as they are, so it decodes every frame: keep them modest.
 pub const ANIMATED_MAX_SIDE: u32 = 2048;
 /// Still images are re-encoded to at most this many pixels per side: twice the 400×300 box

@@ -18,6 +18,7 @@ import { selfUser, useServerSelector } from "../channels";
 import { useAvatars } from "../members/useAvatars";
 import type { SendTarget } from "./conversationInfo";
 import { FormatToolbar } from "./FormatToolbar";
+import { GifPicker } from "./GifPicker";
 import { applyFormat, formatForKey, type Edit, type Format } from "./formatting";
 import type { MessageLimits } from "./images";
 import {
@@ -37,6 +38,8 @@ export interface ComposerProps {
   label: string;
   /** Why writing is impossible right now (no permission, person offline); disables the input. */
   blockedReason: string | null;
+  /** The link-previews privacy switch: off means the GIF picker loads nothing from the web. */
+  linkPreviews?: boolean;
 }
 
 function Icon({ d }: { d: string }) {
@@ -54,7 +57,13 @@ function firstImage(files: FileList | null | undefined): File | undefined {
   return Array.from(files ?? []).find((file) => file.type.startsWith("image/"));
 }
 
-export function Composer({ target, limits, label, blockedReason }: ComposerProps) {
+export function Composer({
+  target,
+  limits,
+  label,
+  blockedReason,
+  linkPreviews = false,
+}: ComposerProps) {
   const { t } = useTranslation("chat");
   const composer = useComposer(target, limits);
   const fileInput = useRef<HTMLInputElement>(null);
@@ -242,6 +251,11 @@ export function Composer({ target, limits, label, blockedReason }: ComposerProps
         >
           <Icon d={IMAGE_ICON} />
         </button>
+        <GifPicker
+          onSend={composer.sendLink}
+          disabled={disabled || composer.busy}
+          linkPreviews={linkPreviews}
+        />
         <input
           ref={fileInput}
           type="file"

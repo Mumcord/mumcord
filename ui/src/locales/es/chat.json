@@ -90,7 +90,8 @@
     "loading": "Cargando la imagen {{name}}",
     "label": "Imagen: {{name}}",
     "view": "Ver la imagen {{name}}",
-    "viewMessage": "Imagen de {{name}}, abrir en el visor"
+    "viewMessage": "Imagen de {{name}}, abrir en el visor",
+    "failed": "No se puede mostrar la imagen (demasiado grande o no disponible)."
   },
   "viewer": {
     "label": "Visor de imágenes",
@@ -107,5 +108,18 @@
     "previous": "Imagen anterior",
     "next": "Imagen siguiente",
     "unnamed": "imagen"
+  },
+  "favorites": {
+    "open": "GIF favoritos",
+    "title": "GIF favoritos",
+    "save": "Guardar como favorito",
+    "remove": "Quitar de favoritos",
+    "removeNamed": "Quitar {{name}} de favoritos",
+    "send": "Enviar {{name}}",
+    "hint": "Las flechas se mueven, Intro envía, Supr quita, Escape cierra.",
+    "empty": "Aún no hay favoritos. Haz clic derecho en un GIF del chat o usa su estrella y elige \"Guardar como favorito\". Aparecerá aquí."
+  },
+  "imageMenu": {
+    "label": "Imagen {{name}}"
   }
 }

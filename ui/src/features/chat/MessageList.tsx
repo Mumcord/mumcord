@@ -20,6 +20,7 @@ import { Avatar, ProfilePreviewTrigger } from "../members";
 import type { ConversationLog } from "./chatStore";
 import { daysAgo, messageLayout } from "./grouping";
 import { highlightCode } from "./highlight";
+import { hideShownLinks, useInlineShown } from "./inlineLinks";
 import { ImageViewer, type ViewerImage } from "./ImageViewer";
 import { LinkPreviews } from "./LinkPreviewCard";
 import { imageName, type ImageClickHandler } from "./links";
@@ -62,7 +63,13 @@ function Body({ message, tabIndex, previews, onImageClick }: BodyProps) {
   const { t } = useTranslation("chat");
   const html = message.body;
   const ref = useRef<HTMLDivElement>(null);
-  const sanitized = useMemo(() => highlightCode(sanitizeHtml(html)), [html]);
+  const cleaned = useMemo(() => highlightCode(sanitizeHtml(html)), [html]);
+  const inlineShown = useInlineShown(message.id);
+  // A link whose image is shown below gives way to the image (QA.43).
+  const sanitized = useMemo(
+    () => (previews ? hideShownLinks(cleaned, inlineShown) : cleaned),
+    [cleaned, inlineShown, previews],
+  );
   useEffect(() => {
     for (const link of ref.current?.querySelectorAll("a") ?? []) {
       link.tabIndex = tabIndex;
@@ -84,7 +91,7 @@ function Body({ message, tabIndex, previews, onImageClick }: BodyProps) {
       <LinkPreviews
         messageId={message.id}
         dismissed={message.dismissedPreviews}
-        html={sanitized}
+        html={cleaned}
         body={html}
         tabIndex={tabIndex}
         onImageClick={onImageClick}

@@ -84,6 +84,13 @@ export const commands = {
 	 *  stored (history saving off) keep nothing; the UI hides the card for the session.
 	 */
 	previewDismiss: (messageId: string, url: string) => typedError<null, ApiError>(__TAURI_INVOKE("preview_dismiss", { messageId, url })),
+	/**  Links of the saved GIF favorites, most recently used first. */
+	gifFavorites: () => typedError<string[], ApiError>(__TAURI_INVOKE("gif_favorites")),
+	/**  Saves an http(s) image link as a favorite (at most 200; the least recently used go first). */
+	gifFavoriteAdd: (url: string) => typedError<null, ApiError>(__TAURI_INVOKE("gif_favorite_add", { url })),
+	gifFavoriteRemove: (url: string) => typedError<null, ApiError>(__TAURI_INVOKE("gif_favorite_remove", { url })),
+	/**  Moves a favorite to the front of the list after it was sent. */
+	gifFavoriteUse: (url: string) => typedError<null, ApiError>(__TAURI_INVOKE("gif_favorite_use", { url })),
 	/**
 	 *  "Clear now": deletes all cached link previews, thumbnails and images. Returns the freed
 	 *  size in bytes (capped at 4 GB; the cache is far smaller).

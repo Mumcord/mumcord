@@ -664,3 +664,23 @@ fn parses_spotify_oembed() {
     assert!(parse_oembed(insecure).expect("parse").thumbnail.is_none());
     assert!(parse_oembed(b"not json").is_err());
 }
+
+/// Manual check against the real GIF hosts (needs internet): `cargo test -p mumcord-engine
+/// live_gif_hosts -- --ignored --nocapture`.
+#[tokio::test]
+#[ignore = "needs internet"]
+async fn live_gif_hosts() {
+    let previews = LinkPreviews::new(None, fetch::AddressPolicy::PublicOnly, Timeouts::default());
+    for url in [
+        "https://media4.giphy.com/media/v1.Y2lkPTc5MGI3NjExYnBlZW9pamVneDBlZm8yZnpxYW5ieXRrNXNtdjhreTN6ZWVyOW92ZSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/1ojn1S7BTXUry8elNi/giphy.gif",
+        "https://giphy.com/gifs/meme-67-kid-kids-1ojn1S7BTXUry8elNi",
+    ] {
+        let preview = previews.preview(url).await;
+        let image = previews.inline_image(url).await;
+        println!(
+            "{url}\n  image_link={:?} -> {:?}",
+            preview.map(|p| p.image_link),
+            image.map(|i| (i.width, i.height, i.animated, i.data_url.len()))
+        );
+    }
+}

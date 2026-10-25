@@ -11,6 +11,7 @@ pub mod embed;
 pub mod fetch;
 pub mod inline;
 pub mod meta;
+pub mod rendition;
 
 use std::collections::HashMap;
 use std::io::Cursor;
@@ -173,7 +174,7 @@ impl LinkPreviews {
             return hit;
         }
         let result = match self.fetcher() {
-            Ok(fetcher) => inline::load(fetcher, &url).await,
+            Ok(fetcher) => self.load_inline(fetcher, &url).await,
             Err(e) => Err(e),
         };
         if let Err(e) = &result {
@@ -183,6 +184,38 @@ impl LinkPreviews {
         let image = result.ok();
         self.images.put(&key, image.clone());
         image
+    }
+
+    /// Tries smaller renditions of known GIF hosts first (a 10 MB GIF is often a few hundred
+    /// KB as WebP), then the address itself. The result keeps the address as posted.
+    async fn load_inline(&self, fetcher: &Fetcher, url: &Url) -> Result<InlineImage, FetchError> {
+        let mut candidates = rendition::smaller_renditions(url);
+        match rendition::gif_page(url) {
+            Some(rendition::GifPage::Tenor) => {
+                let page = fetcher.page(url.as_str()).await?;
+                let image = meta::parse(&page.body, &page.url)
+                    .image
+                    .filter(|i| {
+                        let path = i.path().to_ascii_lowercase();
+                        path.ends_with(".gif") || path.ends_with(".webp")
+                    })
+                    .ok_or(FetchError::UnsupportedType)?;
+                candidates.push(image);
+            }
+            Some(rendition::GifPage::Giphy(_)) => {}
+            None => candidates.push(url.clone()),
+        }
+        let mut last = FetchError::UnsupportedType;
+        for candidate in candidates {
+            match inline::load(fetcher, &candidate).await {
+                Ok(mut image) => {
+                    image.url = url.to_string();
+                    return Ok(image);
+                }
+                Err(e) => last = e,
+            }
+        }
+        Err(last)
     }
 
     async fn build(&self, url: &Url) -> Result<LinkPreview, FetchError> {
@@ -198,6 +231,11 @@ impl LinkPreviews {
             video: None,
             image_link: false,
         };
+        if rendition::gif_page(url).is_some() {
+            // The page is only a wrapper around a GIF: the UI shows the GIF (`inline_image`).
+            preview.image_link = true;
+            return Ok(preview);
+        }
         let image_url = match &video {
             Some(link) if link.provider == VideoProvider::Youtube => {
                 preview.site_name = Some("YouTube".into());

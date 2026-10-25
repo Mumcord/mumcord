@@ -512,6 +512,8 @@ export function createMockApi(options: MockOptions = {}): MockApi {
 
   /** Pretend size of the preview cache, freed by `previewCacheClear`. */
   let cachedPreviewBytes = 1_468_006;
+  // GIF favorites, most recently used first.
+  let gifFavorites: string[] = [];
 
   function serverHistory(serverId: number): Map<string, ChatMessage[]> {
     let map = history.get(serverId);
@@ -1011,6 +1013,21 @@ export function createMockApi(options: MockOptions = {}): MockApi {
             message.dismissedPreviews.push(url);
         }
       }
+      return Promise.resolve(null);
+    },
+    gifFavorites: () => Promise.resolve([...gifFavorites]),
+    gifFavoriteAdd: (url) => {
+      if (!/^https?:\/\//i.test(url)) fail("invalidInput", "favorites need an http(s) link");
+      gifFavorites = [url, ...gifFavorites.filter((u) => u !== url)].slice(0, 200);
+      return Promise.resolve(null);
+    },
+    gifFavoriteRemove: (url) => {
+      gifFavorites = gifFavorites.filter((u) => u !== url);
+      return Promise.resolve(null);
+    },
+    gifFavoriteUse: (url) => {
+      if (gifFavorites.includes(url))
+        gifFavorites = [url, ...gifFavorites.filter((u) => u !== url)];
       return Promise.resolve(null);
     },
     saveImage: () => Promise.resolve(null),

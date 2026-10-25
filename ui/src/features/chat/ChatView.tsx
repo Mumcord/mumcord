@@ -186,6 +186,7 @@ function ConversationChat({ conversation, renderHeaderActions }: ConversationCha
         limits={limits}
         label={t("composer.label", { name: title })}
         blockedReason={blockedReason}
+        linkPreviews={linkPreviews}
       />
       {profileCard}
     </div>
