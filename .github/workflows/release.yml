@@ -132,6 +132,8 @@ jobs:
           Built and smoke-tested by [this workflow run]($RUN_URL). [Code signing policy](https://github.com/ToBee94/mumcord/blob/main/CODE_SIGNING.md) · [Privacy policy](https://github.com/ToBee94/mumcord/blob/main/PRIVACY.md)
 
           These binaries are licensed under the [GNU AGPL-3.0](https://github.com/ToBee94/mumcord/blob/main/LICENSE) only.
+
+          Full changelog: [CHANGELOG.md](https://github.com/ToBee94/mumcord/blob/main/CHANGELOG.md)
           EOF
           # Highlights are written per release; other versions get the plain notes.
           if [[ "$VERSION" == "0.3.0" ]]; then

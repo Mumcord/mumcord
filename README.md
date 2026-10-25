@@ -27,6 +27,8 @@ Test builds for Windows and macOS are unsigned. The operating system will show a
 
 Installers for Windows (`.exe`), macOS (`.dmg`, Apple Silicon and Intel) and Linux (`.AppImage`) are on the [Releases page](https://github.com/ToBee94/mumcord/releases), each with a `SHA256SUMS` file to check the download. Each release's notes say whether its Windows and macOS builds are signed; unsigned builds show a security warning on first start, and the notes explain how to open the app anyway.
 
+See the [changelog](CHANGELOG.md) for what changed in each release.
+
 ## Code signing policy
 
 Windows releases are signed with Azure Artifact Signing once the setup is active. What is signed, and who builds, reviews and publishes signed releases, is described in the [code signing policy](CODE_SIGNING.md).
