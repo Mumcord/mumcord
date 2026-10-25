@@ -229,7 +229,12 @@ function renderLog(log: Partial<ConversationLog>, onSyncEarlier?: () => void) {
     </main>
   );
   const result = render(view(log));
-  return { ...result, update: (next: Partial<ConversationLog>) => result.rerender(view(next)) };
+  return {
+    ...result,
+    update: (next: Partial<ConversationLog>) => {
+      result.rerender(view(next));
+    },
+  };
 }
 
 describe("synced messages in the message list (FR-1.60b, AC-1.51d)", () => {
