@@ -233,7 +233,7 @@
 | L2b | Translations fr, it, pt, nl, pl, sv, da | done | l2-tr-a | – | simple | FR-1.36 | ui/src/locales |
 | L2c | Translations fi, cs, sk, sl, hr, hu, ro | done | l2-tr-b | – | simple | FR-1.36 | ui/src/locales |
 | L2d | Translations bg, el, et, lv, lt, mt, ga | done | l2-tr-c | – | simple | FR-1.36 | ui/src/locales |
-| L2e | Tray menu texts (src-tauri/src/tray.rs, hardcoded en/es/de) for all 24 languages | in progress | | L2a | simple | FR-1.36 | src-tauri/src/tray.rs |
+| L2e | Tray menu texts (src-tauri/src/tray.rs, hardcoded en/es/de) for all 24 languages | done | | L2a | simple | FR-1.36 | src-tauri/src/tray.rs |
 | R4 | SignPath preparation: CODE_SIGNING.md, PRIVACY.md, README/release-notes links, Windows exe metadata, release step gated on secrets | done – SignPath flow superseded by R6 (QA.79) | r4-signpath | – | simple | QA.76 | docs, .github/workflows/release.yml, tauri.conf.json |
 | R5 | macOS signing + notarization in release.yml gated on Apple secrets; maintainer guide for certificate/API key/secrets | done (untested until secrets exist) | r5-apple-signing | R4 | simple | QA.77 | .github/workflows/release.yml, docs |
 | R6 | Azure Artifact Signing for Windows (exe + installer via Tauri signCommand, GitHub OIDC), replace SignPath steps, maintainer guide | done – untested until Azure is set up (environment `release`) | r6-azure-signing | R4 | simple | QA.79 | release workflows, tauri.conf.json, docs |
