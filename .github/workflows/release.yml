@@ -70,8 +70,12 @@ jobs:
     uses: ./.github/workflows/build-and-smoke.yml
     with:
       release: true
-    # Passes the optional Apple and SignPath signing secrets (docs/release-signing.md).
+    # Passes the optional Apple signing secrets; id-token lets the Windows job log in to Azure
+    # for Artifact Signing without a stored secret (docs/release-signing.md).
     secrets: inherit
+    permissions:
+      contents: read
+      id-token: write
 
   release:
     name: Create draft release

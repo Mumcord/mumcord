@@ -5,7 +5,7 @@ name: Build and smoke
 # smoke-tests it against a local Mumble server (scripts/smoke/smoke.sh). Called by
 # test-builds.yml (spec §10, AC-1.30) and release.yml (QA.12). Test builds are never signed.
 # Release builds sign and notarize the macOS DMG only when the Apple secrets exist, and sign the
-# Windows app and installer through SignPath only when the SignPath secrets exist
+# Windows app and installer through Azure Artifact Signing only when the Azure variables exist
 # (docs/release-signing.md); without them those bundles are built unsigned.
 on:
   workflow_call:
@@ -21,10 +21,6 @@ on:
       APPLE_API_KEY:
         required: false
       APPLE_API_KEY_P8:
-        required: false
-      SIGNPATH_API_TOKEN:
-        required: false
-      SIGNPATH_ORGANIZATION_ID:
         required: false
     inputs:
       release:
@@ -60,8 +56,9 @@ jobs:
             bundle: target/universal-apple-darwin/release/bundle/dmg/*.dmg
             rust-targets: aarch64-apple-darwin,x86_64-apple-darwin
     runs-on: ${{ matrix.os }}
-    # A signed Windows release waits for two manual SignPath approvals.
-    timeout-minutes: ${{ (inputs.release && matrix.name == 'windows') && 240 || 60 }}
+    timeout-minutes: 60
+    # The Azure federated credential trusts only jobs in the "release" environment (OIDC).
+    environment: ${{ (inputs.release && matrix.name == 'windows') && 'release' || '' }}
     steps:
       - uses: actions/checkout@v4
 
@@ -121,96 +118,110 @@ jobs:
           } >> "$GITHUB_ENV"
 
       - name: Check Windows signing setup
-        id: signpath
+        id: azure
         if: runner.os == 'Windows' && inputs.release
         shell: bash
         env:
-          SIGNPATH_API_TOKEN: ${{ secrets.SIGNPATH_API_TOKEN }}
-          SIGNPATH_ORGANIZATION_ID: ${{ vars.SIGNPATH_ORGANIZATION_ID || secrets.SIGNPATH_ORGANIZATION_ID }}
+          AZURE_CLIENT_ID: ${{ vars.AZURE_CLIENT_ID }}
+          AZURE_TENANT_ID: ${{ vars.AZURE_TENANT_ID }}
+          AZURE_SUBSCRIPTION_ID: ${{ vars.AZURE_SUBSCRIPTION_ID }}
+          AZURE_SIGNING_ENDPOINT: ${{ vars.AZURE_SIGNING_ENDPOINT }}
+          AZURE_SIGNING_ACCOUNT: ${{ vars.AZURE_SIGNING_ACCOUNT }}
+          AZURE_CERT_PROFILE: ${{ vars.AZURE_CERT_PROFILE }}
         run: |
-          if [[ -z "$SIGNPATH_API_TOKEN" || -z "$SIGNPATH_ORGANIZATION_ID" ]]; then
-            echo "::warning::SIGNPATH_API_TOKEN or SIGNPATH_ORGANIZATION_ID is not set: building the Windows installer unsigned."
-            exit 0
-          fi
+          for v in AZURE_CLIENT_ID AZURE_TENANT_ID AZURE_SUBSCRIPTION_ID AZURE_SIGNING_ENDPOINT AZURE_SIGNING_ACCOUNT AZURE_CERT_PROFILE; do
+            if [[ -z "${!v}" ]]; then
+              echo "::warning::Repository variable $v is not set: building the Windows installer unsigned."
+              exit 0
+            fi
+          done
           echo "enabled=true" >> "$GITHUB_OUTPUT"
-          echo "version=$(node -p "require('./package.json').version")" >> "$GITHUB_OUTPUT"
 
       - name: Build bundle
-        if: steps.signpath.outputs.enabled != 'true'
+        if: steps.azure.outputs.enabled != 'true'
         run: npm run tauri build -- ${{ matrix.args }}
 
-      # Signed Windows release: SignPath cannot sign files inside a finished NSIS installer, so
-      # the app is built and signed first, then the installer is bundled around the signed exe
-      # and signed itself. Each signing request waits for the maintainer's manual approval.
+      # Signed Windows release: Tauri signs the app exe, the uninstaller and the installer with
+      # signtool and Microsoft's Artifact Signing plugin, so the installer contains the signed
+      # exe. The signCommand lives only in this CI overlay, never in tauri.conf.json, so local
+      # builds stay unsigned. The app is compiled before the Azure login because the login's
+      # GitHub token is short-lived and must still be valid when the first file is signed.
       - name: Build Windows app for signing
-        if: steps.signpath.outputs.enabled == 'true'
+        if: steps.azure.outputs.enabled == 'true'
         run: npm run tauri build -- --no-bundle
 
-      - name: Upload unsigned Windows app
-        id: unsigned-app
-        if: steps.signpath.outputs.enabled == 'true'
-        uses: actions/upload-artifact@v4
-        with:
-          name: mumcord-windows-unsigned-app
-          path: target/release/mumcord.exe
-          if-no-files-found: error
-          retention-days: 1
+      - name: Prepare Artifact Signing
+        if: steps.azure.outputs.enabled == 'true'
+        shell: pwsh
+        env:
+          AZURE_SIGNING_ENDPOINT: ${{ vars.AZURE_SIGNING_ENDPOINT }}
+          AZURE_SIGNING_ACCOUNT: ${{ vars.AZURE_SIGNING_ACCOUNT }}
+          AZURE_CERT_PROFILE: ${{ vars.AZURE_CERT_PROFILE }}
+        run: |
+          # Pinned NuGet packages: signtool from the Windows SDK build tools and the Artifact
+          # Signing plugin it loads (runs on the .NET 8 runtime that ships with the runner).
+          $dir = "$env:RUNNER_TEMP\artifact-signing"
+          $packages = @{
+            'microsoft.windows.sdk.buildtools' = '10.0.28000.2705'
+            'microsoft.artifactsigning.client' = '1.0.146'
+          }
+          foreach ($name in $packages.Keys) {
+            $version = $packages[$name]
+            $nupkg = "$dir\$name.zip"
+            New-Item -ItemType Directory -Force $dir | Out-Null
+            Invoke-WebRequest "https://api.nuget.org/v3-flatcontainer/$name/$version/$name.$version.nupkg" -OutFile $nupkg
+            Expand-Archive $nupkg -DestinationPath "$dir\$name"
+          }
+          $signtool = "$dir\microsoft.windows.sdk.buildtools\bin\10.0.28000.0\x64\signtool.exe"
+          $dlib = "$dir\microsoft.artifactsigning.client\bin\x64\Azure.CodeSigning.Dlib.dll"
+          foreach ($file in $signtool, $dlib) {
+            if (-not (Test-Path $file)) { throw "$file not found in the downloaded package" }
+          }
+          # Only the Azure CLI login from the next step may authenticate.
+          $metadata = "$dir\metadata.json"
+          @{
+            Endpoint               = $env:AZURE_SIGNING_ENDPOINT
+            CodeSigningAccountName = $env:AZURE_SIGNING_ACCOUNT
+            CertificateProfileName = $env:AZURE_CERT_PROFILE
+            CorrelationId          = "${{ github.repository }}/${{ github.run_id }}"
+            ExcludeCredentials     = @(
+              'EnvironmentCredential', 'WorkloadIdentityCredential', 'ManagedIdentityCredential',
+              'SharedTokenCacheCredential', 'VisualStudioCredential', 'VisualStudioCodeCredential',
+              'AzurePowerShellCredential', 'AzureDeveloperCliCredential', 'InteractiveBrowserCredential'
+            )
+          } | ConvertTo-Json | Set-Content -Encoding utf8 $metadata
+          @{
+            bundle = @{
+              windows = @{
+                signCommand = @{
+                  cmd  = $signtool
+                  args = @(
+                    'sign', '/v', '/fd', 'SHA256',
+                    '/tr', 'http://timestamp.acs.microsoft.com', '/td', 'SHA256',
+                    '/d', 'Mumcord',
+                    '/dlib', $dlib, '/dmdf', $metadata,
+                    '%1'
+                  )
+                }
+              }
+            }
+          } | ConvertTo-Json -Depth 5 | Set-Content -Encoding utf8 "$dir\tauri.signing.json"
+          "MUMCORD_SIGNING_CONFIG=$dir\tauri.signing.json" | Out-File -Append -Encoding utf8 $env:GITHUB_ENV
 
-      - name: Sign Windows app (SignPath)
-        if: steps.signpath.outputs.enabled == 'true'
-        uses: signpath/github-action-submit-signing-request@v3
+      # OpenID Connect: GitHub vouches for this workflow run, so no Azure secret is stored.
+      - name: Log in to Azure
+        if: steps.azure.outputs.enabled == 'true'
+        uses: azure/login@v3
         with:
-          api-token: ${{ secrets.SIGNPATH_API_TOKEN }}
-          organization-id: ${{ vars.SIGNPATH_ORGANIZATION_ID || secrets.SIGNPATH_ORGANIZATION_ID }}
-          project-slug: mumcord
-          signing-policy-slug: release-signing
-          artifact-configuration-slug: initial
-          github-artifact-id: ${{ steps.unsigned-app.outputs.artifact-id }}
-          wait-for-completion: true
-          wait-for-completion-timeout-in-seconds: 5400
-          output-artifact-directory: signed-app
-          parameters: |
-            version: "${{ steps.signpath.outputs.version }}"
+          client-id: ${{ vars.AZURE_CLIENT_ID }}
+          tenant-id: ${{ vars.AZURE_TENANT_ID }}
+          subscription-id: ${{ vars.AZURE_SUBSCRIPTION_ID }}
 
-      - name: Bundle Windows installer around the signed app
-        if: steps.signpath.outputs.enabled == 'true'
+      - name: Bundle and sign Windows installer
+        if: steps.azure.outputs.enabled == 'true'
         shell: bash
         run: |
-          cp signed-app/mumcord.exe target/release/mumcord.exe
-          npm run tauri bundle -- --bundles nsis
-
-      - name: Upload unsigned Windows installer
-        id: unsigned-installer
-        if: steps.signpath.outputs.enabled == 'true'
-        uses: actions/upload-artifact@v4
-        with:
-          name: mumcord-windows-unsigned-installer
-          path: ${{ matrix.bundle }}
-          if-no-files-found: error
-          retention-days: 1
-
-      - name: Sign Windows installer (SignPath)
-        if: steps.signpath.outputs.enabled == 'true'
-        uses: signpath/github-action-submit-signing-request@v3
-        with:
-          api-token: ${{ secrets.SIGNPATH_API_TOKEN }}
-          organization-id: ${{ vars.SIGNPATH_ORGANIZATION_ID || secrets.SIGNPATH_ORGANIZATION_ID }}
-          project-slug: mumcord
-          signing-policy-slug: release-signing
-          artifact-configuration-slug: initial
-          github-artifact-id: ${{ steps.unsigned-installer.outputs.artifact-id }}
-          wait-for-completion: true
-          wait-for-completion-timeout-in-seconds: 5400
-          output-artifact-directory: signed-installer
-          parameters: |
-            version: "${{ steps.signpath.outputs.version }}"
-
-      - name: Replace the unsigned installer with the signed one
-        if: steps.signpath.outputs.enabled == 'true'
-        shell: bash
-        run: |
-          rm target/release/bundle/nsis/*-setup.exe
-          cp signed-installer/*-setup.exe target/release/bundle/nsis/
+          npm run tauri bundle -- --bundles nsis --config "$MUMCORD_SIGNING_CONFIG"
           echo "MUMCORD_WINDOWS_SIGNED=true" >> "$GITHUB_ENV"
 
       - name: Collect artifact
