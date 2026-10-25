@@ -72,6 +72,8 @@
     "nowGaming": "Share the game I'm playing",
     "nowGamingHint": "Others see your current game",
     "unavailable": "Not available on this system",
+    "overlay": "Overlay",
+    "overlayHint": "Shows who is talking on top of games",
     "allSettings": "All settings…",
     "label": "Quick settings"
   }

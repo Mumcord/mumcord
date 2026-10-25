@@ -72,6 +72,8 @@
     "nowGaming": "Teilen, was ich gerade spiele",
     "nowGamingHint": "Andere sehen dein aktuelles Spiel",
     "unavailable": "Auf diesem System nicht verfügbar",
+    "overlay": "Overlay",
+    "overlayHint": "Zeigt, wer spricht, über Spielen",
     "allSettings": "Alle Einstellungen…",
     "label": "Schnelleinstellungen"
   }

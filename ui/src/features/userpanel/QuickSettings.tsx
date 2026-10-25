@@ -14,7 +14,7 @@ import {
 } from "react";
 import { createPortal } from "react-dom";
 import { useTranslation } from "react-i18next";
-import { getApi, type Theme } from "../../api";
+import { getApi, type OverlayState, type Theme } from "../../api";
 import { useSettings } from "../settings/useSettings";
 import "./quicksettings.css";
 
@@ -35,6 +35,7 @@ const ICON = {
   light:
     "M12 8a4 4 0 1 0 0 8a4 4 0 0 0 0-8zM12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4",
   settings: "M5 12h14M13 6l6 6l-6 6",
+  overlay: "M12 3l9 5-9 5-9-5zM3 13l9 5 9-5",
 } as const;
 
 function Glyph({ d }: { d: string }) {
@@ -80,6 +81,8 @@ export function QuickSettings({
   const { settings, update } = useSettings();
   const [supported, setSupported] = useState(true);
   const [gamingSupported, setGamingSupported] = useState(true);
+  const [overlay, setOverlay] = useState<OverlayState | null>(null);
+  const [macos, setMacos] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
   const titleId = useId();
   const ready = settings !== null;
@@ -116,6 +119,37 @@ export function QuickSettings({
     };
   }, []);
 
+  // The overlay is not offered on macOS (QA.58); the OS name comes from the app info.
+  useEffect(() => {
+    let active = true;
+    const api = getApi();
+    api.appInfo().then(
+      (info) => {
+        if (active) setMacos(info.os.startsWith("macos"));
+      },
+      (error: unknown) => {
+        console.error("Reading the app info failed", error);
+      },
+    );
+    api.overlayState().then(
+      (state) => {
+        if (active) setOverlay(state);
+      },
+      (error: unknown) => {
+        console.error("Reading the overlay state failed", error);
+      },
+    );
+    const unlisten = api.on("overlayChanged", (event) => {
+      if (active) setOverlay(event.state);
+    });
+    return () => {
+      active = false;
+      unlisten();
+    };
+  }, []);
+
+  const overlayShown = !macos && overlay !== null;
+
   useEffect(() => {
     const dismiss = () => {
       onClose();
@@ -140,7 +174,7 @@ export function QuickSettings({
     const top = Math.max(EDGE, Math.min(menu.y, window.innerHeight - element.offsetHeight - EDGE));
     element.style.left = `${String(left)}px`;
     element.style.top = `${String(top)}px`;
-  }, [menu, ready, supported]);
+  }, [menu, ready, supported, overlayShown]);
 
   // Focus the first item once the settings have loaded and the items are enabled.
   useEffect(() => {
@@ -257,6 +291,20 @@ export function QuickSettings({
             },
             !gamingSupported,
           )}
+          {overlayShown &&
+            row(
+              ICON.overlay,
+              t("quickSettings.overlay"),
+              t("quickSettings.overlayHint"),
+              overlay.settings.enabled,
+              () => {
+                getApi()
+                  .overlaySetEnabled(!overlay.settings.enabled)
+                  .then(setOverlay, (error: unknown) => {
+                    console.error("Changing the overlay failed", error);
+                  });
+              },
+            )}
           <div className="quick-settings__theme">
             <span className="quick-settings__label">{t("quickSettings.theme")}</span>
             <div

@@ -704,4 +704,38 @@ describe("quick settings (FR-1.66)", () => {
       expect((await api.settingsGet()).nowGaming).toBe(true);
     });
   });
+
+  it("switches the window overlay on and follows its changes", async () => {
+    await setup();
+    const spy = vi.spyOn(api, "overlaySetEnabled");
+    fireEvent.contextMenu(gear());
+    const row = await screen.findByRole("menuitemcheckbox", { name: /^Overlay/u });
+    expect(row).toHaveAttribute("aria-checked", "false");
+    fireEvent.click(row);
+    await waitFor(() => {
+      expect(row).toHaveAttribute("aria-checked", "true");
+    });
+    expect(spy).toHaveBeenCalledWith(true);
+    const state = await api.overlayState();
+    act(() => {
+      api.mock.emit("overlayChanged", {
+        state: { ...state, settings: { ...state.settings, enabled: false } },
+      });
+    });
+    await waitFor(() => {
+      expect(row).toHaveAttribute("aria-checked", "false");
+    });
+  });
+
+  it("hides the overlay switch on macOS", async () => {
+    await setup();
+    vi.spyOn(api, "appInfo").mockResolvedValue({
+      version: "0.0.0",
+      os: "macos aarch64",
+      thirdPartyNotices: "",
+    });
+    fireEvent.contextMenu(gear());
+    await screen.findByRole("menuitemcheckbox", { name: /^Link previews/u });
+    expect(screen.queryByRole("menuitemcheckbox", { name: /^Overlay/u })).toBeNull();
+  });
 });
