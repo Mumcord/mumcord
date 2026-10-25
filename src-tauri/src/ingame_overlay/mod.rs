@@ -24,11 +24,13 @@ use mumcord_engine::Engine;
 use mumcord_engine::store::{
     GameKey, GameOverlayEntry, InGameOverlayMode, InGameOverlaySettings, Settings,
 };
-use mumcord_overlay_ipc::wire::{Config, Corner, Hello, Scene};
+use mumcord_overlay_ipc::wire::Scene;
+#[cfg(any(target_os = "linux", test))]
+use mumcord_overlay_ipc::wire::{Config, Corner, Hello};
 
 /// Whether this platform can draw inside games. Linux only for now (the Windows hook is designed
 /// but not yet built here; macOS is never supported, QA.58).
-#[cfg(any(target_os = "linux", test))]
+#[cfg(target_os = "linux")]
 pub const SUPPORTED: bool = cfg!(target_os = "linux");
 
 /// The game-side identity reduced to how settings and the blocklist key a game.
@@ -88,7 +90,7 @@ impl Shared {
     }
 
     /// Records a game that connected (deduplicated by key, most recent name kept).
-    #[cfg(any(target_os = "linux", test))]
+    #[cfg(target_os = "linux")]
     pub fn record_seen(&self, game: SeenGame) {
         let mut state = self
             .inner
