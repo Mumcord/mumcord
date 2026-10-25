@@ -67,6 +67,11 @@ describe("settings search index", () => {
     );
   });
 
+  it("finds the full-size image switches (FR-1.74)", () => {
+    expect(labels(searchSettings("offer my full-size", t))).toEqual(["fullImages.offer"]);
+    expect(labels(searchSettings("never requested", t))).toEqual(["fullImages.load"]);
+  });
+
   it("matches the current language without accents", () => {
     const results = labels(searchSettings("barrierefreiheit", translator(de)));
     expect(results).toContain("accessibility");

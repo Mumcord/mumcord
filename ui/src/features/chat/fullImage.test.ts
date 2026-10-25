@@ -99,6 +99,13 @@ describe("keepFullImage", () => {
     expect(keep).toHaveBeenCalledWith(expect.stringMatching(/^data:image\/png;base64,/));
   });
 
+  it("keeps nothing while offering full-size images is off (FR-1.74)", async () => {
+    const keep = vi.spyOn(api, "fullImageKeep");
+    await api.settingsUpdate({ ...(await api.settingsGet()), offerFullImages: false });
+    expect(await keepFullImage(file, THUMB)).toBeNull();
+    expect(keep).not.toHaveBeenCalled();
+  });
+
   it("keeps nothing when the thumbnail is the original", async () => {
     const keep = vi.spyOn(api, "fullImageKeep");
     const original = "data:image/png;base64,b3JpZ2luYWwgcGljdHVyZQ==";

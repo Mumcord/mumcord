@@ -198,6 +198,12 @@ pub struct Settings {
     pub announcements: bool,
     /// Accessibility: "Skip links" (default on; FR-1.69).
     pub skip_links: bool,
+    /// "Offer my full-size images" (default on; FR-1.74): off sends thumbnails only, keeps no
+    /// original and serves none.
+    pub offer_full_images: bool,
+    /// "Load full-size images from others" (default on; FR-1.74): off shows thumbnails only
+    /// and never requests an original.
+    pub load_full_images: bool,
     /// Positional audio (FR-1.41). Off: no game positions are read.
     pub positional: PositionalSettings,
 }
@@ -275,6 +281,8 @@ impl Settings {
             keyboard_hints: s.keyboard_hints,
             announcements: s.announcements,
             skip_links: s.skip_links,
+            offer_full_images: s.offer_full_images,
+            load_full_images: s.load_full_images,
             positional: PositionalSettings {
                 enabled: s.positional.enabled,
                 min_distance: s.positional.min_distance,
@@ -357,6 +365,8 @@ impl Settings {
         s.keyboard_hints = self.keyboard_hints;
         s.announcements = self.announcements;
         s.skip_links = self.skip_links;
+        s.offer_full_images = self.offer_full_images;
+        s.load_full_images = self.load_full_images;
         s.positional = positional_to_store(&self.positional);
         s
     }
@@ -489,6 +499,9 @@ mod tests {
         ui.history_sharing = false;
         assert!(ui.keyboard_hints && ui.announcements && ui.skip_links);
         ui.skip_links = false;
+        assert!(ui.offer_full_images && ui.load_full_images);
+        ui.offer_full_images = false;
+        ui.load_full_images = false;
         ui.chat_display = ChatDisplay::Compact;
         let stored = ui.to_store(&base);
         assert_eq!(stored.chat_display, store::ChatDisplay::Compact);
@@ -503,6 +516,7 @@ mod tests {
         assert!(stored.now_gaming);
         assert!(!stored.history_sharing);
         assert!(stored.keyboard_hints && stored.announcements && !stored.skip_links);
+        assert!(!stored.offer_full_images && !stored.load_full_images);
         assert_eq!(stored.voice_activation, store::VoiceActivation::Manual);
         assert_eq!(stored.voice_threshold_dbfs, -25);
         let too_loud = Settings {

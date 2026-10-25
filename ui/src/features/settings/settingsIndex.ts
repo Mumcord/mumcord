@@ -127,6 +127,18 @@ export const SETTINGS_INDEX: readonly SettingEntry[] = [
   { section: "chatHistory", group: "history.perServer", terms: ["history.explanation"] },
   {
     section: "chatHistory",
+    group: "fullImages.title",
+    control: "fullImages.offer",
+    terms: ["fullImages.offerHint"],
+  },
+  {
+    section: "chatHistory",
+    group: "fullImages.title",
+    control: "fullImages.load",
+    terms: ["fullImages.loadHint"],
+  },
+  {
+    section: "chatHistory",
     group: "historySharing.title",
     control: "historySharing.switch",
     terms: ["historySharing.hint"],

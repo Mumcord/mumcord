@@ -47,8 +47,12 @@ impl Link for HandleLink {
 }
 
 /// Own originals by content hash, for answering requests.
-fn originals(previews: Arc<LinkPreviews>) -> Originals {
+/// With "Offer my full-size images" off nothing is served, so every request is declined.
+fn originals(previews: Arc<LinkPreviews>, offer: bool) -> Originals {
     Arc::new(move |hash: &[u8; 32]| {
+        if !offer {
+            return None;
+        }
         let hex: String = hash.iter().map(|b| format!("{b:02x}")).collect();
         let image = previews.full_image(&hex).filter(|image| image.own)?;
         let (_, payload) = image.data_url.split_once(";base64,")?;
@@ -87,8 +91,25 @@ pub(crate) fn on_plugin_data(
         sender,
         msg,
         Arc::new(HandleLink(ctx.handle.clone())),
-        originals(previews.clone()),
+        originals(
+            previews.clone(),
+            setting(ctx.store().settings(), |s| s.offer_full_images),
+        ),
     );
+}
+
+/// A full-image switch from the settings; on if they cannot be read, as that is the default.
+fn setting<E: std::fmt::Display>(
+    settings: Result<mumcord_store::Settings, E>,
+    pick: fn(&mumcord_store::Settings) -> bool,
+) -> bool {
+    settings.map_or_else(
+        |e| {
+            tracing::warn!(error = %e, "reading settings failed; using the default");
+            true
+        },
+        |s| pick(&s),
+    )
 }
 
 /// The online session that sent a message: by certificate (survives reconnects), else by the
@@ -111,6 +132,12 @@ impl Engine {
     /// bytes) and returns its reference for the message's `<img>` (see [`wire::ATTRIBUTE`]).
     /// Errors: `invalidInput` when it is not a supported image or cannot be made small enough.
     pub async fn full_image_keep(&self, source: Vec<u8>) -> EngineResult<String> {
+        if !setting(self.settings(), |s| s.offer_full_images) {
+            return Err(EngineError::new(
+                ErrorKind::InvalidInput,
+                "offering full-size images is switched off",
+            ));
+        }
         let previews = self.link_previews_arc();
         tokio::task::spawn_blocking(move || {
             let bytes = check::prepare(&source)
@@ -142,6 +169,9 @@ impl Engine {
         sender_session: Option<u32>,
         sender_cert_hash: Option<String>,
     ) -> Option<String> {
+        if !setting(self.settings(), |s| s.load_full_images) {
+            return None;
+        }
         let full = FullRef::parse(reference, check::MAX_BYTES)?;
         let previews = self.link_previews_arc();
         let hex = full.hash_hex();
@@ -206,5 +236,39 @@ impl Engine {
         .await
         .ok()
         .flatten()
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn own_images_are_only_served_while_offered() {
+        let previews = Arc::new(LinkPreviews::new(
+            None,
+            LinkPreviews::app_policy(),
+            Default::default(),
+        ));
+        let bytes = b"original".to_vec();
+        let full = FullRef::of(&bytes);
+        let hex = full.hash_hex();
+        previews.keep_full_image(
+            &hex,
+            FullImage {
+                data_url: format!("data:image/png;base64,{}", crate::people::base64(&bytes)),
+                own: true,
+            },
+        );
+        let mut key = [0u8; 32];
+        for (i, b) in key.iter_mut().enumerate() {
+            *b = u8::from_str_radix(&hex[i * 2..i * 2 + 2], 16).expect("hex");
+        }
+        assert_eq!(originals(previews.clone(), true)(&key), Some(bytes));
+        assert_eq!(
+            originals(previews, false)(&key),
+            None,
+            "nothing served while off"
+        );
     }
 }

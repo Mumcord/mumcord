@@ -159,6 +159,13 @@
     "autoDeleteOff": "Nunca (conservar todo)",
     "autoDeleteHint": "Los mensajes más antiguos se eliminan de este equipo automáticamente, sin preguntar. Solo afecta al historial guardado aquí, no al servidor."
   },
+  "fullImages": {
+    "title": "Imágenes a tamaño completo",
+    "offer": "Ofrecer mis imágenes a tamaño completo",
+    "offerHint": "Otros usuarios de Mumcord pueden abrir mis imágenes a tamaño completo. Desactivado: solo se envía la vista previa pequeña, no se guarda ningún original y no se comparte ninguno.",
+    "load": "Cargar imágenes a tamaño completo de otros",
+    "loadHint": "Abrir las imágenes de otros usuarios de Mumcord a tamaño completo. Desactivado: solo se muestra la vista previa y nunca se solicita el original."
+  },
   "historySharing": {
     "title": "Sincronización del historial",
     "switch": "Compartir mi historial de canales",

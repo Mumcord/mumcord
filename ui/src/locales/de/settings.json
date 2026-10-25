@@ -159,6 +159,13 @@
     "autoDeleteOff": "Nie (alles behalten)",
     "autoDeleteHint": "Ältere Nachrichten werden automatisch und ohne Nachfrage von diesem Computer gelöscht. Das betrifft nur den hier gespeicherten Verlauf, nicht den Server."
   },
+  "fullImages": {
+    "title": "Bilder in Originalgröße",
+    "offer": "Meine Bilder in Originalgröße anbieten",
+    "offerHint": "Andere Mumcord-Nutzer können meine Bilder in Originalgröße öffnen. Aus: Es wird nur die kleine Vorschau gesendet, kein Original gespeichert und keins weitergegeben.",
+    "load": "Bilder anderer in Originalgröße laden",
+    "loadHint": "Bilder anderer Mumcord-Nutzer in Originalgröße öffnen. Aus: Es wird nur die Vorschau gezeigt und das Original nie angefordert."
+  },
   "historySharing": {
     "title": "Verlauf-Synchronisierung",
     "switch": "Meinen Kanalverlauf teilen",

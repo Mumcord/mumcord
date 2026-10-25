@@ -159,6 +159,13 @@
     "autoDeleteOff": "Never (keep everything)",
     "autoDeleteHint": "Older messages are deleted from this computer automatically, without asking. This only affects the history saved here, not the server."
   },
+  "fullImages": {
+    "title": "Full-size images",
+    "offer": "Offer my full-size images",
+    "offerHint": "Other Mumcord users can open my pictures in full size. Off: only the small preview is sent, no original is kept and none is shared.",
+    "load": "Load full-size images from others",
+    "loadHint": "Open pictures from other Mumcord users in full size. Off: only the preview is shown and the original is never requested."
+  },
   "historySharing": {
     "title": "History sync",
     "switch": "Share my channel history",

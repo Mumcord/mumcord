@@ -119,6 +119,24 @@ export function ChatHistorySection({ settings, update }: SettingsSectionProps) {
           {t("previewCache.clearNow")}
         </button>
       </Group>
+      <Group title={t("fullImages.title")}>
+        <Switch
+          label={t("fullImages.offer")}
+          description={t("fullImages.offerHint")}
+          checked={settings.offerFullImages}
+          onChange={(offerFullImages) => {
+            update({ offerFullImages });
+          }}
+        />
+        <Switch
+          label={t("fullImages.load")}
+          description={t("fullImages.loadHint")}
+          checked={settings.loadFullImages}
+          onChange={(loadFullImages) => {
+            update({ loadFullImages });
+          }}
+        />
+      </Group>
       <Group title={t("historySharing.title")}>
         <Switch
           label={t("historySharing.switch")}

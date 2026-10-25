@@ -1,4 +1,4 @@
-import { act, fireEvent, render, screen } from "@testing-library/react";
+import { act, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { useState } from "react";
 import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 import { createMockApi, setApi, type MockApi } from "../../api";
@@ -240,7 +240,9 @@ describe("full images", () => {
   it("shows the thumbnail with progress, then the full image", async () => {
     const { fetch, resolve } = deferredFetch();
     viewer();
-    expect(fetch).toHaveBeenCalledWith(REFERENCE, 4, "cert");
+    await waitFor(() => {
+      expect(fetch).toHaveBeenCalledWith(REFERENCE, 4, "cert");
+    });
     expect(screen.getByRole("img")).toHaveAttribute("src", PNG);
     expect(screen.getByRole("status")).toHaveTextContent("Loading full size…");
     expect(screen.getByText("Beta")).toBeInTheDocument();
@@ -248,23 +250,24 @@ describe("full images", () => {
       api.mock.emit("fullImageProgress", { reference: REFERENCE, received: 512, total: 2048 });
     });
     expect(screen.getByRole("status")).toHaveTextContent("Loading full size… 25 %");
-    await act(async () => {
-      resolve(FULL);
-      await Promise.resolve();
+    resolve(FULL);
+    await waitFor(() => {
+      expect(screen.getByRole("img")).toHaveAttribute("src", FULL);
     });
-    expect(screen.getByRole("img")).toHaveAttribute("src", FULL);
     expect(screen.queryByRole("status")).toBeNull();
   });
 
   it("keeps the thumbnail when the full image cannot be had", async () => {
-    const { resolve } = deferredFetch();
+    const { fetch, resolve } = deferredFetch();
     viewer();
-    await act(async () => {
-      resolve(null);
-      await Promise.resolve();
+    await waitFor(() => {
+      expect(fetch).toHaveBeenCalled();
+    });
+    resolve(null);
+    await waitFor(() => {
+      expect(screen.getByRole("status")).toHaveTextContent("Full size not available");
     });
     expect(screen.getByRole("img")).toHaveAttribute("src", PNG);
-    expect(screen.getByRole("status")).toHaveTextContent("Full size not available");
   });
 
   it("saves the full image once it is there", async () => {
@@ -281,6 +284,16 @@ describe("full images", () => {
       await Promise.resolve();
     });
     expect(save).toHaveBeenCalledWith("/tmp/pic.png", FULL);
+  });
+
+  it("never requests the original while loading full images is off (FR-1.74)", async () => {
+    await api.settingsUpdate({ ...(await api.settingsGet()), loadFullImages: false });
+    const fetch = vi.spyOn(api, "fullImageFetch");
+    viewer();
+    await waitFor(() => {
+      expect(screen.queryByRole("status")).toBeNull();
+    });
+    expect(fetch).not.toHaveBeenCalled();
   });
 
   it("does not fetch anything for images without a full version", () => {

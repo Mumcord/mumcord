@@ -17,6 +17,22 @@ afterEach(() => {
   setApi(undefined);
 });
 
+describe("ChatHistorySection: full-size images (FR-1.74)", () => {
+  it("are on by default and each switch turns off on its own", async () => {
+    const update = vi.fn();
+    render(<ChatHistorySection settings={settings} update={update} />);
+    const offer = screen.getByRole("switch", { name: "Offer my full-size images" });
+    const load = screen.getByRole("switch", { name: "Load full-size images from others" });
+    expect(offer).toBeChecked();
+    expect(load).toBeChecked();
+    fireEvent.click(offer);
+    expect(update).toHaveBeenLastCalledWith({ offerFullImages: false });
+    fireEvent.click(load);
+    expect(update).toHaveBeenLastCalledWith({ loadFullImages: false });
+    await screen.findByText("Servers");
+  });
+});
+
 describe("ChatHistorySection: history sharing (FR-1.60)", () => {
   it("is on by default and turns sharing off", async () => {
     const update = vi.fn();
