@@ -22,6 +22,8 @@ use commands::{
 };
 
 /// Path of the generated TypeScript bindings, relative to this crate.
+// Only debug builds and tests regenerate the bindings.
+#[cfg(any(debug_assertions, test))]
 const BINDINGS_PATH: &str = concat!(
     env!("CARGO_MANIFEST_DIR"),
     "/../ui/src/bindings/commands.ts"
@@ -130,6 +132,7 @@ fn specta_builder() -> Builder<tauri::Wry> {
         ])
 }
 
+#[cfg(any(debug_assertions, test))]
 fn export_bindings(builder: &Builder<tauri::Wry>) -> Result<(), specta_typescript::Error> {
     builder.export(specta_typescript::Typescript::default(), BINDINGS_PATH)
 }
