@@ -198,7 +198,7 @@
 | C10 | (1c) Verify overlay | open | | B32, B33 | simple | AC-1.33, 1.34 | e2e/specs/overlay |
 | B34 | Link previews + YouTube/Twitch player cards (FR-1.49, 1.50) | done – engine web module (SSRF guard, caps, 24 h disk cache), player cards (inline only YouTube on Windows, else browser), wizard + settings switch | b34-link-previews | G1 | complex | AC-1.39, 1.40 | crates/engine (metadata fetch), ui chat, wizard, settings |
 | B35 | Mentions with autocomplete (FR-1.51) | done – MentionPicker, ownMention highlight, mention notifications, @ on unread pill | b35-mentions | G1 | simple | AC-1.41 | ui chat input, notifications |
-| B36 | GIF favorites + GIF button (FR-1.52, QA.43; no search) | in progress | b36-gif-favorites | B38 | simple | AC-1.42 | ui chat input, store favorites |
+| B36 | GIF favorites + GIF button (FR-1.52, QA.43; no search) | done – gif_favorite table (v7), GifPicker, ImageMenu, Giphy/Tenor renditions + page links, URL hiding | b36-gif-favorites | B38 | simple | AC-1.42 | ui chat input, store favorites |
 | B37 | Code highlighting + formatting toolbar/shortcuts (FR-1.53, 1.54) | done – highlight.js core (17 langs, language guessed since sanitizer strips tag), FormatToolbar + shortcuts, Ctrl+K yields in input | b37-code-format | G1 | simple | AC-1.43, 1.44 | ui chat |
 | B38 | External images and image links inline (FR-1.55) | done – web/inline.rs (8 MB, animations passed through), InlineImageCard, sanitizer keeps http(s) img in messages | b38-external-images | B34 | complex | AC-1.45 | crates/engine (image fetch), ui chat |
 | B39 | Bug: unread bubble flashes briefly on the channel whose chat is open when a message arrives (own channel, F93 regression) | done – followStore drops unread for the on-screen chat and marks read immediately | b39-unread-flash | – | simple | FR-1.31 | ui/src/features/follow unread, engine chat.rs |
@@ -219,6 +219,7 @@
 | B54 | (1d) Friends by cert hash with online state (FR-1.64) | open | | B53 | complex | AC-1.54 | store, engine, members, follow DM list |
 | B55 | (1d) Kept friend DM history + online state in DMs (FR-1.65) | open | | B54 | simple | AC-1.54 | store history, chat DM header |
 | B57 | Gear icon for the settings button (QA.47) | done | b57-gear-icon | – | simple | – | ui/src/features/userpanel |
+| L1 | License switch to AGPL-3.0-only + commercial license note, CLA in CONTRIBUTING, About page, package metadata, wiki (QA.51) | in progress | l1-license | – | simple | AC-1.29 | LICENSE, COMMERCIAL.md, CONTRIBUTING.md, README, Cargo/package metadata, settings About, notices |
 | D1 | Implementation report | open | | C1–C10 | simple | all | specs/01-foundation-implementation.md |
 
 ## Contracts from finished tasks
