@@ -21,6 +21,7 @@ import type { ConversationLog } from "./chatStore";
 import { daysAgo, messageLayout } from "./grouping";
 import { highlightCode } from "./highlight";
 import { hideShownLinks, useInlineShown } from "./inlineLinks";
+import { fullImageSource } from "./fullImage";
 import { ImageViewer, type ViewerImage } from "./ImageViewer";
 import { LinkPreviews } from "./LinkPreviewCard";
 import { imageName, type ImageClickHandler } from "./links";
@@ -79,8 +80,12 @@ function Body({ message, tabIndex, previews, onImageClick }: BodyProps) {
       image.tabIndex = tabIndex;
       image.setAttribute("role", "button");
       image.setAttribute("aria-label", t("image.viewMessage", { name: message.senderName }));
+      // The viewer fetches a full image from the message's sender (FR-1.60c).
+      if (message.senderSession !== null)
+        image.dataset["senderSession"] = String(message.senderSession);
+      if (message.senderCertHash !== null) image.dataset["senderCert"] = message.senderCertHash;
     }
-  }, [sanitized, tabIndex, t, message.senderName]);
+  }, [sanitized, tabIndex, t, message.senderName, message.senderSession, message.senderCertHash]);
   const body = (
     <div ref={ref} className="chat-message__body" dangerouslySetInnerHTML={{ __html: sanitized }} />
   );
@@ -179,6 +184,7 @@ export function MessageList({
         src: img.currentSrc || img.src,
         url: img.dataset["imageUrl"],
         name: img.dataset["imageUrl"] ? imageName(img.dataset["imageUrl"]) : t("viewer.unnamed"),
+        full: fullImageSource(img),
       });
     }
     viewerOpener.current = clicked;

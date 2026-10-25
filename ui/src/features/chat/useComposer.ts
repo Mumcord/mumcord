@@ -8,6 +8,7 @@ import { getApi, type ChatMessage } from "../../api";
 import { addSentMessage } from "./chatStore";
 import type { SendTarget } from "./conversationInfo";
 import { describeSendError } from "./errors";
+import { FULL_ATTRIBUTE_RESERVE, fullImageTag, keepFullImage } from "./fullImage";
 import { imageTag, prepareImage, type MessageLimits } from "./images";
 import { markdownToHtml, plainTextToHtml } from "./markdown";
 
@@ -17,9 +18,9 @@ function bodyHtml(text: string, limits: MessageLimits): string {
   return limits.allowHtml ? markdownToHtml(text) : plainTextToHtml(text);
 }
 
-function messageHtml(body: string, image: string | null): string {
+function messageHtml(body: string, image: string | null, fullImage: string | null): string {
   if (image === null) return body;
-  const tag = imageTag(image);
+  const tag = fullImageTag(image, fullImage);
   return body === "" ? tag : `${body}${IMAGE_SEPARATOR}${tag}`;
 }
 
@@ -48,6 +49,8 @@ export function useComposer(target: SendTarget | null, limits: MessageLimits): C
   const { t } = useTranslation("chat");
   const [text, setTextState] = useState("");
   const [image, setImage] = useState<string | null>(null);
+  // Reference of the kept original when the attached image had to be shrunk (FR-1.60c).
+  const [fullImage, setFullImage] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -64,12 +67,18 @@ export function useComposer(target: SendTarget | null, limits: MessageLimits): C
         return;
       }
       // Leave room for the text typed so far and the surrounding tags.
-      const overhead = bodyHtml(text, limits).length + IMAGE_SEPARATOR.length + imageTag("").length;
+      const overhead =
+        bodyHtml(text, limits).length +
+        IMAGE_SEPARATOR.length +
+        imageTag("").length +
+        FULL_ATTRIBUTE_RESERVE;
       setBusy(true);
       const result = await prepareImage(file, limits.image - overhead);
+      const full = result.ok ? await keepFullImage(file, result.dataUrl) : null;
       setBusy(false);
       if (result.ok) {
         setImage(result.dataUrl);
+        setFullImage(full);
       } else {
         setError(
           t(
@@ -87,12 +96,13 @@ export function useComposer(target: SendTarget | null, limits: MessageLimits): C
 
   const removeImage = useCallback(() => {
     setImage(null);
+    setFullImage(null);
     setError(null);
   }, []);
 
   const submit = useCallback(async () => {
     if (busy || target === null) return;
-    const html = messageHtml(bodyHtml(text, limits), image);
+    const html = messageHtml(bodyHtml(text, limits), image, fullImage);
     if (html === "") return;
     const limit = image === null ? limits.text : limits.image;
     let tooLarge = t("errors.imageWithTextTooLong");
@@ -110,12 +120,13 @@ export function useComposer(target: SendTarget | null, limits: MessageLimits): C
       addSentMessage(await send(target, html));
       setTextState("");
       setImage(null);
+      setFullImage(null);
     } catch (err) {
       setError(describeSendError(t, err, tooLarge));
     } finally {
       setBusy(false);
     }
-  }, [busy, image, limits, t, target, text]);
+  }, [busy, fullImage, image, limits, t, target, text]);
 
   const sendLink = useCallback(
     async (url: string) => {

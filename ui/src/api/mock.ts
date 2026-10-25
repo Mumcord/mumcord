@@ -514,6 +514,8 @@ export function createMockApi(options: MockOptions = {}): MockApi {
   let cachedPreviewBytes = 1_468_006;
   // GIF favorites, most recently used first.
   let gifFavorites: string[] = [];
+  /** Originals kept by `fullImageKeep`, by reference. */
+  const fullImages = new Map<string, string>();
 
   function serverHistory(serverId: number): Map<string, ChatMessage[]> {
     let map = history.get(serverId);
@@ -1031,6 +1033,21 @@ export function createMockApi(options: MockOptions = {}): MockApi {
       return Promise.resolve(null);
     },
     saveImage: () => Promise.resolve(null),
+    // Full images (FR-1.60c): kept originals are "fetched" back at once, with one progress event.
+    fullImageKeep: (dataUrl) => {
+      let hash = 0x811c9dc5;
+      for (let i = 0; i < dataUrl.length; i++)
+        hash = Math.imul(hash ^ dataUrl.charCodeAt(i), 16777619);
+      const hex = (hash >>> 0).toString(16).padStart(8, "0").repeat(8);
+      const reference = `${hex}:${String(Math.max(1, Math.floor(dataUrl.length * 0.75)))}`;
+      fullImages.set(reference, dataUrl);
+      return Promise.resolve(reference);
+    },
+    fullImageFetch: (reference) => {
+      const src = fullImages.get(reference) ?? null;
+      if (src !== null) emit("fullImageProgress", { reference, received: 1, total: 1 });
+      return Promise.resolve(src);
+    },
     previewCacheClear: () => {
       const freed = cachedPreviewBytes;
       cachedPreviewBytes = 0;
