@@ -454,3 +454,13 @@ Real automatic updates for .deb/.rpm need our own package repository with a sign
 ## Closing
 
 2026-10-25: All rounds answered (rounds 1–5 in chat at the user's request). The specification has been created: `specs/02-multi-server-themes-specification.md`.
+
+## Addendum – Theme share message (2026-10-25)
+
+> Discussed in chat after the specification was written.
+
+#### QB.1 What does a shared theme look like in the chat? `◉`
+
+- [x] Plain text for official clients: `🎨 Mumcord theme "‹name›" – mct1.‹code›`; Mumcord users see a preview card (mini app mock-up, key colours, "Import theme", "Imported ✓" if already imported). The code also contains the Mumcord version that created the theme, so later changes to the theme format can be handled: newer versions read older themes, older versions import what they know and show "Made with Mumcord ‹version› – update to see it fully".
+
+✍️ Note: (from chat) es sollte auch die mumcord version geteilt werden falls sich was ändert
