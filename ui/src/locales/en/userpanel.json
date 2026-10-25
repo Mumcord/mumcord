@@ -22,7 +22,9 @@
     "reconnecting": "Reconnecting…",
     "connected": "Connected",
     "readOnly": "Read-only",
-    "disconnected": "Not connected"
+    "disconnected": "Not connected",
+    "playing": "Playing {{game}}",
+    "listening": "Listening to {{track}}"
   },
   "profile": {
     "title": "Edit profile",
@@ -58,13 +60,19 @@
   "ptt": "Push-to-talk: hold {{key}} to talk",
   "pttNoKey": "Push-to-talk: no key set",
   "quickSettings": {
-    "label": "Quick settings",
     "linkPreviews": "Link previews and embeds",
+    "linkPreviewsHint": "Sites see your IP address",
     "nowPlaying": "Share what I'm listening to",
-    "unsupported": "not available on macOS",
+    "nowPlayingHint": "Others see your current track",
+    "unsupported": "Not available on macOS",
     "theme": "Theme",
-    "theme_system": "Theme: follow system",
-    "theme_dark": "Theme: dark",
-    "theme_light": "Theme: light"
+    "theme_system": "System",
+    "theme_dark": "Dark",
+    "theme_light": "Light",
+    "nowGaming": "Share the game I'm playing",
+    "nowGamingHint": "Others see your current game",
+    "unavailable": "Not available on this system",
+    "allSettings": "All settings…",
+    "label": "Quick settings"
   }
 }

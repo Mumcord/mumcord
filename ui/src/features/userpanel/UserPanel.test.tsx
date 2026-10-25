@@ -9,6 +9,7 @@ import { subscribeAnnouncements } from "../../a11y/announcer";
 import "../../i18n";
 import { axeViolations } from "../../test/axe";
 import { resetServerStore } from "../channels/serverStore";
+import { resetNowGamingStore } from "../nowgaming";
 import { resetNowPlayingStore } from "../nowplaying";
 import { UserPanel } from "./UserPanel";
 import { LEVEL_FRAME_MS } from "./useMicLevelFill";
@@ -71,6 +72,7 @@ afterEach(() => {
   setApi(undefined);
   resetServerStore();
   resetNowPlayingStore();
+  resetNowGamingStore();
 });
 
 const mute = () => screen.getByRole("button", { name: "Mute microphone" });
@@ -445,6 +447,38 @@ describe("UserPanel", () => {
     expect(status()?.textContent).toBe(normal);
   });
 
+  it("puts the own game before the own track and names both in the tooltip", async () => {
+    await setup();
+    await joinVoice();
+    const status = () => document.querySelector<HTMLElement>(".userpanel__status");
+    const self = (await api.sessionSnapshot())?.selfSession ?? -1;
+    act(() => {
+      api.mock.emit("nowPlayingChanged", {
+        session: self,
+        track: {
+          title: "Song",
+          artist: "Band",
+          album: null,
+          hasCover: false,
+          positionMs: 0,
+          durationMs: null,
+          playing: true,
+        },
+      });
+      api.mock.emit("nowGamingChanged", {
+        session: self,
+        game: { name: "Factorio", hasIcon: false, playedMs: 0, canJoin: false },
+      });
+    });
+    expect(status()).toHaveTextContent("Factorio");
+    expect(status()).toHaveAttribute("title", "Playing Factorio · Listening to Band – Song");
+    expect(status()?.querySelector("svg.userpanel__status-icon")).not.toBeNull();
+    act(() => {
+      api.mock.emit("nowGamingChanged", { session: self, game: null });
+    });
+    expect(status()).toHaveTextContent("Band – Song");
+  });
+
   it("keeps important states over the own track", async () => {
     await setup();
     const self = (await api.sessionSnapshot())?.selfSession ?? -1;
@@ -609,7 +643,9 @@ describe("quick settings (FR-1.66)", () => {
   it("opens on right-click and saves a switch right away", async () => {
     await setup();
     fireEvent.contextMenu(gear(), { clientX: 10, clientY: 10 });
-    const links = await screen.findByRole("menuitemcheckbox", { name: "Link previews and embeds" });
+    const links = await screen.findByRole("menuitemcheckbox", {
+      name: /^Link previews and embeds/u,
+    });
     expect(links).toHaveAttribute("aria-checked", "true");
     fireEvent.click(links);
     await waitFor(async () => {
@@ -623,7 +659,7 @@ describe("quick settings (FR-1.66)", () => {
     await setup();
     gear().focus();
     fireEvent.keyDown(gear(), { key: "F10", shiftKey: true });
-    const dark = await screen.findByRole("menuitemradio", { name: "Theme: dark" });
+    const dark = await screen.findByRole("menuitemradio", { name: "Dark" });
     fireEvent.click(dark);
     await waitFor(() => {
       expect(document.documentElement.dataset.theme).toBe("dark");
@@ -640,7 +676,7 @@ describe("quick settings (FR-1.66)", () => {
     await setup();
     fireEvent.contextMenu(gear());
     fireEvent.click(
-      await screen.findByRole("menuitemcheckbox", { name: "Share what I'm listening to" }),
+      await screen.findByRole("menuitemcheckbox", { name: /^Share what I.m listening to/u }),
     );
     await waitFor(async () => {
       expect((await api.settingsGet()).nowPlaying).toBe(true);
@@ -648,5 +684,24 @@ describe("quick settings (FR-1.66)", () => {
     fireEvent.keyDown(screen.getByRole("menu"), { key: "Escape" });
     fireEvent.click(gear());
     expect(openSettings).toHaveBeenCalled();
+  });
+
+  it("opens the full settings from the footer link and closes the menu", async () => {
+    await setup();
+    fireEvent.contextMenu(gear());
+    fireEvent.click(await screen.findByRole("menuitem", { name: /All settings/ }));
+    expect(openSettings).toHaveBeenCalled();
+    expect(screen.queryByRole("menu", { name: "Quick settings" })).toBeNull();
+  });
+
+  it("toggles now gaming from the quick settings", async () => {
+    await setup();
+    fireEvent.contextMenu(gear());
+    fireEvent.click(
+      await screen.findByRole("menuitemcheckbox", { name: /^Share the game I.m playing/u }),
+    );
+    await waitFor(async () => {
+      expect((await api.settingsGet()).nowGaming).toBe(true);
+    });
   });
 });

@@ -6,6 +6,7 @@ import { getApi } from "../../api";
 import { ConnectionInfo } from "../connection";
 import { disconnect, useServers } from "../servers";
 import { useAvatars } from "../members/useAvatars";
+import { GAMEPAD_PATH, useNowGaming } from "../nowgaming";
 import { trackLabel, useNowPlaying } from "../nowplaying";
 import { describeError } from "./errors";
 import { ProfileDialog } from "./ProfileDialog";
@@ -61,6 +62,7 @@ export function UserPanel() {
   const transmitting = self !== null && state.talking.has(self.session);
   // The own shared track (only reported while "Now playing" is on); no session matches -1.
   const ownTrack = useNowPlaying(self?.session ?? -1);
+  const ownGame = useNowGaming(self?.session ?? -1);
   // Push-to-talk and not held: the mic is closed, so show it crossed out and hide the level.
   const pttIdle = ptt.active && !transmitting && !mute && !deaf;
   const showLevel = state.connected && !mute && !deaf && !pttIdle;
@@ -152,9 +154,15 @@ export function UserPanel() {
           : readOnly
             ? t("status.readOnly")
             : null;
-  // In the normal connected state the status line shows the own playing track, if any.
+  // In the normal connected state the status line shows the own game or playing track. The game
+  // wins the short line (it says more about being busy); the tooltip names both.
   const track = status === null && ownTrack?.track.playing ? trackLabel(ownTrack.track) : null;
-  const statusText = status ?? track ?? (serverLabel || t("status.connected"));
+  const game = status === null && ownGame ? ownGame.game.name : null;
+  const statusText = status ?? game ?? track ?? (serverLabel || t("status.connected"));
+  const statusTitle =
+    game !== null && track !== null
+      ? `${t("status.playing", { game })} · ${t("status.listening", { track })}`
+      : statusText;
 
   return (
     <div className="userpanel">
@@ -186,15 +194,22 @@ export function UserPanel() {
             <span className="userpanel__name" title={name}>
               {name}
             </span>{" "}
-            <span className="userpanel__status" title={statusText}>
-              {track && (
+            <span className="userpanel__status" title={statusTitle}>
+              {(game ?? track) !== null && (
                 <svg
                   className="userpanel__status-icon"
                   viewBox="0 0 24 24"
                   aria-hidden="true"
                   focusable="false"
                 >
-                  <path d={MUSIC} fill="none" stroke="currentColor" strokeWidth="2" />
+                  <path
+                    d={game !== null ? GAMEPAD_PATH : MUSIC}
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
                 </svg>
               )}
               {statusText}
@@ -273,6 +288,7 @@ export function UserPanel() {
       {quick ? (
         <QuickSettings
           menu={quick}
+          onOpenSettings={openSettings}
           onClose={() => {
             setQuick(null);
           }}
