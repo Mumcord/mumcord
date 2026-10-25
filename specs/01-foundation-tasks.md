@@ -213,6 +213,10 @@
 | B48 | Bugs: now playing never sends (setting not persisted? no log lines; Spotify MPRIS present) + audio streams restart every 2 s while the chosen device is unavailable | done – NP worked but never saved by an older build; info logs, own track everywhere; cpal id rewrite fixed, background retry with backoff, no stream restarts | b48-np-audio | B45 | complex | FR-1.58 | engine now_playing, src-tauri now_playing, crates/audio io controller |
 | B50 | (1d) History sync between Mumcord clients (FR-1.60) | open | | 1c | complex | AC-1.51 | engine plugin-data sync, store, chat UI, wizard, settings |
 | B51 | (1d) Mumcord badge (FR-1.61) | open | | – | simple | AC-1.52 | engine hello, PersonStatus |
+| B52 | (1d) Double-click DM + pinned person card with DM and full-profile buttons (FR-1.62) | open | | – | simple | AC-1.53 | members, channels, chat |
+| B53 | (1d) Full profile redesign (FR-1.63) | open | | B52 | simple | AC-1.53 | members ProfileCard |
+| B54 | (1d) Friends by cert hash with online state (FR-1.64) | open | | B53 | complex | AC-1.54 | store, engine, members, follow DM list |
+| B55 | (1d) Kept friend DM history + online state in DMs (FR-1.65) | open | | B54 | simple | AC-1.54 | store history, chat DM header |
 | D1 | Implementation report | open | | C1–C10 | simple | all | specs/01-foundation-implementation.md |
 
 ## Contracts from finished tasks
