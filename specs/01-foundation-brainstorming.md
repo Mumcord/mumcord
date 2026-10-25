@@ -1045,3 +1045,14 @@ Requested by the user; how Discord does it was explained: Discord recognises gam
 ✍️ Note: Requested in chat during /dev ("eventuell auch so ein join game, weiß nicht wie das discord implementiert hat").
 
 ---
+
+#### QA.45 Message sync between Mumcord clients and marking Mumcord users (stage 1d)? `◉`
+Mumble servers keep no chat history; Mumcord clients can fill gaps for each other (client-only, via Mumble plugin data).
+
+- [x] **Stage 1d – history sync:** when a client joins a channel (or on demand, "Load earlier messages"), it asks other Mumcord users who can read that channel for its messages from a time range – up to 7 days back and at most 500 messages per request. Answering clients send their stored channel messages; private chats are never shared. Sharing the own history is on by default and switchable in the first-start wizard and in settings. Synced messages are deduplicated, merged in time order and marked "from ‹name›'s history", because they cannot be verified.
+- [x] **Stage 1d – mark Mumcord users:** a small Mumcord badge next to people who use Mumcord (detected via the plugin-data hello), with a tooltip.
+- [ ] Not now.
+
+✍️ Note: Requested in chat during /dev; answers: sharing on by default and configurable in the wizard; 7 days / 500 messages.
+
+---
