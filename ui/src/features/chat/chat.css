@@ -31,6 +31,15 @@
   white-space: nowrap;
 }
 
+.chat-header__presence {
+  display: inline-flex;
+  flex: none;
+  gap: var(--space-1);
+  align-items: center;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+}
+
 .chat-header__hash {
   margin-right: var(--space-1);
   color: var(--color-text-muted);
