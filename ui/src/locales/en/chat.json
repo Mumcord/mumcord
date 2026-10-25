@@ -13,7 +13,17 @@
     "label": "Messages in {{name}}",
     "loadOlder": "Load older messages",
     "loading": "Loading messages…",
-    "loadFailed": "Older messages couldn't be loaded. Scroll up to try again."
+    "loadFailed": "Older messages couldn't be loaded. Scroll up to try again.",
+    "loadEarlier": "Load earlier messages",
+    "syncing": "Looking for earlier messages from other Mumcord users…",
+    "syncAdded_one": "{{count}} earlier message added from other Mumcord users.",
+    "syncAdded_other": "{{count}} earlier messages added from other Mumcord users.",
+    "syncNone": "No earlier messages found.",
+    "syncFailed": "Earlier messages can't be loaded here.",
+    "syncedFrom": "from {{name}}'s history",
+    "jumpToNewest": "Jump to newest",
+    "jumpToNewestUnseen_one": "Jump to newest, {{count}} new message",
+    "jumpToNewestUnseen_other": "Jump to newest, {{count}} new messages"
   },
   "format": {
     "toolbar": "Formatting",

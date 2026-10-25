@@ -1,8 +1,9 @@
 /**
  * Scrollable message list (FR-1.48a): Discord-style groups (avatar, name and time once per group,
  * text indented after the avatar) or a compact one-line layout, day separators, sanitized bodies,
- * scroll-back paging and a single Tab stop with arrow-key navigation between messages. Links open
- * only on click.
+ * scroll-back paging, messages synced from other Mumcord users marked with their origin, a kept
+ * reading position when messages are inserted above (FR-1.60b), a "Jump to newest" button and a
+ * single Tab stop with arrow-key navigation between messages. Links open only on click.
  */
 import {
   useEffect,
@@ -51,6 +52,11 @@ export interface MessageListProps {
   /** Accessible name of the list, e.g. "Messages in Lobby". */
   label: string;
   onLoadOlder: () => void;
+  /**
+   * Asks other Mumcord users for earlier messages once the local history is exhausted
+   * (FR-1.60); without it, there is no "Load earlier messages" button.
+   */
+  onSyncEarlier?: (() => void) | undefined;
   /**
    * Senders and mention chips react to clicks (pinned card, double click opens the private chat,
    * FR-1.62); without it, sender names are plain text.
@@ -208,6 +214,7 @@ export function MessageList({
   log,
   label,
   onLoadOlder,
+  onSyncEarlier,
   clickablePeople = false,
   display = "cozy",
   avatarFor = noAvatar,
@@ -218,10 +225,13 @@ export function MessageList({
   const scrollRef = useRef<HTMLDivElement>(null);
   const itemRefs = useRef<(HTMLLIElement | null)[]>([]);
   const atBottom = useRef(true);
-  const previous = useRef<{ firstId: string | undefined; height: number }>({
-    firstId: undefined,
-    height: 0,
-  });
+  // The message at the top of the view and its distance from the list's top edge, kept in place
+  // when messages are inserted above it.
+  const anchor = useRef<{ id: string; offset: number } | null>(null);
+  const newestId = useRef<string | undefined>(undefined);
+  // Scrolled away from the latest message, and how many arrived below since then.
+  const [away, setAway] = useState(false);
+  const [unseen, setUnseen] = useState(0);
   const [focusIndex, setFocusIndex] = useState<number | null>(null);
   const [viewer, setViewer] = useState<{ images: ViewerImage[]; index: number } | null>(null);
   // Where focus returns when the viewer closes: the clicked image (or its button).
@@ -248,19 +258,58 @@ export function MessageList({
   };
   const active = Math.min(focusIndex ?? messages.length - 1, messages.length - 1);
 
-  // Keep the reading position when older messages are prepended; follow new ones at the bottom.
+  function measureAnchor() {
+    const element = scrollRef.current;
+    if (!element) return;
+    const top = element.getBoundingClientRect().top;
+    anchor.current = null;
+    for (const [index, item] of itemRefs.current.entries()) {
+      const id = messages[index]?.id;
+      if (!item || id === undefined) continue;
+      const rect = item.getBoundingClientRect();
+      if (rect.bottom > top) {
+        anchor.current = { id, offset: rect.top - top };
+        return;
+      }
+    }
+  }
+
+  // Follow new messages at the bottom; otherwise keep the message at the top of the view where it
+  // was, whatever was inserted above it (older pages, synced history), and count new arrivals.
   useLayoutEffect(() => {
     const element = scrollRef.current;
     if (!element) return;
-    const firstId = messages[0]?.id;
-    const before = previous.current;
-    if (before.firstId !== undefined && firstId !== before.firstId && !atBottom.current) {
-      element.scrollTop += element.scrollHeight - before.height;
-    } else if (atBottom.current) {
+    itemRefs.current.length = messages.length;
+    const newest = messages[messages.length - 1]?.id;
+    if (atBottom.current) {
       element.scrollTop = element.scrollHeight;
+    } else {
+      const kept = anchor.current;
+      const item = kept ? itemRefs.current[messages.findIndex((m) => m.id === kept.id)] : null;
+      if (kept && item) {
+        const offset = item.getBoundingClientRect().top - element.getBoundingClientRect().top;
+        element.scrollTop += offset - kept.offset;
+      }
+      const previous = messages.findIndex((m) => m.id === newestId.current);
+      // Synced history is older than what the user saw arrive, so it is not "new".
+      const arrived =
+        previous < 0 ? 0 : messages.slice(previous + 1).filter((m) => m.syncedFrom === null).length;
+      if (arrived > 0) setUnseen((count) => count + arrived);
     }
-    previous.current = { firstId, height: element.scrollHeight };
+    newestId.current = newest;
+    measureAnchor();
+    // measureAnchor reads the same render's messages and refs.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [messages]);
+
+  function jumpToNewest() {
+    const element = scrollRef.current;
+    if (!element) return;
+    element.scrollTop = element.scrollHeight;
+    atBottom.current = true;
+    setAway(false);
+    setUnseen(0);
+  }
 
   // Every image of the conversation in reading order: message images and external inline images.
   // Read from the DOM, so it is exactly what the user sees (dismissed cards are not included).
@@ -339,6 +388,12 @@ export function MessageList({
   }
 
   function onListKeyDown(event: KeyboardEvent<HTMLDivElement>) {
+    if (event.key === "End" && event.ctrlKey && !event.defaultPrevented) {
+      event.preventDefault();
+      jumpToNewest();
+      moveFocus(messages.length - 1);
+      return;
+    }
     if (event.key !== "Enter" && event.key !== " ") return;
     const image = messageImage(event.target);
     if (!image) return;
@@ -351,6 +406,9 @@ export function MessageList({
     const element = scrollRef.current;
     if (!element) return;
     atBottom.current = element.scrollHeight - element.scrollTop - element.clientHeight < EDGE_PX;
+    setAway(!atBottom.current);
+    if (atBottom.current) setUnseen(0);
+    measureAnchor();
     if (element.scrollTop < EDGE_PX && log.hasMore && !log.loading) onLoadOlder();
   }
 
@@ -375,6 +433,7 @@ export function MessageList({
         break;
       case "End":
         moveFocus(messages.length - 1);
+        jumpToNewest();
         break;
       default:
         return;
@@ -384,72 +443,102 @@ export function MessageList({
 
   return (
     <>
-      {/* Clicks on images sent inside messages open the viewer; keyboard users use Enter / Space. */}
-      {/* eslint-disable-next-line jsx-a11y/no-static-element-interactions */}
-      <div
-        className="chat-list"
-        ref={scrollRef}
-        onScroll={onScroll}
-        onLoadCapture={onMediaLoad}
-        onClick={onListClick}
-        onKeyDown={onListKeyDown}
-      >
-        {log.hasMore ? (
+      <div className="chat-list-frame">
+        {/* Clicks on images sent inside messages open the viewer; keyboard users use Enter / Space. */}
+        {/* eslint-disable-next-line jsx-a11y/no-static-element-interactions */}
+        <div
+          className="chat-list"
+          ref={scrollRef}
+          onScroll={onScroll}
+          onLoadCapture={onMediaLoad}
+          onClick={onListClick}
+          onKeyDown={onListKeyDown}
+        >
+          {log.hasMore ? (
+            <button
+              type="button"
+              className="chat-list__older"
+              disabled={log.loading}
+              onClick={onLoadOlder}
+            >
+              {log.loading ? t("list.loading") : t("list.loadOlder")}
+            </button>
+          ) : onSyncEarlier && log.loaded ? (
+            <button
+              type="button"
+              className="chat-list__older"
+              disabled={log.syncing}
+              onClick={onSyncEarlier}
+            >
+              {t("list.loadEarlier")}
+            </button>
+          ) : null}
+          <SyncStatus log={log} />
+          {log.loadFailed ? (
+            <p className="chat-list__notice" role="status">
+              {t("list.loadFailed")}
+            </p>
+          ) : null}
+          {messages.length === 0 ? (
+            log.loaded ? (
+              <p className="chat-list__empty">{t("empty")}</p>
+            ) : (
+              <p className="chat-list__notice">{t("list.loading")}</p>
+            )
+          ) : (
+            // Arrow-key navigation lives on the list; each item is a focusable roving stop.
+            // eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions
+            <ol
+              className="chat-list__items"
+              data-display={display}
+              aria-label={label}
+              onKeyDown={onKeyDown}
+              onFocus={(event) => {
+                const focused: EventTarget = event.target;
+                const index = itemRefs.current.findIndex((item) => item === focused);
+                if (index >= 0) setFocusIndex(index);
+              }}
+            >
+              {messages.map((message, index) => (
+                <MessageItem
+                  key={message.id}
+                  message={message}
+                  start={layout[index]?.start ?? true}
+                  day={layout[index]?.newDay ? dayLabel(new Date(message.sentAt)) : null}
+                  display={display}
+                  avatar={display === "cozy" && layout[index]?.start ? avatarFor(message) : null}
+                  time={time}
+                  fullTime={fullTime}
+                  tabIndex={index === active ? 0 : -1}
+                  itemRef={(element) => {
+                    itemRefs.current[index] = element;
+                  }}
+                  clickablePeople={clickablePeople}
+                  linkPreviews={linkPreviews}
+                  onImageClick={openViewer}
+                />
+              ))}
+            </ol>
+          )}
+        </div>
+        {away ? (
           <button
             type="button"
-            className="chat-list__older"
-            disabled={log.loading}
-            onClick={onLoadOlder}
+            className="chat-jump"
+            aria-label={
+              unseen > 0 ? t("list.jumpToNewestUnseen", { count: unseen }) : t("list.jumpToNewest")
+            }
+            aria-keyshortcuts="Control+End"
+            onClick={jumpToNewest}
           >
-            {log.loading ? t("list.loading") : t("list.loadOlder")}
+            {t("list.jumpToNewest")}
+            {unseen > 0 ? (
+              <span className="chat-jump__count" aria-hidden="true">
+                {unseen}
+              </span>
+            ) : null}
           </button>
         ) : null}
-        {log.loadFailed ? (
-          <p className="chat-list__notice" role="status">
-            {t("list.loadFailed")}
-          </p>
-        ) : null}
-        {messages.length === 0 ? (
-          log.loaded ? (
-            <p className="chat-list__empty">{t("empty")}</p>
-          ) : (
-            <p className="chat-list__notice">{t("list.loading")}</p>
-          )
-        ) : (
-          // Arrow-key navigation lives on the list; each item is a focusable roving stop.
-          // eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions
-          <ol
-            className="chat-list__items"
-            data-display={display}
-            aria-label={label}
-            onKeyDown={onKeyDown}
-            onFocus={(event) => {
-              const focused: EventTarget = event.target;
-              const index = itemRefs.current.findIndex((item) => item === focused);
-              if (index >= 0) setFocusIndex(index);
-            }}
-          >
-            {messages.map((message, index) => (
-              <MessageItem
-                key={message.id}
-                message={message}
-                start={layout[index]?.start ?? true}
-                day={layout[index]?.newDay ? dayLabel(new Date(message.sentAt)) : null}
-                display={display}
-                avatar={display === "cozy" && layout[index]?.start ? avatarFor(message) : null}
-                time={time}
-                fullTime={fullTime}
-                tabIndex={index === active ? 0 : -1}
-                itemRef={(element) => {
-                  itemRefs.current[index] = element;
-                }}
-                clickablePeople={clickablePeople}
-                linkPreviews={linkPreviews}
-                onImageClick={openViewer}
-              />
-            ))}
-          </ol>
-        )}
       </div>
       {viewer ? (
         <ImageViewer
@@ -462,6 +551,21 @@ export function MessageList({
         />
       ) : null}
     </>
+  );
+}
+
+/** Progress and result of a history sync with other Mumcord users (FR-1.60). */
+function SyncStatus({ log }: { log: ConversationLog }) {
+  const { t } = useTranslation("chat");
+  let text: string | null = null;
+  if (log.syncing) text = t("list.syncing");
+  else if (log.syncFailed) text = t("list.syncFailed");
+  else if (log.syncResult !== null)
+    text = log.syncResult > 0 ? t("list.syncAdded", { count: log.syncResult }) : t("list.syncNone");
+  return (
+    <p className="chat-list__notice chat-list__sync" role="status" hidden={text === null}>
+      {text}
+    </p>
   );
 }
 
@@ -533,6 +637,12 @@ function MessageItem({
             <MumcordBadge user={senderUser} />
           </span>,
         );
+  const origin =
+    message.syncedFrom !== null ? (
+      <span className="chat-message__origin">
+        {t("list.syncedFrom", { name: message.syncedFrom })}
+      </span>
+    ) : null;
   const stamp = (className: string) => (
     <time className={className} dateTime={message.sentAt} title={fullTime.format(sentAt)}>
       {time.format(sentAt)}
@@ -551,6 +661,7 @@ function MessageItem({
           onImageClick={onImageClick}
           clickablePeople={clickablePeople}
         />
+        {origin}
       </div>
     );
   } else if (start) {
@@ -588,6 +699,7 @@ function MessageItem({
             onImageClick={onImageClick}
             clickablePeople={clickablePeople}
           />
+          {origin}
         </div>
       </div>
     );
@@ -605,6 +717,7 @@ function MessageItem({
             onImageClick={onImageClick}
             clickablePeople={clickablePeople}
           />
+          {origin}
         </div>
       </div>
     );

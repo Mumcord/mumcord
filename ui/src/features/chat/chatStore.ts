@@ -1,6 +1,7 @@
 /**
  * Messages per conversation for the current connection: live `messageReceived` events, own sent
- * messages and history pages from `historyLoad` (scroll-back), merged and de-duplicated by id.
+ * messages, history pages from `historyLoad` (scroll-back) and messages synced from other
+ * Mumcord users' history (`historySynced`, inserted at their time), de-duplicated by id.
  * Cleared on every `serverSynced` and on disconnect, because channel and session ids are only
  * valid for one connection; the history is then reloaded from the engine.
  */
@@ -26,6 +27,12 @@ export interface ConversationLog {
   /** More history may exist before the first message. */
   hasMore: boolean;
   loadFailed: boolean;
+  /** A history sync of this channel with other Mumcord users is running (FR-1.60). */
+  syncing: boolean;
+  /** Messages added by the last sync the user asked for; `null` while none finished. */
+  syncResult: number | null;
+  /** The last sync the user asked for could not start. */
+  syncFailed: boolean;
 }
 
 const EMPTY_LOG: ConversationLog = {
@@ -34,6 +41,9 @@ const EMPTY_LOG: ConversationLog = {
   loading: false,
   hasMore: false,
   loadFailed: false,
+  syncing: false,
+  syncResult: null,
+  syncFailed: false,
 };
 
 export function conversationKey(conversation: Conversation): string {
@@ -54,6 +64,8 @@ let boundApi: MumcordApi | undefined;
 let unsubscribers: Unsubscribe[] = [];
 const listeners = new Set<() => void>();
 const incomingListeners = new Set<(message: ChatMessage) => void>();
+/** Channels whose running sync the user asked for; only those report their result. */
+const syncRequested = new Set<string>();
 
 function notify(): void {
   for (const listener of listeners) listener();
@@ -71,6 +83,7 @@ function getLog(key: string): ConversationLog {
 
 function reset(): void {
   generation += 1;
+  syncRequested.clear();
   if (logs.size === 0) return;
   logs = new Map();
   notify();
@@ -98,6 +111,64 @@ function append(message: ChatMessage): void {
   });
 }
 
+/**
+ * Inserts messages into a list sorted oldest first, each after every message sent at the same
+ * time or earlier. Synced batches arrive sorted by time with ties broken by content hash, so
+ * equal times keep the engine's order.
+ */
+export function insertByTime(
+  messages: readonly ChatMessage[],
+  incoming: readonly ChatMessage[],
+): readonly ChatMessage[] {
+  const result = [...messages];
+  for (const message of incoming) {
+    const time = Date.parse(message.sentAt);
+    let at = result.length;
+    while (at > 0 && Date.parse(result[at - 1]?.sentAt ?? "") > time) at -= 1;
+    result.splice(at, 0, message);
+  }
+  return result;
+}
+
+function channelKey(channelId: number): string {
+  return conversationKey({ kind: "channel", channelId });
+}
+
+function insertSynced(channelId: number, incoming: readonly ChatMessage[]): void {
+  const key = channelKey(channelId);
+  const log = getLog(key);
+  // Not shown yet: the first history page will contain them (they are already stored).
+  if (!log.loaded) return;
+  const known = new Set(log.messages.map((m) => m.id));
+  const oldest = log.messages[0];
+  // Older than the loaded window: paging back brings them in the right place; inserting them
+  // now would hide the stored messages in between from paging.
+  const fits = incoming.filter(
+    (m) =>
+      !known.has(m.id) &&
+      (!log.hasMore || (oldest !== undefined && Date.parse(m.sentAt) >= Date.parse(oldest.sentAt))),
+  );
+  if (fits.length === 0) return;
+  const messages = insertByTime(log.messages, fits);
+  const overflow = messages.length > MAX_KEPT;
+  setLog(key, {
+    ...log,
+    messages: overflow ? messages.slice(messages.length - MAX_KEPT) : messages,
+    hasMore: log.hasMore || overflow,
+  });
+}
+
+function onSyncStatus(channelId: number, running: boolean, added: number): void {
+  const key = channelKey(channelId);
+  const asked = syncRequested.has(key);
+  if (!running) syncRequested.delete(key);
+  setLog(key, {
+    ...getLog(key),
+    syncing: running,
+    syncResult: !running && asked ? added : null,
+  });
+}
+
 function bind(api: MumcordApi): void {
   for (const unsubscribe of unsubscribers) unsubscribe();
   boundApi = api;
@@ -107,6 +178,12 @@ function bind(api: MumcordApi): void {
     api.on("messageReceived", ({ message }) => {
       append(message);
       for (const listener of incomingListeners) listener(message);
+    }),
+    api.on("historySynced", ({ channelId, messages }) => {
+      insertSynced(channelId, messages);
+    }),
+    api.on("historySyncStatus", ({ channelId, running, added }) => {
+      onSyncStatus(channelId, running, added);
     }),
     api.on("serverSynced", reset),
     api.on("connectionStateChanged", ({ state }) => {
@@ -134,6 +211,7 @@ async function fetchPage(conversation: Conversation, older: boolean): Promise<vo
     if (started !== generation) return;
     const current = getLog(key);
     setLog(key, {
+      ...current,
       messages: merge(page, current.messages),
       loaded: true,
       loading: false,
@@ -157,6 +235,27 @@ export function ensureLoaded(conversation: Conversation): void {
 /** Pages in older history before the first loaded message. */
 export function loadOlder(conversation: Conversation): Promise<void> {
   return fetchPage(conversation, true);
+}
+
+/**
+ * "Load earlier messages" beyond the local history (FR-1.60): asks other Mumcord users for the
+ * channel's earlier messages. Progress and the result show in the log (`syncing`,
+ * `syncResult`, `syncFailed`); the messages arrive as `historySynced`.
+ */
+export async function requestSync(conversation: Conversation): Promise<void> {
+  if (conversation.kind !== "channel") return;
+  const api = ensureBound();
+  const key = conversationKey(conversation);
+  if (getLog(key).syncing) return;
+  syncRequested.add(key);
+  setLog(key, { ...getLog(key), syncResult: null, syncFailed: false });
+  try {
+    await api.historySyncRequest(conversation.channelId);
+  } catch (error) {
+    console.error("Requesting earlier messages failed", error);
+    syncRequested.delete(key);
+    setLog(key, { ...getLog(key), syncFailed: true });
+  }
 }
 
 /** Adds an own sent message (the engine returns it instead of emitting an event). */
@@ -210,6 +309,7 @@ export function resetChatStore(): void {
   logs = new Map();
   generation += 1;
   incomingListeners.clear();
+  syncRequested.clear();
 }
 
 /** Only the messages of a conversation, oldest first (contract for B22). */
