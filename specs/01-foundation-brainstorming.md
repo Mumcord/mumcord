@@ -1407,3 +1407,14 @@ Requested while testing stage 1d.
 ✍️ Note: Requested in chat during /dev.
 
 ---
+
+#### QA.81 Member column sections? `◉`
+Requested while testing stage 1d.
+
+- [x] **Collapsible like Friends:** "In ‹channel›" gets the same collapsible header as Friends (open by default).
+- [x] **In other channels:** a new section with everyone else on the server, labelled by channel, collapsed by default. Open/closed state is remembered.
+- [x] **Left column label:** a "Server overview" label above the channel tree, styled like the "Direct messages" label.
+
+✍️ Note: Requested in chat during /dev.
+
+---
