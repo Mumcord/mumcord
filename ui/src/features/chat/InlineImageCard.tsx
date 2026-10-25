@@ -131,6 +131,7 @@ export function InlineImageCard({ url, messageId, tabIndex, onImageClick }: Inli
           className="inline-image__img"
           src={image.src}
           alt=""
+          draggable={false}
           data-image-url={image.url}
           width={size.width}
           height={size.height}

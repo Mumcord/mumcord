@@ -1,0 +1,14 @@
+{
+  "region": "Teavitused",
+  "channel": "#{{name}}",
+  "unknownChannel": "Kanal",
+  "line": "{{sender}}: {{preview}}",
+  "groupedChannel_one": "{{count}} uus sõnum kanalis {{name}}",
+  "groupedChannel_other": "{{count}} uut sõnumit kanalis {{name}}",
+  "groupedPrivate_one": "{{count}} uus sõnum kasutajalt {{name}}",
+  "groupedPrivate_other": "{{count}} uut sõnumit kasutajalt {{name}}",
+  "image": "Saatis pildi",
+  "open": "Ava vestlus",
+  "close": "Sulge teavitus",
+  "mentionLine": "{{sender}} mainis sind: {{preview}}"
+}

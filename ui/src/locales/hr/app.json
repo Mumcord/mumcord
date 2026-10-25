@@ -1,0 +1,33 @@
+{
+  "regions": {
+    "servers": "Poslužitelji",
+    "channels": "Kanali",
+    "chat": "Chat",
+    "members": "Članovi",
+    "userPanel": "Tvoj status"
+  },
+  "skipLinks": {
+    "label": "Brze poveznice",
+    "chat": "Preskoči na chat",
+    "channels": "Preskoči na kanale"
+  },
+  "members": {
+    "show": "Prikaži članove",
+    "hide": "Sakrij članove"
+  },
+  "resize": {
+    "channels": "Promijeni veličinu popisa kanala",
+    "members": "Promijeni veličinu popisa članova"
+  },
+  "settings": {
+    "title": "Postavke"
+  },
+  "wizard": {
+    "title": "Dobro došao u Mumcord"
+  },
+  "placeholder": "Uskoro",
+  "startupError": {
+    "title": "Mumcord se nije mogao pokrenuti",
+    "description": "Aplikacija nije mogla učitati tvoje postavke. Pokušaj ponovno; ako i dalje ne uspijeva, ponovno pokreni Mumcord."
+  }
+}

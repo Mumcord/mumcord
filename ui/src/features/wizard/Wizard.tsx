@@ -12,6 +12,7 @@ import { usePreferences } from "../../app/preferences";
 import { useView } from "../../app/view";
 import { IdentityStep } from "./IdentityStep";
 import { MicStep } from "./MicStep";
+import { PrivacyStep } from "./PrivacyStep";
 import { TalkModeStep, type TalkChoice } from "./TalkModeStep";
 import "./wizard.css";
 
@@ -21,6 +22,7 @@ interface Loaded {
   availability: PttAvailability | null;
   mouseStatus: PttMouseStatus | null;
   linkHandlerActive: boolean | null;
+  ingameOverlaySupported: boolean;
 }
 
 type Load = { state: "loading" } | { state: "failed" } | ({ state: "ready" } & Loaded);
@@ -35,17 +37,26 @@ function optional<T>(promise: Promise<T>, what: string): Promise<T | null> {
 
 async function loadWizard(): Promise<Loaded> {
   const api = getApi();
-  const [settings, identity, availability, mouseStatus, linkHandlerActive] = await Promise.all([
-    api.settingsGet(),
-    api.identityGet(),
-    optional(api.pttAvailability(), "ptt availability"),
-    optional(api.pttMouseStatus(), "ptt mouse status"),
-    optional(api.linkHandlerStatus(), "link handler status"),
-  ]);
-  return { settings, identity, availability, mouseStatus, linkHandlerActive };
+  const [settings, identity, availability, mouseStatus, linkHandlerActive, ingameOverlay] =
+    await Promise.all([
+      api.settingsGet(),
+      api.identityGet(),
+      optional(api.pttAvailability(), "ptt availability"),
+      optional(api.pttMouseStatus(), "ptt mouse status"),
+      optional(api.linkHandlerStatus(), "link handler status"),
+      optional(api.ingameOverlayState(), "in-game overlay state"),
+    ]);
+  return {
+    settings,
+    identity,
+    availability,
+    mouseStatus,
+    linkHandlerActive,
+    ingameOverlaySupported: ingameOverlay?.supported ?? false,
+  };
 }
 
-/** First-start wizard: identity → microphone → talk mode and start options (FR-1.1–FR-1.6, FR-1.48d). */
+/** First-start wizard: identity → microphone → privacy → talk mode and start options (FR-1.1–FR-1.6, FR-1.48d). */
 export function Wizard() {
   const { t } = useTranslation("wizard");
   const { finishWizard } = useView();
@@ -119,6 +130,7 @@ export function Wizard() {
       talkMode: choice.talkMode,
       pttKey: choice.pttKey,
       linkPreviews: choice.linkPreviews,
+      historySharing: choice.historySharing,
       wizardCompleted: true,
     });
     if (choice.autostart !== saved.autostart) {
@@ -128,6 +140,14 @@ export function Wizard() {
       } catch (cause: unknown) {
         console.error("setting up start at login failed", cause);
         announce(t("talk.autostartFailed"), "polite");
+      }
+    }
+    if (choice.ingameOverlay) {
+      try {
+        await getApi().ingameOverlaySetMode("on");
+      } catch (cause: unknown) {
+        // Not worth blocking the first start; Settings offers it again.
+        console.error("turning on the in-game overlay failed", cause);
       }
     }
     applySettings(saved);
@@ -162,6 +182,18 @@ export function Wizard() {
           }}
         />
       );
+    case 3:
+      return (
+        <PrivacyStep
+          focusOnMount={navigated}
+          onBack={() => {
+            goTo(2);
+          }}
+          onNext={() => {
+            goTo(4);
+          }}
+        />
+      );
     default:
       return (
         <TalkModeStep
@@ -169,9 +201,10 @@ export function Wizard() {
           availability={load.availability}
           mouseStatus={load.mouseStatus}
           linkHandlerActive={load.linkHandlerActive}
+          ingameOverlaySupported={load.ingameOverlaySupported}
           focusOnMount={navigated}
           onBack={() => {
-            goTo(2);
+            goTo(3);
           }}
           onFinish={finish}
         />

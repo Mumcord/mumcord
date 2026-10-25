@@ -1,0 +1,163 @@
+{
+  "noConversation": "Ikkonnettja ma' server u agħżel kanal biex tibda tiċċattja.",
+  "empty": "Għad m'hemm l-ebda messaġġ. Il-messaġġi li tirċievi hawn jiġu ssejvjati fuq dan il-kompjuter.",
+  "header": {
+    "channel": "#{{name}}",
+    "channelPrefix": "Kanal",
+    "privatePrefix": "Chat privat ma'",
+    "unknownPerson": "Persuna mhux magħrufa"
+  },
+  "list": {
+    "today": "Illum",
+    "yesterday": "Ilbieraħ",
+    "label": "Messaġġi f'{{name}}",
+    "loadOlder": "Tgħabbi messaġġi eqdem",
+    "loading": "Qed jitgħabbew il-messaġġi…",
+    "loadFailed": "Ma setgħux jitgħabbew messaġġi eqdem. Escrolja 'l fuq biex terġa' tipprova.",
+    "loadEarlier": "Tgħabbi messaġġi preċedenti",
+    "syncing": "Qed infittxu messaġġi preċedenti minn utenti oħra ta' Mumcord…",
+    "syncAdded_one": "Ġie miżjud {{count}} messaġġ preċedenti minn utenti oħra ta' Mumcord.",
+    "syncAdded_two": "Ġew miżjuda {{count}} messaġġi preċedenti minn utenti oħra ta' Mumcord.",
+    "syncAdded_few": "Ġew miżjuda {{count}} messaġġi preċedenti minn utenti oħra ta' Mumcord.",
+    "syncAdded_many": "Ġew miżjuda {{count}} messaġġ preċedenti minn utenti oħra ta' Mumcord.",
+    "syncAdded_other": "Ġew miżjuda {{count}} messaġġ preċedenti minn utenti oħra ta' Mumcord.",
+    "syncNone": "Ma nstab l-ebda messaġġ preċedenti.",
+    "syncFailed": "Il-messaġġi preċedenti ma jistgħux jitgħabbew hawn.",
+    "syncedFrom": "mill-istorja ta' {{name}}",
+    "jumpToNewest": "Mur għall-aħħar",
+    "jumpToNewestUnseen_one": "Mur għall-aħħar, {{count}} messaġġ ġdid",
+    "jumpToNewestUnseen_two": "Mur għall-aħħar, {{count}} messaġġi ġodda",
+    "jumpToNewestUnseen_few": "Mur għall-aħħar, {{count}} messaġġi ġodda",
+    "jumpToNewestUnseen_many": "Mur għall-aħħar, {{count}} messaġġ ġdid",
+    "jumpToNewestUnseen_other": "Mur għall-aħħar, {{count}} messaġġ ġdid"
+  },
+  "format": {
+    "toolbar": "Formattjar",
+    "bold": "Grassett",
+    "italic": "Korsiv",
+    "strike": "Strikethrough",
+    "code": "Kodiċi inline",
+    "codeBlock": "Blokk ta' kodiċi",
+    "link": "Link"
+  },
+  "composer": {
+    "label": "Messaġġ lil {{name}}",
+    "hint": "Agħfas Enter biex tibgħat u Shift+Enter għal linja ġdida. Markdown jaħdem: **bold**, *italic*, `code`, [link](https://…).",
+    "addImage": "Żid stampa",
+    "removeImage": "Neħħi l-istampa {{name}}",
+    "imagePreview": "Stampa li se tintbagħat: {{name}}",
+    "send": "Ibgħat",
+    "noPermission": "M'għandekx permess tikteb f'dan il-kanal.",
+    "unavailable": "Dan il-kanal m'għadux disponibbli.",
+    "offline": "{{name}} huwa offline. Tista' terġa' tikteb meta jerġa' jkun lura.",
+    "unnamedImage": "Stampa mwaħħla"
+  },
+  "tray": {
+    "label": "Stampi li se jintbagħtu",
+    "processing": "Qed titħejja l-istampa",
+    "scaled": "Mnaqqsa għal {{width}}×{{height}} biex taqbel mal-limitu tas-server"
+  },
+  "errors": {
+    "tooLong": "Il-messaġġ tiegħek huwa twil wisq għal dan is-server (massimu {{max}} karattri). Qassru u erġa' pprova.",
+    "tooLongNoLimit": "Il-messaġġ tiegħek huwa twil wisq għal dan is-server. Qassru u erġa' pprova.",
+    "imageTooLarge": "Din l-istampa hija kbira wisq għal dan is-server, anke wara l-kompressjoni. Ipprova stampa iżgħar.",
+    "imageWithTextTooLong": "Il-messaġġ bl-istampa huwa kbir wisq għal dan is-server. Qassar it-test jew neħħi l-istampa.",
+    "imagesNotAllowed": "Dan is-server ma jippermettix stampi fil-messaġġi.",
+    "notImage": "Dan il-fajl ma jistax jintbagħat. Uża stampa PNG, JPEG, GIF jew WebP.",
+    "imageUnreadable": "L-istampa ma setgħetx tinqara. Ipprova fajl ieħor.",
+    "denied": "Is-server ma ppermettiex dan il-messaġġ.",
+    "deniedWithReason": "Is-server ma ppermettiex dan il-messaġġ: {{reason}}",
+    "notConnected": "Mhux konness. Erġa' ikkonnettja u erġa' pprova.",
+    "generic": "Il-messaġġ ma setax jintbagħat. Erġa' pprova.",
+    "onlyImages": "Jistgħu jintbagħtu biss stampi.",
+    "sourceTooLarge": "Dan il-fajl huwa kbir wisq biex jintbagħat (aktar minn 25 MB)."
+  },
+  "announce": {
+    "message": "{{name}}: {{text}}",
+    "image": "{{name}} bagħat stampa",
+    "more_one": "{{count}} messaġġ ġdid ieħor",
+    "more_two": "{{count}} messaġġi ġodda oħra",
+    "more_few": "{{count}} messaġġi ġodda oħra",
+    "more_many": "{{count}} messaġġ ġdid ieħor",
+    "more_other": "{{count}} messaġġ ġdid ieħor"
+  },
+  "pinned": {
+    "label": "Info tal-kanal",
+    "showMore": "Uri aktar",
+    "showLess": "Uri inqas"
+  },
+  "mention": {
+    "list": "Persuni li tista' tsemmi",
+    "found_one": "{{count}} persuna suġġerita. Uża l-vireg, imbagħad Enter biex iddaħħal.",
+    "found_two": "{{count}} persuni suġġeriti. Uża l-vireg, imbagħad Enter biex iddaħħal.",
+    "found_few": "{{count}} persuni suġġeriti. Uża l-vireg, imbagħad Enter biex iddaħħal.",
+    "found_many": "{{count}} persuna suġġeriti. Uża l-vireg, imbagħad Enter biex iddaħħal.",
+    "found_other": "{{count}} persuna suġġeriti. Uża l-vireg, imbagħad Enter biex iddaħħal.",
+    "none": "Ma nstab ħadd",
+    "mentionsYou": "Isemmik",
+    "chipLabel": "{{name}}, semmija"
+  },
+  "preview": {
+    "open": "Iftaħ fil-browser",
+    "openLabel": "Iftaħ {{title}} fil-browser",
+    "play": "Daqq {{title}}",
+    "player": "Player tal-vidjo: {{title}}",
+    "videoTitle": "Vidjo ta' {{site}}",
+    "spotifyTitle": "Link ta' {{site}}",
+    "audioPlayer": "Player ta' Spotify: {{title}}",
+    "kind": {
+      "track": "Kanzunetta",
+      "album": "Album",
+      "playlist": "Playlist",
+      "artist": "Artist",
+      "episode": "Episodju",
+      "show": "Show"
+    },
+    "inBrowser": "Jindaqq fil-browser tiegħek",
+    "card": "Preview tal-link: {{title}}",
+    "dismiss": "Aħbi l-preview"
+  },
+  "image": {
+    "loading": "Qed titgħabba l-istampa {{name}}",
+    "label": "Stampa: {{name}}",
+    "view": "Ara l-istampa {{name}}",
+    "viewMessage": "Stampa minn {{name}}, iftaħha fil-viewer",
+    "failed": "L-istampa ma tistax tintwera (kbira wisq jew mhux disponibbli)."
+  },
+  "viewer": {
+    "label": "Viewer tal-istampi",
+    "counter": "{{current}} / {{total}}",
+    "zoomIn": "Zoom in",
+    "zoomOut": "Zoom out",
+    "fit": "Adatta għat-tieqa",
+    "save": "Issejvja l-istampa",
+    "saved": "L-istampa ssejvjata",
+    "saveFailed": "L-istampa ma setgħetx tiġi ssejvjata",
+    "fileFilter": "Stampa",
+    "openInBrowser": "Iftaħ fil-browser",
+    "close": "Agħlaq",
+    "previous": "Stampa preċedenti",
+    "next": "Stampa li jmiss",
+    "unnamed": "stampa",
+    "fullLoading": "Qed titgħabba d-daqs sħiħ…",
+    "fullProgress": "Qed titgħabba d-daqs sħiħ… {{percent}} %",
+    "fullUnavailable": "Id-daqs sħiħ mhux disponibbli – qed jintwera l-preview"
+  },
+  "favorites": {
+    "open": "Favoriti tal-GIFs",
+    "title": "Favoriti tal-GIFs",
+    "save": "Issejvja bħala favorit",
+    "remove": "Neħħi mill-favoriti",
+    "removeNamed": "Neħħi {{name}} mill-favoriti",
+    "send": "Ibgħat {{name}}",
+    "hint": "Il-vireg jimxu, Enter jibgħat, Delete ineħħi, Escape jagħlaq.",
+    "empty": "Għad m'hemm l-ebda favorit. Agħfas il-buttuna tal-lemin fuq GIF fiċ-chat, jew uża l-istilla fuqha, u agħżel \"Issejvja bħala favorit\". Se tidher hawn."
+  },
+  "imageMenu": {
+    "label": "Stampa {{name}}"
+  },
+  "attribution": {
+    "via": "permezz ta' {{brand}}",
+    "view": "Ara fuq {{brand}}"
+  }
+}

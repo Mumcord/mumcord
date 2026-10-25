@@ -1,0 +1,75 @@
+{
+  "serverOverview": "Pregled poslužitelja",
+  "tree": {
+    "label": "Kanali",
+    "hint": "Enter: prikaži chat · Shift+Enter ili dvoklik: pridruži se · Strelice: pomicanje, proširivanje, sažimanje",
+    "join": "Pridruži se",
+    "you": "(ti)",
+    "voiceHere": "ovdje si (glas)",
+    "people_one": "{{count}} osoba",
+    "people_few": "{{count}} osobe",
+    "people_other": "{{count}} osoba",
+    "stack": {
+      "some": "{{shown}} od {{total}} osoba: {{names}} i još {{rest}}",
+      "all_one": "{{count}} osoba: {{names}}",
+      "all_few": "{{count}} osobe: {{names}}",
+      "all_other": "{{count}} osoba: {{names}}",
+      "person": "{{name}} ({{status}})"
+    },
+    "showAll": "Prikaži sve ({{total}})",
+    "showFewer": "Prikaži manje",
+    "jump": "Skoči na moj kanal"
+  },
+  "status": {
+    "listening": "sluša",
+    "talking": "govori",
+    "muted": "mikrofon isključen",
+    "deafened": "zvuk isključen",
+    "serverMuted": "poslužitelj isključio mikrofon",
+    "serverDeafened": "poslužitelj isključio zvuk",
+    "suppressed": "utišan (ovdje ne može govoriti)",
+    "localMuted": "utišan za tebe",
+    "unregistered": "nije registriran"
+  },
+  "mumcordBadge": "Koristi Mumcord",
+  "statusTip": {
+    "registered": "Registriran na ovom poslužitelju",
+    "listening": "Sluša ovaj kanal",
+    "muted": "Mikrofon isključen",
+    "deafened": "Zvuk isključen",
+    "serverMuted": "Poslužitelj je isključio mikrofon",
+    "serverDeafened": "Poslužitelj je isključio zvuk",
+    "suppressed": "Utišan – ne može govoriti u ovom kanalu",
+    "localMuted": "Utišan za tebe",
+    "unregistered": "Nije registriran na ovom poslužitelju (gost)",
+    "nowPlaying": "Sluša {{track}}",
+    "nowGaming": "Igra {{game}}",
+    "positional": "Pozicijski zvuk aktivan"
+  },
+  "announce": {
+    "joined": "{{name}} se pridružio tvom kanalu",
+    "left": "{{name}} je napustio tvoj kanal",
+    "talking": "{{name}} govori"
+  },
+  "errors": {
+    "joinDenied": "Nemaš dopuštenje ući u ovaj kanal.",
+    "joinFailed": "Pridruživanje kanalu nije uspjelo. Pokušaj ponovno.",
+    "notConnected": "Nisi povezan s poslužiteljem."
+  },
+  "empty": {
+    "disconnected": "Nisi povezan. Odaberi poslužitelj da vidiš njegove kanale.",
+    "loading": "Učitavanje kanala…"
+  },
+  "search": {
+    "label": "Pretraži kanale i osobe",
+    "clear": "Očisti pretragu",
+    "empty": "Nijedan kanal ni osoba ne odgovara upitu „{{query}}”.",
+    "count": "{{channels}}, {{people}}",
+    "channels_one": "{{count}} kanal",
+    "channels_few": "{{count}} kanala",
+    "channels_other": "{{count}} kanala",
+    "people_one": "{{count}} osoba",
+    "people_few": "{{count}} osobe",
+    "people_other": "{{count}} osoba"
+  }
+}

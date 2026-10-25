@@ -7,15 +7,19 @@ import { useRef, useState, type KeyboardEvent } from "react";
 import { useTranslation } from "react-i18next";
 import type { User } from "../../api";
 import { StatusIcons } from "../channels/PersonStatus";
+import { MumcordBadge } from "../channels/MumcordBadge";
 import { useStatusText } from "../channels/statusText";
 import { useSelectedConversation } from "../channels/selection";
 import { useServerState } from "../channels/serverStore";
+import { buildTree, type ChannelNode } from "../channels/tree";
 import "./members.css";
+import { CollapsibleSection } from "./CollapsibleSection";
+import { useSectionOpen } from "./useSectionOpen";
 import { Avatar } from "./Avatar";
 import type { SendPrivateMessage } from "./privateMessage";
 import { useAvatars } from "./useAvatars";
 import { ProfilePreviewTrigger } from "./ProfilePreview";
-import { useProfileCard } from "./useProfileCard";
+import { clickPerson, doubleClickPerson } from "./personClick";
 
 const byName = (a: User, b: User) =>
   a.name.localeCompare(b.name, undefined, { sensitivity: "base" });
@@ -29,7 +33,6 @@ export function MembersPanel({ onSendPrivateMessage }: MembersPanelProps) {
   const { t } = useTranslation("members");
   const state = useServerState();
   const { conversation } = useSelectedConversation();
-  const { openProfile, profileCard } = useProfileCard(onSendPrivateMessage);
   const statusText = useStatusText();
   const listRef = useRef<HTMLDivElement>(null);
   const [focusedKey, setFocusedKey] = useState<string | null>(null);
@@ -46,15 +49,24 @@ export function MembersPanel({ onSendPrivateMessage }: MembersPanelProps) {
         u.listeningChannelIds.includes(channel.id),
     )
     .sort(byName);
-  const avatarOf = useAvatars([...people, ...listeners]);
+  const [peopleOpen, setPeopleOpen] = useSectionOpen("members-here", true);
+  const [othersOpen, setOthersOpen] = useSectionOpen("members-others", false);
+  // Walking the whole server is only worth it while the section is open.
+  const others = channel && othersOpen ? otherGroups(buildTree(state), channel.id) : [];
+  const avatarOf = useAvatars([
+    ...(peopleOpen ? people : []),
+    ...listeners,
+    ...others.flatMap((g) => g.members),
+  ]);
 
   if (!channel) {
     return <p className="members-empty">{t("noChannel")}</p>;
   }
 
   const keys = [
-    ...people.map((u) => `p${String(u.session)}`),
+    ...(peopleOpen ? people : []).map((u) => `p${String(u.session)}`),
     ...listeners.map((u) => `l${String(u.session)}`),
+    ...others.flatMap((g) => g.members.map((u) => `o${String(u.session)}`)),
   ];
   const tabStop = keys.find((k) => k === focusedKey) ?? keys[0];
 
@@ -91,12 +103,16 @@ export function MembersPanel({ onSendPrivateMessage }: MembersPanelProps) {
               setFocusedKey(key);
             }}
             onClick={(event) => {
-              openProfile(user.session, event.currentTarget);
+              clickPerson(event.detail, user.session, event.currentTarget);
+            }}
+            onDoubleClick={() => {
+              doubleClickPerson(user.session, undefined, onSendPrivateMessage);
             }}
           >
             <Avatar name={user.name} src={avatarOf(user)} talking={talking} />
             <span className="member__name" data-local-muted={user.localMute}>
               {user.name}
+              <MumcordBadge user={user} />
               {user.session === state.selfSession && (
                 <span className="member__you"> {t("you")}</span>
               )}
@@ -113,16 +129,22 @@ export function MembersPanel({ onSendPrivateMessage }: MembersPanelProps) {
     // The key handler moves focus between the buttons inside; it is not itself interactive.
     // eslint-disable-next-line jsx-a11y/no-static-element-interactions
     <div className="members-panel" ref={listRef} onKeyDown={onKeyDown}>
-      <h2 className="members-heading">
-        {t("inChannel", { channel: channel.name, count: people.length })}
-      </h2>
-      {people.length > 0 ? (
-        <ul className="members-list">
-          {people.map((u) => item(u, `p${String(u.session)}`, false))}
-        </ul>
-      ) : (
-        <p className="members-none">{t("nobody")}</p>
-      )}
+      <CollapsibleSection
+        id="members-here"
+        title={t("inChannel", { channel: channel.name, count: people.length })}
+        open={peopleOpen}
+        onOpenChange={setPeopleOpen}
+      >
+        {() =>
+          people.length > 0 ? (
+            <ul className="members-list">
+              {people.map((u) => item(u, `p${String(u.session)}`, false))}
+            </ul>
+          ) : (
+            <p className="members-none">{t("nobody")}</p>
+          )
+        }
+      </CollapsibleSection>
       {listeners.length > 0 && (
         <>
           <h2 className="members-heading">{t("listening", { count: listeners.length })}</h2>
@@ -131,7 +153,45 @@ export function MembersPanel({ onSendPrivateMessage }: MembersPanelProps) {
           </ul>
         </>
       )}
-      {profileCard}
+      <CollapsibleSection
+        id="members-others"
+        title={t("inOtherChannels")}
+        open={othersOpen}
+        onOpenChange={setOthersOpen}
+      >
+        {() =>
+          others.length > 0 ? (
+            others.map((group) => (
+              <div key={group.channel.id}>
+                <h3 className="members-heading">{group.channel.name}</h3>
+                <ul className="members-list">
+                  {group.members.map((u) => item(u, `o${String(u.session)}`, false))}
+                </ul>
+              </div>
+            ))
+          ) : (
+            <p className="members-none">{t("nobodyElse")}</p>
+          )
+        }
+      </CollapsibleSection>
     </div>
   );
+}
+
+interface ChannelGroup {
+  channel: ChannelNode["channel"];
+  members: User[];
+}
+
+/** People outside `currentId`, grouped by channel in channel-tree order (empty channels skipped). */
+function otherGroups(roots: readonly ChannelNode[], currentId: number): ChannelGroup[] {
+  const groups: ChannelGroup[] = [];
+  const walk = (node: ChannelNode) => {
+    if (node.channel.id !== currentId && node.members.length > 0) {
+      groups.push({ channel: node.channel, members: node.members });
+    }
+    node.children.forEach(walk);
+  };
+  roots.forEach(walk);
+  return groups;
 }

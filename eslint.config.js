@@ -8,7 +8,16 @@ import prettier from "eslint-config-prettier";
 import { defineConfig } from "eslint/config";
 
 export default defineConfig(
-  { ignores: ["dist", "target", "src-tauri", "node_modules", "ui/src/bindings/commands.ts"] },
+  {
+    ignores: [
+      ".claude",
+      "dist",
+      "target",
+      "src-tauri",
+      "node_modules",
+      "ui/src/bindings/commands.ts",
+    ],
+  },
   js.configs.recommended,
   tseslint.configs.strictTypeChecked,
   {

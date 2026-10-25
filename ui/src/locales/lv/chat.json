@@ -1,0 +1,155 @@
+{
+  "noConversation": "Izveido savienojumu ar serveri un izvēlies kanālu, lai sāktu čatot.",
+  "empty": "Vēl nav ziņu. Šeit saņemtās ziņas tiek saglabātas šajā datorā.",
+  "header": {
+    "channel": "#{{name}}",
+    "channelPrefix": "Kanāls",
+    "privatePrefix": "Privāts čats ar",
+    "unknownPerson": "Nezināms cilvēks"
+  },
+  "list": {
+    "today": "Šodien",
+    "yesterday": "Vakar",
+    "label": "Ziņas kanālā {{name}}",
+    "loadOlder": "Ielādēt vecākas ziņas",
+    "loading": "Ielādē ziņas…",
+    "loadFailed": "Vecākas ziņas neizdevās ielādēt. Ritini uz augšu, lai mēģinātu vēlreiz.",
+    "loadEarlier": "Ielādēt agrākas ziņas",
+    "syncing": "Meklē agrākas ziņas no citiem Mumcord lietotājiem…",
+    "syncAdded_zero": "Pievienotas {{count}} agrākas ziņas no citiem Mumcord lietotājiem.",
+    "syncAdded_one": "Pievienota {{count}} agrāka ziņa no citiem Mumcord lietotājiem.",
+    "syncAdded_other": "Pievienotas {{count}} agrākas ziņas no citiem Mumcord lietotājiem.",
+    "syncNone": "Agrākas ziņas netika atrastas.",
+    "syncFailed": "Agrākas ziņas šeit nevar ielādēt.",
+    "syncedFrom": "no {{name}} vēstures",
+    "jumpToNewest": "Pāriet uz jaunāko",
+    "jumpToNewestUnseen_zero": "Pāriet uz jaunāko, {{count}} jaunu ziņu",
+    "jumpToNewestUnseen_one": "Pāriet uz jaunāko, {{count}} jauna ziņa",
+    "jumpToNewestUnseen_other": "Pāriet uz jaunāko, {{count}} jaunas ziņas"
+  },
+  "format": {
+    "toolbar": "Formatēšana",
+    "bold": "Treknraksts",
+    "italic": "Slīpraksts",
+    "strike": "Pārsvītrots",
+    "code": "Iekļauts kods",
+    "codeBlock": "Koda bloks",
+    "link": "Saite"
+  },
+  "composer": {
+    "label": "Rakstīt ziņu: {{name}}",
+    "hint": "Nospied Enter, lai nosūtītu, un Shift+Enter jaunai rindai. Darbojas Markdown: **treknraksts**, *slīpraksts*, `kods`, [saite](https://…).",
+    "addImage": "Pievienot attēlu",
+    "removeImage": "Noņemt attēlu {{name}}",
+    "imagePreview": "Sūtāmais attēls: {{name}}",
+    "send": "Sūtīt",
+    "noPermission": "Tev nav atļaujas rakstīt šajā kanālā.",
+    "unavailable": "Šis kanāls vairs nav pieejams.",
+    "offline": "{{name}} ir bezsaistē. Vari rakstīt atkal, kad viņš būs atpakaļ.",
+    "unnamedImage": "Ielīmēts attēls"
+  },
+  "tray": {
+    "label": "Sūtāmie attēli",
+    "processing": "Sagatavo attēlu",
+    "scaled": "Samazināts līdz {{width}}×{{height}}, lai atbilstu servera ierobežojumam"
+  },
+  "errors": {
+    "tooLong": "Tava ziņa ir pārāk gara šim serverim (ne vairāk kā {{max}} rakstzīmes). Saīsini to un mēģini vēlreiz.",
+    "tooLongNoLimit": "Tava ziņa ir pārāk gara šim serverim. Saīsini to un mēģini vēlreiz.",
+    "imageTooLarge": "Šis attēls ir pārāk liels šim serverim pat pēc saspiešanas. Izmēģini mazāku attēlu.",
+    "imageWithTextTooLong": "Ziņa ar attēlu ir pārāk liela šim serverim. Saīsini tekstu vai noņem attēlu.",
+    "imagesNotAllowed": "Šis serveris neatļauj attēlus ziņās.",
+    "notImage": "Šo failu nevar nosūtīt. Izmanto PNG, JPEG, GIF vai WebP attēlu.",
+    "imageUnreadable": "Attēlu neizdevās nolasīt. Izmēģini citu failu.",
+    "denied": "Serveris neatļāva šo ziņu.",
+    "deniedWithReason": "Serveris neatļāva šo ziņu: {{reason}}",
+    "notConnected": "Tu neesi savienots. Izveido savienojumu atkārtoti un mēģini vēlreiz.",
+    "generic": "Ziņu neizdevās nosūtīt. Mēģini vēlreiz.",
+    "onlyImages": "Var sūtīt tikai attēlus.",
+    "sourceTooLarge": "Šis fails ir pārāk liels, lai to nosūtītu (virs 25 MB)."
+  },
+  "announce": {
+    "message": "{{name}}: {{text}}",
+    "image": "{{name}} nosūtīja attēlu",
+    "more_zero": "vēl {{count}} jaunu ziņu",
+    "more_one": "vēl {{count}} jauna ziņa",
+    "more_other": "vēl {{count}} jaunas ziņas"
+  },
+  "pinned": {
+    "label": "Kanāla informācija",
+    "showMore": "Rādīt vairāk",
+    "showLess": "Rādīt mazāk"
+  },
+  "mention": {
+    "list": "Pieminamie cilvēki",
+    "found_zero": "Ieteikti {{count}} cilvēku. Izmanto bulttaustiņus, pēc tam Enter, lai ievietotu.",
+    "found_one": "Ieteikts {{count}} cilvēks. Izmanto bulttaustiņus, pēc tam Enter, lai ievietotu.",
+    "found_other": "Ieteikti {{count}} cilvēki. Izmanto bulttaustiņus, pēc tam Enter, lai ievietotu.",
+    "none": "Neviens nav atrasts",
+    "mentionsYou": "Piemin tevi",
+    "chipLabel": "{{name}}, pieminējums"
+  },
+  "preview": {
+    "open": "Atvērt pārlūkā",
+    "openLabel": "Atvērt {{title}} pārlūkā",
+    "play": "Atskaņot {{title}}",
+    "player": "Video atskaņotājs: {{title}}",
+    "videoTitle": "{{site}} video",
+    "spotifyTitle": "{{site}} saite",
+    "audioPlayer": "Spotify atskaņotājs: {{title}}",
+    "kind": {
+      "track": "Dziesma",
+      "album": "Albums",
+      "playlist": "Atskaņošanas saraksts",
+      "artist": "Izpildītājs",
+      "episode": "Epizode",
+      "show": "Raidījums"
+    },
+    "inBrowser": "Atskaņo tavā pārlūkā",
+    "card": "Saites priekšskatījums: {{title}}",
+    "dismiss": "Slēpt priekšskatījumu"
+  },
+  "image": {
+    "loading": "Ielādē attēlu {{name}}",
+    "label": "Attēls: {{name}}",
+    "view": "Skatīt attēlu {{name}}",
+    "viewMessage": "Attēls no {{name}}, atvērt skatītājā",
+    "failed": "Attēlu nevar parādīt (pārāk liels vai nav pieejams)."
+  },
+  "viewer": {
+    "label": "Attēlu skatītājs",
+    "counter": "{{current}} / {{total}}",
+    "zoomIn": "Pietuvināt",
+    "zoomOut": "Attālināt",
+    "fit": "Pielāgot logam",
+    "save": "Saglabāt attēlu",
+    "saved": "Attēls saglabāts",
+    "saveFailed": "Attēlu neizdevās saglabāt",
+    "fileFilter": "Attēls",
+    "openInBrowser": "Atvērt pārlūkā",
+    "close": "Aizvērt",
+    "previous": "Iepriekšējais attēls",
+    "next": "Nākamais attēls",
+    "unnamed": "attēls",
+    "fullLoading": "Ielādē pilnu izmēru…",
+    "fullProgress": "Ielādē pilnu izmēru… {{percent}} %",
+    "fullUnavailable": "Pilns izmērs nav pieejams – tiek rādīts priekšskatījums"
+  },
+  "favorites": {
+    "open": "GIF izlase",
+    "title": "GIF izlase",
+    "save": "Saglabāt izlasē",
+    "remove": "Noņemt no izlases",
+    "removeNamed": "Noņemt {{name}} no izlases",
+    "send": "Sūtīt {{name}}",
+    "hint": "Bulttaustiņi pārvieto, Enter sūta, Delete noņem, Escape aizver.",
+    "empty": "Izlasē vēl nekā nav. Noklikšķini ar peles labo pogu uz GIF čatā vai izmanto zvaigznīti uz tā un izvēlies “Saglabāt izlasē”. Tas parādīsies šeit."
+  },
+  "imageMenu": {
+    "label": "Attēls {{name}}"
+  },
+  "attribution": {
+    "via": "caur {{brand}}",
+    "view": "Skatīt {{brand}}"
+  }
+}

@@ -1,0 +1,159 @@
+{
+  "noConversation": "Poveži se s strežnikom in izberi kanal, da začneš klepetati.",
+  "empty": "Še ni sporočil. Sporočila, ki jih prejmeš tukaj, se shranijo na ta računalnik.",
+  "header": {
+    "channel": "#{{name}}",
+    "channelPrefix": "Kanal",
+    "privatePrefix": "Zasebni klepet z",
+    "unknownPerson": "Neznana oseba"
+  },
+  "list": {
+    "today": "Danes",
+    "yesterday": "Včeraj",
+    "label": "Sporočila v {{name}}",
+    "loadOlder": "Naloži starejša sporočila",
+    "loading": "Nalaganje sporočil …",
+    "loadFailed": "Starejših sporočil ni bilo mogoče naložiti. Pomakni se navzgor, da poskusiš znova.",
+    "loadEarlier": "Naloži prejšnja sporočila",
+    "syncing": "Iskanje prejšnjih sporočil pri drugih uporabnikih Mumcorda …",
+    "syncAdded_one": "Dodano {{count}} prejšnje sporočilo od drugih uporabnikov Mumcorda.",
+    "syncAdded_two": "Dodani {{count}} prejšnji sporočili od drugih uporabnikov Mumcorda.",
+    "syncAdded_few": "Dodana {{count}} prejšnja sporočila od drugih uporabnikov Mumcorda.",
+    "syncAdded_other": "Dodanih {{count}} prejšnjih sporočil od drugih uporabnikov Mumcorda.",
+    "syncNone": "Ni najdenih prejšnjih sporočil.",
+    "syncFailed": "Prejšnjih sporočil tukaj ni mogoče naložiti.",
+    "syncedFrom": "iz zgodovine osebe {{name}}",
+    "jumpToNewest": "Skoči na najnovejše",
+    "jumpToNewestUnseen_one": "Skoči na najnovejše, {{count}} novo sporočilo",
+    "jumpToNewestUnseen_two": "Skoči na najnovejše, {{count}} novi sporočili",
+    "jumpToNewestUnseen_few": "Skoči na najnovejše, {{count}} nova sporočila",
+    "jumpToNewestUnseen_other": "Skoči na najnovejše, {{count}} novih sporočil"
+  },
+  "format": {
+    "toolbar": "Oblikovanje",
+    "bold": "Krepko",
+    "italic": "Ležeče",
+    "strike": "Prečrtano",
+    "code": "Koda v vrstici",
+    "codeBlock": "Blok kode",
+    "link": "Povezava"
+  },
+  "composer": {
+    "label": "Sporočilo za {{name}}",
+    "hint": "Pritisni Enter za pošiljanje in Shift+Enter za novo vrstico. Markdown deluje: **krepko**, *ležeče*, `koda`, [povezava](https://…).",
+    "addImage": "Dodaj sliko",
+    "removeImage": "Odstrani sliko {{name}}",
+    "imagePreview": "Slika za pošiljanje: {{name}}",
+    "send": "Pošlji",
+    "noPermission": "Nimaš dovoljenja za pisanje v tem kanalu.",
+    "unavailable": "Ta kanal ni več na voljo.",
+    "offline": "{{name}} ni na spletu. Znova lahko pišeš, ko se vrne.",
+    "unnamedImage": "Prilepljena slika"
+  },
+  "tray": {
+    "label": "Slike za pošiljanje",
+    "processing": "Pripravljanje slike",
+    "scaled": "Pomanjšano na {{width}}×{{height}}, da ustreza omejitvi strežnika"
+  },
+  "errors": {
+    "tooLong": "Tvoje sporočilo je predolgo za ta strežnik (največ {{max}} znakov). Skrajšaj ga in poskusi znova.",
+    "tooLongNoLimit": "Tvoje sporočilo je predolgo za ta strežnik. Skrajšaj ga in poskusi znova.",
+    "imageTooLarge": "Ta slika je prevelika za ta strežnik, tudi po stiskanju. Poskusi z manjšo sliko.",
+    "imageWithTextTooLong": "Sporočilo s sliko je preveliko za ta strežnik. Skrajšaj besedilo ali odstrani sliko.",
+    "imagesNotAllowed": "Ta strežnik ne dovoli slik v sporočilih.",
+    "notImage": "Te datoteke ni mogoče poslati. Uporabi sliko PNG, JPEG, GIF ali WebP.",
+    "imageUnreadable": "Slike ni bilo mogoče prebrati. Poskusi z drugo datoteko.",
+    "denied": "Strežnik ni dovolil tega sporočila.",
+    "deniedWithReason": "Strežnik ni dovolil tega sporočila: {{reason}}",
+    "notConnected": "Nisi povezan. Znova se poveži in poskusi znova.",
+    "generic": "Sporočila ni bilo mogoče poslati. Poskusi znova.",
+    "onlyImages": "Pošiljati je mogoče samo slike.",
+    "sourceTooLarge": "Ta datoteka je prevelika za pošiljanje (več kot 25 MB)."
+  },
+  "announce": {
+    "message": "{{name}}: {{text}}",
+    "image": "{{name}} je poslal sliko",
+    "more_one": "Še {{count}} novo sporočilo",
+    "more_two": "Še {{count}} novi sporočili",
+    "more_few": "Še {{count}} nova sporočila",
+    "more_other": "Še {{count}} novih sporočil"
+  },
+  "pinned": {
+    "label": "Podatki o kanalu",
+    "showMore": "Pokaži več",
+    "showLess": "Pokaži manj"
+  },
+  "mention": {
+    "list": "Osebe, ki jih lahko omeniš",
+    "found_one": "Predlagana je {{count}} oseba. Uporabi puščice, nato Enter za vstavljanje.",
+    "found_two": "Predlagani sta {{count}} osebi. Uporabi puščice, nato Enter za vstavljanje.",
+    "found_few": "Predlagane so {{count}} osebe. Uporabi puščice, nato Enter za vstavljanje.",
+    "found_other": "Predlaganih je {{count}} oseb. Uporabi puščice, nato Enter za vstavljanje.",
+    "none": "Nihče ni najden",
+    "mentionsYou": "Omenja te",
+    "chipLabel": "{{name}}, omemba"
+  },
+  "preview": {
+    "open": "Odpri v brskalniku",
+    "openLabel": "Odpri {{title}} v brskalniku",
+    "play": "Predvajaj {{title}}",
+    "player": "Predvajalnik videa: {{title}}",
+    "videoTitle": "Video {{site}}",
+    "spotifyTitle": "Povezava {{site}}",
+    "audioPlayer": "Predvajalnik Spotify: {{title}}",
+    "kind": {
+      "track": "Skladba",
+      "album": "Album",
+      "playlist": "Seznam predvajanja",
+      "artist": "Izvajalec",
+      "episode": "Epizoda",
+      "show": "Oddaja"
+    },
+    "inBrowser": "Predvaja se v tvojem brskalniku",
+    "card": "Predogled povezave: {{title}}",
+    "dismiss": "Skrij predogled"
+  },
+  "image": {
+    "loading": "Nalaganje slike {{name}}",
+    "label": "Slika: {{name}}",
+    "view": "Ogled slike {{name}}",
+    "viewMessage": "Slika od {{name}}, odpri v pregledovalniku",
+    "failed": "Slike ni mogoče prikazati (prevelika ali ni na voljo)."
+  },
+  "viewer": {
+    "label": "Pregledovalnik slik",
+    "counter": "{{current}} / {{total}}",
+    "zoomIn": "Povečaj",
+    "zoomOut": "Pomanjšaj",
+    "fit": "Prilagodi oknu",
+    "save": "Shrani sliko",
+    "saved": "Slika shranjena",
+    "saveFailed": "Slike ni bilo mogoče shraniti",
+    "fileFilter": "Slika",
+    "openInBrowser": "Odpri v brskalniku",
+    "close": "Zapri",
+    "previous": "Prejšnja slika",
+    "next": "Naslednja slika",
+    "unnamed": "slika",
+    "fullLoading": "Nalaganje polne velikosti …",
+    "fullProgress": "Nalaganje polne velikosti … {{percent}} %",
+    "fullUnavailable": "Polna velikost ni na voljo – prikazan je predogled"
+  },
+  "favorites": {
+    "open": "Priljubljeni GIF-i",
+    "title": "Priljubljeni GIF-i",
+    "save": "Shrani med priljubljene",
+    "remove": "Odstrani iz priljubljenih",
+    "removeNamed": "Odstrani {{name}} iz priljubljenih",
+    "send": "Pošlji {{name}}",
+    "hint": "Puščice premikajo, Enter pošlje, Delete odstrani, Escape zapre.",
+    "empty": "Še ni priljubljenih. Desno klikni GIF v klepetu ali uporabi zvezdico na njem in izberi »Shrani med priljubljene«. Prikazal se bo tukaj."
+  },
+  "imageMenu": {
+    "label": "Slika {{name}}"
+  },
+  "attribution": {
+    "via": "prek {{brand}}",
+    "view": "Ogled na {{brand}}"
+  }
+}

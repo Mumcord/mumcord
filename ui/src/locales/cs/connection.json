@@ -1,0 +1,22 @@
+{
+  "open": "Informace o připojení",
+  "title": "Informace o připojení",
+  "loading": "Načítání…",
+  "notConnected": "Nepřipojeno.",
+  "error": "Informace o připojení teď nejsou k dispozici.",
+  "none": "–",
+  "transport": "Přenos",
+  "transportValue": {
+    "udp": "UDP",
+    "tcp": "TCP (tunelováno)"
+  },
+  "latency": "Odezva",
+  "latencyValue": "{{value}} ms",
+  "loss": "Ztráta paketů",
+  "lossValue": "{{value}} %",
+  "bitrate": "Odesílací datový tok",
+  "bitrateValue": "{{value}} kbit/s",
+  "serverLimit": "Limit serveru",
+  "packets": "Pakety odeslané / přijaté",
+  "packetsValue": "{{sent}} / {{received}}"
+}

@@ -1,0 +1,22 @@
+{
+  "open": "Ryšio informacija",
+  "title": "Ryšio informacija",
+  "loading": "Įkeliama…",
+  "notConnected": "Neprisijungta.",
+  "error": "Ryšio informacija šiuo metu nepasiekiama.",
+  "none": "–",
+  "transport": "Transportas",
+  "transportValue": {
+    "udp": "UDP",
+    "tcp": "TCP (tuneliuojama)"
+  },
+  "latency": "Delsa",
+  "latencyValue": "{{value}} ms",
+  "loss": "Prarasti paketai",
+  "lossValue": "{{value}} %",
+  "bitrate": "Siuntimo sparta",
+  "bitrateValue": "{{value}} kbit/s",
+  "serverLimit": "Serverio riba",
+  "packets": "Išsiųsti / gauti paketai",
+  "packetsValue": "{{sent}} / {{received}}"
+}

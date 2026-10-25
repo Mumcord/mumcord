@@ -1,0 +1,14 @@
+{
+  "region": "Meldingen",
+  "channel": "#{{name}}",
+  "unknownChannel": "Een kanaal",
+  "line": "{{sender}}: {{preview}}",
+  "groupedChannel_one": "{{count}} nieuw bericht in {{name}}",
+  "groupedChannel_other": "{{count}} nieuwe berichten in {{name}}",
+  "groupedPrivate_one": "{{count}} nieuw bericht van {{name}}",
+  "groupedPrivate_other": "{{count}} nieuwe berichten van {{name}}",
+  "image": "Heeft een afbeelding gestuurd",
+  "open": "Chat openen",
+  "close": "Melding sluiten",
+  "mentionLine": "{{sender}} heeft je vermeld: {{preview}}"
+}

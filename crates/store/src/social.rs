@@ -173,6 +173,36 @@ impl Store {
         )?;
         Ok(())
     }
+
+    /// The private note about a person; empty when there is none (FR-1.63).
+    pub fn person_note(&self, server: ServerId, cert_hash: &str) -> Result<String> {
+        Ok(self
+            .conn
+            .query_row(
+                "SELECT note FROM person_note WHERE server_id = ?1 AND person_cert_hash = ?2",
+                params![server, cert_hash],
+                |row| row.get(0),
+            )
+            .optional()?
+            .unwrap_or_default())
+    }
+
+    /// Stores the private note about a person; an empty note removes it.
+    pub fn set_person_note(&self, server: ServerId, cert_hash: &str, note: &str) -> Result<()> {
+        if note.is_empty() {
+            self.conn.execute(
+                "DELETE FROM person_note WHERE server_id = ?1 AND person_cert_hash = ?2",
+                params![server, cert_hash],
+            )?;
+        } else {
+            self.conn.execute(
+                "INSERT INTO person_note (server_id, person_cert_hash, note) VALUES (?1, ?2, ?3)
+                 ON CONFLICT (server_id, person_cert_hash) DO UPDATE SET note = excluded.note",
+                params![server, cert_hash, note],
+            )?;
+        }
+        Ok(())
+    }
 }
 
 #[cfg(test)]
@@ -283,5 +313,27 @@ mod tests {
             store.set_person_setting(a, "h1", &too_loud),
             Err(Error::InvalidVolume(201))
         ));
+    }
+
+    #[test]
+    fn person_notes_are_keyed_by_server_and_hash_and_removed_when_empty() {
+        let (_dir, store) = temp_store();
+        let a = store
+            .add_server(&NewServer::new("A", "a", "u"))
+            .expect("a")
+            .id;
+        let b = store
+            .add_server(&NewServer::new("B", "b", "u"))
+            .expect("b")
+            .id;
+        assert_eq!(store.person_note(a, "h1").expect("get"), "");
+        store.set_person_note(a, "h1", "plays bass").expect("set");
+        store
+            .set_person_note(a, "h1", "plays drums")
+            .expect("update");
+        assert_eq!(store.person_note(a, "h1").expect("get"), "plays drums");
+        assert_eq!(store.person_note(b, "h1").expect("get"), "");
+        store.set_person_note(a, "h1", "").expect("clear");
+        assert_eq!(store.person_note(a, "h1").expect("get"), "");
     }
 }

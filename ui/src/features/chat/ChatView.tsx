@@ -10,12 +10,13 @@ import { announce } from "../../a11y";
 import { getApi, type ChatMessage, type Conversation, type User } from "../../api";
 import { PreferencesContext } from "../../app/preferences";
 import { useSelectedConversation, useServerState } from "../channels";
-import { useProfileCard } from "../members";
+import { PrivatePresence, useFriend } from "../friends";
 import { useAvatars } from "../members/useAvatars";
 import {
   conversationKey,
   ensureLoaded,
   loadOlder,
+  requestSync,
   subscribeIncoming,
   useConversationLog,
 } from "./chatStore";
@@ -67,7 +68,6 @@ function ConversationChat({ conversation, renderHeaderActions }: ConversationCha
   const log = useConversationLog(conversation);
   const info = conversationInfo(server, conversation, log.messages);
   const limits = useMemo(() => messageLimits(server.info), [server.info]);
-  const { openProfile, profileCard } = useProfileCard();
   const pinned = pinnedInfo(server, conversation);
   const pinnedChannelId = conversation.kind === "channel" ? conversation.channelId : null;
   // Outside the app shell (isolated feature tests) there are no preferences: the default applies.
@@ -104,7 +104,10 @@ function ConversationChat({ conversation, renderHeaderActions }: ConversationCha
     [senderOf, avatarOf],
   );
 
-  const name = info.name ?? t("header.unknownPerson");
+  const certHash = conversation.kind === "private" ? conversation.certHash : null;
+  const friend = useFriend(certHash);
+  // A friend who is offline and never wrote is still known by the name last seen (FR-1.65).
+  const name = info.name ?? friend?.name ?? t("header.unknownPerson");
   const title = info.isChannel ? t("header.channel", { name }) : name;
 
   useEffect(() => {
@@ -165,6 +168,13 @@ function ConversationChat({ conversation, renderHeaderActions }: ConversationCha
           </span>
           {name}
         </h2>
+        {!info.isChannel && (
+          <PrivatePresence
+            className="chat-header__presence"
+            online={info.target !== null}
+            certHash={certHash}
+          />
+        )}
         {renderHeaderActions ? (
           <div className="chat-header__actions">{renderHeaderActions(conversation)}</div>
         ) : null}
@@ -176,7 +186,14 @@ function ConversationChat({ conversation, renderHeaderActions }: ConversationCha
         onLoadOlder={() => {
           void loadOlder(conversation);
         }}
-        onOpenProfile={openProfile}
+        onSyncEarlier={
+          conversation.kind === "channel"
+            ? () => {
+                void requestSync(conversation);
+              }
+            : undefined
+        }
+        clickablePeople
         display={display}
         avatarFor={avatarFor}
         linkPreviews={linkPreviews}
@@ -188,7 +205,6 @@ function ConversationChat({ conversation, renderHeaderActions }: ConversationCha
         blockedReason={blockedReason}
         linkPreviews={linkPreviews}
       />
-      {profileCard}
     </div>
   );
 }

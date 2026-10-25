@@ -1,0 +1,22 @@
+{
+  "open": "Ühenduse info",
+  "title": "Ühenduse info",
+  "loading": "Laadin…",
+  "notConnected": "Ühendus puudub.",
+  "error": "Ühenduse info pole praegu saadaval.",
+  "none": "–",
+  "transport": "Edastus",
+  "transportValue": {
+    "udp": "UDP",
+    "tcp": "TCP (tunneldatud)"
+  },
+  "latency": "Viivitus",
+  "latencyValue": "{{value}} ms",
+  "loss": "Paketikadu",
+  "lossValue": "{{value}} %",
+  "bitrate": "Saatmise bitikiirus",
+  "bitrateValue": "{{value}} kbit/s",
+  "serverLimit": "Serveri piirang",
+  "packets": "Saadetud / vastuvõetud paketid",
+  "packetsValue": "{{sent}} / {{received}}"
+}

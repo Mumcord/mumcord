@@ -1,0 +1,88 @@
+{
+  "unknownName": "Int",
+  "mute": "Mutja l-mikrofonu",
+  "deafen": "Itfi s-smigħ",
+  "disconnect": "Skonnettja minn {{server}}",
+  "settings": "Settings rapidi",
+  "announce": {
+    "muted": "Mikrofonu mutat",
+    "unmuted": "Mikrofonu mhux mutat",
+    "deafened": "Is-smigħ mitfi. Ma tistax tisma' lill-oħrajn u l-mikrofonu tiegħek huwa mutat",
+    "undeafened": "Is-smigħ mixgħul"
+  },
+  "readOnly": {
+    "text": "Qed taqra biss – ingħaqad ma' kanal biex titkellem.",
+    "join": "Ingħaqad ma' {{channel}}"
+  },
+  "status": {
+    "connecting": "Qed jikkonnettja…",
+    "reconnecting": "Qed jerġa' jikkonnettja…",
+    "connected": "Konness",
+    "readOnly": "Qari biss",
+    "disconnected": "Mhux konness",
+    "playing": "Qed tilgħab {{game}}",
+    "listening": "Qed tisma' {{track}}"
+  },
+  "profile": {
+    "title": "Editja l-profil",
+    "chooseTitle": "Agħżel stampa tal-profil",
+    "chooseAvatar": "Agħżel stampa…",
+    "removeAvatar": "Neħħi l-istampa",
+    "avatarHint": "L-istampa titnaqqas biex taqbel mal-limitu tas-server.",
+    "avatarUnregistered": "Dan is-server iżomm l-avatars biss ta' utenti rreġistrati – Mumcord jerġa' jibgħat tiegħek kull darba li tikkonnettja.",
+    "avatarChosen": "Magħżula: {{name}}",
+    "avatarRemoved": "L-istampa titneħħa meta tissejvja.",
+    "comment": "Dwarek"
+  },
+  "register": {
+    "title": "Irreġistra fuq dan is-server",
+    "explain": "Ir-reġistrazzjoni tirriżerva ismek fuq dan is-server. Ħadd ieħor ma jista' juża, u s-server jiftakrek id-darba li jmiss li tikkonnettja.",
+    "backup": "L-identità tiegħek hija dak li jipprova li l-isem huwa tiegħek. Jekk titlefha, titlef l-aċċess għall-isem irreġistrat. Issejvja kopja ta' backup issa u żommha sigura.",
+    "password": "Password għall-fajl tal-backup",
+    "export": "Esporta l-identità",
+    "saveTitle": "Issejvja l-backup tal-identità",
+    "passwordRequired": "Daħħal password biex tipproteġi l-fajl tal-backup.",
+    "exported": "Backup tal-identità ssejvjat.",
+    "confirm": "Irreġistra",
+    "done": "Irreġistrat fuq dan is-server"
+  },
+  "errors": {
+    "tooLarge": "Dan huwa kbir wisq għas-server. Agħżel stampa iżgħar jew ikteb test iqsar.",
+    "denied": "Is-server ma jippermettix dan.",
+    "deniedWithReason": "Is-server ma jippermettix dan: {{reason}}",
+    "notConnected": "Mhux konness ma' server.",
+    "file": "Il-fajl ma setax jinqara jew jinkteb.",
+    "generic": "Xi ħaġa marret ħażin. Erġa' pprova."
+  },
+  "ptt": "Push-to-talk: żomm {{key}} biex titkellem",
+  "pttNoKey": "Push-to-talk: l-ebda buttuna ssettjata",
+  "quickSettings": {
+    "linkPreviews": "Previews u embeds tal-links",
+    "linkPreviewsHint": "Is-siti jaraw l-indirizz IP tiegħek",
+    "nowPlaying": "Aqsam dak li qed nisma'",
+    "nowPlayingHint": "L-oħrajn jaraw il-kanzunetta preżenti tiegħek",
+    "unsupported": "Mhux disponibbli fuq macOS",
+    "theme": "Tema",
+    "theme_system": "Sistema",
+    "theme_dark": "Skur",
+    "theme_light": "Ċar",
+    "nowGaming": "Aqsam il-logħba li qed nilgħab",
+    "nowGamingHint": "L-oħrajn jaraw il-logħba preżenti tiegħek",
+    "unavailable": "Mhux disponibbli fuq din is-sistema",
+    "overlay": "Overlay",
+    "overlayHint": "Juri min qed jitkellem fuq il-logħob",
+    "editProfile": "Editja l-profil",
+    "editProfileHint": "Isem, avatar u kummentarju",
+    "register": "Irreġistra fuq dan is-server",
+    "registered": "Irreġistrat fuq dan is-server ✓",
+    "registerHint": "Iżomm ismek u l-avatar tiegħek fuq dan is-server",
+    "allSettings": "Is-settings kollha…",
+    "label": "Settings rapidi",
+    "positional": "Awdjo posizzjonali",
+    "positionalHint": "Vuċijiet f'3D madwarek",
+    "offerImages": "Offri stampi b'daqs sħiħ",
+    "offerImagesHint": "Ħalli lill-oħrajn iniżżlu l-istampi oriġinali tiegħek",
+    "loadImages": "Tgħabbi stampi b'daqs sħiħ",
+    "loadImagesHint": "Ġib l-istampi oriġinali mingħand l-oħrajn"
+  }
+}

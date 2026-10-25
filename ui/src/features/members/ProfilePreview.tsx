@@ -1,7 +1,7 @@
 /**
  * Read-only profile preview on hover or keyboard focus (FR-1.18, QA.21): avatar, name, comment,
- * registered marker and voice state, placed next to the person. A click still opens the full
- * profile card. Wrap a person in `ProfilePreviewTrigger`; `ProfilePreviewHost` is rendered once.
+ * registered marker and voice state, placed next to the person. A click pins it (FR-1.62) with
+ * buttons for a private message, friend (FR-1.64) and the full profile card. Wrap a person in `ProfilePreviewTrigger`; `ProfilePreviewHost` is rendered once.
  */
 import DOMPurify from "dompurify";
 import {
@@ -17,17 +17,24 @@ import { createPortal } from "react-dom";
 import { useTranslation } from "react-i18next";
 import type { User } from "../../api";
 import { VOICE_STATE_KEY, voiceState } from "../channels/statusText";
+import { MumcordBadge } from "../channels/MumcordBadge";
 import { useServerState } from "../channels/serverStore";
+import { FriendButton } from "./FriendButton";
+import { NowGamingFor } from "../nowgaming";
+import { PositionalBadge } from "../positional";
 import { NowPlayingFor } from "../nowplaying";
 import "./profilePreview.css";
 import { Avatar } from "./Avatar";
 import { openPersonMenuFromEvent, openPersonMenuFromKey } from "./personMenuStore";
 import { findPerson } from "./personLookup";
 import { placeNextTo } from "./placement";
+import { openPrivateConversation } from "./privateMessage";
+import { useProfileCard } from "./useProfileCard";
 import {
   closePreview,
   currentPreview,
   holdPreview,
+  pointerDownOnPerson,
   PREVIEW_ID,
   previewOnFocus,
   releasePreview,
@@ -37,7 +44,7 @@ import {
 } from "./profilePreviewStore";
 import { usePersonProfile } from "./usePersonProfile";
 
-/** Touch has no hover; a tap is a click and opens the full card. */
+/** Touch has no hover; a tap is a click and pins the card. */
 const isHoverPointer = (event: PointerEvent) => event.pointerType !== "touch";
 
 /**
@@ -73,8 +80,10 @@ export function ProfilePreviewTrigger({
       onPointerLeave={(event) => {
         if (isHoverPointer(event)) releasePreview();
       }}
-      // Closes before the click lands, so the full card opens without the preview in the way.
-      onPointerDown={closePreview}
+      // Another person's card makes way; this person's stays so the click can pin it as it is.
+      onPointerDown={() => {
+        pointerDownOnPerson(session, name);
+      }}
       onFocus={(event: FocusEvent<HTMLSpanElement>) => {
         previewOnFocus(session, event.currentTarget, event.target, name);
       }}
@@ -94,13 +103,26 @@ export function ProfilePreviewTrigger({
 /** Renders the open preview, if any, into the document body. */
 export function ProfilePreviewHost() {
   const open = useSyncExternalStore(subscribePreview, currentPreview);
+  const { openProfile, profileCard } = useProfileCard();
   // Nothing may stay open (or keep aria-describedby) once the host is gone.
   useEffect(() => closePreview, []);
-  if (!open) return null;
-  return createPortal(<Preview open={open} />, document.body);
+  return (
+    <>
+      {open && createPortal(<Preview open={open} onFullProfile={openProfile} />, document.body)}
+      {profileCard}
+    </>
+  );
 }
 
-function Preview({ open }: { open: OpenPreview }) {
+function Preview({
+  open,
+  onFullProfile,
+}: {
+  open: OpenPreview;
+  onFullProfile: (session: number, opener: HTMLElement | null) => void;
+}) {
+  const { t } = useTranslation("members");
+  const pinned = open.pinned === true;
   const state = useServerState();
   const user = findPerson(state.users, open.session, open.name);
   const ref = useRef<HTMLDivElement>(null);
@@ -117,14 +139,34 @@ function Preview({ open }: { open: OpenPreview }) {
     if (gone) closePreview();
   }, [gone]);
 
+  // A pinned card takes focus so keyboard and screen-reader users land in it.
+  useEffect(() => {
+    if (pinned) ref.current?.focus();
+  }, [pinned]);
+
+  const dismiss = (returnFocus: boolean) => {
+    const opener = open.opener;
+    closePreview();
+    if (returnFocus && opener?.isConnected) opener.focus();
+  };
+
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "Escape") closePreview();
+      if (event.key !== "Escape") return;
+      if (pinned) dismiss(true);
+      else closePreview();
+    };
+    const onPointerDown = (event: Event) => {
+      if (!pinned || !(event.target instanceof Element)) return;
+      // Clicks on a person handle themselves (they re-pin or switch).
+      if (event.target.closest(".profile-preview, .profile-preview-trigger, .tree-person")) return;
+      dismiss(false);
     };
     const onScroll = (event: Event) => {
       const target = event.target;
       if (target === document || target instanceof Window) {
-        closePreview();
+        if (pinned) placeRef.current();
+        else closePreview();
         return;
       }
       if (!(target instanceof Node) || ref.current?.contains(target)) return;
@@ -134,19 +176,27 @@ function Preview({ open }: { open: OpenPreview }) {
     };
     // The user scrolling with the wheel elsewhere closes it, like moving away.
     const onWheel = (event: Event) => {
+      if (pinned) return;
       if (!(event.target instanceof Node && ref.current?.contains(event.target))) closePreview();
     };
+    const onWindowBlur = () => {
+      if (!pinned) closePreview();
+    };
     document.addEventListener("keydown", onKeyDown);
+    document.addEventListener("pointerdown", onPointerDown, true);
     window.addEventListener("scroll", onScroll, true);
     window.addEventListener("wheel", onWheel, { capture: true, passive: true });
-    window.addEventListener("blur", closePreview);
+    window.addEventListener("blur", onWindowBlur);
     return () => {
       document.removeEventListener("keydown", onKeyDown);
+      document.removeEventListener("pointerdown", onPointerDown, true);
       window.removeEventListener("scroll", onScroll, true);
       window.removeEventListener("wheel", onWheel, true);
-      window.removeEventListener("blur", closePreview);
+      window.removeEventListener("blur", onWindowBlur);
     };
-  }, []);
+    // `dismiss` only reads `open.opener`, which is fixed for a pinned card.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pinned]);
 
   function place() {
     const element = ref.current;
@@ -184,15 +234,79 @@ function Preview({ open }: { open: OpenPreview }) {
   });
 
   if (gone) return null;
+  const canAct = pinned && user !== undefined;
   return (
     <div
       ref={ref}
       id={PREVIEW_ID}
-      role="tooltip"
+      role={pinned ? "dialog" : "tooltip"}
+      aria-label={pinned ? (user?.name ?? open.name) : undefined}
+      tabIndex={pinned ? -1 : undefined}
       className="profile-preview"
+      data-pinned={pinned}
       onPointerEnter={holdPreview}
       onPointerLeave={releasePreview}
     >
+      {pinned && (
+        <div className="profile-preview__actions">
+          {canAct && user.session !== state.selfSession && (
+            <button
+              type="button"
+              className="profile-preview__icon"
+              aria-label={t("preview.privateMessage")}
+              title={t("preview.privateMessage")}
+              onClick={() => {
+                dismiss(false);
+                openPrivateConversation(user);
+              }}
+            >
+              {/* Chat bubble; the button's name is its translated aria-label. */}
+              <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" focusable="false">
+                <path
+                  d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinejoin="round"
+                />
+              </svg>
+            </button>
+          )}
+          {canAct && user.session !== state.selfSession && <FriendButton user={user} />}
+          {canAct && (
+            <button
+              type="button"
+              className="profile-preview__icon"
+              aria-label={t("preview.fullProfile")}
+              title={t("preview.fullProfile")}
+              onClick={() => {
+                dismiss(false);
+                onFullProfile(user.session, open.opener ?? null);
+              }}
+            >
+              {/* Identity card; the button's name is its translated aria-label. */}
+              <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" focusable="false">
+                <g fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+                  <rect x="3" y="5" width="18" height="14" rx="2" />
+                  <circle cx="9" cy="11" r="2" />
+                  <path d="M14 10h4M14 14h3" />
+                </g>
+              </svg>
+            </button>
+          )}
+          <button
+            type="button"
+            className="profile-preview__icon"
+            aria-label={t("card.close")}
+            title={t("card.close")}
+            onClick={() => {
+              dismiss(true);
+            }}
+          >
+            <span aria-hidden="true">×</span>
+          </button>
+        </div>
+      )}
       {user ? (
         <PreviewBody key={user.session} user={user} talking={state.talking.has(user.session)} />
       ) : (
@@ -225,13 +339,18 @@ function PreviewBody({ user, talking }: { user: User; talking: boolean }) {
       <div className="profile-preview__header">
         <Avatar name={user.name} src={profile?.avatar ?? null} talking={talking} size="lg" />
         <div className="profile-preview__identity">
-          <p className="profile-preview__name">{user.name}</p>
+          <p className="profile-preview__name">
+            {user.name}
+            <MumcordBadge user={user} />
+            <PositionalBadge session={user.session} />
+          </p>
           <p className="profile-preview__meta">
             {user.registered ? t("registered") : t("unregistered")}
           </p>
           {voice.length > 0 && <p className="profile-preview__voice">{voice.join(", ")}</p>}
         </div>
       </div>
+      <NowGamingFor session={user.session} compact />
       <NowPlayingFor session={user.session} compact />
       {comment && (
         <div className="profile-preview__comment" dangerouslySetInnerHTML={{ __html: comment }} />

@@ -20,6 +20,7 @@ import {
 import { useTranslation } from "react-i18next";
 import "./channels.css";
 import { announce } from "../../a11y/announcer";
+import { useHintPreferences } from "../../a11y/hintPreferences";
 import { useAvatars } from "../members/useAvatars";
 import { rememberCollapsed, rememberedCollapsed } from "./collapseMemory";
 import { buildSearchIndex, foldQuery, searchTree, type SearchResult } from "./search";
@@ -135,6 +136,7 @@ export function ChannelTree({
 }: ChannelTreeProps) {
   const { t } = useTranslation("channels");
   const hintId = useId();
+  const { keyboardHints } = useHintPreferences();
   const treeRef = useRef<HTMLDivElement>(null);
   const [focusedId, setFocusedId] = useState<string | null>(null);
   /** Crowded channels whose people are listed by name for this session ("Show all", QA.14). */
@@ -438,7 +440,8 @@ export function ChannelTree({
         <p className="channel-tree__empty">{t("search.empty", { query: filter.trim() })}</p>
       )}
 
-      <p id={hintId} className="channel-tree__hint">
+      {/* Turned off, the hint only leaves the screen: it still describes the tree to screen readers. */}
+      <p id={hintId} className={keyboardHints ? "channel-tree__hint" : "visually-hidden"}>
         {t("tree.hint")}
       </p>
     </div>

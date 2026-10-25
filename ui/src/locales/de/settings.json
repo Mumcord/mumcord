@@ -9,11 +9,19 @@
     "voice": "Stimme",
     "chatHistory": "Chat & Verlauf",
     "appearance": "Darstellung",
+    "accessibility": "Barrierefreiheit",
     "language": "Sprache",
     "sounds": "Töne & Benachrichtigungen",
-    "overlay": "Overlay & Positionsaudio",
+    "overlay": "Overlay",
     "diagnostics": "Diagnose",
     "about": "Über"
+  },
+  "search": {
+    "label": "Einstellungen durchsuchen",
+    "results": "Suchergebnisse",
+    "empty": "Keine Einstellung passt zu „{{query}}“.",
+    "count_one": "{{count}} Einstellung gefunden",
+    "count_other": "{{count}} Einstellungen gefunden"
   },
   "errors": {
     "secureStorage": "Der sichere Speicher deines Systems ist nicht verfügbar oder der Zugriff wurde verweigert.",
@@ -112,6 +120,17 @@
     "compatRestartNeeded": "Wirkt nach einem Neustart von Mumcord. Die Verbindung wird kurz getrennt.",
     "compatRestart": "Jetzt neu starten",
     "compatRestartFailed": "Mumcord konnte nicht neu starten. Bitte schließe und öffne es selbst.",
+    "compatKdeHint": "Maustasten für Push-to-Talk funktionieren im Hintergrund nur, wenn KDE sie für X11-Anwendungen erlaubt.",
+    "compatKdeAllowed": "KDE erlaubt Maustasten für X11-Anwendungen bereits, deshalb funktioniert die Push-to-Talk-Maustaste auch im Hintergrund.",
+    "compatKdeAllow": "Maustasten erlauben",
+    "compatKdeUndo": "Rückgängig",
+    "compatKdeRestart": "Erledigt. Starte Mumcord neu, damit es wirksam wird.",
+    "compatKdeConfirmTitle": "Maustasten erlauben?",
+    "compatKdeConfirm": "Dadurch können X11-Anwendungen im Hintergrund deine Mausklicks sehen. Es ändert eine Einstellung in KDE (Systemeinstellungen → Unterstützung für ältere X11-Anwendungen). Du kannst es hier jederzeit rückgängig machen.",
+    "compatKdeConfirmButton": "Erlauben",
+    "compatKdeChangeFailed": "Mumcord konnte die KDE-Einstellung nicht ändern. Nutze stattdessen \"KDE-X11-Einstellungen öffnen\".",
+    "compatKdeOpen": "KDE-X11-Einstellungen öffnen",
+    "compatKdeFailed": "Mumcord konnte die KDE-Einstellungen nicht öffnen. Öffne Systemeinstellungen → Unterstützung für ältere X11-Anwendungen selbst.",
     "compatActive": "Der Kompatibilitätsmodus ist an: Push-to-Talk nutzt den X11-Weg. Tasten funktionieren ohne Desktop-Dialog; Maustasten, wenn die X11-Einstellung deines Desktops sie erlaubt.",
     "sensitivityLegend": "Empfindlichkeit der Sprachaktivierung",
     "automatic": "Automatisch – erkennt deine Stimme",
@@ -140,6 +159,18 @@
     "autoDeleteOff": "Nie (alles behalten)",
     "autoDeleteHint": "Ältere Nachrichten werden automatisch und ohne Nachfrage von diesem Computer gelöscht. Das betrifft nur den hier gespeicherten Verlauf, nicht den Server."
   },
+  "fullImages": {
+    "title": "Bilder in Originalgröße",
+    "offer": "Meine Bilder in Originalgröße anbieten",
+    "offerHint": "Andere Mumcord-Nutzer können meine Bilder in Originalgröße öffnen. Aus: Es wird nur die kleine Vorschau gesendet, kein Original gespeichert und keins weitergegeben.",
+    "load": "Bilder anderer in Originalgröße laden",
+    "loadHint": "Bilder anderer Mumcord-Nutzer in Originalgröße öffnen. Aus: Es wird nur die Vorschau gezeigt und das Original nie angefordert."
+  },
+  "historySharing": {
+    "title": "Verlauf-Synchronisierung",
+    "switch": "Meinen Kanalverlauf teilen",
+    "hint": "Andere Mumcord-Nutzer, die einen Kanal betreten oder ihm folgen, können seine Nachrichten aus deinem gespeicherten Verlauf abrufen (bis zu 7 Tage, nur von vor ihrem Beitritt). Private Chats werden nie geteilt."
+  },
   "appearance": {
     "messageDisplay": "Nachrichtenanzeige",
     "messageDisplayLegend": "Layout der Chatnachrichten",
@@ -158,6 +189,15 @@
     "autostart": "Mumcord beim Anmelden starten",
     "startMinimized": "Minimiert starten",
     "startMinimizedHint": "Startet Mumcord beim Anmelden, wartet es im Infobereich, statt das Fenster zu öffnen."
+  },
+  "accessibility": {
+    "hints": "Hinweise",
+    "keyboardHints": "Tastaturhinweise anzeigen",
+    "keyboardHintsHint": "Kurze Tipps wie „Pfeiltasten: bewegen“ unter der Kanalliste und in den GIF-Favoriten. Screenreader lesen sie auch ausgeschaltet vor.",
+    "announcements": "Screenreader-Ansagen",
+    "announcementsHint": "Dein Screenreader sagt Ereignisse an, zum Beispiel wenn jemand beitritt, geht oder zu sprechen beginnt.",
+    "skipLinks": "Sprunglinks",
+    "skipLinksHint": "Links am Anfang des Fensters, die mit der Tab-Taste direkt zum Chat oder zur Kanalliste springen."
   },
   "language": {
     "legend": "Sprache der Oberfläche",
@@ -184,7 +224,67 @@
     "off": "Aus"
   },
   "overlay": {
-    "comingLater": "Das Spiel-Overlay und Positionsaudio kommen in einer späteren Ausbaustufe. Hier gibt es noch keine Einstellungen."
+    "window": {
+      "title": "Fenster-Overlay",
+      "enable": "Overlay anzeigen",
+      "enableHint": "Ein kleines durchsichtiges Fenster, das zeigt, wer spricht. Auch im Tray-Menü verfügbar.",
+      "positionUnsupported": "Dieser Desktop bestimmt, wo Fenster erscheinen. Ecken und Verschieben haben daher keine Wirkung.",
+      "move": "Overlay verschieben…",
+      "moveDone": "Verschieben beenden",
+      "size": "Breite",
+      "wholeChannel": "Ganzen Kanal anzeigen",
+      "wholeChannelHint": "Aus: nur Personen, die sprechen.",
+      "channelName": "Kanalnamen anzeigen",
+      "loadFailed": "Die Overlay-Optionen konnten nicht geladen werden.",
+      "saveFailed": "Die Overlay-Änderung konnte nicht angewendet werden.",
+      "kwin": {
+        "setUp": "Automatisch einrichten",
+        "done": "Fertig: Die KDE-Fensterregel „Mumcord overlay“ ist aktiv.",
+        "removed": "Die KDE-Fensterregel wurde entfernt.",
+        "remove": "Regel entfernen",
+        "openRules": "KDE-Fensterregeln öffnen",
+        "compat": "Stattdessen Kompatibilitätsmodus nutzen",
+        "failed": "Die KDE-Fensterregel konnte nicht geändert werden. Öffne die KDE-Fensterregeln, um sie von Hand anzulegen."
+      }
+    },
+    "corner": {
+      "label": "Position",
+      "topLeft": "Oben links",
+      "topRight": "Oben rechts",
+      "bottomLeft": "Unten links",
+      "bottomRight": "Unten rechts",
+      "custom": "Eigene (verschoben)"
+    },
+    "opacity": "Deckkraft",
+    "inGame": {
+      "title": "In-Game-Overlay",
+      "explanation": "Zeigt in deinen Spielen, wer spricht. Startet automatisch mit dem Spiel und erscheint nur in Spielen.",
+      "mode": "In-Game-Overlay",
+      "off": "Aus",
+      "on": "Ein",
+      "antiCheat": "Manche Spiele mit Anti-Cheat-Schutz werten jedes Overlay als Betrug und können den Account sperren. Diese Spiele sind standardmäßig aus, auch wenn hier Ein gewählt ist.",
+      "games": "Spiele",
+      "noGames": "Noch keine Spiele bekannt. Sie erscheinen hier, sobald sie erkannt werden.",
+      "running": "Läuft gerade",
+      "followsDefault": "Folgt der Voreinstellung",
+      "overridden": "Deine Wahl",
+      "blocked": "Durch Anti-Cheat blockiert.",
+      "blockedReason": "Grund: {{reason}}",
+      "options": "Optionen für {{game}}",
+      "reset": "Voreinstellung für {{game}} nutzen",
+      "size": "Größe",
+      "unsupported": "Das In-Game-Overlay ist auf diesem System nicht verfügbar. Stattdessen wird das Fenster-Overlay oben genutzt.",
+      "loadFailed": "Die In-Game-Overlay-Einstellungen konnten nicht geladen werden.",
+      "saveFailed": "Die In-Game-Overlay-Änderung konnte nicht angewendet werden.",
+      "confirmTitle": "Overlay für {{game}} aktivieren?",
+      "confirmMessage": "Warnung: {{game}} nutzt Anti-Cheat-Schutz ({{reason}}). Overlays können als Betrug erkannt werden und dein Account kann gesperrt werden. Mumcord haftet dafür nicht. Fahre nur fort, wenn du dieses Risiko akzeptierst.",
+      "confirmEnable": "Trotzdem aktivieren",
+      "limits": {
+        "libraryMissing": "Das In-Game-Overlay ist nicht verfügbar: Seine Overlay-Bibliothek (libmumcord_overlay_layer.so) wurde neben Mumcord nicht gefunden. Installiere Mumcord neu, um sie wiederherzustellen. Stattdessen wird das Fenster-Overlay oben genutzt.",
+        "windowsPending": "Das In-Game-Overlay ist unter Windows noch nicht verfügbar. Stattdessen wird das Fenster-Overlay oben genutzt.",
+        "macos": "macOS unterstützt keine In-Game-Overlays. Stattdessen wird das Fenster-Overlay oben genutzt."
+      }
+    }
   },
   "diagnostics": {
     "logging": "Protokoll",
@@ -205,7 +305,10 @@
     "version": "Version",
     "os": "System",
     "license": "Mumcord-Lizenz (AGPL-3.0)",
-    "commercial": "Kommerzielle Lizenzen: tobias@vorwachs.com",
+    "whatsNew": "Neuigkeiten",
+    "support": "Support",
+    "reportBug": "Fehler melden",
+    "requestFeature": "Funktion vorschlagen",
     "notices": "Hinweise zu Drittanbietern",
     "noticesHint": "Mumcord basiert auf Open-Source-Software, darunter Code aus dem Mumble-Projekt.",
     "noticesFailed": "Die Hinweise zu Drittanbietern konnten nicht geladen werden.",
@@ -248,5 +351,42 @@
   "retention": {
     "days_one": "{{count}} Tag",
     "days_other": "{{count}} Tage"
+  },
+  "nowGaming": {
+    "title": "Spielt gerade",
+    "switch": "Teilen, was ich gerade spiele",
+    "hint": "Mumcord sucht unter deinen laufenden Programmen nach bekannten Spielen und nach dem Spiel, das Steam gerade ausführt. Andere Mumcord-Nutzer sehen das Spiel, sein Bild und wie lange du schon spielst, und können deinem Server beitreten, wenn das Spiel einen anbietet; offizielle Mumble-Clients sehen eine Zeile „🎮 Spiel“ am Ende deines Kommentars.",
+    "unsupported": "Auf diesem System nicht unterstützt.",
+    "current": "Wird geteilt: {{game}}",
+    "nothing": "Gerade wird kein Spiel erkannt."
+  },
+  "positional": {
+    "title": "Positionsabhängiger Ton",
+    "switch": "Positionsabhängiger Ton",
+    "hint": "Die Stimmen von Leuten im selben Spiel werden in 3D um dich verteilt. Braucht ein Spiel, das seine Positionen teilt.",
+    "minDistance": "Volle Lautstärke bis (Meter)",
+    "maxDistance": "Stille ab (Meter)",
+    "invalid": "Entfernungen in Metern angeben: Minimum mindestens 0, Maximum mindestens 1 über dem Minimum und höchstens 1000.",
+    "sourceGame": "Positionen von: {{source}} – {{game}}",
+    "source": "Positionen von: {{source}}",
+    "none": "Kein Spiel erkannt",
+    "betaHint": "Das Ergebnis hängt vom Spiel und seiner Plugin-Unterstützung ab."
+  },
+  "gamePlugins": {
+    "title": "Positionsabhängiges Audio: Quellen",
+    "explanation": "Spiele teilen Mumcord über Mumble Link oder über offizielle Mumble-Spiel-Plugins mit, wo du bist. Mumcord findet die Plugins in seinem eigenen Plugin-Ordner und in einer vorhandenen Mumble-Installation. Schalte nur die Plugins für Spiele ein, die du spielst.",
+    "antiCheat": "Spiel-Plugins lesen den Speicher des Spiels. Manche Anti-Cheat-Systeme können das beanstanden; schalte Plugins für Spiele mit strengem Anti-Cheat aus.",
+    "loading": "Suche nach Spiel-Plugins …",
+    "none": "Keine Spiel-Plugins gefunden. Installiere Mumble oder kopiere Plugin-Dateien in Mumcords Plugin-Ordner.",
+    "loadFailed": "Die Spiel-Plugins konnten nicht aufgelistet werden.",
+    "switchFailed": "Das Spiel-Plugin konnte nicht umgeschaltet werden.",
+    "version": "Version {{version}}",
+    "active": "Liefert Positionen",
+    "problem": {
+      "incompatible": "Nicht mit Mumcord kompatibel.",
+      "initFailed": "Start fehlgeschlagen.",
+      "unsupported": "Auf diesem System nicht verfügbar.",
+      "failed": "Nach einem Fehler angehalten. Aus- und wieder einschalten, um es erneut zu versuchen."
+    }
   }
 }

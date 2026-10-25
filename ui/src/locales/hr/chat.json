@@ -1,0 +1,155 @@
+{
+  "noConversation": "Poveži se s poslužiteljem i odaberi kanal za chat.",
+  "empty": "Još nema poruka. Poruke koje ovdje primiš spremaju se na ovom računalu.",
+  "header": {
+    "channel": "#{{name}}",
+    "channelPrefix": "Kanal",
+    "privatePrefix": "Privatni chat s",
+    "unknownPerson": "Nepoznata osoba"
+  },
+  "list": {
+    "today": "Danas",
+    "yesterday": "Jučer",
+    "label": "Poruke u {{name}}",
+    "loadOlder": "Učitaj starije poruke",
+    "loading": "Učitavanje poruka…",
+    "loadFailed": "Starije poruke nije bilo moguće učitati. Pomakni se gore za ponovni pokušaj.",
+    "loadEarlier": "Učitaj ranije poruke",
+    "syncing": "Traženje ranijih poruka od drugih korisnika Mumcorda…",
+    "syncAdded_one": "Dodana je {{count}} ranija poruka od drugih korisnika Mumcorda.",
+    "syncAdded_few": "Dodane su {{count}} ranije poruke od drugih korisnika Mumcorda.",
+    "syncAdded_other": "Dodano je {{count}} ranijih poruka od drugih korisnika Mumcorda.",
+    "syncNone": "Nisu pronađene ranije poruke.",
+    "syncFailed": "Ranije poruke ovdje se ne mogu učitati.",
+    "syncedFrom": "iz povijesti korisnika {{name}}",
+    "jumpToNewest": "Skoči na najnovije",
+    "jumpToNewestUnseen_one": "Skoči na najnovije, {{count}} nova poruka",
+    "jumpToNewestUnseen_few": "Skoči na najnovije, {{count}} nove poruke",
+    "jumpToNewestUnseen_other": "Skoči na najnovije, {{count}} novih poruka"
+  },
+  "format": {
+    "toolbar": "Oblikovanje",
+    "bold": "Podebljano",
+    "italic": "Kurziv",
+    "strike": "Precrtano",
+    "code": "Kod u retku",
+    "codeBlock": "Blok koda",
+    "link": "Poveznica"
+  },
+  "composer": {
+    "label": "Poruka za {{name}}",
+    "hint": "Pritisni Enter za slanje i Shift+Enter za novi redak. Markdown radi: **podebljano**, *kurziv*, `kod`, [poveznica](https://…).",
+    "addImage": "Dodaj sliku",
+    "removeImage": "Ukloni sliku {{name}}",
+    "imagePreview": "Slika za slanje: {{name}}",
+    "send": "Pošalji",
+    "noPermission": "Nemaš dopuštenje pisati u ovom kanalu.",
+    "unavailable": "Ovaj kanal više nije dostupan.",
+    "offline": "{{name}} je izvan mreže. Možeš ponovno pisati kad se vrati.",
+    "unnamedImage": "Zalijepljena slika"
+  },
+  "tray": {
+    "label": "Slike za slanje",
+    "processing": "Priprema slike",
+    "scaled": "Smanjeno na {{width}}×{{height}} zbog ograničenja poslužitelja"
+  },
+  "errors": {
+    "tooLong": "Tvoja poruka je preduga za ovaj poslužitelj (najviše {{max}} znakova). Skrati je i pokušaj ponovno.",
+    "tooLongNoLimit": "Tvoja poruka je preduga za ovaj poslužitelj. Skrati je i pokušaj ponovno.",
+    "imageTooLarge": "Ova slika je prevelika za ovaj poslužitelj, čak i nakon sažimanja. Pokušaj s manjom slikom.",
+    "imageWithTextTooLong": "Poruka sa slikom je prevelika za ovaj poslužitelj. Skrati tekst ili ukloni sliku.",
+    "imagesNotAllowed": "Ovaj poslužitelj ne dopušta slike u porukama.",
+    "notImage": "Ova se datoteka ne može poslati. Koristi sliku PNG, JPEG, GIF ili WebP.",
+    "imageUnreadable": "Sliku nije bilo moguće pročitati. Pokušaj s drugom datotekom.",
+    "denied": "Poslužitelj nije dopustio ovu poruku.",
+    "deniedWithReason": "Poslužitelj nije dopustio ovu poruku: {{reason}}",
+    "notConnected": "Nisi povezan. Ponovno se poveži i pokušaj opet.",
+    "generic": "Poruku nije bilo moguće poslati. Pokušaj ponovno.",
+    "onlyImages": "Mogu se slati samo slike.",
+    "sourceTooLarge": "Ova datoteka je prevelika za slanje (više od 25 MB)."
+  },
+  "announce": {
+    "message": "{{name}}: {{text}}",
+    "image": "{{name}} je poslao sliku",
+    "more_one": "Još {{count}} nova poruka",
+    "more_few": "Još {{count}} nove poruke",
+    "more_other": "Još {{count}} novih poruka"
+  },
+  "pinned": {
+    "label": "Informacije o kanalu",
+    "showMore": "Prikaži više",
+    "showLess": "Prikaži manje"
+  },
+  "mention": {
+    "list": "Osobe koje možeš spomenuti",
+    "found_one": "Predložena je {{count}} osoba. Koristi strelice, zatim Enter za umetanje.",
+    "found_few": "Predložene su {{count}} osobe. Koristi strelice, zatim Enter za umetanje.",
+    "found_other": "Predloženo je {{count}} osoba. Koristi strelice, zatim Enter za umetanje.",
+    "none": "Nitko nije pronađen",
+    "mentionsYou": "Spominje te",
+    "chipLabel": "{{name}}, spominjanje"
+  },
+  "preview": {
+    "open": "Otvori u pregledniku",
+    "openLabel": "Otvori {{title}} u pregledniku",
+    "play": "Reproduciraj {{title}}",
+    "player": "Videoplayer: {{title}}",
+    "videoTitle": "Video s {{site}}",
+    "spotifyTitle": "Poveznica na {{site}}",
+    "audioPlayer": "Spotify player: {{title}}",
+    "kind": {
+      "track": "Pjesma",
+      "album": "Album",
+      "playlist": "Playlista",
+      "artist": "Izvođač",
+      "episode": "Epizoda",
+      "show": "Emisija"
+    },
+    "inBrowser": "Reproducira se u tvom pregledniku",
+    "card": "Pregled poveznice: {{title}}",
+    "dismiss": "Sakrij pregled"
+  },
+  "image": {
+    "loading": "Učitavanje slike {{name}}",
+    "label": "Slika: {{name}}",
+    "view": "Pogledaj sliku {{name}}",
+    "viewMessage": "Slika od {{name}}, otvori u pregledniku slika",
+    "failed": "Sliku nije moguće prikazati (prevelika ili nedostupna)."
+  },
+  "viewer": {
+    "label": "Preglednik slika",
+    "counter": "{{current}} / {{total}}",
+    "zoomIn": "Povećaj",
+    "zoomOut": "Smanji",
+    "fit": "Prilagodi prozoru",
+    "save": "Spremi sliku",
+    "saved": "Slika spremljena",
+    "saveFailed": "Sliku nije bilo moguće spremiti",
+    "fileFilter": "Slika",
+    "openInBrowser": "Otvori u pregledniku",
+    "close": "Zatvori",
+    "previous": "Prethodna slika",
+    "next": "Sljedeća slika",
+    "unnamed": "slika",
+    "fullLoading": "Učitavanje pune veličine…",
+    "fullProgress": "Učitavanje pune veličine… {{percent}} %",
+    "fullUnavailable": "Puna veličina nije dostupna – prikazuje se pregled"
+  },
+  "favorites": {
+    "open": "Omiljeni GIF-ovi",
+    "title": "Omiljeni GIF-ovi",
+    "save": "Spremi u omiljene",
+    "remove": "Ukloni iz omiljenih",
+    "removeNamed": "Ukloni {{name}} iz omiljenih",
+    "send": "Pošalji {{name}}",
+    "hint": "Strelice pomiču, Enter šalje, Delete uklanja, Escape zatvara.",
+    "empty": "Još nema omiljenih. Desnom tipkom klikni GIF u chatu ili koristi zvjezdicu na njemu i odaberi „Spremi u omiljene”. Pojavit će se ovdje."
+  },
+  "imageMenu": {
+    "label": "Slika {{name}}"
+  },
+  "attribution": {
+    "via": "putem {{brand}}",
+    "view": "Pogledaj na {{brand}}"
+  }
+}

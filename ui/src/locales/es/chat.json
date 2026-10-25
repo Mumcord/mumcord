@@ -13,7 +13,19 @@
     "label": "Mensajes en {{name}}",
     "loadOlder": "Cargar mensajes anteriores",
     "loading": "Cargando mensajes…",
-    "loadFailed": "No se pudieron cargar los mensajes anteriores. Desplázate hacia arriba para reintentarlo."
+    "loadFailed": "No se pudieron cargar los mensajes anteriores. Desplázate hacia arriba para reintentarlo.",
+    "loadEarlier": "Cargar mensajes anteriores",
+    "syncing": "Buscando mensajes anteriores de otros usuarios de Mumcord…",
+    "syncAdded_one": "Se añadió {{count}} mensaje anterior de otros usuarios de Mumcord.",
+    "syncAdded_other": "Se añadieron {{count}} mensajes anteriores de otros usuarios de Mumcord.",
+    "syncAdded_many": "Se añadieron {{count}} mensajes anteriores de otros usuarios de Mumcord.",
+    "syncNone": "No se encontraron mensajes anteriores.",
+    "syncFailed": "Aquí no se pueden cargar mensajes anteriores.",
+    "syncedFrom": "del historial de {{name}}",
+    "jumpToNewest": "Ir a lo más reciente",
+    "jumpToNewestUnseen_one": "Ir a lo más reciente, {{count}} mensaje nuevo",
+    "jumpToNewestUnseen_other": "Ir a lo más reciente, {{count}} mensajes nuevos",
+    "jumpToNewestUnseen_many": "Ir a lo más reciente, {{count}} mensajes nuevos"
   },
   "format": {
     "toolbar": "Formato",
@@ -28,12 +40,18 @@
     "label": "Mensaje a {{name}}",
     "hint": "Pulsa Intro para enviar y Mayús+Intro para una nueva línea. Funciona Markdown: **negrita**, *cursiva*, `código`, [enlace](https://…).",
     "addImage": "Añadir imagen",
-    "removeImage": "Quitar imagen",
-    "imagePreview": "Imagen para enviar",
+    "removeImage": "Quitar la imagen {{name}}",
+    "imagePreview": "Imagen para enviar: {{name}}",
     "send": "Enviar",
     "noPermission": "No tienes permiso para escribir en este canal.",
     "unavailable": "Este canal ya no está disponible.",
-    "offline": "{{name}} no está conectado. Podrás escribir de nuevo cuando vuelva."
+    "offline": "{{name}} no está conectado. Podrás escribir de nuevo cuando vuelva.",
+    "unnamedImage": "Imagen pegada"
+  },
+  "tray": {
+    "label": "Imágenes para enviar",
+    "processing": "Preparando la imagen",
+    "scaled": "Reducida a {{width}}×{{height}} para ajustarse al límite del servidor"
   },
   "errors": {
     "tooLong": "Tu mensaje es demasiado largo para este servidor (máximo {{max}} caracteres). Acórtalo e inténtalo de nuevo.",
@@ -46,13 +64,16 @@
     "denied": "El servidor no permitió este mensaje.",
     "deniedWithReason": "El servidor no permitió este mensaje: {{reason}}",
     "notConnected": "No estás conectado. Vuelve a conectarte e inténtalo de nuevo.",
-    "generic": "No se pudo enviar el mensaje. Inténtalo de nuevo."
+    "generic": "No se pudo enviar el mensaje. Inténtalo de nuevo.",
+    "onlyImages": "Solo se pueden enviar imágenes.",
+    "sourceTooLarge": "Este archivo es demasiado grande para enviarlo (más de 25 MB)."
   },
   "announce": {
     "message": "{{name}}: {{text}}",
     "image": "{{name}} envió una imagen",
     "more_one": "{{count}} mensaje nuevo más",
-    "more_other": "{{count}} mensajes nuevos más"
+    "more_other": "{{count}} mensajes nuevos más",
+    "more_many": "{{count}} mensajes nuevos más"
   },
   "pinned": {
     "label": "Información del canal",
@@ -63,8 +84,10 @@
     "list": "Personas que se pueden mencionar",
     "found_one": "{{count}} persona sugerida. Usa las flechas y Enter para insertar.",
     "found_other": "{{count}} personas sugeridas. Usa las flechas y Enter para insertar.",
+    "found_many": "{{count}} personas sugeridas. Usa las flechas y Enter para insertar.",
     "none": "No se encontró a nadie",
-    "mentionsYou": "Te menciona"
+    "mentionsYou": "Te menciona",
+    "chipLabel": "{{name}}, mención"
   },
   "preview": {
     "open": "Abrir en el navegador",
@@ -107,7 +130,10 @@
     "close": "Cerrar",
     "previous": "Imagen anterior",
     "next": "Imagen siguiente",
-    "unnamed": "imagen"
+    "unnamed": "imagen",
+    "fullLoading": "Cargando tamaño completo…",
+    "fullProgress": "Cargando tamaño completo… {{percent}} %",
+    "fullUnavailable": "Tamaño completo no disponible: se muestra la vista previa"
   },
   "favorites": {
     "open": "GIF favoritos",

@@ -1,0 +1,14 @@
+{
+  "region": "Aviseringar",
+  "channel": "#{{name}}",
+  "unknownChannel": "En kanal",
+  "line": "{{sender}}: {{preview}}",
+  "groupedChannel_one": "{{count}} nytt meddelande i {{name}}",
+  "groupedChannel_other": "{{count}} nya meddelanden i {{name}}",
+  "groupedPrivate_one": "{{count}} nytt meddelande från {{name}}",
+  "groupedPrivate_other": "{{count}} nya meddelanden från {{name}}",
+  "image": "Skickade en bild",
+  "open": "Öppna chatten",
+  "close": "Avfärda avisering",
+  "mentionLine": "{{sender}} omnämnde dig: {{preview}}"
+}

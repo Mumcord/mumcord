@@ -5,7 +5,7 @@ import { app, bot, testenv } from "../../helpers/index.ts";
 import { run, runOk } from "../../helpers/run.ts";
 import { waitConnected } from "../../helpers/chat-ui.ts";
 import { typeInto } from "../../helpers/servers-ui.ts";
-import { button, finishWizardWithDefaults, waitForText } from "../../helpers/wizard-util.ts";
+import { button, finishWizardWithDefaults, waitForText, wizardStep } from "../../helpers/wizard-util.ts";
 
 // AC-1.28 (diagnostic file contents/privacy) and AC-1.29 (Settings -> About licenses), driven
 // through the real UI. The test server gets a server password; the bot sends a unique chat text.
@@ -58,7 +58,7 @@ describe("diagnostics and about (AC-1.28, AC-1.29)", () => {
   });
 
   it("completes the wizard", async () => {
-    await waitForText("Step 1 of 3");
+    await waitForText(wizardStep(1));
     await $("input[type=text]").setValue(MY_NAME);
     await button("Next").click();
     await finishWizardWithDefaults();
@@ -78,7 +78,8 @@ describe("diagnostics and about (AC-1.28, AC-1.29)", () => {
   });
 
   it("AC-1.28: saved diagnostic file has the facts and no private data", async () => {
-    await $("button[aria-label='Settings']").click();
+    await $("button[aria-label='Quick settings']").click();
+    await $("//button[@role='menuitem'][contains(., 'All settings')]").click();
     await $("//button[@role='tab'][normalize-space()='Diagnostics']").click();
     // The GTK save dialog appends its ".txt" filter extension even to a typed ".txt" name.
     file = join(app.profile(), "mumcord-diagnostics.txt.txt");

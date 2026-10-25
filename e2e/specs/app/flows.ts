@@ -157,6 +157,10 @@ export async function wizard(name: string, onStep?: (step: number) => Promise<vo
   await browser.keys(["Enter"]);
   await waitText("p.wizard-progress", "3");
   await onStep?.(3);
+  await tabTo((f) => f.tag === "button" && f.cls.includes("button--primary"), "wizard Next");
+  await browser.keys(["Enter"]);
+  await waitText("p.wizard-progress", "4");
+  await onStep?.(4);
   const box = await browser.execute(() => {
     const c = document.querySelector<HTMLInputElement>("form.wizard-step input[type=checkbox]");
     return c ? c.checked : null;
@@ -227,8 +231,10 @@ export async function focusComposer(): Promise<void> {
 }
 
 export async function openSettings(): Promise<void> {
-  await tabTo((f) => f.tag === "button" && ["Settings", "Ajustes", "Einstellungen"].includes(f.label), "Settings button");
+  await tabTo((f) => f.tag === "button" && ["Quick settings", "Ajustes rápidos", "Schnelleinstellungen"].includes(f.label), "Settings button");
   await browser.keys(["Enter"]);
+  await waitFor(".quick-settings");
+  await browser.keys(["End", "Enter"]);
   await waitFor(".overlay__dialog");
   await tabTo((f) => f.role === "tab", "settings tabs");
 }
@@ -245,7 +251,8 @@ export async function settingsTab(index: number): Promise<string> {
 export async function chooseRadio(value: string): Promise<void> {
   await tabTo((f) => f.tag === "input" && f.type === "radio" && groupHas(value), `radio group with ${value}`);
   for (const key of ["ArrowDown", "ArrowUp"]) {
-    for (let i = 0; i < 4; i++) {
+    // The language picker has 25 options; arrow keys wrap around, so this reaches every one.
+    for (let i = 0; i < 25; i++) {
       if ((await focus()).value === value) return;
       await browser.keys([key]);
     }

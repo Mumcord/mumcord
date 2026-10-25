@@ -141,6 +141,8 @@ pub struct UserView {
     /// Local volume in percent (0–200).
     pub volume: u16,
     pub local_mute: bool,
+    /// Features announced by another Mumcord client (FR-1.61); `None` for everyone else.
+    pub mumcord_features: Option<Vec<String>>,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -265,6 +267,8 @@ pub struct ProfileView {
     pub comment: Option<String>,
     /// `data:` URL.
     pub avatar: Option<String>,
+    /// The user's private note about this person; empty when there is none (FR-1.63).
+    pub note: String,
 }
 
 /// Everything the engine reports to the UI.
@@ -312,6 +316,42 @@ pub enum EngineEvent {
     NowPlayingChanged {
         session: u32,
         track: Option<crate::now_playing::NowPlayingView>,
+    },
+    /// A person (or the user, with the own session) started, changed or stopped sharing the
+    /// game they play (FR-1.59).
+    NowGamingChanged {
+        session: u32,
+        game: Option<crate::now_gaming::NowGamingView>,
+    },
+    /// Messages from another Mumcord user's history were added to a channel (FR-1.60), in
+    /// send-time order; insert them by `sent_at` (ties by order here).
+    HistorySynced {
+        channel_id: u32,
+        messages: Vec<crate::chat::ChatMessageView>,
+    },
+    /// A history sync of a channel started (`running`) or ended with `added` new messages.
+    HistorySyncStatus {
+        channel_id: u32,
+        running: bool,
+        added: u32,
+    },
+    /// Progress of a full-size image being fetched for the viewer (FR-1.60c): `received` of
+    /// `total` bytes of the image with this reference.
+    FullImageProgress {
+        reference: String,
+        received: u32,
+        total: u32,
+    },
+    /// The friends list changed: a friend was added or removed, came online, moved, was
+    /// renamed or went offline (FR-1.64). Online friends first.
+    FriendsChanged(Vec<crate::friends::FriendView>),
+    /// Positional audio was switched, or the game delivering positions changed (FR-1.43).
+    PositionalStatusChanged(crate::positional::PositionalStatus),
+    /// A person (or the user, with the own session) started or stopped sending positions
+    /// (the "3D" icon, FR-1.72).
+    PositionalSendingChanged {
+        session: u32,
+        sending: bool,
     },
 }
 

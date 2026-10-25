@@ -1,0 +1,33 @@
+{
+  "regions": {
+    "servers": "Strežniki",
+    "channels": "Kanali",
+    "chat": "Klepet",
+    "members": "Člani",
+    "userPanel": "Tvoje stanje"
+  },
+  "skipLinks": {
+    "label": "Povezave za preskok",
+    "chat": "Skoči na klepet",
+    "channels": "Skoči na kanale"
+  },
+  "members": {
+    "show": "Pokaži člane",
+    "hide": "Skrij člane"
+  },
+  "resize": {
+    "channels": "Spremeni velikost seznama kanalov",
+    "members": "Spremeni velikost seznama članov"
+  },
+  "settings": {
+    "title": "Nastavitve"
+  },
+  "wizard": {
+    "title": "Dobrodošel v Mumcordu"
+  },
+  "placeholder": "Kmalu",
+  "startupError": {
+    "title": "Mumcorda ni bilo mogoče zagnati",
+    "description": "Aplikacija ni mogla naložiti tvojih nastavitev. Poskusi znova; če se težava ponavlja, znova zaženi Mumcord."
+  }
+}

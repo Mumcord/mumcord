@@ -1,0 +1,12 @@
+{
+  "show": "Näita Mumcordi",
+  "mute": "Vaigista mikrofon",
+  "deafen": "Kurdista",
+  "overlay": "Näita kattekihti",
+  "quit": "Välju",
+  "disconnected": "Ühendus puudub",
+  "connecting": "Ühendamine…",
+  "connected": "Ühendatud",
+  "talking": "Ühendatud – räägib",
+  "muted": "Ühendatud – vaigistatud"
+}

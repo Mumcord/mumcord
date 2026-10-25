@@ -9,6 +9,22 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "fe438c63458706e03479442743baae6c88256498e6431708f6dfc520a26515d3"
 
 [[package]]
+name = "ab_glyph"
+version = "0.2.32"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "01c0457472c38ea5bd1c3b5ada5e368271cb550be7a4ca4a0b4634e9913f6cc2"
+dependencies = [
+ "ab_glyph_rasterizer",
+ "owned_ttf_parser",
+]
+
+[[package]]
+name = "ab_glyph_rasterizer"
+version = "0.1.10"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "366ffbaa4442f4684d91e2cd7c5ea7c4ed8add41959a31447066e279e432b618"
+
+[[package]]
 name = "adler2"
 version = "2.0.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -205,6 +221,15 @@ name = "array-init"
 version = "2.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "3d62b7694a562cdf5a74227903507c56ab2cc8bdd1f781ed5cb4cf9c9f810bfc"
+
+[[package]]
+name = "ash"
+version = "0.38.0+1.3.281"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "0bb44936d800fea8f016d7f2311c6a4f97aebd5dc86f09906139ec848cf3a46f"
+dependencies = [
+ "libloading 0.8.9",
+]
 
 [[package]]
 name = "ashpd"
@@ -3112,7 +3137,7 @@ checksum = "1d87ecb2933e8aeadb3e3a02b828fed80a7528047e68b4f424523a0981a3a084"
 
 [[package]]
 name = "mumcord"
-version = "0.2.0"
+version = "0.3.0"
 dependencies = [
  "ashpd",
  "base64 0.23.1",
@@ -3123,6 +3148,7 @@ dependencies = [
  "gtk",
  "libc",
  "mumcord-engine",
+ "mumcord-overlay-ipc",
  "notify-rust",
  "serde",
  "serde_json",
@@ -3136,6 +3162,7 @@ dependencies = [
  "tauri-plugin-opener",
  "tauri-plugin-single-instance",
  "tauri-specta",
+ "tempfile",
  "tokio",
  "tracing",
  "windows",
@@ -3146,7 +3173,7 @@ dependencies = [
 
 [[package]]
 name = "mumcord-audio"
-version = "0.2.0"
+version = "0.3.0"
 dependencies = [
  "cpal",
  "hound",
@@ -3161,7 +3188,7 @@ dependencies = [
 
 [[package]]
 name = "mumcord-bot"
-version = "0.2.0"
+version = "0.3.0"
 dependencies = [
  "anyhow",
  "bytes",
@@ -3178,7 +3205,7 @@ dependencies = [
 
 [[package]]
 name = "mumcord-engine"
-version = "0.2.0"
+version = "0.3.0"
 dependencies = [
  "ammonia",
  "anyhow",
@@ -3187,6 +3214,7 @@ dependencies = [
  "image",
  "mumcord-audio",
  "mumcord-bot",
+ "mumcord-positional",
  "mumcord-protocol",
  "mumcord-store",
  "netsim",
@@ -3196,6 +3224,7 @@ dependencies = [
  "serde",
  "serde_json",
  "sha1 0.10.7",
+ "sha2 0.10.9",
  "specta",
  "tempfile",
  "thiserror 2.0.21",
@@ -3206,8 +3235,25 @@ dependencies = [
 ]
 
 [[package]]
+name = "mumcord-overlay-ipc"
+version = "0.3.0"
+dependencies = [
+ "ab_glyph",
+ "libc",
+]
+
+[[package]]
+name = "mumcord-overlay-layer"
+version = "0.3.0"
+dependencies = [
+ "ash",
+ "libc",
+ "mumcord-overlay-ipc",
+]
+
+[[package]]
 name = "mumcord-positional"
-version = "0.2.0"
+version = "0.3.0"
 dependencies = [
  "libc",
  "libloading 0.8.9",
@@ -3218,7 +3264,7 @@ dependencies = [
 
 [[package]]
 name = "mumcord-protocol"
-version = "0.2.0"
+version = "0.3.0"
 dependencies = [
  "aes 0.8.4",
  "bytes",
@@ -3237,7 +3283,7 @@ dependencies = [
 
 [[package]]
 name = "mumcord-store"
-version = "0.2.0"
+version = "0.3.0"
 dependencies = [
  "keyring",
  "p12-keystore",
@@ -3284,7 +3330,7 @@ dependencies = [
 
 [[package]]
 name = "netsim"
-version = "0.2.0"
+version = "0.3.0"
 dependencies = [
  "anyhow",
  "clap",
@@ -3798,6 +3844,15 @@ checksum = "9aa2b01e1d916879f73a53d01d1d6cee68adbb31d6d9177a8cfce093cced1d50"
 dependencies = [
  "futures-core",
  "pin-project-lite",
+]
+
+[[package]]
+name = "owned_ttf_parser"
+version = "0.25.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "36820e9051aca1014ddc75770aab4d68bc1e9e632f0f5627c4086bc216fb583b"
+dependencies = [
+ "ttf-parser",
 ]
 
 [[package]]
@@ -6651,6 +6706,12 @@ name = "try-lock"
 version = "0.2.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "e421abadd41a4225275504ea4d6566923418b7f05506fbc9c0fe86ba7396114b"
+
+[[package]]
+name = "ttf-parser"
+version = "0.25.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "d2df906b07856748fa3f6e0ad0cbaa047052d4a7dd609e231c4f72cee8c36f31"
 
 [[package]]
 name = "typeid"

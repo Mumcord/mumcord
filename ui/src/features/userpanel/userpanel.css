@@ -20,7 +20,7 @@
   gap: var(--space-1);
 }
 
-.userpanel__user {
+.userpanel__profile {
   display: flex;
   flex: 1 1 auto;
   align-items: center;
@@ -28,15 +28,14 @@
   width: 100%;
   min-width: 0;
   padding: var(--space-1);
-  border: 0;
-  border-radius: var(--radius-md);
-  background: transparent;
   color: var(--color-text);
-  cursor: pointer;
   text-align: left;
 }
 
-.userpanel__user:hover:not(:disabled),
+.userpanel__profile--offline {
+  color: var(--color-text-muted);
+}
+
 .userpanel__toggle:hover:not(:disabled) {
   background: var(--color-bg-hover);
 }
@@ -128,8 +127,7 @@
   cursor: pointer;
 }
 
-.userpanel__toggle:disabled,
-.userpanel__user:disabled {
+.userpanel__toggle:disabled {
   color: var(--color-text-muted);
   cursor: default;
 }
@@ -179,35 +177,6 @@
 .userpanel__icon svg + svg {
   position: absolute;
   inset: 0;
-}
-
-.userpanel__menu {
-  position: absolute;
-  right: var(--space-2);
-  bottom: 100%;
-  left: var(--space-2);
-  margin: 0;
-  padding: var(--space-1);
-  border: 1px solid var(--color-border-strong);
-  border-radius: var(--radius-md);
-  background: var(--color-bg-elevated);
-  box-shadow: var(--shadow-raised);
-  list-style: none;
-}
-
-.userpanel__menu button {
-  width: 100%;
-  padding: var(--space-2);
-  border: 0;
-  border-radius: var(--radius-sm);
-  background: transparent;
-  color: var(--color-text);
-  cursor: pointer;
-  text-align: left;
-}
-
-.userpanel__menu button:hover {
-  background: var(--color-bg-hover);
 }
 
 .userpanel-error {

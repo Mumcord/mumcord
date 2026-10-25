@@ -1,0 +1,15 @@
+{
+  "title": "Priatelia",
+  "item": "{{name}}, {{status}}",
+  "online": "Online",
+  "onlineIn": "Online v {{channel}}",
+  "onlineOnServer": "Online na {{server}}",
+  "offline": "Offline",
+  "lastSeen": "Offline, naposledy {{when}}",
+  "friend": "Priateľ",
+  "friendHint": "Ukáže, kedy je online, a ponechá tvoj súkromný chat s ním.",
+  "noCertificate": "Ľudia bez certifikátu nemôžu byť priatelia, pretože Mumcord by ich nedokázal znova rozpoznať.",
+  "add": "Pridať priateľa",
+  "remove": "Odstrániť priateľa",
+  "failed": "Zmena priateľa sa nepodarila. Skús to znova."
+}

@@ -416,6 +416,7 @@ mod tests {
             has_comment: false,
             volume: 100,
             local_mute: false,
+            mumcord_features: None,
         }
     }
 

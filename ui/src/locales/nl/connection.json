@@ -1,0 +1,22 @@
+{
+  "open": "Verbindingsinfo",
+  "title": "Verbindingsinfo",
+  "loading": "Laden…",
+  "notConnected": "Niet verbonden.",
+  "error": "Verbindingsinfo is nu niet beschikbaar.",
+  "none": "–",
+  "transport": "Transport",
+  "transportValue": {
+    "udp": "UDP",
+    "tcp": "TCP (getunneld)"
+  },
+  "latency": "Latentie",
+  "latencyValue": "{{value}} ms",
+  "loss": "Pakketverlies",
+  "lossValue": "{{value}} %",
+  "bitrate": "Verzendbitrate",
+  "bitrateValue": "{{value}} kbit/s",
+  "serverLimit": "Serverlimiet",
+  "packets": "Pakketten verzonden / ontvangen",
+  "packetsValue": "{{sent}} / {{received}}"
+}

@@ -5,6 +5,7 @@ import { browser } from "@wdio/globals";
 import { profile } from "./app.ts";
 import { bin, testenvDir } from "./paths.ts";
 import { run, runOk } from "./run.ts";
+import { finishWizardWithDefaults } from "./wizard-util.ts";
 
 // UI helpers for the server specs (AC-1.4 – AC-1.6).
 
@@ -44,16 +45,7 @@ export function button(text: string) {
 export async function completeWizard(name: string): Promise<void> {
   await fill("Name", name);
   await button("Next").click();
-  // "Next" generates the RSA-2048 identity; in the unoptimised debug build the random prime search
-  // takes anywhere from about 1 s to well over 15 s on a 2-core runner, so wait far longer than
-  // the default. Failing here used to cascade through the whole spec file.
-  await browser
-    .$("//h2[normalize-space()='Microphone']")
-    .waitForDisplayed({ timeout: 120_000, timeoutMsg: "wizard: identity generation too slow" });
-  await button("Next").click();
-  await browser.$("//h2[normalize-space()='How do you want to talk?']").waitForDisplayed();
-  await button("Finish").click();
-  await browser.$('button[aria-label="Add a server"]').waitForDisplayed();
+  await finishWizardWithDefaults();
 }
 
 /** Server bar button whose accessible name starts with `name` (status suffix allowed). */

@@ -1,0 +1,88 @@
+{
+  "unknownName": "Tu",
+  "mute": "Disattiva microfono",
+  "deafen": "Disattiva audio",
+  "disconnect": "Disconnetti da {{server}}",
+  "settings": "Impostazioni rapide",
+  "announce": {
+    "muted": "Microfono disattivato",
+    "unmuted": "Microfono attivato",
+    "deafened": "Audio disattivato. Non senti gli altri e il tuo microfono è disattivato",
+    "undeafened": "Audio attivato"
+  },
+  "readOnly": {
+    "text": "Stai solo leggendo – entra in un canale per parlare.",
+    "join": "Entra in {{channel}}"
+  },
+  "status": {
+    "connecting": "Connessione in corso…",
+    "reconnecting": "Riconnessione in corso…",
+    "connected": "Connesso",
+    "readOnly": "Sola lettura",
+    "disconnected": "Non connesso",
+    "playing": "Gioca a {{game}}",
+    "listening": "Ascolta {{track}}"
+  },
+  "profile": {
+    "title": "Modifica profilo",
+    "chooseTitle": "Scegli un'immagine del profilo",
+    "chooseAvatar": "Scegli immagine…",
+    "removeAvatar": "Rimuovi immagine",
+    "avatarHint": "L'immagine viene ridimensionata per rispettare il limite del server.",
+    "avatarUnregistered": "Questo server conserva gli avatar solo per gli utenti registrati – Mumcord reinvia il tuo a ogni connessione.",
+    "avatarChosen": "Selezionata: {{name}}",
+    "avatarRemoved": "L'immagine verrà rimossa quando salvi.",
+    "comment": "Su di te"
+  },
+  "register": {
+    "title": "Registrati su questo server",
+    "explain": "La registrazione riserva il tuo nome su questo server. Nessun altro può usarlo e il server ti riconosce alla prossima connessione.",
+    "backup": "La tua identità è ciò che dimostra che il nome è tuo. Se la perdi, perdi l'accesso al nome registrato. Salva subito una copia di backup e conservala con cura.",
+    "password": "Password per il file di backup",
+    "export": "Esporta identità",
+    "saveTitle": "Salva backup dell'identità",
+    "passwordRequired": "Inserisci una password per proteggere il file di backup.",
+    "exported": "Backup dell'identità salvato.",
+    "confirm": "Registrati",
+    "done": "Registrato su questo server"
+  },
+  "errors": {
+    "tooLarge": "È troppo grande per il server. Scegli un'immagine più piccola o scrivi un testo più breve.",
+    "denied": "Il server non lo consente.",
+    "deniedWithReason": "Il server non lo consente: {{reason}}",
+    "notConnected": "Non sei connesso a un server.",
+    "file": "Non è stato possibile leggere o scrivere il file.",
+    "generic": "Qualcosa è andato storto. Riprova."
+  },
+  "ptt": "Push-to-talk: tieni premuto {{key}} per parlare",
+  "pttNoKey": "Push-to-talk: nessun tasto impostato",
+  "quickSettings": {
+    "linkPreviews": "Anteprime e incorporamenti dei link",
+    "linkPreviewsHint": "I siti vedono il tuo indirizzo IP",
+    "nowPlaying": "Condividi cosa sto ascoltando",
+    "nowPlayingHint": "Gli altri vedono il tuo brano attuale",
+    "unsupported": "Non disponibile su macOS",
+    "theme": "Tema",
+    "theme_system": "Sistema",
+    "theme_dark": "Scuro",
+    "theme_light": "Chiaro",
+    "nowGaming": "Condividi il gioco a cui sto giocando",
+    "nowGamingHint": "Gli altri vedono il tuo gioco attuale",
+    "unavailable": "Non disponibile su questo sistema",
+    "overlay": "Overlay",
+    "overlayHint": "Mostra chi sta parlando sopra i giochi",
+    "editProfile": "Modifica profilo",
+    "editProfileHint": "Nome, avatar e commento",
+    "register": "Registrati su questo server",
+    "registered": "Registrato su questo server ✓",
+    "registerHint": "Mantiene il tuo nome e avatar su questo server",
+    "allSettings": "Tutte le impostazioni…",
+    "label": "Impostazioni rapide",
+    "positional": "Audio posizionale",
+    "positionalHint": "Voci disposte in 3D intorno a te",
+    "offerImages": "Offri immagini a dimensione intera",
+    "offerImagesHint": "Permetti agli altri di caricare le tue immagini originali",
+    "loadImages": "Carica immagini a dimensione intera",
+    "loadImagesHint": "Scarica le immagini originali degli altri"
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "close": {
+    "title": "Samazināt uz paplāti vai iziet?",
+    "description": "Tu joprojām esi savienots. Samazināts Mumcord paturēs tevi balss kanālā un paliks sistēmas paplātē.",
+    "remember": "Atcerēties manu izvēli",
+    "minimize": "Samazināt uz paplāti",
+    "quit": "Iziet",
+    "failed": "Tas neizdevās. Lūdzu, mēģini vēlreiz."
+  }
+}

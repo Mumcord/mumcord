@@ -76,3 +76,58 @@
 .profile-preview__comment img {
   max-width: 100%;
 }
+
+/* Pinned by a click: actions sit top right, the header leaves room for them. */
+.profile-preview[data-pinned="true"] {
+  padding-top: var(--space-3);
+}
+
+.profile-preview[data-pinned="true"]:focus-visible {
+  outline: 2px solid var(--color-focus, currentColor);
+  outline-offset: 2px;
+}
+
+.profile-preview__actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--space-2);
+  margin-bottom: var(--space-2);
+}
+
+/* Icon buttons top right (private message, full profile, close): one size and style. */
+.profile-preview__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 1.75rem;
+  min-height: 1.75rem;
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-md);
+  background: transparent;
+  color: var(--color-text-secondary);
+  font: inherit;
+  font-size: var(--font-size-lg);
+  line-height: 1;
+  cursor: pointer;
+}
+
+.profile-preview__icon[aria-pressed="true"] {
+  color: var(--color-accent);
+}
+
+.profile-preview__icon[aria-disabled="true"] {
+  cursor: default;
+  opacity: 0.55;
+}
+
+.profile-preview__icon:hover {
+  background: var(--color-bg-hover, var(--color-border));
+  color: var(--color-text);
+}
+
+.profile-preview__icon:focus-visible {
+  outline: 2px solid var(--color-focus, currentColor);
+  outline-offset: 2px;
+}

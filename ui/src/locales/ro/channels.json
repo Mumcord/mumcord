@@ -1,0 +1,75 @@
+{
+  "serverOverview": "Prezentare generală a serverului",
+  "tree": {
+    "label": "Canale",
+    "hint": "Enter: arată chatul · Shift+Enter sau dublu clic: intră · Săgeți: mută, extinde, restrânge",
+    "join": "Intră",
+    "you": "(tu)",
+    "voiceHere": "ești aici (voice)",
+    "people_one": "{{count}} persoană",
+    "people_few": "{{count}} persoane",
+    "people_other": "{{count}} de persoane",
+    "stack": {
+      "some": "{{shown}} din {{total}} persoane: {{names}} și încă {{rest}}",
+      "all_one": "{{count}} persoană: {{names}}",
+      "all_few": "{{count}} persoane: {{names}}",
+      "all_other": "{{count}} de persoane: {{names}}",
+      "person": "{{name}} ({{status}})"
+    },
+    "showAll": "Arată tot ({{total}})",
+    "showFewer": "Arată mai puține",
+    "jump": "Salt la canalul meu"
+  },
+  "status": {
+    "listening": "ascultă",
+    "talking": "vorbește",
+    "muted": "microfon oprit",
+    "deafened": "sunet oprit",
+    "serverMuted": "microfon oprit de server",
+    "serverDeafened": "sunet oprit de server",
+    "suppressed": "suprimat (nu poate vorbi aici)",
+    "localMuted": "fără sunet pentru tine",
+    "unregistered": "neînregistrat"
+  },
+  "mumcordBadge": "Folosește Mumcord",
+  "statusTip": {
+    "registered": "Înregistrat pe acest server",
+    "listening": "Ascultă acest canal",
+    "muted": "Microfon oprit",
+    "deafened": "Sunet oprit",
+    "serverMuted": "Microfon oprit de server",
+    "serverDeafened": "Sunet oprit de server",
+    "suppressed": "Suprimat – nu poate vorbi în acest canal",
+    "localMuted": "Fără sunet pentru tine",
+    "unregistered": "Neînregistrat pe acest server (oaspete)",
+    "nowPlaying": "Ascultă {{track}}",
+    "nowGaming": "Joacă {{game}}",
+    "positional": "Audio pozițional activ"
+  },
+  "announce": {
+    "joined": "{{name}} a intrat în canalul tău",
+    "left": "{{name}} a ieșit din canalul tău",
+    "talking": "{{name}} vorbește"
+  },
+  "errors": {
+    "joinDenied": "Nu ai voie să intri în acest canal.",
+    "joinFailed": "Nu s-a putut intra în canal. Încearcă din nou.",
+    "notConnected": "Nu ești conectat la un server."
+  },
+  "empty": {
+    "disconnected": "Nu ești conectat. Alege un server ca să-i vezi canalele.",
+    "loading": "Se încarcă canalele…"
+  },
+  "search": {
+    "label": "Caută canale și persoane",
+    "clear": "Șterge căutarea",
+    "empty": "Niciun canal sau persoană nu se potrivește cu „{{query}}”.",
+    "count": "{{channels}}, {{people}}",
+    "channels_one": "{{count}} canal",
+    "channels_few": "{{count}} canale",
+    "channels_other": "{{count}} de canale",
+    "people_one": "{{count}} persoană",
+    "people_few": "{{count}} persoane",
+    "people_other": "{{count}} de persoane"
+  }
+}

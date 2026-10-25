@@ -33,9 +33,13 @@ pub struct User {
     /// Local playback volume in percent, 0–200 (FR-1.18).
     pub volume: u16,
     pub local_mute: bool,
+    /// Another Mumcord client, recognised by its hello (FR-1.61).
+    pub is_mumcord: bool,
+    /// What that client announced it can do (empty for everyone else).
+    pub mumcord_features: Vec<String>,
 }
 
-/// Comment and avatar, fetched on demand when the profile card opens.
+/// Comment, avatar and private note, fetched on demand when the profile card opens.
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, Type)]
 #[serde(rename_all = "camelCase")]
 pub struct PersonProfile {
@@ -43,6 +47,8 @@ pub struct PersonProfile {
     pub comment: Option<String>,
     /// `data:` URL of the avatar image.
     pub avatar: Option<String>,
+    /// The user's private note about this person; empty when there is none.
+    pub note: String,
 }
 
 /// A person appeared or changed (channel, mute state, name, …).
@@ -85,6 +91,8 @@ impl From<UserView> for User {
             has_comment: v.has_comment,
             volume: v.volume,
             local_mute: v.local_mute,
+            is_mumcord: v.mumcord_features.is_some(),
+            mumcord_features: v.mumcord_features.unwrap_or_default(),
         }
     }
 }
@@ -94,6 +102,7 @@ impl From<ProfileView> for PersonProfile {
         Self {
             comment: v.comment,
             avatar: v.avatar,
+            note: v.note,
         }
     }
 }
@@ -118,6 +127,18 @@ pub fn person_set_local_mute(
     muted: bool,
 ) -> ApiResult<()> {
     Ok(engine.person_set_local_mute(session, muted)?)
+}
+
+/// Saves the private note about a person (at most 1000 characters; empty removes it);
+/// remembered by certificate hash per server.
+#[tauri::command]
+#[specta::specta]
+pub fn person_set_note(
+    engine: State<'_, Engine>,
+    session: SessionId,
+    note: String,
+) -> ApiResult<()> {
+    Ok(engine.person_set_note(session, &note)?)
 }
 
 /// Comment and avatar of a person, fetched from the server when not known yet.

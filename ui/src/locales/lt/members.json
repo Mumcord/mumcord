@@ -1,0 +1,71 @@
+{
+  "inChannel_one": "Kanale {{channel}} ({{count}})",
+  "inChannel_few": "Kanale {{channel}} ({{count}})",
+  "inChannel_many": "Kanale {{channel}} ({{count}})",
+  "inChannel_other": "Kanale {{channel}} ({{count}})",
+  "listening_one": "Klauso ({{count}})",
+  "listening_few": "Klauso ({{count}})",
+  "listening_many": "Klauso ({{count}})",
+  "listening_other": "Klauso ({{count}})",
+  "noChannel": "Pasirink kanalą, kad pamatytum, kas jame yra.",
+  "nobody": "Čia nieko nėra.",
+  "nobodyElse": "Serveryje daugiau nieko nėra.",
+  "inOtherChannels": "Kituose kanaluose",
+  "you": "(tu)",
+  "registered": "Registruotas (-a)",
+  "unregistered": "Neregistruotas (-a)",
+  "talking": "Kalba",
+  "card": {
+    "close": "Uždaryti",
+    "loadFailed": "Nepavyko įkelti profilio.",
+    "volume": "Garsumas",
+    "volumeValue": "{{value}} %",
+    "localMute": "Nutildyti man",
+    "sessionOnly": "Šis žmogus neturi sertifikato, todėl šie nustatymai galioja tik per šią sesiją.",
+    "sendPrivateMessage": "Siųsti privačią žinutę",
+    "privateMessage": "Privati žinutė",
+    "localSettings": "Tavo nustatymai",
+    "localSettingsHint": "Tai mato tik tu. Pakeitimai įrašomi iškart.",
+    "localMuteHint": "Šio žmogaus negirdėsi.",
+    "privateNote": "Privati pastaba",
+    "privateNoteHint": "Šią pastabą mato tik tu.",
+    "saved": "Įrašyta"
+  },
+  "errors": {
+    "notConnected": "Neprisijungta prie serverio.",
+    "generic": "Nepavyko. Bandyk dar kartą."
+  },
+  "menu": {
+    "label": "{{name}} veiksmai",
+    "viewProfile": "Peržiūrėti profilį",
+    "join": "Prisijungti prie {{channel}}",
+    "joinDenied": "Neturite teisės įeiti į šį kanalą.",
+    "mute": "Nutildyti man"
+  },
+  "nowPlaying": {
+    "label": "Dabar groja",
+    "listening": "Klauso",
+    "paused": "Pristabdyta",
+    "progress": "Atkūrimo eiga",
+    "position": "{{position}} iš {{duration}}"
+  },
+  "nowGaming": {
+    "label": "Dabar žaidžia",
+    "playing": "Žaidžia",
+    "playedFor": "jau {{time}}",
+    "hoursMinutes": "{{hours}} val. {{minutes}} min.",
+    "minutes_one": "{{count}} min.",
+    "minutes_few": "{{count}} min.",
+    "minutes_many": "{{count}} min.",
+    "minutes_other": "{{count}} min.",
+    "join": "Prisijungti prie žaidimo",
+    "joinTitle": "Prisijungti prie žaidimo?",
+    "joinMessage": "Atsidarys Steam ir prisijungs prie serverio, kuriame šis žmogus žaidžia {{game}}. Jungkis tik prie serverių, kuriais pasitiki.",
+    "joinConfirm": "Atidaryti Steam",
+    "joinFailed": "Nepavyko atidaryti Steam."
+  },
+  "preview": {
+    "privateMessage": "Privati žinutė",
+    "fullProfile": "Visas profilis"
+  }
+}

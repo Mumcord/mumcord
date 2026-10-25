@@ -1,0 +1,15 @@
+{
+  "title": "Amigos",
+  "item": "{{name}}, {{status}}",
+  "online": "En línea",
+  "onlineIn": "En línea en {{channel}}",
+  "onlineOnServer": "En línea en {{server}}",
+  "offline": "Desconectado",
+  "lastSeen": "Desconectado, visto por última vez {{when}}",
+  "friend": "Amigo",
+  "friendHint": "Muestra cuándo está en línea y conserva vuestro chat privado.",
+  "noCertificate": "Las personas sin certificado no pueden ser amigos, porque Mumcord no podría reconocerlas de nuevo.",
+  "add": "Añadir amigo",
+  "remove": "Quitar amigo",
+  "failed": "No se pudo cambiar el amigo. Inténtalo de nuevo."
+}

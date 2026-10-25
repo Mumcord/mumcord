@@ -1,0 +1,15 @@
+{
+  "title": "Vrienden",
+  "item": "{{name}}, {{status}}",
+  "online": "Online",
+  "onlineIn": "Online in {{channel}}",
+  "onlineOnServer": "Online op {{server}}",
+  "offline": "Offline",
+  "lastSeen": "Offline, laatst gezien {{when}}",
+  "friend": "Vriend",
+  "friendHint": "Toont wanneer ze online zijn en bewaart je privéchat met hen.",
+  "noCertificate": "Mensen zonder certificaat kunnen geen vriend zijn, omdat Mumcord ze niet opnieuw kan herkennen.",
+  "add": "Vriend toevoegen",
+  "remove": "Vriend verwijderen",
+  "failed": "De vriend wijzigen is mislukt. Probeer het opnieuw."
+}

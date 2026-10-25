@@ -16,6 +16,7 @@ import {
   FollowStar,
 } from "../features/follow";
 import { ChatView } from "../features/chat";
+import { FriendsList } from "../features/friends";
 import { MembersPanel, openPrivateConversation } from "../features/members";
 import { ConnectionStatus, RejoinPrompt, ServersRoot } from "../features/servers";
 import { CloseDialog } from "../features/app";
@@ -64,9 +65,14 @@ export function ChatMount() {
   return <ChatView renderHeaderActions={(conv) => <FollowHeaderActions conversation={conv} />} />;
 }
 
-/** Member list (B20). */
+/** Member list (B20) with the friends list below (FR-1.64). */
 export function MembersMount() {
-  return <MembersPanel onSendPrivateMessage={openPrivateConversation} />;
+  return (
+    <>
+      <MembersPanel onSendPrivateMessage={openPrivateConversation} />
+      <FriendsList />
+    </>
+  );
 }
 
 /** First-start wizard content (B18); calls `useView().finishWizard()` when done. */

@@ -8,8 +8,10 @@ import { closePersonMenu, currentPersonMenu } from "../members/personMenuStore";
 import {
   closePreview,
   currentPreview,
+  PIN_DELAY_MS,
   PREVIEW_OPEN_DELAY_MS,
 } from "../members/profilePreviewStore";
+import { getSelectedConversation } from "../channels/selection";
 import { MessageList } from "./MessageList";
 
 // Fixed local noon: messages dated "minutes ago" must never straddle midnight.
@@ -28,6 +30,7 @@ function message(id: string, sender: string, minutesAgo: number, body: string): 
     sentAt: new Date(NOW.getTime() - minutesAgo * 60_000).toISOString(),
     body,
     dismissedPreviews: [],
+    syncedFrom: null,
   };
 }
 
@@ -41,7 +44,16 @@ function renderList(display: ChatDisplay, messages = MESSAGES) {
   return render(
     <main>
       <MessageList
-        log={{ messages, loaded: true, loading: false, hasMore: false, loadFailed: false }}
+        log={{
+          messages,
+          loaded: true,
+          loading: false,
+          hasMore: false,
+          loadFailed: false,
+          syncing: false,
+          syncResult: null,
+          syncFailed: false,
+        }}
         label="Messages in #Lobby"
         onLoadOlder={() => undefined}
         display={display}
@@ -63,10 +75,19 @@ describe("MessageList profile preview", () => {
     ];
     const { container } = render(
       <MessageList
-        log={{ messages, loaded: true, loading: false, hasMore: false, loadFailed: false }}
+        log={{
+          messages,
+          loaded: true,
+          loading: false,
+          hasMore: false,
+          loadFailed: false,
+          syncing: false,
+          syncResult: null,
+          syncFailed: false,
+        }}
         label="Messages in #Lobby"
         onLoadOlder={() => undefined}
-        onOpenProfile={() => undefined}
+        clickablePeople
       />,
     );
     const triggers = container.querySelectorAll(".profile-preview-trigger");
@@ -91,7 +112,16 @@ describe("MessageList profile preview", () => {
       const messages = [message("1", "Ghost", 5, "boo")];
       const { container } = render(
         <MessageList
-          log={{ messages, loaded: true, loading: false, hasMore: false, loadFailed: false }}
+          log={{
+            messages,
+            loaded: true,
+            loading: false,
+            hasMore: false,
+            loadFailed: false,
+            syncing: false,
+            syncResult: null,
+            syncFailed: false,
+          }}
           label="Messages"
           onLoadOlder={() => undefined}
           display={display}
@@ -187,5 +217,63 @@ describe("MessageList mentions", () => {
     });
     expect(items[0]).toHaveTextContent("Mentions you");
     expect(items[1]).not.toHaveClass("chat-message--mention");
+  });
+});
+
+describe("MessageList mention chips", () => {
+  afterEach(() => {
+    resetAll();
+    closePreview();
+    closePersonMenu();
+  });
+
+  async function renderMention() {
+    await connectedMock();
+    render(
+      <MessageList
+        log={{
+          messages: [message("1", "Maya", 5, "<p>hi @Anna and @Nobody</p>")],
+          loaded: true,
+          loading: false,
+          hasMore: false,
+          loadFailed: false,
+          syncing: false,
+          syncResult: null,
+          syncFailed: false,
+        }}
+        label="Messages in #Lobby"
+        onLoadOlder={() => undefined}
+        clickablePeople
+      />,
+    );
+    return { chip: await screen.findByRole("button", { name: "Anna, mention" }) };
+  }
+
+  it("makes only people on the server interactive", async () => {
+    await renderMention();
+    expect(screen.queryByRole("button", { name: /Nobody/ })).toBeNull();
+  });
+
+  it("opens the private chat on double click", async () => {
+    const { chip } = await renderMention();
+    fireEvent.doubleClick(chip);
+    expect(getSelectedConversation()).toEqual({ kind: "private", certHash: "annahash" });
+  });
+
+  it("previews on hover, pins on click and opens the menu on right-click", async () => {
+    const { chip } = await renderMention();
+    vi.useFakeTimers();
+    try {
+      fireEvent.pointerOver(chip);
+      vi.advanceTimersByTime(PREVIEW_OPEN_DELAY_MS);
+      expect(currentPreview()?.session).toBe(2);
+      fireEvent.click(chip);
+      vi.advanceTimersByTime(PIN_DELAY_MS);
+      expect(currentPreview()?.pinned).toBe(true);
+      fireEvent.contextMenu(chip, { clientX: 5, clientY: 6 });
+      expect(currentPersonMenu()?.session).toBe(2);
+    } finally {
+      vi.useRealTimers();
+    }
   });
 });

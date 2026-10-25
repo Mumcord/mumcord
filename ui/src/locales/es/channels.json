@@ -1,4 +1,5 @@
 {
+  "serverOverview": "Resumen del servidor",
   "tree": {
     "label": "Canales",
     "hint": "Intro: ver chat · Mayús+Intro o doble clic: unirse · Flechas: mover, expandir, contraer",
@@ -7,10 +8,12 @@
     "voiceHere": "estás aquí (voz)",
     "people_one": "{{count}} persona",
     "people_other": "{{count}} personas",
+    "people_many": "{{count}} personas",
     "stack": {
       "some": "{{shown}} de {{total}} personas: {{names}} y {{rest}} más",
       "all_one": "{{count}} persona: {{names}}",
       "all_other": "{{count}} personas: {{names}}",
+      "all_many": "{{count}} personas: {{names}}",
       "person": "{{name}} ({{status}})"
     },
     "showAll": "Mostrar todas ({{total}})",
@@ -28,6 +31,7 @@
     "localMuted": "silenciado para ti",
     "unregistered": "no registrado"
   },
+  "mumcordBadge": "Usa Mumcord",
   "statusTip": {
     "registered": "Registrado en este servidor",
     "listening": "Escuchando este canal",
@@ -38,7 +42,9 @@
     "suppressed": "Suprimido: no puede hablar en este canal",
     "localMuted": "Silenciado para ti",
     "unregistered": "No registrado en este servidor (invitado)",
-    "nowPlaying": "Escuchando {{track}}"
+    "nowPlaying": "Escuchando {{track}}",
+    "nowGaming": "Jugando a {{game}}",
+    "positional": "Audio posicional activo"
   },
   "announce": {
     "joined": "{{name}} se unió a tu canal",
@@ -61,7 +67,9 @@
     "count": "{{channels}}, {{people}}",
     "channels_one": "{{count}} canal",
     "channels_other": "{{count}} canales",
+    "channels_many": "{{count}} canales",
     "people_one": "{{count}} persona",
-    "people_other": "{{count}} personas"
+    "people_other": "{{count}} personas",
+    "people_many": "{{count}} personas"
   }
 }

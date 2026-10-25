@@ -7,5 +7,7 @@
   "back": "Back",
   "next": "Next",
   "retry": "Try again",
-  "loading": "Loading…"
+  "loading": "Loading…",
+  "beta": "Beta",
+  "betaFeature": "Beta feature"
 }

@@ -1,0 +1,59 @@
+{
+  "follow": "Prati",
+  "following": "Pratiš",
+  "unsupported": "Praćenje kanala zahtijeva poslužitelj s verzijom 1.4 ili novijom.",
+  "unread_one": "{{count}} nepročitana poruka",
+  "unread_few": "{{count}} nepročitane poruke",
+  "unread_other": "{{count}} nepročitanih poruka",
+  "errors": {
+    "denied": "Poslužitelj ti ne dopušta praćenje ovog kanala.",
+    "limit": "Na ovom poslužitelju ne možeš pratiti više kanala. Najprije prestani pratiti neki drugi kanal.",
+    "tooOld": "Ovaj poslužitelj je prestar za praćenje kanala (potrebna je verzija 1.4 ili novija).",
+    "notConnected": "Nisi povezan s poslužiteljem.",
+    "generic": "Praćenje ovog kanala nije uspjelo. Pokušaj ponovno."
+  },
+  "dm": {
+    "title": "Izravne poruke",
+    "unknown": "Nepoznata osoba"
+  },
+  "notify": {
+    "channel": "{{name}} u {{channel}}: {{text}}",
+    "private": "{{name}} (privatno): {{text}}",
+    "more_one": "Još {{count}} nova poruka",
+    "more_few": "Još {{count}} nove poruke",
+    "more_other": "Još {{count}} novih poruka"
+  },
+  "history": {
+    "clear": "Obriši povijest",
+    "title": "Obrisati povijest?",
+    "body": "Ovo trajno briše spremljene poruke ovog razgovora s ovog računala. Drugi zadržavaju svoje kopije.",
+    "confirm": "Obriši povijest",
+    "cancel": "Odustani",
+    "failed": "Povijest nije bilo moguće obrisati. Pokušaj ponovno."
+  },
+  "star": {
+    "follow": "Prati {{channel}}",
+    "unfollow": "Prestani pratiti {{channel}}"
+  },
+  "all": {
+    "menu": "Opcije poslužitelja za {{server}}",
+    "menuLabel": "Opcije poslužitelja",
+    "follow": "Prati sve kanale",
+    "unfollow": "Prestani pratiti sve kanale",
+    "working": "Praćenje kanala…",
+    "followed_one": "Pratiš {{count}} kanal.",
+    "followed_few": "Pratiš {{count}} kanala.",
+    "followed_other": "Pratiš {{count}} kanala.",
+    "skipped_one": "{{count}} preskočen: {{reasons}}.",
+    "skipped_few": "{{count}} preskočena: {{reasons}}.",
+    "skipped_other": "{{count}} preskočeno: {{reasons}}.",
+    "limit": "dosegnuto ograničenje",
+    "notAllowed": "nije dopušteno",
+    "noAnswer": "nema odgovora poslužitelja",
+    "unfollowed": "Više ne pratiš nijedan kanal.",
+    "failed": "Praćenje svih kanala nije uspjelo. Pokušaj ponovno.",
+    "dismiss": "Odbaci",
+    "unfollowFailed": "Prestanak praćenja svih kanala nije uspio. Pokušaj ponovno."
+  },
+  "mention": "sadrži spominjanje tebe"
+}

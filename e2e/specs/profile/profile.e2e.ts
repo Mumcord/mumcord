@@ -18,7 +18,8 @@ async function clickText(selector: string, text: string): Promise<void> {
 }
 
 async function clickItem(text: string): Promise<void> {
-  const el = $(`//*[@role="menuitem"][normalize-space()="${text}"]`);
+  // Menu rows carry a hint after the label, so match the label as a prefix.
+  const el = $(`//*[@role="menuitem"][starts-with(normalize-space(), "${text}")]`);
   await el.waitForClickable();
   await el.click();
 }
@@ -29,10 +30,11 @@ async function onStep(n: number): Promise<void> {
   });
 }
 
+// Profile edits and registration live in the quick settings, opened from the gear.
 async function openUserMenu(): Promise<void> {
-  const btn = $("button.userpanel__user");
-  await btn.waitForEnabled();
-  await btn.click();
+  const gear = $('button[aria-label="Quick settings"]');
+  await gear.waitForClickable();
+  await gear.click();
   await $('[role="menu"]').waitForDisplayed();
 }
 
@@ -43,7 +45,7 @@ describe("profile: register, avatar, comment", () => {
     avatarPath = join(mkdtempSync(join(tmpdir(), "mumcord-avatar-")), "me.png");
     writeFileSync(avatarPath, Buffer.from(PNG_1X1, "base64"));
 
-    // Wizard: identity -> mic -> talk mode.
+    // Wizard: identity -> mic -> privacy -> talk mode.
     await $("#root").waitForDisplayed();
     const name = $('input[type="text"]');
     await name.waitForDisplayed();
@@ -52,6 +54,8 @@ describe("profile: register, avatar, comment", () => {
     await onStep(2);
     await clickText("button", "Next");
     await onStep(3);
+    await clickText("button", "Next");
+    await onStep(4);
     await clickText("button", "Finish");
 
     // First server, then trust its certificate.
@@ -60,13 +64,13 @@ describe("profile: register, avatar, comment", () => {
     await address.setValue(`localhost:${String(testenv.ports.v15)}`);
     await clickText("button", "Add and connect");
     await clickText("button", "Trust and connect");
-    await $("button.userpanel__user").waitForEnabled({ timeout: 30_000 });
+    await $("button.userpanel__toggle--mic").waitForEnabled({ timeout: 30_000 });
   });
 
   it("AC-1.19 offers registration to an unregistered user", async () => {
     await bot(["expect", "user", ME, "--registered", "false"], { name: "Checker" });
     await openUserMenu();
-    await expect($('//*[@role="menuitem"][normalize-space()="Register on this server"]')).toBeDisplayed();
+    await expect($('//*[@role="menuitem"][starts-with(normalize-space(), "Register on this server")]')).toBeDisplayed();
   });
 
   it("AC-1.19 shows the dialog with the backup hint", async () => {
@@ -85,7 +89,7 @@ describe("profile: register, avatar, comment", () => {
     });
     await bot(["expect", "user", ME, "--registered", "true"], { name: "Checker" });
     await openUserMenu();
-    await expect($('//*[@role="menuitem"][normalize-space()="Register on this server"]')).not.toBeExisting();
+    await expect($('//*[@role="menuitem"][starts-with(normalize-space(), "Register on this server")]')).not.toBeExisting();
     await browser.keys("Escape");
   });
 
@@ -130,7 +134,11 @@ describe("profile: register, avatar, comment", () => {
       // Member list: a picture (or comment) for the bot.
       const listImg = row.$("img");
       const listHasImg = await listImg.isExisting();
+      // A click pins the preview card (FR-1.62); its "Full profile" button opens the full card.
       await row.click();
+      const full = $("//div[@id='profile-preview']//button[@aria-label='Full profile']");
+      await full.waitForDisplayed();
+      await full.click();
       const card = $("dialog.profile-card");
       await card.waitForDisplayed();
       await browser.waitUntil(async () => (await card.getText()).includes("Bot comment XYZ"), {
@@ -138,6 +146,16 @@ describe("profile: register, avatar, comment", () => {
       });
       await expect(card.$("img")).toBeExisting();
       expect(listHasImg).toBe(true);
+
+      // AC-1.53: redesigned header with "Private message" as a header action; a private note
+      // applies instantly and confirms with "Saved", without any save button.
+      await expect(card.$(".//div[contains(@class,'profile-card__banner')]//button[normalize-space(.)='Private message']")).toBeExisting();
+      const note = card.$("textarea.profile-card__textarea");
+      await note.setValue("Bot note");
+      await card.$(".profile-card__saved[data-visible='true']").waitForExist({
+        timeoutMsg: "no Saved confirmation after editing the private note",
+      });
+      await expect(card.$$("button*=Save")).toBeElementsArrayOfSize(0);
     } finally {
       b.stop();
       await b.done.catch(() => undefined);

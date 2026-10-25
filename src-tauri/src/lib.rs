@@ -6,8 +6,15 @@ mod deeplink;
 #[cfg(target_os = "linux")]
 mod desktop_entry;
 mod display;
+mod ingame_overlay;
+#[cfg(target_os = "linux")]
+mod kde_x11;
+#[cfg(target_os = "linux")]
+mod kwin_rule;
 mod notifications;
+mod now_gaming;
 mod now_playing;
+mod overlay;
 mod ptt;
 mod tray;
 mod window;
@@ -17,11 +24,13 @@ use tauri::{AppHandle, Manager};
 use tauri_specta::{Builder, Event, collect_commands, collect_events};
 
 use commands::{
-    app, audio, channels, chat, diagnostics, follow, history, identity, links,
+    app, audio, channels, chat, diagnostics, dropped, follow, friends, history, identity, links,
     notifications as notify, people, profile, servers, session, settings,
 };
 
 /// Path of the generated TypeScript bindings, relative to this crate.
+// Only debug builds and tests regenerate the bindings.
+#[cfg(any(debug_assertions, test))]
 const BINDINGS_PATH: &str = concat!(
     env!("CARGO_MANIFEST_DIR"),
     "/../ui/src/bindings/commands.ts"
@@ -57,10 +66,17 @@ fn specta_builder() -> Builder<tauri::Wry> {
             channels::channel_description_request,
             people::person_set_volume,
             people::person_set_local_mute,
+            people::person_set_note,
             people::person_profile,
+            friends::friends_list,
+            friends::friend_add,
+            friends::friend_remove,
             chat::send_channel_message,
             chat::send_private_message,
             chat::save_image,
+            dropped::read_dropped_image,
+            commands::full_image::full_image_keep,
+            commands::full_image::full_image_fetch,
             links::link_preview,
             links::inline_image,
             links::preview_dismiss,
@@ -77,6 +93,7 @@ fn specta_builder() -> Builder<tauri::Wry> {
             history::history_load,
             history::history_clear,
             history::history_set_saving,
+            history::history_sync_request,
             profile::set_own_avatar,
             profile::default_avatar_get,
             profile::default_avatar_set,
@@ -92,6 +109,10 @@ fn specta_builder() -> Builder<tauri::Wry> {
             commands::ptt::ptt_capture_cancel,
             commands::ptt::ptt_mouse_status,
             commands::ptt::ptt_session,
+            commands::ptt::ptt_open_kde_x11_settings,
+            commands::ptt::ptt_kde_x11_access,
+            commands::ptt::ptt_kde_x11_allow_mouse,
+            commands::ptt::ptt_kde_x11_undo,
             app::close_choice,
             app::app_restart,
             app::link_handler_status,
@@ -103,6 +124,23 @@ fn specta_builder() -> Builder<tauri::Wry> {
             notify::notification_dismiss,
             commands::now_playing::now_playing_status,
             commands::now_playing::now_playing_cover,
+            commands::now_gaming::now_gaming_status,
+            commands::now_gaming::now_gaming_icon,
+            commands::now_gaming::now_gaming_join,
+            commands::positional::positional_status,
+            commands::positional::plugins_list,
+            commands::positional::plugin_set_enabled,
+            commands::overlay::overlay_state,
+            commands::overlay::overlay_update,
+            commands::overlay::overlay_set_enabled,
+            commands::overlay::overlay_move_mode,
+            commands::overlay::overlay_kwin_rule_install,
+            commands::overlay::overlay_kwin_rule_remove,
+            commands::overlay::overlay_open_kde_window_rules,
+            commands::ingame_overlay::ingame_overlay_state,
+            commands::ingame_overlay::ingame_overlay_set_mode,
+            commands::ingame_overlay::ingame_overlay_set_game,
+            commands::ingame_overlay::ingame_overlay_remove_game,
         ])
         .events(collect_events![
             servers::DeepLinkOpened,
@@ -117,7 +155,11 @@ fn specta_builder() -> Builder<tauri::Wry> {
             people::UserUpserted,
             people::UserRemoved,
             people::TalkStateChanged,
+            friends::FriendsChanged,
             chat::MessageReceived,
+            history::HistorySynced,
+            history::HistorySyncStatus,
+            commands::full_image::FullImageProgress,
             follow::FollowedChannelsChanged,
             follow::UnreadChanged,
             audio::AudioDevicesChanged,
@@ -127,9 +169,15 @@ fn specta_builder() -> Builder<tauri::Wry> {
             profile::DefaultAvatarSkipped,
             notify::NotificationActivated,
             commands::now_playing::NowPlayingChanged,
+            commands::now_gaming::NowGamingChanged,
+            commands::positional::PositionalStatusChanged,
+            commands::positional::PositionalSendingChanged,
+            commands::overlay::OverlayChanged,
+            commands::ingame_overlay::InGameOverlayChanged,
         ])
 }
 
+#[cfg(any(debug_assertions, test))]
 fn export_bindings(builder: &Builder<tauri::Wry>) -> Result<(), specta_typescript::Error> {
     builder.export(specta_typescript::Typescript::default(), BINDINGS_PATH)
 }
@@ -148,6 +196,7 @@ pub fn run() {
     }
 
     let builder = specta_builder();
+    let invoke = builder.invoke_handler();
 
     // Keep the TypeScript bindings in sync during development.
     // E2E runs set MUMCORD_SKIP_BINDINGS_EXPORT so they never rewrite the tracked file.
@@ -170,8 +219,23 @@ pub fn run() {
         .plugin(tauri_plugin_global_shortcut::Builder::new().build())
         .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_opener::init())
-        .invoke_handler(builder.invoke_handler())
-        .on_window_event(window::on_window_event)
+        .invoke_handler(move |call| {
+            // The overlay page gets only the few commands it needs (least privilege).
+            if !overlay::may_invoke(call.message.webview_ref().label(), call.message.command()) {
+                tracing::warn!(
+                    command = call.message.command(),
+                    "command refused for the overlay"
+                );
+                call.resolver.reject("command not available in this window");
+                return true;
+            }
+            invoke(call)
+        })
+        .manage(dropped::DroppedFiles::default())
+        .on_window_event(|window, event| {
+            dropped::on_window_event(window, event);
+            window::on_window_event(window, event);
+        })
         .setup(move |app| {
             builder.mount_events(app);
             // Before the engine: its event hook uses the notifier.
@@ -179,6 +243,8 @@ pub fn run() {
             start_engine(app.handle())?;
             start_window_and_autostart(app.handle());
             tray::init(app.handle());
+            overlay::init(app.handle());
+            ingame_overlay_init(app.handle());
             deeplink::init(app.handle());
             #[cfg(target_os = "linux")]
             desktop_entry::ensure(app.handle());
@@ -216,6 +282,8 @@ fn start_engine(app: &AppHandle) -> Result<(), Box<dyn std::error::Error>> {
     settings::configure_ptt(app, settings::active_ptt_key(&stored));
 
     now_playing::start(engine.clone());
+    now_gaming::start(engine.clone());
+    start_plugin_host(app, &engine, &data_dir, &stored.enabled_plugins);
     app.manage(engine);
 
     let handle = app.clone();
@@ -227,6 +295,42 @@ fn start_engine(app: &AppHandle) -> Result<(), Box<dyn std::error::Error>> {
         }
     });
     Ok(())
+}
+
+/// Starts the host for the official Mumble game plugins (FR-1.42b) and applies the enabled
+/// ones. Without it positional audio still works through Mumble Link.
+fn start_plugin_host(
+    app: &AppHandle,
+    engine: &Engine,
+    data_dir: &std::path::Path,
+    enabled: &[String],
+) {
+    let dirs = mumcord_engine::positional_sources::plugins::plugin_dirs(data_dir.join("plugins"));
+    match mumcord_engine::positional_sources::PluginHost::start(dirs) {
+        Ok(host) => {
+            if let Err(e) = commands::positional::apply_plugins(engine, &host, enabled) {
+                tracing::warn!(error = %e, "enabling the game plugins failed");
+            }
+            app.manage(host);
+        }
+        Err(e) => tracing::error!(error = %e, "starting the game plugin host failed"),
+    }
+}
+
+/// Sets up the in-game overlay (FR-1.46b): starts its IPC server, installs the Vulkan layer
+/// manifest if the overlay is on, and manages the runtime so commands and events can reach it.
+fn ingame_overlay_init(app: &AppHandle) {
+    let ingame = match app.state::<Engine>().settings() {
+        Ok(stored) => stored.ingame_overlay,
+        Err(e) => {
+            tracing::warn!(error = %e, "reading the in-game overlay settings failed");
+            return;
+        }
+    };
+    let shared = std::sync::Arc::new(ingame_overlay::Shared::default());
+    let runtime = ingame_overlay::init(shared, ingame);
+    runtime.shared.rebuild(&app.state::<Engine>());
+    app.manage(runtime);
 }
 
 /// Shows the window (or keeps it in the tray after a start at login) and brings the OS
@@ -249,6 +353,12 @@ fn start_window_and_autostart(app: &AppHandle) {
 fn emit_engine_event(app: &AppHandle, event: EngineEvent) -> tauri::Result<()> {
     tray::on_engine_event(app, &event);
     notifications::on_engine_event(app, &event);
+    if let (Some(runtime), Some(engine)) = (
+        app.try_state::<ingame_overlay::Runtime>(),
+        app.try_state::<Engine>(),
+    ) {
+        ingame_overlay::on_engine_event(&runtime, &engine, &event);
+    }
     match event {
         EngineEvent::StateChanged(state) => session::ConnectionStateChanged {
             state: state.into(),
@@ -324,6 +434,52 @@ fn emit_engine_event(app: &AppHandle, event: EngineEvent) -> tauri::Result<()> {
                 track: track.map(Into::into),
             }
             .emit(app)
+        }
+        EngineEvent::NowGamingChanged { session, game } => commands::now_gaming::NowGamingChanged {
+            session,
+            game: game.map(Into::into),
+        }
+        .emit(app),
+        EngineEvent::HistorySynced {
+            channel_id,
+            messages,
+        } => history::HistorySynced {
+            channel_id,
+            messages: messages.into_iter().map(Into::into).collect(),
+        }
+        .emit(app),
+        EngineEvent::HistorySyncStatus {
+            channel_id,
+            running,
+            added,
+        } => history::HistorySyncStatus {
+            channel_id,
+            running,
+            added,
+        }
+        .emit(app),
+        EngineEvent::FriendsChanged(list) => friends::FriendsChanged {
+            friends: friends::to_api_friends(list),
+        }
+        .emit(app),
+        EngineEvent::FullImageProgress {
+            reference,
+            received,
+            total,
+        } => commands::full_image::FullImageProgress {
+            reference,
+            received,
+            total,
+        }
+        .emit(app),
+        EngineEvent::PositionalStatusChanged(status) => {
+            commands::positional::PositionalStatusChanged {
+                status: status.into(),
+            }
+            .emit(app)
+        }
+        EngineEvent::PositionalSendingChanged { session, sending } => {
+            commands::positional::PositionalSendingChanged { session, sending }.emit(app)
         }
     }
 }

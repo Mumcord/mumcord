@@ -1,0 +1,10 @@
+{
+  "close": {
+    "title": "Minimizezi în tray sau închizi?",
+    "description": "Ești încă conectat. Minimizat, Mumcord te păstrează în voice și rămâne în tray-ul sistemului.",
+    "remember": "Ține minte alegerea mea",
+    "minimize": "Minimizează în tray",
+    "quit": "Închide",
+    "failed": "Nu a mers. Încearcă din nou."
+  }
+}

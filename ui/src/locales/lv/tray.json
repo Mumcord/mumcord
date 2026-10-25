@@ -1,0 +1,12 @@
+{
+  "show": "Rādīt Mumcord",
+  "mute": "Izslēgt mikrofonu",
+  "deafen": "Izslēgt skaņu",
+  "overlay": "Rādīt pārklājumu",
+  "quit": "Iziet",
+  "disconnected": "Nav savienojuma",
+  "connecting": "Savienojas…",
+  "connected": "Savienots",
+  "talking": "Savienots – runā",
+  "muted": "Savienots – izslēgts mikrofons"
+}

@@ -1,0 +1,88 @@
+{
+  "unknownName": "Te",
+  "mute": "Mikrofon némítása",
+  "deafen": "Süketítés",
+  "disconnect": "Lecsatlakozás: {{server}}",
+  "settings": "Gyorsbeállítások",
+  "announce": {
+    "muted": "Mikrofon némítva",
+    "unmuted": "Mikrofon némítása feloldva",
+    "deafened": "Süketítve. Nem hallasz másokat, és a mikrofonod némítva van",
+    "undeafened": "Süketítés feloldva"
+  },
+  "readOnly": {
+    "text": "Csak olvasol – lépj be egy csatornába a beszélgetéshez.",
+    "join": "Belépés: {{channel}}"
+  },
+  "status": {
+    "connecting": "Csatlakozás…",
+    "reconnecting": "Újracsatlakozás…",
+    "connected": "Csatlakozva",
+    "readOnly": "Csak olvasás",
+    "disconnected": "Nincs kapcsolat",
+    "playing": "Most játszik: {{game}}",
+    "listening": "Most hallgatja: {{track}}"
+  },
+  "profile": {
+    "title": "Profil szerkesztése",
+    "chooseTitle": "Profilkép kiválasztása",
+    "chooseAvatar": "Kép kiválasztása…",
+    "removeAvatar": "Kép eltávolítása",
+    "avatarHint": "A kép a szerver korlátjához igazodva kicsinyítve lesz.",
+    "avatarUnregistered": "Ez a szerver csak regisztrált felhasználók avatarját tárolja – a Mumcord minden csatlakozáskor újraküldi a tiédet.",
+    "avatarChosen": "Kiválasztva: {{name}}",
+    "avatarRemoved": "A kép mentéskor eltávolításra kerül.",
+    "comment": "Rólad"
+  },
+  "register": {
+    "title": "Regisztráció ezen a szerveren",
+    "explain": "A regisztráció lefoglalja a nevedet ezen a szerveren. Senki más nem használhatja, és a szerver megjegyez, amikor legközelebb csatlakozol.",
+    "backup": "Az identitásod bizonyítja, hogy a név a tiéd. Ha elveszíted, elveszíted a hozzáférést a regisztrált névhez. Ments most egy biztonsági másolatot, és tartsd biztonságos helyen.",
+    "password": "Jelszó a biztonsági mentés fájlhoz",
+    "export": "Identitás exportálása",
+    "saveTitle": "Identitás biztonsági mentése",
+    "passwordRequired": "Adj meg egy jelszót a biztonsági mentés fájl védelméhez.",
+    "exported": "Az identitás biztonsági mentése elkészült.",
+    "confirm": "Regisztráció",
+    "done": "Regisztrálva ezen a szerveren"
+  },
+  "errors": {
+    "tooLarge": "Ez túl nagy a szervernek. Válassz kisebb képet, vagy írj rövidebb szöveget.",
+    "denied": "A szerver ezt nem engedélyezi.",
+    "deniedWithReason": "A szerver ezt nem engedélyezi: {{reason}}",
+    "notConnected": "Nem csatlakozol szerverhez.",
+    "file": "A fájlt nem sikerült olvasni vagy írni.",
+    "generic": "Valami hiba történt. Próbáld újra."
+  },
+  "ptt": "Push-to-talk: tartsd lenyomva a(z) {{key}} billentyűt a beszédhez",
+  "pttNoKey": "Push-to-talk: nincs beállított billentyű",
+  "quickSettings": {
+    "linkPreviews": "Linkelőnézetek és beágyazások",
+    "linkPreviewsHint": "A webhelyek látják az IP-címedet",
+    "nowPlaying": "Annak megosztása, amit hallgatok",
+    "nowPlayingHint": "Mások látják az éppen szóló számot",
+    "unsupported": "macOS-en nem érhető el",
+    "theme": "Téma",
+    "theme_system": "Rendszer",
+    "theme_dark": "Sötét",
+    "theme_light": "Világos",
+    "nowGaming": "Annak megosztása, amivel játszom",
+    "nowGamingHint": "Mások látják az aktuális játékodat",
+    "unavailable": "Ezen a rendszeren nem érhető el",
+    "overlay": "Overlay",
+    "overlayHint": "Játékok fölött mutatja, ki beszél",
+    "editProfile": "Profil szerkesztése",
+    "editProfileHint": "Név, avatar és bemutatkozás",
+    "register": "Regisztráció ezen a szerveren",
+    "registered": "Regisztrálva ezen a szerveren ✓",
+    "registerHint": "Megőrzi a nevedet és az avatarodat ezen a szerveren",
+    "allSettings": "Összes beállítás…",
+    "label": "Gyorsbeállítások",
+    "positional": "Térhatású hang",
+    "positionalHint": "A hangok 3D-ben körülötted helyezkednek el",
+    "offerImages": "Teljes méretű képek felkínálása",
+    "offerImagesHint": "Mások betölthetik az eredeti képeidet",
+    "loadImages": "Teljes méretű képek betöltése",
+    "loadImagesHint": "Eredeti képek lekérése másoktól"
+  }
+}

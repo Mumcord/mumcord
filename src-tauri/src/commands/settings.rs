@@ -15,12 +15,100 @@ pub enum Theme {
     Light,
 }
 
+/// UI languages: the 24 official EU languages (FR-1.36), serialised as ISO 639-1 codes.
 #[derive(Serialize, Deserialize, Clone, Copy, Debug, PartialEq, Eq, Type)]
 #[serde(rename_all = "camelCase")]
 pub enum Language {
+    Bg,
+    Cs,
+    Da,
+    De,
+    El,
     En,
     Es,
-    De,
+    Et,
+    Fi,
+    Fr,
+    Ga,
+    Hr,
+    Hu,
+    It,
+    Lt,
+    Lv,
+    Mt,
+    Nl,
+    Pl,
+    Pt,
+    Ro,
+    Sk,
+    Sl,
+    Sv,
+}
+
+impl Language {
+    const ALL: [Language; 24] = [
+        Language::Bg,
+        Language::Cs,
+        Language::Da,
+        Language::De,
+        Language::El,
+        Language::En,
+        Language::Es,
+        Language::Et,
+        Language::Fi,
+        Language::Fr,
+        Language::Ga,
+        Language::Hr,
+        Language::Hu,
+        Language::It,
+        Language::Lt,
+        Language::Lv,
+        Language::Mt,
+        Language::Nl,
+        Language::Pl,
+        Language::Pt,
+        Language::Ro,
+        Language::Sk,
+        Language::Sl,
+        Language::Sv,
+    ];
+
+    /// ISO 639-1 code as stored in the settings file.
+    fn code(self) -> &'static str {
+        match self {
+            Language::Bg => "bg",
+            Language::Cs => "cs",
+            Language::Da => "da",
+            Language::De => "de",
+            Language::El => "el",
+            Language::En => "en",
+            Language::Es => "es",
+            Language::Et => "et",
+            Language::Fi => "fi",
+            Language::Fr => "fr",
+            Language::Ga => "ga",
+            Language::Hr => "hr",
+            Language::Hu => "hu",
+            Language::It => "it",
+            Language::Lt => "lt",
+            Language::Lv => "lv",
+            Language::Mt => "mt",
+            Language::Nl => "nl",
+            Language::Pl => "pl",
+            Language::Pt => "pt",
+            Language::Ro => "ro",
+            Language::Sk => "sk",
+            Language::Sl => "sl",
+            Language::Sv => "sv",
+        }
+    }
+
+    /// Unknown codes (e.g. from a newer version) fall back to following the OS language.
+    fn from_code(code: &str) -> Option<Self> {
+        Self::ALL
+            .into_iter()
+            .find(|language| language.code() == code)
+    }
 }
 
 #[derive(Serialize, Deserialize, Clone, Copy, Debug, PartialEq, Eq, Type)]
@@ -115,7 +203,23 @@ pub struct SoundSettings {
     pub hang_up: bool,
 }
 
-#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, Type)]
+/// Positional audio (FR-1.41): voices of people in the same game placed in 3D.
+#[derive(Serialize, Deserialize, Clone, Copy, Debug, PartialEq, Type)]
+#[serde(rename_all = "camelCase")]
+pub struct PositionalSettings {
+    /// Default off.
+    pub enabled: bool,
+    /// Metres (default 1): voices are at full volume up to this distance.
+    pub min_distance: f32,
+    /// Metres (default 15): voices are silent beyond this distance. Kept above `minDistance`
+    /// on save.
+    pub max_distance: f32,
+}
+
+/// Largest accepted distance in metres.
+const MAX_DISTANCE_M: f32 = 1000.0;
+
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Type)]
 #[serde(rename_all = "camelCase")]
 pub struct Settings {
     /// False until the first-start wizard was finished.
@@ -170,6 +274,26 @@ pub struct Settings {
     pub history_max_age_days: Option<u32>,
     /// "Share what I'm listening to" (default off; FR-1.58). Off: the media player is not read.
     pub now_playing: bool,
+    /// "Share the game I'm playing" (default off; FR-1.59). Off: no programs or Steam files
+    /// are read.
+    pub now_gaming: bool,
+    /// "Share my channel history" (default on; FR-1.60): answer history sync requests of
+    /// other Mumcord users with the stored channel messages (never private chats).
+    pub history_sharing: bool,
+    /// Accessibility: "Show keyboard hints" (default on; FR-1.69).
+    pub keyboard_hints: bool,
+    /// Accessibility: "Screen reader announcements" (default on; FR-1.69).
+    pub announcements: bool,
+    /// Accessibility: "Skip links" (default on; FR-1.69).
+    pub skip_links: bool,
+    /// "Offer my full-size images" (default on; FR-1.74): off sends thumbnails only, keeps no
+    /// original and serves none.
+    pub offer_full_images: bool,
+    /// "Load full-size images from others" (default on; FR-1.74): off shows thumbnails only
+    /// and never requests an original.
+    pub load_full_images: bool,
+    /// Positional audio (FR-1.41). Off: no game positions are read.
+    pub positional: PositionalSettings,
 }
 
 impl Settings {
@@ -182,12 +306,7 @@ impl Settings {
                 store::ThemePreference::Dark => Theme::Dark,
                 store::ThemePreference::Light => Theme::Light,
             },
-            language: s.language.as_deref().and_then(|l| match l {
-                "en" => Some(Language::En),
-                "es" => Some(Language::Es),
-                "de" => Some(Language::De),
-                _ => None,
-            }),
+            language: s.language.as_deref().and_then(Language::from_code),
             talk_mode: match s.talk_mode {
                 store::TalkMode::VoiceActivation => TalkMode::VoiceActivation,
                 store::TalkMode::PushToTalk => TalkMode::PushToTalk,
@@ -240,6 +359,18 @@ impl Settings {
             preview_cache_days: s.preview_cache_days,
             history_max_age_days: s.history_max_age_days,
             now_playing: s.now_playing,
+            now_gaming: s.now_gaming,
+            history_sharing: s.history_sharing,
+            keyboard_hints: s.keyboard_hints,
+            announcements: s.announcements,
+            skip_links: s.skip_links,
+            offer_full_images: s.offer_full_images,
+            load_full_images: s.load_full_images,
+            positional: PositionalSettings {
+                enabled: s.positional.enabled,
+                min_distance: s.positional.min_distance,
+                max_distance: s.positional.max_distance,
+            },
         }
     }
 
@@ -252,14 +383,7 @@ impl Settings {
             Theme::Dark => store::ThemePreference::Dark,
             Theme::Light => store::ThemePreference::Light,
         };
-        s.language = self.language.map(|l| {
-            match l {
-                Language::En => "en",
-                Language::Es => "es",
-                Language::De => "de",
-            }
-            .to_owned()
-        });
+        s.language = self.language.map(|l| l.code().to_owned());
         s.talk_mode = match self.talk_mode {
             TalkMode::VoiceActivation => store::TalkMode::VoiceActivation,
             TalkMode::PushToTalk => store::TalkMode::PushToTalk,
@@ -312,7 +436,28 @@ impl Settings {
         s.preview_cache_days = self.preview_cache_days.map(|d| d.max(1));
         s.history_max_age_days = self.history_max_age_days.map(|d| d.max(1));
         s.now_playing = self.now_playing;
+        s.now_gaming = self.now_gaming;
+        s.history_sharing = self.history_sharing;
+        s.keyboard_hints = self.keyboard_hints;
+        s.announcements = self.announcements;
+        s.skip_links = self.skip_links;
+        s.offer_full_images = self.offer_full_images;
+        s.load_full_images = self.load_full_images;
+        s.positional = positional_to_store(&self.positional);
         s
+    }
+}
+
+/// Validated distances: finite, `0 ≤ min < max ≤ 1000` m.
+fn positional_to_store(p: &PositionalSettings) -> store::PositionalSettings {
+    let defaults = store::PositionalSettings::default();
+    let finite = |v: f32, default: f32| if v.is_finite() { v } else { default };
+    let min = finite(p.min_distance, defaults.min_distance).clamp(0.0, MAX_DISTANCE_M - 1.0);
+    let max = finite(p.max_distance, defaults.max_distance).clamp(min + 1.0, MAX_DISTANCE_M);
+    store::PositionalSettings {
+        enabled: p.enabled,
+        min_distance: min,
+        max_distance: max,
     }
 }
 
@@ -380,12 +525,32 @@ pub async fn settings_update(
     if mouse_changed || key != active_ptt_key(&previous) {
         configure_ptt(&app, key);
     }
+    // The overlay page shows its texts in the app language.
+    if stored.language != previous.language {
+        crate::overlay::notify(&app);
+    }
     Ok(Settings::from_store(&stored))
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn every_language_code_round_trips_through_the_store() {
+        let base = store::Settings::default();
+        for language in Language::ALL {
+            let stored = Settings {
+                language: Some(language),
+                ..Settings::from_store(&base)
+            }
+            .to_store(&base);
+            assert_eq!(stored.language.as_deref(), Some(language.code()));
+            assert_eq!(Settings::from_store(&stored).language, Some(language));
+            let json = serde_json::to_string(&language).expect("serialise language");
+            assert_eq!(json, format!("\"{}\"", language.code()));
+        }
+    }
 
     #[test]
     fn round_trip_keeps_stage_1b_fields() {
@@ -421,6 +586,14 @@ mod tests {
         ui.preview_cache_days = Some(14);
         ui.history_max_age_days = Some(30);
         ui.now_playing = true;
+        ui.now_gaming = true;
+        assert!(ui.history_sharing, "history sharing is on by default");
+        ui.history_sharing = false;
+        assert!(ui.keyboard_hints && ui.announcements && ui.skip_links);
+        ui.skip_links = false;
+        assert!(ui.offer_full_images && ui.load_full_images);
+        ui.offer_full_images = false;
+        ui.load_full_images = false;
         ui.chat_display = ChatDisplay::Compact;
         let stored = ui.to_store(&base);
         assert_eq!(stored.chat_display, store::ChatDisplay::Compact);
@@ -432,6 +605,10 @@ mod tests {
         assert_eq!(stored.preview_cache_days, Some(14));
         assert_eq!(stored.history_max_age_days, Some(30));
         assert!(stored.now_playing);
+        assert!(stored.now_gaming);
+        assert!(!stored.history_sharing);
+        assert!(stored.keyboard_hints && stored.announcements && !stored.skip_links);
+        assert!(!stored.offer_full_images && !stored.load_full_images);
         assert_eq!(stored.voice_activation, store::VoiceActivation::Manual);
         assert_eq!(stored.voice_threshold_dbfs, -25);
         let too_loud = Settings {
@@ -470,10 +647,36 @@ mod tests {
     #[test]
     fn unknown_language_follows_os() {
         let s = store::Settings {
-            language: Some("fr".into()),
+            language: Some("nb".into()),
             ..store::Settings::default()
         };
         assert_eq!(Settings::from_store(&s).language, None);
+    }
+
+    #[test]
+    fn positional_distances_are_kept_valid() {
+        let base = store::Settings::default();
+        let mut ui = Settings::from_store(&base);
+        assert!(!ui.positional.enabled);
+        assert_eq!(
+            (ui.positional.min_distance, ui.positional.max_distance),
+            (1.0, 15.0)
+        );
+        ui.positional = PositionalSettings {
+            enabled: true,
+            min_distance: 5.0,
+            max_distance: 2.0,
+        };
+        let stored = ui.to_store(&base).positional;
+        assert!(stored.enabled);
+        assert_eq!((stored.min_distance, stored.max_distance), (5.0, 6.0));
+        ui.positional.min_distance = f32::NAN;
+        ui.positional.max_distance = 1e9;
+        let stored = ui.to_store(&base).positional;
+        assert_eq!(
+            (stored.min_distance, stored.max_distance),
+            (1.0, MAX_DISTANCE_M)
+        );
     }
 
     #[test]

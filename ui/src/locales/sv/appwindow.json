@@ -1,0 +1,10 @@
+{
+  "close": {
+    "title": "Minimera till systemfältet eller avsluta?",
+    "description": "Du är fortfarande ansluten. När Mumcord är minimerat är du kvar i samtalet och appen ligger i systemfältet.",
+    "remember": "Kom ihåg mitt val",
+    "minimize": "Minimera till systemfältet",
+    "quit": "Avsluta",
+    "failed": "Det fungerade inte. Försök igen."
+  }
+}

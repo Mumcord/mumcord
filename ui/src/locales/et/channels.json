@@ -1,0 +1,71 @@
+{
+  "serverOverview": "Serveri ülevaade",
+  "tree": {
+    "label": "Kanalid",
+    "hint": "Enter: näita vestlust · Shift+Enter või topeltklõps: liitu · Nooleklahvid: liigu, laienda, ahenda",
+    "join": "Liitu",
+    "you": "(sina)",
+    "voiceHere": "oled siin (hääl)",
+    "people_one": "{{count}} inimene",
+    "people_other": "{{count}} inimest",
+    "stack": {
+      "some": "{{shown}} / {{total}} inimest: {{names}} ja veel {{rest}}",
+      "all_one": "{{count}} inimene: {{names}}",
+      "all_other": "{{count}} inimest: {{names}}",
+      "person": "{{name}} ({{status}})"
+    },
+    "showAll": "Näita kõiki ({{total}})",
+    "showFewer": "Näita vähem",
+    "jump": "Hüppa minu kanalisse"
+  },
+  "status": {
+    "listening": "kuulab",
+    "talking": "räägib",
+    "muted": "vaigistatud",
+    "deafened": "kurdistatud",
+    "serverMuted": "serveri poolt vaigistatud",
+    "serverDeafened": "serveri poolt kurdistatud",
+    "suppressed": "summutatud (ei saa siin rääkida)",
+    "localMuted": "sinu jaoks vaigistatud",
+    "unregistered": "registreerimata"
+  },
+  "mumcordBadge": "Kasutab Mumcordi",
+  "statusTip": {
+    "registered": "Registreeritud sellel serveril",
+    "listening": "Kuulab seda kanalit",
+    "muted": "Vaigistatud",
+    "deafened": "Kurdistatud",
+    "serverMuted": "Server vaigistas",
+    "serverDeafened": "Server kurdistas",
+    "suppressed": "Summutatud – ei saa selles kanalis rääkida",
+    "localMuted": "Sinu jaoks vaigistatud",
+    "unregistered": "Sellel serveril registreerimata (külaline)",
+    "nowPlaying": "Kuulab: {{track}}",
+    "nowGaming": "Mängib: {{game}}",
+    "positional": "Positsiooniheli on aktiivne"
+  },
+  "announce": {
+    "joined": "{{name}} liitus sinu kanaliga",
+    "left": "{{name}} lahkus sinu kanalist",
+    "talking": "{{name}} räägib"
+  },
+  "errors": {
+    "joinDenied": "Sul pole luba sellesse kanalisse siseneda.",
+    "joinFailed": "Kanaliga liitumine ei õnnestunud. Proovi palun uuesti.",
+    "notConnected": "Serveriga pole ühendatud."
+  },
+  "empty": {
+    "disconnected": "Ühendus puudub. Vali server, et selle kanaleid näha.",
+    "loading": "Laadin kanaleid…"
+  },
+  "search": {
+    "label": "Otsi kanaleid ja inimesi",
+    "clear": "Tühjenda otsing",
+    "empty": "Päringule „{{query}}“ ei vasta ükski kanal ega inimene.",
+    "count": "{{channels}}, {{people}}",
+    "channels_one": "{{count}} kanal",
+    "channels_other": "{{count}} kanalit",
+    "people_one": "{{count}} inimene",
+    "people_other": "{{count}} inimest"
+  }
+}

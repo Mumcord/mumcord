@@ -23,12 +23,14 @@ async function createIdentity(name = "Tobias") {
 }
 
 describe("Wizard", () => {
-  it("finishes with the defaults in three steps and saves wizardCompleted", async () => {
+  it("finishes with the defaults in four steps and saves wizardCompleted", async () => {
     renderInWizard(harness, <Wizard />);
     const micHeading = await createIdentity();
     await waitFor(() => expect(micHeading).toHaveFocus());
     expect(await harness.api.identityGet()).toEqual({ name: "Tobias", certHash: "selfhash" });
 
+    fireEvent.click(screen.getByRole("button", { name: "Next" }));
+    await screen.findByRole("heading", { name: "Your privacy" });
     fireEvent.click(screen.getByRole("button", { name: "Next" }));
     const talkHeading = await screen.findByRole("heading", { name: "How do you want to talk?" });
     await waitFor(() => expect(talkHeading).toHaveFocus());
@@ -47,12 +49,13 @@ describe("Wizard", () => {
     expect(await harness.api.linkHandlerStatus()).toBe(true);
     expect(saved.autostart).toBe(false);
     expect(saved.linkPreviews).toBe(true);
+    expect(saved.historySharing).toBe(true);
   });
 
   it("announces the step through the focused heading's description", async () => {
     renderInWizard(harness, <Wizard />);
     const heading = await createIdentity();
-    expect(heading).toHaveAccessibleDescription("Step 2 of 3");
+    expect(heading).toHaveAccessibleDescription("Step 2 of 4");
   });
 
   it("politely announces each new step", async () => {
@@ -65,7 +68,7 @@ describe("Wizard", () => {
     expect(spoken).toEqual([]);
     await createIdentity();
     await waitFor(() => {
-      expect(spoken).toEqual(["Microphone. Step 2 of 3"]);
+      expect(spoken).toEqual(["Microphone. Step 2 of 4"]);
     });
     unsubscribe();
   });
@@ -82,6 +85,8 @@ describe("Wizard", () => {
     const micH = await screen.findByRole("heading", { name: "Microphone" });
     await waitFor(() => expect(micH).toHaveFocus());
 
+    fireEvent.submit(form());
+    await screen.findByRole("heading", { name: "Your privacy" });
     fireEvent.submit(form());
     const talkH = await screen.findByRole("heading", { name: "How do you want to talk?" });
     await waitFor(() => expect(talkH).toHaveFocus());
@@ -145,6 +150,8 @@ describe("Wizard", () => {
     renderInWizard(harness, <Wizard />);
     await createIdentity();
     fireEvent.click(screen.getByRole("button", { name: "Next" }));
+    await screen.findByRole("heading", { name: "Your privacy" });
+    fireEvent.click(screen.getByRole("button", { name: "Next" }));
     await screen.findByRole("heading", { name: "How do you want to talk?" });
     harness.api.mock.failNext("settingsUpdate", "internal");
     fireEvent.click(screen.getByRole("button", { name: "Finish" }));
@@ -160,6 +167,8 @@ describe("Wizard", () => {
     renderInWizard(harness, <Wizard />);
     await createIdentity();
     fireEvent.click(screen.getByRole("button", { name: "Next" }));
+    await screen.findByRole("heading", { name: "Your privacy" });
+    fireEvent.click(screen.getByRole("button", { name: "Next" }));
     await screen.findByRole("heading", { name: "How do you want to talk?" });
     harness.api.mock.failNext("linkHandlerRegister", "internal");
     fireEvent.click(screen.getByRole("button", { name: "Finish" }));
@@ -173,6 +182,8 @@ describe("Wizard", () => {
   it("does not register the link handler when unticked", async () => {
     renderInWizard(harness, <Wizard />);
     await createIdentity();
+    fireEvent.click(screen.getByRole("button", { name: "Next" }));
+    await screen.findByRole("heading", { name: "Your privacy" });
     fireEvent.click(screen.getByRole("button", { name: "Next" }));
     fireEvent.click(
       await screen.findByRole("checkbox", { name: "Open mumble:// links with Mumcord" }),
@@ -188,6 +199,8 @@ describe("Wizard", () => {
     renderInWizard(harness, <Wizard />);
     await createIdentity();
     fireEvent.click(screen.getByRole("button", { name: "Next" }));
+    await screen.findByRole("heading", { name: "Your privacy" });
+    fireEvent.click(screen.getByRole("button", { name: "Next" }));
     fireEvent.click(await screen.findByRole("checkbox", { name: "Start Mumcord when I log in" }));
     fireEvent.click(screen.getByRole("button", { name: "Finish" }));
     await waitFor(() => {
@@ -202,6 +215,8 @@ describe("Wizard", () => {
     renderInWizard(harness, <Wizard />);
     await createIdentity();
     fireEvent.click(screen.getByRole("button", { name: "Next" }));
+    await screen.findByRole("heading", { name: "Your privacy" });
+    fireEvent.click(screen.getByRole("button", { name: "Next" }));
     const previews = await screen.findByRole("checkbox", { name: "Show link previews and embeds" });
     expect(previews).toBeChecked();
     expect(previews).toHaveAccessibleDescription(/see your IP address/);
@@ -215,6 +230,26 @@ describe("Wizard", () => {
     expect(harness.applySettings).toHaveBeenCalledWith(saved);
   });
 
+  it("offers channel history sharing, on by default, and turns it off when unticked", async () => {
+    renderInWizard(harness, <Wizard />);
+    await createIdentity();
+    fireEvent.click(screen.getByRole("button", { name: "Next" }));
+    await screen.findByRole("heading", { name: "Your privacy" });
+    fireEvent.click(screen.getByRole("button", { name: "Next" }));
+    const sharing = await screen.findByRole("checkbox", { name: "Share my channel history" });
+    expect(sharing).toBeChecked();
+    expect(sharing).toHaveAccessibleDescription(/Private chats are never shared/);
+    fireEvent.click(sharing);
+    fireEvent.click(screen.getByRole("button", { name: "Finish" }));
+    await waitFor(() => {
+      expect(harness.finishWizard).toHaveBeenCalledOnce();
+    });
+    expect(await harness.api.settingsGet()).toMatchObject({
+      wizardCompleted: true,
+      historySharing: false,
+    });
+  });
+
   it("finishes even when start at login cannot be set up, and says so", async () => {
     const spoken: string[] = [];
     const unsubscribe = subscribeAnnouncements((a) => spoken.push(a.message));
@@ -226,6 +261,8 @@ describe("Wizard", () => {
     );
     renderInWizard(harness, <Wizard />);
     await createIdentity();
+    fireEvent.click(screen.getByRole("button", { name: "Next" }));
+    await screen.findByRole("heading", { name: "Your privacy" });
     fireEvent.click(screen.getByRole("button", { name: "Next" }));
     fireEvent.click(await screen.findByRole("checkbox", { name: "Start Mumcord when I log in" }));
     fireEvent.click(screen.getByRole("button", { name: "Finish" }));
@@ -244,6 +281,8 @@ describe("Wizard", () => {
     expect(await axeViolations(container)).toEqual([]);
     await createIdentity();
     expect(await axeViolations(container)).toEqual([]);
+    fireEvent.click(screen.getByRole("button", { name: "Next" }));
+    await screen.findByRole("heading", { name: "Your privacy" });
     fireEvent.click(screen.getByRole("button", { name: "Next" }));
     await screen.findByRole("heading", { name: "How do you want to talk?" });
     fireEvent.click(screen.getByRole("radio", { name: /Push to talk/ }));

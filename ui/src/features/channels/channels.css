@@ -199,6 +199,18 @@
   font-size: var(--font-size-sm);
 }
 
+/* Heading above the channel tree, styled like the "Direct messages" heading (follow.css). */
+.server-overview {
+  padding: var(--space-2) var(--space-2) 0;
+}
+
+.server-overview h2 {
+  margin: 0 0 var(--space-1);
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+  text-transform: uppercase;
+}
+
 /* Row above the tree: the server name with its menu (if any), then "Jump to my channel". */
 .channels-header {
   display: flex;

@@ -13,11 +13,18 @@ import type {
   ConnectionStats,
   Conversation,
   ErrorCode,
+  Friend,
   HistoryScope,
   Identity,
   InlineImage,
   LinkPreview,
   MumbleLink,
+  GameKey,
+  GameOverlayEntry,
+  GamePlugin,
+  InGameOverlayState,
+  OverlaySettings,
+  OverlayState,
   PttAvailability,
   PttMouseStatus,
   SavedServer,
@@ -63,6 +70,15 @@ export interface MockControls {
   requireCertTrust(serverId: number, previousFingerprint?: string): void;
   /** Simulates an incoming message from another person. */
   receiveMessage(conversation: Conversation, body: string, senderSession: number): ChatMessage;
+  /**
+   * What the next `historySyncRequest` for `channelId` finds in `holderName`'s history
+   * (FR-1.60); without it, a sync finds nothing.
+   */
+  offerHistory(
+    channelId: number,
+    holderName: string,
+    lines: readonly { senderName: string; body: string; sentAt: string }[],
+  ): void;
   /** Simulates a dropped connection; the mock enters `reconnecting`. */
   loseConnection(): void;
   /** Ends a reconnect attempt successfully. */
@@ -81,6 +97,10 @@ export interface MockControls {
   desktopNotices(): readonly MessageNotice[];
   /** Sounds `notifyMessage` played for incoming messages, oldest first (QA.41). */
   messageSounds(): readonly ("message" | "mention")[];
+  /** Simulates a person leaving the server. */
+  removeUser(session: number): void;
+  /** Simulates a person joining the server (or changing, if the session exists). */
+  upsertUser(user: User): void;
 }
 
 export type MockApi = MumcordApi & { readonly mock: MockControls };
@@ -126,10 +146,29 @@ const DEFAULT_SETTINGS: Settings = {
   previewCacheDays: 7,
   historyMaxAgeDays: null,
   nowPlaying: false,
+  nowGaming: false,
+  historySharing: true,
+  keyboardHints: true,
+  announcements: true,
+  skipLinks: true,
+  offerFullImages: true,
+  loadFullImages: true,
+  positional: { enabled: false, minDistance: 1, maxDistance: 15 },
+};
+
+const DEFAULT_OVERLAY: OverlaySettings = {
+  enabled: false,
+  showWholeChannel: false,
+  showChannelName: true,
+  opacity: 90,
+  corner: "topLeft",
+  customPosition: null,
+  width: 240,
+  height: 320,
 };
 
 /** Offline stand-in for the engine's link previews: a YouTube player card or a page card. */
-function mockLinkPreview(url: string): LinkPreview | null {
+function mockLinkPreview(url: string, demo: boolean): LinkPreview | null {
   let parsed: URL;
   try {
     parsed = new URL(url);
@@ -155,6 +194,17 @@ function mockLinkPreview(url: string): LinkPreview | null {
       isImage: false,
     };
   }
+  if (demo) {
+    return {
+      url,
+      siteName: parsed.hostname,
+      title: "Squad notes",
+      description: "Fictional notes from last week's session.",
+      image: demoPicture(),
+      video: null,
+      isImage: false,
+    };
+  }
   return {
     url,
     siteName: parsed.hostname,
@@ -167,9 +217,10 @@ function mockLinkPreview(url: string): LinkPreview | null {
 }
 
 /** Offline stand-in for the engine's inline images: the same small picture for every http(s) URL. */
-function mockInlineImage(url: string): InlineImage | null {
+function mockInlineImage(url: string, demo: boolean): InlineImage | null {
   if (!/^https?:\/\//i.test(url)) return null;
-  return { url, src: MOCK_DEFAULT_AVATAR, width: 320, height: 180, animated: false };
+  const src = demo ? DEMO_PHOTO : MOCK_DEFAULT_AVATAR;
+  return { url, src, width: 320, height: 180, animated: false };
 }
 
 /** 1×1 PNG standing in for any image chosen as the default avatar. */
@@ -292,6 +343,26 @@ const DEMO_AVATARS = new Map<number, string>([
   [15, demoAvatar("#a855f7", "#3b82f6")],
 ]);
 
+/** Abstract landscape (sun over hills) standing in for a page picture or an inline image. */
+function demoPicture(): string {
+  const svg =
+    `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 180">` +
+    `<defs><linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">` +
+    `<stop offset="0" stop-color="#0f172a"/><stop offset="1" stop-color="#f97316"/></linearGradient></defs>` +
+    `<rect width="320" height="180" fill="url(#sky)"/>` +
+    `<circle cx="236" cy="72" r="26" fill="#fde68a"/>` +
+    `<path d="M0 130 L80 84 L160 128 L230 96 L320 140 V180 H0Z" fill="#1e293b"/>` +
+    `<path d="M0 160 L110 132 L210 158 L320 136 V180 H0Z" fill="#0f172a"/></svg>`;
+  return `data:image/svg+xml,${encodeURIComponent(svg)}`;
+}
+
+/**
+ * The landscape of `demoPicture` as a WebP (640×360): inline images only accept raster pictures,
+ * like the engine delivers them.
+ */
+const DEMO_PHOTO =
+  "data:image/webp;base64,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";
+
 function demoHistory(): ChatMessage[] {
   const lines: [number, string, string, number][] = [
     [2, "Maya", "Evening everyone! Anyone up for a round later?", 34],
@@ -305,6 +376,7 @@ function demoHistory(): ChatMessage[] {
       12,
     ],
     [2, "Maya", "Also: new mics sound great, thanks for the tips!", 11],
+    [5, "Jonas", "Photo from the lake trip: https://images.example.org/lake.png", 9],
     [5, "Jonas", "Back. Who's hosting?", 2],
   ];
   return lines.map(([session, name, body, minutesAgo], index) => ({
@@ -317,6 +389,7 @@ function demoHistory(): ChatMessage[] {
     sentAt: new Date(Date.now() - minutesAgo * 60_000).toISOString(),
     body,
     dismissedPreviews: [],
+    syncedFrom: null,
   }));
 }
 
@@ -338,6 +411,8 @@ function person(session: number, name: string, channelId: number, certHash: stri
     hasComment: false,
     volume: 100,
     localMute: false,
+    isMumcord: false,
+    mumcordFeatures: [],
   };
 }
 
@@ -391,11 +466,27 @@ export function createMockApi(options: MockOptions = {}): MockApi {
   const connectDelayMs = options.connectDelayMs ?? 0;
 
   const listeners = new Map<EventName, Set<(payload: never) => void>>();
+  /** Private notes by session (FR-1.63); the engine keys them by certificate hash. */
+  const notes = new Map<number, string>();
+  /** Friends by certificate hash (FR-1.64); online state is derived from the snapshot. */
+  const friends = new Map<string, { name: string; addedAt: string; lastSeenAt: string | null }>();
+  let shownFriends = "[]";
   const failures = new Map<CommandName, ApiError>();
   const certPrompts = new Map<number, string | null>();
 
   let identity: Identity | null = fresh ? null : { name: "Zoe", certHash: "selfhash" };
   let settings: Settings = { ...DEFAULT_SETTINGS, wizardCompleted: !fresh };
+  // One official game plugin as found in a Mumble installation; no game runs in the mock.
+  let gamePlugins: GamePlugin[] = [
+    {
+      id: "gtav",
+      name: "Grand Theft Auto V",
+      version: "1.0.0",
+      enabled: false,
+      active: false,
+      problem: null,
+    },
+  ];
   let defaultAvatar: string | null = demo ? demoAvatar("#14b8a6", "#3b82f6") : null;
   let servers: SavedServer[] = fresh
     ? []
@@ -435,6 +526,46 @@ export function createMockApi(options: MockOptions = {}): MockApi {
   let readOnly = false;
   let ownVoice = { mute: false, deaf: false };
   let windowFocused = true;
+  let overlay: OverlayState = {
+    settings: DEFAULT_OVERLAY,
+    moveMode: false,
+    onTopSupported: true,
+    positionSupported: true,
+    explanationKey: null,
+    kdeWayland: false,
+    kwinRuleInstalled: false,
+    language: null,
+  };
+  const setOverlay = (next: OverlayState) => {
+    overlay = next;
+    emit("overlayChanged", { state: overlay });
+    return Promise.resolve(overlay);
+  };
+  let ingameOverlay: InGameOverlayState = {
+    supported: true,
+    explanationKey: null,
+    mode: "off",
+    games: [],
+    known: [],
+    running: [],
+  };
+  const setIngameOverlay = (next: InGameOverlayState) => {
+    ingameOverlay = next;
+    emit("inGameOverlayChanged", { state: ingameOverlay });
+    return Promise.resolve(ingameOverlay);
+  };
+  const effectOf = (entry: GameOverlayEntry): InGameOverlayState["games"][number]["effective"] => {
+    if (ingameOverlay.mode === "off") return "globalOff";
+    if (entry.blocklist && !entry.riskConfirmed) return "blocked";
+    if (entry.enabled === false) return "gameOff";
+    if (entry.enabled === null && entry.blocklist) return "blocked";
+    return "show";
+  };
+  const sameKey = (a: GameKey, b: GameKey) =>
+    a.kind === b.kind &&
+    (a.kind === "steam"
+      ? a.value === (b as { value: number }).value
+      : a.value.toLowerCase() === (b as { value: string }).value.toLowerCase());
   const desktopNotices: MessageNotice[] = [];
   const messageSounds: ("message" | "mention")[] = [];
   const rejoinOffers = new Map<number, string[]>();
@@ -445,10 +576,64 @@ export function createMockApi(options: MockOptions = {}): MockApi {
       : [],
   );
 
-  function emit<K extends EventName>(event: K, payload: EventPayloads[K]): void {
+  function dispatch<K extends EventName>(event: K, payload: EventPayloads[K]): void {
     const set = listeners.get(event);
     if (!set) return;
     for (const handler of set) (handler as (p: EventPayloads[K]) => void)(payload);
+  }
+
+  /** Friends as the engine reports them: online first, then by name. */
+  function friendViews(): Friend[] {
+    const live = state.state === "connected" ? snapshot : null;
+    const views = [...friends].map(([certHash, f]): Friend => {
+      const user = live?.users.find((u) => u.certHash === certHash && u.session !== SELF_SESSION);
+      return {
+        certHash,
+        name: user?.name ?? f.name,
+        addedAt: f.addedAt,
+        lastSeenAt: f.lastSeenAt,
+        online:
+          user && live
+            ? { serverId: live.serverId, session: user.session, channelId: user.channelId }
+            : null,
+      };
+    });
+    return views.sort(
+      (a, b) =>
+        Number(b.online !== null) - Number(a.online !== null) ||
+        a.name.toLowerCase().localeCompare(b.name.toLowerCase()),
+    );
+  }
+
+  /** Like the engine, emits `friendsChanged` after any event that changes the list. */
+  function refreshFriends(): void {
+    const now = new Date().toISOString();
+    const before = new Map(
+      (JSON.parse(shownFriends) as Friend[]).map((f) => [f.certHash, f.online !== null]),
+    );
+    const views = friendViews();
+    for (const view of views) {
+      const friend = friends.get(view.certHash);
+      if (!friend) continue;
+      if (before.get(view.certHash) === true && view.online === null) friend.lastSeenAt = now;
+      if (view.online !== null) friend.name = view.name;
+    }
+    const next = JSON.stringify(friendViews());
+    if (next === shownFriends) return;
+    shownFriends = next;
+    dispatch("friendsChanged", { friends: JSON.parse(next) as Friend[] });
+  }
+
+  function emit<K extends EventName>(event: K, payload: EventPayloads[K]): void {
+    dispatch(event, payload);
+    if (
+      event === "serverSynced" ||
+      event === "userUpserted" ||
+      event === "userRemoved" ||
+      event === "connectionStateChanged"
+    ) {
+      refreshFriends();
+    }
   }
 
   function on<K extends EventName>(
@@ -514,6 +699,12 @@ export function createMockApi(options: MockOptions = {}): MockApi {
   let cachedPreviewBytes = 1_468_006;
   // GIF favorites, most recently used first.
   let gifFavorites: string[] = [];
+  /** Originals kept by `fullImageKeep`, by reference. */
+  const fullImages = new Map<string, string>();
+  const offeredHistory = new Map<
+    number,
+    { holderName: string; lines: readonly { senderName: string; body: string; sentAt: string }[] }
+  >();
 
   function serverHistory(serverId: number): Map<string, ChatMessage[]> {
     let map = history.get(serverId);
@@ -530,6 +721,20 @@ export function createMockApi(options: MockOptions = {}): MockApi {
     const map = serverHistory(snap.serverId);
     const key = conversationKey(message.conversation);
     map.set(key, [...(map.get(key) ?? []), message]);
+  }
+
+  /** Stores a synced message at its time position, as the engine's store orders by time. */
+  function storeByTime(message: ChatMessage): void {
+    const snap = requireSnapshot();
+    if (!requireServer(snap.serverId).saveHistory) return;
+    const map = serverHistory(snap.serverId);
+    const key = conversationKey(message.conversation);
+    const list = [...(map.get(key) ?? [])];
+    const time = Date.parse(message.sentAt);
+    let at = list.length;
+    while (at > 0 && Date.parse(list[at - 1]?.sentAt ?? "") > time) at -= 1;
+    list.splice(at, 0, message);
+    map.set(key, list);
   }
 
   function checkSize(html: string): void {
@@ -712,6 +917,7 @@ export function createMockApi(options: MockOptions = {}): MockApi {
       sentAt: new Date().toISOString(),
       body: html,
       dismissedPreviews: [],
+      syncedFrom: null,
     };
     store(message);
     return message;
@@ -870,6 +1076,33 @@ export function createMockApi(options: MockOptions = {}): MockApi {
       updateUser(session, { localMute: muted });
       return Promise.resolve(null);
     },
+    personSetNote: (session, note) => {
+      requireUser(session);
+      if (Array.from(note).length > 1000) fail("invalidInput", "note is too long");
+      notes.set(session, note);
+      return Promise.resolve(null);
+    },
+    friendsList: () => Promise.resolve(friendViews()),
+    friendAdd: (session) => {
+      if (session === SELF_SESSION) fail("invalidInput", "you cannot be your own friend");
+      const user = requireUser(session);
+      if (user.certHash === null) {
+        fail("invalidInput", "people without a certificate cannot be friends");
+      }
+      const known = friends.get(user.certHash);
+      friends.set(user.certHash, {
+        name: user.name,
+        addedAt: known?.addedAt ?? new Date().toISOString(),
+        lastSeenAt: known?.lastSeenAt ?? null,
+      });
+      refreshFriends();
+      return Promise.resolve(null);
+    },
+    friendRemove: (certHash) => {
+      friends.delete(certHash);
+      refreshFriends();
+      return Promise.resolve(null);
+    },
     personProfile: (session) => {
       const user = requireUser(session);
       return Promise.resolve({
@@ -881,6 +1114,7 @@ export function createMockApi(options: MockOptions = {}): MockApi {
             (demo ? DEMO_AVATARS.get(session) : undefined) ??
             "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAIAAAD8GO2jAAAAd0lEQVR42u3UwQ2AMAwDwE7HGt2DCRmDTdw/KIlFHIRQrHzrE5Qwzn2WzmiggQZoALcoARjRAHCTBUDkOQA6H35FAuCYmz8+EB7/DYCCXJ+gov1dQGiYl1wOSIz4MxW2m3ugavcWTdIeb3Kmmv1VOAxzlgIyUw4sffQx8QiPKKAAAAAASUVORK5CYII=")
           : null,
+        note: notes.get(session) ?? "",
       });
     },
 
@@ -1003,8 +1237,10 @@ export function createMockApi(options: MockOptions = {}): MockApi {
     },
 
     // links
-    linkPreview: (url) => Promise.resolve(settings.linkPreviews ? mockLinkPreview(url) : null),
-    inlineImage: (url) => Promise.resolve(settings.linkPreviews ? mockInlineImage(url) : null),
+    linkPreview: (url) =>
+      Promise.resolve(settings.linkPreviews ? mockLinkPreview(url, demo) : null),
+    inlineImage: (url) =>
+      Promise.resolve(settings.linkPreviews ? mockInlineImage(url, demo) : null),
     previewDismiss: (messageId, url) => {
       for (const conversations of history.values()) {
         for (const messages of conversations.values()) {
@@ -1031,6 +1267,53 @@ export function createMockApi(options: MockOptions = {}): MockApi {
       return Promise.resolve(null);
     },
     saveImage: () => Promise.resolve(null),
+    // The browser has no native file drops; dropped files arrive as `File` objects instead.
+    readDroppedImage: () =>
+      Promise.reject(new EngineError("notFound", "no native file drops in the mock")),
+    // Full images (FR-1.60c): kept originals are "fetched" back at once, with one progress event.
+    fullImageKeep: (dataUrl) => {
+      if (!settings.offerFullImages)
+        fail("invalidInput", "offering full-size images is switched off");
+      let hash = 0x811c9dc5;
+      for (let i = 0; i < dataUrl.length; i++)
+        hash = Math.imul(hash ^ dataUrl.charCodeAt(i), 16777619);
+      const hex = (hash >>> 0).toString(16).padStart(8, "0").repeat(8);
+      const reference = `${hex}:${String(Math.max(1, Math.floor(dataUrl.length * 0.75)))}`;
+      fullImages.set(reference, dataUrl);
+      return Promise.resolve(reference);
+    },
+    historySyncRequest: (channelId) => {
+      const snap = requireSnapshot();
+      if (!snap.info.followSupported)
+        fail("serverTooOld", "history sync needs a Mumble 1.4+ server");
+      if (channelId !== selfUser().channelId && !snap.followedChannelIds.includes(channelId))
+        fail("notFound", "channel is neither joined nor followed");
+      emit("historySyncStatus", { channelId, running: true, added: 0 });
+      const offer = offeredHistory.get(channelId);
+      offeredHistory.delete(channelId);
+      const messages: ChatMessage[] = (offer?.lines ?? []).map((line) => ({
+        id: String(nextMessageId++),
+        conversation: { kind: "channel", channelId },
+        senderName: line.senderName,
+        senderCertHash: null,
+        senderSession: null,
+        own: false,
+        sentAt: line.sentAt,
+        body: line.body,
+        dismissedPreviews: [],
+        syncedFrom: offer?.holderName ?? null,
+      }));
+      messages.sort((a, b) => Date.parse(a.sentAt) - Date.parse(b.sentAt));
+      for (const message of messages) storeByTime(message);
+      if (messages.length > 0) emit("historySynced", { channelId, messages });
+      emit("historySyncStatus", { channelId, running: false, added: messages.length });
+      return Promise.resolve(null);
+    },
+    fullImageFetch: (reference) => {
+      const src = settings.loadFullImages ? (fullImages.get(reference) ?? null) : null;
+      if (src !== null) emit("fullImageProgress", { reference, received: 1, total: 1 });
+      return Promise.resolve(src);
+    },
     previewCacheClear: () => {
       const freed = cachedPreviewBytes;
       cachedPreviewBytes = 0;
@@ -1041,10 +1324,76 @@ export function createMockApi(options: MockOptions = {}): MockApi {
     nowPlayingStatus: () => Promise.resolve({ supported: true, track: null }),
     nowPlayingCover: () => Promise.resolve(null),
 
+    // now gaming: no game detection in the mock; other people's games come from `mock.emit`.
+    nowGamingStatus: () => Promise.resolve({ supported: true, game: null }),
+    nowGamingIcon: () => Promise.resolve(null),
+    nowGamingJoin: () => Promise.resolve(null),
+
+    // positional audio: no game delivers positions in the mock; "3D" icons come from `mock.emit`.
+    positionalStatus: () =>
+      Promise.resolve({
+        enabled: settings.positional.enabled,
+        source: null,
+        game: null,
+        senders: [],
+      }),
+
+    pluginsList: () => Promise.resolve(gamePlugins.map((p) => ({ ...p }))),
+    pluginSetEnabled: (id, enabled) => {
+      if (!gamePlugins.some((p) => p.id === id)) fail("notFound", "no such game plugin");
+      gamePlugins = gamePlugins.map((p) => (p.id === id ? { ...p, enabled } : p));
+      return Promise.resolve(gamePlugins.map((p) => ({ ...p })));
+    },
+
+    // overlay: no window in the mock; the state round-trips like the engine's.
+    overlayState: () => Promise.resolve(overlay),
+    overlayUpdate: (next) =>
+      setOverlay({
+        ...overlay,
+        settings: next,
+        moveMode: next.enabled && overlay.moveMode,
+      }),
+    overlaySetEnabled: (enabled) =>
+      setOverlay({
+        ...overlay,
+        settings: { ...overlay.settings, enabled },
+        moveMode: enabled && overlay.moveMode,
+      }),
+    overlayKwinRuleInstall: () => setOverlay({ ...overlay, kwinRuleInstalled: true }),
+    overlayKwinRuleRemove: () => setOverlay({ ...overlay, kwinRuleInstalled: false }),
+    overlayOpenKdeWindowRules: () => Promise.resolve(null),
+    overlayMoveMode: (active) =>
+      setOverlay({ ...overlay, moveMode: overlay.settings.enabled && active }),
+
+    // in-game overlay (FR-1.46b)
+    ingameOverlayState: () => Promise.resolve(ingameOverlay),
+    ingameOverlaySetMode: (mode) => {
+      const games = ingameOverlay.games.map((g) => ({ ...g, effective: effectOf({ ...g }) }));
+      return setIngameOverlay({ ...ingameOverlay, mode, games });
+    },
+    ingameOverlaySetGame: (entry) => {
+      const withEffect = { ...entry, effective: effectOf(entry) };
+      const games = ingameOverlay.games.filter((g) => !sameKey(g.key, entry.key));
+      games.push(withEffect);
+      const known = ingameOverlay.known.filter((k) => !sameKey(k.key, entry.key));
+      return setIngameOverlay({ ...ingameOverlay, games, known });
+    },
+    ingameOverlayRemoveGame: (key) =>
+      setIngameOverlay({
+        ...ingameOverlay,
+        games: ingameOverlay.games.filter((g) => !sameKey(g.key, key)),
+      }),
+
     // settings
     settingsGet: () => Promise.resolve({ ...settings }),
     settingsUpdate: (next) => {
+      const positionalSwitched = next.positional.enabled !== settings.positional.enabled;
       settings = { ...next };
+      if (positionalSwitched) {
+        emit("positionalStatusChanged", {
+          status: { enabled: settings.positional.enabled, source: null, game: null, senders: [] },
+        });
+      }
       return Promise.resolve({ ...settings });
     },
 
@@ -1081,7 +1430,12 @@ export function createMockApi(options: MockOptions = {}): MockApi {
     pttCaptureKey: (key) => Promise.resolve(demo || /^Mouse(Middle|4|5)$/.test(key) ? key : "F13"),
     pttMouseStatus: () => Promise.resolve<PttMouseStatus>({ support: "native", state: "ready" }),
     pttCaptureCancel: () => Promise.resolve(null),
-    pttSession: () => Promise.resolve({ waylandDesktop: false, compatibilityActive: false }),
+    pttSession: () =>
+      Promise.resolve({ waylandDesktop: false, compatibilityActive: false, kde: false }),
+    pttOpenKdeX11Settings: () => Promise.resolve(null),
+    pttKdeX11Access: () => Promise.resolve({ allowed: false, undoAvailable: false }),
+    pttKdeX11AllowMouse: () => Promise.resolve({ allowed: true, undoAvailable: true }),
+    pttKdeX11Undo: () => Promise.resolve({ allowed: false, undoAvailable: false }),
 
     // app
     appRestart: () => Promise.resolve(null),
@@ -1103,7 +1457,7 @@ export function createMockApi(options: MockOptions = {}): MockApi {
       Promise.resolve(
         demo
           ? {
-              version: "0.1.0",
+              version: "0.3.0",
               os: "Linux x86_64",
               thirdPartyNotices:
                 "Mumble\nCopyright (c) The Mumble Developers\nBSD-3-Clause\n\nTauri - Apache-2.0 OR MIT\n\nReact - MIT",
@@ -1158,6 +1512,9 @@ export function createMockApi(options: MockOptions = {}): MockApi {
     requireCertTrust: (serverId, previousFingerprint) => {
       certPrompts.set(serverId, previousFingerprint ?? null);
     },
+    offerHistory: (channelId, holderName, lines) => {
+      offeredHistory.set(channelId, { holderName, lines });
+    },
     receiveMessage: (conversation, body, senderSession) => {
       const sender = requireUser(senderSession);
       const message: ChatMessage = {
@@ -1170,6 +1527,7 @@ export function createMockApi(options: MockOptions = {}): MockApi {
         sentAt: new Date().toISOString(),
         body,
         dismissedPreviews: [],
+        syncedFrom: null,
       };
       store(message);
       emit("messageReceived", { message });
@@ -1215,6 +1573,16 @@ export function createMockApi(options: MockOptions = {}): MockApi {
     },
     desktopNotices: () => desktopNotices,
     messageSounds: () => messageSounds,
+    removeUser: (session) => {
+      const snap = requireSnapshot();
+      snap.users = snap.users.filter((u) => u.session !== session);
+      emit("userRemoved", { session });
+    },
+    upsertUser: (user) => {
+      const snap = requireSnapshot();
+      snap.users = [...snap.users.filter((u) => u.session !== user.session), user];
+      emit("userUpserted", { user });
+    },
   };
 
   const api: MockApi = { ...guarded, kind: "mock", on, mock };

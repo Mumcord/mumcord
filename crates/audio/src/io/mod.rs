@@ -2,7 +2,7 @@
 //!
 //! [`AudioIo::start`] opens capture and playback and returns two stable
 //! handles: a [`FrameSource`] that yields captured 10 ms [`Frame`](crate::Frame)s
-//! and a [`FrameSink`] that accepts frames for playback. Both stay valid
+//! and a [`FrameSink`] that accepts mono or stereo frames for playback. Both stay valid
 //! across device switches and hot-plug recovery, so the processing chain and
 //! mixer never have to re-wire.
 //!
@@ -27,8 +27,10 @@
 //!   real time).
 //! - `file:<in.wav>:<out.wav>` – capture plays `<in.wav>` in real time
 //!   (any rate/channel count, silence after its end); playback is recorded
-//!   to `<out.wav>` (48 kHz mono 16-bit, header refreshed every second so it
+//!   to `<out.wav>` (48 kHz mono 16-bit, the mix of both playback channels, header refreshed every second so it
 //!   stays readable if the process is killed).
+//! - `file-stereo:<in.wav>:<out.wav>` – the same, but playback is recorded as
+//!   48 kHz stereo 16-bit (left and right kept apart, for positional audio checks).
 
 mod controller;
 mod cpal_backend;
@@ -125,6 +127,9 @@ pub enum BackendKind {
     /// Capture from a WAV file, record playback to a WAV file.
     #[cfg(any(test, feature = "test-backend"))]
     File { input: PathBuf, output: PathBuf },
+    /// Like `File`, but playback is recorded in stereo.
+    #[cfg(any(test, feature = "test-backend"))]
+    StereoFile { input: PathBuf, output: PathBuf },
 }
 
 impl BackendKind {
@@ -143,6 +148,12 @@ impl BackendKind {
             "" | "cpal" => Ok(BackendKind::Cpal),
             #[cfg(any(test, feature = "test-backend"))]
             "null" => Ok(BackendKind::Null),
+            #[cfg(any(test, feature = "test-backend"))]
+            _ if value.starts_with("file-stereo:") => {
+                parse_file_paths(&value["file-stereo:".len()..])
+                    .map(|(input, output)| BackendKind::StereoFile { input, output })
+                    .ok_or_else(|| IoError::InvalidBackend(value.to_owned()))
+            }
             #[cfg(any(test, feature = "test-backend"))]
             _ if value.starts_with("file:") => parse_file_paths(&value["file:".len()..])
                 .map(|(input, output)| BackendKind::File { input, output })
@@ -196,6 +207,13 @@ mod tests {
         assert_eq!(
             BackendKind::parse("file:a.wav:b.wav").expect("file"),
             BackendKind::File {
+                input: "a.wav".into(),
+                output: "b.wav".into()
+            }
+        );
+        assert_eq!(
+            BackendKind::parse("file-stereo:a.wav:b.wav").expect("stereo file"),
+            BackendKind::StereoFile {
                 input: "a.wav".into(),
                 output: "b.wav".into()
             }

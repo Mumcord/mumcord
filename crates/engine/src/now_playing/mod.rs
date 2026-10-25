@@ -398,23 +398,46 @@ async fn own_comment(ctx: &SessionCtx) -> Option<String> {
     None
 }
 
-/// Puts `line` at the end of the own comment (or removes the line for `None`).
-async fn apply_comment(ctx: SessionCtx, line: Option<String>) {
+/// Serialises status line updates, so "Now playing" and "Now gaming" never overwrite each
+/// other's line with a stale comment.
+static COMMENT_UPDATE: tokio::sync::Mutex<()> = tokio::sync::Mutex::const_new(());
+
+/// Puts the status `line` for `marker` at the end of the own comment (or removes it for `None`).
+pub(crate) async fn apply_comment(ctx: SessionCtx, marker: &'static str, line: Option<String>) {
+    let _serial = COMMENT_UPDATE.lock().await;
     let Some(current) = own_comment(&ctx).await else {
-        tracing::warn!("the own comment did not arrive; now-playing line not updated");
+        tracing::warn!("the own comment did not arrive; status line not updated");
         return;
     };
-    let next = comment::with_line(&current, line.as_deref());
+    let next = comment::with_line(&current, marker, line.as_deref());
     if next == current {
         return;
     }
     if line.is_some() && crate::chat::check_text_size(&ctx, &next).is_err() {
-        tracing::info!("comment too long for the server with the now-playing line; left out");
+        tracing::info!("comment too long for the server with the status line; left out");
         return;
     }
-    match ctx.handle.set_comment(next) {
-        Ok(()) => tracing::info!(line = line.is_some(), "now playing: comment line updated"),
-        Err(e) => tracing::warn!(error = %e, "updating the now-playing line failed"),
+    match ctx.handle.set_comment(next.clone()) {
+        Ok(()) => {
+            tracing::info!(marker, line = line.is_some(), "comment status line updated");
+            wait_for_comment(&ctx, &next).await;
+        }
+        Err(e) => tracing::warn!(error = %e, "updating the comment status line failed"),
+    }
+}
+
+/// Waits briefly until the server confirms `comment`, so the next update builds on it.
+async fn wait_for_comment(ctx: &SessionCtx, comment: &str) {
+    let deadline = Instant::now() + COMMENT_WAIT;
+    while Instant::now() < deadline {
+        let confirmed = ctx.handle.with_state(|s| {
+            s.own_user()
+                .is_some_and(|u| u.comment.as_deref() == Some(comment))
+        });
+        if confirmed {
+            return;
+        }
+        tokio::time::sleep(Duration::from_millis(50)).await;
     }
 }
 
@@ -437,7 +460,8 @@ impl Engine {
             ctx.as_ref().and_then(|ctx| state.tick(ctx, now))
         };
         if let (Some(line), Some(ctx)) = (job, ctx) {
-            self.runtime().spawn(apply_comment(ctx, line));
+            self.runtime()
+                .spawn(apply_comment(ctx, comment::MARKER, line));
         }
     }
 
@@ -521,7 +545,7 @@ impl Engine {
             .applied
             .clone()
             .flatten();
-        comment::with_line(html, line.as_deref())
+        comment::with_line(html, comment::MARKER, line.as_deref())
     }
 }
 

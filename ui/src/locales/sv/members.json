@@ -1,0 +1,65 @@
+{
+  "inChannel_one": "I {{channel}} ({{count}})",
+  "inChannel_other": "I {{channel}} ({{count}})",
+  "listening_one": "Lyssnar ({{count}})",
+  "listening_other": "Lyssnar ({{count}})",
+  "noChannel": "Välj en kanal för att se vem som är med.",
+  "nobody": "Ingen är här.",
+  "nobodyElse": "Ingen annan är på servern.",
+  "inOtherChannels": "I andra kanaler",
+  "you": "(du)",
+  "registered": "Registrerad",
+  "unregistered": "Inte registrerad",
+  "talking": "Pratar",
+  "card": {
+    "close": "Stäng",
+    "loadFailed": "Det gick inte att läsa in profilen.",
+    "volume": "Volym",
+    "volumeValue": "{{value}} %",
+    "localMute": "Stäng av för mig",
+    "sessionOnly": "Den här personen har inget certifikat, så de här inställningarna gäller bara under den här sessionen.",
+    "sendPrivateMessage": "Skicka privat meddelande",
+    "privateMessage": "Privat meddelande",
+    "localSettings": "Dina inställningar",
+    "localSettingsHint": "Bara du ser de här. Ändringar sparas direkt.",
+    "localMuteHint": "Du hör inte den här personen.",
+    "privateNote": "Privat anteckning",
+    "privateNoteHint": "Bara du kan se den här anteckningen.",
+    "saved": "Sparat"
+  },
+  "errors": {
+    "notConnected": "Inte ansluten till någon server.",
+    "generic": "Det fungerade inte. Försök igen."
+  },
+  "menu": {
+    "label": "Åtgärder för {{name}}",
+    "viewProfile": "Visa profil",
+    "join": "Gå med i {{channel}}",
+    "joinDenied": "Du har inte behörighet att gå in i den här kanalen.",
+    "mute": "Stäng av för mig"
+  },
+  "nowPlaying": {
+    "label": "Spelas nu",
+    "listening": "Lyssnar på",
+    "paused": "Pausad",
+    "progress": "Uppspelningsframsteg",
+    "position": "{{position}} av {{duration}}"
+  },
+  "nowGaming": {
+    "label": "Spelar nu",
+    "playing": "Spelar",
+    "playedFor": "i {{time}}",
+    "hoursMinutes": "{{hours}} h {{minutes}} min",
+    "minutes_one": "{{count}} min",
+    "minutes_other": "{{count}} min",
+    "join": "Gå med i spelet",
+    "joinTitle": "Gå med i spelet?",
+    "joinMessage": "Steam öppnas och ansluter till servern där den här personen spelar {{game}}. Gå bara med på servrar du litar på.",
+    "joinConfirm": "Öppna Steam",
+    "joinFailed": "Det gick inte att öppna Steam."
+  },
+  "preview": {
+    "privateMessage": "Privat meddelande",
+    "fullProfile": "Hela profilen"
+  }
+}

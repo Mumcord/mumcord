@@ -25,7 +25,7 @@ import {
   wizard,
 } from "./flows.ts";
 
-const SETTINGS_TABS = 10;
+const SETTINGS_TABS = 11;
 
 for (const theme of ["light", "dark"] as const) {
   describe(`AC-1.27 keyboard-only flows + axe (${theme} OS theme)`, () => {

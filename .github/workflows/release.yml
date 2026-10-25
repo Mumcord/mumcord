@@ -70,6 +70,12 @@ jobs:
     uses: ./.github/workflows/build-and-smoke.yml
     with:
       release: true
+    # Passes the optional Apple signing secrets; id-token lets the Windows job log in to Azure
+    # for Artifact Signing without a stored secret (docs/release-signing.md).
+    secrets: inherit
+    permissions:
+      contents: read
+      id-token: write
 
   release:
     name: Create draft release
@@ -89,11 +95,26 @@ jobs:
         working-directory: dist
         env:
           RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          VERSION: ${{ needs.guard.outputs.version }}
         run: |
           # Fails if any of the three bundles is missing.
           ls -l -- *.AppImage *-setup.exe *.dmg
           sha256sum -- *.AppImage *-setup.exe *.dmg > SHA256SUMS
           cat SHA256SUMS
+          # A warning box as soon as one platform is unsigned, a plain note otherwise.
+          callout=NOTE
+          if [[ -f WINDOWS-SIGNED ]]; then
+            windows_note="Windows: the app and installer are signed (see the [code signing policy](https://github.com/ToBee94/mumcord/blob/main/CODE_SIGNING.md)). SmartScreen may still warn while the certificate builds up reputation: choose **More info → Run anyway**."
+          else
+            callout=WARNING
+            windows_note="Windows is **not signed** yet. On first start, SmartScreen shows \"Windows protected your PC\": choose **More info → Run anyway**."
+          fi
+          if [[ -f MACOS-SIGNED ]]; then
+            macos_note="macOS: the app is signed and notarized by Apple and opens normally."
+          else
+            callout=WARNING
+            macos_note="macOS Gatekeeper says the app \"cannot be opened\": open **System Settings → Privacy & Security** and choose **Open Anyway** (or right-click the app and choose **Open**)."
+          fi
           cat > ../notes.md <<EOF
           ## Downloads
 
@@ -103,14 +124,38 @@ jobs:
 
           Check a download with \`sha256sum -c SHA256SUMS --ignore-missing\`.
 
-          > [!WARNING]
-          > These builds are **not signed** yet. On first start, Windows SmartScreen shows
-          > "Windows protected your PC": choose **More info → Run anyway**. macOS Gatekeeper says
-          > the app "cannot be opened": open **System Settings → Privacy & Security** and choose
-          > **Open Anyway** (or right-click the app and choose **Open**).
+          > [!$callout]
+          > $windows_note
+          >
+          > $macos_note
 
-          Built and smoke-tested by [this workflow run]($RUN_URL).
+          Built and smoke-tested by [this workflow run]($RUN_URL). [Code signing policy](https://github.com/ToBee94/mumcord/blob/main/CODE_SIGNING.md) · [Privacy policy](https://github.com/ToBee94/mumcord/blob/main/PRIVACY.md)
+
+          These binaries are licensed under the [GNU AGPL-3.0](https://github.com/ToBee94/mumcord/blob/main/LICENSE) only.
+
+          Full changelog: [CHANGELOG.md](https://github.com/ToBee94/mumcord/blob/main/CHANGELOG.md)
           EOF
+          # Highlights are written per release; other versions get the plain notes.
+          if [[ "$VERSION" == "0.3.0" ]]; then
+            cat >> ../notes.md <<'EOF'
+
+          ## What's new in 0.3.0
+
+          - **In-game overlay on Linux**: see who is talking inside your game (Vulkan layer, works with Steam and Proton). Switch it on per game; games with anti-cheat are off by default.
+          - **Window overlay**: a click-through window that shows who is talking in your own channel (with a helper for KDE).
+          - **Now gaming**: share the game you are playing.
+          - **Quick settings** with a collapsible Beta group, and **settings search** plus accessibility switches.
+          - **Person menu** with switches, icons and Join channel; a **redesigned full profile** with a private note.
+          - **Friends** with online state, and private chats that are kept.
+          - **History sync** between Mumcord users, and **full-size images on demand**. Drop image files into the chat.
+          - **Positional audio** with Mumble Link and the official game plugins.
+          - **All 24 official EU languages.** The translations have not been reviewed by native speakers yet; corrections are welcome via the "Report a bug" issue template.
+          - A privacy step in the setup wizard, plus changelog and support links in About.
+
+          **Beta:** positional audio, game plugins and full-size images.
+          **Coming later:** the in-game overlay on Windows (until then Windows uses the window overlay). There is no overlay on macOS.
+          EOF
+          fi
 
       - name: Create draft release
         env:

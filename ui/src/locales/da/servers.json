@@ -1,0 +1,128 @@
+{
+  "unknownServer": "serveren",
+  "announce": {
+    "connected": "Forbundet til {{server}}.",
+    "lost": "Forbindelsen til {{server}} blev afbrudt. Forbinder igen…",
+    "ended": "Afbrudt fra {{server}}. Se linjen over chatten for, hvad du kan gøre nu.",
+    "disconnected": "Afbrudt fra {{server}}.",
+    "tcp": "Voice kører nu over TCP, fordi UDP er blokeret. Lyden kan være lidt forsinket.",
+    "removed": "{{server}} er fjernet.",
+    "moved": "{{server}} flyttet til position {{position}} af {{count}}."
+  },
+  "bar": {
+    "listLabel": "Gemte servere",
+    "add": "Tilføj en server",
+    "keyboardHint": "Enter forbinder. Alt plus pil op eller ned flytter serveren. Shift plus F10 åbner flere muligheder.",
+    "status": {
+      "connected": "{{server}} (forbundet)",
+      "connecting": "{{server}} (forbinder)",
+      "reconnecting": "{{server}} (forbinder igen)"
+    }
+  },
+  "menu": {
+    "label": "Muligheder for {{server}}",
+    "connect": "Forbind",
+    "disconnect": "Afbryd",
+    "edit": "Rediger server",
+    "moveUp": "Flyt op",
+    "moveDown": "Flyt ned",
+    "remove": "Fjern server"
+  },
+  "dialog": {
+    "addTitle": "Tilføj en server",
+    "editTitle": "Rediger server",
+    "linkTitle": "Gem denne server?",
+    "address": "Adresse",
+    "addressHint": "For eksempel mumble.example.org. Du kan også indsætte et mumble://-link her.",
+    "filledFromLink": "Udfyldt ud fra mumble://-linket.",
+    "port": "Port",
+    "label": "Navn i serverlinjen",
+    "username": "Dit navn på denne server",
+    "password": "Serveradgangskode (valgfri)",
+    "passwordHint": "Kun nødvendig, hvis serveren beder om en. Den gemmes i dit systems sikre lager.",
+    "passwordKeepHint": "En adgangskode er gemt. Lad feltet stå tomt for at beholde den, eller skriv en ny.",
+    "clearPassword": "Fjern den gemte adgangskode",
+    "add": "Tilføj server",
+    "saveAndConnect": "Gem og forbind",
+    "errors": {
+      "address": "Skriv serverens adresse.",
+      "port": "Skriv en port mellem 1 og 65535. De fleste servere bruger 64738.",
+      "username": "Skriv det navn, du vil bruge på denne server.",
+      "link": "Dette mumble://-link kan ikke læses. Tjek, at det er kopieret helt.",
+      "invalid": "Serveroplysningerne er ikke gyldige. Tjek adressen og porten."
+    }
+  },
+  "errors": {
+    "serverUnreachable": "Serveren kan ikke nås. Tjek adressen og porten, og at du er online.",
+    "wrongPassword": "Serveradgangskoden er forkert. Rediger serveren, og skriv den rigtige adgangskode.",
+    "nameInUse": "Dit navn er allerede i brug eller registreret til en anden på denne server. Rediger serveren, og vælg et andet navn.",
+    "certificateRejected": "Certifikattjekket mislykkedes: enten blev serverens certifikat ikke godkendt, eller også accepterede serveren ikke din identitet. Prøv igen, eller spørg serverens ejer.",
+    "certificateChanged": "Serverens certifikat er ændret og blev ikke godkendt. Godkend det kun, hvis serverens ejer bekræfter ændringen.",
+    "denied": "Serveren afviste forbindelsen.",
+    "deniedWithReason": "Serveren afviste forbindelsen: {{reason}}",
+    "invalidAddress": "Serverens adresse er ikke gyldig. Rediger serveren for at rette den.",
+    "secureStorage": "Dit systems sikre lager er ikke tilgængeligt, så serveradgangskoden kunne ikke læses eller gemmes. Lås det op, og prøv igen.",
+    "notFound": "Denne server er ikke længere gemt.",
+    "generic": "Noget gik galt. Prøv igen."
+  },
+  "remove": {
+    "title": "Fjern {{server}}?",
+    "message": "Den gemte adgangskode, certifikatvalget, de fulgte kanaler og chathistorikken på denne computer slettes.",
+    "confirm": "Fjern"
+  },
+  "switch": {
+    "title": "Skift server?",
+    "message": "Du kan kun være på én server ad gangen. Vil du afbryde fra {{current}} og forbinde til {{next}}?",
+    "confirm": "Afbryd og skift"
+  },
+  "cert": {
+    "newTitle": "Stoler du på denne server?",
+    "newIntro": "Mumcord har ikke set certifikatet fra {{server}} før. Hvis serverens ejer gav dig et fingeraftryk, så tjek, at det passer. Dit valg huskes.",
+    "fingerprint": "Certifikatets fingeraftryk",
+    "changedTitle": "Advarsel: serverens certifikat er ændret",
+    "changedWarning": "Certifikatet fra {{server}} er et andet end det, du stolede på tidligere.",
+    "changedAdvice": "Det kan ske, når serveren er blevet fornyet, men det kan også betyde, at nogen opfanger din forbindelse. Fortsæt kun, hvis serverens ejer har bekræftet ændringen.",
+    "previousFingerprint": "Tidligere godkendt fingeraftryk",
+    "newFingerprint": "Nyt fingeraftryk",
+    "reject": "Forbind ikke",
+    "trust": "Godkend og forbind",
+    "trustChanged": "Godkend det nye certifikat"
+  },
+  "rejoin": {
+    "label": "Join sidste kanal igen",
+    "text": "Du var i {{channel}} sidste gang – join igen?",
+    "rejoin": "Join igen",
+    "notNow": "Ikke nu"
+  },
+  "status": {
+    "label": "Forbindelsesstatus",
+    "connecting": "Forbinder til {{server}}…",
+    "reconnecting": "Forbinder igen… (forsøg {{attempt}} af {{max}}, næste forsøg om {{seconds}} s)",
+    "tcp": "Forbundet via TCP (UDP blokeret). Voice virker, men kan være lidt forsinket.",
+    "disconnected": "Afbrudt",
+    "disconnectedReason": "Afbrudt – {{reason}}",
+    "failed": "Kunne ikke forbinde til {{server}}. {{reason}}",
+    "cancel": "Annullér",
+    "reconnect": "Forbind igen",
+    "editServer": "Rediger server",
+    "actionFailed": {
+      "reorder": "Den nye serverrækkefølge kunne ikke gemmes. Prøv igen.",
+      "remove": "Serveren kunne ikke fjernes. Prøv igen.",
+      "disconnect": "Det lykkedes ikke at afbryde. Prøv igen."
+    }
+  },
+  "empty": {
+    "title": "Tilføj din første server",
+    "description": "Skriv den adresse, du har fået fra din gruppe, eller indsæt et mumble://-link.",
+    "addressLabel": "Serveradresse eller mumble://-link",
+    "addressHint": "For eksempel mumble.example.org eller mumble.example.org:64738.",
+    "connect": "Tilføj og forbind",
+    "pasteLink": "Indsæt et mumble://-link",
+    "moreOptions": "Flere muligheder…",
+    "noLinkInClipboard": "Udklipsholderen indeholder ikke et mumble://-link. Indsæt eller skriv adressen ovenfor.",
+    "pasteManually": "Mumcord kunne ikke læse udklipsholderen. Klik på feltet ovenfor, og tryk på Ctrl+V.",
+    "errors": {
+      "required": "Skriv en serveradresse eller et mumble://-link."
+    }
+  }
+}

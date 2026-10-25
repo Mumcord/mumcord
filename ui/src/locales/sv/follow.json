@@ -1,0 +1,55 @@
+{
+  "follow": "Följ",
+  "following": "Följer",
+  "unsupported": "För att följa kanaler krävs en server med version 1.4 eller senare.",
+  "unread_one": "{{count}} oläst meddelande",
+  "unread_other": "{{count}} olästa meddelanden",
+  "errors": {
+    "denied": "Servern tillåter dig inte att följa den här kanalen.",
+    "limit": "Du kan inte följa fler kanaler på den här servern. Sluta först följa en annan kanal.",
+    "tooOld": "Den här servern är för gammal för att följa kanaler (version 1.4 eller senare krävs).",
+    "notConnected": "Du är inte ansluten till servern.",
+    "generic": "Det gick inte att följa kanalen. Försök igen."
+  },
+  "dm": {
+    "title": "Direktmeddelanden",
+    "unknown": "Okänd person"
+  },
+  "notify": {
+    "channel": "{{name}} i {{channel}}: {{text}}",
+    "private": "{{name}} (privat): {{text}}",
+    "more_one": "{{count}} nytt meddelande till",
+    "more_other": "{{count}} nya meddelanden till"
+  },
+  "history": {
+    "clear": "Rensa historik",
+    "title": "Rensa historiken?",
+    "body": "Det här tar permanent bort de sparade meddelandena i den här konversationen från den här datorn. Andra behåller sina kopior.",
+    "confirm": "Rensa historik",
+    "cancel": "Avbryt",
+    "failed": "Det gick inte att rensa historiken. Försök igen."
+  },
+  "star": {
+    "follow": "Följ {{channel}}",
+    "unfollow": "Sluta följa {{channel}}"
+  },
+  "all": {
+    "menu": "Serveralternativ för {{server}}",
+    "menuLabel": "Serveralternativ",
+    "follow": "Följ alla kanaler",
+    "unfollow": "Sluta följa alla kanaler",
+    "working": "Följer kanaler…",
+    "followed_one": "Följer {{count}} kanal.",
+    "followed_other": "Följer {{count}} kanaler.",
+    "skipped_one": "{{count}} hoppades över: {{reasons}}.",
+    "skipped_other": "{{count}} hoppades över: {{reasons}}.",
+    "limit": "gränsen nådd",
+    "notAllowed": "inte tillåtet",
+    "noAnswer": "inget svar från servern",
+    "unfollowed": "Slutade följa alla kanaler.",
+    "failed": "Det gick inte att följa alla kanaler. Försök igen.",
+    "dismiss": "Avfärda",
+    "unfollowFailed": "Det gick inte att sluta följa alla kanaler. Försök igen."
+  },
+  "mention": "innehåller en omnämning av dig"
+}

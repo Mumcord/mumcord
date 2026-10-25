@@ -7,12 +7,14 @@ members = [
     "crates/engine",
     "crates/bot",
     "crates/positional",
+    "crates/overlay-ipc",
+    "crates/overlay-layer",
     "tools/netsim",
     "src-tauri",
 ]
 
 [workspace.package]
-version = "0.2.0"
+version = "0.3.0"
 edition = "2024"
 rust-version = "1.90"
 license = "AGPL-3.0-only"
@@ -25,6 +27,7 @@ mumcord-audio = { path = "crates/audio" }
 mumcord-store = { path = "crates/store" }
 mumcord-engine = { path = "crates/engine" }
 mumcord-positional = { path = "crates/positional" }
+mumcord-overlay-ipc = { path = "crates/overlay-ipc" }
 
 # Async, networking, TLS
 tokio = { version = "1.54", features = ["full"] }
@@ -46,6 +49,8 @@ protoc-bin-vendored = "3.3"
 aes = "0.8"
 rand = "0.9"
 sha1 = "0.10"
+# Content hash of full-size images shared between Mumcord clients (FR-1.60c).
+sha2 = "0.10"
 rcgen = "0.14"
 p12-keystore = "0.4"
 # Only used to generate RSA identity keys (ring cannot generate RSA keys); signing stays with ring.
@@ -71,10 +76,15 @@ ammonia = "4.2"
 html5ever = "0.40"
 image = { version = "0.25", default-features = false, features = ["png", "jpeg", "gif", "webp"] }
 
+# In-game overlay (FR-1.46b): glyph rasterizing in the game-side renderer, Vulkan bindings for
+# the Linux layer (no loader linking: the layer gets every function from the next layer).
+ab_glyph = "0.2"
+ash = { version = "0.38", default-features = false, features = ["std"] }
+
 # Positional audio / plugin host
 libloading = "0.8"
 libc = "0.2"
-windows-sys = { version = "0.61", features = ["Win32_Foundation", "Win32_System_Memory"] }
+windows-sys = { version = "0.61", features = ["Win32_Foundation", "Win32_Security", "Win32_System_Memory", "Win32_System_Diagnostics_ToolHelp"] }
 
 # Linux desktop portals (Wayland global shortcuts)
 ashpd = "0.13"

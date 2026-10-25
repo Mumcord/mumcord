@@ -1,0 +1,22 @@
+{
+  "open": "Info connessione",
+  "title": "Info connessione",
+  "loading": "Caricamento…",
+  "notConnected": "Non connesso.",
+  "error": "Le info sulla connessione non sono disponibili al momento.",
+  "none": "–",
+  "transport": "Trasporto",
+  "transportValue": {
+    "udp": "UDP",
+    "tcp": "TCP (tunnel)"
+  },
+  "latency": "Latenza",
+  "latencyValue": "{{value}} ms",
+  "loss": "Perdita di pacchetti",
+  "lossValue": "{{value}} %",
+  "bitrate": "Bitrate in invio",
+  "bitrateValue": "{{value}} kbit/s",
+  "serverLimit": "Limite del server",
+  "packets": "Pacchetti inviati / ricevuti",
+  "packetsValue": "{{sent}} / {{received}}"
+}

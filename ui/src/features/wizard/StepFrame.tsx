@@ -2,7 +2,7 @@ import { useEffect, useId, useRef, type SubmitEvent, type ReactNode } from "reac
 import { useTranslation } from "react-i18next";
 import { announce } from "../../a11y";
 
-export const STEP_COUNT = 3;
+export const STEP_COUNT = 4;
 
 interface StepFrameProps {
   /** 1-based step number. */

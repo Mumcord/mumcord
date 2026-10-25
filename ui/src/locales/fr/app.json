@@ -1,0 +1,33 @@
+{
+  "regions": {
+    "servers": "Serveurs",
+    "channels": "Canaux",
+    "chat": "Discussion",
+    "members": "Membres",
+    "userPanel": "Votre statut"
+  },
+  "skipLinks": {
+    "label": "Liens d’accès rapide",
+    "chat": "Aller à la discussion",
+    "channels": "Aller aux canaux"
+  },
+  "members": {
+    "show": "Afficher les membres",
+    "hide": "Masquer les membres"
+  },
+  "resize": {
+    "channels": "Redimensionner la liste des canaux",
+    "members": "Redimensionner la liste des membres"
+  },
+  "settings": {
+    "title": "Paramètres"
+  },
+  "wizard": {
+    "title": "Bienvenue sur Mumcord"
+  },
+  "placeholder": "Bientôt disponible",
+  "startupError": {
+    "title": "Mumcord n’a pas pu démarrer",
+    "description": "L’application n’a pas pu charger vos paramètres. Réessayez ; si le problème persiste, redémarrez Mumcord."
+  }
+}

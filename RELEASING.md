@@ -2,7 +2,7 @@
 
 Releases are built by GitHub Actions (`.github/workflows/release.yml`). Pushing a version tag such as `v0.1.0` that points to a commit on `main` builds the Windows installer (`.exe`), the macOS disk image (`.dmg`, universal for Apple Silicon and Intel) and the Linux AppImage, smoke-tests each one against a local Mumble server, and creates a **draft** GitHub Release with the files and a `SHA256SUMS` checksum file. Nothing becomes public until you publish the draft.
 
-Builds are unsigned until code signing arrives (Epic 5). The release notes say so and explain the Windows SmartScreen and macOS Gatekeeper warnings.
+Builds are unsigned until code signing is set up (Windows via Azure Artifact Signing, macOS via an Apple Developer ID: see [docs/release-signing.md](docs/release-signing.md) and the [code signing policy](CODE_SIGNING.md)). The release notes say per platform whether the build is signed and explain the SmartScreen and Gatekeeper warnings for unsigned ones.
 
 ## 1. Bump the version
 
@@ -46,14 +46,14 @@ The tag must be `v` plus exactly the version from step 1, and it must point to a
 Open the **Actions** tab and follow the **Release** run for the tag. It takes roughly as long as the Test builds workflow (up to about an hour). It runs:
 
 1. **Check tag**: the tag matches the version in all files above and the commit is on `main`.
-2. **Build** on Linux, Windows and macOS.
+2. **Build** on Linux, Windows and macOS. With signing set up, the Windows app and installer and the macOS app are signed automatically; nothing needs your approval.
 3. **Smoke** test: each build is installed on a fresh machine and connects to a local test server.
 4. **Create draft release**: attaches the files and `SHA256SUMS` and writes the release notes.
 
 ## 4. Review and publish
 
 1. Open **Releases** on GitHub; the new release is marked **Draft**.
-2. Check the notes: the fixed download and "unsigned" section, followed by the change list GitHub generated from merged pull requests. Edit the text if needed.
+2. Check the notes: the fixed download and signing section, followed by the change list GitHub generated from merged pull requests. Edit the text if needed.
 3. Check that the `.exe`, `.dmg`, `.AppImage` and `SHA256SUMS` files are attached. Optionally download one and try it.
 4. Click **Publish release**.
 

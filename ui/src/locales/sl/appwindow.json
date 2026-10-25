@@ -1,0 +1,10 @@
+{
+  "close": {
+    "title": "Pomanjšaj v sistemsko vrstico ali zapri?",
+    "description": "Še vedno si povezan. Ko je pomanjšan, te Mumcord ohrani v glasovnem kanalu in ostane v sistemski vrstici.",
+    "remember": "Zapomni si mojo izbiro",
+    "minimize": "Pomanjšaj v sistemsko vrstico",
+    "quit": "Zapri",
+    "failed": "To ni uspelo. Poskusi znova."
+  }
+}

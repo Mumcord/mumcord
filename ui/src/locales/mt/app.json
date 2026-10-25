@@ -1,0 +1,33 @@
+{
+  "regions": {
+    "servers": "Servers",
+    "channels": "Kanali",
+    "chat": "Chat",
+    "members": "Membri",
+    "userPanel": "L-istatus tiegħek"
+  },
+  "skipLinks": {
+    "label": "Aqbeż il-links",
+    "chat": "Aqbeż għaċ-chat",
+    "channels": "Aqbeż għall-kanali"
+  },
+  "members": {
+    "show": "Uri l-membri",
+    "hide": "Aħbi l-membri"
+  },
+  "resize": {
+    "channels": "Biddel id-daqs tal-lista tal-kanali",
+    "members": "Biddel id-daqs tal-lista tal-membri"
+  },
+  "settings": {
+    "title": "Settings"
+  },
+  "wizard": {
+    "title": "Merħba fi Mumcord"
+  },
+  "placeholder": "Dalwaqt",
+  "startupError": {
+    "title": "Mumcord ma setax jibda",
+    "description": "L-app ma setgħetx tgħabbi s-settings tiegħek. Erġa' pprova; jekk ikompli jfalli, erġa' ibda Mumcord."
+  }
+}

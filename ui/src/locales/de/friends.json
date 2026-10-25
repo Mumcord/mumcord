@@ -1,0 +1,15 @@
+{
+  "title": "Freunde",
+  "item": "{{name}}, {{status}}",
+  "online": "Online",
+  "onlineIn": "Online in {{channel}}",
+  "onlineOnServer": "Online auf {{server}}",
+  "offline": "Offline",
+  "lastSeen": "Offline, zuletzt gesehen {{when}}",
+  "friend": "Freund",
+  "friendHint": "Zeigt, wann die Person online ist, und behält euren privaten Chat.",
+  "noCertificate": "Personen ohne Zertifikat können keine Freunde sein, weil Mumcord sie nicht wiedererkennen kann.",
+  "add": "Als Freund hinzufügen",
+  "remove": "Freund entfernen",
+  "failed": "Das Ändern des Freundes hat nicht geklappt. Bitte versuche es noch einmal."
+}

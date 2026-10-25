@@ -9,11 +9,20 @@
     "voice": "Voz",
     "chatHistory": "Chat e historial",
     "appearance": "Apariencia",
+    "accessibility": "Accesibilidad",
     "language": "Idioma",
     "sounds": "Sonidos y notificaciones",
-    "overlay": "Superposición y audio posicional",
+    "overlay": "Superposición",
     "diagnostics": "Diagnóstico",
     "about": "Acerca de"
+  },
+  "search": {
+    "label": "Buscar ajustes",
+    "results": "Resultados de búsqueda",
+    "empty": "Ningún ajuste coincide con «{{query}}».",
+    "count_one": "{{count}} ajuste encontrado",
+    "count_other": "{{count}} ajustes encontrados",
+    "count_many": "{{count}} ajustes encontrados"
   },
   "errors": {
     "secureStorage": "El almacenamiento seguro del sistema no está disponible o se denegó el acceso.",
@@ -112,6 +121,17 @@
     "compatRestartNeeded": "Se aplica cuando Mumcord se reinicie. Te desconectarás un momento.",
     "compatRestart": "Reiniciar ahora",
     "compatRestartFailed": "Mumcord no pudo reiniciarse. Ciérralo y ábrelo tú mismo.",
+    "compatKdeHint": "Los botones del ratón para pulsar para hablar solo funcionan en segundo plano si KDE los permite para aplicaciones X11.",
+    "compatKdeAllowed": "KDE ya permite los botones del ratón para aplicaciones X11, así que el botón del ratón para pulsar para hablar también funciona en segundo plano.",
+    "compatKdeAllow": "Permitir botones del ratón",
+    "compatKdeUndo": "Deshacer",
+    "compatKdeRestart": "Hecho. Reinicia Mumcord para que surta efecto.",
+    "compatKdeConfirmTitle": "¿Permitir los botones del ratón?",
+    "compatKdeConfirm": "Esto permite que las aplicaciones X11 en segundo plano vean tus pulsaciones del ratón. Cambia un ajuste de KDE (Preferencias del sistema → Compatibilidad con aplicaciones X11 heredadas). Puedes deshacerlo aquí en cualquier momento.",
+    "compatKdeConfirmButton": "Permitir",
+    "compatKdeChangeFailed": "Mumcord no pudo cambiar el ajuste de KDE. Usa en su lugar \"Abrir ajustes X11 de KDE\".",
+    "compatKdeOpen": "Abrir ajustes X11 de KDE",
+    "compatKdeFailed": "Mumcord no pudo abrir los ajustes de KDE. Abre tú mismo Preferencias del sistema → Compatibilidad con aplicaciones X11 heredadas.",
     "compatActive": "El modo de compatibilidad está activado: pulsar para hablar usa la forma X11. Las teclas funcionan sin diálogo del escritorio; los botones del ratón funcionan si el ajuste X11 heredado de tu escritorio lo permite.",
     "sensitivityLegend": "Sensibilidad de la activación por voz",
     "automatic": "Automática – detecta tu voz",
@@ -140,6 +160,18 @@
     "autoDeleteOff": "Nunca (conservar todo)",
     "autoDeleteHint": "Los mensajes más antiguos se eliminan de este equipo automáticamente, sin preguntar. Solo afecta al historial guardado aquí, no al servidor."
   },
+  "fullImages": {
+    "title": "Imágenes a tamaño completo",
+    "offer": "Ofrecer mis imágenes a tamaño completo",
+    "offerHint": "Otros usuarios de Mumcord pueden abrir mis imágenes a tamaño completo. Desactivado: solo se envía la vista previa pequeña, no se guarda ningún original y no se comparte ninguno.",
+    "load": "Cargar imágenes a tamaño completo de otros",
+    "loadHint": "Abrir las imágenes de otros usuarios de Mumcord a tamaño completo. Desactivado: solo se muestra la vista previa y nunca se solicita el original."
+  },
+  "historySharing": {
+    "title": "Sincronización del historial",
+    "switch": "Compartir mi historial de canales",
+    "hint": "Otros usuarios de Mumcord que entren o sigan un canal pueden obtener sus mensajes de tu historial guardado (hasta 7 días, solo de antes de que entraran). Los chats privados nunca se comparten."
+  },
   "appearance": {
     "messageDisplay": "Visualización de mensajes",
     "messageDisplayLegend": "Diseño de los mensajes del chat",
@@ -158,6 +190,15 @@
     "autostart": "Iniciar Mumcord al iniciar sesión",
     "startMinimized": "Iniciar minimizado",
     "startMinimizedHint": "Cuando Mumcord se inicia al iniciar sesión, espera en la bandeja del sistema en lugar de abrir la ventana."
+  },
+  "accessibility": {
+    "hints": "Indicaciones",
+    "keyboardHints": "Mostrar indicaciones de teclado",
+    "keyboardHintsHint": "Consejos breves como «Flechas: mover» debajo de la lista de canales y en los GIF favoritos. Los lectores de pantalla los siguen leyendo aunque esté desactivado.",
+    "announcements": "Avisos del lector de pantalla",
+    "announcementsHint": "Tu lector de pantalla anuncia eventos como cuando alguien entra, sale o empieza a hablar.",
+    "skipLinks": "Enlaces de salto",
+    "skipLinksHint": "Enlaces al principio de la ventana que, con la tecla Tab, saltan directamente al chat o a la lista de canales."
   },
   "language": {
     "legend": "Idioma de la interfaz",
@@ -184,7 +225,67 @@
     "off": "Desactivadas"
   },
   "overlay": {
-    "comingLater": "La superposición en juegos y el audio posicional llegarán en una fase posterior. Aquí todavía no hay ajustes."
+    "window": {
+      "title": "Superposición en ventana",
+      "enable": "Mostrar la superposición",
+      "enableHint": "Una pequeña ventana transparente que muestra quién habla. También disponible en el menú de la bandeja.",
+      "positionUnsupported": "Este escritorio decide dónde aparecen las ventanas, así que las esquinas y el movimiento no tienen efecto.",
+      "move": "Mover superposición…",
+      "moveDone": "Terminar de mover",
+      "size": "Ancho",
+      "wholeChannel": "Mostrar todo el canal",
+      "wholeChannelHint": "Desactivado: solo quienes hablan.",
+      "channelName": "Mostrar el nombre del canal",
+      "loadFailed": "No se pudieron cargar las opciones de la superposición.",
+      "saveFailed": "No se pudo aplicar el cambio de la superposición.",
+      "kwin": {
+        "setUp": "Configurar automáticamente",
+        "done": "Listo: la regla de ventana de KDE «Mumcord overlay» está activa.",
+        "removed": "Se quitó la regla de ventana de KDE.",
+        "remove": "Quitar regla",
+        "openRules": "Abrir reglas de ventana de KDE",
+        "compat": "Usar el modo de compatibilidad",
+        "failed": "No se pudo cambiar la regla de ventana de KDE. Abre las reglas de ventana de KDE para crearla a mano."
+      }
+    },
+    "corner": {
+      "label": "Posición",
+      "topLeft": "Arriba a la izquierda",
+      "topRight": "Arriba a la derecha",
+      "bottomLeft": "Abajo a la izquierda",
+      "bottomRight": "Abajo a la derecha",
+      "custom": "Personalizada (movida)"
+    },
+    "opacity": "Opacidad",
+    "inGame": {
+      "title": "Superposición en el juego",
+      "explanation": "Muestra quién habla dentro de tus juegos. Se inicia sola al arrancar un juego y solo aparece en juegos.",
+      "mode": "Superposición en el juego",
+      "off": "Desactivada",
+      "on": "Activada",
+      "antiCheat": "Algunos juegos con protección anti-trampas consideran cualquier superposición una trampa y pueden banear la cuenta. Esos juegos están desactivados por defecto, incluso con la opción activada.",
+      "games": "Juegos",
+      "noGames": "Aún no se conoce ningún juego. Aparecerán aquí cuando se detecten.",
+      "running": "En ejecución",
+      "followsDefault": "Sigue el valor por defecto",
+      "overridden": "Tu elección",
+      "blocked": "Bloqueado por el anti-trampas.",
+      "blockedReason": "Motivo: {{reason}}",
+      "options": "Opciones de {{game}}",
+      "reset": "Usar el valor por defecto en {{game}}",
+      "size": "Tamaño",
+      "unsupported": "La superposición en el juego no está disponible en este sistema. Se usa la superposición en ventana de arriba.",
+      "loadFailed": "No se pudieron cargar los ajustes de la superposición en el juego.",
+      "saveFailed": "No se pudo aplicar el cambio de la superposición en el juego.",
+      "confirmTitle": "¿Activar la superposición en {{game}}?",
+      "confirmMessage": "Advertencia: {{game}} usa protección anti-trampas ({{reason}}). Las superposiciones pueden detectarse como trampas y tu cuenta podría ser baneada. Mumcord no se hace responsable. Continúa solo si aceptas este riesgo.",
+      "confirmEnable": "Activar de todos modos",
+      "limits": {
+        "libraryMissing": "La superposición en el juego no está disponible: no se encontró su biblioteca (libmumcord_overlay_layer.so) junto a Mumcord. Reinstala Mumcord para restaurarla. Se usa la superposición en ventana de arriba.",
+        "windowsPending": "La superposición en el juego aún no está disponible en Windows. Se usa la superposición en ventana de arriba.",
+        "macos": "macOS no admite superposiciones en el juego. Se usa la superposición en ventana de arriba."
+      }
+    }
   },
   "diagnostics": {
     "logging": "Registro",
@@ -205,7 +306,10 @@
     "version": "Versión",
     "os": "Sistema",
     "license": "Licencia de Mumcord (AGPL-3.0)",
-    "commercial": "Licencias comerciales: tobias@vorwachs.com",
+    "whatsNew": "Novedades",
+    "support": "Soporte",
+    "reportBug": "Informar de un error",
+    "requestFeature": "Solicitar una función",
     "notices": "Avisos de terceros",
     "noticesHint": "Mumcord se basa en software de código abierto, incluido código del proyecto Mumble.",
     "noticesFailed": "No se pudieron cargar los avisos de terceros.",
@@ -247,6 +351,44 @@
   },
   "retention": {
     "days_one": "{{count}} día",
-    "days_other": "{{count}} días"
+    "days_other": "{{count}} días",
+    "days_many": "{{count}} días"
+  },
+  "nowGaming": {
+    "title": "Jugando ahora",
+    "switch": "Compartir a qué estoy jugando",
+    "hint": "Mumcord busca juegos conocidos entre tus programas en ejecución y el juego que Steam está ejecutando. Otros usuarios de Mumcord ven el juego, su imagen y cuánto tiempo llevas jugando, y pueden unirse a tu servidor si el juego lo ofrece; los clientes oficiales de Mumble ven una línea «🎮 Juego» al final de tu comentario.",
+    "unsupported": "No compatible con este sistema.",
+    "current": "Compartiendo: {{game}}",
+    "nothing": "No se detecta ningún juego ahora mismo."
+  },
+  "positional": {
+    "title": "Audio posicional",
+    "switch": "Audio posicional",
+    "hint": "Las voces de quienes están en el mismo juego se colocan en 3D a tu alrededor. Requiere un juego que comparta sus posiciones.",
+    "minDistance": "Volumen máximo hasta (metros)",
+    "maxDistance": "Silencio más allá de (metros)",
+    "invalid": "Introduce las distancias en metros: mínimo de 0 o más, máximo al menos 1 por encima del mínimo y como mucho 1000.",
+    "sourceGame": "Posiciones de: {{source}} – {{game}}",
+    "source": "Posiciones de: {{source}}",
+    "none": "No se detecta ningún juego",
+    "betaHint": "El resultado depende del juego y de su compatibilidad con plugins."
+  },
+  "gamePlugins": {
+    "title": "Audio posicional: fuentes",
+    "explanation": "Los juegos indican a Mumcord dónde estás mediante Mumble Link o mediante los plugins de juego oficiales de Mumble. Mumcord busca los plugins en su propia carpeta de plugins y en una instalación de Mumble existente. Activa solo los plugins de los juegos a los que juegas.",
+    "antiCheat": "Los plugins de juego leen la memoria del juego. Algunos sistemas antitrampas pueden marcarlo; desactiva los plugins en juegos con antitrampas estrictos.",
+    "loading": "Buscando plugins de juego…",
+    "none": "No se encontraron plugins de juego. Instala Mumble o copia los archivos de plugin en la carpeta de plugins de Mumcord.",
+    "loadFailed": "No se pudieron listar los plugins de juego.",
+    "switchFailed": "No se pudo cambiar el plugin de juego.",
+    "version": "Versión {{version}}",
+    "active": "Enviando posiciones",
+    "problem": {
+      "incompatible": "No es compatible con Mumcord.",
+      "initFailed": "No se pudo iniciar.",
+      "unsupported": "No disponible en este sistema.",
+      "failed": "Detenido tras un error. Desactívalo y vuelve a activarlo para reintentar."
+    }
   }
 }

@@ -21,7 +21,12 @@ const FLUSH_EVERY_TICKS: u32 = 100;
 
 pub(crate) enum TestBackend {
     Null,
-    File { input: PathBuf, output: PathBuf },
+    File {
+        input: PathBuf,
+        output: PathBuf,
+        /// Record playback as stereo instead of the mono mix.
+        stereo: bool,
+    },
 }
 
 impl TestBackend {
@@ -90,18 +95,21 @@ impl Backend for TestBackend {
         _id: Option<&str>,
         counters: &Arc<Counters>,
     ) -> Result<Opened<Producer<f32>>, IoError> {
-        let mut writer = match self {
-            TestBackend::Null => None,
-            TestBackend::File { output, .. } => Some(open_output_wav(output)?),
+        let (mut writer, channels) = match self {
+            TestBackend::Null => (None, 1),
+            TestBackend::File { output, stereo, .. } => {
+                let channels = if *stereo { 2 } else { 1 };
+                (Some(open_output_wav(output, channels)?), channels)
+            }
         };
-        let (producer, consumer) = ring::ring(SAMPLE_RATE);
+        let (producer, consumer) = ring::stereo_ring(SAMPLE_RATE);
         let counters = counters.clone();
         let guard = TickThread::spawn("audio-test-playback", move |stop| {
             let mut consumer = consumer;
-            let mut block = [0.0f32; SAMPLE_RATE as usize / 100];
+            let mut block = vec![0.0f32; usize::from(channels) * SAMPLE_RATE as usize / 100];
             let mut ticks = 0u32;
             move || {
-                ring::playback(&mut block, 1, &mut consumer, &counters);
+                ring::playback(&mut block, usize::from(channels), &mut consumer, &counters);
                 if let Some(w) = writer.as_mut() {
                     for &s in &block {
                         w.write_sample(to_i16(s)).map_err(wav_err)?;
@@ -314,13 +322,13 @@ static RECORDED: std::sync::Mutex<Vec<PathBuf>> = std::sync::Mutex::new(Vec::new
 /// (the engine closes and reopens the devices between mic test, connections and device
 /// listings, the controller reopens after errors or device switches) continue it, so
 /// everything played during one app run stays in one recording.
-fn open_output_wav(path: &Path) -> Result<WavWriter, IoError> {
+fn open_output_wav(path: &Path, channels: u16) -> Result<WavWriter, IoError> {
     let mut recorded = RECORDED
         .lock()
         .unwrap_or_else(std::sync::PoisonError::into_inner);
     if recorded.iter().any(|p| p == path) {
         match hound::WavWriter::append(path) {
-            Ok(writer) if writer.spec() == output_spec() => return Ok(writer),
+            Ok(writer) if writer.spec() == output_spec(channels) => return Ok(writer),
             Ok(_) => tracing::warn!("test audio output has another format; starting it anew"),
             Err(e) => {
                 tracing::warn!("continuing the test audio output failed ({e}); starting it anew")
@@ -329,12 +337,12 @@ fn open_output_wav(path: &Path) -> Result<WavWriter, IoError> {
     } else {
         recorded.push(path.to_owned());
     }
-    hound::WavWriter::create(path, output_spec()).map_err(wav_err)
+    hound::WavWriter::create(path, output_spec(channels)).map_err(wav_err)
 }
 
-fn output_spec() -> hound::WavSpec {
+fn output_spec(channels: u16) -> hound::WavSpec {
     hound::WavSpec {
-        channels: 1,
+        channels,
         sample_rate: SAMPLE_RATE,
         bits_per_sample: 16,
         sample_format: hound::SampleFormat::Int,

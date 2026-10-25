@@ -1,0 +1,14 @@
+{
+  "region": "Értesítések",
+  "channel": "#{{name}}",
+  "unknownChannel": "Egy csatorna",
+  "line": "{{sender}}: {{preview}}",
+  "groupedChannel_one": "{{count}} új üzenet itt: {{name}}",
+  "groupedChannel_other": "{{count}} új üzenet itt: {{name}}",
+  "groupedPrivate_one": "{{count}} új üzenet tőle: {{name}}",
+  "groupedPrivate_other": "{{count}} új üzenet tőle: {{name}}",
+  "image": "Képet küldött",
+  "open": "Chat megnyitása",
+  "close": "Értesítés elvetése",
+  "mentionLine": "{{sender}} megemlített: {{preview}}"
+}

@@ -1,6 +1,7 @@
 #!/bin/bash
 # Runs inside the E2E container: session D-Bus with an unlocked Secret Service (gnome-keyring),
-# Xvfb, then builds the app (debug, feature test-backend), bot and netsim, then runs WebdriverIO.
+# Xvfb, then builds the app (debug, feature test-backend), bot, netsim, the test game plugin and
+# the in-game overlay check, then runs WebdriverIO.
 # MUMCORD_E2E_SHARD=<n> limits the run to one shard of e2e/shards.json (see wdio.conf.ts).
 set -euo pipefail
 
@@ -28,6 +29,11 @@ rm -f "$HOME"/.local/share/keyrings/*.keyring "$HOME"/.local/share/keyrings/defa
 printf 'e2e' | gnome-keyring-daemon --unlock --components=secrets >/dev/null
 gnome-keyring-daemon --start --components=secrets >/dev/null
 
+# The in-game overlay listens on an abstract Unix socket, and abstract sockets live in the network
+# namespace the container shares with the host (--network host). A Mumcord running on the host for
+# the same uid holds the default name, so the app under test and the layer use a name of their own.
+export MUMCORD_OVERLAY_SOCKET="mumcord-overlay-e2e-$$"
+
 export DISPLAY=:99
 Xvfb "$DISPLAY" -screen 0 1600x1000x24 -nolisten tcp >/dev/null 2>&1 &
 xvfb_pid=$!
@@ -42,9 +48,11 @@ export LIBGL_ALWAYS_SOFTWARE=1 NO_AT_BRIDGE=1
 # it shared. Unset = both.
 step="${MUMCORD_E2E_STEP:-}"
 if [ "$step" != test ]; then
-  echo "building app (debug, test-backend), mumcord-bot, netsim..."
+  echo "building app (debug, test-backend), mumcord-bot, netsim, test game plugin..."
   npx tauri build --debug --no-bundle --features test-backend -- --locked
   cargo build --locked --quiet -p mumcord-bot -p netsim
+  cargo build --locked --quiet -p mumcord-positional --example test_plugin
+  cargo build --locked --quiet -p mumcord-overlay-layer --example headless_check
 fi
 [ "$step" = build ] && exit 0
 

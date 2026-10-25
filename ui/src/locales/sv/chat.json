@@ -1,0 +1,151 @@
+{
+  "noConversation": "Anslut till en server och välj en kanal för att börja chatta.",
+  "empty": "Inga meddelanden än. Meddelanden du får här sparas på den här datorn.",
+  "header": {
+    "channel": "#{{name}}",
+    "channelPrefix": "Kanal",
+    "privatePrefix": "Privat chatt med",
+    "unknownPerson": "Okänd person"
+  },
+  "list": {
+    "today": "Idag",
+    "yesterday": "Igår",
+    "label": "Meddelanden i {{name}}",
+    "loadOlder": "Läs in äldre meddelanden",
+    "loading": "Läser in meddelanden…",
+    "loadFailed": "Det gick inte att läsa in äldre meddelanden. Scrolla upp för att försöka igen.",
+    "loadEarlier": "Läs in tidigare meddelanden",
+    "syncing": "Letar efter tidigare meddelanden från andra Mumcord-användare…",
+    "syncAdded_one": "{{count}} tidigare meddelande har lagts till från andra Mumcord-användare.",
+    "syncAdded_other": "{{count}} tidigare meddelanden har lagts till från andra Mumcord-användare.",
+    "syncNone": "Inga tidigare meddelanden hittades.",
+    "syncFailed": "Tidigare meddelanden kan inte läsas in här.",
+    "syncedFrom": "från {{name}}s historik",
+    "jumpToNewest": "Hoppa till senaste",
+    "jumpToNewestUnseen_one": "Hoppa till senaste, {{count}} nytt meddelande",
+    "jumpToNewestUnseen_other": "Hoppa till senaste, {{count}} nya meddelanden"
+  },
+  "format": {
+    "toolbar": "Formatering",
+    "bold": "Fet",
+    "italic": "Kursiv",
+    "strike": "Genomstruken",
+    "code": "Inbäddad kod",
+    "codeBlock": "Kodblock",
+    "link": "Länk"
+  },
+  "composer": {
+    "label": "Meddelande till {{name}}",
+    "hint": "Tryck på Enter för att skicka och Skift+Enter för ny rad. Markdown fungerar: **fet**, *kursiv*, `kod`, [länk](https://…).",
+    "addImage": "Lägg till bild",
+    "removeImage": "Ta bort bilden {{name}}",
+    "imagePreview": "Bild att skicka: {{name}}",
+    "send": "Skicka",
+    "noPermission": "Du har inte behörighet att skriva i den här kanalen.",
+    "unavailable": "Den här kanalen finns inte längre.",
+    "offline": "{{name}} är offline. Du kan skriva igen när personen är tillbaka.",
+    "unnamedImage": "Inklistrad bild"
+  },
+  "tray": {
+    "label": "Bilder att skicka",
+    "processing": "Förbereder bild",
+    "scaled": "Skalad till {{width}}×{{height}} för att passa servergränsen"
+  },
+  "errors": {
+    "tooLong": "Ditt meddelande är för långt för den här servern (högst {{max}} tecken). Korta ned det och försök igen.",
+    "tooLongNoLimit": "Ditt meddelande är för långt för den här servern. Korta ned det och försök igen.",
+    "imageTooLarge": "Den här bilden är för stor för servern, även efter komprimering. Prova en mindre bild.",
+    "imageWithTextTooLong": "Meddelandet med bilden är för stort för servern. Korta ned texten eller ta bort bilden.",
+    "imagesNotAllowed": "Den här servern tillåter inte bilder i meddelanden.",
+    "notImage": "Den här filen kan inte skickas. Använd en PNG-, JPEG-, GIF- eller WebP-bild.",
+    "imageUnreadable": "Bilden kunde inte läsas. Prova en annan fil.",
+    "denied": "Servern tillät inte det här meddelandet.",
+    "deniedWithReason": "Servern tillät inte det här meddelandet: {{reason}}",
+    "notConnected": "Du är inte ansluten. Anslut igen och försök på nytt.",
+    "generic": "Meddelandet kunde inte skickas. Försök igen.",
+    "onlyImages": "Bara bilder kan skickas.",
+    "sourceTooLarge": "Den här filen är för stor för att skickas (över 25 MB)."
+  },
+  "announce": {
+    "message": "{{name}}: {{text}}",
+    "image": "{{name}} skickade en bild",
+    "more_one": "{{count}} nytt meddelande till",
+    "more_other": "{{count}} nya meddelanden till"
+  },
+  "pinned": {
+    "label": "Kanalinfo",
+    "showMore": "Visa mer",
+    "showLess": "Visa mindre"
+  },
+  "mention": {
+    "list": "Personer att omnämna",
+    "found_one": "{{count}} person föreslås. Använd piltangenterna och sedan Enter för att infoga.",
+    "found_other": "{{count}} personer föreslås. Använd piltangenterna och sedan Enter för att infoga.",
+    "none": "Ingen hittades",
+    "mentionsYou": "Omnämner dig",
+    "chipLabel": "{{name}}, omnämning"
+  },
+  "preview": {
+    "open": "Öppna i webbläsaren",
+    "openLabel": "Öppna {{title}} i webbläsaren",
+    "play": "Spela {{title}}",
+    "player": "Videospelare: {{title}}",
+    "videoTitle": "{{site}}-video",
+    "spotifyTitle": "{{site}}-länk",
+    "audioPlayer": "Spotify-spelare: {{title}}",
+    "kind": {
+      "track": "Låt",
+      "album": "Album",
+      "playlist": "Spellista",
+      "artist": "Artist",
+      "episode": "Avsnitt",
+      "show": "Program"
+    },
+    "inBrowser": "Spelas upp i din webbläsare",
+    "card": "Länkförhandsvisning: {{title}}",
+    "dismiss": "Dölj förhandsvisning"
+  },
+  "image": {
+    "loading": "Läser in bilden {{name}}",
+    "label": "Bild: {{name}}",
+    "view": "Visa bilden {{name}}",
+    "viewMessage": "Bild från {{name}}, öppna i bildvisaren",
+    "failed": "Bilden kan inte visas (för stor eller otillgänglig)."
+  },
+  "viewer": {
+    "label": "Bildvisare",
+    "counter": "{{current}} / {{total}}",
+    "zoomIn": "Zooma in",
+    "zoomOut": "Zooma ut",
+    "fit": "Anpassa till fönstret",
+    "save": "Spara bild",
+    "saved": "Bilden sparades",
+    "saveFailed": "Bilden kunde inte sparas",
+    "fileFilter": "Bild",
+    "openInBrowser": "Öppna i webbläsaren",
+    "close": "Stäng",
+    "previous": "Föregående bild",
+    "next": "Nästa bild",
+    "unnamed": "bild",
+    "fullLoading": "Läser in full storlek…",
+    "fullProgress": "Läser in full storlek… {{percent}} %",
+    "fullUnavailable": "Full storlek är inte tillgänglig – visar förhandsvisningen"
+  },
+  "favorites": {
+    "open": "GIF-favoriter",
+    "title": "GIF-favoriter",
+    "save": "Spara som favorit",
+    "remove": "Ta bort från favoriter",
+    "removeNamed": "Ta bort {{name}} från favoriter",
+    "send": "Skicka {{name}}",
+    "hint": "Piltangenter flyttar, Enter skickar, Delete tar bort, Escape stänger.",
+    "empty": "Inga favoriter än. Högerklicka på en GIF i chatten, eller använd stjärnan på den, och välj \"Spara som favorit\". Då dyker den upp här."
+  },
+  "imageMenu": {
+    "label": "Bilden {{name}}"
+  },
+  "attribution": {
+    "via": "via {{brand}}",
+    "view": "Visa på {{brand}}"
+  }
+}

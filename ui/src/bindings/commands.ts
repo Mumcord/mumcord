@@ -55,8 +55,22 @@ export const commands = {
 	personSetVolume: (session: number, volume: number) => typedError<null, ApiError>(__TAURI_INVOKE("person_set_volume", { session, volume })),
 	/**  Mutes a person locally; remembered by certificate hash per server. */
 	personSetLocalMute: (session: number, muted: boolean) => typedError<null, ApiError>(__TAURI_INVOKE("person_set_local_mute", { session, muted })),
+	/**
+	 *  Saves the private note about a person (at most 1000 characters; empty removes it);
+	 *  remembered by certificate hash per server.
+	 */
+	personSetNote: (session: number, note: string) => typedError<null, ApiError>(__TAURI_INVOKE("person_set_note", { session, note })),
 	/**  Comment and avatar of a person, fetched from the server when not known yet. */
 	personProfile: (session: number) => typedError<PersonProfile, ApiError>(__TAURI_INVOKE("person_profile", { session })),
+	/**  Friends with their online state, online first. */
+	friendsList: () => typedError<Friend[], ApiError>(__TAURI_INVOKE("friends_list")),
+	/**
+	 *  Adds a person on the connected server as a friend; fails for people without a
+	 *  certificate.
+	 */
+	friendAdd: (session: number) => typedError<null, ApiError>(__TAURI_INVOKE("friend_add", { session })),
+	/**  Removes a friend by certificate hash. */
+	friendRemove: (certHash: string) => typedError<null, ApiError>(__TAURI_INVOKE("friend_remove", { certHash })),
 	/**
 	 *  Sends Mumble-compatible HTML (the UI converts Markdown and scales images).
 	 *  Fails with `messageTooLarge` above the server limit or `permissionDenied`.
@@ -68,6 +82,25 @@ export const commands = {
 	 *  already in the UI, so nothing is fetched again.
 	 */
 	saveImage: (path: string, dataUrl: string) => typedError<null, ApiError>(__TAURI_INVOKE("save_image", { path, dataUrl })),
+	/**
+	 *  Reads an image file that was just dropped onto the window (once per drop). Fails with
+	 *  `notFound` for any other path, `messageTooLarge` above 25 MB and `invalidInput` when the
+	 *  file is not a PNG, JPEG, GIF or WebP image.
+	 */
+	readDroppedImage: (path: string) => typedError<DroppedImage, ApiError>(__TAURI_INVOKE("read_dropped_image", { path })),
+	/**
+	 *  Keeps the full image of a picture about to be sent (the original file as a `data:` URL;
+	 *  re-encoded when larger than 512 KiB or 3840 px) and returns the reference to put into the
+	 *  thumbnail's `data-mumcord-full` attribute. Errors: `invalidInput` for anything that is not
+	 *  a usable PNG, JPEG, GIF or WebP image.
+	 */
+	fullImageKeep: (dataUrl: string) => typedError<string, ApiError>(__TAURI_INVOKE("full_image_keep", { dataUrl })),
+	/**
+	 *  The full image behind a thumbnail as a `data:` URL: from the cache, else fetched from the
+	 *  message's sender while they are online (progress as `fullImageProgress`). `null` when it
+	 *  cannot be had; keep showing the thumbnail then.
+	 */
+	fullImageFetch: (reference: string, senderSession: number | null, senderCertHash: string | null) => typedError<string | null, ApiError>(__TAURI_INVOKE("full_image_fetch", { reference, senderSession, senderCertHash })),
 	/**
 	 *  Preview of an http(s) link in a message; `null` when previews are switched off in the
 	 *  settings (then nothing is fetched) or there is nothing to show.
@@ -118,6 +151,13 @@ export const commands = {
 	historyClear: (scope: HistoryScope) => typedError<null, ApiError>(__TAURI_INVOKE("history_clear", { scope })),
 	/**  "Save history" switch per server (default on). */
 	historySetSaving: (serverId: number, enabled: boolean) => typedError<null, ApiError>(__TAURI_INVOKE("history_set_saving", { serverId, enabled })),
+	/**
+	 *  "Load earlier messages" (FR-1.60): asks other Mumcord users for the channel's messages
+	 *  from before the user started receiving it live. The channel must be the own or a followed
+	 *  one (`notFound` otherwise); `serverTooOld` on servers that cannot forward plugin data.
+	 *  Progress arrives as `historySyncStatus`, messages as `historySynced`.
+	 */
+	historySyncRequest: (channelId: number) => typedError<null, ApiError>(__TAURI_INVOKE("history_sync_request", { channelId })),
 	/**  Sets the own avatar from an image file, scaled to the server limit; `null` removes it. */
 	setOwnAvatar: (path: string | null) => typedError<null, ApiError>(__TAURI_INVOKE("set_own_avatar", { path })),
 	/**  The default avatar as a `data:` URL, or `null` if none is set. */
@@ -162,6 +202,27 @@ export const commands = {
 	 *  stored setting only takes effect after `app_restart`.
 	 */
 	pttSession: () => typedError<PttSession, ApiError>(__TAURI_INVOKE("ptt_session")),
+	/**
+	 *  KDE only: opens System Settings → Legacy X11 App Support (`kcmshell6 kwinxwayland`, else
+	 *  `systemsettings kcm_kwinxwayland`). `invalidInput` outside KDE, `io` if neither started.
+	 */
+	pttOpenKdeX11Settings: () => typedError<null, ApiError>(__TAURI_INVOKE("ptt_open_kde_x11_settings")),
+	/**
+	 *  KDE only: whether KWin lets X11 apps see mouse buttons. `invalidInput` outside KDE, `io`
+	 *  if the KDE settings cannot be read.
+	 */
+	pttKdeX11Access: () => typedError<KdeX11Access, ApiError>(__TAURI_INVOKE("ptt_kde_x11_access")),
+	/**
+	 *  KDE only: allows mouse buttons for X11 apps in KDE's settings and asks KWin to reload.
+	 *  `io` if the settings cannot be written, `internal` if KWin cannot be reached (the setting
+	 *  is written; it applies at the next login). A Mumcord restart is needed afterwards.
+	 */
+	pttKdeX11AllowMouse: () => typedError<KdeX11Access, ApiError>(__TAURI_INVOKE("ptt_kde_x11_allow_mouse")),
+	/**
+	 *  KDE only: puts back the settings from before `ptt_kde_x11_allow_mouse`. `invalidInput` if
+	 *  there is nothing to undo; other errors as for allowing.
+	 */
+	pttKdeX11Undo: () => typedError<KdeX11Access, ApiError>(__TAURI_INVOKE("ptt_kde_x11_undo")),
 	/**  Answers `CloseRequested`; `remember` stores the choice as the close behaviour. */
 	closeChoice: (choice: CloseChoice, remember: boolean) => typedError<null, ApiError>(__TAURI_INVOKE("close_choice", { choice, remember })),
 	/**  Disconnects cleanly and starts Mumcord again, e.g. to apply compatibility mode (FR-1.48). */
@@ -189,6 +250,64 @@ export const commands = {
 	 *  by the engine; `null` when link previews are off (nothing is fetched then) or there is none.
 	 */
 	nowPlayingCover: (session: number) => typedError<string | null, ApiError>(__TAURI_INVOKE("now_playing_cover", { session })),
+	/**  Platform support and the own shared game (for the settings). */
+	nowGamingStatus: () => typedError<NowGamingStatus, ApiError>(__TAURI_INVOKE("now_gaming_status")),
+	/**
+	 *  Icon of a person's game (or the own one) as a small `data:` URL, fetched from the Steam CDN
+	 *  and re-encoded by the engine; `null` when link previews are off (nothing is fetched then)
+	 *  or there is none.
+	 */
+	nowGamingIcon: (session: number) => typedError<string | null, ApiError>(__TAURI_INVOKE("now_gaming_icon", { session })),
+	/**
+	 *  Opens the person's game server in Steam (`steam://connect/<host:port>`). Only links the
+	 *  engine validated are opened; ask the user to confirm first. `NotFound` when the person
+	 *  shares no join target (any more).
+	 */
+	nowGamingJoin: (session: number) => typedError<null, ApiError>(__TAURI_INVOKE("now_gaming_join", { session })),
+	/**  The current positional audio status. */
+	positionalStatus: () => typedError<PositionalStatus, ApiError>(__TAURI_INVOKE("positional_status")),
+	/**  The official Mumble game plugins found in Mumcord's and Mumble's plugin folders. */
+	pluginsList: () => typedError<GamePlugin[], ApiError>(__TAURI_INVOKE("plugins_list")),
+	/**  Enables or disables one game plugin and stores the choice; returns the updated list. */
+	pluginSetEnabled: (id: string, enabled: boolean) => typedError<GamePlugin[], ApiError>(__TAURI_INVOKE("plugin_set_enabled", { id, enabled })),
+	/**  Current overlay options, move mode and what this desktop supports. */
+	overlayState: () => typedError<OverlayState, ApiError>(__TAURI_INVOKE("overlay_state")),
+	/**
+	 *  Stores the overlay options and applies them right away (opens, closes, moves or resizes
+	 *  the overlay). Returns the stored state; also emits `overlayChanged`.
+	 */
+	overlayUpdate: (settings: OverlaySettings) => typedError<OverlayState, ApiError>(__TAURI_INVOKE("overlay_update", { settings })),
+	/**  Shows or hides the overlay (same as the tray menu item). */
+	overlaySetEnabled: (enabled: boolean) => typedError<OverlayState, ApiError>(__TAURI_INVOKE("overlay_set_enabled", { enabled })),
+	/**
+	 *  Turns move mode on (the overlay takes clicks and can be dragged) or off (click-through
+	 *  again; a dragged place is stored as `customPosition`). Ignored while the overlay is off.
+	 */
+	overlayMoveMode: (active: boolean) => typedError<OverlayState, ApiError>(__TAURI_INVOKE("overlay_move_mode", { active })),
+	/**
+	 *  KDE Wayland only: adds or updates the KWin window rule that keeps the overlay on top and
+	 *  in its corner, and asks KWin to reload its rules. `invalidInput` elsewhere, `io` if the
+	 *  rules file cannot be written, `internal` if KWin cannot be reached (the rule is written).
+	 */
+	overlayKwinRuleInstall: () => typedError<OverlayState, ApiError>(__TAURI_INVOKE("overlay_kwin_rule_install")),
+	/**  KDE Wayland only: removes Mumcord's KWin window rule again and asks KWin to reload. */
+	overlayKwinRuleRemove: () => typedError<OverlayState, ApiError>(__TAURI_INVOKE("overlay_kwin_rule_remove")),
+	/**
+	 *  KDE only: opens System Settings → Window Rules (`systemsettings kcm_kwinrules`, else
+	 *  `kcmshell6 kwinrules`). `io` if neither could be started.
+	 */
+	overlayOpenKdeWindowRules: () => typedError<null, ApiError>(__TAURI_INVOKE("overlay_open_kde_window_rules")),
+	/**  Current in-game overlay settings, platform support and the games that can be configured. */
+	ingameOverlayState: () => typedError<InGameOverlayState, ApiError>(__TAURI_INVOKE("ingame_overlay_state")),
+	/**  Sets the global mode (off/on). */
+	ingameOverlaySetMode: (mode: InGameOverlayMode) => typedError<InGameOverlayState, ApiError>(__TAURI_INVOKE("ingame_overlay_set_mode", { mode })),
+	/**
+	 *  Adds or replaces a game's options. Enabling a blocklisted game needs `riskConfirmed`; without
+	 *  it the engine keeps the overlay off for that game (the command still stores the choice).
+	 */
+	ingameOverlaySetGame: (entry: GameOverlayEntry) => typedError<InGameOverlayState, ApiError>(__TAURI_INVOKE("ingame_overlay_set_game", { entry })),
+	/**  Removes a game's options (it then follows the global mode again, or the blocklist default). */
+	ingameOverlayRemoveGame: (key: GameKey) => typedError<InGameOverlayState, ApiError>(__TAURI_INVOKE("ingame_overlay_remove_game", { key })),
 };
 
 /** Events */
@@ -203,11 +322,20 @@ export const events = {
 	deepLinkOpened: makeEvent<DeepLinkOpened, DeepLinkOpened>("deep-link-opened"),
 	defaultAvatarSkipped: makeEvent<DefaultAvatarSkipped, DefaultAvatarSkipped>("default-avatar-skipped"),
 	followedChannelsChanged: makeEvent<FollowedChannelsChanged, FollowedChannelsChanged>("followed-channels-changed"),
+	friendsChanged: makeEvent<FriendsChanged, FriendsChanged>("friends-changed"),
+	fullImageProgress: makeEvent<FullImageProgress, FullImageProgress>("full-image-progress"),
+	historySyncStatus: makeEvent<HistorySyncStatus, HistorySyncStatus>("history-sync-status"),
+	historySynced: makeEvent<HistorySynced, HistorySynced>("history-synced"),
+	inGameOverlayChanged: makeEvent<InGameOverlayChanged, InGameOverlayChanged>("in-game-overlay-changed"),
 	messageReceived: makeEvent<MessageReceived, MessageReceived>("message-received"),
 	micLevel: makeEvent<MicLevel, MicLevel>("mic-level"),
 	micTestPhaseChanged: makeEvent<MicTestPhaseChanged, MicTestPhaseChanged>("mic-test-phase-changed"),
 	notificationActivated: makeEvent<NotificationActivated, NotificationActivated>("notification-activated"),
+	nowGamingChanged: makeEvent<NowGamingChanged, NowGamingChanged>("now-gaming-changed"),
 	nowPlayingChanged: makeEvent<NowPlayingChanged, NowPlayingChanged>("now-playing-changed"),
+	overlayChanged: makeEvent<OverlayChanged, OverlayChanged>("overlay-changed"),
+	positionalSendingChanged: makeEvent<PositionalSendingChanged, PositionalSendingChanged>("positional-sending-changed"),
+	positionalStatusChanged: makeEvent<PositionalStatusChanged, PositionalStatusChanged>("positional-status-changed"),
 	serverDenied: makeEvent<ServerDenied, ServerDenied>("server-denied"),
 	serverSynced: makeEvent<ServerSynced, ServerSynced>("server-synced"),
 	talkStateChanged: makeEvent<TalkStateChanged, TalkStateChanged>("talk-state-changed"),
@@ -246,6 +374,14 @@ export type AudioDevices = {
 /**  Device list changed (hot-plug). */
 export type AudioDevicesChanged = {
 	devices: AudioDevices,
+};
+
+/**  A game on the bundled blocklist (QA.56), shown read-only in the settings. */
+export type BlocklistInfo = {
+	name: string,
+	antiCheat: string,
+	reason: string,
+	source: string,
 };
 
 /**  The server's certificate is unknown or changed; the connection waits for `cert_trust_decide`. */
@@ -319,6 +455,11 @@ export type ChatMessage = {
 	body: string,
 	/**  Links whose preview card was dismissed by the user (`preview_dismiss`). */
 	dismissedPreviews: string[],
+	/**
+	 *  Name of the person whose history this message was synced from (FR-1.60); `null` for
+	 *  messages received or sent here. Show "from ‹name›'s history".
+	 */
+	syncedFrom: string | null,
 };
 
 export type CloseBehaviour = "ask" | "minimizeToTray" | "quit";
@@ -365,6 +506,9 @@ export type Conversation = { kind: "channel"; channelId: number } |
 /**  Private chat with a person without certificate; lives only for this session. */
 { kind: "privateSession"; session: number };
 
+/**  Screen corner (same values as the window overlay). */
+export type Corner = "topLeft" | "topRight" | "bottomLeft" | "bottomRight";
+
 /**  A `mumble://` link was opened from outside (startup argument or second launch). */
 export type DeepLinkOpened = {
 	link: MumbleLink,
@@ -377,6 +521,27 @@ export type DeepLinkOpened = {
 export type DefaultAvatarSkipped = {
 	serverId: number,
 };
+
+/**  A dropped image file, ready to go into the attachment tray. */
+export type DroppedImage = {
+	/**  File name without the folder. */
+	name: string,
+	/**  MIME type detected from the file contents, not the extension. */
+	mime: string,
+	/**  The file contents, base64-encoded. */
+	data: string,
+};
+
+/**  Why a game shows the overlay or not. */
+export type Effect = 
+/**  Drawn in this game. */
+"show" | 
+/**  Global mode is off. */
+"globalOff" | 
+/**  Switched off for this game. */
+"gameOff" | 
+/**  On the blocklist and not confirmed. */
+"blocked";
 
 /**  Machine-readable error category; the UI maps it to a plain-language message. */
 export type ErrorCode = 
@@ -433,7 +598,111 @@ export type FollowedChannelsChanged = {
 	channelIds: number[],
 };
 
+export type Friend = {
+	certHash: string,
+	/**  Current name while online, otherwise the name last seen. */
+	name: string,
+	/**  RFC 3339. */
+	addedAt: string,
+	/**  RFC 3339; `null` if not seen online since adding. */
+	lastSeenAt: string | null,
+	/**  `null` while offline. */
+	online: FriendOnline | null,
+};
+
+/**  Where a friend is online right now. */
+export type FriendOnline = {
+	serverId: number,
+	session: number,
+	channelId: number,
+};
+
+/**  The friends list changed (added, removed, online, moved, renamed, offline). Online first. */
+export type FriendsChanged = {
+	friends: Friend[],
+};
+
+/**
+ *  Progress of a full image being fetched: `received` of `total` bytes of the image with this
+ *  reference (the `data-mumcord-full` value of the thumbnail).
+ */
+export type FullImageProgress = {
+	reference: string,
+	received: number,
+	total: number,
+};
+
+/**  How a game is identified: its Steam app id, or its executable name. */
+export type GameKey = { kind: "steam"; value: number } | { kind: "exe"; value: string };
+
+/**  Per-game options sent from the settings page. Ranges are clamped on save. */
+export type GameOverlayEntry = {
+	key: GameKey,
+	/**  Display name; plain text. */
+	name: string,
+	/**  `null` follows the global mode; `true`/`false` overrides it for this game. */
+	enabled: boolean | null,
+	/**
+	 *  The stronger anti-cheat warning was confirmed for this game (needed to enable a
+	 *  blocklisted game, QA.56).
+	 */
+	riskConfirmed: boolean,
+	corner: Corner,
+	/**  Percent of the default size, 50–200. */
+	sizePercent: number,
+	/**  Percent, 20–100. */
+	opacityPercent: number,
+	showWholeChannel: boolean,
+	showChannelName: boolean,
+	/**  Blocklist entry when the game is on the bundled blocklist, else `null` (read-only). */
+	blocklist: BlocklistInfo | null,
+	/**  What the overlay currently does for this game given the whole settings (read-only). */
+	effective: Effect,
+};
+
+/**  An official Mumble game plugin found on this computer (FR-1.42b). */
+export type GamePlugin = {
+	/**  Stable identifier (the file name), as stored in the settings. */
+	id: string,
+	/**  Name the plugin reports. Plain text from a third-party library. */
+	name: string,
+	/**  Version the plugin reports. Plain text. */
+	version: string | null,
+	enabled: boolean,
+	/**  The plugin found its game and delivers positions. */
+	active: boolean,
+	problem: GamePluginProblem | null,
+};
+
+/**  Why a listed game plugin delivers no positions. */
+export type GamePluginProblem = 
+/**  Built for a plugin interface Mumcord does not implement. */
+"incompatible" | 
+/**  The plugin failed to start. */
+"initFailed" | 
+/**  The plugin cannot work on this system. */
+"unsupported" | 
+/**  The plugin failed and is not used until it is enabled again. */
+"failed";
+
 export type HistoryScope = { kind: "conversation"; serverId: number; conversation: Conversation } | { kind: "server"; serverId: number } | { kind: "all" };
+
+/**  A channel's history sync started (`running: true`) or ended with `added` new messages. */
+export type HistorySyncStatus = {
+	channelId: number,
+	running: boolean,
+	added: number,
+};
+
+/**
+ *  Messages from another Mumcord user's history were added to a channel (FR-1.60), sorted
+ *  by `sentAt` (ties by hash), each with `syncedFrom` set. Insert them at their time position
+ *  and keep the reading position (FR-1.60b).
+ */
+export type HistorySynced = {
+	channelId: number,
+	messages: ChatMessage[],
+};
 
 /**  Public view of the identity; the certificate itself never leaves the engine. */
 export type Identity = {
@@ -441,6 +710,29 @@ export type Identity = {
 	name: string,
 	/**  SHA-1 hash of the certificate, as Mumble servers identify it. */
 	certHash: string,
+};
+
+/**  The in-game overlay settings changed. */
+export type InGameOverlayChanged = {
+	state: InGameOverlayState,
+};
+
+/**  Global switch of the in-game overlay. */
+export type InGameOverlayMode = "off" | "on";
+
+/**  Everything the settings page needs. */
+export type InGameOverlayState = {
+	/**  This platform can draw inside games. */
+	supported: boolean,
+	/**  i18n key (namespace `settings`) explaining a platform limitation, or `null`. */
+	explanationKey: string | null,
+	mode: InGameOverlayMode,
+	/**  Games the user configured, each annotated with its blocklist status and current effect. */
+	games: GameOverlayEntry[],
+	/**  Games the user could add: ones running now or on the blocklist, minus the configured ones. */
+	known: KnownGame[],
+	/**  Keys of every game running right now, configured or not. */
+	running: GameKey[],
 };
 
 /**  An external image or image link, ready to show inline (FR-1.55). */
@@ -458,7 +750,23 @@ export type InlineImage = {
 	animated: boolean,
 };
 
-export type Language = "en" | "es" | "de";
+/**  KDE only: whether X11 apps may see mouse buttons now, and whether Mumcord can undo its change. */
+export type KdeX11Access = {
+	allowed: boolean,
+	undoAvailable: boolean,
+};
+
+/**  A game offered to the user to configure: one it ran this session, or one on the blocklist. */
+export type KnownGame = {
+	key: GameKey,
+	name: string,
+	/**  It is running right now (connected to the overlay this session). */
+	running: boolean,
+	blocklist: BlocklistInfo | null,
+};
+
+/**  UI languages: the 24 official EU languages (FR-1.36), serialised as ISO 639-1 codes. */
+export type Language = "bg" | "cs" | "da" | "de" | "el" | "en" | "es" | "et" | "fi" | "fr" | "ga" | "hr" | "hu" | "it" | "lt" | "lv" | "mt" | "nl" | "pl" | "pt" | "ro" | "sk" | "sl" | "sv";
 
 /**  Preview card of a link. All text is plain text, never HTML. */
 export type LinkPreview = {
@@ -547,6 +855,36 @@ export type NotifyOutcome =
 "desktop";
 
 /**
+ *  A game someone plays. `name` is plain text, never HTML. `playedMs` is the play time when the
+ *  event or answer was sent; advance it with the local clock from the moment it arrived.
+ */
+export type NowGaming = {
+	name: string,
+	/**  An icon can be loaded with `now_gaming_icon`. */
+	hasIcon: boolean,
+	playedMs: number,
+	/**  The person's game exposes a server to join (`now_gaming_join`). */
+	canJoin: boolean,
+};
+
+/**
+ *  A person started, changed or stopped sharing the game they play (`game: null`). Also sent
+ *  with the own session while the own game is shared (it never comes back from the server).
+ *  Forget all games on a new `serverSynced` and when a person leaves.
+ */
+export type NowGamingChanged = {
+	session: number,
+	game: NowGaming | null,
+};
+
+/**  Whether this platform can look for games, and the own game as currently shared. */
+export type NowGamingStatus = {
+	supported: boolean,
+	/**  `null` while the setting is off or no game runs. */
+	game: NowGaming | null,
+};
+
+/**
  *  A track someone listens to. All text is plain text, never HTML. `positionMs` is the
  *  position when the event or answer was sent; while `playing`, advance it with the local
  *  clock from the moment it arrived, up to `durationMs`.
@@ -581,17 +919,131 @@ export type NowPlayingStatus = {
 	track: NowPlaying | null,
 };
 
+/**  The overlay options or move mode changed (also sent when the UI language changes). */
+export type OverlayChanged = {
+	state: OverlayState,
+};
+
+/**  Screen corner the overlay sits in unless it was dragged somewhere else. */
+export type OverlayCorner = "topLeft" | "topRight" | "bottomLeft" | "bottomRight";
+
+/**  Top-left corner of the overlay in physical desktop pixels. */
+export type OverlayPoint = {
+	x: number,
+	y: number,
+};
+
+/**  The stored overlay options (FR-1.45). Out-of-range values are clamped on save. */
+export type OverlaySettings = {
+	enabled: boolean,
+	/**  Show everyone in the own channel (talking ones with the ring) instead of only talkers. */
+	showWholeChannel: boolean,
+	/**  Show the own channel's name above the people. */
+	showChannelName: boolean,
+	/**  Percent, 20 – 100 (whole numbers keep the TypeScript type a plain `number`). */
+	opacity: number,
+	/**  Used while `customPosition` is `null`. */
+	corner: OverlayCorner,
+	/**  Set by dragging in move mode; send `null` to go back to `corner`. */
+	customPosition: OverlayPoint | null,
+	/**  Logical pixels, 160 – 800. */
+	width: number,
+	/**  Logical pixels, 80 – 1200. */
+	height: number,
+};
+
+/**  Everything the settings UI and the overlay page need to know about the overlay. */
+export type OverlayState = {
+	settings: OverlaySettings,
+	/**
+	 *  Move mode: the overlay takes clicks so it can be dragged; ends with
+	 *  `overlay_move_mode(false)`, which stores the new place.
+	 */
+	moveMode: boolean,
+	/**
+	 *  Whether this desktop keeps the overlay above other windows (FR-1.46). False on a
+	 *  native Linux Wayland session.
+	 */
+	onTopSupported: boolean,
+	/**
+	 *  Whether the app can place the overlay (corner presets, restoring a dragged place).
+	 *  False on a native Linux Wayland session, where the compositor decides.
+	 */
+	positionSupported: boolean,
+	/**
+	 *  i18n key (namespace `overlay`) of the text explaining a limitation of this desktop, or
+	 *  `null` if there is none. The exclusive-fullscreen note `overlay:limits.exclusiveFullscreen`
+	 *  applies everywhere and is not repeated here.
+	 */
+	explanationKey: string | null,
+	/**  KDE Plasma on native Wayland: the settings offer a KWin window rule for the overlay. */
+	kdeWayland: boolean,
+	/**
+	 *  Whether Mumcord's KWin window rule is in the user's `kwinrulesrc` (only checked on
+	 *  KDE Wayland, else `false`).
+	 */
+	kwinRuleInstalled: boolean,
+	/**  UI language from the settings, for the overlay page (`null` follows the OS). */
+	language: Language | null,
+};
+
 /**  How a server edit treats the stored password. */
 export type PasswordUpdate = 
 /**  Leave the stored password as it is (on add: no password). */
 { kind: "keep" } | { kind: "clear" } | { kind: "set"; value: string };
 
-/**  Comment and avatar, fetched on demand when the profile card opens. */
+/**  Comment, avatar and private note, fetched on demand when the profile card opens. */
 export type PersonProfile = {
 	/**  Sanitized HTML. */
 	comment: string | null,
 	/**  `data:` URL of the avatar image. */
 	avatar: string | null,
+	/**  The user's private note about this person; empty when there is none. */
+	note: string,
+};
+
+/**
+ *  A person (or the user, with the own session) started or stopped sending positions: show or
+ *  hide the "3D" icon. Forget all on a new `serverSynced` and when a person leaves.
+ */
+export type PositionalSendingChanged = {
+	session: number,
+	sending: boolean,
+};
+
+/**  Positional audio (FR-1.41): voices of people in the same game placed in 3D. */
+export type PositionalSettings = {
+	/**  Default off. */
+	enabled: boolean,
+	/**  Metres (default 1): voices are at full volume up to this distance. */
+	minDistance: number | null,
+	/**
+	 *  Metres (default 15): voices are silent beyond this distance. Kept above `minDistance`
+	 *  on save.
+	 */
+	maxDistance: number | null,
+};
+
+/**  What the settings show (FR-1.43) and who gets the "3D" icon (FR-1.72). */
+export type PositionalStatus = {
+	enabled: boolean,
+	/**
+	 *  The source delivering positions right now ("Mumble Link" or a plugin name); `null` while
+	 *  no game delivers any. Plain text.
+	 */
+	source: string | null,
+	/**  The game's own name, if it reports one. Plain text. */
+	game: string | null,
+	/**  Sessions currently sending positions, the own one included. */
+	senders: number[],
+};
+
+/**
+ *  Positional audio was switched or the game delivering positions changed. `senders` is a
+ *  snapshot; follow `PositionalSendingChanged` afterwards.
+ */
+export type PositionalStatusChanged = {
+	status: PositionalStatus,
 };
 
 export type PttAvailability = { status: "available" } | { status: "unavailable"; reason: PttUnavailableReason };
@@ -625,6 +1077,8 @@ export type PttSession = {
 	waylandDesktop: boolean,
 	/**  Mumcord currently runs through XWayland and uses the X11 push-to-talk path. */
 	compatibilityActive: boolean,
+	/**  KDE Plasma: the settings can open KDE's Legacy X11 App Support page. */
+	kde: boolean,
 };
 
 export type PttUnavailableReason = 
@@ -776,6 +1230,34 @@ export type Settings = {
 	historyMaxAgeDays: number | null,
 	/**  "Share what I'm listening to" (default off; FR-1.58). Off: the media player is not read. */
 	nowPlaying: boolean,
+	/**
+	 *  "Share the game I'm playing" (default off; FR-1.59). Off: no programs or Steam files
+	 *  are read.
+	 */
+	nowGaming: boolean,
+	/**
+	 *  "Share my channel history" (default on; FR-1.60): answer history sync requests of
+	 *  other Mumcord users with the stored channel messages (never private chats).
+	 */
+	historySharing: boolean,
+	/**  Accessibility: "Show keyboard hints" (default on; FR-1.69). */
+	keyboardHints: boolean,
+	/**  Accessibility: "Screen reader announcements" (default on; FR-1.69). */
+	announcements: boolean,
+	/**  Accessibility: "Skip links" (default on; FR-1.69). */
+	skipLinks: boolean,
+	/**
+	 *  "Offer my full-size images" (default on; FR-1.74): off sends thumbnails only, keeps no
+	 *  original and serves none.
+	 */
+	offerFullImages: boolean,
+	/**
+	 *  "Load full-size images from others" (default on; FR-1.74): off shows thumbnails only
+	 *  and never requests an original.
+	 */
+	loadFullImages: boolean,
+	/**  Positional audio (FR-1.41). Off: no game positions are read. */
+	positional: PositionalSettings,
 };
 
 /**  Notification sound toggles per event (FR-1.27). */
@@ -846,6 +1328,10 @@ export type User = {
 	/**  Local playback volume in percent, 0–200 (FR-1.18). */
 	volume: number,
 	localMute: boolean,
+	/**  Another Mumcord client, recognised by its hello (FR-1.61). */
+	isMumcord: boolean,
+	/**  What that client announced it can do (empty for everyone else). */
+	mumcordFeatures: string[],
 };
 
 export type UserRemoved = {

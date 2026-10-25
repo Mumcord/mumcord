@@ -1,0 +1,55 @@
+{
+  "follow": "Volgen",
+  "following": "Volgend",
+  "unsupported": "Kanalen volgen vereist een server met versie 1.4 of nieuwer.",
+  "unread_one": "{{count}} ongelezen bericht",
+  "unread_other": "{{count}} ongelezen berichten",
+  "errors": {
+    "denied": "De server staat je niet toe dit kanaal te volgen.",
+    "limit": "Je kunt op deze server geen kanalen meer volgen. Stop eerst met het volgen van een ander kanaal.",
+    "tooOld": "Deze server is te oud om kanalen te volgen (versie 1.4 of nieuwer is nodig).",
+    "notConnected": "Je bent niet verbonden met de server.",
+    "generic": "Dit kanaal volgen is mislukt. Probeer het opnieuw."
+  },
+  "dm": {
+    "title": "Privéberichten",
+    "unknown": "Onbekende persoon"
+  },
+  "notify": {
+    "channel": "{{name}} in {{channel}}: {{text}}",
+    "private": "{{name}} (privé): {{text}}",
+    "more_one": "{{count}} nieuw bericht meer",
+    "more_other": "{{count}} nieuwe berichten meer"
+  },
+  "history": {
+    "clear": "Geschiedenis wissen",
+    "title": "Geschiedenis wissen?",
+    "body": "Hiermee worden de opgeslagen berichten van dit gesprek definitief van deze computer verwijderd. Anderen houden hun eigen kopieën.",
+    "confirm": "Geschiedenis wissen",
+    "cancel": "Annuleren",
+    "failed": "De geschiedenis kon niet worden gewist. Probeer het opnieuw."
+  },
+  "star": {
+    "follow": "{{channel}} volgen",
+    "unfollow": "{{channel}} ontvolgen"
+  },
+  "all": {
+    "menu": "Serveropties voor {{server}}",
+    "menuLabel": "Serveropties",
+    "follow": "Alle kanalen volgen",
+    "unfollow": "Alle kanalen ontvolgen",
+    "working": "Kanalen volgen…",
+    "followed_one": "{{count}} kanaal gevolgd.",
+    "followed_other": "{{count}} kanalen gevolgd.",
+    "skipped_one": "{{count}} overgeslagen: {{reasons}}.",
+    "skipped_other": "{{count}} overgeslagen: {{reasons}}.",
+    "limit": "limiet bereikt",
+    "notAllowed": "niet toegestaan",
+    "noAnswer": "geen antwoord van de server",
+    "unfollowed": "Alle kanalen ontvolgd.",
+    "failed": "Alle kanalen volgen is mislukt. Probeer het opnieuw.",
+    "dismiss": "Sluiten",
+    "unfollowFailed": "Alle kanalen ontvolgen is mislukt. Probeer het opnieuw."
+  },
+  "mention": "bevat een vermelding van jou"
+}

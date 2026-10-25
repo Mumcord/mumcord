@@ -1,0 +1,25 @@
+"Registry"
+{
+	"HKCU"
+	{
+		"Software"
+		{
+			"Valve"
+			{
+				"Steam"
+				{
+					"language"		"english"
+					"SourceModInstallPath"		"/home/u/.local/share/Steam/steamapps\\sourcemods"
+					"RunningAppID"		"570"
+					"Apps"
+					{
+						"570"
+						{
+							"Running"		"1"
+						}
+					}
+				}
+			}
+		}
+	}
+}

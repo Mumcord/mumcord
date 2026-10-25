@@ -122,12 +122,22 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
   gap: var(--space-4);
-  min-height: 100%;
+  height: 100%;
+  overflow-y: auto;
   padding: var(--space-6);
   background: var(--glow-backdrop);
   text-align: center;
+}
+
+/* Centred with auto margins rather than justify-content: content taller than a small window
+   (the wizard's last step) then scrolls from its top instead of being cut off above. */
+.centered-screen > :first-child {
+  margin-top: auto;
+}
+
+.centered-screen > :last-child {
+  margin-bottom: auto;
 }
 
 /* Pill buttons as on the website; padding is unchanged so button sizes stay the same. */

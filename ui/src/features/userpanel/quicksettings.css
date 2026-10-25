@@ -1,0 +1,200 @@
+/* Quick-settings popover on the gear button: switch rows, a theme segmented control, footer link. */
+.quick-settings {
+  position: fixed;
+  z-index: 45;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  width: min(20rem, calc(100vw - 2 * var(--space-2)));
+  padding: var(--space-2);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-tile);
+  background: var(--color-bg-elevated);
+  box-shadow: var(--shadow-raised);
+  color: var(--color-text);
+}
+
+.quick-settings__title {
+  padding: var(--space-1) var(--space-2) var(--space-2);
+  font-family: var(--font-family-display);
+  font-weight: var(--font-weight-bold);
+  letter-spacing: var(--letter-spacing-display);
+}
+
+.quick-settings__row,
+.quick-settings__footer,
+.quick-settings__segment {
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+
+.quick-settings__row {
+  display: flex;
+  /* Buttons shrink-to-fit in block parents (the Beta group); full width keeps every switch in one column. */
+  box-sizing: border-box;
+  width: 100%;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-2);
+  border-radius: var(--radius-md);
+  text-align: start;
+}
+
+.quick-settings__row:hover,
+.quick-settings__row:focus-visible,
+.quick-settings__footer:hover,
+.quick-settings__footer:focus-visible {
+  background: var(--color-bg-hover);
+}
+
+.quick-settings :focus-visible {
+  outline: var(--focus-ring-width) solid var(--color-accent);
+  outline-offset: -2px;
+}
+
+.quick-settings__row[aria-disabled="true"] {
+  cursor: default;
+  opacity: 0.55;
+}
+
+.quick-settings__glyph {
+  flex: none;
+  color: var(--color-text-secondary);
+}
+
+.quick-settings__text {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.quick-settings__label {
+  font-size: var(--font-size-sm);
+}
+
+.quick-settings__hint {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+}
+
+/* Pill switch: the knob slides right when on. Decorative; the row carries aria-checked. */
+.quick-settings__switch {
+  position: relative;
+  flex: none;
+  width: 2.5rem;
+  height: 1.5rem;
+  border-radius: var(--radius-full);
+  background: var(--color-border-strong);
+  transition: background-color var(--duration-normal) var(--ease-out);
+}
+
+.quick-settings__switch::after {
+  content: "";
+  position: absolute;
+  top: 0.1875rem;
+  left: 0.1875rem;
+  width: 1.125rem;
+  height: 1.125rem;
+  border-radius: var(--radius-full);
+  background: #fff;
+  box-shadow: 0 1px 3px rgb(0 0 0 / 35%);
+  transition: transform var(--duration-normal) var(--ease-out);
+}
+
+.quick-settings__row[aria-checked="true"] .quick-settings__switch {
+  background: var(--color-accent);
+}
+
+.quick-settings__row[aria-checked="true"] .quick-settings__switch::after {
+  transform: translateX(1rem);
+}
+
+.quick-settings__theme {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: var(--space-2);
+}
+
+.quick-settings__segments {
+  display: flex;
+  padding: 0.1875rem;
+  border-radius: var(--radius-md);
+  background: var(--color-bg-sidebar);
+  box-shadow: inset 0 0 0 1px var(--color-border);
+}
+
+.quick-settings__segment {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-1);
+  padding: var(--space-1) var(--space-2);
+  border-radius: var(--radius-sm);
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+  transition:
+    background-color var(--duration-normal) var(--ease-out),
+    color var(--duration-normal) var(--ease-out);
+}
+
+.quick-settings__segment .quick-settings__glyph {
+  width: 1rem;
+  height: 1rem;
+  color: inherit;
+}
+
+.quick-settings__segment:hover {
+  color: var(--color-text);
+}
+
+.quick-settings__segment[aria-checked="true"] {
+  background: var(--color-accent);
+  color: var(--color-on-accent);
+  font-weight: var(--font-weight-bold);
+}
+
+.quick-settings__footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: var(--space-1);
+  padding: var(--space-2);
+  border-top: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  color: var(--color-accent-text);
+  font-size: var(--font-size-sm);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .quick-settings__switch,
+  .quick-settings__switch::after,
+  .quick-settings__segment {
+    transition: none;
+  }
+}
+
+.quick-settings__group {
+  gap: var(--space-2);
+  color: var(--color-text-secondary);
+}
+
+.quick-settings__chevron {
+  display: flex;
+  transition: transform var(--duration-normal) var(--ease-out);
+}
+
+.quick-settings__group[aria-expanded="true"] .quick-settings__chevron {
+  transform: rotate(90deg);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .quick-settings__chevron {
+    transition: none;
+  }
+}

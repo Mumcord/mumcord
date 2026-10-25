@@ -28,11 +28,16 @@ certificates) live in `~/.cache/mumcord-build/e2e/` (override with `MUMCORD_E2E_
   helpers call `testenv/up.sh` / `reset.sh` / `docker restart` from inside the container.
 - `e2e/container-run.sh` (inside): session D-Bus, unlocked gnome-keyring (Secret Service, which the
   app uses for the identity and server passwords), Xvfb on `:99`, then builds the app
-  (`tauri build --debug --no-bundle --features test-backend`), `mumcord-bot` and `netsim`, then runs
+  (`tauri build --debug --no-bundle --features test-backend`), `mumcord-bot`, `netsim`, the test
+  game plugin (`crates/positional/examples/test_plugin.rs`) and `headless_check`, then runs
   `wdio run e2e/wdio.conf.ts`.
 - **Audio:** no sound server. The app is built with the `test-backend` feature and the env
   `MUMCORD_AUDIO_BACKEND` picks `null` (default: silence in, discard out) or
-  `file:<in.wav>:<out.wav>` (mic plays `in.wav`, speakers record to `out.wav`, 48 kHz mono 16-bit).
+  `file:<in.wav>:<out.wav>` (mic plays `in.wav`, speakers record to `out.wav`, 48 kHz mono 16-bit);
+  `file-stereo:<in.wav>:<out.wav>` records the speakers in stereo (positional audio checks).
+- **Window manager, Vulkan:** no window manager runs by default; specs that need one start
+  `openbox` themselves (overlay on-top check). lavapipe (software Vulkan) lets
+  `crates/overlay-layer/examples/headless_check` render through the in-game overlay layer.
 - **Fresh install per spec file:** each spec file gets a new profile (`XDG_DATA_HOME`/`CONFIG`/`CACHE`
   in a temp dir) and an empty keyring. Spec files run one at a time (shared servers, keyring, ports).
 - **CI shards:** `.github/workflows/e2e.yml` builds the image and the binaries once
@@ -60,8 +65,9 @@ from `@wdio/globals`). Import helpers from `e2e/helpers/index.ts`:
 | `netsim.start(svc)`, `netsim.ctl(...args)`, `netsim.stop()`   | proxy `127.0.0.1:64800` → server; e.g. `ctl("loss","both","10")`, `ctl("block-udp","on")`   |
 | `app.restart({freshProfile, audio})`                          | quit and restart the app (keeps the profile unless `freshProfile`)                          |
 | `app.profile()`                                               | current profile root (check files in `data/app.mumcord.client/` etc.)                       |
+| `app.invoke(command, args)`                                   | calls a Tauri command of the app and returns its result (state the UI does not show)        |
 | `axe.scan(label, options)`, `axe.summarize(violations)`       | axe-core WCAG 2.2 AA scan of the current screen; returns violations                         |
-| `bin`, `repoRoot`, `artifactsDir`                             | paths to binaries and folders                                                               |
+| `bin`, `repoRoot`, `artifactsDir`                             | paths to binaries (incl. the test game plugin and `headless_check`) and folders             |
 
 The test servers are not started automatically: call `testenv.up("v15")` (or `reset`) in a
 `before` hook of specs that need them. Use `bot(["expect", "user", "Tester"])`-style checks to

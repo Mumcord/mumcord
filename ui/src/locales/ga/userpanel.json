@@ -1,0 +1,88 @@
+{
+  "unknownName": "Tusa",
+  "mute": "Balbhaigh an micreafón",
+  "deafen": "Bodhraigh",
+  "disconnect": "Dícheangail ó {{server}}",
+  "settings": "Socruithe tapa",
+  "announce": {
+    "muted": "Micreafón balbhaithe",
+    "unmuted": "Micreafón díbhalbhaithe",
+    "deafened": "Bodhraithe. Ní chloiseann tú daoine eile agus tá do mhicreafón balbhaithe",
+    "undeafened": "Díbhodhraithe"
+  },
+  "readOnly": {
+    "text": "Tá tú ag léamh leat – téigh isteach i gcainéal chun labhairt.",
+    "join": "Téigh isteach i {{channel}}"
+  },
+  "status": {
+    "connecting": "Ag ceangal…",
+    "reconnecting": "Ag athcheangal…",
+    "connected": "Ceangailte",
+    "readOnly": "Léamh amháin",
+    "disconnected": "Gan ceangal",
+    "playing": "Ag imirt {{game}}",
+    "listening": "Ag éisteacht le {{track}}"
+  },
+  "profile": {
+    "title": "Cuir an phróifíl in eagar",
+    "chooseTitle": "Roghnaigh pictiúr próifíle",
+    "chooseAvatar": "Roghnaigh pictiúr…",
+    "removeAvatar": "Bain an pictiúr",
+    "avatarHint": "Laghdaítear méid an phictiúir chun teorainn an fhreastalaí a chomhlíonadh.",
+    "avatarUnregistered": "Ní choinníonn an freastalaí seo abhatár ach d'úsáideoirí cláraithe – seolann Mumcord do cheann arís gach uair a cheanglaíonn tú.",
+    "avatarChosen": "Roghnaithe: {{name}}",
+    "avatarRemoved": "Bainfear an pictiúr nuair a shábhálfaidh tú.",
+    "comment": "Fúthu"
+  },
+  "register": {
+    "title": "Cláraigh ar an bhfreastalaí seo",
+    "explain": "Cuireann clárú d'ainm in áirithe ar an bhfreastalaí seo. Ní féidir le héinne eile é a úsáid, agus cuimhníonn an freastalaí ort an chéad uair eile a cheanglaíonn tú.",
+    "backup": "Is é d'aitheantas an rud a chruthaíonn gur leatsa an t-ainm. Má chailleann tú é, caillfidh tú rochtain ar an ainm cláraithe. Sábháil cóip chúltaca anois agus coinnigh slán í.",
+    "password": "Pasfhocal don chomhad cúltaca",
+    "export": "Easpórtáil an t-aitheantas",
+    "saveTitle": "Sábháil cúltaca an aitheantais",
+    "passwordRequired": "Cuir pasfhocal isteach chun an comhad cúltaca a chosaint.",
+    "exported": "Sábháladh cúltaca an aitheantais.",
+    "confirm": "Cláraigh",
+    "done": "Cláraithe ar an bhfreastalaí seo"
+  },
+  "errors": {
+    "tooLarge": "Tá sé seo rómhór don fhreastalaí. Roghnaigh pictiúr níos lú nó scríobh téacs níos giorra.",
+    "denied": "Ní cheadaíonn an freastalaí é seo.",
+    "deniedWithReason": "Ní cheadaíonn an freastalaí é seo: {{reason}}",
+    "notConnected": "Níl tú ceangailte le freastalaí.",
+    "file": "Níorbh fhéidir an comhad a léamh ná a scríobh.",
+    "generic": "Chuaigh rud éigin amú. Bain triail eile as."
+  },
+  "ptt": "Brúigh-chun-cainte: coinnigh {{key}} chun labhairt",
+  "pttNoKey": "Brúigh-chun-cainte: gan eochair socraithe",
+  "quickSettings": {
+    "linkPreviews": "Réamhamhairc agus leabuithe nasc",
+    "linkPreviewsHint": "Feiceann suíomhanna do sheoladh IP",
+    "nowPlaying": "Roinn a bhfuil mé ag éisteacht leis",
+    "nowPlayingHint": "Feiceann daoine eile do rian reatha",
+    "unsupported": "Níl sé ar fáil ar macOS",
+    "theme": "Téama",
+    "theme_system": "Córas",
+    "theme_dark": "Dorcha",
+    "theme_light": "Solas",
+    "nowGaming": "Roinn an cluiche atá mé ag imirt",
+    "nowGamingHint": "Feiceann daoine eile do chluiche reatha",
+    "unavailable": "Níl sé ar fáil ar an gcóras seo",
+    "overlay": "Forleagan",
+    "overlayHint": "Taispeánann sé cé atá ag caint ar bharr cluichí",
+    "editProfile": "Cuir an phróifíl in eagar",
+    "editProfileHint": "Ainm, abhatár agus nóta",
+    "register": "Cláraigh ar an bhfreastalaí seo",
+    "registered": "Cláraithe ar an bhfreastalaí seo ✓",
+    "registerHint": "Coinníonn sé d'ainm agus d'abhatár ar an bhfreastalaí seo",
+    "allSettings": "Na socruithe go léir…",
+    "label": "Socruithe tapa",
+    "positional": "Fuaim shuímh",
+    "positionalHint": "Guthanna curtha timpeall ort i 3D",
+    "offerImages": "Tairg íomhánna ar a méid iomlán",
+    "offerImagesHint": "Lig do dhaoine eile do bhuníomhánna a luchtú",
+    "loadImages": "Luchtaigh íomhánna ar a méid iomlán",
+    "loadImagesHint": "Faigh buníomhánna ó dhaoine eile"
+  }
+}

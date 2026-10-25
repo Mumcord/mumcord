@@ -1,12 +1,13 @@
-import { act, fireEvent, render, screen } from "@testing-library/react";
+import { act, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { MockApi } from "../../api";
 import { getServerState } from "../channels/serverStore";
 import { getSelectedConversation, selectConversation } from "../channels/selection";
 import { connectedMock, resetAll, stubDialog } from "../channels/testUtils";
 import { MembersPanel } from "./MembersPanel";
+import { joinTarget } from "./joinTarget";
 import { PersonMenuHost } from "./PersonMenu";
-import { closePersonMenu } from "./personMenuStore";
+import { closePersonMenu, openPersonMenu } from "./personMenuStore";
 import { ProfilePreviewHost } from "./ProfilePreview";
 import { VOLUME_DEBOUNCE_MS } from "./ProfileCard";
 
@@ -41,11 +42,44 @@ describe("PersonMenu", () => {
     expect(menu()).toHaveAccessibleName(/Anna/);
     expect(screen.getAllByRole("menuitem").map((i) => i.textContent)).toEqual([
       "View profile",
-      "Mute for me",
       "Send private message",
     ]);
+    expect(screen.getByRole("menuitemcheckbox", { name: "Mute for me" })).toHaveAttribute(
+      "aria-checked",
+      "false",
+    );
     expect(screen.getByRole("slider", { name: "Volume" })).toBeInTheDocument();
     expect(screen.getByRole("menuitem", { name: "View profile" })).toHaveFocus();
+  });
+
+  it("lists profile and message first, then a separator, then the settings", async () => {
+    await renderPanel();
+    fireEvent.contextMenu(member(/^Anna/), { clientX: 30, clientY: 40 });
+    const entries = [
+      ...(menu()?.querySelectorAll(
+        '[role="menuitem"], [role="menuitemcheckbox"], [role="separator"], input[type="range"]',
+      ) ?? []),
+    ];
+    expect(
+      entries.map((entry) => entry.getAttribute("role") ?? entry.getAttribute("type")),
+    ).toEqual([
+      "menuitem",
+      "menuitem",
+      "separator",
+      "menuitemcheckbox",
+      "menuitemcheckbox",
+      "range",
+    ]);
+    expect(entries[0]).toHaveTextContent("View profile");
+    expect(entries[1]).toHaveTextContent("Send private message");
+  });
+
+  it("shows a decorative icon on every entry", async () => {
+    await renderPanel();
+    fireEvent.contextMenu(member(/^Anna/), { clientX: 30, clientY: 40 });
+    const icons = [...(menu()?.querySelectorAll("svg") ?? [])];
+    expect(icons).toHaveLength(5);
+    for (const icon of icons) expect(icon).toHaveAttribute("aria-hidden", "true");
   });
 
   it("opens from the ContextMenu key and Shift+F10, Escape returns focus", async () => {
@@ -65,27 +99,61 @@ describe("PersonMenu", () => {
     fireEvent.contextMenu(member(/^Anna/), { clientX: 1, clientY: 1 });
     const keys = (key: string) => fireEvent.keyDown(document.activeElement as Element, { key });
     keys("ArrowDown");
-    expect(screen.getByRole("menuitem", { name: "Mute for me" })).toHaveFocus();
+    expect(screen.getByRole("menuitem", { name: "Send private message" })).toHaveFocus();
+    keys("ArrowDown");
+    expect(screen.getByRole("menuitemcheckbox", { name: "Mute for me" })).toHaveFocus();
+    keys("ArrowDown");
+    expect(screen.getByRole("menuitemcheckbox", { name: /^Friend/ })).toHaveFocus();
     keys("ArrowDown");
     expect(screen.getByRole("slider")).toHaveFocus();
-    keys("ArrowDown");
-    expect(screen.getByRole("menuitem", { name: "Send private message" })).toHaveFocus();
     keys("ArrowDown");
     expect(screen.getByRole("menuitem", { name: "View profile" })).toHaveFocus();
   });
 
-  it("mutes locally and offers unmute afterwards", async () => {
+  it("toggles local mute in place and keeps the menu open", async () => {
     await renderPanel();
     const spy = vi.spyOn(api, "personSetLocalMute");
     fireEvent.contextMenu(member(/^Anna/), { clientX: 1, clientY: 1 });
-    fireEvent.click(screen.getByRole("menuitem", { name: "Mute for me" }));
+    const row = screen.getByRole("menuitemcheckbox", { name: "Mute for me" });
+    fireEvent.click(row);
     expect(spy).toHaveBeenCalledWith(2, true);
-    expect(menu()).not.toBeInTheDocument();
     await act(async () => {
       await Promise.resolve();
     });
+    expect(menu()).toBeInTheDocument();
+    expect(screen.getByRole("menuitemcheckbox", { name: "Mute for me" })).toHaveAttribute(
+      "aria-checked",
+      "true",
+    );
+    fireEvent.click(screen.getByRole("menuitemcheckbox", { name: "Mute for me" }));
+    expect(spy).toHaveBeenLastCalledWith(2, false);
+  });
+
+  it("adds and removes a friend in place", async () => {
+    await renderPanel();
+    const add = vi.spyOn(api, "friendAdd");
+    const remove = vi.spyOn(api, "friendRemove");
     fireEvent.contextMenu(member(/^Anna/), { clientX: 1, clientY: 1 });
-    expect(screen.getByRole("menuitem", { name: "Unmute for me" })).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("menuitemcheckbox", { name: /^Friend/ }));
+    expect(add).toHaveBeenCalledWith(2);
+    await act(async () => {
+      await Promise.resolve();
+    });
+    const row = screen.getByRole("menuitemcheckbox", { name: /^Friend/ });
+    expect(row).toHaveAttribute("aria-checked", "true");
+    fireEvent.click(row);
+    expect(remove).toHaveBeenCalledWith("annahash");
+  });
+
+  it("explains why people without a certificate can't be friends", async () => {
+    await renderPanel();
+    const add = vi.spyOn(api, "friendAdd");
+    fireEvent.contextMenu(member(/^Ben/), { clientX: 1, clientY: 1 });
+    const row = screen.getByRole("menuitemcheckbox", { name: /^Friend/ });
+    expect(row).toHaveAttribute("aria-disabled", "true");
+    expect(row).toHaveTextContent("without a certificate");
+    fireEvent.click(row);
+    expect(add).not.toHaveBeenCalled();
   });
 
   it("changes the volume with the slider", async () => {
@@ -165,5 +233,67 @@ describe("PersonMenu", () => {
       document.dispatchEvent(new Event("scroll"));
     });
     expect(menu()).not.toBeInTheDocument();
+  });
+
+  describe("join the person's channel", () => {
+    it("is hidden for someone in the same channel", async () => {
+      await renderPanel();
+      fireEvent.contextMenu(member(/^Anna/), { clientX: 1, clientY: 1 });
+      expect(screen.queryByRole("menuitem", { name: /^Join/ })).not.toBeInTheDocument();
+    });
+
+    it("is hidden for yourself", async () => {
+      await renderPanel();
+      act(() => {
+        openPersonMenu({ session: 1, x: 1, y: 1, opener: null });
+      });
+      expect(screen.queryByRole("menuitem", { name: /^Join/ })).not.toBeInTheDocument();
+    });
+
+    it("sits after the private message and moves you into their channel", async () => {
+      await renderPanel();
+      const join = vi.spyOn(api, "channelJoin");
+      act(() => {
+        openPersonMenu({ session: 4, x: 1, y: 1, opener: null });
+      });
+      const items = screen.getAllByRole("menuitem").map((i) => i.textContent);
+      expect(items).toEqual(["View profile", "Send private message", "Join Raid"]);
+      fireEvent.click(screen.getByRole("menuitem", { name: "Join Raid" }));
+      expect(join).toHaveBeenCalledWith(2);
+      await waitFor(() => {
+        expect(menu()).not.toBeInTheDocument();
+      });
+    });
+
+    it("keeps the menu open and announces why the join failed", async () => {
+      await renderPanel();
+      api.mock.failNext("channelJoin", "permissionDenied");
+      act(() => {
+        openPersonMenu({ session: 4, x: 1, y: 1, opener: null });
+      });
+      fireEvent.click(screen.getByRole("menuitem", { name: "Join Raid" }));
+      expect(await screen.findByRole("alert")).toHaveTextContent(/not allowed/);
+      expect(menu()).toBeInTheDocument();
+    });
+  });
+});
+
+describe("joinTarget", () => {
+  it("disables the entry when the channel cannot be entered", async () => {
+    api = await connectedMock();
+    await waitFor(() => {
+      expect(getServerState().users.get(4)).toBeDefined();
+    });
+    const state = getServerState();
+    const carla = state.users.get(4);
+    if (!carla) throw new Error("seed user missing");
+    const gaming = state.channels.get(2);
+    if (!gaming) throw new Error("seed channel missing");
+    const denied = new Map(state.channels).set(2, {
+      ...gaming,
+      permissions: { ...gaming.permissions, enter: false },
+    });
+    expect(joinTarget({ ...state, channels: denied }, carla)?.allowed).toBe(false);
+    expect(joinTarget(state, carla)?.allowed).toBe(true);
   });
 });

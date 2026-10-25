@@ -1,0 +1,22 @@
+{
+  "open": "Yhteystiedot",
+  "title": "Yhteystiedot",
+  "loading": "Ladataan…",
+  "notConnected": "Ei yhteyttä.",
+  "error": "Yhteystiedot eivät ole juuri nyt saatavilla.",
+  "none": "–",
+  "transport": "Siirtotapa",
+  "transportValue": {
+    "udp": "UDP",
+    "tcp": "TCP (tunneloitu)"
+  },
+  "latency": "Viive",
+  "latencyValue": "{{value}} ms",
+  "loss": "Pakettihäviö",
+  "lossValue": "{{value}} %",
+  "bitrate": "Lähetyksen bittinopeus",
+  "bitrateValue": "{{value}} kbit/s",
+  "serverLimit": "Palvelimen raja",
+  "packets": "Paketteja lähetetty / vastaanotettu",
+  "packetsValue": "{{sent}} / {{received}}"
+}

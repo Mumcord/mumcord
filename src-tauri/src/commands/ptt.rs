@@ -3,8 +3,10 @@
 use serde::{Deserialize, Serialize};
 use specta::Type;
 use tauri::AppHandle;
+#[cfg(target_os = "linux")]
+use tauri::Manager;
 
-use super::types::ApiResult;
+use super::types::{ApiError, ApiResult, ErrorCode};
 use crate::ptt;
 
 #[derive(Serialize, Deserialize, Clone, Copy, Debug, PartialEq, Eq, Type)]
@@ -70,6 +72,8 @@ pub struct PttSession {
     pub wayland_desktop: bool,
     /// Mumcord currently runs through XWayland and uses the X11 push-to-talk path.
     pub compatibility_active: bool,
+    /// KDE Plasma: the settings can open KDE's Legacy X11 App Support page.
+    pub kde: bool,
 }
 
 #[tauri::command]
@@ -94,7 +98,132 @@ pub fn ptt_session() -> ApiResult<PttSession> {
     Ok(PttSession {
         wayland_desktop: env.wayland_desktop(),
         compatibility_active: env.compatibility_active(),
+        kde: crate::overlay::kde(),
     })
+}
+
+/// KDE only: opens System Settings → Legacy X11 App Support (`kcmshell6 kwinxwayland`, else
+/// `systemsettings kcm_kwinxwayland`). `invalidInput` outside KDE, `io` if neither started.
+#[tauri::command]
+#[specta::specta]
+pub fn ptt_open_kde_x11_settings() -> ApiResult<()> {
+    #[cfg(target_os = "linux")]
+    if crate::overlay::kde() {
+        return crate::overlay::open_kde_x11_settings()
+            .map_err(|e| ApiError::new(ErrorCode::Io, e.to_string()));
+    }
+    Err(ApiError::new(ErrorCode::InvalidInput, "not KDE Plasma"))
+}
+
+/// KDE only: whether X11 apps may see mouse buttons now, and whether Mumcord can undo its change.
+#[derive(Serialize, Deserialize, Clone, Copy, Debug, PartialEq, Eq, Type)]
+#[serde(rename_all = "camelCase")]
+pub struct KdeX11Access {
+    pub allowed: bool,
+    pub undo_available: bool,
+}
+
+#[cfg(target_os = "linux")]
+impl From<crate::kde_x11::Access> for KdeX11Access {
+    fn from(a: crate::kde_x11::Access) -> Self {
+        Self {
+            allowed: a.allowed,
+            undo_available: a.undo_available,
+        }
+    }
+}
+
+#[cfg(target_os = "linux")]
+/// Where the values from before Mumcord's change are kept, so it can be undone.
+fn kde_x11_undo_file(app: &AppHandle) -> ApiResult<std::path::PathBuf> {
+    let dir = app
+        .path()
+        .app_data_dir()
+        .map_err(|e| ApiError::new(ErrorCode::Io, e.to_string()))?;
+    std::fs::create_dir_all(&dir).map_err(|e| ApiError::new(ErrorCode::Io, e.to_string()))?;
+    Ok(dir.join("kde-x11-mouse-undo"))
+}
+
+fn not_kde() -> ApiError {
+    ApiError::new(ErrorCode::InvalidInput, "not KDE Plasma")
+}
+
+#[cfg(target_os = "linux")]
+fn require_kde() -> ApiResult<()> {
+    if crate::overlay::kde() {
+        Ok(())
+    } else {
+        Err(not_kde())
+    }
+}
+
+/// KDE only: whether KWin lets X11 apps see mouse buttons. `invalidInput` outside KDE, `io`
+/// if the KDE settings cannot be read.
+#[tauri::command]
+#[specta::specta]
+pub fn ptt_kde_x11_access(app: AppHandle) -> ApiResult<KdeX11Access> {
+    #[cfg(target_os = "linux")]
+    {
+        require_kde()?;
+        crate::kde_x11::access(&crate::kde_x11::Kde, &kde_x11_undo_file(&app)?)
+            .map(Into::into)
+            .map_err(|e| ApiError::new(ErrorCode::Io, e.to_string()))
+    }
+    #[cfg(not(target_os = "linux"))]
+    {
+        let _ = app;
+        Err(not_kde())
+    }
+}
+
+/// KDE only: allows mouse buttons for X11 apps in KDE's settings and asks KWin to reload.
+/// `io` if the settings cannot be written, `internal` if KWin cannot be reached (the setting
+/// is written; it applies at the next login). A Mumcord restart is needed afterwards.
+#[tauri::command]
+#[specta::specta]
+pub async fn ptt_kde_x11_allow_mouse(app: AppHandle) -> ApiResult<KdeX11Access> {
+    #[cfg(target_os = "linux")]
+    {
+        require_kde()?;
+        let access = crate::kde_x11::allow_mouse(&crate::kde_x11::Kde, &kde_x11_undo_file(&app)?)
+            .map_err(|e| ApiError::new(ErrorCode::Io, e.to_string()))?;
+        crate::kde_x11::reconfigure()
+            .await
+            .map_err(|e| ApiError::new(ErrorCode::Internal, e.to_string()))?;
+        Ok(access.into())
+    }
+    #[cfg(not(target_os = "linux"))]
+    {
+        let _ = app;
+        Err(not_kde())
+    }
+}
+
+/// KDE only: puts back the settings from before `ptt_kde_x11_allow_mouse`. `invalidInput` if
+/// there is nothing to undo; other errors as for allowing.
+#[tauri::command]
+#[specta::specta]
+pub async fn ptt_kde_x11_undo(app: AppHandle) -> ApiResult<KdeX11Access> {
+    #[cfg(target_os = "linux")]
+    {
+        require_kde()?;
+        let access = crate::kde_x11::undo(&crate::kde_x11::Kde, &kde_x11_undo_file(&app)?)
+            .map_err(|e| match e.kind() {
+                std::io::ErrorKind::NotFound => {
+                    ApiError::new(ErrorCode::InvalidInput, "nothing to undo")
+                }
+                _ => ApiError::new(ErrorCode::Io, e.to_string()),
+            })?;
+        crate::kde_x11::reconfigure()
+            .await
+            .map_err(|e| ApiError::new(ErrorCode::Internal, e.to_string()))?;
+        Ok(access.into())
+    }
+    #[cfg(not(target_os = "linux"))]
+    {
+        let _ = app;
+        Err(not_kde())
+    }
 }
 
 /// Validates a key the UI captured (`KeyboardEvent.code` plus modifiers, e.g. "Ctrl+KeyA",

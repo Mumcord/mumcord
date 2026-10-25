@@ -8,6 +8,15 @@ export {
 } from "./privateMessage";
 export { Avatar } from "./Avatar";
 export { ProfilePreviewHost, ProfilePreviewTrigger } from "./ProfilePreview";
-export { previewOnFocus, releasePreview } from "./profilePreviewStore";
+export { clickPerson, doubleClickPerson, pinPerson } from "./personClick";
+export {
+  closePreview,
+  pointerDownOnPerson,
+  previewOnFocus,
+  releasePreview,
+  requestPreview,
+} from "./profilePreviewStore";
 export { PersonMenuHost } from "./PersonMenu";
-export { openPersonMenuFromEvent } from "./personMenuStore";
+export { openPersonMenu, openPersonMenuFromEvent, openPersonMenuFromKey } from "./personMenuStore";
+export { CollapsibleSection, type CollapsibleSectionProps } from "./CollapsibleSection";
+export { useSectionOpen } from "./useSectionOpen";

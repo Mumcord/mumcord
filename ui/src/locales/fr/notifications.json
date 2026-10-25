@@ -1,0 +1,16 @@
+{
+  "region": "Notifications",
+  "channel": "#{{name}}",
+  "unknownChannel": "Un canal",
+  "line": "{{sender}} : {{preview}}",
+  "groupedChannel_one": "{{count}} nouveau message dans {{name}}",
+  "groupedChannel_many": "{{count}} nouveaux messages dans {{name}}",
+  "groupedChannel_other": "{{count}} nouveaux messages dans {{name}}",
+  "groupedPrivate_one": "{{count}} nouveau message de {{name}}",
+  "groupedPrivate_many": "{{count}} nouveaux messages de {{name}}",
+  "groupedPrivate_other": "{{count}} nouveaux messages de {{name}}",
+  "image": "A envoyé une image",
+  "open": "Ouvrir la discussion",
+  "close": "Ignorer la notification",
+  "mentionLine": "{{sender}} vous a mentionné : {{preview}}"
+}

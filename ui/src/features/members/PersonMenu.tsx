@@ -1,20 +1,25 @@
 /**
- * Context menu on a person (FR-1.18, QA.32): View profile, local mute, volume slider and
- * private message. Reuses the profile card's volume slider and local-mute action, so both
+ * Context menu on a person (FR-1.18, QA.32): View profile, local mute, friend (FR-1.64), volume
+ * slider and private message. Reuses the profile card's volume slider and local-mute action, so both
  * places store the same per-certificate settings. Yourself only gets "View profile".
  */
 import {
   useEffect,
   useLayoutEffect,
   useRef,
+  useState,
   useSyncExternalStore,
   type KeyboardEvent,
+  type ReactNode,
 } from "react";
 import { createPortal } from "react-dom";
 import { useTranslation } from "react-i18next";
 import { getApi, toEngineError } from "../../api";
 import { useServerState } from "../channels/serverStore";
+import { setFriend, useFriend } from "../friends";
+import "../userpanel/quicksettings.css";
 import "./members.css";
+import { joinTarget } from "./joinTarget";
 import { findPerson } from "./personLookup";
 import { VolumeSlider } from "./ProfileCard";
 import { openPrivateConversation } from "./privateMessage";
@@ -24,12 +29,37 @@ import {
   subscribePersonMenu,
   type OpenPersonMenu,
 } from "./personMenuStore";
+import { joinChannel } from "../userpanel/readOnly";
 import { useProfileCard } from "./useProfileCard";
 
 /** Gap kept between the menu and the window edge. */
 const EDGE = 8;
 
-const ITEMS = '[role="menuitem"], input[type="range"]';
+const ITEMS = '[role="menuitem"], [role="menuitemcheckbox"], input[type="range"]';
+
+/** Decorative: the entry's label is the accessible name, so the icon stays hidden. */
+function MenuIcon({ children }: { children: ReactNode }) {
+  return (
+    <svg
+      className="person-menu__icon"
+      viewBox="0 0 24 24"
+      width="18"
+      height="18"
+      aria-hidden="true"
+      focusable="false"
+    >
+      <g
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      >
+        {children}
+      </g>
+    </svg>
+  );
+}
 
 /** Renders the open person menu and the profile card it can open; mount once. */
 export function PersonMenuHost() {
@@ -53,9 +83,14 @@ function PersonMenu({
   onViewProfile: (session: number, opener: HTMLElement | null) => void;
 }) {
   const { t } = useTranslation("members");
+  const { t: tFriends } = useTranslation("friends");
+  const { t: tChannels } = useTranslation("channels");
   const state = useServerState();
   const user = findPerson(state.users, open.session, open.name);
+  const friend = useFriend(user?.certHash ?? null);
   const ref = useRef<HTMLDivElement>(null);
+  // The menu closes once the join succeeds; a failure keeps it open to show why.
+  const [joinError, setJoinError] = useState<string | null>(null);
 
   const close = (returnFocus: boolean) => {
     closePersonMenu();
@@ -111,6 +146,8 @@ function PersonMenu({
   if (gone) return null;
   const isSelf = user?.session === state.selfSession;
 
+  const join = user && !isSelf ? joinTarget(state, user) : null;
+
   const report = (cause: unknown) => {
     console.error("Changing a person's local settings failed", toEngineError(cause).code);
   };
@@ -149,15 +186,16 @@ function PersonMenu({
     event.stopPropagation();
   };
 
-  const item = (id: string, label: string, onSelect: () => void) => (
+  const item = (id: string, icon: ReactNode, label: string, onSelect: () => void) => (
     <button
       key={id}
       type="button"
       role="menuitem"
       tabIndex={-1}
-      className="server-menu__item"
+      className="server-menu__item person-menu__item"
       onClick={onSelect}
     >
+      <MenuIcon>{icon}</MenuIcon>
       {label}
     </button>
   );
@@ -172,7 +210,7 @@ function PersonMenu({
       onKeyDown={onKeyDown}
     >
       {user ? (
-        item("profile", t("menu.viewProfile"), () => {
+        item("profile", <IdentityCardIcon />, t("menu.viewProfile"), () => {
           closePersonMenu();
           onViewProfile(user.session, open.opener);
         })
@@ -183,27 +221,142 @@ function PersonMenu({
           role="menuitem"
           aria-disabled="true"
           tabIndex={-1}
-          className="server-menu__item"
+          className="server-menu__item person-menu__item"
         >
+          <MenuIcon>
+            <IdentityCardIcon />
+          </MenuIcon>
           {t("menu.viewProfile")}
         </button>
       )}
       {user && !isSelf && (
         <>
-          {item("mute", user.localMute ? t("menu.unmute") : t("menu.mute"), () => {
-            closePersonMenu();
-            getApi().personSetLocalMute(user.session, !user.localMute).catch(report);
-            open.opener?.focus();
-          })}
-          <div className="person-menu__volume">
-            <VolumeSlider user={user} onError={report} />
-          </div>
-          {item("message", t("card.sendPrivateMessage"), () => {
+          {item("message", <ChatBubbleIcon />, t("card.sendPrivateMessage"), () => {
             closePersonMenu();
             openPrivateConversation(user);
           })}
+          {join &&
+            (join.allowed ? (
+              item(
+                "join",
+                <EnterChannelIcon />,
+                t("menu.join", { channel: join.channel.name }),
+                () => {
+                  setJoinError(null);
+                  joinChannel(join.channel.id).then(
+                    () => {
+                      closePersonMenu();
+                    },
+                    (cause: unknown) => {
+                      const { code } = toEngineError(cause);
+                      if (code !== "permissionDenied" && code !== "notConnected") {
+                        console.error("Joining a person's channel failed", code);
+                      }
+                      setJoinError(
+                        code === "permissionDenied"
+                          ? tChannels("errors.joinDenied")
+                          : code === "notConnected"
+                            ? tChannels("errors.notConnected")
+                            : tChannels("errors.joinFailed"),
+                      );
+                    },
+                  );
+                },
+              )
+            ) : (
+              <button
+                type="button"
+                role="menuitem"
+                aria-disabled="true"
+                aria-describedby="person-menu-join-reason"
+                tabIndex={-1}
+                className="server-menu__item person-menu__item"
+              >
+                <MenuIcon>
+                  <EnterChannelIcon />
+                </MenuIcon>
+                {t("menu.join", { channel: join.channel.name })}
+                <span id="person-menu-join-reason" className="visually-hidden">
+                  {t("menu.joinDenied")}
+                </span>
+              </button>
+            ))}
+          {joinError && (
+            <p role="alert" className="channels-error">
+              {joinError}
+            </p>
+          )}
+          <div role="separator" className="person-menu__separator" />
+          {/* Same switch row as the quick settings; the menu stays open while it toggles. */}
+          <button
+            type="button"
+            role="menuitemcheckbox"
+            aria-checked={user.localMute}
+            tabIndex={-1}
+            className="quick-settings__row"
+            onClick={() => {
+              getApi().personSetLocalMute(user.session, !user.localMute).catch(report);
+            }}
+          >
+            <MenuIcon>
+              <path d="M11 5L6 9H2v6h4l5 4zM22 9l-6 6M16 9l6 6" />
+            </MenuIcon>
+            <span className="quick-settings__text">
+              <span className="quick-settings__label">{t("menu.mute")}</span>
+            </span>
+            <span className="quick-settings__switch" aria-hidden="true" />
+          </button>
+          {/* People without a certificate can't be recognised again, so they can't be friends. */}
+          <button
+            type="button"
+            role="menuitemcheckbox"
+            aria-checked={friend !== undefined}
+            aria-disabled={user.certHash === null}
+            tabIndex={-1}
+            className="quick-settings__row"
+            onClick={() => {
+              if (user.certHash === null) return;
+              setFriend(user, friend === undefined).catch(report);
+            }}
+          >
+            <MenuIcon>
+              <path d="M12 21s-7-4.5-9.5-9A5.5 5.5 0 0 1 12 6a5.5 5.5 0 0 1 9.5 6c-2.5 4.5-9.5 9-9.5 9z" />
+            </MenuIcon>
+            <span className="quick-settings__text">
+              <span className="quick-settings__label">{tFriends("friend")}</span>
+              {user.certHash === null && (
+                <span className="quick-settings__hint">{tFriends("noCertificate")}</span>
+              )}
+            </span>
+            <span className="quick-settings__switch" aria-hidden="true" />
+          </button>
+          <div className="person-menu__volume">
+            <MenuIcon>
+              <path d="M11 5L6 9H2v6h4l5 4zM15.5 8.5a5 5 0 0 1 0 7M19 5a10 10 0 0 1 0 14" />
+            </MenuIcon>
+            <VolumeSlider user={user} onError={report} />
+          </div>
         </>
       )}
     </div>
   );
+}
+
+/* Icon shapes match the pinned profile card, so the same action looks the same everywhere. */
+function IdentityCardIcon() {
+  return (
+    <>
+      <rect x="3" y="5" width="18" height="14" rx="2" />
+      <circle cx="9" cy="11" r="2" />
+      <path d="M14 10h4M14 14h3" />
+    </>
+  );
+}
+
+function ChatBubbleIcon() {
+  return <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />;
+}
+
+function EnterChannelIcon() {
+  return <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4M10 17l5-5-5-5M15 12H3" />;
 }

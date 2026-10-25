@@ -1,0 +1,18 @@
+{
+  "region": "Powiadomienia",
+  "channel": "#{{name}}",
+  "unknownChannel": "Kanał",
+  "line": "{{sender}}: {{preview}}",
+  "groupedChannel_one": "{{count}} nowa wiadomość na {{name}}",
+  "groupedChannel_few": "{{count}} nowe wiadomości na {{name}}",
+  "groupedChannel_many": "{{count}} nowych wiadomości na {{name}}",
+  "groupedChannel_other": "{{count}} nowej wiadomości na {{name}}",
+  "groupedPrivate_one": "{{count}} nowa wiadomość od {{name}}",
+  "groupedPrivate_few": "{{count}} nowe wiadomości od {{name}}",
+  "groupedPrivate_many": "{{count}} nowych wiadomości od {{name}}",
+  "groupedPrivate_other": "{{count}} nowej wiadomości od {{name}}",
+  "image": "Wysłano obraz",
+  "open": "Otwórz czat",
+  "close": "Zamknij powiadomienie",
+  "mentionLine": "{{sender}} wspomina o Tobie: {{preview}}"
+}

@@ -1,0 +1,68 @@
+{
+  "inChannel_one": "U {{channel}} ({{count}})",
+  "inChannel_few": "U {{channel}} ({{count}})",
+  "inChannel_other": "U {{channel}} ({{count}})",
+  "listening_one": "Sluša ({{count}})",
+  "listening_few": "Slušaju ({{count}})",
+  "listening_other": "Sluša ({{count}})",
+  "noChannel": "Odaberi kanal da vidiš tko je u njemu.",
+  "nobody": "Ovdje nema nikoga.",
+  "nobodyElse": "Na poslužitelju nema nikog drugog.",
+  "inOtherChannels": "U drugim kanalima",
+  "you": "(ti)",
+  "registered": "Registriran",
+  "unregistered": "Nije registriran",
+  "talking": "Govori",
+  "card": {
+    "close": "Zatvori",
+    "loadFailed": "Profil nije bilo moguće učitati.",
+    "volume": "Glasnoća",
+    "volumeValue": "{{value}} %",
+    "localMute": "Utišaj za mene",
+    "sessionOnly": "Ova osoba nema certifikat pa ove postavke vrijede samo za ovu sesiju.",
+    "sendPrivateMessage": "Pošalji privatnu poruku",
+    "privateMessage": "Privatna poruka",
+    "localSettings": "Tvoje postavke",
+    "localSettingsHint": "Ovo vidiš samo ti. Promjene se odmah spremaju.",
+    "localMuteHint": "Nećeš čuti ovu osobu.",
+    "privateNote": "Privatna bilješka",
+    "privateNoteHint": "Samo ti vidiš ovu bilješku.",
+    "saved": "Spremljeno"
+  },
+  "errors": {
+    "notConnected": "Nisi povezan s poslužiteljem.",
+    "generic": "To nije uspjelo. Pokušaj ponovno."
+  },
+  "menu": {
+    "label": "Radnje za {{name}}",
+    "viewProfile": "Pogledaj profil",
+    "join": "Pridruži se kanalu {{channel}}",
+    "joinDenied": "Nemate dopuštenje za ulazak u ovaj kanal.",
+    "mute": "Utišaj za mene"
+  },
+  "nowPlaying": {
+    "label": "Trenutno svira",
+    "listening": "Sluša",
+    "paused": "Pauzirano",
+    "progress": "Napredak reprodukcije",
+    "position": "{{position}} od {{duration}}"
+  },
+  "nowGaming": {
+    "label": "Trenutno igra",
+    "playing": "Igra",
+    "playedFor": "već {{time}}",
+    "hoursMinutes": "{{hours}} h {{minutes}} min",
+    "minutes_one": "{{count}} min",
+    "minutes_few": "{{count}} min",
+    "minutes_other": "{{count}} min",
+    "join": "Pridruži se igri",
+    "joinTitle": "Pridružiti se igri?",
+    "joinMessage": "Otvorit će se Steam i povezati s poslužiteljem na kojem ova osoba igra {{game}}. Pridružuj se samo poslužiteljima kojima vjeruješ.",
+    "joinConfirm": "Otvori Steam",
+    "joinFailed": "Steam nije bilo moguće otvoriti."
+  },
+  "preview": {
+    "privateMessage": "Privatna poruka",
+    "fullProfile": "Cijeli profil"
+  }
+}

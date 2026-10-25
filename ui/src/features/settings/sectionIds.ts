@@ -5,6 +5,7 @@ export const SECTION_IDS = [
   "voice",
   "chatHistory",
   "appearance",
+  "accessibility",
   "language",
   "sounds",
   "overlay",

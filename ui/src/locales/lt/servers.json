@@ -1,0 +1,128 @@
+{
+  "unknownServer": "serveris",
+  "announce": {
+    "connected": "Prisijungta prie {{server}}.",
+    "lost": "Ryšys su {{server}} nutrūko. Jungiamasi iš naujo…",
+    "ended": "Atsijungta nuo {{server}}. Ką daryti toliau, žiūrėk juostoje virš pokalbio.",
+    "disconnected": "Atsijungta nuo {{server}}.",
+    "tcp": "Balsas dabar veikia per TCP, nes UDP užblokuotas. Garsas gali šiek tiek vėluoti.",
+    "removed": "{{server}} pašalintas.",
+    "moved": "{{server}} perkeltas į {{position}} vietą iš {{count}}."
+  },
+  "bar": {
+    "listLabel": "Įrašyti serveriai",
+    "add": "Pridėti serverį",
+    "keyboardHint": "Enter jungiasi. Alt plius rodyklė aukštyn arba žemyn perkelia serverį. Shift plius F10 atidaro daugiau parinkčių.",
+    "status": {
+      "connected": "{{server}} (prisijungta)",
+      "connecting": "{{server}} (jungiamasi)",
+      "reconnecting": "{{server}} (jungiamasi iš naujo)"
+    }
+  },
+  "menu": {
+    "label": "Parinktys: {{server}}",
+    "connect": "Prisijungti",
+    "disconnect": "Atsijungti",
+    "edit": "Redaguoti serverį",
+    "moveUp": "Perkelti aukštyn",
+    "moveDown": "Perkelti žemyn",
+    "remove": "Pašalinti serverį"
+  },
+  "dialog": {
+    "addTitle": "Pridėti serverį",
+    "editTitle": "Redaguoti serverį",
+    "linkTitle": "Įrašyti šį serverį?",
+    "address": "Adresas",
+    "addressHint": "Pavyzdžiui, mumble.example.org. Čia taip pat gali įklijuoti mumble:// nuorodą.",
+    "filledFromLink": "Užpildyta iš mumble:// nuorodos.",
+    "port": "Prievadas",
+    "label": "Pavadinimas serverių juostoje",
+    "username": "Tavo vardas šiame serveryje",
+    "password": "Serverio slaptažodis (nebūtina)",
+    "passwordHint": "Reikalingas tik jei serveris jo prašo. Saugomas tavo sistemos saugykloje.",
+    "passwordKeepHint": "Slaptažodis įrašytas. Palik tuščią, kad pasiliktų, arba įvesk naują.",
+    "clearPassword": "Pašalinti įrašytą slaptažodį",
+    "add": "Pridėti serverį",
+    "saveAndConnect": "Įrašyti ir prisijungti",
+    "errors": {
+      "address": "Įvesk serverio adresą.",
+      "port": "Įvesk prievadą nuo 1 iki 65535. Dauguma serverių naudoja 64738.",
+      "username": "Įvesk vardą, kurį nori naudoti šiame serveryje.",
+      "link": "Šios mumble:// nuorodos nepavyksta nuskaityti. Patikrink, ar ji nukopijuota visa.",
+      "invalid": "Serverio duomenys netinkami. Patikrink adresą ir prievadą."
+    }
+  },
+  "errors": {
+    "serverUnreachable": "Serverio pasiekti nepavyksta. Patikrink adresą, prievadą ir ar esi prisijungęs (-usi) prie interneto.",
+    "wrongPassword": "Serverio slaptažodis neteisingas. Redaguok serverį ir įvesk teisingą slaptažodį.",
+    "nameInUse": "Tavo vardas šiame serveryje jau naudojamas arba užregistruotas kito žmogaus. Redaguok serverį ir pasirink kitą vardą.",
+    "certificateRejected": "Sertifikato patikra nepavyko: arba serverio sertifikatu nepasitikėta, arba serveris nepriėmė tavo tapatybės. Bandyk dar kartą arba kreipkis į serverio savininką.",
+    "certificateChanged": "Serverio sertifikatas pasikeitė ir juo nepasitikėta. Pasitikėk juo tik tada, kai serverio savininkas patvirtins pakeitimą.",
+    "denied": "Serveris atmetė ryšį.",
+    "deniedWithReason": "Serveris atmetė ryšį: {{reason}}",
+    "invalidAddress": "Serverio adresas netinkamas. Redaguok serverį ir ištaisyk jį.",
+    "secureStorage": "Tavo sistemos saugykla nepasiekiama, todėl serverio slaptažodžio nepavyko nuskaityti ar įrašyti. Atrakink ją ir bandyk dar kartą.",
+    "notFound": "Šis serveris nebeįrašytas.",
+    "generic": "Kažkas nepavyko. Bandyk dar kartą."
+  },
+  "remove": {
+    "title": "Pašalinti {{server}}?",
+    "message": "Jo įrašytas slaptažodis, sertifikato sprendimas, sekami kanalai ir pokalbių istorija šiame kompiuteryje bus ištrinti.",
+    "confirm": "Pašalinti"
+  },
+  "switch": {
+    "title": "Pakeisti serverį?",
+    "message": "Vienu metu gali būti tik viename serveryje. Atsijungti nuo {{current}} ir prisijungti prie {{next}}?",
+    "confirm": "Atsijungti ir pakeisti"
+  },
+  "cert": {
+    "newTitle": "Pasitikėti šiuo serveriu?",
+    "newIntro": "Mumcord dar nėra matęs {{server}} sertifikato. Jei serverio savininkas davė tau kontrolinį kodą (angl. fingerprint), patikrink, ar jis sutampa. Tavo pasirinkimas bus prisimintas.",
+    "fingerprint": "Sertifikato kontrolinis kodas",
+    "changedTitle": "Įspėjimas: serverio sertifikatas pasikeitė",
+    "changedWarning": "{{server}} sertifikatas skiriasi nuo to, kuriuo pasitikėjai anksčiau.",
+    "changedAdvice": "Taip gali nutikti atnaujinus serverį, bet tai taip pat gali reikšti, kad kažkas perima tavo ryšį. Tęsk tik jei serverio savininkas patvirtino pakeitimą.",
+    "previousFingerprint": "Anksčiau patikėtas kontrolinis kodas",
+    "newFingerprint": "Naujas kontrolinis kodas",
+    "reject": "Neprisijungti",
+    "trust": "Pasitikėti ir prisijungti",
+    "trustChanged": "Pasitikėti nauju sertifikatu"
+  },
+  "rejoin": {
+    "label": "Grįžti į paskutinį kanalą",
+    "text": "Praeitą kartą buvai kanale {{channel}} – grįžti?",
+    "rejoin": "Grįžti",
+    "notNow": "Ne dabar"
+  },
+  "status": {
+    "label": "Ryšio būsena",
+    "connecting": "Jungiamasi prie {{server}}…",
+    "reconnecting": "Jungiamasi iš naujo… ({{attempt}} bandymas iš {{max}}, kitas po {{seconds}} s)",
+    "tcp": "Prisijungta per TCP (UDP užblokuotas). Balsas veikia, bet gali šiek tiek vėluoti.",
+    "disconnected": "Atsijungta",
+    "disconnectedReason": "Atsijungta – {{reason}}",
+    "failed": "Nepavyko prisijungti prie {{server}}. {{reason}}",
+    "cancel": "Atšaukti",
+    "reconnect": "Jungtis iš naujo",
+    "editServer": "Redaguoti serverį",
+    "actionFailed": {
+      "reorder": "Nepavyko įrašyti naujos serverių tvarkos. Bandyk dar kartą.",
+      "remove": "Nepavyko pašalinti serverio. Bandyk dar kartą.",
+      "disconnect": "Atsijungti nepavyko. Bandyk dar kartą."
+    }
+  },
+  "empty": {
+    "title": "Pridėk pirmąjį serverį",
+    "description": "Įvesk adresą, kurį gavai iš savo grupės, arba įklijuok mumble:// nuorodą.",
+    "addressLabel": "Serverio adresas arba mumble:// nuoroda",
+    "addressHint": "Pavyzdžiui, mumble.example.org arba mumble.example.org:64738.",
+    "connect": "Pridėti ir prisijungti",
+    "pasteLink": "Įklijuoti mumble:// nuorodą",
+    "moreOptions": "Daugiau parinkčių…",
+    "noLinkInClipboard": "Iškarpinėje nėra mumble:// nuorodos. Įklijuok arba įvesk adresą aukščiau.",
+    "pasteManually": "Mumcord nepavyko nuskaityti iškarpinės. Spustelėk lauką aukščiau ir spausk Ctrl+V.",
+    "errors": {
+      "required": "Įvesk serverio adresą arba mumble:// nuorodą."
+    }
+  }
+}

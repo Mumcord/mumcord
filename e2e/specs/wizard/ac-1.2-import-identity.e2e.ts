@@ -13,6 +13,7 @@ import {
   pageText,
   waitForText,
   wizardArtifacts,
+  wizardStep,
 } from "../../helpers/wizard-util.ts";
 
 // AC-1.2: Wizard with an exported PKCS#12 file → import → connecting to the test server shows the
@@ -72,7 +73,7 @@ describe("AC-1.2 wizard imports a PKCS#12 identity", () => {
   });
 
   it("imports the file in the wizard", async () => {
-    await waitForText("Step 1 of 3", 30_000);
+    await waitForText(wizardStep(1), 30_000);
     await $('input[name="identity-mode"][value="import"]').click();
     await button("Choose file…").click();
     await chooseFileInNativeDialog(p12);

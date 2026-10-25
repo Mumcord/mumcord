@@ -3,6 +3,7 @@ import { act, fireEvent, render, screen, waitFor } from "@testing-library/react"
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import type { ChannelInfo, User } from "../../api";
 import { subscribeAnnouncements } from "../../a11y/announcer";
+import { setHintPreference } from "../../a11y/hintPreferences";
 import { ChannelsPanel } from "./ChannelsPanel";
 import { ChannelTree } from "./ChannelTree";
 import { resetCollapseMemory } from "./collapseMemory";
@@ -34,6 +35,8 @@ function user(session: number, name: string, channelId: number): User {
     hasComment: false,
     volume: 100,
     localMute: false,
+    isMumcord: false,
+    mumcordFeatures: [],
   };
 }
 
@@ -281,5 +284,32 @@ describe("search field", () => {
     });
     fireEvent.keyDown(window, { key: "f", ctrlKey: true });
     expect(input).toHaveFocus();
+  });
+});
+
+describe("ChannelTree keyboard hint", () => {
+  afterEach(() => {
+    setHintPreference("keyboardHints", true);
+  });
+
+  it("is shown by default and only leaves the screen when turned off", () => {
+    render(
+      <ChannelTree
+        state={searchState()}
+        selectedChannelId={null}
+        onSelect={noop}
+        onJoin={noop}
+        onOpenPerson={noop}
+        filter=""
+      />,
+    );
+    const hint = screen.getByText(/Arrow keys: move/);
+    expect(hint).toHaveClass("channel-tree__hint");
+    act(() => {
+      setHintPreference("keyboardHints", false);
+    });
+    expect(hint).toHaveClass("visually-hidden");
+    // Still describes the tree for screen readers.
+    expect(screen.getByRole("tree")).toHaveAttribute("aria-describedby", hint.id);
   });
 });

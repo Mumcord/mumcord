@@ -1,0 +1,65 @@
+{
+  "inChannel_one": "In {{channel}} ({{count}})",
+  "inChannel_other": "In {{channel}} ({{count}})",
+  "listening_one": "Luistert mee ({{count}})",
+  "listening_other": "Luisteren mee ({{count}})",
+  "noChannel": "Kies een kanaal om te zien wie erin zit.",
+  "nobody": "Er is niemand.",
+  "nobodyElse": "Er is verder niemand op de server.",
+  "inOtherChannels": "In andere kanalen",
+  "you": "(jij)",
+  "registered": "Geregistreerd",
+  "unregistered": "Niet geregistreerd",
+  "talking": "Praat",
+  "card": {
+    "close": "Sluiten",
+    "loadFailed": "Het profiel kon niet worden geladen.",
+    "volume": "Volume",
+    "volumeValue": "{{value}} %",
+    "localMute": "Voor mij dempen",
+    "sessionOnly": "Deze persoon heeft geen certificaat, dus deze instellingen gelden alleen voor deze sessie.",
+    "sendPrivateMessage": "Privébericht sturen",
+    "privateMessage": "Privébericht",
+    "localSettings": "Jouw instellingen",
+    "localSettingsHint": "Alleen jij ziet deze. Wijzigingen worden direct opgeslagen.",
+    "localMuteHint": "Je hoort deze persoon niet.",
+    "privateNote": "Privénotitie",
+    "privateNoteHint": "Alleen jij kunt deze notitie zien.",
+    "saved": "Opgeslagen"
+  },
+  "errors": {
+    "notConnected": "Niet verbonden met een server.",
+    "generic": "Dat is mislukt. Probeer het opnieuw."
+  },
+  "menu": {
+    "label": "Acties voor {{name}}",
+    "viewProfile": "Profiel bekijken",
+    "join": "Naar {{channel}} gaan",
+    "joinDenied": "Je mag dit kanaal niet betreden.",
+    "mute": "Voor mij dempen"
+  },
+  "nowPlaying": {
+    "label": "Speelt nu",
+    "listening": "Luistert naar",
+    "paused": "Gepauzeerd",
+    "progress": "Afspeelvoortgang",
+    "position": "{{position}} van {{duration}}"
+  },
+  "nowGaming": {
+    "label": "Gamet nu",
+    "playing": "Speelt",
+    "playedFor": "al {{time}}",
+    "hoursMinutes": "{{hours}} u {{minutes}} min",
+    "minutes_one": "{{count}} min",
+    "minutes_other": "{{count}} min",
+    "join": "Meespelen",
+    "joinTitle": "Meespelen?",
+    "joinMessage": "Steam wordt geopend en maakt verbinding met de server waarop deze persoon {{game}} speelt. Sluit alleen aan bij servers die je vertrouwt.",
+    "joinConfirm": "Steam openen",
+    "joinFailed": "Steam kon niet worden geopend."
+  },
+  "preview": {
+    "privateMessage": "Privébericht",
+    "fullProfile": "Volledig profiel"
+  }
+}

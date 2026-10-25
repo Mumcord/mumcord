@@ -2,12 +2,14 @@ import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { act, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { PreferencesProvider } from "../../app/PreferencesProvider";
 import { ViewContext, type View } from "../../app/view";
 import { createMockApi, setApi, type MockApi, type Settings } from "../../api";
 import { subscribeAnnouncements } from "../../a11y/announcer";
 import "../../i18n";
 import { axeViolations } from "../../test/axe";
 import { resetServerStore } from "../channels/serverStore";
+import { resetNowGamingStore } from "../nowgaming";
 import { resetNowPlayingStore } from "../nowplaying";
 import { UserPanel } from "./UserPanel";
 import { LEVEL_FRAME_MS } from "./useMicLevelFill";
@@ -41,9 +43,14 @@ async function setup(connect = true, registered = false, talk?: Partial<Settings
     await api.connect((server ?? { id: 0 }).id, null);
   }
   render(
-    <ViewContext.Provider value={view}>
-      <UserPanel />
-    </ViewContext.Provider>,
+    <PreferencesProvider>
+      <ViewContext.Provider value={view}>
+        {/* The app mounts the panel in a labelled section (AppShell); axe's region rule needs it. */}
+        <section aria-label="User panel">
+          <UserPanel />
+        </section>
+      </ViewContext.Provider>
+    </PreferencesProvider>,
   );
   if (connect) {
     await screen.findByRole("button", { name: "Mute microphone" });
@@ -68,6 +75,7 @@ afterEach(() => {
   setApi(undefined);
   resetServerStore();
   resetNowPlayingStore();
+  resetNowGamingStore();
 });
 
 const mute = () => screen.getByRole("button", { name: "Mute microphone" });
@@ -91,10 +99,8 @@ async function freshConnect() {
 }
 
 async function openMenuItem(name: string) {
-  const opener = document.querySelector('[aria-haspopup="menu"]');
-  if (!opener) throw new Error("user menu button missing");
-  fireEvent.click(opener);
-  fireEvent.click(await screen.findByRole("menuitem", { name }));
+  fireEvent.click(screen.getByRole("button", { name: "Quick settings" }));
+  fireEvent.click(await screen.findByRole("menuitem", { name: new RegExp(`^${name}`, "u") }));
 }
 
 describe("UserPanel", () => {
@@ -253,10 +259,11 @@ describe("UserPanel", () => {
     expect(screen.queryByRole("button", { name: "Connection info" })).not.toBeInTheDocument();
   });
 
-  it("opens settings", async () => {
+  it("opens the quick settings on a left click, not the full settings", async () => {
     await setup();
-    fireEvent.click(screen.getByRole("button", { name: "Settings" }));
-    expect(openSettings).toHaveBeenCalled();
+    fireEvent.click(screen.getByRole("button", { name: "Quick settings" }));
+    expect(await screen.findByRole("menu", { name: "Quick settings" })).toBeInTheDocument();
+    expect(openSettings).not.toHaveBeenCalled();
   });
 
   it("disables toggles when not connected", async () => {
@@ -286,11 +293,9 @@ describe("UserPanel", () => {
     await waitFor(() => {
       expect(screen.queryByRole("dialog")).toBeNull();
     });
-    const opener = document.querySelector('[aria-haspopup="menu"]');
-    if (!opener) throw new Error("user menu button missing");
-    fireEvent.click(opener);
-    await screen.findByRole("menuitem", { name: "Edit profile" });
-    expect(screen.queryByRole("menuitem", { name: "Register on this server" })).toBeNull();
+    fireEvent.click(screen.getByRole("button", { name: "Quick settings" }));
+    await screen.findByRole("menuitem", { name: /^Edit profile/u });
+    expect(screen.queryByRole("menuitem", { name: /^Register on this server/u })).toBeNull();
   });
 
   it("shows a plain error when registering is refused", async () => {
@@ -353,8 +358,8 @@ describe("UserPanel", () => {
   it("shows the own avatar when the server has one and refreshes on a hash change", async () => {
     await setup();
     const userButton = () => {
-      const el = document.querySelector<HTMLElement>('[aria-haspopup="menu"]');
-      if (!el) throw new Error("user button missing");
+      const el = document.querySelector<HTMLElement>(".userpanel__profile");
+      if (!el) throw new Error("user name area missing");
       return el;
     };
     expect(userButton().querySelector("img")).toBeNull();
@@ -386,24 +391,25 @@ describe("UserPanel", () => {
     const name = document.querySelector<HTMLElement>(".userpanel__name");
     if (!name) throw new Error("name missing");
     expect(name).toHaveAttribute("title", name.textContent);
-    const button = document.querySelector<HTMLElement>('[aria-haspopup="menu"]');
-    // The visible name and status line are the button's accessible name (WCAG 2.5.3).
-    expect(button).toHaveAccessibleName(`${name.textContent} Read-only`);
-    expect(button?.closest(".userpanel__identity")).not.toBeNull();
+    const profile = document.querySelector<HTMLElement>(".userpanel__profile");
+    // Plain text, not a control: the name area offers no button or menu (edits live in quick settings).
+    expect(profile?.tagName).toBe("DIV");
+    expect(profile?.querySelector("button, [aria-haspopup]")).toBeNull();
+    expect(profile?.closest(".userpanel__identity")).not.toBeNull();
     const row = document.querySelector(".userpanel__row");
     if (!row) throw new Error("button row missing");
-    expect(row.contains(button)).toBe(false);
+    expect(row.contains(profile)).toBe(false);
     const labels = [...row.querySelectorAll("button")].map((b) => b.getAttribute("aria-label"));
     expect(labels).toEqual([
       "Mute microphone",
       "Deafen",
       expect.stringMatching(/^Disconnect from /),
       "Connection info",
-      "Settings",
+      "Quick settings",
     ]);
     await joinVoice();
-    expect(button).not.toHaveAccessibleDescription("Read-only");
-    expect(button?.querySelector(".userpanel__status")?.textContent).not.toBe("");
+    expect(profile?.querySelector(".userpanel__status")).not.toHaveTextContent("Read-only");
+    expect(profile?.querySelector(".userpanel__status")?.textContent).not.toBe("");
   });
 
   it("shows the own playing track in the status line, with the full text as tooltip", async () => {
@@ -440,6 +446,38 @@ describe("UserPanel", () => {
       api.mock.emit("nowPlayingChanged", { session: self, track: null });
     });
     expect(status()?.textContent).toBe(normal);
+  });
+
+  it("puts the own game before the own track and names both in the tooltip", async () => {
+    await setup();
+    await joinVoice();
+    const status = () => document.querySelector<HTMLElement>(".userpanel__status");
+    const self = (await api.sessionSnapshot())?.selfSession ?? -1;
+    act(() => {
+      api.mock.emit("nowPlayingChanged", {
+        session: self,
+        track: {
+          title: "Song",
+          artist: "Band",
+          album: null,
+          hasCover: false,
+          positionMs: 0,
+          durationMs: null,
+          playing: true,
+        },
+      });
+      api.mock.emit("nowGamingChanged", {
+        session: self,
+        game: { name: "Factorio", hasIcon: false, playedMs: 0, canJoin: false },
+      });
+    });
+    expect(status()).toHaveTextContent("Factorio");
+    expect(status()).toHaveAttribute("title", "Playing Factorio · Listening to Band – Song");
+    expect(status()?.querySelector("svg.userpanel__status-icon")).not.toBeNull();
+    act(() => {
+      api.mock.emit("nowGamingChanged", { session: self, game: null });
+    });
+    expect(status()).toHaveTextContent("Band – Song");
   });
 
   it("keeps important states over the own track", async () => {
@@ -597,5 +635,188 @@ describe("UserPanel", () => {
       expect(mic()).not.toHaveAttribute("title");
       expect(mic().querySelector(".userpanel__level")).not.toBeNull();
     });
+  });
+});
+
+describe("quick settings (FR-1.66)", () => {
+  const gear = () => screen.getByRole("button", { name: "Quick settings" });
+
+  it("opens on right-click and saves a switch right away", async () => {
+    await setup();
+    fireEvent.contextMenu(gear(), { clientX: 10, clientY: 10 });
+    const links = await screen.findByRole("menuitemcheckbox", {
+      name: /^Link previews and embeds/u,
+    });
+    expect(links).toHaveAttribute("aria-checked", "true");
+    fireEvent.click(links);
+    await waitFor(async () => {
+      expect((await api.settingsGet()).linkPreviews).toBe(false);
+    });
+    expect(links).toHaveAttribute("aria-checked", "false");
+    expect(openSettings).not.toHaveBeenCalled();
+  });
+
+  it("opens with Shift+F10, applies the theme at once and Escape returns focus", async () => {
+    await setup();
+    gear().focus();
+    fireEvent.keyDown(gear(), { key: "F10", shiftKey: true });
+    const dark = await screen.findByRole("menuitemradio", { name: "Dark" });
+    fireEvent.click(dark);
+    await waitFor(() => {
+      expect(document.documentElement.dataset.theme).toBe("dark");
+    });
+    await waitFor(() => {
+      expect(dark).toHaveAttribute("aria-checked", "true");
+    });
+    fireEvent.keyDown(screen.getByRole("menu"), { key: "Escape" });
+    expect(screen.queryByRole("menu", { name: "Quick settings" })).toBeNull();
+    expect(gear()).toHaveFocus();
+  });
+
+  it("toggles now playing and a normal click reopens the menu", async () => {
+    await setup();
+    fireEvent.contextMenu(gear());
+    fireEvent.click(
+      await screen.findByRole("menuitemcheckbox", { name: /^Share what I.m listening to/u }),
+    );
+    await waitFor(async () => {
+      expect((await api.settingsGet()).nowPlaying).toBe(true);
+    });
+    fireEvent.keyDown(screen.getByRole("menu"), { key: "Escape" });
+    fireEvent.click(gear());
+    expect(await screen.findByRole("menu", { name: "Quick settings" })).toBeInTheDocument();
+  });
+
+  it("opens the full settings from the footer link and closes the menu", async () => {
+    await setup();
+    fireEvent.contextMenu(gear());
+    fireEvent.click(await screen.findByRole("menuitem", { name: /All settings/ }));
+    expect(openSettings).toHaveBeenCalled();
+    expect(screen.queryByRole("menu", { name: "Quick settings" })).toBeNull();
+  });
+
+  it("offers profile and registration rows when connected and unregistered", async () => {
+    await setup();
+    fireEvent.contextMenu(gear());
+    fireEvent.click(await screen.findByRole("menuitem", { name: /^Edit profile/u }));
+    expect(screen.queryByRole("menu", { name: "Quick settings" })).toBeNull();
+    expect(await screen.findByRole("dialog")).toBeInTheDocument();
+  });
+
+  it("opens the register dialog from the quick settings", async () => {
+    await setup();
+    fireEvent.contextMenu(gear());
+    const row = await screen.findByRole("menuitem", { name: /^Register on this server/u });
+    expect(row).toHaveTextContent("Keeps your name and avatar on this server");
+    fireEvent.click(row);
+    expect(screen.queryByRole("menu", { name: "Quick settings" })).toBeNull();
+    expect(await screen.findByRole("dialog")).toBeInTheDocument();
+  });
+
+  it("toggles now gaming from the quick settings", async () => {
+    await setup();
+    fireEvent.contextMenu(gear());
+    fireEvent.click(
+      await screen.findByRole("menuitemcheckbox", { name: /^Share the game I.m playing/u }),
+    );
+    await waitFor(async () => {
+      expect((await api.settingsGet()).nowGaming).toBe(true);
+    });
+  });
+
+  describe("Beta group (FR-1.73)", () => {
+    beforeEach(() => {
+      localStorage.clear();
+    });
+
+    const header = () => screen.findByRole("menuitem", { name: "Beta" });
+
+    it("is collapsed by default and expands and collapses", async () => {
+      await setup();
+      fireEvent.contextMenu(gear());
+      const head = await header();
+      expect(head).toHaveAttribute("aria-expanded", "false");
+      expect(screen.queryByRole("menuitemcheckbox", { name: /^Positional audio/u })).toBeNull();
+      fireEvent.click(head);
+      expect(head).toHaveAttribute("aria-expanded", "true");
+      expect(head).toHaveAttribute("aria-controls", screen.getByRole("group", { name: "Beta" }).id);
+      expect(screen.getByRole("menuitemcheckbox", { name: /^Positional audio/u })).toBeVisible();
+      fireEvent.click(head);
+      expect(screen.queryByRole("menuitemcheckbox", { name: /^Positional audio/u })).toBeNull();
+    });
+
+    it("remembers the open state", async () => {
+      await setup();
+      fireEvent.contextMenu(gear());
+      fireEvent.click(await header());
+      fireEvent.keyDown(screen.getByRole("menu"), { key: "Escape" });
+      fireEvent.click(gear());
+      expect(await header()).toHaveAttribute("aria-expanded", "true");
+    });
+
+    it("binds the three switches to the settings", async () => {
+      await setup();
+      fireEvent.contextMenu(gear());
+      fireEvent.click(await header());
+      const positional = screen.getByRole("menuitemcheckbox", { name: /^Positional audio/u });
+      const offer = screen.getByRole("menuitemcheckbox", { name: /^Offer full-size images/u });
+      const load = screen.getByRole("menuitemcheckbox", { name: /^Load full-size images/u });
+      const before = await api.settingsGet();
+      fireEvent.click(positional);
+      fireEvent.click(offer);
+      fireEvent.click(load);
+      await waitFor(async () => {
+        const after = await api.settingsGet();
+        expect(after.positional.enabled).toBe(!before.positional.enabled);
+        expect(after.offerFullImages).toBe(!before.offerFullImages);
+        expect(after.loadFullImages).toBe(!before.loadFullImages);
+      });
+    });
+
+    it("is keyboard operable and takes part in arrow navigation", async () => {
+      await setup();
+      fireEvent.contextMenu(gear());
+      const head = await header();
+      head.focus();
+      fireEvent.click(head);
+      fireEvent.keyDown(head, { key: "ArrowDown" });
+      expect(screen.getByRole("menuitemcheckbox", { name: /^Positional audio/u })).toHaveFocus();
+      fireEvent.keyDown(document.activeElement ?? head, { key: "ArrowUp" });
+      expect(head).toHaveFocus();
+    });
+  });
+
+  it("switches the window overlay on and follows its changes", async () => {
+    await setup();
+    const spy = vi.spyOn(api, "overlaySetEnabled");
+    fireEvent.contextMenu(gear());
+    const row = await screen.findByRole("menuitemcheckbox", { name: /^Overlay/u });
+    expect(row).toHaveAttribute("aria-checked", "false");
+    fireEvent.click(row);
+    await waitFor(() => {
+      expect(row).toHaveAttribute("aria-checked", "true");
+    });
+    expect(spy).toHaveBeenCalledWith(true);
+    const state = await api.overlayState();
+    act(() => {
+      api.mock.emit("overlayChanged", {
+        state: { ...state, settings: { ...state.settings, enabled: false } },
+      });
+    });
+    await waitFor(() => {
+      expect(row).toHaveAttribute("aria-checked", "false");
+    });
+  });
+
+  it("hides the overlay switch on macOS", async () => {
+    await setup();
+    vi.spyOn(api, "appInfo").mockResolvedValue({
+      version: "0.0.0",
+      os: "macos aarch64",
+      thirdPartyNotices: "",
+    });
+    fireEvent.contextMenu(gear());
+    await screen.findByRole("menuitemcheckbox", { name: /^Link previews/u });
+    expect(screen.queryByRole("menuitemcheckbox", { name: /^Overlay/u })).toBeNull();
   });
 });

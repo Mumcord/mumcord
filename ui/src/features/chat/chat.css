@@ -31,6 +31,15 @@
   white-space: nowrap;
 }
 
+.chat-header__presence {
+  display: inline-flex;
+  flex: none;
+  gap: var(--space-1);
+  align-items: center;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+}
+
 .chat-header__hash {
   margin-right: var(--space-1);
   color: var(--color-text-muted);
@@ -49,6 +58,55 @@
   padding: var(--space-2) 0;
   overflow-y: auto;
   overflow-x: hidden;
+  /* The list keeps the reading position itself (FR-1.60b); the browser's anchoring would fight it. */
+  overflow-anchor: none;
+}
+
+/* Holds the scrolling list and the "Jump to newest" button floating over its bottom right. */
+.chat-list-frame {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+}
+
+.chat-jump {
+  position: absolute;
+  right: var(--space-4);
+  bottom: var(--space-3);
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-1) var(--space-3);
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-full);
+  background: var(--color-bg-elevated);
+  color: var(--color-text);
+  font-size: var(--font-size-sm);
+  box-shadow: var(--shadow-raised);
+  cursor: pointer;
+}
+
+.chat-jump:hover {
+  background: var(--color-bg-hover);
+}
+
+.chat-jump__count {
+  min-width: 1.5em;
+  padding: 0 var(--space-1);
+  border-radius: var(--radius-full);
+  background: var(--color-accent);
+  color: var(--color-bg-elevated);
+  font-weight: var(--font-weight-bold);
+  text-align: center;
+}
+
+.chat-message__origin {
+  display: block;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+  font-style: italic;
 }
 
 .chat-list__older {
@@ -535,6 +593,8 @@
   flex-direction: column;
   gap: var(--space-2);
   margin-top: var(--space-1);
+  /* Compact rows hang their first line with a negative text-indent; it is inherited, so the cards would shift onto their own bar. */
+  text-indent: 0;
 }
 
 .link-previews:empty {
@@ -872,6 +932,19 @@
   cursor: default;
 }
 
+.image-viewer__hint {
+  position: absolute;
+  bottom: var(--space-4);
+  left: var(--space-4);
+  z-index: 1;
+  margin: 0;
+  padding: var(--space-1) var(--space-2);
+  border-radius: var(--radius-md);
+  background: var(--color-bg-elevated);
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+}
+
 .image-viewer__status {
   position: absolute;
   bottom: var(--space-4);
@@ -949,6 +1022,12 @@
 
 .gif-picker__choose:hover {
   border-color: var(--color-border-strong);
+}
+
+.gif-picker__thumb {
+  display: block;
+  width: 100%;
+  height: 100%;
 }
 
 .gif-picker__img {
@@ -1039,4 +1118,108 @@
 .gif-picker__attribution:hover {
   background: var(--color-bg-hover);
   text-decoration: underline;
+}
+
+/* Mentions of people on the server: a chip that behaves like their name elsewhere. */
+.chat-mention {
+  padding: 0 var(--space-1);
+  border-radius: var(--radius-sm, 4px);
+  background: color-mix(in srgb, var(--color-accent) 22%, transparent);
+  cursor: pointer;
+}
+
+.chat-mention:hover,
+.chat-mention:focus-visible {
+  background: color-mix(in srgb, var(--color-accent) 30%, transparent);
+}
+
+/* Attachment tray and drop highlight for images (FR-1.30). */
+.chat-composer[data-dragging="true"] .chat-composer__row {
+  box-shadow: inset 0 0 0 2px var(--color-accent);
+}
+
+.chat-tray {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin: 0 0 var(--space-2);
+  padding: 0;
+  list-style: none;
+}
+
+.chat-tray__item {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  max-width: 16rem;
+  padding: var(--space-1);
+  padding-right: 1.75rem;
+  border-radius: var(--radius-sm);
+  background: var(--color-bg-hover);
+  font-size: var(--font-size-sm);
+}
+
+.chat-tray__item img,
+.chat-tray__spinner {
+  flex: none;
+  width: 3.5rem;
+  height: 3.5rem;
+  object-fit: cover;
+  border-radius: var(--radius-sm);
+}
+
+.chat-tray__spinner {
+  box-sizing: border-box;
+  border: 3px solid var(--color-text-muted);
+  border-top-color: transparent;
+  border-radius: 50%;
+  width: 1.5rem;
+  height: 1.5rem;
+  margin: 1rem;
+  animation: chat-tray-spin 0.9s linear infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .chat-tray__spinner {
+    animation-duration: 3s;
+  }
+}
+
+@keyframes chat-tray-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.chat-tray__info {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.chat-tray__name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.chat-tray__note {
+  color: var(--color-text-secondary);
+}
+
+.chat-tray__remove {
+  position: absolute;
+  top: 0;
+  right: 0;
+  min-width: 1.5rem;
+  min-height: 1.5rem;
+  border: 0;
+  background: transparent;
+  color: var(--color-text-muted);
+  cursor: pointer;
+}
+
+.chat-tray__remove:hover {
+  color: var(--color-text);
 }

@@ -40,6 +40,7 @@ use tokio::task::JoinHandle;
 pub use machine::MAX_RECONNECT_ATTEMPTS;
 pub use types::*;
 
+use crate::friends::FriendHub;
 use crate::people::{self, People};
 use crate::sounds::SoundHub;
 use crate::voice::{self, Audio, Meter, VoicePipeline, VoiceShared};
@@ -55,7 +56,11 @@ const PROFILE_WAIT: Duration = Duration::from_secs(3);
 
 /// Event output of the engine; cheap to clone. Extensions (B14) emit through it too.
 #[derive(Clone)]
-pub struct Events(mpsc::UnboundedSender<EngineEvent>, Arc<SoundHub>);
+pub struct Events(
+    mpsc::UnboundedSender<EngineEvent>,
+    Arc<SoundHub>,
+    Arc<FriendHub>,
+);
 
 impl Events {
     /// Notification sounds (B26); also reachable for `Sound::Message` from chat code.
@@ -63,10 +68,19 @@ impl Events {
         &self.1
     }
 
+    /// Friends and their online state (FR-1.64).
+    pub fn friends(&self) -> &Arc<FriendHub> {
+        &self.2
+    }
+
     pub fn emit(&self, event: EngineEvent) {
         self.1.observe(&event);
+        let friends = self.2.observe(&event);
         // A closed receiver means the app is shutting down; nobody is left to inform.
         let _ = self.0.send(event);
+        if let Some(friends) = friends {
+            let _ = self.0.send(EngineEvent::FriendsChanged(friends));
+        }
     }
 }
 
@@ -141,10 +155,21 @@ struct Inner {
     /// offered for rejoining once, on the first fresh connect to its server (QA.9).
     rejoin_offers: Mutex<HashMap<ServerId, String>>,
     core: Mutex<Core>,
-    /// Link previews and video cards for chat links (FR-1.49, FR-1.50).
-    previews: crate::web::LinkPreviews,
+    /// Link previews and video cards for chat links (FR-1.49, FR-1.50); also the image cache
+    /// of full-size chat images.
+    previews: Arc<crate::web::LinkPreviews>,
+    /// Full-size image transfers with other Mumcord clients (FR-1.60c).
+    full_images: Arc<crate::full_image::transfer::Transfers>,
     /// Shared "now playing" status (FR-1.58).
     now_playing: Mutex<crate::now_playing::NowPlaying>,
+    /// Shared "now gaming" status (FR-1.59).
+    now_gaming: Mutex<crate::now_gaming::NowGaming>,
+    /// Other Mumcord users on the server (FR-1.61).
+    mumcord: Mutex<crate::mumcord::Peers>,
+    /// History sync with other Mumcord users (FR-1.60).
+    history_sync: Arc<Mutex<crate::history_sync::HistorySync>>,
+    /// Positional audio (FR-1.41).
+    positional: crate::positional::Positional,
 }
 
 #[derive(Default)]
@@ -159,6 +184,15 @@ struct Core {
     audio: Option<Audio>,
     pipeline: Option<VoicePipeline>,
     mic_test: Option<MicTest>,
+}
+
+/// See [`Engine::downgrade`].
+pub(crate) struct WeakEngine(std::sync::Weak<Inner>);
+
+impl WeakEngine {
+    pub fn upgrade(&self) -> Option<Engine> {
+        self.0.upgrade().map(|inner| Engine { inner })
+    }
 }
 
 /// A live connection.
@@ -270,11 +304,16 @@ impl Engine {
             .collect();
         let store = Arc::new(Mutex::new(store));
         let (tx, rx) = mpsc::unbounded_channel();
-        let events = Events(tx, SoundHub::from_store(store.clone()));
+        let events = Events(
+            tx,
+            SoundHub::from_store(store.clone()),
+            FriendHub::new(store.clone(), rt.clone()),
+        );
         let controls = Arc::new(DspControls::default());
         local::apply_dsp(&controls, &settings);
         let meter = Arc::new(Meter::default());
         voice::spawn_meter(&rt, controls.clone(), meter.clone(), events.clone());
+        let voice = Arc::new(VoiceShared::default());
         let inner = Arc::new(Inner {
             rt,
             data_dir: data_dir.to_path_buf(),
@@ -284,18 +323,27 @@ impl Engine {
             events,
             controls,
             meter,
-            voice: Arc::new(VoiceShared::default()),
+            voice: voice.clone(),
             reconnects: AtomicU32::new(0),
             rejoin_offers: Mutex::new(rejoin_offers),
-            previews: crate::web::LinkPreviews::new(
+            previews: Arc::new(crate::web::LinkPreviews::new(
                 Some(data_dir.join("link-previews")),
                 crate::web::LinkPreviews::app_policy(),
                 crate::web::fetch::Timeouts::default(),
-            ),
+            )),
+            full_images: Arc::new(crate::full_image::new_transfers()),
             core: Mutex::new(Core::default()),
             now_playing: Mutex::new(crate::now_playing::NowPlaying::new(settings.now_playing)),
+            now_gaming: Mutex::new(crate::now_gaming::NowGaming::new(settings.now_gaming)),
+            mumcord: Mutex::default(),
+            history_sync: Arc::default(),
+            positional: crate::positional::Positional::new(
+                voice.positional.clone(),
+                &settings.positional,
+            ),
         });
         let engine = Self { inner };
+        engine.positional_poll_restart();
         engine
             .link_previews()
             .set_max_age_days(settings.preview_cache_days);
@@ -360,8 +408,41 @@ impl Engine {
         &self.inner.previews
     }
 
+    pub(crate) fn link_previews_arc(&self) -> Arc<crate::web::LinkPreviews> {
+        self.inner.previews.clone()
+    }
+
+    pub(crate) fn full_image_transfers(&self) -> &Arc<crate::full_image::transfer::Transfers> {
+        &self.inner.full_images
+    }
+
     pub(crate) fn now_playing_state(&self) -> &Mutex<crate::now_playing::NowPlaying> {
         &self.inner.now_playing
+    }
+
+    pub(crate) fn mumcord_state(&self) -> &Mutex<crate::mumcord::Peers> {
+        &self.inner.mumcord
+    }
+
+    pub(crate) fn now_gaming_state(&self) -> &Mutex<crate::now_gaming::NowGaming> {
+        &self.inner.now_gaming
+    }
+
+    pub(crate) fn history_sync_state(&self) -> &Mutex<crate::history_sync::HistorySync> {
+        &self.inner.history_sync
+    }
+
+    pub(crate) fn positional(&self) -> &crate::positional::Positional {
+        &self.inner.positional
+    }
+
+    pub(crate) fn events(&self) -> &Events {
+        &self.inner.events
+    }
+
+    /// A handle for background tasks that must not keep the engine alive.
+    pub(crate) fn downgrade(&self) -> WeakEngine {
+        WeakEngine(Arc::downgrade(&self.inner))
     }
 
     /// The store, also while disconnected (history commands, B14).
@@ -512,6 +593,61 @@ impl Engine {
         self.inner.change_person(session, |s| s.local_mute = muted)
     }
 
+    /// Saves the private note about a person (FR-1.63); an empty note removes it.
+    pub fn person_set_note(&self, session: u32, note: &str) -> EngineResult<()> {
+        let mut core = lock(&self.inner.core);
+        let (server_id, user) = Inner::person_in_session(&core, session)?;
+        let store = lock(&self.inner.store);
+        core.people.save_note(&store, server_id, &user, note)
+    }
+
+    /// Friends with their online state, online first (FR-1.64).
+    pub fn friends(&self) -> Vec<crate::friends::FriendView> {
+        self.inner.events.friends().views()
+    }
+
+    /// Adds a person on the connected server as a friend (FR-1.64). People without a
+    /// certificate cannot be friends; neither can the user.
+    pub fn friend_add(&self, session: u32) -> EngineResult<()> {
+        let friend = {
+            let core = lock(&self.inner.core);
+            let (_, user) = Inner::person_in_session(&core, session)?;
+            let own = core
+                .session
+                .as_ref()
+                .and_then(|s| s.handle.with_state(|st| st.session));
+            if own == Some(session) {
+                return Err(EngineError::invalid("you cannot be your own friend"));
+            }
+            let cert_hash = user.cert_hash.ok_or_else(|| {
+                EngineError::invalid("people without a certificate cannot be friends")
+            })?;
+            let now = crate::chat::now_millis();
+            lock(&self.inner.store)
+                .add_friend(&cert_hash, &user.name, now)
+                .map_err(store_error)?;
+            mumcord_store::Friend {
+                cert_hash,
+                name: user.name,
+                added_at: now,
+                last_seen_at: None,
+            }
+        };
+        let friends = self.inner.events.friends().added(friend);
+        self.inner.events.emit(EngineEvent::FriendsChanged(friends));
+        Ok(())
+    }
+
+    /// Removes a friend by certificate hash; unknown hashes are a no-op (FR-1.64).
+    pub fn friend_remove(&self, cert_hash: &str) -> EngineResult<()> {
+        lock(&self.inner.store)
+            .remove_friend(cert_hash)
+            .map_err(store_error)?;
+        let friends = self.inner.events.friends().removed(cert_hash);
+        self.inner.events.emit(EngineEvent::FriendsChanged(friends));
+        Ok(())
+    }
+
     /// Asks the server for a channel description announced only by its hash (FR-1.48b). The
     /// text arrives as a `ChannelUpserted` event; asking again for the same hash is a no-op.
     pub fn channel_description_request(&self, channel_id: u32) -> EngineResult<()> {
@@ -555,7 +691,13 @@ impl Engine {
             }
         }
         let mut profile = people::profile(&current);
-        // The own profile is edited from here; the now-playing line is not part of it.
+        {
+            let core = lock(&self.inner.core);
+            profile.note = core
+                .people
+                .note(&lock(&self.inner.store), ctx.server_id, &current);
+        }
+        // The own profile is edited from here; the status lines are not part of it.
         if ctx.handle.with_state(|s| s.session) == Some(session) {
             profile.comment = profile
                 .comment
@@ -781,6 +923,11 @@ impl Inner {
         self.stop_pipeline(core);
         if let Some(session) = core.session.take() {
             crate::now_playing::on_disconnect(&self.now_playing, &session.handle);
+            crate::now_gaming::on_disconnect(&self.now_gaming, &session.handle);
+            crate::mumcord::on_disconnect(&self.mumcord);
+            crate::history_sync::on_disconnect(&self.history_sync);
+            self.full_images.reset();
+            self.positional.on_disconnect();
             session.handle.disconnect();
         }
         self.meter.voice.store(false, Ordering::Relaxed);
@@ -1014,6 +1161,11 @@ impl Inner {
             events: self.events.clone(),
         };
         crate::now_playing::on_synced(&self.now_playing);
+        crate::now_gaming::on_synced(&self.now_gaming);
+        crate::mumcord::on_synced(&self.mumcord, &ctx);
+        crate::history_sync::on_synced(&self.history_sync, &ctx, &self.rt);
+        self.full_images.reset();
+        self.positional.on_synced();
         if let Some(mut snapshot) = self.snapshot(&lock(&self.core)) {
             extension::on_synced(&ctx, &mut snapshot);
             self.events
@@ -1082,6 +1234,16 @@ impl Inner {
                 Some(event) = voice_event => match event {
                     VoiceEvent::Packet(packet) => {
                         self.voice.packets_received.fetch_add(1, Ordering::Relaxed);
+                        if let Some(sending) = self.positional.on_voice_packet(
+                            packet.session,
+                            packet.positional.is_some(),
+                            Instant::now(),
+                        ) {
+                            self.events.emit(EngineEvent::PositionalSendingChanged {
+                                session: packet.session,
+                                sending,
+                            });
+                        }
                         if !self.voice.deaf.load(Ordering::Relaxed)
                             && let (Some(tx), Some(p)) = (packets.as_mut(), voice::playback_packet(&packet))
                         {
@@ -1102,6 +1264,12 @@ impl Inner {
                 },
                 Some(PumpCmd::Packets(sender)) = pump_rx.recv() => packets = sender,
                 _ = tick.tick() => {
+                    for session in self.positional.expire(Instant::now()) {
+                        self.events.emit(EngineEvent::PositionalSendingChanged {
+                            session,
+                            sending: false,
+                        });
+                    }
                     bitrate.set_music_quality(self.controls.music_quality());
                     if let Some(t) = &transport {
                         let stats = t.stats();
@@ -1134,6 +1302,7 @@ impl Inner {
         core.session = None;
         self.meter.voice.store(false, Ordering::Relaxed);
         drop(core);
+        crate::history_sync::on_disconnect(&self.history_sync);
         match reason {
             DisconnectReason::Requested => Ended::Final(None),
             DisconnectReason::Kicked { reason, ban, .. } => {
@@ -1276,12 +1445,15 @@ impl Inner {
                 let own = ctx.handle.with_state(|s| s.session) == Some(user.session);
                 if change.joined {
                     crate::now_playing::on_user_joined(&self.now_playing, ctx, user.session);
+                    crate::now_gaming::on_user_joined(&self.now_gaming, ctx, user.session);
+                    crate::mumcord::on_user_joined(&self.mumcord, ctx, user.session);
                 }
+                crate::history_sync::on_user(&self.history_sync, ctx, user);
                 if own && change.moved_from.is_some() {
                     self.remember_channel(ctx, user.channel_id);
                 }
                 self.events
-                    .emit(EngineEvent::UserUpserted(user_view(user, setting)));
+                    .emit(EngineEvent::UserUpserted(self.user_view_of(user, setting)));
             }
             Event::UserRemoved { user, .. } => {
                 let mut core = lock(&self.core);
@@ -1291,6 +1463,11 @@ impl Inner {
                 }
                 drop(core);
                 crate::now_playing::on_user_removed(&self.now_playing, user.session);
+                crate::now_gaming::on_user_removed(&self.now_gaming, user.session);
+                crate::mumcord::on_user_removed(&self.mumcord, user.session);
+                crate::history_sync::on_user_removed(&self.history_sync, user.session);
+                self.full_images.forget(user.session);
+                self.positional.on_user_removed(user.session);
                 self.events.emit(EngineEvent::UserRemoved(user.session));
             }
             Event::PermissionDenied(denied) => {
@@ -1313,10 +1490,39 @@ impl Inner {
             }
             Event::PluginData(data) => {
                 crate::now_playing::on_plugin_data(&self.now_playing, ctx, data);
+                crate::now_gaming::on_plugin_data(&self.now_gaming, ctx, data);
+                if let Some(session) = crate::mumcord::on_plugin_data(&self.mumcord, ctx, data) {
+                    self.republish_user(ctx, session);
+                }
+                crate::history_sync::on_plugin_data(&self.history_sync, ctx, data);
+                crate::full_image::on_plugin_data(&self.full_images, &self.previews, ctx, data);
             }
             Event::TextMessage(_) | Event::ServerConfigUpdated(_) | Event::Disconnected(_) => {}
         }
         extension::on_event(ctx, &event);
+    }
+
+    fn user_view_of(
+        &self,
+        user: &mumcord_protocol::User,
+        setting: mumcord_store::PersonSetting,
+    ) -> UserView {
+        user_view(user, setting, lock(&self.mumcord).features(user.session))
+    }
+
+    /// Emits the person again, e.g. after they were recognised as a Mumcord user.
+    fn republish_user(&self, ctx: &SessionCtx, session: u32) {
+        let Some(user) = ctx.handle.with_state(|s| s.users.get(&session).cloned()) else {
+            return;
+        };
+        let setting = {
+            // Lock order (see module docs): taking `store` first deadlocks against `snapshot`.
+            let core = lock(&self.core);
+            core.people
+                .setting(&lock(&self.store), ctx.server_id, &user)
+        };
+        self.events
+            .emit(EngineEvent::UserUpserted(self.user_view_of(&user, setting)));
     }
 
     /// One `ChannelsUpserted` for a settled burst of permission answers (see `batch`).
@@ -1388,7 +1594,7 @@ impl Inner {
                     .values()
                     .map(|u| {
                         let mut view =
-                            user_view(u, core.people.setting(&store, session.server_id, u));
+                            self.user_view_of(u, core.people.setting(&store, session.server_id, u));
                         // The server's echo of the mute/deafen just sent may still be on its way.
                         if Some(u.session) == s.session {
                             view.self_mute = core.self_voice.mute;
@@ -1475,17 +1681,7 @@ impl Inner {
         change: impl FnOnce(&mut mumcord_store::PersonSetting),
     ) -> EngineResult<()> {
         let mut core = lock(&self.core);
-        let (server_id, user) = {
-            let s = core
-                .session
-                .as_ref()
-                .ok_or_else(EngineError::not_connected)?;
-            let user = s
-                .handle
-                .with_state(|st| st.users.get(&session).cloned())
-                .ok_or_else(|| EngineError::new(ErrorKind::NotFound, "unknown person"))?;
-            (s.server_id, user)
-        };
+        let (server_id, user) = Self::person_in_session(&core, session)?;
         let setting = {
             let store = lock(&self.store);
             let mut setting = core.people.setting(&store, server_id, &user);
@@ -1498,8 +1694,24 @@ impl Inner {
         }
         drop(core);
         self.events
-            .emit(EngineEvent::UserUpserted(user_view(&user, setting)));
+            .emit(EngineEvent::UserUpserted(self.user_view_of(&user, setting)));
         Ok(())
+    }
+
+    /// The server and the person with this session on it.
+    fn person_in_session(
+        core: &Core,
+        session: u32,
+    ) -> EngineResult<(ServerId, mumcord_protocol::User)> {
+        let s = core
+            .session
+            .as_ref()
+            .ok_or_else(EngineError::not_connected)?;
+        let user = s
+            .handle
+            .with_state(|st| st.users.get(&session).cloned())
+            .ok_or_else(|| EngineError::new(ErrorKind::NotFound, "unknown person"))?;
+        Ok((s.server_id, user))
     }
 
     /// Starts the audio devices on first use.

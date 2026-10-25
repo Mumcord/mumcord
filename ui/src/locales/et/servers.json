@@ -1,0 +1,128 @@
+{
+  "unknownServer": "server",
+  "announce": {
+    "connected": "Ühendatud serveriga {{server}}.",
+    "lost": "Ühendus serveriga {{server}} katkes. Ühendan uuesti…",
+    "ended": "Ühendus serveriga {{server}} katkestati. Vaata, mida edasi teha, vestluse kohal olevalt ribalt.",
+    "disconnected": "Ühendus serveriga {{server}} katkestatud.",
+    "tcp": "Hääl käib nüüd üle TCP, sest UDP on blokeeritud. Heli võib olla veidi viivitusega.",
+    "removed": "{{server}} eemaldatud.",
+    "moved": "{{server}} liigutati kohale {{position}} / {{count}}."
+  },
+  "bar": {
+    "listLabel": "Salvestatud serverid",
+    "add": "Lisa server",
+    "keyboardHint": "Enter ühendab. Alt + üles- või allanool liigutab serverit. Shift + F10 avab lisavalikud.",
+    "status": {
+      "connected": "{{server}} (ühendatud)",
+      "connecting": "{{server}} (ühendan)",
+      "reconnecting": "{{server}} (ühendan uuesti)"
+    }
+  },
+  "menu": {
+    "label": "Valikud: {{server}}",
+    "connect": "Ühendu",
+    "disconnect": "Katkesta ühendus",
+    "edit": "Muuda serverit",
+    "moveUp": "Liiguta üles",
+    "moveDown": "Liiguta alla",
+    "remove": "Eemalda server"
+  },
+  "dialog": {
+    "addTitle": "Lisa server",
+    "editTitle": "Muuda serverit",
+    "linkTitle": "Salvestan selle serveri?",
+    "address": "Aadress",
+    "addressHint": "Näiteks mumble.example.org. Siia võid kleepida ka mumble:// lingi.",
+    "filledFromLink": "Täidetud mumble:// lingist.",
+    "port": "Port",
+    "label": "Nimi serveriribal",
+    "username": "Sinu nimi sellel serveril",
+    "password": "Serveri parool (valikuline)",
+    "passwordHint": "Vaja ainult siis, kui server seda küsib. See hoitakse sinu süsteemi turvahoidlas.",
+    "passwordKeepHint": "Parool on salvestatud. Jäta see tühjaks, et see alles jätta, või sisesta uus.",
+    "clearPassword": "Eemalda salvestatud parool",
+    "add": "Lisa server",
+    "saveAndConnect": "Salvesta ja ühendu",
+    "errors": {
+      "address": "Sisesta serveri aadress.",
+      "port": "Sisesta port vahemikus 1 kuni 65535. Enamik servereid kasutab porti 64738.",
+      "username": "Sisesta nimi, mida soovid sellel serveril kasutada.",
+      "link": "Seda mumble:// linki ei saa lugeda. Kontrolli, et see on täielikult kopeeritud.",
+      "invalid": "Serveri andmed pole kehtivad. Kontrolli aadressi ja porti."
+    }
+  },
+  "errors": {
+    "serverUnreachable": "Serveriga ei saa ühendust. Kontrolli aadressi ja porti ning seda, et oled internetis.",
+    "wrongPassword": "Serveri parool on vale. Muuda serverit ja sisesta õige parool.",
+    "nameInUse": "Sinu nimi on sellel serveril juba kasutusel või kellegi teise nimele registreeritud. Muuda serverit ja vali teine nimi.",
+    "certificateRejected": "Sertifikaadi kontroll ebaõnnestus: kas serveri sertifikaati ei usaldatud või server ei võtnud sinu identiteeti vastu. Proovi uuesti või küsi serveri omanikult.",
+    "certificateChanged": "Serveri sertifikaat on muutunud ja seda ei usaldatud. Usalda seda alles pärast seda, kui serveri omanik on muudatuse kinnitanud.",
+    "denied": "Server keeldus ühendusest.",
+    "deniedWithReason": "Server keeldus ühendusest: {{reason}}",
+    "invalidAddress": "Serveri aadress pole kehtiv. Paranda see serverit muutes.",
+    "secureStorage": "Sinu süsteemi turvahoidla pole saadaval, seega ei saanud serveri parooli lugeda ega salvestada. Ava see ja proovi uuesti.",
+    "notFound": "See server pole enam salvestatud.",
+    "generic": "Midagi läks valesti. Proovi palun uuesti."
+  },
+  "remove": {
+    "title": "Eemaldan serveri {{server}}?",
+    "message": "Selle salvestatud parool, sertifikaadi otsus, jälgitavad kanalid ja vestlusajalugu kustutatakse sellest arvutist.",
+    "confirm": "Eemalda"
+  },
+  "switch": {
+    "title": "Vahetan serverit?",
+    "message": "Korraga saad olla ainult ühel serveril. Katkestan ühenduse serveriga {{current}} ja ühendun serveriga {{next}}?",
+    "confirm": "Katkesta ja vaheta"
+  },
+  "cert": {
+    "newTitle": "Usaldad seda serverit?",
+    "newIntro": "Mumcord pole serveri {{server}} sertifikaati varem näinud. Kui serveri omanik andis sulle sõrmejälje, kontrolli, et see ühtib. Sinu valik jäetakse meelde.",
+    "fingerprint": "Sertifikaadi sõrmejälg",
+    "changedTitle": "Hoiatus: serveri sertifikaat muutus",
+    "changedWarning": "Serveri {{server}} sertifikaat erineb sellest, mida varem usaldasid.",
+    "changedAdvice": "See võib juhtuda pärast serveri sertifikaadi uuendamist, kuid võib tähendada ka seda, et keegi pealtkuulab sinu ühendust. Jätka ainult siis, kui serveri omanik on muudatuse kinnitanud.",
+    "previousFingerprint": "Varem usaldatud sõrmejälg",
+    "newFingerprint": "Uus sõrmejälg",
+    "reject": "Ära ühendu",
+    "trust": "Usalda ja ühendu",
+    "trustChanged": "Usalda uut sertifikaati"
+  },
+  "rejoin": {
+    "label": "Liitu uuesti viimase kanaliga",
+    "text": "Olid eelmisel korral kanalis {{channel}} – liitud uuesti?",
+    "rejoin": "Liitu uuesti",
+    "notNow": "Mitte praegu"
+  },
+  "status": {
+    "label": "Ühenduse olek",
+    "connecting": "Ühendan serveriga {{server}}…",
+    "reconnecting": "Ühendan uuesti… (katse {{attempt}} / {{max}}, järgmine {{seconds}} s pärast)",
+    "tcp": "Ühendatud üle TCP (UDP blokeeritud). Hääl töötab, kuid võib olla veidi viivitusega.",
+    "disconnected": "Ühendus katkestatud",
+    "disconnectedReason": "Ühendus katkestatud – {{reason}}",
+    "failed": "Serveriga {{server}} ei õnnestunud ühendust luua. {{reason}}",
+    "cancel": "Tühista",
+    "reconnect": "Ühendu uuesti",
+    "editServer": "Muuda serverit",
+    "actionFailed": {
+      "reorder": "Serverite uut järjekorda ei õnnestunud salvestada. Proovi palun uuesti.",
+      "remove": "Serverit ei õnnestunud eemaldada. Proovi palun uuesti.",
+      "disconnect": "Ühenduse katkestamine ebaõnnestus. Proovi palun uuesti."
+    }
+  },
+  "empty": {
+    "title": "Lisa oma esimene server",
+    "description": "Sisesta aadress, mille said oma grupilt, või kleebi mumble:// link.",
+    "addressLabel": "Serveri aadress või mumble:// link",
+    "addressHint": "Näiteks mumble.example.org või mumble.example.org:64738.",
+    "connect": "Lisa ja ühendu",
+    "pasteLink": "Kleebi mumble:// link",
+    "moreOptions": "Veel valikuid…",
+    "noLinkInClipboard": "Lõikelaual pole mumble:// linki. Kleebi või kirjuta aadress ülalolevale väljale.",
+    "pasteManually": "Mumcord ei saanud lõikelauda lugeda. Klõpsa ülalolevat välja ja vajuta Ctrl+V.",
+    "errors": {
+      "required": "Sisesta serveri aadress või mumble:// link."
+    }
+  }
+}

@@ -1,0 +1,55 @@
+{
+  "follow": "Követés",
+  "following": "Követed",
+  "unsupported": "A csatornák követéséhez 1.4-es vagy újabb verziójú szerver kell.",
+  "unread_one": "{{count}} olvasatlan üzenet",
+  "unread_other": "{{count}} olvasatlan üzenet",
+  "errors": {
+    "denied": "A szerver nem engedi, hogy kövesd ezt a csatornát.",
+    "limit": "Ezen a szerveren nem követhetsz több csatornát. Előbb szüntesd meg egy másik követését.",
+    "tooOld": "Ez a szerver túl régi a csatornák követéséhez (1.4-es vagy újabb verzió kell).",
+    "notConnected": "Nem csatlakozol a szerverhez.",
+    "generic": "A csatorna követése nem sikerült. Próbáld újra."
+  },
+  "dm": {
+    "title": "Közvetlen üzenetek",
+    "unknown": "Ismeretlen személy"
+  },
+  "notify": {
+    "channel": "{{name}} itt: {{channel}}: {{text}}",
+    "private": "{{name}} (privát): {{text}}",
+    "more_one": "Még {{count}} új üzenet",
+    "more_other": "Még {{count}} új üzenet"
+  },
+  "history": {
+    "clear": "Előzmények törlése",
+    "title": "Törlöd az előzményeket?",
+    "body": "Ez véglegesen törli a beszélgetés mentett üzeneteit erről a számítógépről. Másoknál megmaradnak a saját példányaik.",
+    "confirm": "Előzmények törlése",
+    "cancel": "Mégse",
+    "failed": "Az előzményeket nem sikerült törölni. Próbáld újra."
+  },
+  "star": {
+    "follow": "{{channel}} követése",
+    "unfollow": "{{channel}} követésének megszüntetése"
+  },
+  "all": {
+    "menu": "Szerverbeállítások: {{server}}",
+    "menuLabel": "Szerverbeállítások",
+    "follow": "Összes csatorna követése",
+    "unfollow": "Összes csatorna követésének megszüntetése",
+    "working": "Csatornák követése…",
+    "followed_one": "{{count}} csatornát követsz mostantól.",
+    "followed_other": "{{count}} csatornát követsz mostantól.",
+    "skipped_one": "{{count}} kihagyva: {{reasons}}.",
+    "skipped_other": "{{count}} kihagyva: {{reasons}}.",
+    "limit": "elérted a korlátot",
+    "notAllowed": "nem engedélyezett",
+    "noAnswer": "nincs válasz a szervertől",
+    "unfollowed": "Minden csatorna követése megszűnt.",
+    "failed": "Az összes csatorna követése nem sikerült. Próbáld újra.",
+    "dismiss": "Elvetés",
+    "unfollowFailed": "Az összes csatorna követésének megszüntetése nem sikerült. Próbáld újra."
+  },
+  "mention": "megemlít téged"
+}

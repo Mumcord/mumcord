@@ -1,9 +1,10 @@
-import { act, fireEvent, render, screen } from "@testing-library/react";
+import { act, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { useState } from "react";
 import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 import { createMockApi, setApi, type MockApi } from "../../api";
 import { applyLanguage } from "../../i18n";
 import { axeViolations } from "../../test/axe";
+import { resetFullImages } from "./fullImage";
 import { ImageViewer, type ViewerImage } from "./ImageViewer";
 import { fitScale, zoomAround } from "./viewerMath";
 
@@ -198,5 +199,108 @@ describe("ImageViewer", () => {
     fireEvent.keyDown(dialog(), { key: "ArrowRight" });
     fireEvent.click(screen.getByRole("button", { name: "Open in browser" }));
     expect(opener.openUrl).not.toHaveBeenCalled();
+  });
+});
+
+describe("full images", () => {
+  const REFERENCE = `${"cd".repeat(32)}:2048`;
+  const FULL = "data:image/png;base64,RlVMTA==";
+  const thumbnail: ViewerImage = {
+    src: PNG,
+    name: "image",
+    full: { reference: REFERENCE, senderSession: 4, senderCertHash: "cert" },
+  };
+
+  beforeEach(() => {
+    resetFullImages();
+  });
+
+  function viewer() {
+    return render(
+      <ImageViewer images={[thumbnail]} index={0} onIndexChange={vi.fn()} onClose={vi.fn()} />,
+    );
+  }
+
+  function deferredFetch() {
+    let resolve: (src: string | null) => void = () => undefined;
+    const fetch = vi.spyOn(api, "fullImageFetch").mockImplementation(
+      () =>
+        new Promise((done) => {
+          resolve = done;
+        }),
+    );
+    return {
+      fetch,
+      resolve: (src: string | null) => {
+        resolve(src);
+      },
+    };
+  }
+
+  it("shows the thumbnail with progress, then the full image", async () => {
+    const { fetch, resolve } = deferredFetch();
+    viewer();
+    await waitFor(() => {
+      expect(fetch).toHaveBeenCalledWith(REFERENCE, 4, "cert");
+    });
+    expect(screen.getByRole("img")).toHaveAttribute("src", PNG);
+    expect(screen.getByRole("status")).toHaveTextContent("Loading full size…");
+    expect(screen.getByText("Beta")).toBeInTheDocument();
+    act(() => {
+      api.mock.emit("fullImageProgress", { reference: REFERENCE, received: 512, total: 2048 });
+    });
+    expect(screen.getByRole("status")).toHaveTextContent("Loading full size… 25 %");
+    resolve(FULL);
+    await waitFor(() => {
+      expect(screen.getByRole("img")).toHaveAttribute("src", FULL);
+    });
+    expect(screen.queryByRole("status")).toBeNull();
+  });
+
+  it("keeps the thumbnail when the full image cannot be had", async () => {
+    const { fetch, resolve } = deferredFetch();
+    viewer();
+    await waitFor(() => {
+      expect(fetch).toHaveBeenCalled();
+    });
+    resolve(null);
+    await waitFor(() => {
+      expect(screen.getByRole("status")).toHaveTextContent("Full size not available");
+    });
+    expect(screen.getByRole("img")).toHaveAttribute("src", PNG);
+  });
+
+  it("saves the full image once it is there", async () => {
+    vi.spyOn(api, "fullImageFetch").mockResolvedValue(FULL);
+    dialogs.pickSavePath.mockResolvedValue("/tmp/pic.png");
+    const save = vi.spyOn(api, "saveImage");
+    viewer();
+    await act(async () => {
+      await Promise.resolve();
+    });
+    expect(screen.getByRole("img")).toHaveAttribute("src", FULL);
+    await act(async () => {
+      fireEvent.click(screen.getByRole("button", { name: "Save image" }));
+      await Promise.resolve();
+    });
+    expect(save).toHaveBeenCalledWith("/tmp/pic.png", FULL);
+  });
+
+  it("never requests the original while loading full images is off (FR-1.74)", async () => {
+    await api.settingsUpdate({ ...(await api.settingsGet()), loadFullImages: false });
+    const fetch = vi.spyOn(api, "fullImageFetch");
+    viewer();
+    await waitFor(() => {
+      expect(screen.queryByRole("status")).toBeNull();
+    });
+    expect(fetch).not.toHaveBeenCalled();
+  });
+
+  it("does not fetch anything for images without a full version", () => {
+    const fetch = vi.spyOn(api, "fullImageFetch");
+    render(<Harness />);
+    expect(fetch).not.toHaveBeenCalled();
+    expect(screen.queryByRole("status")).toBeNull();
+    expect(screen.queryByText("Beta")).toBeNull();
   });
 });

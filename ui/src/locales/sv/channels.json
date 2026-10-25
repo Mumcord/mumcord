@@ -1,0 +1,71 @@
+{
+  "serverOverview": "Serveröversikt",
+  "tree": {
+    "label": "Kanaler",
+    "hint": "Enter: visa chatt · Skift+Enter eller dubbelklick: gå med · Piltangenter: flytta, expandera, fäll ihop",
+    "join": "Gå med",
+    "you": "(du)",
+    "voiceHere": "du är här (röst)",
+    "people_one": "{{count}} person",
+    "people_other": "{{count}} personer",
+    "stack": {
+      "some": "{{shown}} av {{total}} personer: {{names}} och {{rest}} till",
+      "all_one": "{{count}} person: {{names}}",
+      "all_other": "{{count}} personer: {{names}}",
+      "person": "{{name}} ({{status}})"
+    },
+    "showAll": "Visa alla ({{total}})",
+    "showFewer": "Visa färre",
+    "jump": "Hoppa till min kanal"
+  },
+  "status": {
+    "listening": "lyssnar",
+    "talking": "pratar",
+    "muted": "mikrofonen avstängd",
+    "deafened": "ljudet avstängt",
+    "serverMuted": "avstängd av servern",
+    "serverDeafened": "ljudet avstängt av servern",
+    "suppressed": "dämpad (kan inte prata här)",
+    "localMuted": "avstängd för dig",
+    "unregistered": "inte registrerad"
+  },
+  "mumcordBadge": "Använder Mumcord",
+  "statusTip": {
+    "registered": "Registrerad på den här servern",
+    "listening": "Lyssnar på den här kanalen",
+    "muted": "Mikrofonen avstängd",
+    "deafened": "Ljudet avstängt",
+    "serverMuted": "Avstängd av servern",
+    "serverDeafened": "Ljudet avstängt av servern",
+    "suppressed": "Dämpad – kan inte prata i den här kanalen",
+    "localMuted": "Avstängd för dig",
+    "unregistered": "Inte registrerad på den här servern (gäst)",
+    "nowPlaying": "Lyssnar på {{track}}",
+    "nowGaming": "Spelar {{game}}",
+    "positional": "Positionsljud aktivt"
+  },
+  "announce": {
+    "joined": "{{name}} gick med i din kanal",
+    "left": "{{name}} lämnade din kanal",
+    "talking": "{{name}} pratar"
+  },
+  "errors": {
+    "joinDenied": "Du får inte gå in i den här kanalen.",
+    "joinFailed": "Det gick inte att gå med i kanalen. Försök igen.",
+    "notConnected": "Inte ansluten till någon server."
+  },
+  "empty": {
+    "disconnected": "Inte ansluten. Välj en server för att se dess kanaler.",
+    "loading": "Läser in kanaler…"
+  },
+  "search": {
+    "label": "Sök kanaler och personer",
+    "clear": "Rensa sökning",
+    "empty": "Inga kanaler eller personer matchar ”{{query}}”.",
+    "count": "{{channels}}, {{people}}",
+    "channels_one": "{{count}} kanal",
+    "channels_other": "{{count}} kanaler",
+    "people_one": "{{count}} person",
+    "people_other": "{{count}} personer"
+  }
+}

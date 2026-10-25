@@ -1,0 +1,155 @@
+{
+  "noConversation": "Connettiti a un server e scegli un canale per iniziare a chattare.",
+  "empty": "Ancora nessun messaggio. I messaggi che ricevi qui vengono salvati su questo computer.",
+  "header": {
+    "channel": "#{{name}}",
+    "channelPrefix": "Canale",
+    "privatePrefix": "Chat privata con",
+    "unknownPerson": "Persona sconosciuta"
+  },
+  "list": {
+    "today": "Oggi",
+    "yesterday": "Ieri",
+    "label": "Messaggi in {{name}}",
+    "loadOlder": "Carica messaggi precedenti",
+    "loading": "Caricamento dei messaggi…",
+    "loadFailed": "Non è stato possibile caricare i messaggi precedenti. Scorri verso l'alto per riprovare.",
+    "loadEarlier": "Carica messaggi precedenti",
+    "syncing": "Cerco messaggi precedenti da altri utenti Mumcord…",
+    "syncAdded_one": "{{count}} messaggio precedente aggiunto da altri utenti Mumcord.",
+    "syncAdded_many": "{{count}} messaggi precedenti aggiunti da altri utenti Mumcord.",
+    "syncAdded_other": "{{count}} messaggi precedenti aggiunti da altri utenti Mumcord.",
+    "syncNone": "Nessun messaggio precedente trovato.",
+    "syncFailed": "Qui non è possibile caricare i messaggi precedenti.",
+    "syncedFrom": "dalla cronologia di {{name}}",
+    "jumpToNewest": "Vai all'ultimo messaggio",
+    "jumpToNewestUnseen_one": "Vai all'ultimo messaggio, {{count}} nuovo messaggio",
+    "jumpToNewestUnseen_many": "Vai all'ultimo messaggio, {{count}} nuovi messaggi",
+    "jumpToNewestUnseen_other": "Vai all'ultimo messaggio, {{count}} nuovi messaggi"
+  },
+  "format": {
+    "toolbar": "Formattazione",
+    "bold": "Grassetto",
+    "italic": "Corsivo",
+    "strike": "Barrato",
+    "code": "Codice in linea",
+    "codeBlock": "Blocco di codice",
+    "link": "Link"
+  },
+  "composer": {
+    "label": "Scrivi a {{name}}",
+    "hint": "Premi Invio per inviare e Maiusc+Invio per andare a capo. Markdown funziona: **grassetto**, *corsivo*, `codice`, [link](https://…).",
+    "addImage": "Aggiungi immagine",
+    "removeImage": "Rimuovi immagine {{name}}",
+    "imagePreview": "Immagine da inviare: {{name}}",
+    "send": "Invia",
+    "noPermission": "Non hai il permesso di scrivere in questo canale.",
+    "unavailable": "Questo canale non è più disponibile.",
+    "offline": "{{name}} è offline. Potrai scrivere di nuovo quando sarà tornato.",
+    "unnamedImage": "Immagine incollata"
+  },
+  "tray": {
+    "label": "Immagini da inviare",
+    "processing": "Preparazione dell'immagine",
+    "scaled": "Ridimensionata a {{width}}×{{height}} per rispettare il limite del server"
+  },
+  "errors": {
+    "tooLong": "Il messaggio è troppo lungo per questo server (massimo {{max}} caratteri). Accorcialo e riprova.",
+    "tooLongNoLimit": "Il messaggio è troppo lungo per questo server. Accorcialo e riprova.",
+    "imageTooLarge": "Questa immagine è troppo grande per questo server, anche dopo la compressione. Prova con un'immagine più piccola.",
+    "imageWithTextTooLong": "Il messaggio con l'immagine è troppo grande per questo server. Accorcia il testo o rimuovi l'immagine.",
+    "imagesNotAllowed": "Questo server non consente immagini nei messaggi.",
+    "notImage": "Questo file non può essere inviato. Usa un'immagine PNG, JPEG, GIF o WebP.",
+    "imageUnreadable": "Non è stato possibile leggere l'immagine. Prova con un altro file.",
+    "denied": "Il server non ha consentito questo messaggio.",
+    "deniedWithReason": "Il server non ha consentito questo messaggio: {{reason}}",
+    "notConnected": "Non sei connesso. Riconnettiti e riprova.",
+    "generic": "Non è stato possibile inviare il messaggio. Riprova.",
+    "onlyImages": "È possibile inviare solo immagini.",
+    "sourceTooLarge": "Questo file è troppo grande per essere inviato (oltre 25 MB)."
+  },
+  "announce": {
+    "message": "{{name}}: {{text}}",
+    "image": "{{name}} ha inviato un'immagine",
+    "more_one": "{{count}} altro messaggio nuovo",
+    "more_many": "{{count}} altri messaggi nuovi",
+    "more_other": "{{count}} altri messaggi nuovi"
+  },
+  "pinned": {
+    "label": "Info sul canale",
+    "showMore": "Mostra di più",
+    "showLess": "Mostra meno"
+  },
+  "mention": {
+    "list": "Persone menzionabili",
+    "found_one": "{{count}} persona suggerita. Usa le frecce, poi Invio per inserire.",
+    "found_many": "{{count}} persone suggerite. Usa le frecce, poi Invio per inserire.",
+    "found_other": "{{count}} persone suggerite. Usa le frecce, poi Invio per inserire.",
+    "none": "Nessuno trovato",
+    "mentionsYou": "Ti menziona",
+    "chipLabel": "{{name}}, menzione"
+  },
+  "preview": {
+    "open": "Apri nel browser",
+    "openLabel": "Apri {{title}} nel browser",
+    "play": "Riproduci {{title}}",
+    "player": "Lettore video: {{title}}",
+    "videoTitle": "Video di {{site}}",
+    "spotifyTitle": "Link di {{site}}",
+    "audioPlayer": "Lettore Spotify: {{title}}",
+    "kind": {
+      "track": "Brano",
+      "album": "Album",
+      "playlist": "Playlist",
+      "artist": "Artista",
+      "episode": "Episodio",
+      "show": "Programma"
+    },
+    "inBrowser": "Si riproduce nel tuo browser",
+    "card": "Anteprima del link: {{title}}",
+    "dismiss": "Nascondi anteprima"
+  },
+  "image": {
+    "loading": "Caricamento dell'immagine {{name}}",
+    "label": "Immagine: {{name}}",
+    "view": "Visualizza immagine {{name}}",
+    "viewMessage": "Immagine di {{name}}, apri nel visualizzatore",
+    "failed": "Impossibile mostrare l'immagine (troppo grande o non disponibile)."
+  },
+  "viewer": {
+    "label": "Visualizzatore di immagini",
+    "counter": "{{current}} / {{total}}",
+    "zoomIn": "Ingrandisci",
+    "zoomOut": "Riduci",
+    "fit": "Adatta alla finestra",
+    "save": "Salva immagine",
+    "saved": "Immagine salvata",
+    "saveFailed": "Non è stato possibile salvare l'immagine",
+    "fileFilter": "Immagine",
+    "openInBrowser": "Apri nel browser",
+    "close": "Chiudi",
+    "previous": "Immagine precedente",
+    "next": "Immagine successiva",
+    "unnamed": "immagine",
+    "fullLoading": "Caricamento a dimensione intera…",
+    "fullProgress": "Caricamento a dimensione intera… {{percent}} %",
+    "fullUnavailable": "Dimensione intera non disponibile – viene mostrata l'anteprima"
+  },
+  "favorites": {
+    "open": "GIF preferite",
+    "title": "GIF preferite",
+    "save": "Salva nei preferiti",
+    "remove": "Rimuovi dai preferiti",
+    "removeNamed": "Rimuovi {{name}} dai preferiti",
+    "send": "Invia {{name}}",
+    "hint": "Frecce per spostarti, Invio per inviare, Canc per rimuovere, Esc per chiudere.",
+    "empty": "Ancora nessun preferito. Fai clic con il tasto destro su una GIF nella chat, o usa la stella su di essa, e scegli \"Salva nei preferiti\". Apparirà qui."
+  },
+  "imageMenu": {
+    "label": "Immagine {{name}}"
+  },
+  "attribution": {
+    "via": "tramite {{brand}}",
+    "view": "Vedi su {{brand}}"
+  }
+}

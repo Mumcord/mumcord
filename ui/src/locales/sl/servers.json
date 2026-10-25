@@ -1,0 +1,128 @@
+{
+  "unknownServer": "strežnik",
+  "announce": {
+    "connected": "Povezano: {{server}}.",
+    "lost": "Povezava prekinjena: {{server}}. Ponovno povezovanje …",
+    "ended": "Povezava zaprta: {{server}}. Kaj narediti naprej, piše v vrstici nad klepetom.",
+    "disconnected": "Povezava zaprta: {{server}}.",
+    "tcp": "Glas zdaj teče prek TCP, ker je UDP blokiran. Zvok je lahko rahlo zakasnjen.",
+    "removed": "{{server}} odstranjen.",
+    "moved": "{{server}} premaknjen na mesto {{position}} od {{count}}."
+  },
+  "bar": {
+    "listLabel": "Shranjeni strežniki",
+    "add": "Dodaj strežnik",
+    "keyboardHint": "Enter vzpostavi povezavo. Alt in puščica gor ali dol premakne strežnik. Shift in F10 odpre več možnosti.",
+    "status": {
+      "connected": "{{server}} (povezano)",
+      "connecting": "{{server}} (povezovanje)",
+      "reconnecting": "{{server}} (ponovno povezovanje)"
+    }
+  },
+  "menu": {
+    "label": "Možnosti za {{server}}",
+    "connect": "Poveži",
+    "disconnect": "Prekini povezavo",
+    "edit": "Uredi strežnik",
+    "moveUp": "Premakni gor",
+    "moveDown": "Premakni dol",
+    "remove": "Odstrani strežnik"
+  },
+  "dialog": {
+    "addTitle": "Dodaj strežnik",
+    "editTitle": "Uredi strežnik",
+    "linkTitle": "Shranim ta strežnik?",
+    "address": "Naslov",
+    "addressHint": "Na primer mumble.example.org. Sem lahko prilepiš tudi povezavo mumble://.",
+    "filledFromLink": "Izpolnjeno iz povezave mumble://.",
+    "port": "Vrata",
+    "label": "Ime v vrstici strežnikov",
+    "username": "Tvoje ime na tem strežniku",
+    "password": "Geslo strežnika (neobvezno)",
+    "passwordHint": "Potrebno samo, če ga strežnik zahteva. Shrani se v varno shrambo tvojega sistema.",
+    "passwordKeepHint": "Geslo je shranjeno. Pusti prazno, da ga obdržiš, ali vpiši novo.",
+    "clearPassword": "Odstrani shranjeno geslo",
+    "add": "Dodaj strežnik",
+    "saveAndConnect": "Shrani in poveži",
+    "errors": {
+      "address": "Vpiši naslov strežnika.",
+      "port": "Vpiši vrata med 1 in 65535. Večina strežnikov uporablja 64738.",
+      "username": "Vpiši ime, ki ga želiš uporabljati na tem strežniku.",
+      "link": "Te povezave mumble:// ni mogoče prebrati. Preveri, ali je bila kopirana v celoti.",
+      "invalid": "Podatki o strežniku niso veljavni. Preveri naslov in vrata."
+    }
+  },
+  "errors": {
+    "serverUnreachable": "Strežnik ni dosegljiv. Preveri naslov in vrata ter ali si povezan z internetom.",
+    "wrongPassword": "Geslo strežnika je napačno. Uredi strežnik in vpiši pravo geslo.",
+    "nameInUse": "Tvoje ime je na tem strežniku že v uporabi ali registrirano na nekoga drugega. Uredi strežnik in izberi drugo ime.",
+    "certificateRejected": "Preverjanje certifikata ni uspelo: certifikatu strežnika ni bilo zaupano ali pa strežnik ni sprejel tvoje identitete. Poskusi znova ali vprašaj lastnika strežnika.",
+    "certificateChanged": "Certifikat strežnika se je spremenil in mu ni bilo zaupano. Zaupaj mu šele, ko lastnik strežnika potrdi spremembo.",
+    "denied": "Strežnik je zavrnil povezavo.",
+    "deniedWithReason": "Strežnik je zavrnil povezavo: {{reason}}",
+    "invalidAddress": "Naslov strežnika ni veljaven. Uredi strežnik in ga popravi.",
+    "secureStorage": "Varna shramba tvojega sistema ni na voljo, zato gesla strežnika ni bilo mogoče prebrati ali shraniti. Odkleni jo in poskusi znova.",
+    "notFound": "Ta strežnik ni več shranjen.",
+    "generic": "Nekaj je šlo narobe. Poskusi znova."
+  },
+  "remove": {
+    "title": "Odstranim {{server}}?",
+    "message": "Izbrisani bodo shranjeno geslo, odločitev o certifikatu, kanali, ki jim slediš, in zgodovina klepeta na tem računalniku.",
+    "confirm": "Odstrani"
+  },
+  "switch": {
+    "title": "Zamenjam strežnik?",
+    "message": "Naenkrat si lahko le na enem strežniku. Prekinem povezavo s {{current}} in se povežem s {{next}}?",
+    "confirm": "Prekini in zamenjaj"
+  },
+  "cert": {
+    "newTitle": "Zaupaš temu strežniku?",
+    "newIntro": "Mumcord certifikata strežnika {{server}} še ni videl. Če ti je lastnik strežnika dal prstni odtis, preveri, ali se ujema. Tvoja izbira se shrani.",
+    "fingerprint": "Prstni odtis certifikata",
+    "changedTitle": "Opozorilo: certifikat strežnika se je spremenil",
+    "changedWarning": "Certifikat strežnika {{server}} se razlikuje od tistega, ki si mu zaupal prej.",
+    "changedAdvice": "To se lahko zgodi po obnovi strežnika, lahko pa tudi pomeni, da nekdo prestreza tvojo povezavo. Nadaljuj samo, če je lastnik strežnika potrdil spremembo.",
+    "previousFingerprint": "Prej zaupani prstni odtis",
+    "newFingerprint": "Nov prstni odtis",
+    "reject": "Ne poveži",
+    "trust": "Zaupaj in poveži",
+    "trustChanged": "Zaupaj novemu certifikatu"
+  },
+  "rejoin": {
+    "label": "Vrni se v zadnji kanal",
+    "text": "Zadnjič si bil v {{channel}} – se vrneš?",
+    "rejoin": "Vrni se",
+    "notNow": "Ne zdaj"
+  },
+  "status": {
+    "label": "Stanje povezave",
+    "connecting": "Povezovanje s {{server}} …",
+    "reconnecting": "Ponovno povezovanje … (poskus {{attempt}} od {{max}}, naslednji čez {{seconds}} s)",
+    "tcp": "Povezano prek TCP (UDP blokiran). Glas deluje, a je lahko rahlo zakasnjen.",
+    "disconnected": "Povezava prekinjena",
+    "disconnectedReason": "Povezava prekinjena – {{reason}}",
+    "failed": "Povezava s {{server}} ni uspela. {{reason}}",
+    "cancel": "Prekliči",
+    "reconnect": "Znova poveži",
+    "editServer": "Uredi strežnik",
+    "actionFailed": {
+      "reorder": "Novega vrstnega reda strežnikov ni bilo mogoče shraniti. Poskusi znova.",
+      "remove": "Strežnika ni bilo mogoče odstraniti. Poskusi znova.",
+      "disconnect": "Prekinitev povezave ni uspela. Poskusi znova."
+    }
+  },
+  "empty": {
+    "title": "Dodaj svoj prvi strežnik",
+    "description": "Vpiši naslov, ki si ga dobil od svoje skupine, ali prilepi povezavo mumble://.",
+    "addressLabel": "Naslov strežnika ali povezava mumble://",
+    "addressHint": "Na primer mumble.example.org ali mumble.example.org:64738.",
+    "connect": "Dodaj in poveži",
+    "pasteLink": "Prilepi povezavo mumble://",
+    "moreOptions": "Več možnosti …",
+    "noLinkInClipboard": "V odložišču ni povezave mumble://. Prilepi ali vpiši naslov zgoraj.",
+    "pasteManually": "Mumcord ni mogel prebrati odložišča. Klikni polje zgoraj in pritisni Ctrl+V.",
+    "errors": {
+      "required": "Vpiši naslov strežnika ali povezavo mumble://."
+    }
+  }
+}

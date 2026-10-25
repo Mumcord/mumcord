@@ -6,6 +6,7 @@ import { Group, Section } from "../components/Section";
 import { errorText } from "../errors";
 import { pickOpenPath, pickSavePath } from "../fileDialogs";
 import { DefaultAvatarGroup } from "./DefaultAvatarGroup";
+import { NowGamingGroup } from "./NowGamingGroup";
 import { NowPlayingGroup } from "./NowPlayingGroup";
 import type { SettingsSectionProps } from "./types";
 
@@ -88,6 +89,7 @@ export function IdentitySection({ settings, update }: SettingsSectionProps) {
       </Group>
       <DefaultAvatarGroup settings={settings} update={update} />
       <NowPlayingGroup settings={settings} update={update} />
+      <NowGamingGroup settings={settings} update={update} />
       <p role="status" className={status?.kind === "error" ? "settings-error" : "settings-success"}>
         {status?.text}
       </p>

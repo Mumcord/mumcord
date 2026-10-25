@@ -1,10 +1,12 @@
-//! Tray icon showing connection and talk state, with Show / Mute / Deafen / Quit (FR-1.37).
+//! Tray icon showing connection and talk state, with Show / Mute / Deafen / Overlay / Quit
+//! (FR-1.37, FR-1.45).
 
 use std::sync::Mutex;
 
 use mumcord_engine::{ConnState, Engine, EngineEvent, UserView};
+use serde::Deserialize;
 use tauri::image::Image;
-use tauri::menu::{CheckMenuItem, Menu, MenuEvent, MenuItem, PredefinedMenuItem};
+use tauri::menu::{CheckMenuItem, IsMenuItem, Menu, MenuEvent, MenuItem, PredefinedMenuItem};
 use tauri::tray::{MouseButton, MouseButtonState, TrayIcon, TrayIconBuilder, TrayIconEvent};
 use tauri::{AppHandle, Manager, Wry};
 
@@ -13,6 +15,7 @@ use crate::window;
 const SHOW: &str = "show";
 const MUTE: &str = "mute";
 const DEAFEN: &str = "deafen";
+const OVERLAY: &str = "overlay";
 const QUIT: &str = "quit";
 
 /// Side length of the generated tray images; trays render at 16–32 px.
@@ -103,73 +106,72 @@ impl TrayState {
     }
 }
 
-/// Tray texts in the app languages (the tray lives outside the web UI and its i18n).
+/// Tray texts, read from the UI's `tray` locale files so every language lives in one place (the
+/// tray itself sits outside the web UI and its i18n).
+#[derive(Deserialize)]
 struct Labels {
-    show: &'static str,
-    mute: &'static str,
-    deafen: &'static str,
-    quit: &'static str,
-    disconnected: &'static str,
-    connecting: &'static str,
-    connected: &'static str,
-    talking: &'static str,
-    muted: &'static str,
+    show: String,
+    mute: String,
+    deafen: String,
+    overlay: String,
+    quit: String,
+    disconnected: String,
+    connecting: String,
+    connected: String,
+    talking: String,
+    muted: String,
 }
 
-const EN: Labels = Labels {
-    show: "Show Mumcord",
-    mute: "Mute",
-    deafen: "Deafen",
-    quit: "Quit",
-    disconnected: "Not connected",
-    connecting: "Connecting…",
-    connected: "Connected",
-    talking: "Connected – talking",
-    muted: "Connected – muted",
-};
+const LOCALES: [(&str, &str); 24] = [
+    ("bg", include_str!("../../ui/src/locales/bg/tray.json")),
+    ("cs", include_str!("../../ui/src/locales/cs/tray.json")),
+    ("da", include_str!("../../ui/src/locales/da/tray.json")),
+    ("de", include_str!("../../ui/src/locales/de/tray.json")),
+    ("el", include_str!("../../ui/src/locales/el/tray.json")),
+    ("en", include_str!("../../ui/src/locales/en/tray.json")),
+    ("es", include_str!("../../ui/src/locales/es/tray.json")),
+    ("et", include_str!("../../ui/src/locales/et/tray.json")),
+    ("fi", include_str!("../../ui/src/locales/fi/tray.json")),
+    ("fr", include_str!("../../ui/src/locales/fr/tray.json")),
+    ("ga", include_str!("../../ui/src/locales/ga/tray.json")),
+    ("hr", include_str!("../../ui/src/locales/hr/tray.json")),
+    ("hu", include_str!("../../ui/src/locales/hu/tray.json")),
+    ("it", include_str!("../../ui/src/locales/it/tray.json")),
+    ("lt", include_str!("../../ui/src/locales/lt/tray.json")),
+    ("lv", include_str!("../../ui/src/locales/lv/tray.json")),
+    ("mt", include_str!("../../ui/src/locales/mt/tray.json")),
+    ("nl", include_str!("../../ui/src/locales/nl/tray.json")),
+    ("pl", include_str!("../../ui/src/locales/pl/tray.json")),
+    ("pt", include_str!("../../ui/src/locales/pt/tray.json")),
+    ("ro", include_str!("../../ui/src/locales/ro/tray.json")),
+    ("sk", include_str!("../../ui/src/locales/sk/tray.json")),
+    ("sl", include_str!("../../ui/src/locales/sl/tray.json")),
+    ("sv", include_str!("../../ui/src/locales/sv/tray.json")),
+];
 
-const ES: Labels = Labels {
-    show: "Mostrar Mumcord",
-    mute: "Silenciar micrófono",
-    deafen: "Ensordecer",
-    quit: "Salir",
-    disconnected: "Sin conexión",
-    connecting: "Conectando…",
-    connected: "Conectado",
-    talking: "Conectado – hablando",
-    muted: "Conectado – silenciado",
-};
-
-const DE: Labels = Labels {
-    show: "Mumcord anzeigen",
-    mute: "Stummschalten",
-    deafen: "Taub schalten",
-    quit: "Beenden",
-    disconnected: "Nicht verbunden",
-    connecting: "Verbinde…",
-    connected: "Verbunden",
-    talking: "Verbunden – spricht",
-    muted: "Verbunden – stumm",
-};
+fn labels_for(code: &str) -> Labels {
+    let find = |wanted: &str| LOCALES.iter().find(|(lang, _)| *lang == wanted);
+    let (_, json) = find(code)
+        .or_else(|| find("en"))
+        .expect("English is bundled");
+    serde_json::from_str(json).expect("tray locale files are valid (checked by tests)")
+}
 
 /// Picks the tray language: the app setting, else the system locale, else English.
-fn labels(setting: Option<&str>, system: Option<&str>) -> &'static Labels {
+fn labels(setting: Option<&str>, system: Option<&str>) -> Labels {
     let lang = setting.or(system).unwrap_or("en");
-    match lang.get(..2).map(str::to_ascii_lowercase).as_deref() {
-        Some("es") => &ES,
-        Some("de") => &DE,
-        _ => &EN,
-    }
+    let code = lang.get(..2).map(str::to_ascii_lowercase);
+    labels_for(code.as_deref().unwrap_or("en"))
 }
 
 impl Labels {
-    fn status(&self, look: Look) -> &'static str {
+    fn status(&self, look: Look) -> &str {
         match look {
-            Look::Disconnected => self.disconnected,
-            Look::Connecting => self.connecting,
-            Look::Idle => self.connected,
-            Look::Talking => self.talking,
-            Look::Muted => self.muted,
+            Look::Disconnected => &self.disconnected,
+            Look::Connecting => &self.connecting,
+            Look::Idle => &self.connected,
+            Look::Talking => &self.talking,
+            Look::Muted => &self.muted,
         }
     }
 }
@@ -181,6 +183,7 @@ pub struct Tray {
     show: MenuItem<Wry>,
     mute: CheckMenuItem<Wry>,
     deafen: CheckMenuItem<Wry>,
+    overlay: CheckMenuItem<Wry>,
     quit: MenuItem<Wry>,
     base: Option<Image<'static>>,
     state: Mutex<TrayState>,
@@ -208,21 +211,21 @@ fn build(app: &AppHandle) -> tauri::Result<Tray> {
     let show = MenuItem::with_id(app, SHOW, "", true, None::<&str>)?;
     let mute = CheckMenuItem::with_id(app, MUTE, "", false, false, None::<&str>)?;
     let deafen = CheckMenuItem::with_id(app, DEAFEN, "", false, false, None::<&str>)?;
+    let overlay_on = app
+        .state::<Engine>()
+        .settings()
+        .is_ok_and(|s| s.overlay.enabled);
+    let overlay = CheckMenuItem::with_id(app, OVERLAY, "", true, overlay_on, None::<&str>)?;
     let quit = MenuItem::with_id(app, QUIT, "", true, None::<&str>)?;
     let separator = PredefinedMenuItem::separator(app)?;
     let separator2 = PredefinedMenuItem::separator(app)?;
-    let menu = Menu::with_items(
-        app,
-        &[
-            &status,
-            &separator,
-            &show,
-            &mute,
-            &deafen,
-            &separator2,
-            &quit,
-        ],
-    )?;
+    // macOS has no overlay at all (QA.58), so its item stays out of the menu there.
+    let mut items: Vec<&dyn IsMenuItem<Wry>> = vec![&status, &separator, &show, &mute, &deafen];
+    if !cfg!(target_os = "macos") {
+        items.push(&overlay);
+    }
+    items.extend([&separator2 as &dyn IsMenuItem<Wry>, &quit]);
+    let menu = Menu::with_items(app, &items)?;
     let base = app.default_window_icon().map(|i| scale(i, ICON_SIZE));
     let mut builder = TrayIconBuilder::with_id("main")
         .menu(&menu)
@@ -247,6 +250,7 @@ fn build(app: &AppHandle) -> tauri::Result<Tray> {
         show,
         mute,
         deafen,
+        overlay,
         quit,
         base,
         state: Mutex::new(TrayState::default()),
@@ -266,6 +270,19 @@ fn on_menu_event(app: &AppHandle, event: MenuEvent) {
         }
         MUTE => engine.set_self_mute(!state.muted),
         DEAFEN => engine.set_self_deaf(!state.deafened),
+        OVERLAY => {
+            // The item toggled itself; the stored setting decides, so read it, not the item.
+            let enabled = engine.settings().is_ok_and(|s| s.overlay.enabled);
+            let app = app.clone();
+            tauri::async_runtime::spawn(async move {
+                let engine = app.state::<Engine>();
+                if let Err(e) = crate::overlay::set_enabled(&app, &engine, !enabled).await {
+                    tracing::warn!(error = %e, "toggling the overlay from the tray failed");
+                    overlay_changed(&app, enabled);
+                }
+            });
+            Ok(())
+        }
         QUIT => {
             window::quit(app);
             Ok(())
@@ -292,6 +309,18 @@ pub fn on_engine_event(app: &AppHandle, event: &EngineEvent) {
     if changed {
         refresh(app, matches!(event, EngineEvent::StateChanged(_)));
     }
+}
+
+/// Shows whether the overlay is on in the menu.
+pub fn overlay_changed(app: &AppHandle, enabled: bool) {
+    let Some(tray) = app.try_state::<Tray>() else {
+        return;
+    };
+    if let Err(e) = tray.overlay.set_checked(enabled) {
+        tracing::warn!(error = %e, "updating the tray overlay item failed");
+    }
+    // Also announced after a language change, so the menu texts follow it.
+    refresh(app, true);
 }
 
 /// Redraws icon, tooltip and menu; `texts` also reloads the language-dependent labels.
@@ -322,10 +351,11 @@ fn refresh(app: &AppHandle, texts: bool) {
         .and_then(|()| tray.deafen.set_checked(state.deafened));
     if texts {
         result = result
-            .and_then(|()| tray.show.set_text(labels.show))
-            .and_then(|()| tray.mute.set_text(labels.mute))
-            .and_then(|()| tray.deafen.set_text(labels.deafen))
-            .and_then(|()| tray.quit.set_text(labels.quit));
+            .and_then(|()| tray.show.set_text(&labels.show))
+            .and_then(|()| tray.mute.set_text(&labels.mute))
+            .and_then(|()| tray.deafen.set_text(&labels.deafen))
+            .and_then(|()| tray.overlay.set_text(&labels.overlay))
+            .and_then(|()| tray.quit.set_text(&labels.quit));
     }
     if let Some(base) = &tray.base {
         result = result.and_then(|()| tray.icon.set_icon(Some(with_dot(base, look))));
@@ -532,6 +562,7 @@ mod tests {
                 has_comment: false,
                 volume: 100,
                 local_mute: false,
+                mumcord_features: None,
             }],
             followed_channel_ids: vec![],
             unread: vec![],
@@ -554,10 +585,32 @@ mod tests {
     }
 
     #[test]
+    fn every_language_has_every_tray_text() {
+        for (code, json) in LOCALES {
+            let parsed: Labels = serde_json::from_str(json)
+                .unwrap_or_else(|e| panic!("tray texts for {code} are incomplete: {e}"));
+            assert!(
+                !parsed.quit.is_empty() && !parsed.talking.is_empty(),
+                "{code}"
+            );
+        }
+        let dir = std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("../ui/src/locales");
+        let folders = std::fs::read_dir(dir)
+            .expect("locales folder exists")
+            .count();
+        assert_eq!(
+            folders,
+            LOCALES.len(),
+            "a language folder is missing from LOCALES"
+        );
+    }
+
+    #[test]
     fn tray_language_follows_setting_then_system() {
         assert_eq!(labels(Some("de"), Some("es_ES.UTF-8")).quit, "Beenden");
         assert_eq!(labels(None, Some("es_ES.UTF-8")).quit, "Salir");
-        assert_eq!(labels(None, Some("fr_FR.UTF-8")).quit, "Quit");
+        assert_eq!(labels(None, Some("fr_FR.UTF-8")).quit, "Quitter");
+        assert_eq!(labels(None, Some("xx_XX")).quit, "Quit");
         assert_eq!(labels(None, None).quit, "Quit");
     }
 

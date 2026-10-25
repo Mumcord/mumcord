@@ -1,0 +1,88 @@
+{
+  "unknownName": "Du",
+  "mute": "Stäng av mikrofonen",
+  "deafen": "Stäng av ljudet",
+  "disconnect": "Koppla från {{server}}",
+  "settings": "Snabbinställningar",
+  "announce": {
+    "muted": "Mikrofonen avstängd",
+    "unmuted": "Mikrofonen påslagen",
+    "deafened": "Ljudet avstängt. Du hör inte andra och din mikrofon är avstängd",
+    "undeafened": "Ljudet påslaget"
+  },
+  "readOnly": {
+    "text": "Du läser med – gå med i en kanal för att prata.",
+    "join": "Gå med i {{channel}}"
+  },
+  "status": {
+    "connecting": "Ansluter…",
+    "reconnecting": "Återansluter…",
+    "connected": "Ansluten",
+    "readOnly": "Skrivskyddad",
+    "disconnected": "Inte ansluten",
+    "playing": "Spelar {{game}}",
+    "listening": "Lyssnar på {{track}}"
+  },
+  "profile": {
+    "title": "Redigera profil",
+    "chooseTitle": "Välj en profilbild",
+    "chooseAvatar": "Välj bild…",
+    "removeAvatar": "Ta bort bild",
+    "avatarHint": "Bilden skalas ned så att den passar serverns gräns.",
+    "avatarUnregistered": "Den här servern behåller bara avatarer för registrerade användare – Mumcord skickar din igen vid varje anslutning.",
+    "avatarChosen": "Vald: {{name}}",
+    "avatarRemoved": "Bilden tas bort när du sparar.",
+    "comment": "Om dig"
+  },
+  "register": {
+    "title": "Registrera dig på den här servern",
+    "explain": "När du registrerar dig reserveras ditt namn på den här servern. Ingen annan kan använda det, och servern känner igen dig nästa gång du ansluter.",
+    "backup": "Din identitet är beviset på att namnet är ditt. Om du förlorar den förlorar du tillgången till det registrerade namnet. Spara en säkerhetskopia nu och förvara den säkert.",
+    "password": "Lösenord för säkerhetskopian",
+    "export": "Exportera identitet",
+    "saveTitle": "Spara säkerhetskopia av identiteten",
+    "passwordRequired": "Ange ett lösenord för att skydda säkerhetskopian.",
+    "exported": "Säkerhetskopian av identiteten sparades.",
+    "confirm": "Registrera",
+    "done": "Registrerad på den här servern"
+  },
+  "errors": {
+    "tooLarge": "Det här är för stort för servern. Välj en mindre bild eller skriv en kortare text.",
+    "denied": "Servern tillåter inte det här.",
+    "deniedWithReason": "Servern tillåter inte det här: {{reason}}",
+    "notConnected": "Du är inte ansluten till en server.",
+    "file": "Filen kunde inte läsas eller skrivas.",
+    "generic": "Något gick fel. Försök igen."
+  },
+  "ptt": "Push-to-talk: håll {{key}} för att prata",
+  "pttNoKey": "Push-to-talk: ingen tangent vald",
+  "quickSettings": {
+    "linkPreviews": "Länkförhandsvisningar och inbäddningar",
+    "linkPreviewsHint": "Webbplatser ser din IP-adress",
+    "nowPlaying": "Dela vad jag lyssnar på",
+    "nowPlayingHint": "Andra ser din aktuella låt",
+    "unsupported": "Inte tillgängligt på macOS",
+    "theme": "Tema",
+    "theme_system": "System",
+    "theme_dark": "Mörkt",
+    "theme_light": "Ljust",
+    "nowGaming": "Dela spelet jag spelar",
+    "nowGamingHint": "Andra ser ditt aktuella spel",
+    "unavailable": "Inte tillgängligt på det här systemet",
+    "overlay": "Overlay",
+    "overlayHint": "Visar vem som pratar ovanpå spel",
+    "editProfile": "Redigera profil",
+    "editProfileHint": "Namn, avatar och kommentar",
+    "register": "Registrera dig på den här servern",
+    "registered": "Registrerad på den här servern ✓",
+    "registerHint": "Behåller ditt namn och din avatar på den här servern",
+    "allSettings": "Alla inställningar…",
+    "label": "Snabbinställningar",
+    "positional": "Positionsljud",
+    "positionalHint": "Röster placeras i 3D runt dig",
+    "offerImages": "Erbjud bilder i full storlek",
+    "offerImagesHint": "Låt andra läsa in dina originalbilder",
+    "loadImages": "Läs in bilder i full storlek",
+    "loadImagesHint": "Hämta originalbilder från andra"
+  }
+}

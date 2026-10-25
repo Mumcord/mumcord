@@ -1,0 +1,10 @@
+{
+  "close": {
+    "title": "Zminimalizować do zasobnika czy zamknąć?",
+    "description": "Nadal jesteś połączony(-a). Po zminimalizowaniu Mumcord utrzyma Cię na kanale głosowym i pozostanie w zasobniku systemowym.",
+    "remember": "Zapamiętaj mój wybór",
+    "minimize": "Minimalizuj do zasobnika",
+    "quit": "Zamknij aplikację",
+    "failed": "To się nie udało. Spróbuj ponownie."
+  }
+}

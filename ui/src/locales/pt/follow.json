@@ -1,0 +1,59 @@
+{
+  "follow": "Seguir",
+  "following": "A seguir",
+  "unsupported": "Seguir canais requer um servidor com a versão 1.4 ou mais recente.",
+  "unread_one": "{{count}} mensagem por ler",
+  "unread_many": "{{count}} mensagens por ler",
+  "unread_other": "{{count}} mensagens por ler",
+  "errors": {
+    "denied": "O servidor não te permite seguir este canal.",
+    "limit": "Não podes seguir mais canais neste servidor. Deixa primeiro de seguir outro canal.",
+    "tooOld": "Este servidor é demasiado antigo para seguir canais (é necessária a versão 1.4 ou mais recente).",
+    "notConnected": "Não estás ligado ao servidor.",
+    "generic": "Não foi possível seguir este canal. Tenta novamente."
+  },
+  "dm": {
+    "title": "Mensagens diretas",
+    "unknown": "Pessoa desconhecida"
+  },
+  "notify": {
+    "channel": "{{name}} em {{channel}}: {{text}}",
+    "private": "{{name}} (privado): {{text}}",
+    "more_one": "mais {{count}} mensagem nova",
+    "more_many": "mais {{count}} mensagens novas",
+    "more_other": "mais {{count}} mensagens novas"
+  },
+  "history": {
+    "clear": "Limpar histórico",
+    "title": "Limpar histórico?",
+    "body": "Isto elimina permanentemente deste computador as mensagens guardadas desta conversa. As outras pessoas mantêm as suas cópias.",
+    "confirm": "Limpar histórico",
+    "cancel": "Cancelar",
+    "failed": "Não foi possível limpar o histórico. Tenta novamente."
+  },
+  "star": {
+    "follow": "Seguir {{channel}}",
+    "unfollow": "Deixar de seguir {{channel}}"
+  },
+  "all": {
+    "menu": "Opções do servidor para {{server}}",
+    "menuLabel": "Opções do servidor",
+    "follow": "Seguir todos os canais",
+    "unfollow": "Deixar de seguir todos os canais",
+    "working": "A seguir canais…",
+    "followed_one": "{{count}} canal seguido.",
+    "followed_many": "{{count}} canais seguidos.",
+    "followed_other": "{{count}} canais seguidos.",
+    "skipped_one": "{{count}} ignorado: {{reasons}}.",
+    "skipped_many": "{{count}} ignorados: {{reasons}}.",
+    "skipped_other": "{{count}} ignorados: {{reasons}}.",
+    "limit": "limite atingido",
+    "notAllowed": "não permitido",
+    "noAnswer": "sem resposta do servidor",
+    "unfollowed": "Deixaste de seguir todos os canais.",
+    "failed": "Não foi possível seguir todos os canais. Tenta novamente.",
+    "dismiss": "Dispensar",
+    "unfollowFailed": "Não foi possível deixar de seguir todos os canais. Tenta novamente."
+  },
+  "mention": "inclui uma menção a ti"
+}

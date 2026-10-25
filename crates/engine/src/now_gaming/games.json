@@ -1,0 +1,166 @@
+{
+  "games": [
+    { "name": "Counter-Strike 2", "steam": 730, "windows": ["cs2.exe"], "linux": ["cs2"] },
+    { "name": "Dota 2", "steam": 570, "windows": ["dota2.exe"], "linux": ["dota2"] },
+    {
+      "name": "Team Fortress 2",
+      "steam": 440,
+      "windows": ["tf_win64.exe", "tf.exe"],
+      "linux": ["tf_linux64"]
+    },
+    { "name": "Portal 2", "steam": 620, "windows": ["portal2.exe"], "linux": ["portal2_linux"] },
+    { "name": "Left 4 Dead 2", "steam": 550, "windows": ["left4dead2.exe"] },
+    { "name": "Garry's Mod", "steam": 4000, "windows": ["gmod.exe"] },
+    { "name": "Apex Legends", "steam": 1172470, "windows": ["r5apex.exe", "r5apex_dx12.exe"] },
+    { "name": "PUBG: BATTLEGROUNDS", "steam": 578080, "windows": ["TslGame.exe"] },
+    { "name": "Rust", "steam": 252490, "windows": ["RustClient.exe"] },
+    { "name": "Grand Theft Auto V", "steam": 271590, "windows": ["GTA5.exe", "GTA5_Enhanced.exe"] },
+    { "name": "Red Dead Redemption 2", "steam": 1174180, "windows": ["RDR2.exe"] },
+    { "name": "Minecraft", "windows": ["Minecraft.Windows.exe"] },
+    {
+      "name": "League of Legends",
+      "windows": ["League of Legends.exe"],
+      "macos": ["LeagueofLegends"]
+    },
+    { "name": "VALORANT", "windows": ["VALORANT-Win64-Shipping.exe"] },
+    { "name": "Fortnite", "windows": ["FortniteClient-Win64-Shipping.exe"] },
+    { "name": "Overwatch 2", "steam": 2357570, "windows": ["Overwatch.exe"] },
+    {
+      "name": "World of Warcraft",
+      "windows": ["Wow.exe", "WowClassic.exe"],
+      "macos": ["World of Warcraft"]
+    },
+    { "name": "Hearthstone", "windows": ["Hearthstone.exe"], "macos": ["Hearthstone"] },
+    { "name": "StarCraft II", "windows": ["SC2_x64.exe", "SC2.exe"], "macos": ["SC2"] },
+    { "name": "Diablo IV", "steam": 2344520, "windows": ["Diablo IV.exe"] },
+    { "name": "Rocket League", "steam": 252950, "windows": ["RocketLeague.exe"] },
+    { "name": "Destiny 2", "steam": 1085660, "windows": ["destiny2.exe"] },
+    {
+      "name": "Tom Clancy's Rainbow Six Siege",
+      "steam": 359550,
+      "windows": ["RainbowSix.exe", "RainbowSix_Vulkan.exe"]
+    },
+    { "name": "Call of Duty", "steam": 1938090, "windows": ["cod.exe"] },
+    { "name": "Battlefield 2042", "steam": 1517290, "windows": ["BF2042.exe"] },
+    { "name": "Marvel Rivals", "steam": 2767030, "windows": ["Marvel-Win64-Shipping.exe"] },
+    { "name": "Elden Ring", "steam": 1245620, "windows": ["eldenring.exe"] },
+    {
+      "name": "Baldur's Gate 3",
+      "steam": 1086940,
+      "windows": ["bg3.exe", "bg3_dx11.exe"],
+      "macos": ["Baldur's Gate 3"]
+    },
+    { "name": "Cyberpunk 2077", "steam": 1091500, "windows": ["Cyberpunk2077.exe"] },
+    { "name": "The Witcher 3: Wild Hunt", "steam": 292030, "windows": ["witcher3.exe"] },
+    { "name": "Black Myth: Wukong", "steam": 2358720, "windows": ["b1-Win64-Shipping.exe"] },
+    { "name": "Monster Hunter: World", "steam": 582010, "windows": ["MonsterHunterWorld.exe"] },
+    { "name": "Monster Hunter Wilds", "steam": 2246340, "windows": ["MonsterHunterWilds.exe"] },
+    { "name": "Helldivers 2", "steam": 553850, "windows": ["helldivers2.exe"] },
+    { "name": "Deep Rock Galactic", "steam": 548430, "windows": ["FSD-Win64-Shipping.exe"] },
+    { "name": "Lethal Company", "steam": 1966720, "windows": ["Lethal Company.exe"] },
+    { "name": "Phasmophobia", "steam": 739630, "windows": ["Phasmophobia.exe"] },
+    { "name": "Among Us", "steam": 945360, "windows": ["Among Us.exe"] },
+    { "name": "Sea of Thieves", "steam": 1172620, "windows": ["SoTGame.exe"] },
+    {
+      "name": "Dead by Daylight",
+      "steam": 381210,
+      "windows": ["DeadByDaylight-Win64-Shipping.exe"]
+    },
+    { "name": "Hunt: Showdown 1896", "steam": 594650, "windows": ["HuntGame.exe"] },
+    { "name": "Escape from Tarkov", "windows": ["EscapeFromTarkov.exe"] },
+    { "name": "DayZ", "steam": 221100, "windows": ["DayZ_x64.exe"] },
+    { "name": "Arma 3", "steam": 107410, "windows": ["arma3_x64.exe", "arma3.exe"] },
+    { "name": "Squad", "steam": 393380, "windows": ["SquadGame.exe"] },
+    { "name": "Hell Let Loose", "steam": 686810, "windows": ["HLL-Win64-Shipping.exe"] },
+    { "name": "War Thunder", "steam": 236390, "windows": ["aces.exe"], "linux": ["aces"] },
+    { "name": "World of Tanks", "windows": ["WorldOfTanks.exe"] },
+    { "name": "Warframe", "steam": 230410, "windows": ["Warframe.x64.exe"] },
+    {
+      "name": "Path of Exile",
+      "steam": 238960,
+      "windows": ["PathOfExile.exe", "PathOfExileSteam.exe", "PathOfExile_x64.exe"]
+    },
+    { "name": "Final Fantasy XIV Online", "steam": 39210, "windows": ["ffxiv_dx11.exe"] },
+    { "name": "Guild Wars 2", "steam": 1284210, "windows": ["Gw2-64.exe"] },
+    { "name": "Old School RuneScape", "windows": ["osclient.exe"] },
+    { "name": "Star Citizen", "windows": ["StarCitizen.exe"] },
+    { "name": "Elite Dangerous", "steam": 359320, "windows": ["EliteDangerous64.exe"] },
+    { "name": "Palworld", "steam": 1623730, "windows": ["Palworld-Win64-Shipping.exe"] },
+    { "name": "Valheim", "steam": 892970, "windows": ["valheim.exe"], "linux": ["valheim.x86_64"] },
+    {
+      "name": "Terraria",
+      "steam": 105600,
+      "windows": ["Terraria.exe"],
+      "linux": ["Terraria.bin.x86_64"]
+    },
+    {
+      "name": "Stardew Valley",
+      "steam": 413150,
+      "windows": ["Stardew Valley.exe"],
+      "linux": ["StardewValley", "Stardew Valley"]
+    },
+    {
+      "name": "Factorio",
+      "steam": 427520,
+      "windows": ["factorio.exe"],
+      "linux": ["factorio"],
+      "macos": ["factorio"]
+    },
+    {
+      "name": "Satisfactory",
+      "steam": 526870,
+      "windows": ["FactoryGameSteam-Win64-Shipping.exe", "FactoryGameEGS-Win64-Shipping.exe"]
+    },
+    {
+      "name": "7 Days to Die",
+      "steam": 251570,
+      "windows": ["7DaysToDie.exe"],
+      "linux": ["7DaysToDie.x86_64"]
+    },
+    {
+      "name": "Don't Starve Together",
+      "steam": 322330,
+      "windows": ["dontstarve_steam_x64.exe"],
+      "linux": ["dontstarve_steam_x64"]
+    },
+    { "name": "Project Zomboid", "steam": 108600, "windows": ["ProjectZomboid64.exe"] },
+    { "name": "Sons of the Forest", "steam": 1326470, "windows": ["SonsOfTheForest.exe"] },
+    { "name": "Space Engineers", "steam": 244850, "windows": ["SpaceEngineers.exe"] },
+    {
+      "name": "Kerbal Space Program",
+      "steam": 220200,
+      "windows": ["KSP_x64.exe"],
+      "linux": ["KSP.x86_64"]
+    },
+    {
+      "name": "Sid Meier's Civilization VI",
+      "steam": 289070,
+      "windows": ["CivilizationVI.exe", "CivilizationVI_DX12.exe"]
+    },
+    {
+      "name": "Age of Empires II: Definitive Edition",
+      "steam": 813780,
+      "windows": ["AoE2DE_s.exe"]
+    },
+    { "name": "Risk of Rain 2", "steam": 632360, "windows": ["Risk of Rain 2.exe"] },
+    {
+      "name": "Hollow Knight",
+      "steam": 367520,
+      "windows": ["hollow_knight.exe"],
+      "linux": ["hollow_knight.x86_64"]
+    },
+    { "name": "Brawlhalla", "steam": 291550, "windows": ["Brawlhalla.exe"] },
+    {
+      "name": "Euro Truck Simulator 2",
+      "steam": 227300,
+      "windows": ["eurotrucks2.exe"],
+      "linux": ["eurotrucks2"]
+    },
+    {
+      "name": "American Truck Simulator",
+      "steam": 270880,
+      "windows": ["amtrucks.exe"],
+      "linux": ["amtrucks"]
+    }
+  ]
+}

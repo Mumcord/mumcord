@@ -19,6 +19,7 @@ import type { User } from "../../api";
 import { Avatar } from "../members/Avatar";
 import { ProfilePreviewTrigger } from "../members/ProfilePreview";
 import { openPersonMenuFromEvent } from "../members/personMenuStore";
+import { clickPerson, doubleClickPerson } from "../members/personClick";
 import { previewOnFocus, releasePreview } from "../members/profilePreviewStore";
 import { AvatarStack, type StackPerson } from "./AvatarStack";
 import { StatusIcons } from "./PersonStatus";
@@ -27,6 +28,7 @@ import { useStatusText } from "./statusText";
 import { cachedSelector, sameValue } from "./cachedSelector";
 import { foldName, matchRange } from "./search";
 import { TreeContext, type TreeContextValue, type ValueStore } from "./treeContext";
+import { MumcordBadge } from "./MumcordBadge";
 import {
   channelRowId,
   CROWDED_CHANNEL_SIZE,
@@ -328,7 +330,11 @@ const PersonRow = memo(function PersonTreeRow({ user, level }: { user: User; lev
       onClick={(event) => {
         event.stopPropagation();
         actions.current.focus(rowId);
-        actions.current.openPerson(session, event.currentTarget);
+        clickPerson(event.detail, session, event.currentTarget);
+      }}
+      onDoubleClick={(event) => {
+        event.stopPropagation();
+        doubleClickPerson(session);
       }}
     >
       <span className="tree-person__row">
@@ -337,6 +343,7 @@ const PersonRow = memo(function PersonTreeRow({ user, level }: { user: User; lev
           <span id={labelId} className="tree-person__name" data-local-muted={user.localMute}>
             <Highlighted text={user.name} query={query} />
             {isSelf && <span className="tree-person__you"> {t("tree.you")}</span>}
+            <MumcordBadge user={user} />
             {status.length > 0 && <span className="visually-hidden">, {status.join(", ")}</span>}
           </span>
         </ProfilePreviewTrigger>

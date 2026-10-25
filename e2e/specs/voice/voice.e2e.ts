@@ -120,6 +120,15 @@ function copyLogs(label: string): void {
   }
 }
 
+/** A click pins the person's preview card (FR-1.62); its "Full profile" button opens the full card. */
+async function openProfileCard(name: string): Promise<void> {
+  await personRow(name).click();
+  const full = $("//div[@id='profile-preview']//button[@aria-label='Full profile']");
+  await full.waitForDisplayed();
+  await full.click();
+  await $("dialog.profile-card").waitForDisplayed();
+}
+
 function maxDb(x: Float32Array): number {
   return Math.max(-200, ...levels(x, 100));
 }
@@ -365,7 +374,7 @@ describe("voice (AC-1.7 – AC-1.12)", () => {
     await main.do(`expect user Tester --in "${botRoot}"`);
     const l100 = activeLevel(await playAndCapture(main, out), -55);
 
-    await personRow("Bot").click();
+    await openProfileCard("Bot");
     const slider = $(".profile-card__volume input[type='range']");
     await slider.waitForDisplayed();
     expect(await slider.getValue()).toBe("100");
@@ -387,11 +396,11 @@ describe("voice (AC-1.7 – AC-1.12)", () => {
     await personRow("BotRenamed").waitForExist({ timeout: 15_000 });
     await sleep(500);
     const l50r = activeLevel(await playAndCapture(main, out), -65);
-    await personRow("BotRenamed").click();
+    await openProfileCard("BotRenamed");
     await expect($(".profile-card__volume output")).toHaveText("50 %");
-    const mute = $("//label[contains(@class,'profile-card__mute')]/input");
+    const mute = $("button.profile-card__mute");
     await mute.click();
-    await expect(mute).toBeSelected();
+    await expect(mute).toHaveAttribute("aria-checked", "true");
     await browser.keys("Escape");
     await sleep(800);
     const mutedCap = await playAndCapture(main, out);
@@ -418,11 +427,11 @@ describe("voice (AC-1.7 – AC-1.12)", () => {
       `local mute after 2nd reconnect: max ${fmt(mutedMaxR)} dB, active windows ${String(leakR.count)} ` +
         `(first ${String(leakR.first)} last ${String(leakR.last)} of ${String(leakR.total)}, 100 ms); tree ${JSON.stringify(await readTree())}`,
     );
-    await personRow("Bot").click();
+    await openProfileCard("Bot");
     await expect($(".profile-card__volume output")).toHaveText("50 %");
-    await expect($("//label[contains(@class,'profile-card__mute')]/input")).toBeSelected();
+    await expect($("button.profile-card__mute")).toHaveAttribute("aria-checked", "true");
     // Control: unmuting makes Bot audible again, still at 50 %.
-    await $("//label[contains(@class,'profile-card__mute')]/input").click();
+    await $("button.profile-card__mute").click();
     await browser.keys("Escape");
     await sleep(800);
     const l50u = activeLevel(await playAndCapture(main, out), -65);
@@ -444,7 +453,8 @@ describe("voice (AC-1.7 – AC-1.12)", () => {
   });
 
   it("AC-1.9 push-to-talk (X11): sent only while the key is held, other window focused", async () => {
-    await $("button[aria-label='Settings']").click();
+    await $("button[aria-label='Quick settings']").click();
+    await $("//button[@role='menuitem'][contains(., 'All settings')]").click();
     await $("button[role='tab']=Voice").click();
     await $("//label[contains(., 'Push-to-talk')]").click();
     const keyButton = $("button=Set key");

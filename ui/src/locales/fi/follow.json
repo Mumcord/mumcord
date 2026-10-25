@@ -1,0 +1,55 @@
+{
+  "follow": "Seuraa",
+  "following": "Seurataan",
+  "unsupported": "Kanavien seuraaminen vaatii palvelimen, jonka versio on 1.4 tai uudempi.",
+  "unread_one": "{{count}} lukematon viesti",
+  "unread_other": "{{count}} lukematonta viestiä",
+  "errors": {
+    "denied": "Palvelin ei salli sinun seurata tätä kanavaa.",
+    "limit": "Et voi seurata enempää kanavia tällä palvelimella. Lopeta ensin jonkin toisen kanavan seuraaminen.",
+    "tooOld": "Tämä palvelin on liian vanha kanavien seuraamiseen (tarvitaan versio 1.4 tai uudempi).",
+    "notConnected": "Et ole yhteydessä palvelimeen.",
+    "generic": "Kanavan seuraaminen ei onnistunut. Yritä uudelleen."
+  },
+  "dm": {
+    "title": "Yksityisviestit",
+    "unknown": "Tuntematon henkilö"
+  },
+  "notify": {
+    "channel": "{{name}} kanavalla {{channel}}: {{text}}",
+    "private": "{{name}} (yksityinen): {{text}}",
+    "more_one": "{{count}} uusi viesti lisää",
+    "more_other": "{{count}} uutta viestiä lisää"
+  },
+  "history": {
+    "clear": "Tyhjennä historia",
+    "title": "Tyhjennetäänkö historia?",
+    "body": "Tämä poistaa tämän keskustelun tallennetut viestit pysyvästi tältä tietokoneelta. Muiden kopiot säilyvät.",
+    "confirm": "Tyhjennä historia",
+    "cancel": "Peruuta",
+    "failed": "Historiaa ei voitu tyhjentää. Yritä uudelleen."
+  },
+  "star": {
+    "follow": "Seuraa kanavaa {{channel}}",
+    "unfollow": "Lopeta kanavan {{channel}} seuraaminen"
+  },
+  "all": {
+    "menu": "Palvelimen {{server}} asetukset",
+    "menuLabel": "Palvelimen asetukset",
+    "follow": "Seuraa kaikkia kanavia",
+    "unfollow": "Lopeta kaikkien kanavien seuraaminen",
+    "working": "Seurataan kanavia…",
+    "followed_one": "{{count}} kanava lisätty seurantaan.",
+    "followed_other": "{{count}} kanavaa lisätty seurantaan.",
+    "skipped_one": "{{count}} ohitettu: {{reasons}}.",
+    "skipped_other": "{{count}} ohitettu: {{reasons}}.",
+    "limit": "raja saavutettu",
+    "notAllowed": "ei sallittu",
+    "noAnswer": "ei vastausta palvelimelta",
+    "unfollowed": "Kaikkien kanavien seuraaminen lopetettu.",
+    "failed": "Kaikkien kanavien seuraaminen ei onnistunut. Yritä uudelleen.",
+    "dismiss": "Ohita",
+    "unfollowFailed": "Kaikkien kanavien seuraamisen lopettaminen ei onnistunut. Yritä uudelleen."
+  },
+  "mention": "sisältää maininnan sinusta"
+}

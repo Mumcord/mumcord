@@ -1,0 +1,88 @@
+{
+  "unknownName": "Jij",
+  "mute": "Microfoon dempen",
+  "deafen": "Doof zetten",
+  "disconnect": "Verbinding met {{server}} verbreken",
+  "settings": "Snelle instellingen",
+  "announce": {
+    "muted": "Microfoon gedempt",
+    "unmuted": "Microfoon niet meer gedempt",
+    "deafened": "Doof gezet. Je hoort anderen niet en je microfoon is gedempt",
+    "undeafened": "Niet meer doof gezet"
+  },
+  "readOnly": {
+    "text": "Je leest alleen mee – neem deel aan een kanaal om te praten.",
+    "join": "Deelnemen aan {{channel}}"
+  },
+  "status": {
+    "connecting": "Verbinden…",
+    "reconnecting": "Opnieuw verbinden…",
+    "connected": "Verbonden",
+    "readOnly": "Alleen lezen",
+    "disconnected": "Niet verbonden",
+    "playing": "Speelt {{game}}",
+    "listening": "Luistert naar {{track}}"
+  },
+  "profile": {
+    "title": "Profiel bewerken",
+    "chooseTitle": "Kies een profielfoto",
+    "chooseAvatar": "Kies een foto…",
+    "removeAvatar": "Foto verwijderen",
+    "avatarHint": "De foto wordt verkleind zodat hij binnen de limiet van de server past.",
+    "avatarUnregistered": "Deze server bewaart avatars alleen voor geregistreerde gebruikers – Mumcord stuurt de jouwe bij elke verbinding opnieuw.",
+    "avatarChosen": "Geselecteerd: {{name}}",
+    "avatarRemoved": "De foto wordt verwijderd zodra je opslaat.",
+    "comment": "Over jou"
+  },
+  "register": {
+    "title": "Registreren op deze server",
+    "explain": "Door te registreren reserveer je je naam op deze server. Niemand anders kan hem gebruiken en de server herkent je de volgende keer dat je verbindt.",
+    "backup": "Je identiteit bewijst dat de naam van jou is. Als je die kwijtraakt, verlies je de toegang tot de geregistreerde naam. Bewaar nu een back-up en berg die veilig op.",
+    "password": "Wachtwoord voor het back-upbestand",
+    "export": "Identiteit exporteren",
+    "saveTitle": "Back-up van identiteit opslaan",
+    "passwordRequired": "Voer een wachtwoord in om het back-upbestand te beveiligen.",
+    "exported": "Back-up van identiteit opgeslagen.",
+    "confirm": "Registreren",
+    "done": "Geregistreerd op deze server"
+  },
+  "errors": {
+    "tooLarge": "Dit is te groot voor de server. Kies een kleinere foto of schrijf een kortere tekst.",
+    "denied": "De server staat dit niet toe.",
+    "deniedWithReason": "De server staat dit niet toe: {{reason}}",
+    "notConnected": "Je bent niet verbonden met een server.",
+    "file": "Het bestand kon niet worden gelezen of geschreven.",
+    "generic": "Er is iets misgegaan. Probeer het opnieuw."
+  },
+  "ptt": "Push-to-talk: houd {{key}} ingedrukt om te praten",
+  "pttNoKey": "Push-to-talk: geen toets ingesteld",
+  "quickSettings": {
+    "linkPreviews": "Linkvoorbeelden en insluitingen",
+    "linkPreviewsHint": "Sites zien je IP-adres",
+    "nowPlaying": "Delen waar ik naar luister",
+    "nowPlayingHint": "Anderen zien je huidige nummer",
+    "unsupported": "Niet beschikbaar op macOS",
+    "theme": "Thema",
+    "theme_system": "Systeem",
+    "theme_dark": "Donker",
+    "theme_light": "Licht",
+    "nowGaming": "Delen welke game ik speel",
+    "nowGamingHint": "Anderen zien je huidige game",
+    "unavailable": "Niet beschikbaar op dit systeem",
+    "overlay": "Overlay",
+    "overlayHint": "Toont wie er praat bovenop games",
+    "editProfile": "Profiel bewerken",
+    "editProfileHint": "Naam, avatar en opmerking",
+    "register": "Registreren op deze server",
+    "registered": "Geregistreerd op deze server ✓",
+    "registerHint": "Behoudt je naam en avatar op deze server",
+    "allSettings": "Alle instellingen…",
+    "label": "Snelle instellingen",
+    "positional": "Positionele audio",
+    "positionalHint": "Stemmen in 3D om je heen geplaatst",
+    "offerImages": "Afbeeldingen op volledige grootte aanbieden",
+    "offerImagesHint": "Laat anderen je originele afbeeldingen laden",
+    "loadImages": "Afbeeldingen op volledige grootte laden",
+    "loadImagesHint": "Originele afbeeldingen van anderen ophalen"
+  }
+}

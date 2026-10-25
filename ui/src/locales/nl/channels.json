@@ -1,0 +1,71 @@
+{
+  "serverOverview": "Serveroverzicht",
+  "tree": {
+    "label": "Kanalen",
+    "hint": "Enter: chat tonen · Shift+Enter of dubbelklik: deelnemen · Pijltjestoetsen: bewegen, uitklappen, inklappen",
+    "join": "Deelnemen",
+    "you": "(jij)",
+    "voiceHere": "je bent hier (voice)",
+    "people_one": "{{count}} persoon",
+    "people_other": "{{count}} personen",
+    "stack": {
+      "some": "{{shown}} van {{total}} personen: {{names}} en {{rest}} meer",
+      "all_one": "{{count}} persoon: {{names}}",
+      "all_other": "{{count}} personen: {{names}}",
+      "person": "{{name}} ({{status}})"
+    },
+    "showAll": "Alles tonen ({{total}})",
+    "showFewer": "Minder tonen",
+    "jump": "Naar mijn kanaal"
+  },
+  "status": {
+    "listening": "luistert",
+    "talking": "praat",
+    "muted": "gedempt",
+    "deafened": "doof gezet",
+    "serverMuted": "gedempt door server",
+    "serverDeafened": "doof gezet door server",
+    "suppressed": "onderdrukt (kan hier niet praten)",
+    "localMuted": "voor jou gedempt",
+    "unregistered": "niet geregistreerd"
+  },
+  "mumcordBadge": "Gebruikt Mumcord",
+  "statusTip": {
+    "registered": "Geregistreerd op deze server",
+    "listening": "Luistert naar dit kanaal",
+    "muted": "Gedempt",
+    "deafened": "Doof gezet",
+    "serverMuted": "Gedempt door de server",
+    "serverDeafened": "Doof gezet door de server",
+    "suppressed": "Onderdrukt – kan niet praten in dit kanaal",
+    "localMuted": "Voor jou gedempt",
+    "unregistered": "Niet geregistreerd op deze server (gast)",
+    "nowPlaying": "Luistert naar {{track}}",
+    "nowGaming": "Speelt {{game}}",
+    "positional": "Positionele audio actief"
+  },
+  "announce": {
+    "joined": "{{name}} is je kanaal binnengekomen",
+    "left": "{{name}} heeft je kanaal verlaten",
+    "talking": "{{name}} praat"
+  },
+  "errors": {
+    "joinDenied": "Je mag dit kanaal niet betreden.",
+    "joinFailed": "Deelnemen aan het kanaal is mislukt. Probeer het opnieuw.",
+    "notConnected": "Niet verbonden met een server."
+  },
+  "empty": {
+    "disconnected": "Niet verbonden. Kies een server om de kanalen te zien.",
+    "loading": "Kanalen laden…"
+  },
+  "search": {
+    "label": "Kanalen en personen zoeken",
+    "clear": "Zoekopdracht wissen",
+    "empty": "Geen kanalen of personen gevonden voor “{{query}}”.",
+    "count": "{{channels}}, {{people}}",
+    "channels_one": "{{count}} kanaal",
+    "channels_other": "{{count}} kanalen",
+    "people_one": "{{count}} persoon",
+    "people_other": "{{count}} personen"
+  }
+}

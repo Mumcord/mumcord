@@ -1,0 +1,88 @@
+{
+  "unknownName": "Tu",
+  "mute": "Oprește microfonul",
+  "deafen": "Oprește sunetul",
+  "disconnect": "Deconectează-te de la {{server}}",
+  "settings": "Setări rapide",
+  "announce": {
+    "muted": "Microfon oprit",
+    "unmuted": "Microfon pornit",
+    "deafened": "Sunet oprit. Nu-i auzi pe ceilalți, iar microfonul tău e oprit",
+    "undeafened": "Sunet pornit"
+  },
+  "readOnly": {
+    "text": "Doar citești – intră într-un canal ca să vorbești.",
+    "join": "Intră în {{channel}}"
+  },
+  "status": {
+    "connecting": "Se conectează…",
+    "reconnecting": "Se reconectează…",
+    "connected": "Conectat",
+    "readOnly": "Doar citire",
+    "disconnected": "Neconectat",
+    "playing": "Joacă {{game}}",
+    "listening": "Ascultă {{track}}"
+  },
+  "profile": {
+    "title": "Editează profilul",
+    "chooseTitle": "Alege o poză de profil",
+    "chooseAvatar": "Alege poza…",
+    "removeAvatar": "Elimină poza",
+    "avatarHint": "Poza e micșorată ca să încapă în limita serverului.",
+    "avatarUnregistered": "Acest server păstrează avatarele doar pentru utilizatorii înregistrați – Mumcord îl retrimite pe al tău la fiecare conectare.",
+    "avatarChosen": "Selectat: {{name}}",
+    "avatarRemoved": "Poza va fi eliminată când salvezi.",
+    "comment": "Despre tine"
+  },
+  "register": {
+    "title": "Înregistrează-te pe acest server",
+    "explain": "Înregistrarea îți rezervă numele pe acest server. Nimeni altcineva nu-l poate folosi, iar serverul te recunoaște data viitoare când te conectezi.",
+    "backup": "Identitatea ta e cea care dovedește că numele îți aparține. Dacă o pierzi, pierzi accesul la numele înregistrat. Salvează acum o copie de rezervă și păstreaz-o în siguranță.",
+    "password": "Parola pentru fișierul de rezervă",
+    "export": "Exportă identitatea",
+    "saveTitle": "Salvează copia de rezervă a identității",
+    "passwordRequired": "Introdu o parolă ca să protejezi fișierul de rezervă.",
+    "exported": "Copia de rezervă a identității a fost salvată.",
+    "confirm": "Înregistrează-te",
+    "done": "Înregistrat pe acest server"
+  },
+  "errors": {
+    "tooLarge": "E prea mare pentru server. Alege o poză mai mică sau scrie un text mai scurt.",
+    "denied": "Serverul nu permite asta.",
+    "deniedWithReason": "Serverul nu permite asta: {{reason}}",
+    "notConnected": "Nu ești conectat la un server.",
+    "file": "Fișierul nu a putut fi citit sau scris.",
+    "generic": "Ceva n-a mers bine. Încearcă din nou."
+  },
+  "ptt": "Push-to-talk: ține apăsat {{key}} ca să vorbești",
+  "pttNoKey": "Push-to-talk: nicio tastă setată",
+  "quickSettings": {
+    "linkPreviews": "Previzualizări de linkuri și conținut încorporat",
+    "linkPreviewsHint": "Site-urile îți văd adresa IP",
+    "nowPlaying": "Arată ce ascult",
+    "nowPlayingHint": "Ceilalți văd piesa pe care o asculți",
+    "unsupported": "Nu e disponibil pe macOS",
+    "theme": "Temă",
+    "theme_system": "Sistem",
+    "theme_dark": "Întunecată",
+    "theme_light": "Luminoasă",
+    "nowGaming": "Arată jocul la care joc",
+    "nowGamingHint": "Ceilalți văd jocul tău actual",
+    "unavailable": "Nu e disponibil pe acest sistem",
+    "overlay": "Overlay",
+    "overlayHint": "Arată cine vorbește peste jocuri",
+    "editProfile": "Editează profilul",
+    "editProfileHint": "Nume, avatar și comentariu",
+    "register": "Înregistrează-te pe acest server",
+    "registered": "Înregistrat pe acest server ✓",
+    "registerHint": "Îți păstrează numele și avatarul pe acest server",
+    "allSettings": "Toate setările…",
+    "label": "Setări rapide",
+    "positional": "Audio pozițional",
+    "positionalHint": "Voci plasate 3D în jurul tău",
+    "offerImages": "Oferă imagini la dimensiune completă",
+    "offerImagesHint": "Lasă-i pe ceilalți să-ți încarce imaginile originale",
+    "loadImages": "Încarcă imagini la dimensiune completă",
+    "loadImagesHint": "Preia imaginile originale de la ceilalți"
+  }
+}

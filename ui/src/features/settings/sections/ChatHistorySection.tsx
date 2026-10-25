@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { getApi, type HistoryScope, type SavedServer } from "../../../api";
+import { BetaBadge } from "../../../components/BetaBadge";
 import { ConfirmDialog } from "../components/ConfirmDialog";
 import { DaysSelect } from "../components/DaysSelect";
 import { Group, Section } from "../components/Section";
@@ -26,8 +27,9 @@ function formatSize(bytes: number): string {
 }
 
 /**
- * Chat & history: link previews (FR-1.49) with their cache clean-up, "Save history" and "Clear
- * history" per server, plus clearing everything and deleting old history automatically (QA.42).
+ * Chat & history: link previews (FR-1.49) with their cache clean-up, "Share my channel history"
+ * with other Mumcord users (FR-1.60), "Save history" and "Clear history" per server, plus
+ * clearing everything and deleting old history automatically (QA.42).
  */
 export function ChatHistorySection({ settings, update }: SettingsSectionProps) {
   const { t } = useTranslation("settings");
@@ -117,6 +119,34 @@ export function ChatHistorySection({ settings, update }: SettingsSectionProps) {
         <button type="button" className="settings-button" onClick={() => void clearCache()}>
           {t("previewCache.clearNow")}
         </button>
+      </Group>
+      <Group title={t("fullImages.title")} badge={<BetaBadge />}>
+        <Switch
+          label={t("fullImages.offer")}
+          description={t("fullImages.offerHint")}
+          checked={settings.offerFullImages}
+          onChange={(offerFullImages) => {
+            update({ offerFullImages });
+          }}
+        />
+        <Switch
+          label={t("fullImages.load")}
+          description={t("fullImages.loadHint")}
+          checked={settings.loadFullImages}
+          onChange={(loadFullImages) => {
+            update({ loadFullImages });
+          }}
+        />
+      </Group>
+      <Group title={t("historySharing.title")}>
+        <Switch
+          label={t("historySharing.switch")}
+          description={t("historySharing.hint")}
+          checked={settings.historySharing}
+          onChange={(historySharing) => {
+            update({ historySharing });
+          }}
+        />
       </Group>
       <p className="settings-hint">{t("history.explanation")}</p>
       <Group title={t("history.perServer")}>

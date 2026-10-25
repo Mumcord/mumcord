@@ -1,4 +1,5 @@
 import { useTranslation } from "react-i18next";
+import { useHintPreferences } from "./hintPreferences";
 import "./skip-links.css";
 
 export interface SkipTarget {
@@ -7,9 +8,14 @@ export interface SkipTarget {
   label: string;
 }
 
-/** Links that become visible on keyboard focus and jump past the navigation columns. */
+/**
+ * Links that become visible on keyboard focus and jump past the navigation columns. Not rendered
+ * while the user has turned skip links off.
+ */
 export function SkipLinks({ targets }: { targets: SkipTarget[] }) {
   const { t } = useTranslation("app");
+  const { skipLinks } = useHintPreferences();
+  if (!skipLinks) return null;
   return (
     <nav className="skip-links" aria-label={t("skipLinks.label")}>
       {targets.map((target) => (

@@ -2,6 +2,7 @@
 /target/
 /dist/
 /src-tauri/gen/schemas/
+/src-tauri/gen/overlay-layer/
 node_modules/
 *.tsbuildinfo
 
@@ -19,3 +20,6 @@ testenv/.env
 .DS_Store
 .idea/
 .vscode/
+
+# Agent worktrees
+.claude/worktrees/

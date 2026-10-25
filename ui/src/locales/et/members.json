@@ -1,0 +1,65 @@
+{
+  "inChannel_one": "Kanalis {{channel}} ({{count}})",
+  "inChannel_other": "Kanalis {{channel}} ({{count}})",
+  "listening_one": "Kuulavad ({{count}})",
+  "listening_other": "Kuulavad ({{count}})",
+  "noChannel": "Vali kanal, et näha, kes seal on.",
+  "nobody": "Siin pole kedagi.",
+  "nobodyElse": "Serveris pole kedagi teist.",
+  "inOtherChannels": "Teistes kanalites",
+  "you": "(sina)",
+  "registered": "Registreeritud",
+  "unregistered": "Registreerimata",
+  "talking": "Räägib",
+  "card": {
+    "close": "Sulge",
+    "loadFailed": "Profiili ei õnnestunud laadida.",
+    "volume": "Helitugevus",
+    "volumeValue": "{{value}} %",
+    "localMute": "Vaigista minu jaoks",
+    "sessionOnly": "Sellel inimesel pole sertifikaati, seega kehtivad need seaded ainult selle seansi jooksul.",
+    "sendPrivateMessage": "Saada privaatsõnum",
+    "privateMessage": "Privaatsõnum",
+    "localSettings": "Sinu seaded",
+    "localSettingsHint": "Neid näed ainult sina. Muudatused salvestatakse kohe.",
+    "localMuteHint": "Sa ei kuule seda inimest.",
+    "privateNote": "Privaatne märge",
+    "privateNoteHint": "Seda märget näed ainult sina.",
+    "saved": "Salvestatud"
+  },
+  "errors": {
+    "notConnected": "Serveriga pole ühendatud.",
+    "generic": "See ei õnnestunud. Proovi palun uuesti."
+  },
+  "menu": {
+    "label": "Toimingud: {{name}}",
+    "viewProfile": "Vaata profiili",
+    "join": "Liitu kanaliga {{channel}}",
+    "joinDenied": "Sul pole luba sellesse kanalisse siseneda.",
+    "mute": "Vaigista minu jaoks"
+  },
+  "nowPlaying": {
+    "label": "Praegu mängib",
+    "listening": "Kuulab",
+    "paused": "Peatatud",
+    "progress": "Esituse edenemine",
+    "position": "{{position}} / {{duration}}"
+  },
+  "nowGaming": {
+    "label": "Praegu mängib mängu",
+    "playing": "Mängib",
+    "playedFor": "{{time}}",
+    "hoursMinutes": "{{hours}} h {{minutes}} min",
+    "minutes_one": "{{count}} min",
+    "minutes_other": "{{count}} min",
+    "join": "Liitu mänguga",
+    "joinTitle": "Liitun mänguga?",
+    "joinMessage": "Steam avaneb ja ühendub serveriga, kus see inimene mängib mängu {{game}}. Liitu ainult serveritega, mida usaldad.",
+    "joinConfirm": "Ava Steam",
+    "joinFailed": "Steami ei õnnestunud avada."
+  },
+  "preview": {
+    "privateMessage": "Privaatsõnum",
+    "fullProfile": "Täielik profiil"
+  }
+}

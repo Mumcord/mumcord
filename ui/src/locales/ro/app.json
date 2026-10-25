@@ -1,0 +1,33 @@
+{
+  "regions": {
+    "servers": "Servere",
+    "channels": "Canale",
+    "chat": "Chat",
+    "members": "Membri",
+    "userPanel": "Starea ta"
+  },
+  "skipLinks": {
+    "label": "Linkuri de salt",
+    "chat": "Salt la chat",
+    "channels": "Salt la canale"
+  },
+  "members": {
+    "show": "Arată membrii",
+    "hide": "Ascunde membrii"
+  },
+  "resize": {
+    "channels": "Redimensionează lista de canale",
+    "members": "Redimensionează lista de membri"
+  },
+  "settings": {
+    "title": "Setări"
+  },
+  "wizard": {
+    "title": "Bun venit în Mumcord"
+  },
+  "placeholder": "În curând",
+  "startupError": {
+    "title": "Mumcord nu a putut porni",
+    "description": "Aplicația nu ți-a putut încărca setările. Încearcă din nou; dacă tot nu merge, repornește Mumcord."
+  }
+}

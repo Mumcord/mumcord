@@ -87,7 +87,7 @@ fn hex(bytes: &[u8]) -> String {
     })
 }
 
-pub fn user_view(user: &User, local: PersonSetting) -> UserView {
+pub fn user_view(user: &User, local: PersonSetting, mumcord: Option<&[String]>) -> UserView {
     UserView {
         session: user.session,
         channel_id: user.channel_id,
@@ -107,6 +107,7 @@ pub fn user_view(user: &User, local: PersonSetting) -> UserView {
             || user.comment.as_ref().is_some_and(|c| !c.is_empty()),
         volume: local.volume,
         local_mute: local.local_mute,
+        mumcord_features: mumcord.map(<[String]>::to_vec),
     }
 }
 

@@ -1,0 +1,88 @@
+{
+  "unknownName": "Ty",
+  "mute": "Stlmiť mikrofón",
+  "deafen": "Stlmiť zvuk",
+  "disconnect": "Odpojiť sa od {{server}}",
+  "settings": "Rýchle nastavenia",
+  "announce": {
+    "muted": "Mikrofón stlmený",
+    "unmuted": "Mikrofón zapnutý",
+    "deafened": "Zvuk stlmený. Nepočuješ ostatných a tvoj mikrofón je stlmený",
+    "undeafened": "Zvuk zapnutý"
+  },
+  "readOnly": {
+    "text": "Len čítaš – ak chceš hovoriť, pripoj sa do kanála.",
+    "join": "Pripojiť sa do {{channel}}"
+  },
+  "status": {
+    "connecting": "Pripájam sa…",
+    "reconnecting": "Znova sa pripájam…",
+    "connected": "Pripojené",
+    "readOnly": "Len na čítanie",
+    "disconnected": "Nepripojené",
+    "playing": "Hrá {{game}}",
+    "listening": "Počúva {{track}}"
+  },
+  "profile": {
+    "title": "Upraviť profil",
+    "chooseTitle": "Vyber profilový obrázok",
+    "chooseAvatar": "Vybrať obrázok…",
+    "removeAvatar": "Odstrániť obrázok",
+    "avatarHint": "Obrázok sa zmenší, aby sa zmestil do limitu servera.",
+    "avatarUnregistered": "Tento server uchováva avatary len pre registrovaných používateľov – Mumcord ten tvoj pošle znova pri každom pripojení.",
+    "avatarChosen": "Vybrané: {{name}}",
+    "avatarRemoved": "Obrázok sa odstráni po uložení.",
+    "comment": "O tebe"
+  },
+  "register": {
+    "title": "Registrovať sa na tomto serveri",
+    "explain": "Registráciou si na tomto serveri rezervuješ svoje meno. Nikto iný ho nemôže použiť a server si ťa zapamätá pri ďalšom pripojení.",
+    "backup": "Tvoja identita dokazuje, že meno patrí tebe. Ak ju stratíš, stratíš prístup k registrovanému menu. Ulož si teraz zálohu a dobre ju uschovaj.",
+    "password": "Heslo pre súbor so zálohou",
+    "export": "Exportovať identitu",
+    "saveTitle": "Uložiť zálohu identity",
+    "passwordRequired": "Zadaj heslo na ochranu súboru so zálohou.",
+    "exported": "Záloha identity uložená.",
+    "confirm": "Registrovať",
+    "done": "Registrovaný na tomto serveri"
+  },
+  "errors": {
+    "tooLarge": "Toto je pre server príliš veľké. Vyber menší obrázok alebo napíš kratší text.",
+    "denied": "Server to nepovoľuje.",
+    "deniedWithReason": "Server to nepovoľuje: {{reason}}",
+    "notConnected": "Nie si pripojený k serveru.",
+    "file": "Súbor sa nepodarilo prečítať ani zapísať.",
+    "generic": "Niečo sa pokazilo. Skús to znova."
+  },
+  "ptt": "Push-to-talk: podrž {{key}} a hovor",
+  "pttNoKey": "Push-to-talk: nie je nastavený kláves",
+  "quickSettings": {
+    "linkPreviews": "Náhľady odkazov a vložený obsah",
+    "linkPreviewsHint": "Stránky uvidia tvoju IP adresu",
+    "nowPlaying": "Zdieľať, čo počúvam",
+    "nowPlayingHint": "Ostatní uvidia tvoju aktuálnu skladbu",
+    "unsupported": "Na macOS nie je dostupné",
+    "theme": "Motív",
+    "theme_system": "Systém",
+    "theme_dark": "Tmavý",
+    "theme_light": "Svetlý",
+    "nowGaming": "Zdieľať hru, ktorú hrám",
+    "nowGamingHint": "Ostatní uvidia tvoju aktuálnu hru",
+    "unavailable": "Na tomto systéme nie je dostupné",
+    "overlay": "Overlay",
+    "overlayHint": "Ukazuje, kto hovorí, nad hrami",
+    "editProfile": "Upraviť profil",
+    "editProfileHint": "Meno, avatar a komentár",
+    "register": "Registrovať sa na tomto serveri",
+    "registered": "Registrovaný na tomto serveri ✓",
+    "registerHint": "Ponechá tvoje meno a avatar na tomto serveri",
+    "allSettings": "Všetky nastavenia…",
+    "label": "Rýchle nastavenia",
+    "positional": "Priestorový zvuk",
+    "positionalHint": "Hlasy rozmiestnené v 3D okolo teba",
+    "offerImages": "Ponúkať obrázky v plnej veľkosti",
+    "offerImagesHint": "Ostatní si môžu načítať tvoje originálne obrázky",
+    "loadImages": "Načítavať obrázky v plnej veľkosti",
+    "loadImagesHint": "Sťahovať originálne obrázky od ostatných"
+  }
+}

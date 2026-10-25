@@ -68,6 +68,9 @@ MUMBLE GAME PLUGINS
 The official Mumble game plugins that Mumcord can load at runtime to read
 game positions are developed by the Mumble project and are licensed under
 the same BSD license shown above. They are not part of this repository.
+Mumcord's plugin host (crates/positional/src/plugins/) follows the plugin
+interface definitions of the Mumble project (MumblePlugin.h and the headers
+it includes), used under the same BSD license.
 Mumcord is compatible with Mumble but is not affiliated with or endorsed by
 the Mumble project.
 

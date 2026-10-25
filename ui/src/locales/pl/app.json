@@ -1,0 +1,33 @@
+{
+  "regions": {
+    "servers": "Serwery",
+    "channels": "Kanały",
+    "chat": "Czat",
+    "members": "Członkowie",
+    "userPanel": "Twój status"
+  },
+  "skipLinks": {
+    "label": "Linki pomijające",
+    "chat": "Przejdź do czatu",
+    "channels": "Przejdź do kanałów"
+  },
+  "members": {
+    "show": "Pokaż członków",
+    "hide": "Ukryj członków"
+  },
+  "resize": {
+    "channels": "Zmień rozmiar listy kanałów",
+    "members": "Zmień rozmiar listy członków"
+  },
+  "settings": {
+    "title": "Ustawienia"
+  },
+  "wizard": {
+    "title": "Witaj w Mumcord"
+  },
+  "placeholder": "Wkrótce",
+  "startupError": {
+    "title": "Nie udało się uruchomić Mumcord",
+    "description": "Aplikacja nie mogła wczytać Twoich ustawień. Spróbuj ponownie; jeśli to nie pomoże, uruchom Mumcord ponownie."
+  }
+}

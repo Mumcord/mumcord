@@ -22,6 +22,7 @@ function renderStep(
   availability: PttAvailability | null = { status: "available" },
   linkHandlerActive: boolean | null = false,
   mouseStatus: PttMouseStatus | null = null,
+  ingameOverlaySupported = true,
 ) {
   renderInWizard(
     harness,
@@ -30,6 +31,7 @@ function renderStep(
       availability={availability}
       mouseStatus={mouseStatus}
       linkHandlerActive={linkHandlerActive}
+      ingameOverlaySupported={ingameOverlaySupported}
       focusOnMount={false}
       onBack={vi.fn()}
       onFinish={onFinish}
@@ -46,6 +48,16 @@ function startCapture() {
 }
 
 describe("TalkModeStep", () => {
+  it("offers the in-game overlay choice where it is supported", () => {
+    renderStep();
+    expect(screen.getByRole("checkbox", { name: /overlay inside games/i })).toBeInTheDocument();
+  });
+
+  it("hides the in-game overlay choice where it is unsupported (macOS)", () => {
+    renderStep({ status: "available" }, false, null, false);
+    expect(screen.queryByRole("checkbox", { name: /overlay inside games/i })).toBeNull();
+  });
+
   it("preselects voice activation and finishes with it", async () => {
     renderStep();
     expect(screen.getByRole("radio", { name: /Voice activation/ })).toBeChecked();
@@ -57,6 +69,8 @@ describe("TalkModeStep", () => {
         registerLinkHandler: true,
         autostart: false,
         linkPreviews: true,
+        historySharing: true,
+        ingameOverlay: false,
       });
     });
   });
@@ -99,6 +113,8 @@ describe("TalkModeStep", () => {
         registerLinkHandler: true,
         autostart: false,
         linkPreviews: true,
+        historySharing: true,
+        ingameOverlay: false,
       });
     });
   });

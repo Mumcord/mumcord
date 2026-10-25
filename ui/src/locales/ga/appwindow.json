@@ -1,0 +1,10 @@
+{
+  "close": {
+    "title": "Íoslaghdaigh go dtí an tráidire nó scoir?",
+    "description": "Tá tú ceangailte fós. Má dhéanann tú íoslaghdú, coinníonn Mumcord ar an nguthán thú agus fanann sé i dtráidire an chórais.",
+    "remember": "Cuimhnigh ar mo rogha",
+    "minimize": "Íoslaghdaigh go dtí an tráidire",
+    "quit": "Scoir",
+    "failed": "Níor oibrigh sé sin. Bain triail eile as."
+  }
+}

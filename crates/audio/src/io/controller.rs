@@ -171,8 +171,18 @@ fn make_backend(kind: BackendKind) -> Box<dyn Backend> {
         #[cfg(any(test, feature = "test-backend"))]
         BackendKind::Null => Box::new(super::test_backend::TestBackend::Null),
         #[cfg(any(test, feature = "test-backend"))]
-        BackendKind::File { input, output } => {
-            Box::new(super::test_backend::TestBackend::File { input, output })
+        BackendKind::File { input, output } => Box::new(super::test_backend::TestBackend::File {
+            input,
+            output,
+            stereo: false,
+        }),
+        #[cfg(any(test, feature = "test-backend"))]
+        BackendKind::StereoFile { input, output } => {
+            Box::new(super::test_backend::TestBackend::File {
+                input,
+                output,
+                stereo: true,
+            })
         }
     }
 }
@@ -744,6 +754,53 @@ mod tests {
         }
         let first = |level: f32| samples.iter().position(|s| (*s - level).abs() < 0.01);
         assert!(first(0.5) < first(0.25) && first(0.25) < first(0.125));
+        std::fs::remove_dir_all(&dir).expect("cleanup");
+    }
+
+    /// AC-1.31 E2E: the stereo file backend keeps left and right apart.
+    #[test]
+    fn stereo_file_backend_records_both_channels() {
+        let dir = temp_dir("stereo");
+        let (input, output) = (dir.join("in.wav"), dir.join("out.wav"));
+        write_silence(&input, 1);
+        let kind = BackendKind::StereoFile {
+            input,
+            output: output.clone(),
+        };
+        let mut handles = AudioIo::start_with(kind, None, None).expect("start");
+        wait_active(&handles.events, 2, Duration::from_secs(10));
+        let (left, right): (Frame, Frame) = ([0.5; FRAME_SAMPLES], [0.25; FRAME_SAMPLES]);
+        let deadline = Instant::now() + Duration::from_secs(10);
+        for _ in 0..20 {
+            while !handles.sink.write_stereo(&left, &right) {
+                assert!(Instant::now() < deadline, "playback stuck");
+                std::thread::sleep(Duration::from_millis(1));
+            }
+        }
+        while handles.sink.queued_samples() > 0 {
+            assert!(Instant::now() < deadline, "playback never drained");
+            std::thread::sleep(Duration::from_millis(5));
+        }
+        drop(handles);
+
+        assert_eq!(
+            hound::WavReader::open(&output)
+                .expect("open")
+                .spec()
+                .channels,
+            2
+        );
+        let samples = recorded(&output);
+        let pairs = samples
+            .as_chunks::<2>()
+            .0
+            .iter()
+            .filter(|[l, r]| (l - 0.5).abs() < 0.01 && (r - 0.25).abs() < 0.01)
+            .count();
+        assert!(
+            pairs >= 20 * FRAME_SAMPLES,
+            "only {pairs} left/right pairs in the recording"
+        );
         std::fs::remove_dir_all(&dir).expect("cleanup");
     }
 

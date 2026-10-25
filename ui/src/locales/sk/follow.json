@@ -1,0 +1,63 @@
+{
+  "follow": "Sledovať",
+  "following": "Sleduješ",
+  "unsupported": "Sledovanie kanálov vyžaduje server vo verzii 1.4 alebo novšej.",
+  "unread_one": "{{count}} neprečítaná správa",
+  "unread_few": "{{count}} neprečítané správy",
+  "unread_many": "{{count}} neprečítanej správy",
+  "unread_other": "{{count}} neprečítaných správ",
+  "errors": {
+    "denied": "Server ti nedovoľuje sledovať tento kanál.",
+    "limit": "Na tomto serveri už nemôžeš sledovať ďalšie kanály. Najprv prestaň sledovať iný kanál.",
+    "tooOld": "Tento server je na sledovanie kanálov príliš starý (vyžaduje sa verzia 1.4 alebo novšia).",
+    "notConnected": "Nie si pripojený k serveru.",
+    "generic": "Sledovanie kanála sa nepodarilo. Skús to znova."
+  },
+  "dm": {
+    "title": "Súkromné správy",
+    "unknown": "Neznáma osoba"
+  },
+  "notify": {
+    "channel": "{{name}} v {{channel}}: {{text}}",
+    "private": "{{name}} (súkromne): {{text}}",
+    "more_one": "Ešte {{count}} nová správa",
+    "more_few": "Ešte {{count}} nové správy",
+    "more_many": "Ešte {{count}} novej správy",
+    "more_other": "Ešte {{count}} nových správ"
+  },
+  "history": {
+    "clear": "Vymazať históriu",
+    "title": "Vymazať históriu?",
+    "body": "Uložené správy tejto konverzácie sa natrvalo vymažú z tohto počítača. Ostatní si svoje kópie ponechajú.",
+    "confirm": "Vymazať históriu",
+    "cancel": "Zrušiť",
+    "failed": "Históriu sa nepodarilo vymazať. Skús to znova."
+  },
+  "star": {
+    "follow": "Sledovať {{channel}}",
+    "unfollow": "Prestať sledovať {{channel}}"
+  },
+  "all": {
+    "menu": "Možnosti servera {{server}}",
+    "menuLabel": "Možnosti servera",
+    "follow": "Sledovať všetky kanály",
+    "unfollow": "Prestať sledovať všetky kanály",
+    "working": "Nastavujem sledovanie kanálov…",
+    "followed_one": "Sleduješ {{count}} kanál.",
+    "followed_few": "Sleduješ {{count}} kanály.",
+    "followed_many": "Sleduješ {{count}} kanála.",
+    "followed_other": "Sleduješ {{count}} kanálov.",
+    "skipped_one": "{{count}} preskočený: {{reasons}}.",
+    "skipped_few": "{{count}} preskočené: {{reasons}}.",
+    "skipped_many": "{{count}} preskočeného: {{reasons}}.",
+    "skipped_other": "{{count}} preskočených: {{reasons}}.",
+    "limit": "dosiahnutý limit",
+    "notAllowed": "nepovolené",
+    "noAnswer": "server neodpovedal",
+    "unfollowed": "Už nesleduješ žiadne kanály.",
+    "failed": "Sledovanie všetkých kanálov sa nepodarilo. Skús to znova.",
+    "dismiss": "Zavrieť",
+    "unfollowFailed": "Zrušenie sledovania všetkých kanálov sa nepodarilo. Skús to znova."
+  },
+  "mention": "obsahuje zmienku o tebe"
+}

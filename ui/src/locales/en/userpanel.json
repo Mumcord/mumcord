@@ -3,10 +3,7 @@
   "mute": "Mute microphone",
   "deafen": "Deafen",
   "disconnect": "Disconnect from {{server}}",
-  "settings": "Settings",
-  "menu": "User menu",
-  "menuProfile": "Edit profile",
-  "menuRegister": "Register on this server",
+  "settings": "Quick settings",
   "announce": {
     "muted": "Microphone muted",
     "unmuted": "Microphone unmuted",
@@ -22,7 +19,9 @@
     "reconnecting": "Reconnecting…",
     "connected": "Connected",
     "readOnly": "Read-only",
-    "disconnected": "Not connected"
+    "disconnected": "Not connected",
+    "playing": "Playing {{game}}",
+    "listening": "Listening to {{track}}"
   },
   "profile": {
     "title": "Edit profile",
@@ -56,5 +55,34 @@
     "generic": "Something went wrong. Please try again."
   },
   "ptt": "Push-to-talk: hold {{key}} to talk",
-  "pttNoKey": "Push-to-talk: no key set"
+  "pttNoKey": "Push-to-talk: no key set",
+  "quickSettings": {
+    "linkPreviews": "Link previews and embeds",
+    "linkPreviewsHint": "Sites see your IP address",
+    "nowPlaying": "Share what I'm listening to",
+    "nowPlayingHint": "Others see your current track",
+    "unsupported": "Not available on macOS",
+    "theme": "Theme",
+    "theme_system": "System",
+    "theme_dark": "Dark",
+    "theme_light": "Light",
+    "nowGaming": "Share the game I'm playing",
+    "nowGamingHint": "Others see your current game",
+    "unavailable": "Not available on this system",
+    "overlay": "Overlay",
+    "overlayHint": "Shows who is talking on top of games",
+    "editProfile": "Edit profile",
+    "editProfileHint": "Name, avatar and comment",
+    "register": "Register on this server",
+    "registered": "Registered on this server ✓",
+    "registerHint": "Keeps your name and avatar on this server",
+    "allSettings": "All settings…",
+    "label": "Quick settings",
+    "positional": "Positional audio",
+    "positionalHint": "Voices placed in 3D around you",
+    "offerImages": "Offer full-size images",
+    "offerImagesHint": "Let others load your original images",
+    "loadImages": "Load full-size images",
+    "loadImagesHint": "Fetch original images from others"
+  }
 }

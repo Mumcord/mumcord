@@ -1,0 +1,151 @@
+{
+  "noConversation": "Csatlakozz egy szerverhez, és válassz csatornát a csevegéshez.",
+  "empty": "Még nincsenek üzenetek. Az itt kapott üzenetek ezen a számítógépen mentődnek.",
+  "header": {
+    "channel": "#{{name}}",
+    "channelPrefix": "Csatorna",
+    "privatePrefix": "Privát chat vele:",
+    "unknownPerson": "Ismeretlen személy"
+  },
+  "list": {
+    "today": "Ma",
+    "yesterday": "Tegnap",
+    "label": "Üzenetek itt: {{name}}",
+    "loadOlder": "Régebbi üzenetek betöltése",
+    "loading": "Üzenetek betöltése…",
+    "loadFailed": "A régebbi üzeneteket nem sikerült betölteni. Görgess fel az újrapróbáláshoz.",
+    "loadEarlier": "Korábbi üzenetek betöltése",
+    "syncing": "Korábbi üzenetek keresése más Mumcord-felhasználóknál…",
+    "syncAdded_one": "{{count}} korábbi üzenet hozzáadva más Mumcord-felhasználóktól.",
+    "syncAdded_other": "{{count}} korábbi üzenet hozzáadva más Mumcord-felhasználóktól.",
+    "syncNone": "Nem található korábbi üzenet.",
+    "syncFailed": "Itt nem lehet korábbi üzeneteket betölteni.",
+    "syncedFrom": "{{name}} előzményeiből",
+    "jumpToNewest": "Ugrás a legújabbra",
+    "jumpToNewestUnseen_one": "Ugrás a legújabbra, {{count}} új üzenet",
+    "jumpToNewestUnseen_other": "Ugrás a legújabbra, {{count}} új üzenet"
+  },
+  "format": {
+    "toolbar": "Formázás",
+    "bold": "Félkövér",
+    "italic": "Dőlt",
+    "strike": "Áthúzott",
+    "code": "Beágyazott kód",
+    "codeBlock": "Kódblokk",
+    "link": "Link"
+  },
+  "composer": {
+    "label": "Üzenet neki: {{name}}",
+    "hint": "Enter: küldés, Shift+Enter: új sor. Markdown is működik: **félkövér**, *dőlt*, `kód`, [link](https://…).",
+    "addImage": "Kép hozzáadása",
+    "removeImage": "Kép eltávolítása: {{name}}",
+    "imagePreview": "Küldendő kép: {{name}}",
+    "send": "Küldés",
+    "noPermission": "Nincs jogosultságod írni ebbe a csatornába.",
+    "unavailable": "Ez a csatorna már nem érhető el.",
+    "offline": "{{name}} offline. Akkor írhatsz újra, ha visszajött.",
+    "unnamedImage": "Beillesztett kép"
+  },
+  "tray": {
+    "label": "Küldendő képek",
+    "processing": "Kép előkészítése",
+    "scaled": "Átméretezve {{width}}×{{height}} méretre a szerverkorlát miatt"
+  },
+  "errors": {
+    "tooLong": "Az üzeneted túl hosszú ehhez a szerverhez (legfeljebb {{max}} karakter). Rövidítsd le, és próbáld újra.",
+    "tooLongNoLimit": "Az üzeneted túl hosszú ehhez a szerverhez. Rövidítsd le, és próbáld újra.",
+    "imageTooLarge": "Ez a kép tömörítés után is túl nagy ehhez a szerverhez. Próbálj egy kisebb képet.",
+    "imageWithTextTooLong": "A képes üzenet túl nagy ehhez a szerverhez. Rövidítsd a szöveget, vagy távolítsd el a képet.",
+    "imagesNotAllowed": "Ez a szerver nem engedélyez képeket az üzenetekben.",
+    "notImage": "Ez a fájl nem küldhető el. Használj PNG, JPEG, GIF vagy WebP képet.",
+    "imageUnreadable": "A képet nem sikerült beolvasni. Próbálj egy másik fájlt.",
+    "denied": "A szerver nem engedélyezte ezt az üzenetet.",
+    "deniedWithReason": "A szerver nem engedélyezte ezt az üzenetet: {{reason}}",
+    "notConnected": "Nincs kapcsolat. Csatlakozz újra, és próbáld újra.",
+    "generic": "Az üzenetet nem sikerült elküldeni. Próbáld újra.",
+    "onlyImages": "Csak képek küldhetők.",
+    "sourceTooLarge": "Ez a fájl túl nagy a küldéshez (több mint 25 MB)."
+  },
+  "announce": {
+    "message": "{{name}}: {{text}}",
+    "image": "{{name}} képet küldött",
+    "more_one": "Még {{count}} új üzenet",
+    "more_other": "Még {{count}} új üzenet"
+  },
+  "pinned": {
+    "label": "Csatorna adatai",
+    "showMore": "Több megjelenítése",
+    "showLess": "Kevesebb megjelenítése"
+  },
+  "mention": {
+    "list": "Megemlíthető személyek",
+    "found_one": "{{count}} javasolt személy. Használd a nyílbillentyűket, majd az Entert a beszúráshoz.",
+    "found_other": "{{count}} javasolt személy. Használd a nyílbillentyűket, majd az Entert a beszúráshoz.",
+    "none": "Nincs találat",
+    "mentionsYou": "Megemlít téged",
+    "chipLabel": "{{name}}, említés"
+  },
+  "preview": {
+    "open": "Megnyitás böngészőben",
+    "openLabel": "{{title}} megnyitása böngészőben",
+    "play": "{{title}} lejátszása",
+    "player": "Videólejátszó: {{title}}",
+    "videoTitle": "{{site}} videó",
+    "spotifyTitle": "{{site}} link",
+    "audioPlayer": "Spotify lejátszó: {{title}}",
+    "kind": {
+      "track": "Szám",
+      "album": "Album",
+      "playlist": "Lejátszási lista",
+      "artist": "Előadó",
+      "episode": "Epizód",
+      "show": "Műsor"
+    },
+    "inBrowser": "A böngésződben szól",
+    "card": "Linkelőnézet: {{title}}",
+    "dismiss": "Előnézet elrejtése"
+  },
+  "image": {
+    "loading": "Kép betöltése: {{name}}",
+    "label": "Kép: {{name}}",
+    "view": "Kép megtekintése: {{name}}",
+    "viewMessage": "Kép tőle: {{name}}, megnyitás a nézegetőben",
+    "failed": "A kép nem jeleníthető meg (túl nagy vagy nem érhető el)."
+  },
+  "viewer": {
+    "label": "Képnézegető",
+    "counter": "{{current}} / {{total}}",
+    "zoomIn": "Nagyítás",
+    "zoomOut": "Kicsinyítés",
+    "fit": "Ablakhoz igazítás",
+    "save": "Kép mentése",
+    "saved": "Kép mentve",
+    "saveFailed": "A képet nem sikerült menteni",
+    "fileFilter": "Kép",
+    "openInBrowser": "Megnyitás böngészőben",
+    "close": "Bezárás",
+    "previous": "Előző kép",
+    "next": "Következő kép",
+    "unnamed": "kép",
+    "fullLoading": "Teljes méret betöltése…",
+    "fullProgress": "Teljes méret betöltése… {{percent}} %",
+    "fullUnavailable": "A teljes méret nem érhető el – előnézet látható"
+  },
+  "favorites": {
+    "open": "Kedvenc GIF-ek",
+    "title": "Kedvenc GIF-ek",
+    "save": "Mentés kedvencként",
+    "remove": "Eltávolítás a kedvencek közül",
+    "removeNamed": "{{name}} eltávolítása a kedvencek közül",
+    "send": "{{name}} küldése",
+    "hint": "Nyílbillentyűk: mozgás, Enter: küldés, Delete: eltávolítás, Escape: bezárás.",
+    "empty": "Még nincsenek kedvenceid. Kattints jobb gombbal egy GIF-re a chatben, vagy használd rajta a csillagot, és válaszd a „Mentés kedvencként” lehetőséget. Itt fog megjelenni."
+  },
+  "imageMenu": {
+    "label": "Kép: {{name}}"
+  },
+  "attribution": {
+    "via": "forrás: {{brand}}",
+    "view": "Megtekintés itt: {{brand}}"
+  }
+}

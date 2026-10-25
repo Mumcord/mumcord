@@ -1,4 +1,4 @@
-import { useEffect, useId, useRef, useState, type KeyboardEvent } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { announce } from "../../a11y";
 import { useView } from "../../app/view";
@@ -6,10 +6,12 @@ import { getApi } from "../../api";
 import { ConnectionInfo } from "../connection";
 import { disconnect, useServers } from "../servers";
 import { useAvatars } from "../members/useAvatars";
+import { GAMEPAD_PATH, useNowGaming } from "../nowgaming";
 import { trackLabel, useNowPlaying } from "../nowplaying";
 import { describeError } from "./errors";
 import { ProfileDialog } from "./ProfileDialog";
 import { joinChannel, useReadOnly } from "./readOnly";
+import { QuickSettings, type QuickSettingsState } from "./QuickSettings";
 import { RegisterDialog } from "./RegisterDialog";
 import { useMicLevelFill } from "./useMicLevelFill";
 import { usePushToTalk } from "./usePushToTalk";
@@ -42,13 +44,11 @@ export function UserPanel() {
   const self = state.self;
   const avatarOf = useAvatars(self ? [self] : []);
   const avatarSrc = self ? avatarOf(self) : null;
-  const [menuOpen, setMenuOpen] = useState(false);
+  const [quick, setQuick] = useState<QuickSettingsState | null>(null);
   const [dialog, setDialog] = useState<Dialog>(null);
   const [error, setError] = useState<string | null>(null);
   const servers = useServers();
-  const menuId = useId();
-  const menuButton = useRef<HTMLButtonElement>(null);
-  const menuRef = useRef<HTMLDivElement>(null);
+  const settingsButton = useRef<HTMLButtonElement>(null);
   const previous = useRef<{ mute: boolean; deaf: boolean } | null>(null);
   const micButton = useRef<HTMLButtonElement>(null);
 
@@ -59,6 +59,7 @@ export function UserPanel() {
   const transmitting = self !== null && state.talking.has(self.session);
   // The own shared track (only reported while "Now playing" is on); no session matches -1.
   const ownTrack = useNowPlaying(self?.session ?? -1);
+  const ownGame = useNowGaming(self?.session ?? -1);
   // Push-to-talk and not held: the mic is closed, so show it crossed out and hide the level.
   const pttIdle = ptt.active && !transmitting && !mute && !deaf;
   const showLevel = state.connected && !mute && !deaf && !pttIdle;
@@ -91,10 +92,6 @@ export function UserPanel() {
     [t],
   );
 
-  useEffect(() => {
-    if (menuOpen) menuRef.current?.querySelector<HTMLElement>('[role="menuitem"]')?.focus();
-  }, [menuOpen]);
-
   const run = (action: Promise<unknown>) => {
     setError(null);
     action.catch((e: unknown) => {
@@ -102,36 +99,9 @@ export function UserPanel() {
     });
   };
 
-  const closeMenu = () => {
-    setMenuOpen(false);
-    menuButton.current?.focus();
-  };
-
   const closeDialog = () => {
     setDialog(null);
-    menuButton.current?.focus();
-  };
-
-  const open = (which: Dialog) => {
-    setMenuOpen(false);
-    setDialog(which);
-  };
-
-  const onMenuKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
-    const items = [...event.currentTarget.querySelectorAll<HTMLElement>('[role="menuitem"]')];
-    const index = items.indexOf(document.activeElement as HTMLElement);
-    const move = (to: number) => {
-      event.preventDefault();
-      items[(to + items.length) % items.length]?.focus();
-    };
-    if (event.key === "ArrowDown") move(index + 1);
-    else if (event.key === "ArrowUp") move(index - 1);
-    else if (event.key === "Home") move(0);
-    else if (event.key === "End") move(items.length - 1);
-    else if (event.key === "Escape" || event.key === "Tab") {
-      if (event.key === "Escape") event.preventDefault();
-      closeMenu();
-    }
+    settingsButton.current?.focus();
   };
 
   const name = self?.name ?? state.identityName ?? t("unknownName");
@@ -150,29 +120,26 @@ export function UserPanel() {
           : readOnly
             ? t("status.readOnly")
             : null;
-  // In the normal connected state the status line shows the own playing track, if any.
+  // In the normal connected state the status line shows the own game or playing track. The game
+  // wins the short line (it says more about being busy); the tooltip names both.
   const track = status === null && ownTrack?.track.playing ? trackLabel(ownTrack.track) : null;
-  const statusText = status ?? track ?? (serverLabel || t("status.connected"));
+  const game = status === null && ownGame ? ownGame.game.name : null;
+  const statusText = status ?? game ?? track ?? (serverLabel || t("status.connected"));
+  const statusTitle =
+    game !== null && track !== null
+      ? `${t("status.playing", { game })} · ${t("status.listening", { track })}`
+      : statusText;
 
   return (
     <div className="userpanel">
       <div className="userpanel__identity">
-        {/* Named by its content, the visible name and status line, so speech input users can say
-            what they see (WCAG 2.5.3 label in name). */}
-        <button
-          ref={menuButton}
-          type="button"
-          className="userpanel__user"
-          aria-haspopup="menu"
-          aria-expanded={menuOpen}
-          aria-controls={menuOpen ? menuId : undefined}
-          disabled={!connected}
-          onClick={() => {
-            setMenuOpen((o) => !o);
-          }}
+        {/* Plain text, not a control: profile edits live in the quick settings (gear). */}
+        <div
+          className={
+            connected ? "userpanel__profile" : "userpanel__profile userpanel__profile--offline"
+          }
         >
-          {/* The initial is drawn by CSS from data-initial, not as DOM text, so the button shows no
-              visible text that is missing from its name (WCAG 2.5.3). */}
+          {/* The initial is drawn by CSS from data-initial, not as DOM text. */}
           <span
             className="userpanel-avatar"
             data-initial={avatarSrc ? undefined : name.slice(0, 1).toUpperCase()}
@@ -184,21 +151,28 @@ export function UserPanel() {
             <span className="userpanel__name" title={name}>
               {name}
             </span>{" "}
-            <span className="userpanel__status" title={statusText}>
-              {track && (
+            <span className="userpanel__status" title={statusTitle}>
+              {(game ?? track) !== null && (
                 <svg
                   className="userpanel__status-icon"
                   viewBox="0 0 24 24"
                   aria-hidden="true"
                   focusable="false"
                 >
-                  <path d={MUSIC} fill="none" stroke="currentColor" strokeWidth="2" />
+                  <path
+                    d={game !== null ? GAMEPAD_PATH : MUSIC}
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
                 </svg>
               )}
               {statusText}
             </span>
           </span>
-        </button>
+        </div>
       </div>
       <div className="userpanel__row">
         <button
@@ -250,51 +224,49 @@ export function UserPanel() {
         ) : null}
         {connected ? <ConnectionInfo className="userpanel__toggle" /> : null}
         <button
+          ref={settingsButton}
           type="button"
           className="userpanel__toggle"
           aria-label={t("settings")}
-          onClick={openSettings}
+          title={t("settings")}
+          aria-haspopup="menu"
+          onClick={(event) => {
+            const box = event.currentTarget.getBoundingClientRect();
+            setQuick({ x: box.left, y: box.bottom, opener: event.currentTarget });
+          }}
+          onContextMenu={(event) => {
+            event.preventDefault();
+            setQuick({ x: event.clientX, y: event.clientY, opener: event.currentTarget });
+          }}
+          onKeyDown={(event) => {
+            if (event.key !== "ContextMenu" && !(event.key === "F10" && event.shiftKey)) return;
+            event.preventDefault();
+            const box = event.currentTarget.getBoundingClientRect();
+            setQuick({ x: box.left, y: box.bottom, opener: event.currentTarget });
+          }}
         >
           <Icon d={GEAR} />
         </button>
       </div>
-      {menuOpen ? (
-        <div
-          tabIndex={-1}
-          id={menuId}
-          ref={menuRef}
-          role="menu"
-          className="userpanel__menu"
-          aria-label={t("menu")}
-          onKeyDown={onMenuKeyDown}
-        >
-          <div role="none">
-            <button
-              type="button"
-              role="menuitem"
-              tabIndex={-1}
-              onClick={() => {
-                open("profile");
-              }}
-            >
-              {t("menuProfile")}
-            </button>
-          </div>
-          {state.canRegister ? (
-            <div role="none">
-              <button
-                type="button"
-                role="menuitem"
-                tabIndex={-1}
-                onClick={() => {
-                  open("register");
-                }}
-              >
-                {t("menuRegister")}
-              </button>
-            </div>
-          ) : null}
-        </div>
+      {quick ? (
+        <QuickSettings
+          menu={quick}
+          account={{
+            connected: state.connected,
+            registered: self?.registered ?? false,
+            canRegister: state.canRegister,
+            onEditProfile: () => {
+              setDialog("profile");
+            },
+            onRegister: () => {
+              setDialog("register");
+            },
+          }}
+          onOpenSettings={openSettings}
+          onClose={() => {
+            setQuick(null);
+          }}
+        />
       ) : null}
       {connected && readOnly && self ? (
         <div className="userpanel-readonly" role="status">

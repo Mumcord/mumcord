@@ -1,0 +1,15 @@
+{
+  "title": "Draugai",
+  "item": "{{name}}, {{status}}",
+  "online": "Prisijungęs (-usi)",
+  "onlineIn": "Prisijungęs (-usi) kanale {{channel}}",
+  "onlineOnServer": "Prisijungęs (-usi) serveryje {{server}}",
+  "offline": "Neprisijungęs (-usi)",
+  "lastSeen": "Neprisijungęs (-usi), paskutinį kartą matytas (-a) {{when}}",
+  "friend": "Draugas",
+  "friendHint": "Rodo, kada jis (ji) prisijungęs (-usi), ir išsaugo jūsų privatų pokalbį.",
+  "noCertificate": "Žmonės be sertifikato negali būti draugais, nes Mumcord negalėtų jų vėl atpažinti.",
+  "add": "Pridėti draugą",
+  "remove": "Pašalinti draugą",
+  "failed": "Nepavyko pakeisti draugo būsenos. Bandyk dar kartą."
+}

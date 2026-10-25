@@ -61,11 +61,31 @@ export async function chooseFileInNativeDialog(path: string): Promise<void> {
   await runOk("xdotool", ["key", "Return"]);
 }
 
-/** Wizard step 2 → 3 → Finish with all defaults. */
+/** Number of first-start wizard steps; the last one is the talk mode step with Finish. */
+export const WIZARD_STEPS = 4;
+
+/** The wizard's progress line for step `n`. */
+export function wizardStep(n: number): string {
+  return `Step ${String(n)} of ${String(WIZARD_STEPS)}`;
+}
+
+/**
+ * After Next on the identity step: Next through the steps in between with their defaults until
+ * the last step shows. Every spec walks the wizard through here, so a new step needs one edit.
+ */
+export async function nextToLastWizardStep(): Promise<void> {
+  for (let step = 2; step < WIZARD_STEPS; step++) {
+    // Leaving step 1 generates the RSA-2048 identity; in the unoptimised debug build the random
+    // prime search takes anywhere from about 1 s to well over 15 s on a 2-core runner.
+    await waitForText(wizardStep(step), step === 2 ? 120_000 : 15_000);
+    await button("Next").click();
+  }
+  await waitForText(wizardStep(WIZARD_STEPS));
+}
+
+/** After Next on the identity step: all remaining steps with defaults, Finish, main window. */
 export async function finishWizardWithDefaults(): Promise<void> {
-  await waitForText("Step 2 of 3");
-  await button("Next").click();
-  await waitForText("Step 3 of 3");
+  await nextToLastWizardStep();
   await button("Finish").click();
   await mainWindowMarker().waitForExist({ timeout: 30_000 });
 }

@@ -1132,3 +1132,289 @@ Findings (not legal advice): GIPHY requires a visible "Powered by GIPHY" mark wh
 ✍️ Note: Requested in chat during /dev.
 
 ---
+
+#### QA.54 Real in-game overlay (stage 1c)? `◉`
+Research: Discord and Overwolf inject code into the game and draw into its frames (works in exclusive fullscreen, but anti-cheat systems may flag it; Discord has no overlay on Linux/macOS). On Linux, MangoHud uses a Vulkan layer (plus an OpenGL preload) that games load themselves.
+
+- [x] **In-game overlay drawn inside the game: Linux via a Vulkan layer (MangoHud-style, with an OpenGL fallback via preload), Windows via a hook into the game's graphics API (Discord-style). It appears only in games – never on the desktop – and is configurable per game (on/off, position, size, opacity, content); games without an entry follow a default (off). A clear anti-cheat warning is shown before enabling it for a game.** The transparent on-top window (B32) remains the fallback where the in-game overlay is off or unsupported (macOS, unsupported graphics APIs).
+- [ ] Window overlay only.
+
+✍️ Note: Requested in chat during /dev ("auf linux wie mit mangohud, windows wie bei discord, aber pro spiel konfigurierbar und das soll auch nur in spielen passieren").
+
+---
+
+#### QA.55 Turning the in-game overlay on (stage 1c)? `◉`
+
+- [x] **The in-game overlay starts automatically when a game starts. A global setting decides: "Off" (it never starts, no layer/hook is active) or "On" (it starts in every game unless that game is switched off in its per-game settings). The first-start wizard offers the choice (default off) with an example screenshot of the overlay in a game; the anti-cheat note is shown there too.**
+
+✍️ Note: Requested in chat during /dev.
+
+---
+
+#### QA.56 Games that forbid overlays (stage 1c)? `◉`
+
+- [x] **A bundled list of games known to ban or block third-party overlays/injection (typically kernel-level anti-cheat: e.g. Riot Vanguard, FACEIT, Ricochet, EasyAntiCheat/BattlEye titles with explicit overlay rules) – with a source/reason per entry. These games have the in-game overlay off by default even when the global setting is "On"; the per-game settings show why, and turning it on requires an explicit confirmation with a stronger warning.** The list is curated and updatable with releases.
+
+✍️ Note: Requested in chat during /dev.
+
+---
+
+#### QA.57 Thumbnail in the chat, full image in the viewer (stage 1d)? `◉`
+The server's image message limit (default 128 KB) caps what can be sent through the chat.
+
+- [x] **Stage 1d: the sender's Mumcord sends a thumbnail through the chat (fits the server limit; what official clients see) and keeps the full image locally. When a Mumcord recipient opens it in the image viewer, Mumcord fetches the full-resolution image from the sender on demand via plugin data (chunked, size-capped, rate-limited, checked against a hash announced with the message); while loading, the thumbnail is shown upscaled with a progress hint. If the sender is offline or the transfer fails, the viewer keeps the thumbnail.** A peer-to-peer transfer can replace the plugin-data path later.
+- [ ] Thumbnail only.
+
+✍️ Note: Requested in chat during /dev.
+
+---
+
+#### QA.58 Overlay on macOS? `◉`
+
+- [x] **No overlay on macOS at all – neither in-game nor the window overlay. The overlay settings section, tray item and wizard choice are hidden on macOS.**
+
+✍️ Note: Requested in chat during /dev ("auch kein Fenster").
+
+---
+
+#### QA.59 Polish requested during stage 1c (recorded together)? `◉`
+These requests were built as tasks and are recorded here so the specification matches.
+
+- [x] **@mentions as interactive chips** (stage 1c): mentions of people on the server render as chips with hover preview, click for the profile card and right-click for the person menu.
+- [x] **Quick settings:** a normal click on the gear opens them (right-click too); rows for link previews, now playing, now gaming, overlay, theme (System/Dark/Light), "Edit profile" and "Register on this server" (only when allowed; "Registered ✓" afterwards); the full settings via "All settings…". Clicking the own name in the user panel no longer opens anything.
+- [x] **Pinned person card:** private message and full profile as icon buttons next to the close ×.
+- [x] **Less rounded design:** smaller corner radii for cards and panels (buttons keep pill shapes).
+- [x] **KDE Wayland window overlay helper:** one-click KWin window rule ("Mumcord overlay": keep above, position, size), remove it again, open KDE window rules, or jump to compatibility mode.
+- [x] **Sent images use the server limit fully:** largest edge that fits (up to 1920 px), PNG or JPEG – whichever gives the bigger image.
+- [x] **Own entry shows the Mumcord badge.**
+- [x] **Settings:** a search field for sections and individual settings (jumps to and highlights the control), a sidebar that does not scroll with the content, and an "Accessibility" section with switches for visible keyboard hints, screen-reader announcements and skip links (all on by default).
+
+✍️ Note: Requested in chat during /dev.
+
+---
+
+#### QA.60 Overlay shows talkers from other channels? `◉`
+Bug reported while testing stage 1c: with the overlay on, people talking in other channels appeared too.
+
+- [x] **Only the current channel:** the overlay (window and in-game) shows only people talking in the user's current channel. Talkers elsewhere never appear; when the user switches channels, the list follows.
+
+✍️ Note: Requested in chat during /dev.
+
+---
+
+#### QA.61 Overlay captures the mouse on X11? `◉`
+Reported while testing stage 1c: in compatibility mode, the push-to-talk mouse button only worked while the Mumcord window was focused. Clarified: this is the documented XWayland/KDE behaviour (FR-1.48) – KDE only passes mouse buttons to X11 apps in the background when "Legacy X11 App Support" allows it. The overlay itself was verified click-through.
+
+- [x] **Never capture input:** the overlay is click-through on X11 too (and in compatibility mode); the mouse and clicks reach every other window.
+
+✍️ Note: Requested in chat during /dev.
+
+---
+
+#### QA.62 Switches in the person menu? `◉`
+Requested while testing stage 1c.
+
+- [x] **Switch rows like quick settings:** in the right-click menu on a person, every on/off action (local mute and similar) is a switch row that shows the current state and toggles in place, instead of a label that flips between "Mute" and "Unmute".
+
+✍️ Note: Requested in chat during /dev.
+
+---
+
+#### QA.63 Full profile is confusing? `◉`
+Reported while testing stage 1c: in the full profile, people press "Send private message" when they want to save their changes.
+
+- [x] **Redesign now (stage 1c, was 1d):** the planned full profile redesign (FR-1.63) is built now. Local settings apply instantly with a short "Saved" confirmation, there is no save step, and actions like "Private message" sit in the header as clearly labelled actions. The friend switch follows with the friends feature in stage 1d.
+
+✍️ Note: Requested in chat during /dev.
+
+---
+
+#### QA.64 Icons in the person menu? `◉`
+Requested while testing stage 1c.
+
+- [x] **Leading icons:** every entry in the right-click menu on a person has an icon – "View profile", "Private message", "Mute for me" and the volume slider – matching the icons used on the pinned card.
+- [x] **Order:** "View profile", "Private message", a separator line, then the settings ("Mute for me", volume).
+- [x] **Clean volume row:** first line "Volume" with the current value right-aligned (e.g. 100%), full-width slider underneath.
+
+✍️ Note: Requested in chat during /dev.
+
+---
+
+#### QA.65 Changelog and support links in the app? `◉`
+Requested while testing stage 1c.
+
+- [x] **What's new:** Settings → About links to the changelog on mumcord.app (German page for German, English otherwise), anchored to the running version.
+- [x] **Support:** "Report a bug" and "Request a feature" open the GitHub issue templates.
+- [x] **No commercial-license note in the app:** the line "Commercial licenses: …" is removed from About (see QA.66).
+
+✍️ Note: Requested in chat during /dev.
+
+---
+
+#### QA.66 Drop the commercial license? `◉`
+Decided during stage 1c; supersedes the commercial part of QA.51.
+
+- [x] **AGPL-3.0-only:** there is no commercial license any more. COMMERCIAL.md and every mention of a commercial license are removed from the repository and the app (the website is maintained by the user).
+- [x] **CLA stays:** contributors still sign the CLA, so the project keeps the option to relicense later (e.g. for app-store distribution or code signing) without asking every contributor.
+- [x] **Older versions:** releases up to v0.1.1 stay MIT.
+
+✍️ Note: Requested in chat during /dev.
+
+---
+
+#### QA.67 Link to the KDE X11 setting? `◉`
+Requested after the push-to-talk mouse button only worked while Mumcord was focused in compatibility mode.
+
+- [x] **Ask and apply:** on KDE, "Allow mouse buttons" asks for permission in plain language and, once confirmed, changes the KDE setting itself (undoable); it shows when mouse buttons are already allowed.
+- [x] **Fallback:** a button opens System Settings → Legacy X11 App Support directly.
+
+✍️ Note: Requested in chat during /dev.
+
+---
+
+#### QA.68 Windows in-game overlay without a Windows test PC? `◉`
+The Windows graphics hook can only be verified on a real Windows PC, which is not available right now.
+
+- [x] **Wait for testing:** the Windows in-game overlay is built once it can be tested on Windows. Until then Windows uses the window overlay; v0.3.0 does not wait for it.
+
+✍️ Note: Requested in chat during /dev.
+
+---
+
+#### QA.69 Publish history summaries on connect? `◉`
+Decided while building the history sync core.
+
+- [x] **Only on request:** clients send their per-channel availability summaries only when a joining client asks, instead of publishing them on connect and on every change. This keeps plugin-data traffic on the server low; the joining client asks first and then fetches from the best holders.
+
+✍️ Note: Requested in chat during /dev.
+
+---
+
+#### QA.70 Positional audio switch and status? `◉`
+Requested for stage 1c (positional audio).
+
+- [x] **Switch in quick settings and settings:** positional audio can be turned on/off in both places (one shared setting).
+- [x] **Who uses it:** a small "3D" icon next to everyone currently sending positional data – including yourself – in the channel tree, member list and profile card. Detected from the position in voice packets, so official Mumble clients show it too; it disappears a few seconds after positions stop.
+
+✍️ Note: Requested in chat during /dev.
+
+---
+
+#### QA.71 How to ship positional audio and plugins? `◉`
+Decided before the v0.3.0 release.
+
+- [x] **Beta:** positional audio and the game plugins carry a "Beta" badge in settings and quick settings, with a short hint that results depend on the game.
+- [x] **Full-size images on demand are Beta too:** a "Beta" badge in the image viewer next to the full-size loading/status line.
+- [x] **Communication:** release notes and wiki call both Beta and say the in-game overlay on Windows is coming later; until then Windows uses the window overlay.
+
+✍️ Note: Requested in chat during /dev.
+
+---
+
+#### QA.72 Switch off full-size images? `◉`
+Requested before the v0.3.0 release.
+
+- [x] **Two switches in Settings → Chat:** "Offer my full-size images" (off: only the thumbnail is sent, no original is kept or served) and "Load full-size images from others" (off: never request originals). Both on by default.
+
+✍️ Note: Requested in chat during /dev.
+
+---
+
+#### QA.73 Beta badge in quick settings looks off? `◉`
+Feedback while testing the Beta labels.
+
+- [x] **Collapsible Beta group:** in quick settings, Beta features (positional audio and the two full-size image switches) move into a collapsible "Beta" group (collapsed by default, state remembered); the rows themselves carry no badge.
+
+✍️ Note: Requested in chat during /dev.
+
+---
+
+#### QA.74 What moves from Epic 1 to Epic 2? `◉`
+Decided before the v0.3.0 release: everything from Epic 1 that will not make v0.3.0 is carried over to Epic 2.
+
+- [x] **In-game overlay on Windows** (DXGI/D3D11/D3D12 hook; waits for a Windows test PC, QA.68).
+- [x] **HDR10/PQ colours** for the in-game overlay (scRGB is handled; HDR10 shows but too bright).
+- [x] **Borderless fullscreen games:** some window managers stack them above keep-above windows – verify on KDE/GNOME and fix if needed.
+- [x] **Flatpak Steam:** check and support the in-game overlay there.
+- [x] **"Now gaming" join target from Mumble Link** game context.
+- [x] **Cancel full-size image transfers** when the viewer closes.
+- [x] **Leaving Beta:** verify the official game plugins with real games; then positional audio, plugins and full-size images drop the Beta label.
+
+✍️ Note: Requested in chat during /dev.
+
+---
+
+#### QA.75 More UI languages? `◉`
+Requested for the v0.3.0 release.
+
+- [x] **All 24 official EU languages:** Bulgarian, Croatian, Czech, Danish, Dutch, English, Estonian, Finnish, French, German, Greek, Hungarian, Irish, Italian, Latvian, Lithuanian, Maltese, Polish, Portuguese, Romanian, Slovak, Slovenian, Spanish, Swedish.
+- [x] **Picker:** each language shown in its own name (endonym), OS language used when supported.
+- [x] **Quality:** translations are made by the team without native review; the release notes invite corrections via a GitHub issue.
+
+✍️ Note: Requested in chat during /dev.
+
+---
+
+#### QA.76 Sign the Windows build? `◉`
+Possible now that Mumcord is AGPL-3.0-only (SignPath Foundation requires OSI licenses without commercial dual licensing).
+
+- [x] **SignPath Foundation:** free code signing for open source; the certificate is issued to SignPath Foundation.
+- [x] **Repo prepares:** a "Code signing policy" page (roles: committers/reviewers/approvers, MFA), a privacy statement covering every network connection (servers the user adds, link previews, images and GIFs from chat links), fixed product name/version metadata in the Windows binaries, and a release-workflow step that submits the installer for signing only when SignPath secrets exist.
+- [x] **Maintainer does:** applies at signpath.org, enables MFA on GitHub and SignPath, adds the secrets, approves each signing request, and links the code signing policy on the website's home and download pages.
+- [x] **Until accepted** releases stay unsigned (v0.3.0 may ship unsigned).
+
+✍️ Note: Requested in chat during /dev.
+
+---
+
+#### QA.77 Sign the macOS build? `◉`
+SignPath does not cover Apple; macOS needs an Apple Developer ID.
+
+- [x] **Apple Developer Program** membership of the maintainer (yearly fee; individual membership shows the maintainer's name as developer).
+- [x] **Developer ID Application certificate + notarization** (App Store Connect API key), so Gatekeeper opens Mumcord without warnings.
+- [x] **Repo prepares** the release workflow: sign and notarize the universal .dmg only when the Apple secrets exist; otherwise build unsigned as today. Secrets never go into the repo.
+
+✍️ Note: Requested in chat during /dev.
+
+---
+
+#### QA.78 Where to show the privacy statement? `◉`
+SignPath requires software that contacts third-party sites by default to show its privacy policy to the user.
+
+- [x] **In the first-start wizard:** a short privacy step (what Mumcord connects to and when, no telemetry) with a link to the full PRIVACY.md, placed before the link-preview choice. Link previews stay on by default. Translated into all supported languages.
+
+✍️ Note: Requested in chat during /dev.
+
+---
+
+#### QA.79 Azure instead of SignPath? `◉`
+Decided before the v0.3.0 release; supersedes QA.76.
+
+- [x] **Azure Artifact Signing** (formerly Trusted Signing) under the maintainer's sole proprietorship "Tobias Vorwachs Einzelunternehmen" (fuewa.systems): individuals outside the US/Canada are not eligible, organizations in the EU are. Basic plan, paid Azure subscription; the company's validated legal name appears as publisher.
+- [x] **Fully automatic:** the release workflow signs the app exe and the installer during the Tauri bundle step, authenticating with GitHub OIDC (no long-lived secret), only when the Azure settings exist; otherwise unsigned as before.
+- [x] **SignPath flow removed;** the code signing policy and privacy statement stay (QA.78 wizard step stays).
+
+✍️ Note: Requested in chat during /dev.
+
+---
+
+#### QA.80 Friends placement and joining people? `◉`
+Requested while testing stage 1d.
+
+- [x] **Friends in the right column:** the Friends list sits in the right-hand column with the member list and shows "In ‹channel›" for online friends (plus the server name if it's another server).
+- [x] **Join channel:** the right-click menu on another person (and on friends) offers "Join ‹channel›"; hidden when already there, disabled with a reason when not permitted; switches server first for friends elsewhere.
+
+✍️ Note: Requested in chat during /dev.
+
+---
+
+#### QA.81 Member column sections? `◉`
+Requested while testing stage 1d.
+
+- [x] **Collapsible like Friends:** "In ‹channel›" gets the same collapsible header as Friends (open by default).
+- [x] **In other channels:** a new section with everyone else on the server, labelled by channel, collapsed by default. Open/closed state is remembered.
+- [x] **Left column label:** a "Server overview" label above the channel tree, styled like the "Direct messages" label.
+
+✍️ Note: Requested in chat during /dev.
+
+---

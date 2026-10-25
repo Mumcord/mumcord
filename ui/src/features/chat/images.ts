@@ -1,21 +1,22 @@
 /**
  * Pasted/dropped images are sent inline as `data:` URLs, so they have to fit the server's image
- * message limit (FR-1.30). Large images are scaled down and re-encoded as JPEG until they fit;
+ * message limit (FR-1.30). Large images are scaled down (as PNG or JPEG, whichever keeps more detail) until they fit;
  * if even the smallest version is too big, the image is refused.
  */
 import type { ServerInfo } from "../../api";
 
 /**
- * Used when the server reports 0 ("unlimited") for image messages: 128 KiB, the default
- * `imagemessagelength` of the Mumble server. Keeps messages small enough for every client.
+ * Used when the server reports 0 ("unlimited") for image messages: 1 MiB, small enough
+ * that other clients do not choke on the message.
  */
-export const UNLIMITED_IMAGE_FALLBACK = 128 * 1024;
+export const UNLIMITED_IMAGE_FALLBACK = 1024 * 1024;
 
-/** Largest edge of a sent image; bigger pictures are scaled down first. */
-export const MAX_IMAGE_EDGE = 600;
+/** Largest edge of a sent image; bigger pictures are scaled down to at most this. */
+export const MAX_IMAGE_EDGE = 1920;
+/** Larger files are refused before reading; decoding them would stall the UI. */
+export const MAX_SOURCE_BYTES = 25 * 1024 * 1024;
 const MIN_IMAGE_EDGE = 64;
-const QUALITIES = [0.85, 0.7, 0.55, 0.4];
-const SHRINK = 0.75;
+const JPEG_QUALITY = 0.85;
 
 const SENDABLE_TYPES = ["image/png", "image/jpeg", "image/gif", "image/webp"];
 
@@ -37,34 +38,89 @@ export function messageLimits(info: ServerInfo | null): MessageLimits {
   };
 }
 
-/** Encodes the image at the given size and JPEG quality and returns a `data:` URL. */
-export type Encoder = (width: number, height: number, quality: number) => Promise<string>;
+export type ImageFormat = "png" | "jpeg";
+
+/** Encodes the image at the given size and returns a `data:` URL (quality only applies to JPEG). */
+export type Encoder = (
+  width: number,
+  height: number,
+  format: ImageFormat,
+  quality: number,
+) => Promise<string>;
+
+/** Smallest steps of the edge search: stops when the bracket is this fine (fraction of the edge). */
+const SEARCH_PRECISION = 0.04;
+
+async function largestFit(
+  size: { width: number; height: number },
+  maxEdge: number,
+  encode: (width: number, height: number) => Promise<string>,
+  budget: number,
+): Promise<{ edge: number; url: string } | null> {
+  const longest = Math.max(size.width, size.height);
+  const attempt = async (edge: number) => {
+    const scale = edge / longest;
+    const url = await encode(
+      Math.max(1, Math.round(size.width * scale)),
+      Math.max(1, Math.round(size.height * scale)),
+    );
+    return url.length <= budget ? url : null;
+  };
+  const top = await attempt(maxEdge);
+  if (top !== null) return { edge: maxEdge, url: top };
+  let best: { edge: number; url: string } | null = null;
+  let low = MIN_IMAGE_EDGE;
+  let high = maxEdge;
+  // Binary search on the edge: about six encodes find the largest size within a few percent.
+  while (high - low > Math.max(8, high * SEARCH_PRECISION)) {
+    const edge = Math.round((low + high) / 2);
+    const url = await attempt(edge);
+    if (url !== null) {
+      best = { edge, url };
+      low = edge;
+    } else {
+      high = edge;
+    }
+  }
+  if (best === null) {
+    const url = await attempt(low);
+    if (url !== null) best = { edge: low, url };
+  }
+  return best;
+}
 
 /**
- * Finds the largest, best-quality encoding whose `data:` URL is at most `budget` characters.
- * Returns `null` when nothing fits.
+ * Finds the largest encoding whose `data:` URL is at most `budget` characters. PNG (lossless,
+ * best for screenshots) wins when it fits at least as large as the JPEG; otherwise JPEG
+ * (best for photos). Returns `null` when nothing fits.
  */
 export async function fitImage(
   size: { width: number; height: number },
   encode: Encoder,
   budget: number,
-): Promise<string | null> {
-  let edge = Math.min(MAX_IMAGE_EDGE, Math.max(size.width, size.height));
-  while (edge >= MIN_IMAGE_EDGE) {
-    const scale = edge / Math.max(size.width, size.height);
-    const width = Math.max(1, Math.round(size.width * scale));
-    const height = Math.max(1, Math.round(size.height * scale));
-    for (const quality of QUALITIES) {
-      const url = await encode(width, height, quality);
-      if (url.length <= budget) return url;
-    }
-    edge = Math.floor(edge * SHRINK);
-  }
-  return null;
+  maxEdge: number = MAX_IMAGE_EDGE,
+): Promise<{ url: string; width: number; height: number } | null> {
+  const longest = Math.max(size.width, size.height);
+  const cap = Math.min(maxEdge, longest);
+  const png = await largestFit(size, cap, (w, h) => encode(w, h, "png", 1), budget);
+  // A full-size PNG that fits cannot be beaten, so skip the JPEG search.
+  const jpeg =
+    png !== null && png.edge === cap
+      ? null
+      : await largestFit(size, cap, (w, h) => encode(w, h, "jpeg", JPEG_QUALITY), budget);
+  const winner = png !== null && (jpeg === null || png.edge >= jpeg.edge) ? png : jpeg;
+  if (winner === null) return null;
+  const scale = winner.edge / longest;
+  return {
+    url: winner.url,
+    width: Math.max(1, Math.round(size.width * scale)),
+    height: Math.max(1, Math.round(size.height * scale)),
+  };
 }
 
 export type ImageResult =
-  { ok: true; dataUrl: string } | { ok: false; reason: "notImage" | "unreadable" | "tooLarge" };
+  | { ok: true; dataUrl: string; width: number; height: number; scaled: boolean }
+  | { ok: false; reason: "notImage" | "unreadable" | "tooLarge" | "sourceTooLarge" };
 
 function readAsDataUrl(file: Blob): Promise<string> {
   return new Promise((resolve, reject) => {
@@ -87,17 +143,25 @@ async function decode(url: string): Promise<HTMLImageElement> {
 }
 
 function canvasEncoder(image: HTMLImageElement): Encoder {
-  return (width, height, quality) => {
+  return async (width, height, format, quality) => {
     const canvas = document.createElement("canvas");
     canvas.width = width;
     canvas.height = height;
     const context = canvas.getContext("2d");
-    if (!context) return Promise.reject(new Error("canvas unavailable"));
-    // JPEG has no transparency; a white background matches how most clients show PNGs.
-    context.fillStyle = "#ffffff";
-    context.fillRect(0, 0, width, height);
+    if (!context) throw new Error("canvas unavailable");
+    if (format === "jpeg") {
+      // JPEG has no transparency; a white background matches how most clients show PNGs.
+      context.fillStyle = "#ffffff";
+      context.fillRect(0, 0, width, height);
+    }
+    context.imageSmoothingQuality = "high";
     context.drawImage(image, 0, 0, width, height);
-    return Promise.resolve(canvas.toDataURL("image/jpeg", quality));
+    // toBlob encodes off the main thread, so the UI stays responsive.
+    const blob = await new Promise<Blob | null>((resolve) => {
+      canvas.toBlob(resolve, `image/${format}`, quality);
+    });
+    if (!blob) throw new Error("encoding failed");
+    return readAsDataUrl(blob);
   };
 }
 
@@ -107,6 +171,7 @@ function canvasEncoder(image: HTMLImageElement): Encoder {
  */
 export async function prepareImage(file: Blob, budget: number): Promise<ImageResult> {
   if (!SENDABLE_TYPES.includes(file.type)) return { ok: false, reason: "notImage" };
+  if (file.size > MAX_SOURCE_BYTES) return { ok: false, reason: "sourceTooLarge" };
   let original: string;
   let image: HTMLImageElement;
   try {
@@ -118,11 +183,18 @@ export async function prepareImage(file: Blob, budget: number): Promise<ImageRes
   }
   const { naturalWidth: width, naturalHeight: height } = image;
   if (Math.max(width, height) <= MAX_IMAGE_EDGE && original.length <= budget) {
-    return { ok: true, dataUrl: original };
+    return { ok: true, dataUrl: original, width, height, scaled: false };
   }
   try {
     const fitted = await fitImage({ width, height }, canvasEncoder(image), budget);
-    return fitted ? { ok: true, dataUrl: fitted } : { ok: false, reason: "tooLarge" };
+    if (!fitted) return { ok: false, reason: "tooLarge" };
+    return {
+      ok: true,
+      dataUrl: fitted.url,
+      width: fitted.width,
+      height: fitted.height,
+      scaled: fitted.width !== width || fitted.height !== height,
+    };
   } catch (error) {
     console.error("Compressing an image for a chat message failed", error);
     return { ok: false, reason: "unreadable" };

@@ -1,0 +1,59 @@
+{
+  "follow": "Sekot",
+  "following": "Seko",
+  "unsupported": "Kanālu sekošanai nepieciešams serveris ar versiju 1.4 vai jaunāku.",
+  "unread_zero": "{{count}} nelasītu ziņu",
+  "unread_one": "{{count}} nelasīta ziņa",
+  "unread_other": "{{count}} nelasītas ziņas",
+  "errors": {
+    "denied": "Serveris neļauj tev sekot šim kanālam.",
+    "limit": "Šajā serverī vairs nevari sekot citiem kanāliem. Vispirms pārtrauc sekot kādam citam kanālam.",
+    "tooOld": "Šis serveris ir pārāk vecs kanālu sekošanai (nepieciešama versija 1.4 vai jaunāka).",
+    "notConnected": "Tu neesi savienots ar serveri.",
+    "generic": "Sekošana šim kanālam neizdevās. Lūdzu, mēģini vēlreiz."
+  },
+  "dm": {
+    "title": "Tiešās ziņas",
+    "unknown": "Nezināms cilvēks"
+  },
+  "notify": {
+    "channel": "{{name}} kanālā {{channel}}: {{text}}",
+    "private": "{{name}} (privāti): {{text}}",
+    "more_zero": "vēl {{count}} jaunu ziņu",
+    "more_one": "vēl {{count}} jauna ziņa",
+    "more_other": "vēl {{count}} jaunas ziņas"
+  },
+  "history": {
+    "clear": "Dzēst vēsturi",
+    "title": "Dzēst vēsturi?",
+    "body": "Tas neatgriezeniski izdzēsīs šīs sarakstes saglabātās ziņas no šī datora. Citiem cilvēkiem paliek viņu kopijas.",
+    "confirm": "Dzēst vēsturi",
+    "cancel": "Atcelt",
+    "failed": "Vēsturi neizdevās izdzēst. Lūdzu, mēģini vēlreiz."
+  },
+  "star": {
+    "follow": "Sekot kanālam {{channel}}",
+    "unfollow": "Pārtraukt sekot kanālam {{channel}}"
+  },
+  "all": {
+    "menu": "Servera opcijas: {{server}}",
+    "menuLabel": "Servera opcijas",
+    "follow": "Sekot visiem kanāliem",
+    "unfollow": "Pārtraukt sekot visiem kanāliem",
+    "working": "Seko kanāliem…",
+    "followed_zero": "Seko {{count}} kanālu.",
+    "followed_one": "Seko {{count}} kanālam.",
+    "followed_other": "Seko {{count}} kanāliem.",
+    "skipped_zero": "{{count}} izlaisti: {{reasons}}.",
+    "skipped_one": "{{count}} izlaists: {{reasons}}.",
+    "skipped_other": "{{count}} izlaisti: {{reasons}}.",
+    "limit": "sasniegts ierobežojums",
+    "notAllowed": "nav atļauts",
+    "noAnswer": "serveris neatbild",
+    "unfollowed": "Pārtraukta sekošana visiem kanāliem.",
+    "failed": "Sekošana visiem kanāliem neizdevās. Lūdzu, mēģini vēlreiz.",
+    "dismiss": "Aizvērt",
+    "unfollowFailed": "Sekošanas pārtraukšana visiem kanāliem neizdevās. Lūdzu, mēģini vēlreiz."
+  },
+  "mention": "ietver tavu pieminējumu"
+}

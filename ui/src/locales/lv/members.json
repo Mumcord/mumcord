@@ -1,0 +1,68 @@
+{
+  "inChannel_zero": "Kanālā {{channel}} ({{count}})",
+  "inChannel_one": "Kanālā {{channel}} ({{count}})",
+  "inChannel_other": "Kanālā {{channel}} ({{count}})",
+  "listening_zero": "Klausās ({{count}})",
+  "listening_one": "Klausās ({{count}})",
+  "listening_other": "Klausās ({{count}})",
+  "noChannel": "Izvēlies kanālu, lai redzētu, kas tajā ir.",
+  "nobody": "Šeit neviena nav.",
+  "nobodyElse": "Serverī nav neviena cita.",
+  "inOtherChannels": "Citos kanālos",
+  "you": "(tu)",
+  "registered": "Reģistrēts",
+  "unregistered": "Nereģistrēts",
+  "talking": "Runā",
+  "card": {
+    "close": "Aizvērt",
+    "loadFailed": "Profilu neizdevās ielādēt.",
+    "volume": "Skaļums",
+    "volumeValue": "{{value}} %",
+    "localMute": "Izslēgt man",
+    "sessionOnly": "Šim cilvēkam nav sertifikāta, tāpēc šie iestatījumi darbojas tikai šajā sesijā.",
+    "sendPrivateMessage": "Sūtīt privātu ziņu",
+    "privateMessage": "Privāta ziņa",
+    "localSettings": "Tavi iestatījumi",
+    "localSettingsHint": "Tikai tu tos redzi. Izmaiņas tiek saglabātas uzreiz.",
+    "localMuteHint": "Tu šo cilvēku nedzirdēsi.",
+    "privateNote": "Privāta piezīme",
+    "privateNoteHint": "Šo piezīmi redzi tikai tu.",
+    "saved": "Saglabāts"
+  },
+  "errors": {
+    "notConnected": "Nav savienojuma ar serveri.",
+    "generic": "Tas neizdevās. Lūdzu, mēģini vēlreiz."
+  },
+  "menu": {
+    "label": "Darbības: {{name}}",
+    "viewProfile": "Skatīt profilu",
+    "join": "Pievienoties kanālam {{channel}}",
+    "joinDenied": "Jums nav atļaujas ieiet šajā kanālā.",
+    "mute": "Izslēgt man"
+  },
+  "nowPlaying": {
+    "label": "Tagad skan",
+    "listening": "Klausās",
+    "paused": "Pauzēts",
+    "progress": "Atskaņošanas gaita",
+    "position": "{{position}} no {{duration}}"
+  },
+  "nowGaming": {
+    "label": "Tagad spēlē",
+    "playing": "Spēlē",
+    "playedFor": "jau {{time}}",
+    "hoursMinutes": "{{hours}} h {{minutes}} min",
+    "minutes_zero": "{{count}} min",
+    "minutes_one": "{{count}} min",
+    "minutes_other": "{{count}} min",
+    "join": "Pievienoties spēlei",
+    "joinTitle": "Pievienoties spēlei?",
+    "joinMessage": "Atvērsies Steam un izveidos savienojumu ar serveri, kurā šis cilvēks spēlē {{game}}. Pievienojies tikai serveriem, kuriem uzticies.",
+    "joinConfirm": "Atvērt Steam",
+    "joinFailed": "Steam neizdevās atvērt."
+  },
+  "preview": {
+    "privateMessage": "Privāta ziņa",
+    "fullProfile": "Pilns profils"
+  }
+}

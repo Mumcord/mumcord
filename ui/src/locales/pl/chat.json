@@ -1,0 +1,159 @@
+{
+  "noConversation": "Połącz się z serwerem i wybierz kanał, aby zacząć czatować.",
+  "empty": "Brak wiadomości. Wiadomości, które tu otrzymasz, są zapisywane na tym komputerze.",
+  "header": {
+    "channel": "#{{name}}",
+    "channelPrefix": "Kanał",
+    "privatePrefix": "Czat prywatny z",
+    "unknownPerson": "Nieznana osoba"
+  },
+  "list": {
+    "today": "Dziś",
+    "yesterday": "Wczoraj",
+    "label": "Wiadomości w {{name}}",
+    "loadOlder": "Wczytaj starsze wiadomości",
+    "loading": "Ładowanie wiadomości…",
+    "loadFailed": "Nie udało się wczytać starszych wiadomości. Przewiń w górę, aby spróbować ponownie.",
+    "loadEarlier": "Wczytaj wcześniejsze wiadomości",
+    "syncing": "Szukanie wcześniejszych wiadomości od innych użytkowników Mumcord…",
+    "syncAdded_one": "Dodano {{count}} wcześniejszą wiadomość od innych użytkowników Mumcord.",
+    "syncAdded_few": "Dodano {{count}} wcześniejsze wiadomości od innych użytkowników Mumcord.",
+    "syncAdded_many": "Dodano {{count}} wcześniejszych wiadomości od innych użytkowników Mumcord.",
+    "syncAdded_other": "Dodano {{count}} wcześniejszej wiadomości od innych użytkowników Mumcord.",
+    "syncNone": "Nie znaleziono wcześniejszych wiadomości.",
+    "syncFailed": "Wcześniejszych wiadomości nie można tu wczytać.",
+    "syncedFrom": "z historii użytkownika {{name}}",
+    "jumpToNewest": "Przejdź do najnowszych",
+    "jumpToNewestUnseen_one": "Przejdź do najnowszych, {{count}} nowa wiadomość",
+    "jumpToNewestUnseen_few": "Przejdź do najnowszych, {{count}} nowe wiadomości",
+    "jumpToNewestUnseen_many": "Przejdź do najnowszych, {{count}} nowych wiadomości",
+    "jumpToNewestUnseen_other": "Przejdź do najnowszych, {{count}} nowej wiadomości"
+  },
+  "format": {
+    "toolbar": "Formatowanie",
+    "bold": "Pogrubienie",
+    "italic": "Kursywa",
+    "strike": "Przekreślenie",
+    "code": "Kod w linii",
+    "codeBlock": "Blok kodu",
+    "link": "Link"
+  },
+  "composer": {
+    "label": "Wiadomość do {{name}}",
+    "hint": "Naciśnij Enter, aby wysłać, a Shift+Enter, aby przejść do nowej linii. Działa Markdown: **pogrubienie**, *kursywa*, `kod`, [link](https://…).",
+    "addImage": "Dodaj obraz",
+    "removeImage": "Usuń obraz {{name}}",
+    "imagePreview": "Obraz do wysłania: {{name}}",
+    "send": "Wyślij",
+    "noPermission": "Nie masz uprawnień do pisania na tym kanale.",
+    "unavailable": "Ten kanał nie jest już dostępny.",
+    "offline": "{{name}} jest offline. Napiszesz ponownie, gdy ta osoba wróci.",
+    "unnamedImage": "Wklejony obraz"
+  },
+  "tray": {
+    "label": "Obrazy do wysłania",
+    "processing": "Przygotowywanie obrazu",
+    "scaled": "Przeskalowano do {{width}}×{{height}}, aby zmieścić się w limicie serwera"
+  },
+  "errors": {
+    "tooLong": "Twoja wiadomość jest zbyt długa dla tego serwera (maksymalnie {{max}} znaków). Skróć ją i spróbuj ponownie.",
+    "tooLongNoLimit": "Twoja wiadomość jest zbyt długa dla tego serwera. Skróć ją i spróbuj ponownie.",
+    "imageTooLarge": "Ten obraz jest zbyt duży dla tego serwera, nawet po kompresji. Spróbuj mniejszego obrazu.",
+    "imageWithTextTooLong": "Wiadomość z obrazem jest zbyt duża dla tego serwera. Skróć tekst lub usuń obraz.",
+    "imagesNotAllowed": "Ten serwer nie zezwala na obrazy w wiadomościach.",
+    "notImage": "Tego pliku nie można wysłać. Użyj obrazu PNG, JPEG, GIF lub WebP.",
+    "imageUnreadable": "Nie udało się odczytać obrazu. Spróbuj innego pliku.",
+    "denied": "Serwer nie zezwolił na tę wiadomość.",
+    "deniedWithReason": "Serwer nie zezwolił na tę wiadomość: {{reason}}",
+    "notConnected": "Nie masz połączenia. Połącz się ponownie i spróbuj jeszcze raz.",
+    "generic": "Nie udało się wysłać wiadomości. Spróbuj ponownie.",
+    "onlyImages": "Można wysyłać tylko obrazy.",
+    "sourceTooLarge": "Ten plik jest zbyt duży, by go wysłać (ponad 25 MB)."
+  },
+  "announce": {
+    "message": "{{name}}: {{text}}",
+    "image": "{{name}} wysyła obraz",
+    "more_one": "jeszcze {{count}} nowa wiadomość",
+    "more_few": "jeszcze {{count}} nowe wiadomości",
+    "more_many": "jeszcze {{count}} nowych wiadomości",
+    "more_other": "jeszcze {{count}} nowej wiadomości"
+  },
+  "pinned": {
+    "label": "Informacje o kanale",
+    "showMore": "Pokaż więcej",
+    "showLess": "Pokaż mniej"
+  },
+  "mention": {
+    "list": "Osoby do wspomnienia",
+    "found_one": "Zaproponowano {{count}} osobę. Użyj strzałek, a potem Enter, aby wstawić.",
+    "found_few": "Zaproponowano {{count}} osoby. Użyj strzałek, a potem Enter, aby wstawić.",
+    "found_many": "Zaproponowano {{count}} osób. Użyj strzałek, a potem Enter, aby wstawić.",
+    "found_other": "Zaproponowano {{count}} osoby. Użyj strzałek, a potem Enter, aby wstawić.",
+    "none": "Nikogo nie znaleziono",
+    "mentionsYou": "Wspomina o Tobie",
+    "chipLabel": "{{name}}, wzmianka"
+  },
+  "preview": {
+    "open": "Otwórz w przeglądarce",
+    "openLabel": "Otwórz {{title}} w przeglądarce",
+    "play": "Odtwórz {{title}}",
+    "player": "Odtwarzacz wideo: {{title}}",
+    "videoTitle": "Wideo {{site}}",
+    "spotifyTitle": "Link {{site}}",
+    "audioPlayer": "Odtwarzacz Spotify: {{title}}",
+    "kind": {
+      "track": "Utwór",
+      "album": "Album",
+      "playlist": "Playlista",
+      "artist": "Wykonawca",
+      "episode": "Odcinek",
+      "show": "Program"
+    },
+    "inBrowser": "Odtwarza się w przeglądarce",
+    "card": "Podgląd linku: {{title}}",
+    "dismiss": "Ukryj podgląd"
+  },
+  "image": {
+    "loading": "Ładowanie obrazu {{name}}",
+    "label": "Obraz: {{name}}",
+    "view": "Zobacz obraz {{name}}",
+    "viewMessage": "Obraz od {{name}}, otwórz w przeglądarce obrazów",
+    "failed": "Nie można pokazać obrazu (zbyt duży lub niedostępny)."
+  },
+  "viewer": {
+    "label": "Przeglądarka obrazów",
+    "counter": "{{current}} / {{total}}",
+    "zoomIn": "Powiększ",
+    "zoomOut": "Pomniejsz",
+    "fit": "Dopasuj do okna",
+    "save": "Zapisz obraz",
+    "saved": "Zapisano obraz",
+    "saveFailed": "Nie udało się zapisać obrazu",
+    "fileFilter": "Obraz",
+    "openInBrowser": "Otwórz w przeglądarce",
+    "close": "Zamknij",
+    "previous": "Poprzedni obraz",
+    "next": "Następny obraz",
+    "unnamed": "obraz",
+    "fullLoading": "Ładowanie pełnego rozmiaru…",
+    "fullProgress": "Ładowanie pełnego rozmiaru… {{percent}} %",
+    "fullUnavailable": "Pełny rozmiar niedostępny – pokazano podgląd"
+  },
+  "favorites": {
+    "open": "Ulubione GIF-y",
+    "title": "Ulubione GIF-y",
+    "save": "Zapisz jako ulubiony",
+    "remove": "Usuń z ulubionych",
+    "removeNamed": "Usuń {{name}} z ulubionych",
+    "send": "Wyślij {{name}}",
+    "hint": "Strzałki przesuwają, Enter wysyła, Delete usuwa, Escape zamyka.",
+    "empty": "Brak ulubionych. Kliknij prawym przyciskiem GIF na czacie lub użyj gwiazdki na nim i wybierz „Zapisz jako ulubiony”. Pojawi się tutaj."
+  },
+  "imageMenu": {
+    "label": "Obraz {{name}}"
+  },
+  "attribution": {
+    "via": "przez {{brand}}",
+    "view": "Zobacz na {{brand}}"
+  }
+}

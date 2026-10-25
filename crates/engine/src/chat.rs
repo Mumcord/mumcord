@@ -23,7 +23,7 @@ use crate::session::{
 use crate::sounds::Sound;
 
 pub use sanitize::sanitize_html;
-use sanitize::sanitize_message_html;
+pub(crate) use sanitize::sanitize_message_html;
 
 /// Size cap for messages with images when the server sets no limit; the UI scales images to
 /// the same target.
@@ -49,6 +49,9 @@ pub struct ChatMessageView {
     pub body: String,
     /// Links whose preview card the user dismissed (QA.42).
     pub dismissed_previews: Vec<String>,
+    /// Name of the person whose history this message was synced from (FR-1.60); `None` for
+    /// messages received or sent here.
+    pub synced_from: Option<String>,
 }
 
 /// What `history_clear` removes.
@@ -260,13 +263,15 @@ fn store_message(
             None
         })
     });
-    match stored {
-        Some(id) => id.to_string(),
-        None => format!(
-            "{TRANSIENT_PREFIX}{}",
-            TRANSIENT_IDS.fetch_add(1, Ordering::Relaxed)
-        ),
-    }
+    stored.map_or_else(transient_id, |id| id.to_string())
+}
+
+/// A fresh id for a message that was shown but not stored.
+pub(crate) fn transient_id() -> String {
+    format!(
+        "{TRANSIENT_PREFIX}{}",
+        TRANSIENT_IDS.fetch_add(1, Ordering::Relaxed)
+    )
 }
 
 /// Incoming text message: route, sanitize, store, emit, count unread (hook from the session).
@@ -307,6 +312,7 @@ pub(crate) fn on_text(ctx: &SessionCtx, msg: &TextMessage) {
         sent_at: now_millis(),
         body: sanitize_message_html(&msg.message),
         dismissed_previews: Vec::new(),
+        synced_from: None,
     };
     let stored = match &key {
         UnreadKey::Stored(c) => Some(c.clone()),
@@ -408,6 +414,7 @@ fn history_view(
     conversation: &ConversationRef,
     own_hash: Option<&str>,
     dismissed_previews: Vec<String>,
+    synced_from: Option<String>,
 ) -> ChatMessageView {
     let own = own_hash.is_some() && m.sender_cert_hash.as_deref() == own_hash;
     ChatMessageView {
@@ -420,6 +427,7 @@ fn history_view(
         sent_at: m.sent_at,
         body: m.body,
         dismissed_previews,
+        synced_from,
     }
 }
 
@@ -548,11 +556,17 @@ impl Engine {
             tracing::warn!(error = %e, "reading dismissed previews failed");
             Default::default()
         });
+        let mut origins = ctx.store().synced_origins(&ids).unwrap_or_else(|e| {
+            // Synced messages then show without their origin; better than no history.
+            tracing::warn!(error = %e, "reading synced message origins failed");
+            Default::default()
+        });
         Ok(rows
             .into_iter()
             .map(|m| {
                 let urls = dismissed.remove(&m.id).unwrap_or_default();
-                history_view(m, &conversation, own_hash.as_deref(), urls)
+                let origin = origins.remove(&m.id);
+                history_view(m, &conversation, own_hash.as_deref(), urls, origin)
             })
             .collect())
     }
@@ -678,6 +692,7 @@ fn own_message(ctx: &SessionCtx, conversation: ConversationRef, html: &str) -> C
         sent_at: now_millis(),
         body: sanitize_message_html(html),
         dismissed_previews: Vec::new(),
+        synced_from: None,
     };
     let stored = match &message.conversation {
         ConversationRef::Channel { channel_id } => ctx
@@ -843,9 +858,12 @@ mod tests {
             sent_at: 1,
             body: "b".into(),
         };
-        assert!(history_view(row(Some("aa")), &conv, Some("aa"), Vec::new()).own);
-        assert!(!history_view(row(Some("bb")), &conv, Some("aa"), Vec::new()).own);
-        assert!(!history_view(row(None), &conv, None, Vec::new()).own);
-        assert_eq!(history_view(row(None), &conv, None, Vec::new()).id, "7");
+        assert!(history_view(row(Some("aa")), &conv, Some("aa"), Vec::new(), None).own);
+        assert!(!history_view(row(Some("bb")), &conv, Some("aa"), Vec::new(), None).own);
+        assert!(!history_view(row(None), &conv, None, Vec::new(), None).own);
+        assert_eq!(
+            history_view(row(None), &conv, None, Vec::new(), None).id,
+            "7"
+        );
     }
 }

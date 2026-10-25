@@ -141,7 +141,7 @@ impl Backend for CpalBackend {
         let info = self.info(Direction::Output, &device)?;
         let supported = pick_config(&device, Direction::Output)?;
         let config = stream_config(&supported);
-        let (producer, consumer) = ring::ring(config.sample_rate);
+        let (producer, consumer) = ring::stereo_ring(config.sample_rate);
         let failed = Arc::new(AtomicBool::new(false));
         let stream = build_output(
             &device,

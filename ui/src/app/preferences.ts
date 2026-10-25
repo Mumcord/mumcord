@@ -1,4 +1,5 @@
 import { createContext, useContext } from "react";
+import type { HintPreference } from "../a11y";
 import type { ChatDisplay, Language, Settings, Theme } from "../api";
 import type { ResolvedTheme } from "../theme/theme";
 
@@ -14,11 +15,14 @@ export interface Preferences {
   /** Show link previews and video player cards in chat (FR-1.49, QA.34). */
   linkPreviews: boolean;
   /**
-   * Applies theme, language, chat layout and link previews from a settings record immediately. The engine sends no event
+   * Applies theme, language, chat layout and link previews and accessibility switches from a settings record immediately. The engine sends no event
    * when settings change, so whoever calls `settingsUpdate` passes the result here.
    */
   applySettings: (
-    settings: Pick<Settings, "theme" | "language" | "chatDisplay" | "linkPreviews">,
+    settings: Pick<
+      Settings,
+      "theme" | "language" | "chatDisplay" | "linkPreviews" | HintPreference
+    >,
   ) => void;
 }
 

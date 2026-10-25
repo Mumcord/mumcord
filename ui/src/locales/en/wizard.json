@@ -44,6 +44,15 @@
     "devicesFailed": "Your audio devices could not be listed. You can continue and pick them later in Settings.",
     "testFailed": "The test could not start. Check that the microphone is connected."
   },
+  "privacy": {
+    "title": "Your privacy",
+    "noTelemetry": "Mumcord sends no telemetry, analytics or crash reports.",
+    "ownServers": "It connects only to the servers you add.",
+    "linkPreviews": "Link previews and images or GIFs from chat links are loaded from the linked sites. You can turn this off in the next step or later in Settings.",
+    "mumcordUsers": "Mumcord-only features exchange data only with other Mumcord users on the same server.",
+    "local": "Everything Mumcord stores stays on your computer.",
+    "statement": "Full privacy statement"
+  },
   "talk": {
     "title": "How do you want to talk?",
     "mode": "Talk mode",
@@ -82,6 +91,12 @@
     "autostartHint": "You can change this later in Settings → Appearance.",
     "autostartFailed": "Mumcord could not be set to start when you log in. You can try again in Settings.",
     "linkPreviews": "Show link previews and embeds",
-    "linkPreviewsHint": "Mumcord loads linked pages to show previews and video players; those sites see your IP address."
+    "linkPreviewsHint": "Mumcord loads linked pages to show previews and video players; those sites see your IP address.",
+    "historySharing": "Share my channel history",
+    "historySharingHint": "Other Mumcord users who join a channel after you can see its earlier messages from your saved history (up to 7 days). Private chats are never shared. You can change this later in Settings → Chat & history.",
+    "ingameOverlay": "Show the overlay inside games",
+    "ingameOverlayHint": "Draws who is talking on top of your game (Linux). You can turn it on or off per game later in Settings.",
+    "ingameOverlayWarning": "Some games with anti-cheat may flag or block in-game overlays. Mumcord keeps known-risky games (such as Valorant or League of Legends) off by default. Enable it only for games you trust.",
+    "ingameOverlayAlt": "Example of the in-game overlay showing who is talking"
   }
 }

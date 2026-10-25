@@ -1,0 +1,22 @@
+{
+  "open": "Kapcsolat adatai",
+  "title": "Kapcsolat adatai",
+  "loading": "Betöltés…",
+  "notConnected": "Nincs kapcsolat.",
+  "error": "A kapcsolat adatai most nem érhetők el.",
+  "none": "–",
+  "transport": "Átvitel",
+  "transportValue": {
+    "udp": "UDP",
+    "tcp": "TCP (alagúton át)"
+  },
+  "latency": "Késleltetés",
+  "latencyValue": "{{value}} ms",
+  "loss": "Csomagvesztés",
+  "lossValue": "{{value}} %",
+  "bitrate": "Küldési bitráta",
+  "bitrateValue": "{{value}} kbit/s",
+  "serverLimit": "Szerverkorlát",
+  "packets": "Küldött / fogadott csomagok",
+  "packetsValue": "{{sent}} / {{received}}"
+}

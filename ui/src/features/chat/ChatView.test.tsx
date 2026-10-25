@@ -5,6 +5,7 @@ import type { MockApi } from "../../api";
 import { axeViolations } from "../../test/axe";
 import { selectConversation } from "../channels";
 import { connectedMock, resetAll, stubDialog } from "../channels/testUtils";
+import { resetFriendsStore } from "../friends";
 import { resetChatStore } from "./chatStore";
 import { ChatView } from "./ChatView";
 
@@ -42,6 +43,7 @@ beforeEach(() => {
 
 afterEach(() => {
   resetChatStore();
+  resetFriendsStore();
   resetAll();
   vi.restoreAllMocks();
 });
@@ -190,5 +192,25 @@ describe("ChatView", () => {
     await waitFor(() => {
       expect(screen.queryByRole("region", { name: "Channel info" })).toBeNull();
     });
+  });
+});
+
+describe("ChatView private chat presence (FR-1.65)", () => {
+  it("shows whether the other person is online and keeps a friend's name when they leave", async () => {
+    const api = await renderChat();
+    await api.friendAdd(2);
+    act(() => {
+      selectConversation({ kind: "private", certHash: "annahash" });
+    });
+    const header = await screen.findByRole("banner");
+    expect(header).toHaveTextContent("Anna");
+    expect(header).toHaveTextContent("Online");
+    act(() => {
+      api.mock.removeUser(2);
+    });
+    await waitFor(() => {
+      expect(header).toHaveTextContent(/Offline, last seen /);
+    });
+    expect(header).toHaveTextContent("Anna");
   });
 });

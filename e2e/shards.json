@@ -2,8 +2,10 @@
   "shards": [
     ["specs/network/network-resilience.e2e.ts"],
     [
+      "specs/chat/friends.e2e.ts",
       "specs/chat/notifications.e2e.ts",
       "specs/misc/diagnostics-about.e2e.ts",
+      "specs/overlay/overlay-smoke.e2e.ts",
       "specs/voice/voice.e2e.ts",
       "specs/wizard/ac-1.1-create-identity.e2e.ts"
     ],
@@ -13,6 +15,7 @@
       "specs/app/theme-language.e2e.ts",
       "specs/chat/follow-limit.e2e.ts",
       "specs/chat/follow-pm.e2e.ts",
+      "specs/positional/positional.e2e.ts",
       "specs/servers/servers.e2e.ts",
       "specs/smoke/app.e2e.ts",
       "specs/voice/read-only-join.e2e.ts",
@@ -24,6 +27,7 @@
       "specs/chat/link-previews.e2e.ts",
       "specs/chat/mentions.e2e.ts",
       "specs/chat/render-send.e2e.ts",
+      "specs/overlay/overlay-ingame.e2e.ts",
       "specs/profile/profile.e2e.ts",
       "specs/voice/rejoin-prompt.e2e.ts",
       "specs/wizard/ac-1.2-import-identity.e2e.ts"

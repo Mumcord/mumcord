@@ -1,0 +1,68 @@
+{
+  "inChannel_one": "Em {{channel}} ({{count}})",
+  "inChannel_many": "Em {{channel}} ({{count}})",
+  "inChannel_other": "Em {{channel}} ({{count}})",
+  "listening_one": "A ouvir ({{count}})",
+  "listening_many": "A ouvir ({{count}})",
+  "listening_other": "A ouvir ({{count}})",
+  "noChannel": "Seleciona um canal para ver quem está nele.",
+  "nobody": "Ninguém aqui.",
+  "nobodyElse": "Mais ninguém está no servidor.",
+  "inOtherChannels": "Noutros canais",
+  "you": "(tu)",
+  "registered": "Registado",
+  "unregistered": "Não registado",
+  "talking": "A falar",
+  "card": {
+    "close": "Fechar",
+    "loadFailed": "Não foi possível carregar o perfil.",
+    "volume": "Volume",
+    "volumeValue": "{{value}} %",
+    "localMute": "Silenciar para mim",
+    "sessionOnly": "Esta pessoa não tem certificado, por isso estas definições só duram esta sessão.",
+    "sendPrivateMessage": "Enviar mensagem privada",
+    "privateMessage": "Mensagem privada",
+    "localSettings": "As tuas definições",
+    "localSettingsHint": "Só tu vês isto. As alterações são guardadas de imediato.",
+    "localMuteHint": "Não vais ouvir esta pessoa.",
+    "privateNote": "Nota privada",
+    "privateNoteHint": "Só tu podes ver esta nota.",
+    "saved": "Guardado"
+  },
+  "errors": {
+    "notConnected": "Sem ligação a um servidor.",
+    "generic": "Não funcionou. Tenta novamente."
+  },
+  "menu": {
+    "label": "Ações para {{name}}",
+    "viewProfile": "Ver perfil",
+    "join": "Entrar em {{channel}}",
+    "joinDenied": "Não tens permissão para entrar neste canal.",
+    "mute": "Silenciar para mim"
+  },
+  "nowPlaying": {
+    "label": "A reproduzir",
+    "listening": "A ouvir",
+    "paused": "Em pausa",
+    "progress": "Progresso da reprodução",
+    "position": "{{position}} de {{duration}}"
+  },
+  "nowGaming": {
+    "label": "A jogar",
+    "playing": "A jogar",
+    "playedFor": "há {{time}}",
+    "hoursMinutes": "{{hours}} h {{minutes}} min",
+    "minutes_one": "{{count}} min",
+    "minutes_many": "{{count}} min",
+    "minutes_other": "{{count}} min",
+    "join": "Entrar no jogo",
+    "joinTitle": "Entrar no jogo?",
+    "joinMessage": "O Steam vai abrir e ligar-se ao servidor onde esta pessoa joga {{game}}. Entra apenas em servidores em que confies.",
+    "joinConfirm": "Abrir o Steam",
+    "joinFailed": "Não foi possível abrir o Steam."
+  },
+  "preview": {
+    "privateMessage": "Mensagem privada",
+    "fullProfile": "Perfil completo"
+  }
+}

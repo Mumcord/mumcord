@@ -1,0 +1,88 @@
+{
+  "unknownName": "Sinä",
+  "mute": "Mykistä mikrofoni",
+  "deafen": "Mykistä kuulokkeet",
+  "disconnect": "Katkaise yhteys palvelimeen {{server}}",
+  "settings": "Pika-asetukset",
+  "announce": {
+    "muted": "Mikrofoni mykistetty",
+    "unmuted": "Mikrofonin mykistys poistettu",
+    "deafened": "Kuulokkeet mykistetty. Et kuule muita, ja mikrofonisi on mykistetty",
+    "undeafened": "Kuulokkeiden mykistys poistettu"
+  },
+  "readOnly": {
+    "text": "Seuraat keskustelua – liity kanavalle puhuaksesi.",
+    "join": "Liity kanavalle {{channel}}"
+  },
+  "status": {
+    "connecting": "Yhdistetään…",
+    "reconnecting": "Yhdistetään uudelleen…",
+    "connected": "Yhdistetty",
+    "readOnly": "Vain luku",
+    "disconnected": "Ei yhteyttä",
+    "playing": "Pelaa: {{game}}",
+    "listening": "Kuuntelee: {{track}}"
+  },
+  "profile": {
+    "title": "Muokkaa profiilia",
+    "chooseTitle": "Valitse profiilikuva",
+    "chooseAvatar": "Valitse kuva…",
+    "removeAvatar": "Poista kuva",
+    "avatarHint": "Kuva pienennetään palvelimen rajan mukaiseksi.",
+    "avatarUnregistered": "Tämä palvelin säilyttää profiilikuvat vain rekisteröityneille käyttäjille – Mumcord lähettää omasi uudelleen jokaisella yhdistämiskerralla.",
+    "avatarChosen": "Valittu: {{name}}",
+    "avatarRemoved": "Kuva poistetaan, kun tallennat.",
+    "comment": "Tietoa sinusta"
+  },
+  "register": {
+    "title": "Rekisteröidy tälle palvelimelle",
+    "explain": "Rekisteröityminen varaa nimesi tällä palvelimella. Kukaan muu ei voi käyttää sitä, ja palvelin muistaa sinut seuraavalla yhdistämiskerralla.",
+    "backup": "Identiteettisi todistaa, että nimi on sinun. Jos menetät sen, menetät pääsyn rekisteröityyn nimeen. Tallenna varmuuskopio nyt ja säilytä se turvassa.",
+    "password": "Varmuuskopiotiedoston salasana",
+    "export": "Vie identiteetti",
+    "saveTitle": "Tallenna identiteetin varmuuskopio",
+    "passwordRequired": "Anna salasana varmuuskopiotiedoston suojaamiseksi.",
+    "exported": "Identiteetin varmuuskopio tallennettu.",
+    "confirm": "Rekisteröidy",
+    "done": "Rekisteröitynyt tälle palvelimelle"
+  },
+  "errors": {
+    "tooLarge": "Tämä on liian suuri palvelimelle. Valitse pienempi kuva tai kirjoita lyhyempi teksti.",
+    "denied": "Palvelin ei salli tätä.",
+    "deniedWithReason": "Palvelin ei salli tätä: {{reason}}",
+    "notConnected": "Et ole yhteydessä palvelimeen.",
+    "file": "Tiedostoa ei voitu lukea tai kirjoittaa.",
+    "generic": "Jokin meni pieleen. Yritä uudelleen."
+  },
+  "ptt": "Puhu painamalla: pidä {{key}} pohjassa puhuaksesi",
+  "pttNoKey": "Puhu painamalla: näppäintä ei ole asetettu",
+  "quickSettings": {
+    "linkPreviews": "Linkkien esikatselut ja upotukset",
+    "linkPreviewsHint": "Sivustot näkevät IP-osoitteesi",
+    "nowPlaying": "Jaa, mitä kuuntelen",
+    "nowPlayingHint": "Muut näkevät nykyisen kappaleesi",
+    "unsupported": "Ei käytettävissä macOS:ssä",
+    "theme": "Teema",
+    "theme_system": "Järjestelmä",
+    "theme_dark": "Tumma",
+    "theme_light": "Vaalea",
+    "nowGaming": "Jaa peli, jota pelaan",
+    "nowGamingHint": "Muut näkevät nykyisen pelisi",
+    "unavailable": "Ei käytettävissä tässä järjestelmässä",
+    "overlay": "Peittokuva",
+    "overlayHint": "Näyttää pelien päällä, kuka puhuu",
+    "editProfile": "Muokkaa profiilia",
+    "editProfileHint": "Nimi, profiilikuva ja kommentti",
+    "register": "Rekisteröidy tälle palvelimelle",
+    "registered": "Rekisteröitynyt tälle palvelimelle ✓",
+    "registerHint": "Säilyttää nimesi ja profiilikuvasi tällä palvelimella",
+    "allSettings": "Kaikki asetukset…",
+    "label": "Pika-asetukset",
+    "positional": "Sijaintiääni",
+    "positionalHint": "Äänet sijoitetaan 3D-tilaan ympärillesi",
+    "offerImages": "Tarjoa täysikokoiset kuvat",
+    "offerImagesHint": "Anna muiden ladata alkuperäiset kuvasi",
+    "loadImages": "Lataa täysikokoiset kuvat",
+    "loadImagesHint": "Hae alkuperäiset kuvat muilta"
+  }
+}

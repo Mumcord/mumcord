@@ -103,3 +103,9 @@ progress {
     scroll-behavior: auto !important;
   }
 }
+
+/* Native image drags copy the whole data: URL into the payload and freeze the webview. */
+img {
+  -webkit-user-drag: none;
+  user-drag: none;
+}

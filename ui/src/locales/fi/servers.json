@@ -1,0 +1,128 @@
+{
+  "unknownServer": "palvelin",
+  "announce": {
+    "connected": "Yhdistetty: {{server}}.",
+    "lost": "Yhteys palvelimeen {{server}} katkesi. Yhdistetään uudelleen…",
+    "ended": "Yhteys palvelimeen {{server}} katkaistu. Chatin yläpuolella oleva palkki kertoo, mitä tehdä seuraavaksi.",
+    "disconnected": "Yhteys palvelimeen {{server}} katkaistu.",
+    "tcp": "Puhe kulkee nyt TCP:n kautta, koska UDP on estetty. Äänessä voi olla pientä viivettä.",
+    "removed": "{{server}} poistettu.",
+    "moved": "{{server}} siirretty sijaintiin {{position}}/{{count}}."
+  },
+  "bar": {
+    "listLabel": "Tallennetut palvelimet",
+    "add": "Lisää palvelin",
+    "keyboardHint": "Enter yhdistää. Alt ja nuoli ylös tai alas siirtää palvelinta. Shift ja F10 avaa lisää vaihtoehtoja.",
+    "status": {
+      "connected": "{{server}} (yhdistetty)",
+      "connecting": "{{server}} (yhdistetään)",
+      "reconnecting": "{{server}} (yhdistetään uudelleen)"
+    }
+  },
+  "menu": {
+    "label": "Asetukset: {{server}}",
+    "connect": "Yhdistä",
+    "disconnect": "Katkaise yhteys",
+    "edit": "Muokkaa palvelinta",
+    "moveUp": "Siirrä ylös",
+    "moveDown": "Siirrä alas",
+    "remove": "Poista palvelin"
+  },
+  "dialog": {
+    "addTitle": "Lisää palvelin",
+    "editTitle": "Muokkaa palvelinta",
+    "linkTitle": "Tallennetaanko tämä palvelin?",
+    "address": "Osoite",
+    "addressHint": "Esimerkiksi mumble.example.org. Voit myös liittää tähän mumble://-linkin.",
+    "filledFromLink": "Täytetty mumble://-linkin perusteella.",
+    "port": "Portti",
+    "label": "Nimi palvelinpalkissa",
+    "username": "Nimesi tällä palvelimella",
+    "password": "Palvelimen salasana (valinnainen)",
+    "passwordHint": "Tarvitaan vain, jos palvelin pyytää sitä. Se säilytetään järjestelmäsi suojatussa tallennustilassa.",
+    "passwordKeepHint": "Salasana on tallennettu. Jätä tämä tyhjäksi säilyttääksesi sen tai kirjoita uusi.",
+    "clearPassword": "Poista tallennettu salasana",
+    "add": "Lisää palvelin",
+    "saveAndConnect": "Tallenna ja yhdistä",
+    "errors": {
+      "address": "Anna palvelimen osoite.",
+      "port": "Anna portti väliltä 1–65535. Useimmat palvelimet käyttävät porttia 64738.",
+      "username": "Anna nimi, jota haluat käyttää tällä palvelimella.",
+      "link": "Tätä mumble://-linkkiä ei voi lukea. Tarkista, että se kopioitiin kokonaan.",
+      "invalid": "Palvelimen tiedot eivät kelpaa. Tarkista osoite ja portti."
+    }
+  },
+  "errors": {
+    "serverUnreachable": "Palvelimeen ei saada yhteyttä. Tarkista osoite ja portti sekä se, että olet verkossa.",
+    "wrongPassword": "Palvelimen salasana on väärä. Muokkaa palvelinta ja anna oikea salasana.",
+    "nameInUse": "Nimesi on jo käytössä tai rekisteröity jollekulle toiselle tällä palvelimella. Muokkaa palvelinta ja valitse toinen nimi.",
+    "certificateRejected": "Varmenteen tarkistus epäonnistui: joko palvelimen varmenteeseen ei luotettu tai palvelin ei hyväksynyt identiteettiäsi. Yritä uudelleen tai kysy palvelimen ylläpitäjältä.",
+    "certificateChanged": "Palvelimen varmenne on muuttunut, eikä siihen luotettu. Luota siihen vasta, kun palvelimen ylläpitäjä on vahvistanut muutoksen.",
+    "denied": "Palvelin hylkäsi yhteyden.",
+    "deniedWithReason": "Palvelin hylkäsi yhteyden: {{reason}}",
+    "invalidAddress": "Palvelimen osoite ei kelpaa. Korjaa se muokkaamalla palvelinta.",
+    "secureStorage": "Järjestelmäsi suojattu tallennustila ei ole käytettävissä, joten palvelimen salasanaa ei voitu lukea tai tallentaa. Avaa sen lukitus ja yritä uudelleen.",
+    "notFound": "Tätä palvelinta ei ole enää tallennettu.",
+    "generic": "Jokin meni pieleen. Yritä uudelleen."
+  },
+  "remove": {
+    "title": "Poistetaanko {{server}}?",
+    "message": "Sen tallennettu salasana, varmennepäätös, seuratut kanavat ja chat-historia poistetaan tältä tietokoneelta.",
+    "confirm": "Poista"
+  },
+  "switch": {
+    "title": "Vaihdetaanko palvelinta?",
+    "message": "Voit olla vain yhdellä palvelimella kerrallaan. Katkaistaanko yhteys palvelimeen {{current}} ja yhdistetään palvelimeen {{next}}?",
+    "confirm": "Katkaise ja vaihda"
+  },
+  "cert": {
+    "newTitle": "Luotetaanko tähän palvelimeen?",
+    "newIntro": "Mumcord ei ole nähnyt palvelimen {{server}} varmennetta aiemmin. Jos palvelimen ylläpitäjä antoi sinulle sormenjäljen, tarkista, että se täsmää. Valintasi muistetaan.",
+    "fingerprint": "Varmenteen sormenjälki",
+    "changedTitle": "Varoitus: palvelimen varmenne muuttui",
+    "changedWarning": "Palvelimen {{server}} varmenne on eri kuin se, johon luotit aiemmin.",
+    "changedAdvice": "Näin voi käydä, kun palvelimen varmenne on uusittu, mutta se voi myös tarkoittaa, että joku sieppaa yhteytesi. Jatka vain, jos palvelimen ylläpitäjä on vahvistanut muutoksen.",
+    "previousFingerprint": "Aiemmin luotettu sormenjälki",
+    "newFingerprint": "Uusi sormenjälki",
+    "reject": "Älä yhdistä",
+    "trust": "Luota ja yhdistä",
+    "trustChanged": "Luota uuteen varmenteeseen"
+  },
+  "rejoin": {
+    "label": "Palaa viimeisimmälle kanavalle",
+    "text": "Olit viimeksi kanavalla {{channel}} – palataanko?",
+    "rejoin": "Palaa",
+    "notNow": "Ei nyt"
+  },
+  "status": {
+    "label": "Yhteyden tila",
+    "connecting": "Yhdistetään palvelimeen {{server}}…",
+    "reconnecting": "Yhdistetään uudelleen… (yritys {{attempt}}/{{max}}, seuraava yritys {{seconds}} s kuluttua)",
+    "tcp": "Yhdistetty TCP:n kautta (UDP estetty). Puhe toimii, mutta siinä voi olla pientä viivettä.",
+    "disconnected": "Yhteys katkaistu",
+    "disconnectedReason": "Yhteys katkaistu – {{reason}}",
+    "failed": "Yhteyttä palvelimeen {{server}} ei saatu. {{reason}}",
+    "cancel": "Peruuta",
+    "reconnect": "Yhdistä uudelleen",
+    "editServer": "Muokkaa palvelinta",
+    "actionFailed": {
+      "reorder": "Uutta palvelinjärjestystä ei voitu tallentaa. Yritä uudelleen.",
+      "remove": "Palvelinta ei voitu poistaa. Yritä uudelleen.",
+      "disconnect": "Yhteyden katkaiseminen epäonnistui. Yritä uudelleen."
+    }
+  },
+  "empty": {
+    "title": "Lisää ensimmäinen palvelimesi",
+    "description": "Anna ryhmältäsi saamasi osoite tai liitä mumble://-linkki.",
+    "addressLabel": "Palvelimen osoite tai mumble://-linkki",
+    "addressHint": "Esimerkiksi mumble.example.org tai mumble.example.org:64738.",
+    "connect": "Lisää ja yhdistä",
+    "pasteLink": "Liitä mumble://-linkki",
+    "moreOptions": "Lisää vaihtoehtoja…",
+    "noLinkInClipboard": "Leikepöydällä ei ole mumble://-linkkiä. Liitä tai kirjoita osoite yllä olevaan kenttään.",
+    "pasteManually": "Mumcord ei voinut lukea leikepöytää. Napsauta yllä olevaa kenttää ja paina Ctrl+V.",
+    "errors": {
+      "required": "Anna palvelimen osoite tai mumble://-linkki."
+    }
+  }
+}

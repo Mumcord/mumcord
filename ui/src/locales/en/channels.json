@@ -1,4 +1,5 @@
 {
+  "serverOverview": "Server overview",
   "tree": {
     "label": "Channels",
     "hint": "Enter: show chat · Shift+Enter or double-click: join · Arrow keys: move, expand, collapse",
@@ -28,6 +29,7 @@
     "localMuted": "muted for you",
     "unregistered": "not registered"
   },
+  "mumcordBadge": "Uses Mumcord",
   "statusTip": {
     "registered": "Registered on this server",
     "listening": "Listening to this channel",
@@ -38,7 +40,9 @@
     "suppressed": "Suppressed – can't speak in this channel",
     "localMuted": "Muted for you",
     "unregistered": "Not registered on this server (guest)",
-    "nowPlaying": "Listening to {{track}}"
+    "nowPlaying": "Listening to {{track}}",
+    "nowGaming": "Playing {{game}}",
+    "positional": "Positional audio active"
   },
   "announce": {
     "joined": "{{name}} joined your channel",

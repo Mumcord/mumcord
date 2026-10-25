@@ -1,0 +1,22 @@
+{
+  "open": "Информация за връзката",
+  "title": "Информация за връзката",
+  "loading": "Зареждане…",
+  "notConnected": "Не си свързан.",
+  "error": "Информацията за връзката не е налична в момента.",
+  "none": "–",
+  "transport": "Транспорт",
+  "transportValue": {
+    "udp": "UDP",
+    "tcp": "TCP (тунелиран)"
+  },
+  "latency": "Латентност",
+  "latencyValue": "{{value}} ms",
+  "loss": "Загуба на пакети",
+  "lossValue": "{{value}} %",
+  "bitrate": "Битрейт на изпращане",
+  "bitrateValue": "{{value}} kbit/s",
+  "serverLimit": "Ограничение на сървъра",
+  "packets": "Изпратени / получени пакети",
+  "packetsValue": "{{sent}} / {{received}}"
+}

@@ -1,0 +1,10 @@
+{
+  "close": {
+    "title": "Minimizzare nell'area di notifica o uscire?",
+    "description": "Sei ancora connesso. Da minimizzato, Mumcord ti mantiene in vocale e resta nell'area di notifica.",
+    "remember": "Ricorda la mia scelta",
+    "minimize": "Minimizza nell'area di notifica",
+    "quit": "Esci",
+    "failed": "Non ha funzionato. Riprova."
+  }
+}

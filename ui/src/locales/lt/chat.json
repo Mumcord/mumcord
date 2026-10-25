@@ -1,0 +1,159 @@
+{
+  "noConversation": "Prisijunk prie serverio ir pasirink kanalą, kad pradėtum bendrauti.",
+  "empty": "Žinučių dar nėra. Čia gautos žinutės įrašomos šiame kompiuteryje.",
+  "header": {
+    "channel": "#{{name}}",
+    "channelPrefix": "Kanalas",
+    "privatePrefix": "Privatus pokalbis su",
+    "unknownPerson": "Nežinomas žmogus"
+  },
+  "list": {
+    "today": "Šiandien",
+    "yesterday": "Vakar",
+    "label": "Žinutės: {{name}}",
+    "loadOlder": "Įkelti senesnes žinutes",
+    "loading": "Įkeliamos žinutės…",
+    "loadFailed": "Nepavyko įkelti senesnių žinučių. Slinkis aukštyn ir bandyk dar kartą.",
+    "loadEarlier": "Įkelti ankstesnes žinutes",
+    "syncing": "Ieškoma ankstesnių žinučių iš kitų Mumcord naudotojų…",
+    "syncAdded_one": "Pridėta {{count}} ankstesnė žinutė iš kitų Mumcord naudotojų.",
+    "syncAdded_few": "Pridėtos {{count}} ankstesnės žinutės iš kitų Mumcord naudotojų.",
+    "syncAdded_many": "Pridėtos {{count}} ankstesnės žinutės iš kitų Mumcord naudotojų.",
+    "syncAdded_other": "Pridėta {{count}} ankstesnių žinučių iš kitų Mumcord naudotojų.",
+    "syncNone": "Ankstesnių žinučių nerasta.",
+    "syncFailed": "Čia ankstesnių žinučių įkelti negalima.",
+    "syncedFrom": "iš {{name}} istorijos",
+    "jumpToNewest": "Pereiti prie naujausių",
+    "jumpToNewestUnseen_one": "Pereiti prie naujausių, {{count}} nauja žinutė",
+    "jumpToNewestUnseen_few": "Pereiti prie naujausių, {{count}} naujos žinutės",
+    "jumpToNewestUnseen_many": "Pereiti prie naujausių, {{count}} naujos žinutės",
+    "jumpToNewestUnseen_other": "Pereiti prie naujausių, {{count}} naujų žinučių"
+  },
+  "format": {
+    "toolbar": "Formatavimas",
+    "bold": "Pusjuodis",
+    "italic": "Kursyvas",
+    "strike": "Perbraukta",
+    "code": "Kodas eilutėje",
+    "codeBlock": "Kodo blokas",
+    "link": "Nuoroda"
+  },
+  "composer": {
+    "label": "Rašyti: {{name}}",
+    "hint": "Spausk Enter, kad išsiųstum, ir Shift+Enter, kad pereitum į naują eilutę. Veikia Markdown: **pusjuodis**, *kursyvas*, `kodas`, [nuoroda](https://…).",
+    "addImage": "Pridėti paveikslėlį",
+    "removeImage": "Pašalinti paveikslėlį {{name}}",
+    "imagePreview": "Siunčiamas paveikslėlis: {{name}}",
+    "send": "Siųsti",
+    "noPermission": "Neturi teisės rašyti šiame kanale.",
+    "unavailable": "Šis kanalas nebepasiekiamas.",
+    "offline": "{{name}} neprisijungęs (-usi). Galėsi vėl rašyti, kai grįš.",
+    "unnamedImage": "Įklijuotas paveikslėlis"
+  },
+  "tray": {
+    "label": "Siunčiami paveikslėliai",
+    "processing": "Ruošiamas paveikslėlis",
+    "scaled": "Sumažinta iki {{width}}×{{height}}, kad tilptų į serverio ribą"
+  },
+  "errors": {
+    "tooLong": "Tavo žinutė per ilga šiam serveriui (daugiausia {{max}} simbolių). Sutrumpink ją ir bandyk dar kartą.",
+    "tooLongNoLimit": "Tavo žinutė per ilga šiam serveriui. Sutrumpink ją ir bandyk dar kartą.",
+    "imageTooLarge": "Šis paveikslėlis per didelis šiam serveriui, net suspaudus. Išbandyk mažesnį paveikslėlį.",
+    "imageWithTextTooLong": "Žinutė su paveikslėliu per didelė šiam serveriui. Sutrumpink tekstą arba pašalink paveikslėlį.",
+    "imagesNotAllowed": "Šis serveris neleidžia siųsti paveikslėlių žinutėse.",
+    "notImage": "Šio failo išsiųsti negalima. Naudok PNG, JPEG, GIF arba WebP paveikslėlį.",
+    "imageUnreadable": "Nepavyko nuskaityti paveikslėlio. Išbandyk kitą failą.",
+    "denied": "Serveris šios žinutės nepriėmė.",
+    "deniedWithReason": "Serveris šios žinutės nepriėmė: {{reason}}",
+    "notConnected": "Neprisijungta. Prisijunk iš naujo ir bandyk dar kartą.",
+    "generic": "Nepavyko išsiųsti žinutės. Bandyk dar kartą.",
+    "onlyImages": "Galima siųsti tik paveikslėlius.",
+    "sourceTooLarge": "Šis failas per didelis siuntimui (daugiau nei 25 MB)."
+  },
+  "announce": {
+    "message": "{{name}}: {{text}}",
+    "image": "{{name}} atsiuntė paveikslėlį",
+    "more_one": "dar {{count}} nauja žinutė",
+    "more_few": "dar {{count}} naujos žinutės",
+    "more_many": "dar {{count}} naujos žinutės",
+    "more_other": "dar {{count}} naujų žinučių"
+  },
+  "pinned": {
+    "label": "Kanalo informacija",
+    "showMore": "Rodyti daugiau",
+    "showLess": "Rodyti mažiau"
+  },
+  "mention": {
+    "list": "Paminimi žmonės",
+    "found_one": "Pasiūlytas {{count}} žmogus. Naudok rodyklių klavišus, tada Enter, kad įterptum.",
+    "found_few": "Pasiūlyti {{count}} žmonės. Naudok rodyklių klavišus, tada Enter, kad įterptum.",
+    "found_many": "Pasiūlyta {{count}} žmogaus. Naudok rodyklių klavišus, tada Enter, kad įterptum.",
+    "found_other": "Pasiūlyta {{count}} žmonių. Naudok rodyklių klavišus, tada Enter, kad įterptum.",
+    "none": "Nieko nerasta",
+    "mentionsYou": "Mini tave",
+    "chipLabel": "{{name}}, paminėjimas"
+  },
+  "preview": {
+    "open": "Atidaryti naršyklėje",
+    "openLabel": "Atidaryti „{{title}}“ naršyklėje",
+    "play": "Leisti „{{title}}“",
+    "player": "Vaizdo įrašų grotuvas: {{title}}",
+    "videoTitle": "{{site}} vaizdo įrašas",
+    "spotifyTitle": "{{site}} nuoroda",
+    "audioPlayer": "Spotify grotuvas: {{title}}",
+    "kind": {
+      "track": "Kūrinys",
+      "album": "Albumas",
+      "playlist": "Grojaraštis",
+      "artist": "Atlikėjas",
+      "episode": "Epizodas",
+      "show": "Laida"
+    },
+    "inBrowser": "Groja tavo naršyklėje",
+    "card": "Nuorodos peržiūra: {{title}}",
+    "dismiss": "Slėpti peržiūrą"
+  },
+  "image": {
+    "loading": "Įkeliamas paveikslėlis {{name}}",
+    "label": "Paveikslėlis: {{name}}",
+    "view": "Peržiūrėti paveikslėlį {{name}}",
+    "viewMessage": "Paveikslėlis nuo {{name}}, atidaryti peržiūros lange",
+    "failed": "Paveikslėlio parodyti negalima (per didelis arba nepasiekiamas)."
+  },
+  "viewer": {
+    "label": "Paveikslėlių peržiūra",
+    "counter": "{{current}} / {{total}}",
+    "zoomIn": "Priartinti",
+    "zoomOut": "Tolinti",
+    "fit": "Priderinti prie lango",
+    "save": "Įrašyti paveikslėlį",
+    "saved": "Paveikslėlis įrašytas",
+    "saveFailed": "Nepavyko įrašyti paveikslėlio",
+    "fileFilter": "Paveikslėlis",
+    "openInBrowser": "Atidaryti naršyklėje",
+    "close": "Uždaryti",
+    "previous": "Ankstesnis paveikslėlis",
+    "next": "Kitas paveikslėlis",
+    "unnamed": "paveikslėlis",
+    "fullLoading": "Įkeliamas pilnas dydis…",
+    "fullProgress": "Įkeliamas pilnas dydis… {{percent}} %",
+    "fullUnavailable": "Pilno dydžio nėra – rodoma peržiūra"
+  },
+  "favorites": {
+    "open": "Mėgstamiausi GIF",
+    "title": "Mėgstamiausi GIF",
+    "save": "Įrašyti į mėgstamiausius",
+    "remove": "Pašalinti iš mėgstamiausių",
+    "removeNamed": "Pašalinti {{name}} iš mėgstamiausių",
+    "send": "Siųsti {{name}}",
+    "hint": "Rodyklės juda, Enter siunčia, Delete šalina, Escape uždaro.",
+    "empty": "Mėgstamiausių dar nėra. Pokalbyje spustelėk GIF dešiniuoju pelės klavišu arba naudok jo žvaigždutę ir pasirink „Įrašyti į mėgstamiausius“. Jis atsiras čia."
+  },
+  "imageMenu": {
+    "label": "Paveikslėlis {{name}}"
+  },
+  "attribution": {
+    "via": "per {{brand}}",
+    "view": "Peržiūrėti per {{brand}}"
+  }
+}

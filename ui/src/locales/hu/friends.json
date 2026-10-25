@@ -1,0 +1,15 @@
+{
+  "title": "Barátok",
+  "item": "{{name}}, {{status}}",
+  "online": "Online",
+  "onlineIn": "Online itt: {{channel}}",
+  "onlineOnServer": "Online itt: {{server}}",
+  "offline": "Offline",
+  "lastSeen": "Offline, utoljára látva: {{when}}",
+  "friend": "Barát",
+  "friendHint": "Mutatja, mikor online, és megőrzi a vele folytatott privát chatet.",
+  "noCertificate": "Tanúsítvány nélküli személyek nem lehetnek barátok, mert a Mumcord nem tudná újra felismerni őket.",
+  "add": "Barát hozzáadása",
+  "remove": "Barát eltávolítása",
+  "failed": "A barát módosítása nem sikerült. Próbáld újra."
+}

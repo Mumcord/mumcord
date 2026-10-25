@@ -5,6 +5,8 @@
   "listening_other": "Hören zu ({{count}})",
   "noChannel": "Wähle einen Kanal, um zu sehen, wer darin ist.",
   "nobody": "Niemand ist hier.",
+  "nobodyElse": "Sonst ist niemand auf dem Server.",
+  "inOtherChannels": "In anderen Kanälen",
   "you": "(du)",
   "registered": "Registriert",
   "unregistered": "Nicht registriert",
@@ -16,7 +18,14 @@
     "volumeValue": "{{value}} %",
     "localMute": "Für mich stummschalten",
     "sessionOnly": "Diese Person hat kein Zertifikat, daher gelten diese Einstellungen nur für diese Sitzung.",
-    "sendPrivateMessage": "Private Nachricht senden"
+    "sendPrivateMessage": "Private Nachricht senden",
+    "privateMessage": "Private Nachricht",
+    "localSettings": "Deine Einstellungen",
+    "localSettingsHint": "Nur du siehst sie. Änderungen werden sofort gespeichert.",
+    "localMuteHint": "Du hörst diese Person nicht mehr.",
+    "privateNote": "Private Notiz",
+    "privateNoteHint": "Nur du kannst diese Notiz sehen.",
+    "saved": "Gespeichert"
   },
   "errors": {
     "notConnected": "Nicht mit einem Server verbunden.",
@@ -25,8 +34,9 @@
   "menu": {
     "label": "Aktionen für {{name}}",
     "viewProfile": "Profil ansehen",
-    "mute": "Für mich stummschalten",
-    "unmute": "Für mich laut schalten"
+    "join": "{{channel}} beitreten",
+    "joinDenied": "Du darfst diesen Kanal nicht betreten.",
+    "mute": "Für mich stummschalten"
   },
   "nowPlaying": {
     "label": "Läuft gerade",
@@ -34,5 +44,22 @@
     "paused": "Pausiert",
     "progress": "Wiedergabefortschritt",
     "position": "{{position}} von {{duration}}"
+  },
+  "nowGaming": {
+    "label": "Spielt gerade",
+    "playing": "Spielt",
+    "playedFor": "seit {{time}}",
+    "hoursMinutes": "{{hours}} Std. {{minutes}} Min.",
+    "minutes_one": "{{count}} Min.",
+    "minutes_other": "{{count}} Min.",
+    "join": "Spiel beitreten",
+    "joinTitle": "Spiel beitreten?",
+    "joinMessage": "Steam wird geöffnet und verbindet sich mit dem Server, auf dem diese Person {{game}} spielt. Tritt nur Servern bei, denen du vertraust.",
+    "joinConfirm": "Steam öffnen",
+    "joinFailed": "Steam konnte nicht geöffnet werden."
+  },
+  "preview": {
+    "privateMessage": "Private Nachricht",
+    "fullProfile": "Vollständiges Profil"
   }
 }

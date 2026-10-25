@@ -1,0 +1,63 @@
+{
+  "follow": "Obserwuj",
+  "following": "Obserwujesz",
+  "unsupported": "Obserwowanie kanałów wymaga serwera w wersji 1.4 lub nowszej.",
+  "unread_one": "{{count}} nieprzeczytana wiadomość",
+  "unread_few": "{{count}} nieprzeczytane wiadomości",
+  "unread_many": "{{count}} nieprzeczytanych wiadomości",
+  "unread_other": "{{count}} nieprzeczytanej wiadomości",
+  "errors": {
+    "denied": "Serwer nie pozwala Ci obserwować tego kanału.",
+    "limit": "Nie możesz obserwować więcej kanałów na tym serwerze. Najpierw przestań obserwować inny kanał.",
+    "tooOld": "Ten serwer jest zbyt stary, by obserwować kanały (wymagana wersja 1.4 lub nowsza).",
+    "notConnected": "Nie masz połączenia z serwerem.",
+    "generic": "Nie udało się obserwować tego kanału. Spróbuj ponownie."
+  },
+  "dm": {
+    "title": "Wiadomości prywatne",
+    "unknown": "Nieznana osoba"
+  },
+  "notify": {
+    "channel": "{{name}} na {{channel}}: {{text}}",
+    "private": "{{name}} (prywatnie): {{text}}",
+    "more_one": "{{count}} nowa wiadomość więcej",
+    "more_few": "{{count}} nowe wiadomości więcej",
+    "more_many": "{{count}} nowych wiadomości więcej",
+    "more_other": "{{count}} nowej wiadomości więcej"
+  },
+  "history": {
+    "clear": "Wyczyść historię",
+    "title": "Wyczyścić historię?",
+    "body": "To trwale usunie z tego komputera zapisane wiadomości z tej rozmowy. Inne osoby zachowają swoje kopie.",
+    "confirm": "Wyczyść historię",
+    "cancel": "Anuluj",
+    "failed": "Nie udało się wyczyścić historii. Spróbuj ponownie."
+  },
+  "star": {
+    "follow": "Obserwuj {{channel}}",
+    "unfollow": "Przestań obserwować {{channel}}"
+  },
+  "all": {
+    "menu": "Opcje serwera {{server}}",
+    "menuLabel": "Opcje serwera",
+    "follow": "Obserwuj wszystkie kanały",
+    "unfollow": "Przestań obserwować wszystkie kanały",
+    "working": "Obserwowanie kanałów…",
+    "followed_one": "Obserwujesz {{count}} kanał.",
+    "followed_few": "Obserwujesz {{count}} kanały.",
+    "followed_many": "Obserwujesz {{count}} kanałów.",
+    "followed_other": "Obserwujesz {{count}} kanału.",
+    "skipped_one": "Pominięto {{count}}: {{reasons}}.",
+    "skipped_few": "Pominięto {{count}}: {{reasons}}.",
+    "skipped_many": "Pominięto {{count}}: {{reasons}}.",
+    "skipped_other": "Pominięto {{count}}: {{reasons}}.",
+    "limit": "osiągnięto limit",
+    "notAllowed": "brak zgody",
+    "noAnswer": "brak odpowiedzi serwera",
+    "unfollowed": "Przestano obserwować wszystkie kanały.",
+    "failed": "Nie udało się obserwować wszystkich kanałów. Spróbuj ponownie.",
+    "dismiss": "Odrzuć",
+    "unfollowFailed": "Nie udało się przestać obserwować wszystkich kanałów. Spróbuj ponownie."
+  },
+  "mention": "zawiera wzmiankę o Tobie"
+}

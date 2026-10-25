@@ -1,0 +1,14 @@
+{
+  "region": "Ilmoitukset",
+  "channel": "#{{name}}",
+  "unknownChannel": "Kanava",
+  "line": "{{sender}}: {{preview}}",
+  "groupedChannel_one": "{{count}} uusi viesti kanavalla {{name}}",
+  "groupedChannel_other": "{{count}} uutta viestiä kanavalla {{name}}",
+  "groupedPrivate_one": "{{count}} uusi viesti käyttäjältä {{name}}",
+  "groupedPrivate_other": "{{count}} uutta viestiä käyttäjältä {{name}}",
+  "image": "Lähetti kuvan",
+  "open": "Avaa chat",
+  "close": "Hylkää ilmoitus",
+  "mentionLine": "{{sender}} mainitsi sinut: {{preview}}"
+}

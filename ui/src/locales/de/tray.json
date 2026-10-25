@@ -1,0 +1,12 @@
+{
+  "show": "Mumcord anzeigen",
+  "mute": "Stummschalten",
+  "deafen": "Taub schalten",
+  "overlay": "Overlay anzeigen",
+  "quit": "Beenden",
+  "disconnected": "Nicht verbunden",
+  "connecting": "Verbinde…",
+  "connected": "Verbunden",
+  "talking": "Verbunden – spricht",
+  "muted": "Verbunden – stumm"
+}

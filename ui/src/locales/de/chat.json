@@ -13,7 +13,17 @@
     "label": "Nachrichten in {{name}}",
     "loadOlder": "Ältere Nachrichten laden",
     "loading": "Nachrichten werden geladen…",
-    "loadFailed": "Ältere Nachrichten konnten nicht geladen werden. Scrolle nach oben, um es erneut zu versuchen."
+    "loadFailed": "Ältere Nachrichten konnten nicht geladen werden. Scrolle nach oben, um es erneut zu versuchen.",
+    "loadEarlier": "Frühere Nachrichten laden",
+    "syncing": "Suche frühere Nachrichten bei anderen Mumcord-Nutzern…",
+    "syncAdded_one": "{{count}} frühere Nachricht von anderen Mumcord-Nutzern hinzugefügt.",
+    "syncAdded_other": "{{count}} frühere Nachrichten von anderen Mumcord-Nutzern hinzugefügt.",
+    "syncNone": "Keine früheren Nachrichten gefunden.",
+    "syncFailed": "Frühere Nachrichten können hier nicht geladen werden.",
+    "syncedFrom": "aus dem Verlauf von {{name}}",
+    "jumpToNewest": "Zu den neuesten springen",
+    "jumpToNewestUnseen_one": "Zu den neuesten springen, {{count}} neue Nachricht",
+    "jumpToNewestUnseen_other": "Zu den neuesten springen, {{count}} neue Nachrichten"
   },
   "format": {
     "toolbar": "Formatierung",
@@ -28,12 +38,18 @@
     "label": "Nachricht an {{name}}",
     "hint": "Enter sendet, Umschalt+Enter fügt eine neue Zeile ein. Markdown funktioniert: **fett**, *kursiv*, `Code`, [Link](https://…).",
     "addImage": "Bild hinzufügen",
-    "removeImage": "Bild entfernen",
-    "imagePreview": "Zu sendendes Bild",
+    "removeImage": "Bild {{name}} entfernen",
+    "imagePreview": "Zu sendendes Bild: {{name}}",
     "send": "Senden",
     "noPermission": "Du darfst in diesem Kanal nicht schreiben.",
     "unavailable": "Dieser Kanal ist nicht mehr verfügbar.",
-    "offline": "{{name}} ist offline. Du kannst wieder schreiben, sobald die Person zurück ist."
+    "offline": "{{name}} ist offline. Du kannst wieder schreiben, sobald die Person zurück ist.",
+    "unnamedImage": "Eingefügtes Bild"
+  },
+  "tray": {
+    "label": "Zu sendende Bilder",
+    "processing": "Bild wird vorbereitet",
+    "scaled": "Auf {{width}}×{{height}} verkleinert, damit es zum Serverlimit passt"
   },
   "errors": {
     "tooLong": "Deine Nachricht ist zu lang für diesen Server (höchstens {{max}} Zeichen). Kürze sie und versuche es erneut.",
@@ -46,7 +62,9 @@
     "denied": "Der Server hat diese Nachricht nicht erlaubt.",
     "deniedWithReason": "Der Server hat diese Nachricht nicht erlaubt: {{reason}}",
     "notConnected": "Du bist nicht verbunden. Verbinde dich neu und versuche es erneut.",
-    "generic": "Die Nachricht konnte nicht gesendet werden. Versuche es erneut."
+    "generic": "Die Nachricht konnte nicht gesendet werden. Versuche es erneut.",
+    "onlyImages": "Es können nur Bilder gesendet werden.",
+    "sourceTooLarge": "Diese Datei ist zu groß zum Senden (über 25 MB)."
   },
   "announce": {
     "message": "{{name}}: {{text}}",
@@ -64,7 +82,8 @@
     "found_one": "{{count}} Person vorgeschlagen. Mit den Pfeiltasten wählen, mit Enter einfügen.",
     "found_other": "{{count}} Personen vorgeschlagen. Mit den Pfeiltasten wählen, mit Enter einfügen.",
     "none": "Niemand gefunden",
-    "mentionsYou": "Erwähnt dich"
+    "mentionsYou": "Erwähnt dich",
+    "chipLabel": "{{name}}, Erwähnung"
   },
   "preview": {
     "open": "Im Browser öffnen",
@@ -107,7 +126,10 @@
     "close": "Schließen",
     "previous": "Vorheriges Bild",
     "next": "Nächstes Bild",
-    "unnamed": "bild"
+    "unnamed": "bild",
+    "fullLoading": "Volle Größe wird geladen…",
+    "fullProgress": "Volle Größe wird geladen… {{percent}} %",
+    "fullUnavailable": "Volle Größe nicht verfügbar – Vorschau wird angezeigt"
   },
   "favorites": {
     "open": "GIF-Favoriten",

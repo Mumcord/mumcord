@@ -1,0 +1,65 @@
+.friends-list ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.friends-list__item {
+  display: flex;
+  gap: var(--space-2);
+  align-items: center;
+  width: 100%;
+  min-height: 2rem;
+  padding: var(--space-1) var(--space-2);
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--color-text);
+  text-align: left;
+  cursor: pointer;
+}
+
+.friends-list__item:hover {
+  background: var(--color-bg-hover);
+}
+
+/* Same selection bar as the channel tree and the direct messages. */
+.friends-list__item[aria-current="true"] {
+  background: var(--color-bg-selected);
+  box-shadow: inset 3px 0 0 var(--color-accent);
+}
+
+.friends-list__text {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.friends-list__name,
+.friends-list__status {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.friends-list__status {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+}
+
+/* Online dot; the state is also spelled out in the status text, so colour is never the only cue. */
+.friends-list__dot,
+.presence-dot {
+  flex: none;
+  width: 0.5rem;
+  height: 0.5rem;
+  border: 1px solid var(--color-text-muted);
+  border-radius: var(--radius-full);
+}
+
+.friends-list__dot[data-online="true"],
+.presence-dot[data-online="true"] {
+  border-color: var(--color-success);
+  background: var(--color-success);
+}

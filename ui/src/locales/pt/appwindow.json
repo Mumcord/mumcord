@@ -1,0 +1,10 @@
+{
+  "close": {
+    "title": "Minimizar para a bandeja ou sair?",
+    "description": "Ainda estás ligado. Se minimizares, o Mumcord mantém-te na voz e fica na bandeja do sistema.",
+    "remember": "Lembrar a minha escolha",
+    "minimize": "Minimizar para a bandeja",
+    "quit": "Sair",
+    "failed": "Não funcionou. Tenta novamente."
+  }
+}

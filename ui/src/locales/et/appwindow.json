@@ -1,0 +1,10 @@
+{
+  "close": {
+    "title": "Minimeeri salve või välju?",
+    "description": "Oled endiselt ühendatud. Minimeerituna hoiab Mumcord sind häälkõnes ja jääb süsteemisalve.",
+    "remember": "Jäta mu valik meelde",
+    "minimize": "Minimeeri salve",
+    "quit": "Välju",
+    "failed": "See ei õnnestunud. Proovi palun uuesti."
+  }
+}

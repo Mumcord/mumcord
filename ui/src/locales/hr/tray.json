@@ -1,0 +1,12 @@
+{
+  "show": "Prikaži Mumcord",
+  "mute": "Isključi mikrofon",
+  "deafen": "Isključi zvuk",
+  "overlay": "Prikaži overlay",
+  "quit": "Izađi",
+  "disconnected": "Nije povezano",
+  "connecting": "Povezivanje…",
+  "connected": "Povezano",
+  "talking": "Povezano – govori",
+  "muted": "Povezano – mikrofon isključen"
+}

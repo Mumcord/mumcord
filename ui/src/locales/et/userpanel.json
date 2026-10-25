@@ -1,0 +1,88 @@
+{
+  "unknownName": "Sina",
+  "mute": "Vaigista mikrofon",
+  "deafen": "Kurdista",
+  "disconnect": "Katkesta ühendus: {{server}}",
+  "settings": "Kiirseaded",
+  "announce": {
+    "muted": "Mikrofon vaigistatud",
+    "unmuted": "Mikrofoni vaigistus lõpetatud",
+    "deafened": "Kurdistatud. Sa ei kuule teisi ja sinu mikrofon on vaigistatud",
+    "undeafened": "Kurdistus lõpetatud"
+  },
+  "readOnly": {
+    "text": "Sa loed kaasa – liitu kanaliga, et rääkida.",
+    "join": "Liitu: {{channel}}"
+  },
+  "status": {
+    "connecting": "Ühendan…",
+    "reconnecting": "Ühendan uuesti…",
+    "connected": "Ühendatud",
+    "readOnly": "Ainult lugemine",
+    "disconnected": "Ühendus puudub",
+    "playing": "Mängib: {{game}}",
+    "listening": "Kuulab: {{track}}"
+  },
+  "profile": {
+    "title": "Muuda profiili",
+    "chooseTitle": "Vali profiilipilt",
+    "chooseAvatar": "Vali pilt…",
+    "removeAvatar": "Eemalda pilt",
+    "avatarHint": "Pilt vähendatakse nii, et see mahub serveri piirangusse.",
+    "avatarUnregistered": "See server hoiab avatare ainult registreeritud kasutajatel – Mumcord saadab sinu oma igal ühendumisel uuesti.",
+    "avatarChosen": "Valitud: {{name}}",
+    "avatarRemoved": "Pilt eemaldatakse, kui salvestad.",
+    "comment": "Sinust"
+  },
+  "register": {
+    "title": "Registreeru sellel serveril",
+    "explain": "Registreerimine reserveerib sinu nime sellel serveril. Keegi teine ei saa seda kasutada ja server tunneb sind järgmisel ühendumisel ära.",
+    "backup": "Sinu identiteet tõestab, et nimi kuulub sulle. Kui kaotad selle, kaotad ligipääsu registreeritud nimele. Salvesta varukoopia kohe ja hoia seda kindlas kohas.",
+    "password": "Varufaili parool",
+    "export": "Ekspordi identiteet",
+    "saveTitle": "Salvesta identiteedi varukoopia",
+    "passwordRequired": "Sisesta parool, et varufaili kaitsta.",
+    "exported": "Identiteedi varukoopia salvestatud.",
+    "confirm": "Registreeru",
+    "done": "Registreeritud sellel serveril"
+  },
+  "errors": {
+    "tooLarge": "See on serverile liiga suur. Vali väiksem pilt või kirjuta lühem tekst.",
+    "denied": "Server ei luba seda.",
+    "deniedWithReason": "Server ei luba seda: {{reason}}",
+    "notConnected": "Sa pole serveriga ühendatud.",
+    "file": "Faili ei õnnestunud lugeda ega kirjutada.",
+    "generic": "Midagi läks valesti. Proovi palun uuesti."
+  },
+  "ptt": "Vajuta ja räägi: hoia all {{key}}",
+  "pttNoKey": "Vajuta ja räägi: klahvi pole määratud",
+  "quickSettings": {
+    "linkPreviews": "Linkide eelvaated ja manused",
+    "linkPreviewsHint": "Saidid näevad sinu IP-aadressi",
+    "nowPlaying": "Jaga, mida kuulan",
+    "nowPlayingHint": "Teised näevad sinu praegust lugu",
+    "unsupported": "macOS-is pole saadaval",
+    "theme": "Teema",
+    "theme_system": "Süsteemi oma",
+    "theme_dark": "Tume",
+    "theme_light": "Hele",
+    "nowGaming": "Jaga mängu, mida mängin",
+    "nowGamingHint": "Teised näevad sinu praegust mängu",
+    "unavailable": "Sellel süsteemil pole saadaval",
+    "overlay": "Kattekiht",
+    "overlayHint": "Näitab mängude peal, kes räägib",
+    "editProfile": "Muuda profiili",
+    "editProfileHint": "Nimi, avatar ja kommentaar",
+    "register": "Registreeru sellel serveril",
+    "registered": "Registreeritud sellel serveril ✓",
+    "registerHint": "Hoiab sinu nime ja avatari sellel serveril",
+    "allSettings": "Kõik seaded…",
+    "label": "Kiirseaded",
+    "positional": "Positsiooniheli",
+    "positionalHint": "Hääled paigutatakse 3D-s sinu ümber",
+    "offerImages": "Paku täissuuruses pilte",
+    "offerImagesHint": "Luba teistel laadida sinu originaalpilte",
+    "loadImages": "Laadi täissuuruses pildid",
+    "loadImagesHint": "Too teistelt originaalpildid"
+  }
+}

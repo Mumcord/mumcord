@@ -1,0 +1,12 @@
+{
+  "listLabel": "Dabar kalba",
+  "move": {
+    "hint": "Vilk, kad perkeltum perdangą",
+    "done": "Atlikta"
+  },
+  "limits": {
+    "wayland": "Šiame „Wayland“ darbalaukyje programos negali laikyti lango viršuje ar pasirinkti jo vietos, todėl perdanga gali atsidurti po kitais langais, o kampų pozicijos neveikia. Balso nustatymuose įjunk „Suderinamumo režimas (kaip TeamSpeak)“ ir iš naujo paleisk Mumcord: tada perdanga liks viršuje.",
+    "waylandKde": "KDE Plasma su „Wayland“ programos negali laikyti lango viršuje ar pasirinkti jo vietos. Yra du sprendimai: leisk Mumcord pridėti KDE lango taisyklę perdangai („Nustatyti automatiškai“) arba balso nustatymuose įjunk „Suderinamumo režimas (kaip TeamSpeak)“ ir iš naujo paleisk Mumcord.",
+    "exclusiveFullscreen": "Perdanga rodoma virš langinių ir be rėmelių viso ekrano žaidimų. Išskirtiniu viso ekrano režimu veikiantys žaidimai piešia virš visų langų, todėl perjunk juos į „be rėmelių“ arba „langinį viso ekrano“ režimą, kad matytum perdangą."
+  }
+}

@@ -6,6 +6,7 @@
  */
 import { useEffect, useId, useRef, useState, type KeyboardEvent } from "react";
 import { useTranslation } from "react-i18next";
+import { useHintPreferences } from "../../a11y/hintPreferences";
 import type { InlineImage } from "../../api";
 import { GifAttribution } from "./GifAttribution";
 import { markFavoriteUsed, removeFavorite, useGifFavorites } from "./favorites";
@@ -19,8 +20,24 @@ const SAFE_SRC = /^data:image\/(?:png|jpeg|gif|webp);base64,/;
 
 function Thumbnail({ url, linkPreviews }: { url: string; linkPreviews: boolean }) {
   const [image, setImage] = useState<InlineImage | null>(null);
+  const [visible, setVisible] = useState(typeof IntersectionObserver === "undefined");
+  const holder = useRef<HTMLSpanElement>(null);
+  // Only thumbnails in view are loaded and animated; scrolled-out ones are released again, so
+  // a long favorites list never decodes dozens of animated GIFs at once.
   useEffect(() => {
-    if (!linkPreviews) return;
+    const element = holder.current;
+    if (!element || typeof IntersectionObserver === "undefined") return;
+    const observer = new IntersectionObserver((entries) => {
+      const last = entries[entries.length - 1];
+      if (last) setVisible(last.isIntersecting);
+    });
+    observer.observe(element);
+    return () => {
+      observer.disconnect();
+    };
+  }, []);
+  useEffect(() => {
+    if (!linkPreviews || !visible) return;
     let active = true;
     void loadInlineImage(url).then((loaded) => {
       if (active) setImage(loaded);
@@ -28,13 +45,17 @@ function Thumbnail({ url, linkPreviews }: { url: string; linkPreviews: boolean }
     return () => {
       active = false;
     };
-  }, [url, linkPreviews]);
-  if (linkPreviews && image && SAFE_SRC.test(image.src)) {
-    return <img className="gif-picker__img" src={image.src} alt="" />;
-  }
+  }, [url, linkPreviews, visible]);
+  // The wrapper stays mounted so the observer keeps watching after the image has loaded.
   return (
-    <span className="gif-picker__placeholder" aria-hidden="true">
-      {imageName(url)}
+    <span ref={holder} className="gif-picker__thumb">
+      {linkPreviews && visible && image && SAFE_SRC.test(image.src) ? (
+        <img className="gif-picker__img" src={image.src} alt="" draggable={false} />
+      ) : (
+        <span className="gif-picker__placeholder" aria-hidden="true">
+          {imageName(url)}
+        </span>
+      )}
     </span>
   );
 }
@@ -57,6 +78,7 @@ export function GifPicker({ onSend, disabled, linkPreviews }: GifPickerProps) {
   const cells = useRef<(HTMLButtonElement | null)[]>([]);
   const dialogId = useId();
   const hintId = useId();
+  const { keyboardHints } = useHintPreferences();
   const current = Math.min(active, Math.max(favorites.length - 1, 0));
 
   useEffect(() => {
@@ -203,7 +225,7 @@ export function GifPicker({ onSend, disabled, linkPreviews }: GifPickerProps) {
             </p>
           ) : (
             <>
-              <p id={hintId} className="gif-picker__hint">
+              <p id={hintId} className={keyboardHints ? "gif-picker__hint" : "visually-hidden"}>
                 {t("favorites.hint")}
               </p>
               <ul className="gif-picker__grid" aria-label={t("favorites.title")}>

@@ -1,0 +1,128 @@
+{
+  "unknownServer": "o servidor",
+  "announce": {
+    "connected": "Ligado a {{server}}.",
+    "lost": "Ligação a {{server}} perdida. A religar…",
+    "ended": "Desligado de {{server}}. Vê a barra acima do chat para saber o que fazer a seguir.",
+    "disconnected": "Desligado de {{server}}.",
+    "tcp": "A voz passa agora por TCP porque o UDP está bloqueado. O áudio pode ter um ligeiro atraso.",
+    "removed": "{{server}} removido.",
+    "moved": "{{server}} movido para a posição {{position}} de {{count}}."
+  },
+  "bar": {
+    "listLabel": "Servidores guardados",
+    "add": "Adicionar um servidor",
+    "keyboardHint": "Enter liga. Alt mais seta para cima ou para baixo move o servidor. Shift mais F10 abre mais opções.",
+    "status": {
+      "connected": "{{server}} (ligado)",
+      "connecting": "{{server}} (a ligar)",
+      "reconnecting": "{{server}} (a religar)"
+    }
+  },
+  "menu": {
+    "label": "Opções para {{server}}",
+    "connect": "Ligar",
+    "disconnect": "Desligar",
+    "edit": "Editar servidor",
+    "moveUp": "Mover para cima",
+    "moveDown": "Mover para baixo",
+    "remove": "Remover servidor"
+  },
+  "dialog": {
+    "addTitle": "Adicionar um servidor",
+    "editTitle": "Editar servidor",
+    "linkTitle": "Guardar este servidor?",
+    "address": "Endereço",
+    "addressHint": "Por exemplo mumble.example.org. Também podes colar aqui uma ligação mumble://.",
+    "filledFromLink": "Preenchido a partir da ligação mumble://.",
+    "port": "Porta",
+    "label": "Nome na barra de servidores",
+    "username": "O teu nome neste servidor",
+    "password": "Palavra-passe do servidor (opcional)",
+    "passwordHint": "Só é necessária se o servidor a pedir. É guardada no armazenamento seguro do sistema.",
+    "passwordKeepHint": "Há uma palavra-passe guardada. Deixa vazio para a manter ou escreve uma nova.",
+    "clearPassword": "Remover a palavra-passe guardada",
+    "add": "Adicionar servidor",
+    "saveAndConnect": "Guardar e ligar",
+    "errors": {
+      "address": "Introduz o endereço do servidor.",
+      "port": "Introduz uma porta entre 1 e 65535. A maioria dos servidores usa 64738.",
+      "username": "Introduz o nome que queres usar neste servidor.",
+      "link": "Não foi possível ler esta ligação mumble://. Verifica se foi copiada por completo.",
+      "invalid": "Os dados do servidor não são válidos. Verifica o endereço e a porta."
+    }
+  },
+  "errors": {
+    "serverUnreachable": "Não foi possível contactar o servidor. Verifica o endereço e a porta, e se estás online.",
+    "wrongPassword": "A palavra-passe do servidor está errada. Edita o servidor e introduz a palavra-passe correta.",
+    "nameInUse": "O teu nome já está em uso ou registado por outra pessoa neste servidor. Edita o servidor e escolhe outro nome.",
+    "certificateRejected": "A verificação do certificado falhou: ou o certificado do servidor não foi considerado de confiança, ou o servidor não aceitou a tua identidade. Tenta novamente ou fala com o dono do servidor.",
+    "certificateChanged": "O certificado do servidor mudou e não foi considerado de confiança. Só deves confiar nele depois de o dono do servidor confirmar a alteração.",
+    "denied": "O servidor recusou a ligação.",
+    "deniedWithReason": "O servidor recusou a ligação: {{reason}}",
+    "invalidAddress": "O endereço do servidor não é válido. Edita o servidor para o corrigir.",
+    "secureStorage": "O armazenamento seguro do sistema não está disponível, por isso não foi possível ler ou guardar a palavra-passe do servidor. Desbloqueia-o e tenta novamente.",
+    "notFound": "Este servidor já não está guardado.",
+    "generic": "Algo correu mal. Tenta novamente."
+  },
+  "remove": {
+    "title": "Remover {{server}}?",
+    "message": "A palavra-passe guardada, a decisão sobre o certificado, os canais seguidos e o histórico de chat neste computador são eliminados.",
+    "confirm": "Remover"
+  },
+  "switch": {
+    "title": "Mudar de servidor?",
+    "message": "Só podes estar num servidor de cada vez. Desligar de {{current}} e ligar a {{next}}?",
+    "confirm": "Desligar e mudar"
+  },
+  "cert": {
+    "newTitle": "Confiar neste servidor?",
+    "newIntro": "O Mumcord ainda não viu o certificado de {{server}}. Se o dono do servidor te deu uma impressão digital, confirma que corresponde. A tua escolha fica guardada.",
+    "fingerprint": "Impressão digital do certificado",
+    "changedTitle": "Aviso: o certificado do servidor mudou",
+    "changedWarning": "O certificado de {{server}} é diferente do que aceitaste anteriormente.",
+    "changedAdvice": "Isto pode acontecer depois de o servidor ser renovado, mas também pode significar que alguém está a intercetar a tua ligação. Só deves continuar se o dono do servidor confirmar a alteração.",
+    "previousFingerprint": "Impressão digital aceite anteriormente",
+    "newFingerprint": "Nova impressão digital",
+    "reject": "Não ligar",
+    "trust": "Confiar e ligar",
+    "trustChanged": "Confiar no novo certificado"
+  },
+  "rejoin": {
+    "label": "Voltar ao último canal",
+    "text": "Da última vez estavas em {{channel}} – Voltar a entrar?",
+    "rejoin": "Voltar a entrar",
+    "notNow": "Agora não"
+  },
+  "status": {
+    "label": "Estado da ligação",
+    "connecting": "A ligar a {{server}}…",
+    "reconnecting": "A religar… (tentativa {{attempt}} de {{max}}, próxima tentativa em {{seconds}} s)",
+    "tcp": "Ligado por TCP (UDP bloqueado). A voz funciona, mas pode ter um ligeiro atraso.",
+    "disconnected": "Sem ligação",
+    "disconnectedReason": "Sem ligação – {{reason}}",
+    "failed": "Não foi possível ligar a {{server}}. {{reason}}",
+    "cancel": "Cancelar",
+    "reconnect": "Religar",
+    "editServer": "Editar servidor",
+    "actionFailed": {
+      "reorder": "Não foi possível guardar a nova ordem dos servidores. Tenta novamente.",
+      "remove": "Não foi possível remover o servidor. Tenta novamente.",
+      "disconnect": "Falhou ao desligar. Tenta novamente."
+    }
+  },
+  "empty": {
+    "title": "Adiciona o teu primeiro servidor",
+    "description": "Introduz o endereço que recebeste do teu grupo ou cola uma ligação mumble://.",
+    "addressLabel": "Endereço do servidor ou ligação mumble://",
+    "addressHint": "Por exemplo mumble.example.org ou mumble.example.org:64738.",
+    "connect": "Adicionar e ligar",
+    "pasteLink": "Colar uma ligação mumble://",
+    "moreOptions": "Mais opções…",
+    "noLinkInClipboard": "A área de transferência não contém uma ligação mumble://. Cola ou escreve o endereço acima.",
+    "pasteManually": "O Mumcord não conseguiu ler a área de transferência. Clica no campo acima e prime Ctrl+V.",
+    "errors": {
+      "required": "Introduz um endereço de servidor ou uma ligação mumble://."
+    }
+  }
+}

@@ -1,0 +1,65 @@
+{
+  "inChannel_one": "Kanavalla {{channel}} ({{count}})",
+  "inChannel_other": "Kanavalla {{channel}} ({{count}})",
+  "listening_one": "Kuuntelee ({{count}})",
+  "listening_other": "Kuuntelee ({{count}})",
+  "noChannel": "Valitse kanava nähdäksesi, keitä siellä on.",
+  "nobody": "Täällä ei ole ketään.",
+  "nobodyElse": "Palvelimella ei ole muita.",
+  "inOtherChannels": "Muilla kanavilla",
+  "you": "(sinä)",
+  "registered": "Rekisteröitynyt",
+  "unregistered": "Ei rekisteröitynyt",
+  "talking": "Puhuu",
+  "card": {
+    "close": "Sulje",
+    "loadFailed": "Profiilia ei voitu ladata.",
+    "volume": "Äänenvoimakkuus",
+    "volumeValue": "{{value}} %",
+    "localMute": "Mykistä minulta",
+    "sessionOnly": "Tällä henkilöllä ei ole varmennetta, joten nämä asetukset ovat voimassa vain tämän istunnon ajan.",
+    "sendPrivateMessage": "Lähetä yksityisviesti",
+    "privateMessage": "Yksityisviesti",
+    "localSettings": "Omat asetuksesi",
+    "localSettingsHint": "Vain sinä näet nämä. Muutokset tallennetaan heti.",
+    "localMuteHint": "Et kuule tätä henkilöä.",
+    "privateNote": "Yksityinen muistiinpano",
+    "privateNoteHint": "Vain sinä näet tämän muistiinpanon.",
+    "saved": "Tallennettu"
+  },
+  "errors": {
+    "notConnected": "Ei yhteyttä palvelimeen.",
+    "generic": "Se ei onnistunut. Yritä uudelleen."
+  },
+  "menu": {
+    "label": "Toiminnot: {{name}}",
+    "viewProfile": "Näytä profiili",
+    "join": "Liity kanavalle {{channel}}",
+    "joinDenied": "Sinulla ei ole oikeutta liittyä tälle kanavalle.",
+    "mute": "Mykistä minulta"
+  },
+  "nowPlaying": {
+    "label": "Nyt soi",
+    "listening": "Kuuntelee",
+    "paused": "Tauolla",
+    "progress": "Toiston edistyminen",
+    "position": "{{position}} / {{duration}}"
+  },
+  "nowGaming": {
+    "label": "Pelaa nyt",
+    "playing": "Pelaa",
+    "playedFor": "{{time}}",
+    "hoursMinutes": "{{hours}} h {{minutes}} min",
+    "minutes_one": "{{count}} min",
+    "minutes_other": "{{count}} min",
+    "join": "Liity peliin",
+    "joinTitle": "Liitytäänkö peliin?",
+    "joinMessage": "Steam avautuu ja yhdistää palvelimeen, jolla tämä henkilö pelaa peliä {{game}}. Liity vain palvelimiin, joihin luotat.",
+    "joinConfirm": "Avaa Steam",
+    "joinFailed": "Steamia ei voitu avata."
+  },
+  "preview": {
+    "privateMessage": "Yksityisviesti",
+    "fullProfile": "Koko profiili"
+  }
+}

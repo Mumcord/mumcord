@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useReducer, type ReactNode } from "react";
+import { migrateLegacyHintPreferences } from "../a11y";
 import { getApi } from "../api";
 import { usePreferences } from "./preferences";
 import { initialViewState, viewReducer, ViewContext, type View } from "./view";
@@ -12,7 +13,10 @@ export function ViewProvider({ children }: { children: ReactNode }) {
     if (state.screen !== "loading") return;
     let cancelled = false;
     const api = getApi();
-    Promise.all([api.identityGet(), api.settingsGet()])
+    Promise.all([
+      api.identityGet(),
+      api.settingsGet().then((loaded) => migrateLegacyHintPreferences(loaded)),
+    ])
       .then(([identity, settings]) => {
         if (cancelled) return;
         applySettings(settings);

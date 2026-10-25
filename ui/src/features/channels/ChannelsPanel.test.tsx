@@ -5,6 +5,8 @@ import { createMockApi, setApi, type MockApi } from "../../api";
 import { applyLanguage } from "../../i18n";
 import { axeViolations } from "../../test/axe";
 import { applyThemeToDocument } from "../../theme/theme";
+import { ProfilePreviewHost } from "../members/ProfilePreview";
+import { PIN_DELAY_MS } from "../members/profilePreviewStore";
 import { AnnouncementLimiter, GLOBAL_INTERVAL_MS, TALK_INTERVAL_MS } from "./announcements";
 import { ChannelsPanel } from "./ChannelsPanel";
 import { getSelectedConversation } from "./selection";
@@ -15,7 +17,12 @@ let api: MockApi;
 
 async function renderPanel(props: Parameters<typeof ChannelsPanel>[0] = {}) {
   api = await connectedMock();
-  const view = render(<ChannelsPanel {...props} />);
+  const view = render(
+    <>
+      <ChannelsPanel {...props} />
+      <ProfilePreviewHost />
+    </>,
+  );
   await screen.findByRole("tree", { name: "Channels" });
   return view;
 }
@@ -46,6 +53,11 @@ describe("ChannelsPanel", () => {
     expect(lobby).toHaveAccessibleName(/you are here \(voice\), 3 people/);
     expect(item(/^Ben/)).toHaveAccessibleName(/not registered/);
     expect(screen.getByText(/Shift\+Enter or double-click: join/)).toBeInTheDocument();
+  });
+
+  it("labels the channel tree with a server overview heading", async () => {
+    await renderPanel();
+    expect(screen.getByRole("heading", { level: 2, name: "Server overview" })).toBeInTheDocument();
   });
 
   it("updates the talking ring and spoken status", async () => {
@@ -251,15 +263,33 @@ describe("ChannelsPanel", () => {
     expect(await screen.findByRole("alert")).toHaveTextContent(/not allowed/);
   });
 
-  it("opens the profile card for a person with Enter and returns focus", async () => {
+  it("pins the card for a person with Enter and returns focus on Escape", async () => {
     await renderPanel();
     const anna = item(/^Anna/);
     anna.focus();
     fireEvent.keyDown(anna, { key: "Enter" });
-    const dialog = await screen.findByRole("dialog", { name: "Anna" });
-    fireEvent.keyDown(dialog, { key: "Escape" });
+    const card = await screen.findByRole("dialog", { name: "Anna" });
+    expect(card).toHaveFocus();
+    fireEvent.keyDown(card, { key: "Escape" });
     expect(screen.queryByRole("dialog")).toBeNull();
     expect(item(/^Anna/)).toHaveFocus();
+  });
+
+  it("pins the card on a single click and opens the private chat on double click", async () => {
+    await renderPanel();
+    vi.useFakeTimers();
+    fireEvent.click(item(/^Anna/), { detail: 1 });
+    act(() => {
+      vi.advanceTimersByTime(PIN_DELAY_MS);
+    });
+    vi.useRealTimers();
+    expect(screen.getByRole("dialog", { name: "Anna" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Private message" })).toBeInTheDocument();
+
+    fireEvent.click(item(/^Anna/), { detail: 2 });
+    fireEvent.doubleClick(item(/^Anna/));
+    expect(screen.queryByRole("dialog")).toBeNull();
+    expect(getSelectedConversation()).toEqual({ kind: "private", certHash: "annahash" });
   });
 
   it("renders the channel badge slot", async () => {

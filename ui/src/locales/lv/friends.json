@@ -1,0 +1,15 @@
+{
+  "title": "Draugi",
+  "item": "{{name}}, {{status}}",
+  "online": "Tiešsaistē",
+  "onlineIn": "Tiešsaistē kanālā {{channel}}",
+  "onlineOnServer": "Tiešsaistē serverī {{server}}",
+  "offline": "Bezsaistē",
+  "lastSeen": "Bezsaistē, pēdējoreiz redzēts {{when}}",
+  "friend": "Draugs",
+  "friendHint": "Rāda, kad viņi ir tiešsaistē, un saglabā tavu privāto čatu ar viņiem.",
+  "noCertificate": "Cilvēki bez sertifikāta nevar būt draugi, jo Mumcord nespētu viņus atpazīt nākamreiz.",
+  "add": "Pievienot draugu",
+  "remove": "Noņemt draugu",
+  "failed": "Drauga izmaiņas neizdevās. Lūdzu, mēģini vēlreiz."
+}

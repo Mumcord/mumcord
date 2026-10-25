@@ -20,9 +20,10 @@ async function restartAndOpenLobby(): Promise<void> {
 }
 
 async function openSettings(): Promise<void> {
-  const button = $("button[aria-label='Settings']");
+  const button = $("button[aria-label='Quick settings']");
   await button.waitForClickable();
   await button.click();
+  await $("//button[@role='menuitem'][contains(., 'All settings')]").click();
   await $("//button[@role='tab' and .='Chat & history']").click();
 }
 

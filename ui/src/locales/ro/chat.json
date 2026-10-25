@@ -1,0 +1,155 @@
+{
+  "noConversation": "Conectează-te la un server și alege un canal ca să începi să scrii.",
+  "empty": "Încă nu există mesaje. Mesajele pe care le primești aici sunt salvate pe acest computer.",
+  "header": {
+    "channel": "#{{name}}",
+    "channelPrefix": "Canal",
+    "privatePrefix": "Chat privat cu",
+    "unknownPerson": "Persoană necunoscută"
+  },
+  "list": {
+    "today": "Azi",
+    "yesterday": "Ieri",
+    "label": "Mesaje în {{name}}",
+    "loadOlder": "Încarcă mesajele mai vechi",
+    "loading": "Se încarcă mesajele…",
+    "loadFailed": "Mesajele mai vechi nu s-au putut încărca. Derulează în sus ca să încerci din nou.",
+    "loadEarlier": "Încarcă mesajele anterioare",
+    "syncing": "Se caută mesaje anterioare de la alți utilizatori Mumcord…",
+    "syncAdded_one": "{{count}} mesaj anterior adăugat de la alți utilizatori Mumcord.",
+    "syncAdded_few": "{{count}} mesaje anterioare adăugate de la alți utilizatori Mumcord.",
+    "syncAdded_other": "{{count}} de mesaje anterioare adăugate de la alți utilizatori Mumcord.",
+    "syncNone": "Nu s-au găsit mesaje anterioare.",
+    "syncFailed": "Mesajele anterioare nu pot fi încărcate aici.",
+    "syncedFrom": "din istoricul lui {{name}}",
+    "jumpToNewest": "Salt la cele mai noi",
+    "jumpToNewestUnseen_one": "Salt la cele mai noi, {{count}} mesaj nou",
+    "jumpToNewestUnseen_few": "Salt la cele mai noi, {{count}} mesaje noi",
+    "jumpToNewestUnseen_other": "Salt la cele mai noi, {{count}} de mesaje noi"
+  },
+  "format": {
+    "toolbar": "Formatare",
+    "bold": "Aldin",
+    "italic": "Cursiv",
+    "strike": "Tăiat",
+    "code": "Cod în linie",
+    "codeBlock": "Bloc de cod",
+    "link": "Link"
+  },
+  "composer": {
+    "label": "Scrie către {{name}}",
+    "hint": "Apasă Enter ca să trimiți și Shift+Enter pentru un rând nou. Merge Markdown: **aldin**, *cursiv*, `cod`, [link](https://…).",
+    "addImage": "Adaugă imagine",
+    "removeImage": "Elimină imaginea {{name}}",
+    "imagePreview": "Imagine de trimis: {{name}}",
+    "send": "Trimite",
+    "noPermission": "Nu ai permisiunea să scrii în acest canal.",
+    "unavailable": "Acest canal nu mai este disponibil.",
+    "offline": "{{name}} este offline. Poți scrie din nou când revine.",
+    "unnamedImage": "Imagine lipită"
+  },
+  "tray": {
+    "label": "Imagini de trimis",
+    "processing": "Se pregătește imaginea",
+    "scaled": "Redimensionată la {{width}}×{{height}} ca să încapă în limita serverului"
+  },
+  "errors": {
+    "tooLong": "Mesajul tău e prea lung pentru acest server (maximum {{max}} caractere). Scurtează-l și încearcă din nou.",
+    "tooLongNoLimit": "Mesajul tău e prea lung pentru acest server. Scurtează-l și încearcă din nou.",
+    "imageTooLarge": "Imaginea e prea mare pentru acest server, chiar și după comprimare. Încearcă o imagine mai mică.",
+    "imageWithTextTooLong": "Mesajul cu imagine e prea mare pentru acest server. Scurtează textul sau elimină imaginea.",
+    "imagesNotAllowed": "Acest server nu permite imagini în mesaje.",
+    "notImage": "Acest fișier nu poate fi trimis. Folosește o imagine PNG, JPEG, GIF sau WebP.",
+    "imageUnreadable": "Imaginea nu a putut fi citită. Încearcă alt fișier.",
+    "denied": "Serverul nu a permis acest mesaj.",
+    "deniedWithReason": "Serverul nu a permis acest mesaj: {{reason}}",
+    "notConnected": "Nu ești conectat. Reconectează-te și încearcă din nou.",
+    "generic": "Mesajul nu a putut fi trimis. Încearcă din nou.",
+    "onlyImages": "Se pot trimite doar imagini.",
+    "sourceTooLarge": "Acest fișier e prea mare pentru a fi trimis (peste 25 MB)."
+  },
+  "announce": {
+    "message": "{{name}}: {{text}}",
+    "image": "{{name}} a trimis o imagine",
+    "more_one": "Încă {{count}} mesaj nou",
+    "more_few": "Încă {{count}} mesaje noi",
+    "more_other": "Încă {{count}} de mesaje noi"
+  },
+  "pinned": {
+    "label": "Informații despre canal",
+    "showMore": "Arată mai mult",
+    "showLess": "Arată mai puțin"
+  },
+  "mention": {
+    "list": "Persoane care pot fi menționate",
+    "found_one": "{{count}} persoană sugerată. Folosește săgețile, apoi Enter ca să inserezi.",
+    "found_few": "{{count}} persoane sugerate. Folosește săgețile, apoi Enter ca să inserezi.",
+    "found_other": "{{count}} de persoane sugerate. Folosește săgețile, apoi Enter ca să inserezi.",
+    "none": "Nu s-a găsit nimeni",
+    "mentionsYou": "Te menționează",
+    "chipLabel": "{{name}}, mențiune"
+  },
+  "preview": {
+    "open": "Deschide în browser",
+    "openLabel": "Deschide {{title}} în browser",
+    "play": "Redă {{title}}",
+    "player": "Player video: {{title}}",
+    "videoTitle": "Videoclip {{site}}",
+    "spotifyTitle": "Link {{site}}",
+    "audioPlayer": "Player Spotify: {{title}}",
+    "kind": {
+      "track": "Piesă",
+      "album": "Album",
+      "playlist": "Playlist",
+      "artist": "Artist",
+      "episode": "Episod",
+      "show": "Emisiune"
+    },
+    "inBrowser": "Se redă în browserul tău",
+    "card": "Previzualizare link: {{title}}",
+    "dismiss": "Ascunde previzualizarea"
+  },
+  "image": {
+    "loading": "Se încarcă imaginea {{name}}",
+    "label": "Imagine: {{name}}",
+    "view": "Vezi imaginea {{name}}",
+    "viewMessage": "Imagine de la {{name}}, deschide în vizualizator",
+    "failed": "Imaginea nu poate fi afișată (prea mare sau indisponibilă)."
+  },
+  "viewer": {
+    "label": "Vizualizator de imagini",
+    "counter": "{{current}} / {{total}}",
+    "zoomIn": "Mărește",
+    "zoomOut": "Micșorează",
+    "fit": "Potrivește în fereastră",
+    "save": "Salvează imaginea",
+    "saved": "Imagine salvată",
+    "saveFailed": "Imaginea nu a putut fi salvată",
+    "fileFilter": "Imagine",
+    "openInBrowser": "Deschide în browser",
+    "close": "Închide",
+    "previous": "Imaginea anterioară",
+    "next": "Imaginea următoare",
+    "unnamed": "imagine",
+    "fullLoading": "Se încarcă dimensiunea completă…",
+    "fullProgress": "Se încarcă dimensiunea completă… {{percent}} %",
+    "fullUnavailable": "Dimensiunea completă nu e disponibilă – se afișează previzualizarea"
+  },
+  "favorites": {
+    "open": "GIF-uri favorite",
+    "title": "GIF-uri favorite",
+    "save": "Salvează ca favorit",
+    "remove": "Elimină din favorite",
+    "removeNamed": "Elimină {{name}} din favorite",
+    "send": "Trimite {{name}}",
+    "hint": "Săgețile navighează, Enter trimite, Delete elimină, Escape închide.",
+    "empty": "Încă nu ai favorite. Dă clic dreapta pe un GIF din chat sau folosește steaua de pe el și alege „Salvează ca favorit”. Va apărea aici."
+  },
+  "imageMenu": {
+    "label": "Imagine {{name}}"
+  },
+  "attribution": {
+    "via": "prin {{brand}}",
+    "view": "Vezi pe {{brand}}"
+  }
+}

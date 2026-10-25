@@ -11,10 +11,21 @@ export function Section({ title, children }: { title: string; children: ReactNod
 }
 
 /** Labelled group of controls inside a section. */
-export function Group({ title, children }: { title: string; children: ReactNode }) {
+export function Group({
+  title,
+  badge,
+  children,
+}: {
+  title: string;
+  badge?: ReactNode;
+  children: ReactNode;
+}) {
   return (
     <div className="settings-group">
-      <h3 className="settings-group__title">{title}</h3>
+      <h3 className="settings-group__title">
+        {title}
+        {badge}
+      </h3>
       {children}
     </div>
   );

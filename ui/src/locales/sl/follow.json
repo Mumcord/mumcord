@@ -1,0 +1,63 @@
+{
+  "follow": "Sledi",
+  "following": "Slediš",
+  "unsupported": "Za sledenje kanalom je potreben strežnik z različico 1.4 ali novejšo.",
+  "unread_one": "{{count}} neprebrano sporočilo",
+  "unread_two": "{{count}} neprebrani sporočili",
+  "unread_few": "{{count}} neprebrana sporočila",
+  "unread_other": "{{count}} neprebranih sporočil",
+  "errors": {
+    "denied": "Strežnik ti ne dovoli slediti temu kanalu.",
+    "limit": "Na tem strežniku ne moreš slediti več kanalom. Najprej prenehaj slediti drugemu kanalu.",
+    "tooOld": "Ta strežnik je prestar za sledenje kanalom (potrebna je različica 1.4 ali novejša).",
+    "notConnected": "Nisi povezan s strežnikom.",
+    "generic": "Sledenje temu kanalu ni uspelo. Poskusi znova."
+  },
+  "dm": {
+    "title": "Neposredna sporočila",
+    "unknown": "Neznana oseba"
+  },
+  "notify": {
+    "channel": "{{name}} v {{channel}}: {{text}}",
+    "private": "{{name}} (zasebno): {{text}}",
+    "more_one": "Še {{count}} novo sporočilo",
+    "more_two": "Še {{count}} novi sporočili",
+    "more_few": "Še {{count}} nova sporočila",
+    "more_other": "Še {{count}} novih sporočil"
+  },
+  "history": {
+    "clear": "Počisti zgodovino",
+    "title": "Počistim zgodovino?",
+    "body": "S tem trajno izbrišeš shranjena sporočila tega pogovora s tega računalnika. Drugi obdržijo svoje kopije.",
+    "confirm": "Počisti zgodovino",
+    "cancel": "Prekliči",
+    "failed": "Zgodovine ni bilo mogoče počistiti. Poskusi znova."
+  },
+  "star": {
+    "follow": "Sledi {{channel}}",
+    "unfollow": "Prenehaj slediti {{channel}}"
+  },
+  "all": {
+    "menu": "Možnosti strežnika za {{server}}",
+    "menuLabel": "Možnosti strežnika",
+    "follow": "Sledi vsem kanalom",
+    "unfollow": "Prenehaj slediti vsem kanalom",
+    "working": "Sledenje kanalom …",
+    "followed_one": "Slediš {{count}} kanalu.",
+    "followed_two": "Slediš {{count}} kanaloma.",
+    "followed_few": "Slediš {{count}} kanalom.",
+    "followed_other": "Slediš {{count}} kanalom.",
+    "skipped_one": "{{count}} preskočen: {{reasons}}.",
+    "skipped_two": "{{count}} preskočena: {{reasons}}.",
+    "skipped_few": "{{count}} preskočeni: {{reasons}}.",
+    "skipped_other": "{{count}} preskočenih: {{reasons}}.",
+    "limit": "dosežena omejitev",
+    "notAllowed": "ni dovoljeno",
+    "noAnswer": "ni odgovora strežnika",
+    "unfollowed": "Ne slediš več nobenemu kanalu.",
+    "failed": "Sledenje vsem kanalom ni uspelo. Poskusi znova.",
+    "dismiss": "Opusti",
+    "unfollowFailed": "Prenehanje sledenja vsem kanalom ni uspelo. Poskusi znova."
+  },
+  "mention": "vsebuje omembo tebe"
+}

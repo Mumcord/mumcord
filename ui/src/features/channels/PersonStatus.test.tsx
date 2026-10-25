@@ -4,7 +4,7 @@ import type { MockApi, User } from "../../api";
 import { applyLanguage } from "../../i18n";
 import { MembersPanel } from "../members/MembersPanel";
 import { ChannelsPanel } from "./ChannelsPanel";
-import { getServerState } from "./serverStore";
+import { getServerState, selfUser } from "./serverStore";
 import { voiceState } from "./statusText";
 import { connectedMock, resetAll, stubDialog } from "./testUtils";
 
@@ -66,6 +66,8 @@ describe("voiceState", () => {
     hasComment: false,
     volume: 100,
     localMute: false,
+    isMumcord: false,
+    mumcordFeatures: [],
   };
 
   it("puts what the server imposes before the person's own choice", () => {
@@ -114,6 +116,33 @@ describe("person status in the tree and member list", () => {
     for (const row of rows()) {
       expect(row).toHaveAccessibleName(/, muted$/);
       expect(icons(row)).toEqual(["person-icon"]);
+    }
+  });
+
+  it("shows the Mumcord badge in tree and member list only for Mumcord users", async () => {
+    await renderBoth();
+    for (const row of rows()) expect(row.querySelector(".mumcord-badge")).toBeNull();
+    update({ isMumcord: true, mumcordFeatures: ["now-playing"] });
+    for (const row of rows()) {
+      expect(row.querySelector(".mumcord-badge")).toHaveAttribute("title", "Uses Mumcord");
+    }
+  });
+
+  it("shows the Mumcord badge on your own rows too", async () => {
+    await renderBoth();
+    const self = selfUser(getServerState());
+    if (!self) throw new Error("no self user in the seeded server");
+    act(() => {
+      api.mock.emit("userUpserted", {
+        user: { ...self, isMumcord: true, mumcordFeatures: ["now-playing"] },
+      });
+    });
+    const ownRows = [
+      screen.getByRole("treeitem", { name: (n) => n.startsWith(self.name) }),
+      screen.getByRole("button", { name: (n) => n.startsWith(self.name) }),
+    ];
+    for (const row of ownRows) {
+      expect(row.querySelector(".mumcord-badge")).toHaveAttribute("title", "Uses Mumcord");
     }
   });
 

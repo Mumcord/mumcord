@@ -1,0 +1,71 @@
+{
+  "serverOverview": "Szerver áttekintése",
+  "tree": {
+    "label": "Csatornák",
+    "hint": "Enter: chat megjelenítése · Shift+Enter vagy dupla kattintás: belépés · Nyílbillentyűk: mozgás, kibontás, összecsukás",
+    "join": "Belépés",
+    "you": "(te)",
+    "voiceHere": "itt vagy (hang)",
+    "people_one": "{{count}} személy",
+    "people_other": "{{count}} személy",
+    "stack": {
+      "some": "{{shown}} / {{total}} személy: {{names}} és még {{rest}}",
+      "all_one": "{{count}} személy: {{names}}",
+      "all_other": "{{count}} személy: {{names}}",
+      "person": "{{name}} ({{status}})"
+    },
+    "showAll": "Összes megjelenítése ({{total}})",
+    "showFewer": "Kevesebb megjelenítése",
+    "jump": "Ugrás a csatornámhoz"
+  },
+  "status": {
+    "listening": "hallgat",
+    "talking": "beszél",
+    "muted": "némítva",
+    "deafened": "süketítve",
+    "serverMuted": "a szerver némította",
+    "serverDeafened": "a szerver süketítette",
+    "suppressed": "elnémítva (itt nem beszélhet)",
+    "localMuted": "nálad némítva",
+    "unregistered": "nem regisztrált"
+  },
+  "mumcordBadge": "Mumcordot használ",
+  "statusTip": {
+    "registered": "Regisztrált ezen a szerveren",
+    "listening": "Hallgatja ezt a csatornát",
+    "muted": "Némítva",
+    "deafened": "Süketítve",
+    "serverMuted": "A szerver némította",
+    "serverDeafened": "A szerver süketítette",
+    "suppressed": "Elnémítva – nem beszélhet ebben a csatornában",
+    "localMuted": "Nálad némítva",
+    "unregistered": "Nem regisztrált ezen a szerveren (vendég)",
+    "nowPlaying": "Most hallgatja: {{track}}",
+    "nowGaming": "Most játszik: {{game}}",
+    "positional": "Térhatású hang aktív"
+  },
+  "announce": {
+    "joined": "{{name}} belépett a csatornádba",
+    "left": "{{name}} elhagyta a csatornádat",
+    "talking": "{{name}} beszél"
+  },
+  "errors": {
+    "joinDenied": "Nem léphetsz be ebbe a csatornába.",
+    "joinFailed": "Nem sikerült belépni a csatornába. Próbáld újra.",
+    "notConnected": "Nincs kapcsolat szerverrel."
+  },
+  "empty": {
+    "disconnected": "Nincs kapcsolat. Válassz egy szervert a csatornái megtekintéséhez.",
+    "loading": "Csatornák betöltése…"
+  },
+  "search": {
+    "label": "Csatornák és személyek keresése",
+    "clear": "Keresés törlése",
+    "empty": "Nincs a(z) „{{query}}” keresésnek megfelelő csatorna vagy személy.",
+    "count": "{{channels}}, {{people}}",
+    "channels_one": "{{count}} csatorna",
+    "channels_other": "{{count}} csatorna",
+    "people_one": "{{count}} személy",
+    "people_other": "{{count}} személy"
+  }
+}

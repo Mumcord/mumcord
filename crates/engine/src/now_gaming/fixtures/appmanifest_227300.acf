@@ -1,0 +1,12 @@
+"AppState"
+{
+	"appid"		"227300"
+	"universe"		"1"
+	"name"		"Euro Truck Simulator 2"
+	"StateFlags"		"4"
+	"installdir"		"Euro Truck Simulator 2"
+	"UserConfig"
+	{
+		"language"		"english"
+	}
+}

@@ -1,0 +1,128 @@
+{
+  "unknownServer": "servern",
+  "announce": {
+    "connected": "Ansluten till {{server}}.",
+    "lost": "Anslutningen till {{server}} bröts. Återansluter…",
+    "ended": "Frånkopplad från {{server}}. Se fältet ovanför chatten för vad du kan göra härnäst.",
+    "disconnected": "Frånkopplad från {{server}}.",
+    "tcp": "Rösten går nu via TCP eftersom UDP är blockerat. Ljudet kan vara något fördröjt.",
+    "removed": "{{server}} har tagits bort.",
+    "moved": "{{server}} flyttades till plats {{position}} av {{count}}."
+  },
+  "bar": {
+    "listLabel": "Sparade servrar",
+    "add": "Lägg till en server",
+    "keyboardHint": "Enter ansluter. Alt plus uppåt- eller nedåtpil flyttar servern. Skift plus F10 öppnar fler alternativ.",
+    "status": {
+      "connected": "{{server}} (ansluten)",
+      "connecting": "{{server}} (ansluter)",
+      "reconnecting": "{{server}} (återansluter)"
+    }
+  },
+  "menu": {
+    "label": "Alternativ för {{server}}",
+    "connect": "Anslut",
+    "disconnect": "Koppla från",
+    "edit": "Redigera server",
+    "moveUp": "Flytta upp",
+    "moveDown": "Flytta ned",
+    "remove": "Ta bort server"
+  },
+  "dialog": {
+    "addTitle": "Lägg till en server",
+    "editTitle": "Redigera server",
+    "linkTitle": "Spara den här servern?",
+    "address": "Adress",
+    "addressHint": "Till exempel mumble.example.org. Du kan också klistra in en mumble://-länk här.",
+    "filledFromLink": "Ifyllt från mumble://-länken.",
+    "port": "Port",
+    "label": "Namn i serverfältet",
+    "username": "Ditt namn på den här servern",
+    "password": "Serverlösenord (valfritt)",
+    "passwordHint": "Behövs bara om servern kräver ett. Det sparas i systemets säkra lagring.",
+    "passwordKeepHint": "Ett lösenord är sparat. Lämna fältet tomt för att behålla det, eller skriv ett nytt.",
+    "clearPassword": "Ta bort det sparade lösenordet",
+    "add": "Lägg till server",
+    "saveAndConnect": "Spara och anslut",
+    "errors": {
+      "address": "Ange serveradressen.",
+      "port": "Ange en port mellan 1 och 65535. De flesta servrar använder 64738.",
+      "username": "Ange namnet du vill använda på den här servern.",
+      "link": "Den här mumble://-länken kan inte läsas. Kontrollera att den kopierades helt.",
+      "invalid": "Serveruppgifterna är ogiltiga. Kontrollera adress och port."
+    }
+  },
+  "errors": {
+    "serverUnreachable": "Servern kan inte nås. Kontrollera adress och port, och att du är online.",
+    "wrongPassword": "Serverlösenordet är fel. Redigera servern och ange rätt lösenord.",
+    "nameInUse": "Ditt namn används redan eller är registrerat av någon annan på den här servern. Redigera servern och välj ett annat namn.",
+    "certificateRejected": "Certifikatkontrollen misslyckades: antingen litades inte på serverns certifikat, eller så godtog servern inte din identitet. Försök igen eller fråga serverns ägare.",
+    "certificateChanged": "Serverns certifikat har ändrats och godkändes inte. Lita på det först när serverns ägare har bekräftat ändringen.",
+    "denied": "Servern nekade anslutningen.",
+    "deniedWithReason": "Servern nekade anslutningen: {{reason}}",
+    "invalidAddress": "Serveradressen är ogiltig. Redigera servern för att rätta den.",
+    "secureStorage": "Systemets säkra lagring är inte tillgänglig, så serverlösenordet kunde inte läsas eller sparas. Lås upp den och försök igen.",
+    "notFound": "Den här servern är inte längre sparad.",
+    "generic": "Något gick fel. Försök igen."
+  },
+  "remove": {
+    "title": "Ta bort {{server}}?",
+    "message": "Det sparade lösenordet, certifikatbeslutet, följda kanaler och chatthistoriken på den här datorn raderas.",
+    "confirm": "Ta bort"
+  },
+  "switch": {
+    "title": "Byta server?",
+    "message": "Du kan bara vara på en server åt gången. Koppla från {{current}} och anslut till {{next}}?",
+    "confirm": "Koppla från och byt"
+  },
+  "cert": {
+    "newTitle": "Lita på den här servern?",
+    "newIntro": "Mumcord har inte sett certifikatet för {{server}} förut. Om serverns ägare gav dig ett fingeravtryck, kontrollera att det stämmer. Ditt val kommer ihåg.",
+    "fingerprint": "Certifikatets fingeravtryck",
+    "changedTitle": "Varning: serverns certifikat har ändrats",
+    "changedWarning": "Certifikatet för {{server}} skiljer sig från det du litade på tidigare.",
+    "changedAdvice": "Det kan hända efter att servern har förnyats, men det kan också betyda att någon avlyssnar din anslutning. Fortsätt bara om serverns ägare har bekräftat ändringen.",
+    "previousFingerprint": "Tidigare betrott fingeravtryck",
+    "newFingerprint": "Nytt fingeravtryck",
+    "reject": "Anslut inte",
+    "trust": "Lita på och anslut",
+    "trustChanged": "Lita på det nya certifikatet"
+  },
+  "rejoin": {
+    "label": "Gå med i senaste kanalen igen",
+    "text": "Du var i {{channel}} förra gången – gå med igen?",
+    "rejoin": "Gå med igen",
+    "notNow": "Inte nu"
+  },
+  "status": {
+    "label": "Anslutningsstatus",
+    "connecting": "Ansluter till {{server}}…",
+    "reconnecting": "Återansluter… (försök {{attempt}} av {{max}}, nästa försök om {{seconds}} s)",
+    "tcp": "Ansluten via TCP (UDP blockerat). Rösten fungerar men kan vara något fördröjd.",
+    "disconnected": "Frånkopplad",
+    "disconnectedReason": "Frånkopplad – {{reason}}",
+    "failed": "Kunde inte ansluta till {{server}}. {{reason}}",
+    "cancel": "Avbryt",
+    "reconnect": "Återanslut",
+    "editServer": "Redigera server",
+    "actionFailed": {
+      "reorder": "Den nya serverordningen kunde inte sparas. Försök igen.",
+      "remove": "Servern kunde inte tas bort. Försök igen.",
+      "disconnect": "Det gick inte att koppla från. Försök igen."
+    }
+  },
+  "empty": {
+    "title": "Lägg till din första server",
+    "description": "Ange adressen du fick från din grupp, eller klistra in en mumble://-länk.",
+    "addressLabel": "Serveradress eller mumble://-länk",
+    "addressHint": "Till exempel mumble.example.org eller mumble.example.org:64738.",
+    "connect": "Lägg till och anslut",
+    "pasteLink": "Klistra in en mumble://-länk",
+    "moreOptions": "Fler alternativ…",
+    "noLinkInClipboard": "Urklipp innehåller ingen mumble://-länk. Klistra in eller skriv adressen ovan.",
+    "pasteManually": "Mumcord kunde inte läsa urklipp. Klicka i fältet ovan och tryck Ctrl+V.",
+    "errors": {
+      "required": "Ange en serveradress eller en mumble://-länk."
+    }
+  }
+}

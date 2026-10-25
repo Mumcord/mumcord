@@ -1,0 +1,12 @@
+{
+  "listLabel": "Praegu räägivad",
+  "move": {
+    "hint": "Lohista, et kattekihti liigutada",
+    "done": "Valmis"
+  },
+  "limits": {
+    "wayland": "Sellel Waylandi töölaual ei saa rakendused akent alati peal hoida ega valida, kuhu see ilmub, nii et kattekiht võib jääda teiste akende taha ja nurgapositsioonidel pole mõju. Lülita Hääle seadetes sisse „Ühilduvusrežiim (nagu TeamSpeak)“ ja taaskäivita Mumcord: siis jääb kattekiht peale.",
+    "waylandKde": "KDE Plasmas Waylandiga ei saa rakendused akent alati peal hoida ega valida, kuhu see ilmub. Seda saab lahendada kahel viisil: lase Mumcordil lisada kattekihile KDE akenireegel („Seadista automaatselt“) või lülita Hääle seadetes sisse „Ühilduvusrežiim (nagu TeamSpeak)“ ja taaskäivita Mumcord.",
+    "exclusiveFullscreen": "Kattekiht kuvatakse akendega ja äärisevaba täisekraaniga mängude peal. Ainult täisekraanil (exclusive fullscreen) töötavad mängud joonistavad kõigi akende peale, seega lülita need režiimi „äärisevaba“ või „akendega täisekraan“, et kattekihti näha."
+  }
+}

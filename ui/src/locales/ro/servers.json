@@ -1,0 +1,128 @@
+{
+  "unknownServer": "serverul",
+  "announce": {
+    "connected": "Conectat la {{server}}.",
+    "lost": "Conexiunea cu {{server}} s-a pierdut. Se reconectează…",
+    "ended": "Deconectat de la {{server}}. Vezi bara de deasupra chatului pentru ce poți face mai departe.",
+    "disconnected": "Deconectat de la {{server}}.",
+    "tcp": "Vocea merge acum prin TCP pentru că UDP e blocat. Sunetul poate avea o mică întârziere.",
+    "removed": "{{server}} a fost eliminat.",
+    "moved": "{{server}} a fost mutat pe poziția {{position}} din {{count}}."
+  },
+  "bar": {
+    "listLabel": "Servere salvate",
+    "add": "Adaugă un server",
+    "keyboardHint": "Enter conectează. Alt plus săgeată sus sau jos mută serverul. Shift plus F10 deschide mai multe opțiuni.",
+    "status": {
+      "connected": "{{server}} (conectat)",
+      "connecting": "{{server}} (se conectează)",
+      "reconnecting": "{{server}} (se reconectează)"
+    }
+  },
+  "menu": {
+    "label": "Opțiuni pentru {{server}}",
+    "connect": "Conectează-te",
+    "disconnect": "Deconectează-te",
+    "edit": "Editează serverul",
+    "moveUp": "Mută în sus",
+    "moveDown": "Mută în jos",
+    "remove": "Elimină serverul"
+  },
+  "dialog": {
+    "addTitle": "Adaugă un server",
+    "editTitle": "Editează serverul",
+    "linkTitle": "Salvezi acest server?",
+    "address": "Adresă",
+    "addressHint": "De exemplu mumble.example.org. Poți lipi aici și un link mumble://.",
+    "filledFromLink": "Completat din linkul mumble://.",
+    "port": "Port",
+    "label": "Nume în bara de servere",
+    "username": "Numele tău pe acest server",
+    "password": "Parola serverului (opțional)",
+    "passwordHint": "E nevoie de ea doar dacă serverul o cere. Este păstrată în stocarea securizată a sistemului tău.",
+    "passwordKeepHint": "O parolă este salvată. Lasă câmpul gol ca s-o păstrezi sau scrie una nouă.",
+    "clearPassword": "Elimină parola salvată",
+    "add": "Adaugă serverul",
+    "saveAndConnect": "Salvează și conectează-te",
+    "errors": {
+      "address": "Introdu adresa serverului.",
+      "port": "Introdu un port între 1 și 65535. Majoritatea serverelor folosesc 64738.",
+      "username": "Introdu numele pe care vrei să-l folosești pe acest server.",
+      "link": "Acest link mumble:// nu poate fi citit. Verifică dacă a fost copiat complet.",
+      "invalid": "Datele serverului nu sunt valide. Verifică adresa și portul."
+    }
+  },
+  "errors": {
+    "serverUnreachable": "Serverul nu poate fi accesat. Verifică adresa și portul și dacă ești online.",
+    "wrongPassword": "Parola serverului e greșită. Editează serverul și introdu parola corectă.",
+    "nameInUse": "Numele tău este deja folosit sau înregistrat de altcineva pe acest server. Editează serverul și alege alt nume.",
+    "certificateRejected": "Verificarea certificatului a eșuat: fie certificatul serverului nu a fost de încredere, fie serverul nu ți-a acceptat identitatea. Încearcă din nou sau întreabă proprietarul serverului.",
+    "certificateChanged": "Certificatul serverului s-a schimbat și nu a fost marcat ca de încredere. Ai încredere în el doar după ce proprietarul serverului confirmă schimbarea.",
+    "denied": "Serverul a refuzat conexiunea.",
+    "deniedWithReason": "Serverul a refuzat conexiunea: {{reason}}",
+    "invalidAddress": "Adresa serverului nu e validă. Editează serverul ca s-o corectezi.",
+    "secureStorage": "Stocarea securizată a sistemului tău nu e disponibilă, așa că parola serverului nu a putut fi citită sau salvată. Deblocheaz-o și încearcă din nou.",
+    "notFound": "Acest server nu mai este salvat.",
+    "generic": "Ceva n-a mers bine. Încearcă din nou."
+  },
+  "remove": {
+    "title": "Elimini {{server}}?",
+    "message": "Parola salvată, decizia privind certificatul, canalele urmărite și istoricul chatului de pe acest computer vor fi șterse.",
+    "confirm": "Elimină"
+  },
+  "switch": {
+    "title": "Schimbi serverul?",
+    "message": "Poți fi pe un singur server odată. Te deconectezi de la {{current}} și te conectezi la {{next}}?",
+    "confirm": "Deconectează-te și schimbă"
+  },
+  "cert": {
+    "newTitle": "Ai încredere în acest server?",
+    "newIntro": "Mumcord nu a mai văzut certificatul lui {{server}}. Dacă proprietarul serverului ți-a dat o amprentă, verifică dacă se potrivește. Alegerea ta va fi ținută minte.",
+    "fingerprint": "Amprenta certificatului",
+    "changedTitle": "Atenție: certificatul serverului s-a schimbat",
+    "changedWarning": "Certificatul lui {{server}} diferă de cel în care ai avut încredere înainte.",
+    "changedAdvice": "Asta se poate întâmpla după ce serverul a fost reînnoit, dar poate însemna și că cineva îți interceptează conexiunea. Continuă doar dacă proprietarul serverului a confirmat schimbarea.",
+    "previousFingerprint": "Amprenta de încredere anterioară",
+    "newFingerprint": "Amprenta nouă",
+    "reject": "Nu te conecta",
+    "trust": "Ai încredere și conectează-te",
+    "trustChanged": "Ai încredere în noul certificat"
+  },
+  "rejoin": {
+    "label": "Revino în ultimul canal",
+    "text": "Ultima dată ai fost în {{channel}} – revii?",
+    "rejoin": "Revino",
+    "notNow": "Nu acum"
+  },
+  "status": {
+    "label": "Starea conexiunii",
+    "connecting": "Se conectează la {{server}}…",
+    "reconnecting": "Se reconectează… (încercarea {{attempt}} din {{max}}, următoarea în {{seconds}} s)",
+    "tcp": "Conectat prin TCP (UDP blocat). Vocea merge, dar poate avea o mică întârziere.",
+    "disconnected": "Deconectat",
+    "disconnectedReason": "Deconectat – {{reason}}",
+    "failed": "Nu s-a putut conecta la {{server}}. {{reason}}",
+    "cancel": "Anulează",
+    "reconnect": "Reconectează-te",
+    "editServer": "Editează serverul",
+    "actionFailed": {
+      "reorder": "Noua ordine a serverelor nu a putut fi salvată. Încearcă din nou.",
+      "remove": "Serverul nu a putut fi eliminat. Încearcă din nou.",
+      "disconnect": "Deconectarea a eșuat. Încearcă din nou."
+    }
+  },
+  "empty": {
+    "title": "Adaugă primul tău server",
+    "description": "Introdu adresa primită de la grupul tău sau lipește un link mumble://.",
+    "addressLabel": "Adresa serverului sau link mumble://",
+    "addressHint": "De exemplu mumble.example.org sau mumble.example.org:64738.",
+    "connect": "Adaugă și conectează-te",
+    "pasteLink": "Lipește un link mumble://",
+    "moreOptions": "Mai multe opțiuni…",
+    "noLinkInClipboard": "Clipboardul nu conține un link mumble://. Lipește sau scrie adresa mai sus.",
+    "pasteManually": "Mumcord nu a putut citi clipboardul. Dă clic în câmpul de mai sus și apasă Ctrl+V.",
+    "errors": {
+      "required": "Introdu o adresă de server sau un link mumble://."
+    }
+  }
+}

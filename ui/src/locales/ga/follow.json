@@ -1,0 +1,67 @@
+{
+  "follow": "Lean",
+  "following": "Ag leanúint",
+  "unsupported": "Teastaíonn freastalaí le leagan 1.4 nó níos nuaí chun cainéil a leanúint.",
+  "unread_one": "{{count}} teachtaireacht gan léamh",
+  "unread_two": "{{count}} theachtaireacht gan léamh",
+  "unread_few": "{{count}} theachtaireacht gan léamh",
+  "unread_many": "{{count}} dteachtaireacht gan léamh",
+  "unread_other": "{{count}} teachtaireacht gan léamh",
+  "errors": {
+    "denied": "Ní cheadaíonn an freastalaí duit an cainéal seo a leanúint.",
+    "limit": "Ní féidir leat tuilleadh cainéal a leanúint ar an bhfreastalaí seo. Scoir de chainéal eile a leanúint ar dtús.",
+    "tooOld": "Tá an freastalaí seo róshean chun cainéil a leanúint (teastaíonn leagan 1.4 nó níos nuaí).",
+    "notConnected": "Níl tú ceangailte leis an bhfreastalaí.",
+    "generic": "Níor oibrigh sé an cainéal seo a leanúint. Bain triail eile as."
+  },
+  "dm": {
+    "title": "Teachtaireachtaí díreacha",
+    "unknown": "Duine anaithnid"
+  },
+  "notify": {
+    "channel": "{{name}} i {{channel}}: {{text}}",
+    "private": "{{name}} (príobháideach): {{text}}",
+    "more_one": "{{count}} teachtaireacht nua eile",
+    "more_two": "{{count}} theachtaireacht nua eile",
+    "more_few": "{{count}} theachtaireacht nua eile",
+    "more_many": "{{count}} dteachtaireacht nua eile",
+    "more_other": "{{count}} teachtaireacht nua eile"
+  },
+  "history": {
+    "clear": "Glan an stair",
+    "title": "Glan an stair?",
+    "body": "Scriosann sé seo teachtaireachtaí sábháilte an chomhrá seo den ríomhaire seo go buan. Coinníonn daoine eile a gcóipeanna féin.",
+    "confirm": "Glan an stair",
+    "cancel": "Cealaigh",
+    "failed": "Níorbh fhéidir an stair a ghlanadh. Bain triail eile as."
+  },
+  "star": {
+    "follow": "Lean {{channel}}",
+    "unfollow": "Scoir de {{channel}} a leanúint"
+  },
+  "all": {
+    "menu": "Roghanna freastalaí do {{server}}",
+    "menuLabel": "Roghanna freastalaí",
+    "follow": "Lean gach cainéal",
+    "unfollow": "Scoir de gach cainéal a leanúint",
+    "working": "Ag leanúint cainéal…",
+    "followed_one": "Leanadh {{count}} cainéal.",
+    "followed_two": "Leanadh {{count}} chainéal.",
+    "followed_few": "Leanadh {{count}} chainéal.",
+    "followed_many": "Leanadh {{count}} gcainéal.",
+    "followed_other": "Leanadh {{count}} cainéal.",
+    "skipped_one": "Scipeáladh {{count}}: {{reasons}}.",
+    "skipped_two": "Scipeáladh {{count}}: {{reasons}}.",
+    "skipped_few": "Scipeáladh {{count}}: {{reasons}}.",
+    "skipped_many": "Scipeáladh {{count}}: {{reasons}}.",
+    "skipped_other": "Scipeáladh {{count}}: {{reasons}}.",
+    "limit": "sroicheadh an teorainn",
+    "notAllowed": "gan chead",
+    "noAnswer": "gan freagra ón bhfreastalaí",
+    "unfollowed": "Scoireadh de gach cainéal a leanúint.",
+    "failed": "Níor oibrigh sé gach cainéal a leanúint. Bain triail eile as.",
+    "dismiss": "Dún",
+    "unfollowFailed": "Níor oibrigh sé scor de gach cainéal a leanúint. Bain triail eile as."
+  },
+  "mention": "luann sé thú"
+}

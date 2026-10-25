@@ -1,4 +1,6 @@
 # E2E image: builds and drives Mumcord headless (Xvfb) through tauri-driver + WebKitWebDriver.
+# openbox: a window manager for the overlay's on-top check; lavapipe (mesa-vulkan-drivers): a
+# software Vulkan driver for the in-game overlay check (AC-1.33, AC-1.34b).
 # Ubuntu because Arch's webkit2gtk ships without WebKitWebDriver.
 FROM ubuntu:24.04
 
@@ -12,6 +14,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
       libssl-dev webkit2gtk-driver \
       xvfb xauth dbus dbus-x11 libnss-wrapper gnome-keyring libsecret-tools xdotool \
       sqlite3 openssl \
+      openbox libvulkan1 mesa-vulkan-drivers \
     && rm -rf /var/lib/apt/lists/*
 
 # Docker CLI + compose plugin: helpers run testenv/up.sh and reset.sh through the host's socket.

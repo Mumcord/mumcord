@@ -3,10 +3,7 @@
   "mute": "Mikrofon stummschalten",
   "deafen": "Taubschalten",
   "disconnect": "Verbindung zu {{server}} trennen",
-  "settings": "Einstellungen",
-  "menu": "Benutzermenü",
-  "menuProfile": "Profil bearbeiten",
-  "menuRegister": "Auf diesem Server registrieren",
+  "settings": "Schnelleinstellungen",
   "announce": {
     "muted": "Mikrofon stummgeschaltet",
     "unmuted": "Mikrofon wieder aktiv",
@@ -22,7 +19,9 @@
     "reconnecting": "Verbinde erneut…",
     "connected": "Verbunden",
     "readOnly": "Nur lesen",
-    "disconnected": "Nicht verbunden"
+    "disconnected": "Nicht verbunden",
+    "playing": "Spielt {{game}}",
+    "listening": "Hört {{track}}"
   },
   "profile": {
     "title": "Profil bearbeiten",
@@ -56,5 +55,34 @@
     "generic": "Etwas ist schiefgelaufen. Bitte versuche es erneut."
   },
   "ptt": "Push-to-Talk: {{key}} gedrückt halten zum Sprechen",
-  "pttNoKey": "Push-to-Talk: keine Taste festgelegt"
+  "pttNoKey": "Push-to-Talk: keine Taste festgelegt",
+  "quickSettings": {
+    "linkPreviews": "Link-Vorschauen und Einbettungen",
+    "linkPreviewsHint": "Websites sehen deine IP-Adresse",
+    "nowPlaying": "Teilen, was ich gerade höre",
+    "nowPlayingHint": "Andere sehen deinen aktuellen Titel",
+    "unsupported": "Unter macOS nicht verfügbar",
+    "theme": "Design",
+    "theme_system": "System",
+    "theme_dark": "Dunkel",
+    "theme_light": "Hell",
+    "nowGaming": "Teilen, was ich gerade spiele",
+    "nowGamingHint": "Andere sehen dein aktuelles Spiel",
+    "unavailable": "Auf diesem System nicht verfügbar",
+    "overlay": "Overlay",
+    "overlayHint": "Zeigt, wer spricht, über Spielen",
+    "editProfile": "Profil bearbeiten",
+    "editProfileHint": "Name, Avatar und Kommentar",
+    "register": "Auf diesem Server registrieren",
+    "registered": "Auf diesem Server registriert ✓",
+    "registerHint": "Behält deinen Namen und Avatar auf diesem Server",
+    "allSettings": "Alle Einstellungen…",
+    "label": "Schnelleinstellungen",
+    "positional": "Positionsabhängiger Ton",
+    "positionalHint": "Stimmen werden in 3D um dich verteilt",
+    "offerImages": "Originalbilder anbieten",
+    "offerImagesHint": "Andere dürfen deine Originalbilder laden",
+    "loadImages": "Originalbilder laden",
+    "loadImagesHint": "Originalbilder von anderen abrufen"
+  }
 }

@@ -1,0 +1,79 @@
+{
+  "serverOverview": "Przegląd serwera",
+  "tree": {
+    "label": "Kanały",
+    "hint": "Enter: pokaż czat · Shift+Enter lub dwuklik: dołącz · Strzałki: przesuwanie, rozwijanie, zwijanie",
+    "join": "Dołącz",
+    "you": "(Ty)",
+    "voiceHere": "jesteś tutaj (głos)",
+    "people_one": "{{count}} osoba",
+    "people_few": "{{count}} osoby",
+    "people_many": "{{count}} osób",
+    "people_other": "{{count}} osoby",
+    "stack": {
+      "some": "{{shown}} z {{total}} osób: {{names}} i {{rest}} więcej",
+      "all_one": "{{count}} osoba: {{names}}",
+      "all_few": "{{count}} osoby: {{names}}",
+      "all_many": "{{count}} osób: {{names}}",
+      "all_other": "{{count}} osoby: {{names}}",
+      "person": "{{name}} ({{status}})"
+    },
+    "showAll": "Pokaż wszystkich ({{total}})",
+    "showFewer": "Pokaż mniej",
+    "jump": "Przejdź do mojego kanału"
+  },
+  "status": {
+    "listening": "słucha",
+    "talking": "mówi",
+    "muted": "wyciszony(-a)",
+    "deafened": "ogłuszony(-a)",
+    "serverMuted": "wyciszony(-a) przez serwer",
+    "serverDeafened": "ogłuszony(-a) przez serwer",
+    "suppressed": "zablokowany(-a) (nie może tu mówić)",
+    "localMuted": "wyciszony(-a) dla Ciebie",
+    "unregistered": "niezarejestrowany(-a)"
+  },
+  "mumcordBadge": "Używa Mumcord",
+  "statusTip": {
+    "registered": "Zarejestrowany(-a) na tym serwerze",
+    "listening": "Słucha tego kanału",
+    "muted": "Wyciszony(-a)",
+    "deafened": "Ogłuszony(-a)",
+    "serverMuted": "Wyciszony(-a) przez serwer",
+    "serverDeafened": "Ogłuszony(-a) przez serwer",
+    "suppressed": "Zablokowany(-a) – nie może mówić na tym kanale",
+    "localMuted": "Wyciszony(-a) dla Ciebie",
+    "unregistered": "Niezarejestrowany(-a) na tym serwerze (gość)",
+    "nowPlaying": "Słucha: {{track}}",
+    "nowGaming": "Gra w {{game}}",
+    "positional": "Dźwięk pozycyjny aktywny"
+  },
+  "announce": {
+    "joined": "{{name}} dołącza do Twojego kanału",
+    "left": "{{name}} opuszcza Twój kanał",
+    "talking": "{{name}} mówi"
+  },
+  "errors": {
+    "joinDenied": "Nie masz pozwolenia na wejście na ten kanał.",
+    "joinFailed": "Nie udało się dołączyć do kanału. Spróbuj ponownie.",
+    "notConnected": "Brak połączenia z serwerem."
+  },
+  "empty": {
+    "disconnected": "Brak połączenia. Wybierz serwer, aby zobaczyć jego kanały.",
+    "loading": "Ładowanie kanałów…"
+  },
+  "search": {
+    "label": "Szukaj kanałów i osób",
+    "clear": "Wyczyść wyszukiwanie",
+    "empty": "Brak kanałów lub osób pasujących do „{{query}}”.",
+    "count": "{{channels}}, {{people}}",
+    "channels_one": "{{count}} kanał",
+    "channels_few": "{{count}} kanały",
+    "channels_many": "{{count}} kanałów",
+    "channels_other": "{{count}} kanału",
+    "people_one": "{{count}} osoba",
+    "people_few": "{{count}} osoby",
+    "people_many": "{{count}} osób",
+    "people_other": "{{count}} osoby"
+  }
+}

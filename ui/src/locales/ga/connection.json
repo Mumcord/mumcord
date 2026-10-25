@@ -1,0 +1,22 @@
+{
+  "open": "Eolas ceangail",
+  "title": "Eolas ceangail",
+  "loading": "Ag luchtú…",
+  "notConnected": "Gan ceangal.",
+  "error": "Níl eolas ceangail ar fáil faoi láthair.",
+  "none": "–",
+  "transport": "Iompar",
+  "transportValue": {
+    "udp": "UDP",
+    "tcp": "TCP (tollta)"
+  },
+  "latency": "Moill",
+  "latencyValue": "{{value}} ms",
+  "loss": "Caillteanas paicéad",
+  "lossValue": "{{value}} %",
+  "bitrate": "Ráta giotán seolta",
+  "bitrateValue": "{{value}} kbit/s",
+  "serverLimit": "Teorainn an fhreastalaí",
+  "packets": "Paicéid seolta / faighte",
+  "packetsValue": "{{sent}} / {{received}}"
+}

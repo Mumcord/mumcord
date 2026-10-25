@@ -3,9 +3,25 @@ name: Build and smoke
 # Reusable: builds the unsigned bundles (Linux AppImage, Windows NSIS installer, macOS universal
 # DMG), uploads them as workflow artifacts, then installs each one on a fresh runner and
 # smoke-tests it against a local Mumble server (scripts/smoke/smoke.sh). Called by
-# test-builds.yml (spec §10, AC-1.30) and release.yml (QA.12). No signing keys or secrets.
+# test-builds.yml (spec §10, AC-1.30) and release.yml (QA.12). Test builds are never signed.
+# Release builds sign and notarize the macOS DMG only when the Apple secrets exist, and sign the
+# Windows app and installer through Azure Artifact Signing only when the Azure variables exist
+# (docs/release-signing.md); without them those bundles are built unsigned.
 on:
   workflow_call:
+    secrets:
+      APPLE_CERTIFICATE:
+        required: false
+      APPLE_CERTIFICATE_PASSWORD:
+        required: false
+      APPLE_SIGNING_IDENTITY:
+        required: false
+      APPLE_API_ISSUER:
+        required: false
+      APPLE_API_KEY:
+        required: false
+      APPLE_API_KEY_P8:
+        required: false
     inputs:
       release:
         description: Build for a tagged release instead of a test build.
@@ -41,6 +57,8 @@ jobs:
             rust-targets: aarch64-apple-darwin,x86_64-apple-darwin
     runs-on: ${{ matrix.os }}
     timeout-minutes: 60
+    # The Azure federated credential trusts only jobs in the "release" environment (OIDC).
+    environment: ${{ (inputs.release && matrix.name == 'windows') && 'release' || '' }}
     steps:
       - uses: actions/checkout@v4
 
@@ -68,14 +86,152 @@ jobs:
       - name: Install npm dependencies
         run: npm ci
 
+      # Tauri imports the certificate into a temporary keychain, signs with the hardened runtime
+      # and entitlements, then notarizes and staples. All of that is switched on by these env vars.
+      - name: Prepare Apple signing and notarization
+        if: runner.os == 'macOS' && inputs.release
+        env:
+          APPLE_CERTIFICATE: ${{ secrets.APPLE_CERTIFICATE }}
+          APPLE_CERTIFICATE_PASSWORD: ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
+          APPLE_SIGNING_IDENTITY: ${{ secrets.APPLE_SIGNING_IDENTITY }}
+          APPLE_API_ISSUER: ${{ secrets.APPLE_API_ISSUER }}
+          APPLE_API_KEY: ${{ secrets.APPLE_API_KEY }}
+          APPLE_API_KEY_P8: ${{ secrets.APPLE_API_KEY_P8 }}
+        run: |
+          for v in APPLE_CERTIFICATE APPLE_CERTIFICATE_PASSWORD APPLE_SIGNING_IDENTITY APPLE_API_ISSUER APPLE_API_KEY APPLE_API_KEY_P8; do
+            if [[ -z "${!v}" ]]; then
+              echo "::warning::Apple secret $v is not set: building the macOS DMG unsigned."
+              exit 0
+            fi
+          done
+          key_path="$RUNNER_TEMP/AuthKey_$APPLE_API_KEY.p8"
+          printf '%s' "$APPLE_API_KEY_P8" > "$key_path"
+          chmod 600 "$key_path"
+          {
+            echo "APPLE_CERTIFICATE=$APPLE_CERTIFICATE"
+            echo "APPLE_CERTIFICATE_PASSWORD=$APPLE_CERTIFICATE_PASSWORD"
+            echo "APPLE_SIGNING_IDENTITY=$APPLE_SIGNING_IDENTITY"
+            echo "APPLE_API_ISSUER=$APPLE_API_ISSUER"
+            echo "APPLE_API_KEY=$APPLE_API_KEY"
+            echo "APPLE_API_KEY_PATH=$key_path"
+            echo "MUMCORD_MACOS_SIGNED=true"
+          } >> "$GITHUB_ENV"
+
+      - name: Check Windows signing setup
+        id: azure
+        if: runner.os == 'Windows' && inputs.release
+        shell: bash
+        env:
+          AZURE_CLIENT_ID: ${{ vars.AZURE_CLIENT_ID }}
+          AZURE_TENANT_ID: ${{ vars.AZURE_TENANT_ID }}
+          AZURE_SUBSCRIPTION_ID: ${{ vars.AZURE_SUBSCRIPTION_ID }}
+          AZURE_SIGNING_ENDPOINT: ${{ vars.AZURE_SIGNING_ENDPOINT }}
+          AZURE_SIGNING_ACCOUNT: ${{ vars.AZURE_SIGNING_ACCOUNT }}
+          AZURE_CERT_PROFILE: ${{ vars.AZURE_CERT_PROFILE }}
+        run: |
+          for v in AZURE_CLIENT_ID AZURE_TENANT_ID AZURE_SUBSCRIPTION_ID AZURE_SIGNING_ENDPOINT AZURE_SIGNING_ACCOUNT AZURE_CERT_PROFILE; do
+            if [[ -z "${!v}" ]]; then
+              echo "::warning::Repository variable $v is not set: building the Windows installer unsigned."
+              exit 0
+            fi
+          done
+          echo "enabled=true" >> "$GITHUB_OUTPUT"
+
       - name: Build bundle
+        if: steps.azure.outputs.enabled != 'true'
         run: npm run tauri build -- ${{ matrix.args }}
+
+      # Signed Windows release: Tauri signs the app exe, the uninstaller and the installer with
+      # signtool and Microsoft's Artifact Signing plugin, so the installer contains the signed
+      # exe. The signCommand lives only in this CI overlay, never in tauri.conf.json, so local
+      # builds stay unsigned. The app is compiled before the Azure login because the login's
+      # GitHub token is short-lived and must still be valid when the first file is signed.
+      - name: Build Windows app for signing
+        if: steps.azure.outputs.enabled == 'true'
+        run: npm run tauri build -- --no-bundle
+
+      - name: Prepare Artifact Signing
+        if: steps.azure.outputs.enabled == 'true'
+        shell: pwsh
+        env:
+          AZURE_SIGNING_ENDPOINT: ${{ vars.AZURE_SIGNING_ENDPOINT }}
+          AZURE_SIGNING_ACCOUNT: ${{ vars.AZURE_SIGNING_ACCOUNT }}
+          AZURE_CERT_PROFILE: ${{ vars.AZURE_CERT_PROFILE }}
+        run: |
+          # Pinned NuGet packages: signtool from the Windows SDK build tools and the Artifact
+          # Signing plugin it loads (runs on the .NET 8 runtime that ships with the runner).
+          $dir = "$env:RUNNER_TEMP\artifact-signing"
+          $packages = @{
+            'microsoft.windows.sdk.buildtools' = '10.0.28000.2705'
+            'microsoft.artifactsigning.client' = '1.0.146'
+          }
+          foreach ($name in $packages.Keys) {
+            $version = $packages[$name]
+            $nupkg = "$dir\$name.zip"
+            New-Item -ItemType Directory -Force $dir | Out-Null
+            Invoke-WebRequest "https://api.nuget.org/v3-flatcontainer/$name/$version/$name.$version.nupkg" -OutFile $nupkg
+            Expand-Archive $nupkg -DestinationPath "$dir\$name"
+          }
+          $signtool = "$dir\microsoft.windows.sdk.buildtools\bin\10.0.28000.0\x64\signtool.exe"
+          $dlib = "$dir\microsoft.artifactsigning.client\bin\x64\Azure.CodeSigning.Dlib.dll"
+          foreach ($file in $signtool, $dlib) {
+            if (-not (Test-Path $file)) { throw "$file not found in the downloaded package" }
+          }
+          # Only the Azure CLI login from the next step may authenticate.
+          $metadata = "$dir\metadata.json"
+          @{
+            Endpoint               = $env:AZURE_SIGNING_ENDPOINT
+            CodeSigningAccountName = $env:AZURE_SIGNING_ACCOUNT
+            CertificateProfileName = $env:AZURE_CERT_PROFILE
+            CorrelationId          = "${{ github.repository }}/${{ github.run_id }}"
+            ExcludeCredentials     = @(
+              'EnvironmentCredential', 'WorkloadIdentityCredential', 'ManagedIdentityCredential',
+              'SharedTokenCacheCredential', 'VisualStudioCredential', 'VisualStudioCodeCredential',
+              'AzurePowerShellCredential', 'AzureDeveloperCliCredential', 'InteractiveBrowserCredential'
+            )
+          } | ConvertTo-Json | Set-Content -Encoding utf8 $metadata
+          @{
+            bundle = @{
+              windows = @{
+                signCommand = @{
+                  cmd  = $signtool
+                  args = @(
+                    'sign', '/v', '/fd', 'SHA256',
+                    '/tr', 'http://timestamp.acs.microsoft.com', '/td', 'SHA256',
+                    '/d', 'Mumcord',
+                    '/dlib', $dlib, '/dmdf', $metadata,
+                    '%1'
+                  )
+                }
+              }
+            }
+          } | ConvertTo-Json -Depth 5 | Set-Content -Encoding utf8 "$dir\tauri.signing.json"
+          "MUMCORD_SIGNING_CONFIG=$dir\tauri.signing.json" | Out-File -Append -Encoding utf8 $env:GITHUB_ENV
+
+      # OpenID Connect: GitHub vouches for this workflow run, so no Azure secret is stored.
+      - name: Log in to Azure
+        if: steps.azure.outputs.enabled == 'true'
+        uses: azure/login@v3
+        with:
+          client-id: ${{ vars.AZURE_CLIENT_ID }}
+          tenant-id: ${{ vars.AZURE_TENANT_ID }}
+          subscription-id: ${{ vars.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Bundle and sign Windows installer
+        if: steps.azure.outputs.enabled == 'true'
+        shell: bash
+        run: |
+          npm run tauri bundle -- --bundles nsis --config "$MUMCORD_SIGNING_CONFIG"
+          echo "MUMCORD_WINDOWS_SIGNED=true" >> "$GITHUB_ENV"
 
       - name: Collect artifact
         shell: bash
         run: |
           mkdir out
           cp ${{ matrix.bundle }} out/
+          # Tells the release job to describe the DMG as signed and notarized.
+          if [[ "${MUMCORD_MACOS_SIGNED:-}" == "true" ]]; then touch out/MACOS-SIGNED; fi
+          if [[ "${MUMCORD_WINDOWS_SIGNED:-}" == "true" ]]; then touch out/WINDOWS-SIGNED; fi
           # Releases carry this note in the release text instead.
           if [[ "${{ inputs.release }}" == "true" ]]; then ls -l out; exit 0; fi
           cat > out/UNSIGNED-TEST-BUILD.txt <<EOF

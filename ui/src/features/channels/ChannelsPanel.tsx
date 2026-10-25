@@ -2,8 +2,7 @@
 import { useCallback, useEffect, useRef, useState, type ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 import { toEngineError } from "../../api";
-import { useProfileCard } from "../members/useProfileCard";
-import type { SendPrivateMessage } from "../members/privateMessage";
+import { pinPerson } from "../members/personClick";
 import { joinChannel, useReadOnly } from "../userpanel/readOnly";
 import { useServerAnnouncements } from "./announcements";
 import { ChannelSearch } from "./ChannelSearch";
@@ -21,21 +20,13 @@ export interface ChannelsPanelProps {
   channelAction?: ((channel: ChannelAction) => ReactNode) | undefined;
   /** Row above the tree, e.g. the server name with its menu (QA.13); "Jump to my channel" follows it. */
   header?: ReactNode;
-  /** "Send private message" on the profile card; defaults to opening the private chat. */
-  onSendPrivateMessage?: SendPrivateMessage | undefined;
 }
 
-export function ChannelsPanel({
-  channelBadge,
-  channelAction,
-  header,
-  onSendPrivateMessage,
-}: ChannelsPanelProps) {
+export function ChannelsPanel({ channelBadge, channelAction, header }: ChannelsPanelProps) {
   const { t } = useTranslation("channels");
   const readOnly = useReadOnly();
   const state = useServerState();
   const { conversation, select } = useSelectedConversation();
-  const { openProfile, profileCard } = useProfileCard(onSendPrivateMessage);
   const [joinError, setJoinError] = useState<string | null>(null);
   const treeRef = useRef<ChannelTreeHandle>(null);
   // What the search field shows, and the query the tree filters by: the query follows ~100 ms
@@ -122,6 +113,9 @@ export function ChannelsPanel({
           requestAnimationFrame(() => treeRef.current?.openFirstMatch());
         }}
       />
+      <section className="server-overview" aria-labelledby="server-overview-title">
+        <h2 id="server-overview-title">{t("serverOverview")}</h2>
+      </section>
       <ChannelTree
         // A fresh tree per server, so its expand/collapse state starts from that server's (QA.27).
         key={state.serverId}
@@ -134,7 +128,9 @@ export function ChannelsPanel({
           select({ kind: "channel", channelId });
         }}
         onJoin={join}
-        onOpenPerson={openProfile}
+        onOpenPerson={(session, opener) => {
+          if (opener) pinPerson(session, opener);
+        }}
         channelBadge={channelBadge}
         channelAction={channelAction}
         filter={filter}
@@ -144,7 +140,6 @@ export function ChannelsPanel({
           {joinError}
         </p>
       )}
-      {profileCard}
     </div>
   );
 }

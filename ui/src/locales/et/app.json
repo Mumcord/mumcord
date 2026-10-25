@@ -1,0 +1,33 @@
+{
+  "regions": {
+    "servers": "Serverid",
+    "channels": "Kanalid",
+    "chat": "Vestlus",
+    "members": "Liikmed",
+    "userPanel": "Sinu staatus"
+  },
+  "skipLinks": {
+    "label": "Jäta lingid vahele",
+    "chat": "Mine vestlusesse",
+    "channels": "Mine kanalite juurde"
+  },
+  "members": {
+    "show": "Näita liikmeid",
+    "hide": "Peida liikmed"
+  },
+  "resize": {
+    "channels": "Muuda kanalite loendi suurust",
+    "members": "Muuda liikmete loendi suurust"
+  },
+  "settings": {
+    "title": "Seaded"
+  },
+  "wizard": {
+    "title": "Tere tulemast Mumcordi"
+  },
+  "placeholder": "Tulekul",
+  "startupError": {
+    "title": "Mumcordi ei õnnestunud käivitada",
+    "description": "Rakendus ei saanud sinu seadeid laadida. Proovi uuesti; kui see ikka ei õnnestu, taaskäivita Mumcord."
+  }
+}

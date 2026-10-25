@@ -1,9 +1,10 @@
 // AC-1.26: OS light -> light, OS dark -> dark (WebKitGTK prefers-color-scheme driven by GTK_THEME),
-// manual override; language es/de switch live (no restart) and every UI text is translated.
-import { writeFileSync } from "node:fs";
+// manual override; language es/de switch live (no restart) and every UI text is translated;
+// the picker offers all 24 EU languages by their own names (FR-1.36) and French/Greek apply live.
+import { readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { browser, expect } from "@wdio/globals";
-import { app, artifactsDir, bot, testenv } from "../../helpers/index.ts";
+import { app, artifactsDir, bot, repoRoot, testenv } from "../../helpers/index.ts";
 import {
   chooseRadio,
   connectFromEmptyState,
@@ -18,8 +19,8 @@ import {
 
 const me = "C7Lang";
 const APPEARANCE = 4;
-const LANGUAGE = 5;
-const TABS = 10;
+const LANGUAGE = 6;
+const TABS = 11;
 
 /** All UI strings on screen: text nodes (incl. visually hidden), aria-labels, placeholders, titles. */
 async function uiTexts(): Promise<string[]> {
@@ -62,16 +63,32 @@ async function collect(): Promise<Set<string>> {
 }
 
 // Same in every language: names, numbers, endonyms, units, symbols, product names.
+// Game titles of the in-game overlay blocklist are names, not UI text.
+const gameTitles = new Set(
+  (
+    JSON.parse(
+      readFileSync(join(repoRoot, "crates/engine/src/ingame_overlay/blocklist.json"), "utf8"),
+    ) as { games: { name: string }[] }
+  ).games.map((g) => g.name),
+);
+
 const neutral = (t: string) =>
+  gameTitles.has(t) ||
   /^[\d\s.,:%/#()+–\-·…★☆×▾▸○]*$/.test(t) ||
   // A single letter (avatar initial), the test audio backend's device name, the OS string.
   /^\p{L}$/u.test(t) ||
   /^(null|linux \S+|windows \S+|macos \S+)$/i.test(t) ||
+  // "Beta" is the same word in English, German and Spanish.
+  /^Beta$/.test(t) ||
   // "Link" is also the German word; its tooltip adds the shortcut.
   /^Link( \(Ctrl\+K\))?$/.test(t) ||
   // "In <channel> (<count>)" reads the same in English and German.
   /^In \S+ \(\d+\)$/.test(t) ||
-  /^(Mumcord|English|Español|Deutsch|Lobby|Raid|AFK|Root|Chat|Audio|Normal|Port|Version|System|Name|C7Lang\w*|localhost.*|OK|Opus|UDP|TCP|TLS|mumble:\/\/.*|v?\d[\w.-]*|https?:\/\/.*|\w+@\w+.*)$/i.test(t);
+  // Language names in the picker are shown in their own language (endonyms).
+  /^(Български|Čeština|Dansk|Deutsch|Ελληνικά|English|Español|Eesti|Suomi|Français|Gaeilge|Hrvatski|Magyar|Italiano|Lietuvių|Latviešu|Malti|Nederlands|Polski|Português|Română|Slovenčina|Slovenščina|Svenska)$/.test(t) ||
+  // Pixel values like "240 px" (and the bare unit) are not translated.
+  /^(\d+\s*)?px$/.test(t) ||
+  /^(Mumcord|Lobby|Raid|AFK|Root|Chat|Audio|Normal|Port|Version|System|Name|Overlay|Position|Support|C7Lang\w*|localhost.*|OK|Opus|UDP|TCP|TLS|mumble:\/\/.*|v?\d[\w.-]*|https?:\/\/.*|\w+@\w+.*)$/i.test(t);
 
 describe("AC-1.26 theme follows OS + manual override", () => {
   before(async () => {
@@ -161,4 +178,30 @@ describe("AC-1.26 language switch without restart", () => {
       expect(leftovers).toEqual([]);
     });
   }
+
+  it("offers all 24 EU languages by their own names and switches to French and Greek live", async () => {
+    const pid = await browser.execute(() => performance.timeOrigin);
+    await openSettings();
+    await settingsTab(LANGUAGE);
+    const names = await browser.execute(() =>
+      Array.from(document.querySelectorAll(".overlay__dialog input[type=radio]"), (r) => r.closest("label")?.textContent.trim() ?? ""),
+    );
+    expect(names).toEqual(expect.arrayContaining(["Français", "Ελληνικά", "Gaeilge", "Malti", "Български"]));
+    expect(names).toHaveLength(25);
+    for (const lang of ["fr", "el"]) {
+      const strings = JSON.parse(readFileSync(join(repoRoot, `ui/src/locales/${lang}/app.json`), "utf8")) as {
+        settings: { title: string };
+      };
+      await chooseRadio(lang);
+      await browser.waitUntil(
+        async () =>
+          (await browser.execute(() => document.querySelector(".overlay__dialog h1")?.textContent ?? "")) ===
+          strings.settings.title,
+        { timeoutMsg: `settings title never became ${strings.settings.title}` },
+      );
+    }
+    expect(await browser.execute(() => performance.timeOrigin)).toBe(pid);
+    await browser.keys(["Escape"]);
+    await waitGone(".overlay__dialog");
+  });
 });

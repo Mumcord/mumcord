@@ -1,0 +1,14 @@
+{
+  "region": "Ειδοποιήσεις",
+  "channel": "#{{name}}",
+  "unknownChannel": "Ένα κανάλι",
+  "line": "{{sender}}: {{preview}}",
+  "groupedChannel_one": "{{count}} νέο μήνυμα στο {{name}}",
+  "groupedChannel_other": "{{count}} νέα μηνύματα στο {{name}}",
+  "groupedPrivate_one": "{{count}} νέο μήνυμα από {{name}}",
+  "groupedPrivate_other": "{{count}} νέα μηνύματα από {{name}}",
+  "image": "Έστειλε μια εικόνα",
+  "open": "Άνοιγμα συνομιλίας",
+  "close": "Απόρριψη ειδοποίησης",
+  "mentionLine": "Ο/Η {{sender}} σε ανέφερε: {{preview}}"
+}

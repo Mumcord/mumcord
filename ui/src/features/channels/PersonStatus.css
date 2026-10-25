@@ -36,3 +36,10 @@
 .person-icon-slot {
   display: inline-flex;
 }
+
+.mumcord-badge {
+  display: inline-flex;
+  flex: none;
+  margin-left: var(--space-1);
+  vertical-align: middle;
+}

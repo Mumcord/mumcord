@@ -1,7 +1,8 @@
 /**
  * Full-window image viewer (FR-1.56): fit to window, zoom around the pointer (wheel, pinch, + / −),
  * pan by dragging, 0 for fit, double-click for 100 %, ← / → through the conversation's images,
- * Escape to close, "Save image" and, for external images, "Open in browser". The view is one CSS
+ * Escape to close, "Save image" and, for external images, "Open in browser". Thumbnails sent by
+ * Mumcord users are replaced by the full image once it arrives from the sender (FR-1.60c). The view is one CSS
  * transform written once per animation frame, so a storm of wheel events costs one update.
  */
 import {
@@ -16,8 +17,10 @@ import {
 import { createPortal } from "react-dom";
 import { useTranslation } from "react-i18next";
 import { getApi } from "../../api";
+import { BetaBadge } from "../../components/BetaBadge";
 import { pickSavePath } from "../settings/fileDialogs";
 import { removeFavorite, saveFavorite, useGifFavorites } from "./favorites";
+import { useFullImage, type FullImageSource } from "./fullImage";
 import { openInBrowser } from "./openLink";
 import {
   clampView,
@@ -36,6 +39,8 @@ export interface ViewerImage {
   /** Address of an external image; only these offer "Open in browser". */
   url?: string | undefined;
   name: string;
+  /** Set when `src` is a thumbnail whose full image can be fetched from the sender. */
+  full?: FullImageSource | undefined;
 }
 
 interface ImageViewerProps {
@@ -61,9 +66,38 @@ function suggestedName(image: ViewerImage, extension: string): string {
   return base.toLowerCase().endsWith(`.${extension}`) ? base : `${base}.${extension}`;
 }
 
+/** Loading progress of the full image, or that only the thumbnail is available. */
+function FullImageHint({ state }: { state: ReturnType<typeof useFullImage> }) {
+  const { t } = useTranslation("chat");
+  if (state.status === "loading") {
+    // The badge sits outside the live region so screen readers don't repeat it on every progress tick.
+    return (
+      <p className="image-viewer__hint">
+        <span role="status">
+          {state.progress === null
+            ? t("viewer.fullLoading")
+            : t("viewer.fullProgress", { percent: Math.floor(state.progress * 100) })}
+        </span>{" "}
+        <BetaBadge />
+      </p>
+    );
+  }
+  if (state.status === "failed") {
+    return (
+      <p className="image-viewer__hint" role="status">
+        {t("viewer.fullUnavailable")}
+      </p>
+    );
+  }
+  return null;
+}
+
 export function ImageViewer({ images, index, onIndexChange, onClose }: ImageViewerProps) {
   const { t } = useTranslation("chat");
   const current = images[index];
+  const full = useFullImage(current?.full);
+  // The thumbnail stays until the full image is there, and when it cannot be had.
+  const shown = full.status === "done" ? full.src : current?.src;
   const favorites = useGifFavorites();
   const dialogRef = useRef<HTMLDivElement>(null);
   const stageRef = useRef<HTMLDivElement>(null);
@@ -142,7 +176,7 @@ export function ImageViewer({ images, index, onIndexChange, onClose }: ImageView
       natural.current = { width: img.naturalWidth, height: img.naturalHeight };
     }
     fit();
-  }, [current?.src, fit]);
+  }, [shown, fit]);
 
   useEffect(() => {
     function onResize() {
@@ -279,8 +313,8 @@ export function ImageViewer({ images, index, onIndexChange, onClose }: ImageView
   }
 
   async function save() {
-    if (!current) return;
-    const extension = extensionOf(current.src);
+    if (!current || shown === undefined) return;
+    const extension = extensionOf(shown);
     try {
       const path = await pickSavePath(
         suggestedName(current, extension),
@@ -288,7 +322,7 @@ export function ImageViewer({ images, index, onIndexChange, onClose }: ImageView
         t("viewer.save"),
       );
       if (path === null) return;
-      await getApi().saveImage(path, current.src);
+      await getApi().saveImage(path, shown);
       setStatus({ text: t("viewer.saved"), failed: false });
     } catch (error) {
       console.error("Saving the image failed", error);
@@ -382,6 +416,7 @@ export function ImageViewer({ images, index, onIndexChange, onClose }: ImageView
             {status.text}
           </p>
         ) : null}
+        <FullImageHint state={full} />
         {/* Pointer drag and the wheel have keyboard equivalents (+ − 0 and the buttons). */}
         {/* eslint-disable-next-line jsx-a11y/no-static-element-interactions */}
         <div
@@ -399,7 +434,7 @@ export function ImageViewer({ images, index, onIndexChange, onClose }: ImageView
           <img
             ref={imgRef}
             className="image-viewer__img"
-            src={current.src}
+            src={shown}
             alt={current.name}
             draggable={false}
             onLoad={(event) => {

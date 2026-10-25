@@ -1,0 +1,20 @@
+{
+  "region": "Notifiki",
+  "channel": "#{{name}}",
+  "unknownChannel": "Kanal",
+  "line": "{{sender}}: {{preview}}",
+  "groupedChannel_one": "{{count}} messaġġ ġdid f'{{name}}",
+  "groupedChannel_two": "{{count}} messaġġi ġodda f'{{name}}",
+  "groupedChannel_few": "{{count}} messaġġi ġodda f'{{name}}",
+  "groupedChannel_many": "{{count}} messaġġ ġdid f'{{name}}",
+  "groupedChannel_other": "{{count}} messaġġ ġdid f'{{name}}",
+  "groupedPrivate_one": "{{count}} messaġġ ġdid minn {{name}}",
+  "groupedPrivate_two": "{{count}} messaġġi ġodda minn {{name}}",
+  "groupedPrivate_few": "{{count}} messaġġi ġodda minn {{name}}",
+  "groupedPrivate_many": "{{count}} messaġġ ġdid minn {{name}}",
+  "groupedPrivate_other": "{{count}} messaġġ ġdid minn {{name}}",
+  "image": "Bagħat stampa",
+  "open": "Iftaħ iċ-chat",
+  "close": "Ormi n-notifika",
+  "mentionLine": "{{sender}} semmielek: {{preview}}"
+}

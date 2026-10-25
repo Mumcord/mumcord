@@ -1,0 +1,88 @@
+{
+  "unknownName": "Dig",
+  "mute": "Slå mikrofonen fra",
+  "deafen": "Slå lyden fra",
+  "disconnect": "Afbryd fra {{server}}",
+  "settings": "Hurtige indstillinger",
+  "announce": {
+    "muted": "Mikrofon slået fra",
+    "unmuted": "Mikrofon slået til",
+    "deafened": "Lyd slået fra. Du kan ikke høre andre, og din mikrofon er slået fra",
+    "undeafened": "Lyd slået til"
+  },
+  "readOnly": {
+    "text": "Du læser kun med – join en kanal for at tale.",
+    "join": "Join {{channel}}"
+  },
+  "status": {
+    "connecting": "Forbinder…",
+    "reconnecting": "Forbinder igen…",
+    "connected": "Forbundet",
+    "readOnly": "Skrivebeskyttet",
+    "disconnected": "Ikke forbundet",
+    "playing": "Spiller {{game}}",
+    "listening": "Lytter til {{track}}"
+  },
+  "profile": {
+    "title": "Rediger profil",
+    "chooseTitle": "Vælg et profilbillede",
+    "chooseAvatar": "Vælg billede…",
+    "removeAvatar": "Fjern billede",
+    "avatarHint": "Billedet skaleres ned, så det holder sig inden for serverens grænse.",
+    "avatarUnregistered": "Denne server gemmer kun avatarer for registrerede brugere – Mumcord sender din igen ved hver forbindelse.",
+    "avatarChosen": "Valgt: {{name}}",
+    "avatarRemoved": "Billedet fjernes, når du gemmer.",
+    "comment": "Om dig"
+  },
+  "register": {
+    "title": "Registrér på denne server",
+    "explain": "Når du registrerer dig, reserveres dit navn på denne server. Ingen andre kan bruge det, og serveren husker dig næste gang, du forbinder.",
+    "backup": "Din identitet er beviset på, at navnet er dit. Mister du den, mister du adgangen til det registrerede navn. Gem en sikkerhedskopi nu, og opbevar den sikkert.",
+    "password": "Adgangskode til sikkerhedskopien",
+    "export": "Eksportér identitet",
+    "saveTitle": "Gem sikkerhedskopi af identitet",
+    "passwordRequired": "Skriv en adgangskode for at beskytte sikkerhedskopien.",
+    "exported": "Sikkerhedskopi af identitet gemt.",
+    "confirm": "Registrér",
+    "done": "Registreret på denne server"
+  },
+  "errors": {
+    "tooLarge": "Det er for stort til serveren. Vælg et mindre billede, eller skriv en kortere tekst.",
+    "denied": "Serveren tillader ikke dette.",
+    "deniedWithReason": "Serveren tillader ikke dette: {{reason}}",
+    "notConnected": "Du er ikke forbundet til en server.",
+    "file": "Filen kunne ikke læses eller skrives.",
+    "generic": "Noget gik galt. Prøv igen."
+  },
+  "ptt": "Push-to-talk: hold {{key}} nede for at tale",
+  "pttNoKey": "Push-to-talk: ingen tast valgt",
+  "quickSettings": {
+    "linkPreviews": "Linkvisninger og indlejringer",
+    "linkPreviewsHint": "Websteder kan se din IP-adresse",
+    "nowPlaying": "Del, hvad jeg lytter til",
+    "nowPlayingHint": "Andre kan se dit aktuelle nummer",
+    "unsupported": "Ikke tilgængelig på macOS",
+    "theme": "Tema",
+    "theme_system": "System",
+    "theme_dark": "Mørkt",
+    "theme_light": "Lyst",
+    "nowGaming": "Del det spil, jeg spiller",
+    "nowGamingHint": "Andre kan se dit aktuelle spil",
+    "unavailable": "Ikke tilgængelig på dette system",
+    "overlay": "Overlay",
+    "overlayHint": "Viser, hvem der taler, oven på spil",
+    "editProfile": "Rediger profil",
+    "editProfileHint": "Navn, avatar og kommentar",
+    "register": "Registrér på denne server",
+    "registered": "Registreret på denne server ✓",
+    "registerHint": "Bevarer dit navn og din avatar på denne server",
+    "allSettings": "Alle indstillinger…",
+    "label": "Hurtige indstillinger",
+    "positional": "Positionslyd",
+    "positionalHint": "Stemmer placeres i 3D omkring dig",
+    "offerImages": "Tilbyd billeder i fuld størrelse",
+    "offerImagesHint": "Lad andre indlæse dine originale billeder",
+    "loadImages": "Indlæs billeder i fuld størrelse",
+    "loadImagesHint": "Hent originale billeder fra andre"
+  }
+}
