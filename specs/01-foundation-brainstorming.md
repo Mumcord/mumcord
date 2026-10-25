@@ -1454,3 +1454,12 @@ Reported after v0.3.0: in Settings → Audio, the positional audio fields "Full 
 ✍️ Note: Requested in chat during /dev.
 
 ---
+
+#### QA.87 Show full-size loading in the chat? `◉`
+Requested after v0.3.0.
+
+- [x] **Epic 2:** a slim progress bar directly under an image in the chat while its full-size version is being fetched, so the progress is visible without opening the viewer.
+
+✍️ Note: Requested in chat during /dev.
+
+---
