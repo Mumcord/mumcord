@@ -137,6 +137,7 @@ Mumcord enforces nothing itself; the server's ACLs decide. The client reflects p
 - **FR-1.45** Position, size, opacity and content are configurable; the overlay can be toggled from the tray and settings.
 - **FR-1.46** Where the OS or desktop doesn't allow staying on top (some Linux desktops) or a game runs in exclusive fullscreen, settings explain the limitation.
 - **FR-1.59** "Now gaming" (QA.44, stage 1c): opt-in status (default off). Detects the game via Mumble Link (name/context) or running programs matched against a bundled list of known games and the running Steam game (app id). Shared like "Now playing" (plugin data to Mumcord users; "🎮 Game" comment line for official clients): game-controller icon next to the person, game name, game icon (Steam app icon through the backend image proxy, else generic) and play time in the profile/preview and in the own user panel status line. "Join game" appears only when the same game exposes a join target (Steam server address from the Mumble Link context via steam://connect/…, or a Steam lobby link); otherwise no button.
+- **FR-1.66** Quick settings (QA.47, stage 1c): right-clicking the settings button in the user panel opens a small menu with switches for link previews, theme (system/dark/light), now-playing sharing and now-gaming sharing, applied immediately and saved like the full settings.
 
 ### 4.10 Stage 1d – Mumcord-to-Mumcord (QA.45)
 - **FR-1.60** History sync: on joining a channel or via "Load earlier messages", Mumcord asks other Mumcord users who may read the channel (via plugin data) for its messages in a time range (max 7 days back, max 500 messages per request, chunked under the server's plugin-data limits, rate-limited). Answering clients send stored channel messages only, never private chats. Sharing the own history is on by default and switchable in the first-start wizard and in settings. Received messages are sanitized, deduplicated, merged by time and marked "from ‹name›'s history".
@@ -194,7 +195,7 @@ flowchart LR
 ```
 
 - **Server bar** (left): saved servers as round icons, connected one highlighted, "+" to add.
-- **Channel list**: tree, unread badge (•2) on followed channels, "Join" button on hover. After a fresh connect the default channel is highlighted as current but not "joined for voice" (read-only state, QA.2); the user panel shows mute and deafen active and a hint "Read-only – Join a channel to talk". Join restores the last own mute/deafen setting (QA.7). While connected, the user panel also shows a "Disconnect" button (hang-up icon) next to mute and deafen (QA.8). The user panel uses two rows – avatar, full own name (never truncated to a few letters; wraps or shrinks slightly, tooltip with the full name) and connection status on top, evenly spaced buttons below – with no separator line, set off by its background; the microphone button shows the live input level as a rising fill while speaking (QA.26).
+- **Channel list**: tree, unread badge (•2) on followed channels, "Join" button on hover. After a fresh connect the default channel is highlighted as current but not "joined for voice" (read-only state, QA.2); the user panel shows mute and deafen active and a hint "Read-only – Join a channel to talk". Join restores the last own mute/deafen setting (QA.7). While connected, the user panel also shows a "Disconnect" button (hang-up icon) next to mute and deafen (QA.8). The settings button uses a gear icon (QA.47). The user panel uses two rows – avatar, full own name (never truncated to a few letters; wraps or shrinks slightly, tooltip with the full name) and connection status on top, evenly spaced buttons below – with no separator line, set off by its background; the microphone button shows the live input level as a rising fill while speaking (QA.26).
 - **Chat**: header with channel name and Follow toggle; message list; input with image button.
 - **Member list**: people in the channel, then listeners.
 - **User panel** (bottom of channel list): own avatar/name, mute, deafen, settings.
@@ -504,6 +505,7 @@ Unless stated otherwise: a fresh Mumcord install, a local test server (1.5) runn
 | QA.44 | Stage 1c: opt-in "Now gaming" status (Mumble Link + known programs + Steam), shared like Now playing; best-effort Join game via Steam connect/lobby | Addendum 2026-10-25; FR-1.59, AC-1.50 |
 | QA.45 | Stage 1d: history sync between Mumcord clients (7 days / 500 msgs, sharing on by default, wizard + settings) and Mumcord badge | Addendum 2026-10-25; scope 2.1, FR-1.60, FR-1.61, AC-1.51, AC-1.52 |
 | QA.46 | Stage 1d: double-click DM, pinned card with DM + full profile, profile redesign, friends by cert hash with online state, kept friend DM history | Addendum 2026-10-25; FR-1.62–1.65, AC-1.53, AC-1.54 |
+| QA.47 | Gear icon for the settings button; stage 1c quick settings on right-click (previews, theme, now playing/gaming) | Addendum 2026-10-25; section 6, FR-1.66 |
 
 ## 13. Open points & risks
 

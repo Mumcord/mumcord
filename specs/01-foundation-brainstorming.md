@@ -1069,3 +1069,12 @@ Mumble servers keep no chat history; Mumcord clients can fill gaps for each othe
 ✍️ Note: Requested in chat during /dev.
 
 ---
+
+#### QA.47 Settings icon and quick settings? `◉`
+
+- [x] **The settings button in the user panel gets a clear gear icon (the current one looks like a theme toggle).**
+- [x] **Stage 1c: right-clicking the settings button opens quick settings – switches for link previews, theme (system/dark/light) and now-playing sharing (plus now-gaming once it exists), applied immediately.**
+
+✍️ Note: Requested in chat during /dev.
+
+---
