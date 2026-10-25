@@ -1192,3 +1192,110 @@ These requests were built as tasks and are recorded here so the specification ma
 ✍️ Note: Requested in chat during /dev.
 
 ---
+
+#### QA.60 Overlay shows talkers from other channels? `◉`
+Bug reported while testing stage 1c: with the overlay on, people talking in other channels appeared too.
+
+- [x] **Only the current channel:** the overlay (window and in-game) shows only people talking in the user's current channel. Talkers elsewhere never appear; when the user switches channels, the list follows.
+
+✍️ Note: Requested in chat during /dev.
+
+---
+
+#### QA.61 Overlay captures the mouse on X11? `◉`
+Reported while testing stage 1c: in compatibility mode, the push-to-talk mouse button only worked while the Mumcord window was focused. Clarified: this is the documented XWayland/KDE behaviour (FR-1.48) – KDE only passes mouse buttons to X11 apps in the background when "Legacy X11 App Support" allows it. The overlay itself was verified click-through.
+
+- [x] **Never capture input:** the overlay is click-through on X11 too (and in compatibility mode); the mouse and clicks reach every other window.
+
+✍️ Note: Requested in chat during /dev.
+
+---
+
+#### QA.62 Switches in the person menu? `◉`
+Requested while testing stage 1c.
+
+- [x] **Switch rows like quick settings:** in the right-click menu on a person, every on/off action (local mute and similar) is a switch row that shows the current state and toggles in place, instead of a label that flips between "Mute" and "Unmute".
+
+✍️ Note: Requested in chat during /dev.
+
+---
+
+#### QA.63 Full profile is confusing? `◉`
+Reported while testing stage 1c: in the full profile, people press "Send private message" when they want to save their changes.
+
+- [x] **Redesign now (stage 1c, was 1d):** the planned full profile redesign (FR-1.63) is built now. Local settings apply instantly with a short "Saved" confirmation, there is no save step, and actions like "Private message" sit in the header as clearly labelled actions. The friend switch follows with the friends feature in stage 1d.
+
+✍️ Note: Requested in chat during /dev.
+
+---
+
+#### QA.64 Icons in the person menu? `◉`
+Requested while testing stage 1c.
+
+- [x] **Leading icons:** every entry in the right-click menu on a person has an icon – "View profile", "Private message", "Mute for me" and the volume slider – matching the icons used on the pinned card.
+- [x] **Order:** "View profile", "Private message", a separator line, then the settings ("Mute for me", volume).
+- [x] **Clean volume row:** first line "Volume" with the current value right-aligned (e.g. 100%), full-width slider underneath.
+
+✍️ Note: Requested in chat during /dev.
+
+---
+
+#### QA.65 Changelog and support links in the app? `◉`
+Requested while testing stage 1c.
+
+- [x] **What's new:** Settings → About links to the changelog on mumcord.app (German page for German, English otherwise), anchored to the running version.
+- [x] **Support:** "Report a bug" and "Request a feature" open the GitHub issue templates.
+- [x] **No commercial-license note in the app:** the line "Commercial licenses: …" is removed from About (see QA.66).
+
+✍️ Note: Requested in chat during /dev.
+
+---
+
+#### QA.66 Drop the commercial license? `◉`
+Decided during stage 1c; supersedes the commercial part of QA.51.
+
+- [x] **AGPL-3.0-only:** there is no commercial license any more. COMMERCIAL.md and every mention of a commercial license are removed from the repository and the app (the website is maintained by the user).
+- [x] **CLA stays:** contributors still sign the CLA, so the project keeps the option to relicense later (e.g. for app-store distribution or code signing) without asking every contributor.
+- [x] **Older versions:** releases up to v0.1.1 stay MIT.
+
+✍️ Note: Requested in chat during /dev.
+
+---
+
+#### QA.67 Link to the KDE X11 setting? `◉`
+Requested after the push-to-talk mouse button only worked while Mumcord was focused in compatibility mode.
+
+- [x] **Ask and apply:** on KDE, "Allow mouse buttons" asks for permission in plain language and, once confirmed, changes the KDE setting itself (undoable); it shows when mouse buttons are already allowed.
+- [x] **Fallback:** a button opens System Settings → Legacy X11 App Support directly.
+
+✍️ Note: Requested in chat during /dev.
+
+---
+
+#### QA.68 Windows in-game overlay without a Windows test PC? `◉`
+The Windows graphics hook can only be verified on a real Windows PC, which is not available right now.
+
+- [x] **Wait for testing:** the Windows in-game overlay is built once it can be tested on Windows. Until then Windows uses the window overlay; v0.3.0 does not wait for it.
+
+✍️ Note: Requested in chat during /dev.
+
+---
+
+#### QA.69 Publish history summaries on connect? `◉`
+Decided while building the history sync core.
+
+- [x] **Only on request:** clients send their per-channel availability summaries only when a joining client asks, instead of publishing them on connect and on every change. This keeps plugin-data traffic on the server low; the joining client asks first and then fetches from the best holders.
+
+✍️ Note: Requested in chat during /dev.
+
+---
+
+#### QA.70 Positional audio switch and status? `◉`
+Requested for stage 1c (positional audio).
+
+- [x] **Switch in quick settings and settings:** positional audio can be turned on/off in both places (one shared setting).
+- [x] **Who uses it:** a small "3D" icon next to everyone currently sending positional data – including yourself – in the channel tree, member list and profile card. Detected from the position in voice packets, so official Mumble clients show it too; it disappears a few seconds after positions stop.
+
+✍️ Note: Requested in chat during /dev.
+
+---
