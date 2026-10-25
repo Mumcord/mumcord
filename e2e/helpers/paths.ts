@@ -9,6 +9,10 @@ export const bin = {
   app: join(targetDir, "debug", "mumcord"),
   bot: join(targetDir, "debug", "mumcord-bot"),
   netsim: join(targetDir, "debug", "netsim"),
+  /** Mumble game plugin for tests (crates/positional/examples/test_plugin.rs). */
+  testPlugin: join(targetDir, "debug", "examples", "libtest_plugin.so"),
+  /** Renders frames through the in-game overlay layer (crates/overlay-layer/examples). */
+  headlessCheck: join(targetDir, "debug", "examples", "headless_check"),
 };
 
 export const testenvDir = join(repoRoot, "testenv");

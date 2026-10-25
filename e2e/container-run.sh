@@ -1,6 +1,7 @@
 #!/bin/bash
 # Runs inside the E2E container: session D-Bus with an unlocked Secret Service (gnome-keyring),
-# Xvfb, then builds the app (debug, feature test-backend), bot and netsim, then runs WebdriverIO.
+# Xvfb, then builds the app (debug, feature test-backend), bot, netsim, the test game plugin and
+# the in-game overlay check, then runs WebdriverIO.
 # MUMCORD_E2E_SHARD=<n> limits the run to one shard of e2e/shards.json (see wdio.conf.ts).
 set -euo pipefail
 
@@ -42,9 +43,11 @@ export LIBGL_ALWAYS_SOFTWARE=1 NO_AT_BRIDGE=1
 # it shared. Unset = both.
 step="${MUMCORD_E2E_STEP:-}"
 if [ "$step" != test ]; then
-  echo "building app (debug, test-backend), mumcord-bot, netsim..."
+  echo "building app (debug, test-backend), mumcord-bot, netsim, test game plugin..."
   npx tauri build --debug --no-bundle --features test-backend -- --locked
   cargo build --locked --quiet -p mumcord-bot -p netsim
+  cargo build --locked --quiet -p mumcord-positional --example test_plugin
+  cargo build --locked --quiet -p mumcord-overlay-layer --example headless_check
 fi
 [ "$step" = build ] && exit 0
 
