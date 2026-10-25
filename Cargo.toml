@@ -95,6 +95,8 @@ gdk = "0.18"
 # already in the tree via ashpd; gtk via Tauri, used to hand the activation token to the window).
 zbus = { version = "5.19", default-features = false, features = ["tokio"] }
 futures-util = { version = "0.3", default-features = false }
+# Desktop launchers for links, run with the host environment inside an AppImage (issue #9).
+open = "5.4"
 gtk = "0.18"
 # Desktop notifications on Windows and macOS (show only; no click callback there).
 notify-rust = { version = "4.18", default-features = false }

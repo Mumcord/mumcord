@@ -10,8 +10,6 @@ import { ImageViewer } from "./ImageViewer";
 import { clearPreviews } from "./links";
 import { MessageList } from "./MessageList";
 
-const opener = vi.hoisted(() => ({ openUrl: vi.fn(() => Promise.resolve()) }));
-vi.mock("@tauri-apps/plugin-opener", () => opener);
 const dialogs = vi.hoisted(() => ({ pickSavePath: vi.fn() }));
 vi.mock("../settings/fileDialogs", () => dialogs);
 
@@ -90,7 +88,6 @@ beforeEach(() => {
   api = createMockApi();
   setApi(api);
   vi.spyOn(api, "inlineImage").mockImplementation((url) => Promise.resolve({ ...GIF, url }));
-  opener.openUrl.mockClear();
 });
 
 afterEach(() => {

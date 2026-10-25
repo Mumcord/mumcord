@@ -14,9 +14,6 @@ import { clearDismissedPreviews } from "./dismissedPreviews";
 import { clearPreviews, playerUrl, previewableLinks } from "./links";
 import { MessageList } from "./MessageList";
 
-const opener = vi.hoisted(() => ({ openUrl: vi.fn(() => Promise.resolve()) }));
-vi.mock("@tauri-apps/plugin-opener", () => opener);
-
 const IMAGE = "data:image/jpeg;base64,/9j/4AAQ";
 
 const PAGE: LinkPreview = {
@@ -107,7 +104,6 @@ beforeEach(() => {
   clearDismissedPreviews();
   api = createMockApi();
   setApi(api);
-  opener.openUrl.mockClear();
 });
 
 afterEach(() => {
@@ -178,16 +174,9 @@ describe("link preview cards", () => {
     expect(card.querySelector("img")?.getAttribute("src")).toBe(IMAGE);
     expect(api.linkPreview).toHaveBeenCalledWith(PAGE.url);
 
-    const internals = window as unknown as Record<string, unknown>;
-    internals.__TAURI_INTERNALS__ = {};
-    try {
-      fireEvent.click(screen.getByRole("button", { name: "Open A <b>headline</b> in browser" }));
-      await waitFor(() => {
-        expect(opener.openUrl).toHaveBeenCalledWith(PAGE.url);
-      });
-    } finally {
-      delete internals.__TAURI_INTERNALS__;
-    }
+    const openLink = vi.spyOn(api, "openLink").mockResolvedValue(null);
+    fireEvent.click(screen.getByRole("button", { name: "Open A <b>headline</b> in browser" }));
+    expect(openLink).toHaveBeenCalledWith(PAGE.url);
     expect(await axeViolations(container)).toEqual([]);
   });
 

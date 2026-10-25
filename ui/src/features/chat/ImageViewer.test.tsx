@@ -8,8 +8,6 @@ import { resetFullImages } from "./fullImage";
 import { ImageViewer, type ViewerImage } from "./ImageViewer";
 import { fitScale, zoomAround } from "./viewerMath";
 
-const opener = vi.hoisted(() => ({ openUrl: vi.fn(() => Promise.resolve()) }));
-vi.mock("@tauri-apps/plugin-opener", () => opener);
 const dialogs = vi.hoisted(() => ({ pickSavePath: vi.fn() }));
 vi.mock("../settings/fileDialogs", () => dialogs);
 
@@ -40,7 +38,6 @@ beforeEach(() => {
   api = createMockApi();
   setApi(api);
   dialogs.pickSavePath.mockReset();
-  opener.openUrl.mockClear();
   vi.stubGlobal("requestAnimationFrame", (callback: FrameRequestCallback) => frames.push(callback));
   vi.stubGlobal("cancelAnimationFrame", () => undefined);
 });
@@ -194,11 +191,12 @@ describe("ImageViewer", () => {
   });
 
   it("offers Open in browser only for external images", () => {
+    const openLink = vi.spyOn(api, "openLink").mockResolvedValue(null);
     render(<Harness />);
     expect(screen.queryByRole("button", { name: "Open in browser" })).toBeNull();
     fireEvent.keyDown(dialog(), { key: "ArrowRight" });
     fireEvent.click(screen.getByRole("button", { name: "Open in browser" }));
-    expect(opener.openUrl).not.toHaveBeenCalled();
+    expect(openLink).toHaveBeenCalledWith("https://pics.example/cat.gif");
   });
 });
 
