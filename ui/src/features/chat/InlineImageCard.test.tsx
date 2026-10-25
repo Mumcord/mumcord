@@ -184,18 +184,13 @@ describe("inline images", () => {
     expect(other.container.querySelector("img")).toBeNull();
   });
 
-  it("opens the browser on click and from Open in browser", async () => {
+  it("opens the browser from Open in browser", async () => {
     vi.spyOn(api, "inlineImage").mockResolvedValue(GIF);
     const internals = window as unknown as Record<string, unknown>;
     internals.__TAURI_INTERNALS__ = {};
     try {
       renderMessage(`<img src="${REMOTE}">`, true);
-      fireEvent.click(await screen.findByRole("button", { name: "View image cat.gif" }));
-      await waitFor(() => {
-        expect(opener.openUrl).toHaveBeenCalledWith(REMOTE);
-      });
-      opener.openUrl.mockClear();
-      fireEvent.click(screen.getByRole("button", { name: "Open cat.gif in browser" }));
+      fireEvent.click(await screen.findByRole("button", { name: "Open cat.gif in browser" }));
       await waitFor(() => {
         expect(opener.openUrl).toHaveBeenCalledWith(REMOTE);
       });
@@ -209,7 +204,7 @@ describe("inline images", () => {
     const onImageClick = vi.fn();
     render(<InlineImageCard url={REMOTE} messageId="3" tabIndex={0} onImageClick={onImageClick} />);
     fireEvent.click(await screen.findByRole("button", { name: "View image cat.gif" }));
-    expect(onImageClick).toHaveBeenCalledWith(GIF);
+    expect(onImageClick).toHaveBeenCalledWith(GIF, expect.any(HTMLElement));
     expect(opener.openUrl).not.toHaveBeenCalled();
   });
 
@@ -221,5 +216,43 @@ describe("inline images", () => {
     fireEvent.click(screen.getByRole("button", { name: "Hide preview" }));
     expect(screen.queryByRole("figure")).toBeNull();
     expect(dismiss).toHaveBeenCalledWith("1", REMOTE);
+  });
+});
+
+describe("image viewer in the chat", () => {
+  const OWN = "data:image/png;base64,iVBORw0KGgo=";
+  const body = `look <img src="${OWN}" alt="x"> and <img src="${REMOTE}">`;
+
+  beforeEach(() => {
+    vi.spyOn(api, "inlineImage").mockResolvedValue(GIF);
+  });
+
+  it("opens on a message image, steps to the external image and returns focus on Escape", async () => {
+    renderMessage(body, true);
+    await screen.findByRole("figure", { name: "Image: cat.gif" });
+    const sent = screen.getByRole("button", { name: /open in viewer/i });
+    fireEvent.click(sent);
+    const viewer = screen.getByRole("dialog", { name: "Image viewer" });
+    expect(screen.getByText("1 / 2")).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Open in browser" })).toBeNull();
+    fireEvent.keyDown(viewer, { key: "ArrowRight" });
+    expect(screen.getByText("2 / 2")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Open in browser" })).toBeInTheDocument();
+    fireEvent.keyDown(viewer, { key: "Escape" });
+    expect(screen.queryByRole("dialog")).toBeNull();
+    await waitFor(() => {
+      expect(sent).toHaveFocus();
+    });
+  });
+
+  it("opens from the inline external image and returns focus to its button", async () => {
+    renderMessage(body, true);
+    const view = await screen.findByRole("button", { name: /View image cat\.gif/ });
+    fireEvent.click(view);
+    expect(screen.getByText("2 / 2")).toBeInTheDocument();
+    fireEvent.keyDown(screen.getByRole("dialog"), { key: "Escape" });
+    await waitFor(() => {
+      expect(view).toHaveFocus();
+    });
   });
 });

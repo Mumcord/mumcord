@@ -9,26 +9,11 @@ import { useTranslation } from "react-i18next";
 import type { InlineImage } from "../../api";
 import { DismissButton, OpenButton } from "./cardButtons";
 import { dismissPreview } from "./dismissedPreviews";
-import { fitImage, IMAGE_BOX, loadInlineImage, type ImageClickHandler } from "./links";
+import { fitImage, IMAGE_BOX, imageName, loadInlineImage, type ImageClickHandler } from "./links";
 import { openInBrowser } from "./openLink";
 
 /** Only images the engine produced; anything else would make the webview load from the web. */
 const SAFE_SRC = /^data:image\/(?:png|jpeg|gif|webp);base64,/;
-
-/** File name of the image link for labels, or its host when the path has none. */
-function imageName(url: string): string {
-  try {
-    const parsed = new URL(url);
-    const last = parsed.pathname.split("/").pop() ?? "";
-    try {
-      return decodeURIComponent(last) || parsed.hostname;
-    } catch {
-      return last || parsed.hostname;
-    }
-  } catch {
-    return url;
-  }
-}
 
 interface InlineImageCardProps {
   url: string;
@@ -78,8 +63,8 @@ export function InlineImageCard({ url, messageId, tabIndex, onImageClick }: Inli
         className="inline-image__view"
         tabIndex={tabIndex}
         aria-label={t("image.view", { name })}
-        onClick={() => {
-          if (onImageClick) onImageClick(image);
+        onClick={(event) => {
+          if (onImageClick) onImageClick(image, event.currentTarget);
           else openInBrowser(image.url);
         }}
       >
@@ -87,6 +72,7 @@ export function InlineImageCard({ url, messageId, tabIndex, onImageClick }: Inli
           className="inline-image__img"
           src={image.src}
           alt=""
+          data-image-url={image.url}
           width={size.width}
           height={size.height}
         />

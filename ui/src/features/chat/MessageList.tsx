@@ -11,6 +11,7 @@ import {
   useRef,
   useState,
   type KeyboardEvent,
+  type MouseEvent as ReactMouseEvent,
   type ReactNode,
 } from "react";
 import { useTranslation } from "react-i18next";
@@ -19,7 +20,9 @@ import { Avatar, ProfilePreviewTrigger } from "../members";
 import type { ConversationLog } from "./chatStore";
 import { daysAgo, messageLayout } from "./grouping";
 import { highlightCode } from "./highlight";
+import { ImageViewer, type ViewerImage } from "./ImageViewer";
 import { LinkPreviews } from "./LinkPreviewCard";
+import { imageName, type ImageClickHandler } from "./links";
 import { openLink } from "./openLink";
 import { useIsMention } from "./ownMention";
 import { sanitizeHtml } from "./sanitize";
@@ -52,9 +55,11 @@ interface BodyProps {
   message: ChatMessage;
   tabIndex: number;
   previews: boolean;
+  onImageClick: ImageClickHandler;
 }
 
-function Body({ message, tabIndex, previews }: BodyProps) {
+function Body({ message, tabIndex, previews, onImageClick }: BodyProps) {
+  const { t } = useTranslation("chat");
   const html = message.body;
   const ref = useRef<HTMLDivElement>(null);
   const sanitized = useMemo(() => highlightCode(sanitizeHtml(html)), [html]);
@@ -62,7 +67,13 @@ function Body({ message, tabIndex, previews }: BodyProps) {
     for (const link of ref.current?.querySelectorAll("a") ?? []) {
       link.tabIndex = tabIndex;
     }
-  }, [sanitized, tabIndex]);
+    // Images sent inside the message open the viewer; the click is handled on the list.
+    for (const image of ref.current?.querySelectorAll("img") ?? []) {
+      image.tabIndex = tabIndex;
+      image.setAttribute("role", "button");
+      image.setAttribute("aria-label", t("image.viewMessage", { name: message.senderName }));
+    }
+  }, [sanitized, tabIndex, t, message.senderName]);
   const body = (
     <div ref={ref} className="chat-message__body" dangerouslySetInnerHTML={{ __html: sanitized }} />
   );
@@ -76,6 +87,7 @@ function Body({ message, tabIndex, previews }: BodyProps) {
         html={sanitized}
         body={html}
         tabIndex={tabIndex}
+        onImageClick={onImageClick}
       />
     </>
   );
@@ -100,6 +112,9 @@ export function MessageList({
     height: 0,
   });
   const [focusIndex, setFocusIndex] = useState<number | null>(null);
+  const [viewer, setViewer] = useState<{ images: ViewerImage[]; index: number } | null>(null);
+  // Where focus returns when the viewer closes: the clicked image (or its button).
+  const viewerOpener = useRef<HTMLElement | null>(null);
   const layout = useMemo(() => messageLayout(messages), [messages]);
   const time = useMemo(
     () => new Intl.DateTimeFormat(i18n.language, { hour: "2-digit", minute: "2-digit" }),
@@ -136,6 +151,42 @@ export function MessageList({
     previous.current = { firstId, height: element.scrollHeight };
   }, [messages]);
 
+  // Every image of the conversation in reading order: message images and external inline images.
+  // Read from the DOM, so it is exactly what the user sees (dismissed cards are not included).
+  const openViewer: ImageClickHandler = (_image, opener) => {
+    openViewerAt(opener);
+  };
+
+  function openViewerAt(clicked: HTMLElement) {
+    const root = scrollRef.current;
+    if (!root) return;
+    const clickedImage =
+      clicked instanceof HTMLImageElement ? clicked : clicked.querySelector("img");
+    const images: ViewerImage[] = [];
+    let index = 0;
+    for (const img of root.querySelectorAll<HTMLImageElement>(
+      ".chat-message__body img, .inline-image__img",
+    )) {
+      if (img === clickedImage) index = images.length;
+      images.push({
+        src: img.currentSrc || img.src,
+        url: img.dataset["imageUrl"],
+        name: img.dataset["imageUrl"] ? imageName(img.dataset["imageUrl"]) : t("viewer.unnamed"),
+      });
+    }
+    viewerOpener.current = clicked;
+    setViewer({ images, index });
+  }
+
+  function closeViewer() {
+    setViewer(null);
+    const opener = viewerOpener.current;
+    // After the dialog is gone; the list may have re-rendered, so fall back to the message.
+    setTimeout(() => {
+      if (opener?.isConnected) opener.focus();
+    }, 0);
+  }
+
   // One delegated listener: links inside sanitized HTML open in the system browser on click.
   useEffect(() => {
     const element = scrollRef.current;
@@ -161,6 +212,27 @@ export function MessageList({
   function onMediaLoad() {
     const element = scrollRef.current;
     if (element && atBottom.current) element.scrollTop = element.scrollHeight;
+  }
+
+  function messageImage(target: EventTarget): HTMLImageElement | null {
+    const image = target instanceof Element ? target.closest("img") : null;
+    return image?.closest(".chat-message__body") ? image : null;
+  }
+
+  function onListClick(event: ReactMouseEvent<HTMLDivElement>) {
+    const image = messageImage(event.target);
+    if (!image) return;
+    event.preventDefault();
+    openViewerAt(image);
+  }
+
+  function onListKeyDown(event: KeyboardEvent<HTMLDivElement>) {
+    if (event.key !== "Enter" && event.key !== " ") return;
+    const image = messageImage(event.target);
+    if (!image) return;
+    event.preventDefault();
+    event.stopPropagation();
+    openViewerAt(image);
   }
 
   function onScroll() {
@@ -199,63 +271,85 @@ export function MessageList({
   }
 
   return (
-    <div className="chat-list" ref={scrollRef} onScroll={onScroll} onLoadCapture={onMediaLoad}>
-      {log.hasMore ? (
-        <button
-          type="button"
-          className="chat-list__older"
-          disabled={log.loading}
-          onClick={onLoadOlder}
-        >
-          {log.loading ? t("list.loading") : t("list.loadOlder")}
-        </button>
-      ) : null}
-      {log.loadFailed ? (
-        <p className="chat-list__notice" role="status">
-          {t("list.loadFailed")}
-        </p>
-      ) : null}
-      {messages.length === 0 ? (
-        log.loaded ? (
-          <p className="chat-list__empty">{t("empty")}</p>
+    <>
+      {/* Clicks on images sent inside messages open the viewer; keyboard users use Enter / Space. */}
+      {/* eslint-disable-next-line jsx-a11y/no-static-element-interactions */}
+      <div
+        className="chat-list"
+        ref={scrollRef}
+        onScroll={onScroll}
+        onLoadCapture={onMediaLoad}
+        onClick={onListClick}
+        onKeyDown={onListKeyDown}
+      >
+        {log.hasMore ? (
+          <button
+            type="button"
+            className="chat-list__older"
+            disabled={log.loading}
+            onClick={onLoadOlder}
+          >
+            {log.loading ? t("list.loading") : t("list.loadOlder")}
+          </button>
+        ) : null}
+        {log.loadFailed ? (
+          <p className="chat-list__notice" role="status">
+            {t("list.loadFailed")}
+          </p>
+        ) : null}
+        {messages.length === 0 ? (
+          log.loaded ? (
+            <p className="chat-list__empty">{t("empty")}</p>
+          ) : (
+            <p className="chat-list__notice">{t("list.loading")}</p>
+          )
         ) : (
-          <p className="chat-list__notice">{t("list.loading")}</p>
-        )
-      ) : (
-        // Arrow-key navigation lives on the list; each item is a focusable roving stop.
-        // eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions
-        <ol
-          className="chat-list__items"
-          data-display={display}
-          aria-label={label}
-          onKeyDown={onKeyDown}
-          onFocus={(event) => {
-            const focused: EventTarget = event.target;
-            const index = itemRefs.current.findIndex((item) => item === focused);
-            if (index >= 0) setFocusIndex(index);
+          // Arrow-key navigation lives on the list; each item is a focusable roving stop.
+          // eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions
+          <ol
+            className="chat-list__items"
+            data-display={display}
+            aria-label={label}
+            onKeyDown={onKeyDown}
+            onFocus={(event) => {
+              const focused: EventTarget = event.target;
+              const index = itemRefs.current.findIndex((item) => item === focused);
+              if (index >= 0) setFocusIndex(index);
+            }}
+          >
+            {messages.map((message, index) => (
+              <MessageItem
+                key={message.id}
+                message={message}
+                start={layout[index]?.start ?? true}
+                day={layout[index]?.newDay ? dayLabel(new Date(message.sentAt)) : null}
+                display={display}
+                avatar={display === "cozy" && layout[index]?.start ? avatarFor(message) : null}
+                time={time}
+                fullTime={fullTime}
+                tabIndex={index === active ? 0 : -1}
+                itemRef={(element) => {
+                  itemRefs.current[index] = element;
+                }}
+                onOpenProfile={onOpenProfile}
+                linkPreviews={linkPreviews}
+                onImageClick={openViewer}
+              />
+            ))}
+          </ol>
+        )}
+      </div>
+      {viewer ? (
+        <ImageViewer
+          images={viewer.images}
+          index={viewer.index}
+          onIndexChange={(index) => {
+            setViewer({ ...viewer, index });
           }}
-        >
-          {messages.map((message, index) => (
-            <MessageItem
-              key={message.id}
-              message={message}
-              start={layout[index]?.start ?? true}
-              day={layout[index]?.newDay ? dayLabel(new Date(message.sentAt)) : null}
-              display={display}
-              avatar={display === "cozy" && layout[index]?.start ? avatarFor(message) : null}
-              time={time}
-              fullTime={fullTime}
-              tabIndex={index === active ? 0 : -1}
-              itemRef={(element) => {
-                itemRefs.current[index] = element;
-              }}
-              onOpenProfile={onOpenProfile}
-              linkPreviews={linkPreviews}
-            />
-          ))}
-        </ol>
-      )}
-    </div>
+          onClose={closeViewer}
+        />
+      ) : null}
+    </>
   );
 }
 
@@ -272,6 +366,7 @@ interface MessageItemProps {
   itemRef: (element: HTMLLIElement | null) => void;
   onOpenProfile: MessageListProps["onOpenProfile"];
   linkPreviews: boolean;
+  onImageClick: ImageClickHandler;
 }
 
 function MessageItem({
@@ -286,6 +381,7 @@ function MessageItem({
   itemRef,
   onOpenProfile,
   linkPreviews,
+  onImageClick,
 }: MessageItemProps) {
   const { t } = useTranslation("chat");
   const mentioned = useIsMention(message);
@@ -324,7 +420,12 @@ function MessageItem({
     row = (
       <div className="chat-message__row">
         {stamp("chat-message__time")} {sender}{" "}
-        <Body message={message} tabIndex={tabIndex} previews={linkPreviews} />
+        <Body
+          message={message}
+          tabIndex={tabIndex}
+          previews={linkPreviews}
+          onImageClick={onImageClick}
+        />
       </div>
     );
   } else if (start) {
@@ -338,7 +439,12 @@ function MessageItem({
             {sender}
             {stamp("chat-message__time")}
           </div>
-          <Body message={message} tabIndex={tabIndex} previews={linkPreviews} />
+          <Body
+            message={message}
+            tabIndex={tabIndex}
+            previews={linkPreviews}
+            onImageClick={onImageClick}
+          />
         </div>
       </div>
     );
@@ -349,7 +455,12 @@ function MessageItem({
         <span className="chat-message__sender visually-hidden">{message.senderName} </span>
         <div className="chat-message__gutter">{stamp("chat-message__hover-time")}</div>
         <div className="chat-message__content">
-          <Body message={message} tabIndex={tabIndex} previews={linkPreviews} />
+          <Body
+            message={message}
+            tabIndex={tabIndex}
+            previews={linkPreviews}
+            onImageClick={onImageClick}
+          />
         </div>
       </div>
     );
