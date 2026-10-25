@@ -218,7 +218,7 @@ export const SETTINGS_INDEX: readonly SettingEntry[] = [
     terms: ["overlay.inGame.explanation", "overlay.inGame.games"],
   },
   {
-    section: "overlay",
+    section: "audio",
     group: "gamePlugins.title",
     terms: ["gamePlugins.explanation", "gamePlugins.antiCheat"],
   },

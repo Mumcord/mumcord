@@ -47,7 +47,6 @@ describe("GamePluginsGroup", () => {
         status: { enabled: true, source: "Grand Theft Auto V", game: null, senders: [] },
       });
     });
-    expect(screen.getByRole("status")).toHaveTextContent("Positions from: Grand Theft Auto V");
     expect(screen.getByText("Version 1.0.0 · Delivering positions")).toBeInTheDocument();
   });
 

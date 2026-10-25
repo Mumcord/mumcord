@@ -33,7 +33,7 @@ function useStatusLine(): string | null {
 
 /**
  * Positional audio (FR-1.41, FR-1.43): on/off, the distance range and where positions come
- * from right now. The same switch is in the quick settings. Position plugins (B31) get their
+ * from right now. The same switch is in the quick settings. The game plugins have their
  * own group next to this one.
  */
 export function PositionalGroup({ settings, update }: SettingsSectionProps) {

@@ -53,21 +53,12 @@ function useGamePlugins() {
 }
 
 /**
- * Positional audio sources (FR-1.42b, FR-1.43): which source delivers positions right now,
- * and the official Mumble game plugins, each switched on individually, with the anti-cheat
+ * Positional audio sources (FR-1.42b): the official Mumble game plugins, each switched on individually, with the anti-cheat
  * notice. Plugin names come from third-party libraries and are shown as plain text.
  */
 export function GamePluginsGroup() {
   const { t } = useTranslation("settings");
   const { plugins, status, error, setEnabled } = useGamePlugins();
-
-  const statusText = (s: PositionalStatus) => {
-    if (!s.enabled) return t("gamePlugins.off");
-    if (s.source === null) return t("gamePlugins.nothing");
-    return s.game
-      ? t("gamePlugins.deliveringGame", { source: s.source, game: s.game })
-      : t("gamePlugins.delivering", { source: s.source });
-  };
 
   // Spread into the switch: it takes no `description` at all when there is nothing to say.
   const description = (p: GamePlugin): { description?: string } => {
@@ -82,11 +73,6 @@ export function GamePluginsGroup() {
     <Group title={t("gamePlugins.title")}>
       <p className="settings-hint">{t("gamePlugins.explanation")}</p>
       <p className="settings-hint">{t("gamePlugins.antiCheat")}</p>
-      {status !== null && (
-        <p className="settings-hint" role="status">
-          {statusText(status)}
-        </p>
-      )}
       {plugins === null && error === null && (
         <p className="settings-hint">{t("gamePlugins.loading")}</p>
       )}

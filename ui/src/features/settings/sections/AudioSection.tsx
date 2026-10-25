@@ -6,6 +6,7 @@ import { Group, Section } from "../components/Section";
 import { Switch } from "../components/Switch";
 import { readableDeviceName } from "../deviceNames";
 import { errorText } from "../errors";
+import { GamePluginsGroup } from "./GamePluginsGroup";
 import { PositionalGroup } from "./PositionalGroup";
 import type { SettingsSectionProps } from "./types";
 
@@ -74,6 +75,7 @@ export function AudioSection({ settings, update }: SettingsSectionProps) {
         />
       </Group>
       <PositionalGroup settings={settings} update={update} />
+      <GamePluginsGroup />
       <MicTest />
     </Section>
   );
