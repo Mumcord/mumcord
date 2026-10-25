@@ -20,7 +20,7 @@ Epic 2 is built as **one stage and shipped as one release, 0.4.0**, when everyth
 - **Website look:** glowing primary button, gradient accents, glass popovers and film grain with a switch (Q2.6, Q4.7).
 - **UI polish:** styled dropdowns (QA.84), consistent settings layout with audit (QA.85), progress bar under chat images while the full image loads (QA.87).
 - **Connection quality (issue #8, QA.83):** ping, packet loss, bandwidth, UDP/TCP in profile and person menu; a signal icon next to people whose connection is weak (Q3.8).
-- **Overlay:** Windows in-game overlay; HDR10 colours; borderless-fullscreen check on KDE/GNOME; Flatpak Steam; fix for the game crash on Mumcord exit (QA.92); window overlay removed with a one-time notice (QA.91, Q2.9); Steam launch option for native OpenGL games on Linux (issue #11, FR-2.57).
+- **Overlay:** Windows in-game overlay as a separate click-through window over the detected game (no DLL, no injection); HDR10 colours; borderless-fullscreen check on KDE/GNOME; Flatpak Steam; fix for the game crash on Mumcord exit (QA.92); window overlay removed with a one-time notice (QA.91, Q2.9); Steam launch option for native OpenGL games on Linux (issue #11, FR-2.57).
 - **Carried over from Epic 1 (QA.74):** "Now gaming" join target from the Mumble Link context; cancelling a running full-size image transfer when the viewer closes.
 - **Epic 1 leftovers (Q1.13):** open manual checks, flaky tests, known bugs, big-server first-draw freeze, rich-text comment editor, Linux tray tooltips.
 - **Big servers (Q1.14):** calmer talking-ring updates, "Syncing big server…" state, "Hide empty channels" and "Talking people first" switches.
@@ -98,12 +98,17 @@ Nothing changes on the server side. The server keeps enforcing ACLs on every con
 
 ### 4.5 Overlay
 
-- **FR-2.28** Windows in-game overlay (QA.68): drawn inside games through a hook into DirectX 11/12 (DXGI), as designed in `docs/engine-api.md`, with the same per-game settings, global on/off, anti-cheat blocklist and warnings as the Linux in-game overlay (FR-1.46b).
-- **FR-2.29** HDR10 games: overlay colours look correct (not too bright) on HDR10/PQ swapchains, on Linux and Windows.
+- **FR-2.28** Windows in-game overlay (QA.68), shown as a separate overlay window over the running game, like Discord's 2025 overlay. **This window approach is Windows-only:** Linux keeps the Vulkan layer and the OpenGL `LD_PRELOAD` path unchanged (FR-2.29 Linux, FR-2.30 to FR-2.32, FR-2.57) and gets no overlay window; macOS stays as described elsewhere in this spec. Same per-game settings, global on/off, game detection, blocklist and corner setting as the Linux in-game overlay (FR-1.46b), plus:
+  - **Separate window, nothing touches the game:** when Mumcord detects a running game window (existing game detection and blocklist logic), it creates a transparent, borderless, click-through, always-on-top layered window that never takes focus and is excluded from the taskbar and alt-tab. No DLL, no injection, no hooking and no files in game folders, so it also works with anti-cheat games.
+  - **Follows the game:** the overlay window stays positioned over the game window and follows move, resize, minimize and focus changes. It is hidden whenever the game is not the foreground window and shown again when it is.
+  - **Drawing:** the window draws Mumcord's existing overlay scene (who is talking, placed in the configured corner).
+  - **Relation to FR-2.33:** FR-2.33 removes the generic, always-visible window overlay. The Windows in-game overlay window is different: it exists only while a detected game is in the foreground and is configured in the in-game overlay settings.
+  - **Known limit:** games in true exclusive fullscreen hide the overlay. Settings shows a short hint: "Use borderless or windowed fullscreen in the game."
+- **FR-2.29** HDR10 games: overlay colours look correct (not too bright) on HDR10 desktops, on Linux and Windows. On Windows the overlay window is composited by Windows (DWM), so Mumcord does no colour conversion of its own.
 - **FR-2.30** The in-game overlay works for games started from Flatpak Steam.
 - **FR-2.31** Borderless-fullscreen games: verified on KDE and GNOME that the in-game overlay shows; fixed where it doesn't.
 - **FR-2.32** Crash fix (QA.92): closing or updating Mumcord never crashes a running game. The layer library is copied to a fixed per-version folder in the app data directory and the Vulkan manifest points there; when the connection to Mumcord is lost, the layer draws nothing and the game keeps running.
-- **FR-2.33** Window overlay removed (QA.91): the floating overlay window, the KDE window-rule helper, its settings and tray item are removed. Users who had the window overlay switched on see a one-time notice after updating that explains the change and opens the in-game overlay settings (Q2.9).
+- **FR-2.33** Window overlay removed (QA.91): the floating overlay window, the KDE window-rule helper, its settings and tray item are removed. The removal applies on all platforms; Linux gets no overlay window, and the only overlay window left is the Windows in-game one (FR-2.28). Users who had the window overlay switched on see a one-time notice after updating that explains the change and opens the in-game overlay settings (Q2.9).
 - **FR-2.34** "Now gaming" join target (QA.74): when the Mumble Link context of the running game contains a joinable server address, "Join game" opens it (FR-1.59).
 - **FR-2.57** OpenGL games on Linux (issue [#11](https://github.com/ToBee94/mumcord/issues/11)): native OpenGL games (e.g. Unity games that force OpenGL) are not hooked by the Vulkan layer, so they need the preload path of the same library. Mumcord makes that usable with a fixed path: (a) the layer library lives in the per-version folder from FR-2.32 (not duplicated) and Mumcord also keeps a stable `current` path in the app data directory that always points to the library of the installed version, so a Steam launch option survives updates and AppImage restarts (the AppImage mount path is never used); (b) Settings → Overlay shows, on Linux while the in-game overlay is on, the exact Steam launch option `LD_PRELOAD=<current path> %command%` with a **Copy** button and a one-line explanation ("Only needed for OpenGL games: paste into the game's Steam launch options."); (c) a troubleshooting entry "OpenGL games need a launch option" in the repo docs and wiki texts (not the website). Out of scope: any automatic or global `LD_PRELOAD` (system-wide preload is risky and would affect every process on the system).
 
@@ -303,7 +308,7 @@ At most one server is in state `Voice` at any time.
 - **Screen capture & video (new, `screenshare`):** OS capture APIs per platform (portal/PipeWire, Windows Graphics Capture, ScreenCaptureKit), VP9 software encoding (libvpx; hardware encoding later), Opus audio, decoding via WebCodecs in the UI with a Rust libvpx fallback; libraries confirmed during build with licence check (AGPL-compatible).
 - **Watch party:** uses the existing YouTube embed (FR-1.50) with the player's control API; only commands go over plugin data.
 - **Themes:** CSS custom properties generated from the theme's key colours; the contrast check runs on the generated values, the same way as the existing contrast test.
-- **Windows overlay:** hook DLL for DXGI (D3D11/D3D12) and injection as designed in `docs/engine-api.md`, sharing the overlay content protocol with the Linux layer.
+- **Windows overlay:** a separate top-level layered window (transparent, click-through, no activation, tool window so it is not in taskbar or alt-tab) positioned over the detected game window; position and visibility follow the game window through window events (move, resize, minimize, foreground change). It draws Mumcord's existing overlay scene. No DLL, injection, hooks or files in game folders. HDR and colour handling are left to Windows DWM composition. Built and cross-linted on the Windows CI runner.
 - **Packaging:** Tauri's bundler for .deb, .rpm and AppImage; a PKGBUILD for `mumcord-bin` built from the release files; a POSIX `install.sh` in the repository.
 - **Architecture rules:** protocol, audio, p2p/screen-share and UI stay separate; the UI never talks to the network or to peers directly.
 
@@ -355,8 +360,8 @@ Big servers & quality:
 - **AC-2.19** Open a person's profile → ping, loss, bandwidth, UDP/TCP, client name and version (a bot using the official Mumble client shows its Mumble version; a second Mumcord client shows "Mumcord <version>") and OS show; a client that reports none shows no client line; simulate a bad connection for a bot (network emulation in the test setup) → signal icon appears next to it; switch off → icon gone.
 
 Overlay:
-- **AC-2.20** Windows: start a D3D11 and a D3D12 game with the in-game overlay on → overlay shows the talking people; a game on the blocklist stays off by default.
-- **AC-2.21** HDR10 game (Linux and Windows) → overlay colours match SDR appearance (not too bright).
+- **AC-2.20** Windows: CI/cross-lint builds the Windows target. Manual on the Windows PC: one DX11 and one DX12 game in borderless mode show the overlay with the talking people and it follows window moves and resizes; clicks go through to the game; the overlay hides on alt-tab and returns when the game is focused again; a game in exclusive fullscreen shows no overlay and Settings shows the borderless/windowed-fullscreen hint; an anti-cheat game shows the overlay with no file changes in its folder.
+- **AC-2.21** HDR10 game (Linux, and Windows on an HDR desktop) → overlay colours match SDR appearance (not too bright).
 - **AC-2.22** Game started from Flatpak Steam → in-game overlay shows.
 - **AC-2.23** Linux: a Vulkan test program with the overlay running, quit Mumcord → the program keeps running, overlay disappears; start Mumcord again → overlay comes back.
 - **AC-2.24** Update from 0.3.x with the window overlay on → one-time notice; no window overlay settings or tray item exist anymore.
@@ -387,7 +392,7 @@ Linux packages:
 |---|---|---|
 | Q1.1 | One stage for all of Epic 2 | Not the recommended split |
 | Q1.2 | One release at the end | 0.4.0 (Q5.4) |
-| Q1.3 | Windows in-game overlay must ship in Epic 2 | Windows test PC available (Q4.1) |
+| Q1.3 | Windows in-game overlay must ship in Epic 2 | Windows test PC available (Q4.1). After the spike: separate click-through overlay window over the detected game, no DLL or injection (FR-2.28) |
 | Q1.4 | Voice on one server, others read-only | FR-2.2 |
 | Q1.5 | Default 5, configurable up to 15 | FR-2.1 |
 | Q1.6 | Last connected servers + per-server switch | FR-2.7 |
@@ -430,6 +435,7 @@ Linux packages:
 | Q5.3 | Screen share 720p30, adaptive down to 480p15 | FR-2.44 |
 | Q5.4 | Version 0.4.0 | |
 | User input 2026-10-25 | Linux packages, curl installer, desktop shortcut; website redesign adopted in the client; manual tests never block | Round 1, Round 2, Round 4 headers |
+| User input 2026-10-25 (after Windows overlay spike) | Windows overlay is a separate transparent click-through window over the detected game (like Discord's 2025 overlay), not a proxy `version.dll`: the proxy-DLL option was considered and dropped because of ban risk and per-game setup. Works with anti-cheat games; exclusive fullscreen is a known limit; HDR handled by Windows composition | FR-2.28, FR-2.29, AC-2.20, Q1.3 |
 
 ## 13. Open points & risks
 
@@ -440,7 +446,7 @@ Linux packages:
 - **UserStats rate limits:** the exact server message limit for UserStats requests must be verified in the Mumble server source during build; pacing (section 6) is adjusted to it.
 - **ARM64:** official Mumble game plugins and some games are x86_64-only; positional audio on ARM64 may be limited. GitHub ARM64 runners are needed in CI.
 - **AUR:** needs an AUR account and key from the user before the first release.
-- **Anti-cheat on Windows:** the DXGI hook can trigger anti-cheat; the blocklist and warnings from Epic 1 apply.
+- **Windows overlay:** games in true exclusive fullscreen hide the overlay window (hint in Settings: use borderless/windowed fullscreen). Keeping the window aligned with the game depends on Windows window events; edge cases (multi-monitor, DPI changes, borderless games that resize late) are covered by manual checks. Nothing is loaded into or written next to the game, so there is no anti-cheat or ban risk from the overlay.
 
 ## 14. Impact on the roadmap
 
