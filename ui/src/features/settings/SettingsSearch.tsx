@@ -1,6 +1,7 @@
 import { useEffect, useId, useRef, type KeyboardEvent, type RefObject } from "react";
 import { useTranslation } from "react-i18next";
 import { announce } from "../../a11y/announcer";
+import type { SectionId } from "./sectionIds";
 import { entryLabel, searchSettings, type SearchResult } from "./settingsIndex";
 
 interface SettingsSearchProps {
@@ -8,6 +9,8 @@ interface SettingsSearchProps {
   onQueryChange: (query: string) => void;
   onPick: (result: SearchResult) => void;
   inputRef: RefObject<HTMLInputElement | null>;
+  /** Sections that are not offered on this platform. */
+  hidden?: readonly SectionId[];
 }
 
 const resultKey = (result: SearchResult) =>
@@ -19,12 +22,18 @@ const resultKey = (result: SearchResult) =>
  * Search field above the section list. While it holds text, the matching sections and settings
  * replace the section list; picking one opens its section and focuses the control.
  */
-export function SettingsSearch({ query, onQueryChange, onPick, inputRef }: SettingsSearchProps) {
+export function SettingsSearch({
+  query,
+  onQueryChange,
+  onPick,
+  inputRef,
+  hidden,
+}: SettingsSearchProps) {
   const { t } = useTranslation("settings");
   const id = useId();
   const listRef = useRef<HTMLUListElement>(null);
   const searching = query.trim() !== "";
-  const results = searching ? searchSettings(query, t) : [];
+  const results = searching ? searchSettings(query, t, hidden) : [];
   const count = results.length;
 
   useEffect(() => {

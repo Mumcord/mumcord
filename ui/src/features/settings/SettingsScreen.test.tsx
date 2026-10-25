@@ -1153,3 +1153,39 @@ describe("Accessibility section", () => {
     expect(hintPreferences().skipLinks).toBe(false);
   });
 });
+
+describe("Overlay on macOS (QA.58)", () => {
+  const onMacos = () =>
+    vi.spyOn(api, "appInfo").mockResolvedValue({
+      version: "0.0.0",
+      os: "macos aarch64",
+      thirdPartyNotices: "",
+    });
+
+  it("hides the Overlay section and its search entries", async () => {
+    onMacos();
+    renderScreen();
+    await waitFor(() => {
+      expect(screen.queryByRole("tab", { name: "Overlay" })).toBeNull();
+    });
+    expect(screen.getAllByRole("tab")).toHaveLength(10);
+    fireEvent.change(screen.getByRole("searchbox", { name: "Search settings" }), {
+      target: { value: "overlay" },
+    });
+    expect(screen.queryByRole("list", { name: "Search results" })).toBeNull();
+  });
+
+  it("keeps the Overlay section and its search entries on Linux", async () => {
+    vi.spyOn(api, "appInfo").mockResolvedValue({
+      version: "0.0.0",
+      os: "linux x86_64",
+      thirdPartyNotices: "",
+    });
+    renderScreen();
+    expect(await screen.findByRole("tab", { name: "Overlay" })).toBeInTheDocument();
+    fireEvent.change(screen.getByRole("searchbox", { name: "Search settings" }), {
+      target: { value: "overlay" },
+    });
+    expect(screen.getByRole("list", { name: "Search results" })).toBeInTheDocument();
+  });
+});

@@ -28,6 +28,7 @@ import { SettingsSearch } from "./SettingsSearch";
 import type { SearchResult } from "./settingsIndex";
 import { findGroup, findTarget, headingOf, type JumpTarget } from "./settingsJump";
 import { SECTION_IDS, type SectionId } from "./sectionIds";
+import { useIsMacos } from "../../api/useIsMacos";
 import { useSettings, type UpdateSettings } from "./useSettings";
 import "./settings.css";
 
@@ -86,6 +87,10 @@ export function SettingsScreen() {
   const { t } = useTranslation("settings");
   const baseId = useId();
   const { settings, loadFailed, saveFailed, update } = useSettings();
+  // macOS has no overlay at all (QA.58).
+  const macos = useIsMacos();
+  const hidden = useMemo<readonly SectionId[]>(() => (macos ? ["overlay"] : []), [macos]);
+  const sections = useMemo(() => SECTION_IDS.filter((id) => !hidden.includes(id)), [hidden]);
   const [active, setActive] = useState<SectionId>("identity");
   const tabs = useRef(new Map<SectionId, HTMLButtonElement>());
   const [hostElement, setHostElement] = useState<HTMLDivElement | null>(null);
@@ -180,8 +185,8 @@ export function SettingsScreen() {
   }, [jump, t]);
 
   const onKeyDown = (event: KeyboardEvent) => {
-    const index = SECTION_IDS.indexOf(active);
-    const last = SECTION_IDS.length - 1;
+    const index = sections.indexOf(active);
+    const last = sections.length - 1;
     const target =
       event.key === "ArrowDown"
         ? index === last
@@ -198,7 +203,7 @@ export function SettingsScreen() {
               : null;
     if (target === null) return;
     event.preventDefault();
-    const next = SECTION_IDS[target];
+    const next = sections[target];
     if (next) select(next);
   };
 
@@ -215,6 +220,7 @@ export function SettingsScreen() {
               onQueryChange={setQuery}
               onPick={pick}
               inputRef={searchRef}
+              hidden={hidden}
             />
             <div
               role="tablist"
@@ -223,7 +229,7 @@ export function SettingsScreen() {
               className="settings__nav"
               hidden={query.trim() !== ""}
             >
-              {SECTION_IDS.map((id) => (
+              {sections.map((id) => (
                 <button
                   key={id}
                   ref={(element) => {

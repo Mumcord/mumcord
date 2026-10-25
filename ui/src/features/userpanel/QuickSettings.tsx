@@ -14,6 +14,7 @@ import {
 } from "react";
 import { createPortal } from "react-dom";
 import { useTranslation } from "react-i18next";
+import { useIsMacos } from "../../api/useIsMacos";
 import { getApi, type OverlayState, type Theme } from "../../api";
 import { useSettings } from "../settings/useSettings";
 import "./quicksettings.css";
@@ -97,7 +98,6 @@ export function QuickSettings({
   const [supported, setSupported] = useState(true);
   const [gamingSupported, setGamingSupported] = useState(true);
   const [overlay, setOverlay] = useState<OverlayState | null>(null);
-  const [macos, setMacos] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
   const titleId = useId();
   const ready = settings !== null;
@@ -134,18 +134,9 @@ export function QuickSettings({
     };
   }, []);
 
-  // The overlay is not offered on macOS (QA.58); the OS name comes from the app info.
   useEffect(() => {
     let active = true;
     const api = getApi();
-    api.appInfo().then(
-      (info) => {
-        if (active) setMacos(info.os.startsWith("macos"));
-      },
-      (error: unknown) => {
-        console.error("Reading the app info failed", error);
-      },
-    );
     api.overlayState().then(
       (state) => {
         if (active) setOverlay(state);
@@ -162,6 +153,9 @@ export function QuickSettings({
       unlisten();
     };
   }, []);
+
+  // The overlay is not offered on macOS (QA.58).
+  const macos = useIsMacos();
 
   const overlayShown = !macos && overlay !== null;
 
