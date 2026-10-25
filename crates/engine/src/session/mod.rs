@@ -40,6 +40,7 @@ use tokio::task::JoinHandle;
 pub use machine::MAX_RECONNECT_ATTEMPTS;
 pub use types::*;
 
+use crate::friends::FriendHub;
 use crate::people::{self, People};
 use crate::sounds::SoundHub;
 use crate::voice::{self, Audio, Meter, VoicePipeline, VoiceShared};
@@ -55,7 +56,11 @@ const PROFILE_WAIT: Duration = Duration::from_secs(3);
 
 /// Event output of the engine; cheap to clone. Extensions (B14) emit through it too.
 #[derive(Clone)]
-pub struct Events(mpsc::UnboundedSender<EngineEvent>, Arc<SoundHub>);
+pub struct Events(
+    mpsc::UnboundedSender<EngineEvent>,
+    Arc<SoundHub>,
+    Arc<FriendHub>,
+);
 
 impl Events {
     /// Notification sounds (B26); also reachable for `Sound::Message` from chat code.
@@ -63,10 +68,19 @@ impl Events {
         &self.1
     }
 
+    /// Friends and their online state (FR-1.64).
+    pub fn friends(&self) -> &Arc<FriendHub> {
+        &self.2
+    }
+
     pub fn emit(&self, event: EngineEvent) {
         self.1.observe(&event);
+        let friends = self.2.observe(&event);
         // A closed receiver means the app is shutting down; nobody is left to inform.
         let _ = self.0.send(event);
+        if let Some(friends) = friends {
+            let _ = self.0.send(EngineEvent::FriendsChanged(friends));
+        }
     }
 }
 
@@ -279,7 +293,11 @@ impl Engine {
             .collect();
         let store = Arc::new(Mutex::new(store));
         let (tx, rx) = mpsc::unbounded_channel();
-        let events = Events(tx, SoundHub::from_store(store.clone()));
+        let events = Events(
+            tx,
+            SoundHub::from_store(store.clone()),
+            FriendHub::new(store.clone(), rt.clone()),
+        );
         let controls = Arc::new(DspControls::default());
         local::apply_dsp(&controls, &settings);
         let meter = Arc::new(Meter::default());
@@ -551,6 +569,53 @@ impl Engine {
         let (server_id, user) = Inner::person_in_session(&core, session)?;
         let store = lock(&self.inner.store);
         core.people.save_note(&store, server_id, &user, note)
+    }
+
+    /// Friends with their online state, online first (FR-1.64).
+    pub fn friends(&self) -> Vec<crate::friends::FriendView> {
+        self.inner.events.friends().views()
+    }
+
+    /// Adds a person on the connected server as a friend (FR-1.64). People without a
+    /// certificate cannot be friends; neither can the user.
+    pub fn friend_add(&self, session: u32) -> EngineResult<()> {
+        let friend = {
+            let core = lock(&self.inner.core);
+            let (_, user) = Inner::person_in_session(&core, session)?;
+            let own = core
+                .session
+                .as_ref()
+                .and_then(|s| s.handle.with_state(|st| st.session));
+            if own == Some(session) {
+                return Err(EngineError::invalid("you cannot be your own friend"));
+            }
+            let cert_hash = user.cert_hash.ok_or_else(|| {
+                EngineError::invalid("people without a certificate cannot be friends")
+            })?;
+            let now = crate::chat::now_millis();
+            lock(&self.inner.store)
+                .add_friend(&cert_hash, &user.name, now)
+                .map_err(store_error)?;
+            mumcord_store::Friend {
+                cert_hash,
+                name: user.name,
+                added_at: now,
+                last_seen_at: None,
+            }
+        };
+        let friends = self.inner.events.friends().added(friend);
+        self.inner.events.emit(EngineEvent::FriendsChanged(friends));
+        Ok(())
+    }
+
+    /// Removes a friend by certificate hash; unknown hashes are a no-op (FR-1.64).
+    pub fn friend_remove(&self, cert_hash: &str) -> EngineResult<()> {
+        lock(&self.inner.store)
+            .remove_friend(cert_hash)
+            .map_err(store_error)?;
+        let friends = self.inner.events.friends().removed(cert_hash);
+        self.inner.events.emit(EngineEvent::FriendsChanged(friends));
+        Ok(())
     }
 
     /// Asks the server for a channel description announced only by its hash (FR-1.48b). The

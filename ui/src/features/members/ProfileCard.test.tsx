@@ -132,6 +132,32 @@ describe("ProfileCard (full profile)", () => {
 });
 
 describe("averageColor", () => {
+  it("adds a friend from Your settings and confirms with Saved", async () => {
+    const { dialog } = await renderCard();
+    const add = vi.spyOn(api, "friendAdd");
+    const toggle = within(dialog).getByRole("switch", { name: "Friend" });
+    expect(toggle).toHaveAttribute("aria-checked", "false");
+    fireEvent.click(toggle);
+    expect(add).toHaveBeenCalledWith(2);
+    await waitFor(() => {
+      expect(within(dialog).getByRole("switch", { name: "Friend" })).toHaveAttribute(
+        "aria-checked",
+        "true",
+      );
+    });
+    expect(savedFlag(dialog)).toHaveAttribute("data-visible", "true");
+  });
+
+  it("explains that people without a certificate can't be friends", async () => {
+    const { dialog } = await renderCard(3);
+    const add = vi.spyOn(api, "friendAdd");
+    const toggle = within(dialog).getByRole("switch", { name: "Friend" });
+    expect(toggle).toHaveAttribute("aria-disabled", "true");
+    expect(toggle).toHaveAccessibleDescription(/without a certificate/);
+    fireEvent.click(toggle);
+    expect(add).not.toHaveBeenCalled();
+  });
+
   it("averages the visible pixels and ignores transparent ones", () => {
     const pixels = new Uint8ClampedArray([255, 0, 0, 255, 0, 0, 255, 255, 9, 9, 9, 0]);
     expect(averageColor(pixels)).toBe("rgb(128 0 128)");

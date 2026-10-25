@@ -1,7 +1,7 @@
 /**
  * Full profile of one person (modal dialog, FR-1.63): a header with banner, avatar, name, status
  * and comment, "Private message" as a labelled header action, and the local settings (volume
- * 0–200 %, local mute, private note). Settings apply instantly and confirm with "Saved"; there is
+ * 0–200 %, local mute, friend, private note). Settings apply instantly and confirm with "Saved"; there is
  * no save button, so nothing at the bottom can be mistaken for one (QA.63). The engine stores
  * them per certificate hash; people without a certificate are only adjusted for this session.
  */
@@ -19,6 +19,7 @@ import { useTranslation } from "react-i18next";
 import { announce } from "../../a11y";
 import { getApi, toEngineError, type User } from "../../api";
 import { useServerState } from "../channels/serverStore";
+import { setFriend, useFriend } from "../friends";
 import { MumcordBadge } from "../channels/MumcordBadge";
 import { NowGamingFor } from "../nowgaming";
 import { NowPlayingFor } from "../nowplaying";
@@ -135,6 +136,10 @@ function ProfileBody({
   const settingsId = useId();
   const muteLabelId = useId();
   const muteHintId = useId();
+  const friendLabelId = useId();
+  const friendHintId = useId();
+  const { t: tFriends } = useTranslation("friends");
+  const friend = useFriend(user.certHash);
 
   const report = (cause: unknown) => {
     const code = toEngineError(cause).code;
@@ -238,6 +243,29 @@ function ProfileBody({
               <span id={muteLabelId}>{t("card.localMute")}</span>
               <span id={muteHintId} className="profile-card__note">
                 {t("card.localMuteHint")}
+              </span>
+            </span>
+            <span className="profile-card__switch" aria-hidden="true" />
+          </button>
+          {/* People without a certificate can't be recognised again, so they can't be friends. */}
+          <button
+            type="button"
+            role="switch"
+            aria-checked={friend !== undefined}
+            aria-disabled={user.certHash === null}
+            aria-labelledby={friendLabelId}
+            aria-describedby={friendHintId}
+            className="profile-card__mute"
+            onClick={() => {
+              if (user.certHash === null) return;
+              setError(null);
+              setFriend(user, friend === undefined).then(stored, report);
+            }}
+          >
+            <span className="profile-card__mute-text">
+              <span id={friendLabelId}>{tFriends("friend")}</span>
+              <span id={friendHintId} className="profile-card__note">
+                {user.certHash === null ? tFriends("noCertificate") : tFriends("friendHint")}
               </span>
             </span>
             <span className="profile-card__switch" aria-hidden="true" />

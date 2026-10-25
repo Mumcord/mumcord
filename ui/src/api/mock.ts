@@ -13,6 +13,7 @@ import type {
   ConnectionStats,
   Conversation,
   ErrorCode,
+  Friend,
   HistoryScope,
   Identity,
   InlineImage,
@@ -95,6 +96,10 @@ export interface MockControls {
   desktopNotices(): readonly MessageNotice[];
   /** Sounds `notifyMessage` played for incoming messages, oldest first (QA.41). */
   messageSounds(): readonly ("message" | "mention")[];
+  /** Simulates a person leaving the server. */
+  removeUser(session: number): void;
+  /** Simulates a person joining the server (or changing, if the session exists). */
+  upsertUser(user: User): void;
 }
 
 export type MockApi = MumcordApi & { readonly mock: MockControls };
@@ -423,6 +428,9 @@ export function createMockApi(options: MockOptions = {}): MockApi {
   const listeners = new Map<EventName, Set<(payload: never) => void>>();
   /** Private notes by session (FR-1.63); the engine keys them by certificate hash. */
   const notes = new Map<number, string>();
+  /** Friends by certificate hash (FR-1.64); online state is derived from the snapshot. */
+  const friends = new Map<string, { name: string; addedAt: string; lastSeenAt: string | null }>();
+  let shownFriends = "[]";
   const failures = new Map<CommandName, ApiError>();
   const certPrompts = new Map<number, string | null>();
 
@@ -516,10 +524,64 @@ export function createMockApi(options: MockOptions = {}): MockApi {
       : [],
   );
 
-  function emit<K extends EventName>(event: K, payload: EventPayloads[K]): void {
+  function dispatch<K extends EventName>(event: K, payload: EventPayloads[K]): void {
     const set = listeners.get(event);
     if (!set) return;
     for (const handler of set) (handler as (p: EventPayloads[K]) => void)(payload);
+  }
+
+  /** Friends as the engine reports them: online first, then by name. */
+  function friendViews(): Friend[] {
+    const live = state.state === "connected" ? snapshot : null;
+    const views = [...friends].map(([certHash, f]): Friend => {
+      const user = live?.users.find((u) => u.certHash === certHash && u.session !== SELF_SESSION);
+      return {
+        certHash,
+        name: user?.name ?? f.name,
+        addedAt: f.addedAt,
+        lastSeenAt: f.lastSeenAt,
+        online:
+          user && live
+            ? { serverId: live.serverId, session: user.session, channelId: user.channelId }
+            : null,
+      };
+    });
+    return views.sort(
+      (a, b) =>
+        Number(b.online !== null) - Number(a.online !== null) ||
+        a.name.toLowerCase().localeCompare(b.name.toLowerCase()),
+    );
+  }
+
+  /** Like the engine, emits `friendsChanged` after any event that changes the list. */
+  function refreshFriends(): void {
+    const now = new Date().toISOString();
+    const before = new Map(
+      (JSON.parse(shownFriends) as Friend[]).map((f) => [f.certHash, f.online !== null]),
+    );
+    const views = friendViews();
+    for (const view of views) {
+      const friend = friends.get(view.certHash);
+      if (!friend) continue;
+      if (before.get(view.certHash) === true && view.online === null) friend.lastSeenAt = now;
+      if (view.online !== null) friend.name = view.name;
+    }
+    const next = JSON.stringify(friendViews());
+    if (next === shownFriends) return;
+    shownFriends = next;
+    dispatch("friendsChanged", { friends: JSON.parse(next) as Friend[] });
+  }
+
+  function emit<K extends EventName>(event: K, payload: EventPayloads[K]): void {
+    dispatch(event, payload);
+    if (
+      event === "serverSynced" ||
+      event === "userUpserted" ||
+      event === "userRemoved" ||
+      event === "connectionStateChanged"
+    ) {
+      refreshFriends();
+    }
   }
 
   function on<K extends EventName>(
@@ -968,6 +1030,27 @@ export function createMockApi(options: MockOptions = {}): MockApi {
       notes.set(session, note);
       return Promise.resolve(null);
     },
+    friendsList: () => Promise.resolve(friendViews()),
+    friendAdd: (session) => {
+      if (session === SELF_SESSION) fail("invalidInput", "you cannot be your own friend");
+      const user = requireUser(session);
+      if (user.certHash === null) {
+        fail("invalidInput", "people without a certificate cannot be friends");
+      }
+      const known = friends.get(user.certHash);
+      friends.set(user.certHash, {
+        name: user.name,
+        addedAt: known?.addedAt ?? new Date().toISOString(),
+        lastSeenAt: known?.lastSeenAt ?? null,
+      });
+      refreshFriends();
+      return Promise.resolve(null);
+    },
+    friendRemove: (certHash) => {
+      friends.delete(certHash);
+      refreshFriends();
+      return Promise.resolve(null);
+    },
     personProfile: (session) => {
       const user = requireUser(session);
       return Promise.resolve({
@@ -1412,6 +1495,16 @@ export function createMockApi(options: MockOptions = {}): MockApi {
     },
     desktopNotices: () => desktopNotices,
     messageSounds: () => messageSounds,
+    removeUser: (session) => {
+      const snap = requireSnapshot();
+      snap.users = snap.users.filter((u) => u.session !== session);
+      emit("userRemoved", { session });
+    },
+    upsertUser: (user) => {
+      const snap = requireSnapshot();
+      snap.users = [...snap.users.filter((u) => u.session !== user.session), user];
+      emit("userUpserted", { user });
+    },
   };
 
   const api: MockApi = { ...guarded, kind: "mock", on, mock };

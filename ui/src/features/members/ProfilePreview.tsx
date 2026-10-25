@@ -1,7 +1,7 @@
 /**
  * Read-only profile preview on hover or keyboard focus (FR-1.18, QA.21): avatar, name, comment,
  * registered marker and voice state, placed next to the person. A click pins it (FR-1.62) with
- * buttons for a private message and the full profile card. Wrap a person in `ProfilePreviewTrigger`; `ProfilePreviewHost` is rendered once.
+ * buttons for a private message, friend (FR-1.64) and the full profile card. Wrap a person in `ProfilePreviewTrigger`; `ProfilePreviewHost` is rendered once.
  */
 import DOMPurify from "dompurify";
 import {
@@ -19,6 +19,7 @@ import type { User } from "../../api";
 import { VOICE_STATE_KEY, voiceState } from "../channels/statusText";
 import { MumcordBadge } from "../channels/MumcordBadge";
 import { useServerState } from "../channels/serverStore";
+import { FriendButton } from "./FriendButton";
 import { NowGamingFor } from "../nowgaming";
 import { NowPlayingFor } from "../nowplaying";
 import "./profilePreview.css";
@@ -270,6 +271,7 @@ function Preview({
               </svg>
             </button>
           )}
+          {canAct && user.session !== state.selfSession && <FriendButton user={user} />}
           {canAct && (
             <button
               type="button"

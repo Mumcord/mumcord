@@ -13,18 +13,21 @@ import {
 import { subscribeIncoming } from "../chat";
 import { htmlToText } from "../chat/sanitize";
 import { createMessageAnnouncer } from "../chat/messageAnnouncer";
+import { PrivatePresence, useFriends } from "../friends";
 import { getFollowState, rememberDirectChat, useFollowState, type DirectChat } from "./followStore";
 import { UnreadBadge } from "./UnreadBadge";
 import "./follow.css";
 
 const SNIPPET_CHARS = 100;
 
+function person(users: ReadonlyMap<number, User>, c: Conversation): User | undefined {
+  if (c.kind === "private") return [...users.values()].find((u) => u.certHash === c.certHash);
+  if (c.kind === "privateSession") return users.get(c.session);
+  return undefined;
+}
+
 function personName(users: ReadonlyMap<number, User>, c: Conversation): string | null {
-  if (c.kind === "private") {
-    return [...users.values()].find((u) => u.certHash === c.certHash)?.name ?? null;
-  }
-  if (c.kind === "privateSession") return users.get(c.session)?.name ?? null;
-  return null;
+  return person(users, c)?.name ?? null;
 }
 
 /** Open private chats ("Direct messages") with unread badges, plus new-message notifications. */
@@ -33,9 +36,12 @@ export function DirectMessages() {
   const follow = useFollowState();
   const server = useServerState();
   const { conversation } = useSelectedConversation();
+  const friends = useFriends();
 
   function nameOf(chat: DirectChat): string {
-    return personName(server.users, chat.conversation) ?? chat.name ?? t("dm.unknown");
+    const c = chat.conversation;
+    const friend = c.kind === "private" ? friends.find((f) => f.certHash === c.certHash) : null;
+    return personName(server.users, c) ?? chat.name ?? friend?.name ?? t("dm.unknown");
   }
 
   // Opening a private chat from anywhere adds it to the list.
@@ -87,6 +93,12 @@ export function DirectMessages() {
                 selectConversation(chat.conversation);
               }}
             >
+              <PrivatePresence
+                className="direct-messages__presence"
+                compact
+                online={person(server.users, chat.conversation) !== undefined}
+                certHash={chat.conversation.kind === "private" ? chat.conversation.certHash : null}
+              />
               <span>{nameOf(chat)}</span>
               <UnreadBadge count={follow.unread.get(chat.key) ?? 0} mentionKey={chat.key} />
             </button>

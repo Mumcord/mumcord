@@ -74,6 +74,11 @@
   background: var(--color-bg-hover);
 }
 
+.direct-messages__presence {
+  display: inline-flex;
+  margin-right: var(--space-2);
+}
+
 /* Same violet selection bar as the channel tree; an inset shadow keeps the row size. */
 .direct-messages__item[aria-current="true"] {
   background: var(--color-bg-selected);

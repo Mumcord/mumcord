@@ -342,6 +342,9 @@ pub enum EngineEvent {
         received: u32,
         total: u32,
     },
+    /// The friends list changed: a friend was added or removed, came online, moved, was
+    /// renamed or went offline (FR-1.64). Online friends first.
+    FriendsChanged(Vec<crate::friends::FriendView>),
 }
 
 /// Phase of the mic test: record, play back, finished or failed to start.

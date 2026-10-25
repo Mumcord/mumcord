@@ -8,6 +8,7 @@
 mod db;
 mod error;
 mod favorites;
+mod friends;
 mod history;
 mod identity;
 mod secrets;
@@ -19,6 +20,7 @@ mod synced;
 pub use db::{DB_FILE_NAME, Store, UnixMillis};
 pub use error::{Error, Result};
 pub use favorites::{GifFavorite, MAX_GIF_FAVORITES};
+pub use friends::Friend;
 pub use history::{ChatMessage, Conversation, NewChatMessage};
 pub use identity::{Identity, cert_hash};
 pub use secrets::{KEYRING_SERVICE, SecretStore};
