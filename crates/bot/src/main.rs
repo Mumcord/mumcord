@@ -118,6 +118,16 @@ enum Command {
         /// Stop after this many seconds.
         #[arg(long)]
         seconds: Option<f64>,
+        /// Send this avatar position "x,y,z" with every packet (positional audio).
+        #[arg(long, value_parser = parse_position, allow_hyphen_values = true)]
+        position: Option<[f32; 3]>,
+    },
+    /// Announce a Mumble Link game context (like a game running next to the client), so people
+    /// in the same game hear this bot's positional voice placed; an empty context means no game.
+    GameContext {
+        context: String,
+        #[arg(long, default_value = "")]
+        identity: String,
     },
     /// Record received voice for --seconds into a 48 kHz mono WAV (sum of all speakers, or
     /// only --from).
@@ -278,14 +288,25 @@ async fn run(bot: &mut Bot, voice: &mut Option<BotVoice>, command: Command) -> R
         Command::DenyListen { channel } => bot.deny_listen(&channel).await?,
         Command::AllowListen { channel } => bot.allow_listen(&channel).await?,
         Command::Describe { channel, html } => bot.set_description(&channel, &html).await?,
+        Command::GameContext { context, identity } => {
+            // The official client prefixes the context with the plugin name ("Link\0").
+            let context = if context.is_empty() {
+                Vec::new()
+            } else {
+                [b"Link\0".as_slice(), context.as_bytes()].concat()
+            };
+            bot.handle().set_plugin_context(context, identity)?;
+        }
         Command::Play {
             file,
             looping,
             seconds,
+            position,
         } => {
             let opts = PlayOptions {
                 forever: looping,
                 max_duration: seconds.map(secs).transpose()?,
+                position,
                 ..Default::default()
             };
             let report = voice_of(bot, voice).await?.play_file(&file, opts).await?;
@@ -323,6 +344,16 @@ async fn run(bot: &mut Bot, voice: &mut Option<BotVoice>, command: Command) -> R
         Command::Script => bail!("script is only valid as the top-level command"),
     }
     Ok(())
+}
+
+fn parse_position(text: &str) -> Result<[f32; 3]> {
+    let parts = text
+        .split(',')
+        .map(|p| p.trim().parse::<f32>().context("not a number"))
+        .collect::<Result<Vec<_>>>()?;
+    <[f32; 3]>::try_from(parts)
+        .ok()
+        .context("give three numbers \"x,y,z\"")
 }
 
 fn secs(seconds: f64) -> Result<Duration> {
@@ -434,6 +465,22 @@ fn split_words(line: &str) -> Result<Vec<String>> {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn parses_positions() {
+        assert_eq!(
+            parse_position("-3, 0,1.5").expect("position"),
+            [-3.0, 0.0, 1.5]
+        );
+        assert!(parse_position("1,2").is_err());
+        assert!(parse_position("1,2,x").is_err());
+        let line = ScriptLine::try_parse_from(["script", "play", "a.wav", "--position", "-3,0,0"])
+            .expect("script line");
+        assert!(matches!(
+            line.command,
+            Command::Play { position: Some([x, _, _]), .. } if x == -3.0
+        ));
+    }
 
     #[test]
     fn splits_like_a_shell() {
