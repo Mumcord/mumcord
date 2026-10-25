@@ -7,6 +7,7 @@ the local test servers in `testenv/`. Decision Q4.8; acceptance criteria in spec
 
     npm run e2e                                              # whole suite
     npm run e2e -- --spec e2e/specs/smoke/app.e2e.ts         # one spec (args go to `wdio run`)
+    MUMCORD_E2E_SHARD=2 npm run e2e                          # one CI shard (see below)
 
 Requires only Docker (user in the `docker` group) and `npm ci` on the host. Everything else runs
 in the `mumcord-e2e` image, because Arch's webkit2gtk ships without `WebKitWebDriver`.
@@ -34,6 +35,14 @@ certificates) live in `~/.cache/mumcord-build/e2e/` (override with `MUMCORD_E2E_
   `file:<in.wav>:<out.wav>` (mic plays `in.wav`, speakers record to `out.wav`, 48 kHz mono 16-bit).
 - **Fresh install per spec file:** each spec file gets a new profile (`XDG_DATA_HOME`/`CONFIG`/`CACHE`
   in a temp dir) and an empty keyring. Spec files run one at a time (shared servers, keyring, ports).
+- **CI shards:** `.github/workflows/e2e.yml` builds the image and the binaries once
+  (`MUMCORD_E2E_STEP=build`), shares them as an artifact, and runs the shards of `e2e/shards.json`
+  in parallel jobs (`MUMCORD_E2E_STEP=test MUMCORD_E2E_SHARD=<n>`, each runner with its own test
+  servers). The "Linux E2E" job fails if the build or any shard failed. The shards are balanced by
+  measured spec durations; the longest spec (network resilience, ~5 min in CI) sits alone in shard 1
+  and sets the floor. A new spec file must be added to a shard (the shortest one); a run with
+  `MUMCORD_E2E_SHARD` set fails while `shards.json` and the spec files disagree. When changing
+  the number of shards, also change the job matrix.
 - **Failures:** screenshot + page source of the app go to `e2e/artifacts/` (git-ignored); CI uploads
   them. axe reports land there too.
 

@@ -1,9 +1,41 @@
-import { mkdirSync, writeFileSync } from "node:fs";
-import { join } from "node:path";
+import { globSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { dirname, join } from "node:path";
+import { fileURLToPath } from "node:url";
 import { browser } from "@wdio/globals";
 import { driverPort, prepareFresh, stopDriver, withTimeout } from "./helpers/app.ts";
 import { netsim } from "./helpers/index.ts";
 import { artifactsDir, bin } from "./helpers/paths.ts";
+
+const e2eDir = dirname(fileURLToPath(import.meta.url));
+const allSpecs = "specs/**/*.e2e.ts";
+
+/**
+ * Spec files of one shard (1-based) from shards.json, so CI can split the suite over parallel
+ * jobs. Fails when the file and the specs on disk disagree: a new spec missing from every shard
+ * would otherwise silently never run in CI.
+ */
+function shardSpecs(shard: string): string[] {
+  const { shards } = JSON.parse(readFileSync(join(e2eDir, "shards.json"), "utf8")) as {
+    shards: string[][];
+  };
+  const listed = shards.flat();
+  const onDisk = globSync(allSpecs, { cwd: e2eDir }).sort();
+  const missing = onDisk.filter((f) => !listed.includes(f));
+  const stale = listed.filter((f, i) => !onDisk.includes(f) || listed.indexOf(f) !== i);
+  if (missing.length > 0 || stale.length > 0) {
+    throw new Error(
+      `e2e/shards.json is out of date. Not in any shard: [${missing.join(", ")}]; ` +
+        `unknown or duplicate: [${stale.join(", ")}]`,
+    );
+  }
+  const index = Number(shard);
+  if (!Number.isInteger(index) || index < 1 || index > shards.length) {
+    throw new Error(`MUMCORD_E2E_SHARD must be 1..${String(shards.length)}, got "${shard}"`);
+  }
+  return shards[index - 1].map((f) => `./${f}`);
+}
+
+const shard = process.env.MUMCORD_E2E_SHARD;
 
 // Each spec file = one worker = one fresh install (new profile, empty keyring, and no app or
 // driver process left over from the previous spec – see killStrays). Specs run one at a
@@ -12,7 +44,7 @@ export const config: WebdriverIO.Config = {
   runner: "local",
   hostname: "127.0.0.1",
   port: driverPort,
-  specs: ["./specs/**/*.e2e.ts"],
+  specs: shard ? shardSpecs(shard) : [`./${allSpecs}`],
   maxInstances: 1,
   capabilities: [
     {
