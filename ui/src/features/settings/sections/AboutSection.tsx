@@ -2,11 +2,14 @@ import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import licenseText from "../../../../../LICENSE?raw";
 import { getApi, type AppInfo } from "../../../api";
+import { openInBrowser } from "../../chat/openLink";
 import { Group, Section } from "../components/Section";
+
+const ISSUES_URL = "https://github.com/ToBee94/mumcord/issues/new";
 
 /** About: version, OS, Mumcord's AGPL license and the third-party notices (AC-1.29). */
 export function AboutSection() {
-  const { t } = useTranslation("settings");
+  const { t, i18n } = useTranslation("settings");
   const [info, setInfo] = useState<AppInfo | null>(null);
   const [notices, setNotices] = useState<string | null>(null);
   const [noticesFailed, setNoticesFailed] = useState(false);
@@ -31,6 +34,10 @@ export function AboutSection() {
     };
   }, []);
 
+  const changelogBase = i18n.language.startsWith("de")
+    ? "https://mumcord.app/changelog"
+    : "https://mumcord.app/en/changelog";
+
   return (
     <Section title={t("sections.about")}>
       <dl className="settings-facts">
@@ -39,8 +46,42 @@ export function AboutSection() {
         <dt>{t("about.os")}</dt>
         <dd>{info?.os ?? "…"}</dd>
       </dl>
+      {info && (
+        <div className="settings-group">
+          <button
+            type="button"
+            className="settings-button"
+            onClick={() => {
+              openInBrowser(`${changelogBase}#v${info.version}`);
+            }}
+          >
+            {t("about.whatsNew")}
+          </button>
+        </div>
+      )}
+      <Group title={t("about.support")}>
+        <div className="settings-actions">
+          <button
+            type="button"
+            className="settings-button"
+            onClick={() => {
+              openInBrowser(`${ISSUES_URL}?template=bug_report.yml`);
+            }}
+          >
+            {t("about.reportBug")}
+          </button>
+          <button
+            type="button"
+            className="settings-button"
+            onClick={() => {
+              openInBrowser(`${ISSUES_URL}?template=feature_request.yml`);
+            }}
+          >
+            {t("about.requestFeature")}
+          </button>
+        </div>
+      </Group>
       <Group title={t("about.license")}>
-        <p className="settings-hint">{t("about.commercial")}</p>
         <ScrollableText label={t("about.license")} text={licenseText} />
       </Group>
       <Group title={t("about.notices")}>
