@@ -60,6 +60,7 @@ fn specta_builder() -> Builder<tauri::Wry> {
             people::person_profile,
             chat::send_channel_message,
             chat::send_private_message,
+            chat::save_image,
             links::link_preview,
             links::inline_image,
             links::preview_dismiss,

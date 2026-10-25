@@ -72,6 +72,16 @@
     "play": "Reproducir {{title}}",
     "player": "Reproductor de vídeo: {{title}}",
     "videoTitle": "Vídeo de {{site}}",
+    "spotifyTitle": "Enlace de {{site}}",
+    "audioPlayer": "Reproductor de Spotify: {{title}}",
+    "kind": {
+      "track": "Canción",
+      "album": "Álbum",
+      "playlist": "Lista de reproducción",
+      "artist": "Artista",
+      "episode": "Episodio",
+      "show": "Podcast"
+    },
     "inBrowser": "Se reproduce en tu navegador",
     "card": "Vista previa del enlace: {{title}}",
     "dismiss": "Ocultar vista previa"
@@ -79,6 +89,23 @@
   "image": {
     "loading": "Cargando la imagen {{name}}",
     "label": "Imagen: {{name}}",
-    "view": "Ver la imagen {{name}}"
+    "view": "Ver la imagen {{name}}",
+    "viewMessage": "Imagen de {{name}}, abrir en el visor"
+  },
+  "viewer": {
+    "label": "Visor de imágenes",
+    "counter": "{{current}} / {{total}}",
+    "zoomIn": "Acercar",
+    "zoomOut": "Alejar",
+    "fit": "Ajustar a la ventana",
+    "save": "Guardar imagen",
+    "saved": "Imagen guardada",
+    "saveFailed": "No se pudo guardar la imagen",
+    "fileFilter": "Imagen",
+    "openInBrowser": "Abrir en el navegador",
+    "close": "Cerrar",
+    "previous": "Imagen anterior",
+    "next": "Imagen siguiente",
+    "unnamed": "imagen"
   }
 }

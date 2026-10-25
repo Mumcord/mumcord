@@ -1013,6 +1013,7 @@ export function createMockApi(options: MockOptions = {}): MockApi {
       }
       return Promise.resolve(null);
     },
+    saveImage: () => Promise.resolve(null),
     previewCacheClear: () => {
       const freed = cachedPreviewBytes;
       cachedPreviewBytes = 0;

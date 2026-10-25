@@ -670,6 +670,12 @@
   border-radius: var(--radius-md);
 }
 
+/* Spotify's embed is a fixed-height widget, not a 16:9 video. */
+.link-card__player--audio {
+  aspect-ratio: auto;
+  height: 152px;
+}
+
 /* Inline images (FR-1.55): scaled into a 400×300 box, aspect ratio kept. The loading
    placeholder has a fixed size so the list does not jump while images arrive. */
 .inline-image {
@@ -737,4 +743,124 @@
 
 .link-card__open:hover {
   background: var(--color-bg-hover);
+}
+
+/* Image viewer (FR-1.56) */
+.chat-message__body img {
+  cursor: zoom-in;
+}
+
+.image-viewer__backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  background: rgb(0 0 0 / 82%);
+}
+
+.image-viewer {
+  position: absolute;
+  inset: 0;
+  outline: none;
+}
+
+.image-viewer__stage {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  touch-action: none;
+  cursor: default;
+}
+
+.image-viewer__stage[data-zoomed="true"] {
+  cursor: grab;
+}
+
+.image-viewer__stage--panning[data-zoomed="true"] {
+  cursor: grabbing;
+}
+
+.image-viewer__img {
+  flex: none;
+  max-width: none;
+  user-select: none;
+  /* The transform scales from the image's own centre, which sits on the stage's centre. */
+  transform-origin: center;
+  image-rendering: auto;
+}
+
+.image-viewer__bar {
+  position: absolute;
+  top: var(--space-3);
+  right: var(--space-3);
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2);
+  border-radius: var(--radius-md);
+  background: var(--color-bg-elevated);
+  color: var(--color-text);
+}
+
+.image-viewer__counter,
+.image-viewer__zoom {
+  min-width: 3.5em;
+  text-align: center;
+  font-size: var(--font-size-sm);
+  font-variant-numeric: tabular-nums;
+}
+
+.image-viewer__button,
+.image-viewer__nav {
+  min-width: 2.25rem;
+  min-height: 2.25rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: var(--color-bg-hover);
+  color: var(--color-text);
+  cursor: pointer;
+}
+
+.image-viewer__button:hover,
+.image-viewer__nav:hover:not(:disabled) {
+  border-color: var(--color-border-strong);
+}
+
+.image-viewer__nav {
+  position: absolute;
+  top: 50%;
+  z-index: 1;
+  transform: translateY(-50%);
+  border-radius: var(--radius-full);
+  font-size: 1.5rem;
+}
+
+.image-viewer__nav--prev {
+  left: var(--space-3);
+}
+
+.image-viewer__nav--next {
+  right: var(--space-3);
+}
+
+.image-viewer__nav:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+.image-viewer__status {
+  position: absolute;
+  bottom: var(--space-4);
+  left: 50%;
+  z-index: 1;
+  transform: translateX(-50%);
+  margin: 0;
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-md);
+  background: var(--color-bg-elevated);
+  color: var(--color-text);
+  font-size: var(--font-size-sm);
 }

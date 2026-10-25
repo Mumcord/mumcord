@@ -204,12 +204,39 @@ describe("chat: link previews, player cards and inline images (AC-1.39, AC-1.40,
     expect(remote).toBe(0);
     expect(site.requests.slice(before).sort()).toEqual(["/anim.gif", "/photo.png"]);
 
-    // Until the image viewer exists (B42), a click opens the image in the system browser.
-    await png.$("button.inline-image__view").click();
+    // FR-1.56 / AC-1.46: a click opens the viewer; + zooms, → shows the next image, Escape closes
+    // and returns focus to the clicked image; "Open in browser" hands the address to the system.
+    await gif.$("button.inline-image__view").click();
+    const viewer = $("[role='dialog'][aria-label='Image viewer']");
+    await viewer.waitForDisplayed();
+    await expect($(".image-viewer__counter")).toHaveText("1 / 2");
+    const scale = () =>
+      browser.execute(() => {
+        const match = /scale\(([\d.]+)\)/.exec(
+          (document.querySelector(".image-viewer__img") as HTMLElement).style.transform,
+        );
+        return Number(match?.[1] ?? 0);
+      });
+    await browser.waitUntil(async () => (await scale()) > 0);
+    const fitted = await scale();
+    await browser.keys("+");
+    await browser.waitUntil(async () => (await scale()) > fitted, { timeoutMsg: "+ did not zoom" });
+    await browser.keys("ArrowRight");
+    await expect($(".image-viewer__counter")).toHaveText("2 / 2");
+    await $("button[aria-label='Open in browser']").click();
     await browser.waitUntil(() => readFileSync(opener.log, "utf8").includes(`${base}/photo.png`), {
       timeout: 10_000,
-      timeoutMsg: "clicking the image did not open it in the system browser",
+      timeoutMsg: "Open in browser in the viewer did not reach the system browser",
     });
+    await browser.keys("Escape");
+    await viewer.waitForDisplayed({ reverse: true });
+    await browser.waitUntil(
+      () =>
+        browser.execute(
+          () => document.activeElement?.classList.contains("inline-image__view") ?? false,
+        ),
+      { timeoutMsg: "focus did not return to the clicked image" },
+    );
   });
 
   it("AC-1.39 with previews switched off shows only the plain link and makes no request", async () => {

@@ -64,6 +64,11 @@ export const commands = {
 	sendChannelMessage: (channelId: number, html: string) => typedError<ChatMessage, ApiError>(__TAURI_INVOKE("send_channel_message", { channelId, html })),
 	sendPrivateMessage: (session: number, html: string) => typedError<ChatMessage, ApiError>(__TAURI_INVOKE("send_private_message", { session, html })),
 	/**
+	 *  Writes the image of a `data:` URL to `path` (the viewer's "Save image", FR-1.56). The data is
+	 *  already in the UI, so nothing is fetched again.
+	 */
+	saveImage: (path: string, dataUrl: string) => typedError<null, ApiError>(__TAURI_INVOKE("save_image", { path, dataUrl })),
+	/**
 	 *  Preview of an http(s) link in a message; `null` when previews are switched off in the
 	 *  settings (then nothing is fetched) or there is nothing to show.
 	 */
@@ -457,7 +462,7 @@ export type LinkPreview = {
 	description: string | null,
 	/**  Preview image as a `data:` URL (fetched and re-encoded by the engine). */
 	image: string | null,
-	/**  Set for YouTube and Twitch links: show a player card. */
+	/**  Set for YouTube, Twitch and Spotify links: show a player card. */
 	video: VideoEmbed | null,
 	/**  The link serves an image: show it inline (`inline_image`) instead of a card. */
 	isImage: boolean,
@@ -852,11 +857,14 @@ export type VideoEmbed = {
 	 *  `&parent=<host of the page>` appended.
 	 */
 	playerUrl: string,
-	/**  Channel or uploader name. */
+	/**
+	 *  Channel or uploader name; for Spotify the kind of item (`track`, `album`, `playlist`,
+	 *  `artist`, `episode`, `show`).
+	 */
 	channel: string | null,
 };
 
-export type VideoSite = "youtube" | "twitch";
+export type VideoSite = "youtube" | "twitch" | "spotify";
 
 export type VoiceActivation = "automatic" | "manual";
 

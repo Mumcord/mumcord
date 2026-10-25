@@ -72,6 +72,16 @@
     "play": "Play {{title}}",
     "player": "Video player: {{title}}",
     "videoTitle": "{{site}} video",
+    "spotifyTitle": "{{site}} link",
+    "audioPlayer": "Spotify player: {{title}}",
+    "kind": {
+      "track": "Track",
+      "album": "Album",
+      "playlist": "Playlist",
+      "artist": "Artist",
+      "episode": "Episode",
+      "show": "Show"
+    },
     "inBrowser": "Plays in your browser",
     "card": "Link preview: {{title}}",
     "dismiss": "Hide preview"
@@ -79,6 +89,23 @@
   "image": {
     "loading": "Loading image {{name}}",
     "label": "Image: {{name}}",
-    "view": "View image {{name}}"
+    "view": "View image {{name}}",
+    "viewMessage": "Image from {{name}}, open in viewer"
+  },
+  "viewer": {
+    "label": "Image viewer",
+    "counter": "{{current}} / {{total}}",
+    "zoomIn": "Zoom in",
+    "zoomOut": "Zoom out",
+    "fit": "Fit to window",
+    "save": "Save image",
+    "saved": "Image saved",
+    "saveFailed": "The image could not be saved",
+    "fileFilter": "Image",
+    "openInBrowser": "Open in browser",
+    "close": "Close",
+    "previous": "Previous image",
+    "next": "Next image",
+    "unnamed": "image"
   }
 }
