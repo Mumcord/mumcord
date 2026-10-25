@@ -49,6 +49,19 @@ describe("OverlayApp", () => {
     expect(await axeViolations(document.body)).toEqual([]);
   });
 
+  it("never lists people talking in other channels and follows a channel switch", async () => {
+    await renderOverlay();
+    act(() => {
+      api.mock.setTalking(2, true);
+      api.mock.setTalking(4, true);
+    });
+    expect(screen.getAllByRole("listitem").map((li) => li.textContent)).toEqual(["Anna"]);
+    await act(async () => {
+      await api.channelJoin(2);
+    });
+    expect(screen.getAllByRole("listitem").map((li) => li.textContent)).toEqual(["Carla"]);
+  });
+
   it("fades people out after they stop talking", async () => {
     await renderOverlay();
     vi.useFakeTimers();

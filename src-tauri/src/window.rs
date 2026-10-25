@@ -9,7 +9,7 @@ use tauri_specta::Event;
 use crate::commands::app::CloseRequested;
 
 /// Label of the only window (tauri.conf.json).
-const MAIN: &str = "main";
+pub const MAIN: &str = "main";
 
 /// Time the connection task gets to send its TLS close before the process exits.
 const DISCONNECT_GRACE: Duration = Duration::from_millis(300);

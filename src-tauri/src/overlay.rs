@@ -67,11 +67,7 @@ fn support_for(env: &crate::ptt::SessionEnv, current_desktop: Option<&str>) -> S
     if !env.runs_on_wayland() {
         return FULL_SUPPORT;
     }
-    let kde = current_desktop.is_some_and(|desktops| {
-        desktops
-            .split(':')
-            .any(|d| d.trim().eq_ignore_ascii_case("KDE"))
-    });
+    let kde = is_kde(current_desktop);
     Support {
         on_top: false,
         position: false,
@@ -81,6 +77,160 @@ fn support_for(env: &crate::ptt::SessionEnv, current_desktop: Option<&str>) -> S
             "limits.wayland"
         }),
     }
+}
+
+#[cfg(target_os = "linux")]
+fn is_kde(current_desktop: Option<&str>) -> bool {
+    current_desktop.is_some_and(|desktops| {
+        desktops
+            .split(':')
+            .any(|d| d.trim().eq_ignore_ascii_case("KDE"))
+    })
+}
+
+/// KDE Plasma, on any session type.
+pub fn kde() -> bool {
+    #[cfg(target_os = "linux")]
+    return is_kde(std::env::var("XDG_CURRENT_DESKTOP").ok().as_deref());
+    #[cfg(not(target_os = "linux"))]
+    false
+}
+
+/// KDE Plasma on native Wayland: the one place where a KWin window rule can fix the overlay.
+#[cfg(target_os = "linux")]
+pub fn kde_wayland() -> bool {
+    let desktop = std::env::var("XDG_CURRENT_DESKTOP").ok();
+    crate::ptt::SessionEnv::current().runs_on_wayland() && is_kde(desktop.as_deref())
+}
+
+#[cfg(not(target_os = "linux"))]
+pub fn kde_wayland() -> bool {
+    false
+}
+
+/// `(kde_wayland, our KWin rule exists)` for the settings UI.
+pub fn kwin_rule_state() -> (bool, bool) {
+    #[cfg(target_os = "linux")]
+    if kde_wayland() {
+        let installed = crate::kwin_rule::config_path().is_some_and(|path| {
+            crate::kwin_rule::installed_in(&path).unwrap_or_else(|e| {
+                tracing::warn!(error = %e, "reading the KWin rules failed");
+                false
+            })
+        });
+        return (true, installed);
+    }
+    (false, false)
+}
+
+/// Where the corner (or the size) puts the overlay on the primary screen, in the logical
+/// pixels KWin rules use. The dragged place is not used: Wayland cannot report it.
+#[cfg(target_os = "linux")]
+pub fn kwin_placement(
+    app: &AppHandle,
+    overlay: &store::OverlaySettings,
+) -> Result<crate::kwin_rule::Placement, String> {
+    let monitor = app
+        .primary_monitor()
+        .map_err(|e| e.to_string())?
+        .ok_or_else(|| "no screen found".to_owned())?;
+    let scale = monitor.scale_factor();
+    let area = monitor.work_area();
+    let origin = area.position.to_logical::<f64>(scale);
+    let extent = area.size.to_logical::<f64>(scale);
+    // Rounded logical pixels are far below i32::MAX / u32::MAX.
+    #[allow(clippy::cast_possible_truncation, clippy::cast_sign_loss)]
+    let (x, y) = corner_position(
+        overlay.corner,
+        Rect {
+            x: origin.x.round() as i32,
+            y: origin.y.round() as i32,
+            width: extent.width.round() as u32,
+            height: extent.height.round() as u32,
+        },
+        (overlay.width, overlay.height),
+        1.0,
+    );
+    Ok(crate::kwin_rule::Placement {
+        x,
+        y,
+        width: overlay.width,
+        height: overlay.height,
+    })
+}
+
+/// Keeps an installed KWin rule in step with the chosen corner and size.
+#[cfg(target_os = "linux")]
+fn refresh_kwin_rule(app: &AppHandle, overlay: &store::OverlaySettings) {
+    if !kde_wayland() {
+        return;
+    }
+    let Some(path) = crate::kwin_rule::config_path() else {
+        return;
+    };
+    if !crate::kwin_rule::installed_in(&path).unwrap_or(false) {
+        return;
+    }
+    let result = kwin_placement(app, overlay).and_then(|placement| {
+        crate::kwin_rule::install_in(&path, placement).map_err(|e| e.to_string())
+    });
+    match result {
+        Ok(true) => {
+            tauri::async_runtime::spawn(async {
+                if let Err(e) = crate::kwin_rule::reconfigure().await {
+                    tracing::warn!(error = %e, "asking KWin to reload its rules failed");
+                }
+            });
+        }
+        Ok(false) => {}
+        Err(e) => tracing::warn!(error = %e, "updating the KWin rule failed"),
+    }
+}
+
+/// Commands that open KDE's window rule settings, tried in order.
+#[cfg(target_os = "linux")]
+const KDE_WINDOW_RULES_ARGV: [[&str; 2]; 2] = [
+    ["systemsettings", "kcm_kwinrules"],
+    ["kcmshell6", "kwinrules"],
+];
+
+/// Commands that open KDE's Legacy X11 App Support page, tried in order.
+#[cfg(target_os = "linux")]
+const KDE_X11_SETTINGS_ARGV: [[&str; 2]; 2] = [
+    ["kcmshell6", "kwinxwayland"],
+    ["systemsettings", "kcm_kwinxwayland"],
+];
+
+/// Starts the first command that exists. Fixed argv, no shell.
+#[cfg(target_os = "linux")]
+fn spawn_first(candidates: &[[&str; 2]]) -> std::io::Result<()> {
+    use std::process::Command;
+    let mut last_error = None;
+    for [program, arg] in candidates {
+        match Command::new(program).arg(arg).spawn() {
+            Ok(mut child) => {
+                // Reaped in the background so the finished settings window leaves no zombie.
+                std::thread::spawn(move || {
+                    let _ = child.wait();
+                });
+                return Ok(());
+            }
+            Err(e) => last_error = Some(e),
+        }
+    }
+    Err(last_error.unwrap_or_else(|| std::io::Error::other("no command to start")))
+}
+
+/// Opens KDE's window rule settings.
+#[cfg(target_os = "linux")]
+pub fn open_kde_window_rules() -> std::io::Result<()> {
+    spawn_first(&KDE_WINDOW_RULES_ARGV)
+}
+
+/// Opens KDE's Legacy X11 App Support settings (FR-1.48).
+#[cfg(target_os = "linux")]
+pub fn open_kde_x11_settings() -> std::io::Result<()> {
+    spawn_first(&KDE_X11_SETTINGS_ARGV)
 }
 
 /// What the current desktop supports.
@@ -141,6 +291,8 @@ pub fn apply(app: &AppHandle, stored: &store::Settings) -> OverlayState {
             tracing::warn!(error = %e, "closing the overlay failed");
         }
     }
+    #[cfg(target_os = "linux")]
+    refresh_kwin_rule(app, overlay);
     let state = state_of(stored, move_mode(app));
     announce(app, &state);
     state
@@ -213,8 +365,30 @@ pub async fn set_move_mode(
 /// Click-through off (move mode) or on. The window may take focus only in move mode, so
 /// Escape and the Done button work there.
 fn take_clicks(window: &WebviewWindow, take: bool) -> tauri::Result<()> {
+    #[cfg(target_os = "linux")]
+    set_input_region(window, take)?;
+    #[cfg(not(target_os = "linux"))]
     window.set_ignore_cursor_events(!take)?;
     window.set_focusable(take)
+}
+
+/// Linux: Tauri's click-through still leaves a 1×1 px input area in the top-left corner that
+/// catches clicks (QA.61), so the overlay sets an empty input region itself. GTK keeps the
+/// region with the widget and reapplies it whenever the window is realized again.
+#[cfg(target_os = "linux")]
+fn set_input_region(window: &WebviewWindow, take: bool) -> tauri::Result<()> {
+    let target = window.clone();
+    window.run_on_main_thread(move || {
+        use gtk::prelude::WidgetExt;
+
+        match target.gtk_window() {
+            Ok(gtk_window) if take => gtk_window.input_shape_combine_region(None),
+            Ok(gtk_window) => {
+                gtk_window.input_shape_combine_region(Some(&gdk::cairo::Region::create()));
+            }
+            Err(e) => tracing::warn!(error = %e, "setting the overlay input region failed"),
+        }
+    })
 }
 
 fn open(app: &AppHandle, overlay: &store::OverlaySettings) -> tauri::Result<()> {
@@ -366,6 +540,27 @@ mod tests {
             corner_position(store::OverlayCorner::BottomRight, area, (400, 400), 1.0),
             (0, 0)
         );
+    }
+
+    #[cfg(target_os = "linux")]
+    #[test]
+    fn the_x11_settings_try_kcmshell6_then_systemsettings() {
+        assert_eq!(KDE_X11_SETTINGS_ARGV[0], ["kcmshell6", "kwinxwayland"]);
+        assert_eq!(
+            KDE_X11_SETTINGS_ARGV[1],
+            ["systemsettings", "kcm_kwinxwayland"]
+        );
+    }
+
+    #[cfg(target_os = "linux")]
+    #[test]
+    fn spawning_reports_an_error_when_no_command_exists() {
+        let missing = [
+            ["mumcord-no-such-program-1", "a"],
+            ["mumcord-no-such-program-2", "b"],
+        ];
+        assert!(spawn_first(&missing).is_err());
+        assert!(spawn_first(&[]).is_err());
     }
 
     #[cfg(target_os = "linux")]

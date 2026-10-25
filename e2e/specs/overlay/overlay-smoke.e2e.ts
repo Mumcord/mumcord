@@ -1,12 +1,27 @@
-// AC-1.33 smoke (B32): the overlay window opens via its command and shows the talking Bot with the
-// talking ring. C10 extends this to the full acceptance criteria (on top, click-through, restart).
+// AC-1.33 smoke (B32): the overlay window opens via its command, stays click-through on X11 (QA.61)
+// and shows the talking Bot with the talking ring. C10 extends this to the full acceptance criteria
+// (on top, click-through, restart).
 import { join } from "node:path";
-import { browser, $ } from "@wdio/globals";
+import { browser, expect, $ } from "@wdio/globals";
 import { botInBackground, repoRoot, testenv, type BackgroundBot } from "../../helpers/index.ts";
+import { run } from "../../helpers/run.ts";
 import { addAndConnect, completeWizard, joinIfReadOnly, readTree } from "../../helpers/voice-ui.ts";
 
 const speechPath = join(repoRoot, "testenv", "audio", "speech.wav");
 const OVERLAY_TITLE = "Mumcord overlay";
+const inputProbe = join(repoRoot, "e2e", "specs", "overlay", "x11-input.py");
+
+interface X11Input {
+  windows: number;
+  inputRects: number;
+  pointerGrabbed: boolean;
+}
+
+async function overlayInput(): Promise<X11Input> {
+  const r = await run("python3", ["-I", inputProbe, OVERLAY_TITLE]);
+  if (r.code !== 0) throw new Error(`x11-input failed: ${r.stderr}`);
+  return JSON.parse(r.stdout) as X11Input;
+}
 
 async function invoke(command: string, args: object): Promise<void> {
   await browser.execute(
@@ -64,6 +79,18 @@ describe("overlay smoke", () => {
 
     await invoke("overlay_set_enabled", { enabled: true });
     await switchToOverlay(main);
+
+    // QA.61: click-through on X11 = an empty input shape (not even Tauri's 1×1 px corner) and
+    // no pointer grab, so clicks reach every other window.
+    let input: X11Input | undefined;
+    await browser.waitUntil(
+      async () => {
+        input = await overlayInput();
+        return input.windows === 1 && input.inputRects === 0;
+      },
+      { timeout: 10_000, timeoutMsg: "overlay still takes pointer input" },
+    );
+    expect(input?.pointerGrabbed).toBe(false);
 
     speaker = botInBackground(["script"], { name: "Bot", timeout: 60 });
     speaker.send(`join "${here}"`);

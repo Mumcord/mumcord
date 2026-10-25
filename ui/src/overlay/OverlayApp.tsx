@@ -38,15 +38,18 @@ export function OverlayApp() {
   const selectPeople = useCallback(
     (s: ServerState): readonly User[] => {
       if (!s.connected) return [];
+      const me = selfUser(s);
+      if (me === undefined) return [];
       if (wholeChannel) {
-        const me = selfUser(s);
-        if (me === undefined) return [];
         return [...s.users.values()]
           .filter((u) => u.channelId === me.channelId)
           .sort((a, b) => a.name.localeCompare(b.name));
       }
+      // Talkers in other channels never appear (QA.60); switching channels re-filters.
       const sessions = talkerKey === "" ? [] : talkerKey.split(",").map(Number);
-      return sessions.flatMap((session) => s.users.get(session) ?? []);
+      return sessions
+        .flatMap((session) => s.users.get(session) ?? [])
+        .filter((u) => u.channelId === me.channelId);
     },
     [wholeChannel, talkerKey],
   );

@@ -8,7 +8,7 @@ use tauri::{AppHandle, State};
 use tauri_specta::Event;
 
 use super::settings::{Language, Settings};
-use super::types::ApiResult;
+use super::types::{ApiError, ApiResult, ErrorCode};
 
 /// Screen corner the overlay sits in unless it was dragged somewhere else.
 #[derive(Serialize, Deserialize, Clone, Copy, Debug, PartialEq, Eq, Type)]
@@ -67,6 +67,11 @@ pub struct OverlayState {
     /// `null` if there is none. The exclusive-fullscreen note `overlay:limits.exclusiveFullscreen`
     /// applies everywhere and is not repeated here.
     pub explanation_key: Option<String>,
+    /// KDE Plasma on native Wayland: the settings offer a KWin window rule for the overlay.
+    pub kde_wayland: bool,
+    /// Whether Mumcord's KWin window rule is in the user's `kwinrulesrc` (only checked on
+    /// KDE Wayland, else `false`).
+    pub kwin_rule_installed: bool,
     /// UI language from the settings, for the overlay page (`null` follows the OS).
     pub language: Option<Language>,
 }
@@ -142,12 +147,15 @@ impl OverlaySettings {
 /// Builds the state from the stored settings and the current move mode.
 pub fn state_of(stored: &store::Settings, move_mode: bool) -> OverlayState {
     let support = crate::overlay::support();
+    let (kde_wayland, kwin_rule_installed) = crate::overlay::kwin_rule_state();
     OverlayState {
         settings: OverlaySettings::from(&stored.overlay),
         move_mode,
         on_top_supported: support.on_top,
         position_supported: support.position,
         explanation_key: support.explanation_key.map(str::to_owned),
+        kde_wayland,
+        kwin_rule_installed,
         language: Settings::from_store(stored).language,
     }
 }
@@ -199,6 +207,76 @@ pub async fn overlay_move_mode(
     active: bool,
 ) -> ApiResult<OverlayState> {
     Ok(crate::overlay::set_move_mode(&app, &engine, active).await?)
+}
+
+/// KDE Wayland only: adds or updates the KWin window rule that keeps the overlay on top and
+/// in its corner, and asks KWin to reload its rules. `invalidInput` elsewhere, `io` if the
+/// rules file cannot be written, `internal` if KWin cannot be reached (the rule is written).
+#[tauri::command]
+#[specta::specta]
+pub async fn overlay_kwin_rule_install(
+    app: AppHandle,
+    engine: State<'_, Engine>,
+) -> ApiResult<OverlayState> {
+    #[cfg(target_os = "linux")]
+    if crate::overlay::kde_wayland() {
+        let stored = engine.settings()?;
+        let placement = crate::overlay::kwin_placement(&app, &stored.overlay)
+            .map_err(|e| ApiError::new(ErrorCode::Internal, e))?;
+        let path = crate::kwin_rule::config_path()
+            .ok_or_else(|| ApiError::new(ErrorCode::Io, "no config directory"))?;
+        crate::kwin_rule::install_in(&path, placement)
+            .map_err(|e| ApiError::new(ErrorCode::Io, e.to_string()))?;
+        crate::kwin_rule::reconfigure()
+            .await
+            .map_err(|e| ApiError::new(ErrorCode::Internal, e.to_string()))?;
+        return Ok(state_of(&stored, crate::overlay::move_mode(&app)));
+    }
+    let _ = (&app, &engine);
+    Err(ApiError::new(
+        ErrorCode::InvalidInput,
+        "not KDE Plasma on Wayland",
+    ))
+}
+
+/// KDE Wayland only: removes Mumcord's KWin window rule again and asks KWin to reload.
+#[tauri::command]
+#[specta::specta]
+pub async fn overlay_kwin_rule_remove(
+    app: AppHandle,
+    engine: State<'_, Engine>,
+) -> ApiResult<OverlayState> {
+    #[cfg(target_os = "linux")]
+    if crate::overlay::kde_wayland() {
+        let path = crate::kwin_rule::config_path()
+            .ok_or_else(|| ApiError::new(ErrorCode::Io, "no config directory"))?;
+        crate::kwin_rule::remove_in(&path)
+            .map_err(|e| ApiError::new(ErrorCode::Io, e.to_string()))?;
+        crate::kwin_rule::reconfigure()
+            .await
+            .map_err(|e| ApiError::new(ErrorCode::Internal, e.to_string()))?;
+        return Ok(state_of(
+            &engine.settings()?,
+            crate::overlay::move_mode(&app),
+        ));
+    }
+    let _ = (&app, &engine);
+    Err(ApiError::new(
+        ErrorCode::InvalidInput,
+        "not KDE Plasma on Wayland",
+    ))
+}
+
+/// KDE only: opens System Settings → Window Rules (`systemsettings kcm_kwinrules`, else
+/// `kcmshell6 kwinrules`). `io` if neither could be started.
+#[tauri::command]
+#[specta::specta]
+pub fn overlay_open_kde_window_rules() -> ApiResult<()> {
+    #[cfg(target_os = "linux")]
+    return crate::overlay::open_kde_window_rules()
+        .map_err(|e| ApiError::new(ErrorCode::Io, e.to_string()));
+    #[cfg(not(target_os = "linux"))]
+    Err(ApiError::new(ErrorCode::InvalidInput, "not KDE Plasma"))
 }
 
 #[cfg(test)]
