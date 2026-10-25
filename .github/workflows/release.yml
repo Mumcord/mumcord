@@ -95,6 +95,7 @@ jobs:
         working-directory: dist
         env:
           RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          VERSION: ${{ needs.guard.outputs.version }}
         run: |
           # Fails if any of the three bundles is missing.
           ls -l -- *.AppImage *-setup.exe *.dmg
@@ -132,6 +133,27 @@ jobs:
 
           These binaries are licensed under the [GNU AGPL-3.0](https://github.com/ToBee94/mumcord/blob/main/LICENSE) only.
           EOF
+          # Highlights are written per release; other versions get the plain notes.
+          if [[ "$VERSION" == "0.3.0" ]]; then
+            cat >> ../notes.md <<'EOF'
+
+          ## What's new in 0.3.0
+
+          - **In-game overlay on Linux**: see who is talking inside your game (Vulkan layer, works with Steam and Proton). Switch it on per game; games with anti-cheat are off by default.
+          - **Window overlay**: a click-through window that shows who is talking in your own channel (with a helper for KDE).
+          - **Now gaming**: share the game you are playing.
+          - **Quick settings** with a collapsible Beta group, and **settings search** plus accessibility switches.
+          - **Person menu** with switches, icons and Join channel; a **redesigned full profile** with a private note.
+          - **Friends** with online state, and private chats that are kept.
+          - **History sync** between Mumcord users, and **full-size images on demand**. Drop image files into the chat.
+          - **Positional audio** with Mumble Link and the official game plugins.
+          - **All 24 official EU languages.** The translations have not been reviewed by native speakers yet; corrections are welcome via the "Report a bug" issue template.
+          - A privacy step in the setup wizard, plus changelog and support links in About.
+
+          **Beta:** positional audio, game plugins and full-size images.
+          **Coming later:** the in-game overlay on Windows (until then Windows uses the window overlay). There is no overlay on macOS.
+          EOF
+          fi
 
       - name: Create draft release
         env:
