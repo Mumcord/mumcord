@@ -18,31 +18,16 @@ function keys(tree: TranslationTree, prefix = ""): string[] {
 }
 
 const PLURAL = /_(zero|one|two|few|many|other)$/;
-// Counts in the UI (people, channels, days …) stay well below a thousand, so the forms whole
-// numbers up to 1000 reach are required. Rarer categories (French/Spanish `_many` for millions,
-// Czech `_many` for fractions) are allowed but not required.
-const SAMPLE_COUNTS = Array.from({ length: 1001 }, (_, n) => n);
-
-/** The keys a language must have: English's keys, with each plural set in that language's forms. */
+/** The keys a language must have: English's keys, with each plural set in every CLDR form of that language. */
 function expectedKeys(language: Language, englishKeys: string[]): string[] {
-  const rules = new Intl.PluralRules(language);
-  const required = [...new Set(SAMPLE_COUNTS.map((n) => rules.select(n)))];
+  const forms = new Intl.PluralRules(language).resolvedOptions().pluralCategories;
   const plurals = new Set(
     englishKeys.filter((key) => PLURAL.test(key)).map((key) => key.replace(PLURAL, "")),
   );
   return [
     ...englishKeys.filter((key) => !PLURAL.test(key)),
-    ...[...plurals].flatMap((base) => required.map((form) => `${base}_${form}`)),
+    ...[...plurals].flatMap((base) => forms.map((form) => `${base}_${form}`)),
   ].sort();
-}
-
-/** Plural keys the language may add beyond the required ones (its other CLDR categories). */
-function optionalKeys(language: Language, englishKeys: string[]): Set<string> {
-  const forms = new Intl.PluralRules(language).resolvedOptions().pluralCategories;
-  const plurals = new Set(
-    englishKeys.filter((key) => PLURAL.test(key)).map((key) => key.replace(PLURAL, "")),
-  );
-  return new Set([...plurals].flatMap((base) => forms.map((form) => `${base}_${form}`)));
 }
 
 const bundles = {} as Record<Language, Bundles>;
@@ -63,11 +48,8 @@ describe("translation files", () => {
   it.each(SUPPORTED_LANGUAGES)("%s has every English key, in its own plural forms", (language) => {
     for (const [namespace, tree] of Object.entries(english)) {
       const englishKeys = keys(tree);
-      const optional = optionalKeys(language, englishKeys);
       const expected = expectedKeys(language, englishKeys);
-      const actual = keys(bundles[language][namespace] ?? {})
-        .filter((key) => !optional.has(key) || expected.includes(key))
-        .sort();
+      const actual = keys(bundles[language][namespace] ?? {}).sort();
       expect({ namespace, keys: actual }).toEqual({ namespace, keys: expected });
     }
   });

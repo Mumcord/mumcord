@@ -8,10 +8,9 @@ export { detectOsLanguage, resolveLanguage, osLanguages } from "./language";
 export { ENDONYMS, SUPPORTED_LANGUAGES } from "./resources";
 
 // Plurals: i18next picks the suffix with Intl.PluralRules for the active language, so translators
-// add one key per CLDR category that whole-number counts reach in their language: `_one` and
-// `_other` everywhere (Polish uses `_many` instead of `_other`), plus `_few` (cs, ga, hr, lt, mt,
-// pl, ro, sk, sl), `_two` (ga, mt, sl), `_many` (ga, mt, pl) and `_zero` (lv). i18n.test.ts
-// names exactly which forms a language is missing.
+// add one key per CLDR plural category of their language: `_one` and `_other` everywhere, plus
+// `_few` (cs, ga, hr, lt, mt, pl, ro, sk, sl), `_two` (ga, mt, sl), `_many` (cs, es, fr, ga,
+// it, lt, mt, pl, pt, sk) and `_zero` (lv). i18n.test.ts names exactly which forms are missing.
 //
 // Starts in English synchronously so the module is usable at import time; the entry points wait
 // for `initialLanguage` before their first render, so nobody sees English flash by.
