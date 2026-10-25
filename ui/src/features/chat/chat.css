@@ -535,6 +535,8 @@
   flex-direction: column;
   gap: var(--space-2);
   margin-top: var(--space-1);
+  /* Compact rows hang their first line with a negative text-indent; it is inherited, so the cards would shift onto their own bar. */
+  text-indent: 0;
 }
 
 .link-previews:empty {
