@@ -63,6 +63,23 @@ pub fn install_into(dir: &Path, library_path: &Path) -> std::io::Result<PathBuf>
     Ok(path)
 }
 
+/// Whether the installed manifest already points at `library_path` with current content.
+fn is_current(dir: &Path, library_path: &Path) -> bool {
+    std::fs::read_to_string(dir.join(MANIFEST_FILE))
+        .is_ok_and(|text| text == manifest_json(library_path))
+}
+
+/// Brings the manifest in `dir` in line with `library_path`: rewritten when it is missing or points
+/// elsewhere (an AppImage mounts at a new path on every launch), removed when no library exists so
+/// a stale manifest never names a vanished file.
+pub fn refresh_in(dir: &Path, library_path: Option<&Path>) -> std::io::Result<()> {
+    match library_path {
+        Some(lib) if is_current(dir, lib) => Ok(()),
+        Some(lib) => install_into(dir, lib).map(|_| ()),
+        None => uninstall_from(dir),
+    }
+}
+
 /// Removes the manifest from `dir` if present. Missing is success.
 pub fn uninstall_from(dir: &Path) -> std::io::Result<()> {
     let path = dir.join(MANIFEST_FILE);
@@ -102,6 +119,39 @@ mod tests {
         assert!(!is_installed_in(&target));
         // Removing again is fine.
         uninstall_from(&target).expect("uninstall again");
+        std::fs::remove_dir_all(&dir).expect("cleanup");
+    }
+
+    fn scratch(name: &str) -> PathBuf {
+        let dir = std::env::temp_dir().join(format!("mumcord-{name}-{}", std::process::id()));
+        let _ = std::fs::remove_dir_all(&dir);
+        dir
+    }
+
+    #[test]
+    fn refresh_replaces_a_stale_library_path() {
+        let dir = scratch("refresh-stale");
+        install_into(&dir, Path::new("/mnt/.mount_old/lib/libx.so")).expect("install");
+        refresh_in(&dir, Some(Path::new("/mnt/.mount_new/lib/libx.so"))).expect("refresh");
+        let json = std::fs::read_to_string(dir.join(MANIFEST_FILE)).expect("read");
+        assert!(json.contains(".mount_new") && !json.contains(".mount_old"));
+        std::fs::remove_dir_all(&dir).expect("cleanup");
+    }
+
+    #[test]
+    fn refresh_removes_the_manifest_without_a_library() {
+        let dir = scratch("refresh-missing");
+        install_into(&dir, Path::new("/gone/libx.so")).expect("install");
+        refresh_in(&dir, None).expect("refresh");
+        assert!(!is_installed_in(&dir));
+        std::fs::remove_dir_all(&dir).expect("cleanup");
+    }
+
+    #[test]
+    fn refresh_installs_when_missing() {
+        let dir = scratch("refresh-new");
+        refresh_in(&dir, Some(Path::new("/opt/libx.so"))).expect("refresh");
+        assert!(is_installed_in(&dir));
         std::fs::remove_dir_all(&dir).expect("cleanup");
     }
 
