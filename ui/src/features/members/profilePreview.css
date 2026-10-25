@@ -95,34 +95,30 @@
   margin-bottom: var(--space-2);
 }
 
-.profile-preview__button {
-  padding: var(--space-1) var(--space-2);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
-  background: var(--color-bg-elevated);
-  color: var(--color-text);
-  font: inherit;
-  cursor: pointer;
-}
-
-.profile-preview__button:hover,
-.profile-preview__close:hover {
-  background: var(--color-bg-hover, var(--color-border));
-}
-
-.profile-preview__full {
-  display: block;
-  margin-top: var(--space-3);
-}
-
-.profile-preview__close {
-  padding: 0 var(--space-2);
+/* Icon buttons top right (private message, full profile, close): one size and style. */
+.profile-preview__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 1.75rem;
+  min-height: 1.75rem;
+  padding: 0;
   border: 0;
   border-radius: var(--radius-md);
   background: transparent;
   color: var(--color-text-secondary);
   font: inherit;
   font-size: var(--font-size-lg);
-  line-height: 1.5;
+  line-height: 1;
   cursor: pointer;
+}
+
+.profile-preview__icon:hover {
+  background: var(--color-bg-hover, var(--color-border));
+  color: var(--color-text);
+}
+
+.profile-preview__icon:focus-visible {
+  outline: 2px solid var(--color-focus, currentColor);
+  outline-offset: 2px;
 }

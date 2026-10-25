@@ -250,41 +250,62 @@ function Preview({
           {canAct && user.session !== state.selfSession && (
             <button
               type="button"
-              className="profile-preview__button"
+              className="profile-preview__icon"
+              aria-label={t("preview.privateMessage")}
+              title={t("preview.privateMessage")}
               onClick={() => {
                 dismiss(false);
                 openPrivateConversation(user);
               }}
             >
-              {t("preview.privateMessage")}
+              {/* Chat bubble; the button's name is its translated aria-label. */}
+              <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" focusable="false">
+                <path
+                  d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinejoin="round"
+                />
+              </svg>
+            </button>
+          )}
+          {canAct && (
+            <button
+              type="button"
+              className="profile-preview__icon"
+              aria-label={t("preview.fullProfile")}
+              title={t("preview.fullProfile")}
+              onClick={() => {
+                dismiss(false);
+                onFullProfile(user.session, open.opener ?? null);
+              }}
+            >
+              {/* Identity card; the button's name is its translated aria-label. */}
+              <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" focusable="false">
+                <g fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+                  <rect x="3" y="5" width="18" height="14" rx="2" />
+                  <circle cx="9" cy="11" r="2" />
+                  <path d="M14 10h4M14 14h3" />
+                </g>
+              </svg>
             </button>
           )}
           <button
             type="button"
-            className="profile-preview__close"
+            className="profile-preview__icon"
             aria-label={t("card.close")}
+            title={t("card.close")}
             onClick={() => {
               dismiss(true);
             }}
           >
-            ×
+            <span aria-hidden="true">×</span>
           </button>
         </div>
       )}
       {user ? (
-        <PreviewBody
-          key={user.session}
-          user={user}
-          talking={state.talking.has(user.session)}
-          onFullProfile={
-            pinned
-              ? () => {
-                  dismiss(false);
-                  onFullProfile(user.session, open.opener ?? null);
-                }
-              : undefined
-          }
-        />
+        <PreviewBody key={user.session} user={user} talking={state.talking.has(user.session)} />
       ) : (
         <div className="profile-preview__header">
           <Avatar name={open.name ?? ""} src={null} size="lg" />
@@ -297,15 +318,7 @@ function Preview({
   );
 }
 
-function PreviewBody({
-  user,
-  talking,
-  onFullProfile,
-}: {
-  user: User;
-  talking: boolean;
-  onFullProfile: (() => void) | undefined;
-}) {
+function PreviewBody({ user, talking }: { user: User; talking: boolean }) {
   const { t } = useTranslation("members");
   const { t: tStatus } = useTranslation("channels");
   const { profile } = usePersonProfile(user.session);
@@ -337,15 +350,6 @@ function PreviewBody({
       <NowPlayingFor session={user.session} compact />
       {comment && (
         <div className="profile-preview__comment" dangerouslySetInnerHTML={{ __html: comment }} />
-      )}
-      {onFullProfile && (
-        <button
-          type="button"
-          className="profile-preview__button profile-preview__full"
-          onClick={onFullProfile}
-        >
-          {t("preview.fullProfile")}
-        </button>
       )}
     </>
   );
