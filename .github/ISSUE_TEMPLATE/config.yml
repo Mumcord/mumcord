@@ -3,6 +3,3 @@ contact_links:
   - name: Documentation and troubleshooting
     url: https://github.com/ToBee94/mumcord/wiki
     about: Installation, push-to-talk on Wayland, audio devices and more.
-  - name: Commercial licensing
-    url: https://github.com/ToBee94/mumcord/blob/main/COMMERCIAL.md
-    about: Using Mumcord in a commercial product.
