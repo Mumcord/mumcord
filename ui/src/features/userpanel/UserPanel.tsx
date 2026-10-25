@@ -270,7 +270,12 @@ export function UserPanel() {
           type="button"
           className="userpanel__toggle"
           aria-label={t("settings")}
-          onClick={openSettings}
+          title={t("settings")}
+          aria-haspopup="menu"
+          onClick={(event) => {
+            const box = event.currentTarget.getBoundingClientRect();
+            setQuick({ x: box.left, y: box.bottom, opener: event.currentTarget });
+          }}
           onContextMenu={(event) => {
             event.preventDefault();
             setQuick({ x: event.clientX, y: event.clientY, opener: event.currentTarget });
@@ -288,6 +293,17 @@ export function UserPanel() {
       {quick ? (
         <QuickSettings
           menu={quick}
+          account={{
+            connected: state.connected,
+            registered: self?.registered ?? false,
+            canRegister: state.canRegister,
+            onEditProfile: () => {
+              open("profile");
+            },
+            onRegister: () => {
+              open("register");
+            },
+          }}
           onOpenSettings={openSettings}
           onClose={() => {
             setQuick(null);

@@ -78,7 +78,8 @@ describe("diagnostics and about (AC-1.28, AC-1.29)", () => {
   });
 
   it("AC-1.28: saved diagnostic file has the facts and no private data", async () => {
-    await $("button[aria-label='Settings']").click();
+    await $("button[aria-label='Quick settings']").click();
+    await $("//button[@role='menuitem'][contains(., 'All settings')]").click();
     await $("//button[@role='tab'][normalize-space()='Diagnostics']").click();
     // The GTK save dialog appends its ".txt" filter extension even to a typed ".txt" name.
     file = join(app.profile(), "mumcord-diagnostics.txt.txt");

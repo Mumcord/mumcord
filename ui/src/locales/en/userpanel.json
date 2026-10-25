@@ -3,7 +3,7 @@
   "mute": "Mute microphone",
   "deafen": "Deafen",
   "disconnect": "Disconnect from {{server}}",
-  "settings": "Settings",
+  "settings": "Quick settings",
   "menu": "User menu",
   "menuProfile": "Edit profile",
   "menuRegister": "Register on this server",
@@ -74,6 +74,11 @@
     "unavailable": "Not available on this system",
     "overlay": "Overlay",
     "overlayHint": "Shows who is talking on top of games",
+    "editProfile": "Edit profile",
+    "editProfileHint": "Name, avatar and comment",
+    "register": "Register on this server",
+    "registered": "Registered on this server ✓",
+    "registerHint": "Keeps your name and avatar on this server",
     "allSettings": "All settings…",
     "label": "Quick settings"
   }

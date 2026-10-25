@@ -22,7 +22,7 @@ import "./quicksettings.css";
 const EDGE = 8;
 
 const ITEM =
-  '[role="menuitemcheckbox"]:not([aria-disabled]), [role="menuitemradio"], [role="menuitem"]';
+  '[role="menuitemcheckbox"]:not([aria-disabled]), [role="menuitemradio"], [role="menuitem"]:not([aria-disabled])';
 
 const THEMES: readonly Theme[] = ["system", "dark", "light"];
 
@@ -36,6 +36,9 @@ const ICON = {
     "M12 8a4 4 0 1 0 0 8a4 4 0 0 0 0-8zM12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4",
   settings: "M5 12h14M13 6l6 6l-6 6",
   overlay: "M12 3l9 5-9 5-9-5zM3 13l9 5 9-5",
+  profile: "M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2M12 3a4 4 0 1 0 0 8a4 4 0 0 0 0-8z",
+  register: "M12 2l8 3v6c0 5-3.5 9-8 11c-4.5-2-8-6-8-11V5zM9 12l2 2l4-4",
+  chevron: "M9 6l6 6l-6 6",
 } as const;
 
 function Glyph({ d }: { d: string }) {
@@ -68,12 +71,24 @@ export interface QuickSettingsState {
   opener: HTMLElement | null;
 }
 
+/** What the account rows need to know about the own user on the connected server. */
+export interface QuickSettingsAccount {
+  connected: boolean;
+  registered: boolean;
+  /** The server lets the own, not yet registered user register. */
+  canRegister: boolean;
+  onEditProfile: () => void;
+  onRegister: () => void;
+}
+
 export function QuickSettings({
   menu,
+  account,
   onClose,
   onOpenSettings,
 }: {
   menu: QuickSettingsState;
+  account: QuickSettingsAccount;
   onClose: () => void;
   onOpenSettings: () => void;
 }) {
@@ -174,7 +189,7 @@ export function QuickSettings({
     const top = Math.max(EDGE, Math.min(menu.y, window.innerHeight - element.offsetHeight - EDGE));
     element.style.left = `${String(left)}px`;
     element.style.top = `${String(top)}px`;
-  }, [menu, ready, supported, overlayShown]);
+  }, [menu, ready, supported, overlayShown, account.connected, account.canRegister]);
 
   // Focus the first item once the settings have loaded and the items are enabled.
   useEffect(() => {
@@ -247,6 +262,39 @@ export function QuickSettings({
       <span className="quick-settings__switch" aria-hidden="true" />
     </button>
   );
+
+  const action = (
+    icon: string,
+    label: string,
+    hint: string,
+    onActivate: () => void,
+    disabled = false,
+  ): ReactNode => (
+    <button
+      type="button"
+      role="menuitem"
+      aria-disabled={disabled || undefined}
+      tabIndex={-1}
+      className="quick-settings__row"
+      onClick={
+        disabled
+          ? undefined
+          : () => {
+              onClose();
+              onActivate();
+            }
+      }
+    >
+      <Glyph d={icon} />
+      <span className="quick-settings__text">
+        <span className="quick-settings__label">{label}</span>
+        <span className="quick-settings__hint">{hint}</span>
+      </span>
+      {disabled ? null : <Glyph d={ICON.chevron} />}
+    </button>
+  );
+
+  const registerHint = t("quickSettings.registerHint");
 
   return createPortal(
     <div
@@ -330,6 +378,24 @@ export function QuickSettings({
               ))}
             </div>
           </div>
+          {account.connected &&
+            action(
+              ICON.profile,
+              t("quickSettings.editProfile"),
+              t("quickSettings.editProfileHint"),
+              account.onEditProfile,
+            )}
+          {account.canRegister &&
+            action(ICON.register, t("quickSettings.register"), registerHint, account.onRegister)}
+          {account.connected &&
+            account.registered &&
+            action(
+              ICON.register,
+              t("quickSettings.registered"),
+              registerHint,
+              account.onRegister,
+              true,
+            )}
           <button
             type="button"
             role="menuitem"

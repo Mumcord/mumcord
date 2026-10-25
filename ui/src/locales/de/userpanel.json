@@ -3,7 +3,7 @@
   "mute": "Mikrofon stummschalten",
   "deafen": "Taubschalten",
   "disconnect": "Verbindung zu {{server}} trennen",
-  "settings": "Einstellungen",
+  "settings": "Schnelleinstellungen",
   "menu": "Benutzermenü",
   "menuProfile": "Profil bearbeiten",
   "menuRegister": "Auf diesem Server registrieren",
@@ -74,6 +74,11 @@
     "unavailable": "Auf diesem System nicht verfügbar",
     "overlay": "Overlay",
     "overlayHint": "Zeigt, wer spricht, über Spielen",
+    "editProfile": "Profil bearbeiten",
+    "editProfileHint": "Name, Avatar und Kommentar",
+    "register": "Auf diesem Server registrieren",
+    "registered": "Auf diesem Server registriert ✓",
+    "registerHint": "Behält deinen Namen und Avatar auf diesem Server",
     "allSettings": "Alle Einstellungen…",
     "label": "Schnelleinstellungen"
   }

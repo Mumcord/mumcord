@@ -227,8 +227,10 @@ export async function focusComposer(): Promise<void> {
 }
 
 export async function openSettings(): Promise<void> {
-  await tabTo((f) => f.tag === "button" && ["Settings", "Ajustes", "Einstellungen"].includes(f.label), "Settings button");
+  await tabTo((f) => f.tag === "button" && ["Quick settings", "Ajustes rápidos", "Schnelleinstellungen"].includes(f.label), "Settings button");
   await browser.keys(["Enter"]);
+  await waitFor(".quick-settings");
+  await browser.keys(["End", "Enter"]);
   await waitFor(".overlay__dialog");
   await tabTo((f) => f.role === "tab", "settings tabs");
 }

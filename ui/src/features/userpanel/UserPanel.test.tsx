@@ -258,10 +258,11 @@ describe("UserPanel", () => {
     expect(screen.queryByRole("button", { name: "Connection info" })).not.toBeInTheDocument();
   });
 
-  it("opens settings", async () => {
+  it("opens the quick settings on a left click, not the full settings", async () => {
     await setup();
-    fireEvent.click(screen.getByRole("button", { name: "Settings" }));
-    expect(openSettings).toHaveBeenCalled();
+    fireEvent.click(screen.getByRole("button", { name: "Quick settings" }));
+    expect(await screen.findByRole("menu", { name: "Quick settings" })).toBeInTheDocument();
+    expect(openSettings).not.toHaveBeenCalled();
   });
 
   it("disables toggles when not connected", async () => {
@@ -404,7 +405,7 @@ describe("UserPanel", () => {
       "Deafen",
       expect.stringMatching(/^Disconnect from /),
       "Connection info",
-      "Settings",
+      "Quick settings",
     ]);
     await joinVoice();
     expect(button).not.toHaveAccessibleDescription("Read-only");
@@ -638,7 +639,7 @@ describe("UserPanel", () => {
 });
 
 describe("quick settings (FR-1.66)", () => {
-  const gear = () => screen.getByRole("button", { name: "Settings" });
+  const gear = () => screen.getByRole("button", { name: "Quick settings" });
 
   it("opens on right-click and saves a switch right away", async () => {
     await setup();
@@ -672,7 +673,7 @@ describe("quick settings (FR-1.66)", () => {
     expect(gear()).toHaveFocus();
   });
 
-  it("toggles now playing and leaves a normal click on the full settings", async () => {
+  it("toggles now playing and a normal click reopens the menu", async () => {
     await setup();
     fireEvent.contextMenu(gear());
     fireEvent.click(
@@ -683,7 +684,7 @@ describe("quick settings (FR-1.66)", () => {
     });
     fireEvent.keyDown(screen.getByRole("menu"), { key: "Escape" });
     fireEvent.click(gear());
-    expect(openSettings).toHaveBeenCalled();
+    expect(await screen.findByRole("menu", { name: "Quick settings" })).toBeInTheDocument();
   });
 
   it("opens the full settings from the footer link and closes the menu", async () => {
@@ -692,6 +693,24 @@ describe("quick settings (FR-1.66)", () => {
     fireEvent.click(await screen.findByRole("menuitem", { name: /All settings/ }));
     expect(openSettings).toHaveBeenCalled();
     expect(screen.queryByRole("menu", { name: "Quick settings" })).toBeNull();
+  });
+
+  it("offers profile and registration rows when connected and unregistered", async () => {
+    await setup();
+    fireEvent.contextMenu(gear());
+    fireEvent.click(await screen.findByRole("menuitem", { name: /^Edit profile/u }));
+    expect(screen.queryByRole("menu", { name: "Quick settings" })).toBeNull();
+    expect(await screen.findByRole("dialog")).toBeInTheDocument();
+  });
+
+  it("opens the register dialog from the quick settings", async () => {
+    await setup();
+    fireEvent.contextMenu(gear());
+    const row = await screen.findByRole("menuitem", { name: /^Register on this server/u });
+    expect(row).toHaveTextContent("Keeps your name and avatar on this server");
+    fireEvent.click(row);
+    expect(screen.queryByRole("menu", { name: "Quick settings" })).toBeNull();
+    expect(await screen.findByRole("dialog")).toBeInTheDocument();
   });
 
   it("toggles now gaming from the quick settings", async () => {

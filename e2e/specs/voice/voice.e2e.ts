@@ -444,7 +444,8 @@ describe("voice (AC-1.7 – AC-1.12)", () => {
   });
 
   it("AC-1.9 push-to-talk (X11): sent only while the key is held, other window focused", async () => {
-    await $("button[aria-label='Settings']").click();
+    await $("button[aria-label='Quick settings']").click();
+    await $("//button[@role='menuitem'][contains(., 'All settings')]").click();
     await $("button[role='tab']=Voice").click();
     await $("//label[contains(., 'Push-to-talk')]").click();
     const keyButton = $("button=Set key");

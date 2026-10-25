@@ -3,7 +3,7 @@
   "mute": "Silenciar micrófono",
   "deafen": "Ensordecer",
   "disconnect": "Desconectar de {{server}}",
-  "settings": "Ajustes",
+  "settings": "Ajustes rápidos",
   "menu": "Menú de usuario",
   "menuProfile": "Editar perfil",
   "menuRegister": "Registrarse en este servidor",
@@ -74,6 +74,11 @@
     "unavailable": "No disponible en este sistema",
     "overlay": "Superposición",
     "overlayHint": "Muestra quién habla sobre los juegos",
+    "editProfile": "Editar perfil",
+    "editProfileHint": "Nombre, avatar y comentario",
+    "register": "Registrarse en este servidor",
+    "registered": "Registrado en este servidor ✓",
+    "registerHint": "Conserva tu nombre y avatar en este servidor",
     "allSettings": "Todos los ajustes…",
     "label": "Ajustes rápidos"
   }

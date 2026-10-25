@@ -83,9 +83,10 @@ async function say(html: string): Promise<void> {
 }
 
 async function openChatSettings(): Promise<void> {
-  const button = $("button[aria-label='Settings']");
+  const button = $("button[aria-label='Quick settings']");
   await button.waitForClickable();
   await button.click();
+  await $("//button[@role='menuitem'][contains(., 'All settings')]").click();
   await $("//button[@role='tab' and .='Chat & history']").click();
 }
 
