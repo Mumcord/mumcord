@@ -25,7 +25,15 @@ Test builds for Windows and macOS are unsigned. The operating system will show a
 
 ## Download
 
-Installers for Windows (`.exe`), macOS (`.dmg`, Apple Silicon and Intel) and Linux (`.AppImage`) are on the [Releases page](https://github.com/ToBee94/mumcord/releases), each with a `SHA256SUMS` file to check the download. They are unsigned for now, so Windows and macOS show a security warning on first start; the release notes explain how to open the app anyway.
+Installers for Windows (`.exe`), macOS (`.dmg`, Apple Silicon and Intel) and Linux (`.AppImage`) are on the [Releases page](https://github.com/ToBee94/mumcord/releases), each with a `SHA256SUMS` file to check the download. Each release's notes say whether its Windows and macOS builds are signed; unsigned builds show a security warning on first start, and the notes explain how to open the app anyway.
+
+## Code signing policy
+
+Windows releases are signed through SignPath once the SignPath Foundation setup is active. Free code signing provided by [SignPath.io](https://about.signpath.io), certificate by [SignPath Foundation](https://signpath.org). Who builds, reviews and approves signed releases is described in the [code signing policy](CODE_SIGNING.md).
+
+## Privacy
+
+Mumcord sends no telemetry. Every network connection it makes is listed in the [privacy policy](PRIVACY.md).
 
 Maintainers: how to cut a release is described in [RELEASING.md](RELEASING.md).
 
