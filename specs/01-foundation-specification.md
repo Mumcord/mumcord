@@ -122,7 +122,7 @@ Mumcord enforces nothing itself; the server's ACLs decide. The client reflects p
 
 ### 4.7 Window, tray & app behaviour
 - **FR-1.35** Theme follows the OS setting; dark is the default design and light is fully supported; manual override in settings (Q2.5).
-- **FR-1.36** UI languages: English, Spanish, German; defaults to the OS language if supported, else English; switchable in settings without restart (Q2.7).
+- **FR-1.36** UI languages: all 24 official EU languages (Bulgarian, Croatian, Czech, Danish, Dutch, English, Estonian, Finnish, French, German, Greek, Hungarian, Irish, Italian, Latvian, Lithuanian, Maltese, Polish, Portuguese, Romanian, Slovak, Slovenian, Spanish, Swedish; QA.75 – previously English, Spanish, German); defaults to the OS language if supported, else English; switchable in settings without restart (Q2.7).
 - **FR-1.37** A tray icon shows the connection and talk state and offers "Show", "Mute", "Deafen", "Quit".
 - **FR-1.38** Closing the window while connected asks once "Minimize to tray or quit?" with "Remember my choice"; changeable in settings (Q2.8).
 - **FR-1.39** Settings screen (Discord-style, sections in a side list): Identity (name, certificate, profile with "Default avatar" and "Send to new servers automatically", FR-1.47), Audio, Voice (incl. the toggle "Allow mouse buttons (requires input group)", Linux Wayland only, default OFF, with a plain-language warning that input-group membership lets any program of the user read all input devices including the keyboard; FR-1.21, QA.4), Chat & history, Appearance, Language, Sounds, Overlay & positional audio, Diagnostics, About (incl. licenses).
@@ -550,6 +550,11 @@ Unless stated otherwise: a fresh Mumcord install, a local test server (1.5) runn
 | QA.72 | Sending and receiving full-size images can each be switched off in settings (both on by default) | Addendum 2026-10-25; FR-1.74 |
 | QA.73 | Quick settings: Beta features (positional audio, full-size image switches) in a collapsible "Beta" group, no per-row badge | Addendum 2026-10-25; FR-1.73 |
 | QA.74 | Epic 1 leftovers that do not make v0.3.0 move to Epic 2 (Windows in-game overlay, HDR10 overlay colours, borderless-fullscreen on-top, Flatpak Steam, Link-based join target, full-image transfer cancel, Beta exit checks) | Addendum 2026-10-25; roadmap row Epic 2 |
+| QA.75 | All 24 official EU languages in v0.3.0; translations made by the team, shown in their own name in the picker, corrections welcome via issues | Addendum 2026-10-25; FR-1.36 |
+| QA.76 | (superseded by QA.79) Windows code signing via SignPath Foundation (free for OSS): repo prepares code signing policy, privacy statement, exe metadata and a release step gated on SignPath secrets; the maintainer applies and approves each release; releases stay unsigned until accepted | Addendum 2026-10-25; release workflow |
+| QA.77 | macOS signing + notarization with the maintainer's Apple Developer ID (paid Apple Developer Program); release workflow signs and notarizes only when Apple secrets exist | Addendum 2026-10-25; release workflow |
+| QA.78 | Privacy statement shown in the first-start wizard (short summary of every network connection + link to PRIVACY.md), before the link-preview choice; satisfies SignPath's privacy notice requirement while link previews stay on by default | Addendum 2026-10-25; wizard |
+| QA.79 | Windows signing via Azure Artifact Signing under the maintainer's sole proprietorship "Tobias Vorwachs Einzelunternehmen" (fuewa.systems) instead of SignPath (QA.76 superseded); signs exe + installer in the release workflow via GitHub OIDC, only when Azure settings exist | Addendum 2026-10-25; release workflow |
 
 ## 13. Open points & risks
 

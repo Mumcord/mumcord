@@ -1343,3 +1343,57 @@ Decided before the v0.3.0 release: everything from Epic 1 that will not make v0.
 ✍️ Note: Requested in chat during /dev.
 
 ---
+
+#### QA.75 More UI languages? `◉`
+Requested for the v0.3.0 release.
+
+- [x] **All 24 official EU languages:** Bulgarian, Croatian, Czech, Danish, Dutch, English, Estonian, Finnish, French, German, Greek, Hungarian, Irish, Italian, Latvian, Lithuanian, Maltese, Polish, Portuguese, Romanian, Slovak, Slovenian, Spanish, Swedish.
+- [x] **Picker:** each language shown in its own name (endonym), OS language used when supported.
+- [x] **Quality:** translations are made by the team without native review; the release notes invite corrections via a GitHub issue.
+
+✍️ Note: Requested in chat during /dev.
+
+---
+
+#### QA.76 Sign the Windows build? `◉`
+Possible now that Mumcord is AGPL-3.0-only (SignPath Foundation requires OSI licenses without commercial dual licensing).
+
+- [x] **SignPath Foundation:** free code signing for open source; the certificate is issued to SignPath Foundation.
+- [x] **Repo prepares:** a "Code signing policy" page (roles: committers/reviewers/approvers, MFA), a privacy statement covering every network connection (servers the user adds, link previews, images and GIFs from chat links), fixed product name/version metadata in the Windows binaries, and a release-workflow step that submits the installer for signing only when SignPath secrets exist.
+- [x] **Maintainer does:** applies at signpath.org, enables MFA on GitHub and SignPath, adds the secrets, approves each signing request, and links the code signing policy on the website's home and download pages.
+- [x] **Until accepted** releases stay unsigned (v0.3.0 may ship unsigned).
+
+✍️ Note: Requested in chat during /dev.
+
+---
+
+#### QA.77 Sign the macOS build? `◉`
+SignPath does not cover Apple; macOS needs an Apple Developer ID.
+
+- [x] **Apple Developer Program** membership of the maintainer (yearly fee; individual membership shows the maintainer's name as developer).
+- [x] **Developer ID Application certificate + notarization** (App Store Connect API key), so Gatekeeper opens Mumcord without warnings.
+- [x] **Repo prepares** the release workflow: sign and notarize the universal .dmg only when the Apple secrets exist; otherwise build unsigned as today. Secrets never go into the repo.
+
+✍️ Note: Requested in chat during /dev.
+
+---
+
+#### QA.78 Where to show the privacy statement? `◉`
+SignPath requires software that contacts third-party sites by default to show its privacy policy to the user.
+
+- [x] **In the first-start wizard:** a short privacy step (what Mumcord connects to and when, no telemetry) with a link to the full PRIVACY.md, placed before the link-preview choice. Link previews stay on by default. Translated into all supported languages.
+
+✍️ Note: Requested in chat during /dev.
+
+---
+
+#### QA.79 Azure instead of SignPath? `◉`
+Decided before the v0.3.0 release; supersedes QA.76.
+
+- [x] **Azure Artifact Signing** (formerly Trusted Signing) under the maintainer's sole proprietorship "Tobias Vorwachs Einzelunternehmen" (fuewa.systems): individuals outside the US/Canada are not eligible, organizations in the EU are. Basic plan, paid Azure subscription; the company's validated legal name appears as publisher.
+- [x] **Fully automatic:** the release workflow signs the app exe and the installer during the Tauri bundle step, authenticating with GitHub OIDC (no long-lived secret), only when the Azure settings exist; otherwise unsigned as before.
+- [x] **SignPath flow removed;** the code signing policy and privacy statement stay (QA.78 wizard step stays).
+
+✍️ Note: Requested in chat during /dev.
+
+---
