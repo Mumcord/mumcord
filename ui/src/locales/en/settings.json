@@ -363,5 +363,26 @@
     "sourceGame": "Positions from: {{source}} – {{game}}",
     "source": "Positions from: {{source}}",
     "none": "No game detected"
+  },
+  "gamePlugins": {
+    "title": "Positional audio: sources",
+    "explanation": "Games tell Mumcord where you are through Mumble Link or through official Mumble game plugins. Mumcord finds the plugins in its own plugin folder and in an existing Mumble installation. Turn on only the plugins for games you play.",
+    "antiCheat": "Game plugins read the game's memory. Some anti-cheat systems may flag this; turn plugins off for games with strict anti-cheat.",
+    "off": "Positional audio is turned off.",
+    "nothing": "No game is delivering positions right now.",
+    "delivering": "Positions from: {{source}}",
+    "deliveringGame": "Positions from: {{source}} ({{game}})",
+    "loading": "Looking for game plugins…",
+    "none": "No game plugins found. Install Mumble or copy plugin files into Mumcord's plugin folder.",
+    "loadFailed": "The game plugins could not be listed.",
+    "switchFailed": "The game plugin could not be switched.",
+    "version": "Version {{version}}",
+    "active": "Delivering positions",
+    "problem": {
+      "incompatible": "Not compatible with Mumcord.",
+      "initFailed": "Failed to start.",
+      "unsupported": "Not available on this system.",
+      "failed": "Stopped after an error. Turn it off and on again to retry."
+    }
   }
 }

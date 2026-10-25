@@ -2,6 +2,7 @@ import { useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { getApi } from "../../../api";
 import { Section } from "../components/Section";
+import { GamePluginsGroup } from "./GamePluginsGroup";
 import { InGameOverlayGroup } from "./InGameOverlayGroup";
 import { createInGameOverlayApi, type InGameOverlayApi } from "./inGameOverlay";
 import { WindowOverlayGroup } from "./WindowOverlayGroup";
@@ -18,6 +19,7 @@ export function OverlaySection({ inGameApi }: { inGameApi?: InGameOverlayApi }) 
     <Section title={t("sections.overlay")}>
       <WindowOverlayGroup />
       <InGameOverlayGroup api={inGameApi ?? engineInGameApi} />
+      <GamePluginsGroup />
     </Section>
   );
 }

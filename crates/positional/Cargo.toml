@@ -19,3 +19,8 @@ windows-sys.workspace = true
 
 [lints]
 workspace = true
+
+# A Mumble game plugin for the plugin host tests (AC-1.32); `cargo test` builds it.
+[[example]]
+name = "test_plugin"
+crate-type = ["cdylib"]

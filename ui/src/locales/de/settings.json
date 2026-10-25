@@ -363,5 +363,26 @@
     "sourceGame": "Positionen von: {{source}} – {{game}}",
     "source": "Positionen von: {{source}}",
     "none": "Kein Spiel erkannt"
+  },
+  "gamePlugins": {
+    "title": "Positionsabhängiges Audio: Quellen",
+    "explanation": "Spiele teilen Mumcord über Mumble Link oder über offizielle Mumble-Spiel-Plugins mit, wo du bist. Mumcord findet die Plugins in seinem eigenen Plugin-Ordner und in einer vorhandenen Mumble-Installation. Schalte nur die Plugins für Spiele ein, die du spielst.",
+    "antiCheat": "Spiel-Plugins lesen den Speicher des Spiels. Manche Anti-Cheat-Systeme können das beanstanden; schalte Plugins für Spiele mit strengem Anti-Cheat aus.",
+    "off": "Positionsabhängiges Audio ist ausgeschaltet.",
+    "nothing": "Gerade liefert kein Spiel Positionen.",
+    "delivering": "Positionen von: {{source}}",
+    "deliveringGame": "Positionen von: {{source}} ({{game}})",
+    "loading": "Suche nach Spiel-Plugins …",
+    "none": "Keine Spiel-Plugins gefunden. Installiere Mumble oder kopiere Plugin-Dateien in Mumcords Plugin-Ordner.",
+    "loadFailed": "Die Spiel-Plugins konnten nicht aufgelistet werden.",
+    "switchFailed": "Das Spiel-Plugin konnte nicht umgeschaltet werden.",
+    "version": "Version {{version}}",
+    "active": "Liefert Positionen",
+    "problem": {
+      "incompatible": "Nicht mit Mumcord kompatibel.",
+      "initFailed": "Start fehlgeschlagen.",
+      "unsupported": "Auf diesem System nicht verfügbar.",
+      "failed": "Nach einem Fehler angehalten. Aus- und wieder einschalten, um es erneut zu versuchen."
+    }
   }
 }
