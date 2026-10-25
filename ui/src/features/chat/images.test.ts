@@ -7,37 +7,67 @@ import {
   messageLimits,
   UNLIMITED_IMAGE_FALLBACK,
   type Encoder,
+  type ImageFormat,
 } from "./images";
 
-/** Fake encoder: output length grows with pixel count and quality. */
-function fakeEncoder(calls: { width: number; height: number; quality: number }[]): Encoder {
-  return (width, height, quality) => {
-    calls.push({ width, height, quality });
-    return Promise.resolve("x".repeat(Math.round(width * height * quality)));
+type Call = { width: number; height: number; format: ImageFormat; quality: number };
+
+/** Fake encoder: output length grows with pixel count; PNG costs `pngCost` per pixel, JPEG scales with quality. */
+function fakeEncoder(calls: Call[], pngCost: number): Encoder {
+  return (width, height, format, quality) => {
+    calls.push({ width, height, format, quality });
+    const per = format === "png" ? pngCost : quality;
+    return Promise.resolve("x".repeat(Math.round(width * height * per)));
   };
 }
 
 describe("fitImage", () => {
-  it("starts at 600 px and lowers the quality first", async () => {
-    const calls: { width: number; height: number; quality: number }[] = [];
-    const url = await fitImage({ width: 1200, height: 600 }, fakeEncoder(calls), 600 * 300 * 0.6);
-    expect(url).not.toBeNull();
-    expect(calls[0]).toEqual({ width: MAX_IMAGE_EDGE, height: 300, quality: 0.85 });
-    expect(calls.at(-1)).toEqual({ width: 600, height: 300, quality: 0.55 });
+  it("keeps the full size when it fits, without a JPEG search", async () => {
+    const calls: Call[] = [];
+    const fit = await fitImage({ width: 1000, height: 500 }, fakeEncoder(calls, 1), 1e9);
+    expect(fit).toMatchObject({ width: 1000, height: 500 });
+    expect(calls).toHaveLength(1);
+    expect(calls[0]?.format).toBe("png");
   });
 
-  it("shrinks the image when the lowest quality is still too big", async () => {
-    const calls: { width: number; height: number; quality: number }[] = [];
-    const url = await fitImage({ width: 600, height: 600 }, fakeEncoder(calls), 100 * 100);
-    expect(url).not.toBeNull();
-    const last = calls.at(-1);
-    expect(last?.width).toBeLessThan(600);
-    expect(url?.length).toBeLessThanOrEqual(100 * 100);
+  it("caps the edge at the maximum", async () => {
+    const calls: Call[] = [];
+    const fit = await fitImage({ width: 4000, height: 2000 }, fakeEncoder(calls, 1), 1e9);
+    expect(fit).toMatchObject({ width: MAX_IMAGE_EDGE, height: MAX_IMAGE_EDGE / 2 });
+  });
+
+  it("uses the budget fully with a large edge and few attempts", async () => {
+    const calls: Call[] = [];
+    const budget = 800 * 800;
+    const fit = await fitImage({ width: 2000, height: 2000 }, fakeEncoder(calls, 1), budget);
+    expect(fit?.url.length).toBeLessThanOrEqual(budget);
+    // 0.85 * edge^2 <= 640000 -> edge ~ 867 for JPEG; PNG only ~ 800.
+    expect(fit?.width).toBeGreaterThan(800);
+    expect(calls.length).toBeLessThanOrEqual(20);
+  });
+
+  it("prefers PNG when it fits at least as large as JPEG", async () => {
+    const fit = await fitImage({ width: 1000, height: 1000 }, fakeEncoder([], 0.1), 90_000);
+    expect(fit?.url.length).toBeLessThanOrEqual(90_000);
+    const png = await fitImage({ width: 1000, height: 1000 }, fakeEncoder([], 0.1), 100_000);
+    expect(png).toMatchObject({ width: 1000 });
+  });
+
+  it("picks JPEG when PNG would have to shrink more", async () => {
+    const calls: Call[] = [];
+    const fit = await fitImage({ width: 1000, height: 1000 }, fakeEncoder(calls, 3), 400_000);
+    const png = Math.max(
+      ...calls
+        .filter((c) => c.format === "png" && 3 * c.width * c.height <= 400_000)
+        .map((c) => c.width),
+    );
+    expect(fit?.width).toBeGreaterThan(png);
+    expect(calls.some((c) => c.format === "jpeg")).toBe(true);
   });
 
   it("refuses when even the smallest version does not fit", async () => {
-    const calls: { width: number; height: number; quality: number }[] = [];
-    expect(await fitImage({ width: 800, height: 800 }, fakeEncoder(calls), 10)).toBeNull();
+    const calls: Call[] = [];
+    expect(await fitImage({ width: 800, height: 800 }, fakeEncoder(calls, 1), 10)).toBeNull();
     expect(Math.min(...calls.map((c) => c.width))).toBeGreaterThanOrEqual(64);
   });
 });

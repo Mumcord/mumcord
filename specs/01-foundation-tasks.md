@@ -196,6 +196,7 @@
 | B56 | (1c) Quick settings on right-click of the settings button (FR-1.66) | done – QuickSettings menu (previews, now playing, theme); game item added with B49 | b56-quick-settings | – | simple | – | userpanel, settings store |
 | B61 | (1c) Bug: dragging images (in chat / image viewer / drop into input) freezes the UI | done (not reproduced; likely native drag of data-URL images) – images not draggable, Composer onDragOver, dragDropEnabled false, 25 MB cap; user check pending | b61-drag-freeze | – | simple | – | ui/src/features/chat |
 | B63 | Quick settings polish: card, pill switches, theme segmented control | done | b63-quick-settings-polish | B56 | simple | FR-1.66 | ui/src/features/userpanel |
+| B65 | Sent images are pixelated: fixed 600 px edge + JPEG only; use the server limit fully (bigger edge, PNG for screenshots, quality search) | done – edge binary search up to 1920 px, PNG vs JPEG choice, 1 MiB fallback without limit | b65-image-quality | – | simple | FR-1.30 | ui/src/features/chat/images.ts |
 | B64 | (1c) In-game overlay: Linux Vulkan layer + GL preload, Windows graphics hook, per-game config, anti-cheat warning (FR-1.46b) | open | | B32 | complex | AC-1.34b | new crates (overlay layer/hook), src-tauri, settings |
 | C9 | (1c) Verify positional audio | open | | B31, B33 | complex | AC-1.31, 1.32 | e2e/specs/positional |
 | C10 | (1c) Verify overlay | open | | B32, B33 | simple | AC-1.33, 1.34 | e2e/specs/overlay |
