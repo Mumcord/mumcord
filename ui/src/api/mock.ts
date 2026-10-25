@@ -151,6 +151,8 @@ const DEFAULT_SETTINGS: Settings = {
   keyboardHints: true,
   announcements: true,
   skipLinks: true,
+  offerFullImages: true,
+  loadFullImages: true,
   positional: { enabled: false, minDistance: 1, maxDistance: 15 },
 };
 
@@ -1263,6 +1265,8 @@ export function createMockApi(options: MockOptions = {}): MockApi {
       Promise.reject(new EngineError("notFound", "no native file drops in the mock")),
     // Full images (FR-1.60c): kept originals are "fetched" back at once, with one progress event.
     fullImageKeep: (dataUrl) => {
+      if (!settings.offerFullImages)
+        fail("invalidInput", "offering full-size images is switched off");
       let hash = 0x811c9dc5;
       for (let i = 0; i < dataUrl.length; i++)
         hash = Math.imul(hash ^ dataUrl.charCodeAt(i), 16777619);
@@ -1299,7 +1303,7 @@ export function createMockApi(options: MockOptions = {}): MockApi {
       return Promise.resolve(null);
     },
     fullImageFetch: (reference) => {
-      const src = fullImages.get(reference) ?? null;
+      const src = settings.loadFullImages ? (fullImages.get(reference) ?? null) : null;
       if (src !== null) emit("fullImageProgress", { reference, received: 1, total: 1 });
       return Promise.resolve(src);
     },

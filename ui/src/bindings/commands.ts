@@ -1245,6 +1245,16 @@ export type Settings = {
 	announcements: boolean,
 	/**  Accessibility: "Skip links" (default on; FR-1.69). */
 	skipLinks: boolean,
+	/**
+	 *  "Offer my full-size images" (default on; FR-1.74): off sends thumbnails only, keeps no
+	 *  original and serves none.
+	 */
+	offerFullImages: boolean,
+	/**
+	 *  "Load full-size images from others" (default on; FR-1.74): off shows thumbnails only
+	 *  and never requests an original.
+	 */
+	loadFullImages: boolean,
 	/**  Positional audio (FR-1.41). Off: no game positions are read. */
 	positional: PositionalSettings,
 };

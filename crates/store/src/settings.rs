@@ -362,6 +362,12 @@ pub struct Settings {
     pub announcements: bool,
     /// Offer "skip to" links for keyboard users (FR-1.69). On by default.
     pub skip_links: bool,
+    /// Offer the full-size version of own pictures to other Mumcord users (FR-1.74). On by
+    /// default. Off: only the thumbnail is sent, no original is kept and none is served.
+    pub offer_full_images: bool,
+    /// Load the full-size version of pictures from other Mumcord users (FR-1.74). On by
+    /// default. Off: only thumbnails are shown and originals are never requested.
+    pub load_full_images: bool,
 }
 
 impl Default for Settings {
@@ -404,6 +410,8 @@ impl Default for Settings {
             keyboard_hints: true,
             announcements: true,
             skip_links: true,
+            offer_full_images: true,
+            load_full_images: true,
         }
     }
 }
@@ -608,6 +616,10 @@ mod tests {
         assert!(
             parsed.keyboard_hints && parsed.announcements && parsed.skip_links,
             "accessibility switches are on for old records"
+        );
+        assert!(
+            parsed.offer_full_images && parsed.load_full_images,
+            "full-size image switches are on for old records"
         );
         store
             .save_settings(&Settings {
