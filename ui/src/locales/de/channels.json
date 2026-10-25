@@ -40,7 +40,8 @@
     "localMuted": "Für dich stummgeschaltet",
     "unregistered": "Auf diesem Server nicht registriert (Gast)",
     "nowPlaying": "Hört {{track}}",
-    "nowGaming": "Spielt {{game}}"
+    "nowGaming": "Spielt {{game}}",
+    "positional": "Positionsabhängiger Ton aktiv"
   },
   "announce": {
     "joined": "{{name}} ist deinem Kanal beigetreten",

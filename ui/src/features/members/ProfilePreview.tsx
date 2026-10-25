@@ -21,6 +21,7 @@ import { MumcordBadge } from "../channels/MumcordBadge";
 import { useServerState } from "../channels/serverStore";
 import { FriendButton } from "./FriendButton";
 import { NowGamingFor } from "../nowgaming";
+import { PositionalBadge } from "../positional";
 import { NowPlayingFor } from "../nowplaying";
 import "./profilePreview.css";
 import { Avatar } from "./Avatar";
@@ -341,6 +342,7 @@ function PreviewBody({ user, talking }: { user: User; talking: boolean }) {
           <p className="profile-preview__name">
             {user.name}
             <MumcordBadge user={user} />
+            <PositionalBadge session={user.session} />
           </p>
           <p className="profile-preview__meta">
             {user.registered ? t("registered") : t("unregistered")}

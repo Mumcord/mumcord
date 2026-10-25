@@ -40,7 +40,8 @@
     "localMuted": "Muted for you",
     "unregistered": "Not registered on this server (guest)",
     "nowPlaying": "Listening to {{track}}",
-    "nowGaming": "Playing {{game}}"
+    "nowGaming": "Playing {{game}}",
+    "positional": "Positional audio active"
   },
   "announce": {
     "joined": "{{name}} joined your channel",

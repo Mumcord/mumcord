@@ -1,0 +1,13 @@
+.positional-badge {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  margin-inline: var(--space-1);
+  padding: 0 4px;
+  border: 1px solid currentColor;
+  border-radius: var(--radius-sm);
+  color: var(--color-accent);
+  font-size: 0.6875rem;
+  font-weight: 700;
+  line-height: 1.3;
+}

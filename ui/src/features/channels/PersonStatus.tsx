@@ -8,6 +8,7 @@ import { trackLabel } from "../nowplaying/progress";
 import { useNowPlaying } from "../nowplaying/nowPlayingStore";
 import { GAMEPAD_PATH } from "../nowgaming/playTime";
 import { useNowGaming } from "../nowgaming/nowGamingStore";
+import { PositionalBadge } from "../positional";
 import "./PersonStatus.css";
 import { voiceState, type VoiceState } from "./statusText";
 
@@ -121,6 +122,7 @@ export function StatusIcons({ user, listener = false }: { user: User; listener?:
       {user.localMute && (
         <Icon name="volume-x" variant="local-muted" tip={t("statusTip.localMuted")} />
       )}
+      <PositionalBadge session={user.session} />
       <NowGamingIcon session={user.session} />
       <NowPlayingIcon session={user.session} />
       {user.registered ? (

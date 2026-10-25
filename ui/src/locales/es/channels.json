@@ -40,7 +40,8 @@
     "localMuted": "Silenciado para ti",
     "unregistered": "No registrado en este servidor (invitado)",
     "nowPlaying": "Escuchando {{track}}",
-    "nowGaming": "Jugando a {{game}}"
+    "nowGaming": "Jugando a {{game}}",
+    "positional": "Audio posicional activo"
   },
   "announce": {
     "joined": "{{name}} se unió a tu canal",
