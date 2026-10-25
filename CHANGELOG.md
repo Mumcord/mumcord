@@ -5,6 +5,7 @@
 ### Fixed
 
 - Keep voice packets within Mumble's size limit with Music quality on, so others keep hearing you on servers with a high bandwidth limit ([`740f784`](https://github.com/ToBee94/mumcord/commit/740f7843773e4d91e42dfc1301ad5dc88836ce16))
+- Open links in the system browser again from the Linux AppImage ([`745fe60`](https://github.com/ToBee94/mumcord/commit/745fe6058bf9c774fe697414f209db36d857a66e))
 
 ## [0.3.0] - 2026-10-25
 
