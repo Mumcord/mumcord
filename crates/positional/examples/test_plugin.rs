@@ -3,6 +3,8 @@
 //! positions. Tests steer it through the extra `mumcord_test_*` functions; every copy of the
 //! library at another path is a separate plugin with its own state.
 //!
+//! The E2E tests set `MUMCORD_TEST_PLUGIN_GAME` instead (see [`texts`]).
+//!
 //! Built by `cargo test` as `examples/<dll prefix>test_plugin.<dll extension>`.
 
 use std::ffi::{CStr, CString, c_char, c_void};
@@ -43,10 +45,29 @@ struct Texts {
 
 static TEXTS: Mutex<Option<Texts>> = Mutex::new(None);
 
+/// Name the plugin reports when the E2E tests configure it through the environment.
+const ENV_NAME: &CStr = c"Mumcord Test Game";
+
+/// The configured texts. Unconfigured, `MUMCORD_TEST_PLUGIN_GAME` names the program to look
+/// for: the E2E tests load the plugin into the real app, where they cannot call
+/// `mumcord_test_configure`.
 fn texts() -> MutexGuard<'static, Option<Texts>> {
-    TEXTS
+    let mut texts = TEXTS
         .lock()
-        .unwrap_or_else(std::sync::PoisonError::into_inner)
+        .unwrap_or_else(std::sync::PoisonError::into_inner);
+    if texts.is_none()
+        && let Some(game) = std::env::var("MUMCORD_TEST_PLUGIN_GAME")
+            .ok()
+            .and_then(|g| CString::new(g).ok())
+    {
+        *texts = Some(Texts {
+            name: ENV_NAME.to_owned(),
+            game,
+            context: c"test-context".to_owned(),
+            identity: c"tester".to_owned(),
+        });
+    }
+    texts
 }
 
 fn count(which: u32) {
