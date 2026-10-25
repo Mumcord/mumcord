@@ -12,6 +12,7 @@ const PLAYER_ORIGINS = new Set([
   "https://www.youtube-nocookie.com",
   "https://player.twitch.tv",
   "https://clips.twitch.tv",
+  "https://open.spotify.com",
 ]);
 
 /** Distinct http(s) link targets of sanitized message HTML, in order, at most {@link MAX_PREVIEWS}. */
@@ -54,11 +55,26 @@ export function externalImages(html: string): string[] {
   return images;
 }
 
+/** File name of the image link for labels, or its host when the path has none. */
+export function imageName(url: string): string {
+  try {
+    const parsed = new URL(url);
+    const last = parsed.pathname.split("/").pop() ?? "";
+    try {
+      return decodeURIComponent(last) || parsed.hostname;
+    } catch {
+      return last || parsed.hostname;
+    }
+  } catch {
+    return url;
+  }
+}
+
 /** Largest box an image is shown in. */
 export const IMAGE_BOX = { width: 400, height: 300 } as const;
 
-/** What a click on an inline image does; the image viewer (B42) plugs in here. */
-export type ImageClickHandler = (image: InlineImage) => void;
+/** What a click on an inline image does (the image viewer); `opener` is the clicked button. */
+export type ImageClickHandler = (image: InlineImage, opener: HTMLElement) => void;
 
 /** Display size of a `width`×`height` image inside {@link IMAGE_BOX}; never scaled up. */
 export function fitImage(width: number, height: number): { width: number; height: number } {
@@ -116,14 +132,15 @@ interface PageLocation {
  * Player URL for an embed in this window, or `null` when the player cannot run here and the
  * card opens the browser instead. YouTube refuses to play without an http(s) referrer, which
  * pages served from Tauri's custom `tauri://` scheme (Linux, macOS) cannot send. Twitch only
- * accepts a `parent` that is served over HTTPS or is `localhost`.
+ * accepts a `parent` that is served over HTTPS or is `localhost`. Spotify runs everywhere.
  */
 export function playerUrl(
   video: VideoEmbed,
   location: PageLocation = window.location,
 ): string | null {
   const { protocol, hostname } = location;
-  if (protocol !== "http:" && protocol !== "https:") return null;
+  // Spotify's embed needs no referrer, so it also runs on Tauri's custom scheme.
+  if (video.site !== "spotify" && protocol !== "http:" && protocol !== "https:") return null;
   let url: URL;
   try {
     url = new URL(video.playerUrl);
@@ -131,6 +148,8 @@ export function playerUrl(
     return null;
   }
   if (!PLAYER_ORIGINS.has(url.origin)) return null;
+  // Only the embed path is in the CSP; the rest of open.spotify.com is not a player.
+  if (url.origin === "https://open.spotify.com" && !url.pathname.startsWith("/embed/")) return null;
   if (video.site === "twitch") {
     if (protocol !== "https:" && hostname !== "localhost") return null;
     url.searchParams.set("parent", hostname);

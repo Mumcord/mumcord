@@ -649,3 +649,18 @@ async fn inline_images_share_the_preview_cache_clean_up() {
     assert!(fresh.clear_cache() > 0, "Clear now removes images too");
     assert!(json_files(&images).is_empty());
 }
+
+#[test]
+fn parses_spotify_oembed() {
+    let body = br#"{"title":"Song   Name","provider_name":"Spotify",
+        "thumbnail_url":"https://image-cdn.spotifycdn.com/image/abc","html":"<iframe>"}"#;
+    let o = parse_oembed(body).expect("parse");
+    assert_eq!(o.title.as_deref(), Some("Song Name"));
+    assert_eq!(
+        o.thumbnail.map(|t| t.to_string()).as_deref(),
+        Some("https://image-cdn.spotifycdn.com/image/abc")
+    );
+    let insecure = br#"{"title":"x","thumbnail_url":"http://cdn.example/a.jpg"}"#;
+    assert!(parse_oembed(insecure).expect("parse").thumbnail.is_none());
+    assert!(parse_oembed(b"not json").is_err());
+}

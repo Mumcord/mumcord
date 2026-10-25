@@ -35,6 +35,20 @@ const YOUTUBE: VideoEmbed = {
   channel: "Rick",
 };
 
+const SPOTIFY: LinkPreview = {
+  url: "https://open.spotify.com/track/4uLU6hMCjMI75M1A2tKUQC?si=abc",
+  siteName: "Spotify",
+  title: "Some Song",
+  description: "Some Artist · Some Album · Song · 2020",
+  image: IMAGE,
+  video: {
+    site: "spotify",
+    playerUrl: "https://open.spotify.com/embed/track/4uLU6hMCjMI75M1A2tKUQC",
+    channel: "track",
+  },
+  isImage: false,
+};
+
 const VIDEO: LinkPreview = {
   url: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
   siteName: "YouTube",
@@ -133,7 +147,17 @@ describe("playerUrl", () => {
     const tauriScheme = { protocol: "tauri:", hostname: "localhost" };
     expect(playerUrl(YOUTUBE, tauriScheme)).toBeNull();
     expect(playerUrl(twitch, tauriScheme)).toBeNull();
+    expect(playerUrl(SPOTIFY.video as VideoEmbed, tauriScheme)).not.toBeNull();
     expect(playerUrl(twitch, { protocol: "http:", hostname: "tauri.localhost" })).toBeNull();
+    const spotify = SPOTIFY.video as VideoEmbed;
+    expect(playerUrl(spotify, { protocol: "http:", hostname: "localhost" })).toBe(
+      spotify.playerUrl,
+    );
+    const notEmbed = {
+      ...spotify,
+      playerUrl: "https://open.spotify.com/track/4uLU6hMCjMI75M1A2tKUQC",
+    };
+    expect(playerUrl(notEmbed, { protocol: "http:", hostname: "localhost" })).toBeNull();
     const foreign = { ...YOUTUBE, playerUrl: "https://evil.example/embed" };
     expect(playerUrl(foreign, { protocol: "http:", hostname: "localhost" })).toBeNull();
   });
@@ -186,6 +210,22 @@ describe("link preview cards", () => {
     expect(frame.getAttribute("sandbox")).not.toContain("allow-popups");
     expect(screen.queryByRole("button", { name: "Play Never gonna" })).toBeNull();
     expect(screen.getByRole("button", { name: "Open Never gonna in browser" })).toBeVisible();
+  });
+
+  it("shows a Spotify card with type and artist and loads the player only after a click", async () => {
+    vi.spyOn(api, "linkPreview").mockResolvedValue(SPOTIFY);
+    const { container } = renderMessage(`<a href="${SPOTIFY.url}">song</a>`, true);
+    const card = await screen.findByRole("article", { name: "Link preview: Some Song" });
+    expect(card).toHaveTextContent("Spotify");
+    expect(card).toHaveTextContent("Track");
+    expect(card).toHaveTextContent("Some Artist");
+    expect(card.querySelector("img")?.getAttribute("src")).toBe(IMAGE);
+    expect(container.querySelector("iframe")).toBeNull();
+
+    fireEvent.click(screen.getByRole("button", { name: "Play Some Song" }));
+    const frame = await screen.findByTitle("Spotify player: Some Song");
+    expect(frame.getAttribute("src")).toBe(SPOTIFY.video?.playerUrl);
+    expect(screen.getByRole("button", { name: "Open Some Song in browser" })).toBeVisible();
   });
 
   it("shows plain links and requests nothing when previews are off", async () => {

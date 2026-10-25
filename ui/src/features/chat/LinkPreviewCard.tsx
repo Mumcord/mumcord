@@ -1,6 +1,6 @@
 /**
  * Cards under a message (FR-1.49, FR-1.50, FR-1.55): a page card with site, title, description
- * and image, a player card for YouTube and Twitch whose player loads only after a click, or
+ * and image, a player card for YouTube, Twitch and Spotify whose player loads only after a click, or
  * the image itself for external images and image links. All text arrives as plain text and is
  * rendered as such; images are `data:` URLs from the engine, so the webview never contacts the
  * linked site.
@@ -150,6 +150,18 @@ function PageCard({ preview, tabIndex, onDismiss }: PageCardProps) {
   );
 }
 
+const SITE_NAMES: Record<VideoEmbed["site"], string> = {
+  youtube: "YouTube",
+  twitch: "Twitch",
+  spotify: "Spotify",
+};
+
+const SPOTIFY_KINDS = ["track", "album", "playlist", "artist", "episode", "show"] as const;
+
+function spotifyKind(kind: string): (typeof SPOTIFY_KINDS)[number] | null {
+  return SPOTIFY_KINDS.find((k) => k === kind) ?? null;
+}
+
 interface VideoCardProps {
   preview: LinkPreview;
   video: VideoEmbed;
@@ -161,21 +173,31 @@ function VideoCard({ preview, video, tabIndex, onDismiss }: VideoCardProps) {
   const { t } = useTranslation("chat");
   const [playing, setPlaying] = useState(false);
   const player = playerUrl(video);
-  const site = preview.siteName ?? (video.site === "youtube" ? "YouTube" : "Twitch");
-  const title = preview.title ?? t("preview.videoTitle", { site });
+  const spotify = video.site === "spotify";
+  const site = preview.siteName ?? SITE_NAMES[video.site];
+  const title =
+    preview.title ?? t(spotify ? "preview.spotifyTitle" : "preview.videoTitle", { site });
+  // Spotify: the channel field holds the kind of item, e.g. "track".
+  const kind = spotify && video.channel !== null ? spotifyKind(video.channel) : null;
   const thumbnail = safeImage(preview.image);
   return (
     <article className="link-card link-card--video" aria-label={t("preview.card", { title })}>
       <div className="link-card__text">
         <p className="link-card__site">{site}</p>
         <p className="link-card__title">{title}</p>
-        {video.channel !== null && <p className="link-card__description">{video.channel}</p>}
+        {kind !== null && <p className="link-card__description">{t(`preview.kind.${kind}`)}</p>}
+        {spotify && preview.description !== null && (
+          <p className="link-card__description">{preview.description}</p>
+        )}
+        {!spotify && video.channel !== null && (
+          <p className="link-card__description">{video.channel}</p>
+        )}
       </div>
       {playing && player !== null ? (
         <iframe
-          className="link-card__player"
+          className={`link-card__player${spotify ? " link-card__player--audio" : ""}`}
           src={player}
-          title={t("preview.player", { title })}
+          title={t(spotify ? "preview.audioPlayer" : "preview.player", { title })}
           allow="autoplay; encrypted-media; fullscreen; picture-in-picture"
           allowFullScreen
           referrerPolicy="strict-origin-when-cross-origin"

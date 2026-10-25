@@ -19,7 +19,7 @@ pub struct LinkPreview {
     pub description: Option<String>,
     /// Preview image as a `data:` URL (fetched and re-encoded by the engine).
     pub image: Option<String>,
-    /// Set for YouTube and Twitch links: show a player card.
+    /// Set for YouTube, Twitch and Spotify links: show a player card.
     pub video: Option<VideoEmbed>,
     /// The link serves an image: show it inline (`inline_image`) instead of a card.
     pub is_image: bool,
@@ -45,6 +45,7 @@ pub struct InlineImage {
 pub enum VideoSite {
     Youtube,
     Twitch,
+    Spotify,
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, Type)]
@@ -54,7 +55,8 @@ pub struct VideoEmbed {
     /// Embedded player URL; load it only after the user clicks play. Twitch needs
     /// `&parent=<host of the page>` appended.
     pub player_url: String,
-    /// Channel or uploader name.
+    /// Channel or uploader name; for Spotify the kind of item (`track`, `album`, `playlist`,
+    /// `artist`, `episode`, `show`).
     pub channel: Option<String>,
 }
 
@@ -120,6 +122,7 @@ impl From<mumcord_engine::LinkPreview> for LinkPreview {
                 site: match v.provider {
                     VideoProvider::Youtube => VideoSite::Youtube,
                     VideoProvider::Twitch => VideoSite::Twitch,
+                    VideoProvider::Spotify => VideoSite::Spotify,
                 },
                 player_url: v.player_url,
                 channel: v.channel,

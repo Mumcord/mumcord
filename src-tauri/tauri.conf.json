@@ -21,7 +21,7 @@
       }
     ],
     "security": {
-      "csp": "default-src 'self'; img-src 'self' data: blob:; style-src 'self' 'unsafe-inline'; connect-src ipc: http://ipc.localhost; frame-src https://www.youtube-nocookie.com https://player.twitch.tv https://clips.twitch.tv"
+      "csp": "default-src 'self'; img-src 'self' data: blob:; style-src 'self' 'unsafe-inline'; connect-src ipc: http://ipc.localhost; frame-src https://www.youtube-nocookie.com https://player.twitch.tv https://clips.twitch.tv https://open.spotify.com/embed/"
     }
   },
   "bundle": {

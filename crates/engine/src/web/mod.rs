@@ -64,7 +64,7 @@ pub struct LinkPreview {
     pub description: Option<String>,
     /// Preview image as a `data:` URL.
     pub image: Option<String>,
-    /// Set for YouTube and Twitch links.
+    /// Set for YouTube, Twitch and Spotify links.
     pub video: Option<VideoEmbed>,
     /// The link itself serves an image: show it inline ([`LinkPreviews::inline_image`])
     /// instead of a card.
@@ -77,7 +77,7 @@ pub struct VideoEmbed {
     pub provider: VideoProvider,
     /// Embedded player, loaded only after a click; Twitch needs `parent` appended.
     pub player_url: String,
-    /// Channel or uploader name.
+    /// Channel or uploader name; for Spotify the kind of item (`track`, `album`, …).
     pub channel: Option<String>,
 }
 
@@ -215,6 +215,32 @@ impl LinkPreviews {
                     }
                 }
             }
+            Some(link) if link.provider == VideoProvider::Spotify => {
+                preview.site_name = Some("Spotify".into());
+                preview.video = Some(embed_of(link, link.channel.clone()));
+                // oEmbed has title and cover; the page's OpenGraph description names the
+                // artist or owner. Either may fail, the card still works.
+                let oembed = spotify_oembed(fetcher, url).await;
+                if let Err(e) = &oembed {
+                    tracing::debug!(error = %e, "no Spotify oEmbed details");
+                }
+                let oembed = oembed.ok();
+                let page = match page_meta(fetcher, url).await {
+                    Ok(m) => Some(m),
+                    Err(e) => {
+                        tracing::debug!(error = %e, "no Spotify page details");
+                        None
+                    }
+                };
+                preview.description = page.as_ref().and_then(|m| m.description.clone());
+                preview.title = oembed
+                    .as_ref()
+                    .and_then(|o| o.title.clone())
+                    .or_else(|| page.as_ref().and_then(|m| m.title.clone()));
+                oembed
+                    .and_then(|o| o.thumbnail)
+                    .or_else(|| page.and_then(|m| m.image))
+            }
             Some(link) => {
                 preview.site_name = Some("Twitch".into());
                 preview.video = Some(embed_of(link, link.channel.clone()));
@@ -282,22 +308,31 @@ struct OEmbed {
 
 /// Title, uploader and thumbnail from YouTube's public oEmbed endpoint.
 async fn youtube_oembed(fetcher: &Fetcher, url: &Url) -> Result<OEmbed, FetchError> {
+    oembed(fetcher, "https://www.youtube.com/oembed", url).await
+}
+
+/// Title and cover from Spotify's public oEmbed endpoint (no key needed).
+async fn spotify_oembed(fetcher: &Fetcher, url: &Url) -> Result<OEmbed, FetchError> {
+    oembed(fetcher, "https://open.spotify.com/oembed", url).await
+}
+
+async fn oembed(fetcher: &Fetcher, endpoint: &str, url: &Url) -> Result<OEmbed, FetchError> {
+    let endpoint = Url::parse_with_params(endpoint, [("format", "json"), ("url", url.as_str())])
+        .map_err(|_| FetchError::InvalidUrl)?;
+    let response = fetcher
+        .get(endpoint.as_str(), "application/json", OEMBED_LIMIT, false)
+        .await?;
+    parse_oembed(&response.body)
+}
+
+fn parse_oembed(body: &[u8]) -> Result<OEmbed, FetchError> {
     #[derive(Deserialize)]
     struct Raw {
         title: Option<String>,
         author_name: Option<String>,
         thumbnail_url: Option<String>,
     }
-    let endpoint = Url::parse_with_params(
-        "https://www.youtube.com/oembed",
-        [("format", "json"), ("url", url.as_str())],
-    )
-    .map_err(|_| FetchError::InvalidUrl)?;
-    let response = fetcher
-        .get(endpoint.as_str(), "application/json", OEMBED_LIMIT, false)
-        .await?;
-    let raw: Raw =
-        serde_json::from_slice(&response.body).map_err(|_| FetchError::UnsupportedType)?;
+    let raw: Raw = serde_json::from_slice(body).map_err(|_| FetchError::UnsupportedType)?;
     Ok(OEmbed {
         title: raw.title.and_then(|t| meta::clean(&t, 200)),
         author: raw.author_name.and_then(|a| meta::clean(&a, 80)),
