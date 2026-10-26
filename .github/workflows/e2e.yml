@@ -19,7 +19,7 @@ env:
 
 jobs:
   # Decides whether the heavy jobs run. A path filter on the trigger would leave the required
-  # checks pending forever on documentation-only pull requests, so the checks always report.
+  # checks pending forever on pull requests without code changes, so the checks always report.
   changes:
     name: Changed files
     runs-on: ubuntu-24.04
@@ -170,7 +170,7 @@ jobs:
         run: |
           echo "changes: $CHANGES, build: $BUILD, shards: $SHARDS"
           [ "$CHANGES" = success ] || exit 1
-          # Documentation-only change: build and shards are skipped on purpose.
+          # No code change: build and shards are skipped on purpose.
           if [ "$BUILD" = skipped ] && [ "$SHARDS" = skipped ]; then exit 0; fi
           [ "$BUILD" = success ] && [ "$SHARDS" = success ]
         env:
