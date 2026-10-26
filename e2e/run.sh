@@ -15,8 +15,9 @@ if [ ! -f "$repo/testenv/.env" ]; then
   echo "created testenv/.env with a random SuperUser password"
 fi
 
-# MUMCORD_E2E_STEP=test (CI shard jobs) uses the image the build job shared via `docker load`.
-if [ "${MUMCORD_E2E_STEP:-}" != test ]; then
+# MUMCORD_E2E_STEP=test (CI shard jobs) uses the image the build job shared via `docker load`;
+# MUMCORD_E2E_IMAGE_BUILT=1 (CI build job) one that is already built with a layer cache.
+if [ "${MUMCORD_E2E_STEP:-}" != test ] && [ -z "${MUMCORD_E2E_IMAGE_BUILT:-}" ]; then
   docker build -q -t "$image" "$repo/e2e" >/dev/null
 fi
 

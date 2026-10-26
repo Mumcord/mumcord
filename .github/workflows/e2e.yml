@@ -40,11 +40,29 @@ jobs:
           key: e2e-${{ hashFiles('Cargo.lock', 'e2e/Dockerfile') }}
           restore-keys: e2e-
 
+      # Layer cache for the image (apt, rustup, tauri-driver): rebuilt only when e2e/Dockerfile
+      # changes, and once a month so the toolchain and packages do not go stale.
+      - name: Image cache scope
+        id: image
+        run: echo "scope=e2e-image-$(date -u +%Y-%m)" >> "$GITHUB_OUTPUT"
+
+      - uses: docker/setup-buildx-action@v3
+
+      - name: Build image
+        uses: docker/build-push-action@v6
+        with:
+          context: e2e
+          tags: mumcord-e2e
+          load: true
+          cache-from: type=gha,scope=${{ steps.image.outputs.scope }}
+          cache-to: type=gha,mode=max,scope=${{ steps.image.outputs.scope }}
+
       # No debug info and no incremental data: faster links and a smaller target cache.
       - name: Build image and binaries
         run: npm run e2e
         env:
           MUMCORD_E2E_STEP: build
+          MUMCORD_E2E_IMAGE_BUILT: 1
           CARGO_PROFILE_DEV_DEBUG: 0
           CARGO_INCREMENTAL: 0
 
