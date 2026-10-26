@@ -201,7 +201,7 @@ describe("GIF picker", () => {
     await waitFor(() => {
       expect(send).toHaveBeenCalledTimes(1);
     });
-    expect(send.mock.calls[0]?.[1]).toContain(CAT);
+    expect(send.mock.calls[0]?.[2]).toContain(CAT);
     expect(screen.queryByRole("dialog")).toBeNull();
     // Sending moved it to the front.
     await waitFor(async () => {

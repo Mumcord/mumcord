@@ -1,11 +1,12 @@
 /**
- * Messages per conversation for the current connection: live `messageReceived` events, own sent
- * messages, history pages from `historyLoad` (scroll-back) and messages synced from other
- * Mumcord users' history (`historySynced`, inserted at their time), de-duplicated by id.
- * Cleared on every `serverSynced` and on disconnect, because channel and session ids are only
- * valid for one connection; the history is then reloaded from the engine.
+ * Messages per server and conversation for the current connections: live `messageReceived`
+ * events, own sent messages, history pages from `historyLoad` (scroll-back) and messages synced
+ * from other Mumcord users' history (`historySynced`, inserted at their time), de-duplicated by
+ * id. A server's messages are cleared on its every `serverSynced` and on its disconnect, because
+ * channel and session ids are only valid for one connection; the history is then reloaded from
+ * the engine. Functions without a `serverId` act on the shown server.
  */
-import { useSyncExternalStore } from "react";
+import { useCallback, useSyncExternalStore } from "react";
 import {
   getApi,
   type ChatMessage,
@@ -13,10 +14,33 @@ import {
   type MumcordApi,
   type Unsubscribe,
 } from "../../api";
+import { shownServerId, useShownServerId } from "../channels/serverStore";
+import type { SendTarget } from "./conversationInfo";
 
 export const HISTORY_PAGE = 50;
 /** Live messages kept per conversation; older ones are dropped and can be paged in again. */
 export const MAX_KEPT = 500;
+
+/** Prefix of the local ids of own messages not confirmed yet; they never reach the engine. */
+export const OUTGOING_PREFIX = "tmp-out-";
+
+/**
+ * An own message on its way (FR-2.74): shown greyed at the end of the conversation until the
+ * engine confirms it, or kept with the reason when sending failed (FR-2.47) so it can be retried.
+ * Local only: it is never stored while it is not confirmed.
+ */
+export interface OutgoingSend {
+  serverId: number;
+  conversation: Conversation;
+  target: SendTarget;
+  html: string;
+  /** How it shows in the list; its id is the local id. */
+  message: ChatMessage;
+  /** Shown when the server finds it too large, already translated. */
+  tooLarge: string;
+  /** `null` while sending; the plain-language reason once it failed, already translated. */
+  error: string | null;
+}
 
 export interface ConversationLog {
   /** Oldest first. */
@@ -33,6 +57,8 @@ export interface ConversationLog {
   syncResult: number | null;
   /** The last sync the user asked for could not start. */
   syncFailed: boolean;
+  /** Own messages not confirmed yet (sending or failed), oldest first; absent when none. */
+  outgoing?: readonly OutgoingSend[];
 }
 
 const EMPTY_LOG: ConversationLog = {
@@ -57,15 +83,31 @@ export function conversationKey(conversation: Conversation): string {
   }
 }
 
+/** Key of a conversation on one server: conversation ids are only unique per server. */
+function logKey(serverId: number, conversation: Conversation): string {
+  return `${String(serverId)}/${conversationKey(conversation)}`;
+}
+
+function serverPrefix(serverId: number): string {
+  return `${String(serverId)}/`;
+}
+
 let logs = new Map<string, ConversationLog>();
-/** Bumped on every reset so late history responses of an old connection are ignored. */
-let generation = 0;
+/**
+ * Bumped per server on every reset so late history responses of an old connection are ignored.
+ * Never deleted, so a reconnect cannot bring an old number back.
+ */
+const generations = new Map<number, number>();
 let boundApi: MumcordApi | undefined;
 let unsubscribers: Unsubscribe[] = [];
 const listeners = new Set<() => void>();
-const incomingListeners = new Set<(message: ChatMessage) => void>();
+const incomingListeners = new Set<(message: ChatMessage, serverId: number) => void>();
 /** Channels whose running sync the user asked for; only those report their result. */
 const syncRequested = new Set<string>();
+
+function generation(serverId: number): number {
+  return generations.get(serverId) ?? 0;
+}
 
 function notify(): void {
   for (const listener of listeners) listener();
@@ -81,11 +123,24 @@ function getLog(key: string): ConversationLog {
   return logs.get(key) ?? EMPTY_LOG;
 }
 
-function reset(): void {
-  generation += 1;
-  syncRequested.clear();
-  if (logs.size === 0) return;
-  logs = new Map();
+/**
+ * Forgets one server's messages; the other servers keep theirs. Unconfirmed own messages stay so
+ * their text is not lost and they can be retried after a reconnect, except those to a person
+ * without a certificate: their session id may belong to someone else after the reconnect.
+ */
+function reset(serverId: number): void {
+  generations.set(serverId, generation(serverId) + 1);
+  const prefix = serverPrefix(serverId);
+  for (const key of syncRequested) if (key.startsWith(prefix)) syncRequested.delete(key);
+  const kept = [...logs].flatMap(([key, log]): [string, ConversationLog][] => {
+    if (!key.startsWith(prefix)) return [[key, log]];
+    const outgoing = (log.outgoing ?? []).filter(
+      (item) => item.conversation.kind !== "privateSession",
+    );
+    return outgoing.length > 0 ? [[key, { ...EMPTY_LOG, outgoing }]] : [];
+  });
+  if (kept.length === logs.size && kept.every(([key, log]) => logs.get(key) === log)) return;
+  logs = new Map(kept);
   notify();
 }
 
@@ -98,17 +153,22 @@ function merge(
   return [...older, ...newer.filter((m) => !seen.has(m.id))];
 }
 
-function append(message: ChatMessage): void {
-  const key = conversationKey(message.conversation);
-  const log = getLog(key);
-  if (log.messages.some((m) => m.id === message.id)) return;
+function withMessage(log: ConversationLog, message: ChatMessage): ConversationLog {
+  if (log.messages.some((m) => m.id === message.id)) return log;
   const messages = [...log.messages, message];
   const overflow = messages.length > MAX_KEPT;
-  setLog(key, {
+  return {
     ...log,
     messages: overflow ? messages.slice(messages.length - MAX_KEPT) : messages,
     hasMore: log.hasMore || overflow,
-  });
+  };
+}
+
+function append(serverId: number, message: ChatMessage): void {
+  const key = logKey(serverId, message.conversation);
+  const log = getLog(key);
+  const next = withMessage(log, message);
+  if (next !== log) setLog(key, next);
 }
 
 /**
@@ -130,12 +190,12 @@ export function insertByTime(
   return result;
 }
 
-function channelKey(channelId: number): string {
-  return conversationKey({ kind: "channel", channelId });
+function channelKey(serverId: number, channelId: number): string {
+  return logKey(serverId, { kind: "channel", channelId });
 }
 
-function insertSynced(channelId: number, incoming: readonly ChatMessage[]): void {
-  const key = channelKey(channelId);
+function insertSynced(serverId: number, channelId: number, incoming: readonly ChatMessage[]): void {
+  const key = channelKey(serverId, channelId);
   const log = getLog(key);
   // Not shown yet: the first history page will contain them (they are already stored).
   if (!log.loaded) return;
@@ -158,8 +218,8 @@ function insertSynced(channelId: number, incoming: readonly ChatMessage[]): void
   });
 }
 
-function onSyncStatus(channelId: number, running: boolean, added: number): void {
-  const key = channelKey(channelId);
+function onSyncStatus(serverId: number, channelId: number, running: boolean, added: number): void {
+  const key = channelKey(serverId, channelId);
   const asked = syncRequested.has(key);
   if (!running) syncRequested.delete(key);
   setLog(key, {
@@ -173,23 +233,30 @@ function bind(api: MumcordApi): void {
   for (const unsubscribe of unsubscribers) unsubscribe();
   boundApi = api;
   logs = new Map();
-  generation += 1;
+  bumpAll();
   unsubscribers = [
-    api.on("messageReceived", ({ message }) => {
-      append(message);
-      for (const listener of incomingListeners) listener(message);
+    api.on("messageReceived", ({ serverId, message }) => {
+      append(serverId, message);
+      for (const listener of incomingListeners) listener(message, serverId);
     }),
-    api.on("historySynced", ({ channelId, messages }) => {
-      insertSynced(channelId, messages);
+    api.on("historySynced", ({ serverId, channelId, messages }) => {
+      insertSynced(serverId, channelId, messages);
     }),
-    api.on("historySyncStatus", ({ channelId, running, added }) => {
-      onSyncStatus(channelId, running, added);
+    api.on("historySyncStatus", ({ serverId, channelId, running, added }) => {
+      onSyncStatus(serverId, channelId, running, added);
     }),
-    api.on("serverSynced", reset),
-    api.on("connectionStateChanged", ({ state }) => {
-      if (state.state === "disconnected") reset();
+    api.on("serverSynced", ({ snapshot }) => {
+      reset(snapshot.serverId);
+    }),
+    api.on("connectionStateChanged", ({ serverId, state }) => {
+      if (state.state === "disconnected") reset(serverId);
     }),
   ];
+}
+
+/** Invalidates the running history requests of every server. */
+function bumpAll(): void {
+  for (const [serverId, value] of generations) generations.set(serverId, value + 1);
 }
 
 function ensureBound(): MumcordApi {
@@ -198,17 +265,21 @@ function ensureBound(): MumcordApi {
   return api;
 }
 
-async function fetchPage(conversation: Conversation, older: boolean): Promise<void> {
+async function fetchPage(
+  serverId: number,
+  conversation: Conversation,
+  older: boolean,
+): Promise<void> {
   const api = ensureBound();
-  const key = conversationKey(conversation);
+  const key = logKey(serverId, conversation);
   const log = getLog(key);
   if (log.loading) return;
   const before = older ? (log.messages[0]?.id ?? null) : null;
-  const started = generation;
+  const started = generation(serverId);
   setLog(key, { ...log, loading: true, loadFailed: false });
   try {
-    const page = await api.historyLoad(conversation, before, HISTORY_PAGE);
-    if (started !== generation) return;
+    const page = await api.historyLoad(serverId, conversation, before, HISTORY_PAGE);
+    if (started !== generation(serverId)) return;
     const current = getLog(key);
     setLog(key, {
       ...current,
@@ -219,22 +290,22 @@ async function fetchPage(conversation: Conversation, older: boolean): Promise<vo
       loadFailed: false,
     });
   } catch (error) {
-    if (started !== generation) return;
+    if (started !== generation(serverId)) return;
     console.error("Loading chat history failed", error);
     setLog(key, { ...getLog(key), loaded: true, loading: false, loadFailed: true });
   }
 }
 
 /** Loads the newest history page once per conversation and connection. */
-export function ensureLoaded(conversation: Conversation): void {
+export function ensureLoaded(conversation: Conversation, serverId = shownServerId()): void {
   ensureBound();
-  const log = getLog(conversationKey(conversation));
-  if (!log.loaded && !log.loading) void fetchPage(conversation, false);
+  const log = getLog(logKey(serverId, conversation));
+  if (!log.loaded && !log.loading) void fetchPage(serverId, conversation, false);
 }
 
 /** Pages in older history before the first loaded message. */
-export function loadOlder(conversation: Conversation): Promise<void> {
-  return fetchPage(conversation, true);
+export function loadOlder(conversation: Conversation, serverId = shownServerId()): Promise<void> {
+  return fetchPage(serverId, conversation, true);
 }
 
 /**
@@ -242,15 +313,18 @@ export function loadOlder(conversation: Conversation): Promise<void> {
  * channel's earlier messages. Progress and the result show in the log (`syncing`,
  * `syncResult`, `syncFailed`); the messages arrive as `historySynced`.
  */
-export async function requestSync(conversation: Conversation): Promise<void> {
+export async function requestSync(
+  conversation: Conversation,
+  serverId = shownServerId(),
+): Promise<void> {
   if (conversation.kind !== "channel") return;
   const api = ensureBound();
-  const key = conversationKey(conversation);
+  const key = logKey(serverId, conversation);
   if (getLog(key).syncing) return;
   syncRequested.add(key);
   setLog(key, { ...getLog(key), syncResult: null, syncFailed: false });
   try {
-    await api.historySyncRequest(conversation.channelId);
+    await api.historySyncRequest(serverId, conversation.channelId);
   } catch (error) {
     console.error("Requesting earlier messages failed", error);
     syncRequested.delete(key);
@@ -259,22 +333,97 @@ export async function requestSync(conversation: Conversation): Promise<void> {
 }
 
 /** Adds an own sent message (the engine returns it instead of emitting an event). */
-export function addSentMessage(message: ChatMessage): void {
+export function addSentMessage(message: ChatMessage, serverId = shownServerId()): void {
   ensureBound();
-  append(message);
+  append(serverId, message);
+}
+
+let nextOutgoingId = 1;
+/** Local id of a confirmed own message, by its stored id: its list item stays the same element. */
+let renderKeys = new Map<string, string>();
+
+/** The React key of a message: the local id it was shown with while sending, else its id. */
+export function renderKey(id: string): string {
+  return renderKeys.get(id) ?? id;
+}
+
+function setOutgoing(
+  serverId: number,
+  conversation: Conversation,
+  change: (list: readonly OutgoingSend[]) => readonly OutgoingSend[],
+): void {
+  const key = logKey(serverId, conversation);
+  const log = getLog(key);
+  setLog(key, { ...log, outgoing: change(log.outgoing ?? []) });
+}
+
+/** Shows an own message greyed at the end of its conversation until it is confirmed. */
+export function addOutgoing(
+  send: Omit<OutgoingSend, "message" | "error">,
+  sender: Pick<ChatMessage, "senderName" | "senderCertHash" | "senderSession">,
+): OutgoingSend {
+  ensureBound();
+  const entry: OutgoingSend = {
+    ...send,
+    message: {
+      ...sender,
+      id: `${OUTGOING_PREFIX}${String(nextOutgoingId++)}`,
+      conversation: send.conversation,
+      own: true,
+      sentAt: new Date().toISOString(),
+      body: send.html,
+      dismissedPreviews: [],
+      syncedFrom: null,
+    },
+    error: null,
+  };
+  setOutgoing(send.serverId, send.conversation, (list) => [...list, entry]);
+  return entry;
+}
+
+/** Sets the failure reason of an unconfirmed message; `null` while it is sent again. */
+export function setOutgoingError(entry: OutgoingSend, error: string | null): void {
+  setOutgoing(entry.serverId, entry.conversation, (list) =>
+    list.map((item) => (item.message.id === entry.message.id ? { ...item, error } : item)),
+  );
+}
+
+/** Removes an unconfirmed message (the user deleted it). */
+export function removeOutgoing(entry: OutgoingSend): void {
+  setOutgoing(entry.serverId, entry.conversation, (list) =>
+    list.filter((item) => item.message.id !== entry.message.id),
+  );
+}
+
+/**
+ * Replaces an unconfirmed message by the stored one the engine returned, in one update and under
+ * the same React key, so the list neither jumps nor shows it twice.
+ */
+export function confirmOutgoing(entry: OutgoingSend, sent: ChatMessage): void {
+  renderKeys = new Map(renderKeys).set(sent.id, entry.message.id);
+  const from = logKey(entry.serverId, entry.conversation);
+  const to = logKey(entry.serverId, sent.conversation);
+  const log = getLog(from);
+  const outgoing = (log.outgoing ?? []).filter((item) => item.message.id !== entry.message.id);
+  logs = new Map(logs);
+  logs.set(from, { ...log, outgoing });
+  logs.set(to, withMessage(getLog(to), sent));
+  notify();
 }
 
 /** Forgets a conversation's messages, e.g. after its history was cleared (B22). */
-export function clearConversation(conversation: Conversation): void {
-  const key = conversationKey(conversation);
+export function clearConversation(conversation: Conversation, serverId = shownServerId()): void {
+  const key = logKey(serverId, conversation);
   if (!logs.has(key)) return;
   logs = new Map(logs);
   logs.delete(key);
   notify();
 }
 
-/** Called for every incoming message of any conversation. */
-export function subscribeIncoming(listener: (message: ChatMessage) => void): () => void {
+/** Called for every incoming message of any conversation on any connected server. */
+export function subscribeIncoming(
+  listener: (message: ChatMessage, serverId: number) => void,
+): () => void {
   ensureBound();
   incomingListeners.add(listener);
   return () => {
@@ -295,10 +444,30 @@ function getLogs(): ReadonlyMap<string, ConversationLog> {
   return logs;
 }
 
-/** Messages and loading state of a conversation; re-renders on change. */
-export function useConversationLog(conversation: Conversation | null): ConversationLog {
-  const all = useSyncExternalStore(subscribe, getLogs);
-  return conversation ? (all.get(conversationKey(conversation)) ?? EMPTY_LOG) : EMPTY_LOG;
+/** The loaded messages of a conversation on `serverId`, oldest first. */
+export function conversationMessages(
+  conversation: Conversation,
+  serverId: number,
+): readonly ChatMessage[] {
+  return (getLogs().get(logKey(serverId, conversation)) ?? EMPTY_LOG).messages;
+}
+
+/**
+ * Messages and loading state of a conversation on `serverId` (default: the shown server);
+ * re-renders on change.
+ */
+export function useConversationLog(
+  conversation: Conversation | null,
+  serverId?: number | null,
+): ConversationLog {
+  const shown = useShownServerId();
+  const server = serverId === undefined ? shown : serverId;
+  const key = conversation && server !== null ? logKey(server, conversation) : null;
+  const get = useCallback(
+    () => (key === null ? EMPTY_LOG : (getLogs().get(key) ?? EMPTY_LOG)),
+    [key],
+  );
+  return useSyncExternalStore(subscribe, get);
 }
 
 /** Test helper: drops the binding so the next use binds to the then-active client. */
@@ -307,12 +476,16 @@ export function resetChatStore(): void {
   unsubscribers = [];
   boundApi = undefined;
   logs = new Map();
-  generation += 1;
+  renderKeys = new Map();
+  bumpAll();
   incomingListeners.clear();
   syncRequested.clear();
 }
 
 /** Only the messages of a conversation, oldest first (contract for B22). */
-export function useConversationMessages(conversation: Conversation | null): readonly ChatMessage[] {
-  return useConversationLog(conversation).messages;
+export function useConversationMessages(
+  conversation: Conversation | null,
+  serverId?: number | null,
+): readonly ChatMessage[] {
+  return useConversationLog(conversation, serverId).messages;
 }

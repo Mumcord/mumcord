@@ -22,7 +22,7 @@ export function GifAttribution({
       className={className}
       href={source.href}
       tabIndex={tabIndex}
-      title={t("attribution.view", { brand })}
+      data-tooltip={t("attribution.view", { brand })}
       onClick={(event) => {
         event.preventDefault();
         openInBrowser(source.href);

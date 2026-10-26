@@ -48,7 +48,7 @@ export function AttachmentTray({
             type="button"
             className="chat-tray__remove"
             aria-label={t("composer.removeImage", { name: item.name })}
-            title={t("composer.removeImage", { name: item.name })}
+            data-tooltip={t("composer.removeImage", { name: item.name })}
             onClick={() => {
               onRemove(item.id);
             }}

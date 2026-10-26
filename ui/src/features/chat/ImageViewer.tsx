@@ -336,7 +336,7 @@ export function ImageViewer({ images, index, onIndexChange, onClose }: ImageView
       type="button"
       className="image-viewer__button"
       aria-label={label}
-      title={label}
+      data-tooltip={label}
       onClick={onClick}
     >
       {text}

@@ -7,7 +7,8 @@ import { getApi, type InlineImage, type LinkPreview, type VideoEmbed } from "../
 /** More cards than this per message would bury the conversation. */
 export const MAX_PREVIEWS = 3;
 
-/** Origins the embedded players may load from; the CSP `frame-src` allows exactly these. */
+/** Origins the embedded players may load from: Spotify in the app window (CSP `frame-src`), the
+ * others in the loopback player page. */
 const PLAYER_ORIGINS = new Set([
   "https://www.youtube-nocookie.com",
   "https://player.twitch.tv",
@@ -107,6 +108,11 @@ function memoized<T>(
 const previews = new Map<string, Promise<LinkPreview | null>>();
 const images = new Map<string, Promise<InlineImage | null>>();
 
+/** Only images the engine produced; anything else would make the webview load from the web. */
+export function safeImage(src: string | null): string | null {
+  return src !== null && /^data:image\/(png|jpeg);base64,/.test(src) ? src : null;
+}
+
 /** The engine's preview of `url`, requested once per app run (the engine caches across runs). */
 export function loadPreview(url: string): Promise<LinkPreview | null> {
   return memoized(previews, url, "a link preview", () => getApi().linkPreview(url));
@@ -123,24 +129,16 @@ export function clearPreviews(): void {
   images.clear();
 }
 
-interface PageLocation {
-  protocol: string;
-  hostname: string;
-}
-
 /**
- * Player URL for an embed in this window, or `null` when the player cannot run here and the
- * card opens the browser instead. YouTube refuses to play without an http(s) referrer, which
- * pages served from Tauri's custom `tauri://` scheme (Linux, macOS) cannot send. Twitch only
- * accepts a `parent` that is served over HTTPS or is `localhost`. Spotify runs everywhere.
+ * How a card's player runs: Spotify's embed directly in the app window (it needs no referrer, so
+ * it also runs on Tauri's custom `tauri://` scheme); YouTube and Twitch through the app's
+ * loopback player page (FR-2.41a), because YouTube refuses to play without an http(s) referrer
+ * and Twitch only accepts an https or `localhost` parent.
  */
-export function playerUrl(
-  video: VideoEmbed,
-  location: PageLocation = window.location,
-): string | null {
-  const { protocol, hostname } = location;
-  // Spotify's embed needs no referrer, so it also runs on Tauri's custom scheme.
-  if (video.site !== "spotify" && protocol !== "http:" && protocol !== "https:") return null;
+export type CardPlayer = { via: "direct" | "page"; url: string };
+
+/** The player of a video card, or `null` when the URL is not one of the known players. */
+export function cardPlayer(video: VideoEmbed): CardPlayer | null {
   let url: URL;
   try {
     url = new URL(video.playerUrl);
@@ -148,11 +146,9 @@ export function playerUrl(
     return null;
   }
   if (!PLAYER_ORIGINS.has(url.origin)) return null;
-  // Only the embed path is in the CSP; the rest of open.spotify.com is not a player.
-  if (url.origin === "https://open.spotify.com" && !url.pathname.startsWith("/embed/")) return null;
-  if (video.site === "twitch") {
-    if (protocol !== "https:" && hostname !== "localhost") return null;
-    url.searchParams.set("parent", hostname);
+  if (url.origin === "https://open.spotify.com") {
+    // Only the embed path is in the CSP; the rest of open.spotify.com is not a player.
+    return url.pathname.startsWith("/embed/") ? { via: "direct", url: url.toString() } : null;
   }
-  return url.toString();
+  return { via: "page", url: url.toString() };
 }

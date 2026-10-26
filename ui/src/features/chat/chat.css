@@ -71,6 +71,37 @@
   min-height: 0;
 }
 
+/* FR-2.62: slim full-width banner over the top of the list; purely visual, so it ignores the pointer. */
+.chat-pinned {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-1) var(--space-4);
+  background: var(--color-bg-elevated);
+  box-shadow: 0 6px 8px -6px rgb(0 0 0 / 0.45);
+  pointer-events: none;
+}
+
+.chat-pinned .avatar {
+  width: 1.5rem;
+  height: 1.5rem;
+}
+
+.chat-pinned__name {
+  color: var(--color-text);
+  font-weight: var(--font-weight-bold);
+}
+
+.chat-pinned__time {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+}
+
 .chat-jump {
   position: absolute;
   right: var(--space-4);
@@ -190,6 +221,12 @@
 .chat-message__gutter {
   display: flex;
   justify-content: center;
+  align-items: flex-start;
+}
+
+/* The preview trigger stretches to the row height; keep the avatar at the top of tall messages. */
+.chat-message__gutter .profile-preview-trigger {
+  align-items: flex-start;
 }
 
 /* Fixed box: an avatar image loading in never shifts the text. */
@@ -730,6 +767,25 @@
   border-radius: var(--radius-md);
 }
 
+/* Missing-codec hint under a chat card's player (FR-2.41a). */
+.link-card__codec-hint {
+  flex-basis: 100%;
+  min-width: 0;
+}
+
+.link-card__codec-hint p {
+  margin: 0;
+}
+
+/* The install command is long and has no spaces to break at, so it wraps anywhere. */
+.link-card__codec-hint code {
+  padding: 0 var(--space-1);
+  border-radius: var(--radius-sm);
+  background: var(--color-bg-hover);
+  overflow-wrap: anywhere;
+  user-select: all;
+}
+
 /* Spotify's embed is a fixed-height widget, not a 16:9 video. */
 .link-card__player--audio {
   aspect-ratio: auto;
@@ -1222,4 +1278,431 @@
 
 .chat-tray__remove:hover {
   color: var(--color-text);
+}
+
+.full-image-transfer {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  max-width: 400px;
+  margin-top: 4px;
+}
+
+.full-image-transfer__cancel {
+  flex: none;
+  padding: 0 4px;
+  border: 0;
+  background: none;
+  color: var(--color-text-muted, inherit);
+  font-size: 14px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.full-image-transfer__cancel:hover {
+  color: var(--color-text, inherit);
+}
+
+.full-image-transfer__cancel:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 1px;
+}
+
+.full-image-bar {
+  flex: 1;
+  height: 3px;
+  border-radius: 2px;
+  background: var(--color-border);
+  overflow: hidden;
+}
+
+.full-image-bar__fill {
+  height: 100%;
+  background: var(--color-accent);
+  transition: width 0.15s linear;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .full-image-bar__fill {
+    transition: none;
+  }
+}
+
+.chat-message__sender--server {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* Own messages not confirmed yet (FR-2.74): greyed while sending, with an error mark when failed. */
+.chat-message--pending > .chat-message__row {
+  opacity: 0.55;
+}
+
+.chat-failed {
+  margin: 2px 0 4px;
+  padding-left: calc(var(--space-4) + var(--chat-avatar-size, 0px) + var(--space-3));
+  color: var(--color-danger);
+  font-size: 0.9em;
+}
+
+.chat-failed__reason {
+  margin: 0 0 4px;
+}
+
+.chat-failed__actions {
+  display: flex;
+  gap: 8px;
+}
+
+.chat-failed__button {
+  padding: 2px 10px;
+  border: 1px solid currentcolor;
+  border-radius: 4px;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+
+/* Shared theme card (FR-2.16) */
+.theme-card {
+  display: flex;
+  gap: var(--space-3);
+  align-items: stretch;
+  max-width: 28rem;
+  margin-top: var(--space-2);
+  padding: var(--space-2);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-bg-elevated);
+}
+
+.theme-card__mock {
+  display: flex;
+  flex: none;
+  width: 7rem;
+  min-height: 4.5rem;
+  overflow: hidden;
+  border-radius: var(--radius-sm);
+  background: var(--mock-background);
+}
+
+.theme-card__mock-side {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  width: 30%;
+  padding: 6px 4px;
+  background: var(--mock-surface);
+}
+
+.theme-card__mock-main {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 5px;
+  padding: 8px 6px;
+}
+
+.theme-card__mock-talking {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--mock-talking);
+}
+
+.theme-card__mock-line {
+  height: 4px;
+  width: 80%;
+  border-radius: 2px;
+  background: var(--mock-text);
+  opacity: 0.6;
+}
+
+.theme-card__mock-line--long {
+  width: 100%;
+}
+
+.theme-card__mock-bubble {
+  height: 12px;
+  width: 60%;
+  border-radius: 4px;
+  background: var(--mock-accent);
+}
+
+.theme-card__body {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: var(--space-1);
+  min-width: 0;
+}
+
+.theme-card__name {
+  margin: 0;
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+.theme-card__note {
+  margin: 0;
+  color: var(--color-text-muted);
+  font-size: 0.85em;
+}
+
+.theme-card__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  align-items: center;
+  margin-top: auto;
+}
+
+.theme-card__imported {
+  color: var(--color-text-muted);
+  font-size: 0.85em;
+}
+
+.theme-card__split {
+  position: relative;
+  display: flex;
+}
+
+.theme-card__apply,
+.theme-card__arrow {
+  padding: var(--space-1) var(--space-3);
+  border: 1px solid var(--color-border);
+  background: var(--color-bg);
+  color: var(--color-text);
+  cursor: pointer;
+}
+
+.theme-card__apply {
+  border-radius: var(--radius-sm) 0 0 var(--radius-sm);
+}
+
+.theme-card__arrow {
+  border-left: 0;
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+  padding-inline: var(--space-2);
+}
+
+.theme-card__apply:focus-visible,
+.theme-card__arrow:focus-visible,
+.theme-card__item:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 1px;
+}
+
+.theme-card__menu {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  min-width: 12rem;
+  margin-top: var(--space-1);
+  padding: var(--space-1);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-bg-elevated);
+  box-shadow: var(--shadow-raised);
+}
+
+.theme-card__item {
+  padding: var(--space-2) var(--space-3);
+  border: 0;
+  background: none;
+  color: var(--color-text);
+  text-align: left;
+  cursor: pointer;
+}
+
+.theme-card__item:hover {
+  background: var(--color-bg);
+}
+
+/* Replies (FR-2.60): the reply button on hover or focus, the quote header and the composer preview. */
+.chat-message {
+  position: relative;
+}
+
+.chat-message__actions {
+  position: absolute;
+  top: 0;
+  right: var(--space-4);
+  /* Above nothing but the pinned banner's neighbours; the banner (FR-2.62) sits higher. */
+  z-index: 2;
+  display: none;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: var(--color-bg-elevated);
+}
+
+.chat-message:hover > .chat-message__actions,
+.chat-message:focus-within > .chat-message__actions {
+  display: flex;
+}
+
+.chat-message--start > .chat-message__actions {
+  top: var(--space-3);
+}
+
+.chat-message__action {
+  display: inline-flex;
+  padding: var(--space-1);
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+}
+
+.chat-message__action:hover,
+.chat-message__action:focus-visible {
+  background: var(--color-bg-hover);
+  color: var(--color-text);
+}
+
+.chat-reply {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  max-width: 100%;
+  margin-bottom: 0.125rem;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--color-text-secondary);
+  font: inherit;
+  font-size: var(--font-size-sm);
+  text-align: start;
+  /* Compact rows hang their first line with a negative text-indent; it is inherited. */
+  text-indent: 0;
+}
+
+.chat-reply svg {
+  flex: none;
+}
+
+.chat-reply--jump {
+  cursor: pointer;
+}
+
+.chat-reply--jump:hover .chat-reply__text {
+  color: var(--color-text);
+}
+
+.chat-reply__name {
+  flex: none;
+  font-weight: var(--font-weight-bold);
+}
+
+.chat-reply__text {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.chat-message--highlight {
+  background: color-mix(in srgb, var(--color-accent) 20%, transparent);
+  transition: background-color 0.3s;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .chat-message--highlight {
+    transition: none;
+  }
+}
+
+.chat-composer__reply {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin: 0 0 var(--space-2);
+  padding: var(--space-1) var(--space-2);
+  border-radius: var(--radius-sm);
+  background: var(--color-bg-elevated);
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+}
+
+.chat-composer__reply-text {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.chat-composer__reply-cancel {
+  display: inline-flex;
+  padding: 0.125rem;
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+}
+
+.chat-composer__reply-cancel:hover,
+.chat-composer__reply-cancel:focus-visible {
+  background: var(--color-bg-hover);
+  color: var(--color-text);
+}
+
+/* Quote blocks typed with "> " (FR-2.68). */
+.chat-message__body blockquote,
+.chat-composer__input blockquote {
+  margin: var(--space-1) 0;
+  padding-left: var(--space-2);
+  border-left: 3px solid var(--color-accent);
+  color: var(--color-text-muted);
+}
+
+.chat-link-copied {
+  position: fixed;
+  left: 50%;
+  bottom: var(--space-3);
+  transform: translateX(-50%);
+  margin: 0;
+  padding: var(--space-1) var(--space-3);
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-full);
+  background: var(--color-bg-elevated);
+  color: var(--color-text);
+  font-size: var(--font-size-sm);
+  pointer-events: none;
+}
+
+.chat-link-copied[hidden] {
+  display: none;
+}
+
+.activity-banners {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  padding: var(--space-1) var(--space-3);
+}
+
+.activity-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding: var(--space-1) var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-bg-elevated);
+  color: var(--color-text);
+}
+
+.activity-banner__text {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }

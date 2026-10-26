@@ -45,6 +45,21 @@ export function mentionPeople(users: Iterable<User>): MentionPerson[] {
   return people;
 }
 
+const peopleByMap = new WeakMap<ReadonlyMap<number, User>, MentionPerson[]>();
+
+/**
+ * `mentionPeople` of a server's people map, worked out once per map: every message body needs
+ * it, and sorting a big server's people again for each of hundreds of messages froze the window.
+ */
+export function mentionPeopleOf(users: ReadonlyMap<number, User>): MentionPerson[] {
+  let people = peopleByMap.get(users);
+  if (people === undefined) {
+    people = mentionPeople(users.values());
+    peopleByMap.set(users, people);
+  }
+  return people;
+}
+
 function chip(doc: Document, text: string, person: MentionPerson, label: string): HTMLElement {
   const element = doc.createElement("span");
   element.className = MENTION_CLASS;

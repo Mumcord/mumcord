@@ -109,7 +109,7 @@ describe("link text under inline images", () => {
     await waitFor(() => {
       expect(container.querySelector(".chat-message__body a")).toBeNull();
     });
-    expect(figure.querySelector("button[title]")?.getAttribute("title")).toBe(URL_A);
+    expect(figure.querySelector("button[data-tooltip]")?.getAttribute("data-tooltip")).toBe(URL_A);
     fireEvent.click(screen.getByRole("button", { name: "Hide preview" }));
     await waitFor(() => {
       expect(container.querySelector(`.chat-message__body a[href="${URL_A}"]`)).not.toBeNull();

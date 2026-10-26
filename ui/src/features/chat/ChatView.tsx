@@ -2,16 +2,19 @@
  * Chat column (FR-1.28–FR-1.30): header, message list and input for the selected conversation
  * (channel or private chat). B22 adds the Follow toggle through `renderHeaderActions`. Sender
  * names open B20's profile card; focus returns to the name when it closes. Channel chats pin the
- * description and welcome text at the top (FR-1.48b).
+ * description and welcome text at the top (FR-1.48b). Replying to a message (FR-2.60) connects
+ * the list and the composer.
  */
-import { useCallback, useContext, useEffect, useMemo, type ReactNode } from "react";
+import { useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 import { announce } from "../../a11y";
 import { getApi, type ChatMessage, type Conversation, type User } from "../../api";
+import { getShownServerId, shownServerId } from "../channels/serverStore";
 import { PreferencesContext } from "../../app/preferences";
 import { useSelectedConversation, useServerState } from "../channels";
 import { PrivatePresence, useFriend } from "../friends";
 import { useAvatars } from "../members/useAvatars";
+import { ActivityBanners } from "./ActivityBanners";
 import {
   conversationKey,
   ensureLoaded,
@@ -25,8 +28,10 @@ import { conversationInfo } from "./conversationInfo";
 import { messageLimits } from "./images";
 import { createMessageAnnouncer } from "./messageAnnouncer";
 import { MessageList } from "./MessageList";
-import { PinnedInfoBox } from "./PinnedInfo";
+import { PinnedInfoBox, type PinnedBlock } from "./PinnedInfo";
 import { pinnedInfo } from "./pinnedInfoModel";
+import { descriptionKey, hideInfo, useHiddenHash, welcomeKey } from "./hiddenInfo";
+import type { ReplyQuote } from "./reply";
 import { hasImage, htmlToText } from "./sanitize";
 import "./chat.css";
 
@@ -68,23 +73,64 @@ function ConversationChat({ conversation, renderHeaderActions }: ConversationCha
   const log = useConversationLog(conversation);
   const info = conversationInfo(server, conversation, log.messages);
   const limits = useMemo(() => messageLimits(server.info), [server.info]);
-  const pinned = pinnedInfo(server, conversation);
   const pinnedChannelId = conversation.kind === "channel" ? conversation.channelId : null;
+  const serverId = shownServerId();
+  const channelKey = descriptionKey(serverId, pinnedChannelId ?? -1);
+  const hiddenWelcome = useHiddenHash(welcomeKey(serverId));
+  const hiddenDescription = useHiddenHash(channelKey);
+  const pinned = pinnedInfo(server, conversation, {
+    welcome: hiddenWelcome,
+    description: hiddenDescription,
+  });
+  const pinnedBlocks: PinnedBlock[] = [];
+  const { description, welcome } = pinned;
+  if (description !== null) {
+    pinnedBlocks.push({
+      html: description,
+      hideLabel: t("pinned.hideDescription"),
+      onHide: () => {
+        hideInfo(channelKey, description);
+      },
+    });
+  }
+  if (welcome !== null) {
+    pinnedBlocks.push({
+      html: welcome,
+      hideLabel: t("pinned.hideWelcome"),
+      onHide: () => {
+        hideInfo(welcomeKey(serverId), welcome);
+      },
+    });
+  }
   // Outside the app shell (isolated feature tests) there are no preferences: the default applies.
   const preferences = useContext(PreferencesContext);
   const display = preferences?.chatDisplay ?? "cozy";
   const linkPreviews = preferences?.linkPreviews ?? false;
   const { users, selfSession } = server;
+  // The message being replied to (FR-2.60); a new conversation starts without one.
+  const [replyTo, setReplyTo] = useState<ReplyQuote | null>(null);
 
-  // The person behind a message while they are still connected. Sessions are reused after
-  // someone leaves, so a different name means the sender is gone (initials fallback).
+  // The person behind a message while they are connected. Sessions change on every reconnect and
+  // history entries have none, so the certificate decides first; a message without one falls back
+  // to its session (only while it still carries the sender's name, sessions are reused) and then
+  // to the name, which is unique on a server.
+  const people = useMemo(() => {
+    const byCert = new Map<string, User>();
+    const byName = new Map<string, User>();
+    for (const user of users.values()) {
+      if (user.certHash !== null) byCert.set(user.certHash, user);
+      byName.set(user.name, user);
+    }
+    return { byCert, byName };
+  }, [users]);
   const senderOf = useCallback(
     (message: ChatMessage): User | undefined => {
-      const session = message.own ? selfSession : message.senderSession;
-      const user = session === null ? undefined : users.get(session);
-      return user && (message.own || user.name === message.senderName) ? user : undefined;
+      if (message.own) return selfSession === null ? undefined : users.get(selfSession);
+      if (message.senderCertHash !== null) return people.byCert.get(message.senderCertHash);
+      const user = message.senderSession === null ? undefined : users.get(message.senderSession);
+      return user?.name === message.senderName ? user : people.byName.get(message.senderName);
     },
-    [users, selfSession],
+    [users, selfSession, people],
   );
   const senders = useMemo(() => {
     if (display !== "cozy") return [];
@@ -119,7 +165,7 @@ function ConversationChat({ conversation, renderHeaderActions }: ConversationCha
   useEffect(() => {
     if (!pinned.needsFetch || pinnedChannelId === null) return;
     getApi()
-      .channelDescriptionRequest(pinnedChannelId)
+      .channelDescriptionRequest(shownServerId(), pinnedChannelId)
       .catch((error: unknown) => {
         console.error("Fetching the channel description failed", error);
       });
@@ -133,7 +179,8 @@ function ConversationChat({ conversation, renderHeaderActions }: ConversationCha
       },
       (count) => t("announce.more", { count }),
     );
-    const unsubscribe = subscribeIncoming((message) => {
+    const unsubscribe = subscribeIncoming((message, serverId) => {
+      if (serverId !== getShownServerId()) return;
       if (message.own || conversationKey(message.conversation) !== key) return;
       const text = htmlToText(message.body).slice(0, ANNOUNCE_CHARS);
       announcer.push(
@@ -179,7 +226,8 @@ function ConversationChat({ conversation, renderHeaderActions }: ConversationCha
           <div className="chat-header__actions">{renderHeaderActions(conversation)}</div>
         ) : null}
       </header>
-      <PinnedInfoBox blocks={pinned.blocks} />
+      {pinnedChannelId !== null && <ActivityBanners channelId={pinnedChannelId} />}
+      <PinnedInfoBox blocks={pinnedBlocks} />
       <MessageList
         log={log}
         label={t("list.label", { name: title })}
@@ -197,6 +245,8 @@ function ConversationChat({ conversation, renderHeaderActions }: ConversationCha
         display={display}
         avatarFor={avatarFor}
         linkPreviews={linkPreviews}
+        onReply={blockedReason === null ? setReplyTo : undefined}
+        listKey={`${String(serverId)}:${JSON.stringify(conversation)}`}
       />
       <Composer
         target={info.target}
@@ -204,6 +254,10 @@ function ConversationChat({ conversation, renderHeaderActions }: ConversationCha
         label={t("composer.label", { name: title })}
         blockedReason={blockedReason}
         linkPreviews={linkPreviews}
+        reply={blockedReason === null ? replyTo : null}
+        onCancelReply={() => {
+          setReplyTo(null);
+        }}
       />
     </div>
   );

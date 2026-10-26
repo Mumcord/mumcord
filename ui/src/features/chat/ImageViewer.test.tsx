@@ -5,6 +5,7 @@ import { createMockApi, setApi, type MockApi } from "../../api";
 import { applyLanguage } from "../../i18n";
 import { axeViolations } from "../../test/axe";
 import { resetFullImages } from "./fullImage";
+import { FullImageBars } from "./FullImageBars";
 import { ImageViewer, type ViewerImage } from "./ImageViewer";
 import { fitScale, zoomAround } from "./viewerMath";
 
@@ -239,13 +240,18 @@ describe("full images", () => {
     const { fetch, resolve } = deferredFetch();
     viewer();
     await waitFor(() => {
-      expect(fetch).toHaveBeenCalledWith(REFERENCE, 4, "cert");
+      expect(fetch).toHaveBeenCalledWith(expect.any(Number), REFERENCE, 4, "cert");
     });
     expect(screen.getByRole("img")).toHaveAttribute("src", PNG);
     expect(screen.getByRole("status")).toHaveTextContent("Loading full size…");
     expect(screen.getByText("Beta")).toBeInTheDocument();
     act(() => {
-      api.mock.emit("fullImageProgress", { reference: REFERENCE, received: 512, total: 2048 });
+      api.mock.emit("fullImageProgress", {
+        serverId: 1,
+        reference: REFERENCE,
+        received: 512,
+        total: 2048,
+      });
     });
     expect(screen.getByRole("status")).toHaveTextContent("Loading full size… 25 %");
     resolve(FULL);
@@ -253,6 +259,113 @@ describe("full images", () => {
       expect(screen.getByRole("img")).toHaveAttribute("src", FULL);
     });
     expect(screen.queryByRole("status")).toBeNull();
+  });
+
+  it("keeps the transfer running when the viewer closes (FR-2.38)", async () => {
+    const { fetch } = deferredFetch();
+    const cancel = vi.spyOn(api, "fullImageCancel");
+    const { unmount } = viewer();
+    await waitFor(() => {
+      expect(fetch).toHaveBeenCalled();
+    });
+    unmount();
+    await new Promise((done) => setTimeout(done, 10));
+    expect(cancel).not.toHaveBeenCalled();
+  });
+
+  it("reopening the viewer attaches to the same transfer with its progress", async () => {
+    const { fetch, resolve } = deferredFetch();
+    const first = viewer();
+    await waitFor(() => {
+      expect(fetch).toHaveBeenCalled();
+    });
+    act(() => {
+      api.mock.emit("fullImageProgress", {
+        serverId: 1,
+        reference: REFERENCE,
+        received: 1024,
+        total: 2048,
+      });
+    });
+    first.unmount();
+    viewer();
+    expect(await screen.findByRole("status")).toHaveTextContent("Loading full size… 50 %");
+    expect(fetch).toHaveBeenCalledTimes(1);
+    resolve(FULL);
+    await waitFor(() => {
+      expect(screen.getByRole("img")).toHaveAttribute("src", FULL);
+    });
+  });
+
+  it("opens a transfer that finished while the viewer was closed at once", async () => {
+    const { fetch, resolve } = deferredFetch();
+    const first = viewer();
+    await waitFor(() => {
+      expect(fetch).toHaveBeenCalled();
+    });
+    first.unmount();
+    resolve(FULL);
+    await new Promise((done) => setTimeout(done, 10));
+    viewer();
+    await waitFor(() => {
+      expect(screen.getByRole("img")).toHaveAttribute("src", FULL);
+    });
+    expect(fetch).toHaveBeenCalledTimes(1);
+  });
+
+  it("cancels on purpose with the x on the progress bar (FR-2.38)", async () => {
+    const { fetch } = deferredFetch();
+    const cancel = vi.spyOn(api, "fullImageCancel");
+    const html = `<img src="${PNG}" data-mumcord-full="${REFERENCE}">`;
+    render(<FullImageBars html={html} />);
+    viewer();
+    await waitFor(() => {
+      expect(fetch).toHaveBeenCalled();
+    });
+    const button = await screen.findByRole("button", { name: "Cancel full-size download" });
+    fireEvent.click(button);
+    expect(cancel).toHaveBeenCalledWith(expect.any(Number), REFERENCE);
+  });
+
+  it("does not cancel a transfer that already finished", async () => {
+    const { fetch, resolve } = deferredFetch();
+    const cancel = vi.spyOn(api, "fullImageCancel");
+    const { unmount } = viewer();
+    await waitFor(() => {
+      expect(fetch).toHaveBeenCalled();
+    });
+    resolve(FULL);
+    await waitFor(() => {
+      expect(screen.getByRole("img")).toHaveAttribute("src", FULL);
+    });
+    unmount();
+    await new Promise((done) => setTimeout(done, 10));
+    expect(cancel).not.toHaveBeenCalled();
+  });
+
+  it("shows a progress bar under the chat image while it loads (FR-2.22)", async () => {
+    const { fetch, resolve } = deferredFetch();
+    const html = `<img src="${PNG}" data-mumcord-full="${REFERENCE}">`;
+    render(<FullImageBars html={html} />);
+    expect(screen.queryByRole("progressbar")).toBeNull();
+    viewer();
+    await waitFor(() => {
+      expect(fetch).toHaveBeenCalled();
+    });
+    const bar = await screen.findByRole("progressbar", { name: "Loading full size…" });
+    act(() => {
+      api.mock.emit("fullImageProgress", {
+        serverId: 1,
+        reference: REFERENCE,
+        received: 512,
+        total: 2048,
+      });
+    });
+    expect(bar).toHaveAttribute("aria-valuenow", "25");
+    resolve(FULL);
+    await waitFor(() => {
+      expect(screen.queryByRole("progressbar")).toBeNull();
+    });
   });
 
   it("keeps the thumbnail when the full image cannot be had", async () => {

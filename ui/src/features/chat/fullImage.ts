@@ -5,8 +5,9 @@
  * the attribute. The image viewer asks the engine for the full image, which fetches it from the
  * original sender on demand; until it arrives (or if it never does) the thumbnail stays.
  */
-import { useEffect, useState } from "react";
+import { useEffect, useState, useSyncExternalStore } from "react";
 import { getApi } from "../../api";
+import { shownServerId } from "../channels/serverStore";
 
 /** Attribute on the message's `<img>` that carries the reference. */
 export const FULL_ATTRIBUTE = "data-mumcord-full";
@@ -79,16 +80,33 @@ export function fullImageSource(img: HTMLImageElement): FullImageSource | undefi
 /** Fetches in flight or done, by reference: opening the viewer again reuses them. */
 const fetches = new Map<string, Promise<string | null>>();
 
+/** References whose fetch has not finished yet, with the last known progress (0–1, or null). */
+const running = new Map<string, number | null>();
+const runningListeners = new Set<() => void>();
+let runningSnapshot: ReadonlyMap<string, number | null> = new Map();
+
+function setRunning(change: (map: Map<string, number | null>) => void): void {
+  change(running);
+  runningSnapshot = new Map(running);
+  for (const listener of runningListeners) listener();
+}
+
 function fetchFullImage(source: FullImageSource): Promise<string | null> {
   const known = fetches.get(source.reference);
   if (known) return known;
+  setRunning((map) => {
+    map.set(source.reference, null);
+  });
   const started = getApi()
-    .fullImageFetch(source.reference, source.senderSession, source.senderCertHash)
+    .fullImageFetch(shownServerId(), source.reference, source.senderSession, source.senderCertHash)
     .catch((error: unknown) => {
       console.error("Fetching the full image failed", error);
       return null;
     })
     .then((src) => {
+      setRunning((map) => {
+        map.delete(source.reference);
+      });
       // A failure may be temporary (sender offline): allow a new try on the next open.
       if (src === null) fetches.delete(source.reference);
       return src;
@@ -110,6 +128,50 @@ async function loadAllowed(): Promise<boolean> {
 /** Forgets finished and running fetches (tests). */
 export function resetFullImages(): void {
   fetches.clear();
+  setRunning((map) => {
+    map.clear();
+  });
+}
+
+/**
+ * Stops a running transfer on purpose (the × on the progress bar). Closing the viewer never
+ * does: the transfer goes on in the background (FR-2.38).
+ */
+export function cancelFullImage(reference: string): void {
+  getApi()
+    .fullImageCancel(shownServerId(), reference)
+    .catch((error: unknown) => {
+      console.error("Cancelling the full image failed", error);
+    });
+}
+
+/**
+ * Progress (0–1) of the full images that are loading right now, by reference; `null` while it
+ * started but nothing arrived yet. Shown as a slim bar under the image in chat (FR-2.22).
+ */
+export function useLoadingFullImages(): ReadonlyMap<string, number | null> {
+  return useSyncExternalStore(subscribeRunning, () => runningSnapshot);
+}
+
+let stopEvents: (() => void) | null = null;
+
+/** One engine listener serves all bars, attached while any bar exists. */
+function subscribeRunning(listener: () => void): () => void {
+  runningListeners.add(listener);
+  stopEvents ??= getApi().on("fullImageProgress", (event) => {
+    if (!running.has(event.reference) || event.total === 0) return;
+    const progress = Math.min(1, event.received / event.total);
+    setRunning((map) => {
+      map.set(event.reference, progress);
+    });
+  });
+  return () => {
+    runningListeners.delete(listener);
+    if (runningListeners.size === 0) {
+      stopEvents?.();
+      stopEvents = null;
+    }
+  };
 }
 
 export type FullImageState =
@@ -132,6 +194,12 @@ export function useFullImage(source: FullImageSource | undefined): FullImageStat
     const stop = getApi().on("fullImageProgress", (event) => {
       if (!active || event.reference !== reference || event.total === 0) return;
       const progress = Math.min(1, event.received / event.total);
+      // Kept for a later reopen, also when no chat bar listens.
+      if (running.has(reference)) {
+        setRunning((map) => {
+          map.set(reference, progress);
+        });
+      }
       setState({ reference, value: { status: "loading", progress } });
     });
     void loadAllowed()
@@ -157,6 +225,8 @@ export function useFullImage(source: FullImageSource | undefined): FullImageStat
   }, [reference, senderSession, senderCertHash]);
 
   if (reference === undefined) return { status: "none" };
-  if (state?.reference !== reference) return { status: "loading", progress: null };
+  // A transfer that is already running (viewer reopened) shows the progress it has made.
+  if (state?.reference !== reference)
+    return { status: "loading", progress: runningSnapshot.get(reference) ?? null };
   return state.value;
 }

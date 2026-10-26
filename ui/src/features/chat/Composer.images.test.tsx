@@ -29,9 +29,9 @@ beforeEach(async () => {
   api = await connectedMock();
   sent = [];
   const original = api.sendChannelMessage.bind(api);
-  vi.spyOn(api, "sendChannelMessage").mockImplementation((channel, html) => {
+  vi.spyOn(api, "sendChannelMessage").mockImplementation((serverId, channel, html) => {
     sent.push(html);
-    return original(channel, html);
+    return original(serverId, channel, html);
   });
 });
 
