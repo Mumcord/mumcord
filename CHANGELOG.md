@@ -1,6 +1,25 @@
 # Changelog
 
-## [0.4.0] - Unreleased
+## [0.4.1] - Unreleased
+
+### macOS
+
+- Fixed connection failures: Mumcord now asks for the Local Network permission, without which macOS 15 and later blocked connections to servers in your home network
+- Clear reasons when a connection fails, in the app and in the log (for example "No route to host" with a pointer to System Settings → Privacy & Security → Local Network)
+- Far fewer keychain prompts: each saved secret is read only once per session and Mumcord uses fewer keychain items (items from older versions are merged on first use)
+- The microphone prompt now appears only once, when the microphone is first used, not when listing devices in the setup wizard or settings
+- The diagnostics page lists audio devices again, even when no audio is running
+- Signed and notarized builds when signing is configured; other builds get a stable signature so macOS can remember your choices
+
+### Fixes
+
+- Fixed two servers failing at the same time: their password and certificate prompts no longer collide
+
+### Internal
+
+- Faster CI builds and end-to-end tests
+
+## [0.4.0] - 2026-10-26
 
 _Watch party and screen sharing are **Beta**. The window overlay is removed: on Windows the new in-game overlay replaces it, on Linux the in-game overlay stays; people who had it switched on see a one-time notice after updating._
 
@@ -177,6 +196,7 @@ _**License change:** Mumcord is licensed under the GNU AGPL-3.0 only from this v
 
 _First release._
 
+[0.4.1]: https://github.com/ToBee94/mumcord/releases/tag/v0.4.1
 [0.4.0]: https://github.com/ToBee94/mumcord/releases/tag/v0.4.0
 [0.3.1]: https://github.com/ToBee94/mumcord/releases/tag/v0.3.1
 [0.3.0]: https://github.com/ToBee94/mumcord/releases/tag/v0.3.0

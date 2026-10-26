@@ -18,8 +18,28 @@ env:
   CARGO_PROFILE_DEV_DEBUG: 0
 
 jobs:
+  # Decides whether the heavy jobs run. A path filter on the trigger would leave the required
+  # checks pending forever on documentation-only pull requests, so the checks always report.
+  changes:
+    name: Changed files
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    outputs:
+      code: ${{ steps.filter.outputs.code }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: scripts/ci
+      - id: filter
+        run: scripts/ci/code-changed.sh >> "$GITHUB_OUTPUT"
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+
   build-test:
-    name: ${{ matrix.os }}
+    name: Build and test (${{ matrix.os }})
+    needs: changes
+    if: needs.changes.outputs.code == 'true'
     strategy:
       fail-fast: false
       matrix:
@@ -159,3 +179,23 @@ jobs:
       - name: Tauri debug build
         if: runner.os != 'Linux'
         run: npm run tauri build -- --debug --no-bundle
+
+  # Required status checks, one per OS under the old names. Runs even when the build was
+  # skipped (documentation-only change), because a skipped matrix job would not report these names.
+  result:
+    name: ${{ matrix.os }}
+    needs: [changes, build-test]
+    if: always()
+    strategy:
+      matrix:
+        os: [ubuntu-24.04, windows-latest, macos-latest]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - name: Check results
+        run: |
+          echo "changes: $CHANGES, build: $BUILD"
+          [ "$CHANGES" = success ] && { [ "$BUILD" = success ] || [ "$BUILD" = skipped ]; }
+        env:
+          CHANGES: ${{ needs.changes.result }}
+          BUILD: ${{ needs.build-test.result }}

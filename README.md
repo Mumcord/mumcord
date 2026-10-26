@@ -32,9 +32,13 @@ Mumcord is **compatible with Mumble**. It is **not affiliated with or endorsed b
 
 ## Status
 
-Early development: Epic 2 (release 0.4.0). Expect rough edges, especially in the Beta features. See `specs/02-multi-server-themes-specification.md` for the current scope and [CHANGELOG.md](CHANGELOG.md) for what each release added.
+Early development. Release 0.4.0 added several servers at once, themes, watch party and screen sharing; expect rough edges, especially in the Beta features. See [CHANGELOG.md](CHANGELOG.md) for what each release added.
 
-Test builds for Windows and macOS are unsigned. The operating system will show a security warning when you start them.
+From 0.4.1, the macOS builds are signed and notarized. Windows builds are still unsigned until code signing is set up, so Windows shows a security warning when you start them.
+
+**macOS Local Network permission:** macOS 15 and later asks whether Mumcord may find devices on your local network. Allow it, or connections to servers in your home network fail with "No route to host". You can change it later in System Settings → Privacy & Security → Local Network.
+
+**Log files** (useful for bug reports; they contain no chat, names or audio): macOS `~/Library/Logs/app.mumcord.client/`, Linux `~/.local/share/app.mumcord.client/logs/`.
 
 ## Download
 
