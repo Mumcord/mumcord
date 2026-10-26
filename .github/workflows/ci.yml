@@ -68,12 +68,9 @@ jobs:
       # A stalled mirror fails the step instead of holding the job for most of an hour.
       - name: Install Linux system libraries
         if: runner.os == 'Linux'
-        timeout-minutes: 10
+        timeout-minutes: 20
         run: |
-          mkdir -p ~/apt-archives/partial
-          sudo apt-get update -o Acquire::Retries=3
-          sudo apt-get install -y --no-install-recommends -o Dir::Cache::Archives="$HOME/apt-archives" \
-            -o Acquire::Retries=3 -o Acquire::http::Timeout=20 -o Acquire::https::Timeout=20 \
+          scripts/ci/apt-install.sh --cache-dir "$HOME/apt-archives" \
             libwebkit2gtk-4.1-dev libayatana-appindicator3-dev librsvg2-dev \
             libxdo-dev libasound2-dev libvpx-dev libpipewire-0.3-dev libclang-dev pkg-config cmake
 
