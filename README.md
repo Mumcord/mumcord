@@ -107,7 +107,7 @@ Maintainers: how to cut a release is described in [RELEASING.md](RELEASING.md).
 
 - Windows: Visual Studio Build Tools with the "Desktop development with C++" workload (MSVC), and the WebView2 runtime (preinstalled on Windows 11).
 - macOS: Xcode command line tools (`xcode-select --install`).
-- Windows and macOS link a static libvpx for screen sharing: build it with `scripts/build-libvpx.sh <dir>` (Windows: vcpkg and LLVM for bindgen; macOS: `brew install nasm`) and set `LIBVPX_STATIC_DIR=<dir>` before building. Details: [RELEASING.md](RELEASING.md#static-libvpx-on-windows-and-macos).
+- Windows and macOS link a static libvpx for screen sharing: build it with `scripts/build-libvpx.sh <dir>` (Windows: vcpkg and LLVM for bindgen; macOS: `brew install nasm`) and set `LIBVPX_STATIC_DIR=<dir>` before building. Linux release packages do the same so they run on older distributions; Linux development builds use the system libvpx. Details: [RELEASING.md](RELEASING.md#static-libvpx).
 
 ### Get the code and run
 

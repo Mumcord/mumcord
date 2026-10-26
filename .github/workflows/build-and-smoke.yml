@@ -73,44 +73,45 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y --no-install-recommends \
             libwebkit2gtk-4.1-dev libayatana-appindicator3-dev librsvg2-dev \
-            libxdo-dev libasound2-dev libvpx-dev libpipewire-0.3-dev libclang-dev pkg-config cmake patchelf xdg-utils
+            libxdo-dev libasound2-dev libpipewire-0.3-dev libclang-dev pkg-config cmake patchelf xdg-utils
 
-      # Screen sharing links a static libvpx on Windows and macOS (scripts/build-libvpx.sh,
-      # RELEASING.md). It is cached: the key changes with the script and, on Windows, with the
-      # libvpx version of the runner's vcpkg.
+      # Screen sharing links a static libvpx into every bundle (scripts/build-libvpx.sh,
+      # RELEASING.md); on Linux this keeps the packages off the build host's libvpx soname. It is
+      # cached per system and architecture: the key changes with the script and, on Windows, with
+      # the libvpx version of the runner's vcpkg.
       - name: libvpx cache key
         id: libvpx
-        if: runner.os != 'Linux'
         shell: bash
         run: |
           version=pinned
           if [[ "$RUNNER_OS" == Windows ]]; then
-            version=$(jq -r '"\(.version // ."version-semver" // ."version-string")-\(."port-version" // 0)"' \
+            version=$(jq -r '(.version // ."version-semver" // ."version-string" | tostring) + "-" + (."port-version" // 0 | tostring)' \
               "$VCPKG_INSTALLATION_ROOT/ports/libvpx/vcpkg.json")
           fi
-          echo "key=libvpx-$RUNNER_OS-$version-${{ hashFiles('scripts/build-libvpx.sh') }}" >> "$GITHUB_OUTPUT"
+          echo "key=libvpx-$RUNNER_OS-$RUNNER_ARCH-$version-${{ hashFiles('scripts/build-libvpx.sh') }}" >> "$GITHUB_OUTPUT"
 
       - name: Restore static libvpx
         id: libvpx-cache
-        if: runner.os != 'Linux'
         uses: actions/cache@v4
         with:
           path: ${{ runner.temp }}/libvpx
           key: ${{ steps.libvpx.outputs.key }}
 
       - name: Build static libvpx
-        if: runner.os != 'Linux' && steps.libvpx-cache.outputs.cache-hit != 'true'
+        if: steps.libvpx-cache.outputs.cache-hit != 'true'
         shell: bash
         run: |
           if [[ "$RUNNER_OS" == macOS ]]; then brew install nasm; fi
+          if [[ "$RUNNER_OS" == Linux ]]; then sudo apt-get install -y --no-install-recommends nasm; fi
           scripts/build-libvpx.sh '${{ runner.temp }}/libvpx'
 
       # bindgen (crates/screenshare/build.rs) loads libclang: LLVM on the Windows runner, Xcode's
-      # toolchain on macOS.
+      # toolchain on macOS, libclang-dev (found on its own) on Linux.
       - name: Point the build at libvpx and libclang
-        if: runner.os != 'Linux'
         shell: bash
         run: |
+          echo 'LIBVPX_STATIC_DIR=${{ runner.temp }}/libvpx' >> "$GITHUB_ENV"
+          if [[ "$RUNNER_OS" == Linux ]]; then exit 0; fi
           if [[ "$RUNNER_OS" == Windows ]]; then
             libclang='C:\Program Files\LLVM\bin'
             test -f "$libclang/libclang.dll"
@@ -118,10 +119,7 @@ jobs:
             libclang="$(xcode-select -p)/Toolchains/XcodeDefault.xctoolchain/usr/lib"
             test -f "$libclang/libclang.dylib"
           fi
-          {
-            echo 'LIBVPX_STATIC_DIR=${{ runner.temp }}/libvpx'
-            echo "LIBCLANG_PATH=$libclang"
-          } >> "$GITHUB_ENV"
+          echo "LIBCLANG_PATH=$libclang" >> "$GITHUB_ENV"
 
       - uses: dtolnay/rust-toolchain@stable
         with:

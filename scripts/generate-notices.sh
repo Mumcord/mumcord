@@ -99,15 +99,14 @@ LIBVPX AND LINUX SYSTEM LIBRARIES
 =================================
 
 These are not Rust or npm packages. libvpx is part of every Mumcord build: the
-Windows and macOS apps contain a statically linked copy, and the Linux builds link
-the system's shared libvpx (the AppImage carries it inside the image). The other
-libraries below are Linux system libraries that Mumcord links or loads at runtime,
+Windows, macOS and Linux apps (AppImage, .deb and .rpm) contain a statically linked
+copy. The other libraries below are Linux system libraries that Mumcord links or loads at runtime,
 and that the Linux AppImage carries inside the image.
 
 libvpx (BSD 3-Clause with patent grant) - https://www.webmproject.org/code/
   VP9 (and VP8) screen-share encoder and decoder, linked by crates/screenshare.
-  Statically linked into the Windows app (vcpkg build) and the macOS app (built
-  from the libvpx release source); shared system library on Linux.
+  Statically linked into the Windows app (vcpkg build) and the macOS and Linux
+  apps (built from the libvpx release source).
   Copyright (c) 2010, The WebM Project authors. All rights reserved.
 
   Redistribution and use in source and binary forms, with or without
