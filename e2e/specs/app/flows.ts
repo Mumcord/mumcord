@@ -5,9 +5,10 @@ import { join } from "node:path";
 import { browser } from "@wdio/globals";
 import type { Result } from "axe-core";
 import { axe, repoRoot } from "../../helpers/index.ts";
+import { ports } from "../../helpers/testenv.ts";
 import { run } from "../../helpers/run.ts";
 
-export const SERVER = "localhost:64738";
+export const SERVER = `localhost:${String(ports.v15)}`;
 
 export interface Focus {
   tag: string;
