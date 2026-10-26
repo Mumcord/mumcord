@@ -181,11 +181,11 @@ fn announce(state: &ServerShares, peers: &ServerPeers, ctx: &SessionCtx, receive
             sound: false,
         },
     };
-    send(
-        &ctx.handle,
-        &capable(peers, ctx.server_id, receivers, FEATURE),
-        &signal,
-    );
+    let receivers = capable(peers, ctx.server_id, receivers, FEATURE);
+    if !receivers.is_empty() {
+        tracing::debug!(?receivers, ?signal, "screen share announced");
+    }
+    send(&ctx.handle, &receivers, &signal);
 }
 
 /// Tells the channel who watches the own share.
@@ -274,6 +274,9 @@ pub(crate) fn on_plugin_data(
         tracing::debug!("ignoring a malformed screen share message");
         return;
     };
+    if let Signal::Share { live, .. } = signal {
+        tracing::debug!(sender, live, "screen share announcement received");
+    }
     let mut reply = None;
     let mut own_viewers = false;
     let changed = {

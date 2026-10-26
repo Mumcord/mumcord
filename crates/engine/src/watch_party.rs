@@ -496,8 +496,10 @@ pub(crate) fn on_plugin_data(state: &ServerParties, ctx: &SessionCtx, data: &Plu
             // A state only fills in a party this client does not know yet; a second one is the
             // answerer repeating its announcement.
             if !valid_video_id(&video) || current.is_some() {
+                tracing::debug!(sender, "watch party state ignored");
                 return;
             }
+            tracing::debug!(sender, "watch party state received");
             let mut party = Party::new(here.channel_id, video, starter);
             party.participants.clear();
             for m in members.into_iter().filter(|m| here.others.contains(m)) {
@@ -691,6 +693,7 @@ pub(crate) fn on_tick(state: &ServerParties, ctx: &SessionCtx) {
 }
 
 fn send_state(ctx: &SessionCtx, party: &Party, session: u32) {
+    tracing::debug!(session, "watch party state sent");
     send(&ctx.handle, &[session], party.state_msg());
     // The list does not fit into the state; it follows as adds, a few messages at most.
     let mut ops = party.playlist.snapshot();
