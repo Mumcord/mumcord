@@ -37,6 +37,24 @@ function party(patch: Partial<WatchParty> = {}): WatchParty {
   };
 }
 
+/**
+ * Posts a report from the player page until `check` passes. The panel attaches its message
+ * listener in an effect after the frame renders, so on a slow runner a single early report is lost.
+ */
+async function reportUntil(
+  frame: HTMLIFrameElement,
+  data: unknown,
+  check: () => void,
+): Promise<void> {
+  await waitFor(() => {
+    act(() => {
+      window.dispatchEvent(
+        new MessageEvent("message", { origin: PAGE_ORIGIN, source: frame.contentWindow, data }),
+      );
+    });
+    check();
+  });
+}
 describe("YouTube only", () => {
   it("accepts only video ids from youtube-nocookie embed URLs", () => {
     expect(videoIdOf(`https://www.youtube-nocookie.com/embed/${VIDEO}`)).toBe(VIDEO);
@@ -348,18 +366,7 @@ describe("panel", () => {
     render(<WatchPartyPanel serverId={1} channelId={channelId} />);
     announce(party({ channelId, joined: true }));
     const frame = await screen.findByTitle<HTMLIFrameElement>("Watch party player");
-    // The message listener attaches in an effect after the frame renders; on a slow runner a single
-    // early message is lost, so it is repeated until the panel reacts.
-    await waitFor(() => {
-      act(() => {
-        window.dispatchEvent(
-          new MessageEvent("message", {
-            origin: PAGE_ORIGIN,
-            source: frame.contentWindow,
-            data: { type: "error", code: 153 },
-          }),
-        );
-      });
+    await reportUntil(frame, { type: "error", code: 153 }, () => {
       expect(screen.getByRole("button", { name: "Open in browser" })).toBeInTheDocument();
     });
     expect(screen.queryByTitle("Watch party player")).toBeNull();
@@ -614,16 +621,7 @@ describe("playlist", () => {
     render(<WatchPartyPanel serverId={1} channelId={channelId} />);
     show({ currentEntry: 3, playlist: [entry(4, VIDEO_B)] });
     const frame = await screen.findByTitle<HTMLIFrameElement>("Watch party player");
-    act(() => {
-      window.dispatchEvent(
-        new MessageEvent("message", {
-          origin: PAGE_ORIGIN,
-          source: frame.contentWindow,
-          data: { type: "ended" },
-        }),
-      );
-    });
-    await waitFor(() => {
+    await reportUntil(frame, { type: "ended" }, () => {
       expect(next).toHaveBeenCalledWith(1, 3, false);
     });
   });
