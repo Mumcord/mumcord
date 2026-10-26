@@ -1,6 +1,8 @@
 import type { Theme } from "../api";
+import { deriveTokens, THEME_TOKENS, themeBase } from "./derive";
+import { MUMCORD_PRESET_ID, type ThemeRecord, type ThemeVariant } from "./themeModel";
 
-export type ResolvedTheme = "dark" | "light";
+export type ResolvedTheme = ThemeVariant;
 
 const DARK_QUERY = "(prefers-color-scheme: dark)";
 
@@ -32,4 +34,27 @@ export function watchOsTheme(onChange: (prefersDark: boolean) => void): () => vo
 /** The token sets in tokens.css are selected by `data-theme` on <html>. */
 export function applyThemeToDocument(theme: ResolvedTheme): void {
   document.documentElement.dataset.theme = theme;
+}
+
+/**
+ * Shows `variant` of `theme` (FR-2.14). Mumcord uses the hand-tuned token sets; every other theme
+ * sets its derived colours as inline variables over the base set matching those colours.
+ */
+export function applyThemeRecord(theme: ThemeRecord, variant: ThemeVariant): void {
+  clearThemeColors();
+  if (theme.id === MUMCORD_PRESET_ID) {
+    applyThemeToDocument(variant);
+    return;
+  }
+  const colors = theme[variant];
+  applyThemeToDocument(themeBase(colors));
+  const tokens = deriveTokens(colors);
+  const { style } = document.documentElement;
+  for (const token of THEME_TOKENS) style.setProperty(`--color-${token}`, tokens[token]);
+}
+
+/** Removes a custom theme's inline colours so the base token set applies again. */
+export function clearThemeColors(): void {
+  const { style } = document.documentElement;
+  for (const token of THEME_TOKENS) style.removeProperty(`--color-${token}`);
 }

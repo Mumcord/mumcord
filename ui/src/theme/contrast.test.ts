@@ -80,6 +80,22 @@ describe.each([':root[data-theme="dark"]', ':root[data-theme="light"]'])(
       },
     );
 
+    it("primary button text has at least 4.5:1 on the pill", () => {
+      expect(contrastRatio(color("primary-text"), color("primary-bg"))).toBeGreaterThanOrEqual(4.5);
+    });
+
+    it.each(["bg-chat", "bg-sidebar"])("primary pill has at least 3:1 on %s", (bg) => {
+      expect(contrastRatio(color("primary-bg"), color(bg))).toBeGreaterThanOrEqual(3);
+    });
+
+    // The gradient is also used as heading text (wizard, empty states) on the chat background.
+    it.each(["accent-stop-1", "accent-stop-2", "accent-stop-3"])(
+      "gradient %s as heading text has at least 4.5:1 on bg-chat",
+      (stop) => {
+        expect(contrastRatio(color(stop), color("bg-chat"))).toBeGreaterThanOrEqual(4.5);
+      },
+    );
+
     it("defines the same colour tokens as the other theme", () => {
       const other = selector.includes("dark")
         ? colorTokens(':root[data-theme="light"]')
