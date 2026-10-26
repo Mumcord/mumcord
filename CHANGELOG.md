@@ -6,7 +6,7 @@
 
 - People who join a voice channel while someone is sharing their screen or a watch party is running now see it more reliably: the announcement is sent a second time in case the server dropped the first
 
-## [0.4.1] - Unreleased
+## [0.4.1] - 2026-10-26
 
 ### macOS
 
