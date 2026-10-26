@@ -144,23 +144,27 @@ export function findingsReport(): string {
 
 // ---------------------------------------------------------------- flows
 
-/** Wizard: create identity `name`, keep defaults, uncheck the mumble:// handler, Finish. */
+/** Wizard: create identity `name`, keep defaults (updates step included), uncheck the mumble:// handler, Finish. */
 export async function wizard(name: string, onStep?: (step: number) => Promise<void>): Promise<void> {
   await waitFor("form.wizard-step");
   await onStep?.(1);
   await tabTo((f) => f.tag === "input" && f.type === "text", "identity name field");
   await typeText(name);
   await browser.keys(["Enter"]);
-  await waitText("p.wizard-progress", "2", 30_000);
+  await waitText("p.wizard-progress", "Step 2 of", 30_000);
   await onStep?.(2);
   await tabTo((f) => f.tag === "button" && f.cls.includes("button--primary"), "wizard Next");
   await browser.keys(["Enter"]);
-  await waitText("p.wizard-progress", "3");
+  await waitText("p.wizard-progress", "Step 3 of");
   await onStep?.(3);
   await tabTo((f) => f.tag === "button" && f.cls.includes("button--primary"), "wizard Next");
   await browser.keys(["Enter"]);
-  await waitText("p.wizard-progress", "4");
+  await waitText("p.wizard-progress", "Step 4 of");
   await onStep?.(4);
+  await tabTo((f) => f.tag === "button" && f.cls.includes("button--primary"), "wizard Next");
+  await browser.keys(["Enter"]);
+  await waitText("p.wizard-progress", "Step 5 of");
+  await onStep?.(5);
   const box = await browser.execute(() => {
     const c = document.querySelector<HTMLInputElement>("form.wizard-step input[type=checkbox]");
     return c ? c.checked : null;
