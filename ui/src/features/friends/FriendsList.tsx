@@ -5,6 +5,7 @@ import {
   selectConversation,
   useSelectedConversation,
   useServerState,
+  useServers as useConnectedServers,
 } from "../channels";
 import {
   CollapsibleSection,
@@ -26,6 +27,7 @@ export function FriendsList() {
   const friends = useFriends();
   const server = useServerState();
   const { servers } = useServers();
+  const connected = useConnectedServers();
   const { conversation } = useSelectedConversation();
   const [open, setOpen] = useSectionOpen("friends", true);
 
@@ -42,13 +44,11 @@ export function FriendsList() {
         <ul>
           {friends.map((friend) => {
             const chat: Conversation = { kind: "private", certHash: friend.certHash };
-            const status = presenceText(
-              t,
-              friend,
-              server,
-              i18n.language,
-              (id) => servers.find((s) => s.id === id)?.label,
-            );
+            const status = presenceText(t, friend, i18n.language, {
+              shownServerId: server.serverId,
+              serverName: (id) => servers.find((s) => s.id === id)?.label,
+              channelName: (id, channelId) => connected.get(id)?.channels.get(channelId)?.name,
+            });
             // Sessions only mean something on the connected server.
             const session =
               friend.online !== null && friend.online.serverId === server.serverId
