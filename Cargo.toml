@@ -135,7 +135,7 @@ gtk = "0.18"
 notify-rust = { version = "4.18", default-features = false }
 
 # Mouse-button push-to-talk: X11 XInput2 raw events, macOS event tap (already in the tree)
-x11rb = { version = "0.13", default-features = false }
+x11rb = { version = "0.14", default-features = false }
 core-graphics = "0.25"
 core-foundation = "0.10"
 
