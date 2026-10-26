@@ -184,6 +184,17 @@ jobs:
           **Removed:** the window overlay. Windows uses the new in-game overlay instead; people who had the window overlay on see a one-time notice.
           **Linux AppImage:** plays YouTube via VP9 but bundles no H.264; install your distribution's gst-libav for H.264 (see the README).
           EOF
+          elif [[ "$VERSION" == "0.4.1" ]]; then
+            cat >> ../notes.md <<'EOF'
+
+          ## What's new in 0.4.1
+
+          - **macOS connection fix**: Mumcord now asks for the Local Network permission, so connections to servers in your home network work on macOS 15 and later. Failures show a clear reason in the app and the log.
+          - **macOS prompts**: far fewer keychain prompts, and the microphone prompt appears only once.
+          - **macOS builds** are signed and notarized when signing is configured.
+          - **Two servers failing at once** no longer collide on the password and certificate prompts.
+          - The diagnostics page lists audio devices again.
+          EOF
           fi
 
       - name: Create draft release
