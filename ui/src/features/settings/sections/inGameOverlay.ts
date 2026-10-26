@@ -4,7 +4,7 @@ import type {
   GameOverlayEntry,
   InGameOverlayState,
   MumcordApi,
-  OverlayCorner,
+  Corner,
 } from "../../../api";
 
 /** Global switch of the in-game overlay (FR-1.46b): "off" never loads a layer or hook. */
@@ -18,7 +18,7 @@ export interface InGameBlock {
 
 /** Per-game look of the in-game overlay. */
 export interface InGameGameOptions {
-  corner: OverlayCorner;
+  corner: Corner;
   /** Percent of the default size, 50 – 200. */
   size: number;
   /** Percent, 20 – 100. */
@@ -42,9 +42,12 @@ export interface InGameGame {
 export interface InGameState {
   /** False where no in-game overlay exists (macOS): the window overlay is the fallback. */
   supported: boolean;
-  /** i18n key (namespace `settings`) naming why it is not supported, or `null`. */
+  /** i18n key (namespace `settings`) naming why it is not supported, or a hint about a limit
+   * when it is (Windows: exclusive fullscreen); `null` when there is nothing to say. */
   explanationKey: string | null;
   mode: InGameMode;
+  /** Steam launch option for native OpenGL games (Linux, overlay on), or `null`. */
+  openglLaunchOption: string | null;
   games: InGameGame[];
 }
 
@@ -99,6 +102,7 @@ function toInGameState(state: InGameOverlayState): InGameState {
     supported: state.supported,
     explanationKey: state.explanationKey,
     mode: state.mode,
+    openglLaunchOption: state.openglLaunchOption,
     games: entriesOf(state).map((entry) => ({
       id: idOf(entry.key),
       name: entry.name,

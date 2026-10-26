@@ -118,6 +118,9 @@ pub struct InGameOverlayState {
     /// i18n key (namespace `settings`) explaining a platform limitation, or `null`.
     pub explanation_key: Option<String>,
     pub mode: InGameOverlayMode,
+    /// Steam launch option for native OpenGL games (Linux, only while the overlay is on), or
+    /// `null`.
+    pub opengl_launch_option: Option<String>,
     /// Games the user configured, each annotated with its blocklist status and current effect.
     pub games: Vec<GameOverlayEntry>,
     /// Games the user could add: ones running now or on the blocklist, minus the configured ones.
@@ -168,7 +171,11 @@ fn from_store_corner(corner: store::OverlayCorner) -> Corner {
     }
 }
 
+/// The blocklist entry for `key`, or `None` also where the blocklist does not apply (Windows).
 fn blocklist_info(key: &StoreKey) -> Option<BlocklistInfo> {
+    if !crate::ingame_overlay::BLOCKLIST_APPLIES {
+        return None;
+    }
     mumcord_engine::blocklist()
         .find(key)
         .map(|g| BlocklistInfo {
@@ -194,7 +201,7 @@ fn to_ui_entry(
         show_whole_channel: entry.show_whole_channel,
         show_channel_name: entry.show_channel_name,
         blocklist: blocklist_info(&entry.key),
-        effective: mumcord_engine::decide_overlay(settings, &entry.key).into(),
+        effective: crate::ingame_overlay::decide(settings, &entry.key).into(),
     }
 }
 
@@ -233,7 +240,11 @@ fn state_of(engine: &Engine, runtime: &Runtime) -> ApiResult<InGameOverlayState>
             });
         }
     }
-    for game in mumcord_engine::blocklist().iter() {
+    let blocklist = crate::ingame_overlay::BLOCKLIST_APPLIES
+        .then(mumcord_engine::blocklist)
+        .into_iter()
+        .flat_map(|list| list.iter());
+    for game in blocklist {
         let key = game.first_key();
         if !is_configured(&key) && !known.iter().any(|k| from_store_key(&key) == k.key) {
             known.push(KnownGame {
@@ -253,6 +264,10 @@ fn state_of(engine: &Engine, runtime: &Runtime) -> ApiResult<InGameOverlayState>
         mode: match settings.mode {
             store::InGameOverlayMode::Off => InGameOverlayMode::Off,
             store::InGameOverlayMode::On => InGameOverlayMode::On,
+        },
+        opengl_launch_option: match settings.mode {
+            store::InGameOverlayMode::On => crate::ingame_overlay::opengl_launch_option(),
+            store::InGameOverlayMode::Off => None,
         },
         games,
         known,

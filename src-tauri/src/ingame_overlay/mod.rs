@@ -6,32 +6,57 @@
 //!   Runtime container) reach it through the Vulkan layer or the OpenGL preload
 //!   (`mumcord-overlay-layer`). Turning the overlay on installs the layer manifest, off removes
 //!   it.
-//! - **Windows:** designed around a hook DLL loaded into detected, allowed games (see
-//!   `docs/engine-api.md`); not built on this Linux host. [`SUPPORTED`] is false there until it
-//!   is implemented and verified on Windows.
+//! - **Windows:** a separate click-through window over the game in the foreground
+//!   (`windows_window`, FR-2.28); nothing is loaded into games, so the anti-cheat blocklist does
+//!   not apply there ([`BLOCKLIST_APPLIES`]).
 //! - **macOS:** no overlay at all (QA.58); [`SUPPORTED`] is false.
 
+#[cfg(any(target_os = "windows", test))]
+mod follow;
 #[cfg(target_os = "linux")]
 mod manifest;
 mod scene;
 #[cfg(target_os = "linux")]
 mod server;
+#[cfg(target_os = "windows")]
+mod windows_window;
 
 use std::collections::HashSet;
 use std::sync::{Arc, Mutex};
 
-use mumcord_engine::Engine;
 use mumcord_engine::store::{
     GameKey, GameOverlayEntry, InGameOverlayMode, InGameOverlaySettings, Settings,
 };
-use mumcord_overlay_ipc::wire::Scene;
+use mumcord_engine::{Engine, OverlayDecision};
 #[cfg(any(target_os = "linux", test))]
-use mumcord_overlay_ipc::wire::{Config, Corner, Hello};
+use mumcord_overlay_ipc::wire::Hello;
+use mumcord_overlay_ipc::wire::Scene;
+#[cfg(any(target_os = "linux", target_os = "windows", test))]
+use mumcord_overlay_ipc::wire::{Config, Corner};
 
-/// Whether this platform can draw inside games. Linux only for now (the Windows hook is designed
-/// but not yet built here; macOS is never supported, QA.58).
+/// Whether the IPC server for the in-game layer runs: Linux only (Windows uses the overlay
+/// window instead; macOS has no overlay, QA.58).
 #[cfg(target_os = "linux")]
 pub const SUPPORTED: bool = cfg!(target_os = "linux");
+
+/// Whether the bundled anti-cheat blocklist (QA.56) applies. Not on Windows: the overlay is a
+/// separate window there and never touches the game (FR-2.28).
+pub const BLOCKLIST_APPLIES: bool = !cfg!(target_os = "windows");
+
+/// Whether the overlay is drawn for `key` on this platform: the engine's decision, but without
+/// the blocklist where it does not apply.
+pub fn decide(settings: &InGameOverlaySettings, key: &GameKey) -> OverlayDecision {
+    if BLOCKLIST_APPLIES {
+        return mumcord_engine::decide_overlay(settings, key);
+    }
+    if settings.mode == InGameOverlayMode::Off {
+        return OverlayDecision::GlobalOff;
+    }
+    match settings.entry(key).and_then(|e| e.enabled) {
+        Some(false) => OverlayDecision::GameOff,
+        Some(true) | None => OverlayDecision::Show,
+    }
+}
 
 /// The game-side identity reduced to how settings and the blocklist key a game.
 #[cfg(any(target_os = "linux", test))]
@@ -89,8 +114,18 @@ impl Shared {
         }
     }
 
+    /// The current in-game overlay settings.
+    #[cfg(target_os = "windows")]
+    pub fn ingame_settings(&self) -> InGameOverlaySettings {
+        self.inner
+            .lock()
+            .unwrap_or_else(std::sync::PoisonError::into_inner)
+            .ingame
+            .clone()
+    }
+
     /// Records a game that connected (deduplicated by key, most recent name kept).
-    #[cfg(target_os = "linux")]
+    #[cfg(any(target_os = "linux", target_os = "windows"))]
     pub fn record_seen(&self, game: SeenGame) {
         let mut state = self
             .inner
@@ -175,13 +210,13 @@ impl Shared {
     }
 
     /// The config to send a game: the decision plus its per-game look.
-    #[cfg(any(target_os = "linux", test))]
+    #[cfg(any(target_os = "linux", target_os = "windows", test))]
     pub fn config_for(&self, key: &GameKey) -> Config {
         let state = self
             .inner
             .lock()
             .unwrap_or_else(std::sync::PoisonError::into_inner);
-        let decision = mumcord_engine::decide_overlay(&state.ingame, key);
+        let decision = decide(&state.ingame, key);
         if !decision.shows() {
             return Config::DISABLED;
         }
@@ -197,7 +232,7 @@ impl Shared {
     }
 
     /// The scene to send a game, filtered by its per-game options.
-    #[cfg(any(target_os = "linux", test))]
+    #[cfg(any(target_os = "linux", target_os = "windows", test))]
     pub fn scene_for(&self, key: &GameKey) -> Scene {
         let state = self
             .inner
@@ -208,7 +243,7 @@ impl Shared {
     }
 }
 
-#[cfg(any(target_os = "linux", test))]
+#[cfg(any(target_os = "linux", target_os = "windows", test))]
 fn filter_scene(scene: &Scene, entry: &GameOverlayEntry) -> Scene {
     Scene {
         channel: if entry.show_channel_name {
@@ -229,7 +264,8 @@ fn filter_scene(scene: &Scene, entry: &GameOverlayEntry) -> Scene {
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub struct Support {
     pub supported: bool,
-    /// i18n key (namespace `settings`) explaining a limitation, or `None`.
+    /// i18n key (namespace `settings`) explaining a limitation, or `None`. Shown as a hint when
+    /// the overlay is supported.
     pub explanation_key: Option<&'static str>,
 }
 
@@ -239,13 +275,13 @@ pub fn support() -> Support {
     support_with(library_path())
 }
 
-/// Platform support: the Windows hook is designed but not yet shipped; the window overlay is the
-/// fallback.
+/// Platform support: the overlay window works for every game, but cannot cover one in exclusive
+/// fullscreen, so the settings carry that hint (FR-2.28).
 #[cfg(target_os = "windows")]
 pub fn support() -> Support {
     Support {
-        supported: false,
-        explanation_key: Some("overlay.inGame.limits.windowsPending"),
+        supported: true,
+        explanation_key: Some("overlay.inGame.limits.windowsFullscreen"),
     }
 }
 
@@ -274,12 +310,24 @@ fn support_with(library: Option<std::path::PathBuf>) -> Support {
     }
 }
 
-/// App-wide runtime, managed by Tauri. Holds the shared state the IPC server reads and keeps the
-/// server alive while the app runs.
+/// App-wide runtime, managed by Tauri. Holds the shared state the IPC server (Linux) or the
+/// overlay window (Windows) reads and keeps it alive while the app runs.
 pub struct Runtime {
     pub shared: Arc<Shared>,
     #[cfg(target_os = "linux")]
     _server: Mutex<Option<server::Server>>,
+    #[cfg(target_os = "windows")]
+    window: Option<windows_window::Overlay>,
+}
+
+impl Runtime {
+    /// Tells the overlay window to redraw (the IPC server instead pushes scenes on its own).
+    fn scene_changed(&self) {
+        #[cfg(target_os = "windows")]
+        if let Some(window) = &self.window {
+            window.scene_changed();
+        }
+    }
 }
 
 /// File name of the Linux layer library (`crates/overlay-layer`).
@@ -311,26 +359,57 @@ fn find_library(
     candidates.into_iter().find(|candidate| candidate.is_file())
 }
 
+/// The Steam launch option that loads the layer into a native OpenGL game (FR-2.57), or `None`
+/// when there is no layer library. It names the stable `current` path, which `sync_manifest` keeps
+/// pointing at the installed version, never the AppImage mount.
+#[cfg(target_os = "linux")]
+pub fn opengl_launch_option() -> Option<String> {
+    let name = library_path()?.file_name()?.to_owned();
+    let path = manifest::current_library_path(&manifest::layer_dir()?, &name);
+    Some(launch_option_for(&path))
+}
+
+/// `LD_PRELOAD=<path> %command%`; the path is quoted when it contains spaces, as Steam hands the
+/// option to a shell.
+#[cfg(target_os = "linux")]
+fn launch_option_for(path: &std::path::Path) -> String {
+    let path = path.to_string_lossy();
+    if path.contains(char::is_whitespace) {
+        format!("LD_PRELOAD=\"{path}\" %command%")
+    } else {
+        format!("LD_PRELOAD={path} %command%")
+    }
+}
+
+#[cfg(not(target_os = "linux"))]
+pub fn opengl_launch_option() -> Option<String> {
+    None
+}
+
 /// Installs or removes the Vulkan layer manifest to match `mode` (Linux). The manifest is present
 /// only while the overlay is globally on, so "off" means nothing is loaded into any game.
 #[cfg(target_os = "linux")]
 pub fn sync_manifest(mode: InGameOverlayMode) {
-    let Some(dir) = manifest::layer_dir() else {
+    let dirs = manifest::layer_dirs();
+    if dirs.is_empty() {
         tracing::warn!("no data directory for the Vulkan layer manifest");
         return;
-    };
-    let result = match mode {
+    }
+    let lib = match mode {
         InGameOverlayMode::On => {
             let lib = library_path();
             if lib.is_none() {
                 tracing::warn!("the in-game overlay library was not found; no layer installed");
             }
-            manifest::refresh_in(&dir, lib.as_deref())
+            lib
         }
-        InGameOverlayMode::Off => manifest::uninstall_from(&dir),
+        InGameOverlayMode::Off => None,
     };
-    if let Err(e) = result {
-        tracing::warn!(error = %e, "updating the Vulkan layer manifest failed");
+    // Native and Flatpak Steam folders are independent: one failing must not skip the other.
+    for dir in dirs {
+        if let Err(e) = manifest::refresh_in(&dir, lib.as_deref()) {
+            tracing::warn!(error = %e, "updating the Vulkan layer manifest failed");
+        }
     }
 }
 
@@ -354,17 +433,26 @@ pub fn init(shared: Arc<Shared>, ingame: InGameOverlaySettings) -> Runtime {
     } else {
         None
     };
+    #[cfg(target_os = "windows")]
+    let window = windows_window::start(shared.clone());
     Runtime {
         shared,
         #[cfg(target_os = "linux")]
         _server: Mutex::new(server),
+        #[cfg(target_os = "windows")]
+        window,
     }
 }
 
-/// Applies changed settings: updates what the server answers and the installed manifest.
+/// Applies changed settings: updates what the server answers, the installed manifest and the
+/// overlay window.
 pub fn apply(runtime: &Runtime, settings: &Settings) {
     runtime.shared.set_settings(settings.ingame_overlay.clone());
     sync_manifest(settings.ingame_overlay.mode);
+    #[cfg(target_os = "windows")]
+    if let Some(window) = &runtime.window {
+        window.settings_changed();
+    }
 }
 
 /// Updates the overlay scene from an engine event. Talking changes update the set and rebuild;
@@ -376,6 +464,7 @@ pub fn on_engine_event(runtime: &Runtime, engine: &Engine, event: &mumcord_engin
         E::TalkStateChanged { session, talking } => {
             if shared.set_talking(*session, *talking) {
                 shared.rebuild(engine);
+                runtime.scene_changed();
             }
         }
         E::ServerSynced(_)
@@ -383,16 +472,20 @@ pub fn on_engine_event(runtime: &Runtime, engine: &Engine, event: &mumcord_engin
         | E::UserRemoved(_)
         | E::ChannelUpserted(_)
         | E::ChannelsUpserted(_)
-        | E::ChannelRemoved(_) => shared.rebuild(engine),
+        | E::ChannelRemoved(_) => {
+            shared.rebuild(engine);
+            runtime.scene_changed();
+        }
         E::StateChanged(mumcord_engine::ConnState::Disconnected { .. }) => {
             shared.clear_talking();
             shared.rebuild(engine);
+            runtime.scene_changed();
         }
         _ => {}
     }
 }
 
-#[cfg(any(target_os = "linux", test))]
+#[cfg(any(target_os = "linux", target_os = "windows", test))]
 fn to_wire_corner(corner: mumcord_engine::store::OverlayCorner) -> Corner {
     use mumcord_engine::store::OverlayCorner as C;
     match corner {
@@ -426,6 +519,20 @@ mod tests {
 
         std::fs::write(bin.join(LIBRARY_NAME), b"").expect("dev lib");
         assert_eq!(find_library(None, &bin), Some(bin.join(LIBRARY_NAME)));
+    }
+
+    #[cfg(target_os = "linux")]
+    #[cfg(target_os = "linux")]
+    #[test]
+    fn launch_option_quotes_paths_with_spaces() {
+        assert_eq!(
+            launch_option_for(std::path::Path::new("/a/b.so")),
+            "LD_PRELOAD=/a/b.so %command%"
+        );
+        assert_eq!(
+            launch_option_for(std::path::Path::new("/a b/c.so")),
+            "LD_PRELOAD=\"/a b/c.so\" %command%"
+        );
     }
 
     #[cfg(target_os = "linux")]

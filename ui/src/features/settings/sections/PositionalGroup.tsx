@@ -71,12 +71,12 @@ export function PositionalGroup({ settings, update }: SettingsSectionProps) {
         }}
       />
       <div className="settings-field-row">
-        <div className="settings-field">
+        <div className="settings-control-row">
           <label htmlFor={minId}>{t("positional.minDistance")}</label>
           <input
             id={minId}
             type="number"
-            className="settings-input"
+            className="settings-input settings-input--compact"
             min={0}
             max={MAX_DISTANCE}
             step="any"
@@ -88,12 +88,12 @@ export function PositionalGroup({ settings, update }: SettingsSectionProps) {
             }}
           />
         </div>
-        <div className="settings-field">
+        <div className="settings-control-row">
           <label htmlFor={maxId}>{t("positional.maxDistance")}</label>
           <input
             id={maxId}
             type="number"
-            className="settings-input"
+            className="settings-input settings-input--compact"
             min={1}
             max={MAX_DISTANCE}
             step="any"

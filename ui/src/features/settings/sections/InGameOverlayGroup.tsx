@@ -111,6 +111,51 @@ function GameRow({
   );
 }
 
+/** Linux launch option for native OpenGL games (FR-2.57): the Vulkan layer cannot hook those. */
+function OpenGlLaunchOption({ option }: { option: string }) {
+  const { t } = useTranslation("settings");
+  const id = useId();
+  const [copy, setCopy] = useState<"idle" | "done" | "failed">("idle");
+  const copyOption = () => {
+    navigator.clipboard.writeText(option).then(
+      () => {
+        setCopy("done");
+      },
+      (e: unknown) => {
+        console.error("Copying the launch option failed", e);
+        setCopy("failed");
+      },
+    );
+  };
+  return (
+    <div role="group" aria-labelledby={id}>
+      <p id={id}>
+        <strong>{t("overlay.inGame.opengl.title")}</strong>
+      </p>
+      <p className="settings-hint">{t("overlay.inGame.opengl.explanation")}</p>
+      <input
+        className="settings-input"
+        type="text"
+        readOnly
+        aria-label={t("overlay.inGame.opengl.label")}
+        value={option}
+        onFocus={(e) => {
+          e.currentTarget.select();
+        }}
+      />
+      <div className="settings-actions">
+        <button type="button" className="settings-button" onClick={copyOption}>
+          {t("overlay.inGame.opengl.copy")}
+        </button>
+      </div>
+      <p className="settings-hint" role="status">
+        {copy === "done" && t("overlay.inGame.opengl.copied")}
+        {copy === "failed" && t("overlay.inGame.opengl.copyFailed")}
+      </p>
+    </div>
+  );
+}
+
 /** In-game overlay (FR-1.46b): global Off/On plus per-game exceptions and the anti-cheat blocklist. */
 export function InGameOverlayGroup({ api }: { api: InGameOverlayApi }) {
   const { t } = useTranslation("settings");
@@ -166,6 +211,9 @@ export function InGameOverlayGroup({ api }: { api: InGameOverlayApi }) {
   }
 
   const modeOptions: InGameMode[] = ["off", "on"];
+  // The anti-cheat warning only where a blocklist applies (not on Windows, where the overlay is a
+  // separate window and never touches the game).
+  const hasBlocklist = state.games.some((game) => game.blocked !== null);
   return (
     <Group title={t("overlay.inGame.title")}>
       <p className="settings-hint">{t("overlay.inGame.explanation")}</p>
@@ -189,7 +237,15 @@ export function InGameOverlayGroup({ api }: { api: InGameOverlayApi }) {
           </button>
         ))}
       </div>
-      <p className="settings-hint">{t("overlay.inGame.antiCheat")}</p>
+      {state.explanationKey !== null && (
+        <p className="settings-hint" role="note">
+          {t(state.explanationKey)}
+        </p>
+      )}
+      {hasBlocklist && <p className="settings-hint">{t("overlay.inGame.antiCheat")}</p>}
+      {state.openglLaunchOption !== null && (
+        <OpenGlLaunchOption option={state.openglLaunchOption} />
+      )}
       {state.games.length === 0 ? (
         <p className="settings-hint">{t("overlay.inGame.noGames")}</p>
       ) : (
