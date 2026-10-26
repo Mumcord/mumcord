@@ -475,6 +475,30 @@ mod tests {
     }
 
     #[test]
+    fn diagnostic_file_lists_audio_devices() {
+        let dir = tempfile::tempdir().unwrap();
+        let mut info = DiagnosticInfo::new("1.2.3");
+        info.audio_devices = vec![
+            DiagAudioDevice {
+                name: "MacBook Pro Microphone".to_owned(),
+                is_input: true,
+                is_default: true,
+            },
+            DiagAudioDevice {
+                name: "MacBook Pro Speakers".to_owned(),
+                is_input: false,
+                is_default: false,
+            },
+        ];
+        let file = dir.path().join("diag.txt");
+        write_diagnostic(&file, &info, &[]).unwrap();
+        let text = std::fs::read_to_string(&file).unwrap();
+        assert!(text.contains("input:  MacBook Pro Microphone (default)"));
+        assert!(text.contains("output: MacBook Pro Speakers\n"));
+        assert!(!text.contains("(none)"));
+    }
+
+    #[test]
     fn level_filters_events() {
         let (_dir, shared) = capture(LogLevel::Warn, || {
             tracing::info!("quiet");

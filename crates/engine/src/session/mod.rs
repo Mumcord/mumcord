@@ -1139,22 +1139,29 @@ impl Engine {
     /// Devices and connection counters for the diagnostic file (no names or addresses
     /// beyond device names, which the diagnostics module documents).
     pub fn diagnostic_info(&self, app_version: &str) -> crate::diag::DiagnosticInfo {
+        use mumcord_audio::io::{AudioIo, Direction};
         let mut info = crate::diag::DiagnosticInfo::new(app_version);
-        let core = lock(&self.inner.core);
-        if let Some(audio) = &core.audio {
-            for (direction, is_input) in [
-                (mumcord_audio::io::Direction::Input, true),
-                (mumcord_audio::io::Direction::Output, false),
-            ] {
-                for d in audio.io().devices(direction).unwrap_or_default() {
-                    info.audio_devices.push(crate::diag::DiagAudioDevice {
-                        name: d.name,
-                        is_input,
-                        is_default: d.is_default,
-                    });
+        for (direction, is_input) in [(Direction::Input, true), (Direction::Output, false)] {
+            // Without a connection or mic test no audio runs; the list is still wanted then.
+            let running = lock(&self.inner.core)
+                .audio
+                .as_ref()
+                .map(|audio| audio.io().devices(direction));
+            let devices = running.unwrap_or_else(|| AudioIo::list_devices(direction));
+            match devices {
+                Ok(devices) => {
+                    info.audio_devices.extend(devices.into_iter().map(|d| {
+                        crate::diag::DiagAudioDevice {
+                            name: d.name,
+                            is_input,
+                            is_default: d.is_default,
+                        }
+                    }));
                 }
+                Err(e) => tracing::warn!(?direction, "listing audio devices failed: {e}"),
             }
         }
+        let core = lock(&self.inner.core);
         info.connection.reconnect_count = self.inner.reconnects.load(Ordering::Relaxed);
         let audio_server = core.audio_server;
         let crypt = audio_server

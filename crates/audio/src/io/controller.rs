@@ -84,6 +84,19 @@ impl AudioIo {
         Self::start_with(BackendKind::from_env()?, input, output)
     }
 
+    /// Lists devices on the backend chosen by [`BackendKind::from_env`] without opening any
+    /// stream, for callers that need the list while audio I/O is not running.
+    pub fn list_devices(direction: Direction) -> Result<Vec<DeviceInfo>, IoError> {
+        Self::list_devices_with(BackendKind::from_env()?, direction)
+    }
+
+    pub fn list_devices_with(
+        kind: BackendKind,
+        direction: Direction,
+    ) -> Result<Vec<DeviceInfo>, IoError> {
+        make_backend(kind).devices(direction)
+    }
+
     pub fn start_with(
         kind: BackendKind,
         input: Option<String>,
@@ -852,6 +865,13 @@ mod tests {
         if let Err(e) = backend.open_output(Some(&id), &counters) {
             panic!("opening the output failed: {e}");
         }
+    }
+
+    #[test]
+    fn lists_devices_without_starting() {
+        let devices =
+            AudioIo::list_devices_with(BackendKind::Null, Direction::Input).expect("devices");
+        assert_eq!(devices.len(), 1);
     }
 
     /// Lists this machine's real devices: `cargo test -p mumcord-audio -- --ignored --nocapture list_devices`.
