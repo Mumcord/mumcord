@@ -9,6 +9,27 @@ the local test servers in `testenv/`. Decision Q4.8; acceptance criteria in spec
     npm run e2e -- --spec e2e/specs/smoke/app.e2e.ts         # one spec (args go to `wdio run`)
     MUMCORD_E2E_SHARD=2 npm run e2e                          # one CI shard (see below)
 
+### Several shards in parallel
+
+Build once, then start one test run per shard, each with its own run id (`MUMCORD_E2E_RUN`, 1–9):
+
+    MUMCORD_E2E_STEP=build npm run e2e
+    for n in 1 2 3; do
+      MUMCORD_E2E_STEP=test MUMCORD_E2E_RUN=$n MUMCORD_E2E_SHARD=$n npm run e2e > e2e-run-$n.log 2>&1 &
+    done
+    wait
+
+Run n gets its own Xvfb display (`:99+n`), tauri-driver/WebKitWebDriver ports (`4444+2n`,
+`4445+2n`), overlay socket, home dir (`<cache>/home-<n>`: keyring, bot certificates), test server
+ports (`MUMCORD_PORT_BASE`, default `40000+1000n`) and compose project (`e2e-<n>`). Keep the port
+base in the 4xxxx range: the default 64738 plus the netsim offsets overflows above ~65400.
+
+`run.sh` locks `<cache>/run.lock` itself, so no `flock` around `npm run e2e` is needed: a build or
+a run without a run id (default servers and ports) takes the lock alone; runs with a run id share
+it, so a build (from another checkout, too) waits until they are done instead of replacing the
+binaries under them. A run id needs `MUMCORD_E2E_STEP=test`. 2–3 parallel runs work on a 16-core
+machine; more invite timing flakes in the voice and packet-loss specs.
+
 Requires only Docker (user in the `docker` group) and `npm ci` on the host. Everything else runs
 in the `mumcord-e2e` image, because Arch's webkit2gtk ships without `WebKitWebDriver`.
 
@@ -22,12 +43,12 @@ certificates) live in `~/.cache/mumcord-build/e2e/` (override with `MUMCORD_E2E_
 - `e2e/run.sh` (host): builds the image from `e2e/Dockerfile`, creates `testenv/.env` with a random
   SuperUser password if missing, and starts the container.
 - **Network:** the container uses `--network host`, so the app, bots and netsim reach the test servers
-  on `localhost:64738–64741` exactly like on the host. netsim always uses 64800 (proxy) and 64801
-  (control).
+  on `localhost:64738–64742` exactly like on the host. netsim uses 64800 (proxy) and 64801
+  (control); all of these move with `MUMCORD_PORT_BASE`.
 - **Test servers:** the host's Docker socket is mounted and the repo is mounted at its host path, so
   helpers call `testenv/up.sh` / `reset.sh` / `docker restart` from inside the container.
 - `e2e/container-run.sh` (inside): session D-Bus, unlocked gnome-keyring (Secret Service, which the
-  app uses for the identity and server passwords), Xvfb on `:99`, then builds the app
+  app uses for the identity and server passwords), Xvfb on `:99` (`:99+n` for run id n), then builds the app
   (`tauri build --debug --no-bundle --features test-backend`), `mumcord-bot`, `netsim`, the test
   game plugin (`crates/positional/examples/test_plugin.rs`) and `headless_check`, then runs
   `wdio run e2e/wdio.conf.ts`.

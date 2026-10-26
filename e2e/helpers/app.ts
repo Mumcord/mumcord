@@ -14,8 +14,11 @@ import { browser } from "@wdio/globals";
 import { bin } from "./paths.ts";
 import { run } from "./run.ts";
 
-/** tauri-driver listens here; it starts WebKitWebDriver on the next port. */
-export const driverPort = 4444;
+/**
+ * tauri-driver listens here; it starts WebKitWebDriver on the next port. Parallel runs
+ * (`MUMCORD_E2E_RUN`, e2e/run.sh) share the host network and need ports of their own.
+ */
+export const driverPort = 4444 + 2 * Number(process.env.MUMCORD_E2E_RUN ?? 0);
 
 export interface LaunchOptions {
   /**
@@ -75,7 +78,8 @@ async function waitPort(port: number, open: boolean): Promise<void> {
  */
 export async function startDriver(): Promise<void> {
   if (!profileDir) newProfile();
-  driver = spawn("tauri-driver", ["--port", String(driverPort)], {
+  const ports = ["--port", String(driverPort), "--native-port", String(driverPort + 1)];
+  driver = spawn("tauri-driver", ports, {
     stdio: ["ignore", "inherit", "inherit"],
     env: {
       ...process.env,

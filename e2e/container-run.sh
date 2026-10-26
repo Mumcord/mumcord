@@ -32,9 +32,12 @@ gnome-keyring-daemon --start --components=secrets >/dev/null
 # The in-game overlay listens on an abstract Unix socket, and abstract sockets live in the network
 # namespace the container shares with the host (--network host). A Mumcord running on the host for
 # the same uid holds the default name, so the app under test and the layer use a name of their own.
-export MUMCORD_OVERLAY_SOCKET="mumcord-overlay-e2e-$$"
+# Parallel runs (MUMCORD_E2E_RUN) share that namespace too, and every container has its own PIDs.
+run="${MUMCORD_E2E_RUN:-}"
+export MUMCORD_OVERLAY_SOCKET="mumcord-overlay-e2e-${run:-$$}"
 
-export DISPLAY=:99
+# The X socket is abstract as well, so parallel runs need a display of their own.
+export DISPLAY=":$((99 + ${run:-0}))"
 Xvfb "$DISPLAY" -screen 0 1600x1000x24 -nolisten tcp >/dev/null 2>&1 &
 xvfb_pid=$!
 trap 'kill "$xvfb_pid" 2>/dev/null || true' EXIT
