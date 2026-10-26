@@ -43,7 +43,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Install rpmbuild
-        run: sudo apt-get update -qq && sudo apt-get install -y -qq --no-install-recommends rpm
+        run: scripts/ci/apt-install.sh rpm
       - name: Build
         run: sh scripts/install-test/make-fake-release.sh release
       - uses: actions/upload-artifact@v4

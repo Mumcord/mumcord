@@ -69,9 +69,9 @@ jobs:
 
       - name: Install Linux system libraries
         if: runner.os == 'Linux'
+        timeout-minutes: 20
         run: |
-          sudo apt-get update
-          sudo apt-get install -y --no-install-recommends \
+          scripts/ci/apt-install.sh \
             libwebkit2gtk-4.1-dev libayatana-appindicator3-dev librsvg2-dev \
             libxdo-dev libasound2-dev libpipewire-0.3-dev libclang-dev pkg-config cmake patchelf xdg-utils
 
@@ -102,7 +102,7 @@ jobs:
         shell: bash
         run: |
           if [[ "$RUNNER_OS" == macOS ]]; then brew install nasm; fi
-          if [[ "$RUNNER_OS" == Linux ]]; then sudo apt-get install -y --no-install-recommends nasm; fi
+          if [[ "$RUNNER_OS" == Linux ]]; then scripts/ci/apt-install.sh nasm; fi
           scripts/build-libvpx.sh '${{ runner.temp }}/libvpx'
 
       # bindgen (crates/screenshare/build.rs) loads libclang: LLVM on the Windows runner, Xcode's
@@ -339,9 +339,9 @@ jobs:
 
       - name: Start test server (Linux, testenv v15)
         if: runner.os == 'Linux'
+        timeout-minutes: 30
         run: |
-          sudo apt-get update
-          sudo apt-get install -y --no-install-recommends \
+          scripts/ci/apt-install.sh \
             libasound2-dev cmake sqlite3 xvfb dbus-x11 gnome-keyring libsecret-tools \
             libwebkit2gtk-4.1-0 libpipewire-0.3-0t64
           # The AppImage must bring its own tray library (it is loaded at runtime, so a missing
