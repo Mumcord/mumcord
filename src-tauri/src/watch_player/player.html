@@ -1,0 +1,248 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Watch party player</title>
+    <style nonce="__NONCE__">
+      html,
+      body {
+        margin: 0;
+        height: 100%;
+        overflow: hidden;
+        background: #000;
+      }
+      iframe {
+        display: block;
+        width: 100%;
+        height: 100%;
+        border: 0;
+      }
+    </style>
+  </head>
+  <body>
+    <script nonce="__NONCE__">
+      "use strict";
+      // Bridge between the Mumcord window and an embedded player (FR-2.41a), served as
+      // `player.html` and `embed.html`. player.html (watch party): the app sends typed
+      // load/play/pause/seek/setVolume messages; the page drives YouTube's postMessage control protocol and
+      // answers with typed ready/state/time/ended/error messages. embed.html (chat card): the app
+      // sends one typed embed message with a YouTube or Twitch player URL and the page frames it;
+      // a YouTube player also reports its errors, so the app can show the missing-codec hint.
+      // Messages are only taken from the parent frame at an app origin and from the YouTube
+      // frame, and only sent back to the app origin that talked first.
+      (() => {
+        const APP_ORIGINS = __APP_ORIGINS__;
+        const YOUTUBE = "https://www.youtube-nocookie.com";
+        const TWITCH_PLAYERS = new Map([
+          ["https://player.twitch.tv", "/"],
+          ["https://clips.twitch.tv", "/embed"],
+        ]);
+        const EMBED = window.location.pathname.endsWith("/embed.html");
+        const VIDEO_ID = /^[A-Za-z0-9_-]{11}$/;
+        const ENDED = 0;
+        /** The player only starts reporting after it heard "listening"; repeat until it does. */
+        const LISTEN_INTERVAL_MS = 250;
+        /** Ducking fades (FR-2.76): a full swing takes this long down and back up, in steps. */
+        const FADE_DOWN_MS = 150;
+        const FADE_UP_MS = 300;
+        const FADE_STEP_MS = 30;
+        /** Volume reports this soon after our own change may still show the old value. */
+        const OWN_CHANGE_MS = 500;
+
+        let app = null;
+        let player = null;
+        let answered = false;
+        let listen = 0;
+        // setVolume is relative to the viewer's own player volume, known from its first report.
+        let userVolume = null;
+        let level = 1;
+        let applied = null;
+        let appliedAt = 0;
+        let fade = 0;
+
+        const toApp = (message) => {
+          if (app !== null) window.parent.postMessage(message, app);
+        };
+        const toPlayer = (message) => {
+          player?.contentWindow?.postMessage(JSON.stringify(message), YOUTUBE);
+        };
+        const command = (func, args = []) => {
+          toPlayer({ event: "command", func, args, id: 1, channel: "widget" });
+        };
+
+        const applyVolume = () => {
+          if (userVolume === null) return;
+          const volume = Math.round(userVolume * level);
+          if (volume === applied) return;
+          applied = volume;
+          appliedAt = performance.now();
+          command("setVolume", [volume]);
+        };
+
+        const fadeTo = (target) => {
+          window.clearInterval(fade);
+          const down = target < level;
+          const step = FADE_STEP_MS / (down ? FADE_DOWN_MS : FADE_UP_MS);
+          fade = window.setInterval(() => {
+            level = down ? Math.max(target, level - step) : Math.min(target, level + step);
+            applyVolume();
+            if (level === target) window.clearInterval(fade);
+          }, FADE_STEP_MS);
+        };
+
+        /** A volume the player reported: its first one, or one the viewer set themselves. */
+        const onVolume = (volume) => {
+          if (userVolume === null) {
+            userVolume = volume;
+            applied = volume;
+            applyVolume();
+          } else if (
+            volume !== applied &&
+            performance.now() - appliedAt > OWN_CHANGE_MS &&
+            level > 0
+          ) {
+            userVolume = Math.min(100, Math.round(volume / level));
+            applied = volume;
+          }
+        };
+
+        const frame = (src) => {
+          player?.remove();
+          player = document.createElement("iframe");
+          player.src = src.toString();
+          player.title = "YouTube";
+          player.allow = "autoplay; encrypted-media; fullscreen; picture-in-picture";
+          player.allowFullscreen = true;
+          player.referrerPolicy = "strict-origin-when-cross-origin";
+          player.setAttribute("sandbox", "allow-scripts allow-same-origin allow-presentation");
+          document.body.append(player);
+        };
+
+        /** Frames a YouTube player with its postMessage API on and listens to it. */
+        const frameYouTube = (src) => {
+          window.clearInterval(listen);
+          answered = false;
+          userVolume = null;
+          applied = null;
+          src.searchParams.set("enablejsapi", "1");
+          src.searchParams.set("origin", window.location.origin);
+          frame(src);
+          listen = window.setInterval(() => {
+            if (answered) window.clearInterval(listen);
+            else toPlayer({ event: "listening", id: 1, channel: "widget" });
+          }, LISTEN_INTERVAL_MS);
+        };
+
+        const load = (videoId) => {
+          const src = new URL(`/embed/${videoId}`, YOUTUBE);
+          src.searchParams.set("playsinline", "1");
+          src.searchParams.set("rel", "0");
+          frameYouTube(src);
+        };
+
+        /** A chat card's player URL as the engine builds it; Twitch gets this page as parent. */
+        const embedSrc = (text) => {
+          let url;
+          try {
+            url = new URL(text);
+          } catch {
+            return null;
+          }
+          if (url.origin === YOUTUBE) {
+            const id = /^\/embed\/([^/]+)$/.exec(url.pathname)?.[1] ?? "";
+            return VIDEO_ID.test(id) ? url : null;
+          }
+          if (TWITCH_PLAYERS.get(url.origin) !== url.pathname) return null;
+          // Twitch checks every frame above its player against the listed parents.
+          url.searchParams.delete("parent");
+          for (const host of new Set([window.location.hostname, new URL(app).hostname])) {
+            url.searchParams.append("parent", host);
+          }
+          return url;
+        };
+
+        const fromApp = (data) => {
+          if (typeof data !== "object" || data === null) return;
+          if (EMBED) {
+            const src =
+              data.type === "embed" && typeof data.url === "string" ? embedSrc(data.url) : null;
+            if (src?.origin === YOUTUBE) frameYouTube(src);
+            else if (src !== null) frame(src);
+            return;
+          }
+          if (data.type === "load" && typeof data.videoId === "string") {
+            if (VIDEO_ID.test(data.videoId)) load(data.videoId);
+          } else if (data.type === "play") {
+            command("playVideo");
+          } else if (data.type === "pause") {
+            command("pauseVideo");
+          } else if (
+            data.type === "seek" &&
+            typeof data.seconds === "number" &&
+            Number.isFinite(data.seconds) &&
+            data.seconds >= 0
+          ) {
+            command("seekTo", [data.seconds, true]);
+          } else if (
+            data.type === "setVolume" &&
+            typeof data.level === "number" &&
+            data.level >= 0 &&
+            data.level <= 1
+          ) {
+            fadeTo(data.level);
+          }
+        };
+
+        const reportState = (state) => {
+          toApp(state === ENDED ? { type: "ended" } : { type: "state", state });
+        };
+
+        const fromPlayer = (data) => {
+          if (typeof data !== "string" || data.length > 100000) return;
+          let message;
+          try {
+            message = JSON.parse(data);
+          } catch {
+            return;
+          }
+          if (typeof message !== "object" || message === null) return;
+          const { event, info } = message;
+          if (event === "onError") {
+            toApp({ type: "error", code: typeof info === "number" ? info : 0 });
+            return;
+          }
+          if (!answered) {
+            answered = true;
+            command("addEventListener", ["onStateChange"]);
+            toApp({ type: "ready" });
+          }
+          if (event === "onStateChange" && typeof info === "number") {
+            reportState(info);
+          } else if (event === "infoDelivery" && typeof info === "object" && info !== null) {
+            if (typeof info.playerState === "number") reportState(info.playerState);
+            if (typeof info.currentTime === "number" && Number.isFinite(info.currentTime)) {
+              toApp({ type: "time", seconds: info.currentTime });
+            }
+            if (typeof info.volume === "number" && info.volume >= 0 && info.volume <= 100) {
+              onVolume(info.volume);
+            }
+          }
+        };
+
+        window.addEventListener("message", (event) => {
+          if (event.source === window.parent && APP_ORIGINS.includes(event.origin)) {
+            if (app === null) app = event.origin;
+            if (event.origin === app) fromApp(event.data);
+          } else if (
+            player !== null &&
+            event.source === player.contentWindow &&
+            event.origin === YOUTUBE
+          ) {
+            fromPlayer(event.data);
+          }
+        });
+      })();
+    </script>
+  </body>
+</html>
