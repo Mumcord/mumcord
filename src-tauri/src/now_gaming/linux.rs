@@ -94,62 +94,61 @@ pub fn steam_app_name(id: u32) -> Option<String> {
 
 #[cfg(test)]
 mod tests {
-    use std::fs;
-    use std::process::{Child, Command};
-
-    use mumcord_engine::GameSource;
+    use mumcord_engine::now_gaming::detect::{self, Os, Process};
 
     use super::super::SystemSource;
 
-    struct Running(Child);
-
-    impl Drop for Running {
-        fn drop(&mut self) {
-            // Best effort: the processes end on their own after a minute anyway.
-            let _ = self.0.kill();
-            let _ = self.0.wait();
+    fn process(name: &str, args: &[&str]) -> Process {
+        Process {
+            name: name.to_owned(),
+            args: args.iter().map(|a| (*a).to_owned()).collect(),
         }
     }
 
-    /// Live check against this machine's `/proc`: a listed program, then a Steam launch wrapper,
-    /// both faked with harmless processes (the build directory, not `/tmp`, holds the copy).
+    /// `/proc` lists this very test process; nothing else on the machine is assumed.
     #[test]
-    fn finds_fake_games_in_proc() {
-        let dir = std::env::current_exe()
-            .expect("test binary")
-            .parent()
-            .expect("build directory")
-            .join("now-gaming-live");
-        fs::create_dir_all(&dir).expect("dir");
-        let fake = dir.join("factorio");
-        fs::copy("/bin/sleep", &fake).expect("copy sleep");
-        let mut source = SystemSource::default();
+    fn lists_own_process_from_proc() {
+        let me = std::env::current_exe().expect("test binary");
+        let exe = detect::exe_name(me.to_str().expect("utf-8 path")).to_owned();
+        let own_comm: String = exe.chars().take(15).collect();
+        assert!(
+            super::processes()
+                .iter()
+                .any(|p| p.name == exe || p.name == own_comm),
+            "own process not listed"
+        );
+    }
 
-        let listed = Running(Command::new(&fake).arg("60").spawn().expect("spawn"));
-        std::thread::sleep(std::time::Duration::from_millis(200));
-        let game = source.detect().expect("listed program found");
+    /// A listed program is found by its name (picked directly: the Steam fallback reads the
+    /// real `registry.vdf`).
+    #[test]
+    fn finds_listed_program() {
+        let processes = [process("factorio", &["/opt/factorio/bin/x64/factorio"])];
+        let game = detect::pick(
+            detect::catalog(),
+            Os::CURRENT.expect("linux"),
+            &processes,
+            None,
+        )
+        .expect("listed program found");
         assert_eq!(game.name, "Factorio");
         assert_eq!(game.steam_app_id, Some(427_520));
+    }
 
-        let _steam = Running(
-            Command::new("sh")
-                .args([
-                    "-c",
-                    // `; true` keeps the shell from exec-ing `sleep`, so its arguments stay visible.
-                    "sleep 60; true",
-                    "reaper",
-                    "SteamLaunch",
-                    "AppId=227300",
-                    "--",
-                    "eurotrucks2",
-                ])
-                .spawn()
-                .expect("spawn"),
-        );
-        std::thread::sleep(std::time::Duration::from_millis(200));
-        let game = source.detect().expect("steam game found");
+    /// Steam's launch wrapper wins over a listed program and needs no Steam files.
+    #[test]
+    fn finds_steam_launch_wrapper() {
+        let processes = [
+            process("factorio", &["factorio"]),
+            process(
+                "reaper",
+                &["reaper", "SteamLaunch", "AppId=227300", "--", "eurotrucks2"],
+            ),
+        ];
+        let game = SystemSource::default()
+            .detect_in(&processes)
+            .expect("steam game found");
         assert_eq!(game.name, "Euro Truck Simulator 2");
         assert_eq!(game.steam_app_id, Some(227_300));
-        drop(listed);
     }
 }

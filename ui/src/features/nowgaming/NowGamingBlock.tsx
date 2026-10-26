@@ -7,6 +7,7 @@
 import { useEffect, useState, type KeyboardEvent } from "react";
 import { useTranslation } from "react-i18next";
 import { getApi, type NowGaming } from "../../api";
+import { shownServerId } from "../channels";
 import { ConfirmDialog } from "../servers/ConfirmDialog";
 import "./nowGaming.css";
 import { GAMEPAD_PATH, playedAt, playedParts, type LiveGame } from "./playTime";
@@ -18,34 +19,44 @@ export const PLAYED_TICK_MS = 30_000;
 /** The block for `session`, or nothing while the person shares no game. */
 export function NowGamingFor({
   session,
+  serverId,
   compact = false,
   joinable = false,
 }: {
   session: number;
+  serverId?: number | undefined;
   compact?: boolean;
   /** Offer "Join game" (not for the own game, not in hover previews). */
   joinable?: boolean;
 }) {
-  const live = useNowGaming(session);
+  const live = useNowGaming(session, serverId);
   return live ? (
-    <NowGamingBlock session={session} live={live} compact={compact} joinable={joinable} />
+    <NowGamingBlock
+      session={session}
+      serverId={serverId}
+      live={live}
+      compact={compact}
+      joinable={joinable}
+    />
   ) : null;
 }
 
 export function NowGamingBlock({
   session,
+  serverId,
   live,
   compact = false,
   joinable = false,
 }: {
   session: number;
+  serverId?: number | undefined;
   live: LiveGame;
   compact?: boolean;
   joinable?: boolean;
 }) {
   const { t } = useTranslation("members");
   const { game } = live;
-  const icon = useIcon(session, game);
+  const icon = useIcon(session, game, serverId);
   const now = useClock();
   const { hours, minutes } = playedParts(playedAt(live, now));
   const time =
@@ -78,19 +89,29 @@ export function NowGamingBlock({
         <p className="now-gaming__name">{game.name}</p>
         <p className="now-gaming__time">{t("nowGaming.playedFor", { time })}</p>
       </div>
-      {joinable && game.canJoin && <JoinButton session={session} name={game.name} />}
+      {joinable && game.canJoin && (
+        <JoinButton session={session} serverId={serverId} name={game.name} />
+      )}
     </section>
   );
 }
 
-function JoinButton({ session, name }: { session: number; name: string }) {
+function JoinButton({
+  session,
+  serverId,
+  name,
+}: {
+  session: number;
+  serverId?: number | undefined;
+  name: string;
+}) {
   const { t } = useTranslation("members");
   const [confirming, setConfirming] = useState(false);
   const [failed, setFailed] = useState(false);
   const join = () => {
     setConfirming(false);
     getApi()
-      .nowGamingJoin(session)
+      .nowGamingJoin(serverId ?? shownServerId(), session)
       .then(
         () => {
           setFailed(false);
@@ -154,7 +175,7 @@ function useClock(): number {
 }
 
 /** The game icon as a `data:` URL from the engine; reloaded when the game changes. */
-function useIcon(session: number, game: NowGaming): string | null {
+function useIcon(session: number, game: NowGaming, serverId?: number): string | null {
   const { hasIcon, name } = game;
   const key = `${String(session)}\n${name}`;
   const [loaded, setLoaded] = useState<{ key: string; icon: string | null } | null>(null);
@@ -162,7 +183,7 @@ function useIcon(session: number, game: NowGaming): string | null {
     if (!hasIcon) return;
     let active = true;
     getApi()
-      .nowGamingIcon(session)
+      .nowGamingIcon(serverId ?? shownServerId(), session)
       .then(
         (icon) => {
           if (active) setLoaded({ key, icon });
@@ -174,6 +195,6 @@ function useIcon(session: number, game: NowGaming): string | null {
     return () => {
       active = false;
     };
-  }, [session, hasIcon, key]);
+  }, [session, serverId, hasIcon, key]);
   return hasIcon && loaded?.key === key ? loaded.icon : null;
 }

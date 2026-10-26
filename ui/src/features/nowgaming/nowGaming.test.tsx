@@ -28,7 +28,7 @@ afterEach(() => {
 
 function share(game: NowGaming | null, session = ANNA) {
   act(() => {
-    api.mock.emit("nowGamingChanged", { session, game });
+    api.mock.emit("nowGamingChanged", { serverId: 1, session, game });
   });
 }
 
@@ -54,14 +54,14 @@ describe("controller icon", () => {
     expect(treeRow().querySelector('[data-icon="gamepad"]')).toBeNull();
     share(factorio);
     const icon = within(treeRow()).getByRole("img", { name: "Playing Factorio" });
-    expect(icon).toHaveAttribute("title", "Playing Factorio");
+    expect(icon).toHaveAttribute("data-tooltip", "Playing Factorio");
     share(null);
     expect(treeRow().querySelector('[data-icon="gamepad"]')).toBeNull();
   });
 
   it("goes away when the server resyncs", async () => {
     share(factorio);
-    const snapshot = await api.sessionSnapshot();
+    const snapshot = await api.sessionSnapshot(1);
     if (!snapshot) throw new Error("not connected");
     act(() => {
       api.mock.emit("serverSynced", { snapshot });
@@ -71,7 +71,7 @@ describe("controller icon", () => {
 });
 
 async function self(): Promise<{ session: number; name: string }> {
-  const snapshot = await api.sessionSnapshot();
+  const snapshot = await api.sessionSnapshot(1);
   const own = snapshot?.users.find((u) => u.session === snapshot.selfSession);
   if (!own) throw new Error("not connected");
   return { session: own.session, name: own.name };
@@ -94,7 +94,7 @@ describe("profile block", () => {
     const block = await screen.findByRole("region", { name: "Now gaming" });
     expect(within(block).getByText("Factorio")).toBeInTheDocument();
     expect(within(block).getByText("for 1 h 20 min")).toBeInTheDocument();
-    expect(icon).toHaveBeenCalledWith(ANNA);
+    expect(icon).toHaveBeenCalledWith(1, ANNA);
     await vi.waitFor(() => {
       expect(block.querySelector("img")).toHaveAttribute("src", "data:image/jpeg;base64,AAAA");
     });
@@ -126,7 +126,7 @@ describe("profile block", () => {
     expect(within(confirm).getByText(/plays Factorio on/)).toBeInTheDocument();
     expect(join).not.toHaveBeenCalled();
     fireEvent.click(within(confirm).getByRole("button", { name: "Open Steam" }));
-    expect(join).toHaveBeenCalledWith(ANNA);
+    expect(join).toHaveBeenCalledWith(1, ANNA);
     await waitFor(() => {
       expect(screen.queryByRole("dialog", { name: "Join game?" })).toBeNull();
     });
