@@ -78,6 +78,8 @@
   },
   "errors": {
     "serverUnreachable": "Servern kan inte nås. Kontrollera adress och port, och att du är online.",
+    "localNetwork": "Servern kan inte nås. Om den finns på ditt lokala nätverk, tillåt Mumcord under Systeminställningar → Integritet och säkerhet → Lokalt nätverk och försök igen.",
+    "serverTooOld": "Servern accepterar inte den här versionen av Mumcord. Sök efter en uppdatering av Mumcord eller fråga serverns ägare.",
     "wrongPassword": "Serverlösenordet är fel. Redigera servern och ange rätt lösenord.",
     "nameInUse": "Ditt namn används redan eller är registrerat av någon annan på den här servern. Redigera servern och välj ett annat namn.",
     "certificateRejected": "Certifikatkontrollen misslyckades: antingen litades inte på serverns certifikat, eller så godtog servern inte din identitet. Försök igen eller fråga serverns ägare.",

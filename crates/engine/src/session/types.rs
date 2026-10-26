@@ -10,6 +10,9 @@ use mumcord_store::ServerId;
 pub enum ErrorKind {
     NotConnected,
     ServerUnreachable,
+    /// macOS reported no route to the server. Since macOS 15 that is also how a missing Local
+    /// Network permission shows up, so the user is pointed to that setting.
+    LocalNetworkBlocked,
     WrongPassword,
     NameInUse,
     CertificateRejected,

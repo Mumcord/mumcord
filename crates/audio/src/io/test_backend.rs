@@ -4,7 +4,7 @@
 
 use std::path::{Path, PathBuf};
 use std::sync::Arc;
-use std::sync::atomic::{AtomicBool, Ordering};
+use std::sync::atomic::{AtomicBool, AtomicUsize, Ordering};
 use std::thread::JoinHandle;
 use std::time::{Duration, Instant};
 
@@ -18,6 +18,14 @@ use crate::SAMPLE_RATE;
 const TICK: Duration = Duration::from_millis(10);
 /// Refresh the WAV header once per second so a killed process leaves a valid file.
 const FLUSH_EVERY_TICKS: u32 = 100;
+
+static INPUT_OPENS: AtomicUsize = AtomicUsize::new(0);
+
+/// How many input streams the test backend opened in this process, for tests that check the
+/// microphone (and with it the OS permission prompt) is opened only once.
+pub fn input_opens() -> usize {
+    INPUT_OPENS.load(Ordering::Relaxed)
+}
 
 pub(crate) enum TestBackend {
     Null,
@@ -62,6 +70,7 @@ impl Backend for TestBackend {
         _id: Option<&str>,
         counters: &Arc<Counters>,
     ) -> Result<Opened<Consumer<f32>>, IoError> {
+        INPUT_OPENS.fetch_add(1, Ordering::Relaxed);
         // The WAV is streamed from the capture thread instead of being decoded here: a long
         // input file (E2E runs use minutes of silence) would otherwise hold up the control
         // thread for seconds and with it the output stream, which opens right after this one.

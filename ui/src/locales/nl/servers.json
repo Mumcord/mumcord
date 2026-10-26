@@ -78,6 +78,8 @@
   },
   "errors": {
     "serverUnreachable": "De server is niet bereikbaar. Controleer het adres en de poort, en of je online bent.",
+    "localNetwork": "De server is niet bereikbaar. Staat hij in je lokale netwerk, geef Mumcord dan toestemming onder Systeeminstellingen → Privacy en beveiliging → Lokaal netwerk en probeer het opnieuw.",
+    "serverTooOld": "De server accepteert deze versie van Mumcord niet. Kijk of er een Mumcord-update is, of vraag het de beheerder van de server.",
     "wrongPassword": "Het serverwachtwoord is onjuist. Bewerk de server en voer het juiste wachtwoord in.",
     "nameInUse": "Je naam is al in gebruik of op deze server geregistreerd door iemand anders. Bewerk de server en kies een andere naam.",
     "certificateRejected": "De certificaatcontrole is mislukt: het certificaat van de server werd niet vertrouwd, of de server accepteerde je identiteit niet. Probeer het opnieuw of vraag de servereigenaar.",

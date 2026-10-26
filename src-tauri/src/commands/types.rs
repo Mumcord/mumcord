@@ -26,6 +26,9 @@ pub enum ErrorCode {
     NotConnected,
     /// The server could not be reached (DNS, refused, timeout).
     ServerUnreachable,
+    /// macOS found no route to the server, which is how a missing Local Network permission
+    /// shows up; the UI points the user to that setting.
+    LocalNetworkBlocked,
     /// The server rejected the server password.
     WrongPassword,
     /// The username is already in use or registered to someone else.
@@ -95,6 +98,7 @@ impl From<EngineError> for ApiError {
         let code = match err.kind {
             ErrorKind::NotConnected => ErrorCode::NotConnected,
             ErrorKind::ServerUnreachable => ErrorCode::ServerUnreachable,
+            ErrorKind::LocalNetworkBlocked => ErrorCode::LocalNetworkBlocked,
             ErrorKind::WrongPassword => ErrorCode::WrongPassword,
             ErrorKind::NameInUse => ErrorCode::NameInUse,
             ErrorKind::CertificateRejected => ErrorCode::CertificateRejected,

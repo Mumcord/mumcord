@@ -78,6 +78,8 @@
   },
   "errors": {
     "serverUnreachable": "Palvelimeen ei saada yhteyttä. Tarkista osoite ja portti sekä se, että olet verkossa.",
+    "localNetwork": "Palvelimeen ei saada yhteyttä. Jos se on lähiverkossasi, salli Mumcord kohdassa Järjestelmäasetukset → Tietosuoja ja turvallisuus → Paikallisverkko ja yritä uudelleen.",
+    "serverTooOld": "Palvelin ei hyväksy tätä Mumcordin versiota. Tarkista, onko Mumcordiin päivitystä, tai kysy palvelimen ylläpitäjältä.",
     "wrongPassword": "Palvelimen salasana on väärä. Muokkaa palvelinta ja anna oikea salasana.",
     "nameInUse": "Nimesi on jo käytössä tai rekisteröity jollekulle toiselle tällä palvelimella. Muokkaa palvelinta ja valitse toinen nimi.",
     "certificateRejected": "Varmenteen tarkistus epäonnistui: joko palvelimen varmenteeseen ei luotettu tai palvelin ei hyväksynyt identiteettiäsi. Yritä uudelleen tai kysy palvelimen ylläpitäjältä.",

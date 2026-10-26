@@ -19,7 +19,9 @@ use mumcord_audio::codec::{
     MAX_PACKET_BYTES, MAX_VOICE_PAYLOAD_BYTES, OpusEncoder, PacketDuration,
 };
 use mumcord_audio::dsp::{DspChain, DspControls, EchoRefConsumer, Gate, MicTest, echo_reference};
-use mumcord_audio::io::{AudioIo, DeviceEvent, DeviceInfo, Direction, FrameSink, FrameSource};
+use mumcord_audio::io::{
+    AudioIo, DeviceEvent, DeviceInfo, Direction, FrameSink, FrameSource, IoError,
+};
 use mumcord_audio::mixer::share::ShareGain;
 use mumcord_audio::mixer::{PacketSender, Playback, PlaybackConfig, PlaybackSink};
 use mumcord_audio::{FRAME_SAMPLES, Frame, SAMPLE_RATE};
@@ -169,8 +171,19 @@ impl Audio {
 }
 
 fn device_list(io: &AudioIo) -> EngineResult<AudioDeviceList> {
+    device_list_with(|direction| io.devices(direction))
+}
+
+/// The device list while no audio runs, without opening any stream.
+pub fn idle_device_list() -> EngineResult<AudioDeviceList> {
+    device_list_with(AudioIo::list_devices)
+}
+
+fn device_list_with(
+    devices: impl Fn(Direction) -> Result<Vec<DeviceInfo>, IoError>,
+) -> EngineResult<AudioDeviceList> {
     let list = |direction| {
-        io.devices(direction)
+        devices(direction)
             .map(|devices| devices.into_iter().map(device_view).collect())
             .map_err(|e| EngineError::internal(format!("audio devices: {e}")))
     };

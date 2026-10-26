@@ -78,6 +78,8 @@
   },
   "errors": {
     "serverUnreachable": "Ní féidir an freastalaí a shroicheadh. Seiceáil an seoladh agus an port, agus go bhfuil tú ar líne.",
+    "localNetwork": "Ní féidir an freastalaí a shroicheadh. Má tá sé ar do líonra áitiúil, ceadaigh Mumcord faoi Socruithe an Chórais → Príobháideacht agus Slándáil → Líonra Áitiúil, ansin bain triail eile as.",
+    "serverTooOld": "Ní ghlacann an freastalaí leis an leagan seo de Mumcord. Seiceáil an bhfuil nuashonrú ar Mumcord, nó fiafraigh d’úinéir an fhreastalaí.",
     "wrongPassword": "Tá pasfhocal an fhreastalaí mícheart. Cuir an freastalaí in eagar agus cuir isteach an pasfhocal ceart.",
     "nameInUse": "Tá d'ainm in úsáid cheana nó cláraithe do dhuine eile ar an bhfreastalaí seo. Cuir an freastalaí in eagar agus roghnaigh ainm eile.",
     "certificateRejected": "Theip ar sheiceáil an teastais: níor iontaoibh teastas an fhreastalaí, nó níor ghlac an freastalaí le d'aitheantas. Bain triail eile as, nó fiafraigh d'úinéir an fhreastalaí.",

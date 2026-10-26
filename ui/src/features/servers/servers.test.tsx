@@ -661,6 +661,28 @@ describe("certificate trust", () => {
       expect(status()).toHaveTextContent("Couldn't connect to Local test server.");
     });
   });
+
+  it("keeps one server's trust question when another server's connection ends", async () => {
+    setup();
+    const other = await addServer("Other", "other.example.org");
+    await renderAll();
+    act(() => {
+      api.mock.emit("certTrustRequired", {
+        serverId: other.id,
+        fingerprint: "CC:DD",
+        previousFingerprint: null,
+      });
+      api.mock.emit("connectionStateChanged", {
+        serverId: 1,
+        state: { state: "connecting", serverId: 1 },
+      });
+      api.mock.emit("connectionStateChanged", {
+        serverId: 1,
+        state: { state: "disconnected", error: { code: "wrongPassword", message: "" } },
+      });
+    });
+    expect(screen.getByRole("dialog", { name: "Trust this server?" })).toHaveTextContent("CC:DD");
+  });
 });
 
 describe("ConnectionStatus", () => {

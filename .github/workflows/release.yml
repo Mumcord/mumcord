@@ -118,10 +118,10 @@ jobs:
             windows_note="Windows is **not signed** yet. On first start, SmartScreen shows \"Windows protected your PC\": choose **More info → Run anyway**."
           fi
           if [[ -f MACOS-SIGNED ]]; then
-            macos_note="macOS: the app is signed and notarized by Apple and opens normally."
+            macos_note="macOS: the app is signed and notarized by Apple and opens normally. Microphone and keychain access are asked once and remembered across updates."
           else
             callout=WARNING
-            macos_note="macOS Gatekeeper says the app \"cannot be opened\": open **System Settings → Privacy & Security** and choose **Open Anyway** (or right-click the app and choose **Open**)."
+            macos_note="macOS is **not notarized** yet. Gatekeeper says Apple could not verify the app: open **System Settings → Privacy & Security** and choose **Open Anyway**. After each update macOS asks once more for microphone and keychain access; choose **Always Allow** for the keychain."
           fi
           cat > ../notes.md <<EOF
           ## Downloads

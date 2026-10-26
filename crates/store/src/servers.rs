@@ -309,8 +309,7 @@ impl Store {
     pub fn remove_server(&self, id: ServerId, secrets: &SecretStore) -> Result<()> {
         // Secrets first: if secure storage fails, the server stays and the user can retry
         // instead of leaving an orphaned secret behind.
-        secrets.delete_server_password(id)?;
-        secrets.set_access_tokens(id, &[])?;
+        secrets.delete_server_secrets(id)?;
         let changed = self
             .conn
             .execute("DELETE FROM saved_server WHERE id = ?1", [id])?;

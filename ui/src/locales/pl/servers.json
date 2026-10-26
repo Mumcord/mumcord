@@ -78,6 +78,8 @@
   },
   "errors": {
     "serverUnreachable": "Nie można połączyć się z serwerem. Sprawdź adres i port oraz czy masz dostęp do internetu.",
+    "localNetwork": "Nie można połączyć się z serwerem. Jeśli jest w Twojej sieci lokalnej, zezwól Mumcord w Ustawienia systemowe → Prywatność i bezpieczeństwo → Sieć lokalna i spróbuj ponownie.",
+    "serverTooOld": "Serwer nie akceptuje tej wersji Mumcord. Sprawdź, czy jest aktualizacja Mumcord, lub zapytaj właściciela serwera.",
     "wrongPassword": "Hasło serwera jest nieprawidłowe. Edytuj serwer i wpisz właściwe hasło.",
     "nameInUse": "Twoja nazwa jest już używana lub zarejestrowana przez kogoś innego na tym serwerze. Edytuj serwer i wybierz inną nazwę.",
     "certificateRejected": "Weryfikacja certyfikatu nie powiodła się: certyfikat serwera nie został zaufany albo serwer nie zaakceptował Twojej tożsamości. Spróbuj ponownie lub zapytaj właściciela serwera.",

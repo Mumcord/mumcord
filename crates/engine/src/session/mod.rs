@@ -197,6 +197,9 @@ struct Inner {
     data_dir: PathBuf,
     store: Arc<Mutex<Store>>,
     secrets: Arc<SecretStore>,
+    /// Held while the audio devices start, so concurrent first uses open the microphone once
+    /// (every open can show the OS microphone prompt).
+    audio_start: tokio::sync::Mutex<()>,
     /// `None` until loaded from secure storage; then `Some(None)` before the wizard ran.
     identity: Mutex<Option<Option<Identity>>>,
     events: Events,
@@ -334,7 +337,8 @@ enum AttemptError {
         fingerprint: String,
         previous: Option<String>,
     },
-    Failure(Failure),
+    /// `reason` is the log-safe cause from [`convert::failure_reason`] or the error kind.
+    Failure { failure: Failure, reason: String },
 }
 
 /// How a synced connection came about.
@@ -417,6 +421,7 @@ impl Engine {
             data_dir: data_dir.to_path_buf(),
             store,
             secrets: Arc::new(secrets),
+            audio_start: tokio::sync::Mutex::new(()),
             identity: Mutex::new(None),
             events,
             controls,
@@ -1077,8 +1082,9 @@ impl Engine {
         Some(self.inner.voice.bitrate_max_bps.load(Ordering::Relaxed)).filter(|&b| b > 0)
     }
 
-    /// Lists devices. Without a connection or mic test the devices are opened only for the
-    /// listing and closed again.
+    /// Lists devices. Without a connection or mic test no stream is opened for it: opening the
+    /// microphone just to list it made macOS ask for microphone access on every device-picker
+    /// screen.
     pub async fn audio_devices(&self) -> EngineResult<AudioDeviceList> {
         let inner = self.inner.clone();
         self.inner
@@ -1090,13 +1096,7 @@ impl Engine {
                         return audio.devices();
                     }
                 }
-                let settings = lock(&inner.store).settings().map_err(store_error)?;
-                let audio = Audio::start(
-                    settings.input_device,
-                    settings.output_device,
-                    inner.events.clone(),
-                )?;
-                audio.devices()
+                voice::idle_device_list()
             })
             .await
             .map_err(|e| EngineError::internal(e.to_string()))?
@@ -1138,22 +1138,29 @@ impl Engine {
     /// Devices and connection counters for the diagnostic file (no names or addresses
     /// beyond device names, which the diagnostics module documents).
     pub fn diagnostic_info(&self, app_version: &str) -> crate::diag::DiagnosticInfo {
+        use mumcord_audio::io::{AudioIo, Direction};
         let mut info = crate::diag::DiagnosticInfo::new(app_version);
-        let core = lock(&self.inner.core);
-        if let Some(audio) = &core.audio {
-            for (direction, is_input) in [
-                (mumcord_audio::io::Direction::Input, true),
-                (mumcord_audio::io::Direction::Output, false),
-            ] {
-                for d in audio.io().devices(direction).unwrap_or_default() {
-                    info.audio_devices.push(crate::diag::DiagAudioDevice {
-                        name: d.name,
-                        is_input,
-                        is_default: d.is_default,
-                    });
+        for (direction, is_input) in [(Direction::Input, true), (Direction::Output, false)] {
+            // Without a connection or mic test no audio runs; the list is still wanted then.
+            let running = lock(&self.inner.core)
+                .audio
+                .as_ref()
+                .map(|audio| audio.io().devices(direction));
+            let devices = running.unwrap_or_else(|| AudioIo::list_devices(direction));
+            match devices {
+                Ok(devices) => {
+                    info.audio_devices.extend(devices.into_iter().map(|d| {
+                        crate::diag::DiagAudioDevice {
+                            name: d.name,
+                            is_input,
+                            is_default: d.is_default,
+                        }
+                    }));
                 }
+                Err(e) => tracing::warn!(?direction, "listing audio devices failed: {e}"),
             }
         }
+        let core = lock(&self.inner.core);
         info.connection.reconnect_count = self.inner.reconnects.load(Ordering::Relaxed);
         let audio_server = core.audio_server;
         let crypt = audio_server
@@ -1546,8 +1553,8 @@ impl Inner {
                     }
                     return;
                 }
-                Err(AttemptError::Failure(failure)) => {
-                    tracing::info!(server_id, "connection attempt failed");
+                Err(AttemptError::Failure { failure, reason }) => {
+                    tracing::info!(server_id, %reason, "connection attempt failed");
                     self.step(server_id, generation, |m| m.failed(failure))
                 }
             };
@@ -1567,7 +1574,10 @@ impl Inner {
         &self,
         server_id: ServerId,
     ) -> Result<(Connection, String, u16), AttemptError> {
-        let fatal = |e: EngineError| AttemptError::Failure(Failure::Fatal(e));
+        let fatal = |e: EngineError| AttemptError::Failure {
+            reason: format!("{:?}", e.kind),
+            failure: Failure::Fatal(e),
+        };
         let (server, trusted) = {
             let store = lock(&self.store);
             let server = store
@@ -1654,7 +1664,10 @@ impl Inner {
                     ))),
                 }
             }
-            Err(e) => Err(AttemptError::Failure(convert::connect_failure(&e))),
+            Err(e) => Err(AttemptError::Failure {
+                failure: convert::connect_failure(&e),
+                reason: convert::failure_reason(&e),
+            }),
         }
     }
 
@@ -2453,6 +2466,7 @@ impl Inner {
 
     /// Starts the audio devices on first use.
     async fn ensure_audio(self: &Arc<Self>) -> EngineResult<()> {
+        let _starting = self.audio_start.lock().await;
         if lock(&self.core).audio.is_some() {
             return Ok(());
         }

@@ -43,8 +43,9 @@ describe("AC-1.3 wizard microphone step", () => {
     expect(Number(await meter.getAttribute("aria-valuenow"))).toBe(0);
 
     // Speaker output written so far (bytes after the 44-byte header); playback must come after.
+    // The audio devices open only when Test is pressed, so the file may not exist yet.
     await browser.pause(1500);
-    const before = Math.max(0, (statSync(outWav).size - 44) / 2);
+    const before = existsSync(outWav) ? Math.max(0, (statSync(outWav).size - 44) / 2) : 0;
 
     await button("Test").click();
     await waitForText("Speak now…", 5_000);

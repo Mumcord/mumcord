@@ -2,6 +2,7 @@
 //! command API.
 
 use std::collections::VecDeque;
+use std::net::SocketAddr;
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::{Arc, Mutex, MutexGuard};
 use std::time::{Duration, Instant};
@@ -294,7 +295,18 @@ async fn connect_inner(
     let server_name = ServerName::try_from(config.host.clone())
         .map_err(|_| ConnectError::InvalidAddress(config.host.clone()))?;
     let (tls_config, seen_cert) = tls::client_config(config.identity, config.verify_cert)?;
-    let tcp = TcpStream::connect((config.host.as_str(), config.port)).await?;
+    // Resolved separately so a lookup failure can be told apart from an unreachable host.
+    let addrs: Vec<SocketAddr> = tokio::net::lookup_host((config.host.as_str(), config.port))
+        .await
+        .map_err(ConnectError::Resolve)?
+        .collect();
+    if addrs.is_empty() {
+        return Err(ConnectError::Resolve(std::io::Error::new(
+            std::io::ErrorKind::NotFound,
+            "no addresses found",
+        )));
+    }
+    let tcp = TcpStream::connect(addrs.as_slice()).await?;
     // Small control messages (and tunnelled voice) must not wait for Nagle.
     tcp.set_nodelay(true)?;
     let mut stream = match TlsConnector::from(tls_config)

@@ -78,6 +78,8 @@
   },
   "errors": {
     "serverUnreachable": "A szerver nem érhető el. Ellenőrizd a címet, a portot és az internetkapcsolatodat.",
+    "localNetwork": "A szerver nem érhető el. Ha a helyi hálózatodon van, engedélyezd a Mumcordot itt: Rendszerbeállítások → Adatvédelem és biztonság → Helyi hálózat, majd próbáld újra.",
+    "serverTooOld": "A szerver nem fogadja el a Mumcord ezen verzióját. Nézd meg, van-e Mumcord-frissítés, vagy kérdezd meg a szerver üzemeltetőjét.",
     "wrongPassword": "Hibás a szerverjelszó. Szerkeszd a szervert, és add meg a helyes jelszót.",
     "nameInUse": "A neved ezen a szerveren már használatban van, vagy más regisztrálta. Szerkeszd a szervert, és válassz másik nevet.",
     "certificateRejected": "A tanúsítvány-ellenőrzés sikertelen: vagy a szerver tanúsítványa nem volt megbízható, vagy a szerver nem fogadta el az identitásodat. Próbáld újra, vagy kérdezd meg a szerver tulajdonosát.",

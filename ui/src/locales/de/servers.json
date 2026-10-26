@@ -78,6 +78,8 @@
   },
   "errors": {
     "serverUnreachable": "Der Server ist nicht erreichbar. Prüfe Adresse und Port und ob du online bist.",
+    "localNetwork": "Der Server ist nicht erreichbar. Wenn er in deinem lokalen Netzwerk ist, erlaube Mumcord unter Systemeinstellungen → Datenschutz & Sicherheit → Lokales Netzwerk und versuche es erneut.",
+    "serverTooOld": "Der Server akzeptiert diese Mumcord-Version nicht. Prüfe, ob es ein Mumcord-Update gibt, oder frage den Serverbetreiber.",
     "wrongPassword": "Das Serverpasswort ist falsch. Bearbeite den Server und gib das richtige Passwort ein.",
     "nameInUse": "Dein Name ist auf diesem Server schon vergeben oder für jemand anderen registriert. Bearbeite den Server und wähle einen anderen Namen.",
     "certificateRejected": "Die Zertifikatsprüfung ist fehlgeschlagen: Entweder wurde dem Serverzertifikat nicht vertraut, oder der Server hat deine Identität nicht akzeptiert. Versuche es erneut oder frage den Serverbetreiber.",

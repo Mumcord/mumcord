@@ -90,10 +90,15 @@ impl Backend for CpalBackend {
             Direction::Input => self.host.input_devices().map_err(backend_err)?.collect(),
             Direction::Output => self.host.output_devices().map_err(backend_err)?.collect(),
         };
+        // One device that cannot be described must not hide all the others.
         let infos = devices
             .iter()
-            .map(|d| self.info(direction, d))
-            .collect::<Result<Vec<_>, _>>()?;
+            .filter_map(|d| {
+                self.info(direction, d)
+                    .inspect_err(|e| tracing::warn!("skipping audio device: {e}"))
+                    .ok()
+            })
+            .collect();
         Ok(super::devices::filter(infos))
     }
 
