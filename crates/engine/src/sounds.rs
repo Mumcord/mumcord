@@ -13,13 +13,16 @@
 //! code through [`SoundHub::play`] with [`Sound::Message`], or [`Sound::Mention`] when the
 //! message mentions the user (the UI owns the matching rules and reports the result).
 //!
-//! The own join and hang-up sounds follow the user's action, not the server: the session code
-//! calls [`SoundHub::voice_join`] for an explicit join and [`SoundHub::hang_up`] before it tears
-//! down voice for a user-initiated disconnect. Automatic arrivals (read-only landing, reconnect
+//! The own join and hang-up sounds follow the user's action: the session code calls
+//! [`SoundHub::voice_join`] for an explicit join and [`SoundHub::hang_up`] before it tears
+//! down voice for a user-initiated disconnect. A join that moves to another channel sounds only
+//! once the server confirms the move, so a refused join (e.g. a missing channel password) stays
+//! silent. Automatic arrivals (read-only landing, reconnect
 //! restore) and quitting never call them.
 
-use std::collections::HashMap;
+use std::collections::{BTreeSet, HashMap};
 use std::sync::{Arc, Mutex, PoisonError};
+use std::time::{Duration, Instant};
 
 use mumcord_store::{SoundSettings, Store};
 
@@ -45,7 +48,20 @@ pub enum Sound {
     VoiceJoin,
     /// You disconnect from a server yourself.
     HangUp,
+    /// Someone starts a watch party in your channel (FR-2.77).
+    PartyStarted,
+    PartyJoined,
+    PartyLeft,
+    /// Someone starts a screen share in your channel (FR-2.77).
+    ShareStarted,
+    ShareStopped,
+    /// Someone starts watching your screen share (FR-2.77).
+    ViewerStarted,
+    ViewerStopped,
 }
+
+/// At most one joining or leaving activity sound per this span (FR-2.77).
+const ACTIVITY_GAP: Duration = Duration::from_secs(1);
 
 impl Sound {
     fn wav(self) -> &'static [u8] {
@@ -59,7 +75,20 @@ impl Sound {
             Self::Message => include_bytes!("../../../assets/sounds/message.wav"),
             Self::Mention => include_bytes!("../../../assets/sounds/mention.wav"),
             Self::VoiceJoin => include_bytes!("../../../assets/sounds/voice_join.wav"),
-            Self::HangUp => include_bytes!("../../../assets/sounds/hang_up.wav"),
+            Self::HangUp | Self::ShareStopped => {
+                include_bytes!("../../../assets/sounds/hang_up.wav")
+            }
+            // Activity sounds reuse the bundled ones: starts sound like the own join,
+            // coming and going like people joining and leaving the channel.
+            Self::PartyStarted | Self::ShareStarted => {
+                include_bytes!("../../../assets/sounds/voice_join.wav")
+            }
+            Self::PartyJoined | Self::ViewerStarted => {
+                include_bytes!("../../../assets/sounds/user_joined.wav")
+            }
+            Self::PartyLeft | Self::ViewerStopped => {
+                include_bytes!("../../../assets/sounds/user_left.wav")
+            }
         }
     }
 
@@ -74,7 +103,22 @@ impl Sound {
             Self::Mention => s.mention,
             Self::VoiceJoin => s.voice_join,
             Self::HangUp => s.hang_up,
+            Self::PartyStarted => s.party_started,
+            Self::PartyJoined => s.party_joined,
+            Self::PartyLeft => s.party_left,
+            Self::ShareStarted => s.share_started,
+            Self::ShareStopped => s.share_stopped,
+            Self::ViewerStarted => s.viewer_started,
+            Self::ViewerStopped => s.viewer_stopped,
         }
+    }
+
+    /// Whether a burst of people coming and going may only sound once per [`ACTIVITY_GAP`].
+    fn rate_limited(self) -> bool {
+        matches!(
+            self,
+            Self::PartyJoined | Self::PartyLeft | Self::ViewerStarted | Self::ViewerStopped
+        )
     }
 
     /// 48 kHz mono samples of the sound.
@@ -142,6 +186,10 @@ struct Tracker {
     own: Option<u32>,
     users: HashMap<u32, Known>,
     joining: Option<Joining>,
+    /// The watch party in the own channel: who takes part.
+    party: Option<BTreeSet<u32>>,
+    /// The screen shares in the own channel: sharer -> viewers.
+    shares: HashMap<u32, BTreeSet<u32>>,
 }
 
 impl Tracker {
@@ -180,6 +228,75 @@ impl Tracker {
             self.joining = Some(joining);
         }
         true
+    }
+
+    /// Watch party and screen share changes of other people (FR-2.77) as sounds. The user's
+    /// own actions stay silent, and so does leaving for another channel.
+    fn activity(&mut self, event: &EngineEvent) -> Vec<Sound> {
+        let own = self.own;
+        let mut sounds = Vec::new();
+        match event {
+            EngineEvent::ServerSynced(_) => {
+                self.party = None;
+                self.shares.clear();
+            }
+            EngineEvent::UserUpserted(u) if Some(u.session) == own => {
+                let moved = self
+                    .users
+                    .get(&u.session)
+                    .is_some_and(|k| k.channel != u.channel_id);
+                if moved {
+                    self.party = None;
+                    self.shares.clear();
+                }
+            }
+            EngineEvent::WatchPartyChanged(view) => {
+                let next = view
+                    .as_ref()
+                    .map(|v| v.participants.iter().copied().collect::<BTreeSet<_>>());
+                let prev = std::mem::replace(&mut self.party, next.clone());
+                match (prev, next, view) {
+                    (None, Some(now), Some(v)) => {
+                        if !v.joined && own.is_none_or(|o| !now.contains(&o)) {
+                            sounds.push(Sound::PartyStarted);
+                        }
+                    }
+                    (Some(before), Some(now), _) => {
+                        let others = |set: &BTreeSet<u32>, other: &BTreeSet<u32>| {
+                            set.difference(other).filter(|s| Some(**s) != own).count()
+                        };
+                        sounds.extend((0..others(&now, &before)).map(|_| Sound::PartyJoined));
+                        sounds.extend((0..others(&before, &now)).map(|_| Sound::PartyLeft));
+                    }
+                    _ => {}
+                }
+            }
+            EngineEvent::ScreenSharesChanged(views) => {
+                let next: HashMap<u32, BTreeSet<u32>> = views
+                    .iter()
+                    .map(|v| (v.session, v.viewers.iter().copied().collect()))
+                    .collect();
+                let prev = std::mem::replace(&mut self.shares, next.clone());
+                for sharer in next.keys().filter(|s| Some(**s) != own) {
+                    if !prev.contains_key(sharer) {
+                        sounds.push(Sound::ShareStarted);
+                    }
+                }
+                for sharer in prev.keys().filter(|s| Some(**s) != own) {
+                    if !next.contains_key(sharer) {
+                        sounds.push(Sound::ShareStopped);
+                    }
+                }
+                if let Some(o) = own
+                    && let (Some(before), Some(now)) = (prev.get(&o), next.get(&o))
+                {
+                    sounds.extend(now.difference(before).map(|_| Sound::ViewerStarted));
+                    sounds.extend(before.difference(now).map(|_| Sound::ViewerStopped));
+                }
+            }
+            _ => {}
+        }
+        sounds
     }
 
     /// Updates the state from `event`; returns the sound it calls for and whether the own
@@ -265,6 +382,10 @@ struct State {
     out: Option<SampleSink>,
     /// The own join sound, waiting for audio that is still starting (link join on connect).
     pending_join: bool,
+    /// The channel an explicit join moves to; its sound waits for the server's confirmation.
+    awaiting_move: Option<u32>,
+    /// When the last rate-limited activity sound was due.
+    last_burst: Option<Instant>,
 }
 
 /// Maps engine events to sounds and plays them. Cheap to share.
@@ -282,6 +403,8 @@ impl SoundHub {
                 tracker: Tracker::default(),
                 out: None,
                 pending_join: false,
+                awaiting_move: None,
+                last_burst: None,
             }),
         })
     }
@@ -324,9 +447,24 @@ impl SoundHub {
         let mut state = self.state();
         if matches!(event, EngineEvent::ServerSynced(_)) {
             state.pending_join = false;
+            state.awaiting_move = None;
         }
+        // The activity diff runs first: it must see the user's own channel before the
+        // channel tracking below moves on.
+        let activity = state.tracker.activity(event);
         if let Some((sound, was_deaf)) = state.tracker.observe(event) {
             self.play_locked(&mut state, sound, was_deaf);
+        }
+        if state.awaiting_move.is_some() && state.awaiting_move == state.tracker.own_channel() {
+            state.awaiting_move = None;
+            self.join_sound(&mut state);
+        }
+        let deaf = state.tracker.own_deaf();
+        for sound in activity {
+            if sound.rate_limited() && !self.burst_allowed(&mut state, sound) {
+                continue;
+            }
+            self.play_locked(&mut state, sound, deaf);
         }
     }
 
@@ -340,12 +478,20 @@ impl SoundHub {
 
     /// The user joins a channel for voice themselves (QA.23); `mute`/`deaf` is the own state
     /// the join turns on. Plays the join sound in place of the mute/deafen cues the server's
-    /// echo of that change would cause. If audio is still starting, it plays once it is up.
-    pub fn voice_join(&self, mute: bool, deaf: bool) {
+    /// echo of that change would cause. With a `target` channel to move to, the sound waits
+    /// until the server put the user there; if audio is still starting, it plays once it is up.
+    pub fn voice_join(&self, target: Option<u32>, mute: bool, deaf: bool) {
         let mut state = self.state();
         state.tracker.expect_join(mute, deaf);
+        state.awaiting_move = target.filter(|t| state.tracker.own_channel() != Some(*t));
+        if state.awaiting_move.is_none() {
+            self.join_sound(&mut state);
+        }
+    }
+
+    fn join_sound(&self, state: &mut State) {
         if state.out.is_some() {
-            self.play_locked(&mut state, Sound::VoiceJoin, false);
+            self.play_locked(state, Sound::VoiceJoin, false);
         } else {
             state.pending_join = true;
         }
@@ -357,9 +503,27 @@ impl SoundHub {
     pub fn hang_up(&self) -> Option<Vec<f32>> {
         let mut state = self.state();
         state.pending_join = false;
+        state.awaiting_move = None;
         state.tracker.joining = None;
         (state.out.is_some() && Sound::HangUp.enabled(&(self.settings)()))
             .then(|| Sound::HangUp.mixed())
+    }
+
+    /// Whether a rate-limited `sound` is not too close to the last one. A sound that would
+    /// stay silent anyway does not use up the gap.
+    fn burst_allowed(&self, state: &mut State, sound: Sound) -> bool {
+        if !sound.enabled(&(self.settings)()) || state.tracker.own_deaf() {
+            return true;
+        }
+        let now = Instant::now();
+        if state
+            .last_burst
+            .is_some_and(|last| now.duration_since(last) < ACTIVITY_GAP)
+        {
+            return false;
+        }
+        state.last_burst = Some(now);
+        true
     }
 
     fn play_locked(&self, state: &mut State, sound: Sound, was_deaf: bool) {
@@ -385,7 +549,7 @@ mod tests {
     use mumcord_audio::mixer::{Playback, PlaybackConfig, PlaybackSink};
     use mumcord_audio::{FRAME_SAMPLES, Frame};
 
-    const ALL: [Sound; 10] = [
+    const ALL: [Sound; 17] = [
         Sound::UserJoined,
         Sound::UserLeft,
         Sound::Mute,
@@ -396,6 +560,13 @@ mod tests {
         Sound::Mention,
         Sound::VoiceJoin,
         Sound::HangUp,
+        Sound::PartyStarted,
+        Sound::PartyJoined,
+        Sound::PartyLeft,
+        Sound::ShareStarted,
+        Sound::ShareStopped,
+        Sound::ViewerStarted,
+        Sound::ViewerStopped,
     ];
 
     fn user(session: u32, channel_id: u32, mute: bool, deaf: bool) -> UserView {
@@ -510,6 +681,13 @@ mod tests {
             mention_notify: false,
             voice_join: false,
             hang_up: false,
+            party_started: false,
+            party_joined: false,
+            party_left: false,
+            share_started: false,
+            share_stopped: false,
+            viewer_started: false,
+            viewer_stopped: false,
         };
         for s in ALL {
             assert!(s.enabled(&SoundSettings::default()), "{s:?}");
@@ -636,9 +814,10 @@ mod tests {
             user(1, 10, true, true),
             user(2, 11, false, false),
         ]));
-        hub.voice_join(false, false);
-        assert_eq!(played(&log), lens(&[Sound::VoiceJoin]));
+        hub.voice_join(Some(11), false, false);
+        assert!(played(&log).is_empty());
         hub.observe(&EngineEvent::UserUpserted(user(1, 11, true, true)));
+        assert_eq!(played(&log), lens(&[Sound::VoiceJoin]));
         hub.observe(&EngineEvent::UserUpserted(user(1, 11, true, false)));
         hub.observe(&EngineEvent::UserUpserted(user(1, 11, false, false)));
         assert_eq!(
@@ -654,11 +833,38 @@ mod tests {
         );
     }
 
+    /// The join sound follows the server's confirmation of the move: a refused join (e.g. a
+    /// channel password is missing, FR-2.78) stays silent, a confirmed one plays it once.
+    #[test]
+    fn join_sound_waits_for_the_confirmed_move() {
+        let (hub, log) = hub_with_log(SoundSettings::default());
+        hub.observe(&synced(vec![user(1, 10, false, false)]));
+        hub.voice_join(Some(12), false, false);
+        assert!(played(&log).is_empty(), "not before the server confirms");
+        hub.observe(&EngineEvent::UserUpserted(user(1, 10, false, false)));
+        assert!(played(&log).is_empty(), "refused: still outside");
+
+        hub.voice_join(Some(12), false, false);
+        hub.observe(&EngineEvent::UserUpserted(user(1, 12, false, false)));
+        hub.observe(&EngineEvent::UserUpserted(user(1, 12, false, false)));
+        assert_eq!(played(&log), lens(&[Sound::VoiceJoin]), "once on arrival");
+    }
+
+    #[test]
+    fn a_new_connection_drops_an_unconfirmed_join() {
+        let (hub, log) = hub_with_log(SoundSettings::default());
+        hub.observe(&synced(vec![user(1, 10, false, false)]));
+        hub.voice_join(Some(12), false, false);
+        hub.observe(&synced(vec![user(1, 10, false, false)]));
+        hub.observe(&EngineEvent::UserUpserted(user(1, 12, false, false)));
+        assert!(played(&log).is_empty());
+    }
+
     #[test]
     fn join_without_voice_change_keeps_later_cues() {
         let (hub, log) = hub_with_log(SoundSettings::default());
         hub.observe(&synced(vec![user(1, 10, false, false)]));
-        hub.voice_join(false, false);
+        hub.voice_join(Some(12), false, false);
         hub.observe(&EngineEvent::UserUpserted(user(1, 12, false, false)));
         hub.observe(&EngineEvent::UserUpserted(user(1, 12, true, false)));
         assert_eq!(played(&log), lens(&[Sound::VoiceJoin, Sound::Mute]));
@@ -668,7 +874,7 @@ mod tests {
     fn unreached_join_stops_swallowing_after_two_echoes() {
         let (hub, log) = hub_with_log(SoundSettings::default());
         hub.observe(&synced(vec![user(1, 10, true, true)]));
-        hub.voice_join(false, false);
+        hub.voice_join(None, false, false);
         hub.observe(&EngineEvent::UserUpserted(user(1, 10, true, false)));
         hub.observe(&EngineEvent::UserUpserted(user(1, 10, true, true)));
         hub.observe(&EngineEvent::UserUpserted(user(1, 10, true, false)));
@@ -700,7 +906,7 @@ mod tests {
             }));
         };
         hub.observe(&synced(vec![user(1, 10, false, false)]));
-        hub.voice_join(true, false);
+        hub.voice_join(None, true, false);
         attach(&hub);
         assert_eq!(
             played(&log),
@@ -712,7 +918,7 @@ mod tests {
         assert_eq!(played(&log), lens(&[Sound::VoiceJoin]), "only once");
 
         hub.detach();
-        hub.voice_join(false, false);
+        hub.voice_join(None, false, false);
         hub.observe(&synced(vec![user(1, 10, false, false)]));
         attach(&hub);
         assert_eq!(
@@ -729,7 +935,7 @@ mod tests {
             ..SoundSettings::default()
         });
         hub.observe(&synced(vec![user(1, 10, true, true)]));
-        hub.voice_join(false, false);
+        hub.voice_join(None, false, false);
         hub.observe(&EngineEvent::UserUpserted(user(1, 10, true, false)));
         assert!(
             played(&log).is_empty(),
@@ -757,7 +963,7 @@ mod tests {
     #[test]
     fn hang_up_drops_a_pending_join() {
         let hub = SoundHub::new(SoundSettings::default);
-        hub.voice_join(false, false);
+        hub.voice_join(None, false, false);
         assert!(hub.hang_up().is_none());
         let log = Arc::new(Mutex::new(Vec::new()));
         let l = log.clone();
@@ -812,5 +1018,164 @@ mod tests {
         let peak = samples.iter().fold(0.0_f32, |m, s| m.max(s.abs()));
         assert!(peak > 0.05, "mute sound missing in output (peak {peak})");
         assert!(peak_dbfs(&samples) <= -12.0);
+    }
+    fn party(participants: &[u32], joined: bool) -> EngineEvent {
+        EngineEvent::WatchPartyChanged(Some(crate::watch_party::WatchPartyView {
+            channel_id: 10,
+            video_id: "v".into(),
+            playing: true,
+            position_ms: 0,
+            participants: participants.to_vec(),
+            last_action: None,
+            joined,
+            current_entry: 0,
+            playlist: Vec::new(),
+            skipped_by: None,
+        }))
+    }
+
+    fn shares(list: &[(u32, &[u32])]) -> EngineEvent {
+        EngineEvent::ScreenSharesChanged(
+            list.iter()
+                .map(|(session, viewers)| crate::screen_share::ScreenShareView {
+                    session: *session,
+                    paused: false,
+                    sound: false,
+                    sound_available: false,
+                    viewers: viewers.to_vec(),
+                    blocked: None,
+                })
+                .collect(),
+        )
+    }
+
+    fn activity_hub(settings: SoundSettings) -> (Arc<SoundHub>, Arc<Mutex<Vec<usize>>>) {
+        let (hub, log) = hub_with_log(settings);
+        hub.observe(&synced(vec![
+            user(1, 10, false, false),
+            user(2, 10, false, false),
+            user(3, 10, false, false),
+        ]));
+        (hub, log)
+    }
+
+    /// Lets the rate limit pass without waiting.
+    fn open_gap(hub: &SoundHub) {
+        hub.state().last_burst = None;
+    }
+
+    #[test]
+    fn party_events_of_others_play_sounds() {
+        let (hub, log) = activity_hub(SoundSettings::default());
+        hub.observe(&party(&[2], false));
+        assert_eq!(played(&log), lens(&[Sound::PartyStarted]));
+        log.lock().unwrap().clear();
+        hub.observe(&party(&[2, 3], false));
+        assert_eq!(played(&log), lens(&[Sound::PartyJoined]));
+        open_gap(&hub);
+        log.lock().unwrap().clear();
+        hub.observe(&party(&[2], false));
+        assert_eq!(played(&log), lens(&[Sound::PartyLeft]));
+    }
+
+    #[test]
+    fn own_party_actions_are_silent() {
+        let (hub, log) = activity_hub(SoundSettings::default());
+        hub.observe(&party(&[1], true));
+        hub.observe(&party(&[1, 2], true));
+        assert_eq!(
+            played(&log),
+            lens(&[Sound::PartyJoined]),
+            "only the other joining"
+        );
+        log.lock().unwrap().clear();
+        open_gap(&hub);
+        hub.observe(&party(&[2], false));
+        assert!(played(&log).is_empty(), "own leave is silent");
+        hub.observe(&party(&[1, 2], true));
+        assert!(played(&log).is_empty(), "own join is silent");
+    }
+
+    #[test]
+    fn share_events_play_sounds() {
+        let (hub, log) = activity_hub(SoundSettings::default());
+        hub.observe(&shares(&[(2, &[])]));
+        assert_eq!(played(&log), lens(&[Sound::ShareStarted]));
+        log.lock().unwrap().clear();
+        hub.observe(&shares(&[]));
+        assert_eq!(played(&log), lens(&[Sound::ShareStopped]));
+    }
+
+    #[test]
+    fn own_share_and_its_viewers() {
+        let (hub, log) = activity_hub(SoundSettings::default());
+        hub.observe(&shares(&[(1, &[])]));
+        assert!(played(&log).is_empty(), "own share start is silent");
+        hub.observe(&shares(&[(1, &[2])]));
+        assert_eq!(played(&log), lens(&[Sound::ViewerStarted]));
+        open_gap(&hub);
+        log.lock().unwrap().clear();
+        hub.observe(&shares(&[(1, &[])]));
+        assert_eq!(played(&log), lens(&[Sound::ViewerStopped]));
+        log.lock().unwrap().clear();
+        hub.observe(&shares(&[]));
+        assert!(played(&log).is_empty(), "own share stop is silent");
+    }
+
+    #[test]
+    fn toggle_off_silences_that_event_only() {
+        let (hub, log) = activity_hub(SoundSettings {
+            share_started: false,
+            ..SoundSettings::default()
+        });
+        hub.observe(&shares(&[(2, &[])]));
+        assert!(played(&log).is_empty());
+        hub.observe(&shares(&[]));
+        assert_eq!(played(&log), lens(&[Sound::ShareStopped]));
+    }
+
+    #[test]
+    fn deafened_user_hears_no_activity() {
+        let (hub, log) = activity_hub(SoundSettings::default());
+        hub.observe(&EngineEvent::UserUpserted(user(1, 10, true, true)));
+        log.lock().unwrap().clear();
+        hub.observe(&party(&[2], false));
+        hub.observe(&shares(&[(2, &[])]));
+        assert!(played(&log).is_empty());
+    }
+
+    #[test]
+    fn joins_and_leaves_are_rate_limited_to_one_per_second() {
+        let (hub, log) = activity_hub(SoundSettings::default());
+        hub.observe(&party(&[1], true));
+        hub.observe(&party(&[1, 2, 3], true));
+        assert_eq!(
+            log.lock().unwrap().len(),
+            1,
+            "burst of two joins sounds once"
+        );
+        hub.observe(&party(&[1], true));
+        assert_eq!(
+            log.lock().unwrap().len(),
+            1,
+            "leaves inside the gap are skipped"
+        );
+        open_gap(&hub);
+        hub.observe(&party(&[1, 2], true));
+        assert_eq!(
+            log.lock().unwrap().len(),
+            2,
+            "after the gap it sounds again"
+        );
+    }
+
+    #[test]
+    fn changing_channel_ends_activity_silently() {
+        let (hub, log) = activity_hub(SoundSettings::default());
+        hub.observe(&shares(&[(2, &[])]));
+        log.lock().unwrap().clear();
+        hub.observe(&EngineEvent::UserUpserted(user(1, 11, false, false)));
+        hub.observe(&shares(&[]));
+        assert!(played(&log).is_empty());
     }
 }

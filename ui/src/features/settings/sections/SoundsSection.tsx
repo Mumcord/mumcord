@@ -14,6 +14,13 @@ const EVENTS: (keyof SoundSettings)[] = [
   "messages",
   "mention",
   "mentionNotify",
+  "partyStarted",
+  "partyJoined",
+  "partyLeft",
+  "shareStarted",
+  "shareStopped",
+  "viewerStarted",
+  "viewerStopped",
 ];
 const NOTIFICATION_MODES: NotificationMode[] = ["both", "inApp", "desktop", "off"];
 
