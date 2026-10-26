@@ -18,8 +18,28 @@ env:
   MUMCORD_E2E_CACHE: /home/runner/.cache/mumcord-e2e
 
 jobs:
+  # Decides whether the heavy jobs run. A path filter on the trigger would leave the required
+  # checks pending forever on documentation-only pull requests, so the checks always report.
+  changes:
+    name: Changed files
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    outputs:
+      code: ${{ steps.filter.outputs.code }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: scripts/ci
+      - id: filter
+        run: scripts/ci/code-changed.sh >> "$GITHUB_OUTPUT"
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+
   build:
     name: E2E build
+    needs: changes
+    if: needs.changes.outputs.code == 'true'
     runs-on: ubuntu-24.04
     timeout-minutes: 45
     steps:
@@ -141,15 +161,19 @@ jobs:
   # this job must run and fail when the build failed and the shards were skipped.
   e2e:
     name: Linux E2E
-    needs: [build, shard]
+    needs: [changes, build, shard]
     if: always()
     runs-on: ubuntu-24.04
     timeout-minutes: 5
     steps:
       - name: Check build and shard results
         run: |
-          echo "build: $BUILD, shards: $SHARDS"
+          echo "changes: $CHANGES, build: $BUILD, shards: $SHARDS"
+          [ "$CHANGES" = success ] || exit 1
+          # Documentation-only change: build and shards are skipped on purpose.
+          if [ "$BUILD" = skipped ] && [ "$SHARDS" = skipped ]; then exit 0; fi
           [ "$BUILD" = success ] && [ "$SHARDS" = success ]
         env:
+          CHANGES: ${{ needs.changes.result }}
           BUILD: ${{ needs.build.result }}
           SHARDS: ${{ needs.shard.result }}
