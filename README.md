@@ -17,17 +17,64 @@ Mumcord is **compatible with Mumble**. It is **not affiliated with or endorsed b
 - A pure client: it speaks the Mumble protocol and works with unmodified, standard Mumble servers. Nothing needs to be installed or changed on the server.
 - Mumble servers 1.4 and newer are fully supported. Older servers are supported on a best-effort basis; features they lack are hidden.
 
+## Features
+
+- **Voice chat for Mumble servers**: push-to-talk or voice activation, noise suppression, music quality, per-person volume, positional audio with the official game plugins (Beta).
+- **Several servers at once** (0.4.0): up to 5 connected servers (configurable up to 15), voice on one, chat, private messages, notifications and badges on all of them; auto-connect at start.
+- **Chat**: images, link previews and player cards, replies and quotes, history sync between Mumcord users, full-size images on demand (Beta), channel passwords, a rich-text comment editor.
+- **Themes** (0.4.0): presets and your own colour themes, each with a dark and a light version, shareable as a code and optionally set per server.
+- **Watch party** (0.4.0, Beta): watch YouTube together with the Mumcord users in your voice channel, with a shared playlist.
+- **Screen sharing** (0.4.0, Beta): share a window or screen with up to 8 Mumcord users in your channel at up to 720p30, over a direct connection (see [Screen sharing](#screen-sharing-beta) for what each OS supports).
+- **Friends, now playing and now gaming**, connection info (ping, loss, bandwidth) and a weak-connection icon.
+- **In-game overlay** that shows who is talking: a Vulkan layer on Linux (with an OpenGL launch option), a click-through window over borderless games on Windows (0.4.0). No overlay on macOS.
+- **Linux packages** (0.4.0): `.deb`, `.rpm`, AUR `mumcord-bin` and AppImage for x86_64 and ARM64, a one-line installer, app-menu entry, `mumble://` links and start at login.
+- All 24 official EU languages, keyboard operation, screen-reader labels and system theme.
+
 ## Status
 
-Early development (Epic 1). Expect missing features and rough edges. See `specs/01-foundation-specification.md` for the scope.
+Early development: Epic 2 (release 0.4.0). Expect rough edges, especially in the Beta features. See `specs/02-multi-server-themes-specification.md` for the current scope and [CHANGELOG.md](CHANGELOG.md) for what each release added.
 
 Test builds for Windows and macOS are unsigned. The operating system will show a security warning when you start them.
 
 ## Download
 
-Installers for Windows (`.exe`), macOS (`.dmg`, Apple Silicon and Intel) and Linux (`.AppImage`) are on the [Releases page](https://github.com/ToBee94/mumcord/releases), each with a `SHA256SUMS` file to check the download. Each release's notes say whether its Windows and macOS builds are signed; unsigned builds show a security warning on first start, and the notes explain how to open the app anyway.
+Installers for Windows (`.exe`), macOS (`.dmg`, Apple Silicon and Intel) and Linux (`.deb`, `.rpm` and `.AppImage`, each for x86_64 and ARM64) are on the [Releases page](https://github.com/ToBee94/mumcord/releases), each with a `SHA256SUMS` file to check the download. Each release's notes say whether its Windows and macOS builds are signed; unsigned builds show a security warning on first start, and the notes explain how to open the app anyway.
+
+On Linux, one line installs Mumcord with your package manager (or the AppImage on other distributions); add `-s -- --uninstall` after `sh` to remove it:
+
+```sh
+curl -fsSL https://github.com/ToBee94/mumcord/releases/latest/download/install.sh | sh
+```
+
+On Arch Linux and derivatives, Mumcord is also in the AUR as `mumcord-bin`.
 
 See the [changelog](CHANGELOG.md) for what changed in each release.
+
+### Linux: GStreamer plugins for watch parties
+
+The `.deb`, `.rpm` and AUR packages install the GStreamer plugins that WebKitGTK needs to play YouTube videos in watch parties. The AppImage bundles the GStreamer plugins it needs and plays YouTube via VP9. It deliberately does not bundle H.264 (gst-libav), so videos that YouTube only serves as H.264 may not play there. The AppImage also loads the GStreamer plugins installed on the system, after its own, so installing gst-libav adds H.264 there too; the player shows a hint when a codec is missing. For a distribution without the packages above, or if you want H.264 with the AppImage, install the plugins yourself:
+
+- Debian, Ubuntu: `sudo apt install gstreamer1.0-plugins-good gstreamer1.0-plugins-bad gstreamer1.0-libav`
+- Fedora: `sudo dnf install gstreamer1-plugins-good gstreamer1-plugins-bad-free gstreamer1-libav` (`gstreamer1-libav` may need [RPM Fusion](https://rpmfusion.org/))
+- Arch, CachyOS, Manjaro: `sudo pacman -S gst-plugins-good gst-plugins-bad gst-libav`
+- openSUSE: `sudo zypper install gstreamer-plugins-good gstreamer-plugins-bad gstreamer-plugins-libav`
+
+### Linux: flickering or slow rendering
+
+Mumcord sets `WEBKIT_DISABLE_COMPOSITING_MODE=1` at startup because WebKitGTK 2.54 flickers with the watch-party video otherwise. To keep WebKit's default compositing (for example if your WebKitGTK version renders better that way), start Mumcord with `MUMCORD_WEBKIT_COMPOSITING=1`. A `WEBKIT_DISABLE_COMPOSITING_MODE` you set yourself is never overwritten.
+
+### Screen sharing (Beta)
+
+Screen sharing needs a direct connection between the person sharing and each viewer (allowed once in a dialog, changeable in _Settings → Privacy_). Mumcord uses no outside server to set it up, so it works when one side has IPv6 or a home router that allows port mapping (UPnP, NAT-PMP or PCP), or when both are on the same network. Behind carrier-grade NAT or two routers without port mapping, that pair cannot watch; Mumcord says so after a short wait.
+
+|                    | Picture                                                                                                                                                                 | Sound                                                                                      |
+| ------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------ |
+| **Windows**        | Windows 10 version 1903 or newer; the system picker offers windows and screens                                                                                          | Only the shared app's sound, Windows 10 version 2004 or newer; no sound for a whole screen |
+| **macOS**          | macOS 14 or newer with the system picker (window, app or screen); macOS 12.3 and 13 share the whole main screen; needs the "Screen & System Audio Recording" permission | Only the shared content's sound, never Mumcord's own; macOS 13 or newer                    |
+| **Linux, Wayland** | The desktop's picker (xdg-desktop-portal with PipeWire) chooses a window or screen                                                                                      | No sound                                                                                   |
+| **Linux, X11**     | Whole screen only                                                                                                                                                       | No sound                                                                                   |
+
+Up to 8 people can watch one share; the quality drops automatically to 480p at 15 frames per second when the upload is too slow.
 
 ## Code signing policy
 
@@ -50,15 +97,17 @@ Maintainers: how to cut a release is described in [RELEASING.md](RELEASING.md).
 
       sudo apt-get install -y --no-install-recommends \
         libwebkit2gtk-4.1-dev libayatana-appindicator3-dev librsvg2-dev \
-        libxdo-dev libasound2-dev cmake patchelf xdg-utils build-essential pkg-config libssl-dev
+        libxdo-dev libasound2-dev libvpx-dev libpipewire-0.3-dev libclang-dev \
+        cmake patchelf xdg-utils build-essential pkg-config libssl-dev
 
 - Linux, Arch/CachyOS:
 
       sudo pacman -S --needed base-devel webkit2gtk-4.1 libayatana-appindicator librsvg \
-        xdotool alsa-lib cmake openssl pkgconf patchelf xdg-utils
+        xdotool alsa-lib libvpx libpipewire clang cmake openssl pkgconf patchelf xdg-utils
 
 - Windows: Visual Studio Build Tools with the "Desktop development with C++" workload (MSVC), and the WebView2 runtime (preinstalled on Windows 11).
 - macOS: Xcode command line tools (`xcode-select --install`).
+- Windows and macOS link a static libvpx for screen sharing: build it with `scripts/build-libvpx.sh <dir>` (Windows: vcpkg and LLVM for bindgen; macOS: `brew install nasm`) and set `LIBVPX_STATIC_DIR=<dir>` before building. Details: [RELEASING.md](RELEASING.md#static-libvpx-on-windows-and-macos).
 
 ### Get the code and run
 
@@ -85,6 +134,7 @@ Bundles land in `target/release/bundle/`: `appimage/*.AppImage` (Linux), `nsis/*
 
 ### Optional
 
+- Manual test checklists: [release 0.4.0](docs/manual-checklist-0.4.0.md), [screen sharing on Windows](docs/screen-share-windows.md), [screen sharing on macOS](docs/screen-share-macos.md); measurements in [docs/screen-share-performance.md](docs/screen-share-performance.md); known problems in [docs/troubleshooting.md](docs/troubleshooting.md).
 - Local Mumble servers for manual and automated tests: [`testenv/README.md`](testenv/README.md). Do not test against public servers.
 - UI end-to-end tests (`npm run e2e`, needs Docker): [`e2e/README.md`](e2e/README.md).
 - After dependency changes, regenerate the third-party notices with `scripts/generate-notices.sh`.
