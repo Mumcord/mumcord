@@ -1,11 +1,15 @@
 import { act, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { announce } from "../../a11y";
+import { PreferencesProvider } from "../../app/PreferencesProvider";
 import { createMockApi, setApi, type MockApi, type MumbleLink } from "../../api";
 import "../../i18n";
 import { axeViolations } from "../../test/axe";
 import { applyThemeToDocument } from "../../theme/theme";
-import { resetServerStore } from "../channels/serverStore";
+import { getShownServerId, resetServerStore } from "../channels/serverStore";
+import { hideInfo, showInfo, welcomeKey } from "../chat/hiddenInfo";
+import { resetFollowStore } from "../follow/followStore";
+import { resetMentions } from "./mentions";
 import { stubDialog } from "../channels/testUtils";
 import { ConnectionStatus } from "./ConnectionStatus";
 import { initials, splitAddress } from "./format";
@@ -27,14 +31,14 @@ function setup(options: Parameters<typeof createMockApi>[0] = {}): MockApi {
 
 async function renderAll() {
   const view = render(
-    <>
+    <PreferencesProvider>
       <nav aria-label="Servers">
         <ServersRoot />
       </nav>
       <main>
         <ConnectionStatus />
       </main>
-    </>,
+    </PreferencesProvider>,
   );
   await waitFor(() => {
     expect(screen.queryByRole("button", { name: "Add a server" })).toBeInTheDocument();
@@ -72,6 +76,8 @@ beforeEach(() => {
 afterEach(() => {
   vi.useRealTimers();
   resetServerStore();
+  resetFollowStore();
+  resetMentions();
   setApi(undefined);
 });
 
@@ -112,7 +118,7 @@ describe("ServerBar", () => {
     expect(announce).toHaveBeenCalledWith("Connected to Local test server.");
   });
 
-  it("asks before switching to another server", async () => {
+  it("connects another server without asking and shows it, keeping the first (FR-2.6)", async () => {
     setup();
     const other = await addServer("Other", "other.example.org");
     await renderAll();
@@ -122,18 +128,19 @@ describe("ServerBar", () => {
     });
     const connect = vi.spyOn(api, "connect");
     fireEvent.click(serverButton(1));
-    expect(dialog()).toHaveTextContent("Disconnect from Local test server and connect to Other?");
-    expect(screen.getByRole("button", { name: "Cancel" })).toHaveFocus();
-    fireEvent.click(screen.getByRole("button", { name: "Cancel" }));
     expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
-    expect(connect).not.toHaveBeenCalled();
-
-    fireEvent.click(serverButton(1));
-    fireEvent.click(screen.getByRole("button", { name: "Disconnect and switch" }));
-    expect(connect).toHaveBeenCalledWith(other.id, null);
+    expect(connect).toHaveBeenCalledWith(other.id, null, null);
     await waitFor(() => {
       expect(serverButtons()[1]).toHaveAttribute("aria-current", "true");
     });
+    expect((await api.connectionsList()).map((c) => c.serverId)).toEqual([1, other.id]);
+
+    // A connected server is only shown again, not reconnected.
+    fireEvent.click(serverButton(0));
+    await waitFor(() => {
+      expect(serverButtons()[0]).toHaveAttribute("aria-current", "true");
+    });
+    expect(connect).toHaveBeenCalledTimes(1);
   });
 
   it("reorders with Alt+Arrow, persists the order and announces it", async () => {
@@ -176,6 +183,27 @@ describe("ServerBar", () => {
     expect(serverButtons().map((b) => b.textContent)).toEqual(["S", "LT"]);
   });
 
+  it("offers Show welcome message only while the welcome message is hidden", async () => {
+    setup();
+    const saved = (await api.serversList())[0];
+    if (!saved) throw new Error("no saved server");
+    await renderAll();
+    const first = serverButton(0);
+    fireEvent.contextMenu(first);
+    expect(screen.queryByRole("menuitem", { name: "Show welcome message" })).toBeNull();
+    fireEvent.keyDown(screen.getByRole("menu"), { key: "Escape" });
+    const id = saved.id;
+    act(() => {
+      hideInfo(welcomeKey(id), "Hello");
+    });
+    fireEvent.contextMenu(first);
+    fireEvent.click(screen.getByRole("menuitem", { name: "Show welcome message" }));
+    expect(localStorage.getItem(`mumcord.hidden.${welcomeKey(id)}`)).toBeNull();
+    act(() => {
+      showInfo(welcomeKey(id));
+    });
+  });
+
   it("offers a context menu with Shift+F10; Escape returns focus", async () => {
     setup();
     await addServer("Second", "two.example.org");
@@ -184,9 +212,12 @@ describe("ServerBar", () => {
     first.focus();
     fireEvent.keyDown(first, { key: "F10", shiftKey: true });
     const menu = screen.getByRole("menu", { name: "Options for Local test server" });
-    const items = within(menu).getAllByRole("menuitem");
+    const items = [...menu.querySelectorAll("button")];
     expect(items.map((i) => i.textContent)).toEqual([
       "Connect",
+      "Always connect at start",
+      "Mute notifications",
+      "Theme…",
       "Edit server",
       "Move down",
       "Remove server",
@@ -216,6 +247,206 @@ describe("ServerBar", () => {
     });
     expect(await api.serversList()).toHaveLength(1);
     expect(announce).toHaveBeenCalledWith("Second removed.");
+  });
+});
+
+describe("ServerBar with several servers (spec §5.2)", () => {
+  async function connectBoth() {
+    const other = await addServer("Other", "other.example.org");
+    await renderAll();
+    fireEvent.click(serverButton(0));
+    await waitFor(() => {
+      expect(serverButton(0)).toHaveAccessibleName("Local test server (connected)");
+    });
+    fireEvent.click(serverButton(1));
+    await waitFor(() => {
+      expect(serverButton(1)).toHaveAttribute("aria-current", "true");
+    });
+    return other;
+  }
+
+  const openMenuOf = (index: number) => {
+    fireEvent.contextMenu(serverButton(index));
+    return screen.getByRole("menu");
+  };
+
+  it("labels connecting, connected, shown and saved servers; the tooltip says the same", async () => {
+    setup({ connectDelayMs: 50 });
+    await addServer("Other", "other.example.org");
+    await renderAll();
+    fireEvent.click(serverButton(0));
+    await waitFor(() => {
+      expect(serverButton(0)).toHaveAccessibleName("Local test server (connecting)");
+    });
+    expect(serverButton(1)).toHaveAccessibleName("Other");
+    await waitFor(() => {
+      expect(serverButton(0)).toHaveAccessibleName("Local test server (connected)");
+    });
+    expect(serverButton(0)).toHaveAttribute("aria-current", "true");
+    expect(serverButton(0)).toHaveAttribute("data-tooltip", "Local test server (connected)");
+  });
+
+  it("marks the voice server, keeps it while another server is shown", async () => {
+    setup();
+    await connectBoth();
+    expect(serverButton(1)).toHaveAccessibleName("Other (connected)");
+    await act(async () => {
+      const snapshot = await api.sessionSnapshot(1);
+      api.mock.focusServer(1);
+      await api.channelJoin(1, snapshot?.channels[0]?.id ?? 0);
+    });
+    await waitFor(() => {
+      expect(serverButton(0)).toHaveAccessibleName("Local test server (connected), voice server");
+    });
+    expect(serverButton(1)).toHaveAttribute("aria-current", "true");
+    expect(serverButton(0)).not.toHaveAttribute("aria-current");
+  });
+
+  it("shows unread messages and mentions of a server that is not shown", async () => {
+    setup();
+    await connectBoth();
+    const snapshot = await api.sessionSnapshot(1);
+    const self = snapshot?.users.find((u) => u.session === snapshot.selfSession);
+    const otherUser = snapshot?.users.find((u) => u.session !== snapshot.selfSession);
+    if (!self || !otherUser) throw new Error("mock server needs two people");
+    const conversation = { kind: "channel" as const, channelId: self.channelId };
+    act(() => {
+      api.mock.focusServer(1);
+      api.mock.receiveMessage(conversation, "hello", otherUser.session);
+    });
+    await waitFor(() => {
+      expect(serverButton(0)).toHaveAccessibleName(
+        "Local test server (connected), unread messages",
+      );
+    });
+    expect(serverButton(0).querySelector(".server-bar__mark--unread")).not.toBeNull();
+    act(() => {
+      api.mock.receiveMessage(conversation, `hi @${self.name}`, otherUser.session);
+    });
+    await waitFor(() => {
+      expect(serverButton(0)).toHaveAccessibleName("Local test server (connected), mentions: 1");
+    });
+    expect(serverButton(0).querySelector(".server-bar__mark--mentions")).toHaveTextContent("1");
+    await act(() => api.conversationMarkRead(1, conversation));
+    await waitFor(() => {
+      expect(serverButton(0)).toHaveAccessibleName("Local test server (connected)");
+    });
+  });
+
+  it("shows a lost connection that gave up and offers Reconnect in the menu", async () => {
+    setup();
+    await renderAll();
+    fireEvent.click(serverButton(0));
+    await waitFor(() => {
+      expect(serverButton(0)).toHaveAttribute("aria-current", "true");
+    });
+    act(() => {
+      api.mock.loseConnection();
+      api.mock.emit("connectionStateChanged", {
+        serverId: 1,
+        state: { state: "disconnected", error: { code: "serverUnreachable", message: "" } },
+      });
+    });
+    expect(serverButton(0)).toHaveAccessibleName("Local test server (connection lost)");
+    const connect = vi.spyOn(api, "connect");
+    fireEvent.click(within(openMenuOf(0)).getByRole("menuitem", { name: "Reconnect" }));
+    expect(connect).toHaveBeenCalledWith(1, null, null);
+  });
+
+  it("disconnects the server whose menu was used, not the shown one (FR-2.9)", async () => {
+    setup();
+    const other = await connectBoth();
+    const disconnect = vi.spyOn(api, "disconnect");
+    fireEvent.click(within(openMenuOf(0)).getByRole("menuitem", { name: "Disconnect" }));
+    await waitFor(() => {
+      expect(serverButton(0)).toHaveAccessibleName("Local test server");
+    });
+    expect(disconnect).toHaveBeenCalledWith(1);
+    expect(getShownServerId()).toBe(other.id);
+  });
+
+  it("switches Always connect at start and Mute notifications from the menu", async () => {
+    setup();
+    await renderAll();
+    const always = () =>
+      within(openMenuOf(0)).getByRole("menuitemcheckbox", { name: "Always connect at start" });
+    expect(always()).toHaveAttribute("aria-checked", "false");
+    fireEvent.click(always());
+    await waitFor(async () => {
+      expect((await api.serversList())[0]?.alwaysConnectAtStart).toBe(true);
+    });
+    expect(always()).toHaveAttribute("aria-checked", "true");
+    fireEvent.keyDown(screen.getByRole("menu"), { key: "Escape" });
+
+    const mute = () =>
+      within(openMenuOf(0)).getByRole("menuitemcheckbox", { name: "Mute notifications" });
+    fireEvent.click(mute());
+    await waitFor(async () => {
+      expect((await api.serversList())[0]?.notificationsMuted).toBe(true);
+    });
+    expect(mute()).toHaveAttribute("aria-checked", "true");
+  });
+
+  it("refuses more Always connect servers than the limit, naming the setting (FR-2.7)", async () => {
+    setup();
+    await api.settingsUpdate({ ...(await api.settingsGet()), maxConnectedServers: 1 });
+    await addServer("Other", "other.example.org");
+    await api.serverSetAlwaysConnect(1, true);
+    await renderAll();
+    fireEvent.click(
+      within(openMenuOf(1)).getByRole("menuitemcheckbox", { name: "Always connect at start" }),
+    );
+    await waitFor(() => {
+      expect(status()).toHaveTextContent(
+        "Only 1 servers can be set to “Always connect at start”, the same as the limit of " +
+          "connected servers. Turn it off for another server, or raise the limit in Settings → Servers.",
+      );
+    });
+  });
+
+  it("explains the connected-servers limit when a connect is refused (FR-2.1)", async () => {
+    setup();
+    await addServer("Other", "other.example.org");
+    await renderAll();
+    api.mock.failNext("connect", "serverLimitReached");
+    fireEvent.click(serverButton(1));
+    await waitFor(() => {
+      expect(status()).toHaveTextContent(
+        "Couldn't connect to Other. You're already connected to the maximum of 5 servers. " +
+          "Disconnect a server, or raise the limit in Settings → Servers.",
+      );
+    });
+    expect(serverButton(1)).toHaveAccessibleName("Other");
+  });
+
+  it("picks a theme for the server from its menu and goes back to the app theme", async () => {
+    setup();
+    await renderAll();
+    const [server] = await api.serversList();
+    if (!server) throw new Error("no server");
+    fireEvent.click(within(openMenuOf(0)).getByRole("menuitem", { name: "Theme…" }));
+    const themes = within(dialog()).getByRole("group", { name: "Theme" });
+    const circle = (name: string) =>
+      within(themes).getByRole("button", { name: new RegExp(`^${name}, theme`) });
+    expect(circle("Use app theme")).toHaveAccessibleName("Use app theme, theme, selected");
+    fireEvent.click(circle("Deep Ocean"));
+    fireEvent.click(within(dialog()).getByRole("button", { name: "Save" }));
+    await waitFor(() => {
+      expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+    });
+    expect((await api.serversList())[0]?.themeId).toBe("preset:ocean");
+
+    fireEvent.click(within(openMenuOf(0)).getByRole("menuitem", { name: "Edit server" }));
+    const editThemes = within(dialog()).getByRole("group", { name: "Theme" });
+    expect(
+      within(editThemes).getByRole("button", { name: "Deep Ocean, theme, selected" }),
+    ).toBeInTheDocument();
+    fireEvent.click(within(editThemes).getByRole("button", { name: /^Use app theme, theme/ }));
+    fireEvent.click(within(dialog()).getByRole("button", { name: "Save" }));
+    await waitFor(() => {
+      expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+    });
+    expect((await api.serversList())[0]?.themeId).toBeNull();
   });
 });
 
@@ -334,6 +565,36 @@ describe("ServerDialog", () => {
     expect((await api.serversList())[1]?.hasPassword).toBe(false);
   });
 
+  it("saves Always connect at start in the edit dialog (FR-2.7)", async () => {
+    setup();
+    await renderAll();
+    fireEvent.contextMenu(serverButton(0));
+    fireEvent.click(screen.getByRole("menuitem", { name: "Edit server" }));
+    const check = within(dialog()).getByRole("checkbox", { name: "Always connect at start" });
+    expect(check).not.toBeChecked();
+    fireEvent.click(check);
+    fireEvent.click(within(dialog()).getByRole("button", { name: "Save" }));
+    await waitFor(() => {
+      expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+    });
+    expect((await api.serversList())[0]?.alwaysConnectAtStart).toBe(true);
+  });
+
+  it("keeps the edit dialog open when the Always connect limit is reached", async () => {
+    setup();
+    await api.settingsUpdate({ ...(await api.settingsGet()), maxConnectedServers: 1 });
+    await addServer("Other", "other.example.org");
+    await api.serverSetAlwaysConnect(1, true);
+    await renderAll();
+    fireEvent.contextMenu(serverButton(1));
+    fireEvent.click(screen.getByRole("menuitem", { name: "Edit server" }));
+    fireEvent.click(within(dialog()).getByRole("checkbox", { name: "Always connect at start" }));
+    fireEvent.click(within(dialog()).getByRole("button", { name: "Save" }));
+    expect(await within(dialog()).findByRole("alert")).toHaveTextContent(
+      /^Only 1 servers can be set to “Always connect at start”/,
+    );
+  });
+
   it("closes on Escape (cancel event)", async () => {
     setup();
     await renderAll();
@@ -432,6 +693,7 @@ describe("ConnectionStatus", () => {
     act(() => {
       api.mock.loseConnection();
       api.mock.emit("connectionStateChanged", {
+        serverId: 1,
         state: { state: "disconnected", error: { code: "serverUnreachable", message: "" } },
       });
     });
@@ -442,7 +704,7 @@ describe("ConnectionStatus", () => {
     );
     const connect = vi.spyOn(api, "connect");
     fireEvent.click(within(status()).getByRole("button", { name: "Reconnect" }));
-    expect(connect).toHaveBeenCalledWith(1, null);
+    expect(connect).toHaveBeenCalledWith(1, null, null);
   });
 
   it("shows TCP fallback", async () => {
@@ -453,7 +715,7 @@ describe("ConnectionStatus", () => {
       expect(serverButtons()[0]).toHaveAttribute("aria-current", "true");
     });
     act(() => {
-      api.mock.emit("transportChanged", { transport: "tcp" });
+      api.mock.emit("transportChanged", { serverId: 1, transport: "tcp" });
     });
     expect(status()).toHaveTextContent("Connected via TCP (UDP blocked).");
     expect(announce).toHaveBeenCalledWith(expect.stringContaining("TCP"));
@@ -521,7 +783,7 @@ describe("empty state", () => {
     const connect = vi.spyOn(api, "connect");
     fireEvent.click(screen.getByRole("button", { name: "Paste a mumble:// link" }));
     await waitFor(() => {
-      expect(connect).toHaveBeenCalledWith(expect.any(Number), ["Raid"]);
+      expect(connect).toHaveBeenCalledWith(expect.any(Number), ["Raid"], null);
     });
   });
 });
@@ -535,44 +797,37 @@ describe("deep links", () => {
     channelPath,
   });
 
-  it("connects to a matching saved server with the channel path", async () => {
-    setup();
-    await renderAll();
-    const connect = vi.spyOn(api, "connect");
-    act(() => {
-      api.mock.emit("deepLinkOpened", { link: link("LOCALHOST", ["Raid"]) });
-    });
-    expect(connect).toHaveBeenCalledWith(1, ["Raid"]);
-  });
-
-  it("asks to switch when another server is connected", async () => {
+  it("shows the server the engine connected for a link", async () => {
     setup();
     const other = await addServer("Other", "other.example.org");
     await renderAll();
-    fireEvent.click(serverButton(0));
-    await waitFor(() => {
-      expect(serverButtons()[0]).toHaveAttribute("aria-current", "true");
-    });
-    act(() => {
-      api.mock.emit("deepLinkOpened", { link: link("other.example.org", ["AFK"]) });
-    });
     const connect = vi.spyOn(api, "connect");
-    fireEvent.click(screen.getByRole("button", { name: "Disconnect and switch" }));
-    expect(connect).toHaveBeenCalledWith(other.id, ["AFK"]);
+    act(() => {
+      api.mock.emit("deepLinkOpened", {
+        link: link("other.example.org", ["AFK"]),
+        outcome: { kind: "connecting", serverId: other.id },
+      });
+    });
+    expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+    expect(getShownServerId()).toBe(other.id);
+    expect(connect).not.toHaveBeenCalled();
   });
 
   it("offers to save an unknown server, then connects", async () => {
     setup();
     await renderAll();
     act(() => {
-      api.mock.emit("deepLinkOpened", { link: link("new.example.org", ["Lobby"]) });
+      api.mock.emit("deepLinkOpened", {
+        link: link("new.example.org", ["Lobby"]),
+        outcome: { kind: "unknownServer" },
+      });
     });
     expect(dialog()).toHaveAccessibleName("Save this server?");
     expect(screen.getByLabelText("Address")).toHaveValue("new.example.org");
     const connect = vi.spyOn(api, "connect");
     fireEvent.click(screen.getByRole("button", { name: "Save and connect" }));
     await waitFor(() => {
-      expect(connect).toHaveBeenCalledWith(2, ["Lobby"]);
+      expect(connect).toHaveBeenCalledWith(2, ["Lobby"], null);
     });
   });
 });

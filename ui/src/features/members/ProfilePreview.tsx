@@ -18,8 +18,9 @@ import { useTranslation } from "react-i18next";
 import type { User } from "../../api";
 import { VOICE_STATE_KEY, voiceState } from "../channels/statusText";
 import { MumcordBadge } from "../channels/MumcordBadge";
-import { useServerState } from "../channels/serverStore";
+import { useServerStateOf, useShownServerId } from "../channels/serverStore";
 import { FriendButton } from "./FriendButton";
+import { ConnectionQuality } from "../connection/ConnectionQuality";
 import { NowGamingFor } from "../nowgaming";
 import { PositionalBadge } from "../positional";
 import { NowPlayingFor } from "../nowplaying";
@@ -119,11 +120,17 @@ function Preview({
   onFullProfile,
 }: {
   open: OpenPreview;
-  onFullProfile: (session: number, opener: HTMLElement | null) => void;
+  onFullProfile: (
+    session: number,
+    opener: HTMLElement | null,
+    focusConnection?: boolean,
+    serverId?: number,
+  ) => void;
 }) {
   const { t } = useTranslation("members");
   const pinned = open.pinned === true;
-  const state = useServerState();
+  const shown = useShownServerId();
+  const state = useServerStateOf(open.serverId ?? shown);
   const user = findPerson(state.users, open.session, open.name);
   const ref = useRef<HTMLDivElement>(null);
   // The trigger may be re-created by a re-render (tree rows, chat list); follow it by session.
@@ -254,10 +261,10 @@ function Preview({
               type="button"
               className="profile-preview__icon"
               aria-label={t("preview.privateMessage")}
-              title={t("preview.privateMessage")}
+              data-tooltip={t("preview.privateMessage")}
               onClick={() => {
                 dismiss(false);
-                openPrivateConversation(user);
+                openPrivateConversation(user, open.serverId);
               }}
             >
               {/* Chat bubble; the button's name is its translated aria-label. */}
@@ -272,16 +279,18 @@ function Preview({
               </svg>
             </button>
           )}
-          {canAct && user.session !== state.selfSession && <FriendButton user={user} />}
+          {canAct && user.session !== state.selfSession && (
+            <FriendButton user={user} serverId={open.serverId} />
+          )}
           {canAct && (
             <button
               type="button"
               className="profile-preview__icon"
               aria-label={t("preview.fullProfile")}
-              title={t("preview.fullProfile")}
+              data-tooltip={t("preview.fullProfile")}
               onClick={() => {
                 dismiss(false);
-                onFullProfile(user.session, open.opener ?? null);
+                onFullProfile(user.session, open.opener ?? null, false, open.serverId);
               }}
             >
               {/* Identity card; the button's name is its translated aria-label. */}
@@ -298,7 +307,7 @@ function Preview({
             type="button"
             className="profile-preview__icon"
             aria-label={t("card.close")}
-            title={t("card.close")}
+            data-tooltip={t("card.close")}
             onClick={() => {
               dismiss(true);
             }}
@@ -308,7 +317,12 @@ function Preview({
         </div>
       )}
       {user ? (
-        <PreviewBody key={user.session} user={user} talking={state.talking.has(user.session)} />
+        <PreviewBody
+          key={`${String(open.serverId)}/${String(user.session)}`}
+          user={user}
+          serverId={open.serverId}
+          talking={state.talking.has(user.session)}
+        />
       ) : (
         <div className="profile-preview__header">
           <Avatar name={open.name ?? ""} src={null} size="lg" />
@@ -321,10 +335,18 @@ function Preview({
   );
 }
 
-function PreviewBody({ user, talking }: { user: User; talking: boolean }) {
+function PreviewBody({
+  user,
+  serverId,
+  talking,
+}: {
+  user: User;
+  serverId: number | undefined;
+  talking: boolean;
+}) {
   const { t } = useTranslation("members");
   const { t: tStatus } = useTranslation("channels");
-  const { profile } = usePersonProfile(user.session);
+  const { profile } = usePersonProfile(user.session, serverId);
   // Sanitized here like on the full card: server comments are untrusted.
   const comment = profile?.comment ? DOMPurify.sanitize(profile.comment) : "";
   const state = voiceState(user);
@@ -342,7 +364,7 @@ function PreviewBody({ user, talking }: { user: User; talking: boolean }) {
           <p className="profile-preview__name">
             {user.name}
             <MumcordBadge user={user} />
-            <PositionalBadge session={user.session} />
+            <PositionalBadge session={user.session} serverId={serverId} />
           </p>
           <p className="profile-preview__meta">
             {user.registered ? t("registered") : t("unregistered")}
@@ -350,8 +372,9 @@ function PreviewBody({ user, talking }: { user: User; talking: boolean }) {
           {voice.length > 0 && <p className="profile-preview__voice">{voice.join(", ")}</p>}
         </div>
       </div>
-      <NowGamingFor session={user.session} compact />
-      <NowPlayingFor session={user.session} compact />
+      <ConnectionQuality session={user.session} serverId={serverId} />
+      <NowGamingFor session={user.session} serverId={serverId} compact />
+      <NowPlayingFor session={user.session} serverId={serverId} compact />
       {comment && (
         <div className="profile-preview__comment" dangerouslySetInnerHTML={{ __html: comment }} />
       )}

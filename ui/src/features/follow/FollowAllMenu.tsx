@@ -2,6 +2,7 @@ import { useCallback, useRef, useState, type MouseEvent } from "react";
 import { useTranslation } from "react-i18next";
 import type { TFunction } from "i18next";
 import { EngineError, getApi } from "../../api";
+import { shownServerId } from "../channels/serverStore";
 import { useServerState } from "../channels";
 import { useServers } from "../servers";
 import { displayName } from "../servers/format";
@@ -48,11 +49,11 @@ export function FollowAllMenu() {
     try {
       if (action === "follow") {
         setFollowNotice({ text: t("all.working"), error: false });
-        const summary = await getApi().channelFollowAll();
+        const summary = await getApi().channelFollowAll(shownServerId());
         setFollowNotice({ text: describeSummary(t, summary), error: false });
       } else {
         setFollowNotice(null);
-        await getApi().channelUnfollowAll();
+        await getApi().channelUnfollowAll(shownServerId());
         setFollowNotice({ text: t("all.unfollowed"), error: false });
       }
     } catch (e) {

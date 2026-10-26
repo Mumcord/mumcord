@@ -4,8 +4,12 @@
  */
 import { useEffect, useState } from "react";
 import { getApi, toEngineError, type PersonProfile } from "../../api";
+import { shownServerId } from "../channels/serverStore";
 
-export function usePersonProfile(session: number): {
+export function usePersonProfile(
+  session: number,
+  serverId?: number,
+): {
   profile: PersonProfile | null;
   loadError: boolean;
 } {
@@ -18,7 +22,7 @@ export function usePersonProfile(session: number): {
   useEffect(() => {
     let active = true;
     getApi()
-      .personProfile(session)
+      .personProfile(serverId ?? shownServerId(), session)
       .then((profile) => {
         if (active) setLoaded({ session, profile, loadError: false });
       })
@@ -29,7 +33,7 @@ export function usePersonProfile(session: number): {
     return () => {
       active = false;
     };
-  }, [session]);
+  }, [session, serverId]);
 
   // A result for a previous session (the preview switched people) is not shown.
   return loaded?.session === session

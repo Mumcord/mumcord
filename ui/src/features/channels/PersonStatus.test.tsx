@@ -1,4 +1,4 @@
-import { act, render, screen } from "@testing-library/react";
+import { act, render, screen, waitFor } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import type { MockApi, User } from "../../api";
 import { applyLanguage } from "../../i18n";
@@ -23,7 +23,7 @@ function base(): User {
 
 function update(change: Partial<User>) {
   act(() => {
-    api.mock.emit("userUpserted", { user: { ...base(), ...change } });
+    api.mock.emit("userUpserted", { serverId: 1, user: { ...base(), ...change } });
   });
 }
 
@@ -36,7 +36,7 @@ async function renderBoth() {
     </>,
   );
   await screen.findByRole("tree", { name: "Channels" });
-  await screen.findByRole("heading", { name: "In Lobby (3)" });
+  await screen.findByRole("heading", { name: "In Lobby (4)" });
 }
 
 const treeRow = () => screen.getByRole("treeitem", { name: /^Anna/ });
@@ -124,7 +124,7 @@ describe("person status in the tree and member list", () => {
     for (const row of rows()) expect(row.querySelector(".mumcord-badge")).toBeNull();
     update({ isMumcord: true, mumcordFeatures: ["now-playing"] });
     for (const row of rows()) {
-      expect(row.querySelector(".mumcord-badge")).toHaveAttribute("title", "Uses Mumcord");
+      expect(row.querySelector(".mumcord-badge")).toHaveAttribute("data-tooltip", "Uses Mumcord");
     }
   });
 
@@ -134,6 +134,7 @@ describe("person status in the tree and member list", () => {
     if (!self) throw new Error("no self user in the seeded server");
     act(() => {
       api.mock.emit("userUpserted", {
+        serverId: 1,
         user: { ...self, isMumcord: true, mumcordFeatures: ["now-playing"] },
       });
     });
@@ -142,7 +143,7 @@ describe("person status in the tree and member list", () => {
       screen.getByRole("button", { name: (n) => n.startsWith(self.name) }),
     ];
     for (const row of ownRows) {
-      expect(row.querySelector(".mumcord-badge")).toHaveAttribute("title", "Uses Mumcord");
+      expect(row.querySelector(".mumcord-badge")).toHaveAttribute("data-tooltip", "Uses Mumcord");
     }
   });
 
@@ -185,7 +186,9 @@ describe("status icon tooltips", () => {
   it.each(cases)("%s icon has a tooltip", async (_n, change, text) => {
     await renderBoth();
     update({ registered: true, ...change });
-    expect((await screen.findAllByTitle(text)).length).toBeGreaterThan(0);
+    await waitFor(() => {
+      expect(document.querySelectorAll(`[data-tooltip="${text}"]`).length).toBeGreaterThan(0);
+    });
   });
 
   it("shows the guest icon only for unregistered people", async () => {

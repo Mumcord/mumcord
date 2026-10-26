@@ -1,11 +1,18 @@
 /**
  * Polite screen-reader announcements for joins, leaves and talking in the own voice channel.
+ * They follow the voice server, not the shown one (FR-2.2): that is where the user hears people.
+ * While no server has voice, the shown server's own channel is announced as before.
  * Rate-limited so a busy channel doesn't flood the screen reader.
  */
 import { useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { announce } from "../../a11y";
-import { selfUser, subscribeServerChanges } from "./serverStore";
+import {
+  getShownServerId,
+  getVoiceServerId,
+  selfUser,
+  subscribeAllServerChanges,
+} from "./serverStore";
 
 /** Minimum time between any two announcements, and between talking announcements per person. */
 export const GLOBAL_INTERVAL_MS = 1500;
@@ -34,7 +41,8 @@ export function useServerAnnouncements(): void {
 
   useEffect(() => {
     const limiter = new AnnouncementLimiter();
-    return subscribeServerChanges((change, state) => {
+    return subscribeAllServerChanges((serverId, change, state) => {
+      if (serverId !== (getVoiceServerId() ?? getShownServerId())) return;
       const self = selfUser(state);
       if (!self) return;
       const now = Date.now();

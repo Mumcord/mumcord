@@ -43,11 +43,12 @@ describe("server store", () => {
     });
     expect(result.current.talking.has(2)).toBe(true);
 
-    await act(() => api.channelJoin(2));
+    await act(() => api.channelJoin(1, 2));
     expect(result.current.users.get(1)?.channelId).toBe(2);
 
     act(() => {
       api.mock.emit("channelUpserted", {
+        serverId: 1,
         channel: {
           id: 9,
           parentId: 2,
@@ -58,13 +59,13 @@ describe("server store", () => {
           hasDescription: false,
         },
       });
-      api.mock.emit("userRemoved", { session: 2 });
+      api.mock.emit("userRemoved", { serverId: 1, session: 2 });
     });
     expect(result.current.channels.get(9)?.name).toBe("Sub");
     expect(result.current.users.has(2)).toBe(false);
     expect(result.current.talking.has(2)).toBe(false);
 
-    await act(() => api.disconnect());
+    await act(() => api.disconnect(1));
     expect(result.current.serverId).toBeNull();
     expect(result.current.users.size).toBe(0);
   });
@@ -97,7 +98,7 @@ describe("selected conversation", () => {
     expect(getSelectedConversation()).toEqual({ kind: "channel", channelId: 3 });
 
     act(() => {
-      api.mock.emit("channelRemoved", { channelId: 3 });
+      api.mock.emit("channelRemoved", { serverId: 1, channelId: 3 });
     });
     expect(result.current.conversation).toEqual({ kind: "channel", channelId: 1 });
 
@@ -109,10 +110,10 @@ describe("selected conversation", () => {
     });
     expect(result.current.conversation).toEqual({ kind: "private", certHash: "annahash" });
 
-    await act(() => api.disconnect());
+    await act(() => api.disconnect(1));
     expect(result.current.conversation).toBeNull();
 
-    await act(() => api.connect(1, null));
+    await act(() => api.connect(1, null, null));
     expect(result.current.conversation).toEqual({ kind: "channel", channelId: 1 });
   });
 });
@@ -178,10 +179,10 @@ describe("per-frame batching", () => {
 
     act(() => {
       for (let id = 10; id < 40; id += 1) {
-        api.mock.emit("channelUpserted", { channel: channel(id) });
+        api.mock.emit("channelUpserted", { serverId: 1, channel: channel(id) });
       }
-      api.mock.emit("userUpserted", { user: { ...anna, channelId: 2 } });
-      api.mock.emit("talkStateChanged", { session: 3, talking: true });
+      api.mock.emit("userUpserted", { serverId: 1, user: { ...anna, channelId: 2 } });
+      api.mock.emit("talkStateChanged", { serverId: 1, session: 3, talking: true });
     });
     expect(result.current).toBe(before);
     expect(pending).not.toBeNull();
@@ -206,7 +207,7 @@ describe("per-frame batching", () => {
       expect(getServerState().serverId).toBe(1);
     });
     setUpdateScheduler(() => () => undefined);
-    api.mock.emit("channelsUpserted", { channels: [channel(50), channel(51)] });
+    api.mock.emit("channelsUpserted", { serverId: 1, channels: [channel(50), channel(51)] });
     expect(getServerState().channels.get(51)?.name).toBe("C51");
   });
 });

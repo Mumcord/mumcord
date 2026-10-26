@@ -11,24 +11,28 @@ import {
   useEffect,
   useMemo,
   useRef,
+  useState,
   useSyncExternalStore,
   type CSSProperties,
 } from "react";
-import { useTranslation } from "react-i18next";
+import { createPortal } from "react-dom";
+import { useT } from "../../i18n/useT";
 import type { User } from "../../api";
-import { Avatar } from "../members/Avatar";
+import { descriptionKey, showInfo, useHiddenHash } from "../chat/hiddenInfo";
 import { ProfilePreviewTrigger } from "../members/ProfilePreview";
 import { openPersonMenuFromEvent } from "../members/personMenuStore";
 import { clickPerson, doubleClickPerson } from "../members/personClick";
 import { previewOnFocus, releasePreview } from "../members/profilePreviewStore";
+import { ServerMenu } from "../servers/ServerMenu";
 import { AvatarStack, type StackPerson } from "./AvatarStack";
 import { StatusIcons } from "./PersonStatus";
-import type { ServerState } from "./serverStore";
+import { shownServerId, type ServerState } from "./serverStore";
 import { useStatusText } from "./statusText";
 import { cachedSelector, sameValue } from "./cachedSelector";
 import { foldName, matchRange } from "./search";
 import { TreeContext, type TreeContextValue, type ValueStore } from "./treeContext";
 import { MumcordBadge } from "./MumcordBadge";
+import { LiveAvatar, LiveBadge } from "../screenshare/LiveBadge";
 import {
   channelRowId,
   CROWDED_CHANNEL_SIZE,
@@ -93,7 +97,7 @@ export const ChannelBranch = memo(function ChannelBranchRow({
   node: ChannelNode;
   level: number;
 }) {
-  const { t } = useTranslation("channels");
+  const t = useT("channels");
   const tree = useTree();
   const { channel } = node;
   const id = channel.id;
@@ -136,6 +140,13 @@ export const ChannelBranch = memo(function ChannelBranchRow({
   const showStack = stack.length > 0;
   const showAllLabel = listingAll ? t("tree.showFewer") : t("tree.showAll", { total: count });
   const actions = tree.actions;
+  // The right-click menu only exists to bring back a closed channel description (FR-2.66).
+  const descriptionHidden = useHiddenHash(descriptionKey(shownServerId(), id)) !== null;
+  const [menu, setMenu] = useState<{ x: number; y: number; opener: HTMLElement } | null>(null);
+  const closeMenu = (returnFocus: boolean) => {
+    if (returnFocus) menu?.opener.focus();
+    setMenu(null);
+  };
   // Indent of the channel's people and sub-channels; also read by its avatar stack line, which is
   // indented like its people (QA.27).
   const indent = { "--tree-indent": `${String(indentRem(level + 1))}rem` } as CSSProperties;
@@ -172,6 +183,17 @@ export const ChannelBranch = memo(function ChannelBranchRow({
           event.stopPropagation();
           actions.current.joinOnce(id, event.timeStamp);
         }}
+        onContextMenu={(event) => {
+          if (!descriptionHidden) return;
+          event.preventDefault();
+          const keyboard = event.clientX === 0 && event.clientY === 0;
+          const rect = event.currentTarget.getBoundingClientRect();
+          setMenu({
+            x: keyboard ? rect.left : event.clientX,
+            y: keyboard ? rect.bottom : event.clientY,
+            opener: event.currentTarget,
+          });
+        }}
       >
         <div className="tree-channel__row" data-selected={selected} data-voice={isOwn}>
           <span
@@ -190,10 +212,30 @@ export const ChannelBranch = memo(function ChannelBranchRow({
             {expanded ? "▾" : "▸"}
           </span>
           <span id={labelId} className="tree-channel__label">
-            <span className="tree-channel__name" title={channel.name}>
+            <span className="tree-channel__name" data-tooltip={channel.name}>
               <Highlighted text={channel.name} query={query} />
             </span>
             {isOwn && <span className="visually-hidden">, {t("tree.voiceHere")}</span>}
+            {!channel.permissions.enter && (
+              // The server's ACL refuses entering; joining asks for a channel password (FR-2.78).
+              <span className="tree-channel__lock">
+                <svg
+                  viewBox="0 0 24 24"
+                  width="12"
+                  height="12"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  aria-hidden="true"
+                  focusable="false"
+                >
+                  <path d="M6 11h12v10H6zM8 11V7a4 4 0 0 1 8 0v4" />
+                </svg>
+                <span className="visually-hidden">, {t("tree.locked")}</span>
+              </span>
+            )}
             {count > 0 && (
               // The digits are CSS-generated (::before) so the row's visible text stays a run of
               // its accessible name (WCAG 2.5.3); the spoken form is the visually hidden phrase.
@@ -219,7 +261,8 @@ export const ChannelBranch = memo(function ChannelBranchRow({
             {/* The stack's label follows in the name (aria-labelledby); this is its comma. */}
             {showStack && <span className="visually-hidden">,</span>}
           </span>
-          {!isOwn && channel.permissions.enter && (
+          {/* Also on locked channels: joining one asks for its password (FR-2.78). */}
+          {!isOwn && (
             <button
               type="button"
               className="tree-channel__join"
@@ -275,6 +318,26 @@ export const ChannelBranch = memo(function ChannelBranchRow({
           </div>
         )}
       </div>
+      {menu &&
+        descriptionHidden &&
+        createPortal(
+          <ServerMenu
+            label={t("tree.menuLabel", { channel: channel.name })}
+            position={menu}
+            onClose={closeMenu}
+            items={[
+              {
+                id: "showDescription",
+                label: t("tree.showDescription"),
+                onSelect: () => {
+                  closeMenu(true);
+                  showInfo(descriptionKey(shownServerId(), id));
+                },
+              },
+            ]}
+          />,
+          document.body,
+        )}
       {expanded && (
         <div role="group" id={groupId} style={indent}>
           {(shown ?? (!crowded || listingAll ? node.members : NO_STACK)).map((user) => (
@@ -291,7 +354,7 @@ export const ChannelBranch = memo(function ChannelBranchRow({
 
 /** One person in the tree. */
 const PersonRow = memo(function PersonTreeRow({ user, level }: { user: User; level: number }) {
-  const { t } = useTranslation("channels");
+  const t = useT("channels");
   const statusText = useStatusText();
   const tree = useTree();
   const session = user.session;
@@ -339,11 +402,12 @@ const PersonRow = memo(function PersonTreeRow({ user, level }: { user: User; lev
     >
       <span className="tree-person__row">
         <ProfilePreviewTrigger session={session}>
-          <Avatar name={user.name} src={src} talking={talking} size="sm" />
+          <LiveAvatar session={session} name={user.name} src={src} talking={talking} size="sm" />
           <span id={labelId} className="tree-person__name" data-local-muted={user.localMute}>
             <Highlighted text={user.name} query={query} />
             {isSelf && <span className="tree-person__you"> {t("tree.you")}</span>}
             <MumcordBadge user={user} />
+            <LiveBadge session={session} />
             {status.length > 0 && <span className="visually-hidden">, {status.join(", ")}</span>}
           </span>
         </ProfilePreviewTrigger>

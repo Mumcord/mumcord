@@ -24,14 +24,14 @@ describe("PositionalBadge", () => {
     expect(screen.queryByRole("img", { name: "Positional audio active" })).toBeNull();
 
     act(() => {
-      api.mock.emit("positionalSendingChanged", { session: 7, sending: true });
+      api.mock.emit("positionalSendingChanged", { serverId: 1, session: 7, sending: true });
     });
     const badge = screen.getByRole("img", { name: "Positional audio active" });
-    expect(badge).toHaveAttribute("title", "Positional audio active");
+    expect(badge).toHaveAttribute("data-tooltip", "Positional audio active");
     expect(badge).toHaveTextContent("3D");
 
     act(() => {
-      api.mock.emit("positionalSendingChanged", { session: 7, sending: false });
+      api.mock.emit("positionalSendingChanged", { serverId: 1, session: 7, sending: false });
     });
     expect(screen.queryByRole("img", { name: "Positional audio active" })).toBeNull();
   });
@@ -39,7 +39,7 @@ describe("PositionalBadge", () => {
   it("only shows for the session that sends", () => {
     render(<PositionalBadge session={7} />);
     act(() => {
-      api.mock.emit("positionalSendingChanged", { session: 8, sending: true });
+      api.mock.emit("positionalSendingChanged", { serverId: 1, session: 8, sending: true });
     });
     expect(screen.queryByRole("img", { name: "Positional audio active" })).toBeNull();
   });
@@ -63,10 +63,10 @@ describe("PositionalBadge", () => {
   it("drops the flag when the person leaves", () => {
     render(<PositionalBadge session={7} />);
     act(() => {
-      api.mock.emit("positionalSendingChanged", { session: 7, sending: true });
+      api.mock.emit("positionalSendingChanged", { serverId: 1, session: 7, sending: true });
     });
     act(() => {
-      api.mock.emit("userRemoved", { session: 7 });
+      api.mock.emit("userRemoved", { serverId: 1, session: 7 });
     });
     expect(screen.queryByRole("img", { name: "Positional audio active" })).toBeNull();
   });

@@ -22,14 +22,14 @@ function setup(): MockApi {
 
 async function connect(channelPath: string[] | null = null) {
   await act(async () => {
-    await api.connect(SERVER, channelPath);
+    await api.connect(SERVER, channelPath, null);
   });
 }
 
 const region = () => screen.getByRole("status", { name: "Rejoin last channel" });
 const prompt = () => within(region()).queryByText("You were in Raid last time – Rejoin?");
 const ownChannel = async () => {
-  const snapshot = await api.sessionSnapshot();
+  const snapshot = await api.sessionSnapshot(1);
   return snapshot?.users.find((u) => u.session === SELF)?.channelId;
 };
 
@@ -52,7 +52,7 @@ describe("RejoinPrompt", () => {
     await waitFor(() => {
       expect(prompt()).not.toBeInTheDocument();
     });
-    const snapshot = await api.sessionSnapshot();
+    const snapshot = await api.sessionSnapshot(1);
     const self = snapshot?.users.find((u) => u.session === SELF);
     expect(self?.channelId).toBe(RAID);
     expect(self?.selfDeaf).toBe(false);
@@ -66,11 +66,11 @@ describe("RejoinPrompt", () => {
     });
     fireEvent.click(within(region()).getByRole("button", { name: "Not now" }));
     expect(prompt()).not.toBeInTheDocument();
-    const snapshot = await api.sessionSnapshot();
+    const snapshot = await api.sessionSnapshot(1);
     expect(snapshot?.users.find((u) => u.session === SELF)?.selfDeaf).toBe(true);
 
     await act(async () => {
-      await api.disconnect();
+      await api.disconnect(1);
     });
     await connect();
     expect(prompt()).not.toBeInTheDocument();
@@ -97,7 +97,7 @@ describe("RejoinPrompt", () => {
       expect(prompt()).toBeInTheDocument();
     });
     await act(async () => {
-      await api.channelJoin(3);
+      await api.channelJoin(1, 3);
     });
     expect(prompt()).not.toBeInTheDocument();
   });

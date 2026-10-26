@@ -101,7 +101,7 @@ describe("follow eye", () => {
 
   it("shows the limit error below the tree and keeps the unread badge", async () => {
     await setup();
-    await act(() => api.channelFollow(2));
+    await act(() => api.channelFollow(1, 2));
     act(() => {
       api.mock.receiveMessage({ kind: "channel", channelId: 2 }, "hello", 2);
     });
@@ -118,7 +118,7 @@ describe("follow eye", () => {
     resetServerStore();
     const old = createMockApi({ serverVersion: "1.3.4" });
     setApi(old);
-    await old.connect(1, null);
+    await old.connect(1, null, null);
     renderPanel();
     await screen.findByRole("tree", { name: "Channels" });
     expect(screen.queryByRole("button", { name: /Follow/ })).toBeNull();

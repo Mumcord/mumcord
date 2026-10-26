@@ -5,12 +5,19 @@ import { createMockApi, setApi, type MockApi } from "../../api";
 import { applyLanguage } from "../../i18n";
 import { axeViolations } from "../../test/axe";
 import { applyThemeToDocument } from "../../theme/theme";
+import { descriptionKey, hideInfo, resetHiddenInfo } from "../chat/hiddenInfo";
 import { ProfilePreviewHost } from "../members/ProfilePreview";
 import { PIN_DELAY_MS } from "../members/profilePreviewStore";
 import { AnnouncementLimiter, GLOBAL_INTERVAL_MS, TALK_INTERVAL_MS } from "./announcements";
 import { ChannelsPanel } from "./ChannelsPanel";
 import { getSelectedConversation } from "./selection";
-import { getServerState, resetServerStore } from "./serverStore";
+import {
+  getServerState,
+  getServerStateOf,
+  resetServerStore,
+  showServer,
+  shownServerId,
+} from "./serverStore";
 import { connectedMock, resetAll, stubDialog } from "./testUtils";
 
 let api: MockApi;
@@ -35,17 +42,39 @@ afterEach(() => {
   resetAll();
 });
 
+describe("channel description menu (FR-2.66)", () => {
+  afterEach(() => {
+    localStorage.clear();
+    resetHiddenInfo();
+  });
+
+  it("offers Show channel description only on a channel whose description is hidden", async () => {
+    await renderPanel();
+    fireEvent.contextMenu(item(/^Lobby/));
+    expect(screen.queryByRole("menu")).toBeNull();
+    act(() => {
+      hideInfo(descriptionKey(shownServerId(), 1), "About");
+    });
+    fireEvent.contextMenu(item(/^Raid/));
+    expect(screen.queryByRole("menu")).toBeNull();
+    fireEvent.contextMenu(item(/^Lobby/));
+    fireEvent.click(screen.getByRole("menuitem", { name: "Show channel description" }));
+    expect(localStorage.getItem(`mumcord.hidden.${descriptionKey(shownServerId(), 1)}`)).toBeNull();
+    expect(screen.queryByRole("menu")).toBeNull();
+  });
+});
+
 describe("ChannelsPanel", () => {
   it("shows an empty state when not connected", async () => {
     api = await connectedMock();
-    await act(() => api.disconnect());
+    await act(() => api.disconnect(1));
     render(<ChannelsPanel />);
     expect(screen.getByText(/Not connected/)).toBeInTheDocument();
   });
 
   it("renders channels with people and their status", async () => {
     await renderPanel();
-    await act(() => api.channelJoin(1));
+    await act(() => api.channelJoin(1, 1));
     const lobby = item(/^Lobby/);
     expect(lobby).toHaveAttribute("aria-expanded", "true");
     expect(lobby).toHaveAttribute("aria-selected", "true");
@@ -118,7 +147,7 @@ describe("ChannelsPanel", () => {
     expect(carla[0]?.querySelector(".person-icon:not(.person-icon--registered)")).toBeNull();
     const self = getServerState().selfSession ?? -1;
     await act(async () => {
-      await api.channelFollow(2);
+      await api.channelFollow(1, 2);
     });
     expect(document.querySelectorAll(`.tree-person[data-row='u${String(self)}']`)).toHaveLength(1);
     expect(item(/^Lobby/)).toHaveAccessibleName(/3 people/);
@@ -181,7 +210,7 @@ describe("ChannelsPanel", () => {
 
     it("marks the joined channel with a cue for screen readers, apart from the selection", async () => {
       await renderPanel();
-      await act(() => api.channelJoin(1));
+      await act(() => api.channelJoin(1, 1));
       expect(voiceRows()).toEqual(["Lobby"]);
       expect(item(/^Lobby/)).toHaveAccessibleName(/you are here \(voice\)/);
       expect(item(/^Raid/)).not.toHaveAccessibleName(/you are here/);
@@ -192,8 +221,8 @@ describe("ChannelsPanel", () => {
 
     it("moves with the user to the joined channel", async () => {
       await renderPanel();
-      await act(() => api.channelJoin(1));
-      await act(() => api.channelJoin(2));
+      await act(() => api.channelJoin(1, 1));
+      await act(() => api.channelJoin(1, 2));
       expect(voiceRows()).toEqual(["Raid"]);
       expect(item(/^Lobby/)).not.toHaveAccessibleName(/you are here/);
       expect(item(/^Raid/)).toHaveAccessibleName(/you are here \(voice\)/);
@@ -205,10 +234,10 @@ describe("ChannelsPanel", () => {
       resetServerStore();
       await applyLanguage("en");
       render(<ChannelsPanel />);
-      await act(() => api.connect(1, null));
+      await act(() => api.connect(1, null, null));
       await screen.findByRole("tree", { name: "Channels" });
       expect(voiceRows()).toEqual([]);
-      await act(() => api.channelJoin(1));
+      await act(() => api.channelJoin(1, 1));
       expect(voiceRows()).toEqual(["Lobby"]);
     });
   });
@@ -378,20 +407,20 @@ describe("announcements", () => {
     const carla = getServerState().users.get(4);
     if (!carla) throw new Error("seed changed");
     act(() => {
-      api.mock.emit("userUpserted", { user: { ...carla, channelId: 1 } });
+      api.mock.emit("userUpserted", { serverId: 1, user: { ...carla, channelId: 1 } });
     });
     expect(heard.at(-1)?.message).toBe("Carla joined your channel");
 
     vi.setSystemTime(6000);
     act(() => {
-      api.mock.emit("userRemoved", { session: 3 });
+      api.mock.emit("userRemoved", { serverId: 1, session: 3 });
     });
     expect(heard.at(-1)?.message).toBe("Ben left your channel");
 
     vi.setSystemTime(8000);
     act(() => {
       // Talking elsewhere is not announced.
-      api.mock.emit("userUpserted", { user: { ...carla, channelId: 2 } });
+      api.mock.emit("userUpserted", { serverId: 1, user: { ...carla, channelId: 2 } });
     });
     vi.setSystemTime(10_000);
     act(() => {
@@ -403,6 +432,21 @@ describe("announcements", () => {
       "Ben left your channel",
       "Carla left your channel",
     ]);
+    stop();
+  });
+
+  it("follows the voice server, not the shown one (FR-2.2)", async () => {
+    const heard: Announcement[] = [];
+    const stop = subscribeAnnouncements((a) => heard.push(a));
+    await renderPanel();
+    const carla = getServerStateOf(1).users.get(4);
+    if (!carla) throw new Error("seed changed");
+    act(() => {
+      api.mock.emit("voiceServerChanged", { serverId: 1 });
+      showServer(2);
+      api.mock.emit("userUpserted", { serverId: 1, user: { ...carla, channelId: 1 } });
+    });
+    expect(heard.map((a) => a.message)).toEqual(["Carla joined your channel"]);
     stop();
   });
 });

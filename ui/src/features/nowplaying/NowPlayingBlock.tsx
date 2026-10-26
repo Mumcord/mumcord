@@ -6,6 +6,7 @@
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { getApi, type NowPlaying } from "../../api";
+import { shownServerId } from "../channels";
 import "./nowPlaying.css";
 import { formatTime, positionAt, type LiveTrack } from "./progress";
 import { useNowPlaying } from "./nowPlayingStore";
@@ -16,27 +17,33 @@ export const PROGRESS_TICK_MS = 1000;
 /** The block for `session`, or nothing while the person shares no track. */
 export function NowPlayingFor({
   session,
+  serverId,
   compact = false,
 }: {
   session: number;
+  serverId?: number | undefined;
   compact?: boolean;
 }) {
-  const live = useNowPlaying(session);
-  return live ? <NowPlayingBlock session={session} live={live} compact={compact} /> : null;
+  const live = useNowPlaying(session, serverId);
+  return live ? (
+    <NowPlayingBlock session={session} serverId={serverId} live={live} compact={compact} />
+  ) : null;
 }
 
 export function NowPlayingBlock({
   session,
+  serverId,
   live,
   compact = false,
 }: {
   session: number;
+  serverId?: number | undefined;
   live: LiveTrack;
   compact?: boolean;
 }) {
   const { t } = useTranslation("members");
   const { track } = live;
-  const cover = useCover(session, track);
+  const cover = useCover(session, track, serverId);
   const now = useClock(track.playing);
   const position = positionAt(live, now);
   const className = compact ? "now-playing now-playing--compact" : "now-playing";
@@ -87,7 +94,7 @@ function useClock(running: boolean): number {
 }
 
 /** The cover as a `data:` URL from the engine; reloaded when the track changes. */
-function useCover(session: number, track: NowPlaying): string | null {
+function useCover(session: number, track: NowPlaying, serverId?: number): string | null {
   const { hasCover, title, artist } = track;
   const key = `${String(session)}\n${artist}\n${title}`;
   const [loaded, setLoaded] = useState<{ key: string; cover: string | null } | null>(null);
@@ -95,7 +102,7 @@ function useCover(session: number, track: NowPlaying): string | null {
     if (!hasCover) return;
     let active = true;
     getApi()
-      .nowPlayingCover(session)
+      .nowPlayingCover(serverId ?? shownServerId(), session)
       .then(
         (cover) => {
           if (active) setLoaded({ key, cover });
@@ -107,6 +114,6 @@ function useCover(session: number, track: NowPlaying): string | null {
     return () => {
       active = false;
     };
-  }, [session, hasCover, key]);
+  }, [session, serverId, hasCover, key]);
   return hasCover && loaded?.key === key ? loaded.cover : null;
 }

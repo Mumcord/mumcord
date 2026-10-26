@@ -94,6 +94,45 @@ function sameItems<T>(a: readonly T[], b: readonly T[]): boolean {
   return a.length === b.length && a.every((item, i) => item === b[i]);
 }
 
+export interface ArrangeOptions {
+  /** Leave out channels without people in them or below them (FR-2.23). */
+  hideEmpty: boolean;
+  /** Channels that stay even when empty, such as the own and the selected one. */
+  keep: ReadonlySet<number>;
+  /** List these talking people first in their channel (FR-2.23); null keeps A–Z. */
+  talkingFirst: ReadonlySet<number> | null;
+}
+
+/**
+ * The tree as the list shows it with the "Hide empty channels" and "Show talking people first"
+ * settings. Unchanged channels keep their node objects, so their memoised rows skip re-rendering.
+ */
+export function arrangeTree(roots: ChannelNode[], options: ArrangeOptions): ChannelNode[] {
+  const { hideEmpty, keep, talkingFirst } = options;
+  if (!hideEmpty && talkingFirst === null) return roots;
+  const arrange = (node: ChannelNode): ChannelNode | null => {
+    const children = node.children.flatMap((child) => arrange(child) ?? []);
+    const members =
+      talkingFirst === null
+        ? node.members
+        : talkingPeopleFirst(node.members, (user) => talkingFirst.has(user.session));
+    if (hideEmpty && children.length === 0 && members.length === 0 && !keep.has(node.channel.id)) {
+      return null;
+    }
+    return members === node.members && sameItems(children, node.children)
+      ? node
+      : { ...node, children, members };
+  };
+  const arranged = roots.flatMap((root) => arrange(root) ?? []);
+  return sameItems(roots, arranged) ? roots : arranged;
+}
+
+/** Talking people first, otherwise in the given order; the same array when no one talks. */
+export function talkingPeopleFirst<T>(people: T[], talks: (person: T) => boolean): T[] {
+  if (!people.some(talks)) return people;
+  return [...people.filter(talks), ...people.filter((person) => !talks(person))];
+}
+
 export function isExpandable(node: ChannelNode): boolean {
   return node.children.length + node.members.length > 0;
 }
@@ -220,6 +259,41 @@ export function visibleRows(
   };
   for (const root of roots) walk(root, null);
   return rows;
+}
+
+/** Rows a big tree adds per frame while it is first drawn: less than a screen (FR-2.24). */
+export const DRAW_STEP_ROWS = 20;
+
+/**
+ * The tree cut down to its first `limit` rows (people of a listed channel count in full), so a
+ * big tree can be drawn a few rows per frame (FR-2.24). Channels that keep all their rows keep
+ * their node objects.
+ */
+export function treePrefix(
+  roots: ChannelNode[],
+  collapsed: ReadonlySet<number>,
+  showAll: ReadonlySet<number>,
+  limit: number,
+): ChannelNode[] {
+  let left = limit;
+  const cut = (node: ChannelNode): ChannelNode => {
+    left -= 1;
+    if (!isExpandable(node) || collapsed.has(node.channel.id)) return node;
+    if (listsMembers(node, showAll)) left -= (shownMembers(node) ?? node.members).length;
+    const children = cutAll(node.children);
+    return children.length === node.children.length ? node : { ...node, children };
+  };
+  const cutAll = (nodes: ChannelNode[]): ChannelNode[] => {
+    const kept: ChannelNode[] = [];
+    for (const node of nodes) {
+      if (left <= 0) break;
+      kept.push(cut(node));
+    }
+    return kept.length === nodes.length && kept.every((node, i) => node === nodes[i])
+      ? nodes
+      : kept;
+  };
+  return cutAll(roots);
 }
 
 /** Servers with more channels than this start collapsed (QA.27). */

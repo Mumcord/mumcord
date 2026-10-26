@@ -36,6 +36,12 @@
   box-shadow: var(--glow-talking);
 }
 
+.avatar[data-live] {
+  /* Same outline slot as talking, so rows never shift; the live ring wins while sharing. */
+  outline: 2px solid var(--color-danger);
+  outline-offset: 1px;
+}
+
 .avatar img {
   width: 100%;
   height: 100%;
@@ -440,4 +446,50 @@
   font: inherit;
   text-transform: inherit;
   cursor: pointer;
+}
+
+.person-menu__header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding: var(--space-2) var(--space-3);
+  border-block-end: 1px solid var(--color-border);
+}
+
+.person-menu__name {
+  min-width: 0;
+  overflow: hidden;
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Muted text; only the icon carries the quality colour, so the line stays readable in both themes. */
+.person-menu__connection {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  gap: var(--space-1);
+  color: var(--color-text-muted);
+  font-size: 0.8em;
+  white-space: nowrap;
+}
+
+.person-menu__connection svg {
+  color: var(--color-success);
+}
+
+.person-menu__connection[data-level="fair"] svg {
+  color: var(--color-warning);
+}
+
+.person-menu__connection[data-level="weak"] svg {
+  color: var(--color-danger);
+}
+
+.profile-card__connection:focus-visible {
+  outline: 2px solid var(--color-focus, currentColor);
+  outline-offset: 2px;
 }

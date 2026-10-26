@@ -1,6 +1,7 @@
 import { act, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { MockApi } from "../../api";
+import { PreferencesContext, type Preferences } from "../../app/preferences";
 import { axeViolations } from "../../test/axe";
 import { applyThemeToDocument } from "../../theme/theme";
 import { getSelectedConversation, selectConversation } from "../channels/selection";
@@ -9,7 +10,7 @@ import { connectedMock, resetAll, stubDialog } from "../channels/testUtils";
 import { MembersPanel } from "./MembersPanel";
 import { ProfilePreviewHost } from "./ProfilePreview";
 import { PIN_DELAY_MS } from "./profilePreviewStore";
-import { ProfileCard, VOLUME_DEBOUNCE_MS } from "./ProfileCard";
+import { ProfileCard, VOLUME_THROTTLE_MS } from "./ProfileCard";
 
 let api: MockApi;
 
@@ -21,7 +22,7 @@ async function renderPanel(props: Parameters<typeof MembersPanel>[0] = {}) {
       <ProfilePreviewHost />
     </>,
   );
-  await screen.findByRole("heading", { name: "In Lobby (3)" });
+  await screen.findByRole("heading", { name: "In Lobby (4)" });
   return view;
 }
 
@@ -50,12 +51,54 @@ afterEach(() => {
 });
 
 describe("MembersPanel", () => {
-  it("lists the people of the selected channel, then listeners", async () => {
+  it("lists talking people first when that setting is on", async () => {
+    api = await connectedMock();
+    const preferences: Preferences = {
+      theme: "system",
+      resolvedTheme: "dark",
+      language: "en",
+      chatDisplay: "cozy",
+      linkPreviews: false,
+      hideEmptyChannels: false,
+      talkingFirst: true,
+      showWeakConnectionIcon: true,
+      applySettings: () => undefined,
+    };
+    render(
+      <PreferencesContext.Provider value={preferences}>
+        <MembersPanel />
+      </PreferencesContext.Provider>,
+    );
+    await screen.findByRole("heading", { name: "In Lobby (4)" });
+    const names = () =>
+      screen
+        .getAllByRole("button")
+        .filter((b) => b.classList.contains("member"))
+        .map((b) => b.textContent);
+    expect(names()[0]).toMatch(/^Anna/);
+    const ben = [...getServerState().users.values()].find((u) => u.name === "Ben");
+    if (!ben) throw new Error("seed has no Ben");
+    act(() => {
+      api.mock.emit("talkStateChanged", { serverId: 1, session: ben.session, talking: true });
+    });
+    await waitFor(() => {
+      expect(names()[0]).toMatch(/^Ben/);
+    });
+    act(() => {
+      api.mock.emit("talkStateChanged", { serverId: 1, session: ben.session, talking: false });
+    });
+    await waitFor(() => {
+      expect(names()[0]).toMatch(/^Anna/);
+    });
+  });
+
+  it("lists the people of the selected channel with listeners inline", async () => {
     await renderPanel();
-    expect(screen.getByRole("heading", { name: "Listening (1)" })).toBeInTheDocument();
+    expect(screen.queryByRole("heading", { name: /listening/i })).not.toBeInTheDocument();
     const buttons = screen.getAllByRole("button").filter((b) => b.classList.contains("member"));
     expect(buttons[0]).toHaveAccessibleName(/^Anna/);
-    expect(buttons[3]).toHaveAccessibleName(/^Carla/);
+    expect(buttons[2]).toHaveAccessibleName(/^Carla.*listening only/i);
+    expect(buttons[2]?.querySelector(".person-icon")).not.toBeNull();
     expect(member(/^Ben/)).toHaveAccessibleName(/not registered/);
 
     act(() => {
@@ -73,7 +116,7 @@ describe("MembersPanel", () => {
     expect(screen.getByRole("heading", { name: "Raid" })).toBeInTheDocument();
     expect(screen.getAllByRole("button", { name: /^Carla/ })).toHaveLength(2);
 
-    const here = screen.getByRole("button", { name: "In Lobby (3)" });
+    const here = screen.getByRole("button", { name: "In Lobby (4)" });
     fireEvent.click(here);
     expect(here).toHaveAttribute("aria-expanded", "false");
     expect(screen.queryByRole("button", { name: /^Anna/ })).not.toBeInTheDocument();
@@ -95,9 +138,9 @@ describe("MembersPanel", () => {
     ).toHaveLength(1);
     member(/^Anna/).focus();
     fireEvent.keyDown(member(/^Anna/), { key: "End" });
-    expect(member(/^Carla/)).toHaveFocus();
-    fireEvent.keyDown(member(/^Carla/), { key: "ArrowUp" });
     expect(member(/^Zoe/)).toHaveFocus();
+    fireEvent.keyDown(member(/^Zoe/), { key: "ArrowUp" });
+    expect(member(/^Carla/)).toHaveFocus();
   });
 
   it("keeps the talking indicator off listener rows", async () => {
@@ -112,14 +155,13 @@ describe("MembersPanel", () => {
   it("keeps voice state off listener rows", async () => {
     await renderPanel();
     await act(async () => {
-      await api.channelFollow(2);
+      await api.channelFollow(1, 2);
       await api.setSelfDeaf(true);
     });
     act(() => {
       selectConversation({ kind: "channel", channelId: 2 });
     });
-    await screen.findByRole("heading", { name: "Listening (1)" });
-    const listeners = screen.getAllByRole("button", { name: /listening/i });
+    const listeners = await screen.findAllByRole("button", { name: /listening only/i });
     const zoe = listeners.find((b) => b.getAttribute("data-key") === "l1");
     expect(zoe).toBeDefined();
     expect(zoe).not.toHaveAccessibleName(/deafened|muted/);
@@ -130,9 +172,8 @@ describe("MembersPanel", () => {
     await renderPanel();
     const self = getServerState().users.get(getServerState().selfSession ?? -1);
     await act(async () => {
-      await api.channelFollow(self?.channelId ?? 1);
+      await api.channelFollow(1, self?.channelId ?? 1);
     });
-    expect(screen.getByRole("heading", { name: "Listening (1)" })).toBeInTheDocument();
     expect(screen.getAllByRole("button", { name: /^Zoe/ })).toHaveLength(1);
   });
 
@@ -143,12 +184,12 @@ describe("MembersPanel", () => {
     expect(await screen.findByText("Hi, I am Anna.")).toBeInTheDocument();
     expect(dialog).toHaveAttribute("open");
 
+    fireEvent.click(screen.getByRole("button", { name: "Settings for Anna" }));
     vi.useFakeTimers();
     const slider = screen.getByRole("slider", { name: "Volume" });
     fireEvent.change(slider, { target: { value: "150" } });
     fireEvent.change(slider, { target: { value: "180" } });
-    expect(getServerState().users.get(2)?.volume).toBe(100);
-    await act(() => vi.advanceTimersByTimeAsync(VOLUME_DEBOUNCE_MS));
+    await act(() => vi.advanceTimersByTimeAsync(VOLUME_THROTTLE_MS));
     expect(getServerState().users.get(2)?.volume).toBe(180);
     vi.useRealTimers();
 
@@ -185,6 +226,7 @@ describe("MembersPanel", () => {
     await renderPanel();
     openFullProfile(/^Ben/);
     await screen.findByRole("dialog", { name: "Ben" });
+    fireEvent.click(screen.getByRole("button", { name: "Settings for Ben" }));
     expect(screen.getByText(/only last for this session/)).toBeInTheDocument();
     fireEvent.keyDown(screen.getByRole("dialog"), { key: "Escape" });
 
@@ -242,7 +284,7 @@ describe("MembersPanel", () => {
     fireEvent.click(screen.getByRole("button", { name: "Close" }));
     expect(screen.queryByRole("dialog")).toBeNull();
     pin(/^Anna/);
-    fireEvent.pointerDown(screen.getByRole("heading", { name: "In Lobby (3)" }));
+    fireEvent.pointerDown(screen.getByRole("heading", { name: "In Lobby (4)" }));
     expect(screen.queryByRole("dialog")).toBeNull();
   });
 
@@ -269,7 +311,7 @@ describe("MembersPanel", () => {
     openFullProfile(/^Anna/);
     await screen.findByRole("dialog", { name: "Anna" });
     act(() => {
-      api.mock.emit("userRemoved", { session: 2 });
+      api.mock.emit("userRemoved", { serverId: 1, session: 2 });
     });
     expect(screen.queryByRole("dialog")).toBeNull();
   });
@@ -307,15 +349,15 @@ describe("MembersPanel", () => {
       note: "",
     });
     act(() => {
-      api.mock.emit("userUpserted", { user: { ...ben, hasAvatar: true } });
+      api.mock.emit("userUpserted", { serverId: 1, user: { ...ben, hasAvatar: true } });
     });
     await waitFor(() => {
       expect(avatarImage(/^Ben/)).toHaveAttribute("src", "data:image/png;base64,QkVO");
     });
-    expect(profile).toHaveBeenCalledExactlyOnceWith(3);
+    expect(profile).toHaveBeenCalledExactlyOnceWith(1, 3);
 
     act(() => {
-      api.mock.emit("userUpserted", { user: { ...ben, hasAvatar: false } });
+      api.mock.emit("userUpserted", { serverId: 1, user: { ...ben, hasAvatar: false } });
     });
     expect(avatarImage(/^Ben/)).toBeNull();
     expect(member(/^Ben/).querySelector(".avatar")).toHaveAttribute("data-initial", "B");
@@ -326,7 +368,7 @@ describe("MembersPanel", () => {
       note: "",
     });
     act(() => {
-      api.mock.emit("userUpserted", { user: { ...ben, hasAvatar: true } });
+      api.mock.emit("userUpserted", { serverId: 1, user: { ...ben, hasAvatar: true } });
     });
     await waitFor(() => {
       expect(avatarImage(/^Ben/)).toHaveAttribute("src", "data:image/png;base64,TkVX");
@@ -346,7 +388,10 @@ describe("MembersPanel", () => {
       note: "",
     });
     act(() => {
-      api.mock.emit("userUpserted", { user: { ...ben, hasAvatar: true, avatarHash: "aa" } });
+      api.mock.emit("userUpserted", {
+        serverId: 1,
+        user: { ...ben, hasAvatar: true, avatarHash: "aa" },
+      });
     });
     await waitFor(() => {
       expect(avatarImage(/^Ben/)).toHaveAttribute("src", "data:image/png;base64,QkVO");
@@ -358,7 +403,10 @@ describe("MembersPanel", () => {
       note: "",
     });
     act(() => {
-      api.mock.emit("userUpserted", { user: { ...ben, hasAvatar: true, avatarHash: "bb" } });
+      api.mock.emit("userUpserted", {
+        serverId: 1,
+        user: { ...ben, hasAvatar: true, avatarHash: "bb" },
+      });
     });
     await waitFor(() => {
       expect(avatarImage(/^Ben/)).toHaveAttribute("src", "data:image/png;base64,TkVX");
@@ -371,7 +419,7 @@ describe("MembersPanel", () => {
     vi.spyOn(api, "personProfile").mockRejectedValue({ code: "notConnected", message: "x" });
     const error = vi.spyOn(console, "error").mockImplementation(() => undefined);
     render(<MembersPanel />);
-    await screen.findByRole("heading", { name: "In Lobby (3)" });
+    await screen.findByRole("heading", { name: "In Lobby (4)" });
     await waitFor(() => {
       expect(error).toHaveBeenCalled();
     });

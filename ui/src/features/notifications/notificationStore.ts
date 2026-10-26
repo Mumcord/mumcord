@@ -4,14 +4,23 @@
  */
 import { useSyncExternalStore } from "react";
 import type { Conversation } from "../../api";
+import { useShownServerId } from "../channels/serverStore";
 
 /** At most this many toasts are visible; older ones make room. */
 export const MAX_VISIBLE = 3;
 
+/** Key of a chat across servers: the same channel id or person can exist on several. */
+export function noticeKey(serverId: number, conversationKey: string): string {
+  return `${String(serverId)}/${conversationKey}`;
+}
+
 export interface Toast {
+  /** `noticeKey` of the chat. */
   key: string;
+  /** The server the chat belongs to (FR-2.10). */
+  serverId: number;
   conversation: Conversation;
-  /** "#Raid" or the sender's name for a private chat. */
+  /** "‹server› · #Raid" or "‹server› · ‹sender›" for a private chat. */
   title: string;
   /** Plain, already translated summary line ("Alice: hi" or "5 new messages in #Raid"). */
   text: string;
@@ -45,9 +54,17 @@ export function markMention(key: string): void {
   for (const listener of listeners) listener();
 }
 
-/** True while the chat has an unseen mention (for the "@" on its unread badge). */
-export function useHasMention(key: string | undefined): boolean {
-  return useSyncExternalStore(subscribe, () => key !== undefined && mentions.has(key));
+/**
+ * True while the chat has an unseen mention (for the "@" on its unread badge). `key` is the
+ * conversation key; `serverId` defaults to the shown server.
+ */
+export function useHasMention(key: string | undefined, serverId?: number): boolean {
+  const shown = useShownServerId();
+  const server = serverId ?? shown;
+  return useSyncExternalStore(
+    subscribe,
+    () => key !== undefined && server !== null && mentions.has(noticeKey(server, key)),
+  );
 }
 
 function forgetMention(key: string): void {
@@ -76,14 +93,17 @@ export function removeToast(key: string): void {
   if (toasts.some((t) => t.key === key)) setToasts(toasts.filter((t) => t.key !== key));
 }
 
-/** Server change or disconnect: chats of the old server are gone. */
-export function clearNotifications(): void {
-  counts = new Map();
-  if (mentions.size > 0) {
-    mentions = new Set();
+/** A server disconnected: its counts, mentions and toasts are gone. */
+export function clearServerNotifications(serverId: number): void {
+  const prefix = noticeKey(serverId, "");
+  for (const key of [...counts.keys()]) if (key.startsWith(prefix)) counts.delete(key);
+  if ([...mentions].some((key) => key.startsWith(prefix))) {
+    mentions = new Set([...mentions].filter((key) => !key.startsWith(prefix)));
     for (const listener of listeners) listener();
   }
-  if (toasts.length > 0) setToasts([]);
+  if (toasts.some((toast) => toast.serverId === serverId)) {
+    setToasts(toasts.filter((toast) => toast.serverId !== serverId));
+  }
 }
 
 function subscribe(listener: () => void): () => void {

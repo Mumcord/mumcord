@@ -1,5 +1,6 @@
 import { useTranslation } from "react-i18next";
 import { LiveRegions } from "../a11y";
+import { TooltipLayer } from "../components/Tooltip";
 import { PersonMenuHost, ProfilePreviewHost } from "../features/members";
 import { NotificationsHost } from "../features/notifications";
 import { AppShell } from "./AppShell";
@@ -7,6 +8,7 @@ import {
   ChannelsMount,
   ChatMount,
   ChatStatusMount,
+  MediaWidgetsMount,
   MembersMount,
   ServersMount,
   UserPanelMount,
@@ -14,15 +16,19 @@ import {
 } from "./mounts";
 import { PreferencesProvider } from "./PreferencesProvider";
 import { SettingsOverlay } from "./SettingsOverlay";
+import { useThemePreviewing } from "../theme/themeStore";
+import { useServerTheme } from "./useServerTheme";
 import { useView } from "./view";
 import { ViewProvider } from "./ViewProvider";
 
 function MainScreen() {
   const { overlay, closeOverlay } = useView();
+  useServerTheme();
+  const previewing = useThemePreviewing();
   return (
     <>
       <AppShell
-        inert={overlay !== null}
+        inert={overlay !== null && !previewing}
         slots={{
           servers: <ServersMount />,
           channels: <ChannelsMount />,
@@ -32,6 +38,10 @@ function MainScreen() {
           members: <MembersMount />,
         }}
       />
+      {/* Kept mounted under the settings overlay so a watched stream does not restart. */}
+      <div inert={overlay !== null && !previewing}>
+        <MediaWidgetsMount />
+      </div>
       {overlay === "settings" && <SettingsOverlay onClose={closeOverlay} />}
       {overlay === null && <ProfilePreviewHost />}
       {overlay === null && <PersonMenuHost />}
@@ -84,6 +94,7 @@ export function App() {
       <ViewProvider>
         <LiveRegions />
         <Screens />
+        <TooltipLayer />
       </ViewProvider>
     </PreferencesProvider>
   );

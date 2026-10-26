@@ -21,6 +21,8 @@ export interface OpenPreview {
   session: number | null;
   /** Name stored with a chat message; used to find the person and as the fallback label. */
   name?: string | undefined;
+  /** Server the person is on; the shown server when omitted. */
+  serverId?: number | undefined;
   /** Element the preview is placed next to. */
   anchor: HTMLElement;
   /** Element that gets `aria-describedby` pointing at the preview (the focused one, if any). */
@@ -82,11 +84,18 @@ export function requestPreview(
   anchor: HTMLElement,
   described = anchor,
   name?: string,
+  serverId?: number,
 ): void {
   clearTimer();
   if (current?.pinned) return;
-  if (current?.session === session && current.name === name && current.anchor === anchor) return;
-  const next = { session, name, anchor, described };
+  if (
+    current?.session === session &&
+    current.name === name &&
+    current.serverId === serverId &&
+    current.anchor === anchor
+  )
+    return;
+  const next = { session, name, serverId, anchor, described };
   if (current) set(next);
   else
     timer = setTimeout(() => {
@@ -126,9 +135,10 @@ export function previewOnFocus(
   anchor: HTMLElement,
   focused = anchor,
   name?: string,
+  serverId?: number,
 ): void {
   // Focus from a mouse click is not keyboard focus; the click opens the full card instead.
-  if (focused.matches(":focus-visible")) requestPreview(session, anchor, focused, name);
+  if (focused.matches(":focus-visible")) requestPreview(session, anchor, focused, name, serverId);
 }
 
 /** Whether `session`/`name` is the person the open preview (hovered or pinned) is about. */

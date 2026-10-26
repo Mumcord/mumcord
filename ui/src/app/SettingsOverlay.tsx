@@ -1,5 +1,6 @@
 import { useEffect, useId, useRef } from "react";
 import { useTranslation } from "react-i18next";
+import { useThemePreviewing } from "../theme/themeStore";
 import { SettingsMount } from "./mounts";
 
 /**
@@ -10,12 +11,18 @@ export function SettingsOverlay({ onClose }: { onClose: () => void }) {
   const { t } = useTranslation(["app", "common"]);
   const titleId = useId();
   const dialogRef = useRef<HTMLDivElement>(null);
+  const previewing = useThemePreviewing();
+  // Escape ends the preview, not Settings; read through a ref so toggling it never re-runs the effect.
+  const previewingRef = useRef(previewing);
+  useEffect(() => {
+    previewingRef.current = previewing;
+  }, [previewing]);
 
   useEffect(() => {
     const opener = document.activeElement instanceof HTMLElement ? document.activeElement : null;
     dialogRef.current?.focus();
     const onKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "Escape") onClose();
+      if (event.key === "Escape" && !previewingRef.current) onClose();
     };
     document.addEventListener("keydown", onKeyDown);
     return () => {
@@ -24,8 +31,14 @@ export function SettingsOverlay({ onClose }: { onClose: () => void }) {
     };
   }, [onClose]);
 
+  // Hidden, not unmounted, so the settings state and the editor draft survive the preview.
   return (
-    <div className="overlay">
+    <div
+      className="overlay"
+      hidden={previewing}
+      inert={previewing}
+      style={previewing ? { display: "none" } : undefined}
+    >
       <div
         ref={dialogRef}
         className="overlay__dialog"

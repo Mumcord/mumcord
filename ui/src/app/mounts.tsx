@@ -3,8 +3,11 @@
  * with its root component; the shell layout itself stays untouched.
  */
 import { useTranslation } from "react-i18next";
+import { getApi } from "../api";
+import { useView } from "./view";
 import { SettingsScreen } from "../features/settings/SettingsScreen";
 import { Wizard } from "../features/wizard";
+import { SharingBar } from "../features/screenshare";
 import { UserPanel } from "../features/userpanel";
 import { ChannelsPanel } from "../features/channels";
 import {
@@ -16,10 +19,21 @@ import {
   FollowStar,
 } from "../features/follow";
 import { ChatView } from "../features/chat";
+import { UserStatsWatcher } from "../features/connection";
 import { FriendsList } from "../features/friends";
 import { MembersPanel, openPrivateConversation } from "../features/members";
+import { ScreenShareWidget } from "../features/screenshare";
+import { VideoDucking, WatchPartyWidget } from "../features/watchparty";
 import { ConnectionStatus, RejoinPrompt, ServersRoot } from "../features/servers";
-import { CloseDialog } from "../features/app";
+import {
+  AppImageMenuPrompt,
+  DirectConsentPrompt,
+  UpdateCheckPrompt,
+  UpdateHint,
+  CloseDialog,
+  WindowOverlayNotice,
+  type WindowOverlayNoticeApi,
+} from "../features/app";
 
 /** Server bar (B19). */
 export function ServersMount() {
@@ -36,6 +50,7 @@ export function ChannelsMount() {
         channelAction={(channel) => <FollowStar {...channel} />}
       />
       <FollowNoticeLine />
+      <UserStatsWatcher />
       <DirectMessages />
     </>
   );
@@ -43,19 +58,37 @@ export function ChannelsMount() {
 
 /** User panel at the bottom of the channel column (B23). */
 export function UserPanelMount() {
-  return <UserPanel />;
+  return (
+    <>
+      <SharingBar />
+      <UserPanel />
+    </>
+  );
 }
+
+const windowOverlayNoticeApi: WindowOverlayNoticeApi = {
+  pending: () => getApi().windowOverlayNoticePending(),
+  dismiss: async () => {
+    await getApi().windowOverlayNoticeDismiss();
+  },
+};
 
 /**
  * Thin status bar above the chat, e.g. "Reconnecting…" (B19), the rejoin offer (QA.9) and the
  * close question (B25). All render nothing when idle.
  */
 export function ChatStatusMount() {
+  const { openOverlaySettings } = useView();
   return (
     <>
       <ConnectionStatus />
       <RejoinPrompt />
       <CloseDialog />
+      <WindowOverlayNotice api={windowOverlayNoticeApi} onOpenSettings={openOverlaySettings} />
+      <UpdateHint />
+      <UpdateCheckPrompt />
+      <AppImageMenuPrompt />
+      <DirectConsentPrompt />
     </>
   );
 }
@@ -63,6 +96,20 @@ export function ChatStatusMount() {
 /** Chat header, message list and input (B21). */
 export function ChatMount() {
   return <ChatView renderHeaderActions={(conv) => <FollowHeaderActions conversation={conv} />} />;
+}
+
+/**
+ * Floating media widgets over the main area (FR-2.70): the watched screen share and the watch
+ * party. At shell level so they stay open while switching chats or servers.
+ */
+export function MediaWidgetsMount() {
+  return (
+    <>
+      <ScreenShareWidget />
+      <WatchPartyWidget />
+      <VideoDucking />
+    </>
+  );
 }
 
 /** Member list (B20) with the friends list below (FR-1.64). */
@@ -88,5 +135,6 @@ export function WizardMount() {
 
 /** Settings content inside the settings overlay (B24). */
 export function SettingsMount() {
-  return <SettingsScreen />;
+  const { settingsSection } = useView();
+  return <SettingsScreen {...(settingsSection ? { initialSection: settingsSection } : {})} />;
 }

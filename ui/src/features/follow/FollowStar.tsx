@@ -1,6 +1,7 @@
 import { useState, type KeyboardEvent, type MouseEvent } from "react";
-import { useTranslation } from "react-i18next";
+import { useT } from "../../i18n/useT";
 import { getApi } from "../../api";
+import { shownServerId } from "../channels/serverStore";
 import { useServerSelector, type ChannelAction } from "../channels";
 import { describeFollowError } from "./errors";
 import { useFollowState } from "./followStore";
@@ -13,7 +14,7 @@ import "./follow.css";
  * Hidden on servers without follow support, like the chat header's Follow button.
  */
 export function FollowStar({ channelId, name, tabbable }: ChannelAction) {
-  const { t } = useTranslation("follow");
+  const t = useT("follow");
   // One eye per channel row: select only the flag, so server events do not re-render them all.
   const followSupported = useServerSelector((s) => s.info?.followSupported ?? false);
   const { followed } = useFollowState();
@@ -26,8 +27,8 @@ export function FollowStar({ channelId, name, tabbable }: ChannelAction) {
     setFollowNotice(null);
     try {
       const api = getApi();
-      if (following) await api.channelUnfollow(channelId);
-      else await api.channelFollow(channelId);
+      if (following) await api.channelUnfollow(shownServerId(), channelId);
+      else await api.channelFollow(shownServerId(), channelId);
     } catch (e) {
       setFollowNotice({ text: describeFollowError(t, e), error: true });
     } finally {

@@ -10,14 +10,27 @@ import { openPrivateConversation, type SendPrivateMessage } from "./privateMessa
 export function useProfileCard(
   onSendPrivateMessage: SendPrivateMessage = openPrivateConversation,
 ): {
-  openProfile: (session: number, opener: HTMLElement | null) => void;
+  openProfile: (
+    session: number,
+    opener: HTMLElement | null,
+    focusConnection?: boolean,
+    serverId?: number,
+  ) => void;
   profileCard: ReactNode;
 } {
-  const [open, setOpen] = useState<{ session: number; opener: HTMLElement | null } | null>(null);
+  const [open, setOpen] = useState<{
+    session: number;
+    serverId: number | undefined;
+    opener: HTMLElement | null;
+    focusConnection: boolean;
+  } | null>(null);
 
-  const openProfile = useCallback((session: number, opener: HTMLElement | null) => {
-    setOpen({ session, opener });
-  }, []);
+  const openProfile = useCallback(
+    (session: number, opener: HTMLElement | null, focusConnection = false, serverId?: number) => {
+      setOpen({ session, serverId, opener, focusConnection });
+    },
+    [],
+  );
 
   const close = useCallback(() => {
     setOpen(null);
@@ -27,8 +40,10 @@ export function useProfileCard(
     open === null ? null : (
       <ProfileCard
         session={open.session}
+        serverId={open.serverId}
         onClose={close}
         returnFocus={open.opener}
+        focusConnection={open.focusConnection}
         onSendPrivateMessage={onSendPrivateMessage}
       />
     );

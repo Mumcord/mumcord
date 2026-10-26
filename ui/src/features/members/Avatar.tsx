@@ -11,11 +11,14 @@ export function Avatar({
   name,
   src = null,
   talking = false,
+  live = false,
   size = "md",
 }: {
   name: string;
   src?: string | null;
   talking?: boolean;
+  /** Red ring: the person shares their screen (FR-2.45). */
+  live?: boolean;
   size?: "sm" | "md" | "lg";
 }) {
   // Remember which source failed to load; a new src gets a fresh attempt.
@@ -26,6 +29,7 @@ export function Avatar({
       className="avatar"
       data-size={size}
       data-talking={talking}
+      data-live={live || undefined}
       data-initial={showImage ? undefined : (name.trim()[0] ?? "?").toUpperCase()}
       style={{ "--avatar-bg": avatarColorVar(name) } as CSSProperties}
       aria-hidden="true"

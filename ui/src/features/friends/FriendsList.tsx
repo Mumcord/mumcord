@@ -1,5 +1,5 @@
 import { useTranslation } from "react-i18next";
-import type { Conversation } from "../../api";
+import { getApi, type Conversation } from "../../api";
 import {
   sameConversation,
   selectConversation,
@@ -54,8 +54,13 @@ export function FriendsList() {
               friend.online !== null && friend.online.serverId === server.serverId
                 ? friend.online.session
                 : null;
+            // A friend on another connected server: Join moves voice there (FR-2.12).
+            const elsewhere =
+              friend.online !== null && friend.online.serverId !== server.serverId
+                ? friend.online
+                : null;
             return (
-              <li key={friend.certHash}>
+              <li key={friend.certHash} className="friends-list__row">
                 <button
                   type="button"
                   className="friends-list__item"
@@ -81,6 +86,22 @@ export function FriendsList() {
                     <span className="friends-list__status">{status}</span>
                   </span>
                 </button>
+                {elsewhere !== null && (
+                  <button
+                    type="button"
+                    className="button friends-list__join"
+                    aria-label={t("joinFriend", { name: friend.name })}
+                    onClick={() => {
+                      getApi()
+                        .channelJoin(elsewhere.serverId, elsewhere.channelId)
+                        .catch((error: unknown) => {
+                          console.error("Joining a friend's channel failed", error);
+                        });
+                    }}
+                  >
+                    {t("join")}
+                  </button>
+                )}
               </li>
             );
           })}

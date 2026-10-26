@@ -25,6 +25,10 @@
   opacity: 0.8;
 }
 
+.person-icon--weak-connection {
+  color: var(--color-warning, var(--color-danger));
+}
+
 .person-icon--local-muted {
   color: var(--color-local-muted);
 }

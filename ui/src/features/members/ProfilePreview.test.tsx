@@ -23,7 +23,7 @@ async function renderWithPreview() {
       <ProfilePreviewHost />
     </>,
   );
-  await screen.findByRole("heading", { name: "In Lobby (3)" });
+  await screen.findByRole("heading", { name: "In Lobby (4)" });
   vi.useFakeTimers();
 }
 
@@ -73,7 +73,7 @@ describe("ProfilePreview", () => {
   it("shows what a person listens to, and the own track on the own entry", async () => {
     await renderWithPreview();
     vi.spyOn(api, "nowPlayingCover").mockResolvedValue("data:image/png;base64,AAAA");
-    const snapshot = await api.sessionSnapshot();
+    const snapshot = await api.sessionSnapshot(1);
     const own = snapshot?.users.find((u) => u.session === snapshot.selfSession);
     if (!own) throw new Error("not connected");
     const song: NowPlaying = {
@@ -86,8 +86,9 @@ describe("ProfilePreview", () => {
       playing: true,
     };
     act(() => {
-      api.mock.emit("nowPlayingChanged", { session: 2, track: song });
+      api.mock.emit("nowPlayingChanged", { serverId: 1, session: 2, track: song });
       api.mock.emit("nowPlayingChanged", {
+        serverId: 1,
         session: own.session,
         track: { ...song, title: "Own song" },
       });

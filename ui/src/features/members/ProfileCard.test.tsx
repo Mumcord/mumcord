@@ -5,11 +5,16 @@ import type { MockApi } from "../../api";
 import { getServerState } from "../channels/serverStore";
 import { connectedMock, resetAll, stubDialog } from "../channels/testUtils";
 import { averageColor } from "./avatarColor";
-import { NOTE_DEBOUNCE_MS, ProfileCard, SAVED_VISIBLE_MS, VOLUME_DEBOUNCE_MS } from "./ProfileCard";
+import { NOTE_DEBOUNCE_MS, ProfileCard, SAVED_VISIBLE_MS, VOLUME_THROTTLE_MS } from "./ProfileCard";
 
 let api: MockApi;
 
-async function renderCard(session = 2, onSendPrivateMessage = vi.fn(), onClose = vi.fn()) {
+async function renderCard(
+  session = 2,
+  onSendPrivateMessage = vi.fn(),
+  onClose = vi.fn(),
+  expand = true,
+) {
   api = await connectedMock();
   await waitFor(() => {
     expect(getServerState().users.has(session)).toBe(true);
@@ -18,8 +23,11 @@ async function renderCard(session = 2, onSendPrivateMessage = vi.fn(), onClose =
     <ProfileCard session={session} onClose={onClose} onSendPrivateMessage={onSendPrivateMessage} />,
   );
   const dialog = await screen.findByRole("dialog");
-  // The private note appears once the profile has loaded.
-  if (session !== getServerState().selfSession) await screen.findByLabelText("Private note");
+  if (session !== getServerState().selfSession && expand) {
+    fireEvent.click(within(dialog).getByRole("button", { name: /^Settings for/ }));
+    // The private note appears once the profile has loaded.
+    await screen.findByLabelText("Private note");
+  }
   return { dialog, onSendPrivateMessage, onClose };
 }
 
@@ -61,7 +69,7 @@ describe("ProfileCard (full profile)", () => {
 
     vi.useFakeTimers();
     fireEvent.change(screen.getByRole("slider", { name: "Volume" }), { target: { value: "150" } });
-    await act(() => vi.advanceTimersByTimeAsync(VOLUME_DEBOUNCE_MS));
+    await act(() => vi.advanceTimersByTimeAsync(VOLUME_THROTTLE_MS));
     expect(getServerState().users.get(2)?.volume).toBe(150);
     expect(savedFlag(dialog)).toHaveAttribute("data-visible", "true");
     expect(heard.map((a) => a.message)).toContain("Saved");
@@ -69,6 +77,26 @@ describe("ProfileCard (full profile)", () => {
     await act(() => vi.advanceTimersByTimeAsync(SAVED_VISIBLE_MS));
     expect(savedFlag(dialog)).toHaveAttribute("data-visible", "false");
     stop();
+  });
+
+  it("applies the volume live while dragging, throttled, and sends the final value", async () => {
+    await renderCard();
+    const slider = screen.getByRole("slider", { name: "Volume" });
+    const spy = vi.spyOn(api, "personSetVolume");
+
+    vi.useFakeTimers();
+    // A drag fires an input event every few ms and never pauses.
+    for (let v = 5; v <= 100; v += 5) {
+      fireEvent.change(slider, { target: { value: String(v) } });
+      await act(() => vi.advanceTimersByTimeAsync(5));
+    }
+    const duringDrag = spy.mock.calls.length;
+    expect(duringDrag).toBeGreaterThanOrEqual(2);
+    expect(duringDrag).toBeLessThanOrEqual(6);
+
+    await act(() => vi.advanceTimersByTimeAsync(VOLUME_THROTTLE_MS));
+    expect(spy).toHaveBeenLastCalledWith(expect.anything(), 2, 100);
+    spy.mockRestore();
   });
 
   it("toggles local mute as a switch and shows Saved", async () => {
@@ -99,11 +127,11 @@ describe("ProfileCard (full profile)", () => {
     expect(setNote).not.toHaveBeenCalled();
     await act(() => vi.advanceTimersByTimeAsync(NOTE_DEBOUNCE_MS));
     expect(setNote).toHaveBeenCalledTimes(1);
-    expect(setNote).toHaveBeenCalledWith(2, "Plays bass");
+    expect(setNote).toHaveBeenCalledWith(1, 2, "Plays bass");
     expect(savedFlag(dialog)).toHaveAttribute("data-visible", "true");
     vi.useRealTimers();
 
-    await expect(api.personProfile(2)).resolves.toMatchObject({ note: "Plays bass" });
+    await expect(api.personProfile(1, 2)).resolves.toMatchObject({ note: "Plays bass" });
   });
 
   it("saves a pending note at once when the field loses focus", async () => {
@@ -112,13 +140,14 @@ describe("ProfileCard (full profile)", () => {
     const note = screen.getByLabelText("Private note");
     fireEvent.change(note, { target: { value: "Friend of Ben" } });
     fireEvent.blur(note);
-    expect(setNote).toHaveBeenCalledWith(2, "Friend of Ben");
+    expect(setNote).toHaveBeenCalledWith(1, 2, "Friend of Ben");
   });
 
   it("shows the stored note when opened", async () => {
     api = await connectedMock();
-    await api.personSetNote(2, "Met at the LAN party");
+    await api.personSetNote(1, 2, "Met at the LAN party");
     render(<ProfileCard session={2} onClose={() => undefined} />);
+    fireEvent.click(await screen.findByRole("button", { name: /^Settings for/ }));
     expect(await screen.findByLabelText("Private note")).toHaveValue("Met at the LAN party");
   });
 
@@ -131,6 +160,55 @@ describe("ProfileCard (full profile)", () => {
   });
 });
 
+describe("ProfileCard settings section (FR-2.25c)", () => {
+  const toggle = (dialog: HTMLElement) =>
+    within(dialog).getByRole("button", { name: /^Settings for Anna/ });
+
+  it("is collapsed when the card opens", async () => {
+    const { dialog } = await renderCard(2, vi.fn(), vi.fn(), false);
+    expect(toggle(dialog)).toHaveAttribute("aria-expanded", "false");
+    expect(within(dialog).queryByRole("slider", { name: "Volume" })).toBeNull();
+    expect(within(dialog).queryByRole("switch", { name: "Mute for me" })).toBeNull();
+  });
+
+  it("expands on click and on Enter", async () => {
+    const { dialog } = await renderCard(2, vi.fn(), vi.fn(), false);
+    fireEvent.click(toggle(dialog));
+    expect(toggle(dialog)).toHaveAttribute("aria-expanded", "true");
+    expect(within(dialog).getByRole("slider", { name: "Volume" })).toBeInTheDocument();
+    fireEvent.click(toggle(dialog));
+    expect(toggle(dialog)).toHaveAttribute("aria-expanded", "false");
+    // A native button, so the browser turns Enter and Space into this same click.
+    expect(toggle(dialog).tagName).toBe("BUTTON");
+  });
+
+  it("shows no hint at 100 % and unmuted, then Volume and Muted hints when collapsed", async () => {
+    const { dialog } = await renderCard(2, vi.fn(), vi.fn(), false);
+    expect(toggle(dialog).querySelector(".disclosure__hint")).toBeNull();
+    fireEvent.click(toggle(dialog));
+    fireEvent.change(within(dialog).getByRole("slider", { name: "Volume" }), {
+      target: { value: "60" },
+    });
+    await waitFor(() => {
+      expect(getServerState().users.get(2)?.volume).toBe(60);
+    });
+    fireEvent.click(toggle(dialog));
+    expect(toggle(dialog)).toHaveTextContent("Volume 60 %");
+    fireEvent.click(toggle(dialog));
+    fireEvent.click(within(dialog).getByRole("switch", { name: "Mute for me" }));
+    await waitFor(() => {
+      expect(getServerState().users.get(2)?.localMute).toBe(true);
+    });
+    fireEvent.click(toggle(dialog));
+    expect(toggle(dialog)).toHaveTextContent("Muted");
+  });
+
+  it("is not shown on the own card", async () => {
+    const { dialog } = await renderCard(1);
+    expect(within(dialog).queryByRole("button", { name: /^Settings for/ })).toBeNull();
+  });
+});
+
 describe("averageColor", () => {
   it("adds a friend from Your settings and confirms with Saved", async () => {
     const { dialog } = await renderCard();
@@ -138,7 +216,7 @@ describe("averageColor", () => {
     const toggle = within(dialog).getByRole("switch", { name: "Friend" });
     expect(toggle).toHaveAttribute("aria-checked", "false");
     fireEvent.click(toggle);
-    expect(add).toHaveBeenCalledWith(2);
+    expect(add).toHaveBeenCalledWith(1, 2);
     await waitFor(() => {
       expect(within(dialog).getByRole("switch", { name: "Friend" })).toHaveAttribute(
         "aria-checked",

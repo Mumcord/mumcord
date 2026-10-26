@@ -14,7 +14,7 @@ export function devAutoConnect(): void {
   const api = getApi();
   void api
     .serversList()
-    .then((servers) => (servers[0] ? api.connect(servers[0].id, null) : null))
+    .then((servers) => (servers[0] ? api.connect(servers[0].id, null, null) : null))
     .catch((error: unknown) => {
       console.error("Dev auto-connect failed", error);
     });

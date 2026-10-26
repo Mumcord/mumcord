@@ -1,5 +1,5 @@
 /** Status of a person as text, shared by the channel tree and the member list. */
-import { useTranslation } from "react-i18next";
+import { useT } from "../../i18n/useT";
 import type { User } from "../../api";
 
 /**
@@ -29,7 +29,7 @@ export const VOICE_STATE_KEY = {
 
 /** Spoken status parts, e.g. ["talking", "muted by server"]. */
 export function useStatusText() {
-  const { t } = useTranslation("channels");
+  const t = useT("channels");
   return (user: User, talking: boolean, listener = false): string[] => {
     const parts: string[] = [];
     // A listener row only marks the listening; the person's voice state belongs to their real row.
