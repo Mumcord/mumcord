@@ -34,7 +34,7 @@ function modal(server: string) {
 }
 
 function passwordField() {
-  return $("//div[@role='dialog' or @role='alertdialog']//input[@type='password' or @type='text'][1]");
+  return $("//dialog[@open]//input[@type='password' or @type='text'][1]");
 }
 
 async function barLabel(name: string): Promise<string> {
@@ -70,12 +70,20 @@ describe("wrong server password modal (AC-2.40)", function () {
   it("two servers failing at once each get their own modal; field focused and masked, Save pre-checked", async () => {
     await serverButton(ONE).click();
     await trustIfAsked();
-    await serverButton(TWO).click();
-    await trustIfAsked();
+    // The first server's password modal can already be open (and makes the page inert), so a real
+    // click may be refused; a script click still starts the second connection while it is open.
+    await browser.execute((el: HTMLElement) => {
+      el.click();
+    }, await serverButton(TWO).getElement());
     await modal(ONE).waitForDisplayed({ timeout: 30_000 });
-    expect(await $("//input[@type='password']").isFocused()).toBe(true);
+    // The second server's certificate prompt opens on top of the first modal; answer it first so
+    // both connections are pending at once, then check the first modal.
+    await trustIfAsked();
+    await browser.waitUntil(async () => await $("//input[@type='password']").isFocused(), {
+      timeoutMsg: "password field not focused",
+    });
     expect(await $("//label[contains(.,'Save password')]/input").isSelected()).toBe(true);
-    // The second server's modal comes after the first is dealt with.
+    // The second server's password modal comes after the first is dealt with.
     await browser.keys("Escape");
     await modal(TWO).waitForDisplayed({ timeout: 15_000 });
     await browser.keys("Escape");

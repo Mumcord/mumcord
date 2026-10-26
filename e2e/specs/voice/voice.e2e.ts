@@ -127,6 +127,9 @@ async function openProfileCard(name: string): Promise<void> {
   await full.waitForDisplayed();
   await full.click();
   await $("dialog.profile-card").waitForDisplayed();
+  // The local settings (volume, mute) sit in a disclosure that starts collapsed.
+  await $("dialog.profile-card .disclosure__toggle").click();
+  await $("dialog.profile-card .disclosure__panel").waitForDisplayed();
 }
 
 function maxDb(x: Float32Array): number {
