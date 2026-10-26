@@ -8,10 +8,12 @@ import { app, artifactsDir, bot, repoRoot, testenv } from "../../helpers/index.t
 import {
   chooseRadio,
   connectFromEmptyState,
+  focus,
   htmlTheme,
   joinChannel,
   openSettings,
   settingsTab,
+  tabTo,
   waitFor,
   waitGone,
   wizard,
@@ -26,6 +28,22 @@ async function settingsTabNamed(name: string): Promise<void> {
     if ((await settingsTab(i)) === name) return;
   }
   throw new Error(`settings tab "${name}" not found`);
+}
+
+/** In Appearance, Tabs to the "Dark or light" dropdown (FR-2.63) and picks `label` by keyboard. */
+async function chooseMode(label: string): Promise<void> {
+  await tabTo((f) => f.role === "combobox" && f.id.endsWith("-mode"), "dark-or-light dropdown");
+  await browser.keys(["Enter", "Home"]);
+  for (let i = 0; i < 3; i++) {
+    const active = await browser.execute(() => {
+      const id = document.activeElement?.getAttribute("aria-activedescendant");
+      return id ? (document.getElementById(id)?.textContent ?? "") : "";
+    });
+    if (active.trim() === label) break;
+    await browser.keys(["ArrowDown"]);
+  }
+  await browser.keys(["Enter"]);
+  await browser.waitUntil(async () => (await focus()).text === label, { timeoutMsg: `mode ${label} not chosen` });
 }
 
 /** All UI strings on screen: text nodes (incl. visually hidden), aria-labels, placeholders, titles. */
@@ -124,7 +142,7 @@ describe("AC-1.26 theme follows OS + manual override", () => {
   it("manual override Light wins over OS dark, live", async () => {
     await openSettings();
     await settingsTabNamed("Appearance");
-    await chooseRadio("light");
+    await chooseMode("Light");
     await browser.waitUntil(async () => (await htmlTheme()) === "light", { timeoutMsg: "override light not applied" });
     await browser.keys(["Escape"]);
   });
@@ -136,9 +154,9 @@ describe("AC-1.26 theme follows OS + manual override", () => {
     expect(await htmlTheme()).toBe("light"); // stored override = light
     await openSettings();
     await settingsTabNamed("Appearance");
-    await chooseRadio("dark");
+    await chooseMode("Dark");
     await browser.waitUntil(async () => (await htmlTheme()) === "dark", { timeoutMsg: "override dark not applied" });
-    await chooseRadio("system");
+    await chooseMode("Follow system");
     await browser.waitUntil(async () => (await htmlTheme()) === "light", { timeoutMsg: "back to system not applied" });
     await browser.keys(["Escape"]);
   });
