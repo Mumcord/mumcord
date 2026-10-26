@@ -4,5 +4,9 @@
 <dict>
   <key>NSMicrophoneUsageDescription</key>
   <string>Mumcord needs the microphone so other people on the server can hear you.</string>
+  <!-- Since macOS 15, connections to local network addresses fail with "No route to host"
+       unless this permission is granted; without the key the prompt never appears. -->
+  <key>NSLocalNetworkUsageDescription</key>
+  <string>Mumcord connects to Mumble servers and other Mumcord users on your local network.</string>
 </dict>
 </plist>
