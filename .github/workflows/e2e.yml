@@ -40,10 +40,13 @@ jobs:
           key: e2e-${{ hashFiles('Cargo.lock', 'e2e/Dockerfile') }}
           restore-keys: e2e-
 
+      # No debug info and no incremental data: faster links and a smaller target cache.
       - name: Build image and binaries
         run: npm run e2e
         env:
           MUMCORD_E2E_STEP: build
+          CARGO_PROFILE_DEV_DEBUG: 0
+          CARGO_INCREMENTAL: 0
 
       # zstd instead of the artifact zip: much faster for the ~3 GB image. tar keeps the
       # executable bits that artifacts would drop.

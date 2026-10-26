@@ -41,5 +41,6 @@ exec docker run --rm -i --init "${tty[@]}" \
   -e MUMCORD_SKIP_BINDINGS_EXPORT=1 \
   -e CI -e MUMCORD_E2E_SHARD -e MUMCORD_E2E_STEP \
   -e MUMCORD_PORT_BASE -e MUMCORD_PROJECT \
+  -e CARGO_PROFILE_DEV_DEBUG -e CARGO_INCREMENTAL \
   "${extra[@]}" \
   "$image" "$@"
