@@ -601,8 +601,9 @@ mod tests {
         }
         let allowed = shared.config_for(&GameKey::Exe("MyGame.exe".into()));
         assert!(allowed.enabled && allowed.opacity_percent == 55 && allowed.show_whole_channel);
-        // A blocklisted game (CS2) is disabled despite the global On.
-        assert_eq!(shared.config_for(&GameKey::Steam(730)), Config::DISABLED);
+        // A blocklisted game (CS2) is disabled despite the global On, where the blocklist applies.
+        let blocklisted = shared.config_for(&GameKey::Steam(730));
+        assert_eq!(blocklisted.enabled, !BLOCKLIST_APPLIES);
     }
 
     #[test]
