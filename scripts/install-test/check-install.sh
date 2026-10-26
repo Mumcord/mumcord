@@ -39,15 +39,18 @@ printf '%s\n' "$out" | grep -q "checksum mismatch" || fail "no checksum mismatch
 assert_nothing_installed "after the checksum mismatch"
 
 step "install with curl | sh"
-curl -fsSL "$good/install.sh" | MUMCORD_RELEASE_URL=$good sh -s -- --yes --desktop-icon
+out=$(curl -fsSL "$good/install.sh" | MUMCORD_RELEASE_URL=$good sh -s -- --yes --desktop-icon 2>&1)
+printf '%s\n' "$out"
 case $expected in
 deb)
     dpkg-query -W mumcord >/dev/null || fail "the .deb is not installed"
     [ ! -e "$appimage" ] || fail "AppImage installed instead of the .deb"
+    ! printf '%s\n' "$out" | grep -q "H.264" || fail "codec hint shown for a native package"
     ;;
 rpm)
     rpm -q Mumcord >/dev/null || fail "the .rpm is not installed"
     [ ! -e "$appimage" ] || fail "AppImage installed instead of the .rpm"
+    ! printf '%s\n' "$out" | grep -q "H.264" || fail "codec hint shown for a native package"
     ;;
 appimage)
     [ -x "$appimage" ] || fail "AppImage not installed"
@@ -55,6 +58,7 @@ appimage)
     grep -qx 'X-Mumcord-Managed=true' "$entry" || fail "menu entry lacks the managed marker"
     grep -qx 'MimeType=x-scheme-handler/mumble;' "$entry" || fail "menu entry is not the mumble:// handler"
     [ -f "$HOME/.local/share/icons/hicolor/128x128/apps/app.mumcord.client.png" ] || fail "icon missing"
+    printf '%s\n' "$out" | grep -q "H.264" || fail "no codec hint after the AppImage install"
     ;;
 esac
 [ "$expected" = appimage ] || [ -x /usr/bin/mumcord ] || fail "/usr/bin/mumcord missing"

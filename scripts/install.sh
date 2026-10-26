@@ -227,7 +227,11 @@ refresh_menu() {
     fi
 }
 
+# Set once the AppImage is installed, whatever the distribution, so the codec hint follows it.
+appimage_installed=false
+
 install_appimage() {
+    appimage_installed=true
     file=$(fetch appimage)
     mkdir -p "$BIN_DIR" "$APPLICATIONS"
     chmod 755 "$file"
@@ -338,7 +342,7 @@ do_install() {
     esac
     offer_desktop_icon
     # Last, so it is not lost above the desktop icon question.
-    if [ "$family" = other ]; then
+    if [ "$appimage_installed" = true ]; then
         codec_hint
     fi
 }
