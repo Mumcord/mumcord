@@ -28,13 +28,32 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      # The runner's Ubuntu mirror is sometimes very slow (once 39 min for 70 MB), so the
+      # downloaded packages are cached. apt still installs them normally (including their install
+      # scripts) and downloads only what changed; the week in the key picks up updates.
+      - name: apt cache key
+        id: apt
+        if: runner.os == 'Linux'
+        run: echo "week=$(date -u +%G-%V)" >> "$GITHUB_OUTPUT"
+
+      - name: Restore apt packages
+        if: runner.os == 'Linux'
+        uses: actions/cache@v4
+        with:
+          path: ~/apt-archives
+          key: apt-${{ matrix.os }}-${{ steps.apt.outputs.week }}
+          restore-keys: apt-${{ matrix.os }}-
+
       - name: Install Linux system libraries
         if: runner.os == 'Linux'
         run: |
+          mkdir -p ~/apt-archives/partial
           sudo apt-get update
-          sudo apt-get install -y --no-install-recommends \
+          sudo apt-get install -y --no-install-recommends -o Dir::Cache::Archives="$HOME/apt-archives" \
             libwebkit2gtk-4.1-dev libayatana-appindicator3-dev librsvg2-dev \
             libxdo-dev libasound2-dev libvpx-dev libpipewire-0.3-dev libclang-dev pkg-config cmake
+          # apt's lock and partial downloads are root-only and must not go into the cache.
+          sudo rm -rf ~/apt-archives/lock ~/apt-archives/partial
 
       # Screen sharing links a static libvpx on Windows and macOS (scripts/build-libvpx.sh,
       # RELEASING.md). It is cached: the key changes with the script and, on Windows, with the
