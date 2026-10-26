@@ -63,6 +63,11 @@ async function show(name: string): Promise<void> {
   await channelName("Lobby").waitForDisplayed({ timeout: 15_000 });
 }
 
+/** Double-click join, retried once: the first click after switching servers can land too early. */
+async function join(name: string): Promise<void> {
+  await joinChannel(name).catch(() => joinChannel(name));
+}
+
 async function serverMenu(name: string, item: string): Promise<void> {
   await serverButton(name).click({ button: "right" });
   const row = $(`//*[@role='menuitem' or @role='menuitemcheckbox'][normalize-space()='${item}']`);
@@ -121,7 +126,7 @@ describe("multiple servers (AC-2.1–2.10)", function () {
     expect(await barLabel(ALPHA)).toBe("Alpha (connected)");
     expect(await barLabel(BRAVO)).toBe("Bravo (connected)");
     await show(ALPHA);
-    await joinChannel("Lobby");
+    await join("Lobby");
     await waitBarLabel(ALPHA, /voice server/);
     expect(await barLabel(BRAVO)).not.toContain("voice server");
     await bot(["expect", "user", USER, "--in", "Lobby", "--deaf", "false"], { ...BOT, name: "A1", port: testenv.ports.v15 });
@@ -130,13 +135,13 @@ describe("multiple servers (AC-2.1–2.10)", function () {
 
   it("AC-2.2: joining on B moves voice there; A shows the user deafened; panel names the server", async () => {
     await show(BRAVO);
-    await joinChannel("Lobby");
+    await join("Lobby");
     await waitBarLabel(BRAVO, /voice server/);
     expect(await barLabel(ALPHA)).not.toContain("voice server");
     await bot(["expect", "user", USER, "--in", "Lobby", "--deaf", "false"], { ...BOT, name: "B2", port: testenv.ports.v15b });
     await bot(["expect", "user", USER, "--in", "Lobby", "--deaf", "true"], { ...BOT, name: "A2", port: testenv.ports.v15 });
     await show(ALPHA);
-    await expect($(".userpanel-voice")).toHaveText("Voice: Lobby · Bravo");
+    expect(await $(".userpanel-voice").getProperty("textContent")).toBe("Voice: Lobby · Bravo");
   });
 
   it("AC-2.3: a followed channel on A (voice on B) shows badge and toast; clicking it shows A's chat; reply works", async () => {
@@ -239,7 +244,7 @@ describe("multiple servers (AC-2.1–2.10)", function () {
 
   it("AC-2.6/2.10: always-connect and last-connected servers reconnect read-only at start; rejoin prompt names A only", async () => {
     await show(ALPHA);
-    await joinChannel("Lobby");
+    await join("Lobby");
     await waitBarLabel(ALPHA, /voice server/);
     await setLimit(3);
     await serverMenu(CHARLIE, "Always connect at start");
@@ -249,7 +254,6 @@ describe("multiple servers (AC-2.1–2.10)", function () {
     await waitBarLabel(CHARLIE, /\(connected\)/, 60_000);
     expect(await barLabel(ALPHA)).not.toContain("voice server");
     const text = await pageText();
-    console.log(`[AC-2.10] rejoin text present: ${/last time/.test(text)}`);
     expect(text).toContain("You were in Lobby last time");
   });
 
