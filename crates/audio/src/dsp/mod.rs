@@ -1,6 +1,6 @@
 //! Send-side audio processing (spec §6):
-//! capture → echo cancellation → AI noise suppression → automatic gain →
-//! voice-activity detection or push-to-talk gate → (Opus encoder).
+//! capture → echo cancellation → AI noise suppression → automatic gain
+//! (with "Music quality": slow loudness leveler instead) → voice-activity detection or push-to-talk gate → (Opus encoder).
 //!
 //! # Wiring
 //!
@@ -27,6 +27,7 @@
 mod controls;
 mod echo_ref;
 mod gate;
+mod leveler;
 mod mic_test;
 #[cfg(test)]
 mod tests;
@@ -46,6 +47,7 @@ pub use echo_ref::{EchoRefConsumer, EchoRefProducer, echo_reference};
 pub use mic_test::{MicTest, MicTestPhase};
 
 use gate::{PttGate, ThresholdGate, VoiceDetector};
+use leveler::Leveler;
 
 /// nnnoiseless expects samples in 16-bit integer range.
 const I16_SCALE: f32 = 32_768.0;
@@ -66,6 +68,10 @@ pub struct DspChain {
     aec: AudioProcessing,
     agc: AudioProcessing,
     denoise: Box<DenoiseState<'static>>,
+    leveler: Leveler,
+    /// Whether the leveler ran on the previous frame; it restarts from unity gain when it
+    /// comes back, as the source may have changed meanwhile.
+    leveling: bool,
     vad: VoiceDetector,
     ptt: PttGate,
     threshold: ThresholdGate,
@@ -109,6 +115,8 @@ impl DspChain {
             aec,
             agc,
             denoise: DenoiseState::new(),
+            leveler: Leveler::default(),
+            leveling: false,
             vad: VoiceDetector::default(),
             ptt: PttGate::default(),
             threshold: ThresholdGate::default(),
@@ -172,6 +180,14 @@ impl DspChain {
             }
         }
 
+        let level_music = controls.auto_gain() && music;
+        if level_music {
+            if !self.leveling {
+                self.leveler = Leveler::default();
+            }
+            self.leveler.process(out);
+        }
+        self.leveling = level_music;
         if controls.auto_gain() && !music {
             self.scratch = *out;
             if self

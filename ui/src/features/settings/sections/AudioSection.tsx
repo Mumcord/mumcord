@@ -1,11 +1,14 @@
 import { useCallback, useEffect, useId, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { getApi, type AudioDevice, type AudioDevices } from "../../../api";
+import { Select } from "../../../components/Select";
 import { LevelMeter } from "../components/LevelMeter";
 import { Group, Section } from "../components/Section";
 import { Switch } from "../components/Switch";
 import { readableDeviceName } from "../deviceNames";
 import { errorText } from "../errors";
+import { BitrateSlider } from "./BitrateSlider";
+import { DuckingGroup } from "./DuckingGroup";
 import { GamePluginsGroup } from "./GamePluginsGroup";
 import { PositionalGroup } from "./PositionalGroup";
 import type { SettingsSectionProps } from "./types";
@@ -73,7 +76,9 @@ export function AudioSection({ settings, update }: SettingsSectionProps) {
             update({ musicQuality });
           }}
         />
+        <BitrateSlider settings={settings} update={update} />
       </Group>
+      <DuckingGroup settings={settings} update={update} />
       <PositionalGroup settings={settings} update={update} />
       <GamePluginsGroup />
       <MicTest />
@@ -95,26 +100,23 @@ function DeviceSelect({ label, devices, value, onChange }: DeviceSelectProps) {
   const id = useId();
   const missing = value !== null && !devices.some((device) => device.id === value);
   return (
-    <div className="settings-field-row">
-      <label className="settings-field" htmlFor={id}>
-        {label}
-      </label>
-      <select
+    <div className="settings-control-row">
+      <label htmlFor={id}>{label}</label>
+      <Select
         id={id}
-        className="settings-input"
         value={value ?? DEFAULT_VALUE}
-        onChange={(event) => {
-          onChange(event.target.value === DEFAULT_VALUE ? null : event.target.value);
+        options={[
+          { value: DEFAULT_VALUE, label: t("audio.systemDefault") },
+          ...devices.map((device) => ({
+            value: device.id,
+            label: readableDeviceName(device.name),
+          })),
+          ...(missing ? [{ value, label: t("audio.unavailableDevice") }] : []),
+        ]}
+        onChange={(next) => {
+          onChange(next === DEFAULT_VALUE ? null : next);
         }}
-      >
-        <option value={DEFAULT_VALUE}>{t("audio.systemDefault")}</option>
-        {devices.map((device) => (
-          <option key={device.id} value={device.id}>
-            {readableDeviceName(device.name)}
-          </option>
-        ))}
-        {missing && <option value={value}>{t("audio.unavailableDevice")}</option>}
-      </select>
+      />
     </div>
   );
 }

@@ -30,6 +30,14 @@ pub struct AudioDevicesChanged {
     pub devices: AudioDevices,
 }
 
+/// The highest bitrate the bitrate slider can reach changed (FR-2.64), e.g. on connecting or
+/// when the voice server changes. `null` without a voice server: show "depends on server".
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, Type, Event)]
+#[serde(rename_all = "camelCase")]
+pub struct BitrateMaxChanged {
+    pub kbps: Option<u32>,
+}
+
 /// Processed input level, about 20 times per second while the mic test runs or while connected.
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Type, Event)]
 #[serde(rename_all = "camelCase")]
@@ -61,6 +69,14 @@ impl From<AudioDeviceList> for AudioDevices {
 #[specta::specta]
 pub async fn audio_devices(engine: State<'_, Engine>) -> ApiResult<AudioDevices> {
     Ok(engine.audio_devices().await?.into())
+}
+
+/// Highest bitrate in kbit/s the bitrate slider can reach (FR-2.64); `null` without a voice
+/// server. Follow `BitrateMaxChanged` afterwards.
+#[tauri::command]
+#[specta::specta]
+pub fn bitrate_max(engine: State<'_, Engine>) -> ApiResult<Option<u32>> {
+    Ok(engine.bitrate_max().map(|b| b / 1000))
 }
 
 /// Records up to 5 s of processed own voice with level metering, then plays it back.

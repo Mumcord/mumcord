@@ -9,6 +9,7 @@
 //! and paces it against the [`FrameSink`](crate::io::FrameSink).
 
 mod playback;
+pub mod share;
 #[cfg(test)]
 mod tests;
 
@@ -111,14 +112,24 @@ pub struct MixerStats {
 
 #[derive(Clone, Copy)]
 struct Settings {
-    volume: f32,
+    /// Linear gain derived from the slider volume by [`volume_gain`].
+    gain: f32,
     muted: bool,
 }
 
 const DEFAULT_SETTINGS: Settings = Settings {
-    volume: 1.0,
+    gain: 1.0,
     muted: false,
 };
+
+/// Gain for a slider volume (0.0–2.0). Loudness is heard logarithmically, so a
+/// linear gain would make the slider feel nearly dead (50 % is only −6 dB, and
+/// 200 % is only +6 dB, which the limiter eats on normal speech). The cubic
+/// curve – the convention desktop mixers use – gives −18 dB at 50 % and
+/// +18 dB at 200 % while keeping 100 % at unity.
+fn volume_gain(volume: f32) -> f32 {
+    volume.clamp(0.0, MAX_VOLUME).powi(3)
+}
 
 struct Speaker {
     session: Option<u32>,
@@ -195,7 +206,8 @@ impl Mixer {
     /// Sets a person's local volume (0.0–2.0 = 0–200 %). Returns `false` if
     /// the settings table is full.
     pub fn set_volume(&mut self, session: u32, volume: f32) -> bool {
-        self.update_settings(session, |s| s.volume = volume.clamp(0.0, MAX_VOLUME))
+        let gain = volume_gain(volume);
+        self.update_settings(session, |s| s.gain = gain)
     }
 
     /// Mutes or unmutes a person locally. Returns `false` if the settings table is full.
@@ -300,7 +312,7 @@ impl Mixer {
         if settings.muted || (self.discard_listener_audio && speaker.via_listener) {
             0.0
         } else {
-            settings.volume
+            settings.gain
         }
     }
 
