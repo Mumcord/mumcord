@@ -419,6 +419,29 @@ describe("ServerBar with several servers (spec §5.2)", () => {
     expect(serverButton(1)).toHaveAccessibleName("Other");
   });
 
+  it("shows the limit message while another connected server is shown, and connects after raising it (FR-2.1)", async () => {
+    setup();
+    await addServer("Other", "other.example.org");
+    await renderAll();
+    fireEvent.click(serverButton(0));
+    await waitFor(() => {
+      expect(serverButtons()[0]).toHaveAttribute("aria-current", "true");
+    });
+    api.mock.failNext("connect", "serverLimitReached");
+    fireEvent.click(serverButton(1));
+    await waitFor(() => {
+      expect(status()).toHaveTextContent("Couldn't connect to Other. You're already connected");
+    });
+    expect(status()).toHaveTextContent("Settings → Servers");
+    expect(serverButtons()[0]).toHaveAttribute("aria-current", "true");
+
+    fireEvent.click(serverButton(1));
+    await waitFor(() => {
+      expect(serverButtons()[1]).toHaveAttribute("aria-current", "true");
+    });
+    expect((await api.connectionsList()).map((c) => c.serverId)).toHaveLength(2);
+  });
+
   it("picks a theme for the server from its menu and goes back to the app theme", async () => {
     setup();
     await renderAll();

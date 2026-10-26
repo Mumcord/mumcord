@@ -133,6 +133,9 @@ function StatusBar({ state }: { state: ServersState }) {
     case "reconnecting":
       return <Reconnecting state={state} />;
     case "connected":
+      // A refusal for another server (e.g. over the server limit) must not be hidden by the
+      // shown server being connected.
+      if (ended) break;
       return state.transport === "tcp" ? <Bar tone="info" text={t("status.tcp")} /> : null;
     case "disconnected":
       break;
