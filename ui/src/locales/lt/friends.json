@@ -4,6 +4,7 @@
   "online": "Prisijungęs (-usi)",
   "onlineIn": "Prisijungęs (-usi) kanale {{channel}}",
   "onlineOnServer": "Prisijungęs (-usi) serveryje {{server}}",
+  "inChannelOnServer": "Kanale {{channel}} · {{server}}",
   "offline": "Neprisijungęs (-usi)",
   "lastSeen": "Neprisijungęs (-usi), paskutinį kartą matytas (-a) {{when}}",
   "friend": "Draugas",

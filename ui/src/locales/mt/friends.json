@@ -4,6 +4,7 @@
   "online": "Online",
   "onlineIn": "Online f'{{channel}}",
   "onlineOnServer": "Online fuq {{server}}",
+  "inChannelOnServer": "F'{{channel}} · {{server}}",
   "offline": "Offline",
   "lastSeen": "Offline, dehru l-aħħar {{when}}",
   "friend": "Ħabib",

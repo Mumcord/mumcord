@@ -4,6 +4,7 @@
   "online": "Ar líne",
   "onlineIn": "Ar líne i {{channel}}",
   "onlineOnServer": "Ar líne ar {{server}}",
+  "inChannelOnServer": "I {{channel}} · {{server}}",
   "offline": "As líne",
   "lastSeen": "As líne, le feiceáil go deireanach {{when}}",
   "friend": "Cara",

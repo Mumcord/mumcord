@@ -4,6 +4,7 @@
   "online": "En línea",
   "onlineIn": "En línea en {{channel}}",
   "onlineOnServer": "En línea en {{server}}",
+  "inChannelOnServer": "En {{channel}} · {{server}}",
   "offline": "Desconectado",
   "lastSeen": "Desconectado, visto por última vez {{when}}",
   "friend": "Amigo",

@@ -4,6 +4,7 @@
   "online": "Tiešsaistē",
   "onlineIn": "Tiešsaistē kanālā {{channel}}",
   "onlineOnServer": "Tiešsaistē serverī {{server}}",
+  "inChannelOnServer": "Kanālā {{channel}} · {{server}}",
   "offline": "Bezsaistē",
   "lastSeen": "Bezsaistē, pēdējoreiz redzēts {{when}}",
   "friend": "Draugs",

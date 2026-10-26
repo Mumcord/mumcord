@@ -4,6 +4,7 @@
   "online": "Online",
   "onlineIn": "Online itt: {{channel}}",
   "onlineOnServer": "Online itt: {{server}}",
+  "inChannelOnServer": "Itt: {{channel}} · {{server}}",
   "offline": "Offline",
   "lastSeen": "Offline, utoljára látva: {{when}}",
   "friend": "Barát",

@@ -4,6 +4,7 @@
   "online": "Paikalla",
   "onlineIn": "Paikalla kanavalla {{channel}}",
   "onlineOnServer": "Paikalla palvelimella {{server}}",
+  "inChannelOnServer": "Kanavalla {{channel}} · {{server}}",
   "offline": "Poissa",
   "lastSeen": "Poissa, nähty viimeksi {{when}}",
   "friend": "Kaveri",

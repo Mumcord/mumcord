@@ -4,6 +4,7 @@
   "online": "Na spletu",
   "onlineIn": "Na spletu v {{channel}}",
   "onlineOnServer": "Na spletu na {{server}}",
+  "inChannelOnServer": "V {{channel}} · {{server}}",
   "offline": "Brez povezave",
   "lastSeen": "Brez povezave, nazadnje viden {{when}}",
   "friend": "Prijatelj",

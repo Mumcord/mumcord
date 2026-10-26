@@ -4,6 +4,7 @@
   "online": "Online",
   "onlineIn": "Online în {{channel}}",
   "onlineOnServer": "Online pe {{server}}",
+  "inChannelOnServer": "În {{channel}} · {{server}}",
   "offline": "Offline",
   "lastSeen": "Offline, văzut ultima dată {{when}}",
   "friend": "Prieten",

@@ -4,6 +4,7 @@
   "online": "На линия",
   "onlineIn": "На линия в {{channel}}",
   "onlineOnServer": "На линия на {{server}}",
+  "inChannelOnServer": "В {{channel}} · {{server}}",
   "offline": "Не е на линия",
   "lastSeen": "Не е на линия, последно видян {{when}}",
   "friend": "Приятел",
