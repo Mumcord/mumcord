@@ -73,7 +73,8 @@ jobs:
         run: |
           scripts/ci/apt-install.sh \
             libwebkit2gtk-4.1-dev libayatana-appindicator3-dev librsvg2-dev \
-            libxdo-dev libasound2-dev libpipewire-0.3-dev libclang-dev pkg-config cmake patchelf xdg-utils
+            libxdo-dev libasound2-dev libpipewire-0.3-dev libclang-dev pkg-config cmake patchelf xdg-utils \
+            gstreamer1.0-plugins-bad
 
       # Screen sharing links a static libvpx into every bundle (scripts/build-libvpx.sh,
       # RELEASING.md); on Linux this keeps the packages off the build host's libvpx soname. It is
@@ -459,6 +460,9 @@ jobs:
               echo "$f must not be bundled in the AppImage" >&2; exit 1
             fi
           done
+          # Without the Opus parser YouTube refuses to play in the AppImage (scripts/filter-gst-plugins.sh).
+          test -e "$RUNNER_TEMP/squashfs-root/usr/lib/gstreamer-1.0/libgstopusparse.so" \
+            || { echo "libgstopusparse.so is missing from the AppImage" >&2; exit 1; }
           # Without the bundled scanner every plugin load warns and runs in-process.
           test -x "$RUNNER_TEMP/squashfs-root/usr/lib/gstreamer1.0/gstreamer-1.0/gst-plugin-scanner" \
             || { echo "gst-plugin-scanner is missing from the AppImage" >&2; exit 1; }
