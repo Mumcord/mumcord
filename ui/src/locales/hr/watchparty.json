@@ -1,0 +1,53 @@
+{
+  "title": "Zajedničko gledanje",
+  "addVideo": "Dodaj video",
+  "beta": "Beta",
+  "join": "Pridruži se zajedničkom gledanju",
+  "leave": "Napusti gledanje",
+  "watching": "{{count}} gleda: {{names}}",
+  "player": "Player zajedničkog gledanja",
+  "watchTogether": "Gledajte zajedno",
+  "watchTogetherFor": "Gledaj {{title}} zajedno s ovim kanalom",
+  "cantPlay": "Player ovdje ne može raditi.",
+  "openInBrowser": "Otvori u pregledniku",
+  "startFailed": "Zajedničko gledanje nije se moglo pokrenuti.",
+  "joinFailed": "Pridruživanje zajedničkom gledanju nije uspjelo.",
+  "leaveFailed": "Napuštanje zajedničkog gledanja nije uspjelo.",
+  "commandFailed": "Zajedničko gledanje nije primilo tvoju promjenu.",
+  "someone": "Netko",
+  "other": {
+    "play": "{{name}} je pokrenuo reprodukciju",
+    "pause": "{{name}} je pauzirao",
+    "seek": "{{name}} je preskočio naprijed",
+    "skipped": "{{name}} je preskočio"
+  },
+  "addToPlaylist": "Dodaj na popis",
+  "addToPlaylistFor": "Dodaj {{title}} na popis zajedničkog gledanja",
+  "playlist": {
+    "title": "Sljedeće",
+    "empty": "Ništa nije sljedeće. Dodaj YouTube poveznice s „Dodaj na popis”.",
+    "skip": "Preskoči",
+    "moveHint": "Alt+Gore i Alt+Dolje pomiču video; možeš ga i povući.",
+    "moved": "Premješteno na mjesto {{position}}",
+    "videoTitle": "YouTube video",
+    "addedBy": "Dodao/la {{name}}",
+    "remove": "Ukloni {{title}} s popisa",
+    "addFailed": "Video nije bilo moguće dodati na popis. Na popis stane do 50 videa.",
+    "removeFailed": "Video nije bilo moguće ukloniti s popisa.",
+    "moveFailed": "Video nije bilo moguće premjestiti.",
+    "skipFailed": "Prelazak na sljedeći video nije uspio.",
+    "nextFailed": "Sljedeći video nije se mogao pokrenuti.",
+    "move": "Premjesti {{title}}",
+    "upNext": "Sljedeće: {{title}}",
+    "upNextNone": "Ništa nije sljedeće"
+  },
+  "widget": {
+    "play": "Reproduciraj",
+    "pause": "Pauziraj"
+  },
+  "codecHint": {
+    "install": "Ovaj video treba podršku za H.264. Instaliraj gst-libav:",
+    "generic": "Ovaj video treba podršku za H.264. Instaliraj gst-libav (GStreamerov libav dodatak) upraviteljem paketa svog sustava.",
+    "rpmFusion": "Na Fedori gst-libav dolazi iz repozitorija RPM Fusion; najprije omogući RPM Fusion."
+  }
+}

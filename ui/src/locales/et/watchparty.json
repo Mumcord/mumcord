@@ -1,0 +1,53 @@
+{
+  "title": "Ühisvaatamine",
+  "addVideo": "Lisa video",
+  "beta": "Beeta",
+  "join": "Liitu ühisvaatamisega",
+  "leave": "Lahku ühisvaatamiselt",
+  "watching": "{{count}} vaatavad: {{names}}",
+  "player": "Ühisvaatamise mängija",
+  "watchTogether": "Vaatame koos",
+  "watchTogetherFor": "Vaata {{title}} koos selle kanaliga",
+  "cantPlay": "Mängija ei saa siin töötada.",
+  "openInBrowser": "Ava brauseris",
+  "startFailed": "Ühisvaatamist ei õnnestunud alustada.",
+  "joinFailed": "Ühisvaatamisega liitumine ebaõnnestus.",
+  "leaveFailed": "Ühisvaatamiselt lahkumine ebaõnnestus.",
+  "commandFailed": "Ühisvaatamine ei saanud sinu muudatust kätte.",
+  "someone": "Keegi",
+  "other": {
+    "play": "{{name}} vajutas esitust",
+    "pause": "{{name}} peatas",
+    "seek": "{{name}} hüppas edasi",
+    "skipped": "{{name}} jättis vahele"
+  },
+  "addToPlaylist": "Lisa esitusloendisse",
+  "addToPlaylistFor": "Lisa {{title}} ühisvaatamise esitusloendisse",
+  "playlist": {
+    "title": "Järgmisena",
+    "empty": "Järgmisena pole midagi. Lisa YouTube'i linke nupuga „Lisa esitusloendisse“.",
+    "skip": "Jäta vahele",
+    "moveHint": "Alt+Üles ja Alt+Alla liigutavad videot; saad seda ka lohistada.",
+    "moved": "Teisaldatud kohale {{position}}",
+    "videoTitle": "YouTube'i video",
+    "addedBy": "Lisas {{name}}",
+    "remove": "Eemalda {{title}} esitusloendist",
+    "addFailed": "Videot ei õnnestunud esitusloendisse lisada. Sinna mahub kuni 50 videot.",
+    "removeFailed": "Videot ei õnnestunud esitusloendist eemaldada.",
+    "moveFailed": "Videot ei õnnestunud teisaldada.",
+    "skipFailed": "Järgmise video juurde liikumine ebaõnnestus.",
+    "nextFailed": "Järgmist videot ei õnnestunud alustada.",
+    "move": "Teisalda {{title}}",
+    "upNext": "Järgmisena: {{title}}",
+    "upNextNone": "Järgmisena pole midagi"
+  },
+  "widget": {
+    "play": "Esita",
+    "pause": "Peata"
+  },
+  "codecHint": {
+    "install": "See video vajab H.264 tuge. Paigalda gst-libav:",
+    "generic": "See video vajab H.264 tuge. Paigalda gst-libav (GStreameri libav-plugin) oma süsteemi paketihalduriga.",
+    "rpmFusion": "Fedoras tuleb gst-libav RPM Fusioni hoidlast; luba esmalt RPM Fusion."
+  }
+}

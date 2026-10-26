@@ -1,0 +1,53 @@
+{
+  "title": "Watch-Party",
+  "addVideo": "Video hinzufügen",
+  "beta": "Beta",
+  "join": "Watch-Party beitreten",
+  "leave": "Party verlassen",
+  "watching": "{{count}} schauen zu: {{names}}",
+  "player": "Watch-Party-Player",
+  "watchTogether": "Gemeinsam ansehen",
+  "watchTogetherFor": "{{title}} gemeinsam mit diesem Kanal ansehen",
+  "cantPlay": "Der Player kann hier nicht laufen.",
+  "openInBrowser": "Im Browser öffnen",
+  "startFailed": "Die Watch-Party konnte nicht gestartet werden.",
+  "joinFailed": "Beitritt zur Watch-Party fehlgeschlagen.",
+  "leaveFailed": "Die Watch-Party konnte nicht verlassen werden.",
+  "commandFailed": "Die Watch-Party hat deine Änderung nicht übernommen.",
+  "someone": "Jemand",
+  "other": {
+    "play": "{{name}} hat Play gedrückt",
+    "pause": "{{name}} hat pausiert",
+    "seek": "{{name}} ist vorgesprungen",
+    "skipped": "{{name}} hat übersprungen"
+  },
+  "addToPlaylist": "Zur Playlist hinzufügen",
+  "addToPlaylistFor": "{{title}} zur Watch-Party-Playlist hinzufügen",
+  "playlist": {
+    "title": "Als Nächstes",
+    "empty": "Nichts als Nächstes. Füge YouTube-Links mit „Zur Playlist hinzufügen“ hinzu.",
+    "skip": "Überspringen",
+    "moveHint": "Alt+Pfeil hoch und Alt+Pfeil runter verschieben das Video; du kannst es auch ziehen.",
+    "moved": "An Position {{position}} verschoben",
+    "videoTitle": "YouTube-Video",
+    "addedBy": "Hinzugefügt von {{name}}",
+    "remove": "{{title}} aus der Playlist entfernen",
+    "addFailed": "Das Video konnte nicht zur Playlist hinzugefügt werden. Sie fasst bis zu 50 Videos.",
+    "removeFailed": "Das Video konnte nicht aus der Playlist entfernt werden.",
+    "moveFailed": "Das Video konnte nicht verschoben werden.",
+    "skipFailed": "Zum nächsten Video springen fehlgeschlagen.",
+    "nextFailed": "Das nächste Video konnte nicht gestartet werden.",
+    "move": "{{title}} verschieben",
+    "upNext": "Als Nächstes: {{title}}",
+    "upNextNone": "Nichts als Nächstes"
+  },
+  "widget": {
+    "play": "Abspielen",
+    "pause": "Pausieren"
+  },
+  "codecHint": {
+    "install": "Dieses Video braucht H.264-Unterstützung. Installiere gst-libav:",
+    "generic": "Dieses Video braucht H.264-Unterstützung. Installiere gst-libav (das GStreamer-libav-Plugin) mit der Paketverwaltung deines Systems.",
+    "rpmFusion": "Unter Fedora kommt gst-libav aus dem RPM-Fusion-Repository; aktiviere zuerst RPM Fusion."
+  }
+}

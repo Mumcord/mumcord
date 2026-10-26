@@ -1,0 +1,53 @@
+{
+  "title": "Bendra peržiūra",
+  "addVideo": "Pridėti vaizdo įrašą",
+  "beta": "Beta",
+  "join": "Prisijungti prie bendros peržiūros",
+  "leave": "Palikti peržiūrą",
+  "watching": "{{count}} žiūri: {{names}}",
+  "player": "Bendros peržiūros grotuvas",
+  "watchTogether": "Žiūrėti kartu",
+  "watchTogetherFor": "Žiūrėti {{title}} kartu su šiuo kanalu",
+  "cantPlay": "Grotuvas čia negali veikti.",
+  "openInBrowser": "Atidaryti naršyklėje",
+  "startFailed": "Nepavyko pradėti bendros peržiūros.",
+  "joinFailed": "Nepavyko prisijungti prie bendros peržiūros.",
+  "leaveFailed": "Nepavyko palikti bendros peržiūros.",
+  "commandFailed": "Bendra peržiūra negavo tavo pakeitimo.",
+  "someone": "Kažkas",
+  "other": {
+    "play": "{{name}} paspaudė leisti",
+    "pause": "{{name}} pristabdė",
+    "seek": "{{name}} peršoko į priekį",
+    "skipped": "{{name}} praleido"
+  },
+  "addToPlaylist": "Pridėti į grojaraštį",
+  "addToPlaylistFor": "Pridėti {{title}} į bendros peržiūros grojaraštį",
+  "playlist": {
+    "title": "Toliau",
+    "empty": "Toliau nieko nėra. Pridėk YouTube nuorodų per „Pridėti į grojaraštį“.",
+    "skip": "Praleisti",
+    "moveHint": "Alt+Aukštyn ir Alt+Žemyn perkelia vaizdo įrašą; jį taip pat gali vilkti.",
+    "moved": "Perkelta į {{position}} vietą",
+    "videoTitle": "YouTube vaizdo įrašas",
+    "addedBy": "Pridėjo {{name}}",
+    "remove": "Pašalinti {{title}} iš grojaraščio",
+    "addFailed": "Nepavyko pridėti vaizdo įrašo į grojaraštį. Jame telpa iki 50 vaizdo įrašų.",
+    "removeFailed": "Nepavyko pašalinti vaizdo įrašo iš grojaraščio.",
+    "moveFailed": "Nepavyko perkelti vaizdo įrašo.",
+    "skipFailed": "Nepavyko pereiti prie kito vaizdo įrašo.",
+    "nextFailed": "Nepavyko paleisti kito vaizdo įrašo.",
+    "move": "Perkelti {{title}}",
+    "upNext": "Toliau: {{title}}",
+    "upNextNone": "Toliau nieko nėra"
+  },
+  "widget": {
+    "play": "Leisti",
+    "pause": "Pristabdyti"
+  },
+  "codecHint": {
+    "install": "Šiam vaizdo įrašui reikia H.264 palaikymo. Įdiek gst-libav:",
+    "generic": "Šiam vaizdo įrašui reikia H.264 palaikymo. Įdiek gst-libav (GStreamer libav papildinį) savo sistemos paketų tvarkykle.",
+    "rpmFusion": "Fedora sistemoje gst-libav gaunamas iš RPM Fusion saugyklos; pirmiausia įjunk RPM Fusion."
+  }
+}

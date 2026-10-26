@@ -1,0 +1,53 @@
+{
+  "title": "Watch party",
+  "addVideo": "Żid video",
+  "beta": "Beta",
+  "join": "Ingħaqad mal-watch party",
+  "leave": "Itlaq mill-party",
+  "watching": "{{count}} qed jaraw: {{names}}",
+  "player": "Player tal-watch party",
+  "watchTogether": "Araw flimkien",
+  "watchTogetherFor": "Ara {{title}} flimkien ma' dan il-kanal",
+  "cantPlay": "Il-player ma jistax jaħdem hawn.",
+  "openInBrowser": "Iftaħ fil-browser",
+  "startFailed": "Il-watch party ma setgħetx tibda.",
+  "joinFailed": "Ma stajtx tingħaqad mal-watch party.",
+  "leaveFailed": "Ma stajtx titlaq mill-watch party.",
+  "commandFailed": "Il-watch party ma rċevietx il-bidla tiegħek.",
+  "someone": "Xi ħadd",
+  "other": {
+    "play": "{{name}} għafas play",
+    "pause": "{{name}} ippawża",
+    "seek": "{{name}} qabeż 'il quddiem",
+    "skipped": "{{name}} qabeż"
+  },
+  "addToPlaylist": "Żid mal-playlist",
+  "addToPlaylistFor": "Żid {{title}} mal-playlist tal-watch party",
+  "playlist": {
+    "title": "Li jmiss",
+    "empty": "Xejn ma jmiss. Żid links ta' YouTube b'“Żid mal-playlist”.",
+    "skip": "Aqbeż",
+    "moveHint": "Alt+Up u Alt+Down iċaqilqu l-video; tista' wkoll tkaxkru.",
+    "moved": "Imċaqlaq għall-pożizzjoni {{position}}",
+    "videoTitle": "Video ta' YouTube",
+    "addedBy": "Miżjud minn {{name}}",
+    "remove": "Neħħi {{title}} mill-playlist",
+    "addFailed": "Il-video ma setax jiżdied mal-playlist. Iżżomm sa 50 video.",
+    "removeFailed": "Il-video ma setax jitneħħa mill-playlist.",
+    "moveFailed": "Il-video ma setax jiċċaqlaq.",
+    "skipFailed": "Ma stajtx taqbeż għall-video li jmiss.",
+    "nextFailed": "Il-video li jmiss ma setax jibda.",
+    "move": "Ċaqlaq {{title}}",
+    "upNext": "Li jmiss: {{title}}",
+    "upNextNone": "Xejn ma jmiss"
+  },
+  "widget": {
+    "play": "Play",
+    "pause": "Pawża"
+  },
+  "codecHint": {
+    "install": "Dan il-video jeħtieġ appoġġ għal H.264. Installa gst-libav:",
+    "generic": "Dan il-video jeħtieġ appoġġ għal H.264. Installa gst-libav (il-plugin libav ta' GStreamer) bil-package manager tas-sistema tiegħek.",
+    "rpmFusion": "Fuq Fedora, gst-libav jiġi mir-repożitorju RPM Fusion; l-ewwel ixgħel RPM Fusion."
+  }
+}

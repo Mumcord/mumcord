@@ -1,0 +1,53 @@
+{
+  "title": "Watch party",
+  "addVideo": "Aggiungi video",
+  "beta": "Beta",
+  "join": "Entra nel watch party",
+  "leave": "Esci dal party",
+  "watching": "{{count}} stanno guardando: {{names}}",
+  "player": "Player del watch party",
+  "watchTogether": "Guarda insieme",
+  "watchTogetherFor": "Guarda {{title}} insieme a questo canale",
+  "cantPlay": "Il player non può funzionare qui.",
+  "openInBrowser": "Apri nel browser",
+  "startFailed": "Impossibile avviare il watch party.",
+  "joinFailed": "Impossibile entrare nel watch party.",
+  "leaveFailed": "Impossibile uscire dal watch party.",
+  "commandFailed": "Il watch party non ha recepito la modifica.",
+  "someone": "Qualcuno",
+  "other": {
+    "play": "{{name}} ha premuto play",
+    "pause": "{{name}} ha messo in pausa",
+    "seek": "{{name}} è andato avanti",
+    "skipped": "{{name}} ha saltato"
+  },
+  "addToPlaylist": "Aggiungi alla playlist",
+  "addToPlaylistFor": "Aggiungi {{title}} alla playlist del watch party",
+  "playlist": {
+    "title": "A seguire",
+    "empty": "Niente a seguire. Aggiungi link YouTube con «Aggiungi alla playlist».",
+    "skip": "Salta",
+    "moveHint": "Alt+Su e Alt+Giù spostano il video; puoi anche trascinarlo.",
+    "moved": "Spostato in posizione {{position}}",
+    "videoTitle": "Video YouTube",
+    "addedBy": "Aggiunto da {{name}}",
+    "remove": "Rimuovi {{title}} dalla playlist",
+    "addFailed": "Impossibile aggiungere il video alla playlist. Contiene al massimo 50 video.",
+    "removeFailed": "Impossibile rimuovere il video dalla playlist.",
+    "moveFailed": "Impossibile spostare il video.",
+    "skipFailed": "Impossibile passare al video successivo.",
+    "nextFailed": "Impossibile avviare il video successivo.",
+    "move": "Sposta {{title}}",
+    "upNext": "A seguire: {{title}}",
+    "upNextNone": "Niente a seguire"
+  },
+  "widget": {
+    "play": "Riproduci",
+    "pause": "Pausa"
+  },
+  "codecHint": {
+    "install": "Questo video richiede il supporto H.264. Installa gst-libav:",
+    "generic": "Questo video richiede il supporto H.264. Installa gst-libav (il plugin libav di GStreamer) con il gestore pacchetti del tuo sistema.",
+    "rpmFusion": "Su Fedora gst-libav arriva dal repository RPM Fusion; abilita prima RPM Fusion."
+  }
+}

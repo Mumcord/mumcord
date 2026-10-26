@@ -1,0 +1,110 @@
+/* The watch party inside its floating widget (FR-2.40, FR-2.70). */
+.watch-party-widget .watch-party {
+  flex: 1;
+  margin: 0;
+  border-radius: 0;
+}
+
+/* The widget's title bar already names the party. */
+.watch-party-widget .watch-party__title {
+  display: none;
+}
+
+.watch-party-widget__people {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+}
+
+/* Overlapping avatars; the ring keeps them apart on any background. */
+.watch-party-widget__person + .watch-party-widget__person,
+.watch-party-widget__person + .watch-party-widget__more {
+  margin-inline-start: calc(var(--space-1) * -1);
+}
+
+.watch-party-widget__person {
+  display: inline-flex;
+  border-radius: 50%;
+  box-shadow: 0 0 0 2px var(--color-bg-elevated);
+}
+
+.watch-party-widget__more {
+  margin-inline-start: var(--space-1);
+  color: var(--color-text-muted);
+  font-size: 0.75rem;
+}
+
+/* Compact layout (FR-2.70): the video fills the aspect-bound area; below it come one slim control
+   row, a one-line action text and the collapsible playlist. Heights match EXTRA_* in the widget. */
+.watch-party-widget .floating-widget__body {
+  overflow: hidden;
+}
+
+.watch-party-widget .watch-party {
+  gap: 0;
+  padding: 0;
+  background: none;
+}
+
+.watch-party-widget .watch-party__player {
+  max-width: none;
+}
+
+.watch-party-widget .watch-party__frame {
+  border-radius: 0;
+}
+
+/* Only holds the Join button; once joined it is empty and must not push the video down. */
+.watch-party-widget .watch-party__header {
+  padding: var(--space-1) var(--space-2);
+}
+
+.watch-party-widget .watch-party__header:not(:has(.button)) {
+  display: none;
+}
+
+/* A caption over the video's bottom edge: it takes no height, so the control row sits right
+   under the video. */
+.watch-party-widget .watch-party {
+  position: relative;
+}
+
+.watch-party-widget .watch-party__action {
+  position: absolute;
+  bottom: 36px;
+  left: var(--space-2);
+  max-width: calc(100% - 2 * var(--space-2));
+  height: 20px;
+  padding: 0 var(--space-1);
+  border-radius: var(--radius-sm);
+  background: color-mix(in srgb, var(--color-bg-elevated) 85%, transparent);
+  overflow: hidden;
+  color: var(--color-text-muted);
+  font-size: 0.75rem;
+  line-height: 20px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* The codec hint and the "can't play" text share the widget's inner padding. */
+.watch-party-widget .watch-party__unavailable {
+  padding: var(--space-2);
+}
+
+.watch-party-widget .watch-playlist {
+  gap: 0;
+  max-width: none;
+}
+
+.watch-party-widget .watch-playlist__header {
+  height: 28px;
+  margin-top: var(--space-1);
+  padding: 0 var(--space-2);
+  justify-content: flex-start;
+}
+
+.watch-party-widget .watch-playlist__empty {
+  padding: var(--space-1) var(--space-2);
+  color: var(--color-text-muted);
+  font-size: 0.75rem;
+}

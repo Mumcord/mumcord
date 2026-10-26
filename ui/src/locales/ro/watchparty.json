@@ -1,0 +1,53 @@
+{
+  "title": "Vizionare comună",
+  "addVideo": "Adaugă videoclip",
+  "beta": "Beta",
+  "join": "Alătură-te vizionării comune",
+  "leave": "Părăsește vizionarea",
+  "watching": "{{count}} urmăresc: {{names}}",
+  "player": "Player pentru vizionare comună",
+  "watchTogether": "Urmăriți împreună",
+  "watchTogetherFor": "Urmărește {{title}} împreună cu acest canal",
+  "cantPlay": "Playerul nu poate rula aici.",
+  "openInBrowser": "Deschide în browser",
+  "startFailed": "Vizionarea comună nu a putut porni.",
+  "joinFailed": "Nu te-ai putut alătura vizionării comune.",
+  "leaveFailed": "Nu ai putut părăsi vizionarea comună.",
+  "commandFailed": "Vizionarea comună nu a primit modificarea ta.",
+  "someone": "Cineva",
+  "other": {
+    "play": "{{name}} a pornit redarea",
+    "pause": "{{name}} a pus pauză",
+    "seek": "{{name}} a sărit înainte",
+    "skipped": "{{name}} a sărit peste"
+  },
+  "addToPlaylist": "Adaugă în playlist",
+  "addToPlaylistFor": "Adaugă {{title}} în playlistul vizionării comune",
+  "playlist": {
+    "title": "Urmează",
+    "empty": "Nu urmează nimic. Adaugă linkuri YouTube cu „Adaugă în playlist”.",
+    "skip": "Sari peste",
+    "moveHint": "Alt+Sus și Alt+Jos mută videoclipul; îl poți și trage.",
+    "moved": "Mutat pe poziția {{position}}",
+    "videoTitle": "Videoclip YouTube",
+    "addedBy": "Adăugat de {{name}}",
+    "remove": "Elimină {{title}} din playlist",
+    "addFailed": "Videoclipul nu a putut fi adăugat în playlist. Acesta are cel mult 50 de videoclipuri.",
+    "removeFailed": "Videoclipul nu a putut fi eliminat din playlist.",
+    "moveFailed": "Videoclipul nu a putut fi mutat.",
+    "skipFailed": "Nu s-a putut trece la videoclipul următor.",
+    "nextFailed": "Videoclipul următor nu a putut porni.",
+    "move": "Mută {{title}}",
+    "upNext": "Urmează: {{title}}",
+    "upNextNone": "Nu urmează nimic"
+  },
+  "widget": {
+    "play": "Redă",
+    "pause": "Pauză"
+  },
+  "codecHint": {
+    "install": "Acest videoclip are nevoie de suport H.264. Instalează gst-libav:",
+    "generic": "Acest videoclip are nevoie de suport H.264. Instalează gst-libav (pluginul libav pentru GStreamer) cu managerul de pachete al sistemului tău.",
+    "rpmFusion": "Pe Fedora, gst-libav vine din depozitul RPM Fusion; activează mai întâi RPM Fusion."
+  }
+}
