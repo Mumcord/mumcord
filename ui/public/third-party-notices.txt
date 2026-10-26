@@ -50,6 +50,9 @@ MUMBLE GAME PLUGINS
 The official Mumble game plugins that Mumcord can load at runtime to read
 game positions are developed by the Mumble project and are licensed under
 the same BSD license shown above. They are not part of this repository.
+Mumcord's plugin host (crates/positional/src/plugins/) follows the plugin
+interface definitions of the Mumble project (MumblePlugin.h and the headers
+it includes), used under the same BSD license.
 Mumcord is compatible with Mumble but is not affiliated with or endorsed by
 the Mumble project.
 
@@ -60,15 +63,16 @@ RUST DEPENDENCIES
 Mumcord links the following Rust crates. Each crate is listed with the
 license(s) it is distributed under, followed by the license text(s).
 
-* MIT License (538 crates)
+* MIT License (576 crates)
 * BSD 3-Clause "New" or "Revised" License (28 crates)
 * ISC License (20 crates)
 * Unicode License v3 (19 crates)
-* Apache License 2.0 (14 crates)
-* GNU Affero General Public License v3.0 only (8 crates)
+* Apache License 2.0 (17 crates)
+* GNU Affero General Public License v3.0 only (12 crates)
 * Mozilla Public License 2.0 (6 crates)
 * BSD 2-Clause "Simplified" License (1 crate)
 * Creative Commons Zero v1.0 Universal (1 crate)
+* The Unlicense (1 crate)
 * zlib License (1 crate)
 
 --------------------------------------------------------------------------------
@@ -76,14 +80,18 @@ GNU Affero General Public License v3.0 only
 --------------------------------------------------------------------------------
 
 Used by:
-  - mumcord-audio 0.1.0
-  - mumcord-bot 0.1.0
-  - mumcord-engine 0.1.0
-  - mumcord-positional 0.1.0
-  - mumcord-protocol 0.1.0
-  - mumcord-store 0.1.0
-  - mumcord 0.1.0
-  - netsim 0.1.0
+  - mumcord-audio 0.4.0
+  - mumcord-bot 0.4.0
+  - mumcord-engine 0.4.0
+  - mumcord-overlay-ipc 0.4.0
+  - mumcord-overlay-layer 0.4.0
+  - mumcord-p2p 0.4.0
+  - mumcord-positional 0.4.0
+  - mumcord-protocol 0.4.0
+  - mumcord-screenshare 0.4.0
+  - mumcord-store 0.4.0
+  - mumcord 0.4.0
+  - netsim 0.4.0
 
 GNU AFFERO GENERAL PUBLIC LICENSE
 Version 3, 19 November 2007
@@ -1664,7 +1672,10 @@ Apache License 2.0
 --------------------------------------------------------------------------------
 
 Used by:
+  - ab_glyph 0.2.32 (https://github.com/alexheretic/ab-glyph)
+  - ab_glyph_rasterizer 0.1.10 (https://github.com/alexheretic/ab-glyph)
   - dunce 1.0.5 (https://gitlab.com/kornelski/dunce)
+  - owned_ttf_parser 0.25.1 (https://github.com/alexheretic/owned-ttf-parser)
   - sync_wrapper 1.0.2 (https://github.com/Actyx/sync_wrapper)
 
 Apache License
@@ -4319,6 +4330,41 @@ MIT License
 --------------------------------------------------------------------------------
 
 Used by:
+  - rand_pcg 0.10.2 (https://github.com/rust-random/rngs)
+
+Copyright (c) 2014-2017 Melissa O'Neill and PCG Project contributors
+Copyright 2018 Developers of the Rand project
+
+Permission is hereby granted, free of charge, to any
+person obtaining a copy of this software and associated
+documentation files (the "Software"), to deal in the
+Software without restriction, including without
+limitation the rights to use, copy, modify, merge,
+publish, distribute, sublicense, and/or sell copies of
+the Software, and to permit persons to whom the Software
+is furnished to do so, subject to the following
+conditions:
+
+The above copyright notice and this permission notice
+shall be included in all copies or substantial portions
+of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF
+ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED
+TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT
+SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR
+IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+DEALINGS IN THE SOFTWARE.
+
+
+--------------------------------------------------------------------------------
+MIT License
+--------------------------------------------------------------------------------
+
+Used by:
   - dbus 0.9.12 (https://github.com/diwic/dbus-rs)
   - libdbus-sys 0.2.7 (https://github.com/diwic/dbus-rs)
 
@@ -4348,6 +4394,7 @@ MIT License
 
 Used by:
   - nom 7.1.3 (https://github.com/Geal/nom)
+  - nom 8.0.0 (https://github.com/rust-bakery/nom)
 
 Copyright (c) 2014-2019 Geoffroy Couprie
 
@@ -4927,13 +4974,49 @@ MIT License
 --------------------------------------------------------------------------------
 
 Used by:
+  - ash 0.38.0+1.3.281 (https://github.com/ash-rs/ash)
+
+Copyright (c) 2016 ASH
+
+Permission is hereby granted, free of charge, to any
+person obtaining a copy of this software and associated
+documentation files (the "Software"), to deal in the
+Software without restriction, including without
+limitation the rights to use, copy, modify, merge,
+publish, distribute, sublicense, and/or sell copies of
+the Software, and to permit persons to whom the Software
+is furnished to do so, subject to the following
+conditions:
+
+The above copyright notice and this permission notice
+shall be included in all copies or substantial portions
+of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF
+ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED
+TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT
+SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR
+IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+DEALINGS IN THE SOFTWARE.
+
+
+--------------------------------------------------------------------------------
+MIT License
+--------------------------------------------------------------------------------
+
+Used by:
   - futures-channel 0.3.34 (https://github.com/rust-lang/futures-rs)
   - futures-core 0.3.34 (https://github.com/rust-lang/futures-rs)
   - futures-executor 0.3.34 (https://github.com/rust-lang/futures-rs)
   - futures-io 0.3.34 (https://github.com/rust-lang/futures-rs)
   - futures-macro 0.3.34 (https://github.com/rust-lang/futures-rs)
+  - futures-sink 0.3.34 (https://github.com/rust-lang/futures-rs)
   - futures-task 0.3.34 (https://github.com/rust-lang/futures-rs)
   - futures-util 0.3.34 (https://github.com/rust-lang/futures-rs)
+  - futures 0.3.34 (https://github.com/rust-lang/futures-rs)
 
 Copyright (c) 2016 Alex Crichton
 Copyright (c) 2017 The Tokio Authors
@@ -5878,6 +5961,74 @@ MIT License
 --------------------------------------------------------------------------------
 
 Used by:
+  - arc-swap 1.9.3 (https://github.com/vorner/arc-swap)
+
+Copyright (c) 2017 arc-swap developers
+
+Permission is hereby granted, free of charge, to any
+person obtaining a copy of this software and associated
+documentation files (the "Software"), to deal in the
+Software without restriction, including without
+limitation the rights to use, copy, modify, merge,
+publish, distribute, sublicense, and/or sell copies of
+the Software, and to permit persons to whom the Software
+is furnished to do so, subject to the following
+conditions:
+
+The above copyright notice and this permission notice
+shall be included in all copies or substantial portions
+of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF
+ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED
+TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT
+SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR
+IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+DEALINGS IN THE SOFTWARE.
+
+
+--------------------------------------------------------------------------------
+MIT License
+--------------------------------------------------------------------------------
+
+Used by:
+  - h2 0.4.20 (https://github.com/hyperium/h2)
+
+Copyright (c) 2017 h2 authors
+
+Permission is hereby granted, free of charge, to any
+person obtaining a copy of this software and associated
+documentation files (the "Software"), to deal in the
+Software without restriction, including without
+limitation the rights to use, copy, modify, merge,
+publish, distribute, sublicense, and/or sell copies of
+the Software, and to permit persons to whom the Software
+is furnished to do so, subject to the following
+conditions:
+
+The above copyright notice and this permission notice
+shall be included in all copies or substantial portions
+of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF
+ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED
+TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT
+SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR
+IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+DEALINGS IN THE SOFTWARE.
+
+
+--------------------------------------------------------------------------------
+MIT License
+--------------------------------------------------------------------------------
+
+Used by:
   - http 1.5.0 (https://github.com/hyperium/http)
 
 Copyright (c) 2017 http-rs authors
@@ -6248,6 +6399,53 @@ CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
 OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR
 IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
+
+
+--------------------------------------------------------------------------------
+MIT License
+--------------------------------------------------------------------------------
+
+Used by:
+  - quinn-proto 0.11.19 (https://github.com/quinn-rs/quinn)
+  - quinn-udp 0.5.16 (https://github.com/quinn-rs/quinn)
+  - quinn 0.11.12 (https://github.com/quinn-rs/quinn)
+
+Copyright (c) 2018 The quinn Developers
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+
+--------------------------------------------------------------------------------
+MIT License
+--------------------------------------------------------------------------------
+
+Used by:
+  - ttf-parser 0.25.1 (https://github.com/harfbuzz/ttf-parser)
+
+Copyright (c) 2018 Yevhenii Reizner
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.
+
 
 
 --------------------------------------------------------------------------------
@@ -7892,6 +8090,22 @@ MIT License
 --------------------------------------------------------------------------------
 
 Used by:
+  - lru-slab 0.1.3 (https://github.com/Ralith/lru-slab)
+
+Copyright (c) 2024 The lru-slab Developers
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+
+--------------------------------------------------------------------------------
+MIT License
+--------------------------------------------------------------------------------
+
+Used by:
   - zbus 5.19.0 (https://github.com/z-galaxy/zbus/)
   - zbus_macros 5.19.0 (https://github.com/z-galaxy/zbus/)
   - zbus_names 4.3.5 (https://github.com/z-galaxy/zbus/)
@@ -8343,6 +8557,7 @@ MIT License
 --------------------------------------------------------------------------------
 
 Used by:
+  - zerocopy-derive 0.8.63 (https://github.com/google/zerocopy)
   - zerocopy 0.8.63 (https://github.com/google/zerocopy)
 
 Copyright 2023 The Fuchsia Authors
@@ -8404,6 +8619,38 @@ SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
 CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
 OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR
 IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+DEALINGS IN THE SOFTWARE.
+
+
+--------------------------------------------------------------------------------
+MIT License
+--------------------------------------------------------------------------------
+
+Used by:
+  - libspa-sys 0.10.1 (https://gitlab.freedesktop.org/pipewire/pipewire-rs)
+  - libspa 0.10.1 (https://gitlab.freedesktop.org/pipewire/pipewire-rs)
+  - pipewire-sys 0.10.1 (https://gitlab.freedesktop.org/pipewire/pipewire-rs)
+  - pipewire 0.10.1 (https://gitlab.freedesktop.org/pipewire/pipewire-rs)
+
+Copyright The pipewire-rs Contributors.
+
+Permission is hereby granted, free of charge, to any person obtaining a
+copy of this software and associated documentation files (the "Software"),
+to deal in the Software without restriction, including without limitation
+the rights to use, copy, modify, merge, publish, distribute, sublicense,
+and/or sell copies of the Software, and to permit persons to whom the
+Software is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice (including the next
+paragraph) shall be included in all copies or substantial portions of the
+Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.  IN NO EVENT SHALL
+THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
 
 
@@ -9193,6 +9440,36 @@ MIT License
 --------------------------------------------------------------------------------
 
 Used by:
+  - netdev 0.47.0 (https://github.com/shellrow/netdev)
+
+MIT License
+
+Copyright (c) 2021-2026 shellrow
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+
+--------------------------------------------------------------------------------
+MIT License
+--------------------------------------------------------------------------------
+
+Used by:
   - rustls-platform-verifier 0.6.2 (https://github.com/rustls/rustls-platform-verifier)
   - rustls-platform-verifier 0.7.1 (https://github.com/rustls/rustls-platform-verifier)
 
@@ -9472,10 +9749,42 @@ MIT License
 --------------------------------------------------------------------------------
 
 Used by:
+  - mac-addr 0.3.0 (https://github.com/shellrow/mac-addr)
+
+MIT License
+
+Copyright (c) 2025 shellrow
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+
+--------------------------------------------------------------------------------
+MIT License
+--------------------------------------------------------------------------------
+
+Used by:
   - anymap3 1.1.0 (https://github.com/reivilibre/anymap3)
   - asn1-rs-impl 0.2.0 (https://github.com/rusticata/asn1-rs.git)
   - block2 0.6.2 (https://github.com/madsmtm/objc2)
   - brotli-decompressor 6.0.1 (https://github.com/dropbox/rust-brotli-decompressor)
+  - cookie-factory 0.3.3 (https://github.com/rust-bakery/cookie-factory)
+  - crab_nat 0.8.1 (https://github.com/ryco117/crab_nat)
   - dasp_sample 0.11.0 (https://github.com/rustaudio/sample.git)
   - dispatch2 0.3.1 (https://github.com/madsmtm/objc2)
   - dlopen2 0.8.2 (https://github.com/OpenByteDev/dlopen2)
@@ -9484,16 +9793,22 @@ Used by:
   - libappindicator-sys 0.9.0
   - libm 0.2.16 (https://github.com/rust-lang/compiler-builtins)
   - mac-notification-sys 0.6.15 (https://github.com/h4llow3En/mac-notification-sys)
+  - netlink-packet-core 0.9.0 (https://github.com/rust-netlink/netlink-packet-core)
+  - netlink-sys 0.9.0 (https://github.com/rust-netlink/netlink-sys)
   - objc2-app-kit 0.3.2 (https://github.com/madsmtm/objc2)
   - objc2-audio-toolbox 0.3.2 (https://github.com/madsmtm/objc2)
   - objc2-core-audio-types 0.3.2 (https://github.com/madsmtm/objc2)
   - objc2-core-audio 0.3.2 (https://github.com/madsmtm/objc2)
   - objc2-core-foundation 0.3.2 (https://github.com/madsmtm/objc2)
   - objc2-core-graphics 0.3.2 (https://github.com/madsmtm/objc2)
+  - objc2-core-media 0.3.2 (https://github.com/madsmtm/objc2)
+  - objc2-core-video 0.3.2 (https://github.com/madsmtm/objc2)
   - objc2-encode 4.1.0 (https://github.com/madsmtm/objc2)
   - objc2-exception-helper 0.1.1 (https://github.com/madsmtm/objc2)
   - objc2-foundation 0.3.2 (https://github.com/madsmtm/objc2)
   - objc2-quartz-core 0.3.2 (https://github.com/madsmtm/objc2)
+  - objc2-screen-capture-kit 0.3.2 (https://github.com/madsmtm/objc2)
+  - objc2-system-configuration 0.3.2 (https://github.com/madsmtm/objc2)
   - objc2-web-kit 0.3.2 (https://github.com/madsmtm/objc2)
   - objc2 0.6.5 (https://github.com/madsmtm/objc2)
   - p12-keystore 0.4.1 (https://github.com/ancwrd1/p12-keystore)
@@ -9562,6 +9877,7 @@ MIT License
 --------------------------------------------------------------------------------
 
 Used by:
+  - tokio-util 0.7.20 (https://github.com/tokio-rs/tokio)
   - tokio 1.54.1 (https://github.com/tokio-rs/tokio)
 
 MIT License
@@ -9786,6 +10102,23 @@ MIT License
 --------------------------------------------------------------------------------
 
 Used by:
+  - xmltree 0.10.3 (https://github.com/eminence/xmltree-rs)
+
+MIT License
+Copyright (c) 2015 Andrew Chin
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+
+--------------------------------------------------------------------------------
+MIT License
+--------------------------------------------------------------------------------
+
+Used by:
   - rsa 0.9.10 (https://github.com/RustCrypto/RSA)
   - rustc-hash 2.1.3 (https://github.com/rust-lang/rustc-hash)
 
@@ -9847,10 +10180,13 @@ Used by:
   - lazy_static 1.5.1 (https://github.com/rust-lang-nursery/lazy-static.rs)
   - linux-raw-sys 0.12.1 (https://github.com/sunfishcode/linux-raw-sys)
   - minimal-lexical 0.2.1 (https://github.com/Alexhuszagh/minimal-lexical)
+  - num_enum 0.7.6 (https://github.com/illicitonion/num_enum)
+  - num_enum_derive 0.7.6 (https://github.com/illicitonion/num_enum)
   - once_cell 1.21.4 (https://github.com/matklad/once_cell)
   - ordered-stream 0.2.0 (https://github.com/danieldg/ordered-stream)
   - parking 2.2.1 (https://github.com/smol-rs/parking)
   - paste 1.0.15 (https://github.com/dtolnay/paste)
+  - pastey 0.2.3 (https://github.com/as1100k/pastey)
   - pin-project-lite 0.2.17 (https://github.com/taiki-e/pin-project-lite)
   - piper 0.2.5 (https://github.com/smol-rs/piper)
   - polling 3.11.0 (https://github.com/smol-rs/polling)
@@ -9861,6 +10197,7 @@ Used by:
   - quote 1.0.47 (https://github.com/dtolnay/quote)
   - rtrb 0.3.5 (https://github.com/mgeier/rtrb)
   - rustix 1.1.5 (https://github.com/bytecodealliance/rustix)
+  - rustversion 1.0.23 (https://github.com/dtolnay/rustversion)
   - semver 1.0.28 (https://github.com/dtolnay/semver)
   - serde-untagged 0.1.9 (https://github.com/dtolnay/serde-untagged)
   - serde 1.0.229 (https://github.com/serde-rs/serde)
@@ -10047,6 +10384,32 @@ MIT License
 --------------------------------------------------------------------------------
 
 Used by:
+  - netlink-packet-route 0.33.0 (https://github.com/rust-netlink/netlink-packet-route)
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of
+this software and associated documentation files (the “Software”), to deal in
+the Software without restriction, including without limitation the rights to
+use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies
+of the Software, and to permit persons to whom the Software is furnished to do
+so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+
+--------------------------------------------------------------------------------
+MIT License
+--------------------------------------------------------------------------------
+
+Used by:
   - ctor 1.0.13 (https://github.com/mmastrac/linktime)
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
@@ -10054,6 +10417,20 @@ Permission is hereby granted, free of charge, to any person obtaining a copy of 
 The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+--------------------------------------------------------------------------------
+MIT License
+--------------------------------------------------------------------------------
+
+Used by:
+  - tinyvec 1.13.3 (https://github.com/Lokathor/tinyvec)
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
 
 --------------------------------------------------------------------------------
 MIT License
@@ -10189,6 +10566,36 @@ Used by:
 The MIT License (MIT)
 
 Copyright (c) 2014 Paho Lurie-Gregg
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+
+--------------------------------------------------------------------------------
+MIT License
+--------------------------------------------------------------------------------
+
+Used by:
+  - xml-rs 0.8.29 (https://github.com/kornelski/xml-rs)
+
+The MIT License (MIT)
+
+Copyright (c) 2014 Vladimir Matveev
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -10355,6 +10762,37 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
+
+
+--------------------------------------------------------------------------------
+MIT License
+--------------------------------------------------------------------------------
+
+Used by:
+  - igd-next 0.18.0 (https://github.com/dariusc93/rust-igd)
+
+The MIT License (MIT)
+
+Copyright (c) 2015 Simon Bernier St-Pierre
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
 
 
 --------------------------------------------------------------------------------
@@ -10608,6 +11046,7 @@ MIT License
 
 Used by:
   - crossbeam-channel 0.5.17 (https://github.com/crossbeam-rs/crossbeam)
+  - crossbeam-queue 0.3.14 (https://github.com/crossbeam-rs/crossbeam)
   - crossbeam-utils 0.8.23 (https://github.com/crossbeam-rs/crossbeam)
 
 The MIT License (MIT)
@@ -12158,6 +12597,39 @@ ICU 1.8.1 to ICU 57.1 © 1995-2016 International Business Machines Corporation a
 
 
 --------------------------------------------------------------------------------
+The Unlicense
+--------------------------------------------------------------------------------
+
+Used by:
+  - ksni 0.3.7 (https://github.com/iovxw/ksni)
+
+This is free and unencumbered software released into the public domain.
+
+Anyone is free to copy, modify, publish, use, compile, sell, or
+distribute this software, either in source code form or as a compiled
+binary, for any purpose, commercial or non-commercial, and by any
+means.
+
+In jurisdictions that recognize copyright laws, the author or authors
+of this software dedicate any and all copyright interest in the
+software to the public domain. We make this dedication for the benefit
+of the public at large and to the detriment of our heirs and
+successors. We intend this dedication to be an overt act of
+relinquishment in perpetuity of all present and future rights to this
+software under copyright law.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+IN NO EVENT SHALL THE AUTHORS BE LIABLE FOR ANY CLAIM, DAMAGES OR
+OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
+ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+OTHER DEALINGS IN THE SOFTWARE.
+
+For more information, please refer to <http://unlicense.org/>
+
+
+--------------------------------------------------------------------------------
 zlib License
 --------------------------------------------------------------------------------
 
@@ -12209,6 +12681,120 @@ notice, here is a blessing:
 
 SQLite is in the public domain (https://sqlite.org/copyright.html). No license
 is required to use, copy, modify or distribute it.
+
+
+LIBVPX AND LINUX SYSTEM LIBRARIES
+=================================
+
+These are not Rust or npm packages. libvpx is part of every Mumcord build: the
+Windows and macOS apps contain a statically linked copy, and the Linux builds link
+the system's shared libvpx (the AppImage carries it inside the image). The other
+libraries below are Linux system libraries that Mumcord links or loads at runtime,
+and that the Linux AppImage carries inside the image.
+
+libvpx (BSD 3-Clause with patent grant) - https://www.webmproject.org/code/
+  VP9 (and VP8) screen-share encoder and decoder, linked by crates/screenshare.
+  Statically linked into the Windows app (vcpkg build) and the macOS app (built
+  from the libvpx release source); shared system library on Linux.
+  Copyright (c) 2010, The WebM Project authors. All rights reserved.
+
+  Redistribution and use in source and binary forms, with or without
+  modification, are permitted provided that the following conditions are met:
+
+    * Redistributions of source code must retain the above copyright notice,
+      this list of conditions and the following disclaimer.
+    * Redistributions in binary form must reproduce the above copyright notice,
+      this list of conditions and the following disclaimer in the documentation
+      and/or other materials provided with the distribution.
+    * Neither the name of Google, nor the WebM Project, nor the names of its
+      contributors may be used to endorse or promote products derived from this
+      software without specific prior written permission.
+
+  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+  ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+  WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+  DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR
+  ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+  (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+  LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
+  ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+  Additional IP Rights Grant (Patents): Google grants to you a perpetual,
+  worldwide, non-exclusive, no-charge, irrevocable (except as stated in the
+  PATENTS file) patent license to make, have made, use, offer to sell, sell,
+  import, transfer and otherwise run, modify and propagate the contents of this
+  implementation of VP9, where such license applies only to those patent claims
+  licensable by Google that are necessarily infringed by this implementation.
+  The full text is in the PATENTS file of the libvpx source:
+  https://chromium.googlesource.com/webm/libvpx/+/refs/heads/main/PATENTS
+
+PipeWire and libspa (MIT) - https://pipewire.org/
+  Wayland screen capture and audio. Loaded from the system (the AppImage uses the
+  host's PipeWire daemon).
+  Copyright (c) 2018-2024 Wim Taymans and the PipeWire contributors.
+  Permission is hereby granted, free of charge, to any person obtaining a copy of
+  this software and associated documentation files (the "Software"), to deal in
+  the Software without restriction, including without limitation the rights to
+  use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies
+  of the Software, and to permit persons to whom the Software is furnished to do
+  so, subject to the following conditions: The above copyright notice and this
+  permission notice shall be included in all copies or substantial portions of
+  the Software. THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+  EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+  MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO
+  EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES
+  OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
+  ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+  DEALINGS IN THE SOFTWARE.
+
+GStreamer core, base libraries and plugins (LGPL-2.1-or-later) - https://gstreamer.freedesktop.org/
+  The AppImage bundles the GStreamer libraries and the plugins from the build
+  system's gst-plugins-base, -good and -bad so WebKitGTK can play video in watch
+  parties. Plugins that implement H.264 and H.265 (gst-libav / FFmpeg, x264, x265,
+  OpenH264) and GPL-only codecs (a52dec, dtsdec, mpeg2dec, libdvdread, faac, faad)
+  are deliberately not bundled; the AppImage plays YouTube through VP9.
+  The .deb, .rpm and Arch packages do not contain GStreamer; they depend on the
+  distribution's packages. Licence text: https://www.gnu.org/licenses/old-licenses/lgpl-2.1.txt
+
+WebKitGTK and JavaScriptCoreGTK (LGPL-2.1-or-later and BSD 2-Clause) - https://webkitgtk.org/
+  The web view that renders Mumcord's interface. Bundled in the AppImage.
+  Licence texts: https://webkit.org/licensing-webkit/
+
+Other system libraries bundled in the AppImage by linuxdeploy (taken from the
+Ubuntu 24.04 build system), under their own licences, mostly LGPL, MIT, BSD or
+similar permissive terms:
+  GTK 3, GLib/GIO/GObject, Pango, Cairo, GdkPixbuf, ATK, librsvg, libsoup 3,
+  libayatana-appindicator, libdbusmenu, ICU, libxml2, libxslt, GnuTLS, Nettle,
+  libsecret, libnice, libsrtp2, libwebp, libjpeg, libpng, libtiff, libsqlite3,
+  libopus, libvorbis, libogg, libFLAC, libmpg123, libmp3lame, libsndfile,
+  libpulse, libX11 and the other X.Org client libraries, and their dependencies.
+  The exact list is the content of usr/lib inside the AppImage
+  (run the AppImage with --appimage-extract to list it). Each library's licence
+  is in the Debian copyright file of the source package of the same name:
+  https://copyright.ubuntu.com/ or /usr/share/doc/<package>/copyright.
+
+SOURCE CODE OFFER (LGPL and GPL components)
+-------------------------------------------
+
+Several libraries above (GStreamer, WebKitGTK, GTK, GLib, and others) are licensed
+under the GNU LGPL or GPL. You may replace them with your own build: the AppImage
+loads them as separate shared libraries. The corresponding source code of the exact
+versions in a Mumcord release is the source of the Ubuntu 24.04 packages used to
+build that release, available with "apt source <package>" on Ubuntu 24.04 or from
+  https://archive.ubuntu.com/ubuntu/pool/ and https://launchpad.net/ubuntu
+Upstream releases:
+  GStreamer   https://gstreamer.freedesktop.org/src/
+  WebKitGTK   https://webkitgtk.org/releases/
+  GTK, GLib   https://download.gnome.org/sources/
+  libvpx      https://github.com/webmproject/libvpx/releases
+  PipeWire    https://gitlab.freedesktop.org/pipewire/pipewire/-/tags
+We also provide the source code of any of these components on request, for at
+least three years after the release that contained it: open an issue at
+https://github.com/ToBee94/mumcord/issues or write to the maintainer.
+Mumcord's own source code is licensed under the GNU AGPL v3 and is available at
+https://github.com/ToBee94/mumcord.
 
 
 NPM DEPENDENCIES (production)
