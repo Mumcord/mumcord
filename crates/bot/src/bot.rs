@@ -86,6 +86,7 @@ impl BotConfig {
             port: self.port,
             username,
             password,
+            tokens: Vec::new(),
             identity,
             // Bots only talk to the local test servers, whose certificates are self-signed.
             verify_cert: Arc::new(|_| true),

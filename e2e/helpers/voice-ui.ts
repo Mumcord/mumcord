@@ -1,5 +1,6 @@
 // UI steps shared by the voice specs: first-start wizard, connecting, reading the channel tree.
 import { browser, $ } from "@wdio/globals";
+import { ports } from "./testenv.ts";
 import { nextToLastWizardStep } from "./wizard-util.ts";
 
 export const SERVER = "localhost";
@@ -18,7 +19,7 @@ export async function completeWizard(name: string): Promise<void> {
 }
 
 /** Adds the server from the empty state and trusts its certificate. */
-export async function addAndConnect(address = `${SERVER}:64738`): Promise<void> {
+export async function addAndConnect(address = `${SERVER}:${String(ports.v15)}`): Promise<void> {
   const input = $("//label[text()='Server address or mumble:// link']/following::input[1]");
   await input.waitForDisplayed({ timeout: 30_000 });
   await input.setValue(address);
