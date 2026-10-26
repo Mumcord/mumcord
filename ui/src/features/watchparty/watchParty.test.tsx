@@ -348,16 +348,20 @@ describe("panel", () => {
     render(<WatchPartyPanel serverId={1} channelId={channelId} />);
     announce(party({ channelId, joined: true }));
     const frame = await screen.findByTitle<HTMLIFrameElement>("Watch party player");
-    act(() => {
-      window.dispatchEvent(
-        new MessageEvent("message", {
-          origin: PAGE_ORIGIN,
-          source: frame.contentWindow,
-          data: { type: "error", code: 153 },
-        }),
-      );
+    // The message listener attaches in an effect after the frame renders; on a slow runner a single
+    // early message is lost, so it is repeated until the panel reacts.
+    await waitFor(() => {
+      act(() => {
+        window.dispatchEvent(
+          new MessageEvent("message", {
+            origin: PAGE_ORIGIN,
+            source: frame.contentWindow,
+            data: { type: "error", code: 153 },
+          }),
+        );
+      });
+      expect(screen.getByRole("button", { name: "Open in browser" })).toBeInTheDocument();
     });
-    expect(screen.getByRole("button", { name: "Open in browser" })).toBeInTheDocument();
     expect(screen.queryByTitle("Watch party player")).toBeNull();
   });
 

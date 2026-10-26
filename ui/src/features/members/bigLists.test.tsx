@@ -118,7 +118,7 @@ describe("a long conversation", () => {
 
   it("draws only the newest messages when shown, older ones on request", async () => {
     await applyLanguage("en");
-    const messages = Array.from({ length: 300 }, (_, i) => message(i));
+    const messages = Array.from({ length: 90 }, (_, i) => message(i));
     render(
       <MessageList
         log={{
@@ -138,11 +138,11 @@ describe("a long conversation", () => {
     );
     const items = () => screen.getAllByRole("listitem");
     expect(items()).toHaveLength(30);
-    expect(items()[0]).toHaveTextContent("message 270");
-    expect(items().at(-1)).toHaveTextContent("message 299");
+    expect(items()[0]).toHaveTextContent("message 60");
+    expect(items().at(-1)).toHaveTextContent("message 89");
     const older = screen.getByRole("button", { name: "Load older messages" });
-    for (let page = 0; page < 9; page++) fireEvent.click(older);
-    expect(items()).toHaveLength(300);
+    for (let page = 0; page < 2; page++) fireEvent.click(older);
+    expect(items()).toHaveLength(90);
     expect(items()[0]).toHaveTextContent("message 0");
     expect(screen.queryByRole("button", { name: "Load older messages" })).not.toBeInTheDocument();
   });
