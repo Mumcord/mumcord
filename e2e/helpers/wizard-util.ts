@@ -62,7 +62,7 @@ export async function chooseFileInNativeDialog(path: string): Promise<void> {
 }
 
 /** Number of first-start wizard steps; the last one is the talk mode step with Finish. */
-export const WIZARD_STEPS = 4;
+export const WIZARD_STEPS = 5;
 
 /** The wizard's progress line for step `n`. */
 export function wizardStep(n: number): string {
