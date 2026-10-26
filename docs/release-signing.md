@@ -1,6 +1,6 @@
 # Release signing
 
-Release builds (`vX.Y.Z` tags) sign the Windows and macOS bundles only when the matching settings exist; otherwise they are built unsigned, exactly as before, and the release notes tell users how to open an unsigned app. Test builds are never signed. No signing key, certificate, password or token is ever stored in this repository.
+Release builds (`vX.Y.Z` tags) sign the Windows and macOS bundles only when the matching settings exist; otherwise they are built unsigned (macOS: ad-hoc signed, see below), and the release notes tell users how to open an unsigned app. Test builds are never signed. No signing key, certificate, password or token is ever stored in this repository.
 
 - [Windows signing (Azure Artifact Signing)](#windows-signing-azure-artifact-signing)
 - [macOS signing and notarization](#macos-signing-and-notarization)
@@ -85,11 +85,37 @@ New certificates have no SmartScreen reputation yet, so the first signed release
 ## macOS signing and notarization
 
 Release builds (`vX.Y.Z` tags, `.github/workflows/release.yml`) sign and notarize the universal
-`.dmg` when the Apple secrets below exist. Without them the DMG is built unsigned, exactly as
-before, and the release notes tell users how to open an unsigned app. Test builds are never signed.
+`.dmg` when the Apple secrets below exist. Without them the app gets an ad-hoc signature instead
+(see below), and the release notes tell users how to open an app that is not notarized. Test
+builds are never signed with the Developer ID.
 
-Signing is done by Tauri itself (hardened runtime, `src-tauri/Entitlements.plist`, microphone
-usage text in `src-tauri/Info.plist`). It needs no server-side change.
+**Status:** the Apple Developer account exists; the certificate, API key and secrets are not set
+up yet (issue #16), so releases are ad-hoc signed and not notarized.
+
+Signing is done by Tauri itself. It needs no server-side change.
+
+- **Identity:** `bundle.macOS.signingIdentity` in `src-tauri/tauri.conf.json` is `-` (ad-hoc).
+  The `APPLE_SIGNING_IDENTITY` secret overrides it for signed releases. Tauri signs inside out
+  with that one identity: the app's only executable (the universal `Mumcord` binary; there are
+  no helpers, sidecars or embedded frameworks), then the `.app` bundle.
+- **Hardened runtime** (Tauri's default) with `src-tauri/Entitlements.plist`:
+  - `com.apple.security.device.audio-input`: the microphone; without it the hardened runtime
+    blocks capture.
+  - `com.apple.security.cs.disable-library-validation`: positional audio loads Mumble game
+    plugins (third-party `.dylib` files); library validation would refuse them.
+  - Nothing else is needed: WebKit runs its JIT in Apple's own WebContent process, the network
+    needs no entitlement outside the App Sandbox (Mumcord is not sandboxed), and screen capture,
+    Input Monitoring and Accessibility are runtime permissions, not entitlements.
+- **Usage texts** in `src-tauri/Info.plist`: microphone and local network. Screen recording has no
+  usage text; macOS shows its own prompt.
+
+### Why the ad-hoc signature matters
+
+macOS remembers microphone access (TCC) and "Always Allow" on keychain items for a code
+signature. A bundle without a valid signature has no stable identity, so macOS asked for the
+microphone and for the login password on every keychain access, and "Allow" never stuck (issue
+#15). The ad-hoc signature is stable for one build: the answers are remembered until the next
+update, which asks once more. Only the Developer ID signature keeps them across updates.
 
 ### One-time setup (maintainer)
 
@@ -131,8 +157,19 @@ usage text in `src-tauri/Info.plist`). It needs no server-side change.
 3. Download the DMG on a Mac and check:
    `codesign --verify --deep --strict --verbose=2 /Applications/Mumcord.app` and
    `spctl --assess --type execute --verbose /Applications/Mumcord.app` ("accepted, source=Notarized
-   Developer ID"). Start the app and confirm the microphone permission prompt appears.
-4. Delete the draft release and the test tag afterwards.
+   Developer ID") and `xcrun stapler validate /Applications/Mumcord.app` ("The validate action
+   worked!"). `codesign -dvv /Applications/Mumcord.app` names the Developer ID certificate under
+   `Authority`, shows `flags=0x10000(runtime)` and the team ID, and
+   `codesign -d --entitlements - /Applications/Mumcord.app` lists the two entitlements above.
+4. Start the app: the microphone prompt appears once (wizard microphone step or first connect).
+   On a fresh Mac the keychain is never asked; items written by an earlier unsigned build are
+   asked for once each ("Always Allow"). Quit, start again and connect: no prompt at all. Install
+   the next pre-release over it: still no prompt.
+5. Delete the draft release and the test tag afterwards.
+
+For an ad-hoc signed (unsigned) build the same `codesign --verify --deep --strict` must pass, and
+`codesign -dvv` shows `Signature=adhoc`. macOS asks for the microphone once and for each keychain
+item once ("Always Allow"); after quitting and starting again nothing is asked.
 
 ### Notes
 
