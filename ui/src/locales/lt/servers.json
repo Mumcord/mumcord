@@ -78,6 +78,8 @@
   },
   "errors": {
     "serverUnreachable": "Serverio pasiekti nepavyksta. Patikrink adresą, prievadą ir ar esi prisijungęs (-usi) prie interneto.",
+    "localNetwork": "Serverio pasiekti nepavyksta. Jei jis tavo vietiniame tinkle, leisk Mumcord skiltyje Sistemos nustatymai → Privatumas ir sauga → Vietinis tinklas ir bandyk dar kartą.",
+    "serverTooOld": "Serveris nepriima šios Mumcord versijos. Patikrink, ar yra Mumcord atnaujinimas, arba paklausk serverio savininko.",
     "wrongPassword": "Serverio slaptažodis neteisingas. Redaguok serverį ir įvesk teisingą slaptažodį.",
     "nameInUse": "Tavo vardas šiame serveryje jau naudojamas arba užregistruotas kito žmogaus. Redaguok serverį ir pasirink kitą vardą.",
     "certificateRejected": "Sertifikato patikra nepavyko: arba serverio sertifikatu nepasitikėta, arba serveris nepriėmė tavo tapatybės. Bandyk dar kartą arba kreipkis į serverio savininką.",

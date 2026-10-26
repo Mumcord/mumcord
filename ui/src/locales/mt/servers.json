@@ -78,6 +78,8 @@
   },
   "errors": {
     "serverUnreachable": "Is-server ma jistax jintlaħaq. Iċċekkja l-indirizz u l-port, u li int online.",
+    "localNetwork": "Is-server ma jistax jintlaħaq. Jekk jinsab fuq in-netwerk lokali tiegħek, ippermetti lil Mumcord taħt System Settings → Privacy & Security → Local Network, imbagħad erġa' pprova.",
+    "serverTooOld": "Is-server ma jaċċettax din il-verżjoni ta' Mumcord. Iċċekkja jekk hemmx aġġornament ta' Mumcord, jew staqsi lis-sid tas-server.",
     "wrongPassword": "Il-password tas-server hija ħażina. Editja s-server u daħħal il-password t-tajba.",
     "nameInUse": "Ismek diġà qed jintuża jew huwa rreġistrat minn xi ħadd ieħor fuq dan is-server. Editja s-server u agħżel isem ieħor.",
     "certificateRejected": "Il-verifika taċ-ċertifikat falliet: jew iċ-ċertifikat tas-server ma ġiex fdat, jew is-server ma aċċettax l-identità tiegħek. Erġa' pprova, jew staqsi lis-sid tas-server.",

@@ -78,6 +78,8 @@
   },
   "errors": {
     "serverUnreachable": "Serverul nu poate fi accesat. Verifică adresa și portul și dacă ești online.",
+    "localNetwork": "Serverul nu poate fi accesat. Dacă este în rețeaua ta locală, permite Mumcord în System Settings → Privacy & Security → Local Network, apoi încearcă din nou.",
+    "serverTooOld": "Serverul nu acceptă această versiune de Mumcord. Verifică dacă există o actualizare Mumcord sau întreabă proprietarul serverului.",
     "wrongPassword": "Parola serverului e greșită. Editează serverul și introdu parola corectă.",
     "nameInUse": "Numele tău este deja folosit sau înregistrat de altcineva pe acest server. Editează serverul și alege alt nume.",
     "certificateRejected": "Verificarea certificatului a eșuat: fie certificatul serverului nu a fost de încredere, fie serverul nu ți-a acceptat identitatea. Încearcă din nou sau întreabă proprietarul serverului.",

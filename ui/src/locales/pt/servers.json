@@ -78,6 +78,8 @@
   },
   "errors": {
     "serverUnreachable": "Não foi possível contactar o servidor. Verifica o endereço e a porta, e se estás online.",
+    "localNetwork": "Não foi possível contactar o servidor. Se estiver na tua rede local, permite o Mumcord em Definições do Sistema → Privacidade e Segurança → Rede local e tenta novamente.",
+    "serverTooOld": "O servidor não aceita esta versão do Mumcord. Verifica se há uma atualização do Mumcord ou pergunta ao responsável do servidor.",
     "wrongPassword": "A palavra-passe do servidor está errada. Edita o servidor e introduz a palavra-passe correta.",
     "nameInUse": "O teu nome já está em uso ou registado por outra pessoa neste servidor. Edita o servidor e escolhe outro nome.",
     "certificateRejected": "A verificação do certificado falhou: ou o certificado do servidor não foi considerado de confiança, ou o servidor não aceitou a tua identidade. Tenta novamente ou fala com o dono do servidor.",

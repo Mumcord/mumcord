@@ -78,6 +78,8 @@
   },
   "errors": {
     "serverUnreachable": "Strežnik ni dosegljiv. Preveri naslov in vrata ter ali si povezan z internetom.",
+    "localNetwork": "Strežnik ni dosegljiv. Če je v tvojem lokalnem omrežju, dovoli Mumcord v Sistemske nastavitve → Zasebnost in varnost → Lokalno omrežje, nato poskusi znova.",
+    "serverTooOld": "Strežnik ne sprejema te različice Mumcorda. Preveri, ali je na voljo posodobitev Mumcorda, ali vprašaj lastnika strežnika.",
     "wrongPassword": "Geslo strežnika je napačno. Uredi strežnik in vpiši pravo geslo.",
     "nameInUse": "Tvoje ime je na tem strežniku že v uporabi ali registrirano na nekoga drugega. Uredi strežnik in izberi drugo ime.",
     "certificateRejected": "Preverjanje certifikata ni uspelo: certifikatu strežnika ni bilo zaupano ali pa strežnik ni sprejel tvoje identitete. Poskusi znova ali vprašaj lastnika strežnika.",

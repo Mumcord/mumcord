@@ -78,6 +78,8 @@
   },
   "errors": {
     "serverUnreachable": "Serveriga ei saa ühendust. Kontrolli aadressi ja porti ning seda, et oled internetis.",
+    "localNetwork": "Serveriga ei saa ühendust. Kui see on sinu kohtvõrgus, luba Mumcord jaotises System Settings → Privacy & Security → Local Network ja proovi uuesti.",
+    "serverTooOld": "Server ei aktsepteeri seda Mumcordi versiooni. Kontrolli, kas Mumcordile on uuendus, või küsi serveri omanikult.",
     "wrongPassword": "Serveri parool on vale. Muuda serverit ja sisesta õige parool.",
     "nameInUse": "Sinu nimi on sellel serveril juba kasutusel või kellegi teise nimele registreeritud. Muuda serverit ja vali teine nimi.",
     "certificateRejected": "Sertifikaadi kontroll ebaõnnestus: kas serveri sertifikaati ei usaldatud või server ei võtnud sinu identiteeti vastu. Proovi uuesti või küsi serveri omanikult.",

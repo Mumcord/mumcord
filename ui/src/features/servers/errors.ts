@@ -32,6 +32,10 @@ export function connectionErrorText(
       return serverLimitText(t, limit);
     case "serverUnreachable":
       return t("errors.serverUnreachable");
+    case "localNetworkBlocked":
+      return t("errors.localNetwork");
+    case "serverTooOld":
+      return t("errors.serverTooOld");
     case "wrongPassword":
       return t("errors.wrongPassword");
     case "nameInUse":

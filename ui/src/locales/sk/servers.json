@@ -78,6 +78,8 @@
   },
   "errors": {
     "serverUnreachable": "Server je nedostupný. Skontroluj adresu, port a či si online.",
+    "localNetwork": "Server je nedostupný. Ak je v tvojej lokálnej sieti, povoľ Mumcord v Systémové nastavenia → Súkromie a bezpečnosť → Lokálna sieť a skús to znova.",
+    "serverTooOld": "Server neprijíma túto verziu Mumcordu. Skontroluj aktualizáciu Mumcordu alebo sa opýtaj prevádzkovateľa servera.",
     "wrongPassword": "Heslo servera je nesprávne. Uprav server a zadaj správne heslo.",
     "nameInUse": "Tvoje meno už na tomto serveri niekto používa alebo je zaregistrované na niekoho iného. Uprav server a vyber iné meno.",
     "certificateRejected": "Kontrola certifikátu zlyhala: buď certifikát servera nebol dôveryhodný, alebo server neprijal tvoju identitu. Skús to znova alebo sa obráť na správcu servera.",

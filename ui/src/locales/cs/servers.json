@@ -78,6 +78,8 @@
   },
   "errors": {
     "serverUnreachable": "Server není dostupný. Zkontroluj adresu a port a jestli jsi online.",
+    "localNetwork": "Server není dostupný. Pokud je ve tvé místní síti, povol Mumcord v Nastavení systému → Soukromí a zabezpečení → Místní síť a zkus to znovu.",
+    "serverTooOld": "Server nepřijímá tuto verzi Mumcordu. Zkontroluj aktualizaci Mumcordu, nebo se zeptej provozovatele serveru.",
     "wrongPassword": "Heslo serveru je špatně. Uprav server a zadej správné heslo.",
     "nameInUse": "Tvoje jméno už na tomto serveru někdo používá nebo je registrované na někoho jiného. Uprav server a zvol jiné jméno.",
     "certificateRejected": "Kontrola certifikátu selhala: buď certifikát serveru nebyl důvěryhodný, nebo server nepřijal tvou identitu. Zkus to znovu, nebo se obrať na správce serveru.",

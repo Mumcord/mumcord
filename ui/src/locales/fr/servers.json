@@ -78,6 +78,8 @@
   },
   "errors": {
     "serverUnreachable": "Le serveur est injoignable. Vérifiez l’adresse et le port, ainsi que votre connexion.",
+    "localNetwork": "Le serveur est injoignable. S’il est sur votre réseau local, autorisez Mumcord dans Réglages Système → Confidentialité et sécurité → Réseau local, puis réessayez.",
+    "serverTooOld": "Le serveur n’accepte pas cette version de Mumcord. Recherchez une mise à jour de Mumcord ou contactez le responsable du serveur.",
     "wrongPassword": "Le mot de passe du serveur est incorrect. Modifiez le serveur et saisissez le bon mot de passe.",
     "nameInUse": "Votre nom est déjà utilisé ou enregistré par quelqu’un d’autre sur ce serveur. Modifiez le serveur et choisissez un autre nom.",
     "certificateRejected": "La vérification du certificat a échoué : soit le certificat du serveur n’était pas approuvé, soit le serveur n’a pas accepté votre identité. Réessayez, ou contactez le propriétaire du serveur.",

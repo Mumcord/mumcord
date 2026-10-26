@@ -78,6 +78,8 @@
   },
   "errors": {
     "serverUnreachable": "Poslužitelj nije dostupan. Provjeri adresu i port te jesi li na mreži.",
+    "localNetwork": "Poslužitelj nije dostupan. Ako je u tvojoj lokalnoj mreži, dopusti Mumcord u Postavke sustava → Privatnost i sigurnost → Lokalna mreža, zatim pokušaj ponovno.",
+    "serverTooOld": "Poslužitelj ne prihvaća ovu verziju Mumcorda. Provjeri postoji li ažuriranje Mumcorda ili pitaj vlasnika poslužitelja.",
     "wrongPassword": "Lozinka poslužitelja je pogrešna. Uredi poslužitelj i unesi ispravnu lozinku.",
     "nameInUse": "Tvoje ime je već u upotrebi ili ga je netko drugi registrirao na ovom poslužitelju. Uredi poslužitelj i odaberi drugo ime.",
     "certificateRejected": "Provjera certifikata nije uspjela: ili certifikat poslužitelja nije označen kao pouzdan, ili poslužitelj nije prihvatio tvoj identitet. Pokušaj ponovno ili pitaj vlasnika poslužitelja.",

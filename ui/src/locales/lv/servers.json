@@ -78,6 +78,8 @@
   },
   "errors": {
     "serverUnreachable": "Serveris nav sasniedzams. Pārbaudi adresi un portu un to, vai esi tiešsaistē.",
+    "localNetwork": "Serveris nav sasniedzams. Ja tas ir tavā lokālajā tīklā, atļauj Mumcord sadaļā System Settings → Privacy & Security → Local Network un mēģini vēlreiz.",
+    "serverTooOld": "Serveris nepieņem šo Mumcord versiju. Pārbaudi, vai ir pieejams Mumcord atjauninājums, vai jautā servera īpašniekam.",
     "wrongPassword": "Servera parole ir nepareiza. Rediģē serveri un ievadi pareizo paroli.",
     "nameInUse": "Tavs vārds šajā serverī jau tiek izmantots vai ir reģistrēts citam. Rediģē serveri un izvēlies citu vārdu.",
     "certificateRejected": "Sertifikāta pārbaude neizdevās: vai nu servera sertifikātam netika uzticēts, vai serveris nepieņēma tavu identitāti. Mēģini vēlreiz vai jautā servera īpašniekam.",
