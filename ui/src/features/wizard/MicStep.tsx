@@ -1,6 +1,7 @@
 import { useEffect, useId, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { getApi, type AudioDevice, type AudioDevices, type Settings } from "../../api";
+import { Select } from "../../components/Select";
 import { shortDeviceName } from "./deviceName";
 import { LevelMeter } from "./LevelMeter";
 import { StepFrame } from "./StepFrame";
@@ -132,18 +133,15 @@ export function MicStep({ settings, focusOnMount, onDevicesChange, onBack, onNex
     return (
       <div className="wizard-field">
         <label htmlFor={id}>{caption}</label>
-        <select
+        <Select
           id={id}
           value={value}
-          onChange={(event) => void changeDevice(key, event.target.value)}
-        >
-          <option value="">{t("mic.systemDefault")}</option>
-          {list.map((device) => (
-            <option key={device.id} value={device.id}>
-              {label(device)}
-            </option>
-          ))}
-        </select>
+          options={[
+            { value: "", label: t("mic.systemDefault") },
+            ...list.map((device) => ({ value: device.id, label: label(device) })),
+          ]}
+          onChange={(next) => void changeDevice(key, next)}
+        />
       </div>
     );
   }

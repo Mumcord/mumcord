@@ -30,8 +30,10 @@ export function renderInWizard(harness: Harness, ui: ReactNode) {
   const view: View = {
     screen: "wizard",
     overlay: null,
+    settingsSection: null,
     finishWizard: harness.finishWizard,
     openSettings: vi.fn(),
+    openOverlaySettings: vi.fn(),
     closeOverlay: vi.fn(),
     retry: vi.fn(),
   };
@@ -41,6 +43,9 @@ export function renderInWizard(harness: Harness, ui: ReactNode) {
     language: "en",
     chatDisplay: "cozy",
     linkPreviews: true,
+    hideEmptyChannels: false,
+    talkingFirst: false,
+    showWeakConnectionIcon: true,
     applySettings: harness.applySettings,
   };
   return render(

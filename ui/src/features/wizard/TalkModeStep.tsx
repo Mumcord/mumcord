@@ -197,7 +197,7 @@ export function TalkModeStep({
 
   return (
     <StepFrame
-      step={4}
+      step={5}
       title={t("talk.title")}
       focusOnMount={focusOnMount}
       busy={busy}
