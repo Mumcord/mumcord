@@ -40,7 +40,8 @@ jobs:
         run: |
           version=pinned
           if [[ "$RUNNER_OS" == Windows ]]; then
-            version=$(jq -r '"\(.version // ."version-semver" // ."version-string")-\(."port-version" // 0)"' \
+            # No \( interpolation: Git Bash's path conversion rewrites "-\(" in arguments.
+            version=$(jq -r '(.version // ."version-semver" // ."version-string" | tostring) + "-" + (."port-version" // 0 | tostring)' \
               "$VCPKG_INSTALLATION_ROOT/ports/libvpx/vcpkg.json")
           fi
           echo "key=libvpx-$RUNNER_OS-$version-${{ hashFiles('scripts/build-libvpx.sh') }}" >> "$GITHUB_OUTPUT"
