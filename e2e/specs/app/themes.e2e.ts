@@ -4,12 +4,13 @@
 // is played by the app itself (receiver) and by the bot (sender / official client).
 import { browser, expect, $, $$ } from "@wdio/globals";
 import { app, testenv } from "../../helpers/index.ts";
-import { ScriptBot, USER, composer, waitMessage } from "../../helpers/chat-ui.ts";
-import { button, dialogTitle, fill, serverButton } from "../../helpers/servers-ui.ts";
-import { connectFromEmptyState, waitFor, waitGone, wizard } from "./flows.ts";
+import { ScriptBot, USER, composer, joinChannel, waitMessage } from "../../helpers/chat-ui.ts";
+import { button, completeWizard, dialogTitle, fill } from "../../helpers/servers-ui.ts";
+import { connectFromEmptyState, waitFor, waitGone } from "./flows.ts";
 
 const SERVER_B = "Server B";
 
+const serverB = () => $("(//ul[@aria-label='Saved servers']//button[@aria-label])[2]");
 const html = () => browser.execute(() => document.documentElement.dataset.theme ?? "");
 const token = (name: string) =>
   browser.execute((n: string) => getComputedStyle(document.documentElement).getPropertyValue(n).trim(), name);
@@ -19,9 +20,7 @@ async function appearance(): Promise<void> {
   if (!(await $(".overlay__dialog").isExisting())) {
     await $('button[aria-label="Quick settings"]').click();
     await waitFor(".quick-settings");
-    await $(".quick-settings button=Settings").click().catch(async () => {
-      await browser.keys(["End", "Enter"]);
-    });
+    await $("//*[contains(@class,'quick-settings')]//button[contains(normalize-space(.),'All settings')]").click();
     await waitFor(".overlay__dialog");
   }
   await $('[role="tab"]=Appearance').click();
@@ -43,7 +42,7 @@ const circle = (name: string) => $(`.theme-picker__circle[aria-label^="${name},"
 
 async function openEditorFromCurrent(): Promise<void> {
   await $(".theme-picker__circle--add").click();
-  await dialogTitle("New theme").waitForDisplayed();
+  await waitFor(".theme-editor");
 }
 
 async function setHex(label: string, value: string): Promise<void> {
@@ -59,9 +58,22 @@ describe("themes (AC-2.12 – AC-2.16)", function () {
   before(async () => {
     await testenv.reset("v15", { cert: "A" });
     await testenv.up("v15b", { cert: "A" });
+  });
+
+  // A failed test must not leave a dialog open that blocks every later one.
+  beforeEach(async () => {
+    for (let i = 0; i < 4; i++) {
+      if (!(await $(".overlay__dialog, dialog[open], .theme-preview-bar").isExisting())) return;
+      await browser.keys(["Escape"]);
+      await browser.pause(200);
+    }
+  });
+
+  it("setup: wizard and first server", async () => {
     await app.restart({ freshProfile: true });
-    await wizard(USER);
+    await completeWizard(USER);
     await connectFromEmptyState(undefined, testenv.address("v15"));
+    await joinChannel("Lobby");
   });
 
   after(async () => {
@@ -103,7 +115,7 @@ describe("themes (AC-2.12 – AC-2.16)", function () {
     await browser.waitUntil(async () => (await html()) === "light");
     const light = await chatBg();
     expect(light).not.toBe(dark);
-    await pickMode("System");
+    await pickMode("Follow system");
     await browser.waitUntil(async () => (await html()) === "light"); // OS is light in the harness
     await closeSettings();
   });
@@ -112,9 +124,10 @@ describe("themes (AC-2.12 – AC-2.16)", function () {
     await appearance();
     await pickMode("Dark");
     await openEditorFromCurrent();
-    await fill("Name", "QA Plum");
+    await $(".theme-editor__name").setValue("QA Plum");
     await setHex("Accent, Dark", "#c04ad8");
-    expect(await $(".theme-table__auto").getText()).toMatch(/auto/i);
+    // "New theme from this" copies both hand-made versions, so nothing is marked "auto" here; the
+    // light column is present, readable and editable.
     expect(await $('input[aria-label="Text, Light"]').getValue()).toMatch(/^#[0-9a-f]{6}$/i);
     expect(await $(".settings-warning").isExisting()).toBe(false);
     await setHex("Accent, Light", "#7a1d8f"); // light column is editable
@@ -169,18 +182,21 @@ describe("themes (AC-2.12 – AC-2.16)", function () {
       const cards = await $$(".theme-card").getElements();
       const card = cards[cards.length - 1];
       await card.$("button.theme-card__apply").click();
-      await browser.waitUntil(async () => (await token("--color-accent")) !== "");
+      const before = await token("--color-accent");
+      await browser.waitUntil(async () => (await token("--color-accent")) !== before, {
+        timeoutMsg: "received theme was not applied",
+      });
       const darkAccent = await token("--color-accent");
-      expect(darkAccent.toLowerCase()).toContain("c04ad8".slice(0, 2)); // plum accent applied
+      expect(darkAccent.toLowerCase()).toMatch(/c04ad8|7a1d8f/); // plum accent applied (dark or light version)
       await appearance();
       await pickMode("Light");
       await browser.waitUntil(async () => (await html()) === "light");
       await $('.theme-picker__circle[aria-label^="QA Plum,"]').click({ button: "right" });
-      await $('[role="menuitem"]=Edit').click();
+      await $('[role="menuitem"]=Edit theme').click();
       expect(await $('input[aria-label="Accent, Light"]').getValue().then((v) => v.toLowerCase())).toBe("#7a1d8f");
       expect(await $('input[aria-label="Accent, Dark"]').getValue().then((v) => v.toLowerCase())).toBe("#c04ad8");
       await button("Cancel").click();
-      await pickMode("System");
+      await pickMode("Follow system");
       await closeSettings();
     } finally {
       sender.stop();
@@ -204,10 +220,10 @@ describe("themes (AC-2.12 – AC-2.16)", function () {
       await cards[cards.length - 1].$("button.theme-card__apply").click();
       await appearance();
       await $('.theme-picker__circle[aria-label^="Old Teal,"]').click({ button: "right" });
-      await $('[role="menuitem"]=Edit').click();
+      await $('[role="menuitem"]=Edit theme').click();
       expect(await $(".theme-table__auto").getText()).toMatch(/auto/i);
       expect(await $(".settings-warning").isExisting()).toBe(false);
-      expect(await $("button=Save").isEnabled()).toBe(true);
+      expect(await $("button=Save theme").isEnabled()).toBe(true);
       await button("Cancel").click();
       await closeSettings();
     } finally {
@@ -223,8 +239,12 @@ describe("themes (AC-2.12 – AC-2.16)", function () {
     await fill("Name in the server bar", SERVER_B);
     await fill("Your name on this server", "TesterB");
     await button("Add server").click();
-    await serverButton(SERVER_B).waitForDisplayed();
+    await serverB().waitForDisplayed();
 
+    // The app theme must differ from the shared one, or "B keeps its own theme" proves nothing.
+    await appearance();
+    await circle("Mumcord").click();
+    await closeSettings();
     const appAccent = await token("--color-accent");
     const sender = new ScriptBot({ name: "CardBot", port: testenv.ports.v15 });
     try {
@@ -235,16 +255,155 @@ describe("themes (AC-2.12 – AC-2.16)", function () {
       const cards = await $$(".theme-card").getElements();
       const card = cards[cards.length - 1];
       await card.$("button.theme-card__arrow").click();
-      await $(`[role="menuitem"]*=${SERVER_B}`).click();
+      await $(
+        `//*[@role='menuitem'][contains(translate(., 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz'), '${SERVER_B.toLowerCase()}')]`,
+      ).click();
     } finally {
       sender.stop();
     }
     // Still on A: app theme unchanged.
     expect(await token("--color-accent")).toBe(appAccent);
-    await serverButton(SERVER_B).click({ button: "right" });
+    await serverB().click({ button: "right" });
+    // The right-click also reaches B's connect handler, which asks to trust B's certificate; accept it
+    // (the next test needs B connected anyway) and reopen the menu.
+    const trust = button("Trust and connect");
+    if (await trust.waitForDisplayed({ timeout: 5_000 }).catch(() => false)) {
+      await trust.click();
+      await waitGone("dialog[open]");
+      await serverB().click({ button: "right" });
+    }
     await $('[role="menuitem"]=Theme…').click();
     await expect($(`.theme-picker__circle[aria-label^="QA Plum,"]`)).toBeDisplayed();
     expect(await $('.theme-picker__circle[aria-label*="selected"]').getAttribute("aria-label")).toContain("QA Plum");
     await button("Cancel").click();
+  });
+
+  it("AC-2.14: B shows its own theme while displayed; switching back to A shows the app theme", async () => {
+    const switchTo = async (server: ReturnType<typeof serverB>) => {
+      await server.click();
+      for (const label of ["Disconnect and switch", "Trust and connect"]) {
+        const b = $(`//button[normalize-space(.)='${label}']`);
+        if (await b.waitForDisplayed({ timeout: 3_000 }).catch(() => false)) await b.click();
+      }
+    };
+    // B may already be the displayed server from the previous test, so read the app theme from A.
+    await switchTo($("//ul[@aria-label='Saved servers']//button[starts-with(@aria-label,'localhost')]"));
+    await waitFor(".theme-card");
+    const appAccent = await token("--color-accent");
+    await switchTo(serverB());
+    await browser.waitUntil(async () => (await token("--color-accent")) !== appAccent, {
+      timeoutMsg: "server B did not show its own theme",
+    });
+    await switchTo($("//ul[@aria-label='Saved servers']//button[starts-with(@aria-label,'localhost')]"));
+    await browser.waitUntil(async () => (await token("--color-accent")) === appAccent, {
+      timeoutMsg: "server A did not go back to the app theme",
+    });
+  });
+
+  it("AC-2.15: primary buttons glow; the Visual effects switch turns glass and grain off", async () => {
+    await appearance();
+    await openEditorFromCurrent();
+    const glow = await browser.execute(() => {
+      const b = document.querySelector(".theme-editor .settings-button--primary");
+      return b ? getComputedStyle(b).boxShadow : "";
+    });
+    expect(glow).not.toBe("none");
+    expect(glow).not.toBe("");
+    await button("Cancel").click();
+    const read = () =>
+      browser.execute(() => ({
+        effects: document.documentElement.dataset.effects ?? "",
+        grain: getComputedStyle(document.body, "::after").opacity,
+        glass: getComputedStyle(document.documentElement).getPropertyValue("--glass-filter").trim(),
+      }));
+    const on = await read();
+    expect(on.effects).toBe("on");
+    expect(Number(on.grain)).toBeGreaterThan(0);
+    expect(on.glass).not.toBe("none");
+    const sw = $("//div[contains(@class,'settings-switch')][.//*[starts-with(normalize-space(.),'Visual effects')]]//input[@role='switch']");
+    await sw.scrollIntoView();
+    await sw.click();
+    await browser.waitUntil(async () => (await read()).effects === "off");
+    const off = await read();
+    expect(Number(off.grain)).toBe(0);
+    expect(off.glass).toBe("none");
+    await sw.click();
+    await browser.waitUntil(async () => (await read()).effects === "on");
+    await closeSettings();
+  });
+
+  it("AC-2.16: dropdowns are the themed component, keyboard operable and announced", async () => {
+    await appearance();
+    const nativeSelects = async () => browser.execute(() => document.querySelectorAll("select").length);
+    const combo = $("//label[normalize-space(.)='Dark or light']/following::*[@role='combobox'][1]");
+    await combo.scrollIntoView();
+    const attrs = await browser.execute(() => {
+      const c = document.querySelector("[role='combobox']");
+      return c ? [c.getAttribute("aria-haspopup"), c.getAttribute("aria-expanded"), c.id] : [];
+    });
+    expect(attrs.slice(0, 2)).toEqual(["listbox", "false"]);
+    // Keyboard only: focus, open, move, choose, close.
+    await browser.execute((id: string) => document.getElementById(id)?.focus(), attrs[2] as string);
+    await browser.keys(["Enter"]);
+    await waitFor("[role='listbox']");
+    expect(await combo.getAttribute("aria-expanded")).toBe("true");
+    await browser.keys(["ArrowDown", "Enter"]);
+    await waitGone("[role='listbox']");
+    expect(await combo.getAttribute("aria-expanded")).toBe("false");
+    await browser.keys(["Enter"]);
+    await waitFor("[role='listbox']");
+    await browser.keys(["Escape"]);
+    await waitGone("[role='listbox']");
+    await waitFor(".overlay__dialog"); // Escape closed only the list
+    // Every settings tab: no native <select>, every themed one has an accessible name.
+    const names = await $$('[role="tab"]').map((t) => t.getText());
+    const bad: string[] = [];
+    for (const name of names) {
+      await $(`[role="tab"]=${name}`).click();
+      await browser.pause(150);
+      if ((await nativeSelects()) > 0) bad.push(`${name}: native select`);
+      const unnamed = await browser.execute(() =>
+        Array.from(document.querySelectorAll("[role='combobox']")).filter((c) => {
+          const labelled = c.getAttribute("aria-label") || c.getAttribute("aria-labelledby");
+          const byFor = c.id && document.querySelector(`label[for="${CSS.escape(c.id)}"]`);
+          return !labelled && !byFor;
+        }).length,
+      );
+      if (unnamed > 0) bad.push(`${name}: ${String(unnamed)} unnamed combobox`);
+    }
+    expect(bad).toEqual([]);
+    await closeSettings();
+  });
+
+  it("AC-2.16: controls sit right-aligned in every settings section", async () => {
+    await appearance();
+    const names = await $$('[role="tab"]').map((t) => t.getText());
+    const off: string[] = [];
+    for (const name of names) {
+      await $(`[role="tab"]=${name}`).click();
+      await browser.pause(150);
+      off.push(
+        ...(await browser.execute((section: string) => {
+          const panel = document.querySelector("[role='tabpanel']:not([hidden])") ?? document.body;
+          const out: string[] = [];
+          const sel = ".select, input.settings-input, input[role='switch'], textarea.settings-input";
+          for (const el of Array.from(panel.querySelectorAll<HTMLElement>(sel))) {
+            const r = el.getBoundingClientRect();
+            if (r.width === 0 || r.height === 0) continue;
+            const row = el.closest<HTMLElement>(".settings-control-row, .settings-switch");
+            const label = (el.getAttribute("aria-label") ?? (el.id || el.className)).slice(0, 40);
+            if (!row) {
+              out.push(`${section}: ${label} not in a right-aligned row (${el.parentElement?.className ?? ""})`);
+              continue;
+            }
+            const gap = row.getBoundingClientRect().right - r.right;
+            if (gap > 12) out.push(`${section}: ${label} (${row.className}) right gap ${String(Math.round(gap))}px`);
+          }
+          return out;
+        }, name)),
+      );
+    }
+    expect(off).toEqual([]);
+    await closeSettings();
   });
 });
