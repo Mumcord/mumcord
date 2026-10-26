@@ -28,30 +28,36 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      # The runner's Ubuntu mirror is sometimes very slow (once 39 min for 70 MB), so the
-      # downloaded packages are cached. apt still installs them normally (including their install
-      # scripts) and downloads only what changed; the week in the key picks up updates.
+      # The runner's Ubuntu mirror is often very slow (30 kB/s: 40 min for 70 MB), so the downloaded
+      # packages are cached per runner image. The image's own package lists pin the versions, so a
+      # cache hit installs without touching the mirror. Only when that fails (new image, partial
+      # cache) apt downloads what is missing, and only when that fails too it refreshes the lists.
       - name: apt cache key
         id: apt
         if: runner.os == 'Linux'
-        run: echo "week=$(date -u +%G-%V)" >> "$GITHUB_OUTPUT"
+        run: echo "image=$ImageVersion" >> "$GITHUB_OUTPUT"
 
       - name: Restore apt packages
         if: runner.os == 'Linux'
         uses: actions/cache@v4
         with:
           path: ~/apt-archives
-          key: apt-${{ matrix.os }}-${{ steps.apt.outputs.week }}
+          key: apt-${{ matrix.os }}-${{ steps.apt.outputs.image }}
           restore-keys: apt-${{ matrix.os }}-
 
+      # A stalled mirror fails the step instead of holding the job for most of an hour.
       - name: Install Linux system libraries
         if: runner.os == 'Linux'
+        timeout-minutes: 10
         run: |
+          pkgs=(libwebkit2gtk-4.1-dev libayatana-appindicator3-dev librsvg2-dev
+            libxdo-dev libasound2-dev libvpx-dev libpipewire-0.3-dev libclang-dev pkg-config cmake)
+          opts=(-y --no-install-recommends -o Dir::Cache::Archives="$HOME/apt-archives"
+            -o Acquire::Retries=3 -o Acquire::http::Timeout=20 -o Acquire::https::Timeout=20)
           mkdir -p ~/apt-archives/partial
-          sudo apt-get update
-          sudo apt-get install -y --no-install-recommends -o Dir::Cache::Archives="$HOME/apt-archives" \
-            libwebkit2gtk-4.1-dev libayatana-appindicator3-dev librsvg2-dev \
-            libxdo-dev libasound2-dev libvpx-dev libpipewire-0.3-dev libclang-dev pkg-config cmake
+          sudo apt-get install "${opts[@]}" --no-download "${pkgs[@]}" \
+            || sudo apt-get install "${opts[@]}" "${pkgs[@]}" \
+            || { sudo apt-get update -o Acquire::Retries=3 && sudo apt-get install "${opts[@]}" "${pkgs[@]}"; }
           # apt's lock and partial downloads are root-only and must not go into the cache.
           sudo rm -rf ~/apt-archives/lock ~/apt-archives/partial
 
