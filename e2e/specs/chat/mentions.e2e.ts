@@ -12,7 +12,8 @@ import {
 } from "../../helpers/chat-ui.ts";
 
 // FR-1.51 / AC-1.41: a mention highlights the message and notifies even while another chat is
-// open; typing @ offers the people on the server and the sent text stays plain "@Name".
+// open; typing @ offers the people on the server and the sent text stays plain "@Name". A reply to
+// the user's message counts as a mention too (FR-2.67).
 describe("chat: mentions (AC-1.41)", () => {
   let mentionBot: ScriptBot;
 
@@ -20,9 +21,9 @@ describe("chat: mentions (AC-1.41)", () => {
     await testenv.up("v15");
     await app.restart({});
     await finishWizard();
-    await addFirstServer(64738);
+    await addFirstServer(testenv.ports.v15);
     await joinChannel("Lobby");
-    mentionBot = new ScriptBot({ name: "MentionBot" });
+    mentionBot = new ScriptBot({ name: "MentionBot", port: testenv.ports.v15 });
     await mentionBot.connected();
     await mentionBot.run("join Lobby");
   });
@@ -50,6 +51,37 @@ describe("chat: mentions (AC-1.41)", () => {
       () => document.querySelectorAll(".chat-message--mention").length,
     );
     expect(marked).toBe(1);
+  });
+
+  // FR-2.67 / AC-2.48: a reply quoting the user's message counts as a mention, one quoting
+  // someone else does not.
+  it("treats a reply to the user's message as a mention", async () => {
+    await selectChannel("Raid");
+    await mentionBot.run(
+      `say --channel Lobby "<blockquote><b>${USER}</b>: lunch at noon?</blockquote>sure thing"`,
+    );
+    const toast = $(
+      "//section[@aria-label='Notifications']//button[contains(@class,'toast__open') and contains(.,'sure thing')]",
+    );
+    await toast.waitForDisplayed({ timeout: 15_000 });
+    await expect(toast).toHaveText(expect.stringContaining("mentioned you"));
+    await toast.click();
+    await waitMessage("sure thing");
+    const marked = await browser.execute(
+      () => document.querySelectorAll(".chat-message--mention").length,
+    );
+    expect(marked).toBe(2);
+  });
+
+  it("does not treat a reply to someone else as a mention", async () => {
+    await mentionBot.run(
+      `say --channel Lobby "<blockquote><b>MentionBot</b>: lunch at noon?</blockquote>not you"`,
+    );
+    await waitMessage("not you");
+    const marked = await browser.execute(
+      () => document.querySelectorAll(".chat-message--mention").length,
+    );
+    expect(marked).toBe(2);
   });
 
   it("offers people after @ and sends plain @Name", async () => {
