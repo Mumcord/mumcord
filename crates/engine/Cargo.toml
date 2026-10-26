@@ -11,6 +11,8 @@ mumcord-protocol.workspace = true
 mumcord-audio.workspace = true
 mumcord-store.workspace = true
 mumcord-positional.workspace = true
+mumcord-p2p.workspace = true
+mumcord-screenshare.workspace = true
 tokio.workspace = true
 bytes.workspace = true
 ammonia.workspace = true
@@ -30,6 +32,56 @@ tracing.workspace = true
 tracing-subscriber.workspace = true
 tracing-appender.workspace = true
 
+[target.'cfg(target_os = "linux")'.dependencies]
+# Core protocol only: whole-screen capture on X11 (GetImage on the root window).
+x11rb.workspace = true
+# Wayland capture: the ScreenCast portal picks the window or screen, PipeWire delivers the frames.
+ashpd = { workspace = true, features = ["screencast"] }
+pipewire.workspace = true
+futures-util.workspace = true
+
+[target.'cfg(target_os = "macos")'.dependencies]
+# Screen capture with the shared app's sound: ScreenCaptureKit (macOS 12.3+, sound 13+, system
+# picker 14+).
+objc2.workspace = true
+block2.workspace = true
+dispatch2.workspace = true
+objc2-foundation = { workspace = true, features = ["NSArray", "NSEnumerator", "NSError", "NSProcessInfo", "NSString", "NSValue"] }
+objc2-screen-capture-kit = { workspace = true, features = ["SCContentSharingPicker", "SCError", "SCShareableContent", "SCStream", "block2", "dispatch2", "objc2-core-foundation", "objc2-core-graphics", "objc2-core-media"] }
+objc2-core-media = { workspace = true, features = ["CMBase", "CMBlockBuffer", "CMFormatDescription", "CMSampleBuffer", "CMTime", "objc2-core-audio-types", "objc2-core-video"] }
+objc2-core-video = { workspace = true, features = ["CVBase", "CVBuffer", "CVImageBuffer", "CVPixelBuffer", "CVReturn"] }
+objc2-core-graphics = { workspace = true, features = ["CGDirectDisplay", "CGWindow"] }
+objc2-core-audio-types = { workspace = true, features = ["CoreAudioBaseTypes"] }
+
+[target.'cfg(windows)'.dependencies]
+# Screen capture: the system picker and frames of Windows.Graphics.Capture (Direct3D 11), and the
+# shared app's sound via WASAPI process loopback. Same version as Tauri's own `windows`;
+# `windows-core` for the activation callback (`#[implement]`).
+windows = { version = "0.62", features = [
+    "Foundation",
+    "Graphics_Capture",
+    "Graphics_DirectX_Direct3D11",
+    "Wdk_System_SystemServices",
+    "Win32_Foundation",
+    "Win32_Graphics_Direct3D",
+    "Win32_Graphics_Direct3D11",
+    "Win32_Graphics_Dwm",
+    "Win32_Graphics_Dxgi",
+    "Win32_Graphics_Dxgi_Common",
+    "Win32_Media_Audio",
+    "Win32_System_Com",
+    "Win32_System_Com_StructuredStorage",
+    "Win32_System_SystemInformation",
+    "Win32_System_Threading",
+    "Win32_System_Variant",
+    "Win32_System_WinRT",
+    "Win32_System_WinRT_Direct3D11",
+    "Win32_UI_Shell",
+    "Win32_UI_WindowsAndMessaging",
+] }
+windows-core = "0.62"
+windows-future = "0.3"
+
 [features]
 # Env-selected file/null audio backend for headless tests and E2E; never in release builds.
 test-backend = ["mumcord-audio/test-backend"]
@@ -39,6 +91,7 @@ tempfile.workspace = true
 mumcord-bot = { path = "../bot" }
 mumcord-store = { workspace = true, features = ["test-util"] }
 netsim = { path = "../../tools/netsim" }
+rcgen.workspace = true
 
 [lints]
 workspace = true

@@ -35,6 +35,7 @@ specta-typescript.workspace = true
 serde.workspace = true
 serde_json.workspace = true
 tokio.workspace = true
+rand.workspace = true
 tracing.workspace = true
 
 [target.'cfg(any(target_os = "linux", target_os = "windows", target_os = "macos"))'.dependencies]
@@ -54,6 +55,8 @@ gtk.workspace = true
 # Mouse-button push-to-talk: evdev reads on Wayland, XInput2 raw button events on X11.
 libc.workspace = true
 x11rb = { workspace = true, features = ["xinput"] }
+# Tray icon as a StatusNotifierItem (FR-2.52): Tauri's Linux tray cannot show a tooltip.
+ksni = { version = "0.3.7", default-features = false, features = ["tokio"] }
 
 [target.'cfg(any(target_os = "windows", target_os = "macos"))'.dependencies]
 # Opens links in the default browser (see browser.rs; Linux uses the launchers directly).
@@ -63,10 +66,14 @@ notify-rust.workspace = true
 
 [target.'cfg(target_os = "windows")'.dependencies]
 # Mouse-button push-to-talk: low-level mouse hook. Registry: the autostart `Run` entry.
+# Gdi, Accessibility (WinEvent hooks) and Shell (fullscreen state): the in-game overlay window.
 windows-sys = { workspace = true, features = [
+    "Win32_Graphics_Gdi",
     "Win32_System_LibraryLoader",
     "Win32_System_Registry",
     "Win32_System_Threading",
+    "Win32_UI_Accessibility",
+    "Win32_UI_Shell",
     "Win32_UI_WindowsAndMessaging",
 ] }
 # "Now playing" (FR-1.58): the system media session. Same version as Tauri's own `windows`.

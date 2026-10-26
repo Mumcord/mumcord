@@ -9,12 +9,14 @@ members = [
     "crates/positional",
     "crates/overlay-ipc",
     "crates/overlay-layer",
+    "crates/p2p",
+    "crates/screenshare",
     "tools/netsim",
     "src-tauri",
 ]
 
 [workspace.package]
-version = "0.3.1"
+version = "0.4.0"
 edition = "2024"
 rust-version = "1.90"
 license = "AGPL-3.0-only"
@@ -28,6 +30,8 @@ mumcord-store = { path = "crates/store" }
 mumcord-engine = { path = "crates/engine" }
 mumcord-positional = { path = "crates/positional" }
 mumcord-overlay-ipc = { path = "crates/overlay-ipc" }
+mumcord-p2p = { path = "crates/p2p" }
+mumcord-screenshare = { path = "crates/screenshare" }
 
 # Async, networking, TLS
 tokio = { version = "1.54", features = ["full"] }
@@ -39,6 +43,16 @@ bytes = "1"
 # connection, with the OS certificate store for web sites.
 reqwest = { version = "0.13", default-features = false, features = ["rustls-no-provider"] }
 rustls-platform-verifier = "0.6"
+
+# Direct Mumcord-to-Mumcord connections (FR-2.35): QUIC on the same rustls/ring stack, router
+# port mapping over UPnP (igd-next) and NAT-PMP/PCP (crab_nat), default gateway and interface
+# addresses (netdev).
+quinn = { version = "0.11", default-features = false, features = ["runtime-tokio", "rustls-ring"] }
+igd-next = { version = "0.18", default-features = false, features = ["aio_tokio"] }
+crab_nat = "0.8"
+netdev = { version = "0.47", default-features = false, features = ["gateway"] }
+# Dual-stack UDP socket (IPv6 with IPv4 mapped) on every platform; already in the tree via tokio.
+socket2 = "0.6"
 
 # Protobuf
 prost = "0.14"
@@ -65,6 +79,25 @@ sonora = "0.2"
 rtrb = "0.3"
 rubato = "0.16"
 hound = "3.5"
+
+# Screen sharing (FR-2.42): VP9 software codec on the system or a CI-built static libvpx, found
+# with pkg-config; bindings are generated at build time so they always match the linked version.
+bindgen = "0.72"
+pkg-config = "0.3"
+# Wayland screen capture (FR-2.42): the ScreenCast portal hands over a PipeWire stream; the
+# system libpipewire is linked (present on every Wayland desktop).
+pipewire = "0.10"
+# macOS screen capture (FR-2.42): ScreenCaptureKit's picker, stream and per-app sound, through
+# the objc2 framework bindings Tauri already pulls in (MIT/Apache-2.0/Zlib).
+objc2 = "0.6"
+block2 = "0.6"
+dispatch2 = { version = "0.3", default-features = false, features = ["std", "objc2"] }
+objc2-foundation = { version = "0.3", default-features = false, features = ["std"] }
+objc2-screen-capture-kit = { version = "0.3", default-features = false, features = ["std"] }
+objc2-core-media = { version = "0.3", default-features = false, features = ["std"] }
+objc2-core-video = { version = "0.3", default-features = false, features = ["std"] }
+objc2-core-graphics = { version = "0.3", default-features = false, features = ["std"] }
+objc2-core-audio-types = { version = "0.3", default-features = false, features = ["std"] }
 
 # Storage & secrets
 rusqlite = { version = "0.40", features = ["bundled"] }

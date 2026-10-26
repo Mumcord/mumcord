@@ -62,6 +62,7 @@ async fn server_cert(port: u16) -> Result<ServerCert, Box<dyn std::error::Error>
         port,
         username: "smoke-seed".to_owned(),
         password: None,
+        tokens: Vec::new(),
         identity: None,
         verify_cert: Arc::new(|_| false),
         login_timeout: Duration::from_secs(10),
