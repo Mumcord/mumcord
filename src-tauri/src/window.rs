@@ -22,10 +22,10 @@ pub enum CloseAction {
     Ask,
 }
 
-/// Closing quits right away unless a server session is active (or being set up), in which
-/// case the stored close behaviour decides.
-pub fn decide_close(state: &ConnState, behaviour: CloseBehaviour) -> CloseAction {
-    if matches!(state, ConnState::Disconnected { .. }) {
+/// Closing quits right away unless at least one server session is active (or being set up),
+/// in which case the stored close behaviour decides.
+pub fn decide_close(connected_servers: usize, behaviour: CloseBehaviour) -> CloseAction {
+    if connected_servers == 0 {
         return CloseAction::Quit;
     }
     match behaviour {
@@ -33,6 +33,15 @@ pub fn decide_close(state: &ConnState, behaviour: CloseBehaviour) -> CloseAction
         CloseBehaviour::MinimizeToTray => CloseAction::MinimizeToTray,
         CloseBehaviour::Quit => CloseAction::Quit,
     }
+}
+
+/// Number of servers that are connected or being (re)connected.
+fn connected_servers(engine: &Engine) -> usize {
+    engine
+        .connections()
+        .iter()
+        .filter(|c| !matches!(c, ConnState::Disconnected { .. }))
+        .count()
 }
 
 /// Window event hook registered on the Tauri builder.
@@ -55,11 +64,16 @@ pub fn on_window_event(window: &Window, event: &WindowEvent) {
         },
         |s| s.close_behaviour,
     );
-    match decide_close(&engine.connection_state(), behaviour) {
+    let connected = connected_servers(&engine);
+    match decide_close(connected, behaviour) {
         CloseAction::Quit => quit(app),
         CloseAction::MinimizeToTray => minimize_to_tray(app),
         CloseAction::Ask => {
-            if let Err(e) = (CloseRequested {}).emit(app) {
+            if let Err(e) = (CloseRequested {
+                connected_servers: u32::try_from(connected).unwrap_or(u32::MAX),
+            })
+            .emit(app)
+            {
                 tracing::warn!(error = %e, "asking the UI about closing failed; minimizing");
                 minimize_to_tray(app);
             }
@@ -145,11 +159,7 @@ pub fn restart(app: &AppHandle) {
 }
 
 fn after_disconnect(app: &AppHandle, then: impl FnOnce(&AppHandle) + Send + 'static) {
-    let connected = !matches!(
-        app.state::<Engine>().connection_state(),
-        ConnState::Disconnected { .. }
-    );
-    if !connected {
+    if connected_servers(&app.state::<Engine>()) == 0 {
         then(app);
         return;
     }
@@ -166,44 +176,26 @@ fn after_disconnect(app: &AppHandle, then: impl FnOnce(&AppHandle) + Send + 'sta
 mod tests {
     use super::*;
 
-    fn connected() -> ConnState {
-        ConnState::Connected { server_id: 1 }
-    }
-
     #[test]
-    fn closing_while_disconnected_always_quits() {
-        let idle = ConnState::Disconnected { error: None };
+    fn closing_without_a_connection_always_quits() {
         for behaviour in [
             CloseBehaviour::Ask,
             CloseBehaviour::MinimizeToTray,
             CloseBehaviour::Quit,
         ] {
-            assert_eq!(decide_close(&idle, behaviour), CloseAction::Quit);
+            assert_eq!(decide_close(0, behaviour), CloseAction::Quit);
         }
     }
 
     #[test]
     fn closing_while_connected_follows_the_setting() {
-        assert_eq!(
-            decide_close(&connected(), CloseBehaviour::Ask),
-            CloseAction::Ask
-        );
-        assert_eq!(
-            decide_close(&connected(), CloseBehaviour::MinimizeToTray),
-            CloseAction::MinimizeToTray
-        );
-        assert_eq!(
-            decide_close(&connected(), CloseBehaviour::Quit),
-            CloseAction::Quit
-        );
-    }
-
-    #[test]
-    fn a_running_connection_attempt_counts_as_connected() {
-        let connecting = ConnState::Connecting { server_id: 1 };
-        assert_eq!(
-            decide_close(&connecting, CloseBehaviour::Ask),
-            CloseAction::Ask
-        );
+        for count in [1, 3] {
+            assert_eq!(decide_close(count, CloseBehaviour::Ask), CloseAction::Ask);
+            assert_eq!(
+                decide_close(count, CloseBehaviour::MinimizeToTray),
+                CloseAction::MinimizeToTray
+            );
+            assert_eq!(decide_close(count, CloseBehaviour::Quit), CloseAction::Quit);
+        }
     }
 }

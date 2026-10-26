@@ -98,7 +98,7 @@ pub fn ptt_session() -> ApiResult<PttSession> {
     Ok(PttSession {
         wayland_desktop: env.wayland_desktop(),
         compatibility_active: env.compatibility_active(),
-        kde: crate::overlay::kde(),
+        kde: crate::kde::kde(),
     })
 }
 
@@ -108,8 +108,8 @@ pub fn ptt_session() -> ApiResult<PttSession> {
 #[specta::specta]
 pub fn ptt_open_kde_x11_settings() -> ApiResult<()> {
     #[cfg(target_os = "linux")]
-    if crate::overlay::kde() {
-        return crate::overlay::open_kde_x11_settings()
+    if crate::kde::kde() {
+        return crate::kde::open_kde_x11_settings()
             .map_err(|e| ApiError::new(ErrorCode::Io, e.to_string()));
     }
     Err(ApiError::new(ErrorCode::InvalidInput, "not KDE Plasma"))
@@ -150,7 +150,7 @@ fn not_kde() -> ApiError {
 
 #[cfg(target_os = "linux")]
 fn require_kde() -> ApiResult<()> {
-    if crate::overlay::kde() {
+    if crate::kde::kde() {
         Ok(())
     } else {
         Err(not_kde())

@@ -7,17 +7,22 @@ mod deeplink;
 #[cfg(target_os = "linux")]
 mod desktop_entry;
 mod display;
+#[cfg(target_os = "linux")]
+mod gst_fallback;
 mod ingame_overlay;
+mod kde;
 #[cfg(target_os = "linux")]
 mod kde_x11;
-#[cfg(target_os = "linux")]
-mod kwin_rule;
 mod notifications;
 mod now_gaming;
 mod now_playing;
-mod overlay;
 mod ptt;
+mod screen_frames;
 mod tray;
+mod update_check;
+mod watch_player;
+#[cfg(target_os = "linux")]
+mod webkit_compositing;
 mod window;
 
 use mumcord_engine::{Engine, EngineEvent, SecretStore, diag};
@@ -53,17 +58,24 @@ fn specta_builder() -> Builder<tauri::Wry> {
             servers::server_update,
             servers::server_remove,
             servers::servers_reorder,
+            servers::server_set_always_connect,
+            servers::server_set_notifications_muted,
+            servers::server_set_theme,
             servers::parse_mumble_link,
             session::connect,
             session::disconnect,
             session::reconnect_cancel,
-            session::connection_state,
+            session::connections_list,
+            session::voice_server_get,
             session::session_snapshot,
             session::connection_stats,
             session::cert_trust_decide,
             session::set_self_mute,
             session::set_self_deaf,
             channels::channel_join,
+            channels::channel_join_with_password,
+            channels::channel_password_count,
+            channels::channel_passwords_remove,
             channels::channel_description_request,
             people::person_set_volume,
             people::person_set_local_mute,
@@ -78,10 +90,13 @@ fn specta_builder() -> Builder<tauri::Wry> {
             dropped::read_dropped_image,
             commands::full_image::full_image_keep,
             commands::full_image::full_image_fetch,
+            commands::full_image::full_image_cancel,
             links::link_preview,
             links::open_link,
             links::inline_image,
             links::preview_dismiss,
+            links::embed_player_open,
+            links::embed_player_close,
             links::gif_favorites,
             links::gif_favorite_add,
             links::gif_favorite_remove,
@@ -103,7 +118,10 @@ fn specta_builder() -> Builder<tauri::Wry> {
             profile::register_self,
             settings::settings_get,
             settings::settings_update,
+            settings::window_overlay_notice_pending,
+            settings::window_overlay_notice_dismiss,
             audio::audio_devices,
+            audio::bitrate_max,
             audio::mic_test_start,
             audio::mic_test_stop,
             commands::ptt::ptt_availability,
@@ -132,25 +150,44 @@ fn specta_builder() -> Builder<tauri::Wry> {
             commands::positional::positional_status,
             commands::positional::plugins_list,
             commands::positional::plugin_set_enabled,
-            commands::overlay::overlay_state,
-            commands::overlay::overlay_update,
-            commands::overlay::overlay_set_enabled,
-            commands::overlay::overlay_move_mode,
-            commands::overlay::overlay_kwin_rule_install,
-            commands::overlay::overlay_kwin_rule_remove,
-            commands::overlay::overlay_open_kde_window_rules,
             commands::ingame_overlay::ingame_overlay_state,
             commands::ingame_overlay::ingame_overlay_set_mode,
             commands::ingame_overlay::ingame_overlay_set_game,
             commands::ingame_overlay::ingame_overlay_remove_game,
+            commands::user_stats::user_stats_watch,
+            commands::p2p::p2p_consent_decide,
+            commands::watch_party::watch_party_start,
+            commands::watch_party::watch_party_command,
+            commands::watch_party::watch_party_join,
+            commands::watch_party::watch_party_get,
+            commands::watch_party::watch_party_leave,
+            commands::watch_party::watch_party_add,
+            commands::watch_party::watch_party_remove,
+            commands::watch_party::watch_party_move,
+            commands::watch_party::watch_party_next,
+            commands::watch_party::watch_party_player_url,
+            commands::screen_share::screen_share_start,
+            commands::screen_share::screen_share_stop,
+            commands::screen_share::screen_share_set_paused,
+            commands::screen_share::screen_share_set_sound,
+            commands::screen_share::screen_share_set_sound_level,
+            commands::screen_share::screen_share_watch,
+            commands::screen_share::screen_share_unwatch,
+            commands::screen_share::screen_share_set_decode_fallback,
+            commands::screen_share::screen_share_request_keyframe,
+            commands::screen_share::screen_share_list,
+            commands::updates::update_check_now,
+            commands::updates::appimage_menu_entry_add,
         ])
         .events(collect_events![
             servers::DeepLinkOpened,
             session::ConnectionStateChanged,
             session::CertTrustRequired,
             session::ServerSynced,
+            session::SyncProgress,
             session::TransportChanged,
             session::ServerDenied,
+            channels::ChannelPasswordPrompt,
             channels::ChannelUpserted,
             channels::ChannelsUpserted,
             channels::ChannelRemoved,
@@ -165,6 +202,7 @@ fn specta_builder() -> Builder<tauri::Wry> {
             follow::FollowedChannelsChanged,
             follow::UnreadChanged,
             audio::AudioDevicesChanged,
+            audio::BitrateMaxChanged,
             audio::MicLevel,
             audio::MicTestPhaseChanged,
             app::CloseRequested,
@@ -174,8 +212,13 @@ fn specta_builder() -> Builder<tauri::Wry> {
             commands::now_gaming::NowGamingChanged,
             commands::positional::PositionalStatusChanged,
             commands::positional::PositionalSendingChanged,
-            commands::overlay::OverlayChanged,
             commands::ingame_overlay::InGameOverlayChanged,
+            session::VoiceServerChanged,
+            commands::user_stats::UserStatsChanged,
+            commands::p2p::DirectConsentRequired,
+            commands::watch_party::WatchPartyChanged,
+            commands::screen_share::ScreenSharesChanged,
+            commands::updates::UpdateAvailable,
         ])
 }
 
@@ -191,6 +234,10 @@ pub fn run() {
     display::prepare(&context.config().identifier);
     #[cfg(target_os = "linux")]
     {
+        // Before WebKit starts its web process, which inherits the GStreamer environment.
+        gst_fallback::prepare(&context.config().identifier);
+        // WebKit reads this when its web process starts (flicker workaround).
+        webkit_compositing::prepare();
         // The Wayland app ID comes from the program name; it must match the desktop entry
         // (`desktop_entry`) for the taskbar icon. Set before GTK starts.
         gdk::glib::set_prgname(Some(context.config().identifier.as_str()));
@@ -220,19 +267,9 @@ pub fn run() {
         .plugin(tauri_plugin_deep_link::init())
         .plugin(tauri_plugin_global_shortcut::Builder::new().build())
         .plugin(tauri_plugin_dialog::init())
-        .invoke_handler(move |call| {
-            // The overlay page gets only the few commands it needs (least privilege).
-            if !overlay::may_invoke(call.message.webview_ref().label(), call.message.command()) {
-                tracing::warn!(
-                    command = call.message.command(),
-                    "command refused for the overlay"
-                );
-                call.resolver.reject("command not available in this window");
-                return true;
-            }
-            invoke(call)
-        })
+        .invoke_handler(invoke)
         .manage(dropped::DroppedFiles::default())
+        .manage(watch_player::PlayerServer::default())
         .on_window_event(|window, event| {
             dropped::on_window_event(window, event);
             window::on_window_event(window, event);
@@ -244,11 +281,12 @@ pub fn run() {
             start_engine(app.handle())?;
             start_window_and_autostart(app.handle());
             tray::init(app.handle());
-            overlay::init(app.handle());
             ingame_overlay_init(app.handle());
             deeplink::init(app.handle());
             #[cfg(target_os = "linux")]
-            desktop_entry::ensure(app.handle());
+            {
+                desktop_entry::ensure(app.handle());
+            }
             Ok(())
         })
         .run(context);
@@ -282,15 +320,27 @@ fn start_engine(app: &AppHandle) -> Result<(), Box<dyn std::error::Error>> {
     ptt::set_evdev_mouse_allowed(stored.allow_mouse_buttons);
     settings::configure_ptt(app, settings::active_ptt_key(&stored));
 
+    let screen_frames = std::sync::Arc::new(screen_frames::ScreenFrames::default());
+    engine.set_screen_frame_sink(screen_frames.clone());
+    app.manage(screen_frames);
     now_playing::start(engine.clone());
     now_gaming::start(engine.clone());
     start_plugin_host(app, &engine, &data_dir, &stored.enabled_plugins);
-    app.manage(engine);
+    app.manage(engine.clone());
+    let at_start = engine.clone();
+    tauri::async_runtime::spawn(async move {
+        if let Err(e) = at_start.connect_at_start().await {
+            tracing::warn!(error = %e, "connecting the servers at start failed");
+        }
+    });
+    update_check::start(app.clone(), engine);
 
     let handle = app.clone();
     tauri::async_runtime::spawn(async move {
-        while let Some(event) = events.recv().await {
-            if let Err(e) = emit_engine_event(&handle, event) {
+        // App-wide events carry no server; their UI events ignore it.
+        while let Some((server_id, event)) = events.recv_tagged().await {
+            let server_id = server_id.map_or(0, commands::types::to_api_server_id);
+            if let Err(e) = emit_engine_event(&handle, server_id, event) {
                 tracing::warn!(error = %e, "forwarding an engine event to the UI failed");
             }
         }
@@ -350,10 +400,15 @@ fn start_window_and_autostart(app: &AppHandle) {
     }
 }
 
-/// Converts an engine event into its UI event and emits it.
-fn emit_engine_event(app: &AppHandle, event: EngineEvent) -> tauri::Result<()> {
+/// Converts an engine event into its UI event and emits it; `server_id` is the server the
+/// session events belong to.
+fn emit_engine_event(
+    app: &AppHandle,
+    server_id: commands::types::ServerId,
+    event: EngineEvent,
+) -> tauri::Result<()> {
     tray::on_engine_event(app, &event);
-    notifications::on_engine_event(app, &event);
+    notifications::on_engine_event(app, server_id, &event);
     if let (Some(runtime), Some(engine)) = (
         app.try_state::<ingame_overlay::Runtime>(),
         app.try_state::<Engine>(),
@@ -362,7 +417,12 @@ fn emit_engine_event(app: &AppHandle, event: EngineEvent) -> tauri::Result<()> {
     }
     match event {
         EngineEvent::StateChanged(state) => session::ConnectionStateChanged {
+            server_id,
             state: state.into(),
+        }
+        .emit(app),
+        EngineEvent::VoiceServerChanged(voice) => session::VoiceServerChanged {
+            server_id: voice.map(commands::types::to_api_server_id),
         }
         .emit(app),
         EngineEvent::CertTrustRequired {
@@ -379,36 +439,66 @@ fn emit_engine_event(app: &AppHandle, event: EngineEvent) -> tauri::Result<()> {
             snapshot: (*snapshot).into(),
         }
         .emit(app),
+        EngineEvent::SyncProgress { channels } => session::SyncProgress {
+            server_id,
+            channels,
+        }
+        .emit(app),
         EngineEvent::TransportChanged(transport) => session::TransportChanged {
+            server_id,
             transport: transport.into(),
         }
         .emit(app),
         EngineEvent::ServerDenied { error, channel_id } => session::ServerDenied {
+            server_id,
             error: error.into(),
             channel_id,
         }
         .emit(app),
+        EngineEvent::ChannelPassword { channel_id, state } => channels::ChannelPasswordPrompt {
+            server_id,
+            channel_id,
+            step: state.into(),
+        }
+        .emit(app),
         EngineEvent::ChannelUpserted(channel) => channels::ChannelUpserted {
+            server_id,
             channel: channel.into(),
         }
         .emit(app),
         EngineEvent::ChannelsUpserted(channels) => channels::ChannelsUpserted {
+            server_id,
             channels: channels.into_iter().map(Into::into).collect(),
         }
         .emit(app),
-        EngineEvent::ChannelRemoved(channel_id) => {
-            channels::ChannelRemoved { channel_id }.emit(app)
+        EngineEvent::ChannelRemoved(channel_id) => channels::ChannelRemoved {
+            server_id,
+            channel_id,
         }
-        EngineEvent::UserUpserted(user) => people::UserUpserted { user: user.into() }.emit(app),
-        EngineEvent::UserRemoved(session) => people::UserRemoved { session }.emit(app),
-        EngineEvent::TalkStateChanged { session, talking } => {
-            people::TalkStateChanged { session, talking }.emit(app)
+        .emit(app),
+        EngineEvent::UserUpserted(user) => people::UserUpserted {
+            server_id,
+            user: user.into(),
         }
-        EngineEvent::FollowedChannelsChanged(channel_ids) => {
-            follow::FollowedChannelsChanged { channel_ids }.emit(app)
+        .emit(app),
+        EngineEvent::UserRemoved(session) => people::UserRemoved { server_id, session }.emit(app),
+        EngineEvent::TalkStateChanged { session, talking } => people::TalkStateChanged {
+            server_id,
+            session,
+            talking,
         }
+        .emit(app),
+        EngineEvent::FollowedChannelsChanged(channel_ids) => follow::FollowedChannelsChanged {
+            server_id,
+            channel_ids,
+        }
+        .emit(app),
         EngineEvent::AudioDevicesChanged(devices) => audio::AudioDevicesChanged {
             devices: devices.into(),
+        }
+        .emit(app),
+        EngineEvent::BitrateMaxChanged(max_bps) => audio::BitrateMaxChanged {
+            kbps: max_bps.map(|b| b / 1000),
         }
         .emit(app),
         EngineEvent::MicLevel(level) => audio::MicLevel { level }.emit(app),
@@ -417,10 +507,12 @@ fn emit_engine_event(app: &AppHandle, event: EngineEvent) -> tauri::Result<()> {
         }
         .emit(app),
         EngineEvent::MessageReceived(message) => chat::MessageReceived {
+            server_id,
             message: (*message).into(),
         }
         .emit(app),
         EngineEvent::UnreadChanged(unread) => follow::UnreadChanged {
+            server_id,
             conversation: unread.conversation.into(),
             count: unread.count,
         }
@@ -431,12 +523,14 @@ fn emit_engine_event(app: &AppHandle, event: EngineEvent) -> tauri::Result<()> {
         .emit(app),
         EngineEvent::NowPlayingChanged { session, track } => {
             commands::now_playing::NowPlayingChanged {
+                server_id,
                 session,
                 track: track.map(Into::into),
             }
             .emit(app)
         }
         EngineEvent::NowGamingChanged { session, game } => commands::now_gaming::NowGamingChanged {
+            server_id,
             session,
             game: game.map(Into::into),
         }
@@ -445,6 +539,7 @@ fn emit_engine_event(app: &AppHandle, event: EngineEvent) -> tauri::Result<()> {
             channel_id,
             messages,
         } => history::HistorySynced {
+            server_id,
             channel_id,
             messages: messages.into_iter().map(Into::into).collect(),
         }
@@ -454,6 +549,7 @@ fn emit_engine_event(app: &AppHandle, event: EngineEvent) -> tauri::Result<()> {
             running,
             added,
         } => history::HistorySyncStatus {
+            server_id,
             channel_id,
             running,
             added,
@@ -463,11 +559,15 @@ fn emit_engine_event(app: &AppHandle, event: EngineEvent) -> tauri::Result<()> {
             friends: friends::to_api_friends(list),
         }
         .emit(app),
+        EngineEvent::DirectConsentRequired => {
+            commands::p2p::DirectConsentRequired { server_id }.emit(app)
+        }
         EngineEvent::FullImageProgress {
             reference,
             received,
             total,
         } => commands::full_image::FullImageProgress {
+            server_id,
             reference,
             received,
             total,
@@ -480,7 +580,38 @@ fn emit_engine_event(app: &AppHandle, event: EngineEvent) -> tauri::Result<()> {
             .emit(app)
         }
         EngineEvent::PositionalSendingChanged { session, sending } => {
-            commands::positional::PositionalSendingChanged { session, sending }.emit(app)
+            commands::positional::PositionalSendingChanged {
+                server_id,
+                session,
+                sending,
+            }
+            .emit(app)
+        }
+        EngineEvent::UserStatsChanged(stats) => commands::user_stats::UserStatsChanged {
+            server_id,
+            session: stats.session,
+            stats: stats.into(),
+        }
+        .emit(app),
+        EngineEvent::WatchPartyChanged(party) => {
+            let joined = party.as_ref().is_some_and(|p| p.joined);
+            app.state::<watch_player::PlayerServer>()
+                .party_changed(server_id, joined);
+            commands::watch_party::WatchPartyChanged {
+                server_id,
+                party: party.map(Into::into),
+            }
+            .emit(app)
+        }
+        EngineEvent::ScreenSharesChanged(shares) => {
+            let sharers: Vec<u32> = shares.iter().map(|s| s.session).collect();
+            app.state::<std::sync::Arc<screen_frames::ScreenFrames>>()
+                .retain(commands::types::to_engine_server_id(server_id), &sharers);
+            commands::screen_share::ScreenSharesChanged {
+                server_id,
+                shares: shares.into_iter().map(Into::into).collect(),
+            }
+            .emit(app)
         }
     }
 }

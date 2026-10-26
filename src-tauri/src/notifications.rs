@@ -13,11 +13,11 @@
 
 use std::collections::HashMap;
 
-use mumcord_engine::{ConnState, EngineEvent, store::NotificationMode};
+use mumcord_engine::{ConnState, Engine, EngineEvent, store::NotificationMode};
 use tauri::{AppHandle, Manager};
 
 use crate::commands::notifications::{MessageNotice, NotifyOutcome};
-use crate::commands::types::Conversation;
+use crate::commands::types::{Conversation, ServerId, to_api_server_id};
 
 /// Whether a new message gets a toast, a system notification or nothing.
 ///
@@ -35,45 +35,48 @@ pub fn decide(mode: NotificationMode, focused: bool, on_screen: bool) -> NotifyO
 }
 
 /// Stable map key of a conversation.
-fn key(conversation: &Conversation) -> String {
+fn key(server_id: ServerId, conversation: &Conversation) -> String {
     match conversation {
-        Conversation::Channel { channel_id } => format!("c:{channel_id}"),
-        Conversation::Private { cert_hash } => format!("p:{cert_hash}"),
-        Conversation::PrivateSession { session } => format!("s:{session}"),
+        Conversation::Channel { channel_id } => format!("{server_id}:c:{channel_id}"),
+        Conversation::Private { cert_hash } => format!("{server_id}:p:{cert_hash}"),
+        Conversation::PrivateSession { session } => format!("{server_id}:s:{session}"),
     }
 }
 
-/// The system notification currently shown per chat, so a new message replaces it.
+/// The system notification currently shown per chat of a server, so a new message replaces it.
 #[derive(Debug, Default)]
 pub struct Groups {
-    by_key: HashMap<String, (Conversation, u32)>,
+    by_key: HashMap<String, (ServerId, Conversation, u32)>,
 }
 
 impl Groups {
     /// Notification id to replace for this chat; 0 asks for a new one.
     #[cfg(any(target_os = "linux", test))]
-    pub fn replaces(&self, conversation: &Conversation) -> u32 {
-        self.by_key.get(&key(conversation)).map_or(0, |(_, id)| *id)
+    pub fn replaces(&self, server_id: ServerId, conversation: &Conversation) -> u32 {
+        self.by_key
+            .get(&key(server_id, conversation))
+            .map_or(0, |(_, _, id)| *id)
     }
 
-    pub fn shown(&mut self, conversation: Conversation, id: u32) {
-        self.by_key.insert(key(&conversation), (conversation, id));
+    pub fn shown(&mut self, server_id: ServerId, conversation: Conversation, id: u32) {
+        self.by_key
+            .insert(key(server_id, &conversation), (server_id, conversation, id));
     }
 
     #[cfg(any(target_os = "linux", test))]
-    fn take_id(&mut self, id: u32) -> Option<Conversation> {
+    fn take_id(&mut self, id: u32) -> Option<(ServerId, Conversation)> {
         let key = self
             .by_key
             .iter()
-            .find_map(|(key, (_, shown))| (*shown == id).then(|| key.clone()))?;
+            .find_map(|(key, (_, _, shown))| (*shown == id).then(|| key.clone()))?;
         self.by_key
             .remove(&key)
-            .map(|(conversation, _)| conversation)
+            .map(|(server_id, conversation, _)| (server_id, conversation))
     }
 
-    /// A notification action: the chat to open for a click ("default"), else `None`.
+    /// A notification action: the server and chat to open for a click ("default"), else `None`.
     #[cfg(any(target_os = "linux", test))]
-    pub fn action(&mut self, id: u32, action_key: &str) -> Option<Conversation> {
+    pub fn action(&mut self, id: u32, action_key: &str) -> Option<(ServerId, Conversation)> {
         if action_key == "default" {
             self.take_id(id)
         } else {
@@ -88,13 +91,23 @@ impl Groups {
     }
 
     /// The chat was opened in the app: its notification is outdated.
-    pub fn dismiss(&mut self, conversation: &Conversation) -> Option<u32> {
-        self.by_key.remove(&key(conversation)).map(|(_, id)| id)
+    pub fn dismiss(&mut self, server_id: ServerId, conversation: &Conversation) -> Option<u32> {
+        self.by_key
+            .remove(&key(server_id, conversation))
+            .map(|(_, _, id)| id)
     }
 
-    /// Server change or disconnect: channel ids and sessions no longer apply.
-    pub fn clear(&mut self) -> Vec<u32> {
-        self.by_key.drain().map(|(_, (_, id))| id).collect()
+    /// Resync or disconnect of a server: its channel ids and sessions no longer apply.
+    pub fn clear_server(&mut self, server_id: ServerId) -> Vec<u32> {
+        let mut ids = Vec::new();
+        self.by_key.retain(|_, (server, _, id)| {
+            let stale = *server == server_id;
+            if stale {
+                ids.push(*id);
+            }
+            !stale
+        });
+        ids
     }
 }
 
@@ -138,6 +151,28 @@ fn main_window_focused(app: &AppHandle) -> bool {
         && window.is_focused().unwrap_or(false)
 }
 
+/// The server's "Mute notifications" switch (FR-2.10) silences everything, mentions and
+/// sounds included.
+/// A failed lookup does not mute, so a message is never lost to a storage error.
+pub async fn server_muted(app: &AppHandle, server_id: ServerId) -> bool {
+    match app.state::<Engine>().servers().await {
+        Ok(servers) => muted_in(
+            servers
+                .iter()
+                .map(|s| (to_api_server_id(s.id), s.notifications_muted)),
+            server_id,
+        ),
+        Err(e) => {
+            tracing::warn!(error = %e, "reading the server's mute setting failed");
+            false
+        }
+    }
+}
+
+fn muted_in(mut servers: impl Iterator<Item = (u32, bool)>, server_id: u32) -> bool {
+    servers.any(|(id, muted)| id == server_id && muted)
+}
+
 /// Decides for one new message and shows the system notification if that is the outcome.
 /// A failing system notification falls back to the toast.
 pub async fn notify(
@@ -145,6 +180,9 @@ pub async fn notify(
     mode: NotificationMode,
     notice: MessageNotice,
 ) -> NotifyOutcome {
+    if server_muted(app, notice.server_id).await {
+        return NotifyOutcome::None;
+    }
     let outcome = decide(mode, main_window_focused(app), notice.on_screen);
     if outcome != NotifyOutcome::Desktop {
         return outcome;
@@ -153,7 +191,7 @@ pub async fn notify(
     let mut groups = notifier.groups.lock().await;
     match show(app, &notifier, &groups, &notice).await {
         Ok(Some(id)) => {
-            groups.shown(notice.conversation, id);
+            groups.shown(notice.server_id, notice.conversation, id);
             NotifyOutcome::Desktop
         }
         Ok(None) => NotifyOutcome::Desktop,
@@ -165,16 +203,21 @@ pub async fn notify(
 }
 
 /// Removes the notification of a chat the user just opened.
-pub async fn dismiss(app: &AppHandle, conversation: &Conversation) {
+pub async fn dismiss(app: &AppHandle, server_id: ServerId, conversation: &Conversation) {
     let notifier = app.state::<Notifier>();
-    let id = notifier.groups.lock().await.dismiss(conversation);
+    let id = notifier
+        .groups
+        .lock()
+        .await
+        .dismiss(server_id, conversation);
     if let Some(id) = id {
         close(&notifier, vec![id]).await;
     }
 }
 
-/// Engine event hook: a new server or a disconnect makes all shown notifications stale.
-pub fn on_engine_event(app: &AppHandle, event: &EngineEvent) {
+/// Engine event hook: a (re)sync or a disconnect makes the shown notifications of that
+/// server stale.
+pub fn on_engine_event(app: &AppHandle, server_id: ServerId, event: &EngineEvent) {
     let stale = matches!(event, EngineEvent::ServerSynced(_))
         || matches!(
             event,
@@ -186,7 +229,7 @@ pub fn on_engine_event(app: &AppHandle, event: &EngineEvent) {
     let app = app.clone();
     tauri::async_runtime::spawn(async move {
         let notifier = app.state::<Notifier>();
-        let ids = notifier.groups.lock().await.clear();
+        let ids = notifier.groups.lock().await.clear_server(server_id);
         if !ids.is_empty() {
             close(&notifier, ids).await;
         }
@@ -203,7 +246,11 @@ async fn show(
 ) -> Result<Option<u32>, String> {
     notifier
         .linux
-        .show(app, groups.replaces(&notice.conversation), notice)
+        .show(
+            app,
+            groups.replaces(notice.server_id, &notice.conversation),
+            notice,
+        )
         .await
         .map(Some)
 }
@@ -264,14 +311,23 @@ async fn show(
 #[cfg(not(any(target_os = "linux", target_os = "windows", target_os = "macos")))]
 async fn close(_notifier: &Notifier, _ids: Vec<u32>) {}
 
-/// A click on a notification: brings the window to the front and tells the UI which chat to open.
+/// A click on a notification: brings the window to the front and tells the UI which server and
+/// chat to open.
 #[cfg(target_os = "linux")]
-fn activate(app: &AppHandle, conversation: Conversation, activation_token: Option<String>) {
+fn activate(
+    app: &AppHandle,
+    server_id: ServerId,
+    conversation: Conversation,
+    activation_token: Option<String>,
+) {
     use tauri_specta::Event;
 
     present(app, activation_token);
-    if let Err(e) =
-        (crate::commands::notifications::NotificationActivated { conversation }).emit(app)
+    if let Err(e) = (crate::commands::notifications::NotificationActivated {
+        server_id,
+        conversation,
+    })
+    .emit(app)
     {
         tracing::warn!(error = %e, "telling the UI about a notification click failed");
     }
@@ -415,14 +471,14 @@ mod linux {
                     Some(signal) = actions.next() => {
                         let Ok(args) = signal.args() else { continue };
                         let token = pending_tokens.remove(&args.id);
-                        let conversation = app
+                        let clicked = app
                             .state::<Notifier>()
                             .groups
                             .lock()
                             .await
                             .action(args.id, &args.action_key);
-                        if let Some(conversation) = conversation {
-                            activate(&app, conversation, token);
+                        if let Some((server_id, conversation)) = clicked {
+                            activate(&app, server_id, conversation, token);
                         }
                     }
                     Some(signal) = closed.next() => {
@@ -492,16 +548,16 @@ mod tests {
     #[test]
     fn one_notification_per_chat_is_replaced() {
         let mut groups = Groups::default();
-        assert_eq!(groups.replaces(&channel(1)), 0);
-        groups.shown(channel(1), 7);
-        groups.shown(channel(2), 8);
-        assert_eq!(groups.replaces(&channel(1)), 7);
-        assert_eq!(groups.replaces(&channel(2)), 8);
+        assert_eq!(groups.replaces(1, &channel(1)), 0);
+        groups.shown(1, channel(1), 7);
+        groups.shown(1, channel(2), 8);
+        assert_eq!(groups.replaces(1, &channel(1)), 7);
+        assert_eq!(groups.replaces(1, &channel(2)), 8);
         let private = Conversation::Private {
             cert_hash: "1".into(),
         };
         assert_eq!(
-            groups.replaces(&private),
+            groups.replaces(1, &private),
             0,
             "keys never collide across kinds"
         );
@@ -510,12 +566,12 @@ mod tests {
     #[test]
     fn click_opens_the_chat_once() {
         let mut groups = Groups::default();
-        groups.shown(channel(1), 7);
+        groups.shown(1, channel(1), 7);
         assert_eq!(groups.action(7, "other"), None);
-        assert_eq!(groups.action(7, "default"), Some(channel(1)));
+        assert_eq!(groups.action(7, "default"), Some((1, channel(1))));
         assert_eq!(groups.action(7, "default"), None);
         assert_eq!(
-            groups.replaces(&channel(1)),
+            groups.replaces(1, &channel(1)),
             0,
             "next message starts a new notification"
         );
@@ -525,15 +581,15 @@ mod tests {
     #[test]
     fn close_dismiss_and_clear_forget_notifications() {
         let mut groups = Groups::default();
-        groups.shown(channel(1), 7);
-        groups.shown(channel(2), 8);
-        groups.shown(channel(3), 9);
+        groups.shown(1, channel(1), 7);
+        groups.shown(1, channel(2), 8);
+        groups.shown(1, channel(3), 9);
         groups.closed(7);
-        assert_eq!(groups.replaces(&channel(1)), 0);
-        assert_eq!(groups.dismiss(&channel(2)), Some(8));
-        assert_eq!(groups.dismiss(&channel(2)), None);
-        assert_eq!(groups.clear(), vec![9]);
-        assert_eq!(groups.replaces(&channel(3)), 0);
+        assert_eq!(groups.replaces(1, &channel(1)), 0);
+        assert_eq!(groups.dismiss(1, &channel(2)), Some(8));
+        assert_eq!(groups.dismiss(1, &channel(2)), None);
+        assert_eq!(groups.clear_server(1), vec![9]);
+        assert_eq!(groups.replaces(1, &channel(3)), 0);
     }
 
     #[test]
@@ -542,5 +598,32 @@ mod tests {
             escape_markup(r#"<b>a</b> & "c" 'd'"#),
             "&lt;b&gt;a&lt;/b&gt; &amp; &quot;c&quot; &#39;d&#39;"
         );
+    }
+
+    #[test]
+    fn same_chat_of_two_servers_keeps_two_notifications() {
+        let mut groups = Groups::default();
+        groups.shown(1, channel(1), 7);
+        groups.shown(2, channel(1), 8);
+        assert_eq!(groups.replaces(1, &channel(1)), 7);
+        assert_eq!(groups.replaces(2, &channel(1)), 8);
+        assert_eq!(groups.action(8, "default"), Some((2, channel(1))));
+    }
+
+    #[test]
+    fn clearing_a_server_keeps_the_others() {
+        let mut groups = Groups::default();
+        groups.shown(1, channel(1), 7);
+        groups.shown(2, channel(1), 8);
+        assert_eq!(groups.clear_server(1), vec![7]);
+        assert_eq!(groups.replaces(2, &channel(1)), 8);
+    }
+
+    #[test]
+    fn only_a_muted_server_is_silenced() {
+        let servers = [(1, true), (2, false)];
+        assert!(muted_in(servers.into_iter(), 1));
+        assert!(!muted_in(servers.into_iter(), 2));
+        assert!(!muted_in(servers.into_iter(), 3));
     }
 }

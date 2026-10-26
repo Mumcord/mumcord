@@ -30,12 +30,18 @@ pub enum HistoryScope {
 #[specta::specta]
 pub fn history_load(
     engine: State<'_, Engine>,
+    server_id: ServerId,
     conversation: Conversation,
     before: Option<String>,
     limit: u32,
 ) -> ApiResult<Vec<ChatMessage>> {
     Ok(engine
-        .history_load(conversation.into(), before.as_deref(), limit)?
+        .history_load(
+            to_engine_server_id(server_id),
+            conversation.into(),
+            before.as_deref(),
+            limit,
+        )?
         .into_iter()
         .map(Into::into)
         .collect())
@@ -80,6 +86,7 @@ pub fn history_set_saving(
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, Type, Event)]
 #[serde(rename_all = "camelCase")]
 pub struct HistorySynced {
+    pub server_id: ServerId,
     pub channel_id: ChannelId,
     pub messages: Vec<ChatMessage>,
 }
@@ -88,6 +95,7 @@ pub struct HistorySynced {
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, Type, Event)]
 #[serde(rename_all = "camelCase")]
 pub struct HistorySyncStatus {
+    pub server_id: ServerId,
     pub channel_id: ChannelId,
     pub running: bool,
     pub added: u32,
@@ -99,6 +107,10 @@ pub struct HistorySyncStatus {
 /// Progress arrives as `historySyncStatus`, messages as `historySynced`.
 #[tauri::command]
 #[specta::specta]
-pub fn history_sync_request(engine: State<'_, Engine>, channel_id: ChannelId) -> ApiResult<()> {
-    Ok(engine.history_sync_request(channel_id, None)?)
+pub fn history_sync_request(
+    engine: State<'_, Engine>,
+    server_id: ServerId,
+    channel_id: ChannelId,
+) -> ApiResult<()> {
+    Ok(engine.history_sync_request(to_engine_server_id(server_id), channel_id, None)?)
 }

@@ -6,7 +6,7 @@ use specta::Type;
 use tauri::State;
 use tauri_specta::Event;
 
-use super::types::ApiResult;
+use super::types::{ApiResult, ServerId, to_engine_server_id};
 
 /// A track someone listens to. All text is plain text, never HTML. `positionMs` is the
 /// position when the event or answer was sent; while `playing`, advance it with the local
@@ -41,6 +41,7 @@ pub struct NowPlayingStatus {
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Type, Event)]
 #[serde(rename_all = "camelCase")]
 pub struct NowPlayingChanged {
+    pub server_id: ServerId,
     pub session: u32,
     pub track: Option<NowPlaying>,
 }
@@ -70,13 +71,16 @@ pub fn now_playing_status(engine: State<'_, Engine>) -> ApiResult<NowPlayingStat
     })
 }
 
-/// Cover of a person's track (or the own one) as a small `data:` URL, fetched and re-encoded
+/// Cover of a person's track on the server (or the own one) as a small `data:` URL, fetched and re-encoded
 /// by the engine; `null` when link previews are off (nothing is fetched then) or there is none.
 #[tauri::command]
 #[specta::specta]
 pub async fn now_playing_cover(
     engine: State<'_, Engine>,
+    server_id: ServerId,
     session: u32,
 ) -> ApiResult<Option<String>> {
-    Ok(engine.now_playing_cover(session).await)
+    Ok(engine
+        .now_playing_cover(to_engine_server_id(server_id), session)
+        .await)
 }

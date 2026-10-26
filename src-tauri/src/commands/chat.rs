@@ -6,7 +6,10 @@ use specta::Type;
 use tauri::State;
 use tauri_specta::Event;
 
-use super::types::{ApiError, ApiResult, ChannelId, Conversation, ErrorCode, SessionId};
+use super::types::{
+    ApiError, ApiResult, ChannelId, Conversation, ErrorCode, ServerId, SessionId,
+    to_engine_server_id,
+};
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, Type)]
 #[serde(rename_all = "camelCase")]
@@ -34,29 +37,39 @@ pub struct ChatMessage {
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, Type, Event)]
 #[serde(rename_all = "camelCase")]
 pub struct MessageReceived {
+    pub server_id: ServerId,
     pub message: ChatMessage,
 }
 
 /// Sends Mumble-compatible HTML (the UI converts Markdown and scales images).
-/// Fails with `messageTooLarge` above the server limit or `permissionDenied`.
+/// Waits briefly for the server's refusal (FR-2.47). Fails with `messageTooLarge` above the
+/// server limit or `permissionDenied` (the message is then not stored).
 #[tauri::command]
 #[specta::specta]
-pub fn send_channel_message(
+pub async fn send_channel_message(
     engine: State<'_, Engine>,
+    server_id: ServerId,
     channel_id: ChannelId,
     html: String,
 ) -> ApiResult<ChatMessage> {
-    Ok(engine.send_channel_message(channel_id, &html)?.into())
+    Ok(engine
+        .send_channel_message(to_engine_server_id(server_id), channel_id, &html)
+        .await?
+        .into())
 }
 
 #[tauri::command]
 #[specta::specta]
-pub fn send_private_message(
+pub async fn send_private_message(
     engine: State<'_, Engine>,
+    server_id: ServerId,
     session: SessionId,
     html: String,
 ) -> ApiResult<ChatMessage> {
-    Ok(engine.send_private_message(session, &html)?.into())
+    Ok(engine
+        .send_private_message(to_engine_server_id(server_id), session, &html)
+        .await?
+        .into())
 }
 
 impl From<ChatMessageView> for ChatMessage {

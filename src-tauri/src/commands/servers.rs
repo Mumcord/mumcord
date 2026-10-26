@@ -26,6 +26,14 @@ pub struct SavedServer {
     pub has_password: bool,
     /// "Save history" switch (FR-1.33); changed via `history_set_saving`.
     pub save_history: bool,
+    /// Connect this server when the app starts (FR-2.7).
+    pub always_connect_at_start: bool,
+    /// This was the voice server when Mumcord last quit; only it offers "Rejoin" (FR-2.3).
+    pub was_voice_server_at_quit: bool,
+    /// No toasts or desktop notifications from this server; badges stay (FR-2.10).
+    pub notifications_muted: bool,
+    /// Theme shown with this server; `null` uses the app theme (FR-2.17).
+    pub theme_id: Option<String>,
 }
 
 /// How a server edit treats the stored password.
@@ -69,6 +77,31 @@ pub struct MumbleLink {
 #[serde(rename_all = "camelCase")]
 pub struct DeepLinkOpened {
     pub link: MumbleLink,
+    pub outcome: LinkOutcome,
+}
+
+/// What Mumcord did with a `mumble://` link (FR-2.13). The UI brings the named server into
+/// view and, for `unknownServer`, offers to save it (FR-1.11).
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, Type)]
+#[serde(tag = "kind", rename_all = "camelCase")]
+pub enum LinkOutcome {
+    /// The server was connected already; a channel path was joined. Show it.
+    #[serde(rename_all = "camelCase")]
+    Shown { server_id: ServerId },
+    /// A connection to the saved server was started. Show it.
+    #[serde(rename_all = "camelCase")]
+    Connecting { server_id: ServerId },
+    /// No saved server matches; the UI opens the add-server dialog filled from the link.
+    UnknownServer,
+    /// The server is saved but the connection limit is reached (`serverLimitReached`).
+    #[serde(rename_all = "camelCase")]
+    LimitReached { server_id: ServerId },
+    /// Connecting failed for another reason.
+    #[serde(rename_all = "camelCase")]
+    Failed {
+        server_id: ServerId,
+        error: ApiError,
+    },
 }
 
 impl From<ServerView> for SavedServer {
@@ -81,6 +114,10 @@ impl From<ServerView> for SavedServer {
             username: v.username,
             has_password: v.has_password,
             save_history: v.save_history,
+            always_connect_at_start: v.always_connect_at_start,
+            was_voice_server_at_quit: v.was_voice_server_at_quit,
+            notifications_muted: v.notifications_muted,
+            theme_id: v.theme_id,
         }
     }
 }
@@ -138,6 +175,49 @@ pub async fn server_update(
 #[specta::specta]
 pub async fn server_remove(engine: State<'_, Engine>, id: ServerId) -> ApiResult<()> {
     Ok(engine.server_remove(to_engine_server_id(id)).await?)
+}
+
+/// Marks the server "Always connect at start" (FR-2.7). Errors: `serverLimitReached` when
+/// more servers would be marked than `maxConnectedServers` allows.
+#[tauri::command]
+#[specta::specta]
+pub async fn server_set_always_connect(
+    engine: State<'_, Engine>,
+    server_id: ServerId,
+    enabled: bool,
+) -> ApiResult<SavedServer> {
+    Ok(engine
+        .server_set_always_connect(to_engine_server_id(server_id), enabled)
+        .await?
+        .into())
+}
+
+/// Mutes or unmutes all notifications of the server, mentions included (FR-2.10).
+#[tauri::command]
+#[specta::specta]
+pub async fn server_set_notifications_muted(
+    engine: State<'_, Engine>,
+    server_id: ServerId,
+    muted: bool,
+) -> ApiResult<SavedServer> {
+    Ok(engine
+        .server_set_notifications_muted(to_engine_server_id(server_id), muted)
+        .await?
+        .into())
+}
+
+/// Sets the theme shown with the server; `null` goes back to the app theme (FR-2.17).
+#[tauri::command]
+#[specta::specta]
+pub async fn server_set_theme(
+    engine: State<'_, Engine>,
+    server_id: ServerId,
+    theme_id: Option<String>,
+) -> ApiResult<SavedServer> {
+    Ok(engine
+        .server_set_theme(to_engine_server_id(server_id), theme_id)
+        .await?
+        .into())
 }
 
 /// Sets the server-bar order; `ids` must contain every saved server exactly once.

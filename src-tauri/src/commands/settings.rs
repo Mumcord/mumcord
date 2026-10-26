@@ -1,11 +1,42 @@
 //! The single settings record (§7, FR-1.23, FR-1.27, FR-1.35, FR-1.36, FR-1.38).
 
+use std::collections::BTreeMap;
+
 use mumcord_engine::{Engine, diag, store};
 use serde::{Deserialize, Serialize};
 use specta::Type;
 use tauri::{AppHandle, State};
 
 use super::types::{ApiError, ApiResult, ErrorCode};
+
+/// Answer to a question asked once (direct connections, update check, AppImage menu entry).
+#[derive(Serialize, Deserialize, Clone, Copy, Debug, PartialEq, Eq, Type)]
+#[serde(rename_all = "camelCase")]
+pub enum Consent {
+    /// Not asked yet.
+    Unset,
+    Yes,
+    No,
+}
+
+/// A custom or imported colour theme (FR-2.14 – FR-2.16) with a dark and a light version. Each
+/// colour map holds the key colours (background, surface, text, accent, talking, warning, error)
+/// as `#rrggbb`; values that are not such a colour are dropped on save. Built-in presets live in
+/// the UI.
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, Type)]
+#[serde(rename_all = "camelCase")]
+pub struct ThemeRecord {
+    pub id: String,
+    pub name: String,
+    /// Single colour set of a theme saved before themes had two versions; the UI turns it into
+    /// both versions and sends it back empty.
+    pub colors: BTreeMap<String, String>,
+    pub colors_dark: BTreeMap<String, String>,
+    pub colors_light: BTreeMap<String, String>,
+    /// True while that version was generated from the other one and not edited by hand.
+    pub light_generated: bool,
+    pub dark_generated: bool,
+}
 
 #[derive(Serialize, Deserialize, Clone, Copy, Debug, PartialEq, Eq, Type)]
 #[serde(rename_all = "camelCase")]
@@ -201,6 +232,13 @@ pub struct SoundSettings {
     pub voice_join: bool,
     /// You disconnect from a server yourself (QA.19).
     pub hang_up: bool,
+    pub party_started: bool,
+    pub party_joined: bool,
+    pub party_left: bool,
+    pub share_started: bool,
+    pub share_stopped: bool,
+    pub viewer_started: bool,
+    pub viewer_stopped: bool,
 }
 
 /// Positional audio (FR-1.41): voices of people in the same game placed in 3D.
@@ -248,6 +286,13 @@ pub struct Settings {
     /// "Music quality" (default off; FR-1.24, QA.37): bitrate cap up to the server limit (max
     /// 510 kbit/s), music-tuned encoder, noise suppression and automatic volume bypassed.
     pub music_quality: bool,
+    /// Own bitrate cap in kbit/s (FR-2.64); `null` is "Max". Range 16 to the maximum from
+    /// `bitrate_max`.
+    pub bitrate_kbps: Option<u32>,
+    /// "Lower video sound while people talk" (default on, FR-2.76).
+    pub video_ducking: bool,
+    /// The lowered level while people talk, 10–80 % (default 30).
+    pub video_ducking_percent: u8,
     pub sounds: SoundSettings,
     /// "Notifications: In-app / Desktop / Both / Off" (default both, FR-1.48c).
     pub notifications: NotificationMode,
@@ -294,6 +339,27 @@ pub struct Settings {
     pub load_full_images: bool,
     /// Positional audio (FR-1.41). Off: no game positions are read.
     pub positional: PositionalSettings,
+    /// How many servers may be connected at once, 1 – 15 (default 5; FR-2.1).
+    pub max_connected_servers: u8,
+    /// Id of the app theme: a built-in preset or one of `customThemes` (FR-2.14).
+    pub app_theme_id: String,
+    pub custom_themes: Vec<ThemeRecord>,
+    /// Frosted glass and film grain (default on; FR-2.19).
+    pub visual_effects: bool,
+    /// Default off (FR-2.23).
+    pub hide_empty_channels: bool,
+    /// "Show talking people first" (default off; FR-2.23).
+    pub talking_first: bool,
+    /// Default on (FR-2.26).
+    pub show_weak_connection_icon: bool,
+    /// "Allow direct connections to other Mumcord users" (FR-2.36).
+    pub allow_direct_connections: Consent,
+    /// "Check for new versions" (FR-2.56).
+    pub update_check: Consent,
+    /// AppImage only: the one-time "Add Mumcord to the app menu" offer (FR-2.55).
+    pub appimage_menu_entry: Consent,
+    /// The one-time "window overlay removed" notice was shown (FR-2.33).
+    pub window_overlay_notice_shown: bool,
 }
 
 impl Settings {
@@ -325,6 +391,9 @@ impl Settings {
             echo_cancellation: s.echo_cancellation,
             auto_gain: s.auto_gain,
             music_quality: s.music_quality,
+            bitrate_kbps: s.bitrate_kbps,
+            video_ducking: s.video_ducking,
+            video_ducking_percent: s.video_ducking_percent,
             sounds: SoundSettings {
                 join_leave: s.sounds.user_joined || s.sounds.user_left,
                 self_mute: s.sounds.self_mute,
@@ -334,6 +403,13 @@ impl Settings {
                 mention_notify: s.sounds.mention_notify,
                 voice_join: s.sounds.voice_join,
                 hang_up: s.sounds.hang_up,
+                party_started: s.sounds.party_started,
+                party_joined: s.sounds.party_joined,
+                party_left: s.sounds.party_left,
+                share_started: s.sounds.share_started,
+                share_stopped: s.sounds.share_stopped,
+                viewer_started: s.sounds.viewer_started,
+                viewer_stopped: s.sounds.viewer_stopped,
             },
             notifications: s.notifications.into(),
             close_behaviour: match s.close_behaviour {
@@ -371,6 +447,29 @@ impl Settings {
                 min_distance: s.positional.min_distance,
                 max_distance: s.positional.max_distance,
             },
+            max_connected_servers: s.max_connected_servers,
+            app_theme_id: s.app_theme_id.clone(),
+            custom_themes: s
+                .custom_themes
+                .iter()
+                .map(|t| ThemeRecord {
+                    id: t.id.clone(),
+                    name: t.name.clone(),
+                    colors: t.colors.clone(),
+                    colors_dark: t.colors_dark.clone(),
+                    colors_light: t.colors_light.clone(),
+                    light_generated: t.light_generated,
+                    dark_generated: t.dark_generated,
+                })
+                .collect(),
+            visual_effects: s.visual_effects,
+            hide_empty_channels: s.hide_empty_channels,
+            talking_first: s.talking_first,
+            show_weak_connection_icon: s.show_weak_connection_icon,
+            allow_direct_connections: s.allow_direct_connections.into(),
+            update_check: s.update_check.into(),
+            appimage_menu_entry: s.appimage_menu_entry.into(),
+            window_overlay_notice_shown: s.window_overlay_notice_shown,
         }
     }
 
@@ -402,6 +501,12 @@ impl Settings {
         s.echo_cancellation = self.echo_cancellation;
         s.auto_gain = self.auto_gain;
         s.music_quality = self.music_quality;
+        s.bitrate_kbps = self.bitrate_kbps;
+        s.video_ducking = self.video_ducking;
+        s.video_ducking_percent = self.video_ducking_percent.clamp(
+            store::MIN_VIDEO_DUCKING_PERCENT,
+            store::MAX_VIDEO_DUCKING_PERCENT,
+        );
         s.sounds.user_joined = self.sounds.join_leave;
         s.sounds.user_left = self.sounds.join_leave;
         s.sounds.self_mute = self.sounds.self_mute;
@@ -411,6 +516,13 @@ impl Settings {
         s.sounds.mention_notify = self.sounds.mention_notify;
         s.sounds.voice_join = self.sounds.voice_join;
         s.sounds.hang_up = self.sounds.hang_up;
+        s.sounds.party_started = self.sounds.party_started;
+        s.sounds.party_joined = self.sounds.party_joined;
+        s.sounds.party_left = self.sounds.party_left;
+        s.sounds.share_started = self.sounds.share_started;
+        s.sounds.share_stopped = self.sounds.share_stopped;
+        s.sounds.viewer_started = self.sounds.viewer_started;
+        s.sounds.viewer_stopped = self.sounds.viewer_stopped;
         s.notifications = self.notifications.into();
         s.close_behaviour = match self.close_behaviour {
             CloseBehaviour::Ask => store::CloseBehaviour::Ask,
@@ -444,7 +556,68 @@ impl Settings {
         s.offer_full_images = self.offer_full_images;
         s.load_full_images = self.load_full_images;
         s.positional = positional_to_store(&self.positional);
+        s.max_connected_servers = self.max_connected_servers.clamp(
+            store::MIN_MAX_CONNECTED_SERVERS,
+            store::MAX_MAX_CONNECTED_SERVERS,
+        );
+        s.app_theme_id = if self.app_theme_id.trim().is_empty() {
+            store::DEFAULT_APP_THEME_ID.to_owned()
+        } else {
+            self.app_theme_id.clone()
+        };
+        s.custom_themes = self.custom_themes.iter().map(theme_to_store).collect();
+        s.visual_effects = self.visual_effects;
+        s.hide_empty_channels = self.hide_empty_channels;
+        s.talking_first = self.talking_first;
+        s.show_weak_connection_icon = self.show_weak_connection_icon;
+        s.allow_direct_connections = self.allow_direct_connections.into();
+        s.update_check = self.update_check.into();
+        s.appimage_menu_entry = self.appimage_menu_entry.into();
+        s.window_overlay_notice_shown = self.window_overlay_notice_shown;
         s
+    }
+}
+
+impl From<store::Consent> for Consent {
+    fn from(c: store::Consent) -> Self {
+        match c {
+            store::Consent::Unset => Self::Unset,
+            store::Consent::Yes => Self::Yes,
+            store::Consent::No => Self::No,
+        }
+    }
+}
+
+impl From<Consent> for store::Consent {
+    fn from(c: Consent) -> Self {
+        match c {
+            Consent::Unset => Self::Unset,
+            Consent::Yes => Self::Yes,
+            Consent::No => Self::No,
+        }
+    }
+}
+
+/// Keeps only real colour values: themes come from chat messages too (FR-2.16).
+fn theme_to_store(t: &ThemeRecord) -> store::Theme {
+    let is_hex_colour = |v: &str| {
+        v.len() == 7 && v.starts_with('#') && v[1..].bytes().all(|b| b.is_ascii_hexdigit())
+    };
+    let only_colours = |colours: &BTreeMap<String, String>| {
+        colours
+            .iter()
+            .filter(|(_, v)| is_hex_colour(v))
+            .map(|(k, v)| (k.clone(), v.to_ascii_lowercase()))
+            .collect()
+    };
+    store::Theme {
+        id: t.id.clone(),
+        name: t.name.clone(),
+        colors: only_colours(&t.colors),
+        colors_dark: only_colours(&t.colors_dark),
+        colors_light: only_colours(&t.colors_light),
+        light_generated: t.light_generated,
+        dark_generated: t.dark_generated,
     }
 }
 
@@ -495,6 +668,28 @@ pub fn settings_get(engine: State<'_, Engine>) -> ApiResult<Settings> {
     Ok(Settings::from_store(&engine.settings()?))
 }
 
+/// The one-time "window overlay is gone" notice is due for users who had it switched on.
+fn window_overlay_notice_due(settings: &store::Settings) -> bool {
+    settings.legacy_window_overlay_enabled && !settings.window_overlay_notice_shown
+}
+
+/// Whether the one-time notice about the removed window overlay still has to be shown.
+#[tauri::command]
+#[specta::specta]
+pub fn window_overlay_notice_pending(engine: State<'_, Engine>) -> ApiResult<bool> {
+    Ok(window_overlay_notice_due(&engine.settings()?))
+}
+
+/// Marks the notice as shown so it never comes back.
+#[tauri::command]
+#[specta::specta]
+pub async fn window_overlay_notice_dismiss(engine: State<'_, Engine>) -> ApiResult<()> {
+    let mut settings = engine.settings()?;
+    settings.window_overlay_notice_shown = true;
+    engine.update_settings(settings).await?;
+    Ok(())
+}
+
 /// Replaces the whole record and applies changes immediately; returns the stored record.
 #[tauri::command]
 #[specta::specta]
@@ -525,9 +720,8 @@ pub async fn settings_update(
     if mouse_changed || key != active_ptt_key(&previous) {
         configure_ptt(&app, key);
     }
-    // The overlay page shows its texts in the app language.
     if stored.language != previous.language {
-        crate::overlay::notify(&app);
+        crate::tray::language_changed(&app);
     }
     Ok(Settings::from_store(&stored))
 }
@@ -554,10 +748,11 @@ mod tests {
 
     #[test]
     fn round_trip_keeps_stage_1b_fields() {
-        let mut base = store::Settings::default();
-        base.overlay.enabled = true;
-        base.enabled_plugins = vec!["gtav".into()];
-        base.language = Some("de".into());
+        let base = store::Settings {
+            enabled_plugins: vec!["gtav".into()],
+            language: Some("de".into()),
+            ..Default::default()
+        };
 
         let mut ui = Settings::from_store(&base);
         assert_eq!(ui.language, Some(Language::De));
@@ -573,6 +768,7 @@ mod tests {
         ui.voice_threshold_dbfs = -25;
         ui.sounds.join_leave = false;
         ui.sounds.hang_up = false;
+        ui.sounds.share_stopped = false;
         ui.log_level = LogLevel::Debug;
         ui.input_device = Some(String::new());
         ui.send_default_avatar = false;
@@ -616,11 +812,11 @@ mod tests {
             ..ui.clone()
         };
         assert_eq!(too_loud.to_store(&base).voice_threshold_dbfs, 0);
-        assert!(stored.overlay.enabled);
         assert_eq!(stored.enabled_plugins, ["gtav"]);
         assert!(stored.wizard_completed);
         assert!(!stored.sounds.user_joined && !stored.sounds.user_left);
         assert!(!stored.sounds.hang_up && stored.sounds.voice_join);
+        assert!(!stored.sounds.share_stopped && stored.sounds.party_started);
         assert_eq!(stored.log_level, store::LogLevel::Debug);
         assert_eq!(
             stored.input_device, None,
@@ -688,5 +884,88 @@ mod tests {
         let stored = ui.to_store(&base);
         assert_eq!(stored.preview_cache_days, Some(1));
         assert_eq!(stored.history_max_age_days, Some(1));
+    }
+
+    #[test]
+    fn window_overlay_notice_is_due_only_for_legacy_users_who_have_not_seen_it() {
+        for (legacy, shown, due) in [
+            (false, false, false),
+            (false, true, false),
+            (true, false, true),
+            (true, true, false),
+        ] {
+            let settings = store::Settings {
+                legacy_window_overlay_enabled: legacy,
+                window_overlay_notice_shown: shown,
+                ..store::Settings::default()
+            };
+            assert_eq!(window_overlay_notice_due(&settings), due);
+        }
+    }
+
+    #[test]
+    fn epic_2_fields_round_trip_with_limits() {
+        let base = store::Settings::default();
+        let mut ui = Settings::from_store(&base);
+        assert_eq!(ui.max_connected_servers, 5);
+        assert_eq!(ui.app_theme_id, "mumcord-dark");
+        assert!(ui.visual_effects && ui.show_weak_connection_icon);
+        assert!(!ui.hide_empty_channels && !ui.talking_first);
+        assert_eq!(ui.allow_direct_connections, Consent::Unset);
+        assert_eq!(ui.update_check, Consent::Unset);
+
+        ui.max_connected_servers = 40;
+        ui.app_theme_id = " ".into();
+        ui.custom_themes = vec![ThemeRecord {
+            id: "custom-1".into(),
+            name: "Mine".into(),
+            colors: BTreeMap::new(),
+            colors_dark: BTreeMap::from([
+                ("accent".into(), "#FF8800".into()),
+                ("text".into(), "url(evil)".into()),
+            ]),
+            colors_light: BTreeMap::from([("text".into(), "red; x".into())]),
+            light_generated: true,
+            dark_generated: false,
+        }];
+        ui.talking_first = true;
+        ui.allow_direct_connections = Consent::No;
+        ui.update_check = Consent::Yes;
+        ui.window_overlay_notice_shown = true;
+        let stored = ui.to_store(&base);
+        assert_eq!(stored.max_connected_servers, 15);
+        assert_eq!(stored.app_theme_id, "mumcord-dark");
+        assert_eq!(
+            stored.custom_themes[0].colors_dark,
+            BTreeMap::from([("accent".into(), "#ff8800".into())])
+        );
+        assert!(stored.custom_themes[0].colors_light.is_empty());
+        assert!(stored.custom_themes[0].light_generated);
+
+        let back = Settings::from_store(&stored);
+        assert!(back.talking_first && back.window_overlay_notice_shown);
+        assert_eq!(back.allow_direct_connections, Consent::No);
+        assert_eq!(back.update_check, Consent::Yes);
+        assert_eq!(back.custom_themes[0].name, "Mine");
+
+        ui.max_connected_servers = 0;
+        assert_eq!(ui.to_store(&base).max_connected_servers, 1);
+    }
+
+    #[test]
+    fn video_ducking_round_trips_within_its_range() {
+        let base = store::Settings::default();
+        let mut ui = Settings::from_store(&base);
+        assert!(ui.video_ducking);
+        assert_eq!(ui.video_ducking_percent, 30);
+        ui.video_ducking = false;
+        ui.video_ducking_percent = 60;
+        let stored = ui.to_store(&base);
+        assert!(!stored.video_ducking);
+        assert_eq!(stored.video_ducking_percent, 60);
+        ui.video_ducking_percent = 5;
+        assert_eq!(ui.to_store(&base).video_ducking_percent, 10);
+        ui.video_ducking_percent = 90;
+        assert_eq!(ui.to_store(&base).video_ducking_percent, 80);
     }
 }

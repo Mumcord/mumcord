@@ -8,13 +8,14 @@ use tauri::State;
 use tauri_specta::Event;
 
 use super::chat::decode_image_data_url;
-use super::types::{ApiResult, SessionId};
+use super::types::{ApiResult, ServerId, SessionId, to_engine_server_id};
 
 /// Progress of a full image being fetched: `received` of `total` bytes of the image with this
 /// reference (the `data-mumcord-full` value of the thumbnail).
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, Type, Event)]
 #[serde(rename_all = "camelCase")]
 pub struct FullImageProgress {
+    pub server_id: ServerId,
     pub reference: String,
     pub received: u32,
     pub total: u32,
@@ -38,11 +39,30 @@ pub async fn full_image_keep(engine: State<'_, Engine>, data_url: String) -> Api
 #[specta::specta]
 pub async fn full_image_fetch(
     engine: State<'_, Engine>,
+    server_id: ServerId,
     reference: String,
     sender_session: Option<SessionId>,
     sender_cert_hash: Option<String>,
 ) -> ApiResult<Option<String>> {
     Ok(engine
-        .full_image_fetch(&reference, sender_session, sender_cert_hash)
+        .full_image_fetch(
+            to_engine_server_id(server_id),
+            &reference,
+            sender_session,
+            sender_cert_hash,
+        )
         .await)
+}
+
+/// Cancels a running `full_image_fetch` of the reference, e.g. when the image viewer closes
+/// (FR-2.38); the fetch then resolves with `null`. Does nothing when none runs.
+#[tauri::command]
+#[specta::specta]
+pub fn full_image_cancel(
+    engine: State<'_, Engine>,
+    server_id: ServerId,
+    reference: String,
+) -> ApiResult<()> {
+    engine.full_image_cancel(to_engine_server_id(server_id), &reference);
+    Ok(())
 }
