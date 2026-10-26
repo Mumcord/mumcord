@@ -285,15 +285,6 @@ checksum = "3ded4057c258ba199e2d26386d3af3780957ecaee6c4ef4041c6b4b8b97c0b06"
 
 [[package]]
 name = "block-buffer"
-version = "0.10.4"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "3078c7629b62d3f0439517fa394996acacc5cbc91c5a20d8c658e77abd503a71"
-dependencies = [
- "generic-array",
-]
-
-[[package]]
-name = "block-buffer"
 version = "0.12.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "d2f6c7dbe95a6ed67ad9f18e57daf93a2f034c524b99fd2b76d18fdfeb6660aa"
@@ -393,7 +384,7 @@ version = "0.5.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "e8cf2a2c93cd704877c0858356ed03480ff301ee950b43f1cbe4573b088bfa6c"
 dependencies = [
- "block-buffer 0.12.1",
+ "block-buffer",
  "crypto-common 0.2.2",
  "inout 0.2.5",
 ]
@@ -595,7 +586,6 @@ version = "0.10.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "9ed9a281f7bc9b7576e61468ba615a66a5c8cfdff42420a70aa82701a3b1e292"
 dependencies = [
- "block-buffer 0.10.4",
  "const-oid 0.9.6",
  "crypto-common 0.1.7",
 ]
@@ -606,7 +596,7 @@ version = "0.11.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "f1dd6dbb5841937940781866fa1281a1ff7bd3bf827091440879f9994983d5c2"
 dependencies = [
- "block-buffer 0.12.1",
+ "block-buffer",
  "const-oid 0.10.2",
  "crypto-common 0.2.2",
  "ctutils",
@@ -1108,7 +1098,7 @@ dependencies = [
  "protoc-bin-vendored",
  "rand 0.9.5",
  "rustls",
- "sha1 0.10.7",
+ "sha1",
  "thiserror",
  "tokio",
  "tokio-rustls",
@@ -1135,7 +1125,7 @@ dependencies = [
  "rusqlite",
  "serde",
  "serde_json",
- "sha1 0.10.7",
+ "sha1",
  "thiserror",
  "tracing",
 ]
@@ -1287,7 +1277,7 @@ dependencies = [
  "pkcs8 0.11.0",
  "rand 0.10.3",
  "rc2",
- "sha1 0.11.0",
+ "sha1",
  "sha2",
  "thiserror",
  "x509-parser",
@@ -2031,17 +2021,6 @@ dependencies = [
  "proc-macro2",
  "quote",
  "syn 3.0.9",
-]
-
-[[package]]
-name = "sha1"
-version = "0.10.7"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a978451301f4db1d02937a4ab3ccce137717b81826e79b7d49ffe3244a13c3b8"
-dependencies = [
- "cfg-if",
- "cpufeatures 0.2.17",
- "digest 0.10.7",
 ]
 
 [[package]]

@@ -62,7 +62,7 @@ protoc-bin-vendored = "3.3"
 # Crypto & certificates
 aes = "0.8"
 rand = "0.9"
-sha1 = "0.10"
+sha1 = "0.11"
 # Content hash of full-size images shared between Mumcord clients (FR-1.60c).
 sha2 = "0.10"
 rcgen = "0.14"
