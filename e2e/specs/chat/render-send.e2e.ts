@@ -28,7 +28,7 @@ describe("chat: rendering and sending (AC-1.13, AC-1.14, AC-1.43)", () => {
     process.env.PATH = `${opener.binDir}:${process.env.PATH ?? ""}`;
     await app.restart();
     await finishWizard();
-    await addFirstServer(64738);
+    await addFirstServer(testenv.ports.v15);
     await joinChannel("Lobby");
     await selectChannel("Lobby");
   });

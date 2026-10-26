@@ -35,7 +35,7 @@ describe("chat: message notifications (FR-1.48c)", () => {
     await testenv.up("v15");
     await app.restart({});
     await finishWizard();
-    await addFirstServer(64738);
+    await addFirstServer(testenv.ports.v15);
     await joinChannel("Lobby");
     raidBot = new ScriptBot({ name: "RaidBot" });
     await raidBot.connected();

@@ -42,7 +42,7 @@ describe("chat: friends (AC-1.54)", () => {
   before(async () => {
     await testenv.up("v15");
     await finishWizard();
-    await addFirstServer(64738);
+    await addFirstServer(testenv.ports.v15);
     await joinChannel("Lobby");
     await selectChannel("Lobby");
     friendBot = new ScriptBot({ name: "FriendBot", cert: CERT });
