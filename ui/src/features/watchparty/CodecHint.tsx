@@ -5,7 +5,7 @@
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { getApi, type LinuxDistro } from "../../api";
-import { installHint, isCodecFailure, supportsH264, type PlaybackFailure } from "./codecHint";
+import { installHint, isCodecFailure, supportsH264, type PlaybackFailure } from "./codecSupport";
 
 interface CodecHintProps {
   /** How the player failed, or `null` while it has not. */

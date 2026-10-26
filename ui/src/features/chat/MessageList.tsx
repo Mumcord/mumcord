@@ -49,7 +49,7 @@ import { FullImageBars } from "./FullImageBars";
 import { SendFailure } from "./SendFailure";
 import { findThemeCode } from "../../theme/shareCodec";
 import { ThemeCard } from "./ThemeCard";
-import { useSharedTheme, withoutThemeShare } from "./themeCard";
+import { useSharedTheme, withoutThemeShare } from "./sharedTheme";
 import { ImageViewer, type ViewerImage } from "./ImageViewer";
 import { LinkPreviews } from "./LinkPreviewCard";
 import { linkMentions, MENTION_CLASS, mentionPeopleOf } from "./mentionChips";

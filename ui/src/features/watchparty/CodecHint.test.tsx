@@ -3,7 +3,7 @@ import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from "vite
 import { createMockApi, setApi, type LinuxDistro, type MockApi } from "../../api";
 import { applyLanguage } from "../../i18n";
 import { CodecHint } from "./CodecHint";
-import type { PlaybackFailure } from "./codecHint";
+import type { PlaybackFailure } from "./codecSupport";
 
 let api: MockApi;
 

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { H264_TYPE, installHint, isCodecFailure, isTwitchPlayer, supportsH264 } from "./codecHint";
+import { H264_TYPE, installHint, isCodecFailure, isTwitchPlayer, supportsH264 } from "./codecSupport";
 
 describe("isCodecFailure", () => {
   it("counts YouTube's HTML5 error and any Twitch player", () => {

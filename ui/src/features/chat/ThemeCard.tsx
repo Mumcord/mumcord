@@ -10,7 +10,7 @@ import { saveServerTheme, useServers } from "../servers";
 import { displayName } from "../servers/format";
 import { useIsImported, useThemeActions } from "../settings/theme";
 import type { SharedTheme } from "../../theme/shareCodec";
-import { useSharedTheme } from "./themeCard";
+import { useSharedTheme } from "./sharedTheme";
 
 /** The version matching the Dark / Light / System setting, like the theme would show. */
 function MockUp({ theme }: { theme: SharedTheme }) {

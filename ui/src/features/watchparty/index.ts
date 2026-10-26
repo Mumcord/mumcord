@@ -10,4 +10,4 @@ export { videoIdOfLink } from "./youtube";
 export { WatchLinkDialog } from "./WatchLinkDialog";
 export { parseBridgeReport, playerOrigin, type BridgeCommand } from "./playerBridge";
 export { CodecHint } from "./CodecHint";
-export { isTwitchPlayer, type PlaybackFailure } from "./codecHint";
+export { isTwitchPlayer, type PlaybackFailure } from "./codecSupport";
