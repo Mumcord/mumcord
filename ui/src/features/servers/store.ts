@@ -200,7 +200,9 @@ function onConnection(serverId: number, next: ConnectionState): void {
       break;
     case "disconnected": {
       patch.transport = null;
-      patch.certPrompt = null;
+      // Another server's trust question stays: with two servers connecting at once, the first
+      // one failing must not leave the second waiting for an answer nobody can give.
+      if (state.certPrompt?.serverId === serverId) patch.certPrompt = null;
       const prevServer = prev.state === "disconnected" ? null : prev.serverId;
       const afterLoss = prev.state === "reconnecting";
       if (
