@@ -1,0 +1,93 @@
+name: Update AUR package
+
+# Publishes the new version to the Arch User Repository package `mumcord-bin` (FR-2.53).
+# Runs when the maintainer publishes a release (not at tag time: the release is a draft until
+# then, so its download links would not work yet). Skips cleanly without the AUR_SSH_KEY
+# secret. See RELEASING.md.
+on:
+  release:
+    types: [published]
+
+permissions:
+  contents: read
+
+jobs:
+  aur:
+    name: Push to AUR
+    # Pre-releases (1.2.3-rc.1) are not valid Arch versions and must not reach the AUR.
+    if: ${{ !github.event.release.prerelease && !contains(github.event.release.tag_name, '-') }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - name: Check for AUR key
+        id: key
+        env:
+          AUR_SSH_KEY: ${{ secrets.AUR_SSH_KEY }}
+        run: |
+          if [[ -z "$AUR_SSH_KEY" ]]; then
+            echo "::notice::AUR_SSH_KEY is not set; skipping the AUR update."
+            echo "present=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "present=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - uses: actions/checkout@v4
+        if: steps.key.outputs.present == 'true'
+        with:
+          ref: ${{ github.event.release.tag_name }}
+
+      - name: Fill in version and checksums
+        if: steps.key.outputs.present == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ github.event.release.tag_name }}
+        run: |
+          set -euo pipefail
+          version=${TAG#v}
+          gh release download "$TAG" --repo "$GITHUB_REPOSITORY" --pattern SHA256SUMS
+          sum() { awk -v f="$1" '$2 == f || $2 == "*" f { print $1 }' SHA256SUMS; }
+          amd64=$(sum "Mumcord_${version}_amd64.deb")
+          arm64=$(sum "Mumcord_${version}_arm64.deb")
+          license=$(sha256sum LICENSE | cut -d' ' -f1)
+          for s in "$amd64" "$arm64" "$license"; do
+            [[ "$s" =~ ^[0-9a-f]{64}$ ]] || { echo "::error::Missing checksum in SHA256SUMS."; exit 1; }
+          done
+          cp packaging/aur/PKGBUILD PKGBUILD
+          sed -i \
+            -e "s/^pkgver=.*/pkgver=$version/" \
+            -e "s/^pkgrel=.*/pkgrel=1/" \
+            -e "s/^sha256sums_x86_64=.*/sha256sums_x86_64=('$amd64')/" \
+            -e "s/^sha256sums_aarch64=.*/sha256sums_aarch64=('$arm64')/" \
+            -e "s/^sha256sums=.*/sha256sums=('$license')/" PKGBUILD
+
+      - name: Generate .SRCINFO
+        if: steps.key.outputs.present == 'true'
+        run: |
+          docker run --rm -v "$PWD:/pkg" -w /pkg archlinux:latest bash -c '
+            useradd -m builder && chown builder . PKGBUILD &&
+            su builder -c "makepkg --printsrcinfo > .SRCINFO"'
+
+      - name: Push to AUR
+        if: steps.key.outputs.present == 'true'
+        env:
+          AUR_SSH_KEY: ${{ secrets.AUR_SSH_KEY }}
+          TAG: ${{ github.event.release.tag_name }}
+        run: |
+          set -euo pipefail
+          install -d -m 700 ~/.ssh
+          printf '%s\n' "$AUR_SSH_KEY" > ~/.ssh/aur
+          chmod 600 ~/.ssh/aur
+          ssh-keyscan -t ed25519 aur.archlinux.org >> ~/.ssh/known_hosts
+          export GIT_SSH_COMMAND="ssh -i $HOME/.ssh/aur -o IdentitiesOnly=yes"
+          git clone ssh://aur@aur.archlinux.org/mumcord-bin.git aur
+          cp PKGBUILD .SRCINFO aur/
+          cd aur
+          git config user.name "Mumcord release"
+          git config user.email "noreply@users.noreply.github.com"
+          git add PKGBUILD .SRCINFO
+          if git diff --cached --quiet; then
+            echo "AUR package is already up to date."
+            exit 0
+          fi
+          git commit -m "Update to ${TAG#v}"
+          git push origin HEAD:master
