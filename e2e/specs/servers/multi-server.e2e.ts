@@ -75,6 +75,15 @@ async function serverMenu(name: string, item: string): Promise<void> {
   await row.click();
 }
 
+/**
+ * Quits like the user does, then starts again. `app.restart` alone ends the WebDriver session,
+ * which kills the app without quitting, and only a quit records the connected servers (FR-2.7).
+ */
+async function quitAndRestart(): Promise<void> {
+  await app.invoke("close_choice", { choice: "quit", remember: false });
+  await app.restart();
+}
+
 async function setLimit(limit: number): Promise<void> {
   const current = await app.invoke<SettingsLike>("settings_get");
   await app.invoke("settings_update", { settings: { ...current, maxConnectedServers: limit } });
@@ -249,18 +258,24 @@ describe("multiple servers (AC-2.1–2.10)", function () {
     await waitBarLabel(ALPHA, /voice server/);
     await setLimit(3);
     await serverMenu(CHARLIE, "Always connect at start");
-    await app.restart();
+    await quitAndRestart();
     await waitBarLabel(ALPHA, /\(connected\)/, 60_000);
     await waitBarLabel(BRAVO, /\(connected\)/, 60_000);
     await waitBarLabel(CHARLIE, /\(connected\)/, 60_000);
     expect(await barLabel(ALPHA)).not.toContain("voice server");
-    const text = await pageText();
-    expect(text).toContain("You were in Lobby last time");
+    // The prompt belongs to the server shown: A offers its channel, B offers none.
+    await show(ALPHA);
+    await browser.waitUntil(async () => (await pageText()).includes("You were in Lobby last time"), {
+      timeout: 15_000,
+      timeoutMsg: "no rejoin prompt for Lobby on A",
+    });
+    await show(BRAVO);
+    expect(await pageText()).not.toContain("last time");
   });
 
   it("AC-2.6: with limit 2 start connects C plus one of A/B; marking more servers than the limit is refused", async () => {
     await setLimit(2);
-    await app.restart();
+    await quitAndRestart();
     await waitBarLabel(CHARLIE, /\(connected\)/, 60_000);
     await sleep(5000);
     const connected = [(await barLabel(ALPHA)).includes("(connected)"), (await barLabel(BRAVO)).includes("(connected)")];
