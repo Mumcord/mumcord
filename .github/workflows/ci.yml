@@ -29,17 +29,17 @@ jobs:
       - uses: actions/checkout@v4
 
       # The runner's Ubuntu mirror is often very slow (30 kB/s: 40 min for 70 MB), so the downloaded
-      # packages are cached per runner image. The image's own package lists pin the versions, so a
-      # cache hit installs without touching the mirror. Only when that fails (new image, partial
-      # cache) apt downloads what is missing, and only when that fails too it refreshes the lists.
+      # packages are cached per runner image; apt then only downloads what changed. The cache is
+      # saved even when the step times out, so a slow first download is not lost.
       - name: apt cache key
         id: apt
         if: runner.os == 'Linux'
         run: echo "image=$ImageVersion" >> "$GITHUB_OUTPUT"
 
       - name: Restore apt packages
+        id: apt-cache
         if: runner.os == 'Linux'
-        uses: actions/cache@v4
+        uses: actions/cache/restore@v4
         with:
           path: ~/apt-archives
           key: apt-${{ matrix.os }}-${{ steps.apt.outputs.image }}
@@ -50,16 +50,24 @@ jobs:
         if: runner.os == 'Linux'
         timeout-minutes: 10
         run: |
-          pkgs=(libwebkit2gtk-4.1-dev libayatana-appindicator3-dev librsvg2-dev
-            libxdo-dev libasound2-dev libvpx-dev libpipewire-0.3-dev libclang-dev pkg-config cmake)
-          opts=(-y --no-install-recommends -o Dir::Cache::Archives="$HOME/apt-archives"
-            -o Acquire::Retries=3 -o Acquire::http::Timeout=20 -o Acquire::https::Timeout=20)
           mkdir -p ~/apt-archives/partial
-          sudo apt-get install "${opts[@]}" --no-download "${pkgs[@]}" \
-            || sudo apt-get install "${opts[@]}" "${pkgs[@]}" \
-            || { sudo apt-get update -o Acquire::Retries=3 && sudo apt-get install "${opts[@]}" "${pkgs[@]}"; }
-          # apt's lock and partial downloads are root-only and must not go into the cache.
-          sudo rm -rf ~/apt-archives/lock ~/apt-archives/partial
+          sudo apt-get update -o Acquire::Retries=3
+          sudo apt-get install -y --no-install-recommends -o Dir::Cache::Archives="$HOME/apt-archives" \
+            -o Acquire::Retries=3 -o Acquire::http::Timeout=20 -o Acquire::https::Timeout=20 \
+            libwebkit2gtk-4.1-dev libayatana-appindicator3-dev librsvg2-dev \
+            libxdo-dev libasound2-dev libvpx-dev libpipewire-0.3-dev libclang-dev pkg-config cmake
+
+      # apt's lock and partial downloads are root-only and must not go into the cache.
+      - name: Clean apt cache
+        if: always() && runner.os == 'Linux' && steps.apt-cache.outputs.cache-hit != 'true'
+        run: sudo rm -rf ~/apt-archives/lock ~/apt-archives/partial
+
+      - name: Save apt packages
+        if: always() && runner.os == 'Linux' && steps.apt-cache.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v4
+        with:
+          path: ~/apt-archives
+          key: apt-${{ matrix.os }}-${{ steps.apt.outputs.image }}
 
       # Screen sharing links a static libvpx on Windows and macOS (scripts/build-libvpx.sh,
       # RELEASING.md). It is cached: the key changes with the script and, on Windows, with the
