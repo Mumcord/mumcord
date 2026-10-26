@@ -1,0 +1,21 @@
+{
+  "label": "Partilha de ecrã de {{name}}",
+  "title": "Ecrã de {{name}}",
+  "beta": "Beta",
+  "picture": "Ecrã partilhado de {{name}}",
+  "someone": "Alguém",
+  "live": "Em direto",
+  "collapse": "Recolher",
+  "expand": "Expandir",
+  "fullscreen": "Ecrã inteiro",
+  "exitFullscreen": "Sair do ecrã inteiro",
+  "stop": "Parar de ver",
+  "starting": "A ligar ao ecrã de {{name}}…",
+  "paused": "{{name}} pausou a partilha.",
+  "full": "Esta partilha está cheia.",
+  "unreachable": "Não foi possível chegar a {{name}} diretamente. A rede dessa pessoa pode bloquear ligações diretas.",
+  "tooOld": "O Mumcord de {{name}} é demasiado antigo para partilhar o ecrã contigo.",
+  "consentOff": "Ver precisa de ligações diretas, e desativaste-as.",
+  "failed": "Não foi possível abrir o ecrã de {{name}}.",
+  "retry": "Tentar novamente"
+}

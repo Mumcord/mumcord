@@ -1,0 +1,21 @@
+{
+  "label": "{{name}} képernyőmegosztása",
+  "title": "{{name}} képernyője",
+  "beta": "Béta",
+  "picture": "{{name}} megosztott képernyője",
+  "someone": "Valaki",
+  "live": "Élő",
+  "collapse": "Összecsukás",
+  "expand": "Kibontás",
+  "fullscreen": "Teljes képernyő",
+  "exitFullscreen": "Kilépés a teljes képernyőből",
+  "stop": "Nézés befejezése",
+  "starting": "Kapcsolódás {{name}} képernyőjéhez…",
+  "paused": "{{name}} szüneteltette a megosztást.",
+  "full": "Ez a megosztás megtelt.",
+  "unreachable": "{{name}} közvetlenül nem érhető el. A hálózata talán blokkolja a közvetlen kapcsolatokat.",
+  "tooOld": "{{name}} Mumcordja túl régi ahhoz, hogy megossza veled a képernyőjét.",
+  "consentOff": "A nézéshez közvetlen kapcsolatok kellenek, és te kikapcsoltad őket.",
+  "failed": "{{name}} képernyőjét nem sikerült megnyitni.",
+  "retry": "Újrapróbálás"
+}

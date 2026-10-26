@@ -1,0 +1,21 @@
+{
+  "label": "Pantalla compartida de {{name}}",
+  "title": "Pantalla de {{name}}",
+  "beta": "Beta",
+  "picture": "Pantalla compartida de {{name}}",
+  "someone": "Alguien",
+  "live": "En directo",
+  "collapse": "Contraer",
+  "expand": "Expandir",
+  "fullscreen": "Pantalla completa",
+  "exitFullscreen": "Salir de pantalla completa",
+  "stop": "Dejar de mirar",
+  "starting": "Conectando a la pantalla de {{name}}…",
+  "paused": "{{name}} pausó la compartición.",
+  "full": "Esta compartición está llena.",
+  "unreachable": "No se pudo contactar directamente con {{name}}. Puede que su red bloquee las conexiones directas.",
+  "tooOld": "El Mumcord de {{name}} es demasiado antiguo para compartir su pantalla contigo.",
+  "consentOff": "Para mirar se necesitan conexiones directas, y las has desactivado.",
+  "failed": "No se pudo abrir la pantalla de {{name}}.",
+  "retry": "Reintentar"
+}

@@ -1,0 +1,21 @@
+{
+  "label": "Qsim tal-iskrin ta' {{name}}",
+  "title": "L-iskrin ta' {{name}}",
+  "beta": "Beta",
+  "picture": "L-iskrin maqsum ta' {{name}}",
+  "someone": "Xi ħadd",
+  "live": "Live",
+  "collapse": "Ikkollassa",
+  "expand": "Espandi",
+  "fullscreen": "Skrin sħiħ",
+  "exitFullscreen": "Oħroġ mill-iskrin sħiħ",
+  "stop": "Ieqaf ara",
+  "starting": "Qed jikkonnettja mal-iskrin ta' {{name}}…",
+  "paused": "{{name}} ippawża l-qsim.",
+  "full": "Dan il-qsim huwa mimli.",
+  "unreachable": "Ma stajniex nilħqu lil {{name}} direttament. In-netwerk tiegħu jista' jkun qed jimblokka konnessjonijiet diretti.",
+  "tooOld": "Il-Mumcord ta' {{name}} huwa qadim wisq biex jaqsam l-iskrin miegħek.",
+  "consentOff": "Biex tara jeħtieġ konnessjonijiet diretti, u int tfejthom.",
+  "failed": "L-iskrin ta' {{name}} ma setax jinfetaħ.",
+  "retry": "Erġa' pprova"
+}

@@ -1,0 +1,21 @@
+{
+  "label": "Näytön jako: {{name}}",
+  "title": "Näyttö: {{name}}",
+  "beta": "Beta",
+  "picture": "Jaettu näyttö: {{name}}",
+  "someone": "Joku",
+  "live": "Livenä",
+  "collapse": "Pienennä",
+  "expand": "Laajenna",
+  "fullscreen": "Koko näyttö",
+  "exitFullscreen": "Poistu koko näytöstä",
+  "stop": "Lopeta katsominen",
+  "starting": "Yhdistetään näyttöön: {{name}}…",
+  "paused": "{{name}} keskeytti jaon.",
+  "full": "Tämä jako on täynnä.",
+  "unreachable": "Henkilöön {{name}} ei saatu suoraa yhteyttä. Verkko saattaa estää suorat yhteydet.",
+  "tooOld": "Henkilön {{name}} Mumcord on liian vanha jakamaan näyttöä kanssasi.",
+  "consentOff": "Katsominen tarvitsee suoria yhteyksiä, ja olet poistanut ne käytöstä.",
+  "failed": "Näyttöä ({{name}}) ei voitu avata.",
+  "retry": "Yritä uudelleen"
+}

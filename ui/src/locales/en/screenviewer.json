@@ -1,0 +1,21 @@
+{
+  "label": "Screen share of {{name}}",
+  "title": "{{name}}'s screen",
+  "beta": "Beta",
+  "picture": "Shared screen of {{name}}",
+  "someone": "Someone",
+  "live": "Live",
+  "collapse": "Collapse",
+  "expand": "Expand",
+  "fullscreen": "Full screen",
+  "exitFullscreen": "Leave full screen",
+  "stop": "Stop watching",
+  "starting": "Connecting to {{name}}'s screen…",
+  "paused": "{{name}} paused the share.",
+  "full": "This share is full.",
+  "unreachable": "Couldn't reach {{name}} directly. Their network may block direct connections.",
+  "tooOld": "{{name}}'s Mumcord is too old to share their screen with you.",
+  "consentOff": "Watching needs direct connections, and you turned them off.",
+  "failed": "{{name}}'s screen could not be opened.",
+  "retry": "Try again"
+}

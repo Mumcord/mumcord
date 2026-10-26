@@ -1,0 +1,21 @@
+{
+  "label": "Skærmdeling fra {{name}}",
+  "title": "{{name}}s skærm",
+  "beta": "Beta",
+  "picture": "Delt skærm fra {{name}}",
+  "someone": "Nogen",
+  "live": "Live",
+  "collapse": "Fold sammen",
+  "expand": "Fold ud",
+  "fullscreen": "Fuld skærm",
+  "exitFullscreen": "Afslut fuld skærm",
+  "stop": "Stop med at se",
+  "starting": "Forbinder til {{name}}s skærm…",
+  "paused": "{{name}} satte delingen på pause.",
+  "full": "Denne deling er fuld.",
+  "unreachable": "Kunne ikke nå {{name}} direkte. Netværket blokerer måske direkte forbindelser.",
+  "tooOld": "{{name}}s Mumcord er for gammel til at dele skærmen med dig.",
+  "consentOff": "At se med kræver direkte forbindelser, og du har slået dem fra.",
+  "failed": "{{name}}s skærm kunne ikke åbnes.",
+  "retry": "Prøv igen"
+}

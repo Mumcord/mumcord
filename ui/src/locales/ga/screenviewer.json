@@ -1,0 +1,21 @@
+{
+  "label": "Comhroinnt scáileáin ó {{name}}",
+  "title": "Scáileán {{name}}",
+  "beta": "Béite",
+  "picture": "Scáileán comhroinnte ó {{name}}",
+  "someone": "Duine éigin",
+  "live": "Beo",
+  "collapse": "Laghdaigh",
+  "expand": "Leathnaigh",
+  "fullscreen": "Lánscáileán",
+  "exitFullscreen": "Fág an lánscáileán",
+  "stop": "Stop ag féachaint",
+  "starting": "Ag ceangal le scáileán {{name}}…",
+  "paused": "Chuir {{name}} an chomhroinnt ar sos.",
+  "full": "Tá an chomhroinnt seo lán.",
+  "unreachable": "Níorbh fhéidir {{name}} a bhaint amach go díreach. B’fhéidir go gcuireann a líonra bac ar cheangail dhíreacha.",
+  "tooOld": "Tá Mumcord {{name}} ró-shean chun a scáileán a chomhroinnt leat.",
+  "consentOff": "Teastaíonn ceangail dhíreacha chun féachaint, agus chas tú as iad.",
+  "failed": "Níorbh fhéidir scáileán {{name}} a oscailt.",
+  "retry": "Bain triail eile as"
+}

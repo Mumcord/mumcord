@@ -1,0 +1,21 @@
+{
+  "label": "Udostępniony ekran: {{name}}",
+  "title": "Ekran: {{name}}",
+  "beta": "Beta",
+  "picture": "Udostępniony ekran: {{name}}",
+  "someone": "Ktoś",
+  "live": "Na żywo",
+  "collapse": "Zwiń",
+  "expand": "Rozwiń",
+  "fullscreen": "Pełny ekran",
+  "exitFullscreen": "Zamknij pełny ekran",
+  "stop": "Przestań oglądać",
+  "starting": "Łączenie z ekranem: {{name}}…",
+  "paused": "{{name}} wstrzymuje udostępnianie.",
+  "full": "To udostępnianie jest pełne.",
+  "unreachable": "Nie można połączyć się bezpośrednio z {{name}}. Sieć może blokować połączenia bezpośrednie.",
+  "tooOld": "Mumcord użytkownika {{name}} jest za stary, aby udostępnić ci ekran.",
+  "consentOff": "Oglądanie wymaga połączeń bezpośrednich, a są one wyłączone.",
+  "failed": "Nie udało się otworzyć ekranu: {{name}}.",
+  "retry": "Spróbuj ponownie"
+}

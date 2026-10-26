@@ -1,0 +1,21 @@
+{
+  "label": "Condivisione schermo di {{name}}",
+  "title": "Schermo di {{name}}",
+  "beta": "Beta",
+  "picture": "Schermo condiviso di {{name}}",
+  "someone": "Qualcuno",
+  "live": "Live",
+  "collapse": "Comprimi",
+  "expand": "Espandi",
+  "fullscreen": "Schermo intero",
+  "exitFullscreen": "Esci da schermo intero",
+  "stop": "Smetti di guardare",
+  "starting": "Connessione allo schermo di {{name}}…",
+  "paused": "{{name}} ha messo in pausa la condivisione.",
+  "full": "Questa condivisione è piena.",
+  "unreachable": "Impossibile raggiungere {{name}} direttamente. La sua rete potrebbe bloccare le connessioni dirette.",
+  "tooOld": "Il Mumcord di {{name}} è troppo vecchio per condividere lo schermo con te.",
+  "consentOff": "Per guardare servono connessioni dirette, e le hai disattivate.",
+  "failed": "Impossibile aprire lo schermo di {{name}}.",
+  "retry": "Riprova"
+}

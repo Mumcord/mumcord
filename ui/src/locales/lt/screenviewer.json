@@ -1,0 +1,21 @@
+{
+  "label": "{{name}} ekrano bendrinimas",
+  "title": "{{name}} ekranas",
+  "beta": "Beta",
+  "picture": "{{name}} bendrinamas ekranas",
+  "someone": "Kažkas",
+  "live": "Tiesiogiai",
+  "collapse": "Sutraukti",
+  "expand": "Išskleisti",
+  "fullscreen": "Visas ekranas",
+  "exitFullscreen": "Išeiti iš viso ekrano",
+  "stop": "Baigti žiūrėti",
+  "starting": "Jungiamasi prie {{name}} ekrano…",
+  "paused": "{{name}} pristabdė bendrinimą.",
+  "full": "Šis bendrinimas pilnas.",
+  "unreachable": "Nepavyko tiesiogiai pasiekti {{name}}. Tinklas gali blokuoti tiesioginius ryšius.",
+  "tooOld": "{{name}} Mumcord per senas, kad galėtų su tavimi bendrinti ekraną.",
+  "consentOff": "Žiūrėjimui reikia tiesioginių ryšių, o tu juos išjungei.",
+  "failed": "Nepavyko atidaryti {{name}} ekrano.",
+  "retry": "Bandyti dar kartą"
+}

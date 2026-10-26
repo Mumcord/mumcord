@@ -1,0 +1,118 @@
+/* Sharer UI: Live marker, share button and controls (FR-2.42–2.45). */
+.live-badge {
+  display: inline-flex;
+  flex: none;
+  margin-left: var(--space-1);
+  padding: 0 var(--space-1);
+  border: 1px solid currentcolor;
+  border-radius: var(--radius-sm);
+  color: var(--color-danger);
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  line-height: 1.4;
+  text-transform: uppercase;
+  vertical-align: middle;
+}
+
+.share-panel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  padding: var(--space-2) var(--space-3) 0;
+}
+
+.share-button {
+  display: inline-flex;
+  gap: var(--space-1);
+  align-items: center;
+  justify-content: center;
+}
+
+.share-panel > .share-button {
+  width: 100%;
+}
+
+.share-button[aria-disabled="true"] {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.share-button__error {
+  margin: 0;
+  color: var(--color-danger);
+  font-size: 0.8125rem;
+}
+
+.sharer-controls {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  padding: var(--space-2);
+  border-radius: var(--radius-md);
+  background: color-mix(in srgb, var(--color-danger) 10%, transparent);
+}
+
+.sharer-controls p {
+  margin: 0;
+}
+
+.sharer-controls__status {
+  font-weight: 600;
+}
+
+.sharer-controls__status .live-badge {
+  margin-left: 0;
+}
+
+.sharer-controls__viewers,
+.sharer-controls__hint {
+  font-size: 0.8125rem;
+}
+
+.sharer-controls__viewers[data-full] {
+  font-weight: 600;
+}
+
+.sharer-controls__buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1);
+}
+
+/* Bar above the user panel while sharing (FR-2.71). */
+.sharing-bar {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  background: var(--color-danger);
+  color: var(--color-on-accent);
+  font-size: 0.8125rem;
+  font-weight: 600;
+}
+
+.sharing-bar__text {
+  flex: 1;
+  min-width: 0;
+}
+
+.sharing-bar__viewers {
+  flex: none;
+  font-weight: 400;
+}
+
+.sharing-bar__end {
+  flex: none;
+  padding: 0 var(--space-2);
+  border: 1px solid currentcolor;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+
+.sharing-bar__end:hover {
+  background: color-mix(in srgb, currentcolor 20%, transparent);
+}
