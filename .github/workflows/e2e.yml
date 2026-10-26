@@ -33,18 +33,22 @@ jobs:
       - name: Install npm dependencies
         run: npm ci
 
+      # A cache entry is never re-saved under the same key, so the week in the key makes the
+      # target dir follow the code (one save per week) instead of drifting further from it.
+      # The month scopes the image layer cache (apt, rustup, tauri-driver): rebuilt only when
+      # e2e/Dockerfile changes, and once a month so the toolchain and packages do not go stale.
+      - name: Cache keys
+        id: keys
+        run: |
+          echo "week=$(date -u +%G-%V)" >> "$GITHUB_OUTPUT"
+          echo "month=$(date -u +%Y-%m)" >> "$GITHUB_OUTPUT"
+
       # Cargo registry + target dir of the in-container build.
       - uses: actions/cache@v4
         with:
           path: ${{ env.MUMCORD_E2E_CACHE }}
-          key: e2e-${{ hashFiles('Cargo.lock', 'e2e/Dockerfile') }}
+          key: e2e-${{ hashFiles('Cargo.lock', 'e2e/Dockerfile') }}-${{ steps.keys.outputs.week }}
           restore-keys: e2e-
-
-      # Layer cache for the image (apt, rustup, tauri-driver): rebuilt only when e2e/Dockerfile
-      # changes, and once a month so the toolchain and packages do not go stale.
-      - name: Image cache scope
-        id: image
-        run: echo "scope=e2e-image-$(date -u +%Y-%m)" >> "$GITHUB_OUTPUT"
 
       - uses: docker/setup-buildx-action@v3
 
@@ -54,8 +58,8 @@ jobs:
           context: e2e
           tags: mumcord-e2e
           load: true
-          cache-from: type=gha,scope=${{ steps.image.outputs.scope }}
-          cache-to: type=gha,mode=max,scope=${{ steps.image.outputs.scope }}
+          cache-from: type=gha,scope=e2e-image-${{ steps.keys.outputs.month }}
+          cache-to: type=gha,mode=max,scope=e2e-image-${{ steps.keys.outputs.month }}
 
       # No debug info and no incremental data: faster links and a smaller target cache.
       - name: Build image and binaries
