@@ -18,10 +18,11 @@ use tokio_rustls::client::TlsStream;
 use crate::error::{CommandError, ConnectError, PermissionDenied, ProtocolError, RejectReason};
 use crate::framing::{self, Frame, MessageType};
 use crate::proto;
-use crate::ratelimit::{self, LeakyBucket};
+use crate::ratelimit::{self, LeakyBucket, Limit};
 use crate::state::{Channel, CryptSetup, ServerInfo, ServerState, User, UserChange};
 use crate::tls::{self, CertVerifier, ClientIdentity};
 use crate::version::MumbleVersion;
+use crate::voice::CryptStats;
 
 /// Interval of TCP keep-alive pings; Mumble's own client uses the same.
 const PING_INTERVAL: Duration = Duration::from_secs(5);
@@ -35,6 +36,8 @@ pub struct ConnectConfig {
     pub username: String,
     /// Server or user password.
     pub password: Option<String>,
+    /// Access tokens (channel passwords) the server matches against `#token` ACL groups.
+    pub tokens: Vec<String>,
     /// Client certificate; without one the user cannot register.
     pub identity: Option<ClientIdentity>,
     /// Trust decision for the server certificate (see [`crate::tls::ServerCert`]).
@@ -137,6 +140,9 @@ pub enum Event {
     UdpTunnel(Bytes),
     /// Plugin data from another client (server 1.4+). `data` is untrusted and unvalidated.
     PluginData(PluginData),
+    /// Connection figures of a person, the answer to [`Handle::request_user_stats`]. Which
+    /// fields are set depends on the own permissions; text fields are untrusted.
+    UserStats(Box<proto::UserStats>),
     /// Final event; the handle stops working afterwards.
     Disconnected(DisconnectReason),
 }
@@ -158,6 +164,7 @@ struct Shared {
     shutdown: Notify,
     reason: Mutex<Option<DisconnectReason>>,
     connected: AtomicBool,
+    ping: Mutex<PingReport>,
 }
 
 impl Shared {
@@ -167,6 +174,10 @@ impl Shared {
             .unwrap_or_else(|poisoned| poisoned.into_inner())
     }
 
+    fn ping(&self) -> MutexGuard<'_, PingReport> {
+        self.ping.lock().unwrap_or_else(|p| p.into_inner())
+    }
+
     /// Records the first reason for ending the connection and wakes the reader.
     fn shut_down(&self, reason: DisconnectReason) {
         let mut slot = self.reason.lock().unwrap_or_else(|p| p.into_inner());
@@ -174,6 +185,76 @@ impl Shared {
             *slot = Some(reason);
         }
         self.shutdown.notify_one();
+    }
+}
+
+/// Own ping figures, sent along with every keep-alive ping. The server keeps only what each
+/// client reports about itself and hands that out in UserStats, so without them everyone else
+/// sees no ping for this user (FR-2.25).
+struct PingReport {
+    started: Instant,
+    tcp_packets: u32,
+    tcp_avg_ms: f64,
+    /// Sum of squared deviations from the mean (Welford), for the variance.
+    tcp_m2: f64,
+    udp: Option<UdpPing>,
+    /// Voice packets this client received, which the server shows others as "from client".
+    crypt: CryptStats,
+}
+
+/// Smoothed UDP ping of the voice link, which runs apart from the control connection.
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub struct UdpPing {
+    pub avg_ms: f32,
+    /// UDP packets received so far.
+    pub packets: u32,
+}
+
+impl Default for PingReport {
+    fn default() -> Self {
+        Self {
+            started: Instant::now(),
+            tcp_packets: 0,
+            tcp_avg_ms: 0.0,
+            tcp_m2: 0.0,
+            udp: None,
+            crypt: CryptStats::default(),
+        }
+    }
+}
+
+impl PingReport {
+    /// Microseconds like Mumble: a local server answers well below one millisecond.
+    fn now_us(&self) -> u64 {
+        self.started.elapsed().as_micros() as u64
+    }
+
+    fn on_reply(&mut self, sent_us: u64) {
+        let Some(rtt_us) = self.now_us().checked_sub(sent_us) else {
+            return;
+        };
+        let rtt_ms = rtt_us as f64 / 1000.0;
+        self.tcp_packets = self.tcp_packets.saturating_add(1);
+        let delta = rtt_ms - self.tcp_avg_ms;
+        self.tcp_avg_ms += delta / f64::from(self.tcp_packets);
+        self.tcp_m2 += delta * (rtt_ms - self.tcp_avg_ms);
+    }
+
+    fn message(&self) -> proto::Ping {
+        let tcp = self.tcp_packets > 0;
+        proto::Ping {
+            timestamp: Some(self.now_us()),
+            tcp_packets: tcp.then_some(self.tcp_packets),
+            tcp_ping_avg: tcp.then_some(self.tcp_avg_ms as f32),
+            tcp_ping_var: tcp.then(|| (self.tcp_m2 / f64::from(self.tcp_packets)) as f32),
+            udp_packets: self.udp.map(|u| u.packets),
+            udp_ping_avg: self.udp.map(|u| u.avg_ms),
+            good: Some(self.crypt.good),
+            late: Some(self.crypt.late),
+            lost: Some(self.crypt.lost),
+            resync: Some(self.crypt.resync),
+            ..Default::default()
+        }
     }
 }
 
@@ -189,13 +270,27 @@ pub struct Handle {
 
 /// Connects, logs in and returns once the server has sent `ServerSync`.
 pub async fn connect(config: ConnectConfig) -> Result<Connection, ConnectError> {
+    connect_with_progress(config, None).await
+}
+
+/// Called with the number of channels received so far while the initial tree streams in.
+pub type SyncProgress = Arc<dyn Fn(usize) + Send + Sync>;
+
+/// Like [`connect`], and reports the channel count while waiting for `ServerSync`.
+pub async fn connect_with_progress(
+    config: ConnectConfig,
+    progress: Option<SyncProgress>,
+) -> Result<Connection, ConnectError> {
     let limit = config.login_timeout;
-    tokio::time::timeout(limit, connect_inner(config))
+    tokio::time::timeout(limit, connect_inner(config, progress))
         .await
         .map_err(|_| ConnectError::Timeout)?
 }
 
-async fn connect_inner(config: ConnectConfig) -> Result<Connection, ConnectError> {
+async fn connect_inner(
+    config: ConnectConfig,
+    progress: Option<SyncProgress>,
+) -> Result<Connection, ConnectError> {
     let server_name = ServerName::try_from(config.host.clone())
         .map_err(|_| ConnectError::InvalidAddress(config.host.clone()))?;
     let (tls_config, seen_cert) = tls::client_config(config.identity, config.verify_cert)?;
@@ -230,7 +325,7 @@ async fn connect_inner(config: ConnectConfig) -> Result<Connection, ConnectError
     // so the paced write loop would let the unlimited Authenticate overtake it; both are
     // therefore written here, in order, before the write loop starts.
     let mut handshake = BytesMut::new();
-    for frame in handshake_frames(config.username, config.password) {
+    for frame in handshake_frames(config.username, config.password, config.tokens) {
         frame.encode(&mut handshake);
     }
     async {
@@ -247,6 +342,7 @@ async fn connect_inner(config: ConnectConfig) -> Result<Connection, ConnectError
         shutdown: Notify::new(),
         reason: Mutex::new(None),
         connected: AtomicBool::new(true),
+        ping: Mutex::default(),
     });
     tokio::spawn(write_loop(writer, rx, shared.clone()));
     let handle = Handle {
@@ -260,6 +356,7 @@ async fn connect_inner(config: ConnectConfig) -> Result<Connection, ConnectError
         synced: false,
     };
     let mut buf = BytesMut::with_capacity(16 * 1024);
+    let mut reported = 0;
     loop {
         if reader
             .read_buf(&mut buf)
@@ -272,7 +369,15 @@ async fn connect_inner(config: ConnectConfig) -> Result<Connection, ConnectError
         }
         while let Some(frame) = framing::decode(&mut buf).inspect_err(|_| handle.close())? {
             match dispatcher.handle(frame) {
-                Control::Continue => {}
+                Control::Continue => {
+                    if let Some(progress) = &progress {
+                        let count = handle.with_state(|s| s.channels.len());
+                        if count != reported {
+                            reported = count;
+                            progress(count);
+                        }
+                    }
+                }
                 Control::Synced => {
                     tokio::spawn(read_loop(reader, buf, dispatcher, handle.tx.downgrade()));
                     return Ok(Connection { handle, events });
@@ -291,7 +396,7 @@ async fn connect_inner(config: ConnectConfig) -> Result<Connection, ConnectError
 }
 
 /// The login messages in the order the server must receive them: Version, then Authenticate.
-fn handshake_frames(username: String, password: Option<String>) -> [Frame; 2] {
+fn handshake_frames(username: String, password: Option<String>, tokens: Vec<String>) -> [Frame; 2] {
     let version = proto::Version {
         version_v1: Some(MumbleVersion::CLIENT.to_v1()),
         version_v2: Some(MumbleVersion::CLIENT.to_v2()),
@@ -302,6 +407,7 @@ fn handshake_frames(username: String, password: Option<String>) -> [Frame; 2] {
     let auth = proto::Authenticate {
         username: Some(username),
         password,
+        tokens,
         opus: Some(true),
         ..Default::default()
     };
@@ -311,28 +417,43 @@ fn handshake_frames(username: String, password: Option<String>) -> [Frame; 2] {
     ]
 }
 
+fn access_tokens_message(tokens: Vec<String>) -> proto::Authenticate {
+    proto::Authenticate {
+        tokens,
+        ..Default::default()
+    }
+}
+
 async fn write_loop(
     mut writer: WriteHalf<TlsStream<TcpStream>>,
     mut rx: mpsc::UnboundedReceiver<Outgoing>,
     shared: Arc<Shared>,
 ) {
-    let started = Instant::now();
     let mut ping =
         tokio::time::interval_at(tokio::time::Instant::now() + PING_INTERVAL, PING_INTERVAL);
     let mut buf = BytesMut::new();
-    let mut bucket = LeakyBucket::new(tokio::time::Instant::now());
-    // Rate-limited frames wait here in order; everything else (voice, pings) goes out at once.
-    let mut paced: VecDeque<Frame> = VecDeque::new();
+    let start = tokio::time::Instant::now();
+    // Rate-limited frames wait here in order, one queue per server bucket; everything else
+    // (voice, pings) goes out at once.
+    let mut messages = Paced::new(Limit::Messages, start);
+    let mut plugin_data = Paced::new(Limit::PluginData, start);
     loop {
         let now = tokio::time::Instant::now();
-        let paced_ready_at = (!paced.is_empty()).then(|| now + bucket.wait_time(now));
+        let messages_ready_at = messages.ready_at(now);
+        let plugin_data_ready_at = plugin_data.ready_at(now);
         let frame = tokio::select! {
             msg = rx.recv() => match msg {
-                Some(Outgoing::Frame(frame)) if ratelimit::is_limited(frame.kind) => {
-                    paced.push_back(frame);
-                    continue;
-                }
-                Some(Outgoing::Frame(frame)) => frame,
+                Some(Outgoing::Frame(frame)) => match ratelimit::limit_of(frame.kind) {
+                    Some(Limit::Messages) => {
+                        messages.queue.push_back(frame);
+                        continue;
+                    }
+                    Some(Limit::PluginData) => {
+                        plugin_data.queue.push_back(frame);
+                        continue;
+                    }
+                    None => frame,
+                },
                 Some(Outgoing::Disconnect) | None => {
                     // Best effort close_notify; the connection is going away either way.
                     let _ = writer.shutdown().await;
@@ -340,19 +461,16 @@ async fn write_loop(
                     return;
                 }
             },
-            () = sleep_until_some(paced_ready_at) => {
-                bucket.take(tokio::time::Instant::now());
-                match paced.pop_front() {
-                    Some(frame) => frame,
-                    None => continue,
-                }
-            }
+            () = sleep_until_some(messages_ready_at) => match messages.pop() {
+                Some(frame) => frame,
+                None => continue,
+            },
+            () = sleep_until_some(plugin_data_ready_at) => match plugin_data.pop() {
+                Some(frame) => frame,
+                None => continue,
+            },
             _ = ping.tick() => {
-                let ping = proto::Ping {
-                    timestamp: Some(started.elapsed().as_millis() as u64),
-                    ..Default::default()
-                };
-                Frame::from_message(MessageType::Ping, &ping)
+                Frame::from_message(MessageType::Ping, &shared.ping().message())
             }
         };
         buf.clear();
@@ -367,6 +485,32 @@ async fn write_loop(
             shared.shut_down(DisconnectReason::Error(err.to_string()));
             return;
         }
+    }
+}
+
+/// Frames that count against one of the server's rate limits, sent no faster than it allows.
+struct Paced {
+    bucket: LeakyBucket,
+    queue: VecDeque<Frame>,
+}
+
+impl Paced {
+    fn new(limit: Limit, now: tokio::time::Instant) -> Self {
+        Self {
+            bucket: LeakyBucket::new(limit, now),
+            queue: VecDeque::new(),
+        }
+    }
+
+    /// When the next queued frame may go, or `None` with nothing queued.
+    fn ready_at(&self, now: tokio::time::Instant) -> Option<tokio::time::Instant> {
+        (!self.queue.is_empty()).then(|| now + self.bucket.wait_time(now))
+    }
+
+    fn pop(&mut self) -> Option<Frame> {
+        let frame = self.queue.pop_front()?;
+        self.bucket.take(tokio::time::Instant::now());
+        Some(frame)
     }
 }
 
@@ -559,6 +703,10 @@ impl Dispatcher {
                     data: m.data.map(Bytes::from).unwrap_or_default(),
                 }));
             }
+            MessageType::UserStats => {
+                let m: proto::UserStats = decode("UserStats", payload)?;
+                self.emit(Event::UserStats(Box::new(m)));
+            }
             MessageType::PermissionDenied => {
                 let m: proto::PermissionDenied = decode("PermissionDenied", payload)?;
                 self.emit(Event::PermissionDenied(m.into()));
@@ -596,7 +744,12 @@ impl Dispatcher {
                 };
                 self.emit_synced(Event::ServerConfigUpdated(info));
             }
-            // Pings are only keep-alive here; the rest is not used by this client.
+            MessageType::Ping => {
+                let m: proto::Ping = decode("Ping", payload)?;
+                if let Some(sent) = m.timestamp {
+                    self.shared.ping().on_reply(sent);
+                }
+            }
             _ => tracing::trace!(?kind, "ignoring control message"),
         }
         Ok(Control::Continue)
@@ -763,7 +916,8 @@ impl Handle {
     }
 
     /// Sends plugin data to the given sessions (server 1.4+). The server drops data over
-    /// [`PLUGIN_DATA_MAX`] bytes and rate-limits senders, so keep it small and infrequent.
+    /// [`PLUGIN_DATA_MAX`] bytes and rate-limits senders; sends are paced below that limit, so a
+    /// burst is delayed rather than lost, but keep it small and infrequent.
     pub fn send_plugin_data(
         &self,
         receivers: &[u32],
@@ -793,6 +947,35 @@ impl Handle {
             channel_description: channel_descriptions.to_vec(),
         };
         self.send(Frame::from_message(MessageType::RequestBlob, &m))
+    }
+
+    /// Asks for a person's connection figures; `stats_only` leaves out certificates and client
+    /// version (the server sends those only to admins and for the own session anyway).
+    pub fn request_user_stats(&self, session: u32, stats_only: bool) -> Result<(), CommandError> {
+        let m = proto::UserStats {
+            session: Some(session),
+            stats_only: Some(stats_only),
+            ..Default::default()
+        };
+        self.send(Frame::from_message(MessageType::UserStats, &m))
+    }
+
+    /// Sets the voice link figures the next keep-alive pings report: the UDP ping (`None` while
+    /// voice runs over TCP) and the counts of received voice packets.
+    pub fn report_voice_link(&self, ping: Option<UdpPing>, crypt: CryptStats) {
+        let mut report = self.shared.ping();
+        report.udp = ping;
+        report.crypt = crypt;
+    }
+
+    /// Replaces the access tokens (channel passwords) of this session. A connected server takes
+    /// only the tokens from a repeated Authenticate, like official clients send it; it then
+    /// re-evaluates the ACLs and resends which channels the user may enter.
+    pub fn set_access_tokens(&self, tokens: Vec<String>) -> Result<(), CommandError> {
+        self.send(Frame::from_message(
+            MessageType::Authenticate,
+            &access_tokens_message(tokens),
+        ))
     }
 
     /// Asks the server for the own permissions in a channel.
@@ -851,6 +1034,29 @@ mod tests {
     use super::*;
 
     #[test]
+    fn pings_report_the_own_tcp_and_udp_figures() {
+        let mut report = PingReport {
+            started: Instant::now() - Duration::from_secs(1),
+            ..Default::default()
+        };
+        assert_eq!(report.message().tcp_ping_avg, None);
+        let now = report.now_us();
+        report.on_reply(now - 30_000);
+        report.on_reply(now - 10_000);
+        report.udp = Some(UdpPing {
+            avg_ms: 12.5,
+            packets: 40,
+        });
+        let m = report.message();
+        assert_eq!(m.tcp_packets, Some(2));
+        let avg = m.tcp_ping_avg.expect("tcp ping");
+        assert!((20.0..21.0).contains(&avg), "{avg}");
+        assert!(m.tcp_ping_var.expect("var") > 90.0);
+        assert_eq!((m.udp_packets, m.udp_ping_avg), (Some(40), Some(12.5)));
+        assert_eq!(m.good, Some(0));
+    }
+
+    #[test]
     fn send_acl_queues_an_acl_frame() {
         let (tx, mut rx) = mpsc::unbounded_channel();
         let handle = Handle {
@@ -860,6 +1066,7 @@ mod tests {
                 shutdown: Notify::new(),
                 reason: Mutex::new(None),
                 connected: AtomicBool::new(true),
+                ping: Mutex::default(),
             }),
         };
         let acl = proto::Acl {
@@ -889,6 +1096,7 @@ mod tests {
                 shutdown: Notify::new(),
                 reason: Mutex::new(None),
                 connected: AtomicBool::new(true),
+                ping: Mutex::default(),
             }),
         };
         assert!(matches!(
@@ -917,7 +1125,7 @@ mod handshake_tests {
 
     #[test]
     fn version_precedes_authenticate_with_both_encodings() {
-        let [version, auth] = handshake_frames("alice".to_owned(), None);
+        let [version, auth] = handshake_frames("alice".to_owned(), None, vec!["secret".into()]);
         assert_eq!(version.message_type(), Some(MessageType::Version));
         assert_eq!(auth.message_type(), Some(MessageType::Authenticate));
 
@@ -934,5 +1142,18 @@ mod handshake_tests {
         let a = proto::Authenticate::decode(auth.payload).expect("authenticate");
         assert_eq!(a.username.as_deref(), Some("alice"));
         assert_eq!(a.opus, Some(true));
+        assert_eq!(a.tokens, ["secret"]);
+    }
+
+    #[test]
+    fn access_tokens_resend_carries_only_the_tokens() {
+        let frame = Frame::from_message(
+            MessageType::Authenticate,
+            &access_tokens_message(vec!["one".into(), "two".into()]),
+        );
+        let a = proto::Authenticate::decode(frame.payload).expect("authenticate");
+        assert_eq!(a.tokens, ["one", "two"]);
+        assert_eq!(a.username, None);
+        assert_eq!(a.password, None);
     }
 }

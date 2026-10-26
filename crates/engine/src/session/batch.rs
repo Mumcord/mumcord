@@ -1,4 +1,9 @@
-//! Coalesces bursts of permission answers into one UI event (scale report, bottleneck #2).
+//! Calms bursts of engine events before they reach the UI.
+//!
+//! Permission answers (scale report, bottleneck #2) are coalesced into one channel event; talk
+//! states are rate-limited per person (FR-2.23, scale report P13).
+//!
+//! ## Permission answers
 //!
 //! After every sync the engine asks the server for its effective permissions in each channel,
 //! and the answers trickle in one by one (305 on a big server within about 100 ms). Sent on as
@@ -11,7 +16,7 @@
 //! channel that was removed in the meantime. That is what keeps ordering safe relative to the
 //! single `ChannelUpserted` / `ChannelRemoved` events emitted in between.
 
-use std::collections::BTreeSet;
+use std::collections::{BTreeMap, BTreeSet};
 
 use tokio::time::{Duration, Instant};
 
@@ -78,6 +83,72 @@ impl PermissionBatch {
     }
 }
 
+/// Least time between two shown talk-state changes of one person: about 10 per second.
+pub const TALK_MIN_GAP: Duration = Duration::from_millis(100);
+/// How long a stop is held back: a pause shorter than this keeps the talking ring on, so a
+/// speaker's ring does not flicker between words.
+pub const TALK_STOP_HOLD: Duration = Duration::from_millis(150);
+
+/// Talk states as the UI should see them. Starting to talk is shown at once (AC-1.7), unless the
+/// person's last change is less than [`TALK_MIN_GAP`] ago; stopping waits [`TALK_STOP_HOLD`].
+#[derive(Default)]
+pub struct TalkBatch {
+    people: BTreeMap<u32, Talker>,
+}
+
+struct Talker {
+    shown: bool,
+    wanted: bool,
+    /// When `wanted` last changed.
+    since: Instant,
+    /// When `shown` last changed.
+    shown_at: Option<Instant>,
+}
+
+impl TalkBatch {
+    /// Records the latest talk state of `session`.
+    pub fn set(&mut self, session: u32, talking: bool, now: Instant) {
+        let talker = self.people.entry(session).or_insert(Talker {
+            shown: false,
+            wanted: false,
+            since: now,
+            shown_at: None,
+        });
+        if talker.wanted != talking {
+            talker.wanted = talking;
+            talker.since = now;
+        }
+    }
+
+    /// The changes due at `now`, in session order; each one is then taken as shown.
+    pub fn take_due(&mut self, now: Instant) -> Vec<(u32, bool)> {
+        let mut due = Vec::new();
+        for (&session, talker) in &mut self.people {
+            if talker.wanted == talker.shown {
+                continue;
+            }
+            let hold = if talker.wanted {
+                talker.since
+            } else {
+                talker.since + TALK_STOP_HOLD
+            };
+            let at = talker
+                .shown_at
+                .map_or(hold, |shown_at| hold.max(shown_at + TALK_MIN_GAP));
+            if now >= at {
+                talker.shown = talker.wanted;
+                talker.shown_at = Some(now);
+                due.push((session, talker.shown));
+            }
+        }
+        // Quiet people are forgotten once their last change no longer limits the next one.
+        self.people.retain(|_, t| {
+            t.shown || t.wanted || t.shown_at.is_some_and(|at| now < at + TALK_MIN_GAP)
+        });
+        due
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -124,5 +195,69 @@ mod tests {
         let channels = batch.take().expect("pending");
         assert_eq!(channels, Channels::All);
         assert!(channels.contains(42));
+    }
+
+    fn ms(start: Instant, ms: u64) -> Instant {
+        start + Duration::from_millis(ms)
+    }
+
+    #[test]
+    fn start_shows_at_once_and_stop_after_the_hold() {
+        let start = Instant::now();
+        let mut talk = TalkBatch::default();
+        talk.set(7, true, start);
+        assert_eq!(talk.take_due(start), vec![(7, true)]);
+        talk.set(7, false, ms(start, 500));
+        assert_eq!(talk.take_due(ms(start, 600)), vec![]);
+        assert_eq!(talk.take_due(ms(start, 650)), vec![(7, false)]);
+        assert_eq!(talk.take_due(ms(start, 700)), vec![]);
+    }
+
+    #[test]
+    fn short_pause_keeps_the_ring_on() {
+        let start = Instant::now();
+        let mut talk = TalkBatch::default();
+        talk.set(1, true, start);
+        assert_eq!(talk.take_due(start), vec![(1, true)]);
+        talk.set(1, false, ms(start, 300));
+        assert_eq!(talk.take_due(ms(start, 340)), vec![]);
+        talk.set(1, true, ms(start, 380));
+        assert_eq!(talk.take_due(ms(start, 1000)), vec![]);
+    }
+
+    #[test]
+    fn changes_of_one_person_are_rate_limited() {
+        let start = Instant::now();
+        let mut talk = TalkBatch::default();
+        talk.set(2, true, start);
+        assert_eq!(talk.take_due(start), vec![(2, true)]);
+        talk.set(2, false, start);
+        assert_eq!(talk.take_due(ms(start, 150)), vec![(2, false)]);
+        // Starting again right after the stop was shown waits for the minimum gap.
+        talk.set(2, true, ms(start, 160));
+        assert_eq!(talk.take_due(ms(start, 200)), vec![]);
+        assert_eq!(talk.take_due(ms(start, 250)), vec![(2, true)]);
+    }
+
+    #[test]
+    fn people_are_independent_and_reported_in_session_order() {
+        let start = Instant::now();
+        let mut talk = TalkBatch::default();
+        talk.set(9, true, start);
+        talk.set(3, true, start);
+        talk.set(5, false, start);
+        assert_eq!(talk.take_due(start), vec![(3, true), (9, true)]);
+    }
+
+    #[test]
+    fn quiet_people_are_forgotten() {
+        let start = Instant::now();
+        let mut talk = TalkBatch::default();
+        talk.set(4, true, start);
+        talk.take_due(start);
+        talk.set(4, false, start);
+        talk.take_due(ms(start, 150));
+        talk.take_due(ms(start, 300));
+        assert!(talk.people.is_empty());
     }
 }

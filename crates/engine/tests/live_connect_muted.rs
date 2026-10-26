@@ -3,20 +3,21 @@
 //! `MUMCORD_LIVE=1 cargo test -p mumcord-engine --features test-backend --test live_connect_muted -- --ignored --test-threads=1`
 #![cfg(feature = "test-backend")]
 
+mod common;
+
 use std::path::Path;
 use std::time::Duration;
 
 use mumcord_bot::env;
+use mumcord_engine::EventReceiver;
 use mumcord_engine::{
     ConnState, Engine, EngineEvent, PasswordChange, SecretStore, ServerFields, ServerView,
 };
-use tokio::sync::mpsc::UnboundedReceiver;
 
-const PORT: u16 = 64739;
 const WAIT: Duration = Duration::from_secs(20);
 
 async fn wait_for<T>(
-    rx: &mut UnboundedReceiver<EngineEvent>,
+    rx: &mut EventReceiver,
     what: &str,
     mut pick: impl FnMut(&EngineEvent) -> Option<T>,
 ) -> T {
@@ -32,7 +33,7 @@ async fn wait_for<T>(
     }
 }
 
-async fn connect(engine: &Engine, rx: &mut UnboundedReceiver<EngineEvent>, server: &ServerView) {
+async fn connect(engine: &Engine, rx: &mut EventReceiver, server: &ServerView) {
     engine.connect(server.id, None).expect("connect");
     loop {
         let event = wait_for(rx, "sync", |e| match e {
@@ -55,8 +56,8 @@ async fn connect(engine: &Engine, rx: &mut UnboundedReceiver<EngineEvent>, serve
     }
 }
 
-async fn disconnect(engine: &Engine, rx: &mut UnboundedReceiver<EngineEvent>) {
-    engine.disconnect();
+async fn disconnect(engine: &Engine, rx: &mut EventReceiver) {
+    engine.disconnect(only_server(engine));
     wait_for(rx, "disconnected", |e| {
         matches!(e, EngineEvent::StateChanged(ConnState::Disconnected { .. })).then_some(())
     })
@@ -88,9 +89,9 @@ async fn setting_off_connects_with_the_last_own_voice_choice() {
     let name = format!("f74-{:06x}", std::process::id() & 0xff_ffff);
     let server = engine
         .server_add(ServerFields {
-            label: format!("test {PORT} {name}"),
+            label: format!("test {} {name}", common::v14()),
             address: "127.0.0.1".into(),
-            port: PORT,
+            port: common::v14(),
             username: name,
             password: match env::testenv_var("SERVER_PASSWORD") {
                 Some(p) => PasswordChange::Set(p),
@@ -127,4 +128,13 @@ async fn setting_off_connects_with_the_last_own_voice_choice() {
         .expect("own user");
     assert!(me.self_mute && !me.self_deaf);
     disconnect(&engine, &mut rx).await;
+}
+
+/// The test's only connected server (0, which no call accepts, when none is).
+fn only_server(engine: &Engine) -> mumcord_engine::ServerId {
+    engine
+        .connections()
+        .first()
+        .and_then(mumcord_engine::ConnState::server_id)
+        .unwrap_or(0)
 }

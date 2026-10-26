@@ -7,21 +7,29 @@
 //! size), which the UI puts into the thumbnail's `<img>` as [`wire::ATTRIBUTE`].
 //!
 //! When a Mumcord user opens such a thumbnail in the image viewer, [`Engine::full_image_fetch`]
-//! asks the original sender for the full image over plugin data ([`transfer`]); the received
+//! asks the original sender for the full image over a direct connection ([`direct`], FR-2.37)
+//! and, when that is not possible, over plugin data ([`transfer`]); the received
 //! bytes must match the announced hash and pass [`check::check`] before they are cached and
 //! shown. If the sender is offline, did not announce [`FEATURE`] in the Mumcord hello, no longer has the image, or the
 //! transfer fails, the viewer keeps the thumbnail. Both sent and received full images live in
 //! the link-preview image cache and follow its clean-up rules (QA.42).
 
 pub mod check;
+mod direct;
 pub(crate) mod transfer;
 pub mod wire;
 
-use std::sync::Arc;
+use std::collections::HashMap;
+use std::sync::atomic::{AtomicBool, AtomicU64, Ordering};
+use std::sync::{Arc, Mutex};
+
+use mumcord_p2p::quinn::{RecvStream, SendStream};
+use tokio::sync::Notify;
 
 use mumcord_protocol::{Handle, PluginData};
 
-use crate::session::{Engine, EngineError, EngineEvent, EngineResult, ErrorKind, SessionCtx};
+use crate::ServerId;
+use crate::session::{Engine, EngineError, EngineEvent, EngineResult, ErrorKind, SessionCtx, lock};
 use crate::web::{FullImage, LinkPreviews};
 pub use transfer::FetchError;
 use transfer::{Link, Originals, Transfers};
@@ -60,13 +68,98 @@ fn originals(previews: Arc<LinkPreviews>, offer: bool) -> Originals {
     })
 }
 
-pub(crate) fn new_transfers() -> Transfers {
-    Transfers::new(transfer::Timing::default())
+/// Stops one running fetch while it goes direct (the plugin-data part has its own cancel).
+#[derive(Default)]
+struct Cancel {
+    cancelled: AtomicBool,
+    wake: Notify,
+}
+
+impl Cancel {
+    fn cancel(&self) {
+        self.cancelled.store(true, Ordering::Relaxed);
+        // `notify_one` keeps a permit for a fetch that is not waiting yet.
+        self.wake.notify_one();
+    }
+
+    fn is_cancelled(&self) -> bool {
+        self.cancelled.load(Ordering::Relaxed)
+    }
+}
+
+/// The transfers of every connected server; sessions are only unique per server.
+#[derive(Default)]
+pub(crate) struct ServerTransfers {
+    servers: Mutex<HashMap<ServerId, Arc<Transfers>>>,
+    /// Running fetches by id.
+    fetches: Mutex<HashMap<u64, RunningFetch>>,
+    next_fetch: AtomicU64,
+}
+
+/// The server and image a running fetch is for.
+type RunningFetch = (ServerId, [u8; 32], Arc<Cancel>);
+
+/// Unregisters a fetch from [`ServerTransfers::fetches`] when it ends.
+struct FetchGuard<'a> {
+    transfers: &'a ServerTransfers,
+    id: u64,
+    cancel: Arc<Cancel>,
+}
+
+impl Drop for FetchGuard<'_> {
+    fn drop(&mut self) {
+        lock(&self.transfers.fetches).remove(&self.id);
+    }
+}
+
+impl ServerTransfers {
+    fn start_fetch(&self, server_id: ServerId, hash: [u8; 32]) -> FetchGuard<'_> {
+        let id = self.next_fetch.fetch_add(1, Ordering::Relaxed);
+        let cancel = Arc::new(Cancel::default());
+        lock(&self.fetches).insert(id, (server_id, hash, cancel.clone()));
+        FetchGuard {
+            transfers: self,
+            id,
+            cancel,
+        }
+    }
+
+    pub(crate) fn of(&self, server_id: ServerId) -> Arc<Transfers> {
+        lock(&self.servers)
+            .entry(server_id)
+            .or_insert_with(|| Arc::new(Transfers::new(transfer::Timing::default())))
+            .clone()
+    }
+
+    /// The connection to `server_id` (re)synced or ended: drops its transfers.
+    pub(crate) fn reset(&self, server_id: ServerId) {
+        if let Some(transfers) = lock(&self.servers).remove(&server_id) {
+            transfers.reset();
+        }
+    }
+
+    /// A person on `server_id` left.
+    pub(crate) fn forget(&self, server_id: ServerId, session: u32) {
+        if let Some(transfers) = lock(&self.servers).get(&server_id) {
+            transfers.forget(session);
+        }
+    }
+
+    fn cancel(&self, server_id: ServerId, hash: &[u8; 32]) {
+        for (id, image, cancel) in lock(&self.fetches).values() {
+            if *id == server_id && image == hash {
+                cancel.cancel();
+            }
+        }
+        if let Some(transfers) = lock(&self.servers).get(&server_id) {
+            transfers.cancel(hash);
+        }
+    }
 }
 
 /// Plugin data from another client (session task).
 pub(crate) fn on_plugin_data(
-    transfers: &Arc<Transfers>,
+    transfers: &ServerTransfers,
     previews: &Arc<LinkPreviews>,
     ctx: &SessionCtx,
     data: &PluginData,
@@ -87,7 +180,7 @@ pub(crate) fn on_plugin_data(
         tracing::debug!("ignoring a malformed full-image message");
         return;
     };
-    transfers.on_message(
+    transfers.of(ctx.server_id).on_message(
         sender,
         msg,
         Arc::new(HandleLink(ctx.handle.clone())),
@@ -96,6 +189,20 @@ pub(crate) fn on_plugin_data(
             setting(ctx.store().settings(), |s| s.offer_full_images),
         ),
     );
+}
+
+/// A request on a direct connection (the stream kind is already read).
+pub(crate) async fn serve_direct(engine: &Engine, send: SendStream, recv: RecvStream) {
+    direct::serve(engine, send, recv).await;
+}
+
+/// How the direct attempt of a fetch ended.
+enum DirectOutcome {
+    Loaded(Vec<u8>),
+    /// Cancelled, or the sender said it does not have the image: plugin data would not help.
+    Stop,
+    /// No direct connection or it broke: try plugin data.
+    Fallback,
 }
 
 /// A full-image switch from the settings; on if they cannot be read, as that is the default.
@@ -159,12 +266,22 @@ impl Engine {
         .map_err(|e| EngineError::new(ErrorKind::Internal, e.to_string()))?
     }
 
+    /// Stops a running [`Self::full_image_fetch`] of the reference on `server_id` (the viewer
+    /// closed); the fetch then returns `None`. Does nothing when no such fetch runs.
+    pub fn full_image_cancel(&self, server_id: ServerId, reference: &str) {
+        if let Some(full) = FullRef::parse(reference, check::MAX_BYTES) {
+            self.full_image_transfers().cancel(server_id, &full.hash);
+        }
+    }
+
     /// The full image behind a thumbnail as a `data:` URL: from the cache, else fetched from the
-    /// message's sender (identified by certificate hash or session) while they are online.
+    /// message's sender on `server_id` (identified by certificate hash or session) while they
+    /// are online.
     /// Emits [`EngineEvent::FullImageProgress`] while loading. `None` when it cannot be had;
     /// the UI keeps showing the thumbnail then.
     pub async fn full_image_fetch(
         &self,
+        server_id: ServerId,
         reference: &str,
         sender_session: Option<u32>,
         sender_cert_hash: Option<String>,
@@ -186,28 +303,45 @@ impl Engine {
         if let Some(image) = cached {
             return Some(image.data_url);
         }
-        let ctx = self.session_ctx().ok()?;
+        let ctx = self.session_ctx_for(server_id).ok()?;
         let from = online_sender(&ctx.handle, sender_session, sender_cert_hash.as_deref())?;
-        if !self.mumcord_user_has_feature(from, FEATURE) {
+        if !self.mumcord_user_has_feature(server_id, from, FEATURE) {
             return None;
         }
-        let events = ctx.events.clone();
-        let progress_ref = reference.to_owned();
-        let bytes = self
+        let progress = {
+            let events = ctx.events.clone();
+            let reference = reference.to_owned();
+            move |received, total| {
+                events.emit(EngineEvent::FullImageProgress {
+                    reference: reference.clone(),
+                    received,
+                    total,
+                });
+            }
+        };
+        let fetch = self
             .full_image_transfers()
-            .fetch(
-                Arc::new(HandleLink(ctx.handle.clone())),
-                from,
-                full,
-                move |received, total| {
-                    events.emit(EngineEvent::FullImageProgress {
-                        reference: progress_ref.clone(),
-                        received,
-                        total,
-                    });
-                },
-            )
-            .await;
+            .start_fetch(server_id, full.hash);
+        let bytes = match self
+            .full_image_direct(server_id, from, full, &fetch.cancel, progress.clone())
+            .await
+        {
+            DirectOutcome::Loaded(bytes) => Ok(bytes),
+            DirectOutcome::Stop => return None,
+            DirectOutcome::Fallback if fetch.cancel.is_cancelled() => return None,
+            DirectOutcome::Fallback => {
+                self.full_image_transfers()
+                    .of(server_id)
+                    .fetch(
+                        Arc::new(HandleLink(ctx.handle.clone())),
+                        from,
+                        full,
+                        progress,
+                    )
+                    .await
+            }
+        };
+        drop(fetch);
         let bytes = match bytes {
             Ok(bytes) => bytes,
             Err(e) => {
@@ -236,6 +370,44 @@ impl Engine {
         .await
         .ok()
         .flatten()
+    }
+
+    /// Tries to fetch `full` from `from` over a direct connection (FR-2.37).
+    async fn full_image_direct(
+        &self,
+        server_id: ServerId,
+        from: u32,
+        full: FullRef,
+        cancel: &Cancel,
+        progress: impl Fn(u32, u32),
+    ) -> DirectOutcome {
+        let attempt = async {
+            let (send, recv) = match self
+                .p2p_open_stream(server_id, from, crate::p2p::STREAM_FULL_IMAGE)
+                .await
+            {
+                Ok(stream) => stream,
+                Err(e) => {
+                    tracing::info!(error = %e, "no direct connection; full image over plugin data");
+                    return DirectOutcome::Fallback;
+                }
+            };
+            match direct::fetch(send, recv, full, progress).await {
+                Ok(bytes) => {
+                    tracing::debug!(bytes = bytes.len(), "full image loaded directly");
+                    DirectOutcome::Loaded(bytes)
+                }
+                Err(direct::DirectFetchError::Unavailable) => DirectOutcome::Stop,
+                Err(e) => {
+                    tracing::info!(error = %e, "direct full image failed; trying plugin data");
+                    DirectOutcome::Fallback
+                }
+            }
+        };
+        tokio::select! {
+            outcome = attempt => outcome,
+            () = cancel.wake.notified() => DirectOutcome::Stop,
+        }
     }
 }
 

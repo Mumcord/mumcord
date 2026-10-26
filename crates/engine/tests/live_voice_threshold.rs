@@ -4,15 +4,17 @@
 //! `MUMCORD_LIVE=1 cargo test -p mumcord-engine --features test-backend --test live_voice_threshold -- --ignored --nocapture`
 #![cfg(feature = "test-backend")]
 
+mod common;
+
 use std::f32::consts::PI;
 use std::path::{Path, PathBuf};
 use std::time::{Duration, Instant};
 
 use mumcord_bot::voice::{BotVoice, Clip};
 use mumcord_bot::{Bot, BotConfig, env};
+use mumcord_engine::EventReceiver;
 use mumcord_engine::{EngineEvent, PasswordChange, SecretStore, ServerFields, Snapshot};
 use mumcord_store::VoiceActivation;
-use tokio::sync::mpsc::UnboundedReceiver;
 
 const WAIT: Duration = Duration::from_secs(20);
 const SAMPLE_RATE: usize = 48_000;
@@ -46,7 +48,7 @@ fn tone(seconds: usize, amplitude: f32) -> impl Iterator<Item = f32> {
 }
 
 async fn wait_for<T>(
-    rx: &mut UnboundedReceiver<EngineEvent>,
+    rx: &mut EventReceiver,
     what: &str,
     mut pick: impl FnMut(&EngineEvent) -> Option<T>,
 ) -> T {
@@ -89,7 +91,7 @@ async fn manual_threshold_lets_only_the_loud_tone_through() {
 
     let listener = Bot::connect(BotConfig {
         data_dir: Some(dir.join("listener")),
-        ..BotConfig::new(&unique("mc-listen"), env::PORT_V14)
+        ..BotConfig::new(&unique("mc-listen"), common::v14())
     })
     .await
     .expect("listener");
@@ -118,7 +120,7 @@ async fn manual_threshold_lets_only_the_loud_tone_through() {
         .server_add(ServerFields {
             label: "v14".into(),
             address: env::HOST.into(),
-            port: env::PORT_V14,
+            port: common::v14(),
             username: name.clone(),
             password: match env::testenv_var("SERVER_PASSWORD") {
                 Some(p) => PasswordChange::Set(p),
@@ -146,7 +148,9 @@ async fn manual_threshold_lets_only_the_loud_tone_through() {
         .find(|c| c.name == "AFK")
         .expect("AFK")
         .id;
-    engine.join_channel(afk).expect("join AFK");
+    engine
+        .join_channel(only_server(&engine), afk)
+        .expect("join AFK");
     let me = snapshot.self_session;
 
     // The loud tone arrives; the quiet one before it never opened the gate.
@@ -166,4 +170,13 @@ async fn manual_threshold_lets_only_the_loud_tone_through() {
         heard > Duration::from_millis(2_000),
         "loud tone cut: {heard:?}"
     );
+}
+
+/// The test's only connected server (0, which no call accepts, when none is).
+fn only_server(engine: &mumcord_engine::Engine) -> mumcord_engine::ServerId {
+    engine
+        .connections()
+        .first()
+        .and_then(mumcord_engine::ConnState::server_id)
+        .unwrap_or(0)
 }

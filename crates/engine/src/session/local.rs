@@ -18,6 +18,7 @@ pub(crate) fn apply_dsp(controls: &DspControls, settings: &Settings) {
     controls.set_noise_suppression(settings.noise_suppression);
     controls.set_auto_gain(settings.auto_gain);
     controls.set_music_quality(settings.music_quality);
+    controls.set_bitrate_cap_kbps(settings.bitrate_kbps);
     controls.set_manual_threshold(settings.voice_activation == VoiceActivation::Manual);
     controls.set_threshold_dbfs(settings.voice_threshold_dbfs as f32);
     controls.set_mode(match settings.talk_mode {
@@ -42,6 +43,10 @@ fn server_view(server: SavedServer, has_password: bool) -> ServerView {
         username: server.username,
         has_password,
         save_history: server.save_history,
+        always_connect_at_start: server.always_connect_at_start,
+        was_voice_server_at_quit: server.was_voice_server_at_quit,
+        notifications_muted: server.notifications_muted,
+        theme_id: server.theme_id,
     }
 }
 
@@ -205,12 +210,81 @@ impl Engine {
         Ok(server_view(saved, has_password))
     }
 
+    /// Marks a server "Always connect at start" (FR-2.7); marking more servers than the
+    /// limit of connected servers allows is refused.
+    pub async fn server_set_always_connect(
+        &self,
+        id: ServerId,
+        enabled: bool,
+    ) -> EngineResult<ServerView> {
+        let saved = {
+            let store = lock(&self.inner.store);
+            let max = store.settings().map_err(store_error)?.max_connected_servers;
+            let servers = store.servers().map_err(store_error)?;
+            let marked = servers
+                .iter()
+                .filter(|s| s.always_connect_at_start && s.id != id)
+                .count();
+            let mut saved = servers
+                .into_iter()
+                .find(|s| s.id == id)
+                .ok_or_else(|| EngineError::new(ErrorKind::NotFound, "unknown server"))?;
+            if enabled && marked >= usize::from(max) {
+                return Err(super::limit_error(max));
+            }
+            saved.always_connect_at_start = enabled;
+            store.update_server(&saved).map_err(store_error)?;
+            saved
+        };
+        let has_password = self.apply_password(id, PasswordChange::Keep).await?;
+        Ok(server_view(saved, has_password))
+    }
+
+    /// Sets the theme shown with the server (FR-2.17); `None` or a blank id goes back to the
+    /// app theme. The id isn't checked against the themes: an unknown one shows the app theme.
+    pub async fn server_set_theme(
+        &self,
+        id: ServerId,
+        theme_id: Option<String>,
+    ) -> EngineResult<ServerView> {
+        let saved = {
+            let store = lock(&self.inner.store);
+            let mut saved = store
+                .server(id)
+                .map_err(store_error)?
+                .ok_or_else(|| EngineError::new(ErrorKind::NotFound, "unknown server"))?;
+            saved.theme_id = theme_choice(theme_id);
+            store.update_server(&saved).map_err(store_error)?;
+            saved
+        };
+        let has_password = self.apply_password(id, PasswordChange::Keep).await?;
+        Ok(server_view(saved, has_password))
+    }
+
+    /// Mutes or unmutes all notifications of the server, mentions included (FR-2.10).
+    pub async fn server_set_notifications_muted(
+        &self,
+        id: ServerId,
+        muted: bool,
+    ) -> EngineResult<ServerView> {
+        let saved = {
+            let store = lock(&self.inner.store);
+            let mut saved = store
+                .server(id)
+                .map_err(store_error)?
+                .ok_or_else(|| EngineError::new(ErrorKind::NotFound, "unknown server"))?;
+            saved.notifications_muted = muted;
+            store.update_server(&saved).map_err(store_error)?;
+            saved
+        };
+        let has_password = self.apply_password(id, PasswordChange::Keep).await?;
+        Ok(server_view(saved, has_password))
+    }
+
     /// Removes a server with password, trust decision, follows and history. Disconnects
-    /// first if it is the current server.
+    /// it first.
     pub async fn server_remove(&self, id: ServerId) -> EngineResult<()> {
-        if self.connection_state().server_id() == Some(id) {
-            self.disconnect();
-        }
+        self.disconnect(id);
         let store = self.inner.store.clone();
         self.blocking(move |secrets| lock(&store).remove_server(id, secrets))
             .await
@@ -268,6 +342,10 @@ impl Engine {
         if previous.now_gaming != settings.now_gaming {
             self.now_gaming_set_enabled(settings.now_gaming);
         }
+        if previous.allow_direct_connections != settings.allow_direct_connections {
+            self.direct()
+                .consent_changed(settings.allow_direct_connections);
+        }
         if previous.positional != settings.positional {
             self.positional_configure(&settings.positional);
         }
@@ -298,6 +376,12 @@ impl Engine {
     }
 }
 
+fn theme_choice(theme_id: Option<String>) -> Option<String> {
+    theme_id
+        .map(|id| id.trim().to_owned())
+        .filter(|id| !id.is_empty())
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -324,5 +408,55 @@ mod tests {
         let mut zero = fields("x", "host", "me");
         zero.port = 0;
         assert!(validated(&zero).is_err());
+    }
+
+    #[test]
+    fn blank_theme_choice_means_app_theme() {
+        assert_eq!(theme_choice(None), None);
+        assert_eq!(theme_choice(Some("  ".into())), None);
+        assert_eq!(
+            theme_choice(Some(" preset:ocean ".into())),
+            Some("preset:ocean".into())
+        );
+    }
+
+    #[tokio::test]
+    async fn notification_mute_is_saved_per_server() {
+        let dir = tempfile::tempdir().expect("tempdir");
+        let (engine, _rx) = Engine::new(
+            dir.path(),
+            crate::SecretStore::in_memory(),
+            tokio::runtime::Handle::current(),
+        )
+        .expect("engine");
+        let muted = engine
+            .server_add(fields("a", "a.example", "me"))
+            .await
+            .expect("server");
+        let other = engine
+            .server_add(fields("b", "b.example", "me"))
+            .await
+            .expect("server");
+
+        let view = engine
+            .server_set_notifications_muted(muted.id, true)
+            .await
+            .expect("mute");
+        assert!(view.notifications_muted);
+        let servers = engine.servers().await.expect("servers");
+        let muted_of = |id| {
+            servers
+                .iter()
+                .find(|s| s.id == id)
+                .map(|s| s.notifications_muted)
+        };
+        assert_eq!(muted_of(muted.id), Some(true));
+        assert_eq!(muted_of(other.id), Some(false));
+
+        let view = engine
+            .server_set_notifications_muted(muted.id, false)
+            .await
+            .expect("unmute");
+        assert!(!view.notifications_muted);
     }
 }

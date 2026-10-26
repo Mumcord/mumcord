@@ -3,15 +3,17 @@
 //! `MUMCORD_LIVE=1 cargo test -p mumcord-engine --features test-backend --test live_moderation -- --ignored --test-threads=1`
 #![cfg(feature = "test-backend")]
 
+mod common;
+
 use std::path::{Path, PathBuf};
 use std::time::Duration;
 
 use mumcord_bot::{Bot, BotConfig, Moderation, env};
+use mumcord_engine::EventReceiver;
 use mumcord_engine::{
     Engine, EngineEvent, PasswordChange, SecretStore, ServerFields, Snapshot, UserView,
 };
 use mumcord_protocol::proto;
-use tokio::sync::mpsc::UnboundedReceiver;
 
 const WAIT: Duration = Duration::from_secs(20);
 
@@ -38,7 +40,7 @@ fn work_dir(name: &str) -> PathBuf {
     dir
 }
 
-async fn connect(engine: &Engine, rx: &mut UnboundedReceiver<EngineEvent>) -> Snapshot {
+async fn connect(engine: &Engine, rx: &mut EventReceiver) -> Snapshot {
     let name = unique("mc-mod");
     engine
         .identity_create(name.clone())
@@ -48,7 +50,7 @@ async fn connect(engine: &Engine, rx: &mut UnboundedReceiver<EngineEvent>) -> Sn
         .server_add(ServerFields {
             label: "test v15".into(),
             address: "127.0.0.1".into(),
-            port: env::PORT_V15,
+            port: common::v15(),
             username: name,
             password: match env::testenv_var("SERVER_PASSWORD") {
                 Some(p) => PasswordChange::Set(p),
@@ -79,7 +81,7 @@ async fn connect(engine: &Engine, rx: &mut UnboundedReceiver<EngineEvent>) -> Sn
 }
 
 async fn wait_user(
-    rx: &mut UnboundedReceiver<EngineEvent>,
+    rx: &mut EventReceiver,
     what: &str,
     name: &str,
     mut done: impl FnMut(&UserView) -> bool,
@@ -118,13 +120,13 @@ async fn server_mute_deafen_and_suppress_reach_the_user_view() {
     connect(&engine, &mut rx).await;
 
     let target_name = unique("mc-mod-target");
-    let mut config = BotConfig::new(&target_name, env::PORT_V15);
+    let mut config = BotConfig::new(&target_name, common::v15());
     config.data_dir = Some(dir.join("bot"));
     let target = Bot::connect(config).await.expect("target bot");
     let view = wait_user(&mut rx, "target appears", &target_name, |_| true).await;
     assert!(!view.server_mute && !view.server_deaf && !view.suppressed);
 
-    let admin = Bot::connect(BotConfig::superuser(env::PORT_V15))
+    let admin = Bot::connect(BotConfig::superuser(common::v15()))
         .await
         .expect("SuperUser bot (SUPERUSER_PASSWORD in testenv/.env)");
     let moderate = |m: Moderation| admin.moderate(&target_name, m).expect("moderate");
@@ -183,7 +185,16 @@ async fn server_mute_deafen_and_suppress_reach_the_user_view() {
     })
     .await;
 
-    engine.disconnect();
+    engine.disconnect(only_server(&engine));
     admin.handle().disconnect();
     target.handle().disconnect();
+}
+
+/// The test's only connected server (0, which no call accepts, when none is).
+fn only_server(engine: &Engine) -> mumcord_engine::ServerId {
+    engine
+        .connections()
+        .first()
+        .and_then(mumcord_engine::ConnState::server_id)
+        .unwrap_or(0)
 }

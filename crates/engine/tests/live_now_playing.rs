@@ -5,19 +5,20 @@
 //! `MUMCORD_LIVE=1 cargo test -p mumcord-engine --features test-backend --test live_now_playing -- --ignored --test-threads=1`
 #![cfg(feature = "test-backend")]
 
+mod common;
+
 use std::path::{Path, PathBuf};
 use std::time::Duration;
 
 use mumcord_bot::{Bot, BotConfig, UserCheck, env};
+use mumcord_engine::EventReceiver;
 use mumcord_engine::now_playing::{DATA_ID, SharedTrack, payload};
 use mumcord_engine::{
     Engine, EngineEvent, LocalTrack, PasswordChange, SecretStore, ServerFields, ServerView,
 };
 use mumcord_protocol::Event;
 use tokio::sync::broadcast;
-use tokio::sync::mpsc::UnboundedReceiver;
 
-const PORT: u16 = 64739;
 const WAIT: Duration = Duration::from_secs(20);
 
 fn live() -> bool {
@@ -44,7 +45,7 @@ fn work_dir(name: &str) -> PathBuf {
 }
 
 async fn wait_for<T>(
-    rx: &mut UnboundedReceiver<EngineEvent>,
+    rx: &mut EventReceiver,
     what: &str,
     mut pick: impl FnMut(&EngineEvent) -> Option<T>,
 ) -> T {
@@ -63,9 +64,9 @@ async fn wait_for<T>(
 async fn add_server(engine: &Engine, name: &str) -> ServerView {
     engine
         .server_add(ServerFields {
-            label: format!("test {PORT} {name}"),
+            label: format!("test {} {name}", common::v14()),
             address: "127.0.0.1".into(),
-            port: PORT,
+            port: common::v14(),
             username: name.into(),
             password: match env::testenv_var("SERVER_PASSWORD") {
                 Some(p) => PasswordChange::Set(p),
@@ -76,7 +77,7 @@ async fn add_server(engine: &Engine, name: &str) -> ServerView {
         .expect("server")
 }
 
-async fn connect(engine: &Engine, rx: &mut UnboundedReceiver<EngineEvent>, server: &ServerView) {
+async fn connect(engine: &Engine, rx: &mut EventReceiver, server: &ServerView) {
     engine.connect(server.id, None).expect("connect");
     loop {
         let event = wait_for(rx, "sync", |e| match e {
@@ -174,7 +175,7 @@ async fn now_playing_reaches_others_and_goes_away_when_turned_off() {
 
     let bot = Bot::connect(BotConfig {
         data_dir: Some(dir.join("bot")),
-        ..BotConfig::new(&unique("b45-bot"), PORT)
+        ..BotConfig::new(&unique("b45-bot"), common::v14())
     })
     .await
     .expect("bot");
@@ -224,13 +225,13 @@ async fn now_playing_reaches_others_and_goes_away_when_turned_off() {
 
     // Official clients: the comment line, next to what the user wrote.
     engine
-        .set_own_comment("Hello there".into())
+        .set_own_comment(only_server(&engine), "Hello there".into())
         .await
         .expect("comment");
     let comment = wait_comment(&bot, &name, |c| c.contains("🎵 Test Band – Test Song")).await;
     assert!(comment.starts_with("Hello there"), "{comment}");
     let own = engine
-        .person_profile(engine_session(&engine))
+        .person_profile(only_server(&engine), engine_session(&engine))
         .await
         .expect("own profile");
     assert_eq!(
@@ -282,14 +283,23 @@ async fn now_playing_reaches_others_and_goes_away_when_turned_off() {
     wait_comment(&bot, &name, |c| c == "Hello there").await;
 
     poller.abort();
-    engine.disconnect();
+    engine.disconnect(only_server(&engine));
 }
 
 fn engine_session(engine: &Engine) -> u32 {
     engine
-        .session_ctx()
+        .session_ctx_for(only_server(engine))
         .expect("connected")
         .handle
         .with_state(|s| s.session)
         .expect("own session")
+}
+
+/// The test's only connected server (0, which no call accepts, when none is).
+fn only_server(engine: &Engine) -> mumcord_engine::ServerId {
+    engine
+        .connections()
+        .first()
+        .and_then(mumcord_engine::ConnState::server_id)
+        .unwrap_or(0)
 }

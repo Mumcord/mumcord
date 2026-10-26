@@ -90,16 +90,6 @@ impl Machine {
         }
     }
 
-    /// The user disconnected or cancelled reconnecting.
-    pub fn cancel(&mut self) {
-        self.stop(None);
-    }
-
-    /// The connection ended for good (e.g. kicked).
-    pub fn end(&mut self, error: Option<EngineError>) {
-        self.stop(error);
-    }
-
     fn schedule_retry(&mut self) -> Step {
         let Some(server_id) = self.server_id() else {
             return Step::Stop;
@@ -244,14 +234,12 @@ mod tests {
     }
 
     #[test]
-    fn connect_sync_and_user_disconnect() {
+    fn connect_and_sync() {
         let mut m = Machine::default();
         m.connect(7);
         assert_eq!(m.state(), &ConnState::Connecting { server_id: 7 });
         m.synced();
         assert_eq!(m.state(), &ConnState::Connected { server_id: 7 });
-        m.cancel();
-        assert_eq!(m.state(), &ConnState::Disconnected { error: None });
     }
 
     #[test]
@@ -314,19 +302,6 @@ mod tests {
         let wrong = EngineError::new(ErrorKind::WrongPassword, "rejected");
         assert_eq!(m.failed(Failure::Fatal(wrong.clone())), Step::Stop);
         assert_eq!(m.state(), &ConnState::Disconnected { error: Some(wrong) });
-    }
-
-    #[test]
-    fn cancel_while_reconnecting() {
-        let mut m = Machine::default();
-        m.connect(1);
-        m.synced();
-        m.lost();
-        m.cancel();
-        assert_eq!(m.state(), &ConnState::Disconnected { error: None });
-        // A stale sync after cancelling must not resurrect the connection.
-        m.synced();
-        assert_eq!(m.state(), &ConnState::Disconnected { error: None });
     }
 
     #[test]

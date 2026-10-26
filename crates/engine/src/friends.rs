@@ -1,12 +1,12 @@
 //! Friends and their online state (FR-1.64).
 //!
 //! Friends are kept in the store by certificate hash. The [`FriendHub`] watches every emitted
-//! engine event to know who is online on the connected server and emits
+//! engine event to know who is online on each connected server and emits
 //! [`EngineEvent::FriendsChanged`] whenever what the friends list shows changes. Last-seen
 //! times and new names are written to the store on a blocking task, because events are
 //! emitted from places that may hold the store lock.
 
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 use std::sync::{Arc, Mutex};
 
 use mumcord_store::{Friend, ServerId, Store, UnixMillis};
@@ -35,7 +35,7 @@ pub struct FriendView {
     pub online: Option<FriendPresence>,
 }
 
-/// A person with a certificate on the connected server.
+/// A person with a certificate on a connected server.
 #[derive(Debug, Clone)]
 struct Present {
     cert_hash: String,
@@ -50,8 +50,10 @@ type Seen = (String, String, UnixMillis);
 #[derive(Debug, Default)]
 struct Tracker {
     friends: HashMap<String, Friend>,
-    server_id: Option<ServerId>,
-    present: HashMap<u32, Present>,
+    /// Servers whose people are known (synced and still connected).
+    synced: HashSet<ServerId>,
+    /// People by server and session; sessions are only unique per server.
+    present: HashMap<(ServerId, u32), Present>,
     shown: Vec<FriendView>,
 }
 
@@ -74,13 +76,13 @@ impl Tracker {
             .friends
             .values()
             .map(|f| {
-                let live = self.server_id.and_then(|server_id| {
-                    self.present
-                        .iter()
-                        .filter(|(_, p)| p.cert_hash == f.cert_hash)
-                        .min_by_key(|(session, _)| **session)
-                        .map(|(session, p)| (server_id, *session, p))
-                });
+                // Online on several servers: the lowest server id, so the choice is stable.
+                let live = self
+                    .present
+                    .iter()
+                    .filter(|(_, p)| p.cert_hash == f.cert_hash)
+                    .min_by_key(|(key, _)| **key)
+                    .map(|((server_id, session), p)| (*server_id, *session, p));
                 FriendView {
                     cert_hash: f.cert_hash.clone(),
                     name: live.map_or_else(|| f.name.clone(), |(_, _, p)| p.name.clone()),
@@ -116,12 +118,18 @@ impl Tracker {
         Some((cert_hash.to_owned(), name.to_owned(), now))
     }
 
-    fn upsert(&mut self, user: &UserView, now: UnixMillis, seen: &mut Vec<Seen>) {
+    fn upsert(
+        &mut self,
+        server_id: ServerId,
+        user: &UserView,
+        now: UnixMillis,
+        seen: &mut Vec<Seen>,
+    ) {
         let Some(cert_hash) = &user.cert_hash else {
             return;
         };
         let before = self.present.insert(
-            user.session,
+            (server_id, user.session),
             Present {
                 cert_hash: cert_hash.clone(),
                 name: user.name.clone(),
@@ -134,48 +142,62 @@ impl Tracker {
         }
     }
 
-    fn leave(&mut self, session: u32, now: UnixMillis, seen: &mut Vec<Seen>) {
-        if let Some(gone) = self.present.remove(&session)
+    fn leave(&mut self, key: (ServerId, u32), now: UnixMillis, seen: &mut Vec<Seen>) {
+        if let Some(gone) = self.present.remove(&key)
             && !self.is_online(&gone.cert_hash)
         {
             seen.extend(self.seen(&gone.cert_hash, &gone.name, now));
         }
     }
 
-    /// Everyone went offline (the connection ended or is being replaced).
-    fn leave_all(&mut self, now: UnixMillis, seen: &mut Vec<Seen>) {
-        let sessions: Vec<u32> = self.present.keys().copied().collect();
-        for session in sessions {
-            self.leave(session, now, seen);
+    /// Everyone on `server_id` went offline (the connection ended or is being replaced).
+    fn leave_all(&mut self, server_id: ServerId, now: UnixMillis, seen: &mut Vec<Seen>) {
+        let keys: Vec<(ServerId, u32)> = self
+            .present
+            .keys()
+            .copied()
+            .filter(|(server, _)| *server == server_id)
+            .collect();
+        for key in keys {
+            self.leave(key, now, seen);
         }
-        self.server_id = None;
+        self.synced.remove(&server_id);
     }
 
-    /// Updates presence from `event`; returns what to store and the new list if it changed.
+    /// Updates presence from `event` of `server` (`None`: app-wide); returns what to store and
+    /// the new list if it changed.
     fn observe(
         &mut self,
+        server: Option<ServerId>,
         event: &EngineEvent,
         now: UnixMillis,
     ) -> (Vec<Seen>, Option<Vec<FriendView>>) {
         let mut seen = Vec::new();
-        match event {
-            EngineEvent::ServerSynced(snapshot) => {
-                self.leave_all(now, &mut seen);
-                self.server_id = Some(snapshot.server_id);
+        match (event, server) {
+            (EngineEvent::ServerSynced(snapshot), _) => {
+                let server_id = snapshot.server_id;
+                self.leave_all(server_id, now, &mut seen);
+                self.synced.insert(server_id);
                 for user in snapshot
                     .users
                     .iter()
                     .filter(|u| u.session != snapshot.self_session)
                 {
-                    self.upsert(user, now, &mut seen);
+                    self.upsert(server_id, user, now, &mut seen);
                 }
             }
-            EngineEvent::UserUpserted(user) if self.server_id.is_some() => {
-                self.upsert(user, now, &mut seen);
+            (EngineEvent::UserUpserted(user), Some(server_id))
+                if self.synced.contains(&server_id) =>
+            {
+                self.upsert(server_id, user, now, &mut seen);
             }
-            EngineEvent::UserRemoved(session) => self.leave(*session, now, &mut seen),
-            EngineEvent::StateChanged(state) if !matches!(state, ConnState::Connected { .. }) => {
-                self.leave_all(now, &mut seen);
+            (EngineEvent::UserRemoved(session), Some(server_id)) => {
+                self.leave((server_id, *session), now, &mut seen);
+            }
+            (EngineEvent::StateChanged(state), Some(server_id))
+                if !matches!(state, ConnState::Connected { .. }) =>
+            {
+                self.leave_all(server_id, now, &mut seen);
             }
             _ => return (seen, None),
         }
@@ -192,7 +214,7 @@ impl Tracker {
     }
 }
 
-/// Friend presence across the connected server; see the module docs.
+/// Friend presence across the connected servers; see the module docs.
 pub struct FriendHub {
     store: Arc<Mutex<Store>>,
     rt: Runtime,
@@ -212,12 +234,17 @@ impl FriendHub {
         })
     }
 
-    /// Feeds one engine event; returns the friends list when it changed.
-    pub(crate) fn observe(&self, event: &EngineEvent) -> Option<Vec<FriendView>> {
+    /// Feeds one engine event of `server` (`None`: app-wide); returns the friends list when it
+    /// changed.
+    pub(crate) fn observe(
+        &self,
+        server: Option<ServerId>,
+        event: &EngineEvent,
+    ) -> Option<Vec<FriendView>> {
         if matches!(event, EngineEvent::FriendsChanged(_)) {
             return None;
         }
-        let (seen, changed) = lock(&self.tracker).observe(event, now_millis());
+        let (seen, changed) = lock(&self.tracker).observe(server, event, now_millis());
         self.persist(seen);
         changed
     }
@@ -323,6 +350,7 @@ mod tests {
         assert!(t.shown.iter().all(|v| v.online.is_none()));
 
         let (seen, list) = t.observe(
+            Some(7),
             &synced(vec![
                 user(1, Some("me"), "Me", 0),
                 user(2, Some("bot"), "Bot", 0),
@@ -343,6 +371,7 @@ mod tests {
         assert!(list[1].online.is_none());
 
         let (seen, list) = t.observe(
+            Some(7),
             &EngineEvent::UserUpserted(user(2, Some("bot"), "Bot", 3)),
             11,
         );
@@ -356,6 +385,7 @@ mod tests {
         );
 
         let (_, list) = t.observe(
+            Some(7),
             &EngineEvent::TalkStateChanged {
                 session: 2,
                 talking: true,
@@ -364,7 +394,7 @@ mod tests {
         );
         assert!(list.is_none());
 
-        let (seen, list) = t.observe(&EngineEvent::UserRemoved(2), 20);
+        let (seen, list) = t.observe(Some(7), &EngineEvent::UserRemoved(2), 20);
         assert_eq!(seen, [("bot".into(), "Bot".into(), 20)]);
         let list = list.expect("offline");
         let bot = list.iter().find(|v| v.cert_hash == "bot").expect("bot");
@@ -373,6 +403,7 @@ mod tests {
 
         // Back with another name: the same friend.
         let (seen, list) = t.observe(
+            Some(7),
             &EngineEvent::UserUpserted(user(5, Some("bot"), "Robot", 0)),
             30,
         );
@@ -386,16 +417,22 @@ mod tests {
     fn disconnect_takes_everyone_offline_and_strangers_do_not_count() {
         let mut t = Tracker::new(vec![friend("bot", "Bot")]);
         t.observe(
+            Some(7),
             &synced(vec![
                 user(2, Some("bot"), "Bot", 0),
                 user(3, None, "Guest", 0),
             ]),
             10,
         );
-        let (_, list) = t.observe(&EngineEvent::UserUpserted(user(4, Some("x"), "X", 0)), 11);
+        let (_, list) = t.observe(
+            Some(7),
+            &EngineEvent::UserUpserted(user(4, Some("x"), "X", 0)),
+            11,
+        );
         assert!(list.is_none());
 
         let (seen, list) = t.observe(
+            Some(7),
             &EngineEvent::StateChanged(ConnState::Reconnecting {
                 server_id: 7,
                 attempt: 1,
@@ -409,6 +446,7 @@ mod tests {
 
         // Updates of an ended connection are ignored.
         let (_, list) = t.observe(
+            Some(7),
             &EngineEvent::UserUpserted(user(2, Some("bot"), "Bot", 0)),
             16,
         );
@@ -416,9 +454,44 @@ mod tests {
     }
 
     #[test]
+    fn friends_are_tracked_per_server() {
+        let mut t = Tracker::new(vec![friend("bot", "Bot")]);
+        let mut on_eight = synced(vec![user(2, Some("x"), "X", 0)]);
+        if let EngineEvent::ServerSynced(snapshot) = &mut on_eight {
+            snapshot.server_id = 8;
+        }
+        t.observe(Some(7), &synced(Vec::new()), 10);
+        t.observe(Some(8), &on_eight, 10);
+
+        // The same session number on another server is another person.
+        let (_, list) = t.observe(
+            Some(8),
+            &EngineEvent::UserUpserted(user(2, Some("bot"), "Bot", 4)),
+            11,
+        );
+        assert_eq!(
+            list.expect("online on 8")[0].online,
+            Some(FriendPresence {
+                server_id: 8,
+                session: 2,
+                channel_id: 4
+            })
+        );
+        let (_, list) = t.observe(Some(7), &EngineEvent::UserRemoved(2), 12);
+        assert!(list.is_none(), "leaving server 7 does not touch server 8");
+
+        // Server 7 ending keeps the friend online on server 8.
+        let ended = EngineEvent::StateChanged(ConnState::Disconnected { error: None });
+        let (_, list) = t.observe(Some(7), &ended, 13);
+        assert!(list.is_none());
+        let (_, list) = t.observe(Some(8), &ended, 14);
+        assert!(list.expect("offline")[0].online.is_none());
+    }
+
+    #[test]
     fn adding_and_removing_changes_the_list() {
         let mut t = Tracker::new(Vec::new());
-        t.observe(&synced(vec![user(2, Some("bot"), "Bot", 0)]), 10);
+        t.observe(Some(7), &synced(vec![user(2, Some("bot"), "Bot", 0)]), 10);
         t.friends.insert("bot".into(), friend("bot", "Bot"));
         let list = t.refresh().expect("added");
         assert!(list[0].online.is_some(), "online right away when present");

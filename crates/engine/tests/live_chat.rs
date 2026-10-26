@@ -3,16 +3,18 @@
 //! `MUMCORD_LIVE=1 cargo test -p mumcord-engine --features test-backend --test live_chat -- --ignored --test-threads=1`
 #![cfg(feature = "test-backend")]
 
+mod common;
+
 use std::path::{Path, PathBuf};
 use std::time::Duration;
 
 use mumcord_bot::samples::{PNG, Sample};
 use mumcord_bot::{Bot, BotConfig, MessageCheck, UserCheck, env};
+use mumcord_engine::EventReceiver;
 use mumcord_engine::{
     ChatMessageView, ConversationRef, Engine, EngineEvent, ErrorKind, HistoryScope, PasswordChange,
     SecretStore, ServerFields, ServerView, Snapshot,
 };
-use tokio::sync::mpsc::UnboundedReceiver;
 
 const WAIT: Duration = Duration::from_secs(20);
 
@@ -45,7 +47,7 @@ fn null_audio() {
 }
 
 async fn wait_for<T>(
-    rx: &mut UnboundedReceiver<EngineEvent>,
+    rx: &mut EventReceiver,
     what: &str,
     mut pick: impl FnMut(&EngineEvent) -> Option<T>,
 ) -> T {
@@ -61,7 +63,7 @@ async fn wait_for<T>(
     }
 }
 
-async fn wait_message(rx: &mut UnboundedReceiver<EngineEvent>, contains: &str) -> ChatMessageView {
+async fn wait_message(rx: &mut EventReceiver, contains: &str) -> ChatMessageView {
     wait_for(rx, contains, |e| match e {
         EngineEvent::MessageReceived(m) if m.body.contains(contains) => Some((**m).clone()),
         _ => None,
@@ -69,10 +71,7 @@ async fn wait_message(rx: &mut UnboundedReceiver<EngineEvent>, contains: &str) -
     .await
 }
 
-async fn wait_unread(
-    rx: &mut UnboundedReceiver<EngineEvent>,
-    conversation: &ConversationRef,
-) -> u32 {
+async fn wait_unread(rx: &mut EventReceiver, conversation: &ConversationRef) -> u32 {
     wait_for(rx, "UnreadChanged", |e| match e {
         EngineEvent::UnreadChanged(u) if &u.conversation == conversation => Some(u.count),
         _ => None,
@@ -80,7 +79,7 @@ async fn wait_unread(
     .await
 }
 
-async fn start_engine(dir: &Path) -> (Engine, UnboundedReceiver<EngineEvent>) {
+async fn start_engine(dir: &Path) -> (Engine, EventReceiver) {
     Engine::new(
         &dir.join("data"),
         SecretStore::in_memory(),
@@ -106,11 +105,7 @@ async fn add_server(engine: &Engine, name: &str, port: u16) -> ServerView {
 }
 
 /// Connects, trusting the server certificate on first use.
-async fn connect(
-    engine: &Engine,
-    rx: &mut UnboundedReceiver<EngineEvent>,
-    server: &ServerView,
-) -> Snapshot {
+async fn connect(engine: &Engine, rx: &mut EventReceiver, server: &ServerView) -> Snapshot {
     engine.connect(server.id, None).expect("connect");
     loop {
         let event = wait_for(rx, "sync", |e| match e {
@@ -170,8 +165,8 @@ async fn chat_follow_history_and_profile() {
         .identity_create(name.clone())
         .await
         .expect("identity");
-    let server = add_server(&engine, &name, env::PORT_V15).await;
-    let bot = Bot::connect(bot_config(&dir, &bot_name, env::PORT_V15))
+    let server = add_server(&engine, &name, common::v15()).await;
+    let bot = Bot::connect(bot_config(&dir, &bot_name, common::v15()))
         .await
         .expect("bot");
     bot.join("Lobby").await.expect("bot joins Lobby");
@@ -186,7 +181,9 @@ async fn chat_follow_history_and_profile() {
     let (lobby, raid) = (channel(&snapshot, "Lobby"), channel(&snapshot, "Raid"));
     let lobby_conv = ConversationRef::Channel { channel_id: lobby };
     let raid_conv = ConversationRef::Channel { channel_id: raid };
-    engine.join_channel(lobby).expect("join Lobby");
+    engine
+        .join_channel(only_server(&engine), lobby)
+        .expect("join Lobby");
     bot.wait_user(
         &name,
         &UserCheck {
@@ -212,11 +209,18 @@ async fn chat_follow_history_and_profile() {
     bot.send_channel(Some("Lobby"), &Sample::ExternalImage.html())
         .expect("external");
     let external = wait_message(&mut rx, "remote image").await;
-    assert!(!external.body.contains("tracker.example"));
+    // Absolute http(s) image sources stay in the body; the UI loads them through the engine's
+    // guarded fetch, never directly.
+    assert!(
+        external
+            .body
+            .contains("https://tracker.example.invalid/pixel.png")
+    );
 
     // Own channel message reaches the bot and is returned stored.
     let sent = engine
-        .send_channel_message(lobby, "<b>hello</b> from mumcord")
+        .send_channel_message(only_server(&engine), lobby, "<b>hello</b> from mumcord")
+        .await
         .expect("send");
     assert!(sent.own && sent.id.parse::<i64>().is_ok());
     bot.wait_message(&MessageCheck {
@@ -237,7 +241,8 @@ async fn chat_follow_history_and_profile() {
     assert_eq!(pm.conversation, private_conv);
     assert_eq!(wait_unread(&mut rx, &private_conv).await, 1);
     engine
-        .send_private_message(bot_session, "private reply")
+        .send_private_message(only_server(&engine), bot_session, "private reply")
+        .await
         .expect("reply");
     bot.wait_message(&MessageCheck {
         from: Some(name.clone()),
@@ -248,7 +253,7 @@ async fn chat_follow_history_and_profile() {
     .await
     .expect("bot receives reply");
     engine
-        .conversation_mark_read(private_conv.clone())
+        .conversation_mark_read(only_server(&engine), private_conv.clone())
         .expect("mark read");
     assert_eq!(wait_unread(&mut rx, &private_conv).await, 0);
 
@@ -256,14 +261,18 @@ async fn chat_follow_history_and_profile() {
     let limit = snapshot.info.max_message_length as usize;
     if limit > 0 {
         let err = engine
-            .send_channel_message(lobby, &"x".repeat(limit + 1))
+            .send_channel_message(only_server(&engine), lobby, &"x".repeat(limit + 1))
+            .await
             .expect_err("too large");
         assert_eq!(err.kind, ErrorKind::MessageTooLarge);
     }
 
     // Follow Raid while staying in Lobby (AC-1.15).
     bot.join("Raid").await.expect("bot joins Raid");
-    engine.channel_follow(raid).await.expect("follow Raid");
+    engine
+        .channel_follow(only_server(&engine), raid)
+        .await
+        .expect("follow Raid");
     let followed = wait_for(&mut rx, "FollowedChannelsChanged", |e| match e {
         EngineEvent::FollowedChannelsChanged(ids) => Some(ids.clone()),
         _ => None,
@@ -281,7 +290,7 @@ async fn chat_follow_history_and_profile() {
 
     // Comment, avatar and registration are visible to the bot (AC-1.19, AC-1.20).
     engine
-        .set_own_comment("<b>my</b> mumcord comment".into())
+        .set_own_comment(only_server(&engine), "<b>my</b> mumcord comment".into())
         .await
         .expect("comment");
     bot.wait_user(
@@ -295,7 +304,10 @@ async fn chat_follow_history_and_profile() {
     .expect("bot sees comment");
     let avatar = dir.join("avatar.png");
     std::fs::write(&avatar, PNG).expect("avatar file");
-    engine.set_own_avatar(Some(avatar)).await.expect("avatar");
+    engine
+        .set_own_avatar(only_server(&engine), Some(avatar))
+        .await
+        .expect("avatar");
     bot.wait_user(
         &name,
         &UserCheck {
@@ -305,7 +317,10 @@ async fn chat_follow_history_and_profile() {
     )
     .await
     .expect("bot sees avatar");
-    engine.register_self().await.expect("register");
+    engine
+        .register_self(only_server(&engine))
+        .await
+        .expect("register");
     bot.wait_user(
         &name,
         &UserCheck {
@@ -318,12 +333,17 @@ async fn chat_follow_history_and_profile() {
 
     // History, paged backwards.
     let lobby_history = engine
-        .history_load(lobby_conv.clone(), None, 50)
+        .history_load(only_server(&engine), lobby_conv.clone(), None, 50)
         .expect("history");
     assert_eq!(lobby_history.len(), 4);
     assert!(lobby_history.last().expect("last").own);
     let older = engine
-        .history_load(lobby_conv.clone(), Some(&lobby_history[2].id), 50)
+        .history_load(
+            only_server(&engine),
+            lobby_conv.clone(),
+            Some(&lobby_history[2].id),
+            50,
+        )
         .expect("page");
     assert_eq!(older, lobby_history[..2].to_vec());
 
@@ -333,7 +353,7 @@ async fn chat_follow_history_and_profile() {
         .identity_export(pkcs12.clone(), "pw".into())
         .await
         .expect("export");
-    engine.disconnect();
+    engine.disconnect(only_server(&engine));
     drop(engine);
     drop(rx);
     let (engine, mut rx) = start_engine(&dir).await;
@@ -355,7 +375,7 @@ async fn chat_follow_history_and_profile() {
         .await
         .expect("follow restored");
     let private_history = engine
-        .history_load(private_conv.clone(), None, 50)
+        .history_load(only_server(&engine), private_conv.clone(), None, 50)
         .expect("private history");
     let bodies: Vec<_> = private_history
         .iter()
@@ -364,7 +384,7 @@ async fn chat_follow_history_and_profile() {
     assert_eq!(bodies, [(false, "psst private"), (true, "private reply")]);
     assert_eq!(
         engine
-            .history_load(lobby_conv.clone(), None, 50)
+            .history_load(only_server(&engine), lobby_conv.clone(), None, 50)
             .expect("lobby")
             .len(),
         4
@@ -379,7 +399,7 @@ async fn chat_follow_history_and_profile() {
         .expect("clear");
     assert!(
         engine
-            .history_load(lobby_conv.clone(), None, 50)
+            .history_load(only_server(&engine), lobby_conv.clone(), None, 50)
             .expect("empty")
             .is_empty()
     );
@@ -391,20 +411,22 @@ async fn chat_follow_history_and_profile() {
     let transient = wait_message(&mut rx, "not kept").await;
     assert!(transient.id.starts_with("tmp-"));
     let raid_history = engine
-        .history_load(raid_conv.clone(), None, 50)
+        .history_load(only_server(&engine), raid_conv.clone(), None, 50)
         .expect("raid");
     assert!(raid_history.iter().all(|m| !m.body.contains("not kept")));
     engine.set_save_history(server.id, true).expect("saving on");
     engine.history_clear(HistoryScope::All).expect("clear all");
     assert!(
         engine
-            .history_load(private_conv, None, 50)
+            .history_load(only_server(&engine), private_conv, None, 50)
             .expect("empty")
             .is_empty()
     );
 
     // Unfollow stops listening.
-    engine.channel_unfollow(raid).expect("unfollow");
+    engine
+        .channel_unfollow(only_server(&engine), raid)
+        .expect("unfollow");
     bot.wait_user(
         &name,
         &UserCheck {
@@ -414,7 +436,7 @@ async fn chat_follow_history_and_profile() {
     )
     .await
     .expect("ear icon gone");
-    engine.disconnect();
+    engine.disconnect(only_server(&engine));
 }
 
 #[tokio::test(flavor = "multi_thread", worker_threads = 4)]
@@ -431,14 +453,14 @@ async fn follow_refused_when_listener_limit_reached() {
         .identity_create(name.clone())
         .await
         .expect("identity");
-    let server = add_server(&engine, &name, env::PORT_LIMIT).await;
+    let server = add_server(&engine, &name, common::limit()).await;
     let snapshot = connect(&engine, &mut rx, &server).await;
     let err = engine
-        .channel_follow(channel(&snapshot, "Raid"))
+        .channel_follow(only_server(&engine), channel(&snapshot, "Raid"))
         .await
         .expect_err("refused");
     assert_eq!(err.kind, ErrorKind::ListenerLimitReached, "{err}");
-    engine.disconnect();
+    engine.disconnect(only_server(&engine));
 }
 
 #[tokio::test(flavor = "multi_thread", worker_threads = 4)]
@@ -455,19 +477,24 @@ async fn follow_needs_server_1_4() {
         .identity_create(name.clone())
         .await
         .expect("identity");
-    let server = add_server(&engine, &name, env::PORT_V13).await;
+    let server = add_server(&engine, &name, common::v13()).await;
     let snapshot = connect(&engine, &mut rx, &server).await;
     assert!(!snapshot.info.follow_supported);
     let err = engine
-        .channel_follow(channel(&snapshot, "Raid"))
+        .channel_follow(only_server(&engine), channel(&snapshot, "Raid"))
         .await
         .expect_err("too old");
     assert_eq!(err.kind, ErrorKind::ServerTooOld);
     // Chat still works on old servers.
     engine
-        .send_channel_message(channel(&snapshot, "Lobby"), "hello old server")
+        .send_channel_message(
+            only_server(&engine),
+            channel(&snapshot, "Lobby"),
+            "hello old server",
+        )
+        .await
         .expect("send");
-    engine.disconnect();
+    engine.disconnect(only_server(&engine));
 }
 
 #[tokio::test(flavor = "multi_thread", worker_threads = 4)]
@@ -484,7 +511,7 @@ async fn follow_all_and_unfollow_all() {
         .identity_create(name.clone())
         .await
         .expect("identity");
-    let server = add_server(&engine, &name, env::PORT_V15).await;
+    let server = add_server(&engine, &name, common::v15()).await;
     let snapshot = connect(&engine, &mut rx, &server).await;
     let own = snapshot
         .users
@@ -493,7 +520,10 @@ async fn follow_all_and_unfollow_all() {
         .map(|u| u.channel_id)
         .expect("own user");
 
-    let summary = engine.channel_follow_all().await.expect("follow all");
+    let summary = engine
+        .channel_follow_all(only_server(&engine))
+        .await
+        .expect("follow all");
     let followed = wait_for(&mut rx, "FollowedChannelsChanged", |e| match e {
         EngineEvent::FollowedChannelsChanged(ids) => Some(ids.clone()),
         _ => None,
@@ -509,17 +539,22 @@ async fn follow_all_and_unfollow_all() {
     );
 
     // A second run finds nothing new.
-    let again = engine.channel_follow_all().await.expect("follow all again");
+    let again = engine
+        .channel_follow_all(only_server(&engine))
+        .await
+        .expect("follow all again");
     assert_eq!(again.followed, 0, "{again:?}");
 
-    engine.channel_unfollow_all().expect("unfollow all");
+    engine
+        .channel_unfollow_all(only_server(&engine))
+        .expect("unfollow all");
     let followed = wait_for(&mut rx, "FollowedChannelsChanged", |e| match e {
         EngineEvent::FollowedChannelsChanged(ids) => Some(ids.clone()),
         _ => None,
     })
     .await;
     assert!(followed.is_empty());
-    engine.disconnect();
+    engine.disconnect(only_server(&engine));
 }
 
 #[tokio::test(flavor = "multi_thread", worker_threads = 4)]
@@ -536,9 +571,12 @@ async fn follow_all_stops_at_the_listener_limit() {
         .identity_create(name.clone())
         .await
         .expect("identity");
-    let server = add_server(&engine, &name, env::PORT_LIMIT).await;
+    let server = add_server(&engine, &name, common::limit()).await;
     let snapshot = connect(&engine, &mut rx, &server).await;
-    let summary = engine.channel_follow_all().await.expect("follow all");
+    let summary = engine
+        .channel_follow_all(only_server(&engine))
+        .await
+        .expect("follow all");
     assert_eq!(summary.followed, 0, "{summary:?}");
     assert!(summary.limit_reached > 0, "{summary:?}");
     assert_eq!(summary.no_answer, 0, "{summary:?}");
@@ -546,5 +584,14 @@ async fn follow_all_stops_at_the_listener_limit() {
         (summary.limit_reached + summary.not_allowed) as usize,
         snapshot.channels.len() - 1
     );
-    engine.disconnect();
+    engine.disconnect(only_server(&engine));
+}
+
+/// The test's only connected server (0, which no call accepts, when none is).
+fn only_server(engine: &Engine) -> mumcord_engine::ServerId {
+    engine
+        .connections()
+        .first()
+        .and_then(mumcord_engine::ConnState::server_id)
+        .unwrap_or(0)
 }

@@ -14,6 +14,7 @@ mod core;
 pub mod hash;
 pub mod wire;
 
+use std::collections::HashMap;
 use std::sync::{Arc, Mutex, MutexGuard};
 use std::time::Duration;
 
@@ -31,11 +32,21 @@ pub use wire::DATA_ID;
 /// How often timeouts are checked and queued packets go out.
 const TICK: Duration = Duration::from_millis(100);
 
-/// The engine's history sync state; one [`Core`] per connection.
-#[derive(Default)]
-pub(crate) struct HistorySync {
+/// The engine's history sync state: one [`Connection`] per connected server, so every server
+/// syncs with its own Mumcord users (FR-2.4).
+pub(crate) type HistorySync = HashMap<ServerId, Connection>;
+
+/// History sync on one connection.
+pub(crate) struct Connection {
+    /// `None` once the server turned out to be too old for plugin data.
     core: Option<Core>,
-    driver: Option<JoinHandle<()>>,
+    driver: JoinHandle<()>,
+}
+
+impl Drop for Connection {
+    fn drop(&mut self) {
+        self.driver.abort();
+    }
 }
 
 struct CtxEnv<'a>(&'a SessionCtx);
@@ -78,7 +89,7 @@ fn live_channels(user: &User) -> impl Iterator<Item = u32> + '_ {
 fn with_core(state: &Mutex<HistorySync>, ctx: &SessionCtx, f: impl FnOnce(&mut Core)) {
     let events = {
         let mut state = lock(state);
-        let Some(core) = state.core.as_mut() else {
+        let Some(core) = state.get_mut(&ctx.server_id).and_then(|c| c.core.as_mut()) else {
             return;
         };
         f(core);
@@ -101,21 +112,17 @@ pub(crate) fn on_synced(state: &Arc<Mutex<HistorySync>>, ctx: &SessionCtx, rt: &
             core.user_seen(user.session, &user.name, live_channels(user), now);
         }
     });
-    let mut guard = lock(state);
-    if let Some(driver) = guard.driver.take() {
-        driver.abort();
-    }
-    guard.core = Some(core);
-    guard.driver = Some(rt.spawn(drive(state.clone(), ctx.clone())));
+    let connection = Connection {
+        core: Some(core),
+        driver: rt.spawn(drive(state.clone(), ctx.clone())),
+    };
+    // Replacing the connection of an earlier sync stops its driver.
+    lock(state).insert(ctx.server_id, connection);
 }
 
-/// The connection ended.
-pub(crate) fn on_disconnect(state: &Mutex<HistorySync>) {
-    let mut guard = lock(state);
-    guard.core = None;
-    if let Some(driver) = guard.driver.take() {
-        driver.abort();
-    }
+/// The connection to `server_id` ended.
+pub(crate) fn on_disconnect(state: &Mutex<HistorySync>, server_id: ServerId) {
+    lock(state).remove(&server_id);
 }
 
 /// Someone joined, moved, followed or unfollowed (own user included).
@@ -126,8 +133,11 @@ pub(crate) fn on_user(state: &Mutex<HistorySync>, ctx: &SessionCtx, user: &User)
     });
 }
 
-pub(crate) fn on_user_removed(state: &Mutex<HistorySync>, session: u32) {
-    if let Some(core) = lock(state).core.as_mut() {
+pub(crate) fn on_user_removed(state: &Mutex<HistorySync>, server_id: ServerId, session: u32) {
+    if let Some(core) = lock(state)
+        .get_mut(&server_id)
+        .and_then(|c| c.core.as_mut())
+    {
         core.user_left(session);
     }
 }
@@ -163,7 +173,9 @@ async fn drive(state: Arc<Mutex<HistorySync>>, ctx: SessionCtx) {
                 Err(e @ CommandError::Unsupported { .. }) => {
                     // Servers before 1.4 cannot forward plugin data: no history sync there.
                     tracing::info!(error = %e, "history sync unavailable on this server");
-                    lock(&state).core = None;
+                    if let Some(c) = lock(&state).get_mut(&ctx.server_id) {
+                        c.core = None;
+                    }
                     return;
                 }
             }
@@ -172,23 +184,27 @@ async fn drive(state: Arc<Mutex<HistorySync>>, ctx: SessionCtx) {
 }
 
 impl Engine {
-    /// "Load earlier messages" (FR-1.60): asks other Mumcord users for the channel's messages
-    /// before `before` (Unix ms; `None`: up to when the channel started arriving live). The
-    /// channel must be the own or a followed one. Progress arrives as `HistorySyncStatus`,
-    /// messages as `HistorySynced` events.
+    /// "Load earlier messages" (FR-1.60): asks other Mumcord users on `server_id` for the
+    /// channel's messages before `before` (Unix ms; `None`: up to when the channel started
+    /// arriving live). The channel must be the own or a followed one. Progress arrives as
+    /// `HistorySyncStatus`, messages as `HistorySynced` events.
     pub fn history_sync_request(
         &self,
+        server_id: ServerId,
         channel_id: u32,
         before: Option<UnixMillis>,
     ) -> EngineResult<()> {
-        self.session_ctx()?;
+        self.session_ctx_for(server_id)?;
         let mut state = lock(self.history_sync_state());
-        let core = state.core.as_mut().ok_or_else(|| {
-            EngineError::new(
-                ErrorKind::ServerTooOld,
-                "history sync needs a Mumble 1.4+ server",
-            )
-        })?;
+        let core = state
+            .get_mut(&server_id)
+            .and_then(|c| c.core.as_mut())
+            .ok_or_else(|| {
+                EngineError::new(
+                    ErrorKind::ServerTooOld,
+                    "history sync needs a Mumble 1.4+ server",
+                )
+            })?;
         core.request(channel_id, before, now_millis())
             .map_err(|e| match e {
                 RequestError::NotLive => EngineError::new(

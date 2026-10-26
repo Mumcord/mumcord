@@ -57,6 +57,7 @@ async fn client(port: u16, prefix: &str) -> Client {
         password: std::env::var("MUMCORD_TEST_SERVER_PASSWORD")
             .ok()
             .filter(|p| !p.is_empty()),
+        tokens: Vec::new(),
         identity: Some(identity()),
         verify_cert: Arc::new(|_| true),
         login_timeout: WAIT,

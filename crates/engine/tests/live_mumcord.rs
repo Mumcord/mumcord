@@ -4,14 +4,15 @@
 //! `MUMCORD_LIVE=1 cargo test -p mumcord-engine --features test-backend --test live_mumcord -- --ignored --test-threads=1`
 #![cfg(feature = "test-backend")]
 
+mod common;
+
 use std::path::{Path, PathBuf};
 use std::time::Duration;
 
 use mumcord_bot::{Bot, BotConfig, env};
+use mumcord_engine::EventReceiver;
 use mumcord_engine::{Engine, EngineEvent, PasswordChange, SecretStore, ServerFields, ServerView};
-use tokio::sync::mpsc::UnboundedReceiver;
 
-const PORT: u16 = 64739;
 const WAIT: Duration = Duration::from_secs(20);
 
 fn live() -> bool {
@@ -38,7 +39,7 @@ fn work_dir(name: &str) -> PathBuf {
 }
 
 async fn wait_for<T>(
-    rx: &mut UnboundedReceiver<EngineEvent>,
+    rx: &mut EventReceiver,
     what: &str,
     mut pick: impl FnMut(&EngineEvent) -> Option<T>,
 ) -> T {
@@ -57,9 +58,9 @@ async fn wait_for<T>(
 async fn add_server(engine: &Engine, name: &str) -> ServerView {
     engine
         .server_add(ServerFields {
-            label: format!("test {PORT} {name}"),
+            label: format!("test {} {name}", common::v14()),
             address: "127.0.0.1".into(),
-            port: PORT,
+            port: common::v14(),
             username: name.into(),
             password: match env::testenv_var("SERVER_PASSWORD") {
                 Some(p) => PasswordChange::Set(p),
@@ -70,7 +71,7 @@ async fn add_server(engine: &Engine, name: &str) -> ServerView {
         .expect("server")
 }
 
-async fn connect(engine: &Engine, rx: &mut UnboundedReceiver<EngineEvent>, server: &ServerView) {
+async fn connect(engine: &Engine, rx: &mut EventReceiver, server: &ServerView) {
     engine.connect(server.id, None).expect("connect");
     loop {
         let event = wait_for(rx, "sync", |e| match e {
@@ -92,7 +93,7 @@ async fn connect(engine: &Engine, rx: &mut UnboundedReceiver<EngineEvent>, serve
     }
 }
 
-async fn start(dir: &Path, who: &str) -> (Engine, UnboundedReceiver<EngineEvent>, String) {
+async fn start(dir: &Path, who: &str) -> (Engine, EventReceiver, String) {
     let (engine, mut rx) = Engine::new(
         &dir.join(who),
         SecretStore::in_memory(),
@@ -121,7 +122,7 @@ fn session_of(engine: &Engine, name: &str) -> u32 {
 }
 
 /// Waits until `name` is known with (`true`) the Mumcord features.
-async fn wait_badge(rx: &mut UnboundedReceiver<EngineEvent>, name: &str) -> Vec<String> {
+async fn wait_badge(rx: &mut EventReceiver, name: &str) -> Vec<String> {
     wait_for(rx, "a Mumcord user", |e| match e {
         EngineEvent::UserUpserted(u) if u.name == name => u.mumcord_features.clone(),
         _ => None,
@@ -140,7 +141,7 @@ async fn mumcord_clients_see_each_other_but_not_official_ones() {
     let dir = work_dir("live_mumcord");
     let bot = Bot::connect(BotConfig {
         data_dir: Some(dir.join("bot")),
-        ..BotConfig::new(&unique("b51-bot"), PORT)
+        ..BotConfig::new(&unique("b51-bot"), common::v14())
     })
     .await
     .expect("bot");
@@ -154,12 +155,12 @@ async fn mumcord_clients_see_each_other_but_not_official_ones() {
     wait_badge(&mut b_rx, &a_name).await;
 
     let a_session = session_of(&a, &a_name);
-    assert!(b.is_mumcord_user(a_session));
-    assert!(!b.is_mumcord_user(session_of(&b, &bot_name)));
-    assert!(!a.is_mumcord_user(session_of(&a, &bot_name)));
+    assert!(b.is_mumcord_user(only_server(&b), a_session));
+    assert!(!b.is_mumcord_user(only_server(&b), session_of(&b, &bot_name)));
+    assert!(!a.is_mumcord_user(only_server(&a), session_of(&a, &bot_name)));
 
     // A reconnect of B (new session) is recognised again.
-    b.disconnect();
+    b.disconnect(only_server(&b));
     wait_for(&mut a_rx, "B leaving", |e| match e {
         EngineEvent::UserRemoved(_) => Some(()),
         _ => None,
@@ -208,9 +209,18 @@ async fn hellos_while_reading_snapshots_do_not_deadlock() {
     for round in 0..5 {
         let (b, _b_rx, b_name) = start(&dir, &format!("b85b{round}")).await;
         wait_badge(&mut a_rx, &b_name).await;
-        b.disconnect();
+        b.disconnect(only_server(&b));
     }
     stop.store(true, std::sync::atomic::Ordering::Relaxed);
     reader.join().expect("snapshot reader");
     done.store(true, std::sync::atomic::Ordering::Relaxed);
+}
+
+/// The test's only connected server (0, which no call accepts, when none is).
+fn only_server(engine: &Engine) -> mumcord_engine::ServerId {
+    engine
+        .connections()
+        .first()
+        .and_then(mumcord_engine::ConnState::server_id)
+        .unwrap_or(0)
 }

@@ -20,6 +20,7 @@ use mumcord_audio::codec::{
 };
 use mumcord_audio::dsp::{DspChain, DspControls, EchoRefConsumer, Gate, MicTest, echo_reference};
 use mumcord_audio::io::{AudioIo, DeviceEvent, DeviceInfo, Direction, FrameSink, FrameSource};
+use mumcord_audio::mixer::share::ShareGain;
 use mumcord_audio::mixer::{PacketSender, Playback, PlaybackConfig, PlaybackSink};
 use mumcord_audio::{FRAME_SAMPLES, Frame, SAMPLE_RATE};
 use mumcord_protocol::{OutgoingAudio, VoiceTransport};
@@ -27,6 +28,8 @@ use tokio::runtime::Handle as Runtime;
 use tokio::task::JoinHandle as TaskHandle;
 
 use crate::positional::PositionalShared;
+use crate::screen_share::sound::ShareSoundHub;
+use crate::session::batch::TalkBatch;
 use crate::session::{
     AudioDeviceList, AudioDeviceView, EngineError, EngineEvent, EngineResult, Events,
 };
@@ -219,11 +222,17 @@ pub(crate) struct VoiceShared {
     pub deaf: AtomicBool,
     pub bitrate_bps: AtomicU32,
     pub loss_percent: AtomicU32,
+    /// Highest bitrate the bitrate slider can reach (FR-2.64); 0 while no voice server is known.
+    pub bitrate_max_bps: AtomicU32,
     /// Voice packets handed to the transport / received, for the connection info.
     pub packets_sent: AtomicU64,
     pub packets_received: AtomicU64,
     /// Listener pose and own position for positional audio.
     pub positional: Arc<PositionalShared>,
+    /// Where watched screen shares' sound goes while the pipeline runs (FR-2.42).
+    pub share_sound: ShareSoundHub,
+    /// Level of watched screen shares' sound, kept across pipelines (auto-ducking, FR-2.76).
+    pub share_gain: Arc<ShareGain>,
 }
 
 impl VoiceShared {
@@ -231,6 +240,7 @@ impl VoiceShared {
     pub fn reset_link(&self) {
         self.bitrate_bps.store(START_BITRATE_BPS, Ordering::Relaxed);
         self.loss_percent.store(0, Ordering::Relaxed);
+        self.bitrate_max_bps.store(0, Ordering::Relaxed);
         self.packets_sent.store(0, Ordering::Relaxed);
         self.packets_received.store(0, Ordering::Relaxed);
     }
@@ -243,9 +253,12 @@ impl Default for VoiceShared {
             deaf: AtomicBool::new(false),
             bitrate_bps: AtomicU32::new(START_BITRATE_BPS),
             loss_percent: AtomicU32::new(0),
+            bitrate_max_bps: AtomicU32::new(0),
             packets_sent: AtomicU64::new(0),
             packets_received: AtomicU64::new(0),
             positional: Arc::default(),
+            share_sound: ShareSoundHub::default(),
+            share_gain: Arc::default(),
         }
     }
 }
@@ -283,6 +296,7 @@ pub(crate) struct VoicePipeline {
     capture: Option<JoinHandle<FrameSource>>,
     talk_task: TaskHandle<()>,
     sounds: Arc<crate::sounds::SoundHub>,
+    shared: Arc<VoiceShared>,
 }
 
 impl VoicePipeline {
@@ -308,6 +322,7 @@ impl VoicePipeline {
                 let _ = echo_producer.push(frame);
             })),
             listener: Some(shared.positional.listener.clone()),
+            share_gain: shared.share_gain.clone(),
             ..PlaybackConfig::default()
         };
         let (playback, ports) = match Playback::start(audio.sink.clone(), config) {
@@ -346,26 +361,24 @@ impl VoicePipeline {
             true
         }));
 
+        shared.share_sound.attach(ports.shares);
+        let pipeline_shared = shared.clone();
+
         let mut talk_events = ports.talk_events;
         let talk_task = rt.spawn(async move {
-            let mut own_talking = false;
+            // Rate-limited per person so busy channels do not flood the UI (FR-2.23).
+            let mut batch = TalkBatch::default();
             let mut tick = tokio::time::interval(TALK_POLL);
             tick.set_missed_tick_behavior(tokio::time::MissedTickBehavior::Skip);
             loop {
-                tick.tick().await;
+                let now = tick.tick().await;
                 while let Ok(e) = talk_events.pop() {
-                    events.emit(EngineEvent::TalkStateChanged {
-                        session: e.session,
-                        talking: e.talking,
-                    });
+                    batch.set(e.session, e.talking, now);
                 }
                 let talking = controls.transmitting() && !shared.muted.load(Ordering::Relaxed);
-                if talking != own_talking {
-                    own_talking = talking;
-                    events.emit(EngineEvent::TalkStateChanged {
-                        session: own_session,
-                        talking,
-                    });
+                batch.set(own_session, talking, now);
+                for (session, talking) in batch.take_due(now) {
+                    events.emit(EngineEvent::TalkStateChanged { session, talking });
                 }
             }
         });
@@ -377,6 +390,7 @@ impl VoicePipeline {
                 capture: Some(capture),
                 talk_task,
                 sounds,
+                shared: pipeline_shared,
             },
             ports.packets,
         ))
@@ -417,6 +431,7 @@ impl Drop for VoicePipeline {
         self.talk_task.abort();
         self.stop.store(true, Ordering::Relaxed);
         self.sounds.detach();
+        self.shared.share_sound.detach();
     }
 }
 

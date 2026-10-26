@@ -3,15 +3,17 @@
 //! `MUMCORD_LIVE=1 cargo test -p mumcord-engine --features test-backend --test live_channel_info -- --ignored --test-threads=1`
 #![cfg(feature = "test-backend")]
 
+mod common;
+
 use std::path::{Path, PathBuf};
 use std::time::Duration;
 
 use mumcord_bot::{Bot, BotConfig, env};
+use mumcord_engine::EventReceiver;
 use mumcord_engine::{
     ChannelView, Engine, EngineEvent, PasswordChange, SecretStore, ServerFields, Snapshot,
 };
 use mumcord_protocol::proto;
-use tokio::sync::mpsc::UnboundedReceiver;
 
 const WAIT: Duration = Duration::from_secs(20);
 
@@ -39,7 +41,7 @@ fn work_dir(name: &str) -> PathBuf {
 }
 
 async fn wait_channel(
-    rx: &mut UnboundedReceiver<EngineEvent>,
+    rx: &mut EventReceiver,
     what: &str,
     id: u32,
     mut done: impl FnMut(&ChannelView) -> bool,
@@ -59,7 +61,7 @@ async fn wait_channel(
     }
 }
 
-async fn connect(engine: &Engine, rx: &mut UnboundedReceiver<EngineEvent>) -> Snapshot {
+async fn connect(engine: &Engine, rx: &mut EventReceiver) -> Snapshot {
     let name = unique("mc-info");
     engine
         .identity_create(name.clone())
@@ -69,7 +71,7 @@ async fn connect(engine: &Engine, rx: &mut UnboundedReceiver<EngineEvent>) -> Sn
         .server_add(ServerFields {
             label: "test v15".into(),
             address: "127.0.0.1".into(),
-            port: env::PORT_V15,
+            port: common::v15(),
             username: name,
             password: match env::testenv_var("SERVER_PASSWORD") {
                 Some(p) => PasswordChange::Set(p),
@@ -115,7 +117,7 @@ async fn description_is_fetched_on_demand_and_updates_live() {
         "<p><b>Raid rules</b>: be on time.</p><script>alert(1)</script><p>{}</p>",
         "Bring potions and food. ".repeat(10)
     );
-    let admin = Bot::connect(BotConfig::superuser(env::PORT_V15))
+    let admin = Bot::connect(BotConfig::superuser(common::v15()))
         .await
         .expect("SuperUser bot (SUPERUSER_PASSWORD in testenv/.env)");
     // A temporary channel moves its creator in and disappears when the bot leaves.
@@ -173,7 +175,9 @@ async fn description_is_fetched_on_demand_and_updates_live() {
     assert!(view.has_description);
     assert_eq!(view.description, None, "only the hash is sent on connect");
 
-    engine.channel_description_request(room).expect("request");
+    engine
+        .channel_description_request(only_server(&engine), room)
+        .expect("request");
     let view = wait_channel(&mut rx, "fetched description", room, |v| {
         v.description.is_some()
     })
@@ -182,7 +186,9 @@ async fn description_is_fetched_on_demand_and_updates_live() {
     assert!(text.contains("<b>Raid rules</b>"));
     assert!(!text.contains("script"), "sanitized");
     // Asking again for the same hash sends nothing and succeeds.
-    engine.channel_description_request(room).expect("repeat");
+    engine
+        .channel_description_request(only_server(&engine), room)
+        .expect("repeat");
 
     admin
         .handle()
@@ -198,6 +204,15 @@ async fn description_is_fetched_on_demand_and_updates_live() {
     .await;
     assert!(view.has_description);
 
-    engine.disconnect();
+    engine.disconnect(only_server(&engine));
     admin.handle().disconnect();
+}
+
+/// The test's only connected server (0, which no call accepts, when none is).
+fn only_server(engine: &Engine) -> mumcord_engine::ServerId {
+    engine
+        .connections()
+        .first()
+        .and_then(mumcord_engine::ConnState::server_id)
+        .unwrap_or(0)
 }
