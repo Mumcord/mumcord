@@ -32,7 +32,7 @@ describe("chat: local history (AC-1.17)", () => {
   before(async () => {
     await testenv.up("v15");
     await finishWizard();
-    await addFirstServer(64738);
+    await addFirstServer(testenv.ports.v15);
     await joinChannel("Lobby");
     await selectChannel("Lobby");
   });

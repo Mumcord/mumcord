@@ -1,10 +1,10 @@
 // AC-1.26: OS light -> light, OS dark -> dark (WebKitGTK prefers-color-scheme driven by GTK_THEME),
 // manual override; language es/de switch live (no restart) and every UI text is translated;
 // the picker offers all 24 EU languages by their own names (FR-1.36) and French/Greek apply live.
-import { readFileSync, writeFileSync } from "node:fs";
+import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { browser, expect, $ } from "@wdio/globals";
-import { app, artifactsDir, bot, repoRoot, testenv } from "../../helpers/index.ts";
+import { app, bot, repoRoot, testenv } from "../../helpers/index.ts";
 import {
   chooseRadio,
   connectFromEmptyState,
@@ -204,17 +204,12 @@ describe("AC-1.26 theme follows OS + manual override", () => {
 
 describe("AC-1.26 language switch without restart", () => {
   let english = new Set<string>();
-  const report: Record<string, string[]> = {};
 
   before(async () => {
     await connectFromEmptyState();
     await joinChannel("Lobby");
     await bot(["expect", "user", me, "--in", "Lobby"], { name: "C7LangPeer", timeout: 20 });
     english = await collect();
-  });
-
-  after(() => {
-    writeFileSync(join(artifactsDir, "c7-untranslated.json"), JSON.stringify(report, null, 2));
   });
 
   for (const [lang, settingsTitle] of [
@@ -237,7 +232,6 @@ describe("AC-1.26 language switch without restart", () => {
       // Same document (no reload / restart happened).
       expect(await browser.execute(() => performance.timeOrigin)).toBe(pid);
       const leftovers = [...translated].filter((t) => english.has(t) && !neutral(t));
-      report[lang] = leftovers;
       if (leftovers.length) console.warn(`${lang}: untranslated candidates:\n  ${leftovers.join("\n  ")}`);
       expect(leftovers).toEqual([]);
     });

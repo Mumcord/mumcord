@@ -1,8 +1,12 @@
 name: CI
 
+# Branch pushes run through their pull request; a push trigger on every branch ran the whole
+# matrix twice. A branch without a pull request can be checked with a manual run.
 on:
   push:
+    branches: [main]
   pull_request:
+  workflow_dispatch:
 
 concurrency:
   group: ci-${{ github.ref }}
@@ -10,6 +14,8 @@ concurrency:
 
 env:
   CARGO_TERM_COLOR: always
+  # No debug info: CI only needs pass/fail, and it makes linking faster and the caches smaller.
+  CARGO_PROFILE_DEV_DEBUG: 0
 
 jobs:
   build-test:
@@ -22,13 +28,46 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      # The runner's Ubuntu mirror is often very slow (30 kB/s: 40 min for 70 MB), so the downloaded
+      # packages are cached per runner image; apt then only downloads what changed. The cache is
+      # saved even when the step times out, so a slow first download is not lost.
+      - name: apt cache key
+        id: apt
+        if: runner.os == 'Linux'
+        run: echo "image=$ImageVersion" >> "$GITHUB_OUTPUT"
+
+      - name: Restore apt packages
+        id: apt-cache
+        if: runner.os == 'Linux'
+        uses: actions/cache/restore@v4
+        with:
+          path: ~/apt-archives
+          key: apt-${{ matrix.os }}-${{ steps.apt.outputs.image }}
+          restore-keys: apt-${{ matrix.os }}-
+
+      # A stalled mirror fails the step instead of holding the job for most of an hour.
       - name: Install Linux system libraries
         if: runner.os == 'Linux'
+        timeout-minutes: 10
         run: |
-          sudo apt-get update
-          sudo apt-get install -y --no-install-recommends \
+          mkdir -p ~/apt-archives/partial
+          sudo apt-get update -o Acquire::Retries=3
+          sudo apt-get install -y --no-install-recommends -o Dir::Cache::Archives="$HOME/apt-archives" \
+            -o Acquire::Retries=3 -o Acquire::http::Timeout=20 -o Acquire::https::Timeout=20 \
             libwebkit2gtk-4.1-dev libayatana-appindicator3-dev librsvg2-dev \
             libxdo-dev libasound2-dev libvpx-dev libpipewire-0.3-dev libclang-dev pkg-config cmake
+
+      # apt's lock and partial downloads are root-only and must not go into the cache.
+      - name: Clean apt cache
+        if: always() && runner.os == 'Linux' && steps.apt-cache.outputs.cache-hit != 'true'
+        run: sudo rm -rf ~/apt-archives/lock ~/apt-archives/partial
+
+      - name: Save apt packages
+        if: always() && runner.os == 'Linux' && steps.apt-cache.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v4
+        with:
+          path: ~/apt-archives
+          key: apt-${{ matrix.os }}-${{ steps.apt.outputs.image }}
 
       # Screen sharing links a static libvpx on Windows and macOS (scripts/build-libvpx.sh,
       # RELEASING.md). It is cached: the key changes with the script and, on Windows, with the
@@ -102,14 +141,21 @@ jobs:
       - name: Rust tests
         run: cargo test --workspace --locked
 
+      # The UI checks are platform-independent (vitest runs in jsdom), so they run on Linux only.
+      # They stay in this job because its name is a required check for main.
       - name: UI lint
+        if: runner.os == 'Linux'
         run: npm run lint
 
       - name: UI typecheck
+        if: runner.os == 'Linux'
         run: npm run typecheck
 
       - name: UI tests
+        if: runner.os == 'Linux'
         run: npm test
 
+      # Linux is covered by the E2E build job, which builds the same app.
       - name: Tauri debug build
+        if: runner.os != 'Linux'
         run: npm run tauri build -- --debug --no-bundle

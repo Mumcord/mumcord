@@ -104,7 +104,7 @@ describe("chat: link previews, player cards and inline images (AC-1.39, AC-1.40,
     process.env.PATH = `${opener.binDir}:${process.env.PATH ?? ""}`;
     await app.restart();
     await finishWizard();
-    await addFirstServer(64738);
+    await addFirstServer(testenv.ports.v15);
     await joinChannel("Lobby");
     await selectChannel("Lobby");
   });

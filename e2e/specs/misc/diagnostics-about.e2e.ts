@@ -67,7 +67,7 @@ describe("diagnostics and about (AC-1.28, AC-1.29)", () => {
   it("connects with the server password and receives chat", async () => {
     const address = $("input[placeholder='mumble.example.org']");
     await address.waitForDisplayed();
-    await typeInto("input[placeholder='mumble.example.org']", `mumble://${MY_NAME}:${SERVER_PASSWORD}@localhost:64738`);
+    await typeInto("input[placeholder='mumble.example.org']", `mumble://${MY_NAME}:${SERVER_PASSWORD}@${testenv.address("v15")}`);
     await button("Add and connect").click();
     await button("Trust and connect").click();
     await waitConnected();

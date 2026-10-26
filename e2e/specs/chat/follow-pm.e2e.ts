@@ -69,7 +69,7 @@ describe("chat: follow and private messages (AC-1.15, AC-1.16, AC-1.18)", () => 
     await bot(["allow-listen", "AFK"], { superuser: true }).catch(() => undefined);
     await app.restart({ audio: `file:${silentWav("chat-silence.wav", 600)}:${out.path}` });
     await finishWizard();
-    await addFirstServer(64738);
+    await addFirstServer(testenv.ports.v15);
     await joinChannel("Lobby");
     raidBot = new ScriptBot({ name: "RaidBot" });
     await raidBot.connected();

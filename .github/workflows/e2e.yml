@@ -2,7 +2,7 @@ name: E2E
 
 # UI end-to-end tests in the e2e/ Docker image (WebKitWebDriver + tauri-driver, Xvfb) against
 # the local testenv Mumble servers. Slow, so separate from CI: on pull requests to main and manual
-# runs. One job builds the image and the debug binaries once, four shard jobs run the spec files
+# runs. One job builds the image and the debug binaries once, five shard jobs run the spec files
 # of e2e/shards.json in parallel (each runner has its own test servers), and "Linux E2E" (the
 # check main's branch protection requires) passes only when all of them passed.
 on:
@@ -33,17 +33,42 @@ jobs:
       - name: Install npm dependencies
         run: npm ci
 
+      # A cache entry is never re-saved under the same key, so the week in the key makes the
+      # target dir follow the code (one save per week) instead of drifting further from it.
+      # The month scopes the image layer cache (apt, rustup, tauri-driver): rebuilt only when
+      # e2e/Dockerfile changes, and once a month so the toolchain and packages do not go stale.
+      - name: Cache keys
+        id: keys
+        run: |
+          echo "week=$(date -u +%G-%V)" >> "$GITHUB_OUTPUT"
+          echo "month=$(date -u +%Y-%m)" >> "$GITHUB_OUTPUT"
+
       # Cargo registry + target dir of the in-container build.
       - uses: actions/cache@v4
         with:
           path: ${{ env.MUMCORD_E2E_CACHE }}
-          key: e2e-${{ hashFiles('Cargo.lock', 'e2e/Dockerfile') }}
+          key: e2e-${{ hashFiles('Cargo.lock', 'e2e/Dockerfile') }}-${{ steps.keys.outputs.week }}
           restore-keys: e2e-
 
+      - uses: docker/setup-buildx-action@v3
+
+      - name: Build image
+        uses: docker/build-push-action@v6
+        with:
+          context: e2e
+          tags: mumcord-e2e
+          load: true
+          cache-from: type=gha,scope=e2e-image-${{ steps.keys.outputs.month }}
+          cache-to: type=gha,mode=max,scope=e2e-image-${{ steps.keys.outputs.month }}
+
+      # No debug info and no incremental data: faster links and a smaller target cache.
       - name: Build image and binaries
         run: npm run e2e
         env:
           MUMCORD_E2E_STEP: build
+          MUMCORD_E2E_IMAGE_BUILT: 1
+          CARGO_PROFILE_DEV_DEBUG: 0
+          CARGO_INCREMENTAL: 0
 
       # zstd instead of the artifact zip: much faster for the ~3 GB image. tar keeps the
       # executable bits that artifacts would drop.
@@ -74,7 +99,7 @@ jobs:
       fail-fast: false
       matrix:
         # Must match the number of shards in e2e/shards.json.
-        shard: [1, 2, 3, 4]
+        shard: [1, 2, 3, 4, 5]
     steps:
       - uses: actions/checkout@v4
 

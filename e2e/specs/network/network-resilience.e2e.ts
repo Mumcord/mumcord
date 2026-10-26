@@ -8,11 +8,12 @@ import { app, bot, botInBackground, netsim, testenv, type BackgroundBot } from "
 import { finishWizardWithDefaults, readWavPcm, writeWavPcm } from "../../helpers/wizard-util.ts";
 
 // AC-1.21 (reconnect), AC-1.22 (UDP blocked -> TCP), AC-1.23 (10 % loss -> bitrate adapts).
-// The app talks to a counting relay (64802) that forwards to netsim (64800) -> test server v15.
+// The app talks to a counting relay (64802 by default) that forwards to netsim (64800) -> test
+// server v15. Both sit above MUMCORD_PORT_BASE, so parallel runs do not collide.
 // The relay exists only because the UI does not expose the encoder bitrate: we measure the size
 // of the app's UDP voice packets instead.
 
-const RELAY_PORT = 64802;
+const RELAY_PORT = netsim.listenPort + 2;
 const ME = "NetTester";
 const LINK = `mumble://${ME}@127.0.0.1:${String(RELAY_PORT)}/Raid`;
 
