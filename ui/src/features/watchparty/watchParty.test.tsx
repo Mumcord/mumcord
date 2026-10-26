@@ -38,23 +38,31 @@ function party(patch: Partial<WatchParty> = {}): WatchParty {
 }
 
 /**
- * Posts a report from the player page until `check` passes. The panel attaches its message
- * listener in an effect after the frame renders, so on a slow runner a single early report is lost.
+ * The player frame once the panel listens for its reports. The listener attaches in an effect after
+ * the frame renders, so on a slow runner a report sent right after the frame appears is lost. Needs
+ * `window.addEventListener` spied on before the render.
  */
-async function reportUntil(
-  frame: HTMLIFrameElement,
-  data: unknown,
-  check: () => void,
-): Promise<void> {
+async function findPlayer(): Promise<HTMLIFrameElement> {
+  const frame = await screen.findByTitle<HTMLIFrameElement>("Watch party player");
   await waitFor(() => {
-    act(() => {
-      window.dispatchEvent(
-        new MessageEvent("message", { origin: PAGE_ORIGIN, source: frame.contentWindow, data }),
-      );
-    });
-    check();
+    // spyOn hands back the existing spy.
+    expect(vi.spyOn(window, "addEventListener")).toHaveBeenCalledWith(
+      "message",
+      expect.any(Function),
+    );
+  });
+  return frame;
+}
+
+/** A report from the player page in `frame`. */
+function report(frame: HTMLIFrameElement, data: unknown): void {
+  act(() => {
+    window.dispatchEvent(
+      new MessageEvent("message", { origin: PAGE_ORIGIN, source: frame.contentWindow, data }),
+    );
   });
 }
+
 describe("YouTube only", () => {
   it("accepts only video ids from youtube-nocookie embed URLs", () => {
     expect(videoIdOf(`https://www.youtube-nocookie.com/embed/${VIDEO}`)).toBe(VIDEO);
@@ -294,6 +302,8 @@ describe("panel", () => {
     api = await connectedMock({ bindStore: true });
     const { users, selfSession } = getServerState();
     channelId = users.get(selfSession ?? -1)?.channelId ?? -1;
+    // Fresh call history, so findPlayer waits for this test's listener.
+    vi.spyOn(window, "addEventListener").mockClear();
   });
   afterEach(() => {
     vi.useRealTimers();
@@ -365,17 +375,16 @@ describe("panel", () => {
   it("offers the browser when YouTube refuses to play here", async () => {
     render(<WatchPartyPanel serverId={1} channelId={channelId} />);
     announce(party({ channelId, joined: true }));
-    const frame = await screen.findByTitle<HTMLIFrameElement>("Watch party player");
-    await reportUntil(frame, { type: "error", code: 153 }, () => {
-      expect(screen.getByRole("button", { name: "Open in browser" })).toBeInTheDocument();
-    });
+    const frame = await findPlayer();
+    report(frame, { type: "error", code: 153 });
+    expect(screen.getByRole("button", { name: "Open in browser" })).toBeInTheDocument();
     expect(screen.queryByTitle("Watch party player")).toBeNull();
   });
 
   it("drives the player through the loopback page and ignores other senders", async () => {
     render(<WatchPartyPanel serverId={1} channelId={channelId} />);
     announce(party({ channelId, joined: true, playing: false, positionMs: 30_000 }));
-    const frame = await screen.findByTitle<HTMLIFrameElement>("Watch party player");
+    const frame = await findPlayer();
     expect(frame.src).toBe(`${PAGE_ORIGIN}/0123456789abcdef0123456789abcdef/player.html`);
     const target = frame.contentWindow;
     if (target === null) throw new Error("no frame window");
@@ -409,19 +418,11 @@ describe("panel", () => {
       </>,
     );
     announce(party({ channelId, joined: true }));
-    const frame = await screen.findByTitle<HTMLIFrameElement>("Watch party player");
+    const frame = await findPlayer();
     const target = frame.contentWindow;
     if (target === null) throw new Error("no frame window");
     const post = vi.spyOn(target, "postMessage").mockImplementation(() => undefined);
-    act(() => {
-      window.dispatchEvent(
-        new MessageEvent("message", {
-          origin: PAGE_ORIGIN,
-          source: target,
-          data: { type: "ready" },
-        }),
-      );
-    });
+    report(frame, { type: "ready" });
     expect(post).not.toHaveBeenCalledWith(
       expect.objectContaining({ type: "setVolume" }),
       PAGE_ORIGIN,
@@ -518,6 +519,8 @@ describe("playlist", () => {
     api = await connectedMock({ bindStore: true });
     const { users, selfSession } = getServerState();
     channelId = users.get(selfSession ?? -1)?.channelId ?? -1;
+    // Fresh call history, so findPlayer waits for this test's listener.
+    vi.spyOn(window, "addEventListener").mockClear();
     vi.spyOn(api, "linkPreview").mockImplementation((url) => {
       const id = new URL(url).searchParams.get("v") ?? "";
       return Promise.resolve({
@@ -620,8 +623,9 @@ describe("playlist", () => {
     const next = vi.spyOn(api, "watchPartyNext").mockResolvedValue(null);
     render(<WatchPartyPanel serverId={1} channelId={channelId} />);
     show({ currentEntry: 3, playlist: [entry(4, VIDEO_B)] });
-    const frame = await screen.findByTitle<HTMLIFrameElement>("Watch party player");
-    await reportUntil(frame, { type: "ended" }, () => {
+    const frame = await findPlayer();
+    report(frame, { type: "ended" });
+    await waitFor(() => {
       expect(next).toHaveBeenCalledWith(1, 3, false);
     });
   });
@@ -630,16 +634,8 @@ describe("playlist", () => {
     vi.spyOn(api, "watchPartyNext").mockResolvedValue(null);
     render(<WatchPartyPanel serverId={1} channelId={channelId} />);
     show({ currentEntry: 3, positionMs: 200_000 });
-    const ended = await screen.findByTitle<HTMLIFrameElement>("Watch party player");
-    act(() => {
-      window.dispatchEvent(
-        new MessageEvent("message", {
-          origin: PAGE_ORIGIN,
-          source: ended.contentWindow,
-          data: { type: "ended" },
-        }),
-      );
-    });
+    const ended = await findPlayer();
+    report(ended, { type: "ended" });
     show({ currentEntry: 3, playing: false, positionMs: 200_000 });
     show({ currentEntry: 5, videoId: VIDEO_B, positionMs: 0 });
     const frame = screen.getByTitle<HTMLIFrameElement>("Watch party player");
