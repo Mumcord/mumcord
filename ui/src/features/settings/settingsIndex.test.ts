@@ -63,6 +63,16 @@ describe("settings search index", () => {
     expect(searchSettings("zzzz", t)).toEqual([]);
   });
 
+  it("finds the newer settings rows", () => {
+    expect(labels(searchSettings("connected servers", t))).toEqual(["servers.limit"]);
+    expect(labels(searchSettings("hide empty", t))).toEqual(["channelList.hideEmpty"]);
+    expect(labels(searchSettings("reduced transparency", t))).toEqual([
+      "appearanceEffects.visualEffects",
+    ]);
+    expect(labels(searchSettings("allow direct connections", t))).toContain("privacyDirect.allow");
+    expect(labels(searchSettings("github", t))).toEqual(["updates.check"]);
+  });
+
   it("finds the history sharing switch (FR-1.60)", () => {
     expect(labels(searchSettings("share my channel history", t))).toEqual([
       "historySharing.switch",

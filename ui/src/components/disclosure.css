@@ -1,0 +1,45 @@
+/* Collapsible row with a chevron, e.g. the per-person settings in the profile card (FR-2.25c). */
+.disclosure__toggle {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  width: 100%;
+  padding: var(--space-1) 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  text-align: start;
+  cursor: pointer;
+}
+
+.disclosure__toggle:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 2px;
+}
+
+.disclosure__title {
+  font-weight: 600;
+}
+
+.disclosure__hint {
+  margin-inline-start: auto;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm, 0.85em);
+}
+
+/* Points right when collapsed, down when expanded. */
+.disclosure__chevron {
+  flex: none;
+  transition: transform var(--duration-normal) var(--ease-out);
+}
+
+.disclosure__toggle[aria-expanded="true"] .disclosure__chevron {
+  transform: rotate(90deg);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .disclosure__chevron {
+    transition: none;
+  }
+}

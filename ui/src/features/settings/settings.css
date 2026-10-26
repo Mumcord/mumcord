@@ -260,6 +260,29 @@
   margin: var(--space-2) 0 var(--space-1);
 }
 
+/* Label on the left, control on the right: same rhythm as the switches. */
+.settings-control-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  padding: var(--space-1) 0;
+}
+
+.settings-control-row > label {
+  flex: 1 1 auto;
+}
+
+.settings-control-row > .select,
+.settings-control-row > .settings-input {
+  flex: 0 0 auto;
+}
+
+.settings-input--compact {
+  width: 7rem;
+  text-align: end;
+}
+
 .settings-input {
   width: 100%;
   max-width: 28rem;
@@ -313,16 +336,17 @@
 }
 
 .settings-button--primary {
-  border-color: var(--color-accent);
-  background: var(--color-accent);
-  color: var(--color-on-accent);
+  border-color: transparent;
+  background: var(--color-primary-bg);
+  color: var(--color-primary-text);
   font-weight: var(--font-weight-bold);
+  box-shadow: var(--shadow-primary-glow);
 }
 
 .settings-button--primary:hover {
-  border-color: var(--color-accent);
-  background: var(--color-accent);
-  filter: brightness(1.08);
+  border-color: transparent;
+  background: var(--color-primary-bg);
+  box-shadow: var(--shadow-primary-glow-hover);
 }
 
 .settings-button--danger,
@@ -414,7 +438,7 @@
 .settings-dialog__backdrop {
   position: fixed;
   inset: 0;
-  z-index: 10;
+  z-index: 80; /* above floating widgets (30+) and menus (70) */
   display: flex;
   align-items: center;
   justify-content: center;
