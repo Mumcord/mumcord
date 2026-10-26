@@ -1,8 +1,12 @@
 name: CI
 
+# Branch pushes run through their pull request; a push trigger on every branch ran the whole
+# matrix twice. A branch without a pull request can be checked with a manual run.
 on:
   push:
+    branches: [main]
   pull_request:
+  workflow_dispatch:
 
 concurrency:
   group: ci-${{ github.ref }}
