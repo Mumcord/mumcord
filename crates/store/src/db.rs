@@ -144,6 +144,16 @@ const MIGRATIONS: &[&str] = &[
     CREATE INDEX chat_message_by_key
         ON chat_message (conversation_kind, conversation_key, sent_at);
     ",
+    // v11: multi-server state (FR-2.3, FR-2.7, FR-2.10, FR-2.17). `connected_at_quit` is the
+    // quit time of a server that was connected then (NULL otherwise); the most recent one
+    // wins when more servers than the limit were connected (AC-2.6).
+    r"
+    ALTER TABLE saved_server ADD COLUMN always_connect_at_start INTEGER NOT NULL DEFAULT 0;
+    ALTER TABLE saved_server ADD COLUMN connected_at_quit INTEGER;
+    ALTER TABLE saved_server ADD COLUMN was_voice_server_at_quit INTEGER NOT NULL DEFAULT 0;
+    ALTER TABLE saved_server ADD COLUMN notifications_muted INTEGER NOT NULL DEFAULT 0;
+    ALTER TABLE saved_server ADD COLUMN theme_id TEXT;
+    ",
 ];
 
 /// Handle to the local database. Not `Sync`; callers share it behind a mutex.
@@ -386,6 +396,35 @@ pub(crate) mod tests {
                 .synced_origins(&[kept[0].id])
                 .expect("origins")
                 .is_empty()
+        );
+    }
+
+    #[test]
+    fn version_10_database_upgrades_with_multi_server_defaults() {
+        let dir = tempfile::tempdir().expect("tempdir");
+        {
+            let mut conn = Connection::open(dir.path().join(DB_FILE_NAME)).expect("open");
+            let tx = conn.transaction().expect("tx");
+            for sql in &MIGRATIONS[..10] {
+                tx.execute_batch(sql).expect("migration");
+            }
+            tx.pragma_update(None, "user_version", 10).expect("pragma");
+            tx.execute(
+                "INSERT INTO saved_server (label, address, username, sort_order)
+                 VALUES ('Old', 'localhost', 'Tester', 0)",
+                [],
+            )
+            .expect("insert");
+            tx.commit().expect("commit");
+        }
+        let store = Store::open(dir.path()).expect("upgrade");
+        let server = &store.servers().expect("servers")[0];
+        assert_eq!(server.label, "Old");
+        assert!(!server.always_connect_at_start && !server.notifications_muted);
+        assert!(!server.was_voice_server_at_quit);
+        assert_eq!(
+            (server.connected_at_quit, server.theme_id.as_deref()),
+            (None, None)
         );
     }
 
