@@ -1,5 +1,5 @@
 // AC-1.35 (spec §11, FR-1.13/FR-1.14, QA.2): a fresh connect lands read-only (default channel,
-// self-muted + deafened, "You're reading along…" notice with a Join button); voice only after an
+// self-muted + deafened, "Read-only – Join a channel to talk." notice with a Join button); voice only after an
 // explicit Join (notice button, double-click, mumble:// link with a channel path), which restores
 // the user's last own mute/deafen choice, also across an app restart (QA.7); an automatic
 // reconnect after a dropped connection keeps channel and voice state.
@@ -24,15 +24,14 @@ import {
   fill,
   launchWithLink,
   serverButton,
-  waitServerStatus,
 } from "../../helpers/servers-ui.ts";
 import { concat, readWav, writeWav } from "../../helpers/voice-audio.ts";
 import { doubleClickRow, ownChannel, showAllPeople } from "../../helpers/voice-ui.ts";
 
 const ME = "ReadOnlyQA";
 const VIA_NETSIM = `127.0.0.1:${String(netsim.listenPort)}`;
-const LINK = "mumble://localhost/Raid";
-const WATCH = { name: "RoWatcher", timeout: 30 };
+const LINK = `mumble://${testenv.address("v15")}/Raid`;
+const WATCH = { name: "RoWatcher", timeout: 30, port: testenv.ports.v15 };
 const OTHER = "SwitchV14";
 const WATCH_OTHER = { ...WATCH, port: testenv.ports.v14 };
 
@@ -65,7 +64,7 @@ async function waitVoiceState(readOnly: boolean): Promise<void> {
 async function expectReadOnlyUi(): Promise<void> {
   await waitVoiceState(true);
   await notice().waitForDisplayed({ timeout: 15_000 });
-  expect(await notice().getText()).toContain("You're reading along");
+  expect(await notice().getText()).toContain("Read-only");
   await noticeJoin().waitForDisplayed();
   expect(await noticeJoin().getText()).toMatch(/^Join /);
 }
@@ -77,7 +76,7 @@ async function expectVoiceOnUi(): Promise<void> {
 
 /** A bot in `channel` hears the app's voice (bot script: join, expect-audio). */
 async function botHearsApp(channel: string, name: string): Promise<void> {
-  const ear = new ScriptBot({ name, timeout: 30 });
+  const ear = new ScriptBot({ name, timeout: 30, port: testenv.ports.v15 });
   try {
     await ear.connected();
     if (channel !== "/") await ear.run(`join ${channel}`);
@@ -94,6 +93,7 @@ async function botHearsNothing(): Promise<void> {
     await bot(["expect-audio", "--from", ME, "--min-rms", "-55", "--timeout", "8"], {
       name: "RoEar",
       timeout: 20,
+      port: testenv.ports.v15,
     });
     heard = true;
   } catch {
@@ -104,7 +104,7 @@ async function botHearsNothing(): Promise<void> {
 
 /** A bot in `channel` hears nothing from the app for a while. */
 async function botInChannelHearsNothing(channel: string): Promise<void> {
-  const ear = new ScriptBot({ name: "RoEar", timeout: 30 });
+  const ear = new ScriptBot({ name: "RoEar", timeout: 30, port: testenv.ports.v15 });
   let heard = false;
   try {
     await ear.connected();
@@ -196,7 +196,7 @@ describe("read-only connect and explicit join (AC-1.35)", () => {
   });
 
   it("chat works while reading along", async () => {
-    const reader = new ScriptBot({ name: "RoReader", timeout: 30 });
+    const reader = new ScriptBot({ name: "RoReader", timeout: 30, port: testenv.ports.v15 });
     try {
       await reader.connected();
       const check = reader.run(`expect message --from ${ME} --contains ro-chat-35`, 40_000);
@@ -303,10 +303,11 @@ describe("read-only connect and explicit join (AC-1.35)", () => {
         resolve();
       });
     });
-    await clickThrough(["Save and connect", "Disconnect and switch", "Trust and connect"], () =>
+    await clickThrough(["Save and connect", "Trust and connect"], () =>
       bot(["expect", "user", ME, "--in", "Raid", "--deaf", "false", "--muted", "false"], {
         name: "RoWatcher",
         timeout: 3,
+        port: testenv.ports.v15,
       }).then(
         () => true,
         () => false,
@@ -340,13 +341,11 @@ describe("read-only connect and explicit join (AC-1.35)", () => {
     await fill("Your name on this server", ME);
     await button("Add server").click();
     await serverButton(OTHER).click();
-    await dialogTitle("Switch server?").waitForDisplayed();
-    await button("Disconnect and switch").click();
     await clickThrough(["Trust and connect"], async () =>
       (await serverButton(OTHER).getAttribute("aria-label"))?.endsWith("(connected)") ?? false,
     );
     await channelName("Raid").waitForDisplayed({ timeout: 15_000 });
-    await expectReadOnlyUi();
+    // A fresh connect is read-only on the server itself; voice stays on the first server.
     await bot(["expect", "user", ME, "--deaf", "true"], WATCH_OTHER);
     await treeSettled();
     await doubleClickRow(channelName("Raid"));
@@ -362,12 +361,10 @@ describe("read-only connect and explicit join (AC-1.35)", () => {
       ["expect", "user", ME, "--in", "Raid", "--muted", "true", "--deaf", "false"],
       WATCH_OTHER,
     );
+    // Both servers stay connected: showing the first one does not disconnect the other.
     await serverButton("127.0.0.1").click();
-    await dialogTitle("Switch server?").waitForDisplayed();
-    await button("Disconnect and switch").click();
-    await waitServerStatus(OTHER, null);
     await waitConnected();
-    await expectReadOnlyUi();
+    await bot(["expect", "user", ME, "--deaf", "true"], WATCH);
     await treeSettled();
     await doubleClickRow(channelName("Raid"));
     await bot(["expect", "user", ME, "--in", "Raid", "--muted", "true", "--deaf", "false"], WATCH);

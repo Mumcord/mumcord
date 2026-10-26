@@ -17,10 +17,10 @@ import {
 // AC-1.4 (add server with password, persists, password only in the keyring), AC-1.5 (trust
 // dialog on first use, blocking warning after a certificate change) and AC-1.6 (mumble:// link
 // opens, connects and joins "Raid"), against testenv v15.
-const LINK = "mumble://localhost/Raid";
+const LINK = `mumble://${testenv.address("v15")}/Raid`;
 const PASSWORD = "qa-ac14-Pw-7f3c9e";
 const PW_SERVER = "Password server";
-const BOT = { name: "QAWatcher", timeout: 25 };
+const BOT = { name: "QAWatcher", timeout: 25, port: testenv.ports.v15 };
 
 async function fingerprints(): Promise<string[]> {
   const texts: string[] = [];
@@ -40,7 +40,7 @@ async function trustNewCert(): Promise<void> {
 async function serverReachable(): Promise<void> {
   await browser.waitUntil(
     () =>
-      bot(["connect"], { name: "QAProbe", timeout: 3 }).then(
+      bot(["connect"], { name: "QAProbe", timeout: 3, port: testenv.ports.v15 }).then(
         () => true,
         () => false,
       ),
@@ -82,7 +82,7 @@ describe("servers (AC-1.4, AC-1.5, AC-1.6)", function () {
     await browser.$('button[aria-label="Add a server"]').click();
     await dialogTitle("Add a server").waitForDisplayed();
     await fill("Address", "127.0.0.1");
-    await fill("Port", "64738");
+    await fill("Port", String(testenv.ports.v15));
     await fill("Name in the server bar", PW_SERVER);
     await fill("Your name on this server", "Tester2");
     await fill("Server password (optional)", PASSWORD);
@@ -92,8 +92,6 @@ describe("servers (AC-1.4, AC-1.5, AC-1.6)", function () {
 
   it("AC-1.5: first connection shows the trust dialog with the fingerprint; accept connects", async () => {
     await serverButton(PW_SERVER).click();
-    await dialogTitle("Switch server?").waitForDisplayed();
-    await button("Disconnect and switch").click();
     await trustNewCert();
     await waitServerStatus(PW_SERVER, "connected");
     await bot(["expect", "user", "Tester2"], BOT);

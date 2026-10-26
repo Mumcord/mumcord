@@ -70,7 +70,7 @@ async function join(name: string): Promise<void> {
 
 async function serverMenu(name: string, item: string): Promise<void> {
   await serverButton(name).click({ button: "right" });
-  const row = $(`//*[@role='menuitem' or @role='menuitemcheckbox'][normalize-space()='${item}']`);
+  const row = $(`//*[@role='menuitem' or @role='menuitemcheckbox'][contains(normalize-space(),'${item}')]`);
   await row.waitForClickable();
   await row.click();
 }
@@ -170,7 +170,8 @@ describe("multiple servers (AC-2.1–2.10)", function () {
     await $("//section[@aria-label='Notifications']//button[contains(@class,'toast__close')]")
       .click()
       .catch(() => undefined);
-    await alphaBot.run('say --channel Raid "second message"');
+    // The first mention is already cleared by now (the server was shown while muting); a new one must count while muted.
+    await alphaBot.run(`say --channel Raid "hey @${USER.toLowerCase()} second message"`);
     await sleep(4000);
     expect(await toast("second message").isExisting()).toBe(false);
     await waitBarLabel(ALPHA, /mentions: 1/);
