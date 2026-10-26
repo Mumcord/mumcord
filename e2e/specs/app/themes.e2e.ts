@@ -181,8 +181,9 @@ describe("themes (AC-2.12 – AC-2.16)", function () {
       await waitMessage("Theme:");
       const cards = await $$(".theme-card").getElements();
       const card = cards[cards.length - 1];
-      await card.$("button.theme-card__apply").click();
+      // Read before the click: the theme can apply before a read right after it.
       const before = await token("--color-accent");
+      await card.$("button.theme-card__apply").click();
       await browser.waitUntil(async () => (await token("--color-accent")) !== before, {
         timeoutMsg: "received theme was not applied",
       });
