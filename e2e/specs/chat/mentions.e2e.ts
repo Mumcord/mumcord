@@ -64,7 +64,8 @@ describe("chat: mentions (AC-1.41)", () => {
       "//section[@aria-label='Notifications']//button[contains(@class,'toast__open') and contains(.,'sure thing')]",
     );
     await toast.waitForDisplayed({ timeout: 15_000 });
-    await expect(toast).toHaveText(expect.stringContaining("mentioned you"));
+    // The toast shows the line under its title; read the DOM text, not the rendered one.
+    expect(await toast.getProperty("textContent")).toContain("mentioned you");
     await toast.click();
     await waitMessage("sure thing");
     const marked = await browser.execute(
