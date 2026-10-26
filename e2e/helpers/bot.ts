@@ -18,7 +18,7 @@ export interface BotOptions {
 function globalArgs(opts: BotOptions): string[] {
   const args: string[] = [];
   if (opts.name !== undefined) args.push("--name", opts.name);
-  if (opts.port !== undefined) args.push("--port", String(opts.port));
+  args.push("--port", String(opts.port ?? ports.v15));
   if (opts.cert !== undefined) args.push("--cert", opts.cert);
   if (opts.superuser) args.push("--superuser");
   if (opts.timeout !== undefined) args.push("--timeout", String(opts.timeout));
