@@ -7,7 +7,8 @@
 //! them to the [`ScreenFrameSink`] (`watch`).
 //!
 //! Only the user's own channel is tracked. A sharer announces its share to everyone there and
-//! again to each Mumcord user who comes in later; leaving the channel (or the server) ends the
+//! again to each Mumcord user who comes in later, to them twice in case the server dropped the
+//! first message; leaving the channel (or the server) ends the
 //! own share and everything watched, and the people still there drop the share and the viewer
 //! themselves when they see the move.
 
@@ -37,7 +38,7 @@ pub mod wire;
 
 use std::collections::HashMap;
 use std::sync::{Arc, Mutex};
-use std::time::Duration;
+use std::time::{Duration, Instant};
 
 use mumcord_p2p::quinn::{RecvStream, SendStream};
 use mumcord_p2p::{DeclineReason, P2pError};
@@ -415,9 +416,38 @@ fn offer_share(state: &ServerShares, peers: &ServerPeers, ctx: &SessionCtx, sess
         .servers
         .get(&ctx.server_id)
         .is_some_and(|s| s.own.is_some());
-    if sharing {
-        announce(state, peers, ctx, &[session]);
+    if !sharing {
+        return;
     }
+    announce(state, peers, ctx, &[session]);
+    if let Some(own) = lock(state)
+        .servers
+        .get_mut(&ctx.server_id)
+        .and_then(|s| s.own.as_mut())
+    {
+        own.announced_to(session, Instant::now());
+    }
+}
+
+/// Sends the own share once more to the newcomers due for it (session tick).
+pub(crate) fn on_tick(state: &ServerShares, peers: &ServerPeers, ctx: &SessionCtx) {
+    let due = lock(state)
+        .servers
+        .get_mut(&ctx.server_id)
+        .and_then(|s| s.own.as_mut())
+        .map(|own| own.take_reannounce(Instant::now()))
+        .unwrap_or_default();
+    if due.is_empty() {
+        return;
+    }
+    let Some(here) = here(&ctx.handle) else {
+        return;
+    };
+    let due: Vec<u32> = due
+        .into_iter()
+        .filter(|s| here.others.contains(s))
+        .collect();
+    announce(state, peers, ctx, &due);
 }
 
 /// Serves a viewer's screen stream. Only an accepted viewer of the own share gets one; frames

@@ -1846,6 +1846,8 @@ impl Inner {
                 },
                 Some(PumpCmd::Packets(sender)) = pump_rx.recv() => packets = sender,
                 _ = tick.tick() => {
+                    crate::watch_party::on_tick(&self.watch_parties, &ctx);
+                    crate::screen_share::on_tick(&self.screen_shares, &self.mumcord, &ctx);
                     let audio = self.is_audio_server(server_id);
                     if audio {
                         for session in self.positional.expire(Instant::now()) {

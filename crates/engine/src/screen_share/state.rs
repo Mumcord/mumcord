@@ -1,6 +1,7 @@
 //! Who shares and who watches on one server, kept for the user's own channel only.
 
 use std::collections::BTreeMap;
+use std::time::{Duration, Instant};
 
 use tokio::sync::oneshot;
 
@@ -8,6 +9,11 @@ use super::media::{Media, ViewerLink};
 use super::signal::MAX_VIEWERS;
 use super::watch::WatchLink;
 use super::{ScreenShareView, WatchBlock};
+
+/// When a newcomer gets the own share a second time. The server silently drops plugin data over
+/// its rate limit, and a join sets off a burst from everyone in the channel, so the first may be
+/// lost.
+pub(crate) const REANNOUNCE: Duration = Duration::from_secs(3);
 
 /// The sharer's answer to a watch request.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -33,6 +39,8 @@ pub(crate) struct OwnShare {
     pub viewers: BTreeMap<u32, Option<ViewerLink>>,
     /// Capture and encoding; `None` only in tests of the bookkeeping.
     pub media: Option<Media>,
+    /// Newcomers to the channel that get the share once more, and when.
+    reannounce: BTreeMap<u32, Instant>,
 }
 
 impl OwnShare {
@@ -43,7 +51,27 @@ impl OwnShare {
             sound_available,
             viewers: BTreeMap::new(),
             media: None,
+            reannounce: BTreeMap::new(),
         }
+    }
+
+    /// `newcomer` was just told about the share; they hear of it again after [`REANNOUNCE`].
+    pub fn announced_to(&mut self, newcomer: u32, now: Instant) {
+        self.reannounce.insert(newcomer, now + REANNOUNCE);
+    }
+
+    /// The newcomers due for their second announcement at `now`; each comes up once.
+    pub fn take_reannounce(&mut self, now: Instant) -> Vec<u32> {
+        let due: Vec<u32> = self
+            .reannounce
+            .iter()
+            .filter(|(_, at)| **at <= now)
+            .map(|(newcomer, _)| *newcomer)
+            .collect();
+        for newcomer in &due {
+            self.reannounce.remove(newcomer);
+        }
+        due
     }
 
     /// Takes `viewer` in unless [`MAX_VIEWERS`] others already watch.
@@ -198,6 +226,9 @@ impl Shares {
     /// `session` is no longer in the user's channel: their share, their watching and the user
     /// watching them end.
     pub fn forget(&mut self, session: u32) -> Forgot {
+        if let Some(own) = self.own.as_mut() {
+            own.reannounce.remove(&session);
+        }
         let own_viewers = self
             .own
             .as_mut()
@@ -356,6 +387,32 @@ mod tests {
         );
         assert!(shares.watching.is_empty() && shares.failed.is_empty());
         assert_eq!(shares.forget(9), Forgot::default());
+    }
+
+    #[test]
+    fn newcomers_hear_of_the_own_share_once_more() {
+        let now = Instant::now();
+        let mut shares = Shares {
+            own: Some(OwnShare::new(false, false)),
+            ..Shares::default()
+        };
+        let own = shares.own.as_mut().expect("own share");
+        own.announced_to(9, now);
+        own.announced_to(8, now + Duration::from_secs(1));
+        own.announced_to(7, now);
+        assert!(own.take_reannounce(now).is_empty(), "not yet");
+        assert_eq!(own.take_reannounce(now + REANNOUNCE), [7, 9]);
+        assert!(
+            own.take_reannounce(now + REANNOUNCE).is_empty(),
+            "only once"
+        );
+
+        shares.forget(8);
+        let own = shares.own.as_mut().expect("own share");
+        assert!(
+            own.take_reannounce(now + REANNOUNCE * 2).is_empty(),
+            "not after leaving the channel"
+        );
     }
 
     #[test]
