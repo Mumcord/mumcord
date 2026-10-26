@@ -2,7 +2,8 @@
 //! same channel that announced [`FEATURE`].
 //!
 //! A sharer announces its share with [`Signal::Share`] (again on every change, and `live:
-//! false` when it stops). A viewer asks with [`Signal::Watch`]; the sharer answers
+//! false` when it stops); someone entering the channel gets it twice, a few seconds apart, in
+//! case the server dropped the first. A viewer asks with [`Signal::Watch`]; the sharer answers
 //! [`Signal::Accept`] (the viewer then opens a [`crate::p2p::STREAM_SCREEN`] stream to the
 //! sharer) or [`Signal::Full`] once [`MAX_VIEWERS`] watch. [`Signal::Unwatch`] ends watching
 //! and [`Signal::Viewers`] tells the viewers who else watches.

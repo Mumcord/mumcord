@@ -10,8 +10,10 @@
 //! Someone who enters the channel later gets the current state from one participant only
 //! (FR-2.75): the host while they are in the party, otherwise the participant with the lowest
 //! session (the one longest on the server). Every client computes the same answerer, so no
-//! coordination is needed, and the answerer sends each newcomer the state once per stay. Leaving the channel (or the server) leaves
-//! the party; the party ends when nobody is left in it.
+//! coordination is needed, and the answerer sends each newcomer the state once per stay, and
+//! once more a few seconds later in case the server dropped the first one; the newcomer keeps
+//! the first state it gets. Leaving the channel (or the server) leaves the party; the party ends
+//! when nobody is left in it.
 //!
 //! Payloads come from other clients and are untrusted: they are size-capped, versioned, the
 //! video id must look like a YouTube id and member lists are capped and checked against the
@@ -27,9 +29,9 @@
 
 mod playlist;
 
-use std::collections::{BTreeSet, HashMap};
+use std::collections::{BTreeMap, BTreeSet, HashMap};
 use std::sync::Mutex;
-use std::time::Instant;
+use std::time::{Duration, Instant};
 
 use mumcord_protocol::{Handle, PLUGIN_DATA_MAX, PluginData};
 use serde::{Deserialize, Serialize};
@@ -49,6 +51,9 @@ pub const FEATURE: &str = "watch-party";
 const VERSION: u32 = 2;
 /// More people than this in one party are not tracked; it bounds the state message too.
 const MAX_PARTICIPANTS: usize = 32;
+/// When a newcomer gets the state a second time. The server silently drops plugin data over its
+/// rate limit, and a join sets off a burst from everyone in the channel, so the first may be lost.
+const REANNOUNCE: Duration = Duration::from_secs(3);
 
 /// A playback command; positions are milliseconds into the video.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
@@ -198,8 +203,9 @@ pub(crate) struct Party {
     skipped_by: Option<u32>,
     /// The current video ended with nothing queued; the next video added starts at once.
     ended: bool,
-    /// Newcomers this client already sent the state to; cleared when they leave the channel.
-    announced: BTreeSet<u32>,
+    /// Newcomers this client already sent the state to, with when to send it once more;
+    /// cleared when they leave the channel.
+    announced: BTreeMap<u32, Option<Instant>>,
 }
 
 impl Party {
@@ -218,7 +224,7 @@ impl Party {
             playlist: Playlist::default(),
             skipped_by: None,
             ended: false,
-            announced: BTreeSet::new(),
+            announced: BTreeMap::new(),
         }
     }
 
@@ -298,13 +304,35 @@ impl Party {
         self.participants.iter().copied().find(|s| *s != newcomer)
     }
 
+    fn answers(&self, own: u32, newcomer: u32) -> bool {
+        self.joined
+            && !self.participants.contains(&newcomer)
+            && self.answerer(newcomer) == Some(own)
+    }
+
     /// Whether this client (`own`) announces the party to `newcomer` now; true at most once per
     /// stay of the newcomer in the channel.
-    fn take_announce(&mut self, own: u32, newcomer: u32) -> bool {
-        let answers = self.joined
-            && !self.participants.contains(&newcomer)
-            && self.answerer(newcomer) == Some(own);
-        answers && self.announced.insert(newcomer)
+    fn take_announce(&mut self, own: u32, newcomer: u32, now: Instant) -> bool {
+        if !self.answers(own, newcomer) || self.announced.contains_key(&newcomer) {
+            return false;
+        }
+        self.announced.insert(newcomer, Some(now + REANNOUNCE));
+        true
+    }
+
+    /// The newcomers due for their second announcement at `now`, if this client still answers
+    /// them; each comes up once.
+    fn take_reannounce(&mut self, own: u32, now: Instant) -> Vec<u32> {
+        let due: Vec<u32> = self
+            .announced
+            .iter_mut()
+            .filter(|(_, at)| at.is_some_and(|at| at <= now))
+            .map(|(newcomer, at)| {
+                *at = None;
+                *newcomer
+            })
+            .collect();
+        due.into_iter().filter(|n| self.answers(own, *n)).collect()
     }
 
     fn view(&self) -> WatchPartyView {
@@ -465,10 +493,13 @@ pub(crate) fn on_plugin_data(state: &ServerParties, ctx: &SessionCtx, data: &Plu
             cur,
             skip,
         } => {
-            // A state only fills in a party this client is not part of yet.
-            if !valid_video_id(&video) || current.is_some_and(|p| p.joined) {
+            // A state only fills in a party this client does not know yet; a second one is the
+            // answerer repeating its announcement.
+            if !valid_video_id(&video) || current.is_some() {
+                tracing::debug!(sender, "watch party state ignored");
                 return;
             }
+            tracing::debug!(sender, "watch party state received");
             let mut party = Party::new(here.channel_id, video, starter);
             party.participants.clear();
             for m in members.into_iter().filter(|m| here.others.contains(m)) {
@@ -633,11 +664,36 @@ fn offer_state(
     let Some(party) = servers.get_mut(&ctx.server_id) else {
         return;
     };
-    if !party.take_announce(own, session) {
+    if !party.take_announce(own, session, Instant::now()) {
         return;
     }
     let party = party.clone();
     drop(servers);
+    send_state(ctx, &party, session);
+}
+
+/// Sends the newcomers due for it the party once more (session tick).
+pub(crate) fn on_tick(state: &ServerParties, ctx: &SessionCtx) {
+    let Some(here) = here(&ctx.handle) else {
+        return;
+    };
+    let mut servers = lock(state);
+    let Some(party) = servers.get_mut(&ctx.server_id) else {
+        return;
+    };
+    let due = party.take_reannounce(here.own, Instant::now());
+    if due.is_empty() {
+        return;
+    }
+    let party = party.clone();
+    drop(servers);
+    for session in due.into_iter().filter(|s| here.others.contains(s)) {
+        send_state(ctx, &party, session);
+    }
+}
+
+fn send_state(ctx: &SessionCtx, party: &Party, session: u32) {
+    tracing::debug!(session, "watch party state sent");
     send(&ctx.handle, &[session], party.state_msg());
     // The list does not fit into the state; it follows as adds, a few messages at most.
     let mut ops = party.playlist.snapshot();
@@ -1212,20 +1268,21 @@ mod tests {
 
     #[test]
     fn a_newcomer_is_announced_once_per_stay_by_the_answerer_only() {
+        let now = Instant::now();
         let mut host = Party::new(1, "dQw4w9WgXcQ".into(), 7);
         host.add(3);
         host.joined = true;
         let mut other = host.clone();
-        assert!(!other.take_announce(3, 9), "only the host answers");
-        assert!(host.take_announce(7, 9));
-        assert!(!host.take_announce(7, 9), "once per newcomer");
+        assert!(!other.take_announce(3, 9, now), "only the host answers");
+        assert!(host.take_announce(7, 9, now));
+        assert!(!host.take_announce(7, 9, now), "once per newcomer");
         assert!(
-            !host.take_announce(7, 3),
+            !host.take_announce(7, 3, now),
             "participants are not announced to"
         );
         host.announced.remove(&9);
         assert!(
-            host.take_announce(7, 9),
+            host.take_announce(7, 9, now),
             "again after leaving and coming back"
         );
 
@@ -1233,8 +1290,36 @@ mod tests {
         invited.participants.clear();
         invited.add(3);
         assert!(
-            !invited.take_announce(3, 9),
+            !invited.take_announce(3, 9, now),
             "a client not in the party never answers"
+        );
+    }
+
+    #[test]
+    fn a_newcomer_is_announced_once_more_after_a_while() {
+        let now = Instant::now();
+        let mut host = Party::new(1, "dQw4w9WgXcQ".into(), 7);
+        host.joined = true;
+        assert!(host.take_announce(7, 9, now));
+        assert!(host.take_announce(7, 8, now + Duration::from_secs(1)));
+        assert!(host.take_reannounce(7, now).is_empty(), "not yet");
+        assert_eq!(host.take_reannounce(7, now + REANNOUNCE), [9]);
+        assert!(
+            host.take_reannounce(7, now + REANNOUNCE * 2).contains(&8),
+            "each newcomer on its own time"
+        );
+        assert!(
+            host.take_reannounce(7, now + REANNOUNCE * 3).is_empty(),
+            "only once"
+        );
+        assert!(!host.take_announce(7, 9, now), "still once per stay");
+
+        host.announced.remove(&9);
+        assert!(host.take_announce(7, 9, now));
+        host.add(9);
+        assert!(
+            host.take_reannounce(7, now + REANNOUNCE).is_empty(),
+            "not to someone who joined meanwhile"
         );
     }
 }

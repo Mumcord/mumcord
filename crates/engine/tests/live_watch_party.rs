@@ -4,7 +4,8 @@
 //! The playlist (FR-2.69, AC-2.50): entries keep one order on every client, reorder and remove
 //! reach the others, a latecomer gets the list, and skip and the end of a video advance once.
 //! Party announce (FR-2.75, AC-2.56): a Mumcord user entering the channel gets a running party
-//! and share within 2 s, from the host (later from another participant), exactly once.
+//! and share within 2 s, from the host (later from another participant), exactly once; the
+//! answerer's repeat a few seconds later changes nothing.
 //! `testenv/up.sh v15`, then:
 //! `MUMCORD_LIVE=1 cargo test -p mumcord-engine --features test-backend --test live_watch_party -- --ignored --test-threads=1`
 #![cfg(feature = "test-backend")]
@@ -496,6 +497,14 @@ async fn newcomers_in_the_channel_get_the_party_once() {
     assert_eq!(got.len(), 1, "one announcement for C: {parties:?}");
     assert!(!got[0].joined && got[0].video_id == VIDEO);
     assert!(share.is_some(), "B's share announced to C");
+    // The repeat a few seconds later, in case the server dropped the first, changes nothing.
+    for _ in 0..3 {
+        let (parties, _) = announced(&mut c.rx, Some(b_session)).await;
+        assert!(
+            parties.is_empty(),
+            "no second announcement for C: {parties:?}"
+        );
+    }
 
     // A leaves the party, B stays: D still gets it, from B.
     a.engine.watch_party_leave(a.server()).expect("A leaves");
