@@ -715,6 +715,11 @@ export type ErrorCode =
 "notConnected" | 
 /**  The server could not be reached (DNS, refused, timeout). */
 "serverUnreachable" | 
+/**
+ *  macOS found no route to the server, which is how a missing Local Network permission
+ *  shows up; the UI points the user to that setting.
+ */
+"localNetworkBlocked" | 
 /**  The server rejected the server password. */
 "wrongPassword" | 
 /**  The username is already in use or registered to someone else. */

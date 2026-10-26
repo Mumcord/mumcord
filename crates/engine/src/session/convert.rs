@@ -140,9 +140,13 @@ pub fn connect_failure(err: &ConnectError) -> Failure {
     use ErrorKind as K;
     let e = |kind, msg: String| EngineError::new(kind, msg);
     match err {
-        ConnectError::Io(_) | ConnectError::Timeout | ConnectError::Closed => {
-            Failure::Transient(e(K::ServerUnreachable, err.to_string()))
+        ConnectError::Io(io) if cfg!(target_os = "macos") && is_no_route(io) => {
+            Failure::Transient(e(K::LocalNetworkBlocked, err.to_string()))
         }
+        ConnectError::Resolve(_)
+        | ConnectError::Io(_)
+        | ConnectError::Timeout
+        | ConnectError::Closed => Failure::Transient(e(K::ServerUnreachable, err.to_string())),
         ConnectError::Tls(_) | ConnectError::Protocol(_) => {
             Failure::Transient(e(K::ServerUnreachable, err.to_string()))
         }
@@ -161,7 +165,10 @@ pub fn connect_failure(err: &ConnectError) -> Failure {
                 }
                 RejectReason::WrongVersion => K::ServerTooOld,
                 RejectReason::ServerFull => K::ServerUnreachable,
-                RejectReason::None | RejectReason::Unknown(_) => K::Internal,
+                // The UI shows the server's own text for an unexplained refusal.
+                RejectReason::None | RejectReason::Unknown(_) => {
+                    return Failure::Fatal(e(K::PermissionDenied, message.clone()));
+                }
             };
             // A full server may have room on the next attempt.
             let error = e(kind, format!("{reason:?}: {message}"));
@@ -171,6 +178,63 @@ pub fn connect_failure(err: &ConnectError) -> Failure {
                 Failure::Fatal(error)
             }
         }
+    }
+}
+
+fn is_no_route(err: &std::io::Error) -> bool {
+    matches!(
+        err.kind(),
+        std::io::ErrorKind::HostUnreachable | std::io::ErrorKind::NetworkUnreachable
+    )
+}
+
+/// Why a connection attempt failed, for the log: a category plus the OS error code where there
+/// is one. Never contains addresses, host or user names, or server-provided text.
+pub fn failure_reason(err: &ConnectError) -> String {
+    use std::io::ErrorKind as Io;
+    let with_code = |category: &str, io: &std::io::Error| match io.raw_os_error() {
+        Some(code) => format!("{category} (os error {code})"),
+        None => category.to_owned(),
+    };
+    match err {
+        ConnectError::Resolve(io) => with_code("dns lookup failed", io),
+        ConnectError::Io(io) => {
+            let category = match io.kind() {
+                Io::ConnectionRefused => "connection refused",
+                Io::TimedOut => "connect timed out",
+                Io::HostUnreachable => "host unreachable",
+                Io::NetworkUnreachable => "network unreachable",
+                Io::ConnectionReset => "connection reset",
+                Io::ConnectionAborted => "connection aborted",
+                Io::PermissionDenied => "permission denied",
+                Io::AddrNotAvailable => "address not available",
+                Io::UnexpectedEof => "closed during tls handshake",
+                _ => "network error",
+            };
+            with_code(category, io)
+        }
+        ConnectError::Tls(tls) => tls_reason(tls),
+        ConnectError::Protocol(_) => "protocol error".to_owned(),
+        ConnectError::InvalidAddress(_) => "invalid address".to_owned(),
+        ConnectError::CertificateRejected(_) => "server certificate not trusted".to_owned(),
+        ConnectError::Rejected { reason, .. } => format!("rejected by server: {reason:?}"),
+        ConnectError::Closed => "server closed the connection during login".to_owned(),
+        ConnectError::Timeout => "login timed out".to_owned(),
+    }
+}
+
+/// Only fieldless detail is kept: some rustls errors carry host names or free text.
+fn tls_reason(err: &rustls::Error) -> String {
+    use rustls::Error as T;
+    match err {
+        T::AlertReceived(alert) => format!("tls: alert received: {alert:?}"),
+        T::PeerIncompatible(rustls::PeerIncompatible::ServerRejectedEncryptedClientHello(_)) => {
+            "tls: peer incompatible: encrypted client hello rejected".to_owned()
+        }
+        T::PeerIncompatible(why) => format!("tls: peer incompatible: {why:?}"),
+        T::PeerMisbehaved(why) => format!("tls: peer misbehaved: {why:?}"),
+        T::InvalidCertificate(_) => "tls: invalid certificate".to_owned(),
+        _ => "tls: other error".to_owned(),
     }
 }
 
@@ -276,5 +340,98 @@ mod tests {
             connect_failure(&ConnectError::Timeout),
             Failure::Transient(e) if e.kind == ErrorKind::ServerUnreachable
         ));
+    }
+
+    #[test]
+    fn unexplained_rejection_shows_the_server_text() {
+        let failure = connect_failure(&ConnectError::Rejected {
+            reason: RejectReason::None,
+            message: "Banned".to_owned(),
+        });
+        assert!(matches!(
+            failure,
+            Failure::Fatal(e) if e.kind == ErrorKind::PermissionDenied && e.message == "Banned"
+        ));
+    }
+
+    #[test]
+    fn no_route_points_to_local_network_permission_on_macos_only() {
+        let expected = if cfg!(target_os = "macos") {
+            ErrorKind::LocalNetworkBlocked
+        } else {
+            ErrorKind::ServerUnreachable
+        };
+        for kind in [
+            std::io::ErrorKind::HostUnreachable,
+            std::io::ErrorKind::NetworkUnreachable,
+        ] {
+            let failure = connect_failure(&ConnectError::Io(kind.into()));
+            assert!(matches!(failure, Failure::Transient(e) if e.kind == expected));
+        }
+        assert!(matches!(
+            connect_failure(&ConnectError::Io(std::io::ErrorKind::ConnectionRefused.into())),
+            Failure::Transient(e) if e.kind == ErrorKind::ServerUnreachable
+        ));
+    }
+
+    #[test]
+    fn failure_reason_names_the_category() {
+        use std::io::{Error, ErrorKind as Io};
+        let io = |kind: Io| failure_reason(&ConnectError::Io(Error::from(kind)));
+        assert_eq!(io(Io::ConnectionRefused), "connection refused");
+        assert_eq!(io(Io::TimedOut), "connect timed out");
+        assert_eq!(io(Io::HostUnreachable), "host unreachable");
+        assert_eq!(io(Io::NetworkUnreachable), "network unreachable");
+        assert_eq!(
+            failure_reason(&ConnectError::Resolve(Error::other(
+                "nodename nor servname"
+            ))),
+            "dns lookup failed"
+        );
+        assert_eq!(failure_reason(&ConnectError::Timeout), "login timed out");
+        assert_eq!(
+            failure_reason(&ConnectError::Rejected {
+                reason: RejectReason::WrongServerPassword,
+                message: String::new(),
+            }),
+            "rejected by server: WrongServerPassword"
+        );
+        assert_eq!(
+            failure_reason(&ConnectError::Tls(rustls::Error::AlertReceived(
+                rustls::AlertDescription::HandshakeFailure
+            ))),
+            "tls: alert received: HandshakeFailure"
+        );
+    }
+
+    #[cfg(target_os = "linux")]
+    #[test]
+    fn failure_reason_carries_the_os_error_code() {
+        // 113 is EHOSTUNREACH on Linux.
+        let err = ConnectError::Io(std::io::Error::from_raw_os_error(113));
+        assert_eq!(failure_reason(&err), "host unreachable (os error 113)");
+    }
+
+    #[test]
+    fn failure_reason_contains_no_personal_data() {
+        let host = "alice-home.example.org";
+        let errors = [
+            ConnectError::InvalidAddress(host.to_owned()),
+            ConnectError::Rejected {
+                reason: RejectReason::UsernameInUse,
+                message: "alice is already connected".to_owned(),
+            },
+            ConnectError::Tls(rustls::Error::InvalidCertificate(
+                rustls::CertificateError::NotValidForNameContext {
+                    expected: rustls::pki_types::ServerName::try_from(host).expect("valid name"),
+                    presented: vec![host.to_owned()],
+                },
+            )),
+            ConnectError::Tls(rustls::Error::General(host.to_owned())),
+        ];
+        for err in &errors {
+            let reason = failure_reason(err);
+            assert!(!reason.contains("alice"), "{reason}");
+        }
     }
 }

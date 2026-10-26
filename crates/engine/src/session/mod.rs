@@ -334,7 +334,8 @@ enum AttemptError {
         fingerprint: String,
         previous: Option<String>,
     },
-    Failure(Failure),
+    /// `reason` is the log-safe cause from [`convert::failure_reason`] or the error kind.
+    Failure { failure: Failure, reason: String },
 }
 
 /// How a synced connection came about.
@@ -1546,8 +1547,8 @@ impl Inner {
                     }
                     return;
                 }
-                Err(AttemptError::Failure(failure)) => {
-                    tracing::info!(server_id, "connection attempt failed");
+                Err(AttemptError::Failure { failure, reason }) => {
+                    tracing::info!(server_id, %reason, "connection attempt failed");
                     self.step(server_id, generation, |m| m.failed(failure))
                 }
             };
@@ -1567,7 +1568,10 @@ impl Inner {
         &self,
         server_id: ServerId,
     ) -> Result<(Connection, String, u16), AttemptError> {
-        let fatal = |e: EngineError| AttemptError::Failure(Failure::Fatal(e));
+        let fatal = |e: EngineError| AttemptError::Failure {
+            reason: format!("{:?}", e.kind),
+            failure: Failure::Fatal(e),
+        };
         let (server, trusted) = {
             let store = lock(&self.store);
             let server = store
@@ -1654,7 +1658,10 @@ impl Inner {
                     ))),
                 }
             }
-            Err(e) => Err(AttemptError::Failure(convert::connect_failure(&e))),
+            Err(e) => Err(AttemptError::Failure {
+                failure: convert::connect_failure(&e),
+                reason: convert::failure_reason(&e),
+            }),
         }
     }
 

@@ -56,6 +56,9 @@ impl RejectReason {
 /// Failure while establishing a connection.
 #[derive(Debug, thiserror::Error)]
 pub enum ConnectError {
+    /// The host name could not be resolved (no `#[from]`: every other I/O error is `Io`).
+    #[error("address lookup failed: {0}")]
+    Resolve(std::io::Error),
     #[error("network error: {0}")]
     Io(#[from] std::io::Error),
     #[error("invalid server address: {0}")]
