@@ -1,6 +1,6 @@
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
-import { act, fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { act, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { PreferencesProvider } from "../../app/PreferencesProvider";
 import { ViewContext, type View } from "../../app/view";
@@ -8,7 +8,7 @@ import { createMockApi, setApi, type MockApi, type Settings } from "../../api";
 import { subscribeAnnouncements } from "../../a11y/announcer";
 import "../../i18n";
 import { axeViolations } from "../../test/axe";
-import { resetServerStore } from "../channels/serverStore";
+import { getShownServerId, resetServerStore, showServer } from "../channels/serverStore";
 import { resetNowGamingStore } from "../nowgaming";
 import { resetNowPlayingStore } from "../nowplaying";
 import { UserPanel } from "./UserPanel";
@@ -40,7 +40,7 @@ async function setup(connect = true, registered = false, talk?: Partial<Settings
   resetServerStore();
   if (connect) {
     const [server] = await api.serversList();
-    await api.connect((server ?? { id: 0 }).id, null);
+    await api.connect((server ?? { id: 0 }).id, null, null);
   }
   render(
     <PreferencesProvider>
@@ -54,11 +54,11 @@ async function setup(connect = true, registered = false, talk?: Partial<Settings
   );
   if (connect) {
     await screen.findByRole("button", { name: "Mute microphone" });
-    const snapshot = await api.sessionSnapshot();
+    const snapshot = await api.sessionSnapshot(1);
     const self = snapshot?.users.find((u) => u.session === snapshot.selfSession);
     if (self)
       act(() => {
-        api.mock.emit("userUpserted", { user: { ...self, registered } });
+        api.mock.emit("userUpserted", { serverId: 1, user: { ...self, registered } });
       });
   }
 }
@@ -80,7 +80,7 @@ afterEach(() => {
 
 const mute = () => screen.getByRole("button", { name: "Mute microphone" });
 const deafen = () => screen.getByRole("button", { name: "Deafen" });
-const READ_ONLY = /reading along/;
+const READ_ONLY = /Join a channel to talk/;
 
 /** Leaves the read-only start of a fresh connect through the notice's join button. */
 async function joinVoice() {
@@ -93,8 +93,8 @@ async function joinVoice() {
 /** Disconnects and connects again: a fresh, user-initiated connect. */
 async function freshConnect() {
   const [server] = await api.serversList();
-  await act(() => api.disconnect());
-  await act(() => api.connect((server ?? { id: 0 }).id, null));
+  await act(() => api.disconnect(1));
+  await act(() => api.connect((server ?? { id: 0 }).id, null, null));
   await screen.findByRole("button", { name: "Mute microphone" });
 }
 
@@ -107,7 +107,7 @@ describe("UserPanel", () => {
   it("offers a named disconnect button only while connected and calls disconnect", async () => {
     await setup();
     const button = await screen.findByRole("button", { name: /^Disconnect from / });
-    expect(button).toHaveAttribute("title", button.getAttribute("aria-label"));
+    expect(button).toHaveAttribute("data-tooltip", button.getAttribute("aria-label"));
     const spy = vi.spyOn(api, "disconnect");
     fireEvent.click(button);
     await waitFor(() => {
@@ -180,10 +180,10 @@ describe("UserPanel", () => {
     expect(mute()).toHaveAttribute("aria-pressed", "true");
     expect(deafen()).toHaveAttribute("aria-pressed", "true");
     const spy = vi.spyOn(api, "channelJoin");
-    const snapshot = await api.sessionSnapshot();
+    const snapshot = await api.sessionSnapshot(1);
     const self = snapshot?.users.find((u) => u.session === snapshot.selfSession);
     await joinVoice();
-    expect(spy).toHaveBeenCalledWith(self?.channelId);
+    expect(spy).toHaveBeenCalledWith(1, self?.channelId);
     expect(mute()).toHaveAttribute("aria-pressed", "false");
     expect(deafen()).toHaveAttribute("aria-pressed", "false");
   });
@@ -227,6 +227,43 @@ describe("UserPanel", () => {
       expect(deafen()).toHaveAttribute("aria-pressed", "true");
     });
     expect(screen.queryByText(READ_ONLY)).not.toBeInTheDocument();
+  });
+
+  it("shows the voice location after a join; clicking it shows the voice server (FR-2.5)", async () => {
+    await setup();
+    expect(screen.queryByRole("button", { name: /^Voice: / })).not.toBeInTheDocument();
+    await joinVoice();
+    const line = await screen.findByRole("button", {
+      name: /^Voice: .+ · Local test server – show this server$/,
+    });
+    expect(line.textContent).toMatch(/^Voice: .+ · Local test server$/);
+
+    const second = await api.serverAdd({
+      label: "Second",
+      address: "two.example.org",
+      port: 64738,
+      username: "You",
+      password: { kind: "keep" },
+    });
+    await act(() => api.connect(second.id, null, null));
+    act(() => {
+      showServer(second.id);
+    });
+    // Second is read-only, but voice (and the mute buttons) stay on the first server.
+    expect(screen.getByRole("button", { name: /^Voice: .+ · Local test server/ })).toBeVisible();
+    expect(screen.queryByText(READ_ONLY)).not.toBeInTheDocument();
+    expect(deafen()).toHaveAttribute("aria-pressed", "false");
+    fireEvent.click(screen.getByRole("button", { name: /^Voice: / }));
+    expect(getShownServerId()).toBe(1);
+    // The panel's Disconnect acts on the shown server only (FR-2.9).
+    act(() => {
+      showServer(second.id);
+    });
+    const spy = vi.spyOn(api, "disconnect");
+    fireEvent.click(screen.getByRole("button", { name: /^Disconnect from/ }));
+    await waitFor(() => {
+      expect(spy).toHaveBeenCalledWith(second.id);
+    });
   });
 
   it("an automatic reconnect keeps the read-only state as it was", async () => {
@@ -307,6 +344,56 @@ describe("UserPanel", () => {
     expect(screen.getByRole("dialog")).toBeInTheDocument();
   });
 
+  async function editable(): Promise<HTMLElement> {
+    const field = await screen.findByRole("textbox", { name: "About you" });
+    await waitFor(() => {
+      expect(field).toHaveAttribute("contenteditable", "true");
+    });
+    return field;
+  }
+
+  function typeHtml(field: HTMLElement, html: string) {
+    field.innerHTML = html;
+    fireEvent.input(field);
+  }
+
+  it("keeps formatting and drops active content when editing a comment", async () => {
+    await setup();
+    const comment = vi.spyOn(api, "setOwnComment");
+    vi.spyOn(api, "personProfile").mockResolvedValue({
+      ...(await api.personProfile(1, 1)),
+      comment: '<p><b>hi</b> <u>there</u><script>x()</script><img src="http://evil/x.png"></p>',
+    });
+    await openMenuItem("Edit profile");
+    const field = await editable();
+    await waitFor(() => {
+      expect(field.innerHTML).toContain("<b>hi</b>");
+    });
+    expect(field.innerHTML).toContain("<u>there</u>");
+    expect(field.innerHTML).not.toMatch(/script|img/u);
+    fireEvent.click(screen.getByRole("button", { name: "Save" }));
+    await waitFor(() => {
+      expect(screen.queryByRole("dialog")).toBeNull();
+    });
+    expect(comment).not.toHaveBeenCalled();
+  });
+
+  it("sends only visible comments and offers the formatting toolbar", async () => {
+    await setup();
+    const comment = vi.spyOn(api, "setOwnComment");
+    await openMenuItem("Edit profile");
+    const toolbar = await screen.findByRole("toolbar", { name: "Text formatting" });
+    for (const name of ["Bold", "Italic", "Link", "Bulleted list", "Numbered list"]) {
+      expect(within(toolbar).getByRole("button", { name })).toBeInTheDocument();
+    }
+    typeHtml(await editable(), "<b>x</b><onerror>");
+    typeHtml(await editable(), "<br> <b></b>");
+    fireEvent.click(screen.getByRole("button", { name: "Save" }));
+    await waitFor(() => {
+      expect(comment).toHaveBeenCalledWith(1, "");
+    });
+  });
+
   it("saves avatar and comment", async () => {
     await setup();
     const avatar = vi.spyOn(api, "setOwnAvatar");
@@ -315,17 +402,14 @@ describe("UserPanel", () => {
     await openMenuItem("Edit profile");
     fireEvent.click(await screen.findByRole("button", { name: "Choose picture…" }));
     await screen.findByText("Selected: face.png");
-    const text = screen.getByLabelText("About you");
-    await waitFor(() => {
-      expect(text).toBeEnabled();
-    });
-    fireEvent.change(text, { target: { value: "a < b\nline" } });
+    const text = await editable();
+    typeHtml(text, "a &lt; b<br>line");
     fireEvent.click(screen.getByRole("button", { name: "Save" }));
     await waitFor(() => {
       expect(screen.queryByRole("dialog")).toBeNull();
     });
-    expect(avatar).toHaveBeenCalledWith("/home/me/face.png");
-    expect(comment).toHaveBeenCalledWith("a &lt; b<br>line");
+    expect(avatar).toHaveBeenCalledWith(1, "/home/me/face.png");
+    expect(comment).toHaveBeenCalledWith(1, "a &lt; b<br>line");
   });
 
   it("explains the avatar re-send only to unregistered users", async () => {
@@ -335,7 +419,7 @@ describe("UserPanel", () => {
     expect(await screen.findByRole("dialog")).toHaveTextContent(hint);
     fireEvent.click(screen.getByRole("button", { name: "Cancel" }));
     await act(async () => {
-      await api.registerSelf();
+      await api.registerSelf(1);
     });
     await openMenuItem("Edit profile");
     expect(await screen.findByRole("dialog")).not.toHaveTextContent(hint);
@@ -344,11 +428,7 @@ describe("UserPanel", () => {
   it("shows the size limit error and keeps the dialog open", async () => {
     await setup();
     await openMenuItem("Edit profile");
-    const text = screen.getByLabelText("About you");
-    await waitFor(() => {
-      expect(text).toBeEnabled();
-    });
-    fireEvent.change(text, { target: { value: "x" } });
+    typeHtml(await editable(), "x");
     api.mock.failNext("setOwnComment", "messageTooLarge");
     fireEvent.click(screen.getByRole("button", { name: "Save" }));
     expect(await screen.findByRole("alert")).toHaveTextContent("too large for the server");
@@ -366,20 +446,20 @@ describe("UserPanel", () => {
     expect(userButton().querySelector(".userpanel-avatar")).toHaveAttribute("data-initial");
     const personProfile = vi.spyOn(api, "personProfile");
     await act(async () => {
-      await api.setOwnAvatar("/a.png");
+      await api.setOwnAvatar(1, "/a.png");
     });
     await waitFor(() => {
       expect(userButton().querySelector("img")).not.toBeNull();
     });
     expect(personProfile).toHaveBeenCalledTimes(1);
     await act(async () => {
-      await api.setOwnAvatar("/b.png");
+      await api.setOwnAvatar(1, "/b.png");
     });
     await waitFor(() => {
       expect(personProfile).toHaveBeenCalledTimes(2);
     });
     await act(async () => {
-      await api.setOwnAvatar(null);
+      await api.setOwnAvatar(1, null);
     });
     await waitFor(() => {
       expect(userButton().querySelector("img")).toBeNull();
@@ -390,7 +470,7 @@ describe("UserPanel", () => {
     await setup();
     const name = document.querySelector<HTMLElement>(".userpanel__name");
     if (!name) throw new Error("name missing");
-    expect(name).toHaveAttribute("title", name.textContent);
+    expect(name).toHaveAttribute("data-tooltip", name.textContent);
     const profile = document.querySelector<HTMLElement>(".userpanel__profile");
     // Plain text, not a control: the name area offers no button or menu (edits live in quick settings).
     expect(profile?.tagName).toBe("DIV");
@@ -417,7 +497,7 @@ describe("UserPanel", () => {
     await joinVoice();
     const status = () => document.querySelector<HTMLElement>(".userpanel__status");
     const normal = status()?.textContent ?? "";
-    const self = (await api.sessionSnapshot())?.selfSession ?? -1;
+    const self = (await api.sessionSnapshot(1))?.selfSession ?? -1;
     const track = {
       title: "A very long song title",
       artist: "Band",
@@ -428,22 +508,26 @@ describe("UserPanel", () => {
       playing: true,
     };
     act(() => {
-      api.mock.emit("nowPlayingChanged", { session: self, track });
+      api.mock.emit("nowPlayingChanged", { serverId: 1, session: self, track });
     });
     expect(status()).toHaveTextContent("Band – A very long song title");
-    expect(status()).toHaveAttribute("title", "Band – A very long song title");
+    expect(status()).toHaveAttribute("data-tooltip", "Band – A very long song title");
     expect(status()?.querySelector("svg.userpanel__status-icon")).not.toBeNull();
     // Paused or stopped: the usual status line again.
     act(() => {
-      api.mock.emit("nowPlayingChanged", { session: self, track: { ...track, playing: false } });
+      api.mock.emit("nowPlayingChanged", {
+        serverId: 1,
+        session: self,
+        track: { ...track, playing: false },
+      });
     });
     expect(status()?.textContent).toBe(normal);
     expect(status()?.querySelector("svg")).toBeNull();
     act(() => {
-      api.mock.emit("nowPlayingChanged", { session: self, track });
+      api.mock.emit("nowPlayingChanged", { serverId: 1, session: self, track });
     });
     act(() => {
-      api.mock.emit("nowPlayingChanged", { session: self, track: null });
+      api.mock.emit("nowPlayingChanged", { serverId: 1, session: self, track: null });
     });
     expect(status()?.textContent).toBe(normal);
   });
@@ -452,9 +536,10 @@ describe("UserPanel", () => {
     await setup();
     await joinVoice();
     const status = () => document.querySelector<HTMLElement>(".userpanel__status");
-    const self = (await api.sessionSnapshot())?.selfSession ?? -1;
+    const self = (await api.sessionSnapshot(1))?.selfSession ?? -1;
     act(() => {
       api.mock.emit("nowPlayingChanged", {
+        serverId: 1,
         session: self,
         track: {
           title: "Song",
@@ -467,24 +552,26 @@ describe("UserPanel", () => {
         },
       });
       api.mock.emit("nowGamingChanged", {
+        serverId: 1,
         session: self,
         game: { name: "Factorio", hasIcon: false, playedMs: 0, canJoin: false },
       });
     });
     expect(status()).toHaveTextContent("Factorio");
-    expect(status()).toHaveAttribute("title", "Playing Factorio · Listening to Band – Song");
+    expect(status()).toHaveAttribute("data-tooltip", "Playing Factorio · Listening to Band – Song");
     expect(status()?.querySelector("svg.userpanel__status-icon")).not.toBeNull();
     act(() => {
-      api.mock.emit("nowGamingChanged", { session: self, game: null });
+      api.mock.emit("nowGamingChanged", { serverId: 1, session: self, game: null });
     });
     expect(status()).toHaveTextContent("Band – Song");
   });
 
   it("keeps important states over the own track", async () => {
     await setup();
-    const self = (await api.sessionSnapshot())?.selfSession ?? -1;
+    const self = (await api.sessionSnapshot(1))?.selfSession ?? -1;
     act(() => {
       api.mock.emit("nowPlayingChanged", {
+        serverId: 1,
         session: self,
         track: {
           title: "Song",
@@ -502,16 +589,16 @@ describe("UserPanel", () => {
 
   it("lets a long name wrap to two lines instead of cutting it off", async () => {
     await setup();
-    const snapshot = await api.sessionSnapshot();
+    const snapshot = await api.sessionSnapshot(1);
     const self = snapshot?.users.find((u) => u.session === snapshot.selfSession);
     if (!self) throw new Error("self missing");
     const long = "Maximilian Schmi";
     act(() => {
-      api.mock.emit("userUpserted", { user: { ...self, name: long } });
+      api.mock.emit("userUpserted", { serverId: 1, user: { ...self, name: long } });
     });
     const name = await screen.findByText(long);
     expect(name).toHaveClass("userpanel__name");
-    expect(name).toHaveAttribute("title", long);
+    expect(name).toHaveAttribute("data-tooltip", long);
     // jsdom does not apply the stylesheet, so assert the rules themselves.
     const css = readFileSync(
       resolve(process.cwd(), "ui/src/features/userpanel/userpanel.css"),
@@ -580,13 +667,13 @@ describe("UserPanel", () => {
     const pttSettings: Partial<Settings> = { talkMode: "pushToTalk", pttKey: "Ctrl+KeyA" };
     const mic = () => screen.getByRole("button", { name: "Mute microphone" });
     const crossed = () => mic().querySelectorAll("svg").length === 2;
-    const selfSession = async () => (await api.sessionSnapshot())?.selfSession ?? -1;
+    const selfSession = async () => (await api.sessionSnapshot(1))?.selfSession ?? -1;
 
     it("shows a crossed-out mic without level while the key is not held", async () => {
       await setup(true, false, pttSettings);
       await joinVoice();
       await waitFor(() => {
-        expect(mic()).toHaveAttribute("title", "Push-to-talk: hold Ctrl+A to talk");
+        expect(mic()).toHaveAttribute("data-tooltip", "Push-to-talk: hold Ctrl+A to talk");
       });
       expect(crossed()).toBe(true);
       expect(mic()).toHaveAttribute("aria-pressed", "false");
@@ -602,13 +689,13 @@ describe("UserPanel", () => {
       });
       const session = await selfSession();
       act(() => {
-        api.mock.emit("talkStateChanged", { session, talking: true });
+        api.mock.emit("talkStateChanged", { serverId: 1, session, talking: true });
       });
       expect(crossed()).toBe(false);
       expect(mic()).not.toHaveAttribute("data-ptt-idle");
       expect(mic().querySelector(".userpanel__level")).not.toBeNull();
       act(() => {
-        api.mock.emit("talkStateChanged", { session, talking: false });
+        api.mock.emit("talkStateChanged", { serverId: 1, session, talking: false });
       });
       expect(crossed()).toBe(true);
     });
@@ -632,7 +719,7 @@ describe("UserPanel", () => {
       await joinVoice();
       expect(crossed()).toBe(false);
       expect(mic()).not.toHaveAttribute("data-ptt-idle");
-      expect(mic()).not.toHaveAttribute("title");
+      expect(mic()).not.toHaveAttribute("data-tooltip");
       expect(mic().querySelector(".userpanel__level")).not.toBeNull();
     });
   });
@@ -661,6 +748,9 @@ describe("quick settings (FR-1.66)", () => {
     gear().focus();
     fireEvent.keyDown(gear(), { key: "F10", shiftKey: true });
     const dark = await screen.findByRole("menuitemradio", { name: "Dark" });
+    await waitFor(() => {
+      expect(screen.getByRole("menu")).toContainElement(document.activeElement as HTMLElement);
+    });
     fireEvent.click(dark);
     await waitFor(() => {
       expect(document.documentElement.dataset.theme).toBe("dark");
@@ -777,6 +867,11 @@ describe("quick settings (FR-1.66)", () => {
       await setup();
       fireEvent.contextMenu(gear());
       const head = await header();
+      // The menu moves focus to its first item once the settings load; wait for that so it
+      // cannot steal the focus from the steps below.
+      await waitFor(() => {
+        expect(screen.getByRole("menu")).toContainElement(document.activeElement as HTMLElement);
+      });
       head.focus();
       fireEvent.click(head);
       fireEvent.keyDown(head, { key: "ArrowDown" });
@@ -786,35 +881,8 @@ describe("quick settings (FR-1.66)", () => {
     });
   });
 
-  it("switches the window overlay on and follows its changes", async () => {
+  it("offers no window overlay switch any more (FR-2.33)", async () => {
     await setup();
-    const spy = vi.spyOn(api, "overlaySetEnabled");
-    fireEvent.contextMenu(gear());
-    const row = await screen.findByRole("menuitemcheckbox", { name: /^Overlay/u });
-    expect(row).toHaveAttribute("aria-checked", "false");
-    fireEvent.click(row);
-    await waitFor(() => {
-      expect(row).toHaveAttribute("aria-checked", "true");
-    });
-    expect(spy).toHaveBeenCalledWith(true);
-    const state = await api.overlayState();
-    act(() => {
-      api.mock.emit("overlayChanged", {
-        state: { ...state, settings: { ...state.settings, enabled: false } },
-      });
-    });
-    await waitFor(() => {
-      expect(row).toHaveAttribute("aria-checked", "false");
-    });
-  });
-
-  it("hides the overlay switch on macOS", async () => {
-    await setup();
-    vi.spyOn(api, "appInfo").mockResolvedValue({
-      version: "0.0.0",
-      os: "macos aarch64",
-      thirdPartyNotices: "",
-    });
     fireEvent.contextMenu(gear());
     await screen.findByRole("menuitemcheckbox", { name: /^Link previews/u });
     expect(screen.queryByRole("menuitemcheckbox", { name: /^Overlay/u })).toBeNull();

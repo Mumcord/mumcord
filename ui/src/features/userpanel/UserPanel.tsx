@@ -4,13 +4,14 @@ import { announce } from "../../a11y";
 import { useView } from "../../app/view";
 import { getApi } from "../../api";
 import { ConnectionInfo } from "../connection";
+import { showServer } from "../channels";
 import { disconnect, useServers } from "../servers";
 import { useAvatars } from "../members/useAvatars";
 import { GAMEPAD_PATH, useNowGaming } from "../nowgaming";
 import { trackLabel, useNowPlaying } from "../nowplaying";
 import { describeError } from "./errors";
 import { ProfileDialog } from "./ProfileDialog";
-import { joinChannel, useReadOnly } from "./readOnly";
+import { joinChannel, useNoVoice } from "./readOnly";
 import { QuickSettings, type QuickSettingsState } from "./QuickSettings";
 import { RegisterDialog } from "./RegisterDialog";
 import { useMicLevelFill } from "./useMicLevelFill";
@@ -40,8 +41,8 @@ export function UserPanel() {
   const { t } = useTranslation("userpanel");
   const { openSettings } = useView();
   const state = useUserPanel();
-  const readOnly = useReadOnly();
-  const self = state.self;
+  const readOnly = useNoVoice();
+  const { self, shownSelf, voice } = state;
   const avatarOf = useAvatars(self ? [self] : []);
   const avatarSrc = self ? avatarOf(self) : null;
   const [quick, setQuick] = useState<QuickSettingsState | null>(null);
@@ -58,8 +59,8 @@ export function UserPanel() {
   const ptt = usePushToTalk();
   const transmitting = self !== null && state.talking.has(self.session);
   // The own shared track (only reported while "Now playing" is on); no session matches -1.
-  const ownTrack = useNowPlaying(self?.session ?? -1);
-  const ownGame = useNowGaming(self?.session ?? -1);
+  const ownTrack = useNowPlaying(shownSelf?.session ?? -1);
+  const ownGame = useNowGaming(shownSelf?.session ?? -1);
   // Push-to-talk and not held: the mic is closed, so show it crossed out and hide the level.
   const pttIdle = ptt.active && !transmitting && !mute && !deaf;
   const showLevel = state.connected && !mute && !deaf && !pttIdle;
@@ -107,8 +108,11 @@ export function UserPanel() {
   const name = self?.name ?? state.identityName ?? t("unknownName");
   const connected = state.connected;
   const link = servers.connection.state === "disconnected" ? null : servers.connection.serverId;
-  const linked = servers.servers.find((s) => s.id === link);
-  const serverLabel = linked ? linked.label || linked.address : "";
+  const nameOf = (id: number | null) => {
+    const saved = servers.servers.find((s) => s.id === id);
+    return saved ? saved.label || saved.address : "";
+  };
+  const serverLabel = nameOf(link);
   const connection = servers.connection.state;
   const status =
     connection === "reconnecting"
@@ -148,10 +152,10 @@ export function UserPanel() {
             {avatarSrc ? <img className="userpanel-avatar__img" src={avatarSrc} alt="" /> : null}
           </span>
           <span className="userpanel__text">
-            <span className="userpanel__name" title={name}>
+            <span className="userpanel__name" data-tooltip={name}>
               {name}
             </span>{" "}
-            <span className="userpanel__status" title={statusTitle}>
+            <span className="userpanel__status" data-tooltip={statusTitle}>
               {(game ?? track) !== null && (
                 <svg
                   className="userpanel__status-icon"
@@ -182,7 +186,7 @@ export function UserPanel() {
           data-ptt-idle={pttIdle ? "" : undefined}
           aria-pressed={mute}
           aria-label={t("mute")}
-          title={micTitle}
+          data-tooltip={micTitle}
           disabled={!connected}
           onClick={() => {
             run(getApi().setSelfMute(!mute));
@@ -214,7 +218,7 @@ export function UserPanel() {
             type="button"
             className="userpanel__toggle userpanel__toggle--hangup"
             aria-label={t("disconnect", { server: serverLabel })}
-            title={t("disconnect", { server: serverLabel })}
+            data-tooltip={t("disconnect", { server: serverLabel })}
             onClick={() => {
               void disconnect();
             }}
@@ -228,7 +232,7 @@ export function UserPanel() {
           type="button"
           className="userpanel__toggle"
           aria-label={t("settings")}
-          title={t("settings")}
+          data-tooltip={t("settings")}
           aria-haspopup="menu"
           onClick={(event) => {
             const box = event.currentTarget.getBoundingClientRect();
@@ -253,7 +257,7 @@ export function UserPanel() {
           menu={quick}
           account={{
             connected: state.connected,
-            registered: self?.registered ?? false,
+            registered: shownSelf?.registered ?? false,
             canRegister: state.canRegister,
             onEditProfile: () => {
               setDialog("profile");
@@ -268,7 +272,15 @@ export function UserPanel() {
           }}
         />
       ) : null}
-      {connected && readOnly && self ? (
+      {voice ? (
+        <VoiceLine
+          channelName={voice.channelName}
+          serverName={nameOf(voice.serverId)}
+          onShow={() => {
+            showServer(voice.serverId);
+          }}
+        />
+      ) : connected && readOnly && shownSelf ? (
         <div className="userpanel-readonly" role="status">
           <p className="userpanel-readonly__text">{t("readOnly.text")}</p>
           {state.channelName !== null ? (
@@ -276,7 +288,7 @@ export function UserPanel() {
               type="button"
               className="button userpanel-readonly__join"
               onClick={() => {
-                run(joinChannel(self.channelId));
+                run(joinChannel(shownSelf.channelId));
               }}
             >
               {t("readOnly.join", { channel: state.channelName })}
@@ -289,15 +301,41 @@ export function UserPanel() {
           {error}
         </p>
       ) : null}
-      {dialog === "profile" && self ? (
+      {dialog === "profile" && shownSelf ? (
         <ProfileDialog
-          session={self.session}
-          hasAvatar={self.hasAvatar}
-          registered={self.registered}
+          session={shownSelf.session}
+          hasAvatar={shownSelf.hasAvatar}
+          registered={shownSelf.registered}
           onClose={closeDialog}
         />
       ) : null}
       {dialog === "register" ? <RegisterDialog onClose={closeDialog} /> : null}
     </div>
+  );
+}
+
+interface VoiceLineProps {
+  channelName: string | null;
+  serverName: string;
+  onShow: () => void;
+}
+
+/** "Voice: ‹channel› · ‹server›" (FR-2.5); clicking it shows the voice server. */
+function VoiceLine({ channelName, serverName, onShow }: VoiceLineProps) {
+  const { t } = useTranslation("userpanel");
+  const text =
+    channelName === null
+      ? t("voice.server", { server: serverName })
+      : t("voice.line", { channel: channelName, server: serverName });
+  return (
+    <button
+      type="button"
+      className="userpanel-voice"
+      aria-label={t("voice.show", { location: text })}
+      data-tooltip={t("voice.show", { location: text })}
+      onClick={onShow}
+    >
+      {text}
+    </button>
   );
 }

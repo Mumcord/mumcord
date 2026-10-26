@@ -2,6 +2,7 @@ import { useId, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { announce } from "../../a11y";
 import { getApi } from "../../api";
+import { shownServerId } from "../channels/serverStore";
 import { describeError } from "./errors";
 import { pickSavePath } from "./files";
 import { Modal } from "./Modal";
@@ -40,7 +41,7 @@ export function RegisterDialog({ onClose }: RegisterDialogProps) {
     setBusy(true);
     setError(null);
     try {
-      await getApi().registerSelf();
+      await getApi().registerSelf(shownServerId());
       announce(t("register.done"));
       onClose();
     } catch (e) {
