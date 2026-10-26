@@ -92,7 +92,7 @@ jobs:
 
       - name: Restore static libvpx
         id: libvpx-cache
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
           path: ${{ runner.temp }}/libvpx
           key: ${{ steps.libvpx.outputs.key }}
@@ -386,7 +386,7 @@ jobs:
       - name: Cache Mumble server (macOS)
         if: runner.os == 'macOS'
         id: server-cache
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
           path: ~/mumble-server
           key: mumble-server-${{ env.MUMBLE_SERVER_VERSION }}-${{ runner.os }}-${{ runner.arch }}

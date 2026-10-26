@@ -64,7 +64,7 @@ jobs:
           echo "month=$(date -u +%Y-%m)" >> "$GITHUB_OUTPUT"
 
       # Cargo registry + target dir of the in-container build.
-      - uses: actions/cache@v4
+      - uses: actions/cache@v6
         with:
           path: ${{ env.MUMCORD_E2E_CACHE }}
           key: e2e-${{ hashFiles('Cargo.lock', 'e2e/Dockerfile') }}-${{ steps.keys.outputs.week }}
