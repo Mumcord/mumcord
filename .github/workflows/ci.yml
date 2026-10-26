@@ -19,7 +19,7 @@ env:
 
 jobs:
   # Decides whether the heavy jobs run. A path filter on the trigger would leave the required
-  # checks pending forever on documentation-only pull requests, so the checks always report.
+  # checks pending forever on pull requests without code changes, so the checks always report.
   changes:
     name: Changed files
     runs-on: ubuntu-24.04
@@ -181,7 +181,7 @@ jobs:
         run: npm run tauri build -- --debug --no-bundle
 
   # Required status checks, one per OS under the old names. Runs even when the build was
-  # skipped (documentation-only change), because a skipped matrix job would not report these names.
+  # skipped (no code change), because a skipped matrix job would not report these names.
   result:
     name: ${{ matrix.os }}
     needs: [changes, build-test]
