@@ -169,6 +169,11 @@ dbg_macro = "warn"
 todo = "warn"
 unwrap_used = "warn"
 
+# Backtraces keep file and line numbers; full debug info would make target dirs much larger and
+# links slower.
+[profile.dev]
+debug = "line-tables-only"
+
 # RSA-2048 key generation in the first-start wizard takes seconds to minutes in unoptimised
 # debug builds; optimising just these crates keeps dev and E2E builds responsive.
 [profile.dev.package.rsa]
