@@ -24,13 +24,15 @@ describe("PinnedInfoBox", () => {
   it("renders nothing without text", () => {
     const { container } = render(<PinnedInfoBox blocks={[]} />);
     expect(container).toBeEmptyDOMElement();
-    const { container: blank } = render(<PinnedInfoBox blocks={["<script>x()</script>"]} />);
+    const { container: blank } = render(
+      <PinnedInfoBox blocks={[{ html: "<script>x()</script>" }]} />,
+    );
     expect(blank).toBeEmptyDOMElement();
   });
 
   it("starts collapsed for long text and toggles with an accessible button", async () => {
     fakeOverflow(true);
-    const { container } = render(<PinnedInfoBox blocks={["<p>Long rules</p>"]} />);
+    const { container } = render(<PinnedInfoBox blocks={[{ html: "<p>Long rules</p>" }]} />);
     const region = screen.getByRole("region", { name: "Channel info" });
     expect(region).toHaveTextContent("Long rules");
     const toggle = screen.getByRole("button", { name: "Show more" });
@@ -52,7 +54,7 @@ describe("PinnedInfoBox", () => {
 
   it("has no toggle when everything fits", () => {
     fakeOverflow(false);
-    render(<PinnedInfoBox blocks={["Short"]} />);
+    render(<PinnedInfoBox blocks={[{ html: "Short" }]} />);
     expect(screen.getByRole("region", { name: "Channel info" })).toHaveTextContent("Short");
     expect(screen.queryByRole("button")).toBeNull();
   });
@@ -62,9 +64,12 @@ describe("PinnedInfoBox", () => {
     render(
       <PinnedInfoBox
         blocks={[
-          '<b>Rules</b><script>alert(1)</script><img src="https://evil.example/x.png" onerror="x()">' +
-            '<a href="javascript:alert(1)">bad</a> <a href="https://example.org/guide">guide</a>',
-          "Welcome",
+          {
+            html:
+              '<b>Rules</b><script>alert(1)</script><img src="https://evil.example/x.png" onerror="x()">' +
+              '<a href="javascript:alert(1)">bad</a> <a href="https://example.org/guide">guide</a>',
+          },
+          { html: "Welcome" },
         ]}
       />,
     );
@@ -79,5 +84,31 @@ describe("PinnedInfoBox", () => {
     const openLink = vi.spyOn(api, "openLink").mockResolvedValue(null);
     fireEvent.click(screen.getByRole("link", { name: "guide" }));
     expect(openLink).toHaveBeenCalledWith("https://example.org/guide");
+  });
+});
+
+describe("PinnedInfoBox close buttons", () => {
+  it("offers × only on blocks that can be closed, each with its own handler", () => {
+    const onHideWelcome = vi.fn();
+    const onHideDescription = vi.fn();
+    const { rerender } = render(<PinnedInfoBox blocks={[{ html: "<p>Rules</p>" }]} />);
+    expect(screen.queryByRole("button", { name: /^Hide/ })).toBeNull();
+    rerender(
+      <PinnedInfoBox
+        blocks={[
+          {
+            html: "<p>About</p>",
+            hideLabel: "Hide channel description",
+            onHide: onHideDescription,
+          },
+          { html: "<p>Hi</p>", hideLabel: "Hide welcome message", onHide: onHideWelcome },
+        ]}
+      />,
+    );
+    fireEvent.click(screen.getByRole("button", { name: "Hide welcome message" }));
+    expect(onHideWelcome).toHaveBeenCalledOnce();
+    expect(onHideDescription).not.toHaveBeenCalled();
+    fireEvent.click(screen.getByRole("button", { name: "Hide channel description" }));
+    expect(onHideDescription).toHaveBeenCalledOnce();
   });
 });

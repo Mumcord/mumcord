@@ -50,14 +50,24 @@ describe("pinnedInfo", () => {
     expect(pinnedInfo(described, at(1)).blocks).toEqual(["Lobby"]);
     // Still being fetched: the description will replace the welcome text, so don't flash it.
     const pending = state([channel(1, { hasDescription: true })]);
-    expect(pinnedInfo(pending, at(1))).toEqual({ blocks: [], needsFetch: true });
+    expect(pinnedInfo(pending, at(1))).toEqual({
+      blocks: [],
+      welcome: null,
+      description: null,
+      needsFetch: true,
+    });
   });
 
   it("shows nothing for other channels without a description, blank texts and private chats", () => {
     const s = state([channel(2), channel(3, { description: "  ", hasDescription: false })], {
       welcomeText: " ",
     });
-    expect(pinnedInfo(s, at(2))).toEqual({ blocks: [], needsFetch: false });
+    expect(pinnedInfo(s, at(2))).toEqual({
+      blocks: [],
+      welcome: null,
+      description: null,
+      needsFetch: false,
+    });
     expect(pinnedInfo(s, at(3)).blocks).toEqual([]);
     expect(pinnedInfo(s, at(9)).blocks).toEqual([]);
     expect(pinnedInfo(s, { kind: "privateSession", session: 1 }).blocks).toEqual([]);
