@@ -29,3 +29,7 @@ The pull request template already has a checkbox for it. Pull requests without i
 - Use Conventional Commits (`feat:`, `fix:`, `docs:`, `chore:` ...).
 - Build, tests, type checks and linters must pass.
 - Never include secrets or connect tests to public Mumble servers; use a local test server.
+
+## Dependency updates
+
+Dependabot (`.github/dependabot.yml`) opens one pull request per ecosystem every Monday for minor and patch updates of Cargo, npm and GitHub Actions dependencies; major updates come as separate pull requests. `tauri-specta` and `specta` are pinned to exact versions and ignored; bump them together by hand.
