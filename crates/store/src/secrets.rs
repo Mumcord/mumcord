@@ -13,7 +13,9 @@
 //!
 //! Every item can cost the user a prompt (an unsigned macOS app is asked for the login
 //! password per item and per access), so each item is read at most once per session, cached
-//! in memory and written only when its value changes. Older versions kept a server's password
+//! in memory and written only when its value changes. A failed read (e.g. a denied prompt)
+//! is remembered too and not repeated before the next start, so callers that ask often
+//! (server list, notifications, reconnects) cannot turn one prompt into a flood. Older versions kept a server's password
 //! and tokens in two items (`server-password/<id>`, `access-tokens/<id>`) and split the
 //! identity on every platform; both are moved to the current layout on first read.
 //!
@@ -83,6 +85,13 @@ struct ServerSecrets {
     tokens: Vec<String>,
 }
 
+/// Outcome of the first read of an item this session.
+enum Cached<T> {
+    Read(T),
+    /// The read failed; later calls fail without asking the OS (and the user) again.
+    Unavailable,
+}
+
 impl ServerSecrets {
     fn is_empty(&self) -> bool {
         self.password.is_none() && self.tokens.is_empty()
@@ -93,7 +102,9 @@ impl ServerSecrets {
 pub struct SecretStore {
     backend: Box<dyn SecretBackend>,
     /// Server items read this session; a server without item is cached as empty.
-    servers: Mutex<HashMap<ServerId, ServerSecrets>>,
+    servers: Mutex<HashMap<ServerId, Cached<ServerSecrets>>>,
+    /// The identity once read this session; `None` until the first read.
+    identity: Mutex<Option<Cached<Option<Identity>>>>,
 }
 
 impl SecretStore {
@@ -112,18 +123,44 @@ impl SecretStore {
         Self {
             backend,
             servers: Mutex::new(HashMap::new()),
+            identity: Mutex::new(None),
         }
     }
 
     /// Stores the identity, replacing any previous one.
     pub fn save_identity(&self, identity: &Identity) -> Result<()> {
+        let mut cache = lock(&self.identity);
         let p12 = identity.to_pkcs12("")?;
         let old_count = self.identity_chunk_count()?;
-        self.write_identity(&p12, old_count)
+        self.write_identity(&p12, old_count)?;
+        *cache = Some(Cached::Read(Some(identity.clone())));
+        Ok(())
     }
 
-    /// The stored identity, or `None` if none was saved yet (first start).
+    /// The stored identity, or `None` if none was saved yet (first start). Read once per
+    /// session.
     pub fn load_identity(&self) -> Result<Option<Identity>> {
+        // Held across the OS calls so concurrent callers wait for one read.
+        let mut cache = lock(&self.identity);
+        match &*cache {
+            Some(Cached::Read(identity)) => return Ok(identity.clone()),
+            Some(Cached::Unavailable) => return Err(Error::SecretUnavailable),
+            None => {}
+        }
+        match self.read_identity() {
+            Ok(identity) => {
+                *cache = Some(Cached::Read(identity.clone()));
+                Ok(identity)
+            }
+            Err(e) => {
+                log_read_failure("the identity", &e);
+                *cache = Some(Cached::Unavailable);
+                Err(e)
+            }
+        }
+    }
+
+    fn read_identity(&self) -> Result<Option<Identity>> {
         let Some(count) = self.identity_chunk_count()? else {
             return Ok(None);
         };
@@ -147,11 +184,13 @@ impl SecretStore {
     }
 
     pub fn delete_identity(&self) -> Result<()> {
+        let mut cache = lock(&self.identity);
         let count = self.identity_chunk_count()?;
         self.backend.delete(IDENTITY_ACCOUNT)?;
         for index in 0..count.unwrap_or(0) {
             self.backend.delete(&chunk_account(index))?;
         }
+        *cache = Some(Cached::Read(None));
         Ok(())
     }
 
@@ -180,17 +219,18 @@ impl SecretStore {
 
     /// Removes the password and access tokens of a removed server without reading them first.
     pub fn delete_server_secrets(&self, server: ServerId) -> Result<()> {
-        let mut cache = self.server_cache();
+        let mut cache = lock(&self.servers);
         match cache.get(&server) {
-            Some(cached) if cached.is_empty() => return Ok(()),
-            Some(_) => self.backend.delete(&server_account(server))?,
-            None => {
+            Some(Cached::Read(cached)) if cached.is_empty() => return Ok(()),
+            Some(Cached::Read(_)) => self.backend.delete(&server_account(server))?,
+            // Removing a server is a deliberate action, so it may ask again.
+            None | Some(Cached::Unavailable) => {
                 self.backend.delete(&server_account(server))?;
                 self.backend.delete(&legacy_password_account(server))?;
                 self.backend.delete(&legacy_tokens_account(server))?;
             }
         }
-        cache.insert(server, ServerSecrets::default());
+        cache.insert(server, Cached::Read(ServerSecrets::default()));
         Ok(())
     }
 
@@ -203,14 +243,21 @@ impl SecretStore {
     ) -> Result<T> {
         // Held across the OS calls so concurrent callers wait for one read instead of each
         // reading (and prompting) for the same item.
-        let mut cache = self.server_cache();
+        let mut cache = lock(&self.servers);
         let current = match cache.get(&server) {
-            Some(cached) => cached.clone(),
-            None => {
-                let read = self.read_server(server)?;
-                cache.insert(server, read.clone());
-                read
-            }
+            Some(Cached::Read(cached)) => cached.clone(),
+            Some(Cached::Unavailable) => return Err(Error::SecretUnavailable),
+            None => match self.read_server(server) {
+                Ok(read) => {
+                    cache.insert(server, Cached::Read(read.clone()));
+                    read
+                }
+                Err(e) => {
+                    log_read_failure("a server's password", &e);
+                    cache.insert(server, Cached::Unavailable);
+                    return Err(e);
+                }
+            },
         };
         let mut next = current.clone();
         let result = change(&mut next);
@@ -221,7 +268,7 @@ impl SecretStore {
                 self.backend
                     .set(&server_account(server), &serde_json::to_vec(&next)?)?;
             }
-            cache.insert(server, next);
+            cache.insert(server, Cached::Read(next));
         }
         Ok(result)
     }
@@ -244,24 +291,37 @@ impl SecretStore {
             },
         };
         if !secrets.is_empty() {
-            // Merged before the old items go, so a failure in between loses nothing.
-            self.backend
-                .set(&server_account(server), &serde_json::to_vec(&secrets)?)?;
-            if legacy_password.is_some() {
-                self.backend.delete(&legacy_password_account(server))?;
-            }
-            if legacy_tokens.is_some() {
-                self.backend.delete(&legacy_tokens_account(server))?;
+            // The secrets were read, so a failed merge (e.g. a denied prompt for the old
+            // items) must not fail the read; the next start tries again.
+            if let Err(e) = self.merge_legacy_server(
+                server,
+                &secrets,
+                legacy_password.is_some(),
+                legacy_tokens.is_some(),
+            ) {
+                tracing::warn!(error = %e, "merging a server's old keychain items failed");
             }
         }
         Ok(secrets)
     }
 
-    fn server_cache(&self) -> MutexGuard<'_, HashMap<ServerId, ServerSecrets>> {
-        // A panic while holding the lock leaves the map itself intact.
-        self.servers
-            .lock()
-            .unwrap_or_else(std::sync::PoisonError::into_inner)
+    fn merge_legacy_server(
+        &self,
+        server: ServerId,
+        secrets: &ServerSecrets,
+        had_password: bool,
+        had_tokens: bool,
+    ) -> Result<()> {
+        // Merged before the old items go, so a failure in between loses nothing.
+        self.backend
+            .set(&server_account(server), &serde_json::to_vec(secrets)?)?;
+        if had_password {
+            self.backend.delete(&legacy_password_account(server))?;
+        }
+        if had_tokens {
+            self.backend.delete(&legacy_tokens_account(server))?;
+        }
+        Ok(())
     }
 
     fn write_identity(&self, p12: &[u8], old_count: Option<usize>) -> Result<()> {
@@ -291,6 +351,25 @@ impl SecretStore {
     }
 }
 
+fn lock<T>(mutex: &Mutex<T>) -> MutexGuard<'_, T> {
+    // A panic while holding the lock leaves the cache itself intact.
+    mutex
+        .lock()
+        .unwrap_or_else(std::sync::PoisonError::into_inner)
+}
+
+fn log_read_failure(what: &str, error: &Error) {
+    // Only OS errors are shown: a parse error could quote part of the secret.
+    match error {
+        Error::SecureStorage(e) => {
+            tracing::warn!(error = %e, "reading {what} from secure storage failed; not asking again until restart");
+        }
+        _ => {
+            tracing::warn!("{what} in secure storage is unreadable; not asking again until restart")
+        }
+    }
+}
+
 fn chunk_account(index: usize) -> String {
     format!("{IDENTITY_ACCOUNT}/{index}")
 }
@@ -310,7 +389,7 @@ fn legacy_tokens_account(server: ServerId) -> String {
 #[cfg(any(test, feature = "test-util"))]
 mod memory {
     use std::collections::HashMap;
-    use std::sync::atomic::{AtomicUsize, Ordering};
+    use std::sync::atomic::{AtomicBool, AtomicUsize, Ordering};
     use std::sync::{Arc, Mutex};
 
     use super::*;
@@ -325,6 +404,8 @@ mod memory {
         items: Mutex<HashMap<String, Vec<u8>>>,
         reads: AtomicUsize,
         writes: AtomicUsize,
+        /// Makes every call fail like a denied keychain prompt.
+        denied: AtomicBool,
     }
 
     #[cfg(test)]
@@ -339,6 +420,10 @@ mod memory {
             self.0.writes.load(Ordering::Relaxed)
         }
 
+        pub(super) fn deny(&self, denied: bool) {
+            self.0.denied.store(denied, Ordering::Relaxed);
+        }
+
         pub(super) fn accounts(&self) -> Vec<String> {
             let mut accounts: Vec<String> =
                 self.0.items.lock().expect("lock").keys().cloned().collect();
@@ -347,9 +432,19 @@ mod memory {
         }
     }
 
+    impl MemoryBackend {
+        fn check_denied(&self) -> Result<()> {
+            if self.0.denied.load(Ordering::Relaxed) {
+                return Err(keyring::Error::NoStorageAccess("denied".into()).into());
+            }
+            Ok(())
+        }
+    }
+
     impl SecretBackend for MemoryBackend {
         fn set(&self, account: &str, secret: &[u8]) -> Result<()> {
             self.0.writes.fetch_add(1, Ordering::Relaxed);
+            self.check_denied()?;
             self.0
                 .items
                 .lock()
@@ -359,10 +454,12 @@ mod memory {
         }
         fn get(&self, account: &str) -> Result<Option<Vec<u8>>> {
             self.0.reads.fetch_add(1, Ordering::Relaxed);
+            self.check_denied()?;
             Ok(self.0.items.lock().expect("lock").get(account).cloned())
         }
         fn delete(&self, account: &str) -> Result<()> {
             self.0.writes.fetch_add(1, Ordering::Relaxed);
+            self.check_denied()?;
             self.0.items.lock().expect("lock").remove(account);
             Ok(())
         }
@@ -571,13 +668,105 @@ mod tests {
 
     #[test]
     fn missing_chunk_is_reported_as_corrupt() {
-        let store = SecretStore::in_memory();
+        let (store, backend) = counted();
         store.save_identity(&IDENTITY).expect("save");
-        store.backend.delete(&chunk_account(0)).expect("drop chunk");
+        backend.delete(&chunk_account(0)).expect("drop chunk");
+        let store = SecretStore::with_backend(Box::new(backend));
         assert!(matches!(
             store.load_identity(),
             Err(Error::CorruptStoredIdentity)
         ));
+    }
+
+    #[test]
+    fn identity_is_read_once_per_session() {
+        let (store, backend) = counted();
+        for _ in 0..3 {
+            assert_eq!(store.load_identity().expect("first start"), None);
+        }
+        assert_eq!(backend.reads(), 1);
+        store.save_identity(&IDENTITY).expect("save");
+
+        // A new session: start-up, every connect and reconnect and the identity settings ask.
+        let store = SecretStore::with_backend(Box::new(backend.clone()));
+        let chunks = store.identity_chunk_count().expect("count").expect("some");
+        let reads = backend.reads();
+        for _ in 0..5 {
+            assert_eq!(
+                store.load_identity().expect("load").as_ref(),
+                Some(&*IDENTITY)
+            );
+        }
+        // The chunk count and the chunks (one outside Windows).
+        assert_eq!(backend.reads() - reads, 1 + chunks);
+    }
+
+    #[test]
+    fn denied_reads_are_not_repeated_until_restart() {
+        let (store, backend) = counted();
+        store.save_identity(&IDENTITY).expect("save");
+        store.set_server_password(7, "hunter2").expect("set");
+
+        let store = SecretStore::with_backend(Box::new(backend.clone()));
+        backend.deny(true);
+        let reads = backend.reads();
+        for _ in 0..5 {
+            assert!(store.load_identity().is_err());
+            assert!(store.server_password(7).is_err());
+            assert!(store.access_tokens(7).is_err());
+        }
+        assert_eq!(backend.reads() - reads, 2);
+
+        // Allowed after a restart.
+        backend.deny(false);
+        let store = SecretStore::with_backend(Box::new(backend.clone()));
+        assert_eq!(
+            store.server_password(7).expect("get").as_deref(),
+            Some("hunter2")
+        );
+        assert!(store.load_identity().expect("load").is_some());
+    }
+
+    #[test]
+    fn denied_merge_of_legacy_items_still_returns_the_secrets() {
+        let backend = MemoryBackend::default();
+        backend
+            .set(&legacy_password_account(4), b"hunter2")
+            .expect("seed password");
+        let store = SecretStore::with_backend(Box::new(backend.clone()));
+        let failing = FailingWrites(backend.clone());
+        let store_denied_writes = SecretStore::with_backend(Box::new(failing));
+        for _ in 0..3 {
+            assert_eq!(
+                store_denied_writes
+                    .server_password(4)
+                    .expect("read despite failed merge")
+                    .as_deref(),
+                Some("hunter2")
+            );
+        }
+        assert_eq!(backend.accounts(), ["server-password/4"]);
+        // The next start merges.
+        assert_eq!(
+            store.server_password(4).expect("get").as_deref(),
+            Some("hunter2")
+        );
+        assert_eq!(backend.accounts(), ["server/4"]);
+    }
+
+    /// Reads succeed, writes fail like a denied prompt for an item of another app version.
+    struct FailingWrites(MemoryBackend);
+
+    impl SecretBackend for FailingWrites {
+        fn set(&self, _account: &str, _secret: &[u8]) -> Result<()> {
+            Err(keyring::Error::NoStorageAccess("denied".into()).into())
+        }
+        fn get(&self, account: &str) -> Result<Option<Vec<u8>>> {
+            self.0.get(account)
+        }
+        fn delete(&self, _account: &str) -> Result<()> {
+            Err(keyring::Error::NoStorageAccess("denied".into()).into())
+        }
     }
 
     /// Runs against the real OS secure storage under a separate test service name and

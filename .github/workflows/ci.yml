@@ -19,7 +19,7 @@ env:
 
 jobs:
   # Decides whether the heavy jobs run. A path filter on the trigger would leave the required
-  # checks pending forever on documentation-only pull requests, so the checks always report.
+  # checks pending forever on pull requests without code changes, so the checks always report.
   changes:
     name: Changed files
     runs-on: ubuntu-24.04
@@ -59,7 +59,7 @@ jobs:
       - name: Restore apt packages
         id: apt-cache
         if: runner.os == 'Linux'
-        uses: actions/cache/restore@v4
+        uses: actions/cache/restore@v6
         with:
           path: ~/apt-archives
           key: apt-${{ matrix.os }}-${{ steps.apt.outputs.image }}
@@ -84,7 +84,7 @@ jobs:
 
       - name: Save apt packages
         if: always() && runner.os == 'Linux' && steps.apt-cache.outputs.cache-hit != 'true'
-        uses: actions/cache/save@v4
+        uses: actions/cache/save@v6
         with:
           path: ~/apt-archives
           key: apt-${{ matrix.os }}-${{ steps.apt.outputs.image }}
@@ -108,7 +108,7 @@ jobs:
       - name: Restore static libvpx
         id: libvpx-cache
         if: runner.os != 'Linux'
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
           path: ${{ runner.temp }}/libvpx
           key: ${{ steps.libvpx.outputs.key }}
@@ -144,7 +144,7 @@ jobs:
 
       - uses: Swatinem/rust-cache@v2
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v7
         with:
           node-version: 24
           cache: npm
@@ -181,7 +181,7 @@ jobs:
         run: npm run tauri build -- --debug --no-bundle
 
   # Required status checks, one per OS under the old names. Runs even when the build was
-  # skipped (documentation-only change), because a skipped matrix job would not report these names.
+  # skipped (no code change), because a skipped matrix job would not report these names.
   result:
     name: ${{ matrix.os }}
     needs: [changes, build-test]

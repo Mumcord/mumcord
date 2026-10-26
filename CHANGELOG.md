@@ -5,6 +5,7 @@
 ### Fixes
 
 - People who join a voice channel while someone is sharing their screen or a watch party is running now see it more reliably: the announcement is sent a second time in case the server dropped the first
+- Fixed a flood of keychain prompts on macOS after updating: a denied or failed keychain read is no longer repeated for every server list refresh, notification or reconnect, and the identity is read only once per session
 
 ## [0.4.1] - 2026-10-26
 

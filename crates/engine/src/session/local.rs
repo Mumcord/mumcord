@@ -151,9 +151,12 @@ impl Engine {
         let ids: Vec<ServerId> = servers.iter().map(|s| s.id).collect();
         let has_password = self
             .blocking(move |secrets| {
-                ids.iter()
-                    .map(|id| secrets.server_password(*id).map(|p| p.is_some()))
-                    .collect::<mumcord_store::Result<Vec<bool>>>()
+                // An unreadable password (logged by the store) must not hide the whole server
+                // list; the server shows as without password until the next start.
+                Ok(ids
+                    .iter()
+                    .map(|id| secrets.server_password(*id).is_ok_and(|p| p.is_some()))
+                    .collect::<Vec<bool>>())
             })
             .await?;
         Ok(servers

@@ -19,7 +19,7 @@ env:
 
 jobs:
   # Decides whether the heavy jobs run. A path filter on the trigger would leave the required
-  # checks pending forever on documentation-only pull requests, so the checks always report.
+  # checks pending forever on pull requests without code changes, so the checks always report.
   changes:
     name: Changed files
     runs-on: ubuntu-24.04
@@ -45,7 +45,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v7
         with:
           node-version: 24
           cache: npm
@@ -64,13 +64,13 @@ jobs:
           echo "month=$(date -u +%Y-%m)" >> "$GITHUB_OUTPUT"
 
       # Cargo registry + target dir of the in-container build.
-      - uses: actions/cache@v4
+      - uses: actions/cache@v6
         with:
           path: ${{ env.MUMCORD_E2E_CACHE }}
           key: e2e-${{ hashFiles('Cargo.lock', 'e2e/Dockerfile') }}-${{ steps.keys.outputs.week }}
           restore-keys: e2e-
 
-      - uses: docker/setup-buildx-action@v3
+      - uses: docker/setup-buildx-action@v4
 
       - name: Build image
         uses: docker/build-push-action@v6
@@ -123,7 +123,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v7
         with:
           node-version: 24
           cache: npm
@@ -131,7 +131,7 @@ jobs:
       - name: Install npm dependencies
         run: npm ci
 
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v8
         with:
           name: e2e-build
 
@@ -170,7 +170,7 @@ jobs:
         run: |
           echo "changes: $CHANGES, build: $BUILD, shards: $SHARDS"
           [ "$CHANGES" = success ] || exit 1
-          # Documentation-only change: build and shards are skipped on purpose.
+          # No code change: build and shards are skipped on purpose.
           if [ "$BUILD" = skipped ] && [ "$SHARDS" = skipped ]; then exit 0; fi
           [ "$BUILD" = success ] && [ "$SHARDS" = success ]
         env:

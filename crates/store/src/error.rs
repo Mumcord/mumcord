@@ -14,6 +14,8 @@ pub enum Error {
     SecureStorage(#[from] keyring::Error),
     #[error("secure storage holds an incomplete identity")]
     CorruptStoredIdentity,
+    #[error("secure storage could not be read earlier; restart the app to try again")]
+    SecretUnavailable,
     #[error("PKCS#12 file could not be read (wrong password or unsupported file): {0}")]
     Pkcs12(#[from] p12_keystore::error::Error),
     #[error("PKCS#12 file contains no private key with a matching certificate")]

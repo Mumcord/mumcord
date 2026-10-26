@@ -92,7 +92,7 @@ jobs:
 
       - name: Restore static libvpx
         id: libvpx-cache
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
           path: ${{ runner.temp }}/libvpx
           key: ${{ steps.libvpx.outputs.key }}
@@ -129,7 +129,7 @@ jobs:
         with:
           key: release
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v7
         with:
           node-version: 24
           cache: npm
@@ -330,7 +330,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v8
         with:
           name: mumcord-${{ matrix.name }}-${{ inputs.release && 'release' || 'unsigned-test-build' }}
           path: build
@@ -386,7 +386,7 @@ jobs:
       - name: Cache Mumble server (macOS)
         if: runner.os == 'macOS'
         id: server-cache
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
           path: ~/mumble-server
           key: mumble-server-${{ env.MUMBLE_SERVER_VERSION }}-${{ runner.os }}-${{ runner.arch }}

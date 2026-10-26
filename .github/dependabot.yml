@@ -1,0 +1,95 @@
+version: 2
+updates:
+  - package-ecosystem: "cargo"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    open-pull-requests-limit: 5
+    commit-message:
+      prefix: "chore(deps)"
+    groups:
+      cargo-minor-patch:
+        update-types:
+          - "minor"
+          - "patch"
+    ignore:
+      # Pinned with an exact "=" requirement in the workspace Cargo.toml
+      # ([workspace.dependencies]); tauri-specta and specta must be bumped together.
+      - dependency-name: "tauri-specta"
+      - dependency-name: "specta"
+  - package-ecosystem: "cargo"
+    directory: "/scripts/smoke/seed"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    open-pull-requests-limit: 5
+    commit-message:
+      prefix: "chore(deps)"
+    groups:
+      cargo-minor-patch:
+        update-types:
+          - "minor"
+          - "patch"
+    ignore:
+      # The seeder path-depends on the workspace crates, so a major bump here rewrites the
+      # workspace Cargo.toml but only the seeder's Cargo.lock, which breaks every --locked build.
+      # Majors of shared crates come through the workspace entry above instead.
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    open-pull-requests-limit: 5
+    commit-message:
+      prefix: "chore(deps)"
+    groups:
+      npm-minor-patch:
+        update-types:
+          - "minor"
+          - "patch"
+      # The wdio packages are released together; the runner expects plugins of its own major.
+      wdio-major:
+        patterns:
+          - "@wdio/*"
+        update-types:
+          - "major"
+      # eslint and @eslint/js share a major and only work together.
+      eslint-major:
+        patterns:
+          - "eslint"
+          - "@eslint/js"
+        update-types:
+          - "major"
+    ignore:
+      # eslint-plugin-jsx-a11y 6.10.2 (latest) only accepts eslint up to 9; lift once it supports 10.
+      - dependency-name: "eslint"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "@eslint/js"
+        update-types: ["version-update:semver-major"]
+      # TypeScript 7 is the native rewrite; typescript-eslint only supports TypeScript < 6.1.
+      - dependency-name: "typescript"
+        update-types: ["version-update:semver-major"]
+      # Must match the Node major the workflows install (node-version: 24); bump both together.
+      - dependency-name: "@types/node"
+        update-types: ["version-update:semver-major"]
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    open-pull-requests-limit: 5
+    commit-message:
+      prefix: "ci(deps)"
+    groups:
+      github_actions-minor-patch:
+        update-types:
+          - "minor"
+          - "patch"
+      # Workflow-only pull requests skip the build and E2E jobs, so each one needs manual
+      # workflow runs to be tested; one grouped pull request needs only one round.
+      github_actions-major:
+        update-types:
+          - "major"

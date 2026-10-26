@@ -368,7 +368,9 @@ pub(crate) fn lock<T>(mutex: &Mutex<T>) -> MutexGuard<'_, T> {
 pub(crate) fn store_error(err: mumcord_store::Error) -> EngineError {
     use mumcord_store::Error as E;
     let kind = match &err {
-        E::SecureStorage(_) | E::CorruptStoredIdentity => ErrorKind::SecureStorageUnavailable,
+        E::SecureStorage(_) | E::CorruptStoredIdentity | E::SecretUnavailable => {
+            ErrorKind::SecureStorageUnavailable
+        }
         E::Pkcs12(_) | E::Pkcs12NoIdentity | E::EmptyIdentityName => ErrorKind::InvalidInput,
         E::InvalidVolume(_) | E::InvalidPort => ErrorKind::InvalidInput,
         E::UnknownServer(_) => ErrorKind::NotFound,
