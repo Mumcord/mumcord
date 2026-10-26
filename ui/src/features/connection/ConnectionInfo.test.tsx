@@ -3,6 +3,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import { createMockApi, setApi, type MockApi } from "../../api";
 import "../../i18n";
 import { axeViolations } from "../../test/axe";
+import { getServerState, resetServerStore } from "../channels/serverStore";
 import { ConnectionInfo } from "./ConnectionInfo";
 import { POLL_INTERVAL_MS } from "./useConnectionStats";
 
@@ -11,9 +12,11 @@ let api: MockApi;
 async function setup(connect = true) {
   api = createMockApi({ seed: "ready" });
   setApi(api);
+  // The stats are asked for the server the server store knows.
+  getServerState();
   if (connect) {
     const [server] = await api.serversList();
-    await api.connect((server ?? { id: 0 }).id, null);
+    await api.connect((server ?? { id: 0 }).id, null, null);
   }
   return render(<ConnectionInfo />);
 }
@@ -29,6 +32,7 @@ function valueOf(panel: HTMLElement, label: string) {
 
 afterEach(() => {
   vi.useRealTimers();
+  resetServerStore();
   setApi(undefined);
 });
 

@@ -1,0 +1,81 @@
+/* Connection figures in the profile card, hover preview (FR-2.25). */
+.connection-quality {
+  font-size: var(--font-size-sm, 0.85em);
+  color: var(--color-text-muted);
+}
+
+.connection-quality__toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-1) 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+
+.connection-quality__toggle[aria-disabled="true"] {
+  cursor: default;
+}
+
+.connection-quality__toggle:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 2px;
+}
+
+.connection-quality__icon {
+  color: var(--color-text-muted);
+}
+
+.connection-quality[data-level="good"] .connection-quality__icon {
+  color: var(--color-success);
+}
+
+.connection-quality[data-level="fair"] .connection-quality__icon {
+  color: var(--color-warning);
+}
+
+.connection-quality[data-level="weak"] .connection-quality__icon {
+  color: var(--color-danger);
+}
+
+/* Framed box: names left, values right in monospace so the figures line up. */
+.connection-quality__details {
+  display: grid;
+  gap: var(--space-1);
+  margin: var(--space-1) 0 0;
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md, 6px);
+}
+
+.connection-quality__row {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.connection-quality dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+  color: var(--color-text);
+  font-family: var(--font-mono, ui-monospace, monospace);
+  text-align: end;
+}
+
+/* Points right when collapsed, down when expanded. */
+.connection-quality__chevron {
+  transition: transform var(--duration-normal) var(--ease-out);
+}
+
+.connection-quality__toggle[aria-expanded="true"] .connection-quality__chevron {
+  transform: rotate(90deg);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .connection-quality__chevron {
+    transition: none;
+  }
+}
