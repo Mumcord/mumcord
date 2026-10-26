@@ -1,0 +1,73 @@
+.theme-picker {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  min-width: 0;
+}
+
+.theme-picker__legend {
+  margin-bottom: var(--space-1);
+  padding: 0;
+  font-weight: 600;
+}
+
+.theme-picker__heading {
+  margin: var(--space-2) 0 var(--space-1);
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+}
+
+.theme-picker__row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.theme-picker__item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-1);
+  width: 4.5rem;
+}
+
+.theme-picker__circle {
+  width: 2.75rem;
+  height: 2.75rem;
+  padding: 0;
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-full);
+  /* The gap keeps the ring visible against circles of the same colour as the page. */
+  outline-offset: 3px;
+  cursor: pointer;
+}
+
+.theme-picker__circle[data-selected] {
+  outline: 2px solid var(--color-accent);
+}
+
+.theme-picker__circle:focus-visible {
+  outline: var(--focus-ring-width) solid var(--color-focus);
+}
+
+.theme-picker__circle--add {
+  display: grid;
+  place-items: center;
+  border-style: dashed;
+  background: none;
+  color: var(--color-text);
+  font-size: var(--font-size-xl);
+}
+
+.theme-picker__name {
+  max-width: 100%;
+  overflow: hidden;
+  font-size: var(--font-size-xs);
+  text-align: center;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
