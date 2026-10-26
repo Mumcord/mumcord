@@ -70,7 +70,7 @@ jobs:
           key: e2e-${{ hashFiles('Cargo.lock', 'e2e/Dockerfile') }}-${{ steps.keys.outputs.week }}
           restore-keys: e2e-
 
-      - uses: docker/setup-buildx-action@v3
+      - uses: docker/setup-buildx-action@v4
 
       - name: Build image
         uses: docker/build-push-action@v6
