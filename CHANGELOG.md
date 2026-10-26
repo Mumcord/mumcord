@@ -6,7 +6,7 @@
 
 - Fixed a flood of keychain prompts after updating: a denied or failed keychain read is no longer repeated for every server list refresh, notification or reconnect, and the identity is read only once per session
 
-## [0.4.1] - Unreleased
+## [0.4.1] - 2026-10-26
 
 ### macOS
 
