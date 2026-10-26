@@ -10,5 +10,6 @@
   "image": "Sendte et billede",
   "open": "Åbn chat",
   "close": "Afvis notifikation",
-  "mentionLine": "{{sender}} omtalte dig: {{preview}}"
+  "mentionLine": "{{sender}} omtalte dig: {{preview}}",
+  "withServer": "{{server}} · {{what}}"
 }

@@ -1,8 +1,6 @@
 {
   "inChannel_one": "I {{channel}} ({{count}})",
   "inChannel_other": "I {{channel}} ({{count}})",
-  "listening_one": "Lytter ({{count}})",
-  "listening_other": "Lytter ({{count}})",
   "noChannel": "Vælg en kanal for at se, hvem der er i den.",
   "nobody": "Der er ingen her.",
   "nobodyElse": "Ingen andre er på serveren.",
@@ -11,6 +9,26 @@
   "registered": "Registreret",
   "unregistered": "Ikke registreret",
   "talking": "Taler",
+  "quality": {
+    "label": "Forbindelse",
+    "summary": "Forbindelse: {{level}}",
+    "level": {
+      "good": "God",
+      "fair": "Middel",
+      "weak": "Svag",
+      "unknown": "Ukendt"
+    },
+    "ping": "Ping",
+    "loss": "Pakketab",
+    "late": "Forsinkede pakker",
+    "bandwidth": "Båndbredde",
+    "transport": "Taletransport",
+    "client": "Klient",
+    "os": "Styresystem",
+    "ms": "{{value}} ms",
+    "percent": "{{value}} %",
+    "kbps": "{{value}} kbit/s"
+  },
   "card": {
     "close": "Luk",
     "loadFailed": "Profilen kunne ikke indlæses.",
@@ -22,6 +40,9 @@
     "privateMessage": "Privat besked",
     "localSettings": "Dine indstillinger",
     "localSettingsHint": "Kun du kan se disse. Ændringer gemmes med det samme.",
+    "settingsFor": "Indstillinger for {{name}}",
+    "hintMuted": "Lydløs",
+    "hintVolume": "Lydstyrke {{value}} %",
     "localMuteHint": "Du hører ikke denne person.",
     "privateNote": "Privat note",
     "privateNoteHint": "Kun du kan se denne note.",
@@ -34,9 +55,10 @@
   "menu": {
     "label": "Handlinger for {{name}}",
     "viewProfile": "Se profil",
-    "join": "Join {{channel}}",
+    "join": "Gå til {{channel}}",
     "joinDenied": "Du har ikke adgang til denne kanal.",
-    "mute": "Slå lyden fra for mig"
+    "mute": "Slå lyden fra for mig",
+    "connectionInfo": "Forbindelsesinfo…"
   },
   "nowPlaying": {
     "label": "Spiller nu",

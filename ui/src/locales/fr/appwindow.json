@@ -5,6 +5,39 @@
     "remember": "Se souvenir de mon choix",
     "minimize": "Réduire dans la zone de notification",
     "quit": "Quitter",
+    "failed": "Cela n’a pas fonctionné. Veuillez réessayer.",
+    "descriptionServers": "Vous êtes encore connecté à {{count}} serveurs. Réduit, Mumcord vous garde en vocal et reste dans la zone de notification."
+  },
+  "windowOverlay": {
+    "title": "L’overlay en fenêtre a été supprimé",
+    "description": "La fenêtre d’overlay flottante n’existe plus. L’overlay en jeu affiche désormais qui parle dans vos jeux. Vous pouvez l’activer dans les paramètres de l’overlay.",
+    "dismiss": "Compris",
+    "openSettings": "Ouvrir les paramètres de l’overlay"
+  },
+  "appImageMenu": {
+    "title": "Ajouter Mumcord au menu des applications ?",
+    "description": "Mumcord apparaîtra dans votre menu des applications. L’icône et le push-to-talk fonctionneront correctement sous Wayland, et les liens mumble:// ouvriront Mumcord. Vous pourrez modifier ce choix plus tard dans les paramètres.",
+    "no": "Non",
+    "yes": "Oui",
+    "failed": "Cela n’a pas fonctionné. Veuillez réessayer."
+  },
+  "updateCheck": {
+    "title": "Rechercher les nouvelles versions ?",
+    "description": "Mumcord peut demander une fois par jour à GitHub si une version plus récente existe et afficher un avis avec un lien. Rien n’est téléchargé ni installé, et rien n’est envoyé à part la requête elle-même, le nom et la version de l’application. Vous pourrez modifier ce choix plus tard dans les paramètres.",
+    "no": "Non",
+    "yes": "Oui",
+    "failed": "Cela n’a pas fonctionné. Veuillez réessayer."
+  },
+  "updateHint": {
+    "message": "Mumcord {{version}} est disponible.",
+    "open": "Voir la version",
+    "dismiss": "Ignorer"
+  },
+  "directConsent": {
+    "title": "Autoriser les connexions directes ?",
+    "description": "Les connexions directes sont plus rapides, mais l’autre personne peut voir votre adresse IP. Mumcord les utilise pour les images en taille réelle et le partage d’écran avec d’autres utilisateurs de Mumcord, et peut ouvrir un port sur votre routeur pour elles. Si vous refusez, les images arrivent toujours via le serveur et le partage d’écran n’est pas disponible. Vous pourrez modifier ce choix plus tard dans Paramètres → Confidentialité.",
+    "no": "Non",
+    "yes": "Oui",
     "failed": "Cela n’a pas fonctionné. Veuillez réessayer."
   }
 }

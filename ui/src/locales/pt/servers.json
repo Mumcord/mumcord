@@ -13,10 +13,15 @@
     "listLabel": "Servidores guardados",
     "add": "Adicionar um servidor",
     "keyboardHint": "Enter liga. Alt mais seta para cima ou para baixo move o servidor. Shift mais F10 abre mais opções.",
-    "status": {
-      "connected": "{{server}} (ligado)",
-      "connecting": "{{server}} (a ligar)",
-      "reconnecting": "{{server}} (a religar)"
+    "label": "{{server}} ({{state}})",
+    "state": {
+      "connected": "ligado",
+      "connecting": "a ligar",
+      "reconnecting": "a religar",
+      "error": "ligação perdida",
+      "voice": "servidor de voz",
+      "unread": "mensagens não lidas",
+      "mentions": "menções: {{mentions}}"
     }
   },
   "menu": {
@@ -26,7 +31,19 @@
     "edit": "Editar servidor",
     "moveUp": "Mover para cima",
     "moveDown": "Mover para baixo",
-    "remove": "Remover servidor"
+    "remove": "Remover servidor",
+    "reconnect": "Religar",
+    "alwaysConnect": "Ligar sempre ao iniciar",
+    "muteNotifications": "Silenciar notificações",
+    "theme": "Tema…",
+    "showWelcome": "Mostrar mensagem de boas-vindas"
+  },
+  "theme": {
+    "title": "Tema para {{server}}",
+    "label": "Tema",
+    "useApp": "Usar tema da aplicação",
+    "hint": "Aplicado enquanto este servidor é mostrado.",
+    "failed": "Não foi possível guardar o tema. Tenta novamente."
   },
   "dialog": {
     "addTitle": "Adicionar um servidor",
@@ -50,7 +67,14 @@
       "username": "Introduz o nome que queres usar neste servidor.",
       "link": "Não foi possível ler esta ligação mumble://. Verifica se foi copiada por completo.",
       "invalid": "Os dados do servidor não são válidos. Verifica o endereço e a porta."
-    }
+    },
+    "alwaysConnect": "Ligar sempre ao iniciar",
+    "alwaysConnectHint": "O Mumcord liga este servidor só em leitura ao iniciar.",
+    "channelPasswords": "Palavras-passe dos canais",
+    "channelPassword": "Palavra-passe do canal {{number}}",
+    "removeChannelPassword": "Remover {{name}}",
+    "remove": "Remover",
+    "channelPasswordsHint": "Guardadas quando um canal protegido as aceitou. As removidas são pedidas de novo na próxima entrada."
   },
   "errors": {
     "serverUnreachable": "Não foi possível contactar o servidor. Verifica o endereço e a porta, e se estás online.",
@@ -63,17 +87,16 @@
     "invalidAddress": "O endereço do servidor não é válido. Edita o servidor para o corrigir.",
     "secureStorage": "O armazenamento seguro do sistema não está disponível, por isso não foi possível ler ou guardar a palavra-passe do servidor. Desbloqueia-o e tenta novamente.",
     "notFound": "Este servidor já não está guardado.",
-    "generic": "Algo correu mal. Tenta novamente."
+    "generic": "Algo correu mal. Tenta novamente.",
+    "serverLimit": "Já estás ligado ao máximo de {{limit}} servidores. Desliga um servidor ou aumenta o limite em Definições → Servidores.",
+    "serverLimitUnknown": "Já estás ligado ao número máximo de servidores. Desliga um servidor ou aumenta o limite em Definições → Servidores.",
+    "alwaysConnectLimit": "Só {{limit}} servidores podem ter «Ligar sempre ao iniciar», o mesmo que o limite de servidores ligados. Desativa-o noutro servidor ou aumenta o limite em Definições → Servidores.",
+    "alwaysConnectLimitUnknown": "Não podem ter «Ligar sempre ao iniciar» mais servidores do que o limite de servidores ligados. Desativa-o noutro servidor ou aumenta o limite em Definições → Servidores."
   },
   "remove": {
     "title": "Remover {{server}}?",
     "message": "A palavra-passe guardada, a decisão sobre o certificado, os canais seguidos e o histórico de chat neste computador são eliminados.",
     "confirm": "Remover"
-  },
-  "switch": {
-    "title": "Mudar de servidor?",
-    "message": "Só podes estar num servidor de cada vez. Desligar de {{current}} e ligar a {{next}}?",
-    "confirm": "Desligar e mudar"
   },
   "cert": {
     "newTitle": "Confiar neste servidor?",
@@ -108,7 +131,10 @@
     "actionFailed": {
       "reorder": "Não foi possível guardar a nova ordem dos servidores. Tenta novamente.",
       "remove": "Não foi possível remover o servidor. Tenta novamente.",
-      "disconnect": "Falhou ao desligar. Tenta novamente."
+      "disconnect": "Falhou ao desligar. Tenta novamente.",
+      "alwaysConnect": "Não foi possível guardar «Ligar sempre ao iniciar». Tenta novamente.",
+      "notifications": "Não foi possível guardar a definição de notificações. Tenta novamente.",
+      "savePassword": "Não foi possível guardar a nova palavra-passe. Edita o servidor para a guardar."
     }
   },
   "empty": {
@@ -124,5 +150,27 @@
     "errors": {
       "required": "Introduz um endereço de servidor ou uma ligação mumble://."
     }
+  },
+  "password": {
+    "title": "Palavra-passe para {{server}}",
+    "intro": "O servidor não aceitou a palavra-passe. Introduz a correta para tentar novamente.",
+    "label": "Palavra-passe",
+    "show": "Mostrar",
+    "hide": "Ocultar",
+    "wrong": "Essa palavra-passe também está errada. Tenta novamente.",
+    "save": "Guardar palavra-passe",
+    "cancel": "Cancelar",
+    "connect": "Ligar",
+    "connecting": "A ligar…"
+  },
+  "channelPassword": {
+    "title": "Este canal precisa de uma palavra-passe",
+    "intro": "Introduz a palavra-passe para {{channel}}.",
+    "label": "Palavra-passe",
+    "wrong": "Palavra-passe errada",
+    "failed": "Não foi possível enviar a palavra-passe. Tenta novamente.",
+    "cancel": "Cancelar",
+    "join": "Entrar",
+    "joining": "A entrar…"
   }
 }

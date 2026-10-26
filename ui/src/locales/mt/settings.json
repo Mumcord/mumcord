@@ -14,7 +14,9 @@
     "sounds": "Ħsejjes u notifiki",
     "overlay": "Overlay",
     "diagnostics": "Dijanjostika",
-    "about": "Dwar"
+    "about": "Dwar",
+    "servers": "Servers",
+    "privacy": "Privatezza"
   },
   "search": {
     "label": "Fittex fis-settings",
@@ -71,7 +73,17 @@
     "testPlaying": "Qed jindaqq il-vuċi tiegħek…",
     "quality": "Kwalità",
     "musicQuality": "Kwalità tal-mużika",
-    "musicQualityHint": "Juża aktar bandwidth u jitfi t-tneħħija tal-istorbju u l-volum awtomatiku; għall-mużika. Push-to-talk jaħdem l-aħjar."
+    "musicQualityHint": "Juża aktar bandwidth u jitfi t-tneħħija tal-istorbju u l-volum awtomatiku; għall-mużika. Push-to-talk jaħdem l-aħjar.",
+    "bitrate": "Bitrate",
+    "bitrateMax": "Mass.",
+    "bitrateValue": "{{kbps}} kbit/s",
+    "bitrateMaxKnown": "Massimu: {{kbps}} kbit/s. It-telf fuq il-konnessjoni jista' jbaxxih xorta.",
+    "bitrateMaxUnknown": "Massimu: jiddependi mis-server. It-telf fuq il-konnessjoni jista' jbaxxih xorta.",
+    "videoSound": "Ħoss tal-video",
+    "ducking": "Baxxi l-ħoss tal-video waqt li xi ħadd ikun qed jitkellem",
+    "duckingHint": "Il-ħoss tal-video tal-watch party u tal-qsim tal-iskrin jitbaxxa waqt li xi ħadd fil-kanal tal-vuċi tiegħek ikun qed jitkellem.",
+    "duckingLevel": "Volum imbaxxi",
+    "duckingLevelValue": "{{percent}} %"
   },
   "voice": {
     "talkMode": "Mod tat-tkellim",
@@ -181,6 +193,7 @@
     "compact": "Kompatta: ħin, isem u messaġġ fuq linja waħda",
     "theme": "Tema",
     "themeLegend": "Tema tal-kuluri",
+    "modeLegend": "Skur jew ċar",
     "system": "Segwi s-sistema",
     "dark": "Skur",
     "light": "Ċar",
@@ -192,6 +205,61 @@
     "autostart": "Ibda Mumcord meta nidħol",
     "startMinimized": "Ibda minimizzat",
     "startMinimizedHint": "Meta Mumcord jibda mad-dħul, jistenna fit-tray minflok jiftaħ it-tieqa."
+  },
+  "themeEditor": {
+    "name": "Isem it-tema",
+    "colorsLegend": "Kuluri ewlenin",
+    "colorColumn": "Kulur",
+    "auto": "awtomatiku",
+    "cellLabel": "{{color}}, {{version}}",
+    "newTitle": "Tema ġdida",
+    "editTitle": "Editja “{{name}}”",
+    "generatedFromDark": "Magħmula awtomatikament mill-verżjoni skura. Issegwi l-bidliet tiegħek hemm sakemm tibdilha hawn.",
+    "generatedFromLight": "Magħmula awtomatikament mill-verżjoni ċara. Issegwi l-bidliet tiegħek hemm sakemm tibdilha hawn.",
+    "colors": {
+      "background": "Sfond",
+      "surface": "Wiċċ",
+      "text": "Test",
+      "accent": "Aċċent",
+      "talking": "Qed jitkellem u online",
+      "warning": "Twissija",
+      "error": "Żball"
+    },
+    "pickColor": "Selettur tal-kulur {{color}}",
+    "invalidHex": "Daħħal il-kulur bħala # segwit minn sitt ċifri eżadeċimali, pereżempju #1a2b3c.",
+    "contrastLowIn": "{{version}}: kuntrast baxx wisq: {{ratio}}:1, jeħtieġ mill-inqas {{min}}:1.",
+    "unreadable": "Din it-tema mhix moqrija biżżejjed. Ibdel il-kulur tat-test jew tal-isfond biex tissejvjaha.",
+    "copyName": "{{name}} (kopja)",
+    "save": "Issejvja t-tema",
+    "saveAs": "Issejvja bħala tema",
+    "saved": "It-tema ġiet issejvjata.",
+    "share": "Aqsam",
+    "shared": "It-tema ġiet ikkupjata. Waħħalha f'chat biex taqsamha.",
+    "shareFailed": "Mumcord ma setax jikkopja t-tema fil-clipboard.",
+    "import": "Importa…",
+    "importTitle": "Importa tema",
+    "importLabel": "Messaġġ jew kodiċi tat-tema",
+    "importHint": "Waħħal messaġġ taċ-chat b'tema ta' Mumcord, jew il-kodiċi tagħha biss (jibda b'mct1.).",
+    "importConfirm": "Importa",
+    "importInvalid": "Din mhix tema valida ta' Mumcord.",
+    "importUnreadable": "Din it-tema mhix moqrija biżżejjed.",
+    "imported": "“{{name}}” ġiet importata.",
+    "alreadyImported": "“{{name}}” diġà qiegħda fit-temi tiegħek.",
+    "madeWithNewer": "Magħmula b'Mumcord {{version}} – aġġorna biex tarah kollu.",
+    "reset": "Irrisettja",
+    "menuLabel": "Għażliet għal {{name}}",
+    "edit": "Editja t-tema",
+    "newFromThis": "Tema ġdida minn din",
+    "preview": "Preview",
+    "previewing": "Preview ta' {{name}}",
+    "backToEditor": "Lura għall-editur",
+    "rename": "Semmi mill-ġdid it-tema",
+    "renameTitle": "Semmi mill-ġdid “{{name}}”",
+    "renameConfirm": "Semmi mill-ġdid",
+    "delete": "Ħassar it-tema",
+    "deleteTitle": "Tħassar “{{name}}”?",
+    "deleteMessage": "Is-servers li jużaw din it-tema jerġgħu lura għat-tema tal-app.",
+    "deleteConfirm": "Ħassar"
   },
   "accessibility": {
     "hints": "Suġġerimenti",
@@ -215,7 +283,14 @@
     "hangUp": "Tiskonnettja minn server",
     "messages": "Messaġġ ġdid f'kanal segwit jew chat privat",
     "mention": "Ħoss meta tissemma",
-    "mentionNotify": "Ibgħat notifika meta tissemma"
+    "mentionNotify": "Ibgħat notifika meta tissemma",
+    "partyStarted": "Xi ħadd jibda watch party fil-kanal tiegħek",
+    "partyJoined": "Xi ħadd jingħaqad mal-watch party tiegħek",
+    "partyLeft": "Xi ħadd jitlaq mill-watch party tiegħek",
+    "shareStarted": "Xi ħadd jibda jaqsam l-iskrin fil-kanal tiegħek",
+    "shareStopped": "Qsim tal-iskrin fil-kanal tiegħek jintemm",
+    "viewerStarted": "Xi ħadd jibda jara l-qsim tal-iskrin tiegħek",
+    "viewerStopped": "Xi ħadd jieqaf jara l-qsim tal-iskrin tiegħek"
   },
   "notifications": {
     "title": "Notifiki",
@@ -227,29 +302,6 @@
     "off": "Mitfi"
   },
   "overlay": {
-    "window": {
-      "title": "Overlay tat-tieqa",
-      "enable": "Uri l-overlay",
-      "enableHint": "Tieqa żgħira trasparenti li turi min qed jitkellem. Disponibbli wkoll mill-menu tat-tray.",
-      "positionUnsupported": "Dan id-desktop jiddeċiedi fejn jidhru t-twieqi, għalhekk il-pożizzjonijiet tal-kantunieri u t-tmexxija ma jaħdmux.",
-      "move": "Mexxi l-overlay…",
-      "moveDone": "Tmexxa",
-      "size": "Wisa'",
-      "wholeChannel": "Uri l-kanal kollu",
-      "wholeChannelHint": "Mitfi: biss persuni li qed jitkellmu.",
-      "channelName": "Uri l-isem tal-kanal",
-      "loadFailed": "L-għażliet tal-overlay ma setgħux jitgħabbew.",
-      "saveFailed": "Il-bidla fl-overlay ma setgħetx tiġi applikata.",
-      "kwin": {
-        "setUp": "Waqqaf awtomatikament",
-        "done": "Lest: ir-regola tat-tieqa ta' KDE “Mumcord overlay” hija attiva.",
-        "removed": "Ir-regola tat-tieqa ta' KDE tneħħiet.",
-        "remove": "Neħħi r-regola",
-        "openRules": "Iftaħ ir-regoli tat-twieqi ta' KDE",
-        "compat": "Uża compatibility mode minflok",
-        "failed": "Ir-regola tat-tieqa ta' KDE ma setgħetx tinbidel. Iftaħ ir-regoli tat-twieqi ta' KDE biex iżżidha bl-idejn."
-      }
-    },
     "corner": {
       "label": "Pożizzjoni",
       "topLeft": "Fuq xellug",
@@ -284,8 +336,16 @@
       "confirmEnable": "Ixgħel xorta waħda",
       "limits": {
         "libraryMissing": "L-overlay fil-logħba mhuwiex disponibbli: il-librerija tiegħu (libmumcord_overlay_layer.so) ma nstabitx ħdejn Mumcord. Erġa' installa Mumcord biex terġa' ddaħħalha. Minfloku jintuża l-overlay tat-tieqa hawn fuq.",
-        "windowsPending": "L-overlay fil-logħba għadu mhuwiex disponibbli fuq Windows. Minfloku jintuża l-overlay tat-tieqa hawn fuq.",
+        "windowsFullscreen": "Uża skrin sħiħ mingħajr bordura jew f'tieqa fil-logħba.",
         "macos": "macOS ma jappoġġjax overlays fil-logħob. Minfloku jintuża l-overlay tat-tieqa hawn fuq."
+      },
+      "opengl": {
+        "title": "Logħob OpenGL",
+        "explanation": "Meħtieġ biss għal-logħob OpenGL: waħħlu fl-għażliet tat-tnedija ta' Steam tal-logħba.",
+        "label": "Għażla tat-tnedija ta' Steam",
+        "copy": "Ikkopja",
+        "copied": "Ikkupjat",
+        "copyFailed": "L-ikkupjar ma rnexxiex. Agħżel it-test u kkopjah bl-idejn."
       }
     }
   },
@@ -394,5 +454,38 @@
       "unsupported": "Mhux disponibbli fuq din is-sistema.",
       "failed": "Waqaf wara żball. Itfih u ixgħelu mill-ġdid biex terġa' tipprova."
     }
+  },
+  "servers": {
+    "connections": "Konnessjonijiet",
+    "limit": "Servers konnessi fl-istess ħin",
+    "limitHint": "Bejn 1 u 15. Konnessjonijiet lil hinn mil-limitu jiġu rrifjutati.",
+    "limitInvalid": "Daħħal numru sħiħ minn 1 sa 15."
+  },
+  "appearanceEffects": {
+    "title": "Effetti",
+    "visualEffects": "Effetti viżivi (ħġieġ, granulu)",
+    "visualEffectsHint": "Menus tal-ħġieġ smerilat u granulu tal-film sottili. Jintfew awtomatikament meta s-sistema titlob inqas trasparenza jew moviment."
+  },
+  "channelList": {
+    "title": "Lista tal-kanali",
+    "hideEmpty": "Aħbi l-kanali vojta",
+    "talkingFirst": "Uri lil min qed jitkellem l-ewwel",
+    "weakConnection": "Uri l-ikona ta' konnessjoni dgħajfa",
+    "weakConnectionHint": "Ikona żgħira tas-sinjal ħdejn persuni b'konnessjoni ħażina."
+  },
+  "privacyDirect": {
+    "title": "Konnessjonijiet diretti",
+    "allow": "Ippermetti konnessjonijiet diretti ma' utenti oħra ta' Mumcord",
+    "hint": "Il-konnessjonijiet diretti huma aktar mgħaġġla, imma l-persuna l-oħra tista' tara l-indirizz IP tiegħek. Sakemm tiddeċiedi, Mumcord jistaqsi l-ewwel darba li tkun se tintuża waħda."
+  },
+  "updates": {
+    "title": "Aġġornamenti",
+    "check": "Fittex verżjonijiet ġodda",
+    "hint": "Darba kuljum Mumcord jistaqsi lil GitHub għall-aħħar rilaxx. Xejn iktar ma jintbagħat."
+  },
+  "appImageMenu": {
+    "label": "Żid lil Mumcord mal-menu tal-apps",
+    "hint": "Jagħmel l-ikona u push-to-talk jaħdmu sew fuq Wayland u l-links mumble:// jiftħu Mumcord. Għall-AppImage biss.",
+    "failed": "Ma ħadimx. Erġa' pprova."
   }
 }

@@ -5,6 +5,39 @@
     "remember": "Jäta mu valik meelde",
     "minimize": "Minimeeri salve",
     "quit": "Välju",
-    "failed": "See ei õnnestunud. Proovi palun uuesti."
+    "failed": "See ei õnnestunud. Proovi palun uuesti.",
+    "descriptionServers": "Oled endiselt ühendatud {{count}} serveriga. Minimeerituna hoiab Mumcord sind häälkanalis ja jääb süsteemisalve."
+  },
+  "windowOverlay": {
+    "title": "Aknakattekiht eemaldati",
+    "description": "Hõljuvat kattekihi akent enam pole. Selle asemel näitab mängusisene kattekiht sinu mängudes, kes räägib. Saad selle sisse lülitada kattekihi seadetes.",
+    "dismiss": "Selge",
+    "openSettings": "Ava kattekihi seaded"
+  },
+  "appImageMenu": {
+    "title": "Kas lisada Mumcord rakenduste menüüsse?",
+    "description": "Nii ilmub Mumcord sinu rakenduste menüüsse. Ikoon ja vajuta ja räägi töötavad Waylandis korralikult ning mumble:// lingid avavad Mumcordi. Saad seda hiljem seadetes muuta.",
+    "no": "Ei",
+    "yes": "Jah",
+    "failed": "See ei õnnestunud. Proovi uuesti."
+  },
+  "updateCheck": {
+    "title": "Kas otsida uusi versioone?",
+    "description": "Mumcord võib kord päevas GitHubilt küsida, kas on uuem versioon, ja näidata lingiga vihjet. Midagi ei laadita alla ega paigaldata ning peale päringu enda ja rakenduse nime ja versiooni ei saadeta midagi. Saad seda hiljem seadetes muuta.",
+    "no": "Ei",
+    "yes": "Jah",
+    "failed": "See ei õnnestunud. Proovi uuesti."
+  },
+  "updateHint": {
+    "message": "Mumcord {{version}} on saadaval.",
+    "open": "Vaata väljalaset",
+    "dismiss": "Peida"
+  },
+  "directConsent": {
+    "title": "Kas lubada otseühendused?",
+    "description": "Otseühendused on kiiremad, kuid teine inimene näeb sinu IP-aadressi. Mumcord kasutab neid täissuuruses piltide ja ekraani jagamise jaoks teiste Mumcordi kasutajatega ning võib nende jaoks avada pordi sinu ruuteris. Kui ütled ei, jõuavad pildid ikkagi serveri kaudu ja ekraani jagamine pole saadaval. Saad seda hiljem muuta jaotises Seaded → Privaatsus.",
+    "no": "Ei",
+    "yes": "Jah",
+    "failed": "See ei õnnestunud. Proovi uuesti."
   }
 }

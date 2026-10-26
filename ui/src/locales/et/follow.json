@@ -13,13 +13,16 @@
   },
   "dm": {
     "title": "Otsesõnumid",
-    "unknown": "Tundmatu inimene"
+    "unknown": "Tundmatu inimene",
+    "withServer": "{{name}}, serveris {{server}}"
   },
   "notify": {
     "channel": "{{name}} kanalis {{channel}}: {{text}}",
     "private": "{{name}} (privaatne): {{text}}",
     "more_one": "veel {{count}} uus sõnum",
-    "more_other": "veel {{count}} uut sõnumit"
+    "more_other": "veel {{count}} uut sõnumit",
+    "channelOn": "{{name}} kanalis {{channel}} serveris {{server}}: {{text}}",
+    "privateOn": "{{name}} (privaatne, {{server}}): {{text}}"
   },
   "history": {
     "clear": "Tühjenda ajalugu",

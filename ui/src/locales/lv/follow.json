@@ -14,14 +14,17 @@
   },
   "dm": {
     "title": "Tiešās ziņas",
-    "unknown": "Nezināms cilvēks"
+    "unknown": "Nezināms cilvēks",
+    "withServer": "{{name}}, serverī {{server}}"
   },
   "notify": {
     "channel": "{{name}} kanālā {{channel}}: {{text}}",
     "private": "{{name}} (privāti): {{text}}",
     "more_zero": "vēl {{count}} jaunu ziņu",
     "more_one": "vēl {{count}} jauna ziņa",
-    "more_other": "vēl {{count}} jaunas ziņas"
+    "more_other": "vēl {{count}} jaunas ziņas",
+    "channelOn": "{{name}} kanālā {{channel}} serverī {{server}}: {{text}}",
+    "privateOn": "{{name}} (privāti, {{server}}): {{text}}"
   },
   "history": {
     "clear": "Dzēst vēsturi",

@@ -11,5 +11,7 @@
   "noCertificate": "Lidé bez certifikátu nemůžou být přáteli, protože by je Mumcord nedokázal znovu rozpoznat.",
   "add": "Přidat přítele",
   "remove": "Odebrat přítele",
-  "failed": "Změna přítele se nepovedla. Zkus to prosím znovu."
+  "failed": "Změna přítele se nepovedla. Zkus to prosím znovu.",
+  "join": "Připojit se",
+  "joinFriend": "Připojit se do kanálu uživatele {{name}}"
 }

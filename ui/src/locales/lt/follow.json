@@ -15,7 +15,8 @@
   },
   "dm": {
     "title": "Tiesioginės žinutės",
-    "unknown": "Nežinomas žmogus"
+    "unknown": "Nežinomas žmogus",
+    "withServer": "{{name}}, serveryje {{server}}"
   },
   "notify": {
     "channel": "{{name}} kanale {{channel}}: {{text}}",
@@ -23,7 +24,9 @@
     "more_one": "dar {{count}} nauja žinutė",
     "more_few": "dar {{count}} naujos žinutės",
     "more_many": "dar {{count}} naujos žinutės",
-    "more_other": "dar {{count}} naujų žinučių"
+    "more_other": "dar {{count}} naujų žinučių",
+    "channelOn": "{{name}} kanale {{channel}} serveryje {{server}}: {{text}}",
+    "privateOn": "{{name}} (privačiai, {{server}}): {{text}}"
   },
   "history": {
     "clear": "Išvalyti istoriją",

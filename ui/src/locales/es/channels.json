@@ -4,24 +4,27 @@
     "label": "Canales",
     "hint": "Intro: ver chat · Mayús+Intro o doble clic: unirse · Flechas: mover, expandir, contraer",
     "join": "Unirse",
+    "menuLabel": "Opciones de {{channel}}",
+    "showDescription": "Mostrar descripción del canal",
     "you": "(tú)",
     "voiceHere": "estás aquí (voz)",
     "people_one": "{{count}} persona",
-    "people_other": "{{count}} personas",
     "people_many": "{{count}} personas",
+    "people_other": "{{count}} personas",
     "stack": {
       "some": "{{shown}} de {{total}} personas: {{names}} y {{rest}} más",
       "all_one": "{{count}} persona: {{names}}",
-      "all_other": "{{count}} personas: {{names}}",
       "all_many": "{{count}} personas: {{names}}",
+      "all_other": "{{count}} personas: {{names}}",
       "person": "{{name}} ({{status}})"
     },
     "showAll": "Mostrar todas ({{total}})",
     "showFewer": "Mostrar menos",
-    "jump": "Ir a mi canal"
+    "jump": "Ir a mi canal",
+    "locked": "bloqueado"
   },
   "status": {
-    "listening": "escuchando",
+    "listening": "solo escuchando",
     "talking": "hablando",
     "muted": "silenciado",
     "deafened": "ensordecido",
@@ -34,7 +37,7 @@
   "mumcordBadge": "Usa Mumcord",
   "statusTip": {
     "registered": "Registrado en este servidor",
-    "listening": "Escuchando este canal",
+    "listening": "Solo escuchando",
     "muted": "Silenciado",
     "deafened": "Ensordecido",
     "serverMuted": "Silenciado por el servidor",
@@ -44,6 +47,7 @@
     "unregistered": "No registrado en este servidor (invitado)",
     "nowPlaying": "Escuchando {{track}}",
     "nowGaming": "Jugando a {{game}}",
+    "weakConnection": "Conexión débil – ping alto o pérdida de paquetes",
     "positional": "Audio posicional activo"
   },
   "announce": {
@@ -58,7 +62,8 @@
   },
   "empty": {
     "disconnected": "Sin conexión. Elige un servidor para ver sus canales.",
-    "loading": "Cargando canales…"
+    "loading": "Cargando canales…",
+    "syncingBig": "Sincronizando servidor grande…"
   },
   "search": {
     "label": "Buscar canales y personas",
@@ -66,10 +71,10 @@
     "empty": "Ningún canal ni persona coincide con «{{query}}».",
     "count": "{{channels}}, {{people}}",
     "channels_one": "{{count}} canal",
-    "channels_other": "{{count}} canales",
     "channels_many": "{{count}} canales",
+    "channels_other": "{{count}} canales",
     "people_one": "{{count}} persona",
-    "people_other": "{{count}} personas",
-    "people_many": "{{count}} personas"
+    "people_many": "{{count}} personas",
+    "people_other": "{{count}} personas"
   }
 }

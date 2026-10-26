@@ -11,5 +11,7 @@
   "noCertificate": "Persuni mingħajr ċertifikat ma jistgħux ikunu ħbieb, għax Mumcord ma jkunx jista' jagħrafhom mill-ġdid.",
   "add": "Żid ħabib",
   "remove": "Neħħi ħabib",
-  "failed": "It-tibdil tal-ħabib ma ħadimx. Erġa' pprova."
+  "failed": "It-tibdil tal-ħabib ma ħadimx. Erġa' pprova.",
+  "join": "Ingħaqad",
+  "joinFriend": "Ingħaqad mal-kanal ta' {{name}}"
 }

@@ -8,6 +8,7 @@
     "unknownPerson": "Pessoa desconhecida"
   },
   "list": {
+    "server": "Servidor",
     "today": "Hoje",
     "yesterday": "Ontem",
     "label": "Mensagens em {{name}}",
@@ -34,7 +35,8 @@
     "strike": "Rasurado",
     "code": "Código em linha",
     "codeBlock": "Bloco de código",
-    "link": "Ligação"
+    "link": "Ligação",
+    "quote": "Citação"
   },
   "composer": {
     "label": "Mensagem para {{name}}",
@@ -66,7 +68,14 @@
     "notConnected": "Não estás ligado. Volta a ligar-te e tenta novamente.",
     "generic": "Não foi possível enviar a mensagem. Tenta novamente.",
     "onlyImages": "Só é possível enviar imagens.",
-    "sourceTooLarge": "Este ficheiro é demasiado grande para enviar (mais de 25 MB)."
+    "sourceTooLarge": "Este ficheiro é demasiado grande para enviar (mais de 25 MB).",
+    "personOffline": "Esta pessoa está offline. Tenta novamente quando voltar."
+  },
+  "failed": {
+    "notSent": "Não enviada.",
+    "retry": "Tentar novamente",
+    "remove": "Eliminar",
+    "announce": "Não foi possível enviar uma mensagem."
   },
   "announce": {
     "message": "{{name}}: {{text}}",
@@ -78,7 +87,9 @@
   "pinned": {
     "label": "Informações do canal",
     "showMore": "Mostrar mais",
-    "showLess": "Mostrar menos"
+    "showLess": "Mostrar menos",
+    "hideWelcome": "Ocultar mensagem de boas-vindas",
+    "hideDescription": "Ocultar descrição do canal"
   },
   "mention": {
     "list": "Pessoas que podes mencionar",
@@ -132,6 +143,7 @@
     "next": "Imagem seguinte",
     "unnamed": "imagem",
     "fullLoading": "A carregar em tamanho original…",
+    "fullCancel": "Cancelar transferência em tamanho original",
     "fullProgress": "A carregar em tamanho original… {{percent}} %",
     "fullUnavailable": "Tamanho original indisponível – a mostrar a pré-visualização"
   },
@@ -145,11 +157,62 @@
     "hint": "As setas movem, Enter envia, Delete remove, Escape fecha.",
     "empty": "Ainda não há favoritos. Clica com o botão direito num GIF no chat, ou usa a estrela nele, e escolhe \"Guardar como favorito\". Vai aparecer aqui."
   },
+  "linkMenu": {
+    "label": "Ligação",
+    "copy": "Copiar ligação",
+    "open": "Abrir ligação",
+    "copied": "Ligação copiada"
+  },
   "imageMenu": {
     "label": "Imagem {{name}}"
   },
   "attribution": {
     "via": "via {{brand}}",
     "view": "Ver em {{brand}}"
+  },
+  "themeCard": {
+    "label": "Tema partilhado {{name}}",
+    "apply": "Aplicar tema",
+    "more": "Aplicar a um servidor",
+    "menuLabel": "Aplicar tema a",
+    "applyToServer": "Aplicar a {{server}}",
+    "imported": "Importado ✓",
+    "newer": "Criado com o Mumcord {{version}} – atualiza para o ver completo",
+    "failed": "Não foi possível aplicar o tema."
+  },
+  "reply": {
+    "action": "Responder",
+    "actionFor": "Responder a {{name}}",
+    "menu": "Mensagem de {{name}}",
+    "replyTo": "Resposta a",
+    "jump": "Ir para a mensagem original",
+    "image": "Imagem",
+    "replyingTo": "A responder a",
+    "cancel": "Cancelar resposta"
+  },
+  "actions": {
+    "label": "Começar juntos",
+    "notConnected": "Sem ligação ao servidor.",
+    "partyRunning": "Já está a decorrer uma watch party neste canal.",
+    "invalidLink": "Isto não é uma ligação de vídeo do YouTube.",
+    "linkLabel": "Ligação do YouTube",
+    "linkPlaceholder": "Cola uma ligação do YouTube",
+    "confirm": "Começar",
+    "watchHint": "Ver um vídeo do YouTube em conjunto com este canal",
+    "dialogTitle": "Ver juntos",
+    "addTitle": "Adicionar à playlist",
+    "addToPlaylist": "Adicionar à playlist",
+    "addConfirm": "Adicionar",
+    "apps": "Apps",
+    "appsLive": "Apps (estás a partilhar o ecrã)"
+  },
+  "activity": {
+    "share": "{{name}} está a partilhar o ecrã",
+    "watch": "Ver",
+    "party": "Watch party: {{title}}",
+    "join": "Entrar",
+    "videoFallback": "Vídeo do YouTube",
+    "someone": "Alguém",
+    "joinFailed": "Não foi possível entrar na watch party."
   }
 }

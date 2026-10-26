@@ -9,5 +9,17 @@
   "retry": "Försök igen",
   "loading": "Läser in…",
   "beta": "Beta",
-  "betaFeature": "Betafunktion"
+  "betaFeature": "Betafunktion",
+  "themePicker": {
+    "swatch": "{{name}}, tema",
+    "swatchSelected": "{{name}}, tema, valt",
+    "yourThemes": "Dina teman",
+    "add": "Nytt tema från det aktuella",
+    "addShort": "Nytt"
+  },
+  "floatingWidget": {
+    "collapse": "Fäll ihop",
+    "expand": "Fäll ut",
+    "handle": "{{name}}: piltangenter flyttar, Skift+piltangenter ändrar storlek"
+  }
 }

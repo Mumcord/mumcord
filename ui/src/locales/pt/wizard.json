@@ -98,5 +98,10 @@
     "ingameOverlayHint": "Desenha quem está a falar por cima do teu jogo (Linux). Podes ativá-lo ou desativá-lo por jogo mais tarde nas Definições.",
     "ingameOverlayWarning": "Alguns jogos com anti-cheat podem sinalizar ou bloquear overlays no jogo. O Mumcord mantém desativados por predefinição os jogos conhecidos como arriscados (como Valorant ou League of Legends). Ativa-o apenas para jogos em que confies.",
     "ingameOverlayAlt": "Exemplo do overlay no jogo a mostrar quem está a falar"
+  },
+  "updates": {
+    "title": "Novas versões",
+    "check": "Procurar novas versões",
+    "hint": "O Mumcord pode perguntar ao GitHub uma vez por dia se existe uma versão mais recente e mostrar um aviso com uma ligação. Nada é transferido nem instalado, e nada é enviado além do próprio pedido e do nome e versão da aplicação. Podes alterar isto mais tarde nas Definições."
   }
 }

@@ -13,10 +13,15 @@
     "listLabel": "Serveurs enregistrés",
     "add": "Ajouter un serveur",
     "keyboardHint": "Entrée pour se connecter. Alt plus flèche haut ou bas pour déplacer le serveur. Maj plus F10 pour ouvrir plus d’options.",
-    "status": {
-      "connected": "{{server}} (connecté)",
-      "connecting": "{{server}} (connexion)",
-      "reconnecting": "{{server}} (reconnexion)"
+    "label": "{{server}} ({{state}})",
+    "state": {
+      "connected": "connecté",
+      "connecting": "connexion",
+      "reconnecting": "reconnexion",
+      "error": "connexion perdue",
+      "voice": "serveur vocal",
+      "unread": "messages non lus",
+      "mentions": "mentions : {{mentions}}"
     }
   },
   "menu": {
@@ -26,7 +31,19 @@
     "edit": "Modifier le serveur",
     "moveUp": "Monter",
     "moveDown": "Descendre",
-    "remove": "Supprimer le serveur"
+    "remove": "Supprimer le serveur",
+    "reconnect": "Se reconnecter",
+    "alwaysConnect": "Toujours se connecter au démarrage",
+    "muteNotifications": "Couper les notifications",
+    "theme": "Thème…",
+    "showWelcome": "Afficher le message de bienvenue"
+  },
+  "theme": {
+    "title": "Thème pour {{server}}",
+    "label": "Thème",
+    "useApp": "Utiliser le thème de l’application",
+    "hint": "Appliqué tant que ce serveur est affiché.",
+    "failed": "Le thème n’a pas pu être enregistré. Veuillez réessayer."
   },
   "dialog": {
     "addTitle": "Ajouter un serveur",
@@ -50,7 +67,14 @@
       "username": "Saisissez le nom que vous voulez utiliser sur ce serveur.",
       "link": "Ce lien mumble:// est illisible. Vérifiez qu’il a été copié en entier.",
       "invalid": "Les informations du serveur ne sont pas valides. Vérifiez l’adresse et le port."
-    }
+    },
+    "alwaysConnect": "Toujours se connecter au démarrage",
+    "alwaysConnectHint": "Mumcord connecte ce serveur en lecture seule au démarrage.",
+    "channelPasswords": "Mots de passe des canaux",
+    "channelPassword": "Mot de passe du canal {{number}}",
+    "removeChannelPassword": "Supprimer {{name}}",
+    "remove": "Supprimer",
+    "channelPasswordsHint": "Enregistrés lorsqu’un canal protégé les a acceptés. Ceux supprimés seront redemandés à la prochaine connexion au canal."
   },
   "errors": {
     "serverUnreachable": "Le serveur est injoignable. Vérifiez l’adresse et le port, ainsi que votre connexion.",
@@ -63,17 +87,16 @@
     "invalidAddress": "L’adresse du serveur n’est pas valide. Modifiez le serveur pour la corriger.",
     "secureStorage": "Le stockage sécurisé de votre système n’est pas disponible : le mot de passe du serveur n’a pas pu être lu ni enregistré. Déverrouillez-le et réessayez.",
     "notFound": "Ce serveur n’est plus enregistré.",
-    "generic": "Une erreur s’est produite. Veuillez réessayer."
+    "generic": "Une erreur s’est produite. Veuillez réessayer.",
+    "serverLimit": "Vous êtes déjà connecté au maximum de {{limit}} serveurs. Déconnectez un serveur ou augmentez la limite dans Paramètres → Serveurs.",
+    "serverLimitUnknown": "Vous êtes déjà connecté au nombre maximal de serveurs. Déconnectez un serveur ou augmentez la limite dans Paramètres → Serveurs.",
+    "alwaysConnectLimit": "Seuls {{limit}} serveurs peuvent être réglés sur « Toujours se connecter au démarrage », comme la limite de serveurs connectés. Désactivez-le pour un autre serveur ou augmentez la limite dans Paramètres → Serveurs.",
+    "alwaysConnectLimitUnknown": "Impossible de régler plus de serveurs sur « Toujours se connecter au démarrage » que la limite de serveurs connectés. Désactivez-le pour un autre serveur ou augmentez la limite dans Paramètres → Serveurs."
   },
   "remove": {
     "title": "Supprimer {{server}} ?",
     "message": "Son mot de passe enregistré, la décision sur son certificat, les canaux suivis et l’historique des discussions sur cet ordinateur seront supprimés.",
     "confirm": "Supprimer"
-  },
-  "switch": {
-    "title": "Changer de serveur ?",
-    "message": "Vous ne pouvez être que sur un seul serveur à la fois. Se déconnecter de {{current}} et se connecter à {{next}} ?",
-    "confirm": "Se déconnecter et changer"
   },
   "cert": {
     "newTitle": "Faire confiance à ce serveur ?",
@@ -108,7 +131,10 @@
     "actionFailed": {
       "reorder": "Le nouvel ordre des serveurs n’a pas pu être enregistré. Veuillez réessayer.",
       "remove": "Le serveur n’a pas pu être supprimé. Veuillez réessayer.",
-      "disconnect": "La déconnexion a échoué. Veuillez réessayer."
+      "disconnect": "La déconnexion a échoué. Veuillez réessayer.",
+      "alwaysConnect": "« Toujours se connecter au démarrage » n’a pas pu être enregistré. Veuillez réessayer.",
+      "notifications": "Le réglage des notifications n’a pas pu être enregistré. Veuillez réessayer.",
+      "savePassword": "Le nouveau mot de passe n’a pas pu être enregistré. Modifiez le serveur pour l’enregistrer."
     }
   },
   "empty": {
@@ -124,5 +150,27 @@
     "errors": {
       "required": "Saisissez une adresse de serveur ou un lien mumble://."
     }
+  },
+  "password": {
+    "title": "Mot de passe pour {{server}}",
+    "intro": "Le serveur n’a pas accepté le mot de passe. Saisissez le bon pour réessayer.",
+    "label": "Mot de passe",
+    "show": "Afficher",
+    "hide": "Masquer",
+    "wrong": "Ce mot de passe est faux aussi. Réessayez.",
+    "save": "Enregistrer le mot de passe",
+    "cancel": "Annuler",
+    "connect": "Se connecter",
+    "connecting": "Connexion…"
+  },
+  "channelPassword": {
+    "title": "Ce canal demande un mot de passe",
+    "intro": "Saisissez le mot de passe pour {{channel}}.",
+    "label": "Mot de passe",
+    "wrong": "Mot de passe incorrect",
+    "failed": "Le mot de passe n’a pas pu être envoyé. Veuillez réessayer.",
+    "cancel": "Annuler",
+    "join": "Rejoindre",
+    "joining": "Connexion au canal…"
   }
 }

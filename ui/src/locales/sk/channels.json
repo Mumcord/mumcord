@@ -4,6 +4,8 @@
     "label": "Kanály",
     "hint": "Enter: zobraziť chat · Shift+Enter alebo dvojklik: pripojiť sa · Šípky: presun, rozbalenie, zbalenie",
     "join": "Pripojiť sa",
+    "menuLabel": "Možnosti pre {{channel}}",
+    "showDescription": "Zobraziť popis kanála",
     "you": "(ty)",
     "voiceHere": "si tu (hlas)",
     "people_one": "{{count}} osoba",
@@ -20,10 +22,11 @@
     },
     "showAll": "Zobraziť všetko ({{total}})",
     "showFewer": "Zobraziť menej",
-    "jump": "Prejsť na môj kanál"
+    "jump": "Prejsť na môj kanál",
+    "locked": "zamknutý"
   },
   "status": {
-    "listening": "počúva",
+    "listening": "iba počúva",
     "talking": "hovorí",
     "muted": "stlmený mikrofón",
     "deafened": "stlmený zvuk",
@@ -36,7 +39,7 @@
   "mumcordBadge": "Používa Mumcord",
   "statusTip": {
     "registered": "Registrovaný na tomto serveri",
-    "listening": "Počúva tento kanál",
+    "listening": "Iba počúva",
     "muted": "Stlmený mikrofón",
     "deafened": "Stlmený zvuk",
     "serverMuted": "Stlmený serverom",
@@ -46,6 +49,7 @@
     "unregistered": "Neregistrovaný na tomto serveri (hosť)",
     "nowPlaying": "Počúva {{track}}",
     "nowGaming": "Hrá {{game}}",
+    "weakConnection": "Slabé pripojenie – vysoký ping alebo strata paketov",
     "positional": "Priestorový zvuk je aktívny"
   },
   "announce": {
@@ -60,7 +64,8 @@
   },
   "empty": {
     "disconnected": "Nie si pripojený. Vyber server a uvidíš jeho kanály.",
-    "loading": "Načítavam kanály…"
+    "loading": "Načítavam kanály…",
+    "syncingBig": "Synchronizuje sa veľký server…"
   },
   "search": {
     "label": "Hľadať kanály a ľudí",

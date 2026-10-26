@@ -9,5 +9,17 @@
   "retry": "Proovi uuesti",
   "loading": "Laadin…",
   "beta": "Beeta",
-  "betaFeature": "Beetafunktsioon"
+  "betaFeature": "Beetafunktsioon",
+  "themePicker": {
+    "swatch": "{{name}}, teema",
+    "swatchSelected": "{{name}}, teema, valitud",
+    "yourThemes": "Sinu teemad",
+    "add": "Uus teema praegusest",
+    "addShort": "Uus"
+  },
+  "floatingWidget": {
+    "collapse": "Ahenda",
+    "expand": "Laienda",
+    "handle": "{{name}}: nooleklahvid liigutavad, Shift+nooleklahvid muudavad suurust"
+  }
 }

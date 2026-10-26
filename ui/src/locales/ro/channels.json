@@ -4,6 +4,8 @@
     "label": "Canale",
     "hint": "Enter: arată chatul · Shift+Enter sau dublu clic: intră · Săgeți: mută, extinde, restrânge",
     "join": "Intră",
+    "menuLabel": "Opțiuni pentru {{channel}}",
+    "showDescription": "Arată descrierea canalului",
     "you": "(tu)",
     "voiceHere": "ești aici (voice)",
     "people_one": "{{count}} persoană",
@@ -18,10 +20,11 @@
     },
     "showAll": "Arată tot ({{total}})",
     "showFewer": "Arată mai puține",
-    "jump": "Salt la canalul meu"
+    "jump": "Salt la canalul meu",
+    "locked": "blocat"
   },
   "status": {
-    "listening": "ascultă",
+    "listening": "doar ascultă",
     "talking": "vorbește",
     "muted": "microfon oprit",
     "deafened": "sunet oprit",
@@ -34,7 +37,7 @@
   "mumcordBadge": "Folosește Mumcord",
   "statusTip": {
     "registered": "Înregistrat pe acest server",
-    "listening": "Ascultă acest canal",
+    "listening": "Doar ascultă",
     "muted": "Microfon oprit",
     "deafened": "Sunet oprit",
     "serverMuted": "Microfon oprit de server",
@@ -44,6 +47,7 @@
     "unregistered": "Neînregistrat pe acest server (oaspete)",
     "nowPlaying": "Ascultă {{track}}",
     "nowGaming": "Joacă {{game}}",
+    "weakConnection": "Conexiune slabă – ping mare sau pierdere de pachete",
     "positional": "Audio pozițional activ"
   },
   "announce": {
@@ -58,7 +62,8 @@
   },
   "empty": {
     "disconnected": "Nu ești conectat. Alege un server ca să-i vezi canalele.",
-    "loading": "Se încarcă canalele…"
+    "loading": "Se încarcă canalele…",
+    "syncingBig": "Se sincronizează un server mare…"
   },
   "search": {
     "label": "Caută canale și persoane",

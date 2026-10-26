@@ -12,5 +12,6 @@
   "image": "A trimis o imagine",
   "open": "Deschide chatul",
   "close": "Închide notificarea",
-  "mentionLine": "{{sender}} te-a menționat: {{preview}}"
+  "mentionLine": "{{sender}} te-a menționat: {{preview}}",
+  "withServer": "{{server}} · {{what}}"
 }

@@ -11,5 +11,7 @@
   "noCertificate": "Personer utan certifikat kan inte vara vänner, eftersom Mumcord inte skulle känna igen dem igen.",
   "add": "Lägg till vän",
   "remove": "Ta bort vän",
-  "failed": "Det gick inte att ändra vänlistan. Försök igen."
+  "failed": "Det gick inte att ändra vänlistan. Försök igen.",
+  "join": "Gå med",
+  "joinFriend": "Gå med i {{name}}s kanal"
 }

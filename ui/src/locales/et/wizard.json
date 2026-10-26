@@ -98,5 +98,10 @@
     "ingameOverlayHint": "Joonistab sinu mängu peale, kes räägib (Linux). Saad selle hiljem seadetes mängu kaupa sisse või välja lülitada.",
     "ingameOverlayWarning": "Mõni petmisvastase kaitsega mäng võib mängusisesed kattekihid märgistada või blokeerida. Mumcord hoiab teadaolevalt riskantsed mängud (nt Valorant või League of Legends) vaikimisi väljas. Luba see ainult mängudele, mida usaldad.",
     "ingameOverlayAlt": "Näide mängusisesest kattekihist, mis näitab, kes räägib"
+  },
+  "updates": {
+    "title": "Uued versioonid",
+    "check": "Otsi uusi versioone",
+    "hint": "Mumcord võib kord päevas GitHubilt küsida, kas on uuem versioon, ja näidata lingiga vihjet. Midagi ei laadita alla ega paigaldata ning peale päringu enda ja rakenduse nime ja versiooni ei saadeta midagi. Saad seda hiljem seadetes muuta."
   }
 }

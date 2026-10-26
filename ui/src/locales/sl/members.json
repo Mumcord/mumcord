@@ -3,10 +3,6 @@
   "inChannel_two": "V {{channel}} ({{count}})",
   "inChannel_few": "V {{channel}} ({{count}})",
   "inChannel_other": "V {{channel}} ({{count}})",
-  "listening_one": "Poslušajo ({{count}})",
-  "listening_two": "Poslušajo ({{count}})",
-  "listening_few": "Poslušajo ({{count}})",
-  "listening_other": "Poslušajo ({{count}})",
   "noChannel": "Izberi kanal, da vidiš, kdo je v njem.",
   "nobody": "Tukaj ni nikogar.",
   "nobodyElse": "Na strežniku ni nikogar drugega.",
@@ -15,6 +11,26 @@
   "registered": "Registriran",
   "unregistered": "Ni registriran",
   "talking": "Govori",
+  "quality": {
+    "label": "Povezava",
+    "summary": "Povezava: {{level}}",
+    "level": {
+      "good": "Dobra",
+      "fair": "Srednja",
+      "weak": "Šibka",
+      "unknown": "Neznana"
+    },
+    "ping": "Ping",
+    "loss": "Izguba paketov",
+    "late": "Zapozneli paketi",
+    "bandwidth": "Pasovna širina",
+    "transport": "Prenos glasu",
+    "client": "Odjemalec",
+    "os": "Operacijski sistem",
+    "ms": "{{value}} ms",
+    "percent": "{{value}} %",
+    "kbps": "{{value}} kbit/s"
+  },
   "card": {
     "close": "Zapri",
     "loadFailed": "Profila ni bilo mogoče naložiti.",
@@ -26,6 +42,9 @@
     "privateMessage": "Zasebno sporočilo",
     "localSettings": "Tvoje nastavitve",
     "localSettingsHint": "Vidiš jih samo ti. Spremembe se shranijo takoj.",
+    "settingsFor": "Nastavitve za {{name}}",
+    "hintMuted": "Utišano",
+    "hintVolume": "Glasnost {{value}} %",
     "localMuteHint": "Te osebe ne boš slišal.",
     "privateNote": "Zasebna opomba",
     "privateNoteHint": "To opombo vidiš samo ti.",
@@ -40,7 +59,8 @@
     "viewProfile": "Ogled profila",
     "join": "Pridruži se kanalu {{channel}}",
     "joinDenied": "Nimate dovoljenja za vstop v ta kanal.",
-    "mute": "Utišaj zame"
+    "mute": "Utišaj zame",
+    "connectionInfo": "Podatki o povezavi…"
   },
   "nowPlaying": {
     "label": "Zdaj se predvaja",

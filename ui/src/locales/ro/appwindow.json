@@ -5,6 +5,39 @@
     "remember": "Ține minte alegerea mea",
     "minimize": "Minimizează în tray",
     "quit": "Închide",
-    "failed": "Nu a mers. Încearcă din nou."
+    "failed": "Nu a mers. Încearcă din nou.",
+    "descriptionServers": "Ești încă conectat la {{count}} servere. Minimizat, Mumcord te ține pe canalul vocal și rămâne în zona de notificare."
+  },
+  "windowOverlay": {
+    "title": "Overlay-ul în fereastră a fost eliminat",
+    "description": "Fereastra plutitoare de overlay nu mai există. În schimb, overlay-ul din joc arată cine vorbește în jocurile tale. Îl poți activa din setările overlay-ului.",
+    "dismiss": "Am înțeles",
+    "openSettings": "Deschide setările overlay-ului"
+  },
+  "appImageMenu": {
+    "title": "Adaugi Mumcord în meniul de aplicații?",
+    "description": "Astfel Mumcord apare în meniul de aplicații. Pictograma și push-to-talk funcționează corect pe Wayland, iar linkurile mumble:// deschid Mumcord. Poți schimba asta mai târziu din Setări.",
+    "no": "Nu",
+    "yes": "Da",
+    "failed": "Nu a funcționat. Încearcă din nou."
+  },
+  "updateCheck": {
+    "title": "Cauți versiuni noi?",
+    "description": "Mumcord poate întreba GitHub o dată pe zi dacă există o versiune mai nouă și poate afișa un indiciu cu un link. Nu se descarcă și nu se instalează nimic și nu se trimite nimic în afară de cererea în sine și de numele și versiunea aplicației. Poți schimba asta mai târziu din Setări.",
+    "no": "Nu",
+    "yes": "Da",
+    "failed": "Nu a funcționat. Încearcă din nou."
+  },
+  "updateHint": {
+    "message": "Mumcord {{version}} este disponibil.",
+    "open": "Vezi versiunea",
+    "dismiss": "Închide"
+  },
+  "directConsent": {
+    "title": "Permiți conexiuni directe?",
+    "description": "Conexiunile directe sunt mai rapide, dar cealaltă persoană îți poate vedea adresa IP. Mumcord le folosește pentru imagini la dimensiune completă și partajarea ecranului cu alți utilizatori Mumcord și poate deschide un port pe routerul tău pentru ele. Dacă spui nu, imaginile ajung în continuare prin server, iar partajarea ecranului nu este disponibilă. Poți schimba asta mai târziu în Setări → Confidențialitate.",
+    "no": "Nu",
+    "yes": "Da",
+    "failed": "Nu a funcționat. Încearcă din nou."
   }
 }

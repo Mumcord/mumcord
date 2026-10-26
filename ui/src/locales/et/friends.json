@@ -11,5 +11,7 @@
   "noCertificate": "Sertifikaadita inimesi ei saa sõbraks lisada, sest Mumcord ei suudaks neid uuesti ära tunda.",
   "add": "Lisa sõber",
   "remove": "Eemalda sõber",
-  "failed": "Sõbra muutmine ei õnnestunud. Proovi palun uuesti."
+  "failed": "Sõbra muutmine ei õnnestunud. Proovi palun uuesti.",
+  "join": "Liitu",
+  "joinFriend": "Liitu kanaliga, kus on {{name}}"
 }

@@ -12,5 +12,6 @@
   "image": "Nosūtīja attēlu",
   "open": "Atvērt čatu",
   "close": "Aizvērt paziņojumu",
-  "mentionLine": "{{sender}} tevi pieminēja: {{preview}}"
+  "mentionLine": "{{sender}} tevi pieminēja: {{preview}}",
+  "withServer": "{{server}} · {{what}}"
 }

@@ -11,5 +11,7 @@
   "noCertificate": "Cilvēki bez sertifikāta nevar būt draugi, jo Mumcord nespētu viņus atpazīt nākamreiz.",
   "add": "Pievienot draugu",
   "remove": "Noņemt draugu",
-  "failed": "Drauga izmaiņas neizdevās. Lūdzu, mēģini vēlreiz."
+  "failed": "Drauga izmaiņas neizdevās. Lūdzu, mēģini vēlreiz.",
+  "join": "Pievienoties",
+  "joinFriend": "Pievienoties {{name}} kanālam"
 }

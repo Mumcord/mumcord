@@ -9,5 +9,17 @@
   "retry": "Reintentar",
   "loading": "Cargando…",
   "beta": "Beta",
-  "betaFeature": "Función beta"
+  "betaFeature": "Función beta",
+  "themePicker": {
+    "swatch": "{{name}}, tema",
+    "swatchSelected": "{{name}}, tema, seleccionado",
+    "yourThemes": "Tus temas",
+    "add": "Nuevo tema a partir del actual",
+    "addShort": "Nuevo"
+  },
+  "floatingWidget": {
+    "collapse": "Contraer",
+    "expand": "Expandir",
+    "handle": "{{name}}: las flechas mueven, Mayúsculas+flechas cambian el tamaño"
+  }
 }

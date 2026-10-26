@@ -4,6 +4,8 @@
     "label": "Kanalai",
     "hint": "Enter: rodyti pokalbį · Shift+Enter arba dukart spustelėti: prisijungti · Rodyklių klavišai: judėti, išskleisti, suskleisti",
     "join": "Prisijungti",
+    "menuLabel": "{{channel}} parinktys",
+    "showDescription": "Rodyti kanalo aprašymą",
     "you": "(tu)",
     "voiceHere": "tu čia (balsas)",
     "people_one": "{{count}} žmogus",
@@ -20,10 +22,11 @@
     },
     "showAll": "Rodyti visus ({{total}})",
     "showFewer": "Rodyti mažiau",
-    "jump": "Pereiti į mano kanalą"
+    "jump": "Pereiti į mano kanalą",
+    "locked": "užrakinta"
   },
   "status": {
-    "listening": "klauso",
+    "listening": "tik klauso",
     "talking": "kalba",
     "muted": "nutildytas (-a)",
     "deafened": "išjungtas (-a) garsas",
@@ -36,7 +39,7 @@
   "mumcordBadge": "Naudoja Mumcord",
   "statusTip": {
     "registered": "Registruotas (-a) šiame serveryje",
-    "listening": "Klauso šio kanalo",
+    "listening": "Tik klauso",
     "muted": "Nutildytas (-a)",
     "deafened": "Išjungtas garsas",
     "serverMuted": "Nutildė serveris",
@@ -46,6 +49,7 @@
     "unregistered": "Neregistruotas (-a) šiame serveryje (svečias)",
     "nowPlaying": "Klauso: {{track}}",
     "nowGaming": "Žaidžia: {{game}}",
+    "weakConnection": "Silpnas ryšys – didelis ping arba paketų praradimas",
     "positional": "Pozicinis garsas įjungtas"
   },
   "announce": {
@@ -60,7 +64,8 @@
   },
   "empty": {
     "disconnected": "Neprisijungta. Pasirink serverį, kad pamatytum jo kanalus.",
-    "loading": "Įkeliami kanalai…"
+    "loading": "Įkeliami kanalai…",
+    "syncingBig": "Sinchronizuojamas didelis serveris…"
   },
   "search": {
     "label": "Ieškoti kanalų ir žmonių",

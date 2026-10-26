@@ -4,6 +4,8 @@
     "label": "Kanali",
     "hint": "Enter: pokaži klepet · Shift+Enter ali dvoklik: pridruži se · Puščice: premikanje, razširi, strni",
     "join": "Pridruži se",
+    "menuLabel": "Možnosti za {{channel}}",
+    "showDescription": "Pokaži opis kanala",
     "you": "(ti)",
     "voiceHere": "tukaj si (glas)",
     "people_one": "{{count}} oseba",
@@ -20,10 +22,11 @@
     },
     "showAll": "Pokaži vse ({{total}})",
     "showFewer": "Pokaži manj",
-    "jump": "Skoči na moj kanal"
+    "jump": "Skoči na moj kanal",
+    "locked": "zaklenjeno"
   },
   "status": {
-    "listening": "posluša",
+    "listening": "samo posluša",
     "talking": "govori",
     "muted": "utišan mikrofon",
     "deafened": "izklopljen zvok",
@@ -36,7 +39,7 @@
   "mumcordBadge": "Uporablja Mumcord",
   "statusTip": {
     "registered": "Registriran na tem strežniku",
-    "listening": "Posluša ta kanal",
+    "listening": "Samo posluša",
     "muted": "Mikrofon utišan",
     "deafened": "Zvok izklopljen",
     "serverMuted": "Utišal strežnik",
@@ -46,6 +49,7 @@
     "unregistered": "Ni registriran na tem strežniku (gost)",
     "nowPlaying": "Posluša {{track}}",
     "nowGaming": "Igra {{game}}",
+    "weakConnection": "Šibka povezava – visok ping ali izguba paketov",
     "positional": "Prostorski zvok je vklopljen"
   },
   "announce": {
@@ -60,7 +64,8 @@
   },
   "empty": {
     "disconnected": "Nisi povezan. Izberi strežnik, da vidiš njegove kanale.",
-    "loading": "Nalaganje kanalov …"
+    "loading": "Nalaganje kanalov …",
+    "syncingBig": "Sinhroniziram velik strežnik…"
   },
   "search": {
     "label": "Išči kanale in osebe",

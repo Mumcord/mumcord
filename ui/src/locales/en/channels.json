@@ -4,6 +4,8 @@
     "label": "Channels",
     "hint": "Enter: show chat · Shift+Enter or double-click: join · Arrow keys: move, expand, collapse",
     "join": "Join",
+    "menuLabel": "Options for {{channel}}",
+    "showDescription": "Show channel description",
     "you": "(you)",
     "voiceHere": "you are here (voice)",
     "people_one": "{{count}} person",
@@ -16,10 +18,11 @@
     },
     "showAll": "Show all ({{total}})",
     "showFewer": "Show fewer",
-    "jump": "Jump to my channel"
+    "jump": "Jump to my channel",
+    "locked": "locked"
   },
   "status": {
-    "listening": "listening",
+    "listening": "listening only",
     "talking": "talking",
     "muted": "muted",
     "deafened": "deafened",
@@ -32,7 +35,7 @@
   "mumcordBadge": "Uses Mumcord",
   "statusTip": {
     "registered": "Registered on this server",
-    "listening": "Listening to this channel",
+    "listening": "Listening only",
     "muted": "Muted",
     "deafened": "Deafened",
     "serverMuted": "Muted by the server",
@@ -42,6 +45,7 @@
     "unregistered": "Not registered on this server (guest)",
     "nowPlaying": "Listening to {{track}}",
     "nowGaming": "Playing {{game}}",
+    "weakConnection": "Weak connection – high ping or packet loss",
     "positional": "Positional audio active"
   },
   "announce": {
@@ -56,7 +60,8 @@
   },
   "empty": {
     "disconnected": "Not connected. Pick a server to see its channels.",
-    "loading": "Loading channels…"
+    "loading": "Loading channels…",
+    "syncingBig": "Syncing big server…"
   },
   "search": {
     "label": "Search channels and people",

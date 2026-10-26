@@ -11,5 +11,7 @@
   "noCertificate": "Žmonės be sertifikato negali būti draugais, nes Mumcord negalėtų jų vėl atpažinti.",
   "add": "Pridėti draugą",
   "remove": "Pašalinti draugą",
-  "failed": "Nepavyko pakeisti draugo būsenos. Bandyk dar kartą."
+  "failed": "Nepavyko pakeisti draugo būsenos. Bandyk dar kartą.",
+  "join": "Prisijungti",
+  "joinFriend": "Prisijungti prie {{name}} kanalo"
 }

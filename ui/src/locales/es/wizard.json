@@ -98,5 +98,10 @@
     "ingameOverlayHint": "Dibuja quién está hablando encima de tu juego (Linux). Luego puedes activarla o desactivarla por juego en Ajustes.",
     "ingameOverlayWarning": "Algunos juegos con anti-trampas pueden marcar o bloquear las superposiciones dentro del juego. Mumcord mantiene desactivados por defecto los juegos de riesgo conocido (como Valorant o League of Legends). Actívala solo en juegos de confianza.",
     "ingameOverlayAlt": "Ejemplo de la superposición dentro del juego mostrando quién habla"
+  },
+  "updates": {
+    "title": "Nuevas versiones",
+    "check": "Buscar nuevas versiones",
+    "hint": "Mumcord puede preguntar a GitHub una vez al día si hay una versión más reciente y mostrar un aviso con un enlace. No se descarga ni instala nada, y no se envía nada salvo la propia consulta y el nombre y la versión de la app. Puedes cambiarlo más tarde en Ajustes."
   }
 }

@@ -5,6 +5,39 @@
     "remember": "Zapamiętaj mój wybór",
     "minimize": "Minimalizuj do zasobnika",
     "quit": "Zamknij aplikację",
-    "failed": "To się nie udało. Spróbuj ponownie."
+    "failed": "To się nie udało. Spróbuj ponownie.",
+    "descriptionServers": "Nadal masz połączenie z {{count}} serwerami. Po zminimalizowaniu Mumcord utrzymuje cię na kanale głosowym i zostaje w zasobniku systemowym."
+  },
+  "windowOverlay": {
+    "title": "Nakładka w oknie została usunięta",
+    "description": "Pływającego okna nakładki już nie ma. Zamiast niego nakładka w grze pokazuje, kto mówi w twoich grach. Możesz ją włączyć w ustawieniach nakładki.",
+    "dismiss": "Rozumiem",
+    "openSettings": "Otwórz ustawienia nakładki"
+  },
+  "appImageMenu": {
+    "title": "Dodać Mumcord do menu aplikacji?",
+    "description": "Dzięki temu Mumcord pojawi się w menu aplikacji. Ikona i push-to-talk będą działać poprawnie w Wayland, a linki mumble:// otworzą Mumcord. Możesz to później zmienić w Ustawieniach.",
+    "no": "Nie",
+    "yes": "Tak",
+    "failed": "Nie udało się. Spróbuj ponownie."
+  },
+  "updateCheck": {
+    "title": "Sprawdzać nowe wersje?",
+    "description": "Mumcord może raz dziennie zapytać GitHub, czy jest nowsza wersja, i pokazać wskazówkę z linkiem. Nic nie jest pobierane ani instalowane i nic nie jest wysyłane poza samym zapytaniem oraz nazwą i wersją aplikacji. Możesz to później zmienić w Ustawieniach.",
+    "no": "Nie",
+    "yes": "Tak",
+    "failed": "Nie udało się. Spróbuj ponownie."
+  },
+  "updateHint": {
+    "message": "Mumcord {{version}} jest dostępny.",
+    "open": "Zobacz wydanie",
+    "dismiss": "Zamknij"
+  },
+  "directConsent": {
+    "title": "Zezwolić na połączenia bezpośrednie?",
+    "description": "Połączenia bezpośrednie są szybsze, ale druga osoba może zobaczyć Twój adres IP. Mumcord używa ich do obrazów w pełnym rozmiarze i udostępniania ekranu innym użytkownikom Mumcorda i może w tym celu otworzyć port na Twoim routerze. Jeśli odmówisz, obrazy nadal dotrą przez serwer, a udostępnianie ekranu będzie niedostępne. Możesz to później zmienić w Ustawienia → Prywatność.",
+    "no": "Nie",
+    "yes": "Tak",
+    "failed": "Nie udało się. Spróbuj ponownie."
   }
 }

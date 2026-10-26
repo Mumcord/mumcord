@@ -5,6 +5,39 @@
     "remember": "Választás megjegyzése",
     "minimize": "Kicsinyítés a tálcára",
     "quit": "Kilépés",
+    "failed": "Ez nem sikerült. Próbáld újra.",
+    "descriptionServers": "Még {{count}} szerverhez csatlakozol. Kis méretre állítva a Mumcord bent tart a hangcsatornában, és a tálcán marad."
+  },
+  "windowOverlay": {
+    "title": "Az ablakos overlay megszűnt",
+    "description": "A lebegő overlay ablak már nincs. Helyette a játékon belüli overlay mutatja, ki beszél a játékaidban. Az overlay beállításaiban kapcsolhatod be.",
+    "dismiss": "Értem",
+    "openSettings": "Overlay beállításainak megnyitása"
+  },
+  "appImageMenu": {
+    "title": "Hozzáadod a Mumcordot az alkalmazásmenühöz?",
+    "description": "Így a Mumcord megjelenik az alkalmazásmenüdben. Az ikon és a push-to-talk megfelelően működik Waylanden, és a mumble:// linkek a Mumcordot nyitják meg. Ezt később a Beállításokban módosíthatod.",
+    "no": "Nem",
+    "yes": "Igen",
+    "failed": "Ez nem sikerült. Próbáld újra."
+  },
+  "updateCheck": {
+    "title": "Keressen új verziókat?",
+    "description": "A Mumcord naponta egyszer megkérdezheti a GitHubot, van-e újabb verzió, és egy linkkel ellátott tippet mutathat. Semmi nem töltődik le és nem települ, és a kérésen, valamint az alkalmazás nevén és verzióján kívül semmi nem kerül elküldésre. Ezt később a Beállításokban módosíthatod.",
+    "no": "Nem",
+    "yes": "Igen",
+    "failed": "Ez nem sikerült. Próbáld újra."
+  },
+  "updateHint": {
+    "message": "Elérhető a Mumcord {{version}}.",
+    "open": "Kiadás megtekintése",
+    "dismiss": "Elvetés"
+  },
+  "directConsent": {
+    "title": "Engedélyezed a közvetlen kapcsolatokat?",
+    "description": "A közvetlen kapcsolatok gyorsabbak, de a másik személy láthatja az IP-címedet. A Mumcord ezeket teljes méretű képekhez és képernyőmegosztáshoz használja más Mumcord-felhasználókkal, és ehhez portot nyithat a routereden. Ha nemet mondasz, a képek továbbra is a szerveren keresztül érkeznek, a képernyőmegosztás pedig nem érhető el. Ezt később módosíthatod a Beállítások → Adatvédelem alatt.",
+    "no": "Nem",
+    "yes": "Igen",
     "failed": "Ez nem sikerült. Próbáld újra."
   }
 }

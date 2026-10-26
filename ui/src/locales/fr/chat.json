@@ -8,6 +8,7 @@
     "unknownPerson": "Personne inconnue"
   },
   "list": {
+    "server": "Serveur",
     "today": "Aujourd’hui",
     "yesterday": "Hier",
     "label": "Messages dans {{name}}",
@@ -34,7 +35,8 @@
     "strike": "Barré",
     "code": "Code en ligne",
     "codeBlock": "Bloc de code",
-    "link": "Lien"
+    "link": "Lien",
+    "quote": "Citation"
   },
   "composer": {
     "label": "Message à {{name}}",
@@ -66,7 +68,14 @@
     "notConnected": "Vous n’êtes pas connecté. Reconnectez-vous et réessayez.",
     "generic": "Le message n’a pas pu être envoyé. Réessayez.",
     "onlyImages": "Seules les images peuvent être envoyées.",
-    "sourceTooLarge": "Ce fichier est trop volumineux pour être envoyé (plus de 25 Mo)."
+    "sourceTooLarge": "Ce fichier est trop volumineux pour être envoyé (plus de 25 Mo).",
+    "personOffline": "Cette personne est hors ligne. Réessayez quand elle sera de retour."
+  },
+  "failed": {
+    "notSent": "Non envoyé.",
+    "retry": "Réessayer",
+    "remove": "Supprimer",
+    "announce": "Un message n’a pas pu être envoyé."
   },
   "announce": {
     "message": "{{name}} : {{text}}",
@@ -78,7 +87,9 @@
   "pinned": {
     "label": "Infos du canal",
     "showMore": "Afficher plus",
-    "showLess": "Afficher moins"
+    "showLess": "Afficher moins",
+    "hideWelcome": "Masquer le message de bienvenue",
+    "hideDescription": "Masquer la description du canal"
   },
   "mention": {
     "list": "Personnes mentionnables",
@@ -132,6 +143,7 @@
     "next": "Image suivante",
     "unnamed": "image",
     "fullLoading": "Chargement en taille réelle…",
+    "fullCancel": "Annuler le téléchargement en taille réelle",
     "fullProgress": "Chargement en taille réelle… {{percent}} %",
     "fullUnavailable": "Taille réelle indisponible – affichage de l’aperçu"
   },
@@ -145,11 +157,62 @@
     "hint": "Flèches pour se déplacer, Entrée pour envoyer, Suppr pour retirer, Échap pour fermer.",
     "empty": "Aucun favori pour l’instant. Faites un clic droit sur un GIF dans la discussion, ou utilisez son étoile, puis choisissez « Ajouter aux favoris ». Il apparaîtra ici."
   },
+  "linkMenu": {
+    "label": "Lien",
+    "copy": "Copier le lien",
+    "open": "Ouvrir le lien",
+    "copied": "Lien copié"
+  },
   "imageMenu": {
     "label": "Image {{name}}"
   },
   "attribution": {
     "via": "via {{brand}}",
     "view": "Voir sur {{brand}}"
+  },
+  "themeCard": {
+    "label": "Thème partagé {{name}}",
+    "apply": "Appliquer le thème",
+    "more": "Appliquer à un serveur",
+    "menuLabel": "Appliquer le thème à",
+    "applyToServer": "Appliquer à {{server}}",
+    "imported": "Importé ✓",
+    "newer": "Créé avec Mumcord {{version}} – mettez à jour pour le voir en entier",
+    "failed": "Impossible d’appliquer le thème."
+  },
+  "reply": {
+    "action": "Répondre",
+    "actionFor": "Répondre à {{name}}",
+    "menu": "Message de {{name}}",
+    "replyTo": "Réponse à",
+    "jump": "Aller au message d'origine",
+    "image": "Image",
+    "replyingTo": "Réponse à",
+    "cancel": "Annuler la réponse"
+  },
+  "actions": {
+    "label": "Lancer ensemble",
+    "notConnected": "Non connecté au serveur.",
+    "partyRunning": "Une watch party est déjà en cours dans ce canal.",
+    "invalidLink": "Ce n’est pas un lien de vidéo YouTube.",
+    "linkLabel": "Lien YouTube",
+    "linkPlaceholder": "Collez un lien YouTube",
+    "confirm": "Lancer",
+    "watchHint": "Regarder une vidéo YouTube avec ce canal",
+    "dialogTitle": "Regarder ensemble",
+    "addTitle": "Ajouter à la playlist",
+    "addToPlaylist": "Ajouter à la playlist",
+    "addConfirm": "Ajouter",
+    "apps": "Applis",
+    "appsLive": "Applis (vous partagez votre écran)"
+  },
+  "activity": {
+    "share": "{{name}} partage son écran",
+    "watch": "Regarder",
+    "party": "Watch party : {{title}}",
+    "join": "Rejoindre",
+    "videoFallback": "Vidéo YouTube",
+    "someone": "Quelqu’un",
+    "joinFailed": "Impossible de rejoindre la watch party."
   }
 }

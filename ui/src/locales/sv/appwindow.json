@@ -5,6 +5,39 @@
     "remember": "Kom ihåg mitt val",
     "minimize": "Minimera till systemfältet",
     "quit": "Avsluta",
+    "failed": "Det fungerade inte. Försök igen.",
+    "descriptionServers": "Du är fortfarande ansluten till {{count}} servrar. Minimerad håller Mumcord dig kvar i röstkanalen och ligger kvar i systemfältet."
+  },
+  "windowOverlay": {
+    "title": "Fönsteroverlayen har tagits bort",
+    "description": "Det flytande overlayfönstret finns inte längre. I stället visar overlayen i spelet vem som pratar i dina spel. Du kan slå på den i overlayinställningarna.",
+    "dismiss": "Uppfattat",
+    "openSettings": "Öppna overlayinställningar"
+  },
+  "appImageMenu": {
+    "title": "Lägga till Mumcord i appmenyn?",
+    "description": "Då hamnar Mumcord i din appmeny. Ikonen och push-to-talk fungerar då ordentligt under Wayland, och mumble://-länkar öppnar Mumcord. Du kan ändra det senare i Inställningar.",
+    "no": "Nej",
+    "yes": "Ja",
+    "failed": "Det fungerade inte. Försök igen."
+  },
+  "updateCheck": {
+    "title": "Söka efter nya versioner?",
+    "description": "Mumcord kan fråga GitHub en gång om dagen om det finns en nyare version och visa en hint med en länk. Inget laddas ner eller installeras, och inget skickas utom själva förfrågan samt appens namn och version. Du kan ändra det senare i Inställningar.",
+    "no": "Nej",
+    "yes": "Ja",
+    "failed": "Det fungerade inte. Försök igen."
+  },
+  "updateHint": {
+    "message": "Mumcord {{version}} finns tillgänglig.",
+    "open": "Visa version",
+    "dismiss": "Stäng"
+  },
+  "directConsent": {
+    "title": "Tillåta direktanslutningar?",
+    "description": "Direktanslutningar är snabbare, men den andra personen kan se din IP-adress. Mumcord använder dem för bilder i full storlek och skärmdelning med andra Mumcord-användare och kan öppna en port i din router för dem. Om du säger nej kommer bilder fortfarande via servern och skärmdelning är inte tillgänglig. Du kan ändra detta senare under Inställningar → Integritet.",
+    "no": "Nej",
+    "yes": "Ja",
     "failed": "Det fungerade inte. Försök igen."
   }
 }

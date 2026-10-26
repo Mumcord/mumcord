@@ -4,6 +4,8 @@
     "label": "Kanäle",
     "hint": "Enter: Chat anzeigen · Umschalt+Enter oder Doppelklick: beitreten · Pfeiltasten: bewegen, auf- und zuklappen",
     "join": "Beitreten",
+    "menuLabel": "Optionen für {{channel}}",
+    "showDescription": "Kanalbeschreibung anzeigen",
     "you": "(du)",
     "voiceHere": "du bist hier (Sprache)",
     "people_one": "{{count}} Person",
@@ -16,10 +18,11 @@
     },
     "showAll": "Alle anzeigen ({{total}})",
     "showFewer": "Weniger anzeigen",
-    "jump": "Zu meinem Kanal springen"
+    "jump": "Zu meinem Kanal springen",
+    "locked": "gesperrt"
   },
   "status": {
-    "listening": "hört zu",
+    "listening": "nur zuhörend",
     "talking": "spricht",
     "muted": "stummgeschaltet",
     "deafened": "taub geschaltet",
@@ -32,7 +35,7 @@
   "mumcordBadge": "Nutzt Mumcord",
   "statusTip": {
     "registered": "Auf diesem Server registriert",
-    "listening": "Hört diesen Kanal mit",
+    "listening": "Nur zuhörend",
     "muted": "Stummgeschaltet",
     "deafened": "Taub geschaltet",
     "serverMuted": "Vom Server stummgeschaltet",
@@ -42,6 +45,7 @@
     "unregistered": "Auf diesem Server nicht registriert (Gast)",
     "nowPlaying": "Hört {{track}}",
     "nowGaming": "Spielt {{game}}",
+    "weakConnection": "Schwache Verbindung – hoher Ping oder Paketverlust",
     "positional": "Positionsabhängiger Ton aktiv"
   },
   "announce": {
@@ -56,7 +60,8 @@
   },
   "empty": {
     "disconnected": "Nicht verbunden. Wähle einen Server, um seine Kanäle zu sehen.",
-    "loading": "Kanäle werden geladen…"
+    "loading": "Kanäle werden geladen…",
+    "syncingBig": "Großer Server wird synchronisiert …"
   },
   "search": {
     "label": "Kanäle und Personen suchen",

@@ -9,5 +9,17 @@
   "retry": "Prøv igen",
   "loading": "Indlæser…",
   "beta": "Beta",
-  "betaFeature": "Betafunktion"
+  "betaFeature": "Betafunktion",
+  "themePicker": {
+    "swatch": "{{name}}, tema",
+    "swatchSelected": "{{name}}, tema, valgt",
+    "yourThemes": "Dine temaer",
+    "add": "Nyt tema ud fra det nuværende",
+    "addShort": "Nyt"
+  },
+  "floatingWidget": {
+    "collapse": "Fold sammen",
+    "expand": "Fold ud",
+    "handle": "{{name}}: piletaster flytter, Shift+piletaster ændrer størrelse"
+  }
 }

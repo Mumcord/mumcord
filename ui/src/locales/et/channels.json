@@ -4,6 +4,8 @@
     "label": "Kanalid",
     "hint": "Enter: näita vestlust · Shift+Enter või topeltklõps: liitu · Nooleklahvid: liigu, laienda, ahenda",
     "join": "Liitu",
+    "menuLabel": "Valikud: {{channel}}",
+    "showDescription": "Näita kanali kirjeldust",
     "you": "(sina)",
     "voiceHere": "oled siin (hääl)",
     "people_one": "{{count}} inimene",
@@ -16,10 +18,11 @@
     },
     "showAll": "Näita kõiki ({{total}})",
     "showFewer": "Näita vähem",
-    "jump": "Hüppa minu kanalisse"
+    "jump": "Hüppa minu kanalisse",
+    "locked": "lukus"
   },
   "status": {
-    "listening": "kuulab",
+    "listening": "ainult kuulab",
     "talking": "räägib",
     "muted": "vaigistatud",
     "deafened": "kurdistatud",
@@ -32,7 +35,7 @@
   "mumcordBadge": "Kasutab Mumcordi",
   "statusTip": {
     "registered": "Registreeritud sellel serveril",
-    "listening": "Kuulab seda kanalit",
+    "listening": "Ainult kuulab",
     "muted": "Vaigistatud",
     "deafened": "Kurdistatud",
     "serverMuted": "Server vaigistas",
@@ -42,6 +45,7 @@
     "unregistered": "Sellel serveril registreerimata (külaline)",
     "nowPlaying": "Kuulab: {{track}}",
     "nowGaming": "Mängib: {{game}}",
+    "weakConnection": "Nõrk ühendus – kõrge ping või pakettide kadu",
     "positional": "Positsiooniheli on aktiivne"
   },
   "announce": {
@@ -56,7 +60,8 @@
   },
   "empty": {
     "disconnected": "Ühendus puudub. Vali server, et selle kanaleid näha.",
-    "loading": "Laadin kanaleid…"
+    "loading": "Laadin kanaleid…",
+    "syncingBig": "Suure serveri sünkroonimine…"
   },
   "search": {
     "label": "Otsi kanaleid ja inimesi",

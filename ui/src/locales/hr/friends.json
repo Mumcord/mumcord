@@ -11,5 +11,7 @@
   "noCertificate": "Osobe bez certifikata ne mogu biti prijatelji jer ih Mumcord ne bi mogao ponovno prepoznati.",
   "add": "Dodaj prijatelja",
   "remove": "Ukloni prijatelja",
-  "failed": "Promjena prijatelja nije uspjela. Pokušaj ponovno."
+  "failed": "Promjena prijatelja nije uspjela. Pokušaj ponovno.",
+  "join": "Pridruži se",
+  "joinFriend": "Pridruži se kanalu korisnika {{name}}"
 }

@@ -10,5 +10,6 @@
   "image": "Saatis pildi",
   "open": "Ava vestlus",
   "close": "Sulge teavitus",
-  "mentionLine": "{{sender}} mainis sind: {{preview}}"
+  "mentionLine": "{{sender}} mainis sind: {{preview}}",
+  "withServer": "{{server}} · {{what}}"
 }

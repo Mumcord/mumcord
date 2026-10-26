@@ -12,5 +12,6 @@
   "image": "Enviou uma imagem",
   "open": "Abrir chat",
   "close": "Dispensar notificação",
-  "mentionLine": "{{sender}} mencionou-te: {{preview}}"
+  "mentionLine": "{{sender}} mencionou-te: {{preview}}",
+  "withServer": "{{server}} · {{what}}"
 }

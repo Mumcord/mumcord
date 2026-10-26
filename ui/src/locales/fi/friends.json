@@ -11,5 +11,7 @@
   "noCertificate": "Ilman varmennetta olevat henkilöt eivät voi olla kavereita, koska Mumcord ei tunnistaisi heitä uudelleen.",
   "add": "Lisää kaveri",
   "remove": "Poista kaveri",
-  "failed": "Kaverin muuttaminen ei onnistunut. Yritä uudelleen."
+  "failed": "Kaverin muuttaminen ei onnistunut. Yritä uudelleen.",
+  "join": "Liity",
+  "joinFriend": "Liity kanavalle, jolla {{name}} on"
 }

@@ -32,7 +32,15 @@
     "avatarUnregistered": "Dan is-server iżomm l-avatars biss ta' utenti rreġistrati – Mumcord jerġa' jibgħat tiegħek kull darba li tikkonnettja.",
     "avatarChosen": "Magħżula: {{name}}",
     "avatarRemoved": "L-istampa titneħħa meta tissejvja.",
-    "comment": "Dwarek"
+    "comment": "Dwarek",
+    "format": "Format tat-test",
+    "bold": "Grassett",
+    "italic": "Korsiv",
+    "link": "Link",
+    "linkAddress": "Indirizz tal-link",
+    "linkApply": "Żid link",
+    "bulletList": "Lista bil-punti",
+    "numberedList": "Lista nnumerata"
   },
   "register": {
     "title": "Irreġistra fuq dan is-server",
@@ -69,8 +77,6 @@
     "nowGaming": "Aqsam il-logħba li qed nilgħab",
     "nowGamingHint": "L-oħrajn jaraw il-logħba preżenti tiegħek",
     "unavailable": "Mhux disponibbli fuq din is-sistema",
-    "overlay": "Overlay",
-    "overlayHint": "Juri min qed jitkellem fuq il-logħob",
     "editProfile": "Editja l-profil",
     "editProfileHint": "Isem, avatar u kummentarju",
     "register": "Irreġistra fuq dan is-server",
@@ -84,5 +90,10 @@
     "offerImagesHint": "Ħalli lill-oħrajn iniżżlu l-istampi oriġinali tiegħek",
     "loadImages": "Tgħabbi stampi b'daqs sħiħ",
     "loadImagesHint": "Ġib l-istampi oriġinali mingħand l-oħrajn"
+  },
+  "voice": {
+    "line": "Vuċi: {{channel}} · {{server}}",
+    "server": "Vuċi: {{server}}",
+    "show": "{{location}} – uri dan is-server"
   }
 }

@@ -9,5 +9,17 @@
   "retry": "Опитай отново",
   "loading": "Зареждане…",
   "beta": "Бета",
-  "betaFeature": "Бета функция"
+  "betaFeature": "Бета функция",
+  "themePicker": {
+    "swatch": "{{name}}, тема",
+    "swatchSelected": "{{name}}, тема, избрана",
+    "yourThemes": "Твоите теми",
+    "add": "Нова тема от текущата",
+    "addShort": "Нова"
+  },
+  "floatingWidget": {
+    "collapse": "Свий",
+    "expand": "Разгъни",
+    "handle": "{{name}}: стрелките местят, Shift+стрелки променят размера"
+  }
 }

@@ -32,7 +32,15 @@
     "avatarUnregistered": "Ní choinníonn an freastalaí seo abhatár ach d'úsáideoirí cláraithe – seolann Mumcord do cheann arís gach uair a cheanglaíonn tú.",
     "avatarChosen": "Roghnaithe: {{name}}",
     "avatarRemoved": "Bainfear an pictiúr nuair a shábhálfaidh tú.",
-    "comment": "Fúthu"
+    "comment": "Fúthu",
+    "format": "Formáidiú téacs",
+    "bold": "Trom",
+    "italic": "Iodálach",
+    "link": "Nasc",
+    "linkAddress": "Seoladh an naisc",
+    "linkApply": "Cuir nasc leis",
+    "bulletList": "Liosta le hurchair",
+    "numberedList": "Liosta uimhrithe"
   },
   "register": {
     "title": "Cláraigh ar an bhfreastalaí seo",
@@ -69,8 +77,6 @@
     "nowGaming": "Roinn an cluiche atá mé ag imirt",
     "nowGamingHint": "Feiceann daoine eile do chluiche reatha",
     "unavailable": "Níl sé ar fáil ar an gcóras seo",
-    "overlay": "Forleagan",
-    "overlayHint": "Taispeánann sé cé atá ag caint ar bharr cluichí",
     "editProfile": "Cuir an phróifíl in eagar",
     "editProfileHint": "Ainm, abhatár agus nóta",
     "register": "Cláraigh ar an bhfreastalaí seo",
@@ -84,5 +90,10 @@
     "offerImagesHint": "Lig do dhaoine eile do bhuníomhánna a luchtú",
     "loadImages": "Luchtaigh íomhánna ar a méid iomlán",
     "loadImagesHint": "Faigh buníomhánna ó dhaoine eile"
+  },
+  "voice": {
+    "line": "Guth: {{channel}} · {{server}}",
+    "server": "Guth: {{server}}",
+    "show": "{{location}} – taispeáin an freastalaí seo"
   }
 }

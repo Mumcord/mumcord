@@ -11,5 +11,7 @@
   "noCertificate": "Pessoas sem certificado não podem ser amigas, porque o Mumcord não as conseguiria reconhecer novamente.",
   "add": "Adicionar amigo",
   "remove": "Remover amigo",
-  "failed": "Não foi possível alterar o amigo. Tenta novamente."
+  "failed": "Não foi possível alterar o amigo. Tenta novamente.",
+  "join": "Entrar",
+  "joinFriend": "Entrar no canal de {{name}}"
 }

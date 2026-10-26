@@ -1,8 +1,6 @@
 {
   "inChannel_one": "В {{channel}} ({{count}})",
   "inChannel_other": "В {{channel}} ({{count}})",
-  "listening_one": "Слушат ({{count}})",
-  "listening_other": "Слушат ({{count}})",
   "noChannel": "Избери канал, за да видиш кой е в него.",
   "nobody": "Тук няма никой.",
   "nobodyElse": "Няма никой друг на сървъра.",
@@ -11,6 +9,26 @@
   "registered": "Регистриран",
   "unregistered": "Нерегистриран",
   "talking": "Говори",
+  "quality": {
+    "label": "Връзка",
+    "summary": "Връзка: {{level}}",
+    "level": {
+      "good": "Добра",
+      "fair": "Средна",
+      "weak": "Слаба",
+      "unknown": "Неизвестна"
+    },
+    "ping": "Пинг",
+    "loss": "Загуба на пакети",
+    "late": "Закъснели пакети",
+    "bandwidth": "Честотна лента",
+    "transport": "Пренос на гласа",
+    "client": "Клиент",
+    "os": "Операционна система",
+    "ms": "{{value}} ms",
+    "percent": "{{value}} %",
+    "kbps": "{{value}} kbit/s"
+  },
   "card": {
     "close": "Затвори",
     "loadFailed": "Профилът не можа да се зареди.",
@@ -22,6 +40,9 @@
     "privateMessage": "Лично съобщение",
     "localSettings": "Твоите настройки",
     "localSettingsHint": "Само ти ги виждаш. Промените се запазват веднага.",
+    "settingsFor": "Настройки за {{name}}",
+    "hintMuted": "Заглушен",
+    "hintVolume": "Сила на звука {{value}} %",
     "localMuteHint": "Няма да чуваш този човек.",
     "privateNote": "Лична бележка",
     "privateNoteHint": "Само ти виждаш тази бележка.",
@@ -36,7 +57,8 @@
     "viewProfile": "Виж профила",
     "join": "Влизане в {{channel}}",
     "joinDenied": "Нямате право да влезете в този канал.",
-    "mute": "Заглуши за мен"
+    "mute": "Заглуши за мен",
+    "connectionInfo": "Информация за връзката…"
   },
   "nowPlaying": {
     "label": "Слуша сега",

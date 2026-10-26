@@ -32,7 +32,15 @@
     "avatarUnregistered": "Deze server bewaart avatars alleen voor geregistreerde gebruikers – Mumcord stuurt de jouwe bij elke verbinding opnieuw.",
     "avatarChosen": "Geselecteerd: {{name}}",
     "avatarRemoved": "De foto wordt verwijderd zodra je opslaat.",
-    "comment": "Over jou"
+    "comment": "Over jou",
+    "format": "Tekstopmaak",
+    "bold": "Vet",
+    "italic": "Cursief",
+    "link": "Link",
+    "linkAddress": "Linkadres",
+    "linkApply": "Link toevoegen",
+    "bulletList": "Lijst met opsommingstekens",
+    "numberedList": "Genummerde lijst"
   },
   "register": {
     "title": "Registreren op deze server",
@@ -69,8 +77,6 @@
     "nowGaming": "Delen welke game ik speel",
     "nowGamingHint": "Anderen zien je huidige game",
     "unavailable": "Niet beschikbaar op dit systeem",
-    "overlay": "Overlay",
-    "overlayHint": "Toont wie er praat bovenop games",
     "editProfile": "Profiel bewerken",
     "editProfileHint": "Naam, avatar en opmerking",
     "register": "Registreren op deze server",
@@ -84,5 +90,10 @@
     "offerImagesHint": "Laat anderen je originele afbeeldingen laden",
     "loadImages": "Afbeeldingen op volledige grootte laden",
     "loadImagesHint": "Originele afbeeldingen van anderen ophalen"
+  },
+  "voice": {
+    "line": "Spraak: {{channel}} · {{server}}",
+    "server": "Spraak: {{server}}",
+    "show": "{{location}} – deze server tonen"
   }
 }

@@ -32,7 +32,15 @@
     "avatarUnregistered": "Ez a szerver csak regisztrált felhasználók avatarját tárolja – a Mumcord minden csatlakozáskor újraküldi a tiédet.",
     "avatarChosen": "Kiválasztva: {{name}}",
     "avatarRemoved": "A kép mentéskor eltávolításra kerül.",
-    "comment": "Rólad"
+    "comment": "Rólad",
+    "format": "Szövegformázás",
+    "bold": "Félkövér",
+    "italic": "Dőlt",
+    "link": "Link",
+    "linkAddress": "Link címe",
+    "linkApply": "Link hozzáadása",
+    "bulletList": "Felsorolás",
+    "numberedList": "Számozott lista"
   },
   "register": {
     "title": "Regisztráció ezen a szerveren",
@@ -69,8 +77,6 @@
     "nowGaming": "Annak megosztása, amivel játszom",
     "nowGamingHint": "Mások látják az aktuális játékodat",
     "unavailable": "Ezen a rendszeren nem érhető el",
-    "overlay": "Overlay",
-    "overlayHint": "Játékok fölött mutatja, ki beszél",
     "editProfile": "Profil szerkesztése",
     "editProfileHint": "Név, avatar és bemutatkozás",
     "register": "Regisztráció ezen a szerveren",
@@ -84,5 +90,10 @@
     "offerImagesHint": "Mások betölthetik az eredeti képeidet",
     "loadImages": "Teljes méretű képek betöltése",
     "loadImagesHint": "Eredeti képek lekérése másoktól"
+  },
+  "voice": {
+    "line": "Hang: {{channel}} · {{server}}",
+    "server": "Hang: {{server}}",
+    "show": "{{location}} – szerver megjelenítése"
   }
 }

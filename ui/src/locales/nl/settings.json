@@ -14,7 +14,9 @@
     "sounds": "Geluiden en meldingen",
     "overlay": "Overlay",
     "diagnostics": "Diagnostiek",
-    "about": "Over"
+    "about": "Over",
+    "servers": "Servers",
+    "privacy": "Privacy"
   },
   "search": {
     "label": "Instellingen zoeken",
@@ -68,7 +70,17 @@
     "testPlaying": "Je stem wordt afgespeeld…",
     "quality": "Kwaliteit",
     "musicQuality": "Muziekkwaliteit",
-    "musicQualityHint": "Gebruikt meer bandbreedte en schakelt ruisonderdrukking en automatisch volume uit; bedoeld voor muziek. Push-to-talk werkt het best."
+    "musicQualityHint": "Gebruikt meer bandbreedte en schakelt ruisonderdrukking en automatisch volume uit; bedoeld voor muziek. Push-to-talk werkt het best.",
+    "bitrate": "Bitrate",
+    "bitrateMax": "Max",
+    "bitrateValue": "{{kbps}} kbit/s",
+    "bitrateMaxKnown": "Maximum: {{kbps}} kbit/s. Verlies op de verbinding kan het nog verlagen.",
+    "bitrateMaxUnknown": "Maximum: hangt af van de server. Verlies op de verbinding kan het nog verlagen.",
+    "videoSound": "Videogeluid",
+    "ducking": "Videogeluid zachter terwijl iemand praat",
+    "duckingHint": "Het geluid van de watchparty-video en schermdeling wordt zachter terwijl iemand in je spraakkanaal praat.",
+    "duckingLevel": "Verlaagd volume",
+    "duckingLevelValue": "{{percent}} %"
   },
   "voice": {
     "talkMode": "Praatmodus",
@@ -178,6 +190,7 @@
     "compact": "Compact: tijd, naam en bericht op één regel",
     "theme": "Thema",
     "themeLegend": "Kleurenthema",
+    "modeLegend": "Donker of licht",
     "system": "Systeem volgen",
     "dark": "Donker",
     "light": "Licht",
@@ -189,6 +202,61 @@
     "autostart": "Mumcord starten wanneer ik inlog",
     "startMinimized": "Geminimaliseerd starten",
     "startMinimizedHint": "Als Mumcord bij het inloggen start, wacht het in het systeemvak in plaats van het venster te openen."
+  },
+  "themeEditor": {
+    "name": "Themanaam",
+    "colorsLegend": "Hoofdkleuren",
+    "colorColumn": "Kleur",
+    "auto": "auto",
+    "cellLabel": "{{color}}, {{version}}",
+    "newTitle": "Nieuw thema",
+    "editTitle": "‘{{name}}’ bewerken",
+    "generatedFromDark": "Automatisch gemaakt van de donkere versie. Volgt je wijzigingen daar totdat je het hier wijzigt.",
+    "generatedFromLight": "Automatisch gemaakt van de lichte versie. Volgt je wijzigingen daar totdat je het hier wijzigt.",
+    "colors": {
+      "background": "Achtergrond",
+      "surface": "Oppervlak",
+      "text": "Tekst",
+      "accent": "Accent",
+      "talking": "Praten en online",
+      "warning": "Waarschuwing",
+      "error": "Fout"
+    },
+    "pickColor": "Kleurkiezer voor {{color}}",
+    "invalidHex": "Voer de kleur in als # gevolgd door zes hexadecimale cijfers, bijvoorbeeld #1a2b3c.",
+    "contrastLowIn": "{{version}}: contrast te laag: {{ratio}}:1, minstens {{min}}:1 nodig.",
+    "unreadable": "Dit thema is niet goed genoeg leesbaar. Wijzig de tekst- of achtergrondkleur om het op te slaan.",
+    "copyName": "{{name}} (kopie)",
+    "save": "Thema opslaan",
+    "saveAs": "Opslaan als thema",
+    "saved": "Thema opgeslagen.",
+    "share": "Delen",
+    "shared": "Thema gekopieerd. Plak het in een chat om het te delen.",
+    "shareFailed": "Mumcord kon het thema niet naar het klembord kopiëren.",
+    "import": "Importeren…",
+    "importTitle": "Een thema importeren",
+    "importLabel": "Themabericht of code",
+    "importHint": "Plak een chatbericht met een Mumcord-thema, of alleen de code (die begint met mct1.).",
+    "importConfirm": "Importeren",
+    "importInvalid": "Dit is geen geldig Mumcord-thema.",
+    "importUnreadable": "Dit thema is niet goed genoeg leesbaar.",
+    "imported": "‘{{name}}’ geïmporteerd.",
+    "alreadyImported": "‘{{name}}’ staat al in je thema's.",
+    "madeWithNewer": "Gemaakt met Mumcord {{version}} – werk bij om het volledig te zien.",
+    "reset": "Herstellen",
+    "menuLabel": "Opties voor {{name}}",
+    "edit": "Thema bewerken",
+    "newFromThis": "Nieuw thema op basis hiervan",
+    "preview": "Voorbeeld",
+    "previewing": "Voorbeeld van {{name}}",
+    "backToEditor": "Terug naar editor",
+    "rename": "Thema hernoemen",
+    "renameTitle": "‘{{name}}’ hernoemen",
+    "renameConfirm": "Hernoemen",
+    "delete": "Thema verwijderen",
+    "deleteTitle": "‘{{name}}’ verwijderen?",
+    "deleteMessage": "Servers die dit thema gebruiken, gaan terug naar het app-thema.",
+    "deleteConfirm": "Verwijderen"
   },
   "accessibility": {
     "hints": "Tips",
@@ -212,7 +280,14 @@
     "hangUp": "Je verbreekt de verbinding met een server",
     "messages": "Nieuw bericht in een gevolgd kanaal of privéchat",
     "mention": "Geluid bij vermelding",
-    "mentionNotify": "Melding bij vermelding"
+    "mentionNotify": "Melding bij vermelding",
+    "partyStarted": "Iemand start een watchparty in je kanaal",
+    "partyJoined": "Iemand doet mee aan je watchparty",
+    "partyLeft": "Iemand verlaat je watchparty",
+    "shareStarted": "Iemand begint in je kanaal een scherm te delen",
+    "shareStopped": "Een schermdeling in je kanaal stopt",
+    "viewerStarted": "Iemand begint naar je schermdeling te kijken",
+    "viewerStopped": "Iemand stopt met kijken naar je schermdeling"
   },
   "notifications": {
     "title": "Meldingen",
@@ -224,29 +299,6 @@
     "off": "Uit"
   },
   "overlay": {
-    "window": {
-      "title": "Vensteroverlay",
-      "enable": "De overlay tonen",
-      "enableHint": "Een klein transparant venster dat toont wie er praat. Ook beschikbaar via het systeemvakmenu.",
-      "positionUnsupported": "Deze desktop bepaalt waar vensters verschijnen, dus hoekposities en verplaatsen hebben geen effect.",
-      "move": "Overlay verplaatsen…",
-      "moveDone": "Klaar met verplaatsen",
-      "size": "Breedte",
-      "wholeChannel": "Het hele kanaal tonen",
-      "wholeChannelHint": "Uit: alleen mensen die praten.",
-      "channelName": "De kanaalnaam tonen",
-      "loadFailed": "De overlayopties konden niet worden geladen.",
-      "saveFailed": "De overlaywijziging kon niet worden toegepast.",
-      "kwin": {
-        "setUp": "Automatisch instellen",
-        "done": "Klaar: de KDE-vensterregel “Mumcord overlay” is actief.",
-        "removed": "De KDE-vensterregel is verwijderd.",
-        "remove": "Regel verwijderen",
-        "openRules": "KDE-vensterregels openen",
-        "compat": "Gebruik in plaats daarvan de compatibiliteitsmodus",
-        "failed": "De KDE-vensterregel kon niet worden gewijzigd. Open de KDE-vensterregels om hem handmatig toe te voegen."
-      }
-    },
     "corner": {
       "label": "Positie",
       "topLeft": "Linksboven",
@@ -281,8 +333,16 @@
       "confirmEnable": "Toch inschakelen",
       "limits": {
         "libraryMissing": "De overlay in games is niet beschikbaar: de overlaybibliotheek (libmumcord_overlay_layer.so) is niet naast Mumcord gevonden. Installeer Mumcord opnieuw om hem te herstellen. In plaats daarvan wordt de vensteroverlay hierboven gebruikt.",
-        "windowsPending": "De overlay in games is nog niet beschikbaar op Windows. In plaats daarvan wordt de vensteroverlay hierboven gebruikt.",
+        "windowsFullscreen": "Gebruik in de game randloos of venster-volledig scherm.",
         "macos": "macOS ondersteunt geen overlays in games. In plaats daarvan wordt de vensteroverlay hierboven gebruikt."
+      },
+      "opengl": {
+        "title": "OpenGL-games",
+        "explanation": "Alleen nodig voor OpenGL-games: plak in de Steam-startopties van de game.",
+        "label": "Steam-startoptie",
+        "copy": "Kopiëren",
+        "copied": "Gekopieerd",
+        "copyFailed": "Kopiëren mislukt. Selecteer de tekst en kopieer die handmatig."
       }
     }
   },
@@ -306,7 +366,7 @@
     "os": "Systeem",
     "license": "Mumcord-licentie (AGPL-3.0)",
     "whatsNew": "Wat is er nieuw",
-    "support": "Support",
+    "support": "Ondersteuning",
     "reportBug": "Een bug melden",
     "requestFeature": "Een functie aanvragen",
     "notices": "Vermeldingen van derden",
@@ -388,5 +448,38 @@
       "unsupported": "Niet beschikbaar op dit systeem.",
       "failed": "Gestopt na een fout. Zet hem uit en weer aan om het opnieuw te proberen."
     }
+  },
+  "servers": {
+    "connections": "Verbindingen",
+    "limit": "Tegelijk verbonden servers",
+    "limitHint": "Tussen 1 en 15. Verbinden boven de limiet wordt geweigerd.",
+    "limitInvalid": "Voer een geheel getal van 1 tot 15 in."
+  },
+  "appearanceEffects": {
+    "title": "Effecten",
+    "visualEffects": "Visuele effecten (glas, korrel)",
+    "visualEffectsHint": "Matglazen menu's en een subtiele filmkorrel. Automatisch uit als je systeem om minder transparantie of beweging vraagt."
+  },
+  "channelList": {
+    "title": "Kanaallijst",
+    "hideEmpty": "Lege kanalen verbergen",
+    "talkingFirst": "Pratende mensen eerst tonen",
+    "weakConnection": "Pictogram voor zwakke verbinding tonen",
+    "weakConnectionHint": "Een klein signaalpictogram naast mensen met een slechte verbinding."
+  },
+  "privacyDirect": {
+    "title": "Directe verbindingen",
+    "allow": "Directe verbindingen met andere Mumcord-gebruikers toestaan",
+    "hint": "Directe verbindingen zijn sneller, maar de ander kan je IP-adres zien. Totdat je beslist, vraagt Mumcord het de eerste keer dat er een gebruikt zou worden."
+  },
+  "updates": {
+    "title": "Updates",
+    "check": "Zoeken naar nieuwe versies",
+    "hint": "Eén keer per dag vraagt Mumcord GitHub naar de nieuwste release. Verder wordt er niets verstuurd."
+  },
+  "appImageMenu": {
+    "label": "Mumcord aan het appmenu toevoegen",
+    "hint": "Zorgt dat het pictogram en push-to-talk goed werken onder Wayland en dat mumble://-links Mumcord openen. Alleen voor de AppImage.",
+    "failed": "Dat is niet gelukt. Probeer het opnieuw."
   }
 }

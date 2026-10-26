@@ -9,5 +9,17 @@
   "retry": "Încearcă din nou",
   "loading": "Se încarcă…",
   "beta": "Beta",
-  "betaFeature": "Funcție beta"
+  "betaFeature": "Funcție beta",
+  "themePicker": {
+    "swatch": "{{name}}, temă",
+    "swatchSelected": "{{name}}, temă, selectată",
+    "yourThemes": "Temele tale",
+    "add": "Temă nouă din cea curentă",
+    "addShort": "Nouă"
+  },
+  "floatingWidget": {
+    "collapse": "Restrânge",
+    "expand": "Extinde",
+    "handle": "{{name}}: săgețile mută, Shift+săgeți redimensionează"
+  }
 }

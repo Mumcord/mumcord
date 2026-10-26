@@ -9,5 +9,17 @@
   "retry": "Bandyti dar kartą",
   "loading": "Įkeliama…",
   "beta": "Beta",
-  "betaFeature": "Beta funkcija"
+  "betaFeature": "Beta funkcija",
+  "themePicker": {
+    "swatch": "{{name}}, tema",
+    "swatchSelected": "{{name}}, tema, pasirinkta",
+    "yourThemes": "Tavo temos",
+    "add": "Nauja tema iš dabartinės",
+    "addShort": "Nauja"
+  },
+  "floatingWidget": {
+    "collapse": "Sutraukti",
+    "expand": "Išskleisti",
+    "handle": "{{name}}: rodyklės perkelia, Shift+rodyklės keičia dydį"
+  }
 }

@@ -14,14 +14,17 @@
   },
   "dm": {
     "title": "Mensagens diretas",
-    "unknown": "Pessoa desconhecida"
+    "unknown": "Pessoa desconhecida",
+    "withServer": "{{name}}, em {{server}}"
   },
   "notify": {
     "channel": "{{name}} em {{channel}}: {{text}}",
     "private": "{{name}} (privado): {{text}}",
     "more_one": "mais {{count}} mensagem nova",
     "more_many": "mais {{count}} mensagens novas",
-    "more_other": "mais {{count}} mensagens novas"
+    "more_other": "mais {{count}} mensagens novas",
+    "channelOn": "{{name}} em {{channel}} em {{server}}: {{text}}",
+    "privateOn": "{{name}} (privado, {{server}}): {{text}}"
   },
   "history": {
     "clear": "Limpar histórico",

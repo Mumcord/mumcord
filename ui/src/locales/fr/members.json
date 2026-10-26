@@ -2,9 +2,6 @@
   "inChannel_one": "Dans {{channel}} ({{count}})",
   "inChannel_many": "Dans {{channel}} ({{count}})",
   "inChannel_other": "Dans {{channel}} ({{count}})",
-  "listening_one": "À l’écoute ({{count}})",
-  "listening_many": "À l’écoute ({{count}})",
-  "listening_other": "À l’écoute ({{count}})",
   "noChannel": "Sélectionnez un canal pour voir qui s’y trouve.",
   "nobody": "Personne ici.",
   "nobodyElse": "Personne d’autre n’est sur le serveur.",
@@ -13,6 +10,26 @@
   "registered": "Enregistré",
   "unregistered": "Non enregistré",
   "talking": "Parle",
+  "quality": {
+    "label": "Connexion",
+    "summary": "Connexion : {{level}}",
+    "level": {
+      "good": "Bonne",
+      "fair": "Moyenne",
+      "weak": "Faible",
+      "unknown": "Inconnue"
+    },
+    "ping": "Ping",
+    "loss": "Perte de paquets",
+    "late": "Paquets en retard",
+    "bandwidth": "Bande passante",
+    "transport": "Transport de la voix",
+    "client": "Client",
+    "os": "Système d’exploitation",
+    "ms": "{{value}} ms",
+    "percent": "{{value}} %",
+    "kbps": "{{value}} kbit/s"
+  },
   "card": {
     "close": "Fermer",
     "loadFailed": "Impossible de charger le profil.",
@@ -24,6 +41,9 @@
     "privateMessage": "Message privé",
     "localSettings": "Vos réglages",
     "localSettingsHint": "Vous seul les voyez. Les modifications sont enregistrées immédiatement.",
+    "settingsFor": "Paramètres pour {{name}}",
+    "hintMuted": "Muet",
+    "hintVolume": "Volume {{value}} %",
     "localMuteHint": "Vous n’entendrez pas cette personne.",
     "privateNote": "Note privée",
     "privateNoteHint": "Vous seul pouvez voir cette note.",
@@ -38,7 +58,8 @@
     "viewProfile": "Voir le profil",
     "join": "Rejoindre {{channel}}",
     "joinDenied": "Vous n'êtes pas autorisé à entrer dans ce canal.",
-    "mute": "Mettre en sourdine pour moi"
+    "mute": "Mettre en sourdine pour moi",
+    "connectionInfo": "Infos de connexion…"
   },
   "nowPlaying": {
     "label": "En écoute",

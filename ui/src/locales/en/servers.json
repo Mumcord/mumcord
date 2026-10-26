@@ -13,10 +13,15 @@
     "listLabel": "Saved servers",
     "add": "Add a server",
     "keyboardHint": "Enter connects. Alt plus Up or Down arrow moves the server. Shift plus F10 opens more options.",
-    "status": {
-      "connected": "{{server}} (connected)",
-      "connecting": "{{server}} (connecting)",
-      "reconnecting": "{{server}} (reconnecting)"
+    "label": "{{server}} ({{state}})",
+    "state": {
+      "connected": "connected",
+      "connecting": "connecting",
+      "reconnecting": "reconnecting",
+      "error": "connection lost",
+      "voice": "voice server",
+      "unread": "unread messages",
+      "mentions": "mentions: {{mentions}}"
     }
   },
   "menu": {
@@ -26,7 +31,19 @@
     "edit": "Edit server",
     "moveUp": "Move up",
     "moveDown": "Move down",
-    "remove": "Remove server"
+    "remove": "Remove server",
+    "reconnect": "Reconnect",
+    "alwaysConnect": "Always connect at start",
+    "muteNotifications": "Mute notifications",
+    "theme": "Theme…",
+    "showWelcome": "Show welcome message"
+  },
+  "theme": {
+    "title": "Theme for {{server}}",
+    "label": "Theme",
+    "useApp": "Use app theme",
+    "hint": "Shown while this server is shown.",
+    "failed": "The theme couldn't be saved. Please try again."
   },
   "dialog": {
     "addTitle": "Add a server",
@@ -50,7 +67,14 @@
       "username": "Enter the name you want to use on this server.",
       "link": "This mumble:// link can't be read. Check that it was copied completely.",
       "invalid": "The server details aren't valid. Check the address and port."
-    }
+    },
+    "alwaysConnect": "Always connect at start",
+    "alwaysConnectHint": "Mumcord connects this server read-only when it starts.",
+    "channelPasswords": "Channel passwords",
+    "channelPassword": "Channel password {{number}}",
+    "removeChannelPassword": "Remove {{name}}",
+    "remove": "Remove",
+    "channelPasswordsHint": "Saved when a protected channel accepted them. Removed ones are asked for again on the next join."
   },
   "errors": {
     "serverUnreachable": "The server can't be reached. Check the address and port, and that you are online.",
@@ -63,17 +87,16 @@
     "invalidAddress": "The server address isn't valid. Edit the server to fix it.",
     "secureStorage": "Your system's secure storage isn't available, so the server password could not be read or saved. Unlock it and try again.",
     "notFound": "This server is no longer saved.",
-    "generic": "Something went wrong. Please try again."
+    "generic": "Something went wrong. Please try again.",
+    "serverLimit": "You're already connected to the maximum of {{limit}} servers. Disconnect a server, or raise the limit in Settings → Servers.",
+    "serverLimitUnknown": "You're already connected to the maximum number of servers. Disconnect a server, or raise the limit in Settings → Servers.",
+    "alwaysConnectLimit": "Only {{limit}} servers can be set to “Always connect at start”, the same as the limit of connected servers. Turn it off for another server, or raise the limit in Settings → Servers.",
+    "alwaysConnectLimitUnknown": "No more servers can be set to “Always connect at start” than the limit of connected servers. Turn it off for another server, or raise the limit in Settings → Servers."
   },
   "remove": {
     "title": "Remove {{server}}?",
     "message": "Its saved password, certificate decision, followed channels and chat history on this computer are deleted.",
     "confirm": "Remove"
-  },
-  "switch": {
-    "title": "Switch server?",
-    "message": "You can only be on one server at a time. Disconnect from {{current}} and connect to {{next}}?",
-    "confirm": "Disconnect and switch"
   },
   "cert": {
     "newTitle": "Trust this server?",
@@ -108,7 +131,10 @@
     "actionFailed": {
       "reorder": "The new server order couldn't be saved. Please try again.",
       "remove": "The server couldn't be removed. Please try again.",
-      "disconnect": "Disconnecting failed. Please try again."
+      "disconnect": "Disconnecting failed. Please try again.",
+      "alwaysConnect": "“Always connect at start” couldn't be saved. Please try again.",
+      "notifications": "The notification setting couldn't be saved. Please try again.",
+      "savePassword": "The new password couldn't be saved. Edit the server to save it."
     }
   },
   "empty": {
@@ -124,5 +150,27 @@
     "errors": {
       "required": "Enter a server address or a mumble:// link."
     }
+  },
+  "password": {
+    "title": "Password for {{server}}",
+    "intro": "The server did not accept the password. Enter the right one to try again.",
+    "label": "Password",
+    "show": "Show",
+    "hide": "Hide",
+    "wrong": "That password is wrong too. Try again.",
+    "save": "Save password",
+    "cancel": "Cancel",
+    "connect": "Connect",
+    "connecting": "Connecting…"
+  },
+  "channelPassword": {
+    "title": "This channel needs a password",
+    "intro": "Enter the password for {{channel}}.",
+    "label": "Password",
+    "wrong": "Wrong password",
+    "failed": "The password couldn't be sent. Please try again.",
+    "cancel": "Cancel",
+    "join": "Join",
+    "joining": "Joining…"
   }
 }

@@ -9,5 +9,17 @@
   "retry": "Pokušaj ponovno",
   "loading": "Učitavanje…",
   "beta": "Beta",
-  "betaFeature": "Beta značajka"
+  "betaFeature": "Beta značajka",
+  "themePicker": {
+    "swatch": "{{name}}, tema",
+    "swatchSelected": "{{name}}, tema, odabrano",
+    "yourThemes": "Tvoje teme",
+    "add": "Nova tema iz trenutne",
+    "addShort": "Nova"
+  },
+  "floatingWidget": {
+    "collapse": "Sažmi",
+    "expand": "Proširi",
+    "handle": "{{name}}: strelice pomiču, Shift+strelice mijenjaju veličinu"
+  }
 }

@@ -58,7 +58,7 @@
     "mode": "Mod tat-tkellim",
     "voiceActivation": "Attivazzjoni bil-vuċi",
     "voiceActivationHint": "Il-mikrofonu tiegħek jixgħel meta titkellem.",
-    "pushToTalk": "Push to talk",
+    "pushToTalk": "Push-to-talk",
     "pushToTalkHint": "Żomm buttuna waqt li titkellem.",
     "waylandNoPortal": "Push to talk mhuwiex disponibbli: id-desktop tiegħek ma jħallix lill-apps jużaw shortcuts globali. L-attivazzjoni bil-vuċi taħdem mingħajr buttuna.",
     "registrationFailed": "Push to talk ma setax jiġi ssettjat fuq din is-sistema. Uża l-attivazzjoni bil-vuċi minflok.",
@@ -98,5 +98,10 @@
     "ingameOverlayHint": "Juri min qed jitkellem fuq il-logħba tiegħek (Linux). Tista' tixgħelha jew titfiha għal kull logħba aktar tard f'Settings.",
     "ingameOverlayWarning": "Xi logħob b'anti-cheat jistgħu jimmarkaw jew jimblukkaw overlays fil-logħba. Mumcord iżomm logħob magħruf bħala riskjuż (bħal Valorant jew League of Legends) mitfi b'mod default. Ixgħelha biss għal logħob li tafda.",
     "ingameOverlayAlt": "Eżempju tal-overlay fil-logħba li juri min qed jitkellem"
+  },
+  "updates": {
+    "title": "Verżjonijiet ġodda",
+    "check": "Fittex verżjonijiet ġodda",
+    "hint": "Mumcord jista' jistaqsi lil GitHub darba kuljum jekk hemmx verżjoni aktar ġdida u juri ħjiel b'link. Xejn ma jitniżżel jew jiġi installat, u xejn ma jintbagħat ħlief it-talba nfisha u l-isem u l-verżjoni tal-app. Tista' tibdel dan aktar tard fis-Settings."
   }
 }

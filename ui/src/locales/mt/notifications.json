@@ -16,5 +16,6 @@
   "image": "Bagħat stampa",
   "open": "Iftaħ iċ-chat",
   "close": "Ormi n-notifika",
-  "mentionLine": "{{sender}} semmielek: {{preview}}"
+  "mentionLine": "{{sender}} semmielek: {{preview}}",
+  "withServer": "{{server}} · {{what}}"
 }

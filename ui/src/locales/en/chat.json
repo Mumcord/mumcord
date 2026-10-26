@@ -8,6 +8,7 @@
     "unknownPerson": "Unknown person"
   },
   "list": {
+    "server": "Server",
     "today": "Today",
     "yesterday": "Yesterday",
     "label": "Messages in {{name}}",
@@ -32,7 +33,8 @@
     "strike": "Strikethrough",
     "code": "Inline code",
     "codeBlock": "Code block",
-    "link": "Link"
+    "link": "Link",
+    "quote": "Quote"
   },
   "composer": {
     "label": "Message {{name}}",
@@ -64,7 +66,14 @@
     "notConnected": "You're not connected. Reconnect and try again.",
     "generic": "The message couldn't be sent. Try again.",
     "onlyImages": "Only images can be sent.",
-    "sourceTooLarge": "This file is too large to send (over 25 MB)."
+    "sourceTooLarge": "This file is too large to send (over 25 MB).",
+    "personOffline": "This person is offline. Try again when they’re back."
+  },
+  "failed": {
+    "notSent": "Not sent.",
+    "retry": "Retry",
+    "remove": "Delete",
+    "announce": "A message couldn’t be sent."
   },
   "announce": {
     "message": "{{name}}: {{text}}",
@@ -75,7 +84,9 @@
   "pinned": {
     "label": "Channel info",
     "showMore": "Show more",
-    "showLess": "Show less"
+    "showLess": "Show less",
+    "hideWelcome": "Hide welcome message",
+    "hideDescription": "Hide channel description"
   },
   "mention": {
     "list": "Mentionable people",
@@ -128,6 +139,7 @@
     "next": "Next image",
     "unnamed": "image",
     "fullLoading": "Loading full size…",
+    "fullCancel": "Cancel full-size download",
     "fullProgress": "Loading full size… {{percent}} %",
     "fullUnavailable": "Full size not available – showing the preview"
   },
@@ -141,11 +153,62 @@
     "hint": "Arrow keys move, Enter sends, Delete removes, Escape closes.",
     "empty": "No favorites yet. Right-click a GIF in the chat, or use the star on it, and choose \"Save as favorite\". It will show up here."
   },
+  "linkMenu": {
+    "label": "Link",
+    "copy": "Copy link",
+    "open": "Open link",
+    "copied": "Link copied"
+  },
   "imageMenu": {
     "label": "Image {{name}}"
   },
   "attribution": {
     "via": "via {{brand}}",
     "view": "View on {{brand}}"
+  },
+  "themeCard": {
+    "label": "Shared theme {{name}}",
+    "apply": "Apply theme",
+    "more": "Apply to a server",
+    "menuLabel": "Apply theme to",
+    "applyToServer": "Apply to {{server}}",
+    "imported": "Imported ✓",
+    "newer": "Made with Mumcord {{version}} – update to see it fully",
+    "failed": "Couldn't apply the theme."
+  },
+  "reply": {
+    "action": "Reply",
+    "actionFor": "Reply to {{name}}",
+    "menu": "Message from {{name}}",
+    "replyTo": "Reply to",
+    "jump": "Jump to the original message",
+    "image": "Image",
+    "replyingTo": "Replying to",
+    "cancel": "Cancel reply"
+  },
+  "actions": {
+    "label": "Start together",
+    "notConnected": "Not connected to the server.",
+    "partyRunning": "A watch party is already running in this channel.",
+    "invalidLink": "This is not a YouTube video link.",
+    "linkLabel": "YouTube link",
+    "linkPlaceholder": "Paste a YouTube link",
+    "confirm": "Start",
+    "watchHint": "Watch a YouTube video together with this channel",
+    "dialogTitle": "Watch together",
+    "addTitle": "Add to playlist",
+    "addToPlaylist": "Add to playlist",
+    "addConfirm": "Add",
+    "apps": "Apps",
+    "appsLive": "Apps (you are sharing your screen)"
+  },
+  "activity": {
+    "share": "{{name}} is sharing their screen",
+    "watch": "Watch",
+    "party": "Watch party: {{title}}",
+    "join": "Join",
+    "videoFallback": "YouTube video",
+    "someone": "Someone",
+    "joinFailed": "Could not join the watch party."
   }
 }

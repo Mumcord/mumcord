@@ -5,6 +5,39 @@
     "remember": "Muista valintani",
     "minimize": "Pienennä ilmoitusalueelle",
     "quit": "Lopeta",
+    "failed": "Se ei onnistunut. Yritä uudelleen.",
+    "descriptionServers": "Olet yhä yhteydessä {{count}} palvelimeen. Pienennettynä Mumcord pitää sinut puhekanavalla ja pysyy ilmoitusalueella."
+  },
+  "windowOverlay": {
+    "title": "Ikkunapeittokuva poistettiin",
+    "description": "Kelluvaa peittokuvaikkunaa ei enää ole. Sen sijaan pelin sisäinen peittokuva näyttää peleissäsi, kuka puhuu. Voit ottaa sen käyttöön peittokuvan asetuksista.",
+    "dismiss": "Selvä",
+    "openSettings": "Avaa peittokuvan asetukset"
+  },
+  "appImageMenu": {
+    "title": "Lisätäänkö Mumcord sovellusvalikkoon?",
+    "description": "Näin Mumcord näkyy sovellusvalikossasi. Kuvake ja puhu painamalla toimivat oikein Waylandissa, ja mumble://-linkit avaavat Mumcordin. Voit muuttaa tätä myöhemmin asetuksista.",
+    "no": "Ei",
+    "yes": "Kyllä",
+    "failed": "Se ei onnistunut. Yritä uudelleen."
+  },
+  "updateCheck": {
+    "title": "Etsitäänkö uusia versioita?",
+    "description": "Mumcord voi kysyä GitHubilta kerran päivässä, onko uudempaa versiota, ja näyttää vihjeen linkin kera. Mitään ei ladata eikä asenneta, eikä mitään lähetetä itse pyynnön sekä sovelluksen nimen ja version lisäksi. Voit muuttaa tätä myöhemmin asetuksista.",
+    "no": "Ei",
+    "yes": "Kyllä",
+    "failed": "Se ei onnistunut. Yritä uudelleen."
+  },
+  "updateHint": {
+    "message": "Mumcord {{version}} on saatavilla.",
+    "open": "Näytä julkaisu",
+    "dismiss": "Ohita"
+  },
+  "directConsent": {
+    "title": "Sallitaanko suorat yhteydet?",
+    "description": "Suorat yhteydet ovat nopeampia, mutta toinen henkilö näkee IP-osoitteesi. Mumcord käyttää niitä täysikokoisiin kuviin ja näytön jakamiseen muiden Mumcord-käyttäjien kanssa ja voi avata niitä varten portin reitittimeesi. Jos vastaat ei, kuvat tulevat edelleen palvelimen kautta eikä näytön jakaminen ole käytettävissä. Voit muuttaa tätä myöhemmin kohdassa Asetukset → Yksityisyys.",
+    "no": "Ei",
+    "yes": "Kyllä",
     "failed": "Se ei onnistunut. Yritä uudelleen."
   }
 }

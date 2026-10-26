@@ -8,6 +8,7 @@
     "unknownPerson": "Tuntematon henkilö"
   },
   "list": {
+    "server": "Palvelin",
     "today": "Tänään",
     "yesterday": "Eilen",
     "label": "Viestit: {{name}}",
@@ -32,7 +33,8 @@
     "strike": "Yliviivaus",
     "code": "Koodi tekstissä",
     "codeBlock": "Koodilohko",
-    "link": "Linkki"
+    "link": "Linkki",
+    "quote": "Lainaus"
   },
   "composer": {
     "label": "Viesti: {{name}}",
@@ -64,7 +66,14 @@
     "notConnected": "Et ole yhteydessä. Yhdistä uudelleen ja yritä sitten.",
     "generic": "Viestiä ei voitu lähettää. Yritä uudelleen.",
     "onlyImages": "Vain kuvia voi lähettää.",
-    "sourceTooLarge": "Tiedosto on liian suuri lähetettäväksi (yli 25 Mt)."
+    "sourceTooLarge": "Tiedosto on liian suuri lähetettäväksi (yli 25 Mt).",
+    "personOffline": "Tämä henkilö ei ole paikalla. Yritä uudelleen, kun hän palaa."
+  },
+  "failed": {
+    "notSent": "Ei lähetetty.",
+    "retry": "Yritä uudelleen",
+    "remove": "Poista",
+    "announce": "Viestiä ei voitu lähettää."
   },
   "announce": {
     "message": "{{name}}: {{text}}",
@@ -75,7 +84,9 @@
   "pinned": {
     "label": "Kanavan tiedot",
     "showMore": "Näytä lisää",
-    "showLess": "Näytä vähemmän"
+    "showLess": "Näytä vähemmän",
+    "hideWelcome": "Piilota tervetuloviesti",
+    "hideDescription": "Piilota kanavan kuvaus"
   },
   "mention": {
     "list": "Mainittavat henkilöt",
@@ -128,6 +139,7 @@
     "next": "Seuraava kuva",
     "unnamed": "kuva",
     "fullLoading": "Ladataan täysikokoista…",
+    "fullCancel": "Peruuta täysikokoinen lataus",
     "fullProgress": "Ladataan täysikokoista… {{percent}} %",
     "fullUnavailable": "Täysikokoista ei saatavilla – näytetään esikatselu"
   },
@@ -141,11 +153,62 @@
     "hint": "Nuolinäppäimet liikkuvat, Enter lähettää, Delete poistaa, Escape sulkee.",
     "empty": "Ei vielä suosikkeja. Napsauta GIFiä chatissa hiiren oikealla painikkeella tai käytä sen tähteä ja valitse ”Tallenna suosikiksi”. Se näkyy sitten täällä."
   },
+  "linkMenu": {
+    "label": "Linkki",
+    "copy": "Kopioi linkki",
+    "open": "Avaa linkki",
+    "copied": "Linkki kopioitu"
+  },
   "imageMenu": {
     "label": "Kuva {{name}}"
   },
   "attribution": {
     "via": "lähde: {{brand}}",
     "view": "Näytä palvelussa {{brand}}"
+  },
+  "themeCard": {
+    "label": "Jaettu teema {{name}}",
+    "apply": "Käytä teemaa",
+    "more": "Käytä palvelimella",
+    "menuLabel": "Käytä teemaa kohteessa",
+    "applyToServer": "Käytä palvelimella {{server}}",
+    "imported": "Tuotu ✓",
+    "newer": "Tehty Mumcordin versiolla {{version}} – päivitä nähdäksesi sen kokonaan",
+    "failed": "Teemaa ei voitu ottaa käyttöön."
+  },
+  "reply": {
+    "action": "Vastaa",
+    "actionFor": "Vastaa käyttäjälle {{name}}",
+    "menu": "Viesti käyttäjältä {{name}}",
+    "replyTo": "Vastaus käyttäjälle",
+    "jump": "Siirry alkuperäiseen viestiin",
+    "image": "Kuva",
+    "replyingTo": "Vastaat käyttäjälle",
+    "cancel": "Peruuta vastaus"
+  },
+  "actions": {
+    "label": "Aloita yhdessä",
+    "notConnected": "Ei yhteyttä palvelimeen.",
+    "partyRunning": "Tällä kanavalla on jo käynnissä yhteiskatselu.",
+    "invalidLink": "Tämä ei ole YouTube-videon linkki.",
+    "linkLabel": "YouTube-linkki",
+    "linkPlaceholder": "Liitä YouTube-linkki",
+    "confirm": "Aloita",
+    "watchHint": "Katso YouTube-video yhdessä tämän kanavan kanssa",
+    "dialogTitle": "Katsotaan yhdessä",
+    "addTitle": "Lisää soittolistaan",
+    "addToPlaylist": "Lisää soittolistaan",
+    "addConfirm": "Lisää",
+    "apps": "Sovellukset",
+    "appsLive": "Sovellukset (jaat näyttöäsi)"
+  },
+  "activity": {
+    "share": "{{name}} jakaa näyttöään",
+    "watch": "Katso",
+    "party": "Yhteiskatselu: {{title}}",
+    "join": "Liity",
+    "videoFallback": "YouTube-video",
+    "someone": "Joku",
+    "joinFailed": "Yhteiskatseluun liittyminen epäonnistui."
   }
 }

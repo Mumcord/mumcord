@@ -11,7 +11,7 @@
     "undeafened": "Undeafened"
   },
   "readOnly": {
-    "text": "You're reading along – join a channel to talk.",
+    "text": "Read-only – Join a channel to talk.",
     "join": "Join {{channel}}"
   },
   "status": {
@@ -32,7 +32,15 @@
     "avatarUnregistered": "This server keeps avatars only for registered users – Mumcord re-sends yours on each connect.",
     "avatarChosen": "Selected: {{name}}",
     "avatarRemoved": "The picture will be removed when you save.",
-    "comment": "About you"
+    "comment": "About you",
+    "format": "Text formatting",
+    "bold": "Bold",
+    "italic": "Italic",
+    "link": "Link",
+    "linkAddress": "Link address",
+    "linkApply": "Add link",
+    "bulletList": "Bulleted list",
+    "numberedList": "Numbered list"
   },
   "register": {
     "title": "Register on this server",
@@ -69,8 +77,6 @@
     "nowGaming": "Share the game I'm playing",
     "nowGamingHint": "Others see your current game",
     "unavailable": "Not available on this system",
-    "overlay": "Overlay",
-    "overlayHint": "Shows who is talking on top of games",
     "editProfile": "Edit profile",
     "editProfileHint": "Name, avatar and comment",
     "register": "Register on this server",
@@ -84,5 +90,10 @@
     "offerImagesHint": "Let others load your original images",
     "loadImages": "Load full-size images",
     "loadImagesHint": "Fetch original images from others"
+  },
+  "voice": {
+    "line": "Voice: {{channel}} · {{server}}",
+    "server": "Voice: {{server}}",
+    "show": "{{location}} – show this server"
   }
 }

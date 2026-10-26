@@ -14,14 +14,17 @@
   },
   "dm": {
     "title": "Mesaje directe",
-    "unknown": "Persoană necunoscută"
+    "unknown": "Persoană necunoscută",
+    "withServer": "{{name}}, pe {{server}}"
   },
   "notify": {
     "channel": "{{name}} în {{channel}}: {{text}}",
     "private": "{{name}} (privat): {{text}}",
     "more_one": "Încă {{count}} mesaj nou",
     "more_few": "Încă {{count}} mesaje noi",
-    "more_other": "Încă {{count}} de mesaje noi"
+    "more_other": "Încă {{count}} de mesaje noi",
+    "channelOn": "{{name}} în {{channel}} pe {{server}}: {{text}}",
+    "privateOn": "{{name}} (privat, {{server}}): {{text}}"
   },
   "history": {
     "clear": "Șterge istoricul",

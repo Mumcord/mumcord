@@ -2,9 +2,6 @@
   "inChannel_zero": "Kanālā {{channel}} ({{count}})",
   "inChannel_one": "Kanālā {{channel}} ({{count}})",
   "inChannel_other": "Kanālā {{channel}} ({{count}})",
-  "listening_zero": "Klausās ({{count}})",
-  "listening_one": "Klausās ({{count}})",
-  "listening_other": "Klausās ({{count}})",
   "noChannel": "Izvēlies kanālu, lai redzētu, kas tajā ir.",
   "nobody": "Šeit neviena nav.",
   "nobodyElse": "Serverī nav neviena cita.",
@@ -13,6 +10,26 @@
   "registered": "Reģistrēts",
   "unregistered": "Nereģistrēts",
   "talking": "Runā",
+  "quality": {
+    "label": "Savienojums",
+    "summary": "Savienojums: {{level}}",
+    "level": {
+      "good": "Labs",
+      "fair": "Vidējs",
+      "weak": "Vājš",
+      "unknown": "Nezināms"
+    },
+    "ping": "Ping",
+    "loss": "Pakešu zudums",
+    "late": "Novēlotas paketes",
+    "bandwidth": "Joslas platums",
+    "transport": "Balss pārraide",
+    "client": "Klients",
+    "os": "Operētājsistēma",
+    "ms": "{{value}} ms",
+    "percent": "{{value}} %",
+    "kbps": "{{value}} kbit/s"
+  },
   "card": {
     "close": "Aizvērt",
     "loadFailed": "Profilu neizdevās ielādēt.",
@@ -24,6 +41,9 @@
     "privateMessage": "Privāta ziņa",
     "localSettings": "Tavi iestatījumi",
     "localSettingsHint": "Tikai tu tos redzi. Izmaiņas tiek saglabātas uzreiz.",
+    "settingsFor": "{{name}} iestatījumi",
+    "hintMuted": "Apklusināts",
+    "hintVolume": "Skaļums {{value}} %",
     "localMuteHint": "Tu šo cilvēku nedzirdēsi.",
     "privateNote": "Privāta piezīme",
     "privateNoteHint": "Šo piezīmi redzi tikai tu.",
@@ -38,7 +58,8 @@
     "viewProfile": "Skatīt profilu",
     "join": "Pievienoties kanālam {{channel}}",
     "joinDenied": "Jums nav atļaujas ieiet šajā kanālā.",
-    "mute": "Izslēgt man"
+    "mute": "Izslēgt man",
+    "connectionInfo": "Savienojuma informācija…"
   },
   "nowPlaying": {
     "label": "Tagad skan",

@@ -14,5 +14,6 @@
   "image": "Wysłano obraz",
   "open": "Otwórz czat",
   "close": "Zamknij powiadomienie",
-  "mentionLine": "{{sender}} wspomina o Tobie: {{preview}}"
+  "mentionLine": "{{sender}} wspomina o Tobie: {{preview}}",
+  "withServer": "{{server}} · {{what}}"
 }

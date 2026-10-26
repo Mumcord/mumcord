@@ -98,5 +98,10 @@
     "ingameOverlayHint": "Toont wie er praat bovenop je game (Linux). Je kunt dit later per game in- of uitschakelen in de instellingen.",
     "ingameOverlayWarning": "Sommige games met anticheat kunnen overlays in de game markeren of blokkeren. Mumcord laat bekende risicogames (zoals Valorant of League of Legends) standaard uit. Schakel hem alleen in voor games die je vertrouwt.",
     "ingameOverlayAlt": "Voorbeeld van de overlay in de game die toont wie er praat"
+  },
+  "updates": {
+    "title": "Nieuwe versies",
+    "check": "Zoeken naar nieuwe versies",
+    "hint": "Mumcord kan GitHub één keer per dag vragen of er een nieuwere versie is en dan een melding met een link tonen. Er wordt niets gedownload of geïnstalleerd, en er wordt niets verstuurd behalve het verzoek zelf en de naam en versie van de app. Je kunt dit later wijzigen in Instellingen."
   }
 }

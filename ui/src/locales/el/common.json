@@ -9,5 +9,17 @@
   "retry": "Δοκίμασε ξανά",
   "loading": "Φόρτωση…",
   "beta": "Beta",
-  "betaFeature": "Δυνατότητα beta"
+  "betaFeature": "Δυνατότητα beta",
+  "themePicker": {
+    "swatch": "{{name}}, θέμα",
+    "swatchSelected": "{{name}}, θέμα, επιλεγμένο",
+    "yourThemes": "Τα θέματά σου",
+    "add": "Νέο θέμα από το τρέχον",
+    "addShort": "Νέο"
+  },
+  "floatingWidget": {
+    "collapse": "Σύμπτυξη",
+    "expand": "Ανάπτυξη",
+    "handle": "{{name}}: τα βέλη μετακινούν, Shift+βέλη αλλάζουν μέγεθος"
+  }
 }

@@ -32,7 +32,15 @@
     "avatarUnregistered": "Šis serveris avatarus saugo tik registruotiems naudotojams – Mumcord išsiunčia tavo avatarą iš naujo kiekvieną kartą prisijungus.",
     "avatarChosen": "Pasirinkta: {{name}}",
     "avatarRemoved": "Nuotrauka bus pašalinta, kai įrašysi.",
-    "comment": "Apie tave"
+    "comment": "Apie tave",
+    "format": "Teksto formatavimas",
+    "bold": "Paryškintas",
+    "italic": "Kursyvas",
+    "link": "Nuoroda",
+    "linkAddress": "Nuorodos adresas",
+    "linkApply": "Pridėti nuorodą",
+    "bulletList": "Sąrašas su ženkleliais",
+    "numberedList": "Numeruotas sąrašas"
   },
   "register": {
     "title": "Registruotis šiame serveryje",
@@ -69,8 +77,6 @@
     "nowGaming": "Dalintis, kokį žaidimą žaidžiu",
     "nowGamingHint": "Kiti mato tavo dabartinį žaidimą",
     "unavailable": "Šioje sistemoje nepasiekiama",
-    "overlay": "Perdanga",
-    "overlayHint": "Rodo, kas kalba, virš žaidimų",
     "editProfile": "Redaguoti profilį",
     "editProfileHint": "Vardas, avataras ir komentaras",
     "register": "Registruotis šiame serveryje",
@@ -84,5 +90,10 @@
     "offerImagesHint": "Leisti kitiems įkelti tavo originalius paveikslėlius",
     "loadImages": "Įkelti pilno dydžio paveikslėlius",
     "loadImagesHint": "Gauti originalius paveikslėlius iš kitų"
+  },
+  "voice": {
+    "line": "Balsas: {{channel}} · {{server}}",
+    "server": "Balsas: {{server}}",
+    "show": "{{location}} – rodyti šį serverį"
   }
 }

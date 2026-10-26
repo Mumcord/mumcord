@@ -98,5 +98,10 @@
     "ingameOverlayHint": "Zīmē, kas runā, virs tavas spēles (Linux). Vēlāk iestatījumos vari to ieslēgt vai izslēgt katrai spēlei atsevišķi.",
     "ingameOverlayWarning": "Dažas spēles ar pretkrāpšanās aizsardzību var atzīmēt vai bloķēt pārklājumus spēlēs. Mumcord pēc noklusējuma atstāj izslēgtu zināmi riskantām spēlēm (piemēram, Valorant vai League of Legends). Ieslēdz to tikai spēlēm, kurām uzticies.",
     "ingameOverlayAlt": "Spēles pārklājuma piemērs, kas rāda, kas runā"
+  },
+  "updates": {
+    "title": "Jaunas versijas",
+    "check": "Meklēt jaunas versijas",
+    "hint": "Mumcord var reizi dienā pajautāt GitHub, vai ir jaunāka versija, un parādīt padomu ar saiti. Nekas netiek lejupielādēts vai instalēts, un nekas netiek sūtīts, izņemot pašu pieprasījumu un lietotnes nosaukumu un versiju. To vari vēlāk mainīt iestatījumos."
   }
 }

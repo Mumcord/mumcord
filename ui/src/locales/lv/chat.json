@@ -8,6 +8,7 @@
     "unknownPerson": "Nezināms cilvēks"
   },
   "list": {
+    "server": "Serveris",
     "today": "Šodien",
     "yesterday": "Vakar",
     "label": "Ziņas kanālā {{name}}",
@@ -34,7 +35,8 @@
     "strike": "Pārsvītrots",
     "code": "Iekļauts kods",
     "codeBlock": "Koda bloks",
-    "link": "Saite"
+    "link": "Saite",
+    "quote": "Citāts"
   },
   "composer": {
     "label": "Rakstīt ziņu: {{name}}",
@@ -66,7 +68,14 @@
     "notConnected": "Tu neesi savienots. Izveido savienojumu atkārtoti un mēģini vēlreiz.",
     "generic": "Ziņu neizdevās nosūtīt. Mēģini vēlreiz.",
     "onlyImages": "Var sūtīt tikai attēlus.",
-    "sourceTooLarge": "Šis fails ir pārāk liels, lai to nosūtītu (virs 25 MB)."
+    "sourceTooLarge": "Šis fails ir pārāk liels, lai to nosūtītu (virs 25 MB).",
+    "personOffline": "Šī persona nav tiešsaistē. Mēģini vēlreiz, kad tā atgriezīsies."
+  },
+  "failed": {
+    "notSent": "Nav nosūtīts.",
+    "retry": "Mēģināt vēlreiz",
+    "remove": "Dzēst",
+    "announce": "Ziņu neizdevās nosūtīt."
   },
   "announce": {
     "message": "{{name}}: {{text}}",
@@ -78,7 +87,9 @@
   "pinned": {
     "label": "Kanāla informācija",
     "showMore": "Rādīt vairāk",
-    "showLess": "Rādīt mazāk"
+    "showLess": "Rādīt mazāk",
+    "hideWelcome": "Paslēpt sveiciena ziņu",
+    "hideDescription": "Paslēpt kanāla aprakstu"
   },
   "mention": {
     "list": "Pieminamie cilvēki",
@@ -132,6 +143,7 @@
     "next": "Nākamais attēls",
     "unnamed": "attēls",
     "fullLoading": "Ielādē pilnu izmēru…",
+    "fullCancel": "Atcelt pilna izmēra lejupielādi",
     "fullProgress": "Ielādē pilnu izmēru… {{percent}} %",
     "fullUnavailable": "Pilns izmērs nav pieejams – tiek rādīts priekšskatījums"
   },
@@ -145,11 +157,62 @@
     "hint": "Bulttaustiņi pārvieto, Enter sūta, Delete noņem, Escape aizver.",
     "empty": "Izlasē vēl nekā nav. Noklikšķini ar peles labo pogu uz GIF čatā vai izmanto zvaigznīti uz tā un izvēlies “Saglabāt izlasē”. Tas parādīsies šeit."
   },
+  "linkMenu": {
+    "label": "Saite",
+    "copy": "Kopēt saiti",
+    "open": "Atvērt saiti",
+    "copied": "Saite nokopēta"
+  },
   "imageMenu": {
     "label": "Attēls {{name}}"
   },
   "attribution": {
     "via": "caur {{brand}}",
     "view": "Skatīt {{brand}}"
+  },
+  "themeCard": {
+    "label": "Kopīgots motīvs {{name}}",
+    "apply": "Lietot motīvu",
+    "more": "Lietot serverim",
+    "menuLabel": "Lietot motīvu",
+    "applyToServer": "Lietot serverim {{server}}",
+    "imported": "Importēts ✓",
+    "newer": "Izveidots ar Mumcord {{version}} – atjaunini, lai redzētu pilnībā",
+    "failed": "Motīvu neizdevās lietot."
+  },
+  "reply": {
+    "action": "Atbildēt",
+    "actionFor": "Atbildēt {{name}}",
+    "menu": "Ziņa no {{name}}",
+    "replyTo": "Atbilde",
+    "jump": "Pāriet uz sākotnējo ziņu",
+    "image": "Attēls",
+    "replyingTo": "Atbilde",
+    "cancel": "Atcelt atbildi"
+  },
+  "actions": {
+    "label": "Sākt kopā",
+    "notConnected": "Nav savienojuma ar serveri.",
+    "partyRunning": "Šajā kanālā jau notiek kopīga skatīšanās.",
+    "invalidLink": "Šī nav YouTube video saite.",
+    "linkLabel": "YouTube saite",
+    "linkPlaceholder": "Ielīmē YouTube saiti",
+    "confirm": "Sākt",
+    "watchHint": "Skatīties YouTube video kopā ar šo kanālu",
+    "dialogTitle": "Skatīties kopā",
+    "addTitle": "Pievienot atskaņošanas sarakstam",
+    "addToPlaylist": "Pievienot atskaņošanas sarakstam",
+    "addConfirm": "Pievienot",
+    "apps": "Lietotnes",
+    "appsLive": "Lietotnes (tu kopīgo ekrānu)"
+  },
+  "activity": {
+    "share": "{{name}} kopīgo ekrānu",
+    "watch": "Skatīties",
+    "party": "Kopīga skatīšanās: {{title}}",
+    "join": "Pievienoties",
+    "videoFallback": "YouTube video",
+    "someone": "Kāds",
+    "joinFailed": "Neizdevās pievienoties kopīgajai skatīšanai."
   }
 }

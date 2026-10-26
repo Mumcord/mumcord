@@ -13,13 +13,16 @@
   },
   "dm": {
     "title": "Direct messages",
-    "unknown": "Unknown person"
+    "unknown": "Unknown person",
+    "withServer": "{{name}}, on {{server}}"
   },
   "notify": {
     "channel": "{{name}} in {{channel}}: {{text}}",
     "private": "{{name}} (private): {{text}}",
     "more_one": "{{count}} more new message",
-    "more_other": "{{count}} more new messages"
+    "more_other": "{{count}} more new messages",
+    "channelOn": "{{name}} in {{channel}} on {{server}}: {{text}}",
+    "privateOn": "{{name}} (private, {{server}}): {{text}}"
   },
   "history": {
     "clear": "Clear history",

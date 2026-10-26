@@ -5,6 +5,39 @@
     "remember": "Cuimhnigh ar mo rogha",
     "minimize": "Íoslaghdaigh go dtí an tráidire",
     "quit": "Scoir",
+    "failed": "Níor oibrigh sé sin. Bain triail eile as.",
+    "descriptionServers": "Tá tú fós ceangailte le {{count}} freastalaí. Íoslaghdaithe, coinníonn Mumcord sa ghuth thú agus fanann sé i dtráidire an chórais."
+  },
+  "windowOverlay": {
+    "title": "Baineadh an forleagan fuinneoige",
+    "description": "Níl an fhuinneog forleagain ar snámh ann a thuilleadh. Ina háit, taispeánann an forleagan sa chluiche cé atá ag caint i do chluichí. Is féidir leat é a chasadh air i socruithe an fhorleagain.",
+    "dismiss": "Tuigim",
+    "openSettings": "Oscail socruithe an fhorleagain"
+  },
+  "appImageMenu": {
+    "title": "Mumcord a chur le roghchlár na n-aipeanna?",
+    "description": "Cuireann sé seo Mumcord i do roghchlár aipeanna. Oibríonn an deilbhín agus brúigh-chun-cainte i gceart ar Wayland, agus osclaíonn naisc mumble:// Mumcord. Is féidir leat é seo a athrú níos déanaí sna Socruithe.",
+    "no": "Níl",
+    "yes": "Tá",
+    "failed": "Níor oibrigh sé sin. Bain triail eile as."
+  },
+  "updateCheck": {
+    "title": "Seiceáil le haghaidh leaganacha nua?",
+    "description": "Is féidir le Mumcord fiafraí de GitHub uair sa lá an bhfuil leagan níos nuaí ann agus leid le nasc a thaispeáint. Ní íoslódáiltear ná ní shuiteáiltear aon rud, agus ní sheoltar aon rud ach an t-iarratas féin agus ainm agus leagan na haipe. Is féidir leat é seo a athrú níos déanaí sna Socruithe.",
+    "no": "Níl",
+    "yes": "Tá",
+    "failed": "Níor oibrigh sé sin. Bain triail eile as."
+  },
+  "updateHint": {
+    "message": "Tá Mumcord {{version}} ar fáil.",
+    "open": "Féach ar an eisiúint",
+    "dismiss": "Ruaig"
+  },
+  "directConsent": {
+    "title": "Ceangail dhíreacha a cheadú?",
+    "description": "Bíonn ceangail dhíreacha níos tapúla, ach feicfidh an duine eile do sheoladh IP. Úsáideann Mumcord iad le haghaidh íomhánna lánmhéide agus comhroinnt scáileáin le húsáideoirí eile Mumcord, agus d’fhéadfadh sé port a oscailt ar do ródaire dóibh. Má deir tú nach ea, tiocfaidh íomhánna tríd an bhfreastalaí fós agus ní bheidh comhroinnt scáileáin ar fáil. Is féidir leat é seo a athrú níos déanaí i Socruithe → Príobháideacht.",
+    "no": "Níl",
+    "yes": "Tá",
     "failed": "Níor oibrigh sé sin. Bain triail eile as."
   }
 }

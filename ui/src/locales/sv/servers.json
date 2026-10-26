@@ -13,10 +13,15 @@
     "listLabel": "Sparade servrar",
     "add": "Lägg till en server",
     "keyboardHint": "Enter ansluter. Alt plus uppåt- eller nedåtpil flyttar servern. Skift plus F10 öppnar fler alternativ.",
-    "status": {
-      "connected": "{{server}} (ansluten)",
-      "connecting": "{{server}} (ansluter)",
-      "reconnecting": "{{server}} (återansluter)"
+    "label": "{{server}} ({{state}})",
+    "state": {
+      "connected": "ansluten",
+      "connecting": "ansluter",
+      "reconnecting": "återansluter",
+      "error": "anslutningen bröts",
+      "voice": "röstserver",
+      "unread": "olästa meddelanden",
+      "mentions": "omnämnanden: {{mentions}}"
     }
   },
   "menu": {
@@ -26,7 +31,19 @@
     "edit": "Redigera server",
     "moveUp": "Flytta upp",
     "moveDown": "Flytta ned",
-    "remove": "Ta bort server"
+    "remove": "Ta bort server",
+    "reconnect": "Återanslut",
+    "alwaysConnect": "Anslut alltid vid start",
+    "muteNotifications": "Stäng av aviseringar",
+    "theme": "Tema…",
+    "showWelcome": "Visa välkomstmeddelande"
+  },
+  "theme": {
+    "title": "Tema för {{server}}",
+    "label": "Tema",
+    "useApp": "Använd appens tema",
+    "hint": "Gäller medan den här servern visas.",
+    "failed": "Temat kunde inte sparas. Försök igen."
   },
   "dialog": {
     "addTitle": "Lägg till en server",
@@ -50,7 +67,14 @@
       "username": "Ange namnet du vill använda på den här servern.",
       "link": "Den här mumble://-länken kan inte läsas. Kontrollera att den kopierades helt.",
       "invalid": "Serveruppgifterna är ogiltiga. Kontrollera adress och port."
-    }
+    },
+    "alwaysConnect": "Anslut alltid vid start",
+    "alwaysConnectHint": "Mumcord ansluter den här servern skrivskyddat vid start.",
+    "channelPasswords": "Kanallösenord",
+    "channelPassword": "Kanallösenord {{number}}",
+    "removeChannelPassword": "Ta bort {{name}}",
+    "remove": "Ta bort",
+    "channelPasswordsHint": "Sparas när en skyddad kanal har godkänt dem. Borttagna efterfrågas igen nästa gång du går med."
   },
   "errors": {
     "serverUnreachable": "Servern kan inte nås. Kontrollera adress och port, och att du är online.",
@@ -63,17 +87,16 @@
     "invalidAddress": "Serveradressen är ogiltig. Redigera servern för att rätta den.",
     "secureStorage": "Systemets säkra lagring är inte tillgänglig, så serverlösenordet kunde inte läsas eller sparas. Lås upp den och försök igen.",
     "notFound": "Den här servern är inte längre sparad.",
-    "generic": "Något gick fel. Försök igen."
+    "generic": "Något gick fel. Försök igen.",
+    "serverLimit": "Du är redan ansluten till max {{limit}} servrar. Koppla från en server eller höj gränsen i Inställningar → Servrar.",
+    "serverLimitUnknown": "Du är redan ansluten till max antal servrar. Koppla från en server eller höj gränsen i Inställningar → Servrar.",
+    "alwaysConnectLimit": "Bara {{limit}} servrar kan ha ”Anslut alltid vid start”, lika många som gränsen för anslutna servrar. Stäng av det för en annan server eller höj gränsen i Inställningar → Servrar.",
+    "alwaysConnectLimitUnknown": "Fler servrar än gränsen för anslutna servrar kan inte ha ”Anslut alltid vid start”. Stäng av det för en annan server eller höj gränsen i Inställningar → Servrar."
   },
   "remove": {
     "title": "Ta bort {{server}}?",
     "message": "Det sparade lösenordet, certifikatbeslutet, följda kanaler och chatthistoriken på den här datorn raderas.",
     "confirm": "Ta bort"
-  },
-  "switch": {
-    "title": "Byta server?",
-    "message": "Du kan bara vara på en server åt gången. Koppla från {{current}} och anslut till {{next}}?",
-    "confirm": "Koppla från och byt"
   },
   "cert": {
     "newTitle": "Lita på den här servern?",
@@ -108,7 +131,10 @@
     "actionFailed": {
       "reorder": "Den nya serverordningen kunde inte sparas. Försök igen.",
       "remove": "Servern kunde inte tas bort. Försök igen.",
-      "disconnect": "Det gick inte att koppla från. Försök igen."
+      "disconnect": "Det gick inte att koppla från. Försök igen.",
+      "alwaysConnect": "”Anslut alltid vid start” kunde inte sparas. Försök igen.",
+      "notifications": "Aviseringsinställningen kunde inte sparas. Försök igen.",
+      "savePassword": "Det nya lösenordet kunde inte sparas. Redigera servern för att spara det."
     }
   },
   "empty": {
@@ -124,5 +150,27 @@
     "errors": {
       "required": "Ange en serveradress eller en mumble://-länk."
     }
+  },
+  "password": {
+    "title": "Lösenord för {{server}}",
+    "intro": "Servern godkände inte lösenordet. Ange rätt lösenord för att försöka igen.",
+    "label": "Lösenord",
+    "show": "Visa",
+    "hide": "Dölj",
+    "wrong": "Det lösenordet är också fel. Försök igen.",
+    "save": "Spara lösenord",
+    "cancel": "Avbryt",
+    "connect": "Anslut",
+    "connecting": "Ansluter…"
+  },
+  "channelPassword": {
+    "title": "Den här kanalen kräver ett lösenord",
+    "intro": "Ange lösenordet för {{channel}}.",
+    "label": "Lösenord",
+    "wrong": "Fel lösenord",
+    "failed": "Lösenordet kunde inte skickas. Försök igen.",
+    "cancel": "Avbryt",
+    "join": "Gå med",
+    "joining": "Går med…"
   }
 }

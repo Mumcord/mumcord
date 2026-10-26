@@ -13,10 +13,15 @@
     "listLabel": "Spremljeni poslužitelji",
     "add": "Dodaj poslužitelj",
     "keyboardHint": "Enter povezuje. Alt i strelica gore ili dolje pomiču poslužitelj. Shift i F10 otvaraju više opcija.",
-    "status": {
-      "connected": "{{server}} (povezan)",
-      "connecting": "{{server}} (povezivanje)",
-      "reconnecting": "{{server}} (ponovno povezivanje)"
+    "label": "{{server}} ({{state}})",
+    "state": {
+      "connected": "povezan",
+      "connecting": "povezivanje",
+      "reconnecting": "ponovno povezivanje",
+      "error": "veza prekinuta",
+      "voice": "glasovni poslužitelj",
+      "unread": "nepročitane poruke",
+      "mentions": "spominjanja: {{mentions}}"
     }
   },
   "menu": {
@@ -26,7 +31,19 @@
     "edit": "Uredi poslužitelj",
     "moveUp": "Pomakni gore",
     "moveDown": "Pomakni dolje",
-    "remove": "Ukloni poslužitelj"
+    "remove": "Ukloni poslužitelj",
+    "reconnect": "Ponovno se poveži",
+    "alwaysConnect": "Uvijek se poveži pri pokretanju",
+    "muteNotifications": "Utišaj obavijesti",
+    "theme": "Tema…",
+    "showWelcome": "Prikaži poruku dobrodošlice"
+  },
+  "theme": {
+    "title": "Tema za {{server}}",
+    "label": "Tema",
+    "useApp": "Koristi temu aplikacije",
+    "hint": "Vrijedi dok je prikazan ovaj poslužitelj.",
+    "failed": "Temu nije bilo moguće spremiti. Pokušaj ponovno."
   },
   "dialog": {
     "addTitle": "Dodaj poslužitelj",
@@ -50,7 +67,14 @@
       "username": "Unesi ime koje želiš koristiti na ovom poslužitelju.",
       "link": "Ovu mumble:// poveznicu nije moguće pročitati. Provjeri je li kopirana u cijelosti.",
       "invalid": "Podaci o poslužitelju nisu ispravni. Provjeri adresu i port."
-    }
+    },
+    "alwaysConnect": "Uvijek se poveži pri pokretanju",
+    "alwaysConnectHint": "Mumcord pri pokretanju povezuje ovaj poslužitelj samo za čitanje.",
+    "channelPasswords": "Lozinke kanala",
+    "channelPassword": "Lozinka kanala {{number}}",
+    "removeChannelPassword": "Ukloni {{name}}",
+    "remove": "Ukloni",
+    "channelPasswordsHint": "Spremljene kad ih je zaštićeni kanal prihvatio. Za uklonjene te pitamo ponovno pri sljedećem ulasku."
   },
   "errors": {
     "serverUnreachable": "Poslužitelj nije dostupan. Provjeri adresu i port te jesi li na mreži.",
@@ -63,17 +87,16 @@
     "invalidAddress": "Adresa poslužitelja nije ispravna. Uredi poslužitelj da je ispraviš.",
     "secureStorage": "Sigurna pohrana tvog sustava nije dostupna pa lozinku poslužitelja nije bilo moguće pročitati ni spremiti. Otključaj je i pokušaj ponovno.",
     "notFound": "Ovaj poslužitelj više nije spremljen.",
-    "generic": "Nešto je pošlo po zlu. Pokušaj ponovno."
+    "generic": "Nešto je pošlo po zlu. Pokušaj ponovno.",
+    "serverLimit": "Već si povezan s najviše {{limit}} poslužitelja. Prekini vezu s poslužiteljem ili povećaj ograničenje u Postavke → Poslužitelji.",
+    "serverLimitUnknown": "Već si povezan s najvećim brojem poslužitelja. Prekini vezu s poslužiteljem ili povećaj ograničenje u Postavke → Poslužitelji.",
+    "alwaysConnectLimit": "Samo {{limit}} poslužitelja može imati „Uvijek se poveži pri pokretanju”, koliko je i ograničenje povezanih poslužitelja. Isključi to za drugi poslužitelj ili povećaj ograničenje u Postavke → Poslužitelji.",
+    "alwaysConnectLimitUnknown": "„Uvijek se poveži pri pokretanju” ne može imati više poslužitelja od ograničenja povezanih poslužitelja. Isključi to za drugi poslužitelj ili povećaj ograničenje u Postavke → Poslužitelji."
   },
   "remove": {
     "title": "Ukloniti {{server}}?",
     "message": "Njegova spremljena lozinka, odluka o certifikatu, praćeni kanali i povijest chata na ovom računalu bit će obrisani.",
     "confirm": "Ukloni"
-  },
-  "switch": {
-    "title": "Promijeniti poslužitelj?",
-    "message": "Istovremeno možeš biti samo na jednom poslužitelju. Odspojiti se s {{current}} i povezati s {{next}}?",
-    "confirm": "Odspoji se i promijeni"
   },
   "cert": {
     "newTitle": "Vjerovati ovom poslužitelju?",
@@ -108,7 +131,10 @@
     "actionFailed": {
       "reorder": "Novi redoslijed poslužitelja nije bilo moguće spremiti. Pokušaj ponovno.",
       "remove": "Poslužitelj nije bilo moguće ukloniti. Pokušaj ponovno.",
-      "disconnect": "Odspajanje nije uspjelo. Pokušaj ponovno."
+      "disconnect": "Odspajanje nije uspjelo. Pokušaj ponovno.",
+      "alwaysConnect": "„Uvijek se poveži pri pokretanju” nije bilo moguće spremiti. Pokušaj ponovno.",
+      "notifications": "Postavku obavijesti nije bilo moguće spremiti. Pokušaj ponovno.",
+      "savePassword": "Novu lozinku nije bilo moguće spremiti. Uredi poslužitelj da je spremiš."
     }
   },
   "empty": {
@@ -124,5 +150,27 @@
     "errors": {
       "required": "Unesi adresu poslužitelja ili mumble:// poveznicu."
     }
+  },
+  "password": {
+    "title": "Lozinka za {{server}}",
+    "intro": "Poslužitelj nije prihvatio lozinku. Unesi ispravnu i pokušaj ponovno.",
+    "label": "Lozinka",
+    "show": "Prikaži",
+    "hide": "Sakrij",
+    "wrong": "I ta je lozinka pogrešna. Pokušaj ponovno.",
+    "save": "Spremi lozinku",
+    "cancel": "Odustani",
+    "connect": "Poveži se",
+    "connecting": "Povezivanje…"
+  },
+  "channelPassword": {
+    "title": "Ovaj kanal traži lozinku",
+    "intro": "Unesi lozinku za {{channel}}.",
+    "label": "Lozinka",
+    "wrong": "Pogrešna lozinka",
+    "failed": "Lozinku nije bilo moguće poslati. Pokušaj ponovno.",
+    "cancel": "Odustani",
+    "join": "Uđi",
+    "joining": "Ulazak…"
   }
 }

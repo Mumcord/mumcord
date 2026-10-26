@@ -1,14 +1,9 @@
 {
-  "inChannel_one": "In {{channel}} ({{count}})",
-  "inChannel_two": "In {{channel}} ({{count}})",
-  "inChannel_few": "In {{channel}} ({{count}})",
-  "inChannel_many": "In {{channel}} ({{count}})",
-  "inChannel_other": "In {{channel}} ({{count}})",
-  "listening_one": "Ag éisteacht ({{count}})",
-  "listening_two": "Ag éisteacht ({{count}})",
-  "listening_few": "Ag éisteacht ({{count}})",
-  "listening_many": "Ag éisteacht ({{count}})",
-  "listening_other": "Ag éisteacht ({{count}})",
+  "inChannel_one": "I {{channel}} ({{count}})",
+  "inChannel_two": "I {{channel}} ({{count}})",
+  "inChannel_few": "I {{channel}} ({{count}})",
+  "inChannel_many": "I {{channel}} ({{count}})",
+  "inChannel_other": "I {{channel}} ({{count}})",
   "noChannel": "Roghnaigh cainéal chun a fheiceáil cé atá ann.",
   "nobody": "Níl aon duine anseo.",
   "nobodyElse": "Níl duine ar bith eile ar an bhfreastalaí.",
@@ -17,6 +12,26 @@
   "registered": "Cláraithe",
   "unregistered": "Gan chlárú",
   "talking": "Ag caint",
+  "quality": {
+    "label": "Ceangal",
+    "summary": "Ceangal: {{level}}",
+    "level": {
+      "good": "Maith",
+      "fair": "Measartha",
+      "weak": "Lag",
+      "unknown": "Anaithnid"
+    },
+    "ping": "Ping",
+    "loss": "Caillteanas paicéad",
+    "late": "Paicéid dhéanacha",
+    "bandwidth": "Bandaleithead",
+    "transport": "Iompar gutha",
+    "client": "Cliant",
+    "os": "Córas oibriúcháin",
+    "ms": "{{value}} ms",
+    "percent": "{{value}} %",
+    "kbps": "{{value}} kbit/s"
+  },
   "card": {
     "close": "Dún",
     "loadFailed": "Níorbh fhéidir an próifíl a luchtú.",
@@ -28,6 +43,9 @@
     "privateMessage": "Teachtaireacht phríobháideach",
     "localSettings": "Do shocruithe",
     "localSettingsHint": "Ní fheiceann ach tusa iad seo. Sábhálfar na hathruithe láithreach.",
+    "settingsFor": "Socruithe do {{name}}",
+    "hintMuted": "Balbhaithe",
+    "hintVolume": "Airde {{value}} %",
     "localMuteHint": "Ní chloisfidh tú an duine seo.",
     "privateNote": "Nóta príobháideach",
     "privateNoteHint": "Ní fheiceann ach tusa an nóta seo.",
@@ -42,7 +60,8 @@
     "viewProfile": "Féach ar an bpróifíl",
     "join": "Téigh isteach i {{channel}}",
     "joinDenied": "Níl cead agat dul isteach sa chainéal seo.",
-    "mute": "Balbhaigh dom"
+    "mute": "Balbhaigh dom",
+    "connectionInfo": "Faisnéis cheangail…"
   },
   "nowPlaying": {
     "label": "Ag seinm anois",

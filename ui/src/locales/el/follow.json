@@ -13,13 +13,16 @@
   },
   "dm": {
     "title": "Προσωπικά μηνύματα",
-    "unknown": "Άγνωστο άτομο"
+    "unknown": "Άγνωστο άτομο",
+    "withServer": "{{name}}, στο {{server}}"
   },
   "notify": {
     "channel": "{{name}} στο {{channel}}: {{text}}",
     "private": "{{name}} (ιδιωτικό): {{text}}",
     "more_one": "{{count}} ακόμη νέο μήνυμα",
-    "more_other": "{{count}} ακόμη νέα μηνύματα"
+    "more_other": "{{count}} ακόμη νέα μηνύματα",
+    "channelOn": "{{name}} στο {{channel}} στο {{server}}: {{text}}",
+    "privateOn": "{{name}} (ιδιωτικά, {{server}}): {{text}}"
   },
   "history": {
     "clear": "Διαγραφή ιστορικού",

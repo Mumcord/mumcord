@@ -98,5 +98,10 @@
     "ingameOverlayHint": "Nad tvojo igro prikaže, kdo govori (Linux). Pozneje ga lahko v nastavitvah vklopiš ali izklopiš za vsako igro posebej.",
     "ingameOverlayWarning": "Nekatere igre s protigoljufijsko zaščito lahko prekrivne sloje v igri označijo ali blokirajo. Mumcord ima znane tvegane igre (na primer Valorant ali League of Legends) privzeto izklopljene. Vklopi ga samo za igre, ki jim zaupaš.",
     "ingameOverlayAlt": "Primer prekrivnega sloja v igri, ki prikazuje, kdo govori"
+  },
+  "updates": {
+    "title": "Nove različice",
+    "check": "Preverjaj nove različice",
+    "hint": "Mumcord lahko enkrat na dan vpraša GitHub, ali obstaja novejša različica, in pokaže namig s povezavo. Nič se ne prenese ali namesti in nič se ne pošlje razen same zahteve ter imena in različice aplikacije. To lahko pozneje spremeniš v Nastavitvah."
   }
 }

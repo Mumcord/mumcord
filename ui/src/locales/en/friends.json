@@ -11,5 +11,7 @@
   "noCertificate": "People without a certificate can't be friends, because Mumcord could not recognise them again.",
   "add": "Add friend",
   "remove": "Remove friend",
-  "failed": "Changing the friend didn't work. Please try again."
+  "failed": "Changing the friend didn't work. Please try again.",
+  "join": "Join",
+  "joinFriend": "Join {{name}}'s channel"
 }

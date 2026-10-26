@@ -14,7 +14,9 @@
     "sounds": "Ljud och aviseringar",
     "overlay": "Overlay",
     "diagnostics": "Diagnostik",
-    "about": "Om"
+    "about": "Om",
+    "servers": "Servrar",
+    "privacy": "Integritet"
   },
   "search": {
     "label": "Sök i inställningar",
@@ -68,7 +70,17 @@
     "testPlaying": "Spelar upp din röst…",
     "quality": "Kvalitet",
     "musicQuality": "Musikkvalitet",
-    "musicQualityHint": "Använder mer bandbredd och stänger av brusreducering och automatisk volym, för musik. Push-to-talk fungerar bäst."
+    "musicQualityHint": "Använder mer bandbredd och stänger av brusreducering och automatisk volym, för musik. Push-to-talk fungerar bäst.",
+    "bitrate": "Bithastighet",
+    "bitrateMax": "Max",
+    "bitrateValue": "{{kbps}} kbit/s",
+    "bitrateMaxKnown": "Max: {{kbps}} kbit/s. Förluster på anslutningen kan fortfarande sänka den.",
+    "bitrateMaxUnknown": "Max: beror på servern. Förluster på anslutningen kan fortfarande sänka den.",
+    "videoSound": "Videoljud",
+    "ducking": "Sänk videoljudet medan någon pratar",
+    "duckingHint": "Ljudet från watch party-videon och skärmdelningen blir tystare medan någon i din röstkanal pratar.",
+    "duckingLevel": "Sänkt volym",
+    "duckingLevelValue": "{{percent}} %"
   },
   "voice": {
     "talkMode": "Pratläge",
@@ -178,6 +190,7 @@
     "compact": "Kompakt: tid, namn och meddelande på en rad",
     "theme": "Tema",
     "themeLegend": "Färgtema",
+    "modeLegend": "Mörkt eller ljust",
     "system": "Följ systemet",
     "dark": "Mörkt",
     "light": "Ljust",
@@ -189,6 +202,61 @@
     "autostart": "Starta Mumcord när jag loggar in",
     "startMinimized": "Starta minimerat",
     "startMinimizedHint": "När Mumcord startar vid inloggning väntar det i systemfältet i stället för att öppna fönstret."
+  },
+  "themeEditor": {
+    "name": "Temanamn",
+    "colorsLegend": "Huvudfärger",
+    "colorColumn": "Färg",
+    "auto": "auto",
+    "cellLabel": "{{color}}, {{version}}",
+    "newTitle": "Nytt tema",
+    "editTitle": "Redigera ”{{name}}”",
+    "generatedFromDark": "Skapat automatiskt från den mörka versionen. Följer dina ändringar där tills du ändrar det här.",
+    "generatedFromLight": "Skapat automatiskt från den ljusa versionen. Följer dina ändringar där tills du ändrar det här.",
+    "colors": {
+      "background": "Bakgrund",
+      "surface": "Yta",
+      "text": "Text",
+      "accent": "Accent",
+      "talking": "Pratar och online",
+      "warning": "Varning",
+      "error": "Fel"
+    },
+    "pickColor": "Färgväljare för {{color}}",
+    "invalidHex": "Ange färgen som # följt av sex hexadecimala siffror, till exempel #1a2b3c.",
+    "contrastLowIn": "{{version}}: för låg kontrast: {{ratio}}:1, minst {{min}}:1 krävs.",
+    "unreadable": "Det här temat är inte tillräckligt läsbart. Ändra text- eller bakgrundsfärgen för att spara det.",
+    "copyName": "{{name}} (kopia)",
+    "save": "Spara tema",
+    "saveAs": "Spara som tema",
+    "saved": "Temat har sparats.",
+    "share": "Dela",
+    "shared": "Temat har kopierats. Klistra in det i en chatt för att dela det.",
+    "shareFailed": "Mumcord kunde inte kopiera temat till urklipp.",
+    "import": "Importera…",
+    "importTitle": "Importera ett tema",
+    "importLabel": "Temameddelande eller kod",
+    "importHint": "Klistra in ett chattmeddelande med ett Mumcord-tema, eller bara dess kod (den börjar med mct1.).",
+    "importConfirm": "Importera",
+    "importInvalid": "Det här är inget giltigt Mumcord-tema.",
+    "importUnreadable": "Det här temat är inte tillräckligt läsbart.",
+    "imported": "”{{name}}” har importerats.",
+    "alreadyImported": "”{{name}}” finns redan bland dina teman.",
+    "madeWithNewer": "Skapat med Mumcord {{version}} – uppdatera för att se det helt.",
+    "reset": "Återställ",
+    "menuLabel": "Alternativ för {{name}}",
+    "edit": "Redigera tema",
+    "newFromThis": "Nytt tema från detta",
+    "preview": "Förhandsgranska",
+    "previewing": "Förhandsgranskar {{name}}",
+    "backToEditor": "Tillbaka till redigeraren",
+    "rename": "Byt namn på tema",
+    "renameTitle": "Byt namn på ”{{name}}”",
+    "renameConfirm": "Byt namn",
+    "delete": "Ta bort tema",
+    "deleteTitle": "Ta bort ”{{name}}”?",
+    "deleteMessage": "Servrar som använder det här temat går tillbaka till appens tema.",
+    "deleteConfirm": "Ta bort"
   },
   "accessibility": {
     "hints": "Tips",
@@ -212,7 +280,14 @@
     "hangUp": "Du kopplar från en server",
     "messages": "Nytt meddelande i en följd kanal eller privat chatt",
     "mention": "Ljud vid omnämning",
-    "mentionNotify": "Avisera vid omnämning"
+    "mentionNotify": "Avisera vid omnämning",
+    "partyStarted": "Någon startar en watch party i din kanal",
+    "partyJoined": "Någon går med i din watch party",
+    "partyLeft": "Någon lämnar din watch party",
+    "shareStarted": "Någon börjar dela skärm i din kanal",
+    "shareStopped": "En skärmdelning i din kanal avslutas",
+    "viewerStarted": "Någon börjar titta på din skärmdelning",
+    "viewerStopped": "Någon slutar titta på din skärmdelning"
   },
   "notifications": {
     "title": "Aviseringar",
@@ -224,29 +299,6 @@
     "off": "Av"
   },
   "overlay": {
-    "window": {
-      "title": "Fönsteroverlay",
-      "enable": "Visa overlayen",
-      "enableHint": "Ett litet genomskinligt fönster som visar vem som pratar. Finns också i systemfältsmenyn.",
-      "positionUnsupported": "Det här skrivbordet bestämmer var fönster visas, så hörnpositioner och flytt har ingen effekt.",
-      "move": "Flytta overlayen…",
-      "moveDone": "Klar med flytt",
-      "size": "Bredd",
-      "wholeChannel": "Visa hela kanalen",
-      "wholeChannelHint": "Av: bara personer som pratar.",
-      "channelName": "Visa kanalnamnet",
-      "loadFailed": "Overlayalternativen kunde inte läsas in.",
-      "saveFailed": "Overlayändringen kunde inte tillämpas.",
-      "kwin": {
-        "setUp": "Ställ in automatiskt",
-        "done": "Klart: KDE-fönsterregeln ”Mumcord overlay” är aktiv.",
-        "removed": "KDE-fönsterregeln togs bort.",
-        "remove": "Ta bort regeln",
-        "openRules": "Öppna KDE:s fönsterregler",
-        "compat": "Använd kompatibilitetsläge i stället",
-        "failed": "KDE-fönsterregeln kunde inte ändras. Öppna KDE:s fönsterregler för att lägga till den manuellt."
-      }
-    },
     "corner": {
       "label": "Position",
       "topLeft": "Uppe till vänster",
@@ -281,8 +333,16 @@
       "confirmEnable": "Slå på ändå",
       "limits": {
         "libraryMissing": "Overlay i spel är inte tillgänglig: dess overlaybibliotek (libmumcord_overlay_layer.so) hittades inte bredvid Mumcord. Installera om Mumcord för att återställa det. Fönsteroverlayen ovan används i stället.",
-        "windowsPending": "Overlay i spel är inte tillgänglig i Windows än. Fönsteroverlayen ovan används i stället.",
+        "windowsFullscreen": "Använd kantlös eller fönsterbaserad helskärm i spelet.",
         "macos": "macOS stöder inte overlayer i spel. Fönsteroverlayen ovan används i stället."
+      },
+      "opengl": {
+        "title": "OpenGL-spel",
+        "explanation": "Behövs bara för OpenGL-spel: klistra in i spelets startalternativ i Steam.",
+        "label": "Startalternativ i Steam",
+        "copy": "Kopiera",
+        "copied": "Kopierat",
+        "copyFailed": "Kopieringen misslyckades. Markera texten och kopiera den för hand."
       }
     }
   },
@@ -388,5 +448,38 @@
       "unsupported": "Inte tillgängligt på det här systemet.",
       "failed": "Stoppades efter ett fel. Stäng av och slå på det igen för att försöka på nytt."
     }
+  },
+  "servers": {
+    "connections": "Anslutningar",
+    "limit": "Samtidigt anslutna servrar",
+    "limitHint": "Mellan 1 och 15. Anslutningar över gränsen nekas.",
+    "limitInvalid": "Ange ett heltal från 1 till 15."
+  },
+  "appearanceEffects": {
+    "title": "Effekter",
+    "visualEffects": "Visuella effekter (glas, korn)",
+    "visualEffectsHint": "Frostade glasmenyer och ett subtilt filmkorn. Stängs av automatiskt när systemet ber om mindre transparens eller rörelse."
+  },
+  "channelList": {
+    "title": "Kanallista",
+    "hideEmpty": "Dölj tomma kanaler",
+    "talkingFirst": "Visa de som pratar först",
+    "weakConnection": "Visa ikon för svag anslutning",
+    "weakConnectionHint": "En liten signalikon bredvid personer med dålig anslutning."
+  },
+  "privacyDirect": {
+    "title": "Direktanslutningar",
+    "allow": "Tillåt direktanslutningar till andra Mumcord-användare",
+    "hint": "Direktanslutningar är snabbare, men den andra personen kan se din IP-adress. Tills du bestämmer dig frågar Mumcord första gången en skulle användas."
+  },
+  "updates": {
+    "title": "Uppdateringar",
+    "check": "Sök efter nya versioner",
+    "hint": "En gång om dagen frågar Mumcord GitHub efter den senaste versionen. Inget annat skickas."
+  },
+  "appImageMenu": {
+    "label": "Lägg till Mumcord i appmenyn",
+    "hint": "Gör att ikonen och push-to-talk fungerar ordentligt under Wayland och att mumble://-länkar öppnar Mumcord. Bara för AppImage.",
+    "failed": "Det fungerade inte. Försök igen."
   }
 }

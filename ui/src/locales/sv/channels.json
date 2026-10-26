@@ -4,6 +4,8 @@
     "label": "Kanaler",
     "hint": "Enter: visa chatt · Skift+Enter eller dubbelklick: gå med · Piltangenter: flytta, expandera, fäll ihop",
     "join": "Gå med",
+    "menuLabel": "Alternativ för {{channel}}",
+    "showDescription": "Visa kanalbeskrivning",
     "you": "(du)",
     "voiceHere": "du är här (röst)",
     "people_one": "{{count}} person",
@@ -16,10 +18,11 @@
     },
     "showAll": "Visa alla ({{total}})",
     "showFewer": "Visa färre",
-    "jump": "Hoppa till min kanal"
+    "jump": "Hoppa till min kanal",
+    "locked": "låst"
   },
   "status": {
-    "listening": "lyssnar",
+    "listening": "lyssnar bara",
     "talking": "pratar",
     "muted": "mikrofonen avstängd",
     "deafened": "ljudet avstängt",
@@ -32,7 +35,7 @@
   "mumcordBadge": "Använder Mumcord",
   "statusTip": {
     "registered": "Registrerad på den här servern",
-    "listening": "Lyssnar på den här kanalen",
+    "listening": "Lyssnar bara",
     "muted": "Mikrofonen avstängd",
     "deafened": "Ljudet avstängt",
     "serverMuted": "Avstängd av servern",
@@ -42,6 +45,7 @@
     "unregistered": "Inte registrerad på den här servern (gäst)",
     "nowPlaying": "Lyssnar på {{track}}",
     "nowGaming": "Spelar {{game}}",
+    "weakConnection": "Svag anslutning – hög ping eller paketförlust",
     "positional": "Positionsljud aktivt"
   },
   "announce": {
@@ -56,7 +60,8 @@
   },
   "empty": {
     "disconnected": "Inte ansluten. Välj en server för att se dess kanaler.",
-    "loading": "Läser in kanaler…"
+    "loading": "Läser in kanaler…",
+    "syncingBig": "Synkar stor server…"
   },
   "search": {
     "label": "Sök kanaler och personer",

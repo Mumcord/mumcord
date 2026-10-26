@@ -8,6 +8,7 @@
     "unknownPerson": "Ismeretlen személy"
   },
   "list": {
+    "server": "Szerver",
     "today": "Ma",
     "yesterday": "Tegnap",
     "label": "Üzenetek itt: {{name}}",
@@ -32,7 +33,8 @@
     "strike": "Áthúzott",
     "code": "Beágyazott kód",
     "codeBlock": "Kódblokk",
-    "link": "Link"
+    "link": "Link",
+    "quote": "Idézet"
   },
   "composer": {
     "label": "Üzenet neki: {{name}}",
@@ -64,7 +66,14 @@
     "notConnected": "Nincs kapcsolat. Csatlakozz újra, és próbáld újra.",
     "generic": "Az üzenetet nem sikerült elküldeni. Próbáld újra.",
     "onlyImages": "Csak képek küldhetők.",
-    "sourceTooLarge": "Ez a fájl túl nagy a küldéshez (több mint 25 MB)."
+    "sourceTooLarge": "Ez a fájl túl nagy a küldéshez (több mint 25 MB).",
+    "personOffline": "Ez a személy offline. Próbáld újra, amikor visszajön."
+  },
+  "failed": {
+    "notSent": "Nincs elküldve.",
+    "retry": "Újra",
+    "remove": "Törlés",
+    "announce": "Egy üzenetet nem sikerült elküldeni."
   },
   "announce": {
     "message": "{{name}}: {{text}}",
@@ -75,7 +84,9 @@
   "pinned": {
     "label": "Csatorna adatai",
     "showMore": "Több megjelenítése",
-    "showLess": "Kevesebb megjelenítése"
+    "showLess": "Kevesebb megjelenítése",
+    "hideWelcome": "Üdvözlő üzenet elrejtése",
+    "hideDescription": "Csatornaleírás elrejtése"
   },
   "mention": {
     "list": "Megemlíthető személyek",
@@ -128,6 +139,7 @@
     "next": "Következő kép",
     "unnamed": "kép",
     "fullLoading": "Teljes méret betöltése…",
+    "fullCancel": "Teljes méretű letöltés megszakítása",
     "fullProgress": "Teljes méret betöltése… {{percent}} %",
     "fullUnavailable": "A teljes méret nem érhető el – előnézet látható"
   },
@@ -141,11 +153,62 @@
     "hint": "Nyílbillentyűk: mozgás, Enter: küldés, Delete: eltávolítás, Escape: bezárás.",
     "empty": "Még nincsenek kedvenceid. Kattints jobb gombbal egy GIF-re a chatben, vagy használd rajta a csillagot, és válaszd a „Mentés kedvencként” lehetőséget. Itt fog megjelenni."
   },
+  "linkMenu": {
+    "label": "Link",
+    "copy": "Link másolása",
+    "open": "Link megnyitása",
+    "copied": "Link másolva"
+  },
   "imageMenu": {
     "label": "Kép: {{name}}"
   },
   "attribution": {
     "via": "forrás: {{brand}}",
     "view": "Megtekintés itt: {{brand}}"
+  },
+  "themeCard": {
+    "label": "Megosztott téma: {{name}}",
+    "apply": "Téma alkalmazása",
+    "more": "Alkalmazás egy szerverre",
+    "menuLabel": "Téma alkalmazása erre:",
+    "applyToServer": "Alkalmazás erre: {{server}}",
+    "imported": "Importálva ✓",
+    "newer": "Mumcord {{version}} verzióval készült – frissíts, hogy teljesen lásd",
+    "failed": "A témát nem sikerült alkalmazni."
+  },
+  "reply": {
+    "action": "Válasz",
+    "actionFor": "Válasz neki: {{name}}",
+    "menu": "{{name}} üzenete",
+    "replyTo": "Válasz neki:",
+    "jump": "Ugrás az eredeti üzenethez",
+    "image": "Kép",
+    "replyingTo": "Válasz neki:",
+    "cancel": "Válasz elvetése"
+  },
+  "actions": {
+    "label": "Közös indítás",
+    "notConnected": "Nincs kapcsolat a szerverrel.",
+    "partyRunning": "Ebben a csatornában már fut egy közös nézés.",
+    "invalidLink": "Ez nem YouTube-videó linkje.",
+    "linkLabel": "YouTube-link",
+    "linkPlaceholder": "Illessz be egy YouTube-linket",
+    "confirm": "Indítás",
+    "watchHint": "YouTube-videó közös nézése ezzel a csatornával",
+    "dialogTitle": "Nézzük együtt",
+    "addTitle": "Hozzáadás a lejátszási listához",
+    "addToPlaylist": "Hozzáadás a lejátszási listához",
+    "addConfirm": "Hozzáadás",
+    "apps": "Alkalmazások",
+    "appsLive": "Alkalmazások (megosztod a képernyődet)"
+  },
+  "activity": {
+    "share": "{{name}} megosztja a képernyőjét",
+    "watch": "Nézés",
+    "party": "Közös nézés: {{title}}",
+    "join": "Csatlakozás",
+    "videoFallback": "YouTube-videó",
+    "someone": "Valaki",
+    "joinFailed": "Nem sikerült csatlakozni a közös nézéshez."
   }
 }

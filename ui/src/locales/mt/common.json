@@ -9,5 +9,17 @@
   "retry": "Erġa' pprova",
   "loading": "Qed jitgħabba…",
   "beta": "Beta",
-  "betaFeature": "Funzjoni beta"
+  "betaFeature": "Funzjoni beta",
+  "themePicker": {
+    "swatch": "{{name}}, tema",
+    "swatchSelected": "{{name}}, tema, magħżula",
+    "yourThemes": "It-temi tiegħek",
+    "add": "Tema ġdida mill-attwali",
+    "addShort": "Ġdida"
+  },
+  "floatingWidget": {
+    "collapse": "Ikkollassa",
+    "expand": "Espandi",
+    "handle": "{{name}}: il-vleġeġ iċaqilqu, Shift+vleġeġ ibiddlu d-daqs"
+  }
 }

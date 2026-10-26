@@ -9,5 +9,17 @@
   "retry": "Bain triail eile as",
   "loading": "Ag luchtú…",
   "beta": "Béite",
-  "betaFeature": "Gné bhéite"
+  "betaFeature": "Gné bhéite",
+  "themePicker": {
+    "swatch": "{{name}}, téama",
+    "swatchSelected": "{{name}}, téama, roghnaithe",
+    "yourThemes": "Do théamaí",
+    "add": "Téama nua ón gceann reatha",
+    "addShort": "Nua"
+  },
+  "floatingWidget": {
+    "collapse": "Laghdaigh",
+    "expand": "Leathnaigh",
+    "handle": "{{name}}: bogann na saigheada é, athraíonn Shift+saigheada an méid"
+  }
 }

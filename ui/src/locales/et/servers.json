@@ -13,10 +13,15 @@
     "listLabel": "Salvestatud serverid",
     "add": "Lisa server",
     "keyboardHint": "Enter ühendab. Alt + üles- või allanool liigutab serverit. Shift + F10 avab lisavalikud.",
-    "status": {
-      "connected": "{{server}} (ühendatud)",
-      "connecting": "{{server}} (ühendan)",
-      "reconnecting": "{{server}} (ühendan uuesti)"
+    "label": "{{server}} ({{state}})",
+    "state": {
+      "connected": "ühendatud",
+      "connecting": "ühendan",
+      "reconnecting": "ühendan uuesti",
+      "error": "ühendus katkes",
+      "voice": "häälserver",
+      "unread": "lugemata sõnumid",
+      "mentions": "mainimised: {{mentions}}"
     }
   },
   "menu": {
@@ -26,7 +31,19 @@
     "edit": "Muuda serverit",
     "moveUp": "Liiguta üles",
     "moveDown": "Liiguta alla",
-    "remove": "Eemalda server"
+    "remove": "Eemalda server",
+    "reconnect": "Ühenda uuesti",
+    "alwaysConnect": "Ühenda alati käivitamisel",
+    "muteNotifications": "Vaigista teavitused",
+    "theme": "Teema…",
+    "showWelcome": "Näita tervitussõnumit"
+  },
+  "theme": {
+    "title": "Teema serverile {{server}}",
+    "label": "Teema",
+    "useApp": "Kasuta rakenduse teemat",
+    "hint": "Kehtib, kuni seda serverit kuvatakse.",
+    "failed": "Teemat ei õnnestunud salvestada. Proovi uuesti."
   },
   "dialog": {
     "addTitle": "Lisa server",
@@ -50,7 +67,14 @@
       "username": "Sisesta nimi, mida soovid sellel serveril kasutada.",
       "link": "Seda mumble:// linki ei saa lugeda. Kontrolli, et see on täielikult kopeeritud.",
       "invalid": "Serveri andmed pole kehtivad. Kontrolli aadressi ja porti."
-    }
+    },
+    "alwaysConnect": "Ühenda alati käivitamisel",
+    "alwaysConnectHint": "Mumcord ühendab selle serveri käivitamisel kirjutuskaitstult.",
+    "channelPasswords": "Kanalite paroolid",
+    "channelPassword": "Kanali parool {{number}}",
+    "removeChannelPassword": "Eemalda {{name}}",
+    "remove": "Eemalda",
+    "channelPasswordsHint": "Salvestatakse, kui kaitstud kanal need vastu võttis. Eemaldatud küsitakse järgmisel sisenemisel uuesti."
   },
   "errors": {
     "serverUnreachable": "Serveriga ei saa ühendust. Kontrolli aadressi ja porti ning seda, et oled internetis.",
@@ -63,17 +87,16 @@
     "invalidAddress": "Serveri aadress pole kehtiv. Paranda see serverit muutes.",
     "secureStorage": "Sinu süsteemi turvahoidla pole saadaval, seega ei saanud serveri parooli lugeda ega salvestada. Ava see ja proovi uuesti.",
     "notFound": "See server pole enam salvestatud.",
-    "generic": "Midagi läks valesti. Proovi palun uuesti."
+    "generic": "Midagi läks valesti. Proovi palun uuesti.",
+    "serverLimit": "Oled juba ühendatud maksimaalse {{limit}} serveriga. Katkesta ühendus mõne serveriga või tõsta piiri menüüs Seaded → Serverid.",
+    "serverLimitUnknown": "Oled juba ühendatud maksimaalse arvu serveritega. Katkesta ühendus mõne serveriga või tõsta piiri menüüs Seaded → Serverid.",
+    "alwaysConnectLimit": "Ainult {{limit}} serveril saab olla „Ühenda alati käivitamisel“, sama palju kui ühendatud serverite piir. Lülita see mõnel teisel serveril välja või tõsta piiri menüüs Seaded → Serverid.",
+    "alwaysConnectLimitUnknown": "„Ühenda alati käivitamisel“ ei saa olla rohkematel serveritel kui ühendatud serverite piir. Lülita see mõnel teisel serveril välja või tõsta piiri menüüs Seaded → Serverid."
   },
   "remove": {
     "title": "Eemaldan serveri {{server}}?",
     "message": "Selle salvestatud parool, sertifikaadi otsus, jälgitavad kanalid ja vestlusajalugu kustutatakse sellest arvutist.",
     "confirm": "Eemalda"
-  },
-  "switch": {
-    "title": "Vahetan serverit?",
-    "message": "Korraga saad olla ainult ühel serveril. Katkestan ühenduse serveriga {{current}} ja ühendun serveriga {{next}}?",
-    "confirm": "Katkesta ja vaheta"
   },
   "cert": {
     "newTitle": "Usaldad seda serverit?",
@@ -108,7 +131,10 @@
     "actionFailed": {
       "reorder": "Serverite uut järjekorda ei õnnestunud salvestada. Proovi palun uuesti.",
       "remove": "Serverit ei õnnestunud eemaldada. Proovi palun uuesti.",
-      "disconnect": "Ühenduse katkestamine ebaõnnestus. Proovi palun uuesti."
+      "disconnect": "Ühenduse katkestamine ebaõnnestus. Proovi palun uuesti.",
+      "alwaysConnect": "Valikut „Ühenda alati käivitamisel“ ei õnnestunud salvestada. Proovi uuesti.",
+      "notifications": "Teavituste seadet ei õnnestunud salvestada. Proovi uuesti.",
+      "savePassword": "Uut parooli ei õnnestunud salvestada. Muuda serverit, et see salvestada."
     }
   },
   "empty": {
@@ -124,5 +150,27 @@
     "errors": {
       "required": "Sisesta serveri aadress või mumble:// link."
     }
+  },
+  "password": {
+    "title": "Parool serverile {{server}}",
+    "intro": "Server ei võtnud parooli vastu. Sisesta õige, et uuesti proovida.",
+    "label": "Parool",
+    "show": "Näita",
+    "hide": "Peida",
+    "wrong": "Ka see parool on vale. Proovi uuesti.",
+    "save": "Salvesta parool",
+    "cancel": "Loobu",
+    "connect": "Ühenda",
+    "connecting": "Ühendamine…"
+  },
+  "channelPassword": {
+    "title": "See kanal vajab parooli",
+    "intro": "Sisesta kanali {{channel}} parool.",
+    "label": "Parool",
+    "wrong": "Vale parool",
+    "failed": "Parooli ei õnnestunud saata. Proovi uuesti.",
+    "cancel": "Loobu",
+    "join": "Sisene",
+    "joining": "Sisenemine…"
   }
 }

@@ -13,13 +13,16 @@
   },
   "dm": {
     "title": "Direkte beskeder",
-    "unknown": "Ukendt person"
+    "unknown": "Ukendt person",
+    "withServer": "{{name}}, på {{server}}"
   },
   "notify": {
     "channel": "{{name}} i {{channel}}: {{text}}",
     "private": "{{name}} (privat): {{text}}",
     "more_one": "{{count}} ny besked mere",
-    "more_other": "{{count}} nye beskeder mere"
+    "more_other": "{{count}} nye beskeder mere",
+    "channelOn": "{{name}} i {{channel}} på {{server}}: {{text}}",
+    "privateOn": "{{name}} (privat, {{server}}): {{text}}"
   },
   "history": {
     "clear": "Ryd historik",

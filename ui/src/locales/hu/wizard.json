@@ -98,5 +98,10 @@
     "ingameOverlayHint": "A játékod fölé rajzolja, ki beszél (Linux). Később játékonként be- vagy kikapcsolhatod a Beállításokban.",
     "ingameOverlayWarning": "Egyes csalásvédelemmel ellátott játékok megjelölhetik vagy blokkolhatják a játékon belüli overlayeket. A Mumcord az ismerten kockázatos játékoknál (például Valorant vagy League of Legends) alapból kikapcsolva tartja. Csak megbízható játékoknál kapcsold be.",
     "ingameOverlayAlt": "Példa a játékon belüli overlayre, amely mutatja, ki beszél"
+  },
+  "updates": {
+    "title": "Új verziók",
+    "check": "Új verziók keresése",
+    "hint": "A Mumcord naponta egyszer megkérdezheti a GitHubot, van-e újabb verzió, és egy linkkel ellátott tippet mutathat. Semmi nem töltődik le és nem települ, és a kérésen, valamint az alkalmazás nevén és verzióján kívül semmi nem kerül elküldésre. Ezt később a Beállításokban módosíthatod."
   }
 }

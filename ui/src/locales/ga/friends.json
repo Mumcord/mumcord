@@ -11,5 +11,7 @@
   "noCertificate": "Ní féidir le daoine gan teastas a bheith ina gcairde, mar ní bheadh Mumcord in ann iad a aithint arís.",
   "add": "Cuir cara leis",
   "remove": "Bain cara",
-  "failed": "Níor oibrigh an t-athrú ar an gcara. Bain triail eile as."
+  "failed": "Níor oibrigh an t-athrú ar an gcara. Bain triail eile as.",
+  "join": "Glac páirt",
+  "joinFriend": "Téigh isteach i gcainéal {{name}}"
 }

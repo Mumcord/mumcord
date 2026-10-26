@@ -14,7 +14,9 @@
     "sounds": "Fuaimeanna agus fógraí",
     "overlay": "Forleagan",
     "diagnostics": "Diagnóisic",
-    "about": "Maidir le"
+    "about": "Maidir le",
+    "servers": "Freastalaithe",
+    "privacy": "Príobháideachas"
   },
   "search": {
     "label": "Cuardaigh socruithe",
@@ -71,7 +73,17 @@
     "testPlaying": "Ag seinm do ghutha ar ais…",
     "quality": "Cáilíocht",
     "musicQuality": "Cáilíocht cheoil",
-    "musicQualityHint": "Úsáideann sé níos mó bandaleithead agus cuireann sé cosc torainn agus airde fuaime uathoibríoch as; le haghaidh ceoil. Oibríonn brúigh-chun-cainte is fearr."
+    "musicQualityHint": "Úsáideann sé níos mó bandaleithead agus cuireann sé cosc torainn agus airde fuaime uathoibríoch as; le haghaidh ceoil. Oibríonn brúigh-chun-cainte is fearr.",
+    "bitrate": "Ráta giotán",
+    "bitrateMax": "Uas.",
+    "bitrateValue": "{{kbps}} kbit/s",
+    "bitrateMaxKnown": "Uasmhéid: {{kbps}} kbit/s. Is féidir le caillteanas ar an gceangal é a ísliú fós.",
+    "bitrateMaxUnknown": "Uasmhéid: ag brath ar an bhfreastalaí. Is féidir le caillteanas ar an gceangal é a ísliú fós.",
+    "videoSound": "Fuaim físeáin",
+    "ducking": "Ísligh fuaim an fhíseáin nuair a bhíonn daoine ag caint",
+    "duckingHint": "Éiríonn fuaim an fhíseáin féachana le chéile agus na comhroinnte scáileáin níos ciúine fad a bhíonn duine i do chainéal gutha ag caint.",
+    "duckingLevel": "Airde íslithe",
+    "duckingLevelValue": "{{percent}} %"
   },
   "voice": {
     "talkMode": "Mód cainte",
@@ -181,6 +193,7 @@
     "compact": "Dlúth: am, ainm agus teachtaireacht ar aon líne",
     "theme": "Téama",
     "themeLegend": "Téama datha",
+    "modeLegend": "Dorcha nó geal",
     "system": "Lean an córas",
     "dark": "Dorcha",
     "light": "Solas",
@@ -192,6 +205,61 @@
     "autostart": "Tosaigh Mumcord nuair a logálaim isteach",
     "startMinimized": "Tosaigh íoslaghdaithe",
     "startMinimizedHint": "Nuair a thosaíonn Mumcord ag logáil isteach, fanann sé sa tráidire in ionad an fhuinneog a oscailt."
+  },
+  "themeEditor": {
+    "name": "Ainm an téama",
+    "colorsLegend": "Príomhdhathanna",
+    "colorColumn": "Dath",
+    "auto": "uath",
+    "cellLabel": "{{color}}, {{version}}",
+    "newTitle": "Téama nua",
+    "editTitle": "Cuir “{{name}}” in eagar",
+    "generatedFromDark": "Déanta go huathoibríoch ón leagan dorcha. Leanann sé d’athruithe ansin go dtí go n-athraíonn tú anseo é.",
+    "generatedFromLight": "Déanta go huathoibríoch ón leagan geal. Leanann sé d’athruithe ansin go dtí go n-athraíonn tú anseo é.",
+    "colors": {
+      "background": "Cúlra",
+      "surface": "Dromchla",
+      "text": "Téacs",
+      "accent": "Béim",
+      "talking": "Ag caint agus ar líne",
+      "warning": "Rabhadh",
+      "error": "Earráid"
+    },
+    "pickColor": "Roghnóir datha {{color}}",
+    "invalidHex": "Cuir isteach an dath mar # agus sé dhigit heicsidheachúlacha ina dhiaidh, mar shampla #1a2b3c.",
+    "contrastLowIn": "{{version}}: codarsnacht ró-íseal: {{ratio}}:1, teastaíonn {{min}}:1 ar a laghad.",
+    "unreadable": "Níl an téama seo inléite go leor. Athraigh dath an téacs nó an chúlra chun é a shábháil.",
+    "copyName": "{{name}} (cóip)",
+    "save": "Sábháil an téama",
+    "saveAs": "Sábháil mar théama",
+    "saved": "Téama sábháilte.",
+    "share": "Comhroinn",
+    "shared": "Téama cóipeáilte. Greamaigh i gcomhrá é chun é a chomhroinnt.",
+    "shareFailed": "Níorbh fhéidir le Mumcord an téama a chóipeáil chuig an ngearrthaisce.",
+    "import": "Iompórtáil…",
+    "importTitle": "Iompórtáil téama",
+    "importLabel": "Teachtaireacht téama nó cód",
+    "importHint": "Greamaigh teachtaireacht chomhrá ina bhfuil téama Mumcord, nó a chód amháin (tosaíonn sé le mct1.).",
+    "importConfirm": "Iompórtáil",
+    "importInvalid": "Ní téama bailí Mumcord é seo.",
+    "importUnreadable": "Níl an téama seo inléite go leor.",
+    "imported": "Iompórtáladh “{{name}}”.",
+    "alreadyImported": "Tá “{{name}}” i do théamaí cheana.",
+    "madeWithNewer": "Déanta le Mumcord {{version}} – nuashonraigh chun é a fheiceáil go hiomlán.",
+    "reset": "Athshocraigh",
+    "menuLabel": "Roghanna do {{name}}",
+    "edit": "Cuir an téama in eagar",
+    "newFromThis": "Téama nua uaidh seo",
+    "preview": "Réamhamharc",
+    "previewing": "Réamhamharc ar {{name}}",
+    "backToEditor": "Ar ais chuig an eagarthóir",
+    "rename": "Athainmnigh an téama",
+    "renameTitle": "Athainmnigh “{{name}}”",
+    "renameConfirm": "Athainmnigh",
+    "delete": "Scrios an téama",
+    "deleteTitle": "Scrios “{{name}}”?",
+    "deleteMessage": "Filleann freastalaithe a úsáideann an téama seo ar théama na haipe.",
+    "deleteConfirm": "Scrios"
   },
   "accessibility": {
     "hints": "Leideanna",
@@ -215,7 +283,14 @@
     "hangUp": "Dícheanglaíonn tú ó fhreastalaí",
     "messages": "Teachtaireacht nua i gcainéal leanta nó i gcomhrá príobháideach",
     "mention": "Fuaim nuair a luaitear thú",
-    "mentionNotify": "Cuir fógra nuair a luaitear thú"
+    "mentionNotify": "Cuir fógra nuair a luaitear thú",
+    "partyStarted": "Tosaíonn duine éigin féachaint le chéile i do chainéal",
+    "partyJoined": "Glacann duine éigin páirt i d’fhéachaint le chéile",
+    "partyLeft": "Fágann duine éigin d’fhéachaint le chéile",
+    "shareStarted": "Tosaíonn duine éigin comhroinnt scáileáin i do chainéal",
+    "shareStopped": "Críochnaíonn comhroinnt scáileáin i do chainéal",
+    "viewerStarted": "Tosaíonn duine éigin ag féachaint ar do chomhroinnt scáileáin",
+    "viewerStopped": "Stopann duine éigin ag féachaint ar do chomhroinnt scáileáin"
   },
   "notifications": {
     "title": "Fógraí",
@@ -227,29 +302,6 @@
     "off": "As"
   },
   "overlay": {
-    "window": {
-      "title": "Forleagan fuinneoige",
-      "enable": "Taispeáin an forleagan",
-      "enableHint": "Fuinneog bheag trédhearcach a thaispeánann cé atá ag caint. Ar fáil ó roghchlár an tráidire freisin.",
-      "positionUnsupported": "Socraíonn an deasc seo cá bhfuil fuinneoga le feiceáil, mar sin níl aon éifeacht ag suíomhanna cúinne ná ag bogadh.",
-      "move": "Bog an forleagan…",
-      "moveDone": "Bogadh críochnaithe",
-      "size": "Leithead",
-      "wholeChannel": "Taispeáin an cainéal ar fad",
-      "wholeChannelHint": "As: ach daoine atá ag caint.",
-      "channelName": "Taispeáin ainm an chainéil",
-      "loadFailed": "Níorbh fhéidir roghanna an fhorleagain a luchtú.",
-      "saveFailed": "Níorbh fhéidir an t-athrú forleagain a chur i bhfeidhm.",
-      "kwin": {
-        "setUp": "Socraigh go huathoibríoch",
-        "done": "Déanta: tá riail fuinneoige KDE “Forleagan Mumcord” gníomhach.",
-        "removed": "Baineadh riail fuinneoige KDE.",
-        "remove": "Bain an riail",
-        "openRules": "Oscail rialacha fuinneoige KDE",
-        "compat": "Úsáid mód comhoiriúnachta ina ionad",
-        "failed": "Níorbh fhéidir riail fuinneoige KDE a athrú. Oscail rialacha fuinneoige KDE chun í a chur leis de láimh."
-      }
-    },
     "corner": {
       "label": "Suíomh",
       "topLeft": "Barr ar chlé",
@@ -284,8 +336,16 @@
       "confirmEnable": "Cuir ar siúl ar aon nós",
       "limits": {
         "libraryMissing": "Níl an forleagan sa chluiche ar fáil: níor aimsíodh a leabharlann forleagain (libmumcord_overlay_layer.so) in aice le Mumcord. Athshuiteáil Mumcord chun é a athchur. Úsáidtear an forleagan fuinneoige thuas ina ionad.",
-        "windowsPending": "Níl an forleagan sa chluiche ar fáil ar Windows fós. Úsáidtear an forleagan fuinneoige thuas ina ionad.",
+        "windowsFullscreen": "Úsáid lánscáileán gan imlíne nó i bhfuinneog sa chluiche.",
         "macos": "Ní thacaíonn macOS le forleagain sa chluiche. Úsáidtear an forleagan fuinneoige thuas ina ionad."
+      },
+      "opengl": {
+        "title": "Cluichí OpenGL",
+        "explanation": "Ag teastáil do chluichí OpenGL amháin: greamaigh i roghanna seolta Steam an chluiche.",
+        "label": "Rogha seolta Steam",
+        "copy": "Cóipeáil",
+        "copied": "Cóipeáilte",
+        "copyFailed": "Theip ar an gcóipeáil. Roghnaigh an téacs agus cóipeáil de láimh é."
       }
     }
   },
@@ -394,5 +454,38 @@
       "unsupported": "Níl sé ar fáil ar an gcóras seo.",
       "failed": "Stad sé tar éis earráide. Cuir as é agus air arís chun triail eile a bhaint as."
     }
+  },
+  "servers": {
+    "connections": "Ceangail",
+    "limit": "Freastalaithe ceangailte ag an am céanna",
+    "limitHint": "Idir 1 agus 15. Diúltaítear do cheangal thar an teorainn.",
+    "limitInvalid": "Cuir isteach slánuimhir ó 1 go 15."
+  },
+  "appearanceEffects": {
+    "title": "Maisíochtaí",
+    "visualEffects": "Maisíochtaí amhairc (gloine, grán)",
+    "visualEffectsHint": "Roghchláir ghloine shioctha agus grán scannáin caolchúiseach. Múchtar go huathoibríoch iad nuair a iarrann do chóras níos lú trédhearcachta nó gluaiseachta."
+  },
+  "channelList": {
+    "title": "Liosta cainéal",
+    "hideEmpty": "Folaigh cainéil fholmha",
+    "talkingFirst": "Taispeáin daoine atá ag caint ar dtús",
+    "weakConnection": "Taispeáin deilbhín ceangail laig",
+    "weakConnectionHint": "Deilbhín beag comhartha in aice le daoine a bhfuil droch-cheangal acu."
+  },
+  "privacyDirect": {
+    "title": "Ceangail dhíreacha",
+    "allow": "Ceadaigh ceangail dhíreacha le húsáideoirí eile Mumcord",
+    "hint": "Bíonn ceangail dhíreacha níos tapúla, ach is féidir leis an duine eile do sheoladh IP a fheiceáil. Go dtí go gcinneann tú, fiafraíonn Mumcord an chéad uair a d’úsáidfí ceann."
+  },
+  "updates": {
+    "title": "Nuashonruithe",
+    "check": "Seiceáil le haghaidh leaganacha nua",
+    "hint": "Uair sa lá fiafraíonn Mumcord de GitHub faoin eisiúint is déanaí. Ní sheoltar aon rud eile."
+  },
+  "appImageMenu": {
+    "label": "Cuir Mumcord le roghchlár na n-aipeanna",
+    "hint": "Oibríonn an deilbhín agus brúigh-chun-cainte i gceart ar Wayland ansin, agus osclaíonn naisc mumble:// Mumcord. Don AppImage amháin.",
+    "failed": "Níor oibrigh sé sin. Bain triail eile as."
   }
 }

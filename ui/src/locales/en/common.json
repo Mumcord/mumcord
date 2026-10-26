@@ -9,5 +9,17 @@
   "retry": "Try again",
   "loading": "Loading…",
   "beta": "Beta",
-  "betaFeature": "Beta feature"
+  "betaFeature": "Beta feature",
+  "themePicker": {
+    "swatch": "{{name}}, theme",
+    "swatchSelected": "{{name}}, theme, selected",
+    "yourThemes": "Your themes",
+    "add": "New theme from the current one",
+    "addShort": "New"
+  },
+  "floatingWidget": {
+    "collapse": "Collapse",
+    "expand": "Expand",
+    "handle": "{{name}}: arrow keys move, Shift+arrow keys resize"
+  }
 }

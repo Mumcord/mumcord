@@ -14,7 +14,9 @@
     "sounds": "Zvuky a upozornenia",
     "overlay": "Overlay",
     "diagnostics": "Diagnostika",
-    "about": "O aplikácii"
+    "about": "O aplikácii",
+    "servers": "Servery",
+    "privacy": "Súkromie"
   },
   "search": {
     "label": "Hľadať v nastaveniach",
@@ -70,7 +72,17 @@
     "testPlaying": "Prehrávam tvoj hlas…",
     "quality": "Kvalita",
     "musicQuality": "Kvalita pre hudbu",
-    "musicQualityHint": "Využíva viac dát a vypína potlačenie šumu aj automatickú hlasitosť; vhodné pre hudbu. Najlepšie funguje s push-to-talk."
+    "musicQualityHint": "Využíva viac dát a vypína potlačenie šumu aj automatickú hlasitosť; vhodné pre hudbu. Najlepšie funguje s push-to-talk.",
+    "bitrate": "Dátový tok",
+    "bitrateMax": "Max.",
+    "bitrateValue": "{{kbps}} kbit/s",
+    "bitrateMaxKnown": "Maximum: {{kbps}} kbit/s. Straty na pripojení ho ešte môžu znížiť.",
+    "bitrateMaxUnknown": "Maximum: závisí od servera. Straty na pripojení ho ešte môžu znížiť.",
+    "videoSound": "Zvuk videa",
+    "ducking": "Stíšiť zvuk videa, keď niekto hovorí",
+    "duckingHint": "Zvuk videa zo spoločného sledovania a zdieľania obrazovky sa stíši, keď niekto v tvojom hlasovom kanáli hovorí.",
+    "duckingLevel": "Znížená hlasitosť",
+    "duckingLevelValue": "{{percent}} %"
   },
   "voice": {
     "talkMode": "Režim hovorenia",
@@ -180,6 +192,7 @@
     "compact": "Kompaktné: čas, meno a správa v jednom riadku",
     "theme": "Motív",
     "themeLegend": "Farebný motív",
+    "modeLegend": "Tmavý alebo svetlý",
     "system": "Podľa systému",
     "dark": "Tmavý",
     "light": "Svetlý",
@@ -191,6 +204,61 @@
     "autostart": "Spustiť Mumcord po prihlásení",
     "startMinimized": "Spustiť minimalizovaný",
     "startMinimizedHint": "Keď sa Mumcord spustí po prihlásení, čaká v lište namiesto otvorenia okna."
+  },
+  "themeEditor": {
+    "name": "Názov motívu",
+    "colorsLegend": "Hlavné farby",
+    "colorColumn": "Farba",
+    "auto": "auto",
+    "cellLabel": "{{color}}, {{version}}",
+    "newTitle": "Nový motív",
+    "editTitle": "Upraviť „{{name}}“",
+    "generatedFromDark": "Vytvorené automaticky z tmavej verzie. Sleduje tvoje zmeny tam, kým ho nezmeníš tu.",
+    "generatedFromLight": "Vytvorené automaticky zo svetlej verzie. Sleduje tvoje zmeny tam, kým ho nezmeníš tu.",
+    "colors": {
+      "background": "Pozadie",
+      "surface": "Plocha",
+      "text": "Text",
+      "accent": "Zvýraznenie",
+      "talking": "Hovorí a online",
+      "warning": "Varovanie",
+      "error": "Chyba"
+    },
+    "pickColor": "Výber farby {{color}}",
+    "invalidHex": "Zadaj farbu ako # a šesť hexadecimálnych číslic, napríklad #1a2b3c.",
+    "contrastLowIn": "{{version}}: príliš nízky kontrast: {{ratio}}:1, potrebné aspoň {{min}}:1.",
+    "unreadable": "Tento motív nie je dosť čitateľný. Zmeň farbu textu alebo pozadia, aby si ho mohol uložiť.",
+    "copyName": "{{name}} (kópia)",
+    "save": "Uložiť motív",
+    "saveAs": "Uložiť ako motív",
+    "saved": "Motív uložený.",
+    "share": "Zdieľať",
+    "shared": "Motív skopírovaný. Vlož ho do chatu a zdieľaj ho.",
+    "shareFailed": "Mumcord nemohol skopírovať motív do schránky.",
+    "import": "Importovať…",
+    "importTitle": "Importovať motív",
+    "importLabel": "Správa s motívom alebo kód",
+    "importHint": "Vlož správu z chatu s motívom Mumcordu, alebo len jeho kód (začína sa mct1.).",
+    "importConfirm": "Importovať",
+    "importInvalid": "Toto nie je platný motív Mumcordu.",
+    "importUnreadable": "Tento motív nie je dosť čitateľný.",
+    "imported": "„{{name}}“ importovaný.",
+    "alreadyImported": "„{{name}}“ už je v tvojich motívoch.",
+    "madeWithNewer": "Vytvorené v Mumcorde {{version}} – aktualizuj, aby si ho videl celý.",
+    "reset": "Obnoviť",
+    "menuLabel": "Možnosti pre {{name}}",
+    "edit": "Upraviť motív",
+    "newFromThis": "Nový motív z tohto",
+    "preview": "Náhľad",
+    "previewing": "Náhľad: {{name}}",
+    "backToEditor": "Späť do editora",
+    "rename": "Premenovať motív",
+    "renameTitle": "Premenovať „{{name}}“",
+    "renameConfirm": "Premenovať",
+    "delete": "Odstrániť motív",
+    "deleteTitle": "Odstrániť „{{name}}“?",
+    "deleteMessage": "Servery, ktoré tento motív používajú, sa vrátia k motívu aplikácie.",
+    "deleteConfirm": "Odstrániť"
   },
   "accessibility": {
     "hints": "Tipy",
@@ -214,7 +282,14 @@
     "hangUp": "Odpojíš sa od servera",
     "messages": "Nová správa v sledovanom kanáli alebo súkromnom chate",
     "mention": "Zvuk pri zmienke",
-    "mentionNotify": "Upozorniť pri zmienke"
+    "mentionNotify": "Upozorniť pri zmienke",
+    "partyStarted": "Niekto spustí spoločné sledovanie v tvojom kanáli",
+    "partyJoined": "Niekto sa pripojí k tvojmu spoločnému sledovaniu",
+    "partyLeft": "Niekto opustí tvoje spoločné sledovanie",
+    "shareStarted": "Niekto začne zdieľať obrazovku v tvojom kanáli",
+    "shareStopped": "Zdieľanie obrazovky v tvojom kanáli sa skončí",
+    "viewerStarted": "Niekto začne sledovať tvoje zdieľanie obrazovky",
+    "viewerStopped": "Niekto prestane sledovať tvoje zdieľanie obrazovky"
   },
   "notifications": {
     "title": "Upozornenia",
@@ -226,29 +301,6 @@
     "off": "Vypnuté"
   },
   "overlay": {
-    "window": {
-      "title": "Overlay v okne",
-      "enable": "Zobrazovať overlay",
-      "enableHint": "Malé priehľadné okno, ktoré ukazuje, kto hovorí. Dostupné aj z ponuky v lište.",
-      "positionUnsupported": "Tento desktop sám rozhoduje, kde sa okná zobrazia, takže umiestnenie do rohov a presúvanie nemajú účinok.",
-      "move": "Presunúť overlay…",
-      "moveDone": "Presúvanie hotové",
-      "size": "Šírka",
-      "wholeChannel": "Zobrazovať celý kanál",
-      "wholeChannelHint": "Vypnuté: len ľudia, ktorí hovoria.",
-      "channelName": "Zobrazovať názov kanála",
-      "loadFailed": "Možnosti overlayu sa nepodarilo načítať.",
-      "saveFailed": "Zmenu overlayu sa nepodarilo použiť.",
-      "kwin": {
-        "setUp": "Nastaviť automaticky",
-        "done": "Hotovo: pravidlo okna KDE „Mumcord overlay“ je aktívne.",
-        "removed": "Pravidlo okna KDE bolo odstránené.",
-        "remove": "Odstrániť pravidlo",
-        "openRules": "Otvoriť pravidlá okien KDE",
-        "compat": "Použiť namiesto toho režim kompatibility",
-        "failed": "Pravidlo okna KDE sa nepodarilo zmeniť. Otvor pravidlá okien KDE a pridaj ho ručne."
-      }
-    },
     "corner": {
       "label": "Umiestnenie",
       "topLeft": "Vľavo hore",
@@ -283,8 +335,16 @@
       "confirmEnable": "Napriek tomu zapnúť",
       "limits": {
         "libraryMissing": "Overlay v hre nie je dostupný: jeho knižnica (libmumcord_overlay_layer.so) sa nenašla vedľa Mumcordu. Na obnovenie preinštaluj Mumcord. Namiesto neho sa použije overlay v okne vyššie.",
-        "windowsPending": "Overlay v hre zatiaľ nie je na Windows dostupný. Namiesto neho sa použije overlay v okne vyššie.",
+        "windowsFullscreen": "V hre použite režim celej obrazovky bez okraja alebo v okne.",
         "macos": "macOS nepodporuje overlay v hrách. Namiesto neho sa použije overlay v okne vyššie."
+      },
+      "opengl": {
+        "title": "Hry OpenGL",
+        "explanation": "Potrebné len pre hry OpenGL: vlož do možností spustenia hry v Steame.",
+        "label": "Možnosť spustenia v Steame",
+        "copy": "Kopírovať",
+        "copied": "Skopírované",
+        "copyFailed": "Kopírovanie zlyhalo. Označ text a skopíruj ho ručne."
       }
     }
   },
@@ -392,5 +452,38 @@
       "unsupported": "Na tomto systéme nie je dostupný.",
       "failed": "Zastavený po chybe. Vypni ho a znova zapni, ak to chceš skúsiť znova."
     }
+  },
+  "servers": {
+    "connections": "Pripojenia",
+    "limit": "Súčasne pripojené servery",
+    "limitHint": "Od 1 do 15. Pripojenia nad limit sa odmietajú.",
+    "limitInvalid": "Zadaj celé číslo od 1 do 15."
+  },
+  "appearanceEffects": {
+    "title": "Efekty",
+    "visualEffects": "Vizuálne efekty (sklo, zrno)",
+    "visualEffectsHint": "Ponuky z matného skla a jemné filmové zrno. Automaticky vypnuté, keď systém žiada menej priehľadnosti alebo pohybu."
+  },
+  "channelList": {
+    "title": "Zoznam kanálov",
+    "hideEmpty": "Skryť prázdne kanály",
+    "talkingFirst": "Zobraziť hovoriacich ako prvých",
+    "weakConnection": "Zobraziť ikonu slabého pripojenia",
+    "weakConnectionHint": "Malá ikona signálu vedľa ľudí so zlým pripojením."
+  },
+  "privacyDirect": {
+    "title": "Priame pripojenia",
+    "allow": "Povoliť priame pripojenia k ostatným používateľom Mumcordu",
+    "hint": "Priame pripojenia sú rýchlejšie, ale druhá osoba uvidí tvoju IP adresu. Kým sa nerozhodneš, Mumcord sa opýta, keď by sa nejaké prvýkrát použilo."
+  },
+  "updates": {
+    "title": "Aktualizácie",
+    "check": "Kontrolovať nové verzie",
+    "hint": "Raz denne sa Mumcord opýta GitHubu na najnovšie vydanie. Nič iné sa neodosiela."
+  },
+  "appImageMenu": {
+    "label": "Pridať Mumcord do ponuky aplikácií",
+    "hint": "Ikona a push-to-talk potom pod Waylandom fungujú správne a odkazy mumble:// otvárajú Mumcord. Len pre AppImage.",
+    "failed": "Nepodarilo sa. Skús to znova."
   }
 }

@@ -13,13 +13,16 @@
   },
   "dm": {
     "title": "Privéberichten",
-    "unknown": "Onbekende persoon"
+    "unknown": "Onbekende persoon",
+    "withServer": "{{name}}, op {{server}}"
   },
   "notify": {
     "channel": "{{name}} in {{channel}}: {{text}}",
     "private": "{{name}} (privé): {{text}}",
     "more_one": "{{count}} nieuw bericht meer",
-    "more_other": "{{count}} nieuwe berichten meer"
+    "more_other": "{{count}} nieuwe berichten meer",
+    "channelOn": "{{name}} in {{channel}} op {{server}}: {{text}}",
+    "privateOn": "{{name}} (privé, {{server}}): {{text}}"
   },
   "history": {
     "clear": "Geschiedenis wissen",

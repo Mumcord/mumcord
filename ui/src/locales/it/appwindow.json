@@ -5,6 +5,39 @@
     "remember": "Ricorda la mia scelta",
     "minimize": "Minimizza nell'area di notifica",
     "quit": "Esci",
+    "failed": "Non ha funzionato. Riprova.",
+    "descriptionServers": "Sei ancora connesso a {{count}} server. Ridotto a icona, Mumcord ti tiene nel canale vocale e resta nell'area di notifica."
+  },
+  "windowOverlay": {
+    "title": "L'overlay in finestra è stato rimosso",
+    "description": "La finestra overlay mobile non c'è più. Ora l'overlay nel gioco mostra chi sta parlando dentro i tuoi giochi. Puoi attivarlo nelle impostazioni dell'overlay.",
+    "dismiss": "Ho capito",
+    "openSettings": "Apri impostazioni overlay"
+  },
+  "appImageMenu": {
+    "title": "Aggiungere Mumcord al menu delle app?",
+    "description": "Così Mumcord compare nel menu delle app. L'icona e il push-to-talk funzionano correttamente su Wayland e i link mumble:// aprono Mumcord. Puoi cambiarlo più tardi nelle Impostazioni.",
+    "no": "No",
+    "yes": "Sì",
+    "failed": "Non ha funzionato. Riprova."
+  },
+  "updateCheck": {
+    "title": "Cercare nuove versioni?",
+    "description": "Mumcord può chiedere a GitHub una volta al giorno se esiste una versione più recente e mostrare un avviso con un link. Non viene scaricato né installato nulla, e non viene inviato nulla oltre alla richiesta stessa e al nome e alla versione dell'app. Puoi cambiarlo più tardi nelle Impostazioni.",
+    "no": "No",
+    "yes": "Sì",
+    "failed": "Non ha funzionato. Riprova."
+  },
+  "updateHint": {
+    "message": "Mumcord {{version}} è disponibile.",
+    "open": "Vedi release",
+    "dismiss": "Chiudi"
+  },
+  "directConsent": {
+    "title": "Consentire le connessioni dirette?",
+    "description": "Le connessioni dirette sono più veloci, ma l’altra persona può vedere il tuo indirizzo IP. Mumcord le usa per le immagini a grandezza piena e la condivisione dello schermo con altri utenti Mumcord e può aprire una porta sul tuo router per esse. Se rispondi no, le immagini arrivano comunque tramite il server e la condivisione dello schermo non è disponibile. Puoi cambiarlo in seguito in Impostazioni → Privacy.",
+    "no": "No",
+    "yes": "Sì",
     "failed": "Non ha funzionato. Riprova."
   }
 }

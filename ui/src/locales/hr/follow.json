@@ -14,14 +14,17 @@
   },
   "dm": {
     "title": "Izravne poruke",
-    "unknown": "Nepoznata osoba"
+    "unknown": "Nepoznata osoba",
+    "withServer": "{{name}}, na {{server}}"
   },
   "notify": {
     "channel": "{{name}} u {{channel}}: {{text}}",
     "private": "{{name}} (privatno): {{text}}",
     "more_one": "Još {{count}} nova poruka",
     "more_few": "Još {{count}} nove poruke",
-    "more_other": "Još {{count}} novih poruka"
+    "more_other": "Još {{count}} novih poruka",
+    "channelOn": "{{name}} u {{channel}} na {{server}}: {{text}}",
+    "privateOn": "{{name}} (privatno, {{server}}): {{text}}"
   },
   "history": {
     "clear": "Obriši povijest",

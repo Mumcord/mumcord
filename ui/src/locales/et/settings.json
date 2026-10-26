@@ -14,7 +14,9 @@
     "sounds": "Helid ja teavitused",
     "overlay": "Kattekiht",
     "diagnostics": "Diagnostika",
-    "about": "Teave"
+    "about": "Teave",
+    "servers": "Serverid",
+    "privacy": "Privaatsus"
   },
   "search": {
     "label": "Otsi seadeid",
@@ -68,7 +70,17 @@
     "testPlaying": "Esitan sinu häält tagasi…",
     "quality": "Kvaliteet",
     "musicQuality": "Muusikakvaliteet",
-    "musicQualityHint": "Kasutab rohkem ribalaiust ning lülitab välja müravaigistuse ja automaatse helitugevuse; mõeldud muusikale. Vajuta ja räägi töötab kõige paremini."
+    "musicQualityHint": "Kasutab rohkem ribalaiust ning lülitab välja müravaigistuse ja automaatse helitugevuse; mõeldud muusikale. Vajuta ja räägi töötab kõige paremini.",
+    "bitrate": "Bitikiirus",
+    "bitrateMax": "Maks.",
+    "bitrateValue": "{{kbps}} kbit/s",
+    "bitrateMaxKnown": "Maksimum: {{kbps}} kbit/s. Kaod ühenduses võivad seda veel vähendada.",
+    "bitrateMaxUnknown": "Maksimum: sõltub serverist. Kaod ühenduses võivad seda veel vähendada.",
+    "videoSound": "Video heli",
+    "ducking": "Vaigista video heli, kui keegi räägib",
+    "duckingHint": "Ühisvaatamise video ja ekraani jagamise heli vaibub, kui keegi sinu häälkanalis räägib.",
+    "duckingLevel": "Vähendatud helitugevus",
+    "duckingLevelValue": "{{percent}} %"
   },
   "voice": {
     "talkMode": "Rääkimisrežiim",
@@ -178,6 +190,7 @@
     "compact": "Kompaktne: kellaaeg, nimi ja sõnum ühel real",
     "theme": "Teema",
     "themeLegend": "Värviteema",
+    "modeLegend": "Tume või hele",
     "system": "Järgi süsteemi",
     "dark": "Tume",
     "light": "Hele",
@@ -189,6 +202,61 @@
     "autostart": "Käivita Mumcord sisselogimisel",
     "startMinimized": "Käivita minimeerituna",
     "startMinimizedHint": "Kui Mumcord käivitub sisselogimisel, ootab see salves, selle asemel et akent avada."
+  },
+  "themeEditor": {
+    "name": "Teema nimi",
+    "colorsLegend": "Põhivärvid",
+    "colorColumn": "Värv",
+    "auto": "auto",
+    "cellLabel": "{{color}}, {{version}}",
+    "newTitle": "Uus teema",
+    "editTitle": "Muuda teemat „{{name}}“",
+    "generatedFromDark": "Loodud automaatselt tumedast versioonist. Järgib seal tehtud muudatusi, kuni muudad seda siin.",
+    "generatedFromLight": "Loodud automaatselt heledast versioonist. Järgib seal tehtud muudatusi, kuni muudad seda siin.",
+    "colors": {
+      "background": "Taust",
+      "surface": "Pind",
+      "text": "Tekst",
+      "accent": "Rõhuvärv",
+      "talking": "Räägib ja võrgus",
+      "warning": "Hoiatus",
+      "error": "Viga"
+    },
+    "pickColor": "Värvivalija: {{color}}",
+    "invalidHex": "Sisesta värv kujul # ja kuus kuueteistkümnendnumbrit, näiteks #1a2b3c.",
+    "contrastLowIn": "{{version}}: kontrast liiga madal: {{ratio}}:1, vaja vähemalt {{min}}:1.",
+    "unreadable": "See teema pole piisavalt loetav. Muuda teksti või tausta värvi, et see salvestada.",
+    "copyName": "{{name}} (koopia)",
+    "save": "Salvesta teema",
+    "saveAs": "Salvesta teemana",
+    "saved": "Teema salvestatud.",
+    "share": "Jaga",
+    "shared": "Teema kopeeritud. Kleebi see vestlusesse, et seda jagada.",
+    "shareFailed": "Mumcord ei saanud teemat lõikelauale kopeerida.",
+    "import": "Impordi…",
+    "importTitle": "Impordi teema",
+    "importLabel": "Teemasõnum või kood",
+    "importHint": "Kleebi Mumcordi teemaga vestlussõnum või ainult selle kood (algab mct1.).",
+    "importConfirm": "Impordi",
+    "importInvalid": "See pole kehtiv Mumcordi teema.",
+    "importUnreadable": "See teema pole piisavalt loetav.",
+    "imported": "„{{name}}“ imporditud.",
+    "alreadyImported": "„{{name}}“ on juba sinu teemade hulgas.",
+    "madeWithNewer": "Tehtud Mumcordi versiooniga {{version}} – uuenda, et seda täielikult näha.",
+    "reset": "Lähtesta",
+    "menuLabel": "Valikud: {{name}}",
+    "edit": "Muuda teemat",
+    "newFromThis": "Uus teema sellest",
+    "preview": "Eelvaade",
+    "previewing": "Eelvaade: {{name}}",
+    "backToEditor": "Tagasi redaktorisse",
+    "rename": "Nimeta teema ümber",
+    "renameTitle": "Nimeta „{{name}}“ ümber",
+    "renameConfirm": "Nimeta ümber",
+    "delete": "Kustuta teema",
+    "deleteTitle": "Kas kustutada „{{name}}“?",
+    "deleteMessage": "Seda teemat kasutavad serverid lähevad tagasi rakenduse teemale.",
+    "deleteConfirm": "Kustuta"
   },
   "accessibility": {
     "hints": "Vihjed",
@@ -212,7 +280,14 @@
     "hangUp": "Katkestad ühenduse serveriga",
     "messages": "Uus sõnum jälgitavas kanalis või privaatvestluses",
     "mention": "Heli mainimisel",
-    "mentionNotify": "Teavita mainimisel"
+    "mentionNotify": "Teavita mainimisel",
+    "partyStarted": "Keegi alustab sinu kanalis ühisvaatamist",
+    "partyJoined": "Keegi liitub sinu ühisvaatamisega",
+    "partyLeft": "Keegi lahkub sinu ühisvaatamiselt",
+    "shareStarted": "Keegi alustab sinu kanalis ekraani jagamist",
+    "shareStopped": "Ekraani jagamine sinu kanalis lõpeb",
+    "viewerStarted": "Keegi hakkab sinu jagatud ekraani vaatama",
+    "viewerStopped": "Keegi lõpetab sinu jagatud ekraani vaatamise"
   },
   "notifications": {
     "title": "Teavitused",
@@ -224,29 +299,6 @@
     "off": "Väljas"
   },
   "overlay": {
-    "window": {
-      "title": "Akna kattekiht",
-      "enable": "Näita kattekihti",
-      "enableHint": "Väike läbipaistev aken, mis näitab, kes räägib. Saadaval ka salvemenüüst.",
-      "positionUnsupported": "See töölaud otsustab, kuhu aknad ilmuvad, seega nurgapositsioonidel ja liigutamisel pole mõju.",
-      "move": "Liiguta kattekihti…",
-      "moveDone": "Liigutamine valmis",
-      "size": "Laius",
-      "wholeChannel": "Näita kogu kanalit",
-      "wholeChannelHint": "Väljas: ainult rääkijad.",
-      "channelName": "Näita kanali nime",
-      "loadFailed": "Kattekihi valikuid ei õnnestunud laadida.",
-      "saveFailed": "Kattekihi muudatust ei õnnestunud rakendada.",
-      "kwin": {
-        "setUp": "Seadista automaatselt",
-        "done": "Valmis: KDE akenireegel „Mumcord overlay“ on aktiivne.",
-        "removed": "KDE akenireegel eemaldati.",
-        "remove": "Eemalda reegel",
-        "openRules": "Ava KDE akenireeglid",
-        "compat": "Kasuta selle asemel ühilduvusrežiimi",
-        "failed": "KDE akenireeglit ei õnnestunud muuta. Ava KDE akenireeglid, et see käsitsi lisada."
-      }
-    },
     "corner": {
       "label": "Asukoht",
       "topLeft": "Üleval vasakul",
@@ -281,8 +333,16 @@
       "confirmEnable": "Lülita sellegipoolest sisse",
       "limits": {
         "libraryMissing": "Mängusisene kattekiht pole saadaval: selle kattekihi teeki (libmumcord_overlay_layer.so) ei leitud Mumcordi kõrvalt. Selle taastamiseks installi Mumcord uuesti. Selle asemel kasutatakse ülalolevat akna kattekihti.",
-        "windowsPending": "Mängusisene kattekiht pole Windowsis veel saadaval. Selle asemel kasutatakse ülalolevat akna kattekihti.",
+        "windowsFullscreen": "Kasuta mängus ääristeta või aknas täisekraani.",
         "macos": "macOS ei toeta mängusiseseid kattekihte. Selle asemel kasutatakse ülalolevat akna kattekihti."
+      },
+      "opengl": {
+        "title": "OpenGL-mängud",
+        "explanation": "Vajalik ainult OpenGL-mängudele: kleebi mängu Steami käivitusvalikutesse.",
+        "label": "Steami käivitusvalik",
+        "copy": "Kopeeri",
+        "copied": "Kopeeritud",
+        "copyFailed": "Kopeerimine ebaõnnestus. Vali tekst ja kopeeri see käsitsi."
       }
     }
   },
@@ -388,5 +448,38 @@
       "unsupported": "Sellel süsteemil pole saadaval.",
       "failed": "Peatus vea tõttu. Proovimiseks lülita välja ja uuesti sisse."
     }
+  },
+  "servers": {
+    "connections": "Ühendused",
+    "limit": "Korraga ühendatud serverid",
+    "limitHint": "1 kuni 15. Piiri ületavad ühendused lükatakse tagasi.",
+    "limitInvalid": "Sisesta täisarv 1 kuni 15."
+  },
+  "appearanceEffects": {
+    "title": "Efektid",
+    "visualEffects": "Visuaalsed efektid (klaas, teralisus)",
+    "visualEffectsHint": "Mattklaasist menüüd ja peen filmiteralisus. Lülitub automaatselt välja, kui süsteem palub vähem läbipaistvust või liikumist."
+  },
+  "channelList": {
+    "title": "Kanalite loend",
+    "hideEmpty": "Peida tühjad kanalid",
+    "talkingFirst": "Näita rääkijaid esimesena",
+    "weakConnection": "Näita nõrga ühenduse ikooni",
+    "weakConnectionHint": "Väike signaaliikoon halva ühendusega inimeste kõrval."
+  },
+  "privacyDirect": {
+    "title": "Otseühendused",
+    "allow": "Luba otseühendused teiste Mumcordi kasutajatega",
+    "hint": "Otseühendused on kiiremad, kuid teine inimene näeb sinu IP-aadressi. Kuni sa pole otsustanud, küsib Mumcord esimesel korral, kui mõnda kasutataks."
+  },
+  "updates": {
+    "title": "Uuendused",
+    "check": "Otsi uusi versioone",
+    "hint": "Kord päevas küsib Mumcord GitHubilt uusimat väljalaset. Midagi muud ei saadeta."
+  },
+  "appImageMenu": {
+    "label": "Lisa Mumcord rakenduste menüüsse",
+    "hint": "Ikoon ja vajuta ja räägi töötavad siis Waylandis korralikult ning mumble:// lingid avavad Mumcordi. Ainult AppImage'i jaoks.",
+    "failed": "See ei õnnestunud. Proovi uuesti."
   }
 }

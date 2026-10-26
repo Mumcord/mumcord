@@ -16,7 +16,8 @@
   },
   "dm": {
     "title": "Teachtaireachtaí díreacha",
-    "unknown": "Duine anaithnid"
+    "unknown": "Duine anaithnid",
+    "withServer": "{{name}}, ar {{server}}"
   },
   "notify": {
     "channel": "{{name}} i {{channel}}: {{text}}",
@@ -25,7 +26,9 @@
     "more_two": "{{count}} theachtaireacht nua eile",
     "more_few": "{{count}} theachtaireacht nua eile",
     "more_many": "{{count}} dteachtaireacht nua eile",
-    "more_other": "{{count}} teachtaireacht nua eile"
+    "more_other": "{{count}} teachtaireacht nua eile",
+    "channelOn": "{{name}} i {{channel}} ar {{server}}: {{text}}",
+    "privateOn": "{{name}} (príobháideach, {{server}}): {{text}}"
   },
   "history": {
     "clear": "Glan an stair",

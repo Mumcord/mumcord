@@ -8,6 +8,7 @@
     "unknownPerson": "Neznana oseba"
   },
   "list": {
+    "server": "Strežnik",
     "today": "Danes",
     "yesterday": "Včeraj",
     "label": "Sporočila v {{name}}",
@@ -36,7 +37,8 @@
     "strike": "Prečrtano",
     "code": "Koda v vrstici",
     "codeBlock": "Blok kode",
-    "link": "Povezava"
+    "link": "Povezava",
+    "quote": "Citat"
   },
   "composer": {
     "label": "Sporočilo za {{name}}",
@@ -68,7 +70,14 @@
     "notConnected": "Nisi povezan. Znova se poveži in poskusi znova.",
     "generic": "Sporočila ni bilo mogoče poslati. Poskusi znova.",
     "onlyImages": "Pošiljati je mogoče samo slike.",
-    "sourceTooLarge": "Ta datoteka je prevelika za pošiljanje (več kot 25 MB)."
+    "sourceTooLarge": "Ta datoteka je prevelika za pošiljanje (več kot 25 MB).",
+    "personOffline": "Ta oseba ni povezana. Poskusi znova, ko se vrne."
+  },
+  "failed": {
+    "notSent": "Ni poslano.",
+    "retry": "Poskusi znova",
+    "remove": "Izbriši",
+    "announce": "Sporočila ni bilo mogoče poslati."
   },
   "announce": {
     "message": "{{name}}: {{text}}",
@@ -81,7 +90,9 @@
   "pinned": {
     "label": "Podatki o kanalu",
     "showMore": "Pokaži več",
-    "showLess": "Pokaži manj"
+    "showLess": "Pokaži manj",
+    "hideWelcome": "Skrij pozdravno sporočilo",
+    "hideDescription": "Skrij opis kanala"
   },
   "mention": {
     "list": "Osebe, ki jih lahko omeniš",
@@ -136,6 +147,7 @@
     "next": "Naslednja slika",
     "unnamed": "slika",
     "fullLoading": "Nalaganje polne velikosti …",
+    "fullCancel": "Prekliči prenos v polni velikosti",
     "fullProgress": "Nalaganje polne velikosti … {{percent}} %",
     "fullUnavailable": "Polna velikost ni na voljo – prikazan je predogled"
   },
@@ -149,11 +161,62 @@
     "hint": "Puščice premikajo, Enter pošlje, Delete odstrani, Escape zapre.",
     "empty": "Še ni priljubljenih. Desno klikni GIF v klepetu ali uporabi zvezdico na njem in izberi »Shrani med priljubljene«. Prikazal se bo tukaj."
   },
+  "linkMenu": {
+    "label": "Povezava",
+    "copy": "Kopiraj povezavo",
+    "open": "Odpri povezavo",
+    "copied": "Povezava kopirana"
+  },
   "imageMenu": {
     "label": "Slika {{name}}"
   },
   "attribution": {
     "via": "prek {{brand}}",
     "view": "Ogled na {{brand}}"
+  },
+  "themeCard": {
+    "label": "Deljena tema {{name}}",
+    "apply": "Uporabi temo",
+    "more": "Uporabi za strežnik",
+    "menuLabel": "Uporabi temo za",
+    "applyToServer": "Uporabi za {{server}}",
+    "imported": "Uvoženo ✓",
+    "newer": "Ustvarjeno z Mumcord {{version}} – posodobi, da jo vidiš v celoti",
+    "failed": "Teme ni bilo mogoče uporabiti."
+  },
+  "reply": {
+    "action": "Odgovori",
+    "actionFor": "Odgovori uporabniku {{name}}",
+    "menu": "Sporočilo od {{name}}",
+    "replyTo": "Odgovor za",
+    "jump": "Skoči na izvirno sporočilo",
+    "image": "Slika",
+    "replyingTo": "Odgovor za",
+    "cancel": "Prekliči odgovor"
+  },
+  "actions": {
+    "label": "Začni skupaj",
+    "notConnected": "Ni povezave s strežnikom.",
+    "partyRunning": "V tem kanalu že poteka skupno gledanje.",
+    "invalidLink": "To ni povezava do videa na YouTubu.",
+    "linkLabel": "Povezava YouTube",
+    "linkPlaceholder": "Prilepi povezavo YouTube",
+    "confirm": "Začni",
+    "watchHint": "Glej video z YouTuba skupaj s tem kanalom",
+    "dialogTitle": "Glejte skupaj",
+    "addTitle": "Dodaj na seznam predvajanja",
+    "addToPlaylist": "Dodaj na seznam predvajanja",
+    "addConfirm": "Dodaj",
+    "apps": "Aplikacije",
+    "appsLive": "Aplikacije (deliš zaslon)"
+  },
+  "activity": {
+    "share": "{{name}} deli zaslon",
+    "watch": "Glej",
+    "party": "Skupno gledanje: {{title}}",
+    "join": "Pridruži se",
+    "videoFallback": "Video z YouTuba",
+    "someone": "Nekdo",
+    "joinFailed": "Pridružitev skupnemu gledanju ni uspela."
   }
 }
