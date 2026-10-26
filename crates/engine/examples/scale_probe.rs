@@ -104,7 +104,7 @@ async fn main() -> anyhow::Result<()> {
         }
     }
     // Join for voice so talking from the channel reaches us (a fresh connect is deafened).
-    engine.join_channel(join)?;
+    engine.join_channel(server.id, join)?;
 
     println!(
         "t_s,cpu_pct,rss_mib,events_per_s,max_per_100ms,userUpserted,userRemoved,talk,message,channel,micLevel,other"
@@ -165,6 +165,6 @@ async fn main() -> anyhow::Result<()> {
             }
         }
     }
-    engine.disconnect();
+    engine.disconnect(server.id);
     Ok(())
 }
