@@ -5,6 +5,39 @@
     "remember": "Zapamti moj izbor",
     "minimize": "Smanji u traku",
     "quit": "Izađi",
-    "failed": "To nije uspjelo. Pokušaj ponovno."
+    "failed": "To nije uspjelo. Pokušaj ponovno.",
+    "descriptionServers": "Još si povezan s {{count}} poslužitelja. Minimiziran te Mumcord drži u glasovnom kanalu i ostaje u sistemskoj traci."
+  },
+  "windowOverlay": {
+    "title": "Overlay u prozoru je uklonjen",
+    "description": "Plutajući prozor overlaya više ne postoji. Umjesto toga overlay u igri pokazuje tko govori u tvojim igrama. Možeš ga uključiti u postavkama overlaya.",
+    "dismiss": "Razumijem",
+    "openSettings": "Otvori postavke overlaya"
+  },
+  "appImageMenu": {
+    "title": "Dodati Mumcord u izbornik aplikacija?",
+    "description": "Tako se Mumcord pojavljuje u izborniku aplikacija. Ikona i pritisni za govor ispravno rade na Waylandu, a poveznice mumble:// otvaraju Mumcord. To možeš kasnije promijeniti u Postavkama.",
+    "no": "Ne",
+    "yes": "Da",
+    "failed": "Nije uspjelo. Pokušaj ponovno."
+  },
+  "updateCheck": {
+    "title": "Provjeravati nove verzije?",
+    "description": "Mumcord može jednom dnevno pitati GitHub postoji li novija verzija i prikazati savjet s poveznicom. Ništa se ne preuzima ni instalira, i ništa se ne šalje osim samog upita te naziva i verzije aplikacije. To možeš kasnije promijeniti u Postavkama.",
+    "no": "Ne",
+    "yes": "Da",
+    "failed": "Nije uspjelo. Pokušaj ponovno."
+  },
+  "updateHint": {
+    "message": "Mumcord {{version}} je dostupan.",
+    "open": "Pogledaj izdanje",
+    "dismiss": "Zatvori"
+  },
+  "directConsent": {
+    "title": "Dopustiti izravne veze?",
+    "description": "Izravne veze su brže, ali druga osoba može vidjeti vašu IP adresu. Mumcord ih koristi za slike pune veličine i dijeljenje zaslona s drugim korisnicima Mumcorda te za njih može otvoriti port na vašem usmjerivaču. Ako odbijete, slike i dalje stižu preko poslužitelja, a dijeljenje zaslona nije dostupno. To možete promijeniti kasnije u Postavke → Privatnost.",
+    "no": "Ne",
+    "yes": "Da",
+    "failed": "Nije uspjelo. Pokušaj ponovno."
   }
 }

@@ -31,7 +31,7 @@ async fn switches_stop_keeping_and_loading() {
     let reference = engine.full_image_keep(png()).await.expect("kept while on");
     assert!(
         engine
-            .full_image_fetch(&reference, None, None)
+            .full_image_fetch(1, &reference, None, None)
             .await
             .is_some(),
         "own image comes from the cache while loading is on"
@@ -44,7 +44,7 @@ async fn switches_stop_keeping_and_loading() {
         .await
         .expect("save");
     assert_eq!(
-        engine.full_image_fetch(&reference, None, None).await,
+        engine.full_image_fetch(1, &reference, None, None).await,
         None,
         "no lookup while loading is off"
     );

@@ -8,6 +8,7 @@
     "unknownPerson": "Persona desconocida"
   },
   "list": {
+    "server": "Servidor",
     "today": "Hoy",
     "yesterday": "Ayer",
     "label": "Mensajes en {{name}}",
@@ -17,15 +18,15 @@
     "loadEarlier": "Cargar mensajes anteriores",
     "syncing": "Buscando mensajes anteriores de otros usuarios de Mumcord…",
     "syncAdded_one": "Se añadió {{count}} mensaje anterior de otros usuarios de Mumcord.",
-    "syncAdded_other": "Se añadieron {{count}} mensajes anteriores de otros usuarios de Mumcord.",
     "syncAdded_many": "Se añadieron {{count}} mensajes anteriores de otros usuarios de Mumcord.",
+    "syncAdded_other": "Se añadieron {{count}} mensajes anteriores de otros usuarios de Mumcord.",
     "syncNone": "No se encontraron mensajes anteriores.",
     "syncFailed": "Aquí no se pueden cargar mensajes anteriores.",
     "syncedFrom": "del historial de {{name}}",
     "jumpToNewest": "Ir a lo más reciente",
     "jumpToNewestUnseen_one": "Ir a lo más reciente, {{count}} mensaje nuevo",
-    "jumpToNewestUnseen_other": "Ir a lo más reciente, {{count}} mensajes nuevos",
-    "jumpToNewestUnseen_many": "Ir a lo más reciente, {{count}} mensajes nuevos"
+    "jumpToNewestUnseen_many": "Ir a lo más reciente, {{count}} mensajes nuevos",
+    "jumpToNewestUnseen_other": "Ir a lo más reciente, {{count}} mensajes nuevos"
   },
   "format": {
     "toolbar": "Formato",
@@ -34,7 +35,8 @@
     "strike": "Tachado",
     "code": "Código en línea",
     "codeBlock": "Bloque de código",
-    "link": "Enlace"
+    "link": "Enlace",
+    "quote": "Cita"
   },
   "composer": {
     "label": "Mensaje a {{name}}",
@@ -66,25 +68,34 @@
     "notConnected": "No estás conectado. Vuelve a conectarte e inténtalo de nuevo.",
     "generic": "No se pudo enviar el mensaje. Inténtalo de nuevo.",
     "onlyImages": "Solo se pueden enviar imágenes.",
-    "sourceTooLarge": "Este archivo es demasiado grande para enviarlo (más de 25 MB)."
+    "sourceTooLarge": "Este archivo es demasiado grande para enviarlo (más de 25 MB).",
+    "personOffline": "Esta persona no está conectada. Inténtalo de nuevo cuando vuelva."
+  },
+  "failed": {
+    "notSent": "No enviado.",
+    "retry": "Reintentar",
+    "remove": "Eliminar",
+    "announce": "No se pudo enviar un mensaje."
   },
   "announce": {
     "message": "{{name}}: {{text}}",
     "image": "{{name}} envió una imagen",
     "more_one": "{{count}} mensaje nuevo más",
-    "more_other": "{{count}} mensajes nuevos más",
-    "more_many": "{{count}} mensajes nuevos más"
+    "more_many": "{{count}} mensajes nuevos más",
+    "more_other": "{{count}} mensajes nuevos más"
   },
   "pinned": {
     "label": "Información del canal",
     "showMore": "Mostrar más",
-    "showLess": "Mostrar menos"
+    "showLess": "Mostrar menos",
+    "hideWelcome": "Ocultar mensaje de bienvenida",
+    "hideDescription": "Ocultar descripción del canal"
   },
   "mention": {
     "list": "Personas que se pueden mencionar",
     "found_one": "{{count}} persona sugerida. Usa las flechas y Enter para insertar.",
-    "found_other": "{{count}} personas sugeridas. Usa las flechas y Enter para insertar.",
     "found_many": "{{count}} personas sugeridas. Usa las flechas y Enter para insertar.",
+    "found_other": "{{count}} personas sugeridas. Usa las flechas y Enter para insertar.",
     "none": "No se encontró a nadie",
     "mentionsYou": "Te menciona",
     "chipLabel": "{{name}}, mención"
@@ -132,6 +143,7 @@
     "next": "Imagen siguiente",
     "unnamed": "imagen",
     "fullLoading": "Cargando tamaño completo…",
+    "fullCancel": "Cancelar descarga a tamaño completo",
     "fullProgress": "Cargando tamaño completo… {{percent}} %",
     "fullUnavailable": "Tamaño completo no disponible: se muestra la vista previa"
   },
@@ -145,11 +157,62 @@
     "hint": "Las flechas se mueven, Intro envía, Supr quita, Escape cierra.",
     "empty": "Aún no hay favoritos. Haz clic derecho en un GIF del chat o usa su estrella y elige \"Guardar como favorito\". Aparecerá aquí."
   },
+  "linkMenu": {
+    "label": "Enlace",
+    "copy": "Copiar enlace",
+    "open": "Abrir enlace",
+    "copied": "Enlace copiado"
+  },
   "imageMenu": {
     "label": "Imagen {{name}}"
   },
   "attribution": {
     "via": "vía {{brand}}",
     "view": "Ver en {{brand}}"
+  },
+  "themeCard": {
+    "label": "Tema compartido {{name}}",
+    "apply": "Aplicar tema",
+    "more": "Aplicar a un servidor",
+    "menuLabel": "Aplicar tema a",
+    "applyToServer": "Aplicar a {{server}}",
+    "imported": "Importado ✓",
+    "newer": "Creado con Mumcord {{version}} – actualiza para verlo completo",
+    "failed": "No se pudo aplicar el tema."
+  },
+  "reply": {
+    "action": "Responder",
+    "actionFor": "Responder a {{name}}",
+    "menu": "Mensaje de {{name}}",
+    "replyTo": "Respuesta a",
+    "jump": "Ir al mensaje original",
+    "image": "Imagen",
+    "replyingTo": "Respondiendo a",
+    "cancel": "Cancelar respuesta"
+  },
+  "actions": {
+    "label": "Empezar juntos",
+    "notConnected": "No conectado al servidor.",
+    "partyRunning": "Ya hay una watch party en este canal.",
+    "invalidLink": "Esto no es un enlace de vídeo de YouTube.",
+    "linkLabel": "Enlace de YouTube",
+    "linkPlaceholder": "Pega un enlace de YouTube",
+    "confirm": "Empezar",
+    "watchHint": "Ver un vídeo de YouTube junto con este canal",
+    "dialogTitle": "Ver juntos",
+    "addTitle": "Añadir a la lista",
+    "addToPlaylist": "Añadir a la lista",
+    "addConfirm": "Añadir",
+    "apps": "Apps",
+    "appsLive": "Apps (estás compartiendo tu pantalla)"
+  },
+  "activity": {
+    "share": "{{name}} está compartiendo su pantalla",
+    "watch": "Ver",
+    "party": "Watch party: {{title}}",
+    "join": "Unirse",
+    "videoFallback": "Vídeo de YouTube",
+    "someone": "Alguien",
+    "joinFailed": "No se pudo unir a la watch party."
   }
 }

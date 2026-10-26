@@ -32,7 +32,15 @@
     "avatarUnregistered": "Acest server păstrează avatarele doar pentru utilizatorii înregistrați – Mumcord îl retrimite pe al tău la fiecare conectare.",
     "avatarChosen": "Selectat: {{name}}",
     "avatarRemoved": "Poza va fi eliminată când salvezi.",
-    "comment": "Despre tine"
+    "comment": "Despre tine",
+    "format": "Formatare text",
+    "bold": "Aldin",
+    "italic": "Cursiv",
+    "link": "Link",
+    "linkAddress": "Adresa linkului",
+    "linkApply": "Adaugă link",
+    "bulletList": "Listă cu marcatori",
+    "numberedList": "Listă numerotată"
   },
   "register": {
     "title": "Înregistrează-te pe acest server",
@@ -69,8 +77,6 @@
     "nowGaming": "Arată jocul la care joc",
     "nowGamingHint": "Ceilalți văd jocul tău actual",
     "unavailable": "Nu e disponibil pe acest sistem",
-    "overlay": "Overlay",
-    "overlayHint": "Arată cine vorbește peste jocuri",
     "editProfile": "Editează profilul",
     "editProfileHint": "Nume, avatar și comentariu",
     "register": "Înregistrează-te pe acest server",
@@ -84,5 +90,10 @@
     "offerImagesHint": "Lasă-i pe ceilalți să-ți încarce imaginile originale",
     "loadImages": "Încarcă imagini la dimensiune completă",
     "loadImagesHint": "Preia imaginile originale de la ceilalți"
+  },
+  "voice": {
+    "line": "Voce: {{channel}} · {{server}}",
+    "server": "Voce: {{server}}",
+    "show": "{{location}} – arată acest server"
   }
 }

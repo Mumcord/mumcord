@@ -1,9 +1,10 @@
-import { fireEvent, render, screen, waitFor } from "@testing-library/react";
-import { afterEach, describe, expect, it, vi } from "vitest";
+import { fireEvent, render, screen, waitFor, within } from "@testing-library/react";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { createMockApi, getApi, setApi, type Settings } from "../api";
 import { applyLanguage } from "../i18n";
 import { axeViolations } from "../test/axe";
 import { App } from "./App";
+import { stubDialog } from "../features/channels/testUtils";
 import { usePreferences } from "./preferences";
 import { useView } from "./view";
 
@@ -39,10 +40,12 @@ let DEFAULTS: Settings;
 async function renderWith(seed: "fresh" | "ready", overrides: Partial<Settings> = {}) {
   const api = createMockApi({ seed });
   DEFAULTS = await api.settingsGet();
-  await api.settingsUpdate({ ...DEFAULTS, ...overrides });
+  await api.settingsUpdate({ ...DEFAULTS, updateCheck: "no", ...overrides });
   setApi(api);
   return render(<App />);
 }
+
+beforeEach(stubDialog);
 
 afterEach(async () => {
   setApi(undefined);
@@ -99,6 +102,33 @@ describe("App", () => {
     fireEvent.keyDown(document, { key: "Escape" });
     expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
     expect(opener).toHaveFocus();
+  });
+
+  it("hides Settings during a theme preview and restores it with the draft", async () => {
+    await renderWith("ready");
+    fireEvent.click(await screen.findByRole("button", { name: "Open settings" }));
+    fireEvent.click(screen.getByRole("tab", { name: "Appearance" }));
+    fireEvent.click(await screen.findByRole("button", { name: "New theme from the current one" }));
+    const editor = screen.getByRole("dialog", { name: /^New theme/ });
+    const accent = within(editor).getByRole("textbox", { name: "Accent, Dark" });
+    fireEvent.change(accent, { target: { value: "#ff66cc" } });
+    fireEvent.click(within(editor).getByRole("button", { name: "Preview" }));
+
+    const back = screen.getByRole("button", { name: "Back to editor" });
+    expect(back).toHaveFocus();
+    expect(screen.queryByRole("dialog", { name: "Settings" })).toBeNull();
+    expect(
+      screen.getByRole("heading", { name: "Settings", hidden: true }).closest(".overlay"),
+    ).toHaveAttribute("hidden");
+    expect(screen.getByRole("main", { name: "Chat" }).closest("[inert]")).toBeNull();
+
+    fireEvent.keyDown(document, { key: "Escape" });
+    expect(screen.getByRole("dialog", { name: "Settings" })).toBeInTheDocument();
+    const restored = screen.getByRole("dialog", { name: /^New theme/ });
+    expect(within(restored).getByRole("textbox", { name: "Accent, Dark" })).toHaveValue("#ff66cc");
+    expect(
+      screen.getByRole("main", { name: "Chat", hidden: true }).closest("[inert]"),
+    ).not.toBeNull();
   });
 
   it("shows a retryable error when settings cannot be loaded", async () => {

@@ -1,0 +1,47 @@
+.chat-actions__error {
+  margin: var(--space-1) 0 0;
+  color: var(--color-danger, inherit);
+}
+
+.chat-apps {
+  position: relative;
+  display: inline-flex;
+}
+
+.chat-apps__button {
+  position: relative;
+}
+
+.chat-apps__live {
+  position: absolute;
+  top: 0.125rem;
+  right: 0.125rem;
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 50%;
+  background: var(--color-danger);
+}
+
+/* Opens upward: the composer sits at the bottom of the window. */
+.chat-apps__menu {
+  position: absolute;
+  inset-block-end: calc(100% + var(--space-1));
+  inset-inline-start: 0;
+  width: max-content;
+  max-width: min(22rem, calc(100vw - 2 * var(--space-4)));
+}
+
+.chat-apps__item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+}
+
+.chat-apps__reason {
+  color: var(--color-text-muted);
+  font-size: 0.75rem;
+}
+
+.chat-apps__viewers {
+  padding: var(--space-1) var(--space-3);
+}

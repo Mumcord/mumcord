@@ -4,6 +4,7 @@
   "online": "Online",
   "onlineIn": "Online na kanale {{channel}}",
   "onlineOnServer": "Online na {{server}}",
+  "inChannelOnServer": "Na kanale {{channel}} · {{server}}",
   "offline": "Offline",
   "lastSeen": "Offline, ostatnio widziano {{when}}",
   "friend": "Znajomy",
@@ -11,5 +12,7 @@
   "noCertificate": "Osoby bez certyfikatu nie mogą być znajomymi, bo Mumcord nie mógłby ich ponownie rozpoznać.",
   "add": "Dodaj do znajomych",
   "remove": "Usuń ze znajomych",
-  "failed": "Nie udało się zmienić statusu znajomego. Spróbuj ponownie."
+  "failed": "Nie udało się zmienić statusu znajomego. Spróbuj ponownie.",
+  "join": "Dołącz",
+  "joinFriend": "Dołącz do kanału {{name}}"
 }

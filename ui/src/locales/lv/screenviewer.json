@@ -1,0 +1,21 @@
+{
+  "label": "{{name}} ekrāna kopīgošana",
+  "title": "{{name}} ekrāns",
+  "beta": "Beta",
+  "picture": "{{name}} kopīgotais ekrāns",
+  "someone": "Kāds",
+  "live": "Tiešraide",
+  "collapse": "Sakļaut",
+  "expand": "Izvērst",
+  "fullscreen": "Pilnekrāns",
+  "exitFullscreen": "Iziet no pilnekrāna",
+  "stop": "Beigt skatīties",
+  "starting": "Savienojas ar {{name}} ekrānu…",
+  "paused": "{{name}} pauzēja kopīgošanu.",
+  "full": "Šī kopīgošana ir pilna.",
+  "unreachable": "Neizdevās tieši sazināties ar {{name}}. Tīkls, iespējams, bloķē tiešos savienojumus.",
+  "tooOld": "{{name}} Mumcord ir pārāk vecs, lai ar tevi kopīgotu ekrānu.",
+  "consentOff": "Skatīšanai vajadzīgi tiešie savienojumi, bet tu tos izslēdzi.",
+  "failed": "{{name}} ekrānu neizdevās atvērt.",
+  "retry": "Mēģināt vēlreiz"
+}

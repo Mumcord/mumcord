@@ -15,7 +15,8 @@
   },
   "dm": {
     "title": "Neposredna sporočila",
-    "unknown": "Neznana oseba"
+    "unknown": "Neznana oseba",
+    "withServer": "{{name}}, na {{server}}"
   },
   "notify": {
     "channel": "{{name}} v {{channel}}: {{text}}",
@@ -23,7 +24,9 @@
     "more_one": "Še {{count}} novo sporočilo",
     "more_two": "Še {{count}} novi sporočili",
     "more_few": "Še {{count}} nova sporočila",
-    "more_other": "Še {{count}} novih sporočil"
+    "more_other": "Še {{count}} novih sporočil",
+    "channelOn": "{{name}} v {{channel}} na {{server}}: {{text}}",
+    "privateOn": "{{name}} (zasebno, {{server}}): {{text}}"
   },
   "history": {
     "clear": "Počisti zgodovino",

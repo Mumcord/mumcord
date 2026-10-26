@@ -98,5 +98,10 @@
     "ingameOverlayHint": "Vykresluje nad hrou, kdo mluví (Linux). Později ho můžeš v Nastavení zapnout nebo vypnout pro každou hru zvlášť.",
     "ingameOverlayWarning": "Některé hry s anti-cheatem můžou overlaye ve hře označit nebo zablokovat. Mumcord má známé rizikové hry (například Valorant nebo League of Legends) ve výchozím stavu vypnuté. Zapni ho jen pro hry, kterým důvěřuješ.",
     "ingameOverlayAlt": "Ukázka overlaye ve hře, který zobrazuje, kdo mluví"
+  },
+  "updates": {
+    "title": "Nové verze",
+    "check": "Kontrolovat nové verze",
+    "hint": "Mumcord se může jednou denně zeptat GitHubu, jestli existuje novější verze, a zobrazit tip s odkazem. Nic se nestahuje ani neinstaluje a nic se neodesílá kromě samotného dotazu a názvu a verze aplikace. Později to můžeš změnit v Nastavení."
   }
 }

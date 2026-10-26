@@ -23,7 +23,8 @@ use serde::{Deserialize, Serialize};
 
 /// Plugin data id of history sync packets; other ids are ignored.
 pub const DATA_ID: &str = "mumcord.history";
-/// The only packet version this client speaks.
+/// The packet version this client sends. Any version >= 1 is accepted on receipt and unknown
+/// fields are ignored. Minor additions keep v=1 and old clients ignore unknown fields; a breaking change gets a new data id.
 pub const VERSION: u32 = 1;
 /// Length of a content hash on the wire.
 pub const HASH_LEN: usize = 8;
@@ -251,7 +252,7 @@ pub fn decode(data: &[u8]) -> Result<Packet, WireError> {
         None => (data, &data[data.len()..]),
     };
     let version: VersionOnly = serde_json::from_slice(head).map_err(|_| WireError::Malformed)?;
-    if version.v != VERSION {
+    if version.v < VERSION {
         return Err(WireError::Version(version.v));
     }
     let header: Header = serde_json::from_slice(head).map_err(|_| WireError::Malformed)?;
@@ -463,13 +464,21 @@ mod tests {
     }
 
     #[test]
+    fn newer_version_with_extra_fields_decodes() {
+        assert_eq!(
+            decode(br#"{"v":2,"t":"deny","r":1,"future":true}"#),
+            Ok(Packet::Deny { req: 1 })
+        );
+    }
+
+    #[test]
     fn untrusted_packets_are_rejected() {
         assert_eq!(
             decode(&vec![b' '; PLUGIN_DATA_MAX + 1]),
             Err(WireError::TooLarge)
         );
         assert_eq!(decode(b"not json"), Err(WireError::Malformed));
-        assert_eq!(decode(br#"{"v":2,"t":"new"}"#), Err(WireError::Version(2)));
+        assert_eq!(decode(br#"{"v":0,"t":"new"}"#), Err(WireError::Version(0)));
         assert_eq!(
             decode(br#"{"v":1,"t":"bogus","r":1}"#),
             Err(WireError::Malformed)

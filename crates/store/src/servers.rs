@@ -1,6 +1,6 @@
 use rusqlite::{OptionalExtension, Row, params};
 
-use crate::db::Store;
+use crate::db::{Store, UnixMillis};
 use crate::error::{Error, Result};
 use crate::secrets::SecretStore;
 
@@ -45,10 +45,22 @@ pub struct SavedServer {
     pub last_channel: Option<String>,
     pub save_history: bool,
     pub sort_order: i64,
+    /// Connect this server when the app starts (FR-2.7).
+    pub always_connect_at_start: bool,
+    /// When the app was quit while connected to this server; `None` if it was not connected.
+    /// Set with [`Store::set_quit_state`], not by [`Store::update_server`].
+    pub connected_at_quit: Option<UnixMillis>,
+    /// This was the voice server when the app was quit, for the rejoin prompt (FR-2.3).
+    pub was_voice_server_at_quit: bool,
+    /// No notifications from this server (FR-2.10).
+    pub notifications_muted: bool,
+    /// Theme for this server; `None` uses the app theme (FR-2.17).
+    pub theme_id: Option<String>,
 }
 
-const SERVER_COLUMNS: &str =
-    "id, label, address, port, username, last_channel, save_history, sort_order";
+const SERVER_COLUMNS: &str = "id, label, address, port, username, last_channel, save_history, \
+     sort_order, always_connect_at_start, connected_at_quit, was_voice_server_at_quit, \
+     notifications_muted, theme_id";
 
 fn server_from_row(row: &Row<'_>) -> rusqlite::Result<SavedServer> {
     Ok(SavedServer {
@@ -60,6 +72,11 @@ fn server_from_row(row: &Row<'_>) -> rusqlite::Result<SavedServer> {
         last_channel: row.get(5)?,
         save_history: row.get(6)?,
         sort_order: row.get(7)?,
+        always_connect_at_start: row.get(8)?,
+        connected_at_quit: row.get(9)?,
+        was_voice_server_at_quit: row.get(10)?,
+        notifications_muted: row.get(11)?,
+        theme_id: row.get(12)?,
     })
 }
 
@@ -105,8 +122,9 @@ impl Store {
             .optional()?)
     }
 
-    /// Updates label, address, port, username, last channel and the save-history
-    /// switch. The order is changed with [`Store::reorder_servers`].
+    /// Updates label, address, port, username, last channel, the save-history switch and the
+    /// multi-server settings (always connect, muted notifications, theme). The order is changed
+    /// with [`Store::reorder_servers`], the quit state with [`Store::set_quit_state`].
     pub fn update_server(&self, server: &SavedServer) -> Result<()> {
         if server.port == 0 {
             return Err(Error::InvalidPort);
@@ -114,7 +132,8 @@ impl Store {
         let changed = self.conn.execute(
             "UPDATE saved_server
              SET label = ?2, address = ?3, port = ?4, username = ?5, last_channel = ?6,
-                 save_history = ?7
+                 save_history = ?7, always_connect_at_start = ?8, notifications_muted = ?9,
+                 theme_id = ?10
              WHERE id = ?1",
             params![
                 server.id,
@@ -123,10 +142,39 @@ impl Store {
                 server.port,
                 server.username,
                 server.last_channel,
-                server.save_history
+                server.save_history,
+                server.always_connect_at_start,
+                server.notifications_muted,
+                server.theme_id
             ],
         )?;
         expect_one(changed, server.id)
+    }
+
+    /// Records, for every server, whether it was connected at quit and which one was the voice
+    /// server. `connected` holds the connected servers; `voice` is at most one of them. Servers
+    /// not listed are marked as not connected.
+    pub fn set_quit_state(
+        &self,
+        connected: &[ServerId],
+        voice: Option<ServerId>,
+        quit_at: UnixMillis,
+    ) -> Result<()> {
+        let tx = self.conn.unchecked_transaction()?;
+        tx.execute(
+            "UPDATE saved_server SET connected_at_quit = NULL, was_voice_server_at_quit = 0",
+            [],
+        )?;
+        for id in connected {
+            let changed = tx.execute(
+                "UPDATE saved_server SET connected_at_quit = ?2, was_voice_server_at_quit = ?3
+                 WHERE id = ?1",
+                params![id, quit_at, voice == Some(*id)],
+            )?;
+            expect_one(changed, *id)?;
+        }
+        tx.commit()?;
+        Ok(())
     }
 
     pub fn set_last_channel(&self, id: ServerId, channel_path: Option<&str>) -> Result<()> {
@@ -257,11 +305,12 @@ impl Store {
     }
 
     /// Removes a server with all its local data (trust decision, follows, history,
-    /// person settings) and its password in secure storage.
+    /// person settings) and its password and channel passwords in secure storage.
     pub fn remove_server(&self, id: ServerId, secrets: &SecretStore) -> Result<()> {
-        // Password first: if secure storage fails, the server stays and the user can retry
+        // Secrets first: if secure storage fails, the server stays and the user can retry
         // instead of leaving an orphaned secret behind.
         secrets.delete_server_password(id)?;
+        secrets.set_access_tokens(id, &[])?;
         let changed = self
             .conn
             .execute("DELETE FROM saved_server WHERE id = ?1", [id])?;
@@ -304,6 +353,65 @@ mod tests {
         assert!(store.voice_channels().expect("read").is_empty());
         assert!(matches!(
             store.set_voice_channel(999, "Root"),
+            Err(Error::UnknownServer(999))
+        ));
+    }
+
+    #[test]
+    fn multi_server_fields_default_off_and_round_trip() {
+        let (_dir, store) = temp_store();
+        let added = store
+            .add_server(&NewServer::new("A", "localhost", "Tester"))
+            .expect("add");
+        assert!(!added.always_connect_at_start && !added.notifications_muted);
+        assert!(!added.was_voice_server_at_quit);
+        assert_eq!(
+            (added.connected_at_quit, added.theme_id.clone()),
+            (None, None)
+        );
+
+        let mut edited = added.clone();
+        edited.always_connect_at_start = true;
+        edited.notifications_muted = true;
+        edited.theme_id = Some("forest".into());
+        store.update_server(&edited).expect("update");
+        assert_eq!(store.server(added.id).expect("get"), Some(edited.clone()));
+
+        // A stale struct saved later must not wipe the quit state.
+        store
+            .set_quit_state(&[added.id], Some(added.id), 42)
+            .expect("quit");
+        store.update_server(&edited).expect("update again");
+        let loaded = store.server(added.id).expect("get").expect("exists");
+        assert_eq!(loaded.connected_at_quit, Some(42));
+        assert!(loaded.was_voice_server_at_quit);
+    }
+
+    #[test]
+    fn quit_state_replaces_the_previous_one() {
+        let (_dir, store) = temp_store();
+        let a = store
+            .add_server(&NewServer::new("A", "localhost", "T"))
+            .expect("add");
+        let b = store
+            .add_server(&NewServer::new("B", "localhost", "T"))
+            .expect("add");
+        store
+            .set_quit_state(&[a.id, b.id], Some(b.id), 10)
+            .expect("quit");
+        store.set_quit_state(&[b.id], None, 20).expect("quit");
+        let a = store.server(a.id).expect("get").expect("a");
+        let b = store.server(b.id).expect("get").expect("b");
+        assert_eq!(
+            (a.connected_at_quit, a.was_voice_server_at_quit),
+            (None, false)
+        );
+        assert_eq!(
+            (b.connected_at_quit, b.was_voice_server_at_quit),
+            (Some(20), false)
+        );
+        assert!(matches!(
+            store.set_quit_state(&[999], None, 1),
             Err(Error::UnknownServer(999))
         ));
     }
@@ -452,6 +560,9 @@ mod tests {
             .expect("add")
             .id;
         secrets.set_server_password(id, "pw").expect("pw");
+        secrets
+            .set_access_tokens(id, &["secret".to_owned()])
+            .expect("tokens");
         store.set_trusted_cert(id, "ab:cd").expect("trust");
         store.follow_channel(id, "Root/Games", 1).expect("follow");
         store
@@ -479,6 +590,7 @@ mod tests {
 
         store.remove_server(id, &secrets).expect("remove");
         assert_eq!(secrets.server_password(id).expect("read"), None);
+        assert!(secrets.access_tokens(id).expect("tokens").is_empty());
         for table in [
             "trusted_cert",
             "followed_channel",

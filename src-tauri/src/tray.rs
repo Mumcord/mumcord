@@ -1,5 +1,6 @@
 //! Tray icon showing connection and talk state, with Show / Mute / Deafen / Overlay / Quit
-//! (FR-1.37, FR-1.45).
+//! (FR-1.37, FR-1.45). On Linux it is our own StatusNotifierItem (see `linux`), with the Tauri
+//! tray as fallback when no StatusNotifierWatcher runs.
 
 use std::sync::Mutex;
 
@@ -12,10 +13,12 @@ use tauri::{AppHandle, Manager, Wry};
 
 use crate::window;
 
+#[cfg(target_os = "linux")]
+mod linux;
+
 const SHOW: &str = "show";
 const MUTE: &str = "mute";
 const DEAFEN: &str = "deafen";
-const OVERLAY: &str = "overlay";
 const QUIT: &str = "quit";
 
 /// Side length of the generated tray images; trays render at 16–32 px.
@@ -113,7 +116,6 @@ struct Labels {
     show: String,
     mute: String,
     deafen: String,
-    overlay: String,
     quit: String,
     disconnected: String,
     connecting: String,
@@ -176,21 +178,133 @@ impl Labels {
     }
 }
 
-/// The tray's live handles, kept in Tauri state.
+/// Tooltip text shown when hovering the tray icon.
+fn tooltip(status: &str) -> String {
+    format!("Mumcord – {status}")
+}
+
+/// What a tray menu item does when clicked.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+enum Action {
+    Show,
+    Mute,
+    Deafen,
+    Quit,
+}
+
+impl Action {
+    fn from_id(id: &str) -> Option<Self> {
+        match id {
+            SHOW => Some(Self::Show),
+            MUTE => Some(Self::Mute),
+            DEAFEN => Some(Self::Deafen),
+            QUIT => Some(Self::Quit),
+            _ => None,
+        }
+    }
+}
+
+/// One row of the tray menu as the StatusNotifierItem draws it (the Tauri tray keeps handles to
+/// its fixed items instead).
+#[cfg(target_os = "linux")]
+#[derive(Clone, Debug, PartialEq, Eq)]
+enum Entry {
+    /// The greyed-out status line at the top.
+    Status(String),
+    Separator,
+    Button(Action, String),
+    Toggle {
+        action: Action,
+        label: String,
+        enabled: bool,
+        checked: bool,
+    },
+}
+
+/// The tray menu for `state`: status, Show, Mute, Deafen, Quit.
+#[cfg(target_os = "linux")]
+fn menu_model(state: TrayState, labels: &Labels) -> Vec<Entry> {
+    let connected = state.conn == Conn::Connected;
+    vec![
+        Entry::Status(labels.status(state.look()).to_owned()),
+        Entry::Separator,
+        Entry::Button(Action::Show, labels.show.clone()),
+        Entry::Toggle {
+            action: Action::Mute,
+            label: labels.mute.clone(),
+            enabled: connected,
+            checked: state.muted,
+        },
+        Entry::Toggle {
+            action: Action::Deafen,
+            label: labels.deafen.clone(),
+            enabled: connected,
+            checked: state.deafened,
+        },
+        Entry::Separator,
+        Entry::Button(Action::Quit, labels.quit.clone()),
+    ]
+}
+
+/// The tray's live state, kept in Tauri state.
 pub struct Tray {
+    backend: Backend,
+    base: Option<Image<'static>>,
+    state: Mutex<TrayState>,
+}
+
+enum Backend {
+    Tauri(Box<TauriTray>),
+    /// Our own StatusNotifierItem: Tauri's Linux tray cannot show a tooltip (FR-2.52).
+    #[cfg(target_os = "linux")]
+    Ksni(ksni::Handle<linux::KsniTray>),
+}
+
+/// Handles of the Tauri tray icon and its menu items.
+struct TauriTray {
     icon: TrayIcon,
     status: MenuItem<Wry>,
     show: MenuItem<Wry>,
     mute: CheckMenuItem<Wry>,
     deafen: CheckMenuItem<Wry>,
-    overlay: CheckMenuItem<Wry>,
     quit: MenuItem<Wry>,
-    base: Option<Image<'static>>,
-    state: Mutex<TrayState>,
+}
+
+fn base_icon(app: &AppHandle) -> Option<Image<'static>> {
+    app.default_window_icon().map(|i| scale(i, ICON_SIZE))
 }
 
 /// Creates the tray. Failing to create it is logged; the app works without one.
+#[cfg(target_os = "linux")]
 pub fn init(app: &AppHandle) {
+    let app = app.clone();
+    tauri::async_runtime::spawn(async move {
+        match linux::spawn(&app).await {
+            Ok(handle) => {
+                app.manage(Tray {
+                    backend: Backend::Ksni(handle),
+                    base: base_icon(&app),
+                    state: Mutex::new(TrayState::default()),
+                });
+                refresh(&app, true);
+            }
+            Err(e) => {
+                tracing::warn!(error = %e, "no StatusNotifierItem tray available; falling back to the AppIndicator tray");
+                let main = app.clone();
+                if let Err(e) = app.run_on_main_thread(move || init_tauri(&main)) {
+                    tracing::warn!(error = %e, "creating the tray icon failed");
+                }
+            }
+        }
+    });
+}
+
+#[cfg(not(target_os = "linux"))]
+pub fn init(app: &AppHandle) {
+    init_tauri(app);
+}
+
+fn init_tauri(app: &AppHandle) {
     if !indicator_library_present() {
         tracing::warn!(
             "no tray library (libayatana-appindicator3 or libappindicator3) found; running without a tray icon"
@@ -211,22 +325,20 @@ fn build(app: &AppHandle) -> tauri::Result<Tray> {
     let show = MenuItem::with_id(app, SHOW, "", true, None::<&str>)?;
     let mute = CheckMenuItem::with_id(app, MUTE, "", false, false, None::<&str>)?;
     let deafen = CheckMenuItem::with_id(app, DEAFEN, "", false, false, None::<&str>)?;
-    let overlay_on = app
-        .state::<Engine>()
-        .settings()
-        .is_ok_and(|s| s.overlay.enabled);
-    let overlay = CheckMenuItem::with_id(app, OVERLAY, "", true, overlay_on, None::<&str>)?;
     let quit = MenuItem::with_id(app, QUIT, "", true, None::<&str>)?;
     let separator = PredefinedMenuItem::separator(app)?;
     let separator2 = PredefinedMenuItem::separator(app)?;
-    // macOS has no overlay at all (QA.58), so its item stays out of the menu there.
-    let mut items: Vec<&dyn IsMenuItem<Wry>> = vec![&status, &separator, &show, &mute, &deafen];
-    if !cfg!(target_os = "macos") {
-        items.push(&overlay);
-    }
-    items.extend([&separator2 as &dyn IsMenuItem<Wry>, &quit]);
+    let items: [&dyn IsMenuItem<Wry>; 7] = [
+        &status,
+        &separator,
+        &show,
+        &mute,
+        &deafen,
+        &separator2,
+        &quit,
+    ];
     let menu = Menu::with_items(app, &items)?;
-    let base = app.default_window_icon().map(|i| scale(i, ICON_SIZE));
+    let base = base_icon(app);
     let mut builder = TrayIconBuilder::with_id("main")
         .menu(&menu)
         .show_menu_on_left_click(false)
@@ -245,55 +357,64 @@ fn build(app: &AppHandle) -> tauri::Result<Tray> {
         builder = builder.icon(with_dot(base, Look::Disconnected));
     }
     Ok(Tray {
-        icon: builder.build(app)?,
-        status,
-        show,
-        mute,
-        deafen,
-        overlay,
-        quit,
+        backend: Backend::Tauri(Box::new(TauriTray {
+            icon: builder.build(app)?,
+            status,
+            show,
+            mute,
+            deafen,
+            quit,
+        })),
         base,
         state: Mutex::new(TrayState::default()),
     })
 }
 
 fn on_menu_event(app: &AppHandle, event: MenuEvent) {
-    let Some(tray) = app.try_state::<Tray>() else {
+    if let Some(action) = Action::from_id(event.id().as_ref()) {
+        perform(app, action);
+    }
+    // A check item toggles itself on click; the engine's echo decides the real state.
+    refresh(app, false);
+}
+
+/// Runs a clicked menu action.
+fn perform(app: &AppHandle, action: Action) {
+    let Some(state) = current_state(app) else {
         return;
     };
-    let state = *tray.state.lock().unwrap_or_else(|e| e.into_inner());
     let engine = app.state::<Engine>();
-    let result = match event.id().as_ref() {
-        SHOW => {
+    let result = match action {
+        Action::Show => {
             window::show(app);
             Ok(())
         }
-        MUTE => engine.set_self_mute(!state.muted),
-        DEAFEN => engine.set_self_deaf(!state.deafened),
-        OVERLAY => {
-            // The item toggled itself; the stored setting decides, so read it, not the item.
-            let enabled = engine.settings().is_ok_and(|s| s.overlay.enabled);
-            let app = app.clone();
-            tauri::async_runtime::spawn(async move {
-                let engine = app.state::<Engine>();
-                if let Err(e) = crate::overlay::set_enabled(&app, &engine, !enabled).await {
-                    tracing::warn!(error = %e, "toggling the overlay from the tray failed");
-                    overlay_changed(&app, enabled);
-                }
-            });
-            Ok(())
-        }
-        QUIT => {
+        Action::Mute => engine.set_self_mute(!state.muted),
+        Action::Deafen => engine.set_self_deaf(!state.deafened),
+        Action::Quit => {
             window::quit(app);
             Ok(())
         }
-        _ => Ok(()),
     };
     if let Err(e) = result {
         tracing::warn!(error = %e, "tray action failed");
     }
-    // A check item toggles itself on click; the engine's echo decides the real state.
-    refresh(app, false);
+}
+
+fn current_state(app: &AppHandle) -> Option<TrayState> {
+    let tray = app.try_state::<Tray>()?;
+    Some(*tray.state.lock().unwrap_or_else(|e| e.into_inner()))
+}
+
+/// The tray texts in the current app language.
+fn current_labels(app: &AppHandle) -> Labels {
+    let setting = app
+        .state::<Engine>()
+        .settings()
+        .ok()
+        .and_then(|s| s.language);
+    let system = std::env::var("LANG").ok();
+    labels(setting.as_deref(), system.as_deref())
 }
 
 /// Updates the tray from an engine event (called for every forwarded event).
@@ -311,15 +432,8 @@ pub fn on_engine_event(app: &AppHandle, event: &EngineEvent) {
     }
 }
 
-/// Shows whether the overlay is on in the menu.
-pub fn overlay_changed(app: &AppHandle, enabled: bool) {
-    let Some(tray) = app.try_state::<Tray>() else {
-        return;
-    };
-    if let Err(e) = tray.overlay.set_checked(enabled) {
-        tracing::warn!(error = %e, "updating the tray overlay item failed");
-    }
-    // Also announced after a language change, so the menu texts follow it.
+/// The app language changed, so the menu texts follow it.
+pub fn language_changed(app: &AppHandle) {
     refresh(app, true);
 }
 
@@ -328,37 +442,42 @@ fn refresh(app: &AppHandle, texts: bool) {
     let Some(tray) = app.try_state::<Tray>() else {
         return;
     };
+    match &tray.backend {
+        Backend::Tauri(handles) => refresh_tauri(app, &tray, handles, texts),
+        #[cfg(target_os = "linux")]
+        Backend::Ksni(handle) => {
+            let handle = handle.clone();
+            let app = app.clone();
+            // The update reads the newest state when it runs, so out-of-order tasks are harmless.
+            tauri::async_runtime::spawn(async move {
+                handle.update(|t| t.sync(&app)).await;
+            });
+        }
+    }
+}
+
+fn refresh_tauri(app: &AppHandle, tray: &Tray, handles: &TauriTray, texts: bool) {
     let state = *tray.state.lock().unwrap_or_else(|e| e.into_inner());
-    let setting = app
-        .state::<Engine>()
-        .settings()
-        .ok()
-        .and_then(|s| s.language);
-    let system = std::env::var("LANG").ok();
-    let labels = labels(setting.as_deref(), system.as_deref());
+    let labels = current_labels(app);
     let look = state.look();
     let connected = state.conn == Conn::Connected;
-    let mut result = tray
+    let mut result = handles
         .status
         .set_text(labels.status(look))
-        .and_then(|()| {
-            tray.icon
-                .set_tooltip(Some(format!("Mumcord – {}", labels.status(look))))
-        })
-        .and_then(|()| tray.mute.set_enabled(connected))
-        .and_then(|()| tray.mute.set_checked(state.muted))
-        .and_then(|()| tray.deafen.set_enabled(connected))
-        .and_then(|()| tray.deafen.set_checked(state.deafened));
+        .and_then(|()| handles.icon.set_tooltip(Some(tooltip(labels.status(look)))))
+        .and_then(|()| handles.mute.set_enabled(connected))
+        .and_then(|()| handles.mute.set_checked(state.muted))
+        .and_then(|()| handles.deafen.set_enabled(connected))
+        .and_then(|()| handles.deafen.set_checked(state.deafened));
     if texts {
         result = result
-            .and_then(|()| tray.show.set_text(&labels.show))
-            .and_then(|()| tray.mute.set_text(&labels.mute))
-            .and_then(|()| tray.deafen.set_text(&labels.deafen))
-            .and_then(|()| tray.overlay.set_text(&labels.overlay))
-            .and_then(|()| tray.quit.set_text(&labels.quit));
+            .and_then(|()| handles.show.set_text(&labels.show))
+            .and_then(|()| handles.mute.set_text(&labels.mute))
+            .and_then(|()| handles.deafen.set_text(&labels.deafen))
+            .and_then(|()| handles.quit.set_text(&labels.quit));
     }
     if let Some(base) = &tray.base {
-        result = result.and_then(|()| tray.icon.set_icon(Some(with_dot(base, look))));
+        result = result.and_then(|()| handles.icon.set_icon(Some(with_dot(base, look))));
     }
     if let Err(e) = result {
         tracing::warn!(error = %e, "updating the tray icon failed");
@@ -612,6 +731,65 @@ mod tests {
         assert_eq!(labels(None, Some("fr_FR.UTF-8")).quit, "Quitter");
         assert_eq!(labels(None, Some("xx_XX")).quit, "Quit");
         assert_eq!(labels(None, None).quit, "Quit");
+    }
+
+    #[cfg(target_os = "linux")]
+    #[test]
+    fn menu_follows_connection_and_voice_state() {
+        let labels = labels(Some("en"), None);
+        let offline = menu_model(TrayState::default(), &labels);
+        assert_eq!(offline.len(), 7);
+        assert_eq!(offline[0], Entry::Status(labels.disconnected.clone()));
+        assert_eq!(offline[2], Entry::Button(Action::Show, labels.show.clone()));
+        assert_eq!(offline[6], Entry::Button(Action::Quit, labels.quit.clone()));
+        assert!(matches!(
+            offline[3],
+            Entry::Toggle {
+                action: Action::Mute,
+                enabled: false,
+                checked: false,
+                ..
+            }
+        ));
+        let muted = TrayState {
+            conn: Conn::Connected,
+            self_session: Some(1),
+            talking: false,
+            muted: true,
+            deafened: false,
+        };
+        let online = menu_model(muted, &labels);
+        assert_eq!(online[0], Entry::Status(labels.muted.clone()));
+        assert!(matches!(
+            online[3],
+            Entry::Toggle {
+                action: Action::Mute,
+                enabled: true,
+                checked: true,
+                ..
+            }
+        ));
+        assert!(matches!(
+            online[4],
+            Entry::Toggle {
+                action: Action::Deafen,
+                enabled: true,
+                checked: false,
+                ..
+            }
+        ));
+    }
+
+    #[test]
+    fn menu_ids_map_to_actions() {
+        assert_eq!(Action::from_id(MUTE), Some(Action::Mute));
+        assert_eq!(Action::from_id(QUIT), Some(Action::Quit));
+        assert_eq!(Action::from_id("status"), None);
+    }
+
+    #[test]
+    fn tooltip_names_app_and_status() {
+        assert_eq!(tooltip("Connected"), "Mumcord – Connected");
     }
 
     #[test]

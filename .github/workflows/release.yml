@@ -85,6 +85,12 @@ jobs:
     permissions:
       contents: write
     steps:
+      # Only for the curl installer, which is published with each release (FR-2.54).
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: scripts/install.sh
+          sparse-checkout-cone-mode: false
+
       - uses: actions/download-artifact@v4
         with:
           pattern: mumcord-*-release
@@ -97,9 +103,11 @@ jobs:
           RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
           VERSION: ${{ needs.guard.outputs.version }}
         run: |
-          # Fails if any of the three bundles is missing.
-          ls -l -- *.AppImage *-setup.exe *.dmg
-          sha256sum -- *.AppImage *-setup.exe *.dmg > SHA256SUMS
+          # Fails if any bundle is missing; Linux has three packages for each of two CPUs.
+          linux=(*_amd64.AppImage *_aarch64.AppImage *_amd64.deb *_arm64.deb *.x86_64.rpm *.aarch64.rpm)
+          ls -l -- "${linux[@]}" *-setup.exe *.dmg
+          cp ../scripts/install.sh .
+          sha256sum -- "${linux[@]}" *-setup.exe *.dmg install.sh > SHA256SUMS
           cat SHA256SUMS
           # A warning box as soon as one platform is unsigned, a plain note otherwise.
           callout=NOTE
@@ -120,7 +128,10 @@ jobs:
 
           - **Windows**: \`*-setup.exe\` (installer)
           - **macOS** (Apple Silicon and Intel): \`*.dmg\`
-          - **Linux**: \`*.AppImage\` (make it executable, then run it)
+          - **Linux** (\`amd64\`/\`x86_64\` for Intel and AMD, \`arm64\`/\`aarch64\` for ARM):
+            - Debian, Ubuntu and derivatives: \`*.deb\` (\`sudo apt install ./Mumcord_*.deb\`)
+            - Fedora, openSUSE and derivatives: \`*.rpm\` (\`sudo dnf install ./Mumcord-*.rpm\` or \`sudo zypper install ./Mumcord-*.rpm\`)
+            - Any distribution: \`*.AppImage\` (make it executable, then run it)
 
           Check a download with \`sha256sum -c SHA256SUMS --ignore-missing\`.
 
@@ -155,6 +166,24 @@ jobs:
           **Beta:** positional audio, game plugins and full-size images.
           **Coming later:** the in-game overlay on Windows (until then Windows uses the window overlay). There is no overlay on macOS.
           EOF
+          elif [[ "$VERSION" == "0.4.0" ]]; then
+            cat >> ../notes.md <<'EOF'
+
+          ## What's new in 0.4.0
+
+          - **Several servers at once**: stay connected to up to 5 servers (configurable up to 15), voice on one, chat, notifications and badges on all of them.
+          - **Themes**: presets and your own colour themes, each with a dark and a light version, shareable as a code with a preview card in the chat, and optionally per server. Plus the website look with glow, gradients, glass and film grain.
+          - **Chat**: replies, quotes, instant sending with Retry, a sticky author banner, a link menu, dismissable welcome messages and a rich-text comment editor.
+          - **Watch party (Beta)**: watch YouTube together with the Mumcord users in your voice channel, with a shared playlist, in a floating widget.
+          - **Screen sharing (Beta)**: share a window or screen with up to 8 Mumcord users in your channel at up to 720p30. Needs a direct connection, so it does not work for every pair of home networks (for example behind carrier-grade NAT). Sound is sent only on Windows 10 2004+ and macOS 13+, and only the shared app's sound; Linux shares the picture only, and X11 only the whole screen.
+          - **Channel passwords**, a password prompt when a server rejects yours, and **connection info** (ping, loss, bandwidth) with a weak-connection icon.
+          - **In-game overlay on Windows** as a click-through window over borderless games (no injection, safe with anti-cheat), HDR10 colours, Flatpak Steam, and an OpenGL launch option on Linux.
+          - **Linux packages**: `.deb`, `.rpm`, AUR `mumcord-bin` and AppImage for x86_64 and ARM64, a one-line installer, app-menu entry, `mumble://` links and start at login. An optional update hint on all platforms.
+
+          **Beta:** watch party, screen sharing, positional audio, game plugins and full-size images.
+          **Removed:** the window overlay. Windows uses the new in-game overlay instead; people who had the window overlay on see a one-time notice.
+          **Linux AppImage:** plays YouTube via VP9 but bundles no H.264; install your distribution's gst-libav for H.264 (see the README).
+          EOF
           fi
 
       - name: Create draft release
@@ -166,4 +195,4 @@ jobs:
         run: |
           gh release create "$TAG" --repo "$GITHUB_REPOSITORY" --verify-tag --draft \
             --title "Mumcord $VERSION" --notes-file notes.md --generate-notes \
-            dist/*.AppImage dist/*-setup.exe dist/*.dmg dist/SHA256SUMS
+            dist/*.AppImage dist/*.deb dist/*.rpm dist/*-setup.exe dist/*.dmg dist/install.sh dist/SHA256SUMS

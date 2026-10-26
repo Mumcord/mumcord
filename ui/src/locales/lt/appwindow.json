@@ -5,6 +5,39 @@
     "remember": "Prisiminti mano pasirinkimą",
     "minimize": "Suskleisti į dėklą",
     "quit": "Išeiti",
+    "failed": "Nepavyko. Bandyk dar kartą.",
+    "descriptionServers": "Vis dar esi prisijungęs prie {{count}} serverių. Sumažintas Mumcord laiko tave balso kanale ir lieka sistemos dėkle."
+  },
+  "windowOverlay": {
+    "title": "Lango perdanga pašalinta",
+    "description": "Slankiojančio perdangos lango nebėra. Vietoj jo žaidimo perdanga rodo, kas kalba tavo žaidimuose. Ją gali įjungti perdangos nustatymuose.",
+    "dismiss": "Supratau",
+    "openSettings": "Atidaryti perdangos nustatymus"
+  },
+  "appImageMenu": {
+    "title": "Pridėti Mumcord į programų meniu?",
+    "description": "Taip Mumcord atsiras tavo programų meniu. Piktograma ir „spausk ir kalbėk“ Wayland aplinkoje veiks tinkamai, o mumble:// nuorodos atidarys Mumcord. Vėliau tai gali pakeisti nustatymuose.",
+    "no": "Ne",
+    "yes": "Taip",
+    "failed": "Nepavyko. Bandyk dar kartą."
+  },
+  "updateCheck": {
+    "title": "Ieškoti naujų versijų?",
+    "description": "Mumcord gali kartą per dieną paklausti GitHub, ar yra naujesnė versija, ir parodyti patarimą su nuoroda. Niekas neatsisiunčiama ir nediegiama, ir nieko nesiunčiama, išskyrus pačią užklausą bei programos pavadinimą ir versiją. Vėliau tai gali pakeisti nustatymuose.",
+    "no": "Ne",
+    "yes": "Taip",
+    "failed": "Nepavyko. Bandyk dar kartą."
+  },
+  "updateHint": {
+    "message": "Pasiekiama Mumcord {{version}}.",
+    "open": "Žiūrėti leidimą",
+    "dismiss": "Uždaryti"
+  },
+  "directConsent": {
+    "title": "Leisti tiesioginius ryšius?",
+    "description": "Tiesioginiai ryšiai greitesni, bet kitas asmuo gali matyti jūsų IP adresą. Mumcord juos naudoja viso dydžio paveikslėliams ir ekrano bendrinimui su kitais Mumcord naudotojais ir gali tam atidaryti prievadą jūsų maršruto parinktuve. Jei atsisakysite, paveikslėliai vis tiek atkeliaus per serverį, o ekrano bendrinimas nebus pasiekiamas. Tai galite pakeisti vėliau skiltyje Nustatymai → Privatumas.",
+    "no": "Ne",
+    "yes": "Taip",
     "failed": "Nepavyko. Bandyk dar kartą."
   }
 }

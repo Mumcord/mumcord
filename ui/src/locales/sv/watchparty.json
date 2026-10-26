@@ -1,0 +1,53 @@
+{
+  "title": "Watch party",
+  "addVideo": "Lägg till video",
+  "beta": "Beta",
+  "join": "Gå med i watch party",
+  "leave": "Lämna partyt",
+  "watching": "{{count}} tittar: {{names}}",
+  "player": "Watch party-spelare",
+  "watchTogether": "Titta tillsammans",
+  "watchTogetherFor": "Titta på {{title}} tillsammans med den här kanalen",
+  "cantPlay": "Spelaren kan inte köras här.",
+  "openInBrowser": "Öppna i webbläsaren",
+  "startFailed": "Watch partyt kunde inte startas.",
+  "joinFailed": "Kunde inte gå med i watch partyt.",
+  "leaveFailed": "Kunde inte lämna watch partyt.",
+  "commandFailed": "Watch partyt tog inte emot din ändring.",
+  "someone": "Någon",
+  "other": {
+    "play": "{{name}} tryckte på spela",
+    "pause": "{{name}} pausade",
+    "seek": "{{name}} hoppade framåt",
+    "skipped": "{{name}} hoppade över"
+  },
+  "addToPlaylist": "Lägg till i spellistan",
+  "addToPlaylistFor": "Lägg till {{title}} i watch partyts spellista",
+  "playlist": {
+    "title": "Näst på tur",
+    "empty": "Inget näst på tur. Lägg till YouTube-länkar med ”Lägg till i spellistan”.",
+    "skip": "Hoppa över",
+    "moveHint": "Alt+Upp och Alt+Ned flyttar videon; du kan också dra den.",
+    "moved": "Flyttad till position {{position}}",
+    "videoTitle": "YouTube-video",
+    "addedBy": "Tillagd av {{name}}",
+    "remove": "Ta bort {{title}} från spellistan",
+    "addFailed": "Videon kunde inte läggas till i spellistan. Den rymmer upp till 50 videor.",
+    "removeFailed": "Videon kunde inte tas bort från spellistan.",
+    "moveFailed": "Videon kunde inte flyttas.",
+    "skipFailed": "Kunde inte hoppa till nästa video.",
+    "nextFailed": "Nästa video kunde inte startas.",
+    "move": "Flytta {{title}}",
+    "upNext": "Näst på tur: {{title}}",
+    "upNextNone": "Inget näst på tur"
+  },
+  "widget": {
+    "play": "Spela",
+    "pause": "Pausa"
+  },
+  "codecHint": {
+    "install": "Den här videon kräver stöd för H.264. Installera gst-libav:",
+    "generic": "Den här videon kräver stöd för H.264. Installera gst-libav (GStreamers libav-plugin) med systemets pakethanterare.",
+    "rpmFusion": "På Fedora kommer gst-libav från RPM Fusion-förrådet; aktivera RPM Fusion först."
+  }
+}

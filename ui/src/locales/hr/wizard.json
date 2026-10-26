@@ -98,5 +98,10 @@
     "ingameOverlayHint": "Prikazuje tko govori preko tvoje igre (Linux). Kasnije ga možeš uključiti ili isključiti za svaku igru u postavkama.",
     "ingameOverlayWarning": "Neke igre s anti-cheatom mogu označiti ili blokirati overlaye u igri. Mumcord poznate rizične igre (poput Valoranta ili League of Legends) po zadanom drži isključenima. Uključi ga samo za igre kojima vjeruješ.",
     "ingameOverlayAlt": "Primjer overlaya u igri koji prikazuje tko govori"
+  },
+  "updates": {
+    "title": "Nove verzije",
+    "check": "Provjeravaj nove verzije",
+    "hint": "Mumcord može jednom dnevno pitati GitHub postoji li novija verzija i prikazati savjet s poveznicom. Ništa se ne preuzima ni instalira, i ništa se ne šalje osim samog upita te naziva i verzije aplikacije. To možeš kasnije promijeniti u Postavkama."
   }
 }

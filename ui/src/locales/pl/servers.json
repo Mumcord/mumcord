@@ -13,10 +13,15 @@
     "listLabel": "Zapisane serwery",
     "add": "Dodaj serwer",
     "keyboardHint": "Enter łączy. Alt plus strzałka w górę lub w dół przesuwa serwer. Shift plus F10 otwiera więcej opcji.",
-    "status": {
-      "connected": "{{server}} (połączono)",
-      "connecting": "{{server}} (łączenie)",
-      "reconnecting": "{{server}} (ponowne łączenie)"
+    "label": "{{server}} ({{state}})",
+    "state": {
+      "connected": "połączono",
+      "connecting": "łączenie",
+      "reconnecting": "ponowne łączenie",
+      "error": "utracono połączenie",
+      "voice": "serwer głosowy",
+      "unread": "nieprzeczytane wiadomości",
+      "mentions": "wzmianki: {{mentions}}"
     }
   },
   "menu": {
@@ -26,7 +31,19 @@
     "edit": "Edytuj serwer",
     "moveUp": "Przesuń w górę",
     "moveDown": "Przesuń w dół",
-    "remove": "Usuń serwer"
+    "remove": "Usuń serwer",
+    "reconnect": "Połącz ponownie",
+    "alwaysConnect": "Zawsze łącz przy starcie",
+    "muteNotifications": "Wycisz powiadomienia",
+    "theme": "Motyw…",
+    "showWelcome": "Pokaż wiadomość powitalną"
+  },
+  "theme": {
+    "title": "Motyw dla {{server}}",
+    "label": "Motyw",
+    "useApp": "Użyj motywu aplikacji",
+    "hint": "Obowiązuje, gdy ten serwer jest wyświetlany.",
+    "failed": "Nie udało się zapisać motywu. Spróbuj ponownie."
   },
   "dialog": {
     "addTitle": "Dodaj serwer",
@@ -50,7 +67,14 @@
       "username": "Podaj nazwę, której chcesz używać na tym serwerze.",
       "link": "Nie można odczytać tego linku mumble://. Sprawdź, czy został skopiowany w całości.",
       "invalid": "Dane serwera są nieprawidłowe. Sprawdź adres i port."
-    }
+    },
+    "alwaysConnect": "Zawsze łącz przy starcie",
+    "alwaysConnectHint": "Mumcord przy starcie łączy ten serwer w trybie tylko do odczytu.",
+    "channelPasswords": "Hasła kanałów",
+    "channelPassword": "Hasło kanału {{number}}",
+    "removeChannelPassword": "Usuń {{name}}",
+    "remove": "Usuń",
+    "channelPasswordsHint": "Zapisywane, gdy chroniony kanał je przyjął. O usunięte zapytamy ponownie przy następnym wejściu."
   },
   "errors": {
     "serverUnreachable": "Nie można połączyć się z serwerem. Sprawdź adres i port oraz czy masz dostęp do internetu.",
@@ -63,17 +87,16 @@
     "invalidAddress": "Adres serwera jest nieprawidłowy. Edytuj serwer, aby go poprawić.",
     "secureStorage": "Bezpieczny magazyn systemu jest niedostępny, więc nie udało się odczytać ani zapisać hasła serwera. Odblokuj go i spróbuj ponownie.",
     "notFound": "Ten serwer nie jest już zapisany.",
-    "generic": "Coś poszło nie tak. Spróbuj ponownie."
+    "generic": "Coś poszło nie tak. Spróbuj ponownie.",
+    "serverLimit": "Masz już maksymalną liczbę {{limit}} połączonych serwerów. Rozłącz serwer lub zwiększ limit w Ustawienia → Serwery.",
+    "serverLimitUnknown": "Masz już maksymalną liczbę połączonych serwerów. Rozłącz serwer lub zwiększ limit w Ustawienia → Serwery.",
+    "alwaysConnectLimit": "Tylko {{limit}} serwerów może mieć „Zawsze łącz przy starcie” – tyle, ile wynosi limit połączonych serwerów. Wyłącz to dla innego serwera lub zwiększ limit w Ustawienia → Serwery.",
+    "alwaysConnectLimitUnknown": "„Zawsze łącz przy starcie” nie może mieć więcej serwerów, niż wynosi limit połączonych serwerów. Wyłącz to dla innego serwera lub zwiększ limit w Ustawienia → Serwery."
   },
   "remove": {
     "title": "Usunąć {{server}}?",
     "message": "Zapisane hasło, decyzja o certyfikacie, obserwowane kanały i historia czatu na tym komputerze zostaną usunięte.",
     "confirm": "Usuń"
-  },
-  "switch": {
-    "title": "Zmienić serwer?",
-    "message": "Możesz być na jednym serwerze naraz. Rozłączyć się z {{current}} i połączyć z {{next}}?",
-    "confirm": "Rozłącz i zmień"
   },
   "cert": {
     "newTitle": "Zaufać temu serwerowi?",
@@ -108,7 +131,10 @@
     "actionFailed": {
       "reorder": "Nie udało się zapisać nowej kolejności serwerów. Spróbuj ponownie.",
       "remove": "Nie udało się usunąć serwera. Spróbuj ponownie.",
-      "disconnect": "Rozłączanie nie powiodło się. Spróbuj ponownie."
+      "disconnect": "Rozłączanie nie powiodło się. Spróbuj ponownie.",
+      "alwaysConnect": "Nie udało się zapisać „Zawsze łącz przy starcie”. Spróbuj ponownie.",
+      "notifications": "Nie udało się zapisać ustawienia powiadomień. Spróbuj ponownie.",
+      "savePassword": "Nie udało się zapisać nowego hasła. Edytuj serwer, aby je zapisać."
     }
   },
   "empty": {
@@ -124,5 +150,27 @@
     "errors": {
       "required": "Podaj adres serwera lub link mumble://."
     }
+  },
+  "password": {
+    "title": "Hasło dla {{server}}",
+    "intro": "Serwer nie przyjął hasła. Wpisz właściwe, aby spróbować ponownie.",
+    "label": "Hasło",
+    "show": "Pokaż",
+    "hide": "Ukryj",
+    "wrong": "To hasło też jest błędne. Spróbuj ponownie.",
+    "save": "Zapisz hasło",
+    "cancel": "Anuluj",
+    "connect": "Połącz",
+    "connecting": "Łączenie…"
+  },
+  "channelPassword": {
+    "title": "Ten kanał wymaga hasła",
+    "intro": "Wpisz hasło do {{channel}}.",
+    "label": "Hasło",
+    "wrong": "Błędne hasło",
+    "failed": "Nie udało się wysłać hasła. Spróbuj ponownie.",
+    "cancel": "Anuluj",
+    "join": "Dołącz",
+    "joining": "Dołączanie…"
   }
 }

@@ -15,7 +15,7 @@ export function JumpToChannelButton({ disabled, onJump }: JumpToChannelButtonPro
       type="button"
       className="jump-to-channel"
       aria-label={label}
-      title={label}
+      data-tooltip={label}
       // aria-disabled keeps the button focusable and its tooltip readable while there is no call.
       aria-disabled={disabled}
       onClick={() => {

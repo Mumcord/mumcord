@@ -38,6 +38,12 @@
   --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
 
   --width-server-bar: 4.5rem;
+
+  /* Website look (FR-2.19): frosted popovers and film grain. Derived from the theme's own
+     --color-bg-elevated, so custom themes get matching glass. */
+  --glass-bg: color-mix(in srgb, var(--color-bg-elevated) 84%, transparent);
+  --glass-filter: blur(1rem) saturate(1.4);
+  --grain-opacity: 0.06;
 }
 
 :root,
@@ -72,7 +78,15 @@
     var(--color-accent-stop-2) 50%,
     var(--color-accent-stop-3)
   );
-  --shadow-glow: 0 0.75rem 2rem -0.75rem rgb(255 111 168 / 55%);
+  /* Primary button pill (FR-2.18): cream/peach with dark text. Custom themes derive the pill from accent
+     and on-accent; the glow follows the accent. */
+  --color-primary-bg: #ffd9c2;
+  --color-primary-text: #0e0a26;
+  --shadow-primary-glow: 0 0.5rem 1.5rem -0.25rem
+    color-mix(in srgb, var(--color-accent) 55%, transparent);
+  --shadow-primary-glow-hover: 0 0.75rem 2rem -0.25rem
+    color-mix(in srgb, var(--color-accent) 75%, transparent);
+  --shadow-glow: 0 0.75rem 2rem -0.75rem color-mix(in srgb, var(--color-accent) 55%, transparent);
   --shadow-raised: 0 1rem 2.5rem -0.75rem rgb(0 0 0 / 60%);
   --glow-talking: 0 0 0.625rem rgb(62 227 158 / 45%);
   --glow-backdrop:
@@ -124,7 +138,15 @@
     var(--color-accent-stop-2) 50%,
     var(--color-accent-stop-3)
   );
-  --shadow-glow: 0 0.75rem 1.75rem -0.75rem rgb(194 31 98 / 45%);
+  /* Primary button pill (FR-2.18): dark pill with light text on the light surfaces. */
+  --color-primary-bg: #17113a;
+  --color-primary-text: #ffffff;
+  --shadow-primary-glow: 0 0.5rem 1.5rem -0.25rem
+    color-mix(in srgb, var(--color-accent) 40%, transparent);
+  --shadow-primary-glow-hover: 0 0.75rem 2rem -0.25rem
+    color-mix(in srgb, var(--color-accent) 60%, transparent);
+  --grain-opacity: 0.05;
+  --shadow-glow: 0 0.75rem 1.75rem -0.75rem color-mix(in srgb, var(--color-accent) 45%, transparent);
   --shadow-raised: 0 1rem 2.5rem -0.75rem rgb(23 17 58 / 25%);
   --glow-talking: 0 0 0.5rem rgb(21 128 61 / 35%);
   --glow-backdrop:
@@ -150,5 +172,21 @@
   :root {
     --duration-fast: 0ms;
     --duration-normal: 0ms;
+  }
+}
+
+/* Visual effects off (FR-2.19): by the setting (data-effects on <html>) or by the OS asking for
+   less motion or transparency. Popovers fall back to solid surfaces, the grain disappears. */
+:root[data-effects="off"] {
+  --glass-bg: var(--color-bg-elevated);
+  --glass-filter: none;
+  --grain-opacity: 0;
+}
+
+@media (prefers-reduced-motion: reduce), (prefers-reduced-transparency: reduce) {
+  :root {
+    --glass-bg: var(--color-bg-elevated);
+    --glass-filter: none;
+    --grain-opacity: 0;
   }
 }

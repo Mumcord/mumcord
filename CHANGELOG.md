@@ -1,5 +1,101 @@
 # Changelog
 
+## [0.4.0] - Unreleased
+
+_Watch party and screen sharing are **Beta**. The window overlay is removed: on Windows the new in-game overlay replaces it, on Linux the in-game overlay stays; people who had it switched on see a one-time notice after updating._
+
+### Multi-server
+
+- Stay connected to up to 5 servers at once (configurable 1–15): voice on one, chat and notifications on the others, with unread and mention badges in the server bar
+- Move your voice to another server by joining one of its channels; "Join channel" for a friend on another server does the same
+- Connect servers automatically at start ("Always connect at start"), reconnect only the server that dropped, and mute notifications per server
+- Private messages, friends, history sync, now playing and now gaming work on every connected server
+- Ask again for the password when a server rejects it, with "Save password"
+- Channel passwords: a lock marks protected channels, joining asks for the password once and remembers it per server (manage it in the edit-server dialog); works with the access tokens official Mumble clients use
+
+### Themes and look
+
+- Colour themes with presets shown as gradient circles, your own themes (save, rename, delete) and an editor with a Preview button
+- Every theme has a dark and a light version; Dark / Light / System picks the version, the second one is generated automatically and can be fine-tuned
+- Share a theme as a code: other Mumcord users get a preview card in the chat with "Apply theme"; set a theme for one server only
+- The website look: glowing primary buttons, gradient accents, glass popovers and film grain, with a "Visual effects" switch (off automatically with reduced motion or transparency)
+- Themed dropdowns everywhere and a consistent settings layout
+
+### Chat
+
+- Reply to messages, with a reply header that jumps to the original; official clients see a readable quote. A reply to your message counts as a mention
+- "> text" sends a quote, also with the new Quote button
+- Messages appear at once while sending, greyed until confirmed, with Retry and Delete if sending fails; messages the server refuses are marked with the reason
+- Sticky author banner while scrolling a long message, and the avatar now sits at the top of tall messages
+- Copy or open links from a right-click menu
+- Dismiss the welcome message and channel descriptions (they come back when their text changes)
+- Rich-text comment editor with bold, links and lists
+- A progress bar under chat images while the full-size image loads; the transfer keeps running when you close the viewer, and × cancels it
+
+### Watch party (Beta)
+
+- Watch YouTube together with the Mumcord users in your voice channel: "Watch together" from the Apps menu next to the image picker, or from a YouTube card
+- Everyone can play, pause, seek and skip; a shared playlist with reorder and auto-next; people who come in later start at the current position
+- The party runs in a floating widget you can move, resize and collapse; a banner at the top of the channel chat invites the others ("Join"); nothing is posted into the chat
+- Official Mumble clients see nothing of the party
+
+### Screen sharing (Beta)
+
+- Share a window or your screen with up to 8 Mumcord users in your voice channel, at up to 720p30; quality drops automatically to 480p15 when your upload is too slow
+- Watch in a floating widget or full screen; a red "You are sharing your screen" bar with "End" and a LIVE ring on your avatar show that you are sharing
+- Sound: on Windows (10 version 2004 or newer) and macOS (13 or newer) viewers hear only the shared window's or app's sound, never the voice chat. Sharing a whole screen on Windows sends no sound, and on macOS 12.3 and 13 the whole main screen is shared. Linux sends no sound
+- Linux: on Wayland the system picker chooses a window or screen; on X11 only the whole screen can be shared
+- Needs a direct connection between sharer and viewer. Without IPv6 or a port mapping on the home router (for example behind carrier-grade NAT), watching is not possible for that pair, and Mumcord says so after a short wait
+- Auto-ducking lowers watch-party and screen-share sound while people talk (setting and slider in Settings → Audio); optional sounds for party and share activity
+
+### Direct connections
+
+- Mumcord users can connect directly to each other (asked once before first use, changeable in Settings → Privacy). Used for screen sharing and faster full-size images; no outside server is involved
+
+### Connection info
+
+- Ping, packet loss, bandwidth and UDP/TCP in the profile card and the person menu ("Connection info…"); admins also see the other person's client and operating system
+- A signal icon next to people with a weak connection
+- A bitrate slider up to the real maximum the server allows
+
+### Big servers
+
+- Calmer talking rings, a "Syncing big server…" state and much faster switching between big servers
+- "Hide empty channels" and "Show talking people first" switches
+- Listeners appear inline in the member list with an ear icon ("Listening only")
+
+### Overlay
+
+- In-game overlay on Windows: a click-through window over borderless and windowed games, with nothing loaded into the game, so it is safe with anti-cheat. Games in exclusive fullscreen hide it
+- HDR10 games show correct overlay colours; games from Flatpak Steam get the overlay on Linux
+- Linux OpenGL games: Settings → Overlay shows a Steam launch option to copy (issue [#11](https://github.com/ToBee94/mumcord/issues/11))
+
+### Audio
+
+- Per-person volume works across the whole range and changes live while dragging
+- Music quality is no longer quieter than speech
+
+### Packaging and desktop
+
+- Linux packages: `.deb`, `.rpm`, AUR `mumcord-bin` and AppImage, each for x86_64 and ARM64, plus a one-line curl installer
+- App-menu entry, `mumble://` links and an optional desktop icon; the AppImage asks before adding itself to the app menu
+- "Start Mumcord when I log in" on Linux, Windows and macOS
+- Optional "Check for new versions" hint with a link (nothing is downloaded)
+- Linux tray tooltips
+- The AppImage bundles the GStreamer plugins for YouTube (VP9) but not H.264; install gst-libav on the system to get H.264 (see README)
+
+### Removed
+
+- The window overlay and its KDE helper and tray item (see the note above)
+
+### Fixed
+
+- Closing or updating Mumcord no longer crashes a running game that shows the in-game overlay
+- Ping no longer shows 0 ms for other people
+- Chat messages show the sender's real avatar after rejoining
+- "Now gaming" can join the game's server from the Mumble Link context
+- Flickering chat hover and talking rings on Linux (Mumcord sets `WEBKIT_DISABLE_COMPOSITING_MODE=1`; see README)
+
 ## [0.3.1] - 2026-10-25
 
 ### Fixed
@@ -81,6 +177,7 @@ _**License change:** Mumcord is licensed under the GNU AGPL-3.0 only from this v
 
 _First release._
 
+[0.4.0]: https://github.com/ToBee94/mumcord/releases/tag/v0.4.0
 [0.3.1]: https://github.com/ToBee94/mumcord/releases/tag/v0.3.1
 [0.3.0]: https://github.com/ToBee94/mumcord/releases/tag/v0.3.0
 [0.2.0]: https://github.com/ToBee94/mumcord/releases/tag/v0.2.0

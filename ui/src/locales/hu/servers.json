@@ -13,10 +13,15 @@
     "listLabel": "Mentett szerverek",
     "add": "Szerver hozzáadása",
     "keyboardHint": "Enter: csatlakozás. Alt + Fel vagy Le nyíl: a szerver áthelyezése. Shift + F10: további lehetőségek.",
-    "status": {
-      "connected": "{{server}} (csatlakozva)",
-      "connecting": "{{server}} (csatlakozás)",
-      "reconnecting": "{{server}} (újracsatlakozás)"
+    "label": "{{server}} ({{state}})",
+    "state": {
+      "connected": "csatlakozva",
+      "connecting": "csatlakozás",
+      "reconnecting": "újracsatlakozás",
+      "error": "a kapcsolat megszakadt",
+      "voice": "hangszerver",
+      "unread": "olvasatlan üzenetek",
+      "mentions": "említések: {{mentions}}"
     }
   },
   "menu": {
@@ -26,7 +31,19 @@
     "edit": "Szerver szerkesztése",
     "moveUp": "Mozgatás fel",
     "moveDown": "Mozgatás le",
-    "remove": "Szerver eltávolítása"
+    "remove": "Szerver eltávolítása",
+    "reconnect": "Újracsatlakozás",
+    "alwaysConnect": "Mindig csatlakozzon indításkor",
+    "muteNotifications": "Értesítések némítása",
+    "theme": "Téma…",
+    "showWelcome": "Üdvözlő üzenet megjelenítése"
+  },
+  "theme": {
+    "title": "Téma ehhez: {{server}}",
+    "label": "Téma",
+    "useApp": "Alkalmazás témájának használata",
+    "hint": "Akkor érvényes, amikor ez a szerver látható.",
+    "failed": "A témát nem sikerült menteni. Próbáld újra."
   },
   "dialog": {
     "addTitle": "Szerver hozzáadása",
@@ -50,7 +67,14 @@
       "username": "Add meg a nevet, amelyet ezen a szerveren használni szeretnél.",
       "link": "Ez a mumble:// link nem olvasható. Ellenőrizd, hogy teljesen kimásoltad-e.",
       "invalid": "A szerver adatai érvénytelenek. Ellenőrizd a címet és a portot."
-    }
+    },
+    "alwaysConnect": "Mindig csatlakozzon indításkor",
+    "alwaysConnectHint": "A Mumcord indításkor csak olvasható módban csatlakozik ehhez a szerverhez.",
+    "channelPasswords": "Csatornajelszavak",
+    "channelPassword": "{{number}}. csatornajelszó",
+    "removeChannelPassword": "{{name}} eltávolítása",
+    "remove": "Eltávolítás",
+    "channelPasswordsHint": "Akkor mentődnek, ha egy védett csatorna elfogadta őket. Az eltávolítottakat a következő belépéskor újra kérjük."
   },
   "errors": {
     "serverUnreachable": "A szerver nem érhető el. Ellenőrizd a címet, a portot és az internetkapcsolatodat.",
@@ -63,17 +87,16 @@
     "invalidAddress": "A szerver címe érvénytelen. Szerkeszd a szervert a javításhoz.",
     "secureStorage": "A rendszered biztonságos tárolója nem érhető el, ezért a szerverjelszót nem sikerült beolvasni vagy menteni. Oldd fel a zárolását, és próbáld újra.",
     "notFound": "Ez a szerver már nincs elmentve.",
-    "generic": "Valami hiba történt. Próbáld újra."
+    "generic": "Valami hiba történt. Próbáld újra.",
+    "serverLimit": "Már a maximális {{limit}} szerverhez csatlakozol. Bonts egy kapcsolatot, vagy emeld a korlátot: Beállítások → Szerverek.",
+    "serverLimitUnknown": "Már a maximális számú szerverhez csatlakozol. Bonts egy kapcsolatot, vagy emeld a korlátot: Beállítások → Szerverek.",
+    "alwaysConnectLimit": "Csak {{limit}} szervernél lehet bekapcsolva a „Mindig csatlakozzon indításkor”, ugyanannyinál, amennyi a csatlakoztatott szerverek korlátja. Kapcsold ki egy másik szervernél, vagy emeld a korlátot: Beállítások → Szerverek.",
+    "alwaysConnectLimitUnknown": "A „Mindig csatlakozzon indításkor” nem lehet több szervernél bekapcsolva, mint a csatlakoztatott szerverek korlátja. Kapcsold ki egy másik szervernél, vagy emeld a korlátot: Beállítások → Szerverek."
   },
   "remove": {
     "title": "Eltávolítod: {{server}}?",
     "message": "A mentett jelszava, a tanúsítványdöntés, a követett csatornák és a chatelőzmények törlődnek erről a számítógépről.",
     "confirm": "Eltávolítás"
-  },
-  "switch": {
-    "title": "Szervert váltasz?",
-    "message": "Egyszerre csak egy szerveren lehetsz. Lecsatlakozol innen: {{current}}, és csatlakozol ide: {{next}}?",
-    "confirm": "Lecsatlakozás és váltás"
   },
   "cert": {
     "newTitle": "Megbízol ebben a szerverben?",
@@ -108,7 +131,10 @@
     "actionFailed": {
       "reorder": "Az új szerversorrendet nem sikerült menteni. Próbáld újra.",
       "remove": "A szervert nem sikerült eltávolítani. Próbáld újra.",
-      "disconnect": "A lecsatlakozás nem sikerült. Próbáld újra."
+      "disconnect": "A lecsatlakozás nem sikerült. Próbáld újra.",
+      "alwaysConnect": "A „Mindig csatlakozzon indításkor” beállítást nem sikerült menteni. Próbáld újra.",
+      "notifications": "Az értesítési beállítást nem sikerült menteni. Próbáld újra.",
+      "savePassword": "Az új jelszót nem sikerült menteni. Szerkeszd a szervert a mentéshez."
     }
   },
   "empty": {
@@ -124,5 +150,27 @@
     "errors": {
       "required": "Adj meg egy szervercímet vagy mumble:// linket."
     }
+  },
+  "password": {
+    "title": "Jelszó ehhez: {{server}}",
+    "intro": "A szerver nem fogadta el a jelszót. Add meg a helyeset az újrapróbáláshoz.",
+    "label": "Jelszó",
+    "show": "Megjelenítés",
+    "hide": "Elrejtés",
+    "wrong": "Ez a jelszó is hibás. Próbáld újra.",
+    "save": "Jelszó mentése",
+    "cancel": "Mégse",
+    "connect": "Csatlakozás",
+    "connecting": "Csatlakozás…"
+  },
+  "channelPassword": {
+    "title": "Ehhez a csatornához jelszó kell",
+    "intro": "Add meg a jelszót ehhez: {{channel}}.",
+    "label": "Jelszó",
+    "wrong": "Hibás jelszó",
+    "failed": "A jelszót nem sikerült elküldeni. Próbáld újra.",
+    "cancel": "Mégse",
+    "join": "Belépés",
+    "joining": "Belépés…"
   }
 }

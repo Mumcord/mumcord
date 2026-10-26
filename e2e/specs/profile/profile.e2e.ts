@@ -45,7 +45,7 @@ describe("profile: register, avatar, comment", () => {
     avatarPath = join(mkdtempSync(join(tmpdir(), "mumcord-avatar-")), "me.png");
     writeFileSync(avatarPath, Buffer.from(PNG_1X1, "base64"));
 
-    // Wizard: identity -> mic -> privacy -> talk mode.
+    // Wizard: identity -> mic -> privacy -> talk mode -> updates.
     await $("#root").waitForDisplayed();
     const name = $('input[type="text"]');
     await name.waitForDisplayed();
@@ -56,6 +56,8 @@ describe("profile: register, avatar, comment", () => {
     await onStep(3);
     await clickText("button", "Next");
     await onStep(4);
+    await clickText("button", "Next");
+    await onStep(5);
     await clickText("button", "Finish");
 
     // First server, then trust its certificate.
@@ -98,14 +100,18 @@ describe("profile: register, avatar, comment", () => {
     // dialog calls after the picker returns.
     await browser.execute(async (p: string) => {
       const w = window as unknown as {
-        __TAURI_INTERNALS__: { invoke: (c: string, a: object) => Promise<unknown> };
+        __TAURI_INTERNALS__: { invoke: (c: string, a?: object) => Promise<unknown> };
       };
-      await w.__TAURI_INTERNALS__.invoke("set_own_avatar", { path: p });
+      // The only saved server is the one this spec connected to.
+      const servers = (await w.__TAURI_INTERNALS__.invoke("servers_list")) as { id: number }[];
+      await w.__TAURI_INTERNALS__.invoke("set_own_avatar", { serverId: servers[0]?.id, path: p });
     }, avatarPath);
     await openUserMenu();
     await clickItem("Edit profile");
-    const area = $("textarea");
-    await browser.waitUntil(async () => await area.isEnabled());
+    // The comment editor is a rich-text field (contenteditable), not a textarea.
+    const area = $("[role='textbox'].rich-editor__field");
+    await area.waitForDisplayed();
+    await area.click();
     await area.setValue(`Hello from ${ME}`);
     await clickText("button", "Save");
     await bot(
@@ -150,6 +156,8 @@ describe("profile: register, avatar, comment", () => {
       // AC-1.53: redesigned header with "Private message" as a header action; a private note
       // applies instantly and confirms with "Saved", without any save button.
       await expect(card.$(".//div[contains(@class,'profile-card__banner')]//button[normalize-space(.)='Private message']")).toBeExisting();
+      // The local settings (including the private note) sit in a disclosure that starts collapsed.
+      await card.$(".disclosure__toggle").click();
       const note = card.$("textarea.profile-card__textarea");
       await note.setValue("Bot note");
       await card.$(".profile-card__saved[data-visible='true']").waitForExist({

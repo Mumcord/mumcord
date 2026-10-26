@@ -15,7 +15,8 @@
   },
   "dm": {
     "title": "Wiadomości prywatne",
-    "unknown": "Nieznana osoba"
+    "unknown": "Nieznana osoba",
+    "withServer": "{{name}}, na {{server}}"
   },
   "notify": {
     "channel": "{{name}} na {{channel}}: {{text}}",
@@ -23,7 +24,9 @@
     "more_one": "{{count}} nowa wiadomość więcej",
     "more_few": "{{count}} nowe wiadomości więcej",
     "more_many": "{{count}} nowych wiadomości więcej",
-    "more_other": "{{count}} nowej wiadomości więcej"
+    "more_other": "{{count}} nowej wiadomości więcej",
+    "channelOn": "{{name}} na {{channel}} na {{server}}: {{text}}",
+    "privateOn": "{{name}} (prywatnie, {{server}}): {{text}}"
   },
   "history": {
     "clear": "Wyczyść historię",

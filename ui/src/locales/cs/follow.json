@@ -15,7 +15,8 @@
   },
   "dm": {
     "title": "Přímé zprávy",
-    "unknown": "Neznámá osoba"
+    "unknown": "Neznámá osoba",
+    "withServer": "{{name}}, na {{server}}"
   },
   "notify": {
     "channel": "{{name}} v {{channel}}: {{text}}",
@@ -23,7 +24,9 @@
     "more_one": "{{count}} další nová zpráva",
     "more_few": "{{count}} další nové zprávy",
     "more_many": "{{count}} dalších nových zpráv",
-    "more_other": "{{count}} dalších nových zpráv"
+    "more_other": "{{count}} dalších nových zpráv",
+    "channelOn": "{{name}} v {{channel}} na {{server}}: {{text}}",
+    "privateOn": "{{name}} (soukromě, {{server}}): {{text}}"
   },
   "history": {
     "clear": "Vymazat historii",

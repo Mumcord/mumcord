@@ -1,0 +1,53 @@
+{
+  "title": "Watch party",
+  "addVideo": "Tilføj video",
+  "beta": "Beta",
+  "join": "Deltag i watch party",
+  "leave": "Forlad partyen",
+  "watching": "{{count}} ser med: {{names}}",
+  "player": "Watch party-afspiller",
+  "watchTogether": "Se sammen",
+  "watchTogetherFor": "Se {{title}} sammen med denne kanal",
+  "cantPlay": "Afspilleren kan ikke køre her.",
+  "openInBrowser": "Åbn i browser",
+  "startFailed": "Watch partyen kunne ikke startes.",
+  "joinFailed": "Kunne ikke deltage i watch partyen.",
+  "leaveFailed": "Kunne ikke forlade watch partyen.",
+  "commandFailed": "Watch partyen modtog ikke din ændring.",
+  "someone": "Nogen",
+  "other": {
+    "play": "{{name}} trykkede på afspil",
+    "pause": "{{name}} satte på pause",
+    "seek": "{{name}} sprang frem",
+    "skipped": "{{name}} sprang over"
+  },
+  "addToPlaylist": "Føj til playliste",
+  "addToPlaylistFor": "Føj {{title}} til watch partyens playliste",
+  "playlist": {
+    "title": "Næste",
+    "empty": "Intet i køen. Tilføj YouTube-links med “Føj til playliste”.",
+    "skip": "Spring over",
+    "moveHint": "Alt+Op og Alt+Ned flytter videoen; du kan også trække den.",
+    "moved": "Flyttet til position {{position}}",
+    "videoTitle": "YouTube-video",
+    "addedBy": "Tilføjet af {{name}}",
+    "remove": "Fjern {{title}} fra playlisten",
+    "addFailed": "Videoen kunne ikke føjes til playlisten. Den kan rumme op til 50 videoer.",
+    "removeFailed": "Videoen kunne ikke fjernes fra playlisten.",
+    "moveFailed": "Videoen kunne ikke flyttes.",
+    "skipFailed": "Kunne ikke springe til næste video.",
+    "nextFailed": "Næste video kunne ikke startes.",
+    "move": "Flyt {{title}}",
+    "upNext": "Næste: {{title}}",
+    "upNextNone": "Intet i køen"
+  },
+  "widget": {
+    "play": "Afspil",
+    "pause": "Pause"
+  },
+  "codecHint": {
+    "install": "Denne video kræver H.264-understøttelse. Installér gst-libav:",
+    "generic": "Denne video kræver H.264-understøttelse. Installér gst-libav (GStreamers libav-plugin) med dit systems pakkehåndtering.",
+    "rpmFusion": "På Fedora kommer gst-libav fra RPM Fusion-arkivet; aktivér RPM Fusion først."
+  }
+}

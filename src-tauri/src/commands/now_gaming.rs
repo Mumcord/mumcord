@@ -6,7 +6,7 @@ use specta::Type;
 use tauri::State;
 use tauri_specta::Event;
 
-use super::types::{ApiError, ApiResult, ErrorCode};
+use super::types::{ApiError, ApiResult, ErrorCode, ServerId, to_engine_server_id};
 
 /// A game someone plays. `name` is plain text, never HTML. `playedMs` is the play time when the
 /// event or answer was sent; advance it with the local clock from the moment it arrived.
@@ -36,6 +36,7 @@ pub struct NowGamingStatus {
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Type, Event)]
 #[serde(rename_all = "camelCase")]
 pub struct NowGamingChanged {
+    pub server_id: ServerId,
     pub session: u32,
     pub game: Option<NowGaming>,
 }
@@ -61,13 +62,19 @@ pub fn now_gaming_status(engine: State<'_, Engine>) -> ApiResult<NowGamingStatus
     })
 }
 
-/// Icon of a person's game (or the own one) as a small `data:` URL, fetched from the Steam CDN
+/// Icon of a person's game on the server (or the own one) as a small `data:` URL, fetched from the Steam CDN
 /// and re-encoded by the engine; `null` when link previews are off (nothing is fetched then)
 /// or there is none.
 #[tauri::command]
 #[specta::specta]
-pub async fn now_gaming_icon(engine: State<'_, Engine>, session: u32) -> ApiResult<Option<String>> {
-    Ok(engine.now_gaming_icon(session).await)
+pub async fn now_gaming_icon(
+    engine: State<'_, Engine>,
+    server_id: ServerId,
+    session: u32,
+) -> ApiResult<Option<String>> {
+    Ok(engine
+        .now_gaming_icon(to_engine_server_id(server_id), session)
+        .await)
 }
 
 /// Opens the person's game server in Steam (`steam://connect/<host:port>`). Only links the
@@ -75,9 +82,13 @@ pub async fn now_gaming_icon(engine: State<'_, Engine>, session: u32) -> ApiResu
 /// shares no join target (any more).
 #[tauri::command]
 #[specta::specta]
-pub fn now_gaming_join(engine: State<'_, Engine>, session: u32) -> ApiResult<()> {
+pub fn now_gaming_join(
+    engine: State<'_, Engine>,
+    server_id: ServerId,
+    session: u32,
+) -> ApiResult<()> {
     let link = engine
-        .now_gaming_join_link(session)
+        .now_gaming_join_link(to_engine_server_id(server_id), session)
         .ok_or_else(|| ApiError::new(ErrorCode::NotFound, "no game to join"))?;
     tracing::info!("now gaming: opening a join link");
     crate::browser::open_url(&link).map_err(|e| ApiError::new(ErrorCode::Internal, e.to_string()))

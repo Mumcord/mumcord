@@ -8,6 +8,7 @@
     "unknownPerson": "Persuna mhux magħrufa"
   },
   "list": {
+    "server": "Server",
     "today": "Illum",
     "yesterday": "Ilbieraħ",
     "label": "Messaġġi f'{{name}}",
@@ -35,10 +36,11 @@
     "toolbar": "Formattjar",
     "bold": "Grassett",
     "italic": "Korsiv",
-    "strike": "Strikethrough",
+    "strike": "Ingasat",
     "code": "Kodiċi inline",
     "codeBlock": "Blokk ta' kodiċi",
-    "link": "Link"
+    "link": "Link",
+    "quote": "Kwotazzjoni"
   },
   "composer": {
     "label": "Messaġġ lil {{name}}",
@@ -70,7 +72,14 @@
     "notConnected": "Mhux konness. Erġa' ikkonnettja u erġa' pprova.",
     "generic": "Il-messaġġ ma setax jintbagħat. Erġa' pprova.",
     "onlyImages": "Jistgħu jintbagħtu biss stampi.",
-    "sourceTooLarge": "Dan il-fajl huwa kbir wisq biex jintbagħat (aktar minn 25 MB)."
+    "sourceTooLarge": "Dan il-fajl huwa kbir wisq biex jintbagħat (aktar minn 25 MB).",
+    "personOffline": "Din il-persuna mhix online. Erġa' pprova meta terġa' lura."
+  },
+  "failed": {
+    "notSent": "Ma ntbagħatx.",
+    "retry": "Erġa' pprova",
+    "remove": "Ħassar",
+    "announce": "Messaġġ ma setax jintbagħat."
   },
   "announce": {
     "message": "{{name}}: {{text}}",
@@ -84,7 +93,9 @@
   "pinned": {
     "label": "Info tal-kanal",
     "showMore": "Uri aktar",
-    "showLess": "Uri inqas"
+    "showLess": "Uri inqas",
+    "hideWelcome": "Aħbi l-messaġġ ta' merħba",
+    "hideDescription": "Aħbi d-deskrizzjoni tal-kanal"
   },
   "mention": {
     "list": "Persuni li tista' tsemmi",
@@ -111,7 +122,7 @@
       "playlist": "Playlist",
       "artist": "Artist",
       "episode": "Episodju",
-      "show": "Show"
+      "show": "Programm"
     },
     "inBrowser": "Jindaqq fil-browser tiegħek",
     "card": "Preview tal-link: {{title}}",
@@ -127,8 +138,8 @@
   "viewer": {
     "label": "Viewer tal-istampi",
     "counter": "{{current}} / {{total}}",
-    "zoomIn": "Zoom in",
-    "zoomOut": "Zoom out",
+    "zoomIn": "Ingrandixxi",
+    "zoomOut": "Iċċekken",
     "fit": "Adatta għat-tieqa",
     "save": "Issejvja l-istampa",
     "saved": "L-istampa ssejvjata",
@@ -140,6 +151,7 @@
     "next": "Stampa li jmiss",
     "unnamed": "stampa",
     "fullLoading": "Qed titgħabba d-daqs sħiħ…",
+    "fullCancel": "Ikkanċella t-tniżżil b'daqs sħiħ",
     "fullProgress": "Qed titgħabba d-daqs sħiħ… {{percent}} %",
     "fullUnavailable": "Id-daqs sħiħ mhux disponibbli – qed jintwera l-preview"
   },
@@ -153,11 +165,62 @@
     "hint": "Il-vireg jimxu, Enter jibgħat, Delete ineħħi, Escape jagħlaq.",
     "empty": "Għad m'hemm l-ebda favorit. Agħfas il-buttuna tal-lemin fuq GIF fiċ-chat, jew uża l-istilla fuqha, u agħżel \"Issejvja bħala favorit\". Se tidher hawn."
   },
+  "linkMenu": {
+    "label": "Link",
+    "copy": "Ikkopja l-link",
+    "open": "Iftaħ il-link",
+    "copied": "Il-link ġie kkupjat"
+  },
   "imageMenu": {
     "label": "Stampa {{name}}"
   },
   "attribution": {
     "via": "permezz ta' {{brand}}",
     "view": "Ara fuq {{brand}}"
+  },
+  "themeCard": {
+    "label": "Tema kondiviża {{name}}",
+    "apply": "Applika t-tema",
+    "more": "Applika għal server",
+    "menuLabel": "Applika t-tema għal",
+    "applyToServer": "Applika għal {{server}}",
+    "imported": "Importata ✓",
+    "newer": "Magħmula b'Mumcord {{version}} – aġġorna biex tarah kollu",
+    "failed": "It-tema ma setgħetx tiġi applikata."
+  },
+  "reply": {
+    "action": "Wieġeb",
+    "actionFor": "Wieġeb lil {{name}}",
+    "menu": "Messaġġ minn {{name}}",
+    "replyTo": "Tweġiba lil",
+    "jump": "Mur għall-messaġġ oriġinali",
+    "image": "Stampa",
+    "replyingTo": "Qed twieġeb lil",
+    "cancel": "Ikkanċella t-tweġiba"
+  },
+  "actions": {
+    "label": "Ibdew flimkien",
+    "notConnected": "Mhux konness mas-server.",
+    "partyRunning": "Diġà għaddej watch party f'dan il-kanal.",
+    "invalidLink": "Dan mhux link ta' video fuq YouTube.",
+    "linkLabel": "Link ta' YouTube",
+    "linkPlaceholder": "Waħħal link ta' YouTube",
+    "confirm": "Ibda",
+    "watchHint": "Ara video ta' YouTube flimkien ma' dan il-kanal",
+    "dialogTitle": "Araw flimkien",
+    "addTitle": "Żid mal-playlist",
+    "addToPlaylist": "Żid mal-playlist",
+    "addConfirm": "Żid",
+    "apps": "Apps",
+    "appsLive": "Apps (qed taqsam l-iskrin tiegħek)"
+  },
+  "activity": {
+    "share": "{{name}} qed jaqsam l-iskrin",
+    "watch": "Ara",
+    "party": "Watch party: {{title}}",
+    "join": "Ingħaqad",
+    "videoFallback": "Video ta' YouTube",
+    "someone": "Xi ħadd",
+    "joinFailed": "Ma stajtx tingħaqad mal-watch party."
   }
 }

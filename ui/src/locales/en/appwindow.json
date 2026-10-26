@@ -5,6 +5,39 @@
     "remember": "Remember my choice",
     "minimize": "Minimize to tray",
     "quit": "Quit",
+    "failed": "That did not work. Please try again.",
+    "descriptionServers": "You are still connected to {{count}} servers. Minimized, Mumcord keeps you in voice and stays in the system tray."
+  },
+  "windowOverlay": {
+    "title": "The window overlay was removed",
+    "description": "The floating overlay window is gone. The in-game overlay shows who is talking inside your games instead. You can switch it on in the overlay settings.",
+    "dismiss": "Got it",
+    "openSettings": "Open overlay settings"
+  },
+  "appImageMenu": {
+    "title": "Add Mumcord to the app menu?",
+    "description": "This puts Mumcord in your app menu. It makes the icon and push-to-talk work properly on Wayland, and lets mumble:// links open Mumcord. You can change this later in Settings.",
+    "no": "No",
+    "yes": "Yes",
+    "failed": "That did not work. Please try again."
+  },
+  "updateCheck": {
+    "title": "Check for new versions?",
+    "description": "Mumcord can ask GitHub once a day whether a newer version exists and show a hint with a link. Nothing is downloaded or installed, and nothing is sent except the request itself and the app name and version. You can change this later in Settings.",
+    "no": "No",
+    "yes": "Yes",
+    "failed": "That did not work. Please try again."
+  },
+  "updateHint": {
+    "message": "Mumcord {{version}} is available.",
+    "open": "View release",
+    "dismiss": "Dismiss"
+  },
+  "directConsent": {
+    "title": "Allow direct connections?",
+    "description": "Direct connections are faster, but the other person can see your IP address. Mumcord uses them for full-size images and screen sharing with other Mumcord users and may open a port on your router for them. If you say no, images still arrive through the server and screen sharing is unavailable. You can change this later in Settings → Privacy.",
+    "no": "No",
+    "yes": "Yes",
     "failed": "That did not work. Please try again."
   }
 }

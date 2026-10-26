@@ -108,9 +108,25 @@ pub struct ConnectionStats {
     pub packets_received: u32,
 }
 
+/// The voice server changed (FR-2.2); `null` when no server has voice.
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, Type, Event)]
+#[serde(rename_all = "camelCase")]
+pub struct VoiceServerChanged {
+    pub server_id: Option<ServerId>,
+}
+
+/// One server's connection state, as listed by `connections_list`.
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, Type)]
+#[serde(rename_all = "camelCase")]
+pub struct ServerConnection {
+    pub server_id: ServerId,
+    pub state: ConnectionState,
+}
+
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, Type, Event)]
 #[serde(rename_all = "camelCase")]
 pub struct ConnectionStateChanged {
+    pub server_id: ServerId,
     pub state: ConnectionState,
 }
 
@@ -132,9 +148,18 @@ pub struct ServerSynced {
     pub snapshot: ServerSnapshot,
 }
 
+/// Channels received so far while a server is still syncing (FR-2.24).
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, Type, Event)]
+#[serde(rename_all = "camelCase")]
+pub struct SyncProgress {
+    pub server_id: ServerId,
+    pub channels: u32,
+}
+
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, Type, Event)]
 #[serde(rename_all = "camelCase")]
 pub struct TransportChanged {
+    pub server_id: ServerId,
     pub transport: Transport,
 }
 
@@ -142,6 +167,7 @@ pub struct TransportChanged {
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, Type, Event)]
 #[serde(rename_all = "camelCase")]
 pub struct ServerDenied {
+    pub server_id: ServerId,
     pub error: ApiError,
     pub channel_id: Option<ChannelId>,
 }
@@ -237,52 +263,84 @@ impl From<ConnectionStatsView> for ConnectionStats {
     }
 }
 
-/// Connects to a saved server, disconnecting the current one first (the UI confirms that).
-/// `channel_path` (from a `mumble://` link) overrides rejoining the last channel.
+/// Connects to a saved server next to the connected ones (FR-2.1, FR-2.6), read-only.
+/// Errors: `serverLimitReached` when `maxConnectedServers` servers are connected already.
+/// `channel_path` (from a `mumble://` link) joins that channel and moves voice there; on an
+/// already connected server only that join happens. `password` replaces the saved password for
+/// this connection only (retry after `wrongPassword`); it is never stored or logged.
 #[tauri::command]
 #[specta::specta]
 pub fn connect(
     engine: State<'_, Engine>,
     server_id: ServerId,
     channel_path: Option<Vec<String>>,
+    password: Option<String>,
 ) -> ApiResult<()> {
-    Ok(engine.connect(to_engine_server_id(server_id), channel_path)?)
+    Ok(engine.connect_with_password(to_engine_server_id(server_id), channel_path, password)?)
 }
 
-/// Disconnects, also cancelling any pending reconnect.
+/// Disconnects the server, also cancelling any pending reconnect. A server that is not
+/// connected is left alone.
 #[tauri::command]
 #[specta::specta]
-pub fn disconnect(engine: State<'_, Engine>) -> ApiResult<()> {
-    engine.disconnect();
+pub fn disconnect(engine: State<'_, Engine>, server_id: ServerId) -> ApiResult<()> {
+    engine.disconnect(to_engine_server_id(server_id));
     Ok(())
 }
 
-/// Stops automatic reconnecting; the state becomes `disconnected`.
+/// Stops automatic reconnecting of the server; its state becomes `disconnected`.
 #[tauri::command]
 #[specta::specta]
-pub fn reconnect_cancel(engine: State<'_, Engine>) -> ApiResult<()> {
-    engine.reconnect_cancel();
+pub fn reconnect_cancel(engine: State<'_, Engine>, server_id: ServerId) -> ApiResult<()> {
+    engine.reconnect_cancel(to_engine_server_id(server_id));
     Ok(())
 }
 
+/// Connection state of every server that is not disconnected (empty when none is).
 #[tauri::command]
 #[specta::specta]
-pub fn connection_state(engine: State<'_, Engine>) -> ApiResult<ConnectionState> {
-    Ok(engine.connection_state().into())
+pub fn connections_list(engine: State<'_, Engine>) -> ApiResult<Vec<ServerConnection>> {
+    Ok(engine
+        .connections()
+        .into_iter()
+        .filter_map(|state| {
+            state.server_id().map(|id| ServerConnection {
+                server_id: to_api_server_id(id),
+                state: state.into(),
+            })
+        })
+        .collect())
 }
 
-/// Current snapshot, or `null` when not connected.
+/// The server that has voice, or `null` when every connected server is read-only.
 #[tauri::command]
 #[specta::specta]
-pub fn session_snapshot(engine: State<'_, Engine>) -> ApiResult<Option<ServerSnapshot>> {
-    Ok(engine.snapshot().map(ServerSnapshot::from))
+pub fn voice_server_get(engine: State<'_, Engine>) -> ApiResult<Option<ServerId>> {
+    Ok(engine.voice_server().map(to_api_server_id))
 }
 
-/// Live link figures, or `null` when not connected (AC-1.23).
+/// Current snapshot of the server, or `null` when it is not connected.
 #[tauri::command]
 #[specta::specta]
-pub fn connection_stats(engine: State<'_, Engine>) -> ApiResult<Option<ConnectionStats>> {
-    Ok(engine.connection_stats().map(ConnectionStats::from))
+pub fn session_snapshot(
+    engine: State<'_, Engine>,
+    server_id: ServerId,
+) -> ApiResult<Option<ServerSnapshot>> {
+    Ok(engine
+        .snapshot_of(to_engine_server_id(server_id))
+        .map(ServerSnapshot::from))
+}
+
+/// Live link figures of the server, or `null` when it is not connected (AC-1.23).
+#[tauri::command]
+#[specta::specta]
+pub fn connection_stats(
+    engine: State<'_, Engine>,
+    server_id: ServerId,
+) -> ApiResult<Option<ConnectionStats>> {
+    Ok(engine
+        .connection_stats(to_engine_server_id(server_id))
+        .map(ConnectionStats::from))
 }
 
 /// Answers a `CertTrustRequired`; trusting is remembered for the server.

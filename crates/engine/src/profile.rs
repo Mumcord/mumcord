@@ -7,6 +7,7 @@ use image::codecs::jpeg::JpegEncoder;
 use image::{DynamicImage, ImageFormat};
 use mumcord_protocol::{DenyKind, PermissionDenied, permissions};
 
+use crate::ServerId;
 use crate::chat::{IMAGE_SOFT_CAP, check_text_size};
 use crate::follow::{OnTimeout, confirm, subscribe_denials};
 use crate::people::avatar_data_url;
@@ -123,7 +124,7 @@ async fn apply_texture(ctx: &SessionCtx, texture: Vec<u8>) -> EngineResult<()> {
             })
         },
         |d| is_profile_denial(d, own),
-        OnTimeout::Accept,
+        OnTimeout::Fail("the new avatar"),
     )
     .await
 }
@@ -344,8 +345,12 @@ impl Engine {
     /// Sets the own avatar from an image file, scaled to the server limit; `None` removes it.
     /// The choice is remembered for the saved server and restored on later connects when the
     /// server does not keep it (FR-1.20, QA.10).
-    pub async fn set_own_avatar(&self, path: Option<PathBuf>) -> EngineResult<()> {
-        let ctx = self.session_ctx()?;
+    pub async fn set_own_avatar(
+        &self,
+        server_id: ServerId,
+        path: Option<PathBuf>,
+    ) -> EngineResult<()> {
+        let ctx = self.session_ctx_for(server_id)?;
         let (texture, keep) = match path {
             None => (Vec::new(), None),
             Some(path) => {
@@ -359,10 +364,11 @@ impl Engine {
     }
 
     /// Sets the own profile comment (Mumble HTML); empty removes it.
-    pub async fn set_own_comment(&self, html: String) -> EngineResult<()> {
-        let ctx = self.session_ctx()?;
+    pub async fn set_own_comment(&self, server_id: ServerId, html: String) -> EngineResult<()> {
+        let ctx = self.session_ctx_for(server_id)?;
         // The status lines stay at the end while they are shown (FR-1.58, FR-1.59).
-        let html = self.with_now_gaming_line(&self.with_now_playing_line(&html));
+        let html =
+            self.with_now_gaming_line(server_id, &self.with_now_playing_line(server_id, &html));
         if !html.trim().is_empty() {
             check_text_size(&ctx, &html)?;
         }
@@ -387,14 +393,14 @@ impl Engine {
                 })
             },
             |d| is_profile_denial(d, own),
-            OnTimeout::Accept,
+            OnTimeout::Fail("the new comment"),
         )
         .await
     }
 
-    /// Registers the current name with the current identity on the connected server.
-    pub async fn register_self(&self) -> EngineResult<()> {
-        let ctx = self.session_ctx()?;
+    /// Registers the current name with the current identity on the connected server `server_id`.
+    pub async fn register_self(&self, server_id: ServerId) -> EngineResult<()> {
+        let ctx = self.session_ctx_for(server_id)?;
         let (own, registered, has_cert, root_bits) = ctx.handle.with_state(|s| {
             let user = s.own_user();
             (

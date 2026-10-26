@@ -130,20 +130,22 @@ describe("sending", () => {
       scaled: true,
     });
     vi.spyOn(api, "fullImageKeep").mockResolvedValue(REFERENCE);
-    const send = vi.spyOn(api, "sendChannelMessage").mockImplementation((channelId, html) =>
-      Promise.resolve({
-        id: "m1",
-        conversation: { kind: "channel", channelId },
-        senderName: "me",
-        senderCertHash: null,
-        senderSession: 1,
-        own: true,
-        sentAt: "2026-10-25T10:00:00.000Z",
-        body: html,
-        dismissedPreviews: [],
-        syncedFrom: null,
-      }),
-    );
+    const send = vi
+      .spyOn(api, "sendChannelMessage")
+      .mockImplementation((_serverId, channelId, html) =>
+        Promise.resolve({
+          id: "m1",
+          conversation: { kind: "channel", channelId },
+          senderName: "me",
+          senderCertHash: null,
+          senderSession: 1,
+          own: true,
+          sentAt: "2026-10-25T10:00:00.000Z",
+          body: html,
+          dismissedPreviews: [],
+          syncedFrom: null,
+        }),
+      );
     const { result } = renderHook(() => useComposer({ kind: "channel", channelId: 0 }, LIMITS));
     act(() => {
       result.current.addFiles([new File(["big"], "big.png", { type: "image/png" })]);
@@ -151,10 +153,16 @@ describe("sending", () => {
     await waitFor(() => {
       expect(result.current.attachments[0]?.status).toBe("ready");
     });
-    await act(async () => {
-      await result.current.submit();
+    act(() => {
+      result.current.submit();
     });
-    expect(send).toHaveBeenCalledWith(0, `<img src="${THUMB}" data-mumcord-full="${REFERENCE}" />`);
+    await waitFor(() => {
+      expect(send).toHaveBeenCalledWith(
+        expect.any(Number),
+        0,
+        `<img src="${THUMB}" data-mumcord-full="${REFERENCE}" />`,
+      );
+    });
     const budget = (images.prepareImage.mock.calls[0] as [Blob, number])[1];
     expect(budget).toBeLessThanOrEqual(LIMITS.image - FULL_ATTRIBUTE_RESERVE);
   });

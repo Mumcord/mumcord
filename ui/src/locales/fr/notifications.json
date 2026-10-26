@@ -12,5 +12,6 @@
   "image": "A envoyé une image",
   "open": "Ouvrir la discussion",
   "close": "Ignorer la notification",
-  "mentionLine": "{{sender}} vous a mentionné : {{preview}}"
+  "mentionLine": "{{sender}} vous a mentionné : {{preview}}",
+  "withServer": "{{server}} · {{what}}"
 }

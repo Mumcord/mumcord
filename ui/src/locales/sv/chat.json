@@ -8,6 +8,7 @@
     "unknownPerson": "Okänd person"
   },
   "list": {
+    "server": "Server",
     "today": "Idag",
     "yesterday": "Igår",
     "label": "Meddelanden i {{name}}",
@@ -32,7 +33,8 @@
     "strike": "Genomstruken",
     "code": "Inbäddad kod",
     "codeBlock": "Kodblock",
-    "link": "Länk"
+    "link": "Länk",
+    "quote": "Citat"
   },
   "composer": {
     "label": "Meddelande till {{name}}",
@@ -64,7 +66,14 @@
     "notConnected": "Du är inte ansluten. Anslut igen och försök på nytt.",
     "generic": "Meddelandet kunde inte skickas. Försök igen.",
     "onlyImages": "Bara bilder kan skickas.",
-    "sourceTooLarge": "Den här filen är för stor för att skickas (över 25 MB)."
+    "sourceTooLarge": "Den här filen är för stor för att skickas (över 25 MB).",
+    "personOffline": "Den här personen är offline. Försök igen när hen är tillbaka."
+  },
+  "failed": {
+    "notSent": "Inte skickat.",
+    "retry": "Försök igen",
+    "remove": "Ta bort",
+    "announce": "Ett meddelande kunde inte skickas."
   },
   "announce": {
     "message": "{{name}}: {{text}}",
@@ -75,7 +84,9 @@
   "pinned": {
     "label": "Kanalinfo",
     "showMore": "Visa mer",
-    "showLess": "Visa mindre"
+    "showLess": "Visa mindre",
+    "hideWelcome": "Dölj välkomstmeddelande",
+    "hideDescription": "Dölj kanalbeskrivning"
   },
   "mention": {
     "list": "Personer att omnämna",
@@ -128,6 +139,7 @@
     "next": "Nästa bild",
     "unnamed": "bild",
     "fullLoading": "Läser in full storlek…",
+    "fullCancel": "Avbryt nedladdning i full storlek",
     "fullProgress": "Läser in full storlek… {{percent}} %",
     "fullUnavailable": "Full storlek är inte tillgänglig – visar förhandsvisningen"
   },
@@ -141,11 +153,62 @@
     "hint": "Piltangenter flyttar, Enter skickar, Delete tar bort, Escape stänger.",
     "empty": "Inga favoriter än. Högerklicka på en GIF i chatten, eller använd stjärnan på den, och välj \"Spara som favorit\". Då dyker den upp här."
   },
+  "linkMenu": {
+    "label": "Länk",
+    "copy": "Kopiera länk",
+    "open": "Öppna länk",
+    "copied": "Länken kopierad"
+  },
   "imageMenu": {
     "label": "Bilden {{name}}"
   },
   "attribution": {
     "via": "via {{brand}}",
     "view": "Visa på {{brand}}"
+  },
+  "themeCard": {
+    "label": "Delat tema {{name}}",
+    "apply": "Använd tema",
+    "more": "Använd på en server",
+    "menuLabel": "Använd tema på",
+    "applyToServer": "Använd på {{server}}",
+    "imported": "Importerat ✓",
+    "newer": "Skapat med Mumcord {{version}} – uppdatera för att se det helt",
+    "failed": "Temat kunde inte användas."
+  },
+  "reply": {
+    "action": "Svara",
+    "actionFor": "Svara {{name}}",
+    "menu": "Meddelande från {{name}}",
+    "replyTo": "Svar till",
+    "jump": "Gå till det ursprungliga meddelandet",
+    "image": "Bild",
+    "replyingTo": "Svarar",
+    "cancel": "Avbryt svar"
+  },
+  "actions": {
+    "label": "Starta tillsammans",
+    "notConnected": "Inte ansluten till servern.",
+    "partyRunning": "Det pågår redan en watch party i den här kanalen.",
+    "invalidLink": "Det här är ingen länk till en YouTube-video.",
+    "linkLabel": "YouTube-länk",
+    "linkPlaceholder": "Klistra in en YouTube-länk",
+    "confirm": "Starta",
+    "watchHint": "Titta på en YouTube-video tillsammans med den här kanalen",
+    "dialogTitle": "Titta tillsammans",
+    "addTitle": "Lägg till i spellistan",
+    "addToPlaylist": "Lägg till i spellistan",
+    "addConfirm": "Lägg till",
+    "apps": "Appar",
+    "appsLive": "Appar (du delar din skärm)"
+  },
+  "activity": {
+    "share": "{{name}} delar sin skärm",
+    "watch": "Titta",
+    "party": "Watch party: {{title}}",
+    "join": "Gå med",
+    "videoFallback": "YouTube-video",
+    "someone": "Någon",
+    "joinFailed": "Kunde inte gå med i watch partyt."
   }
 }

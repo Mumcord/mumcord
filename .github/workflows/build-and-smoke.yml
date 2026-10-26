@@ -40,10 +40,15 @@ jobs:
       fail-fast: false
       matrix:
         include:
+          # AppImage, .deb and .rpm (FR-2.53) for x86_64 and, on GitHub's ARM runner, ARM64.
           - name: linux
             os: ubuntu-24.04
-            args: --bundles appimage
-            bundle: target/release/bundle/appimage/*.AppImage
+            args: --bundles appimage,deb,rpm
+            bundle: target/release/bundle/{appimage/*.AppImage,deb/*.deb,rpm/*.rpm}
+          - name: linux-arm64
+            os: ubuntu-24.04-arm
+            args: --bundles appimage,deb,rpm
+            bundle: target/release/bundle/{appimage/*.AppImage,deb/*.deb,rpm/*.rpm}
           - name: windows
             os: windows-latest
             args: --bundles nsis
@@ -68,7 +73,53 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y --no-install-recommends \
             libwebkit2gtk-4.1-dev libayatana-appindicator3-dev librsvg2-dev \
-            libxdo-dev libasound2-dev cmake patchelf xdg-utils
+            libxdo-dev libasound2-dev libpipewire-0.3-dev libclang-dev pkg-config cmake patchelf xdg-utils
+
+      # Screen sharing links a static libvpx into every bundle (scripts/build-libvpx.sh,
+      # RELEASING.md); on Linux this keeps the packages off the build host's libvpx soname. It is
+      # cached per system and architecture: the key changes with the script and, on Windows, with
+      # the libvpx version of the runner's vcpkg.
+      - name: libvpx cache key
+        id: libvpx
+        shell: bash
+        run: |
+          version=pinned
+          if [[ "$RUNNER_OS" == Windows ]]; then
+            version=$(jq -r '(.version // ."version-semver" // ."version-string" | tostring) + "-" + (."port-version" // 0 | tostring)' \
+              "$VCPKG_INSTALLATION_ROOT/ports/libvpx/vcpkg.json")
+          fi
+          echo "key=libvpx-$RUNNER_OS-$RUNNER_ARCH-$version-${{ hashFiles('scripts/build-libvpx.sh') }}" >> "$GITHUB_OUTPUT"
+
+      - name: Restore static libvpx
+        id: libvpx-cache
+        uses: actions/cache@v4
+        with:
+          path: ${{ runner.temp }}/libvpx
+          key: ${{ steps.libvpx.outputs.key }}
+
+      - name: Build static libvpx
+        if: steps.libvpx-cache.outputs.cache-hit != 'true'
+        shell: bash
+        run: |
+          if [[ "$RUNNER_OS" == macOS ]]; then brew install nasm; fi
+          if [[ "$RUNNER_OS" == Linux ]]; then sudo apt-get install -y --no-install-recommends nasm; fi
+          scripts/build-libvpx.sh '${{ runner.temp }}/libvpx'
+
+      # bindgen (crates/screenshare/build.rs) loads libclang: LLVM on the Windows runner, Xcode's
+      # toolchain on macOS, libclang-dev (found on its own) on Linux.
+      - name: Point the build at libvpx and libclang
+        shell: bash
+        run: |
+          echo 'LIBVPX_STATIC_DIR=${{ runner.temp }}/libvpx' >> "$GITHUB_ENV"
+          if [[ "$RUNNER_OS" == Linux ]]; then exit 0; fi
+          if [[ "$RUNNER_OS" == Windows ]]; then
+            libclang='C:\Program Files\LLVM\bin'
+            test -f "$libclang/libclang.dll"
+          else
+            libclang="$(xcode-select -p)/Toolchains/XcodeDefault.xctoolchain/usr/lib"
+            test -f "$libclang/libclang.dylib"
+          fi
+          echo "LIBCLANG_PATH=$libclang" >> "$GITHUB_ENV"
 
       - uses: dtolnay/rust-toolchain@stable
         with:
@@ -136,6 +187,15 @@ jobs:
             fi
           done
           echo "enabled=true" >> "$GITHUB_OUTPUT"
+
+      # The AppImage bundles the GStreamer plugins (bundleMediaFramework) but not H.264 (gst-libav,
+      # x264) or the GPL-only codecs; see RELEASING.md. The deb/rpm packages depend on gst-libav instead.
+      - name: Exclude H.264 and GPL-only GStreamer plugins from the AppImage
+        if: runner.os == 'Linux'
+        run: |
+          echo "GSTREAMER_PLUGINS_DIR=$(scripts/filter-gst-plugins.sh)" >> "$GITHUB_ENV"
+          # linuxdeploy only finds the plugin scanner by itself on Debian paths; pass it explicitly.
+          echo "GSTREAMER_HELPERS_DIR=$(scripts/gst-helpers-dir.sh)" >> "$GITHUB_ENV"
 
       - name: Build bundle
         if: steps.azure.outputs.enabled != 'true'
@@ -259,6 +319,7 @@ jobs:
       matrix:
         include:
           - { name: linux, os: ubuntu-24.04 }
+          - { name: linux-arm64, os: ubuntu-24.04-arm }
           - { name: windows, os: windows-latest }
           - { name: macos, os: macos-latest }
     runs-on: ${{ matrix.os }}
@@ -282,7 +343,7 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y --no-install-recommends \
             libasound2-dev cmake sqlite3 xvfb dbus-x11 gnome-keyring libsecret-tools \
-            libwebkit2gtk-4.1-0
+            libwebkit2gtk-4.1-0 libpipewire-0.3-0t64
           # The AppImage must bring its own tray library (it is loaded at runtime, so a missing
           # one only shows on machines without it). Keep it off the runner so the smoke test
           # exercises the bundled copy.
@@ -357,7 +418,7 @@ jobs:
           mkdir -p "$dir"
           printf 'database=%s\nport=64738\nautobanAttempts=0\n' "$dir/mumble-server.sqlite" > "$dir/mumble-server.ini"
           ~/mumble-server/mumble-server -ini "$dir/mumble-server.ini" -fg > "$dir/server.log" 2>&1 &
-          for i in $(seq 60); do nc -z 127.0.0.1 64738 && exit 0; sleep 1; done
+          for _ in $(seq 60); do nc -z 127.0.0.1 64738 && exit 0; sleep 1; done
           cat "$dir/server.log"
           exit 1
 
@@ -392,10 +453,20 @@ jobs:
           (cd "$RUNNER_TEMP" && "$GITHUB_WORKSPACE/$app" --appimage-extract >/dev/null)
           test -e "$RUNNER_TEMP/squashfs-root/usr/lib/libayatana-appindicator3.so.1" \
             || { echo "libayatana-appindicator3.so.1 is missing from the AppImage" >&2; exit 1; }
+          for f in libgstlibav.so libavcodec.so.* libx264.so.*; do
+            if compgen -G "$RUNNER_TEMP/squashfs-root/usr/lib/$f" >/dev/null \
+              || compgen -G "$RUNNER_TEMP/squashfs-root/usr/lib/gstreamer-1.0/$f" >/dev/null; then
+              echo "$f must not be bundled in the AppImage" >&2; exit 1
+            fi
+          done
+          # Without the bundled scanner every plugin load warns and runs in-process.
+          test -x "$RUNNER_TEMP/squashfs-root/usr/lib/gstreamer1.0/gstreamer-1.0/gst-plugin-scanner" \
+            || { echo "gst-plugin-scanner is missing from the AppImage" >&2; exit 1; }
           rm -rf "$RUNNER_TEMP/squashfs-root"
           # Secret Service (unlocked gnome-keyring) for the identity, and a virtual display.
           # An EMPTY password creates no `login` collection, so unlock with a fixed non-empty
           # throwaway password in a fresh D-Bus session; verify with secret-tool before seeding.
+          # shellcheck disable=SC2016 # the script is expanded by the inner bash in the D-Bus session
           dbus-run-session -- bash -c '
             set -e
             printf "smoke" | gnome-keyring-daemon --unlock --components=secrets >/dev/null
@@ -411,6 +482,28 @@ jobs:
           if grep -qs 'no tray library' "$logs"/*; then
             echo "the AppImage could not load its bundled tray library" >&2; exit 1
           fi
+
+      # The smoke test ran the AppImage; the .deb and .rpm carry the same binary, so check that
+      # each installs on its distribution with every shared library resolved and the menu entry
+      # (with the mumble:// handler) and the in-game overlay layer in place. Tauri does not scan
+      # the binary for its libraries, so a missing package dependency only shows here.
+      - name: Check .deb and .rpm packages
+        if: runner.os == 'Linux'
+        run: |
+          # shellcheck disable=SC2016 # the script is expanded later, by the shell that runs it
+          check='
+            set -e
+            missing=$(ldd /usr/bin/mumcord | grep "=> not found" || true)
+            if [ -n "$missing" ]; then echo "unresolved libraries: $missing" >&2; exit 1; fi
+            test -e /usr/lib/mumcord/libmumcord_overlay_layer.so
+            grep -qx "MimeType=x-scheme-handler/mumble;" /usr/share/applications/Mumcord.desktop
+            grep -qx "StartupWMClass=app.mumcord.client" /usr/share/applications/Mumcord.desktop
+            test -e /usr/share/icons/hicolor/128x128/apps/mumcord.png
+          '
+          sudo apt-get install -y --no-install-recommends "$PWD/$(ls build/*.deb)"
+          bash -c "$check"
+          docker run --rm -v "$PWD/build:/build:ro" fedora:42 bash -c \
+            "dnf install -y -q /build/*.rpm >/dev/null && $check"
 
       - name: Smoke test (Windows)
         if: runner.os == 'Windows'

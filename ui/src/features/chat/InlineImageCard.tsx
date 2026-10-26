@@ -121,7 +121,7 @@ export function InlineImageCard({ url, messageId, tabIndex, onImageClick }: Inli
         className="inline-image__view"
         tabIndex={tabIndex}
         aria-label={t("image.view", { name })}
-        title={image.url}
+        data-tooltip={image.url}
         onClick={(event) => {
           if (onImageClick) onImageClick(image, event.currentTarget);
           else openInBrowser(image.url);
@@ -144,7 +144,7 @@ export function InlineImageCard({ url, messageId, tabIndex, onImageClick }: Inli
         className="inline-image__favorite"
         tabIndex={tabIndex}
         aria-label={favoriteLabel}
-        title={favoriteLabel}
+        data-tooltip={favoriteLabel}
         onClick={() => {
           if (favorite) removeFavorite(image.url);
           else saveFavorite(image.url);

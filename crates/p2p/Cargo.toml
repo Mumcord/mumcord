@@ -1,0 +1,29 @@
+[package]
+name = "mumcord-p2p"
+description = "Encrypted direct connections between Mumcord clients: QUIC, certificate pinning, port mapping, signalling"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+
+[dependencies]
+tokio.workspace = true
+rustls.workspace = true
+quinn.workspace = true
+igd-next.workspace = true
+crab_nat.workspace = true
+netdev.workspace = true
+rand.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+thiserror.workspace = true
+tracing.workspace = true
+socket2.workspace = true
+mumcord-protocol.workspace = true
+
+[dev-dependencies]
+rcgen.workspace = true
+mumcord-store.workspace = true
+
+[lints]
+workspace = true

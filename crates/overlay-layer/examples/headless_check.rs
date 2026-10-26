@@ -13,6 +13,10 @@
 //! `headless_check serve <seconds>` only plays Mumcord for that long, to watch the overlay in a
 //! real program such as `vkcube` started with the same environment. `headless_check render` only
 //! renders, against a Mumcord started elsewhere.
+//!
+//! With `MUMCORD_CHECK_HDR10=1` the swapchain is HDR10 (10-bit, ST 2084 colour space) and the
+//! check expects the dot's green to sit at SDR reference white in PQ (about 0.5 of full scale),
+//! not at the raw sRGB value (above 0.75), which would look far too bright on an HDR display.
 
 #[cfg(target_os = "linux")]
 fn main() {
@@ -110,10 +114,14 @@ mod linux {
         // Safety: plain Vulkan usage; every object lives until the process exits.
         unsafe {
             let entry = ash::Entry::load().map_err(|e| e.to_string())?;
-            let extensions = [
+            let hdr10 = std::env::var_os("MUMCORD_CHECK_HDR10").is_some();
+            let mut extensions = vec![
                 ash::khr::surface::NAME.as_ptr(),
                 ash::ext::headless_surface::NAME.as_ptr(),
             ];
+            if hdr10 {
+                extensions.push(ash::ext::swapchain_colorspace::NAME.as_ptr());
+            }
             let app = vk::ApplicationInfo::default().api_version(vk::API_VERSION_1_1);
             let instance = entry
                 .create_instance(
@@ -156,12 +164,23 @@ mod linux {
             let caps = surface_fn
                 .get_physical_device_surface_capabilities(physical, surface)
                 .map_err(|e| e.to_string())?;
-            let format = surface_fn
+            let formats = surface_fn
                 .get_physical_device_surface_formats(physical, surface)
-                .map_err(|e| e.to_string())?
-                .into_iter()
-                .find(|f| f.format == vk::Format::B8G8R8A8_UNORM)
-                .ok_or("no BGRA8 UNORM surface format")?;
+                .map_err(|e| e.to_string())?;
+            // The headless surface only lists sRGB formats; Mesa's headless swapchain accepts the
+            // HDR10 pair anyway, which is all the layer looks at.
+            let format = if hdr10 {
+                vk::SurfaceFormatKHR {
+                    format: vk::Format::A2B10G10R10_UNORM_PACK32,
+                    color_space: vk::ColorSpaceKHR::HDR10_ST2084_EXT,
+                }
+            } else {
+                formats
+                    .iter()
+                    .copied()
+                    .find(|f| f.format == vk::Format::B8G8R8A8_UNORM)
+                    .ok_or("no BGRA8 UNORM surface format")?
+            };
             let swapchain_fn = ash::khr::swapchain::Device::new(&instance, &device);
             let swapchain = swapchain_fn
                 .create_swapchain(
@@ -420,6 +439,9 @@ mod linux {
             if let Ok(out) = std::env::var("MUMCORD_CHECK_PPM") {
                 write_ppm(&out, pixels)?;
             }
+            if hdr10 {
+                return check_hdr10(pixels);
+            }
             // BGRA. The panel starts 16 px in; its first row holds the talking dot (13/21 px into
             // the panel), or the channel name when a real Mumcord shows it, which pushes the
             // dot further down. So look for the dot in the panel's top-left area.
@@ -440,6 +462,32 @@ mod linux {
                 return Err("no overlay at the expected place (is the layer loaded?)".into());
             }
             Ok(())
+        }
+    }
+
+    /// A2B10G10R10 pixels: red in bits 0-9, green in 10-19, blue in 20-29.
+    fn check_hdr10(pixels: &[u8]) -> Result<(), String> {
+        let at = |x: u32, y: u32| {
+            let i = ((y * WIDTH + x) * 4) as usize;
+            let v = u32::from_le_bytes([pixels[i], pixels[i + 1], pixels[i + 2], pixels[i + 3]]);
+            (v & 1023, (v >> 10) & 1023, (v >> 20) & 1023)
+        };
+        let far = at(WIDTH - 20, HEIGHT - 20);
+        println!("far pixel (10-bit rgb): {far:?}");
+        if far.2 < 1000 {
+            return Err("the frame was not cleared to blue".into());
+        }
+        // The dot is the only green thing; PQ of 203 nits (SDR white) is 0.58 of full scale.
+        let green = (16..16 + 120)
+            .flat_map(|y| (16..16 + 60).map(move |x| at(x, y)))
+            .map(|(_, g, _)| g)
+            .max();
+        println!("brightest green of the dot (10-bit): {green:?}");
+        match green {
+            None => Err("no overlay at the expected place (is the layer loaded?)".into()),
+            Some(g) if g > 610 => Err(format!("the dot is too bright for HDR10 (green {g})")),
+            Some(g) if g < 300 => Err(format!("the dot is too dark for HDR10 (green {g})")),
+            Some(_) => Ok(()),
         }
     }
 

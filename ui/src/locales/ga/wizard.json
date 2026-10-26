@@ -98,5 +98,10 @@
     "ingameOverlayHint": "Tarraingíonn sé cé atá ag caint ar bharr do chluiche (Linux). Is féidir leat é a chur ar siúl nó as in aghaidh an chluiche níos déanaí i Socruithe.",
     "ingameOverlayWarning": "D'fhéadfadh roinnt cluichí le frithcheilg forleagain sa chluiche a bhrath nó a bhlocáil. Coinníonn Mumcord cluichí a bhfuil riosca ar eolas leo (ar nós Valorant nó League of Legends) as de réir réamhshocraithe. Ná cuir air é ach do chluichí a bhfuil muinín agat astu.",
     "ingameOverlayAlt": "Sampla den fhorleagan sa chluiche ag taispeáint cé atá ag caint"
+  },
+  "updates": {
+    "title": "Leaganacha nua",
+    "check": "Seiceáil le haghaidh leaganacha nua",
+    "hint": "Is féidir le Mumcord fiafraí de GitHub uair sa lá an bhfuil leagan níos nuaí ann agus leid le nasc a thaispeáint. Ní íoslódáiltear ná ní shuiteáiltear aon rud, agus ní sheoltar aon rud ach an t-iarratas féin agus ainm agus leagan na haipe. Is féidir leat é seo a athrú níos déanaí sna Socruithe."
   }
 }

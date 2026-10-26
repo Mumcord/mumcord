@@ -4,6 +4,8 @@
     "label": "Kanali",
     "hint": "Enter: uri ċ-chat · Shift+Enter jew double-click: ingħaqad · Vireg: mexxi, wessa', ikkollassa",
     "join": "Ingħaqad",
+    "menuLabel": "Għażliet għal {{channel}}",
+    "showDescription": "Uri d-deskrizzjoni tal-kanal",
     "you": "(int)",
     "voiceHere": "int hawn (vuċi)",
     "people_one": "{{count}} persuna",
@@ -22,10 +24,11 @@
     },
     "showAll": "Uri kollha ({{total}})",
     "showFewer": "Uri inqas",
-    "jump": "Mur għall-kanal tiegħi"
+    "jump": "Mur għall-kanal tiegħi",
+    "locked": "maqful"
   },
   "status": {
-    "listening": "qed jisma'",
+    "listening": "qed jisma' biss",
     "talking": "qed jitkellem",
     "muted": "mutat",
     "deafened": "bla smigħ",
@@ -38,7 +41,7 @@
   "mumcordBadge": "Juża Mumcord",
   "statusTip": {
     "registered": "Irreġistrat fuq dan is-server",
-    "listening": "Qed jisma' dan il-kanal",
+    "listening": "Qed jisma' biss",
     "muted": "Mutat",
     "deafened": "Bla smigħ",
     "serverMuted": "Mutat mis-server",
@@ -48,6 +51,7 @@
     "unregistered": "Mhux irreġistrat fuq dan is-server (mistieden)",
     "nowPlaying": "Qed jisma' {{track}}",
     "nowGaming": "Qed jilgħab {{game}}",
+    "weakConnection": "Konnessjoni dgħajfa – ping għoli jew telf ta' pakketti",
     "positional": "L-awdjo posizzjonali huwa attiv"
   },
   "announce": {
@@ -62,7 +66,8 @@
   },
   "empty": {
     "disconnected": "Mhux konness. Agħżel server biex tara l-kanali tiegħu.",
-    "loading": "Qed jitgħabbew il-kanali…"
+    "loading": "Qed jitgħabbew il-kanali…",
+    "syncingBig": "Qed jiġi sinkronizzat server kbir…"
   },
   "search": {
     "label": "Fittex kanali u persuni",

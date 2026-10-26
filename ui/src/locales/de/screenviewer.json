@@ -1,0 +1,21 @@
+{
+  "label": "Bildschirmfreigabe von {{name}}",
+  "title": "Bildschirm von {{name}}",
+  "beta": "Beta",
+  "picture": "Geteilter Bildschirm von {{name}}",
+  "someone": "Jemand",
+  "live": "Live",
+  "collapse": "Einklappen",
+  "expand": "Ausklappen",
+  "fullscreen": "Vollbild",
+  "exitFullscreen": "Vollbild verlassen",
+  "stop": "Zuschauen beenden",
+  "starting": "Verbinde mit dem Bildschirm von {{name}} …",
+  "paused": "{{name}} hat die Freigabe pausiert.",
+  "full": "Diese Freigabe ist voll.",
+  "unreachable": "{{name}} ist direkt nicht erreichbar. Das Netzwerk blockiert vielleicht direkte Verbindungen.",
+  "tooOld": "Das Mumcord von {{name}} ist zu alt, um den Bildschirm mit dir zu teilen.",
+  "consentOff": "Zuschauen braucht direkte Verbindungen, und du hast sie ausgeschaltet.",
+  "failed": "Der Bildschirm von {{name}} konnte nicht geöffnet werden.",
+  "retry": "Erneut versuchen"
+}

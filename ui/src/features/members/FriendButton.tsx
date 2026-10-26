@@ -7,7 +7,7 @@ import { setFriend, useFriend } from "../friends";
  * Heart toggle on the pinned person card (FR-1.64). People without a certificate can't be
  * recognised again, so the button stays disabled and says why.
  */
-export function FriendButton({ user }: { user: User }) {
+export function FriendButton({ user, serverId }: { user: User; serverId?: number | undefined }) {
   const { t } = useTranslation("friends");
   const friend = useFriend(user.certHash);
   const [failed, setFailed] = useState(false);
@@ -19,13 +19,13 @@ export function FriendButton({ user }: { user: User }) {
         type="button"
         className="profile-preview__icon"
         aria-label={label}
-        title={label}
+        data-tooltip={label}
         aria-pressed={friend !== undefined}
         aria-disabled={noCertificate}
         onClick={() => {
           if (noCertificate) return;
           setFailed(false);
-          setFriend(user, friend === undefined).catch((cause: unknown) => {
+          setFriend(user, friend === undefined, serverId).catch((cause: unknown) => {
             console.error("Changing a friend failed", toEngineError(cause).code);
             setFailed(true);
           });

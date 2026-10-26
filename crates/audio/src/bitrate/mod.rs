@@ -13,20 +13,22 @@
 //! +12 with positional data, in bytes per packet.
 //!
 //! A packet must also fit Mumble's 1024-byte voice packet limit, so the bitrate never exceeds
-//! what [`MAX_VOICE_PAYLOAD_BYTES`] allows per packet (only reachable with "Music quality"
-//! and 20 ms packets, about 384 kbit/s). The encoder enforces the same limit per packet.
+//! what [`MAX_VOICE_PAYLOAD_BYTES`] allows per packet (about 384 kbit/s for 20 ms
+//! packets). The encoder enforces the same limit per packet.
 
 use crate::codec::MAX_VOICE_PAYLOAD_BYTES;
 
 /// Ceiling even when the server allows more: mono Opus voice gains next to
 /// nothing above this, and it stays below typical server limits.
 pub const MAX_BITRATE_BPS: u32 = 96_000;
-/// Ceiling with "Music quality" on (QA.37): the Opus maximum, further limited by the voice
+/// Highest bitrate the user can pick (FR-2.64): the Opus maximum, further limited by the voice
 /// packet size (see [`packet_budget_bps`]).
 pub const MUSIC_MAX_BITRATE_BPS: u32 = 510_000;
 /// Absolute floor, only for servers whose limit leaves less; below this Opus
 /// voice becomes hard to understand.
 pub const MIN_BITRATE_BPS: u32 = 8_000;
+/// Lowest value of the user's bitrate slider (FR-2.64).
+pub const MIN_USER_CAP_BPS: u32 = 16_000;
 
 /// Share of the server's bandwidth limit kept free. The server (`Server::processMsg`,
 /// `BandwidthRecord`) suppresses every packet that would push the average over its last 360
@@ -126,7 +128,8 @@ pub struct BitrateController {
     oversize_cap: Option<u32>,
     transport: Transport,
     positional: bool,
-    music_quality: bool,
+    /// The user's own cap (FR-2.64); `None` is "Max".
+    user_cap: Option<u32>,
     frames_per_packet: u32,
     bitrate: u32,
     smoothed_loss: f32,
@@ -149,7 +152,7 @@ impl BitrateController {
             oversize_cap: None,
             transport: Transport::Udp,
             positional: false,
-            music_quality: false,
+            user_cap: Some(MAX_BITRATE_BPS),
             frames_per_packet: 2,
             bitrate: MAX_BITRATE_BPS,
             smoothed_loss: 0.0,
@@ -177,11 +180,11 @@ impl BitrateController {
         self.clamp();
     }
 
-    /// "Music quality" (QA.37): raises the ceiling from the speech cap to the server limit,
-    /// at most [`MUSIC_MAX_BITRATE_BPS`]. Turning it on lets the normal recovery steps climb
-    /// there; turning it off lowers the bitrate to the speech cap at once.
-    pub fn set_music_quality(&mut self, on: bool) {
-        self.music_quality = on;
+    /// The user's own bitrate cap in bits per second (FR-2.64); `None` is "Max", the full
+    /// [`Self::max_possible`]. It is independent of "Music quality" and starts at the 96 kbit/s
+    /// speech cap. Lowering takes effect at once; raising goes through the normal recovery steps.
+    pub fn set_user_cap(&mut self, cap_bps: Option<u32>) {
+        self.user_cap = cap_bps.map(|c| c.max(MIN_USER_CAP_BPS));
         self.clamp();
     }
 
@@ -196,7 +199,7 @@ impl BitrateController {
         if count == 0 {
             return;
         }
-        let lowered = (self.ceiling() as f32 * OVERSIZE_CUT) as u32;
+        let lowered = (self.natural_ceiling() as f32 * OVERSIZE_CUT) as u32;
         self.oversize_cap = Some(lowered.max(MIN_BITRATE_BPS));
         self.clamp();
     }
@@ -204,13 +207,24 @@ impl BitrateController {
     /// Highest bitrate the current server limit (minus headroom), packet overhead and voice
     /// packet size allow.
     pub fn ceiling(&self) -> u32 {
+        let limit = self.natural_ceiling();
+        self.user_cap.map_or(limit, |cap| limit.min(cap))
+    }
+
+    /// [`Self::ceiling`] without the user's own cap.
+    fn natural_ceiling(&self) -> u32 {
+        self.limit(MUSIC_MAX_BITRATE_BPS)
+    }
+
+    /// Highest value the user's bitrate slider can reach (FR-2.64): the lowest of the server
+    /// limit, the voice packet limit and 510 kbit/s, whatever "Music quality" says.
+    pub fn max_possible(&self) -> u32 {
+        self.limit(MUSIC_MAX_BITRATE_BPS)
+    }
+
+    fn limit(&self, quality_cap: u32) -> u32 {
         let overhead =
             network_overhead_bps(self.frames_per_packet, self.transport, self.positional);
-        let quality_cap = if self.music_quality {
-            MUSIC_MAX_BITRATE_BPS
-        } else {
-            MAX_BITRATE_BPS
-        };
         let cap = quality_cap
             .min(packet_budget_bps(self.frames_per_packet))
             .min(self.oversize_cap.unwrap_or(u32::MAX))
@@ -232,6 +246,11 @@ impl BitrateController {
         } else {
             MODERATE_FLOOR_BPS
         };
+        // Under the user's own cap, loss must still be able to lower the bitrate: the floors
+        // are absolute values that would otherwise sit at or above a low cap.
+        let floor = self
+            .user_cap
+            .map_or(floor, |cap| floor.min(cap / 2).max(MIN_BITRATE_BPS));
         floor.min(self.ceiling())
     }
 
@@ -483,11 +502,11 @@ mod tests {
     const MUSIC_CEILING_20MS: u32 = 383_200;
 
     #[test]
-    fn music_quality_cap_follows_the_server_limit() {
+    fn max_cap_follows_the_server_limit() {
         let mut c = BitrateController::new();
         c.set_server_max_bandwidth(Some(400_000));
         assert_eq!(c.ceiling(), MAX_BITRATE_BPS, "off: speech cap");
-        c.set_music_quality(true);
+        c.set_user_cap(None);
         // 400 kbit/s − 10 % headroom − 14.8 kbit/s of headers for 20 ms packets over UDP.
         assert_eq!(c.ceiling(), 345_200);
         c.set_server_max_bandwidth(Some(2_000_000));
@@ -510,19 +529,19 @@ mod tests {
     }
 
     #[test]
-    fn music_quality_switch_off_returns_to_the_speech_cap() {
+    fn lowering_the_cap_returns_to_the_speech_cap() {
         let mut c = BitrateController::new();
-        c.set_music_quality(true);
+        c.set_user_cap(None);
         c.set_server_max_bandwidth(Some(400_000));
         assert_eq!(c.target().bitrate_bps, 345_200);
-        c.set_music_quality(false);
+        c.set_user_cap(Some(MAX_BITRATE_BPS));
         assert_eq!(c.target().bitrate_bps, MAX_BITRATE_BPS);
     }
 
     #[test]
-    fn music_quality_still_drops_on_loss_and_recovers() {
+    fn max_cap_still_drops_on_loss_and_recovers() {
         let mut c = BitrateController::new();
-        c.set_music_quality(true);
+        c.set_user_cap(None);
         c.set_server_max_bandwidth(Some(400_000));
         let start = c.target().bitrate_bps;
         let lossy = feed(&mut c, 0.15, 0, 20);
@@ -535,13 +554,13 @@ mod tests {
     /// Issue #7: with Music quality and a 510 kbit/s server limit the bitrate climbed until
     /// every 20 ms packet was too large for a voice packet and got dropped.
     #[test]
-    fn music_bitrate_fits_a_voice_packet() {
+    fn max_bitrate_fits_a_voice_packet() {
         for server in [Some(510_000), Some(2_000_000), None] {
             for transport in [Transport::Udp, Transport::TcpTunnel] {
                 for positional in [false, true] {
                     for frames in [1, 2] {
                         let mut c = BitrateController::new();
-                        c.set_music_quality(true);
+                        c.set_user_cap(None);
                         c.set_server_max_bandwidth(server);
                         c.set_transport(transport);
                         c.set_positional(positional);
@@ -563,7 +582,7 @@ mod tests {
     #[test]
     fn oversized_packets_step_the_ceiling_down() {
         let mut c = BitrateController::new();
-        c.set_music_quality(true);
+        c.set_user_cap(None);
         c.set_server_max_bandwidth(None);
         c.on_oversized_packets(0);
         assert_eq!(
@@ -580,5 +599,80 @@ mod tests {
             c.target().bitrate_bps < lowered,
             "each report is one more step"
         );
+    }
+
+    #[test]
+    fn max_possible_is_lowest_of_server_packet_and_opus_limit() {
+        let mut c = BitrateController::new();
+        // 20 ms packets: the 1024-byte packet limit is the lowest.
+        assert_eq!(c.max_possible(), packet_budget_bps(2));
+        // 10 ms packets would allow more than Opus does.
+        c.set_frames_per_packet(1);
+        assert_eq!(c.max_possible(), MUSIC_MAX_BITRATE_BPS);
+        c.set_frames_per_packet(4);
+        assert_eq!(c.max_possible(), packet_budget_bps(4));
+        c.set_server_max_bandwidth(Some(72_000));
+        assert_eq!(
+            c.max_possible(),
+            64_800 - network_overhead_bps(4, Transport::Udp, false)
+        );
+        // Independent of the user's own cap.
+        let max = c.max_possible();
+        c.set_user_cap(Some(MAX_BITRATE_BPS));
+        assert_eq!(c.max_possible(), max);
+    }
+
+    /// F20: the slider at "Max" allows more than the speech cap, whatever the music switch is.
+    #[test]
+    fn max_cap_allows_more_than_the_speech_cap() {
+        let mut c = BitrateController::new();
+        c.set_server_max_bandwidth(Some(400_000));
+        assert_eq!(c.ceiling(), MAX_BITRATE_BPS, "default is the speech cap");
+        c.set_user_cap(None);
+        assert_eq!(c.ceiling(), c.max_possible());
+        assert!(c.ceiling() > MAX_BITRATE_BPS);
+        // A low server limit still wins over the default cap.
+        c.set_user_cap(Some(MAX_BITRATE_BPS));
+        c.set_server_max_bandwidth(Some(64_000));
+        assert!(c.ceiling() < MAX_BITRATE_BPS);
+    }
+
+    /// The packet limit is computed for the 20 ms packets the voice thread really sends.
+    #[test]
+    fn packet_limit_matches_the_encoder_frame_size() {
+        let frames = crate::codec::PacketDuration::Ms20.frames() as u32;
+        assert_eq!(
+            BitrateController::new().max_possible(),
+            packet_budget_bps(frames)
+        );
+    }
+
+    #[test]
+    fn user_cap_lowers_the_bitrate_and_is_never_exceeded() {
+        let mut c = BitrateController::new();
+        c.set_user_cap(None);
+        c.set_user_cap(Some(32_000));
+        assert_eq!(c.target().bitrate_bps, 32_000);
+        assert_eq!(feed(&mut c, 0.0, 0, 30).bitrate_bps, 32_000);
+
+        // Below the slider minimum is lifted to it; "Max" restores the normal ceiling.
+        c.set_user_cap(Some(1_000));
+        assert_eq!(c.target().bitrate_bps, MIN_USER_CAP_BPS);
+        c.set_user_cap(None);
+        assert_eq!(feed(&mut c, 0.0, 100, 60).bitrate_bps, c.ceiling());
+        assert!(c.ceiling() > 96_000);
+    }
+
+    #[test]
+    fn loss_still_lowers_the_bitrate_below_the_user_cap() {
+        let mut c = BitrateController::new();
+        c.set_user_cap(Some(32_000));
+        let lowered = feed(&mut c, 0.19, 0, 30);
+        assert!(lowered.bitrate_bps < 32_000, "{lowered:?}");
+        assert!(lowered.bitrate_bps >= MIN_BITRATE_BPS);
+
+        // And it climbs back, but only up to the cap.
+        let recovered = feed(&mut c, 0.0, 100, 60);
+        assert_eq!(recovered.bitrate_bps, 32_000);
     }
 }

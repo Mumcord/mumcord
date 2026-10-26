@@ -4,6 +4,8 @@
     "label": "Csatornák",
     "hint": "Enter: chat megjelenítése · Shift+Enter vagy dupla kattintás: belépés · Nyílbillentyűk: mozgás, kibontás, összecsukás",
     "join": "Belépés",
+    "menuLabel": "{{channel}} beállításai",
+    "showDescription": "Csatornaleírás megjelenítése",
     "you": "(te)",
     "voiceHere": "itt vagy (hang)",
     "people_one": "{{count}} személy",
@@ -16,10 +18,11 @@
     },
     "showAll": "Összes megjelenítése ({{total}})",
     "showFewer": "Kevesebb megjelenítése",
-    "jump": "Ugrás a csatornámhoz"
+    "jump": "Ugrás a csatornámhoz",
+    "locked": "zárolt"
   },
   "status": {
-    "listening": "hallgat",
+    "listening": "csak hallgat",
     "talking": "beszél",
     "muted": "némítva",
     "deafened": "süketítve",
@@ -32,7 +35,7 @@
   "mumcordBadge": "Mumcordot használ",
   "statusTip": {
     "registered": "Regisztrált ezen a szerveren",
-    "listening": "Hallgatja ezt a csatornát",
+    "listening": "Csak hallgat",
     "muted": "Némítva",
     "deafened": "Süketítve",
     "serverMuted": "A szerver némította",
@@ -42,6 +45,7 @@
     "unregistered": "Nem regisztrált ezen a szerveren (vendég)",
     "nowPlaying": "Most hallgatja: {{track}}",
     "nowGaming": "Most játszik: {{game}}",
+    "weakConnection": "Gyenge kapcsolat – magas ping vagy csomagvesztés",
     "positional": "Térhatású hang aktív"
   },
   "announce": {
@@ -56,7 +60,8 @@
   },
   "empty": {
     "disconnected": "Nincs kapcsolat. Válassz egy szervert a csatornái megtekintéséhez.",
-    "loading": "Csatornák betöltése…"
+    "loading": "Csatornák betöltése…",
+    "syncingBig": "Nagy szerver szinkronizálása…"
   },
   "search": {
     "label": "Csatornák és személyek keresése",

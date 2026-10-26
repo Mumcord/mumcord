@@ -6,7 +6,7 @@ use specta::Type;
 use tauri::State;
 use tauri_specta::Event;
 
-use super::types::{ApiResult, ChannelId, SessionId};
+use super::types::{ApiResult, ChannelId, ServerId, SessionId, to_engine_server_id};
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, Type)]
 #[serde(rename_all = "camelCase")]
@@ -55,12 +55,14 @@ pub struct PersonProfile {
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, Type, Event)]
 #[serde(rename_all = "camelCase")]
 pub struct UserUpserted {
+    pub server_id: ServerId,
     pub user: User,
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, Type, Event)]
 #[serde(rename_all = "camelCase")]
 pub struct UserRemoved {
+    pub server_id: ServerId,
     pub session: SessionId,
 }
 
@@ -68,6 +70,7 @@ pub struct UserRemoved {
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, Type, Event)]
 #[serde(rename_all = "camelCase")]
 pub struct TalkStateChanged {
+    pub server_id: ServerId,
     pub session: SessionId,
     pub talking: bool,
 }
@@ -112,10 +115,11 @@ impl From<ProfileView> for PersonProfile {
 #[specta::specta]
 pub fn person_set_volume(
     engine: State<'_, Engine>,
+    server_id: ServerId,
     session: SessionId,
     volume: u16,
 ) -> ApiResult<()> {
-    Ok(engine.person_set_volume(session, volume)?)
+    Ok(engine.person_set_volume(to_engine_server_id(server_id), session, volume)?)
 }
 
 /// Mutes a person locally; remembered by certificate hash per server.
@@ -123,10 +127,11 @@ pub fn person_set_volume(
 #[specta::specta]
 pub fn person_set_local_mute(
     engine: State<'_, Engine>,
+    server_id: ServerId,
     session: SessionId,
     muted: bool,
 ) -> ApiResult<()> {
-    Ok(engine.person_set_local_mute(session, muted)?)
+    Ok(engine.person_set_local_mute(to_engine_server_id(server_id), session, muted)?)
 }
 
 /// Saves the private note about a person (at most 1000 characters; empty removes it);
@@ -135,10 +140,11 @@ pub fn person_set_local_mute(
 #[specta::specta]
 pub fn person_set_note(
     engine: State<'_, Engine>,
+    server_id: ServerId,
     session: SessionId,
     note: String,
 ) -> ApiResult<()> {
-    Ok(engine.person_set_note(session, &note)?)
+    Ok(engine.person_set_note(to_engine_server_id(server_id), session, &note)?)
 }
 
 /// Comment and avatar of a person, fetched from the server when not known yet.
@@ -146,7 +152,11 @@ pub fn person_set_note(
 #[specta::specta]
 pub async fn person_profile(
     engine: State<'_, Engine>,
+    server_id: ServerId,
     session: SessionId,
 ) -> ApiResult<PersonProfile> {
-    Ok(engine.person_profile(session).await?.into())
+    Ok(engine
+        .person_profile(to_engine_server_id(server_id), session)
+        .await?
+        .into())
 }

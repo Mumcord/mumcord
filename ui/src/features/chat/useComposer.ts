@@ -4,14 +4,14 @@
  */
 import { useCallback, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { getApi, type ChatMessage } from "../../api";
-import { addSentMessage } from "./chatStore";
+import { shownServerId } from "../channels/serverStore";
 import type { SendTarget } from "./conversationInfo";
-import { describeSendError } from "./errors";
 import { readDroppedFiles } from "./fileDrop";
 import { FULL_ATTRIBUTE_RESERVE, fullImageTag, keepFullImage } from "./fullImage";
 import { imageTag, prepareImage, type MessageLimits } from "./images";
 import { markdownToHtml, plainTextToHtml } from "./markdown";
+import { quoteHtml, type ReplyQuote } from "./reply";
+import { sendOwn } from "./sendMessage";
 
 /** One image in the attachment tray: being processed, or ready to send. */
 export interface Attachment {
@@ -28,15 +28,10 @@ export interface Attachment {
   fullImage: string | null;
 }
 
+const noop = (): void => undefined;
+
 function bodyHtml(text: string, limits: MessageLimits): string {
   return limits.allowHtml ? markdownToHtml(text) : plainTextToHtml(text);
-}
-
-function send(target: SendTarget, html: string): Promise<ChatMessage> {
-  const api = getApi();
-  return target.kind === "channel"
-    ? api.sendChannelMessage(target.channelId, html)
-    : api.sendPrivateMessage(target.session, html);
 }
 
 export interface Composer {
@@ -48,18 +43,29 @@ export interface Composer {
   /** Adds image files dropped from the file manager (native drag and drop) by their paths. */
   addDroppedPaths: (paths: readonly string[]) => Promise<void>;
   removeAttachment: (id: number) => void;
-  busy: boolean;
   error: string | null;
-  submit: () => Promise<void>;
+  /**
+   * Sends the text and the images: the input empties at once and the messages show greyed until
+   * confirmed (FR-2.74).
+   */
+  submit: () => void;
   /** Sends a link as its own message right away (GIF favorites); the typed text stays. */
   sendLink: (url: string) => Promise<void>;
 }
 
-export function useComposer(target: SendTarget | null, limits: MessageLimits): Composer {
+/**
+ * `reply` is the message being replied to (FR-2.60): its quote goes in front of the text, and
+ * `onReplied` runs once the reply is sent.
+ */
+export function useComposer(
+  target: SendTarget | null,
+  limits: MessageLimits,
+  reply: ReplyQuote | null = null,
+  onReplied: () => void = noop,
+): Composer {
   const { t } = useTranslation("chat");
   const [text, setTextState] = useState("");
   const [attachments, setAttachments] = useState<Attachment[]>([]);
-  const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const nextId = useRef(1);
   // Files wait here so only one image is decoded at a time (keeps memory and the UI calm).
@@ -178,63 +184,55 @@ export function useComposer(target: SendTarget | null, limits: MessageLimits): C
     [drop],
   );
 
-  const submit = useCallback(async () => {
-    if (busy || target === null) return;
+  const tooLong =
+    limits.text > 0 ? t("errors.tooLong", { max: limits.text }) : t("errors.tooLongNoLimit");
+
+  const submit = useCallback(() => {
+    if (target === null) return;
     if (attachments.some((item) => item.status === "processing")) return;
-    const body = bodyHtml(text, limits);
-    if (body === "" && attachments.length === 0) return;
+    const typed = bodyHtml(text, limits);
+    if (typed === "" && attachments.length === 0) return;
+    // The quote needs text to go with; images alone are sent without it.
+    const body =
+      typed !== "" && reply !== null ? quoteHtml(reply, limits.allowHtml) + typed : typed;
     if (body !== "" && limits.text > 0 && body.length > limits.text) {
       setError(t("errors.tooLong", { max: limits.text }));
       return;
     }
-    setBusy(true);
     setError(null);
-    let sending = body !== "" ? "text" : "image";
-    try {
-      // The server limit is per message, so the text and every image are separate messages in order.
-      if (body !== "") {
-        addSentMessage(await send(target, body));
-        setTextState("");
-        sending = "image";
-      }
-      for (const item of attachments) {
-        addSentMessage(await send(target, fullImageTag(item.dataUrl, item.fullImage)));
-        removed.current.add(item.id);
-        drop(item.id);
-      }
-    } catch (err) {
-      const tooLarge =
-        sending === "text"
-          ? limits.text > 0
-            ? t("errors.tooLong", { max: limits.text })
-            : t("errors.tooLongNoLimit")
-          : t("errors.imageTooLarge");
-      setError(describeSendError(t, err, tooLarge));
-    } finally {
-      setBusy(false);
+    const serverId = shownServerId();
+    // The server limit is per message, so the text and every image are separate messages in order.
+    if (body !== "") {
+      sendOwn(t, serverId, target, body, tooLong);
+      setTextState("");
+      if (reply !== null) onReplied();
     }
-  }, [attachments, busy, drop, limits, t, target, text]);
+    for (const item of attachments) {
+      sendOwn(
+        t,
+        serverId,
+        target,
+        fullImageTag(item.dataUrl, item.fullImage),
+        t("errors.imageTooLarge"),
+      );
+      removed.current.add(item.id);
+    }
+    if (attachments.length > 0) setAttachments([]);
+  }, [attachments, limits, onReplied, reply, t, target, text, tooLong]);
 
   const sendLink = useCallback(
-    async (url: string) => {
-      if (busy || target === null) return;
+    (url: string) => {
+      if (target === null) return Promise.resolve();
       const html = bodyHtml(url, limits);
       if (limits.text > 0 && html.length > limits.text) {
         setError(t("errors.tooLong", { max: limits.text }));
-        throw new Error("link too long");
+        return Promise.reject(new Error("link too long"));
       }
-      setBusy(true);
       setError(null);
-      try {
-        addSentMessage(await send(target, html));
-      } catch (err) {
-        setError(describeSendError(t, err, t("errors.tooLongNoLimit")));
-        throw err;
-      } finally {
-        setBusy(false);
-      }
+      sendOwn(t, shownServerId(), target, html, tooLong);
+      return Promise.resolve();
     },
-    [busy, limits, t, target],
+    [limits, t, target, tooLong],
   );
 
   return {
@@ -244,7 +242,6 @@ export function useComposer(target: SendTarget | null, limits: MessageLimits): C
     addFiles,
     addDroppedPaths,
     removeAttachment,
-    busy,
     error,
     submit,
     sendLink,

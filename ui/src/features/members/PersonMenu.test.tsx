@@ -4,12 +4,13 @@ import type { MockApi } from "../../api";
 import { getServerState } from "../channels/serverStore";
 import { getSelectedConversation, selectConversation } from "../channels/selection";
 import { connectedMock, resetAll, stubDialog } from "../channels/testUtils";
+import { takeConnectionExpandedRequest } from "../connection/connectionExpanded";
 import { MembersPanel } from "./MembersPanel";
 import { joinTarget } from "./joinTarget";
 import { PersonMenuHost } from "./PersonMenu";
 import { closePersonMenu, openPersonMenu } from "./personMenuStore";
 import { ProfilePreviewHost } from "./ProfilePreview";
-import { VOLUME_DEBOUNCE_MS } from "./ProfileCard";
+import { VOLUME_THROTTLE_MS } from "./ProfileCard";
 
 let api: MockApi;
 
@@ -22,7 +23,7 @@ async function renderPanel() {
       <PersonMenuHost />
     </>,
   );
-  await screen.findByRole("heading", { name: "In Lobby (3)" });
+  await screen.findByRole("heading", { name: "In Lobby (4)" });
 }
 
 const member = (name: RegExp) => screen.getByRole("button", { name });
@@ -30,6 +31,7 @@ const menu = () => screen.queryByRole("menu");
 
 beforeEach(stubDialog);
 afterEach(() => {
+  takeConnectionExpandedRequest();
   act(closePersonMenu);
   vi.useRealTimers();
   resetAll();
@@ -42,6 +44,7 @@ describe("PersonMenu", () => {
     expect(menu()).toHaveAccessibleName(/Anna/);
     expect(screen.getAllByRole("menuitem").map((i) => i.textContent)).toEqual([
       "View profile",
+      "Connection info…",
       "Send private message",
     ]);
     expect(screen.getByRole("menuitemcheckbox", { name: "Mute for me" })).toHaveAttribute(
@@ -65,20 +68,22 @@ describe("PersonMenu", () => {
     ).toEqual([
       "menuitem",
       "menuitem",
+      "menuitem",
       "separator",
       "menuitemcheckbox",
       "menuitemcheckbox",
       "range",
     ]);
     expect(entries[0]).toHaveTextContent("View profile");
-    expect(entries[1]).toHaveTextContent("Send private message");
+    expect(entries[1]).toHaveTextContent("Connection info…");
+    expect(entries[2]).toHaveTextContent("Send private message");
   });
 
   it("shows a decorative icon on every entry", async () => {
     await renderPanel();
     fireEvent.contextMenu(member(/^Anna/), { clientX: 30, clientY: 40 });
     const icons = [...(menu()?.querySelectorAll("svg") ?? [])];
-    expect(icons).toHaveLength(5);
+    expect(icons).toHaveLength(6);
     for (const icon of icons) expect(icon).toHaveAttribute("aria-hidden", "true");
   });
 
@@ -99,6 +104,8 @@ describe("PersonMenu", () => {
     fireEvent.contextMenu(member(/^Anna/), { clientX: 1, clientY: 1 });
     const keys = (key: string) => fireEvent.keyDown(document.activeElement as Element, { key });
     keys("ArrowDown");
+    expect(screen.getByRole("menuitem", { name: "Connection info…" })).toHaveFocus();
+    keys("ArrowDown");
     expect(screen.getByRole("menuitem", { name: "Send private message" })).toHaveFocus();
     keys("ArrowDown");
     expect(screen.getByRole("menuitemcheckbox", { name: "Mute for me" })).toHaveFocus();
@@ -116,7 +123,7 @@ describe("PersonMenu", () => {
     fireEvent.contextMenu(member(/^Anna/), { clientX: 1, clientY: 1 });
     const row = screen.getByRole("menuitemcheckbox", { name: "Mute for me" });
     fireEvent.click(row);
-    expect(spy).toHaveBeenCalledWith(2, true);
+    expect(spy).toHaveBeenCalledWith(1, 2, true);
     await act(async () => {
       await Promise.resolve();
     });
@@ -126,7 +133,7 @@ describe("PersonMenu", () => {
       "true",
     );
     fireEvent.click(screen.getByRole("menuitemcheckbox", { name: "Mute for me" }));
-    expect(spy).toHaveBeenLastCalledWith(2, false);
+    expect(spy).toHaveBeenLastCalledWith(1, 2, false);
   });
 
   it("adds and removes a friend in place", async () => {
@@ -135,7 +142,7 @@ describe("PersonMenu", () => {
     const remove = vi.spyOn(api, "friendRemove");
     fireEvent.contextMenu(member(/^Anna/), { clientX: 1, clientY: 1 });
     fireEvent.click(screen.getByRole("menuitemcheckbox", { name: /^Friend/ }));
-    expect(add).toHaveBeenCalledWith(2);
+    expect(add).toHaveBeenCalledWith(1, 2);
     await act(async () => {
       await Promise.resolve();
     });
@@ -164,9 +171,9 @@ describe("PersonMenu", () => {
     fireEvent.change(screen.getByRole("slider"), { target: { value: "150" } });
     expect(screen.getByText("150 %")).toBeInTheDocument();
     act(() => {
-      vi.advanceTimersByTime(VOLUME_DEBOUNCE_MS);
+      vi.advanceTimersByTime(VOLUME_THROTTLE_MS);
     });
-    expect(spy).toHaveBeenCalledWith(2, 150);
+    expect(spy).toHaveBeenCalledWith(1, 2, 150);
   });
 
   it("opens the private conversation", async () => {
@@ -184,7 +191,87 @@ describe("PersonMenu", () => {
     expect(document.querySelector("dialog.profile-card")).toBeInTheDocument();
   });
 
-  it("shows only 'View profile' for yourself", async () => {
+  it("opens the profile card focused on the connection section, expanded", async () => {
+    await renderPanel();
+    const anna = [...getServerState().users.values()].find((u) => u.name === "Anna");
+    act(() => {
+      api.mock.emit("userStatsChanged", {
+        serverId: 1,
+        session: anna?.session ?? -1,
+        stats: {
+          pingMs: 20,
+          transport: "udp",
+          lossPercent: null,
+          latePercent: null,
+          bandwidthKbps: null,
+          clientRelease: null,
+          clientVersion: null,
+          os: null,
+          osVersion: null,
+        },
+      });
+    });
+    fireEvent.contextMenu(member(/^Anna/), { clientX: 1, clientY: 1 });
+    fireEvent.click(screen.getByRole("menuitem", { name: "Connection info…" }));
+    expect(menu()).not.toBeInTheDocument();
+    const section = document.querySelector("dialog.profile-card [data-connection-section]");
+    expect(section).toBeInTheDocument();
+    expect(section?.querySelector("button")).toHaveFocus();
+    expect(section?.querySelector("button")).toHaveAttribute("aria-expanded", "true");
+  });
+
+  describe("connection line in the header", () => {
+    const annaSession = () =>
+      [...getServerState().users.values()].find((u) => u.name === "Anna")?.session ?? -1;
+    const stats = {
+      pingMs: 42.4,
+      transport: "udp" as const,
+      lossPercent: 1,
+      latePercent: 0,
+      bandwidthKbps: 40,
+      clientRelease: "Mumble 1.5.0",
+      clientVersion: null,
+      os: "Linux",
+      osVersion: null,
+    };
+    const report = (next: typeof stats | { [K in keyof typeof stats]: null }) => {
+      act(() => {
+        api.mock.emit("userStatsChanged", {
+          serverId: 1,
+          session: annaSession(),
+          stats: next,
+        });
+      });
+    };
+
+    it("shows ping and transport, and no block of figures", async () => {
+      await renderPanel();
+      report(stats);
+      fireEvent.contextMenu(member(/^Anna/), { clientX: 1, clientY: 1 });
+      expect(menu()).toHaveTextContent("42 ms · UDP");
+      expect(screen.queryByText("Packet loss")).not.toBeInTheDocument();
+      expect(screen.queryByText("Mumble 1.5.0")).not.toBeInTheDocument();
+    });
+
+    it("is hidden while the server gives no ping", async () => {
+      await renderPanel();
+      report({
+        pingMs: null,
+        transport: null,
+        lossPercent: null,
+        latePercent: null,
+        bandwidthKbps: null,
+        clientRelease: null,
+        clientVersion: null,
+        os: null,
+        osVersion: null,
+      });
+      fireEvent.contextMenu(member(/^Anna/), { clientX: 1, clientY: 1 });
+      expect(menu()).not.toHaveTextContent(" ms");
+    });
+  });
+
+  it("shows only the profile entries for yourself", async () => {
     await renderPanel();
     const self = getServerState().users.get(getServerState().selfSession ?? -1);
     act(() => {
@@ -194,7 +281,7 @@ describe("PersonMenu", () => {
       clientX: 1,
       clientY: 1,
     });
-    expect(screen.getAllByRole("menuitem")).toHaveLength(1);
+    expect(screen.getAllByRole("menuitem")).toHaveLength(2);
     expect(screen.queryByRole("slider")).not.toBeInTheDocument();
   });
 
@@ -257,9 +344,14 @@ describe("PersonMenu", () => {
         openPersonMenu({ session: 4, x: 1, y: 1, opener: null });
       });
       const items = screen.getAllByRole("menuitem").map((i) => i.textContent);
-      expect(items).toEqual(["View profile", "Send private message", "Join Raid"]);
+      expect(items).toEqual([
+        "View profile",
+        "Connection info…",
+        "Send private message",
+        "Join Raid",
+      ]);
       fireEvent.click(screen.getByRole("menuitem", { name: "Join Raid" }));
-      expect(join).toHaveBeenCalledWith(2);
+      expect(join).toHaveBeenCalledWith(1, 2);
       await waitFor(() => {
         expect(menu()).not.toBeInTheDocument();
       });

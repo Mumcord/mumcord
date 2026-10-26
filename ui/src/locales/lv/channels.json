@@ -4,6 +4,8 @@
     "label": "Kanāli",
     "hint": "Enter: rādīt čatu · Shift+Enter vai dubultklikšķis: pievienoties · Bulttaustiņi: pārvietoties, izvērst, sakļaut",
     "join": "Pievienoties",
+    "menuLabel": "{{channel}} opcijas",
+    "showDescription": "Rādīt kanāla aprakstu",
     "you": "(tu)",
     "voiceHere": "tu esi šeit (balss)",
     "people_zero": "{{count}} cilvēku",
@@ -18,10 +20,11 @@
     },
     "showAll": "Rādīt visus ({{total}})",
     "showFewer": "Rādīt mazāk",
-    "jump": "Pāriet uz manu kanālu"
+    "jump": "Pāriet uz manu kanālu",
+    "locked": "slēgts"
   },
   "status": {
-    "listening": "klausās",
+    "listening": "tikai klausās",
     "talking": "runā",
     "muted": "izslēgts mikrofons",
     "deafened": "izslēgta skaņa",
@@ -34,7 +37,7 @@
   "mumcordBadge": "Izmanto Mumcord",
   "statusTip": {
     "registered": "Reģistrēts šajā serverī",
-    "listening": "Klausās šo kanālu",
+    "listening": "Tikai klausās",
     "muted": "Mikrofons izslēgts",
     "deafened": "Skaņa izslēgta",
     "serverMuted": "Servera izslēgts mikrofons",
@@ -44,6 +47,7 @@
     "unregistered": "Nav reģistrēts šajā serverī (viesis)",
     "nowPlaying": "Klausās {{track}}",
     "nowGaming": "Spēlē {{game}}",
+    "weakConnection": "Vājš savienojums – augsts ping vai pakešu zudums",
     "positional": "Pozicionālā skaņa ir aktīva"
   },
   "announce": {
@@ -58,7 +62,8 @@
   },
   "empty": {
     "disconnected": "Nav savienots. Izvēlies serveri, lai redzētu tā kanālus.",
-    "loading": "Ielādē kanālus…"
+    "loading": "Ielādē kanālus…",
+    "syncingBig": "Sinhronizē lielu serveri…"
   },
   "search": {
     "label": "Meklēt kanālus un cilvēkus",

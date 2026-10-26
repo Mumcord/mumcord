@@ -1,6 +1,7 @@
 /**
- * Followed channels, unread counts and the list of open private chats of the connected server.
+ * Followed channels, unread counts and the list of open private chats, per connected server.
  * One store for the app; it binds to the active engine client and re-binds when tests swap it.
+ * Functions without a `serverId` act on the shown server.
  */
 import { useSyncExternalStore } from "react";
 import {
@@ -11,6 +12,7 @@ import {
   type ServerSnapshot,
   type Unsubscribe,
 } from "../../api";
+import { getShownServerId, shownServerId, useShownServerId } from "../channels/serverStore";
 import { conversationKey } from "../chat/chatStore";
 
 export interface DirectChat {
@@ -28,7 +30,7 @@ export interface FollowState {
 
 const EMPTY: FollowState = { followed: [], unread: new Map(), chats: [] };
 
-let state: FollowState = EMPTY;
+let states: ReadonlyMap<number, FollowState> = new Map();
 let boundApi: MumcordApi | undefined;
 let unsubscribers: Unsubscribe[] = [];
 let generation = 0;
@@ -44,8 +46,15 @@ export function setConversationOnScreen(conversation: Conversation, shown: boole
   else onScreen.delete(key);
 }
 
-function set(next: FollowState): void {
-  state = next;
+function stateOf(serverId: number): FollowState {
+  return states.get(serverId) ?? EMPTY;
+}
+
+function set(serverId: number, next: FollowState): void {
+  const copy = new Map(states);
+  if (next === EMPTY) copy.delete(serverId);
+  else copy.set(serverId, next);
+  states = copy;
   for (const listener of listeners) listener();
 }
 
@@ -53,14 +62,19 @@ function isPrivate(conversation: Conversation): boolean {
   return conversation.kind !== "channel";
 }
 
-/** Remembers a private chat in the "Direct messages" list. */
-export function rememberDirectChat(conversation: Conversation, name: string | null): void {
+/** Remembers a private chat in the "Direct messages" list of `serverId`. */
+export function rememberDirectChat(
+  conversation: Conversation,
+  name: string | null,
+  serverId = shownServerId(),
+): void {
   if (!isPrivate(conversation)) return;
+  const state = stateOf(serverId);
   const key = conversationKey(conversation);
   const existing = state.chats.find((c) => c.key === key);
   if (existing && (name === null || existing.name === name)) return;
   const chat: DirectChat = { conversation, key, name: name ?? existing?.name ?? null };
-  set({ ...state, chats: [...state.chats.filter((c) => c.key !== key), chat] });
+  set(serverId, { ...state, chats: [...state.chats.filter((c) => c.key !== key), chat] });
 }
 
 function fromSnapshot(snapshot: ServerSnapshot): FollowState {
@@ -75,50 +89,58 @@ function fromSnapshot(snapshot: ServerSnapshot): FollowState {
   return { followed: snapshot.followedChannelIds, unread, chats };
 }
 
-function onMessage(message: ChatMessage): void {
+function onMessage(serverId: number, message: ChatMessage): void {
   if (!isPrivate(message.conversation)) return;
-  rememberDirectChat(message.conversation, message.own ? null : message.senderName);
+  rememberDirectChat(message.conversation, message.own ? null : message.senderName, serverId);
 }
 
 function bind(api: MumcordApi): void {
   for (const unsubscribe of unsubscribers) unsubscribe();
   boundApi = api;
-  state = EMPTY;
+  states = new Map();
   const mine = ++generation;
   unsubscribers = [
     api.on("serverSynced", ({ snapshot }) => {
-      set(fromSnapshot(snapshot));
+      set(snapshot.serverId, fromSnapshot(snapshot));
     }),
-    api.on("connectionStateChanged", ({ state: connection }) => {
-      if (connection.state === "disconnected" || connection.state === "connecting") set(EMPTY);
+    api.on("connectionStateChanged", ({ serverId, state: connection }) => {
+      if (connection.state === "disconnected" || connection.state === "connecting") {
+        set(serverId, EMPTY);
+      }
     }),
-    api.on("followedChannelsChanged", ({ channelIds }) => {
-      set({ ...state, followed: channelIds });
+    api.on("followedChannelsChanged", ({ serverId, channelIds }) => {
+      set(serverId, { ...stateOf(serverId), followed: channelIds });
     }),
-    api.on("unreadChanged", ({ conversation, count }) => {
+    api.on("unreadChanged", ({ serverId, conversation, count }) => {
       // Dropped before the store changes: rendering the count first would flash the badge until
       // the mark-read round trip comes back.
-      if (count > 0 && onScreen.has(conversationKey(conversation))) {
-        api.conversationMarkRead(conversation).catch((error: unknown) => {
+      const key = conversationKey(conversation);
+      if (count > 0 && serverId === getShownServerId() && onScreen.has(key)) {
+        api.conversationMarkRead(serverId, conversation).catch((error: unknown) => {
           console.error("Marking a conversation as read failed", error);
         });
         return;
       }
+      const state = stateOf(serverId);
       const unread = new Map(state.unread);
-      unread.set(conversationKey(conversation), count);
-      set({ ...state, unread });
-      if (count > 0) rememberDirectChat(conversation, null);
+      unread.set(key, count);
+      set(serverId, { ...state, unread });
+      if (count > 0) rememberDirectChat(conversation, null, serverId);
     }),
-    api.on("messageReceived", ({ message }) => {
-      onMessage(message);
+    api.on("messageReceived", ({ serverId, message }) => {
+      onMessage(serverId, message);
     }),
   ];
+  // Read the engine's own list: the server store may not know the servers yet at this point.
   void api
-    .sessionSnapshot()
-    .then((snapshot) => {
-      if (generation !== mine || !snapshot) return;
-      if (state.followed.length === 0 && state.unread.size === 0 && state.chats.length === 0) {
-        set(fromSnapshot(snapshot));
+    .connectionsList()
+    .then((list) => Promise.all(list.map((entry) => api.sessionSnapshot(entry.serverId))))
+    .then((snapshots) => {
+      if (generation !== mine) return;
+      for (const snapshot of snapshots) {
+        if (snapshot && !states.has(snapshot.serverId)) {
+          set(snapshot.serverId, fromSnapshot(snapshot));
+        }
       }
     })
     .catch((error: unknown) => {
@@ -139,17 +161,26 @@ function subscribe(listener: () => void): () => void {
   };
 }
 
-function getSnapshot(): FollowState {
+function getStates(): ReadonlyMap<number, FollowState> {
   ensureBound();
-  return state;
+  return states;
 }
 
-export function useFollowState(): FollowState {
-  return useSyncExternalStore(subscribe, getSnapshot);
+/** Follow state of every connected server, by server id (e.g. unread badges per server). */
+export function useFollowStates(): ReadonlyMap<number, FollowState> {
+  return useSyncExternalStore(subscribe, getStates);
 }
 
-export function getFollowState(): FollowState {
-  return getSnapshot();
+/** Follow state of `serverId`, by default the shown server. */
+export function useFollowState(serverId?: number | null): FollowState {
+  const shown = useShownServerId();
+  const all = useFollowStates();
+  const server = serverId === undefined ? shown : serverId;
+  return (server === null ? undefined : all.get(server)) ?? EMPTY;
+}
+
+export function getFollowState(serverId = shownServerId()): FollowState {
+  return getStates().get(serverId) ?? EMPTY;
 }
 
 export function unreadOf(s: FollowState, conversation: Conversation): number {
@@ -162,5 +193,5 @@ export function resetFollowStore(): void {
   unsubscribers = [];
   boundApi = undefined;
   generation += 1;
-  state = EMPTY;
+  states = new Map();
 }

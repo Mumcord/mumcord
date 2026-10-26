@@ -259,3 +259,58 @@
 .userpanel__toggle--hangup:hover:not(:disabled) {
   color: var(--color-danger);
 }
+
+/* The voice location (FR-2.5): a quiet text button that shows the voice server. */
+.userpanel-voice {
+  display: block;
+  max-width: 100%;
+  margin-top: var(--space-1);
+  padding: 0;
+  overflow: hidden;
+  border: none;
+  background: none;
+  color: var(--color-success);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-bold);
+  text-align: left;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.userpanel-voice:hover {
+  text-decoration: underline;
+}
+
+/* Rich-text comment editor (FR-2.51). */
+.rich-editor__toolbar,
+.rich-editor__link {
+  display: flex;
+  gap: var(--space-1);
+  margin-bottom: var(--space-1);
+}
+
+.rich-editor__link input {
+  flex: 1;
+}
+
+.rich-editor__field {
+  min-height: 7em;
+  max-height: 16em;
+  padding: var(--space-2);
+  overflow-y: auto;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface);
+  color: var(--color-text);
+}
+
+.rich-editor__field:focus-visible {
+  outline: 2px solid var(--color-accent);
+}
+
+.rich-editor__field ul,
+.rich-editor__field ol {
+  margin: 0;
+  padding-left: 1.5em;
+}

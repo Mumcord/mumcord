@@ -1,8 +1,6 @@
 {
   "inChannel_one": "Στο {{channel}} ({{count}})",
   "inChannel_other": "Στο {{channel}} ({{count}})",
-  "listening_one": "Ακούν ({{count}})",
-  "listening_other": "Ακούν ({{count}})",
   "noChannel": "Διάλεξε ένα κανάλι για να δεις ποιος είναι μέσα.",
   "nobody": "Δεν υπάρχει κανείς εδώ.",
   "nobodyElse": "Δεν υπάρχει κανείς άλλος στον διακομιστή.",
@@ -11,6 +9,26 @@
   "registered": "Εγγεγραμμένος",
   "unregistered": "Μη εγγεγραμμένος",
   "talking": "Μιλά",
+  "quality": {
+    "label": "Σύνδεση",
+    "summary": "Σύνδεση: {{level}}",
+    "level": {
+      "good": "Καλή",
+      "fair": "Μέτρια",
+      "weak": "Αδύναμη",
+      "unknown": "Άγνωστη"
+    },
+    "ping": "Ping",
+    "loss": "Απώλεια πακέτων",
+    "late": "Καθυστερημένα πακέτα",
+    "bandwidth": "Εύρος ζώνης",
+    "transport": "Μεταφορά φωνής",
+    "client": "Πρόγραμμα-πελάτης",
+    "os": "Λειτουργικό σύστημα",
+    "ms": "{{value}} ms",
+    "percent": "{{value}} %",
+    "kbps": "{{value}} kbit/s"
+  },
   "card": {
     "close": "Κλείσιμο",
     "loadFailed": "Το προφίλ δεν μπόρεσε να φορτωθεί.",
@@ -22,6 +40,9 @@
     "privateMessage": "Ιδιωτικό μήνυμα",
     "localSettings": "Οι ρυθμίσεις σου",
     "localSettingsHint": "Τις βλέπεις μόνο εσύ. Οι αλλαγές αποθηκεύονται αμέσως.",
+    "settingsFor": "Ρυθμίσεις για {{name}}",
+    "hintMuted": "Σε σίγαση",
+    "hintVolume": "Ένταση {{value}} %",
     "localMuteHint": "Δεν θα ακούς αυτό το άτομο.",
     "privateNote": "Ιδιωτική σημείωση",
     "privateNoteHint": "Μόνο εσύ βλέπεις αυτή τη σημείωση.",
@@ -36,7 +57,8 @@
     "viewProfile": "Προβολή προφίλ",
     "join": "Συμμετοχή στο {{channel}}",
     "joinDenied": "Δεν επιτρέπεται η είσοδος σε αυτό το κανάλι.",
-    "mute": "Σίγαση για μένα"
+    "mute": "Σίγαση για μένα",
+    "connectionInfo": "Πληροφορίες σύνδεσης…"
   },
   "nowPlaying": {
     "label": "Παίζει τώρα",

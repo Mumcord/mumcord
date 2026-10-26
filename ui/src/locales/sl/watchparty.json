@@ -1,0 +1,53 @@
+{
+  "title": "Skupno gledanje",
+  "addVideo": "Dodaj video",
+  "beta": "Beta",
+  "join": "Pridruži se skupnemu gledanju",
+  "leave": "Zapusti gledanje",
+  "watching": "{{count}} gleda: {{names}}",
+  "player": "Predvajalnik skupnega gledanja",
+  "watchTogether": "Glejte skupaj",
+  "watchTogetherFor": "Glej {{title}} skupaj s tem kanalom",
+  "cantPlay": "Predvajalnik tukaj ne more delovati.",
+  "openInBrowser": "Odpri v brskalniku",
+  "startFailed": "Skupnega gledanja ni bilo mogoče začeti.",
+  "joinFailed": "Pridružitev skupnemu gledanju ni uspela.",
+  "leaveFailed": "Skupnega gledanja ni bilo mogoče zapustiti.",
+  "commandFailed": "Skupno gledanje ni sprejelo tvoje spremembe.",
+  "someone": "Nekdo",
+  "other": {
+    "play": "{{name}} je pritisnil predvajaj",
+    "pause": "{{name}} je začasno ustavil",
+    "seek": "{{name}} je skočil naprej",
+    "skipped": "{{name}} je preskočil"
+  },
+  "addToPlaylist": "Dodaj na seznam predvajanja",
+  "addToPlaylistFor": "Dodaj {{title}} na seznam skupnega gledanja",
+  "playlist": {
+    "title": "Naslednje",
+    "empty": "Nič ni na vrsti. Dodaj povezave YouTube z »Dodaj na seznam predvajanja«.",
+    "skip": "Preskoči",
+    "moveHint": "Alt+Gor in Alt+Dol premakneta video; lahko ga tudi povlečeš.",
+    "moved": "Premaknjeno na mesto {{position}}",
+    "videoTitle": "Video z YouTuba",
+    "addedBy": "Dodal(a) {{name}}",
+    "remove": "Odstrani {{title}} s seznama predvajanja",
+    "addFailed": "Videa ni bilo mogoče dodati na seznam predvajanja. Ta sprejme do 50 videov.",
+    "removeFailed": "Videa ni bilo mogoče odstraniti s seznama predvajanja.",
+    "moveFailed": "Videa ni bilo mogoče premakniti.",
+    "skipFailed": "Preskok na naslednji video ni uspel.",
+    "nextFailed": "Naslednjega videa ni bilo mogoče začeti.",
+    "move": "Premakni {{title}}",
+    "upNext": "Naslednje: {{title}}",
+    "upNextNone": "Nič ni na vrsti"
+  },
+  "widget": {
+    "play": "Predvajaj",
+    "pause": "Začasno ustavi"
+  },
+  "codecHint": {
+    "install": "Ta video potrebuje podporo za H.264. Namesti gst-libav:",
+    "generic": "Ta video potrebuje podporo za H.264. Namesti gst-libav (vtičnik libav za GStreamer) z upraviteljem paketov svojega sistema.",
+    "rpmFusion": "V Fedori gst-libav prihaja iz repozitorija RPM Fusion; najprej omogoči RPM Fusion."
+  }
+}

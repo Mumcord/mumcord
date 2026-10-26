@@ -1,0 +1,21 @@
+{
+  "label": "Schermdeling van {{name}}",
+  "title": "Scherm van {{name}}",
+  "beta": "Bèta",
+  "picture": "Gedeeld scherm van {{name}}",
+  "someone": "Iemand",
+  "live": "Live",
+  "collapse": "Inklappen",
+  "expand": "Uitklappen",
+  "fullscreen": "Volledig scherm",
+  "exitFullscreen": "Volledig scherm verlaten",
+  "stop": "Stoppen met kijken",
+  "starting": "Verbinden met het scherm van {{name}}…",
+  "paused": "{{name}} heeft het delen gepauzeerd.",
+  "full": "Deze schermdeling is vol.",
+  "unreachable": "{{name}} is niet direct bereikbaar. Het netwerk blokkeert misschien directe verbindingen.",
+  "tooOld": "De Mumcord van {{name}} is te oud om het scherm met je te delen.",
+  "consentOff": "Kijken heeft directe verbindingen nodig, en je hebt ze uitgezet.",
+  "failed": "Het scherm van {{name}} kon niet worden geopend.",
+  "retry": "Opnieuw proberen"
+}

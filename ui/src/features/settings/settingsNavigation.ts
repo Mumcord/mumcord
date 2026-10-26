@@ -2,8 +2,6 @@ import { createContext, useContext } from "react";
 
 /** Lets one settings section send the user to a control in another one. */
 export interface SettingsNavigation {
-  /** Opens Voice and focuses the "Compatibility mode (like TeamSpeak)" switch. */
-  showCompatibilityMode: () => void;
   /** True from the request until the switch has taken the focus. */
   compatibilityFocusPending: boolean;
   compatibilityFocused: () => void;

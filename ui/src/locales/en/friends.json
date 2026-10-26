@@ -4,6 +4,7 @@
   "online": "Online",
   "onlineIn": "Online in {{channel}}",
   "onlineOnServer": "Online on {{server}}",
+  "inChannelOnServer": "In {{channel}} · {{server}}",
   "offline": "Offline",
   "lastSeen": "Offline, last seen {{when}}",
   "friend": "Friend",
@@ -11,5 +12,7 @@
   "noCertificate": "People without a certificate can't be friends, because Mumcord could not recognise them again.",
   "add": "Add friend",
   "remove": "Remove friend",
-  "failed": "Changing the friend didn't work. Please try again."
+  "failed": "Changing the friend didn't work. Please try again.",
+  "join": "Join",
+  "joinFriend": "Join {{name}}'s channel"
 }

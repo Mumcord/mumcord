@@ -3,24 +3,52 @@
 // the picker offers all 24 EU languages by their own names (FR-1.36) and French/Greek apply live.
 import { readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
-import { browser, expect } from "@wdio/globals";
+import { browser, expect, $ } from "@wdio/globals";
 import { app, artifactsDir, bot, repoRoot, testenv } from "../../helpers/index.ts";
 import {
   chooseRadio,
   connectFromEmptyState,
+  focus,
   htmlTheme,
   joinChannel,
   openSettings,
   settingsTab,
+  tabTo,
   waitFor,
   waitGone,
   wizard,
 } from "./flows.ts";
 
 const me = "C7Lang";
-const APPEARANCE = 4;
-const LANGUAGE = 6;
-const TABS = 11;
+const TABS = 13;
+
+/**
+ * Opens the settings tab of `section` (its id, so it works in every UI language); indexes shift
+ * whenever sections are added.
+ */
+async function settingsTabNamed(section: string): Promise<void> {
+  for (let i = 0; i < TABS; i++) {
+    await settingsTab(i);
+    if ((await focus()).id.endsWith(`-tab-${section}`)) return;
+  }
+  throw new Error(`settings tab "${section}" not found`);
+}
+
+/** In Appearance, Tabs to the "Dark or light" dropdown (FR-2.63) and picks `label` by keyboard. */
+async function chooseMode(label: string): Promise<void> {
+  await tabTo((f) => f.role === "combobox" && f.id.endsWith("-mode"), "dark-or-light dropdown");
+  await browser.keys(["Enter", "Home"]);
+  for (let i = 0; i < 3; i++) {
+    const active = await browser.execute(() => {
+      const id = document.activeElement?.getAttribute("aria-activedescendant");
+      return id ? (document.getElementById(id)?.textContent ?? "") : "";
+    });
+    if (active.trim() === label) break;
+    await browser.keys(["ArrowDown"]);
+  }
+  await browser.keys(["Enter"]);
+  await browser.waitUntil(async () => (await focus()).text === label, { timeoutMsg: `mode ${label} not chosen` });
+}
 
 /** All UI strings on screen: text nodes (incl. visually hidden), aria-labels, placeholders, titles. */
 async function uiTexts(): Promise<string[]> {
@@ -80,6 +108,9 @@ const neutral = (t: string) =>
   /^(null|linux \S+|windows \S+|macos \S+)$/i.test(t) ||
   // "Beta" is the same word in English, German and Spanish.
   /^Beta$/.test(t) ||
+  // "Apps" is also the German and Spanish word, "Bitrate" and "Updates" the German ones; preset
+  // theme names are names, not translated.
+  /^(Apps|Bitrate|Updates|Deep Ocean|Forest|Paper)$/.test(t) ||
   // "Link" is also the German word; its tooltip adds the shortcut.
   /^Link( \(Ctrl\+K\))?$/.test(t) ||
   // "In <channel> (<count>)" reads the same in English and German.
@@ -117,8 +148,8 @@ describe("AC-1.26 theme follows OS + manual override", () => {
 
   it("manual override Light wins over OS dark, live", async () => {
     await openSettings();
-    await settingsTab(APPEARANCE);
-    await chooseRadio("light");
+    await settingsTabNamed("appearance");
+    await chooseMode("Light");
     await browser.waitUntil(async () => (await htmlTheme()) === "light", { timeoutMsg: "override light not applied" });
     await browser.keys(["Escape"]);
   });
@@ -129,12 +160,45 @@ describe("AC-1.26 theme follows OS + manual override", () => {
     await waitFor(".shell", 30_000);
     expect(await htmlTheme()).toBe("light"); // stored override = light
     await openSettings();
-    await settingsTab(APPEARANCE);
-    await chooseRadio("dark");
+    await settingsTabNamed("appearance");
+    await chooseMode("Dark");
     await browser.waitUntil(async () => (await htmlTheme()) === "dark", { timeoutMsg: "override dark not applied" });
-    await chooseRadio("system");
+    await chooseMode("Follow system");
     await browser.waitUntil(async () => (await htmlTheme()) === "light", { timeoutMsg: "back to system not applied" });
     await browser.keys(["Escape"]);
+  });
+
+  // FR-2.63: the menu is portalled to <body>, so it must stack above the settings overlay.
+  it("right-click on a theme circle shows its menu above the settings", async () => {
+    await openSettings();
+    await $('[role="tab"]=Appearance').click();
+    // A script contextmenu event, not a WebDriver right-click: after that, WebKitWebDriver types
+    // ":" as ";" for the rest of the session, which breaks the next spec's server address.
+    await browser.execute(() => {
+      const circle = document.querySelector(".theme-picker__circle");
+      if (!circle) throw new Error("no theme circle");
+      const box = circle.getBoundingClientRect();
+      circle.dispatchEvent(
+        new MouseEvent("contextmenu", { bubbles: true, cancelable: true, button: 2, clientX: box.left + 4, clientY: box.top + 4 }),
+      );
+    });
+    await waitFor('[role="menu"]');
+    const onTop = await browser.execute(() => {
+      const menu = document.querySelector('[role="menu"]');
+      if (!menu) return false;
+      const box = menu.getBoundingClientRect();
+      const hit = document.elementFromPoint(box.left + box.width / 2, box.top + box.height / 2);
+      return hit !== null && menu.contains(hit);
+    });
+    expect(onTop).toBe(true);
+    const items = await browser.execute(() =>
+      Array.from(document.querySelectorAll('[role="menu"] [role="menuitem"]')).map((item) => item.textContent),
+    );
+    expect(items).toEqual(["New theme from this", "Share"]);
+    await browser.keys(["Escape"]);
+    await waitGone('[role="menu"]');
+    await browser.keys(["Escape"]);
+    await waitGone(".overlay__dialog");
   });
 });
 
@@ -160,7 +224,7 @@ describe("AC-1.26 language switch without restart", () => {
     it(`switches to ${lang} live and translates every UI text`, async () => {
       const pid = await browser.execute(() => performance.timeOrigin);
       await openSettings();
-      await settingsTab(LANGUAGE);
+      await settingsTabNamed("language");
       await chooseRadio(lang);
       await browser.waitUntil(async () => (await browser.execute(() => document.documentElement.lang)) === lang, {
         timeoutMsg: `html lang never became ${lang}`,
@@ -182,7 +246,7 @@ describe("AC-1.26 language switch without restart", () => {
   it("offers all 24 EU languages by their own names and switches to French and Greek live", async () => {
     const pid = await browser.execute(() => performance.timeOrigin);
     await openSettings();
-    await settingsTab(LANGUAGE);
+    await settingsTabNamed("language");
     const names = await browser.execute(() =>
       Array.from(document.querySelectorAll(".overlay__dialog input[type=radio]"), (r) => r.closest("label")?.textContent.trim() ?? ""),
     );

@@ -7,6 +7,7 @@ use specta::Type;
 use tauri::State;
 
 use super::types::{ApiError, ApiResult, ErrorCode};
+use crate::watch_player::PlayerServer;
 
 /// Preview card of a link. All text is plain text, never HTML.
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, Type)]
@@ -172,4 +173,22 @@ pub fn gif_favorite_remove(engine: State<'_, Engine>, url: String) -> ApiResult<
 #[specta::specta]
 pub fn gif_favorite_use(engine: State<'_, Engine>, url: String) -> ApiResult<()> {
     Ok(engine.gif_favorite_use(&url)?)
+}
+
+/// URL of the loopback page that plays a YouTube or Twitch card inline (FR-2.41a); starts its
+/// server on first use. Every call needs a later `embed_player_close`.
+#[tauri::command]
+#[specta::specta]
+pub async fn embed_player_open(player: State<'_, PlayerServer>) -> ApiResult<String> {
+    player
+        .open_embed()
+        .map_err(|e| ApiError::new(ErrorCode::Io, format!("player server: {e}")))
+}
+
+/// The inline player of a chat card closed; the server stops once nothing plays.
+#[tauri::command]
+#[specta::specta]
+pub fn embed_player_close(player: State<'_, PlayerServer>) -> ApiResult<()> {
+    player.close_embed();
+    Ok(())
 }

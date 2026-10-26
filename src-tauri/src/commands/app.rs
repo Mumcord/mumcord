@@ -6,7 +6,7 @@ use specta::Type;
 use tauri::{AppHandle, State};
 use tauri_specta::Event;
 
-use super::servers::MumbleLink;
+use super::servers::DeepLinkOpened;
 use super::types::ApiResult;
 #[cfg(not(target_os = "macos"))]
 use super::types::{ApiError, ErrorCode};
@@ -22,7 +22,10 @@ pub enum CloseChoice {
 /// The window was closed while connected and the close behaviour is "ask".
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, Type, Event)]
 #[serde(rename_all = "camelCase")]
-pub struct CloseRequested {}
+pub struct CloseRequested {
+    /// Servers connected or being connected; the dialog says how many are left (FR-2.1).
+    pub connected_servers: u32,
+}
 
 /// Answers `CloseRequested`; `remember` stores the choice as the close behaviour.
 #[tauri::command]
@@ -74,7 +77,7 @@ pub fn link_handler_register(app: AppHandle) -> ApiResult<()> {
 /// the app), once. Later links arrive only as `deepLinkOpened`.
 #[tauri::command]
 #[specta::specta]
-pub fn deep_link_take_pending(app: AppHandle) -> ApiResult<Option<MumbleLink>> {
+pub fn deep_link_take_pending(app: AppHandle) -> ApiResult<Option<DeepLinkOpened>> {
     Ok(deeplink::take_pending(&app))
 }
 

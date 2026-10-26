@@ -5,6 +5,39 @@
     "remember": "Atcerēties manu izvēli",
     "minimize": "Samazināt uz paplāti",
     "quit": "Iziet",
-    "failed": "Tas neizdevās. Lūdzu, mēģini vēlreiz."
+    "failed": "Tas neizdevās. Lūdzu, mēģini vēlreiz.",
+    "descriptionServers": "Tu joprojām esi savienots ar {{count}} serveriem. Minimizēts Mumcord tevi patur balss kanālā un paliek sistēmas teknē."
+  },
+  "windowOverlay": {
+    "title": "Loga pārklājums ir noņemts",
+    "description": "Peldošā pārklājuma loga vairs nav. Tā vietā spēles pārklājums tavās spēlēs rāda, kurš runā. To var ieslēgt pārklājuma iestatījumos.",
+    "dismiss": "Skaidrs",
+    "openSettings": "Atvērt pārklājuma iestatījumus"
+  },
+  "appImageMenu": {
+    "title": "Pievienot Mumcord lietotņu izvēlnei?",
+    "description": "Tā Mumcord parādās tavā lietotņu izvēlnē. Ikona un push-to-talk Wayland vidē darbojas pareizi, un mumble:// saites atver Mumcord. To vari vēlāk mainīt iestatījumos.",
+    "no": "Nē",
+    "yes": "Jā",
+    "failed": "Neizdevās. Mēģini vēlreiz."
+  },
+  "updateCheck": {
+    "title": "Meklēt jaunas versijas?",
+    "description": "Mumcord var reizi dienā pajautāt GitHub, vai ir jaunāka versija, un parādīt padomu ar saiti. Nekas netiek lejupielādēts vai instalēts, un nekas netiek sūtīts, izņemot pašu pieprasījumu un lietotnes nosaukumu un versiju. To vari vēlāk mainīt iestatījumos.",
+    "no": "Nē",
+    "yes": "Jā",
+    "failed": "Neizdevās. Mēģini vēlreiz."
+  },
+  "updateHint": {
+    "message": "Pieejams Mumcord {{version}}.",
+    "open": "Skatīt laidienu",
+    "dismiss": "Aizvērt"
+  },
+  "directConsent": {
+    "title": "Atļaut tiešos savienojumus?",
+    "description": "Tiešie savienojumi ir ātrāki, bet otra persona var redzēt jūsu IP adresi. Mumcord tos izmanto pilna izmēra attēliem un ekrāna kopīgošanai ar citiem Mumcord lietotājiem un var to dēļ atvērt portu jūsu maršrutētājā. Ja atteiksiet, attēli joprojām pienāks caur serveri, bet ekrāna kopīgošana nebūs pieejama. To varat mainīt vēlāk sadaļā Iestatījumi → Privātums.",
+    "no": "Nē",
+    "yes": "Jā",
+    "failed": "Neizdevās. Mēģini vēlreiz."
   }
 }

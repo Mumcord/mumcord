@@ -14,7 +14,9 @@
     "sounds": "Sunete și notificări",
     "overlay": "Overlay",
     "diagnostics": "Diagnosticare",
-    "about": "Despre"
+    "about": "Despre",
+    "servers": "Servere",
+    "privacy": "Confidențialitate"
   },
   "search": {
     "label": "Caută în setări",
@@ -69,7 +71,17 @@
     "testPlaying": "Se redă vocea ta…",
     "quality": "Calitate",
     "musicQuality": "Calitate pentru muzică",
-    "musicQualityHint": "Folosește mai multă lățime de bandă și oprește suprimarea zgomotului și volumul automat; pentru muzică. Merge cel mai bine cu push-to-talk."
+    "musicQualityHint": "Folosește mai multă lățime de bandă și oprește suprimarea zgomotului și volumul automat; pentru muzică. Merge cel mai bine cu push-to-talk.",
+    "bitrate": "Rată de biți",
+    "bitrateMax": "Max.",
+    "bitrateValue": "{{kbps}} kbit/s",
+    "bitrateMaxKnown": "Maximum: {{kbps}} kbit/s. Pierderile de pe conexiune o pot reduce în continuare.",
+    "bitrateMaxUnknown": "Maximum: depinde de server. Pierderile de pe conexiune o pot reduce în continuare.",
+    "videoSound": "Sunetul videoclipurilor",
+    "ducking": "Coboară sunetul videoclipurilor cât timp vorbește cineva",
+    "duckingHint": "Sunetul videoclipului din vizionarea comună și al partajării ecranului scade cât timp vorbește cineva pe canalul tău vocal.",
+    "duckingLevel": "Volum redus",
+    "duckingLevelValue": "{{percent}} %"
   },
   "voice": {
     "talkMode": "Mod de vorbire",
@@ -179,6 +191,7 @@
     "compact": "Compact: ora, numele și mesajul pe un singur rând",
     "theme": "Temă",
     "themeLegend": "Tema de culori",
+    "modeLegend": "Întunecat sau luminos",
     "system": "Urmează sistemul",
     "dark": "Întunecată",
     "light": "Luminoasă",
@@ -190,6 +203,61 @@
     "autostart": "Pornește Mumcord când mă autentific",
     "startMinimized": "Pornește minimizat",
     "startMinimizedHint": "Când Mumcord pornește la autentificare, așteaptă în tray în loc să deschidă fereastra."
+  },
+  "themeEditor": {
+    "name": "Numele temei",
+    "colorsLegend": "Culori principale",
+    "colorColumn": "Culoare",
+    "auto": "auto",
+    "cellLabel": "{{color}}, {{version}}",
+    "newTitle": "Temă nouă",
+    "editTitle": "Editează „{{name}}”",
+    "generatedFromDark": "Creată automat din versiunea întunecată. Urmează modificările tale de acolo până când o modifici aici.",
+    "generatedFromLight": "Creată automat din versiunea luminoasă. Urmează modificările tale de acolo până când o modifici aici.",
+    "colors": {
+      "background": "Fundal",
+      "surface": "Suprafață",
+      "text": "Text",
+      "accent": "Accent",
+      "talking": "Vorbește și online",
+      "warning": "Avertisment",
+      "error": "Eroare"
+    },
+    "pickColor": "Selector de culoare {{color}}",
+    "invalidHex": "Introdu culoarea ca # urmat de șase cifre hexazecimale, de exemplu #1a2b3c.",
+    "contrastLowIn": "{{version}}: contrast prea mic: {{ratio}}:1, e nevoie de cel puțin {{min}}:1.",
+    "unreadable": "Această temă nu este suficient de lizibilă. Schimbă culoarea textului sau a fundalului ca să o salvezi.",
+    "copyName": "{{name}} (copie)",
+    "save": "Salvează tema",
+    "saveAs": "Salvează ca temă",
+    "saved": "Temă salvată.",
+    "share": "Distribuie",
+    "shared": "Temă copiată. Lipește-o într-un chat ca s-o distribui.",
+    "shareFailed": "Mumcord nu a putut copia tema în clipboard.",
+    "import": "Importă…",
+    "importTitle": "Importă o temă",
+    "importLabel": "Mesaj cu temă sau cod",
+    "importHint": "Lipește un mesaj de chat cu o temă Mumcord sau doar codul ei (începe cu mct1.).",
+    "importConfirm": "Importă",
+    "importInvalid": "Aceasta nu este o temă Mumcord validă.",
+    "importUnreadable": "Această temă nu este suficient de lizibilă.",
+    "imported": "„{{name}}” importată.",
+    "alreadyImported": "„{{name}}” este deja în temele tale.",
+    "madeWithNewer": "Creat cu Mumcord {{version}} – actualizează ca să o vezi complet.",
+    "reset": "Resetează",
+    "menuLabel": "Opțiuni pentru {{name}}",
+    "edit": "Editează tema",
+    "newFromThis": "Temă nouă din aceasta",
+    "preview": "Previzualizare",
+    "previewing": "Previzualizare {{name}}",
+    "backToEditor": "Înapoi la editor",
+    "rename": "Redenumește tema",
+    "renameTitle": "Redenumește „{{name}}”",
+    "renameConfirm": "Redenumește",
+    "delete": "Șterge tema",
+    "deleteTitle": "Ștergi „{{name}}”?",
+    "deleteMessage": "Serverele care folosesc această temă revin la tema aplicației.",
+    "deleteConfirm": "Șterge"
   },
   "accessibility": {
     "hints": "Indicii",
@@ -213,7 +281,14 @@
     "hangUp": "Te deconectezi de la un server",
     "messages": "Mesaj nou într-un canal urmărit sau într-un chat privat",
     "mention": "Sunet când ești menționat",
-    "mentionNotify": "Notificare când ești menționat"
+    "mentionNotify": "Notificare când ești menționat",
+    "partyStarted": "Cineva pornește o vizionare comună pe canalul tău",
+    "partyJoined": "Cineva se alătură vizionării tale comune",
+    "partyLeft": "Cineva părăsește vizionarea ta comună",
+    "shareStarted": "Cineva începe să partajeze ecranul pe canalul tău",
+    "shareStopped": "O partajare de ecran de pe canalul tău se încheie",
+    "viewerStarted": "Cineva începe să urmărească partajarea ta de ecran",
+    "viewerStopped": "Cineva nu mai urmărește partajarea ta de ecran"
   },
   "notifications": {
     "title": "Notificări",
@@ -225,29 +300,6 @@
     "off": "Oprit"
   },
   "overlay": {
-    "window": {
-      "title": "Overlay în fereastră",
-      "enable": "Arată overlay-ul",
-      "enableHint": "O mică fereastră transparentă care arată cine vorbește. Disponibil și din meniul din tray.",
-      "positionUnsupported": "Acest desktop decide unde apar ferestrele, așa că pozițiile din colțuri și mutarea nu au efect.",
-      "move": "Mută overlay-ul…",
-      "moveDone": "Gata cu mutarea",
-      "size": "Lățime",
-      "wholeChannel": "Arată tot canalul",
-      "wholeChannelHint": "Oprit: doar persoanele care vorbesc.",
-      "channelName": "Arată numele canalului",
-      "loadFailed": "Opțiunile overlay-ului nu au putut fi încărcate.",
-      "saveFailed": "Modificarea overlay-ului nu a putut fi aplicată.",
-      "kwin": {
-        "setUp": "Configurează automat",
-        "done": "Gata: regula de fereastră KDE „Mumcord overlay” este activă.",
-        "removed": "Regula de fereastră KDE a fost eliminată.",
-        "remove": "Elimină regula",
-        "openRules": "Deschide regulile de ferestre KDE",
-        "compat": "Folosește în schimb modul de compatibilitate",
-        "failed": "Regula de fereastră KDE nu a putut fi modificată. Deschide regulile de ferestre KDE ca s-o adaugi manual."
-      }
-    },
     "corner": {
       "label": "Poziție",
       "topLeft": "Stânga sus",
@@ -282,8 +334,16 @@
       "confirmEnable": "Activează oricum",
       "limits": {
         "libraryMissing": "Overlay-ul în joc nu e disponibil: biblioteca sa (libmumcord_overlay_layer.so) nu a fost găsită lângă Mumcord. Reinstalează Mumcord ca s-o restaurezi. Se folosește în schimb overlay-ul în fereastră de mai sus.",
-        "windowsPending": "Overlay-ul în joc nu e încă disponibil pe Windows. Se folosește în schimb overlay-ul în fereastră de mai sus.",
+        "windowsFullscreen": "Folosește în joc ecran complet fără margini sau în fereastră.",
         "macos": "macOS nu acceptă overlay-uri în joc. Se folosește în schimb overlay-ul în fereastră de mai sus."
+      },
+      "opengl": {
+        "title": "Jocuri OpenGL",
+        "explanation": "Necesar doar pentru jocurile OpenGL: lipește în opțiunile de lansare Steam ale jocului.",
+        "label": "Opțiune de lansare Steam",
+        "copy": "Copiază",
+        "copied": "Copiat",
+        "copyFailed": "Copierea a eșuat. Selectează textul și copiază-l manual."
       }
     }
   },
@@ -390,5 +450,38 @@
       "unsupported": "Nu e disponibil pe acest sistem.",
       "failed": "Oprit după o eroare. Oprește-l și pornește-l din nou ca să reîncerci."
     }
+  },
+  "servers": {
+    "connections": "Conexiuni",
+    "limit": "Servere conectate simultan",
+    "limitHint": "Între 1 și 15. Conectările peste limită sunt refuzate.",
+    "limitInvalid": "Introdu un număr întreg de la 1 la 15."
+  },
+  "appearanceEffects": {
+    "title": "Efecte",
+    "visualEffects": "Efecte vizuale (sticlă, granulație)",
+    "visualEffectsHint": "Meniuri din sticlă mată și o granulație fină de film. Dezactivate automat când sistemul cere mai puțină transparență sau mișcare."
+  },
+  "channelList": {
+    "title": "Lista canalelor",
+    "hideEmpty": "Ascunde canalele goale",
+    "talkingFirst": "Arată întâi persoanele care vorbesc",
+    "weakConnection": "Arată pictograma de conexiune slabă",
+    "weakConnectionHint": "O mică pictogramă de semnal lângă persoanele cu conexiune slabă."
+  },
+  "privacyDirect": {
+    "title": "Conexiuni directe",
+    "allow": "Permite conexiuni directe cu alți utilizatori Mumcord",
+    "hint": "Conexiunile directe sunt mai rapide, dar cealaltă persoană îți poate vedea adresa IP. Până decizi, Mumcord întreabă prima dată când ar fi folosită una."
+  },
+  "updates": {
+    "title": "Actualizări",
+    "check": "Caută versiuni noi",
+    "hint": "O dată pe zi, Mumcord întreabă GitHub de cea mai nouă versiune. Nu se trimite nimic altceva."
+  },
+  "appImageMenu": {
+    "label": "Adaugă Mumcord în meniul de aplicații",
+    "hint": "Face ca pictograma și push-to-talk să funcționeze corect pe Wayland și ca linkurile mumble:// să deschidă Mumcord. Doar pentru AppImage.",
+    "failed": "Nu a funcționat. Încearcă din nou."
   }
 }

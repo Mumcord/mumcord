@@ -1,5 +1,6 @@
 import { useId } from "react";
 import { useTranslation } from "react-i18next";
+import { Select } from "../../../components/Select";
 
 interface DaysSelectProps {
   label: string;
@@ -23,25 +24,22 @@ export function DaysSelect({ label, value, options, noneLabel, onChange }: DaysS
       ? [...options, value].sort((a, b) => a - b)
       : options;
   return (
-    <div className="settings-field-row">
-      <label className="settings-field" htmlFor={id}>
-        {label}
-      </label>
-      <select
+    <div className="settings-control-row">
+      <label htmlFor={id}>{label}</label>
+      <Select
         id={id}
-        className="settings-input"
         value={value === null ? NONE : String(value)}
-        onChange={(event) => {
-          onChange(event.target.value === NONE ? null : Number(event.target.value));
+        options={[
+          ...days.map((count) => ({
+            value: String(count),
+            label: t("retention.days", { count }),
+          })),
+          { value: NONE, label: noneLabel },
+        ]}
+        onChange={(next) => {
+          onChange(next === NONE ? null : Number(next));
         }}
-      >
-        {days.map((count) => (
-          <option key={count} value={count}>
-            {t("retention.days", { count })}
-          </option>
-        ))}
-        <option value={NONE}>{noneLabel}</option>
-      </select>
+      />
     </div>
   );
 }

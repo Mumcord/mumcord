@@ -32,7 +32,15 @@
     "avatarUnregistered": "Questo server conserva gli avatar solo per gli utenti registrati – Mumcord reinvia il tuo a ogni connessione.",
     "avatarChosen": "Selezionata: {{name}}",
     "avatarRemoved": "L'immagine verrà rimossa quando salvi.",
-    "comment": "Su di te"
+    "comment": "Su di te",
+    "format": "Formattazione del testo",
+    "bold": "Grassetto",
+    "italic": "Corsivo",
+    "link": "Link",
+    "linkAddress": "Indirizzo del link",
+    "linkApply": "Aggiungi link",
+    "bulletList": "Elenco puntato",
+    "numberedList": "Elenco numerato"
   },
   "register": {
     "title": "Registrati su questo server",
@@ -69,8 +77,6 @@
     "nowGaming": "Condividi il gioco a cui sto giocando",
     "nowGamingHint": "Gli altri vedono il tuo gioco attuale",
     "unavailable": "Non disponibile su questo sistema",
-    "overlay": "Overlay",
-    "overlayHint": "Mostra chi sta parlando sopra i giochi",
     "editProfile": "Modifica profilo",
     "editProfileHint": "Nome, avatar e commento",
     "register": "Registrati su questo server",
@@ -84,5 +90,10 @@
     "offerImagesHint": "Permetti agli altri di caricare le tue immagini originali",
     "loadImages": "Carica immagini a dimensione intera",
     "loadImagesHint": "Scarica le immagini originali degli altri"
+  },
+  "voice": {
+    "line": "Voce: {{channel}} · {{server}}",
+    "server": "Voce: {{server}}",
+    "show": "{{location}} – mostra questo server"
   }
 }

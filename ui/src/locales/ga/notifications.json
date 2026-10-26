@@ -16,5 +16,6 @@
   "image": "Sheol sé íomhá",
   "open": "Oscail an comhrá",
   "close": "Díbir an fógra",
-  "mentionLine": "Luaigh {{sender}} thú: {{preview}}"
+  "mentionLine": "Luaigh {{sender}} thú: {{preview}}",
+  "withServer": "{{server}} · {{what}}"
 }

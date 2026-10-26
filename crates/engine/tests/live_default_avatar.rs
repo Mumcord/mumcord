@@ -4,17 +4,18 @@
 //! `MUMCORD_LIVE=1 cargo test -p mumcord-engine --features test-backend --test live_default_avatar -- --ignored --test-threads=1`
 #![cfg(feature = "test-backend")]
 
+mod common;
+
 use std::path::{Path, PathBuf};
 use std::time::Duration;
 
 use mumcord_bot::samples::PNG;
 use mumcord_bot::{Bot, BotConfig, UserCheck, env};
+use mumcord_engine::EventReceiver;
 use mumcord_engine::{
     ConnState, Engine, EngineEvent, PasswordChange, SecretStore, ServerFields, ServerView,
 };
-use tokio::sync::mpsc::UnboundedReceiver;
 
-const PORT: u16 = 64739;
 const WAIT: Duration = Duration::from_secs(20);
 /// Time the engine gets to (wrongly) send an avatar before the bot checks there is none.
 const SETTLE: Duration = Duration::from_secs(3);
@@ -43,7 +44,7 @@ fn work_dir(name: &str) -> PathBuf {
 }
 
 async fn wait_for<T>(
-    rx: &mut UnboundedReceiver<EngineEvent>,
+    rx: &mut EventReceiver,
     what: &str,
     mut pick: impl FnMut(&EngineEvent) -> Option<T>,
 ) -> T {
@@ -62,9 +63,9 @@ async fn wait_for<T>(
 async fn add_server(engine: &Engine, name: &str) -> ServerView {
     engine
         .server_add(ServerFields {
-            label: format!("test {PORT} {name}"),
+            label: format!("test {} {name}", common::v14()),
             address: "127.0.0.1".into(),
-            port: PORT,
+            port: common::v14(),
             username: name.into(),
             password: match env::testenv_var("SERVER_PASSWORD") {
                 Some(p) => PasswordChange::Set(p),
@@ -76,7 +77,7 @@ async fn add_server(engine: &Engine, name: &str) -> ServerView {
 }
 
 /// Fresh connect, trusting the server certificate on first use.
-async fn connect(engine: &Engine, rx: &mut UnboundedReceiver<EngineEvent>, server: &ServerView) {
+async fn connect(engine: &Engine, rx: &mut EventReceiver, server: &ServerView) {
     engine.connect(server.id, None).expect("connect");
     loop {
         let event = wait_for(rx, "sync", |e| match e {
@@ -98,8 +99,8 @@ async fn connect(engine: &Engine, rx: &mut UnboundedReceiver<EngineEvent>, serve
     }
 }
 
-async fn disconnect(engine: &Engine, rx: &mut UnboundedReceiver<EngineEvent>) {
-    engine.disconnect();
+async fn disconnect(engine: &Engine, rx: &mut EventReceiver) {
+    engine.disconnect(only_server(engine));
     wait_for(rx, "disconnected", |e| {
         matches!(e, EngineEvent::StateChanged(ConnState::Disconnected { .. })).then_some(())
     })
@@ -162,7 +163,7 @@ async fn default_avatar_is_sent_once_per_server() {
 
     let bot = Bot::connect(BotConfig {
         data_dir: Some(dir.join("bot")),
-        ..BotConfig::new(&unique("f32-bot"), PORT)
+        ..BotConfig::new(&unique("f32-bot"), common::v14())
     })
     .await
     .expect("bot");
@@ -180,7 +181,10 @@ async fn default_avatar_is_sent_once_per_server() {
     tokio::time::sleep(SETTLE).await;
 
     // Removed manually, then disconnect and connect again: not sent a second time.
-    engine.set_own_avatar(None).await.expect("remove avatar");
+    engine
+        .set_own_avatar(only_server(&engine), None)
+        .await
+        .expect("remove avatar");
     bot.wait_user(&first_name, &avatar(false))
         .await
         .expect("bot sees the removal");
@@ -232,7 +236,7 @@ async fn remembered_avatar_is_resent_when_the_server_keeps_none() {
 
     let bot = Bot::connect(BotConfig {
         data_dir: Some(dir.join("bot")),
-        ..BotConfig::new(&unique("f55-bot"), PORT)
+        ..BotConfig::new(&unique("f55-bot"), common::v14())
     })
     .await
     .expect("bot");
@@ -243,7 +247,7 @@ async fn remembered_avatar_is_resent_when_the_server_keeps_none() {
     let guest = add_server(&engine, &guest_name).await;
     connect(&engine, &mut rx, &guest).await;
     engine
-        .set_own_avatar(Some(source.clone()))
+        .set_own_avatar(only_server(&engine), Some(source.clone()))
         .await
         .expect("set avatar");
     let sent = avatar_hash(&bot, &guest_name).await;
@@ -263,9 +267,12 @@ async fn remembered_avatar_is_resent_when_the_server_keeps_none() {
     let member_name = unique("f55-member");
     let member = add_server(&engine, &member_name).await;
     connect(&engine, &mut rx, &member).await;
-    engine.register_self().await.expect("register");
     engine
-        .set_own_avatar(Some(source))
+        .register_self(only_server(&engine))
+        .await
+        .expect("register");
+    engine
+        .set_own_avatar(only_server(&engine), Some(source))
         .await
         .expect("set avatar");
     let kept = avatar_hash(&bot, &member_name).await;
@@ -283,4 +290,13 @@ async fn remembered_avatar_is_resent_when_the_server_keeps_none() {
         "server copy kept, nothing re-sent"
     );
     disconnect(&engine, &mut rx).await;
+}
+
+/// The test's only connected server (0, which no call accepts, when none is).
+fn only_server(engine: &Engine) -> mumcord_engine::ServerId {
+    engine
+        .connections()
+        .first()
+        .and_then(mumcord_engine::ConnState::server_id)
+        .unwrap_or(0)
 }

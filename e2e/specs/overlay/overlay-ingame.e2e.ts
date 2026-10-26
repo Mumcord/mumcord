@@ -6,7 +6,7 @@
 import { existsSync } from "node:fs";
 import { join } from "node:path";
 import { browser, expect, $ } from "@wdio/globals";
-import { app, artifactsDir, bin, botInBackground, repoRoot, testenv, type BackgroundBot } from "../../helpers/index.ts";
+import { app, artifactsDir, bin, botInBackgroundOn, repoRoot, testenv, type BackgroundBot } from "../../helpers/index.ts";
 import { run } from "../../helpers/run.ts";
 import { addAndConnect, completeWizard, joinIfReadOnly, readTree } from "../../helpers/voice-ui.ts";
 
@@ -57,9 +57,14 @@ function gameRow() {
   return $(`//li[contains(@class,'overlay-settings__game')][.//label[.='${GAME}']]`);
 }
 
-/** A field in the game's expanded options. */
-function gameField(label: string, control: "select" | "input") {
-  return $(`//div[@role='group'][@aria-label='${GAME}']//div[label[.='${label}']]/${control}`);
+/** A slider in the game's expanded options. */
+function gameField(label: string) {
+  return $(`//div[@role='group'][@aria-label='${GAME}']//div[label[.='${label}']]/input`);
+}
+
+/** The themed corner dropdown in the game's expanded options. */
+function positionCombo() {
+  return $(`//div[@role='group'][@aria-label='${GAME}']//div[label[.='Position']]//*[@role='combobox']`);
 }
 
 describe("in-game overlay (AC-1.34b)", () => {
@@ -71,7 +76,7 @@ describe("in-game overlay (AC-1.34b)", () => {
     await addAndConnect();
     await joinIfReadOnly();
     const ownC = (await readTree()).find((c) => c.people.includes("Tester"));
-    speaker = botInBackground(["script"], { name: "Bot", timeout: 60 });
+    speaker = botInBackgroundOn("v15", ["script"], { name: "Bot", timeout: 60 });
     speaker.send(`join "${!ownC || ownC.level === 1 ? "/" : ownC.name}"`);
     speaker.send(`play ${speechPath} --loop --seconds 300`);
   });
@@ -116,8 +121,9 @@ describe("in-game overlay (AC-1.34b)", () => {
   it("AC-1.34b per-game position and opacity are kept after a restart", async () => {
     await openOverlaySettings();
     await gameRow().$(`button=Options for ${GAME}`).click();
-    await gameField("Position", "select").selectByAttribute("value", "bottomRight");
-    const opacity = gameField("Opacity", "input");
+    await positionCombo().click();
+    await $("//*[@role='option' and normalize-space(.)='Bottom right']").click();
+    const opacity = gameField("Opacity");
     const before = await opacity.getValue();
     await browser.execute((e: HTMLElement) => {
       e.focus();
@@ -133,8 +139,10 @@ describe("in-game overlay (AC-1.34b)", () => {
     await app.restart();
     await openOverlaySettings();
     await gameRow().$(`button=Options for ${GAME}`).click();
-    await expect(gameField("Position", "select")).toHaveValue("bottomRight");
-    await expect(gameField("Opacity", "input")).toHaveValue(changed);
+    await browser.waitUntil(async () => (await positionCombo().getProperty("textContent")) === "Bottom right", {
+      timeoutMsg: "position not kept after the restart",
+    });
+    await expect(gameField("Opacity")).toHaveValue(changed);
     await closeSettings();
   });
 });

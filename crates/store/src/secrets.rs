@@ -6,6 +6,8 @@
 //! - `identity/<n>` – chunk `n` of the identity as PKCS#12 (empty password; protection
 //!   comes from the OS store)
 //! - `server-password/<server id>` – password of a saved server
+//! - `access-tokens/<server id>` – channel passwords (Mumble access tokens) of a saved server,
+//!   as a JSON array of strings
 //!
 //! The identity is chunked because Windows Credential Manager rejects secrets larger
 //! than 2560 bytes and an RSA PKCS#12 can exceed that.
@@ -144,6 +146,23 @@ impl SecretStore {
         self.backend.delete(&password_account(server))
     }
 
+    /// Access tokens (channel passwords) of a saved server, oldest first; none is not an error.
+    pub fn access_tokens(&self, server: ServerId) -> Result<Vec<String>> {
+        match self.backend.get(&tokens_account(server))? {
+            Some(bytes) => Ok(serde_json::from_slice(&bytes)?),
+            None => Ok(Vec::new()),
+        }
+    }
+
+    /// Replaces the access tokens of a saved server; an empty list removes the entry.
+    pub fn set_access_tokens(&self, server: ServerId, tokens: &[String]) -> Result<()> {
+        if tokens.is_empty() {
+            return self.backend.delete(&tokens_account(server));
+        }
+        self.backend
+            .set(&tokens_account(server), &serde_json::to_vec(tokens)?)
+    }
+
     fn identity_chunk_count(&self) -> Result<Option<usize>> {
         let Some(raw) = self.backend.get(IDENTITY_ACCOUNT)? else {
             return Ok(None);
@@ -162,6 +181,10 @@ fn chunk_account(index: usize) -> String {
 
 fn password_account(server: ServerId) -> String {
     format!("server-password/{server}")
+}
+
+fn tokens_account(server: ServerId) -> String {
+    format!("access-tokens/{server}")
 }
 
 #[cfg(any(test, feature = "test-util"))]
@@ -234,6 +257,14 @@ mod tests {
         store.delete_server_password(7).expect("delete missing");
         assert_eq!(store.server_password(7).expect("gone"), None);
 
+        assert!(store.access_tokens(7).expect("none").is_empty());
+        let tokens = ["secret".to_owned(), "with \"quote\"".to_owned()];
+        store.set_access_tokens(7, &tokens).expect("set tokens");
+        assert_eq!(store.access_tokens(7).expect("get tokens"), tokens);
+        assert!(store.access_tokens(8).expect("other server").is_empty());
+        store.set_access_tokens(7, &[]).expect("clear tokens");
+        assert!(store.access_tokens(7).expect("cleared").is_empty());
+
         store.delete_identity().expect("delete identity");
         assert_eq!(store.load_identity().expect("gone"), None);
     }
@@ -292,6 +323,7 @@ mod tests {
         let store = SecretStore::os_with_service("app.mumcord.client.test");
         store.delete_identity().expect("pre-clean identity");
         store.delete_server_password(7).expect("pre-clean password");
+        store.set_access_tokens(7, &[]).expect("pre-clean tokens");
         exercise(&store);
     }
 }

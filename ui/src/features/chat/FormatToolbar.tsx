@@ -13,6 +13,7 @@ const ICONS: Record<Format, string> = {
     "M5 12h14M16 7.5C15.4 6 14 5 12 5c-2.5 0-4 1.3-4 3M8 16.5c.6 1.5 2 2.5 4 2.5 2.5 0 4-1.3 4-3",
   code: "M9 8l-4 4 4 4M15 8l4 4-4 4",
   codeBlock: "M4 5h16v14H4zM10 10l-2 2 2 2M14 10l2 2-2 2",
+  quote: "M5 8h5v5c0 3-2 4.5-5 5M14 8h5v5c0 3-2 4.5-5 5",
   link: "M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1",
 };
 
@@ -66,7 +67,7 @@ export function FormatToolbar({ onFormat, disabled }: FormatToolbarProps) {
             className="chat-format__button"
             aria-label={label}
             aria-keyshortcuts={SHORTCUTS[format]}
-            title={`${label} (${shortcutLabel(SHORTCUTS[format])})`}
+            data-tooltip={`${label} (${shortcutLabel(SHORTCUTS[format])})`}
             tabIndex={index === active ? 0 : -1}
             disabled={disabled}
             // Keeps the caret and selection in the input while clicking.

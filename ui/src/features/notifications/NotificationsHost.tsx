@@ -1,10 +1,16 @@
 import { useCallback, useEffect, useRef } from "react";
 import { useTranslation } from "react-i18next";
 import { getApi, type Conversation } from "../../api";
-import { selectConversation, subscribeServerChanges, useSelectedConversation } from "../channels";
+import {
+  selectConversation,
+  showServer,
+  useSelectedConversation,
+  useShownServerId,
+} from "../channels";
 import { conversationKey, subscribeIncoming } from "../chat";
+import { useServers } from "../servers";
 import { handleIncoming } from "./incoming";
-import { clearNotifications, markSeen } from "./notificationStore";
+import { clearServerNotifications, markSeen, noticeKey } from "./notificationStore";
 import { Toasts } from "./Toasts";
 import "./notifications.css";
 
@@ -15,9 +21,9 @@ export interface NotificationsHostProps {
   onOpenChat: () => void;
 }
 
-function dismissSystemNotification(conversation: Conversation): void {
+function dismissSystemNotification(serverId: number, conversation: Conversation): void {
   getApi()
-    .notificationDismiss(conversation)
+    .notificationDismiss(serverId, conversation)
     .catch((error: unknown) => {
       console.error("Dismissing a desktop notification failed", error);
     });
@@ -40,35 +46,58 @@ function focusChat(): void {
 export function NotificationsHost({ overlayOpen, onOpenChat }: NotificationsHostProps) {
   const { t } = useTranslation("notifications");
   const { conversation: selected } = useSelectedConversation();
-  const live = useRef({ t, overlayOpen, onOpenChat, selected });
+  const shown = useShownServerId();
+  const { servers } = useServers();
+  const serverName = useCallback(
+    (id: number) => {
+      const server = servers.find((s) => s.id === id);
+      return server ? server.label || server.address : undefined;
+    },
+    [servers],
+  );
+  const muted = useCallback(
+    (id: number) => servers.find((s) => s.id === id)?.notificationsMuted ?? false,
+    [servers],
+  );
+  const live = useRef({ t, overlayOpen, onOpenChat, selected, shown, serverName, muted });
   useEffect(() => {
-    live.current = { t, overlayOpen, onOpenChat, selected };
+    live.current = { t, overlayOpen, onOpenChat, selected, shown, serverName, muted };
   });
 
-  const open = useCallback((conversation: Conversation) => {
+  // Shows the chat's server first (FR-2.10); the selection is remembered per server.
+  const open = useCallback((serverId: number, conversation: Conversation) => {
     live.current.onOpenChat();
+    showServer(serverId);
     selectConversation(conversation);
-    markSeen(conversationKey(conversation));
-    dismissSystemNotification(conversation);
+    markSeen(noticeKey(serverId, conversationKey(conversation)));
+    dismissSystemNotification(serverId, conversation);
     focusChat();
   }, []);
 
   useEffect(() => {
     function seeSelected(): void {
-      const { selected: current, overlayOpen: covered } = live.current;
-      if (current === null || covered) return;
-      markSeen(conversationKey(current));
-      dismissSystemNotification(current);
+      const { selected: current, overlayOpen: covered, shown: server } = live.current;
+      if (current === null || covered || server === null) return;
+      markSeen(noticeKey(server, conversationKey(current)));
+      dismissSystemNotification(server, current);
     }
     const unsubscribers = [
-      subscribeIncoming((message) => {
-        void handleIncoming(message, live.current);
+      subscribeIncoming((message, serverId) => {
+        void handleIncoming(message, serverId, {
+          t: live.current.t,
+          overlayOpen: live.current.overlayOpen,
+          serverName: (id) => live.current.serverName(id),
+          muted: (id) => live.current.muted(id),
+        });
       }),
-      getApi().on("notificationActivated", ({ conversation }) => {
-        open(conversation);
+      getApi().on("notificationActivated", ({ serverId, conversation }) => {
+        open(serverId, conversation);
       }),
-      subscribeServerChanges((change, state) => {
-        if (change.kind === "synced" || state.serverId === null) clearNotifications();
+      getApi().on("serverSynced", ({ snapshot }) => {
+        clearServerNotifications(snapshot.serverId);
+      }),
+      getApi().on("connectionStateChanged", ({ serverId, state }) => {
+        if (state.state === "disconnected") clearServerNotifications(serverId);
       }),
     ];
     // Coming back to the window shows the selected chat again.
@@ -80,10 +109,10 @@ export function NotificationsHost({ overlayOpen, onOpenChat }: NotificationsHost
   }, [open]);
 
   useEffect(() => {
-    if (selected === null || overlayOpen) return;
-    markSeen(conversationKey(selected));
-    dismissSystemNotification(selected);
-  }, [selected, overlayOpen]);
+    if (selected === null || overlayOpen || shown === null) return;
+    markSeen(noticeKey(shown, conversationKey(selected)));
+    dismissSystemNotification(shown, selected);
+  }, [selected, overlayOpen, shown]);
 
   return <Toasts onOpen={open} />;
 }

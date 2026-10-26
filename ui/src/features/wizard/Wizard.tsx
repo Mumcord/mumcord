@@ -13,6 +13,7 @@ import { useView } from "../../app/view";
 import { IdentityStep } from "./IdentityStep";
 import { MicStep } from "./MicStep";
 import { PrivacyStep } from "./PrivacyStep";
+import { UpdatesStep } from "./UpdatesStep";
 import { TalkModeStep, type TalkChoice } from "./TalkModeStep";
 import "./wizard.css";
 
@@ -56,13 +57,14 @@ async function loadWizard(): Promise<Loaded> {
   };
 }
 
-/** First-start wizard: identity → microphone → privacy → talk mode and start options (FR-1.1–FR-1.6, FR-1.48d). */
+/** First-start wizard: identity → microphone → privacy → update hint → talk mode and start options (FR-1.1–FR-1.6, FR-1.48d). */
 export function Wizard() {
   const { t } = useTranslation("wizard");
   const { finishWizard } = useView();
   const { applySettings } = usePreferences();
   const [load, setLoad] = useState<Load>({ state: "loading" });
   const [step, setStep] = useState(1);
+  const [updateCheck, setUpdateCheck] = useState(false);
   // Focus follows step changes only, not the initial render.
   const [navigated, setNavigated] = useState(false);
 
@@ -131,6 +133,7 @@ export function Wizard() {
       pttKey: choice.pttKey,
       linkPreviews: choice.linkPreviews,
       historySharing: choice.historySharing,
+      updateCheck: updateCheck ? "yes" : "no",
       wizardCompleted: true,
     });
     if (choice.autostart !== saved.autostart) {
@@ -194,6 +197,21 @@ export function Wizard() {
           }}
         />
       );
+    case 4:
+      return (
+        <UpdatesStep
+          initial={settings.updateCheck === "yes"}
+          focusOnMount={navigated}
+          onBack={() => {
+            goTo(3);
+          }}
+          onNext={(check) => {
+            // Saved with the final step; going Back keeps the choice in the form state.
+            setUpdateCheck(check);
+            goTo(5);
+          }}
+        />
+      );
     default:
       return (
         <TalkModeStep
@@ -204,7 +222,7 @@ export function Wizard() {
           ingameOverlaySupported={load.ingameOverlaySupported}
           focusOnMount={navigated}
           onBack={() => {
-            goTo(3);
+            goTo(4);
           }}
           onFinish={finish}
         />

@@ -4,6 +4,8 @@
     "label": "Canaux",
     "hint": "Entrée : afficher la discussion · Maj+Entrée ou double-clic : rejoindre · Flèches : se déplacer, développer, réduire",
     "join": "Rejoindre",
+    "menuLabel": "Options pour {{channel}}",
+    "showDescription": "Afficher la description du canal",
     "you": "(vous)",
     "voiceHere": "vous êtes ici (vocal)",
     "people_one": "{{count}} personne",
@@ -18,10 +20,11 @@
     },
     "showAll": "Tout afficher ({{total}})",
     "showFewer": "Afficher moins",
-    "jump": "Aller à mon canal"
+    "jump": "Aller à mon canal",
+    "locked": "verrouillé"
   },
   "status": {
-    "listening": "écoute",
+    "listening": "écoute seulement",
     "talking": "parle",
     "muted": "micro coupé",
     "deafened": "son coupé",
@@ -34,7 +37,7 @@
   "mumcordBadge": "Utilise Mumcord",
   "statusTip": {
     "registered": "Enregistré sur ce serveur",
-    "listening": "Écoute ce canal",
+    "listening": "Écoute seulement",
     "muted": "Micro coupé",
     "deafened": "Son coupé",
     "serverMuted": "Micro coupé par le serveur",
@@ -44,6 +47,7 @@
     "unregistered": "Non enregistré sur ce serveur (invité)",
     "nowPlaying": "Écoute {{track}}",
     "nowGaming": "Joue à {{game}}",
+    "weakConnection": "Connexion faible – ping élevé ou perte de paquets",
     "positional": "Audio positionnel actif"
   },
   "announce": {
@@ -58,7 +62,8 @@
   },
   "empty": {
     "disconnected": "Non connecté. Choisissez un serveur pour voir ses canaux.",
-    "loading": "Chargement des canaux…"
+    "loading": "Chargement des canaux…",
+    "syncingBig": "Synchronisation d’un grand serveur…"
   },
   "search": {
     "label": "Rechercher des canaux et des personnes",

@@ -8,7 +8,7 @@ use specta::Type;
 use tauri::State;
 use tauri_specta::Event;
 
-use super::types::{ApiResult, ServerId};
+use super::types::{ApiResult, ServerId, to_engine_server_id};
 
 /// The default avatar was not sent to a server because it cannot fit the server's image
 /// limit (FR-1.47).
@@ -39,20 +39,32 @@ pub async fn default_avatar_set(
 /// Sets the own avatar from an image file, scaled to the server limit; `null` removes it.
 #[tauri::command]
 #[specta::specta]
-pub async fn set_own_avatar(engine: State<'_, Engine>, path: Option<String>) -> ApiResult<()> {
-    Ok(engine.set_own_avatar(path.map(PathBuf::from)).await?)
+pub async fn set_own_avatar(
+    engine: State<'_, Engine>,
+    server_id: ServerId,
+    path: Option<String>,
+) -> ApiResult<()> {
+    Ok(engine
+        .set_own_avatar(to_engine_server_id(server_id), path.map(PathBuf::from))
+        .await?)
 }
 
 /// Sets the own profile comment (Mumble-compatible HTML; empty removes it).
 #[tauri::command]
 #[specta::specta]
-pub async fn set_own_comment(engine: State<'_, Engine>, html: String) -> ApiResult<()> {
-    Ok(engine.set_own_comment(html).await?)
+pub async fn set_own_comment(
+    engine: State<'_, Engine>,
+    server_id: ServerId,
+    html: String,
+) -> ApiResult<()> {
+    Ok(engine
+        .set_own_comment(to_engine_server_id(server_id), html)
+        .await?)
 }
 
 /// Registers the current name on the connected server with the current identity.
 #[tauri::command]
 #[specta::specta]
-pub async fn register_self(engine: State<'_, Engine>) -> ApiResult<()> {
-    Ok(engine.register_self().await?)
+pub async fn register_self(engine: State<'_, Engine>, server_id: ServerId) -> ApiResult<()> {
+    Ok(engine.register_self(to_engine_server_id(server_id)).await?)
 }

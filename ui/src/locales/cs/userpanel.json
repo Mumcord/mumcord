@@ -32,7 +32,15 @@
     "avatarUnregistered": "Tento server uchovává avatary jen registrovaným uživatelům – Mumcord ten tvůj pošle znovu při každém připojení.",
     "avatarChosen": "Vybráno: {{name}}",
     "avatarRemoved": "Obrázek se odebere po uložení.",
-    "comment": "O tobě"
+    "comment": "O tobě",
+    "format": "Formátování textu",
+    "bold": "Tučné",
+    "italic": "Kurzíva",
+    "link": "Odkaz",
+    "linkAddress": "Adresa odkazu",
+    "linkApply": "Přidat odkaz",
+    "bulletList": "Odrážkový seznam",
+    "numberedList": "Číslovaný seznam"
   },
   "register": {
     "title": "Registrovat se na tomto serveru",
@@ -69,8 +77,6 @@
     "nowGaming": "Sdílet hru, kterou hraju",
     "nowGamingHint": "Ostatní uvidí tvou aktuální hru",
     "unavailable": "Na tomto systému není dostupné",
-    "overlay": "Overlay",
-    "overlayHint": "Zobrazuje nad hrami, kdo mluví",
     "editProfile": "Upravit profil",
     "editProfileHint": "Jméno, avatar a komentář",
     "register": "Registrovat se na tomto serveru",
@@ -84,5 +90,10 @@
     "offerImagesHint": "Ostatní si můžou načíst tvé originální obrázky",
     "loadImages": "Načítat obrázky v plné velikosti",
     "loadImagesHint": "Stahovat originální obrázky od ostatních"
+  },
+  "voice": {
+    "line": "Hlas: {{channel}} · {{server}}",
+    "server": "Hlas: {{server}}",
+    "show": "{{location}} – zobrazit tento server"
   }
 }

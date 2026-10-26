@@ -3,6 +3,8 @@
 //! `MUMCORD_LIVE=1 cargo test -p mumcord-engine --features test-backend --test live_positional -- --ignored --nocapture --test-threads=1`
 #![cfg(feature = "test-backend")]
 
+mod common;
+
 use std::collections::BTreeMap;
 use std::path::{Path, PathBuf};
 use std::sync::Arc;
@@ -14,11 +16,11 @@ use mumcord_audio::spatial::Listener;
 use mumcord_audio::{FRAME_SAMPLES, Frame};
 use mumcord_bot::voice::{BotVoice, Clip, PlayOptions};
 use mumcord_bot::{Bot, BotConfig, env};
+use mumcord_engine::EventReceiver;
 use mumcord_engine::positional_sources::{Fetch, Pose, PositionSource, Positional};
 use mumcord_engine::{EngineEvent, PasswordChange, SecretStore, ServerFields, Snapshot};
 use mumcord_protocol::voice::VoicePacket;
 use tokio::sync::broadcast;
-use tokio::sync::mpsc::UnboundedReceiver;
 
 const WAIT: Duration = Duration::from_secs(20);
 const SAMPLE_RATE: usize = 48_000;
@@ -55,7 +57,7 @@ fn speech() -> Clip {
 async fn bot_in_channel(dir: &Path, name: &str, context: &[u8]) -> (Bot, BotVoice) {
     let bot = Bot::connect(BotConfig {
         data_dir: Some(dir.join(name)),
-        ..BotConfig::new(name, env::PORT_V15)
+        ..BotConfig::new(name, common::v15())
     })
     .await
     .expect("connect");
@@ -223,7 +225,7 @@ impl PositionSource for FakeGame {
 /// Waits for a "sending positions" change of `session`; fails on a change of any session in
 /// `never`.
 async fn sending_change(
-    rx: &mut UnboundedReceiver<EngineEvent>,
+    rx: &mut EventReceiver,
     session: u32,
     never: &[u32],
     within: Duration,
@@ -299,7 +301,7 @@ async fn engine_sends_positions_to_its_game_and_flags_senders() {
         .server_add(ServerFields {
             label: "v15".into(),
             address: env::HOST.into(),
-            port: env::PORT_V15,
+            port: common::v15(),
             username: name.clone(),
             password: match env::testenv_var("SERVER_PASSWORD") {
                 Some(p) => PasswordChange::Set(p),
@@ -329,7 +331,9 @@ async fn engine_sends_positions_to_its_game_and_flags_senders() {
         .find(|c| c.name == CHANNEL)
         .expect("channel")
         .id;
-    engine.join_channel(channel).expect("join");
+    engine
+        .join_channel(only_server(&engine), channel)
+        .expect("join");
     let me = snapshot.self_session;
     let peer_session = peer_bot.own_user().expect("peer").session;
     let stranger_session = stranger_bot.own_user().expect("stranger").session;
@@ -394,4 +398,13 @@ async fn engine_sends_positions_to_its_game_and_flags_senders() {
         sending_change(&mut rx, me, &[], Duration::from_secs(2)).await,
         Some(false)
     );
+}
+
+/// The test's only connected server (0, which no call accepts, when none is).
+fn only_server(engine: &mumcord_engine::Engine) -> mumcord_engine::ServerId {
+    engine
+        .connections()
+        .first()
+        .and_then(mumcord_engine::ConnState::server_id)
+        .unwrap_or(0)
 }

@@ -43,6 +43,7 @@ pub struct DspControls {
     noise_suppression: AtomicBool,
     auto_gain: AtomicBool,
     music_quality: AtomicBool,
+    bitrate_cap_kbps: AtomicU32,
     push_to_talk: AtomicBool,
     manual_threshold: AtomicBool,
     threshold_dbfs: AtomicF32,
@@ -63,6 +64,7 @@ impl Default for DspControls {
             noise_suppression: AtomicBool::new(true),
             auto_gain: AtomicBool::new(true),
             music_quality: AtomicBool::new(false),
+            bitrate_cap_kbps: AtomicU32::new(0),
             push_to_talk: AtomicBool::new(false),
             manual_threshold: AtomicBool::new(false),
             threshold_dbfs: AtomicF32::new(THRESHOLD_DEFAULT_DBFS),
@@ -101,14 +103,26 @@ impl DspControls {
         self.auto_gain.load(Ordering::Relaxed)
     }
 
-    /// "Music quality" (QA.37): the chain skips noise suppression and automatic gain, which
-    /// damage music, and the engine tunes the encoder for music and lifts the bitrate cap.
+    /// "Music quality" (QA.37): the chain skips noise suppression and the speech gain control,
+    /// which damage music; with automatic gain on, a slow leveler keeps music as loud as speech.
+    /// The engine tunes the encoder for music and lifts the bitrate cap.
     pub fn set_music_quality(&self, on: bool) {
         self.music_quality.store(on, Ordering::Relaxed);
     }
 
     pub fn music_quality(&self) -> bool {
         self.music_quality.load(Ordering::Relaxed)
+    }
+
+    /// Own bitrate cap in kbit/s (FR-2.64); `None` means "Max". The engine's bitrate controller
+    /// never goes above it.
+    pub fn set_bitrate_cap_kbps(&self, kbps: Option<u32>) {
+        self.bitrate_cap_kbps
+            .store(kbps.unwrap_or(0), Ordering::Relaxed);
+    }
+
+    pub fn bitrate_cap_kbps(&self) -> Option<u32> {
+        Some(self.bitrate_cap_kbps.load(Ordering::Relaxed)).filter(|&k| k > 0)
     }
 
     pub fn set_mode(&self, mode: TalkMode) {

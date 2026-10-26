@@ -12,19 +12,17 @@ import { dismissPreview, useDismissedPreviews } from "./dismissedPreviews";
 import {
   externalImages,
   isImageLink,
+  cardPlayer,
   loadPreview,
-  playerUrl,
   previewableLinks,
+  safeImage,
   type ImageClickHandler,
 } from "./links";
 import { openInBrowser } from "./openLink";
 import { DismissButton, OpenButton } from "./cardButtons";
 import { InlineImageCard } from "./InlineImageCard";
-
-/** Only images the engine produced; anything else would make the webview load from the web. */
-function safeImage(src: string | null): string | null {
-  return src !== null && /^data:image\/(png|jpeg);base64,/.test(src) ? src : null;
-}
+import { PagePlayer } from "./PagePlayer";
+import { WatchTogetherButton } from "../watchparty";
 
 interface LinkPreviewsProps {
   /** The message the cards belong to; dismissals are remembered per message. */
@@ -172,7 +170,7 @@ interface VideoCardProps {
 function VideoCard({ preview, video, tabIndex, onDismiss }: VideoCardProps) {
   const { t } = useTranslation("chat");
   const [playing, setPlaying] = useState(false);
-  const player = playerUrl(video);
+  const player = cardPlayer(video);
   const spotify = video.site === "spotify";
   const site = preview.siteName ?? SITE_NAMES[video.site];
   const title =
@@ -193,10 +191,19 @@ function VideoCard({ preview, video, tabIndex, onDismiss }: VideoCardProps) {
           <p className="link-card__description">{video.channel}</p>
         )}
       </div>
-      {playing && player !== null ? (
+      {playing && player?.via === "page" ? (
+        <PagePlayer
+          playerUrl={player.url}
+          title={t("preview.player", { title })}
+          onFailed={() => {
+            setPlaying(false);
+            openInBrowser(preview.url);
+          }}
+        />
+      ) : playing && player !== null ? (
         <iframe
           className={`link-card__player${spotify ? " link-card__player--audio" : ""}`}
-          src={player}
+          src={player.url}
           title={t(spotify ? "preview.audioPlayer" : "preview.player", { title })}
           allow="autoplay; encrypted-media; fullscreen; picture-in-picture"
           allowFullScreen
@@ -209,7 +216,7 @@ function VideoCard({ preview, video, tabIndex, onDismiss }: VideoCardProps) {
           className="link-card__play"
           tabIndex={tabIndex}
           aria-label={t("preview.play", { title })}
-          title={player === null ? t("preview.inBrowser") : undefined}
+          data-tooltip={player === null ? t("preview.inBrowser") : undefined}
           onClick={() => {
             if (player === null) openInBrowser(preview.url);
             else setPlaying(true);
@@ -220,6 +227,9 @@ function VideoCard({ preview, video, tabIndex, onDismiss }: VideoCardProps) {
             ▶
           </span>
         </button>
+      )}
+      {video.site === "youtube" && (
+        <WatchTogetherButton playerUrl={video.playerUrl} title={title} tabIndex={tabIndex} />
       )}
       <OpenButton url={preview.url} title={title} tabIndex={tabIndex} />
       <DismissButton onDismiss={onDismiss} tabIndex={tabIndex} />

@@ -4,52 +4,57 @@
  */
 import { useSyncExternalStore } from "react";
 import { getApi, type MumcordApi, type Unsubscribe } from "../../api";
+import { useShownServerId } from "../channels/serverStore";
 import type { LiveGame } from "./playTime";
 
 type Games = ReadonlyMap<number, LiveGame>;
 
 const EMPTY: Games = new Map();
 
-let games: Games = EMPTY;
+/** Per server id; each server's map is keyed by session. */
+let games = new Map<number, Games>();
 let boundApi: MumcordApi | undefined;
 let unsubscribers: Unsubscribe[] = [];
 const listeners = new Set<() => void>();
 
-function set(next: Games): void {
-  games = next;
+function set(serverId: number, next: Games): void {
+  games = new Map(games);
+  if (next.size === 0) games.delete(serverId);
+  else games.set(serverId, next);
   for (const listener of listeners) listener();
 }
 
-function without(session: number): void {
-  if (!games.has(session)) return;
-  const next = new Map(games);
+function without(serverId: number, session: number): void {
+  const current = games.get(serverId);
+  if (!current?.has(session)) return;
+  const next = new Map(current);
   next.delete(session);
-  set(next);
+  set(serverId, next);
 }
 
 function bind(api: MumcordApi): void {
   for (const unsubscribe of unsubscribers) unsubscribe();
   boundApi = api;
-  games = EMPTY;
+  games = new Map();
   unsubscribers = [
-    api.on("nowGamingChanged", ({ session, game }) => {
+    api.on("nowGamingChanged", ({ serverId, session, game }) => {
       if (game === null) {
-        without(session);
+        without(serverId, session);
         return;
       }
-      const next = new Map(games);
+      const next = new Map(games.get(serverId) ?? EMPTY);
       // The play time is anchored to the local arrival time, not the sender's clock.
       next.set(session, { game, atMs: Date.now() });
-      set(next);
+      set(serverId, next);
     }),
-    api.on("serverSynced", () => {
-      set(EMPTY);
+    api.on("serverSynced", ({ snapshot }) => {
+      set(snapshot.serverId, EMPTY);
     }),
-    api.on("connectionStateChanged", ({ state }) => {
-      if (state.state !== "connected") set(EMPTY);
+    api.on("connectionStateChanged", ({ serverId, state }) => {
+      if (state.state !== "connected") set(serverId, EMPTY);
     }),
-    api.on("userRemoved", ({ session }) => {
-      without(session);
+    api.on("userRemoved", ({ serverId, session }) => {
+      without(serverId, session);
     }),
   ];
 }
@@ -68,10 +73,12 @@ function subscribe(listener: () => void): () => void {
 }
 
 /** The game a person shares, or `null`. */
-export function useNowGaming(session: number): LiveGame | null {
+export function useNowGaming(session: number, serverId?: number | null): LiveGame | null {
+  const shown = useShownServerId();
+  const server = serverId === undefined ? shown : serverId;
   return useSyncExternalStore(subscribe, () => {
     ensureBound();
-    return games.get(session) ?? null;
+    return (server === null ? undefined : games.get(server)?.get(session)) ?? null;
   });
 }
 
@@ -80,5 +87,5 @@ export function resetNowGamingStore(): void {
   for (const unsubscribe of unsubscribers) unsubscribe();
   unsubscribers = [];
   boundApi = undefined;
-  games = EMPTY;
+  games = new Map();
 }

@@ -10,5 +10,6 @@
   "image": "Изпрати изображение",
   "open": "Отвори чата",
   "close": "Затвори известието",
-  "mentionLine": "{{sender}} те спомена: {{preview}}"
+  "mentionLine": "{{sender}} те спомена: {{preview}}",
+  "withServer": "{{server}} · {{what}}"
 }

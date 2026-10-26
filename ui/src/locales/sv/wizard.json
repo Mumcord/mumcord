@@ -98,5 +98,10 @@
     "ingameOverlayHint": "Ritar vem som pratar ovanpå ditt spel (Linux). Du kan slå på eller av det per spel senare under Inställningar.",
     "ingameOverlayWarning": "Vissa spel med anti-cheat kan flagga eller blockera overlayer i spel. Mumcord håller kända riskspel (som Valorant eller League of Legends) avstängda som standard. Slå bara på det för spel du litar på.",
     "ingameOverlayAlt": "Exempel på overlayen i spel som visar vem som pratar"
+  },
+  "updates": {
+    "title": "Nya versioner",
+    "check": "Sök efter nya versioner",
+    "hint": "Mumcord kan fråga GitHub en gång om dagen om det finns en nyare version och visa en hint med en länk. Inget laddas ner eller installeras, och inget skickas utom själva förfrågan samt appens namn och version. Du kan ändra det senare i Inställningar."
   }
 }

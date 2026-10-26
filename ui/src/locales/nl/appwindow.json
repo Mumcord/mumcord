@@ -5,6 +5,39 @@
     "remember": "Mijn keuze onthouden",
     "minimize": "Naar systeemvak minimaliseren",
     "quit": "Afsluiten",
-    "failed": "Dat is mislukt. Probeer het opnieuw."
+    "failed": "Dat is mislukt. Probeer het opnieuw.",
+    "descriptionServers": "Je bent nog met {{count}} servers verbonden. Geminimaliseerd houdt Mumcord je in de spraak en blijft het in het systeemvak."
+  },
+  "windowOverlay": {
+    "title": "De vensteroverlay is verwijderd",
+    "description": "Het zwevende overlayvenster is weg. In plaats daarvan laat de in-game-overlay in je games zien wie er praat. Je kunt die aanzetten in de overlay-instellingen.",
+    "dismiss": "Begrepen",
+    "openSettings": "Overlay-instellingen openen"
+  },
+  "appImageMenu": {
+    "title": "Mumcord aan het appmenu toevoegen?",
+    "description": "Hiermee komt Mumcord in je appmenu. Het pictogram en push-to-talk werken dan goed onder Wayland, en mumble://-links openen Mumcord. Je kunt dit later wijzigen in Instellingen.",
+    "no": "Nee",
+    "yes": "Ja",
+    "failed": "Dat is niet gelukt. Probeer het opnieuw."
+  },
+  "updateCheck": {
+    "title": "Zoeken naar nieuwe versies?",
+    "description": "Mumcord kan GitHub één keer per dag vragen of er een nieuwere versie is en dan een melding met een link tonen. Er wordt niets gedownload of geïnstalleerd, en er wordt niets verstuurd behalve het verzoek zelf en de naam en versie van de app. Je kunt dit later wijzigen in Instellingen.",
+    "no": "Nee",
+    "yes": "Ja",
+    "failed": "Dat is niet gelukt. Probeer het opnieuw."
+  },
+  "updateHint": {
+    "message": "Mumcord {{version}} is beschikbaar.",
+    "open": "Release bekijken",
+    "dismiss": "Sluiten"
+  },
+  "directConsent": {
+    "title": "Directe verbindingen toestaan?",
+    "description": "Directe verbindingen zijn sneller, maar de andere persoon kan je IP-adres zien. Mumcord gebruikt ze voor afbeeldingen op volledige grootte en schermdelen met andere Mumcord-gebruikers en kan hiervoor een poort op je router openen. Als je nee zegt, komen afbeeldingen nog steeds via de server binnen en is schermdelen niet beschikbaar. Je kunt dit later wijzigen via Instellingen → Privacy.",
+    "no": "Nee",
+    "yes": "Ja",
+    "failed": "Dat is niet gelukt. Probeer het opnieuw."
   }
 }

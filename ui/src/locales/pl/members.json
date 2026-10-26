@@ -3,10 +3,6 @@
   "inChannel_few": "Na {{channel}} ({{count}})",
   "inChannel_many": "Na {{channel}} ({{count}})",
   "inChannel_other": "Na {{channel}} ({{count}})",
-  "listening_one": "Słuchają ({{count}})",
-  "listening_few": "Słuchają ({{count}})",
-  "listening_many": "Słuchają ({{count}})",
-  "listening_other": "Słuchają ({{count}})",
   "noChannel": "Wybierz kanał, aby zobaczyć, kto na nim jest.",
   "nobody": "Nikogo tu nie ma.",
   "nobodyElse": "Nikogo innego nie ma na serwerze.",
@@ -15,6 +11,26 @@
   "registered": "Zarejestrowany(-a)",
   "unregistered": "Niezarejestrowany(-a)",
   "talking": "Mówi",
+  "quality": {
+    "label": "Połączenie",
+    "summary": "Połączenie: {{level}}",
+    "level": {
+      "good": "Dobre",
+      "fair": "Średnie",
+      "weak": "Słabe",
+      "unknown": "Nieznane"
+    },
+    "ping": "Ping",
+    "loss": "Utrata pakietów",
+    "late": "Spóźnione pakiety",
+    "bandwidth": "Przepustowość",
+    "transport": "Transport głosu",
+    "client": "Klient",
+    "os": "System operacyjny",
+    "ms": "{{value}} ms",
+    "percent": "{{value}} %",
+    "kbps": "{{value}} kbit/s"
+  },
   "card": {
     "close": "Zamknij",
     "loadFailed": "Nie udało się wczytać profilu.",
@@ -26,6 +42,9 @@
     "privateMessage": "Wiadomość prywatna",
     "localSettings": "Twoje ustawienia",
     "localSettingsHint": "Widzisz je tylko Ty. Zmiany zapisują się od razu.",
+    "settingsFor": "Ustawienia dla {{name}}",
+    "hintMuted": "Wyciszono",
+    "hintVolume": "Głośność {{value}} %",
     "localMuteHint": "Nie będziesz słyszeć tej osoby.",
     "privateNote": "Prywatna notatka",
     "privateNoteHint": "Tylko Ty widzisz tę notatkę.",
@@ -40,7 +59,8 @@
     "viewProfile": "Zobacz profil",
     "join": "Dołącz do {{channel}}",
     "joinDenied": "Nie masz uprawnień do wejścia na ten kanał.",
-    "mute": "Wycisz dla mnie"
+    "mute": "Wycisz dla mnie",
+    "connectionInfo": "Informacje o połączeniu…"
   },
   "nowPlaying": {
     "label": "Teraz gra",

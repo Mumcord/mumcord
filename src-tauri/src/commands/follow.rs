@@ -6,17 +6,19 @@ use specta::Type;
 use tauri::State;
 use tauri_specta::Event;
 
-use super::types::{ApiResult, ChannelId, Conversation};
+use super::types::{ApiResult, ChannelId, Conversation, ServerId, to_engine_server_id};
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, Type, Event)]
 #[serde(rename_all = "camelCase")]
 pub struct FollowedChannelsChanged {
+    pub server_id: ServerId,
     pub channel_ids: Vec<ChannelId>,
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, Type, Event)]
 #[serde(rename_all = "camelCase")]
 pub struct UnreadChanged {
+    pub server_id: ServerId,
     pub conversation: Conversation,
     pub count: u32,
 }
@@ -25,14 +27,24 @@ pub struct UnreadChanged {
 /// Fails with `serverTooOld`, `permissionDenied` or `listenerLimitReached`.
 #[tauri::command]
 #[specta::specta]
-pub async fn channel_follow(engine: State<'_, Engine>, channel_id: ChannelId) -> ApiResult<()> {
-    Ok(engine.channel_follow(channel_id).await?)
+pub async fn channel_follow(
+    engine: State<'_, Engine>,
+    server_id: ServerId,
+    channel_id: ChannelId,
+) -> ApiResult<()> {
+    Ok(engine
+        .channel_follow(to_engine_server_id(server_id), channel_id)
+        .await?)
 }
 
 #[tauri::command]
 #[specta::specta]
-pub fn channel_unfollow(engine: State<'_, Engine>, channel_id: ChannelId) -> ApiResult<()> {
-    Ok(engine.channel_unfollow(channel_id)?)
+pub fn channel_unfollow(
+    engine: State<'_, Engine>,
+    server_id: ServerId,
+    channel_id: ChannelId,
+) -> ApiResult<()> {
+    Ok(engine.channel_unfollow(to_engine_server_id(server_id), channel_id)?)
 }
 
 /// Outcome of "Follow all channels" (QA.13); already followed channels are not counted.
@@ -63,14 +75,20 @@ impl From<EngineSummary> for FollowAllSummary {
 /// server's listener limit. Fails with `serverTooOld`.
 #[tauri::command]
 #[specta::specta]
-pub async fn channel_follow_all(engine: State<'_, Engine>) -> ApiResult<FollowAllSummary> {
-    Ok(engine.channel_follow_all().await?.into())
+pub async fn channel_follow_all(
+    engine: State<'_, Engine>,
+    server_id: ServerId,
+) -> ApiResult<FollowAllSummary> {
+    Ok(engine
+        .channel_follow_all(to_engine_server_id(server_id))
+        .await?
+        .into())
 }
 
 #[tauri::command]
 #[specta::specta]
-pub fn channel_unfollow_all(engine: State<'_, Engine>) -> ApiResult<()> {
-    Ok(engine.channel_unfollow_all()?)
+pub fn channel_unfollow_all(engine: State<'_, Engine>, server_id: ServerId) -> ApiResult<()> {
+    Ok(engine.channel_unfollow_all(to_engine_server_id(server_id))?)
 }
 
 /// Resets the unread count of a conversation.
@@ -78,7 +96,8 @@ pub fn channel_unfollow_all(engine: State<'_, Engine>) -> ApiResult<()> {
 #[specta::specta]
 pub fn conversation_mark_read(
     engine: State<'_, Engine>,
+    server_id: ServerId,
     conversation: Conversation,
 ) -> ApiResult<()> {
-    Ok(engine.conversation_mark_read(conversation.into())?)
+    Ok(engine.conversation_mark_read(to_engine_server_id(server_id), conversation.into())?)
 }

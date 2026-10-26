@@ -5,6 +5,39 @@
     "remember": "Auswahl merken",
     "minimize": "In den Infobereich",
     "quit": "Beenden",
+    "failed": "Das hat nicht geklappt. Bitte versuche es erneut.",
+    "descriptionServers": "Du bist noch mit {{count}} Servern verbunden. Minimiert hält dich Mumcord im Sprachkanal und bleibt im Systembereich."
+  },
+  "windowOverlay": {
+    "title": "Das Fenster-Overlay wurde entfernt",
+    "description": "Das schwebende Overlay-Fenster gibt es nicht mehr. Stattdessen zeigt das In-Game-Overlay in deinen Spielen, wer spricht. Du kannst es in den Overlay-Einstellungen einschalten.",
+    "dismiss": "Verstanden",
+    "openSettings": "Overlay-Einstellungen öffnen"
+  },
+  "appImageMenu": {
+    "title": "Mumcord zum App-Menü hinzufügen?",
+    "description": "Damit erscheint Mumcord in deinem App-Menü. So funktionieren Symbol und Push-to-Talk unter Wayland richtig, und mumble://-Links öffnen Mumcord. Du kannst das später in den Einstellungen ändern.",
+    "no": "Nein",
+    "yes": "Ja",
+    "failed": "Das hat nicht geklappt. Bitte versuche es erneut."
+  },
+  "updateCheck": {
+    "title": "Nach neuen Versionen suchen?",
+    "description": "Mumcord kann einmal am Tag bei GitHub nachfragen, ob es eine neuere Version gibt, und dann einen Hinweis mit Link zeigen. Es wird nichts heruntergeladen oder installiert, und außer der Anfrage selbst sowie App-Name und Version wird nichts gesendet. Du kannst das später in den Einstellungen ändern.",
+    "no": "Nein",
+    "yes": "Ja",
+    "failed": "Das hat nicht geklappt. Bitte versuche es erneut."
+  },
+  "updateHint": {
+    "message": "Mumcord {{version}} ist verfügbar.",
+    "open": "Release ansehen",
+    "dismiss": "Ausblenden"
+  },
+  "directConsent": {
+    "title": "Direkte Verbindungen erlauben?",
+    "description": "Direkte Verbindungen sind schneller, aber die andere Person kann deine IP-Adresse sehen. Mumcord nutzt sie für Bilder in voller Größe und Bildschirmfreigabe mit anderen Mumcord-Nutzern und öffnet dafür eventuell einen Port an deinem Router. Wenn du Nein sagst, kommen Bilder weiterhin über den Server und Bildschirmfreigabe ist nicht verfügbar. Du kannst das später unter Einstellungen → Datenschutz ändern.",
+    "no": "Nein",
+    "yes": "Ja",
     "failed": "Das hat nicht geklappt. Bitte versuche es erneut."
   }
 }

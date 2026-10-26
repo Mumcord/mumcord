@@ -4,9 +4,17 @@
  */
 import { SAFE_LINK } from "./sanitize";
 
-export type Format = "bold" | "italic" | "strike" | "code" | "codeBlock" | "link";
+export type Format = "bold" | "italic" | "strike" | "code" | "codeBlock" | "link" | "quote";
 
-export const FORMATS: readonly Format[] = ["bold", "italic", "strike", "code", "codeBlock", "link"];
+export const FORMATS: readonly Format[] = [
+  "bold",
+  "italic",
+  "strike",
+  "code",
+  "codeBlock",
+  "link",
+  "quote",
+];
 
 /** Shortcut per format in `aria-keyshortcuts` syntax; shown in tooltips as well. */
 export const SHORTCUTS: Record<Format, string> = {
@@ -16,6 +24,7 @@ export const SHORTCUTS: Record<Format, string> = {
   code: "Control+E",
   codeBlock: "Control+Shift+E",
   link: "Control+K",
+  quote: "Control+Shift+9",
 };
 
 export interface Edit {
@@ -51,6 +60,22 @@ export function applyFormat(edit: Edit, format: Format): Edit {
       const after = end === text.length || text[end] === "\n" ? "\n```" : "\n```\n";
       return wrap(edit, before, after);
     }
+    case "quote": {
+      // Every line the selection touches; a caret at the very start of the next line is not on it.
+      const from = text.lastIndexOf("\n", start - 1) + 1;
+      const touchedEnd = end > start && text[end - 1] === "\n" ? end - 1 : end;
+      const nl = text.indexOf("\n", touchedEnd);
+      const to = nl === -1 ? text.length : nl;
+      const lines = text.slice(from, to).split("\n");
+      const allQuoted = lines.every((line) => line.startsWith("> "));
+      const changed = lines.map((line) => (allQuoted ? line.slice(2) : `> ${line}`)).join("\n");
+      const delta = allQuoted ? -2 : 2;
+      return {
+        text: text.slice(0, from) + changed + text.slice(to),
+        selectionStart: Math.max(from, start + delta),
+        selectionEnd: Math.max(from, end + delta * lines.length),
+      };
+    }
     case "link": {
       const selected = text.slice(start, end);
       if (SAFE_LINK.test(selected.trim())) {
@@ -80,6 +105,7 @@ export function formatForKey(event: ShortcutKey): Format | null {
   if (event.shiftKey) {
     if (key === "x") return "strike";
     if (key === "e") return "codeBlock";
+    if (key === "9" || key === "(") return "quote";
     return null;
   }
   if (key === "b") return "bold";

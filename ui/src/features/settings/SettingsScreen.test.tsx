@@ -5,6 +5,7 @@ import { createMockApi, setApi, type MockApi } from "../../api";
 import { PreferencesContext, type Preferences } from "../../app/preferences";
 import { applyLanguage } from "../../i18n";
 import { openInBrowser } from "../chat/openLink";
+import { chooseOption, optionLabels } from "../../components/SelectTestUtils";
 import { axeViolations } from "../../test/axe";
 import { applyThemeToDocument } from "../../theme/theme";
 import { pickOpenPath, pickSavePath } from "./fileDialogs";
@@ -54,6 +55,9 @@ function renderScreen() {
     language: "en",
     chatDisplay: "cozy",
     linkPreviews: true,
+    hideEmptyChannels: false,
+    talkingFirst: false,
+    showWeakConnectionIcon: true,
     applySettings,
   };
   return render(
@@ -81,18 +85,18 @@ describe("SettingsScreen", () => {
     const list = screen.getByRole("tablist", { name: "Settings sections" });
     expect(list).toHaveAttribute("aria-orientation", "vertical");
     const tabs = within(list).getAllByRole("tab");
-    expect(tabs).toHaveLength(11);
+    expect(tabs).toHaveLength(13);
     const identity = screen.getByRole("tab", { name: "Identity" });
     expect(identity).toHaveAttribute("aria-selected", "true");
     expect(identity).toHaveAttribute("tabindex", "0");
 
     fireEvent.keyDown(identity, { key: "ArrowDown" });
-    const audio = screen.getByRole("tab", { name: "Audio" });
-    expect(audio).toHaveFocus();
-    expect(audio).toHaveAttribute("aria-selected", "true");
-    expect(screen.getByRole("tabpanel", { name: "Audio" })).toBeInTheDocument();
+    const servers = screen.getByRole("tab", { name: "Servers" });
+    expect(servers).toHaveFocus();
+    expect(servers).toHaveAttribute("aria-selected", "true");
+    expect(screen.getByRole("tabpanel", { name: "Servers" })).toBeInTheDocument();
 
-    fireEvent.keyDown(audio, { key: "End" });
+    fireEvent.keyDown(servers, { key: "End" });
     expect(screen.getByRole("tab", { name: "About" })).toHaveFocus();
     fireEvent.keyDown(screen.getByRole("tab", { name: "About" }), { key: "ArrowDown" });
     expect(identity).toHaveFocus();
@@ -117,16 +121,18 @@ describe("SettingsScreen", () => {
   it("saves a change immediately and applies theme and language", async () => {
     const update = vi.spyOn(api, "settingsUpdate");
     await openSection("Appearance");
-    fireEvent.click(screen.getByRole("radio", { name: "Light" }));
+    chooseOption(screen.getByRole("combobox", { name: "Dark or light" }), "Light");
+    fireEvent.click(screen.getByRole("button", { name: "Forest, theme" }));
+    const light = { theme: "light", appThemeId: "preset:forest" };
     await waitFor(() => {
-      expect(applySettings).toHaveBeenCalledWith(expect.objectContaining({ theme: "light" }));
+      expect(applySettings).toHaveBeenCalledWith(expect.objectContaining(light));
     });
-    expect(update).toHaveBeenCalledWith(expect.objectContaining({ theme: "light" }));
+    expect(update).toHaveBeenCalledWith(expect.objectContaining(light));
 
     fireEvent.click(screen.getByRole("radio", { name: "Minimize to the tray" }));
     await waitFor(() => {
       expect(update).toHaveBeenLastCalledWith(
-        expect.objectContaining({ theme: "light", closeBehaviour: "minimizeToTray" }),
+        expect.objectContaining({ ...light, closeBehaviour: "minimizeToTray" }),
       );
     });
   });
@@ -242,6 +248,13 @@ describe("SettingsScreen", () => {
             mentionNotify: true,
             voiceJoin: true,
             hangUp: true,
+            partyStarted: true,
+            partyJoined: true,
+            partyLeft: true,
+            shareStarted: true,
+            shareStopped: true,
+            viewerStarted: true,
+            viewerStopped: true,
           },
         }),
       );
@@ -298,7 +311,7 @@ describe("SettingsScreen", () => {
 
   it("shows the overlay section", async () => {
     await openSection("Overlay");
-    expect(await screen.findByRole("switch", { name: "Show the overlay" })).toBeInTheDocument();
+    expect(await screen.findByRole("heading", { name: "In-game overlay" })).toBeInTheDocument();
   });
 
   it("offers the in-game overlay through the engine", async () => {
@@ -307,22 +320,6 @@ describe("SettingsScreen", () => {
     fireEvent.click(await screen.findByRole("radio", { name: "On" }));
     expect(setMode).toHaveBeenCalledWith("on");
     expect(screen.queryByText(/not available on this system/)).not.toBeInTheDocument();
-  });
-
-  it("jumps from the KDE overlay help to the compatibility mode switch", async () => {
-    const state = await api.overlayState();
-    vi.spyOn(api, "overlayState").mockResolvedValue({ ...state, kdeWayland: true });
-    vi.spyOn(api, "pttSession").mockResolvedValue({
-      waylandDesktop: true,
-      compatibilityActive: false,
-      kde: false,
-    });
-    await openSection("Overlay");
-    fireEvent.click(await screen.findByRole("button", { name: "Use compatibility mode instead" }));
-    const toggle = await screen.findByRole("switch", { name: /Compatibility mode/ });
-    await waitFor(() => {
-      expect(toggle).toHaveFocus();
-    });
   });
 });
 
@@ -341,14 +338,16 @@ describe("Audio section", () => {
     });
     const update = vi.spyOn(api, "settingsUpdate");
     await openSection("Audio");
-    expect(await screen.findByRole("option", { name: "Default ALSA Input" })).toBeInTheDocument();
-    const mic = screen.getByRole("combobox", { name: "Microphone" });
-    expect(mic).toHaveValue("");
-    fireEvent.change(mic, { target: { value: "mic-usb" } });
+    const mic = await screen.findByRole("combobox", { name: "Microphone" });
+    await waitFor(() => {
+      expect(optionLabels(mic)).toContain("Default ALSA Input");
+    });
+    expect(mic).toHaveTextContent("System default");
+    chooseOption(mic, "USB Headset");
     await waitFor(() => {
       expect(update).toHaveBeenLastCalledWith(expect.objectContaining({ inputDevice: "mic-usb" }));
     });
-    fireEvent.change(mic, { target: { value: "" } });
+    chooseOption(mic, "System default");
     await waitFor(() => {
       expect(update).toHaveBeenLastCalledWith(expect.objectContaining({ inputDevice: null }));
     });
@@ -356,13 +355,16 @@ describe("Audio section", () => {
 
   it("follows hot-plugged devices", async () => {
     await openSection("Audio");
-    await screen.findAllByRole("option", { name: "USB Headset" });
+    const mic = await screen.findByRole("combobox", { name: "Microphone" });
+    await waitFor(() => {
+      expect(optionLabels(mic)).toContain("USB Headset");
+    });
     act(() => {
       api.mock.emit("audioDevicesChanged", {
         devices: { inputs: [{ id: "new", name: "Webcam Mic", isDefault: false }], outputs: [] },
       });
     });
-    expect(screen.getByRole("option", { name: "Webcam Mic" })).toBeInTheDocument();
+    expect(optionLabels(mic)).toContain("Webcam Mic");
   });
 
   it("runs the microphone test through the engine's phases with a level meter", async () => {
@@ -768,22 +770,74 @@ describe("Audio section music quality", () => {
   });
 });
 
+describe("Audio section video ducking (FR-2.76)", () => {
+  it("is on at 30 % by default and saves the switch and the slider", async () => {
+    const update = vi.spyOn(api, "settingsUpdate");
+    await openSection("Audio");
+    const toggle = screen.getByRole("switch", { name: "Lower video sound while people talk" });
+    expect(toggle).toBeChecked();
+    const slider = screen.getByRole("slider", { name: "Lowered volume" });
+    expect(slider).toHaveValue("30");
+    fireEvent.change(slider, { target: { value: "60" } });
+    await waitFor(() => {
+      expect(update).toHaveBeenLastCalledWith(expect.objectContaining({ videoDuckingPercent: 60 }));
+    });
+    fireEvent.click(toggle);
+    await waitFor(() => {
+      expect(update).toHaveBeenLastCalledWith(expect.objectContaining({ videoDucking: false }));
+    });
+    expect(slider).toBeDisabled();
+  });
+});
+
+describe("Audio section bitrate slider", () => {
+  it("defaults to 96 kbit/s, says the maximum depends on the server while not connected", async () => {
+    await openSection("Audio");
+    const slider = screen.getByRole("slider", { name: "Bitrate" });
+    expect(slider).toHaveAttribute("aria-valuetext", "96 kbit/s");
+    expect(slider).toHaveAttribute("min", "16");
+    expect(screen.getByText(/Maximum: depends on server/)).toBeInTheDocument();
+  });
+
+  it("shows the server maximum, follows changes and saves a lower value live", async () => {
+    vi.spyOn(api, "bitrateMax").mockResolvedValue(96);
+    const update = vi.spyOn(api, "settingsUpdate");
+    await openSection("Audio");
+    const slider = await screen.findByRole("slider", { name: "Bitrate" });
+    await screen.findByText(/Maximum: 96 kbit\/s/);
+    expect(slider).toHaveAttribute("max", "96");
+
+    fireEvent.change(slider, { target: { value: "32" } });
+    await waitFor(() => {
+      expect(update).toHaveBeenLastCalledWith(expect.objectContaining({ bitrateKbps: 32 }));
+    });
+    expect(slider).toHaveAttribute("aria-valuetext", "32 kbit/s");
+
+    act(() => {
+      api.mock.emit("bitrateMaxChanged", { kbps: 384 });
+    });
+    await screen.findByText(/Maximum: 384 kbit\/s/);
+    expect(slider).toHaveAttribute("max", "384");
+
+    fireEvent.change(slider, { target: { value: "384" } });
+    await waitFor(() => {
+      expect(update).toHaveBeenLastCalledWith(expect.objectContaining({ bitrateKbps: null }));
+    });
+  });
+});
+
 describe("Chat & history section", () => {
   it("offers the preview cache age with 7 days as the default and saves a change", async () => {
     const update = vi.spyOn(api, "settingsUpdate");
     await openSection("Chat & history");
     const select = screen.getByRole("combobox", { name: "Delete cached previews after" });
-    expect(select).toHaveValue("7");
-    expect(
-      within(select)
-        .getAllByRole("option")
-        .map((o) => o.textContent),
-    ).toEqual(["1 day", "7 days", "30 days", "Never"]);
-    fireEvent.change(select, { target: { value: "30" } });
+    expect(select).toHaveTextContent("7 days");
+    expect(optionLabels(select)).toEqual(["1 day", "7 days", "30 days", "Never"]);
+    chooseOption(select, "30 days");
     await waitFor(() => {
       expect(update).toHaveBeenLastCalledWith(expect.objectContaining({ previewCacheDays: 30 }));
     });
-    fireEvent.change(select, { target: { value: "none" } });
+    chooseOption(select, "Never");
     await waitFor(() => {
       expect(update).toHaveBeenLastCalledWith(expect.objectContaining({ previewCacheDays: null }));
     });
@@ -812,16 +866,18 @@ describe("Chat & history section", () => {
     const update = vi.spyOn(api, "settingsUpdate");
     await openSection("Chat & history");
     const select = screen.getByRole("combobox", { name: "Delete chat history older than" });
-    expect(select).toHaveValue("none");
-    expect(
-      within(select)
-        .getAllByRole("option")
-        .map((o) => o.textContent),
-    ).toEqual(["7 days", "30 days", "90 days", "365 days", "Never (keep everything)"]);
+    expect(select).toHaveTextContent("Never (keep everything)");
+    expect(optionLabels(select)).toEqual([
+      "7 days",
+      "30 days",
+      "90 days",
+      "365 days",
+      "Never (keep everything)",
+    ]);
     expect(
       screen.getByText(/deleted from this computer automatically, without asking/),
     ).toBeVisible();
-    fireEvent.change(select, { target: { value: "90" } });
+    chooseOption(select, "90 days");
     await waitFor(() => {
       expect(update).toHaveBeenLastCalledWith(expect.objectContaining({ historyMaxAgeDays: 90 }));
     });
@@ -993,9 +1049,10 @@ describe("Diagnostics section", () => {
     const update = vi.spyOn(api, "settingsUpdate");
     const save = vi.spyOn(api, "diagnosticsSave");
     await openSection("Diagnostics");
-    fireEvent.change(screen.getByRole("combobox", { name: "Log detail" }), {
-      target: { value: "debug" },
-    });
+    chooseOption(
+      screen.getByRole("combobox", { name: "Log detail" }),
+      "Detailed (for troubleshooting)",
+    );
     await waitFor(() => {
       expect(update).toHaveBeenCalledWith(expect.objectContaining({ logLevel: "debug" }));
     });
@@ -1160,6 +1217,8 @@ describe("Overlay on macOS (QA.58)", () => {
       version: "0.0.0",
       os: "macos aarch64",
       thirdPartyNotices: "",
+      appimage: false,
+      distro: null,
     });
 
   it("hides the Overlay section and its search entries", async () => {
@@ -1168,7 +1227,7 @@ describe("Overlay on macOS (QA.58)", () => {
     await waitFor(() => {
       expect(screen.queryByRole("tab", { name: "Overlay" })).toBeNull();
     });
-    expect(screen.getAllByRole("tab")).toHaveLength(10);
+    expect(screen.getAllByRole("tab")).toHaveLength(12);
     fireEvent.change(screen.getByRole("searchbox", { name: "Search settings" }), {
       target: { value: "overlay" },
     });
@@ -1180,6 +1239,8 @@ describe("Overlay on macOS (QA.58)", () => {
       version: "0.0.0",
       os: "linux x86_64",
       thirdPartyNotices: "",
+      appimage: false,
+      distro: null,
     });
     renderScreen();
     expect(await screen.findByRole("tab", { name: "Overlay" })).toBeInTheDocument();

@@ -13,8 +13,9 @@ describe("tauri client", () => {
   it("passes arguments through and resolves with the data", async () => {
     invoke.mockResolvedValue([]);
     const api = createTauriApi();
-    expect(await api.historyLoad({ kind: "channel", channelId: 3 }, null, 20)).toEqual([]);
+    expect(await api.historyLoad(1, { kind: "channel", channelId: 3 }, null, 20)).toEqual([]);
     expect(invoke).toHaveBeenCalledWith("history_load", {
+      serverId: 1,
       conversation: { kind: "channel", channelId: 3 },
       before: null,
       limit: 20,

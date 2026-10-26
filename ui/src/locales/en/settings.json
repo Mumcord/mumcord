@@ -14,7 +14,9 @@
     "sounds": "Sounds & notifications",
     "overlay": "Overlay",
     "diagnostics": "Diagnostics",
-    "about": "About"
+    "about": "About",
+    "servers": "Servers",
+    "privacy": "Privacy"
   },
   "search": {
     "label": "Search settings",
@@ -68,7 +70,17 @@
     "testPlaying": "Playing back your voice…",
     "quality": "Quality",
     "musicQuality": "Music quality",
-    "musicQualityHint": "Uses more bandwidth and turns off noise suppression and automatic volume; for music. Push-to-talk works best."
+    "musicQualityHint": "Tunes the encoder for music and turns off noise suppression and automatic volume; for music. Push-to-talk works best.",
+    "bitrate": "Bitrate",
+    "bitrateMax": "Max",
+    "bitrateValue": "{{kbps}} kbit/s",
+    "bitrateMaxKnown": "Maximum: {{kbps}} kbit/s. Loss on the connection can still lower it.",
+    "bitrateMaxUnknown": "Maximum: depends on server. Loss on the connection can still lower it.",
+    "videoSound": "Video sound",
+    "ducking": "Lower video sound while people talk",
+    "duckingHint": "The watch-party video and screen-share sound get quieter while someone in your voice channel talks.",
+    "duckingLevel": "Lowered volume",
+    "duckingLevelValue": "{{percent}} %"
   },
   "voice": {
     "talkMode": "Talk mode",
@@ -178,6 +190,7 @@
     "compact": "Compact: time, name and message on one line",
     "theme": "Theme",
     "themeLegend": "Colour theme",
+    "modeLegend": "Dark or light",
     "system": "Follow system",
     "dark": "Dark",
     "light": "Light",
@@ -189,6 +202,61 @@
     "autostart": "Start Mumcord when I log in",
     "startMinimized": "Start minimized",
     "startMinimizedHint": "When Mumcord starts at login, it waits in the tray instead of opening the window."
+  },
+  "themeEditor": {
+    "name": "Theme name",
+    "colorsLegend": "Key colours",
+    "colorColumn": "Colour",
+    "auto": "auto",
+    "cellLabel": "{{color}}, {{version}}",
+    "newTitle": "New theme",
+    "editTitle": "Edit “{{name}}”",
+    "generatedFromDark": "Made automatically from the dark version. It follows your changes there until you change it here.",
+    "generatedFromLight": "Made automatically from the light version. It follows your changes there until you change it here.",
+    "colors": {
+      "background": "Background",
+      "surface": "Surface",
+      "text": "Text",
+      "accent": "Accent",
+      "talking": "Talking and online",
+      "warning": "Warning",
+      "error": "Error"
+    },
+    "pickColor": "{{color}} colour picker",
+    "invalidHex": "Enter the colour as # followed by six hex digits, for example #1a2b3c.",
+    "contrastLowIn": "{{version}}: contrast too low: {{ratio}}:1, needs at least {{min}}:1.",
+    "unreadable": "This theme isn't readable enough. Change the text or background colour to save it.",
+    "copyName": "{{name}} (copy)",
+    "save": "Save theme",
+    "saveAs": "Save as theme",
+    "saved": "Theme saved.",
+    "share": "Share",
+    "shared": "Theme copied. Paste it into a chat to share it.",
+    "shareFailed": "Mumcord couldn't copy the theme to the clipboard.",
+    "import": "Import…",
+    "importTitle": "Import a theme",
+    "importLabel": "Theme message or code",
+    "importHint": "Paste a chat message with a Mumcord theme, or just its code (it starts with mct1.).",
+    "importConfirm": "Import",
+    "importInvalid": "This isn't a valid Mumcord theme.",
+    "importUnreadable": "This theme isn't readable enough.",
+    "imported": "Imported “{{name}}”.",
+    "alreadyImported": "“{{name}}” is already in your themes.",
+    "madeWithNewer": "Made with Mumcord {{version}} – update to see it fully.",
+    "reset": "Reset",
+    "menuLabel": "Options for {{name}}",
+    "edit": "Edit theme",
+    "newFromThis": "New theme from this",
+    "preview": "Preview",
+    "previewing": "Previewing {{name}}",
+    "backToEditor": "Back to editor",
+    "rename": "Rename theme",
+    "renameTitle": "Rename “{{name}}”",
+    "renameConfirm": "Rename",
+    "delete": "Delete theme",
+    "deleteTitle": "Delete “{{name}}”?",
+    "deleteMessage": "Servers that use this theme go back to the app theme.",
+    "deleteConfirm": "Delete"
   },
   "accessibility": {
     "hints": "Hints",
@@ -212,7 +280,14 @@
     "hangUp": "You disconnect from a server",
     "messages": "New message in a followed channel or private chat",
     "mention": "Sound when mentioned",
-    "mentionNotify": "Notify when mentioned"
+    "mentionNotify": "Notify when mentioned",
+    "partyStarted": "Someone starts a watch party in your channel",
+    "partyJoined": "Someone joins your watch party",
+    "partyLeft": "Someone leaves your watch party",
+    "shareStarted": "Someone starts a screen share in your channel",
+    "shareStopped": "A screen share in your channel ends",
+    "viewerStarted": "Someone starts watching your screen share",
+    "viewerStopped": "Someone stops watching your screen share"
   },
   "notifications": {
     "title": "Notifications",
@@ -224,29 +299,6 @@
     "off": "Off"
   },
   "overlay": {
-    "window": {
-      "title": "Window overlay",
-      "enable": "Show the overlay",
-      "enableHint": "A small transparent window that shows who is talking. Also available from the tray menu.",
-      "positionUnsupported": "This desktop decides where windows appear, so corner positions and moving have no effect.",
-      "move": "Move overlay…",
-      "moveDone": "Done moving",
-      "size": "Width",
-      "wholeChannel": "Show the whole channel",
-      "wholeChannelHint": "Off: only people who are talking.",
-      "channelName": "Show the channel name",
-      "loadFailed": "The overlay options could not be loaded.",
-      "saveFailed": "The overlay change could not be applied.",
-      "kwin": {
-        "setUp": "Set up automatically",
-        "done": "Done: the KDE window rule “Mumcord overlay” is active.",
-        "removed": "The KDE window rule was removed.",
-        "remove": "Remove rule",
-        "openRules": "Open KDE window rules",
-        "compat": "Use compatibility mode instead",
-        "failed": "The KDE window rule could not be changed. Open the KDE window rules to add it by hand."
-      }
-    },
     "corner": {
       "label": "Position",
       "topLeft": "Top left",
@@ -273,16 +325,24 @@
       "options": "Options for {{game}}",
       "reset": "Use default for {{game}}",
       "size": "Size",
-      "unsupported": "The in-game overlay is not available on this system. The window overlay above is used instead.",
+      "unsupported": "The in-game overlay is not available on this system.",
       "loadFailed": "The in-game overlay settings could not be loaded.",
       "saveFailed": "The in-game overlay change could not be applied.",
+      "opengl": {
+        "title": "OpenGL games",
+        "explanation": "Only needed for OpenGL games: paste into the game's Steam launch options.",
+        "label": "Steam launch option",
+        "copy": "Copy",
+        "copied": "Copied",
+        "copyFailed": "Copying failed. Select the text and copy it by hand."
+      },
       "confirmTitle": "Enable the overlay for {{game}}?",
       "confirmMessage": "Warning: {{game}} uses anti-cheat protection ({{reason}}). Overlays can be detected as cheating and your account may be banned. Mumcord is not responsible for that. Only continue if you accept this risk.",
       "confirmEnable": "Enable anyway",
       "limits": {
-        "libraryMissing": "The in-game overlay is not available: its overlay library (libmumcord_overlay_layer.so) was not found next to Mumcord. Reinstall Mumcord to restore it. The window overlay above is used instead.",
-        "windowsPending": "The in-game overlay is not available on Windows yet. The window overlay above is used instead.",
-        "macos": "macOS does not support in-game overlays. The window overlay above is used instead."
+        "libraryMissing": "The in-game overlay is not available: its overlay library (libmumcord_overlay_layer.so) was not found next to Mumcord. Reinstall Mumcord to restore it.",
+        "windowsFullscreen": "Use borderless or windowed fullscreen in the game.",
+        "macos": "macOS does not support in-game overlays."
       }
     }
   },
@@ -388,5 +448,38 @@
       "unsupported": "Not available on this system.",
       "failed": "Stopped after an error. Turn it off and on again to retry."
     }
+  },
+  "servers": {
+    "connections": "Connections",
+    "limit": "Connected servers at once",
+    "limitHint": "Between 1 and 15. Connecting beyond the limit is refused.",
+    "limitInvalid": "Enter a whole number from 1 to 15."
+  },
+  "appearanceEffects": {
+    "title": "Effects",
+    "visualEffects": "Visual effects (glass, grain)",
+    "visualEffectsHint": "Frosted-glass menus and a subtle film grain. Turned off automatically when your system asks for reduced transparency or motion."
+  },
+  "channelList": {
+    "title": "Channel list",
+    "hideEmpty": "Hide empty channels",
+    "talkingFirst": "Show talking people first",
+    "weakConnection": "Show weak connection icon",
+    "weakConnectionHint": "A small signal icon next to people whose connection is poor."
+  },
+  "privacyDirect": {
+    "title": "Direct connections",
+    "allow": "Allow direct connections to other Mumcord users",
+    "hint": "Direct connections are faster, but the other person can see your IP address. Until you decide, Mumcord asks the first time one would be used."
+  },
+  "updates": {
+    "title": "Updates",
+    "check": "Check for new versions",
+    "hint": "Once a day Mumcord asks GitHub for the latest release. Nothing else is sent."
+  },
+  "appImageMenu": {
+    "label": "Add Mumcord to the app menu",
+    "hint": "Makes the icon and push-to-talk work properly on Wayland and lets mumble:// links open Mumcord. Only for the AppImage.",
+    "failed": "That did not work. Please try again."
   }
 }

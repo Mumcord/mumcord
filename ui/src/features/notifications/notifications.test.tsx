@@ -2,7 +2,7 @@ import { act, fireEvent, render, screen, waitFor, within } from "@testing-librar
 import { afterEach, describe, expect, it, vi } from "vitest";
 import type { Conversation, MockApi, NotificationMode } from "../../api";
 import { axeViolations } from "../../test/axe";
-import { getSelectedConversation, selectConversation } from "../channels";
+import { getSelectedConversation, selectConversation, shownServerId } from "../channels";
 import { connectedMock, resetAll } from "../channels/testUtils";
 import { resetChatStore } from "../chat/chatStore";
 import { MAX_PREVIEW, plainPreview } from "./preview";
@@ -15,10 +15,13 @@ const AFK: Conversation = { kind: "channel", channelId: 3 };
 const ANNA = 2;
 let api: MockApi;
 
-async function setup(options: { mode?: NotificationMode; overlayOpen?: boolean } = {}) {
+async function setup(
+  options: { mode?: NotificationMode; overlayOpen?: boolean; muted?: boolean } = {},
+) {
   resetNotifications();
   api = await connectedMock();
   resetChatStore();
+  if (options.muted) await api.serverSetNotificationsMuted(1, true);
   if (options.mode) {
     const settings = await api.settingsGet();
     await api.settingsUpdate({ ...settings, notifications: options.mode });
@@ -65,11 +68,19 @@ describe("message toasts", () => {
     expect(await axeViolations(view.container)).toEqual([]);
   });
 
+  it("stays silent for a muted server and is quiet", async () => {
+    await setup({ muted: true });
+    await act(() => Promise.resolve());
+    receive(RAID, "muted");
+    await act(() => Promise.resolve());
+    expect(within(toastRegion()).queryByRole("button")).toBeNull();
+  });
+
   it("stays silent for the chat on screen and for own messages", async () => {
     await setup();
     receive(LOBBY, "visible already");
     await act(async () => {
-      await api.sendChannelMessage(2, "mine @zoe");
+      await api.sendChannelMessage(1, 2, "mine @zoe");
     });
     await act(() => Promise.resolve());
     expect(within(toastRegion()).queryByRole("button")).toBeNull();
@@ -99,7 +110,7 @@ describe("message toasts", () => {
       );
     });
     expect(within(toastRegion()).queryByRole("button", { name: /#Raid/ })).toBeNull();
-    expect(within(toastRegion()).getByRole("button", { name: /^Ben/ })).toHaveTextContent("psst");
+    expect(within(toastRegion()).getByRole("button", { name: /Ben/ })).toHaveTextContent("psst");
   });
 
   it("opens and focuses the chat on click and forgets the count", async () => {
@@ -117,7 +128,7 @@ describe("message toasts", () => {
       selectConversation(LOBBY);
     });
     receive(RAID, "three");
-    expect(await within(toastRegion()).findByRole("button", { name: /^#Raid/ })).toHaveTextContent(
+    expect(await within(toastRegion()).findByRole("button", { name: /#Raid/ })).toHaveTextContent(
       "Anna: three",
     );
   });
@@ -125,7 +136,7 @@ describe("message toasts", () => {
   it("opens the chat when a desktop notification is clicked", async () => {
     await setup();
     act(() => {
-      api.mock.emit("notificationActivated", { conversation: RAID });
+      api.mock.emit("notificationActivated", { serverId: shownServerId(), conversation: RAID });
     });
     expect(getSelectedConversation()).toEqual(RAID);
   });
@@ -170,7 +181,7 @@ describe("notification setting", () => {
     expect(api.mock.desktopNotices()[1]).toMatchObject({
       conversation: RAID,
       onScreen: false,
-      summary: "2 new messages in #Raid",
+      summary: expect.stringMatching(/^.+ · 2 new messages in #Raid$/) as string,
       body: "Anna: two",
     });
     expect(within(toastRegion()).queryByRole("button")).toBeNull();
@@ -241,6 +252,31 @@ describe("mentions", () => {
     const toast = await within(toastRegion()).findByRole("button", { name: /#AFK/ });
     expect(toast).toHaveTextContent("Anna: hey @zoe, look");
     expect(api.mock.messageSounds()).toEqual(["mention"]);
+  });
+
+  it("treats a reply to an own message as a mention (FR-2.67)", async () => {
+    await setup();
+    receive(AFK, "<blockquote><b>Zoe</b>: lunch at noon?</blockquote>sure");
+    const toast = await within(toastRegion()).findByRole("button", { name: /#AFK/ });
+    expect(toast).toHaveTextContent("Anna mentioned you: Zoe: lunch at noon? sure");
+    expect(api.mock.messageSounds()).toEqual(["mention"]);
+  });
+
+  it("does not treat a reply to someone else as a mention", async () => {
+    await setup();
+    receive(AFK, "<blockquote><b>Anna</b>: lunch at noon?</blockquote>sure");
+    const toast = await within(toastRegion()).findByRole("button", { name: /#AFK/ });
+    expect(toast).not.toHaveTextContent("mentioned you");
+    expect(api.mock.messageSounds()).toEqual(["message"]);
+  });
+
+  it("stays silent for a reply mention on a muted server", async () => {
+    await setup({ muted: true });
+    await act(() => Promise.resolve());
+    receive(AFK, "<blockquote><b>Zoe</b>: lunch at noon?</blockquote>sure");
+    await act(() => Promise.resolve());
+    expect(within(toastRegion()).queryByRole("button")).toBeNull();
+    expect(api.mock.messageSounds()).toEqual([]);
   });
 
   it("does not treat an email address as a mention", async () => {

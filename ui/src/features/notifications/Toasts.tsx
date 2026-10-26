@@ -7,7 +7,7 @@ import { markSeen, removeToast, useToasts, type Toast } from "./notificationStor
 export const TOAST_MS = 6000;
 
 interface ToastsProps {
-  onOpen: (conversation: Conversation) => void;
+  onOpen: (serverId: number, conversation: Conversation) => void;
 }
 
 /** Closing a focused toast must not drop keyboard focus onto the page body. */
@@ -22,7 +22,7 @@ function ToastItem({
 }: {
   toast: Toast;
   paused: boolean;
-  onOpen: (conversation: Conversation) => void;
+  onOpen: (serverId: number, conversation: Conversation) => void;
 }) {
   const { t } = useTranslation("notifications");
 
@@ -54,7 +54,7 @@ function ToastItem({
         className="toast__open"
         onKeyDown={closeOnEscape}
         onClick={() => {
-          onOpen(toast.conversation);
+          onOpen(toast.serverId, toast.conversation);
         }}
       >
         <span className="toast__title">{toast.title}</span>

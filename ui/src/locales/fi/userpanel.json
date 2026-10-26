@@ -32,7 +32,15 @@
     "avatarUnregistered": "Tämä palvelin säilyttää profiilikuvat vain rekisteröityneille käyttäjille – Mumcord lähettää omasi uudelleen jokaisella yhdistämiskerralla.",
     "avatarChosen": "Valittu: {{name}}",
     "avatarRemoved": "Kuva poistetaan, kun tallennat.",
-    "comment": "Tietoa sinusta"
+    "comment": "Tietoa sinusta",
+    "format": "Tekstin muotoilu",
+    "bold": "Lihavointi",
+    "italic": "Kursivointi",
+    "link": "Linkki",
+    "linkAddress": "Linkin osoite",
+    "linkApply": "Lisää linkki",
+    "bulletList": "Luettelomerkit",
+    "numberedList": "Numeroitu luettelo"
   },
   "register": {
     "title": "Rekisteröidy tälle palvelimelle",
@@ -69,8 +77,6 @@
     "nowGaming": "Jaa peli, jota pelaan",
     "nowGamingHint": "Muut näkevät nykyisen pelisi",
     "unavailable": "Ei käytettävissä tässä järjestelmässä",
-    "overlay": "Peittokuva",
-    "overlayHint": "Näyttää pelien päällä, kuka puhuu",
     "editProfile": "Muokkaa profiilia",
     "editProfileHint": "Nimi, profiilikuva ja kommentti",
     "register": "Rekisteröidy tälle palvelimelle",
@@ -84,5 +90,10 @@
     "offerImagesHint": "Anna muiden ladata alkuperäiset kuvasi",
     "loadImages": "Lataa täysikokoiset kuvat",
     "loadImagesHint": "Hae alkuperäiset kuvat muilta"
+  },
+  "voice": {
+    "line": "Puhe: {{channel}} · {{server}}",
+    "server": "Puhe: {{server}}",
+    "show": "{{location}} – näytä tämä palvelin"
   }
 }

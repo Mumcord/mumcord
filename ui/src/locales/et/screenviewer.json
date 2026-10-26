@@ -1,0 +1,21 @@
+{
+  "label": "Ekraani jagamine: {{name}}",
+  "title": "Ekraan: {{name}}",
+  "beta": "Beeta",
+  "picture": "Jagatud ekraan: {{name}}",
+  "someone": "Keegi",
+  "live": "Otse",
+  "collapse": "Ahenda",
+  "expand": "Laienda",
+  "fullscreen": "Täisekraan",
+  "exitFullscreen": "Välju täisekraanist",
+  "stop": "Lõpeta vaatamine",
+  "starting": "Ühendumine ekraaniga: {{name}}…",
+  "paused": "{{name}} peatas jagamise.",
+  "full": "See jagamine on täis.",
+  "unreachable": "Kasutajaga {{name}} ei saanud otse ühendust. Võrk võib otseühendusi blokeerida.",
+  "tooOld": "Kasutaja {{name}} Mumcord on sinuga ekraani jagamiseks liiga vana.",
+  "consentOff": "Vaatamine vajab otseühendusi ja sa oled need välja lülitanud.",
+  "failed": "Ekraani ({{name}}) ei õnnestunud avada.",
+  "retry": "Proovi uuesti"
+}

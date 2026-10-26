@@ -32,7 +32,15 @@
     "avatarUnregistered": "Ovaj poslužitelj čuva avatare samo za registrirane korisnike – Mumcord ponovno šalje tvoj pri svakom povezivanju.",
     "avatarChosen": "Odabrano: {{name}}",
     "avatarRemoved": "Slika će biti uklonjena kad spremiš.",
-    "comment": "O tebi"
+    "comment": "O tebi",
+    "format": "Oblikovanje teksta",
+    "bold": "Podebljano",
+    "italic": "Kurziv",
+    "link": "Poveznica",
+    "linkAddress": "Adresa poveznice",
+    "linkApply": "Dodaj poveznicu",
+    "bulletList": "Popis s grafičkim oznakama",
+    "numberedList": "Numerirani popis"
   },
   "register": {
     "title": "Registriraj se na ovom poslužitelju",
@@ -69,8 +77,6 @@
     "nowGaming": "Dijeli igru koju igram",
     "nowGamingHint": "Drugi vide tvoju trenutnu igru",
     "unavailable": "Nije dostupno na ovom sustavu",
-    "overlay": "Overlay",
-    "overlayHint": "Prikazuje tko govori preko igara",
     "editProfile": "Uredi profil",
     "editProfileHint": "Ime, avatar i komentar",
     "register": "Registriraj se na ovom poslužitelju",
@@ -84,5 +90,10 @@
     "offerImagesHint": "Dopusti drugima da učitaju tvoje originalne slike",
     "loadImages": "Učitavaj slike pune veličine",
     "loadImagesHint": "Dohvaćaj originalne slike od drugih"
+  },
+  "voice": {
+    "line": "Glas: {{channel}} · {{server}}",
+    "server": "Glas: {{server}}",
+    "show": "{{location}} – prikaži ovaj poslužitelj"
   }
 }

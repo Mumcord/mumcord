@@ -1,0 +1,21 @@
+{
+  "label": "Skärmdelning från {{name}}",
+  "title": "{{name}}s skärm",
+  "beta": "Beta",
+  "picture": "Delad skärm från {{name}}",
+  "someone": "Någon",
+  "live": "Live",
+  "collapse": "Fäll ihop",
+  "expand": "Fäll ut",
+  "fullscreen": "Helskärm",
+  "exitFullscreen": "Lämna helskärm",
+  "stop": "Sluta titta",
+  "starting": "Ansluter till {{name}}s skärm…",
+  "paused": "{{name}} pausade delningen.",
+  "full": "Den här delningen är full.",
+  "unreachable": "Kunde inte nå {{name}} direkt. Nätverket kanske blockerar direktanslutningar.",
+  "tooOld": "{{name}}s Mumcord är för gammal för att dela skärmen med dig.",
+  "consentOff": "Att titta kräver direktanslutningar, och du har stängt av dem.",
+  "failed": "{{name}}s skärm kunde inte öppnas.",
+  "retry": "Försök igen"
+}

@@ -12,7 +12,8 @@ use crate::web::meta::clean;
 
 /// Plugin data id of the payload; other ids are ignored.
 pub const DATA_ID: &str = "mumcord.nowgaming";
-/// The only payload version this client speaks.
+/// The payload version this client sends. Any version >= 1 is accepted on receipt and unknown
+/// fields are ignored. Minor additions keep v=1 and old clients ignore unknown fields; a breaking change gets a new data id.
 pub const VERSION: u32 = 1;
 /// Longest game name kept (characters).
 pub const MAX_NAME: usize = 100;
@@ -100,7 +101,7 @@ pub fn decode(data: &[u8]) -> Result<Option<SharedGame>, PayloadError> {
         return Err(PayloadError::TooLarge);
     }
     let wire: Wire = serde_json::from_slice(data).map_err(|_| PayloadError::Malformed)?;
-    if wire.v != VERSION {
+    if wire.v < VERSION {
         return Err(PayloadError::Version(wire.v));
     }
     let Some(name) = wire.game.as_deref().and_then(|g| clean(g, MAX_NAME)) else {
@@ -178,6 +179,15 @@ mod tests {
     }
 
     #[test]
+    fn newer_version_with_extra_fields_decodes() {
+        let decoded = decode(br#"{"v":2,"game":"x","steam_app_id":730,"future":{"a":1}}"#)
+            .expect("valid")
+            .expect("game");
+        assert_eq!(decoded.name, "x");
+        assert_eq!(decoded.steam_app_id, Some(730));
+    }
+
+    #[test]
     fn untrusted_input_is_capped_and_filtered() {
         assert_eq!(
             decode(&vec![b' '; PLUGIN_DATA_MAX + 1]),
@@ -185,8 +195,8 @@ mod tests {
         );
         assert_eq!(decode(b"not json"), Err(PayloadError::Malformed));
         assert_eq!(
-            decode(br#"{"v":2,"game":"x"}"#),
-            Err(PayloadError::Version(2))
+            decode(br#"{"v":0,"game":"x"}"#),
+            Err(PayloadError::Version(0))
         );
         let decoded =
             decode(br#"{"v":1,"game":"a\u0000b\u202e","steam_app_id":0,"join":"steam://run/730"}"#)

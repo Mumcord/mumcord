@@ -13,10 +13,15 @@
     "listLabel": "Gemte servere",
     "add": "Tilføj en server",
     "keyboardHint": "Enter forbinder. Alt plus pil op eller ned flytter serveren. Shift plus F10 åbner flere muligheder.",
-    "status": {
-      "connected": "{{server}} (forbundet)",
-      "connecting": "{{server}} (forbinder)",
-      "reconnecting": "{{server}} (forbinder igen)"
+    "label": "{{server}} ({{state}})",
+    "state": {
+      "connected": "forbundet",
+      "connecting": "forbinder",
+      "reconnecting": "forbinder igen",
+      "error": "forbindelse mistet",
+      "voice": "taleserver",
+      "unread": "ulæste beskeder",
+      "mentions": "omtaler: {{mentions}}"
     }
   },
   "menu": {
@@ -26,7 +31,19 @@
     "edit": "Rediger server",
     "moveUp": "Flyt op",
     "moveDown": "Flyt ned",
-    "remove": "Fjern server"
+    "remove": "Fjern server",
+    "reconnect": "Forbind igen",
+    "alwaysConnect": "Forbind altid ved start",
+    "muteNotifications": "Slå notifikationer fra",
+    "theme": "Tema…",
+    "showWelcome": "Vis velkomstbesked"
+  },
+  "theme": {
+    "title": "Tema for {{server}}",
+    "label": "Tema",
+    "useApp": "Brug appens tema",
+    "hint": "Gælder, mens denne server vises.",
+    "failed": "Temaet kunne ikke gemmes. Prøv igen."
   },
   "dialog": {
     "addTitle": "Tilføj en server",
@@ -50,7 +67,14 @@
       "username": "Skriv det navn, du vil bruge på denne server.",
       "link": "Dette mumble://-link kan ikke læses. Tjek, at det er kopieret helt.",
       "invalid": "Serveroplysningerne er ikke gyldige. Tjek adressen og porten."
-    }
+    },
+    "alwaysConnect": "Forbind altid ved start",
+    "alwaysConnectHint": "Mumcord forbinder denne server skrivebeskyttet ved start.",
+    "channelPasswords": "Kanaladgangskoder",
+    "channelPassword": "Kanaladgangskode {{number}}",
+    "removeChannelPassword": "Fjern {{name}}",
+    "remove": "Fjern",
+    "channelPasswordsHint": "Gemt, når en beskyttet kanal har godkendt dem. Fjernede spørges der om igen næste gang, du går ind."
   },
   "errors": {
     "serverUnreachable": "Serveren kan ikke nås. Tjek adressen og porten, og at du er online.",
@@ -63,17 +87,16 @@
     "invalidAddress": "Serverens adresse er ikke gyldig. Rediger serveren for at rette den.",
     "secureStorage": "Dit systems sikre lager er ikke tilgængeligt, så serveradgangskoden kunne ikke læses eller gemmes. Lås det op, og prøv igen.",
     "notFound": "Denne server er ikke længere gemt.",
-    "generic": "Noget gik galt. Prøv igen."
+    "generic": "Noget gik galt. Prøv igen.",
+    "serverLimit": "Du er allerede forbundet til maksimum på {{limit}} servere. Afbryd en server, eller hæv grænsen i Indstillinger → Servere.",
+    "serverLimitUnknown": "Du er allerede forbundet til det maksimale antal servere. Afbryd en server, eller hæv grænsen i Indstillinger → Servere.",
+    "alwaysConnectLimit": "Kun {{limit}} servere kan have “Forbind altid ved start”, det samme som grænsen for forbundne servere. Slå det fra for en anden server, eller hæv grænsen i Indstillinger → Servere.",
+    "alwaysConnectLimitUnknown": "Flere servere end grænsen for forbundne servere kan ikke have “Forbind altid ved start”. Slå det fra for en anden server, eller hæv grænsen i Indstillinger → Servere."
   },
   "remove": {
     "title": "Fjern {{server}}?",
     "message": "Den gemte adgangskode, certifikatvalget, de fulgte kanaler og chathistorikken på denne computer slettes.",
     "confirm": "Fjern"
-  },
-  "switch": {
-    "title": "Skift server?",
-    "message": "Du kan kun være på én server ad gangen. Vil du afbryde fra {{current}} og forbinde til {{next}}?",
-    "confirm": "Afbryd og skift"
   },
   "cert": {
     "newTitle": "Stoler du på denne server?",
@@ -108,7 +131,10 @@
     "actionFailed": {
       "reorder": "Den nye serverrækkefølge kunne ikke gemmes. Prøv igen.",
       "remove": "Serveren kunne ikke fjernes. Prøv igen.",
-      "disconnect": "Det lykkedes ikke at afbryde. Prøv igen."
+      "disconnect": "Det lykkedes ikke at afbryde. Prøv igen.",
+      "alwaysConnect": "“Forbind altid ved start” kunne ikke gemmes. Prøv igen.",
+      "notifications": "Notifikationsindstillingen kunne ikke gemmes. Prøv igen.",
+      "savePassword": "Den nye adgangskode kunne ikke gemmes. Rediger serveren for at gemme den."
     }
   },
   "empty": {
@@ -124,5 +150,27 @@
     "errors": {
       "required": "Skriv en serveradresse eller et mumble://-link."
     }
+  },
+  "password": {
+    "title": "Adgangskode til {{server}}",
+    "intro": "Serveren godkendte ikke adgangskoden. Indtast den rigtige for at prøve igen.",
+    "label": "Adgangskode",
+    "show": "Vis",
+    "hide": "Skjul",
+    "wrong": "Den adgangskode er også forkert. Prøv igen.",
+    "save": "Gem adgangskode",
+    "cancel": "Annullér",
+    "connect": "Forbind",
+    "connecting": "Forbinder…"
+  },
+  "channelPassword": {
+    "title": "Denne kanal kræver en adgangskode",
+    "intro": "Indtast adgangskoden til {{channel}}.",
+    "label": "Adgangskode",
+    "wrong": "Forkert adgangskode",
+    "failed": "Adgangskoden kunne ikke sendes. Prøv igen.",
+    "cancel": "Annullér",
+    "join": "Gå ind",
+    "joining": "Går ind…"
   }
 }

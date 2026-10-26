@@ -24,6 +24,7 @@ use std::time::{Duration, Instant, SystemTime, UNIX_EPOCH};
 
 use mumcord_protocol::{Handle, PluginData};
 
+use crate::ServerId;
 use crate::now_playing::{apply_comment, comment};
 use crate::session::{Engine, EngineEvent, SessionCtx, lock};
 pub use payload::{DATA_ID, SharedGame};
@@ -82,13 +83,22 @@ fn icon_url(app_id: u32) -> String {
     format!("https://cdn.cloudflare.steamstatic.com/steam/apps/{app_id}/header.jpg")
 }
 
-/// The engine's now-gaming state; lives as long as the engine, reset per connection.
+/// The engine's now-gaming state; lives as long as the engine. The game is shared on every
+/// connected server (FR-2.4), each with its own [`Share`].
 #[derive(Default)]
 pub(crate) struct NowGaming {
     /// The setting; while off, nothing is shared and the comment line is removed.
     enabled: bool,
     /// The game being played, as shared (with its start time).
     local: Option<SharedGame>,
+    servers: HashMap<ServerId, Share>,
+    /// Steam app id → icon `data:` URL (`None`: could not be loaded).
+    icons: HashMap<u32, Option<String>>,
+}
+
+/// What was shared on one connection; reset per connection.
+#[derive(Default)]
+struct Share {
     /// What was last sent to everyone, and when.
     sent: Option<(SharedGame, Instant)>,
     /// People who joined since the last send and still need the current game.
@@ -100,8 +110,6 @@ pub(crate) struct NowGaming {
     comment_since: Option<Instant>,
     /// Games of other people (`started_at_ms` moved to the local clock).
     remote: HashMap<u32, SharedGame>,
-    /// Steam app id → icon `data:` URL (`None`: could not be loaded).
-    icons: HashMap<u32, Option<String>>,
     /// Whether a failed send was already logged on this connection.
     send_failure_logged: bool,
 }
@@ -112,17 +120,6 @@ impl NowGaming {
             enabled,
             ..Self::default()
         }
-    }
-
-    /// Forgets everything tied to the connection (new connection or disconnect).
-    fn reset_session(&mut self) {
-        self.sent = None;
-        self.joined.clear();
-        self.send_failure_logged = false;
-        self.comment_applied = None;
-        self.comment_wanted = None;
-        self.comment_since = None;
-        self.remote.clear();
     }
 
     /// Takes the latest detection; a different game (or none) restarts the play time.
@@ -160,9 +157,26 @@ impl NowGaming {
         }
     }
 
-    /// Sends what changed; returns the comment line to apply, if it must change.
+    /// Sends what changed on `ctx`'s server; returns the comment line to apply there, if it
+    /// must change.
     fn tick(&mut self, ctx: &SessionCtx, now: Instant) -> Option<Option<String>> {
         let current = self.local.clone();
+        let enabled = self.enabled;
+        self.servers
+            .entry(ctx.server_id)
+            .or_default()
+            .tick(ctx, current, enabled, now)
+    }
+}
+
+impl Share {
+    fn tick(
+        &mut self,
+        ctx: &SessionCtx,
+        current: Option<SharedGame>,
+        enabled: bool,
+        now: Instant,
+    ) -> Option<Option<String>> {
         if needs_send(self.sent.as_ref(), current.as_ref(), now) {
             let own = ctx.handle.with_state(|s| s.session);
             let everyone: Vec<u32> = ctx.handle.with_state(|s| {
@@ -194,7 +208,7 @@ impl NowGaming {
             self.comment_wanted = wanted;
             self.comment_since = Some(now);
         }
-        let settled = !self.enabled
+        let settled = !enabled
             || self
                 .comment_since
                 .is_some_and(|since| now.duration_since(since) >= COMMENT_SETTLE);
@@ -271,10 +285,21 @@ pub(crate) fn on_plugin_data(state: &Mutex<NowGaming>, ctx: &SessionCtx, data: &
                 // A start time in the future (clock differences) counts as "just started".
                 game.started_at_ms = game.started_at_ms.min(unix_ms());
                 let update = view(&game);
-                state.remote.insert(sender, game);
+                state
+                    .servers
+                    .entry(ctx.server_id)
+                    .or_default()
+                    .remote
+                    .insert(sender, game);
                 Some(update)
             }
-            None if state.remote.remove(&sender).is_some() => None,
+            None if state
+                .servers
+                .get_mut(&ctx.server_id)
+                .is_some_and(|share| share.remote.remove(&sender).is_some()) =>
+            {
+                None
+            }
             None => return,
         }
     };
@@ -287,24 +312,33 @@ pub(crate) fn on_plugin_data(state: &Mutex<NowGaming>, ctx: &SessionCtx, data: &
 /// Someone joined the server: they get the current game with the next update.
 pub(crate) fn on_user_joined(state: &Mutex<NowGaming>, ctx: &SessionCtx, session: u32) {
     if ctx.handle.with_state(|s| s.session) != Some(session) {
-        lock(state).joined.push(session);
+        lock(state)
+            .servers
+            .entry(ctx.server_id)
+            .or_default()
+            .joined
+            .push(session);
     }
 }
 
-pub(crate) fn on_user_removed(state: &Mutex<NowGaming>, session: u32) {
-    lock(state).remote.remove(&session);
+pub(crate) fn on_user_removed(state: &Mutex<NowGaming>, server_id: ServerId, session: u32) {
+    if let Some(share) = lock(state).servers.get_mut(&server_id) {
+        share.remote.remove(&session);
+    }
 }
 
 /// A connection (re)synced: everything is shared afresh and the comment checked again.
-pub(crate) fn on_synced(state: &Mutex<NowGaming>) {
-    lock(state).reset_session();
+pub(crate) fn on_synced(state: &Mutex<NowGaming>, server_id: ServerId) {
+    lock(state).servers.insert(server_id, Share::default());
 }
 
-/// The user disconnects: remove the comment line while the connection still exists (best
-/// effort; a line left behind is removed on the next connect).
-pub(crate) fn on_disconnect(state: &Mutex<NowGaming>, handle: &Handle) {
-    let mut state = lock(state);
-    if matches!(state.comment_applied, Some(Some(_)))
+/// The user disconnects from a server: remove the comment line while the connection still
+/// exists (best effort; a line left behind is removed on the next connect).
+pub(crate) fn on_disconnect(state: &Mutex<NowGaming>, server_id: ServerId, handle: &Handle) {
+    let Some(share) = lock(state).servers.remove(&server_id) else {
+        return;
+    };
+    if matches!(share.comment_applied, Some(Some(_)))
         && let Some(current) = handle.with_state(|s| s.own_user().and_then(|u| u.comment.clone()))
     {
         let without = comment::with_line(&current, comment::GAME_MARKER, None);
@@ -314,7 +348,6 @@ pub(crate) fn on_disconnect(state: &Mutex<NowGaming>, handle: &Handle) {
             tracing::debug!(error = %e, "removing the now-gaming line failed");
         }
     }
-    state.reset_session();
 }
 
 impl Engine {
@@ -327,14 +360,16 @@ impl Engine {
     /// the app shell every [`POLL_INTERVAL`], also when nothing changed.
     pub fn now_gaming_update(&self, game: Option<LocalGame>) {
         let now = Instant::now();
-        let ctx = self.session_ctx().ok();
-        let job = {
+        let ctxs = self.session_ctxs();
+        let jobs: Vec<_> = {
             let mut state = lock(self.now_gaming_state());
             let game = game.filter(|_| state.enabled);
             state.set_local(game);
-            ctx.as_ref().and_then(|ctx| state.tick(ctx, now))
+            ctxs.into_iter()
+                .filter_map(|ctx| state.tick(&ctx, now).map(|line| (ctx, line)))
+                .collect()
         };
-        if let (Some(line), Some(ctx)) = (job, ctx) {
+        for (ctx, line) in jobs {
             self.runtime()
                 .spawn(apply_comment(ctx, comment::GAME_MARKER, line));
         }
@@ -354,17 +389,19 @@ impl Engine {
         lock(self.now_gaming_state()).local.as_ref().map(view)
     }
 
-    /// The `steam://connect/…` link of a person's game, if they share one (never the own).
-    pub fn now_gaming_join_link(&self, session: u32) -> Option<String> {
+    /// The `steam://connect/…` link of a person's game on `server_id`, if they share one
+    /// (never the own).
+    pub fn now_gaming_join_link(&self, server_id: ServerId, session: u32) -> Option<String> {
         lock(self.now_gaming_state())
-            .remote
-            .get(&session)
+            .servers
+            .get(&server_id)
+            .and_then(|share| share.remote.get(&session))
             .and_then(|g| g.join.clone())
     }
 
     /// Icon (`data:` URL) of a person's game, or of the own one; `None` while link previews
     /// are off (nothing is fetched then) or when there is no usable icon.
-    pub async fn now_gaming_icon(&self, session: u32) -> Option<String> {
+    pub async fn now_gaming_icon(&self, server_id: ServerId, session: u32) -> Option<String> {
         match self.settings() {
             Ok(settings) if settings.link_previews => {}
             Ok(_) => return None,
@@ -374,7 +411,7 @@ impl Engine {
             }
         }
         let own = self
-            .session_ctx()
+            .session_ctx_for(server_id)
             .ok()
             .and_then(|ctx| ctx.handle.with_state(|s| s.session));
         let app_id = {
@@ -382,7 +419,10 @@ impl Engine {
             let game = if own == Some(session) {
                 state.local.as_ref()
             } else {
-                state.remote.get(&session)
+                state
+                    .servers
+                    .get(&server_id)
+                    .and_then(|share| share.remote.get(&session))
             };
             let app_id = game.and_then(|g| g.steam_app_id)?;
             if let Some(cached) = state.icons.get(&app_id) {
@@ -417,11 +457,11 @@ impl Engine {
     }
 
     /// The own comment with the current now-gaming line kept at its end (`set_own_comment`).
-    pub(crate) fn with_now_gaming_line(&self, html: &str) -> String {
+    pub(crate) fn with_now_gaming_line(&self, server_id: ServerId, html: &str) -> String {
         let line = lock(self.now_gaming_state())
-            .comment_applied
-            .clone()
-            .flatten();
+            .servers
+            .get(&server_id)
+            .and_then(|share| share.comment_applied.clone().flatten());
         comment::with_line(html, comment::GAME_MARKER, line.as_deref())
     }
 }

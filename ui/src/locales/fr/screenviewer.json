@@ -1,0 +1,21 @@
+{
+  "label": "Partage d’écran de {{name}}",
+  "title": "Écran de {{name}}",
+  "beta": "Bêta",
+  "picture": "Écran partagé de {{name}}",
+  "someone": "Quelqu’un",
+  "live": "En direct",
+  "collapse": "Réduire",
+  "expand": "Développer",
+  "fullscreen": "Plein écran",
+  "exitFullscreen": "Quitter le plein écran",
+  "stop": "Arrêter de regarder",
+  "starting": "Connexion à l’écran de {{name}}…",
+  "paused": "{{name}} a mis le partage en pause.",
+  "full": "Ce partage est complet.",
+  "unreachable": "Impossible de joindre {{name}} directement. Son réseau bloque peut-être les connexions directes.",
+  "tooOld": "Le Mumcord de {{name}} est trop ancien pour partager son écran avec vous.",
+  "consentOff": "Regarder nécessite des connexions directes, et vous les avez désactivées.",
+  "failed": "L’écran de {{name}} n’a pas pu être ouvert.",
+  "retry": "Réessayer"
+}

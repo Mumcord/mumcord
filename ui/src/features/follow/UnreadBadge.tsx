@@ -1,4 +1,4 @@
-import { useTranslation } from "react-i18next";
+import { useT } from "../../i18n/useT";
 import { useHasMention } from "../notifications";
 import { useFollowState } from "./followStore";
 
@@ -13,10 +13,21 @@ export function ChannelUnreadBadge({ channelId }: { channelId: number }) {
   );
 }
 
-/** `mentionKey`: conversation key; an unseen mention there adds an "@" to the pill. */
-export function UnreadBadge({ count, mentionKey }: { count: number; mentionKey?: string }) {
-  const { t } = useTranslation("follow");
-  const mentioned = useHasMention(mentionKey);
+/**
+ * `mentionKey`: conversation key; an unseen mention there adds an "@" to the pill. `serverId`
+ * defaults to the shown server.
+ */
+export function UnreadBadge({
+  count,
+  mentionKey,
+  serverId,
+}: {
+  count: number;
+  mentionKey?: string;
+  serverId?: number;
+}) {
+  const t = useT("follow");
+  const mentioned = useHasMention(mentionKey, serverId);
   if (count <= 0) return null;
   // The digits are CSS-generated (::before) so the badge adds no DOM text: the visible count stays
   // part of the accessible name (WCAG 2.5.3 label-in-name). The spoken form is the hidden phrase.

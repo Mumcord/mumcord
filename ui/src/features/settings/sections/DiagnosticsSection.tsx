@@ -1,6 +1,7 @@
 import { useId, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { getApi, type LogLevel } from "../../../api";
+import { Select } from "../../../components/Select";
 import { Group, Section } from "../components/Section";
 import { errorText } from "../errors";
 import { pickSavePath } from "../fileDialogs";
@@ -36,24 +37,19 @@ export function DiagnosticsSection({ settings, update }: SettingsSectionProps) {
   return (
     <Section title={t("sections.diagnostics")}>
       <Group title={t("diagnostics.logging")}>
-        <div className="settings-field-row">
-          <label className="settings-field" htmlFor={id}>
-            {t("diagnostics.logLevel")}
-          </label>
-          <select
+        <div className="settings-control-row">
+          <label htmlFor={id}>{t("diagnostics.logLevel")}</label>
+          <Select
             id={id}
-            className="settings-input"
             value={settings.logLevel}
-            onChange={(event) => {
-              update({ logLevel: event.target.value as LogLevel });
+            options={LEVELS.map((level) => ({
+              value: level,
+              label: t(`diagnostics.levels.${level}`),
+            }))}
+            onChange={(level) => {
+              update({ logLevel: level as LogLevel });
             }}
-          >
-            {LEVELS.map((level) => (
-              <option key={level} value={level}>
-                {t(`diagnostics.levels.${level}`)}
-              </option>
-            ))}
-          </select>
+          />
         </div>
       </Group>
       <Group title={t("diagnostics.file")}>

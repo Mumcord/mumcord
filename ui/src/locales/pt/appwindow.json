@@ -5,6 +5,39 @@
     "remember": "Lembrar a minha escolha",
     "minimize": "Minimizar para a bandeja",
     "quit": "Sair",
+    "failed": "Não funcionou. Tenta novamente.",
+    "descriptionServers": "Ainda estás ligado a {{count}} servidores. Minimizado, o Mumcord mantém-te na voz e fica na área de notificação."
+  },
+  "windowOverlay": {
+    "title": "O overlay em janela foi removido",
+    "description": "A janela de overlay flutuante deixou de existir. Em vez disso, o overlay no jogo mostra quem está a falar dentro dos teus jogos. Podes ativá-lo nas definições do overlay.",
+    "dismiss": "Entendido",
+    "openSettings": "Abrir definições do overlay"
+  },
+  "appImageMenu": {
+    "title": "Adicionar o Mumcord ao menu de aplicações?",
+    "description": "Assim o Mumcord aparece no teu menu de aplicações. O ícone e o push-to-talk funcionam corretamente no Wayland, e as ligações mumble:// abrem o Mumcord. Podes alterar isto mais tarde nas Definições.",
+    "no": "Não",
+    "yes": "Sim",
+    "failed": "Não funcionou. Tenta novamente."
+  },
+  "updateCheck": {
+    "title": "Procurar novas versões?",
+    "description": "O Mumcord pode perguntar ao GitHub uma vez por dia se existe uma versão mais recente e mostrar um aviso com uma ligação. Nada é transferido nem instalado, e nada é enviado além do próprio pedido e do nome e versão da aplicação. Podes alterar isto mais tarde nas Definições.",
+    "no": "Não",
+    "yes": "Sim",
+    "failed": "Não funcionou. Tenta novamente."
+  },
+  "updateHint": {
+    "message": "O Mumcord {{version}} está disponível.",
+    "open": "Ver versão",
+    "dismiss": "Dispensar"
+  },
+  "directConsent": {
+    "title": "Permitir ligações diretas?",
+    "description": "As ligações diretas são mais rápidas, mas a outra pessoa pode ver o seu endereço IP. O Mumcord usa-as para imagens em tamanho real e partilha de ecrã com outros utilizadores do Mumcord e pode abrir uma porta no seu router para elas. Se disser que não, as imagens continuam a chegar através do servidor e a partilha de ecrã fica indisponível. Pode alterar isto mais tarde em Definições → Privacidade.",
+    "no": "Não",
+    "yes": "Sim",
     "failed": "Não funcionou. Tenta novamente."
   }
 }

@@ -145,18 +145,17 @@ describe("chat: link previews, player cards and inline images (AC-1.39, AC-1.40,
     await expect(tw).toHaveText(expect.stringContaining("mumcordtest"));
     await expect($$("iframe")).toBeElementsArrayOfSize(0);
 
-    // Linux serves the UI from tauri://, where the players cannot run: play opens the browser.
+    // FR-2.41a: play runs the video inline through the app's loopback player page; nothing is
+    // handed to the system browser.
     await yt.$("button.link-card__play").click();
-    await browser.waitUntil(() => readFileSync(opener.log, "utf8").includes(youtube), {
-      timeout: 10_000,
-      timeoutMsg: "play did not open the video in the system browser",
-    });
+    await $("iframe[title^='Video player']").waitForExist({ timeout: 15_000 });
+    expect(readFileSync(opener.log, "utf8")).not.toContain(youtube);
     await tw.$("button.link-card__open").click();
     await browser.waitUntil(() => readFileSync(opener.log, "utf8").includes(twitch), {
       timeout: 10_000,
       timeoutMsg: "Open in browser did not hand the Twitch link to the system browser",
     });
-    await expect($$("iframe")).toBeElementsArrayOfSize(0);
+    await expect($$("iframe")).toBeElementsArrayOfSize(1);
   });
 
   it("QA.42 hides a card with the x button and keeps it hidden after a restart", async () => {

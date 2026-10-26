@@ -13,10 +13,15 @@
     "listLabel": "Opgeslagen servers",
     "add": "Server toevoegen",
     "keyboardHint": "Enter maakt verbinding. Alt plus pijl omhoog of omlaag verplaatst de server. Shift plus F10 opent meer opties.",
-    "status": {
-      "connected": "{{server}} (verbonden)",
-      "connecting": "{{server}} (verbinden)",
-      "reconnecting": "{{server}} (opnieuw verbinden)"
+    "label": "{{server}} ({{state}})",
+    "state": {
+      "connected": "verbonden",
+      "connecting": "verbinden",
+      "reconnecting": "opnieuw verbinden",
+      "error": "verbinding verbroken",
+      "voice": "spraakserver",
+      "unread": "ongelezen berichten",
+      "mentions": "vermeldingen: {{mentions}}"
     }
   },
   "menu": {
@@ -26,7 +31,19 @@
     "edit": "Server bewerken",
     "moveUp": "Omhoog",
     "moveDown": "Omlaag",
-    "remove": "Server verwijderen"
+    "remove": "Server verwijderen",
+    "reconnect": "Opnieuw verbinden",
+    "alwaysConnect": "Altijd verbinden bij opstarten",
+    "muteNotifications": "Meldingen dempen",
+    "theme": "Thema…",
+    "showWelcome": "Welkomstbericht tonen"
+  },
+  "theme": {
+    "title": "Thema voor {{server}}",
+    "label": "Thema",
+    "useApp": "App-thema gebruiken",
+    "hint": "Geldt zolang deze server wordt getoond.",
+    "failed": "Het thema kon niet worden opgeslagen. Probeer het opnieuw."
   },
   "dialog": {
     "addTitle": "Server toevoegen",
@@ -50,7 +67,14 @@
       "username": "Voer de naam in die je op deze server wilt gebruiken.",
       "link": "Deze mumble://-link kan niet worden gelezen. Controleer of hij volledig is gekopieerd.",
       "invalid": "De servergegevens zijn ongeldig. Controleer het adres en de poort."
-    }
+    },
+    "alwaysConnect": "Altijd verbinden bij opstarten",
+    "alwaysConnectHint": "Mumcord verbindt deze server bij het opstarten alleen-lezen.",
+    "channelPasswords": "Kanaalwachtwoorden",
+    "channelPassword": "Kanaalwachtwoord {{number}}",
+    "removeChannelPassword": "{{name}} verwijderen",
+    "remove": "Verwijderen",
+    "channelPasswordsHint": "Opgeslagen wanneer een beveiligd kanaal ze accepteerde. Verwijderde worden bij de volgende keer betreden opnieuw gevraagd."
   },
   "errors": {
     "serverUnreachable": "De server is niet bereikbaar. Controleer het adres en de poort, en of je online bent.",
@@ -63,17 +87,16 @@
     "invalidAddress": "Het serveradres is ongeldig. Bewerk de server om het te herstellen.",
     "secureStorage": "De beveiligde opslag van je systeem is niet beschikbaar, dus het serverwachtwoord kon niet worden gelezen of opgeslagen. Ontgrendel de opslag en probeer het opnieuw.",
     "notFound": "Deze server is niet meer opgeslagen.",
-    "generic": "Er is iets misgegaan. Probeer het opnieuw."
+    "generic": "Er is iets misgegaan. Probeer het opnieuw.",
+    "serverLimit": "Je bent al met het maximum van {{limit}} servers verbonden. Verbreek een server of verhoog de limiet in Instellingen → Servers.",
+    "serverLimitUnknown": "Je bent al met het maximale aantal servers verbonden. Verbreek een server of verhoog de limiet in Instellingen → Servers.",
+    "alwaysConnectLimit": "Slechts {{limit}} servers kunnen op ‘Altijd verbinden bij opstarten’ staan, net zoveel als de limiet voor verbonden servers. Zet het uit voor een andere server of verhoog de limiet in Instellingen → Servers.",
+    "alwaysConnectLimitUnknown": "Er kunnen niet meer servers op ‘Altijd verbinden bij opstarten’ staan dan de limiet voor verbonden servers. Zet het uit voor een andere server of verhoog de limiet in Instellingen → Servers."
   },
   "remove": {
     "title": "{{server}} verwijderen?",
     "message": "Het opgeslagen wachtwoord, de certificaatkeuze, gevolgde kanalen en de chatgeschiedenis op deze computer worden verwijderd.",
     "confirm": "Verwijderen"
-  },
-  "switch": {
-    "title": "Van server wisselen?",
-    "message": "Je kunt maar op één server tegelijk zijn. Verbinding met {{current}} verbreken en verbinden met {{next}}?",
-    "confirm": "Verbreken en wisselen"
   },
   "cert": {
     "newTitle": "Deze server vertrouwen?",
@@ -108,7 +131,10 @@
     "actionFailed": {
       "reorder": "De nieuwe servervolgorde kon niet worden opgeslagen. Probeer het opnieuw.",
       "remove": "De server kon niet worden verwijderd. Probeer het opnieuw.",
-      "disconnect": "Verbinding verbreken is mislukt. Probeer het opnieuw."
+      "disconnect": "Verbinding verbreken is mislukt. Probeer het opnieuw.",
+      "alwaysConnect": "‘Altijd verbinden bij opstarten’ kon niet worden opgeslagen. Probeer het opnieuw.",
+      "notifications": "De meldingsinstelling kon niet worden opgeslagen. Probeer het opnieuw.",
+      "savePassword": "Het nieuwe wachtwoord kon niet worden opgeslagen. Bewerk de server om het op te slaan."
     }
   },
   "empty": {
@@ -124,5 +150,27 @@
     "errors": {
       "required": "Voer een serveradres of een mumble://-link in."
     }
+  },
+  "password": {
+    "title": "Wachtwoord voor {{server}}",
+    "intro": "De server heeft het wachtwoord niet geaccepteerd. Voer het juiste in om het opnieuw te proberen.",
+    "label": "Wachtwoord",
+    "show": "Tonen",
+    "hide": "Verbergen",
+    "wrong": "Ook dat wachtwoord is fout. Probeer het opnieuw.",
+    "save": "Wachtwoord opslaan",
+    "cancel": "Annuleren",
+    "connect": "Verbinden",
+    "connecting": "Verbinden…"
+  },
+  "channelPassword": {
+    "title": "Dit kanaal vraagt om een wachtwoord",
+    "intro": "Voer het wachtwoord voor {{channel}} in.",
+    "label": "Wachtwoord",
+    "wrong": "Verkeerd wachtwoord",
+    "failed": "Het wachtwoord kon niet worden verstuurd. Probeer het opnieuw.",
+    "cancel": "Annuleren",
+    "join": "Betreden",
+    "joining": "Betreden…"
   }
 }

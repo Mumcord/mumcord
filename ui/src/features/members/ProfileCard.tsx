@@ -16,11 +16,14 @@ import {
   type KeyboardEvent,
 } from "react";
 import { useTranslation } from "react-i18next";
+import { Disclosure } from "../../components/Disclosure";
+import { useThrottledSend } from "../../components/useThrottledSend";
 import { announce } from "../../a11y";
 import { getApi, toEngineError, type User } from "../../api";
-import { useServerState } from "../channels/serverStore";
+import { shownServerId, useServerStateOf, useShownServerId } from "../channels/serverStore";
 import { setFriend, useFriend } from "../friends";
 import { MumcordBadge } from "../channels/MumcordBadge";
+import { ConnectionQuality } from "../connection/ConnectionQuality";
 import { NowGamingFor } from "../nowgaming";
 import { PositionalBadge } from "../positional";
 import { NowPlayingFor } from "../nowplaying";
@@ -31,7 +34,8 @@ import { openPrivateConversation, type SendPrivateMessage } from "./privateMessa
 import { usePersonProfile } from "./usePersonProfile";
 
 /** Delay before a slider change is sent, so dragging doesn't fire a command per pixel. */
-export const VOLUME_DEBOUNCE_MS = 150;
+/** Minimum gap between volume commands while dragging (about 20 per second). */
+export const VOLUME_THROTTLE_MS = 50;
 /** Delay after the last keystroke before the private note is saved. */
 export const NOTE_DEBOUNCE_MS = 600;
 /** How long "Saved" stays visible after a change was stored. */
@@ -41,21 +45,28 @@ const MAX_NOTE_LENGTH = 1000;
 
 export interface ProfileCardProps {
   session: number;
+  /** Server the person is on; the shown server when omitted. */
+  serverId?: number | undefined;
   /** Called when the card should close (Escape, close button, person gone). */
   onClose: () => void;
   /** Element that gets focus back after closing (usually the one that opened the card). */
   returnFocus?: HTMLElement | null | undefined;
   /** "Private message"; defaults to opening the private conversation in the chat. */
   onSendPrivateMessage?: SendPrivateMessage | undefined;
+  /** Scrolls to and focuses the connection figures when the card opens. */
+  focusConnection?: boolean | undefined;
 }
 
 export function ProfileCard({
   session,
+  serverId,
   onClose: onCloseProp,
   returnFocus = null,
   onSendPrivateMessage = openPrivateConversation,
+  focusConnection = false,
 }: ProfileCardProps) {
-  const state = useServerState();
+  const shown = useShownServerId();
+  const state = useServerStateOf(serverId ?? shown);
   const user = state.users.get(session);
   const dialogRef = useRef<HTMLDialogElement>(null);
   const titleId = useId();
@@ -69,8 +80,17 @@ export function ProfileCard({
   const present = user !== undefined;
   useEffect(() => {
     const dialog = dialogRef.current;
-    if (present && dialog && !dialog.open) dialog.showModal();
-  }, [present]);
+    if (present && dialog && !dialog.open) {
+      dialog.showModal();
+      if (focusConnection) {
+        const section = dialog.querySelector<HTMLElement>("[data-connection-section]");
+        // jsdom has no scrollIntoView.
+        // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+        section?.scrollIntoView?.({ block: "center" });
+        (section?.querySelector<HTMLElement>("button") ?? section)?.focus();
+      }
+    }
+  }, [present, focusConnection]);
 
   // The person left or the connection dropped: nothing left to show.
   useEffect(() => {
@@ -101,11 +121,13 @@ export function ProfileCard({
       <ProfileBody
         key={session}
         user={user}
+        serverId={serverId}
         titleId={titleId}
         isSelf={isSelf}
         talking={state.talking.has(session)}
         onSendPrivateMessage={() => {
-          onSendPrivateMessage(user);
+          if (serverId === undefined) onSendPrivateMessage(user);
+          else onSendPrivateMessage(user, serverId);
           onClose();
         }}
         onClose={onClose}
@@ -116,6 +138,7 @@ export function ProfileCard({
 
 function ProfileBody({
   user,
+  serverId,
   titleId,
   isSelf,
   talking,
@@ -123,6 +146,7 @@ function ProfileBody({
   onClose,
 }: {
   user: User;
+  serverId: number | undefined;
   titleId: string;
   isSelf: boolean;
   talking: boolean;
@@ -130,11 +154,15 @@ function ProfileBody({
   onClose: () => void;
 }) {
   const { t } = useTranslation("members");
-  const { profile, loadError } = usePersonProfile(user.session);
+  const { profile, loadError } = usePersonProfile(user.session, serverId);
   const [error, setError] = useState<string | null>(null);
   const [saved, showSaved] = useSavedFlash(t("card.saved"));
   const avatarColor = useAvatarColor(profile?.avatar ?? null);
-  const settingsId = useId();
+  const settingsHint = user.localMute
+    ? t("card.hintMuted")
+    : user.volume !== 100
+      ? t("card.hintVolume", { value: user.volume })
+      : undefined;
   const muteLabelId = useId();
   const muteHintId = useId();
   const friendLabelId = useId();
@@ -178,7 +206,7 @@ function ProfileBody({
             type="button"
             className="profile-card__action profile-card__action--icon"
             aria-label={t("card.close")}
-            title={t("card.close")}
+            data-tooltip={t("card.close")}
             onClick={onClose}
           >
             {/* Cross; the button's name is its translated aria-label. */}
@@ -199,16 +227,19 @@ function ProfileBody({
         <h2 id={titleId} className="profile-card__name">
           {user.name}
           <MumcordBadge user={user} />
-          <PositionalBadge session={user.session} />
+          <PositionalBadge session={user.session} serverId={serverId} />
         </h2>
         <p className="profile-card__meta">
           {user.registered ? t("registered") : t("unregistered")}
           {talking && <> · {t("talking")}</>}
         </p>
       </div>
+      <div data-connection-section tabIndex={-1} className="profile-card__connection">
+        <ConnectionQuality session={user.session} serverId={serverId} />
+      </div>
       {loadError && <p className="profile-card__note">{t("card.loadFailed")}</p>}
-      <NowGamingFor session={user.session} joinable={!isSelf} />
-      <NowPlayingFor session={user.session} />
+      <NowGamingFor session={user.session} serverId={serverId} joinable={!isSelf} />
+      <NowPlayingFor session={user.session} serverId={serverId} />
       {comment && (
         <div
           className="profile-card__comment"
@@ -217,70 +248,74 @@ function ProfileBody({
         />
       )}
       {!isSelf && (
-        <section className="profile-card__section" aria-labelledby={settingsId}>
-          <div className="profile-card__section-head">
-            <h3 id={settingsId} className="profile-card__section-title">
-              {t("card.localSettings")}
-            </h3>
-            {/* Screen readers hear "Saved" through the announcer instead. */}
-            <span className="profile-card__saved" data-visible={saved} aria-hidden="true">
-              {t("card.saved")}
-            </span>
-          </div>
-          <p className="profile-card__note">{t("card.localSettingsHint")}</p>
-          <VolumeSlider user={user} onError={report} onSaved={stored} />
-          <button
-            type="button"
-            role="switch"
-            aria-checked={user.localMute}
-            aria-labelledby={muteLabelId}
-            aria-describedby={muteHintId}
-            className="profile-card__mute"
-            onClick={() => {
-              setError(null);
-              getApi().personSetLocalMute(user.session, !user.localMute).then(stored, report);
-            }}
-          >
-            <span className="profile-card__mute-text">
-              <span id={muteLabelId}>{t("card.localMute")}</span>
-              <span id={muteHintId} className="profile-card__note">
-                {t("card.localMuteHint")}
+        <section className="profile-card__section">
+          <Disclosure title={t("card.settingsFor", { name: user.name })} hint={settingsHint}>
+            <div className="profile-card__section-head">
+              {/* Screen readers hear "Saved" through the announcer instead. */}
+              <span className="profile-card__saved" data-visible={saved} aria-hidden="true">
+                {t("card.saved")}
               </span>
-            </span>
-            <span className="profile-card__switch" aria-hidden="true" />
-          </button>
-          {/* People without a certificate can't be recognised again, so they can't be friends. */}
-          <button
-            type="button"
-            role="switch"
-            aria-checked={friend !== undefined}
-            aria-disabled={user.certHash === null}
-            aria-labelledby={friendLabelId}
-            aria-describedby={friendHintId}
-            className="profile-card__mute"
-            onClick={() => {
-              if (user.certHash === null) return;
-              setError(null);
-              setFriend(user, friend === undefined).then(stored, report);
-            }}
-          >
-            <span className="profile-card__mute-text">
-              <span id={friendLabelId}>{tFriends("friend")}</span>
-              <span id={friendHintId} className="profile-card__note">
-                {user.certHash === null ? tFriends("noCertificate") : tFriends("friendHint")}
+            </div>
+            <p className="profile-card__note">{t("card.localSettingsHint")}</p>
+            <VolumeSlider user={user} serverId={serverId} onError={report} onSaved={stored} />
+            <button
+              type="button"
+              role="switch"
+              aria-checked={user.localMute}
+              aria-labelledby={muteLabelId}
+              aria-describedby={muteHintId}
+              className="profile-card__mute"
+              onClick={() => {
+                setError(null);
+                getApi()
+                  .personSetLocalMute(serverId ?? shownServerId(), user.session, !user.localMute)
+                  .then(stored, report);
+              }}
+            >
+              <span className="profile-card__mute-text">
+                <span id={muteLabelId}>{t("card.localMute")}</span>
+                <span id={muteHintId} className="profile-card__note">
+                  {t("card.localMuteHint")}
+                </span>
               </span>
-            </span>
-            <span className="profile-card__switch" aria-hidden="true" />
-          </button>
-          {profile !== null && (
-            <NoteField
-              session={user.session}
-              initial={profile.note}
-              onError={report}
-              onSaved={stored}
-            />
-          )}
-          {user.certHash === null && <p className="profile-card__note">{t("card.sessionOnly")}</p>}
+              <span className="profile-card__switch" aria-hidden="true" />
+            </button>
+            {/* People without a certificate can't be recognised again, so they can't be friends. */}
+            <button
+              type="button"
+              role="switch"
+              aria-checked={friend !== undefined}
+              aria-disabled={user.certHash === null}
+              aria-labelledby={friendLabelId}
+              aria-describedby={friendHintId}
+              className="profile-card__mute"
+              onClick={() => {
+                if (user.certHash === null) return;
+                setError(null);
+                setFriend(user, friend === undefined, serverId).then(stored, report);
+              }}
+            >
+              <span className="profile-card__mute-text">
+                <span id={friendLabelId}>{tFriends("friend")}</span>
+                <span id={friendHintId} className="profile-card__note">
+                  {user.certHash === null ? tFriends("noCertificate") : tFriends("friendHint")}
+                </span>
+              </span>
+              <span className="profile-card__switch" aria-hidden="true" />
+            </button>
+            {profile !== null && (
+              <NoteField
+                session={user.session}
+                serverId={serverId}
+                initial={profile.note}
+                onError={report}
+                onSaved={stored}
+              />
+            )}
+            {user.certHash === null && (
+              <p className="profile-card__note">{t("card.sessionOnly")}</p>
+            )}
+          </Disclosure>
         </section>
       )}
       {error && (
@@ -352,11 +387,13 @@ function useDebouncedSend(delayMs: number): {
 
 function NoteField({
   session,
+  serverId,
   initial,
   onError,
   onSaved,
 }: {
   session: number;
+  serverId: number | undefined;
   initial: string;
   onError: (cause: unknown) => void;
   onSaved: () => void;
@@ -381,7 +418,9 @@ function NoteField({
           const note = event.target.value;
           setValue(note);
           schedule(() => {
-            getApi().personSetNote(session, note).then(onSaved, onError);
+            getApi()
+              .personSetNote(serverId ?? shownServerId(), session, note)
+              .then(onSaved, onError);
           });
         }}
         onBlur={flush}
@@ -395,10 +434,13 @@ function NoteField({
 
 export function VolumeSlider({
   user,
+  serverId,
   onError,
   onSaved,
 }: {
   user: User;
+  /** Server the person is on; the shown server when omitted. */
+  serverId?: number | undefined;
   onError: (cause: unknown) => void;
   /** Called after the engine stored a change. */
   onSaved?: () => void;
@@ -406,13 +448,13 @@ export function VolumeSlider({
   const { t } = useTranslation("members");
   const inputId = useId();
   const [value, setValue] = useState(user.volume);
-  const { schedule } = useDebouncedSend(VOLUME_DEBOUNCE_MS);
+  const { schedule } = useThrottledSend(VOLUME_THROTTLE_MS);
 
   const change = (volume: number) => {
     setValue(volume);
     schedule(() => {
       getApi()
-        .personSetVolume(user.session, volume)
+        .personSetVolume(serverId ?? shownServerId(), user.session, volume)
         .then(() => onSaved?.(), onError);
     });
   };

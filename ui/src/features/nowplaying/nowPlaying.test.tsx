@@ -31,7 +31,7 @@ afterEach(() => {
 
 function share(track: NowPlaying | null, session = ANNA) {
   act(() => {
-    api.mock.emit("nowPlayingChanged", { session, track });
+    api.mock.emit("nowPlayingChanged", { serverId: 1, session, track });
   });
 }
 
@@ -65,7 +65,7 @@ describe("music icon", () => {
     expect(treeRow().querySelector('[data-icon="music"]')).toBeNull();
     share(song);
     const icon = within(treeRow()).getByRole("img", { name: "Listening to Band – Song" });
-    expect(icon).toHaveAttribute("title", "Listening to Band – Song");
+    expect(icon).toHaveAttribute("data-tooltip", "Listening to Band – Song");
     share({ ...song, playing: false });
     expect(treeRow().querySelector('[data-icon="music"]')).toBeNull();
   });
@@ -76,7 +76,7 @@ describe("music icon", () => {
     expect(ownRow.querySelector('[data-icon="music"]')).toBeNull();
     share(song, own.session);
     const icon = within(ownRow).getByRole("img", { name: "Listening to Band – Song" });
-    expect(icon).toHaveAttribute("title", "Listening to Band – Song");
+    expect(icon).toHaveAttribute("data-tooltip", "Listening to Band – Song");
     share(null, own.session);
     expect(ownRow.querySelector('[data-icon="music"]')).toBeNull();
   });
@@ -87,7 +87,7 @@ describe("music icon", () => {
     expect(treeRow().querySelector('[data-icon="music"]')).toBeNull();
 
     share(song);
-    const snapshot = await api.sessionSnapshot();
+    const snapshot = await api.sessionSnapshot(1);
     if (!snapshot) throw new Error("not connected");
     act(() => {
       api.mock.emit("serverSynced", { snapshot });
@@ -98,7 +98,7 @@ describe("music icon", () => {
 
 /** The own session and name; the engine reports the own track with the own session. */
 async function self(): Promise<{ session: number; name: string }> {
-  const snapshot = await api.sessionSnapshot();
+  const snapshot = await api.sessionSnapshot(1);
   const own = snapshot?.users.find((u) => u.session === snapshot.selfSession);
   if (!own) throw new Error("not connected");
   return { session: own.session, name: own.name };
@@ -126,7 +126,7 @@ describe("profile block", () => {
     expect(bar).toHaveAttribute("max", "200000");
     expect(bar).toHaveAttribute("value", "60000");
     expect(within(block).getByText("1:00 / 3:20")).toBeInTheDocument();
-    expect(cover).toHaveBeenCalledWith(ANNA);
+    expect(cover).toHaveBeenCalledWith(1, ANNA);
     await vi.waitFor(() => {
       expect(block.querySelector("img")).toHaveAttribute("src", "data:image/png;base64,AAAA");
     });
@@ -148,7 +148,7 @@ describe("profile block", () => {
     share(song, own.session);
     const block = await screen.findByRole("region", { name: "Now playing" });
     expect(within(block).getByText("Song")).toBeInTheDocument();
-    expect(cover).toHaveBeenCalledWith(own.session);
+    expect(cover).toHaveBeenCalledWith(1, own.session);
   });
 
   it("loads no cover when the track has none and freezes while paused", async () => {

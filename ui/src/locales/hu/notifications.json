@@ -10,5 +10,6 @@
   "image": "Képet küldött",
   "open": "Chat megnyitása",
   "close": "Értesítés elvetése",
-  "mentionLine": "{{sender}} megemlített: {{preview}}"
+  "mentionLine": "{{sender}} megemlített: {{preview}}",
+  "withServer": "{{server}} · {{what}}"
 }

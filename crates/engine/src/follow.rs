@@ -43,8 +43,10 @@ pub(crate) fn subscribe_denials() -> broadcast::Receiver<(ServerId, PermissionDe
 
 /// What happens when the server neither confirms nor denies in time.
 pub(crate) enum OnTimeout {
-    Accept,
     Fail(&'static str),
+    /// Success after waiting this long without a denial, for requests the server never
+    /// confirms (text messages).
+    Accept(Duration),
 }
 
 /// Waits until `accepted` holds for the server state, a `relevant` denial arrives, or the
@@ -56,7 +58,11 @@ pub(crate) async fn confirm(
     relevant: impl Fn(&PermissionDenied) -> bool,
     on_timeout: OnTimeout,
 ) -> EngineResult<()> {
-    let deadline = tokio::time::Instant::now() + CONFIRM_TIMEOUT;
+    let wait = match on_timeout {
+        OnTimeout::Fail(_) => CONFIRM_TIMEOUT,
+        OnTimeout::Accept(grace) => grace,
+    };
+    let deadline = tokio::time::Instant::now() + wait;
     loop {
         loop {
             match denials.try_recv() {
@@ -75,10 +81,10 @@ pub(crate) async fn confirm(
         }
         if tokio::time::Instant::now() >= deadline {
             return match on_timeout {
-                OnTimeout::Accept => Ok(()),
                 OnTimeout::Fail(what) => Err(EngineError::internal(format!(
                     "the server did not confirm {what}"
                 ))),
+                OnTimeout::Accept(_) => Ok(()),
             };
         }
         tokio::time::sleep(POLL).await;
@@ -170,8 +176,8 @@ fn count(n: usize) -> u32 {
 impl Engine {
     /// Starts following a channel. Errors: `ServerTooOld` (< 1.4), `PermissionDenied`,
     /// `ListenerLimitReached`.
-    pub async fn channel_follow(&self, channel_id: u32) -> EngineResult<()> {
-        let ctx = self.session_ctx()?;
+    pub async fn channel_follow(&self, server_id: ServerId, channel_id: u32) -> EngineResult<()> {
+        let ctx = self.session_ctx_for(server_id)?;
         let (supported, volume, channel) = ctx.handle.with_state(|s| {
             (
                 s.server.supports_listening(),
@@ -222,8 +228,8 @@ impl Engine {
     }
 
     /// Stops following a channel.
-    pub fn channel_unfollow(&self, channel_id: u32) -> EngineResult<()> {
-        let ctx = self.session_ctx()?;
+    pub fn channel_unfollow(&self, server_id: ServerId, channel_id: u32) -> EngineResult<()> {
+        let ctx = self.session_ctx_for(server_id)?;
         let path = ctx
             .channel_path(channel_id)
             .ok_or_else(|| EngineError::new(ErrorKind::NotFound, "unknown channel"))?;
@@ -254,8 +260,8 @@ impl Engine {
     /// Follows every channel the user may listen to, except their own voice channel (QA.13).
     /// One batched listen request; the server refuses what exceeds its listener limit.
     /// Errors: `ServerTooOld` (< 1.4).
-    pub async fn channel_follow_all(&self) -> EngineResult<FollowAllSummary> {
-        let ctx = self.session_ctx()?;
+    pub async fn channel_follow_all(&self, server_id: ServerId) -> EngineResult<FollowAllSummary> {
+        let ctx = self.session_ctx_for(server_id)?;
         let followed = ctx.followed_channel_ids();
         let (supported, volume, candidates, not_allowed) = ctx.handle.with_state(|s| {
             let own = s.own_user().map(|u| u.channel_id);
@@ -367,9 +373,9 @@ impl Engine {
         Ok(summary)
     }
 
-    /// Stops following every channel of the connected server (QA.13).
-    pub fn channel_unfollow_all(&self) -> EngineResult<()> {
-        let ctx = self.session_ctx()?;
+    /// Stops following every channel of the connected server `server_id` (QA.13).
+    pub fn channel_unfollow_all(&self, server_id: ServerId) -> EngineResult<()> {
+        let ctx = self.session_ctx_for(server_id)?;
         let paths = ctx
             .store()
             .followed_channels(ctx.server_id)

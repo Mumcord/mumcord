@@ -1,9 +1,10 @@
 //! Finds the game being played for "Now gaming" (FR-1.59) and hands it to the engine, which
 //! shares it. Sources are asked best first (see `mumcord_engine::now_gaming::detect` for what
-//! each platform reads); a Mumble Link source (B30) goes in front of [`SystemSource`] in
+//! each platform reads); the Mumble Link context adds the join target to [`SystemSource`]'s game in
 //! [`sources`]. Nothing is read while the setting is off; reading runs off the UI thread every
 //! `POLL_INTERVAL`, and the engine decides what changed. Game names never go into the logs.
 
+mod link;
 #[cfg(target_os = "linux")]
 mod linux;
 #[cfg(target_os = "macos")]
@@ -39,9 +40,15 @@ struct SystemSource {
 
 impl GameSource for SystemSource {
     fn detect(&mut self) -> Option<LocalGame> {
+        self.detect_in(&processes())
+    }
+}
+
+impl SystemSource {
+    /// Split from [`GameSource::detect`] so tests can hand in a fixed process list.
+    fn detect_in(&mut self, processes: &[Process]) -> Option<LocalGame> {
         let os = Os::CURRENT?;
-        let processes = processes();
-        let steam = running_steam_app(&processes).and_then(|id| {
+        let steam = running_steam_app(processes).and_then(|id| {
             let name = self
                 .names
                 .entry(id)
@@ -49,7 +56,7 @@ impl GameSource for SystemSource {
                 .clone();
             name.map(|name| (id, name))
         });
-        detect::pick(detect::catalog(), os, &processes, steam)
+        detect::pick(detect::catalog(), os, processes, steam)
     }
 }
 
@@ -109,7 +116,7 @@ fn manifest_name(roots: &[std::path::PathBuf], id: u32) -> Option<String> {
 
 /// The game sources, best first.
 fn sources() -> Vec<Box<dyn GameSource>> {
-    vec![Box::new(SystemSource::default())]
+    vec![Box::new(link::LinkJoinSource::new(SystemSource::default()))]
 }
 
 /// Looks for games for the engine as long as the app runs.

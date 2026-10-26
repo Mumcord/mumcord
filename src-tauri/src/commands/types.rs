@@ -53,6 +53,13 @@ pub enum ErrorCode {
     /// The desktop did not confirm the push-to-talk shortcut (Wayland portal): its dialog was
     /// dismissed, no key was assigned in time, or the portal failed. `message` has the detail.
     ShortcutNotConfirmed,
+    /// The screen share already has the maximum of 8 viewers (FR-2.43).
+    ShareFull,
+    /// Watching a screen share needs a direct connection and none can be made (FR-2.46);
+    /// `message` is the reason: `consentOff`, `peerUnsupported` or `noDirectPath`.
+    DirectUnavailable,
+    /// Connecting would exceed the "connected servers" limit (FR-2.1); `message` names it.
+    ServerLimitReached,
     /// Unexpected internal failure.
     Internal,
 }
@@ -95,9 +102,12 @@ impl From<EngineError> for ApiError {
             ErrorKind::ServerTooOld => ErrorCode::ServerTooOld,
             ErrorKind::PermissionDenied => ErrorCode::PermissionDenied,
             ErrorKind::ListenerLimitReached => ErrorCode::ListenerLimitReached,
+            ErrorKind::ServerLimitReached => ErrorCode::ServerLimitReached,
             ErrorKind::MessageTooLarge => ErrorCode::MessageTooLarge,
             ErrorKind::InvalidInput => ErrorCode::InvalidInput,
             ErrorKind::NotFound => ErrorCode::NotFound,
+            ErrorKind::ShareFull => ErrorCode::ShareFull,
+            ErrorKind::DirectUnavailable => ErrorCode::DirectUnavailable,
             ErrorKind::SecureStorageUnavailable => ErrorCode::SecureStorageUnavailable,
             ErrorKind::Io => ErrorCode::Io,
             ErrorKind::Internal => ErrorCode::Internal,
@@ -114,6 +124,15 @@ pub fn to_api_server_id(id: mumcord_engine::ServerId) -> ServerId {
 
 pub fn to_engine_server_id(id: ServerId) -> mumcord_engine::ServerId {
     id.into()
+}
+
+/// Error of a command that is part of the contract but not built yet (on this platform).
+#[cfg(not(target_os = "linux"))]
+pub fn not_implemented(command: &str) -> ApiError {
+    ApiError::new(
+        ErrorCode::NotImplemented,
+        format!("{command} is not implemented yet"),
+    )
 }
 
 /// A chat conversation: a channel or a private chat with one person.

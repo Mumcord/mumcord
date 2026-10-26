@@ -7,7 +7,10 @@ use tauri::{AppHandle, Manager, Url};
 use tauri_plugin_deep_link::DeepLinkExt;
 use tauri_specta::Event;
 
-use crate::commands::servers::{DeepLinkOpened, MumbleLink, parse_link};
+use mumcord_engine::{Engine, ServerId};
+
+use crate::commands::servers::{DeepLinkOpened, LinkOutcome, MumbleLink, parse_link};
+use crate::commands::types::{ApiError, to_api_server_id};
 use crate::window;
 
 /// URL scheme Mumcord handles (also declared in tauri.conf.json). macOS registers it through
@@ -23,12 +26,12 @@ pub const SCHEME: &str = "mumble";
 #[derive(Debug, Default)]
 struct LinkBuffer {
     ui_ready: bool,
-    pending: Option<MumbleLink>,
+    pending: Option<DeepLinkOpened>,
 }
 
 impl LinkBuffer {
     /// Accepts a link; returns it if it should be emitted now.
-    fn offer(&mut self, link: MumbleLink) -> Option<MumbleLink> {
+    fn offer(&mut self, link: DeepLinkOpened) -> Option<DeepLinkOpened> {
         if self.ui_ready {
             Some(link)
         } else {
@@ -38,7 +41,7 @@ impl LinkBuffer {
     }
 
     /// Hands the kept link to the UI and switches to emitting.
-    fn take(&mut self) -> Option<MumbleLink> {
+    fn take(&mut self) -> Option<DeepLinkOpened> {
         self.ui_ready = true;
         self.pending.take()
     }
@@ -70,24 +73,97 @@ fn open_urls(app: &AppHandle, urls: &[Url]) {
     }
 }
 
+/// What a link leads to, decided from the saved server it names and the running connections.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+enum LinkPlan {
+    UnknownServer,
+    /// Already connected: only the channel path (if any) is joined.
+    Show(ServerId),
+    Connect(ServerId),
+    LimitReached(ServerId),
+}
+
+fn plan(saved: Option<ServerId>, connected: &[ServerId], max: u8) -> LinkPlan {
+    let Some(id) = saved else {
+        return LinkPlan::UnknownServer;
+    };
+    if connected.contains(&id) {
+        LinkPlan::Show(id)
+    } else if connected.len() >= usize::from(max) {
+        LinkPlan::LimitReached(id)
+    } else {
+        LinkPlan::Connect(id)
+    }
+}
+
 fn open(app: &AppHandle, link: MumbleLink) {
     window::show(app);
+    let app = app.clone();
+    tauri::async_runtime::spawn(async move {
+        let outcome = resolve(&app.state::<Engine>(), &link).await;
+        tracing::info!(?outcome, "mumble:// link received");
+        deliver(&app, DeepLinkOpened { link, outcome });
+    });
+}
+
+/// Connects or joins as FR-2.13 says; the connection itself enforces the limit again.
+async fn resolve(engine: &Engine, link: &MumbleLink) -> LinkOutcome {
+    let (saved, max) = match (engine.servers().await, engine.settings()) {
+        (Ok(servers), Ok(settings)) => (
+            servers
+                .iter()
+                .find(|s| s.address.eq_ignore_ascii_case(&link.address) && s.port == link.port)
+                .map(|s| s.id),
+            settings.max_connected_servers,
+        ),
+        (Err(e), _) | (_, Err(e)) => {
+            tracing::warn!(error = %e, "reading saved servers for a link failed");
+            return LinkOutcome::UnknownServer;
+        }
+    };
+    let connected: Vec<ServerId> = engine
+        .connections()
+        .iter()
+        .filter_map(|c| c.server_id())
+        .collect();
+    let path = (!link.channel_path.is_empty()).then(|| link.channel_path.clone());
+    let (id, shown) = match plan(saved, &connected, max) {
+        LinkPlan::UnknownServer => return LinkOutcome::UnknownServer,
+        LinkPlan::LimitReached(id) => {
+            return LinkOutcome::LimitReached {
+                server_id: to_api_server_id(id),
+            };
+        }
+        LinkPlan::Show(id) => (id, true),
+        LinkPlan::Connect(id) => (id, false),
+    };
+    let server_id = to_api_server_id(id);
+    match engine.connect(id, path) {
+        Ok(()) if shown => LinkOutcome::Shown { server_id },
+        Ok(()) => LinkOutcome::Connecting { server_id },
+        Err(e) => LinkOutcome::Failed {
+            server_id,
+            error: ApiError::from(e),
+        },
+    }
+}
+
+fn deliver(app: &AppHandle, opened: DeepLinkOpened) {
     let state = app.state::<PendingLinks>();
     let ready = state
         .0
         .lock()
         .unwrap_or_else(|e| e.into_inner())
-        .offer(link);
-    tracing::info!(buffered = ready.is_none(), "mumble:// link received");
-    if let Some(link) = ready
-        && let Err(e) = (DeepLinkOpened { link }).emit(app)
+        .offer(opened);
+    if let Some(opened) = ready
+        && let Err(e) = opened.emit(app)
     {
         tracing::warn!(error = %e, "forwarding a mumble:// link to the UI failed");
     }
 }
 
 /// Returns the link kept for the UI (if any); from now on links are emitted directly.
-pub fn take_pending(app: &AppHandle) -> Option<MumbleLink> {
+pub fn take_pending(app: &AppHandle) -> Option<DeepLinkOpened> {
     let link = app
         .try_state::<PendingLinks>()?
         .0
@@ -102,6 +178,13 @@ pub fn take_pending(app: &AppHandle) -> Option<MumbleLink> {
 mod tests {
     use super::*;
 
+    fn opened(path: &str) -> DeepLinkOpened {
+        DeepLinkOpened {
+            link: link(path),
+            outcome: LinkOutcome::UnknownServer,
+        }
+    }
+
     fn link(path: &str) -> MumbleLink {
         parse_link(&format!("mumble://localhost:64738/{path}")).expect("valid link")
     }
@@ -109,16 +192,16 @@ mod tests {
     #[test]
     fn links_before_the_ui_is_ready_are_kept_newest_first() {
         let mut buffer = LinkBuffer::default();
-        assert_eq!(buffer.offer(link("Lobby")), None);
-        assert_eq!(buffer.offer(link("Raid")), None);
-        assert_eq!(buffer.take(), Some(link("Raid")));
+        assert_eq!(buffer.offer(opened("Lobby")), None);
+        assert_eq!(buffer.offer(opened("Raid")), None);
+        assert_eq!(buffer.take(), Some(opened("Raid")));
     }
 
     #[test]
     fn links_after_the_first_take_are_emitted_not_kept() {
         let mut buffer = LinkBuffer::default();
         assert_eq!(buffer.take(), None);
-        assert_eq!(buffer.offer(link("Raid")), Some(link("Raid")));
+        assert_eq!(buffer.offer(opened("Raid")), Some(opened("Raid")));
         assert_eq!(buffer.take(), None);
     }
 
@@ -128,5 +211,30 @@ mod tests {
         assert_eq!(parsed.address, "localhost");
         assert_eq!(parsed.port, 64738);
         assert_eq!(parsed.channel_path, vec!["Raid", "Team 1"]);
+    }
+
+    #[test]
+    fn link_to_an_unsaved_server_is_unknown() {
+        assert_eq!(plan(None, &[], 3), LinkPlan::UnknownServer);
+    }
+
+    #[test]
+    fn link_with_no_connection_connects() {
+        assert_eq!(plan(Some(1), &[], 3), LinkPlan::Connect(1));
+    }
+
+    #[test]
+    fn link_connects_next_to_an_existing_connection() {
+        assert_eq!(plan(Some(2), &[1], 3), LinkPlan::Connect(2));
+    }
+
+    #[test]
+    fn link_to_a_connected_server_shows_it_even_at_the_limit() {
+        assert_eq!(plan(Some(1), &[1, 2], 2), LinkPlan::Show(1));
+    }
+
+    #[test]
+    fn link_at_the_limit_is_refused() {
+        assert_eq!(plan(Some(3), &[1, 2], 2), LinkPlan::LimitReached(3));
     }
 }

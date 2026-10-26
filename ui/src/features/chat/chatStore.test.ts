@@ -21,7 +21,7 @@ afterEach(() => {
 
 describe("chat store", () => {
   it("collects live messages per conversation and de-duplicates by id", async () => {
-    const api = await connectedMock();
+    const api = await connectedMock({ bindStore: true });
     resetChatStore();
     const { result } = renderHook(() => useConversationLog(LOBBY));
     let first: ReturnType<typeof api.mock.receiveMessage> | undefined;
@@ -31,13 +31,13 @@ describe("chat store", () => {
     });
     expect(result.current.messages.map((m) => m.body)).toEqual(["hi"]);
     act(() => {
-      if (first) api.mock.emit("messageReceived", { message: first });
+      if (first) api.mock.emit("messageReceived", { serverId: 1, message: first });
     });
     expect(result.current.messages).toHaveLength(1);
   });
 
   it("loads history pages, merges live messages and pages backwards", async () => {
-    const api = await connectedMock();
+    const api = await connectedMock({ bindStore: true });
     resetChatStore();
     for (let i = 0; i < HISTORY_PAGE + 5; i += 1)
       api.mock.receiveMessage(LOBBY, `m${String(i)}`, 2);
@@ -61,10 +61,10 @@ describe("chat store", () => {
   });
 
   it("adds own sent messages and clears on resync, disconnect and on request", async () => {
-    const api = await connectedMock();
+    const api = await connectedMock({ bindStore: true });
     resetChatStore();
     const { result } = renderHook(() => useConversationLog(LOBBY));
-    const sent = await api.sendChannelMessage(1, "mine");
+    const sent = await api.sendChannelMessage(1, 1, "mine");
     act(() => {
       addSentMessage(sent);
       addSentMessage(sent);
@@ -86,7 +86,7 @@ describe("chat store", () => {
     act(() => {
       addSentMessage(sent);
     });
-    await act(() => api.disconnect());
+    await act(() => api.disconnect(1));
     expect(result.current.messages).toHaveLength(0);
   });
 });

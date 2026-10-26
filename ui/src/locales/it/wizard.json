@@ -37,7 +37,7 @@
     "defaultVia": "Predefinito di sistema ({{backend}})",
     "level": "Livello del microfono",
     "test": "Prova",
-    "stop": "Stop",
+    "stop": "Ferma",
     "idle": "Premi Prova, di' qualcosa e ti riascolterai.",
     "recording": "Parla ora…",
     "playing": "Riproduzione della tua voce…",
@@ -98,5 +98,10 @@
     "ingameOverlayHint": "Disegna chi sta parlando sopra il tuo gioco (Linux). Potrai attivarlo o disattivarlo per ogni gioco più tardi in Impostazioni.",
     "ingameOverlayWarning": "Alcuni giochi con anti-cheat potrebbero segnalare o bloccare gli overlay nel gioco. Mumcord tiene disattivati di default i giochi noti per essere a rischio (come Valorant o League of Legends). Attivalo solo per i giochi di cui ti fidi.",
     "ingameOverlayAlt": "Esempio dell'overlay nel gioco che mostra chi sta parlando"
+  },
+  "updates": {
+    "title": "Nuove versioni",
+    "check": "Cerca nuove versioni",
+    "hint": "Mumcord può chiedere a GitHub una volta al giorno se esiste una versione più recente e mostrare un avviso con un link. Non viene scaricato né installato nulla, e non viene inviato nulla oltre alla richiesta stessa e al nome e alla versione dell'app. Puoi cambiarlo più tardi nelle Impostazioni."
   }
 }

@@ -2,7 +2,7 @@ use std::sync::{Arc, Mutex};
 use std::time::{Duration, Instant};
 
 use super::*;
-use crate::jitter::tests::{TestPacket, tone_packets};
+use crate::jitter::tests::{TestPacket, tone_packets, tone_packets_at};
 
 const FRAME_MS: u64 = 10;
 
@@ -87,7 +87,12 @@ fn steady_rms(out: &[f32]) -> f32 {
 }
 
 fn one_speaker(configure: impl FnOnce(&mut Mixer), via_listener: bool) -> Vec<f32> {
-    let packets = tone_packets(50, 0);
+    speaker_at(0.4, configure, via_listener)
+}
+
+/// One speaker playing a tone with peak `amplitude`.
+fn speaker_at(amplitude: f32, configure: impl FnOnce(&mut Mixer), via_listener: bool) -> Vec<f32> {
+    let packets = tone_packets_at(amplitude, 50, 0);
     let mut mixer = Mixer::new().expect("mixer");
     configure(&mut mixer);
     let speech = [Speech {
@@ -99,33 +104,47 @@ fn one_speaker(configure: impl FnOnce(&mut Mixer), via_listener: bool) -> Vec<f3
     run(&mut mixer, &speech, None, 1_200).0
 }
 
+/// Loudness change of the steady tone in dB relative to `normal`.
+fn db(level: f32, normal: f32) -> f32 {
+    20.0 * (level / normal).log10()
+}
+
 #[test]
-fn volume_scales_and_mute_silences() {
+fn volume_follows_a_perceptual_curve_and_mute_silences() {
     let normal = steady_rms(&one_speaker(|_| {}, false));
-    let double = steady_rms(&one_speaker(|m| assert!(m.set_volume(7, 2.0)), false));
+    let full = steady_rms(&one_speaker(|m| assert!(m.set_volume(7, 1.0)), false));
     let half = steady_rms(&one_speaker(|m| assert!(m.set_volume(7, 0.5)), false));
+    let quarter = steady_rms(&one_speaker(|m| assert!(m.set_volume(7, 0.25)), false));
     let muted = steady_rms(&one_speaker(|m| assert!(m.set_muted(7, true)), false));
     let zero = steady_rms(&one_speaker(|m| assert!(m.set_volume(7, 0.0)), false));
     assert!(normal > 0.2, "tone audible: {normal}");
+    assert!(db(full, normal).abs() < 0.1, "100 % is unity");
+    // A linear slider only takes 6 dB off at 50 %, which is barely audible.
     assert!(
-        (double / normal - 2.0).abs() < 0.05,
-        "200 %: {}",
-        double / normal
+        (db(half, normal) + 18.0).abs() < 0.5,
+        "50 %: {} dB",
+        db(half, normal)
     );
     assert!(
-        (half / normal - 0.5).abs() < 0.02,
-        "50 %: {}",
-        half / normal
+        (db(quarter, normal) + 36.0).abs() < 1.0,
+        "25 %: {} dB",
+        db(quarter, normal)
     );
     assert_eq!(muted, 0.0);
     assert_eq!(zero, 0.0);
 }
 
 #[test]
-fn volume_is_clamped_to_200_percent() {
-    let normal = steady_rms(&one_speaker(|_| {}, false));
-    let over = steady_rms(&one_speaker(|m| assert!(m.set_volume(7, 9.0)), false));
-    assert!((over / normal - 2.0).abs() < 0.05);
+fn volume_boosts_a_quiet_speaker_by_18_db_at_200_percent() {
+    let normal = steady_rms(&speaker_at(0.04, |_| {}, false));
+    let double = steady_rms(&speaker_at(0.04, |m| assert!(m.set_volume(7, 2.0)), false));
+    let over = steady_rms(&speaker_at(0.04, |m| assert!(m.set_volume(7, 9.0)), false));
+    assert!(
+        (db(double, normal) - 18.0).abs() < 0.5,
+        "200 %: {} dB",
+        db(double, normal)
+    );
+    assert!((db(over, normal) - 18.0).abs() < 0.5, "clamped to 200 %");
 }
 
 #[test]
@@ -400,5 +419,65 @@ fn playback_thread_mixes_paces_and_taps() {
                 talking: false
             },
         ]
+    );
+}
+
+#[test]
+fn playback_thread_plays_share_sound_at_its_level() {
+    use super::share::{ShareStats, share_channel, share_encoder};
+
+    const AMPLITUDE: f32 = 0.25;
+    let frames = Arc::new(Mutex::new(Vec::new()));
+    let sink = RealTimeSink {
+        started: Instant::now(),
+        written: 0,
+        frames: Arc::clone(&frames),
+    };
+    let (playback, mut ports) = Playback::start(sink, PlaybackConfig::default()).expect("playback");
+    let stats = Arc::new(ShareStats::default());
+    let (mut writer, source) = share_channel(stats.clone()).expect("channel");
+    assert!(ports.shares.add(source).is_ok());
+
+    let mut encoder = share_encoder().expect("encoder");
+    let mut out = [0u8; crate::codec::MAX_PACKET_BYTES];
+    let started = Instant::now();
+    for n in 0..100 {
+        let mut frame = [0.0; FRAME_SAMPLES];
+        for (i, s) in frame.iter_mut().enumerate() {
+            let t = (n * FRAME_SAMPLES + i) as f32 / 48_000.0;
+            *s = AMPLITUDE * (std::f32::consts::TAU * 440.0 * t).sin();
+        }
+        if let Some(len) = encoder.push_frame(&frame, &mut out).expect("encode") {
+            writer.push_packet(&out[..len]).expect("decode");
+        }
+        let due = started + Duration::from_millis(10 * (n as u64 + 1));
+        if let Some(wait) = due.checked_duration_since(Instant::now()) {
+            std::thread::sleep(wait);
+        }
+    }
+    drop(writer);
+    let deadline = Instant::now() + Duration::from_secs(5);
+    while stats.snapshot().played_samples < 90 * FRAME_SAMPLES as u64 {
+        assert!(Instant::now() < deadline, "{:?}", stats.snapshot());
+        std::thread::sleep(Duration::from_millis(10));
+    }
+    std::thread::sleep(Duration::from_millis(100));
+    // The ring was played out and handed back for freeing.
+    ports.shares.collect();
+    drop(playback);
+
+    let frames = frames.lock().expect("frames");
+    let expected = AMPLITUDE / std::f32::consts::SQRT_2;
+    let audible: Vec<f32> = frames
+        .iter()
+        .map(|f| rms(&f[..]))
+        .filter(|level| *level > 0.05)
+        .collect();
+    assert!(audible.len() >= 80, "{} audible frames", audible.len());
+    let steady = &audible[10..audible.len() - 5];
+    let level = steady.iter().sum::<f32>() / steady.len() as f32;
+    assert!(
+        (level - expected).abs() < expected * 0.1,
+        "level {level}, expected {expected}"
     );
 }

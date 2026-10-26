@@ -13,13 +13,16 @@
   },
   "dm": {
     "title": "Лични съобщения",
-    "unknown": "Непознат човек"
+    "unknown": "Непознат човек",
+    "withServer": "{{name}}, на {{server}}"
   },
   "notify": {
     "channel": "{{name}} в {{channel}}: {{text}}",
     "private": "{{name}} (лично): {{text}}",
     "more_one": "{{count}} друго ново съобщение",
-    "more_other": "{{count}} други нови съобщения"
+    "more_other": "{{count}} други нови съобщения",
+    "channelOn": "{{name}} в {{channel}} на {{server}}: {{text}}",
+    "privateOn": "{{name}} (лично, {{server}}): {{text}}"
   },
   "history": {
     "clear": "Изчисти историята",

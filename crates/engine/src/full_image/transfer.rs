@@ -13,7 +13,7 @@ use std::collections::{HashMap, VecDeque};
 use std::sync::{Arc, Mutex};
 use std::time::Duration;
 
-use tokio::sync::mpsc;
+use tokio::sync::{Notify, mpsc};
 use tokio::time::Instant;
 
 use super::check::MAX_BYTES;
@@ -80,6 +80,8 @@ pub enum FetchError {
     Protocol,
     #[error("the data does not match the announced image")]
     Mismatch,
+    #[error("cancelled")]
+    Cancelled,
 }
 
 struct Job {
@@ -95,6 +97,8 @@ struct State {
     next_id: u32,
     /// Running downloads by (sender session, transfer id).
     downloads: HashMap<(u32, u32), mpsc::UnboundedSender<Msg>>,
+    /// Wake-ups to stop running downloads, with the hash of the image they fetch.
+    cancels: HashMap<(u32, u32), ([u8; 32], Arc<Notify>)>,
     queue: VecDeque<Job>,
     /// Requester of the running upload, while one runs.
     active: Option<u32>,
@@ -254,6 +258,17 @@ impl Transfers {
         }
     }
 
+    /// Stops the running downloads of this image (the viewer closed). Chunks that still
+    /// arrive find no download and are ignored.
+    pub(crate) fn cancel(&self, hash: &[u8; 32]) {
+        let state = lock(&self.state);
+        for (key, notify) in state.cancels.values() {
+            if key == hash {
+                notify.notify_one();
+            }
+        }
+    }
+
     fn still_serving(&self, generation: u64, to: u32) -> bool {
         let state = lock(&self.state);
         state.generation == generation && state.active == Some(to)
@@ -270,6 +285,7 @@ impl Transfers {
         progress: impl Fn(u32, u32),
     ) -> Result<Vec<u8>, FetchError> {
         let (tx, mut rx) = mpsc::unbounded_channel();
+        let cancelled = Arc::new(Notify::new());
         let id = {
             let mut state = lock(&self.state);
             if state.downloads.len() >= MAX_DOWNLOADS {
@@ -278,6 +294,9 @@ impl Transfers {
             state.next_id = state.next_id.wrapping_add(1);
             let id = state.next_id;
             state.downloads.insert((from, id), tx);
+            state
+                .cancels
+                .insert((from, id), (full.hash, cancelled.clone()));
             id
         };
         let _registered = Registered {
@@ -297,10 +316,12 @@ impl Transfers {
         let mut wait = self.timing.reply;
         let mut data: Option<Vec<u8>> = None;
         loop {
-            let msg = tokio::time::timeout(wait, rx.recv())
-                .await
-                .map_err(|_| FetchError::Timeout)?
-                .ok_or(FetchError::Gone)?;
+            let msg = tokio::select! {
+                () = cancelled.notified() => return Err(FetchError::Cancelled),
+                msg = tokio::time::timeout(wait, rx.recv()) => {
+                    msg.map_err(|_| FetchError::Timeout)?.ok_or(FetchError::Gone)?
+                }
+            };
             match (msg, data.as_mut()) {
                 (Msg::Queued { .. }, None) => wait = self.timing.queued,
                 (Msg::Start { size, .. }, None) => {
@@ -350,7 +371,9 @@ struct Registered<'a> {
 
 impl Drop for Registered<'_> {
     fn drop(&mut self) {
-        lock(&self.transfers.state).downloads.remove(&self.key);
+        let mut state = lock(&self.transfers.state);
+        state.downloads.remove(&self.key);
+        state.cancels.remove(&self.key);
     }
 }
 
@@ -577,6 +600,45 @@ mod tests {
         };
         let (result, ()) = tokio::join!(fetch(&bob, ALICE, FullRef::of(&picture)), leave);
         assert_eq!(result.0, Err(FetchError::Gone));
+    }
+
+    #[tokio::test]
+    async fn cancel_stops_the_download_and_ignores_late_chunks() {
+        let picture = image(CHUNK_LEN * 3);
+        let full = FullRef::of(&picture);
+        let alice = client(ALICE, vec![picture], |msg| match msg {
+            // The sender stalls after the first chunk, so the download is still running.
+            Msg::Chunk { index, .. } if index > 0 => None,
+            other => Some(other),
+        });
+        let bob = client(BOB, vec![], Some);
+        connect(&[&alice, &bob]);
+        let canceller = bob.transfers.clone();
+        tokio::spawn(async move {
+            tokio::time::sleep(Duration::from_millis(50)).await;
+            canceller.cancel(&full.hash);
+        });
+        let started = Instant::now();
+        let (result, _) = fetch(&bob, ALICE, full).await;
+        assert!(matches!(result, Err(FetchError::Cancelled)));
+        assert!(
+            started.elapsed() < Duration::from_millis(400),
+            "no timeout wait"
+        );
+        assert!(lock(&bob.transfers.state).downloads.is_empty());
+        assert!(lock(&bob.transfers.state).cancels.is_empty());
+        // A chunk arriving after the cancel finds no download and is dropped.
+        bob.transfers.on_message(
+            ALICE,
+            Msg::Chunk {
+                id: 1,
+                index: 1,
+                data: vec![0; CHUNK_LEN],
+            },
+            bob.wire.clone(),
+            bob.originals.clone(),
+        );
+        assert!(lock(&bob.transfers.state).downloads.is_empty());
     }
 
     #[tokio::test]

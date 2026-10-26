@@ -10,5 +10,6 @@
   "image": "Έστειλε μια εικόνα",
   "open": "Άνοιγμα συνομιλίας",
   "close": "Απόρριψη ειδοποίησης",
-  "mentionLine": "Ο/Η {{sender}} σε ανέφερε: {{preview}}"
+  "mentionLine": "Ο/Η {{sender}} σε ανέφερε: {{preview}}",
+  "withServer": "{{server}} · {{what}}"
 }

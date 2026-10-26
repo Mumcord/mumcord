@@ -1,10 +1,7 @@
 {
   "inChannel_one": "En {{channel}} ({{count}})",
-  "inChannel_other": "En {{channel}} ({{count}})",
   "inChannel_many": "En {{channel}} ({{count}})",
-  "listening_one": "Escuchando ({{count}})",
-  "listening_other": "Escuchando ({{count}})",
-  "listening_many": "Escuchando ({{count}})",
+  "inChannel_other": "En {{channel}} ({{count}})",
   "noChannel": "Selecciona un canal para ver quién está.",
   "nobody": "No hay nadie.",
   "nobodyElse": "No hay nadie más en el servidor.",
@@ -13,6 +10,26 @@
   "registered": "Registrado",
   "unregistered": "No registrado",
   "talking": "Hablando",
+  "quality": {
+    "label": "Conexión",
+    "summary": "Conexión: {{level}}",
+    "level": {
+      "good": "Buena",
+      "fair": "Regular",
+      "weak": "Débil",
+      "unknown": "Desconocida"
+    },
+    "ping": "Ping",
+    "loss": "Pérdida de paquetes",
+    "late": "Paquetes tardíos",
+    "bandwidth": "Ancho de banda",
+    "transport": "Transporte de voz",
+    "client": "Cliente",
+    "os": "Sistema operativo",
+    "ms": "{{value}} ms",
+    "percent": "{{value}} %",
+    "kbps": "{{value}} kbit/s"
+  },
   "card": {
     "close": "Cerrar",
     "loadFailed": "No se pudo cargar el perfil.",
@@ -24,6 +41,9 @@
     "privateMessage": "Mensaje privado",
     "localSettings": "Tus ajustes",
     "localSettingsHint": "Solo tú los ves. Los cambios se guardan al instante.",
+    "settingsFor": "Ajustes de {{name}}",
+    "hintMuted": "Silenciado",
+    "hintVolume": "Volumen {{value}} %",
     "localMuteHint": "No oirás a esta persona.",
     "privateNote": "Nota privada",
     "privateNoteHint": "Solo tú puedes ver esta nota.",
@@ -38,7 +58,8 @@
     "viewProfile": "Ver perfil",
     "join": "Unirse a {{channel}}",
     "joinDenied": "No tienes permiso para entrar en este canal.",
-    "mute": "Silenciar para mí"
+    "mute": "Silenciar para mí",
+    "connectionInfo": "Info de conexión…"
   },
   "nowPlaying": {
     "label": "Reproduciendo",
@@ -53,8 +74,8 @@
     "playedFor": "desde hace {{time}}",
     "hoursMinutes": "{{hours}} h {{minutes}} min",
     "minutes_one": "{{count}} min",
-    "minutes_other": "{{count}} min",
     "minutes_many": "{{count}} min",
+    "minutes_other": "{{count}} min",
     "join": "Unirse a la partida",
     "joinTitle": "¿Unirse a la partida?",
     "joinMessage": "Se abrirá Steam y se conectará al servidor en el que esta persona juega a {{game}}. Únete solo a servidores de confianza.",

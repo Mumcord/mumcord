@@ -1418,3 +1418,101 @@ Requested while testing stage 1d.
 ✍️ Note: Requested in chat during /dev.
 
 ---
+
+#### QA.82 Music quality drops voice (issue #7)? `◉`
+Bug found after v0.3.0: at high server limits the music bitrate produced Opus frames over Mumble's 1024-byte voice packet limit, and the sender dropped them silently.
+
+- [x] **Hotfix 0.3.1:** cap the music bitrate so one packet including its header stays within the limit (derived from frame size), lower the bitrate instead of dropping, log once instead of per packet, with a test at a 510 kbit/s server limit.
+
+✍️ Note: Requested in chat during /dev.
+
+---
+
+#### QA.83 Connection quality of others (issue #8)? `◉`
+Feature request after v0.3.0.
+
+- [x] **Epic 2:** show ping, packet loss and bandwidth (Mumble UserStats) for others and oneself in the person menu/profile and as an optional signal icon; poll only while visible; hide what the server doesn't return.
+
+✍️ Note: Requested in chat during /dev.
+
+---
+
+#### QA.84 Dropdown styling? `◉`
+Requested after v0.3.0.
+
+- [x] **Epic 2:** replace the native-looking dropdowns (settings, dialogs, wizard) with one themed select component that matches the design tokens in light and dark mode and stays keyboard and screen-reader accessible.
+
+✍️ Note: Requested in chat during /dev.
+
+---
+
+#### QA.85 Inputs not right-aligned? `◉`
+Reported after v0.3.0: in Settings → Audio, the positional audio fields "Full volume up to (m)" and "Silent from (m)" are not right-aligned like the other controls.
+
+- [x] **Epic 2:** align all number/text inputs in settings rows to the right like switches and dropdowns, and audit every settings section for the same issue.
+
+✍️ Note: Requested in chat during /dev.
+
+---
+
+#### QA.87 Show full-size loading in the chat? `◉`
+Requested after v0.3.0.
+
+- [x] **Epic 2:** a slim progress bar directly under an image in the chat while its full-size version is being fetched, so the progress is visible without opening the viewer.
+
+✍️ Note: Requested in chat during /dev.
+
+---
+
+#### QA.88 Watch party and screen sharing? `◉`
+Requested after v0.3.0; both go to the end of Epic 2 and ship as Beta.
+
+- [x] **YouTube watch party:** Mumcord users in a channel watch the same YouTube video in sync; play, pause and seek are synchronized over plugin data.
+- [x] **Screen sharing:** share a screen or window with other Mumcord users. Mumble servers can't carry video, so this needs a direct peer-to-peer connection (signalling over plugin data); how to get through home routers (NAT/STUN) without any server-side component must be decided in the Epic 2 specification.
+
+✍️ Note: Requested in chat during /dev.
+
+---
+
+#### QA.89 Send images peer-to-peer? `◉`
+Requested after v0.3.0: full-size images over plugin data are slow (about 2.7 KB/s because of the server's rate limit).
+
+- [x] **Epic 2:** full-size images first try a direct peer-to-peer connection between the two Mumcord users (same P2P layer as screen sharing, signalling over plugin data); if no direct connection can be made, the existing plugin-data transfer is used. Integrity and size checks stay the same.
+- [x] **Switchable:** a setting "Allow direct connections to other Mumcord users" (explains that a direct connection reveals your IP address to them); when off, only plugin data is used.
+
+✍️ Note: Requested in chat during /dev.
+
+---
+
+#### QA.90 How does peer-to-peer work? `◉`
+Decided after v0.3.0 for Epic 2.
+
+- [x] **Introduction via the Mumble server:** both clients exchange their reachable addresses over plugin data, then try to connect directly at the same time.
+- [x] **Ways to connect:** IPv6 (often public anyway), asking the home router for its public address and a port (UPnP / NAT-PMP / PCP) and the local network. **No STUN/TURN or other external server in Epic 2.**
+- [x] **Security:** the direct connection is encrypted and both sides verify each other with the Mumble certificate hashes they already know.
+- [x] **Fallback:** if no direct path works, full-size images use plugin data as today; screen sharing is unavailable in that case.
+
+✍️ Note: Requested in chat during /dev.
+
+---
+
+#### QA.91 Keep the window overlay? `◉`
+Decided after v0.3.0.
+
+- [x] **Only the in-game overlay in Epic 2:** the window overlay (floating on-top window, KDE window rule helper, its settings and tray item) is removed.
+- [x] **Removed completely in Epic 2,** not tied to the Windows in-game overlay: Windows has no overlay until its in-game overlay ships. macOS keeps having no overlay.
+
+✍️ Note: Requested in chat during /dev.
+
+---
+
+#### QA.92 Game crashes when Mumcord closes? `◉`
+Reported after v0.3.0 with the in-game overlay on Linux.
+
+- [x] **Likely cause:** the overlay library runs inside the game but is loaded from Mumcord's own folder (the AppImage mount, or the build folder in development), which disappears or is replaced when Mumcord exits or updates.
+- [x] **Fix in Epic 2:** copy the library to a fixed per-version folder in the user's data directory and point the Vulkan manifest there; the layer keeps running without Mumcord (lost connection = draw nothing). Verify with a test that exits Mumcord while a Vulkan program runs.
+- [x] **Until then:** close the game before Mumcord, or turn the in-game overlay off.
+
+✍️ Note: Requested in chat during /dev.
+
+---

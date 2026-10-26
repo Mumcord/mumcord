@@ -3,15 +3,17 @@
 //! On Wayland the compositor finds a window's icon and name through the `.desktop` file whose
 //! name matches the window's app ID (`app.mumcord.client`, set as the program name in `run`); window icons
 //! set by the app are ignored. The desktop portal maps global shortcuts to an app the same way.
-//! Development builds and AppImages are not installed by a package manager, so Mumcord writes
-//! that entry and its icons into the user's data folder at start-up. The same entry is the
-//! `mumble://` handler, so there is only one Mumcord entry.
+//! Development builds are not installed by a package manager, so Mumcord writes that entry and
+//! its icons into the user's data folder at start-up. An AppImage does so only after the user
+//! agreed (`appimage_menu_entry`, FR-2.55); the UI asks once. The same entry is the `mumble://`
+//! handler, so there is only one Mumcord entry.
 
 use std::ffi::OsString;
 use std::io;
 use std::path::{Path, PathBuf};
 use std::process::Command;
 
+use mumcord_engine::{Engine, store::Consent};
 use tauri::{AppHandle, Manager};
 
 /// Shown in menus and the taskbar.
@@ -29,6 +31,64 @@ const ICONS: [(&str, &[u8]); 4] = [
     ("256x256", include_bytes!("../icons/128x128@2x.png")),
     ("512x512", include_bytes!("../icons/icon.png")),
 ];
+
+/// Whether this process runs from an AppImage (the runtime sets `APPIMAGE` to its path).
+pub(crate) fn is_appimage() -> bool {
+    std::env::var_os("APPIMAGE").is_some_and(|path| !path.is_empty())
+}
+
+/// Whether the user's entry may be written and kept up to date. Package installs and
+/// development builds always may; an AppImage only after a "yes", because it is not installed
+/// and the user never asked for a menu entry.
+fn may_write_entry(appimage: bool, consent: Consent) -> bool {
+    !appimage || consent == Consent::Yes
+}
+
+/// Whether an entry Mumcord manages already exists although the user was never asked: the curl
+/// installer writes it when it installs the AppImage (FR-2.54), which counts as a yes.
+fn installer_consented(consent: Consent, user_entry: Option<&str>) -> bool {
+    consent == Consent::Unset && user_entry.is_some_and(is_managed)
+}
+
+/// Stores the yes when the installer already wrote the entry, so the UI does not offer the
+/// menu entry again. Blocks briefly: it runs during setup, before the UI reads the settings.
+fn adopt_installer_entry(app: &AppHandle, install: &Install, consent: Consent) -> Consent {
+    let entry = match read_optional(&install.entry_path()) {
+        Ok(entry) => entry,
+        Err(e) => {
+            tracing::warn!(error = %e, "reading the desktop entry failed");
+            return consent;
+        }
+    };
+    if !installer_consented(consent, entry.as_deref()) {
+        return consent;
+    }
+    let engine = app.state::<Engine>();
+    let stored = engine.settings().and_then(|mut settings| {
+        settings.appimage_menu_entry = Consent::Yes;
+        tauri::async_runtime::block_on(engine.update_settings(settings))
+    });
+    match stored {
+        Ok(_) => {
+            tracing::info!("the installer added the menu entry; keeping it up to date");
+            Consent::Yes
+        }
+        Err(e) => {
+            tracing::warn!(error = %e, "storing the installer's menu entry choice failed");
+            consent
+        }
+    }
+}
+
+fn appimage_consent(app: &AppHandle) -> Consent {
+    match app.state::<Engine>().settings() {
+        Ok(settings) => settings.appimage_menu_entry,
+        Err(e) => {
+            tracing::warn!(error = %e, "reading the menu entry choice failed; not writing the entry");
+            Consent::Unset
+        }
+    }
+}
 
 /// File name of the entry for an app ID.
 fn file_name(app_id: &str) -> String {
@@ -281,6 +341,15 @@ pub fn ensure(app: &AppHandle) {
             return;
         }
     };
+    let appimage = is_appimage();
+    let mut consent = appimage_consent(app);
+    if appimage {
+        consent = adopt_installer_entry(app, &install, consent);
+    }
+    if !may_write_entry(appimage, consent) {
+        tracing::info!("not writing the desktop entry: the AppImage menu entry was not accepted");
+        return;
+    }
     let spawned = std::thread::Builder::new()
         .name("desktop-entry".into())
         .spawn(move || {
@@ -301,8 +370,25 @@ pub fn is_handler(app: &AppHandle) -> io::Result<bool> {
     Ok(default_handler()?.as_deref() == Some(file_name(&app.config().identifier).as_str()))
 }
 
-/// Makes Mumcord's entry the default `mumble://` handler.
+/// AppImage only, after the user agreed: writes the entry and icons and moves an old
+/// `mumble://` default over. Safe to repeat.
+pub fn add_for_appimage(app: &AppHandle) -> io::Result<()> {
+    if !is_appimage() {
+        return Err(io::Error::other("not running as an AppImage"));
+    }
+    let install = Install::from_app(app)?;
+    install.ensure_entry()?;
+    install.migrate_legacy_handler()
+}
+
+/// Makes Mumcord's entry the default `mumble://` handler. An AppImage needs the user's
+/// menu-entry consent first, since the handler is that same entry.
 pub fn register_handler(app: &AppHandle) -> io::Result<()> {
+    if !may_write_entry(is_appimage(), appimage_consent(app)) {
+        return Err(io::Error::other(
+            "allow Mumcord to add itself to the app menu first",
+        ));
+    }
     let install = Install::from_app(app)?;
     install.ensure_entry()?;
     set_default_handler(&file_name(&install.app_id))
@@ -334,6 +420,34 @@ mod tests {
         }
         assert!(!content.contains("NoDisplay"));
         assert_eq!(file_name(APP_ID), "app.mumcord.client.desktop");
+    }
+
+    #[test]
+    fn an_appimage_writes_only_after_a_yes() {
+        assert!(!may_write_entry(true, Consent::Unset));
+        assert!(!may_write_entry(true, Consent::No));
+        assert!(may_write_entry(true, Consent::Yes));
+    }
+
+    #[test]
+    fn an_entry_written_by_the_installer_counts_as_a_yes() {
+        let managed = desktop_file(APP_ID, "/home/a/.local/bin/Mumcord.AppImage");
+        assert!(installer_consented(Consent::Unset, Some(&managed)));
+        // Never overrides an answer, and never adopts an entry Mumcord did not write.
+        assert!(!installer_consented(Consent::No, Some(&managed)));
+        assert!(!installer_consented(Consent::Yes, Some(&managed)));
+        assert!(!installer_consented(
+            Consent::Unset,
+            Some("[Desktop Entry]\nName=Mumcord\n")
+        ));
+        assert!(!installer_consented(Consent::Unset, None));
+    }
+
+    #[test]
+    fn packages_and_dev_builds_do_not_ask() {
+        for consent in [Consent::Unset, Consent::No, Consent::Yes] {
+            assert!(may_write_entry(false, consent));
+        }
     }
 
     #[test]

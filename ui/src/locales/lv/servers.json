@@ -13,10 +13,15 @@
     "listLabel": "Saglabātie serveri",
     "add": "Pievienot serveri",
     "keyboardHint": "Enter izveido savienojumu. Alt plus augšupvērstā vai lejupvērstā bultiņa pārvieto serveri. Shift plus F10 atver papildu opcijas.",
-    "status": {
-      "connected": "{{server}} (savienots)",
-      "connecting": "{{server}} (savienojas)",
-      "reconnecting": "{{server}} (atjauno savienojumu)"
+    "label": "{{server}} ({{state}})",
+    "state": {
+      "connected": "savienots",
+      "connecting": "savienojas",
+      "reconnecting": "atjauno savienojumu",
+      "error": "savienojums zudis",
+      "voice": "balss serveris",
+      "unread": "nelasītas ziņas",
+      "mentions": "pieminējumi: {{mentions}}"
     }
   },
   "menu": {
@@ -26,7 +31,19 @@
     "edit": "Rediģēt serveri",
     "moveUp": "Pārvietot uz augšu",
     "moveDown": "Pārvietot uz leju",
-    "remove": "Noņemt serveri"
+    "remove": "Noņemt serveri",
+    "reconnect": "Savienot no jauna",
+    "alwaysConnect": "Vienmēr savienot palaišanas laikā",
+    "muteNotifications": "Apklusināt paziņojumus",
+    "theme": "Motīvs…",
+    "showWelcome": "Rādīt sveiciena ziņu"
+  },
+  "theme": {
+    "title": "Motīvs serverim {{server}}",
+    "label": "Motīvs",
+    "useApp": "Lietot lietotnes motīvu",
+    "hint": "Darbojas, kamēr tiek rādīts šis serveris.",
+    "failed": "Motīvu neizdevās saglabāt. Mēģini vēlreiz."
   },
   "dialog": {
     "addTitle": "Pievienot serveri",
@@ -50,7 +67,14 @@
       "username": "Ievadi vārdu, ko vēlies izmantot šajā serverī.",
       "link": "Šo mumble:// saiti nevar nolasīt. Pārbaudi, vai tā ir nokopēta pilnībā.",
       "invalid": "Servera dati nav derīgi. Pārbaudi adresi un portu."
-    }
+    },
+    "alwaysConnect": "Vienmēr savienot palaišanas laikā",
+    "alwaysConnectHint": "Mumcord palaišanas laikā savieno šo serveri tikai lasīšanas režīmā.",
+    "channelPasswords": "Kanālu paroles",
+    "channelPassword": "Kanāla parole {{number}}",
+    "removeChannelPassword": "Noņemt {{name}}",
+    "remove": "Noņemt",
+    "channelPasswordsHint": "Saglabātas, kad aizsargāts kanāls tās pieņēma. Noņemtās tiks prasītas atkal nākamajā ieejā."
   },
   "errors": {
     "serverUnreachable": "Serveris nav sasniedzams. Pārbaudi adresi un portu un to, vai esi tiešsaistē.",
@@ -63,17 +87,16 @@
     "invalidAddress": "Servera adrese nav derīga. Rediģē serveri, lai to labotu.",
     "secureStorage": "Tavas sistēmas drošā krātuve nav pieejama, tāpēc servera paroli nevarēja nolasīt vai saglabāt. Atbloķē to un mēģini vēlreiz.",
     "notFound": "Šis serveris vairs nav saglabāts.",
-    "generic": "Kaut kas nogāja greizi. Lūdzu, mēģini vēlreiz."
+    "generic": "Kaut kas nogāja greizi. Lūdzu, mēģini vēlreiz.",
+    "serverLimit": "Tu jau esi savienots ar maksimālo {{limit}} serveru skaitu. Atvieno kādu serveri vai palielini ierobežojumu sadaļā Iestatījumi → Serveri.",
+    "serverLimitUnknown": "Tu jau esi savienots ar maksimālo serveru skaitu. Atvieno kādu serveri vai palielini ierobežojumu sadaļā Iestatījumi → Serveri.",
+    "alwaysConnectLimit": "Tikai {{limit}} serveriem var būt „Vienmēr savienot palaišanas laikā“, tikpat, cik savienoto serveru ierobežojums. Izslēdz to citam serverim vai palielini ierobežojumu sadaļā Iestatījumi → Serveri.",
+    "alwaysConnectLimitUnknown": "„Vienmēr savienot palaišanas laikā“ nevar būt vairāk serveriem, nekā ir savienoto serveru ierobežojums. Izslēdz to citam serverim vai palielini ierobežojumu sadaļā Iestatījumi → Serveri."
   },
   "remove": {
     "title": "Noņemt {{server}}?",
     "message": "Tā saglabātā parole, sertifikāta lēmums, sekotie kanāli un čata vēsture šajā datorā tiks dzēsti.",
     "confirm": "Noņemt"
-  },
-  "switch": {
-    "title": "Pārslēgt serveri?",
-    "message": "Vienlaikus vari būt tikai vienā serverī. Atvienoties no {{current}} un savienoties ar {{next}}?",
-    "confirm": "Atvienoties un pārslēgt"
   },
   "cert": {
     "newTitle": "Uzticēties šim serverim?",
@@ -108,7 +131,10 @@
     "actionFailed": {
       "reorder": "Jauno serveru secību neizdevās saglabāt. Lūdzu, mēģini vēlreiz.",
       "remove": "Serveri neizdevās noņemt. Lūdzu, mēģini vēlreiz.",
-      "disconnect": "Atvienošanās neizdevās. Lūdzu, mēģini vēlreiz."
+      "disconnect": "Atvienošanās neizdevās. Lūdzu, mēģini vēlreiz.",
+      "alwaysConnect": "„Vienmēr savienot palaišanas laikā“ neizdevās saglabāt. Mēģini vēlreiz.",
+      "notifications": "Paziņojumu iestatījumu neizdevās saglabāt. Mēģini vēlreiz.",
+      "savePassword": "Jauno paroli neizdevās saglabāt. Rediģē serveri, lai to saglabātu."
     }
   },
   "empty": {
@@ -124,5 +150,27 @@
     "errors": {
       "required": "Ievadi servera adresi vai mumble:// saiti."
     }
+  },
+  "password": {
+    "title": "Parole serverim {{server}}",
+    "intro": "Serveris nepieņēma paroli. Ievadi pareizo, lai mēģinātu vēlreiz.",
+    "label": "Parole",
+    "show": "Rādīt",
+    "hide": "Paslēpt",
+    "wrong": "Arī šī parole ir nepareiza. Mēģini vēlreiz.",
+    "save": "Saglabāt paroli",
+    "cancel": "Atcelt",
+    "connect": "Savienot",
+    "connecting": "Savienojas…"
+  },
+  "channelPassword": {
+    "title": "Šim kanālam vajadzīga parole",
+    "intro": "Ievadi paroli kanālam {{channel}}.",
+    "label": "Parole",
+    "wrong": "Nepareiza parole",
+    "failed": "Paroli neizdevās nosūtīt. Mēģini vēlreiz.",
+    "cancel": "Atcelt",
+    "join": "Ieiet",
+    "joining": "Ieiet…"
   }
 }

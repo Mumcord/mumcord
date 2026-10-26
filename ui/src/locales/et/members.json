@@ -1,8 +1,6 @@
 {
   "inChannel_one": "Kanalis {{channel}} ({{count}})",
   "inChannel_other": "Kanalis {{channel}} ({{count}})",
-  "listening_one": "Kuulavad ({{count}})",
-  "listening_other": "Kuulavad ({{count}})",
   "noChannel": "Vali kanal, et näha, kes seal on.",
   "nobody": "Siin pole kedagi.",
   "nobodyElse": "Serveris pole kedagi teist.",
@@ -11,6 +9,26 @@
   "registered": "Registreeritud",
   "unregistered": "Registreerimata",
   "talking": "Räägib",
+  "quality": {
+    "label": "Ühendus",
+    "summary": "Ühendus: {{level}}",
+    "level": {
+      "good": "Hea",
+      "fair": "Keskmine",
+      "weak": "Nõrk",
+      "unknown": "Teadmata"
+    },
+    "ping": "Ping",
+    "loss": "Pakettide kadu",
+    "late": "Hilinenud paketid",
+    "bandwidth": "Ribalaius",
+    "transport": "Hääle edastus",
+    "client": "Klient",
+    "os": "Operatsioonisüsteem",
+    "ms": "{{value}} ms",
+    "percent": "{{value}} %",
+    "kbps": "{{value}} kbit/s"
+  },
   "card": {
     "close": "Sulge",
     "loadFailed": "Profiili ei õnnestunud laadida.",
@@ -22,6 +40,9 @@
     "privateMessage": "Privaatsõnum",
     "localSettings": "Sinu seaded",
     "localSettingsHint": "Neid näed ainult sina. Muudatused salvestatakse kohe.",
+    "settingsFor": "Seaded: {{name}}",
+    "hintMuted": "Vaigistatud",
+    "hintVolume": "Helitugevus {{value}} %",
     "localMuteHint": "Sa ei kuule seda inimest.",
     "privateNote": "Privaatne märge",
     "privateNoteHint": "Seda märget näed ainult sina.",
@@ -36,7 +57,8 @@
     "viewProfile": "Vaata profiili",
     "join": "Liitu kanaliga {{channel}}",
     "joinDenied": "Sul pole luba sellesse kanalisse siseneda.",
-    "mute": "Vaigista minu jaoks"
+    "mute": "Vaigista minu jaoks",
+    "connectionInfo": "Ühenduse teave…"
   },
   "nowPlaying": {
     "label": "Praegu mängib",

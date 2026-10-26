@@ -6,17 +6,19 @@
 //! `MUMCORD_LIVE=1 cargo test -p mumcord-engine --features test-backend --test live_full_image -- --ignored --test-threads=1`
 #![cfg(feature = "test-backend")]
 
+mod common;
+
 use std::io::Cursor;
 use std::path::{Path, PathBuf};
 use std::time::Duration;
 
 use image::{ImageFormat, Rgb, RgbImage};
 use mumcord_bot::env;
+use mumcord_engine::EventReceiver;
 use mumcord_engine::full_image::FullRef;
+use mumcord_engine::store::Consent;
 use mumcord_engine::{Engine, EngineEvent, PasswordChange, SecretStore, ServerFields, ServerView};
-use tokio::sync::mpsc::UnboundedReceiver;
 
-const PORT: u16 = 64739;
 const WAIT: Duration = Duration::from_secs(30);
 
 fn live() -> bool {
@@ -43,7 +45,7 @@ fn work_dir(name: &str) -> PathBuf {
 }
 
 async fn wait_for<T>(
-    rx: &mut UnboundedReceiver<EngineEvent>,
+    rx: &mut EventReceiver,
     what: &str,
     mut pick: impl FnMut(&EngineEvent) -> Option<T>,
 ) -> T {
@@ -59,7 +61,7 @@ async fn wait_for<T>(
     }
 }
 
-async fn engine(dir: &Path, name: &str) -> (Engine, UnboundedReceiver<EngineEvent>, ServerView) {
+async fn engine(dir: &Path, name: &str) -> (Engine, EventReceiver, ServerView) {
     let (engine, rx) = Engine::new(
         &dir.join(name),
         SecretStore::in_memory(),
@@ -67,11 +69,16 @@ async fn engine(dir: &Path, name: &str) -> (Engine, UnboundedReceiver<EngineEven
     )
     .expect("engine");
     engine.identity_create(name.into()).await.expect("identity");
+    // Plugin data only: the direct path is covered by live_p2p, and an unanswered consent
+    // question would hold the fetch for a minute before it falls back.
+    let mut settings = engine.settings().expect("settings");
+    settings.allow_direct_connections = Consent::No;
+    engine.update_settings(settings).await.expect("no direct");
     let server = engine
         .server_add(ServerFields {
-            label: format!("test {PORT} {name}"),
+            label: format!("test {} {name}", common::v14()),
             address: "127.0.0.1".into(),
-            port: PORT,
+            port: common::v14(),
             username: name.into(),
             password: match env::testenv_var("SERVER_PASSWORD") {
                 Some(p) => PasswordChange::Set(p),
@@ -83,7 +90,7 @@ async fn engine(dir: &Path, name: &str) -> (Engine, UnboundedReceiver<EngineEven
     (engine, rx, server)
 }
 
-async fn connect(engine: &Engine, rx: &mut UnboundedReceiver<EngineEvent>, server: &ServerView) {
+async fn connect(engine: &Engine, rx: &mut EventReceiver, server: &ServerView) {
     engine.connect(server.id, None).expect("connect");
     loop {
         let event = wait_for(rx, "sync", |e| match e {
@@ -148,7 +155,10 @@ async fn full_image_is_fetched_from_the_sender() {
         "a small valid image is kept as it is"
     );
     let html = format!("<img src=\"{THUMBNAIL}\" data-mumcord-full=\"{reference}\" />");
-    alice.send_channel_message(0, &html).expect("sent");
+    alice
+        .send_channel_message(only_server(&alice), 0, &html)
+        .await
+        .expect("sent");
 
     let message = wait_for(&mut bob_rx, "the image message", |e| match e {
         EngineEvent::MessageReceived(m) if m.sender_name == alice_name => Some((**m).clone()),
@@ -168,7 +178,7 @@ async fn full_image_is_fetched_from_the_sender() {
         let reference = reference.clone();
         let cert = message.sender_cert_hash.clone();
         tokio::spawn(async move {
-            bob.full_image_fetch(&reference, message.sender_session, cert)
+            bob.full_image_fetch(only_server(&bob), &reference, message.sender_session, cert)
                 .await
         })
     };
@@ -186,7 +196,8 @@ async fn full_image_is_fetched_from_the_sender() {
     assert!(data_url.starts_with("data:image/png;base64,"), "{data_url}");
     // The second open comes from the cache, without asking Alice again.
     assert_eq!(
-        bob.full_image_fetch(&reference, None, None).await,
+        bob.full_image_fetch(only_server(&bob), &reference, None, None)
+            .await,
         Some(data_url)
     );
 
@@ -195,13 +206,22 @@ async fn full_image_is_fetched_from_the_sender() {
         .full_image_keep(picture(20, 20, 9))
         .await
         .expect("kept");
-    alice.disconnect();
+    alice.disconnect(only_server(&alice));
     let started = tokio::time::Instant::now();
     assert_eq!(
-        bob.full_image_fetch(&other, message.sender_session, None)
+        bob.full_image_fetch(only_server(&bob), &other, message.sender_session, None)
             .await,
         None
     );
     assert!(started.elapsed() < WAIT, "gives up quickly");
-    bob.disconnect();
+    bob.disconnect(only_server(&bob));
+}
+
+/// The test's only connected server (0, which no call accepts, when none is).
+fn only_server(engine: &Engine) -> mumcord_engine::ServerId {
+    engine
+        .connections()
+        .first()
+        .and_then(mumcord_engine::ConnState::server_id)
+        .unwrap_or(0)
 }

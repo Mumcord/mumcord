@@ -1,8 +1,6 @@
 {
   "inChannel_one": "In {{channel}} ({{count}})",
   "inChannel_other": "In {{channel}} ({{count}})",
-  "listening_one": "Listening ({{count}})",
-  "listening_other": "Listening ({{count}})",
   "noChannel": "Select a channel to see who is in it.",
   "nobody": "Nobody is here.",
   "nobodyElse": "Nobody else is on the server.",
@@ -11,6 +9,26 @@
   "registered": "Registered",
   "unregistered": "Not registered",
   "talking": "Talking",
+  "quality": {
+    "label": "Connection",
+    "summary": "Connection: {{level}}",
+    "level": {
+      "good": "Good",
+      "fair": "Fair",
+      "weak": "Weak",
+      "unknown": "Unknown"
+    },
+    "ping": "Ping",
+    "loss": "Packet loss",
+    "late": "Late packets",
+    "bandwidth": "Bandwidth",
+    "transport": "Voice transport",
+    "client": "Client",
+    "os": "Operating system",
+    "ms": "{{value}} ms",
+    "percent": "{{value}} %",
+    "kbps": "{{value}} kbit/s"
+  },
   "card": {
     "close": "Close",
     "loadFailed": "Could not load the profile.",
@@ -22,6 +40,9 @@
     "privateMessage": "Private message",
     "localSettings": "Your settings",
     "localSettingsHint": "Only you see these. Changes are saved right away.",
+    "settingsFor": "Settings for {{name}}",
+    "hintMuted": "Muted",
+    "hintVolume": "Volume {{value}} %",
     "localMuteHint": "You won't hear this person.",
     "privateNote": "Private note",
     "privateNoteHint": "Only you can see this note.",
@@ -36,7 +57,8 @@
     "viewProfile": "View profile",
     "join": "Join {{channel}}",
     "joinDenied": "You are not allowed to enter this channel.",
-    "mute": "Mute for me"
+    "mute": "Mute for me",
+    "connectionInfo": "Connection info…"
   },
   "nowPlaying": {
     "label": "Now playing",

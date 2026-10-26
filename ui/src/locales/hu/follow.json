@@ -13,13 +13,16 @@
   },
   "dm": {
     "title": "Közvetlen üzenetek",
-    "unknown": "Ismeretlen személy"
+    "unknown": "Ismeretlen személy",
+    "withServer": "{{name}}, itt: {{server}}"
   },
   "notify": {
     "channel": "{{name}} itt: {{channel}}: {{text}}",
     "private": "{{name}} (privát): {{text}}",
     "more_one": "Még {{count}} új üzenet",
-    "more_other": "Még {{count}} új üzenet"
+    "more_other": "Még {{count}} új üzenet",
+    "channelOn": "{{name}} itt: {{channel}}, {{server}}: {{text}}",
+    "privateOn": "{{name}} (privát, {{server}}): {{text}}"
   },
   "history": {
     "clear": "Előzmények törlése",

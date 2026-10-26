@@ -9,5 +9,17 @@
   "retry": "Yritä uudelleen",
   "loading": "Ladataan…",
   "beta": "Beta",
-  "betaFeature": "Beta-ominaisuus"
+  "betaFeature": "Beta-ominaisuus",
+  "themePicker": {
+    "swatch": "{{name}}, teema",
+    "swatchSelected": "{{name}}, teema, valittu",
+    "yourThemes": "Omat teemat",
+    "add": "Uusi teema nykyisestä",
+    "addShort": "Uusi"
+  },
+  "floatingWidget": {
+    "collapse": "Pienennä",
+    "expand": "Laajenna",
+    "handle": "{{name}}: nuolinäppäimet siirtävät, Vaihto+nuolinäppäimet muuttavat kokoa"
+  }
 }

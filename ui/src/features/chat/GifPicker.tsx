@@ -185,7 +185,7 @@ export function GifPicker({ onSend, disabled, linkPreviews }: GifPickerProps) {
         type="button"
         className="chat-composer__icon chat-composer__gif"
         aria-label={t("favorites.open")}
-        title={t("favorites.open")}
+        data-tooltip={t("favorites.open")}
         aria-haspopup="dialog"
         aria-expanded={open}
         aria-controls={open ? dialogId : undefined}
@@ -241,7 +241,7 @@ export function GifPicker({ onSend, disabled, linkPreviews }: GifPickerProps) {
                         className="gif-picker__choose"
                         tabIndex={index === current ? 0 : -1}
                         aria-label={t("favorites.send", { name })}
-                        title={linkPreviews ? name : url}
+                        data-tooltip={linkPreviews ? name : url}
                         onClick={() => {
                           choose(url);
                         }}
@@ -254,7 +254,7 @@ export function GifPicker({ onSend, disabled, linkPreviews }: GifPickerProps) {
                         className="gif-picker__remove"
                         tabIndex={-1}
                         aria-label={t("favorites.removeNamed", { name })}
-                        title={t("favorites.remove")}
+                        data-tooltip={t("favorites.remove")}
                         onClick={() => {
                           remove(index);
                         }}

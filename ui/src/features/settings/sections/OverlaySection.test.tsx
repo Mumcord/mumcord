@@ -1,5 +1,6 @@
 import { act, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { chooseOption } from "../../../components/SelectTestUtils";
 import { createMockApi, setApi, type MockApi } from "../../../api";
 import { applyLanguage } from "../../../i18n";
 import type { InGameGame, InGameOverlayApi, InGameState } from "./inGameOverlay";
@@ -18,8 +19,10 @@ const game = (over: Partial<InGameGame>): InGameGame => ({
   ...over,
 });
 
-function fakeInGame(initial: Omit<InGameState, "explanationKey"> & Partial<InGameState>) {
-  const state: InGameState = { explanationKey: null, ...initial };
+function fakeInGame(
+  initial: Omit<InGameState, "explanationKey" | "openglLaunchOption"> & Partial<InGameState>,
+) {
+  const state: InGameState = { explanationKey: null, openglLaunchOption: null, ...initial };
   const fake: InGameOverlayApi = {
     state: vi.fn(() => Promise.resolve(state)),
     setMode: vi.fn(() => Promise.resolve(state)),
@@ -41,100 +44,36 @@ afterEach(() => {
   setApi(undefined);
 });
 
-describe("Window overlay", () => {
-  it("toggles, changes the corner and the sliders through the commands", async () => {
-    const setEnabled = vi.spyOn(api, "overlaySetEnabled");
-    const update = vi.spyOn(api, "overlayUpdate");
-    const move = vi.spyOn(api, "overlayMoveMode");
-    render(<OverlaySection inGameApi={fakeInGame({ supported: true, mode: "off", games: [] })} />);
-    const toggle = await screen.findByRole("switch", { name: "Show the overlay" });
-    fireEvent.click(toggle);
-    expect(setEnabled).toHaveBeenCalledWith(true);
-    await waitFor(() => {
-      expect(toggle).toBeChecked();
-    });
-
-    fireEvent.change(screen.getByLabelText("Position", { selector: "select" }), {
-      target: { value: "bottomRight" },
-    });
-    expect(update).toHaveBeenLastCalledWith(
-      expect.objectContaining({ corner: "bottomRight", customPosition: null }),
-    );
-    fireEvent.change(screen.getByLabelText("Opacity"), { target: { value: "50" } });
-    expect(update).toHaveBeenLastCalledWith(expect.objectContaining({ opacity: 50 }));
-    fireEvent.click(screen.getByRole("switch", { name: "Show the whole channel" }));
-    expect(update).toHaveBeenLastCalledWith(expect.objectContaining({ showWholeChannel: true }));
-
-    fireEvent.click(screen.getByRole("button", { name: "Move overlay…" }));
-    expect(move).toHaveBeenCalledWith(true);
-    expect(await screen.findByRole("button", { name: "Done moving" })).toBeInTheDocument();
-  });
-
-  it("explains the limits of this desktop", async () => {
-    const state = await api.overlayState();
-    vi.spyOn(api, "overlayState").mockResolvedValue({
-      ...state,
-      onTopSupported: false,
-      positionSupported: false,
-      explanationKey: "limits.wayland",
-    });
-    render(<OverlaySection />);
-    expect(await screen.findByText(/Wayland desktop/)).toBeInTheDocument();
-    expect(screen.getByText(/corner positions and moving have no effect/)).toBeInTheDocument();
-    expect(screen.getByLabelText("Position", { selector: "select" })).toBeDisabled();
-    expect(screen.getByRole("button", { name: "Move overlay…" })).toBeDisabled();
-  });
-});
-
-describe("KDE window rule", () => {
-  it("is not offered outside KDE Wayland", async () => {
-    render(<OverlaySection />);
-    await screen.findByRole("switch", { name: "Show the overlay" });
-    expect(screen.queryByRole("button", { name: "Set up automatically" })).not.toBeInTheDocument();
-    expect(screen.queryByRole("button", { name: "Open KDE window rules" })).not.toBeInTheDocument();
-  });
-
-  it("sets up, removes and opens the rules on KDE Wayland", async () => {
-    const state = await api.overlayState();
-    vi.spyOn(api, "overlayState").mockResolvedValue({ ...state, kdeWayland: true });
-    // The mock's own state is not on KDE Wayland, so answer with KDE states here.
-    const install = vi
-      .spyOn(api, "overlayKwinRuleInstall")
-      .mockResolvedValue({ ...state, kdeWayland: true, kwinRuleInstalled: true });
-    const remove = vi
-      .spyOn(api, "overlayKwinRuleRemove")
-      .mockResolvedValue({ ...state, kdeWayland: true, kwinRuleInstalled: false });
-    const open = vi.spyOn(api, "overlayOpenKdeWindowRules");
-    render(<OverlaySection />);
-    expect(await screen.findByRole("button", { name: "Set up automatically" })).toBeVisible();
-    expect(screen.queryByRole("button", { name: "Remove rule" })).not.toBeInTheDocument();
-
-    fireEvent.click(screen.getByRole("button", { name: "Set up automatically" }));
-    expect(install).toHaveBeenCalledOnce();
-    expect(await screen.findByText(/window rule .* is active/)).toBeVisible();
-
-    fireEvent.click(await screen.findByRole("button", { name: "Remove rule" }));
-    expect(remove).toHaveBeenCalledOnce();
-    await waitFor(() => {
-      expect(screen.queryByRole("button", { name: "Remove rule" })).not.toBeInTheDocument();
-    });
-
-    fireEvent.click(screen.getByRole("button", { name: "Open KDE window rules" }));
-    expect(open).toHaveBeenCalledOnce();
-  });
-
-  it("reports a failed setup", async () => {
-    const state = await api.overlayState();
-    vi.spyOn(api, "overlayState").mockResolvedValue({ ...state, kdeWayland: true });
-    vi.spyOn(console, "error").mockImplementation(() => undefined);
-    vi.spyOn(api, "overlayKwinRuleInstall").mockRejectedValue(new Error("no"));
-    render(<OverlaySection />);
-    fireEvent.click(await screen.findByRole("button", { name: "Set up automatically" }));
-    expect(await screen.findByRole("alert")).toHaveTextContent(/could not be changed/);
-  });
-});
-
 describe("In-game overlay", () => {
+  it("shows the OpenGL launch option and copies it", async () => {
+    const option =
+      "LD_PRELOAD=/home/u/.local/share/app.mumcord.client/overlay-layer/current/lib.so %command%";
+    const writeText = vi.fn(() => Promise.resolve());
+    Object.defineProperty(navigator, "clipboard", { value: { writeText }, configurable: true });
+    render(
+      <OverlaySection
+        inGameApi={fakeInGame({
+          supported: true,
+          mode: "on",
+          games: [],
+          openglLaunchOption: option,
+        })}
+      />,
+    );
+    expect(await screen.findByRole("textbox", { name: "Steam launch option" })).toHaveValue(option);
+    fireEvent.click(screen.getByRole("button", { name: "Copy" }));
+    await waitFor(() => {
+      expect(writeText).toHaveBeenCalledWith(option);
+    });
+    expect(await screen.findByText("Copied")).toBeInTheDocument();
+  });
+
+  it("hides the OpenGL launch option without one", async () => {
+    render(<OverlaySection inGameApi={fakeInGame({ supported: true, mode: "on", games: [] })} />);
+    await screen.findByRole("radio", { name: "On" });
+    expect(screen.queryByText("OpenGL games")).toBeNull();
+  });
+
   it("sets the global mode", async () => {
     const fake = fakeInGame({ supported: true, mode: "off", games: [] });
     render(<OverlaySection inGameApi={fake} />);
@@ -163,6 +102,24 @@ describe("In-game overlay", () => {
     expect(await screen.findByText(/overlay library .* was not found/)).toBeInTheDocument();
   });
 
+  it("shows a platform hint and no anti-cheat warning without a blocklist", async () => {
+    render(
+      <OverlaySection
+        inGameApi={fakeInGame({
+          supported: true,
+          explanationKey: "overlay.inGame.limits.windowsFullscreen",
+          mode: "on",
+          games: [game({ name: "Some Game" })],
+        })}
+      />,
+    );
+    expect(
+      await screen.findByText("Use borderless or windowed fullscreen in the game."),
+    ).toBeInTheDocument();
+    expect(screen.getByRole("radio", { name: "On" })).toBeChecked();
+    expect(screen.queryByText(/anti-cheat protection/)).not.toBeInTheDocument();
+  });
+
   it("follows changes made elsewhere", async () => {
     const fake = fakeInGame({ supported: true, mode: "off", games: [] });
     let push: (state: InGameState) => void = () => undefined;
@@ -173,7 +130,13 @@ describe("In-game overlay", () => {
     render(<OverlaySection inGameApi={fake} />);
     await screen.findByRole("radio", { name: "Off", checked: true });
     act(() => {
-      push({ supported: true, explanationKey: null, mode: "on", games: [] });
+      push({
+        supported: true,
+        explanationKey: null,
+        openglLaunchOption: null,
+        mode: "on",
+        games: [],
+      });
     });
     expect(screen.getByRole("radio", { name: "On" })).toBeChecked();
   });
@@ -219,9 +182,7 @@ describe("In-game overlay", () => {
     render(<OverlaySection inGameApi={fake} />);
     fireEvent.click(await screen.findByRole("button", { name: "Options for Factorio" }));
     const group = screen.getByRole("group", { name: "Factorio" });
-    fireEvent.change(within(group).getByLabelText("Position"), {
-      target: { value: "bottomRight" },
-    });
+    chooseOption(within(group).getByRole("combobox", { name: "Position" }), "Bottom right");
     fireEvent.change(within(group).getByLabelText("Opacity"), { target: { value: "80" } });
     expect(fake.setGameOptions).toHaveBeenLastCalledWith("f", {
       corner: "bottomRight",

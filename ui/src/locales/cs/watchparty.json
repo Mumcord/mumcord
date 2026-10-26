@@ -1,0 +1,53 @@
+{
+  "title": "Společné sledování",
+  "addVideo": "Přidat video",
+  "beta": "Beta",
+  "join": "Připojit se ke společnému sledování",
+  "leave": "Opustit sledování",
+  "watching": "{{count}} sleduje: {{names}}",
+  "player": "Přehrávač společného sledování",
+  "watchTogether": "Sledovat společně",
+  "watchTogetherFor": "Sledovat {{title}} společně s tímto kanálem",
+  "cantPlay": "Přehrávač tady nemůže běžet.",
+  "openInBrowser": "Otevřít v prohlížeči",
+  "startFailed": "Společné sledování se nepodařilo spustit.",
+  "joinFailed": "Ke společnému sledování se nepodařilo připojit.",
+  "leaveFailed": "Společné sledování se nepodařilo opustit.",
+  "commandFailed": "Společné sledování nepřijalo tvou změnu.",
+  "someone": "Někdo",
+  "other": {
+    "play": "{{name}} spustil(a) přehrávání",
+    "pause": "{{name}} pozastavil(a)",
+    "seek": "{{name}} přeskočil(a) dopředu",
+    "skipped": "{{name}} přeskočil(a)"
+  },
+  "addToPlaylist": "Přidat do playlistu",
+  "addToPlaylistFor": "Přidat {{title}} do playlistu společného sledování",
+  "playlist": {
+    "title": "Následuje",
+    "empty": "Nic dalšího nenásleduje. Přidej odkazy na YouTube přes „Přidat do playlistu“.",
+    "skip": "Přeskočit",
+    "moveHint": "Alt+Nahoru a Alt+Dolů přesouvají video; můžeš ho také přetáhnout.",
+    "moved": "Přesunuto na pozici {{position}}",
+    "videoTitle": "Video na YouTube",
+    "addedBy": "Přidal(a) {{name}}",
+    "remove": "Odebrat {{title}} z playlistu",
+    "addFailed": "Video se nepodařilo přidat do playlistu. Pojme až 50 videí.",
+    "removeFailed": "Video se nepodařilo odebrat z playlistu.",
+    "moveFailed": "Video se nepodařilo přesunout.",
+    "skipFailed": "Nepodařilo se přeskočit na další video.",
+    "nextFailed": "Další video se nepodařilo spustit.",
+    "move": "Přesunout {{title}}",
+    "upNext": "Následuje: {{title}}",
+    "upNextNone": "Nic dalšího nenásleduje"
+  },
+  "widget": {
+    "play": "Přehrát",
+    "pause": "Pozastavit"
+  },
+  "codecHint": {
+    "install": "Toto video potřebuje podporu H.264. Nainstaluj gst-libav:",
+    "generic": "Toto video potřebuje podporu H.264. Nainstaluj gst-libav (plugin libav pro GStreamer) správcem balíčků svého systému.",
+    "rpmFusion": "Na Fedoře pochází gst-libav z repozitáře RPM Fusion; nejdřív povol RPM Fusion."
+  }
+}

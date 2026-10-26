@@ -1,6 +1,7 @@
 import { act, fireEvent, screen, waitFor } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi, type Mock } from "vitest";
 import { setApi, type Settings } from "../../api";
+import { chooseOption, optionLabels } from "../../components/SelectTestUtils";
 import { MicStep } from "./MicStep";
 import { renderInWizard, setupWizardTest, type Harness } from "./testUtils";
 
@@ -53,19 +54,21 @@ describe("MicStep", () => {
     });
     renderStep();
     const output = screen.getByRole("combobox", { name: "Speakers or headphones" });
-    expect(
-      await screen.findAllByRole("option", { name: "System default (PipeWire)" }),
-    ).toHaveLength(2);
-    expect(output).toHaveValue("");
-    expect(screen.getAllByRole("option", { name: "System default" })).toHaveLength(2);
+    const input = await screen.findByRole("combobox", { name: "Microphone" });
+    await waitFor(() => {
+      expect(optionLabels(input)).toContain("System default (PipeWire)");
+    });
+    expect(output).toHaveTextContent("System default");
+    expect(optionLabels(output)).toContain("System default");
   });
 
   it("saves a changed device", async () => {
     renderStep();
-    await screen.findAllByRole("option", { name: "USB Headset" });
-    fireEvent.change(screen.getByRole("combobox", { name: "Microphone" }), {
-      target: { value: "mic-usb" },
+    const mic = screen.getByRole("combobox", { name: "Microphone" });
+    await waitFor(() => {
+      expect(optionLabels(mic)).toContain("USB Headset");
     });
+    chooseOption(mic, "USB Headset");
     await waitFor(() => {
       expect(onDevicesChange).toHaveBeenCalledWith({ inputDevice: "mic-usb", outputDevice: null });
     });
@@ -74,22 +77,26 @@ describe("MicStep", () => {
   it("reports a failed device save", async () => {
     onDevicesChange.mockRejectedValue(new Error("nope"));
     renderStep();
-    await screen.findAllByRole("option", { name: "USB Headset" });
-    fireEvent.change(screen.getByRole("combobox", { name: "Microphone" }), {
-      target: { value: "mic-usb" },
+    const mic = screen.getByRole("combobox", { name: "Microphone" });
+    await waitFor(() => {
+      expect(optionLabels(mic)).toContain("USB Headset");
     });
+    chooseOption(mic, "USB Headset");
     expect(await screen.findByRole("alert")).toHaveTextContent("could not be saved");
   });
 
   it("follows device hot-plug", async () => {
     renderStep();
-    await screen.findAllByRole("option", { name: "USB Headset" });
+    const mic = screen.getByRole("combobox", { name: "Microphone" });
+    await waitFor(() => {
+      expect(optionLabels(mic)).toContain("USB Headset");
+    });
     act(() => {
       harness.api.mock.emit("audioDevicesChanged", {
         devices: { inputs: [{ id: "new", name: "Webcam Mic", isDefault: false }], outputs: [] },
       });
     });
-    expect(screen.getByRole("option", { name: "Webcam Mic" })).toBeInTheDocument();
+    expect(optionLabels(mic)).toContain("Webcam Mic");
   });
 
   it("lets the user continue when devices cannot be listed", async () => {
@@ -158,7 +165,10 @@ describe("MicStep", () => {
 
   it("ignores level events while no test runs", async () => {
     renderStep();
-    await screen.findAllByRole("option", { name: "USB Headset" });
+    const mic = screen.getByRole("combobox", { name: "Microphone" });
+    await waitFor(() => {
+      expect(optionLabels(mic)).toContain("USB Headset");
+    });
     act(() => {
       harness.api.mock.emit("micLevel", { level: 0.9 });
     });

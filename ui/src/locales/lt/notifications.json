@@ -14,5 +14,6 @@
   "image": "Atsiuntė paveikslėlį",
   "open": "Atidaryti pokalbį",
   "close": "Atmesti pranešimą",
-  "mentionLine": "{{sender}} paminėjo tave: {{preview}}"
+  "mentionLine": "{{sender}} paminėjo tave: {{preview}}",
+  "withServer": "{{server}} · {{what}}"
 }

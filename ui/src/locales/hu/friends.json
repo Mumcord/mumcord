@@ -4,6 +4,7 @@
   "online": "Online",
   "onlineIn": "Online itt: {{channel}}",
   "onlineOnServer": "Online itt: {{server}}",
+  "inChannelOnServer": "Itt: {{channel}} · {{server}}",
   "offline": "Offline",
   "lastSeen": "Offline, utoljára látva: {{when}}",
   "friend": "Barát",
@@ -11,5 +12,7 @@
   "noCertificate": "Tanúsítvány nélküli személyek nem lehetnek barátok, mert a Mumcord nem tudná újra felismerni őket.",
   "add": "Barát hozzáadása",
   "remove": "Barát eltávolítása",
-  "failed": "A barát módosítása nem sikerült. Próbáld újra."
+  "failed": "A barát módosítása nem sikerült. Próbáld újra.",
+  "join": "Csatlakozás",
+  "joinFriend": "Csatlakozás {{name}} csatornájához"
 }

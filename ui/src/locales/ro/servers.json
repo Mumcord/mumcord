@@ -13,10 +13,15 @@
     "listLabel": "Servere salvate",
     "add": "Adaugă un server",
     "keyboardHint": "Enter conectează. Alt plus săgeată sus sau jos mută serverul. Shift plus F10 deschide mai multe opțiuni.",
-    "status": {
-      "connected": "{{server}} (conectat)",
-      "connecting": "{{server}} (se conectează)",
-      "reconnecting": "{{server}} (se reconectează)"
+    "label": "{{server}} ({{state}})",
+    "state": {
+      "connected": "conectat",
+      "connecting": "se conectează",
+      "reconnecting": "se reconectează",
+      "error": "conexiune pierdută",
+      "voice": "server vocal",
+      "unread": "mesaje necitite",
+      "mentions": "mențiuni: {{mentions}}"
     }
   },
   "menu": {
@@ -26,7 +31,19 @@
     "edit": "Editează serverul",
     "moveUp": "Mută în sus",
     "moveDown": "Mută în jos",
-    "remove": "Elimină serverul"
+    "remove": "Elimină serverul",
+    "reconnect": "Reconectează",
+    "alwaysConnect": "Conectează mereu la pornire",
+    "muteNotifications": "Dezactivează notificările",
+    "theme": "Temă…",
+    "showWelcome": "Arată mesajul de bun venit"
+  },
+  "theme": {
+    "title": "Temă pentru {{server}}",
+    "label": "Temă",
+    "useApp": "Folosește tema aplicației",
+    "hint": "Se aplică cât timp este afișat acest server.",
+    "failed": "Tema nu a putut fi salvată. Încearcă din nou."
   },
   "dialog": {
     "addTitle": "Adaugă un server",
@@ -50,7 +67,14 @@
       "username": "Introdu numele pe care vrei să-l folosești pe acest server.",
       "link": "Acest link mumble:// nu poate fi citit. Verifică dacă a fost copiat complet.",
       "invalid": "Datele serverului nu sunt valide. Verifică adresa și portul."
-    }
+    },
+    "alwaysConnect": "Conectează mereu la pornire",
+    "alwaysConnectHint": "Mumcord conectează acest server doar în citire la pornire.",
+    "channelPasswords": "Parolele canalelor",
+    "channelPassword": "Parola canalului {{number}}",
+    "removeChannelPassword": "Elimină {{name}}",
+    "remove": "Elimină",
+    "channelPasswordsHint": "Salvate când un canal protejat le-a acceptat. Cele eliminate sunt cerute din nou la următoarea intrare."
   },
   "errors": {
     "serverUnreachable": "Serverul nu poate fi accesat. Verifică adresa și portul și dacă ești online.",
@@ -63,17 +87,16 @@
     "invalidAddress": "Adresa serverului nu e validă. Editează serverul ca s-o corectezi.",
     "secureStorage": "Stocarea securizată a sistemului tău nu e disponibilă, așa că parola serverului nu a putut fi citită sau salvată. Deblocheaz-o și încearcă din nou.",
     "notFound": "Acest server nu mai este salvat.",
-    "generic": "Ceva n-a mers bine. Încearcă din nou."
+    "generic": "Ceva n-a mers bine. Încearcă din nou.",
+    "serverLimit": "Ești deja conectat la maximum {{limit}} servere. Deconectează un server sau mărește limita din Setări → Servere.",
+    "serverLimitUnknown": "Ești deja conectat la numărul maxim de servere. Deconectează un server sau mărește limita din Setări → Servere.",
+    "alwaysConnectLimit": "Doar {{limit}} servere pot avea „Conectează mereu la pornire”, cât limita de servere conectate. Dezactivează opțiunea pentru alt server sau mărește limita din Setări → Servere.",
+    "alwaysConnectLimitUnknown": "Nu pot avea „Conectează mereu la pornire” mai multe servere decât limita de servere conectate. Dezactivează opțiunea pentru alt server sau mărește limita din Setări → Servere."
   },
   "remove": {
     "title": "Elimini {{server}}?",
     "message": "Parola salvată, decizia privind certificatul, canalele urmărite și istoricul chatului de pe acest computer vor fi șterse.",
     "confirm": "Elimină"
-  },
-  "switch": {
-    "title": "Schimbi serverul?",
-    "message": "Poți fi pe un singur server odată. Te deconectezi de la {{current}} și te conectezi la {{next}}?",
-    "confirm": "Deconectează-te și schimbă"
   },
   "cert": {
     "newTitle": "Ai încredere în acest server?",
@@ -108,7 +131,10 @@
     "actionFailed": {
       "reorder": "Noua ordine a serverelor nu a putut fi salvată. Încearcă din nou.",
       "remove": "Serverul nu a putut fi eliminat. Încearcă din nou.",
-      "disconnect": "Deconectarea a eșuat. Încearcă din nou."
+      "disconnect": "Deconectarea a eșuat. Încearcă din nou.",
+      "alwaysConnect": "„Conectează mereu la pornire” nu a putut fi salvat. Încearcă din nou.",
+      "notifications": "Setarea notificărilor nu a putut fi salvată. Încearcă din nou.",
+      "savePassword": "Parola nouă nu a putut fi salvată. Editează serverul ca să o salvezi."
     }
   },
   "empty": {
@@ -124,5 +150,27 @@
     "errors": {
       "required": "Introdu o adresă de server sau un link mumble://."
     }
+  },
+  "password": {
+    "title": "Parolă pentru {{server}}",
+    "intro": "Serverul nu a acceptat parola. Introdu parola corectă ca să încerci din nou.",
+    "label": "Parolă",
+    "show": "Arată",
+    "hide": "Ascunde",
+    "wrong": "Și această parolă e greșită. Încearcă din nou.",
+    "save": "Salvează parola",
+    "cancel": "Anulează",
+    "connect": "Conectează",
+    "connecting": "Se conectează…"
+  },
+  "channelPassword": {
+    "title": "Acest canal cere o parolă",
+    "intro": "Introdu parola pentru {{channel}}.",
+    "label": "Parolă",
+    "wrong": "Parolă greșită",
+    "failed": "Parola nu a putut fi trimisă. Încearcă din nou.",
+    "cancel": "Anulează",
+    "join": "Intră",
+    "joining": "Se intră…"
   }
 }

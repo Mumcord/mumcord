@@ -17,9 +17,17 @@ pub enum ErrorKind {
     ServerTooOld,
     PermissionDenied,
     ListenerLimitReached,
+    /// As many servers are connected (or marked "Always connect at start") as the limit in
+    /// the settings allows (FR-2.1, FR-2.7).
+    ServerLimitReached,
     MessageTooLarge,
     InvalidInput,
     NotFound,
+    /// The screen share already has the maximum of viewers (FR-2.43).
+    ShareFull,
+    /// Watching needs a direct connection and none can be made (FR-2.46); `message` is the
+    /// reason, a [`crate::screen_share::WatchBlock::code`].
+    DirectUnavailable,
     SecureStorageUnavailable,
     Io,
     Internal,
@@ -243,6 +251,14 @@ pub struct ServerView {
     pub username: String,
     pub has_password: bool,
     pub save_history: bool,
+    /// Connect this server when the app starts (FR-2.7).
+    pub always_connect_at_start: bool,
+    /// This was the voice server when the app was quit (FR-2.3).
+    pub was_voice_server_at_quit: bool,
+    /// No notifications from this server (FR-2.10).
+    pub notifications_muted: bool,
+    /// Theme for this server; `None` uses the app theme (FR-2.17).
+    pub theme_id: Option<String>,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -275,16 +291,27 @@ pub struct ProfileView {
 #[derive(Debug, Clone, PartialEq)]
 pub enum EngineEvent {
     StateChanged(ConnState),
+    /// Voice moved to this server, or to none (FR-2.2).
+    VoiceServerChanged(Option<ServerId>),
     CertTrustRequired {
         server_id: ServerId,
         fingerprint: String,
         previous_fingerprint: Option<String>,
     },
     ServerSynced(Box<Snapshot>),
+    /// Channels received so far while the server is still syncing (FR-2.24).
+    SyncProgress {
+        channels: u32,
+    },
     TransportChanged(VoiceTransportKind),
     ServerDenied {
         error: EngineError,
         channel_id: Option<u32>,
+    },
+    /// The channel-password dialog for a refused join changes (FR-2.78).
+    ChannelPassword {
+        channel_id: u32,
+        state: super::ChannelPasswordState,
     },
     ChannelUpserted(ChannelView),
     /// Several channels changed at once, e.g. a burst of permission answers after a sync.
@@ -298,6 +325,9 @@ pub enum EngineEvent {
     },
     FollowedChannelsChanged(Vec<u32>),
     AudioDevicesChanged(AudioDeviceList),
+    /// The highest bitrate the bitrate slider can reach changed (FR-2.64); `None` without a
+    /// voice server.
+    BitrateMaxChanged(Option<u32>),
     /// Microphone level 0.0–1.0.
     MicLevel(f32),
     /// The mic test moved to a new phase (FR-1.4).
@@ -335,6 +365,9 @@ pub enum EngineEvent {
         running: bool,
         added: u32,
     },
+    /// A direct connection would be used while `allow_direct_connections` is still unset: ask
+    /// the user once and answer with `Engine::p2p_consent_decide` (FR-2.36).
+    DirectConsentRequired,
     /// Progress of a full-size image being fetched for the viewer (FR-1.60c): `received` of
     /// `total` bytes of the image with this reference.
     FullImageProgress {
@@ -353,6 +386,12 @@ pub enum EngineEvent {
         session: u32,
         sending: bool,
     },
+    /// New UserStats of a person on the server (FR-2.25).
+    UserStatsChanged(crate::stats::UserStatsView),
+    /// The watch party in the user's channel started, changed or ended (`None`) (FR-2.39).
+    WatchPartyChanged(Option<crate::watch_party::WatchPartyView>),
+    /// The screen shares in the user's channel changed; the full list (FR-2.42 – FR-2.46).
+    ScreenSharesChanged(Vec<crate::screen_share::ScreenShareView>),
 }
 
 /// Phase of the mic test: record, play back, finished or failed to start.

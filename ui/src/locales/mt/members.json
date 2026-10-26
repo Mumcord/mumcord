@@ -4,11 +4,6 @@
   "inChannel_few": "F'{{channel}} ({{count}})",
   "inChannel_many": "F'{{channel}} ({{count}})",
   "inChannel_other": "F'{{channel}} ({{count}})",
-  "listening_one": "Qed jisimgħu ({{count}})",
-  "listening_two": "Qed jisimgħu ({{count}})",
-  "listening_few": "Qed jisimgħu ({{count}})",
-  "listening_many": "Qed jisimgħu ({{count}})",
-  "listening_other": "Qed jisimgħu ({{count}})",
   "noChannel": "Agħżel kanal biex tara min hemm.",
   "nobody": "Ħadd mhu hawn.",
   "nobodyElse": "Ħadd ieħor m’huwa fuq is-server.",
@@ -17,6 +12,26 @@
   "registered": "Irreġistrat",
   "unregistered": "Mhux irreġistrat",
   "talking": "Qed jitkellem",
+  "quality": {
+    "label": "Konnessjoni",
+    "summary": "Konnessjoni: {{level}}",
+    "level": {
+      "good": "Tajba",
+      "fair": "Medja",
+      "weak": "Dgħajfa",
+      "unknown": "Mhux magħrufa"
+    },
+    "ping": "Ping",
+    "loss": "Telf ta' pakketti",
+    "late": "Pakketti tard",
+    "bandwidth": "Bandwidth",
+    "transport": "Trasport tal-vuċi",
+    "client": "Klijent",
+    "os": "Sistema operattiva",
+    "ms": "{{value}} ms",
+    "percent": "{{value}} %",
+    "kbps": "{{value}} kbit/s"
+  },
   "card": {
     "close": "Agħlaq",
     "loadFailed": "Ma setax jitgħabba l-profil.",
@@ -28,6 +43,9 @@
     "privateMessage": "Messaġġ privat",
     "localSettings": "Is-settings tiegħek",
     "localSettingsHint": "Int biss tarahom. It-tibdil jiġi ssejvjat immedjatament.",
+    "settingsFor": "Settings għal {{name}}",
+    "hintMuted": "Muted",
+    "hintVolume": "Volum {{value}} %",
     "localMuteHint": "Ma tisimax lil din il-persuna.",
     "privateNote": "Nota privata",
     "privateNoteHint": "Int biss tista' tara din in-nota.",
@@ -42,7 +60,8 @@
     "viewProfile": "Ara l-profil",
     "join": "Ingħaqad ma' {{channel}}",
     "joinDenied": "M'intix permess tidħol f'dan il-kanal.",
-    "mute": "Mutja għalija"
+    "mute": "Mutja għalija",
+    "connectionInfo": "Informazzjoni dwar il-konnessjoni…"
   },
   "nowPlaying": {
     "label": "Qed jindaqq issa",

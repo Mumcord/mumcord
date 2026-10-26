@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { getApi } from "../../api";
+import { shownServerId } from "../channels/serverStore";
 import type { ConnectionStats } from "../../bindings/commands";
 
 /** How often the open panel refreshes; matches the engine's bitrate controller tick. */
@@ -28,7 +29,7 @@ export function useConnectionStats(active: boolean): StatsState {
     let cancelled = false;
     const load = () => {
       getApi()
-        .connectionStats()
+        .connectionStats(shownServerId())
         .then(
           (stats) => {
             if (!cancelled)

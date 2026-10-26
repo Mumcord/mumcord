@@ -1,10 +1,12 @@
 import { useEffect, useId, useState, type SyntheticEvent } from "react";
 import { useTranslation } from "react-i18next";
 import { getApi } from "../../api";
+import { shownServerId } from "../channels/serverStore";
 import { describeError } from "./errors";
 import { pickImagePath } from "./files";
 import { Modal } from "./Modal";
-import { htmlToText, textToHtml } from "./text";
+import { commentToSend } from "./commentHtml";
+import { RichCommentEditor } from "./RichCommentEditor";
 
 type AvatarChange = { kind: "keep" } | { kind: "remove" } | { kind: "set"; path: string };
 
@@ -19,8 +21,8 @@ export function ProfileDialog({ session, hasAvatar, registered, onClose }: Profi
   const { t } = useTranslation(["userpanel", "common"]);
   const commentId = useId();
   const errorId = useId();
-  const [comment, setComment] = useState("");
-  const [original, setOriginal] = useState("");
+  const [initialComment, setInitialComment] = useState("");
+  const [comment, setComment] = useState<string | null>(null);
   const [loaded, setLoaded] = useState(false);
   const [currentAvatar, setCurrentAvatar] = useState<string | null>(null);
   const [avatar, setAvatar] = useState<AvatarChange>({ kind: "keep" });
@@ -30,12 +32,10 @@ export function ProfileDialog({ session, hasAvatar, registered, onClose }: Profi
   useEffect(() => {
     let active = true;
     getApi()
-      .personProfile(session)
+      .personProfile(shownServerId(), session)
       .then((profile) => {
         if (!active) return;
-        const text = htmlToText(profile.comment ?? "");
-        setComment(text);
-        setOriginal(text);
+        setInitialComment(profile.comment ?? "");
         setCurrentAvatar(profile.avatar);
       })
       .catch((e: unknown) => {
@@ -64,9 +64,10 @@ export function ProfileDialog({ session, hasAvatar, registered, onClose }: Profi
     setError(null);
     const api = getApi();
     try {
-      if (avatar.kind === "set") await api.setOwnAvatar(avatar.path);
-      else if (avatar.kind === "remove") await api.setOwnAvatar(null);
-      if (comment !== original) await api.setOwnComment(textToHtml(comment));
+      if (avatar.kind === "set") await api.setOwnAvatar(shownServerId(), avatar.path);
+      else if (avatar.kind === "remove") await api.setOwnAvatar(shownServerId(), null);
+      // Untouched comments are not re-sent, so formatting written elsewhere stays byte-exact.
+      if (comment !== null) await api.setOwnComment(shownServerId(), commentToSend(comment));
       onClose();
     } catch (e) {
       setError(describeError(t, e));
@@ -109,16 +110,16 @@ export function ProfileDialog({ session, hasAvatar, registered, onClose }: Profi
               : t("profile.avatarHint")}
         </p>
         {registered ? null : <p className="userpanel-hint">{t("profile.avatarUnregistered")}</p>}
-        <label htmlFor={commentId}>{t("profile.comment")}</label>
-        <textarea
-          id={commentId}
-          rows={5}
-          value={comment}
+        <span id={commentId} className="rich-editor__label">
+          {t("profile.comment")}
+        </span>
+        <RichCommentEditor
+          labelId={commentId}
+          initialHtml={initialComment}
+          loadKey={loaded ? 1 : 0}
           disabled={!loaded}
-          aria-describedby={error ? errorId : undefined}
-          onChange={(e) => {
-            setComment(e.target.value);
-          }}
+          describedBy={error ? errorId : undefined}
+          onChange={setComment}
         />
         {error ? (
           <p id={errorId} className="userpanel-error" role="alert">

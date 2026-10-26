@@ -10,5 +10,6 @@
   "image": "Hat ein Bild gesendet",
   "open": "Chat öffnen",
   "close": "Benachrichtigung schließen",
-  "mentionLine": "{{sender}} hat dich erwähnt: {{preview}}"
+  "mentionLine": "{{sender}} hat dich erwähnt: {{preview}}",
+  "withServer": "{{server}} · {{what}}"
 }

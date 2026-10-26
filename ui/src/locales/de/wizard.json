@@ -98,5 +98,10 @@
     "ingameOverlayHint": "Zeigt direkt im Spiel an, wer spricht (Linux). Du kannst es später in den Einstellungen pro Spiel ein- oder ausschalten.",
     "ingameOverlayWarning": "Manche Spiele mit Anti-Cheat können In-Game-Overlays melden oder blockieren. Mumcord lässt bekannt riskante Spiele (etwa Valorant oder League of Legends) standardmäßig aus. Aktiviere es nur für Spiele, denen du vertraust.",
     "ingameOverlayAlt": "Beispiel des In-Game-Overlays, das zeigt, wer spricht"
+  },
+  "updates": {
+    "title": "Neue Versionen",
+    "check": "Nach neuen Versionen suchen",
+    "hint": "Mumcord kann einmal am Tag bei GitHub nachfragen, ob es eine neuere Version gibt, und einen Hinweis mit Link zeigen. Es wird nichts heruntergeladen oder installiert, und außer der Anfrage selbst sowie App-Name und Version wird nichts gesendet. Du kannst das später in den Einstellungen ändern."
   }
 }

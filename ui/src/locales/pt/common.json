@@ -9,5 +9,17 @@
   "retry": "Tentar novamente",
   "loading": "A carregar…",
   "beta": "Beta",
-  "betaFeature": "Funcionalidade beta"
+  "betaFeature": "Funcionalidade beta",
+  "themePicker": {
+    "swatch": "{{name}}, tema",
+    "swatchSelected": "{{name}}, tema, selecionado",
+    "yourThemes": "Os teus temas",
+    "add": "Novo tema a partir do atual",
+    "addShort": "Novo"
+  },
+  "floatingWidget": {
+    "collapse": "Recolher",
+    "expand": "Expandir",
+    "handle": "{{name}}: as setas movem, Shift+setas redimensionam"
+  }
 }

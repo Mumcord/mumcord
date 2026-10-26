@@ -13,10 +13,15 @@
     "listLabel": "Server salvati",
     "add": "Aggiungi un server",
     "keyboardHint": "Invio per connettersi. Alt più freccia su o giù sposta il server. Maiusc più F10 apre altre opzioni.",
-    "status": {
-      "connected": "{{server}} (connesso)",
-      "connecting": "{{server}} (connessione in corso)",
-      "reconnecting": "{{server}} (riconnessione in corso)"
+    "label": "{{server}} ({{state}})",
+    "state": {
+      "connected": "connesso",
+      "connecting": "connessione in corso",
+      "reconnecting": "riconnessione in corso",
+      "error": "connessione persa",
+      "voice": "server vocale",
+      "unread": "messaggi non letti",
+      "mentions": "menzioni: {{mentions}}"
     }
   },
   "menu": {
@@ -26,7 +31,19 @@
     "edit": "Modifica server",
     "moveUp": "Sposta su",
     "moveDown": "Sposta giù",
-    "remove": "Rimuovi server"
+    "remove": "Rimuovi server",
+    "reconnect": "Riconnetti",
+    "alwaysConnect": "Connetti sempre all'avvio",
+    "muteNotifications": "Silenzia notifiche",
+    "theme": "Tema…",
+    "showWelcome": "Mostra messaggio di benvenuto"
+  },
+  "theme": {
+    "title": "Tema per {{server}}",
+    "label": "Tema",
+    "useApp": "Usa tema dell'app",
+    "hint": "Usato mentre questo server è visualizzato.",
+    "failed": "Impossibile salvare il tema. Riprova."
   },
   "dialog": {
     "addTitle": "Aggiungi un server",
@@ -50,7 +67,14 @@
       "username": "Inserisci il nome che vuoi usare su questo server.",
       "link": "Questo link mumble:// non può essere letto. Controlla che sia stato copiato per intero.",
       "invalid": "I dati del server non sono validi. Controlla indirizzo e porta."
-    }
+    },
+    "alwaysConnect": "Connetti sempre all'avvio",
+    "alwaysConnectHint": "All'avvio Mumcord connette questo server in sola lettura.",
+    "channelPasswords": "Password dei canali",
+    "channelPassword": "Password canale {{number}}",
+    "removeChannelPassword": "Rimuovi {{name}}",
+    "remove": "Rimuovi",
+    "channelPasswordsHint": "Salvate quando un canale protetto le ha accettate. Quelle rimosse vengono richieste di nuovo al prossimo ingresso."
   },
   "errors": {
     "serverUnreachable": "Il server non è raggiungibile. Controlla indirizzo e porta e che tu sia online.",
@@ -63,17 +87,16 @@
     "invalidAddress": "L'indirizzo del server non è valido. Modifica il server per correggerlo.",
     "secureStorage": "L'archivio sicuro del tuo sistema non è disponibile, quindi non è stato possibile leggere o salvare la password del server. Sbloccalo e riprova.",
     "notFound": "Questo server non è più salvato.",
-    "generic": "Qualcosa è andato storto. Riprova."
+    "generic": "Qualcosa è andato storto. Riprova.",
+    "serverLimit": "Sei già connesso al massimo di {{limit}} server. Disconnetti un server o alza il limite in Impostazioni → Server.",
+    "serverLimitUnknown": "Sei già connesso al numero massimo di server. Disconnetti un server o alza il limite in Impostazioni → Server.",
+    "alwaysConnectLimit": "Solo {{limit}} server possono avere «Connetti sempre all'avvio», come il limite di server connessi. Disattivalo per un altro server o alza il limite in Impostazioni → Server.",
+    "alwaysConnectLimitUnknown": "Non puoi impostare «Connetti sempre all'avvio» su più server del limite di server connessi. Disattivalo per un altro server o alza il limite in Impostazioni → Server."
   },
   "remove": {
     "title": "Rimuovere {{server}}?",
     "message": "La password salvata, la decisione sul certificato, i canali seguiti e la cronologia chat su questo computer verranno eliminati.",
     "confirm": "Rimuovi"
-  },
-  "switch": {
-    "title": "Cambiare server?",
-    "message": "Puoi stare su un solo server alla volta. Disconnetterti da {{current}} e connetterti a {{next}}?",
-    "confirm": "Disconnetti e cambia"
   },
   "cert": {
     "newTitle": "Fidarti di questo server?",
@@ -108,7 +131,10 @@
     "actionFailed": {
       "reorder": "Non è stato possibile salvare il nuovo ordine dei server. Riprova.",
       "remove": "Non è stato possibile rimuovere il server. Riprova.",
-      "disconnect": "Disconnessione non riuscita. Riprova."
+      "disconnect": "Disconnessione non riuscita. Riprova.",
+      "alwaysConnect": "Impossibile salvare «Connetti sempre all'avvio». Riprova.",
+      "notifications": "Impossibile salvare l'impostazione delle notifiche. Riprova.",
+      "savePassword": "Impossibile salvare la nuova password. Modifica il server per salvarla."
     }
   },
   "empty": {
@@ -124,5 +150,27 @@
     "errors": {
       "required": "Inserisci un indirizzo del server o un link mumble://."
     }
+  },
+  "password": {
+    "title": "Password per {{server}}",
+    "intro": "Il server non ha accettato la password. Inserisci quella giusta per riprovare.",
+    "label": "Password",
+    "show": "Mostra",
+    "hide": "Nascondi",
+    "wrong": "Anche questa password è sbagliata. Riprova.",
+    "save": "Salva password",
+    "cancel": "Annulla",
+    "connect": "Connetti",
+    "connecting": "Connessione…"
+  },
+  "channelPassword": {
+    "title": "Questo canale richiede una password",
+    "intro": "Inserisci la password per {{channel}}.",
+    "label": "Password",
+    "wrong": "Password errata",
+    "failed": "Impossibile inviare la password. Riprova.",
+    "cancel": "Annulla",
+    "join": "Entra",
+    "joining": "Ingresso…"
   }
 }

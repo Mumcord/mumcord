@@ -12,5 +12,6 @@
   "image": "Poslao je sliku",
   "open": "Otvori chat",
   "close": "Odbaci obavijest",
-  "mentionLine": "{{sender}} te spomenuo: {{preview}}"
+  "mentionLine": "{{sender}} te spomenuo: {{preview}}",
+  "withServer": "{{server}} · {{what}}"
 }

@@ -63,3 +63,13 @@
   border-color: var(--color-success);
   background: var(--color-success);
 }
+
+.friends-list__row {
+  display: flex;
+  gap: var(--space-1);
+  align-items: center;
+}
+
+.friends-list__join {
+  flex: none;
+}

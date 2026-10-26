@@ -3,10 +3,6 @@
   "inChannel_few": "V {{channel}} ({{count}})",
   "inChannel_many": "V {{channel}} ({{count}})",
   "inChannel_other": "V {{channel}} ({{count}})",
-  "listening_one": "Poslouchá ({{count}})",
-  "listening_few": "Poslouchají ({{count}})",
-  "listening_many": "Poslouchá ({{count}})",
-  "listening_other": "Poslouchá ({{count}})",
   "noChannel": "Vyber kanál, abys viděl, kdo v něm je.",
   "nobody": "Nikdo tu není.",
   "nobodyElse": "Na serveru nikdo jiný není.",
@@ -15,6 +11,26 @@
   "registered": "Registrovaný",
   "unregistered": "Neregistrovaný",
   "talking": "Mluví",
+  "quality": {
+    "label": "Připojení",
+    "summary": "Připojení: {{level}}",
+    "level": {
+      "good": "Dobré",
+      "fair": "Průměrné",
+      "weak": "Slabé",
+      "unknown": "Neznámé"
+    },
+    "ping": "Ping",
+    "loss": "Ztráta paketů",
+    "late": "Opožděné pakety",
+    "bandwidth": "Šířka pásma",
+    "transport": "Přenos hlasu",
+    "client": "Klient",
+    "os": "Operační systém",
+    "ms": "{{value}} ms",
+    "percent": "{{value}} %",
+    "kbps": "{{value}} kbit/s"
+  },
   "card": {
     "close": "Zavřít",
     "loadFailed": "Profil se nepodařilo načíst.",
@@ -26,6 +42,9 @@
     "privateMessage": "Soukromá zpráva",
     "localSettings": "Tvoje nastavení",
     "localSettingsHint": "Vidíš je jen ty. Změny se ukládají hned.",
+    "settingsFor": "Nastavení pro {{name}}",
+    "hintMuted": "Ztlumeno",
+    "hintVolume": "Hlasitost {{value}} %",
     "localMuteHint": "Tuto osobu neuslyšíš.",
     "privateNote": "Soukromá poznámka",
     "privateNoteHint": "Tuto poznámku vidíš jen ty.",
@@ -40,7 +59,8 @@
     "viewProfile": "Zobrazit profil",
     "join": "Připojit se k {{channel}}",
     "joinDenied": "Do tohoto kanálu nemáte přístup.",
-    "mute": "Ztlumit pro mě"
+    "mute": "Ztlumit pro mě",
+    "connectionInfo": "Informace o připojení…"
   },
   "nowPlaying": {
     "label": "Právě hraje",

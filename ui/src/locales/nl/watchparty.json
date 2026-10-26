@@ -1,0 +1,53 @@
+{
+  "title": "Watchparty",
+  "addVideo": "Video toevoegen",
+  "beta": "Bèta",
+  "join": "Meedoen aan watchparty",
+  "leave": "Party verlaten",
+  "watching": "{{count}} kijken: {{names}}",
+  "player": "Watchparty-speler",
+  "watchTogether": "Samen kijken",
+  "watchTogetherFor": "{{title}} samen met dit kanaal kijken",
+  "cantPlay": "De speler kan hier niet draaien.",
+  "openInBrowser": "Openen in browser",
+  "startFailed": "De watchparty kon niet worden gestart.",
+  "joinFailed": "Deelnemen aan de watchparty is mislukt.",
+  "leaveFailed": "De watchparty verlaten is mislukt.",
+  "commandFailed": "De watchparty heeft je wijziging niet ontvangen.",
+  "someone": "Iemand",
+  "other": {
+    "play": "{{name}} drukte op afspelen",
+    "pause": "{{name}} pauzeerde",
+    "seek": "{{name}} sprong vooruit",
+    "skipped": "{{name}} sloeg over"
+  },
+  "addToPlaylist": "Aan afspeellijst toevoegen",
+  "addToPlaylistFor": "{{title}} aan de watchparty-afspeellijst toevoegen",
+  "playlist": {
+    "title": "Hierna",
+    "empty": "Niets hierna. Voeg YouTube-links toe met ‘Aan afspeellijst toevoegen’.",
+    "skip": "Overslaan",
+    "moveHint": "Alt+Omhoog en Alt+Omlaag verplaatsen de video; je kunt hem ook slepen.",
+    "moved": "Verplaatst naar positie {{position}}",
+    "videoTitle": "YouTube-video",
+    "addedBy": "Toegevoegd door {{name}}",
+    "remove": "{{title}} uit de afspeellijst verwijderen",
+    "addFailed": "De video kon niet aan de afspeellijst worden toegevoegd. Die bevat maximaal 50 video's.",
+    "removeFailed": "De video kon niet uit de afspeellijst worden verwijderd.",
+    "moveFailed": "De video kon niet worden verplaatst.",
+    "skipFailed": "Doorgaan naar de volgende video is mislukt.",
+    "nextFailed": "De volgende video kon niet worden gestart.",
+    "move": "{{title}} verplaatsen",
+    "upNext": "Hierna: {{title}}",
+    "upNextNone": "Niets hierna"
+  },
+  "widget": {
+    "play": "Afspelen",
+    "pause": "Pauzeren"
+  },
+  "codecHint": {
+    "install": "Deze video heeft H.264-ondersteuning nodig. Installeer gst-libav:",
+    "generic": "Deze video heeft H.264-ondersteuning nodig. Installeer gst-libav (de GStreamer-libav-plug-in) met de pakketbeheerder van je systeem.",
+    "rpmFusion": "Op Fedora komt gst-libav uit de RPM Fusion-repository; schakel eerst RPM Fusion in."
+  }
+}

@@ -14,7 +14,9 @@
     "sounds": "Garsai ir pranešimai",
     "overlay": "Perdanga",
     "diagnostics": "Diagnostika",
-    "about": "Apie"
+    "about": "Apie",
+    "servers": "Serveriai",
+    "privacy": "Privatumas"
   },
   "search": {
     "label": "Ieškoti nustatymų",
@@ -70,7 +72,17 @@
     "testPlaying": "Atkuriamas tavo balsas…",
     "quality": "Kokybė",
     "musicQuality": "Muzikos kokybė",
-    "musicQualityHint": "Naudoja daugiau pralaidumo ir išjungia triukšmo slopinimą bei automatinį garsumą; skirta muzikai. Geriausiai veikia su „Spausk ir kalbėk“."
+    "musicQualityHint": "Naudoja daugiau pralaidumo ir išjungia triukšmo slopinimą bei automatinį garsumą; skirta muzikai. Geriausiai veikia su „Spausk ir kalbėk“.",
+    "bitrate": "Bitų sparta",
+    "bitrateMax": "Maks.",
+    "bitrateValue": "{{kbps}} kbit/s",
+    "bitrateMaxKnown": "Daugiausia: {{kbps}} kbit/s. Ryšio nuostoliai vis tiek gali ją sumažinti.",
+    "bitrateMaxUnknown": "Daugiausia: priklauso nuo serverio. Ryšio nuostoliai vis tiek gali ją sumažinti.",
+    "videoSound": "Vaizdo įrašų garsas",
+    "ducking": "Pritildyti vaizdo įrašų garsą, kai kas nors kalba",
+    "duckingHint": "Bendros peržiūros vaizdo įrašo ir ekrano bendrinimo garsas tyla, kai kas nors tavo balso kanale kalba.",
+    "duckingLevel": "Pritildytas garsumas",
+    "duckingLevelValue": "{{percent}} %"
   },
   "voice": {
     "talkMode": "Kalbėjimo režimas",
@@ -180,6 +192,7 @@
     "compact": "Kompaktiškas: laikas, vardas ir žinutė vienoje eilutėje",
     "theme": "Tema",
     "themeLegend": "Spalvų tema",
+    "modeLegend": "Tamsi ar šviesi",
     "system": "Pagal sistemą",
     "dark": "Tamsi",
     "light": "Šviesi",
@@ -191,6 +204,61 @@
     "autostart": "Paleisti Mumcord, kai prisijungiu prie sistemos",
     "startMinimized": "Paleisti suskleistą",
     "startMinimizedHint": "Kai Mumcord pasileidžia prisijungus prie sistemos, jis laukia dėkle, o ne atidaro langą."
+  },
+  "themeEditor": {
+    "name": "Temos pavadinimas",
+    "colorsLegend": "Pagrindinės spalvos",
+    "colorColumn": "Spalva",
+    "auto": "auto",
+    "cellLabel": "{{color}}, {{version}}",
+    "newTitle": "Nauja tema",
+    "editTitle": "Redaguoti „{{name}}“",
+    "generatedFromDark": "Sukurta automatiškai iš tamsiosios versijos. Seka tavo pakeitimus ten, kol pakeisi ją čia.",
+    "generatedFromLight": "Sukurta automatiškai iš šviesiosios versijos. Seka tavo pakeitimus ten, kol pakeisi ją čia.",
+    "colors": {
+      "background": "Fonas",
+      "surface": "Paviršius",
+      "text": "Tekstas",
+      "accent": "Akcentas",
+      "talking": "Kalba ir prisijungęs",
+      "warning": "Įspėjimas",
+      "error": "Klaida"
+    },
+    "pickColor": "Spalvos parinkiklis: {{color}}",
+    "invalidHex": "Įvesk spalvą kaip # ir šešis šešioliktainius skaitmenis, pavyzdžiui, #1a2b3c.",
+    "contrastLowIn": "{{version}}: per mažas kontrastas: {{ratio}}:1, reikia bent {{min}}:1.",
+    "unreadable": "Ši tema nepakankamai įskaitoma. Pakeisk teksto ar fono spalvą, kad ją išsaugotum.",
+    "copyName": "{{name}} (kopija)",
+    "save": "Išsaugoti temą",
+    "saveAs": "Išsaugoti kaip temą",
+    "saved": "Tema išsaugota.",
+    "share": "Bendrinti",
+    "shared": "Tema nukopijuota. Įklijuok ją į pokalbį, kad pasidalintum.",
+    "shareFailed": "Mumcord nepavyko nukopijuoti temos į iškarpinę.",
+    "import": "Importuoti…",
+    "importTitle": "Importuoti temą",
+    "importLabel": "Temos žinutė arba kodas",
+    "importHint": "Įklijuok pokalbio žinutę su Mumcord tema arba tik jos kodą (prasideda mct1.).",
+    "importConfirm": "Importuoti",
+    "importInvalid": "Tai netinkama Mumcord tema.",
+    "importUnreadable": "Ši tema nepakankamai įskaitoma.",
+    "imported": "„{{name}}“ importuota.",
+    "alreadyImported": "„{{name}}“ jau yra tavo temose.",
+    "madeWithNewer": "Sukurta su Mumcord {{version}} – atnaujink, kad matytum visą.",
+    "reset": "Atkurti",
+    "menuLabel": "{{name}} parinktys",
+    "edit": "Redaguoti temą",
+    "newFromThis": "Nauja tema iš šios",
+    "preview": "Peržiūra",
+    "previewing": "Peržiūrima {{name}}",
+    "backToEditor": "Atgal į redaktorių",
+    "rename": "Pervadinti temą",
+    "renameTitle": "Pervadinti „{{name}}“",
+    "renameConfirm": "Pervadinti",
+    "delete": "Ištrinti temą",
+    "deleteTitle": "Ištrinti „{{name}}“?",
+    "deleteMessage": "Serveriai, naudojantys šią temą, grįš prie programos temos.",
+    "deleteConfirm": "Ištrinti"
   },
   "accessibility": {
     "hints": "Užuominos",
@@ -214,7 +282,14 @@
     "hangUp": "Tu atsijungi nuo serverio",
     "messages": "Nauja žinutė sekamame kanale ar privačiame pokalbyje",
     "mention": "Garsas, kai paminima",
-    "mentionNotify": "Pranešti, kai paminima"
+    "mentionNotify": "Pranešti, kai paminima",
+    "partyStarted": "Kas nors pradeda bendrą peržiūrą tavo kanale",
+    "partyJoined": "Kas nors prisijungia prie tavo bendros peržiūros",
+    "partyLeft": "Kas nors palieka tavo bendrą peržiūrą",
+    "shareStarted": "Kas nors pradeda bendrinti ekraną tavo kanale",
+    "shareStopped": "Ekrano bendrinimas tavo kanale baigiasi",
+    "viewerStarted": "Kas nors pradeda žiūrėti tavo ekrano bendrinimą",
+    "viewerStopped": "Kas nors baigia žiūrėti tavo ekrano bendrinimą"
   },
   "notifications": {
     "title": "Pranešimai",
@@ -226,29 +301,6 @@
     "off": "Išjungta"
   },
   "overlay": {
-    "window": {
-      "title": "Lango perdanga",
-      "enable": "Rodyti perdangą",
-      "enableHint": "Nedidelis permatomas langas, rodantis, kas kalba. Taip pat pasiekiamas iš dėklo meniu.",
-      "positionUnsupported": "Šis darbalaukis pats sprendžia, kur rodyti langus, todėl kampų pozicijos ir perkėlimas neveikia.",
-      "move": "Perkelti perdangą…",
-      "moveDone": "Perkėlimas baigtas",
-      "size": "Plotis",
-      "wholeChannel": "Rodyti visą kanalą",
-      "wholeChannelHint": "Išjungta: rodomi tik kalbantys žmonės.",
-      "channelName": "Rodyti kanalo pavadinimą",
-      "loadFailed": "Nepavyko įkelti perdangos parinkčių.",
-      "saveFailed": "Nepavyko pritaikyti perdangos pakeitimo.",
-      "kwin": {
-        "setUp": "Nustatyti automatiškai",
-        "done": "Atlikta: KDE lango taisyklė „Mumcord overlay“ aktyvi.",
-        "removed": "KDE lango taisyklė pašalinta.",
-        "remove": "Pašalinti taisyklę",
-        "openRules": "Atidaryti KDE lango taisykles",
-        "compat": "Vietoj to naudoti suderinamumo režimą",
-        "failed": "Nepavyko pakeisti KDE lango taisyklės. Atidaryk KDE lango taisykles ir pridėk ją rankiniu būdu."
-      }
-    },
     "corner": {
       "label": "Padėtis",
       "topLeft": "Viršuje kairėje",
@@ -283,8 +335,16 @@
       "confirmEnable": "Vis tiek įjungti",
       "limits": {
         "libraryMissing": "Perdanga žaidime nepasiekiama: jos bibliotekos (libmumcord_overlay_layer.so) šalia Mumcord nerasta. Iš naujo įdiek Mumcord, kad ją atkurtum. Vietoj jos naudojama aukščiau esanti lango perdanga.",
-        "windowsPending": "Perdanga žaidime Windows sistemoje dar nepasiekiama. Vietoj jos naudojama aukščiau esanti lango perdanga.",
+        "windowsFullscreen": "Žaidime naudokite viso ekrano režimą be rėmelio arba lange.",
         "macos": "macOS nepalaiko perdangų žaidimuose. Vietoj jos naudojama aukščiau esanti lango perdanga."
+      },
+      "opengl": {
+        "title": "OpenGL žaidimai",
+        "explanation": "Reikia tik OpenGL žaidimams: įklijuok į žaidimo Steam paleidimo parinktis.",
+        "label": "Steam paleidimo parinktis",
+        "copy": "Kopijuoti",
+        "copied": "Nukopijuota",
+        "copyFailed": "Kopijuoti nepavyko. Pažymėk tekstą ir nukopijuok jį rankiniu būdu."
       }
     }
   },
@@ -392,5 +452,38 @@
       "unsupported": "Šioje sistemoje nepasiekiama.",
       "failed": "Sustojo dėl klaidos. Išjunk ir vėl įjunk, kad bandytum iš naujo."
     }
+  },
+  "servers": {
+    "connections": "Ryšiai",
+    "limit": "Vienu metu prijungti serveriai",
+    "limitHint": "Nuo 1 iki 15. Jungimaisi virš ribos atmetami.",
+    "limitInvalid": "Įvesk sveikąjį skaičių nuo 1 iki 15."
+  },
+  "appearanceEffects": {
+    "title": "Efektai",
+    "visualEffects": "Vaizdo efektai (stiklas, grūdėtumas)",
+    "visualEffectsHint": "Matinio stiklo meniu ir subtilus juostos grūdėtumas. Išjungiama automatiškai, kai sistema prašo mažiau skaidrumo ar judesio."
+  },
+  "channelList": {
+    "title": "Kanalų sąrašas",
+    "hideEmpty": "Slėpti tuščius kanalus",
+    "talkingFirst": "Pirmiau rodyti kalbančiuosius",
+    "weakConnection": "Rodyti silpno ryšio piktogramą",
+    "weakConnectionHint": "Maža signalo piktograma šalia žmonių, kurių ryšys prastas."
+  },
+  "privacyDirect": {
+    "title": "Tiesioginiai ryšiai",
+    "allow": "Leisti tiesioginius ryšius su kitais Mumcord naudotojais",
+    "hint": "Tiesioginiai ryšiai greitesni, bet kitas asmuo gali matyti tavo IP adresą. Kol nenusprendei, Mumcord paklausia pirmą kartą, kai toks būtų naudojamas."
+  },
+  "updates": {
+    "title": "Atnaujinimai",
+    "check": "Ieškoti naujų versijų",
+    "hint": "Kartą per dieną Mumcord paklausia GitHub apie naujausią leidimą. Daugiau nieko nesiunčiama."
+  },
+  "appImageMenu": {
+    "label": "Pridėti Mumcord į programų meniu",
+    "hint": "Tada piktograma ir „spausk ir kalbėk“ Wayland aplinkoje veikia tinkamai, o mumble:// nuorodos atidaro Mumcord. Tik AppImage.",
+    "failed": "Nepavyko. Bandyk dar kartą."
   }
 }

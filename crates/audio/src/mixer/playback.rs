@@ -6,6 +6,7 @@ use std::sync::atomic::{AtomicBool, AtomicU64, Ordering};
 use std::thread::JoinHandle;
 use std::time::{Duration, Instant};
 
+use super::share::{ShareGain, SharePort, ShareSlots, share_slots};
 use super::{Mixer, TalkEvent, VoicePacket};
 use crate::codec::CodecError;
 use crate::io::FrameSink;
@@ -72,6 +73,8 @@ pub struct PlaybackConfig {
     pub far_end_tap: Option<FarEndTap>,
     /// Places voices that carry a position around this listener (positional audio).
     pub listener: Option<Arc<Listener>>,
+    /// Gain of watched screen shares' sound (auto-ducking, FR-2.76).
+    pub share_gain: Arc<ShareGain>,
 }
 
 impl Default for PlaybackConfig {
@@ -80,6 +83,7 @@ impl Default for PlaybackConfig {
             target_queue_ms: 25,
             far_end_tap: None,
             listener: None,
+            share_gain: Arc::default(),
         }
     }
 }
@@ -147,6 +151,8 @@ pub struct PlaybackPorts {
     /// 48 kHz mono samples mixed into the output (notification sounds,
     /// mic-test loopback). Write whole sounds; underflow plays silence.
     pub mix_in: rtrb::Producer<f32>,
+    /// Sound of watched screen shares, each its own source ([`super::share`]).
+    pub shares: SharePort,
 }
 
 /// Owns the playback thread; dropping it stops the thread.
@@ -170,6 +176,7 @@ impl Playback {
         let (command_tx, command_rx) = rtrb::RingBuffer::new(COMMAND_QUEUE);
         let (event_tx, event_rx) = rtrb::RingBuffer::new(EVENT_QUEUE);
         let (mix_in_tx, mix_in_rx) = rtrb::RingBuffer::new(MIX_IN_QUEUE);
+        let (share_port, shares) = share_slots(Arc::clone(&config.share_gain));
         let counters = Arc::new(Counters::default());
         let stop = Arc::new(AtomicBool::new(false));
 
@@ -182,6 +189,7 @@ impl Playback {
             events: event_tx,
             mix_in: mix_in_rx,
             mix_in_gain: 1.0,
+            shares,
             counters: Arc::clone(&counters),
             stop: Arc::clone(&stop),
         };
@@ -196,6 +204,7 @@ impl Playback {
             },
             talk_events: event_rx,
             mix_in: mix_in_tx,
+            shares: share_port,
         };
         let playback = Self {
             commands: command_tx,
@@ -267,6 +276,7 @@ struct Worker<S> {
     events: rtrb::Producer<TalkEvent>,
     mix_in: rtrb::Consumer<f32>,
     mix_in_gain: f32,
+    shares: ShareSlots,
     counters: Arc<Counters>,
     stop: Arc<AtomicBool>,
 }
@@ -285,6 +295,7 @@ impl<S: PlaybackSink> Worker<S> {
 
         while !self.stop.load(Ordering::Relaxed) {
             self.apply_commands();
+            self.shares.update();
             while let Ok(packet) = self.packets.pop() {
                 let arrival_ms = millis_since(epoch, packet.arrival);
                 self.mixer.push_packet(&packet, arrival_ms);
@@ -301,7 +312,11 @@ impl<S: PlaybackSink> Worker<S> {
                 if !due {
                     break;
                 }
-                let has_extra = self.read_mix_in(&mut extra);
+                let mut has_extra = self.read_mix_in(&mut extra);
+                if !has_extra {
+                    extra.fill(0.0);
+                }
+                has_extra |= self.shares.mix_into(&mut extra);
                 let events = &mut self.events;
                 self.mixer.mix(
                     &mut left,

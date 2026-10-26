@@ -34,6 +34,7 @@ const entry = (over: Partial<GameOverlayEntry>): GameOverlayEntry => ({
 const raw: InGameOverlayState = {
   supported: true,
   explanationKey: null,
+  openglLaunchOption: null,
   mode: "on",
   games: [entry({})],
   known: [

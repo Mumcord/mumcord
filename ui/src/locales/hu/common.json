@@ -9,5 +9,17 @@
   "retry": "Újra",
   "loading": "Betöltés…",
   "beta": "Béta",
-  "betaFeature": "Béta funkció"
+  "betaFeature": "Béta funkció",
+  "themePicker": {
+    "swatch": "{{name}}, téma",
+    "swatchSelected": "{{name}}, téma, kiválasztva",
+    "yourThemes": "Saját témák",
+    "add": "Új téma a jelenlegiből",
+    "addShort": "Új"
+  },
+  "floatingWidget": {
+    "collapse": "Összecsukás",
+    "expand": "Kibontás",
+    "handle": "{{name}}: a nyilak mozgatnak, a Shift+nyilak átméreteznek"
+  }
 }

@@ -32,7 +32,15 @@
     "avatarUnregistered": "Den här servern behåller bara avatarer för registrerade användare – Mumcord skickar din igen vid varje anslutning.",
     "avatarChosen": "Vald: {{name}}",
     "avatarRemoved": "Bilden tas bort när du sparar.",
-    "comment": "Om dig"
+    "comment": "Om dig",
+    "format": "Textformatering",
+    "bold": "Fet",
+    "italic": "Kursiv",
+    "link": "Länk",
+    "linkAddress": "Länkadress",
+    "linkApply": "Lägg till länk",
+    "bulletList": "Punktlista",
+    "numberedList": "Numrerad lista"
   },
   "register": {
     "title": "Registrera dig på den här servern",
@@ -69,8 +77,6 @@
     "nowGaming": "Dela spelet jag spelar",
     "nowGamingHint": "Andra ser ditt aktuella spel",
     "unavailable": "Inte tillgängligt på det här systemet",
-    "overlay": "Overlay",
-    "overlayHint": "Visar vem som pratar ovanpå spel",
     "editProfile": "Redigera profil",
     "editProfileHint": "Namn, avatar och kommentar",
     "register": "Registrera dig på den här servern",
@@ -84,5 +90,10 @@
     "offerImagesHint": "Låt andra läsa in dina originalbilder",
     "loadImages": "Läs in bilder i full storlek",
     "loadImagesHint": "Hämta originalbilder från andra"
+  },
+  "voice": {
+    "line": "Röst: {{channel}} · {{server}}",
+    "server": "Röst: {{server}}",
+    "show": "{{location}} – visa den här servern"
   }
 }

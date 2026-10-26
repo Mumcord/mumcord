@@ -1,0 +1,21 @@
+{
+  "label": "Partajarea ecranului lui {{name}}",
+  "title": "Ecranul lui {{name}}",
+  "beta": "Beta",
+  "picture": "Ecranul partajat al lui {{name}}",
+  "someone": "Cineva",
+  "live": "Live",
+  "collapse": "Restrânge",
+  "expand": "Extinde",
+  "fullscreen": "Ecran complet",
+  "exitFullscreen": "Ieși din ecran complet",
+  "stop": "Nu mai urmări",
+  "starting": "Conectare la ecranul lui {{name}}…",
+  "paused": "{{name}} a pus partajarea pe pauză.",
+  "full": "Această partajare este plină.",
+  "unreachable": "{{name}} nu poate fi contactat direct. Rețeaua poate bloca conexiunile directe.",
+  "tooOld": "Mumcord-ul lui {{name}} este prea vechi ca să își partajeze ecranul cu tine.",
+  "consentOff": "Urmărirea are nevoie de conexiuni directe, iar tu le-ai dezactivat.",
+  "failed": "Ecranul lui {{name}} nu a putut fi deschis.",
+  "retry": "Încearcă din nou"
+}

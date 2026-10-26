@@ -13,10 +13,15 @@
     "listLabel": "Uložené servery",
     "add": "Přidat server",
     "keyboardHint": "Enter připojí. Alt a šipka nahoru nebo dolů přesune server. Shift a F10 otevře další možnosti.",
-    "status": {
-      "connected": "{{server}} (připojeno)",
-      "connecting": "{{server}} (připojování)",
-      "reconnecting": "{{server}} (opětovné připojování)"
+    "label": "{{server}} ({{state}})",
+    "state": {
+      "connected": "připojeno",
+      "connecting": "připojování",
+      "reconnecting": "opětovné připojování",
+      "error": "spojení ztraceno",
+      "voice": "hlasový server",
+      "unread": "nepřečtené zprávy",
+      "mentions": "zmínky: {{mentions}}"
     }
   },
   "menu": {
@@ -26,7 +31,19 @@
     "edit": "Upravit server",
     "moveUp": "Posunout nahoru",
     "moveDown": "Posunout dolů",
-    "remove": "Odebrat server"
+    "remove": "Odebrat server",
+    "reconnect": "Znovu připojit",
+    "alwaysConnect": "Vždy připojit při spuštění",
+    "muteNotifications": "Ztlumit oznámení",
+    "theme": "Motiv…",
+    "showWelcome": "Zobrazit uvítací zprávu"
+  },
+  "theme": {
+    "title": "Motiv pro {{server}}",
+    "label": "Motiv",
+    "useApp": "Použít motiv aplikace",
+    "hint": "Platí, dokud je zobrazen tento server.",
+    "failed": "Motiv se nepodařilo uložit. Zkus to znovu."
   },
   "dialog": {
     "addTitle": "Přidat server",
@@ -50,7 +67,14 @@
       "username": "Zadej jméno, které chceš na tomto serveru používat.",
       "link": "Tento odkaz mumble:// nelze přečíst. Zkontroluj, že byl zkopírován celý.",
       "invalid": "Údaje o serveru nejsou platné. Zkontroluj adresu a port."
-    }
+    },
+    "alwaysConnect": "Vždy připojit při spuštění",
+    "alwaysConnectHint": "Mumcord při spuštění připojí tento server jen pro čtení.",
+    "channelPasswords": "Hesla kanálů",
+    "channelPassword": "Heslo kanálu {{number}}",
+    "removeChannelPassword": "Odebrat {{name}}",
+    "remove": "Odebrat",
+    "channelPasswordsHint": "Uloží se, když je chráněný kanál přijal. Na odebraná se při dalším vstupu zeptáme znovu."
   },
   "errors": {
     "serverUnreachable": "Server není dostupný. Zkontroluj adresu a port a jestli jsi online.",
@@ -63,17 +87,16 @@
     "invalidAddress": "Adresa serveru není platná. Uprav server a oprav ji.",
     "secureStorage": "Zabezpečené úložiště tvého systému není dostupné, takže heslo serveru nešlo přečíst ani uložit. Odemkni ho a zkus to znovu.",
     "notFound": "Tento server už není uložený.",
-    "generic": "Něco se pokazilo. Zkus to prosím znovu."
+    "generic": "Něco se pokazilo. Zkus to prosím znovu.",
+    "serverLimit": "Už jsi připojen k maximu {{limit}} serverů. Odpoj nějaký server nebo zvyš limit v Nastavení → Servery.",
+    "serverLimitUnknown": "Už jsi připojen k maximálnímu počtu serverů. Odpoj nějaký server nebo zvyš limit v Nastavení → Servery.",
+    "alwaysConnectLimit": "Jen {{limit}} serverů může mít „Vždy připojit při spuštění“, stejně jako je limit připojených serverů. Vypni to u jiného serveru nebo zvyš limit v Nastavení → Servery.",
+    "alwaysConnectLimitUnknown": "„Vždy připojit při spuštění“ nemůže mít více serverů, než je limit připojených serverů. Vypni to u jiného serveru nebo zvyš limit v Nastavení → Servery."
   },
   "remove": {
     "title": "Odebrat {{server}}?",
     "message": "Uložené heslo, rozhodnutí o certifikátu, sledované kanály a historie chatu na tomto počítači budou smazány.",
     "confirm": "Odebrat"
-  },
-  "switch": {
-    "title": "Přepnout server?",
-    "message": "Najednou můžeš být jen na jednom serveru. Odpojit se od {{current}} a připojit k {{next}}?",
-    "confirm": "Odpojit a přepnout"
   },
   "cert": {
     "newTitle": "Důvěřovat tomuto serveru?",
@@ -108,7 +131,10 @@
     "actionFailed": {
       "reorder": "Nové pořadí serverů se nepodařilo uložit. Zkus to prosím znovu.",
       "remove": "Server se nepodařilo odebrat. Zkus to prosím znovu.",
-      "disconnect": "Odpojení se nepovedlo. Zkus to prosím znovu."
+      "disconnect": "Odpojení se nepovedlo. Zkus to prosím znovu.",
+      "alwaysConnect": "„Vždy připojit při spuštění“ se nepodařilo uložit. Zkus to znovu.",
+      "notifications": "Nastavení oznámení se nepodařilo uložit. Zkus to znovu.",
+      "savePassword": "Nové heslo se nepodařilo uložit. Uprav server, abys ho uložil."
     }
   },
   "empty": {
@@ -124,5 +150,27 @@
     "errors": {
       "required": "Zadej adresu serveru nebo odkaz mumble://."
     }
+  },
+  "password": {
+    "title": "Heslo pro {{server}}",
+    "intro": "Server heslo nepřijal. Zadej správné a zkus to znovu.",
+    "label": "Heslo",
+    "show": "Zobrazit",
+    "hide": "Skrýt",
+    "wrong": "I toto heslo je špatně. Zkus to znovu.",
+    "save": "Uložit heslo",
+    "cancel": "Zrušit",
+    "connect": "Připojit",
+    "connecting": "Připojování…"
+  },
+  "channelPassword": {
+    "title": "Tento kanál vyžaduje heslo",
+    "intro": "Zadej heslo pro {{channel}}.",
+    "label": "Heslo",
+    "wrong": "Špatné heslo",
+    "failed": "Heslo se nepodařilo odeslat. Zkus to znovu.",
+    "cancel": "Zrušit",
+    "join": "Vstoupit",
+    "joining": "Vstupování…"
   }
 }

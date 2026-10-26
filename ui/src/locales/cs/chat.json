@@ -8,6 +8,7 @@
     "unknownPerson": "Neznámá osoba"
   },
   "list": {
+    "server": "Server",
     "today": "Dnes",
     "yesterday": "Včera",
     "label": "Zprávy v {{name}}",
@@ -36,7 +37,8 @@
     "strike": "Přeškrtnutí",
     "code": "Kód v textu",
     "codeBlock": "Blok kódu",
-    "link": "Odkaz"
+    "link": "Odkaz",
+    "quote": "Citace"
   },
   "composer": {
     "label": "Zpráva pro {{name}}",
@@ -68,7 +70,14 @@
     "notConnected": "Nejsi připojen. Připoj se znovu a zkus to ještě jednou.",
     "generic": "Zprávu se nepodařilo odeslat. Zkus to znovu.",
     "onlyImages": "Odeslat lze jen obrázky.",
-    "sourceTooLarge": "Tento soubor je na odeslání příliš velký (přes 25 MB)."
+    "sourceTooLarge": "Tento soubor je na odeslání příliš velký (přes 25 MB).",
+    "personOffline": "Tato osoba je offline. Zkus to znovu, až se vrátí."
+  },
+  "failed": {
+    "notSent": "Neodesláno.",
+    "retry": "Zkusit znovu",
+    "remove": "Smazat",
+    "announce": "Zprávu se nepodařilo odeslat."
   },
   "announce": {
     "message": "{{name}}: {{text}}",
@@ -81,7 +90,9 @@
   "pinned": {
     "label": "Informace o kanálu",
     "showMore": "Zobrazit více",
-    "showLess": "Zobrazit méně"
+    "showLess": "Zobrazit méně",
+    "hideWelcome": "Skrýt uvítací zprávu",
+    "hideDescription": "Skrýt popis kanálu"
   },
   "mention": {
     "list": "Lidé, které lze zmínit",
@@ -136,6 +147,7 @@
     "next": "Další obrázek",
     "unnamed": "obrazek",
     "fullLoading": "Načítání plné velikosti…",
+    "fullCancel": "Zrušit stahování v plné velikosti",
     "fullProgress": "Načítání plné velikosti… {{percent}} %",
     "fullUnavailable": "Plná velikost není k dispozici – zobrazuje se náhled"
   },
@@ -149,11 +161,62 @@
     "hint": "Šipky pro pohyb, Enter odešle, Delete odebere, Escape zavře.",
     "empty": "Zatím žádné oblíbené. Klikni pravým tlačítkem na GIF v chatu nebo na něm použij hvězdičku a zvol „Uložit do oblíbených“. Pak se objeví tady."
   },
+  "linkMenu": {
+    "label": "Odkaz",
+    "copy": "Kopírovat odkaz",
+    "open": "Otevřít odkaz",
+    "copied": "Odkaz zkopírován"
+  },
   "imageMenu": {
     "label": "Obrázek {{name}}"
   },
   "attribution": {
     "via": "přes {{brand}}",
     "view": "Zobrazit na {{brand}}"
+  },
+  "themeCard": {
+    "label": "Sdílený motiv {{name}}",
+    "apply": "Použít motiv",
+    "more": "Použít na server",
+    "menuLabel": "Použít motiv na",
+    "applyToServer": "Použít na {{server}}",
+    "imported": "Importováno ✓",
+    "newer": "Vytvořeno v Mumcordu {{version}} – aktualizuj, abys ho viděl celý",
+    "failed": "Motiv se nepodařilo použít."
+  },
+  "reply": {
+    "action": "Odpovědět",
+    "actionFor": "Odpovědět uživateli {{name}}",
+    "menu": "Zpráva od {{name}}",
+    "replyTo": "Odpověď pro",
+    "jump": "Přejít na původní zprávu",
+    "image": "Obrázek",
+    "replyingTo": "Odpověď pro",
+    "cancel": "Zrušit odpověď"
+  },
+  "actions": {
+    "label": "Začít společně",
+    "notConnected": "Nepřipojeno k serveru.",
+    "partyRunning": "V tomto kanálu už běží společné sledování.",
+    "invalidLink": "Toto není odkaz na video na YouTube.",
+    "linkLabel": "Odkaz na YouTube",
+    "linkPlaceholder": "Vlož odkaz na YouTube",
+    "confirm": "Začít",
+    "watchHint": "Sledovat video z YouTube společně s tímto kanálem",
+    "dialogTitle": "Sledovat společně",
+    "addTitle": "Přidat do playlistu",
+    "addToPlaylist": "Přidat do playlistu",
+    "addConfirm": "Přidat",
+    "apps": "Aplikace",
+    "appsLive": "Aplikace (sdílíš obrazovku)"
+  },
+  "activity": {
+    "share": "{{name}} sdílí obrazovku",
+    "watch": "Sledovat",
+    "party": "Společné sledování: {{title}}",
+    "join": "Připojit se",
+    "videoFallback": "Video na YouTube",
+    "someone": "Někdo",
+    "joinFailed": "Ke společnému sledování se nepodařilo připojit."
   }
 }

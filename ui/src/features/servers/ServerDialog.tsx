@@ -1,9 +1,20 @@
 import { useId, useState, type SubmitEvent } from "react";
 import { useTranslation } from "react-i18next";
 import { getApi, type MumbleLink, type PasswordUpdate, type SavedServer } from "../../api";
+import { ChannelPasswordList } from "./ChannelPasswordList";
 import { Dialog } from "./Dialog";
 import { DEFAULT_PORT, isMumbleLink, splitAddress } from "./format";
-import { addServer, requestConnect, toApiError, updateServer } from "./store";
+import { serverLimitText } from "./errors";
+import { ServerThemeSelect } from "./ServerThemeSelect";
+import {
+  addServer,
+  getServerLimit,
+  requestConnect,
+  saveAlwaysConnect,
+  saveServerTheme,
+  toApiError,
+  updateServer,
+} from "./store";
 
 interface ServerDialogProps {
   /** Server being edited; `null` adds a new one. */
@@ -21,6 +32,8 @@ interface Fields {
   username: string;
   password: string;
   clearPassword: boolean;
+  alwaysConnect: boolean;
+  themeId: string | null;
 }
 
 function initialFields(
@@ -36,6 +49,8 @@ function initialFields(
       username: server.username,
       password: "",
       clearPassword: false,
+      alwaysConnect: server.alwaysConnectAtStart,
+      themeId: server.themeId,
     };
   }
   return {
@@ -45,6 +60,8 @@ function initialFields(
     username: link?.username ?? identityName,
     password: link?.password ?? "",
     clearPassword: false,
+    alwaysConnect: false,
+    themeId: null,
   };
 }
 
@@ -63,6 +80,7 @@ export function ServerDialog({ server, link, identityName, onClose }: ServerDial
   const [linkError, setLinkError] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+  const [removedTokens, setRemovedTokens] = useState<number[]>([]);
   const connectAfter = link !== null;
 
   const set = (patch: Partial<Fields>) => {
@@ -131,6 +149,15 @@ export function ServerDialog({ server, link, identityName, onClose }: ServerDial
     setFormError(null);
     try {
       const saved = server ? await updateServer(server.id, input) : await addServer(input);
+      if (server && fields.alwaysConnect !== server.alwaysConnectAtStart) {
+        await saveAlwaysConnect(server.id, fields.alwaysConnect);
+      }
+      if (server && fields.themeId !== server.themeId) {
+        await saveServerTheme(server.id, fields.themeId);
+      }
+      if (server && removedTokens.length > 0) {
+        await getApi().channelPasswordsRemove(server.id, removedTokens);
+      }
       onClose();
       if (connectAfter) requestConnect(saved.id, channelPath);
     } catch (error) {
@@ -140,7 +167,9 @@ export function ServerDialog({ server, link, identityName, onClose }: ServerDial
           ? t("dialog.errors.invalid")
           : apiError.code === "secureStorageUnavailable"
             ? t("errors.secureStorage")
-            : t("errors.generic"),
+            : apiError.code === "serverLimitReached"
+              ? serverLimitText(t, getServerLimit(), true)
+              : t("errors.generic"),
       );
       setBusy(false);
     }
@@ -267,6 +296,45 @@ export function ServerDialog({ server, link, identityName, onClose }: ServerDial
             </label>
           )}
         </div>
+        {server && (
+          <ChannelPasswordList
+            serverId={server.id}
+            removed={removedTokens}
+            onRemove={(index) => {
+              setRemovedTokens((current) => [...current, index]);
+            }}
+          />
+        )}
+        {server && (
+          <div className="servers-form__field">
+            <label className="servers-form__check">
+              <input
+                type="checkbox"
+                checked={fields.alwaysConnect}
+                aria-describedby={`${id}-always-hint`}
+                onChange={(event) => {
+                  set({ alwaysConnect: event.target.checked });
+                }}
+              />
+              {t("dialog.alwaysConnect")}
+            </label>
+            <p id={`${id}-always-hint`} className="servers-form__hint">
+              {t("dialog.alwaysConnectHint")}
+            </p>
+          </div>
+        )}
+        {server && (
+          <div className="servers-form__field">
+            <ServerThemeSelect
+              label={t("theme.label")}
+              value={fields.themeId}
+              onChange={(themeId) => {
+                set({ themeId });
+              }}
+            />
+            <p className="servers-form__hint">{t("theme.hint")}</p>
+          </div>
+        )}
         {formError && (
           <p className="servers-form__error" role="alert">
             {formError}

@@ -4,11 +4,14 @@ import licenseText from "../../../../../LICENSE?raw";
 import { getApi, type AppInfo } from "../../../api";
 import { openInBrowser } from "../../chat/openLink";
 import { Group, Section } from "../components/Section";
+import { Switch } from "../components/Switch";
+import { AppImageMenuEntrySwitch } from "./AppImageMenuEntrySwitch";
+import type { SettingsSectionProps } from "./types";
 
 const ISSUES_URL = "https://github.com/ToBee94/mumcord/issues/new";
 
 /** About: version, OS, Mumcord's AGPL license and the third-party notices (AC-1.29). */
-export function AboutSection() {
+export function AboutSection({ settings, update }: SettingsSectionProps) {
   const { t, i18n } = useTranslation("settings");
   const [info, setInfo] = useState<AppInfo | null>(null);
   const [notices, setNotices] = useState<string | null>(null);
@@ -59,6 +62,17 @@ export function AboutSection() {
           </button>
         </div>
       )}
+      <Group title={t("updates.title")}>
+        <Switch
+          label={t("updates.check")}
+          description={t("updates.hint")}
+          checked={settings.updateCheck === "yes"}
+          onChange={(on) => {
+            update({ updateCheck: on ? "yes" : "no" });
+          }}
+        />
+        {info?.appimage === true && <AppImageMenuEntrySwitch />}
+      </Group>
       <Group title={t("about.support")}>
         <div className="settings-actions">
           <button

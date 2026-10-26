@@ -1,10 +1,11 @@
 import { useTranslation } from "react-i18next";
-import type { Conversation } from "../../api";
+import { getApi, type Conversation } from "../../api";
 import {
   sameConversation,
   selectConversation,
   useSelectedConversation,
   useServerState,
+  useServers as useConnectedServers,
 } from "../channels";
 import {
   CollapsibleSection,
@@ -26,6 +27,7 @@ export function FriendsList() {
   const friends = useFriends();
   const server = useServerState();
   const { servers } = useServers();
+  const connected = useConnectedServers();
   const { conversation } = useSelectedConversation();
   const [open, setOpen] = useSectionOpen("friends", true);
 
@@ -42,20 +44,23 @@ export function FriendsList() {
         <ul>
           {friends.map((friend) => {
             const chat: Conversation = { kind: "private", certHash: friend.certHash };
-            const status = presenceText(
-              t,
-              friend,
-              server,
-              i18n.language,
-              (id) => servers.find((s) => s.id === id)?.label,
-            );
+            const status = presenceText(t, friend, i18n.language, {
+              shownServerId: server.serverId,
+              serverName: (id) => servers.find((s) => s.id === id)?.label,
+              channelName: (id, channelId) => connected.get(id)?.channels.get(channelId)?.name,
+            });
             // Sessions only mean something on the connected server.
             const session =
               friend.online !== null && friend.online.serverId === server.serverId
                 ? friend.online.session
                 : null;
+            // A friend on another connected server: Join moves voice there (FR-2.12).
+            const elsewhere =
+              friend.online !== null && friend.online.serverId !== server.serverId
+                ? friend.online
+                : null;
             return (
-              <li key={friend.certHash}>
+              <li key={friend.certHash} className="friends-list__row">
                 <button
                   type="button"
                   className="friends-list__item"
@@ -81,6 +86,22 @@ export function FriendsList() {
                     <span className="friends-list__status">{status}</span>
                   </span>
                 </button>
+                {elsewhere !== null && (
+                  <button
+                    type="button"
+                    className="button friends-list__join"
+                    aria-label={t("joinFriend", { name: friend.name })}
+                    onClick={() => {
+                      getApi()
+                        .channelJoin(elsewhere.serverId, elsewhere.channelId)
+                        .catch((error: unknown) => {
+                          console.error("Joining a friend's channel failed", error);
+                        });
+                    }}
+                  >
+                    {t("join")}
+                  </button>
+                )}
               </li>
             );
           })}

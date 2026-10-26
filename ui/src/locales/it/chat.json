@@ -8,6 +8,7 @@
     "unknownPerson": "Persona sconosciuta"
   },
   "list": {
+    "server": "Server",
     "today": "Oggi",
     "yesterday": "Ieri",
     "label": "Messaggi in {{name}}",
@@ -34,7 +35,8 @@
     "strike": "Barrato",
     "code": "Codice in linea",
     "codeBlock": "Blocco di codice",
-    "link": "Link"
+    "link": "Link",
+    "quote": "Citazione"
   },
   "composer": {
     "label": "Scrivi a {{name}}",
@@ -66,7 +68,14 @@
     "notConnected": "Non sei connesso. Riconnettiti e riprova.",
     "generic": "Non è stato possibile inviare il messaggio. Riprova.",
     "onlyImages": "È possibile inviare solo immagini.",
-    "sourceTooLarge": "Questo file è troppo grande per essere inviato (oltre 25 MB)."
+    "sourceTooLarge": "Questo file è troppo grande per essere inviato (oltre 25 MB).",
+    "personOffline": "Questa persona è offline. Riprova quando torna."
+  },
+  "failed": {
+    "notSent": "Non inviato.",
+    "retry": "Riprova",
+    "remove": "Elimina",
+    "announce": "Un messaggio non è stato inviato."
   },
   "announce": {
     "message": "{{name}}: {{text}}",
@@ -78,7 +87,9 @@
   "pinned": {
     "label": "Info sul canale",
     "showMore": "Mostra di più",
-    "showLess": "Mostra meno"
+    "showLess": "Mostra meno",
+    "hideWelcome": "Nascondi messaggio di benvenuto",
+    "hideDescription": "Nascondi descrizione del canale"
   },
   "mention": {
     "list": "Persone menzionabili",
@@ -132,6 +143,7 @@
     "next": "Immagine successiva",
     "unnamed": "immagine",
     "fullLoading": "Caricamento a dimensione intera…",
+    "fullCancel": "Annulla download a dimensione intera",
     "fullProgress": "Caricamento a dimensione intera… {{percent}} %",
     "fullUnavailable": "Dimensione intera non disponibile – viene mostrata l'anteprima"
   },
@@ -145,11 +157,62 @@
     "hint": "Frecce per spostarti, Invio per inviare, Canc per rimuovere, Esc per chiudere.",
     "empty": "Ancora nessun preferito. Fai clic con il tasto destro su una GIF nella chat, o usa la stella su di essa, e scegli \"Salva nei preferiti\". Apparirà qui."
   },
+  "linkMenu": {
+    "label": "Link",
+    "copy": "Copia link",
+    "open": "Apri link",
+    "copied": "Link copiato"
+  },
   "imageMenu": {
     "label": "Immagine {{name}}"
   },
   "attribution": {
     "via": "tramite {{brand}}",
     "view": "Vedi su {{brand}}"
+  },
+  "themeCard": {
+    "label": "Tema condiviso {{name}}",
+    "apply": "Applica tema",
+    "more": "Applica a un server",
+    "menuLabel": "Applica tema a",
+    "applyToServer": "Applica a {{server}}",
+    "imported": "Importato ✓",
+    "newer": "Creato con Mumcord {{version}} – aggiorna per vederlo completo",
+    "failed": "Impossibile applicare il tema."
+  },
+  "reply": {
+    "action": "Rispondi",
+    "actionFor": "Rispondi a {{name}}",
+    "menu": "Messaggio di {{name}}",
+    "replyTo": "Risposta a",
+    "jump": "Vai al messaggio originale",
+    "image": "Immagine",
+    "replyingTo": "Rispondi a",
+    "cancel": "Annulla risposta"
+  },
+  "actions": {
+    "label": "Avvia insieme",
+    "notConnected": "Non connesso al server.",
+    "partyRunning": "In questo canale c'è già un watch party in corso.",
+    "invalidLink": "Questo non è un link a un video YouTube.",
+    "linkLabel": "Link YouTube",
+    "linkPlaceholder": "Incolla un link YouTube",
+    "confirm": "Avvia",
+    "watchHint": "Guarda un video YouTube insieme a questo canale",
+    "dialogTitle": "Guarda insieme",
+    "addTitle": "Aggiungi alla playlist",
+    "addToPlaylist": "Aggiungi alla playlist",
+    "addConfirm": "Aggiungi",
+    "apps": "App",
+    "appsLive": "App (stai condividendo lo schermo)"
+  },
+  "activity": {
+    "share": "{{name}} sta condividendo lo schermo",
+    "watch": "Guarda",
+    "party": "Watch party: {{title}}",
+    "join": "Entra",
+    "videoFallback": "Video YouTube",
+    "someone": "Qualcuno",
+    "joinFailed": "Impossibile entrare nel watch party."
   }
 }

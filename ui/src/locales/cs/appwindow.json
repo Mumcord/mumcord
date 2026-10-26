@@ -5,6 +5,39 @@
     "remember": "Zapamatovat volbu",
     "minimize": "Minimalizovat do lišty",
     "quit": "Ukončit",
-    "failed": "To se nepovedlo. Zkus to prosím znovu."
+    "failed": "To se nepovedlo. Zkus to prosím znovu.",
+    "descriptionServers": "Jsi stále připojen k {{count}} serverům. Minimalizovaný Mumcord tě drží v hlasovém kanálu a zůstává v oznamovací oblasti."
+  },
+  "windowOverlay": {
+    "title": "Okenní overlay byl odstraněn",
+    "description": "Plovoucí okno overlaye už neexistuje. Místo toho overlay ve hře ukazuje, kdo ve tvých hrách mluví. Můžeš ho zapnout v nastavení overlaye.",
+    "dismiss": "Rozumím",
+    "openSettings": "Otevřít nastavení overlaye"
+  },
+  "appImageMenu": {
+    "title": "Přidat Mumcord do nabídky aplikací?",
+    "description": "Mumcord se tak objeví v nabídce aplikací. Ikona a push-to-talk budou pod Waylandem fungovat správně a odkazy mumble:// otevřou Mumcord. Později to můžeš změnit v Nastavení.",
+    "no": "Ne",
+    "yes": "Ano",
+    "failed": "Nepovedlo se. Zkus to znovu."
+  },
+  "updateCheck": {
+    "title": "Kontrolovat nové verze?",
+    "description": "Mumcord se může jednou denně zeptat GitHubu, jestli existuje novější verze, a zobrazit tip s odkazem. Nic se nestahuje ani neinstaluje a nic se neodesílá kromě samotného dotazu a názvu a verze aplikace. Později to můžeš změnit v Nastavení.",
+    "no": "Ne",
+    "yes": "Ano",
+    "failed": "Nepovedlo se. Zkus to znovu."
+  },
+  "updateHint": {
+    "message": "Mumcord {{version}} je k dispozici.",
+    "open": "Zobrazit vydání",
+    "dismiss": "Zavřít"
+  },
+  "directConsent": {
+    "title": "Povolit přímá spojení?",
+    "description": "Přímá spojení jsou rychlejší, ale druhá osoba uvidí vaši IP adresu. Mumcord je používá pro obrázky v plné velikosti a sdílení obrazovky s ostatními uživateli Mumcordu a může pro ně otevřít port na vašem routeru. Pokud odmítnete, obrázky dorazí přes server a sdílení obrazovky nebude dostupné. Později to můžete změnit v Nastavení → Soukromí.",
+    "no": "Ne",
+    "yes": "Ano",
+    "failed": "Nepovedlo se. Zkus to znovu."
   }
 }

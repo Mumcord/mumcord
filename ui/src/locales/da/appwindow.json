@@ -5,6 +5,39 @@
     "remember": "Husk mit valg",
     "minimize": "Minimér til bakken",
     "quit": "Afslut",
+    "failed": "Det virkede ikke. Prøv igen.",
+    "descriptionServers": "Du er stadig forbundet til {{count}} servere. Minimeret holder Mumcord dig i talekanalen og bliver i systembakken."
+  },
+  "windowOverlay": {
+    "title": "Vinduesoverlayet er fjernet",
+    "description": "Det svævende overlayvindue findes ikke længere. I stedet viser overlayet i spillet, hvem der taler i dine spil. Du kan slå det til i overlay-indstillingerne.",
+    "dismiss": "Forstået",
+    "openSettings": "Åbn overlay-indstillinger"
+  },
+  "appImageMenu": {
+    "title": "Føj Mumcord til appmenuen?",
+    "description": "Så kommer Mumcord i din appmenu. Ikonet og push-to-talk virker korrekt under Wayland, og mumble://-links åbner Mumcord. Du kan ændre det senere i Indstillinger.",
+    "no": "Nej",
+    "yes": "Ja",
+    "failed": "Det virkede ikke. Prøv igen."
+  },
+  "updateCheck": {
+    "title": "Søg efter nye versioner?",
+    "description": "Mumcord kan spørge GitHub en gang om dagen, om der findes en nyere version, og vise et tip med et link. Intet hentes eller installeres, og intet sendes ud over selve forespørgslen samt appens navn og version. Du kan ændre det senere i Indstillinger.",
+    "no": "Nej",
+    "yes": "Ja",
+    "failed": "Det virkede ikke. Prøv igen."
+  },
+  "updateHint": {
+    "message": "Mumcord {{version}} er tilgængelig.",
+    "open": "Se udgivelse",
+    "dismiss": "Luk"
+  },
+  "directConsent": {
+    "title": "Tillad direkte forbindelser?",
+    "description": "Direkte forbindelser er hurtigere, men den anden person kan se din IP-adresse. Mumcord bruger dem til billeder i fuld størrelse og skærmdeling med andre Mumcord-brugere og kan åbne en port på din router til dem. Hvis du siger nej, kommer billeder stadig via serveren, og skærmdeling er ikke tilgængelig. Du kan ændre det senere under Indstillinger → Privatliv.",
+    "no": "Nej",
+    "yes": "Ja",
     "failed": "Det virkede ikke. Prøv igen."
   }
 }

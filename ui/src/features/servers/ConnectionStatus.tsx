@@ -10,7 +10,7 @@ import {
   useServers,
 } from "./store";
 import { EmptyState } from "./EmptyState";
-import { EDIT_FIXES, connectionErrorText } from "./errors";
+import { EDIT_FIXES, connectionErrorText, serverLimitText } from "./errors";
 import { displayName } from "./format";
 import "./servers.css";
 
@@ -92,6 +92,9 @@ const ACTION_KEYS: Record<ActionContext, string> = {
   reorder: "status.actionFailed.reorder",
   remove: "status.actionFailed.remove",
   disconnect: "status.actionFailed.disconnect",
+  alwaysConnect: "status.actionFailed.alwaysConnect",
+  notifications: "status.actionFailed.notifications",
+  savePassword: "status.actionFailed.savePassword",
 };
 
 /** Thin bar above the chat (spec §5.2). Shows nothing while connected normally or idle. */
@@ -101,7 +104,14 @@ function StatusBar({ state }: { state: ServersState }) {
 
   if (actionError) {
     return (
-      <Bar tone="danger" text={t(ACTION_KEYS[actionError.context])}>
+      <Bar
+        tone="danger"
+        text={
+          actionError.error.code === "serverLimitReached"
+            ? serverLimitText(t, state.serverLimit, actionError.context === "alwaysConnect")
+            : t(ACTION_KEYS[actionError.context])
+        }
+      >
         <button type="button" className="button" onClick={dismissActionError}>
           {t("common:close")}
         </button>
@@ -123,12 +133,15 @@ function StatusBar({ state }: { state: ServersState }) {
     case "reconnecting":
       return <Reconnecting state={state} />;
     case "connected":
+      // A refusal for another server (e.g. over the server limit) must not be hidden by the
+      // shown server being connected.
+      if (ended) break;
       return state.transport === "tcp" ? <Bar tone="info" text={t("status.tcp")} /> : null;
     case "disconnected":
       break;
   }
   if (!ended) return null;
-  const reason = ended.error ? connectionErrorText(t, ended.error) : null;
+  const reason = ended.error ? connectionErrorText(t, ended.error, state.serverLimit) : null;
   const text = ended.afterLoss
     ? reason
       ? t("status.disconnectedReason", { reason })

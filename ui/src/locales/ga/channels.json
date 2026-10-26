@@ -4,6 +4,8 @@
     "label": "Cainéil",
     "hint": "Enter: taispeáin an comhrá · Shift+Enter nó dúbailt-chliceáil: téigh isteach · Eochracha saigheada: bog, leathnaigh, laghdaigh",
     "join": "Téigh isteach",
+    "menuLabel": "Roghanna do {{channel}}",
+    "showDescription": "Taispeáin cur síos an chainéil",
     "you": "(tusa)",
     "voiceHere": "tá tú anseo (guth)",
     "people_one": "{{count}} duine",
@@ -22,10 +24,11 @@
     },
     "showAll": "Taispeáin gach ceann ({{total}})",
     "showFewer": "Taispeáin níos lú",
-    "jump": "Léim go dtí mo chainéal"
+    "jump": "Léim go dtí mo chainéal",
+    "locked": "faoi ghlas"
   },
   "status": {
-    "listening": "ag éisteacht",
+    "listening": "ag éisteacht amháin",
     "talking": "ag caint",
     "muted": "balbhaithe",
     "deafened": "bodhraithe",
@@ -38,7 +41,7 @@
   "mumcordBadge": "Úsáideann sé Mumcord",
   "statusTip": {
     "registered": "Cláraithe ar an bhfreastalaí seo",
-    "listening": "Ag éisteacht leis an gcainéal seo",
+    "listening": "Ag éisteacht amháin",
     "muted": "Balbhaithe",
     "deafened": "Bodhraithe",
     "serverMuted": "Balbhaithe ag an bhfreastalaí",
@@ -48,6 +51,7 @@
     "unregistered": "Gan chlárú ar an bhfreastalaí seo (aoi)",
     "nowPlaying": "Ag éisteacht le {{track}}",
     "nowGaming": "Ag imirt {{game}}",
+    "weakConnection": "Ceangal lag – ping ard nó caillteanas paicéad",
     "positional": "Fuaim shuímh gníomhach"
   },
   "announce": {
@@ -62,7 +66,8 @@
   },
   "empty": {
     "disconnected": "Gan ceangal. Roghnaigh freastalaí chun a chainéil a fheiceáil.",
-    "loading": "Ag luchtú cainéal…"
+    "loading": "Ag luchtú cainéal…",
+    "syncingBig": "Freastalaí mór á shioncronú…"
   },
   "search": {
     "label": "Cuardaigh cainéil agus daoine",

@@ -27,6 +27,7 @@
 }
 
 .server-bar__server {
+  position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -62,8 +63,17 @@
   border-color: var(--color-warning);
 }
 
-/* Pill marker left of the connected server, so the state is not shown by colour alone. */
-.server-bar__item[data-status="connected"]::before {
+.server-bar__item[data-status="error"] .server-bar__server {
+  border-color: var(--color-danger);
+}
+
+/* Saved but not connected: greyed out. */
+.server-bar__item:not([data-status]) .server-bar__server {
+  color: var(--color-text-muted);
+}
+
+/* Pill marker left of the shown server, so the state is not shown by colour alone. */
+.server-bar__item[data-shown]::before {
   position: absolute;
   top: 25%;
   left: calc(-1 * var(--space-2));
@@ -74,37 +84,71 @@
   content: "";
 }
 
+/* Small marks on the icon's corners; the button's label carries the same information. */
+.server-bar__mark {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 1.125rem;
+  height: 1.125rem;
+  padding: 0 0.2rem;
+  border: 2px solid var(--color-bg-servers);
+  border-radius: var(--radius-full);
+  font-family: var(--font-family);
+  font-size: 0.6875rem;
+  font-weight: var(--font-weight-bold);
+  line-height: 1;
+}
+
+.server-bar__mark--voice {
+  top: -0.25rem;
+  left: -0.25rem;
+  background: var(--color-success);
+  color: var(--color-bg-servers);
+}
+
+.server-bar__mark--progress,
+.server-bar__mark--error {
+  top: -0.25rem;
+  right: -0.25rem;
+  color: var(--color-bg-servers);
+}
+
+.server-bar__mark--progress {
+  background: var(--color-warning);
+}
+
+.server-bar__mark--error {
+  background: var(--color-danger);
+}
+
+.server-bar__mark--mentions {
+  right: -0.25rem;
+  bottom: -0.25rem;
+  background: var(--color-danger);
+  color: var(--color-bg-servers);
+}
+
+.server-bar__mark--unread {
+  right: -0.125rem;
+  bottom: -0.125rem;
+  min-width: 0.75rem;
+  height: 0.75rem;
+  padding: 0;
+  background: var(--color-text);
+}
+
 .server-bar__add {
   color: var(--color-success);
   font-size: var(--font-size-xl);
 }
 
-.server-bar__tooltip {
-  position: fixed;
-  z-index: 40;
-  margin-left: calc(3rem + var(--space-3));
-  padding: var(--space-1) var(--space-3);
-  border-radius: var(--radius-md);
-  background: var(--color-bg-elevated);
-  color: var(--color-text);
-  font-size: var(--font-size-sm);
-  white-space: nowrap;
-  pointer-events: none;
-  visibility: hidden;
-  box-shadow:
-    0 0 0 1px var(--color-border),
-    var(--shadow-raised);
-}
-
-.server-bar__item:hover .server-bar__tooltip,
-.server-bar__server:focus-visible + .server-bar__tooltip {
-  visibility: visible;
-}
-
-/* Context menu */
+/* Context menu. Portalled to <body> and also opened from modal layers (settings overlay at 50,
+   user panel modal at 60), so it must stack above them. */
 .server-menu {
   position: fixed;
-  z-index: 45;
+  z-index: 70;
   display: flex;
   flex-direction: column;
   min-width: 12rem;
@@ -128,6 +172,16 @@
 .server-menu__item:hover,
 .server-menu__item:focus-visible {
   background: var(--color-bg-hover);
+}
+
+.server-menu__item[aria-disabled="true"] {
+  color: var(--color-text-muted);
+  cursor: default;
+}
+
+.server-menu__check {
+  display: inline-block;
+  width: 1.25em;
 }
 
 .server-menu__item--danger {
@@ -293,4 +347,30 @@
   flex-wrap: wrap;
   justify-content: center;
   gap: var(--space-2);
+}
+
+.servers-password__row {
+  display: flex;
+  gap: 8px;
+}
+
+.servers-password__row input {
+  flex: 1;
+  min-width: 0;
+}
+
+.servers-tokens {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.servers-tokens__item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
 }

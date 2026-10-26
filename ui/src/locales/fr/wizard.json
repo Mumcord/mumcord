@@ -98,5 +98,10 @@
     "ingameOverlayHint": "Affiche qui parle par-dessus votre jeu (Linux). Vous pourrez l’activer ou le désactiver par jeu plus tard dans les paramètres.",
     "ingameOverlayWarning": "Certains jeux dotés d’un anti-triche peuvent signaler ou bloquer les overlays en jeu. Mumcord désactive par défaut les jeux connus pour être risqués (comme Valorant ou League of Legends). Activez-le uniquement pour les jeux de confiance.",
     "ingameOverlayAlt": "Exemple de l’overlay en jeu indiquant qui parle"
+  },
+  "updates": {
+    "title": "Nouvelles versions",
+    "check": "Rechercher les nouvelles versions",
+    "hint": "Mumcord peut demander une fois par jour à GitHub si une version plus récente existe et afficher un avis avec un lien. Rien n’est téléchargé ni installé, et rien n’est envoyé à part la requête elle-même, le nom et la version de l’application. Vous pourrez modifier ce choix plus tard dans les paramètres."
   }
 }

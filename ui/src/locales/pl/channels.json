@@ -4,6 +4,8 @@
     "label": "Kanały",
     "hint": "Enter: pokaż czat · Shift+Enter lub dwuklik: dołącz · Strzałki: przesuwanie, rozwijanie, zwijanie",
     "join": "Dołącz",
+    "menuLabel": "Opcje dla {{channel}}",
+    "showDescription": "Pokaż opis kanału",
     "you": "(Ty)",
     "voiceHere": "jesteś tutaj (głos)",
     "people_one": "{{count}} osoba",
@@ -20,10 +22,11 @@
     },
     "showAll": "Pokaż wszystkich ({{total}})",
     "showFewer": "Pokaż mniej",
-    "jump": "Przejdź do mojego kanału"
+    "jump": "Przejdź do mojego kanału",
+    "locked": "zablokowany"
   },
   "status": {
-    "listening": "słucha",
+    "listening": "tylko słucha",
     "talking": "mówi",
     "muted": "wyciszony(-a)",
     "deafened": "ogłuszony(-a)",
@@ -36,7 +39,7 @@
   "mumcordBadge": "Używa Mumcord",
   "statusTip": {
     "registered": "Zarejestrowany(-a) na tym serwerze",
-    "listening": "Słucha tego kanału",
+    "listening": "Tylko słucha",
     "muted": "Wyciszony(-a)",
     "deafened": "Ogłuszony(-a)",
     "serverMuted": "Wyciszony(-a) przez serwer",
@@ -46,6 +49,7 @@
     "unregistered": "Niezarejestrowany(-a) na tym serwerze (gość)",
     "nowPlaying": "Słucha: {{track}}",
     "nowGaming": "Gra w {{game}}",
+    "weakConnection": "Słabe połączenie – wysoki ping lub utrata pakietów",
     "positional": "Dźwięk pozycyjny aktywny"
   },
   "announce": {
@@ -60,7 +64,8 @@
   },
   "empty": {
     "disconnected": "Brak połączenia. Wybierz serwer, aby zobaczyć jego kanały.",
-    "loading": "Ładowanie kanałów…"
+    "loading": "Ładowanie kanałów…",
+    "syncingBig": "Synchronizowanie dużego serwera…"
   },
   "search": {
     "label": "Szukaj kanałów i osób",

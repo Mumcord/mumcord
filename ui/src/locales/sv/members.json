@@ -1,8 +1,6 @@
 {
   "inChannel_one": "I {{channel}} ({{count}})",
   "inChannel_other": "I {{channel}} ({{count}})",
-  "listening_one": "Lyssnar ({{count}})",
-  "listening_other": "Lyssnar ({{count}})",
   "noChannel": "Välj en kanal för att se vem som är med.",
   "nobody": "Ingen är här.",
   "nobodyElse": "Ingen annan är på servern.",
@@ -11,6 +9,26 @@
   "registered": "Registrerad",
   "unregistered": "Inte registrerad",
   "talking": "Pratar",
+  "quality": {
+    "label": "Anslutning",
+    "summary": "Anslutning: {{level}}",
+    "level": {
+      "good": "Bra",
+      "fair": "Godkänd",
+      "weak": "Svag",
+      "unknown": "Okänd"
+    },
+    "ping": "Ping",
+    "loss": "Paketförlust",
+    "late": "Sena paket",
+    "bandwidth": "Bandbredd",
+    "transport": "Rösttransport",
+    "client": "Klient",
+    "os": "Operativsystem",
+    "ms": "{{value}} ms",
+    "percent": "{{value}} %",
+    "kbps": "{{value}} kbit/s"
+  },
   "card": {
     "close": "Stäng",
     "loadFailed": "Det gick inte att läsa in profilen.",
@@ -22,6 +40,9 @@
     "privateMessage": "Privat meddelande",
     "localSettings": "Dina inställningar",
     "localSettingsHint": "Bara du ser de här. Ändringar sparas direkt.",
+    "settingsFor": "Inställningar för {{name}}",
+    "hintMuted": "Ljud av",
+    "hintVolume": "Volym {{value}} %",
     "localMuteHint": "Du hör inte den här personen.",
     "privateNote": "Privat anteckning",
     "privateNoteHint": "Bara du kan se den här anteckningen.",
@@ -36,7 +57,8 @@
     "viewProfile": "Visa profil",
     "join": "Gå med i {{channel}}",
     "joinDenied": "Du har inte behörighet att gå in i den här kanalen.",
-    "mute": "Stäng av för mig"
+    "mute": "Stäng av för mig",
+    "connectionInfo": "Anslutningsinfo…"
   },
   "nowPlaying": {
     "label": "Spelas nu",

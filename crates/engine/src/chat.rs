@@ -10,11 +10,14 @@ mod sanitize;
 use std::collections::HashMap;
 use std::sync::atomic::{AtomicU64, Ordering};
 use std::sync::{LazyLock, Mutex};
-use std::time::{SystemTime, UNIX_EPOCH};
+use std::time::{Duration, SystemTime, UNIX_EPOCH};
 
-use mumcord_protocol::{ServerState, TextMessage, TextTarget};
+use mumcord_protocol::{
+    DenyKind, PermissionDenied, ServerState, TextMessage, TextTarget, permissions,
+};
 use mumcord_store::{ChatMessage, Conversation, NewChatMessage, ServerId, Store, UnixMillis};
 
+use crate::follow::{OnTimeout, confirm, subscribe_denials};
 use crate::session::convert::{channel_view, command_error, join_path, split_path};
 use crate::session::{
     ConversationRef, Engine, EngineError, EngineEvent, EngineResult, ErrorKind, SessionCtx,
@@ -435,8 +438,13 @@ impl Engine {
     /// Plays the sound of a new incoming message (FR-1.27, QA.41). The UI calls this per message
     /// because only it knows the matching rules and the names the user went by: `mention` is
     /// its verdict. The sound toggles and deafness are applied by the sound hub.
-    pub fn message_sound(&self, conversation: &ConversationRef, mention: bool) -> EngineResult<()> {
-        let ctx = self.session_ctx()?;
+    pub fn message_sound(
+        &self,
+        server_id: ServerId,
+        conversation: &ConversationRef,
+        mention: bool,
+    ) -> EngineResult<()> {
+        let ctx = self.session_ctx_for(server_id)?;
         let route = match conversation {
             ConversationRef::Channel { channel_id } => Route::Channel(*channel_id),
             _ => Route::Private { session: 0 },
@@ -451,13 +459,15 @@ impl Engine {
         Ok(())
     }
 
-    /// Sends Mumble HTML to a channel (FR-1.28, FR-1.30) and returns the stored own message.
-    pub fn send_channel_message(
+    /// Sends Mumble HTML to a channel on `server_id` (FR-1.28, FR-1.30) and returns the stored
+    /// own message. Waits briefly for a refusal (FR-2.47); nothing is stored then.
+    pub async fn send_channel_message(
         &self,
+        server_id: ServerId,
         channel_id: u32,
         html: &str,
     ) -> EngineResult<ChatMessageView> {
-        let ctx = self.session_ctx()?;
+        let ctx = self.session_ctx_for(server_id)?;
         let allowed = ctx.handle.with_state(|s| {
             s.channels
                 .get(&channel_id)
@@ -474,9 +484,11 @@ impl Engine {
             Some(true) => {}
         }
         check_text_size(&ctx, html)?;
+        let denials = subscribe_denials();
         ctx.handle
             .send_text(&TextTarget::channel(channel_id), html)
             .map_err(command_error)?;
+        await_refusal(&ctx, denials, Some(channel_id)).await?;
         Ok(own_message(
             &ctx,
             ConversationRef::Channel { channel_id },
@@ -484,17 +496,25 @@ impl Engine {
         ))
     }
 
-    /// Sends Mumble HTML to one person and returns the stored own message.
-    pub fn send_private_message(&self, session: u32, html: &str) -> EngineResult<ChatMessageView> {
-        let ctx = self.session_ctx()?;
+    /// Sends Mumble HTML to one person on `server_id` and returns the stored own message.
+    /// Waits briefly for a refusal (FR-2.47); nothing is stored then.
+    pub async fn send_private_message(
+        &self,
+        server_id: ServerId,
+        session: u32,
+        html: &str,
+    ) -> EngineResult<ChatMessageView> {
+        let ctx = self.session_ctx_for(server_id)?;
         let recipient = ctx
             .handle
             .with_state(|s| s.users.get(&session).map(|u| u.cert_hash.clone()))
             .ok_or_else(|| EngineError::new(ErrorKind::NotFound, "unknown person"))?;
         check_text_size(&ctx, html)?;
+        let denials = subscribe_denials();
         ctx.handle
             .send_text(&TextTarget::user(session), html)
             .map_err(command_error)?;
+        await_refusal(&ctx, denials, None).await?;
         let conversation = match recipient {
             Some(cert_hash) => ConversationRef::Private { cert_hash },
             None => ConversationRef::PrivateSession { session },
@@ -504,8 +524,12 @@ impl Engine {
 
     /// Resets the unread count of a conversation (and the stored read marker of a followed
     /// channel).
-    pub fn conversation_mark_read(&self, conversation: ConversationRef) -> EngineResult<()> {
-        let ctx = self.session_ctx()?;
+    pub fn conversation_mark_read(
+        &self,
+        server_id: ServerId,
+        conversation: ConversationRef,
+    ) -> EngineResult<()> {
+        let ctx = self.session_ctx_for(server_id)?;
         let key = unread_key(&ctx, &conversation)?;
         if let UnreadKey::Stored(Conversation::Channel(path)) = &key {
             ctx.store()
@@ -520,15 +544,16 @@ impl Engine {
         Ok(())
     }
 
-    /// Stored messages of a conversation on the connected server, oldest first; `before`
-    /// pages backwards from a message id.
+    /// Stored messages of a conversation on the connected server `server_id`, oldest first;
+    /// `before` pages backwards from a message id.
     pub fn history_load(
         &self,
+        server_id: ServerId,
         conversation: ConversationRef,
         before: Option<&str>,
         limit: u32,
     ) -> EngineResult<Vec<ChatMessageView>> {
-        let ctx = self.session_ctx()?;
+        let ctx = self.session_ctx_for(server_id)?;
         let Some(stored) = stored_conversation(&ctx, &conversation)? else {
             return Ok(Vec::new());
         };
@@ -618,7 +643,6 @@ impl Engine {
 
     /// Clears local history (FR-1.33); cleared conversations are no longer unread.
     pub fn history_clear(&self, scope: HistoryScope) -> EngineResult<()> {
-        let ctx = self.session_ctx().ok();
         let store = self.store_handle();
         let cleared: Vec<(ServerId, UnreadKey)> = match &scope {
             HistoryScope::Conversation {
@@ -629,10 +653,7 @@ impl Engine {
                     ConversationRef::Private { cert_hash } => {
                         UnreadKey::Stored(Conversation::Private(cert_hash.clone()))
                     }
-                    _ => match &ctx {
-                        Some(ctx) if ctx.server_id == *server_id => unread_key(ctx, conversation)?,
-                        _ => return Err(EngineError::not_connected()),
-                    },
+                    _ => unread_key(&self.session_ctx_for(*server_id)?, conversation)?,
                 };
                 if let UnreadKey::Stored(c) = &key {
                     lock(&store)
@@ -656,11 +677,17 @@ impl Engine {
                 lock(&UNREAD).keys().cloned().collect()
             }
         };
-        let mut unread = lock(&UNREAD);
-        for entry in cleared {
-            let had = unread.remove(&entry).is_some_and(|n| n > 0);
-            if let Some(ctx) = ctx.as_ref().filter(|c| had && c.server_id == entry.0)
-                && let Some(conversation) = key_conversation(ctx, &entry.1)
+        let had: Vec<(ServerId, UnreadKey)> = {
+            let mut unread = lock(&UNREAD);
+            cleared
+                .into_iter()
+                .filter(|entry| unread.remove(entry).is_some_and(|n| n > 0))
+                .collect()
+        };
+        // Outside the unread lock: a sync takes the core lock first, then that one.
+        for (server_id, key) in had {
+            if let Ok(ctx) = self.session_ctx_for(server_id)
+                && let Some(conversation) = key_conversation(&ctx, &key)
             {
                 ctx.events.emit(EngineEvent::UnreadChanged(UnreadView {
                     conversation,
@@ -670,6 +697,38 @@ impl Engine {
         }
         Ok(())
     }
+}
+
+/// Mumble never acknowledges a text message, only refuses it. A refusal arrives within a round
+/// trip, so a message counts as delivered once none came for this long.
+const REFUSAL_GRACE: Duration = Duration::from_millis(1200);
+
+fn is_text_refusal(denied: &PermissionDenied, channel_id: Option<u32>) -> bool {
+    match denied.kind {
+        DenyKind::TextTooLong => true,
+        DenyKind::Permission => {
+            denied
+                .permission
+                .is_none_or(|p| p & permissions::TEXT_MESSAGE != 0)
+                && channel_id.is_none_or(|c| denied.channel_id.is_none_or(|d| d == c))
+        }
+        _ => false,
+    }
+}
+
+async fn await_refusal(
+    ctx: &SessionCtx,
+    denials: tokio::sync::broadcast::Receiver<(ServerId, PermissionDenied)>,
+    channel_id: Option<u32>,
+) -> EngineResult<()> {
+    confirm(
+        ctx,
+        denials,
+        |_| false,
+        |d| is_text_refusal(d, channel_id),
+        OnTimeout::Accept(REFUSAL_GRACE),
+    )
+    .await
 }
 
 /// Stores and returns an own sent message.
@@ -865,5 +924,46 @@ mod tests {
             history_view(row(None), &conv, None, Vec::new(), None).id,
             "7"
         );
+    }
+
+    fn denial(
+        kind: DenyKind,
+        permission: Option<u32>,
+        channel_id: Option<u32>,
+    ) -> PermissionDenied {
+        PermissionDenied {
+            kind,
+            permission,
+            channel_id,
+            session: None,
+            reason: None,
+            name: None,
+        }
+    }
+
+    #[test]
+    fn only_text_denials_refuse_a_message() {
+        let write = denial(
+            DenyKind::Permission,
+            Some(permissions::TEXT_MESSAGE),
+            Some(3),
+        );
+        assert!(is_text_refusal(&write, Some(3)));
+        assert!(
+            !is_text_refusal(&write, Some(4)),
+            "another channel's denial"
+        );
+        assert!(
+            is_text_refusal(&write, None),
+            "a private message names the target's channel"
+        );
+        let enter = denial(DenyKind::Permission, Some(permissions::ENTER), Some(3));
+        assert!(!is_text_refusal(&enter, Some(3)), "an unrelated permission");
+        let long = denial(DenyKind::TextTooLong, None, None);
+        assert!(is_text_refusal(&long, Some(3)));
+        assert!(!is_text_refusal(
+            &denial(DenyKind::ChannelFull, None, None),
+            Some(3)
+        ));
     }
 }

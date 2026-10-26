@@ -13,13 +13,16 @@
   },
   "dm": {
     "title": "Yksityisviestit",
-    "unknown": "Tuntematon henkilö"
+    "unknown": "Tuntematon henkilö",
+    "withServer": "{{name}}, palvelimella {{server}}"
   },
   "notify": {
     "channel": "{{name}} kanavalla {{channel}}: {{text}}",
     "private": "{{name}} (yksityinen): {{text}}",
     "more_one": "{{count}} uusi viesti lisää",
-    "more_other": "{{count}} uutta viestiä lisää"
+    "more_other": "{{count}} uutta viestiä lisää",
+    "channelOn": "{{name}} kanavalla {{channel}} palvelimella {{server}}: {{text}}",
+    "privateOn": "{{name}} (yksityinen, {{server}}): {{text}}"
   },
   "history": {
     "clear": "Tyhjennä historia",

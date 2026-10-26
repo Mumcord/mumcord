@@ -71,7 +71,7 @@ export function ChannelSearch({ value, onChange, onClear, onSubmit }: ChannelSea
           type="button"
           className="channel-search__clear"
           aria-label={t("search.clear")}
-          title={t("search.clear")}
+          data-tooltip={t("search.clear")}
           onClick={() => {
             onClear();
             inputRef.current?.focus();

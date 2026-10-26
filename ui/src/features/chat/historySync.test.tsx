@@ -56,19 +56,20 @@ describe("history sync in the chat store (FR-1.60b)", () => {
   });
 
   it("puts synced messages between the shown ones, marked with their origin", async () => {
-    const api = await connectedMock();
+    const api = await connectedMock({ bindStore: true });
     resetChatStore();
     const { result } = renderHook(() => useConversationLog(LOBBY));
     act(() => {
       ensureLoaded(LOBBY);
-      api.mock.emit("messageReceived", { message: message("a", 10, "a") });
-      api.mock.emit("messageReceived", { message: message("d", 1, "d") });
+      api.mock.emit("messageReceived", { serverId: 1, message: message("a", 10, "a") });
+      api.mock.emit("messageReceived", { serverId: 1, message: message("d", 1, "d") });
     });
     await waitFor(() => {
       expect(result.current.loaded).toBe(true);
     });
     act(() => {
       api.mock.emit("historySynced", {
+        serverId: 1,
         channelId: 1,
         messages: [message("b", 5, "b", "Alice"), message("c", 4, "c", "Alice")],
       });
@@ -78,7 +79,7 @@ describe("history sync in the chat store (FR-1.60b)", () => {
   });
 
   it("leaves synced messages older than the loaded window to paging", async () => {
-    const api = await connectedMock();
+    const api = await connectedMock({ bindStore: true });
     resetChatStore();
     for (let i = 0; i < HISTORY_PAGE + 5; i += 1)
       api.mock.receiveMessage(LOBBY, `m${String(i)}`, 2);
@@ -93,6 +94,7 @@ describe("history sync in the chat store (FR-1.60b)", () => {
     const recent = { ...message("new", 0, "recent"), sentAt: new Date().toISOString() };
     act(() => {
       api.mock.emit("historySynced", {
+        serverId: 1,
         channelId: 1,
         messages: [message("old", 24 * 60, "a day ago", "Alice"), recent],
       });
@@ -102,7 +104,7 @@ describe("history sync in the chat store (FR-1.60b)", () => {
   });
 
   it("asks other Mumcord users on request and reports the result", async () => {
-    const api = await connectedMock();
+    const api = await connectedMock({ bindStore: true });
     resetChatStore();
     const { result } = renderHook(() => useConversationLog(LOBBY));
     act(() => {
@@ -122,22 +124,22 @@ describe("history sync in the chat store (FR-1.60b)", () => {
   });
 
   it("shows a running sync but no result for syncs the user did not ask for", async () => {
-    const api = await connectedMock();
+    const api = await connectedMock({ bindStore: true });
     resetChatStore();
     const { result } = renderHook(() => useConversationLog(LOBBY));
     act(() => {
-      api.mock.emit("historySyncStatus", { channelId: 1, running: true, added: 0 });
+      api.mock.emit("historySyncStatus", { serverId: 1, channelId: 1, running: true, added: 0 });
     });
     expect(result.current.syncing).toBe(true);
     act(() => {
-      api.mock.emit("historySyncStatus", { channelId: 1, running: false, added: 3 });
+      api.mock.emit("historySyncStatus", { serverId: 1, channelId: 1, running: false, added: 3 });
     });
     expect(result.current.syncing).toBe(false);
     expect(result.current.syncResult).toBeNull();
   });
 
   it("reports when earlier messages cannot be requested", async () => {
-    await connectedMock();
+    await connectedMock({ bindStore: true });
     resetChatStore();
     const elsewhere: Conversation = { kind: "channel", channelId: 2 };
     const { result } = renderHook(() => useConversationLog(elsewhere));
@@ -239,14 +241,14 @@ function renderLog(log: Partial<ConversationLog>, onSyncEarlier?: () => void) {
 
 describe("synced messages in the message list (FR-1.60b, AC-1.51d)", () => {
   it("marks synced messages with the person whose history they came from", async () => {
-    await connectedMock();
+    await connectedMock({ bindStore: true });
     renderLog({ messages: [message("1", 5, "hello", "Alice"), message("2", 1, "live")] });
     expect(screen.getByText("from Alice's history")).toBeInTheDocument();
     expect(screen.getAllByText(/history/)).toHaveLength(1);
   });
 
   it("offers earlier messages once the local history is exhausted and shows progress", async () => {
-    await connectedMock();
+    await connectedMock({ bindStore: true });
     const onSync = vi.fn();
     const { update } = renderLog({ messages: TEN }, onSync);
     fireEvent.click(screen.getByRole("button", { name: "Load earlier messages" }));
@@ -265,7 +267,7 @@ describe("synced messages in the message list (FR-1.60b, AC-1.51d)", () => {
   });
 
   it("keeps the visible message in place when older messages are inserted above it", async () => {
-    await connectedMock();
+    await connectedMock({ bindStore: true });
     const { update } = renderLog({ messages: TEN });
     const list = fakeLayout();
     scrollTo(list, 40);
@@ -288,7 +290,7 @@ describe("synced messages in the message list (FR-1.60b, AC-1.51d)", () => {
   });
 
   it("shows Jump to newest with the count of new messages while scrolled up", async () => {
-    await connectedMock();
+    await connectedMock({ bindStore: true });
     const { update } = renderLog({ messages: TEN });
     const list = fakeLayout();
     expect(screen.queryByRole("button", { name: /Jump to newest/ })).toBeNull();
@@ -307,7 +309,7 @@ describe("synced messages in the message list (FR-1.60b, AC-1.51d)", () => {
   });
 
   it("does not count synced history as new and jumps with Ctrl+End", async () => {
-    await connectedMock();
+    await connectedMock({ bindStore: true });
     const { update } = renderLog({ messages: TEN });
     const list = fakeLayout();
     scrollTo(list, 0);

@@ -532,3 +532,87 @@ fn manual_threshold_gates_quiet_and_loud_tones_and_ptt_ignores_it() {
     }
     assert_eq!(open_frames(&mut chain, &tone(0.25)), 0);
 }
+
+/// Sustained three-note chord with a slow swell, standing in for music.
+fn music_like(len: usize, amplitude: f32) -> Vec<f32> {
+    (0..len)
+        .map(|i| {
+            let t = i as f32 / SAMPLE_RATE as f32;
+            let chord: f32 = [220.0, 277.2, 329.6]
+                .iter()
+                .map(|f| (2.0 * PI * f * t).sin())
+                .sum::<f32>()
+                / 3.0;
+            amplitude * (0.75 + 0.25 * (2.0 * PI * 0.3 * t).sin()) * chord
+        })
+        .collect()
+}
+
+fn level_dbfs(samples: &[f32]) -> f32 {
+    db(energy(samples))
+}
+
+fn peak(samples: &[f32]) -> f32 {
+    samples.iter().fold(0.0f32, |p, s| p.max(s.abs()))
+}
+
+/// Output level of `input` after 10 s with auto gain on and music quality as given.
+fn sent_level(input: &[f32], music: bool) -> (f32, f32) {
+    let (mut chain, _) = chain_with(false, false, true);
+    chain.controls().set_music_quality(music);
+    let out = run(&mut chain, input);
+    let tail = last_seconds(&out, 3.0);
+    (level_dbfs(tail), peak(tail))
+}
+
+/// F14: with "Music quality" on, the sender skipped automatic gain and nothing replaced it,
+/// so listeners heard music clients far quieter than speech clients.
+#[test]
+fn music_quality_sends_as_loud_as_speech() {
+    let len = 10 * SAMPLE_RATE as usize;
+    for amplitude in [0.02, 0.3] {
+        let (speech, _) = sent_level(&speech_like(len, amplitude), false);
+        let (music_mode, music_peak) = sent_level(&speech_like(len, amplitude), true);
+        println!(
+            "speech-like {amplitude}: voice {speech:.1} dBFS, music quality {music_mode:.1} dBFS"
+        );
+        assert!(
+            (music_mode - speech).abs() <= 3.0,
+            "music quality {music_mode:.1} vs voice {speech:.1} dBFS"
+        );
+        assert!(
+            music_peak < 0.99,
+            "music quality clips: peak {music_peak:.2}"
+        );
+    }
+
+    // Quiet music is lifted to the level quiet speech is sent at.
+    let (speech_quiet, _) = sent_level(&speech_like(len, 0.02), false);
+    let (music_quiet, _) = sent_level(&music_like(len, 0.02), true);
+    println!("quiet music {music_quiet:.1} dBFS, quiet speech {speech_quiet:.1} dBFS");
+    assert!(
+        (music_quiet - speech_quiet).abs() <= 3.0,
+        "quiet music {music_quiet:.1} vs speech {speech_quiet:.1} dBFS"
+    );
+
+    // Loud music passes as it is, like loud speech: no compression and no clipping.
+    let loud = music_like(len, 0.9);
+    let (music_loud, loud_peak) = sent_level(&loud, true);
+    let input_level = level_dbfs(last_seconds(&loud, 3.0));
+    println!("loud music {music_loud:.1} dBFS (input {input_level:.1}), peak {loud_peak:.2}");
+    assert!((music_loud - input_level).abs() <= 0.5);
+    assert!(loud_peak < 0.99, "loud music clips: peak {loud_peak:.2}");
+}
+
+/// A sudden loud passage after a quiet one must not clip while the gain is still lifted.
+#[test]
+fn music_leveler_never_clips_on_a_sudden_peak() {
+    let mut input = music_like(6 * SAMPLE_RATE as usize, 0.01);
+    input.extend(music_like(2 * SAMPLE_RATE as usize, 0.8));
+    let (mut chain, _) = chain_with(false, false, true);
+    chain.controls().set_music_quality(true);
+    let out = run(&mut chain, &input);
+    let loud_peak = peak(last_seconds(&out, 2.0));
+    println!("peak after sudden loud passage: {loud_peak:.3}");
+    assert!(loud_peak <= 0.9, "peak {loud_peak:.3}");
+}

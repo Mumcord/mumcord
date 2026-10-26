@@ -192,10 +192,8 @@ pub fn denial_error(denied: &PermissionDenied) -> EngineError {
         }
         _ => ErrorKind::PermissionDenied,
     };
-    let message = denied
-        .reason
-        .clone()
-        .unwrap_or_else(|| format!("{:?}", denied.kind));
+    // Without the server's own text there is nothing readable to show; the UI words it.
+    let message = denied.reason.clone().unwrap_or_default();
     EngineError::new(kind, message)
 }
 

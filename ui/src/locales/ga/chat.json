@@ -8,6 +8,7 @@
     "unknownPerson": "Duine anaithnid"
   },
   "list": {
+    "server": "Freastalaí",
     "today": "Inniu",
     "yesterday": "Inné",
     "label": "Teachtaireachtaí i {{name}}",
@@ -38,7 +39,8 @@
     "strike": "Líne tríd",
     "code": "Cód inlíne",
     "codeBlock": "Bloc cóid",
-    "link": "Nasc"
+    "link": "Nasc",
+    "quote": "Athfhriotal"
   },
   "composer": {
     "label": "Seol teachtaireacht chuig {{name}}",
@@ -70,7 +72,14 @@
     "notConnected": "Níl tú ceangailte. Athcheangail agus bain triail eile as.",
     "generic": "Níorbh fhéidir an teachtaireacht a sheoladh. Bain triail eile as.",
     "onlyImages": "Ní féidir ach íomhánna a sheoladh.",
-    "sourceTooLarge": "Tá an comhad seo rómhór le seoladh (os cionn 25 MB)."
+    "sourceTooLarge": "Tá an comhad seo rómhór le seoladh (os cionn 25 MB).",
+    "personOffline": "Tá an duine seo as líne. Bain triail eile as nuair a bheidh sé ar ais."
+  },
+  "failed": {
+    "notSent": "Níor seoladh.",
+    "retry": "Atriail",
+    "remove": "Scrios",
+    "announce": "Níorbh fhéidir teachtaireacht a sheoladh."
   },
   "announce": {
     "message": "{{name}}: {{text}}",
@@ -84,7 +93,9 @@
   "pinned": {
     "label": "Eolas faoin gcainéal",
     "showMore": "Taispeáin tuilleadh",
-    "showLess": "Taispeáin níos lú"
+    "showLess": "Taispeáin níos lú",
+    "hideWelcome": "Folaigh an teachtaireacht fáilte",
+    "hideDescription": "Folaigh cur síos an chainéil"
   },
   "mention": {
     "list": "Daoine ar féidir iad a lua",
@@ -140,6 +151,7 @@
     "next": "An chéad íomhá eile",
     "unnamed": "íomhá",
     "fullLoading": "Ag luchtú an mhéid iomláin…",
+    "fullCancel": "Cealaigh an íoslódáil lánmhéide",
     "fullProgress": "Ag luchtú an mhéid iomláin… {{percent}} %",
     "fullUnavailable": "Níl an méid iomlán ar fáil – ag taispeáint an réamhamhairc"
   },
@@ -153,11 +165,62 @@
     "hint": "Bogann na heochracha saigheada, seolann Enter, scriosann Delete, dúnann Escape.",
     "empty": "Gan ceanáin fós. Cliceáil ar dheis ar GIF sa chomhrá, nó úsáid an réalta air, agus roghnaigh \"Sábháil mar cheanán\". Taispeánfar anseo é."
   },
+  "linkMenu": {
+    "label": "Nasc",
+    "copy": "Cóipeáil an nasc",
+    "open": "Oscail an nasc",
+    "copied": "Nasc cóipeáilte"
+  },
   "imageMenu": {
     "label": "Íomhá {{name}}"
   },
   "attribution": {
     "via": "trí {{brand}}",
     "view": "Féach ar {{brand}}"
+  },
+  "themeCard": {
+    "label": "Téama comhroinnte {{name}}",
+    "apply": "Cuir an téama i bhfeidhm",
+    "more": "Cuir i bhfeidhm ar fhreastalaí",
+    "menuLabel": "Cuir an téama i bhfeidhm ar",
+    "applyToServer": "Cuir i bhfeidhm ar {{server}}",
+    "imported": "Iompórtáilte ✓",
+    "newer": "Déanta le Mumcord {{version}} – nuashonraigh chun é a fheiceáil go hiomlán",
+    "failed": "Níorbh fhéidir an téama a chur i bhfeidhm."
+  },
+  "reply": {
+    "action": "Freagair",
+    "actionFor": "Freagair {{name}}",
+    "menu": "Teachtaireacht ó {{name}}",
+    "replyTo": "Freagra ar",
+    "jump": "Léim chuig an mbunteachtaireacht",
+    "image": "Íomhá",
+    "replyingTo": "Ag freagairt",
+    "cancel": "Cealaigh an freagra"
+  },
+  "actions": {
+    "label": "Tosaigh le chéile",
+    "notConnected": "Níl ceangal leis an bhfreastalaí.",
+    "partyRunning": "Tá féachaint le chéile ar siúl sa chainéal seo cheana.",
+    "invalidLink": "Ní nasc chuig físeán YouTube é seo.",
+    "linkLabel": "Nasc YouTube",
+    "linkPlaceholder": "Greamaigh nasc YouTube",
+    "confirm": "Tosaigh",
+    "watchHint": "Féach ar fhíseán YouTube in éineacht leis an gcainéal seo",
+    "dialogTitle": "Féachaigí le chéile",
+    "addTitle": "Cuir leis an seinmliosta",
+    "addToPlaylist": "Cuir leis an seinmliosta",
+    "addConfirm": "Cuir leis",
+    "apps": "Aipeanna",
+    "appsLive": "Aipeanna (tá do scáileán á chomhroinnt agat)"
+  },
+  "activity": {
+    "share": "Tá a scáileán á chomhroinnt ag {{name}}",
+    "watch": "Féach",
+    "party": "Féachaint le chéile: {{title}}",
+    "join": "Glac páirt",
+    "videoFallback": "Físeán YouTube",
+    "someone": "Duine éigin",
+    "joinFailed": "Níorbh fhéidir páirt a ghlacadh san fhéachaint le chéile."
   }
 }

@@ -5,6 +5,39 @@
     "remember": "Zapamätať si moju voľbu",
     "minimize": "Minimalizovať do lišty",
     "quit": "Ukončiť",
+    "failed": "Nepodarilo sa. Skús to znova.",
+    "descriptionServers": "Stále si pripojený k {{count}} serverom. Minimalizovaný Mumcord ťa drží v hlasovom kanáli a zostáva v oblasti oznámení."
+  },
+  "windowOverlay": {
+    "title": "Okenný overlay bol odstránený",
+    "description": "Plávajúce okno overlayu už neexistuje. Namiesto neho overlay v hre ukazuje, kto vo tvojich hrách hovorí. Môžeš ho zapnúť v nastaveniach overlayu.",
+    "dismiss": "Rozumiem",
+    "openSettings": "Otvoriť nastavenia overlayu"
+  },
+  "appImageMenu": {
+    "title": "Pridať Mumcord do ponuky aplikácií?",
+    "description": "Mumcord sa tak objaví v ponuke aplikácií. Ikona a push-to-talk budú pod Waylandom fungovať správne a odkazy mumble:// otvoria Mumcord. Neskôr to môžeš zmeniť v Nastaveniach.",
+    "no": "Nie",
+    "yes": "Áno",
+    "failed": "Nepodarilo sa. Skús to znova."
+  },
+  "updateCheck": {
+    "title": "Kontrolovať nové verzie?",
+    "description": "Mumcord sa môže raz denne opýtať GitHubu, či existuje novšia verzia, a zobraziť tip s odkazom. Nič sa nesťahuje ani neinštaluje a nič sa neodosiela okrem samotnej požiadavky a názvu a verzie aplikácie. Neskôr to môžeš zmeniť v Nastaveniach.",
+    "no": "Nie",
+    "yes": "Áno",
+    "failed": "Nepodarilo sa. Skús to znova."
+  },
+  "updateHint": {
+    "message": "Mumcord {{version}} je k dispozícii.",
+    "open": "Zobraziť vydanie",
+    "dismiss": "Zavrieť"
+  },
+  "directConsent": {
+    "title": "Povoliť priame spojenia?",
+    "description": "Priame spojenia sú rýchlejšie, ale druhá osoba uvidí vašu IP adresu. Mumcord ich používa na obrázky v plnej veľkosti a zdieľanie obrazovky s ostatnými používateľmi Mumcordu a môže pre ne otvoriť port na vašom smerovači. Ak odmietnete, obrázky prídu cez server a zdieľanie obrazovky nebude dostupné. Neskôr to môžete zmeniť v Nastavenia → Súkromie.",
+    "no": "Nie",
+    "yes": "Áno",
     "failed": "Nepodarilo sa. Skús to znova."
   }
 }

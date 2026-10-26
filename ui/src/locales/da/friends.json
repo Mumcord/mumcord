@@ -4,6 +4,7 @@
   "online": "Online",
   "onlineIn": "Online i {{channel}}",
   "onlineOnServer": "Online på {{server}}",
+  "inChannelOnServer": "I {{channel}} · {{server}}",
   "offline": "Offline",
   "lastSeen": "Offline, sidst set {{when}}",
   "friend": "Ven",
@@ -11,5 +12,7 @@
   "noCertificate": "Personer uden certifikat kan ikke være venner, fordi Mumcord ikke kan genkende dem igen.",
   "add": "Tilføj ven",
   "remove": "Fjern ven",
-  "failed": "Det lykkedes ikke at ændre vennen. Prøv igen."
+  "failed": "Det lykkedes ikke at ændre vennen. Prøv igen.",
+  "join": "Deltag",
+  "joinFriend": "Gå til {{name}}s kanal"
 }

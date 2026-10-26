@@ -32,7 +32,15 @@
     "avatarUnregistered": "See server hoiab avatare ainult registreeritud kasutajatel – Mumcord saadab sinu oma igal ühendumisel uuesti.",
     "avatarChosen": "Valitud: {{name}}",
     "avatarRemoved": "Pilt eemaldatakse, kui salvestad.",
-    "comment": "Sinust"
+    "comment": "Sinust",
+    "format": "Teksti vormindus",
+    "bold": "Paks",
+    "italic": "Kaldkiri",
+    "link": "Link",
+    "linkAddress": "Lingi aadress",
+    "linkApply": "Lisa link",
+    "bulletList": "Täpploend",
+    "numberedList": "Nummerdatud loend"
   },
   "register": {
     "title": "Registreeru sellel serveril",
@@ -69,8 +77,6 @@
     "nowGaming": "Jaga mängu, mida mängin",
     "nowGamingHint": "Teised näevad sinu praegust mängu",
     "unavailable": "Sellel süsteemil pole saadaval",
-    "overlay": "Kattekiht",
-    "overlayHint": "Näitab mängude peal, kes räägib",
     "editProfile": "Muuda profiili",
     "editProfileHint": "Nimi, avatar ja kommentaar",
     "register": "Registreeru sellel serveril",
@@ -84,5 +90,10 @@
     "offerImagesHint": "Luba teistel laadida sinu originaalpilte",
     "loadImages": "Laadi täissuuruses pildid",
     "loadImagesHint": "Too teistelt originaalpildid"
+  },
+  "voice": {
+    "line": "Hääl: {{channel}} · {{server}}",
+    "server": "Hääl: {{server}}",
+    "show": "{{location}} – näita seda serverit"
   }
 }

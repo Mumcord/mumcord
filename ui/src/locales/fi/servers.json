@@ -13,10 +13,15 @@
     "listLabel": "Tallennetut palvelimet",
     "add": "Lisää palvelin",
     "keyboardHint": "Enter yhdistää. Alt ja nuoli ylös tai alas siirtää palvelinta. Shift ja F10 avaa lisää vaihtoehtoja.",
-    "status": {
-      "connected": "{{server}} (yhdistetty)",
-      "connecting": "{{server}} (yhdistetään)",
-      "reconnecting": "{{server}} (yhdistetään uudelleen)"
+    "label": "{{server}} ({{state}})",
+    "state": {
+      "connected": "yhdistetty",
+      "connecting": "yhdistetään",
+      "reconnecting": "yhdistetään uudelleen",
+      "error": "yhteys katkesi",
+      "voice": "puhepalvelin",
+      "unread": "lukemattomia viestejä",
+      "mentions": "maininnat: {{mentions}}"
     }
   },
   "menu": {
@@ -26,7 +31,19 @@
     "edit": "Muokkaa palvelinta",
     "moveUp": "Siirrä ylös",
     "moveDown": "Siirrä alas",
-    "remove": "Poista palvelin"
+    "remove": "Poista palvelin",
+    "reconnect": "Yhdistä uudelleen",
+    "alwaysConnect": "Yhdistä aina käynnistettäessä",
+    "muteNotifications": "Mykistä ilmoitukset",
+    "theme": "Teema…",
+    "showWelcome": "Näytä tervetuloviesti"
+  },
+  "theme": {
+    "title": "Teema palvelimelle {{server}}",
+    "label": "Teema",
+    "useApp": "Käytä sovelluksen teemaa",
+    "hint": "Käytössä, kun tämä palvelin on näkyvissä.",
+    "failed": "Teemaa ei voitu tallentaa. Yritä uudelleen."
   },
   "dialog": {
     "addTitle": "Lisää palvelin",
@@ -50,7 +67,14 @@
       "username": "Anna nimi, jota haluat käyttää tällä palvelimella.",
       "link": "Tätä mumble://-linkkiä ei voi lukea. Tarkista, että se kopioitiin kokonaan.",
       "invalid": "Palvelimen tiedot eivät kelpaa. Tarkista osoite ja portti."
-    }
+    },
+    "alwaysConnect": "Yhdistä aina käynnistettäessä",
+    "alwaysConnectHint": "Mumcord yhdistää tähän palvelimeen käynnistyksessä vain luku -tilassa.",
+    "channelPasswords": "Kanavien salasanat",
+    "channelPassword": "Kanavan salasana {{number}}",
+    "removeChannelPassword": "Poista {{name}}",
+    "remove": "Poista",
+    "channelPasswordsHint": "Tallennetaan, kun suojattu kanava on hyväksynyt ne. Poistettuja kysytään uudelleen seuraavalla liittymiskerralla."
   },
   "errors": {
     "serverUnreachable": "Palvelimeen ei saada yhteyttä. Tarkista osoite ja portti sekä se, että olet verkossa.",
@@ -63,17 +87,16 @@
     "invalidAddress": "Palvelimen osoite ei kelpaa. Korjaa se muokkaamalla palvelinta.",
     "secureStorage": "Järjestelmäsi suojattu tallennustila ei ole käytettävissä, joten palvelimen salasanaa ei voitu lukea tai tallentaa. Avaa sen lukitus ja yritä uudelleen.",
     "notFound": "Tätä palvelinta ei ole enää tallennettu.",
-    "generic": "Jokin meni pieleen. Yritä uudelleen."
+    "generic": "Jokin meni pieleen. Yritä uudelleen.",
+    "serverLimit": "Olet jo yhteydessä enimmäismäärään eli {{limit}} palvelimeen. Katkaise yhteys johonkin palvelimeen tai nosta rajaa kohdassa Asetukset → Palvelimet.",
+    "serverLimitUnknown": "Olet jo yhteydessä enimmäismäärään palvelimia. Katkaise yhteys johonkin palvelimeen tai nosta rajaa kohdassa Asetukset → Palvelimet.",
+    "alwaysConnectLimit": "Vain {{limit}} palvelimella voi olla ”Yhdistä aina käynnistettäessä”, saman verran kuin yhdistettyjen palvelinten raja. Poista se käytöstä toiselta palvelimelta tai nosta rajaa kohdassa Asetukset → Palvelimet.",
+    "alwaysConnectLimitUnknown": "”Yhdistä aina käynnistettäessä” ei voi olla useammalla palvelimella kuin yhdistettyjen palvelinten raja. Poista se käytöstä toiselta palvelimelta tai nosta rajaa kohdassa Asetukset → Palvelimet."
   },
   "remove": {
     "title": "Poistetaanko {{server}}?",
     "message": "Sen tallennettu salasana, varmennepäätös, seuratut kanavat ja chat-historia poistetaan tältä tietokoneelta.",
     "confirm": "Poista"
-  },
-  "switch": {
-    "title": "Vaihdetaanko palvelinta?",
-    "message": "Voit olla vain yhdellä palvelimella kerrallaan. Katkaistaanko yhteys palvelimeen {{current}} ja yhdistetään palvelimeen {{next}}?",
-    "confirm": "Katkaise ja vaihda"
   },
   "cert": {
     "newTitle": "Luotetaanko tähän palvelimeen?",
@@ -108,7 +131,10 @@
     "actionFailed": {
       "reorder": "Uutta palvelinjärjestystä ei voitu tallentaa. Yritä uudelleen.",
       "remove": "Palvelinta ei voitu poistaa. Yritä uudelleen.",
-      "disconnect": "Yhteyden katkaiseminen epäonnistui. Yritä uudelleen."
+      "disconnect": "Yhteyden katkaiseminen epäonnistui. Yritä uudelleen.",
+      "alwaysConnect": "Asetusta ”Yhdistä aina käynnistettäessä” ei voitu tallentaa. Yritä uudelleen.",
+      "notifications": "Ilmoitusasetusta ei voitu tallentaa. Yritä uudelleen.",
+      "savePassword": "Uutta salasanaa ei voitu tallentaa. Muokkaa palvelinta tallentaaksesi sen."
     }
   },
   "empty": {
@@ -124,5 +150,27 @@
     "errors": {
       "required": "Anna palvelimen osoite tai mumble://-linkki."
     }
+  },
+  "password": {
+    "title": "Salasana palvelimelle {{server}}",
+    "intro": "Palvelin ei hyväksynyt salasanaa. Anna oikea yrittääksesi uudelleen.",
+    "label": "Salasana",
+    "show": "Näytä",
+    "hide": "Piilota",
+    "wrong": "Sekin salasana on väärä. Yritä uudelleen.",
+    "save": "Tallenna salasana",
+    "cancel": "Peruuta",
+    "connect": "Yhdistä",
+    "connecting": "Yhdistetään…"
+  },
+  "channelPassword": {
+    "title": "Tämä kanava vaatii salasanan",
+    "intro": "Anna salasana kanavalle {{channel}}.",
+    "label": "Salasana",
+    "wrong": "Väärä salasana",
+    "failed": "Salasanaa ei voitu lähettää. Yritä uudelleen.",
+    "cancel": "Peruuta",
+    "join": "Liity",
+    "joining": "Liitytään…"
   }
 }

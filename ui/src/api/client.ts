@@ -28,6 +28,11 @@ export type EventPayloads = {
   [K in EventName]: Parameters<Parameters<GeneratedEvents[K]["listen"]>[0]>[0]["payload"];
 };
 
+/** Events that belong to one server; their payload carries its `serverId`. */
+export type ServerEventName = {
+  [K in EventName]: EventPayloads[K] extends { serverId: number } ? K : never;
+}[EventName];
+
 export type Unsubscribe = () => void;
 
 export interface MumcordApi extends EngineCommands {

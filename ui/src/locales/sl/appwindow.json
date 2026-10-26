@@ -5,6 +5,39 @@
     "remember": "Zapomni si mojo izbiro",
     "minimize": "Pomanjšaj v sistemsko vrstico",
     "quit": "Zapri",
-    "failed": "To ni uspelo. Poskusi znova."
+    "failed": "To ni uspelo. Poskusi znova.",
+    "descriptionServers": "Še vedno si povezan s {{count}} strežniki. Pomanjšan te Mumcord obdrži v glasovnem kanalu in ostane v sistemski vrstici."
+  },
+  "windowOverlay": {
+    "title": "Okenski prekrivni sloj je odstranjen",
+    "description": "Plavajočega okna prekrivnega sloja ni več. Namesto njega prekrivni sloj v igri pokaže, kdo govori v tvojih igrah. Vklopiš ga lahko v nastavitvah prekrivnega sloja.",
+    "dismiss": "Razumem",
+    "openSettings": "Odpri nastavitve prekrivnega sloja"
+  },
+  "appImageMenu": {
+    "title": "Želiš dodati Mumcord v meni aplikacij?",
+    "description": "Tako se Mumcord pojavi v meniju aplikacij. Ikona in pritisni za govor v Waylandu delujeta pravilno, povezave mumble:// pa odprejo Mumcord. To lahko pozneje spremeniš v Nastavitvah.",
+    "no": "Ne",
+    "yes": "Da",
+    "failed": "Ni uspelo. Poskusi znova."
+  },
+  "updateCheck": {
+    "title": "Želiš preverjati nove različice?",
+    "description": "Mumcord lahko enkrat na dan vpraša GitHub, ali obstaja novejša različica, in pokaže namig s povezavo. Nič se ne prenese ali namesti in nič se ne pošlje razen same zahteve ter imena in različice aplikacije. To lahko pozneje spremeniš v Nastavitvah.",
+    "no": "Ne",
+    "yes": "Da",
+    "failed": "Ni uspelo. Poskusi znova."
+  },
+  "updateHint": {
+    "message": "Mumcord {{version}} je na voljo.",
+    "open": "Poglej izdajo",
+    "dismiss": "Zapri"
+  },
+  "directConsent": {
+    "title": "Dovolim neposredne povezave?",
+    "description": "Neposredne povezave so hitrejše, vendar lahko druga oseba vidi vaš naslov IP. Mumcord jih uporablja za slike v polni velikosti in deljenje zaslona z drugimi uporabniki Mumcorda ter lahko zanje odpre vrata na vašem usmerjevalniku. Če odklonite, slike še vedno prispejo prek strežnika, deljenje zaslona pa ni na voljo. To lahko pozneje spremenite v Nastavitve → Zasebnost.",
+    "no": "Ne",
+    "yes": "Da",
+    "failed": "Ni uspelo. Poskusi znova."
   }
 }

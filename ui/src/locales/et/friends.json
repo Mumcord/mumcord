@@ -4,6 +4,7 @@
   "online": "Võrgus",
   "onlineIn": "Võrgus kanalis {{channel}}",
   "onlineOnServer": "Võrgus serveris {{server}}",
+  "inChannelOnServer": "Kanalis {{channel}} · {{server}}",
   "offline": "Võrgust väljas",
   "lastSeen": "Võrgust väljas, viimati nähtud {{when}}",
   "friend": "Sõber",
@@ -11,5 +12,7 @@
   "noCertificate": "Sertifikaadita inimesi ei saa sõbraks lisada, sest Mumcord ei suudaks neid uuesti ära tunda.",
   "add": "Lisa sõber",
   "remove": "Eemalda sõber",
-  "failed": "Sõbra muutmine ei õnnestunud. Proovi palun uuesti."
+  "failed": "Sõbra muutmine ei õnnestunud. Proovi palun uuesti.",
+  "join": "Liitu",
+  "joinFriend": "Liitu kanaliga, kus on {{name}}"
 }

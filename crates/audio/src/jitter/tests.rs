@@ -10,6 +10,11 @@ pub(crate) struct TestPacket {
 
 /// `count` 20 ms packets of a 440 Hz tone, sequence numbers in 10 ms frames.
 pub(crate) fn tone_packets(count: usize, first_seq: u64) -> Vec<TestPacket> {
+    tone_packets_at(0.4, count, first_seq)
+}
+
+/// [`tone_packets`] with the tone's peak `amplitude`.
+pub(crate) fn tone_packets_at(amplitude: f32, count: usize, first_seq: u64) -> Vec<TestPacket> {
     let mut encoder = OpusEncoder::new(32_000, PacketDuration::Ms20).expect("encoder");
     encoder.set_packet_loss_percent(10).expect("loss hint");
     let mut out = [0u8; MAX_PACKET_BYTES];
@@ -18,7 +23,8 @@ pub(crate) fn tone_packets(count: usize, first_seq: u64) -> Vec<TestPacket> {
     let mut t = 0usize;
     while packets.len() < count {
         for s in frame.iter_mut() {
-            *s = 0.4 * (2.0 * std::f32::consts::PI * 440.0 * t as f32 / SAMPLE_RATE as f32).sin();
+            *s = amplitude
+                * (2.0 * std::f32::consts::PI * 440.0 * t as f32 / SAMPLE_RATE as f32).sin();
             t += 1;
         }
         if let Some(len) = encoder.push_frame(&frame, &mut out).expect("encode") {

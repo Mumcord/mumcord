@@ -4,6 +4,7 @@
   "online": "Online",
   "onlineIn": "Online in {{channel}}",
   "onlineOnServer": "Online op {{server}}",
+  "inChannelOnServer": "In {{channel}} · {{server}}",
   "offline": "Offline",
   "lastSeen": "Offline, laatst gezien {{when}}",
   "friend": "Vriend",
@@ -11,5 +12,7 @@
   "noCertificate": "Mensen zonder certificaat kunnen geen vriend zijn, omdat Mumcord ze niet opnieuw kan herkennen.",
   "add": "Vriend toevoegen",
   "remove": "Vriend verwijderen",
-  "failed": "De vriend wijzigen is mislukt. Probeer het opnieuw."
+  "failed": "De vriend wijzigen is mislukt. Probeer het opnieuw.",
+  "join": "Deelnemen",
+  "joinFriend": "Kanaal van {{name}} betreden"
 }

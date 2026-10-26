@@ -5,15 +5,17 @@
 //! Uses netsim on 127.0.0.1:64800 (proxy) / 64801 (control) in front of v15.
 #![cfg(feature = "test-backend")]
 
+mod common;
+
 use std::path::{Path, PathBuf};
 use std::time::{Duration, Instant};
 
 use mumcord_bot::voice::{BotVoice, Clip, PlayOptions};
 use mumcord_bot::{Bot, BotConfig, UserCheck, env};
+use mumcord_engine::EventReceiver;
 use mumcord_engine::{
     ConnState, Engine, EngineEvent, ErrorKind, PasswordChange, SecretStore, ServerFields, Snapshot,
 };
-use tokio::sync::mpsc::UnboundedReceiver;
 
 const PROXY: &str = "127.0.0.1:64800";
 const CONTROL: &str = "127.0.0.1:64801";
@@ -44,7 +46,7 @@ fn work_dir(name: &str) -> PathBuf {
 
 /// Waits for the first event matching `pick`, skipping others.
 async fn wait_for<T>(
-    rx: &mut UnboundedReceiver<EngineEvent>,
+    rx: &mut EventReceiver,
     what: &str,
     mut pick: impl FnMut(&EngineEvent) -> Option<T>,
 ) -> T {
@@ -63,7 +65,7 @@ async fn wait_for<T>(
     }
 }
 
-async fn wait_synced(rx: &mut UnboundedReceiver<EngineEvent>) -> Snapshot {
+async fn wait_synced(rx: &mut EventReceiver) -> Snapshot {
     wait_for(rx, "ServerSynced", |e| match e {
         EngineEvent::ServerSynced(s) => Some((**s).clone()),
         EngineEvent::CertTrustRequired { .. } => panic!("unexpected certificate question"),
@@ -72,7 +74,7 @@ async fn wait_synced(rx: &mut UnboundedReceiver<EngineEvent>) -> Snapshot {
     .await
 }
 
-async fn wait_own_channel(rx: &mut UnboundedReceiver<EngineEvent>, session: u32, channel: u32) {
+async fn wait_own_channel(rx: &mut EventReceiver, session: u32, channel: u32) {
     wait_for(rx, "own user in channel", |e| match e {
         EngineEvent::UserUpserted(u) if u.session == session && u.channel_id == channel => Some(()),
         _ => None,
@@ -127,7 +129,7 @@ async fn tofu_voice_mute_and_reconnect() {
 
     let netsim = netsim::start(
         PROXY.parse().expect("addr"),
-        format!("127.0.0.1:{}", env::PORT_V15)
+        format!("127.0.0.1:{}", common::v15())
             .parse()
             .expect("addr"),
         CONTROL.parse().expect("addr"),
@@ -152,7 +154,7 @@ async fn tofu_voice_mute_and_reconnect() {
 
     let bot = Bot::connect(BotConfig {
         data_dir: Some(dir.join("bot")),
-        ..BotConfig::new(&bot_name, env::PORT_V15)
+        ..BotConfig::new(&bot_name, common::v15())
     })
     .await
     .expect("bot");
@@ -211,7 +213,9 @@ async fn tofu_voice_mute_and_reconnect() {
     .await
     .expect("deafened on the server after connecting");
 
-    engine.join_channel(raid).expect("join Raid");
+    engine
+        .join_channel(only_server(&engine), raid)
+        .expect("join Raid");
     wait_own_channel(&mut rx, snapshot.self_session, raid).await;
     bot.wait_user(&name, &muted(false))
         .await
@@ -296,7 +300,7 @@ async fn tofu_voice_mute_and_reconnect() {
         .await
         .expect("bot hears the engine after reconnect");
 
-    engine.disconnect();
+    engine.disconnect(only_server(&engine));
     wait_for(&mut rx, "Disconnected", |e| match e {
         EngineEvent::StateChanged(ConnState::Disconnected { error: None }) => Some(()),
         _ => None,
@@ -324,7 +328,7 @@ async fn declining_the_certificate_disconnects() {
         .await
         .expect("identity");
     let mut fields = server_fields(&name);
-    fields.port = env::PORT_V15;
+    fields.port = common::v15();
     let server = engine.server_add(fields).await.expect("server");
 
     engine.connect(server.id, None).expect("connect");
@@ -348,7 +352,7 @@ async fn declining_the_certificate_disconnects() {
 /// Connects `server` (trusting its certificate if asked) and returns the synced snapshot.
 async fn connect_synced(
     engine: &Engine,
-    rx: &mut UnboundedReceiver<EngineEvent>,
+    rx: &mut EventReceiver,
     server: mumcord_engine::ServerId,
 ) -> Snapshot {
     engine.connect(server, None).expect("connect");
@@ -368,8 +372,8 @@ async fn connect_synced(
     }
 }
 
-async fn disconnected(engine: &Engine, rx: &mut UnboundedReceiver<EngineEvent>) {
-    engine.disconnect();
+async fn disconnected(engine: &Engine, rx: &mut EventReceiver) {
+    engine.disconnect(only_server(engine));
     wait_for(rx, "Disconnected", |e| match e {
         EngineEvent::StateChanged(ConnState::Disconnected { error: None }) => Some(()),
         _ => None,
@@ -402,7 +406,7 @@ async fn join_restores_the_last_own_mute_after_a_restart() {
     let identity = dir.join("identity.p12");
     let bot = Bot::connect(BotConfig {
         data_dir: Some(dir.join("bot")),
-        ..BotConfig::new(&unique("mc-ownear"), env::PORT_V14)
+        ..BotConfig::new(&unique("mc-ownear"), common::v14())
     })
     .await
     .expect("bot");
@@ -425,13 +429,15 @@ async fn join_restores_the_last_own_mute_after_a_restart() {
             .await
             .expect("identity");
         let mut fields = server_fields(&name);
-        fields.port = env::PORT_V14;
+        fields.port = common::v14();
         let server = engine.server_add(fields).await.expect("server");
         let snapshot = connect_synced(&engine, &mut rx, server.id).await;
         let raid = channel_id(&snapshot, "Raid");
 
         // Never muted before: Join turns voice fully on.
-        engine.join_channel(raid).expect("join Raid");
+        engine
+            .join_channel(only_server(&engine), raid)
+            .expect("join Raid");
         bot.wait_user(&name, &in_raid(false, false))
             .await
             .expect("voice on after the first join");
@@ -469,7 +475,7 @@ async fn join_restores_the_last_own_mute_after_a_restart() {
     engine.set_self_mute(true).expect("mute while read-only");
 
     engine
-        .join_channel(channel_id(&snapshot, "Raid"))
+        .join_channel(only_server(&engine), channel_id(&snapshot, "Raid"))
         .expect("join Raid after restart");
     bot.wait_user(&name, &in_raid(true, false))
         .await
@@ -483,7 +489,7 @@ async fn join_restores_the_last_own_mute_after_a_restart() {
     disconnected(&engine, &mut rx).await;
     let snapshot = connect_synced(&engine, &mut rx, server).await;
     engine
-        .join_channel(channel_id(&snapshot, "Raid"))
+        .join_channel(only_server(&engine), channel_id(&snapshot, "Raid"))
         .expect("join Raid again");
     bot.wait_user(&name, &in_raid(false, false))
         .await
@@ -491,10 +497,7 @@ async fn join_restores_the_last_own_mute_after_a_restart() {
     disconnected(&engine, &mut rx).await;
 }
 
-async fn restarted_engine(
-    data: &Path,
-    identity: &Path,
-) -> (Engine, UnboundedReceiver<EngineEvent>) {
+async fn restarted_engine(data: &Path, identity: &Path) -> (Engine, EventReceiver) {
     let (engine, rx) = Engine::new(
         data,
         SecretStore::in_memory(),
@@ -522,7 +525,7 @@ async fn quitting_while_joined_offers_a_rejoin_once_after_the_restart() {
     let identity = dir.join("identity.p12");
     let bot = Bot::connect(BotConfig {
         data_dir: Some(dir.join("bot")),
-        ..BotConfig::new(&unique("mc-rejoinear"), env::PORT_V14)
+        ..BotConfig::new(&unique("mc-rejoinear"), common::v14())
     })
     .await
     .expect("bot");
@@ -543,13 +546,15 @@ async fn quitting_while_joined_offers_a_rejoin_once_after_the_restart() {
             .await
             .expect("identity");
         let mut fields = server_fields(&name);
-        fields.port = env::PORT_V14;
+        fields.port = common::v14();
         let server = engine.server_add(fields).await.expect("server");
         let snapshot = connect_synced(&engine, &mut rx, server.id).await;
         assert!(snapshot.read_only);
         assert_eq!(snapshot.rejoin_channel_id, None, "nothing to offer yet");
         let raid = channel_id(&snapshot, "Raid");
-        engine.join_channel(raid).expect("join Raid");
+        engine
+            .join_channel(only_server(&engine), raid)
+            .expect("join Raid");
         bot.wait_user(&name, &in_raid).await.expect("in Raid");
         // Quit while joined.
         engine.shutdown();
@@ -581,7 +586,9 @@ async fn quitting_while_joined_offers_a_rejoin_once_after_the_restart() {
         snapshot.rejoin_channel_id, None,
         "offered once per app start"
     );
-    engine.join_channel(raid).expect("rejoin Raid");
+    engine
+        .join_channel(only_server(&engine), raid)
+        .expect("rejoin Raid");
     bot.wait_user(&name, &in_raid).await.expect("back in Raid");
     let snapshot = engine.snapshot().expect("snapshot");
     assert!(!snapshot.read_only, "voice on after the join");
@@ -598,9 +605,10 @@ async fn quitting_while_joined_offers_a_rejoin_once_after_the_restart() {
     disconnected(&engine, &mut rx).await;
 }
 
-/// QA.7: switching servers while joined for voice lands read-only on the new server, and a Join
-/// there restores the own mute/deafen choice from the previous server, not the forced state,
-/// also when voice was turned on by undeafening the read-only state instead of a Join.
+/// QA.7 / FR-2.2: connecting another server while joined for voice lands read-only there, and
+/// a Join there moves voice and restores the own mute/deafen choice from the previous server,
+/// not the forced state, also when voice was turned on by undeafening the read-only state
+/// instead of a Join.
 #[tokio::test(flavor = "multi_thread", worker_threads = 2)]
 #[ignore = "needs testenv v14 and v15 (MUMCORD_LIVE=1)"]
 async fn join_after_a_server_switch_restores_the_own_mute() {
@@ -615,10 +623,10 @@ async fn join_after_a_server_switch_restores_the_own_mute() {
             ..BotConfig::new(&unique("mc-switchear"), port)
         })
     };
-    let bot14 = bot_on(env::PORT_V14, dir.join("bot14"))
+    let bot14 = bot_on(common::v14(), dir.join("bot14"))
         .await
         .expect("bot v14");
-    let bot15 = bot_on(env::PORT_V15, dir.join("bot15"))
+    let bot15 = bot_on(common::v15(), dir.join("bot15"))
         .await
         .expect("bot v15");
     let in_raid = |muted: bool, deaf: bool| UserCheck {
@@ -638,17 +646,17 @@ async fn join_after_a_server_switch_restores_the_own_mute() {
         .await
         .expect("identity");
     let mut fields = server_fields(&name);
-    fields.port = env::PORT_V14;
+    fields.port = common::v14();
     let v14 = engine.server_add(fields).await.expect("server v14").id;
     let mut fields = server_fields(&name);
     fields.label = "v15".into();
-    fields.port = env::PORT_V15;
+    fields.port = common::v15();
     let v15 = engine.server_add(fields).await.expect("server v15").id;
 
     // An earlier session ended deafened while joined.
     let snapshot = connect_synced(&engine, &mut rx, v14).await;
     engine
-        .join_channel(channel_id(&snapshot, "Raid"))
+        .join_channel(v14, channel_id(&snapshot, "Raid"))
         .expect("join Raid on v14");
     engine.set_self_deaf(true).expect("deafen");
     bot14
@@ -670,11 +678,11 @@ async fn join_after_a_server_switch_restores_the_own_mute() {
         .await
         .expect("voice on at v14");
 
-    // Switch to v15 without disconnecting first.
+    // Connect v15 next to v14: it lands read-only, a Join there moves voice (FR-2.2).
     let snapshot = connect_synced(&engine, &mut rx, v15).await;
-    assert!(snapshot.read_only, "read-only after the switch");
+    assert!(snapshot.read_only, "read-only on the second server");
     engine
-        .join_channel(channel_id(&snapshot, "Raid"))
+        .join_channel(v15, channel_id(&snapshot, "Raid"))
         .expect("join Raid on v15");
     bot15
         .wait_user(&name, &in_raid(false, false))
@@ -694,14 +702,23 @@ async fn join_after_a_server_switch_restores_the_own_mute() {
         .wait_user(&name, &in_raid(true, false))
         .await
         .expect("muted at v15");
-    let snapshot = connect_synced(&engine, &mut rx, v14).await;
-    assert!(snapshot.read_only, "read-only after switching back");
+    let snapshot = engine.snapshot_of(v14).expect("v14 still connected");
+    assert!(snapshot.read_only, "read-only since voice moved to v15");
     engine
-        .join_channel(channel_id(&snapshot, "Raid"))
+        .join_channel(v14, channel_id(&snapshot, "Raid"))
         .expect("join Raid on v14 again");
     bot14
         .wait_user(&name, &in_raid(true, false))
         .await
         .expect("muted, not deafened after joining v14");
     disconnected(&engine, &mut rx).await;
+}
+
+/// The test's only connected server (0, which no call accepts, when none is).
+fn only_server(engine: &Engine) -> mumcord_engine::ServerId {
+    engine
+        .connections()
+        .first()
+        .and_then(mumcord_engine::ConnState::server_id)
+        .unwrap_or(0)
 }

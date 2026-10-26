@@ -112,6 +112,13 @@
 }
 
 /* Pill after the name (icon + number); the name truncates first, pills never shrink. */
+.tree-channel__lock {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  color: var(--color-text-secondary);
+}
+
 .tree-channel__count {
   display: inline-flex;
   flex: none;

@@ -13,10 +13,15 @@
     "listLabel": "Freastalaithe sábháilte",
     "add": "Cuir freastalaí leis",
     "keyboardHint": "Ceanglaíonn Enter. Bogann Alt móide an tsaighead suas nó síos an freastalaí. Osclaíonn Shift móide F10 tuilleadh roghanna.",
-    "status": {
-      "connected": "{{server}} (ceangailte)",
-      "connecting": "{{server}} (ag ceangal)",
-      "reconnecting": "{{server}} (ag athcheangal)"
+    "label": "{{server}} ({{state}})",
+    "state": {
+      "connected": "ceangailte",
+      "connecting": "ag ceangal",
+      "reconnecting": "ag athcheangal",
+      "error": "ceangal caillte",
+      "voice": "freastalaí gutha",
+      "unread": "teachtaireachtaí gan léamh",
+      "mentions": "tagairtí: {{mentions}}"
     }
   },
   "menu": {
@@ -26,7 +31,19 @@
     "edit": "Cuir an freastalaí in eagar",
     "moveUp": "Bog suas",
     "moveDown": "Bog síos",
-    "remove": "Bain an freastalaí"
+    "remove": "Bain an freastalaí",
+    "reconnect": "Athcheangail",
+    "alwaysConnect": "Ceangail i gcónaí ag an tús",
+    "muteNotifications": "Balbhaigh fógraí",
+    "theme": "Téama…",
+    "showWelcome": "Taispeáin an teachtaireacht fáilte"
+  },
+  "theme": {
+    "title": "Téama do {{server}}",
+    "label": "Téama",
+    "useApp": "Úsáid téama na haipe",
+    "hint": "I bhfeidhm fad atá an freastalaí seo á thaispeáint.",
+    "failed": "Níorbh fhéidir an téama a shábháil. Bain triail eile as."
   },
   "dialog": {
     "addTitle": "Cuir freastalaí leis",
@@ -50,7 +67,14 @@
       "username": "Cuir isteach an t-ainm ar mhaith leat a úsáid ar an bhfreastalaí seo.",
       "link": "Ní féidir an nasc mumble:// seo a léamh. Seiceáil gur cóipeáladh go hiomlán é.",
       "invalid": "Níl sonraí an fhreastalaí bailí. Seiceáil an seoladh agus an port."
-    }
+    },
+    "alwaysConnect": "Ceangail i gcónaí ag an tús",
+    "alwaysConnectHint": "Ceanglaíonn Mumcord an freastalaí seo i mód léite amháin nuair a thosaíonn sé.",
+    "channelPasswords": "Pasfhocail cainéal",
+    "channelPassword": "Pasfhocal cainéil {{number}}",
+    "removeChannelPassword": "Bain {{name}}",
+    "remove": "Bain",
+    "channelPasswordsHint": "Sábháilte nuair a ghlac cainéal cosanta leo. Iarrtar na cinn a baineadh arís an chéad uair eile a théann tú isteach."
   },
   "errors": {
     "serverUnreachable": "Ní féidir an freastalaí a shroicheadh. Seiceáil an seoladh agus an port, agus go bhfuil tú ar líne.",
@@ -63,17 +87,16 @@
     "invalidAddress": "Níl seoladh an fhreastalaí bailí. Cuir an freastalaí in eagar chun é a cheartú.",
     "secureStorage": "Níl stóras slán do chórais ar fáil, mar sin níorbh fhéidir pasfhocal an fhreastalaí a léamh ná a shábháil. Díghlasáil é agus bain triail eile as.",
     "notFound": "Níl an freastalaí seo sábháilte a thuilleadh.",
-    "generic": "Chuaigh rud éigin amú. Bain triail eile as."
+    "generic": "Chuaigh rud éigin amú. Bain triail eile as.",
+    "serverLimit": "Tá tú ceangailte cheana leis an uasmhéid de {{limit}} freastalaí. Dícheangail freastalaí, nó ardaigh an teorainn i Socruithe → Freastalaithe.",
+    "serverLimitUnknown": "Tá tú ceangailte cheana leis an uaslíon freastalaithe. Dícheangail freastalaí, nó ardaigh an teorainn i Socruithe → Freastalaithe.",
+    "alwaysConnectLimit": "Ní féidir “Ceangail i gcónaí ag an tús” a bheith ach ar {{limit}} freastalaí, an líon céanna le teorainn na bhfreastalaithe ceangailte. Cas as é do fhreastalaí eile, nó ardaigh an teorainn i Socruithe → Freastalaithe.",
+    "alwaysConnectLimitUnknown": "Ní féidir “Ceangail i gcónaí ag an tús” a bheith ar níos mó freastalaithe ná teorainn na bhfreastalaithe ceangailte. Cas as é do fhreastalaí eile, nó ardaigh an teorainn i Socruithe → Freastalaithe."
   },
   "remove": {
     "title": "Bain {{server}}?",
     "message": "Scriostar a phasfhocal sábháilte, a chinneadh teastais, a chainéil leanta agus a stair comhrá ar an ríomhaire seo.",
     "confirm": "Bain"
-  },
-  "switch": {
-    "title": "Athraigh freastalaí?",
-    "message": "Ní féidir leat a bheith ach ar fhreastalaí amháin ag an am. An ndícheanglóidh tú ó {{current}} agus an gceanglóidh tú le {{next}}?",
-    "confirm": "Dícheangail agus athraigh"
   },
   "cert": {
     "newTitle": "Cuir iontaoibh sa fhreastalaí seo?",
@@ -108,7 +131,10 @@
     "actionFailed": {
       "reorder": "Níorbh fhéidir ord nua na bhfreastalaithe a shábháil. Bain triail eile as.",
       "remove": "Níorbh fhéidir an freastalaí a bhaint. Bain triail eile as.",
-      "disconnect": "Theip ar an dícheangal. Bain triail eile as."
+      "disconnect": "Theip ar an dícheangal. Bain triail eile as.",
+      "alwaysConnect": "Níorbh fhéidir “Ceangail i gcónaí ag an tús” a shábháil. Bain triail eile as.",
+      "notifications": "Níorbh fhéidir an socrú fógraí a shábháil. Bain triail eile as.",
+      "savePassword": "Níorbh fhéidir an pasfhocal nua a shábháil. Cuir an freastalaí in eagar chun é a shábháil."
     }
   },
   "empty": {
@@ -124,5 +150,27 @@
     "errors": {
       "required": "Cuir isteach seoladh freastalaí nó nasc mumble://."
     }
+  },
+  "password": {
+    "title": "Pasfhocal do {{server}}",
+    "intro": "Níor ghlac an freastalaí leis an bpasfhocal. Cuir isteach an ceann ceart chun triail eile a bhaint as.",
+    "label": "Pasfhocal",
+    "show": "Taispeáin",
+    "hide": "Folaigh",
+    "wrong": "Tá an pasfhocal sin mícheart freisin. Bain triail eile as.",
+    "save": "Sábháil an pasfhocal",
+    "cancel": "Cealaigh",
+    "connect": "Ceangail",
+    "connecting": "Ag ceangal…"
+  },
+  "channelPassword": {
+    "title": "Teastaíonn pasfhocal ón gcainéal seo",
+    "intro": "Cuir isteach an pasfhocal do {{channel}}.",
+    "label": "Pasfhocal",
+    "wrong": "Pasfhocal mícheart",
+    "failed": "Níorbh fhéidir an pasfhocal a sheoladh. Bain triail eile as.",
+    "cancel": "Cealaigh",
+    "join": "Téigh isteach",
+    "joining": "Ag dul isteach…"
   }
 }

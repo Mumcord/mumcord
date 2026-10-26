@@ -1,0 +1,130 @@
+name: Installer
+
+# Tests the curl installer (scripts/install.sh) in distribution containers against a fake
+# release served from the runner over http, so no test ever downloads from github.com. The fake
+# packages carry the real asset names but only a stub program: installing the real .deb and .rpm
+# is already checked in build-and-smoke.yml, and this keeps the job a few minutes long instead
+# of waiting for the full app build.
+on:
+  pull_request:
+    paths:
+      - scripts/install.sh
+      - scripts/install-test/**
+      - .github/workflows/installer.yml
+  push:
+    branches: [main]
+    paths:
+      - scripts/install.sh
+      - scripts/install-test/**
+      - .github/workflows/installer.yml
+  workflow_dispatch:
+
+concurrency:
+  group: installer-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  lint:
+    name: Lint installer
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: shellcheck
+        run: shellcheck -s sh scripts/install.sh scripts/install-test/*.sh
+
+  fake-release:
+    name: Build fake release
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install rpmbuild
+        run: sudo apt-get update -qq && sudo apt-get install -y -qq --no-install-recommends rpm
+      - name: Build
+        run: sh scripts/install-test/make-fake-release.sh release
+      - uses: actions/upload-artifact@v4
+        with:
+          name: fake-release
+          path: release
+          retention-days: 3
+
+  test:
+    name: Install on ${{ matrix.name }}
+    needs: fake-release
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - {
+              name: Ubuntu,
+              image: "ubuntu:24.04",
+              kind: deb,
+              runner: ubuntu-24.04,
+              setup: "apt-get update -qq && apt-get install -y -qq curl",
+            }
+          - {
+              name: Debian,
+              image: "debian:12",
+              kind: deb,
+              runner: ubuntu-24.04,
+              setup: "apt-get update -qq && apt-get install -y -qq curl",
+            }
+          - { name: Fedora, image: "fedora:42", kind: rpm, runner: ubuntu-24.04, setup: "true" }
+          - {
+              name: openSUSE,
+              image: "opensuse/tumbleweed",
+              kind: rpm,
+              runner: ubuntu-24.04,
+              setup: "command -v curl || zypper -nq install curl",
+            }
+          - {
+              name: Arch,
+              image: "archlinux:latest",
+              kind: appimage,
+              runner: ubuntu-24.04,
+              setup: "true",
+            }
+          # An AUR helper that does not know mumcord-bin (the AUR package may not exist yet).
+          - {
+              name: Arch with AUR helper,
+              image: "archlinux:latest",
+              kind: appimage,
+              runner: ubuntu-24.04,
+              setup: "sh /t/fake-aur-helper.sh",
+            }
+          - {
+              name: Ubuntu ARM64,
+              image: "ubuntu:24.04",
+              kind: deb,
+              runner: ubuntu-24.04-arm,
+              setup: "apt-get update -qq && apt-get install -y -qq curl",
+            }
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: fake-release
+          path: release
+      - name: Serve the fake release
+        run: |
+          python3 -m http.server 8000 --bind 127.0.0.1 --directory release >/dev/null 2>&1 &
+          for _ in 1 2 3 4 5 6 7 8 9 10; do
+            curl -fsS -o /dev/null http://127.0.0.1:8000/good/SHA256SUMS && exit 0
+            sleep 1
+          done
+          echo "the fake release server did not start" >&2
+          exit 1
+      - name: Test the installer
+        env:
+          IMAGE: ${{ matrix.image }}
+          KIND: ${{ matrix.kind }}
+          SETUP: ${{ matrix.setup }}
+        run: |
+          docker run --rm --network host -v "$PWD/scripts/install-test:/t:ro" "$IMAGE" sh -c \
+            "$SETUP >/dev/null && sh /t/check-install.sh $KIND http://127.0.0.1:8000/good http://127.0.0.1:8000/bad"

@@ -1,0 +1,28 @@
+/* Close buttons of the dismissible pinned blocks: welcome message, channel description (FR-2.66). */
+.pinned-info__block {
+  position: relative;
+}
+
+.pinned-info__close {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 1.5rem;
+  height: 1.5rem;
+  border: none;
+  border-radius: var(--radius-md);
+  background: transparent;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-md, 1rem);
+  line-height: 1;
+  cursor: pointer;
+}
+
+.pinned-info__close:hover {
+  background: var(--color-bg-hover, var(--color-border));
+  color: var(--color-text);
+}
+
+.pinned-info__block:has(.pinned-info__close) .pinned-info__text {
+  padding-right: 1.75rem;
+}

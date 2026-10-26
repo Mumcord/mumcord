@@ -217,12 +217,27 @@ impl Fetcher {
         limit: usize,
         truncate: bool,
     ) -> Result<Fetched, FetchError> {
+        self.get_as(url, AGENT, accept, limit, truncate).await
+    }
+
+    /// Like [`Fetcher::get`] with another `User-Agent` (the update check names the app version).
+    pub async fn get_as(
+        &self,
+        url: &str,
+        agent: &str,
+        accept: &'static str,
+        limit: usize,
+        truncate: bool,
+    ) -> Result<Fetched, FetchError> {
         let url = Url::parse(url).map_err(|_| FetchError::InvalidUrl)?;
         check_url(&url, &self.policy)?;
         let mut response = self
             .client
             .get(url)
-            .header(USER_AGENT, HeaderValue::from_static(AGENT))
+            .header(
+                USER_AGENT,
+                HeaderValue::from_str(agent).map_err(|_| FetchError::InvalidUrl)?,
+            )
             .header(ACCEPT, HeaderValue::from_static(accept))
             .send()
             .await

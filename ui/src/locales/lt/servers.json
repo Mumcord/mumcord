@@ -13,10 +13,15 @@
     "listLabel": "Įrašyti serveriai",
     "add": "Pridėti serverį",
     "keyboardHint": "Enter jungiasi. Alt plius rodyklė aukštyn arba žemyn perkelia serverį. Shift plius F10 atidaro daugiau parinkčių.",
-    "status": {
-      "connected": "{{server}} (prisijungta)",
-      "connecting": "{{server}} (jungiamasi)",
-      "reconnecting": "{{server}} (jungiamasi iš naujo)"
+    "label": "{{server}} ({{state}})",
+    "state": {
+      "connected": "prisijungta",
+      "connecting": "jungiamasi",
+      "reconnecting": "jungiamasi iš naujo",
+      "error": "ryšys nutrūko",
+      "voice": "balso serveris",
+      "unread": "neskaitytos žinutės",
+      "mentions": "paminėjimai: {{mentions}}"
     }
   },
   "menu": {
@@ -26,7 +31,19 @@
     "edit": "Redaguoti serverį",
     "moveUp": "Perkelti aukštyn",
     "moveDown": "Perkelti žemyn",
-    "remove": "Pašalinti serverį"
+    "remove": "Pašalinti serverį",
+    "reconnect": "Prisijungti iš naujo",
+    "alwaysConnect": "Visada jungtis paleidžiant",
+    "muteNotifications": "Nutildyti pranešimus",
+    "theme": "Tema…",
+    "showWelcome": "Rodyti pasveikinimo žinutę"
+  },
+  "theme": {
+    "title": "Tema serveriui {{server}}",
+    "label": "Tema",
+    "useApp": "Naudoti programos temą",
+    "hint": "Galioja, kol rodomas šis serveris.",
+    "failed": "Nepavyko išsaugoti temos. Bandyk dar kartą."
   },
   "dialog": {
     "addTitle": "Pridėti serverį",
@@ -50,7 +67,14 @@
       "username": "Įvesk vardą, kurį nori naudoti šiame serveryje.",
       "link": "Šios mumble:// nuorodos nepavyksta nuskaityti. Patikrink, ar ji nukopijuota visa.",
       "invalid": "Serverio duomenys netinkami. Patikrink adresą ir prievadą."
-    }
+    },
+    "alwaysConnect": "Visada jungtis paleidžiant",
+    "alwaysConnectHint": "Paleidžiant Mumcord prijungia šį serverį tik skaitymui.",
+    "channelPasswords": "Kanalų slaptažodžiai",
+    "channelPassword": "Kanalo slaptažodis {{number}}",
+    "removeChannelPassword": "Pašalinti {{name}}",
+    "remove": "Pašalinti",
+    "channelPasswordsHint": "Išsaugomi, kai apsaugotas kanalas juos priėmė. Pašalintų bus paklausta dar kartą kitą kartą įeinant."
   },
   "errors": {
     "serverUnreachable": "Serverio pasiekti nepavyksta. Patikrink adresą, prievadą ir ar esi prisijungęs (-usi) prie interneto.",
@@ -63,17 +87,16 @@
     "invalidAddress": "Serverio adresas netinkamas. Redaguok serverį ir ištaisyk jį.",
     "secureStorage": "Tavo sistemos saugykla nepasiekiama, todėl serverio slaptažodžio nepavyko nuskaityti ar įrašyti. Atrakink ją ir bandyk dar kartą.",
     "notFound": "Šis serveris nebeįrašytas.",
-    "generic": "Kažkas nepavyko. Bandyk dar kartą."
+    "generic": "Kažkas nepavyko. Bandyk dar kartą.",
+    "serverLimit": "Jau esi prisijungęs prie didžiausio {{limit}} serverių skaičiaus. Atjunk serverį arba padidink ribą skiltyje Nustatymai → Serveriai.",
+    "serverLimitUnknown": "Jau esi prisijungęs prie didžiausio serverių skaičiaus. Atjunk serverį arba padidink ribą skiltyje Nustatymai → Serveriai.",
+    "alwaysConnectLimit": "Tik {{limit}} serveriai gali turėti „Visada jungtis paleidžiant“, tiek pat, kiek prijungtų serverių riba. Išjunk tai kitam serveriui arba padidink ribą skiltyje Nustatymai → Serveriai.",
+    "alwaysConnectLimitUnknown": "„Visada jungtis paleidžiant“ negali turėti daugiau serverių nei prijungtų serverių riba. Išjunk tai kitam serveriui arba padidink ribą skiltyje Nustatymai → Serveriai."
   },
   "remove": {
     "title": "Pašalinti {{server}}?",
     "message": "Jo įrašytas slaptažodis, sertifikato sprendimas, sekami kanalai ir pokalbių istorija šiame kompiuteryje bus ištrinti.",
     "confirm": "Pašalinti"
-  },
-  "switch": {
-    "title": "Pakeisti serverį?",
-    "message": "Vienu metu gali būti tik viename serveryje. Atsijungti nuo {{current}} ir prisijungti prie {{next}}?",
-    "confirm": "Atsijungti ir pakeisti"
   },
   "cert": {
     "newTitle": "Pasitikėti šiuo serveriu?",
@@ -108,7 +131,10 @@
     "actionFailed": {
       "reorder": "Nepavyko įrašyti naujos serverių tvarkos. Bandyk dar kartą.",
       "remove": "Nepavyko pašalinti serverio. Bandyk dar kartą.",
-      "disconnect": "Atsijungti nepavyko. Bandyk dar kartą."
+      "disconnect": "Atsijungti nepavyko. Bandyk dar kartą.",
+      "alwaysConnect": "Nepavyko išsaugoti „Visada jungtis paleidžiant“. Bandyk dar kartą.",
+      "notifications": "Nepavyko išsaugoti pranešimų nustatymo. Bandyk dar kartą.",
+      "savePassword": "Nepavyko išsaugoti naujo slaptažodžio. Redaguok serverį, kad jį išsaugotum."
     }
   },
   "empty": {
@@ -124,5 +150,27 @@
     "errors": {
       "required": "Įvesk serverio adresą arba mumble:// nuorodą."
     }
+  },
+  "password": {
+    "title": "Slaptažodis serveriui {{server}}",
+    "intro": "Serveris nepriėmė slaptažodžio. Įvesk teisingą ir bandyk dar kartą.",
+    "label": "Slaptažodis",
+    "show": "Rodyti",
+    "hide": "Slėpti",
+    "wrong": "Ir šis slaptažodis neteisingas. Bandyk dar kartą.",
+    "save": "Išsaugoti slaptažodį",
+    "cancel": "Atšaukti",
+    "connect": "Prisijungti",
+    "connecting": "Jungiamasi…"
+  },
+  "channelPassword": {
+    "title": "Šiam kanalui reikia slaptažodžio",
+    "intro": "Įvesk {{channel}} slaptažodį.",
+    "label": "Slaptažodis",
+    "wrong": "Neteisingas slaptažodis",
+    "failed": "Nepavyko išsiųsti slaptažodžio. Bandyk dar kartą.",
+    "cancel": "Atšaukti",
+    "join": "Įeiti",
+    "joining": "Įeinama…"
   }
 }

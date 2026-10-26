@@ -13,13 +13,16 @@
   },
   "dm": {
     "title": "Direktmeddelanden",
-    "unknown": "Okänd person"
+    "unknown": "Okänd person",
+    "withServer": "{{name}}, på {{server}}"
   },
   "notify": {
     "channel": "{{name}} i {{channel}}: {{text}}",
     "private": "{{name}} (privat): {{text}}",
     "more_one": "{{count}} nytt meddelande till",
-    "more_other": "{{count}} nya meddelanden till"
+    "more_other": "{{count}} nya meddelanden till",
+    "channelOn": "{{name}} i {{channel}} på {{server}}: {{text}}",
+    "privateOn": "{{name}} (privat, {{server}}): {{text}}"
   },
   "history": {
     "clear": "Rensa historik",

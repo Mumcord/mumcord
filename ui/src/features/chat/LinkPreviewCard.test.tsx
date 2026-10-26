@@ -1,4 +1,4 @@
-import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 import {
   createMockApi,
@@ -11,7 +11,7 @@ import {
 import { applyLanguage } from "../../i18n";
 import { axeViolations } from "../../test/axe";
 import { clearDismissedPreviews } from "./dismissedPreviews";
-import { clearPreviews, playerUrl, previewableLinks } from "./links";
+import { cardPlayer, clearPreviews, previewableLinks } from "./links";
 import { MessageList } from "./MessageList";
 
 const IMAGE = "data:image/jpeg;base64,/9j/4AAQ";
@@ -125,41 +125,30 @@ describe("previewableLinks", () => {
   });
 });
 
-describe("playerUrl", () => {
-  const twitch = {
-    site: "twitch" as const,
-    playerUrl: "https://player.twitch.tv/?channel=someone&autoplay=true",
-    channel: "someone",
-  };
+const EMBED_PAGE = "http://localhost:43215/0123456789abcdef0123456789abcdef/embed.html";
+const TWITCH = {
+  site: "twitch" as const,
+  playerUrl: "https://player.twitch.tv/?channel=someone&autoplay=true",
+  channel: "someone",
+};
 
-  it("embeds YouTube on http(s) pages and Twitch with its parent where Twitch allows it", () => {
-    const dev = { protocol: "http:", hostname: "localhost" };
-    expect(playerUrl(YOUTUBE, dev)).toBe(YOUTUBE.playerUrl);
-    expect(playerUrl(twitch, dev)).toBe(
-      "https://player.twitch.tv/?channel=someone&autoplay=true&parent=localhost",
-    );
-    expect(playerUrl(twitch, { protocol: "https:", hostname: "tauri.localhost" })).toContain(
-      "parent=tauri.localhost",
-    );
+describe("cardPlayer", () => {
+  it("runs YouTube and Twitch in the loopback page and Spotify directly", () => {
+    expect(cardPlayer(YOUTUBE)).toEqual({ via: "page", url: YOUTUBE.playerUrl });
+    expect(cardPlayer(TWITCH)).toEqual({ via: "page", url: TWITCH.playerUrl });
+    const spotify = SPOTIFY.video as VideoEmbed;
+    expect(cardPlayer(spotify)).toEqual({ via: "direct", url: spotify.playerUrl });
   });
 
-  it("falls back to the browser where the player cannot run", () => {
-    const tauriScheme = { protocol: "tauri:", hostname: "localhost" };
-    expect(playerUrl(YOUTUBE, tauriScheme)).toBeNull();
-    expect(playerUrl(twitch, tauriScheme)).toBeNull();
-    expect(playerUrl(SPOTIFY.video as VideoEmbed, tauriScheme)).not.toBeNull();
-    expect(playerUrl(twitch, { protocol: "http:", hostname: "tauri.localhost" })).toBeNull();
+  it("refuses URLs that are not a known player", () => {
     const spotify = SPOTIFY.video as VideoEmbed;
-    expect(playerUrl(spotify, { protocol: "http:", hostname: "localhost" })).toBe(
-      spotify.playerUrl,
-    );
     const notEmbed = {
       ...spotify,
       playerUrl: "https://open.spotify.com/track/4uLU6hMCjMI75M1A2tKUQC",
     };
-    expect(playerUrl(notEmbed, { protocol: "http:", hostname: "localhost" })).toBeNull();
-    const foreign = { ...YOUTUBE, playerUrl: "https://evil.example/embed" };
-    expect(playerUrl(foreign, { protocol: "http:", hostname: "localhost" })).toBeNull();
+    expect(cardPlayer(notEmbed)).toBeNull();
+    expect(cardPlayer({ ...YOUTUBE, playerUrl: "https://evil.example/embed" })).toBeNull();
+    expect(cardPlayer({ ...YOUTUBE, playerUrl: "not a url" })).toBeNull();
   });
 });
 
@@ -197,12 +186,63 @@ describe("link preview cards", () => {
     expect(card).toHaveTextContent("Rick");
     expect(container.querySelector("iframe")).toBeNull();
 
+    const open = vi.spyOn(api, "embedPlayerOpen");
+    const close = vi.spyOn(api, "embedPlayerClose");
     fireEvent.click(screen.getByRole("button", { name: "Play Never gonna" }));
-    const frame = await screen.findByTitle("Video player: Never gonna");
-    expect(frame.getAttribute("src")).toBe(YOUTUBE.playerUrl);
+    const frame = await screen.findByTitle<HTMLIFrameElement>("Video player: Never gonna");
+    expect(open).toHaveBeenCalledTimes(1);
+    expect(frame.getAttribute("src")).toBe(EMBED_PAGE);
     expect(frame.getAttribute("sandbox")).not.toContain("allow-popups");
+    const target = frame.contentWindow;
+    if (target === null) throw new Error("no frame window");
+    const post = vi.spyOn(target, "postMessage").mockImplementation(() => undefined);
+    fireEvent.load(frame);
+    expect(post).toHaveBeenCalledWith(
+      { type: "embed", url: YOUTUBE.playerUrl },
+      "http://localhost:43215",
+    );
     expect(screen.queryByRole("button", { name: "Play Never gonna" })).toBeNull();
     expect(screen.getByRole("button", { name: "Open Never gonna in browser" })).toBeVisible();
+
+    cleanup();
+    await waitFor(() => {
+      expect(close).toHaveBeenCalledTimes(1);
+    });
+  });
+
+  it("plays a Twitch card through the loopback page too", async () => {
+    vi.spyOn(api, "linkPreview").mockResolvedValue({
+      ...VIDEO,
+      url: "https://www.twitch.tv/someone",
+      siteName: "Twitch",
+      title: "Live stream",
+      video: TWITCH,
+    });
+    renderMessage(`<a href="https://www.twitch.tv/someone">stream</a>`, true);
+    fireEvent.click(await screen.findByRole("button", { name: "Play Live stream" }));
+    const frame = await screen.findByTitle<HTMLIFrameElement>("Video player: Live stream");
+    expect(frame.getAttribute("src")).toBe(EMBED_PAGE);
+    const target = frame.contentWindow;
+    if (target === null) throw new Error("no frame window");
+    const post = vi.spyOn(target, "postMessage").mockImplementation(() => undefined);
+    fireEvent.load(frame);
+    expect(post).toHaveBeenCalledWith(
+      { type: "embed", url: TWITCH.playerUrl },
+      "http://localhost:43215",
+    );
+  });
+
+  it("opens the browser when the player page cannot be opened", async () => {
+    vi.spyOn(api, "linkPreview").mockResolvedValue(VIDEO);
+    vi.spyOn(api, "embedPlayerOpen").mockRejectedValue({ code: "io", message: "bind" });
+    const opened = vi.spyOn(api, "openLink").mockResolvedValue(null);
+    vi.spyOn(console, "warn").mockImplementation(() => undefined);
+    renderMessage(`<a href="${VIDEO.url}">video</a>`, true);
+    fireEvent.click(await screen.findByRole("button", { name: "Play Never gonna" }));
+    await waitFor(() => {
+      expect(opened).toHaveBeenCalledWith(VIDEO.url);
+    });
+    expect(screen.getByRole("button", { name: "Play Never gonna" })).toBeInTheDocument();
   });
 
   it("shows a Spotify card with type and artist and loads the player only after a click", async () => {

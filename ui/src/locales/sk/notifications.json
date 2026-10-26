@@ -14,5 +14,6 @@
   "image": "Poslal(a) obrázok",
   "open": "Otvoriť chat",
   "close": "Zavrieť upozornenie",
-  "mentionLine": "{{sender}} ťa spomenul(a): {{preview}}"
+  "mentionLine": "{{sender}} ťa spomenul(a): {{preview}}",
+  "withServer": "{{server}} · {{what}}"
 }

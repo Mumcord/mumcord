@@ -14,7 +14,9 @@
     "sounds": "Hangok és értesítések",
     "overlay": "Overlay",
     "diagnostics": "Diagnosztika",
-    "about": "Névjegy"
+    "about": "Névjegy",
+    "servers": "Szerverek",
+    "privacy": "Adatvédelem"
   },
   "search": {
     "label": "Beállítások keresése",
@@ -68,7 +70,17 @@
     "testPlaying": "A hangod visszajátszása…",
     "quality": "Minőség",
     "musicQuality": "Zenei minőség",
-    "musicQualityHint": "Több sávszélességet használ, és kikapcsolja a zajszűrést és az automatikus hangerőt; zenéhez. Push-to-talkkal működik a legjobban."
+    "musicQualityHint": "Több sávszélességet használ, és kikapcsolja a zajszűrést és az automatikus hangerőt; zenéhez. Push-to-talkkal működik a legjobban.",
+    "bitrate": "Bitráta",
+    "bitrateMax": "Max.",
+    "bitrateValue": "{{kbps}} kbit/s",
+    "bitrateMaxKnown": "Maximum: {{kbps}} kbit/s. A kapcsolat veszteségei még csökkenthetik.",
+    "bitrateMaxUnknown": "Maximum: a szervertől függ. A kapcsolat veszteségei még csökkenthetik.",
+    "videoSound": "Videó hangja",
+    "ducking": "Videó hangjának halkítása, amíg valaki beszél",
+    "duckingHint": "A közös nézés videójának és a képernyőmegosztásnak a hangja halkabb lesz, amíg valaki beszél a hangcsatornádban.",
+    "duckingLevel": "Csökkentett hangerő",
+    "duckingLevelValue": "{{percent}} %"
   },
   "voice": {
     "talkMode": "Beszédmód",
@@ -178,6 +190,7 @@
     "compact": "Kompakt: idő, név és üzenet egy sorban",
     "theme": "Téma",
     "themeLegend": "Színtéma",
+    "modeLegend": "Sötét vagy világos",
     "system": "Rendszer követése",
     "dark": "Sötét",
     "light": "Világos",
@@ -189,6 +202,61 @@
     "autostart": "Mumcord indítása bejelentkezéskor",
     "startMinimized": "Indítás kicsinyítve",
     "startMinimizedHint": "Ha a Mumcord bejelentkezéskor indul, a tálcán vár az ablak megnyitása helyett."
+  },
+  "themeEditor": {
+    "name": "Téma neve",
+    "colorsLegend": "Fő színek",
+    "colorColumn": "Szín",
+    "auto": "auto",
+    "cellLabel": "{{color}}, {{version}}",
+    "newTitle": "Új téma",
+    "editTitle": "„{{name}}” szerkesztése",
+    "generatedFromDark": "Automatikusan készült a sötét változatból. Követi az ott végzett módosításaidat, amíg itt meg nem változtatod.",
+    "generatedFromLight": "Automatikusan készült a világos változatból. Követi az ott végzett módosításaidat, amíg itt meg nem változtatod.",
+    "colors": {
+      "background": "Háttér",
+      "surface": "Felület",
+      "text": "Szöveg",
+      "accent": "Kiemelés",
+      "talking": "Beszél és online",
+      "warning": "Figyelmeztetés",
+      "error": "Hiba"
+    },
+    "pickColor": "{{color}} színválasztó",
+    "invalidHex": "Add meg a színt # jellel és hat hexadecimális számjeggyel, például #1a2b3c.",
+    "contrastLowIn": "{{version}}: túl alacsony kontraszt: {{ratio}}:1, legalább {{min}}:1 kell.",
+    "unreadable": "Ez a téma nem elég olvasható. Módosítsd a szöveg vagy a háttér színét a mentéshez.",
+    "copyName": "{{name}} (másolat)",
+    "save": "Téma mentése",
+    "saveAs": "Mentés témaként",
+    "saved": "Téma mentve.",
+    "share": "Megosztás",
+    "shared": "Téma másolva. Illeszd be egy chatbe a megosztáshoz.",
+    "shareFailed": "A Mumcord nem tudta a vágólapra másolni a témát.",
+    "import": "Importálás…",
+    "importTitle": "Téma importálása",
+    "importLabel": "Témaüzenet vagy kód",
+    "importHint": "Illessz be egy Mumcord-témát tartalmazó chatüzenetet, vagy csak a kódját (mct1.-gyel kezdődik).",
+    "importConfirm": "Importálás",
+    "importInvalid": "Ez nem érvényes Mumcord-téma.",
+    "importUnreadable": "Ez a téma nem elég olvasható.",
+    "imported": "„{{name}}” importálva.",
+    "alreadyImported": "„{{name}}” már a témáid között van.",
+    "madeWithNewer": "Mumcord {{version}} verzióval készült – frissíts, hogy teljesen lásd.",
+    "reset": "Visszaállítás",
+    "menuLabel": "{{name}} beállításai",
+    "edit": "Téma szerkesztése",
+    "newFromThis": "Új téma ebből",
+    "preview": "Előnézet",
+    "previewing": "{{name}} előnézete",
+    "backToEditor": "Vissza a szerkesztőbe",
+    "rename": "Téma átnevezése",
+    "renameTitle": "„{{name}}” átnevezése",
+    "renameConfirm": "Átnevezés",
+    "delete": "Téma törlése",
+    "deleteTitle": "Törlöd ezt: „{{name}}”?",
+    "deleteMessage": "Az ezt a témát használó szerverek visszaállnak az alkalmazás témájára.",
+    "deleteConfirm": "Törlés"
   },
   "accessibility": {
     "hints": "Tippek",
@@ -212,7 +280,14 @@
     "hangUp": "Lecsatlakozol egy szerverről",
     "messages": "Új üzenet egy követett csatornában vagy privát chatben",
     "mention": "Hang említéskor",
-    "mentionNotify": "Értesítés említéskor"
+    "mentionNotify": "Értesítés említéskor",
+    "partyStarted": "Valaki közös nézést indít a csatornádban",
+    "partyJoined": "Valaki csatlakozik a közös nézésedhez",
+    "partyLeft": "Valaki kilép a közös nézésedből",
+    "shareStarted": "Valaki képernyőmegosztást indít a csatornádban",
+    "shareStopped": "Véget ér egy képernyőmegosztás a csatornádban",
+    "viewerStarted": "Valaki elkezdi nézni a képernyőmegosztásodat",
+    "viewerStopped": "Valaki abbahagyja a képernyőmegosztásod nézését"
   },
   "notifications": {
     "title": "Értesítések",
@@ -224,29 +299,6 @@
     "off": "Ki"
   },
   "overlay": {
-    "window": {
-      "title": "Ablakos overlay",
-      "enable": "Overlay megjelenítése",
-      "enableHint": "Kis átlátszó ablak, amely mutatja, ki beszél. A tálcamenüből is elérhető.",
-      "positionUnsupported": "Ez az asztali környezet dönti el, hol jelennek meg az ablakok, ezért a sarokpozícióknak és az áthelyezésnek nincs hatása.",
-      "move": "Overlay áthelyezése…",
-      "moveDone": "Áthelyezés kész",
-      "size": "Szélesség",
-      "wholeChannel": "Az egész csatorna megjelenítése",
-      "wholeChannelHint": "Kikapcsolva: csak azok, akik beszélnek.",
-      "channelName": "Csatornanév megjelenítése",
-      "loadFailed": "Az overlay beállításait nem sikerült betölteni.",
-      "saveFailed": "Az overlay módosítását nem sikerült alkalmazni.",
-      "kwin": {
-        "setUp": "Automatikus beállítás",
-        "done": "Kész: a „Mumcord overlay” KDE ablakszabály aktív.",
-        "removed": "A KDE ablakszabály eltávolítva.",
-        "remove": "Szabály eltávolítása",
-        "openRules": "KDE ablakszabályok megnyitása",
-        "compat": "Inkább kompatibilitási mód használata",
-        "failed": "A KDE ablakszabályt nem sikerült módosítani. Nyisd meg a KDE ablakszabályokat, és add hozzá kézzel."
-      }
-    },
     "corner": {
       "label": "Pozíció",
       "topLeft": "Bal felső",
@@ -281,8 +333,16 @@
       "confirmEnable": "Bekapcsolás mégis",
       "limits": {
         "libraryMissing": "A játékon belüli overlay nem érhető el: az overlay könyvtára (libmumcord_overlay_layer.so) nem található a Mumcord mellett. Telepítsd újra a Mumcordot a helyreállításához. Helyette a fenti ablakos overlay használatos.",
-        "windowsPending": "A játékon belüli overlay Windowson még nem érhető el. Helyette a fenti ablakos overlay használatos.",
+        "windowsFullscreen": "A játékban használj keret nélküli vagy ablakos teljes képernyőt.",
         "macos": "A macOS nem támogatja a játékon belüli overlayeket. Helyette a fenti ablakos overlay használatos."
+      },
+      "opengl": {
+        "title": "OpenGL-játékok",
+        "explanation": "Csak OpenGL-játékokhoz kell: illeszd be a játék Steam-indítási beállításaiba.",
+        "label": "Steam-indítási beállítás",
+        "copy": "Másolás",
+        "copied": "Másolva",
+        "copyFailed": "A másolás nem sikerült. Jelöld ki a szöveget, és másold kézzel."
       }
     }
   },
@@ -388,5 +448,38 @@
       "unsupported": "Ezen a rendszeren nem érhető el.",
       "failed": "Hiba után leállt. Kapcsold ki, majd be az újrapróbáláshoz."
     }
+  },
+  "servers": {
+    "connections": "Kapcsolatok",
+    "limit": "Egyszerre csatlakoztatott szerverek",
+    "limitHint": "1 és 15 között. A korláton felüli csatlakozásokat elutasítja.",
+    "limitInvalid": "Adj meg egy egész számot 1 és 15 között."
+  },
+  "appearanceEffects": {
+    "title": "Effektek",
+    "visualEffects": "Vizuális effektek (üveg, szemcsésség)",
+    "visualEffectsHint": "Matt üveg menük és finom filmszemcse. Automatikusan kikapcsol, ha a rendszered kevesebb átlátszóságot vagy mozgást kér."
+  },
+  "channelList": {
+    "title": "Csatornalista",
+    "hideEmpty": "Üres csatornák elrejtése",
+    "talkingFirst": "Beszélők megjelenítése elöl",
+    "weakConnection": "Gyenge kapcsolat ikon megjelenítése",
+    "weakConnectionHint": "Kis jelerősség-ikon a gyenge kapcsolatú személyek mellett."
+  },
+  "privacyDirect": {
+    "title": "Közvetlen kapcsolatok",
+    "allow": "Közvetlen kapcsolatok engedélyezése más Mumcord-felhasználókkal",
+    "hint": "A közvetlen kapcsolatok gyorsabbak, de a másik fél láthatja az IP-címedet. Amíg nem döntesz, a Mumcord rákérdez, amikor először használna egyet."
+  },
+  "updates": {
+    "title": "Frissítések",
+    "check": "Új verziók keresése",
+    "hint": "A Mumcord naponta egyszer megkérdezi a GitHubot a legújabb kiadásról. Semmi más nem kerül elküldésre."
+  },
+  "appImageMenu": {
+    "label": "Mumcord hozzáadása az alkalmazásmenühöz",
+    "hint": "Így az ikon és a push-to-talk megfelelően működik Waylanden, és a mumble:// linkek a Mumcordot nyitják meg. Csak az AppImage-hez.",
+    "failed": "Ez nem sikerült. Próbáld újra."
   }
 }

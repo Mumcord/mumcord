@@ -13,10 +13,15 @@
     "listLabel": "Shranjeni strežniki",
     "add": "Dodaj strežnik",
     "keyboardHint": "Enter vzpostavi povezavo. Alt in puščica gor ali dol premakne strežnik. Shift in F10 odpre več možnosti.",
-    "status": {
-      "connected": "{{server}} (povezano)",
-      "connecting": "{{server}} (povezovanje)",
-      "reconnecting": "{{server}} (ponovno povezovanje)"
+    "label": "{{server}} ({{state}})",
+    "state": {
+      "connected": "povezano",
+      "connecting": "povezovanje",
+      "reconnecting": "ponovno povezovanje",
+      "error": "povezava izgubljena",
+      "voice": "glasovni strežnik",
+      "unread": "neprebrana sporočila",
+      "mentions": "omembe: {{mentions}}"
     }
   },
   "menu": {
@@ -26,7 +31,19 @@
     "edit": "Uredi strežnik",
     "moveUp": "Premakni gor",
     "moveDown": "Premakni dol",
-    "remove": "Odstrani strežnik"
+    "remove": "Odstrani strežnik",
+    "reconnect": "Znova poveži",
+    "alwaysConnect": "Vedno poveži ob zagonu",
+    "muteNotifications": "Utišaj obvestila",
+    "theme": "Tema…",
+    "showWelcome": "Pokaži pozdravno sporočilo"
+  },
+  "theme": {
+    "title": "Tema za {{server}}",
+    "label": "Tema",
+    "useApp": "Uporabi temo aplikacije",
+    "hint": "Velja, dokler je prikazan ta strežnik.",
+    "failed": "Teme ni bilo mogoče shraniti. Poskusi znova."
   },
   "dialog": {
     "addTitle": "Dodaj strežnik",
@@ -50,7 +67,14 @@
       "username": "Vpiši ime, ki ga želiš uporabljati na tem strežniku.",
       "link": "Te povezave mumble:// ni mogoče prebrati. Preveri, ali je bila kopirana v celoti.",
       "invalid": "Podatki o strežniku niso veljavni. Preveri naslov in vrata."
-    }
+    },
+    "alwaysConnect": "Vedno poveži ob zagonu",
+    "alwaysConnectHint": "Mumcord ob zagonu poveže ta strežnik samo za branje.",
+    "channelPasswords": "Gesla kanalov",
+    "channelPassword": "Geslo kanala {{number}}",
+    "removeChannelPassword": "Odstrani {{name}}",
+    "remove": "Odstrani",
+    "channelPasswordsHint": "Shranjena, ko jih je zaščiten kanal sprejel. Za odstranjena te ob naslednjem vstopu spet vprašamo."
   },
   "errors": {
     "serverUnreachable": "Strežnik ni dosegljiv. Preveri naslov in vrata ter ali si povezan z internetom.",
@@ -63,17 +87,16 @@
     "invalidAddress": "Naslov strežnika ni veljaven. Uredi strežnik in ga popravi.",
     "secureStorage": "Varna shramba tvojega sistema ni na voljo, zato gesla strežnika ni bilo mogoče prebrati ali shraniti. Odkleni jo in poskusi znova.",
     "notFound": "Ta strežnik ni več shranjen.",
-    "generic": "Nekaj je šlo narobe. Poskusi znova."
+    "generic": "Nekaj je šlo narobe. Poskusi znova.",
+    "serverLimit": "Povezan si že z največ {{limit}} strežniki. Prekini povezavo s strežnikom ali zvišaj omejitev v Nastavitve → Strežniki.",
+    "serverLimitUnknown": "Povezan si že z največjim številom strežnikov. Prekini povezavo s strežnikom ali zvišaj omejitev v Nastavitve → Strežniki.",
+    "alwaysConnectLimit": "Samo {{limit}} strežnikov ima lahko »Vedno poveži ob zagonu«, toliko kot je omejitev povezanih strežnikov. Izklopi to za drug strežnik ali zvišaj omejitev v Nastavitve → Strežniki.",
+    "alwaysConnectLimitUnknown": "»Vedno poveži ob zagonu« ne more imeti več strežnikov, kot je omejitev povezanih strežnikov. Izklopi to za drug strežnik ali zvišaj omejitev v Nastavitve → Strežniki."
   },
   "remove": {
     "title": "Odstranim {{server}}?",
     "message": "Izbrisani bodo shranjeno geslo, odločitev o certifikatu, kanali, ki jim slediš, in zgodovina klepeta na tem računalniku.",
     "confirm": "Odstrani"
-  },
-  "switch": {
-    "title": "Zamenjam strežnik?",
-    "message": "Naenkrat si lahko le na enem strežniku. Prekinem povezavo s {{current}} in se povežem s {{next}}?",
-    "confirm": "Prekini in zamenjaj"
   },
   "cert": {
     "newTitle": "Zaupaš temu strežniku?",
@@ -108,7 +131,10 @@
     "actionFailed": {
       "reorder": "Novega vrstnega reda strežnikov ni bilo mogoče shraniti. Poskusi znova.",
       "remove": "Strežnika ni bilo mogoče odstraniti. Poskusi znova.",
-      "disconnect": "Prekinitev povezave ni uspela. Poskusi znova."
+      "disconnect": "Prekinitev povezave ni uspela. Poskusi znova.",
+      "alwaysConnect": "»Vedno poveži ob zagonu« ni bilo mogoče shraniti. Poskusi znova.",
+      "notifications": "Nastavitve obvestil ni bilo mogoče shraniti. Poskusi znova.",
+      "savePassword": "Novega gesla ni bilo mogoče shraniti. Uredi strežnik, da ga shraniš."
     }
   },
   "empty": {
@@ -124,5 +150,27 @@
     "errors": {
       "required": "Vpiši naslov strežnika ali povezavo mumble://."
     }
+  },
+  "password": {
+    "title": "Geslo za {{server}}",
+    "intro": "Strežnik ni sprejel gesla. Vpiši pravo in poskusi znova.",
+    "label": "Geslo",
+    "show": "Pokaži",
+    "hide": "Skrij",
+    "wrong": "Tudi to geslo je napačno. Poskusi znova.",
+    "save": "Shrani geslo",
+    "cancel": "Prekliči",
+    "connect": "Poveži",
+    "connecting": "Povezujem…"
+  },
+  "channelPassword": {
+    "title": "Ta kanal zahteva geslo",
+    "intro": "Vpiši geslo za {{channel}}.",
+    "label": "Geslo",
+    "wrong": "Napačno geslo",
+    "failed": "Gesla ni bilo mogoče poslati. Poskusi znova.",
+    "cancel": "Prekliči",
+    "join": "Vstopi",
+    "joining": "Vstopam…"
   }
 }

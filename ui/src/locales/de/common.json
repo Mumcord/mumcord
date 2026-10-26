@@ -9,5 +9,17 @@
   "retry": "Erneut versuchen",
   "loading": "Wird geladen…",
   "beta": "Beta",
-  "betaFeature": "Beta-Funktion"
+  "betaFeature": "Beta-Funktion",
+  "themePicker": {
+    "swatch": "{{name}}, Design",
+    "swatchSelected": "{{name}}, Design, ausgewählt",
+    "yourThemes": "Deine Designs",
+    "add": "Neues Design aus dem aktuellen",
+    "addShort": "Neu"
+  },
+  "floatingWidget": {
+    "collapse": "Einklappen",
+    "expand": "Ausklappen",
+    "handle": "{{name}}: Pfeiltasten verschieben, Umschalt+Pfeiltasten ändern die Größe"
+  }
 }

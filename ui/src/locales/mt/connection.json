@@ -8,7 +8,7 @@
   "transport": "Trasport",
   "transportValue": {
     "udp": "UDP",
-    "tcp": "TCP (tunnelled)"
+    "tcp": "TCP (permezz ta' mina)"
   },
   "latency": "Latenza",
   "latencyValue": "{{value}} ms",

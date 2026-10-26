@@ -26,10 +26,12 @@ pub use identity::{Identity, cert_hash};
 pub use secrets::{KEYRING_SERVICE, SecretStore};
 pub use servers::{DEFAULT_PORT, NewServer, SavedServer, ServerId};
 pub use settings::{
-    ChatDisplay, CloseBehaviour, DEFAULT_INGAME_OPACITY_PERCENT, DEFAULT_INGAME_SIZE_PERCENT,
-    GameKey, GameOverlayEntry, InGameOverlayMode, InGameOverlaySettings, LogLevel,
-    NotificationMode, OverlayCorner, OverlayPoint, OverlaySettings, OwnVoice, PositionalSettings,
-    Settings, SoundSettings, TalkMode, ThemePreference, VoiceActivation,
+    ChatDisplay, CloseBehaviour, Consent, DEFAULT_APP_THEME_ID, DEFAULT_INGAME_OPACITY_PERCENT,
+    DEFAULT_INGAME_SIZE_PERCENT, DEFAULT_MAX_CONNECTED_SERVERS, GameKey, GameOverlayEntry,
+    InGameOverlayMode, InGameOverlaySettings, LogLevel, MAX_MAX_CONNECTED_SERVERS,
+    MAX_VIDEO_DUCKING_PERCENT, MIN_MAX_CONNECTED_SERVERS, MIN_VIDEO_DUCKING_PERCENT,
+    NotificationMode, OverlayCorner, OwnVoice, PositionalSettings, Settings, SoundSettings,
+    TalkMode, Theme, ThemePreference, VoiceActivation,
 };
 pub use social::{FollowedChannel, PersonSetting};
 pub use synced::RangeSummary;

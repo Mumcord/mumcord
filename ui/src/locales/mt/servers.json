@@ -13,10 +13,15 @@
     "listLabel": "Servers ssejvjati",
     "add": "Żid server",
     "keyboardHint": "Enter jikkonnettja. Alt flimkien mal-vireg Up jew Down jmexxi s-server. Shift flimkien ma' F10 jiftaħ aktar għażliet.",
-    "status": {
-      "connected": "{{server}} (konness)",
-      "connecting": "{{server}} (qed jikkonnettja)",
-      "reconnecting": "{{server}} (qed jerġa' jikkonnettja)"
+    "label": "{{server}} ({{state}})",
+    "state": {
+      "connected": "konness",
+      "connecting": "qed jikkonnettja",
+      "reconnecting": "qed jerġa' jikkonnettja",
+      "error": "il-konnessjoni ntilfet",
+      "voice": "server tal-vuċi",
+      "unread": "messaġġi mhux moqrija",
+      "mentions": "semmewk: {{mentions}}"
     }
   },
   "menu": {
@@ -26,7 +31,19 @@
     "edit": "Editja s-server",
     "moveUp": "Mexxi 'l fuq",
     "moveDown": "Mexxi 'l isfel",
-    "remove": "Neħħi s-server"
+    "remove": "Neħħi s-server",
+    "reconnect": "Erġa' kkonnettja",
+    "alwaysConnect": "Dejjem ikkonnettja mal-bidu",
+    "muteNotifications": "Itfi n-notifiki",
+    "theme": "Tema…",
+    "showWelcome": "Uri l-messaġġ ta' merħba"
+  },
+  "theme": {
+    "title": "Tema għal {{server}}",
+    "label": "Tema",
+    "useApp": "Uża t-tema tal-app",
+    "hint": "Tapplika sakemm dan is-server ikun qed jintwera.",
+    "failed": "It-tema ma setgħetx tiġi ssejvjata. Erġa' pprova."
   },
   "dialog": {
     "addTitle": "Żid server",
@@ -50,7 +67,14 @@
       "username": "Daħħal l-isem li trid tuża fuq dan is-server.",
       "link": "Dan il-link mumble:// ma jistax jinqara. Iċċekkja li ġie kkupjat kollu.",
       "invalid": "Id-dettalji tas-server mhumiex validi. Iċċekkja l-indirizz u l-port."
-    }
+    },
+    "alwaysConnect": "Dejjem ikkonnettja mal-bidu",
+    "alwaysConnectHint": "Mumcord jikkonnettja dan is-server read-only meta jibda.",
+    "channelPasswords": "Passwords tal-kanali",
+    "channelPassword": "Password tal-kanal {{number}}",
+    "removeChannelPassword": "Neħħi {{name}}",
+    "remove": "Neħħi",
+    "channelPasswordsHint": "Jiġu ssejvjati meta kanal protett aċċettahom. Dawk imneħħija jerġgħu jintalbu d-darba li jmiss li tidħol."
   },
   "errors": {
     "serverUnreachable": "Is-server ma jistax jintlaħaq. Iċċekkja l-indirizz u l-port, u li int online.",
@@ -63,17 +87,16 @@
     "invalidAddress": "L-indirizz tas-server mhuwiex validu. Editja s-server biex tirranġah.",
     "secureStorage": "L-ħażna sigura tas-sistema tiegħek mhix disponibbli, għalhekk il-password tas-server ma setgħetx tinqara jew tiġi ssejvjata. Ħoll il-lock u erġa' pprova.",
     "notFound": "Dan is-server m'għadux issejvjat.",
-    "generic": "Xi ħaġa marret ħażin. Erġa' pprova."
+    "generic": "Xi ħaġa marret ħażin. Erġa' pprova.",
+    "serverLimit": "Diġà konness mal-massimu ta' {{limit}} servers. Skonnettja server, jew għolli l-limitu f'Settings → Servers.",
+    "serverLimitUnknown": "Diġà konness mal-għadd massimu ta' servers. Skonnettja server, jew għolli l-limitu f'Settings → Servers.",
+    "alwaysConnectLimit": "{{limit}} servers biss jista' jkollhom “Dejjem ikkonnettja mal-bidu”, l-istess bħal-limitu ta' servers konnessi. Itfih għal server ieħor, jew għolli l-limitu f'Settings → Servers.",
+    "alwaysConnectLimitUnknown": "Ma jistgħux ikunu aktar servers b'“Dejjem ikkonnettja mal-bidu” mil-limitu ta' servers konnessi. Itfih għal server ieħor, jew għolli l-limitu f'Settings → Servers."
   },
   "remove": {
     "title": "Tneħħi {{server}}?",
     "message": "Il-password ssejvjata tiegħu, id-deċiżjoni dwar iċ-ċertifikat, il-kanali segwiti u l-istorja taċ-chat fuq dan il-kompjuter jitħassru.",
     "confirm": "Neħħi"
-  },
-  "switch": {
-    "title": "Tbiddel is-server?",
-    "message": "Tista' tkun fuq server wieħed biss kull darba. Tiskonnettja minn {{current}} u tikkonnettja ma' {{next}}?",
-    "confirm": "Skonnettja u biddel"
   },
   "cert": {
     "newTitle": "Tafda dan is-server?",
@@ -108,7 +131,10 @@
     "actionFailed": {
       "reorder": "L-ordni l-ġdida tas-servers ma setgħetx tiġi ssejvjata. Erġa' pprova.",
       "remove": "Is-server ma setax jitneħħa. Erġa' pprova.",
-      "disconnect": "L-iskonnessjoni falliet. Erġa' pprova."
+      "disconnect": "L-iskonnessjoni falliet. Erġa' pprova.",
+      "alwaysConnect": "“Dejjem ikkonnettja mal-bidu” ma setax jiġi ssejvjat. Erġa' pprova.",
+      "notifications": "Is-setting tan-notifiki ma setax jiġi ssejvjat. Erġa' pprova.",
+      "savePassword": "Il-password il-ġdida ma setgħetx tiġi ssejvjata. Editja s-server biex tissejvjaha."
     }
   },
   "empty": {
@@ -124,5 +150,27 @@
     "errors": {
       "required": "Daħħal indirizz ta' server jew link mumble://."
     }
+  },
+  "password": {
+    "title": "Password għal {{server}}",
+    "intro": "Is-server ma aċċettax il-password. Daħħal dik it-tajba biex terġa' tipprova.",
+    "label": "Password",
+    "show": "Uri",
+    "hide": "Aħbi",
+    "wrong": "Anki dik il-password hija ħażina. Erġa' pprova.",
+    "save": "Issejvja l-password",
+    "cancel": "Ikkanċella",
+    "connect": "Ikkonnettja",
+    "connecting": "Qed jikkonnettja…"
+  },
+  "channelPassword": {
+    "title": "Dan il-kanal jeħtieġ password",
+    "intro": "Daħħal il-password għal {{channel}}.",
+    "label": "Password",
+    "wrong": "Password ħażina",
+    "failed": "Il-password ma setgħetx tintbagħat. Erġa' pprova.",
+    "cancel": "Ikkanċella",
+    "join": "Idħol",
+    "joining": "Qed tidħol…"
   }
 }

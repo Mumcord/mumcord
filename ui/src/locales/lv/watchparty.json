@@ -1,0 +1,53 @@
+{
+  "title": "Kopīga skatīšanās",
+  "addVideo": "Pievienot video",
+  "beta": "Beta",
+  "join": "Pievienoties kopīgajai skatīšanai",
+  "leave": "Pamest skatīšanos",
+  "watching": "{{count}} skatās: {{names}}",
+  "player": "Kopīgās skatīšanās atskaņotājs",
+  "watchTogether": "Skatīties kopā",
+  "watchTogetherFor": "Skatīties {{title}} kopā ar šo kanālu",
+  "cantPlay": "Atskaņotājs šeit nevar darboties.",
+  "openInBrowser": "Atvērt pārlūkā",
+  "startFailed": "Kopīgo skatīšanos neizdevās sākt.",
+  "joinFailed": "Neizdevās pievienoties kopīgajai skatīšanai.",
+  "leaveFailed": "Neizdevās pamest kopīgo skatīšanos.",
+  "commandFailed": "Kopīgā skatīšanās nesaņēma tavas izmaiņas.",
+  "someone": "Kāds",
+  "other": {
+    "play": "{{name}} nospieda atskaņot",
+    "pause": "{{name}} pauzēja",
+    "seek": "{{name}} pārlēca uz priekšu",
+    "skipped": "{{name}} izlaida"
+  },
+  "addToPlaylist": "Pievienot atskaņošanas sarakstam",
+  "addToPlaylistFor": "Pievienot {{title}} kopīgās skatīšanās sarakstam",
+  "playlist": {
+    "title": "Nākamais",
+    "empty": "Nekā nākamā. Pievieno YouTube saites ar “Pievienot atskaņošanas sarakstam”.",
+    "skip": "Izlaist",
+    "moveHint": "Alt+Augšup un Alt+Lejup pārvieto video; to var arī vilkt.",
+    "moved": "Pārvietots uz vietu {{position}}",
+    "videoTitle": "YouTube video",
+    "addedBy": "Pievienoja {{name}}",
+    "remove": "Noņemt {{title}} no saraksta",
+    "addFailed": "Video neizdevās pievienot sarakstam. Tajā var būt līdz 50 video.",
+    "removeFailed": "Video neizdevās noņemt no saraksta.",
+    "moveFailed": "Video neizdevās pārvietot.",
+    "skipFailed": "Neizdevās pāriet uz nākamo video.",
+    "nextFailed": "Nākamo video neizdevās sākt.",
+    "move": "Pārvietot {{title}}",
+    "upNext": "Nākamais: {{title}}",
+    "upNextNone": "Nekā nākamā"
+  },
+  "widget": {
+    "play": "Atskaņot",
+    "pause": "Pauzēt"
+  },
+  "codecHint": {
+    "install": "Šim video vajadzīgs H.264 atbalsts. Instalē gst-libav:",
+    "generic": "Šim video vajadzīgs H.264 atbalsts. Instalē gst-libav (GStreamer libav spraudni) ar savas sistēmas pakotņu pārvaldnieku.",
+    "rpmFusion": "Fedora sistēmā gst-libav nāk no RPM Fusion repozitorija; vispirms iespējo RPM Fusion."
+  }
+}

@@ -7,16 +7,31 @@
   "bundle": {
     "linux": {
       "appimage": {
+        "bundleMediaFramework": true,
         "files": {
           "/usr/lib/mumcord/libmumcord_overlay_layer.so": "gen/overlay-layer/libmumcord_overlay_layer.so"
         }
       },
       "deb": {
+        "depends": [
+          "libasound2 | libasound2t64",
+          "libpipewire-0.3-0t64 | libpipewire-0.3-0",
+          "gstreamer1.0-plugins-good",
+          "gstreamer1.0-plugins-bad",
+          "gstreamer1.0-libav"
+        ],
         "files": {
           "/usr/lib/mumcord/libmumcord_overlay_layer.so": "gen/overlay-layer/libmumcord_overlay_layer.so"
         }
       },
       "rpm": {
+        "depends": [
+          "libpipewire-0.3.so.0()(64bit)",
+          "(gstreamer1-plugins-good or gstreamer-plugins-good)",
+          "(gstreamer1-plugins-bad-free or gstreamer-plugins-bad)"
+        ],
+        "recommends": ["(gstreamer1-libav or gstreamer-plugins-libav)"],
+        "desktopTemplate": "linux/mumcord.desktop",
         "files": {
           "/usr/lib/mumcord/libmumcord_overlay_layer.so": "gen/overlay-layer/libmumcord_overlay_layer.so"
         }

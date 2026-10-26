@@ -1,0 +1,53 @@
+{
+  "title": "Wspólne oglądanie",
+  "addVideo": "Dodaj film",
+  "beta": "Beta",
+  "join": "Dołącz do wspólnego oglądania",
+  "leave": "Opuść oglądanie",
+  "watching": "{{count}} ogląda: {{names}}",
+  "player": "Odtwarzacz wspólnego oglądania",
+  "watchTogether": "Oglądaj razem",
+  "watchTogetherFor": "Obejrzyj {{title}} razem z tym kanałem",
+  "cantPlay": "Odtwarzacz nie może tu działać.",
+  "openInBrowser": "Otwórz w przeglądarce",
+  "startFailed": "Nie udało się rozpocząć wspólnego oglądania.",
+  "joinFailed": "Nie udało się dołączyć do wspólnego oglądania.",
+  "leaveFailed": "Nie udało się opuścić wspólnego oglądania.",
+  "commandFailed": "Wspólne oglądanie nie przyjęło twojej zmiany.",
+  "someone": "Ktoś",
+  "other": {
+    "play": "{{name}} wznawia odtwarzanie",
+    "pause": "{{name}} wstrzymuje",
+    "seek": "{{name}} przewija do przodu",
+    "skipped": "{{name}} pomija"
+  },
+  "addToPlaylist": "Dodaj do playlisty",
+  "addToPlaylistFor": "Dodaj {{title}} do playlisty wspólnego oglądania",
+  "playlist": {
+    "title": "Następne",
+    "empty": "Nic więcej w kolejce. Dodaj linki do YouTube przez „Dodaj do playlisty”.",
+    "skip": "Pomiń",
+    "moveHint": "Alt+Strzałka w górę i Alt+Strzałka w dół przesuwają film; możesz go też przeciągnąć.",
+    "moved": "Przeniesiono na pozycję {{position}}",
+    "videoTitle": "Film z YouTube",
+    "addedBy": "Dodane przez {{name}}",
+    "remove": "Usuń {{title}} z playlisty",
+    "addFailed": "Nie udało się dodać filmu do playlisty. Mieści ona do 50 filmów.",
+    "removeFailed": "Nie udało się usunąć filmu z playlisty.",
+    "moveFailed": "Nie udało się przenieść filmu.",
+    "skipFailed": "Nie udało się przejść do następnego filmu.",
+    "nextFailed": "Nie udało się uruchomić następnego filmu.",
+    "move": "Przenieś {{title}}",
+    "upNext": "Następne: {{title}}",
+    "upNextNone": "Nic więcej w kolejce"
+  },
+  "widget": {
+    "play": "Odtwórz",
+    "pause": "Wstrzymaj"
+  },
+  "codecHint": {
+    "install": "Ten film wymaga obsługi H.264. Zainstaluj gst-libav:",
+    "generic": "Ten film wymaga obsługi H.264. Zainstaluj gst-libav (wtyczkę libav dla GStreamera) menedżerem pakietów swojego systemu.",
+    "rpmFusion": "W Fedorze gst-libav pochodzi z repozytorium RPM Fusion; najpierw włącz RPM Fusion."
+  }
+}

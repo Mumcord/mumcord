@@ -2,16 +2,20 @@
 import { createMockApi, setApi, type MockApi } from "../../api";
 import { applyLanguage } from "../../i18n";
 import { resetSelection } from "./selection";
-import { resetServerStore } from "./serverStore";
+import { getServerState, resetServerStore } from "./serverStore";
 
-/** Fresh mock engine, connected to the seeded server (own user in Lobby). */
-export async function connectedMock(): Promise<MockApi> {
+/**
+ * Fresh mock engine, connected to the seeded server (own user in Lobby). `bindStore` binds the
+ * server store first, for tests of other stores whose commands need its server id.
+ */
+export async function connectedMock({ bindStore = false } = {}): Promise<MockApi> {
   resetServerStore();
   resetSelection();
   await applyLanguage("en");
   const api = createMockApi();
   setApi(api);
-  await api.connect(1, null);
+  if (bindStore) getServerState();
+  await api.connect(1, null, null);
   return api;
 }
 

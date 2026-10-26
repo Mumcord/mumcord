@@ -15,7 +15,8 @@
   },
   "dm": {
     "title": "Súkromné správy",
-    "unknown": "Neznáma osoba"
+    "unknown": "Neznáma osoba",
+    "withServer": "{{name}}, na {{server}}"
   },
   "notify": {
     "channel": "{{name}} v {{channel}}: {{text}}",
@@ -23,7 +24,9 @@
     "more_one": "Ešte {{count}} nová správa",
     "more_few": "Ešte {{count}} nové správy",
     "more_many": "Ešte {{count}} novej správy",
-    "more_other": "Ešte {{count}} nových správ"
+    "more_other": "Ešte {{count}} nových správ",
+    "channelOn": "{{name}} v {{channel}} na {{server}}: {{text}}",
+    "privateOn": "{{name}} (súkromne, {{server}}): {{text}}"
   },
   "history": {
     "clear": "Vymazať históriu",

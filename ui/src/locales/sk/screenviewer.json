@@ -1,0 +1,21 @@
+{
+  "label": "Zdieľanie obrazovky: {{name}}",
+  "title": "Obrazovka: {{name}}",
+  "beta": "Beta",
+  "picture": "Zdieľaná obrazovka: {{name}}",
+  "someone": "Niekto",
+  "live": "Naživo",
+  "collapse": "Zbaliť",
+  "expand": "Rozbaliť",
+  "fullscreen": "Celá obrazovka",
+  "exitFullscreen": "Ukončiť celú obrazovku",
+  "stop": "Prestať sledovať",
+  "starting": "Pripája sa k obrazovke: {{name}}…",
+  "paused": "{{name}} pozastavil(a) zdieľanie.",
+  "full": "Toto zdieľanie je plné.",
+  "unreachable": "{{name}} nie je priamo dostupný. Sieť možno blokuje priame pripojenia.",
+  "tooOld": "Mumcord používateľa {{name}} je príliš starý na to, aby s tebou zdieľal obrazovku.",
+  "consentOff": "Sledovanie potrebuje priame pripojenia a ty ich máš vypnuté.",
+  "failed": "Obrazovku {{name}} sa nepodarilo otvoriť.",
+  "retry": "Skúsiť znova"
+}

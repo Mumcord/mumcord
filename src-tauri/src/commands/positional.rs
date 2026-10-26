@@ -11,7 +11,7 @@ use specta::Type;
 use tauri::State;
 use tauri_specta::Event;
 
-use super::types::{ApiError, ApiResult, ErrorCode};
+use super::types::{ApiError, ApiResult, ErrorCode, ServerId};
 
 /// What the settings show (FR-1.43) and who gets the "3D" icon (FR-1.72).
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, Type)]
@@ -40,6 +40,7 @@ pub struct PositionalStatusChanged {
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, Type, Event)]
 #[serde(rename_all = "camelCase")]
 pub struct PositionalSendingChanged {
+    pub server_id: ServerId,
     pub session: u32,
     pub sending: bool,
 }

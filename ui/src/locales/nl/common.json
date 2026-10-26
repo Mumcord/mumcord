@@ -8,6 +8,18 @@
   "next": "Volgende",
   "retry": "Opnieuw proberen",
   "loading": "Laden…",
-  "beta": "Beta",
-  "betaFeature": "Bètafunctie"
+  "beta": "Bèta",
+  "betaFeature": "Bètafunctie",
+  "themePicker": {
+    "swatch": "{{name}}, thema",
+    "swatchSelected": "{{name}}, thema, geselecteerd",
+    "yourThemes": "Jouw thema's",
+    "add": "Nieuw thema op basis van het huidige",
+    "addShort": "Nieuw"
+  },
+  "floatingWidget": {
+    "collapse": "Inklappen",
+    "expand": "Uitklappen",
+    "handle": "{{name}}: pijltjestoetsen verplaatsen, Shift+pijltjestoetsen wijzigen de grootte"
+  }
 }

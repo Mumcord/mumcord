@@ -1,0 +1,53 @@
+{
+  "title": "Közös nézés",
+  "addVideo": "Videó hozzáadása",
+  "beta": "Béta",
+  "join": "Csatlakozás a közös nézéshez",
+  "leave": "Kilépés a közös nézésből",
+  "watching": "{{count}} nézi: {{names}}",
+  "player": "Közös nézés lejátszója",
+  "watchTogether": "Nézzük együtt",
+  "watchTogetherFor": "{{title}} közös nézése ezzel a csatornával",
+  "cantPlay": "A lejátszó itt nem tud futni.",
+  "openInBrowser": "Megnyitás böngészőben",
+  "startFailed": "A közös nézést nem sikerült elindítani.",
+  "joinFailed": "Nem sikerült csatlakozni a közös nézéshez.",
+  "leaveFailed": "Nem sikerült kilépni a közös nézésből.",
+  "commandFailed": "A közös nézés nem kapta meg a módosításodat.",
+  "someone": "Valaki",
+  "other": {
+    "play": "{{name}} elindította a lejátszást",
+    "pause": "{{name}} szüneteltetett",
+    "seek": "{{name}} előreugrott",
+    "skipped": "{{name}} átugrotta"
+  },
+  "addToPlaylist": "Hozzáadás a lejátszási listához",
+  "addToPlaylistFor": "{{title}} hozzáadása a közös nézés lejátszási listájához",
+  "playlist": {
+    "title": "Következik",
+    "empty": "Nincs következő. Adj hozzá YouTube-linkeket a „Hozzáadás a lejátszási listához” gombbal.",
+    "skip": "Kihagyás",
+    "moveHint": "Az Alt+Fel és az Alt+Le mozgatja a videót; húzhatod is.",
+    "moved": "Áthelyezve a(z) {{position}}. helyre",
+    "videoTitle": "YouTube-videó",
+    "addedBy": "Hozzáadta: {{name}}",
+    "remove": "{{title}} eltávolítása a lejátszási listából",
+    "addFailed": "A videót nem sikerült hozzáadni a lejátszási listához. Legfeljebb 50 videót tartalmazhat.",
+    "removeFailed": "A videót nem sikerült eltávolítani a lejátszási listából.",
+    "moveFailed": "A videót nem sikerült áthelyezni.",
+    "skipFailed": "Nem sikerült a következő videóra ugrani.",
+    "nextFailed": "A következő videót nem sikerült elindítani.",
+    "move": "{{title}} áthelyezése",
+    "upNext": "Következik: {{title}}",
+    "upNextNone": "Nincs következő"
+  },
+  "widget": {
+    "play": "Lejátszás",
+    "pause": "Szünet"
+  },
+  "codecHint": {
+    "install": "Ehhez a videóhoz H.264-támogatás kell. Telepítsd a gst-libav csomagot:",
+    "generic": "Ehhez a videóhoz H.264-támogatás kell. Telepítsd a gst-libav csomagot (a GStreamer libav bővítményét) a rendszered csomagkezelőjével.",
+    "rpmFusion": "Fedorán a gst-libav az RPM Fusion tárolóból érhető el; előbb engedélyezd az RPM Fusiont."
+  }
+}

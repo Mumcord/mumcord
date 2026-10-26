@@ -13,10 +13,15 @@
     "listLabel": "Gespeicherte Server",
     "add": "Server hinzufügen",
     "keyboardHint": "Eingabe verbindet. Alt plus Pfeil hoch oder runter verschiebt den Server. Umschalt plus F10 öffnet weitere Optionen.",
-    "status": {
-      "connected": "{{server}} (verbunden)",
-      "connecting": "{{server}} (verbindet)",
-      "reconnecting": "{{server}} (verbindet neu)"
+    "label": "{{server}} ({{state}})",
+    "state": {
+      "connected": "verbunden",
+      "connecting": "verbindet",
+      "reconnecting": "verbindet neu",
+      "error": "Verbindung verloren",
+      "voice": "Sprachserver",
+      "unread": "ungelesene Nachrichten",
+      "mentions": "Erwähnungen: {{mentions}}"
     }
   },
   "menu": {
@@ -26,7 +31,19 @@
     "edit": "Server bearbeiten",
     "moveUp": "Nach oben",
     "moveDown": "Nach unten",
-    "remove": "Server entfernen"
+    "remove": "Server entfernen",
+    "reconnect": "Neu verbinden",
+    "alwaysConnect": "Beim Start immer verbinden",
+    "muteNotifications": "Benachrichtigungen stummschalten",
+    "theme": "Design …",
+    "showWelcome": "Willkommensnachricht anzeigen"
+  },
+  "theme": {
+    "title": "Design für {{server}}",
+    "label": "Design",
+    "useApp": "App-Design verwenden",
+    "hint": "Gilt, solange dieser Server angezeigt wird.",
+    "failed": "Das Design konnte nicht gespeichert werden. Bitte versuche es erneut."
   },
   "dialog": {
     "addTitle": "Server hinzufügen",
@@ -50,7 +67,14 @@
       "username": "Gib den Namen ein, den du auf diesem Server nutzen willst.",
       "link": "Dieser mumble://-Link kann nicht gelesen werden. Prüfe, ob er vollständig kopiert wurde.",
       "invalid": "Die Serverangaben sind ungültig. Prüfe Adresse und Port."
-    }
+    },
+    "alwaysConnect": "Beim Start immer verbinden",
+    "alwaysConnectHint": "Mumcord verbindet diesen Server beim Start schreibgeschützt.",
+    "channelPasswords": "Kanalpasswörter",
+    "channelPassword": "Kanalpasswort {{number}}",
+    "removeChannelPassword": "{{name}} entfernen",
+    "remove": "Entfernen",
+    "channelPasswordsHint": "Gespeichert, wenn ein geschützter Kanal sie akzeptiert hat. Entfernte werden beim nächsten Betreten erneut abgefragt."
   },
   "errors": {
     "serverUnreachable": "Der Server ist nicht erreichbar. Prüfe Adresse und Port und ob du online bist.",
@@ -63,17 +87,16 @@
     "invalidAddress": "Die Serveradresse ist ungültig. Bearbeite den Server, um sie zu korrigieren.",
     "secureStorage": "Der sichere Speicher deines Systems ist nicht verfügbar, daher konnte das Serverpasswort nicht gelesen oder gespeichert werden. Entsperre ihn und versuche es erneut.",
     "notFound": "Dieser Server ist nicht mehr gespeichert.",
-    "generic": "Etwas ist schiefgelaufen. Bitte versuche es erneut."
+    "generic": "Etwas ist schiefgelaufen. Bitte versuche es erneut.",
+    "serverLimit": "Du bist schon mit der Höchstzahl von {{limit}} Servern verbunden. Trenne einen Server oder erhöhe das Limit unter Einstellungen → Server.",
+    "serverLimitUnknown": "Du bist schon mit der Höchstzahl an Servern verbunden. Trenne einen Server oder erhöhe das Limit unter Einstellungen → Server.",
+    "alwaysConnectLimit": "Nur {{limit}} Server können auf „Beim Start immer verbinden“ gestellt werden, genauso viele wie das Limit verbundener Server. Schalte es für einen anderen Server aus oder erhöhe das Limit unter Einstellungen → Server.",
+    "alwaysConnectLimitUnknown": "Es können nicht mehr Server auf „Beim Start immer verbinden“ gestellt werden, als das Limit verbundener Server erlaubt. Schalte es für einen anderen Server aus oder erhöhe das Limit unter Einstellungen → Server."
   },
   "remove": {
     "title": "{{server}} entfernen?",
     "message": "Das gespeicherte Passwort, die Zertifikatsentscheidung, gefolgte Kanäle und der Chatverlauf auf diesem Computer werden gelöscht.",
     "confirm": "Entfernen"
-  },
-  "switch": {
-    "title": "Server wechseln?",
-    "message": "Du kannst nur mit einem Server gleichzeitig verbunden sein. Von {{current}} trennen und mit {{next}} verbinden?",
-    "confirm": "Trennen und wechseln"
   },
   "cert": {
     "newTitle": "Diesem Server vertrauen?",
@@ -108,7 +131,10 @@
     "actionFailed": {
       "reorder": "Die neue Serverreihenfolge konnte nicht gespeichert werden. Bitte versuche es erneut.",
       "remove": "Der Server konnte nicht entfernt werden. Bitte versuche es erneut.",
-      "disconnect": "Trennen ist fehlgeschlagen. Bitte versuche es erneut."
+      "disconnect": "Trennen ist fehlgeschlagen. Bitte versuche es erneut.",
+      "alwaysConnect": "„Beim Start immer verbinden“ konnte nicht gespeichert werden. Bitte versuche es erneut.",
+      "notifications": "Die Benachrichtigungseinstellung konnte nicht gespeichert werden. Bitte versuche es erneut.",
+      "savePassword": "Das neue Passwort konnte nicht gespeichert werden. Bearbeite den Server, um es zu speichern."
     }
   },
   "empty": {
@@ -124,5 +150,27 @@
     "errors": {
       "required": "Gib eine Serveradresse oder einen mumble://-Link ein."
     }
+  },
+  "password": {
+    "title": "Passwort für {{server}}",
+    "intro": "Der Server hat das Passwort nicht akzeptiert. Gib das richtige ein, um es erneut zu versuchen.",
+    "label": "Passwort",
+    "show": "Anzeigen",
+    "hide": "Verbergen",
+    "wrong": "Auch dieses Passwort ist falsch. Versuche es erneut.",
+    "save": "Passwort speichern",
+    "cancel": "Abbrechen",
+    "connect": "Verbinden",
+    "connecting": "Verbinde …"
+  },
+  "channelPassword": {
+    "title": "Dieser Kanal braucht ein Passwort",
+    "intro": "Gib das Passwort für {{channel}} ein.",
+    "label": "Passwort",
+    "wrong": "Falsches Passwort",
+    "failed": "Das Passwort konnte nicht gesendet werden. Bitte versuche es erneut.",
+    "cancel": "Abbrechen",
+    "join": "Beitreten",
+    "joining": "Trete bei …"
   }
 }

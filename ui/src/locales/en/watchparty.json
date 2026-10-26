@@ -1,0 +1,53 @@
+{
+  "title": "Watch party",
+  "addVideo": "Add video",
+  "beta": "Beta",
+  "join": "Join watch party",
+  "leave": "Leave party",
+  "watching": "{{count}} watching: {{names}}",
+  "player": "Watch party player",
+  "watchTogether": "Watch together",
+  "watchTogetherFor": "Watch {{title}} together with this channel",
+  "cantPlay": "The player can't run here.",
+  "openInBrowser": "Open in browser",
+  "startFailed": "The watch party could not be started.",
+  "joinFailed": "Could not join the watch party.",
+  "leaveFailed": "Could not leave the watch party.",
+  "commandFailed": "The watch party did not get your change.",
+  "someone": "Someone",
+  "other": {
+    "play": "{{name}} pressed play",
+    "pause": "{{name}} paused",
+    "seek": "{{name}} jumped ahead",
+    "skipped": "{{name}} skipped"
+  },
+  "addToPlaylist": "Add to playlist",
+  "addToPlaylistFor": "Add {{title}} to the watch party playlist",
+  "playlist": {
+    "title": "Up next",
+    "empty": "Nothing up next. Add YouTube links with “Add to playlist”.",
+    "skip": "Skip",
+    "moveHint": "Alt+Up and Alt+Down move the video; you can also drag it.",
+    "moved": "Moved to position {{position}}",
+    "videoTitle": "YouTube video",
+    "addedBy": "Added by {{name}}",
+    "remove": "Remove {{title}} from the playlist",
+    "addFailed": "The video could not be added to the playlist. It holds up to 50 videos.",
+    "removeFailed": "The video could not be removed from the playlist.",
+    "moveFailed": "The video could not be moved.",
+    "skipFailed": "Could not skip to the next video.",
+    "nextFailed": "The next video could not be started.",
+    "move": "Move {{title}}",
+    "upNext": "Up next: {{title}}",
+    "upNextNone": "Nothing up next"
+  },
+  "widget": {
+    "play": "Play",
+    "pause": "Pause"
+  },
+  "codecHint": {
+    "install": "This video needs H.264 support. Install gst-libav:",
+    "generic": "This video needs H.264 support. Install gst-libav (the GStreamer libav plugin) with your system's package manager.",
+    "rpmFusion": "On Fedora, gst-libav comes from the RPM Fusion repository; enable RPM Fusion first."
+  }
+}

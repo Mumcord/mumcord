@@ -14,7 +14,9 @@
     "sounds": "Skaņas un paziņojumi",
     "overlay": "Pārklājums",
     "diagnostics": "Diagnostika",
-    "about": "Par lietotni"
+    "about": "Par lietotni",
+    "servers": "Serveri",
+    "privacy": "Privātums"
   },
   "search": {
     "label": "Meklēt iestatījumos",
@@ -69,7 +71,17 @@
     "testPlaying": "Atskaņo tavu balsi…",
     "quality": "Kvalitāte",
     "musicQuality": "Mūzikas kvalitāte",
-    "musicQualityHint": "Izmanto vairāk joslas platuma un izslēdz trokšņu slāpēšanu un automātisko skaļumu; paredzēts mūzikai. Push-to-talk darbojas vislabāk."
+    "musicQualityHint": "Izmanto vairāk joslas platuma un izslēdz trokšņu slāpēšanu un automātisko skaļumu; paredzēts mūzikai. Push-to-talk darbojas vislabāk.",
+    "bitrate": "Bitu pārraides ātrums",
+    "bitrateMax": "Maks.",
+    "bitrateValue": "{{kbps}} kbit/s",
+    "bitrateMaxKnown": "Maksimums: {{kbps}} kbit/s. Zudumi savienojumā to joprojām var samazināt.",
+    "bitrateMaxUnknown": "Maksimums: atkarīgs no servera. Zudumi savienojumā to joprojām var samazināt.",
+    "videoSound": "Video skaņa",
+    "ducking": "Klusināt video skaņu, kamēr kāds runā",
+    "duckingHint": "Kopīgās skatīšanās video un ekrāna kopīgošanas skaņa kļūst klusāka, kamēr kāds tavā balss kanālā runā.",
+    "duckingLevel": "Samazināts skaļums",
+    "duckingLevelValue": "{{percent}} %"
   },
   "voice": {
     "talkMode": "Runāšanas režīms",
@@ -179,6 +191,7 @@
     "compact": "Kompakts: laiks, vārds un ziņa vienā rindā",
     "theme": "Motīvs",
     "themeLegend": "Krāsu motīvs",
+    "modeLegend": "Tumšs vai gaišs",
     "system": "Sekot sistēmai",
     "dark": "Tumšs",
     "light": "Gaišs",
@@ -190,6 +203,61 @@
     "autostart": "Startēt Mumcord, kad pieslēdzos sistēmai",
     "startMinimized": "Startēt samazinātu",
     "startMinimizedHint": "Kad Mumcord startē pieslēgšanās brīdī, tas gaida paplātē, nevis atver logu."
+  },
+  "themeEditor": {
+    "name": "Motīva nosaukums",
+    "colorsLegend": "Galvenās krāsas",
+    "colorColumn": "Krāsa",
+    "auto": "auto",
+    "cellLabel": "{{color}}, {{version}}",
+    "newTitle": "Jauns motīvs",
+    "editTitle": "Rediģēt “{{name}}”",
+    "generatedFromDark": "Automātiski izveidots no tumšās versijas. Seko tavām izmaiņām tur, līdz tu to maini šeit.",
+    "generatedFromLight": "Automātiski izveidots no gaišās versijas. Seko tavām izmaiņām tur, līdz tu to maini šeit.",
+    "colors": {
+      "background": "Fons",
+      "surface": "Virsma",
+      "text": "Teksts",
+      "accent": "Akcents",
+      "talking": "Runā un tiešsaistē",
+      "warning": "Brīdinājums",
+      "error": "Kļūda"
+    },
+    "pickColor": "Krāsu atlasītājs: {{color}}",
+    "invalidHex": "Ievadi krāsu kā # un sešus heksadecimālos ciparus, piemēram, #1a2b3c.",
+    "contrastLowIn": "{{version}}: pārāk zems kontrasts: {{ratio}}:1, vajag vismaz {{min}}:1.",
+    "unreadable": "Šis motīvs nav pietiekami salasāms. Maini teksta vai fona krāsu, lai to saglabātu.",
+    "copyName": "{{name}} (kopija)",
+    "save": "Saglabāt motīvu",
+    "saveAs": "Saglabāt kā motīvu",
+    "saved": "Motīvs saglabāts.",
+    "share": "Kopīgot",
+    "shared": "Motīvs nokopēts. Ielīmē to tērzēšanā, lai kopīgotu.",
+    "shareFailed": "Mumcord nevarēja nokopēt motīvu starpliktuvē.",
+    "import": "Importēt…",
+    "importTitle": "Importēt motīvu",
+    "importLabel": "Motīva ziņa vai kods",
+    "importHint": "Ielīmē tērzēšanas ziņu ar Mumcord motīvu vai tikai tā kodu (tas sākas ar mct1.).",
+    "importConfirm": "Importēt",
+    "importInvalid": "Šis nav derīgs Mumcord motīvs.",
+    "importUnreadable": "Šis motīvs nav pietiekami salasāms.",
+    "imported": "“{{name}}” importēts.",
+    "alreadyImported": "“{{name}}” jau ir tavos motīvos.",
+    "madeWithNewer": "Izveidots ar Mumcord {{version}} – atjaunini, lai redzētu pilnībā.",
+    "reset": "Atiestatīt",
+    "menuLabel": "{{name}} opcijas",
+    "edit": "Rediģēt motīvu",
+    "newFromThis": "Jauns motīvs no šī",
+    "preview": "Priekšskatījums",
+    "previewing": "Priekšskata {{name}}",
+    "backToEditor": "Atpakaļ uz redaktoru",
+    "rename": "Pārdēvēt motīvu",
+    "renameTitle": "Pārdēvēt “{{name}}”",
+    "renameConfirm": "Pārdēvēt",
+    "delete": "Dzēst motīvu",
+    "deleteTitle": "Dzēst “{{name}}”?",
+    "deleteMessage": "Serveri, kas izmanto šo motīvu, atgriežas pie lietotnes motīva.",
+    "deleteConfirm": "Dzēst"
   },
   "accessibility": {
     "hints": "Padomi",
@@ -213,7 +281,14 @@
     "hangUp": "Tu atvienojies no servera",
     "messages": "Jauna ziņa kanālā, kuram seko, vai privātā čatā",
     "mention": "Skaņa, kad tevi piemin",
-    "mentionNotify": "Paziņot, kad tevi piemin"
+    "mentionNotify": "Paziņot, kad tevi piemin",
+    "partyStarted": "Kāds sāk kopīgu skatīšanos tavā kanālā",
+    "partyJoined": "Kāds pievienojas tavai kopīgajai skatīšanai",
+    "partyLeft": "Kāds pamet tavu kopīgo skatīšanos",
+    "shareStarted": "Kāds sāk ekrāna kopīgošanu tavā kanālā",
+    "shareStopped": "Ekrāna kopīgošana tavā kanālā beidzas",
+    "viewerStarted": "Kāds sāk skatīties tavu ekrāna kopīgošanu",
+    "viewerStopped": "Kāds beidz skatīties tavu ekrāna kopīgošanu"
   },
   "notifications": {
     "title": "Paziņojumi",
@@ -225,29 +300,6 @@
     "off": "Izslēgts"
   },
   "overlay": {
-    "window": {
-      "title": "Loga pārklājums",
-      "enable": "Rādīt pārklājumu",
-      "enableHint": "Neliels caurspīdīgs logs, kas rāda, kas runā. Pieejams arī no paplātes izvēlnes.",
-      "positionUnsupported": "Šī darbvirsma pati nosaka, kur parādās logi, tāpēc stūru pozīcijām un pārvietošanai nav ietekmes.",
-      "move": "Pārvietot pārklājumu…",
-      "moveDone": "Pārvietošana pabeigta",
-      "size": "Platums",
-      "wholeChannel": "Rādīt visu kanālu",
-      "wholeChannelHint": "Izslēgts: tikai cilvēki, kas runā.",
-      "channelName": "Rādīt kanāla nosaukumu",
-      "loadFailed": "Pārklājuma opcijas neizdevās ielādēt.",
-      "saveFailed": "Pārklājuma izmaiņu neizdevās pielietot.",
-      "kwin": {
-        "setUp": "Iestatīt automātiski",
-        "done": "Gatavs: KDE loga noteikums “Mumcord overlay” ir aktīvs.",
-        "removed": "KDE loga noteikums tika noņemts.",
-        "remove": "Noņemt noteikumu",
-        "openRules": "Atvērt KDE logu noteikumus",
-        "compat": "Tā vietā izmantot saderības režīmu",
-        "failed": "KDE loga noteikumu neizdevās mainīt. Atver KDE logu noteikumus, lai to pievienotu manuāli."
-      }
-    },
     "corner": {
       "label": "Pozīcija",
       "topLeft": "Augšā pa kreisi",
@@ -282,8 +334,16 @@
       "confirmEnable": "Tomēr ieslēgt",
       "limits": {
         "libraryMissing": "Pārklājums spēlē nav pieejams: tā pārklājuma bibliotēka (libmumcord_overlay_layer.so) netika atrasta blakus Mumcord. Pārinstalē Mumcord, lai to atjaunotu. Tā vietā tiek izmantots loga pārklājums augstāk.",
-        "windowsPending": "Pārklājums spēlē vēl nav pieejams operētājsistēmā Windows. Tā vietā tiek izmantots loga pārklājums augstāk.",
+        "windowsFullscreen": "Spēlē izmantojiet pilnekrāna režīmu bez apmales vai logā.",
         "macos": "macOS neatbalsta pārklājumus spēlēs. Tā vietā tiek izmantots loga pārklājums augstāk."
+      },
+      "opengl": {
+        "title": "OpenGL spēles",
+        "explanation": "Vajadzīgs tikai OpenGL spēlēm: ielīmē spēles Steam palaišanas opcijās.",
+        "label": "Steam palaišanas opcija",
+        "copy": "Kopēt",
+        "copied": "Nokopēts",
+        "copyFailed": "Kopēšana neizdevās. Atlasi tekstu un nokopē to manuāli."
       }
     }
   },
@@ -390,5 +450,38 @@
       "unsupported": "Nav pieejams šajā sistēmā.",
       "failed": "Apturēts kļūdas dēļ. Izslēdz un ieslēdz to atkal, lai mēģinātu vēlreiz."
     }
+  },
+  "servers": {
+    "connections": "Savienojumi",
+    "limit": "Vienlaikus savienotie serveri",
+    "limitHint": "No 1 līdz 15. Savienojumi pāri ierobežojumam tiek noraidīti.",
+    "limitInvalid": "Ievadi veselu skaitli no 1 līdz 15."
+  },
+  "appearanceEffects": {
+    "title": "Efekti",
+    "visualEffects": "Vizuālie efekti (stikls, graudainība)",
+    "visualEffectsHint": "Matēta stikla izvēlnes un smalka filmas graudainība. Automātiski izslēgti, kad sistēma prasa mazāk caurspīdīguma vai kustību."
+  },
+  "channelList": {
+    "title": "Kanālu saraksts",
+    "hideEmpty": "Paslēpt tukšos kanālus",
+    "talkingFirst": "Rādīt runātājus vispirms",
+    "weakConnection": "Rādīt vāja savienojuma ikonu",
+    "weakConnectionHint": "Maza signāla ikona blakus cilvēkiem ar vāju savienojumu."
+  },
+  "privacyDirect": {
+    "title": "Tiešie savienojumi",
+    "allow": "Atļaut tiešos savienojumus ar citiem Mumcord lietotājiem",
+    "hint": "Tiešie savienojumi ir ātrāki, bet otra persona var redzēt tavu IP adresi. Kamēr neesi izlēmis, Mumcord jautā pirmajā reizē, kad tāds tiktu izmantots."
+  },
+  "updates": {
+    "title": "Atjauninājumi",
+    "check": "Meklēt jaunas versijas",
+    "hint": "Reizi dienā Mumcord pajautā GitHub par jaunāko laidienu. Nekas cits netiek sūtīts."
+  },
+  "appImageMenu": {
+    "label": "Pievienot Mumcord lietotņu izvēlnei",
+    "hint": "Ikona un push-to-talk tad Wayland vidē darbojas pareizi, un mumble:// saites atver Mumcord. Tikai AppImage.",
+    "failed": "Neizdevās. Mēģini vēlreiz."
   }
 }

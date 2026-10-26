@@ -159,18 +159,25 @@
   background: var(--color-bg-hover);
 }
 
-/* Plain violet (QA.24): the logo gradient is reserved for highlights such as the connected server. */
+/* Glow pill (FR-2.18): cream pill with pink glow, a dark pill in the light theme. */
 .button--primary {
   border-color: transparent;
-  background: var(--color-accent);
-  color: var(--color-on-accent);
+  background: var(--color-primary-bg);
+  color: var(--color-primary-text);
   font-weight: var(--font-weight-bold);
+  box-shadow: var(--shadow-primary-glow);
 }
 
 .button--primary:hover:not(:disabled) {
   border-color: transparent;
-  background: var(--color-accent);
-  filter: brightness(1.08);
+  background: var(--color-primary-bg);
+  box-shadow: var(--shadow-primary-glow-hover);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .button--primary:hover:not(:disabled) {
+    transform: translateY(-1px);
+  }
 }
 
 @media (prefers-reduced-motion: no-preference) {

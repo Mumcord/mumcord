@@ -1,8 +1,6 @@
 {
   "inChannel_one": "In {{channel}} ({{count}})",
   "inChannel_other": "In {{channel}} ({{count}})",
-  "listening_one": "Hört zu ({{count}})",
-  "listening_other": "Hören zu ({{count}})",
   "noChannel": "Wähle einen Kanal, um zu sehen, wer darin ist.",
   "nobody": "Niemand ist hier.",
   "nobodyElse": "Sonst ist niemand auf dem Server.",
@@ -11,6 +9,26 @@
   "registered": "Registriert",
   "unregistered": "Nicht registriert",
   "talking": "Spricht",
+  "quality": {
+    "label": "Verbindung",
+    "summary": "Verbindung: {{level}}",
+    "level": {
+      "good": "Gut",
+      "fair": "Mittel",
+      "weak": "Schwach",
+      "unknown": "Unbekannt"
+    },
+    "ping": "Ping",
+    "loss": "Paketverlust",
+    "late": "Verspätete Pakete",
+    "bandwidth": "Bandbreite",
+    "transport": "Sprachübertragung",
+    "client": "Client",
+    "os": "Betriebssystem",
+    "ms": "{{value}} ms",
+    "percent": "{{value}} %",
+    "kbps": "{{value}} kbit/s"
+  },
   "card": {
     "close": "Schließen",
     "loadFailed": "Profil konnte nicht geladen werden.",
@@ -22,6 +40,9 @@
     "privateMessage": "Private Nachricht",
     "localSettings": "Deine Einstellungen",
     "localSettingsHint": "Nur du siehst sie. Änderungen werden sofort gespeichert.",
+    "settingsFor": "Einstellungen für {{name}}",
+    "hintMuted": "Stummgeschaltet",
+    "hintVolume": "Lautstärke {{value}} %",
     "localMuteHint": "Du hörst diese Person nicht mehr.",
     "privateNote": "Private Notiz",
     "privateNoteHint": "Nur du kannst diese Notiz sehen.",
@@ -36,7 +57,8 @@
     "viewProfile": "Profil ansehen",
     "join": "{{channel}} beitreten",
     "joinDenied": "Du darfst diesen Kanal nicht betreten.",
-    "mute": "Für mich stummschalten"
+    "mute": "Für mich stummschalten",
+    "connectionInfo": "Verbindungsinfo …"
   },
   "nowPlaying": {
     "label": "Läuft gerade",

@@ -2,7 +2,7 @@
  * Small Mumcord logo next to the name of people who use Mumcord too (FR-1.61, QA.45). The engine
  * recognises them by their plugin-data hello; official clients never get the badge.
  */
-import { useTranslation } from "react-i18next";
+import { useT } from "../../i18n/useT";
 import type { User } from "../../api";
 import { isMumcord } from "./mumcord";
 
@@ -14,7 +14,7 @@ export function MumcordBadge({
   user: Pick<User, "isMumcord"> | undefined;
   size?: number;
 }) {
-  const { t } = useTranslation("channels");
+  const t = useT("channels");
   if (!isMumcord(user)) return null;
   const label = t("mumcordBadge");
   // The leading space keeps the badge a separate word in the accessible name: inline elements
@@ -22,7 +22,7 @@ export function MumcordBadge({
   return (
     <>
       {" "}
-      <span className="mumcord-badge" title={label} role="img" aria-label={label}>
+      <span className="mumcord-badge" data-tooltip={label} role="img" aria-label={label}>
         <svg viewBox="0 0 24 24" width={size} height={size} aria-hidden="true" focusable="false">
           <circle cx="7" cy="4.8" r="3" fill="var(--color-mumcord-a, #ff8a9b)" />
           <circle cx="17" cy="4.8" r="3" fill="var(--color-mumcord-b, #9b7cff)" />

@@ -4,6 +4,7 @@
  */
 import { useEffect, useId, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
+import "./pinnedInfoClose.css";
 import { openLink } from "./openLink";
 import { sanitizeHtml } from "./sanitize";
 
@@ -22,9 +23,16 @@ function onLinkClick(event: MouseEvent) {
 
 const BLOCK_SEPARATOR = "\u0000";
 
-export interface PinnedInfoBoxProps {
+export interface PinnedBlock {
   /** Untrusted server HTML; sanitized here. */
-  blocks: readonly string[];
+  html: string;
+  /** Set when the block can be closed (welcome text, channel description); label of the button. */
+  hideLabel?: string;
+  onHide?: () => void;
+}
+
+export interface PinnedInfoBoxProps {
+  blocks: readonly PinnedBlock[];
 }
 
 export function PinnedInfoBox({ blocks }: PinnedInfoBoxProps) {
@@ -34,7 +42,7 @@ export function PinnedInfoBox({ blocks }: PinnedInfoBoxProps) {
   const [expanded, setExpanded] = useState(false);
   const [overflows, setOverflows] = useState(false);
   // Keyed by content: the caller derives a new array on every server state change.
-  const joined = blocks.join(BLOCK_SEPARATOR);
+  const joined = blocks.map((block) => block.html).join(BLOCK_SEPARATOR);
   const sanitized = useMemo(
     () =>
       joined
@@ -43,6 +51,10 @@ export function PinnedInfoBox({ blocks }: PinnedInfoBoxProps) {
         .filter((html) => html.trim() !== ""),
     [joined],
   );
+  // Blocks that sanitize to nothing are skipped, so pair the survivors with their close buttons.
+  const shown = blocks
+    .map((block) => ({ block, html: sanitizeHtml(block.html) }))
+    .filter((entry) => entry.html.trim() !== "");
 
   // Only offer "Show more" when the collapsed box actually hides something.
   useLayoutEffect(() => {
@@ -81,13 +93,28 @@ export function PinnedInfoBox({ blocks }: PinnedInfoBoxProps) {
           collapsed ? "pinned-info__body pinned-info__body--collapsed" : "pinned-info__body"
         }
       >
-        {sanitized.map((html, index) => (
+        {shown.map(({ block, html }, index) => (
           <div
             // The blocks are a fixed list (description, welcome text) that never reorders.
             key={index}
-            className="pinned-info__block chat-message__body"
-            dangerouslySetInnerHTML={{ __html: html }}
-          />
+            className="pinned-info__block"
+          >
+            <div
+              className="pinned-info__text chat-message__body"
+              dangerouslySetInnerHTML={{ __html: html }}
+            />
+            {block.onHide ? (
+              <button
+                type="button"
+                className="pinned-info__close"
+                aria-label={block.hideLabel}
+                data-tooltip={block.hideLabel}
+                onClick={block.onHide}
+              >
+                ×
+              </button>
+            ) : null}
+          </div>
         ))}
       </div>
       {overflows || expanded ? (

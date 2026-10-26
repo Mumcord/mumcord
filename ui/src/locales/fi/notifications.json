@@ -10,5 +10,6 @@
   "image": "Lähetti kuvan",
   "open": "Avaa chat",
   "close": "Hylkää ilmoitus",
-  "mentionLine": "{{sender}} mainitsi sinut: {{preview}}"
+  "mentionLine": "{{sender}} mainitsi sinut: {{preview}}",
+  "withServer": "{{server}} · {{what}}"
 }

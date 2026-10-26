@@ -3,15 +3,18 @@
 //! `MUMCORD_LIVE=1 cargo test -p mumcord-engine --features test-backend --test live_history_sync -- --ignored --test-threads=1`
 #![cfg(feature = "test-backend")]
 
+mod common;
+
 use std::path::{Path, PathBuf};
 use std::time::Duration;
 
 use mumcord_bot::{Bot, BotConfig, UserCheck, env};
+use mumcord_engine::EventReceiver;
 use mumcord_engine::{
     ChatMessageView, Engine, EngineEvent, PasswordChange, SecretStore, ServerFields, ServerView,
     Snapshot,
 };
-use tokio::sync::mpsc::UnboundedReceiver;
+use mumcord_protocol::proto;
 
 const WAIT: Duration = Duration::from_secs(20);
 
@@ -39,7 +42,7 @@ fn work_dir(name: &str) -> PathBuf {
 }
 
 async fn wait_for<T>(
-    rx: &mut UnboundedReceiver<EngineEvent>,
+    rx: &mut EventReceiver,
     what: &str,
     mut pick: impl FnMut(&EngineEvent) -> Option<T>,
 ) -> T {
@@ -55,7 +58,7 @@ async fn wait_for<T>(
     }
 }
 
-async fn wait_message(rx: &mut UnboundedReceiver<EngineEvent>, contains: &str) -> ChatMessageView {
+async fn wait_message(rx: &mut EventReceiver, contains: &str) -> ChatMessageView {
     wait_for(rx, contains, |e| match e {
         EngineEvent::MessageReceived(m) if m.body.contains(contains) => Some((**m).clone()),
         _ => None,
@@ -64,10 +67,7 @@ async fn wait_message(rx: &mut UnboundedReceiver<EngineEvent>, contains: &str) -
 }
 
 /// Collects synced messages of `channel` until its sync ends; returns them and the count.
-async fn wait_sync(
-    rx: &mut UnboundedReceiver<EngineEvent>,
-    channel: u32,
-) -> (Vec<ChatMessageView>, u32) {
+async fn wait_sync(rx: &mut EventReceiver, channel: u32) -> (Vec<ChatMessageView>, u32) {
     let mut synced = Vec::new();
     let added = wait_for(rx, "history sync", |e| match e {
         EngineEvent::HistorySynced {
@@ -88,7 +88,7 @@ async fn wait_sync(
     (synced, added)
 }
 
-async fn start_engine(dir: &Path, name: &str) -> (Engine, UnboundedReceiver<EngineEvent>) {
+async fn start_engine(dir: &Path, name: &str) -> (Engine, EventReceiver) {
     let (engine, rx) = Engine::new(
         &dir.join("data"),
         SecretStore::in_memory(),
@@ -107,7 +107,7 @@ async fn add_server(engine: &Engine, name: &str) -> ServerView {
         .server_add(ServerFields {
             label: "test".into(),
             address: "127.0.0.1".into(),
-            port: env::PORT_V15,
+            port: common::v15(),
             username: name.into(),
             password: match env::testenv_var("SERVER_PASSWORD") {
                 Some(p) => PasswordChange::Set(p),
@@ -119,11 +119,7 @@ async fn add_server(engine: &Engine, name: &str) -> ServerView {
 }
 
 /// Connects, trusting the server certificate on first use.
-async fn connect(
-    engine: &Engine,
-    rx: &mut UnboundedReceiver<EngineEvent>,
-    server: &ServerView,
-) -> Snapshot {
+async fn connect(engine: &Engine, rx: &mut EventReceiver, server: &ServerView) -> Snapshot {
     engine.connect(server.id, None).expect("connect");
     loop {
         let event = wait_for(rx, "sync", |e| match e {
@@ -175,22 +171,50 @@ async fn late_joiner_receives_missed_lobby_messages() {
     let (b, mut b_rx) = start_engine(&dir.join("b"), &b_name).await;
     let bot = Bot::connect(BotConfig {
         data_dir: Some(dir.join("bot")),
-        ..BotConfig::new(&bot_name, env::PORT_V15)
+        ..BotConfig::new(&bot_name, common::v15())
     })
     .await
     .expect("bot");
-    bot.join("Lobby").await.expect("bot joins Lobby");
+    // A temporary channel of its own keeps other clients' chatter out of the history. Only an
+    // admin may create it; it moves its creator in and disappears when everybody has left, so
+    // the admin stays connected for the whole test.
+    let room = unique("mc-hsroom");
+    let admin = Bot::connect(BotConfig::superuser(common::v15()))
+        .await
+        .expect("SuperUser bot (SUPERUSER_PASSWORD in testenv/.env)");
+    admin
+        .handle()
+        .send_channel_state(proto::ChannelState {
+            parent: Some(0),
+            name: Some(room.clone()),
+            temporary: Some(true),
+            ..Default::default()
+        })
+        .expect("create channel");
+    admin
+        .wait_user("SuperUser", &in_channel(&room))
+        .await
+        .expect("room created");
+    // The bot learns of the new channel a moment after the admin did.
+    for _ in 0..50 {
+        if bot.channel_id(&room).is_ok() {
+            break;
+        }
+        tokio::time::sleep(Duration::from_millis(100)).await;
+    }
+    bot.join(&room).await.expect("bot joins the room");
 
-    // A stays in Lobby while messages are sent; one private message too.
+    // A stays in the room while messages are sent; one private message too.
     let a_server = add_server(&a, &a_name).await;
     let snapshot = connect(&a, &mut a_rx, &a_server).await;
-    let lobby = channel(&snapshot, "Lobby");
-    a.join_channel(lobby).expect("A joins Lobby");
-    bot.wait_user(&a_name, &in_channel("Lobby"))
+    let lobby = channel(&snapshot, &room);
+    a.join_channel(only_server(&a), lobby)
+        .expect("A joins the room");
+    bot.wait_user(&a_name, &in_channel(&room))
         .await
-        .expect("A in Lobby");
+        .expect("A in the room");
     for body in ["first missed", "second missed", "third missed"] {
-        bot.send_channel(Some("Lobby"), body).expect("send");
+        bot.send_channel(Some(&room), body).expect("send");
         wait_message(&mut a_rx, body).await;
     }
     bot.send_private(&a_name, "private psst").expect("pm");
@@ -201,7 +225,8 @@ async fn late_joiner_receives_missed_lobby_messages() {
     // B joins later and gets the missed messages from A's history, in order.
     let b_server = add_server(&b, &b_name).await;
     connect(&b, &mut b_rx, &b_server).await;
-    b.join_channel(lobby).expect("B joins Lobby");
+    b.join_channel(only_server(&b), lobby)
+        .expect("B joins the room");
     let (synced, added) = wait_sync(&mut b_rx, lobby).await;
     let bodies: Vec<&str> = synced.iter().map(|m| m.body.as_str()).collect();
     assert_eq!(bodies, ["first missed", "second missed", "third missed"]);
@@ -215,6 +240,7 @@ async fn late_joiner_receives_missed_lobby_messages() {
     // The stored copies keep their origin, so the marker survives reopening the chat.
     let stored = b
         .history_load(
+            only_server(&b),
             mumcord_engine::ConversationRef::Channel { channel_id: lobby },
             None,
             50,
@@ -229,10 +255,11 @@ async fn late_joiner_receives_missed_lobby_messages() {
     );
 
     // A message after B's join arrives live and is not synced again by "load earlier".
-    bot.send_channel(Some("Lobby"), "live after join")
+    bot.send_channel(Some(&room), "live after join")
         .expect("send");
     wait_message(&mut b_rx, "live after join").await;
-    b.history_sync_request(lobby, None).expect("load earlier");
+    b.history_sync_request(only_server(&b), lobby, None)
+        .expect("load earlier");
     let (again, added) = wait_sync(&mut b_rx, lobby).await;
     assert!(again.is_empty(), "nothing new: {again:?}");
     assert_eq!(added, 0);
@@ -243,11 +270,21 @@ async fn late_joiner_receives_missed_lobby_messages() {
     a.update_settings(settings).await.expect("save");
     b.history_clear(mumcord_engine::HistoryScope::All)
         .expect("clear B");
-    b.history_sync_request(lobby, None).expect("load earlier");
+    b.history_sync_request(only_server(&b), lobby, None)
+        .expect("load earlier");
     let (none, added) = wait_sync(&mut b_rx, lobby).await;
     assert!(none.is_empty());
     assert_eq!(added, 0);
 
-    a.disconnect();
-    b.disconnect();
+    a.disconnect(only_server(&a));
+    b.disconnect(only_server(&b));
+}
+
+/// The test's only connected server (0, which no call accepts, when none is).
+fn only_server(engine: &Engine) -> mumcord_engine::ServerId {
+    engine
+        .connections()
+        .first()
+        .and_then(mumcord_engine::ConnState::server_id)
+        .unwrap_or(0)
 }

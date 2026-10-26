@@ -2,7 +2,7 @@
 //!
 //! The session task calls these hooks; B14 adds its module calls here instead of touching
 //! the connection lifecycle. Use [`SessionCtx`] for the protocol handle, the store and event
-//! output, and `Engine::session_ctx` from commands.
+//! output, and `Engine::session_ctx_for` from commands.
 
 use mumcord_protocol::Event;
 

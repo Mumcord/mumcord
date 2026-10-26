@@ -337,7 +337,8 @@ impl Engine {
         } else {
             None
         };
-        let ctx = self.session_ctx().ok();
+        // Positional audio always refers to the voice server (FR-2.2).
+        let ctx = self.voice_ctx();
         let own = ctx
             .as_ref()
             .and_then(|ctx| ctx.handle.with_state(|s| s.session));
@@ -351,8 +352,8 @@ impl Engine {
             self.events()
                 .emit(EngineEvent::PositionalStatusChanged(positional.status()));
         }
-        if let Some((session, sending)) = applied.own_sending {
-            self.events()
+        if let (Some((session, sending)), Some(ctx)) = (applied.own_sending, &ctx) {
+            ctx.events
                 .emit(EngineEvent::PositionalSendingChanged { session, sending });
         }
     }

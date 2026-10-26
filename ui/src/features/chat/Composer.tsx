@@ -1,6 +1,7 @@
 /**
  * Message input: Markdown with a formatting toolbar and shortcuts, Enter to send (Shift+Enter for a new line), images (one or
  * several) by button, paste or drop into an attachment tray, and inline errors such as a denied permission or a too-large image.
+ * While replying (FR-2.60) a preview of the quoted message sits above the input; × or Escape cancels it.
  */
 import {
   useEffect,
@@ -19,6 +20,7 @@ import { isFileDrag } from "../../app/nativeDrag";
 import { selfUser, useServerSelector } from "../channels";
 import { useAvatars } from "../members/useAvatars";
 import type { SendTarget } from "./conversationInfo";
+import { ChatActionRow } from "./ChatActionRow";
 import { AttachmentTray } from "./AttachmentTray";
 import { hasNativeFileDrop, isOverRect, onNativeFileDrop } from "./fileDrop";
 import { FormatToolbar } from "./FormatToolbar";
@@ -33,6 +35,7 @@ import {
   type MentionQuery,
 } from "./mentions";
 import { MentionPicker } from "./MentionPicker";
+import type { ReplyQuote } from "./reply";
 import { useComposer } from "./useComposer";
 
 export interface ComposerProps {
@@ -44,6 +47,9 @@ export interface ComposerProps {
   blockedReason: string | null;
   /** The link-previews privacy switch: off means the GIF picker loads nothing from the web. */
   linkPreviews?: boolean;
+  /** The message being replied to, shown as a preview and quoted in the sent message. */
+  reply?: ReplyQuote | null;
+  onCancelReply?: () => void;
 }
 
 function Icon({ d }: { d: string }) {
@@ -56,6 +62,7 @@ function Icon({ d }: { d: string }) {
 
 const IMAGE_ICON = "M4 5h16v14H4zM4 16l5-5 4 4 3-3 4 4M15 9h.01";
 const SEND_ICON = "M4 12l16-8-6 16-2-7z";
+const CANCEL_ICON = "M6 6l12 12M18 6L6 18";
 
 export function Composer({
   target,
@@ -63,9 +70,11 @@ export function Composer({
   label,
   blockedReason,
   linkPreviews = false,
+  reply = null,
+  onCancelReply,
 }: ComposerProps) {
   const { t } = useTranslation("chat");
-  const composer = useComposer(target, limits);
+  const composer = useComposer(target, limits, reply, onCancelReply);
   const fileInput = useRef<HTMLInputElement>(null);
   const formRef = useRef<HTMLFormElement>(null);
   const input = useRef<HTMLTextAreaElement>(null);
@@ -206,8 +215,18 @@ export function Composer({
     return true;
   }
 
+  // Choosing "Reply" moves straight to the input.
+  useEffect(() => {
+    if (reply !== null) input.current?.focus();
+  }, [reply]);
+
   function onKeyDown(event: KeyboardEvent<HTMLTextAreaElement>) {
     if (onPickerKey(event)) return;
+    if (event.key === "Escape" && reply !== null && onCancelReply) {
+      event.preventDefault();
+      onCancelReply();
+      return;
+    }
     if (
       event.key === "Backspace" &&
       composer.text === "" &&
@@ -228,7 +247,7 @@ export function Composer({
     }
     if (event.key === "Enter" && !event.shiftKey && !event.nativeEvent.isComposing) {
       event.preventDefault();
-      void composer.submit();
+      composer.submit();
     }
   }
 
@@ -274,106 +293,128 @@ export function Composer({
   }
 
   return (
-    // Dragging only marks the composer as a drop target; the keyboard path is the image button.
-    // eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions
-    <form
-      ref={formRef}
-      className="chat-composer"
-      data-dragging={dragging || nativeOver ? "true" : undefined}
-      onDragEnter={onDragEnter}
-      onDragLeave={onDragLeave}
-      onDragOver={onDragOver}
-      onDrop={onDrop}
-      onSubmit={(event) => {
-        event.preventDefault();
-        void composer.submit();
-      }}
-    >
-      {blockedReason ? <p className="chat-composer__blocked">{blockedReason}</p> : null}
-      {composer.error ? (
-        <p id={errorId} className="chat-composer__error" role="alert">
-          {composer.error}
+    <>
+      {/* Dragging only marks the composer as a drop target; the keyboard path is the image button. */}
+      {/* eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions */}
+      <form
+        ref={formRef}
+        className="chat-composer"
+        data-dragging={dragging || nativeOver ? "true" : undefined}
+        onDragEnter={onDragEnter}
+        onDragLeave={onDragLeave}
+        onDragOver={onDragOver}
+        onDrop={onDrop}
+        onSubmit={(event) => {
+          event.preventDefault();
+          composer.submit();
+        }}
+      >
+        {blockedReason ? <p className="chat-composer__blocked">{blockedReason}</p> : null}
+        {composer.error ? (
+          <p id={errorId} className="chat-composer__error" role="alert">
+            {composer.error}
+          </p>
+        ) : null}
+        {reply !== null ? (
+          <div className="chat-composer__reply">
+            <span className="chat-composer__reply-text">
+              {t("reply.replyingTo")} <span className="chat-reply__name">{reply.name}</span>
+              {": "}
+              {reply.snippet}
+            </span>
+            {onCancelReply ? (
+              <button
+                type="button"
+                className="chat-composer__reply-cancel"
+                aria-label={t("reply.cancel")}
+                data-tooltip={t("reply.cancel")}
+                onClick={() => {
+                  onCancelReply();
+                  input.current?.focus();
+                }}
+              >
+                <Icon d={CANCEL_ICON} />
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+        <AttachmentTray items={composer.attachments} onRemove={composer.removeAttachment} />
+        {pickerOpen ? (
+          <MentionPicker
+            id={pickerId}
+            candidates={candidates}
+            active={activeIndex}
+            avatarOf={avatarOf}
+            onPick={pick}
+          />
+        ) : null}
+        <p className="visually-hidden" role="status">
+          {pickerOpen ? t("mention.found", { count: candidates.length }) : ""}
         </p>
-      ) : null}
-      <AttachmentTray items={composer.attachments} onRemove={composer.removeAttachment} />
-      {pickerOpen ? (
-        <MentionPicker
-          id={pickerId}
-          candidates={candidates}
-          active={activeIndex}
-          avatarOf={avatarOf}
-          onPick={pick}
-        />
-      ) : null}
-      <p className="visually-hidden" role="status">
-        {pickerOpen ? t("mention.found", { count: candidates.length }) : ""}
-      </p>
-      <FormatToolbar onFormat={format} disabled={disabled} />
-      <div className="chat-composer__row">
-        <button
-          type="button"
-          className="chat-composer__icon"
-          aria-label={t("composer.addImage")}
-          title={t("composer.addImage")}
-          disabled={disabled || composer.busy}
-          onClick={() => fileInput.current?.click()}
-        >
-          <Icon d={IMAGE_ICON} />
-        </button>
-        <GifPicker
-          onSend={composer.sendLink}
-          disabled={disabled || composer.busy}
-          linkPreviews={linkPreviews}
-        />
-        <input
-          ref={fileInput}
-          type="file"
-          accept="image/png,image/jpeg,image/gif,image/webp"
-          hidden
-          multiple
-          onChange={(event) => {
-            composer.addFiles(Array.from(event.currentTarget.files ?? []));
-            event.currentTarget.value = "";
-          }}
-        />
-        <textarea
-          ref={input}
-          role={pickerOpen ? "combobox" : undefined}
-          aria-expanded={pickerOpen ? true : undefined}
-          aria-controls={pickerOpen ? pickerId : undefined}
-          aria-activedescendant={pickerOpen ? optionId(pickerId, activeIndex) : undefined}
-          aria-autocomplete={pickerOpen ? "list" : undefined}
-          className="chat-composer__input"
-          rows={1}
-          aria-label={label}
-          aria-describedby={composer.error ? `${hintId} ${errorId}` : hintId}
-          placeholder={label}
-          value={composer.text}
-          disabled={disabled}
-          onChange={(event) => {
-            composer.setText(event.target.value);
-            setCaret(event.target.selectionStart);
-            setActive(0);
-          }}
-          onSelect={(event) => {
-            setCaret(event.currentTarget.selectionStart);
-          }}
-          onKeyDown={onKeyDown}
-          onPaste={onPaste}
-        />
-        <button
-          type="submit"
-          className="chat-composer__icon"
-          aria-label={t("composer.send")}
-          title={t("composer.send")}
-          disabled={disabled || composer.busy}
-        >
-          <Icon d={SEND_ICON} />
-        </button>
-      </div>
-      <p id={hintId} className="visually-hidden">
-        {t("composer.hint")}
-      </p>
-    </form>
+        <FormatToolbar onFormat={format} disabled={disabled} />
+        <div className="chat-composer__row">
+          <ChatActionRow />
+          <button
+            type="button"
+            className="chat-composer__icon"
+            aria-label={t("composer.addImage")}
+            data-tooltip={t("composer.addImage")}
+            disabled={disabled}
+            onClick={() => fileInput.current?.click()}
+          >
+            <Icon d={IMAGE_ICON} />
+          </button>
+          <GifPicker onSend={composer.sendLink} disabled={disabled} linkPreviews={linkPreviews} />
+          <input
+            ref={fileInput}
+            type="file"
+            accept="image/png,image/jpeg,image/gif,image/webp"
+            hidden
+            multiple
+            onChange={(event) => {
+              composer.addFiles(Array.from(event.currentTarget.files ?? []));
+              event.currentTarget.value = "";
+            }}
+          />
+          <textarea
+            ref={input}
+            role={pickerOpen ? "combobox" : undefined}
+            aria-expanded={pickerOpen ? true : undefined}
+            aria-controls={pickerOpen ? pickerId : undefined}
+            aria-activedescendant={pickerOpen ? optionId(pickerId, activeIndex) : undefined}
+            aria-autocomplete={pickerOpen ? "list" : undefined}
+            className="chat-composer__input"
+            rows={1}
+            aria-label={label}
+            aria-describedby={composer.error ? `${hintId} ${errorId}` : hintId}
+            placeholder={label}
+            value={composer.text}
+            disabled={disabled}
+            onChange={(event) => {
+              composer.setText(event.target.value);
+              setCaret(event.target.selectionStart);
+              setActive(0);
+            }}
+            onSelect={(event) => {
+              setCaret(event.currentTarget.selectionStart);
+            }}
+            onKeyDown={onKeyDown}
+            onPaste={onPaste}
+          />
+          <button
+            type="submit"
+            className="chat-composer__icon"
+            aria-label={t("composer.send")}
+            data-tooltip={t("composer.send")}
+            disabled={disabled}
+          >
+            <Icon d={SEND_ICON} />
+          </button>
+        </div>
+        <p id={hintId} className="visually-hidden">
+          {t("composer.hint")}
+        </p>
+      </form>
+    </>
   );
 }

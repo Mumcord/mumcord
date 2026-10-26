@@ -21,6 +21,8 @@ import { DiagnosticsSection } from "./sections/DiagnosticsSection";
 import { IdentitySection } from "./sections/IdentitySection";
 import { LanguageSection } from "./sections/LanguageSection";
 import { OverlaySection } from "./sections/OverlaySection";
+import { PrivacySection } from "./sections/PrivacySection";
+import { ServersSection } from "./sections/ServersSection";
 import { SoundsSection } from "./sections/SoundsSection";
 import { VoiceSection } from "./sections/VoiceSection";
 import { SettingsNavigationContext, type SettingsNavigation } from "./settingsNavigation";
@@ -55,6 +57,10 @@ function renderSection(id: SectionId, settings: Settings, update: UpdateSettings
   switch (id) {
     case "identity":
       return <IdentitySection {...props} />;
+    case "servers":
+      return <ServersSection {...props} />;
+    case "privacy":
+      return <PrivacySection {...props} />;
     case "audio":
       return <AudioSection {...props} />;
     case "voice":
@@ -74,16 +80,16 @@ function renderSection(id: SectionId, settings: Settings, update: UpdateSettings
     case "diagnostics":
       return <DiagnosticsSection {...props} />;
     case "about":
-      return <AboutSection />;
+      return <AboutSection {...props} />;
   }
 }
 
 /**
  * Settings content of the settings overlay (FR-1.39): a search field and a vertical list of
  * sections on the left (one Tab stop, arrow keys move) and the selected section on the right.
- * Both columns scroll on their own. Every change is saved immediately.
+ * `initialSection` picks the section shown first. Both columns scroll on their own. Every change is saved immediately.
  */
-export function SettingsScreen() {
+export function SettingsScreen({ initialSection }: { initialSection?: SectionId }) {
   const { t } = useTranslation("settings");
   const baseId = useId();
   const { settings, loadFailed, saveFailed, update } = useSettings();
@@ -91,7 +97,7 @@ export function SettingsScreen() {
   const macos = useIsMacos();
   const hidden = useMemo<readonly SectionId[]>(() => (macos ? ["overlay"] : []), [macos]);
   const sections = useMemo(() => SECTION_IDS.filter((id) => !hidden.includes(id)), [hidden]);
-  const [active, setActive] = useState<SectionId>("identity");
+  const [active, setActive] = useState<SectionId>(initialSection ?? "identity");
   const tabs = useRef(new Map<SectionId, HTMLButtonElement>());
   const [hostElement, setHostElement] = useState<HTMLDivElement | null>(null);
   const { dialogContext, blocking } = useDialogHost(hostElement);
@@ -104,10 +110,6 @@ export function SettingsScreen() {
   const panelRef = useRef<HTMLDivElement>(null);
   const navigation = useMemo<SettingsNavigation>(
     () => ({
-      showCompatibilityMode: () => {
-        setCompatibilityFocusPending(true);
-        setActive("voice");
-      },
       compatibilityFocusPending,
       compatibilityFocused: () => {
         setCompatibilityFocusPending(false);

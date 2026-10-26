@@ -3,10 +3,6 @@
   "inChannel_few": "Kanale {{channel}} ({{count}})",
   "inChannel_many": "Kanale {{channel}} ({{count}})",
   "inChannel_other": "Kanale {{channel}} ({{count}})",
-  "listening_one": "Klauso ({{count}})",
-  "listening_few": "Klauso ({{count}})",
-  "listening_many": "Klauso ({{count}})",
-  "listening_other": "Klauso ({{count}})",
   "noChannel": "Pasirink kanalą, kad pamatytum, kas jame yra.",
   "nobody": "Čia nieko nėra.",
   "nobodyElse": "Serveryje daugiau nieko nėra.",
@@ -15,6 +11,26 @@
   "registered": "Registruotas (-a)",
   "unregistered": "Neregistruotas (-a)",
   "talking": "Kalba",
+  "quality": {
+    "label": "Ryšys",
+    "summary": "Ryšys: {{level}}",
+    "level": {
+      "good": "Geras",
+      "fair": "Vidutinis",
+      "weak": "Silpnas",
+      "unknown": "Nežinomas"
+    },
+    "ping": "Ping",
+    "loss": "Paketų praradimas",
+    "late": "Pavėlavę paketai",
+    "bandwidth": "Pralaidumas",
+    "transport": "Balso perdavimas",
+    "client": "Klientas",
+    "os": "Operacinė sistema",
+    "ms": "{{value}} ms",
+    "percent": "{{value}} %",
+    "kbps": "{{value}} kbit/s"
+  },
   "card": {
     "close": "Uždaryti",
     "loadFailed": "Nepavyko įkelti profilio.",
@@ -26,6 +42,9 @@
     "privateMessage": "Privati žinutė",
     "localSettings": "Tavo nustatymai",
     "localSettingsHint": "Tai mato tik tu. Pakeitimai įrašomi iškart.",
+    "settingsFor": "{{name}} nustatymai",
+    "hintMuted": "Nutildyta",
+    "hintVolume": "Garsumas {{value}} %",
     "localMuteHint": "Šio žmogaus negirdėsi.",
     "privateNote": "Privati pastaba",
     "privateNoteHint": "Šią pastabą mato tik tu.",
@@ -40,7 +59,8 @@
     "viewProfile": "Peržiūrėti profilį",
     "join": "Prisijungti prie {{channel}}",
     "joinDenied": "Neturite teisės įeiti į šį kanalą.",
-    "mute": "Nutildyti man"
+    "mute": "Nutildyti man",
+    "connectionInfo": "Ryšio informacija…"
   },
   "nowPlaying": {
     "label": "Dabar groja",

@@ -30,6 +30,39 @@ impl Bot {
         self.set_acl(channel, Vec::new()).await
     }
 
+    /// Denies "Text message" for everyone on `channel` and its subchannels (FR-2.47). Replaces
+    /// the channel's own ACL.
+    pub async fn deny_text(&self, channel: &str) -> Result<()> {
+        self.deny_for_everyone(channel, permissions::TEXT_MESSAGE)
+            .await
+    }
+
+    /// Removes the channel's own ACL entries again (back to inheriting from the parent).
+    pub async fn allow_text(&self, channel: &str) -> Result<()> {
+        self.set_acl(channel, Vec::new()).await
+    }
+
+    /// Lets only holders of the access token `token` enter `channel` (a channel password,
+    /// FR-2.78): denies "Enter" for everyone, then grants it to the token group `#<token>`.
+    /// Replaces the channel's own ACL.
+    pub async fn require_token(&self, channel: &str, token: &str) -> Result<()> {
+        let entry = |group: String, grant: u32, deny: u32| proto::acl::ChanAcl {
+            apply_here: Some(true),
+            apply_subs: Some(true),
+            inherited: Some(false),
+            user_id: None,
+            group: Some(group),
+            grant: Some(grant),
+            deny: Some(deny),
+        };
+        // Later entries win, so the token grant overrides the deny for everyone.
+        let acls = vec![
+            entry("all".to_owned(), 0, permissions::ENTER),
+            entry(format!("#{token}"), permissions::ENTER, 0),
+        ];
+        self.set_acl(channel, acls).await
+    }
+
     async fn deny_for_everyone(&self, channel: &str, permission: u32) -> Result<()> {
         let deny = proto::acl::ChanAcl {
             apply_here: Some(true),

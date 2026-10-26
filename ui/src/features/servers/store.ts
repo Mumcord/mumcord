@@ -12,6 +12,7 @@ import {
   type ApiError,
   type CertTrustRequired,
   type ConnectionState,
+  type DeepLinkOpened,
   type MumbleLink,
   type MumcordApi,
   type SavedServer,
@@ -19,13 +20,14 @@ import {
   type Unsubscribe,
 } from "../../api";
 import { i18n } from "../../i18n";
+import { getShownServerId, showServer, subscribeServerChanges } from "../channels/serverStore";
 
 /** A dialog the server feature should show; rendered by the server bar mount. */
 export type DialogRequest =
   | { kind: "add"; link: MumbleLink | null }
   | { kind: "edit"; serverId: number }
   | { kind: "remove"; serverId: number }
-  | { kind: "switch"; serverId: number; channelPath: string[] | null };
+  | { kind: "theme"; serverId: number };
 
 /** Why the last connection ended without the user asking for it. */
 export interface ConnectionEnd {
@@ -35,30 +37,52 @@ export interface ConnectionEnd {
   afterLoss: boolean;
 }
 
-export type ActionContext = "reorder" | "remove" | "disconnect";
+export type ActionContext =
+  "reorder" | "remove" | "disconnect" | "alwaysConnect" | "notifications" | "savePassword";
+
+/** A server whose connect was refused for a wrong password; the retry dialog is open (FR-2.59). */
+export interface PasswordPrompt {
+  serverId: number;
+  /** A retry with a typed password was refused again. */
+  wrong: boolean;
+  /** The retry is under way; the dialog waits for its outcome. */
+  busy: boolean;
+}
 
 export interface ServersState {
   ready: boolean;
   servers: SavedServer[];
   identityName: string;
+  /** Connection of the shown server, or of the server that changed last while none is shown. */
   connection: ConnectionState;
+  /** Every server that is not disconnected (FR-2.1). */
+  connections: ReadonlyMap<number, ConnectionState>;
   transport: "udp" | "tcp" | null;
   ended: ConnectionEnd | null;
   actionError: { context: ActionContext; error: ApiError } | null;
+  /** Servers waiting for a password, in the order they failed; the dialog shows the first. */
+  passwordPrompts: readonly PasswordPrompt[];
   certPrompt: CertTrustRequired | null;
   dialog: DialogRequest | null;
+  /** The connected-servers limit, read from the settings when the engine refused one (FR-2.1). */
+  serverLimit: number | null;
 }
+
+const DISCONNECTED: ConnectionState = { state: "disconnected", error: null };
 
 const INITIAL: ServersState = {
   ready: false,
   servers: [],
   identityName: "",
   connection: { state: "disconnected", error: null },
+  connections: new Map(),
   transport: null,
   ended: null,
   actionError: null,
+  passwordPrompts: [],
   certPrompt: null,
   dialog: null,
+  serverLimit: null,
 };
 
 interface Store {
@@ -69,7 +93,7 @@ interface Store {
   /** Set once an engine connection event arrived, so the initial query can't overwrite it. */
   connectionSeen: boolean;
   /** A link opened before the saved servers were loaded; handled once they are. */
-  pendingLink: MumbleLink | null;
+  pendingLink: DeepLinkOpened | null;
 }
 
 let store: Store | null = null;
@@ -95,22 +119,80 @@ function serverName(state: ServersState, id: number): string {
   return server ? server.label || server.address : t("unknownServer");
 }
 
-function onConnection(next: ConnectionState): void {
+/**
+ * Typed passwords to save once their connect succeeded (FR-2.59). Kept out of the state so no
+ * listener or devtool sees them; dropped when the connect fails or the user cancels.
+ */
+const passwordsToSave = new Map<number, string>();
+
+function withoutPrompt(prompts: readonly PasswordPrompt[], serverId: number): PasswordPrompt[] {
+  return prompts.filter((p) => p.serverId !== serverId);
+}
+
+/** Opens or reopens the retry dialog; an automatic reconnect never does (FR-2.8). */
+function promptPassword(state: ServersState, serverId: number): PasswordPrompt[] {
+  passwordsToSave.delete(serverId);
+  const index = state.passwordPrompts.findIndex((p) => p.serverId === serverId);
+  const prompt = {
+    serverId,
+    wrong: state.passwordPrompts[index]?.busy ?? false,
+    busy: false,
+  };
+  if (index < 0) return [...state.passwordPrompts, prompt];
+  return state.passwordPrompts.map((p, i) => (i === index ? prompt : p));
+}
+
+async function savePassword(serverId: number, password: string): Promise<void> {
+  const { api, state } = ensure();
+  const server = state.servers.find((s) => s.id === serverId);
+  if (!server) return;
+  try {
+    replaceServer(
+      await api.serverUpdate(serverId, {
+        label: server.label,
+        address: server.address,
+        port: server.port,
+        username: server.username,
+        password: { kind: "set", value: password },
+      }),
+    );
+  } catch (error) {
+    console.error("Saving the new server password failed");
+    setState({ actionError: { context: "savePassword", error: toApiError(error) } });
+  }
+}
+
+function onConnection(serverId: number, next: ConnectionState): void {
   if (!store) return;
   store.connectionSeen = true;
   const state = store.state;
-  const prev = state.connection;
-  const patch: Partial<ServersState> = { connection: next };
+  const prev = state.connections.get(serverId) ?? DISCONNECTED;
+  const connections = new Map(state.connections);
+  if (next.state === "disconnected") connections.delete(serverId);
+  else connections.set(serverId, next);
+  const shown = getShownServerId();
+  const showsThis = shown === null || shown === serverId || !connections.has(shown);
+  const patch: Partial<ServersState> = {
+    connections,
+    ...(showsThis ? { connection: next } : {}),
+  };
   switch (next.state) {
     case "connecting":
       patch.ended = null;
       patch.transport = null;
       // The status bar (role="status") already says "Connecting to …".
       break;
-    case "connected":
+    case "connected": {
       patch.ended = null;
+      patch.passwordPrompts = withoutPrompt(state.passwordPrompts, serverId);
+      const typed = passwordsToSave.get(serverId);
+      if (typed !== undefined) {
+        passwordsToSave.delete(serverId);
+        void savePassword(serverId, typed);
+      }
       announce(t("announce.connected", { server: serverName(state, next.serverId) }));
       break;
+    }
     case "reconnecting":
       if (prev.state !== "reconnecting") {
         announce(t("announce.lost", { server: serverName(state, next.serverId) }), "assertive");
@@ -121,6 +203,16 @@ function onConnection(next: ConnectionState): void {
       patch.certPrompt = null;
       const prevServer = prev.state === "disconnected" ? null : prev.serverId;
       const afterLoss = prev.state === "reconnecting";
+      if (
+        prevServer !== null &&
+        prev.state === "connecting" &&
+        next.error?.code === "wrongPassword"
+      ) {
+        patch.passwordPrompts = promptPassword(state, prevServer);
+      } else if (prevServer !== null) {
+        passwordsToSave.delete(prevServer);
+        patch.passwordPrompts = withoutPrompt(state.passwordPrompts, prevServer);
+      }
       if (prevServer !== null && (next.error !== null || afterLoss)) {
         patch.ended = { serverId: prevServer, error: next.error, afterLoss };
         announce(t("announce.ended", { server: serverName(state, prevServer) }), "assertive");
@@ -151,8 +243,8 @@ function start(api: MumcordApi): Store {
   };
   store = created;
   created.unsubscribers = [
-    api.on("connectionStateChanged", ({ state }) => {
-      onConnection(state);
+    api.on("connectionStateChanged", ({ serverId, state }) => {
+      onConnection(serverId, state);
     }),
     api.on("transportChanged", ({ transport }) => {
       onTransport(transport);
@@ -160,28 +252,38 @@ function start(api: MumcordApi): Store {
     api.on("certTrustRequired", (prompt) => {
       setState({ certPrompt: prompt });
     }),
-    api.on("deepLinkOpened", ({ link }) => {
-      openLink(link);
+    api.on("deepLinkOpened", (opened) => {
+      openLink(opened);
+    }),
+    subscribeServerChanges((change) => {
+      if (change.kind !== "shown" || store !== created) return;
+      const shown = getShownServerId();
+      const connection = shown === null ? undefined : created.state.connections.get(shown);
+      if (connection) setState({ connection });
     }),
   ];
   // A link that launched the app arrived before these listeners existed (B25).
   void api.deepLinkTakePending().then(
-    (link) => {
+    (opened) => {
       // Not tied to `created`: React StrictMode restarts the store and the link is handed out once.
-      if (link) openLink(link);
+      if (opened) openLink(opened);
     },
     (error: unknown) => {
       console.error("Reading the start link failed", error);
     },
   );
-  void Promise.all([api.serversList(), api.connectionState(), api.identityGet()]).then(
-    ([servers, connection, identity]) => {
+  void Promise.all([api.serversList(), api.connectionsList(), api.identityGet()]).then(
+    ([servers, connections, identity]) => {
       if (store !== created) return;
+      const shown = getShownServerId();
+      const map = new Map(connections.map((c) => [c.serverId, c.state]));
+      const connection =
+        (shown === null ? undefined : map.get(shown)) ?? connections[0]?.state ?? DISCONNECTED;
       setState({
         ready: true,
         servers,
         identityName: identity?.name ?? "",
-        ...(created.connectionSeen ? {} : { connection }),
+        ...(created.connectionSeen ? {} : { connection, connections: map }),
       });
       takePendingLink(created);
     },
@@ -196,9 +298,9 @@ function start(api: MumcordApi): Store {
 }
 
 function takePendingLink(current: Store): void {
-  const link = current.pendingLink;
+  const opened = current.pendingLink;
   current.pendingLink = null;
-  if (link) openLink(link);
+  if (opened) openLink(opened);
 }
 
 function stop(): void {
@@ -235,6 +337,11 @@ export function useServers(): ServersState {
   return useSyncExternalStore(subscribe, getSnapshot);
 }
 
+/** The limit read with the last `serverLimitReached` refusal, `null` if unknown. */
+export function getServerLimit(): number | null {
+  return getSnapshot().serverLimit;
+}
+
 // --- actions ---
 
 export function openDialog(dialog: DialogRequest): void {
@@ -266,9 +373,9 @@ export async function updateServer(id: number, input: ServerInput): Promise<Save
 
 export async function removeServer(id: number): Promise<void> {
   const { api } = ensure();
-  const { connection, servers } = getSnapshot();
+  const { connections, servers } = getSnapshot();
   try {
-    if (connection.state !== "disconnected" && connection.serverId === id) await api.disconnect();
+    if (connections.has(id)) await api.disconnect(id);
     await api.serverRemove(id);
     const ended = getSnapshot().ended;
     setState({
@@ -305,52 +412,160 @@ export async function moveServer(id: number, toIndex: number): Promise<void> {
   }
 }
 
-async function connectNow(serverId: number, channelPath: string[] | null): Promise<void> {
+/**
+ * Converts an engine error; for a refusal over the connected-servers limit it first reads the
+ * limit, so the message can name it (FR-2.1).
+ */
+async function describeError(error: unknown): Promise<ApiError> {
+  return withLimit(toApiError(error));
+}
+
+async function withLimit(apiError: ApiError): Promise<ApiError> {
+  if (apiError.code !== "serverLimitReached") return apiError;
+  try {
+    const settings = await ensure().api.settingsGet();
+    setState({ serverLimit: settings.maxConnectedServers });
+  } catch (settingsError) {
+    console.error("Reading the connected-servers limit failed", settingsError);
+    setState({ serverLimit: null });
+  }
+  return apiError;
+}
+
+/** Starts connecting; false when the engine refused. */
+async function connectNow(serverId: number, channelPath: string[] | null): Promise<boolean> {
   const { api } = ensure();
   setState({ ended: null, actionError: null });
   try {
-    await api.connect(serverId, channelPath);
+    await api.connect(serverId, channelPath, null);
+    return true;
   } catch (error) {
-    setState({ ended: { serverId, error: toApiError(error), afterLoss: false } });
+    const apiError = await describeError(error);
+    setState({ ended: { serverId, error: apiError, afterLoss: false } });
+    return false;
   }
 }
 
 /**
- * Connects to a saved server. Only one server can be connected (FR-1.9): while another one is
- * active, the user is asked to switch first.
+ * Shows a saved server, connecting it (read-only) first if it is not connected (FR-2.6). Other
+ * connected servers stay connected; the engine refuses a connect beyond the limit (FR-2.1).
  */
 export function requestConnect(serverId: number, channelPath: string[] | null = null): void {
-  const { connection } = ensure().state;
-  if (connection.state !== "disconnected") {
-    if (connection.serverId === serverId) return;
-    setState({ dialog: { kind: "switch", serverId, channelPath } });
+  if (ensure().state.connections.has(serverId)) {
+    showServer(serverId);
     return;
   }
-  void connectNow(serverId, channelPath);
+  void connectNow(serverId, channelPath).then((connected) => {
+    if (connected) showServer(serverId);
+  });
 }
 
-/** Confirmed switch: the engine disconnects the current server before connecting. */
-export function confirmSwitch(serverId: number, channelPath: string[] | null): void {
-  setState({ dialog: null });
-  void connectNow(serverId, channelPath);
-}
-
-export async function disconnect(): Promise<void> {
+/**
+ * Disconnects one server, by default the shown one (FR-2.9); the other servers stay connected.
+ */
+export async function disconnect(serverId?: number): Promise<void> {
   const { api } = ensure();
+  const { connection } = getSnapshot();
+  const id = serverId ?? (connection.state === "disconnected" ? null : connection.serverId);
+  if (id === null) return;
   try {
-    await api.disconnect();
+    await api.disconnect(id);
   } catch (error) {
     setState({ actionError: { context: "disconnect", error: toApiError(error) } });
+  }
+}
+
+function replaceServer(server: SavedServer): void {
+  setState({ servers: getSnapshot().servers.map((s) => (s.id === server.id ? server : s)) });
+}
+
+/**
+ * Saves the "Always connect at start" flag (FR-2.7). Throws the engine's error, e.g.
+ * `serverLimitReached` when more servers would be marked than the limit allows (the limit is
+ * then in `serverLimit`).
+ */
+export async function saveAlwaysConnect(serverId: number, enabled: boolean): Promise<void> {
+  const { api } = ensure();
+  try {
+    replaceServer(await api.serverSetAlwaysConnect(serverId, enabled));
+  } catch (error) {
+    await describeError(error);
+    throw error;
+  }
+}
+
+/** The menu's "Always connect at start" switch; a refusal shows in the status bar. */
+export async function toggleAlwaysConnect(serverId: number, enabled: boolean): Promise<void> {
+  setState({ actionError: null });
+  try {
+    await saveAlwaysConnect(serverId, enabled);
+  } catch (error) {
+    setState({ actionError: { context: "alwaysConnect", error: toApiError(error) } });
+  }
+}
+
+/** Sets the theme shown with the server; `null` means the app theme (FR-2.17). Throws the engine's error. */
+export async function saveServerTheme(serverId: number, themeId: string | null): Promise<void> {
+  const { api } = ensure();
+  replaceServer(await api.serverSetTheme(serverId, themeId));
+}
+
+/** The menu's "Mute notifications" switch (FR-2.10); badges keep updating. */
+export async function toggleNotificationsMuted(serverId: number, muted: boolean): Promise<void> {
+  const { api } = ensure();
+  setState({ actionError: null });
+  try {
+    replaceServer(await api.serverSetNotificationsMuted(serverId, muted));
+  } catch (error) {
+    setState({ actionError: { context: "notifications", error: toApiError(error) } });
   }
 }
 
 export async function cancelReconnect(): Promise<void> {
   const { api } = ensure();
+  const { connection } = getSnapshot();
+  if (connection.state === "disconnected") return;
   try {
-    await api.reconnectCancel();
+    await api.reconnectCancel(connection.serverId);
   } catch (error) {
     setState({ actionError: { context: "disconnect", error: toApiError(error) } });
   }
+}
+
+/**
+ * Retries a refused connect with the typed password for this connect only (FR-2.59). With
+ * `save` the saved server gets the password once the connect succeeded.
+ */
+export async function retryWithPassword(
+  serverId: number,
+  password: string,
+  save: boolean,
+): Promise<void> {
+  const { api, state } = ensure();
+  if (save) passwordsToSave.set(serverId, password);
+  else passwordsToSave.delete(serverId);
+  setState({
+    ended: null,
+    passwordPrompts: state.passwordPrompts.map((p) =>
+      p.serverId === serverId ? { ...p, busy: true } : p,
+    ),
+  });
+  try {
+    await api.connect(serverId, null, password);
+  } catch (error) {
+    passwordsToSave.delete(serverId);
+    const apiError = await describeError(error);
+    setState({
+      ended: { serverId, error: apiError, afterLoss: false },
+      passwordPrompts: withoutPrompt(ensure().state.passwordPrompts, serverId),
+    });
+  }
+}
+
+/** Closes the retry dialog; the server stays disconnected with its normal error. */
+export function cancelPasswordPrompt(serverId: number): void {
+  passwordsToSave.delete(serverId);
+  setState({ passwordPrompts: withoutPrompt(ensure().state.passwordPrompts, serverId) });
 }
 
 /** Answers a certificate prompt; trusting is remembered by the engine (FR-1.10). */
@@ -366,27 +581,34 @@ export async function decideTrust(trust: boolean): Promise<void> {
   }
 }
 
-function sameHost(a: string, b: string): boolean {
-  return a.trim().toLowerCase() === b.trim().toLowerCase();
-}
-
 /**
- * Handles a `mumble://` link (FR-1.11): connects to a matching saved server, otherwise offers to
- * save it first.
+ * Shows the result of a `mumble://` link the engine already handled (FR-1.11, FR-2.13): it
+ * connected or joined a matching server, which is now shown; an unknown server is offered for
+ * saving; a refusal is explained on the server's status.
  */
-export function openLink(link: MumbleLink): void {
+export function openLink({ link, outcome }: DeepLinkOpened): void {
   const current = ensure();
   if (!current.state.ready) {
-    current.pendingLink = link;
+    current.pendingLink = { link, outcome };
     return;
   }
-  const { servers } = current.state;
-  const match = servers.find(
-    (s) =>
-      sameHost(s.address, link.address) &&
-      s.port === link.port &&
-      (link.username === null || s.username === link.username),
-  );
-  if (match) requestConnect(match.id, link.channelPath.length > 0 ? link.channelPath : null);
-  else setState({ dialog: { kind: "add", link } });
+  switch (outcome.kind) {
+    case "shown":
+    case "connecting":
+      showServer(outcome.serverId);
+      return;
+    case "unknownServer":
+      setState({ dialog: { kind: "add", link } });
+      return;
+    case "limitReached":
+      showServer(outcome.serverId);
+      void withLimit({ code: "serverLimitReached", message: "" }).then((error) => {
+        setState({ ended: { serverId: outcome.serverId, error, afterLoss: false } });
+      });
+      return;
+    case "failed":
+      showServer(outcome.serverId);
+      setState({ ended: { serverId: outcome.serverId, error: outcome.error, afterLoss: false } });
+      return;
+  }
 }

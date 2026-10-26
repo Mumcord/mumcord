@@ -9,5 +9,17 @@
   "retry": "Mēģināt vēlreiz",
   "loading": "Ielādē…",
   "beta": "Beta",
-  "betaFeature": "Beta funkcija"
+  "betaFeature": "Beta funkcija",
+  "themePicker": {
+    "swatch": "{{name}}, motīvs",
+    "swatchSelected": "{{name}}, motīvs, atlasīts",
+    "yourThemes": "Tavi motīvi",
+    "add": "Jauns motīvs no pašreizējā",
+    "addShort": "Jauns"
+  },
+  "floatingWidget": {
+    "collapse": "Sakļaut",
+    "expand": "Izvērst",
+    "handle": "{{name}}: bultiņas pārvieto, Shift+bultiņas maina izmēru"
+  }
 }

@@ -3,7 +3,9 @@
   "tree": {
     "label": "Kanaler",
     "hint": "Enter: vis chat · Shift+Enter eller dobbeltklik: join · Piletaster: flyt, udvid, skjul",
-    "join": "Join",
+    "join": "Deltag",
+    "menuLabel": "Indstillinger for {{channel}}",
+    "showDescription": "Vis kanalbeskrivelse",
     "you": "(dig)",
     "voiceHere": "du er her (voice)",
     "people_one": "{{count}} person",
@@ -16,10 +18,11 @@
     },
     "showAll": "Vis alle ({{total}})",
     "showFewer": "Vis færre",
-    "jump": "Hop til min kanal"
+    "jump": "Hop til min kanal",
+    "locked": "låst"
   },
   "status": {
-    "listening": "lytter",
+    "listening": "lytter kun",
     "talking": "taler",
     "muted": "mikrofon slået fra",
     "deafened": "lyd slået fra",
@@ -32,7 +35,7 @@
   "mumcordBadge": "Bruger Mumcord",
   "statusTip": {
     "registered": "Registreret på denne server",
-    "listening": "Lytter til denne kanal",
+    "listening": "Lytter kun",
     "muted": "Mikrofon slået fra",
     "deafened": "Lyd slået fra",
     "serverMuted": "Slået fra af serveren",
@@ -42,6 +45,7 @@
     "unregistered": "Ikke registreret på denne server (gæst)",
     "nowPlaying": "Lytter til {{track}}",
     "nowGaming": "Spiller {{game}}",
+    "weakConnection": "Svag forbindelse – høj ping eller pakketab",
     "positional": "Positionslyd er aktiv"
   },
   "announce": {
@@ -56,7 +60,8 @@
   },
   "empty": {
     "disconnected": "Ikke forbundet. Vælg en server for at se dens kanaler.",
-    "loading": "Indlæser kanaler…"
+    "loading": "Indlæser kanaler…",
+    "syncingBig": "Synkroniserer stor server…"
   },
   "search": {
     "label": "Søg i kanaler og personer",

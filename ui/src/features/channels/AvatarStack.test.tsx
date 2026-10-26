@@ -68,7 +68,7 @@ beforeEach(async () => {
   const api = createMockApi();
   setApi(api);
   getServerState(); // binds the store before the snapshot arrives
-  await api.connect(1, null);
+  await api.connect(1, null, null);
   base = getServerState();
 });
 afterEach(resetAll);

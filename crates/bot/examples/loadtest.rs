@@ -130,6 +130,7 @@ async fn connect_user(port: u16, name: String, channel: u32) -> Result<Handle> {
         port,
         username: name.clone(),
         password: env::testenv_var("SERVER_PASSWORD").filter(|p| !p.is_empty()),
+        tokens: Vec::new(),
         identity: None,
         // Local load-test server only; its certificate is self-signed.
         verify_cert: Arc::new(|_| true),

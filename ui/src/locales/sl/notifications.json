@@ -14,5 +14,6 @@
   "image": "Poslal sliko",
   "open": "Odpri klepet",
   "close": "Opusti obvestilo",
-  "mentionLine": "{{sender}} te je omenil: {{preview}}"
+  "mentionLine": "{{sender}} te je omenil: {{preview}}",
+  "withServer": "{{server}} · {{what}}"
 }

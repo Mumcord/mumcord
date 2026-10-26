@@ -4,6 +4,10 @@ export interface MenuItem {
   id: string;
   label: string;
   danger?: boolean;
+  /** Makes the item a switch (menuitemcheckbox) with this state. */
+  checked?: boolean;
+  /** Shown but not usable yet; stays focusable so screen readers can find it. */
+  disabled?: boolean;
   onSelect: () => void;
 }
 
@@ -15,12 +19,14 @@ interface ServerMenuProps {
   onClose: (returnFocus: boolean) => void;
 }
 
+const ITEM_ROLES = '[role="menuitem"], [role="menuitemcheckbox"]';
+
 /** Context menu for a server icon: arrow keys move, Enter selects, Escape/Tab close. */
 export function ServerMenu({ label, items, position, onClose }: ServerMenuProps) {
   const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    ref.current?.querySelector<HTMLElement>('[role="menuitem"]')?.focus();
+    ref.current?.querySelector<HTMLElement>(ITEM_ROLES)?.focus();
     const onPointerDown = (event: PointerEvent) => {
       if (event.target instanceof Node && !ref.current?.contains(event.target)) onClose(false);
     };
@@ -31,7 +37,7 @@ export function ServerMenu({ label, items, position, onClose }: ServerMenuProps)
   }, [onClose]);
 
   const onKeyDown = (event: KeyboardEvent) => {
-    const menuItems = [...(ref.current?.querySelectorAll<HTMLElement>('[role="menuitem"]') ?? [])];
+    const menuItems = [...(ref.current?.querySelectorAll<HTMLElement>(ITEM_ROLES) ?? [])];
     const index = menuItems.findIndex((item) => item === document.activeElement);
     const focusAt = (next: number) => {
       menuItems[(next + menuItems.length) % menuItems.length]?.focus();
@@ -74,13 +80,20 @@ export function ServerMenu({ label, items, position, onClose }: ServerMenuProps)
         <button
           key={item.id}
           type="button"
-          role="menuitem"
+          role={item.checked === undefined ? "menuitem" : "menuitemcheckbox"}
+          aria-checked={item.checked}
+          aria-disabled={item.disabled}
           tabIndex={-1}
           className={
             item.danger ? "server-menu__item server-menu__item--danger" : "server-menu__item"
           }
-          onClick={item.onSelect}
+          onClick={item.disabled ? undefined : item.onSelect}
         >
+          {item.checked === undefined ? null : (
+            <span className="server-menu__check" aria-hidden="true">
+              {item.checked ? "✓" : ""}
+            </span>
+          )}
           {item.label}
         </button>
       ))}

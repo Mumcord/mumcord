@@ -32,7 +32,15 @@
     "avatarUnregistered": "Šis serveris glabā avatarus tikai reģistrētiem lietotājiem – Mumcord nosūta tavu atkārtoti katrā savienojumā.",
     "avatarChosen": "Izvēlēts: {{name}}",
     "avatarRemoved": "Attēls tiks noņemts, kad saglabāsi.",
-    "comment": "Par tevi"
+    "comment": "Par tevi",
+    "format": "Teksta formatējums",
+    "bold": "Treknraksts",
+    "italic": "Slīpraksts",
+    "link": "Saite",
+    "linkAddress": "Saites adrese",
+    "linkApply": "Pievienot saiti",
+    "bulletList": "Aizzīmju saraksts",
+    "numberedList": "Numurēts saraksts"
   },
   "register": {
     "title": "Reģistrēties šajā serverī",
@@ -69,8 +77,6 @@
     "nowGaming": "Dalīties ar to, ko spēlēju",
     "nowGamingHint": "Citi redz tavu pašreizējo spēli",
     "unavailable": "Nav pieejams šajā sistēmā",
-    "overlay": "Pārklājums",
-    "overlayHint": "Rāda, kas runā, virs spēlēm",
     "editProfile": "Rediģēt profilu",
     "editProfileHint": "Vārds, avatars un komentārs",
     "register": "Reģistrēties šajā serverī",
@@ -84,5 +90,10 @@
     "offerImagesHint": "Ļauj citiem ielādēt tavus oriģinālos attēlus",
     "loadImages": "Ielādēt pilna izmēra attēlus",
     "loadImagesHint": "Iegūt oriģinālos attēlus no citiem"
+  },
+  "voice": {
+    "line": "Balss: {{channel}} · {{server}}",
+    "server": "Balss: {{server}}",
+    "show": "{{location}} – rādīt šo serveri"
   }
 }

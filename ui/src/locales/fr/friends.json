@@ -4,6 +4,7 @@
   "online": "En ligne",
   "onlineIn": "En ligne dans {{channel}}",
   "onlineOnServer": "En ligne sur {{server}}",
+  "inChannelOnServer": "Dans {{channel}} · {{server}}",
   "offline": "Hors ligne",
   "lastSeen": "Hors ligne, vu pour la dernière fois {{when}}",
   "friend": "Ami",
@@ -11,5 +12,7 @@
   "noCertificate": "Les personnes sans certificat ne peuvent pas être ajoutées en ami, car Mumcord ne pourrait pas les reconnaître.",
   "add": "Ajouter en ami",
   "remove": "Retirer des amis",
-  "failed": "La modification n’a pas fonctionné. Veuillez réessayer."
+  "failed": "La modification n’a pas fonctionné. Veuillez réessayer.",
+  "join": "Rejoindre",
+  "joinFriend": "Rejoindre le canal de {{name}}"
 }

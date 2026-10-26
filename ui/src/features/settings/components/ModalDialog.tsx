@@ -12,6 +12,8 @@ import { DialogHostContext } from "./dialogHost";
 interface ModalDialogProps {
   title: string;
   onClose: () => void;
+  /** Extra class on the dialog box, e.g. to make it wider. */
+  className?: string;
   children: ReactNode;
 }
 
@@ -23,7 +25,7 @@ const FOCUSABLE =
  * stays inside the dialog, Escape closes only this dialog (not the whole settings overlay) and
  * focus returns to the element that opened it.
  */
-export function ModalDialog({ title, onClose, children }: ModalDialogProps) {
+export function ModalDialog({ title, onClose, className, children }: ModalDialogProps) {
   const titleId = useId();
   const ref = useRef<HTMLDivElement>(null);
   const host = useContext(DialogHostContext);
@@ -70,7 +72,7 @@ export function ModalDialog({ title, onClose, children }: ModalDialogProps) {
         role="dialog"
         aria-modal="true"
         aria-labelledby={titleId}
-        className="settings-dialog"
+        className={className ? `settings-dialog ${className}` : "settings-dialog"}
         onKeyDown={onKeyDown}
       >
         <h3 id={titleId} className="settings-dialog__title">

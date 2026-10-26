@@ -4,6 +4,8 @@
     "label": "Kanalen",
     "hint": "Enter: chat tonen · Shift+Enter of dubbelklik: deelnemen · Pijltjestoetsen: bewegen, uitklappen, inklappen",
     "join": "Deelnemen",
+    "menuLabel": "Opties voor {{channel}}",
+    "showDescription": "Kanaalbeschrijving tonen",
     "you": "(jij)",
     "voiceHere": "je bent hier (voice)",
     "people_one": "{{count}} persoon",
@@ -16,10 +18,11 @@
     },
     "showAll": "Alles tonen ({{total}})",
     "showFewer": "Minder tonen",
-    "jump": "Naar mijn kanaal"
+    "jump": "Naar mijn kanaal",
+    "locked": "vergrendeld"
   },
   "status": {
-    "listening": "luistert",
+    "listening": "alleen luisteren",
     "talking": "praat",
     "muted": "gedempt",
     "deafened": "doof gezet",
@@ -32,7 +35,7 @@
   "mumcordBadge": "Gebruikt Mumcord",
   "statusTip": {
     "registered": "Geregistreerd op deze server",
-    "listening": "Luistert naar dit kanaal",
+    "listening": "Alleen luisteren",
     "muted": "Gedempt",
     "deafened": "Doof gezet",
     "serverMuted": "Gedempt door de server",
@@ -42,6 +45,7 @@
     "unregistered": "Niet geregistreerd op deze server (gast)",
     "nowPlaying": "Luistert naar {{track}}",
     "nowGaming": "Speelt {{game}}",
+    "weakConnection": "Zwakke verbinding – hoge ping of pakketverlies",
     "positional": "Positionele audio actief"
   },
   "announce": {
@@ -56,7 +60,8 @@
   },
   "empty": {
     "disconnected": "Niet verbonden. Kies een server om de kanalen te zien.",
-    "loading": "Kanalen laden…"
+    "loading": "Kanalen laden…",
+    "syncingBig": "Grote server synchroniseren…"
   },
   "search": {
     "label": "Kanalen en personen zoeken",

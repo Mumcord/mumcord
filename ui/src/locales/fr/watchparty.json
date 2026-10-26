@@ -1,0 +1,53 @@
+{
+  "title": "Watch party",
+  "addVideo": "Ajouter une vidéo",
+  "beta": "Bêta",
+  "join": "Rejoindre la watch party",
+  "leave": "Quitter la party",
+  "watching": "{{count}} regardent : {{names}}",
+  "player": "Lecteur de la watch party",
+  "watchTogether": "Regarder ensemble",
+  "watchTogetherFor": "Regarder {{title}} avec ce canal",
+  "cantPlay": "Le lecteur ne peut pas fonctionner ici.",
+  "openInBrowser": "Ouvrir dans le navigateur",
+  "startFailed": "La watch party n’a pas pu être lancée.",
+  "joinFailed": "Impossible de rejoindre la watch party.",
+  "leaveFailed": "Impossible de quitter la watch party.",
+  "commandFailed": "La watch party n’a pas pris en compte votre modification.",
+  "someone": "Quelqu’un",
+  "other": {
+    "play": "{{name}} a lancé la lecture",
+    "pause": "{{name}} a mis en pause",
+    "seek": "{{name}} a avancé",
+    "skipped": "{{name}} a passé la vidéo"
+  },
+  "addToPlaylist": "Ajouter à la playlist",
+  "addToPlaylistFor": "Ajouter {{title}} à la playlist de la watch party",
+  "playlist": {
+    "title": "À suivre",
+    "empty": "Rien à suivre. Ajoutez des liens YouTube avec « Ajouter à la playlist ».",
+    "skip": "Passer",
+    "moveHint": "Alt+Haut et Alt+Bas déplacent la vidéo ; vous pouvez aussi la faire glisser.",
+    "moved": "Déplacé en position {{position}}",
+    "videoTitle": "Vidéo YouTube",
+    "addedBy": "Ajouté par {{name}}",
+    "remove": "Retirer {{title}} de la playlist",
+    "addFailed": "La vidéo n’a pas pu être ajoutée à la playlist. Elle contient au maximum 50 vidéos.",
+    "removeFailed": "La vidéo n’a pas pu être retirée de la playlist.",
+    "moveFailed": "La vidéo n’a pas pu être déplacée.",
+    "skipFailed": "Impossible de passer à la vidéo suivante.",
+    "nextFailed": "La vidéo suivante n’a pas pu être lancée.",
+    "move": "Déplacer {{title}}",
+    "upNext": "À suivre : {{title}}",
+    "upNextNone": "Rien à suivre"
+  },
+  "widget": {
+    "play": "Lecture",
+    "pause": "Pause"
+  },
+  "codecHint": {
+    "install": "Cette vidéo nécessite la prise en charge de H.264. Installez gst-libav :",
+    "generic": "Cette vidéo nécessite la prise en charge de H.264. Installez gst-libav (le plugin libav de GStreamer) avec le gestionnaire de paquets de votre système.",
+    "rpmFusion": "Sur Fedora, gst-libav provient du dépôt RPM Fusion ; activez d’abord RPM Fusion."
+  }
+}

@@ -18,7 +18,7 @@ export function DismissButton({
       className="link-card__dismiss"
       tabIndex={tabIndex}
       aria-label={t("preview.dismiss")}
-      title={t("preview.dismiss")}
+      data-tooltip={t("preview.dismiss")}
       onClick={onDismiss}
     >
       <span aria-hidden="true">×</span>

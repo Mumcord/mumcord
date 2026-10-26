@@ -5,11 +5,13 @@ import { toEngineError } from "../../api";
 import { pinPerson } from "../members/personClick";
 import { joinChannel, useReadOnly } from "../userpanel/readOnly";
 import { useServerAnnouncements } from "./announcements";
+import { BigServerGate } from "./BigServerGate";
 import { ChannelSearch } from "./ChannelSearch";
 import { ChannelTree, type ChannelAction, type ChannelTreeHandle } from "./ChannelTree";
 import { JumpToChannelButton } from "./JumpToChannelButton";
 import { useSelectedConversation } from "./selection";
 import { selfUser, useServerState } from "./serverStore";
+import { BIG_SERVER_CHANNELS } from "./tree";
 
 const SEARCH_DEBOUNCE_MS = 100;
 
@@ -79,9 +81,15 @@ export function ChannelsPanel({ channelBadge, channelAction, header }: ChannelsP
   );
 
   if (state.serverId === null) {
+    // A big server takes seconds to sync; say so as soon as its channel count shows it (AC-2.17).
+    const syncingBig = state.syncChannels > BIG_SERVER_CHANNELS;
     return (
-      <p className="channels-empty">
-        {state.connection.state === "disconnected" ? t("empty.disconnected") : t("empty.loading")}
+      <p className="channels-empty" role={syncingBig ? "status" : undefined}>
+        {state.connection.state === "disconnected"
+          ? t("empty.disconnected")
+          : syncingBig
+            ? t("empty.syncingBig")
+            : t("empty.loading")}
       </p>
     );
   }
@@ -116,25 +124,30 @@ export function ChannelsPanel({ channelBadge, channelAction, header }: ChannelsP
       <section className="server-overview" aria-labelledby="server-overview-title">
         <h2 id="server-overview-title">{t("serverOverview")}</h2>
       </section>
-      <ChannelTree
+      <BigServerGate
         // A fresh tree per server, so its expand/collapse state starts from that server's (QA.27).
         key={state.serverId}
-        ref={treeRef}
-        state={state}
-        readOnly={readOnly}
-        selectedChannelId={conversation?.kind === "channel" ? conversation.channelId : null}
-        onSelect={(channelId) => {
-          setJoinError(null);
-          select({ kind: "channel", channelId });
-        }}
-        onJoin={join}
-        onOpenPerson={(session, opener) => {
-          if (opener) pinPerson(session, opener);
-        }}
-        channelBadge={channelBadge}
-        channelAction={channelAction}
-        filter={filter}
-      />
+        big={state.channels.size > BIG_SERVER_CHANNELS}
+        className="channels-empty"
+      >
+        <ChannelTree
+          ref={treeRef}
+          state={state}
+          readOnly={readOnly}
+          selectedChannelId={conversation?.kind === "channel" ? conversation.channelId : null}
+          onSelect={(channelId) => {
+            setJoinError(null);
+            select({ kind: "channel", channelId });
+          }}
+          onJoin={join}
+          onOpenPerson={(session, opener) => {
+            if (opener) pinPerson(session, opener);
+          }}
+          channelBadge={channelBadge}
+          channelAction={channelAction}
+          filter={filter}
+        />
+      </BigServerGate>
       {joinError && (
         <p role="alert" className="channels-error">
           {joinError}

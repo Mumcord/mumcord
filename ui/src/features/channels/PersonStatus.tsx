@@ -2,13 +2,15 @@
  * Mute/deafen/listener/unregistered icons for a person; the spoken equivalent is `useStatusText()`.
  * The "now playing" note (FR-1.58) and "now gaming" controller (FR-1.59) carry their own labels.
  */
-import { useTranslation } from "react-i18next";
+import { useT } from "../../i18n/useT";
 import type { User } from "../../api";
 import { trackLabel } from "../nowplaying/progress";
 import { useNowPlaying } from "../nowplaying/nowPlayingStore";
 import { GAMEPAD_PATH } from "../nowgaming/playTime";
 import { useNowGaming } from "../nowgaming/nowGamingStore";
 import { PositionalBadge } from "../positional";
+import { useShowWeakConnectionIcon } from "../../app/preferences";
+import { isWeakConnection, useUserStats } from "../connection/userStatsStore";
 import "./PersonStatus.css";
 import { voiceState, type VoiceState } from "./statusText";
 
@@ -21,7 +23,8 @@ type IconName =
   | "user-guest"
   | "user-check"
   | "music"
-  | "gamepad";
+  | "gamepad"
+  | "signal";
 
 const PATHS: Record<IconName, string> = {
   "mic-off":
@@ -33,6 +36,8 @@ const PATHS: Record<IconName, string> = {
   "volume-x": "M11 5 6 9H3v6h3l5 4V5M22 9l-6 6M16 9l6 6",
   music: "M9 18V5l12-2v13M9 18a3 3 0 1 1-6 0a3 3 0 1 1 6 0M21 16a3 3 0 1 1-6 0a3 3 0 1 1 6 0",
   gamepad: GAMEPAD_PATH,
+  // Three rising signal bars.
+  signal: "M5 20v-4M12 20v-9M19 20v-15",
   // Person outline; the guest variant dashes it so it reads as "no account".
   "user-check": "M12 4a4 4 0 1 0 0 8a4 4 0 1 0 0-8M4 21a8 8 0 0 1 16 0M15 17l1.8 1.8L20 15.5",
   "user-guest": "M12 4a4 4 0 1 0 0 8a4 4 0 1 0 0-8M4 21a8 8 0 0 1 16 0",
@@ -81,7 +86,7 @@ export function Icon({
   return tip ? (
     <span
       className="person-icon-slot"
-      title={tip}
+      data-tooltip={tip}
       {...(label ? { role: "img", "aria-label": label } : {})}
     >
       {svg}
@@ -101,7 +106,7 @@ export function VoiceStateIcon({ state }: { state: VoiceState }) {
  * Voice states come first so they line up; the registered/guest marker sits last.
  */
 export function StatusIcons({ user, listener = false }: { user: User; listener?: boolean }) {
-  const { t } = useTranslation("channels");
+  const t = useT("channels");
   if (listener) {
     return (
       <span className="person-icons">
@@ -123,6 +128,7 @@ export function StatusIcons({ user, listener = false }: { user: User; listener?:
         <Icon name="volume-x" variant="local-muted" tip={t("statusTip.localMuted")} />
       )}
       <PositionalBadge session={user.session} />
+      <WeakConnectionIcon session={user.session} />
       <NowGamingIcon session={user.session} />
       <NowPlayingIcon session={user.session} />
       {user.registered ? (
@@ -136,7 +142,7 @@ export function StatusIcons({ user, listener = false }: { user: User; listener?:
 
 /** Music note while the person shares a playing track (FR-1.58). */
 function NowPlayingIcon({ session }: { session: number }) {
-  const { t } = useTranslation("channels");
+  const t = useT("channels");
   const live = useNowPlaying(session);
   if (!live?.track.playing) return null;
   const tip = t("statusTip.nowPlaying", { track: trackLabel(live.track) });
@@ -145,9 +151,19 @@ function NowPlayingIcon({ session }: { session: number }) {
 
 /** Game controller while the person shares the game they play (FR-1.59). */
 function NowGamingIcon({ session }: { session: number }) {
-  const { t } = useTranslation("channels");
+  const t = useT("channels");
   const live = useNowGaming(session);
   if (!live) return null;
   const tip = t("statusTip.nowGaming", { game: live.game.name });
   return <Icon name="gamepad" variant="music" tip={tip} label={tip} />;
+}
+
+/** Signal icon while the person's ping or packet loss is poor (FR-2.26). */
+function WeakConnectionIcon({ session }: { session: number }) {
+  const t = useT("channels");
+  const enabled = useShowWeakConnectionIcon();
+  const weak = isWeakConnection(useUserStats(session));
+  if (!enabled || !weak) return null;
+  const tip = t("statusTip.weakConnection");
+  return <Icon name="signal" variant="weak-connection" tip={tip} label={tip} />;
 }

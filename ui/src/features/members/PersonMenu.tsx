@@ -15,7 +15,7 @@ import {
 import { createPortal } from "react-dom";
 import { useTranslation } from "react-i18next";
 import { getApi, toEngineError } from "../../api";
-import { useServerState } from "../channels/serverStore";
+import { shownServerId, useServerState } from "../channels/serverStore";
 import { setFriend, useFriend } from "../friends";
 import "../userpanel/quicksettings.css";
 import "./members.css";
@@ -30,6 +30,8 @@ import {
   type OpenPersonMenu,
 } from "./personMenuStore";
 import { joinChannel } from "../userpanel/readOnly";
+import { requestConnectionExpanded } from "../connection/connectionExpanded";
+import { connectionLevel, useUserStats } from "../connection/userStatsStore";
 import { useProfileCard } from "./useProfileCard";
 
 /** Gap kept between the menu and the window edge. */
@@ -80,7 +82,7 @@ function PersonMenu({
   onViewProfile,
 }: {
   open: OpenPersonMenu;
-  onViewProfile: (session: number, opener: HTMLElement | null) => void;
+  onViewProfile: (session: number, opener: HTMLElement | null, focusConnection?: boolean) => void;
 }) {
   const { t } = useTranslation("members");
   const { t: tFriends } = useTranslation("friends");
@@ -209,6 +211,12 @@ function PersonMenu({
       tabIndex={-1}
       onKeyDown={onKeyDown}
     >
+      {user && (
+        <div role="none" className="person-menu__header">
+          <span className="person-menu__name">{user.name}</span>
+          <MenuConnectionLine session={user.session} />
+        </div>
+      )}
       {user ? (
         item("profile", <IdentityCardIcon />, t("menu.viewProfile"), () => {
           closePersonMenu();
@@ -229,6 +237,12 @@ function PersonMenu({
           {t("menu.viewProfile")}
         </button>
       )}
+      {user &&
+        item("connection", <SignalIcon />, t("menu.connectionInfo"), () => {
+          closePersonMenu();
+          requestConnectionExpanded();
+          onViewProfile(user.session, open.opener, true);
+        })}
       {user && !isSelf && (
         <>
           {item("message", <ChatBubbleIcon />, t("card.sendPrivateMessage"), () => {
@@ -295,7 +309,9 @@ function PersonMenu({
             tabIndex={-1}
             className="quick-settings__row"
             onClick={() => {
-              getApi().personSetLocalMute(user.session, !user.localMute).catch(report);
+              getApi()
+                .personSetLocalMute(shownServerId(), user.session, !user.localMute)
+                .catch(report);
             }}
           >
             <MenuIcon>
@@ -340,6 +356,35 @@ function PersonMenu({
       )}
     </div>
   );
+}
+
+/** Ping and transport next to the name; the server only returns ping where it may be shown (FR-2.25a). */
+function MenuConnectionLine({ session }: { session: number }) {
+  const { t } = useTranslation("members");
+  const stats = useUserStats(session);
+  if (stats?.pingMs == null) return null;
+  const transport = stats.transport === null ? null : stats.transport === "udp" ? "UDP" : "TCP";
+  const text = [t("quality.ms", { value: Math.round(stats.pingMs) }), transport]
+    .filter((part) => part !== null)
+    .join(" · ");
+  return (
+    <span className="person-menu__connection" data-level={connectionLevel(stats)}>
+      <svg viewBox="0 0 24 24" width="14" height="14" aria-hidden="true" focusable="false">
+        <path
+          d="M4 20v-3M9 20v-7M14 20v-11M19 20V4"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2.5"
+          strokeLinecap="round"
+        />
+      </svg>
+      <span className="person-menu__connection-text">{text}</span>
+    </span>
+  );
+}
+
+function SignalIcon() {
+  return <path d="M4 20v-3M9 20v-7M14 20v-11M19 20V4" />;
 }
 
 /* Icon shapes match the pinned profile card, so the same action looks the same everywhere. */

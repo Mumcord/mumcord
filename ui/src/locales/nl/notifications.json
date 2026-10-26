@@ -10,5 +10,6 @@
   "image": "Heeft een afbeelding gestuurd",
   "open": "Chat openen",
   "close": "Melding sluiten",
-  "mentionLine": "{{sender}} heeft je vermeld: {{preview}}"
+  "mentionLine": "{{sender}} heeft je vermeld: {{preview}}",
+  "withServer": "{{server}} · {{what}}"
 }

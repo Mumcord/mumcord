@@ -21,15 +21,21 @@ import { useTranslation } from "react-i18next";
 import "./channels.css";
 import { announce } from "../../a11y/announcer";
 import { useHintPreferences } from "../../a11y/hintPreferences";
+import { useListPreferences } from "../../app/preferences";
 import { useAvatars } from "../members/useAvatars";
 import { rememberCollapsed, rememberedCollapsed } from "./collapseMemory";
+import { useDrawSteps } from "./drawSteps";
 import { buildSearchIndex, foldQuery, searchTree, type SearchResult } from "./search";
 import type { ServerState } from "./serverStore";
 import {
+  arrangeTree,
+  BIG_SERVER_CHANNELS,
   buildTree,
   channelPath,
   channelRowId,
+  DRAW_STEP_ROWS,
   initialCollapsed,
+  treePrefix,
   visibleRows,
   visibleStacks,
   type ChannelNode,
@@ -168,6 +174,20 @@ export function ChannelTree({
   );
   const [jump, setJump] = useState<{ rowId: string } | null>(null);
 
+  // "Hide empty channels" and "Show talking people first" (FR-2.23). Talking only reorders the
+  // tree while that switch is on. Search below always covers every channel.
+  const { hideEmptyChannels, talkingFirst } = useListPreferences();
+  const talkingOrder = talkingFirst ? state.talking : null;
+  const listRoots = useMemo(
+    () =>
+      arrangeTree(roots, {
+        hideEmpty: hideEmptyChannels,
+        keep: new Set([ownChannelId, selectedChannelId].filter((id): id is number => id !== null)),
+        talkingFirst: talkingOrder,
+      }),
+    [roots, hideEmptyChannels, ownChannelId, selectedChannelId, talkingOrder],
+  );
+
   // Search (QA.27). Without a query the tree below is the full one, so rows keep their memoised
   // nodes. The index of folded names is built once per tree, only while searching.
   const query = foldQuery(filter);
@@ -190,7 +210,7 @@ export function ChannelTree({
     if (found?.query !== query && searchCollapsed.size > 0) setSearchCollapsed(new Set());
     setFound({ roots, query, result });
   }
-  const shownRoots = result?.roots ?? roots;
+  const shownRoots = result?.roots ?? listRoots;
   // Result counts go to the app's polite live region, e.g. "12 channels, 3 people".
   const resultCount =
     result === null
@@ -207,6 +227,21 @@ export function ChannelTree({
   const rows = useMemo(
     () => visibleRows(shownRoots, shownCollapsed, showAll),
     [shownRoots, shownCollapsed, showAll],
+  );
+  // A big tree is drawn a few rows per frame: laying out all rows at once froze a slow laptop
+  // for longer than 200 ms, both on connecting and on switching to the server (FR-2.24).
+  const drawnRows = useDrawSteps(
+    rows.length,
+    DRAW_STEP_ROWS,
+    state.channels.size > BIG_SERVER_CHANNELS,
+    String(state.serverId),
+  );
+  const drawnRoots = useMemo(
+    () =>
+      drawnRows >= rows.length
+        ? shownRoots
+        : treePrefix(shownRoots, shownCollapsed, showAll, drawnRows),
+    [drawnRows, rows.length, shownRoots, shownCollapsed, showAll],
   );
   const stacks = useMemo(
     () => visibleStacks(shownRoots, shownCollapsed, showAll, state.talking),
@@ -431,7 +466,7 @@ export function ChannelTree({
         onKeyDown={onKeyDown}
       >
         <TreeContext.Provider value={context}>
-          {shownRoots.map((root) => (
+          {drawnRoots.map((root) => (
             <ChannelBranch key={channelRowId(root.channel.id)} node={root} level={1} />
           ))}
         </TreeContext.Provider>

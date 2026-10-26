@@ -9,38 +9,28 @@ import {
 } from "react";
 import { useTranslation } from "react-i18next";
 import type { SavedServer } from "../../api";
-import { useServerState } from "../channels";
+import { useShownServerId, useVoiceServerId } from "../channels";
+import { showInfo, useHiddenHash, welcomeKey } from "../chat/hiddenInfo";
+import { useFollowStates } from "../follow/followStore";
 import { displayName, initials } from "./format";
+import { mentionCount, useMentions } from "./mentions";
 import { ServerMenu, type MenuItem } from "./ServerMenu";
 import {
   disconnect,
   moveServer,
   openDialog,
   requestConnect,
+  toggleAlwaysConnect,
+  toggleNotificationsMuted,
   useServers,
-  type ServersState,
 } from "./store";
-
-type ServerStatus = "connected" | "connecting" | "reconnecting" | null;
-
-/**
- * Status of one icon. "Connected" follows the shared server state (synced server), the
- * transitional states come from the own connection status.
- */
-function statusOf(state: ServersState, connectedId: number | null, id: number): ServerStatus {
-  const { connection } = state;
-  if (connection.state === "connecting" || connection.state === "reconnecting") {
-    return connection.serverId === id ? connection.state : null;
-  }
-  if (connection.state === "connected" && connection.serverId === id) return "connected";
-  return connectedId === id && connection.state !== "disconnected" ? "connected" : null;
-}
+import { serverLabel, statusOf, type ServerBadges, type ServerStatus } from "./serverStatus";
 
 interface ServerOptionsProps {
   server: SavedServer;
   index: number;
   count: number;
-  connected: boolean;
+  status: ServerStatus;
   position: { x: number; y: number };
   onMove: (server: SavedServer, toIndex: number) => void;
   onClose: (returnFocus: boolean) => void;
@@ -51,7 +41,7 @@ function ServerOptions({
   server,
   index,
   count,
-  connected,
+  status,
   position,
   onMove,
   onClose,
@@ -62,20 +52,41 @@ function ServerOptions({
     onClose(true);
     fn();
   };
+  const hiddenWelcome = useHiddenHash(welcomeKey(server.id));
+  const connected = status !== null && status !== "error";
   const items: MenuItem[] = [
     connected
       ? {
           id: "disconnect",
           label: t("menu.disconnect"),
-          onSelect: act(() => void disconnect()),
+          onSelect: act(() => void disconnect(server.id)),
         }
       : {
           id: "connect",
-          label: t("menu.connect"),
+          label: status === "error" ? t("menu.reconnect") : t("menu.connect"),
           onSelect: act(() => {
             requestConnect(server.id);
           }),
         },
+    {
+      id: "alwaysConnect",
+      label: t("menu.alwaysConnect"),
+      checked: server.alwaysConnectAtStart,
+      onSelect: act(() => void toggleAlwaysConnect(server.id, !server.alwaysConnectAtStart)),
+    },
+    {
+      id: "muteNotifications",
+      label: t("menu.muteNotifications"),
+      checked: server.notificationsMuted,
+      onSelect: act(() => void toggleNotificationsMuted(server.id, !server.notificationsMuted)),
+    },
+    {
+      id: "theme",
+      label: t("menu.theme"),
+      onSelect: act(() => {
+        openDialog({ kind: "theme", serverId: server.id });
+      }),
+    },
     {
       id: "edit",
       label: t("menu.edit"),
@@ -102,6 +113,15 @@ function ServerOptions({
       }),
     });
   }
+  if (hiddenWelcome !== null) {
+    items.push({
+      id: "showWelcome",
+      label: t("menu.showWelcome"),
+      onSelect: act(() => {
+        showInfo(welcomeKey(server.id));
+      }),
+    });
+  }
   items.push({
     id: "remove",
     label: t("menu.remove"),
@@ -121,14 +141,27 @@ function ServerOptions({
 }
 
 /**
- * Left column: saved servers as round icons (connected one highlighted), "+" to add.
+ * Left column: saved servers as round icons with their state (connected, connecting, error,
+ * voice server, unread, mentions; spec §5.2), "+" to add. The shown server is marked.
  * One Tab stop with arrow-key navigation; Alt+Up/Down or drag and drop reorders.
  */
 export function ServerBar() {
   const { t } = useTranslation("servers");
   const state = useServers();
-  const connectedId = useServerState().serverId;
+  const shownId = useShownServerId();
+  const voiceId = useVoiceServerId();
+  const follow = useFollowStates();
+  const mentions = useMentions();
   const { servers } = state;
+  const badgesOf = (id: number): ServerBadges => {
+    const unread = [...(follow.get(id)?.unread.values() ?? [])].some((count) => count > 0);
+    return {
+      status: statusOf(state, id),
+      voice: voiceId === id,
+      unread,
+      mentions: mentionCount(mentions.get(id), follow.get(id)),
+    };
+  };
   const hintId = useId();
   const [focusIndex, setFocusIndex] = useState(0);
   const [menu, setMenu] = useState<{ serverId: number; x: number; y: number } | null>(null);
@@ -204,13 +237,17 @@ export function ServerBar() {
       </p>
       <ul className="server-bar__list" aria-label={t("bar.listLabel")}>
         {servers.map((server, index) => {
-          const status = statusOf(state, connectedId, server.id);
+          const badges = badgesOf(server.id);
+          const { status } = badges;
           const name = displayName(server);
+          const label = serverLabel(t, name, badges);
+          const shown = shownId === server.id && status !== null && status !== "error";
           return (
             <li
               key={server.id}
               className="server-bar__item"
               data-status={status ?? undefined}
+              data-shown={shown || undefined}
               data-dragging={dragId === server.id || undefined}
             >
               <button
@@ -221,8 +258,10 @@ export function ServerBar() {
                 type="button"
                 className="server-bar__server"
                 tabIndex={index === activeIndex ? 0 : -1}
-                aria-label={status ? t(`bar.status.${status}`, { server: name }) : name}
-                aria-current={status === "connected" ? "true" : undefined}
+                aria-label={label}
+                data-tooltip={label}
+                data-tooltip-placement="right"
+                aria-current={shown ? "true" : undefined}
                 aria-describedby={hintId}
                 draggable
                 onDragStart={(event) => {
@@ -254,10 +293,8 @@ export function ServerBar() {
                 }}
               >
                 <span aria-hidden="true">{initials(name)}</span>
+                <ServerMarks badges={badges} />
               </button>
-              <span className="server-bar__tooltip" aria-hidden="true">
-                {name}
-              </span>
             </li>
           );
         })}
@@ -267,27 +304,58 @@ export function ServerBar() {
           type="button"
           className="server-bar__server server-bar__add"
           aria-label={t("bar.add")}
+          data-tooltip={t("bar.add")}
+          data-tooltip-placement="right"
           onClick={() => {
             openDialog({ kind: "add", link: null });
           }}
         >
           <span aria-hidden="true">+</span>
         </button>
-        <span className="server-bar__tooltip" aria-hidden="true">
-          {t("bar.add")}
-        </span>
       </div>
       {menu && menuServer && (
         <ServerOptions
           server={menuServer}
           index={menuIndex}
           count={servers.length}
-          connected={statusOf(state, connectedId, menuServer.id) !== null}
+          status={statusOf(state, menuServer.id)}
           position={{ x: menu.x, y: menu.y }}
           onMove={move}
           onClose={closeMenu}
         />
       )}
     </div>
+  );
+}
+
+/** Visual marks on an icon; hidden from screen readers, the button's label says the same. */
+function ServerMarks({ badges }: { badges: ServerBadges }) {
+  const { status } = badges;
+  return (
+    <>
+      {badges.voice ? (
+        <span className="server-bar__mark server-bar__mark--voice" aria-hidden="true">
+          <svg viewBox="0 0 24 24" width="12" height="12" fill="currentColor">
+            <path d="M4 9v6h4l5 4V5L8 9H4zm12.5 3a4.5 4.5 0 0 0-2.5-4v8a4.5 4.5 0 0 0 2.5-4z" />
+          </svg>
+        </span>
+      ) : null}
+      {status === "connecting" || status === "reconnecting" ? (
+        <span className="server-bar__mark server-bar__mark--progress" aria-hidden="true">
+          ⟳
+        </span>
+      ) : status === "error" ? (
+        <span className="server-bar__mark server-bar__mark--error" aria-hidden="true">
+          !
+        </span>
+      ) : null}
+      {badges.mentions > 0 ? (
+        <span className="server-bar__mark server-bar__mark--mentions" aria-hidden="true">
+          {badges.mentions > 99 ? "99+" : badges.mentions}
+        </span>
+      ) : badges.unread ? (
+        <span className="server-bar__mark server-bar__mark--unread" aria-hidden="true" />
+      ) : null}
+    </>
   );
 }

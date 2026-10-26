@@ -7,7 +7,9 @@ use tauri::State;
 use tauri_specta::Event;
 
 use super::chat::rfc3339;
-use super::types::{ApiResult, ChannelId, ServerId, SessionId, to_api_server_id};
+use super::types::{
+    ApiResult, ChannelId, ServerId, SessionId, to_api_server_id, to_engine_server_id,
+};
 
 /// Where a friend is online right now.
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, Type)]
@@ -72,12 +74,16 @@ pub fn friends_list(engine: State<'_, Engine>) -> ApiResult<Vec<Friend>> {
     Ok(to_api_friends(engine.friends()))
 }
 
-/// Adds a person on the connected server as a friend; fails for people without a
+/// Adds a person on a connected server as a friend; fails for people without a
 /// certificate.
 #[tauri::command]
 #[specta::specta]
-pub fn friend_add(engine: State<'_, Engine>, session: SessionId) -> ApiResult<()> {
-    Ok(engine.friend_add(session)?)
+pub fn friend_add(
+    engine: State<'_, Engine>,
+    server_id: ServerId,
+    session: SessionId,
+) -> ApiResult<()> {
+    Ok(engine.friend_add(to_engine_server_id(server_id), session)?)
 }
 
 /// Removes a friend by certificate hash.

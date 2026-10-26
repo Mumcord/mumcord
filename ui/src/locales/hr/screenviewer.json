@@ -1,0 +1,21 @@
+{
+  "label": "Dijeljenje zaslona: {{name}}",
+  "title": "Zaslon: {{name}}",
+  "beta": "Beta",
+  "picture": "Dijeljeni zaslon: {{name}}",
+  "someone": "Netko",
+  "live": "Uživo",
+  "collapse": "Sažmi",
+  "expand": "Proširi",
+  "fullscreen": "Cijeli zaslon",
+  "exitFullscreen": "Izađi iz cijelog zaslona",
+  "stop": "Prestani gledati",
+  "starting": "Povezivanje sa zaslonom: {{name}}…",
+  "paused": "{{name}} je pauzirao dijeljenje.",
+  "full": "Ovo dijeljenje je puno.",
+  "unreachable": "{{name}} nije izravno dostupan. Mreža možda blokira izravne veze.",
+  "tooOld": "Mumcord korisnika {{name}} prestar je da bi s tobom dijelio zaslon.",
+  "consentOff": "Gledanje treba izravne veze, a ti si ih isključio.",
+  "failed": "Zaslon {{name}} nije bilo moguće otvoriti.",
+  "retry": "Pokušaj ponovno"
+}

@@ -8,6 +8,7 @@
     "unknownPerson": "Persoană necunoscută"
   },
   "list": {
+    "server": "Server",
     "today": "Azi",
     "yesterday": "Ieri",
     "label": "Mesaje în {{name}}",
@@ -34,7 +35,8 @@
     "strike": "Tăiat",
     "code": "Cod în linie",
     "codeBlock": "Bloc de cod",
-    "link": "Link"
+    "link": "Link",
+    "quote": "Citat"
   },
   "composer": {
     "label": "Scrie către {{name}}",
@@ -66,7 +68,14 @@
     "notConnected": "Nu ești conectat. Reconectează-te și încearcă din nou.",
     "generic": "Mesajul nu a putut fi trimis. Încearcă din nou.",
     "onlyImages": "Se pot trimite doar imagini.",
-    "sourceTooLarge": "Acest fișier e prea mare pentru a fi trimis (peste 25 MB)."
+    "sourceTooLarge": "Acest fișier e prea mare pentru a fi trimis (peste 25 MB).",
+    "personOffline": "Această persoană este offline. Încearcă din nou când revine."
+  },
+  "failed": {
+    "notSent": "Netrimis.",
+    "retry": "Reîncearcă",
+    "remove": "Șterge",
+    "announce": "Un mesaj nu a putut fi trimis."
   },
   "announce": {
     "message": "{{name}}: {{text}}",
@@ -78,7 +87,9 @@
   "pinned": {
     "label": "Informații despre canal",
     "showMore": "Arată mai mult",
-    "showLess": "Arată mai puțin"
+    "showLess": "Arată mai puțin",
+    "hideWelcome": "Ascunde mesajul de bun venit",
+    "hideDescription": "Ascunde descrierea canalului"
   },
   "mention": {
     "list": "Persoane care pot fi menționate",
@@ -132,6 +143,7 @@
     "next": "Imaginea următoare",
     "unnamed": "imagine",
     "fullLoading": "Se încarcă dimensiunea completă…",
+    "fullCancel": "Anulează descărcarea la dimensiune completă",
     "fullProgress": "Se încarcă dimensiunea completă… {{percent}} %",
     "fullUnavailable": "Dimensiunea completă nu e disponibilă – se afișează previzualizarea"
   },
@@ -145,11 +157,62 @@
     "hint": "Săgețile navighează, Enter trimite, Delete elimină, Escape închide.",
     "empty": "Încă nu ai favorite. Dă clic dreapta pe un GIF din chat sau folosește steaua de pe el și alege „Salvează ca favorit”. Va apărea aici."
   },
+  "linkMenu": {
+    "label": "Link",
+    "copy": "Copiază linkul",
+    "open": "Deschide linkul",
+    "copied": "Link copiat"
+  },
   "imageMenu": {
     "label": "Imagine {{name}}"
   },
   "attribution": {
     "via": "prin {{brand}}",
     "view": "Vezi pe {{brand}}"
+  },
+  "themeCard": {
+    "label": "Temă distribuită {{name}}",
+    "apply": "Aplică tema",
+    "more": "Aplică pe un server",
+    "menuLabel": "Aplică tema pe",
+    "applyToServer": "Aplică pe {{server}}",
+    "imported": "Importat ✓",
+    "newer": "Creat cu Mumcord {{version}} – actualizează ca să o vezi complet",
+    "failed": "Tema nu a putut fi aplicată."
+  },
+  "reply": {
+    "action": "Răspunde",
+    "actionFor": "Răspunde-i lui {{name}}",
+    "menu": "Mesaj de la {{name}}",
+    "replyTo": "Răspuns pentru",
+    "jump": "Salt la mesajul original",
+    "image": "Imagine",
+    "replyingTo": "Răspuns pentru",
+    "cancel": "Anulează răspunsul"
+  },
+  "actions": {
+    "label": "Începeți împreună",
+    "notConnected": "Nu ești conectat la server.",
+    "partyRunning": "O vizionare comună rulează deja pe acest canal.",
+    "invalidLink": "Acesta nu este un link către un videoclip YouTube.",
+    "linkLabel": "Link YouTube",
+    "linkPlaceholder": "Lipește un link YouTube",
+    "confirm": "Începe",
+    "watchHint": "Urmărește un videoclip YouTube împreună cu acest canal",
+    "dialogTitle": "Urmăriți împreună",
+    "addTitle": "Adaugă în playlist",
+    "addToPlaylist": "Adaugă în playlist",
+    "addConfirm": "Adaugă",
+    "apps": "Aplicații",
+    "appsLive": "Aplicații (îți partajezi ecranul)"
+  },
+  "activity": {
+    "share": "{{name}} își partajează ecranul",
+    "watch": "Urmărește",
+    "party": "Vizionare comună: {{title}}",
+    "join": "Alătură-te",
+    "videoFallback": "Videoclip YouTube",
+    "someone": "Cineva",
+    "joinFailed": "Nu te-ai putut alătura vizionării comune."
   }
 }

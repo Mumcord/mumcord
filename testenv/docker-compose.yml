@@ -18,8 +18,18 @@ services:
   v15:
     <<: *mumble
     image: mumblevoip/mumble-server:v1.5.735
-    ports: ["64738:64738/tcp", "64738:64738/udp"]
-    volumes: ["./data/v15:/data", "./certs/${CERT_SET:-A}:/certs:ro"]
+    ports: ["${PORT_V15:-64738}:64738/tcp", "${PORT_V15:-64738}:64738/udp"]
+    volumes: ["./${DATA_ROOT:-data}/v15:/data", "./certs/${CERT_SET:-A}:/certs:ro"]
+
+  # Second 1.5 server for multi-server tests (a different server to connect to at the same time).
+  v15b:
+    <<: *mumble
+    image: mumblevoip/mumble-server:v1.5.735
+    environment:
+      <<: *mumble-env
+      MUMBLE_CONFIG_REGISTERNAME: Mumcord Test Server B
+    ports: ["${PORT_V15B:-64742}:64738/tcp", "${PORT_V15B:-64742}:64738/udp"]
+    volumes: ["./${DATA_ROOT:-data}/v15b:/data", "./certs/${CERT_SET:-A}:/certs:ro"]
 
   v14:
     <<: *mumble
@@ -27,8 +37,12 @@ services:
     # This image has no PUID/PGID support and runs as a fixed uid 1000, which cannot write to a
     # data dir owned by another host user (e.g. uid 1001 on CI runners).
     user: "${PUID:-1000}:${PGID:-1000}"
-    ports: ["64739:64738/tcp", "64739:64738/udp"]
-    volumes: ["./data/v14:/data", "./certs/${CERT_SET:-A}:/certs:ro"]
+    environment:
+      <<: *mumble-env
+      # Tests of the bitrate slider raise this above the 96 kbit/s speech cap (local server only).
+      MUMBLE_CONFIG_BANDWIDTH: "${BANDWIDTH_V14:-72000}"
+    ports: ["${PORT_V14:-64739}:64738/tcp", "${PORT_V14:-64739}:64738/udp"]
+    volumes: ["./${DATA_ROOT:-data}/v14:/data", "./certs/${CERT_SET:-A}:/certs:ro"]
 
   # Listener limits of 0 disable channel listening, so Listen must be refused.
   limit:
@@ -38,8 +52,8 @@ services:
       <<: *mumble-env
       MUMBLE_CONFIG_LISTENERSPERCHANNEL: "0"
       MUMBLE_CONFIG_LISTENERSPERUSER: "0"
-    ports: ["64741:64738/tcp", "64741:64738/udp"]
-    volumes: ["./data/limit:/data", "./certs/${CERT_SET:-A}:/certs:ro"]
+    ports: ["${PORT_LIMIT:-64741}:64738/tcp", "${PORT_LIMIT:-64741}:64738/udp"]
+    volumes: ["./${DATA_ROOT:-data}/limit:/data", "./certs/${CERT_SET:-A}:/certs:ro"]
 
   v13:
     build: ./v13
@@ -49,5 +63,5 @@ services:
     environment:
       SUPERUSER_PASSWORD: ${SUPERUSER_PASSWORD:?copy .env.example to .env}
       SERVER_PASSWORD: ${SERVER_PASSWORD:-}
-    ports: ["64740:64738/tcp", "64740:64738/udp"]
-    volumes: ["./data/v13:/data", "./certs/${CERT_SET:-A}:/certs:ro"]
+    ports: ["${PORT_V13:-64740}:64738/tcp", "${PORT_V13:-64740}:64738/udp"]
+    volumes: ["./${DATA_ROOT:-data}/v13:/data", "./certs/${CERT_SET:-A}:/certs:ro"]

@@ -48,6 +48,8 @@ describe("PrivacyStep", () => {
     await screen.findByRole("heading", { name: "Your privacy" });
     expect(screen.queryByRole("checkbox", { name: "Show link previews and embeds" })).toBeNull();
     fireEvent.click(screen.getByRole("button", { name: "Next" }));
+    await screen.findByRole("heading", { name: "New versions" });
+    fireEvent.click(screen.getByRole("button", { name: "Next" }));
     await screen.findByRole("heading", { name: "How do you want to talk?" });
     expect(screen.getByRole("checkbox", { name: "Show link previews and embeds" })).toBeChecked();
   });

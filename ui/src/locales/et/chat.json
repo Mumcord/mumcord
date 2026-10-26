@@ -8,6 +8,7 @@
     "unknownPerson": "Tundmatu inimene"
   },
   "list": {
+    "server": "Server",
     "today": "Täna",
     "yesterday": "Eile",
     "label": "Sõnumid: {{name}}",
@@ -32,7 +33,8 @@
     "strike": "Läbijoonitud",
     "code": "Reasisene kood",
     "codeBlock": "Koodiplokk",
-    "link": "Link"
+    "link": "Link",
+    "quote": "Tsitaat"
   },
   "composer": {
     "label": "Sõnum: {{name}}",
@@ -64,7 +66,14 @@
     "notConnected": "Ühendus puudub. Ühendu uuesti ja proovi veel.",
     "generic": "Sõnumit ei õnnestunud saata. Proovi uuesti.",
     "onlyImages": "Saata saab ainult pilte.",
-    "sourceTooLarge": "See fail on saatmiseks liiga suur (üle 25 MB)."
+    "sourceTooLarge": "See fail on saatmiseks liiga suur (üle 25 MB).",
+    "personOffline": "See inimene pole võrgus. Proovi uuesti, kui ta tagasi on."
+  },
+  "failed": {
+    "notSent": "Saatmata.",
+    "retry": "Proovi uuesti",
+    "remove": "Kustuta",
+    "announce": "Sõnumit ei õnnestunud saata."
   },
   "announce": {
     "message": "{{name}}: {{text}}",
@@ -75,7 +84,9 @@
   "pinned": {
     "label": "Kanali info",
     "showMore": "Näita rohkem",
-    "showLess": "Näita vähem"
+    "showLess": "Näita vähem",
+    "hideWelcome": "Peida tervitussõnum",
+    "hideDescription": "Peida kanali kirjeldus"
   },
   "mention": {
     "list": "Mainitavad inimesed",
@@ -128,6 +139,7 @@
     "next": "Järgmine pilt",
     "unnamed": "pilt",
     "fullLoading": "Laadin täissuuruses…",
+    "fullCancel": "Tühista täissuuruses allalaadimine",
     "fullProgress": "Laadin täissuuruses… {{percent}} %",
     "fullUnavailable": "Täissuurus pole saadaval – näitan eelvaadet"
   },
@@ -141,11 +153,62 @@
     "hint": "Nooleklahvid liigutavad, Enter saadab, Delete eemaldab, Escape sulgeb.",
     "empty": "Lemmikuid pole veel. Tee vestluses GIF-il paremklõps või kasuta selle tärni ning vali „Salvesta lemmikuks“. Siis ilmub see siia."
   },
+  "linkMenu": {
+    "label": "Link",
+    "copy": "Kopeeri link",
+    "open": "Ava link",
+    "copied": "Link kopeeritud"
+  },
   "imageMenu": {
     "label": "Pilt {{name}}"
   },
   "attribution": {
     "via": "allikas {{brand}}",
     "view": "Vaata: {{brand}}"
+  },
+  "themeCard": {
+    "label": "Jagatud teema {{name}}",
+    "apply": "Rakenda teema",
+    "more": "Rakenda serverile",
+    "menuLabel": "Rakenda teema",
+    "applyToServer": "Rakenda serverile {{server}}",
+    "imported": "Imporditud ✓",
+    "newer": "Tehtud Mumcordi versiooniga {{version}} – uuenda, et seda täielikult näha",
+    "failed": "Teemat ei õnnestunud rakendada."
+  },
+  "reply": {
+    "action": "Vasta",
+    "actionFor": "Vasta kasutajale {{name}}",
+    "menu": "Sõnum kasutajalt {{name}}",
+    "replyTo": "Vastus kasutajale",
+    "jump": "Mine algse sõnumi juurde",
+    "image": "Pilt",
+    "replyingTo": "Vastad kasutajale",
+    "cancel": "Tühista vastus"
+  },
+  "actions": {
+    "label": "Alusta koos",
+    "notConnected": "Serveriga pole ühendust.",
+    "partyRunning": "Selles kanalis käib juba ühisvaatamine.",
+    "invalidLink": "See pole YouTube'i video link.",
+    "linkLabel": "YouTube'i link",
+    "linkPlaceholder": "Kleebi YouTube'i link",
+    "confirm": "Alusta",
+    "watchHint": "Vaata YouTube'i videot koos selle kanaliga",
+    "dialogTitle": "Vaatame koos",
+    "addTitle": "Lisa esitusloendisse",
+    "addToPlaylist": "Lisa esitusloendisse",
+    "addConfirm": "Lisa",
+    "apps": "Rakendused",
+    "appsLive": "Rakendused (jagad oma ekraani)"
+  },
+  "activity": {
+    "share": "{{name}} jagab oma ekraani",
+    "watch": "Vaata",
+    "party": "Ühisvaatamine: {{title}}",
+    "join": "Liitu",
+    "videoFallback": "YouTube'i video",
+    "someone": "Keegi",
+    "joinFailed": "Ühisvaatamisega liitumine ebaõnnestus."
   }
 }

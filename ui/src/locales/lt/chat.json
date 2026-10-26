@@ -8,6 +8,7 @@
     "unknownPerson": "Nežinomas žmogus"
   },
   "list": {
+    "server": "Serveris",
     "today": "Šiandien",
     "yesterday": "Vakar",
     "label": "Žinutės: {{name}}",
@@ -36,7 +37,8 @@
     "strike": "Perbraukta",
     "code": "Kodas eilutėje",
     "codeBlock": "Kodo blokas",
-    "link": "Nuoroda"
+    "link": "Nuoroda",
+    "quote": "Citata"
   },
   "composer": {
     "label": "Rašyti: {{name}}",
@@ -68,7 +70,14 @@
     "notConnected": "Neprisijungta. Prisijunk iš naujo ir bandyk dar kartą.",
     "generic": "Nepavyko išsiųsti žinutės. Bandyk dar kartą.",
     "onlyImages": "Galima siųsti tik paveikslėlius.",
-    "sourceTooLarge": "Šis failas per didelis siuntimui (daugiau nei 25 MB)."
+    "sourceTooLarge": "Šis failas per didelis siuntimui (daugiau nei 25 MB).",
+    "personOffline": "Šis asmuo neprisijungęs. Bandyk dar kartą, kai jis grįš."
+  },
+  "failed": {
+    "notSent": "Neišsiųsta.",
+    "retry": "Bandyti dar kartą",
+    "remove": "Ištrinti",
+    "announce": "Nepavyko išsiųsti žinutės."
   },
   "announce": {
     "message": "{{name}}: {{text}}",
@@ -81,7 +90,9 @@
   "pinned": {
     "label": "Kanalo informacija",
     "showMore": "Rodyti daugiau",
-    "showLess": "Rodyti mažiau"
+    "showLess": "Rodyti mažiau",
+    "hideWelcome": "Slėpti pasveikinimo žinutę",
+    "hideDescription": "Slėpti kanalo aprašymą"
   },
   "mention": {
     "list": "Paminimi žmonės",
@@ -136,6 +147,7 @@
     "next": "Kitas paveikslėlis",
     "unnamed": "paveikslėlis",
     "fullLoading": "Įkeliamas pilnas dydis…",
+    "fullCancel": "Atšaukti viso dydžio atsisiuntimą",
     "fullProgress": "Įkeliamas pilnas dydis… {{percent}} %",
     "fullUnavailable": "Pilno dydžio nėra – rodoma peržiūra"
   },
@@ -149,11 +161,62 @@
     "hint": "Rodyklės juda, Enter siunčia, Delete šalina, Escape uždaro.",
     "empty": "Mėgstamiausių dar nėra. Pokalbyje spustelėk GIF dešiniuoju pelės klavišu arba naudok jo žvaigždutę ir pasirink „Įrašyti į mėgstamiausius“. Jis atsiras čia."
   },
+  "linkMenu": {
+    "label": "Nuoroda",
+    "copy": "Kopijuoti nuorodą",
+    "open": "Atidaryti nuorodą",
+    "copied": "Nuoroda nukopijuota"
+  },
   "imageMenu": {
     "label": "Paveikslėlis {{name}}"
   },
   "attribution": {
     "via": "per {{brand}}",
     "view": "Peržiūrėti per {{brand}}"
+  },
+  "themeCard": {
+    "label": "Bendrinama tema {{name}}",
+    "apply": "Taikyti temą",
+    "more": "Taikyti serveriui",
+    "menuLabel": "Taikyti temą",
+    "applyToServer": "Taikyti {{server}}",
+    "imported": "Importuota ✓",
+    "newer": "Sukurta su Mumcord {{version}} – atnaujink, kad matytum visą",
+    "failed": "Nepavyko pritaikyti temos."
+  },
+  "reply": {
+    "action": "Atsakyti",
+    "actionFor": "Atsakyti {{name}}",
+    "menu": "{{name}} žinutė",
+    "replyTo": "Atsakymas",
+    "jump": "Pereiti prie pradinės žinutės",
+    "image": "Paveikslėlis",
+    "replyingTo": "Atsakoma",
+    "cancel": "Atšaukti atsakymą"
+  },
+  "actions": {
+    "label": "Pradėti kartu",
+    "notConnected": "Neprisijungta prie serverio.",
+    "partyRunning": "Šiame kanale jau vyksta bendra peržiūra.",
+    "invalidLink": "Tai ne YouTube vaizdo įrašo nuoroda.",
+    "linkLabel": "YouTube nuoroda",
+    "linkPlaceholder": "Įklijuok YouTube nuorodą",
+    "confirm": "Pradėti",
+    "watchHint": "Žiūrėti YouTube vaizdo įrašą kartu su šiuo kanalu",
+    "dialogTitle": "Žiūrėti kartu",
+    "addTitle": "Pridėti į grojaraštį",
+    "addToPlaylist": "Pridėti į grojaraštį",
+    "addConfirm": "Pridėti",
+    "apps": "Programos",
+    "appsLive": "Programos (bendrini ekraną)"
+  },
+  "activity": {
+    "share": "{{name}} bendrina ekraną",
+    "watch": "Žiūrėti",
+    "party": "Bendra peržiūra: {{title}}",
+    "join": "Prisijungti",
+    "videoFallback": "YouTube vaizdo įrašas",
+    "someone": "Kažkas",
+    "joinFailed": "Nepavyko prisijungti prie bendros peržiūros."
   }
 }

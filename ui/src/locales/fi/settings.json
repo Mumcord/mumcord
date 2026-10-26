@@ -14,7 +14,9 @@
     "sounds": "Äänet ja ilmoitukset",
     "overlay": "Peittokuva",
     "diagnostics": "Diagnostiikka",
-    "about": "Tietoja"
+    "about": "Tietoja",
+    "servers": "Palvelimet",
+    "privacy": "Yksityisyys"
   },
   "search": {
     "label": "Hae asetuksista",
@@ -68,7 +70,17 @@
     "testPlaying": "Toistetaan ääntäsi…",
     "quality": "Laatu",
     "musicQuality": "Musiikkilaatu",
-    "musicQualityHint": "Käyttää enemmän kaistaa ja poistaa käytöstä kohinanvaimennuksen ja automaattisen äänenvoimakkuuden; musiikkia varten. Puhu painamalla toimii parhaiten."
+    "musicQualityHint": "Käyttää enemmän kaistaa ja poistaa käytöstä kohinanvaimennuksen ja automaattisen äänenvoimakkuuden; musiikkia varten. Puhu painamalla toimii parhaiten.",
+    "bitrate": "Bittinopeus",
+    "bitrateMax": "Maks.",
+    "bitrateValue": "{{kbps}} kbit/s",
+    "bitrateMaxKnown": "Enintään: {{kbps}} kbit/s. Yhteyden hävikki voi silti laskea sitä.",
+    "bitrateMaxUnknown": "Enintään: riippuu palvelimesta. Yhteyden hävikki voi silti laskea sitä.",
+    "videoSound": "Videoiden ääni",
+    "ducking": "Hiljennä videoiden ääntä, kun joku puhuu",
+    "duckingHint": "Yhteiskatselun videon ja näytön jaon ääni hiljenee, kun joku puhekanavallasi puhuu.",
+    "duckingLevel": "Hiljennetty äänenvoimakkuus",
+    "duckingLevelValue": "{{percent}} %"
   },
   "voice": {
     "talkMode": "Puhetila",
@@ -178,6 +190,7 @@
     "compact": "Tiivis: aika, nimi ja viesti samalla rivillä",
     "theme": "Teema",
     "themeLegend": "Väriteema",
+    "modeLegend": "Tumma vai vaalea",
     "system": "Seuraa järjestelmää",
     "dark": "Tumma",
     "light": "Vaalea",
@@ -189,6 +202,61 @@
     "autostart": "Käynnistä Mumcord, kun kirjaudun sisään",
     "startMinimized": "Käynnistä pienennettynä",
     "startMinimizedHint": "Kun Mumcord käynnistyy kirjautuessa, se odottaa ilmoitusalueella ikkunan avaamisen sijaan."
+  },
+  "themeEditor": {
+    "name": "Teeman nimi",
+    "colorsLegend": "Päävärit",
+    "colorColumn": "Väri",
+    "auto": "auto",
+    "cellLabel": "{{color}}, {{version}}",
+    "newTitle": "Uusi teema",
+    "editTitle": "Muokkaa: ”{{name}}”",
+    "generatedFromDark": "Tehty automaattisesti tummasta versiosta. Seuraa siellä tekemiäsi muutoksia, kunnes muutat sitä täällä.",
+    "generatedFromLight": "Tehty automaattisesti vaaleasta versiosta. Seuraa siellä tekemiäsi muutoksia, kunnes muutat sitä täällä.",
+    "colors": {
+      "background": "Tausta",
+      "surface": "Pinta",
+      "text": "Teksti",
+      "accent": "Korostus",
+      "talking": "Puhuu ja paikalla",
+      "warning": "Varoitus",
+      "error": "Virhe"
+    },
+    "pickColor": "Värinvalitsin: {{color}}",
+    "invalidHex": "Anna väri muodossa # ja kuusi heksadesimaalinumeroa, esimerkiksi #1a2b3c.",
+    "contrastLowIn": "{{version}}: kontrasti liian matala: {{ratio}}:1, vähintään {{min}}:1 tarvitaan.",
+    "unreadable": "Tämä teema ei ole tarpeeksi luettava. Muuta tekstin tai taustan väriä tallentaaksesi sen.",
+    "copyName": "{{name}} (kopio)",
+    "save": "Tallenna teema",
+    "saveAs": "Tallenna teemana",
+    "saved": "Teema tallennettu.",
+    "share": "Jaa",
+    "shared": "Teema kopioitu. Liitä se chattiin jakaaksesi sen.",
+    "shareFailed": "Mumcord ei voinut kopioida teemaa leikepöydälle.",
+    "import": "Tuo…",
+    "importTitle": "Tuo teema",
+    "importLabel": "Teemaviesti tai koodi",
+    "importHint": "Liitä chat-viesti, jossa on Mumcord-teema, tai pelkkä sen koodi (alkaa mct1.).",
+    "importConfirm": "Tuo",
+    "importInvalid": "Tämä ei ole kelvollinen Mumcord-teema.",
+    "importUnreadable": "Tämä teema ei ole tarpeeksi luettava.",
+    "imported": "”{{name}}” tuotu.",
+    "alreadyImported": "”{{name}}” on jo teemoissasi.",
+    "madeWithNewer": "Tehty Mumcordin versiolla {{version}} – päivitä nähdäksesi sen kokonaan.",
+    "reset": "Palauta",
+    "menuLabel": "Valinnat: {{name}}",
+    "edit": "Muokkaa teemaa",
+    "newFromThis": "Uusi teema tästä",
+    "preview": "Esikatselu",
+    "previewing": "Esikatsellaan: {{name}}",
+    "backToEditor": "Takaisin editoriin",
+    "rename": "Nimeä teema uudelleen",
+    "renameTitle": "Nimeä ”{{name}}” uudelleen",
+    "renameConfirm": "Nimeä uudelleen",
+    "delete": "Poista teema",
+    "deleteTitle": "Poistetaanko ”{{name}}”?",
+    "deleteMessage": "Tätä teemaa käyttävät palvelimet palaavat sovelluksen teemaan.",
+    "deleteConfirm": "Poista"
   },
   "accessibility": {
     "hints": "Vihjeet",
@@ -212,7 +280,14 @@
     "hangUp": "Katkaiset yhteyden palvelimeen",
     "messages": "Uusi viesti seuratulla kanavalla tai yksityisessä chatissa",
     "mention": "Ääni, kun sinut mainitaan",
-    "mentionNotify": "Ilmoita, kun sinut mainitaan"
+    "mentionNotify": "Ilmoita, kun sinut mainitaan",
+    "partyStarted": "Joku aloittaa yhteiskatselun kanavallasi",
+    "partyJoined": "Joku liittyy yhteiskatseluusi",
+    "partyLeft": "Joku poistuu yhteiskatselustasi",
+    "shareStarted": "Joku aloittaa näytön jaon kanavallasi",
+    "shareStopped": "Näytön jako kanavallasi päättyy",
+    "viewerStarted": "Joku alkaa katsoa näytön jakoasi",
+    "viewerStopped": "Joku lopettaa näytön jakosi katsomisen"
   },
   "notifications": {
     "title": "Ilmoitukset",
@@ -224,29 +299,6 @@
     "off": "Pois"
   },
   "overlay": {
-    "window": {
-      "title": "Ikkunapeittokuva",
-      "enable": "Näytä peittokuva",
-      "enableHint": "Pieni läpinäkyvä ikkuna, joka näyttää, kuka puhuu. Saatavilla myös ilmoitusalueen valikosta.",
-      "positionUnsupported": "Tämä työpöytä päättää, mihin ikkunat ilmestyvät, joten kulmasijainneilla ja siirtämisellä ei ole vaikutusta.",
-      "move": "Siirrä peittokuvaa…",
-      "moveDone": "Siirto valmis",
-      "size": "Leveys",
-      "wholeChannel": "Näytä koko kanava",
-      "wholeChannelHint": "Pois päältä: vain puhuvat henkilöt.",
-      "channelName": "Näytä kanavan nimi",
-      "loadFailed": "Peittokuvan asetuksia ei voitu ladata.",
-      "saveFailed": "Peittokuvan muutosta ei voitu ottaa käyttöön.",
-      "kwin": {
-        "setUp": "Määritä automaattisesti",
-        "done": "Valmis: KDE-ikkunasääntö ”Mumcord overlay” on käytössä.",
-        "removed": "KDE-ikkunasääntö poistettiin.",
-        "remove": "Poista sääntö",
-        "openRules": "Avaa KDE:n ikkunasäännöt",
-        "compat": "Käytä sen sijaan yhteensopivuustilaa",
-        "failed": "KDE-ikkunasääntöä ei voitu muuttaa. Avaa KDE:n ikkunasäännöt ja lisää se käsin."
-      }
-    },
     "corner": {
       "label": "Sijainti",
       "topLeft": "Ylävasen",
@@ -281,8 +333,16 @@
       "confirmEnable": "Ota käyttöön silti",
       "limits": {
         "libraryMissing": "Pelinsisäinen peittokuva ei ole käytettävissä: sen kirjastoa (libmumcord_overlay_layer.so) ei löytynyt Mumcordin vierestä. Palauta se asentamalla Mumcord uudelleen. Sen sijaan käytetään yllä olevaa ikkunapeittokuvaa.",
-        "windowsPending": "Pelinsisäinen peittokuva ei ole vielä käytettävissä Windowsissa. Sen sijaan käytetään yllä olevaa ikkunapeittokuvaa.",
+        "windowsFullscreen": "Käytä pelissä reunatonta tai ikkunoitua koko näyttöä.",
         "macos": "macOS ei tue pelinsisäisiä peittokuvia. Sen sijaan käytetään yllä olevaa ikkunapeittokuvaa."
+      },
+      "opengl": {
+        "title": "OpenGL-pelit",
+        "explanation": "Tarvitaan vain OpenGL-peleissä: liitä pelin Steam-käynnistysasetuksiin.",
+        "label": "Steam-käynnistysasetus",
+        "copy": "Kopioi",
+        "copied": "Kopioitu",
+        "copyFailed": "Kopiointi epäonnistui. Valitse teksti ja kopioi se käsin."
       }
     }
   },
@@ -388,5 +448,38 @@
       "unsupported": "Ei käytettävissä tässä järjestelmässä.",
       "failed": "Pysähtyi virheen jälkeen. Yritä uudelleen poistamalla se käytöstä ja ottamalla uudelleen käyttöön."
     }
+  },
+  "servers": {
+    "connections": "Yhteydet",
+    "limit": "Yhtä aikaa yhdistetyt palvelimet",
+    "limitHint": "Välillä 1–15. Rajan ylittävät yhteydet hylätään.",
+    "limitInvalid": "Anna kokonaisluku väliltä 1–15."
+  },
+  "appearanceEffects": {
+    "title": "Tehosteet",
+    "visualEffects": "Visuaaliset tehosteet (lasi, rakeisuus)",
+    "visualEffectsHint": "Huurrelasivalikot ja hienovarainen filmirae. Pois päältä automaattisesti, kun järjestelmä pyytää vähemmän läpinäkyvyyttä tai liikettä."
+  },
+  "channelList": {
+    "title": "Kanavaluettelo",
+    "hideEmpty": "Piilota tyhjät kanavat",
+    "talkingFirst": "Näytä puhujat ensin",
+    "weakConnection": "Näytä heikon yhteyden kuvake",
+    "weakConnectionHint": "Pieni signaalikuvake henkilöiden vieressä, joilla on heikko yhteys."
+  },
+  "privacyDirect": {
+    "title": "Suorat yhteydet",
+    "allow": "Salli suorat yhteydet muihin Mumcord-käyttäjiin",
+    "hint": "Suorat yhteydet ovat nopeampia, mutta toinen henkilö näkee IP-osoitteesi. Kunnes päätät, Mumcord kysyy, kun sellaista käytettäisiin ensimmäisen kerran."
+  },
+  "updates": {
+    "title": "Päivitykset",
+    "check": "Etsi uusia versioita",
+    "hint": "Kerran päivässä Mumcord kysyy GitHubilta uusinta julkaisua. Mitään muuta ei lähetetä."
+  },
+  "appImageMenu": {
+    "label": "Lisää Mumcord sovellusvalikkoon",
+    "hint": "Saa kuvakkeen ja puhu painamalla -toiminnon toimimaan oikein Waylandissa ja mumble://-linkit avaamaan Mumcordin. Vain AppImagelle.",
+    "failed": "Se ei onnistunut. Yritä uudelleen."
   }
 }

@@ -1,5 +1,5 @@
 import { act, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
-import { afterEach, beforeAll, describe, expect, it } from "vitest";
+import { afterEach, beforeAll, describe, expect, it, vi } from "vitest";
 import { applyLanguage } from "../../i18n";
 import { axeViolations } from "../../test/axe";
 import { ChannelSearch } from "../channels/ChannelSearch";
@@ -87,12 +87,13 @@ describe("Composer formatting", () => {
       "Inline code",
       "Code block",
       "Link",
+      "Quote",
     ]);
-    expect(buttons[0]?.title).toBe("Bold (Ctrl+B)");
+    expect(buttons[0]?.dataset.tooltip).toBe("Bold (Ctrl+B)");
     expect(buttons.filter((b) => b.tabIndex === 0)).toHaveLength(1);
     buttons[0]?.focus();
     fireEvent.keyDown(buttons[0] as HTMLButtonElement, { key: "ArrowLeft" });
-    expect(document.activeElement).toBe(buttons[5]);
+    expect(document.activeElement).toBe(buttons[6]);
     expect(await axeViolations(container)).toEqual([]);
   });
 });
@@ -164,5 +165,87 @@ describe("Composer mentions", () => {
     await screen.findByRole("listbox");
     fireEvent.keyDown(input, { key: "b", ctrlKey: true });
     expect(input.value).toBe("@a****");
+  });
+});
+
+describe("Composer replies", () => {
+  afterEach(() => {
+    resetAll();
+  });
+
+  it("shows the reply preview, sends the quote first and cancels with Escape", async () => {
+    const api = await connectedMock();
+    const sent: string[] = [];
+    const original = api.sendChannelMessage.bind(api);
+    vi.spyOn(api, "sendChannelMessage").mockImplementation((serverId, channel, html) => {
+      sent.push(html);
+      return original(serverId, channel, html);
+    });
+    const onCancel = vi.fn();
+    const { rerender } = render(
+      <Composer
+        target={{ kind: "channel", channelId: 1 }}
+        limits={LIMITS}
+        label="Message #Lobby"
+        blockedReason={null}
+        reply={{ name: "Maya", snippet: "<b>hi</b>" }}
+        onCancelReply={onCancel}
+      />,
+    );
+    const input = screen.getByRole<HTMLTextAreaElement>("textbox", { name: "Message #Lobby" });
+    await waitFor(() => {
+      expect(input).toHaveFocus();
+    });
+    expect(screen.getByText(/Replying to/)).toHaveTextContent("Replying to Maya: <b>hi</b>");
+
+    fireEvent.keyDown(input, { key: "Escape" });
+    expect(onCancel).toHaveBeenCalledTimes(1);
+
+    fireEvent.change(input, { target: { value: "yes" } });
+    fireEvent.keyDown(input, { key: "Enter" });
+    await waitFor(() => {
+      expect(sent).toEqual(["<blockquote><b>Maya</b>: &lt;b&gt;hi&lt;/b&gt;</blockquote>yes"]);
+    });
+    expect(onCancel).toHaveBeenCalledTimes(2);
+
+    rerender(
+      <Composer
+        target={{ kind: "channel", channelId: 1 }}
+        limits={LIMITS}
+        label="Message #Lobby"
+        blockedReason={null}
+        reply={{ name: "Maya", snippet: "hi" }}
+        onCancelReply={onCancel}
+      />,
+    );
+    fireEvent.click(screen.getByRole("button", { name: "Cancel reply" }));
+    expect(onCancel).toHaveBeenCalledTimes(3);
+  });
+});
+
+describe("Composer Apps button", () => {
+  afterEach(resetAll);
+
+  it("sits directly before the image picker and has no menu until opened", async () => {
+    const api = await connectedMock({ bindStore: true });
+    api.mock.emit("voiceServerChanged", { serverId: 1 });
+    const { selectConversation } = await import("../channels/selection");
+    const { getServerState } = await import("../channels/serverStore");
+    const { users, selfSession } = getServerState();
+    selectConversation({
+      kind: "channel",
+      channelId: users.get(selfSession ?? -1)?.channelId ?? -1,
+    });
+    renderComposer();
+    const apps = screen.getByRole("button", { name: "Apps" });
+    expect(apps.parentElement?.nextElementSibling).toBe(
+      screen.getByRole("button", { name: "Add image" }),
+    );
+    expect(screen.queryByRole("menu")).toBeNull();
+  });
+
+  it("is not shown when the chat is not the voice channel's", () => {
+    renderComposer();
+    expect(screen.queryByRole("button", { name: "Apps" })).toBeNull();
   });
 });

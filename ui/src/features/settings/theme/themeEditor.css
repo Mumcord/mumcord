@@ -1,0 +1,93 @@
+/* The editor dialog: wide enough for the Light | Dark table. */
+.settings-dialog.theme-editor {
+  width: min(40rem, calc(100vw - 2 * var(--space-4)));
+}
+
+.theme-editor__legend {
+  margin: 0 0 var(--space-1);
+  font-size: var(--font-size-md);
+  font-weight: 600;
+  text-align: start;
+}
+
+.theme-editor__name {
+  max-width: 16rem;
+}
+
+/* One row per key colour, the Light and Dark versions side by side (FR-2.63). */
+.theme-table {
+  width: 100%;
+  margin-top: var(--space-2);
+  border-collapse: collapse;
+}
+
+.theme-table th,
+.theme-table td {
+  padding: var(--space-1) var(--space-1) var(--space-1) 0;
+  text-align: start;
+  vertical-align: top;
+}
+
+.theme-table th[scope="row"] {
+  padding-top: calc(var(--space-1) + 0.4rem);
+  font-weight: normal;
+}
+
+.theme-table__auto {
+  margin-inline-start: var(--space-1);
+  padding: 0 var(--space-1);
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-sm);
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-xs);
+  font-weight: normal;
+}
+
+/* Colour button and hex field of one cell. */
+.theme-color {
+  display: grid;
+  grid-template-columns: auto minmax(5rem, 7rem);
+  align-items: center;
+  column-gap: var(--space-1);
+}
+
+.theme-color__picker {
+  width: 2.25rem;
+  height: 2rem;
+  padding: 0;
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-sm);
+  background: none;
+  cursor: pointer;
+}
+
+.theme-color__hex {
+  font-family: monospace;
+  text-align: end;
+}
+
+.theme-color__note {
+  grid-column: 1 / -1;
+  margin: var(--space-1) 0 0;
+  font-size: var(--font-size-sm);
+}
+
+/* Floating bar shown while the app previews the draft; sits above the settings overlay. */
+.theme-preview-bar {
+  position: fixed;
+  inset-block-end: var(--space-4);
+  inset-inline: 0;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-3);
+  width: fit-content;
+  margin-inline: auto;
+  padding: var(--space-2) var(--space-4);
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-lg);
+  background: var(--color-bg-elevated);
+  color: var(--color-text);
+  box-shadow: var(--shadow-raised);
+}

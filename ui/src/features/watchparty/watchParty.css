@@ -1,0 +1,256 @@
+/* Watch party above the chat (FR-2.39 – FR-2.41, spec 5.4). */
+.watch-party {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin: var(--space-2) var(--space-3) 0;
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-md);
+  background: color-mix(in srgb, var(--color-accent) 10%, transparent);
+}
+
+.watch-party__header {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  align-items: center;
+}
+
+.watch-party__title {
+  margin: 0;
+  font-size: 1rem;
+}
+
+.watch-party__beta {
+  margin-left: var(--space-1);
+  padding: 0 var(--space-1);
+  border: 1px solid currentcolor;
+  border-radius: var(--radius-sm);
+  font-size: 0.75rem;
+  font-weight: normal;
+}
+
+.watch-party__player {
+  width: 100%;
+  max-width: 48rem;
+}
+
+.watch-party__frame {
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  border: 0;
+  border-radius: var(--radius-sm);
+}
+
+.watch-party__unavailable {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  align-items: center;
+}
+
+.watch-party__unavailable p,
+.watch-party__action {
+  margin: 0;
+}
+
+/* Missing-codec hint (FR-2.41a): its own line between the message and the button. */
+.watch-party__codec-hint {
+  flex-basis: 100%;
+  min-width: 0;
+}
+
+.watch-party__codec-hint p {
+  margin: 0;
+}
+
+/* The install command is long and has no spaces to break at, so it wraps anywhere. */
+.watch-party__codec-hint code {
+  padding: 0 var(--space-1);
+  border-radius: var(--radius-sm);
+  background: var(--color-bg-hover);
+  overflow-wrap: anywhere;
+  user-select: all;
+}
+
+/* Playlist (FR-2.69). */
+.watch-playlist {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  max-width: 48rem;
+}
+
+.watch-playlist__header {
+  display: flex;
+  gap: var(--space-2);
+  align-items: center;
+  justify-content: space-between;
+}
+
+.watch-playlist__title,
+.watch-playlist__empty {
+  margin: 0;
+  font-size: 0.875rem;
+}
+
+.watch-playlist__list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  max-height: 16rem;
+  margin: 0;
+  padding: 0;
+  overflow-y: auto;
+  list-style: none;
+}
+
+.watch-playlist__entry {
+  display: flex;
+  gap: var(--space-2);
+  align-items: center;
+  padding: var(--space-1);
+  border-radius: var(--radius-sm);
+  cursor: grab;
+}
+
+.watch-playlist__entry:hover,
+.watch-playlist__entry:focus-visible {
+  background: color-mix(in srgb, var(--color-accent) 12%, transparent);
+}
+
+.watch-playlist__entry--dragged {
+  opacity: 0.5;
+}
+
+.watch-playlist__thumbnail {
+  flex: none;
+  width: 48px;
+  aspect-ratio: 16 / 9;
+  border-radius: var(--radius-sm);
+  background: color-mix(in srgb, currentcolor 10%, transparent);
+  object-fit: cover;
+}
+
+.watch-playlist__text {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.watch-playlist__name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.watch-playlist__handle {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: 1.5rem;
+  height: 1.5rem;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  line-height: 1;
+  cursor: grab;
+}
+
+/* Compact icon buttons and rows. */
+.watch-party__icon {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  min-width: 1.75rem;
+  height: 1.75rem;
+  padding: 0 var(--space-1);
+}
+
+.watch-playlist__up-next {
+  flex: 1;
+  min-width: 0;
+  margin: 0;
+  overflow: hidden;
+  font-size: 0.8125rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.watch-playlist__by {
+  display: inline-flex;
+  flex: none;
+}
+
+.watch-playlist__remove {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: 1.5rem;
+  height: 1.5rem;
+  min-width: 0;
+  padding: 0;
+  line-height: 1;
+}
+
+.watch-playlist__add {
+  display: inline-flex;
+  gap: var(--space-1);
+  align-items: center;
+  align-self: flex-start;
+  margin-top: var(--space-1);
+}
+
+@keyframes watch-party-notice {
+  0%,
+  90% {
+    opacity: 1;
+  }
+
+  100% {
+    opacity: 0;
+  }
+}
+
+.watch-party__notice {
+  animation: watch-party-notice 4s forwards;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .watch-party__notice {
+    animation: none;
+  }
+}
+
+.watch-playlist__next {
+  flex: 1;
+  min-width: 0;
+}
+
+button.watch-playlist__up-next {
+  display: block;
+  width: 100%;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  cursor: pointer;
+  text-align: start;
+}
+
+/* Fixed so it reaches out of the clipping widget; above widgets (30+), below menus (70). */
+.watch-playlist__popover {
+  position: fixed;
+  z-index: 50;
+  padding: var(--space-1);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-bg-elevated);
+  box-shadow: 0 8px 24px rgb(0 0 0 / 35%);
+}

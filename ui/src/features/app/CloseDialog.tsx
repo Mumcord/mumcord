@@ -9,27 +9,28 @@ import "./app.css";
  * `closeChoice`. Escape or cancelling keeps the window open and connected.
  */
 export function CloseDialog() {
-  const [open, setOpen] = useState(false);
+  const [servers, setServers] = useState<number | null>(null);
 
   useEffect(
     () =>
-      getApi().on("closeRequested", () => {
-        setOpen(true);
+      getApi().on("closeRequested", ({ connectedServers }) => {
+        setServers(connectedServers);
       }),
     [],
   );
 
-  if (!open) return null;
+  if (servers === null) return null;
   return (
     <CloseDialogContent
+      servers={servers}
       onDone={() => {
-        setOpen(false);
+        setServers(null);
       }}
     />
   );
 }
 
-function CloseDialogContent({ onDone }: { onDone: () => void }) {
+function CloseDialogContent({ servers, onDone }: { servers: number; onDone: () => void }) {
   const { t } = useTranslation("appwindow");
   const titleId = useId();
   const descriptionId = useId();
@@ -79,7 +80,9 @@ function CloseDialogContent({ onDone }: { onDone: () => void }) {
       <h2 id={titleId} className="app-dialog__title">
         {t("close.title")}
       </h2>
-      <p id={descriptionId}>{t("close.description")}</p>
+      <p id={descriptionId}>
+        {servers > 1 ? t("close.descriptionServers", { count: servers }) : t("close.description")}
+      </p>
       <label className="app-dialog__remember">
         <input
           type="checkbox"

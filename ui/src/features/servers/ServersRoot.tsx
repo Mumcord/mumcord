@@ -1,17 +1,15 @@
 import { useTranslation } from "react-i18next";
+import { useServerStateOf } from "../channels/serverStore";
 import { CertTrustDialog } from "./CertTrustDialog";
+import { ChannelPasswordDialog } from "./ChannelPasswordDialog";
+import { useChannelPasswordPrompt } from "./channelPasswordStore";
 import { ConfirmDialog } from "./ConfirmDialog";
 import { displayName } from "./format";
+import { PasswordDialog } from "./PasswordDialog";
 import { ServerBar } from "./ServerBar";
 import { ServerDialog } from "./ServerDialog";
-import {
-  closeDialog,
-  confirmSwitch,
-  decideTrust,
-  removeServer,
-  useServers,
-  type ServersState,
-} from "./store";
+import { ServerThemeDialog } from "./ServerThemeDialog";
+import { closeDialog, decideTrust, removeServer, useServers, type ServersState } from "./store";
 import "./servers.css";
 
 function nameOf(state: ServersState, id: number): string {
@@ -22,7 +20,7 @@ function nameOf(state: ServersState, id: number): string {
 function ServerDialogs() {
   const { t } = useTranslation("servers");
   const state = useServers();
-  const { dialog, connection } = state;
+  const { dialog } = state;
   if (!dialog) return null;
   switch (dialog.kind) {
     case "add":
@@ -47,6 +45,11 @@ function ServerDialogs() {
         />
       );
     }
+    case "theme": {
+      const server = state.servers.find((s) => s.id === dialog.serverId);
+      if (!server) return null;
+      return <ServerThemeDialog key={server.id} server={server} onClose={closeDialog} />;
+    }
     case "remove":
       return (
         <ConfirmDialog
@@ -61,34 +64,42 @@ function ServerDialogs() {
           onClose={closeDialog}
         />
       );
-    case "switch": {
-      const current = connection.state === "disconnected" ? null : connection.serverId;
-      return (
-        <ConfirmDialog
-          title={t("switch.title")}
-          message={t("switch.message", {
-            current: current === null ? "" : nameOf(state, current),
-            next: nameOf(state, dialog.serverId),
-          })}
-          confirmLabel={t("switch.confirm")}
-          onConfirm={() => {
-            confirmSwitch(dialog.serverId, dialog.channelPath);
-          }}
-          onClose={closeDialog}
-        />
-      );
-    }
   }
+}
+
+function ChannelPasswordHost() {
+  const prompt = useChannelPasswordPrompt();
+  const server = useServerStateOf(prompt?.serverId ?? null);
+  if (!prompt) return null;
+  return (
+    <ChannelPasswordDialog
+      key={`${String(prompt.serverId)}-${String(prompt.channelId)}`}
+      prompt={prompt}
+      channelName={server.channels.get(prompt.channelId)?.name ?? ""}
+    />
+  );
 }
 
 /** Content of the server bar mount: the bar plus the server, confirmation and trust dialogs. */
 export function ServersRoot() {
   const state = useServers();
   const prompt = state.certPrompt;
+  const firstPrompt = state.passwordPrompts[0];
   return (
     <>
       <ServerBar />
       <ServerDialogs />
+      <ChannelPasswordHost />
+      {firstPrompt && (
+        <PasswordDialog
+          key={firstPrompt.serverId}
+          prompt={firstPrompt}
+          serverName={nameOf(state, firstPrompt.serverId)}
+          savedPassword={
+            state.servers.find((s) => s.id === firstPrompt.serverId)?.hasPassword ?? false
+          }
+        />
+      )}
       {prompt && (
         <CertTrustDialog
           key={prompt.fingerprint}

@@ -20,6 +20,12 @@ use crate::shared::{self, Frame};
 const VERTEX_SPV: &[u8] = include_bytes!("../../shaders/overlay.vert.spv");
 const FRAGMENT_SPV: &[u8] = include_bytes!("../../shaders/overlay.frag.spv");
 
+/// Whether the swapchain carries HDR10 (BT.2020 primaries, ST 2084 curve), where the overlay
+/// needs a colour conversion in the shader.
+fn is_hdr10(color_space: vk::ColorSpaceKHR) -> bool {
+    color_space == vk::ColorSpaceKHR::HDR10_ST2084_EXT
+}
+
 struct PerImage {
     view: vk::ImageView,
     framebuffer: vk::Framebuffer,
@@ -55,6 +61,7 @@ pub struct Renderer {
     pipeline_layout: vk::PipelineLayout,
     pipeline: vk::Pipeline,
     sampler: vk::Sampler,
+    hdr10: bool,
     descriptor_pool: vk::DescriptorPool,
     images: Vec<PerImage>,
     /// Command pool and the queue family it belongs to, made on the first present.
@@ -145,6 +152,7 @@ impl Renderer {
             pipeline_layout: vk::PipelineLayout::null(),
             pipeline: vk::Pipeline::null(),
             sampler: vk::Sampler::null(),
+            hdr10: is_hdr10(info.image_color_space),
             descriptor_pool: vk::DescriptorPool::null(),
             images: Vec::new(),
             pool: None,
@@ -358,6 +366,15 @@ impl Renderer {
                 return Err(e);
             }
         };
+        // Selects the HDR10 conversion in the fragment shader (`HDR10`, constant id 0).
+        let hdr10 = u32::from(self.hdr10).to_ne_bytes();
+        let spec_entry = [vk::SpecializationMapEntry::default()
+            .constant_id(0)
+            .offset(0)
+            .size(hdr10.len())];
+        let spec = vk::SpecializationInfo::default()
+            .map_entries(&spec_entry)
+            .data(&hdr10);
         let stages = [
             vk::PipelineShaderStageCreateInfo::default()
                 .stage(vk::ShaderStageFlags::VERTEX)
@@ -366,7 +383,8 @@ impl Renderer {
             vk::PipelineShaderStageCreateInfo::default()
                 .stage(vk::ShaderStageFlags::FRAGMENT)
                 .module(fragment)
-                .name(c"main"),
+                .name(c"main")
+                .specialization_info(&spec),
         ];
         let vertex_input = vk::PipelineVertexInputStateCreateInfo::default();
         let assembly = vk::PipelineInputAssemblyStateCreateInfo::default()
@@ -898,6 +916,14 @@ mod tests {
         assert_eq!(upload_slot(0, []), Some(1));
         // The back slot is only reused once nothing on the GPU samples it any more.
         assert_eq!(upload_slot(0, [0, 1]), None);
+    }
+
+    #[test]
+    fn only_the_st2084_colour_space_is_hdr10() {
+        assert!(is_hdr10(vk::ColorSpaceKHR::HDR10_ST2084_EXT));
+        assert!(!is_hdr10(vk::ColorSpaceKHR::SRGB_NONLINEAR));
+        assert!(!is_hdr10(vk::ColorSpaceKHR::EXTENDED_SRGB_LINEAR_EXT));
+        assert!(!is_hdr10(vk::ColorSpaceKHR::HDR10_HLG_EXT));
     }
 
     #[test]

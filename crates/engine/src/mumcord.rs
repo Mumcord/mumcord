@@ -15,6 +15,7 @@ use std::collections::{HashMap, HashSet};
 use mumcord_protocol::{Handle, PLUGIN_DATA_MAX, PluginData};
 use serde::{Deserialize, Serialize};
 
+use crate::ServerId;
 use crate::session::{Engine, SessionCtx, lock};
 
 /// Plugin data id of the hello; other ids are ignored.
@@ -24,7 +25,14 @@ pub const VERSION: u32 = 1;
 /// The `app` value of every hello.
 const APP: &str = "mumcord";
 /// What this client can do for other Mumcord clients.
-pub const FEATURES: &[&str] = &["now-playing", "now-gaming", crate::full_image::FEATURE];
+pub const FEATURES: &[&str] = &[
+    "now-playing",
+    "now-gaming",
+    crate::full_image::FEATURE,
+    crate::p2p::FEATURE,
+    crate::watch_party::FEATURE,
+    crate::screen_share::signal::FEATURE,
+];
 const MAX_FEATURES: usize = 16;
 const MAX_FEATURE_LEN: usize = 32;
 
@@ -85,7 +93,10 @@ pub fn decode(data: &[u8]) -> Result<Vec<String>, HelloError> {
     Ok(features)
 }
 
-/// Who is known as a Mumcord user on the current connection.
+/// Who is known as a Mumcord user, per connected server.
+pub(crate) type ServerPeers = std::sync::Mutex<HashMap<ServerId, Peers>>;
+
+/// Who is known as a Mumcord user on one connection.
 #[derive(Default)]
 pub(crate) struct Peers {
     /// Session → announced features.
@@ -143,11 +154,12 @@ fn others(handle: &Handle) -> Vec<u32> {
 }
 
 /// The connection synced: greet everyone who is already here.
-pub(crate) fn on_synced(state: &std::sync::Mutex<Peers>, ctx: &SessionCtx) {
+pub(crate) fn on_synced(state: &ServerPeers, ctx: &SessionCtx) {
     let own = ctx.handle.with_state(|s| s.session);
     let everyone = others(&ctx.handle);
     {
-        let mut peers = lock(state);
+        let mut servers = lock(state);
+        let peers = servers.entry(ctx.server_id).or_default();
         peers.reset();
         peers.synced = true;
         // We are a Mumcord client too: the badge must show on our own entry everywhere.
@@ -160,31 +172,32 @@ pub(crate) fn on_synced(state: &std::sync::Mutex<Peers>, ctx: &SessionCtx) {
 }
 
 /// Someone joined after the sync: they get our hello.
-pub(crate) fn on_user_joined(state: &std::sync::Mutex<Peers>, ctx: &SessionCtx, session: u32) {
+pub(crate) fn on_user_joined(state: &ServerPeers, ctx: &SessionCtx, session: u32) {
     if ctx.handle.with_state(|s| s.session) == Some(session) {
         return;
     }
-    let first = {
-        let mut peers = lock(state);
-        peers.synced && peers.greet(session)
-    };
+    let first = lock(state)
+        .get_mut(&ctx.server_id)
+        .is_some_and(|peers| peers.synced && peers.greet(session));
     if first {
         send(&ctx.handle, &[session]);
     }
 }
 
 /// Forgets a person who left; true when they were a known Mumcord user.
-pub(crate) fn on_user_removed(state: &std::sync::Mutex<Peers>, session: u32) -> bool {
-    lock(state).forget(session)
+pub(crate) fn on_user_removed(state: &ServerPeers, server_id: ServerId, session: u32) -> bool {
+    lock(state)
+        .get_mut(&server_id)
+        .is_some_and(|peers| peers.forget(session))
 }
 
-pub(crate) fn on_disconnect(state: &std::sync::Mutex<Peers>) {
-    lock(state).reset();
+pub(crate) fn on_disconnect(state: &ServerPeers, server_id: ServerId) {
+    lock(state).remove(&server_id);
 }
 
 /// A hello arrived (session task). Returns the sender when its Mumcord state changed.
 pub(crate) fn on_plugin_data(
-    state: &std::sync::Mutex<Peers>,
+    state: &ServerPeers,
     ctx: &SessionCtx,
     data: &PluginData,
 ) -> Option<u32> {
@@ -206,7 +219,8 @@ pub(crate) fn on_plugin_data(
         }
     };
     let (changed, reply) = {
-        let mut peers = lock(state);
+        let mut servers = lock(state);
+        let peers = servers.entry(ctx.server_id).or_default();
         (
             peers.learn(sender, features),
             peers.synced && peers.greet(sender),
@@ -219,16 +233,25 @@ pub(crate) fn on_plugin_data(
 }
 
 impl Engine {
-    /// Whether `session` is known to be another Mumcord client (it sent a hello).
-    pub fn is_mumcord_user(&self, session: u32) -> bool {
-        lock(self.mumcord_state()).features(session).is_some()
+    /// Whether `session` on `server_id` is known to be another Mumcord client (it sent a hello).
+    pub fn is_mumcord_user(&self, server_id: ServerId, session: u32) -> bool {
+        lock(self.mumcord_state())
+            .get(&server_id)
+            .and_then(|peers| peers.features(session))
+            .is_some()
     }
 
-    /// Whether `session` is a Mumcord client that announced `feature`. Gate Mumcord-only
-    /// behaviour (extra plugin payloads, shared history, …) on this.
-    pub fn mumcord_user_has_feature(&self, session: u32, feature: &str) -> bool {
+    /// Whether `session` on `server_id` is a Mumcord client that announced `feature`. Gate
+    /// Mumcord-only behaviour (extra plugin payloads, shared history, …) on this.
+    pub fn mumcord_user_has_feature(
+        &self,
+        server_id: ServerId,
+        session: u32,
+        feature: &str,
+    ) -> bool {
         lock(self.mumcord_state())
-            .features(session)
+            .get(&server_id)
+            .and_then(|peers| peers.features(session))
             .is_some_and(|f| f.iter().any(|x| x == feature))
     }
 }
@@ -240,7 +263,17 @@ mod tests {
     #[test]
     fn hello_round_trips() {
         let features = decode(&encode()).expect("own hello decodes");
-        assert_eq!(features, ["full-image", "now-gaming", "now-playing"]);
+        assert_eq!(
+            features,
+            [
+                "full-image",
+                "now-gaming",
+                "now-playing",
+                "p2p",
+                "screen-share",
+                "watch-party"
+            ]
+        );
         assert!(encode().len() <= PLUGIN_DATA_MAX);
     }
 

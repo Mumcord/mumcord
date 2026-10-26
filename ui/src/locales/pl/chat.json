@@ -8,6 +8,7 @@
     "unknownPerson": "Nieznana osoba"
   },
   "list": {
+    "server": "Serwer",
     "today": "Dziś",
     "yesterday": "Wczoraj",
     "label": "Wiadomości w {{name}}",
@@ -36,7 +37,8 @@
     "strike": "Przekreślenie",
     "code": "Kod w linii",
     "codeBlock": "Blok kodu",
-    "link": "Link"
+    "link": "Link",
+    "quote": "Cytat"
   },
   "composer": {
     "label": "Wiadomość do {{name}}",
@@ -68,7 +70,14 @@
     "notConnected": "Nie masz połączenia. Połącz się ponownie i spróbuj jeszcze raz.",
     "generic": "Nie udało się wysłać wiadomości. Spróbuj ponownie.",
     "onlyImages": "Można wysyłać tylko obrazy.",
-    "sourceTooLarge": "Ten plik jest zbyt duży, by go wysłać (ponad 25 MB)."
+    "sourceTooLarge": "Ten plik jest zbyt duży, by go wysłać (ponad 25 MB).",
+    "personOffline": "Ta osoba jest offline. Spróbuj ponownie, gdy wróci."
+  },
+  "failed": {
+    "notSent": "Nie wysłano.",
+    "retry": "Ponów",
+    "remove": "Usuń",
+    "announce": "Nie udało się wysłać wiadomości."
   },
   "announce": {
     "message": "{{name}}: {{text}}",
@@ -81,7 +90,9 @@
   "pinned": {
     "label": "Informacje o kanale",
     "showMore": "Pokaż więcej",
-    "showLess": "Pokaż mniej"
+    "showLess": "Pokaż mniej",
+    "hideWelcome": "Ukryj wiadomość powitalną",
+    "hideDescription": "Ukryj opis kanału"
   },
   "mention": {
     "list": "Osoby do wspomnienia",
@@ -136,6 +147,7 @@
     "next": "Następny obraz",
     "unnamed": "obraz",
     "fullLoading": "Ładowanie pełnego rozmiaru…",
+    "fullCancel": "Anuluj pobieranie w pełnym rozmiarze",
     "fullProgress": "Ładowanie pełnego rozmiaru… {{percent}} %",
     "fullUnavailable": "Pełny rozmiar niedostępny – pokazano podgląd"
   },
@@ -149,11 +161,62 @@
     "hint": "Strzałki przesuwają, Enter wysyła, Delete usuwa, Escape zamyka.",
     "empty": "Brak ulubionych. Kliknij prawym przyciskiem GIF na czacie lub użyj gwiazdki na nim i wybierz „Zapisz jako ulubiony”. Pojawi się tutaj."
   },
+  "linkMenu": {
+    "label": "Link",
+    "copy": "Kopiuj link",
+    "open": "Otwórz link",
+    "copied": "Skopiowano link"
+  },
   "imageMenu": {
     "label": "Obraz {{name}}"
   },
   "attribution": {
     "via": "przez {{brand}}",
     "view": "Zobacz na {{brand}}"
+  },
+  "themeCard": {
+    "label": "Udostępniony motyw {{name}}",
+    "apply": "Zastosuj motyw",
+    "more": "Zastosuj na serwerze",
+    "menuLabel": "Zastosuj motyw na",
+    "applyToServer": "Zastosuj na {{server}}",
+    "imported": "Zaimportowano ✓",
+    "newer": "Utworzono w Mumcord {{version}} – zaktualizuj, aby zobaczyć całość",
+    "failed": "Nie udało się zastosować motywu."
+  },
+  "reply": {
+    "action": "Odpowiedz",
+    "actionFor": "Odpowiedz użytkownikowi {{name}}",
+    "menu": "Wiadomość od {{name}}",
+    "replyTo": "Odpowiedź do",
+    "jump": "Przejdź do oryginalnej wiadomości",
+    "image": "Obraz",
+    "replyingTo": "Odpowiadasz",
+    "cancel": "Anuluj odpowiedź"
+  },
+  "actions": {
+    "label": "Zacznij razem",
+    "notConnected": "Brak połączenia z serwerem.",
+    "partyRunning": "Na tym kanale trwa już wspólne oglądanie.",
+    "invalidLink": "To nie jest link do filmu na YouTube.",
+    "linkLabel": "Link do YouTube",
+    "linkPlaceholder": "Wklej link do YouTube",
+    "confirm": "Zacznij",
+    "watchHint": "Obejrzyj film z YouTube razem z tym kanałem",
+    "dialogTitle": "Oglądaj razem",
+    "addTitle": "Dodaj do playlisty",
+    "addToPlaylist": "Dodaj do playlisty",
+    "addConfirm": "Dodaj",
+    "apps": "Aplikacje",
+    "appsLive": "Aplikacje (udostępniasz ekran)"
+  },
+  "activity": {
+    "share": "{{name}} udostępnia ekran",
+    "watch": "Oglądaj",
+    "party": "Wspólne oglądanie: {{title}}",
+    "join": "Dołącz",
+    "videoFallback": "Film z YouTube",
+    "someone": "Ktoś",
+    "joinFailed": "Nie udało się dołączyć do wspólnego oglądania."
   }
 }

@@ -18,9 +18,9 @@ beforeEach(() => {
   setApi(api);
 });
 
-function ask() {
+function ask(connectedServers = 1) {
   act(() => {
-    api.mock.emit("closeRequested", {});
+    api.mock.emit("closeRequested", { connectedServers });
   });
   return screen.getByRole("dialog", { name: "Minimize to tray or quit?" });
 }
@@ -29,6 +29,12 @@ describe("CloseDialog", () => {
   it("stays hidden until the engine asks", () => {
     render(<CloseDialog />);
     expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+  });
+
+  it("says how many servers stay connected", () => {
+    render(<CloseDialog />);
+    ask(3);
+    expect(screen.getByText(/connected to 3 servers/)).toBeInTheDocument();
   });
 
   it("answers with the choice and remembers it when asked to", async () => {

@@ -1,0 +1,194 @@
+/* Floating media widget inside the app window (FR-2.70). */
+.floating-widget {
+  position: fixed;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  overflow: hidden;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-bg-chat);
+  color: var(--color-text);
+  box-shadow: 0 8px 24px rgb(0 0 0 / 35%);
+}
+
+.floating-widget:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: -2px;
+}
+
+.floating-widget[data-gesture] {
+  user-select: none;
+}
+
+/* An iframe in the body (e.g. the party player) would swallow pointer events mid-gesture. */
+.floating-widget[data-gesture] .floating-widget__body {
+  pointer-events: none;
+}
+
+.floating-widget__bar {
+  display: flex;
+  flex: 0 0 auto;
+  gap: var(--space-2);
+  align-items: center;
+  padding: var(--space-1) var(--space-2);
+  border-bottom: 1px solid var(--color-border);
+  background: var(--color-bg-elevated);
+  cursor: grab;
+  touch-action: none;
+}
+
+.floating-widget[data-gesture="move"] .floating-widget__bar {
+  cursor: grabbing;
+}
+
+.floating-widget[data-collapsed="true"] .floating-widget__bar {
+  border-bottom: 0;
+}
+
+.floating-widget__bar:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: -2px;
+}
+
+.floating-widget__title {
+  flex: 1;
+  min-width: 0;
+  margin: 0;
+  overflow: hidden;
+  font-size: 0.875rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.floating-widget__body {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-height: 0;
+  overflow: auto;
+}
+
+.floating-widget__body[hidden] {
+  display: none;
+}
+
+/* Full screen shows the content even while the widget is collapsed. */
+.floating-widget:fullscreen {
+  border: 0;
+  border-radius: 0;
+}
+
+.floating-widget:fullscreen .floating-widget__body {
+  display: flex;
+}
+
+.floating-widget__edge {
+  position: absolute;
+  touch-action: none;
+}
+
+.floating-widget__edge--n,
+.floating-widget__edge--s {
+  right: 6px;
+  left: 6px;
+  height: 6px;
+  cursor: ns-resize;
+}
+
+.floating-widget__edge--e,
+.floating-widget__edge--w {
+  top: 6px;
+  bottom: 6px;
+  width: 6px;
+  cursor: ew-resize;
+}
+
+.floating-widget__edge--n {
+  top: 0;
+}
+
+.floating-widget__edge--s {
+  bottom: 0;
+}
+
+.floating-widget__edge--e {
+  right: 0;
+}
+
+.floating-widget__edge--w {
+  left: 0;
+}
+
+.floating-widget__edge--ne,
+.floating-widget__edge--nw,
+.floating-widget__edge--se,
+.floating-widget__edge--sw {
+  width: 12px;
+  height: 12px;
+}
+
+.floating-widget__edge--ne {
+  top: 0;
+  right: 0;
+  cursor: nesw-resize;
+}
+
+.floating-widget__edge--sw {
+  bottom: 0;
+  left: 0;
+  cursor: nesw-resize;
+}
+
+.floating-widget__edge--nw {
+  top: 0;
+  left: 0;
+  cursor: nwse-resize;
+}
+
+.floating-widget__edge--se {
+  right: 0;
+  bottom: 0;
+  cursor: nwse-resize;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .floating-widget {
+    transition: box-shadow 120ms ease-out;
+  }
+
+  .floating-widget[data-gesture] {
+    box-shadow: 0 12px 32px rgb(0 0 0 / 45%);
+  }
+}
+
+.floating-widget__title[data-has-extra] {
+  flex: 0 1 auto;
+}
+
+/* The free space after the extra is the bar's own margin, not the no-drag extra, so it still
+   drags the widget. */
+.floating-widget__title-extra {
+  display: flex;
+  flex: 0 1 auto;
+  align-items: center;
+  min-width: 0;
+  margin-inline-end: auto;
+}
+
+/* Compact title-bar buttons: about 24px hit area, one icon size. */
+.floating-widget__bar {
+  gap: var(--space-1);
+}
+
+.floating-widget__bar .button {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  min-width: 24px;
+  height: 24px;
+  padding: 0 var(--space-1);
+  font-size: 0.875rem;
+  line-height: 1;
+}

@@ -6,7 +6,7 @@
   "sections": {
     "identity": "Identitet",
     "audio": "Lyd",
-    "voice": "Voice",
+    "voice": "Stemme",
     "chatHistory": "Chat og historik",
     "appearance": "Udseende",
     "accessibility": "Tilgængelighed",
@@ -14,7 +14,9 @@
     "sounds": "Lyde og notifikationer",
     "overlay": "Overlay",
     "diagnostics": "Diagnostik",
-    "about": "Om"
+    "about": "Om",
+    "servers": "Servere",
+    "privacy": "Privatliv"
   },
   "search": {
     "label": "Søg i indstillinger",
@@ -68,7 +70,17 @@
     "testPlaying": "Afspiller din stemme…",
     "quality": "Kvalitet",
     "musicQuality": "Musikkvalitet",
-    "musicQualityHint": "Bruger mere båndbredde og slår støjundertrykkelse og automatisk lydstyrke fra; til musik. Push-to-talk virker bedst."
+    "musicQualityHint": "Bruger mere båndbredde og slår støjundertrykkelse og automatisk lydstyrke fra; til musik. Push-to-talk virker bedst.",
+    "bitrate": "Bitrate",
+    "bitrateMax": "Maks.",
+    "bitrateValue": "{{kbps}} kbit/s",
+    "bitrateMaxKnown": "Maksimum: {{kbps}} kbit/s. Tab på forbindelsen kan stadig sænke den.",
+    "bitrateMaxUnknown": "Maksimum: afhænger af serveren. Tab på forbindelsen kan stadig sænke den.",
+    "videoSound": "Videolyd",
+    "ducking": "Skru ned for videolyden, mens nogen taler",
+    "duckingHint": "Lyden fra watch party-videoen og skærmdelingen bliver lavere, mens nogen i din talekanal taler.",
+    "duckingLevel": "Sænket lydstyrke",
+    "duckingLevelValue": "{{percent}} %"
   },
   "voice": {
     "talkMode": "Taletilstand",
@@ -178,6 +190,7 @@
     "compact": "Kompakt: tid, navn og besked på én linje",
     "theme": "Tema",
     "themeLegend": "Farvetema",
+    "modeLegend": "Mørkt eller lyst",
     "system": "Følg systemet",
     "dark": "Mørkt",
     "light": "Lyst",
@@ -189,6 +202,61 @@
     "autostart": "Start Mumcord, når jeg logger ind",
     "startMinimized": "Start minimeret",
     "startMinimizedHint": "Når Mumcord starter ved login, venter det i bakken i stedet for at åbne vinduet."
+  },
+  "themeEditor": {
+    "name": "Temanavn",
+    "colorsLegend": "Hovedfarver",
+    "colorColumn": "Farve",
+    "auto": "auto",
+    "cellLabel": "{{color}}, {{version}}",
+    "newTitle": "Nyt tema",
+    "editTitle": "Rediger “{{name}}”",
+    "generatedFromDark": "Lavet automatisk ud fra den mørke version. Følger dine ændringer dér, indtil du ændrer det her.",
+    "generatedFromLight": "Lavet automatisk ud fra den lyse version. Følger dine ændringer dér, indtil du ændrer det her.",
+    "colors": {
+      "background": "Baggrund",
+      "surface": "Flade",
+      "text": "Tekst",
+      "accent": "Accent",
+      "talking": "Taler og online",
+      "warning": "Advarsel",
+      "error": "Fejl"
+    },
+    "pickColor": "Farvevælger for {{color}}",
+    "invalidHex": "Indtast farven som # efterfulgt af seks hexcifre, for eksempel #1a2b3c.",
+    "contrastLowIn": "{{version}}: for lav kontrast: {{ratio}}:1, kræver mindst {{min}}:1.",
+    "unreadable": "Dette tema er ikke læsbart nok. Ændr tekst- eller baggrundsfarven for at gemme det.",
+    "copyName": "{{name}} (kopi)",
+    "save": "Gem tema",
+    "saveAs": "Gem som tema",
+    "saved": "Tema gemt.",
+    "share": "Del",
+    "shared": "Tema kopieret. Indsæt det i en chat for at dele det.",
+    "shareFailed": "Mumcord kunne ikke kopiere temaet til udklipsholderen.",
+    "import": "Importér…",
+    "importTitle": "Importér et tema",
+    "importLabel": "Temabesked eller kode",
+    "importHint": "Indsæt en chatbesked med et Mumcord-tema, eller bare dets kode (den starter med mct1.).",
+    "importConfirm": "Importér",
+    "importInvalid": "Dette er ikke et gyldigt Mumcord-tema.",
+    "importUnreadable": "Dette tema er ikke læsbart nok.",
+    "imported": "“{{name}}” importeret.",
+    "alreadyImported": "“{{name}}” er allerede blandt dine temaer.",
+    "madeWithNewer": "Lavet med Mumcord {{version}} – opdatér for at se det helt.",
+    "reset": "Nulstil",
+    "menuLabel": "Indstillinger for {{name}}",
+    "edit": "Rediger tema",
+    "newFromThis": "Nyt tema ud fra dette",
+    "preview": "Forhåndsvisning",
+    "previewing": "Forhåndsviser {{name}}",
+    "backToEditor": "Tilbage til editoren",
+    "rename": "Omdøb tema",
+    "renameTitle": "Omdøb “{{name}}”",
+    "renameConfirm": "Omdøb",
+    "delete": "Slet tema",
+    "deleteTitle": "Slet “{{name}}”?",
+    "deleteMessage": "Servere, der bruger dette tema, går tilbage til appens tema.",
+    "deleteConfirm": "Slet"
   },
   "accessibility": {
     "hints": "Tip",
@@ -212,7 +280,14 @@
     "hangUp": "Du afbryder fra en server",
     "messages": "Ny besked i en fulgt kanal eller privat chat",
     "mention": "Lyd ved omtale",
-    "mentionNotify": "Giv besked ved omtale"
+    "mentionNotify": "Giv besked ved omtale",
+    "partyStarted": "Nogen starter en watch party i din kanal",
+    "partyJoined": "Nogen deltager i din watch party",
+    "partyLeft": "Nogen forlader din watch party",
+    "shareStarted": "Nogen starter en skærmdeling i din kanal",
+    "shareStopped": "En skærmdeling i din kanal slutter",
+    "viewerStarted": "Nogen begynder at se din skærmdeling",
+    "viewerStopped": "Nogen stopper med at se din skærmdeling"
   },
   "notifications": {
     "title": "Notifikationer",
@@ -224,31 +299,8 @@
     "off": "Fra"
   },
   "overlay": {
-    "window": {
-      "title": "Vinduesoverlay",
-      "enable": "Vis overlayet",
-      "enableHint": "Et lille gennemsigtigt vindue, der viser, hvem der taler. Også tilgængeligt fra bakkemenuen.",
-      "positionUnsupported": "Dette skrivebord bestemmer, hvor vinduer vises, så hjørnepositioner og flytning har ingen effekt.",
-      "move": "Flyt overlay…",
-      "moveDone": "Færdig med at flytte",
-      "size": "Bredde",
-      "wholeChannel": "Vis hele kanalen",
-      "wholeChannelHint": "Fra: kun personer, der taler.",
-      "channelName": "Vis kanalens navn",
-      "loadFailed": "Overlayindstillingerne kunne ikke indlæses.",
-      "saveFailed": "Ændringen af overlayet kunne ikke anvendes.",
-      "kwin": {
-        "setUp": "Sæt op automatisk",
-        "done": "Færdig: KDE-vinduesreglen “Mumcord overlay” er aktiv.",
-        "removed": "KDE-vinduesreglen er fjernet.",
-        "remove": "Fjern regel",
-        "openRules": "Åbn KDE's vinduesregler",
-        "compat": "Brug kompatibilitetstilstand i stedet",
-        "failed": "KDE-vinduesreglen kunne ikke ændres. Åbn KDE's vinduesregler for at tilføje den manuelt."
-      }
-    },
     "corner": {
-      "label": "Position",
+      "label": "Placering",
       "topLeft": "Øverst til venstre",
       "topRight": "Øverst til højre",
       "bottomLeft": "Nederst til venstre",
@@ -281,8 +333,16 @@
       "confirmEnable": "Slå til alligevel",
       "limits": {
         "libraryMissing": "Overlay i spil er ikke tilgængeligt: dets overlaybibliotek (libmumcord_overlay_layer.so) blev ikke fundet ved siden af Mumcord. Geninstallér Mumcord for at gendanne det. Vinduesoverlayet ovenfor bruges i stedet.",
-        "windowsPending": "Overlay i spil er ikke tilgængeligt på Windows endnu. Vinduesoverlayet ovenfor bruges i stedet.",
+        "windowsFullscreen": "Brug kantløs eller vinduesbaseret fuldskærm i spillet.",
         "macos": "macOS understøtter ikke overlays i spil. Vinduesoverlayet ovenfor bruges i stedet."
+      },
+      "opengl": {
+        "title": "OpenGL-spil",
+        "explanation": "Kun nødvendigt for OpenGL-spil: indsæt i spillets startindstillinger i Steam.",
+        "label": "Startindstilling i Steam",
+        "copy": "Kopiér",
+        "copied": "Kopieret",
+        "copyFailed": "Kopiering mislykkedes. Markér teksten, og kopiér den manuelt."
       }
     }
   },
@@ -388,5 +448,38 @@
       "unsupported": "Ikke tilgængeligt på dette system.",
       "failed": "Stoppede efter en fejl. Slå det fra og til igen for at prøve igen."
     }
+  },
+  "servers": {
+    "connections": "Forbindelser",
+    "limit": "Samtidigt forbundne servere",
+    "limitHint": "Mellem 1 og 15. Forbindelser ud over grænsen afvises.",
+    "limitInvalid": "Indtast et helt tal fra 1 til 15."
+  },
+  "appearanceEffects": {
+    "title": "Effekter",
+    "visualEffects": "Visuelle effekter (glas, kornethed)",
+    "visualEffectsHint": "Menuer i frostet glas og en diskret filmkornethed. Slås automatisk fra, når dit system beder om mindre gennemsigtighed eller bevægelse."
+  },
+  "channelList": {
+    "title": "Kanalliste",
+    "hideEmpty": "Skjul tomme kanaler",
+    "talkingFirst": "Vis dem, der taler, først",
+    "weakConnection": "Vis ikon for svag forbindelse",
+    "weakConnectionHint": "Et lille signalikon ved personer med dårlig forbindelse."
+  },
+  "privacyDirect": {
+    "title": "Direkte forbindelser",
+    "allow": "Tillad direkte forbindelser til andre Mumcord-brugere",
+    "hint": "Direkte forbindelser er hurtigere, men den anden person kan se din IP-adresse. Indtil du beslutter dig, spørger Mumcord første gang, en ville blive brugt."
+  },
+  "updates": {
+    "title": "Opdateringer",
+    "check": "Søg efter nye versioner",
+    "hint": "En gang om dagen spørger Mumcord GitHub om den nyeste udgivelse. Intet andet sendes."
+  },
+  "appImageMenu": {
+    "label": "Føj Mumcord til appmenuen",
+    "hint": "Får ikonet og push-to-talk til at virke korrekt under Wayland og mumble://-links til at åbne Mumcord. Kun til AppImage.",
+    "failed": "Det virkede ikke. Prøv igen."
   }
 }

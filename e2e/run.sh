@@ -40,5 +40,6 @@ exec docker run --rm -i --init "${tty[@]}" \
   -e HOME=/cache/home -e CARGO_HOME=/cache/cargo -e CARGO_TARGET_DIR=/cache/target \
   -e MUMCORD_SKIP_BINDINGS_EXPORT=1 \
   -e CI -e MUMCORD_E2E_SHARD -e MUMCORD_E2E_STEP \
+  -e MUMCORD_PORT_BASE -e MUMCORD_PROJECT \
   "${extra[@]}" \
   "$image" "$@"

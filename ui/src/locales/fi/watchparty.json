@@ -1,0 +1,53 @@
+{
+  "title": "Yhteiskatselu",
+  "addVideo": "Lisää video",
+  "beta": "Beta",
+  "join": "Liity yhteiskatseluun",
+  "leave": "Poistu yhteiskatselusta",
+  "watching": "{{count}} katsoo: {{names}}",
+  "player": "Yhteiskatselun soitin",
+  "watchTogether": "Katsotaan yhdessä",
+  "watchTogetherFor": "Katso {{title}} yhdessä tämän kanavan kanssa",
+  "cantPlay": "Soitin ei voi toimia täällä.",
+  "openInBrowser": "Avaa selaimessa",
+  "startFailed": "Yhteiskatselua ei voitu aloittaa.",
+  "joinFailed": "Yhteiskatseluun liittyminen epäonnistui.",
+  "leaveFailed": "Yhteiskatselusta poistuminen epäonnistui.",
+  "commandFailed": "Yhteiskatselu ei saanut muutostasi.",
+  "someone": "Joku",
+  "other": {
+    "play": "{{name}} painoi toistoa",
+    "pause": "{{name}} pysäytti tauolle",
+    "seek": "{{name}} hyppäsi eteenpäin",
+    "skipped": "{{name}} ohitti"
+  },
+  "addToPlaylist": "Lisää soittolistaan",
+  "addToPlaylistFor": "Lisää {{title}} yhteiskatselun soittolistaan",
+  "playlist": {
+    "title": "Seuraavaksi",
+    "empty": "Ei mitään seuraavaksi. Lisää YouTube-linkkejä valinnalla ”Lisää soittolistaan”.",
+    "skip": "Ohita",
+    "moveHint": "Alt+Ylös ja Alt+Alas siirtävät videota; voit myös vetää sitä.",
+    "moved": "Siirretty sijaan {{position}}",
+    "videoTitle": "YouTube-video",
+    "addedBy": "Lisännyt {{name}}",
+    "remove": "Poista {{title}} soittolistalta",
+    "addFailed": "Videota ei voitu lisätä soittolistaan. Siihen mahtuu enintään 50 videota.",
+    "removeFailed": "Videota ei voitu poistaa soittolistalta.",
+    "moveFailed": "Videota ei voitu siirtää.",
+    "skipFailed": "Seuraavaan videoon siirtyminen epäonnistui.",
+    "nextFailed": "Seuraavaa videota ei voitu aloittaa.",
+    "move": "Siirrä {{title}}",
+    "upNext": "Seuraavaksi: {{title}}",
+    "upNextNone": "Ei mitään seuraavaksi"
+  },
+  "widget": {
+    "play": "Toista",
+    "pause": "Tauko"
+  },
+  "codecHint": {
+    "install": "Tämä video tarvitsee H.264-tuen. Asenna gst-libav:",
+    "generic": "Tämä video tarvitsee H.264-tuen. Asenna gst-libav (GStreamerin libav-liitännäinen) järjestelmäsi paketinhallinnalla.",
+    "rpmFusion": "Fedorassa gst-libav tulee RPM Fusion -ohjelmistolähteestä; ota RPM Fusion ensin käyttöön."
+  }
+}

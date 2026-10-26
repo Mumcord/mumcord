@@ -8,7 +8,7 @@ describe("MumcordBadge", () => {
   it("renders a labelled badge for Mumcord users", () => {
     render(<MumcordBadge user={{ isMumcord: true }} />);
     expect(screen.getByRole("img", { name: "Uses Mumcord" })).toHaveAttribute(
-      "title",
+      "data-tooltip",
       "Uses Mumcord",
     );
   });

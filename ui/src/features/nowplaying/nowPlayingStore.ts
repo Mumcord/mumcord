@@ -5,52 +5,57 @@
  */
 import { useSyncExternalStore } from "react";
 import { getApi, type MumcordApi, type Unsubscribe } from "../../api";
+import { useShownServerId } from "../channels/serverStore";
 import type { LiveTrack } from "./progress";
 
 type Tracks = ReadonlyMap<number, LiveTrack>;
 
 const EMPTY: Tracks = new Map();
 
-let tracks: Tracks = EMPTY;
+/** Per server id; each server's map is keyed by session. */
+let tracks = new Map<number, Tracks>();
 let boundApi: MumcordApi | undefined;
 let unsubscribers: Unsubscribe[] = [];
 const listeners = new Set<() => void>();
 
-function set(next: Tracks): void {
-  tracks = next;
+function set(serverId: number, next: Tracks): void {
+  tracks = new Map(tracks);
+  if (next.size === 0) tracks.delete(serverId);
+  else tracks.set(serverId, next);
   for (const listener of listeners) listener();
 }
 
-function without(session: number): void {
-  if (!tracks.has(session)) return;
-  const next = new Map(tracks);
+function without(serverId: number, session: number): void {
+  const current = tracks.get(serverId);
+  if (!current?.has(session)) return;
+  const next = new Map(current);
   next.delete(session);
-  set(next);
+  set(serverId, next);
 }
 
 function bind(api: MumcordApi): void {
   for (const unsubscribe of unsubscribers) unsubscribe();
   boundApi = api;
-  tracks = EMPTY;
+  tracks = new Map();
   unsubscribers = [
-    api.on("nowPlayingChanged", ({ session, track }) => {
+    api.on("nowPlayingChanged", ({ serverId, session, track }) => {
       if (track === null) {
-        without(session);
+        without(serverId, session);
         return;
       }
-      const next = new Map(tracks);
+      const next = new Map(tracks.get(serverId) ?? EMPTY);
       // The position is anchored to the local arrival time, not the sender's clock.
       next.set(session, { track, atMs: Date.now() });
-      set(next);
+      set(serverId, next);
     }),
-    api.on("serverSynced", () => {
-      set(EMPTY);
+    api.on("serverSynced", ({ snapshot }) => {
+      set(snapshot.serverId, EMPTY);
     }),
-    api.on("connectionStateChanged", ({ state }) => {
-      if (state.state !== "connected") set(EMPTY);
+    api.on("connectionStateChanged", ({ serverId, state }) => {
+      if (state.state !== "connected") set(serverId, EMPTY);
     }),
-    api.on("userRemoved", ({ session }) => {
-      without(session);
+    api.on("userRemoved", ({ serverId, session }) => {
+      without(serverId, session);
     }),
   ];
 }
@@ -69,10 +74,12 @@ function subscribe(listener: () => void): () => void {
 }
 
 /** The track a person shares, or `null`. */
-export function useNowPlaying(session: number): LiveTrack | null {
+export function useNowPlaying(session: number, serverId?: number | null): LiveTrack | null {
+  const shown = useShownServerId();
+  const server = serverId === undefined ? shown : serverId;
   return useSyncExternalStore(subscribe, () => {
     ensureBound();
-    return tracks.get(session) ?? null;
+    return (server === null ? undefined : tracks.get(server)?.get(session)) ?? null;
   });
 }
 
@@ -81,5 +88,5 @@ export function resetNowPlayingStore(): void {
   for (const unsubscribe of unsubscribers) unsubscribe();
   unsubscribers = [];
   boundApi = undefined;
-  tracks = EMPTY;
+  tracks = new Map();
 }

@@ -3,10 +3,6 @@
   "inChannel_few": "V {{channel}} ({{count}})",
   "inChannel_many": "V {{channel}} ({{count}})",
   "inChannel_other": "V {{channel}} ({{count}})",
-  "listening_one": "Počúva ({{count}})",
-  "listening_few": "Počúvajú ({{count}})",
-  "listening_many": "Počúva ({{count}})",
-  "listening_other": "Počúva ({{count}})",
   "noChannel": "Vyber kanál a uvidíš, kto v ňom je.",
   "nobody": "Nikto tu nie je.",
   "nobodyElse": "Na serveri nikto iný nie je.",
@@ -15,6 +11,26 @@
   "registered": "Registrovaný",
   "unregistered": "Neregistrovaný",
   "talking": "Hovorí",
+  "quality": {
+    "label": "Pripojenie",
+    "summary": "Pripojenie: {{level}}",
+    "level": {
+      "good": "Dobré",
+      "fair": "Priemerné",
+      "weak": "Slabé",
+      "unknown": "Neznáme"
+    },
+    "ping": "Ping",
+    "loss": "Strata paketov",
+    "late": "Oneskorené pakety",
+    "bandwidth": "Šírka pásma",
+    "transport": "Prenos hlasu",
+    "client": "Klient",
+    "os": "Operačný systém",
+    "ms": "{{value}} ms",
+    "percent": "{{value}} %",
+    "kbps": "{{value}} kbit/s"
+  },
   "card": {
     "close": "Zavrieť",
     "loadFailed": "Profil sa nepodarilo načítať.",
@@ -26,6 +42,9 @@
     "privateMessage": "Súkromná správa",
     "localSettings": "Tvoje nastavenia",
     "localSettingsHint": "Vidíš ich len ty. Zmeny sa ukladajú okamžite.",
+    "settingsFor": "Nastavenia pre {{name}}",
+    "hintMuted": "Stlmené",
+    "hintVolume": "Hlasitosť {{value}} %",
     "localMuteHint": "Túto osobu nebudeš počuť.",
     "privateNote": "Súkromná poznámka",
     "privateNoteHint": "Túto poznámku vidíš len ty.",
@@ -40,7 +59,8 @@
     "viewProfile": "Zobraziť profil",
     "join": "Pripojiť sa k {{channel}}",
     "joinDenied": "Do tohto kanála nemáte povolený vstup.",
-    "mute": "Stlmiť pre mňa"
+    "mute": "Stlmiť pre mňa",
+    "connectionInfo": "Informácie o pripojení…"
   },
   "nowPlaying": {
     "label": "Práve hrá",

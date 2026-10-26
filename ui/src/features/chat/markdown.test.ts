@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { markdownToHtml, plainTextToHtml } from "./markdown";
+import { htmlToText } from "./sanitize";
 
 describe("markdownToHtml", () => {
   it("converts inline Markdown without a wrapping paragraph", () => {
@@ -36,5 +37,29 @@ describe("markdownToHtml", () => {
 
   it("escapes plain text for servers without HTML", () => {
     expect(plainTextToHtml(" <b>&</b> ")).toBe("&lt;b&gt;&amp;&lt;/b&gt;");
+  });
+});
+
+describe("text emoticons and lone angle brackets (F22)", () => {
+  it.each([">_>", ">.<", ">hello", "<_<", ">:(", "a > b"])("shows %s as typed", (text) => {
+    const html = markdownToHtml(text);
+    expect(html).not.toContain("<blockquote");
+    expect(html).not.toContain("<em>");
+    expect(htmlToText(html)).toBe(text);
+  });
+  it("turns lines starting with '> ' into one quote block (AC-2.49)", () => {
+    expect(markdownToHtml("> one\n> two")).toBe("<blockquote><p>one<br>two</p></blockquote>");
+    const mixed = markdownToHtml("> quoted\nreply");
+    expect(mixed).toContain("<blockquote>");
+    expect(mixed).toContain("reply");
+    expect(markdownToHtml("> a\n>_>")).not.toBe(markdownToHtml("> a\n> _>"));
+  });
+  it("keeps a lone > on a later line as text", () => {
+    const html = markdownToHtml("a\n>_>");
+    expect(html).not.toContain("<blockquote");
+    expect(html).toContain("&gt;_&gt;");
+  });
+  it("keeps Markdown italic with asterisks", () => {
+    expect(markdownToHtml("*x*")).toBe("<em>x</em>");
   });
 });

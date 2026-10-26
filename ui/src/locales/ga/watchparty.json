@@ -1,0 +1,53 @@
+{
+  "title": "Féachaint le chéile",
+  "addVideo": "Cuir físeán leis",
+  "beta": "Béite",
+  "join": "Glac páirt san fhéachaint le chéile",
+  "leave": "Fág an fhéachaint",
+  "watching": "{{count}} ag féachaint: {{names}}",
+  "player": "Seinnteoir féachana le chéile",
+  "watchTogether": "Féachaigí le chéile",
+  "watchTogetherFor": "Féach ar {{title}} in éineacht leis an gcainéal seo",
+  "cantPlay": "Ní féidir leis an seinnteoir rith anseo.",
+  "openInBrowser": "Oscail sa bhrabhsálaí",
+  "startFailed": "Níorbh fhéidir an fhéachaint le chéile a thosú.",
+  "joinFailed": "Níorbh fhéidir páirt a ghlacadh san fhéachaint le chéile.",
+  "leaveFailed": "Níorbh fhéidir an fhéachaint le chéile a fhágáil.",
+  "commandFailed": "Ní bhfuair an fhéachaint le chéile d’athrú.",
+  "someone": "Duine éigin",
+  "other": {
+    "play": "Bhrúigh {{name}} seinn",
+    "pause": "Chuir {{name}} ar sos",
+    "seek": "Léim {{name}} ar aghaidh",
+    "skipped": "Scipeáil {{name}}"
+  },
+  "addToPlaylist": "Cuir leis an seinmliosta",
+  "addToPlaylistFor": "Cuir {{title}} le seinmliosta na féachana le chéile",
+  "playlist": {
+    "title": "Ar aghaidh",
+    "empty": "Níl aon rud le teacht. Cuir naisc YouTube leis le “Cuir leis an seinmliosta”.",
+    "skip": "Scipeáil",
+    "moveHint": "Bogann Alt+Suas agus Alt+Síos an físeán; is féidir leat é a tharraingt freisin.",
+    "moved": "Bogtha go suíomh {{position}}",
+    "videoTitle": "Físeán YouTube",
+    "addedBy": "Curtha leis ag {{name}}",
+    "remove": "Bain {{title}} den seinmliosta",
+    "addFailed": "Níorbh fhéidir an físeán a chur leis an seinmliosta. Tá spás ann do 50 físeán ar a mhéad.",
+    "removeFailed": "Níorbh fhéidir an físeán a bhaint den seinmliosta.",
+    "moveFailed": "Níorbh fhéidir an físeán a bhogadh.",
+    "skipFailed": "Níorbh fhéidir scipeáil go dtí an chéad fhíseán eile.",
+    "nextFailed": "Níorbh fhéidir an chéad fhíseán eile a thosú.",
+    "move": "Bog {{title}}",
+    "upNext": "Ar aghaidh: {{title}}",
+    "upNextNone": "Níl aon rud le teacht"
+  },
+  "widget": {
+    "play": "Seinn",
+    "pause": "Sos"
+  },
+  "codecHint": {
+    "install": "Teastaíonn tacaíocht H.264 ón bhfíseán seo. Suiteáil gst-libav:",
+    "generic": "Teastaíonn tacaíocht H.264 ón bhfíseán seo. Suiteáil gst-libav (breiseán libav GStreamer) le bainisteoir pacáistí do chórais.",
+    "rpmFusion": "Ar Fedora, tagann gst-libav ó stór RPM Fusion; cumasaigh RPM Fusion ar dtús."
+  }
+}

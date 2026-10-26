@@ -1,8 +1,9 @@
 import { useId } from "react";
 import { useTranslation } from "react-i18next";
-import type { OverlayCorner } from "../../../api";
+import type { Corner } from "../../../api";
+import { Select } from "../../../components/Select";
 
-const OVERLAY_CORNERS: OverlayCorner[] = ["topLeft", "topRight", "bottomLeft", "bottomRight"];
+const OVERLAY_CORNERS: Corner[] = ["topLeft", "topRight", "bottomLeft", "bottomRight"];
 
 /** Slider with a visible value, shared by the window and per-game overlay options. */
 export function SliderField({
@@ -55,33 +56,31 @@ export function CornerSelect({
   onChange,
 }: {
   label: string;
-  value: OverlayCorner;
+  value: Corner;
   custom: boolean;
   disabled?: boolean;
-  onChange: (corner: OverlayCorner) => void;
+  onChange: (corner: Corner) => void;
 }) {
   const { t } = useTranslation("settings");
   const id = useId();
   return (
-    <div className="settings-field">
+    <div className="settings-control-row">
       <label htmlFor={id}>{label}</label>
-      <select
-        className="settings-input"
+      <Select
         id={id}
         value={custom ? "custom" : value}
         disabled={disabled}
-        onChange={(event) => {
-          const next = event.target.value;
-          if (next !== "custom") onChange(next as OverlayCorner);
+        options={[
+          ...(custom ? [{ value: "custom", label: t("overlay.corner.custom") }] : []),
+          ...OVERLAY_CORNERS.map((corner) => ({
+            value: corner,
+            label: t(`overlay.corner.${corner}`),
+          })),
+        ]}
+        onChange={(next) => {
+          if (next !== "custom") onChange(next as Corner);
         }}
-      >
-        {custom && <option value="custom">{t("overlay.corner.custom")}</option>}
-        {OVERLAY_CORNERS.map((corner) => (
-          <option key={corner} value={corner}>
-            {t(`overlay.corner.${corner}`)}
-          </option>
-        ))}
-      </select>
+      />
     </div>
   );
 }

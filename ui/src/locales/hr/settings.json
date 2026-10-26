@@ -14,7 +14,9 @@
     "sounds": "Zvukovi i obavijesti",
     "overlay": "Overlay",
     "diagnostics": "Dijagnostika",
-    "about": "O aplikaciji"
+    "about": "O aplikaciji",
+    "servers": "Poslužitelji",
+    "privacy": "Privatnost"
   },
   "search": {
     "label": "Pretraži postavke",
@@ -69,7 +71,17 @@
     "testPlaying": "Reprodukcija tvog glasa…",
     "quality": "Kvaliteta",
     "musicQuality": "Kvaliteta za glazbu",
-    "musicQualityHint": "Troši više propusnosti i isključuje suzbijanje šuma i automatsku glasnoću; za glazbu. Najbolje radi s Pritisni za govor."
+    "musicQualityHint": "Troši više propusnosti i isključuje suzbijanje šuma i automatsku glasnoću; za glazbu. Najbolje radi s Pritisni za govor.",
+    "bitrate": "Brzina prijenosa",
+    "bitrateMax": "Maks.",
+    "bitrateValue": "{{kbps}} kbit/s",
+    "bitrateMaxKnown": "Najviše: {{kbps}} kbit/s. Gubici na vezi je i dalje mogu smanjiti.",
+    "bitrateMaxUnknown": "Najviše: ovisi o poslužitelju. Gubici na vezi je i dalje mogu smanjiti.",
+    "videoSound": "Zvuk videa",
+    "ducking": "Stišaj zvuk videa dok netko govori",
+    "duckingHint": "Zvuk videa zajedničkog gledanja i dijeljenja zaslona tiši se dok netko u tvojem glasovnom kanalu govori.",
+    "duckingLevel": "Smanjena glasnoća",
+    "duckingLevelValue": "{{percent}} %"
   },
   "voice": {
     "talkMode": "Način govora",
@@ -179,6 +191,7 @@
     "compact": "Kompaktno: vrijeme, ime i poruka u jednom retku",
     "theme": "Tema",
     "themeLegend": "Tema boja",
+    "modeLegend": "Tamno ili svijetlo",
     "system": "Prati sustav",
     "dark": "Tamna",
     "light": "Svijetla",
@@ -190,6 +203,61 @@
     "autostart": "Pokreni Mumcord kad se prijavim",
     "startMinimized": "Pokreni smanjeno",
     "startMinimizedHint": "Kad se Mumcord pokrene pri prijavi, čeka u traci umjesto da otvori prozor."
+  },
+  "themeEditor": {
+    "name": "Naziv teme",
+    "colorsLegend": "Glavne boje",
+    "colorColumn": "Boja",
+    "auto": "auto",
+    "cellLabel": "{{color}}, {{version}}",
+    "newTitle": "Nova tema",
+    "editTitle": "Uredi „{{name}}”",
+    "generatedFromDark": "Automatski izrađeno iz tamne verzije. Prati tvoje promjene tamo dok je ne promijeniš ovdje.",
+    "generatedFromLight": "Automatski izrađeno iz svijetle verzije. Prati tvoje promjene tamo dok je ne promijeniš ovdje.",
+    "colors": {
+      "background": "Pozadina",
+      "surface": "Površina",
+      "text": "Tekst",
+      "accent": "Naglasak",
+      "talking": "Govori i na mreži",
+      "warning": "Upozorenje",
+      "error": "Pogreška"
+    },
+    "pickColor": "Birač boje {{color}}",
+    "invalidHex": "Unesi boju kao # i šest heksadecimalnih znamenki, na primjer #1a2b3c.",
+    "contrastLowIn": "{{version}}: prenizak kontrast: {{ratio}}:1, potrebno barem {{min}}:1.",
+    "unreadable": "Ova tema nije dovoljno čitljiva. Promijeni boju teksta ili pozadine da je spremiš.",
+    "copyName": "{{name}} (kopija)",
+    "save": "Spremi temu",
+    "saveAs": "Spremi kao temu",
+    "saved": "Tema spremljena.",
+    "share": "Dijeli",
+    "shared": "Tema kopirana. Zalijepi je u chat da je podijeliš.",
+    "shareFailed": "Mumcord nije mogao kopirati temu u međuspremnik.",
+    "import": "Uvezi…",
+    "importTitle": "Uvezi temu",
+    "importLabel": "Poruka s temom ili kod",
+    "importHint": "Zalijepi poruku iz chata s Mumcord temom ili samo njezin kod (počinje s mct1.).",
+    "importConfirm": "Uvezi",
+    "importInvalid": "Ovo nije valjana Mumcord tema.",
+    "importUnreadable": "Ova tema nije dovoljno čitljiva.",
+    "imported": "„{{name}}” uvezena.",
+    "alreadyImported": "„{{name}}” već je među tvojim temama.",
+    "madeWithNewer": "Izrađeno s Mumcordom {{version}} – ažuriraj da je vidiš u cijelosti.",
+    "reset": "Vrati na zadano",
+    "menuLabel": "Opcije za {{name}}",
+    "edit": "Uredi temu",
+    "newFromThis": "Nova tema iz ove",
+    "preview": "Pregled",
+    "previewing": "Pregled: {{name}}",
+    "backToEditor": "Natrag u uređivač",
+    "rename": "Preimenuj temu",
+    "renameTitle": "Preimenuj „{{name}}”",
+    "renameConfirm": "Preimenuj",
+    "delete": "Izbriši temu",
+    "deleteTitle": "Izbrisati „{{name}}”?",
+    "deleteMessage": "Poslužitelji koji koriste ovu temu vraćaju se na temu aplikacije.",
+    "deleteConfirm": "Izbriši"
   },
   "accessibility": {
     "hints": "Savjeti",
@@ -213,7 +281,14 @@
     "hangUp": "Odspojiš se s poslužitelja",
     "messages": "Nova poruka u praćenom kanalu ili privatnom chatu",
     "mention": "Zvuk kad te netko spomene",
-    "mentionNotify": "Obavijest kad te netko spomene"
+    "mentionNotify": "Obavijest kad te netko spomene",
+    "partyStarted": "Netko pokreće zajedničko gledanje u tvojem kanalu",
+    "partyJoined": "Netko se pridružuje tvojem zajedničkom gledanju",
+    "partyLeft": "Netko napušta tvoje zajedničko gledanje",
+    "shareStarted": "Netko pokreće dijeljenje zaslona u tvojem kanalu",
+    "shareStopped": "Dijeljenje zaslona u tvojem kanalu završava",
+    "viewerStarted": "Netko počinje gledati tvoje dijeljenje zaslona",
+    "viewerStopped": "Netko prestaje gledati tvoje dijeljenje zaslona"
   },
   "notifications": {
     "title": "Obavijesti",
@@ -225,29 +300,6 @@
     "off": "Isključeno"
   },
   "overlay": {
-    "window": {
-      "title": "Overlay u prozoru",
-      "enable": "Prikaži overlay",
-      "enableHint": "Mali prozirni prozor koji prikazuje tko govori. Dostupan je i iz izbornika trake.",
-      "positionUnsupported": "Ovaj desktop odlučuje gdje se prozori pojavljuju, pa položaji u kutovima i pomicanje nemaju učinka.",
-      "move": "Pomakni overlay…",
-      "moveDone": "Gotovo s pomicanjem",
-      "size": "Širina",
-      "wholeChannel": "Prikaži cijeli kanal",
-      "wholeChannelHint": "Isključeno: samo osobe koje govore.",
-      "channelName": "Prikaži naziv kanala",
-      "loadFailed": "Opcije overlaya nije bilo moguće učitati.",
-      "saveFailed": "Promjenu overlaya nije bilo moguće primijeniti.",
-      "kwin": {
-        "setUp": "Postavi automatski",
-        "done": "Gotovo: KDE pravilo prozora „Mumcord overlay” je aktivno.",
-        "removed": "KDE pravilo prozora je uklonjeno.",
-        "remove": "Ukloni pravilo",
-        "openRules": "Otvori KDE pravila prozora",
-        "compat": "Umjesto toga koristi način kompatibilnosti",
-        "failed": "KDE pravilo prozora nije bilo moguće promijeniti. Otvori KDE pravila prozora i dodaj ga ručno."
-      }
-    },
     "corner": {
       "label": "Položaj",
       "topLeft": "Gore lijevo",
@@ -282,8 +334,16 @@
       "confirmEnable": "Svejedno uključi",
       "limits": {
         "libraryMissing": "Overlay u igri nije dostupan: njegova biblioteka (libmumcord_overlay_layer.so) nije pronađena pored Mumcorda. Ponovno instaliraj Mumcord da je vratiš. Umjesto njega koristi se gornji overlay u prozoru.",
-        "windowsPending": "Overlay u igri još nije dostupan na Windowsu. Umjesto njega koristi se gornji overlay u prozoru.",
+        "windowsFullscreen": "U igri koristite cijeli zaslon bez obruba ili u prozoru.",
         "macos": "macOS ne podržava overlay u igri. Umjesto njega koristi se gornji overlay u prozoru."
+      },
+      "opengl": {
+        "title": "OpenGL igre",
+        "explanation": "Potrebno samo za OpenGL igre: zalijepi u Steam opcije pokretanja igre.",
+        "label": "Steam opcija pokretanja",
+        "copy": "Kopiraj",
+        "copied": "Kopirano",
+        "copyFailed": "Kopiranje nije uspjelo. Označi tekst i kopiraj ga ručno."
       }
     }
   },
@@ -390,5 +450,38 @@
       "unsupported": "Nije dostupno na ovom sustavu.",
       "failed": "Zaustavljeno nakon pogreške. Isključi i ponovno uključi za novi pokušaj."
     }
+  },
+  "servers": {
+    "connections": "Veze",
+    "limit": "Istodobno povezani poslužitelji",
+    "limitHint": "Između 1 i 15. Povezivanje iznad ograničenja se odbija.",
+    "limitInvalid": "Unesi cijeli broj od 1 do 15."
+  },
+  "appearanceEffects": {
+    "title": "Efekti",
+    "visualEffects": "Vizualni efekti (staklo, zrno)",
+    "visualEffectsHint": "Izbornici od mutnog stakla i blago filmsko zrno. Automatski isključeno kad sustav traži manje prozirnosti ili pokreta."
+  },
+  "channelList": {
+    "title": "Popis kanala",
+    "hideEmpty": "Sakrij prazne kanale",
+    "talkingFirst": "Prvo prikaži one koji govore",
+    "weakConnection": "Prikaži ikonu slabe veze",
+    "weakConnectionHint": "Mala ikona signala pored osoba sa slabom vezom."
+  },
+  "privacyDirect": {
+    "title": "Izravne veze",
+    "allow": "Dopusti izravne veze s drugim korisnicima Mumcorda",
+    "hint": "Izravne veze su brže, ali druga osoba može vidjeti tvoju IP adresu. Dok ne odlučiš, Mumcord pita kad bi se veza prvi put koristila."
+  },
+  "updates": {
+    "title": "Ažuriranja",
+    "check": "Provjeravaj nove verzije",
+    "hint": "Jednom dnevno Mumcord pita GitHub za najnovije izdanje. Ništa drugo se ne šalje."
+  },
+  "appImageMenu": {
+    "label": "Dodaj Mumcord u izbornik aplikacija",
+    "hint": "Ikona i pritisni za govor tada ispravno rade na Waylandu, a poveznice mumble:// otvaraju Mumcord. Samo za AppImage.",
+    "failed": "Nije uspjelo. Pokušaj ponovno."
   }
 }

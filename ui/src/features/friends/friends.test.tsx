@@ -1,8 +1,8 @@
 import { act, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
-import { afterEach, describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import type { MockApi } from "../../api";
 import { getSelectedConversation } from "../channels/selection";
-import { getServerState } from "../channels/serverStore";
+import { getServerState, shownServerId } from "../channels/serverStore";
 import { connectedMock, resetAll } from "../channels/testUtils";
 import { FriendsList } from "./FriendsList";
 import { resetFriendsStore } from "./friendsStore";
@@ -33,8 +33,8 @@ describe("FriendsList", () => {
     await connected();
     render(<FriendsList />);
     await act(async () => {
-      await api.friendAdd(4);
-      await api.friendAdd(2);
+      await api.friendAdd(shownServerId(), 4);
+      await api.friendAdd(shownServerId(), 2);
     });
     const list = screen.getByRole("region", { name: "Friends" });
     const items = within(list).getAllByRole("button", { name: /,/ });
@@ -52,7 +52,7 @@ describe("FriendsList", () => {
     await connected();
     render(<FriendsList />);
     await act(async () => {
-      await api.friendAdd(2);
+      await api.friendAdd(shownServerId(), 2);
     });
     const anna = getServerState().users.get(2);
     if (!anna) throw new Error("Anna is missing");
@@ -77,7 +77,7 @@ describe("FriendsList", () => {
     await connected();
     render(<FriendsList />);
     await act(async () => {
-      await api.friendAdd(2);
+      await api.friendAdd(shownServerId(), 2);
     });
     expect(screen.getByRole("region", { name: "Friends" })).toBeInTheDocument();
     await act(async () => {
@@ -88,14 +88,45 @@ describe("FriendsList", () => {
 
   it("refuses people without a certificate", async () => {
     await connected();
-    await expect(api.friendAdd(3)).rejects.toMatchObject({ code: "invalidInput" });
+    await expect(api.friendAdd(shownServerId(), 3)).rejects.toMatchObject({ code: "invalidInput" });
+  });
+
+  it("offers Join only for a friend on another server and joins their channel there", async () => {
+    await connected();
+    const join = vi.spyOn(api, "channelJoin").mockResolvedValue(null);
+    render(<FriendsList />);
+    const here = shownServerId();
+    const other = here + 1;
+    act(() => {
+      api.mock.emit("friendsChanged", {
+        friends: [
+          {
+            certHash: "annahash",
+            name: "Anna",
+            addedAt: "2026-01-01T00:00:00Z",
+            lastSeenAt: null,
+            online: { serverId: here, session: 2, channelId: 0 },
+          },
+          {
+            certHash: "berthash",
+            name: "Bert",
+            addedAt: "2026-01-01T00:00:00Z",
+            lastSeenAt: null,
+            online: { serverId: other, session: 7, channelId: 12 },
+          },
+        ],
+      });
+    });
+    expect(screen.queryByRole("button", { name: "Join Anna's channel" })).toBeNull();
+    fireEvent.click(screen.getByRole("button", { name: "Join Bert's channel" }));
+    expect(join).toHaveBeenCalledWith(other, 12);
   });
 });
 
 describe("PrivatePresence", () => {
   it("says online or offline, and when a friend was last seen", async () => {
     await connected();
-    await api.friendAdd(2);
+    await api.friendAdd(shownServerId(), 2);
     const { rerender } = render(<PrivatePresence online certHash="annahash" />);
     expect(screen.getByText("Online")).toBeInTheDocument();
     rerender(<PrivatePresence online={false} certHash="someone" />);

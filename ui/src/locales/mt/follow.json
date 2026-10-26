@@ -16,7 +16,8 @@
   },
   "dm": {
     "title": "Messaġġi diretti",
-    "unknown": "Persuna mhux magħrufa"
+    "unknown": "Persuna mhux magħrufa",
+    "withServer": "{{name}}, fuq {{server}}"
   },
   "notify": {
     "channel": "{{name}} f'{{channel}}: {{text}}",
@@ -25,7 +26,9 @@
     "more_two": "{{count}} messaġġi ġodda oħra",
     "more_few": "{{count}} messaġġi ġodda oħra",
     "more_many": "{{count}} messaġġ ġdid ieħor",
-    "more_other": "{{count}} messaġġ ġdid ieħor"
+    "more_other": "{{count}} messaġġ ġdid ieħor",
+    "channelOn": "{{name}} f'{{channel}} fuq {{server}}: {{text}}",
+    "privateOn": "{{name}} (privat, {{server}}): {{text}}"
   },
   "history": {
     "clear": "Ħassar l-istorja",

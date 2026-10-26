@@ -9,5 +9,17 @@
   "retry": "Skúsiť znova",
   "loading": "Načítava sa…",
   "beta": "Beta",
-  "betaFeature": "Funkcia v beta verzii"
+  "betaFeature": "Funkcia v beta verzii",
+  "themePicker": {
+    "swatch": "{{name}}, motív",
+    "swatchSelected": "{{name}}, motív, vybraný",
+    "yourThemes": "Tvoje motívy",
+    "add": "Nový motív z aktuálneho",
+    "addShort": "Nový"
+  },
+  "floatingWidget": {
+    "collapse": "Zbaliť",
+    "expand": "Rozbaliť",
+    "handle": "{{name}}: šípky posúvajú, Shift+šípky menia veľkosť"
+  }
 }

@@ -1,6 +1,8 @@
 //! The single app settings record. Every field has a serde default so settings saved
 //! by an older version load cleanly and new fields need no database migration.
 
+use std::collections::BTreeMap;
+
 use rusqlite::{OptionalExtension, params};
 use serde::{Deserialize, Serialize};
 
@@ -105,6 +107,20 @@ pub struct SoundSettings {
     pub voice_join: bool,
     /// You disconnect from a server yourself (QA.19).
     pub hang_up: bool,
+    /// Someone starts a watch party in your channel (FR-2.77).
+    pub party_started: bool,
+    /// Someone joins the watch party (FR-2.77).
+    pub party_joined: bool,
+    /// Someone leaves the watch party (FR-2.77).
+    pub party_left: bool,
+    /// Someone starts a screen share in your channel (FR-2.77).
+    pub share_started: bool,
+    /// A screen share in your channel ends (FR-2.77).
+    pub share_stopped: bool,
+    /// Someone starts watching your screen share (FR-2.77).
+    pub viewer_started: bool,
+    /// Someone stops watching your screen share (FR-2.77).
+    pub viewer_stopped: bool,
 }
 
 impl Default for SoundSettings {
@@ -119,11 +135,18 @@ impl Default for SoundSettings {
             mention_notify: true,
             voice_join: true,
             hang_up: true,
+            party_started: true,
+            party_joined: true,
+            party_left: true,
+            share_started: true,
+            share_stopped: true,
+            viewer_started: true,
+            viewer_stopped: true,
         }
     }
 }
 
-/// Screen corner the overlay sits in unless the user dragged it somewhere else (FR-1.45).
+/// Screen corner the in-game overlay sits in (FR-1.46b).
 #[derive(Debug, Clone, Copy, Default, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "snake_case")]
 pub enum OverlayCorner {
@@ -132,51 +155,6 @@ pub enum OverlayCorner {
     TopRight,
     BottomLeft,
     BottomRight,
-}
-
-/// Top-left corner of the overlay in physical desktop pixels, set by dragging it in move mode.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
-pub struct OverlayPoint {
-    pub x: i32,
-    pub y: i32,
-}
-
-/// Default overlay size in logical pixels: room for about six talking people.
-pub const DEFAULT_OVERLAY_WIDTH: u32 = 240;
-pub const DEFAULT_OVERLAY_HEIGHT: u32 = 320;
-
-/// Overlay options (FR-1.44, FR-1.45).
-#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(default)]
-pub struct OverlaySettings {
-    pub enabled: bool,
-    /// Show the whole current channel instead of only who is talking.
-    pub show_whole_channel: bool,
-    /// Show the name of the own channel above the people.
-    pub show_channel_name: bool,
-    /// 0.0 (transparent) – 1.0 (opaque).
-    pub opacity: f32,
-    pub corner: OverlayCorner,
-    /// Where the user dragged the overlay; `None` places it in `corner`.
-    pub custom_position: Option<OverlayPoint>,
-    /// Logical pixels.
-    pub width: u32,
-    pub height: u32,
-}
-
-impl Default for OverlaySettings {
-    fn default() -> Self {
-        Self {
-            enabled: false,
-            show_whole_channel: false,
-            show_channel_name: true,
-            opacity: 0.9,
-            corner: OverlayCorner::default(),
-            custom_position: None,
-            width: DEFAULT_OVERLAY_WIDTH,
-            height: DEFAULT_OVERLAY_HEIGHT,
-        }
-    }
 }
 
 /// Global switch of the in-game overlay (FR-1.46b, QA.55).
@@ -290,6 +268,50 @@ impl Default for PositionalSettings {
     }
 }
 
+/// Answer to a question asked once; `Unset` means the user was not asked yet.
+#[derive(Debug, Clone, Copy, Default, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum Consent {
+    #[default]
+    Unset,
+    Yes,
+    No,
+}
+
+/// A custom colour theme (FR-2.14, FR-2.15) with a dark and a light version. Each colour map
+/// holds the seven keys background, surface, text, accent, talking, warning and error as
+/// lowercase `#rrggbb`; the UI validates them and generates a missing version, so the store only
+/// keeps what it is given. Built-in presets live in the UI and are not stored.
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct Theme {
+    pub id: String,
+    pub name: String,
+    /// The single colour set of themes saved before themes had two versions. The UI reads it as
+    /// the version matching its brightness; saving the theme again writes the two sets instead.
+    #[serde(default, alias = "colours", skip_serializing_if = "BTreeMap::is_empty")]
+    pub colors: BTreeMap<String, String>,
+    #[serde(default, rename = "colours_dark", alias = "colors_dark")]
+    pub colors_dark: BTreeMap<String, String>,
+    #[serde(default, rename = "colours_light", alias = "colors_light")]
+    pub colors_light: BTreeMap<String, String>,
+    /// True while that version was generated from the other one and not edited by hand.
+    #[serde(default)]
+    pub light_generated: bool,
+    #[serde(default)]
+    pub dark_generated: bool,
+}
+
+/// Id of the built-in theme used until the user picks another one.
+pub const DEFAULT_APP_THEME_ID: &str = "mumcord-dark";
+/// Default and bounds of the number of simultaneously connected servers (FR-2.1).
+pub const DEFAULT_MAX_CONNECTED_SERVERS: u8 = 5;
+pub const MIN_MAX_CONNECTED_SERVERS: u8 = 1;
+pub const MAX_MAX_CONNECTED_SERVERS: u8 = 15;
+/// Range and default of the lowered video level while people talk, in percent (FR-2.76).
+pub const MIN_VIDEO_DUCKING_PERCENT: u8 = 10;
+pub const MAX_VIDEO_DUCKING_PERCENT: u8 = 80;
+pub const DEFAULT_VIDEO_DUCKING_PERCENT: u8 = 30;
+
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 #[serde(default)]
 pub struct Settings {
@@ -320,12 +342,21 @@ pub struct Settings {
     /// the server limit (at most 510 kbit/s), the encoder is tuned for music and noise
     /// suppression and automatic gain are bypassed. Off by default.
     pub music_quality: bool,
+    /// Own bitrate cap in kbit/s (Settings → Audio, FR-2.64), independent of `music_quality`;
+    /// `None` is "Max": the highest bitrate the server and the packet size allow. Defaults to
+    /// 96 kbit/s (lower if the server allows less). Automatic lowering on packet loss works below it.
+    pub bitrate_kbps: Option<u32>,
+    /// "Lower video sound while people talk" (Settings → Audio, FR-2.76): the watch-party video
+    /// and watched screen-share sound drop to `video_ducking_percent` while someone in the own
+    /// voice channel talks. On by default.
+    pub video_ducking: bool,
+    /// The lowered level in percent of the normal volume, 10–80 (default 30). Clamped on load.
+    pub video_ducking_percent: u8,
     pub sounds: SoundSettings,
     pub notifications: NotificationMode,
     pub close_behaviour: CloseBehaviour,
     pub chat_display: ChatDisplay,
     pub log_level: LogLevel,
-    pub overlay: OverlaySettings,
     /// In-game overlay drawn inside games (FR-1.46b).
     pub ingame_overlay: InGameOverlaySettings,
     pub positional: PositionalSettings,
@@ -369,7 +400,35 @@ pub struct Settings {
     /// Load the full-size version of pictures from other Mumcord users (FR-1.74). On by
     /// default. Off: only thumbnails are shown and originals are never requested.
     pub load_full_images: bool,
+    /// Most servers connected at once, 1–15 (FR-2.1). Clamped on load.
+    pub max_connected_servers: u8,
+    /// Id of the theme for the whole app: a built-in preset or one of `custom_themes`.
+    pub app_theme_id: String,
+    /// Imported and user-made themes; built-in presets are not stored (FR-2.15).
+    pub custom_themes: Vec<Theme>,
+    /// Blur and translucency; ignored when the OS asks for reduced transparency or motion.
+    pub visual_effects: bool,
+    pub hide_empty_channels: bool,
+    pub talking_first: bool,
+    pub show_weak_connection_icon: bool,
+    /// Direct connections to other Mumcord users (FR-2.36); `Unset` asks on first use.
+    pub allow_direct_connections: Consent,
+    /// Daily check for a new version (FR-2.56); `Unset` asks.
+    pub update_check: Consent,
+    /// When the last update check ran, in milliseconds since the Unix epoch.
+    pub last_update_check: Option<i64>,
+    /// AppImage only: the user's answer to "Add Mumcord to the app menu" (FR-2.55). The menu
+    /// entry is written only on `Yes`.
+    pub appimage_menu_entry: Consent,
+    /// The one-time notice about the removed window overlay was shown (FR-2.33).
+    pub window_overlay_notice_shown: bool,
+    /// The user had Epic 1's window overlay enabled before it was removed (FR-2.33). Derived once
+    /// from the old record on first load, then persisted.
+    pub legacy_window_overlay_enabled: bool,
 }
+
+/// Default own bitrate cap in kbit/s: today's speech cap (FR-2.64).
+pub const DEFAULT_BITRATE_KBPS: u32 = 96;
 
 impl Default for Settings {
     fn default() -> Self {
@@ -389,12 +448,14 @@ impl Default for Settings {
             echo_cancellation: true,
             auto_gain: true,
             music_quality: false,
+            bitrate_kbps: Some(DEFAULT_BITRATE_KBPS),
+            video_ducking: true,
+            video_ducking_percent: DEFAULT_VIDEO_DUCKING_PERCENT,
             sounds: SoundSettings::default(),
             notifications: NotificationMode::default(),
             close_behaviour: CloseBehaviour::default(),
             chat_display: ChatDisplay::default(),
             log_level: LogLevel::default(),
-            overlay: OverlaySettings::default(),
             ingame_overlay: InGameOverlaySettings::default(),
             positional: PositionalSettings::default(),
             enabled_plugins: Vec::new(),
@@ -413,6 +474,19 @@ impl Default for Settings {
             skip_links: true,
             offer_full_images: true,
             load_full_images: true,
+            max_connected_servers: DEFAULT_MAX_CONNECTED_SERVERS,
+            app_theme_id: DEFAULT_APP_THEME_ID.to_owned(),
+            custom_themes: Vec::new(),
+            visual_effects: true,
+            hide_empty_channels: false,
+            talking_first: false,
+            show_weak_connection_icon: true,
+            allow_direct_connections: Consent::Unset,
+            update_check: Consent::Unset,
+            last_update_check: None,
+            appimage_menu_entry: Consent::Unset,
+            window_overlay_notice_shown: false,
+            legacy_window_overlay_enabled: false,
         }
     }
 }
@@ -425,6 +499,23 @@ pub struct OwnVoice {
     pub deaf: bool,
 }
 
+fn has_key(json: &str, key: &str) -> bool {
+    serde_json::from_str::<serde_json::Value>(json).is_ok_and(|v| v.get(key).is_some())
+}
+
+/// Whether an Epic 1 record (still carrying the removed `overlay` key) had the window overlay on.
+/// A record already saved in the Epic 2 format carries the flag itself, so it is not re-derived.
+fn legacy_window_overlay_enabled(json: &str) -> bool {
+    let Ok(value) = serde_json::from_str::<serde_json::Value>(json) else {
+        return false;
+    };
+    value.get("legacy_window_overlay_enabled").is_none()
+        && value
+            .pointer("/overlay/enabled")
+            .and_then(serde_json::Value::as_bool)
+            == Some(true)
+}
+
 impl Store {
     /// The saved settings, or defaults if none were saved yet.
     pub fn settings(&self) -> Result<Settings> {
@@ -435,7 +526,21 @@ impl Store {
             })
             .optional()?;
         match json {
-            Some(json) => Ok(serde_json::from_str(&json)?),
+            Some(json) => {
+                let mut settings: Settings = serde_json::from_str(&json)?;
+                settings.legacy_window_overlay_enabled |= legacy_window_overlay_enabled(&json);
+                if settings.music_quality && !has_key(&json, "bitrate_kbps") {
+                    // Music quality used to lift the cap; keep those users at "Max".
+                    settings.bitrate_kbps = None;
+                }
+                settings.max_connected_servers = settings
+                    .max_connected_servers
+                    .clamp(MIN_MAX_CONNECTED_SERVERS, MAX_MAX_CONNECTED_SERVERS);
+                settings.video_ducking_percent = settings
+                    .video_ducking_percent
+                    .clamp(MIN_VIDEO_DUCKING_PERCENT, MAX_VIDEO_DUCKING_PERCENT);
+                Ok(settings)
+            }
             None => Ok(Settings::default()),
         }
     }
@@ -497,10 +602,26 @@ mod tests {
         changed.sounds.user_left = false;
         changed.sounds.voice_join = false;
         changed.sounds.hang_up = false;
-        changed.overlay.corner = OverlayCorner::BottomRight;
-        changed.overlay.custom_position = Some(OverlayPoint { x: -1, y: 2 });
-        changed.overlay.width = 300;
-        changed.overlay.opacity = 0.5;
+        changed.max_connected_servers = 9;
+        changed.app_theme_id = "custom-1".into();
+        changed.custom_themes = vec![Theme {
+            id: "custom-1".into(),
+            name: "Mine".into(),
+            colors: BTreeMap::new(),
+            colors_dark: BTreeMap::from([("accent".to_owned(), "#112233".to_owned())]),
+            colors_light: BTreeMap::from([("accent".to_owned(), "#445566".to_owned())]),
+            light_generated: true,
+            dark_generated: false,
+        }];
+        changed.visual_effects = false;
+        changed.hide_empty_channels = true;
+        changed.talking_first = true;
+        changed.show_weak_connection_icon = false;
+        changed.allow_direct_connections = Consent::No;
+        changed.update_check = Consent::Yes;
+        changed.last_update_check = Some(1_700_000_000_000);
+        changed.appimage_menu_entry = Consent::Yes;
+        changed.window_overlay_notice_shown = true;
         changed.enabled_plugins = vec!["gtav".into()];
         changed.wizard_completed = true;
         changed.log_level = LogLevel::Debug;
@@ -571,26 +692,101 @@ mod tests {
     }
 
     #[test]
-    fn overlay_options_load_from_records_saved_before_they_existed() {
+    fn epic_1_record_with_window_overlay_loads_with_epic_2_defaults() {
         let (_dir, store) = temp_store();
-        // Shape written by earlier versions: no corner, size or channel name yet.
+        // Written by Epic 1: still has the removed window-overlay options.
         store
             .conn
             .execute(
                 "INSERT INTO settings (id, data) VALUES (1, ?1)",
-                params![r#"{"overlay":{"enabled":true,"opacity":0.5,"bounds":null}}"#],
+                params![
+                    r#"{"wizard_completed":true,"autostart":true,"overlay":{"enabled":true,"opacity":0.5,"corner":"top_left"}}"#
+                ],
             )
             .expect("insert");
-        let overlay = store.settings().expect("load").overlay;
-        assert!(overlay.enabled);
-        assert!((overlay.opacity - 0.5).abs() < f32::EPSILON);
-        assert_eq!(overlay.corner, OverlayCorner::TopLeft);
-        assert_eq!(overlay.custom_position, None);
-        assert_eq!(
-            (overlay.width, overlay.height),
-            (DEFAULT_OVERLAY_WIDTH, DEFAULT_OVERLAY_HEIGHT)
-        );
-        assert!(overlay.show_channel_name);
+        let loaded = store.settings().expect("load");
+        assert!(loaded.wizard_completed && loaded.autostart);
+        assert_eq!(loaded.max_connected_servers, 5);
+        assert_eq!(loaded.app_theme_id, DEFAULT_APP_THEME_ID);
+        assert!(loaded.custom_themes.is_empty());
+        assert!(loaded.visual_effects && loaded.show_weak_connection_icon);
+        assert!(!loaded.hide_empty_channels && !loaded.talking_first);
+        assert_eq!(loaded.allow_direct_connections, Consent::Unset);
+        assert_eq!(loaded.update_check, Consent::Unset);
+        assert_eq!(loaded.appimage_menu_entry, Consent::Unset);
+        assert_eq!(loaded.last_update_check, None);
+        assert!(!loaded.window_overlay_notice_shown);
+        assert!(loaded.legacy_window_overlay_enabled);
+    }
+
+    #[test]
+    fn legacy_window_overlay_flag_follows_epic_1_record_and_round_trips() {
+        for (json, expected) in [
+            (r#"{"overlay":{"enabled":true}}"#, true),
+            (r#"{"overlay":{"enabled":false}}"#, false),
+            (r#"{"autostart":true}"#, false),
+        ] {
+            let (_dir, store) = temp_store();
+            store
+                .conn
+                .execute(
+                    "INSERT INTO settings (id, data) VALUES (1, ?1)",
+                    params![json],
+                )
+                .expect("insert");
+            let loaded = store.settings().expect("load");
+            assert_eq!(loaded.legacy_window_overlay_enabled, expected);
+            store.save_settings(&loaded).expect("save");
+            assert_eq!(
+                store
+                    .settings()
+                    .expect("reload")
+                    .legacy_window_overlay_enabled,
+                expected
+            );
+        }
+    }
+
+    #[test]
+    fn max_connected_servers_is_clamped_on_load() {
+        let (_dir, store) = temp_store();
+        for (stored, expected) in [(0, 1), (7, 7), (200, 15)] {
+            store
+                .conn
+                .execute(
+                    "INSERT INTO settings (id, data) VALUES (1, ?1)
+                     ON CONFLICT (id) DO UPDATE SET data = excluded.data",
+                    params![format!(r#"{{"max_connected_servers":{stored}}}"#)],
+                )
+                .expect("insert");
+            assert_eq!(
+                store.settings().expect("load").max_connected_servers,
+                expected
+            );
+        }
+    }
+
+    #[test]
+    fn video_ducking_is_on_at_30_percent_and_clamped_on_load() {
+        let (_dir, store) = temp_store();
+        let defaults = store.settings().expect("load");
+        assert!(defaults.video_ducking);
+        assert_eq!(defaults.video_ducking_percent, 30);
+        for (stored, expected) in [(0, 10), (60, 60), (95, 80)] {
+            store
+                .conn
+                .execute(
+                    "INSERT INTO settings (id, data) VALUES (1, ?1)
+                     ON CONFLICT (id) DO UPDATE SET data = excluded.data",
+                    params![format!(
+                        r#"{{"video_ducking":false,"video_ducking_percent":{stored}}}"#
+                    )],
+                )
+                .expect("insert");
+            let loaded = store.settings().expect("load");
+            assert!(!loaded.video_ducking);
+            assert_eq!(loaded.video_ducking_percent, expected);
+        }
     }
 
     #[test]
@@ -603,6 +799,17 @@ mod tests {
         };
         store.save_settings(&settings).expect("save");
         assert!(store.settings().expect("reload").music_quality);
+    }
+
+    #[test]
+    fn bitrate_cap_persists() {
+        let (_dir, store) = temp_store();
+        let settings = Settings {
+            bitrate_kbps: Some(32),
+            ..Settings::default()
+        };
+        store.save_settings(&settings).expect("save");
+        assert_eq!(store.settings().expect("reload").bitrate_kbps, Some(32));
     }
 
     #[test]
@@ -639,6 +846,30 @@ mod tests {
     }
 
     #[test]
+    fn bitrate_cap_defaults_to_96_and_music_users_start_at_max() {
+        let (_dir, store) = temp_store();
+        let save_raw = |json: &str| {
+            store
+                .conn
+                .execute(
+                    "INSERT INTO settings (id, data) VALUES (1, ?1)
+                     ON CONFLICT (id) DO UPDATE SET data = excluded.data",
+                    params![json],
+                )
+                .expect("write");
+        };
+        assert_eq!(store.settings().expect("fresh").bitrate_kbps, Some(96));
+        save_raw(r#"{"theme":"dark"}"#);
+        assert_eq!(store.settings().expect("old").bitrate_kbps, Some(96));
+        save_raw(r#"{"music_quality":true}"#);
+        assert_eq!(store.settings().expect("music").bitrate_kbps, None);
+        save_raw(r#"{"music_quality":true,"bitrate_kbps":64}"#);
+        assert_eq!(store.settings().expect("chosen").bitrate_kbps, Some(64));
+        save_raw(r#"{"music_quality":false,"bitrate_kbps":null}"#);
+        assert_eq!(store.settings().expect("max").bitrate_kbps, None);
+    }
+
+    #[test]
     fn partial_json_falls_back_to_defaults() {
         let parsed: Settings =
             serde_json::from_str(r#"{"theme":"dark","sounds":{"user_joined":false}}"#)
@@ -650,6 +881,10 @@ mod tests {
         assert!(
             parsed.sounds.voice_join && parsed.sounds.hang_up,
             "new sounds are on for settings saved before they existed"
+        );
+        assert!(
+            parsed.sounds.party_started && parsed.sounds.viewer_stopped,
+            "activity sounds are on for older settings"
         );
         assert!(parsed.noise_suppression);
         assert!(
@@ -680,5 +915,44 @@ mod tests {
         assert!(!parsed.autostart, "starting at login is opt-in");
         assert!(parsed.start_minimized);
         assert!(parsed.connect_muted, "read-only connect stays the default");
+    }
+
+    #[test]
+    fn theme_saved_with_one_colour_set_still_loads() {
+        let theme: Theme =
+            serde_json::from_str(r##"{"id":"a","name":"A","colors":{"accent":"#112233"}}"##)
+                .expect("parse theme");
+        assert_eq!(theme.colors["accent"], "#112233");
+        assert!(theme.colors_dark.is_empty() && theme.colors_light.is_empty());
+        assert!(!theme.light_generated && !theme.dark_generated);
+    }
+
+    #[test]
+    fn theme_versions_use_the_spec_field_names() {
+        let theme: Theme = serde_json::from_str(
+            r##"{"id":"a","name":"A","colors_dark":{"text":"#ffffff"},"colours_light":{"text":"#000000"},"light_generated":true}"##,
+        )
+        .expect("parse theme");
+        assert_eq!(theme.colors_dark["text"], "#ffffff");
+        assert_eq!(theme.colors_light["text"], "#000000");
+        let json = serde_json::to_string(&theme).expect("serialise");
+        assert!(json.contains("\"colours_dark\"") && json.contains("\"colours_light\""));
+        assert!(
+            !json.contains("\"colors\""),
+            "an empty legacy set is not written"
+        );
+    }
+
+    #[test]
+    fn theme_accepts_the_british_spelling_on_load() {
+        let theme: Theme =
+            serde_json::from_str(r##"{"id":"a","name":"A","colours":{"accent":"#112233"}}"##)
+                .expect("parse theme");
+        assert_eq!(theme.colors["accent"], "#112233");
+        assert!(
+            serde_json::to_string(&theme)
+                .expect("serialise")
+                .contains("\"colors\"")
+        );
     }
 }

@@ -13,10 +13,15 @@
     "listLabel": "Uložené servery",
     "add": "Pridať server",
     "keyboardHint": "Enter pripojí. Alt a šípka hore alebo dole presunie server. Shift a F10 otvorí ďalšie možnosti.",
-    "status": {
-      "connected": "{{server}} (pripojené)",
-      "connecting": "{{server}} (pripája sa)",
-      "reconnecting": "{{server}} (znova sa pripája)"
+    "label": "{{server}} ({{state}})",
+    "state": {
+      "connected": "pripojené",
+      "connecting": "pripája sa",
+      "reconnecting": "znova sa pripája",
+      "error": "spojenie stratené",
+      "voice": "hlasový server",
+      "unread": "neprečítané správy",
+      "mentions": "zmienky: {{mentions}}"
     }
   },
   "menu": {
@@ -26,7 +31,19 @@
     "edit": "Upraviť server",
     "moveUp": "Posunúť hore",
     "moveDown": "Posunúť dole",
-    "remove": "Odstrániť server"
+    "remove": "Odstrániť server",
+    "reconnect": "Znova pripojiť",
+    "alwaysConnect": "Vždy pripojiť pri spustení",
+    "muteNotifications": "Stlmiť upozornenia",
+    "theme": "Motív…",
+    "showWelcome": "Zobraziť uvítaciu správu"
+  },
+  "theme": {
+    "title": "Motív pre {{server}}",
+    "label": "Motív",
+    "useApp": "Použiť motív aplikácie",
+    "hint": "Platí, kým je zobrazený tento server.",
+    "failed": "Motív sa nepodarilo uložiť. Skús to znova."
   },
   "dialog": {
     "addTitle": "Pridať server",
@@ -50,7 +67,14 @@
       "username": "Zadaj meno, ktoré chceš na tomto serveri používať.",
       "link": "Tento odkaz mumble:// sa nedá prečítať. Skontroluj, či bol skopírovaný celý.",
       "invalid": "Údaje servera nie sú platné. Skontroluj adresu a port."
-    }
+    },
+    "alwaysConnect": "Vždy pripojiť pri spustení",
+    "alwaysConnectHint": "Mumcord pri spustení pripojí tento server len na čítanie.",
+    "channelPasswords": "Heslá kanálov",
+    "channelPassword": "Heslo kanála {{number}}",
+    "removeChannelPassword": "Odobrať {{name}}",
+    "remove": "Odobrať",
+    "channelPasswordsHint": "Uložia sa, keď ich chránený kanál prijal. Na odobrané sa pri ďalšom vstupe opýtame znova."
   },
   "errors": {
     "serverUnreachable": "Server je nedostupný. Skontroluj adresu, port a či si online.",
@@ -63,17 +87,16 @@
     "invalidAddress": "Adresa servera nie je platná. Uprav server a oprav ju.",
     "secureStorage": "Zabezpečené úložisko tvojho systému nie je dostupné, takže heslo servera sa nepodarilo prečítať ani uložiť. Odomkni ho a skús to znova.",
     "notFound": "Tento server už nie je uložený.",
-    "generic": "Niečo sa pokazilo. Skús to znova."
+    "generic": "Niečo sa pokazilo. Skús to znova.",
+    "serverLimit": "Už si pripojený k maximu {{limit}} serverov. Odpoj nejaký server alebo zvýš limit v Nastavenia → Servery.",
+    "serverLimitUnknown": "Už si pripojený k maximálnemu počtu serverov. Odpoj nejaký server alebo zvýš limit v Nastavenia → Servery.",
+    "alwaysConnectLimit": "Len {{limit}} serverov môže mať „Vždy pripojiť pri spustení“, rovnako ako je limit pripojených serverov. Vypni to pri inom serveri alebo zvýš limit v Nastavenia → Servery.",
+    "alwaysConnectLimitUnknown": "„Vždy pripojiť pri spustení“ nemôže mať viac serverov, než je limit pripojených serverov. Vypni to pri inom serveri alebo zvýš limit v Nastavenia → Servery."
   },
   "remove": {
     "title": "Odstrániť {{server}}?",
     "message": "Jeho uložené heslo, rozhodnutie o certifikáte, sledované kanály a história chatu v tomto počítači sa vymažú.",
     "confirm": "Odstrániť"
-  },
-  "switch": {
-    "title": "Prepnúť server?",
-    "message": "Naraz môžeš byť len na jednom serveri. Odpojiť sa od {{current}} a pripojiť k {{next}}?",
-    "confirm": "Odpojiť a prepnúť"
   },
   "cert": {
     "newTitle": "Dôverovať tomuto serveru?",
@@ -108,7 +131,10 @@
     "actionFailed": {
       "reorder": "Nové poradie serverov sa nepodarilo uložiť. Skús to znova.",
       "remove": "Server sa nepodarilo odstrániť. Skús to znova.",
-      "disconnect": "Odpojenie zlyhalo. Skús to znova."
+      "disconnect": "Odpojenie zlyhalo. Skús to znova.",
+      "alwaysConnect": "„Vždy pripojiť pri spustení“ sa nepodarilo uložiť. Skús to znova.",
+      "notifications": "Nastavenie upozornení sa nepodarilo uložiť. Skús to znova.",
+      "savePassword": "Nové heslo sa nepodarilo uložiť. Uprav server, aby si ho uložil."
     }
   },
   "empty": {
@@ -124,5 +150,27 @@
     "errors": {
       "required": "Zadaj adresu servera alebo odkaz mumble://."
     }
+  },
+  "password": {
+    "title": "Heslo pre {{server}}",
+    "intro": "Server heslo neprijal. Zadaj správne a skús to znova.",
+    "label": "Heslo",
+    "show": "Zobraziť",
+    "hide": "Skryť",
+    "wrong": "Aj toto heslo je nesprávne. Skús to znova.",
+    "save": "Uložiť heslo",
+    "cancel": "Zrušiť",
+    "connect": "Pripojiť",
+    "connecting": "Pripája sa…"
+  },
+  "channelPassword": {
+    "title": "Tento kanál vyžaduje heslo",
+    "intro": "Zadaj heslo pre {{channel}}.",
+    "label": "Heslo",
+    "wrong": "Nesprávne heslo",
+    "failed": "Heslo sa nepodarilo odoslať. Skús to znova.",
+    "cancel": "Zrušiť",
+    "join": "Vstúpiť",
+    "joining": "Vstupuje sa…"
   }
 }

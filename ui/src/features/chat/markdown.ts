@@ -18,6 +18,20 @@ export function escapeHtml(text: string): string {
 const marked = new Marked({
   gfm: true,
   breaks: true,
+  tokenizer: {
+    // Only `> ` with a space starts a quote (FR-2.68); `>_>`, `>.<` or `>hello` stay text (FR-1.30).
+    blockquote(src) {
+      const match = /^(?:> [^\n]*(?:\n|$))+/.exec(src);
+      if (match === null) return undefined;
+      const raw = match[0];
+      const text = raw
+        .replace(/\n$/, "")
+        .split("\n")
+        .map((line) => line.slice(2))
+        .join("\n");
+      return { type: "blockquote", raw, text, tokens: this.lexer.blockTokens(text) };
+    },
+  },
   renderer: {
     html({ text }) {
       return escapeHtml(text);

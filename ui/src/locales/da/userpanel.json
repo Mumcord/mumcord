@@ -12,7 +12,7 @@
   },
   "readOnly": {
     "text": "Du læser kun med – join en kanal for at tale.",
-    "join": "Join {{channel}}"
+    "join": "Gå til {{channel}}"
   },
   "status": {
     "connecting": "Forbinder…",
@@ -32,7 +32,15 @@
     "avatarUnregistered": "Denne server gemmer kun avatarer for registrerede brugere – Mumcord sender din igen ved hver forbindelse.",
     "avatarChosen": "Valgt: {{name}}",
     "avatarRemoved": "Billedet fjernes, når du gemmer.",
-    "comment": "Om dig"
+    "comment": "Om dig",
+    "format": "Tekstformatering",
+    "bold": "Fed",
+    "italic": "Kursiv",
+    "link": "Link",
+    "linkAddress": "Linkadresse",
+    "linkApply": "Tilføj link",
+    "bulletList": "Punktopstilling",
+    "numberedList": "Nummereret liste"
   },
   "register": {
     "title": "Registrér på denne server",
@@ -69,8 +77,6 @@
     "nowGaming": "Del det spil, jeg spiller",
     "nowGamingHint": "Andre kan se dit aktuelle spil",
     "unavailable": "Ikke tilgængelig på dette system",
-    "overlay": "Overlay",
-    "overlayHint": "Viser, hvem der taler, oven på spil",
     "editProfile": "Rediger profil",
     "editProfileHint": "Navn, avatar og kommentar",
     "register": "Registrér på denne server",
@@ -84,5 +90,10 @@
     "offerImagesHint": "Lad andre indlæse dine originale billeder",
     "loadImages": "Indlæs billeder i fuld størrelse",
     "loadImagesHint": "Hent originale billeder fra andre"
+  },
+  "voice": {
+    "line": "Tale: {{channel}} · {{server}}",
+    "server": "Tale: {{server}}",
+    "show": "{{location}} – vis denne server"
   }
 }

@@ -14,7 +14,8 @@ use crate::web::meta::clean;
 
 /// Plugin data id of the payload; other ids are ignored.
 pub const DATA_ID: &str = "mumcord.nowplaying";
-/// The only payload version this client speaks.
+/// The payload version this client sends. Any version >= 1 is accepted on receipt and unknown
+/// fields are ignored. Minor additions keep v=1 and old clients ignore unknown fields; a breaking change gets a new data id.
 pub const VERSION: u32 = 1;
 /// Longest title, artist or album kept (characters).
 pub const MAX_TEXT: usize = 120;
@@ -127,7 +128,7 @@ pub fn decode(data: &[u8]) -> Result<Option<SharedTrack>, PayloadError> {
         return Err(PayloadError::TooLarge);
     }
     let wire: Wire = serde_json::from_slice(data).map_err(|_| PayloadError::Malformed)?;
-    if wire.v != VERSION {
+    if wire.v < VERSION {
         return Err(PayloadError::Version(wire.v));
     }
     let Some(title) = wire.title.as_deref().and_then(|t| text(t, MAX_TEXT)) else {
@@ -205,6 +206,14 @@ mod tests {
     }
 
     #[test]
+    fn newer_version_with_extra_fields_decodes() {
+        let decoded = decode(br#"{"v":2,"title":"x","future":[1,2]}"#)
+            .expect("valid")
+            .expect("track");
+        assert_eq!(decoded.title, "x");
+    }
+
+    #[test]
     fn untrusted_input_is_capped_and_filtered() {
         assert_eq!(
             decode(&vec![b' '; PLUGIN_DATA_MAX + 1]),
@@ -212,8 +221,8 @@ mod tests {
         );
         assert_eq!(decode(b"not json"), Err(PayloadError::Malformed));
         assert_eq!(
-            decode(br#"{"v":2,"title":"x"}"#),
-            Err(PayloadError::Version(2))
+            decode(br#"{"v":0,"title":"x"}"#),
+            Err(PayloadError::Version(0))
         );
         let decoded = decode(
             br#"{"v":1,"title":"a\u0000b\u202e","art":"javascript:alert(1)","pos_ms":9000,"dur_ms":5000}"#,

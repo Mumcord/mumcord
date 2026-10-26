@@ -8,6 +8,7 @@
     "unknownPerson": "Ukendt person"
   },
   "list": {
+    "server": "Server",
     "today": "I dag",
     "yesterday": "I går",
     "label": "Beskeder i {{name}}",
@@ -32,7 +33,8 @@
     "strike": "Gennemstreget",
     "code": "Inline-kode",
     "codeBlock": "Kodeblok",
-    "link": "Link"
+    "link": "Link",
+    "quote": "Citat"
   },
   "composer": {
     "label": "Besked til {{name}}",
@@ -64,7 +66,14 @@
     "notConnected": "Du er ikke forbundet. Opret forbindelse igen, og prøv igen.",
     "generic": "Beskeden kunne ikke sendes. Prøv igen.",
     "onlyImages": "Kun billeder kan sendes.",
-    "sourceTooLarge": "Denne fil er for stor til at blive sendt (over 25 MB)."
+    "sourceTooLarge": "Denne fil er for stor til at blive sendt (over 25 MB).",
+    "personOffline": "Denne person er offline. Prøv igen, når personen er tilbage."
+  },
+  "failed": {
+    "notSent": "Ikke sendt.",
+    "retry": "Prøv igen",
+    "remove": "Slet",
+    "announce": "En besked kunne ikke sendes."
   },
   "announce": {
     "message": "{{name}}: {{text}}",
@@ -75,7 +84,9 @@
   "pinned": {
     "label": "Kanalinfo",
     "showMore": "Vis mere",
-    "showLess": "Vis mindre"
+    "showLess": "Vis mindre",
+    "hideWelcome": "Skjul velkomstbesked",
+    "hideDescription": "Skjul kanalbeskrivelse"
   },
   "mention": {
     "list": "Personer, der kan omtales",
@@ -128,6 +139,7 @@
     "next": "Næste billede",
     "unnamed": "billede",
     "fullLoading": "Indlæser i fuld størrelse…",
+    "fullCancel": "Annullér download i fuld størrelse",
     "fullProgress": "Indlæser i fuld størrelse… {{percent}} %",
     "fullUnavailable": "Fuld størrelse er ikke tilgængelig – viser forhåndsvisningen"
   },
@@ -141,11 +153,62 @@
     "hint": "Piletaster flytter, Enter sender, Delete fjerner, Escape lukker.",
     "empty": "Ingen favoritter endnu. Højreklik på en GIF i chatten, eller brug stjernen på den, og vælg \"Gem som favorit\". Den vises så her."
   },
+  "linkMenu": {
+    "label": "Link",
+    "copy": "Kopiér link",
+    "open": "Åbn link",
+    "copied": "Link kopieret"
+  },
   "imageMenu": {
     "label": "Billede {{name}}"
   },
   "attribution": {
     "via": "via {{brand}}",
     "view": "Se på {{brand}}"
+  },
+  "themeCard": {
+    "label": "Delt tema {{name}}",
+    "apply": "Anvend tema",
+    "more": "Anvend på en server",
+    "menuLabel": "Anvend tema på",
+    "applyToServer": "Anvend på {{server}}",
+    "imported": "Importeret ✓",
+    "newer": "Lavet med Mumcord {{version}} – opdatér for at se det helt",
+    "failed": "Temaet kunne ikke anvendes."
+  },
+  "reply": {
+    "action": "Svar",
+    "actionFor": "Svar {{name}}",
+    "menu": "Besked fra {{name}}",
+    "replyTo": "Svar til",
+    "jump": "Gå til den oprindelige besked",
+    "image": "Billede",
+    "replyingTo": "Svarer",
+    "cancel": "Annullér svar"
+  },
+  "actions": {
+    "label": "Start sammen",
+    "notConnected": "Ikke forbundet til serveren.",
+    "partyRunning": "Der kører allerede en watch party i denne kanal.",
+    "invalidLink": "Dette er ikke et link til en YouTube-video.",
+    "linkLabel": "YouTube-link",
+    "linkPlaceholder": "Indsæt et YouTube-link",
+    "confirm": "Start",
+    "watchHint": "Se en YouTube-video sammen med denne kanal",
+    "dialogTitle": "Se sammen",
+    "addTitle": "Føj til playliste",
+    "addToPlaylist": "Føj til playliste",
+    "addConfirm": "Tilføj",
+    "apps": "Apps",
+    "appsLive": "Apps (du deler din skærm)"
+  },
+  "activity": {
+    "share": "{{name}} deler sin skærm",
+    "watch": "Se",
+    "party": "Watch party: {{title}}",
+    "join": "Deltag",
+    "videoFallback": "YouTube-video",
+    "someone": "Nogen",
+    "joinFailed": "Kunne ikke deltage i watch partyen."
   }
 }

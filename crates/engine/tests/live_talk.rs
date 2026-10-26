@@ -4,14 +4,16 @@
 //! `MUMCORD_LIVE=1 cargo test -p mumcord-engine --features test-backend --test live_talk -- --ignored --nocapture`
 #![cfg(feature = "test-backend")]
 
+mod common;
+
 use std::collections::BTreeSet;
 use std::path::{Path, PathBuf};
 use std::time::Duration;
 
 use mumcord_bot::voice::{BotVoice, Clip, PlayOptions};
 use mumcord_bot::{Bot, BotConfig, env};
+use mumcord_engine::EventReceiver;
 use mumcord_engine::{EngineEvent, PasswordChange, SecretStore, ServerFields, Snapshot};
-use tokio::sync::mpsc::UnboundedReceiver;
 
 const WAIT: Duration = Duration::from_secs(20);
 const SAMPLE_RATE: usize = 48_000;
@@ -40,7 +42,7 @@ fn work_dir(name: &str) -> PathBuf {
 }
 
 async fn wait_for<T>(
-    rx: &mut UnboundedReceiver<EngineEvent>,
+    rx: &mut EventReceiver,
     what: &str,
     mut pick: impl FnMut(&EngineEvent) -> Option<T>,
 ) -> T {
@@ -57,7 +59,7 @@ async fn wait_for<T>(
 }
 
 /// Collects the sessions reported as talking during `window`.
-async fn talkers(rx: &mut UnboundedReceiver<EngineEvent>, window: Duration) -> BTreeSet<u32> {
+async fn talkers(rx: &mut EventReceiver, window: Duration) -> BTreeSet<u32> {
     let deadline = tokio::time::Instant::now() + window;
     let mut seen = BTreeSet::new();
     while let Ok(Some(event)) = tokio::time::timeout_at(deadline, rx.recv()).await {
@@ -100,7 +102,7 @@ async fn only_the_speaker_is_reported_talking() {
     let bot = |n: &str| {
         Bot::connect(BotConfig {
             data_dir: Some(dir.join(n)),
-            ..BotConfig::new(n, env::PORT_V14)
+            ..BotConfig::new(n, common::v14())
         })
     };
     let talker = bot(&unique("mc-talker")).await.expect("talker");
@@ -127,7 +129,7 @@ async fn only_the_speaker_is_reported_talking() {
         .server_add(ServerFields {
             label: "v14".into(),
             address: env::HOST.into(),
-            port: env::PORT_V14,
+            port: common::v14(),
             username: name.clone(),
             password: match env::testenv_var("SERVER_PASSWORD") {
                 Some(p) => PasswordChange::Set(p),
@@ -154,7 +156,9 @@ async fn only_the_speaker_is_reported_talking() {
         .find(|c| c.name == "AFK")
         .expect("AFK")
         .id;
-    engine.join_channel(afk).expect("join AFK");
+    engine
+        .join_channel(only_server(&engine), afk)
+        .expect("join AFK");
     let me = snapshot.self_session;
     let talker_session = talker.own_user().expect("talker user").session;
 
@@ -173,4 +177,13 @@ async fn only_the_speaker_is_reported_talking() {
     // We talk (mic speech after 12 s): only we are flagged.
     let own = talkers(&mut rx, Duration::from_secs(12)).await;
     assert_eq!(own, BTreeSet::from([me]), "own talk");
+}
+
+/// The test's only connected server (0, which no call accepts, when none is).
+fn only_server(engine: &mumcord_engine::Engine) -> mumcord_engine::ServerId {
+    engine
+        .connections()
+        .first()
+        .and_then(mumcord_engine::ConnState::server_id)
+        .unwrap_or(0)
 }

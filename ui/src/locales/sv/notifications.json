@@ -10,5 +10,6 @@
   "image": "Skickade en bild",
   "open": "Öppna chatten",
   "close": "Avfärda avisering",
-  "mentionLine": "{{sender}} omnämnde dig: {{preview}}"
+  "mentionLine": "{{sender}} omnämnde dig: {{preview}}",
+  "withServer": "{{server}} · {{what}}"
 }

@@ -43,6 +43,7 @@ fn config(port: u16, name: &str, accept: bool) -> ConnectConfig {
         password: std::env::var("MUMCORD_TEST_SERVER_PASSWORD")
             .ok()
             .filter(|p| !p.is_empty()),
+        tokens: Vec::new(),
         identity: Some(identity()),
         verify_cert: Arc::new(move |_| accept),
         login_timeout: WAIT,

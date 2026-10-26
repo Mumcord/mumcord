@@ -5,6 +5,39 @@
     "remember": "Ftakar l-għażla tiegħi",
     "minimize": "Minimizza fit-tray",
     "quit": "Oħroġ",
-    "failed": "Dan ma ħadimx. Erġa' pprova."
+    "failed": "Dan ma ħadimx. Erġa' pprova.",
+    "descriptionServers": "Għadek konness ma' {{count}} servers. Meta jkun minimizzat, Mumcord iżommok fil-vuċi u jibqa' fit-tray tas-sistema."
+  },
+  "windowOverlay": {
+    "title": "L-overlay fit-tieqa tneħħa",
+    "description": "It-tieqa tal-overlay li żżomm fuq kollox m'għadhiex. Minflokha, l-overlay fil-logħba juri min qed jitkellem fil-logħob tiegħek. Tista' tixgħelu fis-settings tal-overlay.",
+    "dismiss": "Fhimt",
+    "openSettings": "Iftaħ is-settings tal-overlay"
+  },
+  "appImageMenu": {
+    "title": "Iżżid lil Mumcord mal-menu tal-apps?",
+    "description": "B'hekk Mumcord jidher fil-menu tal-apps tiegħek. L-ikona u push-to-talk jaħdmu sew fuq Wayland, u l-links mumble:// jiftħu Mumcord. Tista' tibdel dan aktar tard fis-Settings.",
+    "no": "Le",
+    "yes": "Iva",
+    "failed": "Ma ħadimx. Erġa' pprova."
+  },
+  "updateCheck": {
+    "title": "Tfittex verżjonijiet ġodda?",
+    "description": "Mumcord jista' jistaqsi lil GitHub darba kuljum jekk hemmx verżjoni aktar ġdida u juri ħjiel b'link. Xejn ma jitniżżel jew jiġi installat, u xejn ma jintbagħat ħlief it-talba nfisha u l-isem u l-verżjoni tal-app. Tista' tibdel dan aktar tard fis-Settings.",
+    "no": "Le",
+    "yes": "Iva",
+    "failed": "Ma ħadimx. Erġa' pprova."
+  },
+  "updateHint": {
+    "message": "Mumcord {{version}} huwa disponibbli.",
+    "open": "Ara r-rilaxx",
+    "dismiss": "Warrab"
+  },
+  "directConsent": {
+    "title": "Tippermetti konnessjonijiet diretti?",
+    "description": "Il-konnessjonijiet diretti huma aktar mgħaġġla, iżda l-persuna l-oħra tista’ tara l-indirizz IP tiegħek. Mumcord jużahom għal stampi f’daqs sħiħ u għall-qsim tal-iskrin ma’ utenti oħra ta’ Mumcord u jista’ jiftaħ port fuq ir-router tiegħek għalihom. Jekk tgħid le, l-istampi xorta jaslu permezz tas-server u l-qsim tal-iskrin ma jkunx disponibbli. Tista’ tibdel dan aktar tard f’Settings → Privatezza.",
+    "no": "Le",
+    "yes": "Iva",
+    "failed": "Ma ħadimx. Erġa' pprova."
   }
 }
