@@ -197,6 +197,9 @@ struct Inner {
     data_dir: PathBuf,
     store: Arc<Mutex<Store>>,
     secrets: Arc<SecretStore>,
+    /// Held while the audio devices start, so concurrent first uses open the microphone once
+    /// (every open can show the OS microphone prompt).
+    audio_start: tokio::sync::Mutex<()>,
     /// `None` until loaded from secure storage; then `Some(None)` before the wizard ran.
     identity: Mutex<Option<Option<Identity>>>,
     events: Events,
@@ -418,6 +421,7 @@ impl Engine {
             data_dir: data_dir.to_path_buf(),
             store,
             secrets: Arc::new(secrets),
+            audio_start: tokio::sync::Mutex::new(()),
             identity: Mutex::new(None),
             events,
             controls,
@@ -1078,8 +1082,9 @@ impl Engine {
         Some(self.inner.voice.bitrate_max_bps.load(Ordering::Relaxed)).filter(|&b| b > 0)
     }
 
-    /// Lists devices. Without a connection or mic test the devices are opened only for the
-    /// listing and closed again.
+    /// Lists devices. Without a connection or mic test no stream is opened for it: opening the
+    /// microphone just to list it made macOS ask for microphone access on every device-picker
+    /// screen.
     pub async fn audio_devices(&self) -> EngineResult<AudioDeviceList> {
         let inner = self.inner.clone();
         self.inner
@@ -1091,13 +1096,7 @@ impl Engine {
                         return audio.devices();
                     }
                 }
-                let settings = lock(&inner.store).settings().map_err(store_error)?;
-                let audio = Audio::start(
-                    settings.input_device,
-                    settings.output_device,
-                    inner.events.clone(),
-                )?;
-                audio.devices()
+                voice::idle_device_list()
             })
             .await
             .map_err(|e| EngineError::internal(e.to_string()))?
@@ -2467,6 +2466,7 @@ impl Inner {
 
     /// Starts the audio devices on first use.
     async fn ensure_audio(self: &Arc<Self>) -> EngineResult<()> {
+        let _starting = self.audio_start.lock().await;
         if lock(&self.core).audio.is_some() {
             return Ok(());
         }

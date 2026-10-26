@@ -45,6 +45,8 @@ use std::path::PathBuf;
 
 pub use controller::{AudioHandles, AudioIo};
 pub use frames::{FrameSink, FrameSource};
+#[cfg(any(test, feature = "test-backend"))]
+pub use test_backend::input_opens;
 
 /// Environment variable that selects the test backend (feature `test-backend`).
 pub const BACKEND_ENV: &str = "MUMCORD_AUDIO_BACKEND";
