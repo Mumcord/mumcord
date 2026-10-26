@@ -108,14 +108,21 @@ jobs:
       - name: Rust tests
         run: cargo test --workspace --locked
 
+      # The UI checks are platform-independent (vitest runs in jsdom), so they run on Linux only.
+      # They stay in this job because its name is a required check for main.
       - name: UI lint
+        if: runner.os == 'Linux'
         run: npm run lint
 
       - name: UI typecheck
+        if: runner.os == 'Linux'
         run: npm run typecheck
 
       - name: UI tests
+        if: runner.os == 'Linux'
         run: npm test
 
+      # Linux is covered by the E2E build job, which builds the same app.
       - name: Tauri debug build
+        if: runner.os != 'Linux'
         run: npm run tauri build -- --debug --no-bundle
