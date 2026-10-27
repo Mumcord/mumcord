@@ -32,7 +32,7 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 10
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - name: shellcheck
         run: shellcheck -s sh scripts/install.sh scripts/install-test/*.sh
 
@@ -41,12 +41,12 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 10
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - name: Install rpmbuild
         run: scripts/ci/apt-install.sh rpm
       - name: Build
         run: sh scripts/install-test/make-fake-release.sh release
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: fake-release
           path: release
@@ -106,7 +106,7 @@ jobs:
               setup: "apt-get update -qq && apt-get install -y -qq curl",
             }
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - uses: actions/download-artifact@v8
         with:
           name: fake-release

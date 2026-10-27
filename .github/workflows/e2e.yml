@@ -27,7 +27,7 @@ jobs:
     outputs:
       code: ${{ steps.filter.outputs.code }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           sparse-checkout: scripts/ci
       - id: filter
@@ -43,7 +43,7 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 45
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - uses: actions/setup-node@v7
         with:
@@ -100,7 +100,7 @@ jobs:
             | zstd -T0 -3 -q -o e2e-bin.tar.zst
           ls -lh e2e-image.tar.zst e2e-bin.tar.zst
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: e2e-build
           path: |
@@ -121,7 +121,7 @@ jobs:
         # Must match the number of shards in e2e/shards.json.
         shard: [1, 2, 3, 4, 5]
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - uses: actions/setup-node@v7
         with:
@@ -151,7 +151,7 @@ jobs:
 
       - name: Upload failure artifacts
         if: failure()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: e2e-artifacts-shard-${{ matrix.shard }}
           path: e2e/artifacts/

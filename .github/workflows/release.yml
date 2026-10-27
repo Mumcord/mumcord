@@ -24,7 +24,7 @@ jobs:
     outputs:
       version: ${{ steps.check.outputs.version }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           # Full history, so the tagged commit can be checked against main.
           fetch-depth: 0
@@ -86,7 +86,7 @@ jobs:
       contents: write
     steps:
       # Only for the curl installer, which is published with each release (FR-2.54).
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           sparse-checkout: scripts/install.sh
           sparse-checkout-cone-mode: false
