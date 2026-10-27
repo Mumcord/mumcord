@@ -1,154 +1,202 @@
 <p align="center">
-  <img src="assets/brand/mumcord-logo.png" alt="Mumcord logo" width="160" />
+  <img src="docs/images/readme-banner.svg" alt="Mumcord: modern voice and chat for any Mumble server" width="100%" />
 </p>
 
-# Mumcord
+<p align="center">
+  <a href="https://github.com/Mumcord/mumcord/releases/latest"><img src="https://img.shields.io/github/v/release/Mumcord/mumcord?label=release&color=8b6cff" alt="Latest release" /></a>
+  <a href="https://github.com/Mumcord/mumcord/actions/workflows/ci.yml"><img src="https://img.shields.io/github/actions/workflow/status/Mumcord/mumcord/ci.yml?branch=main&label=CI" alt="CI status" /></a>
+  <a href="https://github.com/Mumcord/mumcord/releases"><img src="https://img.shields.io/github/downloads/Mumcord/mumcord/total?color=ff9a8b" alt="Downloads" /></a>
+  <a href="LICENSE"><img src="https://img.shields.io/badge/licence-AGPL--3.0-blue" alt="Licence: AGPL-3.0" /></a>
+  <img src="https://img.shields.io/badge/platforms-Windows%20%7C%20macOS%20%7C%20Linux-555" alt="Platforms: Windows, macOS, Linux" />
+  <a href="https://crates.io/crates/mumcord-protocol"><img src="https://img.shields.io/crates/v/mumcord-protocol?label=crates.io" alt="mumcord-protocol on crates.io" /></a>
+</p>
 
-Mumcord is a modern desktop voice chat client for gaming groups and online communities. It is built with Rust, Tauri 2 and React/TypeScript.
+<p align="center">
+  <b>A modern desktop voice client for gaming groups and communities, on the Mumble servers you already run.</b><br />
+  <a href="https://mumcord.app">Website</a> ·
+  <a href="https://github.com/Mumcord/mumcord/releases/latest">Download</a> ·
+  <a href="https://github.com/Mumcord/mumcord/wiki">Wiki</a> ·
+  <a href="CHANGELOG.md">Changelog</a>
+</p>
 
-Website: **[mumcord.app](https://mumcord.app)** · Wiki: [github.com/Mumcord/mumcord/wiki](https://github.com/Mumcord/mumcord/wiki) · Website source: [mumcord-www](https://github.com/Mumcord/mumcord-www)
+<picture>
+  <source media="(prefers-color-scheme: light)" srcset="docs/images/screenshots/main-light.png" />
+  <img src="docs/images/screenshots/main-dark.png" alt="Mumcord main window: server bar with several servers, channel tree, chat with a reply, code and a link preview, and the member list (demo data)" />
+</picture>
 
-Mumcord is **compatible with Mumble**. It is **not affiliated with or endorsed by the Mumble project**. "Mumble" is the name of that project; Mumcord does not use the Mumble logo.
+## Why Mumcord
 
-![Mumcord main window: channel tree, chat and member list (dark theme, demo data)](docs/images/mumcord-main.png)
-
-## What it is
-
-- A pure client: it speaks the Mumble protocol and works with unmodified, standard Mumble servers. Nothing needs to be installed or changed on the server.
-- Mumble servers 1.4 and newer are fully supported. Older servers are supported on a best-effort basis; features they lack are hidden.
+- **Works with any standard Mumble server.** A pure client: nothing to install or change on the server. Mumble 1.4 and newer are fully supported.
+- **Chat that feels current.** Replies, quotes, images, link previews, mentions and history sync, next to low-latency Mumble voice.
+- **Several servers at once, your colours.** Stay connected to up to 5 servers (configurable up to 15) and pick or build themes, per server if you like.
+- **Privacy first.** No telemetry, TLS always on, your identity kept in the system's secure storage, and every network connection documented.
 
 ## Features
 
-- **Voice chat for Mumble servers**: push-to-talk or voice activation, noise suppression, music quality, per-person volume, positional audio with the official game plugins (Beta).
-- **Several servers at once** (0.4.0): up to 5 connected servers (configurable up to 15), voice on one, chat, private messages, notifications and badges on all of them; auto-connect at start.
-- **Chat**: images, link previews and player cards, replies and quotes, history sync between Mumcord users, full-size images on demand (Beta), channel passwords, a rich-text comment editor.
-- **Themes** (0.4.0): presets and your own colour themes, each with a dark and a light version, shareable as a code and optionally set per server.
-- **Watch party** (0.4.0, Beta): watch YouTube together with the Mumcord users in your voice channel, with a shared playlist.
-- **Screen sharing** (0.4.0, Beta): share a window or screen with up to 8 Mumcord users in your channel at up to 720p30, over a direct connection (see [Screen sharing](#screen-sharing-beta) for what each OS supports).
-- **Friends, now playing and now gaming**, connection info (ping, loss, bandwidth) and a weak-connection icon.
-- **In-game overlay** that shows who is talking: a Vulkan layer on Linux (with an OpenGL launch option), a click-through window over borderless games on Windows (0.4.0). No overlay on macOS.
-- **Linux packages** (0.4.0): `.deb`, `.rpm`, AUR `mumcord-bin` and AppImage for x86_64 and ARM64, a one-line installer, app-menu entry, `mumble://` links and start at login.
-- All 24 official EU languages, keyboard operation, screen-reader labels and system theme.
+| | |
+|---|---|
+| **Voice** | Push-to-talk (keys and mouse buttons, also on Wayland) or voice activation · AI noise suppression, echo cancellation and automatic gain · music quality · per-person volume · positional audio with the official game plugins **(Beta)** |
+| **Chat** | Images, link previews and player cards · replies and quotes · @mentions · code highlighting · history sync between Mumcord users · full-size images on demand **(Beta)** · follow text channels without joining · rich-text comment editor |
+| **Multi-server and themes** | Up to 5 servers connected (1–15), voice on one, chat and badges on all · auto-connect at start · preset and custom colour themes, each in dark and light · share a theme as a code, set one per server |
+| **Watch party and screen sharing (Beta)** | Watch YouTube together with a shared playlist **(Beta)** · share a window or screen with up to 8 people at up to 720p30 over a direct connection **(Beta)** |
+| **In-game overlay** | See who is talking in game: Vulkan layer on Linux (OpenGL launch option, Steam and Proton), click-through window over borderless games on Windows · "Now gaming" status · no overlay on macOS |
+| **People** | Friends, full profiles with a private note, now playing, connection info (ping, loss, bandwidth) and a weak-connection icon · built for big servers (Ctrl+K search, tested with 1000 people) |
+| **Privacy and security** | No telemetry · TLS with certificate checks and clear warnings · identity in the OS secure storage · link previews behind a privacy switch · logs without chat, names or audio |
+| **Everywhere** | Windows, macOS and Linux (X11 and Wayland) · all 24 official EU languages · keyboard operation, screen-reader labels, system theme |
 
-## Status
-
-Early development. Release 0.4.0 added several servers at once, themes, watch party and screen sharing; expect rough edges, especially in the Beta features. See [CHANGELOG.md](CHANGELOG.md) for what each release added.
-
-From 0.4.1, the macOS builds are signed and notarized. Windows builds are still unsigned until code signing is set up, so Windows shows a security warning when you start them.
-
-**macOS Local Network permission:** macOS 15 and later asks whether Mumcord may find devices on your local network. Allow it, or connections to servers in your home network fail with "No route to host". You can change it later in System Settings → Privacy & Security → Local Network.
-
-**Log files** (useful for bug reports; they contain no chat, names or audio): macOS `~/Library/Logs/app.mumcord.client/`, Linux `~/.local/share/app.mumcord.client/logs/`.
+More in the wiki: [Features](https://github.com/Mumcord/mumcord/wiki/Features). Mumcord is in early development; expect rough edges, especially in Beta features.
 
 ## Download
 
-Installers for Windows (`.exe`), macOS (`.dmg`, Apple Silicon and Intel) and Linux (`.deb`, `.rpm` and `.AppImage`, each for x86_64 and ARM64) are on the [Releases page](https://github.com/Mumcord/mumcord/releases), each with a `SHA256SUMS` file to check the download. Each release's notes say whether its Windows and macOS builds are signed; unsigned builds show a security warning on first start, and the notes explain how to open the app anyway.
+Get the latest build from the [Releases page](https://github.com/Mumcord/mumcord/releases/latest). Every release ships a `SHA256SUMS` file to check your download.
 
-On Linux, one line installs Mumcord with your package manager (or the AppImage on other distributions); add `-s -- --uninstall` after `sh` to remove it:
+| System | Package | Notes |
+|---|---|---|
+| **Windows** 10/11 | `*-setup.exe` installer | Not code-signed yet: SmartScreen warns, choose "More info" → "Run anyway" |
+| **macOS** | `.dmg`, Apple Silicon and Intel | Signed and notarized since 0.4.1 |
+| **Linux** x86_64 and ARM64 | `.deb`, `.rpm`, `.AppImage` | The `.deb` and `.rpm` pull in everything they need |
+| **Arch Linux** | AUR `mumcord-bin` | `paru -S mumcord-bin` or `yay -S mumcord-bin` |
+
+**Linux one-liner** (picks the right package for your distribution, falls back to the AppImage):
 
 ```sh
 curl -fsSL https://github.com/Mumcord/mumcord/releases/latest/download/install.sh | sh
 ```
 
-On Arch Linux and derivatives, Mumcord is also in the AUR as `mumcord-bin`.
+To remove Mumcord, add `-s -- --uninstall` after `sh`.
 
-See the [changelog](CHANGELOG.md) for what changed in each release.
+- **macOS Local Network:** macOS 15 and later ask whether Mumcord may find devices on your local network. Allow it, or servers in your home network fail with "No route to host" (change it later in System Settings → Privacy & Security → Local Network).
+- **Linux H.264 for watch parties:** the AppImage plays YouTube via VP9 but does not bundle H.264 (gst-libav). Install gst-libav if a video does not play; the player shows a hint when a codec is missing.
 
-### Linux: GStreamer plugins for watch parties
+<details>
+<summary><b>Linux: GStreamer plugins for watch parties</b></summary>
 
-The `.deb`, `.rpm` and AUR packages install the GStreamer plugins that WebKitGTK needs to play YouTube videos in watch parties. The AppImage bundles the GStreamer plugins it needs and plays YouTube via VP9. It deliberately does not bundle H.264 (gst-libav), so videos that YouTube only serves as H.264 may not play there. The AppImage also loads the GStreamer plugins installed on the system, after its own, so installing gst-libav adds H.264 there too; the player shows a hint when a codec is missing. For a distribution without the packages above, or if you want H.264 with the AppImage, install the plugins yourself:
+The `.deb`, `.rpm` and AUR packages install the GStreamer plugins WebKitGTK needs to play YouTube. The AppImage bundles its own plugins (without H.264) and also loads the ones installed on the system. On other distributions, or for H.264 with the AppImage:
 
 - Debian, Ubuntu: `sudo apt install gstreamer1.0-plugins-good gstreamer1.0-plugins-bad gstreamer1.0-libav`
 - Fedora: `sudo dnf install gstreamer1-plugins-good gstreamer1-plugins-bad-free gstreamer1-libav` (`gstreamer1-libav` may need [RPM Fusion](https://rpmfusion.org/))
 - Arch, CachyOS, Manjaro: `sudo pacman -S gst-plugins-good gst-plugins-bad gst-libav`
 - openSUSE: `sudo zypper install gstreamer-plugins-good gstreamer-plugins-bad gstreamer-plugins-libav`
 
-### Linux: flickering or slow rendering
+</details>
 
-Mumcord sets `WEBKIT_DISABLE_COMPOSITING_MODE=1` at startup because WebKitGTK 2.54 flickers with the watch-party video otherwise. To keep WebKit's default compositing (for example if your WebKitGTK version renders better that way), start Mumcord with `MUMCORD_WEBKIT_COMPOSITING=1`. A `WEBKIT_DISABLE_COMPOSITING_MODE` you set yourself is never overwritten.
+<details>
+<summary><b>Linux: flickering or slow rendering</b></summary>
 
-### Screen sharing (Beta)
+Mumcord sets `WEBKIT_DISABLE_COMPOSITING_MODE=1` at startup because WebKitGTK 2.54 flickers with the watch-party video otherwise. To keep WebKit's default compositing, start Mumcord with `MUMCORD_WEBKIT_COMPOSITING=1`. A `WEBKIT_DISABLE_COMPOSITING_MODE` you set yourself is never overwritten.
+
+</details>
+
+<details>
+<summary><b>Screen sharing (Beta): what each system supports</b></summary>
 
 Screen sharing needs a direct connection between the person sharing and each viewer (allowed once in a dialog, changeable in _Settings → Privacy_). Mumcord uses no outside server to set it up, so it works when one side has IPv6 or a home router that allows port mapping (UPnP, NAT-PMP or PCP), or when both are on the same network. Behind carrier-grade NAT or two routers without port mapping, that pair cannot watch; Mumcord says so after a short wait.
 
-|                    | Picture                                                                                                                                                                 | Sound                                                                                      |
-| ------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------ |
-| **Windows**        | Windows 10 version 1903 or newer; the system picker offers windows and screens                                                                                          | Only the shared app's sound, Windows 10 version 2004 or newer; no sound for a whole screen |
-| **macOS**          | macOS 14 or newer with the system picker (window, app or screen); macOS 12.3 and 13 share the whole main screen; needs the "Screen & System Audio Recording" permission | Only the shared content's sound, never Mumcord's own; macOS 13 or newer                    |
-| **Linux, Wayland** | The desktop's picker (xdg-desktop-portal with PipeWire) chooses a window or screen                                                                                      | No sound                                                                                   |
-| **Linux, X11**     | Whole screen only                                                                                                                                                       | No sound                                                                                   |
+| | Picture | Sound |
+|---|---|---|
+| **Windows** | Windows 10 version 1903 or newer; the system picker offers windows and screens | Only the shared app's sound, Windows 10 version 2004 or newer; no sound for a whole screen |
+| **macOS** | macOS 14 or newer with the system picker (window, app or screen); macOS 12.3 and 13 share the whole main screen; needs the "Screen & System Audio Recording" permission | Only the shared content's sound, never Mumcord's own; macOS 13 or newer |
+| **Linux, Wayland** | The desktop's picker (xdg-desktop-portal with PipeWire) chooses a window or screen | No sound |
+| **Linux, X11** | Whole screen only | No sound |
 
 Up to 8 people can watch one share; the quality drops automatically to 480p at 15 frames per second when the upload is too slow.
 
-## Webhook bot
+</details>
 
-The webhook bot (and the scripted test bot the E2E tests use) now lives in its own repository: [Mumcord/mumbot](https://github.com/Mumcord/mumbot).
+## Compatibility
 
-## Code signing policy
+- **Unmodified servers.** Mumcord speaks the standard Mumble protocol and needs nothing on the server: no plugins, no companion service, no config changes. Mumble 1.4 and newer are fully supported; older servers work on a best-effort basis and features they lack are hidden.
+- **Mumcord extras ride on plugin data.** Features like history sync, full-size images, watch parties and screen-share signalling travel over Mumble's standard plugin data channel ([Plugin data protocol](https://github.com/Mumcord/mumcord/wiki/Plugin-Data-Protocol)).
+- **Mixed rooms just work.** People on the official Mumble client still see normal chat: replies arrive as readable quotes, and Mumcord-only features stay invisible to them.
 
-Windows releases are signed with Azure Artifact Signing once the setup is active. What is signed, and who builds, reviews and publishes signed releases, is described in the [code signing policy](CODE_SIGNING.md).
+Mumcord is compatible with Mumble but **not affiliated with or endorsed by the Mumble project**, and does not use the Mumble logo.
+
+## Ecosystem
+
+| Project | What it is |
+|---|---|
+| [Mumcord/mumbot](https://github.com/Mumcord/mumbot) | Webhook bot for posting into Mumble channels, and the scripted test bot the E2E tests use |
+| [Mumcord/mumpeer](https://github.com/Mumcord/mumpeer) | Planned optional relay for direct connections when no direct path is possible |
+| [`mumcord-protocol`](https://crates.io/crates/mumcord-protocol) | Rust library for the Mumble protocol |
+| [`mumcord-codec`](https://crates.io/crates/mumcord-codec) | Opus codec, jitter buffer, mixer and processing chain, without audio devices (good for headless bots) |
+| [`mumcord-audio`](https://crates.io/crates/mumcord-audio) | Audio device input and output on top of `mumcord-codec` |
+| `mumcord-store`, `mumcord-p2p` | Local storage and direct connections; coming to crates.io with the next release |
+
+## Roadmap
+
+| Stage | Status |
+|---|---|
+| Epic 1: Foundation (everyday client, chat, in-game, people) | Released, 0.1.0 to 0.3.1 |
+| Epic 2: Multi-server and themes, watch party and screen sharing | Released, 0.4.x |
+| Epic 3: Comfort and polish (hotkeys, tray, whisper, Do Not Disturb, …) | Planned, see the [Epic 3 milestone](https://github.com/Mumcord/mumcord/milestone/2) |
+| Epics 4 to 6: admin features, signed installers and auto-update, GIF search | Later |
+
+Details: [Roadmap](https://github.com/Mumcord/mumcord/wiki/Roadmap) in the wiki.
+
+## Documentation
+
+- [Wiki home](https://github.com/Mumcord/mumcord/wiki): features, installation, architecture, testing
+- [Installation](https://github.com/Mumcord/mumcord/wiki/Installation) and [Troubleshooting](https://github.com/Mumcord/mumcord/wiki/Troubleshooting)
+- [Plugin data protocol](https://github.com/Mumcord/mumcord/wiki/Plugin-Data-Protocol) for bots and integrations
+- [Changelog](CHANGELOG.md) for what each release added
+
+## Troubleshooting
+
+For bug reports, use **Settings → Diagnostics → Save diagnostic file**: app version, OS, audio devices, connection statistics and recent log lines, with no chat, passwords or certificates. Then [open an issue](https://github.com/Mumcord/mumcord/issues/new/choose).
+
+| System | Log folder |
+|---|---|
+| Windows | `%LOCALAPPDATA%\app.mumcord.client\logs\` |
+| macOS | `~/Library/Logs/app.mumcord.client/` |
+| Linux | `~/.local/share/app.mumcord.client/logs/` |
+
+Logs contain no chat, names or audio. Known problems and fixes: [Troubleshooting](https://github.com/Mumcord/mumcord/wiki/Troubleshooting) and [docs/troubleshooting.md](docs/troubleshooting.md).
+
+## Building from source
+
+You need Rust 1.90+, Node.js 24 and the platform libraries listed on the wiki's [Building](https://github.com/Mumcord/mumcord/wiki/Building) page. Then:
+
+```sh
+git clone https://github.com/Mumcord/mumcord.git && cd mumcord
+npm ci
+npm run tauri dev
+```
+
+<details>
+<summary><b>Checks, release packages and test setup</b></summary>
+
+- Release packages: `npm run tauri build`; bundles land in `target/release/bundle/`. Windows and macOS link a static libvpx, see [RELEASING.md](RELEASING.md#static-libvpx).
+- Checks before a pull request:
+
+  ```sh
+  cargo fmt --all --check
+  cargo clippy --workspace --all-targets --locked -- -D warnings
+  cargo test --workspace --locked
+  npm run lint && npm run typecheck && npm test
+  ```
+
+- Local Mumble servers for manual and automated tests: [`testenv/README.md`](testenv/README.md). Never test against public servers.
+- UI end-to-end tests (`npm run e2e`, needs Docker): [`e2e/README.md`](e2e/README.md).
+- Manual checklists: [release 0.4.0](docs/manual-checklist-0.4.0.md), [screen sharing on Windows](docs/screen-share-windows.md) and [on macOS](docs/screen-share-macos.md); measurements in [docs/screen-share-performance.md](docs/screen-share-performance.md).
+- After dependency changes, regenerate the third-party notices with `scripts/generate-notices.sh`.
+- Maintainers: cutting a release is described in [RELEASING.md](RELEASING.md).
+
+</details>
+
+## Contributing
+
+Bug reports and ideas are welcome via the [issue templates](https://github.com/Mumcord/mumcord/issues/new/choose). For code, read [CONTRIBUTING.md](CONTRIBUTING.md) first: contributions require agreeing to the CLA described there.
 
 ## Privacy
 
 Mumcord sends no telemetry. Every network connection it makes is listed in the [privacy policy](PRIVACY.md).
 
-Maintainers: how to cut a release is described in [RELEASING.md](RELEASING.md).
+## Code signing
 
-## Building from source
+macOS builds are signed and notarized. Windows releases will be signed with Azure Artifact Signing once the setup is active. What is signed, and who builds, reviews and publishes signed releases, is in the [code signing policy](CODE_SIGNING.md).
 
-### Prerequisites
+## Licence
 
-- Rust, stable toolchain, 1.90 or newer (`rustup`), with the `rustfmt` and `clippy` components.
-- Node.js 24 (the version CI uses) and npm.
-- No `protoc` is needed: the protobuf compiler is vendored (`protoc-bin-vendored`).
-- Linux, Debian/Ubuntu (24.04 in CI):
+Mumcord is licensed under the [GNU AGPL v3 only](LICENSE) from version 0.2.0. Versions up to and including 0.1.1 were released under the MIT License and stay MIT for those who have them.
 
-      sudo apt-get install -y --no-install-recommends \
-        libwebkit2gtk-4.1-dev libayatana-appindicator3-dev librsvg2-dev \
-        libxdo-dev libasound2-dev libvpx-dev libpipewire-0.3-dev libclang-dev \
-        cmake patchelf xdg-utils build-essential pkg-config libssl-dev
-
-- Linux, Arch/CachyOS:
-
-      sudo pacman -S --needed base-devel webkit2gtk-4.1 libayatana-appindicator librsvg \
-        xdotool alsa-lib libvpx libpipewire clang cmake openssl pkgconf patchelf xdg-utils
-
-- Windows: Visual Studio Build Tools with the "Desktop development with C++" workload (MSVC), and the WebView2 runtime (preinstalled on Windows 11).
-- macOS: Xcode command line tools (`xcode-select --install`).
-- Windows and macOS link a static libvpx for screen sharing: build it with `scripts/build-libvpx.sh <dir>` (Windows: vcpkg and LLVM for bindgen; macOS: `brew install nasm`) and set `LIBVPX_STATIC_DIR=<dir>` before building. Linux release packages do the same so they run on older distributions; Linux development builds use the system libvpx. Details: [RELEASING.md](RELEASING.md#static-libvpx).
-
-### Get the code and run
-
-    git clone <repository-url> mumcord && cd mumcord
-    npm ci
-    npm run tauri dev
-
-### Build release packages
-
-    npm run tauri build
-
-Bundles land in `target/release/bundle/`: `appimage/*.AppImage` (Linux), `nsis/*-setup.exe` (Windows), `dmg/*.dmg` and `macos/*.app` (macOS). Each OS builds only its own formats. To build a single format, pass `-- --bundles appimage` (or `nsis`, `dmg`). The packages are unsigned; Windows and macOS show a security warning on first start.
-
-### Checks
-
-    cargo fmt --all --check
-    cargo clippy --workspace --all-targets --locked -- -D warnings
-    cargo test --workspace --locked
-    npm run lint
-    npm run typecheck
-    npm test
-
-`npm run build` type-checks and builds the frontend only.
-
-### Optional
-
-- Manual test checklists: [release 0.4.0](docs/manual-checklist-0.4.0.md), [screen sharing on Windows](docs/screen-share-windows.md), [screen sharing on macOS](docs/screen-share-macos.md); measurements in [docs/screen-share-performance.md](docs/screen-share-performance.md); known problems in [docs/troubleshooting.md](docs/troubleshooting.md).
-- Local Mumble servers for manual and automated tests: [`testenv/README.md`](testenv/README.md). Do not test against public servers.
-- UI end-to-end tests (`npm run e2e`, needs Docker): [`e2e/README.md`](e2e/README.md).
-- After dependency changes, regenerate the third-party notices with `scripts/generate-notices.sh`.
-
-## Licenses
-
-Mumcord is licensed under the [GNU AGPL v3 only](LICENSE) from version 0.2.0. Contributions require agreeing to the CLA described in [CONTRIBUTING.md](CONTRIBUTING.md). Versions up to and including 0.1.1 were released under the MIT License and stay MIT for those who have them.
-
-Third-party licenses, including Mumble's BSD license for the protocol definitions in `proto/`, are listed in [`THIRD_PARTY_NOTICES`](THIRD_PARTY_NOTICES). Regenerate it with `scripts/generate-notices.sh` when dependencies change.
+Third-party licences, including Mumble's BSD licence for the protocol definitions in `proto/`, are listed in [`THIRD_PARTY_NOTICES`](THIRD_PARTY_NOTICES).
