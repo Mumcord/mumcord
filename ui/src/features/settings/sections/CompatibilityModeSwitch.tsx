@@ -11,7 +11,7 @@ interface CompatibilityModeSwitchProps extends SettingsSectionProps {
 }
 
 /**
- * Linux Wayland only: "Compatibility mode (like TeamSpeak)" (FR-1.48). The engine reads the
+ * Linux Wayland only: "Compatibility mode (X11)" (FR-1.48). The engine reads the
  * setting at start-up, so a change offers a restart until the running mode matches it.
  */
 export function CompatibilityModeSwitch({
