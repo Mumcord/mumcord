@@ -183,7 +183,7 @@ export async function pasteImage(width: number, height: number, noise: boolean):
   );
 }
 
-/** A `mumcord-bot script` session: `run(line)` sends a line and waits for its "ok" echo. */
+/** A `mumbot script` session: `run(line)` sends a line and waits for its "ok" echo. */
 export class ScriptBot {
   private readonly bot: BackgroundBot;
   private out = "";

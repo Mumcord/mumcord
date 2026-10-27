@@ -45,7 +45,7 @@ const log = (msg: string) => {
 };
 const fmt = (n: number) => n.toFixed(1);
 
-/** A `mumcord-bot script` on one connection; `do(line)` resolves when the bot printed `ok <line>`. */
+/** A `mumbot script` on one connection; `do(line)` resolves when the bot printed `ok <line>`. */
 class ScriptBot {
   readonly bg: BackgroundBot;
   private out = "";

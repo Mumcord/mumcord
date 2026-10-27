@@ -27,14 +27,14 @@ function globalArgs(opts: BotOptions): string[] {
 }
 
 /**
- * Runs one `mumcord-bot` subcommand, e.g. `bot(["expect", "user", "Tester"])`, and throws unless it
- * exits 0 (exit 0 = check passed). See `mumcord-bot --help` for subcommands.
+ * Runs one `mumbot` subcommand, e.g. `bot(["expect", "user", "Tester"])`, and throws unless it
+ * exits 0 (exit 0 = check passed). See `mumbot --help` for subcommands.
  */
 export async function bot(command: readonly string[], opts: BotOptions = {}): Promise<RunResult> {
   const result = await run(bin.bot, [...globalArgs(opts), ...command]);
   if (result.code !== 0) {
     throw new Error(
-      `mumcord-bot ${command.join(" ")} failed (${String(result.code)}):\n${result.stderr}`,
+      `mumbot ${command.join(" ")} failed (${String(result.code)}):\n${result.stderr}`,
     );
   }
   return result;
@@ -63,8 +63,7 @@ export function botInBackground(command: readonly string[], opts: BotOptions = {
     child.on("close", (code) => {
       const result = { code: code ?? -1, stdout, stderr };
       if (code === 0) resolvePromise(result);
-      else
-        reject(new Error(`mumcord-bot ${command.join(" ")} failed (${String(code)}):\n${stderr}`));
+      else reject(new Error(`mumbot ${command.join(" ")} failed (${String(code)}):\n${stderr}`));
     });
   });
   return {
