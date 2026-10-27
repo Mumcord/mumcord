@@ -1,7 +1,7 @@
 //! Window-system choice made before GTK starts: push-to-talk compatibility mode (FR-1.48, QA.5).
 //!
 //! On a Linux Wayland desktop the stored `ptt_compatibility_mode` setting makes Mumcord run
-//! through XWayland, like TeamSpeak, so the X11 push-to-talk path works without the portal or
+//! through XWayland, so the X11 push-to-talk path works without the portal or
 //! the `input` group. GTK reads `GDK_BACKEND` once at start-up, so the choice is made here
 //! from the settings database and only changes with a restart.
 

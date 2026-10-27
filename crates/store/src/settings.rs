@@ -329,8 +329,8 @@ pub struct Settings {
     /// Linux Wayland: read mouse buttons for push-to-talk from input devices (needs the
     /// `input` group; opt-in, FR-1.39, QA.4).
     pub allow_mouse_buttons: bool,
-    /// Linux Wayland: start through XWayland and use the X11 push-to-talk path, like
-    /// TeamSpeak (FR-1.48, QA.5). Read before the window system starts; applies on restart.
+    /// Linux Wayland: start through XWayland and use the X11 push-to-talk path
+    /// (FR-1.48, QA.5). Read before the window system starts; applies on restart.
     pub ptt_compatibility_mode: bool,
     /// Device names; `None` uses the system default device.
     pub input_device: Option<String>,
