@@ -112,7 +112,7 @@ jobs:
           # A warning box as soon as one platform is unsigned, a plain note otherwise.
           callout=NOTE
           if [[ -f WINDOWS-SIGNED ]]; then
-            windows_note="Windows: the app and installer are signed (see the [code signing policy](https://github.com/ToBee94/mumcord/blob/main/CODE_SIGNING.md)). SmartScreen may still warn while the certificate builds up reputation: choose **More info → Run anyway**."
+            windows_note="Windows: the app and installer are signed (see the [code signing policy](https://github.com/Mumcord/mumcord/blob/main/CODE_SIGNING.md)). SmartScreen may still warn while the certificate builds up reputation: choose **More info → Run anyway**."
           else
             callout=WARNING
             windows_note="Windows is **not signed** yet. On first start, SmartScreen shows \"Windows protected your PC\": choose **More info → Run anyway**."
@@ -140,11 +140,11 @@ jobs:
           >
           > $macos_note
 
-          Built and smoke-tested by [this workflow run]($RUN_URL). [Code signing policy](https://github.com/ToBee94/mumcord/blob/main/CODE_SIGNING.md) · [Privacy policy](https://github.com/ToBee94/mumcord/blob/main/PRIVACY.md)
+          Built and smoke-tested by [this workflow run]($RUN_URL). [Code signing policy](https://github.com/Mumcord/mumcord/blob/main/CODE_SIGNING.md) · [Privacy policy](https://github.com/Mumcord/mumcord/blob/main/PRIVACY.md)
 
-          These binaries are licensed under the [GNU AGPL-3.0](https://github.com/ToBee94/mumcord/blob/main/LICENSE) only.
+          These binaries are licensed under the [GNU AGPL-3.0](https://github.com/Mumcord/mumcord/blob/main/LICENSE) only.
 
-          Full changelog: [CHANGELOG.md](https://github.com/ToBee94/mumcord/blob/main/CHANGELOG.md)
+          Full changelog: [CHANGELOG.md](https://github.com/Mumcord/mumcord/blob/main/CHANGELOG.md)
           EOF
           # Highlights are written per release; other versions get the plain notes.
           if [[ "$VERSION" == "0.3.0" ]]; then

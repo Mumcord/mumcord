@@ -46,11 +46,11 @@ All steps happen in the [Azure portal](https://portal.azure.com) and on GitHub. 
 6. **Create the certificate profile.** On the signing account: _Certificate profiles → Create → Public Trust_, a name (for example `mumcord`), and the identity validation from step 5. Note the profile name.
 7. **Create the app registration for GitHub.** _Microsoft Entra ID → App registrations → New registration_, name `mumcord-github-signing`, single tenant, no redirect URI. Note its **Application (client) ID**. Do not create a client secret.
 8. **Trust GitHub (federated credential).** In the app registration: _Certificates & secrets → Federated credentials → Add credential_ → scenario **GitHub Actions deploying Azure resources**:
-   - organization `ToBee94`, repository `mumcord`,
+   - organization `Mumcord`, repository `mumcord`,
    - entity type **Environment**, environment name `release`,
    - name `mumcord-release`.
 
-   This lets only workflow jobs in the `release` environment of `ToBee94/mumcord` sign.
+   This lets only workflow jobs in the `release` environment of `Mumcord/mumcord` sign.
 
 9. **Allow the app to sign.** On the signing account (or only the certificate profile from step 6): _Access control (IAM) → Add role assignment_ → **Artifact Signing Certificate Profile Signer** → members: the app registration `mumcord-github-signing`.
 10. **Create the GitHub environment.** Repository _Settings → Environments → New environment_ `release`. Under _Deployment branches and tags_ choose **Selected branches and tags** and add the tag rule `v*`, so only release tags can sign.

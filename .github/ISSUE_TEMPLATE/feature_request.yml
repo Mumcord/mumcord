@@ -6,7 +6,7 @@ body:
     attributes:
       value: |
         Mumcord is a pure client: features must work with any unmodified Mumble server.
-        Check the [roadmap](https://github.com/ToBee94/mumcord/wiki/Roadmap) first – your idea may already be planned.
+        Check the [roadmap](https://github.com/Mumcord/mumcord/wiki/Roadmap) first – your idea may already be planned.
   - type: textarea
     id: problem
     attributes:

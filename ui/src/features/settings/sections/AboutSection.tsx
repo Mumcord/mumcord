@@ -8,7 +8,7 @@ import { Switch } from "../components/Switch";
 import { AppImageMenuEntrySwitch } from "./AppImageMenuEntrySwitch";
 import type { SettingsSectionProps } from "./types";
 
-const ISSUES_URL = "https://github.com/ToBee94/mumcord/issues/new";
+const ISSUES_URL = "https://github.com/Mumcord/mumcord/issues/new";
 
 /** About: version, OS, Mumcord's AGPL license and the third-party notices (AC-1.29). */
 export function AboutSection({ settings, update }: SettingsSectionProps) {

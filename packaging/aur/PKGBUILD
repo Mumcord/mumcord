@@ -8,7 +8,7 @@ pkgver=0.0.0
 pkgrel=1
 pkgdesc='Modern voice chat client compatible with Mumble (prebuilt release)'
 arch=('x86_64' 'aarch64')
-url='https://github.com/ToBee94/mumcord'
+url='https://github.com/Mumcord/mumcord'
 license=('AGPL-3.0-only')
 depends=('webkit2gtk-4.1' 'gtk3' 'libayatana-appindicator' 'alsa-lib' 'libpipewire' 'hicolor-icon-theme'
          'gst-plugins-good' 'gst-plugins-bad' 'gst-libav')
@@ -22,7 +22,7 @@ source_x86_64=("$_base/${_name}_${pkgver}_amd64.deb")
 source_aarch64=("$_base/${_name}_${pkgver}_arm64.deb")
 sha256sums_x86_64=('SKIP')
 sha256sums_aarch64=('SKIP')
-source=("LICENSE-$pkgver::https://raw.githubusercontent.com/ToBee94/mumcord/v$pkgver/LICENSE")
+source=("LICENSE-$pkgver::https://raw.githubusercontent.com/Mumcord/mumcord/v$pkgver/LICENSE")
 sha256sums=('SKIP')
 
 package() {

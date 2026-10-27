@@ -35,7 +35,7 @@ describe("PrivacyStep", () => {
     );
     fireEvent.click(screen.getByRole("button", { name: "Full privacy statement" }));
     expect(openInBrowser).toHaveBeenCalledWith(
-      "https://github.com/ToBee94/mumcord/blob/main/PRIVACY.md",
+      "https://github.com/Mumcord/mumcord/blob/main/PRIVACY.md",
     );
   });
 

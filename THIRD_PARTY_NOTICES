@@ -12791,9 +12791,9 @@ Upstream releases:
   PipeWire    https://gitlab.freedesktop.org/pipewire/pipewire/-/tags
 We also provide the source code of any of these components on request, for at
 least three years after the release that contained it: open an issue at
-https://github.com/ToBee94/mumcord/issues or write to the maintainer.
+https://github.com/Mumcord/mumcord/issues or write to the maintainer.
 Mumcord's own source code is licensed under the GNU AGPL v3 and is available at
-https://github.com/ToBee94/mumcord.
+https://github.com/Mumcord/mumcord.
 
 
 NPM DEPENDENCIES (production)

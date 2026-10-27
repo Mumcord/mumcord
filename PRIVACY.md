@@ -49,7 +49,7 @@ Images from Giphy and Tenor are fetched as described above (only with link previ
 
 ### Features shared with other Mumcord users on the same server
 
-Some features work only between Mumcord users. They exchange small messages as Mumble plugin data **through the Mumble server you are connected to**, never through any other system, and only with people on that same server. Official Mumble clients ignore these messages. Every message type, with its exact contents, is documented on the wiki page [Plugin data protocol](https://github.com/ToBee94/mumcord/wiki/Plugin-Data-Protocol). Like everything you send to a server, these messages pass through the server, so its operator could read them.
+Some features work only between Mumcord users. They exchange small messages as Mumble plugin data **through the Mumble server you are connected to**, never through any other system, and only with people on that same server. Official Mumble clients ignore these messages. Every message type, with its exact contents, is documented on the wiki page [Plugin data protocol](https://github.com/Mumcord/mumcord/wiki/Plugin-Data-Protocol). Like everything you send to a server, these messages pass through the server, so its operator could read them.
 
 - **Mumcord recognition:** on connect, Mumcord sends a short "hello" (which Mumcord features your client supports) to the people on the server.
 - **Chat history sync:** Mumcord asks other Mumcord users for channel messages you missed, and answers such requests with the channel messages it has stored. Private messages are never shared. Switch answering off in _Settings_ ("Share my channel history", on by default).
@@ -92,4 +92,4 @@ Notifications, activity sounds (for watch parties and screen shares) and the act
 
 ## Changes and contact
 
-Changes to this policy are made in this file in the [Mumcord repository](https://github.com/ToBee94/mumcord) and are visible in its history. Questions: open an issue at <https://github.com/ToBee94/mumcord/issues>.
+Changes to this policy are made in this file in the [Mumcord repository](https://github.com/Mumcord/mumcord) and are visible in its history. Questions: open an issue at <https://github.com/Mumcord/mumcord/issues>.

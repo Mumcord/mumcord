@@ -6,7 +6,7 @@
 
 Mumcord is a modern desktop voice chat client for gaming groups and online communities. It is built with Rust, Tauri 2 and React/TypeScript.
 
-Website: **[mumcord.app](https://mumcord.app)** · Wiki: [github.com/ToBee94/mumcord/wiki](https://github.com/ToBee94/mumcord/wiki) · Website source: [mumcord-www](https://github.com/ToBee94/mumcord-www)
+Website: **[mumcord.app](https://mumcord.app)** · Wiki: [github.com/Mumcord/mumcord/wiki](https://github.com/Mumcord/mumcord/wiki) · Website source: [mumcord-www](https://github.com/Mumcord/mumcord-www)
 
 Mumcord is **compatible with Mumble**. It is **not affiliated with or endorsed by the Mumble project**. "Mumble" is the name of that project; Mumcord does not use the Mumble logo.
 
@@ -42,12 +42,12 @@ From 0.4.1, the macOS builds are signed and notarized. Windows builds are still 
 
 ## Download
 
-Installers for Windows (`.exe`), macOS (`.dmg`, Apple Silicon and Intel) and Linux (`.deb`, `.rpm` and `.AppImage`, each for x86_64 and ARM64) are on the [Releases page](https://github.com/ToBee94/mumcord/releases), each with a `SHA256SUMS` file to check the download. Each release's notes say whether its Windows and macOS builds are signed; unsigned builds show a security warning on first start, and the notes explain how to open the app anyway.
+Installers for Windows (`.exe`), macOS (`.dmg`, Apple Silicon and Intel) and Linux (`.deb`, `.rpm` and `.AppImage`, each for x86_64 and ARM64) are on the [Releases page](https://github.com/Mumcord/mumcord/releases), each with a `SHA256SUMS` file to check the download. Each release's notes say whether its Windows and macOS builds are signed; unsigned builds show a security warning on first start, and the notes explain how to open the app anyway.
 
 On Linux, one line installs Mumcord with your package manager (or the AppImage on other distributions); add `-s -- --uninstall` after `sh` to remove it:
 
 ```sh
-curl -fsSL https://github.com/ToBee94/mumcord/releases/latest/download/install.sh | sh
+curl -fsSL https://github.com/Mumcord/mumcord/releases/latest/download/install.sh | sh
 ```
 
 On Arch Linux and derivatives, Mumcord is also in the AUR as `mumcord-bin`.
