@@ -3412,11 +3412,9 @@ version = "0.4.2"
 dependencies = [
  "cpal",
  "hound",
- "nnnoiseless",
- "opus",
+ "mumcord-codec",
  "rtrb",
  "rubato",
- "sonora",
  "thiserror 2.0.21",
  "tracing",
 ]
@@ -3440,6 +3438,19 @@ dependencies = [
  "toml 1.1.8+spec-1.1.0",
  "tracing",
  "tracing-subscriber",
+]
+
+[[package]]
+name = "mumcord-codec"
+version = "0.4.2"
+dependencies = [
+ "hound",
+ "nnnoiseless",
+ "opus",
+ "rtrb",
+ "sonora",
+ "thiserror 2.0.21",
+ "tracing",
 ]
 
 [[package]]

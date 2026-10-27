@@ -14,7 +14,6 @@
 //! - Settings, push-to-talk key state and the level meter live in a shared
 //!   [`DspControls`] (atomics only), so UI and hotkey threads never touch
 //!   the chain itself.
-//! - `MicTest` (feature `io`) is the first-start wizard's "test playback" (FR-1.4).
 //!
 //! # Real-time behaviour
 //!
@@ -28,8 +27,6 @@ mod controls;
 mod echo_ref;
 mod gate;
 mod leveler;
-#[cfg(feature = "io")]
-mod mic_test;
 #[cfg(test)]
 mod tests;
 
@@ -45,8 +42,6 @@ pub use controls::{
     DspControls, Level, THRESHOLD_DEFAULT_DBFS, THRESHOLD_MAX_DBFS, THRESHOLD_MIN_DBFS, TalkMode,
 };
 pub use echo_ref::{EchoRefConsumer, EchoRefProducer, echo_reference};
-#[cfg(feature = "io")]
-pub use mic_test::{MicTest, MicTestPhase};
 
 use gate::{PttGate, ThresholdGate, VoiceDetector};
 use leveler::Leveler;
@@ -77,7 +72,7 @@ pub struct DspChain {
     vad: VoiceDetector,
     ptt: PttGate,
     threshold: ThresholdGate,
-    /// Set by [`MicTest`]: the wizard always demonstrates noise suppression.
+    /// Set by the microphone test of `mumcord-audio`: the wizard always demonstrates noise suppression.
     force_noise_suppression: bool,
     scratch: Frame,
     render: Frame,
@@ -134,6 +129,11 @@ impl DspChain {
     /// The shared controls of this chain.
     pub fn controls(&self) -> &Arc<DspControls> {
         &self.controls
+    }
+
+    /// Keeps noise suppression on regardless of the controls (the wizard's microphone test).
+    pub fn force_noise_suppression(&mut self) {
+        self.force_noise_suppression = true;
     }
 
     /// Processes one captured frame into `out` and decides whether it is

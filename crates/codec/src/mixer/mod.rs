@@ -6,7 +6,7 @@
 //! 3D placement of voices that carry a position (FR-1.41, see [`crate::spatial`]),
 //! talking-state events, an optional mix-in frame (notification sounds,
 //! mic-test loopback) and a limiter. Output is stereo. [`Playback`] runs it on its own thread
-//! and paces it against a [`PlaybackSink`] (the device `FrameSink` with feature `io`).
+//! and paces it against a [`PlaybackSink`] (the device `FrameSink` of `mumcord-audio`).
 
 mod playback;
 pub mod share;

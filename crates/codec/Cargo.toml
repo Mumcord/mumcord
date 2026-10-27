@@ -1,0 +1,28 @@
+[package]
+name = "mumcord-codec"
+description = "Voice codec for Mumble clients and bots: Opus encoder and decoder, jitter buffer, mixer, bitrate control and processing chain, without audio devices"
+repository = "https://github.com/Mumcord/mumcord"
+homepage = "https://github.com/Mumcord/mumcord"
+documentation = "https://docs.rs/mumcord-codec"
+readme = "README.md"
+keywords = ["mumble", "opus", "voip", "audio", "jitter-buffer"]
+categories = ["multimedia::audio", "multimedia::encoding"]
+include = ["src/**", "README.md"]
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+
+[dependencies]
+opus.workspace = true
+nnnoiseless.workspace = true
+sonora.workspace = true
+rtrb.workspace = true
+thiserror.workspace = true
+tracing.workspace = true
+
+[dev-dependencies]
+hound.workspace = true
+
+[lints]
+workspace = true

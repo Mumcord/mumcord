@@ -1,33 +1,42 @@
-//! Mumcord audio: device I/O (feature `io`), Opus codec and (in later tasks) the processing
-//! chain, jitter buffer and mixer.
+//! Mumcord audio: device I/O (capture and playback via cpal) on top of `mumcord-codec`.
+//!
+//! The codec items (Opus, jitter buffer, mixer, bitrate control, spatial placement, processing
+//! chain and the frame constants) are re-exported, so `mumcord_audio::codec`, `::mixer` and so
+//! on keep working. Headless users that need no devices depend on `mumcord-codec` directly.
 //!
 //! # Frame contract
 //!
-//! Everything inside the crate exchanges audio as [`Frame`]s: 48 kHz, mono,
-//! `f32` samples in `[-1.0, 1.0]`, 10 ms (480 samples) per frame. Device
-//! sample rates and channel layouts are converted at the I/O edge
-//! (`io`), so processing code never sees anything else. The one exception
-//! is playback: the mixer renders a stereo pair of frames (left, right) so
-//! positional voices can be placed ([`spatial`]). Outgoing Opus
-//! packets carry 20 ms (two frames) by default, see [`codec`].
+//! Everything exchanges audio as [`Frame`]s: 48 kHz, mono, `f32` samples in `[-1.0, 1.0]`,
+//! 10 ms (480 samples) per frame. Device sample rates and channel layouts are converted at the
+//! I/O edge ([`io`]), so processing code never sees anything else.
 
-pub mod bitrate;
-pub mod codec;
-pub mod dsp;
-#[cfg(feature = "io")]
 pub mod io;
-pub mod jitter;
-pub mod mixer;
-pub mod spatial;
+mod mic_test;
 
-/// Internal sample rate of all audio frames, in Hz.
-pub const SAMPLE_RATE: u32 = 48_000;
+pub use mumcord_codec::{
+    FRAME_SAMPLES, Frame, SAMPLE_RATE, bitrate, codec, jitter, mixer, spatial,
+};
 
-/// Samples per internal frame (10 ms at [`SAMPLE_RATE`]).
-pub const FRAME_SAMPLES: usize = 480;
+/// The processing chain of `mumcord-codec` plus the device-bound [`MicTest`](dsp::MicTest).
+pub mod dsp {
+    pub use crate::mic_test::{MicTest, MicTestPhase};
+    pub use mumcord_codec::dsp::*;
+}
 
-/// One 10 ms block of 48 kHz mono audio.
-pub type Frame = [f32; FRAME_SAMPLES];
+// Lets the mixer's playback thread write into the device queue.
+impl mixer::PlaybackSink for io::FrameSink {
+    fn write_frame(&mut self, frame: &Frame) -> bool {
+        io::FrameSink::write_frame(self, frame)
+    }
+
+    fn write_stereo(&mut self, left: &Frame, right: &Frame) -> bool {
+        io::FrameSink::write_stereo(self, left, right)
+    }
+
+    fn queued_samples(&mut self) -> usize {
+        io::FrameSink::queued_samples(self)
+    }
+}
 
 // Compiles the README example as a doctest so it cannot rot.
 #[cfg(doctest)]

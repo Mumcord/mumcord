@@ -2,7 +2,7 @@
 
 The voice audio layer of [Mumcord](https://github.com/Mumcord/mumcord), a modern voice chat client for standard Mumble servers. It is meant for clients and bots that need to send and receive Mumble voice.
 
-It provides the Opus encoder and decoder, a jitter buffer, a mixer with positional placement, microphone and speaker I/O (via cpal), resampling, and the voice processing chain (noise suppression, echo cancellation, gate, leveler). Network transport is not part of this crate; see `mumcord-protocol` for that.
+It adds microphone and speaker I/O (via cpal), resampling and the microphone test to `mumcord-codec`, which provides the Opus encoder and decoder, a jitter buffer, a mixer with positional placement and the voice processing chain (noise suppression, echo cancellation, gate, leveler); this crate re-exports all of it. Network transport is not part of this crate; see `mumcord-protocol` for that.
 
 All audio inside the crate is 48 kHz mono `f32`, split into 10 ms frames of 480 samples.
 
@@ -26,16 +26,15 @@ let samples = decoder.decode(&packet[..len], &mut pcm).expect("decode");
 assert_eq!(samples, 2 * FRAME_SAMPLES);
 ```
 
-## Features
+## Crate split
 
-- `io` (default): microphone and speaker I/O via cpal (capture, playback, device listing, the stream controller, resampling and the microphone test). It pulls in cpal and, on Linux, ALSA.
-- `test-backend`: a null/WAV-file replacement for the audio devices, for headless tests. Implies `io`.
-
-With `default-features = false` the crate keeps the Opus codec, jitter buffer, mixer, spatial placement, bitrate control and the processing chain, and has no cpal or ALSA dependency, so headless clients and bots can build it for static musl targets:
+Everything that works without devices lives in [`mumcord-codec`](https://crates.io/crates/mumcord-codec) and is re-exported here, so `mumcord_audio::codec`, `::mixer` and so on keep working. Headless clients and bots that need no microphone or speakers should depend on `mumcord-codec` alone: it has no cpal or ALSA dependency and builds for static musl targets.
 
 ```toml
-mumcord-audio = { version = "0.4", default-features = false }
+mumcord-codec = "0.4"
 ```
+
+The `test-backend` feature adds a null/WAV-file replacement for the audio devices, for headless tests.
 
 ## Licence
 

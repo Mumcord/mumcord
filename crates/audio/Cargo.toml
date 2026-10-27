@@ -1,6 +1,6 @@
 [package]
 name = "mumcord-audio"
-description = "Voice audio for Mumble clients and bots: Opus codec, jitter buffer, mixer, device I/O and processing chain"
+description = "Voice audio for Mumble clients: microphone and speaker I/O on top of mumcord-codec (Opus codec, jitter buffer, mixer, processing chain)"
 repository = "https://github.com/Mumcord/mumcord"
 homepage = "https://github.com/Mumcord/mumcord"
 documentation = "https://docs.rs/mumcord-audio"
@@ -14,24 +14,17 @@ rust-version.workspace = true
 license.workspace = true
 
 [dependencies]
-cpal = { workspace = true, optional = true }
-opus.workspace = true
-nnnoiseless.workspace = true
-sonora.workspace = true
+mumcord-codec.workspace = true
+cpal.workspace = true
 rtrb.workspace = true
-rubato = { workspace = true, optional = true }
+rubato.workspace = true
 thiserror.workspace = true
 tracing.workspace = true
 hound = { workspace = true, optional = true }
 
 [features]
-default = ["io"]
-# Audio device I/O (capture, playback, device listing, stream controller) via cpal. Turn it off
-# (`default-features = false`) for headless users that only need the codec, jitter buffer and mixer;
-# that build has no cpal/ALSA dependency and builds for static musl targets.
-io = ["dep:cpal", "dep:rubato"]
 # Env-selected null/WAV-file audio backend for headless tests and E2E; never in release builds.
-test-backend = ["io", "dep:hound"]
+test-backend = ["dep:hound"]
 
 [dev-dependencies]
 hound.workspace = true

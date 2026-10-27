@@ -3,6 +3,7 @@ resolver = "3"
 members = [
     "crates/protocol",
     "crates/audio",
+    "crates/codec",
     "crates/store",
     "crates/engine",
     "crates/bot",
@@ -25,6 +26,8 @@ repository = "https://github.com/Mumcord/mumcord"
 [workspace.dependencies]
 # Internal crates
 mumcord-protocol = { path = "crates/protocol" }
+# The version is the minor series: crates.io needs it for the publish of mumcord-audio, and it only changes with a minor/major bump.
+mumcord-codec = { path = "crates/codec", version = "0.4" }
 mumcord-audio = { path = "crates/audio" }
 mumcord-store = { path = "crates/store" }
 mumcord-engine = { path = "crates/engine" }

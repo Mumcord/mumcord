@@ -158,15 +158,15 @@ jobs:
       - name: Rust tests
         run: cargo test --workspace --locked
 
-      # The headless bot builds mumcord-audio without device I/O (no cpal/ALSA) for static musl
-      # binaries, so the codec-only build must keep compiling, lint-clean and free of cpal/alsa.
-      - name: Audio crate without device I/O
+      # The headless bot builds mumcord-codec for static musl binaries, so it must stay lint-clean,
+      # tested and free of the device crates (cpal/ALSA) and the resampler.
+      - name: Codec crate without device I/O
         if: runner.os == 'Linux'
         run: |
-          cargo clippy -p mumcord-audio --no-default-features --all-targets --locked -- -D warnings
-          cargo test -p mumcord-audio --no-default-features --locked
-          if cargo tree -p mumcord-audio --no-default-features -e normal --locked | grep -iE 'cpal|alsa'; then
-            echo "mumcord-audio without the io feature must not depend on cpal or alsa" >&2
+          cargo clippy -p mumcord-codec --all-targets --locked -- -D warnings
+          cargo test -p mumcord-codec --locked
+          if cargo tree -p mumcord-codec -e normal --locked | grep -iE 'cpal|alsa|rubato'; then
+            echo "mumcord-codec must not depend on cpal, alsa or rubato" >&2
             exit 1
           fi
 

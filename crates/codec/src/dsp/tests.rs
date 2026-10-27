@@ -7,8 +7,6 @@ use std::time::{Duration, Instant};
 
 use super::gate::{PTT_TAIL_FRAMES, PttGate, VAD_HANGOVER_FRAMES, VoiceDetector};
 use super::*;
-#[cfg(feature = "io")]
-use crate::io::{AudioHandles, AudioIo, BackendKind};
 
 /// Counts allocations per thread so the no-allocation check is not
 /// disturbed by tests running in parallel.
@@ -417,63 +415,6 @@ fn per_frame_processing_time() {
     if !cfg!(debug_assertions) {
         assert!(mean < Duration::from_millis(5), "mean {mean:?}");
     }
-}
-
-#[cfg(feature = "io")]
-#[test]
-fn mic_test_records_then_plays_back() {
-    let dir = std::env::temp_dir().join(format!("mumcord-dsp-mic-{}", std::process::id()));
-    std::fs::create_dir_all(&dir).expect("temp dir");
-    let (input, output) = (dir.join("in.wav"), dir.join("out.wav"));
-    write_wav(&input, &speech_like(SAMPLE_RATE as usize, 0.3));
-
-    let kind = BackendKind::File {
-        input: input.clone(),
-        output: output.clone(),
-    };
-    let AudioHandles {
-        io, source, sink, ..
-    } = AudioIo::start_with(kind, None, None).expect("start");
-    let controls = Arc::new(DspControls::default());
-    controls.set_noise_suppression(false);
-    let started = Instant::now();
-    let test = MicTest::start(source, sink, controls.clone(), Duration::from_secs(5))
-        .expect("start mic test");
-    assert_eq!(test.phase(), MicTestPhase::Recording);
-
-    // The meter shows the latest frame and the test speech pulses at 4 Hz,
-    // so a single reading can land in a pause; poll until a loud frame shows
-    // up (processing may lag real time on a loaded machine).
-    let deadline = started + Duration::from_secs(4);
-    while controls.level().peak_dbfs <= -30.0 {
-        assert!(Instant::now() < deadline, "meter not live");
-        assert_eq!(test.phase(), MicTestPhase::Recording);
-        std::thread::sleep(Duration::from_millis(2));
-    }
-    // Record at least 600 ms of the 1 s input before stopping.
-    if let Some(rest) = Duration::from_millis(600).checked_sub(started.elapsed()) {
-        std::thread::sleep(rest);
-    }
-    test.stop_recording();
-    let deadline = Instant::now() + Duration::from_secs(10);
-    while test.phase() != MicTestPhase::Done {
-        assert!(Instant::now() < deadline, "mic test never finished");
-        std::thread::sleep(Duration::from_millis(10));
-    }
-    let (_source, mut sink) = test.finish().expect("handles returned");
-    // Let the queued tail play out before the backend is closed.
-    let deadline = Instant::now() + Duration::from_secs(5);
-    while sink.queued_samples() > 0 {
-        assert!(Instant::now() < deadline, "playback queue never drained");
-        std::thread::sleep(Duration::from_millis(5));
-    }
-    drop(io);
-
-    let recorded = read_wav(&output);
-    std::fs::remove_dir_all(&dir).expect("cleanup");
-    let audible = recorded.iter().filter(|s| s.abs() > 0.05).count();
-    println!("mic test played back {audible} audible samples");
-    assert!(audible >= SAMPLE_RATE as usize / 10, "playback missing");
 }
 
 fn write_wav(path: &Path, samples: &[f32]) {
