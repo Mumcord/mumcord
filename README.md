@@ -80,17 +80,9 @@ Screen sharing needs a direct connection between the person sharing and each vie
 
 Up to 8 people can watch one share; the quality drops automatically to 480p at 15 frames per second when the upload is too slow.
 
-## Webhook bot (quick start)
+## Webhook bot
 
-The bot is a headless Mumcord client: an outside system posts one HTTP request with an API key, and the bot writes that text into a channel. Nothing is installed or configured on the Mumble server.
-
-1. `cargo build -p mumcord-bot`
-2. `cp crates/bot/examples/bot.example.toml bot.toml`, put a long random key in it (`bot.toml` stays private, it is git-ignored)
-3. `mumcord-bot webhook --config bot.toml`
-4. `curl -s -H 'X-API-Key: <your key>' http://127.0.0.1:8080/channels` → the channel ids this key may write to
-5. `curl -s -X POST http://127.0.0.1:8080/message -H 'X-API-Key: <your key>' -d '{"channel": 2, "message": "build failed"}'`
-
-The full description is in [docs/bot-webhook.md](docs/bot-webhook.md).
+The webhook bot (and the scripted test bot the E2E tests use) now lives in its own repository: [Mumcord/mumbot](https://github.com/Mumcord/mumbot).
 
 ## Code signing policy
 

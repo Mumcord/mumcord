@@ -33,7 +33,7 @@ machine; more invite timing flakes in the voice and packet-loss specs.
 Requires only Docker (user in the `docker` group) and `npm ci` on the host. Everything else runs
 in the `mumcord-e2e` image, because Arch's webkit2gtk ships without `WebKitWebDriver`.
 
-Runtime (16-core dev machine): cold ~5 min (image build ~3 min, first full debug build of app, bot
+Runtime (16-core dev machine): cold ~5 min (image build ~3 min, first full debug build of app
 and netsim ~1.5 min, smoke spec a few seconds); warm ~15 s without code changes, plus the incremental
 rebuild otherwise. In CI expect roughly 3–4x that. Build caches (cargo registry, target dir, bot
 certificates) live in `~/.cache/mumcord-build/e2e/` (override with `MUMCORD_E2E_CACHE`), never in `target/` or `/tmp`.
