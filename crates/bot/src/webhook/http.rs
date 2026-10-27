@@ -99,10 +99,7 @@ pub trait Api {
     /// Channels the key may write to, names resolved against the live tree (FR-3.4).
     fn allowed_ids(&self, key: &ApiKey) -> impl Future<Output = Vec<u32>> + Send;
     /// `GET /channels` answer: only the channels of the presented key (Round 5).
-    fn allowed_channels(
-        &self,
-        key: &ApiKey,
-    ) -> impl Future<Output = Vec<(u32, String)>> + Send;
+    fn allowed_channels(&self, key: &ApiKey) -> impl Future<Output = Vec<(u32, String)>> + Send;
     /// Cap for one message: the spec cap, or the smaller value the server reports (FR-3.6).
     fn message_cap(&self) -> impl Future<Output = usize> + Send;
     /// Sends the message and reports whether the server accepted it (Q2.10).
@@ -218,8 +215,7 @@ async fn message<A: Api>(
         return Response::error(400, "invalid JSON body").audit(Some(key), None);
     };
     if parsed.message.trim().is_empty() {
-        return Response::error(400, "empty message")
-            .audit(Some(key), Some(parsed.channel));
+        return Response::error(400, "empty message").audit(Some(key), Some(parsed.channel));
     }
     // FR-3.6: the server's own limit counts when it is smaller.
     if parsed.message.chars().count() > api.message_cap().await {
@@ -235,14 +231,19 @@ async fn message<A: Api>(
     if !api.connected().await {
         return audit(Response::error(503, "not connected"));
     }
-    match api.deliver(parsed.channel, &markdown::render_html(&parsed.message)).await {
+    match api
+        .deliver(parsed.channel, &markdown::render_html(&parsed.message))
+        .await
+    {
         Ok(()) => audit(Response::ok(200, "{\"delivered\":true}")),
         Err(error) => audit(error.response()),
     }
 }
 
 fn authenticated<'a>(request: &Request, config: &'a WebhookConfig) -> Option<&'a ApiKey> {
-    request.header(KEY_HEADER).and_then(|key| config.find_key(key))
+    request
+        .header(KEY_HEADER)
+        .and_then(|key| config.find_key(key))
 }
 
 fn quote(value: &str) -> String {
@@ -284,7 +285,9 @@ pub fn parse_request(bytes: &[u8]) -> Option<Request> {
 }
 
 fn split_at<'a>(bytes: &'a [u8], pattern: &[u8]) -> Option<(&'a [u8], &'a [u8])> {
-    let pos = bytes.windows(pattern.len()).position(|window| window == pattern)?;
+    let pos = bytes
+        .windows(pattern.len())
+        .position(|window| window == pattern)?;
     Some((&bytes[..pos], &bytes[pos + pattern.len()..]))
 }
 
@@ -294,7 +297,9 @@ pub async fn serve<A: Api + Send + Sync + 'static>(
     config: Arc<WebhookConfig>,
     api: Arc<A>,
 ) -> Result<()> {
-    let limiter = Arc::new(tokio::sync::Mutex::new(RateLimiter::new(config.rate_limit())));
+    let limiter = Arc::new(tokio::sync::Mutex::new(RateLimiter::new(
+        config.rate_limit(),
+    )));
     while let Ok((mut socket, peer)) = listener.accept().await {
         let (config, api, limiter) = (Arc::clone(&config), Arc::clone(&api), Arc::clone(&limiter));
         tokio::spawn(async move {
@@ -335,7 +340,6 @@ pub async fn serve<A: Api + Send + Sync + 'static>(
             // connection does not reset the answer before the client can read it.
             let timeout = Duration::from_millis(200);
             let _ = tokio::time::timeout(timeout, socket.read(&mut scratch)).await;
-
         });
     }
     Ok(())
@@ -369,7 +373,11 @@ async fn read_request(socket: &mut tokio::net::TcpStream) -> Result<Request> {
         }
         body.extend_from_slice(&chunk[..read]);
     }
-    Ok(Request { declared_len: length, body, ..request })
+    Ok(Request {
+        declared_len: length,
+        body,
+        ..request
+    })
 }
 
 #[cfg(test)]
@@ -484,18 +492,30 @@ channels = ["Lobby", 42]
         let over = "x".repeat(1001);
         let body = format!(r#"{{"channel":42,"message":"{over}"}}"#);
         assert_eq!(
-            handle(&request("POST", "/message", Some("test-key-1"), &body), &config, &api, &mut limiter, now)
-                .await
-                .status,
+            handle(
+                &request("POST", "/message", Some("test-key-1"), &body),
+                &config,
+                &api,
+                &mut limiter,
+                now
+            )
+            .await
+            .status,
             400,
             "the server only accepts 1000 characters"
         );
         let fits = "x".repeat(1000);
         let body = format!(r#"{{"channel":42,"message":"{fits}"}}"#);
         assert_eq!(
-            handle(&request("POST", "/message", Some("test-key-1"), &body), &config, &api, &mut limiter, now)
-                .await
-                .status,
+            handle(
+                &request("POST", "/message", Some("test-key-1"), &body),
+                &config,
+                &api,
+                &mut limiter,
+                now
+            )
+            .await
+            .status,
             200
         );
     }
@@ -514,7 +534,11 @@ channels = ["Lobby", 42]
             Instant::now(),
         )
         .await;
-        assert_eq!(response.key.as_deref(), Some("ci"), "the label, not the key value");
+        assert_eq!(
+            response.key.as_deref(),
+            Some("ci"),
+            "the label, not the key value"
+        );
         assert_eq!(response.channel, Some(42));
     }
 
@@ -524,7 +548,12 @@ channels = ["Lobby", 42]
         let config = config();
         let mut limiter = RateLimiter::new(20);
         let response = handle(
-            &request("POST", "/message", Some("test-key-1"), r#"{"channel":42,"message":"hi"}"#),
+            &request(
+                "POST",
+                "/message",
+                Some("test-key-1"),
+                r#"{"channel":42,"message":"hi"}"#,
+            ),
             &config,
             &api,
             &mut limiter,
@@ -611,7 +640,12 @@ channels = ["Lobby", 42]
         let refused = fake(true, Err(DeliveryError::Refused));
         for api in [&offline, &refused] {
             let response = handle(
-                &request("POST", "/message", Some("test-key-1"), r#"{"channel":42,"message":"x"}"#),
+                &request(
+                    "POST",
+                    "/message",
+                    Some("test-key-1"),
+                    r#"{"channel":42,"message":"x"}"#,
+                ),
                 &config,
                 api,
                 &mut limiter,
@@ -635,13 +669,25 @@ channels = ["Lobby", 42]
             r#"{"channel":42,"message":"x"}"#,
         );
         for _ in 0..20 {
-            assert_eq!(handle(&req, &config, &api, &mut limiter, now).await.status, 200);
+            assert_eq!(
+                handle(&req, &config, &api, &mut limiter, now).await.status,
+                200
+            );
         }
-        assert_eq!(handle(&req, &config, &api, &mut limiter, now).await.status, 429);
         assert_eq!(
-            handle(&req, &config, &api, &mut limiter, now + Duration::from_secs(61))
-                .await
-                .status,
+            handle(&req, &config, &api, &mut limiter, now).await.status,
+            429
+        );
+        assert_eq!(
+            handle(
+                &req,
+                &config,
+                &api,
+                &mut limiter,
+                now + Duration::from_secs(61)
+            )
+            .await
+            .status,
             200
         );
     }

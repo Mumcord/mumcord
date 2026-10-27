@@ -101,7 +101,9 @@ fn inline(escaped: &str) -> String {
     let mut out = String::with_capacity(escaped.len());
     let mut i = 0;
     while i < bytes.len() {
-        if bytes[i] == b'`' && let Some(end) = find(bytes, b'`', i + 1) {
+        if bytes[i] == b'`'
+            && let Some(end) = find(bytes, b'`', i + 1)
+        {
             out.push_str("<code>");
             out.push_str(&escaped[i + 1..end]);
             out.push_str("</code>");
@@ -143,7 +145,10 @@ fn inline(escaped: &str) -> String {
 }
 
 fn find(bytes: &[u8], needle: u8, from: usize) -> Option<usize> {
-    bytes[from..].iter().position(|b| *b == needle).map(|p| p + from)
+    bytes[from..]
+        .iter()
+        .position(|b| *b == needle)
+        .map(|p| p + from)
 }
 
 fn find_pair(bytes: &[u8], from: usize) -> Option<usize> {
@@ -188,7 +193,10 @@ mod tests {
         assert_eq!(render_html("*italic*"), "<i>italic</i>");
         assert_eq!(render_html("`code`"), "<code>code</code>");
         assert_eq!(render_html("# Title"), "<h1>Title</h1>");
-        assert_eq!(render_html("- one\n- two"), "<ul><li>one</li><li>two</li></ul>");
+        assert_eq!(
+            render_html("- one\n- two"),
+            "<ul><li>one</li><li>two</li></ul>"
+        );
         assert_eq!(render_html("a\nb"), "a<br>b");
         assert_eq!(
             render_html("```\n<b>x</b>\n```"),

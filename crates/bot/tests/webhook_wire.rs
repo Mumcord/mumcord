@@ -6,7 +6,7 @@
 use std::sync::Arc;
 
 use anyhow::Result;
-use mumcord_bot::webhook::{ApiKey, Api, DeliveryError, MAX_MESSAGE_CHARS, WebhookConfig, serve};
+use mumcord_bot::webhook::{Api, ApiKey, DeliveryError, MAX_MESSAGE_CHARS, WebhookConfig, serve};
 use tokio::io::{AsyncReadExt, AsyncWriteExt};
 use tokio::net::TcpListener;
 
@@ -64,7 +64,9 @@ async fn call(
     let mut answer = Vec::new();
     socket.read_to_end(&mut answer).await?;
     let answer = String::from_utf8(answer)?;
-    let (head, body) = answer.split_once("\r\n\r\n").unwrap_or((answer.as_str(), ""));
+    let (head, body) = answer
+        .split_once("\r\n\r\n")
+        .unwrap_or((answer.as_str(), ""));
     let status = head
         .lines()
         .next()
@@ -85,8 +87,7 @@ async fn listener_answers_the_specified_codes() {
 key = "wire-key"
 label = "ci"
 channels = ["Lobby"]
-"#
-            ,
+"#,
         )
         .expect("config"),
     );
@@ -117,7 +118,10 @@ channels = ["Lobby"]
             .await
             .expect("request");
         assert_eq!(status, want, "{body} → {answer}");
-        assert!(!answer.contains("channels"), "no channel list in an error: {answer}");
+        assert!(
+            !answer.contains("channels"),
+            "no channel list in an error: {answer}"
+        );
     }
 
     assert_eq!(
@@ -128,7 +132,10 @@ channels = ["Lobby"]
         "{\"channels\":[{\"id\":2,\"name\":\"Lobby\"}]}"
     );
     assert_eq!(
-        call(port, None, "GET", "/health", "").await.expect("health").1,
+        call(port, None, "GET", "/health", "")
+            .await
+            .expect("health")
+            .1,
         "{\"connected\":true,\"uptime_seconds\":60,\"server\":\"127.0.0.1\"}"
     );
     assert_eq!(
@@ -145,11 +152,18 @@ channels = ["Lobby"]
         20_001,
         "x".repeat(20_001)
     );
-    let mut socket = tokio::net::TcpStream::connect(("127.0.0.1", port)).await.expect("connect");
+    let mut socket = tokio::net::TcpStream::connect(("127.0.0.1", port))
+        .await
+        .expect("connect");
     socket.write_all(big.as_bytes()).await.expect("write");
     let mut answer = Vec::new();
     socket.read_to_end(&mut answer).await.expect("read");
-    assert!(String::from_utf8(answer).expect("utf8").starts_with("HTTP/1.1 413"), "body cap");
+    assert!(
+        String::from_utf8(answer)
+            .expect("utf8")
+            .starts_with("HTTP/1.1 413"),
+        "body cap"
+    );
 
     // AC-3.7: several requests at the same time, each gets its own answer.
     let mut running = Vec::new();

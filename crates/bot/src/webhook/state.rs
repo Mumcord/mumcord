@@ -9,9 +9,9 @@ use tokio::sync::Mutex;
 
 use crate::Bot;
 use crate::checks::resolve_channel;
+use crate::webhook::MAX_MESSAGE_CHARS;
 use crate::webhook::config::{ApiKey, ChannelRef, WebhookConfig};
 use crate::webhook::http::{Api, DeliveryError, serve};
-use crate::webhook::MAX_MESSAGE_CHARS;
 
 /// Wait between reconnect attempts (FR-3.1).
 const RECONNECT_DELAY: Duration = Duration::from_secs(2);
@@ -46,7 +46,9 @@ impl BotApi {
     /// Reconnects after the link dropped (FR-3.1).
     pub async fn reconnect(&self) -> Result<()> {
         let mut guard = self.bot.lock().await;
-        let bot = guard.as_mut().ok_or_else(|| anyhow::anyhow!("bot is gone"))?;
+        let bot = guard
+            .as_mut()
+            .ok_or_else(|| anyhow::anyhow!("bot is gone"))?;
         bot.reconnect_as(&self.config.server.name).await?;
         if let Some(channel) = &self.config.server.channel {
             bot.join(channel).await?;
@@ -62,7 +64,11 @@ impl BotApi {
     /// Clone of the live command handle, so a test can force a reconnect.
     pub async fn handle(&self) -> Handle {
         let guard = self.bot.lock().await;
-        guard.as_ref().expect("bot is not connected").handle().clone()
+        guard
+            .as_ref()
+            .expect("bot is not connected")
+            .handle()
+            .clone()
     }
 }
 
@@ -100,7 +106,9 @@ impl Api for BotApi {
 
     async fn allowed_ids(&self, key: &ApiKey) -> Vec<u32> {
         let guard = self.bot.lock().await;
-        let Some(bot) = guard.as_ref() else { return Vec::new() };
+        let Some(bot) = guard.as_ref() else {
+            return Vec::new();
+        };
         let state = bot.state();
         let mut ids: Vec<u32> = key
             .channels
@@ -117,7 +125,9 @@ impl Api for BotApi {
 
     async fn allowed_channels(&self, key: &ApiKey) -> Vec<(u32, String)> {
         let guard = self.bot.lock().await;
-        let Some(bot) = guard.as_ref() else { return Vec::new() };
+        let Some(bot) = guard.as_ref() else {
+            return Vec::new();
+        };
         let state = bot.state();
         key.channels
             .iter()
@@ -125,7 +135,12 @@ impl Api for BotApi {
                 ChannelRef::Id(id) => Some(*id),
                 ChannelRef::Name(name) => resolve_channel(&state, name).ok(),
             })
-            .filter_map(|id| state.channels.get(&id).map(|channel| (id, channel.name.clone())))
+            .filter_map(|id| {
+                state
+                    .channels
+                    .get(&id)
+                    .map(|channel| (id, channel.name.clone()))
+            })
             .collect()
     }
 
@@ -142,7 +157,10 @@ impl Api for BotApi {
             .permissions
             .get(&channel_id)
             .is_some_and(|bits| bits & permissions::TEXT_MESSAGE != 0);
-        if let Err(error) = bot.handle().send_text(&TextTarget::channel(channel_id), html) {
+        if let Err(error) = bot
+            .handle()
+            .send_text(&TextTarget::channel(channel_id), html)
+        {
             tracing::warn!(%error, "sending the message failed");
             return Err(DeliveryError::Refused);
         }

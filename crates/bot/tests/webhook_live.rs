@@ -9,7 +9,9 @@
 use std::sync::Arc;
 
 use anyhow::Result;
-use mumcord_bot::webhook::{Api, ApiKey, BotApi, ChannelRef, HttpConfig, ServerConfig, WebhookConfig};
+use mumcord_bot::webhook::{
+    Api, ApiKey, BotApi, ChannelRef, HttpConfig, ServerConfig, WebhookConfig,
+};
 use mumcord_bot::{Bot, BotConfig, MessageCheck, env};
 use tokio::io::{AsyncReadExt, AsyncWriteExt};
 use tokio::net::TcpListener;
@@ -92,7 +94,9 @@ async fn call(
     let mut answer = Vec::new();
     socket.read_to_end(&mut answer).await?;
     let answer = String::from_utf8(answer)?;
-    let (head, body) = answer.split_once("\r\n\r\n").unwrap_or((answer.as_str(), ""));
+    let (head, body) = answer
+        .split_once("\r\n\r\n")
+        .unwrap_or((answer.as_str(), ""));
     let status = head
         .lines()
         .next()
@@ -157,17 +161,26 @@ async fn webhook_messages_reach_the_channel_chat() {
     println!("AC-3.2 ✅ chat: {seen:?}");
 
     // AC-3.3: each case answers its own code, error bodies hold no channel list.
-    let long = format!(
-        r#"{{"channel":{LOBBY},"message":"{}"}}"#,
-        "x".repeat(5001)
-    );
+    let long = format!(r#"{{"channel":{LOBBY},"message":"{}"}}"#, "x".repeat(5001));
     for (key, body, want) in [
         (None, "{}", 401u16),
         (Some("wrong"), "{}", 401),
         (Some("test-key-ci"), "not json", 400),
-        (Some("test-key-ci"), &format!(r#"{{"channel":{LOBBY},"message":" "}}"#), 400),
-        (Some("test-key-ci"), &format!(r#"{{"channel":{LOBBY},"message":"x"}}"#), 200),
-        (Some("test-key-ci"), &format!(r#"{{"channel":{RAID},"message":"x"}}"#), 403),
+        (
+            Some("test-key-ci"),
+            &format!(r#"{{"channel":{LOBBY},"message":" "}}"#),
+            400,
+        ),
+        (
+            Some("test-key-ci"),
+            &format!(r#"{{"channel":{LOBBY},"message":"x"}}"#),
+            200,
+        ),
+        (
+            Some("test-key-ci"),
+            &format!(r#"{{"channel":{RAID},"message":"x"}}"#),
+            403,
+        ),
         (Some("test-key-ci"), r#"{"channel":99,"message":"x"}"#, 404),
         (Some("test-key-ci"), &long, 400),
     ] {
@@ -175,7 +188,10 @@ async fn webhook_messages_reach_the_channel_chat() {
             .await
             .expect("request");
         assert_eq!(status, want, "{body} → {answer}");
-        assert!(!answer.contains("channels"), "no channel list in an error: {answer}");
+        assert!(
+            !answer.contains("channels"),
+            "no channel list in an error: {answer}"
+        );
     }
 
     // AC-3.4: the key sees only its own channels; health needs no key.
@@ -183,15 +199,19 @@ async fn webhook_messages_reach_the_channel_chat() {
         .await
         .expect("channels");
     assert_eq!(status, 200);
-    assert!(body.contains("\"name\":\"Lobby\"") && !body.contains("Raid"), "{body}");
-    let (status, body) = call(port, None, "GET", "/health", "").await.expect("health");
+    assert!(
+        body.contains("\"name\":\"Lobby\"") && !body.contains("Raid"),
+        "{body}"
+    );
+    let (status, body) = call(port, None, "GET", "/health", "")
+        .await
+        .expect("health");
     assert_eq!(status, 200);
     assert!(body.contains("\"connected\":true"), "{body}");
 
     // AC-3.5: the Markdown subset renders as markup, caller HTML stays literal text.
-    let markup = format!(
-        r#"{{"channel":{LOBBY},"message":"**bold** <b>literal</b> https://example.com"}}"#
-    );
+    let markup =
+        format!(r#"{{"channel":{LOBBY},"message":"**bold** <b>literal</b> https://example.com"}}"#);
     let (status, _) = call(port, Some("test-key-ci"), "POST", "/message", &markup)
         .await
         .expect("markup");
@@ -203,7 +223,10 @@ async fn webhook_messages_reach_the_channel_chat() {
         })
         .await
         .expect("AC-3.5 markup reaches the chat");
-    assert!(rendered.message.contains("&lt;b&gt;literal&lt;/b&gt;"), "{rendered:?}");
+    assert!(
+        rendered.message.contains("&lt;b&gt;literal&lt;/b&gt;"),
+        "{rendered:?}"
+    );
 
     // AC-3.7: parallel requests, nothing lost or doubled. The key's limit is 20 per minute, so
     // the requests that remain inside the limit must all be answered.
@@ -250,7 +273,10 @@ async fn webhook_messages_reach_the_channel_chat() {
             })
             .await
             .expect("the accepted probe reached the chat");
-        assert!(used <= 20, "the limit must refuse the 21st request, saw {used}");
+        assert!(
+            used <= 20,
+            "the limit must refuse the 21st request, saw {used}"
+        );
     }
     println!("AC-3.3 ✅ rate limit refused after {used} requests for key ci");
 

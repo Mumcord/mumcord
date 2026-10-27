@@ -38,7 +38,12 @@ fn unique(prefix: &str) -> String {
     )
 }
 
-fn config(dir: &std::path::Path, name: &str, room: &str, with_password: bool) -> Arc<WebhookConfig> {
+fn config(
+    dir: &std::path::Path,
+    name: &str,
+    room: &str,
+    with_password: bool,
+) -> Arc<WebhookConfig> {
     Arc::new(WebhookConfig {
         server: ServerConfig {
             host: env::HOST.to_owned(),
@@ -113,7 +118,9 @@ async fn the_bot_uses_the_configured_channel_password() {
 
     // The bot with the password in its config: it joins the locked channel and can write.
     let api = Arc::new(BotApi::new(config(dir.path(), &with_password, &room, true)));
-    api.connect().await.expect("login and join with the password");
+    api.connect()
+        .await
+        .expect("login and join with the password");
     admin
         .wait_user(
             &with_password,
@@ -133,9 +140,14 @@ async fn the_bot_uses_the_configured_channel_password() {
     let observer = Bot::connect(config(dir.path(), &observer_name, &room, true).bot_config())
         .await
         .expect("observer with the password");
-    observer.join(&room).await.expect("observer joins the locked channel");
+    observer
+        .join(&room)
+        .await
+        .expect("observer joins the locked channel");
 
-    let listener = tokio::net::TcpListener::bind("127.0.0.1:0").await.expect("listen");
+    let listener = tokio::net::TcpListener::bind("127.0.0.1:0")
+        .await
+        .expect("listen");
     let port = listener.local_addr().expect("port").port();
     tokio::spawn({
         let api = Arc::clone(&api);
@@ -155,7 +167,12 @@ async fn the_bot_uses_the_configured_channel_password() {
         .expect("the message reached the locked channel");
 
     // A bot without the password stays outside: join is refused, so nothing is written.
-    let locked_out = Arc::new(BotApi::new(config(dir.path(), &without_password, &room, false)));
+    let locked_out = Arc::new(BotApi::new(config(
+        dir.path(),
+        &without_password,
+        &room,
+        false,
+    )));
     let error = locked_out.connect().await;
     println!("join without password -> {error:?}");
     assert!(
@@ -168,7 +185,10 @@ async fn the_bot_uses_the_configured_channel_password() {
         .values()
         .find(|user| user.name == without_password)
         .expect("the bot without the password is connected");
-    assert_ne!(outside.channel_id, id, "it stays outside the locked channel");
+    assert_ne!(
+        outside.channel_id, id,
+        "it stays outside the locked channel"
+    );
 
     println!("addendum ✅ token accepted, locked channel usable, no token stays outside");
 }
@@ -183,7 +203,9 @@ async fn request(port: u16, key: &str, body: &str) -> Result<(u16, String)> {
     let mut answer = Vec::new();
     socket.read_to_end(&mut answer).await?;
     let answer = String::from_utf8(answer)?;
-    let (head, text) = answer.split_once("\r\n\r\n").unwrap_or((answer.as_str(), ""));
+    let (head, text) = answer
+        .split_once("\r\n\r\n")
+        .unwrap_or((answer.as_str(), ""));
     let status = head
         .lines()
         .next()

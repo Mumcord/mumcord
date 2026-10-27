@@ -119,8 +119,8 @@ impl WebhookConfig {
     pub fn load(path: &Path) -> Result<Self> {
         let text = std::fs::read_to_string(path)
             .with_context(|| format!("cannot read config {}", path.display()))?;
-        let config: Self = toml::from_str(&text)
-            .with_context(|| format!("invalid config {}", path.display()))?;
+        let config: Self =
+            toml::from_str(&text).with_context(|| format!("invalid config {}", path.display()))?;
         config.validate()?;
         Ok(config)
     }
@@ -140,7 +140,9 @@ impl WebhookConfig {
                 bail!("key {} has no allowed channels", entry.label);
             }
             for channel in &entry.channels {
-                if let ChannelRef::Name(name) = channel && name.is_empty() {
+                if let ChannelRef::Name(name) = channel
+                    && name.is_empty()
+                {
                     bail!("key {} has an empty channel name", entry.label);
                 }
             }
@@ -164,7 +166,13 @@ impl WebhookConfig {
                 self.server
                     .name
                     .chars()
-                    .map(|c| if c.is_ascii_alphanumeric() || c == '-' || c == '_' { c } else { '_' })
+                    .map(|c| {
+                        if c.is_ascii_alphanumeric() || c == '-' || c == '_' {
+                            c
+                        } else {
+                            '_'
+                        }
+                    })
                     .collect(),
             )
         });
@@ -175,7 +183,11 @@ impl WebhookConfig {
             .password
             .clone()
             .or_else(|| crate::env::testenv_var("SERVER_PASSWORD"));
-        bot.tokens = self.tokens.iter().map(|token| token.password.clone()).collect();
+        bot.tokens = self
+            .tokens
+            .iter()
+            .map(|token| token.password.clone())
+            .collect();
         bot
     }
 
@@ -327,9 +339,13 @@ channels = ["Lobby", 42]
     fn the_shipped_example_parses() {
         let path = concat!(env!("CARGO_MANIFEST_DIR"), "/examples/bot.example.toml");
         let config: WebhookConfig =
-            toml::from_str(&std::fs::read_to_string(path).expect("example file")).expect("example config");
+            toml::from_str(&std::fs::read_to_string(path).expect("example file"))
+                .expect("example config");
         assert_eq!(config.keys.len(), 1);
-        assert!(config.tokens.is_empty(), "passwords stay commented in the example");
+        assert!(
+            config.tokens.is_empty(),
+            "passwords stay commented in the example"
+        );
         assert!(config.listens_locally(), "the example binds to loopback");
     }
 
@@ -340,7 +356,7 @@ channels = ["Lobby", 42]
 [[token]]
 channel = "Secret"
 password = "hunter2"
-"#
+"#,
         )
         .expect("config");
         assert_eq!(good.tokens.len(), 1);
@@ -349,7 +365,7 @@ password = "hunter2"
 [[token]]
 channel = "Secret"
 passwort = "hunter2"
-"#
+"#,
         );
         assert!(typo.is_err(), "a wrong field name is not silently ignored");
     }
@@ -376,13 +392,19 @@ password = "other"
             vec!["hunter2".to_owned(), "other".to_owned()]
         );
         let shown = format!("{:?}", config.tokens[0]);
-        assert!(!shown.contains("hunter2"), "secrets stay out of the log: {shown}");
+        assert!(
+            !shown.contains("hunter2"),
+            "secrets stay out of the log: {shown}"
+        );
     }
 
     #[test]
     fn certificate_name_stays_within_the_allowed_characters() {
         let config: WebhookConfig = toml::from_str(SAMPLE).expect("toml");
-        assert_eq!(config.bot_config().cert_name.as_deref(), Some("Mumcord_Bot"));
+        assert_eq!(
+            config.bot_config().cert_name.as_deref(),
+            Some("Mumcord_Bot")
+        );
     }
 
     #[test]
