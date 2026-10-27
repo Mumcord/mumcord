@@ -68,6 +68,7 @@ fn config(dir: &std::path::Path, name: &str) -> Arc<WebhookConfig> {
                 channels: vec![ChannelRef::Name("Lobby".to_owned())],
             },
         ],
+        tokens: Vec::new(),
     })
 }
 
@@ -167,7 +168,7 @@ async fn webhook_messages_reach_the_channel_chat() {
         (Some("test-key-ci"), &format!(r#"{{"channel":{LOBBY},"message":" "}}"#), 400),
         (Some("test-key-ci"), &format!(r#"{{"channel":{LOBBY},"message":"x"}}"#), 200),
         (Some("test-key-ci"), &format!(r#"{{"channel":{RAID},"message":"x"}}"#), 403),
-        (Some("test-key-ci"), &format!(r#"{{"channel":99,"message":"x"}}"#), 404),
+        (Some("test-key-ci"), r#"{"channel":99,"message":"x"}"#, 404),
         (Some("test-key-ci"), &long, 400),
     ] {
         let (status, answer) = call(port, key, "POST", "/message", body)

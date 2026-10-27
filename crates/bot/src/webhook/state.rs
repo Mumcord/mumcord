@@ -11,6 +11,7 @@ use crate::Bot;
 use crate::checks::resolve_channel;
 use crate::webhook::config::{ApiKey, ChannelRef, WebhookConfig};
 use crate::webhook::http::{Api, DeliveryError, serve};
+use crate::webhook::MAX_MESSAGE_CHARS;
 
 /// Wait between reconnect attempts (FR-3.1).
 const RECONNECT_DELAY: Duration = Duration::from_secs(2);
@@ -85,6 +86,18 @@ impl Api for BotApi {
     }
 
     /// Config entries may be a name or an ID; names resolve against the live tree (FR-3.3, FR-3.4).
+    async fn message_cap(&self) -> usize {
+        let guard = self.bot.lock().await;
+        let reported = guard
+            .as_ref()
+            .and_then(|bot| bot.state().server.message_length)
+            .unwrap_or(0);
+        if reported == 0 {
+            return MAX_MESSAGE_CHARS;
+        }
+        (reported as usize).min(MAX_MESSAGE_CHARS)
+    }
+
     async fn allowed_ids(&self, key: &ApiKey) -> Vec<u32> {
         let guard = self.bot.lock().await;
         let Some(bot) = guard.as_ref() else { return Vec::new() };

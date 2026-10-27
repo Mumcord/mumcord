@@ -14,7 +14,7 @@ use tokio::io::{AsyncReadExt, AsyncWriteExt};
 use tokio::net::TcpListener;
 
 use crate::webhook::config::{ApiKey, WebhookConfig};
-use crate::webhook::{MAX_BODY_BYTES, MAX_MESSAGE_CHARS, markdown};
+use crate::webhook::{MAX_BODY_BYTES, markdown};
 
 /// Header the API key is read from (Q2.2).
 pub const KEY_HEADER: &str = "X-API-Key";
@@ -43,6 +43,9 @@ impl Request {
 pub struct Response {
     pub status: u16,
     pub json: Option<String>,
+    /// Key label and channel id of the request, for the log (FR-3.20). Never the key value.
+    pub key: Option<String>,
+    pub channel: Option<u32>,
 }
 
 impl Response {
@@ -50,7 +53,16 @@ impl Response {
         Self {
             status,
             json: Some(json.into()),
+            key: None,
+            channel: None,
         }
+    }
+
+    /// Fills in what the request log needs (FR-3.20).
+    fn audit(mut self, key: Option<&ApiKey>, channel: Option<u32>) -> Self {
+        self.key = key.map(|entry| entry.label.clone());
+        self.channel = channel;
+        self
     }
 
     fn error(status: u16, reason: &str) -> Self {
@@ -91,6 +103,8 @@ pub trait Api {
         &self,
         key: &ApiKey,
     ) -> impl Future<Output = Vec<(u32, String)>> + Send;
+    /// Cap for one message: the spec cap, or the smaller value the server reports (FR-3.6).
+    fn message_cap(&self) -> impl Future<Output = usize> + Send;
     /// Sends the message and reports whether the server accepted it (Q2.10).
     fn deliver(
         &self,
@@ -173,7 +187,7 @@ pub async fn handle<A: Api>(
                     .map(|(id, name)| format!("{{\"id\":{id},\"name\":{}}}", quote(name)))
                     .collect::<Vec<_>>()
                     .join(",");
-                Response::ok(200, format!("{{\"channels\":[{channels}]}}"))
+                Response::ok(200, format!("{{\"channels\":[{channels}]}}")).audit(Some(key), None)
             }
             None => Response::error(401, "unknown or missing key"),
         },
@@ -195,32 +209,35 @@ async fn message<A: Api>(
         return Response::error(401, "unknown or missing key");
     };
     if !limiter.allow(&key.label, now) {
-        return Response::error(429, "rate limit reached");
+        return Response::error(429, "rate limit reached").audit(Some(key), None);
     }
     if request.declared_len > MAX_BODY_BYTES {
-        return Response::error(413, "request body too large");
+        return Response::error(413, "request body too large").audit(Some(key), None);
     }
     let Ok(parsed) = serde_json::from_slice::<MessageRequest>(&request.body) else {
-        return Response::error(400, "invalid JSON body");
+        return Response::error(400, "invalid JSON body").audit(Some(key), None);
     };
     if parsed.message.trim().is_empty() {
-        return Response::error(400, "empty message");
+        return Response::error(400, "empty message")
+            .audit(Some(key), Some(parsed.channel));
     }
-    if parsed.message.chars().count() > MAX_MESSAGE_CHARS {
+    // FR-3.6: the server's own limit counts when it is smaller.
+    if parsed.message.chars().count() > api.message_cap().await {
         return Response::error(400, "message too long");
     }
+    let audit = |response: Response| response.audit(Some(key), Some(parsed.channel));
     if !api.channel_exists(parsed.channel).await {
-        return Response::error(404, "channel not found");
+        return audit(Response::error(404, "channel not found"));
     }
     if !api.allowed_ids(key).await.contains(&parsed.channel) {
-        return Response::error(403, "channel not allowed for this key");
+        return audit(Response::error(403, "channel not allowed for this key"));
     }
     if !api.connected().await {
-        return Response::error(503, "not connected");
+        return audit(Response::error(503, "not connected"));
     }
     match api.deliver(parsed.channel, &markdown::render_html(&parsed.message)).await {
-        Ok(()) => Response::ok(200, "{\"delivered\":true}"),
-        Err(error) => error.response(),
+        Ok(()) => audit(Response::ok(200, "{\"delivered\":true}")),
+        Err(error) => audit(error.response()),
     }
 }
 
@@ -296,8 +313,20 @@ pub async fn serve<A: Api + Send + Sync + 'static>(
                 Instant::now(),
             )
             .await;
-            // Only request metadata is logged: peer, path, status. No key, no message text (Q3.7).
-            tracing::info!(peer = %peer, path = %request.path, status = response.status, "request");
+            // Only request metadata is logged: peer, key label, channel, status. Never the key
+            // value, never the message text (FR-3.20, Q3.7).
+            tracing::info!(
+                peer = %peer,
+                path = %request.path,
+                key = response.key.as_deref().unwrap_or("-"),
+                // 0 is a real channel (Root), so an empty value is shown as "-".
+                channel = response
+                    .channel
+                    .map(|id| id.to_string())
+                    .unwrap_or_else(|| "-".to_owned()),
+                status = response.status,
+                "request"
+            );
             if let Err(error) = socket.write_all(&response.to_bytes()).await {
                 tracing::warn!(peer = %peer, %error, "answer could not be sent");
             }
@@ -346,12 +375,15 @@ async fn read_request(socket: &mut tokio::net::TcpStream) -> Result<Request> {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::webhook::MAX_MESSAGE_CHARS;
     use crate::webhook::config::ChannelRef;
 
     struct FakeApi {
         connected: bool,
         channels: Vec<(u32, String)>,
         deliver_result: Result<(), DeliveryError>,
+        /// 0 means "the server reports no limit", so the spec cap applies.
+        server_cap: usize,
     }
 
     impl Api for FakeApi {
@@ -393,6 +425,13 @@ mod tests {
                 })
                 .collect()
         }
+        async fn message_cap(&self) -> usize {
+            if self.server_cap == 0 {
+                MAX_MESSAGE_CHARS
+            } else {
+                self.server_cap.min(MAX_MESSAGE_CHARS)
+            }
+        }
         async fn deliver(&self, _channel: u32, _html: &str) -> Result<(), DeliveryError> {
             self.deliver_result.clone()
         }
@@ -427,7 +466,56 @@ channels = ["Lobby", 42]
             connected,
             channels: vec![(42, "Lobby".to_owned()), (7, "Raid".to_owned())],
             deliver_result,
+            server_cap: 0,
         }
+    }
+
+    #[tokio::test]
+    async fn the_server_reported_cap_wins_when_it_is_smaller() {
+        let api = FakeApi {
+            connected: true,
+            channels: vec![(42, "Lobby".to_owned())],
+            deliver_result: Ok(()),
+            server_cap: 1000,
+        };
+        let config = config();
+        let mut limiter = RateLimiter::new(config.rate_limit());
+        let now = Instant::now();
+        let over = "x".repeat(1001);
+        let body = format!(r#"{{"channel":42,"message":"{over}"}}"#);
+        assert_eq!(
+            handle(&request("POST", "/message", Some("test-key-1"), &body), &config, &api, &mut limiter, now)
+                .await
+                .status,
+            400,
+            "the server only accepts 1000 characters"
+        );
+        let fits = "x".repeat(1000);
+        let body = format!(r#"{{"channel":42,"message":"{fits}"}}"#);
+        assert_eq!(
+            handle(&request("POST", "/message", Some("test-key-1"), &body), &config, &api, &mut limiter, now)
+                .await
+                .status,
+            200
+        );
+    }
+
+    #[tokio::test]
+    async fn the_request_log_carries_the_key_label_and_the_channel() {
+        let api = fake(true, Ok(()));
+        let config = config();
+        let mut limiter = RateLimiter::new(config.rate_limit());
+        let body = r#"{"channel":42,"message":"hello"}"#;
+        let response = handle(
+            &request("POST", "/message", Some("test-key-1"), body),
+            &config,
+            &api,
+            &mut limiter,
+            Instant::now(),
+        )
+        .await;
+        assert_eq!(response.key.as_deref(), Some("ci"), "the label, not the key value");
+        assert_eq!(response.channel, Some(42));
     }
 
     #[tokio::test]
@@ -483,9 +571,11 @@ channels = ["Lobby", 42]
             body: vec![0u8; MAX_BODY_BYTES],
             declared_len: MAX_BODY_BYTES + 1,
         };
+        let too_big = handle(&big, &config, &api, &mut limiter, Instant::now()).await;
         assert_eq!(
-            handle(&big, &config, &api, &mut limiter, Instant::now()).await,
-            Response::error(413, "request body too large")
+            (too_big.status, too_big.json.as_deref()),
+            (413, Some(r#"{"error":"request body too large"}"#)),
+            "the answer is the status plus a short reason, not a channel list"
         );
         assert_eq!(
             handle(

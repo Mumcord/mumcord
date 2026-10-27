@@ -6,7 +6,7 @@
 use std::sync::Arc;
 
 use anyhow::Result;
-use mumcord_bot::webhook::{ApiKey, Api, DeliveryError, WebhookConfig, serve};
+use mumcord_bot::webhook::{ApiKey, Api, DeliveryError, MAX_MESSAGE_CHARS, WebhookConfig, serve};
 use tokio::io::{AsyncReadExt, AsyncWriteExt};
 use tokio::net::TcpListener;
 
@@ -35,6 +35,9 @@ impl Api for Stub {
             .filter(|(id, _)| self.allowed.contains(id))
             .cloned()
             .collect()
+    }
+    async fn message_cap(&self) -> usize {
+        MAX_MESSAGE_CHARS
     }
     async fn deliver(&self, _channel: u32, _html: &str) -> Result<(), DeliveryError> {
         Ok(())
