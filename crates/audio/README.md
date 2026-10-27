@@ -26,6 +26,17 @@ let samples = decoder.decode(&packet[..len], &mut pcm).expect("decode");
 assert_eq!(samples, 2 * FRAME_SAMPLES);
 ```
 
+## Features
+
+- `io` (default): microphone and speaker I/O via cpal (capture, playback, device listing, the stream controller, resampling and the microphone test). It pulls in cpal and, on Linux, ALSA.
+- `test-backend`: a null/WAV-file replacement for the audio devices, for headless tests. Implies `io`.
+
+With `default-features = false` the crate keeps the Opus codec, jitter buffer, mixer, spatial placement, bitrate control and the processing chain, and has no cpal or ALSA dependency, so headless clients and bots can build it for static musl targets:
+
+```toml
+mumcord-audio = { version = "0.4", default-features = false }
+```
+
 ## Licence
 
 AGPL-3.0-only.

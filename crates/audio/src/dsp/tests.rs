@@ -7,6 +7,7 @@ use std::time::{Duration, Instant};
 
 use super::gate::{PTT_TAIL_FRAMES, PttGate, VAD_HANGOVER_FRAMES, VoiceDetector};
 use super::*;
+#[cfg(feature = "io")]
 use crate::io::{AudioHandles, AudioIo, BackendKind};
 
 /// Counts allocations per thread so the no-allocation check is not
@@ -418,6 +419,7 @@ fn per_frame_processing_time() {
     }
 }
 
+#[cfg(feature = "io")]
 #[test]
 fn mic_test_records_then_plays_back() {
     let dir = std::env::temp_dir().join(format!("mumcord-dsp-mic-{}", std::process::id()));

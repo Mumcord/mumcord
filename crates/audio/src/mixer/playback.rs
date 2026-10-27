@@ -9,6 +9,7 @@ use std::time::{Duration, Instant};
 use super::share::{ShareGain, SharePort, ShareSlots, share_slots};
 use super::{Mixer, TalkEvent, VoicePacket};
 use crate::codec::CodecError;
+#[cfg(feature = "io")]
 use crate::io::FrameSink;
 use crate::spatial::Listener;
 use crate::{FRAME_SAMPLES, Frame, SAMPLE_RATE};
@@ -27,7 +28,7 @@ const POLL_INTERVAL: Duration = Duration::from_millis(2);
 const MAX_FRAMES_PER_POLL: u32 = 4;
 const FRAME_DURATION: Duration = Duration::from_millis(10);
 
-/// Where mixed frames go; implemented by [`FrameSink`] and by test doubles.
+/// Where mixed frames go; implemented by `FrameSink` (feature `io`) and by test doubles.
 pub trait PlaybackSink: Send + 'static {
     /// Queues a mono frame; `false` if it was dropped (queue full or no device).
     fn write_frame(&mut self, frame: &Frame) -> bool;
@@ -41,6 +42,7 @@ pub trait PlaybackSink: Send + 'static {
     fn queued_samples(&mut self) -> usize;
 }
 
+#[cfg(feature = "io")]
 impl PlaybackSink for FrameSink {
     fn write_frame(&mut self, frame: &Frame) -> bool {
         FrameSink::write_frame(self, frame)

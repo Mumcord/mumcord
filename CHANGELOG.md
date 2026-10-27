@@ -5,6 +5,7 @@
 ### Added
 
 - The Mumble protocol library `mumcord-protocol` and the voice audio library `mumcord-audio` are now published on crates.io with every release, so other projects such as the bot can depend on them by version
+- `mumcord-audio` has a new `io` feature (on by default) for audio device I/O; without it the crate has no cpal or ALSA dependency, so headless bots can build it for static musl targets
 
 ### Changed
 

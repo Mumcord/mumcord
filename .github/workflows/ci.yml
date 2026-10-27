@@ -158,6 +158,18 @@ jobs:
       - name: Rust tests
         run: cargo test --workspace --locked
 
+      # The headless bot builds mumcord-audio without device I/O (no cpal/ALSA) for static musl
+      # binaries, so the codec-only build must keep compiling, lint-clean and free of cpal/alsa.
+      - name: Audio crate without device I/O
+        if: runner.os == 'Linux'
+        run: |
+          cargo clippy -p mumcord-audio --no-default-features --all-targets --locked -- -D warnings
+          cargo test -p mumcord-audio --no-default-features --locked
+          if cargo tree -p mumcord-audio --no-default-features -e normal --locked | grep -iE 'cpal|alsa'; then
+            echo "mumcord-audio without the io feature must not depend on cpal or alsa" >&2
+            exit 1
+          fi
+
       # The UI checks are platform-independent (vitest runs in jsdom), so they run on Linux only.
       # They stay in this job because its name is a required check for main.
       - name: UI lint

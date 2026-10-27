@@ -14,7 +14,7 @@
 //! - Settings, push-to-talk key state and the level meter live in a shared
 //!   [`DspControls`] (atomics only), so UI and hotkey threads never touch
 //!   the chain itself.
-//! - [`MicTest`] is the first-start wizard's "test playback" (FR-1.4).
+//! - `MicTest` (feature `io`) is the first-start wizard's "test playback" (FR-1.4).
 //!
 //! # Real-time behaviour
 //!
@@ -28,6 +28,7 @@ mod controls;
 mod echo_ref;
 mod gate;
 mod leveler;
+#[cfg(feature = "io")]
 mod mic_test;
 #[cfg(test)]
 mod tests;
@@ -44,6 +45,7 @@ pub use controls::{
     DspControls, Level, THRESHOLD_DEFAULT_DBFS, THRESHOLD_MAX_DBFS, THRESHOLD_MIN_DBFS, TalkMode,
 };
 pub use echo_ref::{EchoRefConsumer, EchoRefProducer, echo_reference};
+#[cfg(feature = "io")]
 pub use mic_test::{MicTest, MicTestPhase};
 
 use gate::{PttGate, ThresholdGate, VoiceDetector};

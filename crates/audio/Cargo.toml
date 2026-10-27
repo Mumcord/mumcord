@@ -14,19 +14,24 @@ rust-version.workspace = true
 license.workspace = true
 
 [dependencies]
-cpal.workspace = true
+cpal = { workspace = true, optional = true }
 opus.workspace = true
 nnnoiseless.workspace = true
 sonora.workspace = true
 rtrb.workspace = true
-rubato.workspace = true
+rubato = { workspace = true, optional = true }
 thiserror.workspace = true
 tracing.workspace = true
 hound = { workspace = true, optional = true }
 
 [features]
+default = ["io"]
+# Audio device I/O (capture, playback, device listing, stream controller) via cpal. Turn it off
+# (`default-features = false`) for headless users that only need the codec, jitter buffer and mixer;
+# that build has no cpal/ALSA dependency and builds for static musl targets.
+io = ["dep:cpal", "dep:rubato"]
 # Env-selected null/WAV-file audio backend for headless tests and E2E; never in release builds.
-test-backend = ["dep:hound"]
+test-backend = ["io", "dep:hound"]
 
 [dev-dependencies]
 hound.workspace = true
