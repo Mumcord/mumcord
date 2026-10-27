@@ -81,6 +81,7 @@ The bot has no special rights on the Mumble server. It is one client, so the ser
 - **FR-3.19** On startup the bot warns when it listens on a non-loopback address over plain HTTP (Q2.8, Q4.6).
 - **FR-3.20** Log per request: timestamp, key name, channel id, status code. Never the key value, never the message text (Q3.7, project rule).
 - **FR-3.21** The config file with keys is git-ignored; the repository only contains an example with a placeholder (Q2.4, Q4.8).
+- **FR-3.22** Channel passwords belong to the channel, not to a key (Addendum, 2026-10-27). A separate `[[token]]` list holds `channel` (name or ID, same rules as the key entries) and `password`. The bot presents these passwords to the server at login like a normal client (Spec 01 / FR-2.78), so a channel that only the token group may enter becomes usable for it. Without the configured password the bot stays outside that channel and nothing is written there. Passwords are secrets: git-ignored config, never logged, hidden in `Debug`.
 
 ## 5. UI & UX
 
@@ -194,6 +195,7 @@ Test setup for all criteria: local test server (`testenv/`, unmodified murmur), 
 - **AC-3.6** Startup with `listen = 0.0.0.0:8080` prints the plain-HTTP warning; default startup is bound to `127.0.0.1` only.
 - **AC-3.7** Ten parallel requests → all answered with the correct code, no message lost, no message sent twice, log shows ten entries with key label, channel and status only (no key value, no message text).
 - **AC-3.8** Integration test covers AC-3.1 to AC-3.7 against the local test server, no server-side change and no protocol extension.
+- **AC-3.9** Live test against the local test server: on a channel that only the token group may enter, the bot with `[[token]]` joins it and a posted message reaches the chat; a bot without the configured password stays outside.
 
 ## 12. Decision log
 

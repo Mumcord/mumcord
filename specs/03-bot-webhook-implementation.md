@@ -68,3 +68,33 @@ The webhook bot runs as a headless Mumble client: an HTTP request with an API ke
 - Secrets: only in the git-ignored config file; `ApiKey`'s `Debug` prints `<hidden>` so a key cannot appear in a log.
 - Tested: Linux, toolchain stable 1.99.1, `cargo test -p mumcord-bot` (29 unit + 1 wire test), `cargo clippy -p mumcord-bot --all-targets` clean, live test against `testenv/v15` (standard mumble-server 1.5.735). `rustfmt` is not installed for this toolchain, so formatting was checked by hand against `rustfmt.toml` (max width 100).
 - New dependency for `mumcord-bot`: `toml` (config file).
+
+## Run 2 – 2026-10-27 (review pass, task B6)
+
+Two requirements were not fully implemented in run 1; both are closed and tested.
+
+- **FR-3.6 – server-reported message cap.** The bot used the fixed 5000 characters. It now uses the smaller of 5000 and the `maxMessageLength` the server reports, so a server with a lower limit is respected. Test: `the_server_reported_cap_wins_when_it_is_smaller` (a server with 1000 refuses the 1001st character, accepts 1000). A standard murmur reports 10000, so behaviour on the local test server stays 5000.
+- **FR-3.20 – request log.** The log only carried peer, path and status. It now logs timestamp, peer, path, key **label**, channel id and status — still never the key value and never the message text. Observed in the running program:
+  `request peer=127.0.0.1:54528 path=/message key="test" channel=1 status=200`
+  Requests without a key or without a channel show `-`, because `0` is a real channel (Root).
+- `docs/bot-webhook.md` status-code table now mentions the server-reported cap.
+
+Checks: build, 31 unit tests, wire test, live test against `testenv/v15` (standard mumble-server 1.5) and `cargo clippy -p mumcord-bot --all-targets` all pass. Formatting checked by hand (`rustfmt` is not installed for this toolchain).
+
+## Run 3 – 2026-10-27 (Addendum: channel passwords, task B7)
+
+The product owner asked what happens when a channel has a password. The MVP config only carried the
+server connect password, so a protected channel stayed closed for the bot. Decision: passwords
+belong to the channel, not to a key, so the config gets a separate `[[token]]` list
+(`channel` + `password`) that is presented to the server at login through the normal
+access-token mechanism (FR-2.78). Recorded as FR-3.22 and AC-3.9.
+
+- `crates/bot/src/webhook/config.rs`: `ChannelToken`, `WebhookConfig.tokens`, passwords hidden in `Debug`.
+- `crates/bot/src/bot.rs`: `BotConfig.tokens`, used at login and on reconnect.
+- `docs/bot-webhook.md` + `crates/bot/examples/bot.example.toml`: the new section and the commented example.
+- Tests: unit test for the config parsing and the hidden password (32 unit tests), live test
+  `crates/bot/tests/webhook_tokens.rs` against `testenv/v15`: SuperUser bot creates a channel that
+  only the token group `#s3cret-token` may enter; the webhook bot with `[[token]]` joins it and the
+  posted message reaches the chat; a bot without the password stays outside and the join is refused.
+
+Checks: build, 32 unit tests, wire test, live tests (`webhook_live`, `webhook_tokens`), clippy clean.

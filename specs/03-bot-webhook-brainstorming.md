@@ -418,3 +418,16 @@ The alternative would be the whole channel tree, which is friendlier for a human
 **Q4.4 (body size):** confirmed with a cap. The cap is the message cap itself (5000 characters), so a body larger than that is refused with `413`. Because 5000 characters can encode to more than 5000 bytes, the practical byte limit is 20 KB.
 
 ---
+
+
+## Round 6 – Addendum, 2026-10-27: channel passwords
+
+Question: what happens when a channel is password protected?
+
+- The MVP config only had the server connect password, so a protected channel stayed closed for the bot.
+- Decision (product owner): passwords belong to the channel, not to a key → separate `[[token]]` list with `channel` + `password`.
+- Behaviour: the bot presents the passwords at login like any normal client (FR-2.78 mechanism, already implemented in the engine). With the password the channel becomes usable; without it the bot stays outside and nothing is written there.
+- Passwords are secrets: git-ignored config, never logged, hidden in `Debug`.
+- No server-side change: this is the standard Mumble access-token mechanism.
+
+Recorded as FR-3.22 and AC-3.9.

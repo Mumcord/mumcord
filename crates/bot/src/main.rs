@@ -212,6 +212,7 @@ async fn main() -> Result<()> {
         data_dir: None,
         superuser: cli.superuser,
         password: None,
+        tokens: Vec::new(),
         timeout: Duration::from_secs(cli.timeout),
     })
     .await?;

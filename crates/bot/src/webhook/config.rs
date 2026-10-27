@@ -16,6 +16,7 @@ use crate::webhook::{DELIVERY_TIMEOUT, RATE_LIMIT_PER_MINUTE};
 pub const DEFAULT_LISTEN: &str = "127.0.0.1:8080";
 
 #[derive(Debug, Clone, PartialEq, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct WebhookConfig {
     #[serde(default)]
     pub server: ServerConfig,
@@ -23,9 +24,32 @@ pub struct WebhookConfig {
     pub http: HttpConfig,
     #[serde(default)]
     pub keys: Vec<ApiKey>,
+    /// Channel passwords, presented to the server at login (FR-2.78, spec 03 addendum).
+    /// `[[token]]` is accepted as the nicer spelling; a field that is not part of the config is
+    /// an error, so a typo is reported instead of silently ignored.
+    #[serde(default, alias = "token")]
+    pub tokens: Vec<ChannelToken>,
+}
+
+#[derive(Clone, PartialEq, Eq, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct ChannelToken {
+    pub channel: ChannelRef,
+    pub password: String,
+}
+
+/// One channel password. `channel` may be a name or an ID like in the key entries.
+impl std::fmt::Debug for ChannelToken {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("ChannelToken")
+            .field("channel", &self.channel)
+            .field("password", &"<hidden>")
+            .finish()
+    }
 }
 
 #[derive(Debug, Clone, PartialEq, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct ServerConfig {
     #[serde(default = "default_host")]
     pub host: String,
@@ -52,6 +76,7 @@ pub struct ServerConfig {
 }
 
 #[derive(Debug, Clone, PartialEq, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct HttpConfig {
     #[serde(default = "default_listen")]
     pub listen: String,
@@ -63,6 +88,7 @@ pub struct HttpConfig {
 
 /// One API key and the channels it may write to (Q2.3).
 #[derive(Clone, PartialEq, Eq, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct ApiKey {
     pub key: String,
     /// Name used in logs; the key value itself is never logged.
@@ -149,6 +175,7 @@ impl WebhookConfig {
             .password
             .clone()
             .or_else(|| crate::env::testenv_var("SERVER_PASSWORD"));
+        bot.tokens = self.tokens.iter().map(|token| token.password.clone()).collect();
         bot
     }
 
@@ -294,6 +321,62 @@ channels = ["Lobby", 42]
         assert!(config.find_key("a-long-random-key-1234567890").is_some());
         assert!(config.find_key("a-long-random-key-1234567891").is_none());
         assert!(!format!("{:?}", config.keys[0]).contains("1234567890"));
+    }
+
+    #[test]
+    fn the_shipped_example_parses() {
+        let path = concat!(env!("CARGO_MANIFEST_DIR"), "/examples/bot.example.toml");
+        let config: WebhookConfig =
+            toml::from_str(&std::fs::read_to_string(path).expect("example file")).expect("example config");
+        assert_eq!(config.keys.len(), 1);
+        assert!(config.tokens.is_empty(), "passwords stay commented in the example");
+        assert!(config.listens_locally(), "the example binds to loopback");
+    }
+
+    #[test]
+    fn the_simpler_token_spelling_works_and_typos_are_reported() {
+        let good: WebhookConfig = toml::from_str(
+            r#"
+[[token]]
+channel = "Secret"
+password = "hunter2"
+"#
+        )
+        .expect("config");
+        assert_eq!(good.tokens.len(), 1);
+        let typo = toml::from_str::<WebhookConfig>(
+            r#"
+[[token]]
+channel = "Secret"
+passwort = "hunter2"
+"#
+        );
+        assert!(typo.is_err(), "a wrong field name is not silently ignored");
+    }
+
+    #[test]
+    fn channel_passwords_become_login_tokens_and_stay_hidden() {
+        let text = r#"
+[[keys]]
+key = "test-key-1"
+label = "ci"
+channels = ["Lobby"]
+
+[[tokens]]
+channel = "Secret"
+password = "hunter2"
+
+[[tokens]]
+channel = 7
+password = "other"
+"#;
+        let config: WebhookConfig = toml::from_str(text).expect("toml");
+        assert_eq!(
+            config.bot_config().tokens,
+            vec!["hunter2".to_owned(), "other".to_owned()]
+        );
+        let shown = format!("{:?}", config.tokens[0]);
+        assert!(!shown.contains("hunter2"), "secrets stay out of the log: {shown}");
     }
 
     #[test]

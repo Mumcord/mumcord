@@ -15,3 +15,8 @@ delivery_timeout_secs = 3
 key = "REPLACE-WITH-A-LONG-RANDOM-KEY"
 label = "example"
 channels = ["Lobby"]
+
+# One block per channel password. The bot presents it at login.
+# [[token]]
+# channel = "Secret"
+# password = "hunter2"
