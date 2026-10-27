@@ -65,7 +65,7 @@ jobs:
     # The Azure federated credential trusts only jobs in the "release" environment (OIDC).
     environment: ${{ (inputs.release && matrix.name == 'windows') && 'release' || '' }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Install Linux system libraries
         if: runner.os == 'Linux'
@@ -305,7 +305,7 @@ jobs:
           EOF
           ls -l out
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: mumcord-${{ matrix.name }}-${{ inputs.release && 'release' || 'unsigned-test-build' }}
           path: out/
@@ -329,7 +329,7 @@ jobs:
       run:
         shell: bash
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - uses: actions/download-artifact@v8
         with:

@@ -27,7 +27,7 @@ jobs:
     outputs:
       code: ${{ steps.filter.outputs.code }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           sparse-checkout: scripts/ci
       - id: filter
@@ -46,7 +46,7 @@ jobs:
         os: [ubuntu-24.04, windows-latest, macos-latest]
     runs-on: ${{ matrix.os }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       # The runner's Ubuntu mirror is often very slow (30 kB/s: 40 min for 70 MB), so the downloaded
       # packages are cached per runner image; apt then only downloads what changed. The cache is
