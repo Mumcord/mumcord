@@ -74,17 +74,17 @@ chat permission for that channel. A standard Mumble server does not acknowledge 
 
 Status codes:
 
-| Code | Meaning |
-|---|---|
-| `200` | written to the server |
-| `401` | key missing or unknown (checked before the body is read) |
-| `403` | channel not allowed for this key |
-| `404` | channel does not exist |
+| Code  | Meaning                                                                                                 |
+| ----- | ------------------------------------------------------------------------------------------------------- |
+| `200` | written to the server                                                                                   |
+| `401` | key missing or unknown (checked before the body is read)                                                |
+| `403` | channel not allowed for this key                                                                        |
+| `404` | channel does not exist                                                                                  |
 | `400` | bad JSON, empty message, or message over 5000 characters (or over the smaller limit the server reports) |
-| `413` | request body over 20 KB |
-| `405` | wrong HTTP method |
-| `429` | rate limit reached (20 requests per minute per key) |
-| `503` | bot not connected, or the server refused the message |
+| `413` | request body over 20 KB                                                                                 |
+| `405` | wrong HTTP method                                                                                       |
+| `429` | rate limit reached (20 requests per minute per key)                                                     |
+| `503` | bot not connected, or the server refused the message                                                    |
 
 Error bodies carry a short reason only, never a channel list.
 
