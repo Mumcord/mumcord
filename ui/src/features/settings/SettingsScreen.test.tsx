@@ -1086,11 +1086,11 @@ describe("About section", () => {
     expect(openInBrowser).toHaveBeenLastCalledWith("https://mumcord.app/en/changelog#v0.0.0-mock");
     fireEvent.click(screen.getByRole("button", { name: "Report a bug" }));
     expect(openInBrowser).toHaveBeenLastCalledWith(
-      "https://github.com/ToBee94/mumcord/issues/new?template=bug_report.yml",
+      "https://github.com/Mumcord/mumcord/issues/new?template=bug_report.yml",
     );
     fireEvent.click(screen.getByRole("button", { name: "Request a feature" }));
     expect(openInBrowser).toHaveBeenLastCalledWith(
-      "https://github.com/ToBee94/mumcord/issues/new?template=feature_request.yml",
+      "https://github.com/Mumcord/mumcord/issues/new?template=feature_request.yml",
     );
   });
 

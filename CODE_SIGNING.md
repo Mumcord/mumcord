@@ -1,6 +1,6 @@
 # Code signing policy
 
-This policy applies to the Windows release builds of Mumcord published on the [GitHub Releases page](https://github.com/ToBee94/mumcord/releases). They are signed with [Azure Artifact Signing](https://learn.microsoft.com/azure/artifact-signing/) by Microsoft. The certificate is issued to the maintainer's company, whose legal name, verified by Microsoft, appears as the publisher. Until the signing setup is active, Windows releases are unsigned and their release notes say so.
+This policy applies to the Windows release builds of Mumcord published on the [GitHub Releases page](https://github.com/Mumcord/mumcord/releases). They are signed with [Azure Artifact Signing](https://learn.microsoft.com/azure/artifact-signing/) by Microsoft. The certificate is issued to the maintainer's company, whose legal name, verified by Microsoft, appears as the publisher. Until the signing setup is active, Windows releases are unsigned and their release notes say so.
 
 ## What is signed
 
@@ -44,4 +44,4 @@ Mumcord sends no telemetry. The network connections it makes and the data it sto
 
 ## Download
 
-Installers for Windows (`.exe`), macOS (`.dmg`, Apple Silicon and Intel) and Linux (`.AppImage`) are on the [Releases page](https://github.com/ToBee94/mumcord/releases), each with a `SHA256SUMS` file to check the download. Each release's notes say whether its Windows and macOS builds are signed; unsigned builds show a security warning on first start, and the notes explain how to open the app anyway.
+Installers for Windows (`.exe`), macOS (`.dmg`, Apple Silicon and Intel) and Linux (`.AppImage`) are on the [Releases page](https://github.com/Mumcord/mumcord/releases), each with a `SHA256SUMS` file to check the download. Each release's notes say whether its Windows and macOS builds are signed; unsigned builds show a security warning on first start, and the notes explain how to open the app anyway.

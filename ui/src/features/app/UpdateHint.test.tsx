@@ -46,12 +46,12 @@ describe("UpdateHint", () => {
   it("shows the version, links to the release and can be dismissed", async () => {
     const { api, emit } = fakeApi();
     render(<UpdateHint api={api} />);
-    emit({ version: "0.5.0", url: "https://github.com/ToBee94/mumcord/releases/tag/v0.5.0" });
+    emit({ version: "0.5.0", url: "https://github.com/Mumcord/mumcord/releases/tag/v0.5.0" });
     const hint = await screen.findByRole("status");
     expect(hint).toHaveTextContent("Mumcord 0.5.0 is available.");
     expect(await axeViolations(hint)).toEqual([]);
     fireEvent.click(screen.getByRole("button", { name: "View release" }));
-    expect(open).toHaveBeenCalledWith("https://github.com/ToBee94/mumcord/releases/tag/v0.5.0");
+    expect(open).toHaveBeenCalledWith("https://github.com/Mumcord/mumcord/releases/tag/v0.5.0");
     fireEvent.click(screen.getByRole("button", { name: "Dismiss" }));
     expect(screen.queryByRole("status")).toBeNull();
   });

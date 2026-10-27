@@ -2,7 +2,7 @@ import { useTranslation } from "react-i18next";
 import { openInBrowser } from "../chat/openLink";
 import { StepFrame } from "./StepFrame";
 
-export const PRIVACY_URL = "https://github.com/ToBee94/mumcord/blob/main/PRIVACY.md";
+export const PRIVACY_URL = "https://github.com/Mumcord/mumcord/blob/main/PRIVACY.md";
 
 interface PrivacyStepProps {
   focusOnMount: boolean;

@@ -1,7 +1,7 @@
 #!/bin/sh
 # Installs Mumcord on Linux from the latest GitHub release:
 #
-#   curl -fsSL https://github.com/ToBee94/mumcord/releases/latest/download/install.sh | sh
+#   curl -fsSL https://github.com/Mumcord/mumcord/releases/latest/download/install.sh | sh
 #
 # Debian/Ubuntu get the .deb (apt), Fedora/RHEL and openSUSE the .rpm (dnf/zypper), Arch the
 # AUR package when an AUR helper is installed and the AUR has it; everything else gets the
@@ -20,7 +20,7 @@
 
 set -eu
 
-RELEASE_URL=${MUMCORD_RELEASE_URL:-https://github.com/ToBee94/mumcord/releases/latest/download}
+RELEASE_URL=${MUMCORD_RELEASE_URL:-https://github.com/Mumcord/mumcord/releases/latest/download}
 APP_ID=app.mumcord.client
 BIN_DIR=$HOME/.local/bin
 DATA_HOME=${XDG_DATA_HOME:-$HOME/.local/share}
@@ -163,7 +163,7 @@ file_size() {
 have() { command -v "$1" >/dev/null 2>&1; }
 
 usage() {
-    sed -n '2,19s/^# \{0,1\}//p' "$0" 2>/dev/null || say "See https://github.com/ToBee94/mumcord#download"
+    sed -n '2,19s/^# \{0,1\}//p' "$0" 2>/dev/null || say "See https://github.com/Mumcord/mumcord#download"
 }
 
 uninstall=false

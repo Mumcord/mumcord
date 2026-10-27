@@ -14,8 +14,8 @@ use tauri_specta::Event;
 
 use crate::commands::updates::{UpdateAvailable, UpdateInfo};
 
-const LATEST_RELEASE_URL: &str = "https://api.github.com/repos/ToBee94/mumcord/releases/latest";
-const RELEASE_PAGE: &str = "https://github.com/ToBee94/mumcord/releases/tag/";
+const LATEST_RELEASE_URL: &str = "https://api.github.com/repos/Mumcord/mumcord/releases/latest";
+const RELEASE_PAGE: &str = "https://github.com/Mumcord/mumcord/releases/tag/";
 /// Tests and E2E point the check at a local server; the app never reads another address.
 const URL_OVERRIDE_ENV: &str = "MUMCORD_UPDATE_URL";
 const DAY_MS: i64 = 24 * 60 * 60 * 1000;
@@ -184,7 +184,7 @@ mod tests {
         assert_eq!(info.version, "0.4.1");
         assert_eq!(
             info.url,
-            "https://github.com/ToBee94/mumcord/releases/tag/v0.4.1"
+            "https://github.com/Mumcord/mumcord/releases/tag/v0.4.1"
         );
     }
 
