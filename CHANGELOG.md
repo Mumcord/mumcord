@@ -1,12 +1,18 @@
 # Changelog
 
-## [0.4.2] - Unreleased
+## [0.4.2] - 2026-10-27
 
-### Fixes
+### Fixed
 
 - Fixed YouTube videos in watch parties showing "This video can't be played in your browser" in the Linux AppImage: the AppImage now ships the Opus audio parser YouTube playback needs
 - People who join a voice channel while someone is sharing their screen or a watch party is running now see it more reliably: the announcement is sent a second time in case the server dropped the first
 - Fixed a flood of keychain prompts on macOS after updating: a denied or failed keychain read is no longer repeated for every server list refresh, notification or reconnect, and the identity is read only once per session
+
+### Internal
+
+- Dependabot now checks dependencies and GitHub Actions weekly, with grouped and blocked major updates
+- Updated the `rtrb` and `x11rb` libraries and the GitHub Actions used by CI and releases
+- CI switches to another Ubuntu package mirror when apt stalls
 
 ## [0.4.1] - 2026-10-26
 
@@ -204,6 +210,7 @@ _**License change:** Mumcord is licensed under the GNU AGPL-3.0 only from this v
 
 _First release._
 
+[0.4.2]: https://github.com/ToBee94/mumcord/releases/tag/v0.4.2
 [0.4.1]: https://github.com/ToBee94/mumcord/releases/tag/v0.4.1
 [0.4.0]: https://github.com/ToBee94/mumcord/releases/tag/v0.4.0
 [0.3.1]: https://github.com/ToBee94/mumcord/releases/tag/v0.3.1
