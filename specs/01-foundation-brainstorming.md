@@ -61,7 +61,7 @@ The official client works well but looks and feels dated and is hard to set up f
 - [x] Connected to several servers at the same time. Later.
 - [x] Rich chat (images, link previews, reactions) – parts need server support. Later.
 
-✍️ Note: Design like Discord. I want to see text channels without having to join them.
+✍️ Note: Design as a chat-first app. I want to see text channels without having to join them.
 
 #### Q1.3 How does it relate to the official client? `◉`
 
@@ -123,7 +123,7 @@ This is the most important technical decision; details follow in round 4. In sho
 | A | Rust | Web technology in a lightweight app shell (Tauri) | Very easy | Yes | Low–medium |
 | B | C++ | Qt (same as the official client) | Medium | Hard | Low, but dated feel |
 | C | Rust | Native Rust UI toolkit | Medium | Partly | Medium (young toolkits) |
-| D | Node/TypeScript | Electron (like Discord) | Very easy | No | High memory use, audio harder |
+| D | Node/TypeScript | Electron | Very easy | No | High memory use, audio harder |
 
 - [x] ⭐ **A – Rust engine + web-based UI in Tauri.** Rust is fast and safe (fewer crashes and security holes) for audio and networking; the UI uses the same technology as modern websites, so it's quick to build and easy to make beautiful. Much lighter than Electron, and Tauri can later target Android/iOS.
 - [ ] B – C++ with Qt. Proven, close to the official client, but harder to make feel modern and slower to develop.
@@ -177,10 +177,10 @@ This only sketches the order of later epics; each one gets its own brainstorming
 
 ✍️ Note:
 
-#### Q1.12 How are Discord-like text channels (readable without joining) handled? `◉`
+#### Q1.12 How are always-readable text channels (readable without joining) handled? `◉`
 Standard Mumble servers only deliver channel messages to people inside that channel and store no chat history. Reading without joining therefore needs a "Mumcord companion" service installed next to the Mumble server.
 
-- [ ] ⭐ **Discord-like design now, companion later.** On plain servers: own channel and private messages only.
+- [ ] ⭐ **Chat-first design now, companion later.** On plain servers: own channel and private messages only.
 - [x] Companion service in the first version. Read-without-joining and history on servers that run it.
 - [ ] Plain Mumble behaviour only, never a companion.
 
@@ -200,11 +200,11 @@ This overrides Q1.12.
 
 ---
 
-#### Q1.14 Without a companion, how do Discord-like text channels work? `◉`
+#### Q1.14 Without a companion, how do always-readable text channels work? `◉`
 Standard Mumble servers deliver channel messages only to users inside that channel and keep no chat history.
 
-- [x] ⭐ **Best possible as a pure client.** Discord-like layout. Every received message is stored locally, so users can scroll back through what they have seen. If Mumble's "listen to channel" feature (hearing a channel without joining it) also delivers text messages, use it to read channels without joining; otherwise users join a channel to read it live. Whether listening delivers text is checked in round 3.
-- [ ] Join to read, Discord look, local history.
+- [x] ⭐ **Best possible as a pure client.** Chat-first layout. Every received message is stored locally, so users can scroll back through what they have seen. If Mumble's "listen to channel" feature (hearing a channel without joining it) also delivers text messages, use it to read channels without joining; otherwise users join a channel to read it live. Whether listening delivers text is checked in round 3.
+- [ ] Join to read, local history.
 - [ ] Plain Mumble text behaviour, no local history.
 
 ✍️ Note:
@@ -252,7 +252,7 @@ Positional audio and the overlay each need operating-system-specific code.
 └────┴────────────┴──────────────────┴──────────┘
 ```
 
-- [x] ⭐ **Discord-style, 4 columns:** server bar with saved servers (one connected at a time), channel list, chat, member list.
+- [x] ⭐ **4 columns:** server bar with saved servers (one connected at a time), channel list, chat, member list.
 - [ ] 3 columns, servers chosen from a start screen.
 - [ ] Compact Mumble-like tree with chat on the right.
 
@@ -261,7 +261,7 @@ Positional audio and the overlay each need operating-system-specific code.
 #### Q2.4 Mumble channels are voice and text at once – how are they shown? `◉`
 
 - [x] ⭐ **One entry per channel.** Single-click shows the channel's chat (live via "listen" if possible, otherwise saved history); double-click or "Join" enters voice.
-- [ ] Each channel shown twice (# text and 🔊 voice), Discord-style.
+- [ ] Each channel shown twice (# text and 🔊 voice).
 - [ ] Clicking always joins; chat shows the current channel only.
 
 ✍️ Note:
@@ -648,12 +648,12 @@ Keyboard push-to-talk on Wayland stays on the desktop portal (Q4.11); the portal
 
 ---
 
-#### QA.5 Push-to-talk on KDE Wayland: compatibility mode like TeamSpeak? `◉`
-TeamSpeak 3 runs through KDE's X11 compatibility layer (XWayland). KDE's "Legacy X11 App Support" setting (default: key combinations with Ctrl/Alt/Meta and modifier keys; mouse buttons off) lets such apps see global input without a dialog or the `input` group. Mumcord already has the X11 push-to-talk path for keys and mouse buttons.
+#### QA.5 Push-to-talk on KDE Wayland: compatibility mode via XWayland? `◉`
+Some voice clients run through KDE's X11 compatibility layer (XWayland). KDE's "Legacy X11 App Support" setting (default: key combinations with Ctrl/Alt/Meta and modifier keys; mouse buttons off) lets such apps see global input without a dialog or the `input` group. Mumcord already has the X11 push-to-talk path for keys and mouse buttons.
 
 - [ ] Compatibility mode by default on KDE Wayland; modern path as a setting.
 - [ ] Only fix the modern path (portal dialog for keys, evdev + `input` group for mouse buttons).
-- [x] **Both: Settings → Voice offers a "Compatibility mode (like TeamSpeak)" switch on Linux Wayland; the default stays the modern path.** In compatibility mode Mumcord runs through XWayland and uses its X11 push-to-talk for keys and mouse buttons, limited to what the desktop's legacy X11 setting allows; the switch explains that trade-off.
+- [x] **Both: Settings → Voice offers a "Compatibility mode (X11)" switch on Linux Wayland; the default stays the modern path.** In compatibility mode Mumcord runs through XWayland and uses its X11 push-to-talk for keys and mouse buttons, limited to what the desktop's legacy X11 setting allows; the switch explains that trade-off.
 
 ✍️ Note: Asked and answered in chat during /dev.
 
@@ -661,7 +661,7 @@ TeamSpeak 3 runs through KDE's X11 compatibility layer (XWayland). KDE's "Legacy
 
 #### QA.6 Talking indicator in the channel list: avatar with a green ring? `◉`
 
-- [x] **Each person row in the channel list shows the person's avatar (default avatar if none); while they talk, a green ring appears around it (Discord style).** Listener rows keep only the listener marker (no ring, no voice-state icons).
+- [x] **Each person row in the channel list shows the person's avatar (default avatar if none); while they talk, a green ring appears around it.** Listener rows keep only the listener marker (no ring, no voice-state icons).
 - [ ] Keep the current icon-only indicator.
 
 ✍️ Note: Requested in chat during /dev.
@@ -800,7 +800,7 @@ Desktop notifications were planned for Epic 3.
 
 #### QA.20 Avatars in the chat? `◉`
 
-- [x] **Discord-style message layout: the sender's avatar on the left of each message group, name and time on the first line, message text indented to start after the avatar. Consecutive messages from the same sender within a few minutes are grouped without repeating avatar and name, and stay indented the same way.**
+- [x] **Grouped message layout: the sender's avatar on the left of each message group, name and time on the first line, message text indented to start after the avatar. Consecutive messages from the same sender within a few minutes are grouped without repeating avatar and name, and stay indented the same way.**
 - [ ] Keep the current layout.
 
 ✍️ Note: Requested in chat during /dev.
@@ -1036,13 +1036,13 @@ An API key shipped inside the app can be extracted by anyone; abuse would use up
 ---
 
 #### QA.44 Share which game the user is playing (stage 1c)? `◉`
-Requested by the user; how Discord does it was explained: Discord recognises games by matching running programs against its own game database, and "Join" only works for games that integrate Discord's SDK (Rich Presence) and hand over a join secret.
+Requested by the user; how other chat apps do it was explained: they recognise games by matching running programs against its own game database, and "Join" only works for games that integrate a rich-presence SDK and hand over a join secret.
 
 - [x] **"Now gaming" status, opt-in (default off), stage 1c.** Detection: (1) Mumble Link – games with positional audio report their name and context; (2) running programs matched against a small bundled list of known games plus Steam games detected from the running Steam client (app id). Shared like "Now playing" (plugin data to Mumcord users, short "🎮 Game" line in the comment for official clients): a game-controller icon next to the person, game name + game icon (Steam app icon via the backend image proxy when an app id is known, otherwise a generic icon) and "playing for 1 h 20 min" in the profile/preview, and in the own user panel's status line.
-- [x] **"Join game", best effort:** offered only when another Mumcord user plays the same game and the game exposes a join target – a Steam game with a server address from the Mumble Link context (steam://connect/…) or a Steam lobby link. Otherwise no join button. A full Discord-style join needs the game's cooperation and is out of scope.
+- [x] **"Join game", best effort:** offered only when another Mumcord user plays the same game and the game exposes a join target – a Steam game with a server address from the Mumble Link context (steam://connect/…) or a Steam lobby link. Otherwise no join button. A full full one-click join needs the game's cooperation and is out of scope.
 - [ ] Not needed.
 
-✍️ Note: Requested in chat during /dev ("eventuell auch so ein join game, weiß nicht wie das discord implementiert hat").
+✍️ Note: Requested in chat during /dev ("eventuell auch so ein join game, weiß nicht wie man das löst").
 
 ---
 
@@ -1134,12 +1134,12 @@ Findings (not legal advice): GIPHY requires a visible "Powered by GIPHY" mark wh
 ---
 
 #### QA.54 Real in-game overlay (stage 1c)? `◉`
-Research: Discord and Overwolf inject code into the game and draw into its frames (works in exclusive fullscreen, but anti-cheat systems may flag it; Discord has no overlay on Linux/macOS). On Linux, MangoHud uses a Vulkan layer (plus an OpenGL preload) that games load themselves.
+Research: some overlay tools inject code into the game and draw into its frames (works in exclusive fullscreen, but anti-cheat systems may flag it; some have no overlay on Linux/macOS). On Linux, MangoHud uses a Vulkan layer (plus an OpenGL preload) that games load themselves.
 
-- [x] **In-game overlay drawn inside the game: Linux via a Vulkan layer (MangoHud-style, with an OpenGL fallback via preload), Windows via a hook into the game's graphics API (Discord-style). It appears only in games – never on the desktop – and is configurable per game (on/off, position, size, opacity, content); games without an entry follow a default (off). A clear anti-cheat warning is shown before enabling it for a game.** The transparent on-top window (B32) remains the fallback where the in-game overlay is off or unsupported (macOS, unsupported graphics APIs).
+- [x] **In-game overlay drawn inside the game: Linux via a Vulkan layer (MangoHud-style, with an OpenGL fallback via preload), Windows via a hook into the game's graphics API (a common approach). It appears only in games – never on the desktop – and is configurable per game (on/off, position, size, opacity, content); games without an entry follow a default (off). A clear anti-cheat warning is shown before enabling it for a game.** The transparent on-top window (B32) remains the fallback where the in-game overlay is off or unsupported (macOS, unsupported graphics APIs).
 - [ ] Window overlay only.
 
-✍️ Note: Requested in chat during /dev ("auf linux wie mit mangohud, windows wie bei discord, aber pro spiel konfigurierbar und das soll auch nur in spielen passieren").
+✍️ Note: Requested in chat during /dev ("auf linux wie mit mangohud, windows mit hook im spiel, aber pro spiel konfigurierbar und das soll auch nur in spielen passieren").
 
 ---
 

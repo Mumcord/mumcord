@@ -82,4 +82,4 @@ An official Mumble client (1.5) in the same channel as Mumcord.
 ## 9. Epic 1 leftovers
 
 - [ ] **Stage 1a gate (G1):** the Linux/KDE, Windows and macOS parts of the [Epic 1 manual checklist](../specs/01-foundation-implementation.md#manual-checklist-for-the-stage-1a-gate-user), if not done yet.
-- [ ] **Wayland push-to-talk compatibility mode (AC-1.38):** on KDE Wayland, switch on _Settings → Voice → "Compatibility mode (like TeamSpeak)"_ and restart. A key combination works as push-to-talk while another app is focused; switching it off and restarting returns to the modern path.
+- [ ] **Wayland push-to-talk compatibility mode (AC-1.38):** on KDE Wayland, switch on _Settings → Voice → "Compatibility mode (X11)"_ and restart. A key combination works as push-to-talk while another app is focused; switching it off and restarting returns to the modern path.
