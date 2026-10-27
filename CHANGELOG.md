@@ -2,6 +2,10 @@
 
 ## [0.4.3] - Unreleased
 
+### Added
+
+- The Mumble protocol library `mumcord-protocol` is now published on crates.io with every release, so other projects such as the bot can depend on it by version
+
 ### Changed
 
 - The Linux install script no longer tells you to install gst-libav (H.264 video support) when it is already installed; when it is missing it asks whether to install it right away

@@ -42,3 +42,8 @@ pub mod proto {
 pub mod udp_proto {
     include!(concat!(env!("OUT_DIR"), "/mumble_udp.rs"));
 }
+
+// Compiles the README example as a doctest so it cannot rot.
+#[cfg(doctest)]
+#[doc = include_str!("../README.md")]
+struct ReadmeDoctests;
