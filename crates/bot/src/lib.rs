@@ -11,6 +11,7 @@ pub mod checks;
 pub mod env;
 pub mod samples;
 pub mod voice;
+pub mod webhook;
 
 pub use bot::{Bot, BotConfig, DEFAULT_TIMEOUT, Moderation};
 pub use checks::{MessageCheck, UserCheck};
