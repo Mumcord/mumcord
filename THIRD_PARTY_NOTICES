@@ -63,7 +63,7 @@ RUST DEPENDENCIES
 Mumcord links the following Rust crates. Each crate is listed with the
 license(s) it is distributed under, followed by the license text(s).
 
-* MIT License (576 crates)
+* MIT License (578 crates)
 * BSD 3-Clause "New" or "Revised" License (28 crates)
 * ISC License (20 crates)
 * Unicode License v3 (19 crates)
@@ -80,18 +80,18 @@ GNU Affero General Public License v3.0 only
 --------------------------------------------------------------------------------
 
 Used by:
-  - mumcord-audio 0.4.0
-  - mumcord-bot 0.4.0
-  - mumcord-engine 0.4.0
-  - mumcord-overlay-ipc 0.4.0
-  - mumcord-overlay-layer 0.4.0
-  - mumcord-p2p 0.4.0
-  - mumcord-positional 0.4.0
-  - mumcord-protocol 0.4.0
-  - mumcord-screenshare 0.4.0
-  - mumcord-store 0.4.0
-  - mumcord 0.4.0
-  - netsim 0.4.0
+  - mumcord-audio 0.4.2 (https://github.com/Mumcord/mumcord)
+  - mumcord-codec 0.4.2 (https://github.com/Mumcord/mumcord)
+  - mumcord-engine 0.4.2
+  - mumcord-overlay-ipc 0.4.2
+  - mumcord-overlay-layer 0.4.2
+  - mumcord-p2p 0.4.2
+  - mumcord-positional 0.4.2
+  - mumcord-protocol 0.4.2 (https://github.com/Mumcord/mumcord)
+  - mumcord-screenshare 0.4.2
+  - mumcord-store 0.4.2
+  - mumcord 0.4.2
+  - netsim 0.4.2
 
 GNU AFFERO GENERAL PUBLIC LICENSE
 Version 3, 19 November 2007
@@ -8494,7 +8494,9 @@ MIT License
 
 Used by:
   - x11rb-protocol 0.13.2 (https://github.com/psychon/x11rb)
+  - x11rb-protocol 0.14.0 (https://github.com/psychon/x11rb)
   - x11rb 0.13.2 (https://github.com/psychon/x11rb)
+  - x11rb 0.14.0 (https://github.com/psychon/x11rb)
 
 Copyright 2019 x11rb Contributers
 
@@ -10195,7 +10197,7 @@ Used by:
   - proc-macro-crate 3.5.0 (https://github.com/bkchr/proc-macro-crate)
   - proc-macro2 1.0.107 (https://github.com/dtolnay/proc-macro2)
   - quote 1.0.47 (https://github.com/dtolnay/quote)
-  - rtrb 0.3.5 (https://github.com/mgeier/rtrb)
+  - rtrb 0.4.1 (https://github.com/mgeier/rtrb)
   - rustix 1.1.5 (https://github.com/bytecodealliance/rustix)
   - rustversion 1.0.23 (https://github.com/dtolnay/rustversion)
   - semver 1.0.28 (https://github.com/dtolnay/semver)

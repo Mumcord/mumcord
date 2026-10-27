@@ -13,7 +13,7 @@ use std::path::{Path, PathBuf};
 use std::time::Duration;
 
 use image::{ImageFormat, Rgb, RgbImage};
-use mumcord_bot::env;
+use mumbot::env;
 use mumcord_engine::p2p::P2pConfig;
 use mumcord_engine::store::Consent;
 use mumcord_engine::{

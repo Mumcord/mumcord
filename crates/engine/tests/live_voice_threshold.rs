@@ -10,8 +10,8 @@ use std::f32::consts::PI;
 use std::path::{Path, PathBuf};
 use std::time::{Duration, Instant};
 
-use mumcord_bot::voice::{BotVoice, Clip};
-use mumcord_bot::{Bot, BotConfig, env};
+use mumbot::voice::{BotVoice, Clip};
+use mumbot::{Bot, BotConfig, env};
 use mumcord_engine::EventReceiver;
 use mumcord_engine::{EngineEvent, PasswordChange, SecretStore, ServerFields, Snapshot};
 use mumcord_store::VoiceActivation;

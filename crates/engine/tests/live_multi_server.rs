@@ -9,7 +9,7 @@ mod common;
 use std::path::Path;
 use std::time::Duration;
 
-use mumcord_bot::{Bot, BotConfig, UserCheck, env};
+use mumbot::{Bot, BotConfig, UserCheck, env};
 use mumcord_engine::{
     ConnState, Engine, EngineEvent, ErrorKind, EventReceiver, PasswordChange, SecretStore,
     ServerFields, ServerId, Snapshot,

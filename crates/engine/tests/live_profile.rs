@@ -7,7 +7,7 @@ mod common;
 
 use std::time::Duration;
 
-use mumcord_bot::{Bot, BotConfig, UserCheck, env};
+use mumbot::{Bot, BotConfig, UserCheck, env};
 use mumcord_engine::{
     Engine, EngineEvent, EventReceiver, PasswordChange, SecretStore, ServerFields,
 };

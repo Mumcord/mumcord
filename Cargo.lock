@@ -3368,6 +3368,26 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "1d87ecb2933e8aeadb3e3a02b828fed80a7528047e68b4f424523a0981a3a084"
 
 [[package]]
+name = "mumbot"
+version = "0.1.0"
+source = "git+https://github.com/Mumcord/mumbot?tag=v0.1.0#693a34b63500b203e1babd5e57ebfb23d35399be"
+dependencies = [
+ "anyhow",
+ "bytes",
+ "clap",
+ "hound",
+ "mumcord-codec",
+ "mumcord-protocol",
+ "rcgen",
+ "serde",
+ "serde_json",
+ "tokio",
+ "toml 1.1.8+spec-1.1.0",
+ "tracing",
+ "tracing-subscriber",
+]
+
+[[package]]
 name = "mumcord"
 version = "0.4.2"
 dependencies = [
@@ -3420,27 +3440,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "mumcord-bot"
-version = "0.4.2"
-dependencies = [
- "anyhow",
- "bytes",
- "clap",
- "hound",
- "mumcord-audio",
- "mumcord-protocol",
- "opus",
- "rcgen",
- "serde",
- "serde_json",
- "tempfile",
- "tokio",
- "toml 1.1.8+spec-1.1.0",
- "tracing",
- "tracing-subscriber",
-]
-
-[[package]]
 name = "mumcord-codec"
 version = "0.4.2"
 dependencies = [
@@ -3466,8 +3465,8 @@ dependencies = [
  "futures-util",
  "html5ever 0.40.1",
  "image",
+ "mumbot",
  "mumcord-audio",
- "mumcord-bot",
  "mumcord-p2p",
  "mumcord-positional",
  "mumcord-protocol",
