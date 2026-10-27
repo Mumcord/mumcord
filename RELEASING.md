@@ -81,9 +81,9 @@ Run `scripts/generate-notices.sh` after dependencies change. The "native librari
 
 ## Publishing the library crates (crates.io)
 
-The library crates `mumcord-protocol` (`crates/protocol`) and `mumcord-audio` (`crates/audio`) are published on crates.io with the app version. The **Release** workflow does it automatically in its last job, after the draft release exists; tags with a pre-release suffix (such as `-rc.1`) are skipped. Each crate is checked on its own: a version that is already on crates.io is skipped with a notice, since published versions can never be replaced.
+The library crates `mumcord-protocol` (`crates/protocol`), `mumcord-codec` (`crates/codec`) and `mumcord-audio` (`crates/audio`) are published on crates.io with the app version, in the order protocol, codec, audio (audio depends on codec; protocol is independent). The **Release** workflow does it automatically in its last job, after the draft release exists; tags with a pre-release suffix (such as `-rc.1`) are skipped. On a minor or major version bump also change the `version` of the `mumcord-codec` entry in the workspace `Cargo.toml` (it is the minor series, e.g. `0.4`), or publishing `mumcord-audio` fails. Each crate is checked on its own: a version that is already on crates.io is skipped with a notice, since published versions can never be replaced.
 
-To publish the current version of `main` without a new release, run the **Publish crates** workflow from the Actions tab on `main`. It needs the repository secret `CARGO_REGISTRY_TOKEN` (a crates.io API token). Check a package locally with `cargo publish -p <crate> --dry-run --locked`. Each crate must stay self-contained: only crates.io dependencies and no files outside its own directory (the `.proto` files live in `crates/protocol/proto`).
+To publish the current version of `main` without a new release, run the **Publish crates** workflow from the Actions tab on `main`. It needs the repository secret `CARGO_REGISTRY_TOKEN` (a crates.io API token). Check a package locally with `cargo publish -p <crate> --dry-run --locked` (for `mumcord-audio` this only works once the matching `mumcord-codec` is on crates.io). Each crate must stay self-contained: only crates.io dependencies and no files outside its own directory (the `.proto` files live in `crates/protocol/proto`).
 
 ## AUR package (Arch Linux)
 

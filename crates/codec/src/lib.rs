@@ -1,0 +1,34 @@
+//! Mumcord codec: everything of the voice audio layer that works without audio devices.
+//!
+//! This is the Opus codec, the jitter buffer, the mixer, bitrate control, spatial placement and
+//! the send-side processing chain. Device I/O lives in `mumcord-audio`, which re-exports all of
+//! this; headless users (bots) depend on this crate alone and need no cpal or ALSA.
+//!
+//! # Frame contract
+//!
+//! Everything exchanges audio as [`Frame`]s: 48 kHz, mono, `f32` samples in `[-1.0, 1.0]`,
+//! 10 ms (480 samples) per frame. Device sample rates and channel layouts are converted at the
+//! I/O edge, so processing code never sees anything else. The one exception is playback: the
+//! mixer renders a stereo pair of frames (left, right) so positional voices can be placed
+//! ([`spatial`]). Outgoing Opus packets carry 20 ms (two frames) by default, see [`codec`].
+
+pub mod bitrate;
+pub mod codec;
+pub mod dsp;
+pub mod jitter;
+pub mod mixer;
+pub mod spatial;
+
+/// Internal sample rate of all audio frames, in Hz.
+pub const SAMPLE_RATE: u32 = 48_000;
+
+/// Samples per internal frame (10 ms at [`SAMPLE_RATE`]).
+pub const FRAME_SAMPLES: usize = 480;
+
+/// One 10 ms block of 48 kHz mono audio.
+pub type Frame = [f32; FRAME_SAMPLES];
+
+// Compiles the README example as a doctest so it cannot rot.
+#[cfg(doctest)]
+#[doc = include_str!("../README.md")]
+struct ReadmeDoctests;

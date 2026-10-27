@@ -9,7 +9,6 @@ use std::time::{Duration, Instant};
 use super::share::{ShareGain, SharePort, ShareSlots, share_slots};
 use super::{Mixer, TalkEvent, VoicePacket};
 use crate::codec::CodecError;
-use crate::io::FrameSink;
 use crate::spatial::Listener;
 use crate::{FRAME_SAMPLES, Frame, SAMPLE_RATE};
 
@@ -27,7 +26,7 @@ const POLL_INTERVAL: Duration = Duration::from_millis(2);
 const MAX_FRAMES_PER_POLL: u32 = 4;
 const FRAME_DURATION: Duration = Duration::from_millis(10);
 
-/// Where mixed frames go; implemented by [`FrameSink`] and by test doubles.
+/// Where mixed frames go; implemented by the device `FrameSink` of `mumcord-audio` and by test doubles.
 pub trait PlaybackSink: Send + 'static {
     /// Queues a mono frame; `false` if it was dropped (queue full or no device).
     fn write_frame(&mut self, frame: &Frame) -> bool;
@@ -39,20 +38,6 @@ pub trait PlaybackSink: Send + 'static {
     }
     /// Audio queued but not yet played, in 48 kHz samples.
     fn queued_samples(&mut self) -> usize;
-}
-
-impl PlaybackSink for FrameSink {
-    fn write_frame(&mut self, frame: &Frame) -> bool {
-        FrameSink::write_frame(self, frame)
-    }
-
-    fn write_stereo(&mut self, left: &Frame, right: &Frame) -> bool {
-        FrameSink::write_stereo(self, left, right)
-    }
-
-    fn queued_samples(&mut self) -> usize {
-        FrameSink::queued_samples(self)
-    }
 }
 
 /// The mono mix of a stereo frame.
