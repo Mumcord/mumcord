@@ -1,5 +1,5 @@
 /**
- * Scrollable message list (FR-1.48a): Discord-style groups (avatar, name and time once per group,
+ * Scrollable message list (FR-1.48a): grouped messages (avatar, name and time once per group,
  * text indented after the avatar) or a compact one-line layout, day separators, sanitized bodies,
  * scroll-back paging, messages synced from other Mumcord users marked with their origin, a kept
  * reading position when messages are inserted above (FR-1.60b), a "Jump to newest" button and a

@@ -1376,7 +1376,7 @@ export type Settings = {
 	/**  Linux Wayland: "Allow mouse buttons (requires input group)" (default off, FR-1.39). */
 	allowMouseButtons: boolean,
 	/**
-	 *  Linux Wayland: "Compatibility mode (like TeamSpeak)", runs through XWayland with the X11
+	 *  Linux Wayland: "Compatibility mode (X11)", runs through XWayland with the X11
 	 *  push-to-talk path (default off, FR-1.48). Takes effect after `app_restart`.
 	 */
 	pttCompatibilityMode: boolean,

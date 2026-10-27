@@ -98,7 +98,7 @@ Each connection costs a little memory, CPU and network. The scale test showed bi
 
 #### Q1.6 Which servers connect automatically when Mumcord starts? `◉`
 
-- [x] ⭐ **The servers that were connected when you last quit, plus a per-server switch "Connect when Mumcord starts".** Feels like Discord: you come back to where you were. Every connect is read-only until you join a channel (FR-1.14).
+- [x] ⭐ **The servers that were connected when you last quit, plus a per-server switch "Connect when Mumcord starts".** You come back to where you were. Every connect is read-only until you join a channel (FR-1.14).
 - [ ] Every saved server, always.
 - [ ] None – you click each server yourself.
 
