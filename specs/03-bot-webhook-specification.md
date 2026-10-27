@@ -59,13 +59,13 @@ The bot has no special rights on the Mumble server. It is one client, so the ser
 ### 4.2 HTTP API
 
 - **FR-3.5** `POST /message` accepts JSON `{"channel": <id>, "message": "<text>"}`. Missing key → `401` before the body is parsed (Q4.6). Invalid JSON or missing fields → `400`.
-- **FR-3.6** Empty or whitespace-only message → `400`. Message longer than 5000 characters, or longer than the server's `maxMessageLength` when the server reports one, → `400` (Q2.7, Q4.4). No separate body-size cap was decided; see risks.
+- **FR-3.6** Empty or whitespace-only message → `400`. Message longer than 5000 characters, or longer than the server's `maxMessageLength` when the server reports one, → `400`. Body size is capped by that same message cap: a request body larger than 20 KB (5000 characters can encode to more bytes) is rejected with `413` (Q2.7, Q4.4, Addendum).
 - **FR-3.7** Channel unknown → `404`. Channel known but not allowed for this key → `403`. Error bodies are `{"error": "<short reason>"}`, no channel list (Q3.1 note, Q4.3).
 - **FR-3.8** Rate limit: 20 messages per minute per key; above that → `429` (Q2.9).
 - **FR-3.9** Delivery is synchronous: the bot waits up to 3 s for the server to accept the message and answers `200` with `{"delivered": true}` only then; failure to deliver → `503` (Q2.10, Q4.1).
 - **FR-3.10** While the bot is not connected, requests are answered `503` immediately; nothing is queued (Q3.5).
 - **FR-3.11** Requests are handled concurrently (Q3.6); chat order follows the order in which messages were sent to the server.
-- **FR-3.12** `GET /channels` returns `{"channels": [{"id": 42, "name": "Lobby"}, …]}` limited to the channels of the presented key (Round 5).
+- **FR-3.12** `GET /channels` returns `{"channels": [{"id": 42, "name": "Lobby"}, …]}` limited to the channels of the presented key (Round 5, confirmed in the Addendum).
 - **FR-3.13** `GET /health` returns `{"connected": true, "uptime_seconds": 1234, "server": "<host>"}` and `{"connected": false, …}` when the link is down. No key required.
 - **FR-3.14** Wrong HTTP method on a known path → `405` (open point in Q4.3; kept as a small, explicit rule).
 
@@ -188,7 +188,7 @@ Test setup for all criteria: local test server (`testenv/`, unmodified murmur), 
 
 - **AC-3.1** Start the bot → it connects as its own user with the persistent certificate and shows in the channel tree; kill the network for 5 s → the bot reconnects and `GET /health` reports `connected: true` again.
 - **AC-3.2** `curl -H 'X-API-Key: <key>' -d '{"channel":42,"message":"build failed"}' http://127.0.0.1:8080/message` → `200 {"delivered": true}`, and the message appears in the Mumcord chat of `#Lobby` from the bot user.
-- **AC-3.3** Wrong key → `401`; unknown key before body parsing → `401`; channel id not in the key's list → `403`; channel id that does not exist → `404`; empty or whitespace message → `400`; message over 5000 characters → `400`; 21st request in one minute → `429`; bot disconnected → `503`. All error bodies contain only a short reason, no channel list.
+- **AC-3.3** Wrong key → `401`; unknown key before body parsing → `401`; channel id not in the key's list → `403`; channel id that does not exist → `404`; empty or whitespace message → `400`; message over 5000 characters → `400`; body over 20 KB → `413`; 21st request in one minute → `429`; bot disconnected → `503`. All error bodies contain only a short reason, no channel list.
 - **AC-3.4** `GET /channels` with the key → only the channels that key may write to (id + name). `GET /health` → connection state and uptime.
 - **AC-3.5** A message with `**bold**`, `*italic*`, `` `code` ``, a fenced block, a `- list`, a `# heading` and an `https://` link renders as markup in the client; a message containing `<b>text</b>` shows the literal characters, proving nothing from the caller passes through as HTML.
 - **AC-3.6** Startup with `listen = 0.0.0.0:8080` prints the plain-HTTP warning; default startup is bound to `127.0.0.1` only.
@@ -226,8 +226,8 @@ Test setup for all criteria: local test server (`testenv/`, unmodified murmur), 
 | Q3.8 | Subcommand of `mumcord-bot` | No new package |
 | Q4.1 | JSON request/response as specified | |
 | Q4.2 | Config accepts name or ID per entry | |
-| Q4.3 | Error codes as listed; `GET /channels` limited to the key's channels | Answered in Round 5 |
-| Q4.4 | No body size limit, only the message cap | Risk in §13 |
+| Q4.3 | Error codes as listed; `GET /channels` limited to the key's channels | Confirmed (Addendum) |
+| Q4.4 | Body-size cap = message cap, `413` above 20 KB | Confirmed (Addendum) |
 | Q4.5 | Escape first, then fixed subset, http/https links only | |
 | Q4.6 | Constant-time compare, loopback default, startup warning, key check before body | |
 | Q4.7 | Integration test covers the listed criteria, incl. parallel + standard murmur | |
@@ -235,8 +235,7 @@ Test setup for all criteria: local test server (`testenv/`, unmodified murmur), 
 
 ## 13. Open points & risks
 
-- **No body-size limit (Q4.4):** a caller can send a large body for a small message. Suggested mitigation during build: reject bodies above a generous hard limit (e.g. 64 KB) as a defensive default; needs a one-line confirmation from the product owner.
-- **Round 5 decision** (`GET /channels` = key's channels only) is my recommendation, not yet confirmed by the user.
+- **Body cap follows the message cap** (Addendum), so a caller cannot push a huge body for a small message; `413` is the only extra status code.
 - **Channel IDs are unstable:** a recreated channel gets a new ID; name entries in the config survive, ID entries break silently.
 - **User-supplied keys can be weak** (Q2.4 was answered against generation); the docs should state "long random key", and generation remains optional tooling.
 - **Plain HTTP** puts the key on the wire when listening outside localhost; the warning covers it but cannot prevent it.
