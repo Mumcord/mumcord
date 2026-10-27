@@ -1,6 +1,13 @@
 [package]
 name = "mumcord-protocol"
 description = "Mumble protocol: TLS control channel, protobuf messages, UDP voice crypto"
+repository = "https://github.com/Mumcord/mumcord"
+homepage = "https://github.com/Mumcord/mumcord"
+documentation = "https://docs.rs/mumcord-protocol"
+readme = "README.md"
+keywords = ["mumble", "voip", "protocol"]
+categories = ["network-programming", "multimedia::audio"]
+include = ["src/**", "proto/**", "build.rs", "README.md"]
 version.workspace = true
 edition.workspace = true
 rust-version.workspace = true

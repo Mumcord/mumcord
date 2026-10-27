@@ -79,6 +79,12 @@ To build locally on a Mac (`brew install nasm`) or on Linux (`nasm` from the dis
 
 Run `scripts/generate-notices.sh` after dependencies change. The "native libraries" section (libvpx, PipeWire, GStreamer, WebKitGTK, source offer) is written in that script; update it when bundled native libraries change.
 
+## Publishing the protocol crate (crates.io)
+
+The library crate `mumcord-protocol` (`crates/protocol`) is published on crates.io with the app version. The **Release** workflow does it automatically in its last job, after the draft release exists; tags with a pre-release suffix (such as `-rc.1`) are skipped. A version that is already on crates.io is skipped with a notice, since published versions can never be replaced.
+
+To publish the current version of `main` without a new release, run the **Publish crates** workflow from the Actions tab on `main`. It needs the repository secret `CARGO_REGISTRY_TOKEN` (a crates.io API token). Check a package locally with `cargo publish -p mumcord-protocol --dry-run --locked`. The crate must stay self-contained: only crates.io dependencies and no files outside `crates/protocol` (the `.proto` files live in `crates/protocol/proto`).
+
 ## AUR package (Arch Linux)
 
 The `mumcord-bin` package on the Arch User Repository repackages the release `.deb` (the Arch packages `webkit2gtk-4.1` and friends are used instead of the bundled copies an AppImage would carry). `.github/workflows/aur.yml` updates it automatically when you click **Publish release** (step 4); pre-releases are skipped. Without the secret below the job skips itself, so nothing breaks.

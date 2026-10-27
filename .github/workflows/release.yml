@@ -216,3 +216,11 @@ jobs:
           gh release create "$TAG" --repo "$GITHUB_REPOSITORY" --verify-tag --draft \
             --title "Mumcord $VERSION" --notes-file notes.md --generate-notes \
             dist/*.AppImage dist/*.deb dist/*.rpm dist/*-setup.exe dist/*.dmg dist/install.sh dist/SHA256SUMS
+
+  # After the draft exists, so a failed build never leaves a crate on crates.io without a
+  # release (published versions cannot be removed). Pre-releases are skipped inside the workflow.
+  publish-crates:
+    name: Publish crates
+    needs: [guard, release]
+    uses: ./.github/workflows/publish-crates.yml
+    secrets: inherit
