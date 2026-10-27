@@ -1,0 +1,4 @@
+# The mumbot library in the live tests reads the SuperUser password from testenv/.env. It looks
+# relative to the working directory, and cargo runs tests from the crate's directory.
+[env]
+MUMCORD_TESTENV_DIR = { value = "testenv", relative = true }
