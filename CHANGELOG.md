@@ -4,7 +4,7 @@
 
 ### Added
 
-- The Mumble protocol library `mumcord-protocol` is now published on crates.io with every release, so other projects such as the bot can depend on it by version
+- The Mumble protocol library `mumcord-protocol` and the voice audio library `mumcord-audio` are now published on crates.io with every release, so other projects such as the bot can depend on them by version
 
 ### Changed
 

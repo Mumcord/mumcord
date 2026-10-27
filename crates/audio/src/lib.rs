@@ -27,3 +27,8 @@ pub const FRAME_SAMPLES: usize = 480;
 
 /// One 10 ms block of 48 kHz mono audio.
 pub type Frame = [f32; FRAME_SAMPLES];
+
+// Compiles the README example as a doctest so it cannot rot.
+#[cfg(doctest)]
+#[doc = include_str!("../README.md")]
+struct ReadmeDoctests;
