@@ -84,7 +84,7 @@ hound = "3.5"
 
 # Screen sharing (FR-2.42): VP9 software codec on the system or a CI-built static libvpx, found
 # with pkg-config; bindings are generated at build time so they always match the linked version.
-bindgen = "0.72"
+bindgen = "0.73"
 pkg-config = "0.3"
 # Wayland screen capture (FR-2.42): the ScreenCast portal hands over a PipeWire stream; the
 # system libpipewire is linked (present on every Wayland desktop).
