@@ -14,7 +14,7 @@ Maintained by the team lead. Agents report status changes in their final report.
 - **Release plan 0.4.0 (lead, user said "do as you think", 2026-10-26):** Windows/macOS screen share stays in Epic 2; code is written now and checked locally with the cross-lint trick, CI (SS2) runs on the next push, which still needs user OK. gst-libav (H.264) is dropped from the AppImage bundle (VP9 via vpx stays); deb/rpm/AUR keep it as a dependency. After F40 and F44: G3 green gate, then small local commits (no push).
 - **Release prep 0.4.0 (user, 2026-10-26: "prepare 0.4.0 completely so I can release later"):** order = running tasks (F40, F44b, T1, B63) → B61 → B37 translations → SS14 + B35 docs, release notes, version bump 0.4.0 → G3 green gate → C1–C7 QA → fixes → D1 report → small local commits. Push, tag and release stay with the user; SS2 CI changes are prepared locally and first verified on the user's push.
 - **Release authorization 0.4.0 (user, 2026-10-26):** the lead may do everything up to the DRAFT release on its own: push epic-2, open a PR to main, fix CI until green, merge when green, tag v0.4.0 so release.yml creates the draft. Publishing the draft stays with the user.
-- **Windows in-game overlay:** separate transparent click-through window over the detected game. No DLL, no injection, no files in game folders; works with anti-cheat games; exclusive fullscreen hides it (hint shown).
+- **Windows in-game overlay:** separate transparent click-through window over the detected game (like Discord 2025). No DLL, no injection, no files in game folders; works with anti-cheat games; exclusive fullscreen hides it (hint shown).
 - **Screen sharing (from B25a spike):** software VP9 via libvpx first (hardware encoding later); X11 = whole screen only; sound = only the shared window's/app's sound (user choice; per-app capture on each OS, report where an OS can't do it); 8 viewers, quality drops automatically to 480p/15 fps when upload is too slow.
 
 ## Tasks
@@ -59,7 +59,7 @@ Maintained by the team lead. Agents report status changes in their final report.
 | B19s | Spike: Windows overlay as user-placed proxy DLL + ingame_overlay (no own injector) | done | b19s-win-overlay-spike | – | complex | research only |
 | B19a | Windows overlay part 1: named pipe, injection, overlay-hook crate skeleton | cancelled (replaced by B19c–B19f) | b19a-win-overlay-ipc | B15, B17 | complex | FR-2.28; crates/overlay-ipc, crates/overlay-hook |
 | S4 | Spec amendment: Windows overlay experimental via user-placed proxy version.dll + ingame_overlay | superseded by S5 | s4-spec-win-overlay | B19s | simple | specs/02-…-specification.md |
-| S5 | Spec amendment: Windows overlay as separate click-through window over the game | done | s5-spec-win-window-overlay | S4 | simple | specs/02-…-specification.md |
+| S5 | Spec amendment: Windows overlay as separate click-through window over the game (like Discord 2025) | done | s5-spec-win-window-overlay | S4 | simple | specs/02-…-specification.md |
 | S6 | Spec amendment: listeners inline with ear icon (FR-2.58, AC-2.39) | done | s6-spec-listeners | – | simple | specs/02-…-specification.md |
 | S7 | Spec fix: no anti-cheat blocklist for the Windows overlay window (FR-2.28) | done | s7-spec-blocklist | B19w | simple | specs/02-…-specification.md |
 | S8 | Spec fix: client version/OS admin-only, loss/ping visibility (FR-2.25, AC-2.19) | done | s8-spec-client-info-admin | B13 plan | simple | specs/02-…-specification.md |
