@@ -195,6 +195,15 @@ jobs:
           - **Two servers failing at once** no longer collide on the password and certificate prompts.
           - The diagnostics page lists audio devices again.
           EOF
+          elif [[ "$VERSION" == "0.4.2" ]]; then
+            cat >> ../notes.md <<'EOF'
+
+          ## What's new in 0.4.2
+
+          - **macOS keychain**: Mumcord asks for keychain access only once, instead of repeating the prompt.
+          - **Screen share and watch party**: people who join a channel now reliably see a running screen share or watch party.
+          - **Linux AppImage**: YouTube videos in the watch party play again.
+          EOF
           fi
 
       - name: Create draft release
