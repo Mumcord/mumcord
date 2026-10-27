@@ -25,11 +25,11 @@ repository = "https://github.com/Mumcord/mumcord"
 
 [workspace.dependencies]
 # Internal crates
-mumcord-protocol = { path = "crates/protocol" }
-# The version is the minor series: crates.io needs it for the publish of mumcord-audio, and it only changes with a minor/major bump.
+mumcord-protocol = { path = "crates/protocol", version = "0.4" }
+# The version is the minor series: crates.io needs it for the publish of mumcord-audio and mumcord-p2p, and it only changes with a minor/major bump.
 mumcord-codec = { path = "crates/codec", version = "0.4" }
 mumcord-audio = { path = "crates/audio" }
-mumcord-store = { path = "crates/store" }
+mumcord-store = { path = "crates/store", version = "0.4" }
 mumcord-engine = { path = "crates/engine" }
 mumcord-positional = { path = "crates/positional" }
 mumcord-overlay-ipc = { path = "crates/overlay-ipc" }
