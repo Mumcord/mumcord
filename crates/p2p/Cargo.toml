@@ -1,6 +1,13 @@
 [package]
 name = "mumcord-p2p"
-description = "Encrypted direct connections between Mumcord clients: QUIC, certificate pinning, port mapping, signalling"
+description = "Encrypted direct connections between Mumble clients: QUIC with certificate pinning, port mapping and signalling"
+repository = "https://github.com/Mumcord/mumcord"
+homepage = "https://github.com/Mumcord/mumcord"
+documentation = "https://docs.rs/mumcord-p2p"
+readme = "README.md"
+keywords = ["mumble", "quic", "p2p", "nat", "voip"]
+categories = ["network-programming"]
+include = ["src/**", "README.md"]
 version.workspace = true
 edition.workspace = true
 rust-version.workspace = true
@@ -23,7 +30,8 @@ mumcord-protocol.workspace = true
 
 [dev-dependencies]
 rcgen.workspace = true
-mumcord-store.workspace = true
+# Path only, so the published package does not depend on mumcord-store.
+mumcord-store = { path = "../store" }
 
 [lints]
 workspace = true

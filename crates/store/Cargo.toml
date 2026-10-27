@@ -1,6 +1,13 @@
 [package]
 name = "mumcord-store"
-description = "Local database, identity certificates and OS secure storage"
+description = "Local persistence for Mumble clients: SQLite database, identity certificates and OS secure storage for secrets"
+repository = "https://github.com/Mumcord/mumcord"
+homepage = "https://github.com/Mumcord/mumcord"
+documentation = "https://docs.rs/mumcord-store"
+readme = "README.md"
+keywords = ["mumble", "sqlite", "keyring", "client-certificate", "voip"]
+categories = ["database", "authentication"]
+include = ["src/**", "README.md"]
 version.workspace = true
 edition.workspace = true
 rust-version.workspace = true
