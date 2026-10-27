@@ -40,6 +40,8 @@ pub struct BotConfig {
     pub superuser: bool,
     /// Server password; defaults to `SERVER_PASSWORD` from the test environment.
     pub password: Option<String>,
+    /// Channel passwords (Mumble access tokens) presented at login (FR-2.78).
+    pub tokens: Vec<String>,
     pub timeout: Duration,
 }
 
@@ -54,6 +56,7 @@ impl BotConfig {
             data_dir: None,
             superuser: false,
             password: None,
+            tokens: Vec::new(),
             timeout: DEFAULT_TIMEOUT,
         }
     }
@@ -86,7 +89,7 @@ impl BotConfig {
             port: self.port,
             username,
             password,
-            tokens: Vec::new(),
+            tokens: self.tokens.clone(),
             identity,
             // Bots only talk to the local test servers, whose certificates are self-signed.
             verify_cert: Arc::new(|_| true),

@@ -45,6 +45,11 @@ struct Cli {
 
 #[derive(Subcommand, Debug)]
 enum Command {
+    /// Run as the webhook bot: HTTP API with an API key, see docs/bot-webhook.md.
+    Webhook {
+        #[arg(long)]
+        config: PathBuf,
+    },
     /// Connect and print session and certificate hash.
     Connect,
     /// Move into a channel (name or Root/Path).
@@ -192,6 +197,13 @@ enum Toggle {
 #[tokio::main]
 async fn main() -> Result<()> {
     let cli = Cli::parse();
+    if let Command::Webhook { config } = cli.command {
+        tracing_subscriber::fmt()
+            .with_env_filter(tracing_subscriber::EnvFilter::from_default_env())
+            .init();
+        let config = std::sync::Arc::new(mumcord_bot::webhook::WebhookConfig::load(&config)?);
+        return mumcord_bot::webhook::run(config).await;
+    }
     let mut bot = Bot::connect(BotConfig {
         host: cli.host.clone(),
         port: cli.port,
@@ -200,6 +212,7 @@ async fn main() -> Result<()> {
         data_dir: None,
         superuser: cli.superuser,
         password: None,
+        tokens: Vec::new(),
         timeout: Duration::from_secs(cli.timeout),
     })
     .await?;
@@ -240,6 +253,7 @@ struct ScriptLine {
 
 async fn run(bot: &mut Bot, voice: &mut Option<BotVoice>, command: Command) -> Result<()> {
     match command {
+        Command::Webhook { .. } => bail!("the webhook bot runs its own loop"),
         Command::Connect => print_identity(bot)?,
         Command::Join { channel } => bot.join(&channel).await?,
         Command::Say { channel, html } => bot.send_channel(channel.as_deref(), &html)?,
