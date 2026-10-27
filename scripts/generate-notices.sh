@@ -58,7 +58,7 @@ The protocol definition files in proto/ (Mumble.proto, MumbleUDP.proto) are
 taken from the Mumble project and are used under its BSD license:
 
 PROTOCOL
-  cat proto/LICENSE.mumble
+  cat crates/protocol/proto/LICENSE.mumble
   cat <<'PLUGINS'
 
 

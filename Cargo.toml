@@ -20,7 +20,7 @@ version = "0.4.2"
 edition = "2024"
 rust-version = "1.90"
 license = "AGPL-3.0-only"
-repository = "https://github.com/ToBee94/mumcord"
+repository = "https://github.com/Mumcord/mumcord"
 
 [workspace.dependencies]
 # Internal crates

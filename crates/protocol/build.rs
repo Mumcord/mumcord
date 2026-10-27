@@ -4,8 +4,8 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let mut config = prost_build::Config::new();
     config.protoc_executable(protoc);
     config.compile_protos(
-        &["../../proto/Mumble.proto", "../../proto/MumbleUDP.proto"],
-        &["../../proto"],
+        &["proto/Mumble.proto", "proto/MumbleUDP.proto"],
+        &["proto"],
     )?;
     Ok(())
 }
