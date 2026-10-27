@@ -8,7 +8,7 @@ mod common;
 
 use std::time::Duration;
 
-use mumcord_bot::env;
+use mumbot::env;
 use mumcord_engine::{
     ConnState, Engine, EngineEvent, ErrorKind, EventReceiver, PasswordChange, SecretStore,
     ServerFields,

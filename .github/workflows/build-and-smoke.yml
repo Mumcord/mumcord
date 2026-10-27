@@ -319,10 +319,11 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - { name: linux, os: ubuntu-24.04 }
-          - { name: linux-arm64, os: ubuntu-24.04-arm }
-          - { name: windows, os: windows-latest }
-          - { name: macos, os: macos-latest }
+          # mumbot: target of the pinned test bot release (scripts/fetch-mumbot.sh).
+          - { name: linux, os: ubuntu-24.04, mumbot: linux-x86_64 }
+          - { name: linux-arm64, os: ubuntu-24.04-arm, mumbot: linux-aarch64 }
+          - { name: windows, os: windows-latest, mumbot: windows-x86_64 }
+          - { name: macos, os: macos-latest, mumbot: macos-universal }
     runs-on: ${{ matrix.os }}
     timeout-minutes: 60
     defaults:
@@ -434,10 +435,17 @@ jobs:
             . -> target
             scripts/smoke/seed -> target
 
-      - name: Build seeder and mumcord-bot
-        run: |
-          cargo build --release --locked -p mumcord-bot
-          CARGO_TARGET_DIR="$PWD/target" cargo build --release --locked --manifest-path scripts/smoke/seed/Cargo.toml
+      - name: Build seeder
+        run: CARGO_TARGET_DIR="$PWD/target" cargo build --release --locked --manifest-path scripts/smoke/seed/Cargo.toml
+
+      # The archive name carries the version, so a bump in scripts/mumbot.env misses the cache.
+      - uses: actions/cache@v6
+        with:
+          path: ~/.cache/mumbot
+          key: mumbot-${{ matrix.mumbot }}-${{ hashFiles('scripts/mumbot.env') }}
+
+      - name: Fetch mumbot
+        run: scripts/fetch-mumbot.sh ${{ matrix.mumbot }} "$RUNNER_TEMP/mumbot"
 
       # --- Install the build and run the smoke test ------------------------------------------
 
@@ -478,8 +486,8 @@ jobs:
             printf "probe" | secret-tool store --label=smoke-probe app mumcord-smoke
             test "$(secret-tool lookup app mumcord-smoke)" = probe
             secret-tool clear app mumcord-smoke
-            xvfb-run -a scripts/smoke/smoke.sh --app "$0" --seed target/release/mumcord-smoke-seed --bot target/release/mumcord-bot
-          ' "$PWD/$app"
+            xvfb-run -a scripts/smoke/smoke.sh --app "$0" --seed target/release/mumcord-smoke-seed --bot "$1"
+          ' "$PWD/$app" "$RUNNER_TEMP/mumbot/mumbot"
           # The app runs without a tray when the library cannot be loaded; in the AppImage that
           # means the bundled copy is broken (e.g. a dependency of it is missing).
           logs="${XDG_DATA_HOME:-$HOME/.local/share}/app.mumcord.client/logs"
@@ -526,7 +534,7 @@ jobs:
           powershell -NoProfile -File scripts/smoke/start-win-server.ps1 "$MUMBLE_SERVER_EXE" "$dir" || { dump; exit 1; }
           powershell -NoProfile -Command "if (-not (Get-Process -Id (Get-Content '$dir\\server.pid') -ErrorAction SilentlyContinue)) { exit 1 }" \
             || { echo "server process is gone before seeding" >&2; dump; exit 1; }
-          scripts/smoke/smoke.sh --app "$app" --seed target/release/mumcord-smoke-seed.exe --bot target/release/mumcord-bot.exe || { dump; exit 1; }
+          scripts/smoke/smoke.sh --app "$app" --seed target/release/mumcord-smoke-seed.exe --bot "$RUNNER_TEMP/mumbot/mumbot.exe" || { dump; exit 1; }
 
       - name: Smoke test (macOS)
         if: runner.os == 'macOS'
@@ -536,7 +544,7 @@ jobs:
           cp -R "$mount/Mumcord.app" /Applications/
           hdiutil detach "$mount"
           if [[ "${{ steps.mac-server.outcome }}" == "success" ]]; then
-            scripts/smoke/smoke.sh --app /Applications/Mumcord.app --seed target/release/mumcord-smoke-seed --bot target/release/mumcord-bot
+            scripts/smoke/smoke.sh --app /Applications/Mumcord.app --seed target/release/mumcord-smoke-seed --bot "$RUNNER_TEMP/mumbot/mumbot"
           else
             echo "::warning::No Mumble server on macOS – start-only check; 'connects' is a manual checklist item (AC-1.30)."
             scripts/smoke/smoke.sh --app /Applications/Mumcord.app --start-only

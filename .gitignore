@@ -23,6 +23,3 @@ testenv/.env
 
 # Agent worktrees
 .claude/worktrees/
-
-# Real config with API keys (FR-3.21): never commit.
-bot.toml

@@ -95,7 +95,7 @@ jobs:
       - name: Package image and binaries
         run: |
           docker save mumcord-e2e | zstd -T0 -3 -q -o e2e-image.tar.zst
-          tar -C "$MUMCORD_E2E_CACHE/target/debug" -cf - mumcord mumcord-bot netsim examples/libtest_plugin.so \
+          tar -C "$MUMCORD_E2E_CACHE/target/debug" -cf - mumcord mumbot netsim examples/libtest_plugin.so \
             examples/headless_check libmumcord_overlay_layer.so \
             | zstd -T0 -3 -q -o e2e-bin.tar.zst
           ls -lh e2e-image.tar.zst e2e-bin.tar.zst

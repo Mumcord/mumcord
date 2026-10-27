@@ -15,7 +15,7 @@ mod common;
 use std::path::{Path, PathBuf};
 use std::time::Duration;
 
-use mumcord_bot::env;
+use mumbot::env;
 use mumcord_engine::screen_share::ScreenShareView;
 use mumcord_engine::{
     Engine, EngineEvent, EventReceiver, PasswordChange, SecretStore, ServerFields, Snapshot,

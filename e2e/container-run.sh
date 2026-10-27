@@ -1,7 +1,7 @@
 #!/bin/bash
 # Runs inside the E2E container: session D-Bus with an unlocked Secret Service (gnome-keyring),
-# Xvfb, then builds the app (debug, feature test-backend), bot, netsim, the test game plugin and
-# the in-game overlay check, then runs WebdriverIO.
+# Xvfb, then builds the app (debug, feature test-backend), netsim, the test game plugin and the
+# in-game overlay check, fetches the pinned mumbot test bot, then runs WebdriverIO.
 # MUMCORD_E2E_SHARD=<n> limits the run to one shard of e2e/shards.json (see wdio.conf.ts).
 set -euo pipefail
 
@@ -51,12 +51,18 @@ export LIBGL_ALWAYS_SOFTWARE=1 NO_AT_BRIDGE=1
 # it shared. Unset = both.
 step="${MUMCORD_E2E_STEP:-}"
 if [ "$step" != test ]; then
-  echo "building app (debug, test-backend), mumcord-bot, netsim, test game plugin..."
+  echo "building app (debug, test-backend), netsim, test game plugin..."
   npx tauri build --debug --no-bundle --features test-backend -- --locked
-  cargo build --locked --quiet -p mumcord-bot -p netsim
+  cargo build --locked --quiet -p netsim
   cargo build --locked --quiet -p mumcord-positional --example test_plugin
   cargo build --locked --quiet -p mumcord-overlay-layer --example headless_check
+  # Next to the debug binaries, so CI ships it to the shard jobs with them.
+  scripts/fetch-mumbot.sh linux-x86_64 "$CARGO_TARGET_DIR/debug"
 fi
 [ "$step" = build ] && exit 0
+
+# The bot is a release binary, not built from this repository: point it at this checkout's test
+# servers (SuperUser password) and at a fixed place for its certificates (AC-1.2 imports one).
+export MUMCORD_TESTENV_DIR="$PWD/testenv" MUMCORD_BOT_DATA="$HOME/.local/share/mumbot"
 
 exec npx wdio run e2e/wdio.conf.ts "$@"

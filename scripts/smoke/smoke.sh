@@ -2,18 +2,18 @@
 # Packaging smoke test (AC-1.30): starts an installed/unpacked Mumcord build and checks that it
 # connects to a local Mumble test server.
 #
-#   scripts/smoke/smoke.sh --app <app> --seed <mumcord-smoke-seed> --bot <mumcord-bot> [--port N]
+#   scripts/smoke/smoke.sh --app <app> --seed <mumcord-smoke-seed> --bot <mumbot> [--port N]
 #
 #   --app   Linux: the AppImage (or binary); Windows: Mumcord.exe; macOS: Mumcord.app
 #   --seed  built scripts/smoke/seed binary
-#   --bot   built mumcord-bot binary
+#   --bot   mumbot binary (scripts/fetch-mumbot.sh)
 #   --port  test server port (default 64738)
 #   --start-only  no server available: only check that the app starts and keeps running
 #                 (no --seed/--bot needed; the connect part then belongs on the manual checklist)
 #
 # Steps: seed a profile (identity in the OS secure storage, wizard done, saved server with its
 # certificate trusted) → start the app with a mumble:// link to that server → pass when the app
-# log shows "connected" with a server_id AND mumcord-bot sees the app's user on the server.
+# log shows "connected" with a server_id AND mumbot sees the app's user on the server.
 #
 # The seed step replaces the identity in the OS secure storage, so the script only runs when
 # CI is set or --allow-identity-overwrite is given (use a throwaway keyring/profile locally).
@@ -136,7 +136,7 @@ echo "== seeding profile in $data_dir"
 "$seed" "$(native_path "$data_dir")" "$port" "$username"
 
 # The bot waits (up to the timeout) for the app's user to appear; start it first.
-echo "== waiting for $username with mumcord-bot"
+echo "== waiting for $username with mumbot"
 "$bot" --port "$port" --name SmokeBot --timeout "$timeout_secs" expect user "$username" \
   >"$work/bot.out" 2>&1 &
 bot_pid=$!

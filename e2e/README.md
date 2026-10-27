@@ -33,7 +33,7 @@ machine; more invite timing flakes in the voice and packet-loss specs.
 Requires only Docker (user in the `docker` group) and `npm ci` on the host. Everything else runs
 in the `mumcord-e2e` image, because Arch's webkit2gtk ships without `WebKitWebDriver`.
 
-Runtime (16-core dev machine): cold ~5 min (image build ~3 min, first full debug build of app, bot
+Runtime (16-core dev machine): cold ~5 min (image build ~3 min, first full debug build of app
 and netsim ~1.5 min, smoke spec a few seconds); warm ~15 s without code changes, plus the incremental
 rebuild otherwise. In CI expect roughly 3–4x that. Build caches (cargo registry, target dir, bot
 certificates) live in `~/.cache/mumcord-build/e2e/` (override with `MUMCORD_E2E_CACHE`), never in `target/` or `/tmp`.
@@ -49,9 +49,10 @@ certificates) live in `~/.cache/mumcord-build/e2e/` (override with `MUMCORD_E2E_
   helpers call `testenv/up.sh` / `reset.sh` / `docker restart` from inside the container.
 - `e2e/container-run.sh` (inside): session D-Bus, unlocked gnome-keyring (Secret Service, which the
   app uses for the identity and server passwords), Xvfb on `:99` (`:99+n` for run id n), then builds the app
-  (`tauri build --debug --no-bundle --features test-backend`), `mumcord-bot`, `netsim`, the test
-  game plugin (`crates/positional/examples/test_plugin.rs`) and `headless_check`, then runs
-  `wdio run e2e/wdio.conf.ts`.
+  (`tauri build --debug --no-bundle --features test-backend`), `netsim`, the test game plugin
+  (`crates/positional/examples/test_plugin.rs`) and `headless_check`, fetches the test bot (the
+  [mumbot](https://github.com/Mumcord/mumbot) release pinned in `scripts/mumbot.env`, via
+  `scripts/fetch-mumbot.sh`), then runs `wdio run e2e/wdio.conf.ts`.
 - **Audio:** no sound server. The app is built with the `test-backend` feature and the env
   `MUMCORD_AUDIO_BACKEND` picks `null` (default: silence in, discard out) or
   `file:<in.wav>:<out.wav>` (mic plays `in.wav`, speakers record to `out.wav`, 48 kHz mono 16-bit);
@@ -81,7 +82,7 @@ from `@wdio/globals`). Import helpers from `e2e/helpers/index.ts`:
 | ----------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------- |
 | `testenv.up(svc, {cert})`, `testenv.reset(svc, {cert})`                                   | start / reset a server (`v15`, `v15b`, `v14`, `v13`, `limit`; cert `A`/`B`). `reset` drops clients.              |
 | `testenv.stop/start/restart(svc)`, `testenv.ports`                                        | container control for reconnect tests; port map                                                                  |
-| `bot([...cmd], {name, port, cert, superuser, timeout, hold})`                             | runs one `mumcord-bot` subcommand; throws unless exit 0                                                          |
+| `bot([...cmd], {name, port, cert, superuser, timeout, hold})`                             | runs one `mumbot` subcommand; throws unless exit 0                                                               |
 | `botInBackground([...cmd], opts)`                                                         | long-running bot (`--hold`, `script` via `.send(line)`); `.done`, `.stop()`                                      |
 | `botOn(svc, cmd, opts)`, `botOnAll(svcs, cmd, opts)`, `botInBackgroundOn(svc, cmd, opts)` | bots by service name (`v15`, `v15b` …); `botOnAll` connects to several servers at once                           |
 | `netsim.start(svc)`, `netsim.ctl(...args)`, `netsim.stop()`                               | proxy `127.0.0.1:64800` → server; e.g. `ctl("loss","both","10")`, `ctl("block-udp","on")`                        |

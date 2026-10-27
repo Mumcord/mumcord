@@ -13,7 +13,7 @@ use std::path::{Path, PathBuf};
 use std::time::Duration;
 
 use image::{ImageFormat, Rgb, RgbImage};
-use mumcord_bot::env;
+use mumbot::env;
 use mumcord_engine::EventReceiver;
 use mumcord_engine::full_image::FullRef;
 use mumcord_engine::store::Consent;

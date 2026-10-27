@@ -8,7 +8,7 @@ mod common;
 use std::path::{Path, PathBuf};
 use std::time::Duration;
 
-use mumcord_bot::{Bot, BotConfig, env};
+use mumbot::{Bot, BotConfig, env};
 use mumcord_engine::EventReceiver;
 use mumcord_engine::{
     ChannelView, Engine, EngineEvent, PasswordChange, SecretStore, ServerFields, Snapshot,

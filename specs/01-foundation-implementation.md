@@ -56,7 +56,7 @@ Legend: ✅ verified · 🎧 automated check passed, listening check pending · 
 3. Complete the first-start wizard (name, microphone, finish).
 4. Click "+" and add a server: address `localhost`, port `64739`, any username; accept the certificate fingerprint.
 5. You land read-only in the default channel, muted and deafened. Double-click "Raid" to join: voice turns on.
-6. Optional: run the bot (`cargo run -p mumcord-bot -- --port 64739 --name Bot --hold 600 join Raid`; the bot leaves after the command unless `--hold` keeps it connected) to have a second participant; try chat, follow, private messages, registration, avatar.
+6. Optional: run the bot (`mumbot --port 64739 --name Bot --hold 600 join Raid`; the bot leaves after the command unless `--hold` keeps it connected) to have a second participant; try chat, follow, private messages, registration, avatar.
 7. Open the signal icon in the user panel for transport, latency, loss and bitrate. Test links with `xdg-open mumble://localhost:64739/Raid` after enabling the handler in the wizard.
 8. Network tests: `cargo run -p netsim -- run --listen 127.0.0.1:64800 --target 127.0.0.1:64739 --control 127.0.0.1:64801`, connect to port 64800, then `cargo run -p netsim -- ctl --control 127.0.0.1:64801 loss both 10`.
 9. Automated suite: `npm run e2e` (Docker; about 5 min cold, 15 s warm).
@@ -119,7 +119,7 @@ Open: G1 (stage 1a gate, user), B30–B33, C9, C10, D1 (stage 1b).
 - **New dependencies:** `sonora`, `opus` (static libopus), `rustls` with ring, `rsa` (key generation only), `image` (chat and avatar resizing), `rusqlite` (bundled SQLite), `keyring`, WebdriverIO devDependencies for E2E. Third-party notices regenerated with `scripts/generate-notices.sh` (cargo-about 0.9.2); `rust-ini` is pinned to 0.21.1 in `Cargo.lock`.
 - **Local data:** SQLite database `mumcord.sqlite3` in the app data directory, schema migrated v1 → v2 via `PRAGMA user_version` (v2 adds the per-server "default avatar sent" flag); `default_avatar.png` (128 px) next to it; new setting `sendDefaultAvatar` (default on) and wizard/log level settings. Certificate and server passwords live only in the OS keyring (service `app.mumcord.client`).
 - **Environment variables:** `MUMCORD_AUDIO_BACKEND=null|file:<in.wav>:<out.wav>` (test builds with feature `test-backend`; release builds reject it), `MUMCORD_SKIP_BINDINGS_EXPORT` (skips regenerating `ui/src/bindings/commands.ts`), `MUMCORD_LIVE=1` (enables live tests: `cargo test -p mumcord-protocol -- --ignored --test-threads=1`), `MUMCORD_BOT_DATA` (bot certificates), `VITE_MUMCORD_MOCK=1` (UI against the mock engine).
-- **Test infrastructure:** `testenv/` Docker servers (v15 64738, v14 64739, v13 64740, limit 64741); `crates/bot` scripted Mumble clients with voice; `tools/netsim` packet-loss proxy; `e2e/` Docker image with WebdriverIO and tauri-driver (`npm run e2e`); `scripts/smoke` for cross-OS smoke tests.
+- **Test infrastructure:** `testenv/` Docker servers (v15 64738, v14 64739, v13 64740, limit 64741); scripted Mumble clients with voice (the [mumbot](https://github.com/Mumcord/mumbot) release pinned in `scripts/mumbot.env`); `tools/netsim` packet-loss proxy; `e2e/` Docker image with WebdriverIO and tauri-driver (`npm run e2e`); `scripts/smoke` for cross-OS smoke tests.
 - **CI:** `ci.yml` (fmt, clippy, tests, lint, typecheck, UI tests on three OS), `e2e.yml` (Linux), `release.yml` named "Test builds" (AppImage, NSIS installer, DMG as artifacts `mumcord-<os>-unsigned-test-build`, plus a smoke test per OS).
 - **Scale:** 46 commands and 17 events in the engine contract (`docs/engine-api.md`).
 - **Platforms tested:** Linux (CachyOS/KDE, Ubuntu 24.04 in Docker/CI), Windows and macOS via CI only. Servers: Mumble 1.5.735 and 1.4.230 live; 1.3 untested.
@@ -133,7 +133,7 @@ Tick each box when it behaves as described under "Pass". If something fails, not
 - **Test servers:** on the Linux PC run `testenv/up.sh v14` (port 64739). Linux tests use `localhost`.
 - **Windows and macOS test builds:** on GitHub open the repository, go to Actions, choose the workflow "Test builds", open the latest green run for branch `epic-1` and download the artifact at the bottom: `mumcord-windows-unsigned-test-build` or `mumcord-macos-unsigned-test-build`. Unzip it. The builds are unsigned, so a security warning is expected.
 - **Server reachability for Windows/macOS:** the test server must be reachable from those machines. Two options. (a) Run the Docker test servers on the Linux PC and connect over the LAN using the PC's IP address (find it with `ip addr`), port 64739; allow ports 64739 TCP and UDP in the firewall. (b) Use a public server of your own, only if you explicitly agree to that. Do not use other people's public servers.
-- Make sure the Bot can join: `cargo run -p mumcord-bot -- --port 64739 --name Bot --hold 600 join Raid` (optional but helpful for hearing and seeing a second participant).
+- Make sure the Bot can join: `mumbot --port 64739 --name Bot --hold 600 join Raid` (`scripts/fetch-mumbot.sh linux-x86_64 <dir>` downloads it; optional but helpful for hearing and seeing a second participant).
 
 ### Linux / KDE (about 20 min)
 

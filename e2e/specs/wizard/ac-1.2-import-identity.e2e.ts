@@ -26,7 +26,7 @@ const P12_PASSWORD = "c1-secret";
 function botCertDir(): string {
   const base =
     process.env.MUMCORD_BOT_DATA ??
-    join(process.env.XDG_DATA_HOME ?? join(process.env.HOME ?? "", ".local/share"), "mumcord-bot");
+    join(process.env.XDG_DATA_HOME ?? join(process.env.HOME ?? "", ".local/share"), "mumbot");
   return join(base, "certs", CERT);
 }
 

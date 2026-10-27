@@ -13,7 +13,7 @@ use std::path::{Path, PathBuf};
 use std::sync::{Arc, Mutex};
 use std::time::{Duration, Instant};
 
-use mumcord_bot::env;
+use mumbot::env;
 use mumcord_engine::p2p::P2pConfig;
 use mumcord_engine::screen_share::wire::{Frame, FrameHeader};
 use mumcord_engine::screen_share::{I420Frame, ScreenFrameSink, ScreenShareView};

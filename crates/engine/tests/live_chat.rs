@@ -8,8 +8,8 @@ mod common;
 use std::path::{Path, PathBuf};
 use std::time::Duration;
 
-use mumcord_bot::samples::{PNG, Sample};
-use mumcord_bot::{Bot, BotConfig, MessageCheck, UserCheck, env};
+use mumbot::samples::{PNG, Sample};
+use mumbot::{Bot, BotConfig, MessageCheck, UserCheck, env};
 use mumcord_engine::EventReceiver;
 use mumcord_engine::{
     ChatMessageView, ConversationRef, Engine, EngineEvent, ErrorKind, HistoryScope, PasswordChange,

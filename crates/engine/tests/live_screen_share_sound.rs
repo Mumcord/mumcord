@@ -10,7 +10,7 @@ mod common;
 use std::path::{Path, PathBuf};
 use std::time::{Duration, Instant};
 
-use mumcord_bot::env;
+use mumbot::env;
 use mumcord_engine::p2p::P2pConfig;
 use mumcord_engine::screen_share::{ScreenShareView, TestTone};
 use mumcord_engine::store::Consent;
