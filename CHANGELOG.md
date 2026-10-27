@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.4.3] - Unreleased
+
+### Changed
+
+- The Linux install script no longer tells you to install gst-libav (H.264 video support) when it is already installed; when it is missing it asks whether to install it right away
+
 ## [0.4.2] - 2026-10-27
 
 ### Fixed

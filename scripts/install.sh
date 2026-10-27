@@ -291,21 +291,50 @@ install_package() {
 }
 
 # The AppImage has no H.264 decoder (patent-encumbered); the system's gst-libav adds it
-# (FR-2.41a). The distribution is unknown here, so the package manager decides the command.
-codec_hint() {
+# (FR-2.41a). The distribution is unknown here, so the package manager decides the package.
+# Nothing is asked when it is already installed; otherwise the user may let the installer add it.
+codec_support() {
+    if installed_package gst-libav gstreamer1.0-libav gstreamer1-plugin-libav gstreamer1-libav gstreamer-plugins-libav >/dev/null; then
+        return
+    fi
     if have apt-get; then
-        cmd="sudo apt install gstreamer1.0-libav"
+        hint="sudo apt install gstreamer1.0-libav"
+        set -- apt-get install -y gstreamer1.0-libav
     elif have dnf; then
-        cmd="sudo dnf install gstreamer1-libav (gst-libav comes from RPM Fusion; enable it first)"
+        hint="sudo dnf install gstreamer1-libav (gst-libav comes from RPM Fusion; enable it first)"
+        set -- dnf install -y gstreamer1-libav
     elif have pacman; then
-        cmd="sudo pacman -S gst-libav"
+        hint="sudo pacman -S gst-libav"
+        set -- pacman -S --needed --noconfirm gst-libav
     elif have zypper; then
-        cmd="sudo zypper install gstreamer-plugins-libav"
+        hint="sudo zypper install gstreamer-plugins-libav"
+        set -- zypper --non-interactive install gstreamer-plugins-libav
     else
         say "Some videos need H.264 support. Install gst-libav (the GStreamer libav plugin) with your system's package manager."
         return
     fi
-    say "Some videos need H.264 support. Install gst-libav: $cmd"
+    if ask_yes_no "Some videos need H.264 support. Install gst-libav now?"; then
+        if run_as_root "$@"; then
+            say "H.264 support installed."
+            return
+        fi
+        warn "installing gst-libav failed"
+    fi
+    say "Some videos need H.264 support. Install gst-libav: $hint"
+}
+
+# run_as_root COMMAND...: like need_root, but a missing sudo only fails this command instead of
+# stopping the installer, for optional extras.
+run_as_root() {
+    if [ "$(id -u)" -eq 0 ]; then
+        "$@" </dev/null
+    elif have sudo; then
+        say "Installing gst-libav needs administrator rights; sudo may ask for your password."
+        sudo "$@" </dev/null
+    else
+        warn "sudo is not installed"
+        return 1
+    fi
 }
 
 aur_helper() {
@@ -343,7 +372,7 @@ do_install() {
     offer_desktop_icon
     # Last, so it is not lost above the desktop icon question.
     if [ "$appimage_installed" = true ]; then
-        codec_hint
+        codec_support
     fi
 }
 
