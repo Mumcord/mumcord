@@ -27,7 +27,7 @@ committed. Use a long random key, not a word someone can guess.
 host = "127.0.0.1"
 port = 64738
 name = "Mumcord Bot"          # the user people see in the channel
-# cert_name = "Mumcord Bot"   # keeps the same identity across restarts
+# cert_name = "Mumcord_Bot"   # keeps the same identity; spaces are not allowed
 channel = "Lobby"             # channel the bot joins at login
 # password = ""               # only if the server needs a connect password
 # data_dir = "/path/to/certs"
@@ -44,6 +44,21 @@ channels = ["Lobby", 42]      # name or channel id, mixed allowed
 ```
 
 A key may only write to the channels listed for it. Add one `[[keys]]` block per outside system.
+
+## Channel passwords
+
+Passwords belong to the channel, not to a key, so they are a separate list (FR-3.22):
+
+```toml
+[[token]]
+channel = "Secret"            # name or channel id
+password = "hunter2"
+```
+
+The bot presents these passwords to the server at login, like any normal Mumble client. A channel
+that only the token group may enter becomes usable for the bot then. Without the configured
+password the bot stays outside that channel and nothing is written there. Passwords are secrets:
+the config file is git-ignored, and they are never logged.
 
 ## Post a message
 
@@ -65,7 +80,7 @@ Status codes:
 | `401` | key missing or unknown (checked before the body is read) |
 | `403` | channel not allowed for this key |
 | `404` | channel does not exist |
-| `400` | bad JSON, empty message, or message over 5000 characters |
+| `400` | bad JSON, empty message, or message over 5000 characters (or over the smaller limit the server reports) |
 | `413` | request body over 20 KB |
 | `405` | wrong HTTP method |
 | `429` | rate limit reached (20 requests per minute per key) |
