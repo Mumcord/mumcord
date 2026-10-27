@@ -57,8 +57,8 @@
 | B8 | Audio DSP chain | done | b8-dsp | B7 | complex | FR-1.23, 1.21, 1.4 | crates/audio/src/dsp/ |
 | B9 | Jitter buffer, mixer, bitrate | done | b9-mixer | B7 | complex | FR-1.24, 1.25, 1.18/1.19, 1.31 | crates/audio/src/{jitter,mixer,bitrate}/ |
 | B7b | Filter device list to user-meaningful devices (hide raw hw/plughw/surround ALSA entries, prefer PipeWire/Pulse names) | done | b7b-devices | B7 | simple | FR-1.4 | crates/audio/src/io/{cpal_backend.rs,devices.rs}, `mod devices;` in io/mod.rs |
-| B10 | Bot harness (control) | done | b10-bot | B2, B4 | complex | test infra | crates/bot (except voice) |
-| B11 | Bot voice | done | b11-botvoice | B5, B10 | simple | test infra | crates/bot/src/voice/, testenv/audio/ |
+| B10 | Bot harness (control) | done | b10-bot | B2, B4 | complex | test infra | crates/bot (except voice; now [Mumcord/mumbot](https://github.com/Mumcord/mumbot)) |
+| B11 | Bot voice | done | b11-botvoice | B5, B10 | simple | test infra | crates/bot/src/voice/ (now Mumcord/mumbot), testenv/audio/ |
 | B12 | Netsim proxy | done | b12-netsim | B1 | simple | AC-1.21–1.23 infra | tools/netsim |
 | B13 | Engine: session & connection | done | b13r-session | B3, B5, B6, B8, B9 | complex | FR-1.9, 1.10, 1.13, 1.14, 1.19, 1.22, 1.24–1.26 | crates/engine/src/{session,voice,people}.rs + matching commands |
 | B14 | Engine: chat, follow, history, profile | done | b14-chat | B13 | complex | FR-1.20, 1.28–1.34 | crates/engine/src/{chat,follow,profile}.rs + matching commands |

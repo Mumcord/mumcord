@@ -11,7 +11,7 @@
 | Machine | 16 cores, 31 GiB RAM, Linux (CachyOS) |
 | Server | Unmodified `mumblevoip/mumble-server:v1.5.735` as its own compose project `mumcord-scale`, port 64850, data in `testenv/data/scale/`, user limit raised to 1500 (test infrastructure only). Start: `testenv/scale/up.sh`, stop: `testenv/scale/down.sh`. |
 | Channels | 304 + root, seeded by `testenv/scale/seed_channels.py`: Welcome Lobby, AFK, Event Stage, Gaming › 12 games › Casual/Ranked/Squads › Squad 1–4 › Team Red/Blue (level 5), Clans › 15 clans › Lounge/Ops › Alpha–Charlie, Community, Music, Study Hall, Support. |
-| Load | `crates/bot/examples/loadtest.rs`: 1000 users without certificates (connected in about 41–59 s, 50 at a time), plus 6 talkers with certificates. Distribution: Welcome Lobby 140, AFK 110, Event Stage 120, one game room 60, the rest spread over about 110 channels with a long tail; about 190 channels empty. **Churn** (switched on by a file): 10 moves/s, 2 leaves + 2 joins/s, 1 chat message/s (half of them in the probe's channel). **Talking**: 6 speakers in the probe's channel, bursts of 1–4 s with 0.5–3 s pauses. |
+| Load | `examples/loadtest.rs` of the bot (then `crates/bot`, now [Mumcord/mumbot](https://github.com/Mumcord/mumbot)): 1000 users without certificates (connected in about 41–59 s, 50 at a time), plus 6 talkers with certificates. Distribution: Welcome Lobby 140, AFK 110, Event Stage 120, one game room 60, the rest spread over about 110 channels with a long tail; about 190 channels empty. **Churn** (switched on by a file): 10 moves/s, 2 leaves + 2 joins/s, 1 chat message/s (half of them in the probe's channel). **Talking**: 6 speakers in the probe's channel, bursts of 1–4 s with 0.5–3 s pauses. |
 | Engine probe | `crates/engine/examples/scale_probe.rs`: the real `Engine` (null audio backend, no Tauri/UI). It connects, joins Welcome Lobby, and every 5 s logs CPU, memory and events per second sent towards the UI, broken down by type. |
 | UI | Production build of the UI with the mock engine and the new opt-in seed `stress` (`VITE_MUMCORD_MOCK=1 VITE_MUMCORD_MOCK_SEED=stress`). It shows the same tree as the load server and 1000 people, about a third with avatars. It exposes `window.__mumcordMock` so a script can inject events. Measured in headless Chromium 127 at 1440×900 with dark theme, driven over the DevTools protocol. Each run was done at 1× CPU and at 4× CPU throttling (≈ a modest laptop; WebKitGTK, the real app's web engine, is usually slower than Chromium too). |
 | Not done | The real Tauri app (WebKitGTK) against the load server: it would need a full E2E Docker build plus scripting of the wizard and trust dialogs. The engine probe and the Chromium numbers cover both halves separately. The IPC hop between them (one JSON message per event) is not measured. |
@@ -120,7 +120,7 @@ Effort: **S** = hours to 1 day, **M** = 2–4 days, **L** = a week or more. **Ty
 ```bash
 testenv/scale/up.sh                                   # load server on :64850 (seeds 304 channels once)
 export CARGO_TARGET_DIR=~/.cache/mumcord-build/scale
-cargo run --release -p mumcord-bot --example loadtest -- --users 1000 \
+cargo run --release --manifest-path /path/mumbot/Cargo.toml --example loadtest -- --users 1000 \
   --churn-file /path/churn --talk-file /path/talk --cert-dir /path/botcerts
 touch /path/talk; touch /path/churn                   # switch talking / churn on (rm to stop)
 MUMCORD_AUDIO_BACKEND=null PROBE_DIR=/path/probe cargo run --release -p mumcord-engine \
