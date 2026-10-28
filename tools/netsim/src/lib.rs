@@ -8,7 +8,7 @@ use std::sync::{Arc, Mutex, PoisonError};
 use std::time::Duration;
 
 use anyhow::{Context, Result, bail};
-use rand::Rng;
+use rand::RngExt;
 use tokio::io::{AsyncBufReadExt, AsyncWriteExt, BufReader};
 use tokio::net::{TcpListener, TcpStream, UdpSocket};
 use tokio::sync::watch;
