@@ -3396,6 +3396,7 @@ dependencies = [
  "libc",
  "mumcord-engine",
  "mumcord-overlay-ipc",
+ "mumcord-protocol",
  "notify-rust",
  "open",
  "rand 0.10.3",

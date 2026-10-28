@@ -1,9 +1,10 @@
 name: Release
 
 # Release builds from version tags on main (decision QA.12). Pushing `vX.Y.Z` checks that the
-# tag matches the app version and points to a commit on main, builds and smoke-tests the
-# bundles (build-and-smoke.yml), and creates a DRAFT GitHub Release with the bundles, one SBOM
-# per bundle type and SHA256SUMS. The maintainer reviews and publishes it by hand. See RELEASING.md.
+# tag is a version and points to a commit on main, sets that version in all manifests of each
+# build (scripts/set-version.sh), builds and smoke-tests the bundles (build-and-smoke.yml), and
+# creates a DRAFT GitHub Release with the bundles, one SBOM per bundle type and SHA256SUMS. The
+# maintainer reviews and publishes it by hand. See RELEASING.md.
 on:
   push:
     tags: ["v*"]
@@ -29,7 +30,9 @@ jobs:
           # Full history, so the tagged commit can be checked against main.
           fetch-depth: 0
 
-      - name: Check tag against app version and main
+      # The manifests in the repository are not bumped for a release: every job that builds or
+      # publishes sets this version first (scripts/set-version.sh, RELEASING.md).
+      - name: Check tag is a version on main
         id: check
         env:
           TAG: ${{ github.ref_name }}
@@ -39,31 +42,18 @@ jobs:
             || fail "Tag '$TAG' is not a version tag like v1.2.3."
           version=${TAG#v}
 
-          # Tauri takes the app version from the src-tauri crate (tauri.conf.json sets none),
-          # which inherits the workspace version in Cargo.toml.
-          check() { [[ "$2" == "$version" ]] || fail "$1 is '$2', but the tag says '$version'."; }
-          check "package.json version" "$(node -p "require('./package.json').version")"
-          check "package-lock.json version" "$(node -p "require('./package-lock.json').version")"
-          conf=$(node -p "require('./src-tauri/tauri.conf.json').version ?? ''")
-          [[ -z "$conf" ]] || check "src-tauri/tauri.conf.json version" "$conf"
-          cargo metadata --no-deps --format-version 1 \
-            | jq -r '.packages[] | "\(.name) \(.version)"' > members.txt
-          while read -r name v; do
-            check "Cargo.toml version of crate $name" "$v"
-            # The builds use --locked, so a stale Cargo.lock would fail late; catch it here.
-            locked=$(awk -v n="$name" '$0 == "name = \"" n "\"" { getline; gsub(/version = |"/, ""); print; exit }' Cargo.lock)
-            check "Cargo.lock version of crate $name (run cargo check after bumping)" "$locked"
-          done < members.txt
-          # The smoke-test seeder is a separate Cargo project that also pins workspace crates.
-          cargo metadata --manifest-path scripts/smoke/seed/Cargo.toml --locked --format-version 1 >/dev/null \
-            || fail "scripts/smoke/seed/Cargo.lock is stale (run cargo check --manifest-path scripts/smoke/seed/Cargo.toml)."
-
           commit=$(git rev-parse HEAD)
           git merge-base --is-ancestor "$commit" origin/main \
             || fail "Tag '$TAG' points to $commit, which is not on main. Tag a commit on main."
 
-          echo "Tag $TAG matches the app version and is on main."
+          echo "Tag $TAG is a version on main."
           echo "version=$version" >> "$GITHUB_OUTPUT"
+
+      # Fails here, before any build, when the script cannot set this version.
+      - name: Dry run of the version step
+        env:
+          VERSION: ${{ steps.check.outputs.version }}
+        run: scripts/set-version.sh "$VERSION"
 
   # Regenerates the third-party notices from the tagged commit, so the About page of every bundle
   # lists exactly the dependencies it ships; the build jobs bundle this artifact. It also enforces
@@ -112,6 +102,7 @@ jobs:
     uses: ./.github/workflows/build-and-smoke.yml
     with:
       release: true
+      version: ${{ needs.guard.outputs.version }}
     # Passes the optional Apple signing secrets; id-token lets the Windows job log in to Azure
     # for Artifact Signing without a stored secret (docs/release-signing.md).
     secrets: inherit
@@ -149,6 +140,13 @@ jobs:
           pattern: sbom-native-*
           path: native
           merge-multiple: true
+
+      # The manifests carry no release version; set the tag's, as the builds do, so the SBOMs
+      # list Mumcord's own crates and packages with it.
+      - name: Set version
+        env:
+          VERSION: ${{ needs.guard.outputs.version }}
+        run: scripts/set-version.sh "$VERSION"
 
       - name: Generate SBOMs
         env:
@@ -322,4 +320,6 @@ jobs:
     name: Publish crates
     needs: [guard, release]
     uses: ./.github/workflows/publish-crates.yml
+    with:
+      version: ${{ needs.guard.outputs.version }}
     secrets: inherit

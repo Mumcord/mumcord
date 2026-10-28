@@ -72,7 +72,8 @@ export function AboutSection({ settings, update }: SettingsSectionProps) {
             type="button"
             className="settings-button"
             onClick={() => {
-              openInBrowser(`${changelogBase}#v${info.version}`);
+              // Dev builds have no changelog entry of their own; they open their base release.
+              openInBrowser(`${changelogBase}#v${info.packageVersion}`);
             }}
           >
             {t("about.whatsNew")}

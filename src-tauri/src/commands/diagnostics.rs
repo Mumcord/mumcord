@@ -14,7 +14,10 @@ const THIRD_PARTY_NOTICES: &str = include_str!("../../../THIRD_PARTY_NOTICES");
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, Type)]
 #[serde(rename_all = "camelCase")]
 pub struct AppInfo {
+    /// The display version: `X.Y.Z` for a release, `dev~<commit>` or `dev~YYYYMMDD` otherwise.
     pub version: String,
+    /// Numeric `X.Y.Z` (the last release for dev builds), for versions other clients parse.
+    pub package_version: String,
     pub os: String,
     /// Contents of `THIRD_PARTY_NOTICES` for Settings → About.
     pub third_party_notices: String,
@@ -37,7 +40,7 @@ pub struct LinuxDistro {
 #[tauri::command]
 #[specta::specta]
 pub fn diagnostics_save(path: String) -> ApiResult<()> {
-    let info = diag::collect_info(env!("CARGO_PKG_VERSION"));
+    let info = diag::collect_info(crate::version::DISPLAY);
     diag::save_diagnostic_file(Path::new(&path), &info).map_err(|e| {
         ApiError::new(
             ErrorCode::Io,
@@ -50,7 +53,8 @@ pub fn diagnostics_save(path: String) -> ApiResult<()> {
 #[specta::specta]
 pub fn app_info() -> ApiResult<AppInfo> {
     Ok(AppInfo {
-        version: env!("CARGO_PKG_VERSION").to_owned(),
+        version: crate::version::DISPLAY.to_owned(),
+        package_version: crate::version::PACKAGE.to_owned(),
         os: diag::os_description(),
         third_party_notices: THIRD_PARTY_NOTICES.to_owned(),
         appimage: appimage(),

@@ -48,6 +48,13 @@ jobs:
     steps:
       - uses: actions/checkout@v7
 
+      # The version the app shows (RELEASING.md); the manifests keep the last release's version.
+      - name: Set display version
+        shell: bash
+        env:
+          SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+        run: echo "MUMCORD_VERSION=dev~${SHA::7}" >> "$GITHUB_ENV"
+
       # The runner's Ubuntu mirror is often very slow (30 kB/s: 40 min for 70 MB), so the downloaded
       # packages are cached per runner image; apt then only downloads what changed. The cache is
       # saved even when the step times out, so a slow first download is not lost.
@@ -183,6 +190,11 @@ jobs:
       - name: UI tests
         if: runner.os == 'Linux'
         run: npm test
+
+      # release.yml and publish-crates.yml set the tag's version with this script before building.
+      - name: Version script
+        if: runner.os == 'Linux'
+        run: scripts/ci/test-set-version.sh
 
       # Linux is covered by the E2E build job, which builds the same app.
       - name: Tauri debug build

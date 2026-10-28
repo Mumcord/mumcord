@@ -26,6 +26,7 @@ afterEach(() => {
 function onSystem(os: string, distro: LinuxDistro | null) {
   vi.spyOn(api, "appInfo").mockResolvedValue({
     version: "0.4.0",
+    packageVersion: "0.4.0",
     os,
     thirdPartyNotices: "",
     appimage: true,

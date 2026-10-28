@@ -1671,6 +1671,7 @@ export function createMockApi(options: MockOptions = {}): MockApi {
         demo
           ? {
               version: "0.3.0",
+              packageVersion: "0.3.0",
               os: "Linux x86_64",
               thirdPartyNotices:
                 "Mumble\nCopyright (c) The Mumble Developers\nBSD-3-Clause\n\nTauri - Apache-2.0 OR MIT\n\nReact - MIT",
@@ -1679,6 +1680,7 @@ export function createMockApi(options: MockOptions = {}): MockApi {
             }
           : {
               version: "0.0.0-mock",
+              packageVersion: "0.0.0-mock",
               os: "mock",
               thirdPartyNotices:
                 "Mumble\nCopyright (c) The Mumble Developers\nBSD-3-Clause\n\nSome library - Apache-2.0",

@@ -1094,6 +1094,19 @@ describe("About section", () => {
     );
   });
 
+  it("shows a dev build's display version and links the release it is based on", async () => {
+    const info = api.appInfo.bind(api);
+    vi.spyOn(api, "appInfo").mockImplementation(async () => ({
+      ...(await info()),
+      version: "dev~a1b2c3d",
+      packageVersion: "0.4.2",
+    }));
+    await openSection("About");
+    expect(await screen.findByText("dev~a1b2c3d")).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "What's new" }));
+    expect(openInBrowser).toHaveBeenLastCalledWith("https://mumcord.app/en/changelog#v0.4.2");
+  });
+
   it("links the German changelog for the German UI", async () => {
     await applyLanguage("de");
     await openSection("Über");
@@ -1215,6 +1228,7 @@ describe("Overlay on macOS (QA.58)", () => {
   const onMacos = () =>
     vi.spyOn(api, "appInfo").mockResolvedValue({
       version: "0.0.0",
+      packageVersion: "0.0.0",
       os: "macos aarch64",
       thirdPartyNotices: "",
       appimage: false,
@@ -1237,6 +1251,7 @@ describe("Overlay on macOS (QA.58)", () => {
   it("keeps the Overlay section and its search entries on Linux", async () => {
     vi.spyOn(api, "appInfo").mockResolvedValue({
       version: "0.0.0",
+      packageVersion: "0.0.0",
       os: "linux x86_64",
       thirdPartyNotices: "",
       appimage: false,

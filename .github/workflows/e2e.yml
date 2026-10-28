@@ -45,6 +45,13 @@ jobs:
     steps:
       - uses: actions/checkout@v7
 
+      # The version the app shows (RELEASING.md); the manifests keep the last release's version.
+      - name: Set display version
+        shell: bash
+        env:
+          SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+        run: echo "MUMCORD_VERSION=dev~${SHA::7}" >> "$GITHUB_ENV"
+
       - uses: actions/setup-node@v7
         with:
           node-version: 24

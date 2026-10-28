@@ -66,7 +66,8 @@ describe("packet inspector (issue #60)", () => {
     await openSettings("About");
     expect(await $("//button[@role='tab'][normalize-space()='Packet inspector']").isExisting()).toBe(false);
     const version = $("//dt[normalize-space()='Version']/following-sibling::dd[1]");
-    await browser.waitUntil(async () => /\d+\.\d+/.test(await version.getText()), {
+    // Dev builds show dev~<commit> instead of a release version (RELEASING.md).
+    await browser.waitUntil(async () => /\d+\.\d+|dev~\S+/.test(await version.getText()), {
       timeoutMsg: "version not loaded",
     });
     for (let i = 0; i < 7; i++) await version.click();

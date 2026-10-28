@@ -117,6 +117,8 @@ const neutral = (t: string) =>
   /^In \S+ \(\d+\)$/.test(t) ||
   // Language names in the picker are shown in their own language (endonyms).
   /^(Български|Čeština|Dansk|Deutsch|Ελληνικά|English|Español|Eesti|Suomi|Français|Gaeilge|Hrvatski|Magyar|Italiano|Lietuvių|Latviešu|Malti|Nederlands|Polski|Português|Română|Slovenčina|Slovenščina|Svenska)$/.test(t) ||
+  // Dev builds show their version as dev~<commit> or dev~YYYYMMDD (RELEASING.md).
+  /^dev~[\w.-]+$/.test(t) ||
   // Pixel values like "240 px" (and the bare unit) are not translated.
   /^(\d+\s*)?px$/.test(t) ||
   /^(Mumcord|Lobby|Raid|AFK|Root|Chat|Audio|Normal|Port|Version|System|Name|Overlay|Position|Support|C7Lang\w*|localhost.*|OK|Opus|UDP|TCP|TLS|mumble:\/\/.*|v?\d[\w.-]*|https?:\/\/.*|\w+@\w+.*)$/i.test(t);

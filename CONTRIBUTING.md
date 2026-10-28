@@ -29,6 +29,7 @@ The pull request template already has a checkbox for it. Pull requests without i
 - Use Conventional Commits (`feat:`, `fix:`, `docs:`, `chore:` ...).
 - Build, tests, type checks and linters must pass.
 - Never include secrets or connect tests to public Mumble servers; use a local test server.
+- Do not bump versions in `package.json` or `Cargo.toml`: the version comes from the release tag at build time, and a local build shows `dev~YYYYMMDD` (see [RELEASING.md](RELEASING.md#versions)).
 
 ## Dependency updates
 
