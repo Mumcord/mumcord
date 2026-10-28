@@ -214,5 +214,19 @@
     "videoFallback": "YouTube video",
     "someone": "Netko",
     "joinFailed": "Pridruživanje zajedničkom gledanju nije uspjelo."
+  },
+  "card": {
+    "label": "Kartica: {{title}}",
+    "labelWithStatus": "Kartica: {{title}}, {{status}}",
+    "untitled": "Bez naslova",
+    "status": {
+      "info": "Informacija",
+      "success": "Uspjeh",
+      "warning": "Upozorenje",
+      "error": "Pogreška"
+    },
+    "open": "Otvori",
+    "openLabel": "Otvori {{title}} u pregledniku",
+    "imageLink": "Slika: {{url}}"
   }
 }

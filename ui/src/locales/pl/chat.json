@@ -218,5 +218,19 @@
     "videoFallback": "Film z YouTube",
     "someone": "Ktoś",
     "joinFailed": "Nie udało się dołączyć do wspólnego oglądania."
+  },
+  "card": {
+    "label": "Karta: {{title}}",
+    "labelWithStatus": "Karta: {{title}}, {{status}}",
+    "untitled": "Bez tytułu",
+    "status": {
+      "info": "Informacja",
+      "success": "Sukces",
+      "warning": "Ostrzeżenie",
+      "error": "Błąd"
+    },
+    "open": "Otwórz",
+    "openLabel": "Otwórz {{title}} w przeglądarce",
+    "imageLink": "Obraz: {{url}}"
   }
 }

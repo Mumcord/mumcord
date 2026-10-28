@@ -210,5 +210,19 @@
     "videoFallback": "YouTube video",
     "someone": "Someone",
     "joinFailed": "Could not join the watch party."
+  },
+  "card": {
+    "label": "Card: {{title}}",
+    "labelWithStatus": "Card: {{title}}, {{status}}",
+    "untitled": "Untitled",
+    "status": {
+      "info": "Info",
+      "success": "Success",
+      "warning": "Warning",
+      "error": "Error"
+    },
+    "open": "Open",
+    "openLabel": "Open {{title}} in browser",
+    "imageLink": "Image: {{url}}"
   }
 }

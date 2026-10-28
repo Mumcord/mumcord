@@ -223,6 +223,44 @@ describe("Composer replies", () => {
   });
 });
 
+describe("Composer cards", () => {
+  afterEach(() => {
+    resetAll();
+  });
+
+  it("sends typed card BB code as card HTML that official clients can read", async () => {
+    const api = await connectedMock();
+    const sent: string[] = [];
+    const original = api.sendChannelMessage.bind(api);
+    vi.spyOn(api, "sendChannelMessage").mockImplementation((serverId, channel, html) => {
+      sent.push(html);
+      return original(serverId, channel, html);
+    });
+    render(
+      <Composer
+        target={{ kind: "channel", channelId: 1 }}
+        limits={LIMITS}
+        label="Message #Lobby"
+        blockedReason={null}
+      />,
+    );
+    const input = screen.getByRole<HTMLTextAreaElement>("textbox", { name: "Message #Lobby" });
+    fireEvent.change(input, {
+      target: {
+        value: "[card title=Deploy color=info url=https://ci.test/1]Version **2.8**[/card]",
+      },
+    });
+    fireEvent.keyDown(input, { key: "Enter" });
+    await waitFor(() => {
+      expect(sent).toEqual([
+        '<div data-mumcord-card="v=1&amp;title=Deploy&amp;color=info&amp;url=https%3A%2F%2Fci.test%2F1">' +
+          '<b>[Info] Deploy</b><div data-mumcord-card="body">Version <strong>2.8</strong></div>' +
+          '<a href="https://ci.test/1">https://ci.test/1</a></div>',
+      ]);
+    });
+  });
+});
+
 describe("Composer Apps button", () => {
   afterEach(resetAll);
 

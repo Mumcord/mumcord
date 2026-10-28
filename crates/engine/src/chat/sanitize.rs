@@ -5,7 +5,8 @@
 //! Chat messages additionally keep absolute http(s) image sources ([`sanitize_message_html`]):
 //! the UI never puts them into the page but asks the engine to fetch them (FR-1.55, QA.35)
 //! when link previews are on. Comments and welcome texts never keep them. Message images also
-//! keep a valid full-image reference ([`crate::full_image::wire::ATTRIBUTE`], FR-1.60c).
+//! keep a valid full-image reference ([`crate::full_image::wire::ATTRIBUTE`], FR-1.60c) and the
+//! message card marker ([`CARD_ATTRIBUTE`] on `<div>`, issue #72), which the UI parses strictly.
 
 use std::borrow::Cow;
 use std::collections::{HashMap, HashSet};
@@ -54,6 +55,9 @@ const TAGS: &[&str] = &[
     "ul",
 ];
 
+/// Marks a message card and its text (docs/message-cards.md); plain data for the UI.
+pub const CARD_ATTRIBUTE: &str = "data-mumcord-card";
+
 const IMAGE_TYPES: &[&str] = &["png", "jpeg", "gif", "webp"];
 
 static POLICY: LazyLock<Builder<'static>> = LazyLock::new(|| policy(false));
@@ -64,13 +68,17 @@ fn policy(message: bool) -> Builder<'static> {
     if message {
         image_attributes.insert(FULL_ATTRIBUTE);
     }
+    let mut tag_attributes = HashMap::from([
+        ("a", HashSet::from(["href", "title"])),
+        ("img", image_attributes),
+    ]);
+    if message {
+        tag_attributes.insert("div", HashSet::from([CARD_ATTRIBUTE]));
+    }
     let mut builder = Builder::empty();
     builder
         .tags(TAGS.iter().copied().collect())
-        .tag_attributes(HashMap::from([
-            ("a", HashSet::from(["href", "title"])),
-            ("img", image_attributes),
-        ]))
+        .tag_attributes(tag_attributes)
         .url_schemes(HashSet::from(["http", "https", "mailto", "data"]))
         .url_relative(UrlRelative::Deny)
         .link_rel(Some("noopener noreferrer nofollow"))
@@ -209,6 +217,18 @@ mod tests {
             let html = format!("<img src=\"{PNG}\" data-mumcord-full=\"{bad}\">");
             assert_eq!(sanitize_message_html(&html), format!("<img src=\"{PNG}\">"));
         }
+    }
+
+    #[test]
+    fn messages_keep_the_card_marker_on_divs_only() {
+        let html = "<div data-mumcord-card=\"v=1&amp;title=CPU\"><b>CPU</b>\
+                    <div data-mumcord-card=\"body\">x</div></div>";
+        assert_eq!(sanitize_message_html(html), html);
+        assert_eq!(sanitize_html(html), "<div><b>CPU</b><div>x</div></div>");
+        assert_eq!(
+            sanitize_message_html("<span data-mumcord-card=\"body\">x</span>"),
+            "<span>x</span>"
+        );
     }
 
     #[test]

@@ -49,6 +49,8 @@ import { FullImageBars } from "./FullImageBars";
 import { SendFailure } from "./SendFailure";
 import { findThemeCode } from "../../theme/shareCodec";
 import { ThemeCard } from "./ThemeCard";
+import { extractCards } from "./cards";
+import { MessageCards } from "./MessageCard";
 import { useSharedTheme, withoutThemeShare } from "./sharedTheme";
 import { ImageViewer, type ViewerImage } from "./ImageViewer";
 import { LinkPreviews } from "./LinkPreviewCard";
@@ -183,7 +185,9 @@ function Body({ message, tabIndex, previews, onImageClick, clickablePeople, onJu
   const { t } = useTranslation("chat");
   const html = message.body;
   const ref = useRef<HTMLDivElement>(null);
-  const sanitizedHtml = useMemo(() => highlightCode(sanitizeHtml(html)), [html]);
+  // Cards (issue #72) render on their own below the text, like the theme card.
+  const extracted = useMemo(() => extractCards(sanitizeHtml(html)), [html]);
+  const sanitizedHtml = useMemo(() => highlightCode(extracted.rest), [extracted]);
   // A reply shows its quote as a header; the rest is the message itself.
   const reply = useMemo(() => parseReply(sanitizedHtml), [sanitizedHtml]);
   const cleaned = reply?.rest ?? sanitizedHtml;
@@ -294,6 +298,12 @@ function Body({ message, tabIndex, previews, onImageClick, clickablePeople, onJu
     <>
       {reply ? <ReplyHeader quote={reply.quote} onJump={onJump} tabIndex={tabIndex} /> : null}
       {body}
+      <MessageCards
+        cards={extracted.cards}
+        tabIndex={tabIndex}
+        previews={previews}
+        onImageClick={onImageClick}
+      />
       <FullImageBars html={cleaned} />
       <ThemeCard html={cleaned} tabIndex={tabIndex} />
       {previews ? (

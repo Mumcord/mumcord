@@ -210,5 +210,19 @@
     "videoFallback": "Видео в YouTube",
     "someone": "Някой",
     "joinFailed": "Неуспешно влизане в общото гледане."
+  },
+  "card": {
+    "label": "Карта: {{title}}",
+    "labelWithStatus": "Карта: {{title}}, {{status}}",
+    "untitled": "Без заглавие",
+    "status": {
+      "info": "Информация",
+      "success": "Успех",
+      "warning": "Предупреждение",
+      "error": "Грешка"
+    },
+    "open": "Отвори",
+    "openLabel": "Отвори {{title}} в браузъра",
+    "imageLink": "Изображение: {{url}}"
   }
 }

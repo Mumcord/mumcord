@@ -6,6 +6,9 @@
 import DOMPurify from "dompurify";
 import { FULL_ATTRIBUTE, FULL_REFERENCE } from "./fullImage";
 
+/** Marks a message card on the wire (see `cards.ts`); kept on `<div>` only. */
+const CARD_ATTRIBUTE = "data-mumcord-card";
+
 const ALLOWED_TAGS = [
   "a",
   "b",
@@ -56,10 +59,13 @@ const SAFE_IMAGE = /^data:image\/(?:png|jpeg|gif|webp);base64,[a-z0-9+/=\s]+$/i;
 const purifier = DOMPurify(window);
 
 // The full-image reference of message images (FR-1.60c) survives only in its exact format;
-// data attributes are otherwise not allowed.
+// data attributes are otherwise not allowed. The same goes for the card marker.
 purifier.addHook("uponSanitizeAttribute", (node, data) => {
   if (node.nodeName === "IMG" && data.attrName === FULL_ATTRIBUTE) {
     data.forceKeepAttr = FULL_REFERENCE.test(data.attrValue);
+  } else if (node.nodeName === "DIV" && data.attrName === CARD_ATTRIBUTE) {
+    // Plain data; `cards.ts` parses the value strictly.
+    data.forceKeepAttr = true;
   }
 });
 

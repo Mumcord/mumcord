@@ -210,5 +210,19 @@
     "videoFallback": "YouTube-videó",
     "someone": "Valaki",
     "joinFailed": "Nem sikerült csatlakozni a közös nézéshez."
+  },
+  "card": {
+    "label": "Kártya: {{title}}",
+    "labelWithStatus": "Kártya: {{title}}, {{status}}",
+    "untitled": "Cím nélkül",
+    "status": {
+      "info": "Információ",
+      "success": "Siker",
+      "warning": "Figyelmeztetés",
+      "error": "Hiba"
+    },
+    "open": "Megnyitás",
+    "openLabel": "{{title}} megnyitása a böngészőben",
+    "imageLink": "Kép: {{url}}"
   }
 }

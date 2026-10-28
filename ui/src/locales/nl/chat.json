@@ -210,5 +210,19 @@
     "videoFallback": "YouTube-video",
     "someone": "Iemand",
     "joinFailed": "Deelnemen aan de watchparty is mislukt."
+  },
+  "card": {
+    "label": "Kaart: {{title}}",
+    "labelWithStatus": "Kaart: {{title}}, {{status}}",
+    "untitled": "Zonder titel",
+    "status": {
+      "info": "Info",
+      "success": "Gelukt",
+      "warning": "Waarschuwing",
+      "error": "Fout"
+    },
+    "open": "Openen",
+    "openLabel": "{{title}} openen in de browser",
+    "imageLink": "Afbeelding: {{url}}"
   }
 }
