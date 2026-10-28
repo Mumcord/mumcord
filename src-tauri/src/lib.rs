@@ -10,6 +10,7 @@ mod display;
 #[cfg(target_os = "linux")]
 mod gst_fallback;
 mod ingame_overlay;
+mod inspector_window;
 mod kde;
 #[cfg(target_os = "linux")]
 mod kde_x11;
@@ -145,6 +146,10 @@ fn specta_builder() -> Builder<tauri::Wry> {
             commands::inspector::packet_capture_poll,
             commands::inspector::packet_capture_clear,
             commands::inspector::packet_capture_export,
+            commands::inspector::packet_inspector_open,
+            commands::inspector::packet_inspector_close,
+            commands::inspector::packet_inspector_share,
+            commands::inspector::packet_inspector_view,
             notify::notify_message,
             notify::notification_dismiss,
             commands::now_playing::now_playing_status,
@@ -224,6 +229,7 @@ fn specta_builder() -> Builder<tauri::Wry> {
             commands::watch_party::WatchPartyChanged,
             commands::screen_share::ScreenSharesChanged,
             commands::updates::UpdateAvailable,
+            commands::inspector::InspectorViewChanged,
         ])
 }
 
@@ -272,12 +278,25 @@ pub fn run() {
         .plugin(tauri_plugin_deep_link::init())
         .plugin(tauri_plugin_global_shortcut::Builder::new().build())
         .plugin(tauri_plugin_dialog::init())
-        .invoke_handler(invoke)
+        .invoke_handler(move |call| {
+            let label = call.message.webview_ref().label().to_owned();
+            if !inspector_window::command_allowed(&label, call.message.command()) {
+                call.resolver.reject(commands::types::ApiError::new(
+                    commands::types::ErrorCode::PermissionDenied,
+                    "this command is not available in this window",
+                ));
+                return true;
+            }
+            invoke(call)
+        })
         .manage(dropped::DroppedFiles::default())
+        .manage(inspector_window::OpenLock::default())
+        .manage(commands::inspector::SharedView::default())
         .manage(watch_player::PlayerServer::default())
         .on_window_event(|window, event| {
             dropped::on_window_event(window, event);
             window::on_window_event(window, event);
+            inspector_window::on_window_event(window, event);
         })
         .setup(move |app| {
             builder.mount_events(app);

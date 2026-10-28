@@ -494,6 +494,7 @@
     "intro": "Taispeánann sé na paicéid a sheolann agus a fhaigheann Mumcord, go príomha sonraí breiseán Mumcord, chun fabhtanna a aimsiú. Ní choinnítear ach na 2,000 paicéad is déanaí, i gcuimhne an ghléis seo; ní logáiltear ná ní sheoltar aon rud áit ar bith.",
     "devTools": "Uirlisí forbróra",
     "devToolsHint": "Cuir as chun an cigire paicéad a cheilt arís agus an gabháil a stopadh.",
+    "open": "Oscail an cigire paicéad",
     "filters": "Scagairí agus easpórtáil",
     "server": "Freastalaí",
     "allServers": "Gach freastalaí",

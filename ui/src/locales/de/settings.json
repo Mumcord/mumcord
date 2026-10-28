@@ -488,6 +488,7 @@
     "intro": "Zeigt die Pakete, die Mumcord sendet und empfängt, vor allem Mumcord-Plugin-Daten, zur Fehlersuche. Es werden nur die letzten 2.000 Pakete im Arbeitsspeicher dieses Geräts gehalten; nichts wird protokolliert oder irgendwohin gesendet.",
     "devTools": "Entwicklerwerkzeuge",
     "devToolsHint": "Ausschalten, um den Paketinspektor wieder auszublenden und die Aufzeichnung zu beenden.",
+    "open": "Paketinspektor öffnen",
     "filters": "Filter und Export",
     "server": "Server",
     "allServers": "Alle Server",

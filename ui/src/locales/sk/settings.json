@@ -492,6 +492,7 @@
     "intro": "Zobrazuje pakety, ktoré Mumcord odosiela a prijíma, hlavne dáta pluginov Mumcord, na ladenie. Uchováva sa iba posledných 2 000 paketov, v pamäti tohto zariadenia; nič sa nezaznamenáva ani nikam neodosiela.",
     "devTools": "Vývojárske nástroje",
     "devToolsHint": "Vypnutím znova skryjete inšpektor paketov a zastavíte zachytávanie.",
+    "open": "Otvoriť inšpektor paketov",
     "filters": "Filtre a export",
     "server": "Server",
     "allServers": "Všetky servery",

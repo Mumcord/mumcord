@@ -488,6 +488,7 @@
     "intro": "Viser de pakker, Mumcord sender og modtager, mest Mumcord-plugindata, til fejlfinding. Kun de seneste 2.000 pakker gemmes, i hukommelsen på denne enhed; intet logges eller sendes noget sted hen.",
     "devTools": "Udviklerværktøjer",
     "devToolsHint": "Slå fra for at skjule pakkeinspektøren igen og stoppe optagelsen.",
+    "open": "Åbn pakkeinspektøren",
     "filters": "Filtre og eksport",
     "server": "Server",
     "allServers": "Alle servere",

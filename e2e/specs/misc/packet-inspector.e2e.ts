@@ -9,7 +9,8 @@ import { button, finishWizardWithDefaults, waitForText, wizardStep } from "../..
 
 // Issue #60: the hidden packet inspector. Seven clicks on the version in About unlock it; on
 // connecting, the app greets the bot that is already there with a Mumcord hello (plugin data),
-// which must show up as a sent row that expands to its decoded content and can be exported.
+// which must show up as a sent row in the inspector's own window, expand to its decoded content
+// and be exportable. WebDriver sees that window as a second window handle.
 const MY_NAME = "Inspector-Tester";
 const BOT_NAME = "Inspector-Bot";
 
@@ -17,6 +18,22 @@ async function openSettings(tab: string): Promise<void> {
   await $("button[aria-label='Quick settings']").click();
   await $("//button[@role='menuitem'][contains(., 'All settings')]").click();
   await $(`//button[@role='tab'][normalize-space()='${tab}']`).click();
+}
+
+let mainWindow = "";
+
+/** Switches WebDriver to the inspector window once it exists. */
+async function switchToInspector(): Promise<void> {
+  let inspector = "";
+  await browser.waitUntil(
+    async () => {
+      const handles = await browser.getWindowHandles();
+      inspector = handles.find((h) => h !== mainWindow) ?? "";
+      return inspector !== "";
+    },
+    { timeout: 15_000, timeoutMsg: "packet inspector window never opened" },
+  );
+  await browser.switchToWindow(inspector);
 }
 
 /** Types `path` into the native save dialog titled `title` (WebDriver cannot reach it). */
@@ -87,7 +104,12 @@ describe("packet inspector (issue #60)", () => {
     await button("Trust and connect").click();
     await waitConnected();
 
+    mainWindow = await browser.getWindowHandle();
     await openSettings("Packet inspector");
+    expect(await $("table").isExisting()).toBe(false);
+    await button("Open packet inspector").click();
+    await switchToInspector();
+    await $("main[aria-label='Packet inspector']").waitForDisplayed();
     const row = $("//tr[contains(@class,'pi-row-sent')][.//code[normalize-space()='mumcord.hello']]");
     await row.waitForDisplayed({ timeout: 15_000, timeoutMsg: "no sent hello row" });
     expect(await row.getText()).toContain("Mumcord hello");
@@ -115,5 +137,26 @@ describe("packet inspector (issue #60)", () => {
     const exported = JSON.parse(text) as { warning: string; packets: { kind: string; direction: string }[] };
     expect(exported.warning).toMatch(/personal data/);
     expect(exported.packets.some((p) => p.kind === "mumcord.hello" && p.direction === "sent")).toBe(true);
+  });
+
+  it("keeps a single window: opening again brings the open one back", async () => {
+    await browser.switchToWindow(mainWindow);
+    await button("Open packet inspector").click();
+    await browser.pause(1000);
+    expect(await browser.getWindowHandles()).toHaveLength(2);
+  });
+
+  it("ignores Escape and closes on Ctrl+W, leaving the app running", async () => {
+    await switchToInspector();
+    await browser.keys(["Escape"]);
+    await browser.pause(500);
+    expect(await browser.getWindowHandles()).toHaveLength(2);
+    await browser.keys(["Control", "w"]);
+    await browser.waitUntil(async () => (await browser.getWindowHandles()).length === 1, {
+      timeout: 10_000,
+      timeoutMsg: "Ctrl+W did not close the packet inspector",
+    });
+    await browser.switchToWindow(mainWindow);
+    await button("Open packet inspector").waitForDisplayed();
   });
 });

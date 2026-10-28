@@ -492,6 +492,7 @@
     "intro": "Pokazuje pakiety wysyłane i odbierane przez Mumcord, głównie dane wtyczek Mumcord, do debugowania. Przechowywanych jest tylko ostatnie 2000 pakietów, w pamięci tego urządzenia; nic nie jest zapisywane w logach ani nigdzie wysyłane.",
     "devTools": "Narzędzia deweloperskie",
     "devToolsHint": "Wyłącz, aby ponownie ukryć inspektor pakietów i zatrzymać przechwytywanie.",
+    "open": "Otwórz inspektor pakietów",
     "filters": "Filtry i eksport",
     "server": "Serwer",
     "allServers": "Wszystkie serwery",

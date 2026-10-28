@@ -1,12 +1,17 @@
 //! Packet inspector for debugging (issue #60): hidden until the user unlocks the developer
 //! tools. Captured packets stay in the engine's memory; the UI fetches new ones every 250 ms
-//! while the inspector is open.
+//! while the inspector window is open. The main window shares its theme, language and the names
+//! it knows with that window, which has no access to the rest of the app.
+
+use std::collections::BTreeMap;
+use std::sync::Mutex;
 
 use mumcord_engine::Engine;
 use mumcord_engine::inspector::{InspectorPoll, PacketCount, PacketView, TapDirection, VoiceCount};
 use serde::{Deserialize, Serialize};
 use specta::Type;
-use tauri::State;
+use tauri::{AppHandle, State};
+use tauri_specta::Event;
 
 use super::types::{ApiError, ApiResult, ErrorCode, ServerId, SessionId, to_api_server_id};
 
@@ -146,8 +151,15 @@ impl From<InspectorPoll> for PacketCapture {
 /// unlocked; turning it off drops everything captured.
 #[tauri::command]
 #[specta::specta]
-pub fn packet_capture_set(engine: State<'_, Engine>, enabled: bool) -> ApiResult<()> {
+pub fn packet_capture_set(
+    app: AppHandle,
+    engine: State<'_, Engine>,
+    enabled: bool,
+) -> ApiResult<()> {
     engine.set_packet_capture(enabled);
+    if !enabled {
+        crate::inspector_window::close(&app);
+    }
     Ok(())
 }
 
@@ -176,4 +188,97 @@ pub fn packet_capture_clear(engine: State<'_, Engine>) -> ApiResult<()> {
 pub fn packet_capture_export(path: String, contents: String) -> ApiResult<()> {
     std::fs::write(&path, contents)
         .map_err(|e| ApiError::new(ErrorCode::Io, format!("writing packet export failed: {e}")))
+}
+
+/// A person the main window knows, for the inspector's from / to column.
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, Type)]
+#[serde(rename_all = "camelCase")]
+pub struct InspectorUser {
+    pub server_id: ServerId,
+    pub session: SessionId,
+    pub name: String,
+}
+
+/// A saved server's label, for the inspector's server filter.
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, Type)]
+#[serde(rename_all = "camelCase")]
+pub struct InspectorServer {
+    pub server_id: ServerId,
+    pub label: String,
+}
+
+/// What the inspector window takes over from the main window: the look of the page and the
+/// names to show.
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, Type)]
+#[serde(rename_all = "camelCase")]
+pub struct InspectorView {
+    /// `data-*` attributes of the main window's root element (theme, visual effects, hints).
+    pub attributes: BTreeMap<String, String>,
+    /// CSS custom properties set on the main window's root element (theme colours).
+    pub properties: BTreeMap<String, String>,
+    pub language: String,
+    pub users: Vec<InspectorUser>,
+    pub servers: Vec<InspectorServer>,
+}
+
+/// The main window's view changed; sent to the inspector window only.
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, Type, Event)]
+#[serde(rename_all = "camelCase")]
+pub struct InspectorViewChanged {
+    pub view: InspectorView,
+}
+
+/// The last view the main window shared, for an inspector window that opens later.
+#[derive(Default)]
+pub struct SharedView(Mutex<Option<InspectorView>>);
+
+/// Opens the packet inspector window, or brings it to the front if it is already open.
+#[tauri::command]
+#[specta::specta]
+pub async fn packet_inspector_open(app: AppHandle) -> ApiResult<()> {
+    // Async: creating a window from a synchronous command deadlocks on Windows.
+    crate::inspector_window::open(&app).map_err(|e| {
+        tracing::warn!(error = %e, "opening the packet inspector window failed");
+        ApiError::new(
+            ErrorCode::Io,
+            format!("opening the packet inspector failed: {e}"),
+        )
+    })
+}
+
+/// Closes the packet inspector window (Ctrl+W in that window).
+#[tauri::command]
+#[specta::specta]
+pub fn packet_inspector_close(app: AppHandle) -> ApiResult<()> {
+    crate::inspector_window::close(&app);
+    Ok(())
+}
+
+/// Called by the main window whenever its theme, language or known names change.
+#[tauri::command]
+#[specta::specta]
+pub fn packet_inspector_share(
+    app: AppHandle,
+    shared: State<'_, SharedView>,
+    view: InspectorView,
+) -> ApiResult<()> {
+    *shared
+        .0
+        .lock()
+        .unwrap_or_else(std::sync::PoisonError::into_inner) = Some(view.clone());
+    if let Err(e) = (InspectorViewChanged { view }).emit_to(&app, crate::inspector_window::LABEL) {
+        tracing::warn!(error = %e, "updating the packet inspector window failed");
+    }
+    Ok(())
+}
+
+/// The view the main window shared last; `null` before it shared one.
+#[tauri::command]
+#[specta::specta]
+pub fn packet_inspector_view(shared: State<'_, SharedView>) -> ApiResult<Option<InspectorView>> {
+    Ok(shared
+        .0
+        .lock()
+        .unwrap_or_else(std::sync::PoisonError::into_inner)
+        .clone())
 }

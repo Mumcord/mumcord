@@ -488,6 +488,7 @@
     "intro": "Shows the packets Mumcord sends and receives, mainly Mumcord plugin data, for debugging. Only the last 2,000 packets are kept, in memory on this device; nothing is logged or sent anywhere.",
     "devTools": "Developer tools",
     "devToolsHint": "Turn off to hide the packet inspector again and stop capturing.",
+    "open": "Open packet inspector",
     "filters": "Filters and export",
     "server": "Server",
     "allServers": "All servers",

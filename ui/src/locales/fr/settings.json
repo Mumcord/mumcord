@@ -490,6 +490,7 @@
     "intro": "Affiche les paquets envoyés et reçus par Mumcord, surtout les données des plugins Mumcord, pour le débogage. Seuls les 2 000 derniers paquets sont conservés, en mémoire sur cet appareil ; rien n’est journalisé ni envoyé ailleurs.",
     "devTools": "Outils de développement",
     "devToolsHint": "Désactivez pour masquer à nouveau l’inspecteur de paquets et arrêter la capture.",
+    "open": "Ouvrir l’inspecteur de paquets",
     "filters": "Filtres et export",
     "server": "Serveur",
     "allServers": "Tous les serveurs",

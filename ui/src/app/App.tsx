@@ -17,7 +17,8 @@ import {
 import { PreferencesProvider } from "./PreferencesProvider";
 import { SettingsOverlay } from "./SettingsOverlay";
 import { useThemePreviewing } from "../theme/themeStore";
-import { useDevToolsCapture } from "../features/inspector/devTools";
+import { useDevToolsCapture, useDevToolsUnlocked } from "../features/inspector/devTools";
+import { InspectorViewShare } from "../features/inspector/InspectorViewShare";
 import { useServerTheme } from "./useServerTheme";
 import { useView } from "./view";
 import { ViewProvider } from "./ViewProvider";
@@ -26,6 +27,7 @@ function MainScreen() {
   const { overlay, closeOverlay } = useView();
   useServerTheme();
   useDevToolsCapture();
+  const devTools = useDevToolsUnlocked();
   const previewing = useThemePreviewing();
   return (
     <>
@@ -48,6 +50,7 @@ function MainScreen() {
       {overlay === null && <ProfilePreviewHost />}
       {overlay === null && <PersonMenuHost />}
       <NotificationsHost overlayOpen={overlay !== null} onOpenChat={closeOverlay} />
+      {devTools && <InspectorViewShare />}
     </>
   );
 }

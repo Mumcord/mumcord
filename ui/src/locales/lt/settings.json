@@ -492,6 +492,7 @@
     "intro": "Rodo paketus, kuriuos Mumcord siunčia ir gauna, daugiausia Mumcord papildinių duomenis, derinimui. Saugomi tik paskutiniai 2000 paketų, šio įrenginio atmintyje; niekas nėra registruojama ar niekur siunčiama.",
     "devTools": "Kūrėjo įrankiai",
     "devToolsHint": "Išjunkite, kad vėl paslėptumėte paketų tikrintuvą ir sustabdytumėte fiksavimą.",
+    "open": "Atidaryti paketų inspektorių",
     "filters": "Filtrai ir eksportas",
     "server": "Serveris",
     "allServers": "Visi serveriai",

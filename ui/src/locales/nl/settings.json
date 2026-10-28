@@ -488,6 +488,7 @@
     "intro": "Toont de pakketten die Mumcord verstuurt en ontvangt, vooral Mumcord-plugingegevens, voor foutopsporing. Alleen de laatste 2.000 pakketten worden bewaard, in het geheugen van dit apparaat; er wordt niets gelogd of ergens heen gestuurd.",
     "devTools": "Ontwikkelaarstools",
     "devToolsHint": "Zet uit om de pakketinspecteur weer te verbergen en het vastleggen te stoppen.",
+    "open": "Pakketinspector openen",
     "filters": "Filters en export",
     "server": "Server",
     "allServers": "Alle servers",
