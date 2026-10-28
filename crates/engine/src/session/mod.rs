@@ -774,8 +774,14 @@ impl Engine {
         for server_id in connected {
             self.inner.close_slot(&mut core, server_id, None);
         }
+        // The connections drain in their own tasks, in parallel; this only waits for the last.
+        let all_closed = async move {
+            for closed in closed {
+                closed.await;
+            }
+        };
         async move {
-            if tokio::time::timeout(SHUTDOWN_DRAIN, futures_util::future::join_all(closed))
+            if tokio::time::timeout(SHUTDOWN_DRAIN, all_closed)
                 .await
                 .is_err()
             {
