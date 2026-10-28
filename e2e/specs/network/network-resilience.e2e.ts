@@ -225,8 +225,13 @@ async function waitNoBar(timeout: number): Promise<void> {
   });
 }
 
+// The chat header follow button; the Clear history button uses the same class.
+function followButton() {
+  return $("//button[contains(@class,'follow-toggle') and @aria-pressed]");
+}
+
 async function followButtonText(): Promise<string> {
-  return await $("button.follow-toggle").getText();
+  return await followButton().getText();
 }
 
 describe("network resilience (AC-1.21, AC-1.22, AC-1.23)", () => {
@@ -262,9 +267,9 @@ describe("network resilience (AC-1.21, AC-1.22, AC-1.23)", () => {
     await bot(["expect", "user", ME, "--in", "Raid"], { name: "Watcher", timeout: 30 });
     // Select Lobby (single click) and follow it.
     await $("//*[@role='treeitem'][.//*[normalize-space()='Lobby']]").click();
-    await $("button.follow-toggle").waitForDisplayed();
+    await followButton().waitForDisplayed();
     if (!(await followButtonText()).includes("Following")) {
-      await $("button.follow-toggle").click();
+      await followButton().click();
     }
     await browser.waitUntil(async () => (await followButtonText()).includes("Following"));
     await bot(["expect", "user", ME, "--in", "Raid", "--listening", "Lobby"], {

@@ -1,5 +1,6 @@
 import { browser, expect, $ } from "@wdio/globals";
 import { app, testenv } from "../../helpers/index.ts";
+import { hasClass } from "../../helpers/selectors.ts";
 import {
   addFirstServer,
   finishWizard,
@@ -55,7 +56,7 @@ describe("chat: friends (AC-1.54)", () => {
   });
 
   it("adds Bot as a friend from the person menu; it shows as online", async () => {
-    const person = $("//*[contains(@class,'tree-person') and contains(.,'FriendBot')]");
+    const person = $(`//div[${hasClass('tree-person')} and contains(.,'FriendBot')]`);
     await person.waitForDisplayed({ timeout: 10_000 });
     await person.click({ button: "right" });
     const row = $("//*[@role='menuitemcheckbox'][starts-with(normalize-space(),'Friend')]");

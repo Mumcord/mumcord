@@ -33,6 +33,7 @@ const VIA_NETSIM = `127.0.0.1:${String(netsim.listenPort)}`;
 const LINK = `mumble://${testenv.address("v15")}/Raid`;
 const WATCH = { name: "RoWatcher", timeout: 30, port: testenv.ports.v15 };
 const OTHER = "SwitchV14";
+const APP_SERVER = "127.0.0.1";
 const WATCH_OTHER = { ...WATCH, port: testenv.ports.v14 };
 
 const dir = mkdtempSync(join(tmpdir(), "mumcord-readonly-"));
@@ -144,8 +145,13 @@ async function connectSaved(): Promise<void> {
   await waitConnected();
 }
 
-async function waitConnected(): Promise<void> {
-  await $("//button[contains(@aria-label,'(connected)')]").waitForExist({ timeout: 30_000 });
+/** Bar button of one server: this spec keeps two servers connected at the same time. */
+function connectedButton(server: string) {
+  return $(`//button[starts-with(@aria-label, '${server} (connected)')]`);
+}
+
+async function waitConnected(server = APP_SERVER): Promise<void> {
+  await connectedButton(server).waitForExist({ timeout: 30_000 });
   await channelName("Raid").waitForDisplayed({ timeout: 15_000 });
   await showAllPeople();
 }
@@ -323,10 +329,7 @@ describe("read-only connect and explicit join (AC-1.35)", () => {
     await deafenButton().click();
     await bot(["expect", "user", ME, "--in", "Raid", "--deaf", "true"], WATCH);
     await $("button[aria-label^='Disconnect from']").click();
-    await $("//button[contains(@aria-label,'(connected)')]").waitForExist({
-      reverse: true,
-      timeout: 15_000,
-    });
+    await connectedButton(APP_SERVER).waitForExist({ reverse: true, timeout: 15_000 });
     await connectSaved();
     await expectReadOnlyUi();
     await deafenButton().click();
