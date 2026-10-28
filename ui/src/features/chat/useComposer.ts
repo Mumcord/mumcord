@@ -10,6 +10,7 @@ import type { SendTarget } from "./conversationInfo";
 import { readDroppedFiles } from "./fileDrop";
 import { FULL_ATTRIBUTE_RESERVE, fullImageTag, keepFullImage } from "./fullImage";
 import { imageTag, prepareImage, type MessageLimits } from "./images";
+import { composeCards } from "./cards";
 import { markdownToHtml, plainTextToHtml } from "./markdown";
 import { quoteHtml, type ReplyQuote } from "./reply";
 import { sendOwn } from "./sendMessage";
@@ -32,7 +33,10 @@ export interface Attachment {
 const noop = (): void => undefined;
 
 function bodyHtml(text: string, limits: MessageLimits): string {
-  return limits.allowHtml ? markdownToHtml(text) : plainTextToHtml(text);
+  // Cards go out as HTML official clients can read (issue #72); without HTML the typed BB code
+  // stays text, which Mumcord still renders as a card.
+  if (!limits.allowHtml) return plainTextToHtml(text);
+  return composeCards(text, markdownToHtml) ?? markdownToHtml(text);
 }
 
 export interface Composer {
