@@ -3,30 +3,44 @@
 
 use std::collections::VecDeque;
 
-use rubato::{FftFixedIn, Resampler as _};
+use rubato::audioadapter_buffers::direct::SequentialSliceOfSlices;
+use rubato::{Fft, FixedSync, Resampler as _};
 
 use super::IoError;
 
+/// Single-channel views of audio, so rubato reads and writes in place without copying.
+type MonoIn<'a> = SequentialSliceOfSlices<&'a [&'a [f32]]>;
+type MonoOut<'a> = SequentialSliceOfSlices<&'a mut [&'a mut [f32]]>;
+
 /// Streaming mono resampler: push any number of samples, pop converted ones.
 pub(crate) struct Resampler {
-    inner: FftFixedIn<f32>,
+    inner: Fft<f32>,
     input: Vec<f32>,
-    output_buf: Vec<Vec<f32>>,
+    /// Worst-case output buffer for one chunk, reused every call: the real-time
+    /// path must not allocate.
+    output_buf: Vec<f32>,
     output: VecDeque<f32>,
 }
 
 impl Resampler {
     pub(crate) fn new(from_rate: u32, to_rate: u32) -> Result<Self, IoError> {
-        // 10 ms input chunks keep the added delay at one frame.
+        // 10 ms input chunks. rubato picks FFT sub-chunks near 256 frames, so the added
+        // delay is half the internal FFT block, not one chunk (test: latency budget).
         let chunk = (from_rate / 100).max(1) as usize;
-        let inner = FftFixedIn::new(from_rate as usize, to_rate as usize, chunk, 1, 1)
-            .map_err(|e| IoError::Resampler(e.to_string()))?;
-        let output_buf = inner.output_buffer_allocate(true);
+        let inner = Fft::new(
+            from_rate as usize,
+            to_rate as usize,
+            chunk,
+            1,
+            FixedSync::Input,
+        )
+        .map_err(|e| IoError::Resampler(e.to_string()))?;
+        let max_output = inner.output_frames_max();
         Ok(Self {
             input: Vec::with_capacity(chunk * 4),
-            output: VecDeque::with_capacity(inner.output_frames_max() * 4),
+            output: VecDeque::with_capacity(max_output * 4),
+            output_buf: vec![0.0; max_output],
             inner,
-            output_buf,
         })
     }
 
@@ -35,13 +49,27 @@ impl Resampler {
         let mut consumed = 0;
         while self.input.len() - consumed >= self.inner.input_frames_next() {
             let needed = self.inner.input_frames_next();
-            let chunk = [&self.input[consumed..consumed + needed]];
-            match self
-                .inner
-                .process_into_buffer(&chunk, &mut self.output_buf, None)
-            {
-                Ok((_, produced)) => self.output.extend(&self.output_buf[0][..produced]),
-                // Only possible with mis-sized buffers, which `new` rules out.
+            let in_channels: [&[f32]; 1] = [&self.input[consumed..consumed + needed]];
+            let out_frames = self.output_buf.len();
+            let mut out_channels: [&mut [f32]; 1] = [&mut self.output_buf];
+            // Both buffers are sized to what the resampler asks for, so a size error here
+            // would mean a bug in this module, not bad input.
+            let input = match MonoIn::new(&in_channels, 1, needed) {
+                Ok(buffer) => buffer,
+                Err(e) => {
+                    tracing::error!("resampler input buffer too small: {e}");
+                    break;
+                }
+            };
+            let mut output = match MonoOut::new_mut(&mut out_channels, 1, out_frames) {
+                Ok(buffer) => buffer,
+                Err(e) => {
+                    tracing::error!("resampler output buffer too small: {e}");
+                    break;
+                }
+            };
+            match self.inner.process_into_buffer(&input, &mut output, None) {
+                Ok((_, produced)) => self.output.extend(&self.output_buf[..produced]),
                 Err(e) => tracing::error!("resampler failed: {e}"),
             }
             consumed += needed;
@@ -126,5 +154,16 @@ mod tests {
         assert!(!r.pop_exact(&mut frame));
         r.push(&[0.0; 1000]);
         assert!(r.pop_exact(&mut frame));
+    }
+
+    /// The resampler must stay inside the latency budget of the foundation spec
+    /// (specs/01-foundation-specification.md:338, audio processing adds at most 30 ms).
+    #[test]
+    fn added_delay_stays_within_the_latency_budget() {
+        for (from, to) in [(44_100, 48_000), (48_000, 44_100), (16_000, 48_000)] {
+            let r = Resampler::new(from, to).expect("resampler");
+            let delay_ms = r.inner.output_delay() as f64 * 1000.0 / to as f64;
+            assert!(delay_ms <= 30.0, "{from} -> {to}: {delay_ms:.1} ms");
+        }
     }
 }
