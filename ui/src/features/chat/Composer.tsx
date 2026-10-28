@@ -64,6 +64,30 @@ const IMAGE_ICON = "M4 5h16v14H4zM4 16l5-5 4 4 3-3 4 4M15 9h.01";
 const SEND_ICON = "M4 12l16-8-6 16-2-7z";
 const CANCEL_ICON = "M6 6l12 12M18 6L6 18";
 
+/** `DataTransferItemList` is a list, not an iterable, so it is read by index. */
+function clipboardItems(data: DataTransfer): DataTransferItem[] {
+  const items = data.items;
+  const out: DataTransferItem[] = [];
+  for (let i = 0; i < items.length; i += 1) {
+    const item = items[i];
+    if (item !== undefined) out.push(item);
+  }
+  return out;
+}
+
+/**
+ * Files of a paste. WebKitGTK does not fill `clipboardData.files` for a clipboard image (issue
+ * #50): a screenshot arrives as an item only, so reading `files` alone makes the paste do nothing.
+ */
+function pasteFiles(data: DataTransfer): File[] {
+  const files = Array.from(data.files);
+  if (files.length > 0) return files;
+  return clipboardItems(data)
+    .filter((item) => item.kind === "file")
+    .map((item) => item.getAsFile())
+    .filter((file): file is File => file !== null);
+}
+
 export function Composer({
   target,
   limits,
@@ -252,8 +276,16 @@ export function Composer({
   }
 
   function onPaste(event: ClipboardEvent<HTMLTextAreaElement>) {
-    const files = Array.from(event.clipboardData.files);
-    if (files.length === 0) return;
+    const data = event.clipboardData;
+    const files = pasteFiles(data);
+    if (files.length === 0) {
+      // A clipboard image the webview cannot hand over as a file: say so instead of doing nothing.
+      if (
+        clipboardItems(data).some((item) => item.kind === "file" && item.type.startsWith("image/"))
+      )
+        composer.showError(t("errors.imageUnreadable"));
+      return;
+    }
     // Text copied together with a file (e.g. from a spreadsheet) still pastes as text.
     if (!files.some((file) => file.type.startsWith("image/"))) return;
     event.preventDefault();

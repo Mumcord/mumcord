@@ -44,6 +44,8 @@ export interface Composer {
   addDroppedPaths: (paths: readonly string[]) => Promise<void>;
   removeAttachment: (id: number) => void;
   error: string | null;
+  /** Reports a problem the file itself cannot explain, such as a clipboard image the webview cannot hand over. */
+  showError: (message: string) => void;
   /**
    * Sends the text and the images: the input empties at once and the messages show greyed until
    * confirmed (FR-2.74).
@@ -184,6 +186,10 @@ export function useComposer(
     [drop],
   );
 
+  const showError = useCallback((message: string) => {
+    setError(message);
+  }, []);
+
   const tooLong =
     limits.text > 0 ? t("errors.tooLong", { max: limits.text }) : t("errors.tooLongNoLimit");
 
@@ -243,6 +249,7 @@ export function useComposer(
     addDroppedPaths,
     removeAttachment,
     error,
+    showError,
     submit,
     sendLink,
   };

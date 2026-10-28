@@ -57,6 +57,14 @@ function paste(input: HTMLElement, files: File[]) {
   fireEvent.paste(input, { clipboardData: { files, types: ["Files"] } });
 }
 
+/** WebKitGTK gives a clipboard image as `items` only, with an empty `files`. */
+function pasteItems(
+  input: HTMLElement,
+  items: { kind: string; type: string; getAsFile: () => File | null }[],
+) {
+  fireEvent.paste(input, { clipboardData: { files: [], items, types: ["text/plain", "Files"] } });
+}
+
 function drop(form: HTMLElement, files: File[]) {
   fireEvent.drop(form, { dataTransfer: { files, types: ["Files"] } });
 }
@@ -129,6 +137,25 @@ describe("Composer image attachments", () => {
     const { input } = setup();
     paste(input, [png("big.png")]);
     expect(await screen.findByText("Scaled to 800×600 to fit the server limit")).toBeTruthy();
+  });
+
+  it("pastes an image the webview delivers as a clipboard item only", async () => {
+    const { input } = setup();
+    pasteItems(input, [{ kind: "file", type: "image/png", getAsFile: () => png("pasted.png") }]);
+    expect(await screen.findByRole("img", { name: "Image to send: pasted.png" })).toBeTruthy();
+  });
+
+  it("says so when a clipboard image cannot be read as a file", async () => {
+    const { input } = setup();
+    pasteItems(input, [{ kind: "file", type: "image/png", getAsFile: () => null }]);
+    expect((await screen.findByRole("alert")).textContent).toContain("couldn't be read");
+    expect(prepare).not.toHaveBeenCalled();
+  });
+
+  it("does not complain about a plain text paste", () => {
+    const { input } = setup();
+    fireEvent.paste(input, { clipboardData: { files: [], items: [], types: ["text/plain"] } });
+    expect(screen.queryByRole("alert")).toBeNull();
   });
 
   it("refuses non-image files and images that are too large", async () => {
