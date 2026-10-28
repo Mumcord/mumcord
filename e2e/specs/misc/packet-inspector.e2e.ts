@@ -109,7 +109,7 @@ describe("packet inspector (issue #60)", () => {
     expect(await $("table").isExisting()).toBe(false);
     await button("Open packet inspector").click();
     await switchToInspector();
-    await $("main[aria-label='Packet inspector']").waitForDisplayed();
+    await $("//main[h1[normalize-space()='Packet inspector']]").waitForDisplayed();
     const row = $("//tr[contains(@class,'pi-row-sent')][.//code[normalize-space()='mumcord.hello']]");
     await row.waitForDisplayed({ timeout: 15_000, timeoutMsg: "no sent hello row" });
     expect(await row.getText()).toContain("Mumcord hello");
@@ -151,7 +151,11 @@ describe("packet inspector (issue #60)", () => {
     await browser.keys(["Escape"]);
     await browser.pause(500);
     expect(await browser.getWindowHandles()).toHaveLength(2);
-    await browser.keys(["Control", "w"]);
+    // The window is gone before the keys are released, so WebDriver reports the release as
+    // failed ("no such window"); the window count below is what matters.
+    await browser.keys(["Control", "w"]).catch((error: unknown) => {
+      console.log(`[e2e] Ctrl+W: ${String(error)}`);
+    });
     await browser.waitUntil(async () => (await browser.getWindowHandles()).length === 1, {
       timeout: 10_000,
       timeoutMsg: "Ctrl+W did not close the packet inspector",
