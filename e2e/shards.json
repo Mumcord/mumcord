@@ -11,6 +11,7 @@
     [
       "specs/app/theme-language.e2e.ts",
       "specs/chat/link-previews.e2e.ts",
+      "specs/chat/message-cards.e2e.ts",
       "specs/chat/mentions.e2e.ts",
       "specs/overlay/overlay-ingame.e2e.ts",
       "specs/servers/multi-server.e2e.ts",
