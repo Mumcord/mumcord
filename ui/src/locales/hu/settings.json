@@ -488,6 +488,7 @@
     "intro": "Megmutatja a Mumcord által küldött és fogadott csomagokat, főleg a Mumcord-bővítmények adatait, hibakereséshez. Csak az utolsó 2000 csomag marad meg, ezen az eszközön a memóriában; semmi nem kerül naplózásra vagy elküldésre.",
     "devTools": "Fejlesztői eszközök",
     "devToolsHint": "Kapcsold ki, hogy újra elrejtsd a csomagvizsgálót, és leállítsd a rögzítést.",
+    "open": "Csomagvizsgáló megnyitása",
     "filters": "Szűrők és exportálás",
     "server": "Szerver",
     "allServers": "Minden szerver",

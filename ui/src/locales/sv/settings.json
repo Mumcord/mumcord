@@ -488,6 +488,7 @@
     "intro": "Visar de paket som Mumcord skickar och tar emot, främst Mumcord-plugindata, för felsökning. Bara de senaste 2 000 paketen sparas, i minnet på den här enheten; inget loggas eller skickas någonstans.",
     "devTools": "Utvecklarverktyg",
     "devToolsHint": "Stäng av för att dölja paketinspektören igen och sluta fånga paket.",
+    "open": "Öppna paketinspektören",
     "filters": "Filter och export",
     "server": "Server",
     "allServers": "Alla servrar",

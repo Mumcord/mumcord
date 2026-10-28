@@ -11,9 +11,27 @@ for example why a late joiner did not see a running screen share.
 3. "Developer tools unlocked" appears, and a **Packet inspector** section is added at the end of
    the settings list.
 
-The section starts with a **Developer tools** switch; turning it off hides the section again and
-stops the capture. The choice is stored on this device only (in the app's local web storage), not
-in the settings file.
+The section has a **Developer tools** switch; turning it off hides the section again, stops the
+capture and closes the inspector window. The choice is stored on this device only (in the app's
+local web storage), not in the settings file.
+
+## The inspector window
+
+**Open packet inspector** in that section opens the inspector in a window of its own, so it can
+stay next to the main window while you reproduce a problem. Clicking it again while the window is
+open brings that window to the front; there is never more than one.
+
+- The window remembers its size and position on this device (`packet-inspector-window.json` in
+  the app's data folder). If the screen it was on is gone, the system places it.
+- It follows the main window's theme, accessibility hints and language as they change, and shows
+  the names the main window knows.
+- **Ctrl+W** (⌘W on macOS) or the window's close button closes it; Esc does nothing, so it cannot
+  be closed by accident. Closing it does not quit Mumcord; quitting Mumcord closes it.
+- Capture does not depend on the window: it runs while the developer tools are unlocked, so
+  packets sent while the window was closed are there when it opens (within the ring buffer).
+- The window can only read the capture. It may call the inspector commands (fetch, clear, export)
+  and the app version for exports, listen to events and show the save dialog for exports; every
+  other command (connecting, sending, settings, deep links) is refused for it.
 
 ## What is captured
 

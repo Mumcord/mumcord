@@ -492,6 +492,7 @@
     "intro": "Zobrazuje pakety, které Mumcord odesílá a přijímá, hlavně data pluginů Mumcord, pro ladění. Uchovává se jen posledních 2 000 paketů, v paměti tohoto zařízení; nic se neprotokoluje ani nikam neodesílá.",
     "devTools": "Vývojářské nástroje",
     "devToolsHint": "Vypnutím znovu skryjete inspektor paketů a zastavíte zachytávání.",
+    "open": "Otevřít inspektor paketů",
     "filters": "Filtry a export",
     "server": "Server",
     "allServers": "Všechny servery",

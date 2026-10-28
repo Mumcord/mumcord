@@ -490,6 +490,7 @@
     "intro": "Mostra os pacotes que o Mumcord envia e recebe, sobretudo dados de plugins do Mumcord, para depuração. Só os últimos 2000 pacotes são mantidos, na memória deste dispositivo; nada é registado nem enviado para lado nenhum.",
     "devTools": "Ferramentas de programador",
     "devToolsHint": "Desative para voltar a ocultar o inspetor de pacotes e parar a captura.",
+    "open": "Abrir o inspetor de pacotes",
     "filters": "Filtros e exportação",
     "server": "Servidor",
     "allServers": "Todos os servidores",

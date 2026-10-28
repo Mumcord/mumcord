@@ -490,6 +490,7 @@
     "intro": "Rāda paketes, ko Mumcord sūta un saņem, galvenokārt Mumcord spraudņu datus, kļūdu meklēšanai. Tiek glabātas tikai pēdējās 2000 paketes, šīs ierīces atmiņā; nekas netiek reģistrēts vai kaut kur sūtīts.",
     "devTools": "Izstrādātāja rīki",
     "devToolsHint": "Izslēdziet, lai atkal paslēptu pakešu inspektoru un apturētu tveršanu.",
+    "open": "Atvērt pakešu inspektoru",
     "filters": "Filtri un eksports",
     "server": "Serveris",
     "allServers": "Visi serveri",

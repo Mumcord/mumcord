@@ -494,6 +494,7 @@
     "intro": "Juri l-pakketti li Mumcord jibgħat u jirċievi, l-aktar data tal-plugins ta’ Mumcord, għad-debugging. Jinżammu biss l-aħħar 2,000 pakkett, fil-memorja ta’ dan l-apparat; xejn ma jiġi rreġistrat jew mibgħut x’imkien.",
     "devTools": "Għodod tal-iżviluppatur",
     "devToolsHint": "Itfi biex terġa’ taħbi l-ispettur tal-pakketti u twaqqaf il-qbid.",
+    "open": "Iftaħ l-ispettur tal-pakketti",
     "filters": "Filtri u esportazzjoni",
     "server": "Server",
     "allServers": "Is-servers kollha",

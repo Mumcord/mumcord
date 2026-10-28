@@ -8,7 +8,7 @@ use tauri_specta::Event;
 
 use crate::commands::app::CloseRequested;
 
-/// Label of the only window (tauri.conf.json).
+/// Label of the main window (tauri.conf.json).
 pub const MAIN: &str = "main";
 
 /// Least time between a quit request and the exit, so the reply to the command that asked for it
@@ -160,6 +160,7 @@ pub fn restart(app: &AppHandle) {
 }
 
 fn after_disconnect(app: &AppHandle, then: impl FnOnce(&AppHandle) + Send + 'static) {
+    crate::inspector_window::save_before_exit(app);
     if connected_servers(&app.state::<Engine>()) == 0 {
         then(app);
         return;

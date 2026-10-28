@@ -3,7 +3,7 @@
  * It follows the contract in docs/engine-api.md closely enough for UI flows, not the
  * Mumble protocol: no network, no audio.
  */
-import type { MessageNotice, NotifyOutcome } from "../bindings/commands";
+import type { InspectorView, MessageNotice, NotifyOutcome } from "../bindings/commands";
 import type {
   ApiError,
   AudioDevices,
@@ -518,6 +518,7 @@ export function createMockApi(options: MockOptions = {}): MockApi {
   let shownFriends = "[]";
   const failures = new Map<CommandName, ApiError>();
   const inspector = createMockInspector();
+  let inspectorView: InspectorView | null = null;
   const certPrompts = new Map<number, string | null>();
 
   let identity: Identity | null = fresh ? null : { name: "Zoe", certHash: "selfhash" };
@@ -1663,6 +1664,15 @@ export function createMockApi(options: MockOptions = {}): MockApi {
       return Promise.resolve(null);
     },
     packetCaptureExport: () => Promise.resolve(null),
+    // The mock has no second window; the inspector page opens with `?window=packet-inspector`.
+    packetInspectorOpen: () => Promise.resolve(null),
+    packetInspectorClose: () => Promise.resolve(null),
+    packetInspectorShare: (view) => {
+      inspectorView = view;
+      emit("inspectorViewChanged", { view });
+      return Promise.resolve(null);
+    },
+    packetInspectorView: () => Promise.resolve(inspectorView),
 
     // diagnostics
     diagnosticsSave: () => Promise.resolve(null),

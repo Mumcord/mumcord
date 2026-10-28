@@ -492,6 +492,7 @@
     "intro": "Prikazuje pakete, ki jih Mumcord pošilja in prejema, predvsem podatke vtičnikov Mumcord, za odpravljanje napak. Hrani se le zadnjih 2000 paketov, v pomnilniku te naprave; nič se ne beleži ali pošilja drugam.",
     "devTools": "Razvijalska orodja",
     "devToolsHint": "Izklopite, da znova skrijete pregledovalnik paketov in ustavite zajemanje.",
+    "open": "Odpri pregledovalnik paketov",
     "filters": "Filtri in izvoz",
     "server": "Strežnik",
     "allServers": "Vsi strežniki",

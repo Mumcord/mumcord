@@ -490,6 +490,7 @@
     "intro": "Prikazuje pakete koje Mumcord šalje i prima, uglavnom podatke dodataka za Mumcord, radi otklanjanja pogrešaka. Čuva se samo posljednjih 2000 paketa, u memoriji ovog uređaja; ništa se ne bilježi niti šalje bilo kamo.",
     "devTools": "Alati za razvojne programere",
     "devToolsHint": "Isključi za ponovno skrivanje inspektora paketa i zaustavljanje snimanja.",
+    "open": "Otvori inspektor paketa",
     "filters": "Filtri i izvoz",
     "server": "Poslužitelj",
     "allServers": "Svi poslužitelji",

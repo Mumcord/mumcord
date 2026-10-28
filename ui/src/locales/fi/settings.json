@@ -488,6 +488,7 @@
     "intro": "Näyttää Mumcordin lähettämät ja vastaanottamat paketit, lähinnä Mumcord-lisäosien tietoja, virheenjäljitystä varten. Vain viimeiset 2 000 pakettia säilytetään tämän laitteen muistissa; mitään ei kirjata lokiin tai lähetetä minnekään.",
     "devTools": "Kehittäjätyökalut",
     "devToolsHint": "Poista käytöstä piilottaaksesi pakettitarkastimen uudelleen ja lopettaaksesi tallennuksen.",
+    "open": "Avaa pakettitarkastin",
     "filters": "Suodattimet ja vienti",
     "server": "Palvelin",
     "allServers": "Kaikki palvelimet",

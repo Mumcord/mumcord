@@ -488,6 +488,7 @@
     "intro": "Näitab pakette, mida Mumcord saadab ja võtab vastu, peamiselt Mumcordi pluginate andmeid, silumiseks. Säilitatakse ainult viimased 2000 paketti, selle seadme mälus; midagi ei logita ega saadeta kuhugi.",
     "devTools": "Arendaja tööriistad",
     "devToolsHint": "Lülita välja, et pakettide inspektor uuesti peita ja jäädvustamine peatada.",
+    "open": "Ava paketiinspektor",
     "filters": "Filtrid ja eksport",
     "server": "Server",
     "allServers": "Kõik serverid",

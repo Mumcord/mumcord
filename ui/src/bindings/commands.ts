@@ -313,6 +313,14 @@ export const commands = {
 	packetCaptureClear: () => typedError<null, ApiError>(__TAURI_INVOKE("packet_capture_clear")),
 	/**  Writes an export the UI built from the captured packets (JSON or Markdown) to `path`. */
 	packetCaptureExport: (path: string, contents: string) => typedError<null, ApiError>(__TAURI_INVOKE("packet_capture_export", { path, contents })),
+	/**  Opens the packet inspector window, or brings it to the front if it is already open. */
+	packetInspectorOpen: () => typedError<null, ApiError>(__TAURI_INVOKE("packet_inspector_open")),
+	/**  Closes the packet inspector window (Ctrl+W in that window). */
+	packetInspectorClose: () => typedError<null, ApiError>(__TAURI_INVOKE("packet_inspector_close")),
+	/**  Called by the main window whenever its theme, language or known names change. */
+	packetInspectorShare: (view: InspectorView) => typedError<null, ApiError>(__TAURI_INVOKE("packet_inspector_share", { view })),
+	/**  The view the main window shared last; `null` before it shared one. */
+	packetInspectorView: () => typedError<InspectorView | null, ApiError>(__TAURI_INVOKE("packet_inspector_view")),
 	/**  Decides by window focus and the notification setting; shows the system notification itself. */
 	notifyMessage: (notice: MessageNotice) => typedError<NotifyOutcome, ApiError>(__TAURI_INVOKE("notify_message", { notice })),
 	/**  The user opened this chat: its system notification is outdated. */
@@ -455,6 +463,7 @@ export const events = {
 	historySyncStatus: makeEvent<HistorySyncStatus, HistorySyncStatus>("history-sync-status"),
 	historySynced: makeEvent<HistorySynced, HistorySynced>("history-synced"),
 	inGameOverlayChanged: makeEvent<InGameOverlayChanged, InGameOverlayChanged>("in-game-overlay-changed"),
+	inspectorViewChanged: makeEvent<InspectorViewChanged, InspectorViewChanged>("inspector-view-changed"),
 	messageReceived: makeEvent<MessageReceived, MessageReceived>("message-received"),
 	micLevel: makeEvent<MicLevel, MicLevel>("mic-level"),
 	micTestPhaseChanged: makeEvent<MicTestPhaseChanged, MicTestPhaseChanged>("mic-test-phase-changed"),
@@ -958,6 +967,38 @@ export type InlineImage = {
 	width: number,
 	height: number,
 	animated: boolean,
+};
+
+/**  A saved server's label, for the inspector's server filter. */
+export type InspectorServer = {
+	serverId: number,
+	label: string,
+};
+
+/**  A person the main window knows, for the inspector's from / to column. */
+export type InspectorUser = {
+	serverId: number,
+	session: number,
+	name: string,
+};
+
+/**
+ *  What the inspector window takes over from the main window: the look of the page and the
+ *  names to show.
+ */
+export type InspectorView = {
+	/**  `data-*` attributes of the main window's root element (theme, visual effects, hints). */
+	attributes: { [key in string]: string },
+	/**  CSS custom properties set on the main window's root element (theme colours). */
+	properties: { [key in string]: string },
+	language: string,
+	users: InspectorUser[],
+	servers: InspectorServer[],
+};
+
+/**  The main window's view changed; sent to the inspector window only. */
+export type InspectorViewChanged = {
+	view: InspectorView,
 };
 
 /**  KDE only: whether X11 apps may see mouse buttons now, and whether Mumcord can undo its change. */

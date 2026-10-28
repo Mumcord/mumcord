@@ -490,6 +490,7 @@
     "intro": "Afișează pachetele trimise și primite de Mumcord, mai ales date ale pluginurilor Mumcord, pentru depanare. Sunt păstrate doar ultimele 2.000 de pachete, în memoria acestui dispozitiv; nimic nu este înregistrat în jurnal sau trimis nicăieri.",
     "devTools": "Instrumente pentru dezvoltatori",
     "devToolsHint": "Dezactivează pentru a ascunde din nou inspectorul de pachete și a opri captura.",
+    "open": "Deschide inspectorul de pachete",
     "filters": "Filtre și export",
     "server": "Server",
     "allServers": "Toate serverele",

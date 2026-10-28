@@ -1,11 +1,13 @@
 /* Packet inspector (issue #60). Colours come from theme tokens so every theme stays readable. */
 
-/* The table needs the whole panel width; the texts keep the usual line length. */
-.settings__panel > .settings-section:has(.pi-marker) {
-  max-width: none;
+/* The inspector window: only the document scrolls in the app's root, so the page scrolls here. */
+.pi-window {
+  height: 100%;
+  overflow: auto;
+  padding: var(--space-6);
 }
 
-.settings__panel > .settings-section:has(.pi-marker) .settings-hint {
+.pi-window .settings-hint {
   max-width: calc(48rem - 2 * var(--space-6));
 }
 
