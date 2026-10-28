@@ -33,16 +33,16 @@
 
 ## Features
 
-|                                           |                                                                                                                                                                                                                                            |
-| ----------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| **Voice**                                 | Push-to-talk (keys and mouse buttons, also on Wayland) or voice activation · AI noise suppression, echo cancellation and automatic gain · music quality · per-person volume · positional audio with the official game plugins **(Beta)**   |
-| **Chat**                                  | Images, link previews and player cards · replies and quotes · @mentions · code highlighting · history sync between Mumcord users · full-size images on demand **(Beta)** · follow text channels without joining · rich-text comment editor |
-| **Multi-server and themes**               | Up to 5 servers connected (1–15), voice on one, chat and badges on all · auto-connect at start · preset and custom colour themes, each in dark and light · share a theme as a code, set one per server                                     |
-| **Watch party and screen sharing (Beta)** | Watch YouTube together with a shared playlist **(Beta)** · share a window or screen with up to 8 people at up to 720p30 over a direct connection **(Beta)**                                                                                |
-| **In-game overlay**                       | See who is talking in game: Vulkan layer on Linux (OpenGL launch option, Steam and Proton), click-through window over borderless games on Windows · "Now gaming" status · no overlay on macOS                                              |
-| **People**                                | Friends, full profiles with a private note, now playing, connection info (ping, loss, bandwidth) and a weak-connection icon · built for big servers (Ctrl+K search, tested with 1000 people)                                               |
-| **Privacy and security**                  | No telemetry · TLS with certificate checks and clear warnings · identity in the OS secure storage · link previews behind a privacy switch · logs without chat, names or audio                                                              |
-| **Everywhere**                            | Windows, macOS and Linux (X11 and Wayland) · all 24 official EU languages · keyboard operation, screen-reader labels, system theme                                                                                                         |
+|                                           |                                                                                                                                                                                                                                                                                        |
+| ----------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Voice**                                 | Push-to-talk (keys and mouse buttons, also on Wayland) or voice activation · AI noise suppression, echo cancellation and automatic gain · music quality · per-person volume · positional audio with the official game plugins **(Beta)**                                               |
+| **Chat**                                  | Images, link previews and player cards · message cards for bot and status messages · replies and quotes · @mentions · code highlighting · history sync between Mumcord users · full-size images on demand **(Beta)** · follow text channels without joining · rich-text comment editor |
+| **Multi-server and themes**               | Up to 5 servers connected (1–15), voice on one, chat and badges on all · auto-connect at start · preset and custom colour themes, each in dark and light · share a theme as a code, set one per server                                                                                 |
+| **Watch party and screen sharing (Beta)** | Watch YouTube together with a shared playlist **(Beta)** · share a window or screen with up to 8 people at up to 720p30 over a direct connection **(Beta)**                                                                                                                            |
+| **In-game overlay**                       | See who is talking in game: Vulkan layer on Linux (OpenGL launch option, Steam and Proton), click-through window over borderless games on Windows · "Now gaming" status · no overlay on macOS                                                                                          |
+| **People**                                | Friends, full profiles with a private note, now playing, connection info (ping, loss, bandwidth) and a weak-connection icon · built for big servers (Ctrl+K search, tested with 1000 people)                                                                                           |
+| **Privacy and security**                  | No telemetry · TLS with certificate checks and clear warnings · identity in the OS secure storage · link previews behind a privacy switch · logs without chat, names or audio                                                                                                          |
+| **Everywhere**                            | Windows, macOS and Linux (X11 and Wayland) · all 24 official EU languages · keyboard operation, screen-reader labels, system theme                                                                                                                                                     |
 
 More in the wiki: [Features](https://github.com/Mumcord/mumcord/wiki/Features). Mumcord is in early development; expect rough edges, especially in Beta features.
 
@@ -66,6 +66,7 @@ curl -fsSL https://github.com/Mumcord/mumcord/releases/latest/download/install.s
 To remove Mumcord, add `-s -- --uninstall` after `sh`.
 
 - **macOS Local Network:** macOS 15 and later ask whether Mumcord may find devices on your local network. Allow it, or servers in your home network fail with "No route to host" (change it later in System Settings → Privacy & Security → Local Network).
+- **Linux installer:** the one-liner shows numbered steps and offers to install gst-libav (H.264) when it is missing.
 - **Linux H.264 for watch parties:** the AppImage plays YouTube via VP9 but does not bundle H.264 (gst-libav). Install gst-libav if a video does not play; the player shows a hint when a codec is missing.
 
 <details>
@@ -113,21 +114,21 @@ Mumcord is compatible with Mumble but **not affiliated with or endorsed by the M
 
 ## Ecosystem
 
-| Project                                                         | What it is                                                                                            |
-| --------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------- |
-| [Mumcord/mumbot](https://github.com/Mumcord/mumbot)             | Webhook bot for posting into Mumble channels, and the scripted test bot the E2E tests use             |
-| [Mumcord/mumpeer](https://github.com/Mumcord/mumpeer)           | Planned optional relay for direct connections when no direct path is possible                         |
-| [`mumcord-protocol`](https://crates.io/crates/mumcord-protocol) | Rust library for the Mumble protocol                                                                  |
-| [`mumcord-codec`](https://crates.io/crates/mumcord-codec)       | Opus codec, jitter buffer, mixer and processing chain, without audio devices (good for headless bots) |
-| [`mumcord-audio`](https://crates.io/crates/mumcord-audio)       | Audio device input and output on top of `mumcord-codec`                                               |
-| `mumcord-store`, `mumcord-p2p`                                  | Local storage and direct connections; coming to crates.io with the next release                       |
+| Project                                                                                                          | What it is                                                                                            |
+| ---------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------- |
+| [Mumcord/mumbot](https://github.com/Mumcord/mumbot)                                                              | Webhook bot for posting into Mumble channels, and the scripted test bot the E2E tests use             |
+| [Mumcord/mumpeer](https://github.com/Mumcord/mumpeer)                                                            | Planned optional relay for direct connections when no direct path is possible                         |
+| [`mumcord-protocol`](https://crates.io/crates/mumcord-protocol)                                                  | Rust library for the Mumble protocol                                                                  |
+| [`mumcord-codec`](https://crates.io/crates/mumcord-codec)                                                        | Opus codec, jitter buffer, mixer and processing chain, without audio devices (good for headless bots) |
+| [`mumcord-audio`](https://crates.io/crates/mumcord-audio)                                                        | Audio device input and output on top of `mumcord-codec`                                               |
+| [`mumcord-store`](https://crates.io/crates/mumcord-store), [`mumcord-p2p`](https://crates.io/crates/mumcord-p2p) | Local storage and direct connections, on crates.io since 0.4.3                                        |
 
 ## Roadmap
 
 | Stage                                                                       | Status                                                                              |
 | --------------------------------------------------------------------------- | ----------------------------------------------------------------------------------- |
 | Epic 1: Foundation (everyday client, chat, in-game, people)                 | Released, 0.1.0 to 0.3.1                                                            |
-| Epic 2: Multi-server and themes, watch party and screen sharing             | Released, 0.4.x                                                                     |
+| Epic 2: Multi-server and themes, watch party and screen sharing             | Released, 0.4.0 to 0.4.3                                                            |
 | Epic 3: Comfort and polish (hotkeys, tray, whisper, Do Not Disturb, …)      | Planned, see the [Epic 3 milestone](https://github.com/Mumcord/mumcord/milestone/2) |
 | Epics 4 to 6: admin features, signed installers and auto-update, GIF search | Later                                                                               |
 
@@ -142,7 +143,7 @@ Details: [Roadmap](https://github.com/Mumcord/mumcord/wiki/Roadmap) in the wiki.
 
 ## Troubleshooting
 
-For bug reports, use **Settings → Diagnostics → Save diagnostic file**: app version, OS, audio devices, connection statistics and recent log lines, with no chat, passwords or certificates. Then [open an issue](https://github.com/Mumcord/mumcord/issues/new/choose).
+For bug reports, use **Settings → Diagnostics → Save diagnostic file**: app version, OS, audio devices, connection statistics and recent log lines, with no chat, passwords or certificates. Mumcord also has a hidden [packet inspector](docs/packet-inspector.md) for debugging plugin data (click the version in About seven times). Then [open an issue](https://github.com/Mumcord/mumcord/issues/new/choose).
 
 | System  | Log folder                                |
 | ------- | ----------------------------------------- |
@@ -165,6 +166,7 @@ npm run tauri dev
 <details>
 <summary><b>Checks, release packages and test setup</b></summary>
 
+- Message cards: how bots and people write them is in [docs/message-cards.md](docs/message-cards.md).
 - Version: a local build shows `dev~YYYYMMDD` in Settings → About and in the diagnostics file, plus `-dirty` when the tree has uncommitted changes; set `MUMCORD_VERSION` to override it. Release and CI versions: [RELEASING.md](RELEASING.md#versions).
 - Release packages: `npm run tauri build`; bundles land in `target/release/bundle/`. Windows and macOS link a static libvpx, see [RELEASING.md](RELEASING.md#static-libvpx).
 - Checks before a pull request:
@@ -179,7 +181,7 @@ npm run tauri dev
 - Local Mumble servers for manual and automated tests: [`testenv/README.md`](testenv/README.md). Never test against public servers.
 - UI end-to-end tests (`npm run e2e`, needs Docker): [`e2e/README.md`](e2e/README.md).
 - Manual checklists: [release 0.4.0](docs/manual-checklist-0.4.0.md), [screen sharing on Windows](docs/screen-share-windows.md) and [on macOS](docs/screen-share-macos.md); measurements in [docs/screen-share-performance.md](docs/screen-share-performance.md).
-- After dependency changes, regenerate the third-party notices with `scripts/generate-notices.sh`.
+- Third-party notices are generated by CI for every release (and a pull request updates them after dependency changes on `main`); to check them locally run `scripts/generate-notices.sh`.
 - Maintainers: cutting a release is described in [RELEASING.md](RELEASING.md).
 
 </details>
