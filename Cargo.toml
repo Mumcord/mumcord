@@ -128,7 +128,7 @@ gdk = "0.18"
 # Desktop notifications for new messages (FR-1.48c): the freedesktop notification service on D-Bus,
 # talked to directly for click actions and per-channel replacement (zbus and futures-util are
 # already in the tree via ashpd; gtk via Tauri, used to hand the activation token to the window).
-zbus = { version = "5.19", default-features = false, features = ["tokio"] }
+zbus = { version = "6.1", default-features = false, features = ["tokio"] }
 futures-util = { version = "0.3", default-features = false }
 # Desktop launchers for links, run with the host environment inside an AppImage (issue #9).
 open = "5.4"
