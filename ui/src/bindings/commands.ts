@@ -467,7 +467,10 @@ export type ApiError = {
 };
 
 export type AppInfo = {
+	/**  The display version: `X.Y.Z` for a release, `dev~<commit>` or `dev~YYYYMMDD` otherwise. */
 	version: string,
+	/**  Numeric `X.Y.Z` (the last release for dev builds), for versions other clients parse. */
+	packageVersion: string,
 	os: string,
 	/**  Contents of `THIRD_PARTY_NOTICES` for Settings → About. */
 	thirdPartyNotices: string,

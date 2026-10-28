@@ -20,6 +20,7 @@ mod ptt;
 mod screen_frames;
 mod tray;
 mod update_check;
+mod version;
 mod watch_player;
 #[cfg(target_os = "linux")]
 mod webkit_compositing;
@@ -310,10 +311,11 @@ fn start_engine(app: &AppHandle) -> Result<(), Box<dyn std::error::Error>> {
     if let Err(e) = diag::init(&logs_dir, settings::diag_level(stored.log_level), 7) {
         eprintln!("file logging unavailable: {e}");
     }
-    tracing::info!(version = env!("CARGO_PKG_VERSION"), "Mumcord starting");
+    tracing::info!(version = version::DISPLAY, "Mumcord starting");
+    mumcord_protocol::set_client_release(format!("Mumcord {}", version::DISPLAY));
 
     let info_engine = engine.clone();
-    diag::set_info_provider(move || info_engine.diagnostic_info(env!("CARGO_PKG_VERSION")));
+    diag::set_info_provider(move || info_engine.diagnostic_info(version::DISPLAY));
 
     let controls = engine.dsp_controls();
     ptt::set_handler(move |pressed| controls.set_ptt_pressed(pressed));

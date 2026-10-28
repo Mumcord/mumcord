@@ -127,6 +127,10 @@ async fn fetch_latest(
 /// Runs the check when the user consented and (unless `force`) a day passed. Failures are
 /// logged only: an update hint must never bother the user with an error.
 pub async fn check(engine: &Engine, force: bool) -> EngineResult<Option<UpdateInfo>> {
+    // A dev build is newer than the release it is based on; it never offers that release.
+    if !crate::version::is_release() {
+        return Ok(None);
+    }
     let mut settings = engine.settings()?;
     if settings.update_check != Consent::Yes {
         return Ok(None);
@@ -140,7 +144,7 @@ pub async fn check(engine: &Engine, force: bool) -> EngineResult<Option<UpdateIn
     engine.update_settings(settings).await?;
 
     let (url, policy) = target();
-    match fetch_latest(&url, policy, Timeouts::default(), env!("CARGO_PKG_VERSION")).await {
+    match fetch_latest(&url, policy, Timeouts::default(), crate::version::DISPLAY).await {
         Ok(info) => Ok(info),
         Err(e) => {
             tracing::warn!(error = %e, "update check failed");

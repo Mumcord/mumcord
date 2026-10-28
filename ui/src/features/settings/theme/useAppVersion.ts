@@ -5,7 +5,8 @@ let version: Promise<string> | null = null;
 
 /**
  * The running Mumcord version from the backend, which theme codes carry (FR-2.16); `null` until
- * it is known. Asked once per app run.
+ * it is known. Asked once per app run. The numeric package version, not the `dev~…` display
+ * version: receivers reject codes whose version they cannot parse.
  */
 export function useAppVersion(): string | null {
   const [current, setCurrent] = useState<string | null>(null);
@@ -13,7 +14,7 @@ export function useAppVersion(): string | null {
     let active = true;
     version ??= getApi()
       .appInfo()
-      .then((info) => info.version);
+      .then((info) => info.packageVersion);
     version.then(
       (value) => {
         if (active) setCurrent(value);
