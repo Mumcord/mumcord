@@ -293,6 +293,20 @@ export const commands = {
 	/**  Writes the diagnostic file (no chat contents, passwords, certificates or personal data). */
 	diagnosticsSave: (path: string) => typedError<null, ApiError>(__TAURI_INVOKE("diagnostics_save", { path })),
 	appInfo: () => typedError<AppInfo, ApiError>(__TAURI_INVOKE("app_info")),
+	/**
+	 *  Starts or stops capturing packets. The UI turns it on while the developer tools are
+	 *  unlocked; turning it off drops everything captured.
+	 */
+	packetCaptureSet: (enabled: boolean) => typedError<null, ApiError>(__TAURI_INVOKE("packet_capture_set", { enabled })),
+	/**
+	 *  Packets captured after the packet with id `after` (all kept packets with `null`), plus the
+	 *  counters.
+	 */
+	packetCapturePoll: (after: number | null) => typedError<PacketCapture, ApiError>(__TAURI_INVOKE("packet_capture_poll", { after })),
+	/**  Drops the captured packets and resets the counters. */
+	packetCaptureClear: () => typedError<null, ApiError>(__TAURI_INVOKE("packet_capture_clear")),
+	/**  Writes an export the UI built from the captured packets (JSON or Markdown) to `path`. */
+	packetCaptureExport: (path: string, contents: string) => typedError<null, ApiError>(__TAURI_INVOKE("packet_capture_export", { path, contents })),
 	/**  Decides by window focus and the notification setting; shows the system notification itself. */
 	notifyMessage: (notice: MessageNotice) => typedError<NotifyOutcome, ApiError>(__TAURI_INVOKE("notify_message", { notice })),
 	/**  The user opened this chat: its system notification is outdated. */
@@ -1137,6 +1151,54 @@ export type NowPlayingStatus = {
 	track: NowPlaying | null,
 };
 
+/**
+ *  One captured control-channel packet. Everything except `id`, `atMs`, `direction`, `size`
+ *  and the pacer fields comes from the server or other clients: render it as plain text only.
+ */
+export type Packet = {
+	/**  Increases by one per captured packet. */
+	id: number,
+	serverId: number,
+	/**  Capture time in milliseconds since the Unix epoch. */
+	atMs: number | null,
+	direction: PacketDirection,
+	/**  Plugin data id (e.g. `mumcord.watch`) or Mumble message name (e.g. `UserState`). */
+	kind: string,
+	pluginData: boolean,
+	/**  Bytes of the plugin data, or of the whole message for other types. */
+	size: number,
+	/**  Sender session of received plugin data. */
+	sender: number | null,
+	/**  Receiver sessions of sent plugin data. */
+	receivers: number[],
+	/**  How long the client pacer held sent plugin data back. */
+	delayMs: number | null,
+	/**  Plugin-data messages the pacer still lets through at once after this one. */
+	tokensLeft: number | null,
+	/**  The payload as pretty-printed JSON; `null` if it is neither JSON nor a known format. */
+	decoded: string | null,
+	/**  The plugin data as lowercase hex; empty for other types. */
+	rawHex: string,
+};
+
+export type PacketCapture = {
+	capturing: boolean,
+	/**  Packets newer than the requested id, oldest first. */
+	packets: Packet[],
+	/**  Packets per server, kind and direction since capture started or was cleared. */
+	counters: PacketCounter[],
+	voice: VoiceCounter[],
+};
+
+export type PacketCounter = {
+	serverId: number,
+	kind: string,
+	direction: PacketDirection,
+	count: number,
+};
+
+export type PacketDirection = "sent" | "received";
+
 /**  How a server edit treats the stored password. */
 export type PasswordUpdate = 
 /**  Leave the stored password as it is (on add: no password). */
@@ -1669,6 +1731,13 @@ export type VideoEmbed = {
 export type VideoSite = "youtube" | "twitch" | "spotify";
 
 export type VoiceActivation = "automatic" | "manual";
+
+/**  Voice packets of a connected server since its voice link started. */
+export type VoiceCounter = {
+	serverId: number,
+	sent: number,
+	received: number,
+};
 
 /**  The voice server changed (FR-2.2); `null` when no server has voice. */
 export type VoiceServerChanged = {
