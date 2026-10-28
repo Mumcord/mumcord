@@ -8,6 +8,7 @@ pub mod friends;
 pub mod full_image;
 pub mod history_sync;
 pub mod ingame_overlay;
+pub mod inspector;
 mod maintenance;
 pub mod mumcord;
 pub mod now_gaming;
