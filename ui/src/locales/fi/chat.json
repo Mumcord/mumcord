@@ -210,5 +210,19 @@
     "videoFallback": "YouTube-video",
     "someone": "Joku",
     "joinFailed": "Yhteiskatseluun liittyminen epäonnistui."
+  },
+  "card": {
+    "label": "Kortti: {{title}}",
+    "labelWithStatus": "Kortti: {{title}}, {{status}}",
+    "untitled": "Nimetön",
+    "status": {
+      "info": "Tiedoksi",
+      "success": "Onnistui",
+      "warning": "Varoitus",
+      "error": "Virhe"
+    },
+    "open": "Avaa",
+    "openLabel": "Avaa {{title}} selaimessa",
+    "imageLink": "Kuva: {{url}}"
   }
 }

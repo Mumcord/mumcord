@@ -218,5 +218,19 @@
     "videoFallback": "Video z YouTuba",
     "someone": "Nekdo",
     "joinFailed": "Pridružitev skupnemu gledanju ni uspela."
+  },
+  "card": {
+    "label": "Kartica: {{title}}",
+    "labelWithStatus": "Kartica: {{title}}, {{status}}",
+    "untitled": "Brez naslova",
+    "status": {
+      "info": "Informacija",
+      "success": "Uspeh",
+      "warning": "Opozorilo",
+      "error": "Napaka"
+    },
+    "open": "Odpri",
+    "openLabel": "Odpri {{title}} v brskalniku",
+    "imageLink": "Slika: {{url}}"
   }
 }

@@ -1706,3 +1706,155 @@
   text-overflow: ellipsis;
   white-space: nowrap;
 }
+
+/* Message cards (issue #72): built like the link preview card, stripe and status by colour. */
+.message-cards {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin-top: var(--space-1);
+}
+
+.message-card {
+  --card-stripe: var(--color-accent);
+
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  max-width: 32rem;
+  padding: var(--space-3);
+  border: 1px solid var(--color-border);
+  border-left: 4px solid var(--card-stripe);
+  border-radius: var(--radius-md);
+  background: var(--color-bg-elevated);
+}
+
+.message-card[data-color="success"] {
+  --card-stripe: var(--color-success);
+}
+
+.message-card[data-color="warning"] {
+  --card-stripe: var(--color-warning);
+}
+
+.message-card[data-color="error"] {
+  --card-stripe: var(--color-danger);
+}
+
+.message-card__header {
+  display: flex;
+  gap: var(--space-2);
+  align-items: flex-start;
+}
+
+.message-card__icon {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 1.5rem;
+  height: 1.5rem;
+  border-radius: var(--radius-sm);
+  background: var(--card-stripe);
+  color: var(--color-bg-elevated);
+}
+
+.message-card__title {
+  flex: 1;
+  min-width: 0;
+  margin: 0;
+  color: var(--color-text);
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-bold);
+  overflow-wrap: anywhere;
+  text-decoration: none;
+}
+
+a.message-card__title:hover {
+  text-decoration: underline;
+}
+
+.message-card__status {
+  flex: none;
+  margin-left: auto;
+  padding: 0 var(--space-2);
+  border: 1px solid currentcolor;
+  border-radius: var(--radius-full);
+  color: var(--card-stripe);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-bold);
+  white-space: nowrap;
+}
+
+.message-card[data-color="info"] .message-card__status {
+  color: var(--color-accent-text);
+}
+
+.message-card__body {
+  color: var(--color-text-secondary);
+  overflow-wrap: anywhere;
+}
+
+.message-card__body code,
+.message-card__body pre {
+  background: var(--color-bg-hover);
+}
+
+.message-card__image {
+  display: block;
+  align-self: flex-start;
+  max-width: 100%;
+  padding: 0;
+  overflow: hidden;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: none;
+  cursor: zoom-in;
+}
+
+.message-card__image img {
+  display: block;
+  max-width: 100%;
+  max-height: 20rem;
+  height: auto;
+  object-fit: contain;
+}
+
+.message-card__image--loading {
+  width: 100%;
+  height: 8rem;
+  cursor: default;
+}
+
+.message-card__image-link {
+  color: var(--color-accent-text);
+  font-size: var(--font-size-sm);
+  overflow-wrap: anywhere;
+}
+
+.message-card__link {
+  display: flex;
+  gap: var(--space-3);
+  align-items: center;
+  justify-content: space-between;
+}
+
+.message-card__link a {
+  min-width: 0;
+  color: var(--color-accent-text);
+  overflow-wrap: anywhere;
+}
+
+.message-card__open {
+  flex: none;
+  padding: var(--space-1) var(--space-3);
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-md);
+  background: transparent;
+  color: var(--color-text);
+  font-size: var(--font-size-sm);
+  cursor: pointer;
+}
+
+.message-card__open:hover {
+  background: var(--color-bg-hover);
+}

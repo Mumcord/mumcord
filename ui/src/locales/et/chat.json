@@ -210,5 +210,19 @@
     "videoFallback": "YouTube'i video",
     "someone": "Keegi",
     "joinFailed": "Ühisvaatamisega liitumine ebaõnnestus."
+  },
+  "card": {
+    "label": "Kaart: {{title}}",
+    "labelWithStatus": "Kaart: {{title}}, {{status}}",
+    "untitled": "Pealkirjata",
+    "status": {
+      "info": "Teave",
+      "success": "Õnnestus",
+      "warning": "Hoiatus",
+      "error": "Viga"
+    },
+    "open": "Ava",
+    "openLabel": "Ava {{title}} brauseris",
+    "imageLink": "Pilt: {{url}}"
   }
 }

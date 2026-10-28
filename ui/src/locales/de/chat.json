@@ -210,5 +210,19 @@
     "videoFallback": "YouTube-Video",
     "someone": "Jemand",
     "joinFailed": "Beitritt zur Watch-Party fehlgeschlagen."
+  },
+  "card": {
+    "label": "Karte: {{title}}",
+    "labelWithStatus": "Karte: {{title}}, {{status}}",
+    "untitled": "Ohne Titel",
+    "status": {
+      "info": "Info",
+      "success": "Erfolg",
+      "warning": "Warnung",
+      "error": "Fehler"
+    },
+    "open": "Öffnen",
+    "openLabel": "{{title}} im Browser öffnen",
+    "imageLink": "Bild: {{url}}"
   }
 }

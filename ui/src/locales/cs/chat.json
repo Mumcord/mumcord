@@ -218,5 +218,19 @@
     "videoFallback": "Video na YouTube",
     "someone": "Někdo",
     "joinFailed": "Ke společnému sledování se nepodařilo připojit."
+  },
+  "card": {
+    "label": "Karta: {{title}}",
+    "labelWithStatus": "Karta: {{title}}, {{status}}",
+    "untitled": "Bez názvu",
+    "status": {
+      "info": "Informace",
+      "success": "Úspěch",
+      "warning": "Varování",
+      "error": "Chyba"
+    },
+    "open": "Otevřít",
+    "openLabel": "Otevřít {{title}} v prohlížeči",
+    "imageLink": "Obrázek: {{url}}"
   }
 }

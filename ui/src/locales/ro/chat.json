@@ -214,5 +214,19 @@
     "videoFallback": "Videoclip YouTube",
     "someone": "Cineva",
     "joinFailed": "Nu te-ai putut alătura vizionării comune."
+  },
+  "card": {
+    "label": "Card: {{title}}",
+    "labelWithStatus": "Card: {{title}}, {{status}}",
+    "untitled": "Fără titlu",
+    "status": {
+      "info": "Informație",
+      "success": "Reușit",
+      "warning": "Avertisment",
+      "error": "Eroare"
+    },
+    "open": "Deschide",
+    "openLabel": "Deschide {{title}} în browser",
+    "imageLink": "Imagine: {{url}}"
   }
 }

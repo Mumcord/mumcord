@@ -222,5 +222,19 @@
     "videoFallback": "Video ta' YouTube",
     "someone": "Xi ħadd",
     "joinFailed": "Ma stajtx tingħaqad mal-watch party."
+  },
+  "card": {
+    "label": "Karta: {{title}}",
+    "labelWithStatus": "Karta: {{title}}, {{status}}",
+    "untitled": "Mingħajr titlu",
+    "status": {
+      "info": "Informazzjoni",
+      "success": "Suċċess",
+      "warning": "Twissija",
+      "error": "Żball"
+    },
+    "open": "Iftaħ",
+    "openLabel": "Iftaħ {{title}} fil-browser",
+    "imageLink": "Immaġni: {{url}}"
   }
 }

@@ -214,5 +214,19 @@
     "videoFallback": "YouTube video",
     "someone": "Kāds",
     "joinFailed": "Neizdevās pievienoties kopīgajai skatīšanai."
+  },
+  "card": {
+    "label": "Kartīte: {{title}}",
+    "labelWithStatus": "Kartīte: {{title}}, {{status}}",
+    "untitled": "Bez nosaukuma",
+    "status": {
+      "info": "Informācija",
+      "success": "Izdevās",
+      "warning": "Brīdinājums",
+      "error": "Kļūda"
+    },
+    "open": "Atvērt",
+    "openLabel": "Atvērt {{title}} pārlūkā",
+    "imageLink": "Attēls: {{url}}"
   }
 }

@@ -210,5 +210,19 @@
     "videoFallback": "Βίντεο YouTube",
     "someone": "Κάποιος",
     "joinFailed": "Η συμμετοχή στην κοινή προβολή απέτυχε."
+  },
+  "card": {
+    "label": "Κάρτα: {{title}}",
+    "labelWithStatus": "Κάρτα: {{title}}, {{status}}",
+    "untitled": "Χωρίς τίτλο",
+    "status": {
+      "info": "Πληροφορία",
+      "success": "Επιτυχία",
+      "warning": "Προειδοποίηση",
+      "error": "Σφάλμα"
+    },
+    "open": "Άνοιγμα",
+    "openLabel": "Άνοιγμα του {{title}} στο πρόγραμμα περιήγησης",
+    "imageLink": "Εικόνα: {{url}}"
   }
 }

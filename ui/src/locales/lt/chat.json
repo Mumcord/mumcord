@@ -218,5 +218,19 @@
     "videoFallback": "YouTube vaizdo įrašas",
     "someone": "Kažkas",
     "joinFailed": "Nepavyko prisijungti prie bendros peržiūros."
+  },
+  "card": {
+    "label": "Kortelė: {{title}}",
+    "labelWithStatus": "Kortelė: {{title}}, {{status}}",
+    "untitled": "Be pavadinimo",
+    "status": {
+      "info": "Informacija",
+      "success": "Sėkmė",
+      "warning": "Įspėjimas",
+      "error": "Klaida"
+    },
+    "open": "Atidaryti",
+    "openLabel": "Atidaryti {{title}} naršyklėje",
+    "imageLink": "Paveikslėlis: {{url}}"
   }
 }

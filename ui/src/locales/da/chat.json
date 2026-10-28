@@ -210,5 +210,19 @@
     "videoFallback": "YouTube-video",
     "someone": "Nogen",
     "joinFailed": "Kunne ikke deltage i watch partyen."
+  },
+  "card": {
+    "label": "Kort: {{title}}",
+    "labelWithStatus": "Kort: {{title}}, {{status}}",
+    "untitled": "Uden titel",
+    "status": {
+      "info": "Info",
+      "success": "Gennemført",
+      "warning": "Advarsel",
+      "error": "Fejl"
+    },
+    "open": "Åbn",
+    "openLabel": "Åbn {{title}} i browseren",
+    "imageLink": "Billede: {{url}}"
   }
 }

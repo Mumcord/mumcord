@@ -222,5 +222,19 @@
     "videoFallback": "Físeán YouTube",
     "someone": "Duine éigin",
     "joinFailed": "Níorbh fhéidir páirt a ghlacadh san fhéachaint le chéile."
+  },
+  "card": {
+    "label": "Cárta: {{title}}",
+    "labelWithStatus": "Cárta: {{title}}, {{status}}",
+    "untitled": "Gan teideal",
+    "status": {
+      "info": "Eolas",
+      "success": "Rath",
+      "warning": "Rabhadh",
+      "error": "Earráid"
+    },
+    "open": "Oscail",
+    "openLabel": "Oscail {{title}} sa bhrabhsálaí",
+    "imageLink": "Íomhá: {{url}}"
   }
 }
