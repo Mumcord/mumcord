@@ -44,7 +44,7 @@ bytes = "1"
 # Link previews (FR-1.49): HTTP/1.1 client on the same rustls/ring stack as the Mumble
 # connection, with the OS certificate store for web sites.
 reqwest = { version = "0.13", default-features = false, features = ["rustls-no-provider"] }
-rustls-platform-verifier = "0.6"
+rustls-platform-verifier = "0.7"
 
 # Direct Mumcord-to-Mumcord connections (FR-2.35): QUIC on the same rustls/ring stack, router
 # port mapping over UPnP (igd-next) and NAT-PMP/PCP (crab_nat), default gateway and interface
