@@ -13,6 +13,10 @@
 - The Linux install script no longer tells you to install gst-libav (H.264 video support) when it is already installed; when it is missing it asks whether to install it right away
 - The Linux install script got a new look: a Mumcord banner, numbered steps with a download progress spinner, clear success and warning marks and a summary at the end; logs, pipes, `NO_COLOR` and `TERM=dumb` get plain text
 
+### Internal
+
+- The AES library is updated to 0.9, which now uses the hardware-accelerated path by default on modern x86 CPUs; the voice crypto code follows the renamed API of its cipher layer
+
 ## [0.4.2] - 2026-10-27
 
 ### Fixed
