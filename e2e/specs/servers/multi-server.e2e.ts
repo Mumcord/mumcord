@@ -1,5 +1,6 @@
 import { browser, expect, $ } from "@wdio/globals";
 import { app, bot, testenv } from "../../helpers/index.ts";
+import { hasClass } from "../../helpers/selectors.ts";
 import {
   channelName,
   finishWizard,
@@ -38,6 +39,12 @@ async function addServer(label: string, svc: "v15" | "v15b" | "v14"): Promise<vo
 
 async function barLabel(name: string): Promise<string> {
   return (await serverButton(name).getAttribute("aria-label")) ?? "";
+}
+
+/** Number of the two marked servers that show as connected in the server bar. */
+async function connectedOfAB(): Promise<number> {
+  const labels = [await barLabel(ALPHA), await barLabel(BRAVO)];
+  return labels.filter((label) => label.includes("(connected)")).length;
 }
 
 async function waitBarLabel(name: string, re: RegExp, timeout = 25_000): Promise<void> {
@@ -231,7 +238,7 @@ describe("multiple servers (AC-2.1–2.10)", function () {
       await friend.connected();
       await show(BRAVO);
       await friend.run("join Raid");
-      const person = $("//*[contains(@class,'tree-person') and contains(.,'FriendyB')]");
+      const person = $(`//div[${hasClass('tree-person')} and contains(.,'FriendyB')]`);
       await person.waitForDisplayed({ timeout: 15_000 });
       await person.click({ button: "right" });
       const row = $("//*[@role='menuitemcheckbox'][starts-with(normalize-space(),'Friend')]");
@@ -277,10 +284,12 @@ describe("multiple servers (AC-2.1–2.10)", function () {
     await setLimit(2);
     await quitAndRestart();
     await waitBarLabel(CHARLIE, /\(connected\)/, 60_000);
-    await sleep(5000);
-    const connected = [(await barLabel(ALPHA)).includes("(connected)"), (await barLabel(BRAVO)).includes("(connected)")];
-    console.log(`[AC-2.6] limit 2: A connected=${String(connected[0])}, B connected=${String(connected[1])}`);
-    expect(connected.filter(Boolean)).toHaveLength(1);
+    await browser.waitUntil(async () => (await connectedOfAB()) === 1, {
+      timeout: 40_000,
+      timeoutMsg: "neither A nor B reconnected with limit 2",
+    });
+    console.log(`[AC-2.6] limit 2: A and B connected together: ${String(await connectedOfAB())}`);
+    expect(await connectedOfAB()).toBe(1);
     await serverMenu(ALPHA, "Always connect at start");
     await serverMenu(BRAVO, "Always connect at start");
     await browser.waitUntil(async () => (await pageText()).includes("Only 2 servers can be set"), {
