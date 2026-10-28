@@ -19,6 +19,7 @@
       "connecting": "povezivanje",
       "reconnecting": "ponovno povezivanje",
       "error": "veza prekinuta",
+      "failed": "veza nije uspjela",
       "voice": "glasovni poslužitelj",
       "unread": "nepročitane poruke",
       "mentions": "spominjanja: {{mentions}}"
@@ -128,6 +129,7 @@
     "disconnectedReason": "Odspojen – {{reason}}",
     "failed": "Povezivanje s {{server}} nije uspjelo. {{reason}}",
     "cancel": "Odustani",
+    "dismiss": "Odbaci",
     "reconnect": "Ponovno se poveži",
     "editServer": "Uredi poslužitelj",
     "actionFailed": {

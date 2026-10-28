@@ -4,16 +4,19 @@ import type { ServersState } from "./store";
 
 /**
  * "error": the connection was lost and reconnecting gave up or was cancelled; the menu offers
- * "Reconnect". A failed first connect stays a plain saved server, the status bar explains it.
+ * "Reconnect". "failed": the last connect attempt failed; it outlives the status bar message,
+ * which hides after a while.
  */
-export type ServerStatus = "connected" | "connecting" | "reconnecting" | "error" | null;
+export type ServerStatus = "connected" | "connecting" | "reconnecting" | "error" | "failed" | null;
 
 /** Status of one icon (spec §5.2); `null` is a saved server that is not connected. */
 export function statusOf(state: ServersState, id: number): ServerStatus {
   const connection = state.connections.get(id);
   if (connection && connection.state !== "disconnected") return connection.state;
   const { ended } = state;
-  return ended?.serverId === id && ended.afterLoss ? "error" : null;
+  if (ended?.serverId !== id) return null;
+  if (ended.afterLoss) return "error";
+  return ended.error ? "failed" : null;
 }
 
 export interface ServerBadges {

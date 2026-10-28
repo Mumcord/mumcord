@@ -142,7 +142,7 @@ describe("PasswordDialog", () => {
     expect(screen.getByRole("status", { name: "Connection status" })).toHaveTextContent(
       "The server password is wrong.",
     );
-    connectTo("Raid Night");
+    connectTo("Raid Night (connection failed)");
     const second = await dialog();
     fireEvent(second, new Event("cancel", { cancelable: true }));
     await waitFor(() => {

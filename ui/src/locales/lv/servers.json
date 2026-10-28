@@ -19,6 +19,7 @@
       "connecting": "savienojas",
       "reconnecting": "atjauno savienojumu",
       "error": "savienojums zudis",
+      "failed": "savienojums neizdevās",
       "voice": "balss serveris",
       "unread": "nelasītas ziņas",
       "mentions": "pieminējumi: {{mentions}}"
@@ -128,6 +129,7 @@
     "disconnectedReason": "Atvienots – {{reason}}",
     "failed": "Neizdevās savienoties ar {{server}}. {{reason}}",
     "cancel": "Atcelt",
+    "dismiss": "Aizvērt",
     "reconnect": "Savienoties vēlreiz",
     "editServer": "Rediģēt serveri",
     "actionFailed": {

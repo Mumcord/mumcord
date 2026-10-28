@@ -9,8 +9,9 @@ export function initials(label: string): string {
   return letters.join("").toUpperCase() || "?";
 }
 
-export function displayName(server: SavedServer): string {
-  return server.label || server.address;
+/** The label, or host:port for an entry without one (an id is never shown). */
+export function displayName(server: Pick<SavedServer, "label" | "address" | "port">): string {
+  return server.label.trim() || `${server.address}:${String(server.port)}`;
 }
 
 export function isMumbleLink(value: string): boolean {

@@ -12,7 +12,7 @@ import { resetFollowStore } from "../follow/followStore";
 import { resetMentions } from "./mentions";
 import { stubDialog } from "../channels/testUtils";
 import { ConnectionStatus } from "./ConnectionStatus";
-import { initials, splitAddress } from "./format";
+import { displayName, initials, splitAddress } from "./format";
 import { ServersRoot } from "./ServersRoot";
 
 vi.mock("../../a11y", async (importOriginal) => {
@@ -416,7 +416,7 @@ describe("ServerBar with several servers (spec §5.2)", () => {
           "Disconnect a server, or raise the limit in Settings → Servers.",
       );
     });
-    expect(serverButton(1)).toHaveAccessibleName("Other");
+    expect(serverButton(1)).toHaveAccessibleName("Other (connection failed)");
   });
 
   it("shows the limit message while another connected server is shown, and connects after raising it (FR-2.1)", async () => {
@@ -893,5 +893,86 @@ describe("accessibility", () => {
     expect(await axeViolations(view.container)).toEqual([]);
     fireEvent.click(screen.getByRole("button", { name: "Add a server" }));
     expect(await axeViolations(view.container)).toEqual([]);
+  });
+});
+
+describe("failed-connection banner", () => {
+  async function failConnect() {
+    api.mock.failNext("connect", "serverUnreachable");
+    fireEvent.click(serverButton(0));
+    await waitFor(() => {
+      expect(status()).toHaveTextContent("Couldn't connect to");
+    });
+  }
+
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
+  it("hides after 60 s but the server keeps its error state", async () => {
+    vi.useFakeTimers({ shouldAdvanceTime: true });
+    setup();
+    await renderAll();
+    await failConnect();
+    act(() => {
+      vi.advanceTimersByTime(59_000);
+    });
+    expect(status()).toHaveTextContent("Couldn't connect to");
+    act(() => {
+      vi.advanceTimersByTime(1000);
+    });
+    expect(status()).toBeEmptyDOMElement();
+    expect(serverButton(0)).toHaveAccessibleName("Local test server (connection failed)");
+  });
+
+  it("dismisses with a labelled button", async () => {
+    setup();
+    await renderAll();
+    await failConnect();
+    fireEvent.click(within(status()).getByRole("button", { name: "Dismiss" }));
+    expect(status()).toBeEmptyDOMElement();
+  });
+
+  it("pauses the timer while hovered or focused", async () => {
+    vi.useFakeTimers({ shouldAdvanceTime: true });
+    setup();
+    await renderAll();
+    await failConnect();
+    const bar = status().querySelector(".servers-status") as HTMLElement;
+    fireEvent.mouseEnter(bar);
+    act(() => {
+      vi.advanceTimersByTime(120_000);
+    });
+    expect(status()).toHaveTextContent("Couldn't connect to");
+    fireEvent.mouseLeave(bar);
+    act(() => {
+      vi.advanceTimersByTime(60_000);
+    });
+    expect(status()).toBeEmptyDOMElement();
+    // Keyboard focus pauses it too.
+    await failConnect();
+    const again = status().querySelector(".servers-status") as HTMLElement;
+    fireEvent.focus(again);
+    act(() => {
+      vi.advanceTimersByTime(120_000);
+    });
+    expect(status()).toHaveTextContent("Couldn't connect to");
+  });
+
+  it("shows again on a new failure, not for the same one", async () => {
+    setup();
+    await renderAll();
+    await failConnect();
+    fireEvent.click(within(status()).getByRole("button", { name: "Dismiss" }));
+    expect(status()).toBeEmptyDOMElement();
+    await failConnect();
+    expect(status()).toHaveTextContent("Couldn't connect to");
+  });
+
+  it("names a server without a label by host and port, never by id", () => {
+    expect(displayName({ label: "Raid", address: "a.example.org", port: 1 })).toBe("Raid");
+    expect(displayName({ label: "  ", address: "a.example.org", port: 64738 })).toBe(
+      "a.example.org:64738",
+    );
   });
 });

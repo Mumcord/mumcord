@@ -1,6 +1,6 @@
-import { useEffect, useState, type ReactNode } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import { useTranslation } from "react-i18next";
-import type { ActionContext, ServersState } from "./store";
+import type { ActionContext, ConnectionEnd, ServersState } from "./store";
 import {
   cancelReconnect,
   disconnect,
@@ -41,11 +41,22 @@ interface BarProps {
   /** Spoken instead of `text` when the visible text changes every second (countdown). */
   spokenText?: string;
   children?: ReactNode;
+  /** Hover or keyboard focus on the bar, so a timed bar is not removed while being read. */
+  onPause?: (paused: boolean) => void;
 }
 
-function Bar({ tone, text, spokenText, children }: BarProps) {
+function Bar({ tone, text, spokenText, children, onPause }: BarProps) {
   return (
-    <div className="servers-status" data-tone={tone}>
+    // The handlers only track hover and focus to pause a timer; the buttons inside do the work.
+    // eslint-disable-next-line jsx-a11y/no-static-element-interactions
+    <div
+      className="servers-status"
+      data-tone={tone}
+      onMouseEnter={() => onPause?.(true)}
+      onMouseLeave={() => onPause?.(false)}
+      onFocus={() => onPause?.(true)}
+      onBlur={() => onPause?.(false)}
+    >
       <p className="servers-status__text">
         {spokenText === undefined ? (
           text
@@ -58,6 +69,75 @@ function Bar({ tone, text, spokenText, children }: BarProps) {
       </p>
       {children && <div className="servers-status__actions">{children}</div>}
     </div>
+  );
+}
+
+/** A failed connect hides on its own after this long; the server icon keeps the error. */
+const ENDED_AUTO_HIDE_MS = 60_000;
+
+/**
+ * The banner for a connection that ended. Shown once per failure: dismissing or timing out
+ * remembers that failure, and only a new one (a new object in the store) shows it again.
+ */
+function EndedBar({ state, ended }: { state: ServersState; ended: ConnectionEnd }) {
+  const { t } = useTranslation(["servers", "common"]);
+  const [hidden, setHidden] = useState<ConnectionEnd | null>(null);
+  const [paused, setPaused] = useState(false);
+  // Time left on the 60 s, kept across pauses and reset for a new failure.
+  const left = useRef({ ended, ms: ENDED_AUTO_HIDE_MS });
+  const visible = hidden !== ended;
+  useEffect(() => {
+    if (paused || !visible) return;
+    if (left.current.ended !== ended) left.current = { ended, ms: ENDED_AUTO_HIDE_MS };
+    const started = Date.now();
+    const timer = setTimeout(() => {
+      setHidden(ended);
+    }, left.current.ms);
+    return () => {
+      clearTimeout(timer);
+      left.current.ms = Math.max(left.current.ms - (Date.now() - started), 0);
+    };
+  }, [ended, paused, visible]);
+  if (!visible) return null;
+  const reason = ended.error ? connectionErrorText(t, ended.error, state.serverLimit) : null;
+  const text = ended.afterLoss
+    ? reason
+      ? t("status.disconnectedReason", { reason })
+      : t("status.disconnected")
+    : t("status.failed", { server: nameOf(state, ended.serverId), reason: reason ?? "" });
+  return (
+    <Bar tone="danger" text={text} onPause={setPaused}>
+      {ended.error && EDIT_FIXES.includes(ended.error.code) && (
+        <button
+          type="button"
+          className="button"
+          onClick={() => {
+            openDialog({ kind: "edit", serverId: ended.serverId });
+          }}
+        >
+          {t("status.editServer")}
+        </button>
+      )}
+      <button
+        type="button"
+        className="button button--primary"
+        onClick={() => {
+          requestConnect(ended.serverId);
+        }}
+      >
+        {ended.afterLoss ? t("status.reconnect") : t("common:retry")}
+      </button>
+      <button
+        type="button"
+        className="button"
+        aria-label={t("status.dismiss")}
+        onClick={() => {
+          setHidden(ended);
+        }}
+      >
+        ✕
+      </button>
+    </Bar>
   );
 }
 
@@ -141,36 +221,7 @@ function StatusBar({ state }: { state: ServersState }) {
       break;
   }
   if (!ended) return null;
-  const reason = ended.error ? connectionErrorText(t, ended.error, state.serverLimit) : null;
-  const text = ended.afterLoss
-    ? reason
-      ? t("status.disconnectedReason", { reason })
-      : t("status.disconnected")
-    : t("status.failed", { server: nameOf(state, ended.serverId), reason: reason ?? "" });
-  return (
-    <Bar tone="danger" text={text}>
-      {ended.error && EDIT_FIXES.includes(ended.error.code) && (
-        <button
-          type="button"
-          className="button"
-          onClick={() => {
-            openDialog({ kind: "edit", serverId: ended.serverId });
-          }}
-        >
-          {t("status.editServer")}
-        </button>
-      )}
-      <button
-        type="button"
-        className="button button--primary"
-        onClick={() => {
-          requestConnect(ended.serverId);
-        }}
-      >
-        {ended.afterLoss ? t("status.reconnect") : t("common:retry")}
-      </button>
-    </Bar>
-  );
+  return <EndedBar state={state} ended={ended} />;
 }
 
 /**

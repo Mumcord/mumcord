@@ -19,6 +19,7 @@
       "connecting": "ansluter",
       "reconnecting": "återansluter",
       "error": "anslutningen bröts",
+      "failed": "anslutningen misslyckades",
       "voice": "röstserver",
       "unread": "olästa meddelanden",
       "mentions": "omnämnanden: {{mentions}}"
@@ -128,6 +129,7 @@
     "disconnectedReason": "Frånkopplad – {{reason}}",
     "failed": "Kunde inte ansluta till {{server}}. {{reason}}",
     "cancel": "Avbryt",
+    "dismiss": "Stäng",
     "reconnect": "Återanslut",
     "editServer": "Redigera server",
     "actionFailed": {

@@ -19,6 +19,7 @@
       "connecting": "connecting",
       "reconnecting": "reconnecting",
       "error": "connection lost",
+      "failed": "connection failed",
       "voice": "voice server",
       "unread": "unread messages",
       "mentions": "mentions: {{mentions}}"
@@ -128,6 +129,7 @@
     "disconnectedReason": "Disconnected – {{reason}}",
     "failed": "Couldn't connect to {{server}}. {{reason}}",
     "cancel": "Cancel",
+    "dismiss": "Dismiss",
     "reconnect": "Reconnect",
     "editServer": "Edit server",
     "actionFailed": {

@@ -19,6 +19,7 @@
       "connecting": "verbindet",
       "reconnecting": "verbindet neu",
       "error": "Verbindung verloren",
+      "failed": "Verbindung fehlgeschlagen",
       "voice": "Sprachserver",
       "unread": "ungelesene Nachrichten",
       "mentions": "Erwähnungen: {{mentions}}"
@@ -128,6 +129,7 @@
     "disconnectedReason": "Getrennt – {{reason}}",
     "failed": "Verbindung zu {{server}} fehlgeschlagen. {{reason}}",
     "cancel": "Abbrechen",
+    "dismiss": "Schließen",
     "reconnect": "Neu verbinden",
     "editServer": "Server bearbeiten",
     "actionFailed": {
