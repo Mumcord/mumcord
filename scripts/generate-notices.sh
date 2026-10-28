@@ -1,28 +1,68 @@
 #!/usr/bin/env bash
-# Regenerates THIRD_PARTY_NOTICES (repo root) and ui/public/third-party-notices.txt.
-# Run after dependencies change. Needs: cargo-about (cargo install cargo-about --locked --features cli),
-# node/npm, and an installed node_modules (npm ci).
+# Regenerates THIRD_PARTY_NOTICES (repo root) and ui/public/third-party-notices.txt. CI runs it
+# for every release before bundling and on main after dependency changes (.github/workflows/
+# notices.yml), so running it by hand is optional. Needs: cargo-about at the version in
+# scripts/license-tools.env, node/npm, and an installed node_modules (npm ci).
+#
+# Licence policy: fails when a dependency has a licence that is not allowed, so an incompatible
+# dependency is noticed at once. Rust crates are checked against `accepted` in about.toml, npm
+# packages against npm_allowed below. Mumcord is AGPL-3.0-only; only permissive or weak-copyleft
+# licences compatible with it belong on either list.
 set -euo pipefail
 
 root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$root"
+# shellcheck source=scripts/license-tools.env
+source scripts/license-tools.env
+
+# Production npm packages, as SPDX identifiers. OFL-1.1 covers the bundled fonts.
+npm_allowed="MIT Apache-2.0 BSD-2-Clause BSD-3-Clause ISC 0BSD MPL-2.0 CC0-1.0 Unlicense Zlib OFL-1.1"
 
 command -v cargo-about >/dev/null 2>&1 || PATH="$HOME/.cargo/bin:$PATH"
 command -v cargo-about >/dev/null 2>&1 || {
-  echo "cargo-about not found. Install: cargo install cargo-about --locked --features cli" >&2
+  echo "cargo-about not found. Install: cargo install cargo-about --version $CARGO_ABOUT_VERSION --locked --features cli" >&2
   exit 1
 }
+installed="$(cargo about --version | awk '{print $2}')"
+if [ "$installed" != "$CARGO_ABOUT_VERSION" ]; then
+  echo "warning: cargo-about $installed is installed, CI uses $CARGO_ABOUT_VERSION; the output may differ." >&2
+fi
 [ -d node_modules ] || { echo "node_modules missing. Run: npm ci" >&2; exit 1; }
 
 tmp="$(mktemp -d)"
 trap 'rm -rf "$tmp"' EXIT
 
-cargo about generate about.hbs > "$tmp/rust.txt"
-npx --yes license-checker-rseidelsohn --production --json > "$tmp/npm.json"
+cargo about generate --locked about.hbs > "$tmp/rust.txt" || {
+  echo "error: cargo-about failed. If it reports 'failed to satisfy license requirements', a Rust" >&2
+  echo "dependency uses a licence that is not in 'accepted' in about.toml. Replace the dependency," >&2
+  echo "or add the licence there only after checking that it is compatible with the AGPL-3.0." >&2
+  exit 1
+}
+npx --yes "license-checker-rseidelsohn@$LICENSE_CHECKER_VERSION" --production --json > "$tmp/npm.json"
 
-node - "$tmp/npm.json" > "$tmp/npm.txt" <<'NODE'
+node - "$tmp/npm.json" "$npm_allowed" > "$tmp/npm.txt" <<'NODE'
 const fs = require("fs");
 const data = JSON.parse(fs.readFileSync(process.argv[2], "utf8"));
+const allowed = new Set(process.argv[3].split(" "));
+// An SPDX expression is allowed when one OR alternative has only allowed AND parts. Several
+// detected licences (an array) must all be allowed.
+const ok = (expr) =>
+  expr
+    .replace(/[()]/g, "")
+    .split(/\s+OR\s+/)
+    .some((alt) => alt.split(/\s+AND\s+/).every((id) => allowed.has(id.trim())));
+const rejected = Object.entries(data)
+  .filter(([key]) => !key.startsWith("mumcord@"))
+  .filter(([, d]) => ![].concat(d.licenses ?? "UNKNOWN").every((l) => ok(String(l))))
+  .map(([key, d]) => `  ${key}: ${[].concat(d.licenses ?? "UNKNOWN").join(", ")}`);
+if (rejected.length) {
+  console.error(
+    "error: npm packages with a licence that is not allowed (npm_allowed in scripts/generate-notices.sh):\n" +
+      rejected.join("\n") +
+      "\nReplace the package, or add the licence there only after checking that it is compatible with the AGPL-3.0.",
+  );
+  process.exit(1);
+}
 const bar = "-".repeat(80);
 const out = ["NPM DEPENDENCIES (production)", "=============================", ""];
 for (const key of Object.keys(data).sort()) {
