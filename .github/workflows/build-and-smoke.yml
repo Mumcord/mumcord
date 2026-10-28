@@ -27,6 +27,12 @@ on:
         description: Build for a tagged release instead of a test build.
         type: boolean
         default: false
+      version:
+        description: >-
+          Release version (X.Y.Z) to set in all manifests and show in the app. Empty for a test
+          build: the bundles get the last release's version and the app shows dev~<commit>.
+        type: string
+        default: ""
 
 env:
   CARGO_TERM_COLOR: always
@@ -134,6 +140,24 @@ jobs:
         with:
           node-version: 24
           cache: npm
+
+      # After rust-cache, whose key hashes the manifests. Installers need a numeric version (RPM
+      # rejects '-', MSI/NSIS and macOS want X.Y.Z), so a test build packages as the last release
+      # and only the version shown in the app says dev~<commit> (RELEASING.md).
+      - name: Set version
+        shell: bash
+        env:
+          VERSION: ${{ inputs.version }}
+          SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+        run: |
+          if [[ -n "$VERSION" ]]; then
+            display=$VERSION
+          else
+            VERSION=$(scripts/latest-release-version.sh)
+            display="dev~${SHA::7}"
+          fi
+          scripts/set-version.sh "$VERSION"
+          echo "MUMCORD_VERSION=$display" >> "$GITHUB_ENV"
 
       - name: Install npm dependencies
         run: npm ci
