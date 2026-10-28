@@ -33,16 +33,16 @@
 
 ## Features
 
-| | |
-|---|---|
-| **Voice** | Push-to-talk (keys and mouse buttons, also on Wayland) or voice activation · AI noise suppression, echo cancellation and automatic gain · music quality · per-person volume · positional audio with the official game plugins **(Beta)** |
-| **Chat** | Images, link previews and player cards · replies and quotes · @mentions · code highlighting · history sync between Mumcord users · full-size images on demand **(Beta)** · follow text channels without joining · rich-text comment editor |
-| **Multi-server and themes** | Up to 5 servers connected (1–15), voice on one, chat and badges on all · auto-connect at start · preset and custom colour themes, each in dark and light · share a theme as a code, set one per server |
-| **Watch party and screen sharing (Beta)** | Watch YouTube together with a shared playlist **(Beta)** · share a window or screen with up to 8 people at up to 720p30 over a direct connection **(Beta)** |
-| **In-game overlay** | See who is talking in game: Vulkan layer on Linux (OpenGL launch option, Steam and Proton), click-through window over borderless games on Windows · "Now gaming" status · no overlay on macOS |
-| **People** | Friends, full profiles with a private note, now playing, connection info (ping, loss, bandwidth) and a weak-connection icon · built for big servers (Ctrl+K search, tested with 1000 people) |
-| **Privacy and security** | No telemetry · TLS with certificate checks and clear warnings · identity in the OS secure storage · link previews behind a privacy switch · logs without chat, names or audio |
-| **Everywhere** | Windows, macOS and Linux (X11 and Wayland) · all 24 official EU languages · keyboard operation, screen-reader labels, system theme |
+|                                           |                                                                                                                                                                                                                                            |
+| ----------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **Voice**                                 | Push-to-talk (keys and mouse buttons, also on Wayland) or voice activation · AI noise suppression, echo cancellation and automatic gain · music quality · per-person volume · positional audio with the official game plugins **(Beta)**   |
+| **Chat**                                  | Images, link previews and player cards · replies and quotes · @mentions · code highlighting · history sync between Mumcord users · full-size images on demand **(Beta)** · follow text channels without joining · rich-text comment editor |
+| **Multi-server and themes**               | Up to 5 servers connected (1–15), voice on one, chat and badges on all · auto-connect at start · preset and custom colour themes, each in dark and light · share a theme as a code, set one per server                                     |
+| **Watch party and screen sharing (Beta)** | Watch YouTube together with a shared playlist **(Beta)** · share a window or screen with up to 8 people at up to 720p30 over a direct connection **(Beta)**                                                                                |
+| **In-game overlay**                       | See who is talking in game: Vulkan layer on Linux (OpenGL launch option, Steam and Proton), click-through window over borderless games on Windows · "Now gaming" status · no overlay on macOS                                              |
+| **People**                                | Friends, full profiles with a private note, now playing, connection info (ping, loss, bandwidth) and a weak-connection icon · built for big servers (Ctrl+K search, tested with 1000 people)                                               |
+| **Privacy and security**                  | No telemetry · TLS with certificate checks and clear warnings · identity in the OS secure storage · link previews behind a privacy switch · logs without chat, names or audio                                                              |
+| **Everywhere**                            | Windows, macOS and Linux (X11 and Wayland) · all 24 official EU languages · keyboard operation, screen-reader labels, system theme                                                                                                         |
 
 More in the wiki: [Features](https://github.com/Mumcord/mumcord/wiki/Features). Mumcord is in early development; expect rough edges, especially in Beta features.
 
@@ -50,12 +50,12 @@ More in the wiki: [Features](https://github.com/Mumcord/mumcord/wiki/Features). 
 
 Get the latest build from the [Releases page](https://github.com/Mumcord/mumcord/releases/latest). Every release ships a `SHA256SUMS` file to check your download.
 
-| System | Package | Notes |
-|---|---|---|
-| **Windows** 10/11 | `*-setup.exe` installer | Not code-signed yet: SmartScreen warns, choose "More info" → "Run anyway" |
-| **macOS** | `.dmg`, Apple Silicon and Intel | Signed and notarized since 0.4.1 |
-| **Linux** x86_64 and ARM64 | `.deb`, `.rpm`, `.AppImage` | The `.deb` and `.rpm` pull in everything they need |
-| **Arch Linux** | AUR `mumcord-bin` | `paru -S mumcord-bin` or `yay -S mumcord-bin` |
+| System                     | Package                         | Notes                                                                     |
+| -------------------------- | ------------------------------- | ------------------------------------------------------------------------- |
+| **Windows** 10/11          | `*-setup.exe` installer         | Not code-signed yet: SmartScreen warns, choose "More info" → "Run anyway" |
+| **macOS**                  | `.dmg`, Apple Silicon and Intel | Signed and notarized since 0.4.1                                          |
+| **Linux** x86_64 and ARM64 | `.deb`, `.rpm`, `.AppImage`     | The `.deb` and `.rpm` pull in everything they need                        |
+| **Arch Linux**             | AUR `mumcord-bin`               | `paru -S mumcord-bin` or `yay -S mumcord-bin`                             |
 
 **Linux one-liner** (picks the right package for your distribution, falls back to the AppImage):
 
@@ -92,12 +92,12 @@ Mumcord sets `WEBKIT_DISABLE_COMPOSITING_MODE=1` at startup because WebKitGTK 2.
 
 Screen sharing needs a direct connection between the person sharing and each viewer (allowed once in a dialog, changeable in _Settings → Privacy_). Mumcord uses no outside server to set it up, so it works when one side has IPv6 or a home router that allows port mapping (UPnP, NAT-PMP or PCP), or when both are on the same network. Behind carrier-grade NAT or two routers without port mapping, that pair cannot watch; Mumcord says so after a short wait.
 
-| | Picture | Sound |
-|---|---|---|
-| **Windows** | Windows 10 version 1903 or newer; the system picker offers windows and screens | Only the shared app's sound, Windows 10 version 2004 or newer; no sound for a whole screen |
-| **macOS** | macOS 14 or newer with the system picker (window, app or screen); macOS 12.3 and 13 share the whole main screen; needs the "Screen & System Audio Recording" permission | Only the shared content's sound, never Mumcord's own; macOS 13 or newer |
-| **Linux, Wayland** | The desktop's picker (xdg-desktop-portal with PipeWire) chooses a window or screen | No sound |
-| **Linux, X11** | Whole screen only | No sound |
+|                    | Picture                                                                                                                                                                 | Sound                                                                                      |
+| ------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------ |
+| **Windows**        | Windows 10 version 1903 or newer; the system picker offers windows and screens                                                                                          | Only the shared app's sound, Windows 10 version 2004 or newer; no sound for a whole screen |
+| **macOS**          | macOS 14 or newer with the system picker (window, app or screen); macOS 12.3 and 13 share the whole main screen; needs the "Screen & System Audio Recording" permission | Only the shared content's sound, never Mumcord's own; macOS 13 or newer                    |
+| **Linux, Wayland** | The desktop's picker (xdg-desktop-portal with PipeWire) chooses a window or screen                                                                                      | No sound                                                                                   |
+| **Linux, X11**     | Whole screen only                                                                                                                                                       | No sound                                                                                   |
 
 Up to 8 people can watch one share; the quality drops automatically to 480p at 15 frames per second when the upload is too slow.
 
@@ -113,23 +113,23 @@ Mumcord is compatible with Mumble but **not affiliated with or endorsed by the M
 
 ## Ecosystem
 
-| Project | What it is |
-|---|---|
-| [Mumcord/mumbot](https://github.com/Mumcord/mumbot) | Webhook bot for posting into Mumble channels, and the scripted test bot the E2E tests use |
-| [Mumcord/mumpeer](https://github.com/Mumcord/mumpeer) | Planned optional relay for direct connections when no direct path is possible |
-| [`mumcord-protocol`](https://crates.io/crates/mumcord-protocol) | Rust library for the Mumble protocol |
-| [`mumcord-codec`](https://crates.io/crates/mumcord-codec) | Opus codec, jitter buffer, mixer and processing chain, without audio devices (good for headless bots) |
-| [`mumcord-audio`](https://crates.io/crates/mumcord-audio) | Audio device input and output on top of `mumcord-codec` |
-| `mumcord-store`, `mumcord-p2p` | Local storage and direct connections; coming to crates.io with the next release |
+| Project                                                         | What it is                                                                                            |
+| --------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------- |
+| [Mumcord/mumbot](https://github.com/Mumcord/mumbot)             | Webhook bot for posting into Mumble channels, and the scripted test bot the E2E tests use             |
+| [Mumcord/mumpeer](https://github.com/Mumcord/mumpeer)           | Planned optional relay for direct connections when no direct path is possible                         |
+| [`mumcord-protocol`](https://crates.io/crates/mumcord-protocol) | Rust library for the Mumble protocol                                                                  |
+| [`mumcord-codec`](https://crates.io/crates/mumcord-codec)       | Opus codec, jitter buffer, mixer and processing chain, without audio devices (good for headless bots) |
+| [`mumcord-audio`](https://crates.io/crates/mumcord-audio)       | Audio device input and output on top of `mumcord-codec`                                               |
+| `mumcord-store`, `mumcord-p2p`                                  | Local storage and direct connections; coming to crates.io with the next release                       |
 
 ## Roadmap
 
-| Stage | Status |
-|---|---|
-| Epic 1: Foundation (everyday client, chat, in-game, people) | Released, 0.1.0 to 0.3.1 |
-| Epic 2: Multi-server and themes, watch party and screen sharing | Released, 0.4.x |
-| Epic 3: Comfort and polish (hotkeys, tray, whisper, Do Not Disturb, …) | Planned, see the [Epic 3 milestone](https://github.com/Mumcord/mumcord/milestone/2) |
-| Epics 4 to 6: admin features, signed installers and auto-update, GIF search | Later |
+| Stage                                                                       | Status                                                                              |
+| --------------------------------------------------------------------------- | ----------------------------------------------------------------------------------- |
+| Epic 1: Foundation (everyday client, chat, in-game, people)                 | Released, 0.1.0 to 0.3.1                                                            |
+| Epic 2: Multi-server and themes, watch party and screen sharing             | Released, 0.4.x                                                                     |
+| Epic 3: Comfort and polish (hotkeys, tray, whisper, Do Not Disturb, …)      | Planned, see the [Epic 3 milestone](https://github.com/Mumcord/mumcord/milestone/2) |
+| Epics 4 to 6: admin features, signed installers and auto-update, GIF search | Later                                                                               |
 
 Details: [Roadmap](https://github.com/Mumcord/mumcord/wiki/Roadmap) in the wiki.
 
@@ -144,11 +144,11 @@ Details: [Roadmap](https://github.com/Mumcord/mumcord/wiki/Roadmap) in the wiki.
 
 For bug reports, use **Settings → Diagnostics → Save diagnostic file**: app version, OS, audio devices, connection statistics and recent log lines, with no chat, passwords or certificates. Then [open an issue](https://github.com/Mumcord/mumcord/issues/new/choose).
 
-| System | Log folder |
-|---|---|
+| System  | Log folder                                |
+| ------- | ----------------------------------------- |
 | Windows | `%LOCALAPPDATA%\app.mumcord.client\logs\` |
-| macOS | `~/Library/Logs/app.mumcord.client/` |
-| Linux | `~/.local/share/app.mumcord.client/logs/` |
+| macOS   | `~/Library/Logs/app.mumcord.client/`      |
+| Linux   | `~/.local/share/app.mumcord.client/logs/` |
 
 Logs contain no chat, names or audio. Known problems and fixes: [Troubleshooting](https://github.com/Mumcord/mumcord/wiki/Troubleshooting) and [docs/troubleshooting.md](docs/troubleshooting.md).
 
