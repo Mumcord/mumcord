@@ -16,7 +16,8 @@
     "diagnostics": "Dijanjostika",
     "about": "Dwar",
     "servers": "Servers",
-    "privacy": "Privatezza"
+    "privacy": "Privatezza",
+    "packetInspector": "Ispettur tal-pakketti"
   },
   "search": {
     "label": "Fittex fis-settings",
@@ -375,7 +376,8 @@
     "notices": "Avviżi ta' partijiet terzi",
     "noticesHint": "Mumcord huwa mibni fuq softwer open-source, inkluż kodiċi mill-proġett Mumble.",
     "noticesFailed": "L-avviżi ta' partijiet terzi ma setgħux jitgħabbew.",
-    "loading": "Qed jitgħabba…"
+    "loading": "Qed jitgħabba…",
+    "devToolsUnlocked": "L-għodod tal-iżviluppatur infetħu: l-ispettur tal-pakketti issa jinsab fil-lista tas-settings."
   },
   "profile": {
     "title": "Profil",
@@ -487,5 +489,79 @@
     "label": "Żid lil Mumcord mal-menu tal-apps",
     "hint": "Jagħmel l-ikona u push-to-talk jaħdmu sew fuq Wayland u l-links mumble:// jiftħu Mumcord. Għall-AppImage biss.",
     "failed": "Ma ħadimx. Erġa' pprova."
+  },
+  "inspector": {
+    "intro": "Juri l-pakketti li Mumcord jibgħat u jirċievi, l-aktar data tal-plugins ta’ Mumcord, għad-debugging. Jinżammu biss l-aħħar 2,000 pakkett, fil-memorja ta’ dan l-apparat; xejn ma jiġi rreġistrat jew mibgħut x’imkien.",
+    "devTools": "Għodod tal-iżviluppatur",
+    "devToolsHint": "Itfi biex terġa’ taħbi l-ispettur tal-pakketti u twaqqaf il-qbid.",
+    "filters": "Filtri u esportazzjoni",
+    "server": "Server",
+    "allServers": "Is-servers kollha",
+    "direction": "Direzzjoni",
+    "allDirections": "Iż-żewġ direzzjonijiet",
+    "type": "Tip",
+    "allTypes": "It-tipi kollha",
+    "sent": "Mibgħuta",
+    "received": "Riċevuti",
+    "pause": "Waqqaf",
+    "resume": "Kompli",
+    "paused": "Imwaqqaf: il-pakketti l-ġodda jidhru meta tkompli.",
+    "clear": "Neħħi",
+    "exportJson": "Esporta JSON",
+    "exportMarkdown": "Esporta Markdown",
+    "fileTypeJson": "Fajl JSON",
+    "fileTypeMarkdown": "Fajl Markdown",
+    "exportWarning": "L-esportazzjonijiet fihom il-pakketti murija bil-filtri attwali u jistgħu jinkludu data personali bħal ismijiet u test taċ-chat. Iċċekkjahom qabel taqsamhom.",
+    "exported": "Esportazzjoni ssejvjata.",
+    "counters": "Għadadi",
+    "noCounters": "Għadu ma tgħadd xejn.",
+    "voice": "Pakketti tal-vuċi: {{sent}} mibgħuta, {{received}} riċevuti",
+    "packets": "Pakketti ({{shown}} minn {{total}})",
+    "empty": "Għad m’hemm l-ebda pakkett.",
+    "tableCaption": "Pakketti maqbuda, l-aħħar fl-aħħar",
+    "columns": {
+      "time": "Ħin",
+      "direction": "Direzzjoni",
+      "type": "Tip",
+      "size": "Daqs",
+      "peers": "Minn / Lil",
+      "pacer": "Pacer"
+    },
+    "details": "Dettalji tal-pakkett fil-{{time}}",
+    "toUsers_one": "→ {{count}} utent",
+    "toUsers_two": "→ {{count}} utenti",
+    "toUsers_few": "→ {{count}} utenti",
+    "toUsers_many": "→ {{count}} utent",
+    "toUsers_other": "→ {{count}} utent",
+    "delayed": "ittardjat b’{{ms}} ms",
+    "notDelayed": "mhux ittardjat",
+    "tokensLeft": "tokens li fadal: {{tokens}}",
+    "bytes": "{{bytes}} bytes",
+    "fields": {
+      "gap": "Distakk mill-pakkett preċedenti",
+      "kind": "ID intern",
+      "size": "Daqs",
+      "decoded": "Kontenut deskodifikat"
+    },
+    "noDecoding": "Dan il-kontenut m’għandux forma li tinqara; ara l-bytes mhux ipproċessati.",
+    "controlOnly": "Messaġġ standard ta’ Mumble: jiġu rreġistrati biss it-tip u d-daqs tiegħu.",
+    "showHex": "Uri hex mhux ipproċessat",
+    "hideHex": "Aħbi hex mhux ipproċessat",
+    "rawHex": "Bytes mhux ipproċessati f’hex",
+    "copy": "Ikkopja l-pakkett",
+    "copied": "Ikkupjat.",
+    "copyFailed": "Il-kopjar naqas.",
+    "kinds": {
+      "hello": "Tislima ta’ Mumcord",
+      "history": "Sinkronizzazzjoni tal-istorja taċ-chat",
+      "image": "Trasferiment tal-immaġni bid-daqs sħiħ",
+      "nowgaming": "Status “jilgħab issa”",
+      "nowplaying": "Status “jisma’ issa”",
+      "p2p": "Twaqqif tal-konnessjoni diretta",
+      "screen": "Sinjal tal-qsim tal-iskrin",
+      "watch": "Stat tas-sessjoni ta’ ħarsa flimkien",
+      "plugin": "Data tal-plugin",
+      "mumble": "Messaġġ ta’ Mumble"
+    }
   }
 }

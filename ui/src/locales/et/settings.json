@@ -16,7 +16,8 @@
     "diagnostics": "Diagnostika",
     "about": "Teave",
     "servers": "Serverid",
-    "privacy": "Privaatsus"
+    "privacy": "Privaatsus",
+    "packetInspector": "Pakettide inspektor"
   },
   "search": {
     "label": "Otsi seadeid",
@@ -372,7 +373,8 @@
     "notices": "Kolmandate osapoolte teated",
     "noticesHint": "Mumcord põhineb avatud lähtekoodiga tarkvaral, sealhulgas Mumble'i projekti koodil.",
     "noticesFailed": "Kolmandate osapoolte teateid ei õnnestunud laadida.",
-    "loading": "Laadin…"
+    "loading": "Laadin…",
+    "devToolsUnlocked": "Arendaja tööriistad avatud: pakettide inspektor on nüüd seadete loendis."
   },
   "profile": {
     "title": "Profiil",
@@ -481,5 +483,76 @@
     "label": "Lisa Mumcord rakenduste menüüsse",
     "hint": "Ikoon ja vajuta ja räägi töötavad siis Waylandis korralikult ning mumble:// lingid avavad Mumcordi. Ainult AppImage'i jaoks.",
     "failed": "See ei õnnestunud. Proovi uuesti."
+  },
+  "inspector": {
+    "intro": "Näitab pakette, mida Mumcord saadab ja võtab vastu, peamiselt Mumcordi pluginate andmeid, silumiseks. Säilitatakse ainult viimased 2000 paketti, selle seadme mälus; midagi ei logita ega saadeta kuhugi.",
+    "devTools": "Arendaja tööriistad",
+    "devToolsHint": "Lülita välja, et pakettide inspektor uuesti peita ja jäädvustamine peatada.",
+    "filters": "Filtrid ja eksport",
+    "server": "Server",
+    "allServers": "Kõik serverid",
+    "direction": "Suund",
+    "allDirections": "Mõlemad suunad",
+    "type": "Tüüp",
+    "allTypes": "Kõik tüübid",
+    "sent": "Saadetud",
+    "received": "Vastu võetud",
+    "pause": "Peata",
+    "resume": "Jätka",
+    "paused": "Peatatud: uued paketid ilmuvad, kui jätkad.",
+    "clear": "Tühjenda",
+    "exportJson": "Ekspordi JSON",
+    "exportMarkdown": "Ekspordi Markdown",
+    "fileTypeJson": "JSON-fail",
+    "fileTypeMarkdown": "Markdown-fail",
+    "exportWarning": "Eksport sisaldab praeguste filtritega kuvatud pakette ja võib sisaldada isikuandmeid, näiteks nimesid ja vestlusteksti. Kontrolli see enne jagamist üle.",
+    "exported": "Eksport salvestatud.",
+    "counters": "Loendurid",
+    "noCounters": "Midagi pole veel loendatud.",
+    "voice": "Häälepaketid: {{sent}} saadetud, {{received}} vastu võetud",
+    "packets": "Paketid ({{shown}} / {{total}})",
+    "empty": "Pakette pole veel.",
+    "tableCaption": "Jäädvustatud paketid, uusim viimasena",
+    "columns": {
+      "time": "Aeg",
+      "direction": "Suund",
+      "type": "Tüüp",
+      "size": "Suurus",
+      "peers": "Saatja / Saaja",
+      "pacer": "Pacer"
+    },
+    "details": "Paketi üksikasjad kellaajal {{time}}",
+    "toUsers_one": "→ {{count}} kasutaja",
+    "toUsers_other": "→ {{count}} kasutajat",
+    "delayed": "viivitatud {{ms}} ms",
+    "notDelayed": "viivitamata",
+    "tokensLeft": "järelejäänud märke: {{tokens}}",
+    "bytes": "{{bytes}} baiti",
+    "fields": {
+      "gap": "Vahe eelmise paketiga",
+      "kind": "Sisemine ID",
+      "size": "Suurus",
+      "decoded": "Dekodeeritud sisu"
+    },
+    "noDecoding": "Sellel sisul pole loetavat kuju; vaata toorbaite.",
+    "controlOnly": "Tavaline Mumble’i sõnum: salvestatakse ainult selle tüüp ja suurus.",
+    "showHex": "Näita toorheksat",
+    "hideHex": "Peida toorheksa",
+    "rawHex": "Toorbaidid heksana",
+    "copy": "Kopeeri pakett",
+    "copied": "Kopeeritud.",
+    "copyFailed": "Kopeerimine ebaõnnestus.",
+    "kinds": {
+      "hello": "Mumcordi tervitus",
+      "history": "Vestluse ajaloo sünkroonimine",
+      "image": "Täissuuruses pildi edastus",
+      "nowgaming": "Olek „mängib praegu”",
+      "nowplaying": "Olek „kuulab praegu”",
+      "p2p": "Otseühenduse loomine",
+      "screen": "Ekraanijagamise signaal",
+      "watch": "Ühisvaatamise olek",
+      "plugin": "Plugina andmed",
+      "mumble": "Mumble’i sõnum"
+    }
   }
 }

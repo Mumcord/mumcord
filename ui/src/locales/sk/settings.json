@@ -16,7 +16,8 @@
     "diagnostics": "Diagnostika",
     "about": "O aplikácii",
     "servers": "Servery",
-    "privacy": "Súkromie"
+    "privacy": "Súkromie",
+    "packetInspector": "Inšpektor paketov"
   },
   "search": {
     "label": "Hľadať v nastaveniach",
@@ -374,7 +375,8 @@
     "notices": "Licencie tretích strán",
     "noticesHint": "Mumcord je postavený na open-source softvéri vrátane kódu z projektu Mumble.",
     "noticesFailed": "Licencie tretích strán sa nepodarilo načítať.",
-    "loading": "Načítava sa…"
+    "loading": "Načítava sa…",
+    "devToolsUnlocked": "Vývojárske nástroje odomknuté: inšpektor paketov je teraz v zozname nastavení."
   },
   "profile": {
     "title": "Profil",
@@ -485,5 +487,78 @@
     "label": "Pridať Mumcord do ponuky aplikácií",
     "hint": "Ikona a push-to-talk potom pod Waylandom fungujú správne a odkazy mumble:// otvárajú Mumcord. Len pre AppImage.",
     "failed": "Nepodarilo sa. Skús to znova."
+  },
+  "inspector": {
+    "intro": "Zobrazuje pakety, ktoré Mumcord odosiela a prijíma, hlavne dáta pluginov Mumcord, na ladenie. Uchováva sa iba posledných 2 000 paketov, v pamäti tohto zariadenia; nič sa nezaznamenáva ani nikam neodosiela.",
+    "devTools": "Vývojárske nástroje",
+    "devToolsHint": "Vypnutím znova skryjete inšpektor paketov a zastavíte zachytávanie.",
+    "filters": "Filtre a export",
+    "server": "Server",
+    "allServers": "Všetky servery",
+    "direction": "Smer",
+    "allDirections": "Oba smery",
+    "type": "Typ",
+    "allTypes": "Všetky typy",
+    "sent": "Odoslané",
+    "received": "Prijaté",
+    "pause": "Pozastaviť",
+    "resume": "Pokračovať",
+    "paused": "Pozastavené: nové pakety sa zobrazia po pokračovaní.",
+    "clear": "Vymazať",
+    "exportJson": "Exportovať JSON",
+    "exportMarkdown": "Exportovať Markdown",
+    "fileTypeJson": "Súbor JSON",
+    "fileTypeMarkdown": "Súbor Markdown",
+    "exportWarning": "Exporty obsahujú pakety zobrazené s aktuálnymi filtrami a môžu obsahovať osobné údaje, napríklad mená a text četu. Pred zdieľaním ich skontrolujte.",
+    "exported": "Export uložený.",
+    "counters": "Počítadlá",
+    "noCounters": "Zatiaľ nič nespočítané.",
+    "voice": "Hlasové pakety: {{sent}} odoslaných, {{received}} prijatých",
+    "packets": "Pakety ({{shown}} z {{total}})",
+    "empty": "Zatiaľ žiadne pakety.",
+    "tableCaption": "Zachytené pakety, najnovšie posledné",
+    "columns": {
+      "time": "Čas",
+      "direction": "Smer",
+      "type": "Typ",
+      "size": "Veľkosť",
+      "peers": "Od / Komu",
+      "pacer": "Pacer"
+    },
+    "details": "Podrobnosti paketu z {{time}}",
+    "toUsers_one": "→ {{count}} používateľ",
+    "toUsers_few": "→ {{count}} používatelia",
+    "toUsers_many": "→ {{count}} používateľa",
+    "toUsers_other": "→ {{count}} používateľov",
+    "delayed": "oneskorené o {{ms}} ms",
+    "notDelayed": "bez oneskorenia",
+    "tokensLeft": "zostávajúce tokeny: {{tokens}}",
+    "bytes": "{{bytes}} bajtov",
+    "fields": {
+      "gap": "Odstup od predchádzajúceho paketu",
+      "kind": "Interné ID",
+      "size": "Veľkosť",
+      "decoded": "Dekódovaný obsah"
+    },
+    "noDecoding": "Tieto dáta nemajú čitateľnú podobu; pozrite si surové bajty.",
+    "controlOnly": "Štandardná správa Mumble: zaznamenáva sa iba jej typ a veľkosť.",
+    "showHex": "Zobraziť surový hex",
+    "hideHex": "Skryť surový hex",
+    "rawHex": "Surové bajty v hex",
+    "copy": "Kopírovať paket",
+    "copied": "Skopírované.",
+    "copyFailed": "Kopírovanie zlyhalo.",
+    "kinds": {
+      "hello": "Pozdrav Mumcord",
+      "history": "Synchronizácia histórie četu",
+      "image": "Prenos obrázka v plnej veľkosti",
+      "nowgaming": "Stav „práve hrá“",
+      "nowplaying": "Stav „práve počúva“",
+      "p2p": "Nadviazanie priameho spojenia",
+      "screen": "Signál zdieľania obrazovky",
+      "watch": "Stav spoločného sledovania",
+      "plugin": "Dáta pluginu",
+      "mumble": "Správa Mumble"
+    }
   }
 }

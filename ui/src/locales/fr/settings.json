@@ -16,7 +16,8 @@
     "diagnostics": "Diagnostic",
     "about": "À propos",
     "servers": "Serveurs",
-    "privacy": "Confidentialité"
+    "privacy": "Confidentialité",
+    "packetInspector": "Inspecteur de paquets"
   },
   "search": {
     "label": "Rechercher dans les paramètres",
@@ -373,7 +374,8 @@
     "notices": "Mentions des tiers",
     "noticesHint": "Mumcord repose sur des logiciels open source, dont du code du projet Mumble.",
     "noticesFailed": "Les mentions des tiers n’ont pas pu être chargées.",
-    "loading": "Chargement…"
+    "loading": "Chargement…",
+    "devToolsUnlocked": "Outils de développement déverrouillés : l’inspecteur de paquets figure maintenant dans la liste des paramètres."
   },
   "profile": {
     "title": "Profil",
@@ -483,5 +485,77 @@
     "label": "Ajouter Mumcord au menu des applications",
     "hint": "L’icône et le push-to-talk fonctionnent correctement sous Wayland, et les liens mumble:// ouvrent Mumcord. Uniquement pour l’AppImage.",
     "failed": "Cela n’a pas fonctionné. Veuillez réessayer."
+  },
+  "inspector": {
+    "intro": "Affiche les paquets envoyés et reçus par Mumcord, surtout les données des plugins Mumcord, pour le débogage. Seuls les 2 000 derniers paquets sont conservés, en mémoire sur cet appareil ; rien n’est journalisé ni envoyé ailleurs.",
+    "devTools": "Outils de développement",
+    "devToolsHint": "Désactivez pour masquer à nouveau l’inspecteur de paquets et arrêter la capture.",
+    "filters": "Filtres et export",
+    "server": "Serveur",
+    "allServers": "Tous les serveurs",
+    "direction": "Direction",
+    "allDirections": "Les deux directions",
+    "type": "Type",
+    "allTypes": "Tous les types",
+    "sent": "Envoyés",
+    "received": "Reçus",
+    "pause": "Pause",
+    "resume": "Reprendre",
+    "paused": "En pause : les nouveaux paquets apparaîtront à la reprise.",
+    "clear": "Effacer",
+    "exportJson": "Exporter en JSON",
+    "exportMarkdown": "Exporter en Markdown",
+    "fileTypeJson": "Fichier JSON",
+    "fileTypeMarkdown": "Fichier Markdown",
+    "exportWarning": "Les exports contiennent les paquets affichés avec les filtres actuels et peuvent inclure des données personnelles comme des noms et du texte de chat. Vérifiez-les avant de les partager.",
+    "exported": "Export enregistré.",
+    "counters": "Compteurs",
+    "noCounters": "Rien de compté pour l’instant.",
+    "voice": "Paquets vocaux : {{sent}} envoyés, {{received}} reçus",
+    "packets": "Paquets ({{shown}} sur {{total}})",
+    "empty": "Aucun paquet pour l’instant.",
+    "tableCaption": "Paquets capturés, les plus récents en dernier",
+    "columns": {
+      "time": "Heure",
+      "direction": "Direction",
+      "type": "Type",
+      "size": "Taille",
+      "peers": "De / Vers",
+      "pacer": "Pacer"
+    },
+    "details": "Détails du paquet de {{time}}",
+    "toUsers_one": "→ {{count}} utilisateur",
+    "toUsers_many": "→ {{count}} d’utilisateurs",
+    "toUsers_other": "→ {{count}} utilisateurs",
+    "delayed": "retardé de {{ms}} ms",
+    "notDelayed": "non retardé",
+    "tokensLeft": "jetons restants : {{tokens}}",
+    "bytes": "{{bytes}} octets",
+    "fields": {
+      "gap": "Écart avec le paquet précédent",
+      "kind": "Identifiant interne",
+      "size": "Taille",
+      "decoded": "Contenu décodé"
+    },
+    "noDecoding": "Ce contenu n’a pas de forme lisible ; voir les octets bruts.",
+    "controlOnly": "Message Mumble standard : seuls son type et sa taille sont enregistrés.",
+    "showHex": "Afficher l’hex brut",
+    "hideHex": "Masquer l’hex brut",
+    "rawHex": "Octets bruts en hex",
+    "copy": "Copier le paquet",
+    "copied": "Copié.",
+    "copyFailed": "Échec de la copie.",
+    "kinds": {
+      "hello": "Hello Mumcord",
+      "history": "Synchronisation de l’historique du chat",
+      "image": "Transfert d’image en taille réelle",
+      "nowgaming": "Statut « joue en ce moment »",
+      "nowplaying": "Statut « écoute en ce moment »",
+      "p2p": "Établissement d’une connexion directe",
+      "screen": "Signal de partage d’écran",
+      "watch": "État de la soirée de visionnage",
+      "plugin": "Données de plugin",
+      "mumble": "Message Mumble"
+    }
   }
 }
