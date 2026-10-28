@@ -33,6 +33,13 @@ async fn main() {
 }
 ```
 
+## Rate limits and disconnecting
+
+Standard servers drop messages that arrive faster than their rate limit allows, so the client paces chat, own user state, channel, ACL and plugin data messages: a short burst goes out at once, the rest waits in a queue. `Handle::disconnect` sends what is still queued first, at the allowed pace, and closes once the server has confirmed it (a ping answered after the last message), or after 2 s at the latest; anything left over is logged by message kind and count. If the connection is lost instead, the queue is dropped.
+
+- `Handle::flush().await` waits until everything queued so far has been sent and processed by the server, without closing.
+- `Handle::closed().await` waits until the connection has stopped sending, e.g. to delay exiting the process after `disconnect`.
+
 ## Licence
 
 AGPL-3.0-only. The vendored Mumble `.proto` files keep their original BSD licence (`proto/LICENSE.mumble`).

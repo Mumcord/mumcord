@@ -58,6 +58,9 @@ const LOGIN_TIMEOUT: Duration = Duration::from_secs(15);
 const BITRATE_INTERVAL: Duration = Duration::from_secs(1);
 /// How long `person_profile` waits for requested avatar/comment blobs.
 const PROFILE_WAIT: Duration = Duration::from_secs(3);
+/// Longest wait on quit for the connections to send what is still queued (they drain in parallel,
+/// each bounded by the protocol's own drain timeout), so quitting never hangs.
+const SHUTDOWN_DRAIN: Duration = Duration::from_secs(2);
 
 /// An engine event with the server it belongs to (`None` for app-wide events).
 pub type TaggedEvent = (Option<ServerId>, EngineEvent);
@@ -747,8 +750,10 @@ impl Engine {
 
     /// Disconnects every server for quitting or restarting the app (FR-2.9). Unlike
     /// [`Engine::disconnect`] it keeps the voice channel, so the next start offers to rejoin
-    /// it (QA.9), and records which servers were connected for the next start (FR-2.7).
-    pub fn shutdown(&self) {
+    /// it (QA.9), and records which servers were connected for the next start (FR-2.7). The
+    /// returned future resolves once the connections have sent what was still queued (chat,
+    /// status, plugin data), at most [`SHUTDOWN_DRAIN`] later; await it before exiting.
+    pub fn shutdown(&self) -> impl Future<Output = ()> + Send + use<> {
         let mut core = lock(&self.inner.core);
         let mut slots: Vec<(ServerId, u64)> = core
             .slots
@@ -764,8 +769,27 @@ impl Engine {
         ) {
             tracing::warn!(error = %e, "saving the connected servers failed");
         }
+        let closed: Vec<_> = core
+            .slots
+            .values()
+            .filter_map(|slot| slot.session.as_ref().map(|s| s.handle.closed()))
+            .collect();
         for server_id in connected {
             self.inner.close_slot(&mut core, server_id, None);
+        }
+        // The connections drain in their own tasks, in parallel; this only waits for the last.
+        let all_closed = async move {
+            for closed in closed {
+                closed.await;
+            }
+        };
+        async move {
+            if tokio::time::timeout(SHUTDOWN_DRAIN, all_closed)
+                .await
+                .is_err()
+            {
+                tracing::warn!("connections did not close in time on shutdown");
+            }
         }
     }
 

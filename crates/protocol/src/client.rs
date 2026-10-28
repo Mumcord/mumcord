@@ -1,7 +1,7 @@
 //! The control-channel connection: login, background read/write tasks, the event stream and the
 //! command API.
 
-use std::collections::VecDeque;
+use std::collections::{BTreeMap, VecDeque};
 use std::net::SocketAddr;
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::{Arc, Mutex, MutexGuard};
@@ -10,9 +10,9 @@ use std::time::{Duration, Instant};
 use bytes::{Bytes, BytesMut};
 use prost::Message;
 use rustls::pki_types::ServerName;
-use tokio::io::{AsyncReadExt, AsyncWriteExt, ReadHalf, WriteHalf};
+use tokio::io::{AsyncReadExt, AsyncWrite, AsyncWriteExt, ReadHalf};
 use tokio::net::TcpStream;
-use tokio::sync::{Notify, mpsc};
+use tokio::sync::{Notify, mpsc, oneshot, watch};
 use tokio_rustls::TlsConnector;
 use tokio_rustls::client::TlsStream;
 
@@ -30,6 +30,10 @@ use crate::voice::CryptStats;
 const PING_INTERVAL: Duration = Duration::from_secs(5);
 /// Servers drop clients after 30 s of silence; if we hear nothing for that long the link is dead.
 const READ_TIMEOUT: Duration = Duration::from_secs(30);
+/// How long a requested disconnect may spend sending what is still queued. After the burst of 4,
+/// paced messages go out one per 1.2 s, so this covers a burst plus one more; a longer wait would
+/// hold up quitting the app for messages that are rarely that many.
+const DRAIN_TIMEOUT: Duration = Duration::from_secs(2);
 
 /// Everything needed to open a connection.
 pub struct ConnectConfig {
@@ -158,12 +162,23 @@ pub struct Connection {
 
 enum Outgoing {
     Frame(Frame),
+    /// Answered once everything queued before it is written and the server has answered a ping
+    /// sent after it.
+    Flush(oneshot::Sender<()>),
+    /// Sends what is still queued (within [`DRAIN_TIMEOUT`]), then closes.
     Disconnect,
+    /// Closes at once and drops anything queued: the connection is lost or the login failed.
+    Abort,
 }
 
 struct Shared {
     state: Mutex<ServerState>,
     shutdown: Notify,
+    /// Set by [`Handle::disconnect`]: no new commands are taken while the queue drains.
+    closing: AtomicBool,
+    /// Timestamp of the latest ping the server answered. The server handles a client's messages
+    /// in order, so an answered ping means everything sent before it has been processed.
+    pong: watch::Sender<u64>,
     reason: Mutex<Option<DisconnectReason>>,
     connected: AtomicBool,
     ping: Mutex<PingReport>,
@@ -376,6 +391,8 @@ async fn connect_inner(
     let shared = Arc::new(Shared {
         state: Mutex::new(ServerState::default()),
         shutdown: Notify::new(),
+        closing: AtomicBool::new(false),
+        pong: watch::Sender::new(0),
         reason: Mutex::new(None),
         connected: AtomicBool::new(true),
         ping: Mutex::default(),
@@ -461,68 +478,196 @@ fn access_tokens_message(tokens: Vec<String>) -> proto::Authenticate {
     }
 }
 
-async fn write_loop(
-    mut writer: WriteHalf<TlsStream<TcpStream>>,
+async fn write_loop<W: AsyncWrite + Unpin>(
+    writer: W,
     mut rx: mpsc::UnboundedReceiver<Outgoing>,
     shared: Arc<Shared>,
 ) {
     let mut ping =
         tokio::time::interval_at(tokio::time::Instant::now() + PING_INTERVAL, PING_INTERVAL);
-    let mut buf = BytesMut::new();
-    let start = tokio::time::Instant::now();
-    // Rate-limited frames wait here in order, one queue per server bucket; everything else
-    // (voice, pings) goes out at once.
-    let mut messages = Paced::new(Limit::Messages, start);
-    let mut plugin_data = Paced::new(Limit::PluginData, start);
-    loop {
+    let mut pong = shared.pong.subscribe();
+    let mut out = Writer::new(writer, shared.clone(), tokio::time::Instant::now());
+    // Set while a requested disconnect drains the queue: the deadline and the flush that ends it.
+    let mut closing: Option<tokio::time::Instant> = None;
+    let mut drained: Option<oneshot::Receiver<()>> = None;
+    let mut handles_gone = false;
+    let result = loop {
         let now = tokio::time::Instant::now();
-        let messages_ready_at = messages.ready_at(now);
-        let plugin_data_ready_at = plugin_data.ready_at(now);
-        let (frame, pacing) = tokio::select! {
-            msg = rx.recv() => match msg {
+        let messages_ready_at = out.messages.ready_at(now);
+        let plugin_data_ready_at = out.plugin_data.ready_at(now);
+        let step = tokio::select! {
+            msg = rx.recv(), if !handles_gone => match msg {
                 Some(Outgoing::Frame(frame)) => match ratelimit::limit_of(frame.kind) {
                     Some(Limit::Messages) => {
-                        messages.queue.push_back((frame, now));
-                        continue;
+                        out.messages.push(frame, now);
+                        Ok(())
                     }
                     Some(Limit::PluginData) => {
-                        plugin_data.queue.push_back((frame, now));
-                        continue;
+                        out.plugin_data.push(frame, now);
+                        Ok(())
                     }
-                    None => (frame, None),
+                    None => out.write(&frame, None).await,
                 },
-                Some(Outgoing::Disconnect) | None => {
-                    // Best effort close_notify; the connection is going away either way.
-                    let _ = writer.shutdown().await;
-                    shared.shut_down(DisconnectReason::Requested);
-                    return;
+                Some(Outgoing::Flush(done)) => {
+                    out.flushes.push(out.flush_marker(done));
+                    out.confirm_written().await
                 }
+                Some(Outgoing::Disconnect) | None if closing.is_none() => {
+                    handles_gone = msg.is_none();
+                    closing = Some(tokio::time::Instant::now() + DRAIN_TIMEOUT);
+                    let (done, wait) = oneshot::channel();
+                    drained = Some(wait);
+                    out.flushes.push(out.flush_marker(done));
+                    out.confirm_written().await
+                }
+                Some(Outgoing::Disconnect) => Ok(()),
+                None => {
+                    handles_gone = true;
+                    Ok(())
+                }
+                Some(Outgoing::Abort) => break Ok(()),
             },
-            () = sleep_until_some(messages_ready_at) => match messages.pop() {
-                Some((frame, _)) => (frame, None),
-                None => continue,
+            () = sleep_until_some(messages_ready_at) => match out.messages.pop() {
+                Some((frame, _)) => out.write_paced(&frame, None).await,
+                None => Ok(()),
             },
-            () = sleep_until_some(plugin_data_ready_at) => match plugin_data.pop() {
-                Some((frame, pacing)) => (frame, Some(pacing)),
-                None => continue,
+            () = sleep_until_some(plugin_data_ready_at) => match out.plugin_data.pop() {
+                Some((frame, pacing)) => out.write_paced(&frame, Some(pacing)).await,
+                None => Ok(()),
             },
+            Ok(()) = pong.changed() => {
+                out.confirm_answered(*pong.borrow_and_update());
+                Ok(())
+            }
+            () = done_or_pending(&mut drained) => break Ok(()),
+            () = sleep_until_some(closing) => {
+                tracing::warn!("disconnect timed out before the queue was sent");
+                break Ok(());
+            }
             _ = ping.tick() => {
-                (Frame::from_message(MessageType::Ping, &shared.ping().message()), None)
+                let frame = Frame::from_message(MessageType::Ping, &shared.ping().message());
+                out.write(&frame, None).await
             }
         };
-        buf.clear();
-        frame.encode(&mut buf);
-        if let Err(err) = async {
-            writer.write_all(&buf).await?;
-            writer.flush().await
+        if let Err(err) = step {
+            break Err(err);
         }
-        .await
-        {
+    };
+    out.log_dropped();
+    match result {
+        Ok(()) => {
+            // Best effort close_notify; the connection is going away either way.
+            let _ = out.writer.shutdown().await;
+            shared.shut_down(DisconnectReason::Requested);
+        }
+        Err(err) => {
             tracing::warn!(error = %err, "control channel write failed");
             shared.shut_down(DisconnectReason::Error(err.to_string()));
-            return;
         }
-        shared.tap(TapDirection::Sent, &frame, pacing);
+    }
+}
+
+/// The write side of the control channel: rate-limited frames wait here in order, one queue per
+/// server bucket; everything else (voice, pings) goes out at once.
+struct Writer<W> {
+    writer: W,
+    buf: BytesMut,
+    shared: Arc<Shared>,
+    messages: Paced,
+    plugin_data: Paced,
+    /// Flushes whose frames are not all written yet.
+    flushes: Vec<FlushMarker>,
+    /// Flushes whose frames are written, waiting for the answer to the ping with this timestamp.
+    unanswered: Vec<(u64, oneshot::Sender<()>)>,
+}
+
+/// A flush waits until both queues have sent as many frames as they had taken when it arrived.
+struct FlushMarker {
+    messages: u64,
+    plugin_data: u64,
+    done: oneshot::Sender<()>,
+}
+
+impl<W: AsyncWrite + Unpin> Writer<W> {
+    fn new(writer: W, shared: Arc<Shared>, now: tokio::time::Instant) -> Self {
+        Self {
+            writer,
+            buf: BytesMut::new(),
+            shared,
+            messages: Paced::new(Limit::Messages, now),
+            plugin_data: Paced::new(Limit::PluginData, now),
+            flushes: Vec::new(),
+            unanswered: Vec::new(),
+        }
+    }
+
+    async fn write(&mut self, frame: &Frame, pacing: Option<TapPacing>) -> std::io::Result<()> {
+        self.buf.clear();
+        frame.encode(&mut self.buf);
+        self.writer.write_all(&self.buf).await?;
+        self.writer.flush().await?;
+        self.shared.tap(TapDirection::Sent, frame, pacing);
+        Ok(())
+    }
+
+    async fn write_paced(
+        &mut self,
+        frame: &Frame,
+        pacing: Option<TapPacing>,
+    ) -> std::io::Result<()> {
+        self.write(frame, pacing).await?;
+        self.confirm_written().await
+    }
+
+    fn flush_marker(&self, done: oneshot::Sender<()>) -> FlushMarker {
+        FlushMarker {
+            messages: self.messages.pushed,
+            plugin_data: self.plugin_data.pushed,
+            done,
+        }
+    }
+
+    /// Sends one ping for all flushes whose frames are now written; its answer completes them.
+    async fn confirm_written(&mut self) -> std::io::Result<()> {
+        let (sent, waiting): (Vec<_>, Vec<_>) = std::mem::take(&mut self.flushes)
+            .into_iter()
+            .partition(|f| {
+                self.messages.popped >= f.messages && self.plugin_data.popped >= f.plugin_data
+            });
+        self.flushes = waiting;
+        if sent.is_empty() {
+            return Ok(());
+        }
+        let ping = self.shared.ping().message();
+        let stamp = ping.timestamp.unwrap_or_default();
+        self.unanswered
+            .extend(sent.into_iter().map(|f| (stamp, f.done)));
+        self.write(&Frame::from_message(MessageType::Ping, &ping), None)
+            .await
+    }
+
+    /// Completes the flushes whose ping the server has answered (`answered` is its timestamp).
+    fn confirm_answered(&mut self, answered: u64) {
+        let (done, waiting): (Vec<_>, Vec<_>) = std::mem::take(&mut self.unanswered)
+            .into_iter()
+            .partition(|(stamp, _)| *stamp <= answered);
+        self.unanswered = waiting;
+        for (_, flush) in done {
+            // The caller may have stopped waiting.
+            let _ = flush.send(());
+        }
+    }
+
+    /// Reports what is still queued and will not be sent: message kinds and counts, no content.
+    fn log_dropped(&self) {
+        let mut dropped: BTreeMap<u16, usize> = BTreeMap::new();
+        for (frame, _) in self.messages.queue.iter().chain(&self.plugin_data.queue) {
+            *dropped.entry(frame.kind).or_default() += 1;
+        }
+        for (kind, count) in dropped {
+            let kind = MessageType::from_u16(kind);
+            tracing::warn!(?kind, count, "queued messages dropped on disconnect");
+        }
     }
 }
 
@@ -531,6 +676,9 @@ struct Paced {
     bucket: LeakyBucket,
     /// Frames with the time they were queued.
     queue: VecDeque<(Frame, tokio::time::Instant)>,
+    /// Frames taken and sent so far, for flushes to tell when their frames are out.
+    pushed: u64,
+    popped: u64,
 }
 
 impl Paced {
@@ -538,7 +686,14 @@ impl Paced {
         Self {
             bucket: LeakyBucket::new(limit, now),
             queue: VecDeque::new(),
+            pushed: 0,
+            popped: 0,
         }
+    }
+
+    fn push(&mut self, frame: Frame, now: tokio::time::Instant) {
+        self.queue.push_back((frame, now));
+        self.pushed += 1;
     }
 
     /// When the next queued frame may go, or `None` with nothing queued.
@@ -546,15 +701,27 @@ impl Paced {
         (!self.queue.is_empty()).then(|| now + self.bucket.wait_time(now))
     }
 
+    /// The next frame to send; counted as sent, since a failed write ends the connection anyway.
     fn pop(&mut self) -> Option<(Frame, TapPacing)> {
         let (frame, queued) = self.queue.pop_front()?;
         let now = tokio::time::Instant::now();
         self.bucket.take(now);
+        self.popped += 1;
         let pacing = TapPacing {
             delay: now.saturating_duration_since(queued),
             tokens_left: self.bucket.tokens_left(now),
         };
         Some((frame, pacing))
+    }
+}
+
+/// Waits for `rx` to be answered, or forever when there is nothing to wait for.
+async fn done_or_pending(rx: &mut Option<oneshot::Receiver<()>>) {
+    match rx {
+        Some(rx) => {
+            let _ = rx.await;
+        }
+        None => std::future::pending().await,
     }
 }
 
@@ -602,7 +769,7 @@ async fn read_loop(
     shared.connected.store(false, Ordering::Release);
     // Stop the writer too; it is already gone if it caused the shutdown.
     if let Some(tx) = writer.upgrade() {
-        let _ = tx.send(Outgoing::Disconnect);
+        let _ = tx.send(Outgoing::Abort);
     }
     tracing::info!(?reason, "control channel closed");
     let _ = dispatcher.events.send(Event::Disconnected(reason));
@@ -793,6 +960,13 @@ impl Dispatcher {
                 let m: proto::Ping = decode("Ping", payload)?;
                 if let Some(sent) = m.timestamp {
                     self.shared.ping().on_reply(sent);
+                    self.shared.pong.send_if_modified(|latest| {
+                        let newer = sent > *latest;
+                        if newer {
+                            *latest = sent;
+                        }
+                        newer
+                    });
                 }
             }
             _ => tracing::trace!(?kind, "ignoring control message"),
@@ -803,16 +977,19 @@ impl Dispatcher {
 
 impl Handle {
     fn send(&self, frame: Frame) -> Result<(), CommandError> {
-        if !self.is_connected() {
-            return Err(CommandError::NotConnected);
-        }
-        self.tx
-            .send(Outgoing::Frame(frame))
-            .map_err(|_| CommandError::NotConnected)
+        self.queue(Outgoing::Frame(frame))
     }
 
+    fn queue(&self, out: Outgoing) -> Result<(), CommandError> {
+        if !self.is_connected() || self.shared.closing.load(Ordering::Acquire) {
+            return Err(CommandError::NotConnected);
+        }
+        self.tx.send(out).map_err(|_| CommandError::NotConnected)
+    }
+
+    /// Closes at once without sending what is queued (login failed).
     fn close(&self) {
-        let _ = self.tx.send(Outgoing::Disconnect);
+        let _ = self.tx.send(Outgoing::Abort);
     }
 
     fn send_user_state(&self, mut m: proto::UserState) -> Result<(), CommandError> {
@@ -1066,9 +1243,30 @@ impl Handle {
         self.send(Frame::from_message(MessageType::CryptSetup, &m))
     }
 
-    /// Closes the connection; an [`Event::Disconnected`] with `Requested` follows.
+    /// Waits until everything queued so far has been sent and the server has processed it,
+    /// which a ping answered afterwards confirms. Rate-limited messages beyond the burst take
+    /// 1.2 s each, so this can take a while; wrap it in a timeout if needed. Fails with
+    /// [`CommandError::NotConnected`] if the connection ends first.
+    pub async fn flush(&self) -> Result<(), CommandError> {
+        let (done, wait) = oneshot::channel();
+        self.queue(Outgoing::Flush(done))?;
+        wait.await.map_err(|_| CommandError::NotConnected)
+    }
+
+    /// Closes the connection gracefully: what is still queued is sent first, at the pace the
+    /// server allows, and confirmed like [`Handle::flush`]; after 2 s the rest is dropped (and
+    /// logged by kind and count). New commands fail from now on. An [`Event::Disconnected`] with
+    /// `Requested` follows; [`Handle::closed`] waits for the end.
     pub fn disconnect(&self) {
-        self.close();
+        self.shared.closing.store(true, Ordering::Release);
+        let _ = self.tx.send(Outgoing::Disconnect);
+    }
+
+    /// Resolves once the connection has stopped sending: after [`Handle::disconnect`] that is
+    /// when the queue is drained or its time is up, otherwise when the connection is lost.
+    pub fn closed(&self) -> impl Future<Output = ()> + Send + use<> {
+        let tx = self.tx.clone();
+        async move { tx.closed().await }
     }
 }
 
@@ -1109,6 +1307,8 @@ mod tests {
             shared: Arc::new(Shared {
                 state: Mutex::new(ServerState::default()),
                 shutdown: Notify::new(),
+                closing: AtomicBool::new(false),
+                pong: watch::Sender::new(0),
                 reason: Mutex::new(None),
                 connected: AtomicBool::new(true),
                 ping: Mutex::default(),
@@ -1140,6 +1340,8 @@ mod tests {
             shared: Arc::new(Shared {
                 state: Mutex::new(state),
                 shutdown: Notify::new(),
+                closing: AtomicBool::new(false),
+                pong: watch::Sender::new(0),
                 reason: Mutex::new(None),
                 connected: AtomicBool::new(true),
                 ping: Mutex::default(),
@@ -1163,6 +1365,183 @@ mod tests {
         assert_eq!(m.receiver_sessions, vec![3, 4]);
         assert_eq!(m.data_id.as_deref(), Some("mumcord.test"));
         assert_eq!(m.data.as_deref(), Some(&b"{}"[..]));
+    }
+}
+
+#[cfg(test)]
+mod drain_tests {
+    use tokio::io::{AsyncReadExt, DuplexStream};
+    use tokio::task::JoinHandle;
+
+    use super::*;
+
+    fn shared() -> Arc<Shared> {
+        Arc::new(Shared {
+            state: Mutex::new(ServerState::default()),
+            shutdown: Notify::new(),
+            closing: AtomicBool::new(false),
+            pong: watch::Sender::new(0),
+            reason: Mutex::new(None),
+            connected: AtomicBool::new(true),
+            ping: Mutex::default(),
+            tap: None,
+        })
+    }
+
+    fn text(i: u32) -> Frame {
+        let m = proto::TextMessage {
+            message: format!("message {i}"),
+            ..Default::default()
+        };
+        Frame::from_message(MessageType::TextMessage, &m)
+    }
+
+    /// Plays the server: collects the text messages until the client closes, answering pings
+    /// only when `answer` is set.
+    fn server(
+        mut stream: DuplexStream,
+        shared: Arc<Shared>,
+        answer: bool,
+    ) -> JoinHandle<Vec<String>> {
+        tokio::spawn(async move {
+            let mut buf = BytesMut::new();
+            let mut texts = Vec::new();
+            while stream.read_buf(&mut buf).await.expect("read") > 0 {
+                while let Some(frame) = framing::decode(&mut buf).expect("frame") {
+                    if frame.kind == MessageType::TextMessage as u16 {
+                        let m = proto::TextMessage::decode(frame.payload).expect("text");
+                        texts.push(m.message);
+                    } else if frame.kind == MessageType::Ping as u16 && answer {
+                        let m = proto::Ping::decode(frame.payload).expect("ping");
+                        shared.pong.send_replace(m.timestamp.expect("timestamp"));
+                    }
+                }
+            }
+            texts
+        })
+    }
+
+    fn start(answer: bool) -> (Handle, JoinHandle<Vec<String>>) {
+        start_with(answer, shared())
+    }
+
+    fn start_with(answer: bool, shared: Arc<Shared>) -> (Handle, JoinHandle<Vec<String>>) {
+        let (client, server_side) = tokio::io::duplex(64 * 1024);
+        let (tx, rx) = mpsc::unbounded_channel();
+        tokio::spawn(write_loop(client, rx, shared.clone()));
+        let server = server(server_side, shared.clone(), answer);
+        (Handle { tx, shared }, server)
+    }
+
+    fn expected(count: u32) -> Vec<String> {
+        (0..count).map(|i| format!("message {i}")).collect()
+    }
+
+    #[tokio::test(start_paused = true)]
+    async fn disconnect_sends_the_queue_beyond_the_burst_first() {
+        let (handle, server) = start(true);
+        let started = tokio::time::Instant::now();
+        for i in 0..5 {
+            handle.send(text(i)).expect("queued");
+        }
+        handle.disconnect();
+        assert_eq!(handle.send(text(9)), Err(CommandError::NotConnected));
+        handle.closed().await;
+        assert_eq!(server.await.expect("server"), expected(5));
+        // The fifth waited for the pace: the drain respects the rate limit.
+        assert!(started.elapsed() >= Duration::from_millis(1200));
+        assert_eq!(
+            *handle.shared.reason.lock().expect("reason"),
+            Some(DisconnectReason::Requested)
+        );
+    }
+
+    #[tokio::test(start_paused = true)]
+    async fn disconnect_drops_what_does_not_fit_in_the_timeout() {
+        let (handle, server) = start(true);
+        let started = tokio::time::Instant::now();
+        for i in 0..8 {
+            handle.send(text(i)).expect("queued");
+        }
+        handle.disconnect();
+        handle.closed().await;
+        // Burst of 4, one more after 1.2 s; the next would be due at 2.4 s.
+        assert_eq!(server.await.expect("server"), expected(5));
+        assert_eq!(started.elapsed(), DRAIN_TIMEOUT);
+    }
+
+    #[tokio::test(start_paused = true)]
+    async fn disconnect_waits_for_the_server_to_confirm() {
+        let (handle, server) = start(false);
+        let started = tokio::time::Instant::now();
+        handle.send(text(0)).expect("queued");
+        handle.disconnect();
+        handle.closed().await;
+        assert_eq!(server.await.expect("server"), expected(1));
+        assert_eq!(started.elapsed(), DRAIN_TIMEOUT);
+    }
+
+    #[tokio::test(start_paused = true)]
+    async fn flush_completes_once_the_queue_is_sent_and_confirmed() {
+        let (handle, server) = start(true);
+        let started = tokio::time::Instant::now();
+        for i in 0..6 {
+            handle.send(text(i)).expect("queued");
+        }
+        handle.flush().await.expect("flushed");
+        // Burst of 4, then 1.2 s each.
+        assert_eq!(started.elapsed(), Duration::from_millis(2400));
+        handle.disconnect();
+        assert_eq!(server.await.expect("server"), expected(6));
+    }
+
+    #[derive(Default)]
+    struct Recorder(Mutex<Vec<u16>>);
+
+    impl PacketTap for Recorder {
+        fn enabled(&self) -> bool {
+            true
+        }
+
+        fn on_frame(&self, frame: TappedFrame) {
+            assert_eq!(frame.direction, TapDirection::Sent);
+            self.0.lock().expect("recorder").push(frame.kind);
+        }
+    }
+
+    #[tokio::test(start_paused = true)]
+    async fn frames_sent_while_draining_reach_the_tap() {
+        let recorder = Arc::new(Recorder::default());
+        let mut shared = shared();
+        Arc::get_mut(&mut shared).expect("unshared").tap = Some(recorder.clone());
+        let (handle, server) = start_with(true, shared);
+        for i in 0..6 {
+            handle.send(text(i)).expect("queued");
+        }
+        handle.disconnect();
+        handle.closed().await;
+        assert_eq!(server.await.expect("server"), expected(5));
+        let texts = recorder
+            .0
+            .lock()
+            .expect("recorder")
+            .iter()
+            .filter(|kind| **kind == MessageType::TextMessage as u16)
+            .count();
+        assert_eq!(texts, 5);
+    }
+
+    #[tokio::test(start_paused = true)]
+    async fn abort_drops_the_queue() {
+        let (handle, server) = start(true);
+        for i in 0..6 {
+            handle.send(text(i)).expect("queued");
+        }
+        handle.close();
+        handle.closed().await;
+        // Some of the burst may have gone out already; the paced rest never does.
+        let sent = server.await.expect("server");
+        assert!(sent.len() <= 4, "{sent:?}");
     }
 }
 

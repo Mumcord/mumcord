@@ -557,7 +557,7 @@ async fn quitting_while_joined_offers_a_rejoin_once_after_the_restart() {
             .expect("join Raid");
         bot.wait_user(&name, &in_raid).await.expect("in Raid");
         // Quit while joined.
-        engine.shutdown();
+        engine.shutdown().await;
         wait_for(&mut rx, "Disconnected", |e| match e {
             EngineEvent::StateChanged(ConnState::Disconnected { error: None }) => Some(()),
             _ => None,

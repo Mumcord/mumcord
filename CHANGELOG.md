@@ -16,6 +16,7 @@
 
 ### Fixed
 
+- Disconnecting, removing a server or quitting right after sending no longer loses the last chat message, status change or plugin data that was still waiting for the server's rate limit: the connection now sends what is queued first (at most 2 s) and quitting waits for it. `mumcord-protocol` gains `Handle::flush` and `Handle::closed` for the same guarantee in other programs (#74)
 - Pasting an image file copied in the file manager (for example right-click → Copy in Dolphin or Files) into the message input now attaches it like a dropped image, with the same preview, size limit and "Only images can be sent" message for other files; on Linux the webview hides the copied files from the page, so Mumcord reads them from the system clipboard itself and accepts only regular image files up to 25 MB
 
 ### Internal
