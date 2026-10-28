@@ -20,14 +20,11 @@ The version is set at build time from git; nobody bumps it in the manifests by h
 
 Between a release and the merge of its sync pull request (step 4), the manifests in the repository keep the version of an older release; that is expected. Dev builds are not affected: their display version comes from git and their package version from the latest `v*` tag, never from the manifests.
 
-## 1. Prepare the release pull request
+## 1. Check the changelog
 
-The release pull request touches only two files:
+No release pull request is needed. Make sure `CHANGELOG.md` on `main` has a section for the version, headed `## [0.4.3] - Unreleased` (a plain `## [Unreleased]` section works too: it is renamed after the release). Its text becomes the "What's new" part of the release notes, so write it for users. Do not put a date in the heading; the sync pull request (step 4) adds the tag's date.
 
-1. `CHANGELOG.md`: replace "Unreleased" in the release's heading with the release date, for example `## [0.4.3] - 2026-10-30`.
-2. For a feature release, a "What's new" block for the version in the **Write checksums and release notes** step of `.github/workflows/release.yml` (see the 0.3.0 and 0.4.0 blocks). Patch releases need none.
-
-Work through the manual checks of the release, for 0.4.0 [docs/manual-checklist-0.4.0.md](docs/manual-checklist-0.4.0.md). Open the pull request and merge it into `main` once CI is green.
+Work through the manual checks of the release, for 0.4.0 [docs/manual-checklist-0.4.0.md](docs/manual-checklist-0.4.0.md).
 
 ## 2. Tag the release on `main`
 
@@ -49,16 +46,16 @@ Open the **Actions** tab and follow the **Release** run for the tag. It takes ro
 3. **Build** on Linux, Windows and macOS. Each build job first sets the tag's version in all manifests and lock files, so the bundles, the app's About page and the diagnostics all say `X.Y.Z`. With signing set up, the Windows app and installer and the macOS app are signed automatically; nothing needs your approval.
 4. **Smoke** test: each build is installed on a fresh machine and connects to a local test server.
 5. **Generate SBOMs**: one software bill of materials per package type (see [SBOM](#sbom)).
-6. **Create draft release**: attaches the files, the SBOMs and `SHA256SUMS`, attests their build provenance and writes the release notes.
+6. **Create draft release**: attaches the files, the SBOMs and `SHA256SUMS`, attests their build provenance and writes the release notes (the download section, then the version's `CHANGELOG.md` section as "What's new", then the change list GitHub generated).
 7. **Publish crates**: publishes the library crates with the tag's version (see below).
 
 ## 4. Review and publish
 
 1. Open **Releases** on GitHub; the new release is marked **Draft**.
-2. Check the notes: the fixed download and signing section, followed by the change list GitHub generated from merged pull requests. Edit the text if needed.
+2. Check the notes: the fixed download and signing section, the "What's new" text from the changelog, followed by the change list GitHub generated from merged pull requests. Edit the text if needed.
 3. Check that the `.exe`, `.dmg`, `.AppImage`, `.cdx.json` and `SHA256SUMS` files are attached. Optionally download one and try it.
 4. Click **Publish release**.
-5. Publishing starts `.github/workflows/post-release.yml`, which opens the pull request "chore: sync version X.Y.Z and third-party notices" (branch `chore/sync-version-X.Y.Z`) with the released version in the manifests and lock files and the regenerated notices, and starts CI and E2E on it. Merge it once the checks are green. It runs on publishing, not when the build finishes, so a draft you discard changes nothing; pre-releases (`-rc.1` and the like) are not synced. If it did not run, start it by hand: **Actions → Post-release sync → Run workflow** with the version. Opening the pull request needs **Settings → Actions → General → Allow GitHub Actions to create and approve pull requests**; without it the run pushes the branch and shows a warning with a link to open the pull request by hand. While the sync pull request is open, `notices.yml` does nothing (the sync contains fresh notices) and closes nothing; the sync closes an open notices pull request.
+5. Publishing starts `.github/workflows/post-release.yml`, which opens the pull request "chore: sync version X.Y.Z and third-party notices" (branch `chore/sync-version-X.Y.Z`) with the released version in the manifests and lock files, the regenerated notices and the finalised `CHANGELOG.md` (the version's heading gets the tag's date, a link is added at the bottom, and an empty `## [Unreleased]` section is added on top; a section that is already dated is left alone, and running it again changes nothing), and starts CI and E2E on it. Merge it once the checks are green. It runs on publishing, not when the build finishes, so a draft you discard changes nothing; pre-releases (`-rc.1` and the like) are not synced. If it did not run, start it by hand: **Actions → Post-release sync → Run workflow** with the version. Opening the pull request needs **Settings → Actions → General → Allow GitHub Actions to create and approve pull requests**; without it the run pushes the branch and shows a warning with a link to open the pull request by hand. While the sync pull request is open, `notices.yml` does nothing (the sync contains fresh notices) and closes nothing; the sync closes an open notices pull request.
 
 ## AppImage: no H.264 / GPL-only codecs
 

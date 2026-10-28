@@ -170,10 +170,13 @@ jobs:
       id-token: write
       attestations: write
     steps:
-      # Only for the curl installer, which is published with each release (FR-2.54).
+      # The curl installer, which is published with each release (FR-2.54), and the changelog for the
+      # release notes.
       - uses: actions/checkout@v7
         with:
-          sparse-checkout: scripts/install.sh
+          sparse-checkout: |
+            scripts/install.sh
+            CHANGELOG.md
           sparse-checkout-cone-mode: false
 
       - uses: actions/download-artifact@v8
@@ -237,80 +240,16 @@ jobs:
 
           Full changelog: [CHANGELOG.md](https://github.com/Mumcord/mumcord/blob/main/CHANGELOG.md)
           EOF
-          # Highlights are written per release; other versions get the plain notes.
-          if [[ "$VERSION" == "0.3.0" ]]; then
-            cat >> ../notes.md <<'EOF'
-
-          ## What's new in 0.3.0
-
-          - **In-game overlay on Linux**: see who is talking inside your game (Vulkan layer, works with Steam and Proton). Switch it on per game; games with anti-cheat are off by default.
-          - **Window overlay**: a click-through window that shows who is talking in your own channel (with a helper for KDE).
-          - **Now gaming**: share the game you are playing.
-          - **Quick settings** with a collapsible Beta group, and **settings search** plus accessibility switches.
-          - **Person menu** with switches, icons and Join channel; a **redesigned full profile** with a private note.
-          - **Friends** with online state, and private chats that are kept.
-          - **History sync** between Mumcord users, and **full-size images on demand**. Drop image files into the chat.
-          - **Positional audio** with Mumble Link and the official game plugins.
-          - **All 24 official EU languages.** The translations have not been reviewed by native speakers yet; corrections are welcome via the "Report a bug" issue template.
-          - A privacy step in the setup wizard, plus changelog and support links in About.
-
-          **Beta:** positional audio, game plugins and full-size images.
-          **Coming later:** the in-game overlay on Windows (until then Windows uses the window overlay). There is no overlay on macOS.
-          EOF
-          elif [[ "$VERSION" == "0.4.0" ]]; then
-            cat >> ../notes.md <<'EOF'
-
-          ## What's new in 0.4.0
-
-          - **Several servers at once**: stay connected to up to 5 servers (configurable up to 15), voice on one, chat, notifications and badges on all of them.
-          - **Themes**: presets and your own colour themes, each with a dark and a light version, shareable as a code with a preview card in the chat, and optionally per server. Plus the website look with glow, gradients, glass and film grain.
-          - **Chat**: replies, quotes, instant sending with Retry, a sticky author banner, a link menu, dismissable welcome messages and a rich-text comment editor.
-          - **Watch party (Beta)**: watch YouTube together with the Mumcord users in your voice channel, with a shared playlist, in a floating widget.
-          - **Screen sharing (Beta)**: share a window or screen with up to 8 Mumcord users in your channel at up to 720p30. Needs a direct connection, so it does not work for every pair of home networks (for example behind carrier-grade NAT). Sound is sent only on Windows 10 2004+ and macOS 13+, and only the shared app's sound; Linux shares the picture only, and X11 only the whole screen.
-          - **Channel passwords**, a password prompt when a server rejects yours, and **connection info** (ping, loss, bandwidth) with a weak-connection icon.
-          - **In-game overlay on Windows** as a click-through window over borderless games (no injection, safe with anti-cheat), HDR10 colours, Flatpak Steam, and an OpenGL launch option on Linux.
-          - **Linux packages**: `.deb`, `.rpm`, AUR `mumcord-bin` and AppImage for x86_64 and ARM64, a one-line installer, app-menu entry, `mumble://` links and start at login. An optional update hint on all platforms.
-
-          **Beta:** watch party, screen sharing, positional audio, game plugins and full-size images.
-          **Removed:** the window overlay. Windows uses the new in-game overlay instead; people who had the window overlay on see a one-time notice.
-          **Linux AppImage:** plays YouTube via VP9 but bundles no H.264; install your distribution's gst-libav for H.264 (see the README).
-          EOF
-          elif [[ "$VERSION" == "0.4.1" ]]; then
-            cat >> ../notes.md <<'EOF'
-
-          ## What's new in 0.4.1
-
-          - **macOS connection fix**: Mumcord now asks for the Local Network permission, so connections to servers in your home network work on macOS 15 and later. Failures show a clear reason in the app and the log.
-          - **macOS prompts**: far fewer keychain prompts, and the microphone prompt appears only once.
-          - **macOS builds** are signed and notarized when signing is configured.
-          - **Two servers failing at once** no longer collide on the password and certificate prompts.
-          - The diagnostics page lists audio devices again.
-          EOF
-          elif [[ "$VERSION" == "0.4.2" ]]; then
-            cat >> ../notes.md <<'EOF'
-
-          ## What's new in 0.4.2
-
-          - **macOS keychain**: Mumcord asks for keychain access only once, instead of repeating the prompt.
-          - **Screen share and watch party**: people who join a channel now reliably see a running screen share or watch party.
-          - **Linux AppImage**: YouTube videos in the watch party play again.
-          EOF
-          elif [[ "$VERSION" == "0.4.3" ]]; then
-            cat >> ../notes.md <<'EOF'
-
-          ## What's new in 0.4.3
-
-          - **New Linux installer**: a cleaner look, and it offers to install gst-libav (H.264 video) when it is missing.
-          - **Pasting images**: images from the clipboard (for example from Spectacle) and image files copied in the file manager can be pasted into the message box.
-          - **No lost messages**: the last message you send before disconnecting or quitting is no longer lost.
-          - **Connection banner**: the "couldn't connect" banner hides itself after a minute and can be dismissed.
-          - **Libraries**: the protocol, codec, audio, store and p2p libraries are published on crates.io.
-
-          ### Beta notes
-
-          - **Message cards** are new: bots and people can post compact cards with a title, status colour, icon, text, image and link. Official Mumble clients show them as readable text.
-          - The **packet inspector** is a hidden developer tool (seven clicks on the version in Settings, About). It opens in its own window and only reads what Mumcord sends and receives.
-          EOF
+          # "What's new" is the version's section of CHANGELOG.md (dated or still "Unreleased" at
+          # tag time); without one the notes stay plain.
+          whats_new=$(awk -v v="$VERSION" '
+            /^## / { on = index($0, "## [" v "]") == 1; next }
+            /^\[[0-9]/ { on = 0 }
+            on' ../CHANGELOG.md)
+          if [[ -n "${whats_new//[[:space:]]/}" ]]; then
+            { printf '\n## What'"'"'s new in %s\n' "$VERSION"; printf '%s\n' "$whats_new"; } >> ../notes.md
+          else
+            echo "::warning::CHANGELOG.md has no section for $VERSION; the release notes have no \"What's new\"."
           fi
 
       # Signed provenance: proves each file listed in SHA256SUMS was built by this workflow run.

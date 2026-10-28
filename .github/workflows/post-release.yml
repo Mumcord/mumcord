@@ -2,7 +2,8 @@ name: Post-release sync
 
 # Releases are built from the tag with the version set at build time (scripts/set-version.sh), so
 # nothing writes the released version back to main. After a release is published, this workflow
-# commits that version (manifests and lock files) and the regenerated third-party notices on the
+# commits that version (manifests and lock files), the finalised CHANGELOG.md (release date, empty
+# Unreleased section; scripts/finalise-changelog.sh) and the regenerated third-party notices on the
 # pull request "chore: sync version X.Y.Z and third-party notices" from the branch
 # chore/sync-version-X.Y.Z; main is protected, so it never pushes there. It runs on "published"
 # rather than when the Release workflow succeeds: that workflow only creates a draft, and a draft
@@ -108,6 +109,16 @@ jobs:
         if: steps.current.outputs.skip == 'false'
         run: scripts/set-version.sh "${{ steps.version.outputs.version }}"
 
+      # The release date is the tag's date (the tagger's for an annotated tag).
+      - name: Finalise changelog
+        if: steps.current.outputs.skip == 'false'
+        env:
+          VERSION: ${{ steps.version.outputs.version }}
+        run: |
+          git fetch --no-tags --depth=1 origin "refs/tags/v$VERSION:refs/tags/v$VERSION"
+          date=$(git for-each-ref "refs/tags/v$VERSION" --format='%(creatordate:short)')
+          scripts/finalise-changelog.sh "$VERSION" "$date"
+
       - name: Generate notices
         if: steps.current.outputs.skip == 'false'
         run: scripts/generate-notices.sh
@@ -138,7 +149,7 @@ jobs:
           git push --force origin "$branch"
 
           if [[ -z "$open" ]]; then
-            body=$(printf 'Writes the released version %s into the manifests and lock files (scripts/set-version.sh) and regenerates the third-party notices (scripts/generate-notices.sh), after the [Post-release sync workflow](%s/%s/actions/runs/%s). CI and E2E are started on this branch by the same run.\n\nChanged files:\n\n%s\n' \
+            body=$(printf 'Writes the released version %s into the manifests and lock files (scripts/set-version.sh), dates its CHANGELOG.md section (scripts/finalise-changelog.sh) and regenerates the third-party notices (scripts/generate-notices.sh), after the [Post-release sync workflow](%s/%s/actions/runs/%s). CI and E2E are started on this branch by the same run.\n\nChanged files:\n\n%s\n' \
               "$VERSION" "$GITHUB_SERVER_URL" "$GITHUB_REPOSITORY" "$GITHUB_RUN_ID" "$(sed 's/.*/- `&`/' <<< "$changed")")
             gh pr create --base main --head "$branch" --title "$title" --body "$body" \
               || echo "::warning::Could not open the pull request (is \"Allow GitHub Actions to create and approve pull requests\" switched on?). Open it by hand: $GITHUB_SERVER_URL/$GITHUB_REPOSITORY/compare/main...$branch"
