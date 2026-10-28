@@ -6,6 +6,7 @@
 
 - The Mumble protocol library `mumcord-protocol` and the voice audio library `mumcord-audio` are now published on crates.io with every release, so other projects such as the bot can depend on them by version
 - The voice library is split: the new crate `mumcord-codec` holds everything that works without audio devices (Opus codec, jitter buffer, mixer, bitrate control, processing chain) and has no cpal or ALSA dependency, so headless bots can build it for static musl targets; `mumcord-audio` keeps the device I/O and re-exports the codec, and both are published on crates.io
+- Message cards: bots and people can post a compact card with a title, a status colour (info, success, warning, error, always also named in text), a built-in icon, chat-formatted text, an image and a link by writing `[card title="…" color=warning icon=chart image="…" url="…"]text[/card]`. Official Mumble clients see the same message as readable formatted text; images load only with link previews on, through Mumcord like other previews. See `docs/message-cards.md` (#72)
 - The local storage library `mumcord-store` (database, identity certificates, OS secure storage) and the direct-connection library `mumcord-p2p` (QUIC with certificate pinning) are now published on crates.io with every release too
 
 ### Changed
