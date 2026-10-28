@@ -21,6 +21,7 @@ import {
 } from "../../api";
 import { i18n } from "../../i18n";
 import { getShownServerId, showServer, subscribeServerChanges } from "../channels/serverStore";
+import { displayName } from "./format";
 
 /** A dialog the server feature should show; rendered by the server bar mount. */
 export type DialogRequest =
@@ -116,7 +117,7 @@ function setState(patch: Partial<ServersState>): void {
 
 function serverName(state: ServersState, id: number): string {
   const server = state.servers.find((s) => s.id === id);
-  return server ? server.label || server.address : t("unknownServer");
+  return server ? displayName(server) : t("unknownServer");
 }
 
 /**

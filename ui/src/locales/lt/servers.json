@@ -19,6 +19,7 @@
       "connecting": "jungiamasi",
       "reconnecting": "jungiamasi iš naujo",
       "error": "ryšys nutrūko",
+      "failed": "prisijungti nepavyko",
       "voice": "balso serveris",
       "unread": "neskaitytos žinutės",
       "mentions": "paminėjimai: {{mentions}}"
@@ -128,6 +129,7 @@
     "disconnectedReason": "Atsijungta – {{reason}}",
     "failed": "Nepavyko prisijungti prie {{server}}. {{reason}}",
     "cancel": "Atšaukti",
+    "dismiss": "Uždaryti",
     "reconnect": "Jungtis iš naujo",
     "editServer": "Redaguoti serverį",
     "actionFailed": {

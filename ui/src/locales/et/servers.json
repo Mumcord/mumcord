@@ -19,6 +19,7 @@
       "connecting": "ühendan",
       "reconnecting": "ühendan uuesti",
       "error": "ühendus katkes",
+      "failed": "ühendus ebaõnnestus",
       "voice": "häälserver",
       "unread": "lugemata sõnumid",
       "mentions": "mainimised: {{mentions}}"
@@ -128,6 +129,7 @@
     "disconnectedReason": "Ühendus katkestatud – {{reason}}",
     "failed": "Serveriga {{server}} ei õnnestunud ühendust luua. {{reason}}",
     "cancel": "Tühista",
+    "dismiss": "Sulge",
     "reconnect": "Ühendu uuesti",
     "editServer": "Muuda serverit",
     "actionFailed": {

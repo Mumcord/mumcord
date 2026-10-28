@@ -53,7 +53,7 @@ function ServerOptions({
     fn();
   };
   const hiddenWelcome = useHiddenHash(welcomeKey(server.id));
-  const connected = status !== null && status !== "error";
+  const connected = status !== null && status !== "error" && status !== "failed";
   const items: MenuItem[] = [
     connected
       ? {
@@ -63,7 +63,8 @@ function ServerOptions({
         }
       : {
           id: "connect",
-          label: status === "error" ? t("menu.reconnect") : t("menu.connect"),
+          label:
+            status === "error" || status === "failed" ? t("menu.reconnect") : t("menu.connect"),
           onSelect: act(() => {
             requestConnect(server.id);
           }),
@@ -241,7 +242,8 @@ export function ServerBar() {
           const { status } = badges;
           const name = displayName(server);
           const label = serverLabel(t, name, badges);
-          const shown = shownId === server.id && status !== null && status !== "error";
+          const shown =
+            shownId === server.id && status !== null && status !== "error" && status !== "failed";
           return (
             <li
               key={server.id}
@@ -344,7 +346,7 @@ function ServerMarks({ badges }: { badges: ServerBadges }) {
         <span className="server-bar__mark server-bar__mark--progress" aria-hidden="true">
           ⟳
         </span>
-      ) : status === "error" ? (
+      ) : status === "error" || status === "failed" ? (
         <span className="server-bar__mark server-bar__mark--error" aria-hidden="true">
           !
         </span>

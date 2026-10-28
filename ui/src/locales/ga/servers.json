@@ -19,6 +19,7 @@
       "connecting": "ag ceangal",
       "reconnecting": "ag athcheangal",
       "error": "ceangal caillte",
+      "failed": "theip ar an nasc",
       "voice": "freastalaí gutha",
       "unread": "teachtaireachtaí gan léamh",
       "mentions": "tagairtí: {{mentions}}"
@@ -128,6 +129,7 @@
     "disconnectedReason": "Dícheangailte – {{reason}}",
     "failed": "Níorbh fhéidir ceangal le {{server}}. {{reason}}",
     "cancel": "Cealaigh",
+    "dismiss": "Dún",
     "reconnect": "Athcheangail",
     "editServer": "Cuir an freastalaí in eagar",
     "actionFailed": {

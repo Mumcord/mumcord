@@ -19,6 +19,7 @@
       "connecting": "свързване",
       "reconnecting": "повторно свързване",
       "error": "връзката е загубена",
+      "failed": "връзката е неуспешна",
       "voice": "гласов сървър",
       "unread": "непрочетени съобщения",
       "mentions": "споменавания: {{mentions}}"
@@ -128,6 +129,7 @@
     "disconnectedReason": "Връзката е прекратена – {{reason}}",
     "failed": "Не успя да се свърже със {{server}}. {{reason}}",
     "cancel": "Отказ",
+    "dismiss": "Отхвърляне",
     "reconnect": "Свържи се отново",
     "editServer": "Редактирай сървъра",
     "actionFailed": {

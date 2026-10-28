@@ -19,6 +19,7 @@
       "connecting": "csatlakozás",
       "reconnecting": "újracsatlakozás",
       "error": "a kapcsolat megszakadt",
+      "failed": "a kapcsolódás sikertelen",
       "voice": "hangszerver",
       "unread": "olvasatlan üzenetek",
       "mentions": "említések: {{mentions}}"
@@ -128,6 +129,7 @@
     "disconnectedReason": "Lecsatlakozva – {{reason}}",
     "failed": "Nem sikerült csatlakozni: {{server}}. {{reason}}",
     "cancel": "Mégse",
+    "dismiss": "Bezárás",
     "reconnect": "Újracsatlakozás",
     "editServer": "Szerver szerkesztése",
     "actionFailed": {

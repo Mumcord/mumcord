@@ -19,6 +19,7 @@
       "connecting": "σύνδεση",
       "reconnecting": "επανασύνδεση",
       "error": "η σύνδεση χάθηκε",
+      "failed": "η σύνδεση απέτυχε",
       "voice": "διακομιστής φωνής",
       "unread": "μη αναγνωσμένα μηνύματα",
       "mentions": "αναφορές: {{mentions}}"
@@ -128,6 +129,7 @@
     "disconnectedReason": "Αποσυνδέθηκες – {{reason}}",
     "failed": "Δεν ήταν δυνατή η σύνδεση στο {{server}}. {{reason}}",
     "cancel": "Ακύρωση",
+    "dismiss": "Απόρριψη",
     "reconnect": "Επανασύνδεση",
     "editServer": "Επεξεργασία διακομιστή",
     "actionFailed": {
