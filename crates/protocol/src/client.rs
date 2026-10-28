@@ -4,7 +4,7 @@
 use std::collections::VecDeque;
 use std::net::SocketAddr;
 use std::sync::atomic::{AtomicBool, Ordering};
-use std::sync::{Arc, Mutex, MutexGuard};
+use std::sync::{Arc, Mutex, MutexGuard, OnceLock};
 use std::time::{Duration, Instant};
 
 use bytes::{Bytes, BytesMut};
@@ -407,12 +407,30 @@ async fn connect_inner(
     }
 }
 
+/// The release name sent in the Version message; see [`set_client_release`].
+static CLIENT_RELEASE: OnceLock<String> = OnceLock::new();
+
+/// Sets the release name servers show for this client (default `Mumcord <crate version>`), so an
+/// app can report its own build version. A process-wide setting, because the name belongs to the
+/// running program rather than to one connection; only the first call takes effect.
+pub fn set_client_release(release: impl Into<String>) {
+    // A second call keeps the first name; nothing to report.
+    let _ = CLIENT_RELEASE.set(release.into());
+}
+
+fn client_release() -> String {
+    CLIENT_RELEASE
+        .get()
+        .cloned()
+        .unwrap_or_else(|| format!("Mumcord {}", env!("CARGO_PKG_VERSION")))
+}
+
 /// The login messages in the order the server must receive them: Version, then Authenticate.
 fn handshake_frames(username: String, password: Option<String>, tokens: Vec<String>) -> [Frame; 2] {
     let version = proto::Version {
         version_v1: Some(MumbleVersion::CLIENT.to_v1()),
         version_v2: Some(MumbleVersion::CLIENT.to_v2()),
-        release: Some(format!("Mumcord {}", env!("CARGO_PKG_VERSION"))),
+        release: Some(client_release()),
         os: Some(std::env::consts::OS.to_owned()),
         os_version: None,
     };
@@ -1155,6 +1173,16 @@ mod handshake_tests {
         assert_eq!(a.username.as_deref(), Some("alice"));
         assert_eq!(a.opus, Some(true));
         assert_eq!(a.tokens, ["secret"]);
+    }
+
+    #[test]
+    fn the_app_sets_the_release_name_servers_show() {
+        // Process-wide: keeps the "Mumcord " prefix the other handshake test checks for.
+        set_client_release("Mumcord dev~a1b2c3d");
+        set_client_release("Mumcord ignored");
+        let [version, _] = handshake_frames("alice".to_owned(), None, Vec::new());
+        let v = proto::Version::decode(version.payload).expect("version");
+        assert_eq!(v.release.as_deref(), Some("Mumcord dev~a1b2c3d"));
     }
 
     #[test]
