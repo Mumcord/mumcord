@@ -177,6 +177,8 @@ impl VoiceTransport {
             seq: 0,
             oversized: 0,
             oversized_logged: 0,
+            audio_sent: 0,
+            audio_received: 0,
             oversize_logged_at: None,
             events: events_tx,
             stats: Arc::clone(&stats),
@@ -267,6 +269,9 @@ struct Worker {
     /// Value of `oversized` at the last log line, and when it was written.
     oversized_logged: u64,
     oversize_logged_at: Option<Instant>,
+    /// Audio packets handed to the transport and received from it, reported in [`LinkStats`].
+    audio_sent: u64,
+    audio_received: u64,
     events: mpsc::UnboundedSender<VoiceEvent>,
     stats: Arc<Mutex<LinkStats>>,
 }
@@ -303,6 +308,8 @@ impl Worker {
             }
             let mut stats = self.link.stats(self.crypt.stats);
             stats.oversized = self.oversized;
+            stats.audio_sent = self.audio_sent;
+            stats.audio_received = self.audio_received;
             *lock(&self.stats) = stats;
         }
     }
@@ -347,7 +354,8 @@ impl Worker {
         }
     }
 
-    fn emit_audio(&self, audio: AudioIn, transport: Transport) {
+    fn emit_audio(&mut self, audio: AudioIn, transport: Transport) {
+        self.audio_received += 1;
         self.emit(VoiceEvent::Packet(VoicePacket {
             session: audio.session,
             seq: audio.seq,
@@ -398,6 +406,7 @@ impl Worker {
             self.log_oversized(audio.payload.len());
             return Ok(());
         };
+        self.audio_sent += 1;
         match self.link.transport() {
             Transport::Udp => {
                 self.send_udp(&plain).await;
