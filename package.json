@@ -25,11 +25,11 @@
     "@tauri-apps/plugin-global-shortcut": "^2.4.1",
     "dompurify": "^3.4.17",
     "highlight.js": "^11.12.0",
-    "i18next": "^26.5.7",
+    "i18next": "^26.5.10",
     "marked": "^18.1.1",
     "react": "^19.3.1",
     "react-dom": "^19.3.1",
-    "react-i18next": "^17.1.5"
+    "react-i18next": "^17.1.8"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.5",
