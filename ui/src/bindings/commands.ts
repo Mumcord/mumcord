@@ -117,6 +117,12 @@ export const commands = {
 	 */
 	readDroppedImage: (path: string) => typedError<DroppedImage, ApiError>(__TAURI_INVOKE("read_dropped_image", { path })),
 	/**
+	 *  Paths of the files copied to the clipboard, for a paste the webview cannot hand over
+	 *  (issue #50). Each may then be read once with `read_dropped_image`. Paths that are not
+	 *  valid UTF-8 are skipped: the UI could not hand them back unchanged.
+	 */
+	clipboardFiles: () => typedError<string[], ApiError>(__TAURI_INVOKE("clipboard_files")),
+	/**
 	 *  Keeps the full image of a picture about to be sent (the original file as a `data:` URL;
 	 *  re-encoded when larger than 512 KiB or 3840 px) and returns the reference to put into the
 	 *  thumbnail's `data-mumcord-full` attribute. Errors: `invalidInput` for anything that is not
