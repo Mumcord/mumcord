@@ -1,0 +1,25 @@
+name: Seeder lock
+
+# The smoke-test seeder is its own Cargo project, so the workspace checks never look at its lock.
+# A stale lock only showed up when a release run built the seeder with --locked. Not a required
+# check, hence the path filter on the trigger.
+on:
+  pull_request:
+    paths:
+      - "Cargo.toml"
+      - "Cargo.lock"
+      - "crates/*/Cargo.toml"
+      - "scripts/smoke/**"
+      - ".github/workflows/seed-lock.yml"
+  workflow_dispatch:
+
+jobs:
+  seed-lock:
+    name: Seeder lock is current
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7
+      - uses: dtolnay/rust-toolchain@stable
+      - name: Check the lock
+        run: cargo metadata --locked --format-version 1 --manifest-path scripts/smoke/seed/Cargo.toml > /dev/null
