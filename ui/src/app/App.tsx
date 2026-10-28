@@ -17,6 +17,7 @@ import {
 import { PreferencesProvider } from "./PreferencesProvider";
 import { SettingsOverlay } from "./SettingsOverlay";
 import { useThemePreviewing } from "../theme/themeStore";
+import { useDevToolsCapture } from "../features/inspector/devTools";
 import { useServerTheme } from "./useServerTheme";
 import { useView } from "./view";
 import { ViewProvider } from "./ViewProvider";
@@ -24,6 +25,7 @@ import { ViewProvider } from "./ViewProvider";
 function MainScreen() {
   const { overlay, closeOverlay } = useView();
   useServerTheme();
+  useDevToolsCapture();
   const previewing = useThemePreviewing();
   return (
     <>
