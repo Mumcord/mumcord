@@ -16,7 +16,8 @@
     "diagnostics": "Diagnostica",
     "about": "Informazioni",
     "servers": "Server",
-    "privacy": "Privacy"
+    "privacy": "Privacy",
+    "packetInspector": "Ispettore pacchetti"
   },
   "search": {
     "label": "Cerca nelle impostazioni",
@@ -373,7 +374,8 @@
     "notices": "Avvisi di terze parti",
     "noticesHint": "Mumcord è costruito su software open source, incluso codice del progetto Mumble.",
     "noticesFailed": "Non è stato possibile caricare gli avvisi di terze parti.",
-    "loading": "Caricamento…"
+    "loading": "Caricamento…",
+    "devToolsUnlocked": "Strumenti per sviluppatori sbloccati: l’ispettore pacchetti è ora nell’elenco delle impostazioni."
   },
   "profile": {
     "title": "Profilo",
@@ -483,5 +485,77 @@
     "label": "Aggiungi Mumcord al menu delle app",
     "hint": "Fa funzionare correttamente l'icona e il push-to-talk su Wayland e fa aprire Mumcord dai link mumble://. Solo per l'AppImage.",
     "failed": "Non ha funzionato. Riprova."
+  },
+  "inspector": {
+    "intro": "Mostra i pacchetti che Mumcord invia e riceve, soprattutto dati dei plugin di Mumcord, per il debug. Vengono conservati solo gli ultimi 2.000 pacchetti, in memoria su questo dispositivo; nulla viene registrato o inviato altrove.",
+    "devTools": "Strumenti per sviluppatori",
+    "devToolsHint": "Disattiva per nascondere di nuovo l’ispettore pacchetti e interrompere l’acquisizione.",
+    "filters": "Filtri ed esportazione",
+    "server": "Server",
+    "allServers": "Tutti i server",
+    "direction": "Direzione",
+    "allDirections": "Entrambe le direzioni",
+    "type": "Tipo",
+    "allTypes": "Tutti i tipi",
+    "sent": "Inviati",
+    "received": "Ricevuti",
+    "pause": "Pausa",
+    "resume": "Riprendi",
+    "paused": "In pausa: i nuovi pacchetti compariranno alla ripresa.",
+    "clear": "Svuota",
+    "exportJson": "Esporta JSON",
+    "exportMarkdown": "Esporta Markdown",
+    "fileTypeJson": "File JSON",
+    "fileTypeMarkdown": "File Markdown",
+    "exportWarning": "Le esportazioni contengono i pacchetti mostrati con i filtri attuali e possono includere dati personali come nomi e testo delle chat. Controllale prima di condividerle.",
+    "exported": "Esportazione salvata.",
+    "counters": "Contatori",
+    "noCounters": "Ancora nulla conteggiato.",
+    "voice": "Pacchetti vocali: {{sent}} inviati, {{received}} ricevuti",
+    "packets": "Pacchetti ({{shown}} di {{total}})",
+    "empty": "Ancora nessun pacchetto.",
+    "tableCaption": "Pacchetti acquisiti, i più recenti per ultimi",
+    "columns": {
+      "time": "Ora",
+      "direction": "Direzione",
+      "type": "Tipo",
+      "size": "Dimensione",
+      "peers": "Da / A",
+      "pacer": "Pacer"
+    },
+    "details": "Dettagli del pacchetto delle {{time}}",
+    "toUsers_one": "→ {{count}} utente",
+    "toUsers_many": "→ {{count}} di utenti",
+    "toUsers_other": "→ {{count}} utenti",
+    "delayed": "ritardato di {{ms}} ms",
+    "notDelayed": "non ritardato",
+    "tokensLeft": "token rimanenti: {{tokens}}",
+    "bytes": "{{bytes}} byte",
+    "fields": {
+      "gap": "Intervallo dal pacchetto precedente",
+      "kind": "ID interno",
+      "size": "Dimensione",
+      "decoded": "Contenuto decodificato"
+    },
+    "noDecoding": "Questo payload non ha una forma leggibile; vedi i byte grezzi.",
+    "controlOnly": "Messaggio Mumble standard: vengono registrati solo tipo e dimensione.",
+    "showHex": "Mostra hex grezzo",
+    "hideHex": "Nascondi hex grezzo",
+    "rawHex": "Byte grezzi in hex",
+    "copy": "Copia pacchetto",
+    "copied": "Copiato.",
+    "copyFailed": "Copia non riuscita.",
+    "kinds": {
+      "hello": "Hello di Mumcord",
+      "history": "Sincronizzazione cronologia chat",
+      "image": "Trasferimento immagine a dimensione intera",
+      "nowgaming": "Stato «sta giocando»",
+      "nowplaying": "Stato «sta ascoltando»",
+      "p2p": "Configurazione connessione diretta",
+      "screen": "Segnale di condivisione schermo",
+      "watch": "Stato della watch party",
+      "plugin": "Dati del plugin",
+      "mumble": "Messaggio Mumble"
+    }
   }
 }

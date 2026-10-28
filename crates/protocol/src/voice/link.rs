@@ -49,6 +49,9 @@ pub struct LinkStats {
     pub crypt: CryptStats,
     /// Outgoing audio packets dropped so far because they exceeded the voice packet limit.
     pub oversized: u64,
+    /// Audio packets sent and received over either transport since the link started.
+    pub audio_sent: u64,
+    pub audio_received: u64,
 }
 
 pub(crate) struct Link {
@@ -188,6 +191,8 @@ impl Link {
             rtt: if udp { self.rtt } else { None },
             crypt,
             oversized: 0,
+            audio_sent: 0,
+            audio_received: 0,
         }
     }
 

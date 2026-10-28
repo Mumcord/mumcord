@@ -16,7 +16,8 @@
     "diagnostics": "Diagnose",
     "about": "Über",
     "servers": "Server",
-    "privacy": "Datenschutz"
+    "privacy": "Datenschutz",
+    "packetInspector": "Paketinspektor"
   },
   "search": {
     "label": "Einstellungen durchsuchen",
@@ -372,7 +373,8 @@
     "notices": "Hinweise zu Drittanbietern",
     "noticesHint": "Mumcord basiert auf Open-Source-Software, darunter Code aus dem Mumble-Projekt.",
     "noticesFailed": "Die Hinweise zu Drittanbietern konnten nicht geladen werden.",
-    "loading": "Wird geladen…"
+    "loading": "Wird geladen…",
+    "devToolsUnlocked": "Entwicklerwerkzeuge freigeschaltet: Der Paketinspektor steht jetzt in der Einstellungsliste."
   },
   "profile": {
     "title": "Profil",
@@ -481,5 +483,76 @@
     "label": "Mumcord zum App-Menü hinzufügen",
     "hint": "Damit funktionieren Symbol und Push-to-Talk unter Wayland richtig, und mumble://-Links öffnen Mumcord. Nur für das AppImage.",
     "failed": "Das hat nicht geklappt. Bitte versuche es erneut."
+  },
+  "inspector": {
+    "intro": "Zeigt die Pakete, die Mumcord sendet und empfängt, vor allem Mumcord-Plugin-Daten, zur Fehlersuche. Es werden nur die letzten 2.000 Pakete im Arbeitsspeicher dieses Geräts gehalten; nichts wird protokolliert oder irgendwohin gesendet.",
+    "devTools": "Entwicklerwerkzeuge",
+    "devToolsHint": "Ausschalten, um den Paketinspektor wieder auszublenden und die Aufzeichnung zu beenden.",
+    "filters": "Filter und Export",
+    "server": "Server",
+    "allServers": "Alle Server",
+    "direction": "Richtung",
+    "allDirections": "Beide Richtungen",
+    "type": "Typ",
+    "allTypes": "Alle Typen",
+    "sent": "Gesendet",
+    "received": "Empfangen",
+    "pause": "Pause",
+    "resume": "Fortsetzen",
+    "paused": "Pausiert: Neue Pakete erscheinen, wenn du fortsetzt.",
+    "clear": "Leeren",
+    "exportJson": "JSON exportieren",
+    "exportMarkdown": "Markdown exportieren",
+    "fileTypeJson": "JSON-Datei",
+    "fileTypeMarkdown": "Markdown-Datei",
+    "exportWarning": "Exporte enthalten die mit den aktuellen Filtern angezeigten Pakete und können persönliche Daten wie Namen und Chattext enthalten. Prüfe sie, bevor du sie weitergibst.",
+    "exported": "Export gespeichert.",
+    "counters": "Zähler",
+    "noCounters": "Noch nichts gezählt.",
+    "voice": "Sprachpakete: {{sent}} gesendet, {{received}} empfangen",
+    "packets": "Pakete ({{shown}} von {{total}})",
+    "empty": "Noch keine Pakete.",
+    "tableCaption": "Aufgezeichnete Pakete, neueste zuletzt",
+    "columns": {
+      "time": "Zeit",
+      "direction": "Richtung",
+      "type": "Typ",
+      "size": "Größe",
+      "peers": "Von / An",
+      "pacer": "Pacer"
+    },
+    "details": "Details zum Paket von {{time}}",
+    "toUsers_one": "→ {{count}} Benutzer",
+    "toUsers_other": "→ {{count}} Benutzer",
+    "delayed": "{{ms}} ms verzögert",
+    "notDelayed": "nicht verzögert",
+    "tokensLeft": "verbleibende Tokens: {{tokens}}",
+    "bytes": "{{bytes}} Bytes",
+    "fields": {
+      "gap": "Abstand zum vorherigen Paket",
+      "kind": "Interne ID",
+      "size": "Größe",
+      "decoded": "Dekodierter Inhalt"
+    },
+    "noDecoding": "Diese Nutzdaten haben keine lesbare Form; siehe die Rohbytes.",
+    "controlOnly": "Standard-Mumble-Nachricht: Nur Typ und Größe werden aufgezeichnet.",
+    "showHex": "Roh-Hex anzeigen",
+    "hideHex": "Roh-Hex ausblenden",
+    "rawHex": "Rohbytes als Hex",
+    "copy": "Paket kopieren",
+    "copied": "Kopiert.",
+    "copyFailed": "Kopieren fehlgeschlagen.",
+    "kinds": {
+      "hello": "Mumcord-Hallo",
+      "history": "Chatverlauf-Abgleich",
+      "image": "Übertragung von Bildern in voller Größe",
+      "nowgaming": "Status „Spielt gerade“",
+      "nowplaying": "Status „Hört gerade“",
+      "p2p": "Aufbau einer direkten Verbindung",
+      "screen": "Signal zur Bildschirmfreigabe",
+      "watch": "Status der Watch-Party",
+      "plugin": "Plugin-Daten",
+      "mumble": "Mumble-Nachricht"
+    }
   }
 }

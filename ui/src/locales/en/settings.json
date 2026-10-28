@@ -16,7 +16,8 @@
     "diagnostics": "Diagnostics",
     "about": "About",
     "servers": "Servers",
-    "privacy": "Privacy"
+    "privacy": "Privacy",
+    "packetInspector": "Packet inspector"
   },
   "search": {
     "label": "Search settings",
@@ -372,7 +373,8 @@
     "notices": "Third-party notices",
     "noticesHint": "Mumcord is built on open-source software, including code from the Mumble project.",
     "noticesFailed": "The third-party notices could not be loaded.",
-    "loading": "Loading…"
+    "loading": "Loading…",
+    "devToolsUnlocked": "Developer tools unlocked: the packet inspector is now in the settings list."
   },
   "profile": {
     "title": "Profile",
@@ -481,5 +483,76 @@
     "label": "Add Mumcord to the app menu",
     "hint": "Makes the icon and push-to-talk work properly on Wayland and lets mumble:// links open Mumcord. Only for the AppImage.",
     "failed": "That did not work. Please try again."
+  },
+  "inspector": {
+    "intro": "Shows the packets Mumcord sends and receives, mainly Mumcord plugin data, for debugging. Only the last 2,000 packets are kept, in memory on this device; nothing is logged or sent anywhere.",
+    "devTools": "Developer tools",
+    "devToolsHint": "Turn off to hide the packet inspector again and stop capturing.",
+    "filters": "Filters and export",
+    "server": "Server",
+    "allServers": "All servers",
+    "direction": "Direction",
+    "allDirections": "Both directions",
+    "type": "Type",
+    "allTypes": "All types",
+    "sent": "Sent",
+    "received": "Received",
+    "pause": "Pause",
+    "resume": "Resume",
+    "paused": "Paused: new packets show up when you resume.",
+    "clear": "Clear",
+    "exportJson": "Export JSON",
+    "exportMarkdown": "Export Markdown",
+    "fileTypeJson": "JSON file",
+    "fileTypeMarkdown": "Markdown file",
+    "exportWarning": "Exports contain the packets shown with the current filters and can include personal data such as names and chat text. Check them before sharing.",
+    "exported": "Export saved.",
+    "counters": "Counters",
+    "noCounters": "Nothing counted yet.",
+    "voice": "Voice packets: {{sent}} sent, {{received}} received",
+    "packets": "Packets ({{shown}} of {{total}})",
+    "empty": "No packets yet.",
+    "tableCaption": "Captured packets, newest last",
+    "columns": {
+      "time": "Time",
+      "direction": "Direction",
+      "type": "Type",
+      "size": "Size",
+      "peers": "From / To",
+      "pacer": "Pacer"
+    },
+    "details": "Details of the packet at {{time}}",
+    "toUsers_one": "→ {{count}} user",
+    "toUsers_other": "→ {{count}} users",
+    "delayed": "delayed {{ms}} ms",
+    "notDelayed": "not delayed",
+    "tokensLeft": "tokens left: {{tokens}}",
+    "bytes": "{{bytes}} bytes",
+    "fields": {
+      "gap": "Gap to previous packet",
+      "kind": "Internal id",
+      "size": "Size",
+      "decoded": "Decoded content"
+    },
+    "noDecoding": "This payload has no readable form; see the raw bytes.",
+    "controlOnly": "Standard Mumble message: only its type and size are recorded.",
+    "showHex": "Show raw hex",
+    "hideHex": "Hide raw hex",
+    "rawHex": "Raw bytes in hex",
+    "copy": "Copy packet",
+    "copied": "Copied.",
+    "copyFailed": "Copying failed.",
+    "kinds": {
+      "hello": "Mumcord hello",
+      "history": "Chat history sync",
+      "image": "Full-size image transfer",
+      "nowgaming": "Now gaming status",
+      "nowplaying": "Now playing status",
+      "p2p": "Direct connection setup",
+      "screen": "Screen share signal",
+      "watch": "Watch party state",
+      "plugin": "Plugin data",
+      "mumble": "Mumble message"
+    }
   }
 }

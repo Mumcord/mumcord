@@ -16,7 +16,8 @@
     "diagnostics": "Diagnosticare",
     "about": "Despre",
     "servers": "Servere",
-    "privacy": "Confidențialitate"
+    "privacy": "Confidențialitate",
+    "packetInspector": "Inspector de pachete"
   },
   "search": {
     "label": "Caută în setări",
@@ -373,7 +374,8 @@
     "notices": "Mențiuni terțe",
     "noticesHint": "Mumcord este construit pe software open-source, inclusiv cod din proiectul Mumble.",
     "noticesFailed": "Mențiunile terțe nu au putut fi încărcate.",
-    "loading": "Se încarcă…"
+    "loading": "Se încarcă…",
+    "devToolsUnlocked": "Instrumente pentru dezvoltatori deblocate: inspectorul de pachete este acum în lista de setări."
   },
   "profile": {
     "title": "Profil",
@@ -483,5 +485,77 @@
     "label": "Adaugă Mumcord în meniul de aplicații",
     "hint": "Face ca pictograma și push-to-talk să funcționeze corect pe Wayland și ca linkurile mumble:// să deschidă Mumcord. Doar pentru AppImage.",
     "failed": "Nu a funcționat. Încearcă din nou."
+  },
+  "inspector": {
+    "intro": "Afișează pachetele trimise și primite de Mumcord, mai ales date ale pluginurilor Mumcord, pentru depanare. Sunt păstrate doar ultimele 2.000 de pachete, în memoria acestui dispozitiv; nimic nu este înregistrat în jurnal sau trimis nicăieri.",
+    "devTools": "Instrumente pentru dezvoltatori",
+    "devToolsHint": "Dezactivează pentru a ascunde din nou inspectorul de pachete și a opri captura.",
+    "filters": "Filtre și export",
+    "server": "Server",
+    "allServers": "Toate serverele",
+    "direction": "Direcție",
+    "allDirections": "Ambele direcții",
+    "type": "Tip",
+    "allTypes": "Toate tipurile",
+    "sent": "Trimise",
+    "received": "Primite",
+    "pause": "Pauză",
+    "resume": "Reia",
+    "paused": "În pauză: pachetele noi apar când reiei.",
+    "clear": "Șterge",
+    "exportJson": "Exportă JSON",
+    "exportMarkdown": "Exportă Markdown",
+    "fileTypeJson": "Fișier JSON",
+    "fileTypeMarkdown": "Fișier Markdown",
+    "exportWarning": "Exporturile conțin pachetele afișate cu filtrele curente și pot include date personale, precum nume și text din chat. Verifică-le înainte de a le partaja.",
+    "exported": "Export salvat.",
+    "counters": "Contoare",
+    "noCounters": "Încă nu s-a numărat nimic.",
+    "voice": "Pachete vocale: {{sent}} trimise, {{received}} primite",
+    "packets": "Pachete ({{shown}} din {{total}})",
+    "empty": "Încă nu există pachete.",
+    "tableCaption": "Pachete capturate, cele mai noi la sfârșit",
+    "columns": {
+      "time": "Ora",
+      "direction": "Direcție",
+      "type": "Tip",
+      "size": "Dimensiune",
+      "peers": "De la / Către",
+      "pacer": "Pacer"
+    },
+    "details": "Detaliile pachetului de la {{time}}",
+    "toUsers_one": "→ {{count}} utilizator",
+    "toUsers_few": "→ {{count}} utilizatori",
+    "toUsers_other": "→ {{count}} de utilizatori",
+    "delayed": "întârziat cu {{ms}} ms",
+    "notDelayed": "fără întârziere",
+    "tokensLeft": "jetoane rămase: {{tokens}}",
+    "bytes": "{{bytes}} octeți",
+    "fields": {
+      "gap": "Interval față de pachetul anterior",
+      "kind": "ID intern",
+      "size": "Dimensiune",
+      "decoded": "Conținut decodat"
+    },
+    "noDecoding": "Aceste date nu au o formă lizibilă; vezi octeții bruți.",
+    "controlOnly": "Mesaj Mumble standard: sunt înregistrate doar tipul și dimensiunea.",
+    "showHex": "Arată hex brut",
+    "hideHex": "Ascunde hex brut",
+    "rawHex": "Octeți bruți în hex",
+    "copy": "Copiază pachetul",
+    "copied": "Copiat.",
+    "copyFailed": "Copierea a eșuat.",
+    "kinds": {
+      "hello": "Salut Mumcord",
+      "history": "Sincronizarea istoricului chatului",
+      "image": "Transfer de imagine la dimensiune completă",
+      "nowgaming": "Stare „joacă acum”",
+      "nowplaying": "Stare „ascultă acum”",
+      "p2p": "Stabilirea conexiunii directe",
+      "screen": "Semnal de partajare a ecranului",
+      "watch": "Starea sesiunii de vizionare",
+      "plugin": "Date plugin",
+      "mumble": "Mesaj Mumble"
+    }
   }
 }

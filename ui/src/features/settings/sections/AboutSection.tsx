@@ -1,7 +1,9 @@
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import licenseText from "../../../../../LICENSE?raw";
+import { announce } from "../../../a11y";
 import { getApi, type AppInfo } from "../../../api";
+import { useUnlockClicks } from "../../inspector/devTools";
 import { openInBrowser } from "../../chat/openLink";
 import { Group, Section } from "../components/Section";
 import { Switch } from "../components/Switch";
@@ -16,6 +18,11 @@ export function AboutSection({ settings, update }: SettingsSectionProps) {
   const [info, setInfo] = useState<AppInfo | null>(null);
   const [notices, setNotices] = useState<string | null>(null);
   const [noticesFailed, setNoticesFailed] = useState(false);
+  const [unlocked, setUnlocked] = useState(false);
+  const versionClicked = useUnlockClicks(() => {
+    setUnlocked(true);
+    announce(t("about.devToolsUnlocked"));
+  });
 
   useEffect(() => {
     let active = true;
@@ -45,10 +52,20 @@ export function AboutSection({ settings, update }: SettingsSectionProps) {
     <Section title={t("sections.about")}>
       <dl className="settings-facts">
         <dt>{t("about.version")}</dt>
-        <dd>{info?.version ?? "…"}</dd>
+        {/* Clicking the version seven times unlocks the developer tools (issue #60); the
+            gesture is deliberately hidden, so the text is not announced as a button. */}
+        {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-noninteractive-element-interactions */}
+        <dd className="settings-version" onClick={versionClicked}>
+          {info?.version ?? "…"}
+        </dd>
         <dt>{t("about.os")}</dt>
         <dd>{info?.os ?? "…"}</dd>
       </dl>
+      {unlocked && (
+        <p role="status" className="settings-success">
+          {t("about.devToolsUnlocked")}
+        </p>
+      )}
       {info && (
         <div className="settings-group">
           <button

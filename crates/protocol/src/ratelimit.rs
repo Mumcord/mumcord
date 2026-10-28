@@ -74,6 +74,12 @@ impl LeakyBucket {
         (self.timer + self.token_interval * needed).saturating_duration_since(now)
     }
 
+    /// Messages that may still go at once.
+    pub(crate) fn tokens_left(&self, now: Instant) -> u32 {
+        let level = self.tokens.saturating_sub(self.drained(now));
+        self.max_tokens.saturating_sub(level)
+    }
+
     /// Records a sent message.
     pub(crate) fn take(&mut self, now: Instant) {
         let drained = self.drained(now);
@@ -98,6 +104,7 @@ mod tests {
             bucket.take(start);
         }
         assert_eq!(bucket.wait_time(start), interval);
+        assert_eq!(bucket.tokens_left(start), 0);
         let later = start + Duration::from_millis(500);
         assert_eq!(
             bucket.wait_time(later),

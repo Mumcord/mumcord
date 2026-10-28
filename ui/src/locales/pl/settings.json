@@ -16,7 +16,8 @@
     "diagnostics": "Diagnostyka",
     "about": "O aplikacji",
     "servers": "Serwery",
-    "privacy": "Prywatność"
+    "privacy": "Prywatność",
+    "packetInspector": "Inspektor pakietów"
   },
   "search": {
     "label": "Szukaj w ustawieniach",
@@ -374,7 +375,8 @@
     "notices": "Informacje o oprogramowaniu stron trzecich",
     "noticesHint": "Mumcord powstał na bazie oprogramowania open source, w tym kodu z projektu Mumble.",
     "noticesFailed": "Nie udało się wczytać informacji o oprogramowaniu stron trzecich.",
-    "loading": "Ładowanie…"
+    "loading": "Ładowanie…",
+    "devToolsUnlocked": "Narzędzia deweloperskie odblokowane: inspektor pakietów jest teraz na liście ustawień."
   },
   "profile": {
     "title": "Profil",
@@ -485,5 +487,78 @@
     "label": "Dodaj Mumcord do menu aplikacji",
     "hint": "Sprawia, że ikona i push-to-talk działają poprawnie w Wayland, a linki mumble:// otwierają Mumcord. Tylko dla AppImage.",
     "failed": "Nie udało się. Spróbuj ponownie."
+  },
+  "inspector": {
+    "intro": "Pokazuje pakiety wysyłane i odbierane przez Mumcord, głównie dane wtyczek Mumcord, do debugowania. Przechowywanych jest tylko ostatnie 2000 pakietów, w pamięci tego urządzenia; nic nie jest zapisywane w logach ani nigdzie wysyłane.",
+    "devTools": "Narzędzia deweloperskie",
+    "devToolsHint": "Wyłącz, aby ponownie ukryć inspektor pakietów i zatrzymać przechwytywanie.",
+    "filters": "Filtry i eksport",
+    "server": "Serwer",
+    "allServers": "Wszystkie serwery",
+    "direction": "Kierunek",
+    "allDirections": "Oba kierunki",
+    "type": "Typ",
+    "allTypes": "Wszystkie typy",
+    "sent": "Wysłane",
+    "received": "Odebrane",
+    "pause": "Wstrzymaj",
+    "resume": "Wznów",
+    "paused": "Wstrzymano: nowe pakiety pojawią się po wznowieniu.",
+    "clear": "Wyczyść",
+    "exportJson": "Eksportuj JSON",
+    "exportMarkdown": "Eksportuj Markdown",
+    "fileTypeJson": "Plik JSON",
+    "fileTypeMarkdown": "Plik Markdown",
+    "exportWarning": "Eksporty zawierają pakiety widoczne przy bieżących filtrach i mogą zawierać dane osobowe, takie jak nazwy i tekst czatu. Sprawdź je przed udostępnieniem.",
+    "exported": "Eksport zapisany.",
+    "counters": "Liczniki",
+    "noCounters": "Nic jeszcze nie policzono.",
+    "voice": "Pakiety głosowe: {{sent}} wysłanych, {{received}} odebranych",
+    "packets": "Pakiety ({{shown}} z {{total}})",
+    "empty": "Brak pakietów.",
+    "tableCaption": "Przechwycone pakiety, najnowsze na końcu",
+    "columns": {
+      "time": "Czas",
+      "direction": "Kierunek",
+      "type": "Typ",
+      "size": "Rozmiar",
+      "peers": "Od / Do",
+      "pacer": "Pacer"
+    },
+    "details": "Szczegóły pakietu z {{time}}",
+    "toUsers_one": "→ {{count}} użytkownik",
+    "toUsers_few": "→ {{count}} użytkowników",
+    "toUsers_many": "→ {{count}} użytkowników",
+    "toUsers_other": "→ {{count}} użytkownika",
+    "delayed": "opóźniony o {{ms}} ms",
+    "notDelayed": "bez opóźnienia",
+    "tokensLeft": "pozostałe tokeny: {{tokens}}",
+    "bytes": "{{bytes}} B",
+    "fields": {
+      "gap": "Odstęp od poprzedniego pakietu",
+      "kind": "Wewnętrzny identyfikator",
+      "size": "Rozmiar",
+      "decoded": "Zdekodowana zawartość"
+    },
+    "noDecoding": "Ta zawartość nie ma czytelnej postaci; zobacz surowe bajty.",
+    "controlOnly": "Standardowa wiadomość Mumble: zapisywany jest tylko jej typ i rozmiar.",
+    "showHex": "Pokaż surowy hex",
+    "hideHex": "Ukryj surowy hex",
+    "rawHex": "Surowe bajty w hex",
+    "copy": "Kopiuj pakiet",
+    "copied": "Skopiowano.",
+    "copyFailed": "Kopiowanie nie powiodło się.",
+    "kinds": {
+      "hello": "Powitanie Mumcord",
+      "history": "Synchronizacja historii czatu",
+      "image": "Przesyłanie obrazu w pełnym rozmiarze",
+      "nowgaming": "Status „teraz gra”",
+      "nowplaying": "Status „teraz słucha”",
+      "p2p": "Konfiguracja bezpośredniego połączenia",
+      "screen": "Sygnał udostępniania ekranu",
+      "watch": "Stan wspólnego oglądania",
+      "plugin": "Dane wtyczki",
+      "mumble": "Wiadomość Mumble"
+    }
   }
 }
