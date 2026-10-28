@@ -165,6 +165,7 @@ npm run tauri dev
 <details>
 <summary><b>Checks, release packages and test setup</b></summary>
 
+- Version: a local build shows `dev~YYYYMMDD` in Settings → About and in the diagnostics file, plus `-dirty` when the tree has uncommitted changes; set `MUMCORD_VERSION` to override it. Release and CI versions: [RELEASING.md](RELEASING.md#versions).
 - Release packages: `npm run tauri build`; bundles land in `target/release/bundle/`. Windows and macOS link a static libvpx, see [RELEASING.md](RELEASING.md#static-libvpx).
 - Checks before a pull request:
 

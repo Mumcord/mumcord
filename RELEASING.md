@@ -4,53 +4,51 @@ Releases are built by GitHub Actions (`.github/workflows/release.yml`). Pushing 
 
 Builds are unsigned until code signing is set up (Windows via Azure Artifact Signing, macOS via an Apple Developer ID: see [docs/release-signing.md](docs/release-signing.md) and the [code signing policy](CODE_SIGNING.md)). The release notes say per platform whether the build is signed and explain the SmartScreen and Gatekeeper warnings for unsigned ones.
 
-## 1. Bump the version
+## Versions
 
-The version lives in three places, which must all match the tag (the workflow checks this and stops otherwise):
+The version is set at build time from git; nobody bumps it in the manifests by hand.
 
-| File                                   | What to change                                                    |
-| -------------------------------------- | ----------------------------------------------------------------- |
-| `package.json` and `package-lock.json` | `"version"`; both are updated by the `npm version` command below  |
-| `Cargo.toml` (`[workspace.package]`)   | `version = "…"`; every crate, including the app, inherits it      |
-| `Cargo.lock`                           | updated automatically by `cargo check` after editing `Cargo.toml` |
-| `scripts/smoke/seed/Cargo.lock`        | the smoke-test seeder is its own Cargo project; refresh it too    |
+| Build                                | Version shown in the app (About, diagnostics, log, server) | Package version of the bundles   |
+| ------------------------------------ | ---------------------------------------------------------- | -------------------------------- |
+| Release tag `vX.Y.Z` (`release.yml`) | `X.Y.Z`                                                    | `X.Y.Z`                          |
+| CI build of `main` or a pull request | `dev~<short commit>`, e.g. `dev~a1b2c3d`                   | test builds: the latest `v*` tag |
+| Local build                          | `dev~YYYYMMDD`, plus `-dirty` with uncommitted changes     | the version in `Cargo.toml`      |
 
-`src-tauri/tauri.conf.json` has no version on purpose: Tauri takes the app version from `Cargo.toml`. Do not add one.
+- **Display version.** `src-tauri/build.rs` reads `MUMCORD_VERSION` (set by CI: the tag's version in releases, `dev~<short commit>` in `ci.yml`, `e2e.yml` and test builds). Without it, it uses the build date and asks git whether the tree has uncommitted changes; without git (for example a source tarball) it leaves out `-dirty` instead of failing. The rules are in `src-tauri/build/version.rs`. Dev builds never look for updates, since they are newer than the release they are based on. Theme share codes keep the numeric package version, because other clients reject a version they cannot parse.
+- **Package version.** Installer formats need a plain number (RPM rejects `-`, MSI/NSIS want `X.Y.Z`, macOS bundle versions are numeric), so dev bundles carry the version of the latest `v*` tag (`scripts/latest-release-version.sh`) and only the app's display version says `dev~…`.
+- **Setting it.** `scripts/set-version.sh X.Y.Z` writes the version into `package.json`, `package-lock.json`, `[workspace.package]` in `Cargo.toml` (every crate inherits it), the requirements of the internal crates crates.io needs (`version = "X.Y"`), `Cargo.lock` and `scripts/smoke/seed/Cargo.lock`. CI runs it on a fresh checkout and never commits the result; `scripts/ci/test-set-version.sh` checks it on every CI run. `src-tauri/tauri.conf.json` has no version on purpose: Tauri takes the app version from `Cargo.toml`. Do not add one.
 
-On a branch, for example for version `0.2.0`:
+The manifests in the repository keep the version of an older release; that is expected and needs no update.
 
-```sh
-npm version 0.2.0 --no-git-tag-version   # package.json + package-lock.json
-# edit Cargo.toml: [workspace.package] version = "0.2.0"
-cargo check --workspace                  # refreshes Cargo.lock
-cargo check --manifest-path scripts/smoke/seed/Cargo.toml   # refreshes the seeder's Cargo.lock
-git add package.json package-lock.json Cargo.toml Cargo.lock scripts/smoke/seed/Cargo.lock
-git commit -m "chore: release 0.2.0"
-```
+## 1. Prepare the release pull request
 
-Before that commit, write the release's section in `CHANGELOG.md` (replace "Unreleased" with the release date) and, for a feature release, a "What's new" block for the version in the **Write checksums and release notes** step of `.github/workflows/release.yml` (see the 0.3.0 and 0.4.0 blocks). Work through the manual checks of the release, for 0.4.0 [docs/manual-checklist-0.4.0.md](docs/manual-checklist-0.4.0.md).
+The release pull request touches only two files:
 
-Open a pull request and merge it into `main` once CI is green.
+1. `CHANGELOG.md`: replace "Unreleased" in the release's heading with the release date, for example `## [0.4.3] - 2026-10-30`.
+2. For a feature release, a "What's new" block for the version in the **Write checksums and release notes** step of `.github/workflows/release.yml` (see the 0.3.0 and 0.4.0 blocks). Patch releases need none.
+
+Work through the manual checks of the release, for 0.4.0 [docs/manual-checklist-0.4.0.md](docs/manual-checklist-0.4.0.md). Open the pull request and merge it into `main` once CI is green.
 
 ## 2. Tag the release on `main`
 
 ```sh
 git switch main
 git pull
-git tag -a v0.2.0 -m "Mumcord 0.2.0"
-git push origin v0.2.0
+git tag -a v0.4.3 -m "Mumcord 0.4.3"
+git push origin v0.4.3
 ```
 
-The tag must be `v` plus exactly the version from step 1, and it must point to a commit on `main`.
+The tag must be `v` plus a version (`X.Y.Z`, optionally with a pre-release suffix such as `-rc.1`) and must point to a commit on `main`. The tag alone decides the version.
 
 ## 3. Wait for the workflow
 
 Open the **Actions** tab and follow the **Release** run for the tag. It takes roughly as long as the Test builds workflow (up to about an hour). It runs:
 
-1. **Check tag**: the tag matches the version in all files above and the commit is on `main`.
-2. **Build** on Linux, Windows and macOS. With signing set up, the Windows app and installer and the macOS app are signed automatically; nothing needs your approval.
+1. **Check tag**: the tag is a version, the commit is on `main`, and a dry run of `scripts/set-version.sh` works.
+2. **Build** on Linux, Windows and macOS. Each build job first sets the tag's version in all manifests and lock files, so the bundles, the app's About page and the diagnostics all say `X.Y.Z`. With signing set up, the Windows app and installer and the macOS app are signed automatically; nothing needs your approval.
 3. **Smoke** test: each build is installed on a fresh machine and connects to a local test server.
 4. **Create draft release**: attaches the files and `SHA256SUMS` and writes the release notes.
+5. **Publish crates**: publishes the library crates with the tag's version (see below).
 
 ## 4. Review and publish
 
@@ -81,9 +79,9 @@ Run `scripts/generate-notices.sh` after dependencies change. The "native librari
 
 ## Publishing the library crates (crates.io)
 
-The library crates `mumcord-protocol` (`crates/protocol`), `mumcord-codec` (`crates/codec`), `mumcord-store` (`crates/store`), `mumcord-audio` (`crates/audio`) and `mumcord-p2p` (`crates/p2p`) are published on crates.io with the app version. Protocol, codec and store are independent; audio depends on codec and p2p on protocol, so those two wait for them. The **Release** workflow does it automatically in its last job, after the draft release exists; tags with a pre-release suffix (such as `-rc.1`) are skipped. On a minor or major version bump also change the `version` of the `mumcord-codec` and `mumcord-protocol` entries (and `mumcord-store`, kept in step) in the workspace `Cargo.toml` (it is the minor series, e.g. `0.4`), or publishing `mumcord-audio` and `mumcord-p2p` fails. Each crate is checked on its own: a version that is already on crates.io is skipped with a notice, since published versions can never be replaced.
+The library crates `mumcord-protocol` (`crates/protocol`), `mumcord-codec` (`crates/codec`), `mumcord-store` (`crates/store`), `mumcord-audio` (`crates/audio`) and `mumcord-p2p` (`crates/p2p`) are published on crates.io with the app version. Protocol, codec and store are independent; audio depends on codec and p2p on protocol, so those two wait for them. The **Release** workflow does it automatically in its last job, after the draft release exists; tags with a pre-release suffix (such as `-rc.1`) are skipped. Each job of `publish-crates.yml` first runs `scripts/set-version.sh` with that version, which also sets the requirements of the internal crates (`mumcord-codec`, `mumcord-protocol`, `mumcord-store`) to the minor series, e.g. `0.4`, so `mumcord-audio` and `mumcord-p2p` find their dependencies on crates.io. Each crate is checked on its own: a version that is already on crates.io is skipped with a notice, since published versions can never be replaced.
 
-To publish the current version of `main` without a new release, run the **Publish crates** workflow from the Actions tab on `main`. It needs the repository secret `CARGO_REGISTRY_TOKEN` (a crates.io API token). Check a package locally with `cargo publish -p <crate> --dry-run --locked` (for `mumcord-audio` this only works once the matching `mumcord-codec` is on crates.io, and for `mumcord-p2p` the matching `mumcord-protocol`). Each crate must stay self-contained: only crates.io dependencies and no files outside its own directory (the `.proto` files live in `crates/protocol/proto`).
+To publish a release's crates without a new release, run the **Publish crates** workflow from the Actions tab and pick the release tag under "Use workflow from"; it publishes that tag's version. Left empty on `main`, the version input falls back to the latest release tag, and the crates are built from `main`'s code. It needs the repository secret `CARGO_REGISTRY_TOKEN` (a crates.io API token). Check a package locally with `cargo publish -p <crate> --dry-run --locked` (for `mumcord-audio` this only works once the matching `mumcord-codec` is on crates.io, and for `mumcord-p2p` the matching `mumcord-protocol`). Each crate must stay self-contained: only crates.io dependencies and no files outside its own directory (the `.proto` files live in `crates/protocol/proto`).
 
 ## AUR package (Arch Linux)
 
@@ -100,16 +98,16 @@ One-time setup:
 
 Nothing has been published, so it is safe to start over:
 
-1. Read the failing step in the Actions run. A failed **Check tag** step says exactly which file has the wrong version or that the commit is not on `main`.
+1. Read the failing step in the Actions run. A failed **Check tag** step says whether the tag is not a version, the commit is not on `main`, or the version could not be set.
 2. If a draft release was already created, delete it on the Releases page.
 3. Delete the tag, locally and on GitHub:
 
    ```sh
-   git tag -d v0.2.0
-   git push origin :refs/tags/v0.2.0
+   git tag -d v0.4.3
+   git push origin :refs/tags/v0.4.3
    ```
 
 4. Fix the problem with a normal pull request into `main`.
 5. Tag the fixed `main` again (step 2).
 
-Once a release is published, do not move or reuse its tag. Fix problems with a new version instead (for example `v0.2.1`).
+Once a release is published, do not move or reuse its tag. Fix problems with a new version instead (for example `v0.4.4`).
