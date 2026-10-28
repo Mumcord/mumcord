@@ -2,8 +2,8 @@ name: Release
 
 # Release builds from version tags on main (decision QA.12). Pushing `vX.Y.Z` checks that the
 # tag matches the app version and points to a commit on main, builds and smoke-tests the
-# bundles (build-and-smoke.yml), and creates a DRAFT GitHub Release with the bundles and
-# SHA256SUMS. The maintainer reviews and publishes it by hand. See RELEASING.md.
+# bundles (build-and-smoke.yml), and creates a DRAFT GitHub Release with the bundles, one SBOM
+# per bundle type and SHA256SUMS. The maintainer reviews and publishes it by hand. See RELEASING.md.
 on:
   push:
     tags: ["v*"]
@@ -65,8 +65,50 @@ jobs:
           echo "Tag $TAG matches the app version and is on main."
           echo "version=$version" >> "$GITHUB_OUTPUT"
 
-  build:
+  # Regenerates the third-party notices from the tagged commit, so the About page of every bundle
+  # lists exactly the dependencies it ships; the build jobs bundle this artifact. It also enforces
+  # the licence policy (scripts/generate-notices.sh) before anything is built.
+  notices:
+    name: Generate third-party notices
     needs: guard
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Read tool versions
+        id: tools
+        run: grep '^[A-Z_]*=' scripts/license-tools.env >> "$GITHUB_OUTPUT"
+
+      - uses: dtolnay/rust-toolchain@stable
+
+      - uses: ./.github/actions/cargo-tool
+        with:
+          crate: cargo-about
+          version: ${{ steps.tools.outputs.CARGO_ABOUT_VERSION }}
+          features: cli
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Install npm dependencies
+        run: npm ci
+
+      - name: Generate notices
+        run: scripts/generate-notices.sh
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: third-party-notices
+          path: |
+            THIRD_PARTY_NOTICES
+            ui/public/third-party-notices.txt
+          if-no-files-found: error
+
+  build:
+    needs: [guard, notices]
     uses: ./.github/workflows/build-and-smoke.yml
     with:
       release: true
@@ -77,13 +119,58 @@ jobs:
       contents: read
       id-token: write
 
+  # One CycloneDX SBOM per bundle type (scripts/generate-sbom.sh), from the tagged commit and the
+  # native libraries each build job recorded (scripts/sbom-native.sh).
+  sbom:
+    name: Generate SBOMs
+    needs: [guard, build]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Read tool versions
+        id: tools
+        run: grep '^[A-Z_]*=' scripts/license-tools.env >> "$GITHUB_OUTPUT"
+
+      - uses: dtolnay/rust-toolchain@stable
+
+      - uses: ./.github/actions/cargo-tool
+        with:
+          crate: cargo-cyclonedx
+          version: ${{ steps.tools.outputs.CARGO_CYCLONEDX_VERSION }}
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+
+      - uses: actions/download-artifact@v8
+        with:
+          pattern: sbom-native-*
+          path: native
+          merge-multiple: true
+
+      - name: Generate SBOMs
+        env:
+          VERSION: ${{ needs.guard.outputs.version }}
+        run: scripts/generate-sbom.sh "$VERSION" native sbom
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: mumcord-sbom
+          path: sbom/
+          if-no-files-found: error
+
   release:
     name: Create draft release
-    needs: [guard, build]
+    needs: [guard, build, sbom]
     runs-on: ubuntu-24.04
     timeout-minutes: 10
     permissions:
       contents: write
+      # Build provenance attestation of the release files.
+      id-token: write
+      attestations: write
     steps:
       # Only for the curl installer, which is published with each release (FR-2.54).
       - uses: actions/checkout@v7
@@ -97,6 +184,12 @@ jobs:
           path: dist
           merge-multiple: true
 
+      - name: Download SBOMs
+        uses: actions/download-artifact@v8
+        with:
+          name: mumcord-sbom
+          path: dist
+
       - name: Write checksums and release notes
         working-directory: dist
         env:
@@ -105,9 +198,9 @@ jobs:
         run: |
           # Fails if any bundle is missing; Linux has three packages for each of two CPUs.
           linux=(*_amd64.AppImage *_aarch64.AppImage *_amd64.deb *_arm64.deb *.x86_64.rpm *.aarch64.rpm)
-          ls -l -- "${linux[@]}" *-setup.exe *.dmg
+          ls -l -- "${linux[@]}" *-setup.exe *.dmg *.cdx.json
           cp ../scripts/install.sh .
-          sha256sum -- "${linux[@]}" *-setup.exe *.dmg install.sh > SHA256SUMS
+          sha256sum -- "${linux[@]}" *-setup.exe *.dmg *.cdx.json install.sh > SHA256SUMS
           cat SHA256SUMS
           # A warning box as soon as one platform is unsigned, a plain note otherwise.
           callout=NOTE
@@ -133,7 +226,7 @@ jobs:
             - Fedora, openSUSE and derivatives: \`*.rpm\` (\`sudo dnf install ./Mumcord-*.rpm\` or \`sudo zypper install ./Mumcord-*.rpm\`)
             - Any distribution: \`*.AppImage\` (make it executable, then run it)
 
-          Check a download with \`sha256sum -c SHA256SUMS --ignore-missing\`.
+          Check a download with \`sha256sum -c SHA256SUMS --ignore-missing\`. Each package type has a software bill of materials (SBOM, CycloneDX JSON) that lists its Rust crates, npm packages and bundled native libraries: \`mumcord-$VERSION-<platform>.cdx.json\`. The files are attested by GitHub (\`gh attestation verify <file> --repo Mumcord/mumcord\`).
 
           > [!$callout]
           > $windows_note
@@ -206,6 +299,12 @@ jobs:
           EOF
           fi
 
+      # Signed provenance: proves each file listed in SHA256SUMS was built by this workflow run.
+      - name: Attest build provenance
+        uses: actions/attest-build-provenance@v4
+        with:
+          subject-checksums: dist/SHA256SUMS
+
       - name: Create draft release
         env:
           GH_TOKEN: ${{ github.token }}
@@ -215,7 +314,7 @@ jobs:
         run: |
           gh release create "$TAG" --repo "$GITHUB_REPOSITORY" --verify-tag --draft \
             --title "Mumcord $VERSION" --notes-file notes.md --generate-notes \
-            dist/*.AppImage dist/*.deb dist/*.rpm dist/*-setup.exe dist/*.dmg dist/install.sh dist/SHA256SUMS
+            dist/*.AppImage dist/*.deb dist/*.rpm dist/*-setup.exe dist/*.dmg dist/*.cdx.json dist/install.sh dist/SHA256SUMS
 
   # After the draft exists, so a failed build never leaves a crate on crates.io without a
   # release (published versions cannot be removed). Pre-releases are skipped inside the workflow.

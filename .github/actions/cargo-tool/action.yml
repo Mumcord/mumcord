@@ -1,0 +1,43 @@
+name: Install a cargo tool
+description: >-
+  Installs a cargo subcommand at a pinned version (scripts/license-tools.env) and caches the
+  binary, so later runs skip the build.
+inputs:
+  crate:
+    description: Crate name, for example cargo-about.
+    required: true
+  version:
+    description: Exact version to install.
+    required: true
+  features:
+    description: Optional cargo features of the crate.
+    default: ""
+runs:
+  using: composite
+  steps:
+    - id: dir
+      shell: bash
+      env:
+        CRATE: ${{ inputs.crate }}
+        VERSION: ${{ inputs.version }}
+      run: echo "root=$HOME/.cargo-tools/$CRATE-$VERSION" >> "$GITHUB_OUTPUT"
+
+    - id: cache
+      uses: actions/cache@v6
+      with:
+        path: ${{ steps.dir.outputs.root }}
+        key: cargo-tool-${{ runner.os }}-${{ runner.arch }}-${{ inputs.crate }}-${{ inputs.version }}-${{ inputs.features }}
+
+    - if: steps.cache.outputs.cache-hit != 'true'
+      shell: bash
+      env:
+        CRATE: ${{ inputs.crate }}
+        VERSION: ${{ inputs.version }}
+        FEATURES: ${{ inputs.features }}
+        ROOT: ${{ steps.dir.outputs.root }}
+      run: cargo install "$CRATE" --version "$VERSION" --locked --root "$ROOT" ${FEATURES:+--features "$FEATURES"}
+
+    - shell: bash
+      env:
+        ROOT: ${{ steps.dir.outputs.root }}
+      run: echo "$ROOT/bin" >> "$GITHUB_PATH"
