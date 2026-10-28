@@ -196,7 +196,7 @@ async fn voice_moves_between_connected_servers_within_the_limit() {
     assert_eq!(engine.voice_server(), Some(b));
 
     // Quitting records the connected servers and the voice server (FR-2.7, FR-2.3).
-    engine.shutdown();
+    engine.shutdown().await;
     assert!(engine.connections().is_empty());
     let servers = engine.servers().await.expect("servers");
     let voice: Vec<ServerId> = servers

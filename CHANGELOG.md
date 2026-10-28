@@ -13,6 +13,10 @@
 - The Linux install script no longer tells you to install gst-libav (H.264 video support) when it is already installed; when it is missing it asks whether to install it right away
 - The Linux install script got a new look: a Mumcord banner, numbered steps with a download progress spinner, clear success and warning marks and a summary at the end; logs, pipes, `NO_COLOR` and `TERM=dumb` get plain text
 
+### Fixed
+
+- Disconnecting, removing a server or quitting right after sending no longer loses the last chat message, status change or plugin data that was still waiting for the server's rate limit: the connection now sends what is queued first (at most 2 s) and quitting waits for it. `mumcord-protocol` gains `Handle::flush` and `Handle::closed` for the same guarantee in other programs (#74)
+
 ### Internal
 
 - The AES library is updated to 0.9, which now uses the hardware-accelerated path by default on modern x86 CPUs; the voice crypto code follows the renamed API of its cipher layer

@@ -1,7 +1,4 @@
 //! Main window behaviour: what closing the window does (FR-1.38) and clean shutdown.
-
-use std::time::Duration;
-
 use mumcord_engine::{ConnState, Engine, store::CloseBehaviour};
 use tauri::{AppHandle, Manager, WebviewWindow, Window, WindowEvent};
 use tauri_specta::Event;
@@ -10,9 +7,6 @@ use crate::commands::app::CloseRequested;
 
 /// Label of the only window (tauri.conf.json).
 pub const MAIN: &str = "main";
-
-/// Time the connection task gets to send its TLS close before the process exits.
-const DISCONNECT_GRACE: Duration = Duration::from_millis(300);
 
 /// What a close request of the main window leads to.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
@@ -163,11 +157,12 @@ fn after_disconnect(app: &AppHandle, then: impl FnOnce(&AppHandle) + Send + 'sta
         then(app);
         return;
     }
-    // Keeps the voice channel so the next start can offer to rejoin it (QA.9).
-    app.state::<Engine>().shutdown();
+    // Keeps the voice channel so the next start can offer to rejoin it (QA.9). Waits (bounded)
+    // until the connections have sent what is still queued and their TLS close.
+    let closed = app.state::<Engine>().shutdown();
     let app = app.clone();
     tauri::async_runtime::spawn(async move {
-        tokio::time::sleep(DISCONNECT_GRACE).await;
+        closed.await;
         then(&app);
     });
 }
