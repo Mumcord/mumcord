@@ -1,4 +1,7 @@
 //! Main window behaviour: what closing the window does (FR-1.38) and clean shutdown.
+
+use std::time::Duration;
+
 use mumcord_engine::{ConnState, Engine, store::CloseBehaviour};
 use tauri::{AppHandle, Manager, WebviewWindow, Window, WindowEvent};
 use tauri_specta::Event;
@@ -7,6 +10,10 @@ use crate::commands::app::CloseRequested;
 
 /// Label of the only window (tauri.conf.json).
 pub const MAIN: &str = "main";
+
+/// Least time between a quit request and the exit, so the reply to the command that asked for it
+/// still reaches the window, even when the connections close at once.
+const QUIT_GRACE: Duration = Duration::from_millis(300);
 
 /// What a close request of the main window leads to.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
@@ -162,7 +169,7 @@ fn after_disconnect(app: &AppHandle, then: impl FnOnce(&AppHandle) + Send + 'sta
     let closed = app.state::<Engine>().shutdown();
     let app = app.clone();
     tauri::async_runtime::spawn(async move {
-        closed.await;
+        tokio::join!(closed, tokio::time::sleep(QUIT_GRACE));
         then(&app);
     });
 }
