@@ -14,8 +14,8 @@ use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::{Arc, Mutex};
 use std::time::{SystemTime, UNIX_EPOCH};
 
-use mumcord_protocol::framing::MessageType;
 pub use mumcord_protocol::TapDirection;
+use mumcord_protocol::framing::MessageType;
 use mumcord_protocol::{PacketTap, TappedFrame};
 use mumcord_store::ServerId;
 use serde_json::{Value, json};
