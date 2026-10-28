@@ -13,6 +13,10 @@
 - The Linux install script no longer tells you to install gst-libav (H.264 video support) when it is already installed; when it is missing it asks whether to install it right away
 - The Linux install script got a new look: a Mumcord banner, numbered steps with a download progress spinner, clear success and warning marks and a summary at the end; logs, pipes, `NO_COLOR` and `TERM=dumb` get plain text
 
+### Fixed
+
+- Pasting an image file copied in the file manager (for example right-click → Copy in Dolphin or Files) into the message input now attaches it like a dropped image, with the same preview, size limit and "Only images can be sent" message for other files; on Linux the webview hides the copied files from the page, so Mumcord reads them from the system clipboard itself and accepts only regular image files up to 25 MB
+
 ### Internal
 
 - The AES library is updated to 0.9, which now uses the hardware-accelerated path by default on modern x86 CPUs; the voice crypto code follows the renamed API of its cipher layer
