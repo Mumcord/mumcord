@@ -9,7 +9,7 @@ use mumcord_engine::LocalTrack;
 use zbus::Connection;
 use zbus::fdo::{DBusProxy, PropertiesProxy};
 use zbus::names::InterfaceName;
-use zbus::zvariant::{OwnedValue, Value};
+use zbus::{OwnedVariant, Variant};
 
 const PREFIX: &str = "org.mpris.MediaPlayer2.";
 const PATH: &str = "/org/mpris/MediaPlayer2";
@@ -98,10 +98,11 @@ async fn current(connection: &Connection) -> zbus::Result<(Vec<String>, Option<L
 async fn properties(
     connection: &Connection,
     name: &str,
-) -> zbus::Result<HashMap<String, OwnedValue>> {
+) -> zbus::Result<HashMap<String, OwnedVariant>> {
+    // zbus 6 records builder errors instead of returning them from each setter; build() reports.
     let proxy = PropertiesProxy::builder(connection)
-        .destination(name)?
-        .path(PATH)?
+        .destination(name)
+        .path(PATH)
         .build()
         .await?;
     Ok(proxy
@@ -110,24 +111,24 @@ async fn properties(
 }
 
 /// Variant values inside `a{sv}` arrive boxed once more.
-fn unboxed<'a>(value: &'a Value<'a>) -> &'a Value<'a> {
+fn unboxed<'a>(value: &'a Variant<'a>) -> &'a Variant<'a> {
     match value {
-        Value::Value(inner) => unboxed(inner),
+        Variant::Variant(inner) => unboxed(inner),
         other => other,
     }
 }
 
-fn text(value: &Value<'_>) -> Option<String> {
+fn text(value: &Variant<'_>) -> Option<String> {
     match unboxed(value) {
-        Value::Str(s) => Some(s.as_str().trim().to_owned()).filter(|s| !s.is_empty()),
+        Variant::Str(s) => Some(s.as_str().trim().to_owned()).filter(|s| !s.is_empty()),
         _ => None,
     }
 }
 
 /// A list of strings (`xesam:artist` is `as`), joined; some players send a single string.
-fn names(value: &Value<'_>) -> Option<String> {
+fn names(value: &Variant<'_>) -> Option<String> {
     match unboxed(value) {
-        Value::Array(items) => {
+        Variant::Array(items) => {
             let joined = items.iter().filter_map(text).collect::<Vec<_>>().join(", ");
             Some(joined).filter(|s| !s.is_empty())
         }
@@ -136,27 +137,27 @@ fn names(value: &Value<'_>) -> Option<String> {
 }
 
 /// Microseconds (players disagree on the integer type) as milliseconds.
-fn micros_as_ms(value: &Value<'_>) -> Option<u64> {
+fn micros_as_ms(value: &Variant<'_>) -> Option<u64> {
     let micros: i128 = match unboxed(value) {
-        Value::I64(v) => (*v).into(),
-        Value::U64(v) => (*v).into(),
-        Value::I32(v) => (*v).into(),
-        Value::U32(v) => (*v).into(),
+        Variant::I64(v) => (*v).into(),
+        Variant::U64(v) => (*v).into(),
+        Variant::I32(v) => (*v).into(),
+        Variant::U32(v) => (*v).into(),
         // Saturating cast; whole microseconds are plenty.
-        Value::F64(v) if v.is_finite() => *v as i128,
+        Variant::F64(v) if v.is_finite() => *v as i128,
         _ => return None,
     };
     u64::try_from(micros.max(0) / 1000).ok()
 }
 
 /// A player's state; `None` when it is stopped or has no title.
-pub(crate) fn parse_player(props: &HashMap<String, OwnedValue>) -> Option<LocalTrack> {
+pub(crate) fn parse_player(props: &HashMap<String, OwnedVariant>) -> Option<LocalTrack> {
     let playing = match props.get("PlaybackStatus").and_then(|v| text(v)).as_deref() {
         Some("Playing") => true,
         Some("Paused") => false,
         _ => return None,
     };
-    let Value::Dict(metadata) = unboxed(props.get("Metadata")?) else {
+    let Variant::Dict(metadata) = unboxed(props.get("Metadata")?) else {
         return None;
     };
     let mut title = None;
@@ -165,7 +166,7 @@ pub(crate) fn parse_player(props: &HashMap<String, OwnedValue>) -> Option<LocalT
     let mut art_url = None;
     let mut duration_ms = None;
     for (key, value) in metadata.iter() {
-        let Value::Str(key) = unboxed(key) else {
+        let Variant::Str(key) = unboxed(key) else {
             continue;
         };
         match key.as_str() {
@@ -209,33 +210,33 @@ pub(crate) fn pick(players: Vec<(String, LocalTrack)>) -> Option<LocalTrack> {
 mod tests {
     use super::*;
 
-    fn owned(value: Value<'_>) -> OwnedValue {
-        OwnedValue::try_from(value).expect("owned value")
+    fn owned(value: Variant<'_>) -> OwnedVariant {
+        OwnedVariant::try_from(value).expect("owned value")
     }
 
     fn player(
         status: &str,
-        metadata: HashMap<&str, Value<'static>>,
+        metadata: HashMap<&str, Variant<'static>>,
         position: i64,
-    ) -> HashMap<String, OwnedValue> {
+    ) -> HashMap<String, OwnedVariant> {
         HashMap::from([
             (
                 "PlaybackStatus".to_owned(),
-                owned(Value::from(status.to_owned())),
+                owned(Variant::from(status.to_owned())),
             ),
-            ("Metadata".to_owned(), owned(Value::from(metadata))),
-            ("Position".to_owned(), owned(Value::from(position))),
+            ("Metadata".to_owned(), owned(Variant::from(metadata))),
+            ("Position".to_owned(), owned(Variant::from(position))),
         ])
     }
 
-    fn spotify_metadata() -> HashMap<&'static str, Value<'static>> {
+    fn spotify_metadata() -> HashMap<&'static str, Variant<'static>> {
         HashMap::from([
-            ("xesam:title", Value::from("Song")),
-            ("xesam:artist", Value::from(vec!["Band", "Guest"])),
-            ("xesam:album", Value::from("Record")),
-            ("mpris:artUrl", Value::from("https://i.scdn.co/image/abc")),
-            ("mpris:length", Value::from(200_000_000_u64)),
-            ("mpris:trackid", Value::from("spotify:track:1")),
+            ("xesam:title", Variant::from("Song")),
+            ("xesam:artist", Variant::from(vec!["Band", "Guest"])),
+            ("xesam:album", Variant::from("Record")),
+            ("mpris:artUrl", Variant::from("https://i.scdn.co/image/abc")),
+            ("mpris:length", Variant::from(200_000_000_u64)),
+            ("mpris:trackid", Variant::from("spotify:track:1")),
         ])
     }
 
@@ -264,23 +265,23 @@ mod tests {
         let metadata = HashMap::from([
             (
                 "mpris:trackid",
-                Value::from("/com/spotify/track/19nAFg6Mb6jXN3yxPC2sSk"),
+                Variant::from("/com/spotify/track/19nAFg6Mb6jXN3yxPC2sSk"),
             ),
-            ("mpris:length", Value::from(225_080_000_u64)),
+            ("mpris:length", Variant::from(225_080_000_u64)),
             (
                 "mpris:artUrl",
-                Value::from("https://i.scdn.co/image/ab67616d0000b273"),
+                Variant::from("https://i.scdn.co/image/ab67616d0000b273"),
             ),
-            ("xesam:album", Value::from("Record")),
-            ("xesam:albumArtist", Value::from(vec!["Band"])),
-            ("xesam:artist", Value::from(vec!["Band"])),
-            ("xesam:autoRating", Value::from(0.51_f64)),
-            ("xesam:discNumber", Value::from(1_i32)),
-            ("xesam:title", Value::from("Song")),
-            ("xesam:trackNumber", Value::from(3_i32)),
+            ("xesam:album", Variant::from("Record")),
+            ("xesam:albumArtist", Variant::from(vec!["Band"])),
+            ("xesam:artist", Variant::from(vec!["Band"])),
+            ("xesam:autoRating", Variant::from(0.51_f64)),
+            ("xesam:discNumber", Variant::from(1_i32)),
+            ("xesam:title", Variant::from("Song")),
+            ("xesam:trackNumber", Variant::from(3_i32)),
             (
                 "xesam:url",
-                Value::from("https://open.spotify.com/track/19nAFg6Mb6jXN3yxPC2sSk"),
+                Variant::from("https://open.spotify.com/track/19nAFg6Mb6jXN3yxPC2sSk"),
             ),
         ]);
         let track = parse_player(&player("Playing", metadata, 0)).expect("track");
@@ -298,13 +299,13 @@ mod tests {
     #[test]
     fn stopped_untitled_or_odd_players_are_skipped_or_tolerated() {
         assert!(parse_player(&player("Stopped", spotify_metadata(), 0)).is_none());
-        let untitled = HashMap::from([("xesam:artist", Value::from(vec!["Band"]))]);
+        let untitled = HashMap::from([("xesam:artist", Variant::from(vec!["Band"]))]);
         assert!(parse_player(&player("Playing", untitled, 0)).is_none());
         // Single-string artist, signed length, no position, paused.
         let odd = HashMap::from([
-            ("xesam:title", Value::from("Talk")),
-            ("xesam:artist", Value::from("Host")),
-            ("mpris:length", Value::from(-5_i64)),
+            ("xesam:title", Variant::from("Talk")),
+            ("xesam:artist", Variant::from("Host")),
+            ("mpris:length", Variant::from(-5_i64)),
         ]);
         let mut props = player("Paused", odd, -1);
         props.remove("Position");

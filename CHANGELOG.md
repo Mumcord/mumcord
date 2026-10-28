@@ -17,6 +17,7 @@
 
 - The AES library is updated to 0.9, which now uses the hardware-accelerated path by default on modern x86 CPUs; the voice crypto code follows the renamed API of its cipher layer
 - `bindgen` stays at 0.72: the 0.73 series needs `prettyplease` 0.3, which `prost-build` does not accept yet, so the two cannot be resolved together; Dependabot no longer proposes that bump until `prost-build` allows it
+- The D-Bus library `zbus` is updated to 6.1, which merged the `zvariant` crate into it: proxy support has to be switched on with the `proxy` feature, `Value` and `OwnedValue` are renamed to `Variant` and `OwnedVariant`, and the proxy builder no longer reports a bad name or path at the setter but when the proxy is built; the desktop notification and MPRIS code follows the new names
 - The random number library `rand` is updated to 0.10, which drops the duplicated `rand` and `rand_core` trees from the dependency graph; the network simulator now imports the trait that provides range sampling, renamed from `Rng` to `RngExt` in that version
 
 ## [0.4.2] - 2026-10-27

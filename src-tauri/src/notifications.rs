@@ -360,7 +360,7 @@ mod linux {
 
     use futures_util::StreamExt;
     use tauri::{AppHandle, Manager};
-    use zbus::zvariant::Value;
+    use zbus::Variant;
 
     use super::{MessageNotice, Notifier, activate, escape_markup};
 
@@ -379,7 +379,7 @@ mod linux {
             summary: &str,
             body: &str,
             actions: &[&str],
-            hints: HashMap<&str, Value<'_>>,
+            hints: HashMap<&str, Variant<'_>>,
             expire_timeout: i32,
         ) -> zbus::Result<u32>;
 
@@ -424,8 +424,8 @@ mod linux {
             let identifier = app.config().identifier.as_str();
             let hints = HashMap::from([
                 // Lets the desktop show Mumcord's name and icon from its desktop entry.
-                ("desktop-entry", Value::from(identifier)),
-                ("category", Value::from("im.received")),
+                ("desktop-entry", Variant::from(identifier)),
+                ("category", Variant::from("im.received")),
             ]);
             proxy
                 .notify(
