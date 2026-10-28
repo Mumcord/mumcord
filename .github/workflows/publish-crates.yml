@@ -2,15 +2,29 @@ name: Publish crates
 
 # Publishes the library crates mumcord-protocol, mumcord-codec, mumcord-store, mumcord-audio and mumcord-p2p to crates.io so other projects
 # (for example the bot) can depend on them by version. Called by release.yml after the draft
-# release exists, and runnable by hand from main to publish the current version without a new
-# release. A version that is already on crates.io is skipped per crate, pre-release versions are
-# never published. See RELEASING.md.
+# release exists, with the tag's version. Runnable by hand from a version tag (or main) to publish
+# a release's crates without a new release. Each job first sets the version in the manifests,
+# which the repository does not carry (scripts/set-version.sh). A version that is already on
+# crates.io is skipped per crate, pre-release versions are never published. See RELEASING.md.
 on:
   workflow_call:
+    inputs:
+      version:
+        description: Version to publish (X.Y.Z); release.yml passes the tag's version.
+        required: true
+        type: string
     secrets:
       CARGO_REGISTRY_TOKEN:
         required: true
   workflow_dispatch:
+    inputs:
+      version:
+        description: >-
+          Version to publish (X.Y.Z). Empty: the version of the tag this runs from, or else the
+          latest release tag.
+        required: false
+        type: string
+        default: ""
 
 permissions:
   contents: read
@@ -35,6 +49,13 @@ jobs:
       - uses: actions/checkout@v7
 
       - uses: dtolnay/rust-toolchain@stable
+
+      - name: Set version
+        env:
+          VERSION: ${{ inputs.version }}
+        run: |
+          if [[ -z "$VERSION" && "$GITHUB_REF" == refs/tags/v* ]]; then VERSION=${GITHUB_REF_NAME#v}; fi
+          scripts/set-version.sh "${VERSION:-$(scripts/latest-release-version.sh)}"
 
       - name: Check whether this version is already published
         id: check
@@ -66,7 +87,8 @@ jobs:
         if: steps.check.outputs.publish == 'true'
         env:
           CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
-        run: cargo publish -p mumcord-protocol --locked
+        # --allow-dirty: the version step changed the manifests in the checkout.
+        run: cargo publish -p mumcord-protocol --locked --allow-dirty
 
   publish-codec:
     name: Publish mumcord-codec
@@ -82,6 +104,13 @@ jobs:
       - uses: actions/checkout@v7
 
       - uses: dtolnay/rust-toolchain@stable
+
+      - name: Set version
+        env:
+          VERSION: ${{ inputs.version }}
+        run: |
+          if [[ -z "$VERSION" && "$GITHUB_REF" == refs/tags/v* ]]; then VERSION=${GITHUB_REF_NAME#v}; fi
+          scripts/set-version.sh "${VERSION:-$(scripts/latest-release-version.sh)}"
 
       # cargo verifies the packaged crate by building it; the Opus sources need cmake.
       - name: Install build dependencies
@@ -117,7 +146,8 @@ jobs:
         if: steps.check.outputs.publish == 'true'
         env:
           CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
-        run: cargo publish -p mumcord-codec --locked
+        # --allow-dirty: the version step changed the manifests in the checkout.
+        run: cargo publish -p mumcord-codec --locked --allow-dirty
 
   publish-audio:
     name: Publish mumcord-audio
@@ -135,6 +165,13 @@ jobs:
       - uses: actions/checkout@v7
 
       - uses: dtolnay/rust-toolchain@stable
+
+      - name: Set version
+        env:
+          VERSION: ${{ inputs.version }}
+        run: |
+          if [[ -z "$VERSION" && "$GITHUB_REF" == refs/tags/v* ]]; then VERSION=${GITHUB_REF_NAME#v}; fi
+          scripts/set-version.sh "${VERSION:-$(scripts/latest-release-version.sh)}"
 
       # cpal links ALSA, and cargo verifies the packaged crate by building it.
       - name: Install build dependencies
@@ -170,7 +207,8 @@ jobs:
         if: steps.check.outputs.publish == 'true'
         env:
           CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
-        run: cargo publish -p mumcord-audio --locked
+        # --allow-dirty: the version step changed the manifests in the checkout.
+        run: cargo publish -p mumcord-audio --locked --allow-dirty
 
   publish-store:
     name: Publish mumcord-store
@@ -186,6 +224,13 @@ jobs:
       - uses: actions/checkout@v7
 
       - uses: dtolnay/rust-toolchain@stable
+
+      - name: Set version
+        env:
+          VERSION: ${{ inputs.version }}
+        run: |
+          if [[ -z "$VERSION" && "$GITHUB_REF" == refs/tags/v* ]]; then VERSION=${GITHUB_REF_NAME#v}; fi
+          scripts/set-version.sh "${VERSION:-$(scripts/latest-release-version.sh)}"
 
       - name: Check whether this version is already published
         id: check
@@ -217,7 +262,8 @@ jobs:
         if: steps.check.outputs.publish == 'true'
         env:
           CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
-        run: cargo publish -p mumcord-store --locked
+        # --allow-dirty: the version step changed the manifests in the checkout.
+        run: cargo publish -p mumcord-store --locked --allow-dirty
 
   publish-p2p:
     name: Publish mumcord-p2p
@@ -235,6 +281,13 @@ jobs:
       - uses: actions/checkout@v7
 
       - uses: dtolnay/rust-toolchain@stable
+
+      - name: Set version
+        env:
+          VERSION: ${{ inputs.version }}
+        run: |
+          if [[ -z "$VERSION" && "$GITHUB_REF" == refs/tags/v* ]]; then VERSION=${GITHUB_REF_NAME#v}; fi
+          scripts/set-version.sh "${VERSION:-$(scripts/latest-release-version.sh)}"
 
       - name: Check whether this version is already published
         id: check
@@ -266,4 +319,5 @@ jobs:
         if: steps.check.outputs.publish == 'true'
         env:
           CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
-        run: cargo publish -p mumcord-p2p --locked
+        # --allow-dirty: the version step changed the manifests in the checkout.
+        run: cargo publish -p mumcord-p2p --locked --allow-dirty
