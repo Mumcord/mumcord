@@ -112,10 +112,10 @@ const PacketRow = memo(function PacketRow({
           <code className="pi-kind-id">{packet.kind}</code>
         </td>
         <td className="pi-size">{formatSize(packet.size)}</td>
-        <td>
+        <td className="pi-peers">
           <Peers packet={packet} names={names} />
         </td>
-        <td>
+        <td className="pi-pacer">
           <Pacer packet={packet} />
         </td>
       </tr>

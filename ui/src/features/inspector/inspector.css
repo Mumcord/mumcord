@@ -1,5 +1,14 @@
 /* Packet inspector (issue #60). Colours come from theme tokens so every theme stays readable. */
 
+/* The table needs the whole panel width; the texts keep the usual line length. */
+.settings__panel > .settings-section:has(.pi-marker) {
+  max-width: none;
+}
+
+.settings__panel > .settings-section:has(.pi-marker) .settings-hint {
+  max-width: calc(48rem - 2 * var(--space-6));
+}
+
 .pi-toolbar {
   display: flex;
   flex-wrap: wrap;
@@ -86,7 +95,9 @@
   font-size: var(--font-size-xs);
 }
 
-.pi-size {
+.pi-size,
+.pi-peers,
+.pi-pacer {
   white-space: nowrap;
 }
 

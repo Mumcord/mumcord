@@ -123,7 +123,7 @@ export function PacketInspectorSection() {
 
   return (
     <Section title={t("sections.packetInspector")}>
-      <p className="settings-hint">{t("inspector.intro")}</p>
+      <p className="settings-hint pi-marker">{t("inspector.intro")}</p>
       <Switch
         label={t("inspector.devTools")}
         description={t("inspector.devToolsHint")}
