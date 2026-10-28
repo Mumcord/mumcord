@@ -78,10 +78,11 @@ describe("chat: message cards (#72)", () => {
     await expect(shown.$(".message-card__icon")).toExist();
     await expect(shown.$("button.message-card__image img")).toHaveAttribute(
       "src",
-      expect.stringMatching(/^data:image\/png;base64,/),
+      // The engine re-encodes small pictures, so the type may change.
+      expect.stringMatching(/^data:image\/(?:png|jpeg);base64,/),
     );
     expect(site.requests).toContain("/cpu.png");
-    await expect(shown.$("a[href='https://grafana.test/d/db-1']")).toExist();
+    await expect(shown.$(".message-card__link a[href='https://grafana.test/d/db-1']")).toExist();
     await expect(shown.$("button.message-card__open")).toExist();
     // The fallback lines for official clients stay hidden in Mumcord.
     await expect($("//li[contains(@class,'chat-message')][contains(., '[Warning]')]")).not.toExist();
