@@ -7,8 +7,8 @@
 //! forged block is rejected.
 
 use aes::Aes128;
-use aes::cipher::generic_array::GenericArray;
-use aes::cipher::{BlockDecrypt, BlockEncrypt, KeyInit};
+use aes::cipher::array::Array;
+use aes::cipher::{BlockCipherDecrypt, BlockCipherEncrypt, KeyInit};
 
 pub(crate) const BLOCK: usize = 16;
 /// Bytes the crypto adds in front of the plaintext: nonce low byte + 3 tag bytes.
@@ -73,7 +73,7 @@ impl CryptState {
         ) else {
             return false;
         };
-        self.cipher = Some(Aes128::new(&GenericArray::from(key)));
+        self.cipher = Some(Aes128::new(&Array::from(key)));
         self.encrypt_iv = eiv;
         self.decrypt_iv = div;
         self.decrypt_history = [0; 256];
@@ -218,13 +218,13 @@ fn decrement(bytes: &mut [u8]) {
 }
 
 fn aes_encrypt(cipher: &Aes128, block: &Block) -> Block {
-    let mut b = GenericArray::from(*block);
+    let mut b = Array::from(*block);
     cipher.encrypt_block(&mut b);
     b.into()
 }
 
 fn aes_decrypt(cipher: &Aes128, block: &Block) -> Block {
-    let mut b = GenericArray::from(*block);
+    let mut b = Array::from(*block);
     cipher.decrypt_block(&mut b);
     b.into()
 }
@@ -355,7 +355,7 @@ mod tests {
     ];
 
     fn cipher() -> Aes128 {
-        Aes128::new(&GenericArray::from(RAW_KEY))
+        Aes128::new(&Array::from(RAW_KEY))
     }
 
     /// Encrypt/decrypt pair as in Mumble's TestCrypt: random key, encrypt nonce forced to 0x55.

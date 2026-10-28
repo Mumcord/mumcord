@@ -62,7 +62,7 @@ prost-build = "0.14"
 protoc-bin-vendored = "3.3"
 
 # Crypto & certificates
-aes = "0.8"
+aes = "0.9"
 rand = "0.9"
 sha1 = "0.10"
 # Content hash of full-size images shared between Mumcord clients (FR-1.60c).
