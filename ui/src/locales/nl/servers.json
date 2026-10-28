@@ -19,6 +19,7 @@
       "connecting": "verbinden",
       "reconnecting": "opnieuw verbinden",
       "error": "verbinding verbroken",
+      "failed": "verbinding mislukt",
       "voice": "spraakserver",
       "unread": "ongelezen berichten",
       "mentions": "vermeldingen: {{mentions}}"
@@ -128,6 +129,7 @@
     "disconnectedReason": "Verbinding verbroken – {{reason}}",
     "failed": "Kon geen verbinding maken met {{server}}. {{reason}}",
     "cancel": "Annuleren",
+    "dismiss": "Sluiten",
     "reconnect": "Opnieuw verbinden",
     "editServer": "Server bewerken",
     "actionFailed": {

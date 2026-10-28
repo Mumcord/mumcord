@@ -19,6 +19,7 @@
       "connecting": "qed jikkonnettja",
       "reconnecting": "qed jerġa' jikkonnettja",
       "error": "il-konnessjoni ntilfet",
+      "failed": "il-konnessjoni falliet",
       "voice": "server tal-vuċi",
       "unread": "messaġġi mhux moqrija",
       "mentions": "semmewk: {{mentions}}"
@@ -128,6 +129,7 @@
     "disconnectedReason": "Skonnettjat – {{reason}}",
     "failed": "Ma stajtx nikkonnettja ma' {{server}}. {{reason}}",
     "cancel": "Ikkanċella",
+    "dismiss": "Ċaħħad",
     "reconnect": "Erġa' ikkonnettja",
     "editServer": "Editja s-server",
     "actionFailed": {

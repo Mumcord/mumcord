@@ -16,7 +16,8 @@
     "diagnostics": "Diagnosztika",
     "about": "Névjegy",
     "servers": "Szerverek",
-    "privacy": "Adatvédelem"
+    "privacy": "Adatvédelem",
+    "packetInspector": "Csomagvizsgáló"
   },
   "search": {
     "label": "Beállítások keresése",
@@ -372,7 +373,8 @@
     "notices": "Harmadik féltől származó közlemények",
     "noticesHint": "A Mumcord nyílt forráskódú szoftverekre épül, többek között a Mumble projekt kódjára.",
     "noticesFailed": "A harmadik féltől származó közleményeket nem sikerült betölteni.",
-    "loading": "Betöltés…"
+    "loading": "Betöltés…",
+    "devToolsUnlocked": "Fejlesztői eszközök feloldva: a csomagvizsgáló mostantól szerepel a beállítások listájában."
   },
   "profile": {
     "title": "Profil",
@@ -481,5 +483,76 @@
     "label": "Mumcord hozzáadása az alkalmazásmenühöz",
     "hint": "Így az ikon és a push-to-talk megfelelően működik Waylanden, és a mumble:// linkek a Mumcordot nyitják meg. Csak az AppImage-hez.",
     "failed": "Ez nem sikerült. Próbáld újra."
+  },
+  "inspector": {
+    "intro": "Megmutatja a Mumcord által küldött és fogadott csomagokat, főleg a Mumcord-bővítmények adatait, hibakereséshez. Csak az utolsó 2000 csomag marad meg, ezen az eszközön a memóriában; semmi nem kerül naplózásra vagy elküldésre.",
+    "devTools": "Fejlesztői eszközök",
+    "devToolsHint": "Kapcsold ki, hogy újra elrejtsd a csomagvizsgálót, és leállítsd a rögzítést.",
+    "filters": "Szűrők és exportálás",
+    "server": "Szerver",
+    "allServers": "Minden szerver",
+    "direction": "Irány",
+    "allDirections": "Mindkét irány",
+    "type": "Típus",
+    "allTypes": "Minden típus",
+    "sent": "Elküldött",
+    "received": "Fogadott",
+    "pause": "Szünet",
+    "resume": "Folytatás",
+    "paused": "Szüneteltetve: az új csomagok a folytatáskor jelennek meg.",
+    "clear": "Törlés",
+    "exportJson": "JSON exportálása",
+    "exportMarkdown": "Markdown exportálása",
+    "fileTypeJson": "JSON-fájl",
+    "fileTypeMarkdown": "Markdown-fájl",
+    "exportWarning": "Az exportok az aktuális szűrőkkel megjelenített csomagokat tartalmazzák, és személyes adatokat, például neveket és csevegőszöveget is tartalmazhatnak. Megosztás előtt ellenőrizd őket.",
+    "exported": "Export mentve.",
+    "counters": "Számlálók",
+    "noCounters": "Még nincs mit megszámolni.",
+    "voice": "Hangcsomagok: {{sent}} elküldve, {{received}} fogadva",
+    "packets": "Csomagok ({{shown}} / {{total}})",
+    "empty": "Még nincsenek csomagok.",
+    "tableCaption": "Rögzített csomagok, legújabb alul",
+    "columns": {
+      "time": "Idő",
+      "direction": "Irány",
+      "type": "Típus",
+      "size": "Méret",
+      "peers": "Feladó / Címzett",
+      "pacer": "Pacer"
+    },
+    "details": "A(z) {{time}} időpontú csomag részletei",
+    "toUsers_one": "→ {{count}} felhasználó",
+    "toUsers_other": "→ {{count}} felhasználó",
+    "delayed": "{{ms}} ms késéssel",
+    "notDelayed": "nem késleltetett",
+    "tokensLeft": "hátralévő tokenek: {{tokens}}",
+    "bytes": "{{bytes}} bájt",
+    "fields": {
+      "gap": "Eltelt idő az előző csomag óta",
+      "kind": "Belső azonosító",
+      "size": "Méret",
+      "decoded": "Dekódolt tartalom"
+    },
+    "noDecoding": "Ennek a tartalomnak nincs olvasható formája; nézd a nyers bájtokat.",
+    "controlOnly": "Szabványos Mumble-üzenet: csak a típusa és a mérete kerül rögzítésre.",
+    "showHex": "Nyers hex megjelenítése",
+    "hideHex": "Nyers hex elrejtése",
+    "rawHex": "Nyers bájtok hexában",
+    "copy": "Csomag másolása",
+    "copied": "Másolva.",
+    "copyFailed": "A másolás nem sikerült.",
+    "kinds": {
+      "hello": "Mumcord-köszöntés",
+      "history": "Csevegési előzmények szinkronizálása",
+      "image": "Teljes méretű kép átvitele",
+      "nowgaming": "„Most játszik” állapot",
+      "nowplaying": "„Most hallgat” állapot",
+      "p2p": "Közvetlen kapcsolat felépítése",
+      "screen": "Képernyőmegosztási jelzés",
+      "watch": "Közös nézés állapota",
+      "plugin": "Bővítményadatok",
+      "mumble": "Mumble-üzenet"
+    }
   }
 }

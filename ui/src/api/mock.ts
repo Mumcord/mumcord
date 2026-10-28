@@ -45,6 +45,7 @@ import {
   type Unsubscribe,
 } from "./client";
 import { STRESS_SELF_CHANNEL_PATH, stressChannels, stressUsers } from "./mockStress";
+import { createMockInspector } from "./mockInspector";
 
 export interface MockOptions {
   /**
@@ -516,6 +517,7 @@ export function createMockApi(options: MockOptions = {}): MockApi {
   const friends = new Map<string, { name: string; addedAt: string; lastSeenAt: string | null }>();
   let shownFriends = "[]";
   const failures = new Map<CommandName, ApiError>();
+  const inspector = createMockInspector();
   const certPrompts = new Map<number, string | null>();
 
   let identity: Identity | null = fresh ? null : { name: "Zoe", certHash: "selfhash" };
@@ -1484,6 +1486,8 @@ export function createMockApi(options: MockOptions = {}): MockApi {
     // The browser has no native file drops; dropped files arrive as `File` objects instead.
     readDroppedImage: () =>
       Promise.reject(new EngineError("notFound", "no native file drops in the mock")),
+    // Browsers hand pasted files to the page themselves; there is no native clipboard to read.
+    clipboardFiles: () => Promise.resolve([]),
     // Full images (FR-1.60c): kept originals are "fetched" back at once, with one progress event.
     fullImageKeep: (dataUrl) => {
       if (!settings.offerFullImages)
@@ -1647,6 +1651,18 @@ export function createMockApi(options: MockOptions = {}): MockApi {
     },
     // Mock links arrive only via `api.mock.emit("deepLinkOpened", …)`.
     deepLinkTakePending: () => Promise.resolve(null),
+
+    // packet inspector
+    packetCaptureSet: (enabled) => {
+      inspector.set(enabled);
+      return Promise.resolve(null);
+    },
+    packetCapturePoll: (after) => Promise.resolve(inspector.poll(after)),
+    packetCaptureClear: () => {
+      inspector.clear();
+      return Promise.resolve(null);
+    },
+    packetCaptureExport: () => Promise.resolve(null),
 
     // diagnostics
     diagnosticsSave: () => Promise.resolve(null),

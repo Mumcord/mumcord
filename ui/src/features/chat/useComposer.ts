@@ -4,6 +4,7 @@
  */
 import { useCallback, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { getApi } from "../../api";
 import { shownServerId } from "../channels/serverStore";
 import type { SendTarget } from "./conversationInfo";
 import { readDroppedFiles } from "./fileDrop";
@@ -42,6 +43,8 @@ export interface Composer {
   addFiles: (files: readonly File[]) => void;
   /** Adds image files dropped from the file manager (native drag and drop) by their paths. */
   addDroppedPaths: (paths: readonly string[]) => Promise<void>;
+  /** Adds image files copied in the file manager, read from the system clipboard (issue #50). */
+  addCopiedFiles: () => Promise<void>;
   removeAttachment: (id: number) => void;
   error: string | null;
   /** Reports a problem the file itself cannot explain, such as a clipboard image the webview cannot hand over. */
@@ -177,6 +180,18 @@ export function useComposer(
     [addFiles, limits.allowHtml, t],
   );
 
+  const addCopiedFiles = useCallback(async () => {
+    let paths: string[];
+    try {
+      paths = await getApi().clipboardFiles();
+    } catch (err) {
+      console.error("reading the copied files failed", err);
+      setError(t("errors.imageUnreadable"));
+      return;
+    }
+    await addDroppedPaths(paths);
+  }, [addDroppedPaths, t]);
+
   const removeAttachment = useCallback(
     (id: number) => {
       removed.current.add(id);
@@ -247,6 +262,7 @@ export function useComposer(
     attachments,
     addFiles,
     addDroppedPaths,
+    addCopiedFiles,
     removeAttachment,
     error,
     showError,

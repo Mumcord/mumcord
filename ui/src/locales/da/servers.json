@@ -19,6 +19,7 @@
       "connecting": "forbinder",
       "reconnecting": "forbinder igen",
       "error": "forbindelse mistet",
+      "failed": "forbindelsen mislykkedes",
       "voice": "taleserver",
       "unread": "ulæste beskeder",
       "mentions": "omtaler: {{mentions}}"
@@ -128,6 +129,7 @@
     "disconnectedReason": "Afbrudt – {{reason}}",
     "failed": "Kunne ikke forbinde til {{server}}. {{reason}}",
     "cancel": "Annullér",
+    "dismiss": "Afvis",
     "reconnect": "Forbind igen",
     "editServer": "Rediger server",
     "actionFailed": {

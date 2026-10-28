@@ -16,7 +16,8 @@
     "diagnostics": "Dijagnostika",
     "about": "O aplikaciji",
     "servers": "Poslužitelji",
-    "privacy": "Privatnost"
+    "privacy": "Privatnost",
+    "packetInspector": "Inspektor paketa"
   },
   "search": {
     "label": "Pretraži postavke",
@@ -373,7 +374,8 @@
     "notices": "Obavijesti trećih strana",
     "noticesHint": "Mumcord je izgrađen na softveru otvorenog koda, uključujući kod iz projekta Mumble.",
     "noticesFailed": "Obavijesti trećih strana nije bilo moguće učitati.",
-    "loading": "Učitavanje…"
+    "loading": "Učitavanje…",
+    "devToolsUnlocked": "Alati za razvojne programere otključani: inspektor paketa sada je na popisu postavki."
   },
   "profile": {
     "title": "Profil",
@@ -483,5 +485,77 @@
     "label": "Dodaj Mumcord u izbornik aplikacija",
     "hint": "Ikona i pritisni za govor tada ispravno rade na Waylandu, a poveznice mumble:// otvaraju Mumcord. Samo za AppImage.",
     "failed": "Nije uspjelo. Pokušaj ponovno."
+  },
+  "inspector": {
+    "intro": "Prikazuje pakete koje Mumcord šalje i prima, uglavnom podatke dodataka za Mumcord, radi otklanjanja pogrešaka. Čuva se samo posljednjih 2000 paketa, u memoriji ovog uređaja; ništa se ne bilježi niti šalje bilo kamo.",
+    "devTools": "Alati za razvojne programere",
+    "devToolsHint": "Isključi za ponovno skrivanje inspektora paketa i zaustavljanje snimanja.",
+    "filters": "Filtri i izvoz",
+    "server": "Poslužitelj",
+    "allServers": "Svi poslužitelji",
+    "direction": "Smjer",
+    "allDirections": "Oba smjera",
+    "type": "Vrsta",
+    "allTypes": "Sve vrste",
+    "sent": "Poslano",
+    "received": "Primljeno",
+    "pause": "Pauziraj",
+    "resume": "Nastavi",
+    "paused": "Pauzirano: novi paketi pojavit će se kad nastaviš.",
+    "clear": "Očisti",
+    "exportJson": "Izvezi JSON",
+    "exportMarkdown": "Izvezi Markdown",
+    "fileTypeJson": "JSON datoteka",
+    "fileTypeMarkdown": "Markdown datoteka",
+    "exportWarning": "Izvozi sadrže pakete prikazane s trenutnim filtrima i mogu uključivati osobne podatke poput imena i teksta chata. Provjeri ih prije dijeljenja.",
+    "exported": "Izvoz spremljen.",
+    "counters": "Brojači",
+    "noCounters": "Još ništa nije izbrojeno.",
+    "voice": "Glasovni paketi: {{sent}} poslano, {{received}} primljeno",
+    "packets": "Paketi ({{shown}} od {{total}})",
+    "empty": "Još nema paketa.",
+    "tableCaption": "Snimljeni paketi, najnoviji na kraju",
+    "columns": {
+      "time": "Vrijeme",
+      "direction": "Smjer",
+      "type": "Vrsta",
+      "size": "Veličina",
+      "peers": "Od / Prema",
+      "pacer": "Pacer"
+    },
+    "details": "Detalji paketa u {{time}}",
+    "toUsers_one": "→ {{count}} korisnik",
+    "toUsers_few": "→ {{count}} korisnika",
+    "toUsers_other": "→ {{count}} korisnika",
+    "delayed": "odgođeno {{ms}} ms",
+    "notDelayed": "nije odgođeno",
+    "tokensLeft": "preostali tokeni: {{tokens}}",
+    "bytes": "{{bytes}} bajtova",
+    "fields": {
+      "gap": "Razmak od prethodnog paketa",
+      "kind": "Interni ID",
+      "size": "Veličina",
+      "decoded": "Dekodirani sadržaj"
+    },
+    "noDecoding": "Ovaj sadržaj nema čitljiv oblik; pogledaj sirove bajtove.",
+    "controlOnly": "Standardna Mumble poruka: bilježi se samo njezina vrsta i veličina.",
+    "showHex": "Prikaži sirovi hex",
+    "hideHex": "Sakrij sirovi hex",
+    "rawHex": "Sirovi bajtovi u hex-u",
+    "copy": "Kopiraj paket",
+    "copied": "Kopirano.",
+    "copyFailed": "Kopiranje nije uspjelo.",
+    "kinds": {
+      "hello": "Mumcord pozdrav",
+      "history": "Sinkronizacija povijesti chata",
+      "image": "Prijenos slike u punoj veličini",
+      "nowgaming": "Status „trenutno igra”",
+      "nowplaying": "Status „trenutno sluša”",
+      "p2p": "Uspostava izravne veze",
+      "screen": "Signal dijeljenja zaslona",
+      "watch": "Stanje zajedničkog gledanja",
+      "plugin": "Podaci dodatka",
+      "mumble": "Mumble poruka"
+    }
   }
 }

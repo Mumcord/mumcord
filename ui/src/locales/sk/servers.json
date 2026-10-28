@@ -19,6 +19,7 @@
       "connecting": "pripája sa",
       "reconnecting": "znova sa pripája",
       "error": "spojenie stratené",
+      "failed": "pripojenie zlyhalo",
       "voice": "hlasový server",
       "unread": "neprečítané správy",
       "mentions": "zmienky: {{mentions}}"
@@ -128,6 +129,7 @@
     "disconnectedReason": "Odpojené – {{reason}}",
     "failed": "Nepodarilo sa pripojiť k {{server}}. {{reason}}",
     "cancel": "Zrušiť",
+    "dismiss": "Zavrieť",
     "reconnect": "Znova pripojiť",
     "editServer": "Upraviť server",
     "actionFailed": {

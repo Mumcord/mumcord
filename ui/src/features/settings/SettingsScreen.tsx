@@ -21,6 +21,7 @@ import { DiagnosticsSection } from "./sections/DiagnosticsSection";
 import { IdentitySection } from "./sections/IdentitySection";
 import { LanguageSection } from "./sections/LanguageSection";
 import { OverlaySection } from "./sections/OverlaySection";
+import { PacketInspectorSection } from "./sections/PacketInspectorSection";
 import { PrivacySection } from "./sections/PrivacySection";
 import { ServersSection } from "./sections/ServersSection";
 import { SoundsSection } from "./sections/SoundsSection";
@@ -31,6 +32,7 @@ import type { SearchResult } from "./settingsIndex";
 import { findGroup, findTarget, headingOf, type JumpTarget } from "./settingsJump";
 import { SECTION_IDS, type SectionId } from "./sectionIds";
 import { useIsMacos } from "../../api/useIsMacos";
+import { useDevToolsUnlocked } from "../inspector/devTools";
 import { useSettings, type UpdateSettings } from "./useSettings";
 import "./settings.css";
 
@@ -81,6 +83,8 @@ function renderSection(id: SectionId, settings: Settings, update: UpdateSettings
       return <DiagnosticsSection {...props} />;
     case "about":
       return <AboutSection {...props} />;
+    case "packetInspector":
+      return <PacketInspectorSection />;
   }
 }
 
@@ -95,9 +99,19 @@ export function SettingsScreen({ initialSection }: { initialSection?: SectionId 
   const { settings, loadFailed, saveFailed, update } = useSettings();
   // macOS has no overlay at all (QA.58).
   const macos = useIsMacos();
-  const hidden = useMemo<readonly SectionId[]>(() => (macos ? ["overlay"] : []), [macos]);
+  // The packet inspector stays hidden until the developer tools are unlocked (issue #60).
+  const devTools = useDevToolsUnlocked();
+  const hidden = useMemo<readonly SectionId[]>(
+    () => [
+      ...(macos ? (["overlay"] as const) : []),
+      ...(devTools ? [] : (["packetInspector"] as const)),
+    ],
+    [macos, devTools],
+  );
   const sections = useMemo(() => SECTION_IDS.filter((id) => !hidden.includes(id)), [hidden]);
   const [active, setActive] = useState<SectionId>(initialSection ?? "identity");
+  // Hiding the developer tools from their own section goes back to About.
+  if (active === "packetInspector" && !devTools) setActive("about");
   const tabs = useRef(new Map<SectionId, HTMLButtonElement>());
   const [hostElement, setHostElement] = useState<HTMLDivElement | null>(null);
   const { dialogContext, blocking } = useDialogHost(hostElement);

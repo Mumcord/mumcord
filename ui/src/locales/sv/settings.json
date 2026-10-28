@@ -16,7 +16,8 @@
     "diagnostics": "Diagnostik",
     "about": "Om",
     "servers": "Servrar",
-    "privacy": "Integritet"
+    "privacy": "Integritet",
+    "packetInspector": "Paketinspektör"
   },
   "search": {
     "label": "Sök i inställningar",
@@ -372,7 +373,8 @@
     "notices": "Tredjepartsmeddelanden",
     "noticesHint": "Mumcord bygger på öppen källkod, bland annat kod från Mumble-projektet.",
     "noticesFailed": "Tredjepartsmeddelandena kunde inte läsas in.",
-    "loading": "Läser in…"
+    "loading": "Läser in…",
+    "devToolsUnlocked": "Utvecklarverktyg upplåsta: paketinspektören finns nu i inställningslistan."
   },
   "profile": {
     "title": "Profil",
@@ -481,5 +483,76 @@
     "label": "Lägg till Mumcord i appmenyn",
     "hint": "Gör att ikonen och push-to-talk fungerar ordentligt under Wayland och att mumble://-länkar öppnar Mumcord. Bara för AppImage.",
     "failed": "Det fungerade inte. Försök igen."
+  },
+  "inspector": {
+    "intro": "Visar de paket som Mumcord skickar och tar emot, främst Mumcord-plugindata, för felsökning. Bara de senaste 2 000 paketen sparas, i minnet på den här enheten; inget loggas eller skickas någonstans.",
+    "devTools": "Utvecklarverktyg",
+    "devToolsHint": "Stäng av för att dölja paketinspektören igen och sluta fånga paket.",
+    "filters": "Filter och export",
+    "server": "Server",
+    "allServers": "Alla servrar",
+    "direction": "Riktning",
+    "allDirections": "Båda riktningarna",
+    "type": "Typ",
+    "allTypes": "Alla typer",
+    "sent": "Skickade",
+    "received": "Mottagna",
+    "pause": "Pausa",
+    "resume": "Återuppta",
+    "paused": "Pausad: nya paket visas när du återupptar.",
+    "clear": "Rensa",
+    "exportJson": "Exportera JSON",
+    "exportMarkdown": "Exportera Markdown",
+    "fileTypeJson": "JSON-fil",
+    "fileTypeMarkdown": "Markdown-fil",
+    "exportWarning": "Exporter innehåller de paket som visas med aktuella filter och kan innehålla personuppgifter som namn och chattext. Kontrollera dem innan du delar.",
+    "exported": "Exporten sparades.",
+    "counters": "Räknare",
+    "noCounters": "Inget räknat ännu.",
+    "voice": "Röstpaket: {{sent}} skickade, {{received}} mottagna",
+    "packets": "Paket ({{shown}} av {{total}})",
+    "empty": "Inga paket ännu.",
+    "tableCaption": "Fångade paket, nyaste sist",
+    "columns": {
+      "time": "Tid",
+      "direction": "Riktning",
+      "type": "Typ",
+      "size": "Storlek",
+      "peers": "Från / Till",
+      "pacer": "Pacer"
+    },
+    "details": "Detaljer för paketet kl. {{time}}",
+    "toUsers_one": "→ {{count}} användare",
+    "toUsers_other": "→ {{count}} användare",
+    "delayed": "fördröjt {{ms}} ms",
+    "notDelayed": "inte fördröjt",
+    "tokensLeft": "tokens kvar: {{tokens}}",
+    "bytes": "{{bytes}} byte",
+    "fields": {
+      "gap": "Avstånd till föregående paket",
+      "kind": "Internt id",
+      "size": "Storlek",
+      "decoded": "Avkodat innehåll"
+    },
+    "noDecoding": "Den här nyttolasten har ingen läsbar form; se råbytena.",
+    "controlOnly": "Vanligt Mumble-meddelande: bara typ och storlek registreras.",
+    "showHex": "Visa rå hex",
+    "hideHex": "Dölj rå hex",
+    "rawHex": "Råbytes i hex",
+    "copy": "Kopiera paket",
+    "copied": "Kopierat.",
+    "copyFailed": "Kopieringen misslyckades.",
+    "kinds": {
+      "hello": "Mumcord-hälsning",
+      "history": "Synkning av chatthistorik",
+      "image": "Överföring av bild i full storlek",
+      "nowgaming": "Status ”spelar nu”",
+      "nowplaying": "Status ”lyssnar nu”",
+      "p2p": "Uppsättning av direktanslutning",
+      "screen": "Signal för skärmdelning",
+      "watch": "Status för tittarkväll",
+      "plugin": "Plugindata",
+      "mumble": "Mumble-meddelande"
+    }
   }
 }

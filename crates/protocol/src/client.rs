@@ -21,6 +21,7 @@ use crate::framing::{self, Frame, MessageType};
 use crate::proto;
 use crate::ratelimit::{self, LeakyBucket, Limit};
 use crate::state::{Channel, CryptSetup, ServerInfo, ServerState, User, UserChange};
+use crate::tap::{PacketTap, TapDirection, TapPacing, TappedFrame};
 use crate::tls::{self, CertVerifier, ClientIdentity};
 use crate::version::MumbleVersion;
 use crate::voice::CryptStats;
@@ -166,6 +167,7 @@ struct Shared {
     reason: Mutex<Option<DisconnectReason>>,
     connected: AtomicBool,
     ping: Mutex<PingReport>,
+    tap: Option<Arc<dyn PacketTap>>,
 }
 
 impl Shared {
@@ -186,6 +188,17 @@ impl Shared {
             *slot = Some(reason);
         }
         self.shutdown.notify_one();
+    }
+
+    fn tap(&self, direction: TapDirection, frame: &Frame, pacing: Option<TapPacing>) {
+        if let Some(tap) = self.tap.as_ref().filter(|tap| tap.enabled()) {
+            tap.on_frame(TappedFrame::new(
+                direction,
+                frame.kind,
+                &frame.payload,
+                pacing,
+            ));
+        }
     }
 }
 
@@ -282,8 +295,18 @@ pub async fn connect_with_progress(
     config: ConnectConfig,
     progress: Option<SyncProgress>,
 ) -> Result<Connection, ConnectError> {
+    connect_with_tap(config, progress, None).await
+}
+
+/// Like [`connect_with_progress`], and hands every frame from the start of the login on to
+/// `tap`, for debugging tools.
+pub async fn connect_with_tap(
+    config: ConnectConfig,
+    progress: Option<SyncProgress>,
+    tap: Option<Arc<dyn PacketTap>>,
+) -> Result<Connection, ConnectError> {
     let limit = config.login_timeout;
-    tokio::time::timeout(limit, connect_inner(config, progress))
+    tokio::time::timeout(limit, connect_inner(config, progress, tap))
         .await
         .map_err(|_| ConnectError::Timeout)?
 }
@@ -291,6 +314,7 @@ pub async fn connect_with_progress(
 async fn connect_inner(
     config: ConnectConfig,
     progress: Option<SyncProgress>,
+    tap: Option<Arc<dyn PacketTap>>,
 ) -> Result<Connection, ConnectError> {
     let server_name = ServerName::try_from(config.host.clone())
         .map_err(|_| ConnectError::InvalidAddress(config.host.clone()))?;
@@ -355,6 +379,7 @@ async fn connect_inner(
         reason: Mutex::new(None),
         connected: AtomicBool::new(true),
         ping: Mutex::default(),
+        tap,
     });
     tokio::spawn(write_loop(writer, rx, shared.clone()));
     let handle = Handle {
@@ -471,18 +496,18 @@ async fn write_loop(
         let now = tokio::time::Instant::now();
         let messages_ready_at = messages.ready_at(now);
         let plugin_data_ready_at = plugin_data.ready_at(now);
-        let frame = tokio::select! {
+        let (frame, pacing) = tokio::select! {
             msg = rx.recv() => match msg {
                 Some(Outgoing::Frame(frame)) => match ratelimit::limit_of(frame.kind) {
                     Some(Limit::Messages) => {
-                        messages.queue.push_back(frame);
+                        messages.queue.push_back((frame, now));
                         continue;
                     }
                     Some(Limit::PluginData) => {
-                        plugin_data.queue.push_back(frame);
+                        plugin_data.queue.push_back((frame, now));
                         continue;
                     }
-                    None => frame,
+                    None => (frame, None),
                 },
                 Some(Outgoing::Disconnect) | None => {
                     // Best effort close_notify; the connection is going away either way.
@@ -492,15 +517,15 @@ async fn write_loop(
                 }
             },
             () = sleep_until_some(messages_ready_at) => match messages.pop() {
-                Some(frame) => frame,
+                Some((frame, _)) => (frame, None),
                 None => continue,
             },
             () = sleep_until_some(plugin_data_ready_at) => match plugin_data.pop() {
-                Some(frame) => frame,
+                Some((frame, pacing)) => (frame, Some(pacing)),
                 None => continue,
             },
             _ = ping.tick() => {
-                Frame::from_message(MessageType::Ping, &shared.ping().message())
+                (Frame::from_message(MessageType::Ping, &shared.ping().message()), None)
             }
         };
         buf.clear();
@@ -515,13 +540,15 @@ async fn write_loop(
             shared.shut_down(DisconnectReason::Error(err.to_string()));
             return;
         }
+        shared.tap(TapDirection::Sent, &frame, pacing);
     }
 }
 
 /// Frames that count against one of the server's rate limits, sent no faster than it allows.
 struct Paced {
     bucket: LeakyBucket,
-    queue: VecDeque<Frame>,
+    /// Frames with the time they were queued.
+    queue: VecDeque<(Frame, tokio::time::Instant)>,
 }
 
 impl Paced {
@@ -537,10 +564,15 @@ impl Paced {
         (!self.queue.is_empty()).then(|| now + self.bucket.wait_time(now))
     }
 
-    fn pop(&mut self) -> Option<Frame> {
-        let frame = self.queue.pop_front()?;
-        self.bucket.take(tokio::time::Instant::now());
-        Some(frame)
+    fn pop(&mut self) -> Option<(Frame, TapPacing)> {
+        let (frame, queued) = self.queue.pop_front()?;
+        let now = tokio::time::Instant::now();
+        self.bucket.take(now);
+        let pacing = TapPacing {
+            delay: now.saturating_duration_since(queued),
+            tokens_left: self.bucket.tokens_left(now),
+        };
+        Some((frame, pacing))
     }
 }
 
@@ -626,6 +658,7 @@ impl Dispatcher {
     }
 
     fn handle(&mut self, frame: Frame) -> Control {
+        self.shared.tap(TapDirection::Received, &frame, None);
         let Some(kind) = frame.message_type() else {
             tracing::debug!(kind = frame.kind, "ignoring unknown control message");
             return Control::Continue;
@@ -1097,6 +1130,7 @@ mod tests {
                 reason: Mutex::new(None),
                 connected: AtomicBool::new(true),
                 ping: Mutex::default(),
+                tap: None,
             }),
         };
         let acl = proto::Acl {
@@ -1127,6 +1161,7 @@ mod tests {
                 reason: Mutex::new(None),
                 connected: AtomicBool::new(true),
                 ping: Mutex::default(),
+                tap: None,
             }),
         };
         assert!(matches!(

@@ -13,5 +13,6 @@ export const SECTION_IDS = [
   "privacy",
   "diagnostics",
   "about",
+  "packetInspector",
 ] as const;
 export type SectionId = (typeof SECTION_IDS)[number];

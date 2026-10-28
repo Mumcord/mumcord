@@ -7,6 +7,8 @@ name: Build and smoke
 # Release builds sign and notarize the macOS DMG only when the Apple secrets exist, and sign the
 # Windows app and installer through Azure Artifact Signing only when the Azure variables exist
 # (docs/release-signing.md); without them those bundles are built unsigned.
+# Release builds also bundle the third-party notices that release.yml regenerated (artifact
+# third-party-notices) and upload the list of bundled native libraries for its SBOM job.
 on:
   workflow_call:
     secrets:
@@ -73,6 +75,13 @@ jobs:
     steps:
       - uses: actions/checkout@v7
 
+      # Releases bundle the notices release.yml regenerated from the tagged commit.
+      - name: Use the regenerated third-party notices
+        if: inputs.release
+        uses: actions/download-artifact@v8
+        with:
+          name: third-party-notices
+
       - name: Install Linux system libraries
         if: runner.os == 'Linux'
         timeout-minutes: 20
@@ -96,6 +105,7 @@ jobs:
               "$VCPKG_INSTALLATION_ROOT/ports/libvpx/vcpkg.json")
           fi
           echo "key=libvpx-$RUNNER_OS-$RUNNER_ARCH-$version-${{ hashFiles('scripts/build-libvpx.sh') }}" >> "$GITHUB_OUTPUT"
+          echo "version=$version" >> "$GITHUB_OUTPUT"
 
       - name: Restore static libvpx
         id: libvpx-cache
@@ -308,6 +318,22 @@ jobs:
         run: |
           npm run tauri bundle -- --bundles nsis --config "$MUMCORD_SIGNING_CONFIG"
           echo "MUMCORD_WINDOWS_SIGNED=true" >> "$GITHUB_ENV"
+
+      # The SBOM job of release.yml runs on another runner and cannot see this host's libraries.
+      - name: List bundled native libraries for the SBOM
+        if: inputs.release
+        shell: bash
+        env:
+          # Windows links vcpkg's libvpx; the other systems build the version in the script.
+          LIBVPX_VERSION: ${{ runner.os == 'Windows' && steps.libvpx.outputs.version || '' }}
+        run: scripts/sbom-native.sh "$LIBVPX_VERSION" > "sbom-native-${{ matrix.name }}.txt"
+
+      - uses: actions/upload-artifact@v7
+        if: inputs.release
+        with:
+          name: sbom-native-${{ matrix.name }}
+          path: sbom-native-${{ matrix.name }}.txt
+          if-no-files-found: error
 
       - name: Collect artifact
         shell: bash

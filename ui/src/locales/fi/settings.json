@@ -16,7 +16,8 @@
     "diagnostics": "Diagnostiikka",
     "about": "Tietoja",
     "servers": "Palvelimet",
-    "privacy": "Yksityisyys"
+    "privacy": "Yksityisyys",
+    "packetInspector": "Pakettitarkastin"
   },
   "search": {
     "label": "Hae asetuksista",
@@ -372,7 +373,8 @@
     "notices": "Kolmannen osapuolen ilmoitukset",
     "noticesHint": "Mumcord perustuu avoimen lähdekoodin ohjelmistoihin, mukaan lukien Mumble-projektin koodiin.",
     "noticesFailed": "Kolmannen osapuolen ilmoituksia ei voitu ladata.",
-    "loading": "Ladataan…"
+    "loading": "Ladataan…",
+    "devToolsUnlocked": "Kehittäjätyökalut avattu: pakettitarkastin on nyt asetusluettelossa."
   },
   "profile": {
     "title": "Profiili",
@@ -481,5 +483,76 @@
     "label": "Lisää Mumcord sovellusvalikkoon",
     "hint": "Saa kuvakkeen ja puhu painamalla -toiminnon toimimaan oikein Waylandissa ja mumble://-linkit avaamaan Mumcordin. Vain AppImagelle.",
     "failed": "Se ei onnistunut. Yritä uudelleen."
+  },
+  "inspector": {
+    "intro": "Näyttää Mumcordin lähettämät ja vastaanottamat paketit, lähinnä Mumcord-lisäosien tietoja, virheenjäljitystä varten. Vain viimeiset 2 000 pakettia säilytetään tämän laitteen muistissa; mitään ei kirjata lokiin tai lähetetä minnekään.",
+    "devTools": "Kehittäjätyökalut",
+    "devToolsHint": "Poista käytöstä piilottaaksesi pakettitarkastimen uudelleen ja lopettaaksesi tallennuksen.",
+    "filters": "Suodattimet ja vienti",
+    "server": "Palvelin",
+    "allServers": "Kaikki palvelimet",
+    "direction": "Suunta",
+    "allDirections": "Molemmat suunnat",
+    "type": "Tyyppi",
+    "allTypes": "Kaikki tyypit",
+    "sent": "Lähetetty",
+    "received": "Vastaanotettu",
+    "pause": "Tauko",
+    "resume": "Jatka",
+    "paused": "Tauolla: uudet paketit näkyvät, kun jatkat.",
+    "clear": "Tyhjennä",
+    "exportJson": "Vie JSON",
+    "exportMarkdown": "Vie Markdown",
+    "fileTypeJson": "JSON-tiedosto",
+    "fileTypeMarkdown": "Markdown-tiedosto",
+    "exportWarning": "Viennit sisältävät nykyisillä suodattimilla näytetyt paketit ja voivat sisältää henkilötietoja, kuten nimiä ja chat-tekstiä. Tarkista ne ennen jakamista.",
+    "exported": "Vienti tallennettu.",
+    "counters": "Laskurit",
+    "noCounters": "Mitään ei ole vielä laskettu.",
+    "voice": "Äänipaketit: {{sent}} lähetetty, {{received}} vastaanotettu",
+    "packets": "Paketit ({{shown}} / {{total}})",
+    "empty": "Ei vielä paketteja.",
+    "tableCaption": "Tallennetut paketit, uusin viimeisenä",
+    "columns": {
+      "time": "Aika",
+      "direction": "Suunta",
+      "type": "Tyyppi",
+      "size": "Koko",
+      "peers": "Lähettäjä / Vastaanottaja",
+      "pacer": "Pacer"
+    },
+    "details": "Paketin tiedot ajalta {{time}}",
+    "toUsers_one": "→ {{count}} käyttäjä",
+    "toUsers_other": "→ {{count}} käyttäjää",
+    "delayed": "viivästetty {{ms}} ms",
+    "notDelayed": "ei viivästetty",
+    "tokensLeft": "tokeneita jäljellä: {{tokens}}",
+    "bytes": "{{bytes}} tavua",
+    "fields": {
+      "gap": "Väli edelliseen pakettiin",
+      "kind": "Sisäinen tunnus",
+      "size": "Koko",
+      "decoded": "Purettu sisältö"
+    },
+    "noDecoding": "Tällä sisällöllä ei ole luettavaa muotoa; katso raakatavut.",
+    "controlOnly": "Tavallinen Mumble-viesti: vain sen tyyppi ja koko tallennetaan.",
+    "showHex": "Näytä raaka heksa",
+    "hideHex": "Piilota raaka heksa",
+    "rawHex": "Raakatavut heksana",
+    "copy": "Kopioi paketti",
+    "copied": "Kopioitu.",
+    "copyFailed": "Kopiointi epäonnistui.",
+    "kinds": {
+      "hello": "Mumcord-tervehdys",
+      "history": "Chat-historian synkronointi",
+      "image": "Kuvan siirto täysikokoisena",
+      "nowgaming": "Tila ”pelaa nyt”",
+      "nowplaying": "Tila ”kuuntelee nyt”",
+      "p2p": "Suoran yhteyden muodostus",
+      "screen": "Näytönjaon signaali",
+      "watch": "Yhteiskatselun tila",
+      "plugin": "Lisäosan tiedot",
+      "mumble": "Mumble-viesti"
+    }
   }
 }

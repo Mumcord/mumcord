@@ -19,6 +19,7 @@
       "connecting": "connexion",
       "reconnecting": "reconnexion",
       "error": "connexion perdue",
+      "failed": "échec de la connexion",
       "voice": "serveur vocal",
       "unread": "messages non lus",
       "mentions": "mentions : {{mentions}}"
@@ -128,6 +129,7 @@
     "disconnectedReason": "Déconnecté – {{reason}}",
     "failed": "Impossible de se connecter à {{server}}. {{reason}}",
     "cancel": "Annuler",
+    "dismiss": "Fermer",
     "reconnect": "Se reconnecter",
     "editServer": "Modifier le serveur",
     "actionFailed": {

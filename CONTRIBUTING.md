@@ -34,3 +34,5 @@ The pull request template already has a checkbox for it. Pull requests without i
 ## Dependency updates
 
 Dependabot (`.github/dependabot.yml`) opens one pull request per ecosystem every Monday for minor and patch updates of Cargo, npm and GitHub Actions dependencies; major updates come as separate pull requests. `tauri-specta` and `specta` are pinned to exact versions and ignored; bump them together by hand.
+
+The third-party notices (`THIRD_PARTY_NOTICES`, `ui/public/third-party-notices.txt`) are generated automatically: after a dependency change lands on `main`, a workflow opens the pull request "chore: regenerate third-party notices", and every release regenerates them before bundling. Do not update them in your pull request. A new dependency must use an allowed licence (`accepted` in `about.toml` for Rust, `npm_allowed` in `scripts/generate-notices.sh` for npm); see [RELEASING.md](RELEASING.md#third-party-notices).

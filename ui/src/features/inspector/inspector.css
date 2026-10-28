@@ -1,0 +1,187 @@
+/* Packet inspector (issue #60). Colours come from theme tokens so every theme stays readable. */
+
+/* The table needs the whole panel width; the texts keep the usual line length. */
+.settings__panel > .settings-section:has(.pi-marker) {
+  max-width: none;
+}
+
+.settings__panel > .settings-section:has(.pi-marker) .settings-hint {
+  max-width: calc(48rem - 2 * var(--space-6));
+}
+
+.pi-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2) var(--space-4);
+}
+
+.pi-table-wrap {
+  overflow-x: auto;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+}
+
+.pi-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--font-size-sm);
+  font-variant-numeric: tabular-nums;
+}
+
+.pi-table th,
+.pi-table td {
+  padding: var(--space-1) var(--space-2);
+  text-align: start;
+  vertical-align: top;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.pi-table th {
+  position: sticky;
+  top: 0;
+  background: var(--color-bg-elevated);
+  color: var(--color-text-secondary);
+  font-weight: var(--font-weight-bold);
+}
+
+.pi-row:hover {
+  background: var(--color-bg-hover);
+}
+
+.pi-row-sent {
+  box-shadow: inset 3px 0 0 var(--color-accent);
+}
+
+.pi-row-received {
+  box-shadow: inset 3px 0 0 var(--color-success);
+}
+
+.pi-expand {
+  display: inline-flex;
+  gap: var(--space-1);
+  padding: 0;
+  border: none;
+  background: none;
+  color: var(--color-text);
+  font: inherit;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.pi-expand:focus-visible {
+  outline: var(--focus-ring-width) solid var(--color-focus);
+  outline-offset: 2px;
+}
+
+.pi-chevron {
+  color: var(--color-text-muted);
+}
+
+.pi-direction {
+  white-space: nowrap;
+  font-weight: var(--font-weight-bold);
+}
+
+.pi-direction-sent {
+  color: var(--color-accent-text);
+}
+
+.pi-direction-received {
+  color: var(--color-success);
+}
+
+.pi-kind-id {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+}
+
+.pi-size,
+.pi-peers,
+.pi-pacer {
+  white-space: nowrap;
+}
+
+.pi-delayed {
+  color: var(--color-warning);
+}
+
+.pi-receivers summary {
+  cursor: pointer;
+}
+
+.pi-receivers ul {
+  margin: var(--space-1) 0 0;
+  padding-inline-start: var(--space-4);
+}
+
+.pi-details-row > td {
+  background: var(--color-bg-sidebar);
+}
+
+.pi-details {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: var(--space-2) 0;
+}
+
+.pi-facts {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  gap: var(--space-1) var(--space-3);
+  margin: 0;
+}
+
+.pi-facts dt {
+  color: var(--color-text-secondary);
+}
+
+.pi-facts dd {
+  margin: 0;
+}
+
+.pi-code {
+  max-height: 20rem;
+  margin: 0;
+  padding: var(--space-2);
+  overflow: auto;
+  border-radius: var(--radius-sm);
+  background: var(--color-bg-elevated);
+  color: var(--color-text);
+  font-size: var(--font-size-xs);
+  white-space: pre;
+}
+
+.pi-code:focus-visible {
+  outline: var(--focus-ring-width) solid var(--color-focus);
+}
+
+.pi-json-key {
+  color: var(--color-warning);
+}
+
+.pi-json-string {
+  color: var(--color-success);
+}
+
+.pi-json-number {
+  color: var(--color-accent-text);
+}
+
+.pi-json-literal {
+  color: var(--color-accent);
+}
+
+.pi-json-punctuation {
+  color: var(--color-text-muted);
+}
+
+.pi-counters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1) var(--space-4);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: var(--font-size-sm);
+}
