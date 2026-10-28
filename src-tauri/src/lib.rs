@@ -88,6 +88,7 @@ fn specta_builder() -> Builder<tauri::Wry> {
             chat::send_private_message,
             chat::save_image,
             dropped::read_dropped_image,
+            dropped::clipboard_files,
             commands::full_image::full_image_keep,
             commands::full_image::full_image_fetch,
             commands::full_image::full_image_cancel,

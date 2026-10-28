@@ -88,6 +88,19 @@ function pasteFiles(data: DataTransfer): File[] {
     .filter((file): file is File => file !== null);
 }
 
+/**
+ * Whether a paste holds files copied in the file manager that the webview keeps to itself: WebKitGTK
+ * lists `text/uri-list` for them but gives neither `File` objects nor the paths (issue #50). A
+ * copied web link also comes as `text/uri-list`, but its URLs stay readable.
+ */
+function hasHiddenFiles(data: DataTransfer): boolean {
+  if (!data.types.includes("text/uri-list")) return false;
+  return data
+    .getData("text/uri-list")
+    .split(/\r?\n/)
+    .every((line) => line.trim() === "" || line.startsWith("#") || line.startsWith("file:"));
+}
+
 export function Composer({
   target,
   limits,
@@ -279,6 +292,11 @@ export function Composer({
     const data = event.clipboardData;
     const files = pasteFiles(data);
     if (files.length === 0) {
+      if (hasHiddenFiles(data)) {
+        event.preventDefault();
+        void composer.addCopiedFiles();
+        return;
+      }
       // A clipboard image the webview cannot hand over as a file: say so instead of doing nothing.
       if (
         clipboardItems(data).some((item) => item.kind === "file" && item.type.startsWith("image/"))

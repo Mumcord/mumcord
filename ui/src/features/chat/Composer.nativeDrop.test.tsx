@@ -1,4 +1,4 @@
-import { act, render, screen, waitFor } from "@testing-library/react";
+import { act, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import type { DragDropEvent } from "@tauri-apps/api/webview";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { EngineError, type MockApi } from "../../api";
@@ -111,5 +111,72 @@ describe("Composer native file drops", () => {
     });
     emit({ type: "drop", paths: ["/home/me/notes.txt"], position: at(100, 1500) });
     expect((await screen.findByRole("alert")).textContent).toBe("Only images can be sent.");
+  });
+});
+
+/** A paste as WebKitGTK delivers a file copied in the file manager: the paths stay hidden. */
+function pasteUriList(input: HTMLElement, uriList = "") {
+  return fireEvent.paste(input, {
+    clipboardData: {
+      files: [],
+      items: [{ kind: "string", type: "text/uri-list", getAsFile: () => null }],
+      types: ["text/uri-list"],
+      getData: (type: string) => (type === "text/uri-list" ? uriList : ""),
+    },
+  });
+}
+
+describe("Composer paste of copied image files (issue #50)", () => {
+  it("attaches an image file copied in the file manager", async () => {
+    const copied = vi.spyOn(api, "clipboardFiles").mockResolvedValue(["/home/me/cat.png"]);
+    const read = vi
+      .spyOn(api, "readDroppedImage")
+      .mockResolvedValue({ name: "cat.png", mime: "image/png", data: btoa("x") });
+    setup();
+    const notPrevented = pasteUriList(screen.getByRole("textbox"));
+    expect(notPrevented).toBe(false);
+    expect(await screen.findByRole("img", { name: "Image to send: cat.png" })).toBeTruthy();
+    expect(copied).toHaveBeenCalledOnce();
+    expect(read).toHaveBeenCalledWith("/home/me/cat.png");
+  });
+
+  it("shows the drop error when the copied file is not an image", async () => {
+    vi.spyOn(api, "clipboardFiles").mockResolvedValue(["/home/me/notes.txt"]);
+    vi.spyOn(api, "readDroppedImage").mockRejectedValue(new EngineError("invalidInput", "no"));
+    setup();
+    pasteUriList(screen.getByRole("textbox"));
+    expect((await screen.findByRole("alert")).textContent).toBe("Only images can be sent.");
+  });
+
+  it("says so when the copied files cannot be read from the clipboard", async () => {
+    vi.spyOn(api, "clipboardFiles").mockRejectedValue(new EngineError("io", "no"));
+    vi.spyOn(console, "error").mockImplementation(() => undefined);
+    setup();
+    pasteUriList(screen.getByRole("textbox"));
+    expect((await screen.findByRole("alert")).textContent).toBe(
+      "The image couldn't be read. Try another file.",
+    );
+  });
+
+  it("uses the files when the webview hands them over", async () => {
+    const copied = vi.spyOn(api, "clipboardFiles");
+    setup();
+    fireEvent.paste(screen.getByRole("textbox"), {
+      clipboardData: {
+        files: [new File(["x"], "dog.png", { type: "image/png" })],
+        types: ["text/uri-list", "Files"],
+        getData: () => "",
+      },
+    });
+    expect(await screen.findByRole("img", { name: "Image to send: dog.png" })).toBeTruthy();
+    expect(copied).not.toHaveBeenCalled();
+  });
+
+  it("pastes a copied web link as text", () => {
+    const copied = vi.spyOn(api, "clipboardFiles");
+    setup();
+    const notPrevented = pasteUriList(screen.getByRole("textbox"), "https://example.com/\r\n");
+    expect(notPrevented).toBe(true);
+    expect(copied).not.toHaveBeenCalled();
   });
 });
