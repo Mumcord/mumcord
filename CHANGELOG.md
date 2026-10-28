@@ -7,6 +7,7 @@
 - The Mumble protocol library `mumcord-protocol` and the voice audio library `mumcord-audio` are now published on crates.io with every release, so other projects such as the bot can depend on them by version
 - The voice library is split: the new crate `mumcord-codec` holds everything that works without audio devices (Opus codec, jitter buffer, mixer, bitrate control, processing chain) and has no cpal or ALSA dependency, so headless bots can build it for static musl targets; `mumcord-audio` keeps the device I/O and re-exports the codec, and both are published on crates.io
 - The local storage library `mumcord-store` (database, identity certificates, OS secure storage) and the direct-connection library `mumcord-p2p` (QUIC with certificate pinning) are now published on crates.io with every release too
+- A hidden packet inspector for debugging Mumcord's plugin data (issue #60): seven clicks on the version in Settings → About unlock it, and **Open packet inspector** in Settings shows the sent and received packets in a window of its own, with filters, counters, decoded content and JSON or Markdown export. The window remembers its size and position, follows the app's theme and language, closes with Ctrl+W, and can only read the capture; capturing runs while the developer tools are unlocked, whether the window is open or not
 
 ### Changed
 
