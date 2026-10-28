@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.4.4] - Unreleased
+
+### Changed
+
+- After a release is published, a workflow opens a pull request that writes the released version into the manifests and lock files and regenerates the third-party notices, so `main` no longer stays on the previous version
+
 ## [0.4.3] - 2026-10-28
 
 ### Added

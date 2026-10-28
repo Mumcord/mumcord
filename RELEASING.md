@@ -18,7 +18,7 @@ The version is set at build time from git; nobody bumps it in the manifests by h
 - **Package version.** Installer formats need a plain number (RPM rejects `-`, MSI/NSIS want `X.Y.Z`, macOS bundle versions are numeric), so dev bundles carry the version of the latest `v*` tag (`scripts/latest-release-version.sh`) and only the app's display version says `dev~…`.
 - **Setting it.** `scripts/set-version.sh X.Y.Z` writes the version into `package.json`, `package-lock.json`, `[workspace.package]` in `Cargo.toml` (every crate inherits it), the requirements of the internal crates crates.io needs (`version = "X.Y"`), `Cargo.lock` and `scripts/smoke/seed/Cargo.lock`. CI runs it on a fresh checkout and never commits the result; `scripts/ci/test-set-version.sh` checks it on every CI run. `src-tauri/tauri.conf.json` has no version on purpose: Tauri takes the app version from `Cargo.toml`. Do not add one.
 
-The manifests in the repository keep the version of an older release; that is expected and needs no update.
+Between a release and the merge of its sync pull request (step 4), the manifests in the repository keep the version of an older release; that is expected. Dev builds are not affected: their display version comes from git and their package version from the latest `v*` tag, never from the manifests.
 
 ## 1. Prepare the release pull request
 
@@ -58,6 +58,7 @@ Open the **Actions** tab and follow the **Release** run for the tag. It takes ro
 2. Check the notes: the fixed download and signing section, followed by the change list GitHub generated from merged pull requests. Edit the text if needed.
 3. Check that the `.exe`, `.dmg`, `.AppImage`, `.cdx.json` and `SHA256SUMS` files are attached. Optionally download one and try it.
 4. Click **Publish release**.
+5. Publishing starts `.github/workflows/post-release.yml`, which opens the pull request "chore: sync version X.Y.Z and third-party notices" (branch `chore/sync-version-X.Y.Z`) with the released version in the manifests and lock files and the regenerated notices, and starts CI and E2E on it. Merge it once the checks are green. It runs on publishing, not when the build finishes, so a draft you discard changes nothing; pre-releases (`-rc.1` and the like) are not synced. If it did not run, start it by hand: **Actions → Post-release sync → Run workflow** with the version. Opening the pull request needs **Settings → Actions → General → Allow GitHub Actions to create and approve pull requests**; without it the run pushes the branch and shows a warning with a link to open the pull request by hand. While the sync pull request is open, `notices.yml` does nothing (the sync contains fresh notices) and closes nothing; the sync closes an open notices pull request.
 
 ## AppImage: no H.264 / GPL-only codecs
 

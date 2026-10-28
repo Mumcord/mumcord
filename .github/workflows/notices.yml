@@ -8,7 +8,8 @@ name: Third-party notices
 # their checks land on the pull request's head commit, which is what the required checks look at.
 # Opening the pull request needs the repository setting "Allow GitHub Actions to create and
 # approve pull requests"; without it the branch is still pushed and the run shows a warning with a
-# link to open the pull request by hand.
+# link to open the pull request by hand. While the version sync pull request of a release is open
+# (post-release.yml), which contains fresh notices as well, this workflow does nothing.
 on:
   push:
     branches: [main]
@@ -75,6 +76,12 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           files=(THIRD_PARTY_NOTICES ui/public/third-party-notices.txt)
+          sync=$(gh pr list --base main --state open --json number,headRefName \
+            -q '[.[] | select(.headRefName | startswith("chore/sync-version-"))][0].number')
+          if [[ -n "$sync" ]]; then
+            echo "Version sync pull request #$sync is open and regenerates the notices; skipping."
+            exit 0
+          fi
           open=$(gh pr list --head "$BRANCH" --base main --state open --json number -q '.[0].number')
           if git diff --quiet -- "${files[@]}"; then
             echo "The notices on main are up to date."
