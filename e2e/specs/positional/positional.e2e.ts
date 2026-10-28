@@ -16,6 +16,7 @@ import {
   testenv,
   type BackgroundBot,
 } from "../../helpers/index.ts";
+import { hasClass } from "../../helpers/selectors.ts";
 import { readWav, rms, silence, splitStereo, wavSamples, writeWav } from "../../helpers/voice-audio.ts";
 import { addAndConnect, completeWizard, joinIfReadOnly, personRow, readTree } from "../../helpers/voice-ui.ts";
 
@@ -94,7 +95,7 @@ async function openAudioSettings(): Promise<void> {
 
 /** The settings switch whose label is `label`. */
 function settingsSwitch(label: string) {
-  return $(`//div[contains(@class,'settings-switch')][.//label[.='${label}']]//input[@role='switch']`);
+  return $(`//div[${hasClass('settings-switch')}][.//label[.='${label}']]//input[@role='switch']`);
 }
 
 async function closeDialog(): Promise<void> {
@@ -231,7 +232,7 @@ describe("positional audio (AC-1.31, AC-1.32, AC-1.55)", () => {
     await toggle.click();
     await expect(toggle).toBeSelected();
 
-    const plugin = $(`//div[contains(@class,'settings-switch')][.//label[.='${PLUGIN_NAME}']]`);
+    const plugin = $(`//div[${hasClass('settings-switch')}][.//label[.='${PLUGIN_NAME}']]`);
     await browser.waitUntil(async () => (await plugin.getText()).includes("Delivering positions"), {
       timeout: 15_000,
       timeoutMsg: "plugin never shown as delivering positions",

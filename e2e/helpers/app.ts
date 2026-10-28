@@ -13,6 +13,7 @@ import { join } from "node:path";
 import { browser } from "@wdio/globals";
 import { bin } from "./paths.ts";
 import { run } from "./run.ts";
+import { shared } from "./state.ts";
 
 /**
  * tauri-driver listens here; it starts WebKitWebDriver on the next port. Parallel runs
@@ -30,13 +31,16 @@ export interface LaunchOptions {
   freshProfile?: boolean;
 }
 
-let driver: ChildProcess | undefined;
-let profileDir = "";
-let audio = "null";
+// Shared with the wdio config (see state.ts): the hook starts the driver, the specs read it.
+const state = shared("app", {
+  driver: undefined as ChildProcess | undefined,
+  profileDir: "",
+  audio: "null",
+});
 
 /** The current profile's root (XDG data/config/cache dirs live below it). */
 export function profile(): string {
-  return profileDir;
+  return state.profileDir;
 }
 
 /** Deletes Mumcord's keyring entries (identity, server passwords) from the Secret Service. */
@@ -47,8 +51,8 @@ async function clearKeyring(): Promise<void> {
 }
 
 function newProfile(): void {
-  profileDir = mkdtempSync(join(tmpdir(), "mumcord-profile-"));
-  for (const d of ["data", "config", "cache"]) mkdirSync(join(profileDir, d));
+  state.profileDir = mkdtempSync(join(tmpdir(), "mumcord-profile-"));
+  for (const d of ["data", "config", "cache"]) mkdirSync(join(state.profileDir, d));
 }
 
 function portOpen(port: number): Promise<boolean> {
@@ -77,16 +81,16 @@ async function waitPort(port: number, open: boolean): Promise<void> {
  * audio backend are fixed per driver process.
  */
 export async function startDriver(): Promise<void> {
-  if (!profileDir) newProfile();
+  if (!state.profileDir) newProfile();
   const ports = ["--port", String(driverPort), "--native-port", String(driverPort + 1)];
-  driver = spawn("tauri-driver", ports, {
+  state.driver = spawn("tauri-driver", ports, {
     stdio: ["ignore", "inherit", "inherit"],
     env: {
       ...process.env,
-      XDG_DATA_HOME: join(profileDir, "data"),
-      XDG_CONFIG_HOME: join(profileDir, "config"),
-      XDG_CACHE_HOME: join(profileDir, "cache"),
-      MUMCORD_AUDIO_BACKEND: audio,
+      XDG_DATA_HOME: join(state.profileDir, "data"),
+      XDG_CONFIG_HOME: join(state.profileDir, "config"),
+      XDG_CACHE_HOME: join(state.profileDir, "cache"),
+      MUMCORD_AUDIO_BACKEND: state.audio,
       // Link previews may only fetch the local test page, never the internet (FR-1.49).
       MUMCORD_TEST_PREVIEW_ADDRESSES: "127.0.0.1",
     },
@@ -162,8 +166,8 @@ export async function killStrays(graceMs = 5_000): Promise<void> {
 }
 
 export async function stopDriver(): Promise<void> {
-  driver?.kill("SIGTERM");
-  driver = undefined;
+  state.driver?.kill("SIGTERM");
+  state.driver = undefined;
   // A wedged driver may not close its port; killStrays below kills it either way.
   await waitPort(driverPort, false).catch(() => undefined);
   await killStrays();
@@ -174,7 +178,7 @@ export async function stopDriver(): Promise<void> {
 /** Prepares a fresh install for a new spec file (called from wdio.conf.ts before the session). */
 export async function prepareFresh(): Promise<void> {
   newProfile();
-  audio = "null";
+  state.audio = "null";
   await killStrays(0);
   await clearKeyring();
   await startDriver();
@@ -194,7 +198,7 @@ export async function restart(opts: LaunchOptions = {}): Promise<void> {
     newProfile();
     await clearKeyring();
   }
-  if (opts.audio !== undefined) audio = opts.audio;
+  if (opts.audio !== undefined) state.audio = opts.audio;
   await startDriver();
   // A healthy debug build starts in seconds even on a 2-core runner; fail clearly instead of
   // letting the test hit the mocha timeout.

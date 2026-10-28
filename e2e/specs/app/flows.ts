@@ -85,12 +85,20 @@ export async function typeText(text: string): Promise<void> {
   }
 }
 
+// These say "something matching appeared/disappeared", not "this one element". A strict `$` (wdio 10)
+// throws when several elements match, so the checks count matches through `$$`.
 export async function waitFor(selector: string, timeout = 20_000): Promise<void> {
-  await browser.$(selector).waitForExist({ timeout, timeoutMsg: `${selector} did not appear` });
+  await browser.waitUntil(async () => (await browser.$$(selector)).length > 0, {
+    timeout,
+    timeoutMsg: `${selector} did not appear`,
+  });
 }
 
 export async function waitGone(selector: string, timeout = 20_000): Promise<void> {
-  await browser.$(selector).waitForExist({ timeout, reverse: true, timeoutMsg: `${selector} did not go away` });
+  await browser.waitUntil(async () => (await browser.$$(selector)).length === 0, {
+    timeout,
+    timeoutMsg: `${selector} did not go away`,
+  });
 }
 
 export async function waitText(selector: string, text: string, timeout = 20_000): Promise<void> {

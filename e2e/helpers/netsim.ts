@@ -1,6 +1,7 @@
 import { spawn, type ChildProcess } from "node:child_process";
 import { bin } from "./paths.ts";
 import { runOk } from "./run.ts";
+import { shared } from "./state.ts";
 import { ports, type Service } from "./testenv.ts";
 
 /**
@@ -53,22 +54,23 @@ export async function startProxy(
   throw new Error("netsim did not start");
 }
 
-let proxy: Proxy | undefined;
+// Shared with the wdio config (see state.ts): the specs start the proxy, afterSession stops it.
+const state = shared("netsim", { proxy: undefined as Proxy | undefined });
 
 /** Starts the default proxy 127.0.0.1:listenPort -> the given test server (TCP+UDP). */
 export async function start(target: Service = "v15"): Promise<void> {
-  if (proxy) throw new Error("netsim already running");
-  proxy = await startProxy(target);
+  if (state.proxy) throw new Error("netsim already running");
+  state.proxy = await startProxy(target);
 }
 
 export async function ctl(...args: string[]): Promise<string> {
-  if (proxy) return proxy.ctl(...args);
+  if (state.proxy) return state.proxy.ctl(...args);
   return (
     await runOk(bin.netsim, ["ctl", "--control", `127.0.0.1:${String(controlPort)}`, ...args])
   ).stdout;
 }
 
 export function stop(): void {
-  proxy?.stop();
-  proxy = undefined;
+  state.proxy?.stop();
+  state.proxy = undefined;
 }

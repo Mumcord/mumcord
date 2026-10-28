@@ -41,6 +41,16 @@ async function barLabel(name: string): Promise<string> {
   return (await serverButton(name).getAttribute("aria-label")) ?? "";
 }
 
+/**
+ * Click through a script. A WebDriver click waits for the element to be interactable, and a button
+ * of a dialog that another modal covers is inert, so a real click there never happens.
+ */
+async function clickByScript(element: WebdriverIO.Element): Promise<void> {
+  await browser.execute((node: HTMLElement) => {
+    node.click();
+  }, element);
+}
+
 async function waitConnected(name: string): Promise<void> {
   await browser.waitUntil(async () => (await barLabel(name)).includes("(connected)"), {
     timeout: 30_000,
@@ -72,13 +82,11 @@ describe("wrong server password modal (AC-2.40)", function () {
     await trustIfAsked();
     // The first server's password modal can already be open (and makes the page inert), so a real
     // click may be refused; a script click still starts the second connection while it is open.
-    await browser.execute((el: HTMLElement) => {
-      el.click();
-    }, await serverButton(TWO).getElement());
+    await clickByScript(await serverButton(TWO).getElement());
     await modal(ONE).waitForDisplayed({ timeout: 30_000 });
-    // The second server's certificate prompt opens on top of the first modal; answer it first so
-    // both connections are pending at once, then check the first modal.
-    await trustIfAsked();
+    // Which of the two dialogs is on top depends on how the two connections finish, so answer the
+    // certificate prompt through a script click: both connections must stay pending at once.
+    await clickByScript(await $("//button[.='Trust and connect']").getElement());
     await browser.waitUntil(async () => await $("//input[@type='password']").isFocused(), {
       timeoutMsg: "password field not focused",
     });

@@ -1,5 +1,5 @@
 import { readFileSync } from "node:fs";
-import { browser, expect, $ } from "@wdio/globals";
+import { browser, expect, $, $$ } from "@wdio/globals";
 import { app, bot, testenv } from "../../helpers/index.ts";
 import {
   addFirstServer,
@@ -201,7 +201,8 @@ describe("chat: rendering and sending (AC-1.13, AC-1.14, AC-1.43)", () => {
       await selectChannel("Lobby");
       await expect(region()).not.toExist();
       // The root is the first channel in the tree, shown under the server's registered name.
-      await $("//span[contains(@class,'tree-channel__name')]").click();
+      const channels = await $$("//span[contains(@class,'tree-channel__name')]");
+      await channels[0].click();
       await browser.waitUntil(
         async () => (await region().isExisting()) && (await region().getText()).includes("Welcome to this server"),
         { timeoutMsg: "welcome text not pinned in the root channel" },

@@ -38,6 +38,11 @@ const speechPath = join(repoRoot, "testenv", "audio", "speech.wav");
 const noisyPath = join(repoRoot, "testenv", "audio", "speech_noisy.wav");
 const speech = readWav(speechPath);
 const noisy = readWav(noisyPath);
+
+/** Both switches in the profile card share the class, so the label tells the local-mute one apart. */
+function muteSwitch() {
+  return $("//button[@role='switch'][contains(., 'Mute for me')]");
+}
 const f = (name: string) => join(dir, name);
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 const log = (msg: string) => {
@@ -401,7 +406,7 @@ describe("voice (AC-1.7 – AC-1.12)", () => {
     const l50r = activeLevel(await playAndCapture(main, out), -65);
     await openProfileCard("BotRenamed");
     await expect($(".profile-card__volume output")).toHaveText("50 %");
-    const mute = $("button.profile-card__mute");
+    const mute = muteSwitch();
     await mute.click();
     await expect(mute).toHaveAttribute("aria-checked", "true");
     await browser.keys("Escape");
@@ -432,9 +437,9 @@ describe("voice (AC-1.7 – AC-1.12)", () => {
     );
     await openProfileCard("Bot");
     await expect($(".profile-card__volume output")).toHaveText("50 %");
-    await expect($("button.profile-card__mute")).toHaveAttribute("aria-checked", "true");
+    await expect(muteSwitch()).toHaveAttribute("aria-checked", "true");
     // Control: unmuting makes Bot audible again, still at 50 %.
-    await $("button.profile-card__mute").click();
+    await muteSwitch().click();
     await browser.keys("Escape");
     await sleep(800);
     const l50u = activeLevel(await playAndCapture(main, out), -65);

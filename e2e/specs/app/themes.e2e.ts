@@ -4,6 +4,7 @@
 // is played by the app itself (receiver) and by the bot (sender / official client).
 import { browser, expect, $, $$ } from "@wdio/globals";
 import { app, testenv } from "../../helpers/index.ts";
+import { hasClass } from "../../helpers/selectors.ts";
 import { ScriptBot, USER, composer, joinChannel, waitMessage } from "../../helpers/chat-ui.ts";
 import { button, completeWizard, dialogTitle, fill } from "../../helpers/servers-ui.ts";
 import { connectFromEmptyState, waitFor, waitGone } from "./flows.ts";
@@ -162,7 +163,8 @@ describe("themes (AC-2.12 – AC-2.16)", function () {
       const got = await official.run(`expect message --from ${USER} --contains "mct1."`);
       expect(got).toContain(code);
       await waitMessage("QA Plum");
-      await expect($(".theme-card")).toBeDisplayed();
+      // Several theme cards are listed here, so the check is about the list, not one card.
+      await expect($$(".theme-card")).toBeDisplayed();
     } finally {
       official.stop();
     }
@@ -321,7 +323,7 @@ describe("themes (AC-2.12 – AC-2.16)", function () {
     expect(on.effects).toBe("on");
     expect(Number(on.grain)).toBeGreaterThan(0);
     expect(on.glass).not.toBe("none");
-    const sw = $("//div[contains(@class,'settings-switch')][.//*[starts-with(normalize-space(.),'Visual effects')]]//input[@role='switch']");
+    const sw = $(`//div[${hasClass('settings-switch')}][.//*[starts-with(normalize-space(.),'Visual effects')]]//input[@role='switch']`);
     await sw.scrollIntoView();
     await sw.click();
     await browser.waitUntil(async () => (await read()).effects === "off");
