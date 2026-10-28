@@ -16,6 +16,7 @@
 ### Internal
 
 - The AES library is updated to 0.9, which now uses the hardware-accelerated path by default on modern x86 CPUs; the voice crypto code follows the renamed API of its cipher layer
+- `bindgen` stays at 0.72: the 0.73 series needs `prettyplease` 0.3, which `prost-build` does not accept yet, so the two cannot be resolved together; Dependabot no longer proposes that bump until `prost-build` allows it
 
 ## [0.4.2] - 2026-10-27
 
