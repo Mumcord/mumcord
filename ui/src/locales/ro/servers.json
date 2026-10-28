@@ -19,6 +19,7 @@
       "connecting": "se conectează",
       "reconnecting": "se reconectează",
       "error": "conexiune pierdută",
+      "failed": "conexiunea a eșuat",
       "voice": "server vocal",
       "unread": "mesaje necitite",
       "mentions": "mențiuni: {{mentions}}"
@@ -128,6 +129,7 @@
     "disconnectedReason": "Deconectat – {{reason}}",
     "failed": "Nu s-a putut conecta la {{server}}. {{reason}}",
     "cancel": "Anulează",
+    "dismiss": "Închide",
     "reconnect": "Reconectează-te",
     "editServer": "Editează serverul",
     "actionFailed": {

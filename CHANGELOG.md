@@ -10,6 +10,7 @@
 
 ### Changed
 
+- The "couldn't connect" banner now hides after 60 seconds (hovering or focusing it pauses the timer) and has a dismiss button; it comes back only for a new failure, and the server icon keeps showing the failed connection. Servers without a name are shown as host and port
 - The Linux install script no longer tells you to install gst-libav (H.264 video support) when it is already installed; when it is missing it asks whether to install it right away
 - The Linux install script got a new look: a Mumcord banner, numbered steps with a download progress spinner, clear success and warning marks and a summary at the end; logs, pipes, `NO_COLOR` and `TERM=dumb` get plain text
 

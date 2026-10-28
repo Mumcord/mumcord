@@ -21,6 +21,7 @@ use crate::framing::{self, Frame, MessageType};
 use crate::proto;
 use crate::ratelimit::{self, LeakyBucket, Limit};
 use crate::state::{Channel, CryptSetup, ServerInfo, ServerState, User, UserChange};
+use crate::tap::{PacketTap, TapDirection, TapPacing, TappedFrame};
 use crate::tls::{self, CertVerifier, ClientIdentity};
 use crate::version::MumbleVersion;
 use crate::voice::CryptStats;
@@ -181,6 +182,7 @@ struct Shared {
     reason: Mutex<Option<DisconnectReason>>,
     connected: AtomicBool,
     ping: Mutex<PingReport>,
+    tap: Option<Arc<dyn PacketTap>>,
 }
 
 impl Shared {
@@ -201,6 +203,17 @@ impl Shared {
             *slot = Some(reason);
         }
         self.shutdown.notify_one();
+    }
+
+    fn tap(&self, direction: TapDirection, frame: &Frame, pacing: Option<TapPacing>) {
+        if let Some(tap) = self.tap.as_ref().filter(|tap| tap.enabled()) {
+            tap.on_frame(TappedFrame::new(
+                direction,
+                frame.kind,
+                &frame.payload,
+                pacing,
+            ));
+        }
     }
 }
 
@@ -297,8 +310,18 @@ pub async fn connect_with_progress(
     config: ConnectConfig,
     progress: Option<SyncProgress>,
 ) -> Result<Connection, ConnectError> {
+    connect_with_tap(config, progress, None).await
+}
+
+/// Like [`connect_with_progress`], and hands every frame from the start of the login on to
+/// `tap`, for debugging tools.
+pub async fn connect_with_tap(
+    config: ConnectConfig,
+    progress: Option<SyncProgress>,
+    tap: Option<Arc<dyn PacketTap>>,
+) -> Result<Connection, ConnectError> {
     let limit = config.login_timeout;
-    tokio::time::timeout(limit, connect_inner(config, progress))
+    tokio::time::timeout(limit, connect_inner(config, progress, tap))
         .await
         .map_err(|_| ConnectError::Timeout)?
 }
@@ -306,6 +329,7 @@ pub async fn connect_with_progress(
 async fn connect_inner(
     config: ConnectConfig,
     progress: Option<SyncProgress>,
+    tap: Option<Arc<dyn PacketTap>>,
 ) -> Result<Connection, ConnectError> {
     let server_name = ServerName::try_from(config.host.clone())
         .map_err(|_| ConnectError::InvalidAddress(config.host.clone()))?;
@@ -372,6 +396,7 @@ async fn connect_inner(
         reason: Mutex::new(None),
         connected: AtomicBool::new(true),
         ping: Mutex::default(),
+        tap,
     });
     tokio::spawn(write_loop(writer, rx, shared.clone()));
     let handle = Handle {
@@ -474,14 +499,14 @@ async fn write_loop<W: AsyncWrite + Unpin>(
             msg = rx.recv(), if !handles_gone => match msg {
                 Some(Outgoing::Frame(frame)) => match ratelimit::limit_of(frame.kind) {
                     Some(Limit::Messages) => {
-                        out.messages.push(frame);
+                        out.messages.push(frame, now);
                         Ok(())
                     }
                     Some(Limit::PluginData) => {
-                        out.plugin_data.push(frame);
+                        out.plugin_data.push(frame, now);
                         Ok(())
                     }
-                    None => out.write(&frame).await,
+                    None => out.write(&frame, None).await,
                 },
                 Some(Outgoing::Flush(done)) => {
                     out.flushes.push(out.flush_marker(done));
@@ -503,11 +528,11 @@ async fn write_loop<W: AsyncWrite + Unpin>(
                 Some(Outgoing::Abort) => break Ok(()),
             },
             () = sleep_until_some(messages_ready_at) => match out.messages.pop() {
-                Some(frame) => out.write_paced(&frame).await,
+                Some((frame, _)) => out.write_paced(&frame, None).await,
                 None => Ok(()),
             },
             () = sleep_until_some(plugin_data_ready_at) => match out.plugin_data.pop() {
-                Some(frame) => out.write_paced(&frame).await,
+                Some((frame, pacing)) => out.write_paced(&frame, Some(pacing)).await,
                 None => Ok(()),
             },
             Ok(()) = pong.changed() => {
@@ -521,7 +546,7 @@ async fn write_loop<W: AsyncWrite + Unpin>(
             }
             _ = ping.tick() => {
                 let frame = Frame::from_message(MessageType::Ping, &shared.ping().message());
-                out.write(&frame).await
+                out.write(&frame, None).await
             }
         };
         if let Err(err) = step {
@@ -576,15 +601,21 @@ impl<W: AsyncWrite + Unpin> Writer<W> {
         }
     }
 
-    async fn write(&mut self, frame: &Frame) -> std::io::Result<()> {
+    async fn write(&mut self, frame: &Frame, pacing: Option<TapPacing>) -> std::io::Result<()> {
         self.buf.clear();
         frame.encode(&mut self.buf);
         self.writer.write_all(&self.buf).await?;
-        self.writer.flush().await
+        self.writer.flush().await?;
+        self.shared.tap(TapDirection::Sent, frame, pacing);
+        Ok(())
     }
 
-    async fn write_paced(&mut self, frame: &Frame) -> std::io::Result<()> {
-        self.write(frame).await?;
+    async fn write_paced(
+        &mut self,
+        frame: &Frame,
+        pacing: Option<TapPacing>,
+    ) -> std::io::Result<()> {
+        self.write(frame, pacing).await?;
         self.confirm_written().await
     }
 
@@ -611,7 +642,7 @@ impl<W: AsyncWrite + Unpin> Writer<W> {
         let stamp = ping.timestamp.unwrap_or_default();
         self.unanswered
             .extend(sent.into_iter().map(|f| (stamp, f.done)));
-        self.write(&Frame::from_message(MessageType::Ping, &ping))
+        self.write(&Frame::from_message(MessageType::Ping, &ping), None)
             .await
     }
 
@@ -630,7 +661,7 @@ impl<W: AsyncWrite + Unpin> Writer<W> {
     /// Reports what is still queued and will not be sent: message kinds and counts, no content.
     fn log_dropped(&self) {
         let mut dropped: BTreeMap<u16, usize> = BTreeMap::new();
-        for frame in self.messages.queue.iter().chain(&self.plugin_data.queue) {
+        for (frame, _) in self.messages.queue.iter().chain(&self.plugin_data.queue) {
             *dropped.entry(frame.kind).or_default() += 1;
         }
         for (kind, count) in dropped {
@@ -643,7 +674,8 @@ impl<W: AsyncWrite + Unpin> Writer<W> {
 /// Frames that count against one of the server's rate limits, sent no faster than it allows.
 struct Paced {
     bucket: LeakyBucket,
-    queue: VecDeque<Frame>,
+    /// Frames with the time they were queued.
+    queue: VecDeque<(Frame, tokio::time::Instant)>,
     /// Frames taken and sent so far, for flushes to tell when their frames are out.
     pushed: u64,
     popped: u64,
@@ -659,8 +691,8 @@ impl Paced {
         }
     }
 
-    fn push(&mut self, frame: Frame) {
-        self.queue.push_back(frame);
+    fn push(&mut self, frame: Frame, now: tokio::time::Instant) {
+        self.queue.push_back((frame, now));
         self.pushed += 1;
     }
 
@@ -670,11 +702,16 @@ impl Paced {
     }
 
     /// The next frame to send; counted as sent, since a failed write ends the connection anyway.
-    fn pop(&mut self) -> Option<Frame> {
-        let frame = self.queue.pop_front()?;
-        self.bucket.take(tokio::time::Instant::now());
+    fn pop(&mut self) -> Option<(Frame, TapPacing)> {
+        let (frame, queued) = self.queue.pop_front()?;
+        let now = tokio::time::Instant::now();
+        self.bucket.take(now);
         self.popped += 1;
-        Some(frame)
+        let pacing = TapPacing {
+            delay: now.saturating_duration_since(queued),
+            tokens_left: self.bucket.tokens_left(now),
+        };
+        Some((frame, pacing))
     }
 }
 
@@ -770,6 +807,7 @@ impl Dispatcher {
     }
 
     fn handle(&mut self, frame: Frame) -> Control {
+        self.shared.tap(TapDirection::Received, &frame, None);
         let Some(kind) = frame.message_type() else {
             tracing::debug!(kind = frame.kind, "ignoring unknown control message");
             return Control::Continue;
@@ -1274,6 +1312,7 @@ mod tests {
                 reason: Mutex::new(None),
                 connected: AtomicBool::new(true),
                 ping: Mutex::default(),
+                tap: None,
             }),
         };
         let acl = proto::Acl {
@@ -1306,6 +1345,7 @@ mod tests {
                 reason: Mutex::new(None),
                 connected: AtomicBool::new(true),
                 ping: Mutex::default(),
+                tap: None,
             }),
         };
         assert!(matches!(
@@ -1344,6 +1384,7 @@ mod drain_tests {
             reason: Mutex::new(None),
             connected: AtomicBool::new(true),
             ping: Mutex::default(),
+            tap: None,
         })
     }
 
@@ -1381,9 +1422,12 @@ mod drain_tests {
     }
 
     fn start(answer: bool) -> (Handle, JoinHandle<Vec<String>>) {
+        start_with(answer, shared())
+    }
+
+    fn start_with(answer: bool, shared: Arc<Shared>) -> (Handle, JoinHandle<Vec<String>>) {
         let (client, server_side) = tokio::io::duplex(64 * 1024);
         let (tx, rx) = mpsc::unbounded_channel();
-        let shared = shared();
         tokio::spawn(write_loop(client, rx, shared.clone()));
         let server = server(server_side, shared.clone(), answer);
         (Handle { tx, shared }, server)
@@ -1449,6 +1493,42 @@ mod drain_tests {
         assert_eq!(started.elapsed(), Duration::from_millis(2400));
         handle.disconnect();
         assert_eq!(server.await.expect("server"), expected(6));
+    }
+
+    #[derive(Default)]
+    struct Recorder(Mutex<Vec<u16>>);
+
+    impl PacketTap for Recorder {
+        fn enabled(&self) -> bool {
+            true
+        }
+
+        fn on_frame(&self, frame: TappedFrame) {
+            assert_eq!(frame.direction, TapDirection::Sent);
+            self.0.lock().expect("recorder").push(frame.kind);
+        }
+    }
+
+    #[tokio::test(start_paused = true)]
+    async fn frames_sent_while_draining_reach_the_tap() {
+        let recorder = Arc::new(Recorder::default());
+        let mut shared = shared();
+        Arc::get_mut(&mut shared).expect("unshared").tap = Some(recorder.clone());
+        let (handle, server) = start_with(true, shared);
+        for i in 0..6 {
+            handle.send(text(i)).expect("queued");
+        }
+        handle.disconnect();
+        handle.closed().await;
+        assert_eq!(server.await.expect("server"), expected(5));
+        let texts = recorder
+            .0
+            .lock()
+            .expect("recorder")
+            .iter()
+            .filter(|kind| **kind == MessageType::TextMessage as u16)
+            .count();
+        assert_eq!(texts, 5);
     }
 
     #[tokio::test(start_paused = true)]

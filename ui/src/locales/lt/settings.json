@@ -16,7 +16,8 @@
     "diagnostics": "Diagnostika",
     "about": "Apie",
     "servers": "Serveriai",
-    "privacy": "Privatumas"
+    "privacy": "Privatumas",
+    "packetInspector": "Paketų tikrintuvas"
   },
   "search": {
     "label": "Ieškoti nustatymų",
@@ -374,7 +375,8 @@
     "notices": "Trečiųjų šalių pranešimai",
     "noticesHint": "Mumcord sukurtas naudojant atvirojo kodo programinę įrangą, įskaitant Mumble projekto kodą.",
     "noticesFailed": "Nepavyko įkelti trečiųjų šalių pranešimų.",
-    "loading": "Įkeliama…"
+    "loading": "Įkeliama…",
+    "devToolsUnlocked": "Kūrėjo įrankiai atrakinti: paketų tikrintuvas dabar yra nustatymų sąraše."
   },
   "profile": {
     "title": "Profilis",
@@ -485,5 +487,78 @@
     "label": "Pridėti Mumcord į programų meniu",
     "hint": "Tada piktograma ir „spausk ir kalbėk“ Wayland aplinkoje veikia tinkamai, o mumble:// nuorodos atidaro Mumcord. Tik AppImage.",
     "failed": "Nepavyko. Bandyk dar kartą."
+  },
+  "inspector": {
+    "intro": "Rodo paketus, kuriuos Mumcord siunčia ir gauna, daugiausia Mumcord papildinių duomenis, derinimui. Saugomi tik paskutiniai 2000 paketų, šio įrenginio atmintyje; niekas nėra registruojama ar niekur siunčiama.",
+    "devTools": "Kūrėjo įrankiai",
+    "devToolsHint": "Išjunkite, kad vėl paslėptumėte paketų tikrintuvą ir sustabdytumėte fiksavimą.",
+    "filters": "Filtrai ir eksportas",
+    "server": "Serveris",
+    "allServers": "Visi serveriai",
+    "direction": "Kryptis",
+    "allDirections": "Abi kryptys",
+    "type": "Tipas",
+    "allTypes": "Visi tipai",
+    "sent": "Išsiųsta",
+    "received": "Gauta",
+    "pause": "Pristabdyti",
+    "resume": "Tęsti",
+    "paused": "Pristabdyta: nauji paketai pasirodys, kai tęsite.",
+    "clear": "Išvalyti",
+    "exportJson": "Eksportuoti JSON",
+    "exportMarkdown": "Eksportuoti Markdown",
+    "fileTypeJson": "JSON failas",
+    "fileTypeMarkdown": "Markdown failas",
+    "exportWarning": "Eksporte yra paketai, rodomi su dabartiniais filtrais, ir gali būti asmens duomenų, pavyzdžiui, vardų ir pokalbio teksto. Prieš dalindamiesi patikrinkite.",
+    "exported": "Eksportas išsaugotas.",
+    "counters": "Skaitikliai",
+    "noCounters": "Dar nieko nesuskaičiuota.",
+    "voice": "Balso paketai: {{sent}} išsiųsta, {{received}} gauta",
+    "packets": "Paketai ({{shown}} iš {{total}})",
+    "empty": "Paketų dar nėra.",
+    "tableCaption": "Užfiksuoti paketai, naujausi gale",
+    "columns": {
+      "time": "Laikas",
+      "direction": "Kryptis",
+      "type": "Tipas",
+      "size": "Dydis",
+      "peers": "Nuo / Kam",
+      "pacer": "Pacer"
+    },
+    "details": "Paketo, gauto {{time}}, informacija",
+    "toUsers_one": "→ {{count}} naudotojas",
+    "toUsers_few": "→ {{count}} naudotojai",
+    "toUsers_many": "→ {{count}} naudotojo",
+    "toUsers_other": "→ {{count}} naudotojų",
+    "delayed": "uždelsta {{ms}} ms",
+    "notDelayed": "neuždelsta",
+    "tokensLeft": "liko žetonų: {{tokens}}",
+    "bytes": "{{bytes}} baitų",
+    "fields": {
+      "gap": "Tarpas nuo ankstesnio paketo",
+      "kind": "Vidinis ID",
+      "size": "Dydis",
+      "decoded": "Iškoduotas turinys"
+    },
+    "noDecoding": "Šis turinys neturi įskaitomos formos; žiūrėkite neapdorotus baitus.",
+    "controlOnly": "Standartinis Mumble pranešimas: įrašomas tik jo tipas ir dydis.",
+    "showHex": "Rodyti neapdorotą hex",
+    "hideHex": "Slėpti neapdorotą hex",
+    "rawHex": "Neapdoroti baitai hex formatu",
+    "copy": "Kopijuoti paketą",
+    "copied": "Nukopijuota.",
+    "copyFailed": "Nepavyko nukopijuoti.",
+    "kinds": {
+      "hello": "Mumcord sveikinimas",
+      "history": "Pokalbio istorijos sinchronizavimas",
+      "image": "Viso dydžio paveikslėlio perdavimas",
+      "nowgaming": "Būsena „dabar žaidžia“",
+      "nowplaying": "Būsena „dabar klausosi“",
+      "p2p": "Tiesioginio ryšio užmezgimas",
+      "screen": "Ekrano bendrinimo signalas",
+      "watch": "Bendro žiūrėjimo būsena",
+      "plugin": "Papildinio duomenys",
+      "mumble": "Mumble pranešimas"
+    }
   }
 }

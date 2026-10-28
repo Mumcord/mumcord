@@ -16,7 +16,8 @@
     "diagnostics": "Diagnostika",
     "about": "Par lietotni",
     "servers": "Serveri",
-    "privacy": "Privātums"
+    "privacy": "Privātums",
+    "packetInspector": "Pakešu inspektors"
   },
   "search": {
     "label": "Meklēt iestatījumos",
@@ -373,7 +374,8 @@
     "notices": "Trešo pušu paziņojumi",
     "noticesHint": "Mumcord ir veidots uz atvērtā koda programmatūras pamata, tostarp koda no Mumble projekta.",
     "noticesFailed": "Trešo pušu paziņojumus neizdevās ielādēt.",
-    "loading": "Ielādē…"
+    "loading": "Ielādē…",
+    "devToolsUnlocked": "Izstrādātāja rīki atbloķēti: pakešu inspektors tagad ir iestatījumu sarakstā."
   },
   "profile": {
     "title": "Profils",
@@ -483,5 +485,77 @@
     "label": "Pievienot Mumcord lietotņu izvēlnei",
     "hint": "Ikona un push-to-talk tad Wayland vidē darbojas pareizi, un mumble:// saites atver Mumcord. Tikai AppImage.",
     "failed": "Neizdevās. Mēģini vēlreiz."
+  },
+  "inspector": {
+    "intro": "Rāda paketes, ko Mumcord sūta un saņem, galvenokārt Mumcord spraudņu datus, kļūdu meklēšanai. Tiek glabātas tikai pēdējās 2000 paketes, šīs ierīces atmiņā; nekas netiek reģistrēts vai kaut kur sūtīts.",
+    "devTools": "Izstrādātāja rīki",
+    "devToolsHint": "Izslēdziet, lai atkal paslēptu pakešu inspektoru un apturētu tveršanu.",
+    "filters": "Filtri un eksports",
+    "server": "Serveris",
+    "allServers": "Visi serveri",
+    "direction": "Virziens",
+    "allDirections": "Abi virzieni",
+    "type": "Veids",
+    "allTypes": "Visi veidi",
+    "sent": "Nosūtītās",
+    "received": "Saņemtās",
+    "pause": "Pauze",
+    "resume": "Turpināt",
+    "paused": "Apturēts: jaunās paketes parādīsies, kad turpināsiet.",
+    "clear": "Notīrīt",
+    "exportJson": "Eksportēt JSON",
+    "exportMarkdown": "Eksportēt Markdown",
+    "fileTypeJson": "JSON fails",
+    "fileTypeMarkdown": "Markdown fails",
+    "exportWarning": "Eksportā ir paketes, kas redzamas ar pašreizējiem filtriem, un tajā var būt personas dati, piemēram, vārdi un tērzēšanas teksts. Pārbaudiet to pirms kopīgošanas.",
+    "exported": "Eksports saglabāts.",
+    "counters": "Skaitītāji",
+    "noCounters": "Vēl nekas nav saskaitīts.",
+    "voice": "Balss paketes: {{sent}} nosūtītas, {{received}} saņemtas",
+    "packets": "Paketes ({{shown}} no {{total}})",
+    "empty": "Pakešu vēl nav.",
+    "tableCaption": "Notvertās paketes, jaunākās beigās",
+    "columns": {
+      "time": "Laiks",
+      "direction": "Virziens",
+      "type": "Veids",
+      "size": "Izmērs",
+      "peers": "No / Kam",
+      "pacer": "Pacer"
+    },
+    "details": "Paketes informācija no {{time}}",
+    "toUsers_zero": "→ {{count}} lietotāju",
+    "toUsers_one": "→ {{count}} lietotājs",
+    "toUsers_other": "→ {{count}} lietotāji",
+    "delayed": "aizkavēta par {{ms}} ms",
+    "notDelayed": "nav aizkavēta",
+    "tokensLeft": "atlikušie žetoni: {{tokens}}",
+    "bytes": "{{bytes}} baiti",
+    "fields": {
+      "gap": "Atstarpe no iepriekšējās paketes",
+      "kind": "Iekšējais ID",
+      "size": "Izmērs",
+      "decoded": "Atkodētais saturs"
+    },
+    "noDecoding": "Šim saturam nav lasāmas formas; skatiet neapstrādātos baitus.",
+    "controlOnly": "Standarta Mumble ziņojums: tiek reģistrēts tikai tā veids un izmērs.",
+    "showHex": "Rādīt neapstrādātu hex",
+    "hideHex": "Slēpt neapstrādātu hex",
+    "rawHex": "Neapstrādāti baiti hex formātā",
+    "copy": "Kopēt paketi",
+    "copied": "Nokopēts.",
+    "copyFailed": "Kopēšana neizdevās.",
+    "kinds": {
+      "hello": "Mumcord sveiciens",
+      "history": "Tērzēšanas vēstures sinhronizēšana",
+      "image": "Pilna izmēra attēla pārsūtīšana",
+      "nowgaming": "Statuss “tagad spēlē”",
+      "nowplaying": "Statuss “tagad klausās”",
+      "p2p": "Tiešā savienojuma izveide",
+      "screen": "Ekrāna kopīgošanas signāls",
+      "watch": "Kopīgas skatīšanās stāvoklis",
+      "plugin": "Spraudņa dati",
+      "mumble": "Mumble ziņojums"
+    }
   }
 }

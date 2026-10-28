@@ -45,6 +45,7 @@ import {
   type Unsubscribe,
 } from "./client";
 import { STRESS_SELF_CHANNEL_PATH, stressChannels, stressUsers } from "./mockStress";
+import { createMockInspector } from "./mockInspector";
 
 export interface MockOptions {
   /**
@@ -516,6 +517,7 @@ export function createMockApi(options: MockOptions = {}): MockApi {
   const friends = new Map<string, { name: string; addedAt: string; lastSeenAt: string | null }>();
   let shownFriends = "[]";
   const failures = new Map<CommandName, ApiError>();
+  const inspector = createMockInspector();
   const certPrompts = new Map<number, string | null>();
 
   let identity: Identity | null = fresh ? null : { name: "Zoe", certHash: "selfhash" };
@@ -1649,6 +1651,18 @@ export function createMockApi(options: MockOptions = {}): MockApi {
     },
     // Mock links arrive only via `api.mock.emit("deepLinkOpened", …)`.
     deepLinkTakePending: () => Promise.resolve(null),
+
+    // packet inspector
+    packetCaptureSet: (enabled) => {
+      inspector.set(enabled);
+      return Promise.resolve(null);
+    },
+    packetCapturePoll: (after) => Promise.resolve(inspector.poll(after)),
+    packetCaptureClear: () => {
+      inspector.clear();
+      return Promise.resolve(null);
+    },
+    packetCaptureExport: () => Promise.resolve(null),
 
     // diagnostics
     diagnosticsSave: () => Promise.resolve(null),

@@ -33,6 +33,7 @@
       "specs/chat/follow-v13.e2e.ts",
       "specs/chat/notifications.e2e.ts",
       "specs/misc/diagnostics-about.e2e.ts",
+      "specs/misc/packet-inspector.e2e.ts",
       "specs/voice/read-only-join.e2e.ts",
       "specs/wizard/ac-1.1-create-identity.e2e.ts"
     ]

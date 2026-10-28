@@ -241,6 +241,8 @@ struct Inner {
     watch_parties: crate::watch_party::ServerParties,
     /// Screen shares in the user's channels (FR-2.42).
     screen_shares: crate::screen_share::ServerShares,
+    /// Packet inspector capture, shared by every connection (issue #60).
+    inspector: Arc<crate::inspector::Inspector>,
 }
 
 #[derive(Default)]
@@ -451,6 +453,7 @@ impl Engine {
             history_sync: Arc::default(),
             watch_parties: Mutex::default(),
             screen_shares: Mutex::default(),
+            inspector: Arc::default(),
             positional: crate::positional::Positional::new(
                 voice.positional.clone(),
                 &settings.positional,
@@ -1128,6 +1131,35 @@ impl Engine {
             .map_err(|e| EngineError::internal(e.to_string()))?
     }
 
+    /// Starts or stops the packet inspector's capture (issue #60); stopping drops what it holds.
+    pub fn set_packet_capture(&self, enabled: bool) {
+        self.inner.inspector.set_enabled(enabled);
+    }
+
+    /// Drops the captured packets and resets the inspector's counters.
+    pub fn clear_packet_capture(&self) {
+        self.inner.inspector.clear();
+    }
+
+    /// Captured packets with an id above `after`, the counters and the voice packet counts.
+    pub fn poll_packet_capture(&self, after: Option<u64>) -> crate::inspector::InspectorPoll {
+        let voice = {
+            let core = lock(&self.inner.core);
+            core.slots
+                .keys()
+                .filter_map(|&server_id| {
+                    let stats = core.session(server_id).ok()?.transport.as_ref()?.stats();
+                    Some(crate::inspector::VoiceCount {
+                        server_id,
+                        sent: stats.audio_sent,
+                        received: stats.audio_received,
+                    })
+                })
+                .collect()
+        };
+        self.inner.inspector.poll(after, voice)
+    }
+
     /// Live link figures of a server's connection, `None` when not connected (AC-1.23).
     /// Bitrate and packet counters belong to the voice pipeline's server; elsewhere they are 0.
     pub fn connection_stats(&self, server_id: ServerId) -> Option<ConnectionStatsView> {
@@ -1668,7 +1700,8 @@ impl Inner {
                 channels: u32::try_from(channels).unwrap_or(u32::MAX),
             });
         });
-        match mumcord_protocol::connect_with_progress(config, Some(progress)).await {
+        let tap = Some(self.inspector.tap(server_id));
+        match mumcord_protocol::connect_with_tap(config, Some(progress), tap).await {
             Ok(connection) => Ok((connection, server.address, server.port)),
             Err(ConnectError::CertificateRejected(cert)) => {
                 let fingerprint = format_fingerprint(&cert.sha256_hex);

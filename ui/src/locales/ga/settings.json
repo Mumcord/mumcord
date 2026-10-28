@@ -16,7 +16,8 @@
     "diagnostics": "Diagnóisic",
     "about": "Maidir le",
     "servers": "Freastalaithe",
-    "privacy": "Príobháideachas"
+    "privacy": "Príobháideachas",
+    "packetInspector": "Cigire paicéad"
   },
   "search": {
     "label": "Cuardaigh socruithe",
@@ -375,7 +376,8 @@
     "notices": "Fógraí tríú páirtí",
     "noticesHint": "Tá Mumcord tógtha ar bhogearraí foinse oscailte, cód ó thionscadal Mumble san áireamh.",
     "noticesFailed": "Níorbh fhéidir na fógraí tríú páirtí a luchtú.",
-    "loading": "Ag luchtú…"
+    "loading": "Ag luchtú…",
+    "devToolsUnlocked": "Díghlasáladh uirlisí forbróra: tá an cigire paicéad anois sa liosta socruithe."
   },
   "profile": {
     "title": "Próifíl",
@@ -487,5 +489,79 @@
     "label": "Cuir Mumcord le roghchlár na n-aipeanna",
     "hint": "Oibríonn an deilbhín agus brúigh-chun-cainte i gceart ar Wayland ansin, agus osclaíonn naisc mumble:// Mumcord. Don AppImage amháin.",
     "failed": "Níor oibrigh sé sin. Bain triail eile as."
+  },
+  "inspector": {
+    "intro": "Taispeánann sé na paicéid a sheolann agus a fhaigheann Mumcord, go príomha sonraí breiseán Mumcord, chun fabhtanna a aimsiú. Ní choinnítear ach na 2,000 paicéad is déanaí, i gcuimhne an ghléis seo; ní logáiltear ná ní sheoltar aon rud áit ar bith.",
+    "devTools": "Uirlisí forbróra",
+    "devToolsHint": "Cuir as chun an cigire paicéad a cheilt arís agus an gabháil a stopadh.",
+    "filters": "Scagairí agus easpórtáil",
+    "server": "Freastalaí",
+    "allServers": "Gach freastalaí",
+    "direction": "Treo",
+    "allDirections": "An dá threo",
+    "type": "Cineál",
+    "allTypes": "Gach cineál",
+    "sent": "Seolta",
+    "received": "Faighte",
+    "pause": "Cuir ar sos",
+    "resume": "Lean ar aghaidh",
+    "paused": "Ar sos: taispeánfar paicéid nua nuair a leanfaidh tú ar aghaidh.",
+    "clear": "Glan",
+    "exportJson": "Easpórtáil JSON",
+    "exportMarkdown": "Easpórtáil Markdown",
+    "fileTypeJson": "Comhad JSON",
+    "fileTypeMarkdown": "Comhad Markdown",
+    "exportWarning": "Cuimsíonn easpórtálacha na paicéid a thaispeántar leis na scagairí reatha agus féadfaidh sonraí pearsanta a bheith iontu, mar ainmneacha agus téacs comhrá. Seiceáil iad sular roinn tú iad.",
+    "exported": "Easpórtáil sábháilte.",
+    "counters": "Cuntair",
+    "noCounters": "Níl aon rud áirithe go fóill.",
+    "voice": "Paicéid ghutha: {{sent}} seolta, {{received}} faighte",
+    "packets": "Paicéid ({{shown}} as {{total}})",
+    "empty": "Gan paicéid go fóill.",
+    "tableCaption": "Paicéid a gabhadh, an ceann is nua ar deireadh",
+    "columns": {
+      "time": "Am",
+      "direction": "Treo",
+      "type": "Cineál",
+      "size": "Méid",
+      "peers": "Ó / Chuig",
+      "pacer": "Pacer"
+    },
+    "details": "Sonraí an phaicéid ag {{time}}",
+    "toUsers_one": "→ {{count}} úsáideoir",
+    "toUsers_two": "→ {{count}} úsáideoir",
+    "toUsers_few": "→ {{count}} úsáideoir",
+    "toUsers_many": "→ {{count}} úsáideoir",
+    "toUsers_other": "→ {{count}} úsáideoir",
+    "delayed": "moillithe {{ms}} ms",
+    "notDelayed": "gan moill",
+    "tokensLeft": "comharthaí fágtha: {{tokens}}",
+    "bytes": "{{bytes}} beart",
+    "fields": {
+      "gap": "Bearna ón bpaicéad roimhe",
+      "kind": "Aitheantas inmheánach",
+      "size": "Méid",
+      "decoded": "Ábhar díchódaithe"
+    },
+    "noDecoding": "Níl foirm inléite ag an ábhar seo; féach na bearta amha.",
+    "controlOnly": "Gnáththeachtaireacht Mumble: ní thaifeadtar ach a cineál agus a méid.",
+    "showHex": "Taispeáin hex amh",
+    "hideHex": "Folaigh hex amh",
+    "rawHex": "Bearta amha i hex",
+    "copy": "Cóipeáil paicéad",
+    "copied": "Cóipeáilte.",
+    "copyFailed": "Theip ar an gcóipeáil.",
+    "kinds": {
+      "hello": "Beannú Mumcord",
+      "history": "Sioncronú stair an chomhrá",
+      "image": "Aistriú íomhá lán-mhéide",
+      "nowgaming": "Stádas “ag imirt anois”",
+      "nowplaying": "Stádas “ag éisteacht anois”",
+      "p2p": "Nasc díreach á shocrú",
+      "screen": "Comhartha comhroinnte scáileáin",
+      "watch": "Staid an tseisiúin féachana",
+      "plugin": "Sonraí breiseáin",
+      "mumble": "Teachtaireacht Mumble"
+    }
   }
 }

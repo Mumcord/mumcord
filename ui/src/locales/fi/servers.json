@@ -19,6 +19,7 @@
       "connecting": "yhdistetään",
       "reconnecting": "yhdistetään uudelleen",
       "error": "yhteys katkesi",
+      "failed": "yhteys epäonnistui",
       "voice": "puhepalvelin",
       "unread": "lukemattomia viestejä",
       "mentions": "maininnat: {{mentions}}"
@@ -128,6 +129,7 @@
     "disconnectedReason": "Yhteys katkaistu – {{reason}}",
     "failed": "Yhteyttä palvelimeen {{server}} ei saatu. {{reason}}",
     "cancel": "Peruuta",
+    "dismiss": "Sulje",
     "reconnect": "Yhdistä uudelleen",
     "editServer": "Muokkaa palvelinta",
     "actionFailed": {

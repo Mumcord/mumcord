@@ -10,6 +10,7 @@ pub mod framing;
 pub mod permissions;
 mod ratelimit;
 pub mod state;
+pub mod tap;
 pub mod tls;
 pub mod version;
 pub mod voice;
@@ -17,6 +18,7 @@ pub mod voice;
 pub use client::{
     ConnectConfig, Connection, DisconnectReason, Event, Handle, PLUGIN_DATA_MAX, PluginData,
     SyncProgress, TextMessage, TextTarget, UdpPing, connect, connect_with_progress,
+    connect_with_tap,
 };
 pub use error::{
     CommandError, ConnectError, DenyKind, PermissionDenied, ProtocolError, RejectReason,
@@ -24,6 +26,7 @@ pub use error::{
 /// Certificate/key DER types used by [`ClientIdentity`] and [`ServerCert`].
 pub use rustls::pki_types;
 pub use state::{Channel, CryptSetup, ServerInfo, ServerState, User, UserChange};
+pub use tap::{PacketTap, TapDirection, TapPacing, TapPluginData, TappedFrame};
 pub use tls::{CertVerifier, ClientIdentity, ServerCert, cert_hash};
 pub use version::MumbleVersion;
 pub use voice::{

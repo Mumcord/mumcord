@@ -144,7 +144,7 @@ describe("servers (AC-1.4, AC-1.5, AC-1.6)", function () {
     await browser
       .$("//p[contains(normalize-space(),\"Couldn't connect to Password server\")]")
       .waitForDisplayed({ timeout: 10_000 });
-    await waitServerStatus(PW_SERVER, null);
+    await waitServerStatus(PW_SERVER, "connection failed");
     await bot(["expect", "user-gone", "Tester2"], BOT);
   });
 });

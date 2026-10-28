@@ -16,7 +16,8 @@
     "diagnostics": "Diagnostiek",
     "about": "Over",
     "servers": "Servers",
-    "privacy": "Privacy"
+    "privacy": "Privacy",
+    "packetInspector": "Pakketinspecteur"
   },
   "search": {
     "label": "Instellingen zoeken",
@@ -372,7 +373,8 @@
     "notices": "Vermeldingen van derden",
     "noticesHint": "Mumcord is gebouwd op opensourcesoftware, waaronder code van het Mumble-project.",
     "noticesFailed": "De vermeldingen van derden konden niet worden geladen.",
-    "loading": "Laden…"
+    "loading": "Laden…",
+    "devToolsUnlocked": "Ontwikkelaarstools ontgrendeld: de pakketinspecteur staat nu in de lijst met instellingen."
   },
   "profile": {
     "title": "Profiel",
@@ -481,5 +483,76 @@
     "label": "Mumcord aan het appmenu toevoegen",
     "hint": "Zorgt dat het pictogram en push-to-talk goed werken onder Wayland en dat mumble://-links Mumcord openen. Alleen voor de AppImage.",
     "failed": "Dat is niet gelukt. Probeer het opnieuw."
+  },
+  "inspector": {
+    "intro": "Toont de pakketten die Mumcord verstuurt en ontvangt, vooral Mumcord-plugingegevens, voor foutopsporing. Alleen de laatste 2.000 pakketten worden bewaard, in het geheugen van dit apparaat; er wordt niets gelogd of ergens heen gestuurd.",
+    "devTools": "Ontwikkelaarstools",
+    "devToolsHint": "Zet uit om de pakketinspecteur weer te verbergen en het vastleggen te stoppen.",
+    "filters": "Filters en export",
+    "server": "Server",
+    "allServers": "Alle servers",
+    "direction": "Richting",
+    "allDirections": "Beide richtingen",
+    "type": "Type",
+    "allTypes": "Alle typen",
+    "sent": "Verzonden",
+    "received": "Ontvangen",
+    "pause": "Pauzeren",
+    "resume": "Hervatten",
+    "paused": "Gepauzeerd: nieuwe pakketten verschijnen als je hervat.",
+    "clear": "Wissen",
+    "exportJson": "JSON exporteren",
+    "exportMarkdown": "Markdown exporteren",
+    "fileTypeJson": "JSON-bestand",
+    "fileTypeMarkdown": "Markdown-bestand",
+    "exportWarning": "Exports bevatten de pakketten die met de huidige filters worden getoond en kunnen persoonlijke gegevens bevatten, zoals namen en chattekst. Controleer ze voordat je ze deelt.",
+    "exported": "Export opgeslagen.",
+    "counters": "Tellers",
+    "noCounters": "Nog niets geteld.",
+    "voice": "Spraakpakketten: {{sent}} verzonden, {{received}} ontvangen",
+    "packets": "Pakketten ({{shown}} van {{total}})",
+    "empty": "Nog geen pakketten.",
+    "tableCaption": "Vastgelegde pakketten, nieuwste laatst",
+    "columns": {
+      "time": "Tijd",
+      "direction": "Richting",
+      "type": "Type",
+      "size": "Grootte",
+      "peers": "Van / Naar",
+      "pacer": "Pacer"
+    },
+    "details": "Details van het pakket van {{time}}",
+    "toUsers_one": "→ {{count}} gebruiker",
+    "toUsers_other": "→ {{count}} gebruikers",
+    "delayed": "{{ms}} ms vertraagd",
+    "notDelayed": "niet vertraagd",
+    "tokensLeft": "resterende tokens: {{tokens}}",
+    "bytes": "{{bytes}} bytes",
+    "fields": {
+      "gap": "Tijd sinds vorig pakket",
+      "kind": "Interne id",
+      "size": "Grootte",
+      "decoded": "Gedecodeerde inhoud"
+    },
+    "noDecoding": "Deze payload heeft geen leesbare vorm; zie de ruwe bytes.",
+    "controlOnly": "Standaard Mumble-bericht: alleen het type en de grootte worden vastgelegd.",
+    "showHex": "Ruwe hex tonen",
+    "hideHex": "Ruwe hex verbergen",
+    "rawHex": "Ruwe bytes in hex",
+    "copy": "Pakket kopiëren",
+    "copied": "Gekopieerd.",
+    "copyFailed": "Kopiëren mislukt.",
+    "kinds": {
+      "hello": "Mumcord-hallo",
+      "history": "Synchronisatie van chatgeschiedenis",
+      "image": "Overdracht van afbeelding op volledige grootte",
+      "nowgaming": "Status ‘speelt nu’",
+      "nowplaying": "Status ‘luistert nu’",
+      "p2p": "Opzetten van directe verbinding",
+      "screen": "Signaal voor schermdelen",
+      "watch": "Status van kijkfeest",
+      "plugin": "Plugingegevens",
+      "mumble": "Mumble-bericht"
+    }
   }
 }
