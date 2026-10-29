@@ -1,7 +1,5 @@
 # Changelog
 
-## [Unreleased]
-
 ## [0.4.4] - Unreleased
 
 ### Changed
