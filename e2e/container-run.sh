@@ -14,7 +14,8 @@ if ! getent passwd "$(id -u)" >/dev/null; then
   cat /etc/group > "$nss_dir/group"
   getent group "$(id -g)" >/dev/null || echo "e2e:x:$(id -g):" >> "$nss_dir/group"
   export NSS_WRAPPER_PASSWD="$nss_dir/passwd" NSS_WRAPPER_GROUP="$nss_dir/group"
-  export LD_PRELOAD="$(ls /usr/lib/*/libnss_wrapper.so | head -n1)${LD_PRELOAD:+:$LD_PRELOAD}"
+  nss_wrapper_lib=$(find /usr/lib -name libnss_wrapper.so -print -quit)
+  export LD_PRELOAD="$nss_wrapper_lib${LD_PRELOAD:+:$LD_PRELOAD}"
 fi
 
 if [ -z "${DBUS_SESSION_BUS_ADDRESS:-}" ]; then

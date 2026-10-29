@@ -3,5 +3,7 @@
 set -euo pipefail
 cd "$(dirname "$0")"
 . ./env.sh
-export PUID="$(id -u)" PGID="$(id -g)" SUPERUSER_PASSWORD="${SUPERUSER_PASSWORD:-x}"
+PUID=$(id -u)
+PGID=$(id -g)
+export PUID PGID SUPERUSER_PASSWORD="${SUPERUSER_PASSWORD:-x}"
 if [ $# -ge 1 ]; then docker compose rm -sf "$1"; else docker compose down --remove-orphans; fi

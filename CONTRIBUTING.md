@@ -31,6 +31,10 @@ The pull request template already has a checkbox for it. Pull requests without i
 - Never include secrets or connect tests to public Mumble servers; use a local test server.
 - Do not bump versions in `package.json` or `Cargo.toml`: the version comes from the release tag at build time, and a local build shows `dev~YYYYMMDD` (see [RELEASING.md](RELEASING.md#versions)).
 
+## Linting workflows and scripts
+
+The CI job "Lint workflows and scripts" runs [actionlint](https://github.com/rhysd/actionlint) over `.github/workflows` and `.github/actions` (it also runs shellcheck on inline `run:` steps) and [shellcheck](https://www.shellcheck.net/) over every `*.sh` file. Run the same checks locally with `scripts/ci/lint-ci.sh`; it needs both tools on your `PATH`, and the CI job pins their versions. If it fails, fix the finding. Where a warning is a false positive, add a `# shellcheck disable=SCxxxx # reason` comment directly above that one command; blanket disables are not accepted.
+
 ## Dependency security and licence checks
 
 The CI job "Dependency checks" (`.github/workflows/dependency-audit.yml`) also runs every Monday on `main`, so a new advisory against unchanged dependencies shows up without any pull request. It runs [cargo-deny](https://github.com/EmbarkStudios/cargo-deny) with `deny.toml` for the app workspace and for `scripts/smoke/seed`, and `npm audit --omit=dev --audit-level=high` for the production npm packages. To run it locally: `cargo deny check` in the repository root and in `scripts/smoke/seed`, and the `npm audit` command above.

@@ -24,6 +24,8 @@
 
 ### Internal
 
+- CI has a fast "Lint workflows and scripts" job that checks the GitHub workflows with actionlint and every shell script with shellcheck (pinned versions), also for pull requests that only touch workflows or scripts. `scripts/ci/lint-ci.sh` runs it locally; existing findings in the scripts are fixed (#104)
+
 - CI checks dependencies for known security advisories, disallowed licences and unknown sources with cargo-deny (`deny.toml`, same licence list as the third-party notices) and runs `npm audit` for production packages, on every pull request and weekly on `main`. Accepted advisories are listed with a reason and an issue (#103)
 
 ## [0.4.3] - 2026-10-28

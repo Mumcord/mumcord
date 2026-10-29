@@ -3,8 +3,13 @@
 set -euo pipefail
 cd "$(dirname "$0")"
 [ -f ../.env ] || { echo "missing testenv/.env" >&2; exit 1; }
-set -a; . ../.env; set +a
-export PUID="$(id -u)" PGID="$(id -g)"
+set -a
+# shellcheck disable=SC1091 # testenv/.env is a git-ignored local file, not in the repo
+. ../.env
+set +a
+PUID=$(id -u)
+PGID=$(id -g)
+export PUID PGID
 ../gen-certs.sh
 mkdir -p ../data/scale
 compose=(docker compose -p mumcord-scale -f docker-compose.yml)

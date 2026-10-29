@@ -1,3 +1,4 @@
+# shellcheck shell=bash
 # Sourced by up.sh, down.sh and reset.sh. Derives compose variables from two optional overrides:
 #   MUMCORD_PORT_BASE   host port of v15 (default 64738); v14/v13/limit/v15b follow at +1..+4
 #   MUMCORD_PROJECT     compose project name (default testenv); a non-default name also gets its

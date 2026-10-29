@@ -149,6 +149,7 @@ jobs:
           git push --force origin "$branch"
 
           if [[ -z "$open" ]]; then
+            # shellcheck disable=SC2001,SC2016 # sed prefixes each changed file line; backticks are literal Markdown
             body=$(printf 'Writes the released version %s into the manifests and lock files (scripts/set-version.sh), dates its CHANGELOG.md section (scripts/finalise-changelog.sh) and regenerates the third-party notices (scripts/generate-notices.sh), after the [Post-release sync workflow](%s/%s/actions/runs/%s). CI and E2E are started on this branch by the same run.\n\nChanged files:\n\n%s\n' \
               "$VERSION" "$GITHUB_SERVER_URL" "$GITHUB_REPOSITORY" "$GITHUB_RUN_ID" "$(sed 's/.*/- `&`/' <<< "$changed")")
             gh pr create --base main --head "$branch" --title "$title" --body "$body" \
