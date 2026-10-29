@@ -27,7 +27,7 @@
   "history": {
     "clear": "Rensa historik",
     "title": "Rensa historiken?",
-    "body": "Det här tar permanent bort de sparade meddelandena i den här konversationen från den här datorn. Andra behåller sina kopior.",
+    "body": "Det här tar permanent bort de sparade meddelandena i den här konversationen från den här datorn. Andra behåller sina kopior. Deras kopior synkroniseras inte tillbaka till den här datorn.",
     "confirm": "Rensa historik",
     "cancel": "Avbryt",
     "failed": "Det gick inte att rensa historiken. Försök igen."

@@ -851,6 +851,62 @@ describe("Chat & history section", () => {
     expect(clear).toHaveBeenCalledOnce();
   });
 
+  it("shows the cache sizes per category and in total", async () => {
+    vi.spyOn(api, "cacheSizes").mockResolvedValue({
+      previewsKib: 1024,
+      webKib: 2048,
+      tempKib: 512,
+    });
+    await openSection("Privacy");
+    expect(
+      await screen.findByRole("switch", { name: "Link previews and images (1.0 MB)" }),
+    ).toBeChecked();
+    expect(screen.getByRole("switch", { name: "Web engine cache (2.0 MB)" })).toBeChecked();
+    expect(screen.getByRole("switch", { name: "Temporary files (512.0 KB)" })).toBeChecked();
+    expect(screen.getByText("Total: 3.5 MB")).toBeVisible();
+  });
+
+  it("clears only the selected caches after a confirmation that names what stays", async () => {
+    const clear = vi
+      .spyOn(api, "cacheClear")
+      .mockResolvedValue({ freedKib: 1024, webPending: false });
+    await openSection("Privacy");
+    fireEvent.click(await screen.findByRole("switch", { name: /^Web engine cache/ }));
+    fireEvent.click(screen.getByRole("button", { name: "Clear cache" }));
+    expect(clear).not.toHaveBeenCalled();
+    const dialog = await screen.findByRole("dialog");
+    expect(dialog).toHaveTextContent(
+      /chat history, settings, servers, certificates, friends and notes/,
+    );
+    fireEvent.click(within(dialog).getByRole("button", { name: "Clear cache" }));
+    expect(await screen.findByText("Cache cleared (1.0 MB)")).toBeVisible();
+    expect(clear).toHaveBeenCalledWith(["previews", "temp"]);
+  });
+
+  it("does not clear anything when the confirmation is cancelled or nothing is selected", async () => {
+    const clear = vi.spyOn(api, "cacheClear");
+    await openSection("Privacy");
+    fireEvent.click(await screen.findByRole("button", { name: "Clear cache" }));
+    fireEvent.click(
+      within(await screen.findByRole("dialog")).getByRole("button", { name: "Cancel" }),
+    );
+    expect(clear).not.toHaveBeenCalled();
+    for (const name of [/^Link previews and images/, /^Web engine cache/, /^Temporary files/]) {
+      fireEvent.click(screen.getByRole("switch", { name }));
+    }
+    expect(screen.getByRole("button", { name: "Clear cache" })).toBeDisabled();
+  });
+
+  it("says when the web engine cache goes at the next start", async () => {
+    vi.spyOn(api, "cacheClear").mockResolvedValue({ freedKib: 2048, webPending: true });
+    await openSection("Privacy");
+    fireEvent.click(await screen.findByRole("button", { name: "Clear cache" }));
+    fireEvent.click(
+      within(await screen.findByRole("dialog")).getByRole("button", { name: "Clear cache" }),
+    );
+    expect(await screen.findByText(/removed the next time Mumcord starts/)).toBeVisible();
+  });
+
   it("reports a failed cache clean-up", async () => {
     vi.spyOn(api, "previewCacheClear").mockRejectedValue({ kind: "io", message: "x" });
     vi.spyOn(console, "error").mockImplementation(() => undefined);

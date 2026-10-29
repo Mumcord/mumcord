@@ -15,7 +15,7 @@ const HISTORY_EVERY: u64 = 24;
 const MILLIS_PER_DAY: i64 = 24 * 60 * 60 * 1000;
 
 /// Messages sent before this moment are older than `days` days.
-fn history_cutoff(now: UnixMillis, days: u32) -> UnixMillis {
+pub(crate) fn history_cutoff(now: UnixMillis, days: u32) -> UnixMillis {
     now.saturating_sub(i64::from(days).saturating_mul(MILLIS_PER_DAY))
 }
 

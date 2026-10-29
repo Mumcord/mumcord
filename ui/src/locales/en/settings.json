@@ -164,8 +164,8 @@
     "all": "All servers",
     "clearAll": "Clear all history…",
     "confirmTitle": "Clear history?",
-    "confirmServer": "All saved messages from {{server}} will be deleted from this computer. This cannot be undone.",
-    "confirmAll": "All saved messages from every server will be deleted from this computer. This cannot be undone.",
+    "confirmServer": "All saved messages from {{server}} will be deleted from this computer. Other people keep their copies. Their copies won't be synced back to this computer. This cannot be undone.",
+    "confirmAll": "All saved messages from every server will be deleted from this computer. Other people keep their copies. Their copies won't be synced back to this computer. This cannot be undone.",
     "confirm": "Clear history",
     "cleared": "History cleared.",
     "autoDelete": "Delete chat history older than",
@@ -409,6 +409,22 @@
     "never": "Never",
     "clearNow": "Clear now",
     "cleared": "Cache cleared, {{size}} freed."
+  },
+  "cache": {
+    "title": "Cache",
+    "hint": "Mumcord keeps temporary data on this computer so things load faster. Clearing it is safe; it is rebuilt when needed.",
+    "kind": {
+      "previews": "Link previews and images",
+      "webEngine": "Web engine cache",
+      "temp": "Temporary files"
+    },
+    "total": "Total: {{size}}",
+    "calculating": "Calculating…",
+    "clear": "Clear cache",
+    "confirmTitle": "Clear cache?",
+    "confirm": "Only the selected caches are deleted. Your chat history, settings, servers, certificates, friends and notes are not touched.",
+    "cleared": "Cache cleared ({{size}})",
+    "webPending": "The web engine cache is removed the next time Mumcord starts."
   },
   "retention": {
     "days_one": "{{count}} day",

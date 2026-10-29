@@ -657,14 +657,14 @@ impl Engine {
                 };
                 if let UnreadKey::Stored(c) = &key {
                     lock(&store)
-                        .clear_conversation_history(*server_id, c)
+                        .clear_conversation_history(*server_id, c, now_millis())
                         .map_err(store_error)?;
                 }
                 vec![(*server_id, key)]
             }
             HistoryScope::Server(server_id) => {
                 lock(&store)
-                    .clear_server_history(*server_id)
+                    .clear_server_history(*server_id, now_millis())
                     .map_err(store_error)?;
                 lock(&UNREAD)
                     .keys()
@@ -673,7 +673,9 @@ impl Engine {
                     .collect()
             }
             HistoryScope::All => {
-                lock(&store).clear_all_history().map_err(store_error)?;
+                lock(&store)
+                    .clear_all_history(now_millis())
+                    .map_err(store_error)?;
                 lock(&UNREAD).keys().cloned().collect()
             }
         };

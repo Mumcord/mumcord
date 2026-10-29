@@ -164,8 +164,8 @@
     "all": "Kaikki palvelimet",
     "clearAll": "Tyhjennä koko historia…",
     "confirmTitle": "Tyhjennetäänkö historia?",
-    "confirmServer": "Kaikki palvelimen {{server}} tallennetut viestit poistetaan tältä tietokoneelta. Tätä ei voi kumota.",
-    "confirmAll": "Kaikkien palvelimien tallennetut viestit poistetaan tältä tietokoneelta. Tätä ei voi kumota.",
+    "confirmServer": "Kaikki palvelimen {{server}} tallennetut viestit poistetaan tältä tietokoneelta. Muiden kopiot säilyvät. Heidän kopioitaan ei synkronoida takaisin tälle tietokoneelle. Tätä ei voi kumota.",
+    "confirmAll": "Kaikkien palvelimien tallennetut viestit poistetaan tältä tietokoneelta. Muiden kopiot säilyvät. Heidän kopioitaan ei synkronoida takaisin tälle tietokoneelle. Tätä ei voi kumota.",
     "confirm": "Tyhjennä historia",
     "cleared": "Historia tyhjennetty.",
     "autoDelete": "Poista chat-historia, joka on vanhempi kuin",
@@ -409,6 +409,22 @@
     "never": "Ei koskaan",
     "clearNow": "Tyhjennä nyt",
     "cleared": "Välimuisti tyhjennetty, {{size}} vapautettu."
+  },
+  "cache": {
+    "title": "Välimuisti",
+    "hint": "Mumcord tallentaa tälle tietokoneelle väliaikaisia tietoja, jotta kaikki latautuu nopeammin. Niiden tyhjentäminen on turvallista; ne luodaan tarvittaessa uudelleen.",
+    "kind": {
+      "previews": "Linkkien esikatselut ja kuvat",
+      "webEngine": "Selainmoottorin välimuisti",
+      "temp": "Väliaikaiset tiedostot"
+    },
+    "total": "Yhteensä: {{size}}",
+    "calculating": "Lasketaan…",
+    "clear": "Tyhjennä välimuisti",
+    "confirmTitle": "Tyhjennetäänkö välimuisti?",
+    "confirm": "Vain valitut välimuistit poistetaan. Keskusteluhistoriaan, asetuksiin, palvelimiin, varmenteisiin, kavereihin ja muistiinpanoihin ei kosketa.",
+    "cleared": "Välimuisti tyhjennetty ({{size}})",
+    "webPending": "Selainmoottorin välimuisti poistetaan, kun Mumcord käynnistyy seuraavan kerran."
   },
   "retention": {
     "days_one": "{{count}} päivä",

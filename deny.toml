@@ -1,0 +1,71 @@
+# cargo-deny configuration: dependency advisories, licences, duplicate crates and sources.
+# Run `cargo deny check` in the repo root and in scripts/smoke/seed (it has its own lock file); the
+# CI job "Dependency checks" does the same. See CONTRIBUTING.md for what to do when it fails.
+
+[graph]
+# The platforms Mumcord ships for (same list as about.toml), so Windows- or macOS-only crates
+# are checked too.
+targets = [
+    "x86_64-unknown-linux-gnu",
+    "x86_64-pc-windows-msvc",
+    "x86_64-apple-darwin",
+    "aarch64-apple-darwin",
+]
+
+[advisories]
+version = 2
+yanked = "deny"
+# Report unsound crates in the whole tree, not only in our own crates (the default), so the glib
+# advisory below shows up as a visible, tracked exception.
+unsound = "all"
+# Accepted advisories, each with the reason and the issue that tracks it. All are transitive
+# dependencies without a fix we can apply; remove the entry when the dependency is gone.
+ignore = [
+    # Tauri's GTK 3 stack is pinned to gtk-rs 0.18; the fix needs glib 0.20 (#93).
+    { id = "RUSTSEC-2024-0429", reason = "glib 0.18 via Tauri's GTK 3 stack, no compatible fix yet (#93)" },
+    { id = "RUSTSEC-2024-0370", reason = "proc-macro-error via glib-macros 0.18, same GTK 3 stack (#131)" },
+    { id = "RUSTSEC-2024-0436", reason = "paste (unmaintained) via specta and tauri-specta (#131)" },
+    { id = "RUSTSEC-2026-0192", reason = "ttf-parser (unmaintained) via ab_glyph in the game overlay (#131)" },
+    { id = "RUSTSEC-2026-0370", reason = "zvariant (unmaintained) via zbus 5, waiting for zbus 6 in ashpd, ksni and secret-service (#131)" },
+    { id = "RUSTSEC-2026-0371", reason = "zbus_names (unmaintained) via zbus 5 (#131)" },
+    { id = "RUSTSEC-2026-0372", reason = "zvariant_derive (unmaintained) via zbus 5 (#131)" },
+    { id = "RUSTSEC-2023-0071", reason = "rsa Marvin timing attack, no fix released; only used to generate identity keys, no RSA decryption (#131)" },
+]
+
+[licenses]
+version = 2
+# Keep in sync with `accepted` in about.toml (the third-party notices): both lists must allow
+# exactly the same licences, otherwise a dependency could pass one check and fail the other.
+# Not every listed licence is used by every dependency set (e.g. the smoke seed tool).
+unused-allowed-license = "allow"
+allow = [
+    "AGPL-3.0-only",
+    "MIT",
+    "Apache-2.0",
+    "Apache-2.0 WITH LLVM-exception",
+    "BSD-2-Clause",
+    "BSD-3-Clause",
+    "ISC",
+    "Unicode-3.0",
+    "Unicode-DFS-2016",
+    "Zlib",
+    "MPL-2.0",
+    "CC0-1.0",
+    "BSL-1.0",
+    "OpenSSL",
+    "0BSD",
+    "Unlicense",
+    "CDLA-Permissive-2.0",
+]
+
+[bans]
+# Duplicate versions are common in a Tauri tree and not fixable here, so they only warn.
+multiple-versions = "warn"
+wildcards = "allow"
+
+[sources]
+unknown-registry = "deny"
+unknown-git = "deny"
+allow-registry = ["https://github.com/rust-lang/crates.io-index"]
+# The engine's live tests drive bots through mumbot, pinned by tag (crates/engine/Cargo.toml).
+allow-git = ["https://github.com/Mumcord/mumbot"]
