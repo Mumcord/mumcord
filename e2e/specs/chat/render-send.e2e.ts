@@ -131,6 +131,9 @@ describe("chat: rendering and sending (AC-1.13, AC-1.14, AC-1.43)", () => {
       const own = (await messageBodies()).find((body) => body.includes("answer"));
       expect(own).toMatch(/<code class="hljs">/);
       expect(own).toMatch(/<span class="hljs-keyword">const<\/span>/);
+      // Issue #111: the block carries its copy and download buttons.
+      await expect($('.chat-code button[aria-label="Copy code"]')).toExist();
+      await expect($('.chat-code button[aria-label="Download code"]')).toExist();
     } finally {
       listener.stop();
     }

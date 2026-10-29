@@ -224,5 +224,15 @@
     "open": "Ava",
     "openLabel": "Ava {{title}} brauseris",
     "imageLink": "Pilt: {{url}}"
+  },
+  "codeBlock": {
+    "copy": "Kopeeri kood",
+    "copied": "Kopeeritud",
+    "copyFailed": "Koodi ei õnnestunud kopeerida.",
+    "download": "Laadi kood alla",
+    "saved": "Salvestatud",
+    "saveFailed": "Koodi ei õnnestunud salvestada.",
+    "tooLarge": "Kood on allalaadimiseks liiga suur.",
+    "fileType": "Koodifail"
   }
 }

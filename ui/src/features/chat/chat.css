@@ -356,6 +356,69 @@
   background: none;
 }
 
+/* Code block buttons (issue #111) float over the block's corner, so showing them never moves text. */
+.chat-code {
+  position: relative;
+}
+
+.chat-code__actions {
+  position: absolute;
+  top: var(--space-1);
+  right: var(--space-1);
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  opacity: 0;
+  transition: opacity 120ms ease;
+}
+
+.chat-code:hover .chat-code__actions,
+.chat-code__actions:focus-within,
+.chat-code__actions[data-active] {
+  opacity: 1;
+}
+
+@media (hover: none) {
+  .chat-code__actions {
+    opacity: 1;
+  }
+}
+
+.chat-code__status {
+  font-size: 0.75rem;
+  color: var(--color-text-secondary);
+}
+
+.chat-code__status[data-failed] {
+  color: var(--color-danger);
+}
+
+.chat-code__button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.75rem;
+  height: 1.75rem;
+  padding: 0;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: var(--color-bg-elevated);
+  color: var(--color-text-secondary);
+  cursor: pointer;
+}
+
+.chat-code__button:hover {
+  border-color: var(--color-border-strong);
+  background: var(--color-bg-hover);
+  color: var(--color-text);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .chat-code__actions {
+    transition: none;
+  }
+}
+
 /* Syntax colors (FR-1.53) reuse theme tokens so both themes keep readable contrast. */
 .hljs-keyword,
 .hljs-selector-tag,

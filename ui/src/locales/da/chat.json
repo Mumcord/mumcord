@@ -224,5 +224,15 @@
     "open": "Åbn",
     "openLabel": "Åbn {{title}} i browseren",
     "imageLink": "Billede: {{url}}"
+  },
+  "codeBlock": {
+    "copy": "Kopiér kode",
+    "copied": "Kopieret",
+    "copyFailed": "Koden kunne ikke kopieres.",
+    "download": "Download kode",
+    "saved": "Gemt",
+    "saveFailed": "Koden kunne ikke gemmes.",
+    "tooLarge": "Koden er for stor til at downloade.",
+    "fileType": "Kodefil"
   }
 }

@@ -232,5 +232,15 @@
     "open": "Atidaryti",
     "openLabel": "Atidaryti {{title}} naršyklėje",
     "imageLink": "Paveikslėlis: {{url}}"
+  },
+  "codeBlock": {
+    "copy": "Kopijuoti kodą",
+    "copied": "Nukopijuota",
+    "copyFailed": "Nepavyko nukopijuoti kodo.",
+    "download": "Atsisiųsti kodą",
+    "saved": "Išsaugota",
+    "saveFailed": "Nepavyko išsaugoti kodo.",
+    "tooLarge": "Kodas per didelis atsisiųsti.",
+    "fileType": "Kodo failas"
   }
 }

@@ -228,5 +228,15 @@
     "open": "Atvērt",
     "openLabel": "Atvērt {{title}} pārlūkā",
     "imageLink": "Attēls: {{url}}"
+  },
+  "codeBlock": {
+    "copy": "Kopēt kodu",
+    "copied": "Nokopēts",
+    "copyFailed": "Kodu neizdevās nokopēt.",
+    "download": "Lejupielādēt kodu",
+    "saved": "Saglabāts",
+    "saveFailed": "Kodu neizdevās saglabāt.",
+    "tooLarge": "Kods ir pārāk liels lejupielādei.",
+    "fileType": "Koda fails"
   }
 }

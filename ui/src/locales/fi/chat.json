@@ -224,5 +224,15 @@
     "open": "Avaa",
     "openLabel": "Avaa {{title}} selaimessa",
     "imageLink": "Kuva: {{url}}"
+  },
+  "codeBlock": {
+    "copy": "Kopioi koodi",
+    "copied": "Kopioitu",
+    "copyFailed": "Koodin kopiointi epäonnistui.",
+    "download": "Lataa koodi",
+    "saved": "Tallennettu",
+    "saveFailed": "Koodin tallennus epäonnistui.",
+    "tooLarge": "Koodi on liian suuri ladattavaksi.",
+    "fileType": "Kooditiedosto"
   }
 }

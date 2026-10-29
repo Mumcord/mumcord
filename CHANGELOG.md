@@ -2,6 +2,10 @@
 
 ## [0.4.4] - Unreleased
 
+### Added
+
+- Code blocks in chat messages have Copy and Download buttons in their corner, shown on hover and keyboard focus: Copy puts the plain code on the clipboard, Download saves it as `snippet.<ext>` named after the detected language (`.txt` if unknown) (#111)
+
 ### Changed
 
 - The post-release changelog step no longer adds a second empty "Unreleased" section when the next version already has an open "X.Y.Z - Unreleased" section, and the release notes fall back to a plain "Unreleased" section

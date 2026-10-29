@@ -224,5 +224,15 @@
     "open": "Öffnen",
     "openLabel": "{{title}} im Browser öffnen",
     "imageLink": "Bild: {{url}}"
+  },
+  "codeBlock": {
+    "copy": "Code kopieren",
+    "copied": "Kopiert",
+    "copyFailed": "Der Code konnte nicht kopiert werden.",
+    "download": "Code herunterladen",
+    "saved": "Gespeichert",
+    "saveFailed": "Der Code konnte nicht gespeichert werden.",
+    "tooLarge": "Der Code ist zu groß zum Herunterladen.",
+    "fileType": "Code-Datei"
   }
 }
