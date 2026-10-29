@@ -538,6 +538,41 @@ describe("MessageList replies", () => {
       expect(writeText).toHaveBeenCalledWith("third");
     });
 
+    it("keeps the selection highlighted while the menu is open and after Copy (#135)", () => {
+      // WebKitGTK collapses the selection when a menu button takes the focus.
+      const focus = vi.spyOn(HTMLElement.prototype, "focus").mockImplementation(() => {
+        window.getSelection()?.removeAllRanges();
+      });
+      renderReplies(MESSAGES);
+      const second = bodyText("second");
+      select(second, 1, second, 4);
+      fireEvent.contextMenu(screen.getAllByRole("listitem")[1] as HTMLElement, {
+        clientX: 10,
+        clientY: 10,
+      });
+      expect(window.getSelection()?.toString()).toBe("eco");
+      const copy = vi.spyOn(getApi(), "copyText").mockResolvedValue(null);
+      fireEvent.click(screen.getByRole("menuitem", { name: "Copy" }));
+      expect(copy).toHaveBeenCalledWith("eco");
+      expect(window.getSelection()?.toString()).toBe("eco");
+      copy.mockRestore();
+      focus.mockRestore();
+    });
+
+    it("clears the selection again on a click elsewhere", () => {
+      renderReplies(MESSAGES);
+      const second = bodyText("second");
+      select(second, 1, second, 4);
+      fireEvent.contextMenu(screen.getAllByRole("listitem")[1] as HTMLElement, {
+        clientX: 10,
+        clientY: 10,
+      });
+      window.getSelection()?.removeAllRanges();
+      fireEvent.pointerDown(document.body);
+      expect(screen.queryByRole("menu")).toBeNull();
+      expect(window.getSelection()?.toString()).toBe("");
+    });
+
     it("tells the user when copying fails", async () => {
       const writeText = vi.fn().mockRejectedValue(new Error("denied"));
       Object.defineProperty(navigator, "clipboard", { value: { writeText }, configurable: true });
