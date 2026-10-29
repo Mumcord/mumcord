@@ -123,6 +123,12 @@ export const commands = {
 	 */
 	clipboardFiles: () => typedError<string[], ApiError>(__TAURI_INVOKE("clipboard_files")),
 	/**
+	 *  The image data copied to the clipboard, for a paste the webview cannot hand over (issue
+	 *  #110); `null` when the clipboard holds none. Fails with `messageTooLarge` above 25 MB and
+	 *  `invalidInput` when the data is not a PNG image.
+	 */
+	clipboardImage: () => typedError<DroppedImage | null, ApiError>(__TAURI_INVOKE("clipboard_image")),
+	/**
 	 *  Keeps the full image of a picture about to be sent (the original file as a `data:` URL;
 	 *  re-encoded when larger than 512 KiB or 3840 px) and returns the reference to put into the
 	 *  thumbnail's `data-mumcord-full` attribute. Errors: `invalidInput` for anything that is not

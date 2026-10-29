@@ -5,7 +5,8 @@
 //! file contents with `read_dropped_image`. To keep that from becoming a way to read any
 //! file, only paths that were just dropped onto the main window may be read, each once.
 //! A paste works the same way: `clipboard_files` reads the copied paths from the system
-//! clipboard (never from the UI) and allows them like dropped ones.
+//! clipboard (never from the UI) and allows them like dropped ones. Copied image data
+//! without a file behind it, such as a screenshot, comes from `clipboard_image` (issue #110).
 
 use std::collections::HashMap;
 use std::fs::File;
@@ -225,6 +226,63 @@ pub async fn clipboard_files(
         .collect())
 }
 
+/// Reads PNG data from the clipboard, empty when it holds none. The WebKitGTK bundled in the
+/// AppImage hands the page nothing on paste for copied image data (issue #110). Screenshot
+/// tools and browsers all offer PNG, so no other format is asked for.
+#[cfg(target_os = "linux")]
+async fn copied_png(app: &AppHandle) -> ApiResult<Vec<u8>> {
+    let (tx, rx) = tokio::sync::oneshot::channel();
+    app.run_on_main_thread(move || {
+        let png = gdk::Atom::intern("image/png");
+        gtk::Clipboard::get(&gdk::SELECTION_CLIPBOARD).request_contents(&png, move |_, data| {
+            // Fails only when the command was cancelled; nobody waits for the data then.
+            let _ = tx.send(data.data());
+        });
+    })
+    .map_err(|e| ApiError::new(ErrorCode::Internal, e.to_string()))?;
+    rx.await
+        .map_err(|_| ApiError::new(ErrorCode::Io, "the clipboard did not answer"))
+}
+
+/// WebView2 and WKWebView hand pasted image data to the page as a `File`, so the UI does
+/// not need this there.
+#[cfg(not(target_os = "linux"))]
+async fn copied_png(_app: &AppHandle) -> ApiResult<Vec<u8>> {
+    Ok(Vec::new())
+}
+
+fn clipboard_png(bytes: Vec<u8>) -> ApiResult<Option<DroppedImage>> {
+    if bytes.is_empty() {
+        return Ok(None);
+    }
+    if bytes.len() as u64 > MAX_DROPPED_BYTES {
+        return Err(too_large());
+    }
+    if sniff_image(&bytes) != Some("image/png") {
+        return Err(ApiError::new(
+            ErrorCode::InvalidInput,
+            "not a supported image",
+        ));
+    }
+    Ok(Some(DroppedImage {
+        name: "image.png".to_owned(),
+        mime: "image/png".to_owned(),
+        data: STANDARD.encode(&bytes),
+    }))
+}
+
+/// The image data copied to the clipboard, for a paste the webview cannot hand over (issue
+/// #110); `null` when the clipboard holds none. Fails with `messageTooLarge` above 25 MB and
+/// `invalidInput` when the data is not a PNG image.
+#[tauri::command]
+#[specta::specta]
+pub async fn clipboard_image(app: AppHandle) -> ApiResult<Option<DroppedImage>> {
+    let bytes = copied_png(&app).await.inspect_err(|e| {
+        tracing::warn!(code = ?e.code, "reading the copied image from the clipboard failed");
+    })?;
+    clipboard_png(bytes)
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -244,6 +302,30 @@ mod tests {
             .and_then(|mut f| f.write_all(contents))
             .expect("write temp file");
         (dir, path)
+    }
+
+    #[test]
+    fn takes_png_data_from_the_clipboard() {
+        assert_eq!(
+            clipboard_png(Vec::new()).expect("no data is no error"),
+            None
+        );
+        let image = clipboard_png(PNG.to_vec())
+            .expect("png data is taken")
+            .expect("png data is an image");
+        assert_eq!(image.name, "image.png");
+        assert_eq!(image.mime, "image/png");
+        assert_eq!(STANDARD.decode(image.data).expect("base64"), PNG);
+    }
+
+    #[test]
+    fn refuses_clipboard_data_that_is_no_png_or_too_large() {
+        let err = clipboard_png(b"<html>".to_vec()).expect_err("html is refused");
+        assert_eq!(err.code, ErrorCode::InvalidInput);
+        let mut big = PNG.to_vec();
+        big.resize(usize::try_from(MAX_DROPPED_BYTES).expect("fits") + 1, 0);
+        let err = clipboard_png(big).expect_err("too large is refused");
+        assert_eq!(err.code, ErrorCode::MessageTooLarge);
     }
 
     #[test]
