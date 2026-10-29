@@ -80,18 +80,18 @@ GNU Affero General Public License v3.0 only
 --------------------------------------------------------------------------------
 
 Used by:
-  - mumcord-audio 0.4.2 (https://github.com/Mumcord/mumcord)
-  - mumcord-codec 0.4.2 (https://github.com/Mumcord/mumcord)
-  - mumcord-engine 0.4.2
-  - mumcord-overlay-ipc 0.4.2
-  - mumcord-overlay-layer 0.4.2
-  - mumcord-p2p 0.4.2 (https://github.com/Mumcord/mumcord)
-  - mumcord-positional 0.4.2
-  - mumcord-protocol 0.4.2 (https://github.com/Mumcord/mumcord)
-  - mumcord-screenshare 0.4.2
-  - mumcord-store 0.4.2 (https://github.com/Mumcord/mumcord)
-  - mumcord 0.4.2
-  - netsim 0.4.2
+  - mumcord-audio 0.4.3 (https://github.com/Mumcord/mumcord)
+  - mumcord-codec 0.4.3 (https://github.com/Mumcord/mumcord)
+  - mumcord-engine 0.4.3
+  - mumcord-overlay-ipc 0.4.3
+  - mumcord-overlay-layer 0.4.3
+  - mumcord-p2p 0.4.3 (https://github.com/Mumcord/mumcord)
+  - mumcord-positional 0.4.3
+  - mumcord-protocol 0.4.3 (https://github.com/Mumcord/mumcord)
+  - mumcord-screenshare 0.4.3
+  - mumcord-store 0.4.3 (https://github.com/Mumcord/mumcord)
+  - mumcord 0.4.3
+  - netsim 0.4.3
 
 GNU AFFERO GENERAL PUBLIC LICENSE
 Version 3, 19 November 2007
