@@ -166,7 +166,8 @@ describe("diagnostics and about (AC-1.28, AC-1.29)", () => {
     await current.waitForDisplayed();
     const first = $("//button[@aria-expanded][.//span[normalize-space()='0.1.0']]");
     expect(await first.getAttribute("aria-expanded")).toBe("false");
-    await $("input[type=search]").setValue("First release");
+    // WebDriver's setValue does not reach React's onChange in WebKitGTK; typing does.
+    await typeInto("input[type=search]", "First release");
     await browser.waitUntil(async () => (await first.getAttribute("aria-expanded")) === "true", {
       timeout: 5_000,
       timeoutMsg: "the search did not open the matching version",
