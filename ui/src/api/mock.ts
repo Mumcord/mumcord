@@ -1484,6 +1484,7 @@ export function createMockApi(options: MockOptions = {}): MockApi {
       return Promise.resolve(null);
     },
     saveImage: () => Promise.resolve(null),
+    copyImage: () => Promise.resolve(null),
     saveText: () => Promise.resolve(null),
     // The browser has no native file drops; dropped files arrive as `File` objects instead.
     readDroppedImage: () =>

@@ -118,8 +118,76 @@ pub(crate) fn rfc3339(millis: i64) -> String {
 #[tauri::command]
 #[specta::specta]
 pub async fn save_image(path: String, data_url: String) -> ApiResult<()> {
-    let bytes = decode_image_data_url(&data_url)?;
+    let bytes = limited_image_bytes(&data_url)?;
     std::fs::write(&path, bytes).map_err(|err| ApiError::new(ErrorCode::Io, err.to_string()))
+}
+
+/// Largest image "Copy image" and "Save image" take (issue #115): well above the largest
+/// full-size image Mumcord users share, small enough that decoding stays quick.
+pub(crate) const MAX_IMAGE_BYTES: usize = 50 * 1024 * 1024;
+
+/// Width or height above which "Copy image" refuses to decode: the clipboard gets raw pixels.
+const MAX_COPY_EDGE: u32 = 16_384;
+
+/// Memory the decoder may use for one copied image.
+const MAX_COPY_ALLOC: u64 = 512 * 1024 * 1024;
+
+/// The bytes of an image `data:` URL, refused with `messageTooLarge` above `MAX_IMAGE_BYTES`.
+fn limited_image_bytes(data_url: &str) -> Result<Vec<u8>, ApiError> {
+    let too_large = || ApiError::new(ErrorCode::MessageTooLarge, "image too large");
+    // Base64 needs 4 characters per 3 bytes; checked before decoding anything.
+    if data_url.len() / 4 * 3 > MAX_IMAGE_BYTES + 3 {
+        return Err(too_large());
+    }
+    let bytes = decode_image_data_url(data_url)?;
+    if bytes.len() > MAX_IMAGE_BYTES {
+        return Err(too_large());
+    }
+    Ok(bytes)
+}
+
+/// The pixels of an image `data:` URL for the clipboard. Clipboards rarely take animations, so
+/// a GIF gives its first frame.
+fn clipboard_pixels(data_url: &str) -> Result<tauri::image::Image<'static>, ApiError> {
+    let bytes = limited_image_bytes(data_url)?;
+    let invalid = || ApiError::new(ErrorCode::InvalidInput, "not a readable image");
+    let mut reader = image::ImageReader::new(std::io::Cursor::new(bytes))
+        .with_guessed_format()
+        .map_err(|_| invalid())?;
+    let mut limits = image::Limits::default();
+    limits.max_image_width = Some(MAX_COPY_EDGE);
+    limits.max_image_height = Some(MAX_COPY_EDGE);
+    limits.max_alloc = Some(MAX_COPY_ALLOC);
+    reader.limits(limits);
+    let decoded = reader.decode().map_err(|err| match err {
+        image::ImageError::Limits(_) => {
+            ApiError::new(ErrorCode::MessageTooLarge, "image too large")
+        }
+        _ => invalid(),
+    })?;
+    let rgba = decoded.into_rgba8();
+    let (width, height) = rgba.dimensions();
+    Ok(tauri::image::Image::new_owned(
+        rgba.into_raw(),
+        width,
+        height,
+    ))
+}
+
+/// Puts the image of a `data:` URL on the system clipboard as image data ("Copy image", issue
+/// #115). Fails with `messageTooLarge` above the size limits, `invalidInput` when the data is not
+/// a readable image and `io` when the clipboard does not take it.
+#[tauri::command]
+#[specta::specta]
+pub async fn copy_image(app: tauri::AppHandle, data_url: String) -> ApiResult<()> {
+    use tauri_plugin_clipboard_manager::ClipboardExt as _;
+    let pixels = clipboard_pixels(&data_url).inspect_err(|e| {
+        tracing::warn!(code = ?e.code, "copying an image failed");
+    })?;
+    app.clipboard().write_image(&pixels).map_err(|_| {
+        tracing::warn!("the clipboard did not take the copied image");
+        ApiError::new(ErrorCode::Io, "the clipboard did not take the image")
+    })
 }
 
 /// Largest text `save_text` writes; matches the UI's limit for downloading a code block.
@@ -151,7 +219,12 @@ pub(crate) fn decode_image_data_url(data_url: &str) -> Result<Vec<u8>, ApiError>
 
 #[cfg(test)]
 mod tests {
-    use super::{MAX_TEXT_BYTES, decode_image_data_url, rfc3339, save_text};
+    use super::{
+        MAX_IMAGE_BYTES, MAX_TEXT_BYTES, clipboard_pixels, decode_image_data_url,
+        limited_image_bytes, rfc3339, save_text,
+    };
+    use crate::commands::types::ErrorCode;
+    use base64::Engine as _;
 
     #[test]
     fn formats_rfc3339() {
@@ -184,5 +257,71 @@ mod tests {
         );
         assert!(save_text(path_text, "x".repeat(MAX_TEXT_BYTES + 1)).is_err());
         std::fs::remove_dir_all(&dir).expect("remove temp dir");
+    }
+
+    fn data_url(mime: &str, bytes: &[u8]) -> String {
+        format!(
+            "data:{mime};base64,{}",
+            base64::engine::general_purpose::STANDARD.encode(bytes)
+        )
+    }
+
+    fn encoded(image: &image::RgbaImage, format: image::ImageFormat) -> Vec<u8> {
+        let mut out = std::io::Cursor::new(Vec::new());
+        image.write_to(&mut out, format).expect("encode test image");
+        out.into_inner()
+    }
+
+    #[test]
+    fn copies_the_pixels_of_png_and_jpeg() {
+        let png = image::RgbaImage::from_pixel(3, 2, image::Rgba([10, 20, 30, 255]));
+        let pixels = clipboard_pixels(&data_url(
+            "image/png",
+            &encoded(&png, image::ImageFormat::Png),
+        ))
+        .expect("png decodes");
+        assert_eq!((pixels.width(), pixels.height()), (3, 2));
+        assert_eq!(&pixels.rgba()[..4], &[10, 20, 30, 255]);
+        let rgb = image::DynamicImage::ImageRgba8(png).into_rgb8();
+        let mut jpeg = std::io::Cursor::new(Vec::new());
+        rgb.write_to(&mut jpeg, image::ImageFormat::Jpeg)
+            .expect("encode jpeg");
+        let pixels =
+            clipboard_pixels(&data_url("image/jpeg", &jpeg.into_inner())).expect("jpeg decodes");
+        assert_eq!((pixels.width(), pixels.height()), (3, 2));
+    }
+
+    #[test]
+    fn copies_the_first_frame_of_a_gif() {
+        use image::codecs::gif::GifEncoder;
+        let red = image::RgbaImage::from_pixel(2, 2, image::Rgba([255, 0, 0, 255]));
+        let blue = image::RgbaImage::from_pixel(2, 2, image::Rgba([0, 0, 255, 255]));
+        let mut gif = Vec::new();
+        {
+            let mut encoder = GifEncoder::new(&mut gif);
+            encoder
+                .encode_frames([image::Frame::new(red), image::Frame::new(blue)])
+                .expect("encode gif");
+        }
+        let pixels = clipboard_pixels(&data_url("image/gif", &gif)).expect("gif decodes");
+        assert_eq!(&pixels.rgba()[..4], &[255, 0, 0, 255]);
+    }
+
+    #[test]
+    fn refuses_unreadable_and_oversized_images() {
+        let err = clipboard_pixels(&data_url("image/png", b"not a png")).expect_err("garbage");
+        assert_eq!(err.code, ErrorCode::InvalidInput);
+        let big = "A".repeat((MAX_IMAGE_BYTES + 6) / 3 * 4);
+        let err =
+            limited_image_bytes(&format!("data:image/png;base64,{big}")).expect_err("too large");
+        assert_eq!(err.code, ErrorCode::MessageTooLarge);
+        // A huge canvas in a tiny file must not make the decoder allocate gigabytes.
+        let wide = image::RgbaImage::new(20_000, 1);
+        let err = clipboard_pixels(&data_url(
+            "image/png",
+            &encoded(&wide, image::ImageFormat::Png),
+        ))
+        .expect_err("too wide");
+        assert_eq!(err.code, ErrorCode::MessageTooLarge);
     }
 }

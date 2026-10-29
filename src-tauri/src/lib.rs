@@ -89,6 +89,7 @@ fn specta_builder() -> Builder<tauri::Wry> {
             chat::send_channel_message,
             chat::send_private_message,
             chat::save_image,
+            chat::copy_image,
             chat::save_text,
             dropped::read_dropped_image,
             dropped::clipboard_files,
@@ -281,6 +282,7 @@ pub fn run() {
         .plugin(tauri_plugin_deep_link::init())
         .plugin(tauri_plugin_global_shortcut::Builder::new().build())
         .plugin(tauri_plugin_dialog::init())
+        .plugin(tauri_plugin_clipboard_manager::init())
         .invoke_handler(move |call| {
             let label = call.message.webview_ref().label().to_owned();
             if !inspector_window::command_allowed(&label, call.message.command()) {
