@@ -1,7 +1,7 @@
 // UI and bot helpers for the chat/follow specs (e2e/specs/chat, AC-1.13–AC-1.18).
 import { chmodSync, mkdirSync, readFileSync, statSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
-import { browser, $, $$ } from "@wdio/globals";
+import { browser, expect, $, $$ } from "@wdio/globals";
 import { botInBackground, type BackgroundBot, type BotOptions } from "./bot.ts";
 import { artifactsDir } from "./paths.ts";
 import { nextToLastWizardStep } from "./wizard-util.ts";
@@ -304,4 +304,20 @@ export class OutputWav {
 
 export function sleep(ms: number): Promise<void> {
   return new Promise((r) => setTimeout(r, ms));
+}
+
+/**
+ * Checks that an engine image is shown through a `blob:` URL (issue #109: no long `data:` URL in
+ * `<img src>`) and was actually decoded. Never a web address: the webview loads nothing itself.
+ */
+export async function expectBlobImage(img: ReturnType<typeof $>): Promise<void> {
+  await expect(img).toHaveAttribute("src", expect.stringMatching(/^blob:/));
+  await browser.waitUntil(
+    async () =>
+      browser.execute(
+        (el: HTMLElement) => el instanceof HTMLImageElement && el.complete && el.naturalWidth > 0,
+        await img.getElement(),
+      ),
+    { timeout: 10_000, timeoutMsg: "image not decoded" },
+  );
 }

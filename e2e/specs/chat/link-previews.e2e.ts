@@ -5,6 +5,7 @@ import { browser, expect, $, $$ } from "@wdio/globals";
 import { app, bot, botInBackground, testenv } from "../../helpers/index.ts";
 import {
   addFirstServer,
+  expectBlobImage,
   finishWizard,
   installOpenerStub,
   joinChannel,
@@ -189,16 +190,14 @@ describe("chat: link previews, player cards and inline images (AC-1.39, AC-1.40,
     const png = inlineImage("photo.png");
     await gif.waitForDisplayed({ timeout: 15_000 });
     await png.waitForDisplayed({ timeout: 15_000 });
-    // The animation reaches the webview unchanged; the still image is re-encoded by the engine.
-    await expect(gif.$("img")).toHaveAttribute("src", expect.stringMatching(/^data:image\/gif;base64,/));
-    await expect(png.$("img")).toHaveAttribute(
-      "src",
-      expect.stringMatching(/^data:image\/(png|jpeg);base64,/),
-    );
+    // Both are shown through blob: URLs of the engine's bytes (#109), so the type is not visible
+    // here; the engine tests check that the animation passes unchanged and stills are re-encoded.
+    await expectBlobImage(gif.$("img"));
+    await expectBlobImage(png.$("img"));
     const remote = await browser.execute(
       () =>
         Array.from(document.querySelectorAll(".chat-list__items img")).filter(
-          (i) => !(i.getAttribute("src") ?? "").startsWith("data:"),
+          (i) => !/^(data|blob):/.test(i.getAttribute("src") ?? ""),
         ).length,
     );
     expect(remote).toBe(0);
@@ -264,10 +263,7 @@ describe("chat: link previews, player cards and inline images (AC-1.39, AC-1.40,
     const picker = $("[role='dialog'][aria-label='GIF favorites']");
     await picker.waitForDisplayed();
     const choose = picker.$("button[aria-label='Send anim.gif']");
-    await expect(choose.$("img")).toHaveAttribute(
-      "src",
-      expect.stringMatching(/^data:image\/gif;base64,/),
-    );
+    await expectBlobImage(choose.$("img"));
     await choose.click();
     await listener.done;
     await picker.waitForDisplayed({ reverse: true });

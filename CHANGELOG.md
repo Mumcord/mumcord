@@ -10,13 +10,18 @@
 ### Changed
 
 - The post-release changelog step no longer adds a second empty "Unreleased" section when the next version already has an open "X.Y.Z - Unreleased" section, and the release notes fall back to a plain "Unreleased" section
-
 - After a release is published, a workflow opens a pull request that writes the released version into the manifests and lock files and regenerates the third-party notices and dates the changelog section, so `main` no longer stays on the previous version and a release needs no pull request beforehand; the release notes take their "What's new" from the changelog
 
 ### Fixed
 
 - Deleted chat history no longer comes back through history sync when you rejoin: clearing a channel, a server or all history (and the automatic deletion after N days) now also limits what is fetched from other Mumcord users' copies, and the confirmation says that others keep their copies (issue #119)
+- In the compact chat layout, the shared theme card no longer draws its title over the thumbnail, and message cards and image transfer bars no longer shift left; the theme card fits its content and shrinks cleanly on narrow windows (#121)
+- Large GIPHY GIFs no longer slow the whole app down: the chat now shows GIPHY's downsized GIF, sized for the chat box, instead of the full-size WebP, which kept the renderer about four times as busy while it played. GIFs already cached from earlier messages are fetched again in the lighter format, and moving the mouse over a large GIF no longer keeps a CPU core busy (#109)
 - Pasting copied image data, such as a Spectacle screenshot or "Copy image" in a browser, attaches the image again on Linux; the WebKitGTK bundled in the AppImage hands such a paste nothing, so the image is now read from the system clipboard (issue #110)
+
+### Internal
+
+- CI checks dependencies for known security advisories, disallowed licences and unknown sources with cargo-deny (`deny.toml`, same licence list as the third-party notices) and runs `npm audit` for production packages, on every pull request and weekly on `main`. Accepted advisories are listed with a reason and an issue (#103)
 
 ## [0.4.3] - 2026-10-28
 

@@ -303,6 +303,30 @@ describe("themes (AC-2.12 – AC-2.16)", function () {
     });
   });
 
+  it("compact chat layout keeps the theme card's title clear of its thumbnail", async () => {
+    // The layout is pure CSS keyed on this attribute, so switching it directly avoids the settings round trip.
+    await browser.execute(() => {
+      document.querySelector(".chat-list__items")?.setAttribute("data-display", "compact");
+    });
+    try {
+      const gap = await browser.execute(() => {
+        const card = document.querySelector(".theme-card");
+        const mock = card?.querySelector(".theme-card__mock")?.getBoundingClientRect();
+        const name = card?.querySelector(".theme-card__name")?.getBoundingClientRect();
+        const bounds = card?.getBoundingClientRect();
+        if (!mock || !name || !bounds) return null;
+        return { title: name.left - mock.right, inside: name.right <= bounds.right && mock.left >= bounds.left };
+      });
+      expect(gap).not.toBeNull();
+      expect(gap?.title).toBeGreaterThanOrEqual(0);
+      expect(gap?.inside).toBe(true);
+    } finally {
+      await browser.execute(() => {
+        document.querySelector(".chat-list__items")?.setAttribute("data-display", "cozy");
+      });
+    }
+  });
+
   it("AC-2.15: primary buttons glow; the Visual effects switch turns glass and grain off", async () => {
     await appearance();
     await openEditorFromCurrent();

@@ -36,6 +36,12 @@ jobs:
           GH_TOKEN: ${{ github.token }}
           PR_NUMBER: ${{ github.event.pull_request.number }}
 
+  # Always runs, outside the changes gate: a pull request that only bumps a lockfile or adds a
+  # crate should still be checked. The same workflow runs weekly on main (dependency-audit.yml).
+  dependencies:
+    name: Dependency checks
+    uses: ./.github/workflows/dependency-audit.yml
+
   build-test:
     name: Build and test (${{ matrix.os }})
     needs: changes
