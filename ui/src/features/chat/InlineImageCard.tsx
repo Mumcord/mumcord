@@ -9,7 +9,7 @@ import { useTranslation } from "react-i18next";
 import type { InlineImage } from "../../api";
 import { DismissButton, OpenButton } from "./cardButtons";
 import { dismissPreview } from "./dismissedPreviews";
-import { displaySrc } from "./displaySrc";
+import { useDisplaySrc } from "./displaySrc";
 import { GifAttribution } from "./GifAttribution";
 import { removeFavorite, saveFavorite, useGifFavorites } from "./favorites";
 import { markInlineShown } from "./inlineLinks";
@@ -44,6 +44,7 @@ export function InlineImageCard({ url, messageId, tabIndex, onImageClick }: Inli
     };
   }, [url]);
   const visible = image !== undefined && image !== null && SAFE_SRC.test(image.src);
+  const src = useDisplaySrc(visible ? image.src : undefined);
   useEffect(() => {
     if (!visible) return;
     return markInlineShown(messageId, url);
@@ -130,7 +131,7 @@ export function InlineImageCard({ url, messageId, tabIndex, onImageClick }: Inli
       >
         <img
           className="inline-image__img"
-          src={displaySrc(image.src)}
+          src={src}
           alt=""
           draggable={false}
           data-image-url={image.url}

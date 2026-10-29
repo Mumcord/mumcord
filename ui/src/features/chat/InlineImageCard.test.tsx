@@ -273,7 +273,8 @@ describe("image viewer in the chat", () => {
     fireEvent.click(view);
     expect(screen.getByText("2 / 2")).toBeInTheDocument();
     // The viewer gets the engine's data: URL (it saves from it), not the card's blob: URL.
-    expect(document.querySelector(".image-viewer__img")).toHaveAttribute("src", GIF.src);
+    const shown = document.querySelector(".image-viewer__img")?.getAttribute("src") ?? "";
+    expect(originalSrc(shown)).toBe(GIF.src);
     fireEvent.keyDown(screen.getByRole("dialog"), { key: "Escape" });
     await waitFor(() => {
       expect(view).toHaveFocus();

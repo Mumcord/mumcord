@@ -10,7 +10,7 @@ import { useHintPreferences } from "../../a11y/hintPreferences";
 import type { InlineImage } from "../../api";
 import { GifAttribution } from "./GifAttribution";
 import { markFavoriteUsed, removeFavorite, useGifFavorites } from "./favorites";
-import { displaySrc } from "./displaySrc";
+import { useDisplaySrc } from "./displaySrc";
 import { imageName, loadInlineImage } from "./links";
 
 const COLUMNS = 4;
@@ -47,11 +47,14 @@ function Thumbnail({ url, linkPreviews }: { url: string; linkPreviews: boolean }
       active = false;
     };
   }, [url, linkPreviews, visible]);
+  const src = useDisplaySrc(
+    linkPreviews && visible && image && SAFE_SRC.test(image.src) ? image.src : undefined,
+  );
   // The wrapper stays mounted so the observer keeps watching after the image has loaded.
   return (
     <span ref={holder} className="gif-picker__thumb">
-      {linkPreviews && visible && image && SAFE_SRC.test(image.src) ? (
-        <img className="gif-picker__img" src={displaySrc(image.src)} alt="" draggable={false} />
+      {src !== undefined ? (
+        <img className="gif-picker__img" src={src} alt="" draggable={false} />
       ) : (
         <span className="gif-picker__placeholder" aria-hidden="true">
           {imageName(url)}
