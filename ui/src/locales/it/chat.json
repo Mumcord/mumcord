@@ -237,6 +237,7 @@
     "saved": "Salvato",
     "saveFailed": "Impossibile salvare il codice.",
     "tooLarge": "Il codice è troppo grande per essere scaricato.",
-    "fileType": "File di codice"
+    "fileType": "File di codice",
+    "plainText": "Testo semplice"
   }
 }

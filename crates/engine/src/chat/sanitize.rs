@@ -6,7 +6,8 @@
 //! the UI never puts them into the page but asks the engine to fetch them (FR-1.55, QA.35)
 //! when link previews are on. Comments and welcome texts never keep them. Message images also
 //! keep a valid full-image reference ([`crate::full_image::wire::ATTRIBUTE`], FR-1.60c) and the
-//! message card marker ([`CARD_ATTRIBUTE`] on `<div>`, issue #72), which the UI parses strictly.
+//! message card marker ([`CARD_ATTRIBUTE`] on `<div>`, issue #72), which the UI parses strictly,
+//! and the code block language ([`CODE_LANGUAGE_ATTRIBUTE`] on `<pre>`, issue #112).
 
 use std::borrow::Cow;
 use std::collections::{HashMap, HashSet};
@@ -58,6 +59,9 @@ const TAGS: &[&str] = &[
 /// Marks a message card and its text (docs/message-cards.md); plain data for the UI.
 pub const CARD_ATTRIBUTE: &str = "data-mumcord-card";
 
+/// The language of a ``` code block (`sql`, `c++`); kept only in that shape.
+pub const CODE_LANGUAGE_ATTRIBUTE: &str = "data-mumcord-lang";
+
 const IMAGE_TYPES: &[&str] = &["png", "jpeg", "gif", "webp"];
 
 static POLICY: LazyLock<Builder<'static>> = LazyLock::new(|| policy(false));
@@ -74,6 +78,7 @@ fn policy(message: bool) -> Builder<'static> {
     ]);
     if message {
         tag_attributes.insert("div", HashSet::from([CARD_ATTRIBUTE]));
+        tag_attributes.insert("pre", HashSet::from([CODE_LANGUAGE_ATTRIBUTE]));
     }
     let mut builder = Builder::empty();
     builder
@@ -91,6 +96,9 @@ fn policy(message: bool) -> Builder<'static> {
                 ("img", FULL_ATTRIBUTE) => FullRef::parse(value, MAX_BYTES)
                     .is_some()
                     .then_some(Cow::Borrowed(value)),
+                ("pre", CODE_LANGUAGE_ATTRIBUTE) => {
+                    is_code_language(value).then_some(Cow::Borrowed(value))
+                }
                 ("a", "href") if value.trim_start().to_ascii_lowercase().starts_with("data:") => {
                     None
                 }
@@ -109,6 +117,16 @@ pub fn sanitize_html(html: &str) -> String {
 /// so the UI can show them through the engine's guarded fetch.
 pub fn sanitize_message_html(html: &str) -> String {
     MESSAGE_POLICY.clean(html).to_string()
+}
+
+/// Same rule as the UI's `CODE_LANGUAGE`: a lowercase name of at most 32 characters.
+fn is_code_language(value: &str) -> bool {
+    let mut chars = value.chars();
+    chars
+        .next()
+        .is_some_and(|c| c.is_ascii_lowercase() || c.is_ascii_digit())
+        && value.len() <= 32
+        && chars.all(|c| c.is_ascii_lowercase() || c.is_ascii_digit() || "+#._-".contains(c))
 }
 
 fn is_external_image(src: &str) -> bool {
@@ -228,6 +246,24 @@ mod tests {
         assert_eq!(
             sanitize_message_html("<span data-mumcord-card=\"body\">x</span>"),
             "<span>x</span>"
+        );
+    }
+
+    #[test]
+    fn messages_keep_a_valid_code_language_on_pre_only() {
+        let html = "<pre data-mumcord-lang=\"c++\"><code>int x;</code></pre>";
+        assert_eq!(sanitize_message_html(html), html);
+        assert_eq!(sanitize_html(html), "<pre><code>int x;</code></pre>");
+        for bad in ["SQL", "\"><img src=x>", "a b", "", &"a".repeat(33)] {
+            let html = format!(
+                "<pre data-mumcord-lang=\"{}\">x</pre>",
+                bad.replace('"', "&quot;")
+            );
+            assert_eq!(sanitize_message_html(&html), "<pre>x</pre>", "{bad}");
+        }
+        assert_eq!(
+            sanitize_message_html("<code data-mumcord-lang=\"sql\">x</code>"),
+            "<code>x</code>"
         );
     }
 

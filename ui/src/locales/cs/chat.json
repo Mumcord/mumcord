@@ -241,6 +241,7 @@
     "saved": "Uloženo",
     "saveFailed": "Kód se nepodařilo uložit.",
     "tooLarge": "Kód je příliš velký ke stažení.",
-    "fileType": "Soubor s kódem"
+    "fileType": "Soubor s kódem",
+    "plainText": "Prostý text"
   }
 }

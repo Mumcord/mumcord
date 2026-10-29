@@ -241,6 +241,7 @@
     "saved": "Shranjeno",
     "saveFailed": "Kode ni bilo mogoče shraniti.",
     "tooLarge": "Koda je prevelika za prenos.",
-    "fileType": "Datoteka s kodo"
+    "fileType": "Datoteka s kodo",
+    "plainText": "Navadno besedilo"
   }
 }

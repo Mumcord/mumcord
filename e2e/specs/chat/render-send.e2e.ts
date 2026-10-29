@@ -139,6 +139,32 @@ describe("chat: rendering and sending (AC-1.13, AC-1.14, AC-1.43)", () => {
     }
   });
 
+  it("issue #112 a ```sql block keeps its language through the server", async () => {
+    const listener = new ScriptBot({ name: "LangBot" });
+    try {
+      await listener.connected();
+      await listener.run("join Lobby");
+      const box = composer();
+      await box.waitForEnabled();
+      // A typed newline would send the message, so the fence comes from Ctrl+Shift+E.
+      await box.setValue("SELECT name FROM users;");
+      await browser.keys(["Control", "a"]);
+      await browser.keys(["Control", "Shift", "e"]);
+      await browser.keys(["Control", "Home"]);
+      await browser.keys(["End"]);
+      await browser.keys("sql");
+      expect(await box.getValue()).toBe("```sql\nSELECT name FROM users;\n```");
+      await browser.keys("Enter");
+      const got = await listener.run(`expect message --from ${USER} --contains "SELECT name"`);
+      expect(got).toContain('<pre data-mumcord-lang="sql"><code>SELECT name FROM users;');
+      await waitMessage("SELECT name FROM users;");
+      const label = await $(".chat-code__label=SQL");
+      await expect(label).toExist();
+    } finally {
+      listener.stop();
+    }
+  });
+
   it("AC-1.14 compresses (or refuses with a message) an image above the server limit", async () => {
     const listener = new ScriptBot({ name: "SendBot2" });
     try {

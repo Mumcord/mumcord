@@ -233,6 +233,7 @@
     "saved": "Mentve",
     "saveFailed": "Nem sikerült a kódot menteni.",
     "tooLarge": "A kód túl nagy a letöltéshez.",
-    "fileType": "Kódfájl"
+    "fileType": "Kódfájl",
+    "plainText": "Egyszerű szöveg"
   }
 }

@@ -233,6 +233,7 @@
     "saved": "Gespeichert",
     "saveFailed": "Der Code konnte nicht gespeichert werden.",
     "tooLarge": "Der Code ist zu groß zum Herunterladen.",
-    "fileType": "Code-Datei"
+    "fileType": "Code-Datei",
+    "plainText": "Klartext"
   }
 }

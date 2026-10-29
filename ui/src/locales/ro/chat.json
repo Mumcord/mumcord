@@ -237,6 +237,7 @@
     "saved": "Salvat",
     "saveFailed": "Codul nu a putut fi salvat.",
     "tooLarge": "Codul este prea mare pentru a fi descărcat.",
-    "fileType": "Fișier de cod"
+    "fileType": "Fișier de cod",
+    "plainText": "Text simplu"
   }
 }

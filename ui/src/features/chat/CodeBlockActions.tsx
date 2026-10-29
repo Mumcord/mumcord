@@ -38,7 +38,7 @@ interface CodeBlockActionsProps {
   tabIndex: number;
 }
 
-/** Copy and download buttons in the corner of one code block (issue #111). */
+/** Language label, copy and download buttons in the corner of one code block (issues #111, #112). */
 export function CodeBlockActions({ block, tabIndex }: CodeBlockActionsProps) {
   const { t } = useTranslation("chat");
   const [status, setStatus] = useState<Status | null>(null);
@@ -91,8 +91,12 @@ export function CodeBlockActions({ block, tabIndex }: CodeBlockActionsProps) {
     }
   }
 
+  // The language the sender named (issue #112); plain text is the only label with a translation.
+  const named = block.dataset["languageLabel"];
+  const label = block.dataset["language"] === "plaintext" ? t("codeBlock.plainText") : named;
   return (
     <div className="chat-code__actions" data-active={status === null ? undefined : true}>
+      {label === undefined ? null : <span className="chat-code__label">{label}</span>}
       <span
         role="status"
         className="chat-code__status"
