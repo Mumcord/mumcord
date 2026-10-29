@@ -515,7 +515,10 @@ describe("MessageList replies", () => {
       expect(event).toBe(false);
       const items = screen.getAllByRole("menuitem").map((item) => item.textContent);
       expect(items).toEqual(["Copy", "Reply"]);
+      const copy = vi.spyOn(getApi(), "copyText");
       fireEvent.click(screen.getByRole("menuitem", { name: "Copy" }));
+      expect(copy).toHaveBeenCalledWith("eco");
+      copy.mockRestore();
       expect(writeText).toHaveBeenCalledWith("eco");
       expect(await screen.findByText("Text copied")).toBeTruthy();
     });
@@ -574,12 +577,16 @@ describe("MessageList replies", () => {
     });
 
     it("Ctrl+C copies plain text with line breaks and without hidden labels", () => {
+      const copy = vi.spyOn(getApi(), "copyText").mockResolvedValue(null);
       renderReplies(MESSAGES);
       select(bodyText("first"), 0, bodyText("second"), 6);
       const setData = vi.fn();
       const event = fireEvent.copy(screen.getByText("first"), { clipboardData: { setData } });
       expect(event).toBe(false);
       expect(setData).toHaveBeenCalledWith("text/plain", "first\nsecond");
+      // Also through the engine's clipboard, which reaches the desktop where the webview's does not.
+      expect(copy).toHaveBeenCalledWith("first\nsecond");
+      copy.mockRestore();
     });
   });
 

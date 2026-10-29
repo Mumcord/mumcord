@@ -22,7 +22,7 @@ import {
 } from "react";
 import { useTranslation } from "react-i18next";
 import { useT } from "../../i18n/useT";
-import type { ChatDisplay, ChatMessage } from "../../api";
+import { getApi, type ChatDisplay, type ChatMessage } from "../../api";
 import { useServerSelector } from "../channels";
 import { shownServerId } from "../channels/serverStore";
 import { useServers } from "../servers/store";
@@ -654,16 +654,19 @@ export function MessageList({
     };
   }, [copyNote]);
 
-  function copyText(text: string, done: string, what: string) {
-    navigator.clipboard.writeText(text).then(
-      () => {
-        setCopyNote(done);
-      },
-      (error: unknown) => {
-        console.error(`Copying ${what} failed`, error);
-        setCopyNote(t("copy.failed"));
-      },
-    );
+  // Through the engine: the webview's own clipboard does not reach the desktop everywhere.
+  function copyText(text: string, done: string | null, what: string) {
+    getApi()
+      .copyText(text)
+      .then(
+        () => {
+          if (done !== null) setCopyNote(done);
+        },
+        (error: unknown) => {
+          console.error(`Copying ${what} failed`, error);
+          setCopyNote(t("copy.failed"));
+        },
+      );
   }
 
   const copySelectionItem = (selection: string) => ({
@@ -679,6 +682,8 @@ export function MessageList({
     if (text === "") return;
     event.preventDefault();
     event.clipboardData.setData("text/plain", text);
+    // Also through the engine, like the menu: the webview's copy may not reach the desktop.
+    copyText(text, null, "the selected text");
   }
 
   function openMenu(index: number, event: ReactMouseEvent<HTMLLIElement>) {

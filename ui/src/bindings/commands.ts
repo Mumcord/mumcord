@@ -113,6 +113,13 @@ export const commands = {
 	/**  Writes text the UI already has to `path` (a chat code block's "Download", issue #111). */
 	saveText: (path: string, contents: string) => typedError<null, ApiError>(__TAURI_INVOKE("save_text", { path, contents })),
 	/**
+	 *  Puts plain text on the system clipboard (copying chat text, issue #114). The webview's own
+	 *  clipboard access does not reach the desktop everywhere (WebKitGTK on Linux), so the copy
+	 *  goes through the Tauri clipboard plugin instead. Fails with `messageTooLarge` above 10 MB and
+	 *  `io` when the clipboard does not take the text.
+	 */
+	copyText: (text: string) => typedError<null, ApiError>(__TAURI_INVOKE("copy_text", { text })),
+	/**
 	 *  Reads an image file that was just dropped onto the window (once per drop). Fails with
 	 *  `notFound` for any other path, `messageTooLarge` above 25 MB and `invalidInput` when the
 	 *  file is not a PNG, JPEG, GIF or WebP image.
