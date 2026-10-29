@@ -4,7 +4,8 @@
 # - "## [X.Y.Z] - Unreleased" gets the release date. Without such a heading, a filled
 #   "## [Unreleased]" section becomes "## [X.Y.Z] - <date>". An already dated section stays as is.
 # - Adds the "[X.Y.Z]: …/releases/tag/vX.Y.Z" link to the link list at the bottom, if missing.
-# - Adds an empty "## [Unreleased]" section on top, if missing.
+# - Adds an empty "## [Unreleased]" section on top, unless an open section already exists: a plain
+#   "## [Unreleased]" or a "## [X.Y.Z] - Unreleased" of the next version.
 # Running it twice changes nothing more.
 set -euo pipefail
 version=${1:?version missing, e.g. 0.4.3}
@@ -23,6 +24,6 @@ VERSION=$version DATE=$date perl -0pi -e '
   }
   s/^(\[[0-9][^\n]*\n)/[$v]: https:\/\/github.com\/Mumcord\/mumcord\/releases\/tag\/v$v\n$1/m
     if /^\[[0-9]/m && !/^\[\Q$v\E\]:/m;
-  s/^(# Changelog\n\n)/$1## [Unreleased]\n\n/ unless /^## \[Unreleased\]/m;
+  s/^(# Changelog\n\n)/$1## [Unreleased]\n\n/ unless /^## \[(?:[0-9]+\.[0-9]+\.[0-9]+\] - )?Unreleased\]?[ \t]*$/m;
 ' CHANGELOG.md
 echo "CHANGELOG.md finalised for $version ($date)."

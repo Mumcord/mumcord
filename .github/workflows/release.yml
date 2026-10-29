@@ -240,12 +240,17 @@ jobs:
 
           Full changelog: [CHANGELOG.md](https://github.com/Mumcord/mumcord/blob/main/CHANGELOG.md)
           EOF
-          # "What's new" is the version's section of CHANGELOG.md (dated or still "Unreleased" at
-          # tag time); without one the notes stay plain.
-          whats_new=$(awk -v v="$VERSION" '
-            /^## / { on = index($0, "## [" v "]") == 1; next }
-            /^\[[0-9]/ { on = 0 }
-            on' ../CHANGELOG.md)
+          # "What's new" is the version's section of CHANGELOG.md (dated, "X.Y.Z - Unreleased" or a plain
+          # "[Unreleased]" at tag time); without one the notes stay plain.
+          section() {
+            awk -v h="## [$1]" '
+              /^## / { on = index($0, h) == 1; next }
+              /^\[[0-9]/ { on = 0 }
+              on' ../CHANGELOG.md
+          }
+          # A plain "## [Unreleased]" section is the release when the version has no section of its own.
+          whats_new=$(section "$VERSION")
+          [[ -n "${whats_new//[[:space:]]/}" ]] || whats_new=$(section Unreleased)
           if [[ -n "${whats_new//[[:space:]]/}" ]]; then
             { printf '\n## What'"'"'s new in %s\n' "$VERSION"; printf '%s\n' "$whats_new"; } >> ../notes.md
           else
