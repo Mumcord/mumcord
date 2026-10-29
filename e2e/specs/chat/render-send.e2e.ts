@@ -298,7 +298,7 @@ describe("chat: rendering and sending (AC-1.13, AC-1.14, AC-1.43)", () => {
     await copied("words please");
   });
 
-  // Issue #115. The copied image is read back by pasting it into the message box with Ctrl+V.
+  // Issue #115. The system clipboard must offer the copied image as PNG data, as pasting apps ask.
   it("issue #115 copies a chat image from its context menu as image data", async () => {
     await selectChannel("Lobby");
     // The PNG RenderBot sent in AC-1.13; a script contextmenu event (see theme-language.e2e.ts).
@@ -318,14 +318,9 @@ describe("chat: rendering and sending (AC-1.13, AC-1.14, AC-1.43)", () => {
     expect(items).toEqual(["Copy image", "Save image…", "Open in image viewer"]);
     await $('[role="menuitem"]=Copy image').click();
     await $("p.chat-link-copied=Image copied").waitForExist();
-
-    const box = composer();
-    await box.click();
-    await browser.keys(["Control", "v"]);
-    const attached = $(".chat-tray__item");
-    await attached.waitForExist({ timeoutMsg: "the copied image was not pasted" });
-    await $(".chat-tray__remove").click();
-    await attached.waitForExist({ reverse: true });
+    await browser.waitUntil(async () => (await readClipboard("png")).startsWith("png "), {
+      timeoutMsg: "no PNG image on the clipboard",
+    });
   });
 
   it("keeps the window fixed when the chat overflows (no document scroll)", async () => {
