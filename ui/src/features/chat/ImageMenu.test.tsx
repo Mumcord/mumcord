@@ -12,7 +12,7 @@ import { applyLanguage } from "../../i18n";
 import { axeViolations } from "../../test/axe";
 import { clearDismissedPreviews } from "./dismissedPreviews";
 import { clearFavorites } from "./favorites";
-import { FULL_ATTRIBUTE, resetFullImages } from "./fullImage";
+import { arrivedFullImage, FULL_ATTRIBUTE, resetFullImages } from "./fullImage";
 import { imageFileName } from "./imageActions";
 import { clearPreviews } from "./links";
 import { MessageList } from "./MessageList";
@@ -130,7 +130,7 @@ describe("image context menu (#115)", () => {
     // Opening the viewer fetches the full image.
     fireEvent.click(screen.getByRole("button", { name: /image from Maya/i }));
     await waitFor(() => {
-      expect(document.querySelector(".image-viewer__img")?.getAttribute("src")).toBe(FULL_PNG);
+      expect(arrivedFullImage(REFERENCE)).toBe(FULL_PNG);
     });
     fireEvent.keyDown(screen.getByRole("dialog"), { key: "Escape" });
     rightClick(screen.getByRole("button", { name: /image from Maya/i }));

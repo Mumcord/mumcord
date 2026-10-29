@@ -706,7 +706,8 @@ export function MessageList({
     const rect = element.getBoundingClientRect();
     const keyboard = event.clientX === 0 && event.clientY === 0;
     setImageMenu({
-      src: img ? img.currentSrc || img.src : null,
+      // Cards show a blob: URL; copying and saving work on the data: URL behind it.
+      src: img ? originalSrc(img.currentSrc || img.src) : null,
       url,
       name: url === null ? t("viewer.unnamed") : imageName(url),
       fileName: url === null ? null : imageName(url),

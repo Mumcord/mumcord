@@ -28,34 +28,11 @@ export function imageActionError(error: unknown, failed: string, tooLarge: strin
   return large ? tooLarge : failed;
 }
 
-function readAsDataUrl(blob: Blob): Promise<string> {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = () => {
-      resolve(typeof reader.result === "string" ? reader.result : "");
-    };
-    reader.onerror = () => {
-      reject(reader.error ?? new Error("reading the image failed"));
-    };
-    reader.readAsDataURL(blob);
-  });
-}
-
-/**
- * The `data:` URL of a shown image. A `blob:` URL is read back from memory; every other source
- * is refused, so this can never reach the network.
- */
-export async function imageDataUrl(src: string): Promise<string> {
-  if (IMAGE_DATA_URL.test(src)) {
-    if ((src.length / 4) * 3 > MAX_IMAGE_BYTES + 3) throw new ImageTooLargeError();
-    return src;
-  }
-  if (!src.startsWith("blob:")) throw new Error("not a local image");
-  const blob = await (await fetch(src)).blob();
-  if (blob.size > MAX_IMAGE_BYTES) throw new ImageTooLargeError();
-  const dataUrl = await readAsDataUrl(blob);
-  if (!IMAGE_DATA_URL.test(dataUrl)) throw new Error("not a supported image");
-  return dataUrl;
+/** The `data:` URL of a shown image; every other address is refused, so nothing is fetched. */
+export function imageDataUrl(src: string): string {
+  if (!IMAGE_DATA_URL.test(src)) throw new Error("not a local image");
+  if ((src.length / 4) * 3 > MAX_IMAGE_BYTES + 3) throw new ImageTooLargeError();
+  return src;
 }
 
 /** File extension of the image's real format. */
@@ -81,7 +58,7 @@ export function imageFileName(name: string | null, extension: string, now = new 
 
 /** Puts the image on the system clipboard as image data. */
 export async function copyImage(src: string): Promise<void> {
-  await getApi().copyImage(await imageDataUrl(src));
+  await getApi().copyImage(imageDataUrl(src));
 }
 
 /**
@@ -94,7 +71,7 @@ export async function saveImageAs(
   title: string,
   filterName: string,
 ): Promise<boolean> {
-  const dataUrl = await imageDataUrl(src);
+  const dataUrl = imageDataUrl(src);
   const extension = imageExtension(dataUrl);
   const path = await pickSavePath(
     imageFileName(name, extension),
