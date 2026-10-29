@@ -164,8 +164,8 @@
     "all": "Kõik serverid",
     "clearAll": "Tühjenda kogu ajalugu…",
     "confirmTitle": "Tühjendan ajaloo?",
-    "confirmServer": "Kõik serveri {{server}} salvestatud sõnumid kustutatakse sellest arvutist. Seda ei saa tagasi võtta.",
-    "confirmAll": "Kõigi serverite kõik salvestatud sõnumid kustutatakse sellest arvutist. Seda ei saa tagasi võtta.",
+    "confirmServer": "Kõik serveri {{server}} salvestatud sõnumid kustutatakse sellest arvutist. Teistel jäävad nende koopiad alles. Nende koopiaid ei sünkroonita sellesse arvutisse tagasi. Seda ei saa tagasi võtta.",
+    "confirmAll": "Kõigi serverite kõik salvestatud sõnumid kustutatakse sellest arvutist. Teistel jäävad nende koopiad alles. Nende koopiaid ei sünkroonita sellesse arvutisse tagasi. Seda ei saa tagasi võtta.",
     "confirm": "Tühjenda ajalugu",
     "cleared": "Ajalugu tühjendatud.",
     "autoDelete": "Kustuta vestlusajalugu, mis on vanem kui",
@@ -409,6 +409,22 @@
     "never": "Mitte kunagi",
     "clearNow": "Tühjenda kohe",
     "cleared": "Vahemälu tühjendatud, vabanes {{size}}."
+  },
+  "cache": {
+    "title": "Vahemälu",
+    "hint": "Mumcord hoiab selles arvutis ajutisi andmeid, et kõik laadiks kiiremini. Nende tühjendamine on ohutu; vajaduse korral luuakse need uuesti.",
+    "kind": {
+      "previews": "Linkide eelvaated ja pildid",
+      "webEngine": "Veebimootori vahemälu",
+      "temp": "Ajutised failid"
+    },
+    "total": "Kokku: {{size}}",
+    "calculating": "Arvutan…",
+    "clear": "Tühjenda vahemälu",
+    "confirmTitle": "Kas tühjendada vahemälu?",
+    "confirm": "Kustutatakse ainult valitud vahemälud. Vestluste ajalugu, seaded, serverid, sertifikaadid, sõbrad ja märkmed jäävad puutumata.",
+    "cleared": "Vahemälu tühjendatud ({{size}})",
+    "webPending": "Veebimootori vahemälu eemaldatakse Mumcordi järgmisel käivitamisel."
   },
   "retention": {
     "days_one": "{{count}} päev",

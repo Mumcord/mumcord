@@ -2,6 +2,7 @@
 
 mod autostart;
 mod browser;
+mod cache_dirs;
 mod commands;
 mod deeplink;
 #[cfg(target_os = "linux")]
@@ -109,6 +110,8 @@ fn specta_builder() -> Builder<tauri::Wry> {
             links::gif_favorite_remove,
             links::gif_favorite_use,
             links::preview_cache_clear,
+            commands::cache::cache_sizes,
+            commands::cache::cache_clear,
             follow::channel_follow,
             follow::channel_unfollow,
             follow::channel_follow_all,
@@ -248,6 +251,8 @@ pub fn run() {
     let context = tauri::generate_context!();
     // Before anything else starts a thread or GTK: it may switch to XWayland (FR-1.48).
     display::prepare(&context.config().identifier);
+    // Before any web view holds the web cache files open.
+    cache_dirs::apply_pending(&context.config().identifier);
     #[cfg(target_os = "linux")]
     {
         // Before WebKit starts its web process, which inherits the GStreamer environment.

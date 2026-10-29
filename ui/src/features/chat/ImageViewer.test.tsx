@@ -4,10 +4,18 @@ import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from "vite
 import { createMockApi, setApi, type MockApi } from "../../api";
 import { applyLanguage } from "../../i18n";
 import { axeViolations } from "../../test/axe";
+import { originalSrc } from "./displaySrc";
 import { resetFullImages } from "./fullImage";
 import { FullImageBars } from "./FullImageBars";
 import { ImageViewer, type ViewerImage } from "./ImageViewer";
 import { fitScale, zoomAround } from "./viewerMath";
+
+/** The data: URL the viewer shows; the `<img>` itself gets a blob: URL of it. */
+function shownSrc(): string {
+  const src = screen.getByRole("img").getAttribute("src") ?? "";
+  expect(src).toMatch(/^blob:/);
+  return originalSrc(src);
+}
 
 const dialogs = vi.hoisted(() => ({ pickSavePath: vi.fn() }));
 vi.mock("../settings/fileDialogs", () => dialogs);
@@ -126,11 +134,23 @@ describe("ImageViewer", () => {
     expect(Number(/scale\(([\d.]+)\)/.exec(transform())?.[1])).toBeGreaterThan(wheeled);
   });
 
+  it("revokes the blob: URL of each image it stops showing and when it closes", () => {
+    const revoke = vi.spyOn(URL, "revokeObjectURL");
+    const { unmount } = render(<Harness />);
+    const first = screen.getByRole("img").getAttribute("src");
+    fireEvent.keyDown(dialog(), { key: "ArrowRight" });
+    expect(revoke).toHaveBeenCalledWith(first);
+    const second = screen.getByRole("img").getAttribute("src");
+    unmount();
+    expect(revoke).toHaveBeenCalledWith(second);
+    revoke.mockRestore();
+  });
+
   it("steps through the images with the arrow keys and the buttons", () => {
     render(<Harness />);
     fireEvent.keyDown(dialog(), { key: "ArrowRight" });
     expect(screen.getByText("2 / 3")).toBeInTheDocument();
-    expect(screen.getByRole("img")).toHaveAttribute("src", GIF);
+    expect(shownSrc()).toBe(GIF);
     fireEvent.keyDown(dialog(), { key: "ArrowLeft" });
     expect(screen.getByText("1 / 3")).toBeInTheDocument();
     fireEvent.keyDown(dialog(), { key: "ArrowLeft" });
@@ -259,7 +279,7 @@ describe("full images", () => {
     await waitFor(() => {
       expect(fetch).toHaveBeenCalledWith(expect.any(Number), REFERENCE, 4, "cert");
     });
-    expect(screen.getByRole("img")).toHaveAttribute("src", PNG);
+    expect(shownSrc()).toBe(PNG);
     expect(screen.getByRole("status")).toHaveTextContent("Loading full size…");
     expect(screen.getByText("Beta")).toBeInTheDocument();
     act(() => {
@@ -273,7 +293,7 @@ describe("full images", () => {
     expect(screen.getByRole("status")).toHaveTextContent("Loading full size… 25 %");
     resolve(FULL);
     await waitFor(() => {
-      expect(screen.getByRole("img")).toHaveAttribute("src", FULL);
+      expect(shownSrc()).toBe(FULL);
     });
     expect(screen.queryByRole("status")).toBeNull();
   });
@@ -310,7 +330,7 @@ describe("full images", () => {
     expect(fetch).toHaveBeenCalledTimes(1);
     resolve(FULL);
     await waitFor(() => {
-      expect(screen.getByRole("img")).toHaveAttribute("src", FULL);
+      expect(shownSrc()).toBe(FULL);
     });
   });
 
@@ -325,7 +345,7 @@ describe("full images", () => {
     await new Promise((done) => setTimeout(done, 10));
     viewer();
     await waitFor(() => {
-      expect(screen.getByRole("img")).toHaveAttribute("src", FULL);
+      expect(shownSrc()).toBe(FULL);
     });
     expect(fetch).toHaveBeenCalledTimes(1);
   });
@@ -353,7 +373,7 @@ describe("full images", () => {
     });
     resolve(FULL);
     await waitFor(() => {
-      expect(screen.getByRole("img")).toHaveAttribute("src", FULL);
+      expect(shownSrc()).toBe(FULL);
     });
     unmount();
     await new Promise((done) => setTimeout(done, 10));
@@ -395,7 +415,7 @@ describe("full images", () => {
     await waitFor(() => {
       expect(screen.getByRole("status")).toHaveTextContent("Full size not available");
     });
-    expect(screen.getByRole("img")).toHaveAttribute("src", PNG);
+    expect(shownSrc()).toBe(PNG);
   });
 
   it("saves the full image once it is there", async () => {
@@ -406,7 +426,7 @@ describe("full images", () => {
     await act(async () => {
       await Promise.resolve();
     });
-    expect(screen.getByRole("img")).toHaveAttribute("src", FULL);
+    expect(shownSrc()).toBe(FULL);
     await act(async () => {
       fireEvent.click(screen.getByRole("button", { name: "Save image" }));
       await Promise.resolve();

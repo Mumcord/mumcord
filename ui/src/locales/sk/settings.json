@@ -166,8 +166,8 @@
     "all": "Všetky servery",
     "clearAll": "Vymazať celú históriu…",
     "confirmTitle": "Vymazať históriu?",
-    "confirmServer": "Všetky uložené správy zo servera {{server}} sa z tohto počítača vymažú. Nedá sa to vrátiť späť.",
-    "confirmAll": "Všetky uložené správy zo všetkých serverov sa z tohto počítača vymažú. Nedá sa to vrátiť späť.",
+    "confirmServer": "Všetky uložené správy zo servera {{server}} sa z tohto počítača vymažú. Ostatní si svoje kópie ponechajú. Ich kópie sa do tohto počítača znova nesynchronizujú. Nedá sa to vrátiť späť.",
+    "confirmAll": "Všetky uložené správy zo všetkých serverov sa z tohto počítača vymažú. Ostatní si svoje kópie ponechajú. Ich kópie sa do tohto počítača znova nesynchronizujú. Nedá sa to vrátiť späť.",
     "confirm": "Vymazať históriu",
     "cleared": "História vymazaná.",
     "autoDelete": "Mazať históriu chatu staršiu ako",
@@ -411,6 +411,22 @@
     "never": "Nikdy",
     "clearNow": "Vymazať teraz",
     "cleared": "Vyrovnávacia pamäť vymazaná, uvoľnené {{size}}."
+  },
+  "cache": {
+    "title": "Vyrovnávacia pamäť",
+    "hint": "Mumcord ukladá v tomto počítači dočasné údaje, aby sa všetko načítalo rýchlejšie. Ich vymazanie je bezpečné; v prípade potreby sa vytvoria znova.",
+    "kind": {
+      "previews": "Náhľady odkazov a obrázky",
+      "webEngine": "Vyrovnávacia pamäť webového jadra",
+      "temp": "Dočasné súbory"
+    },
+    "total": "Spolu: {{size}}",
+    "calculating": "Počíta sa…",
+    "clear": "Vymazať vyrovnávaciu pamäť",
+    "confirmTitle": "Vymazať vyrovnávaciu pamäť?",
+    "confirm": "Vymaže sa len vybraná vyrovnávacia pamäť. História četu, nastavenia, servery, certifikáty, priatelia a poznámky ostanú nedotknuté.",
+    "cleared": "Vyrovnávacia pamäť vymazaná ({{size}})",
+    "webPending": "Vyrovnávacia pamäť webového jadra sa odstráni pri ďalšom spustení Mumcordu."
   },
   "retention": {
     "days_one": "{{count}} deň",

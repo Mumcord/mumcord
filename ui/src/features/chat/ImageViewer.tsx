@@ -18,6 +18,7 @@ import { createPortal } from "react-dom";
 import { useTranslation } from "react-i18next";
 import { BetaBadge } from "../../components/BetaBadge";
 import { removeFavorite, saveFavorite, useGifFavorites } from "./favorites";
+import { useDisplaySrc } from "./displaySrc";
 import { useFullImage, type FullImageSource } from "./fullImage";
 import { copyImage, imageActionError, saveImageAs } from "./imageActions";
 import { openInBrowser } from "./openLink";
@@ -83,6 +84,8 @@ export function ImageViewer({ images, index, onIndexChange, onClose }: ImageView
   const full = useFullImage(current?.full);
   // The thumbnail stays until the full image is there, and when it cannot be had.
   const shown = full.status === "done" ? full.src : current?.src;
+  // Shown through a blob: URL (see displaySrc.ts); saving keeps using `shown`.
+  const displayed = useDisplaySrc(shown);
   const favorites = useGifFavorites();
   const dialogRef = useRef<HTMLDivElement>(null);
   const stageRef = useRef<HTMLDivElement>(null);
@@ -432,7 +435,7 @@ export function ImageViewer({ images, index, onIndexChange, onClose }: ImageView
           <img
             ref={imgRef}
             className="image-viewer__img"
-            src={shown}
+            src={displayed}
             alt={current.name}
             draggable={false}
             onLoad={(event) => {

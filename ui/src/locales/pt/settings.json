@@ -165,8 +165,8 @@
     "all": "Todos os servidores",
     "clearAll": "Limpar todo o histórico…",
     "confirmTitle": "Limpar histórico?",
-    "confirmServer": "Todas as mensagens guardadas de {{server}} serão eliminadas deste computador. Esta ação não pode ser anulada.",
-    "confirmAll": "Todas as mensagens guardadas de todos os servidores serão eliminadas deste computador. Esta ação não pode ser anulada.",
+    "confirmServer": "Todas as mensagens guardadas de {{server}} serão eliminadas deste computador. As outras pessoas mantêm as suas cópias. As cópias delas não voltam a ser sincronizadas com este computador. Esta ação não pode ser anulada.",
+    "confirmAll": "Todas as mensagens guardadas de todos os servidores serão eliminadas deste computador. As outras pessoas mantêm as suas cópias. As cópias delas não voltam a ser sincronizadas com este computador. Esta ação não pode ser anulada.",
     "confirm": "Limpar histórico",
     "cleared": "Histórico limpo.",
     "autoDelete": "Eliminar histórico de chat com mais de",
@@ -410,6 +410,22 @@
     "never": "Nunca",
     "clearNow": "Limpar agora",
     "cleared": "Cache limpa, {{size}} libertados."
+  },
+  "cache": {
+    "title": "Cache",
+    "hint": "O Mumcord guarda dados temporários neste computador para tudo carregar mais depressa. Limpá-los é seguro; são recriados quando necessário.",
+    "kind": {
+      "previews": "Pré-visualizações de links e imagens",
+      "webEngine": "Cache do motor web",
+      "temp": "Ficheiros temporários"
+    },
+    "total": "Total: {{size}}",
+    "calculating": "A calcular…",
+    "clear": "Limpar cache",
+    "confirmTitle": "Limpar a cache?",
+    "confirm": "Apenas as caches selecionadas são eliminadas. O histórico de conversas, as definições, os servidores, os certificados, os amigos e as notas não são afetados.",
+    "cleared": "Cache limpa ({{size}})",
+    "webPending": "A cache do motor web é removida no próximo arranque do Mumcord."
   },
   "retention": {
     "days_one": "{{count}} dia",

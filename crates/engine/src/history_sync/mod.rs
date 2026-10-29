@@ -70,6 +70,16 @@ impl Env for CtxEnv<'_> {
         )
     }
 
+    fn history_max_age_days(&self) -> Option<u32> {
+        self.0.store().settings().map_or_else(
+            |e| {
+                tracing::warn!(error = %e, "reading settings failed; syncing the full week");
+                None
+            },
+            |s| s.history_max_age_days,
+        )
+    }
+
     fn own_cert(&self) -> Option<String> {
         self.0
             .handle

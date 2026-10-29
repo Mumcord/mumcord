@@ -143,7 +143,7 @@ mod tests {
 
         // Manual deletion still works.
         store
-            .clear_conversation_history(server, &kept)
+            .clear_conversation_history(server, &kept, 10)
             .expect("clear");
         assert!(store.messages(server, &kept, 10).expect("gone").is_empty());
     }

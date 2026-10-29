@@ -7,24 +7,13 @@ import { DaysSelect } from "../components/DaysSelect";
 import { Group, Section } from "../components/Section";
 import { Switch } from "../components/Switch";
 import { errorText } from "../errors";
+import { formatSize } from "../formatSize";
 import type { SettingsSectionProps } from "./types";
 
 type Status = { kind: "success" | "error"; text: string } | null;
 
 const CACHE_DAYS = [1, 7, 30] as const;
 const HISTORY_DAYS = [7, 30, 90, 365] as const;
-
-/** "1.4 MB" style size for the space a cache clean-up freed. */
-function formatSize(bytes: number): string {
-  const units = ["B", "KB", "MB", "GB"];
-  let size = bytes;
-  let unit = 0;
-  while (size >= 1024 && unit < units.length - 1) {
-    size /= 1024;
-    unit += 1;
-  }
-  return `${unit === 0 ? String(size) : size.toFixed(1)} ${units[unit] ?? "B"}`;
-}
 
 /**
  * Chat & history: link previews (FR-1.49) with their cache clean-up, "Share my channel history"

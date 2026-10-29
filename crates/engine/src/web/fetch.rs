@@ -132,6 +132,9 @@ pub struct Fetched {
     pub body: Vec<u8>,
 }
 
+/// Set by Fastly (Giphy's CDN) when it served a stand-in because the file was not found.
+const NOT_FOUND_FALLBACK: &str = "x-retry-not-found-metric";
+
 /// Image formats shown in chat.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ImageKind {
@@ -245,6 +248,12 @@ impl Fetcher {
         let status = response.status();
         if !status.is_success() {
             return Err(FetchError::Status(status.as_u16()));
+        }
+        // Giphy's CDN answers a missing file with 200 and a "This content is not available"
+        // GIF; this header is its only sign (issue #109). Treat it like the 404 it stands for,
+        // so the next rendition is tried.
+        if response.headers().contains_key(NOT_FOUND_FALLBACK) {
+            return Err(FetchError::Status(404));
         }
         let media_type = response
             .headers()

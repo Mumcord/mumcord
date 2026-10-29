@@ -10,6 +10,7 @@ import { useTranslation } from "react-i18next";
 import type { InlineImage } from "../../api";
 import { displayUrl, type CardColor, type CardIcon, type MessageCard as Card } from "./cards";
 import { useCodeBlockActions } from "./useCodeBlockActions";
+import { useDisplaySrc } from "./displaySrc";
 import { useHighlightedCode } from "./highlight";
 import { imageName, loadInlineImage, type ImageClickHandler } from "./links";
 import { openInBrowser } from "./openLink";
@@ -108,6 +109,8 @@ function CardImage({ url, title, previews, tabIndex, onImageClick }: CardImagePr
       active = false;
     };
   }, [url, previews]);
+  const safe = previews && image !== null && image !== undefined && SAFE_SRC.test(image.src);
+  const src = useDisplaySrc(safe ? image.src : undefined);
   if (previews && image === undefined) {
     return (
       <div
@@ -138,7 +141,7 @@ function CardImage({ url, title, previews, tabIndex, onImageClick }: CardImagePr
       }}
     >
       <img
-        src={image.src}
+        src={src}
         alt=""
         draggable={false}
         data-image-url={image.url}

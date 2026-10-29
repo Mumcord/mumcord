@@ -31,7 +31,7 @@
   "history": {
     "clear": "Wyczyść historię",
     "title": "Wyczyścić historię?",
-    "body": "To trwale usunie z tego komputera zapisane wiadomości z tej rozmowy. Inne osoby zachowają swoje kopie.",
+    "body": "To trwale usunie z tego komputera zapisane wiadomości z tej rozmowy. Inne osoby zachowają swoje kopie. Ich kopie nie zostaną ponownie zsynchronizowane z tym komputerem.",
     "confirm": "Wyczyść historię",
     "cancel": "Anuluj",
     "failed": "Nie udało się wyczyścić historii. Spróbuj ponownie."

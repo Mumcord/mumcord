@@ -31,7 +31,7 @@
   "history": {
     "clear": "Počisti zgodovino",
     "title": "Počistim zgodovino?",
-    "body": "S tem trajno izbrišeš shranjena sporočila tega pogovora s tega računalnika. Drugi obdržijo svoje kopije.",
+    "body": "S tem trajno izbrišeš shranjena sporočila tega pogovora s tega računalnika. Drugi obdržijo svoje kopije. Njihove kopije se ne bodo znova sinhronizirale na ta računalnik.",
     "confirm": "Počisti zgodovino",
     "cancel": "Prekliči",
     "failed": "Zgodovine ni bilo mogoče počistiti. Poskusi znova."

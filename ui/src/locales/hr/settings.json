@@ -165,8 +165,8 @@
     "all": "Svi poslužitelji",
     "clearAll": "Obriši svu povijest…",
     "confirmTitle": "Obrisati povijest?",
-    "confirmServer": "Sve spremljene poruke s {{server}} bit će obrisane s ovog računala. Ovo se ne može poništiti.",
-    "confirmAll": "Sve spremljene poruke sa svih poslužitelja bit će obrisane s ovog računala. Ovo se ne može poništiti.",
+    "confirmServer": "Sve spremljene poruke s {{server}} bit će obrisane s ovog računala. Drugi zadržavaju svoje kopije. Njihove se kopije neće ponovno sinkronizirati na ovo računalo. Ovo se ne može poništiti.",
+    "confirmAll": "Sve spremljene poruke sa svih poslužitelja bit će obrisane s ovog računala. Drugi zadržavaju svoje kopije. Njihove se kopije neće ponovno sinkronizirati na ovo računalo. Ovo se ne može poništiti.",
     "confirm": "Obriši povijest",
     "cleared": "Povijest obrisana.",
     "autoDelete": "Briši povijest chata stariju od",
@@ -410,6 +410,22 @@
     "never": "Nikad",
     "clearNow": "Očisti sada",
     "cleared": "Predmemorija očišćena, oslobođeno {{size}}."
+  },
+  "cache": {
+    "title": "Predmemorija",
+    "hint": "Mumcord na ovom računalu sprema privremene podatke kako bi se sve brže učitavalo. Brisanje je sigurno; po potrebi se ponovno stvaraju.",
+    "kind": {
+      "previews": "Pregledi poveznica i slike",
+      "webEngine": "Predmemorija web-mehanizma",
+      "temp": "Privremene datoteke"
+    },
+    "total": "Ukupno: {{size}}",
+    "calculating": "Izračun…",
+    "clear": "Očisti predmemoriju",
+    "confirmTitle": "Očistiti predmemoriju?",
+    "confirm": "Brišu se samo odabrane predmemorije. Povijest razgovora, postavke, poslužitelji, certifikati, prijatelji i bilješke ostaju netaknuti.",
+    "cleared": "Predmemorija očišćena ({{size}})",
+    "webPending": "Predmemorija web-mehanizma uklonit će se pri sljedećem pokretanju programa Mumcord."
   },
   "retention": {
     "days_one": "{{count}} dan",

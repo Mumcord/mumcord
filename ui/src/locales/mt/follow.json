@@ -33,7 +33,7 @@
   "history": {
     "clear": "Ħassar l-istorja",
     "title": "Tħassar l-istorja?",
-    "body": "Dan iħassar b'mod permanenti l-messaġġi ssejvjati ta' din il-konversazzjoni minn dan il-kompjuter. Il-persuni l-oħra jżommu l-kopji tagħhom.",
+    "body": "Dan iħassar b'mod permanenti l-messaġġi ssejvjati ta' din il-konversazzjoni minn dan il-kompjuter. Il-persuni l-oħra jżommu l-kopji tagħhom. Il-kopji tagħhom mhux se jerġgħu jiġu sinkronizzati ma' dan il-kompjuter.",
     "confirm": "Ħassar l-istorja",
     "cancel": "Ikkanċella",
     "failed": "L-istorja ma setgħetx titħassar. Erġa' pprova."

@@ -1,9 +1,10 @@
 import { useTranslation } from "react-i18next";
 import { Group, Section } from "../components/Section";
 import { Switch } from "../components/Switch";
+import { CacheGroup } from "./CacheGroup";
 import type { SettingsSectionProps } from "./types";
 
-/** Privacy: consent to direct connections between Mumcord users (FR-2.36). */
+/** Privacy: consent to direct connections between Mumcord users (FR-2.36) and the caches. */
 export function PrivacySection({ settings, update }: SettingsSectionProps) {
   const { t } = useTranslation("settings");
   return (
@@ -18,6 +19,7 @@ export function PrivacySection({ settings, update }: SettingsSectionProps) {
           }}
         />
       </Group>
+      <CacheGroup />
     </Section>
   );
 }

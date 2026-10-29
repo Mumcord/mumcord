@@ -165,8 +165,8 @@
     "all": "Visi serveri",
     "clearAll": "Dzēst visu vēsturi…",
     "confirmTitle": "Dzēst vēsturi?",
-    "confirmServer": "Visas saglabātās ziņas no {{server}} tiks izdzēstas no šī datora. To nevar atsaukt.",
-    "confirmAll": "Visas saglabātās ziņas no visiem serveriem tiks izdzēstas no šī datora. To nevar atsaukt.",
+    "confirmServer": "Visas saglabātās ziņas no {{server}} tiks izdzēstas no šī datora. Citiem cilvēkiem paliek viņu kopijas. Viņu kopijas netiks atkal sinhronizētas uz šo datoru. To nevar atsaukt.",
+    "confirmAll": "Visas saglabātās ziņas no visiem serveriem tiks izdzēstas no šī datora. Citiem cilvēkiem paliek viņu kopijas. Viņu kopijas netiks atkal sinhronizētas uz šo datoru. To nevar atsaukt.",
     "confirm": "Dzēst vēsturi",
     "cleared": "Vēsture izdzēsta.",
     "autoDelete": "Dzēst čata vēsturi, kas vecāka par",
@@ -410,6 +410,22 @@
     "never": "Nekad",
     "clearNow": "Notīrīt tagad",
     "cleared": "Kešatmiņa notīrīta, atbrīvots {{size}}."
+  },
+  "cache": {
+    "title": "Kešatmiņa",
+    "hint": "Mumcord šajā datorā glabā pagaidu datus, lai viss ielādētos ātrāk. Tos droši var notīrīt; vajadzības gadījumā tie tiek izveidoti no jauna.",
+    "kind": {
+      "previews": "Saišu priekšskatījumi un attēli",
+      "webEngine": "Tīmekļa dzinēja kešatmiņa",
+      "temp": "Pagaidu faili"
+    },
+    "total": "Kopā: {{size}}",
+    "calculating": "Aprēķina…",
+    "clear": "Notīrīt kešatmiņu",
+    "confirmTitle": "Notīrīt kešatmiņu?",
+    "confirm": "Tiek dzēstas tikai atlasītās kešatmiņas. Tērzēšanas vēsture, iestatījumi, serveri, sertifikāti, draugi un piezīmes netiek skarti.",
+    "cleared": "Kešatmiņa notīrīta ({{size}})",
+    "webPending": "Tīmekļa dzinēja kešatmiņa tiks noņemta nākamajā Mumcord palaišanas reizē."
   },
   "retention": {
     "days_zero": "{{count}} dienu",

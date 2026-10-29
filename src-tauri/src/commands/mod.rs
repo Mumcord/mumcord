@@ -6,6 +6,7 @@
 
 pub mod app;
 pub mod audio;
+pub mod cache;
 pub mod channels;
 pub mod chat;
 pub mod diagnostics;
