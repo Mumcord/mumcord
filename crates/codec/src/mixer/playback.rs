@@ -97,12 +97,15 @@ pub struct PlaybackStats {
     pub packets_dropped: u64,
     pub late_packets: u64,
     pub concealed_frames: u64,
+    /// 10 ms frames decoded from received packets.
+    pub received_frames: u64,
     /// Frames the sink refused (queue full or no output device).
     pub frames_refused: u64,
-    /// Times the playback thread woke up to a nearly empty device queue: it was scheduled too
-    /// late, and the device played silence or will shortly.
+    /// Times the playback thread woke up to a nearly empty device queue while it was playing
+    /// sound: it was scheduled too late, and the device cut the sound short or will shortly.
+    /// Late wake-ups while only silence is queued are not heard and not counted.
     pub late_wakeups: u64,
-    /// Largest jitter-buffer target delay of the speakers currently playing, in ms.
+    /// Largest jitter-buffer target delay of the speakers playing (or of the last stream), in ms.
     pub jitter_delay_ms: u64,
     /// Average and worst time to mix (decode, conceal, place) one 10 ms frame, in µs.
     pub mix_time_avg_us: u64,
@@ -115,6 +118,7 @@ struct Counters {
     no_slot: AtomicU64,
     late: AtomicU64,
     concealed: AtomicU64,
+    received: AtomicU64,
     refused: AtomicU64,
     late_wakeups: AtomicU64,
     jitter_delay_ms: AtomicU64,
@@ -289,6 +293,7 @@ impl Playback {
                 + c.no_slot.load(Ordering::Relaxed),
             late_packets: c.late.load(Ordering::Relaxed),
             concealed_frames: c.concealed.load(Ordering::Relaxed),
+            received_frames: c.received.load(Ordering::Relaxed),
             frames_refused: c.refused.load(Ordering::Relaxed),
             late_wakeups: c.late_wakeups.load(Ordering::Relaxed),
             jitter_delay_ms: c.jitter_delay_ms.load(Ordering::Relaxed),
@@ -342,6 +347,9 @@ impl<S: PlaybackSink> Worker<S> {
         let mut sink_refusing = false;
         // A late wake-up only counts once the queue was filled at least once.
         let mut primed = false;
+        // Whether the frames queued for the device carry sound; a late wake-up over queued
+        // silence is not heard.
+        let mut audible = false;
 
         while !self.stop.load(Ordering::Relaxed) {
             self.apply_commands();
@@ -352,7 +360,7 @@ impl<S: PlaybackSink> Worker<S> {
             }
             if !sink_refusing {
                 let queued = self.sink.queued_samples();
-                if primed && queued < LATE_QUEUE_SAMPLES {
+                if primed && audible && queued < LATE_QUEUE_SAMPLES {
                     self.counters.late_wakeups.fetch_add(1, Ordering::Relaxed);
                 }
             }
@@ -376,7 +384,7 @@ impl<S: PlaybackSink> Worker<S> {
                 has_extra |= self.shares.mix_into(&mut extra);
                 let events = &mut self.events;
                 let mix_start = Instant::now();
-                self.mixer.mix(
+                audible = self.mixer.mix(
                     &mut left,
                     &mut right,
                     has_extra.then_some(&extra),
@@ -446,6 +454,7 @@ impl<S: PlaybackSink> Worker<S> {
         c.no_slot.store(stats.packets_no_slot, Ordering::Relaxed);
         c.late.store(stats.late_packets, Ordering::Relaxed);
         c.concealed.store(stats.concealed_frames, Ordering::Relaxed);
+        c.received.store(stats.received_frames, Ordering::Relaxed);
         c.jitter_delay_ms
             .store(stats.jitter_delay_ms, Ordering::Relaxed);
     }

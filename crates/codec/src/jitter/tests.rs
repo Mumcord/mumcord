@@ -252,3 +252,35 @@ fn invalid_packets_are_ignored() {
     assert_eq!(jb.stats().invalid_packets, 2);
     assert!(jb.is_idle());
 }
+
+#[test]
+fn stream_end_without_last_flag_is_not_concealment() {
+    let mut packets = tone_packets(20, 0);
+    if let Some(last) = packets.last_mut() {
+        last.is_last = false;
+    }
+    let mut jb = JitterBuffer::new().expect("jitter buffer");
+    simulate(&mut jb, &clean_schedule(&packets, 3), 1_000);
+    assert!(jb.is_idle());
+    let stats = jb.stats();
+    assert_eq!(
+        (stats.concealed_frames, stats.fec_frames),
+        (0, 0),
+        "{stats:?}"
+    );
+    assert_eq!(stats.decoded_frames, 40);
+}
+
+#[test]
+fn late_packet_after_a_bridge_counts_the_bridge() {
+    let packets = tone_packets(40, 0);
+    let mut schedule = clean_schedule(&packets, 3);
+    // Packet 10 arrives 40 ms late but before the burst times out: the bridge covered a gap.
+    schedule[10].0 = schedule[10].0.map(|a| a + 40);
+    for entry in schedule.iter_mut().skip(11) {
+        entry.0 = entry.0.map(|a| a + 40);
+    }
+    let mut jb = JitterBuffer::new().expect("jitter buffer");
+    simulate(&mut jb, &schedule, 1_500);
+    assert!(jb.stats().concealed_frames >= 1, "{:?}", jb.stats());
+}

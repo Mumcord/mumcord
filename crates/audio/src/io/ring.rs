@@ -98,8 +98,9 @@ pub(crate) fn capture<T>(
 /// Real-time playback body: pops interleaved stereo pairs onto the device
 /// channels (mono devices get the mix of both, channels beyond the first two
 /// get it too, so non-positional audio sounds as before on every layout) and
-/// fills the rest with silence. Only a buffer that runs dry part-way counts as
-/// an underrun; an empty queue is the normal "nobody talks" state.
+/// fills the rest with silence. Only a buffer that runs dry part-way through sound counts as
+/// an underrun; an empty queue, or one that runs dry after silence, is the normal "nobody
+/// talks" state and not heard.
 pub(crate) fn playback<T>(
     data: &mut [T],
     channels: usize,
@@ -111,9 +112,7 @@ pub(crate) fn playback<T>(
     let frames = data.len() / channels;
     let available = consumer.slots() / 2;
     let readable = frames.min(available);
-    if available > 0 && readable < frames {
-        counters.playback_underrun();
-    }
+    let mut audible = false;
     let mut out = data.chunks_exact_mut(channels);
     if let Ok(chunk) = consumer.read_chunk(readable * 2) {
         let (a, b) = chunk.as_slices();
@@ -124,6 +123,7 @@ pub(crate) fn playback<T>(
             else {
                 break;
             };
+            audible |= left != 0.0 || right != 0.0;
             let mid = T::from_sample((left + right) * 0.5);
             match frame {
                 [only] => *only = mid,
@@ -136,6 +136,9 @@ pub(crate) fn playback<T>(
             }
         }
         chunk.commit_all();
+    }
+    if audible && readable < frames {
+        counters.playback_underrun();
     }
     for frame in out {
         frame.fill(T::EQUILIBRIUM);
@@ -177,6 +180,17 @@ mod tests {
             counters.snapshot().playback_underruns,
             1,
             "empty queue is not an underrun"
+        );
+
+        // The playback thread keeps feeding silence while nobody talks; running dry after
+        // it is not heard.
+        producer.push(0.0).expect("push");
+        producer.push(0.0).expect("push");
+        playback(&mut out, 2, &mut consumer, &counters);
+        assert_eq!(
+            counters.snapshot().playback_underruns,
+            1,
+            "running dry after silence is not an underrun"
         );
 
         for s in [0.5, 0.25, -0.5, 0.0] {

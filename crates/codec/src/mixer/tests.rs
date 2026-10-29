@@ -483,22 +483,86 @@ fn playback_thread_plays_share_sound_at_its_level() {
 }
 
 #[test]
-fn jitter_delay_is_reported_while_someone_talks() {
-    let packets = tone_packets(20, 0);
+fn jitter_delay_is_reported_while_someone_talks_and_kept_afterwards() {
+    let packets = tone_packets(40, 0);
     let mut mixer = Mixer::new().expect("mixer");
     let (mut left, mut right) = ([0.0; FRAME_SAMPLES], [0.0; FRAME_SAMPLES]);
+    assert_eq!(mixer.stats().jitter_delay_ms, 0, "nobody talked yet");
     let mut talking_delay = 0;
-    for now in (0..800).step_by(10) {
+    for now in (0..1_500).step_by(10) {
         if let Some(p) = packets.get(now as usize / 20).filter(|_| now % 20 == 0) {
-            mixer.push_packet(&packet(3, p, false), now + 1);
+            // Every fourth packet arrives 30 ms late: jitter.
+            let delay = if (now / 20) % 4 == 3 { 30 } else { 0 };
+            mixer.push_packet(&packet(3, p, false), now + 1 + delay);
         }
         mixer.mix(&mut left, &mut right, None, now + 1, &mut |_| {});
-        if now == 200 {
+        if now == 600 {
             talking_delay = mixer.stats().jitter_delay_ms;
         }
     }
-    assert!(talking_delay >= 20, "one packet at least: {talking_delay}");
-    assert_eq!(mixer.stats().jitter_delay_ms, 0, "nobody talks any more");
+    assert!(
+        talking_delay > 20,
+        "more than one packet under jitter: {talking_delay}"
+    );
+    assert!(
+        mixer.stats().jitter_delay_ms > 0,
+        "the last stream's buffer is still shown between bursts"
+    );
+}
+
+#[test]
+fn idle_silence_and_stream_ends_are_not_concealment() {
+    let mut mixer = Mixer::new().expect("mixer");
+    let (mut left, mut right) = ([0.0; FRAME_SAMPLES], [0.0; FRAME_SAMPLES]);
+    for now in (0..5_000).step_by(10) {
+        assert!(!mixer.mix(&mut left, &mut right, None, now, &mut |_| {}));
+    }
+    assert_eq!(mixer.stats().concealed_frames, 0, "nobody talked");
+
+    // A stream that ends without the last-frame flag (lost, or a client that never sets it),
+    // followed by a long silence.
+    let mut packets = tone_packets(20, 0);
+    if let Some(last) = packets.last_mut() {
+        last.is_last = false;
+    }
+    let (_, events) = run(
+        &mut mixer,
+        &[Speech {
+            session: 4,
+            packets: &packets,
+            start_ms: 0,
+            via_listener: false,
+        }],
+        None,
+        5_000,
+    );
+    assert_eq!(events.len(), 2, "the stream started and ended: {events:?}");
+    let stats = mixer.stats();
+    assert_eq!(stats.concealed_frames, 0, "{stats:?}");
+    assert_eq!(stats.received_frames, 40);
+}
+
+#[test]
+fn a_gap_inside_a_stream_is_concealment() {
+    let packets = tone_packets(40, 0);
+    // Packets 10–12 (60 ms) are lost; the stream goes on afterwards.
+    let kept: Vec<_> = packets
+        .into_iter()
+        .enumerate()
+        .filter(|(i, _)| !(10..13).contains(i))
+        .map(|(_, p)| p)
+        .collect();
+    let mut mixer = Mixer::new().expect("mixer");
+    let (mut left, mut right) = ([0.0; FRAME_SAMPLES], [0.0; FRAME_SAMPLES]);
+    for now in (0..1_500).step_by(10) {
+        for p in kept.iter().filter(|p| p.seq * FRAME_MS == now) {
+            mixer.push_packet(&packet(5, p, false), now + 1);
+        }
+        mixer.mix(&mut left, &mut right, None, now + 1, &mut |_| {});
+    }
+    let stats = mixer.stats();
+    assert!(stats.concealed_frames >= 4, "{stats:?}");
+    assert_eq!(stats.received_frames, 74);
 }
 
 /// A device queue the test drains at will, like a device whose feeder thread ran late.
@@ -545,7 +609,7 @@ fn playback_thread_counts_late_wakeups_and_keeps_its_setup() {
     let sink = DrainableSink {
         queued: Arc::clone(&queued),
     };
-    let (playback, _ports) = Playback::start(sink, config).expect("playback");
+    let (playback, mut ports) = Playback::start(sink, config).expect("playback");
     let wait_until = |what: &str, done: &dyn Fn() -> bool| {
         let deadline = Instant::now() + Duration::from_secs(5);
         while !done() {
@@ -553,9 +617,23 @@ fn playback_thread_counts_late_wakeups_and_keeps_its_setup() {
             std::thread::sleep(Duration::from_millis(2));
         }
     };
-    wait_until("queue filled", &|| queued.load(Ordering::Relaxed) >= 1200);
+    let filled = || queued.load(Ordering::Relaxed) >= 1200;
+    wait_until("queue filled", &filled);
     assert_eq!(playback.stats().late_wakeups, 0, "a full queue is on time");
-    // The device played everything before the thread woke up again.
+    // The device played all the queued silence before the thread woke up again: not heard.
+    queued.store(0, Ordering::Relaxed);
+    wait_until("queue refilled", &filled);
+    assert_eq!(
+        playback.stats().late_wakeups,
+        0,
+        "running late over silence is not heard"
+    );
+    // Now with sound queued, the device runs dry part-way through it.
+    for _ in 0..4_800 {
+        ports.mix_in.push(0.5).expect("mix-in");
+    }
+    queued.store(0, Ordering::Relaxed);
+    wait_until("sound queued", &filled);
     queued.store(0, Ordering::Relaxed);
     wait_until("late wake-up counted", &|| {
         playback.stats().late_wakeups >= 1

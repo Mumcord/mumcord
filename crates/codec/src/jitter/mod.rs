@@ -73,8 +73,12 @@ pub struct JitterStats {
     pub invalid_packets: u64,
     /// 10 ms frames rebuilt from in-band FEC.
     pub fec_frames: u64,
-    /// 10 ms frames synthesized by packet-loss concealment.
+    /// 10 ms frames synthesized by packet-loss concealment while the stream went on. Frames
+    /// bridged after a stream's last packet (its end, when the last-frame flag is missing) are
+    /// not losses and are not counted.
     pub concealed_frames: u64,
+    /// 10 ms frames decoded from received packets.
+    pub decoded_frames: u64,
     /// 10 ms frames dropped to shrink the buffer.
     pub dropped_frames: u64,
     pub decode_errors: u64,
@@ -118,6 +122,9 @@ pub struct JitterBuffer {
     next_seq: u64,
     end_pending: bool,
     conceal_run: u32,
+    /// Frames bridged while waiting for a packet that may never come (the stream may have
+    /// ended); counted as concealed only once the stream continues.
+    bridged: u64,
     first_arrival_ms: u64,
     last_arrival_ms: u64,
     /// Smallest transit of the current burst, in ms.
@@ -142,6 +149,7 @@ impl JitterBuffer {
             next_seq: 0,
             end_pending: false,
             conceal_run: 0,
+            bridged: 0,
             first_arrival_ms: 0,
             last_arrival_ms: 0,
             transit_base: None,
@@ -306,6 +314,7 @@ impl JitterBuffer {
         self.transit_base = None;
         self.end_pending = false;
         self.conceal_run = 0;
+        self.bridged = 0;
         self.over_target_since = None;
     }
 
@@ -317,6 +326,8 @@ impl JitterBuffer {
         }
         self.pcm_read = 0;
         self.pcm_len = 0;
+        // Frames bridged after the last packet were the stream's end, not a loss.
+        self.bridged = 0;
         // The sender resets its encoder per talk burst; keep in step.
         if self.decoder.reset().is_err() {
             self.stats.decode_errors += 1;
@@ -330,6 +341,7 @@ impl JitterBuffer {
 
     fn clear(&mut self) {
         self.slots.fill(EMPTY_SLOT);
+        self.bridged = 0;
         self.pcm_read = 0;
         self.pcm_len = 0;
         if self.decoder.reset().is_err() {
@@ -390,11 +402,13 @@ impl JitterBuffer {
                 self.next_seq += slot.frames;
                 self.end_pending = slot.is_last;
                 self.conceal_run = 0;
+                self.commit_bridged();
                 continue;
             }
             concealed = true;
             match self.earliest_after(self.next_seq) {
                 Some(later) => {
+                    self.commit_bridged();
                     let gap = self.slots[later].seq - self.next_seq;
                     if gap > MAX_GAP_FRAMES {
                         self.next_seq = self.slots[later].seq;
@@ -409,7 +423,9 @@ impl JitterBuffer {
                 None if self.conceal_run < MAX_CONCEAL_FRAMES => {
                     // Probably just late: bridge without advancing, which
                     // delays the stream by one frame and grows the buffer.
-                    self.conceal();
+                    self.compact();
+                    self.synthesize(FRAME_SAMPLES, None);
+                    self.bridged += 1;
                     self.conceal_run += 1;
                 }
                 None => break,
@@ -426,7 +442,10 @@ impl JitterBuffer {
         }
         let out = &mut self.pcm[self.pcm_len..];
         match self.decoder.decode(&slot.data[..slot.len], out) {
-            Ok(n) => self.pcm_len += n,
+            Ok(n) => {
+                self.pcm_len += n;
+                self.stats.decoded_frames += (n / FRAME_SAMPLES) as u64;
+            }
             Err(_) => {
                 self.stats.decode_errors += 1;
                 let n = slot.frames as usize * FRAME_SAMPLES;
@@ -439,6 +458,12 @@ impl JitterBuffer {
         self.compact();
         self.stats.fec_frames += gap;
         self.synthesize(gap as usize * FRAME_SAMPLES, Some(later));
+    }
+
+    /// The stream went on after a bridge: the bridged frames covered a real gap.
+    fn commit_bridged(&mut self) {
+        self.stats.concealed_frames += self.bridged;
+        self.bridged = 0;
     }
 
     fn conceal(&mut self) {
