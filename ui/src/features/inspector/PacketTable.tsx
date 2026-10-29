@@ -3,6 +3,7 @@
  * shown besides times, sizes and the pacer comes from other clients and is rendered as text.
  */
 import { memo, useState } from "react";
+import { getApi } from "../../api";
 import { useTranslation } from "react-i18next";
 import { JsonView } from "./JsonView";
 import {
@@ -173,7 +174,7 @@ function PacketDetails({ packet, previousAtMs, names }: Omit<RowProps, "open" | 
   const [copy, setCopy] = useState<"copied" | "failed" | null>(null);
   const copyPacket = async () => {
     try {
-      await navigator.clipboard.writeText(packetBlock(packet, names, previousAtMs).join("\n"));
+      await getApi().copyText(packetBlock(packet, names, previousAtMs).join("\n"));
       setCopy("copied");
     } catch (error: unknown) {
       console.error("Copying the packet failed", error);

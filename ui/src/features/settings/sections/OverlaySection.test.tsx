@@ -48,8 +48,7 @@ describe("In-game overlay", () => {
   it("shows the OpenGL launch option and copies it", async () => {
     const option =
       "LD_PRELOAD=/home/u/.local/share/app.mumcord.client/overlay-layer/current/lib.so %command%";
-    const writeText = vi.fn(() => Promise.resolve());
-    Object.defineProperty(navigator, "clipboard", { value: { writeText }, configurable: true });
+    const writeText = vi.spyOn(api, "copyText").mockResolvedValue(null);
     render(
       <OverlaySection
         inGameApi={fakeInGame({

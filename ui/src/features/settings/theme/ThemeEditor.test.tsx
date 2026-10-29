@@ -1,7 +1,7 @@
 import { fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import { useState } from "react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { createMockApi, setApi, type Settings } from "../../../api";
+import { createMockApi, getApi, setApi, type Settings } from "../../../api";
 import { chooseOption } from "../../../components/SelectTestUtils";
 import { applyLanguage } from "../../../i18n";
 import { axeViolations } from "../../../test/axe";
@@ -297,9 +297,8 @@ describe("ThemeEditor (FR-2.14 – FR-2.16, FR-2.63)", () => {
   });
 
   it("copies the share message with the app version", async () => {
-    const writeText = vi.fn(() => Promise.resolve());
-    Object.defineProperty(navigator, "clipboard", { value: { writeText }, configurable: true });
     await renderEditor({ appThemeId: "preset:forest" });
+    const writeText = vi.spyOn(getApi(), "copyText").mockResolvedValue(null);
     fireEvent.click(within(openMenu("Forest")).getByRole("menuitem", { name: "Share" }));
     const forest = findPreset("preset:forest");
     if (!forest) throw new Error("no preset");

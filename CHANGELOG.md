@@ -16,6 +16,7 @@
 
 ### Fixed
 
+- The Copy buttons on code blocks, the packet inspector, the theme share action and the OpenGL launch option now copy through the app's own clipboard access, so they work on Linux where the web engine's clipboard fails (issue #134)
 - Voice no longer crackles or drops out as easily when the computer is under heavy load: Mumcord's capture and playback threads, and the audio device threads, ask the system for real-time scheduling (rtkit on Linux, MMCSS on Windows, a time-constraint policy on macOS; without it they keep running at normal priority), and a buffer under- or overrun of the audio device no longer restarts the whole audio stream. The connection info and the diagnostic file show audio dropouts, late audio frames, concealed frames, the jitter-buffer delay, the processing time and whether real-time audio is on (#123)
 - Deleted chat history no longer comes back through history sync when you rejoin: clearing a channel, a server or all history (and the automatic deletion after N days) now also limits what is fetched from other Mumcord users' copies, and the confirmation says that others keep their copies (issue #119)
 - In the compact chat layout, the shared theme card no longer draws its title over the thumbnail, and message cards and image transfer bars no longer shift left; the theme card fits its content and shrinks cleanly on narrow windows (#121)
