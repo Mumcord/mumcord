@@ -199,10 +199,12 @@ describe("noise suppression backends", () => {
     const inactive = await $("//p[contains(., 'Not active until you accept')]");
     await inactive.scrollIntoView();
     expect(await inactive.isDisplayed()).toBe(true);
-    // The engine keeps the refused library out of the frame path, so the level stays near the clip.
+    // The engine keeps the refused library out of the frame path, so nnnoiseless stays as the
+    // fallback. The refused run has to match the fallback, not the un-suppressed baseline.
+    // What the refused backend does is proven in the engine test; here the settings gate is checked
+    // through the UI, and the audio only has to arrive with the fallback suppressor.
     const refused = await measure("rnnoise-refused");
     expect(refused.gapDb).toBeLessThan(off.gapDb);
-    expect(refused.gapDb).toBeGreaterThan(off.gapDb - 12);
     await openVoiceSettings();
     const again = await switchByText("accept running this unreviewed");
     await again.click();
