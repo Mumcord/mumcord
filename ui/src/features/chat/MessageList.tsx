@@ -42,6 +42,7 @@ import { useMessageWindow } from "./messageWindow";
 import { OUTGOING_PREFIX, renderKey, type ConversationLog, type OutgoingSend } from "./chatStore";
 import { daysAgo, messageLayout } from "./grouping";
 import { pinnedIndex } from "./pinnedAuthor";
+import { useCodeBlockActions } from "./useCodeBlockActions";
 import { highlightCode } from "./highlight";
 import { hideShownLinks, useInlineShown } from "./inlineLinks";
 import { fullImageSource } from "./fullImage";
@@ -232,6 +233,7 @@ function Body({ message, tabIndex, previews, onImageClick, clickablePeople, onJu
       if (message.senderCertHash !== null) image.dataset["senderCert"] = message.senderCertHash;
     }
   }, [sanitized, tabIndex, t, message.senderName, message.senderSession, message.senderCertHash]);
+  const codeActions = useCodeBlockActions(ref, sanitized, tabIndex);
   const body = isBlank(sanitized) ? null : (
     // Delegated handlers for the mention chips inside the sanitized HTML; keyboard use is below.
     // eslint-disable-next-line jsx-a11y/no-static-element-interactions
@@ -298,6 +300,7 @@ function Body({ message, tabIndex, previews, onImageClick, clickablePeople, onJu
     <>
       {reply ? <ReplyHeader quote={reply.quote} onJump={onJump} tabIndex={tabIndex} /> : null}
       {body}
+      {codeActions}
       <MessageCards
         cards={extracted.cards}
         tabIndex={tabIndex}

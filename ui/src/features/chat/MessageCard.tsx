@@ -5,10 +5,11 @@
  * a plain link and nothing is requested. Links are ordinary anchors, so the message list's click
  * handler and link menu apply to them as to chat links.
  */
-import { useEffect, useMemo, useState, type ReactNode } from "react";
+import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 import type { InlineImage } from "../../api";
 import { displayUrl, type CardColor, type CardIcon, type MessageCard as Card } from "./cards";
+import { useCodeBlockActions } from "./useCodeBlockActions";
 import { highlightCode } from "./highlight";
 import { imageName, loadInlineImage, type ImageClickHandler } from "./links";
 import { openInBrowser } from "./openLink";
@@ -153,6 +154,8 @@ interface MessageCardProps {
 export function MessageCard({ card, tabIndex, previews, onImageClick }: MessageCardProps) {
   const { t } = useTranslation("chat");
   const body = useMemo(() => highlightCode(card.body), [card.body]);
+  const bodyRef = useRef<HTMLDivElement>(null);
+  const codeActions = useCodeBlockActions(bodyRef, body, tabIndex);
   const status = card.color === null ? null : t(`card.status.${card.color}`);
   const title = card.title ?? t("card.untitled");
   const label =
@@ -178,10 +181,12 @@ export function MessageCard({ card, tabIndex, previews, onImageClick }: MessageC
       ) : null}
       {body === "" ? null : (
         <div
+          ref={bodyRef}
           className="message-card__body chat-message__body"
           dangerouslySetInnerHTML={{ __html: body }}
         />
       )}
+      {codeActions}
       {card.image === null ? null : (
         <CardImage
           url={card.image}
