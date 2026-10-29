@@ -27,7 +27,7 @@
   "history": {
     "clear": "Előzmények törlése",
     "title": "Törlöd az előzményeket?",
-    "body": "Ez véglegesen törli a beszélgetés mentett üzeneteit erről a számítógépről. Másoknál megmaradnak a saját példányaik.",
+    "body": "Ez véglegesen törli a beszélgetés mentett üzeneteit erről a számítógépről. Másoknál megmaradnak a saját példányaik. Az ő példányaik nem szinkronizálódnak vissza erre a számítógépre.",
     "confirm": "Előzmények törlése",
     "cancel": "Mégse",
     "failed": "Az előzményeket nem sikerült törölni. Próbáld újra."

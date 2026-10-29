@@ -29,7 +29,7 @@
   "history": {
     "clear": "Obriši povijest",
     "title": "Obrisati povijest?",
-    "body": "Ovo trajno briše spremljene poruke ovog razgovora s ovog računala. Drugi zadržavaju svoje kopije.",
+    "body": "Ovo trajno briše spremljene poruke ovog razgovora s ovog računala. Drugi zadržavaju svoje kopije. Njihove se kopije neće ponovno sinkronizirati na ovo računalo.",
     "confirm": "Obriši povijest",
     "cancel": "Odustani",
     "failed": "Povijest nije bilo moguće obrisati. Pokušaj ponovno."

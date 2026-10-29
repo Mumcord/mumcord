@@ -51,6 +51,44 @@ impl Store {
         Ok((inserted == 1).then(|| self.conn.last_insert_rowid()))
     }
 
+    /// When the user last cleared the history of the channel `channel_key` on `server`, by
+    /// clearing that channel, the server or all history (issue #119). History sync takes
+    /// nothing from before this moment, so deleted messages do not come back.
+    pub fn history_cleared_at(
+        &self,
+        server: ServerId,
+        channel_key: &str,
+    ) -> Result<Option<UnixMillis>> {
+        Ok(self.conn.query_row(
+            "SELECT MAX(cleared_at) FROM history_cleared
+             WHERE (server_id IS NULL OR server_id = ?1)
+               AND (channel_key IS NULL OR channel_key = ?2)",
+            params![server, channel_key],
+            |row| row.get(0),
+        )?)
+    }
+
+    /// Remembers a "clear history" (`None`: all servers or all channels). Older marks the new
+    /// one covers are dropped, so the table stays as small as the number of clears.
+    pub(crate) fn mark_cleared(
+        &self,
+        server: Option<ServerId>,
+        channel_key: Option<&str>,
+        at: UnixMillis,
+    ) -> Result<()> {
+        self.conn.execute(
+            "DELETE FROM history_cleared
+             WHERE (?1 IS NULL OR server_id = ?1) AND (?2 IS NULL OR channel_key = ?2)",
+            params![server, channel_key],
+        )?;
+        self.conn.execute(
+            "INSERT INTO history_cleared (server_id, channel_key, cleared_at)
+             VALUES (?1, ?2, ?3)",
+            params![server, channel_key, at],
+        )?;
+        Ok(())
+    }
+
     /// The newest `limit` messages of a conversation sent in `[from, to)`, oldest first.
     pub fn messages_between(
         &self,
@@ -204,5 +242,55 @@ mod tests {
                 .expect("insert"),
             None
         );
+    }
+
+    #[test]
+    fn clearing_history_remembers_when_per_channel_server_and_all() {
+        let (_dir, store) = temp_store();
+        let a = server(&store);
+        let b = server(&store);
+        let lobby = Conversation::Channel("Lobby".into());
+        assert_eq!(store.history_cleared_at(a, "Lobby").expect("none"), None);
+
+        store
+            .clear_conversation_history(a, &lobby, 100)
+            .expect("channel");
+        assert_eq!(store.history_cleared_at(a, "Lobby").expect("a"), Some(100));
+        assert_eq!(
+            store.history_cleared_at(a, "Raid").expect("other channel"),
+            None
+        );
+        assert_eq!(
+            store.history_cleared_at(b, "Lobby").expect("other server"),
+            None
+        );
+        // Private chats are never synced, so clearing one marks nothing.
+        store
+            .clear_conversation_history(a, &Conversation::Private("aa".into()), 150)
+            .expect("private");
+        assert_eq!(store.history_cleared_at(a, "Lobby").expect("a"), Some(100));
+
+        store.clear_server_history(a, 200).expect("server");
+        assert_eq!(
+            store.history_cleared_at(a, "Raid").expect("raid"),
+            Some(200)
+        );
+        assert_eq!(store.history_cleared_at(b, "Raid").expect("b"), None);
+
+        store.clear_all_history(300).expect("all");
+        assert_eq!(store.history_cleared_at(b, "Raid").expect("b"), Some(300));
+        store
+            .clear_conversation_history(a, &lobby, 400)
+            .expect("again");
+        assert_eq!(
+            store.history_cleared_at(a, "Lobby").expect("newest"),
+            Some(400)
+        );
+        assert_eq!(store.history_cleared_at(a, "Raid").expect("all"), Some(300));
+        let rows: i64 = store
+            .conn
+            .query_row("SELECT COUNT(*) FROM history_cleared", [], |r| r.get(0))
+            .expect("count");
+        assert_eq!(rows, 2, "covered marks are dropped");
     }
 }

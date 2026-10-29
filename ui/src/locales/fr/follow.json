@@ -29,7 +29,7 @@
   "history": {
     "clear": "Effacer l’historique",
     "title": "Effacer l’historique ?",
-    "body": "Cela supprime définitivement de cet ordinateur les messages enregistrés de cette conversation. Les autres personnes conservent leurs copies.",
+    "body": "Cela supprime définitivement de cet ordinateur les messages enregistrés de cette conversation. Les autres personnes conservent leurs copies. Leurs copies ne seront pas resynchronisées sur cet ordinateur.",
     "confirm": "Effacer l’historique",
     "cancel": "Annuler",
     "failed": "L’historique n’a pas pu être effacé. Veuillez réessayer."

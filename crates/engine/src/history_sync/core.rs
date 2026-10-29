@@ -1,7 +1,8 @@
 //! The history sync state machine of one connection, both sides (FR-1.60, QA.48, QA.49).
 //!
 //! **Requesting** (one channel at a time, queued): ask everyone who holds the channel's
-//! messages in `[now − 7 days, cutoff)` (`areq`), collect summaries for
+//! messages in `[now − 7 days, cutoff)` (`areq`; starting later after the user cleared the
+//! channel or within the automatic deletion window, see `sync_floor`), collect summaries for
 //! [`DISCOVER_MS`], ask the [`MAX_HOLDERS`] largest holders for their hash lists (`hreq`),
 //! subtract what is already stored (±1 s, see [`super::hash`]), assign every missing hash to
 //! exactly one holder (spread evenly) and fetch it (`get`). Received messages are checked
@@ -30,6 +31,7 @@ use mumcord_store::{ChatMessage, Conversation, NewChatMessage, ServerId, Store, 
 use super::hash::{Content, content_hash, text_key, variants};
 use super::wire::{self, Hash, MAX_MESSAGES, Packet, WireMessage};
 use crate::chat::{ChatMessageView, sanitize_message_html, transient_id};
+use crate::maintenance::history_cutoff;
 use crate::session::{ConversationRef, EngineEvent};
 
 /// How far back a sync reaches (FR-1.60).
@@ -74,6 +76,8 @@ pub(crate) trait Env {
     fn own_cert(&self) -> Option<String>;
     /// Store key (channel path) of a channel.
     fn channel_key(&self, channel: u32) -> Option<String>;
+    /// The "delete history after N days" setting. Never called while [`Env::store`] is held.
+    fn history_max_age_days(&self) -> Option<u32>;
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -413,11 +417,17 @@ impl Core {
 
     fn start_next(&mut self, env: &impl Env, now: UnixMillis) {
         while let Some(pending) = self.pending.pop_front() {
-            let from = now - MAX_AGE_MS;
             let Some(key) = env.channel_key(pending.channel) else {
                 continue;
             };
+            let from = sync_floor(env, &key, now);
             if from >= pending.to {
+                // Nothing to ask for (e.g. cleared since): "load earlier" still gets its answer.
+                self.events.push(EngineEvent::HistorySyncStatus {
+                    channel_id: pending.channel,
+                    running: false,
+                    added: 0,
+                });
                 continue;
             }
             self.events.push(EngineEvent::HistorySyncStatus {
@@ -708,6 +718,8 @@ impl Core {
         let Some(job) = self.job.as_mut() else {
             return;
         };
+        // The user may have cleared the channel while this sync was running.
+        let from = cleared_floor(env, &job.key).map_or(job.from, |f| f.max(job.from));
         let Stage::Transfer { known, .. } = &mut job.stage else {
             return;
         };
@@ -723,7 +735,8 @@ impl Core {
         // message ("ok", "ok") is two messages, while another source's copy is a duplicate.
         let mut texts = Vec::new();
         for m in messages.into_iter().take(wanted.len()) {
-            if m.ts < job.from || m.ts >= job.to || m.b.len() > MAX_BODY {
+            // Also guards against holders that ignore the requested range.
+            if m.ts < from || m.ts >= job.to || m.b.len() > MAX_BODY {
                 continue;
             }
             if m.h.as_deref().is_some_and(|h| !is_cert_hash(h)) {
@@ -987,6 +1000,30 @@ fn stored_content<'a>(key: &'a str, m: &'a ChatMessage) -> Content<'a> {
         sender_cert_hash: m.sender_cert_hash.as_deref(),
         sent_at: m.sent_at,
         body: &m.body,
+    }
+}
+
+/// The oldest send time a sync of the channel `key` takes (issue #119): at most
+/// [`MAX_AGE_MS`] back, nothing the automatic history deletion would delete right away, and
+/// nothing from before the user last cleared the channel.
+fn sync_floor(env: &impl Env, key: &str, now: UnixMillis) -> UnixMillis {
+    let mut floor = now - MAX_AGE_MS;
+    if let Some(days) = env.history_max_age_days() {
+        floor = floor.max(history_cutoff(now, days));
+    }
+    cleared_floor(env, key).map_or(floor, |f| f.max(floor))
+}
+
+/// The first send time after the user last cleared the channel `key`, if they did. Holders
+/// stamp messages with their own clocks, so a copy of a deleted message may carry a time up to
+/// [`SKEW_MS`] after the clear; those few seconds are skipped too.
+fn cleared_floor(env: &impl Env, key: &str) -> Option<UnixMillis> {
+    match env.store().history_cleared_at(env.server_id(), key) {
+        Ok(at) => at.map(|at| at.saturating_add(SKEW_MS + 1)),
+        Err(e) => {
+            tracing::warn!(error = %e, "history sync: reading when history was cleared failed");
+            None
+        }
     }
 }
 

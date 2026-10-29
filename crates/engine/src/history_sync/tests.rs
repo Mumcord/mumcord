@@ -24,6 +24,7 @@ struct TestEnv {
     server: ServerId,
     sharing: bool,
     cert: String,
+    max_age_days: Option<u32>,
 }
 
 impl Env for TestEnv {
@@ -38,6 +39,9 @@ impl Env for TestEnv {
     }
     fn own_cert(&self) -> Option<String> {
         Some(self.cert.clone())
+    }
+    fn history_max_age_days(&self) -> Option<u32> {
+        self.max_age_days
     }
     fn channel_key(&self, channel: u32) -> Option<String> {
         match channel {
@@ -54,6 +58,9 @@ struct Node {
     core: Core,
     env: TestEnv,
     events: Vec<EngineEvent>,
+    /// Answers as if every request reached back the full week, like a client that ignores
+    /// the requested range.
+    ignores_from: bool,
 }
 
 /// Clients by session plus a clock; [`Net::run`] ticks everyone and forwards packets.
@@ -99,8 +106,10 @@ impl Net {
                         server,
                         sharing: true,
                         cert: cert(session),
+                        max_age_days: None,
                     },
                     events: Vec::new(),
+                    ignores_from: false,
                 },
             );
         }
@@ -149,7 +158,26 @@ impl Net {
     fn deliver(&mut self, from: u32, to: &[u32], data: &[u8]) {
         for receiver in to {
             if let Some(node) = self.nodes.get_mut(receiver) {
-                node.core.on_packet(&node.env, from, data, self.now);
+                let data = match wire::decode(data) {
+                    Ok(Packet::AvailabilityRequest {
+                        req, channel, to, ..
+                    }) if node.ignores_from => wire::encode(&Packet::AvailabilityRequest {
+                        req,
+                        channel,
+                        from: 0,
+                        to,
+                    }),
+                    Ok(Packet::HashRequest {
+                        req, channel, to, ..
+                    }) if node.ignores_from => wire::encode(&Packet::HashRequest {
+                        req,
+                        channel,
+                        from: 0,
+                        to,
+                    }),
+                    _ => data.to_vec(),
+                };
+                node.core.on_packet(&node.env, from, &data, self.now);
                 node.events.extend(node.core.take_events());
             }
         }
@@ -212,6 +240,31 @@ impl Net {
             .into_iter()
             .map(|m| (m.sent_at, m.body))
             .collect()
+    }
+
+    /// The lowest `from` that `session` asked for in the lobby.
+    fn lowest_from(&self, session: u32) -> Option<UnixMillis> {
+        self.log
+            .iter()
+            .filter(|(f, _, _)| *f == session)
+            .filter_map(|(_, _, p)| match p {
+                Packet::AvailabilityRequest { channel, from, .. }
+                | Packet::HashRequest { channel, from, .. }
+                    if *channel == LOBBY =>
+                {
+                    Some(*from)
+                }
+                _ => None,
+            })
+            .min()
+    }
+
+    /// `session` leaves the lobby and joins it again after `ms`.
+    fn rejoin_lobby(&mut self, session: u32, ms: i64) {
+        self.place(session, &[ROOT]);
+        self.run(ms);
+        self.place(session, &[LOBBY]);
+        self.run(10_000);
     }
 
     fn fetches(&self, from: u32, to: u32) -> usize {
@@ -638,4 +691,152 @@ fn the_code_language_marker_survives_the_sync_round_trip() {
     // What the UI reads after a restart: the copy in the local database.
     let stored: Vec<String> = net.stored(2, LOBBY).into_iter().map(|(_, b)| b).collect();
     assert_eq!(stored, [body]);
+}
+
+/// Node 2 synced three lobby messages from node 1 and then cleared its history with `clear`.
+/// Returns when it cleared.
+fn synced_then_cleared(
+    net: &mut Net,
+    clear: impl FnOnce(&Store, ServerId, UnixMillis),
+) -> UnixMillis {
+    net.place(1, &[LOBBY]);
+    for (i, body) in ["one", "two", "three"].iter().enumerate() {
+        net.hold(
+            1,
+            LOBBY,
+            3,
+            START - 60_000 + i64::try_from(i).unwrap_or(0) * 1000,
+            body,
+        );
+    }
+    net.place(2, &[LOBBY]);
+    net.run(10_000);
+    assert_eq!(net.stored(2, LOBBY).len(), 3);
+    let cleared = net.now;
+    let node = net.node(2);
+    clear(&node.env.store(), node.env.server, cleared);
+    assert!(net.stored(2, LOBBY).is_empty());
+    cleared
+}
+
+#[test]
+fn cleared_history_does_not_come_back_through_the_sync() {
+    let clears: [fn(&Store, ServerId, UnixMillis); 3] = [
+        |store, server, at| {
+            store
+                .clear_conversation_history(server, &Conversation::Channel("Lobby".into()), at)
+                .expect("clear channel");
+        },
+        |store, server, at| {
+            store
+                .clear_server_history(server, at)
+                .expect("clear server")
+        },
+        |store, _, at| store.clear_all_history(at).expect("clear all"),
+    ];
+    for clear in clears {
+        let mut net = Net::new(&[1, 2]);
+        let cleared = synced_then_cleared(&mut net, clear);
+        net.log.clear();
+        // Sent while node 2 was away: new to it, so it is synced.
+        net.place(2, &[ROOT]);
+        net.hold(1, LOBBY, 3, cleared + 10_000, "after the clear");
+        net.run(20_000);
+        net.place(2, &[LOBBY]);
+        net.run(10_000);
+
+        let stored: Vec<_> = net.stored(2, LOBBY).into_iter().map(|(_, b)| b).collect();
+        assert_eq!(stored, ["after the clear"]);
+        let asked = net.lowest_from(2).expect("asked again");
+        assert!(asked > cleared, "the request starts after the clear");
+    }
+}
+
+#[test]
+fn holders_that_ignore_the_range_cannot_bring_cleared_messages_back() {
+    let mut net = Net::new(&[1, 2]);
+    net.node(1).ignores_from = true;
+    let lobby = Conversation::Channel("Lobby".into());
+    let cleared = synced_then_cleared(&mut net, |store, server, at| {
+        store
+            .clear_conversation_history(server, &lobby, at)
+            .expect("clear");
+    });
+    // A copy stamped by a holder whose clock runs a little ahead.
+    net.hold(1, LOBBY, 3, cleared + 2000, "skewed copy");
+    net.rejoin_lobby(2, 20_000);
+    assert!(net.stored(2, LOBBY).is_empty());
+}
+
+#[test]
+fn clearing_during_a_sync_drops_what_is_still_arriving() {
+    let mut net = Net::new(&[1, 2]);
+    net.place(1, &[LOBBY]);
+    net.hold(1, LOBBY, 3, START - 5000, "old");
+    net.place(2, &[LOBBY]);
+    while net.fetches(2, 1) == 0 {
+        net.run(100);
+        assert!(net.now < START + 10_000, "no fetch sent");
+    }
+    let now = net.now;
+    let node = net.node(2);
+    node.env
+        .store()
+        .clear_conversation_history(node.env.server, &Conversation::Channel("Lobby".into()), now)
+        .expect("clear");
+    net.run(10_000);
+    assert!(net.stored(2, LOBBY).is_empty());
+    assert!(net.synced(2).is_empty());
+}
+
+#[test]
+fn messages_the_automatic_deletion_would_remove_are_not_synced() {
+    const DAY: i64 = 24 * 60 * 60 * 1000;
+    let mut net = Net::new(&[1, 2]);
+    net.node(2).env.max_age_days = Some(1);
+    net.place(1, &[LOBBY]);
+    net.hold(1, LOBBY, 3, START - 2 * DAY, "two days old");
+    net.hold(1, LOBBY, 3, START - DAY / 2, "half a day old");
+    net.place(2, &[LOBBY]);
+    net.run(10_000);
+    assert_eq!(bodies(&net.synced(2)), ["half a day old"]);
+    let asked = net.lowest_from(2).expect("asked");
+    assert!(
+        asked >= START - DAY,
+        "the request stays inside the retention window"
+    );
+}
+
+#[test]
+fn holders_answer_only_from_the_requested_start() {
+    // How clients answer `from` since FR-1.60: a raised start is honored by every version, so
+    // a cleared channel needs no new request field.
+    let mut net = Net::new(&[1, 2]);
+    net.place(1, &[LOBBY]);
+    net.run(1000);
+    net.place(2, &[LOBBY]);
+    net.hold(1, LOBBY, 3, START - 5000, "before the start");
+    net.hold(1, LOBBY, 3, START - 1000, "after the start");
+    let request = br#"{"v":1,"t":"hreq","r":77,"c":1,"from":1699999997000,"to":1700000001000}"#;
+    net.deliver(2, &[1], request);
+    let later = net.now + 1000;
+    let hashes: Vec<_> = net
+        .node(1)
+        .core
+        .take_outgoing(later)
+        .iter()
+        .filter_map(|(_, d)| match wire::decode(d) {
+            Ok(Packet::Hashes { hashes, .. }) => Some(hashes),
+            _ => None,
+        })
+        .flatten()
+        .collect();
+    let after = content_hash(&Content {
+        channel: "Lobby",
+        sender_name: "user3",
+        sender_cert_hash: Some(&cert(3)),
+        sent_at: START - 1000,
+        body: "after the start",
+    });
+    assert_eq!(hashes, [after]);
 }

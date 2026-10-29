@@ -1,5 +1,5 @@
 //! History sync between two Mumcord engines against the local test server (AC-1.51,
-//! AC-1.51c). `testenv/up.sh v15`, then:
+//! AC-1.51c), and deleted history staying deleted (issue #119). `testenv/up.sh v15`, then:
 //! `MUMCORD_LIVE=1 cargo test -p mumcord-engine --features test-backend --test live_history_sync -- --ignored --test-threads=1`
 #![cfg(feature = "test-backend")]
 
@@ -169,40 +169,7 @@ async fn late_joiner_receives_missed_lobby_messages() {
     let (a_name, b_name, bot_name) = (unique("mc-hsa"), unique("mc-hsb"), unique("mc-hsbot"));
     let (a, mut a_rx) = start_engine(&dir.join("a"), &a_name).await;
     let (b, mut b_rx) = start_engine(&dir.join("b"), &b_name).await;
-    let bot = Bot::connect(BotConfig {
-        data_dir: Some(dir.join("bot")),
-        ..BotConfig::new(&bot_name, common::v15())
-    })
-    .await
-    .expect("bot");
-    // A temporary channel of its own keeps other clients' chatter out of the history. Only an
-    // admin may create it; it moves its creator in and disappears when everybody has left, so
-    // the admin stays connected for the whole test.
-    let room = unique("mc-hsroom");
-    let admin = Bot::connect(BotConfig::superuser(common::v15()))
-        .await
-        .expect("SuperUser bot (SUPERUSER_PASSWORD in testenv/.env)");
-    admin
-        .handle()
-        .send_channel_state(proto::ChannelState {
-            parent: Some(0),
-            name: Some(room.clone()),
-            temporary: Some(true),
-            ..Default::default()
-        })
-        .expect("create channel");
-    admin
-        .wait_user("SuperUser", &in_channel(&room))
-        .await
-        .expect("room created");
-    // The bot learns of the new channel a moment after the admin did.
-    for _ in 0..50 {
-        if bot.channel_id(&room).is_ok() {
-            break;
-        }
-        tokio::time::sleep(Duration::from_millis(100)).await;
-    }
-    bot.join(&room).await.expect("bot joins the room");
+    let (_admin, bot, room) = temp_room(&dir, &bot_name).await;
 
     // A stays in the room while messages are sent; one private message too.
     let a_server = add_server(&a, &a_name).await;
@@ -264,19 +231,131 @@ async fn late_joiner_receives_missed_lobby_messages() {
     assert!(again.is_empty(), "nothing new: {again:?}");
     assert_eq!(added, 0);
 
-    // With sharing off on A, B gets nothing.
+    // With sharing off on A, B gets nothing of what it missed while away.
     let mut settings = a.settings().expect("settings");
     settings.history_sharing = false;
     a.update_settings(settings).await.expect("save");
-    b.history_clear(mumcord_engine::HistoryScope::All)
-        .expect("clear B");
-    b.history_sync_request(only_server(&b), lobby, None)
-        .expect("load earlier");
+    b.join_channel(only_server(&b), 0)
+        .expect("B leaves the room");
+    tokio::time::sleep(Duration::from_millis(500)).await;
+    bot.send_channel(Some(&room), "missed while away")
+        .expect("send");
+    wait_message(&mut a_rx, "missed while away").await;
+    tokio::time::sleep(Duration::from_millis(1100)).await;
+    b.join_channel(only_server(&b), lobby)
+        .expect("B rejoins the room");
     let (none, added) = wait_sync(&mut b_rx, lobby).await;
     assert!(none.is_empty());
     assert_eq!(added, 0);
 
     a.disconnect(only_server(&a));
+    b.disconnect(only_server(&b));
+}
+
+/// A temporary channel of its own keeps other clients' chatter out of the history. Only an
+/// admin may create it; it moves its creator in and disappears when everybody has left, so the
+/// returned admin must stay connected for the whole test. The bot `bot_name` is in the room.
+async fn temp_room(dir: &Path, bot_name: &str) -> (Bot, Bot, String) {
+    let bot = Bot::connect(BotConfig {
+        data_dir: Some(dir.join("bot")),
+        ..BotConfig::new(bot_name, common::v15())
+    })
+    .await
+    .expect("bot");
+    let room = unique("mc-hsroom");
+    let admin = Bot::connect(BotConfig::superuser(common::v15()))
+        .await
+        .expect("SuperUser bot (SUPERUSER_PASSWORD in testenv/.env)");
+    admin
+        .handle()
+        .send_channel_state(proto::ChannelState {
+            parent: Some(0),
+            name: Some(room.clone()),
+            temporary: Some(true),
+            ..Default::default()
+        })
+        .expect("create channel");
+    admin
+        .wait_user("SuperUser", &in_channel(&room))
+        .await
+        .expect("room created");
+    // The bot learns of the new channel a moment after the admin did.
+    for _ in 0..50 {
+        if bot.channel_id(&room).is_ok() {
+            break;
+        }
+        tokio::time::sleep(Duration::from_millis(100)).await;
+    }
+    bot.join(&room).await.expect("bot joins the room");
+    (admin, bot, room)
+}
+
+#[tokio::test(flavor = "multi_thread", worker_threads = 4)]
+#[ignore = "needs testenv v15 (MUMCORD_LIVE=1)"]
+async fn deleted_history_stays_deleted_after_rejoining() {
+    if !live() {
+        return;
+    }
+    // SAFETY: set before any audio thread exists; tests run with --test-threads=1.
+    unsafe { std::env::set_var("MUMCORD_AUDIO_BACKEND", "null") };
+    let dir = work_dir("engine-live-history-deleted");
+    let (a_name, b_name, bot_name) = (unique("mc-hda"), unique("mc-hdb"), unique("mc-hdbot"));
+    let (a, mut a_rx) = start_engine(&dir.join("a"), &a_name).await;
+    let (b, mut b_rx) = start_engine(&dir.join("b"), &b_name).await;
+    let (_admin, bot, room) = temp_room(&dir, &bot_name).await;
+
+    // B is in the room for the whole conversation, so B holds all of it.
+    let b_server = add_server(&b, &b_name).await;
+    let snapshot = connect(&b, &mut b_rx, &b_server).await;
+    let lobby = channel(&snapshot, &room);
+    b.join_channel(only_server(&b), lobby)
+        .expect("B joins the room");
+    bot.wait_user(&b_name, &in_channel(&room))
+        .await
+        .expect("B in the room");
+    for body in ["old one", "old two"] {
+        bot.send_channel(Some(&room), body).expect("send");
+        wait_message(&mut b_rx, body).await;
+    }
+    tokio::time::sleep(Duration::from_millis(1100)).await;
+
+    // A joins, gets the messages from B and deletes them.
+    let a_server = add_server(&a, &a_name).await;
+    connect(&a, &mut a_rx, &a_server).await;
+    let a_id = only_server(&a);
+    a.join_channel(a_id, lobby).expect("A joins the room");
+    let (synced, _) = wait_sync(&mut a_rx, lobby).await;
+    assert_eq!(synced.len(), 2, "A first gets B's copies");
+    let room_ref = mumcord_engine::ConversationRef::Channel { channel_id: lobby };
+    a.history_clear(mumcord_engine::HistoryScope::Conversation {
+        server_id: a_id,
+        conversation: room_ref.clone(),
+    })
+    .expect("A deletes the room's history");
+
+    // A leaves; a message sent meanwhile is new to A and may be synced. It is sent more than the
+    // clock-skew margin after the clear, which skips the first seconds after it.
+    a.join_channel(a_id, 0).expect("A leaves the room");
+    tokio::time::sleep(Duration::from_millis(6000)).await;
+    bot.send_channel(Some(&room), "while away").expect("send");
+    wait_message(&mut b_rx, "while away").await;
+    tokio::time::sleep(Duration::from_millis(1100)).await;
+
+    // A rejoins: B answers, but only with what came after the clear.
+    a.join_channel(a_id, lobby).expect("A rejoins the room");
+    let (synced, added) = wait_sync(&mut a_rx, lobby).await;
+    let bodies: Vec<&str> = synced.iter().map(|m| m.body.as_str()).collect();
+    assert_eq!(bodies, ["while away"]);
+    assert_eq!(added, 1);
+    a.history_sync_request(a_id, lobby, None)
+        .expect("load earlier");
+    let (again, _) = wait_sync(&mut a_rx, lobby).await;
+    assert!(again.is_empty(), "nothing older comes back: {again:?}");
+    let stored = a.history_load(a_id, room_ref, None, 50).expect("history");
+    let bodies: Vec<&str> = stored.iter().map(|m| m.body.as_str()).collect();
+    assert_eq!(bodies, ["while away"]);
+
+    a.disconnect(a_id);
     b.disconnect(only_server(&b));
 }
 

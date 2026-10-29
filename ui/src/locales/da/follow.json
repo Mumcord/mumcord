@@ -27,7 +27,7 @@
   "history": {
     "clear": "Ryd historik",
     "title": "Ryd historik?",
-    "body": "Dette sletter permanent de gemte beskeder fra denne samtale på denne computer. Andre beholder deres kopier.",
+    "body": "Dette sletter permanent de gemte beskeder fra denne samtale på denne computer. Andre beholder deres kopier. Deres kopier synkroniseres ikke tilbage til denne computer.",
     "confirm": "Ryd historik",
     "cancel": "Annullér",
     "failed": "Historikken kunne ikke ryddes. Prøv igen."

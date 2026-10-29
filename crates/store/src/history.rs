@@ -229,11 +229,12 @@ impl Store {
     }
 
     /// "Clear history" for one channel or private chat (a friend's chat on all servers, as it
-    /// is shown).
+    /// is shown). A cleared channel remembers `at` (see [`Store::history_cleared_at`]).
     pub fn clear_conversation_history(
         &self,
         server: ServerId,
         conversation: &Conversation,
+        at: UnixMillis,
     ) -> Result<()> {
         let (kind, key) = conversation.parts();
         let scope = self.history_scope(server, conversation)?;
@@ -243,19 +244,23 @@ impl Store {
                AND conversation_key = ?3",
             params![scope, kind, key],
         )?;
+        if let Conversation::Channel(path) = conversation {
+            self.mark_cleared(Some(server), Some(path), at)?;
+        }
         Ok(())
     }
 
     /// "Clear history" for a whole server.
-    pub fn clear_server_history(&self, server: ServerId) -> Result<()> {
+    pub fn clear_server_history(&self, server: ServerId, at: UnixMillis) -> Result<()> {
         self.conn
             .execute("DELETE FROM chat_message WHERE server_id = ?1", [server])?;
-        Ok(())
+        self.mark_cleared(Some(server), None, at)
     }
 
     /// "Clear all history".
-    pub fn clear_all_history(&self) -> Result<()> {
+    pub fn clear_all_history(&self, at: UnixMillis) -> Result<()> {
         self.conn.execute("DELETE FROM chat_message", [])?;
+        self.mark_cleared(None, None, at)?;
         // Deleted chat contents must not linger in free pages of the file.
         self.conn.execute_batch("VACUUM")?;
         Ok(())
@@ -389,17 +394,17 @@ mod tests {
         };
 
         store
-            .clear_conversation_history(a, &lobby)
+            .clear_conversation_history(a, &lobby, 1)
             .expect("clear conv");
         assert!(store.messages(a, &lobby, 10).expect("m").is_empty());
         assert_eq!(store.messages(a, &games, 10).expect("m").len(), 1);
         assert_eq!(store.messages(b, &lobby, 10).expect("m").len(), 1);
         assert_eq!(count(&store), 3);
 
-        store.clear_server_history(b).expect("clear server");
+        store.clear_server_history(b, 1).expect("clear server");
         assert_eq!(count(&store), 1);
 
-        store.clear_all_history().expect("clear all");
+        store.clear_all_history(1).expect("clear all");
         assert_eq!(count(&store), 0);
     }
 
