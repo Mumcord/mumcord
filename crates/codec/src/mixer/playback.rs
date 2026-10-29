@@ -25,6 +25,8 @@ const POLL_INTERVAL: Duration = Duration::from_millis(2);
 /// device) cannot make the thread drain the jitter buffers faster than real time.
 const MAX_FRAMES_PER_POLL: u32 = 4;
 const FRAME_DURATION: Duration = Duration::from_millis(10);
+/// Device queue below which a wake-up counts as late (5 ms).
+const LATE_QUEUE_SAMPLES: usize = FRAME_SAMPLES / 2;
 
 /// Where mixed frames go; implemented by the device `FrameSink` of `mumcord-audio` and by test doubles.
 pub trait PlaybackSink: Send + 'static {
@@ -90,6 +92,14 @@ pub struct PlaybackStats {
     pub concealed_frames: u64,
     /// Frames the sink refused (queue full or no output device).
     pub frames_refused: u64,
+    /// Times the playback thread woke up to a nearly empty device queue: it was scheduled too
+    /// late, and the device played silence or will shortly.
+    pub late_wakeups: u64,
+    /// Largest jitter-buffer target delay of the speakers currently playing, in ms.
+    pub jitter_delay_ms: u64,
+    /// Average and worst time to mix (decode, conceal, place) one 10 ms frame, in µs.
+    pub mix_time_avg_us: u64,
+    pub mix_time_max_us: u64,
 }
 
 #[derive(Default)]
@@ -99,6 +109,47 @@ struct Counters {
     late: AtomicU64,
     concealed: AtomicU64,
     refused: AtomicU64,
+    late_wakeups: AtomicU64,
+    jitter_delay_ms: AtomicU64,
+    mix_time: FrameTime,
+}
+
+/// Processing time per frame, written by one thread with relaxed atomics and read anywhere.
+#[derive(Debug, Default)]
+pub struct FrameTime {
+    frames: AtomicU64,
+    total_us: AtomicU64,
+    max_us: AtomicU64,
+}
+
+impl FrameTime {
+    /// Records the time one frame took.
+    pub fn record(&self, elapsed: Duration) {
+        let us = u64::try_from(elapsed.as_micros()).unwrap_or(u64::MAX);
+        self.frames.fetch_add(1, Ordering::Relaxed);
+        self.total_us.fetch_add(us, Ordering::Relaxed);
+        self.max_us.fetch_max(us, Ordering::Relaxed);
+    }
+
+    /// Average time per frame in µs (0 before the first frame).
+    pub fn avg_us(&self) -> u64 {
+        let frames = self.frames.load(Ordering::Relaxed);
+        self.total_us
+            .load(Ordering::Relaxed)
+            .checked_div(frames)
+            .unwrap_or(0)
+    }
+
+    /// Worst time of a single frame in µs.
+    pub fn max_us(&self) -> u64 {
+        self.max_us.load(Ordering::Relaxed)
+    }
+
+    pub fn reset(&self) {
+        self.frames.store(0, Ordering::Relaxed);
+        self.total_us.store(0, Ordering::Relaxed);
+        self.max_us.store(0, Ordering::Relaxed);
+    }
 }
 
 enum Command {
@@ -232,6 +283,10 @@ impl Playback {
             late_packets: c.late.load(Ordering::Relaxed),
             concealed_frames: c.concealed.load(Ordering::Relaxed),
             frames_refused: c.refused.load(Ordering::Relaxed),
+            late_wakeups: c.late_wakeups.load(Ordering::Relaxed),
+            jitter_delay_ms: c.jitter_delay_ms.load(Ordering::Relaxed),
+            mix_time_avg_us: c.mix_time.avg_us(),
+            mix_time_max_us: c.mix_time.max_us(),
         }
     }
 
@@ -277,6 +332,8 @@ impl<S: PlaybackSink> Worker<S> {
         // When the sink refuses frames (no device), pace by the wall clock.
         let mut next_frame_due = Instant::now();
         let mut sink_refusing = false;
+        // A late wake-up only counts once the queue was filled at least once.
+        let mut primed = false;
 
         while !self.stop.load(Ordering::Relaxed) {
             self.apply_commands();
@@ -284,6 +341,13 @@ impl<S: PlaybackSink> Worker<S> {
             while let Ok(packet) = self.packets.pop() {
                 let arrival_ms = millis_since(epoch, packet.arrival);
                 self.mixer.push_packet(&packet, arrival_ms);
+            }
+            if !sink_refusing {
+                let queued = self.sink.queued_samples();
+                if primed && queued < LATE_QUEUE_SAMPLES {
+                    self.counters.late_wakeups.fetch_add(1, Ordering::Relaxed);
+                }
+                primed |= queued >= target_samples;
             }
 
             let mut mixed = 0;
@@ -303,6 +367,7 @@ impl<S: PlaybackSink> Worker<S> {
                 }
                 has_extra |= self.shares.mix_into(&mut extra);
                 let events = &mut self.events;
+                let mix_start = Instant::now();
                 self.mixer.mix(
                     &mut left,
                     &mut right,
@@ -314,6 +379,7 @@ impl<S: PlaybackSink> Worker<S> {
                         let _ = events.push(event);
                     },
                 );
+                self.counters.mix_time.record(mix_start.elapsed());
                 if let Some(tap) = &mut self.config.far_end_tap {
                     downmix(&left, &right, &mut mono);
                     tap(&mono);
@@ -372,6 +438,8 @@ impl<S: PlaybackSink> Worker<S> {
         c.no_slot.store(stats.packets_no_slot, Ordering::Relaxed);
         c.late.store(stats.late_packets, Ordering::Relaxed);
         c.concealed.store(stats.concealed_frames, Ordering::Relaxed);
+        c.jitter_delay_ms
+            .store(stats.jitter_delay_ms, Ordering::Relaxed);
     }
 }
 

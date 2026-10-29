@@ -274,6 +274,31 @@ struct Slot {
 }
 
 impl Core {
+    /// Glitch counters of the running voice pipeline; `None` while it is not running.
+    fn audio_health(&self, voice: &VoiceShared) -> Option<AudioHealthView> {
+        let pipeline = self.pipeline.as_ref()?;
+        let io = self.audio.as_ref()?.io().stats();
+        let base = pipeline.io_base();
+        let playback = pipeline.playback_stats();
+        Some(AudioHealthView {
+            device_xruns: io.device_xruns.saturating_sub(base.device_xruns),
+            stream_restarts: io.stream_restarts.saturating_sub(base.stream_restarts),
+            capture_overruns: io.capture_overruns.saturating_sub(base.capture_overruns),
+            playback_underruns: io
+                .playback_underruns
+                .saturating_sub(base.playback_underruns),
+            capture_late_frames: voice.capture_late_frames.load(Ordering::Relaxed),
+            playback_late_wakeups: playback.late_wakeups,
+            concealed_frames: playback.concealed_frames,
+            late_packets: playback.late_packets,
+            jitter_delay_ms: playback.jitter_delay_ms,
+            capture_time_avg_us: voice.capture_time.avg_us(),
+            capture_time_max_us: voice.capture_time.max_us(),
+            mix_time_avg_us: playback.mix_time_avg_us,
+            mix_time_max_us: playback.mix_time_max_us,
+        })
+    }
+
     fn session(&self, server_id: ServerId) -> EngineResult<&Session> {
         self.slots
             .get(&server_id)
@@ -1190,6 +1215,7 @@ impl Engine {
             server_max_bandwidth_bps: session.handle.with_state(|s| s.server.max_bandwidth),
             packets_sent: count(&voice.packets_sent),
             packets_received: count(&voice.packets_received),
+            audio: on_voice.then(|| core.audio_health(voice)).flatten(),
         })
     }
 

@@ -222,8 +222,14 @@ fn stream_config(supported: &SupportedStreamConfig) -> StreamConfig {
 /// Error callbacks run on the audio thread: only flag the failure, the
 /// control thread logs it and reopens the stream. `DeviceChanged` means the
 /// host already moved the stream to the new default device, so it keeps running.
-fn error_flag(failed: Arc<AtomicBool>) -> impl FnMut(cpal::Error) + Send + 'static {
+fn error_flag(
+    failed: Arc<AtomicBool>,
+    counters: Arc<Counters>,
+) -> impl FnMut(cpal::Error) + Send + 'static {
     move |err| {
+        if err.kind() == ErrorKind::Xrun {
+            counters.device_xrun();
+        }
         if err.kind() != ErrorKind::DeviceChanged {
             failed.store(true, Ordering::Relaxed);
         }
@@ -280,10 +286,13 @@ where
     device
         .build_input_stream(
             config,
-            move |data: &[T], _: &cpal::InputCallbackInfo| {
-                ring::capture(data, channels, &mut producer, &counters);
+            {
+                let counters = counters.clone();
+                move |data: &[T], _: &cpal::InputCallbackInfo| {
+                    ring::capture(data, channels, &mut producer, &counters);
+                }
             },
-            error_flag(failed),
+            error_flag(failed, counters),
             None,
         )
         .map_err(backend_err)
@@ -322,10 +331,13 @@ where
     device
         .build_output_stream(
             config,
-            move |data: &mut [T], _: &cpal::OutputCallbackInfo| {
-                ring::playback(data, channels, &mut consumer, &counters);
+            {
+                let counters = counters.clone();
+                move |data: &mut [T], _: &cpal::OutputCallbackInfo| {
+                    ring::playback(data, channels, &mut consumer, &counters);
+                }
             },
-            error_flag(failed),
+            error_flag(failed, counters),
             None,
         )
         .map_err(backend_err)

@@ -28,6 +28,8 @@ pub(crate) struct Counters {
     capture_overruns: AtomicU64,
     playback_underruns: AtomicU64,
     playback_frames_dropped: AtomicU64,
+    device_xruns: AtomicU64,
+    stream_restarts: AtomicU64,
 }
 
 impl Counters {
@@ -43,11 +45,21 @@ impl Counters {
         self.playback_frames_dropped.fetch_add(1, Ordering::Relaxed);
     }
 
+    pub(crate) fn device_xrun(&self) {
+        self.device_xruns.fetch_add(1, Ordering::Relaxed);
+    }
+
+    pub(crate) fn stream_restart(&self) {
+        self.stream_restarts.fetch_add(1, Ordering::Relaxed);
+    }
+
     pub(crate) fn snapshot(&self) -> IoStats {
         IoStats {
             capture_overruns: self.capture_overruns.load(Ordering::Relaxed),
             playback_underruns: self.playback_underruns.load(Ordering::Relaxed),
             playback_frames_dropped: self.playback_frames_dropped.load(Ordering::Relaxed),
+            device_xruns: self.device_xruns.load(Ordering::Relaxed),
+            stream_restarts: self.stream_restarts.load(Ordering::Relaxed),
         }
     }
 }

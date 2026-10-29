@@ -98,6 +98,11 @@ pub struct IoStats {
     pub playback_underruns: u64,
     /// Frames rejected by [`FrameSink::write_frame`] because the queue was full.
     pub playback_frames_dropped: u64,
+    /// Buffer under- or overruns the audio host reported for the device itself (the device
+    /// callback ran too late), in either direction.
+    pub device_xruns: u64,
+    /// Streams reopened because the host reported them as failed.
+    pub stream_restarts: u64,
 }
 
 /// Errors from audio device I/O.
