@@ -110,6 +110,8 @@ export const commands = {
 	 *  already in the UI, so nothing is fetched again.
 	 */
 	saveImage: (path: string, dataUrl: string) => typedError<null, ApiError>(__TAURI_INVOKE("save_image", { path, dataUrl })),
+	/**  Writes text the UI already has to `path` (a chat code block's "Download", issue #111). */
+	saveText: (path: string, contents: string) => typedError<null, ApiError>(__TAURI_INVOKE("save_text", { path, contents })),
 	/**
 	 *  Reads an image file that was just dropped onto the window (once per drop). Fails with
 	 *  `notFound` for any other path, `messageTooLarge` above 25 MB and `invalidInput` when the
