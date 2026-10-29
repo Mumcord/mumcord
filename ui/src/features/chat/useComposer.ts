@@ -7,7 +7,7 @@ import { useTranslation } from "react-i18next";
 import { getApi } from "../../api";
 import { shownServerId } from "../channels/serverStore";
 import type { SendTarget } from "./conversationInfo";
-import { readDroppedFiles } from "./fileDrop";
+import { readClipboardImage, readDroppedFiles, type DropFailure } from "./fileDrop";
 import { FULL_ATTRIBUTE_RESERVE, fullImageTag, keepFullImage } from "./fullImage";
 import { imageTag, prepareImage, type MessageLimits } from "./images";
 import { composeCards } from "./cards";
@@ -47,12 +47,15 @@ export interface Composer {
   addFiles: (files: readonly File[]) => void;
   /** Adds image files dropped from the file manager (native drag and drop) by their paths. */
   addDroppedPaths: (paths: readonly string[]) => Promise<void>;
-  /** Adds image files copied in the file manager, read from the system clipboard (issue #50). */
-  addCopiedFiles: () => Promise<void>;
+  /**
+   * Adds what a paste could not hand over, read from the system clipboard: image files copied in
+   * the file manager (issue #50), else copied image data such as a screenshot (issue #110).
+   * `imageListed` says the paste listed an image it did not hand over, which is reported when the
+   * clipboard has none either.
+   */
+  addFromClipboard: (imageListed: boolean) => Promise<void>;
   removeAttachment: (id: number) => void;
   error: string | null;
-  /** Reports a problem the file itself cannot explain, such as a clipboard image the webview cannot hand over. */
-  showError: (message: string) => void;
   /**
    * Sends the text and the images: the input empties at once and the messages show greyed until
    * confirmed (FR-2.74).
@@ -161,15 +164,9 @@ export function useComposer(
     [limits.allowHtml, process, t],
   );
 
-  const addDroppedPaths = useCallback(
-    async (paths: readonly string[]) => {
-      setError(null);
-      if (paths.length === 0) return;
-      if (!limits.allowHtml) {
-        setError(t("errors.imagesNotAllowed"));
-        return;
-      }
-      const { files, failures } = await readDroppedFiles(paths);
+  /** Adds files read through the engine and reports the first one that could not be read. */
+  const addRead = useCallback(
+    ({ files, failures }: { files: File[]; failures: DropFailure[] }) => {
       addFiles(files);
       const failure = failures[0];
       if (failure !== undefined) {
@@ -181,20 +178,45 @@ export function useComposer(
         setError(t(key, { name: failure.name }));
       }
     },
-    [addFiles, limits.allowHtml, t],
+    [addFiles, t],
   );
 
-  const addCopiedFiles = useCallback(async () => {
-    let paths: string[];
-    try {
-      paths = await getApi().clipboardFiles();
-    } catch (err) {
-      console.error("reading the copied files failed", err);
-      setError(t("errors.imageUnreadable"));
-      return;
-    }
-    await addDroppedPaths(paths);
-  }, [addDroppedPaths, t]);
+  const addDroppedPaths = useCallback(
+    async (paths: readonly string[]) => {
+      setError(null);
+      if (paths.length === 0) return;
+      if (!limits.allowHtml) {
+        setError(t("errors.imagesNotAllowed"));
+        return;
+      }
+      addRead(await readDroppedFiles(paths));
+    },
+    [addRead, limits.allowHtml, t],
+  );
+
+  const addFromClipboard = useCallback(
+    async (imageListed: boolean) => {
+      let paths: string[];
+      try {
+        paths = await getApi().clipboardFiles();
+      } catch (err) {
+        console.error("reading the copied files failed", err);
+        setError(t("errors.imageUnreadable"));
+        return;
+      }
+      if (paths.length > 0) {
+        await addDroppedPaths(paths);
+        return;
+      }
+      const read = await readClipboardImage();
+      if (read.files.length === 0 && read.failures.length === 0) {
+        if (imageListed) setError(t("errors.imageUnreadable"));
+        return;
+      }
+      addRead(read);
+    },
+    [addDroppedPaths, addRead, t],
+  );
 
   const removeAttachment = useCallback(
     (id: number) => {
@@ -204,10 +226,6 @@ export function useComposer(
     },
     [drop],
   );
-
-  const showError = useCallback((message: string) => {
-    setError(message);
-  }, []);
 
   const tooLong =
     limits.text > 0 ? t("errors.tooLong", { max: limits.text }) : t("errors.tooLongNoLimit");
@@ -266,10 +284,9 @@ export function useComposer(
     attachments,
     addFiles,
     addDroppedPaths,
-    addCopiedFiles,
+    addFromClipboard,
     removeAttachment,
     error,
-    showError,
     submit,
     sendLink,
   };

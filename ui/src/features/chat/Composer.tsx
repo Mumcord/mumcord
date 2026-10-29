@@ -78,14 +78,19 @@ function clipboardItems(data: DataTransfer): DataTransferItem[] {
 /**
  * Files of a paste. WebKitGTK does not fill `clipboardData.files` for a clipboard image (issue
  * #50): a screenshot arrives as an item only, so reading `files` alone makes the paste do nothing.
+ * It sometimes hands over a clipboard image as an empty file, which counts as not handed over
+ * (issue #110).
  */
 function pasteFiles(data: DataTransfer): File[] {
   const files = Array.from(data.files);
-  if (files.length > 0) return files;
-  return clipboardItems(data)
-    .filter((item) => item.kind === "file")
-    .map((item) => item.getAsFile())
-    .filter((file): file is File => file !== null);
+  const handed =
+    files.length > 0
+      ? files
+      : clipboardItems(data)
+          .filter((item) => item.kind === "file")
+          .map((item) => item.getAsFile())
+          .filter((file): file is File => file !== null);
+  return handed.filter((file) => file.size > 0);
 }
 
 /**
@@ -99,6 +104,14 @@ function hasHiddenFiles(data: DataTransfer): boolean {
     .getData("text/uri-list")
     .split(/\r?\n/)
     .every((line) => line.trim() === "" || line.startsWith("#") || line.startsWith("file:"));
+}
+
+/**
+ * Whether a paste holds text the input takes as it is. A paste without it may still hold copied
+ * image data the webview did not hand over (issue #110).
+ */
+function hasText(data: DataTransfer): boolean {
+  return data.types.includes("text/plain") || data.types.includes("text/uri-list");
 }
 
 export function Composer({
@@ -292,16 +305,14 @@ export function Composer({
     const data = event.clipboardData;
     const files = pasteFiles(data);
     if (files.length === 0) {
-      if (hasHiddenFiles(data)) {
+      // Image data in the paste always wins over a file reference, so it can never come here.
+      const imageListed = clipboardItems(data).some(
+        (item) => item.kind === "file" && item.type.startsWith("image/"),
+      );
+      if (imageListed || hasHiddenFiles(data) || !hasText(data)) {
         event.preventDefault();
-        void composer.addCopiedFiles();
-        return;
+        void composer.addFromClipboard(imageListed);
       }
-      // A clipboard image the webview cannot hand over as a file: say so instead of doing nothing.
-      if (
-        clipboardItems(data).some((item) => item.kind === "file" && item.type.startsWith("image/"))
-      )
-        composer.showError(t("errors.imageUnreadable"));
       return;
     }
     // Text copied together with a file (e.g. from a spreadsheet) still pastes as text.
