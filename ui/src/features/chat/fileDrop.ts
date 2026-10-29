@@ -8,6 +8,7 @@
  */
 import { getCurrentWebview, type DragDropEvent } from "@tauri-apps/api/webview";
 import { EngineError, getApi } from "../../api";
+import type { DroppedImage } from "../../bindings/commands";
 
 /** A point in physical pixels, relative to the top-left corner of the webview. */
 export interface PhysicalPoint {
@@ -82,6 +83,10 @@ function decodeBase64(data: string): Uint8Array<ArrayBuffer> {
   return bytes;
 }
 
+function toFile(image: DroppedImage): File {
+  return new File([decodeBase64(image.data)], image.name, { type: image.mime });
+}
+
 /** Reads dropped files through the engine, which accepts only images that were just dropped. */
 export async function readDroppedFiles(
   paths: readonly string[],
@@ -90,11 +95,23 @@ export async function readDroppedFiles(
   const failures: DropFailure[] = [];
   for (const path of paths) {
     try {
-      const image = await getApi().readDroppedImage(path);
-      files.push(new File([decodeBase64(image.data)], image.name, { type: image.mime }));
+      files.push(toFile(await getApi().readDroppedImage(path)));
     } catch (err) {
       failures.push({ name: baseName(path), reason: failureReason(err) });
     }
   }
   return { files, failures };
+}
+
+/**
+ * Reads copied image data through the engine, for a paste that hands the page none (issue #110):
+ * the WebKitGTK bundled in the AppImage leaves such a paste empty.
+ */
+export async function readClipboardImage(): Promise<{ files: File[]; failures: DropFailure[] }> {
+  try {
+    const image = await getApi().clipboardImage();
+    return { files: image === null ? [] : [toFile(image)], failures: [] };
+  } catch (err) {
+    return { files: [], failures: [{ name: "image.png", reason: failureReason(err) }] };
+  }
 }

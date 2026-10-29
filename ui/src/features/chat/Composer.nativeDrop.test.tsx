@@ -180,3 +180,142 @@ describe("Composer paste of copied image files (issue #50)", () => {
     expect(copied).not.toHaveBeenCalled();
   });
 });
+
+type Offer = { kind: "file"; file: File } | { kind: "string"; type: string; value: string };
+
+/**
+ * A paste as WebKitGTK hands it to the page. A newer WebKitGTK gives clipboard image data as a
+ * file item; the one in the AppImage gives no items at all for it (issue #110).
+ */
+function paste(input: HTMLElement, offers: readonly Offer[]) {
+  const strings = offers.filter((offer) => offer.kind === "string");
+  const types = strings.map((offer) => offer.type);
+  if (offers.some((offer) => offer.kind === "file")) types.push("Files");
+  return fireEvent.paste(input, {
+    clipboardData: {
+      files: [],
+      items: offers.map((offer) =>
+        offer.kind === "file"
+          ? { kind: "file", type: offer.file.type, getAsFile: () => offer.file }
+          : { kind: "string", type: offer.type, getAsFile: () => null },
+      ),
+      types,
+      getData: (type: string) => strings.find((offer) => offer.type === type)?.value ?? "",
+    },
+  });
+}
+
+const screenshot = (): Offer => ({
+  kind: "file",
+  file: new File(["png"], "image.png", { type: "image/png" }),
+});
+
+describe("Composer paste of image data (issue #110)", () => {
+  it.each<[string, Offer[]]>([
+    ["image data only", [screenshot()]],
+    [
+      "image data with a file reference",
+      [screenshot(), { kind: "string", type: "text/uri-list", value: "file:///tmp/shot.png\r\n" }],
+    ],
+    [
+      "a Spectacle screenshot",
+      [
+        screenshot(),
+        { kind: "string", type: "application/x-kde-suggestedfilename", value: "Screenshot.png" },
+        { kind: "string", type: "application/x-kde-onlyReplaceEmpty", value: "1" },
+        { kind: "string", type: "text/uri-list", value: "file:///tmp/Screenshot_1.png\r\n" },
+      ],
+    ],
+    [
+      "an image copied in a browser",
+      [
+        screenshot(),
+        { kind: "string", type: "text/html", value: '<img src="https://a.test/x.png">' },
+      ],
+    ],
+  ])("attaches %s once, without asking the engine", async (_, offers) => {
+    const copied = vi.spyOn(api, "clipboardFiles");
+    const native = vi.spyOn(api, "clipboardImage");
+    setup();
+    expect(paste(screen.getByRole("textbox"), offers)).toBe(false);
+    expect(await screen.findByRole("img", { name: "Image to send: image.png" })).toBeTruthy();
+    expect(screen.getAllByRole("img", { name: /^Image to send/ })).toHaveLength(1);
+    expect(copied).not.toHaveBeenCalled();
+    expect(native).not.toHaveBeenCalled();
+  });
+
+  it("reads the files of a file reference without image data", async () => {
+    vi.spyOn(api, "clipboardFiles").mockResolvedValue(["/home/me/cat.png"]);
+    vi.spyOn(api, "readDroppedImage").mockResolvedValue({
+      name: "cat.png",
+      mime: "image/png",
+      data: btoa("x"),
+    });
+    const native = vi.spyOn(api, "clipboardImage");
+    setup();
+    paste(screen.getByRole("textbox"), [
+      { kind: "string", type: "text/uri-list", value: "" },
+      { kind: "string", type: "application/x-kde-cutselection", value: "0" },
+    ]);
+    expect(await screen.findByRole("img", { name: "Image to send: cat.png" })).toBeTruthy();
+    expect(native).not.toHaveBeenCalled();
+  });
+
+  it.each<[string, Offer[]]>([
+    ["a paste the webview leaves empty", []],
+    [
+      "an image the webview hands over as an empty file",
+      [{ kind: "file", file: new File([], "image.png", { type: "image/png" }) }],
+    ],
+    [
+      "a Spectacle screenshot whose file is gone",
+      [{ kind: "string", type: "text/uri-list", value: "file:///tmp/Screenshot_1.png\r\n" }],
+    ],
+    [
+      "an image copied in a browser without its data",
+      [{ kind: "string", type: "text/html", value: '<img src="https://a.test/x.png">' }],
+    ],
+  ])("reads the image data natively for %s", async (_, offers) => {
+    vi.spyOn(api, "clipboardFiles").mockResolvedValue([]);
+    const native = vi
+      .spyOn(api, "clipboardImage")
+      .mockResolvedValue({ name: "image.png", mime: "image/png", data: btoa("png") });
+    setup();
+    expect(paste(screen.getByRole("textbox"), offers)).toBe(false);
+    expect(await screen.findByRole("img", { name: "Image to send: image.png" })).toBeTruthy();
+    expect(native).toHaveBeenCalledOnce();
+  });
+
+  it("does nothing when the clipboard holds neither files nor an image", async () => {
+    vi.spyOn(api, "clipboardFiles").mockResolvedValue([]);
+    const native = vi.spyOn(api, "clipboardImage").mockResolvedValue(null);
+    setup();
+    paste(screen.getByRole("textbox"), []);
+    await waitFor(() => {
+      expect(native).toHaveBeenCalledOnce();
+    });
+    expect(screen.queryByRole("alert")).toBeNull();
+    expect(screen.queryByRole("img", { name: /^Image to send/ })).toBeNull();
+  });
+
+  it("says so when the native image is too large", async () => {
+    vi.spyOn(api, "clipboardFiles").mockResolvedValue([]);
+    vi.spyOn(api, "clipboardImage").mockRejectedValue(new EngineError("messageTooLarge", "big"));
+    setup();
+    paste(screen.getByRole("textbox"), []);
+    expect((await screen.findByRole("alert")).textContent).toBe(
+      "This file is too large to send (over 25 MB).",
+    );
+  });
+
+  it("pastes plain text as text", () => {
+    const copied = vi.spyOn(api, "clipboardFiles");
+    const native = vi.spyOn(api, "clipboardImage");
+    setup();
+    expect(
+      paste(screen.getByRole("textbox"), [{ kind: "string", type: "text/plain", value: "hi" }]),
+    ).toBe(true);
+    expect(copied).not.toHaveBeenCalled();
+    expect(native).not.toHaveBeenCalled();
+  });
+});
