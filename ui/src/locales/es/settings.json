@@ -419,7 +419,7 @@
       "webEngine": "Caché del motor web",
       "temp": "Archivos temporales"
     },
-    "total": "Total: {{size}}",
+    "total": "Total en uso: {{size}}",
     "calculating": "Calculando…",
     "clear": "Vaciar caché",
     "confirmTitle": "¿Vaciar la caché?",
