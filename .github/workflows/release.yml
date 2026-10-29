@@ -95,6 +95,7 @@ jobs:
           path: |
             THIRD_PARTY_NOTICES
             ui/public/third-party-notices.txt
+            ui/public/third-party-notices.json
           if-no-files-found: error
 
   build:

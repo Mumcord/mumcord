@@ -1,7 +1,8 @@
 name: Third-party notices
 
-# Regenerates THIRD_PARTY_NOTICES and ui/public/third-party-notices.txt (scripts/generate-notices.sh)
-# after dependency changes on main. When they changed, it opens or updates the pull request
+# Regenerates THIRD_PARTY_NOTICES, ui/public/third-party-notices.txt and its JSON form for the About
+# window, ui/public/third-party-notices.json (scripts/generate-notices.sh), after dependency changes
+# on main. When they changed, it opens or updates the pull request
 # "chore: regenerate third-party notices" from the fixed branch chore/regenerate-notices; main is
 # protected, so it never pushes there. A pull request opened with the workflow token starts no
 # workflows by itself, so this workflow then starts CI and E2E on the branch (workflow_dispatch);
@@ -17,9 +18,9 @@ on:
       - Cargo.lock
       - package-lock.json
       - about.toml
-      - about.hbs
       - licenses/**
       - scripts/generate-notices.sh
+      - scripts/notices.js
       - scripts/license-tools.env
   workflow_dispatch:
 
@@ -75,7 +76,7 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          files=(THIRD_PARTY_NOTICES ui/public/third-party-notices.txt)
+          files=(THIRD_PARTY_NOTICES ui/public/third-party-notices.txt ui/public/third-party-notices.json)
           sync=$(gh pr list --base main --state open --json number,headRefName \
             -q '[.[] | select(.headRefName | startswith("chore/sync-version-"))][0].number')
           if [[ -n "$sync" ]]; then
