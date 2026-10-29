@@ -91,6 +91,7 @@ fn specta_builder() -> Builder<tauri::Wry> {
             chat::save_image,
             chat::copy_image,
             chat::save_text,
+            chat::copy_text,
             dropped::read_dropped_image,
             dropped::clipboard_files,
             dropped::clipboard_image,

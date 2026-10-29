@@ -1486,6 +1486,8 @@ export function createMockApi(options: MockOptions = {}): MockApi {
     saveImage: () => Promise.resolve(null),
     copyImage: () => Promise.resolve(null),
     saveText: () => Promise.resolve(null),
+    // The browser's own clipboard stands in for the system one.
+    copyText: (text) => navigator.clipboard.writeText(text).then(() => null),
     // The browser has no native file drops; dropped files arrive as `File` objects instead.
     readDroppedImage: () =>
       Promise.reject(new EngineError("notFound", "no native file drops in the mock")),
