@@ -2,7 +2,7 @@
 
 The device-free voice layer of [Mumcord](https://github.com/Mumcord/mumcord), a modern voice chat client for standard Mumble servers. It is meant for clients and bots that need to send and receive Mumble voice without touching audio hardware.
 
-It provides the Opus encoder and decoder (with a default and a "Music quality" mode), a jitter buffer, a mixer with positional placement, adaptive bitrate control and the voice processing chain (noise suppression, echo cancellation, gate, leveler). It has no cpal, ALSA or resampling dependency, so it builds for static musl targets. Microphone and speaker I/O is in `mumcord-audio`, which re-exports everything here. Network transport is in `mumcord-protocol`.
+It provides the Opus encoder and decoder (with a default and a "Music quality" mode), a jitter buffer, a mixer with positional placement, adaptive bitrate control and the voice processing chain (noise suppression with three selectable local backends — `nnnoiseless`, `rnnoise-rs` and `sonora-ns` — echo cancellation, gate, leveler). It has no cpal, ALSA or resampling dependency, so it builds for static musl targets. Microphone and speaker I/O is in `mumcord-audio`, which re-exports everything here. Network transport is in `mumcord-protocol`.
 
 All audio is 48 kHz mono `f32`, split into 10 ms frames of 480 samples.
 
