@@ -1,0 +1,120 @@
+{
+  "$comment": "Components that are neither Rust crates nor npm packages, for scripts/generate-notices.sh. A version of the form @name is read from the build inputs (scripts/notices.js); an empty one comes from the Ubuntu 24.04 build host. texts are files relative to the repository root, @opus-copying is the COPYING file of the libopus source vendored by opusic-sys.",
+  "components": [
+    {
+      "name": "Mumble protocol and plugin interface",
+      "version": "",
+      "license": "BSD-3-Clause",
+      "repository": "https://github.com/mumble-voip/mumble",
+      "description": [
+        "The protocol definition files in proto/ (Mumble.proto, MumbleUDP.proto) are taken",
+        "from the Mumble project. The official Mumble game plugins that Mumcord can load at",
+        "runtime to read game positions are developed by the Mumble project under the same",
+        "license; they are not part of this repository. Mumcord's plugin host",
+        "(crates/positional/src/plugins/) follows the plugin interface definitions of the",
+        "Mumble project (MumblePlugin.h and the headers it includes). Mumcord is compatible",
+        "with Mumble but is not affiliated with or endorsed by the Mumble project."
+      ],
+      "texts": ["crates/protocol/proto/LICENSE.mumble"]
+    },
+    {
+      "name": "libopus",
+      "version": "@libopus",
+      "license": "BSD-3-Clause",
+      "repository": "https://github.com/xiph/opus",
+      "description": [
+        "Opus voice codec, compiled from the source vendored by the opusic-sys crate."
+      ],
+      "texts": ["@opus-copying"]
+    },
+    {
+      "name": "libvpx",
+      "version": "@libvpx",
+      "license": "BSD-3-Clause",
+      "repository": "https://chromium.googlesource.com/webm/libvpx",
+      "description": [
+        "VP9 (and VP8) screen-share encoder and decoder, linked by crates/screenshare.",
+        "Statically linked into the Windows app (vcpkg build) and the macOS and Linux apps",
+        "(built from the libvpx release source), so it is part of every Mumcord build."
+      ],
+      "texts": ["licenses/libvpx.txt"]
+    },
+    {
+      "name": "SQLite",
+      "version": "@sqlite",
+      "license": "blessing",
+      "repository": "https://sqlite.org",
+      "description": [
+        "Compiled in by libsqlite3-sys (feature \"bundled\", via rusqlite) and statically",
+        "linked into Mumcord."
+      ],
+      "texts": ["licenses/sqlite.txt"]
+    },
+    {
+      "name": "PipeWire and libspa",
+      "version": "",
+      "license": "MIT",
+      "repository": "https://gitlab.freedesktop.org/pipewire/pipewire",
+      "description": [
+        "Wayland screen capture and audio on Linux. Loaded from the system (the AppImage uses",
+        "the host's PipeWire daemon)."
+      ],
+      "texts": ["licenses/pipewire.txt"]
+    },
+    {
+      "name": "GStreamer",
+      "version": "",
+      "license": "LGPL-2.1-or-later",
+      "repository": "https://gitlab.freedesktop.org/gstreamer/gstreamer",
+      "description": [
+        "GStreamer core libraries from the Ubuntu 24.04 build host, bundled in the AppImage so",
+        "WebKitGTK can play video in watch parties. The .deb, .rpm and Arch packages do not",
+        "contain GStreamer; they depend on the distribution's packages."
+      ],
+      "texts": ["licenses/lgpl-2.1.txt"]
+    },
+    {
+      "name": "GStreamer Base Plugins",
+      "version": "",
+      "license": "LGPL-2.1-or-later",
+      "repository": "https://gitlab.freedesktop.org/gstreamer/gstreamer",
+      "description": ["The plugins of gst-plugins-base, bundled in the AppImage."],
+      "texts": ["licenses/lgpl-2.1.txt"]
+    },
+    {
+      "name": "GStreamer Good Plugins",
+      "version": "",
+      "license": "LGPL-2.1-or-later",
+      "repository": "https://gitlab.freedesktop.org/gstreamer/gstreamer",
+      "description": [
+        "The plugins of gst-plugins-good, bundled in the AppImage. Plugins that implement",
+        "H.264 and H.265 (gst-libav / FFmpeg, x264, x265, OpenH264) and GPL-only codecs",
+        "(a52dec, dtsdec, mpeg2dec, libdvdread, faac, faad) are deliberately not bundled",
+        "(scripts/filter-gst-plugins.sh); the AppImage plays YouTube through VP9."
+      ],
+      "texts": ["licenses/lgpl-2.1.txt"]
+    },
+    {
+      "name": "GStreamer Bad Plugins (opusparse)",
+      "version": "",
+      "license": "LGPL-2.1-or-later",
+      "repository": "https://gitlab.freedesktop.org/gstreamer/gstreamer",
+      "description": [
+        "Only the Opus parser of gst-plugins-bad, bundled in the AppImage: without it WebKit",
+        "reports no playable audio format for YouTube."
+      ],
+      "texts": ["licenses/lgpl-2.1.txt"]
+    },
+    {
+      "name": "WebKitGTK and JavaScriptCoreGTK",
+      "version": "",
+      "license": "LGPL-2.1-or-later AND BSD-2-Clause",
+      "repository": "https://webkitgtk.org",
+      "description": [
+        "The web view that renders Mumcord's interface on Linux. Bundled in the AppImage from",
+        "the Ubuntu 24.04 build host."
+      ],
+      "texts": ["licenses/webkit.txt", "licenses/lgpl-2.1.txt"]
+    }
+  ]
+}

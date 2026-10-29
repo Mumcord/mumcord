@@ -8,9 +8,6 @@ use specta::Type;
 
 use super::types::{ApiError, ApiResult, ErrorCode};
 
-/// Contents of `THIRD_PARTY_NOTICES`, embedded at build time.
-const THIRD_PARTY_NOTICES: &str = include_str!("../../../THIRD_PARTY_NOTICES");
-
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, Type)]
 #[serde(rename_all = "camelCase")]
 pub struct AppInfo {
@@ -19,8 +16,6 @@ pub struct AppInfo {
     /// Numeric `X.Y.Z` (the last release for dev builds), for versions other clients parse.
     pub package_version: String,
     pub os: String,
-    /// Contents of `THIRD_PARTY_NOTICES` for Settings → About.
-    pub third_party_notices: String,
     /// Running from an AppImage: the UI offers the app-menu entry (FR-2.55).
     pub appimage: bool,
     /// The Linux distribution, for the missing-codec install hint (FR-2.41a); `None` on other
@@ -56,7 +51,6 @@ pub fn app_info() -> ApiResult<AppInfo> {
         version: crate::version::DISPLAY.to_owned(),
         package_version: crate::version::PACKAGE.to_owned(),
         os: diag::os_description(),
-        third_party_notices: THIRD_PARTY_NOTICES.to_owned(),
         appimage: appimage(),
         distro: distro(),
     })

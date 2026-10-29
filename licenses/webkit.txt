@@ -1,0 +1,4 @@
+WebKit is licensed under the GNU LGPL v2.1 (the text follows) and, for parts of
+its code, under the BSD 2-Clause license. Each BSD-licensed file carries its
+license and copyright notice in its source; an overview is at
+https://webkit.org/licensing-webkit/.

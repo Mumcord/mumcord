@@ -374,7 +374,8 @@
     "requestFeature": "Zaproponuj funkcję",
     "notices": "Informacje o oprogramowaniu stron trzecich",
     "noticesHint": "Mumcord powstał na bazie oprogramowania open source, w tym kodu z projektu Mumble.",
-    "noticesFailed": "Nie udało się wczytać informacji o oprogramowaniu stron trzecich.",
+    "showNotices": "Pokaż licencje stron trzecich",
+    "noticesFailed": "Nie udało się otworzyć licencji stron trzecich.",
     "loading": "Ładowanie…",
     "devToolsUnlocked": "Narzędzia deweloperskie odblokowane: inspektor pakietów jest teraz na liście ustawień."
   },
@@ -576,6 +577,29 @@
       "watch": "Stan wspólnego oglądania",
       "plugin": "Dane wtyczki",
       "mumble": "Wiadomość Mumble"
+    }
+  },
+  "licences": {
+    "title": "Licencje stron trzecich",
+    "own": "Mumcord jest wolnym oprogramowaniem na licencji GNU Affero General Public License v3 only (AGPL-3.0-only).",
+    "sourceCode": "Kod źródłowy",
+    "search": "Szukaj według nazwy lub licencji",
+    "filter": "Licencja",
+    "allLicences": "Wszystkie licencje",
+    "expandAll": "Rozwiń wszystko",
+    "collapseAll": "Zwiń wszystko",
+    "shown": "Wyświetlane: {{shown}} z {{total}}",
+    "empty": "Żaden komponent nie pasuje do wyszukiwania.",
+    "loadFailed": "Nie udało się wczytać listy licencji.",
+    "repository": "Repozytorium:",
+    "copy": "Kopiuj tekst licencji",
+    "copied": "Skopiowano tekst licencji",
+    "copyFailed": "Kopiowanie nie powiodło się",
+    "textOf": "Tekst licencji {{name}}",
+    "sources": {
+      "rust": "Rust",
+      "npm": "npm",
+      "native": "Natywne"
     }
   }
 }

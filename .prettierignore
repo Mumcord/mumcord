@@ -9,5 +9,5 @@ specs
 CLAUDE.md
 .claude
 testenv
-about.hbs
+ui/public/third-party-notices.json
 e2e/artifacts

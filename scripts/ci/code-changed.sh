@@ -19,7 +19,7 @@ is_code() {
     scripts/ci/*) return 1 ;;
     # Rust
     *.rs | Cargo.toml | */Cargo.toml | Cargo.lock | */Cargo.lock | .cargo/* | rust-toolchain* \
-      | clippy.toml | rustfmt.toml | about.toml | about.hbs | crates/* | tools/* | proto/*) return 0 ;;
+      | clippy.toml | rustfmt.toml | about.toml | crates/* | tools/* | proto/*) return 0 ;;
     # React / TypeScript UI
     ui/* | *.ts | *.tsx | *.js | *.mjs | *.cjs | *.css | *.html | package.json | package-lock.json \
       | tsconfig*.json | vite.config.* | vitest.config.* | eslint.config.* | assets/*) return 0 ;;

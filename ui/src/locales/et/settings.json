@@ -372,7 +372,8 @@
     "requestFeature": "Soovi funktsiooni",
     "notices": "Kolmandate osapoolte teated",
     "noticesHint": "Mumcord põhineb avatud lähtekoodiga tarkvaral, sealhulgas Mumble'i projekti koodil.",
-    "noticesFailed": "Kolmandate osapoolte teateid ei õnnestunud laadida.",
+    "showNotices": "Näita kolmandate osapoolte litsentse",
+    "noticesFailed": "Kolmandate osapoolte litsentse ei õnnestunud avada.",
     "loading": "Laadin…",
     "devToolsUnlocked": "Arendaja tööriistad avatud: pakettide inspektor on nüüd seadete loendis."
   },
@@ -570,6 +571,29 @@
       "watch": "Ühisvaatamise olek",
       "plugin": "Plugina andmed",
       "mumble": "Mumble’i sõnum"
+    }
+  },
+  "licences": {
+    "title": "Kolmandate osapoolte litsentsid",
+    "own": "Mumcord ise on vaba tarkvara litsentsi GNU Affero General Public License v3 only (AGPL-3.0-only) all.",
+    "sourceCode": "Lähtekood",
+    "search": "Otsi nime või litsentsi järgi",
+    "filter": "Litsents",
+    "allLicences": "Kõik litsentsid",
+    "expandAll": "Laienda kõik",
+    "collapseAll": "Ahenda kõik",
+    "shown": "Näidatud: {{shown}} / {{total}}",
+    "empty": "Ükski komponent ei vasta otsingule.",
+    "loadFailed": "Litsentside loendit ei õnnestunud laadida.",
+    "repository": "Hoidla:",
+    "copy": "Kopeeri litsentsi tekst",
+    "copied": "Litsentsi tekst kopeeritud",
+    "copyFailed": "Kopeerimine ebaõnnestus",
+    "textOf": "Komponendi {{name}} litsentsi tekst",
+    "sources": {
+      "rust": "Rust",
+      "npm": "npm",
+      "native": "Natiivne"
     }
   }
 }

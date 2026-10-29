@@ -372,7 +372,8 @@
     "requestFeature": "Ehdota ominaisuutta",
     "notices": "Kolmannen osapuolen ilmoitukset",
     "noticesHint": "Mumcord perustuu avoimen lähdekoodin ohjelmistoihin, mukaan lukien Mumble-projektin koodiin.",
-    "noticesFailed": "Kolmannen osapuolen ilmoituksia ei voitu ladata.",
+    "showNotices": "Näytä kolmansien osapuolten lisenssit",
+    "noticesFailed": "Kolmansien osapuolten lisenssejä ei voitu avata.",
     "loading": "Ladataan…",
     "devToolsUnlocked": "Kehittäjätyökalut avattu: pakettitarkastin on nyt asetusluettelossa."
   },
@@ -570,6 +571,29 @@
       "watch": "Yhteiskatselun tila",
       "plugin": "Lisäosan tiedot",
       "mumble": "Mumble-viesti"
+    }
+  },
+  "licences": {
+    "title": "Kolmansien osapuolten lisenssit",
+    "own": "Mumcord itse on vapaa ohjelmisto, jonka lisenssi on GNU Affero General Public License v3 only (AGPL-3.0-only).",
+    "sourceCode": "Lähdekoodi",
+    "search": "Hae nimellä tai lisenssillä",
+    "filter": "Lisenssi",
+    "allLicences": "Kaikki lisenssit",
+    "expandAll": "Laajenna kaikki",
+    "collapseAll": "Supista kaikki",
+    "shown": "Näytetään: {{shown}}/{{total}}",
+    "empty": "Mikään komponentti ei vastaa hakua.",
+    "loadFailed": "Lisenssiluetteloa ei voitu ladata.",
+    "repository": "Koodivarasto:",
+    "copy": "Kopioi lisenssiteksti",
+    "copied": "Lisenssiteksti kopioitu",
+    "copyFailed": "Kopiointi epäonnistui",
+    "textOf": "Komponentin {{name}} lisenssiteksti",
+    "sources": {
+      "rust": "Rust",
+      "npm": "npm",
+      "native": "Natiivi"
     }
   }
 }

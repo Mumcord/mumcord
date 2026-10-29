@@ -373,7 +373,8 @@
     "requestFeature": "Predloži značajku",
     "notices": "Obavijesti trećih strana",
     "noticesHint": "Mumcord je izgrađen na softveru otvorenog koda, uključujući kod iz projekta Mumble.",
-    "noticesFailed": "Obavijesti trećih strana nije bilo moguće učitati.",
+    "showNotices": "Prikaži licence trećih strana",
+    "noticesFailed": "Licence trećih strana nije moguće otvoriti.",
     "loading": "Učitavanje…",
     "devToolsUnlocked": "Alati za razvojne programere otključani: inspektor paketa sada je na popisu postavki."
   },
@@ -573,6 +574,29 @@
       "watch": "Stanje zajedničkog gledanja",
       "plugin": "Podaci dodatka",
       "mumble": "Mumble poruka"
+    }
+  },
+  "licences": {
+    "title": "Licence trećih strana",
+    "own": "Mumcord je slobodan softver pod licencom GNU Affero General Public License v3 only (AGPL-3.0-only).",
+    "sourceCode": "Izvorni kod",
+    "search": "Traži po nazivu ili licenci",
+    "filter": "Licenca",
+    "allLicences": "Sve licence",
+    "expandAll": "Proširi sve",
+    "collapseAll": "Sažmi sve",
+    "shown": "Prikazano: {{shown}} od {{total}}",
+    "empty": "Nijedna komponenta ne odgovara pretrazi.",
+    "loadFailed": "Popis licenci nije moguće učitati.",
+    "repository": "Repozitorij:",
+    "copy": "Kopiraj tekst licence",
+    "copied": "Tekst licence kopiran",
+    "copyFailed": "Kopiranje nije uspjelo",
+    "textOf": "Tekst licence za {{name}}",
+    "sources": {
+      "rust": "Rust",
+      "npm": "npm",
+      "native": "Izvorno"
     }
   }
 }

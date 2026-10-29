@@ -18,6 +18,7 @@ pub mod history;
 pub mod identity;
 pub mod ingame_overlay;
 pub mod inspector;
+pub mod licences;
 pub mod links;
 pub mod notifications;
 pub mod now_gaming;

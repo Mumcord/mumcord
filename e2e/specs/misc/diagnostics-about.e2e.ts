@@ -109,15 +109,41 @@ describe("diagnostics and about (AC-1.28, AC-1.29)", () => {
     const license = $("pre[aria-label='Mumcord license (AGPL-3.0)']");
     await license.waitForDisplayed();
     expect(await license.getText()).toMatch(/GNU AFFERO GENERAL PUBLIC LICENSE/);
-    const notices = $("pre[aria-label='Third-party notices']");
-    await browser.waitUntil(async () => !(await notices.getText()).startsWith("Loading"), {
-      timeoutMsg: "notices not loaded",
-    });
-    const text = await notices.getText();
-    expect(text).toMatch(/Mumble/);
-    expect(text).toMatch(/BSD|Redistribution and use in source and binary forms/i);
+
+    // Issue #138: the third-party licences open in a window of their own, a second WebDriver
+    // window handle.
+    const mainWindow = await browser.getWindowHandle();
+    await button("Show third-party licences").click();
+    let licences = "";
+    await browser.waitUntil(
+      async () => {
+        licences = (await browser.getWindowHandles()).find((h) => h !== mainWindow) ?? "";
+        return licences !== "";
+      },
+      { timeout: 15_000, timeoutMsg: "licences window never opened" },
+    );
+    await browser.switchToWindow(licences);
+    await $("h1=Third-party licences").waitForDisplayed();
+    expect(await $("main").getText()).toContain("AGPL-3.0-only");
+    await $("input[type=search]").setValue("Mumble");
+    const mumble = $("//button[@aria-expanded][contains(., 'Mumble protocol and plugin interface')]");
+    await mumble.click();
+    expect(await mumble.getAttribute("aria-expanded")).toBe("true");
+    const text = await $("pre[aria-label='Licence text of Mumble protocol and plugin interface']").getText();
     // Mumble's own BSD notice, not just any BSD-licensed crate.
     expect(text).toMatch(/Copyright \(C\) 2005-\d{4} The Mumble Developers/);
     expect(text).toContain("Neither the name of The Mumble Developers");
+
+    // The window is gone before the keys are released, so WebDriver reports the release as
+    // failed ("no such window"); the window count below is what matters.
+    await browser.keys(["Control", "w"]).catch((error: unknown) => {
+      console.log(`[e2e] Ctrl+W: ${String(error)}`);
+    });
+    await browser.waitUntil(async () => (await browser.getWindowHandles()).length === 1, {
+      timeout: 10_000,
+      timeoutMsg: "Ctrl+W did not close the licences window",
+    });
+    await browser.switchToWindow(mainWindow);
+    await button("Show third-party licences").waitForDisplayed();
   });
 });

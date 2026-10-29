@@ -375,7 +375,8 @@
     "requestFeature": "Iarr gné",
     "notices": "Fógraí tríú páirtí",
     "noticesHint": "Tá Mumcord tógtha ar bhogearraí foinse oscailte, cód ó thionscadal Mumble san áireamh.",
-    "noticesFailed": "Níorbh fhéidir na fógraí tríú páirtí a luchtú.",
+    "showNotices": "Taispeáin ceadúnais tríú páirtí",
+    "noticesFailed": "Níorbh fhéidir na ceadúnais tríú páirtí a oscailt.",
     "loading": "Ag luchtú…",
     "devToolsUnlocked": "Díghlasáladh uirlisí forbróra: tá an cigire paicéad anois sa liosta socruithe."
   },
@@ -579,6 +580,29 @@
       "watch": "Staid an tseisiúin féachana",
       "plugin": "Sonraí breiseáin",
       "mumble": "Teachtaireacht Mumble"
+    }
+  },
+  "licences": {
+    "title": "Ceadúnais tríú páirtí",
+    "own": "Is bogearra saor é Mumcord féin faoin GNU Affero General Public License v3 only (AGPL-3.0-only).",
+    "sourceCode": "Cód foinseach",
+    "search": "Cuardaigh de réir ainm nó ceadúnais",
+    "filter": "Ceadúnas",
+    "allLicences": "Gach ceadúnas",
+    "expandAll": "Leathnaigh gach rud",
+    "collapseAll": "Laghdaigh gach rud",
+    "shown": "Á dtaispeáint: {{shown}} as {{total}}",
+    "empty": "Níl aon chomhpháirt ag teacht leis an gcuardach.",
+    "loadFailed": "Níorbh fhéidir liosta na gceadúnas a lódáil.",
+    "repository": "Stór:",
+    "copy": "Cóipeáil téacs an cheadúnais",
+    "copied": "Cóipeáladh téacs an cheadúnais",
+    "copyFailed": "Theip ar an gcóipeáil",
+    "textOf": "Téacs ceadúnais {{name}}",
+    "sources": {
+      "rust": "Rust",
+      "npm": "npm",
+      "native": "Dúchasach"
     }
   }
 }

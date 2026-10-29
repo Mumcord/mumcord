@@ -373,7 +373,8 @@
     "requestFeature": "Cere o funcție",
     "notices": "Mențiuni terțe",
     "noticesHint": "Mumcord este construit pe software open-source, inclusiv cod din proiectul Mumble.",
-    "noticesFailed": "Mențiunile terțe nu au putut fi încărcate.",
+    "showNotices": "Afișează licențele terților",
+    "noticesFailed": "Licențele terților nu au putut fi deschise.",
     "loading": "Se încarcă…",
     "devToolsUnlocked": "Instrumente pentru dezvoltatori deblocate: inspectorul de pachete este acum în lista de setări."
   },
@@ -573,6 +574,29 @@
       "watch": "Starea sesiunii de vizionare",
       "plugin": "Date plugin",
       "mumble": "Mesaj Mumble"
+    }
+  },
+  "licences": {
+    "title": "Licențele terților",
+    "own": "Mumcord este software liber sub licența GNU Affero General Public License v3 only (AGPL-3.0-only).",
+    "sourceCode": "Cod sursă",
+    "search": "Caută după nume sau licență",
+    "filter": "Licență",
+    "allLicences": "Toate licențele",
+    "expandAll": "Extinde tot",
+    "collapseAll": "Restrânge tot",
+    "shown": "Afișate: {{shown}} din {{total}}",
+    "empty": "Nicio componentă nu corespunde căutării.",
+    "loadFailed": "Lista de licențe nu a putut fi încărcată.",
+    "repository": "Depozit:",
+    "copy": "Copiază textul licenței",
+    "copied": "Textul licenței a fost copiat",
+    "copyFailed": "Copierea a eșuat",
+    "textOf": "Textul licenței pentru {{name}}",
+    "sources": {
+      "rust": "Rust",
+      "npm": "npm",
+      "native": "Nativ"
     }
   }
 }

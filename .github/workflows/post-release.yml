@@ -15,7 +15,7 @@ name: Post-release sync
 # request needs the repository setting "Allow GitHub Actions to create and approve pull requests";
 # without it the branch is still pushed and the run shows a warning with a link to open it by hand.
 #
-# It owns the same two notices files as notices.yml: it closes an open notices pull request (this
+# It owns the same three notices files as notices.yml: it closes an open notices pull request (this
 # one contains fresh notices), and notices.yml skips while a sync pull request is open.
 on:
   release:

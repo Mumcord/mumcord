@@ -374,7 +374,8 @@
     "requestFeature": "Navrhnout funkci",
     "notices": "Oznámení třetích stran",
     "noticesHint": "Mumcord je postaven na open-source softwaru, včetně kódu z projektu Mumble.",
-    "noticesFailed": "Oznámení třetích stran se nepodařilo načíst.",
+    "showNotices": "Zobrazit licence třetích stran",
+    "noticesFailed": "Licence třetích stran se nepodařilo otevřít.",
     "loading": "Načítání…",
     "devToolsUnlocked": "Vývojářské nástroje odemčeny: inspektor paketů je nyní v seznamu nastavení."
   },
@@ -576,6 +577,29 @@
       "watch": "Stav společného sledování",
       "plugin": "Data pluginu",
       "mumble": "Zpráva Mumble"
+    }
+  },
+  "licences": {
+    "title": "Licence třetích stran",
+    "own": "Mumcord je svobodný software pod licencí GNU Affero General Public License v3 only (AGPL-3.0-only).",
+    "sourceCode": "Zdrojový kód",
+    "search": "Hledat podle názvu nebo licence",
+    "filter": "Licence",
+    "allLicences": "Všechny licence",
+    "expandAll": "Rozbalit vše",
+    "collapseAll": "Sbalit vše",
+    "shown": "Zobrazeno: {{shown}} z {{total}}",
+    "empty": "Hledání neodpovídá žádná součást.",
+    "loadFailed": "Seznam licencí se nepodařilo načíst.",
+    "repository": "Repozitář:",
+    "copy": "Kopírovat text licence",
+    "copied": "Text licence zkopírován",
+    "copyFailed": "Kopírování se nezdařilo",
+    "textOf": "Text licence {{name}}",
+    "sources": {
+      "rust": "Rust",
+      "npm": "npm",
+      "native": "Nativní"
     }
   }
 }

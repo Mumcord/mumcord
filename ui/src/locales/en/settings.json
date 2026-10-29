@@ -372,7 +372,8 @@
     "requestFeature": "Request a feature",
     "notices": "Third-party notices",
     "noticesHint": "Mumcord is built on open-source software, including code from the Mumble project.",
-    "noticesFailed": "The third-party notices could not be loaded.",
+    "showNotices": "Show third-party licences",
+    "noticesFailed": "The third-party licences could not be opened.",
     "loading": "Loading…",
     "devToolsUnlocked": "Developer tools unlocked: the packet inspector is now in the settings list."
   },
@@ -570,6 +571,29 @@
       "watch": "Watch party state",
       "plugin": "Plugin data",
       "mumble": "Mumble message"
+    }
+  },
+  "licences": {
+    "title": "Third-party licences",
+    "own": "Mumcord itself is free software under the GNU Affero General Public License v3 only (AGPL-3.0-only).",
+    "sourceCode": "Source code",
+    "search": "Search by name or licence",
+    "filter": "Licence",
+    "allLicences": "All licences",
+    "expandAll": "Expand all",
+    "collapseAll": "Collapse all",
+    "shown": "Shown: {{shown}} of {{total}}",
+    "empty": "No component matches the search.",
+    "loadFailed": "The licence list could not be loaded.",
+    "repository": "Repository:",
+    "copy": "Copy licence text",
+    "copied": "Licence text copied",
+    "copyFailed": "Copying failed",
+    "textOf": "Licence text of {{name}}",
+    "sources": {
+      "rust": "Rust",
+      "npm": "npm",
+      "native": "Native"
     }
   }
 }

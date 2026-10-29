@@ -372,7 +372,8 @@
     "requestFeature": "Föreslå en funktion",
     "notices": "Tredjepartsmeddelanden",
     "noticesHint": "Mumcord bygger på öppen källkod, bland annat kod från Mumble-projektet.",
-    "noticesFailed": "Tredjepartsmeddelandena kunde inte läsas in.",
+    "showNotices": "Visa licenser för tredjepart",
+    "noticesFailed": "Licenserna för tredjepart kunde inte öppnas.",
     "loading": "Läser in…",
     "devToolsUnlocked": "Utvecklarverktyg upplåsta: paketinspektören finns nu i inställningslistan."
   },
@@ -570,6 +571,29 @@
       "watch": "Status för tittarkväll",
       "plugin": "Plugindata",
       "mumble": "Mumble-meddelande"
+    }
+  },
+  "licences": {
+    "title": "Licenser för tredjepart",
+    "own": "Mumcord är självt fri programvara under GNU Affero General Public License v3 only (AGPL-3.0-only).",
+    "sourceCode": "Källkod",
+    "search": "Sök efter namn eller licens",
+    "filter": "Licens",
+    "allLicences": "Alla licenser",
+    "expandAll": "Fäll ut alla",
+    "collapseAll": "Fäll ihop alla",
+    "shown": "Visas: {{shown}} av {{total}}",
+    "empty": "Ingen komponent matchar sökningen.",
+    "loadFailed": "Licenslistan kunde inte läsas in.",
+    "repository": "Kodförråd:",
+    "copy": "Kopiera licenstext",
+    "copied": "Licenstext kopierad",
+    "copyFailed": "Kopieringen misslyckades",
+    "textOf": "Licenstext för {{name}}",
+    "sources": {
+      "rust": "Rust",
+      "npm": "npm",
+      "native": "Native"
     }
   }
 }

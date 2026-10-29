@@ -375,7 +375,8 @@
     "requestFeature": "Itlob funzjoni",
     "notices": "Avviżi ta' partijiet terzi",
     "noticesHint": "Mumcord huwa mibni fuq softwer open-source, inkluż kodiċi mill-proġett Mumble.",
-    "noticesFailed": "L-avviżi ta' partijiet terzi ma setgħux jitgħabbew.",
+    "showNotices": "Uri l-liċenzji ta’ partijiet terzi",
+    "noticesFailed": "Il-liċenzji ta’ partijiet terzi ma setgħux jinfetħu.",
     "loading": "Qed jitgħabba…",
     "devToolsUnlocked": "L-għodod tal-iżviluppatur infetħu: l-ispettur tal-pakketti issa jinsab fil-lista tas-settings."
   },
@@ -579,6 +580,29 @@
       "watch": "Stat tas-sessjoni ta’ ħarsa flimkien",
       "plugin": "Data tal-plugin",
       "mumble": "Messaġġ ta’ Mumble"
+    }
+  },
+  "licences": {
+    "title": "Liċenzji ta’ partijiet terzi",
+    "own": "Mumcord innifsu huwa softwer ħieles taħt il-GNU Affero General Public License v3 only (AGPL-3.0-only).",
+    "sourceCode": "Kodiċi sors",
+    "search": "Fittex bl-isem jew bil-liċenza",
+    "filter": "Liċenza",
+    "allLicences": "Il-liċenzji kollha",
+    "expandAll": "Espandi kollox",
+    "collapseAll": "Iġbor kollox",
+    "shown": "Murija: {{shown}} minn {{total}}",
+    "empty": "L-ebda komponent ma jaqbel mat-tfittxija.",
+    "loadFailed": "Il-lista tal-liċenzji ma setgħetx titgħabba.",
+    "repository": "Repożitorju:",
+    "copy": "Ikkopja t-test tal-liċenza",
+    "copied": "It-test tal-liċenza ġie kkupjat",
+    "copyFailed": "L-ikkupjar falla",
+    "textOf": "It-test tal-liċenza ta’ {{name}}",
+    "sources": {
+      "rust": "Rust",
+      "npm": "npm",
+      "native": "Nattiv"
     }
   }
 }

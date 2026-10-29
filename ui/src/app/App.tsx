@@ -19,6 +19,7 @@ import { SettingsOverlay } from "./SettingsOverlay";
 import { useThemePreviewing } from "../theme/themeStore";
 import { useDevToolsCapture, useDevToolsUnlocked } from "../features/inspector/devTools";
 import { InspectorViewShare } from "../features/inspector/InspectorViewShare";
+import { WindowLookShare } from "../features/licences/WindowLookShare";
 import { useServerTheme } from "./useServerTheme";
 import { useView } from "./view";
 import { ViewProvider } from "./ViewProvider";
@@ -51,6 +52,7 @@ function MainScreen() {
       {overlay === null && <PersonMenuHost />}
       <NotificationsHost overlayOpen={overlay !== null} onOpenChat={closeOverlay} />
       {devTools && <InspectorViewShare />}
+      <WindowLookShare />
     </>
   );
 }
