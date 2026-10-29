@@ -15,13 +15,14 @@ import {
   useMemo,
   useRef,
   useState,
+  type ClipboardEvent,
   type KeyboardEvent,
   type MouseEvent as ReactMouseEvent,
   type ReactNode,
 } from "react";
 import { useTranslation } from "react-i18next";
 import { useT } from "../../i18n/useT";
-import type { ChatDisplay, ChatMessage } from "../../api";
+import { getApi, type ChatDisplay, type ChatMessage } from "../../api";
 import { useServerSelector } from "../channels";
 import { shownServerId } from "../channels/serverStore";
 import { useServers } from "../servers/store";
@@ -63,6 +64,7 @@ import { useIsMention } from "./ownMention";
 import { ContextMenu, type MenuPosition } from "../../components/ContextMenu";
 import { findOriginal, parseReply, quoteFor, replyOf, type ReplyQuote } from "./reply";
 import { SAFE_LINK, sanitizeHtml } from "./sanitize";
+import { selectedText } from "./selectionText";
 
 /** Within this distance of the top, older history is loaded; of the bottom, new messages scroll. */
 const EDGE_PX = 48;
@@ -377,9 +379,14 @@ export function MessageList({
   // Where focus returns when the viewer closes: the clicked image (or its button).
   const viewerOpener = useRef<HTMLElement | null>(null);
   const layout = useMemo(() => messageLayout(messages), [messages]);
-  const [menu, setMenu] = useState<(MenuPosition & { index: number }) | null>(null);
-  const [linkMenu, setLinkMenu] = useState<(MenuPosition & { url: string }) | null>(null);
-  const [linkCopied, setLinkCopied] = useState(false);
+  // `selection` is the text selected when the menu opened: clicking an item may clear it.
+  const [menu, setMenu] = useState<(MenuPosition & { index: number; selection: string }) | null>(
+    null,
+  );
+  const [linkMenu, setLinkMenu] = useState<
+    (MenuPosition & { url: string; selection: string }) | null
+  >(null);
+  const [copyNote, setCopyNote] = useState<string | null>(null);
   // The original of a reply that was jumped to, highlighted for a moment.
   const [highlighted, setHighlighted] = useState<string | null>(null);
   const serverLabel = useServers().servers.find((s) => s.id === shownServerId())?.label;
@@ -640,29 +647,51 @@ export function MessageList({
   }
 
   useEffect(() => {
-    if (!linkCopied) return;
+    if (copyNote === null) return;
     const timer = setTimeout(() => {
-      setLinkCopied(false);
+      setCopyNote(null);
     }, 2500);
     return () => {
       clearTimeout(timer);
     };
-  }, [linkCopied]);
+  }, [copyNote]);
 
-  function copyLink(url: string) {
-    navigator.clipboard.writeText(url).then(
-      () => {
-        setLinkCopied(true);
-      },
-      (error: unknown) => {
-        console.error("Copying a link failed", error);
-      },
-    );
+  // Through the engine: the webview's own clipboard does not reach the desktop everywhere.
+  function copyText(text: string, done: string | null, what: string) {
+    getApi()
+      .copyText(text)
+      .then(
+        () => {
+          if (done !== null) setCopyNote(done);
+        },
+        (error: unknown) => {
+          console.error(`Copying ${what} failed`, error);
+          setCopyNote(t("copy.failed"));
+        },
+      );
+  }
+
+  const copySelectionItem = (selection: string) => ({
+    label: t("copy.selection"),
+    onSelect: () => {
+      copyText(selection, t("copy.done"), "the selected text");
+    },
+  });
+
+  // Ctrl+C: plain text with line breaks, without the hidden labels the browser would copy too.
+  function onCopy(event: ClipboardEvent<HTMLDivElement>) {
+    const text = selectedText(window.getSelection(), event.currentTarget);
+    if (text === "") return;
+    event.preventDefault();
+    event.clipboardData.setData("text/plain", text);
+    // Also through the engine, like the menu: the webview's copy may not reach the desktop.
+    copyText(text, null, "the selected text");
   }
 
   function openMenu(index: number, event: ReactMouseEvent<HTMLLIElement>) {
     // Mention chips and names have their own menus.
     if (event.defaultPrevented) return;
+    const selection = selectedText(window.getSelection(), scrollRef.current);
     // A link has its own menu; this also keeps the webview's default one away.
     const anchor = event.target instanceof Element ? event.target.closest("a[href]") : null;
     const url = anchor?.getAttribute("href")?.trim();
@@ -672,18 +701,21 @@ export function MessageList({
       const keyboard = event.clientX === 0 && event.clientY === 0;
       setLinkMenu({
         url,
+        selection,
         x: keyboard ? rect.left : event.clientX,
         y: keyboard ? rect.bottom : event.clientY,
         opener: anchor,
       });
       return;
     }
-    if (!onReply) return;
+    // With a selection the menu leads with Copy (#114); the webview's own menu would drop it.
+    if (!onReply && selection === "") return;
     event.preventDefault();
     const rect = event.currentTarget.getBoundingClientRect();
     const keyboard = event.clientX === 0 && event.clientY === 0;
     setMenu({
       index,
+      selection,
       x: keyboard ? rect.left : event.clientX,
       y: keyboard ? rect.top : event.clientY,
       opener: itemRefs.current[index] ?? null,
@@ -763,6 +795,7 @@ export function MessageList({
           onLoadCapture={onMediaLoad}
           onClick={onListClick}
           onKeyDown={onListKeyDown}
+          onCopy={onCopy}
         >
           {hidden > 0 || log.hasMore ? (
             <button
@@ -875,12 +908,17 @@ export function MessageList({
             setMenu(null);
           }}
           items={[
-            {
-              label: t("reply.action"),
-              onSelect: () => {
-                reply(menu.index);
-              },
-            },
+            ...(menu.selection === "" ? [] : [copySelectionItem(menu.selection)]),
+            ...(onReply
+              ? [
+                  {
+                    label: t("reply.action"),
+                    onSelect: () => {
+                      reply(menu.index);
+                    },
+                  },
+                ]
+              : []),
           ]}
         />
       ) : null}
@@ -892,10 +930,11 @@ export function MessageList({
             setLinkMenu(null);
           }}
           items={[
+            ...(linkMenu.selection === "" ? [] : [copySelectionItem(linkMenu.selection)]),
             {
               label: t("linkMenu.copy"),
               onSelect: () => {
-                copyLink(linkMenu.url);
+                copyText(linkMenu.url, t("linkMenu.copied"), "a link");
               },
             },
             {
@@ -907,8 +946,8 @@ export function MessageList({
           ]}
         />
       ) : null}
-      <p className="chat-link-copied" role="status" hidden={!linkCopied}>
-        {linkCopied ? t("linkMenu.copied") : ""}
+      <p className="chat-link-copied" role="status" hidden={copyNote === null}>
+        {copyNote ?? ""}
       </p>
       {viewer ? (
         <ImageViewer

@@ -163,6 +163,11 @@
     "open": "Abrir ligação",
     "copied": "Ligação copiada"
   },
+  "copy": {
+    "selection": "Copiar",
+    "done": "Texto copiado",
+    "failed": "Não foi possível copiar para a área de transferência"
+  },
   "imageMenu": {
     "label": "Imagem {{name}}"
   },

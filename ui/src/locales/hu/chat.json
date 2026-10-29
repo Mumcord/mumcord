@@ -159,6 +159,11 @@
     "open": "Link megnyitása",
     "copied": "Link másolva"
   },
+  "copy": {
+    "selection": "Másolás",
+    "done": "Szöveg másolva",
+    "failed": "Nem sikerült a vágólapra másolni"
+  },
   "imageMenu": {
     "label": "Kép: {{name}}"
   },

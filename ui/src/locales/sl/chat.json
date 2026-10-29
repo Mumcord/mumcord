@@ -167,6 +167,11 @@
     "open": "Odpri povezavo",
     "copied": "Povezava kopirana"
   },
+  "copy": {
+    "selection": "Kopiraj",
+    "done": "Besedilo kopirano",
+    "failed": "Kopiranje v odložišče ni uspelo"
+  },
   "imageMenu": {
     "label": "Slika {{name}}"
   },

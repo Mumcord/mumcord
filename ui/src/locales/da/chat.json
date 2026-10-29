@@ -159,6 +159,11 @@
     "open": "Åbn link",
     "copied": "Link kopieret"
   },
+  "copy": {
+    "selection": "Kopiér",
+    "done": "Tekst kopieret",
+    "failed": "Kunne ikke kopiere til udklipsholderen"
+  },
   "imageMenu": {
     "label": "Billede {{name}}"
   },

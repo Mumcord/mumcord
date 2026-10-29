@@ -171,6 +171,11 @@
     "open": "Iftaħ il-link",
     "copied": "Il-link ġie kkupjat"
   },
+  "copy": {
+    "selection": "Ikkopja",
+    "done": "It-test ġie kkupjat",
+    "failed": "Ma setax jiġi kkupjat fil-clipboard"
+  },
   "imageMenu": {
     "label": "Stampa {{name}}"
   },

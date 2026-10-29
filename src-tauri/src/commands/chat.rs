@@ -138,6 +138,35 @@ pub fn save_text(path: String, contents: String) -> ApiResult<()> {
     std::fs::write(&path, contents).map_err(|err| ApiError::new(ErrorCode::Io, err.to_string()))
 }
 
+/// Largest text `copy_text` puts on the clipboard: far more than a long chat selection.
+const MAX_COPY_TEXT_BYTES: usize = 10 * 1024 * 1024;
+
+/// Checks text for `copy_text`; split out so the limit is testable without a clipboard.
+fn copyable_text(text: &str) -> Result<(), ApiError> {
+    if text.len() > MAX_COPY_TEXT_BYTES {
+        return Err(ApiError::new(
+            ErrorCode::MessageTooLarge,
+            "text too large to copy",
+        ));
+    }
+    Ok(())
+}
+
+/// Puts plain text on the system clipboard (copying chat text, issue #114). The webview's own
+/// clipboard access does not reach the desktop everywhere (WebKitGTK on Linux), so the copy
+/// goes through the Tauri clipboard plugin instead. Fails with `messageTooLarge` above 10 MB and
+/// `io` when the clipboard does not take the text.
+#[tauri::command]
+#[specta::specta]
+pub async fn copy_text(app: tauri::AppHandle, text: String) -> ApiResult<()> {
+    use tauri_plugin_clipboard_manager::ClipboardExt as _;
+    copyable_text(&text)?;
+    app.clipboard().write_text(text).map_err(|_| {
+        tracing::warn!("the clipboard did not take the copied text");
+        ApiError::new(ErrorCode::Io, "the clipboard did not take the text")
+    })
+}
+
 /// The bytes of a base64 `data:image/...` URL; anything else is rejected.
 pub(crate) fn decode_image_data_url(data_url: &str) -> Result<Vec<u8>, ApiError> {
     use base64::Engine as _;
@@ -151,7 +180,10 @@ pub(crate) fn decode_image_data_url(data_url: &str) -> Result<Vec<u8>, ApiError>
 
 #[cfg(test)]
 mod tests {
-    use super::{MAX_TEXT_BYTES, decode_image_data_url, rfc3339, save_text};
+    use super::{
+        MAX_COPY_TEXT_BYTES, MAX_TEXT_BYTES, copyable_text, decode_image_data_url, rfc3339,
+        save_text,
+    };
 
     #[test]
     fn formats_rfc3339() {
@@ -184,5 +216,12 @@ mod tests {
         );
         assert!(save_text(path_text, "x".repeat(MAX_TEXT_BYTES + 1)).is_err());
         std::fs::remove_dir_all(&dir).expect("remove temp dir");
+    }
+
+    #[test]
+    fn copies_text_up_to_the_limit() {
+        assert!(copyable_text("hello\nworld").is_ok());
+        assert!(copyable_text(&"x".repeat(MAX_COPY_TEXT_BYTES)).is_ok());
+        assert!(copyable_text(&"x".repeat(MAX_COPY_TEXT_BYTES + 1)).is_err());
     }
 }

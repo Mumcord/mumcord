@@ -163,6 +163,11 @@
     "open": "Ouvrir le lien",
     "copied": "Lien copié"
   },
+  "copy": {
+    "selection": "Copier",
+    "done": "Texte copié",
+    "failed": "Impossible de copier dans le presse-papiers"
+  },
   "imageMenu": {
     "label": "Image {{name}}"
   },

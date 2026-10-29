@@ -159,6 +159,11 @@
     "open": "Link openen",
     "copied": "Link gekopieerd"
   },
+  "copy": {
+    "selection": "Kopiëren",
+    "done": "Tekst gekopieerd",
+    "failed": "Kopiëren naar het klembord is mislukt"
+  },
   "imageMenu": {
     "label": "Afbeelding {{name}}"
   },

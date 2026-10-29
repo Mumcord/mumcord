@@ -9,6 +9,7 @@ import {
   messageBodies,
   pasteImage,
   composer,
+  readClipboard,
   ScriptBot,
   selectChannel,
   sendText,
@@ -237,6 +238,64 @@ describe("chat: rendering and sending (AC-1.13, AC-1.14, AC-1.43)", () => {
         { timeoutMsg: "welcome text not pinned in the root channel" },
       );
     });
+  });
+
+  // Issue #114. The system clipboard is read back like a pasting application does.
+  it("issue #114 copies selected message text from the context menu and with Ctrl+C", async () => {
+    await selectChannel("Lobby");
+    await sendText("select these words please");
+    await waitMessage("select these words please");
+    /** Selects `words` in the newest message; returns false if they are not there. */
+    const selectWords = (words: string) =>
+      browser.execute((words) => {
+        const bodies = document.querySelectorAll(".chat-list__items .chat-message__body");
+        const body = bodies[bodies.length - 1];
+        const walker = document.createTreeWalker(body, NodeFilter.SHOW_TEXT);
+        for (let node = walker.nextNode(); node; node = walker.nextNode()) {
+          const at = (node.textContent ?? "").indexOf(words);
+          if (at < 0) continue;
+          const range = document.createRange();
+          range.setStart(node, at);
+          range.setEnd(node, at + words.length);
+          window.getSelection()?.removeAllRanges();
+          window.getSelection()?.addRange(range);
+          return true;
+        }
+        return false;
+      }, words);
+    const copied = async (text: string) => {
+      await browser.waitUntil(async () => (await readClipboard("text")) === text, {
+        timeoutMsg: `${JSON.stringify(text)} not on the clipboard`,
+      });
+    };
+
+    expect(await selectWords("these words")).toBe(true);
+    // A script contextmenu event, not a WebDriver right-click (see theme-language.e2e.ts).
+    await browser.execute(() => {
+      const items = document.querySelectorAll(".chat-list__items > li");
+      const item = items[items.length - 1];
+      const box = item.getBoundingClientRect();
+      item.dispatchEvent(
+        new MouseEvent("contextmenu", { bubbles: true, cancelable: true, button: 2, clientX: box.left + 8, clientY: box.top + 8 }),
+      );
+    });
+    await $('[role="menu"]').waitForDisplayed();
+    const items = await browser.execute(() =>
+      Array.from(document.querySelectorAll('[role="menu"] [role="menuitem"]')).map((item) => item.textContent),
+    );
+    expect(items[0]).toBe("Copy");
+    await $('[role="menuitem"]=Copy').click();
+    await $("p.chat-link-copied=Text copied").waitForExist();
+    await copied("these words");
+
+    await browser.execute(() => {
+      const items = document.querySelectorAll<HTMLElement>(".chat-list__items > li");
+      items[items.length - 1].focus();
+    });
+    // A different part, so the check can't pass on what the menu copied before.
+    expect(await selectWords("words please")).toBe(true);
+    await browser.keys(["Control", "c"]);
+    await copied("words please");
   });
 
   it("keeps the window fixed when the chat overflows (no document scroll)", async () => {

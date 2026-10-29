@@ -159,6 +159,11 @@
     "open": "Open link",
     "copied": "Link copied"
   },
+  "copy": {
+    "selection": "Copy",
+    "done": "Text copied",
+    "failed": "Couldn't copy to the clipboard"
+  },
   "imageMenu": {
     "label": "Image {{name}}"
   },

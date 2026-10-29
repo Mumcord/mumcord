@@ -159,6 +159,11 @@
     "open": "Avaa linkki",
     "copied": "Linkki kopioitu"
   },
+  "copy": {
+    "selection": "Kopioi",
+    "done": "Teksti kopioitu",
+    "failed": "Leikepöydälle kopioiminen epäonnistui"
+  },
   "imageMenu": {
     "label": "Kuva {{name}}"
   },
