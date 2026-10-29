@@ -3452,6 +3452,7 @@ dependencies = [
  "futures-util",
  "gdk",
  "gtk",
+ "image",
  "ksni",
  "libc",
  "mumcord-engine",

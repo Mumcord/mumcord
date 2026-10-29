@@ -179,13 +179,30 @@ describe("ImageViewer", () => {
       fireEvent.click(screen.getByRole("button", { name: "Save image" }));
       await Promise.resolve();
     });
+    // A message image has no name of its own: it gets a dated one (issue #115).
     expect(dialogs.pickSavePath).toHaveBeenCalledWith(
-      "image.png",
+      expect.stringMatching(/^image-\d{4}-\d{2}-\d{2}\.png$/),
       expect.objectContaining({ extensions: ["png"] }),
       "Save image",
     );
     expect(save).toHaveBeenCalledWith("/tmp/pic.png", PNG);
     expect(await screen.findByText("Image saved")).toBeInTheDocument();
+  });
+
+  it("copies the shown image to the clipboard (issue #115)", async () => {
+    const copy = vi.spyOn(api, "copyImage");
+    render(<Harness />);
+    fireEvent.click(screen.getByRole("button", { name: "Copy image" }));
+    expect(await screen.findByText("Image copied")).toBeInTheDocument();
+    expect(copy).toHaveBeenCalledWith(PNG);
+  });
+
+  it("says so when copying fails", async () => {
+    vi.spyOn(api, "copyImage").mockRejectedValue(new Error("no clipboard"));
+    vi.spyOn(console, "error").mockImplementation(() => undefined);
+    render(<Harness />);
+    fireEvent.click(screen.getByRole("button", { name: "Copy image" }));
+    expect(await screen.findByText("The image could not be copied")).toBeInTheDocument();
   });
 
   it("saves nothing when the save dialog is cancelled", async () => {

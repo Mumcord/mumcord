@@ -173,7 +173,15 @@
     "failed": "Nie udało się skopiować do schowka"
   },
   "imageMenu": {
-    "label": "Obraz {{name}}"
+    "label": "Obraz {{name}}",
+    "copy": "Kopiuj obraz",
+    "save": "Zapisz obraz…",
+    "copyAddress": "Kopiuj adres obrazu",
+    "openViewer": "Otwórz w przeglądarce obrazów",
+    "copied": "Skopiowano obraz",
+    "addressCopied": "Skopiowano adres obrazu",
+    "copyFailed": "Nie udało się skopiować obrazu",
+    "tooLarge": "Obraz jest za duży, aby go skopiować lub zapisać"
   },
   "attribution": {
     "via": "przez {{brand}}",

@@ -298,6 +298,31 @@ describe("chat: rendering and sending (AC-1.13, AC-1.14, AC-1.43)", () => {
     await copied("words please");
   });
 
+  // Issue #115. The system clipboard must offer the copied image as PNG data, as pasting apps ask.
+  it("issue #115 copies a chat image from its context menu as image data", async () => {
+    await selectChannel("Lobby");
+    // The PNG RenderBot sent in AC-1.13; a script contextmenu event (see theme-language.e2e.ts).
+    await browser.execute(() => {
+      const image = document.querySelector<HTMLImageElement>(".chat-list__items .chat-message__body img");
+      if (image === null) throw new Error("no message image");
+      image.scrollIntoView({ block: "center" });
+      const box = image.getBoundingClientRect();
+      image.dispatchEvent(
+        new MouseEvent("contextmenu", { bubbles: true, cancelable: true, button: 2, clientX: box.left + 4, clientY: box.top + 4 }),
+      );
+    });
+    await $('[role="menu"]').waitForDisplayed();
+    const items = await browser.execute(() =>
+      Array.from(document.querySelectorAll('[role="menu"] [role="menuitem"]')).map((item) => item.textContent),
+    );
+    expect(items).toEqual(["Copy image", "Save image…", "Open in image viewer"]);
+    await $('[role="menuitem"]=Copy image').click();
+    await $("p.chat-link-copied=Image copied").waitForExist();
+    await browser.waitUntil(async () => (await readClipboard("png")).startsWith("png "), {
+      timeoutMsg: "no PNG image on the clipboard",
+    });
+  });
+
   it("keeps the window fixed when the chat overflows (no document scroll)", async () => {
     await selectChannel("Lobby");
     for (let i = 0; i < 40; i++) await sendText(`overflow line ${String(i)}`);

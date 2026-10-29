@@ -169,7 +169,15 @@
     "failed": "No se pudo copiar al portapapeles"
   },
   "imageMenu": {
-    "label": "Imagen {{name}}"
+    "label": "Imagen {{name}}",
+    "copy": "Copiar imagen",
+    "save": "Guardar imagen…",
+    "copyAddress": "Copiar dirección de la imagen",
+    "openViewer": "Abrir en el visor de imágenes",
+    "copied": "Imagen copiada",
+    "addressCopied": "Dirección de la imagen copiada",
+    "copyFailed": "No se pudo copiar la imagen",
+    "tooLarge": "La imagen es demasiado grande para copiarla o guardarla"
   },
   "attribution": {
     "via": "vía {{brand}}",

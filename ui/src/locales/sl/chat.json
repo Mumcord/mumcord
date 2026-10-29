@@ -173,7 +173,15 @@
     "failed": "Kopiranje v odložišče ni uspelo"
   },
   "imageMenu": {
-    "label": "Slika {{name}}"
+    "label": "Slika {{name}}",
+    "copy": "Kopiraj sliko",
+    "save": "Shrani sliko…",
+    "copyAddress": "Kopiraj naslov slike",
+    "openViewer": "Odpri v pregledovalniku slik",
+    "copied": "Slika kopirana",
+    "addressCopied": "Naslov slike kopiran",
+    "copyFailed": "Slike ni bilo mogoče kopirati",
+    "tooLarge": "Slika je prevelika za kopiranje ali shranjevanje"
   },
   "attribution": {
     "via": "prek {{brand}}",

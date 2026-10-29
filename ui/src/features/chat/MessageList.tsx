@@ -64,6 +64,7 @@ import { useIsMention } from "./ownMention";
 import { ContextMenu, type MenuPosition } from "../../components/ContextMenu";
 import { findOriginal, parseReply, quoteFor, replyOf, type ReplyQuote } from "./reply";
 import { SAFE_LINK, sanitizeHtml } from "./sanitize";
+import { ImageMenu, type ImageMenuState } from "./ImageMenu";
 import { selectedText } from "./selectionText";
 
 /** Within this distance of the top, older history is loaded; of the bottom, new messages scroll. */
@@ -386,6 +387,9 @@ export function MessageList({
   const [linkMenu, setLinkMenu] = useState<
     (MenuPosition & { url: string; selection: string }) | null
   >(null);
+  const [imageMenu, setImageMenu] = useState<
+    (ImageMenuState & { image: HTMLImageElement | null }) | null
+  >(null);
   const [copyNote, setCopyNote] = useState<string | null>(null);
   // The original of a reply that was jumped to, highlighted for a moment.
   const [highlighted, setHighlighted] = useState<string | null>(null);
@@ -530,7 +534,7 @@ export function MessageList({
     const images: ViewerImage[] = [];
     let index = 0;
     for (const img of root.querySelectorAll<HTMLImageElement>(
-      ".chat-message__body img, .inline-image__img",
+      ".chat-message__body img, .inline-image__img, .message-card__image img",
     )) {
       if (img === clickedImage) index = images.length;
       images.push({
@@ -688,10 +692,40 @@ export function MessageList({
     copyText(text, null, "the selected text");
   }
 
+  /** The image menu for a right-click (or the menu key) on a chat image; false elsewhere. */
+  function openImageMenu(event: ReactMouseEvent<HTMLLIElement>, selection: string): boolean {
+    const target = event.target instanceof Element ? event.target : null;
+    // Inline external images and message-card images (also while loading or failed), or an
+    // image sent inside the message.
+    const holder = target?.closest<HTMLElement>(".inline-image, .message-card__image") ?? null;
+    const img = holder ? holder.querySelector("img") : target ? messageImage(target) : null;
+    const element = img ?? holder;
+    if (!element) return false;
+    event.preventDefault();
+    const url = element.dataset["imageUrl"] ?? null;
+    const rect = element.getBoundingClientRect();
+    const keyboard = event.clientX === 0 && event.clientY === 0;
+    setImageMenu({
+      // Cards show a blob: URL; copying and saving work on the data: URL behind it.
+      src: img ? originalSrc(img.currentSrc || img.src) : null,
+      url,
+      name: url === null ? t("viewer.unnamed") : imageName(url),
+      fileName: url === null ? null : imageName(url),
+      full: (img ? fullImageSource(img)?.reference : undefined) ?? null,
+      selection,
+      x: keyboard ? rect.left : event.clientX,
+      y: keyboard ? rect.bottom : event.clientY,
+      opener: img?.closest("button") ?? img ?? holder?.querySelector("button") ?? null,
+      image: img,
+    });
+    return true;
+  }
+
   function openMenu(index: number, event: ReactMouseEvent<HTMLLIElement>) {
     // Mention chips and names have their own menus.
     if (event.defaultPrevented) return;
     const selection = selectedText(window.getSelection(), scrollRef.current);
+    if (openImageMenu(event, selection)) return;
     // A link has its own menu; this also keeps the webview's default one away.
     const anchor = event.target instanceof Element ? event.target.closest("a[href]") : null;
     const url = anchor?.getAttribute("href")?.trim();
@@ -944,6 +978,23 @@ export function MessageList({
               },
             },
           ]}
+        />
+      ) : null}
+      {imageMenu ? (
+        <ImageMenu
+          menu={imageMenu}
+          onClose={() => {
+            setImageMenu(null);
+          }}
+          onOpenViewer={
+            imageMenu.image
+              ? () => {
+                  if (imageMenu.image?.isConnected) openViewerAt(imageMenu.image);
+                }
+              : undefined
+          }
+          copyText={copyText}
+          notify={setCopyNote}
         />
       ) : null}
       <p className="chat-link-copied" role="status" hidden={copyNote === null}>

@@ -165,7 +165,15 @@
     "failed": "Kunne ikke kopiere til udklipsholderen"
   },
   "imageMenu": {
-    "label": "Billede {{name}}"
+    "label": "Billede {{name}}",
+    "copy": "Kopiér billede",
+    "save": "Gem billede…",
+    "copyAddress": "Kopiér billedadresse",
+    "openViewer": "Åbn i billedfremviser",
+    "copied": "Billede kopieret",
+    "addressCopied": "Billedadresse kopieret",
+    "copyFailed": "Billedet kunne ikke kopieres",
+    "tooLarge": "Billedet er for stort til at kopiere eller gemme"
   },
   "attribution": {
     "via": "via {{brand}}",

@@ -110,6 +110,12 @@ export const commands = {
 	 *  already in the UI, so nothing is fetched again.
 	 */
 	saveImage: (path: string, dataUrl: string) => typedError<null, ApiError>(__TAURI_INVOKE("save_image", { path, dataUrl })),
+	/**
+	 *  Puts the image of a `data:` URL on the system clipboard as image data ("Copy image", issue
+	 *  #115). Fails with `messageTooLarge` above the size limits, `invalidInput` when the data is not
+	 *  a readable image and `io` when the clipboard does not take it.
+	 */
+	copyImage: (dataUrl: string) => typedError<null, ApiError>(__TAURI_INVOKE("copy_image", { dataUrl })),
 	/**  Writes text the UI already has to `path` (a chat code block's "Download", issue #111). */
 	saveText: (path: string, contents: string) => typedError<null, ApiError>(__TAURI_INVOKE("save_text", { path, contents })),
 	/**

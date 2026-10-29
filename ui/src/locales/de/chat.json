@@ -165,7 +165,15 @@
     "failed": "Kopieren in die Zwischenablage fehlgeschlagen"
   },
   "imageMenu": {
-    "label": "Bild {{name}}"
+    "label": "Bild {{name}}",
+    "copy": "Bild kopieren",
+    "save": "Bild speichern…",
+    "copyAddress": "Bildadresse kopieren",
+    "openViewer": "In der Bildansicht öffnen",
+    "copied": "Bild kopiert",
+    "addressCopied": "Bildadresse kopiert",
+    "copyFailed": "Das Bild konnte nicht kopiert werden",
+    "tooLarge": "Das Bild ist zu groß zum Kopieren oder Speichern"
   },
   "attribution": {
     "via": "über {{brand}}",

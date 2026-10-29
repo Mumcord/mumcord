@@ -80,6 +80,9 @@ export function fullImageSource(img: HTMLImageElement): FullImageSource | undefi
 /** Fetches in flight or done, by reference: opening the viewer again reuses them. */
 const fetches = new Map<string, Promise<string | null>>();
 
+/** Full images that have arrived, by reference: "Copy image" and "Save image…" prefer them. */
+const arrived = new Map<string, string>();
+
 /** References whose fetch has not finished yet, with the last known progress (0–1, or null). */
 const running = new Map<string, number | null>();
 const runningListeners = new Set<() => void>();
@@ -109,6 +112,7 @@ function fetchFullImage(source: FullImageSource): Promise<string | null> {
       });
       // A failure may be temporary (sender offline): allow a new try on the next open.
       if (src === null) fetches.delete(source.reference);
+      else arrived.set(source.reference, src);
       return src;
     });
   fetches.set(source.reference, started);
@@ -128,6 +132,7 @@ async function loadAllowed(): Promise<boolean> {
 /** Forgets finished and running fetches (tests). */
 export function resetFullImages(): void {
   fetches.clear();
+  arrived.clear();
   setRunning((map) => {
     map.clear();
   });
@@ -172,6 +177,11 @@ function subscribeRunning(listener: () => void): () => void {
       stopEvents = null;
     }
   };
+}
+
+/** The full image for `reference` if it has already arrived; never starts a fetch. */
+export function arrivedFullImage(reference: string): string | undefined {
+  return arrived.get(reference);
 }
 
 export type FullImageState =

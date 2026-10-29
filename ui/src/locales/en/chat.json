@@ -165,7 +165,15 @@
     "failed": "Couldn't copy to the clipboard"
   },
   "imageMenu": {
-    "label": "Image {{name}}"
+    "label": "Image {{name}}",
+    "copy": "Copy image",
+    "save": "Save image…",
+    "copyAddress": "Copy image address",
+    "openViewer": "Open in image viewer",
+    "copied": "Image copied",
+    "addressCopied": "Image address copied",
+    "copyFailed": "The image could not be copied",
+    "tooLarge": "The image is too large to copy or save"
   },
   "attribution": {
     "via": "via {{brand}}",

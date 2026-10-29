@@ -1487,6 +1487,7 @@ export function createMockApi(options: MockOptions = {}): MockApi {
       return Promise.resolve(null);
     },
     saveImage: () => Promise.resolve(null),
+    copyImage: () => Promise.resolve(null),
     saveText: () => Promise.resolve(null),
     // The browser's own clipboard stands in for the system one.
     copyText: (text) => navigator.clipboard.writeText(text).then(() => null),

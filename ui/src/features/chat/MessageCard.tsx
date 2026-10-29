@@ -140,7 +140,14 @@ function CardImage({ url, title, previews, tabIndex, onImageClick }: CardImagePr
         else openInBrowser(image.url);
       }}
     >
-      <img src={src} alt="" draggable={false} width={image.width} height={image.height} />
+      <img
+        src={src}
+        alt=""
+        draggable={false}
+        data-image-url={image.url}
+        width={image.width}
+        height={image.height}
+      />
     </button>
   );
 }

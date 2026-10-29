@@ -169,7 +169,15 @@
     "failed": "Neizdevās kopēt starpliktuvē"
   },
   "imageMenu": {
-    "label": "Attēls {{name}}"
+    "label": "Attēls {{name}}",
+    "copy": "Kopēt attēlu",
+    "save": "Saglabāt attēlu…",
+    "copyAddress": "Kopēt attēla adresi",
+    "openViewer": "Atvērt attēlu skatītājā",
+    "copied": "Attēls nokopēts",
+    "addressCopied": "Attēla adrese nokopēta",
+    "copyFailed": "Attēlu neizdevās nokopēt",
+    "tooLarge": "Attēls ir pārāk liels, lai to kopētu vai saglabātu"
   },
   "attribution": {
     "via": "caur {{brand}}",

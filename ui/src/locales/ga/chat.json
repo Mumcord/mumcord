@@ -177,7 +177,15 @@
     "failed": "Níorbh fhéidir cóipeáil chuig an ngearrthaisce"
   },
   "imageMenu": {
-    "label": "Íomhá {{name}}"
+    "label": "Íomhá {{name}}",
+    "copy": "Cóipeáil an íomhá",
+    "save": "Sábháil an íomhá…",
+    "copyAddress": "Cóipeáil seoladh na híomhá",
+    "openViewer": "Oscail san amharcán íomhánna",
+    "copied": "Cóipeáladh an íomhá",
+    "addressCopied": "Cóipeáladh seoladh na híomhá",
+    "copyFailed": "Níorbh fhéidir an íomhá a chóipeáil",
+    "tooLarge": "Tá an íomhá rómhór le cóipeáil nó le sábháil"
   },
   "attribution": {
     "via": "trí {{brand}}",

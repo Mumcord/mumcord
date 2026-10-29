@@ -169,7 +169,15 @@
     "failed": "Kopiranje u međuspremnik nije uspjelo"
   },
   "imageMenu": {
-    "label": "Slika {{name}}"
+    "label": "Slika {{name}}",
+    "copy": "Kopiraj sliku",
+    "save": "Spremi sliku…",
+    "copyAddress": "Kopiraj adresu slike",
+    "openViewer": "Otvori u pregledniku slika",
+    "copied": "Slika kopirana",
+    "addressCopied": "Adresa slike kopirana",
+    "copyFailed": "Sliku nije moguće kopirati",
+    "tooLarge": "Slika je prevelika za kopiranje ili spremanje"
   },
   "attribution": {
     "via": "putem {{brand}}",

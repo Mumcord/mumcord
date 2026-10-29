@@ -165,7 +165,15 @@
     "failed": "Kopiëren naar het klembord is mislukt"
   },
   "imageMenu": {
-    "label": "Afbeelding {{name}}"
+    "label": "Afbeelding {{name}}",
+    "copy": "Afbeelding kopiëren",
+    "save": "Afbeelding opslaan…",
+    "copyAddress": "Afbeeldingsadres kopiëren",
+    "openViewer": "Openen in afbeeldingsviewer",
+    "copied": "Afbeelding gekopieerd",
+    "addressCopied": "Afbeeldingsadres gekopieerd",
+    "copyFailed": "De afbeelding kon niet worden gekopieerd",
+    "tooLarge": "De afbeelding is te groot om te kopiëren of op te slaan"
   },
   "attribution": {
     "via": "via {{brand}}",
