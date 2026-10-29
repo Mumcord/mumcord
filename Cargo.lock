@@ -3525,6 +3525,7 @@ dependencies = [
  "audio_thread_priority",
  "cpal",
  "hound",
+ "libc",
  "mumcord-codec",
  "rtrb",
  "rubato",

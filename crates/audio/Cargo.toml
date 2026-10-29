@@ -30,5 +30,11 @@ test-backend = ["dep:hound"]
 [dev-dependencies]
 hound.workspace = true
 
+[target.'cfg(target_os = "linux")'.dependencies]
+libc.workspace = true
+
+[target.'cfg(target_os = "linux")'.dev-dependencies]
+libc.workspace = true
+
 [lints]
 workspace = true

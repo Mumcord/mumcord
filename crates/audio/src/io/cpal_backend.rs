@@ -261,6 +261,8 @@ fn build_input(
     counters: Arc<Counters>,
     failed: Arc<AtomicBool>,
 ) -> Result<cpal::Stream, IoError> {
+    // cpal moves its callback threads to real-time priority (`realtime-dbus`).
+    crate::rt::guard_overruns();
     dispatch_format!(
         supported.sample_format(),
         input_stream,
@@ -307,6 +309,8 @@ fn build_output(
     counters: Arc<Counters>,
     failed: Arc<AtomicBool>,
 ) -> Result<cpal::Stream, IoError> {
+    // cpal moves its callback threads to real-time priority (`realtime-dbus`).
+    crate::rt::guard_overruns();
     dispatch_format!(
         supported.sample_format(),
         output_stream,

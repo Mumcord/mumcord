@@ -189,6 +189,41 @@ opt-level = 3
 [profile.dev.package.num-bigint-dig]
 opt-level = 3
 
+# Voice DSP (noise suppression, echo cancellation, resampling, Opus) in an unoptimised build
+# needs several milliseconds per 10 ms frame, enough to fall behind the microphone (issue #139).
+[profile.dev.package.nnnoiseless]
+opt-level = 3
+
+[profile.dev.package.easyfft]
+opt-level = 3
+
+[profile.dev.package.rustfft]
+opt-level = 3
+
+[profile.dev.package.sonora-aec3]
+opt-level = 3
+
+[profile.dev.package.sonora-agc2]
+opt-level = 3
+
+[profile.dev.package.sonora-ns]
+opt-level = 3
+
+[profile.dev.package.sonora-common-audio]
+opt-level = 3
+
+[profile.dev.package.sonora-simd]
+opt-level = 3
+
+[profile.dev.package.rubato]
+opt-level = 3
+
+[profile.dev.package.realfft]
+opt-level = 3
+
+[profile.dev.package.opusic-sys]
+opt-level = 3
+
 # mumbot (dev-dependency of the engine's live tests) depends on the published protocol and codec
 # crates; build it against these instead, so they exist once and `cargo -p` stays unambiguous.
 [patch.crates-io]
