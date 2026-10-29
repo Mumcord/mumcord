@@ -3540,6 +3540,7 @@ dependencies = [
  "hound",
  "nnnoiseless",
  "opus",
+ "rnnoise-rs",
  "rtrb",
  "sonora",
  "thiserror 2.0.21",
@@ -5345,6 +5346,11 @@ dependencies = [
  "untrusted",
  "windows-sys 0.52.0",
 ]
+
+[[package]]
+name = "rnnoise-rs"
+version = "0.1.0"
+source = "git+https://github.com/lovelace-labs/rnnoise-rs?rev=74b46b1065630f68464ee60dd542e3ce175743db#74b46b1065630f68464ee60dd542e3ce175743db"
 
 [[package]]
 name = "rsa"

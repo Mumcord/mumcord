@@ -81,6 +81,9 @@ audio_thread_priority = { version = "0.35", default-features = false, features =
 # opusic-sys builds libopus statically from bundled sources.
 opus = "0.4"
 nnnoiseless = { version = "0.5", default-features = false }
+# rnnoise-rs is not published on crates.io, so it is pinned to a commit of the repository
+# (BSD-3-Clause, no dependencies). The library name is `rnnoise`.
+rnnoise-rs = { git = "https://github.com/lovelace-labs/rnnoise-rs", rev = "74b46b1065630f68464ee60dd542e3ce175743db" }
 sonora = "0.2"
 rtrb = "0.4"
 rubato = "5.0"
