@@ -15,6 +15,7 @@
 
 ### Fixed
 
+- Large GIPHY GIFs no longer slow the whole app down: the chat now shows GIPHY's downsized GIF, sized for the chat box, instead of the full-size WebP, which kept the renderer about four times as busy while it played. GIFs already cached from earlier messages are fetched again in the lighter format, and moving the mouse over a large GIF no longer keeps a CPU core busy (#109)
 - Pasting copied image data, such as a Spectacle screenshot or "Copy image" in a browser, attaches the image again on Linux; the WebKitGTK bundled in the AppImage hands such a paste nothing, so the image is now read from the system clipboard (issue #110)
 
 ## [0.4.3] - 2026-10-28
