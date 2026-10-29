@@ -173,7 +173,15 @@
     "failed": "Kopírovanie do schránky zlyhalo"
   },
   "imageMenu": {
-    "label": "Obrázok {{name}}"
+    "label": "Obrázok {{name}}",
+    "copy": "Kopírovať obrázok",
+    "save": "Uložiť obrázok…",
+    "copyAddress": "Kopírovať adresu obrázka",
+    "openViewer": "Otvoriť v prehliadači obrázkov",
+    "copied": "Obrázok skopírovaný",
+    "addressCopied": "Adresa obrázka skopírovaná",
+    "copyFailed": "Obrázok sa nepodarilo skopírovať",
+    "tooLarge": "Obrázok je príliš veľký na kopírovanie alebo uloženie"
   },
   "attribution": {
     "via": "cez {{brand}}",

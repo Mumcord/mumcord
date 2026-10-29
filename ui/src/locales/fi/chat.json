@@ -165,7 +165,15 @@
     "failed": "Leikepöydälle kopioiminen epäonnistui"
   },
   "imageMenu": {
-    "label": "Kuva {{name}}"
+    "label": "Kuva {{name}}",
+    "copy": "Kopioi kuva",
+    "save": "Tallenna kuva…",
+    "copyAddress": "Kopioi kuvan osoite",
+    "openViewer": "Avaa kuvankatseluohjelmassa",
+    "copied": "Kuva kopioitu",
+    "addressCopied": "Kuvan osoite kopioitu",
+    "copyFailed": "Kuvaa ei voitu kopioida",
+    "tooLarge": "Kuva on liian suuri kopioitavaksi tai tallennettavaksi"
   },
   "attribution": {
     "via": "lähde: {{brand}}",

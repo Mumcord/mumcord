@@ -177,7 +177,15 @@
     "failed": "Ma setax jiġi kkupjat fil-clipboard"
   },
   "imageMenu": {
-    "label": "Stampa {{name}}"
+    "label": "Stampa {{name}}",
+    "copy": "Ikkopja l-istampa",
+    "save": "Issejvja l-istampa…",
+    "copyAddress": "Ikkopja l-indirizz tal-istampa",
+    "openViewer": "Iftaħ fil-viewer tal-istampi",
+    "copied": "L-istampa ġiet ikkupjata",
+    "addressCopied": "L-indirizz tal-istampa ġie kkupjat",
+    "copyFailed": "L-istampa ma setgħetx tiġi kkupjata",
+    "tooLarge": "L-istampa hija kbira wisq biex tiġi kkupjata jew issejvjata"
   },
   "attribution": {
     "via": "permezz ta' {{brand}}",

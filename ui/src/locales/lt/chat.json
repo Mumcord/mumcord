@@ -173,7 +173,15 @@
     "failed": "Nepavyko nukopijuoti į iškarpinę"
   },
   "imageMenu": {
-    "label": "Paveikslėlis {{name}}"
+    "label": "Paveikslėlis {{name}}",
+    "copy": "Kopijuoti paveikslėlį",
+    "save": "Įrašyti paveikslėlį…",
+    "copyAddress": "Kopijuoti paveikslėlio adresą",
+    "openViewer": "Atverti paveikslėlių peržiūroje",
+    "copied": "Paveikslėlis nukopijuotas",
+    "addressCopied": "Paveikslėlio adresas nukopijuotas",
+    "copyFailed": "Nepavyko nukopijuoti paveikslėlio",
+    "tooLarge": "Paveikslėlis per didelis kopijuoti ar įrašyti"
   },
   "attribution": {
     "via": "per {{brand}}",

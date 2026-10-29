@@ -169,7 +169,15 @@
     "failed": "Impossible de copier dans le presse-papiers"
   },
   "imageMenu": {
-    "label": "Image {{name}}"
+    "label": "Image {{name}}",
+    "copy": "Copier l’image",
+    "save": "Enregistrer l’image…",
+    "copyAddress": "Copier l’adresse de l’image",
+    "openViewer": "Ouvrir dans la visionneuse",
+    "copied": "Image copiée",
+    "addressCopied": "Adresse de l’image copiée",
+    "copyFailed": "Impossible de copier l’image",
+    "tooLarge": "L’image est trop volumineuse pour être copiée ou enregistrée"
   },
   "attribution": {
     "via": "via {{brand}}",

@@ -165,7 +165,15 @@
     "failed": "Det gick inte att kopiera till urklipp"
   },
   "imageMenu": {
-    "label": "Bilden {{name}}"
+    "label": "Bilden {{name}}",
+    "copy": "Kopiera bild",
+    "save": "Spara bild…",
+    "copyAddress": "Kopiera bildadress",
+    "openViewer": "Öppna i bildvisaren",
+    "copied": "Bild kopierad",
+    "addressCopied": "Bildadress kopierad",
+    "copyFailed": "Bilden kunde inte kopieras",
+    "tooLarge": "Bilden är för stor för att kopiera eller spara"
   },
   "attribution": {
     "via": "via {{brand}}",

@@ -1,7 +1,7 @@
 /**
  * Full-window image viewer (FR-1.56): fit to window, zoom around the pointer (wheel, pinch, + / −),
  * pan by dragging, 0 for fit, double-click for 100 %, ← / → through the conversation's images,
- * Escape to close, "Save image" and, for external images, "Open in browser". Thumbnails sent by
+ * Escape to close, "Copy image", "Save image" and, for external images, "Open in browser". Thumbnails sent by
  * Mumcord users are replaced by the full image once it arrives from the sender (FR-1.60c). The view is one CSS
  * transform written once per animation frame, so a storm of wheel events costs one update.
  */
@@ -16,11 +16,10 @@ import {
 } from "react";
 import { createPortal } from "react-dom";
 import { useTranslation } from "react-i18next";
-import { getApi } from "../../api";
 import { BetaBadge } from "../../components/BetaBadge";
-import { pickSavePath } from "../settings/fileDialogs";
 import { removeFavorite, saveFavorite, useGifFavorites } from "./favorites";
 import { useFullImage, type FullImageSource } from "./fullImage";
+import { copyImage, imageActionError, saveImageAs } from "./imageActions";
 import { openInBrowser } from "./openLink";
 import {
   clampView,
@@ -51,20 +50,6 @@ interface ImageViewerProps {
 }
 
 const FOCUSABLE = "button:not([disabled])";
-
-/** File extension for a `data:image/...` URL. */
-function extensionOf(src: string): string {
-  const match = /^data:image\/(png|jpeg|gif|webp)/.exec(src);
-  if (!match) return "png";
-  return match[1] === "jpeg" ? "jpg" : (match[1] ?? "png");
-}
-
-/** Suggested file name: the external file's own name, else "image". */
-function suggestedName(image: ViewerImage, extension: string): string {
-  const last = image.name.replace(/[\\/:*?"<>|]/g, "_").trim();
-  const base = last === "" ? "image" : last;
-  return base.toLowerCase().endsWith(`.${extension}`) ? base : `${base}.${extension}`;
-}
 
 /** Loading progress of the full image, or that only the thumbnail is available. */
 function FullImageHint({ state }: { state: ReturnType<typeof useFullImage> }) {
@@ -314,19 +299,31 @@ export function ImageViewer({ images, index, onIndexChange, onClose }: ImageView
 
   async function save() {
     if (!current || shown === undefined) return;
-    const extension = extensionOf(shown);
     try {
-      const path = await pickSavePath(
-        suggestedName(current, extension),
-        { name: t("viewer.fileFilter"), extensions: [extension] },
-        t("viewer.save"),
-      );
-      if (path === null) return;
-      await getApi().saveImage(path, shown);
+      // Only external images have a name of their own; the others get a dated one.
+      const name = current.url === undefined ? null : current.name;
+      if (!(await saveImageAs(shown, name, t("viewer.save"), t("viewer.fileFilter")))) return;
       setStatus({ text: t("viewer.saved"), failed: false });
     } catch (error) {
       console.error("Saving the image failed", error);
-      setStatus({ text: t("viewer.saveFailed"), failed: true });
+      setStatus({
+        text: imageActionError(error, t("viewer.saveFailed"), t("imageMenu.tooLarge")),
+        failed: true,
+      });
+    }
+  }
+
+  async function copy() {
+    if (shown === undefined) return;
+    try {
+      await copyImage(shown);
+      setStatus({ text: t("imageMenu.copied"), failed: false });
+    } catch (error) {
+      console.error("Copying the image failed", error);
+      setStatus({
+        text: imageActionError(error, t("imageMenu.copyFailed"), t("imageMenu.tooLarge")),
+        failed: true,
+      });
     }
   }
 
@@ -388,6 +385,7 @@ export function ImageViewer({ images, index, onIndexChange, onClose }: ImageView
             "+",
           )}
           {button(t("viewer.fit"), fit, "⤢")}
+          {button(t("imageMenu.copy"), () => void copy(), "⧉")}
           {button(t("viewer.save"), () => void save(), "⬇")}
           {current.url !== undefined
             ? button(

@@ -165,7 +165,15 @@
     "failed": "Lõikelauale kopeerimine ebaõnnestus"
   },
   "imageMenu": {
-    "label": "Pilt {{name}}"
+    "label": "Pilt {{name}}",
+    "copy": "Kopeeri pilt",
+    "save": "Salvesta pilt…",
+    "copyAddress": "Kopeeri pildi aadress",
+    "openViewer": "Ava pildivaaturis",
+    "copied": "Pilt kopeeritud",
+    "addressCopied": "Pildi aadress kopeeritud",
+    "copyFailed": "Pilti ei õnnestunud kopeerida",
+    "tooLarge": "Pilt on kopeerimiseks või salvestamiseks liiga suur"
   },
   "attribution": {
     "via": "allikas {{brand}}",

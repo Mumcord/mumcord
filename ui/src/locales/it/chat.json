@@ -169,7 +169,15 @@
     "failed": "Impossibile copiare negli appunti"
   },
   "imageMenu": {
-    "label": "Immagine {{name}}"
+    "label": "Immagine {{name}}",
+    "copy": "Copia immagine",
+    "save": "Salva immagine…",
+    "copyAddress": "Copia indirizzo immagine",
+    "openViewer": "Apri nel visualizzatore",
+    "copied": "Immagine copiata",
+    "addressCopied": "Indirizzo immagine copiato",
+    "copyFailed": "Impossibile copiare l’immagine",
+    "tooLarge": "L’immagine è troppo grande per essere copiata o salvata"
   },
   "attribution": {
     "via": "tramite {{brand}}",

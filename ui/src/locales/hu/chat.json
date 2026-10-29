@@ -165,7 +165,15 @@
     "failed": "Nem sikerült a vágólapra másolni"
   },
   "imageMenu": {
-    "label": "Kép: {{name}}"
+    "label": "Kép: {{name}}",
+    "copy": "Kép másolása",
+    "save": "Kép mentése…",
+    "copyAddress": "Képcím másolása",
+    "openViewer": "Megnyitás a képnézegetőben",
+    "copied": "Kép másolva",
+    "addressCopied": "Képcím másolva",
+    "copyFailed": "A képet nem sikerült másolni",
+    "tooLarge": "A kép túl nagy a másoláshoz vagy mentéshez"
   },
   "attribution": {
     "via": "forrás: {{brand}}",

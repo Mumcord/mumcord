@@ -4,7 +4,7 @@
  * image's site. Images are scaled into `IMAGE_BOX` (400×300) with their aspect ratio kept; a box
  * of that size holds the place while the image loads.
  */
-import { useCallback, useEffect, useState, type MouseEvent } from "react";
+import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import type { InlineImage } from "../../api";
 import { DismissButton, OpenButton } from "./cardButtons";
@@ -12,7 +12,6 @@ import { dismissPreview } from "./dismissedPreviews";
 import { GifAttribution } from "./GifAttribution";
 import { removeFavorite, saveFavorite, useGifFavorites } from "./favorites";
 import { markInlineShown } from "./inlineLinks";
-import { ImageMenu, type ImageMenuState } from "./ImageMenu";
 import { fitImage, IMAGE_BOX, imageName, loadInlineImage, type ImageClickHandler } from "./links";
 import { openInBrowser } from "./openLink";
 
@@ -48,10 +47,6 @@ export function InlineImageCard({ url, messageId, tabIndex, onImageClick }: Inli
     return markInlineShown(messageId, url);
   }, [visible, messageId, url]);
   const favorites = useGifFavorites();
-  const [menu, setMenu] = useState<ImageMenuState | null>(null);
-  const closeMenu = useCallback(() => {
-    setMenu(null);
-  }, []);
   const name = imageName(url);
   if (image === undefined) {
     return (
@@ -60,6 +55,7 @@ export function InlineImageCard({ url, messageId, tabIndex, onImageClick }: Inli
         role="img"
         aria-busy="true"
         aria-label={t("image.loading", { name })}
+        data-image-url={url}
         style={{ width: IMAGE_BOX.width, height: IMAGE_BOX.height }}
       />
     );
@@ -71,6 +67,7 @@ export function InlineImageCard({ url, messageId, tabIndex, onImageClick }: Inli
         className="inline-image inline-image--failed"
         role="group"
         aria-label={t("image.label", { name })}
+        data-image-url={url}
       >
         <span className="inline-image__failed-text">{t("image.failed")}</span>
         <OpenButton
@@ -92,29 +89,12 @@ export function InlineImageCard({ url, messageId, tabIndex, onImageClick }: Inli
   const favorite = favorites.includes(image.url);
   const favoriteLabel = favorite ? t("favorites.remove") : t("favorites.save");
 
-  function openMenu(event: MouseEvent<HTMLElement>) {
-    event.preventDefault();
-    const target = event.currentTarget;
-    const rect = target.getBoundingClientRect();
-    // The ContextMenu key reports no pointer position; place the menu at the image instead.
-    const fromKeyboard = event.clientX === 0 && event.clientY === 0;
-    setMenu({
-      url: image?.url ?? url,
-      name,
-      x: fromKeyboard ? rect.left : event.clientX,
-      y: fromKeyboard ? rect.bottom : event.clientY,
-      opener: target.querySelector<HTMLElement>("button"),
-    });
-  }
-
   return (
-    // The menu is a pointer shortcut for the buttons inside, which stay keyboard operable.
-    // eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions
+    // The message list opens the image menu for a right-click or the menu key in here.
     <figure
       className="inline-image"
       aria-label={t("image.label", { name })}
       style={{ width: size.width }}
-      onContextMenu={openMenu}
     >
       <button
         type="button"
@@ -158,7 +138,6 @@ export function InlineImageCard({ url, messageId, tabIndex, onImageClick }: Inli
           dismissPreview(messageId, url);
         }}
       />
-      {menu ? <ImageMenu menu={menu} onClose={closeMenu} /> : null}
     </figure>
   );
 }

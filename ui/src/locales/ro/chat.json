@@ -169,7 +169,15 @@
     "failed": "Copierea în clipboard a eșuat"
   },
   "imageMenu": {
-    "label": "Imagine {{name}}"
+    "label": "Imagine {{name}}",
+    "copy": "Copiază imaginea",
+    "save": "Salvează imaginea…",
+    "copyAddress": "Copiază adresa imaginii",
+    "openViewer": "Deschide în vizualizatorul de imagini",
+    "copied": "Imagine copiată",
+    "addressCopied": "Adresa imaginii copiată",
+    "copyFailed": "Imaginea nu a putut fi copiată",
+    "tooLarge": "Imaginea este prea mare pentru a fi copiată sau salvată"
   },
   "attribution": {
     "via": "prin {{brand}}",

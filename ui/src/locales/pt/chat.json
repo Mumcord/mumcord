@@ -169,7 +169,15 @@
     "failed": "Não foi possível copiar para a área de transferência"
   },
   "imageMenu": {
-    "label": "Imagem {{name}}"
+    "label": "Imagem {{name}}",
+    "copy": "Copiar imagem",
+    "save": "Guardar imagem…",
+    "copyAddress": "Copiar endereço da imagem",
+    "openViewer": "Abrir no visualizador de imagens",
+    "copied": "Imagem copiada",
+    "addressCopied": "Endereço da imagem copiado",
+    "copyFailed": "Não foi possível copiar a imagem",
+    "tooLarge": "A imagem é demasiado grande para copiar ou guardar"
   },
   "attribution": {
     "via": "via {{brand}}",
