@@ -14,6 +14,7 @@ members = [
     "tools/netsim",
     "src-tauri",
 ]
+exclude = ["vendor/rnnoise-rs"]
 
 [workspace.package]
 version = "0.4.4"

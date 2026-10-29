@@ -5350,9 +5350,6 @@ dependencies = [
 [[package]]
 name = "rnnoise-rs"
 version = "0.1.0"
-dependencies = [
- "realfft",
-]
 
 [[package]]
 name = "rsa"
