@@ -5,7 +5,14 @@
 import { browser, expect, $, $$ } from "@wdio/globals";
 import { app, testenv } from "../../helpers/index.ts";
 import { hasClass } from "../../helpers/selectors.ts";
-import { ScriptBot, USER, composer, joinChannel, waitMessage } from "../../helpers/chat-ui.ts";
+import {
+  ScriptBot,
+  USER,
+  composer,
+  joinChannel,
+  readClipboard,
+  waitMessage,
+} from "../../helpers/chat-ui.ts";
 import { button, completeWizard, dialogTitle, fill } from "../../helpers/servers-ui.ts";
 import { connectFromEmptyState, waitFor, waitGone } from "./flows.ts";
 
@@ -155,8 +162,15 @@ describe("themes (AC-2.12 – AC-2.16)", function () {
       const box = composer();
       await box.waitForEnabled();
       await box.click();
-      await browser.keys(["Control", "v"]);
-      code = (await box.getValue()).match(/mct1\.[A-Za-z0-9_-]+/)?.[0] ?? "";
+      // The share message goes to the system clipboard through the engine; read it there (the
+      // webview's own paste does not see it everywhere) and type it into the composer.
+      await browser.waitUntil(async () => (await readClipboard("text")).includes("mct1."), {
+        timeout: 10_000,
+        timeoutMsg: "the share message did not reach the system clipboard",
+      });
+      const shared = await readClipboard("text");
+      await box.setValue(shared);
+      code = shared.match(/mct1\.[A-Za-z0-9_-]+/)?.[0] ?? "";
       expect(code.length).toBeGreaterThan(20);
       expect(code.length).toBeLessThanOrEqual(2048);
       await browser.keys("Enter");
