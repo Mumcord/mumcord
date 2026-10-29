@@ -8,6 +8,10 @@
 
 - After a release is published, a workflow opens a pull request that writes the released version into the manifests and lock files and regenerates the third-party notices and dates the changelog section, so `main` no longer stays on the previous version and a release needs no pull request beforehand; the release notes take their "What's new" from the changelog
 
+### Fixed
+
+- Large GIPHY GIFs no longer slow the whole app down: the chat now shows GIPHY's downsized GIF, sized for the chat box, instead of the full-size WebP, which kept the renderer about four times as busy while it played (#109)
+
 ## [0.4.3] - 2026-10-28
 
 ### Added

@@ -217,8 +217,8 @@ impl LinkPreviews {
         image
     }
 
-    /// Tries smaller renditions of known GIF hosts first (a 10 MB GIF is often a few hundred
-    /// KB as WebP), then the address itself. The result keeps the address as posted.
+    /// Tries smaller renditions of known GIF hosts first (Giphy's downsized GIF of a 10 MB
+    /// original is a fraction of its size and far cheaper to animate), then the address itself. The result keeps the address as posted.
     async fn load_inline(&self, fetcher: &Fetcher, url: &Url) -> Result<InlineImage, FetchError> {
         let mut candidates = rendition::smaller_renditions(url);
         match rendition::gif_page(url) {
