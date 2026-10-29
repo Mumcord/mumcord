@@ -200,7 +200,7 @@ impl LinkPreviews {
     pub async fn inline_image(&self, url: &str) -> Option<InlineImage> {
         let mut url = Url::parse(url.trim()).ok()?;
         url.set_fragment(None);
-        let key = url.to_string();
+        let key = rendition::cache_key(&url);
         if let Some(hit) = self.images.get(&key) {
             return hit;
         }

@@ -61,6 +61,20 @@ fn media(path: &str) -> Option<Url> {
     Url::parse(&format!("https://media.giphy.com/media/{path}")).ok()
 }
 
+/// Bumped when the renditions picked for a link change, so images cached under the old choice
+/// are fetched again (the cache keeps them for days).
+const RENDITIONS_VERSION: u32 = 2;
+
+/// Cache key of the inline image for `url`: the address itself, versioned for links whose
+/// image is a rendition picked here.
+pub fn cache_key(url: &Url) -> String {
+    if gif_page(url).is_some() || !smaller_renditions(url).is_empty() {
+        format!("renditions-v{RENDITIONS_VERSION}:{url}")
+    } else {
+        url.to_string()
+    }
+}
+
 /// Smaller renditions to try before the address itself, best first. Empty for other links.
 pub fn smaller_renditions(url: &Url) -> Vec<Url> {
     if let Some(GifPage::Giphy(id)) = gif_page(url) {
@@ -176,6 +190,18 @@ mod tests {
         );
         assert!(smaller_renditions(&url("https://media.giphy.com/media/abc/giphy.png")).is_empty());
         assert!(smaller_renditions(&url("https://example.com/media/x/giphy.gif")).is_empty());
+    }
+
+    #[test]
+    fn cache_keys_of_rendition_links_are_versioned() {
+        let page = url("https://giphy.com/gifs/x-1ojn1S7BTXUry8elNi");
+        assert_eq!(cache_key(&page), format!("renditions-v2:{page}"));
+        let media = url("https://media.giphy.com/media/1ojn1S7BTXUry8elNi/giphy.gif");
+        assert_ne!(cache_key(&media), media.to_string());
+        let tenor = url("https://tenor.com/view/cat-dance-gif-12345678");
+        assert_ne!(cache_key(&tenor), tenor.to_string());
+        let plain = url("https://example.com/cat.gif");
+        assert_eq!(cache_key(&plain), plain.to_string());
     }
 
     #[test]
