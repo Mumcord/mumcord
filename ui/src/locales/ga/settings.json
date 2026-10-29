@@ -413,6 +413,22 @@
     "clearNow": "Glan anois",
     "cleared": "Glanadh an taisce, {{size}} saor."
   },
+  "cache": {
+    "title": "Taisce",
+    "hint": "Coinníonn Mumcord sonraí sealadacha ar an ríomhaire seo ionas go luchtaíonn gach rud níos tapúla. Tá sé sábháilte iad a ghlanadh; athchruthaítear iad nuair is gá.",
+    "kind": {
+      "previews": "Réamhamhairc nasc agus íomhánna",
+      "webEngine": "Taisce an inneall gréasáin",
+      "temp": "Comhaid shealadacha"
+    },
+    "total": "Iomlán: {{size}}",
+    "calculating": "Áríomh…",
+    "clear": "Glan an taisce",
+    "confirmTitle": "An mbeidh an taisce á glanadh?",
+    "confirm": "Ní scriostar ach na taisceanna roghnaithe. Ní dhéantar aon difear do stair do chomhrá, do shocruithe, do fhreastalaithe, do theastais, do chairde ná do nótaí.",
+    "cleared": "Taisce glanta ({{size}})",
+    "webPending": "Bainfear taisce an inneall gréasáin an chéad uair eile a thosóidh Mumcord."
+  },
   "retention": {
     "days_one": "{{count}} lá",
     "days_two": "{{count}} lá",

@@ -411,6 +411,22 @@
     "clearNow": "Golește acum",
     "cleared": "Cache golit, {{size}} eliberați."
   },
+  "cache": {
+    "title": "Cache",
+    "hint": "Mumcord păstrează pe acest computer date temporare pentru ca totul să se încarce mai repede. Ștergerea lor este sigură; se recreează la nevoie.",
+    "kind": {
+      "previews": "Previzualizări de linkuri și imagini",
+      "webEngine": "Cache-ul motorului web",
+      "temp": "Fișiere temporare"
+    },
+    "total": "Total: {{size}}",
+    "calculating": "Se calculează…",
+    "clear": "Șterge cache-ul",
+    "confirmTitle": "Ștergi cache-ul?",
+    "confirm": "Sunt șterse doar cache-urile selectate. Istoricul conversațiilor, setările, serverele, certificatele, prietenii și notițele nu sunt afectate.",
+    "cleared": "Cache șters ({{size}})",
+    "webPending": "Cache-ul motorului web este eliminat la următoarea pornire a Mumcord."
+  },
   "retention": {
     "days_one": "{{count}} zi",
     "days_few": "{{count}} zile",

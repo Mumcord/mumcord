@@ -410,6 +410,22 @@
     "clearNow": "Nu wissen",
     "cleared": "Cache gewist, {{size}} vrijgemaakt."
   },
+  "cache": {
+    "title": "Cache",
+    "hint": "Mumcord bewaart tijdelijke gegevens op deze computer zodat alles sneller laadt. Wissen is veilig; ze worden zo nodig opnieuw opgebouwd.",
+    "kind": {
+      "previews": "Linkvoorbeelden en afbeeldingen",
+      "webEngine": "Cache van de webengine",
+      "temp": "Tijdelijke bestanden"
+    },
+    "total": "Totaal: {{size}}",
+    "calculating": "Berekenen…",
+    "clear": "Cache wissen",
+    "confirmTitle": "Cache wissen?",
+    "confirm": "Alleen de geselecteerde caches worden verwijderd. Je chatgeschiedenis, instellingen, servers, certificaten, vrienden en notities blijven ongemoeid.",
+    "cleared": "Cache gewist ({{size}})",
+    "webPending": "De cache van de webengine wordt verwijderd bij de volgende start van Mumcord."
+  },
   "retention": {
     "days_one": "{{count}} dag",
     "days_other": "{{count}} dagen"

@@ -413,6 +413,22 @@
     "clearNow": "Ħassar issa",
     "cleared": "Cache imnaddfa, {{size}} meħlusa."
   },
+  "cache": {
+    "title": "Cache",
+    "hint": "Mumcord iżomm data temporanja fuq dan il-kompjuter biex kollox jitgħabba aktar malajr. Tista' tindiffa mingħajr periklu; terġa' tinħoloq meta jkun hemm bżonn.",
+    "kind": {
+      "previews": "Previews tal-links u stampi",
+      "webEngine": "Cache tal-magna tal-web",
+      "temp": "Fajls temporanji"
+    },
+    "total": "Total: {{size}}",
+    "calculating": "Qed jiġi kkalkulat…",
+    "clear": "Ixxotta l-cache",
+    "confirmTitle": "Tixxotta l-cache?",
+    "confirm": "Jitħassru biss il-caches magħżula. L-istorja taċ-chat, is-settings, is-servers, iċ-ċertifikati, l-ħbieb u n-noti ma jintmessu.",
+    "cleared": "Cache xxuttata ({{size}})",
+    "webPending": "Il-cache tal-magna tal-web titneħħa fil-bidu li jmiss ta' Mumcord."
+  },
   "retention": {
     "days_one": "{{count}} jum",
     "days_two": "{{count}} jumejn",

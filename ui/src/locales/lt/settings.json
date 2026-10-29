@@ -412,6 +412,22 @@
     "clearNow": "Išvalyti dabar",
     "cleared": "Talpykla išvalyta, atlaisvinta {{size}}."
   },
+  "cache": {
+    "title": "Talpykla",
+    "hint": "„Mumcord“ šiame kompiuteryje laiko laikinus duomenis, kad viskas įsikeltų greičiau. Juos galima saugiai išvalyti; prireikus jie sukuriami iš naujo.",
+    "kind": {
+      "previews": "Nuorodų peržiūros ir paveikslėliai",
+      "webEngine": "Žiniatinklio variklio talpykla",
+      "temp": "Laikinieji failai"
+    },
+    "total": "Iš viso: {{size}}",
+    "calculating": "Skaičiuojama…",
+    "clear": "Išvalyti talpyklą",
+    "confirmTitle": "Išvalyti talpyklą?",
+    "confirm": "Ištrinamos tik pasirinktos talpyklos. Pokalbių istorija, nustatymai, serveriai, sertifikatai, draugai ir užrašai neliečiami.",
+    "cleared": "Talpykla išvalyta ({{size}})",
+    "webPending": "Žiniatinklio variklio talpykla bus pašalinta kitą kartą paleidus „Mumcord“."
+  },
   "retention": {
     "days_one": "{{count}} diena",
     "days_few": "{{count}} dienos",

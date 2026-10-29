@@ -410,6 +410,22 @@
     "clearNow": "Clear now",
     "cleared": "Cache cleared, {{size}} freed."
   },
+  "cache": {
+    "title": "Cache",
+    "hint": "Mumcord keeps temporary data on this computer so things load faster. Clearing it is safe; it is rebuilt when needed.",
+    "kind": {
+      "previews": "Link previews and images",
+      "webEngine": "Web engine cache",
+      "temp": "Temporary files"
+    },
+    "total": "Total: {{size}}",
+    "calculating": "Calculating…",
+    "clear": "Clear cache",
+    "confirmTitle": "Clear cache?",
+    "confirm": "Only the selected caches are deleted. Your chat history, settings, servers, certificates, friends and notes are not touched.",
+    "cleared": "Cache cleared ({{size}})",
+    "webPending": "The web engine cache is removed the next time Mumcord starts."
+  },
   "retention": {
     "days_one": "{{count}} day",
     "days_other": "{{count}} days"

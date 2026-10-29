@@ -411,6 +411,22 @@
     "clearNow": "Notīrīt tagad",
     "cleared": "Kešatmiņa notīrīta, atbrīvots {{size}}."
   },
+  "cache": {
+    "title": "Kešatmiņa",
+    "hint": "Mumcord šajā datorā glabā pagaidu datus, lai viss ielādētos ātrāk. Tos droši var notīrīt; vajadzības gadījumā tie tiek izveidoti no jauna.",
+    "kind": {
+      "previews": "Saišu priekšskatījumi un attēli",
+      "webEngine": "Tīmekļa dzinēja kešatmiņa",
+      "temp": "Pagaidu faili"
+    },
+    "total": "Kopā: {{size}}",
+    "calculating": "Aprēķina…",
+    "clear": "Notīrīt kešatmiņu",
+    "confirmTitle": "Notīrīt kešatmiņu?",
+    "confirm": "Tiek dzēstas tikai atlasītās kešatmiņas. Tērzēšanas vēsture, iestatījumi, serveri, sertifikāti, draugi un piezīmes netiek skarti.",
+    "cleared": "Kešatmiņa notīrīta ({{size}})",
+    "webPending": "Tīmekļa dzinēja kešatmiņa tiks noņemta nākamajā Mumcord palaišanas reizē."
+  },
   "retention": {
     "days_zero": "{{count}} dienu",
     "days_one": "{{count}} diena",

@@ -412,6 +412,22 @@
     "clearNow": "Vymazat teď",
     "cleared": "Mezipaměť vymazána, uvolněno {{size}}."
   },
+  "cache": {
+    "title": "Mezipaměť",
+    "hint": "Mumcord ukládá v tomto počítači dočasná data, aby se vše načítalo rychleji. Jejich vymazání je bezpečné; v případě potřeby se vytvoří znovu.",
+    "kind": {
+      "previews": "Náhledy odkazů a obrázky",
+      "webEngine": "Mezipaměť webového jádra",
+      "temp": "Dočasné soubory"
+    },
+    "total": "Celkem: {{size}}",
+    "calculating": "Počítání…",
+    "clear": "Vymazat mezipaměť",
+    "confirmTitle": "Vymazat mezipaměť?",
+    "confirm": "Smaže se jen vybraná mezipaměť. Historie chatu, nastavení, servery, certifikáty, přátelé a poznámky zůstanou nedotčeny.",
+    "cleared": "Mezipaměť vymazána ({{size}})",
+    "webPending": "Mezipaměť webového jádra se odstraní při dalším spuštění Mumcordu."
+  },
   "retention": {
     "days_one": "{{count}} den",
     "days_few": "{{count}} dny",
