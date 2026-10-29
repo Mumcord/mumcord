@@ -15,6 +15,7 @@
 
 ### Fixed
 
+- Deleted chat history no longer comes back through history sync when you rejoin: clearing a channel, a server or all history (and the automatic deletion after N days) now also limits what is fetched from other Mumcord users' copies, and the confirmation says that others keep their copies (issue #119)
 - Pasting copied image data, such as a Spectacle screenshot or "Copy image" in a browser, attaches the image again on Linux; the WebKitGTK bundled in the AppImage hands such a paste nothing, so the image is now read from the system clipboard (issue #110)
 
 ## [0.4.3] - 2026-10-28
