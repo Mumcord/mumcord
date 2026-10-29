@@ -31,7 +31,7 @@
   "history": {
     "clear": "Išvalyti istoriją",
     "title": "Išvalyti istoriją?",
-    "body": "Tai visam laikui ištrins išsaugotas šio pokalbio žinutes iš šio kompiuterio. Kiti žmonės savo kopijas pasilieka.",
+    "body": "Tai visam laikui ištrins išsaugotas šio pokalbio žinutes iš šio kompiuterio. Kiti žmonės savo kopijas pasilieka. Jų kopijos nebus vėl sinchronizuotos į šį kompiuterį.",
     "confirm": "Išvalyti istoriją",
     "cancel": "Atšaukti",
     "failed": "Nepavyko išvalyti istorijos. Bandyk dar kartą."

@@ -27,7 +27,7 @@
   "history": {
     "clear": "Tyhjennä historia",
     "title": "Tyhjennetäänkö historia?",
-    "body": "Tämä poistaa tämän keskustelun tallennetut viestit pysyvästi tältä tietokoneelta. Muiden kopiot säilyvät.",
+    "body": "Tämä poistaa tämän keskustelun tallennetut viestit pysyvästi tältä tietokoneelta. Muiden kopiot säilyvät. Heidän kopioitaan ei synkronoida takaisin tälle tietokoneelle.",
     "confirm": "Tyhjennä historia",
     "cancel": "Peruuta",
     "failed": "Historiaa ei voitu tyhjentää. Yritä uudelleen."

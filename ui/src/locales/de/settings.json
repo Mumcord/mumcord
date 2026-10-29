@@ -164,8 +164,8 @@
     "all": "Alle Server",
     "clearAll": "Gesamten Verlauf löschen…",
     "confirmTitle": "Verlauf löschen?",
-    "confirmServer": "Alle gespeicherten Nachrichten von {{server}} werden von diesem Computer gelöscht. Das kann nicht rückgängig gemacht werden.",
-    "confirmAll": "Alle gespeicherten Nachrichten aller Server werden von diesem Computer gelöscht. Das kann nicht rückgängig gemacht werden.",
+    "confirmServer": "Alle gespeicherten Nachrichten von {{server}} werden von diesem Computer gelöscht. Andere behalten ihre eigenen Kopien. Deren Kopien werden nicht wieder auf diesen Computer synchronisiert. Das kann nicht rückgängig gemacht werden.",
+    "confirmAll": "Alle gespeicherten Nachrichten aller Server werden von diesem Computer gelöscht. Andere behalten ihre eigenen Kopien. Deren Kopien werden nicht wieder auf diesen Computer synchronisiert. Das kann nicht rückgängig gemacht werden.",
     "confirm": "Verlauf löschen",
     "cleared": "Verlauf gelöscht.",
     "autoDelete": "Chatverlauf löschen, der älter ist als",
@@ -409,6 +409,22 @@
     "never": "Nie",
     "clearNow": "Jetzt leeren",
     "cleared": "Zwischenspeicher geleert, {{size}} freigegeben."
+  },
+  "cache": {
+    "title": "Zwischenspeicher",
+    "hint": "Mumcord speichert temporäre Daten auf diesem Computer, damit alles schneller lädt. Das Leeren ist unbedenklich; die Daten werden bei Bedarf neu aufgebaut.",
+    "kind": {
+      "previews": "Link-Vorschauen und Bilder",
+      "webEngine": "Cache der Web-Engine",
+      "temp": "Temporäre Dateien"
+    },
+    "total": "Gesamt: {{size}}",
+    "calculating": "Wird berechnet…",
+    "clear": "Cache leeren",
+    "confirmTitle": "Cache leeren?",
+    "confirm": "Es werden nur die ausgewählten Caches gelöscht. Chatverlauf, Einstellungen, Server, Zertifikate, Freunde und Notizen bleiben unberührt.",
+    "cleared": "Cache geleert ({{size}})",
+    "webPending": "Der Cache der Web-Engine wird beim nächsten Start von Mumcord entfernt."
   },
   "retention": {
     "days_one": "{{count}} Tag",

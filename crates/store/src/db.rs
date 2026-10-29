@@ -154,6 +154,16 @@ const MIGRATIONS: &[&str] = &[
     ALTER TABLE saved_server ADD COLUMN notifications_muted INTEGER NOT NULL DEFAULT 0;
     ALTER TABLE saved_server ADD COLUMN theme_id TEXT;
     ",
+    // v12: when the user last cleared channel history (issue #119), so history sync does not
+    // bring the deleted messages back from other people's copies. `server_id` NULL: all
+    // servers; `channel_key` NULL: every channel of the server.
+    r"
+    CREATE TABLE history_cleared (
+        server_id   INTEGER REFERENCES saved_server (id) ON DELETE CASCADE,
+        channel_key TEXT,
+        cleared_at  INTEGER NOT NULL
+    );
+    ",
 ];
 
 /// Handle to the local database. Not `Sync`; callers share it behind a mutex.

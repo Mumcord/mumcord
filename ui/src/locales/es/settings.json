@@ -165,8 +165,8 @@
     "all": "Todos los servidores",
     "clearAll": "Borrar todo el historial…",
     "confirmTitle": "¿Borrar historial?",
-    "confirmServer": "Todos los mensajes guardados de {{server}} se borrarán de este ordenador. No se puede deshacer.",
-    "confirmAll": "Todos los mensajes guardados de todos los servidores se borrarán de este ordenador. No se puede deshacer.",
+    "confirmServer": "Todos los mensajes guardados de {{server}} se borrarán de este ordenador. Las demás personas conservan sus copias. Sus copias no se volverán a sincronizar con este equipo. No se puede deshacer.",
+    "confirmAll": "Todos los mensajes guardados de todos los servidores se borrarán de este ordenador. Las demás personas conservan sus copias. Sus copias no se volverán a sincronizar con este equipo. No se puede deshacer.",
     "confirm": "Borrar historial",
     "cleared": "Historial borrado.",
     "autoDelete": "Eliminar el historial de chat anterior a",
@@ -410,6 +410,22 @@
     "never": "Nunca",
     "clearNow": "Vaciar ahora",
     "cleared": "Caché vaciada, se liberaron {{size}}."
+  },
+  "cache": {
+    "title": "Caché",
+    "hint": "Mumcord guarda datos temporales en este equipo para que todo cargue más rápido. Vaciarlos es seguro; se vuelven a crear cuando hacen falta.",
+    "kind": {
+      "previews": "Vistas previas de enlaces e imágenes",
+      "webEngine": "Caché del motor web",
+      "temp": "Archivos temporales"
+    },
+    "total": "Total en uso: {{size}}",
+    "calculating": "Calculando…",
+    "clear": "Vaciar caché",
+    "confirmTitle": "¿Vaciar la caché?",
+    "confirm": "Solo se eliminan las cachés seleccionadas. Tu historial de chat, ajustes, servidores, certificados, amigos y notas no se tocan.",
+    "cleared": "Caché vaciada ({{size}})",
+    "webPending": "La caché del motor web se elimina la próxima vez que se inicie Mumcord."
   },
   "retention": {
     "days_one": "{{count}} día",

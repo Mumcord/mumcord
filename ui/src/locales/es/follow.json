@@ -29,7 +29,7 @@
   "history": {
     "clear": "Borrar historial",
     "title": "¿Borrar el historial?",
-    "body": "Esto elimina de forma permanente los mensajes guardados de esta conversación en este equipo. Las demás personas conservan sus copias.",
+    "body": "Esto elimina de forma permanente los mensajes guardados de esta conversación en este equipo. Las demás personas conservan sus copias. Sus copias no se volverán a sincronizar con este equipo.",
     "confirm": "Borrar historial",
     "cancel": "Cancelar",
     "failed": "No se pudo borrar el historial. Inténtalo de nuevo."

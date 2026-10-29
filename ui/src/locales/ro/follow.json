@@ -29,7 +29,7 @@
   "history": {
     "clear": "Șterge istoricul",
     "title": "Ștergi istoricul?",
-    "body": "Aceasta șterge definitiv de pe acest computer mesajele salvate ale acestei conversații. Ceilalți își păstrează copiile.",
+    "body": "Aceasta șterge definitiv de pe acest computer mesajele salvate ale acestei conversații. Ceilalți își păstrează copiile. Copiile lor nu vor fi sincronizate înapoi pe acest computer.",
     "confirm": "Șterge istoricul",
     "cancel": "Anulează",
     "failed": "Istoricul nu a putut fi șters. Încearcă din nou."

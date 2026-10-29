@@ -164,8 +164,8 @@
     "all": "Alla servrar",
     "clearAll": "Rensa all historik…",
     "confirmTitle": "Rensa historiken?",
-    "confirmServer": "Alla sparade meddelanden från {{server}} raderas från den här datorn. Det går inte att ångra.",
-    "confirmAll": "Alla sparade meddelanden från alla servrar raderas från den här datorn. Det går inte att ångra.",
+    "confirmServer": "Alla sparade meddelanden från {{server}} raderas från den här datorn. Andra behåller sina kopior. Deras kopior synkroniseras inte tillbaka till den här datorn. Det går inte att ångra.",
+    "confirmAll": "Alla sparade meddelanden från alla servrar raderas från den här datorn. Andra behåller sina kopior. Deras kopior synkroniseras inte tillbaka till den här datorn. Det går inte att ångra.",
     "confirm": "Rensa historik",
     "cleared": "Historiken rensades.",
     "autoDelete": "Radera chatthistorik som är äldre än",
@@ -409,6 +409,22 @@
     "never": "Aldrig",
     "clearNow": "Rensa nu",
     "cleared": "Cachen rensades, {{size}} frigjordes."
+  },
+  "cache": {
+    "title": "Cache",
+    "hint": "Mumcord sparar tillfälliga data på den här datorn så att allt laddas snabbare. Det är säkert att rensa dem; de skapas på nytt vid behov.",
+    "kind": {
+      "previews": "Länkförhandsvisningar och bilder",
+      "webEngine": "Webbmotorns cache",
+      "temp": "Tillfälliga filer"
+    },
+    "total": "Totalt: {{size}}",
+    "calculating": "Beräknar…",
+    "clear": "Rensa cache",
+    "confirmTitle": "Rensa cache?",
+    "confirm": "Bara de valda cacheminnena raderas. Din chatthistorik, dina inställningar, servrar, certifikat, vänner och anteckningar berörs inte.",
+    "cleared": "Cache rensad ({{size}})",
+    "webPending": "Webbmotorns cache tas bort nästa gång Mumcord startar."
   },
   "retention": {
     "days_one": "{{count}} dag",

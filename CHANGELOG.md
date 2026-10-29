@@ -4,19 +4,26 @@
 
 ### Added
 
+- Settings > Privacy shows how much space the caches use (link previews and images, the web engine cache, temporary files) and has a Clear cache button with per-category checkboxes. A confirmation says that chat history, settings, servers, certificates, friends and notes are never touched. The web engine cache is removed at the next start so that the stored settings stay safe (#116)
 - Code blocks in chat messages have Copy and Download buttons in their corner, shown on hover and keyboard focus: Copy puts the plain code on the clipboard, Download saves it as `snippet.<ext>` named after the detected language (`.txt` if unknown) (#111)
 - Code blocks keep the language written after the fence (for example `sql`, `rust` or `php`) and are highlighted as exactly that language, with the language shown in the block's corner. New languages: PHP, Ruby, Kotlin, Swift, Lua, PowerShell, Windows batch (`cmd`), Dockerfile, TOML, Markdown, Makefile, nginx, plain text and hex dumps (`hex`: offset, bytes and ASCII column), plus aliases such as `sh`, `py`, `rs`, `js`, `ts`, `c++`, `bat` and `yml`. Unknown languages stay plain text with their name. The language travels as a `data-mumcord-lang` attribute that standard Mumble servers pass through; code from other clients is still detected automatically. See `docs/code-blocks.md` (#112)
 
 ### Changed
 
 - The post-release changelog step no longer adds a second empty "Unreleased" section when the next version already has an open "X.Y.Z - Unreleased" section, and the release notes fall back to a plain "Unreleased" section
-
 - After a release is published, a workflow opens a pull request that writes the released version into the manifests and lock files and regenerates the third-party notices and dates the changelog section, so `main` no longer stays on the previous version and a release needs no pull request beforehand; the release notes take their "What's new" from the changelog
 
 ### Fixed
 
+- Deleted chat history no longer comes back through history sync when you rejoin: clearing a channel, a server or all history (and the automatic deletion after N days) now also limits what is fetched from other Mumcord users' copies, and the confirmation says that others keep their copies (issue #119)
+- In the compact chat layout, the shared theme card no longer draws its title over the thumbnail, and message cards and image transfer bars no longer shift left; the theme card fits its content and shrinks cleanly on narrow windows (#121)
+- Large GIPHY GIFs no longer slow the whole app down: the chat now shows GIPHY's downsized GIF, sized for the chat box, instead of the full-size WebP, which kept the renderer about four times as busy while it played. GIFs already cached from earlier messages are fetched again in the lighter format, and moving the mouse over a large GIF no longer keeps a CPU core busy (#109)
 - Pasting copied image data, such as a Spectacle screenshot or "Copy image" in a browser, attaches the image again on Linux; the WebKitGTK bundled in the AppImage hands such a paste nothing, so the image is now read from the system clipboard (issue #110)
 - Selected chat text can be copied again: with text selected, the chat's right-click menu starts with **Copy**, before the message actions, and Ctrl+C copies the same plain text with its line breaks but without hidden labels, the hover time or button text. Before, the message menu replaced the webview's own menu and offered no Copy at all (issue #114)
+
+### Internal
+
+- CI checks dependencies for known security advisories, disallowed licences and unknown sources with cargo-deny (`deny.toml`, same licence list as the third-party notices) and runs `npm audit` for production packages, on every pull request and weekly on `main`. Accepted advisories are listed with a reason and an issue (#103)
 
 ## [0.4.3] - 2026-10-28
 

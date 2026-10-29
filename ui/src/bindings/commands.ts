@@ -195,6 +195,13 @@ export const commands = {
 	 *  size in bytes (capped at 4 GB; the cache is far smaller).
 	 */
 	previewCacheClear: () => typedError<number, ApiError>(__TAURI_INVOKE("preview_cache_clear")),
+	/**  Measures the caches off the UI thread. */
+	cacheSizes: () => typedError<CacheSizes, ApiError>(__TAURI_INVOKE("cache_sizes")),
+	/**
+	 *  Deletes the selected caches, and only caches (never history, settings, servers,
+	 *  certificates, friends or notes).
+	 */
+	cacheClear: (kinds: CacheKind[]) => typedError<CacheCleared, ApiError>(__TAURI_INVOKE("cache_clear", { kinds })),
 	/**
 	 *  Starts listening to the channel with its audio muted locally.
 	 *  Fails with `serverTooOld`, `permissionDenied` or `listenerLimitReached`.
@@ -557,6 +564,29 @@ export type BlocklistInfo = {
 	antiCheat: string,
 	reason: string,
 	source: string,
+};
+
+/**  Result of "Clear cache". */
+export type CacheCleared = {
+	/**  Space freed, including the web cache that the next start deletes. */
+	freedKib: number,
+	webPending: boolean,
+};
+
+/**  One selectable group of cached data. */
+export type CacheKind = 
+/**  Link previews, inline images and GIF renditions kept by the engine. */
+"previews" | 
+/**  The built-in browser's HTTP cache and cache storage. */
+"webEngine" | 
+/**  Temporary files in the app cache directory. */
+"temp";
+
+/**  Space used per category in KiB (capped at about 4 TB). */
+export type CacheSizes = {
+	previewsKib: number,
+	webKib: number,
+	tempKib: number,
 };
 
 /**  The server's certificate is unknown or changed; the connection waits for `cert_trust_decide`. */
