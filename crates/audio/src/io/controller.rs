@@ -347,6 +347,7 @@ impl Control<'_> {
     }
 
     fn check(&mut self, direction: Direction, list: Option<&[DeviceInfo]>, now: Instant) -> Action {
+        let counters = self.counters.clone();
         let slot = self.slot(direction);
         // Whether the chosen device just appeared in the list (it was missing before).
         let mut reappeared = false;
@@ -360,6 +361,7 @@ impl Control<'_> {
         };
         if active.guard.failed() {
             tracing::warn!("{direction:?} audio stream failed; reopening");
+            counters.stream_restart();
             return Action::Reopen;
         }
         let Some(list) = list else {

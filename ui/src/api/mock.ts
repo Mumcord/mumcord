@@ -286,6 +286,15 @@ const DEFAULT_CONNECTION_STATS: ConnectionStats = {
   serverMaxBandwidthKbps: 558,
   packetsSent: 0,
   packetsReceived: 0,
+  audio: {
+    dropouts: 0,
+    lateFrames: 0,
+    concealedFrames: 0,
+    jitterBufferMs: 30,
+    processingAvgUs: 300,
+    processingMaxUs: 900,
+    realtime: true,
+  },
 };
 
 const allow = { enter: true, textMessage: true, listen: true, registerSelf: false };

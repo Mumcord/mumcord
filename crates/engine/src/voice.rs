@@ -20,10 +20,13 @@ use mumcord_audio::codec::{
 };
 use mumcord_audio::dsp::{DspChain, DspControls, EchoRefConsumer, Gate, MicTest, echo_reference};
 use mumcord_audio::io::{
-    AudioIo, DeviceEvent, DeviceInfo, Direction, FrameSink, FrameSource, IoError,
+    AudioIo, DeviceEvent, DeviceInfo, Direction, FrameSink, FrameSource, IoError, IoStats,
 };
 use mumcord_audio::mixer::share::ShareGain;
-use mumcord_audio::mixer::{PacketSender, Playback, PlaybackConfig, PlaybackSink};
+use mumcord_audio::mixer::{
+    FrameTime, PacketSender, Playback, PlaybackConfig, PlaybackSink, PlaybackStats,
+};
+use mumcord_audio::rt::RtGuard;
 use mumcord_audio::{FRAME_SAMPLES, Frame, SAMPLE_RATE};
 use mumcord_protocol::{OutgoingAudio, VoiceTransport};
 use tokio::runtime::Handle as Runtime;
@@ -50,6 +53,8 @@ pub const MIC_TEST_MAX: Duration = Duration::from_secs(5);
 const TAIL_MARGIN: Duration = Duration::from_millis(250);
 /// Initial encoder bitrate until the bitrate controller reports a target.
 const START_BITRATE_BPS: u32 = 72_000;
+/// Captured audio queued beyond this when a frame is read means the capture thread fell behind.
+const CAPTURE_LATE_SAMPLES: usize = 2 * FRAME_SAMPLES;
 
 /// Maps a peak level in dBFS to the 0–1 meter scale (−60 dBFS and below read as 0).
 pub fn meter_level(peak_dbfs: f32) -> f32 {
@@ -240,6 +245,12 @@ pub(crate) struct VoiceShared {
     /// Voice packets handed to the transport / received, for the connection info.
     pub packets_sent: AtomicU64,
     pub packets_received: AtomicU64,
+    /// Time the capture thread needs per 10 ms frame (DSP chain and Opus encoder).
+    pub capture_time: FrameTime,
+    /// Frames the capture thread read with more than [`CAPTURE_LATE_SAMPLES`] still queued.
+    pub capture_late_frames: AtomicU64,
+    /// Voice threads (capture, playback) running with real-time scheduling.
+    pub realtime_threads: AtomicU32,
     /// Listener pose and own position for positional audio.
     pub positional: Arc<PositionalShared>,
     /// Where watched screen shares' sound goes while the pipeline runs (FR-2.42).
@@ -256,6 +267,8 @@ impl VoiceShared {
         self.bitrate_max_bps.store(0, Ordering::Relaxed);
         self.packets_sent.store(0, Ordering::Relaxed);
         self.packets_received.store(0, Ordering::Relaxed);
+        self.capture_time.reset();
+        self.capture_late_frames.store(0, Ordering::Relaxed);
     }
 }
 
@@ -269,6 +282,9 @@ impl Default for VoiceShared {
             bitrate_max_bps: AtomicU32::new(0),
             packets_sent: AtomicU64::new(0),
             packets_received: AtomicU64::new(0),
+            capture_time: FrameTime::default(),
+            capture_late_frames: AtomicU64::new(0),
+            realtime_threads: AtomicU32::new(0),
             positional: Arc::default(),
             share_sound: ShareSoundHub::default(),
             share_gain: Arc::default(),
@@ -310,6 +326,8 @@ pub(crate) struct VoicePipeline {
     talk_task: TaskHandle<()>,
     sounds: Arc<crate::sounds::SoundHub>,
     shared: Arc<VoiceShared>,
+    /// Device counters when the pipeline started; the connection info shows what happened since.
+    io_base: IoStats,
 }
 
 impl VoicePipeline {
@@ -328,6 +346,8 @@ impl VoicePipeline {
             .source
             .take()
             .ok_or_else(|| EngineError::internal("microphone is in use by the mic test"))?;
+        let io_base = audio.io().stats();
+        shared.realtime_threads.store(0, Ordering::Relaxed);
         let (mut echo_producer, echo_consumer) = echo_reference();
         let config = PlaybackConfig {
             far_end_tap: Some(Box::new(move |frame: &Frame| {
@@ -336,6 +356,10 @@ impl VoicePipeline {
             })),
             listener: Some(shared.positional.listener.clone()),
             share_gain: shared.share_gain.clone(),
+            on_thread_start: Some({
+                let shared = shared.clone();
+                Box::new(move || Box::new(realtime("playback", &shared)))
+            }),
             ..PlaybackConfig::default()
         };
         let (playback, ports) = match Playback::start(audio.sink.clone(), config) {
@@ -404,9 +428,19 @@ impl VoicePipeline {
                 talk_task,
                 sounds,
                 shared: pipeline_shared,
+                io_base,
             },
             ports.packets,
         ))
+    }
+
+    pub fn playback_stats(&self) -> PlaybackStats {
+        self.playback.stats()
+    }
+
+    /// Device counters at the start of this pipeline.
+    pub fn io_base(&self) -> IoStats {
+        self.io_base
     }
 
     /// Local volume (0–200 %) and mute of a person.
@@ -485,12 +519,17 @@ fn capture_loop(
         shared.packets_sent.fetch_add(1, Ordering::Relaxed);
     };
 
+    let _realtime = realtime("capture", shared);
     // Drop audio captured before this connection started.
     while source.read_frame(&mut input) {}
     while !stop.load(Ordering::Relaxed) {
         if !source.wait_frame(&mut input, Duration::from_millis(50)) {
             continue;
         }
+        if source.queued_samples() > CAPTURE_LATE_SAMPLES {
+            shared.capture_late_frames.fetch_add(1, Ordering::Relaxed);
+        }
+        let started = Instant::now();
         let target = shared.bitrate_bps.load(Ordering::Relaxed);
         if target != bitrate && encoder.set_bitrate(target as i32).is_ok() {
             bitrate = target;
@@ -530,8 +569,25 @@ fn capture_loop(
                 send(len, &packet, true);
             }
         }
+        shared.capture_time.record(started.elapsed());
     }
     source
+}
+
+/// Real-time scheduling for a voice thread, so a loaded CPU does not delay its frames (issue
+/// #123). Refused (no rtkit, a sandbox), the thread runs at normal priority as before.
+fn realtime(thread: &'static str, shared: &VoiceShared) -> Option<RtGuard> {
+    match mumcord_audio::rt::promote_current_thread() {
+        Ok(guard) => {
+            shared.realtime_threads.fetch_add(1, Ordering::Relaxed);
+            tracing::debug!(thread, "real-time scheduling on");
+            Some(guard)
+        }
+        Err(e) => {
+            tracing::info!(thread, "{e}; running at normal priority");
+            None
+        }
+    }
 }
 
 /// Converts a received packet for the mixer; `None` if the payload is oversized.

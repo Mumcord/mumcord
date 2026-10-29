@@ -136,6 +136,9 @@ pub struct DiagConnectionStats {
     pub packets_sent: u64,
     pub packets_received: u64,
     pub reconnect_count: u32,
+    /// Glitch counters of the local audio path; `None` without a running voice pipeline.
+    #[serde(default)]
+    pub audio: Option<crate::AudioHealthView>,
 }
 
 /// Everything the diagnostic file contains besides the log lines.
@@ -333,6 +336,46 @@ pub fn save_diagnostic_file(path: &Path, info: &DiagnosticInfo) -> io::Result<()
     write_diagnostic(path, info, &recent_log_lines())
 }
 
+fn write_audio_health(out: &mut String, audio: Option<&crate::AudioHealthView>) {
+    let _ = writeln!(out, "\nAudio:");
+    let Some(a) = audio else {
+        let _ = writeln!(out, "  (voice not running)");
+        return;
+    };
+    let _ = writeln!(out, "  real-time threads: {}", a.realtime_threads);
+    let _ = writeln!(
+        out,
+        "  device xruns / stream restarts: {} / {}",
+        a.device_xruns, a.stream_restarts
+    );
+    let _ = writeln!(
+        out,
+        "  capture overruns / playback underruns: {} / {}",
+        a.capture_overruns, a.playback_underruns
+    );
+    let _ = writeln!(
+        out,
+        "  late capture frames / late playback wake-ups: {} / {}",
+        a.capture_late_frames, a.playback_late_wakeups
+    );
+    let _ = writeln!(
+        out,
+        "  concealed frames / late packets: {} / {}",
+        a.concealed_frames, a.late_packets
+    );
+    let _ = writeln!(out, "  jitter buffer: {} ms", a.jitter_delay_ms);
+    let _ = writeln!(
+        out,
+        "  capture time avg / max: {} / {} µs",
+        a.capture_time_avg_us, a.capture_time_max_us
+    );
+    let _ = writeln!(
+        out,
+        "  mix time avg / max: {} / {} µs",
+        a.mix_time_avg_us, a.mix_time_max_us
+    );
+}
+
 fn write_diagnostic(path: &Path, info: &DiagnosticInfo, lines: &[String]) -> io::Result<()> {
     let mut out = String::new();
     let _ = writeln!(out, "Mumcord diagnostic file");
@@ -386,6 +429,7 @@ fn write_diagnostic(path: &Path, info: &DiagnosticInfo, lines: &[String]) -> io:
         c.packets_sent, c.packets_received
     );
     let _ = writeln!(out, "  reconnects: {}", c.reconnect_count);
+    write_audio_health(&mut out, c.audio.as_ref());
     let _ = writeln!(out, "\nRecent log lines:");
     for line in lines {
         let _ = writeln!(out, "{}", scrub_value(line));
@@ -458,6 +502,15 @@ mod tests {
             server_max_bandwidth_kbps: Some(72),
             packets_sent: 7,
             packets_received: 9,
+            audio: Some(crate::AudioHealthView {
+                device_xruns: 3,
+                concealed_frames: 5,
+                jitter_delay_ms: 40,
+                capture_time_avg_us: 250,
+                capture_time_max_us: 900,
+                realtime_threads: 2,
+                ..crate::AudioHealthView::default()
+            }),
             ..DiagConnectionStats::default()
         };
         let file = dir.path().join("diag.txt");
@@ -468,6 +521,11 @@ mod tests {
             "loss: 12.5 %",
             "send bitrate: 40 kbit/s",
             "server max bandwidth: 72 kbit/s",
+            "real-time threads: 2",
+            "device xruns / stream restarts: 3 / 0",
+            "concealed frames / late packets: 5 / 0",
+            "jitter buffer: 40 ms",
+            "capture time avg / max: 250 / 900 µs",
             "packets sent/received: 7/9",
         ] {
             assert!(text.contains(line), "missing {line}");

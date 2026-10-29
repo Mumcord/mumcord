@@ -481,3 +481,97 @@ fn playback_thread_plays_share_sound_at_its_level() {
         "level {level}, expected {expected}"
     );
 }
+
+#[test]
+fn jitter_delay_is_reported_while_someone_talks() {
+    let packets = tone_packets(20, 0);
+    let mut mixer = Mixer::new().expect("mixer");
+    let (mut left, mut right) = ([0.0; FRAME_SAMPLES], [0.0; FRAME_SAMPLES]);
+    let mut talking_delay = 0;
+    for now in (0..800).step_by(10) {
+        if let Some(p) = packets.get(now as usize / 20).filter(|_| now % 20 == 0) {
+            mixer.push_packet(&packet(3, p, false), now + 1);
+        }
+        mixer.mix(&mut left, &mut right, None, now + 1, &mut |_| {});
+        if now == 200 {
+            talking_delay = mixer.stats().jitter_delay_ms;
+        }
+    }
+    assert!(talking_delay >= 20, "one packet at least: {talking_delay}");
+    assert_eq!(mixer.stats().jitter_delay_ms, 0, "nobody talks any more");
+}
+
+/// A device queue the test drains at will, like a device whose feeder thread ran late.
+struct DrainableSink {
+    queued: Arc<std::sync::atomic::AtomicUsize>,
+}
+
+impl PlaybackSink for DrainableSink {
+    fn write_frame(&mut self, _: &Frame) -> bool {
+        self.queued
+            .fetch_add(FRAME_SAMPLES, std::sync::atomic::Ordering::Relaxed);
+        true
+    }
+
+    fn queued_samples(&mut self) -> usize {
+        self.queued.load(std::sync::atomic::Ordering::Relaxed)
+    }
+}
+
+struct DropFlag(Arc<std::sync::atomic::AtomicBool>);
+
+impl Drop for DropFlag {
+    fn drop(&mut self) {
+        self.0.store(true, std::sync::atomic::Ordering::Relaxed);
+    }
+}
+
+#[test]
+fn playback_thread_counts_late_wakeups_and_keeps_its_setup() {
+    use std::sync::atomic::{AtomicBool, AtomicUsize, Ordering};
+    let queued = Arc::new(AtomicUsize::new(0));
+    let setup_dropped = Arc::new(AtomicBool::new(false));
+    let setup_thread = Arc::new(Mutex::new(None));
+    let config = PlaybackConfig {
+        on_thread_start: Some({
+            let (dropped, thread) = (Arc::clone(&setup_dropped), Arc::clone(&setup_thread));
+            Box::new(move || {
+                *thread.lock().expect("thread") = std::thread::current().name().map(str::to_owned);
+                Box::new(DropFlag(dropped))
+            })
+        }),
+        ..PlaybackConfig::default()
+    };
+    let sink = DrainableSink {
+        queued: Arc::clone(&queued),
+    };
+    let (playback, _ports) = Playback::start(sink, config).expect("playback");
+    let wait_until = |what: &str, done: &dyn Fn() -> bool| {
+        let deadline = Instant::now() + Duration::from_secs(5);
+        while !done() {
+            assert!(Instant::now() < deadline, "timed out: {what}");
+            std::thread::sleep(Duration::from_millis(2));
+        }
+    };
+    wait_until("queue filled", &|| queued.load(Ordering::Relaxed) >= 1200);
+    assert_eq!(playback.stats().late_wakeups, 0, "a full queue is on time");
+    // The device played everything before the thread woke up again.
+    queued.store(0, Ordering::Relaxed);
+    wait_until("late wake-up counted", &|| {
+        playback.stats().late_wakeups >= 1
+    });
+    assert!(playback.stats().mix_time_max_us >= playback.stats().mix_time_avg_us);
+    assert_eq!(
+        setup_thread.lock().expect("thread").as_deref(),
+        Some("mumcord-playback")
+    );
+    assert!(
+        !setup_dropped.load(Ordering::Relaxed),
+        "setup lives with the thread"
+    );
+    drop(playback);
+    assert!(
+        setup_dropped.load(Ordering::Relaxed),
+        "setup ends with the thread"
+    );
+}

@@ -12,6 +12,7 @@
 
 pub mod io;
 mod mic_test;
+pub mod rt;
 
 pub use mumcord_codec::{
     FRAME_SAMPLES, Frame, SAMPLE_RATE, bitrate, codec, jitter, mixer, spatial,

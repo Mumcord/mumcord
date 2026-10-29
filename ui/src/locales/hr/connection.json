@@ -18,5 +18,16 @@
   "bitrateValue": "{{value}} kbit/s",
   "serverLimit": "Ograničenje poslužitelja",
   "packets": "Paketi poslani / primljeni",
-  "packetsValue": "{{sent}} / {{received}}"
+  "packetsValue": "{{sent}} / {{received}}",
+  "audioDropouts": "Prekidi zvuka",
+  "audioLate": "Zakašnjeli audio okviri",
+  "audioConcealed": "Prikriveni audio okviri",
+  "jitterBuffer": "Međuspremnik podrhtavanja",
+  "audioProcessing": "Obrada zvuka (prosj. / maks.)",
+  "audioProcessingValue": "{{avg}} / {{max}} ms",
+  "realtimeAudio": "Zvuk u stvarnom vremenu",
+  "realtimeValue": {
+    "on": "Uključeno",
+    "off": "Isključeno"
+  }
 }

@@ -18,5 +18,16 @@
   "bitrateValue": "{{value}} kbit/s",
   "serverLimit": "Servergräns",
   "packets": "Paket skickade / mottagna",
-  "packetsValue": "{{sent}} / {{received}}"
+  "packetsValue": "{{sent}} / {{received}}",
+  "audioDropouts": "Ljudavbrott",
+  "audioLate": "Försenade ljudramar",
+  "audioConcealed": "Dolda ljudramar",
+  "jitterBuffer": "Jitterbuffert",
+  "audioProcessing": "Ljudbehandling (snitt / max)",
+  "audioProcessingValue": "{{avg}} / {{max}} ms",
+  "realtimeAudio": "Ljud i realtid",
+  "realtimeValue": {
+    "on": "På",
+    "off": "Av"
+  }
 }

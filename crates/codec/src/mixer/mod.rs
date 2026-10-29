@@ -14,8 +14,8 @@ pub mod share;
 mod tests;
 
 pub use playback::{
-    PacketSender, Playback, PlaybackConfig, PlaybackError, PlaybackPorts, PlaybackSink,
-    PlaybackStats, downmix,
+    FrameTime, PacketSender, Playback, PlaybackConfig, PlaybackError, PlaybackPorts, PlaybackSink,
+    PlaybackStats, ThreadStart, downmix,
 };
 
 use std::sync::Arc;
@@ -108,6 +108,9 @@ pub struct MixerStats {
     pub late_packets: u64,
     /// Lost or late 10 ms frames rebuilt by FEC or concealment.
     pub concealed_frames: u64,
+    /// Largest jitter-buffer target delay of the speakers playing in the last mixed frame, in ms
+    /// (0 while nobody talks).
+    pub jitter_delay_ms: u64,
 }
 
 #[derive(Clone, Copy)]
@@ -254,6 +257,7 @@ impl Mixer {
         left.fill(0.0);
         right.fill(0.0);
         let listener = self.listener.as_ref().and_then(|l| l.state());
+        let mut jitter_delay_ms = 0;
         for idx in 0..self.speakers.len() {
             let Some(session) = self.speakers[idx].session else {
                 continue;
@@ -275,6 +279,7 @@ impl Mixer {
             if pull == Pull::Silent {
                 speaker.spatial.silence();
             } else {
+                jitter_delay_ms = jitter_delay_ms.max(speaker.jitter.target_delay_ms());
                 let placement = match (&listener, speaker.position) {
                     (Some(l), Some(p)) => Placement::at(l, p),
                     _ => Placement::CENTER,
@@ -297,6 +302,7 @@ impl Mixer {
             speaker.counted_late = stats.late_packets;
             speaker.counted_concealed = concealed;
         }
+        self.stats.jitter_delay_ms = jitter_delay_ms;
         if let Some(extra) = mix_in {
             for ((l, r), e) in left.iter_mut().zip(right.iter_mut()).zip(extra.iter()) {
                 *l += e;

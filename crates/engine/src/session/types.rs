@@ -222,6 +222,40 @@ pub struct ConnectionStatsView {
     pub server_max_bandwidth_bps: Option<u32>,
     pub packets_sent: u64,
     pub packets_received: u64,
+    /// Health of the local audio path; `None` on a server without the voice pipeline.
+    pub audio: Option<AudioHealthView>,
+}
+
+/// Glitch counters of the local audio path since the voice pipeline started (issue #123). A
+/// rising count says where crackles or dropouts come from: the device, the threads feeding it
+/// (scheduled too late), or the network (concealment).
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Default, serde::Serialize, serde::Deserialize)]
+pub struct AudioHealthView {
+    /// Under- or overruns the audio host reported for the devices.
+    pub device_xruns: u64,
+    /// Device streams reopened after an error.
+    pub stream_restarts: u64,
+    /// Captured audio dropped because the capture thread did not keep up.
+    pub capture_overruns: u64,
+    /// Playback buffers that ran dry part-way.
+    pub playback_underruns: u64,
+    /// Frames the capture thread processed with a backlog (it was scheduled late).
+    pub capture_late_frames: u64,
+    /// Times the playback thread woke up to a nearly empty device queue.
+    pub playback_late_wakeups: u64,
+    /// Received 10 ms frames rebuilt by FEC or concealment (late or lost packets).
+    pub concealed_frames: u64,
+    pub late_packets: u64,
+    /// Current jitter-buffer delay of the speakers playing, in ms.
+    pub jitter_delay_ms: u64,
+    /// Average and worst capture processing time per 10 ms frame (DSP, Opus, send), in µs.
+    pub capture_time_avg_us: u64,
+    pub capture_time_max_us: u64,
+    /// Average and worst mixing time per 10 ms frame (decode, concealment), in µs.
+    pub mix_time_avg_us: u64,
+    pub mix_time_max_us: u64,
+    /// Voice threads (of capture and playback) that got real-time scheduling.
+    pub realtime_threads: u32,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]

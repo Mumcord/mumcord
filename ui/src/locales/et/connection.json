@@ -18,5 +18,16 @@
   "bitrateValue": "{{value}} kbit/s",
   "serverLimit": "Serveri piirang",
   "packets": "Saadetud / vastuvõetud paketid",
-  "packetsValue": "{{sent}} / {{received}}"
+  "packetsValue": "{{sent}} / {{received}}",
+  "audioDropouts": "Heli katkestused",
+  "audioLate": "Hilinenud helikaadrid",
+  "audioConcealed": "Varjatud helikaadrid",
+  "jitterBuffer": "Värinapuhver",
+  "audioProcessing": "Helitöötlus (kesk. / maks.)",
+  "audioProcessingValue": "{{avg}} / {{max}} ms",
+  "realtimeAudio": "Reaalajas heli",
+  "realtimeValue": {
+    "on": "Sees",
+    "off": "Väljas"
+  }
 }

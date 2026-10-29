@@ -18,5 +18,16 @@
   "bitrateValue": "{{value}} kbit/s",
   "serverLimit": "Teorainn an fhreastalaí",
   "packets": "Paicéid seolta / faighte",
-  "packetsValue": "{{sent}} / {{received}}"
+  "packetsValue": "{{sent}} / {{received}}",
+  "audioDropouts": "Briseadh fuaime",
+  "audioLate": "Frámaí fuaime déanacha",
+  "audioConcealed": "Frámaí fuaime folaithe",
+  "jitterBuffer": "Maolán creathanna",
+  "audioProcessing": "Próiseáil fuaime (meán / uas.)",
+  "audioProcessingValue": "{{avg}} / {{max}} ms",
+  "realtimeAudio": "Fuaim fíor-ama",
+  "realtimeValue": {
+    "on": "Ar siúl",
+    "off": "As"
+  }
 }

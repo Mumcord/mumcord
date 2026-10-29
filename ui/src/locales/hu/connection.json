@@ -18,5 +18,16 @@
   "bitrateValue": "{{value}} kbit/s",
   "serverLimit": "Szerverkorlát",
   "packets": "Küldött / fogadott csomagok",
-  "packetsValue": "{{sent}} / {{received}}"
+  "packetsValue": "{{sent}} / {{received}}",
+  "audioDropouts": "Hangkimaradások",
+  "audioLate": "Késett hangkeretek",
+  "audioConcealed": "Elfedett hangkeretek",
+  "jitterBuffer": "Jitterpuffer",
+  "audioProcessing": "Hangfeldolgozás (átl. / max.)",
+  "audioProcessingValue": "{{avg}} / {{max}} ms",
+  "realtimeAudio": "Valós idejű hang",
+  "realtimeValue": {
+    "on": "Be",
+    "off": "Ki"
+  }
 }

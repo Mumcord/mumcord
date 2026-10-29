@@ -18,5 +18,16 @@
   "bitrateValue": "{{value}} kbit/s",
   "serverLimit": "Palvelimen raja",
   "packets": "Paketteja lähetetty / vastaanotettu",
-  "packetsValue": "{{sent}} / {{received}}"
+  "packetsValue": "{{sent}} / {{received}}",
+  "audioDropouts": "Äänikatkot",
+  "audioLate": "Myöhästyneet äänikehykset",
+  "audioConcealed": "Peitetyt äänikehykset",
+  "jitterBuffer": "Värinäpuskuri",
+  "audioProcessing": "Äänenkäsittely (ka. / maks.)",
+  "audioProcessingValue": "{{avg}} / {{max}} ms",
+  "realtimeAudio": "Reaaliaikainen ääni",
+  "realtimeValue": {
+    "on": "Päällä",
+    "off": "Pois"
+  }
 }

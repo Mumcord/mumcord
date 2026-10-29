@@ -345,8 +345,15 @@ History sync (FR-1.60, FR-1.60b, QA.48–QA.50) lets Mumcord clients fill each o
 - `sendBitrateKbps`: the current Opus encoder target set by the adaptive bitrate controller (FR-1.24). It drops when the link is lossy (AC-1.23) and recovers when it is clean again.
 - `serverMaxBandwidthKbps`: the server's per-user bandwidth limit, or `null` if it announced none.
 - `packetsSent` / `packetsReceived`: voice packets sent and received since the current connection (or reconnect) started.
+- `audio`: health of the local audio path since voice started on this connection, or `null` on a server without voice (issue #123). Rising counts tell where crackles or dropouts come from:
+  - `dropouts`: problems the audio devices reported or ran into (host xruns, stream restarts, captured audio that did not fit, playback that ran dry).
+  - `lateFrames`: frames the capture or playback thread handled too late because the CPU was busy elsewhere.
+  - `concealedFrames`: received frames rebuilt by packet-loss concealment because packets came late or not at all (network).
+  - `jitterBufferMs`: the current jitter-buffer delay of the people talking; it grows while packets arrive unevenly.
+  - `processingAvgUs` / `processingMaxUs`: average and worst time to process one captured 10 ms frame (echo cancellation, noise suppression, automatic gain, Opus).
+  - `realtime`: whether the voice threads got real-time scheduling (rtkit on Linux, MMCSS on Windows, a time-constraint policy on macOS). Without it they run at normal priority and are more easily delayed under load.
 
-It is a command the UI polls about once per second while the connection info panel is open, not a periodic event: nothing is computed or sent while nobody looks, and the event stream stays free of noise. The same figures, plus the crypto good/late/lost counters, are written to the diagnostic file (`diagnostics_save`).
+It is a command the UI polls about once per second while the connection info panel is open, not a periodic event: nothing is computed or sent while nobody looks, and the event stream stays free of noise. The same figures, plus the crypto good/late/lost counters and the audio counters in full detail (per direction, with mixing time), are written to the diagnostic file (`diagnostics_save`).
 
 ## Packet inspector
 

@@ -18,5 +18,16 @@
   "bitrateValue": "{{value}} kbit/s",
   "serverLimit": "Limit serveru",
   "packets": "Pakety odeslané / přijaté",
-  "packetsValue": "{{sent}} / {{received}}"
+  "packetsValue": "{{sent}} / {{received}}",
+  "audioDropouts": "Výpadky zvuku",
+  "audioLate": "Opožděné zvukové rámce",
+  "audioConcealed": "Maskované zvukové rámce",
+  "jitterBuffer": "Vyrovnávací paměť jitteru",
+  "audioProcessing": "Zpracování zvuku (prům. / max.)",
+  "audioProcessingValue": "{{avg}} / {{max}} ms",
+  "realtimeAudio": "Zvuk v reálném čase",
+  "realtimeValue": {
+    "on": "Zapnuto",
+    "off": "Vypnuto"
+  }
 }

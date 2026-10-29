@@ -18,5 +18,16 @@
   "bitrateValue": "{{value}} kbit/s",
   "serverLimit": "Servera ierobežojums",
   "packets": "Pakešu nosūtīts / saņemts",
-  "packetsValue": "{{sent}} / {{received}}"
+  "packetsValue": "{{sent}} / {{received}}",
+  "audioDropouts": "Skaņas pārtraukumi",
+  "audioLate": "Novēloti audio kadri",
+  "audioConcealed": "Maskēti audio kadri",
+  "jitterBuffer": "Trīces buferis",
+  "audioProcessing": "Audio apstrāde (vid. / maks.)",
+  "audioProcessingValue": "{{avg}} / {{max}} ms",
+  "realtimeAudio": "Reāllaika audio",
+  "realtimeValue": {
+    "on": "Ieslēgts",
+    "off": "Izslēgts"
+  }
 }
