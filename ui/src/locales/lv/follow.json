@@ -29,7 +29,7 @@
   "history": {
     "clear": "Dzēst vēsturi",
     "title": "Dzēst vēsturi?",
-    "body": "Tas neatgriezeniski izdzēsīs šīs sarakstes saglabātās ziņas no šī datora. Citiem cilvēkiem paliek viņu kopijas.",
+    "body": "Tas neatgriezeniski izdzēsīs šīs sarakstes saglabātās ziņas no šī datora. Citiem cilvēkiem paliek viņu kopijas. Viņu kopijas netiks atkal sinhronizētas uz šo datoru.",
     "confirm": "Dzēst vēsturi",
     "cancel": "Atcelt",
     "failed": "Vēsturi neizdevās izdzēst. Lūdzu, mēģini vēlreiz."

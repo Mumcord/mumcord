@@ -29,7 +29,7 @@
   "history": {
     "clear": "Limpar histórico",
     "title": "Limpar histórico?",
-    "body": "Isto elimina permanentemente deste computador as mensagens guardadas desta conversa. As outras pessoas mantêm as suas cópias.",
+    "body": "Isto elimina permanentemente deste computador as mensagens guardadas desta conversa. As outras pessoas mantêm as suas cópias. As cópias delas não voltam a ser sincronizadas com este computador.",
     "confirm": "Limpar histórico",
     "cancel": "Cancelar",
     "failed": "Não foi possível limpar o histórico. Tenta novamente."

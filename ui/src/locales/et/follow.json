@@ -27,7 +27,7 @@
   "history": {
     "clear": "Tühjenda ajalugu",
     "title": "Tühjendan ajaloo?",
-    "body": "See kustutab selle vestluse salvestatud sõnumid sellest arvutist jäädavalt. Teistel jäävad nende koopiad alles.",
+    "body": "See kustutab selle vestluse salvestatud sõnumid sellest arvutist jäädavalt. Teistel jäävad nende koopiad alles. Nende koopiaid ei sünkroonita sellesse arvutisse tagasi.",
     "confirm": "Tühjenda ajalugu",
     "cancel": "Tühista",
     "failed": "Ajaloo tühjendamine ei õnnestunud. Proovi palun uuesti."

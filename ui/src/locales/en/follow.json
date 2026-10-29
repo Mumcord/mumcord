@@ -27,7 +27,7 @@
   "history": {
     "clear": "Clear history",
     "title": "Clear history?",
-    "body": "This permanently deletes the saved messages of this conversation from this computer. Other people keep their copies.",
+    "body": "This permanently deletes the saved messages of this conversation from this computer. Other people keep their copies. Their copies won't be synced back to this computer.",
     "confirm": "Clear history",
     "cancel": "Cancel",
     "failed": "The history couldn't be cleared. Please try again."

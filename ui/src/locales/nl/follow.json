@@ -27,7 +27,7 @@
   "history": {
     "clear": "Geschiedenis wissen",
     "title": "Geschiedenis wissen?",
-    "body": "Hiermee worden de opgeslagen berichten van dit gesprek definitief van deze computer verwijderd. Anderen houden hun eigen kopieën.",
+    "body": "Hiermee worden de opgeslagen berichten van dit gesprek definitief van deze computer verwijderd. Anderen houden hun eigen kopieën. Hun kopieën worden niet opnieuw naar deze computer gesynchroniseerd.",
     "confirm": "Geschiedenis wissen",
     "cancel": "Annuleren",
     "failed": "De geschiedenis kon niet worden gewist. Probeer het opnieuw."
