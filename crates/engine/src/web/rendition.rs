@@ -63,7 +63,7 @@ fn media(path: &str) -> Option<Url> {
 
 /// Bumped when the renditions picked for a link change, so images cached under the old choice
 /// are fetched again (the cache keeps them for days).
-const RENDITIONS_VERSION: u32 = 2;
+const RENDITIONS_VERSION: u32 = 3;
 
 /// Cache key of the inline image for `url`: the address itself, versioned for links whose
 /// image is a rendition picked here.
@@ -195,7 +195,7 @@ mod tests {
     #[test]
     fn cache_keys_of_rendition_links_are_versioned() {
         let page = url("https://giphy.com/gifs/x-1ojn1S7BTXUry8elNi");
-        assert_eq!(cache_key(&page), format!("renditions-v2:{page}"));
+        assert_eq!(cache_key(&page), format!("renditions-v3:{page}"));
         let media = url("https://media.giphy.com/media/1ojn1S7BTXUry8elNi/giphy.gif");
         assert_ne!(cache_key(&media), media.to_string());
         let tenor = url("https://tenor.com/view/cat-dance-gif-12345678");

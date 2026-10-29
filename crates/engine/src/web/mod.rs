@@ -236,17 +236,7 @@ impl LinkPreviews {
             Some(rendition::GifPage::Giphy(_)) => {}
             None => candidates.push(url.clone()),
         }
-        let mut last = FetchError::UnsupportedType;
-        for candidate in candidates {
-            match inline::load(fetcher, &candidate).await {
-                Ok(mut image) => {
-                    image.url = url.to_string();
-                    return Ok(image);
-                }
-                Err(e) => last = e,
-            }
-        }
-        Err(last)
+        first_inline(fetcher, &candidates, url).await
     }
 
     async fn build(&self, url: &Url) -> Result<LinkPreview, FetchError> {
@@ -495,6 +485,27 @@ struct DiskEntry<T> {
 }
 
 /// Memory cache of every result plus a small on-disk cache of successful ones.
+/// The first of `candidates` that loads as an inline image, kept under the address `url` as
+/// posted. A missing, refused or unusable rendition (404, 403, not an image) falls through to the
+/// next one; the error of the last candidate is returned when none loads.
+async fn first_inline(
+    fetcher: &Fetcher,
+    candidates: &[Url],
+    url: &Url,
+) -> Result<InlineImage, FetchError> {
+    let mut last = FetchError::UnsupportedType;
+    for candidate in candidates {
+        match inline::load(fetcher, candidate).await {
+            Ok(mut image) => {
+                image.url = url.to_string();
+                return Ok(image);
+            }
+            Err(e) => last = e,
+        }
+    }
+    Err(last)
+}
+
 struct Cache<T> {
     dir: Option<PathBuf>,
     limits: CacheLimits,
