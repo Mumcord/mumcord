@@ -11,6 +11,7 @@ import {
 import { applyLanguage } from "../../i18n";
 import { axeViolations } from "../../test/axe";
 import { clearDismissedPreviews } from "./dismissedPreviews";
+import { originalSrc } from "./displaySrc";
 import { InlineImageCard } from "./InlineImageCard";
 import { clearPreviews, externalImages, fitImage, IMAGE_BOX, isImageLink } from "./links";
 import { MessageList } from "./MessageList";
@@ -109,7 +110,9 @@ describe("inline images", () => {
     const { container } = renderMessage(`look <img src="${REMOTE}">`, true);
     const figure = await screen.findByRole("figure", { name: "Image: cat.gif" });
     const img = figure.querySelector("img");
-    expect(img?.getAttribute("src")).toBe(GIF.src);
+    // Shown through a short blob: URL of the engine bytes (issue #109), never the remote address.
+    expect(img?.getAttribute("src")).toMatch(/^blob:/);
+    expect(originalSrc(img?.getAttribute("src") ?? "")).toBe(GIF.src);
     expect(img?.getAttribute("width")).toBe("400");
     expect(img?.getAttribute("height")).toBe("200");
     expect(api.inlineImage).toHaveBeenCalledWith(REMOTE);
@@ -269,6 +272,8 @@ describe("image viewer in the chat", () => {
     const view = await screen.findByRole("button", { name: /View image cat\.gif/ });
     fireEvent.click(view);
     expect(screen.getByText("2 / 2")).toBeInTheDocument();
+    // The viewer gets the engine's data: URL (it saves from it), not the card's blob: URL.
+    expect(document.querySelector(".image-viewer__img")).toHaveAttribute("src", GIF.src);
     fireEvent.keyDown(screen.getByRole("dialog"), { key: "Escape" });
     await waitFor(() => {
       expect(view).toHaveFocus();

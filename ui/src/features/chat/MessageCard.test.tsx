@@ -4,6 +4,7 @@ import { createMockApi, setApi, type ChatMessage, type InlineImage, type MockApi
 import { applyLanguage } from "../../i18n";
 import { axeViolations } from "../../test/axe";
 import { cardToHtml, type MessageCard } from "./cards";
+import { originalSrc } from "./displaySrc";
 import { clearPreviews } from "./links";
 import { MessageList } from "./MessageList";
 
@@ -96,7 +97,9 @@ describe("message cards", () => {
     expect(container.textContent).not.toContain("[Warning]");
     expect(container.textContent).not.toContain("Image:");
     const view = await screen.findByRole("button", { name: "View image CPU high on db-1" });
-    expect(view.querySelector("img")?.getAttribute("src")).toBe(PNG.src);
+    const src = view.querySelector("img")?.getAttribute("src") ?? "";
+    expect(src).toMatch(/^blob:/);
+    expect(originalSrc(src)).toBe(PNG.src);
     expect(inlineImage).toHaveBeenCalledWith(IMAGE);
     expect(screen.getByRole("link", { name: "CPU high on db-1" }).getAttribute("href")).toBe(URL_);
     expect(screen.getByRole("link", { name: "grafana.test/d/db-1" })).toBeTruthy();

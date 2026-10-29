@@ -10,6 +10,7 @@ import { useTranslation } from "react-i18next";
 import type { InlineImage } from "../../api";
 import { displayUrl, type CardColor, type CardIcon, type MessageCard as Card } from "./cards";
 import { highlightCode } from "./highlight";
+import { displaySrc } from "./displaySrc";
 import { imageName, loadInlineImage, type ImageClickHandler } from "./links";
 import { openInBrowser } from "./openLink";
 
@@ -136,7 +137,13 @@ function CardImage({ url, title, previews, tabIndex, onImageClick }: CardImagePr
         else openInBrowser(image.url);
       }}
     >
-      <img src={image.src} alt="" draggable={false} width={image.width} height={image.height} />
+      <img
+        src={displaySrc(image.src)}
+        alt=""
+        draggable={false}
+        width={image.width}
+        height={image.height}
+      />
     </button>
   );
 }

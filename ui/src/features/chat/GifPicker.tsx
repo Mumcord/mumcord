@@ -10,6 +10,7 @@ import { useHintPreferences } from "../../a11y/hintPreferences";
 import type { InlineImage } from "../../api";
 import { GifAttribution } from "./GifAttribution";
 import { markFavoriteUsed, removeFavorite, useGifFavorites } from "./favorites";
+import { displaySrc } from "./displaySrc";
 import { imageName, loadInlineImage } from "./links";
 
 const COLUMNS = 4;
@@ -50,7 +51,7 @@ function Thumbnail({ url, linkPreviews }: { url: string; linkPreviews: boolean }
   return (
     <span ref={holder} className="gif-picker__thumb">
       {linkPreviews && visible && image && SAFE_SRC.test(image.src) ? (
-        <img className="gif-picker__img" src={image.src} alt="" draggable={false} />
+        <img className="gif-picker__img" src={displaySrc(image.src)} alt="" draggable={false} />
       ) : (
         <span className="gif-picker__placeholder" aria-hidden="true">
           {imageName(url)}

@@ -9,6 +9,7 @@ import { useTranslation } from "react-i18next";
 import type { InlineImage } from "../../api";
 import { DismissButton, OpenButton } from "./cardButtons";
 import { dismissPreview } from "./dismissedPreviews";
+import { displaySrc } from "./displaySrc";
 import { GifAttribution } from "./GifAttribution";
 import { removeFavorite, saveFavorite, useGifFavorites } from "./favorites";
 import { markInlineShown } from "./inlineLinks";
@@ -129,7 +130,7 @@ export function InlineImageCard({ url, messageId, tabIndex, onImageClick }: Inli
       >
         <img
           className="inline-image__img"
-          src={image.src}
+          src={displaySrc(image.src)}
           alt=""
           draggable={false}
           data-image-url={image.url}
