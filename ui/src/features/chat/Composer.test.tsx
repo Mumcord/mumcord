@@ -261,6 +261,38 @@ describe("Composer cards", () => {
   });
 });
 
+describe("Composer code blocks", () => {
+  afterEach(() => {
+    resetAll();
+  });
+
+  it("sends the fence language as a marker on the <pre> (issue #112)", async () => {
+    const api = await connectedMock();
+    const sent: string[] = [];
+    const original = api.sendChannelMessage.bind(api);
+    vi.spyOn(api, "sendChannelMessage").mockImplementation((serverId, channel, html) => {
+      sent.push(html);
+      return original(serverId, channel, html);
+    });
+    render(
+      <Composer
+        target={{ kind: "channel", channelId: 1 }}
+        limits={LIMITS}
+        label="Message #Lobby"
+        blockedReason={null}
+      />,
+    );
+    const input = screen.getByRole<HTMLTextAreaElement>("textbox", { name: "Message #Lobby" });
+    fireEvent.change(input, { target: { value: "```sql\nSELECT * FROM users;\n```" } });
+    fireEvent.keyDown(input, { key: "Enter" });
+    await waitFor(() => {
+      expect(sent).toEqual([
+        '<pre data-mumcord-lang="sql"><code>SELECT * FROM users;\n</code></pre>',
+      ]);
+    });
+  });
+});
+
 describe("Composer Apps button", () => {
   afterEach(resetAll);
 

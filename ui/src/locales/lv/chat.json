@@ -237,6 +237,7 @@
     "saved": "Saglabāts",
     "saveFailed": "Kodu neizdevās saglabāt.",
     "tooLarge": "Kods ir pārāk liels lejupielādei.",
-    "fileType": "Koda fails"
+    "fileType": "Koda fails",
+    "plainText": "Vienkāršs teksts"
   }
 }

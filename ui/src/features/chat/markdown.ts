@@ -4,7 +4,7 @@
  * messages. Raw HTML typed by the user is shown as text, never interpreted.
  */
 import { Marked } from "marked";
-import { sanitizeHtml } from "./sanitize";
+import { CODE_LANGUAGE, CODE_LANGUAGE_ATTRIBUTE, sanitizeHtml } from "./sanitize";
 
 export function escapeHtml(text: string): string {
   return text
@@ -35,6 +35,14 @@ const marked = new Marked({
   renderer: {
     html({ text }) {
       return escapeHtml(text);
+    },
+    // The fence language travels as a data attribute (issue #112); official clients ignore it.
+    code({ text, lang }) {
+      const language = (lang ?? "").trim().split(/\s/, 1)[0]?.toLowerCase() ?? "";
+      const marker = CODE_LANGUAGE.test(language)
+        ? ` ${CODE_LANGUAGE_ATTRIBUTE}="${escapeHtml(language)}"`
+        : "";
+      return `<pre${marker}><code>${escapeHtml(text.replace(/\n$/, ""))}\n</code></pre>\n`;
     },
   },
 });

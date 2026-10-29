@@ -233,6 +233,7 @@
     "saved": "Sparad",
     "saveFailed": "Koden kunde inte sparas.",
     "tooLarge": "Koden är för stor för att laddas ner.",
-    "fileType": "Kodfil"
+    "fileType": "Kodfil",
+    "plainText": "Ren text"
   }
 }

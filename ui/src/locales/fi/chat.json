@@ -233,6 +233,7 @@
     "saved": "Tallennettu",
     "saveFailed": "Koodin tallennus epäonnistui.",
     "tooLarge": "Koodi on liian suuri ladattavaksi.",
-    "fileType": "Kooditiedosto"
+    "fileType": "Kooditiedosto",
+    "plainText": "Pelkkä teksti"
   }
 }

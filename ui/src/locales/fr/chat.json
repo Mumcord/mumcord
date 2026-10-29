@@ -237,6 +237,7 @@
     "saved": "Enregistré",
     "saveFailed": "Impossible d’enregistrer le code.",
     "tooLarge": "Le code est trop volumineux pour être téléchargé.",
-    "fileType": "Fichier de code"
+    "fileType": "Fichier de code",
+    "plainText": "Texte brut"
   }
 }

@@ -169,10 +169,47 @@ describe("code block buttons", () => {
   });
 });
 
+describe("language label (issue #112)", () => {
+  it("shows the named language in the block's corner", () => {
+    const { container } = renderMessage(markdownToHtml("```sql\n" + SQL + "\n```"));
+    expect(container.querySelector(".chat-code__label")?.textContent).toBe("SQL");
+  });
+
+  it("translates the plain text label", () => {
+    const { container } = renderMessage(markdownToHtml("```plaintext\nhello\n```"));
+    expect(container.querySelector(".chat-code__label")?.textContent).toBe("Plain text");
+  });
+
+  it("shows no label for a block whose language was only detected", () => {
+    const { container } = renderMessage(markdownToHtml("```\n" + SQL + "\n```"));
+    expect(container.querySelector(".chat-code__label")).toBeNull();
+  });
+
+  it("names the download after the fence language", async () => {
+    dialogs.pickSavePath.mockResolvedValue(null);
+    renderMessage(markdownToHtml("```py\nprint('hi')\n```"));
+    fireEvent.click(screen.getByRole("button", { name: "Download code" }));
+    await waitFor(() => {
+      expect(dialogs.pickSavePath).toHaveBeenCalled();
+    });
+    expect(dialogs.pickSavePath.mock.calls[0]?.[0]).toBe("snippet.py");
+  });
+
+  it("highlights a lazily loaded language once its grammar arrives", async () => {
+    const { container } = renderMessage(markdownToHtml("```lua\nlocal x = nil\n```"));
+    expect(container.querySelector(".chat-code__label")?.textContent).toBe("Lua");
+    await waitFor(() => {
+      expect(container.querySelector(".chat-code .hljs-keyword")).not.toBeNull();
+    });
+  });
+});
+
 describe("extensionFor", () => {
   it("maps known languages and falls back to txt", () => {
     expect(extensionFor("rust")).toBe("rs");
     expect(extensionFor("python")).toBe("py");
+    expect(extensionFor("cmd")).toBe("bat");
+    expect(extensionFor("hex")).toBe("hex");
     expect(extensionFor("klingon")).toBe("txt");
     expect(extensionFor(undefined)).toBe("txt");
   });
