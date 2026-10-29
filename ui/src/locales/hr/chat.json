@@ -163,6 +163,11 @@
     "open": "Otvori poveznicu",
     "copied": "Poveznica kopirana"
   },
+  "copy": {
+    "selection": "Kopiraj",
+    "done": "Tekst kopiran",
+    "failed": "Kopiranje u međuspremnik nije uspjelo"
+  },
   "imageMenu": {
     "label": "Slika {{name}}"
   },

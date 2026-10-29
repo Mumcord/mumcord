@@ -163,6 +163,11 @@
     "open": "Deschide linkul",
     "copied": "Link copiat"
   },
+  "copy": {
+    "selection": "Copiază",
+    "done": "Text copiat",
+    "failed": "Copierea în clipboard a eșuat"
+  },
   "imageMenu": {
     "label": "Imagine {{name}}"
   },

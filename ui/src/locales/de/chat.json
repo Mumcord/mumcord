@@ -159,6 +159,11 @@
     "open": "Link öffnen",
     "copied": "Link kopiert"
   },
+  "copy": {
+    "selection": "Kopieren",
+    "done": "Text kopiert",
+    "failed": "Kopieren in die Zwischenablage fehlgeschlagen"
+  },
   "imageMenu": {
     "label": "Bild {{name}}"
   },

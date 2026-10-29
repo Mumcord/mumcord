@@ -159,6 +159,11 @@
     "open": "Ava link",
     "copied": "Link kopeeritud"
   },
+  "copy": {
+    "selection": "Kopeeri",
+    "done": "Tekst kopeeritud",
+    "failed": "Lõikelauale kopeerimine ebaõnnestus"
+  },
   "imageMenu": {
     "label": "Pilt {{name}}"
   },

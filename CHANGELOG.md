@@ -16,6 +16,7 @@
 ### Fixed
 
 - Pasting copied image data, such as a Spectacle screenshot or "Copy image" in a browser, attaches the image again on Linux; the WebKitGTK bundled in the AppImage hands such a paste nothing, so the image is now read from the system clipboard (issue #110)
+- Selected chat text can be copied again: with text selected, the chat's right-click menu starts with **Copy**, before the message actions, and Ctrl+C copies the same plain text with its line breaks but without hidden labels, the hover time or button text. Before, the message menu replaced the webview's own menu and offered no Copy at all (issue #114)
 
 ## [0.4.3] - 2026-10-28
 

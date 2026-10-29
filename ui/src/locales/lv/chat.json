@@ -163,6 +163,11 @@
     "open": "Atvērt saiti",
     "copied": "Saite nokopēta"
   },
+  "copy": {
+    "selection": "Kopēt",
+    "done": "Teksts nokopēts",
+    "failed": "Neizdevās kopēt starpliktuvē"
+  },
   "imageMenu": {
     "label": "Attēls {{name}}"
   },

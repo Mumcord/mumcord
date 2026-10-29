@@ -171,6 +171,11 @@
     "open": "Oscail an nasc",
     "copied": "Nasc cóipeáilte"
   },
+  "copy": {
+    "selection": "Cóipeáil",
+    "done": "Cóipeáladh an téacs",
+    "failed": "Níorbh fhéidir cóipeáil chuig an ngearrthaisce"
+  },
   "imageMenu": {
     "label": "Íomhá {{name}}"
   },

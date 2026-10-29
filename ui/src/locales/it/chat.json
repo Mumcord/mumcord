@@ -163,6 +163,11 @@
     "open": "Apri link",
     "copied": "Link copiato"
   },
+  "copy": {
+    "selection": "Copia",
+    "done": "Testo copiato",
+    "failed": "Impossibile copiare negli appunti"
+  },
   "imageMenu": {
     "label": "Immagine {{name}}"
   },

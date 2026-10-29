@@ -167,6 +167,11 @@
     "open": "Atidaryti nuorodą",
     "copied": "Nuoroda nukopijuota"
   },
+  "copy": {
+    "selection": "Kopijuoti",
+    "done": "Tekstas nukopijuotas",
+    "failed": "Nepavyko nukopijuoti į iškarpinę"
+  },
   "imageMenu": {
     "label": "Paveikslėlis {{name}}"
   },

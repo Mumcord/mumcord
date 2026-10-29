@@ -484,6 +484,105 @@ describe("MessageList replies", () => {
     });
   });
 
+  describe("text selection (#114)", () => {
+    function select(node: Node, start: number, endNode: Node, end: number) {
+      const range = document.createRange();
+      range.setStart(node, start);
+      range.setEnd(endNode, end);
+      window.getSelection()?.removeAllRanges();
+      window.getSelection()?.addRange(range);
+    }
+
+    function bodyText(text: string): Text {
+      const body = screen.getByText(text);
+      return body.firstChild as Text;
+    }
+
+    afterEach(() => {
+      window.getSelection()?.removeAllRanges();
+    });
+
+    it("puts Copy for the selection before the message actions and copies it", async () => {
+      const writeText = vi.fn().mockResolvedValue(undefined);
+      Object.defineProperty(navigator, "clipboard", { value: { writeText }, configurable: true });
+      renderReplies(MESSAGES);
+      const second = bodyText("second");
+      select(second, 1, second, 4);
+      const event = fireEvent.contextMenu(screen.getAllByRole("listitem")[1] as HTMLElement, {
+        clientX: 10,
+        clientY: 10,
+      });
+      expect(event).toBe(false);
+      const items = screen.getAllByRole("menuitem").map((item) => item.textContent);
+      expect(items).toEqual(["Copy", "Reply"]);
+      fireEvent.click(screen.getByRole("menuitem", { name: "Copy" }));
+      expect(writeText).toHaveBeenCalledWith("eco");
+      expect(await screen.findByText("Text copied")).toBeTruthy();
+    });
+
+    it("copies the selection captured when the menu opened, even if it is gone by then", () => {
+      const writeText = vi.fn().mockResolvedValue(undefined);
+      Object.defineProperty(navigator, "clipboard", { value: { writeText }, configurable: true });
+      renderReplies(MESSAGES);
+      const third = bodyText("third");
+      select(third, 0, third, 5);
+      fireEvent.contextMenu(screen.getAllByRole("listitem")[2] as HTMLElement, {
+        clientX: 10,
+        clientY: 10,
+      });
+      window.getSelection()?.removeAllRanges();
+      fireEvent.click(screen.getByRole("menuitem", { name: "Copy" }));
+      expect(writeText).toHaveBeenCalledWith("third");
+    });
+
+    it("tells the user when copying fails", async () => {
+      const writeText = vi.fn().mockRejectedValue(new Error("denied"));
+      Object.defineProperty(navigator, "clipboard", { value: { writeText }, configurable: true });
+      const error = vi.spyOn(console, "error").mockImplementation(() => undefined);
+      renderReplies(MESSAGES);
+      const third = bodyText("third");
+      select(third, 0, third, 5);
+      fireEvent.contextMenu(screen.getAllByRole("listitem")[2] as HTMLElement, {
+        clientX: 10,
+        clientY: 10,
+      });
+      fireEvent.click(screen.getByRole("menuitem", { name: "Copy" }));
+      expect(await screen.findByText("Couldn't copy to the clipboard")).toBeTruthy();
+      // The log names the failure, never the copied text.
+      expect(JSON.stringify(error.mock.calls)).not.toContain("third");
+      error.mockRestore();
+    });
+
+    it("shows only the message actions without a selection", () => {
+      renderReplies(MESSAGES);
+      fireEvent.contextMenu(screen.getAllByRole("listitem")[1] as HTMLElement, {
+        clientX: 10,
+        clientY: 10,
+      });
+      expect(screen.getAllByRole("menuitem").map((item) => item.textContent)).toEqual(["Reply"]);
+    });
+
+    it("offers Copy even where messages can't be replied to", () => {
+      renderList("cozy");
+      const first = bodyText("first");
+      select(first, 0, first, 5);
+      fireEvent.contextMenu(screen.getAllByRole("listitem")[0] as HTMLElement, {
+        clientX: 10,
+        clientY: 10,
+      });
+      expect(screen.getAllByRole("menuitem").map((item) => item.textContent)).toEqual(["Copy"]);
+    });
+
+    it("Ctrl+C copies plain text with line breaks and without hidden labels", () => {
+      renderReplies(MESSAGES);
+      select(bodyText("first"), 0, bodyText("second"), 6);
+      const setData = vi.fn();
+      const event = fireEvent.copy(screen.getByText("first"), { clipboardData: { setData } });
+      expect(event).toBe(false);
+      expect(setData).toHaveBeenCalledWith("text/plain", "first\nsecond");
+    });
+  });
+
   it("shows the reply header as plain text and jumps to the original", () => {
     renderReplies([
       ...MESSAGES,

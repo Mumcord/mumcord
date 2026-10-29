@@ -167,6 +167,11 @@
     "open": "Otwórz link",
     "copied": "Skopiowano link"
   },
+  "copy": {
+    "selection": "Kopiuj",
+    "done": "Skopiowano tekst",
+    "failed": "Nie udało się skopiować do schowka"
+  },
   "imageMenu": {
     "label": "Obraz {{name}}"
   },

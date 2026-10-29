@@ -163,6 +163,11 @@
     "open": "Abrir enlace",
     "copied": "Enlace copiado"
   },
+  "copy": {
+    "selection": "Copiar",
+    "done": "Texto copiado",
+    "failed": "No se pudo copiar al portapapeles"
+  },
   "imageMenu": {
     "label": "Imagen {{name}}"
   },

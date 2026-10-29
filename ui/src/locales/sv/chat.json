@@ -159,6 +159,11 @@
     "open": "Öppna länk",
     "copied": "Länken kopierad"
   },
+  "copy": {
+    "selection": "Kopiera",
+    "done": "Text kopierad",
+    "failed": "Det gick inte att kopiera till urklipp"
+  },
   "imageMenu": {
     "label": "Bilden {{name}}"
   },

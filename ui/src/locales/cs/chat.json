@@ -167,6 +167,11 @@
     "open": "Otevřít odkaz",
     "copied": "Odkaz zkopírován"
   },
+  "copy": {
+    "selection": "Kopírovat",
+    "done": "Text zkopírován",
+    "failed": "Kopírování do schránky se nezdařilo"
+  },
   "imageMenu": {
     "label": "Obrázek {{name}}"
   },
