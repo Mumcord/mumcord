@@ -15,6 +15,7 @@
 
 ### Fixed
 
+- In the compact chat layout, the shared theme card no longer draws its title over the thumbnail, and message cards and image transfer bars no longer shift left; the theme card fits its content and shrinks cleanly on narrow windows (#121)
 - Pasting copied image data, such as a Spectacle screenshot or "Copy image" in a browser, attaches the image again on Linux; the WebKitGTK bundled in the AppImage hands such a paste nothing, so the image is now read from the system clipboard (issue #110)
 
 ## [0.4.3] - 2026-10-28
