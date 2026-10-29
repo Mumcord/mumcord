@@ -9,6 +9,15 @@ import { FULL_ATTRIBUTE, FULL_REFERENCE } from "./fullImage";
 /** Marks a message card on the wire (see `cards.ts`); kept on `<div>` only. */
 const CARD_ATTRIBUTE = "data-mumcord-card";
 
+/**
+ * The language of a ``` code block on the wire, kept on `<pre>` only (issue #112). The class
+ * attribute does not survive Mumble, a data attribute does, like the card marker.
+ */
+export const CODE_LANGUAGE_ATTRIBUTE = "data-mumcord-lang";
+
+/** A language name as typed after the fence: `sql`, `c++`, `objective-c`; nothing else. */
+export const CODE_LANGUAGE = /^[a-z0-9][a-z0-9+#._-]{0,31}$/;
+
 const ALLOWED_TAGS = [
   "a",
   "b",
@@ -59,13 +68,15 @@ const SAFE_IMAGE = /^data:image\/(?:png|jpeg|gif|webp);base64,[a-z0-9+/=\s]+$/i;
 const purifier = DOMPurify(window);
 
 // The full-image reference of message images (FR-1.60c) survives only in its exact format;
-// data attributes are otherwise not allowed. The same goes for the card marker.
+// data attributes are otherwise not allowed. The same goes for the card and code language markers.
 purifier.addHook("uponSanitizeAttribute", (node, data) => {
   if (node.nodeName === "IMG" && data.attrName === FULL_ATTRIBUTE) {
     data.forceKeepAttr = FULL_REFERENCE.test(data.attrValue);
   } else if (node.nodeName === "DIV" && data.attrName === CARD_ATTRIBUTE) {
     // Plain data; `cards.ts` parses the value strictly.
     data.forceKeepAttr = true;
+  } else if (node.nodeName === "PRE" && data.attrName === CODE_LANGUAGE_ATTRIBUTE) {
+    data.forceKeepAttr = CODE_LANGUAGE.test(data.attrValue);
   }
 });
 

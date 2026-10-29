@@ -241,6 +241,7 @@
     "saved": "Išsaugota",
     "saveFailed": "Nepavyko išsaugoti kodo.",
     "tooLarge": "Kodas per didelis atsisiųsti.",
-    "fileType": "Kodo failas"
+    "fileType": "Kodo failas",
+    "plainText": "Paprastas tekstas"
   }
 }

@@ -233,6 +233,7 @@
     "saved": "Opgeslagen",
     "saveFailed": "De code kon niet worden opgeslagen.",
     "tooLarge": "De code is te groot om te downloaden.",
-    "fileType": "Codebestand"
+    "fileType": "Codebestand",
+    "plainText": "Platte tekst"
   }
 }

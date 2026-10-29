@@ -241,6 +241,7 @@
     "saved": "Zapisano",
     "saveFailed": "Nie udało się zapisać kodu.",
     "tooLarge": "Kod jest zbyt duży, aby go pobrać.",
-    "fileType": "Plik z kodem"
+    "fileType": "Plik z kodem",
+    "plainText": "Zwykły tekst"
   }
 }

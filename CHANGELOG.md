@@ -5,6 +5,7 @@
 ### Added
 
 - Code blocks in chat messages have Copy and Download buttons in their corner, shown on hover and keyboard focus: Copy puts the plain code on the clipboard, Download saves it as `snippet.<ext>` named after the detected language (`.txt` if unknown) (#111)
+- Code blocks keep the language written after the fence (for example `sql`, `rust` or `php`) and are highlighted as exactly that language, with the language shown in the block's corner. New languages: PHP, Ruby, Kotlin, Swift, Lua, PowerShell, Windows batch (`cmd`), Dockerfile, TOML, Markdown, Makefile, nginx, plain text and hex dumps (`hex`: offset, bytes and ASCII column), plus aliases such as `sh`, `py`, `rs`, `js`, `ts`, `c++`, `bat` and `yml`. Unknown languages stay plain text with their name. The language travels as a `data-mumcord-lang` attribute that standard Mumble servers pass through; code from other clients is still detected automatically. See `docs/code-blocks.md` (#112)
 
 ### Changed
 

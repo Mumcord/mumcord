@@ -245,6 +245,7 @@
     "saved": "Sábháilte",
     "saveFailed": "Níorbh fhéidir an cód a shábháil.",
     "tooLarge": "Tá an cód rómhór le híoslódáil.",
-    "fileType": "Comhad cóid"
+    "fileType": "Comhad cóid",
+    "plainText": "Gnáth-théacs"
   }
 }

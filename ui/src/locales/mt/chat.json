@@ -245,6 +245,7 @@
     "saved": "Issejvjat",
     "saveFailed": "Il-kodiċi ma setax jiġi ssejvjat.",
     "tooLarge": "Il-kodiċi huwa kbir wisq biex jitniżżel.",
-    "fileType": "Fajl tal-kodiċi"
+    "fileType": "Fajl tal-kodiċi",
+    "plainText": "Test sempliċi"
   }
 }

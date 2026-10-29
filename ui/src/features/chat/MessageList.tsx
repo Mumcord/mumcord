@@ -43,7 +43,7 @@ import { OUTGOING_PREFIX, renderKey, type ConversationLog, type OutgoingSend } f
 import { daysAgo, messageLayout } from "./grouping";
 import { pinnedIndex } from "./pinnedAuthor";
 import { useCodeBlockActions } from "./useCodeBlockActions";
-import { highlightCode } from "./highlight";
+import { useHighlightedCode } from "./highlight";
 import { hideShownLinks, useInlineShown } from "./inlineLinks";
 import { fullImageSource } from "./fullImage";
 import { FullImageBars } from "./FullImageBars";
@@ -189,7 +189,7 @@ function Body({ message, tabIndex, previews, onImageClick, clickablePeople, onJu
   const ref = useRef<HTMLDivElement>(null);
   // Cards (issue #72) render on their own below the text, like the theme card.
   const extracted = useMemo(() => extractCards(sanitizeHtml(html)), [html]);
-  const sanitizedHtml = useMemo(() => highlightCode(extracted.rest), [extracted]);
+  const sanitizedHtml = useHighlightedCode(extracted.rest);
   // A reply shows its quote as a header; the rest is the message itself.
   const reply = useMemo(() => parseReply(sanitizedHtml), [sanitizedHtml]);
   const cleaned = reply?.rest ?? sanitizedHtml;

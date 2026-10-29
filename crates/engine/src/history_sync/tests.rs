@@ -623,3 +623,19 @@ fn a_silent_holder_times_out_and_its_share_is_fetched_elsewhere() {
     assert_eq!(got, ["m0", "m1", "m2", "m3"]);
     assert_eq!(net.finished(2, LOBBY), Some(4));
 }
+
+#[test]
+fn the_code_language_marker_survives_the_sync_round_trip() {
+    // Issue #112: the language of a ``` block travels as a data attribute on the <pre>.
+    let body = "<pre data-mumcord-lang=\"sql\"><code>SELECT 1;\n</code></pre>";
+    let mut net = Net::new(&[1, 2]);
+    net.place(1, &[LOBBY]);
+    net.hold(1, LOBBY, 3, START - 60_000, body);
+    net.place(2, &[LOBBY]);
+    net.run(10_000);
+
+    assert_eq!(bodies(&net.synced(2)), [body]);
+    // What the UI reads after a restart: the copy in the local database.
+    let stored: Vec<String> = net.stored(2, LOBBY).into_iter().map(|(_, b)| b).collect();
+    assert_eq!(stored, [body]);
+}

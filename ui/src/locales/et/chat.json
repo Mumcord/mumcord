@@ -233,6 +233,7 @@
     "saved": "Salvestatud",
     "saveFailed": "Koodi ei õnnestunud salvestada.",
     "tooLarge": "Kood on allalaadimiseks liiga suur.",
-    "fileType": "Koodifail"
+    "fileType": "Koodifail",
+    "plainText": "Lihttekst"
   }
 }

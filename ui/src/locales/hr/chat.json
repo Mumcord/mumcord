@@ -237,6 +237,7 @@
     "saved": "Spremljeno",
     "saveFailed": "Kôd nije moguće spremiti.",
     "tooLarge": "Kôd je prevelik za preuzimanje.",
-    "fileType": "Datoteka s kôdom"
+    "fileType": "Datoteka s kôdom",
+    "plainText": "Običan tekst"
   }
 }

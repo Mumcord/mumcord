@@ -233,6 +233,7 @@
     "saved": "Gemt",
     "saveFailed": "Koden kunne ikke gemmes.",
     "tooLarge": "Koden er for stor til at downloade.",
-    "fileType": "Kodefil"
+    "fileType": "Kodefil",
+    "plainText": "Almindelig tekst"
   }
 }
