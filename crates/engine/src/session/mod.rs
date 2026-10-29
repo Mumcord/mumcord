@@ -1269,6 +1269,7 @@ impl Engine {
             c.server_max_bandwidth_kbps = stats.server_max_bandwidth_bps.map(|b| b / 1000);
             c.packets_sent = stats.packets_sent;
             c.packets_received = stats.packets_received;
+            c.audio = stats.audio;
         }
         if let Some(crypt) = crypt {
             info.connection.packets_good = crypt.good.into();

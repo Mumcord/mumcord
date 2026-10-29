@@ -18,5 +18,16 @@
   "bitrateValue": "{{value}} kbit/s",
   "serverLimit": "Όριο διακομιστή",
   "packets": "Πακέτα που στάλθηκαν / λήφθηκαν",
-  "packetsValue": "{{sent}} / {{received}}"
+  "packetsValue": "{{sent}} / {{received}}",
+  "audioDropouts": "Διακοπές ήχου",
+  "audioLate": "Καθυστερημένα πλαίσια ήχου",
+  "audioConcealed": "Πλαίσια ήχου με απόκρυψη",
+  "jitterBuffer": "Buffer διακύμανσης",
+  "audioProcessing": "Επεξεργασία ήχου (μ.ό. / μέγ.)",
+  "audioProcessingValue": "{{avg}} / {{max}} ms",
+  "realtimeAudio": "Ήχος σε πραγματικό χρόνο",
+  "realtimeValue": {
+    "on": "Ενεργό",
+    "off": "Ανενεργό"
+  }
 }

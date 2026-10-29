@@ -53,6 +53,37 @@ describe("ConnectionInfo", () => {
     expect(valueOf(panel, "Server limit")).toBe("558 kbit/s");
   });
 
+  it("shows the health of the local audio path while voice runs", async () => {
+    await setup();
+    api.mock.setConnectionStats({
+      audio: {
+        dropouts: 2,
+        lateFrames: 7,
+        concealedFrames: 12,
+        jitterBufferMs: 60,
+        processingAvgUs: 350,
+        processingMaxUs: 4200,
+        realtime: false,
+      },
+    });
+    const panel = openPanel();
+    await within(panel).findByText("Audio dropouts");
+    expect(valueOf(panel, "Audio dropouts")).toBe("2");
+    expect(valueOf(panel, "Late audio frames")).toBe("7");
+    expect(valueOf(panel, "Concealed audio frames")).toBe("12");
+    expect(valueOf(panel, "Jitter buffer")).toBe("60 ms");
+    expect(valueOf(panel, "Audio processing (avg / max)")).toBe("0.4 / 4.2 ms");
+    expect(valueOf(panel, "Real-time audio")).toBe("Off");
+  });
+
+  it("leaves the audio rows out on a server without voice", async () => {
+    await setup();
+    api.mock.setConnectionStats({ audio: null });
+    const panel = openPanel();
+    await within(panel).findByText("Transport");
+    expect(within(panel).queryByText("Audio dropouts")).toBeNull();
+  });
+
   it("updates live while open, e.g. when the bitrate drops", async () => {
     vi.useFakeTimers({ shouldAdvanceTime: true });
     await setup();

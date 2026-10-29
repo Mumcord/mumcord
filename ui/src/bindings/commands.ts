@@ -536,6 +536,23 @@ export type AudioDevicesChanged = {
 	devices: AudioDevices,
 };
 
+/**  Glitch counters of the local audio path since voice started on this connection (issue #123). */
+export type AudioHealth = {
+	/**  Device problems: xruns, stream restarts, capture overruns and playback underruns. */
+	dropouts: number,
+	/**  Frames the capture or playback thread handled too late (it was not scheduled in time). */
+	lateFrames: number,
+	/**  Received frames rebuilt by concealment because packets came late or not at all. */
+	concealedFrames: number,
+	/**  Current jitter-buffer delay of the people talking. */
+	jitterBufferMs: number,
+	/**  Average and worst capture processing time per 10 ms frame, in µs. */
+	processingAvgUs: number,
+	processingMaxUs: number,
+	/**  Whether the voice threads run with real-time scheduling. */
+	realtime: boolean,
+};
+
 /**
  *  The highest bitrate the bitrate slider can reach changed (FR-2.64), e.g. on connecting or
  *  when the voice server changes. `null` without a voice server: show "depends on server".
@@ -687,6 +704,8 @@ export type ConnectionStats = {
 	serverMaxBandwidthKbps: number | null,
 	packetsSent: number,
 	packetsReceived: number,
+	/**  Health of the local audio path; `null` on a server without voice. */
+	audio: AudioHealth | null,
 };
 
 /**  Answer to a question asked once (direct connections, update check, AppImage menu entry). */

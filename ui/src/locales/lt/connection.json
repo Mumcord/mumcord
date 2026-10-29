@@ -18,5 +18,16 @@
   "bitrateValue": "{{value}} kbit/s",
   "serverLimit": "Serverio riba",
   "packets": "Išsiųsti / gauti paketai",
-  "packetsValue": "{{sent}} / {{received}}"
+  "packetsValue": "{{sent}} / {{received}}",
+  "audioDropouts": "Garso trūkiai",
+  "audioLate": "Pavėlavę garso kadrai",
+  "audioConcealed": "Užmaskuoti garso kadrai",
+  "jitterBuffer": "Drebėjimo buferis",
+  "audioProcessing": "Garso apdorojimas (vid. / maks.)",
+  "audioProcessingValue": "{{avg}} / {{max}} ms",
+  "realtimeAudio": "Garsas realiuoju laiku",
+  "realtimeValue": {
+    "on": "Įjungta",
+    "off": "Išjungta"
+  }
 }

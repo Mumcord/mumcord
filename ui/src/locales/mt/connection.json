@@ -18,5 +18,16 @@
   "bitrateValue": "{{value}} kbit/s",
   "serverLimit": "Limitu tas-server",
   "packets": "Pakketti mibgħuta / riċevuti",
-  "packetsValue": "{{sent}} / {{received}}"
+  "packetsValue": "{{sent}} / {{received}}",
+  "audioDropouts": "Interruzzjonijiet tal-awdjo",
+  "audioLate": "Frejms tal-awdjo tard",
+  "audioConcealed": "Frejms tal-awdjo moħbija",
+  "jitterBuffer": "Buffer tal-jitter",
+  "audioProcessing": "Ipproċessar tal-awdjo (medja / mass.)",
+  "audioProcessingValue": "{{avg}} / {{max}} ms",
+  "realtimeAudio": "Awdjo f'ħin reali",
+  "realtimeValue": {
+    "on": "Mixgħul",
+    "off": "Mitfi"
+  }
 }

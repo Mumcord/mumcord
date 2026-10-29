@@ -18,5 +18,16 @@
   "bitrateValue": "{{value}} kbit/s",
   "serverLimit": "Limita serverului",
   "packets": "Pachete trimise / primite",
-  "packetsValue": "{{sent}} / {{received}}"
+  "packetsValue": "{{sent}} / {{received}}",
+  "audioDropouts": "Întreruperi audio",
+  "audioLate": "Cadre audio întârziate",
+  "audioConcealed": "Cadre audio mascate",
+  "jitterBuffer": "Buffer de jitter",
+  "audioProcessing": "Procesare audio (medie / max.)",
+  "audioProcessingValue": "{{avg}} / {{max}} ms",
+  "realtimeAudio": "Audio în timp real",
+  "realtimeValue": {
+    "on": "Activat",
+    "off": "Dezactivat"
+  }
 }

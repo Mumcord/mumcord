@@ -18,5 +18,16 @@
   "bitrateValue": "{{value}} kbit/s",
   "serverLimit": "Ограничение на сървъра",
   "packets": "Изпратени / получени пакети",
-  "packetsValue": "{{sent}} / {{received}}"
+  "packetsValue": "{{sent}} / {{received}}",
+  "audioDropouts": "Прекъсвания на звука",
+  "audioLate": "Закъснели аудио кадри",
+  "audioConcealed": "Маскирани аудио кадри",
+  "jitterBuffer": "Буфер за трептене",
+  "audioProcessing": "Обработка на звука (ср. / макс.)",
+  "audioProcessingValue": "{{avg}} / {{max}} ms",
+  "realtimeAudio": "Звук в реално време",
+  "realtimeValue": {
+    "on": "Вкл.",
+    "off": "Изкл."
+  }
 }

@@ -18,5 +18,16 @@
   "bitrateValue": "{{value}} kbit/s",
   "serverLimit": "Serverlimit",
   "packets": "Pakete gesendet / empfangen",
-  "packetsValue": "{{sent}} / {{received}}"
+  "packetsValue": "{{sent}} / {{received}}",
+  "audioDropouts": "Audio-Aussetzer",
+  "audioLate": "Verspätete Audio-Frames",
+  "audioConcealed": "Verdeckte Audio-Frames",
+  "jitterBuffer": "Jitter-Puffer",
+  "audioProcessing": "Audioverarbeitung (Ø / max.)",
+  "audioProcessingValue": "{{avg}} / {{max}} ms",
+  "realtimeAudio": "Echtzeit-Audio",
+  "realtimeValue": {
+    "on": "An",
+    "off": "Aus"
+  }
 }

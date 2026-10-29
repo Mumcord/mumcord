@@ -229,7 +229,7 @@ pub struct ConnectionStatsView {
 /// Glitch counters of the local audio path since the voice pipeline started (issue #123). A
 /// rising count says where crackles or dropouts come from: the device, the threads feeding it
 /// (scheduled too late), or the network (concealment).
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Default, serde::Serialize, serde::Deserialize)]
 pub struct AudioHealthView {
     /// Under- or overruns the audio host reported for the devices.
     pub device_xruns: u64,

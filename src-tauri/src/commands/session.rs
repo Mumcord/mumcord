@@ -2,7 +2,7 @@
 //! (FR-1.9, FR-1.10, FR-1.12–1.14, FR-1.22, FR-1.26).
 
 use mumcord_engine::{
-    ConnState, ConnectionStatsView, Engine, ServerInfoView, Snapshot, UnreadView,
+    AudioHealthView, ConnState, ConnectionStatsView, Engine, ServerInfoView, Snapshot, UnreadView,
     VoiceTransportKind,
 };
 use serde::{Deserialize, Serialize};
@@ -106,6 +106,44 @@ pub struct ConnectionStats {
     pub server_max_bandwidth_kbps: Option<u32>,
     pub packets_sent: u32,
     pub packets_received: u32,
+    /// Health of the local audio path; `null` on a server without voice.
+    pub audio: Option<AudioHealth>,
+}
+
+/// Glitch counters of the local audio path since voice started on this connection (issue #123).
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, Type)]
+#[serde(rename_all = "camelCase")]
+pub struct AudioHealth {
+    /// Device problems: xruns, stream restarts, capture overruns and playback underruns.
+    pub dropouts: u32,
+    /// Frames the capture or playback thread handled too late (it was not scheduled in time).
+    pub late_frames: u32,
+    /// Received frames rebuilt by concealment because packets came late or not at all.
+    pub concealed_frames: u32,
+    /// Current jitter-buffer delay of the people talking.
+    pub jitter_buffer_ms: u32,
+    /// Average and worst capture processing time per 10 ms frame, in µs.
+    pub processing_avg_us: u32,
+    pub processing_max_us: u32,
+    /// Whether the voice threads run with real-time scheduling.
+    pub realtime: bool,
+}
+
+impl From<AudioHealthView> for AudioHealth {
+    fn from(a: AudioHealthView) -> Self {
+        let count = |n: u64| u32::try_from(n).unwrap_or(u32::MAX);
+        Self {
+            dropouts: count(
+                a.device_xruns + a.stream_restarts + a.capture_overruns + a.playback_underruns,
+            ),
+            late_frames: count(a.capture_late_frames + a.playback_late_wakeups),
+            concealed_frames: count(a.concealed_frames),
+            jitter_buffer_ms: count(a.jitter_delay_ms),
+            processing_avg_us: count(a.capture_time_avg_us),
+            processing_max_us: count(a.capture_time_max_us),
+            realtime: a.realtime_threads > 0,
+        }
+    }
 }
 
 /// The voice server changed (FR-2.2); `null` when no server has voice.
@@ -259,6 +297,7 @@ impl From<ConnectionStatsView> for ConnectionStats {
             server_max_bandwidth_kbps: v.server_max_bandwidth_bps.map(|b| b / 1000),
             packets_sent: count(v.packets_sent),
             packets_received: count(v.packets_received),
+            audio: v.audio.map(AudioHealth::from),
         }
     }
 }
