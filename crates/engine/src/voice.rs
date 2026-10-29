@@ -55,6 +55,10 @@ const TAIL_MARGIN: Duration = Duration::from_millis(250);
 const START_BITRATE_BPS: u32 = 72_000;
 /// Captured audio queued beyond this when a frame is read means the capture thread fell behind.
 const CAPTURE_LATE_SAMPLES: usize = 2 * FRAME_SAMPLES;
+/// Longest stretch the capture thread works through a backlog without sleeping. At real-time
+/// priority Linux counts such a stretch toward `RLIMIT_RTTIME` and demotes the thread past it
+/// (issue #139); a 1 ms nap resets the count and still lets it catch up.
+const CAPTURE_BURST: Duration = Duration::from_millis(20);
 
 /// Maps a peak level in dBFS to the 0–1 meter scale (−60 dBFS and below read as 0).
 pub fn meter_level(peak_dbfs: f32) -> f32 {
@@ -412,6 +416,19 @@ impl VoicePipeline {
                 while let Ok(e) = talk_events.pop() {
                     batch.set(e.session, e.talking, now);
                 }
+                let demoted = mumcord_audio::rt::take_demotions();
+                if demoted > 0 {
+                    // Logged here, not in the voice threads: they must not block on logging.
+                    tracing::warn!(
+                        demoted,
+                        "a voice thread ran past its real-time budget; back at normal priority"
+                    );
+                    let _ = shared.realtime_threads.fetch_update(
+                        Ordering::Relaxed,
+                        Ordering::Relaxed,
+                        |n| Some(n.saturating_sub(demoted)),
+                    );
+                }
                 let talking = controls.transmitting() && !shared.muted.load(Ordering::Relaxed);
                 batch.set(own_session, talking, now);
                 for (session, talking) in batch.take_due(now) {
@@ -522,11 +539,13 @@ fn capture_loop(
     let _realtime = realtime("capture", shared);
     // Drop audio captured before this connection started.
     while source.read_frame(&mut input) {}
+    let mut burst_start: Option<Instant> = None;
     while !stop.load(Ordering::Relaxed) {
         if !source.wait_frame(&mut input, Duration::from_millis(50)) {
             continue;
         }
-        if source.queued_samples() > CAPTURE_LATE_SAMPLES {
+        let queued = source.queued_samples();
+        if queued > CAPTURE_LATE_SAMPLES {
             shared.capture_late_frames.fetch_add(1, Ordering::Relaxed);
         }
         let started = Instant::now();
@@ -570,13 +589,27 @@ fn capture_loop(
             }
         }
         shared.capture_time.record(started.elapsed());
+        // With a full frame still queued, the next wait returns without sleeping.
+        if queued < FRAME_SAMPLES {
+            burst_start = None;
+        } else if burst_start.get_or_insert(started).elapsed() > CAPTURE_BURST {
+            std::thread::sleep(Duration::from_millis(1));
+            burst_start = None;
+        }
     }
     source
 }
 
 /// Real-time scheduling for a voice thread, so a loaded CPU does not delay its frames (issue
 /// #123). Refused (no rtkit, a sandbox), the thread runs at normal priority as before.
+///
+/// Debug builds stay at normal priority: unoptimised DSP code is slow enough to use up the
+/// real-time budget and get the thread demoted at once (issue #139).
 fn realtime(thread: &'static str, shared: &VoiceShared) -> Option<RtGuard> {
+    if cfg!(debug_assertions) {
+        tracing::debug!(thread, "debug build: real-time scheduling off");
+        return None;
+    }
     match mumcord_audio::rt::promote_current_thread() {
         Ok(guard) => {
             shared.realtime_threads.fetch_add(1, Ordering::Relaxed);
