@@ -411,6 +411,22 @@
     "clearNow": "Limpar agora",
     "cleared": "Cache limpa, {{size}} libertados."
   },
+  "cache": {
+    "title": "Cache",
+    "hint": "O Mumcord guarda dados temporários neste computador para tudo carregar mais depressa. Limpá-los é seguro; são recriados quando necessário.",
+    "kind": {
+      "previews": "Pré-visualizações de links e imagens",
+      "webEngine": "Cache do motor web",
+      "temp": "Ficheiros temporários"
+    },
+    "total": "Total: {{size}}",
+    "calculating": "A calcular…",
+    "clear": "Limpar cache",
+    "confirmTitle": "Limpar a cache?",
+    "confirm": "Apenas as caches selecionadas são eliminadas. O histórico de conversas, as definições, os servidores, os certificados, os amigos e as notas não são afetados.",
+    "cleared": "Cache limpa ({{size}})",
+    "webPending": "A cache do motor web é removida no próximo arranque do Mumcord."
+  },
   "retention": {
     "days_one": "{{count}} dia",
     "days_many": "{{count}} dias",

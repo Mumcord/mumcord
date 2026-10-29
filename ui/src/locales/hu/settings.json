@@ -410,6 +410,22 @@
     "clearNow": "Törlés most",
     "cleared": "Gyorsítótár törölve, {{size}} felszabadítva."
   },
+  "cache": {
+    "title": "Gyorsítótár",
+    "hint": "A Mumcord ideiglenes adatokat tárol ezen a számítógépen, hogy minden gyorsabban töltsön be. A törlésük biztonságos; szükség esetén újra létrejönnek.",
+    "kind": {
+      "previews": "Hivatkozás-előnézetek és képek",
+      "webEngine": "Webmotor gyorsítótára",
+      "temp": "Ideiglenes fájlok"
+    },
+    "total": "Összesen: {{size}}",
+    "calculating": "Számítás…",
+    "clear": "Gyorsítótár törlése",
+    "confirmTitle": "Törli a gyorsítótárat?",
+    "confirm": "Csak a kijelölt gyorsítótárak törlődnek. A csevegési előzmények, beállítások, kiszolgálók, tanúsítványok, barátok és jegyzetek érintetlenek maradnak.",
+    "cleared": "Gyorsítótár törölve ({{size}})",
+    "webPending": "A webmotor gyorsítótára a Mumcord következő indításakor törlődik."
+  },
   "retention": {
     "days_one": "{{count}} nap",
     "days_other": "{{count}} nap"

@@ -412,6 +412,22 @@
     "clearNow": "Wyczyść teraz",
     "cleared": "Wyczyszczono pamięć podręczną, zwolniono {{size}}."
   },
+  "cache": {
+    "title": "Pamięć podręczna",
+    "hint": "Mumcord przechowuje na tym komputerze dane tymczasowe, aby wszystko ładowało się szybciej. Wyczyszczenie ich jest bezpieczne; w razie potrzeby powstaną od nowa.",
+    "kind": {
+      "previews": "Podglądy linków i obrazy",
+      "webEngine": "Pamięć podręczna silnika WWW",
+      "temp": "Pliki tymczasowe"
+    },
+    "total": "Razem: {{size}}",
+    "calculating": "Obliczanie…",
+    "clear": "Wyczyść pamięć podręczną",
+    "confirmTitle": "Wyczyścić pamięć podręczną?",
+    "confirm": "Usuwane są tylko wybrane pamięci podręczne. Historia czatu, ustawienia, serwery, certyfikaty, znajomi i notatki pozostają nietknięte.",
+    "cleared": "Wyczyszczono pamięć podręczną ({{size}})",
+    "webPending": "Pamięć podręczna silnika WWW zostanie usunięta przy następnym uruchomieniu Mumcord."
+  },
   "retention": {
     "days_one": "{{count}} dzień",
     "days_few": "{{count}} dni",

@@ -410,6 +410,22 @@
     "clearNow": "Rensa nu",
     "cleared": "Cachen rensades, {{size}} frigjordes."
   },
+  "cache": {
+    "title": "Cache",
+    "hint": "Mumcord sparar tillfälliga data på den här datorn så att allt laddas snabbare. Det är säkert att rensa dem; de skapas på nytt vid behov.",
+    "kind": {
+      "previews": "Länkförhandsvisningar och bilder",
+      "webEngine": "Webbmotorns cache",
+      "temp": "Tillfälliga filer"
+    },
+    "total": "Totalt: {{size}}",
+    "calculating": "Beräknar…",
+    "clear": "Rensa cache",
+    "confirmTitle": "Rensa cache?",
+    "confirm": "Bara de valda cacheminnena raderas. Din chatthistorik, dina inställningar, servrar, certifikat, vänner och anteckningar berörs inte.",
+    "cleared": "Cache rensad ({{size}})",
+    "webPending": "Webbmotorns cache tas bort nästa gång Mumcord startar."
+  },
   "retention": {
     "days_one": "{{count}} dag",
     "days_other": "{{count}} dagar"

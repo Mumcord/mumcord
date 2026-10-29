@@ -411,6 +411,22 @@
     "clearNow": "Svuota ora",
     "cleared": "Cache svuotata, {{size}} liberati."
   },
+  "cache": {
+    "title": "Cache",
+    "hint": "Mumcord conserva dati temporanei su questo computer per caricare tutto più velocemente. Svuotarli è sicuro; vengono ricreati quando servono.",
+    "kind": {
+      "previews": "Anteprime dei link e immagini",
+      "webEngine": "Cache del motore web",
+      "temp": "File temporanei"
+    },
+    "total": "Totale: {{size}}",
+    "calculating": "Calcolo in corso…",
+    "clear": "Svuota cache",
+    "confirmTitle": "Svuotare la cache?",
+    "confirm": "Vengono eliminate solo le cache selezionate. Cronologia chat, impostazioni, server, certificati, amici e note non vengono toccati.",
+    "cleared": "Cache svuotata ({{size}})",
+    "webPending": "La cache del motore web viene rimossa al prossimo avvio di Mumcord."
+  },
   "retention": {
     "days_one": "{{count}} giorno",
     "days_many": "{{count}} giorni",

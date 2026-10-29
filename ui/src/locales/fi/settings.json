@@ -410,6 +410,22 @@
     "clearNow": "Tyhjennä nyt",
     "cleared": "Välimuisti tyhjennetty, {{size}} vapautettu."
   },
+  "cache": {
+    "title": "Välimuisti",
+    "hint": "Mumcord tallentaa tälle tietokoneelle väliaikaisia tietoja, jotta kaikki latautuu nopeammin. Niiden tyhjentäminen on turvallista; ne luodaan tarvittaessa uudelleen.",
+    "kind": {
+      "previews": "Linkkien esikatselut ja kuvat",
+      "webEngine": "Selainmoottorin välimuisti",
+      "temp": "Väliaikaiset tiedostot"
+    },
+    "total": "Yhteensä: {{size}}",
+    "calculating": "Lasketaan…",
+    "clear": "Tyhjennä välimuisti",
+    "confirmTitle": "Tyhjennetäänkö välimuisti?",
+    "confirm": "Vain valitut välimuistit poistetaan. Keskusteluhistoriaan, asetuksiin, palvelimiin, varmenteisiin, kavereihin ja muistiinpanoihin ei kosketa.",
+    "cleared": "Välimuisti tyhjennetty ({{size}})",
+    "webPending": "Selainmoottorin välimuisti poistetaan, kun Mumcord käynnistyy seuraavan kerran."
+  },
   "retention": {
     "days_one": "{{count}} päivä",
     "days_other": "{{count}} päivää"

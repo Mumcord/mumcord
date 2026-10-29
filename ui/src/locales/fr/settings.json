@@ -411,6 +411,22 @@
     "clearNow": "Vider maintenant",
     "cleared": "Cache vidé, {{size}} libérés."
   },
+  "cache": {
+    "title": "Cache",
+    "hint": "Mumcord conserve des données temporaires sur cet ordinateur pour que tout se charge plus vite. Les supprimer est sans risque ; elles sont recréées au besoin.",
+    "kind": {
+      "previews": "Aperçus de liens et images",
+      "webEngine": "Cache du moteur web",
+      "temp": "Fichiers temporaires"
+    },
+    "total": "Total : {{size}}",
+    "calculating": "Calcul en cours…",
+    "clear": "Vider le cache",
+    "confirmTitle": "Vider le cache ?",
+    "confirm": "Seuls les caches sélectionnés sont supprimés. Votre historique de discussion, vos paramètres, serveurs, certificats, amis et notes ne sont pas touchés.",
+    "cleared": "Cache vidé ({{size}})",
+    "webPending": "Le cache du moteur web sera supprimé au prochain démarrage de Mumcord."
+  },
   "retention": {
     "days_one": "{{count}} jour",
     "days_many": "{{count}} jours",

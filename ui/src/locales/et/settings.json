@@ -410,6 +410,22 @@
     "clearNow": "Tühjenda kohe",
     "cleared": "Vahemälu tühjendatud, vabanes {{size}}."
   },
+  "cache": {
+    "title": "Vahemälu",
+    "hint": "Mumcord hoiab selles arvutis ajutisi andmeid, et kõik laadiks kiiremini. Nende tühjendamine on ohutu; vajaduse korral luuakse need uuesti.",
+    "kind": {
+      "previews": "Linkide eelvaated ja pildid",
+      "webEngine": "Veebimootori vahemälu",
+      "temp": "Ajutised failid"
+    },
+    "total": "Kokku: {{size}}",
+    "calculating": "Arvutan…",
+    "clear": "Tühjenda vahemälu",
+    "confirmTitle": "Kas tühjendada vahemälu?",
+    "confirm": "Kustutatakse ainult valitud vahemälud. Vestluste ajalugu, seaded, serverid, sertifikaadid, sõbrad ja märkmed jäävad puutumata.",
+    "cleared": "Vahemälu tühjendatud ({{size}})",
+    "webPending": "Veebimootori vahemälu eemaldatakse Mumcordi järgmisel käivitamisel."
+  },
   "retention": {
     "days_one": "{{count}} päev",
     "days_other": "{{count}} päeva"
