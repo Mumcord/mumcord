@@ -29,5 +29,35 @@
   "realtimeValue": {
     "on": "Activat",
     "off": "Dezactivat"
+  },
+  "audioRating": "Audio: {{rating}}",
+  "rating": {
+    "good": "Bun",
+    "fair": "Mediu",
+    "poor": "Slab"
+  },
+  "reason": {
+    "good_one": "Nicio problemă în ultimul minut",
+    "good_few": "Nicio problemă în ultimele {{count}} minute",
+    "good_other": "Nicio problemă în ultimele {{count}} de minute",
+    "network": "O parte din vocea celorlalți a fost mascată: pierderi în rețea",
+    "cpu": "Procesarea sunetului tău întârzie: încărcare mare a procesorului",
+    "device": "Dispozitivul tău audio a avut întreruperi"
+  },
+  "details": "Detalii",
+  "sinceConnected": "Contoare de la conectare. Grafice: ultimele {{minutes}} min.",
+  "about": "Despre {{label}}",
+  "help": {
+    "dropouts": "Goluri când dispozitivul audio nu a ținut pasul (depășiri, goliri sau reporniri). Normal: 0.",
+    "late": "Cadre audio procesate prea târziu de calculator, de obicei din cauza încărcării mari a procesorului. Normal: 0 sau aproape 0.",
+    "concealed": "Cadre de voce ale celorlalți care nu au sosit la timp, așa că aplicația a umplut golul. Cauză: pierderi în rețea. Normal: aproape 0.",
+    "jitter": "Întârziere care netezește pachetele de voce ale celorlalți ce sosesc neregulat. Normal: 20–60 ms.",
+    "processing": "Timpul de procesare a unui cadru de 10 ms de la microfonul tău. Normal: mult sub 10 ms.",
+    "realtime": "Dacă firele audio primesc prioritate în timp real de la sistem. Activat ajută la evitarea întreruperilor sub sarcină."
+  },
+  "recent": {
+    "perMinute": "Ultimele {{minutes}} min: {{value}} pe minut.",
+    "concealedShare": "Ultimele {{minutes}} min: {{value}} % din cadrele primite.",
+    "processingMax": "Ultimele {{minutes}} min: max. {{value}} ms din bugetul de {{budget}} ms pe cadru."
   }
 }

@@ -29,5 +29,36 @@
   "realtimeValue": {
     "on": "Vklopljeno",
     "off": "Izklopljeno"
+  },
+  "audioRating": "Zvok: {{rating}}",
+  "rating": {
+    "good": "Dober",
+    "fair": "Srednji",
+    "poor": "Slab"
+  },
+  "reason": {
+    "good_one": "Brez težav v zadnji {{count}} minuti",
+    "good_two": "Brez težav v zadnjih {{count}} minutah",
+    "good_few": "Brez težav v zadnjih {{count}} minutah",
+    "good_other": "Brez težav v zadnjih {{count}} minutah",
+    "network": "Del glasu drugih je bil prikrit: izguba v omrežju",
+    "cpu": "Obdelava vašega zvoka zamuja: visoka obremenitev procesorja",
+    "device": "Vaša zvočna naprava je imela prekinitve"
+  },
+  "details": "Podrobnosti",
+  "sinceConnected": "Števci od povezave. Grafi: zadnjih {{minutes}} min.",
+  "about": "O postavki {{label}}",
+  "help": {
+    "dropouts": "Vrzeli, ko zvočna naprava ni dohajala (prekoračitev, podkoračitev ali ponovni zagon). Običajno: 0.",
+    "late": "Zvočni okvirji, ki jih je računalnik obdelal prepozno, običajno zaradi visoke obremenitve procesorja. Običajno: 0 ali skoraj 0.",
+    "concealed": "Glasovni okvirji drugih, ki niso prispeli pravočasno, zato je odjemalec zapolnil vrzel. Vzrok: izguba v omrežju. Običajno: skoraj 0.",
+    "jitter": "Zakasnitev, ki izravna neenakomerno prihajajoče glasovne pakete drugih. Običajno: 20–60 ms.",
+    "processing": "Čas za obdelavo enega 10-milisekundnega okvirja z vašega mikrofona. Običajno: precej pod 10 ms.",
+    "realtime": "Ali zvočne niti od sistema dobijo prednost v realnem času. Vklopljeno pomaga preprečiti prekinitve pod obremenitvijo."
+  },
+  "recent": {
+    "perMinute": "Zadnjih {{minutes}} min: {{value}} na minuto.",
+    "concealedShare": "Zadnjih {{minutes}} min: {{value}} % prejetih okvirjev.",
+    "processingMax": "Zadnjih {{minutes}} min: največ {{value}} ms od {{budget}} ms na okvir."
   }
 }

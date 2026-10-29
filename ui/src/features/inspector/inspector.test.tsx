@@ -114,6 +114,12 @@ describe("PacketInspector", () => {
     expect(await screen.findAllByText("Mumcord hello")).not.toHaveLength(0);
     expect(screen.getByText("Packets (6 of 6)")).toBeInTheDocument();
     expect(screen.getByText(/Voice packets: 1520 sent, 3044 received/u)).toBeInTheDocument();
+    // The voice server's line carries the audio rating badge with its reason.
+    const voiceLine = screen.getByText(/Voice packets: 1520 sent, 3044 received/u);
+    expect(within(voiceLine).getByText("Audio: Fair")).toBeInTheDocument();
+    expect(
+      within(voiceLine).getByText("Some voice from others was concealed: network loss"),
+    ).toBeInTheDocument();
 
     fireEvent.click(screen.getByRole("combobox", { name: "Direction" }));
     fireEvent.click(screen.getByRole("option", { name: "Received" }));

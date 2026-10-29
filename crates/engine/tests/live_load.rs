@@ -22,6 +22,8 @@ use mumcord_engine::{EngineEvent, PasswordChange, SecretStore, ServerFields, Sna
 const WAIT: Duration = Duration::from_secs(20);
 const SAMPLE_RATE: usize = 48_000;
 const MEASURE: Duration = Duration::from_secs(20);
+/// Silence before the peer starts talking, to check that idle time is not counted as a glitch.
+const IDLE: Duration = Duration::from_secs(5);
 const TONE_HZ: f32 = 440.0;
 const TONE_AMPLITUDE: f32 = 0.2;
 /// Samples per 10 ms block of the glitch analysis.
@@ -258,6 +260,21 @@ async fn voice_stays_clean_under_load() {
     engine.join_channel(server.id, afk).expect("join AFK");
     let me = snapshot.self_session;
 
+    // Nobody else talks yet: idle silence must not count as concealment (issue #152).
+    tokio::time::sleep(IDLE).await;
+    let idle = engine
+        .connection_stats(server.id)
+        .and_then(|s| s.audio)
+        .expect("audio health while connected");
+    eprintln!(
+        "idle: {:?} {:?}, concealed {}",
+        idle.rating.rating, idle.rating.issue, idle.concealed_frames
+    );
+    assert_eq!(
+        idle.concealed_frames, 0,
+        "silence is not concealment: {idle:?}"
+    );
+
     let mut incoming = peer_voice.subscribe_packets();
     let collect = tokio::spawn(async move {
         let mut packets = Vec::new();
@@ -289,10 +306,13 @@ async fn voice_stays_clean_under_load() {
     drop(engine);
 
     let recording = Clip::load(&output).expect("recording").samples;
-    let start = recording
-        .iter()
-        .position(|s| s.abs() > TONE_AMPLITUDE / 2.0)
-        .expect("tone reached the recording");
+    // The tone starts after the idle phase; earlier sound is the join notification.
+    let idle_samples = IDLE.as_secs() as usize * SAMPLE_RATE;
+    let start = idle_samples
+        + recording[idle_samples.min(recording.len())..]
+            .iter()
+            .position(|s| s.abs() > TONE_AMPLITUDE / 2.0)
+            .expect("tone reached the recording");
     // Skip the first second (jitter buffer settling, join sound) and the fade at the end.
     let window = &recording[(start + SAMPLE_RATE).min(recording.len())
         ..(start + MEASURE.as_secs() as usize * SAMPLE_RATE).min(recording.len())];
@@ -301,6 +321,10 @@ async fn voice_stays_clean_under_load() {
     eprintln!("playback (tone from the peer): {playback:?}");
     eprintln!("sending (speech to the peer): {sending:?}");
     eprintln!("audio health: {health:?}");
+    eprintln!(
+        "rating under the call: {:?} {:?}",
+        health.rating.rating, health.rating.issue
+    );
 
     assert!(playback.blocks > 1500, "tone recorded: {playback:?}");
     assert!(sending.packets > 200, "speech received: {sending:?}");

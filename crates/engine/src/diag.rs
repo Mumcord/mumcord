@@ -342,6 +342,20 @@ fn write_audio_health(out: &mut String, audio: Option<&crate::AudioHealthView>) 
         let _ = writeln!(out, "  (voice not running)");
         return;
     };
+    let r = &a.rating;
+    let issue = r.issue.map_or(String::new(), |i| format!(" ({i:?})"));
+    let _ = writeln!(
+        out,
+        "  rating: {:?}{issue} over the last {} s: dropouts {}, late frames {}, \
+         concealed {} of {} received frames, processing max {} µs",
+        r.rating,
+        r.window_secs,
+        r.dropouts,
+        r.late_frames,
+        r.concealed_frames,
+        r.received_frames,
+        r.processing_max_us
+    );
     let _ = writeln!(out, "  real-time threads: {}", a.realtime_threads);
     let _ = writeln!(
         out,
@@ -509,6 +523,14 @@ mod tests {
                 capture_time_avg_us: 250,
                 capture_time_max_us: 900,
                 realtime_threads: 2,
+                rating: crate::audio_rating::AudioRatingView {
+                    rating: crate::audio_rating::AudioRating::Fair,
+                    issue: Some(crate::audio_rating::AudioIssue::Network),
+                    window_secs: 120,
+                    concealed_frames: 20,
+                    received_frames: 980,
+                    ..Default::default()
+                },
                 ..crate::AudioHealthView::default()
             }),
             ..DiagConnectionStats::default()
@@ -522,6 +544,7 @@ mod tests {
             "send bitrate: 40 kbit/s",
             "server max bandwidth: 72 kbit/s",
             "real-time threads: 2",
+            "rating: Fair (Network) over the last 120 s: dropouts 0, late frames 0, concealed 20 of 980 received frames",
             "device xruns / stream restarts: 3 / 0",
             "concealed frames / late packets: 5 / 0",
             "jitter buffer: 40 ms",

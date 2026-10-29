@@ -29,5 +29,35 @@
   "realtimeValue": {
     "on": "Activé",
     "off": "Désactivé"
+  },
+  "audioRating": "Audio : {{rating}}",
+  "rating": {
+    "good": "Bon",
+    "fair": "Moyen",
+    "poor": "Mauvais"
+  },
+  "reason": {
+    "good_one": "Aucun problème au cours de la dernière minute",
+    "good_many": "Aucun problème au cours des {{count}} dernières minutes",
+    "good_other": "Aucun problème au cours des {{count}} dernières minutes",
+    "network": "Une partie de la voix des autres a été masquée : perte réseau",
+    "cpu": "Le traitement de votre audio prend du retard : charge CPU élevée",
+    "device": "Votre périphérique audio a eu des coupures"
+  },
+  "details": "Détails",
+  "sinceConnected": "Compteurs depuis la connexion. Graphiques : {{minutes}} dernières min.",
+  "about": "À propos de {{label}}",
+  "help": {
+    "dropouts": "Trous quand votre périphérique audio n’a pas suivi (débordements, sous-alimentations ou redémarrages). Normal : 0.",
+    "late": "Trames audio traitées trop tard par votre ordinateur, souvent à cause d’une charge CPU élevée. Normal : 0 ou presque.",
+    "concealed": "Trames vocales des autres arrivées trop tard, le client a donc comblé le trou. Cause : perte réseau. Normal : presque 0.",
+    "jitter": "Délai qui lisse les paquets vocaux des autres arrivant de façon irrégulière. Normal : 20–60 ms.",
+    "processing": "Temps de traitement d’une trame de 10 ms de votre micro. Normal : bien en dessous de 10 ms.",
+    "realtime": "Indique si les fils audio reçoivent une priorité temps réel du système. Activé aide à éviter les coupures en charge."
+  },
+  "recent": {
+    "perMinute": "{{minutes}} dernières min : {{value}} par minute.",
+    "concealedShare": "{{minutes}} dernières min : {{value}} % des trames reçues.",
+    "processingMax": "{{minutes}} dernières min : max. {{value}} ms sur un budget de {{budget}} ms par trame."
   }
 }

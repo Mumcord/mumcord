@@ -2,6 +2,7 @@ import { useEffect, useId, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { getApi, type PacketCounter, type VoiceCounter } from "../../api";
 import { Select } from "../../components/Select";
+import { AudioRatingBadge } from "../connection";
 import { Group } from "../settings/components/Section";
 import { errorText } from "../settings/errors";
 import { pickSavePath } from "../settings/fileDialogs";
@@ -212,6 +213,7 @@ export function PacketInspector({ names }: { names: Names }) {
             {shownVoice.map((v) => (
               <li key={`voice ${String(v.serverId)}`}>
                 {t("inspector.voice", { sent: v.sent, received: v.received })}
+                {v.rating && <AudioRatingBadge rating={v.rating.rating} issue={v.rating.issue} />}
               </li>
             ))}
           </ul>

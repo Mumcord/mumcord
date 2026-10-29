@@ -1,6 +1,7 @@
 //! Mumcord engine: app state, the server connection, voice and diagnostics. The app shell
 //! (`src-tauri`) talks only to [`Engine`] and converts its types into command/event types.
 
+pub mod audio_rating;
 pub mod cache;
 pub mod chat;
 pub mod diag;

@@ -29,5 +29,34 @@
   "realtimeValue": {
     "on": "An",
     "off": "Aus"
+  },
+  "audioRating": "Audio: {{rating}}",
+  "rating": {
+    "good": "Gut",
+    "fair": "Mittel",
+    "poor": "Schlecht"
+  },
+  "reason": {
+    "good_one": "Keine Probleme in der letzten Minute",
+    "good_other": "Keine Probleme in den letzten {{count}} Minuten",
+    "network": "Etwas Sprache von anderen wurde verdeckt: Netzwerkverlust",
+    "cpu": "Deine Audioverarbeitung hinkt hinterher: hohe CPU-Last",
+    "device": "Dein Audiogerät hatte Aussetzer"
+  },
+  "details": "Details",
+  "sinceConnected": "Zähler seit Verbindungsaufbau. Verläufe: letzte {{minutes}} min.",
+  "about": "Über {{label}}",
+  "help": {
+    "dropouts": "Lücken, weil dein Audiogerät nicht mithalten konnte (Überläufe, Unterläufe oder Neustarts). Normal: 0.",
+    "late": "Audio-Frames, die dein Computer zu spät verarbeitet hat, meist bei hoher CPU-Last. Normal: 0 oder fast 0.",
+    "concealed": "Sprach-Frames von anderen, die nicht rechtzeitig ankamen, sodass der Client die Lücke gefüllt hat. Ursache: Netzwerkverlust. Normal: fast 0.",
+    "jitter": "Verzögerung, die ungleichmäßig ankommende Sprachpakete anderer ausgleicht. Normal: 20–60 ms.",
+    "processing": "Zeit für die Verarbeitung eines 10-ms-Frames deines Mikrofons. Normal: deutlich unter 10 ms.",
+    "realtime": "Ob die Audio-Threads vom System Echtzeit-Priorität bekommen. „An“ hilft gegen Aussetzer unter Last."
+  },
+  "recent": {
+    "perMinute": "Letzte {{minutes}} min: {{value}} pro Minute.",
+    "concealedShare": "Letzte {{minutes}} min: {{value}} % der empfangenen Frames.",
+    "processingMax": "Letzte {{minutes}} min: max. {{value}} ms von {{budget}} ms Frame-Budget."
   }
 }

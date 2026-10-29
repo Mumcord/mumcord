@@ -29,5 +29,35 @@
   "realtimeValue": {
     "on": "Ieslēgts",
     "off": "Izslēgts"
+  },
+  "audioRating": "Audio: {{rating}}",
+  "rating": {
+    "good": "Labs",
+    "fair": "Vidējs",
+    "poor": "Slikts"
+  },
+  "reason": {
+    "good_zero": "Pēdējās {{count}} minūtēs problēmu nebija",
+    "good_one": "Pēdējā {{count}} minūtē problēmu nebija",
+    "good_other": "Pēdējās {{count}} minūtēs problēmu nebija",
+    "network": "Daļa citu balss tika maskēta: tīkla zudumi",
+    "cpu": "Jūsu audio apstrāde kavējas: liela procesora slodze",
+    "device": "Jūsu audio ierīcei bija pārtraukumi"
+  },
+  "details": "Detaļas",
+  "sinceConnected": "Skaitītāji kopš savienojuma. Grafiki: pēdējās {{minutes}} min.",
+  "about": "Par: {{label}}",
+  "help": {
+    "dropouts": "Pārtraukumi, kad audio ierīce netika līdzi (pārpilde, nepietiekama aizpilde vai restartēšana). Normāli: 0.",
+    "late": "Audio kadri, ko dators apstrādāja par vēlu, parasti lielas procesora slodzes dēļ. Normāli: 0 vai gandrīz 0.",
+    "concealed": "Citu balss kadri, kas neienāca laikā, tāpēc klients aizpildīja robu. Cēlonis: tīkla zudumi. Normāli: gandrīz 0.",
+    "jitter": "Aizture, kas izlīdzina nevienmērīgi pienākošās citu balss paketes. Normāli: 20–60 ms.",
+    "processing": "Laiks viena 10 ms mikrofona kadra apstrādei. Normāli: krietni zem 10 ms.",
+    "realtime": "Vai audio pavedieni saņem reāllaika prioritāti no sistēmas. Ieslēgts palīdz izvairīties no pārtraukumiem slodzes laikā."
+  },
+  "recent": {
+    "perMinute": "Pēdējās {{minutes}} min: {{value}} minūtē.",
+    "concealedShare": "Pēdējās {{minutes}} min: {{value}} % no saņemtajiem kadriem.",
+    "processingMax": "Pēdējās {{minutes}} min: maks. {{value}} ms no {{budget}} ms kadra budžeta."
   }
 }

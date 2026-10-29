@@ -3,6 +3,7 @@
 
 use std::fmt;
 
+use crate::audio_rating::HealthTotals;
 use mumcord_store::ServerId;
 
 /// Error category; mirrors the command contract's `ErrorCode` (docs/engine-api.md).
@@ -246,7 +247,7 @@ pub struct AudioHealthView {
     /// Received 10 ms frames rebuilt by FEC or concealment (late or lost packets).
     pub concealed_frames: u64,
     pub late_packets: u64,
-    /// Current jitter-buffer delay of the speakers playing, in ms.
+    /// Jitter-buffer delay of the speakers playing (or of the last stream between bursts), in ms.
     pub jitter_delay_ms: u64,
     /// Average and worst capture processing time per 10 ms frame (DSP, Opus, send), in µs.
     pub capture_time_avg_us: u64,
@@ -256,6 +257,25 @@ pub struct AudioHealthView {
     pub mix_time_max_us: u64,
     /// Voice threads (of capture and playback) that got real-time scheduling.
     pub realtime_threads: u32,
+    /// 10 ms frames decoded from received voice (the base of the concealed share).
+    pub received_frames: u64,
+    /// Overall rating over the recent window (issue #152).
+    pub rating: crate::audio_rating::AudioRatingView,
+}
+
+impl AudioHealthView {
+    /// The counters the rating looks at, grouped by cause.
+    pub fn totals(&self) -> HealthTotals {
+        HealthTotals {
+            dropouts: self.device_xruns
+                + self.stream_restarts
+                + self.capture_overruns
+                + self.playback_underruns,
+            late_frames: self.capture_late_frames + self.playback_late_wakeups,
+            concealed_frames: self.concealed_frames,
+            received_frames: self.received_frames,
+        }
+    }
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]

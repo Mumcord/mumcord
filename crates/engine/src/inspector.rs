@@ -70,6 +70,11 @@ pub struct VoiceCount {
     pub server_id: ServerId,
     pub sent: u64,
     pub received: u64,
+    /// Audio rating and its cause on the server with the voice pipeline (issue #152).
+    pub rating: Option<(
+        crate::audio_rating::AudioRating,
+        Option<crate::audio_rating::AudioIssue>,
+    )>,
 }
 
 /// What the UI gets on each poll.

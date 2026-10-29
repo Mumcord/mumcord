@@ -29,5 +29,34 @@
   "realtimeValue": {
     "on": "Til",
     "off": "Fra"
+  },
+  "audioRating": "Lyd: {{rating}}",
+  "rating": {
+    "good": "God",
+    "fair": "Middel",
+    "poor": "Dårlig"
+  },
+  "reason": {
+    "good_one": "Ingen problemer i det seneste minut",
+    "good_other": "Ingen problemer i de seneste {{count}} minutter",
+    "network": "Noget tale fra andre blev skjult: netværkstab",
+    "cpu": "Din lydbehandling halter bagefter: høj CPU-belastning",
+    "device": "Din lydenhed havde udfald"
+  },
+  "details": "Detaljer",
+  "sinceConnected": "Tællere siden forbindelsen. Grafer: seneste {{minutes}} min.",
+  "about": "Om {{label}}",
+  "help": {
+    "dropouts": "Huller, når din lydenhed ikke kunne følge med (overløb, underløb eller genstart). Normalt: 0.",
+    "late": "Lydrammer, som din computer behandlede for sent, typisk ved høj CPU-belastning. Normalt: 0 eller tæt på.",
+    "concealed": "Talerammer fra andre, der ikke nåede frem i tide, så klienten udfyldte hullet. Skyldes netværkstab. Normalt: tæt på 0.",
+    "jitter": "Forsinkelse, der udjævner talepakker fra andre, som ankommer ujævnt. Normalt: 20–60 ms.",
+    "processing": "Tid til at behandle én 10 ms-ramme fra din mikrofon. Normalt: et godt stykke under 10 ms.",
+    "realtime": "Om lydtrådene får realtidsprioritet af systemet. Til hjælper mod udfald under belastning."
+  },
+  "recent": {
+    "perMinute": "Seneste {{minutes}} min: {{value}} pr. minut.",
+    "concealedShare": "Seneste {{minutes}} min: {{value}} % af modtagne rammer.",
+    "processingMax": "Seneste {{minutes}} min: maks. {{value}} ms af {{budget}} ms rammebudget."
   }
 }

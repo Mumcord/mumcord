@@ -29,5 +29,35 @@
   "realtimeValue": {
     "on": "Activado",
     "off": "Desactivado"
+  },
+  "audioRating": "Audio: {{rating}}",
+  "rating": {
+    "good": "Bueno",
+    "fair": "Regular",
+    "poor": "Malo"
+  },
+  "reason": {
+    "good_one": "Sin problemas en el último minuto",
+    "good_many": "Sin problemas en los últimos {{count}} minutos",
+    "good_other": "Sin problemas en los últimos {{count}} minutos",
+    "network": "Parte de la voz de otros se ocultó: pérdida de red",
+    "cpu": "El procesamiento de tu audio va con retraso: carga de CPU alta",
+    "device": "Tu dispositivo de audio tuvo cortes"
+  },
+  "details": "Detalles",
+  "sinceConnected": "Contadores desde la conexión. Gráficos: últimos {{minutes}} min.",
+  "about": "Acerca de {{label}}",
+  "help": {
+    "dropouts": "Huecos cuando tu dispositivo de audio no dio abasto (desbordamientos, vaciados o reinicios). Normal: 0.",
+    "late": "Tramas de audio que tu equipo procesó tarde, normalmente por una carga de CPU alta. Normal: 0 o casi 0.",
+    "concealed": "Tramas de voz de otros que no llegaron a tiempo, así que el cliente rellenó el hueco. Causa: pérdida de red. Normal: casi 0.",
+    "jitter": "Retardo que compensa los paquetes de voz de otros que llegan de forma irregular. Normal: 20–60 ms.",
+    "processing": "Tiempo para procesar una trama de 10 ms de tu micrófono. Normal: muy por debajo de 10 ms.",
+    "realtime": "Si los hilos de audio reciben prioridad de tiempo real del sistema. Activado ayuda a evitar cortes con carga."
+  },
+  "recent": {
+    "perMinute": "Últimos {{minutes}} min: {{value}} por minuto.",
+    "concealedShare": "Últimos {{minutes}} min: {{value}} % de las tramas recibidas.",
+    "processingMax": "Últimos {{minutes}} min: máx. {{value}} ms de {{budget}} ms por trama."
   }
 }

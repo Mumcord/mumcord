@@ -29,5 +29,35 @@
   "realtimeValue": {
     "on": "Attivo",
     "off": "Disattivo"
+  },
+  "audioRating": "Audio: {{rating}}",
+  "rating": {
+    "good": "Buono",
+    "fair": "Discreto",
+    "poor": "Scarso"
+  },
+  "reason": {
+    "good_one": "Nessun problema nell’ultimo minuto",
+    "good_many": "Nessun problema negli ultimi {{count}} minuti",
+    "good_other": "Nessun problema negli ultimi {{count}} minuti",
+    "network": "Parte della voce degli altri è stata mascherata: perdita di rete",
+    "cpu": "L’elaborazione del tuo audio è in ritardo: carico CPU elevato",
+    "device": "Il tuo dispositivo audio ha avuto interruzioni"
+  },
+  "details": "Dettagli",
+  "sinceConnected": "Contatori dalla connessione. Grafici: ultimi {{minutes}} min.",
+  "about": "Informazioni su {{label}}",
+  "help": {
+    "dropouts": "Vuoti quando il dispositivo audio non è riuscito a stare al passo (overrun, underrun o riavvii). Normale: 0.",
+    "late": "Frame audio elaborati in ritardo dal computer, di solito per un carico CPU elevato. Normale: 0 o quasi.",
+    "concealed": "Frame vocali degli altri non arrivati in tempo, quindi il client ha riempito il vuoto. Causa: perdita di rete. Normale: quasi 0.",
+    "jitter": "Ritardo che compensa i pacchetti vocali degli altri che arrivano in modo irregolare. Normale: 20–60 ms.",
+    "processing": "Tempo per elaborare un frame di 10 ms del tuo microfono. Normale: ben sotto i 10 ms.",
+    "realtime": "Indica se i thread audio ricevono priorità in tempo reale dal sistema. Attivo aiuta a evitare interruzioni sotto carico."
+  },
+  "recent": {
+    "perMinute": "Ultimi {{minutes}} min: {{value}} al minuto.",
+    "concealedShare": "Ultimi {{minutes}} min: {{value}} % dei frame ricevuti.",
+    "processingMax": "Ultimi {{minutes}} min: max {{value}} ms su {{budget}} ms per frame."
   }
 }

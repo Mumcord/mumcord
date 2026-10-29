@@ -29,5 +29,36 @@
   "realtimeValue": {
     "on": "Įjungta",
     "off": "Išjungta"
+  },
+  "audioRating": "Garsas: {{rating}}",
+  "rating": {
+    "good": "Geras",
+    "fair": "Vidutinis",
+    "poor": "Prastas"
+  },
+  "reason": {
+    "good_one": "Per paskutinę {{count}} minutę problemų nebuvo",
+    "good_few": "Per paskutines {{count}} minutes problemų nebuvo",
+    "good_many": "Per paskutines {{count}} minutės problemų nebuvo",
+    "good_other": "Per paskutines {{count}} minučių problemų nebuvo",
+    "network": "Dalis kitų balso buvo užmaskuota: tinklo nuostoliai",
+    "cpu": "Jūsų garso apdorojimas vėluoja: didelė procesoriaus apkrova",
+    "device": "Jūsų garso įrenginys trūkinėjo"
+  },
+  "details": "Išsami informacija",
+  "sinceConnected": "Skaitikliai nuo prisijungimo. Grafikai: paskutinės {{minutes}} min.",
+  "about": "Apie: {{label}}",
+  "help": {
+    "dropouts": "Trūkiai, kai garso įrenginys nespėjo (perpildymas, nepakankamas užpildymas ar paleidimas iš naujo). Įprasta: 0.",
+    "late": "Garso kadrai, kuriuos kompiuteris apdorojo per vėlai, dažniausiai dėl didelės procesoriaus apkrovos. Įprasta: 0 ar beveik 0.",
+    "concealed": "Kitų balso kadrai, kurie neatkeliavo laiku, todėl programa užpildė spragą. Priežastis: tinklo nuostoliai. Įprasta: beveik 0.",
+    "jitter": "Delsa, išlyginanti netolygiai ateinančius kitų balso paketus. Įprasta: 20–60 ms.",
+    "processing": "Laikas vienam 10 ms mikrofono kadrui apdoroti. Įprasta: gerokai mažiau nei 10 ms.",
+    "realtime": "Ar garso gijos gauna realaus laiko prioritetą iš sistemos. Įjungta padeda išvengti trūkių esant apkrovai."
+  },
+  "recent": {
+    "perMinute": "Paskutinės {{minutes}} min: {{value}} per minutę.",
+    "concealedShare": "Paskutinės {{minutes}} min: {{value}} % gautų kadrų.",
+    "processingMax": "Paskutinės {{minutes}} min: daugiausia {{value}} ms iš {{budget}} ms kadro biudžeto."
   }
 }

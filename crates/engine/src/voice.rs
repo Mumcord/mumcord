@@ -32,6 +32,7 @@ use mumcord_protocol::{OutgoingAudio, VoiceTransport};
 use tokio::runtime::Handle as Runtime;
 use tokio::task::JoinHandle as TaskHandle;
 
+use crate::audio_rating::HealthHistory;
 use crate::positional::PositionalShared;
 use crate::screen_share::sound::ShareSoundHub;
 use crate::session::batch::TalkBatch;
@@ -251,7 +252,8 @@ pub(crate) struct VoiceShared {
     pub packets_received: AtomicU64,
     /// Time the capture thread needs per 10 ms frame (DSP chain and Opus encoder).
     pub capture_time: FrameTime,
-    /// Frames the capture thread read with more than [`CAPTURE_LATE_SAMPLES`] still queued.
+    /// Frames the capture thread read with more than [`CAPTURE_LATE_SAMPLES`] still queued while
+    /// sending (a backlog while the gate is closed delays nothing anyone hears).
     pub capture_late_frames: AtomicU64,
     /// Voice threads (capture, playback) running with real-time scheduling.
     pub realtime_threads: AtomicU32,
@@ -332,6 +334,7 @@ pub(crate) struct VoicePipeline {
     shared: Arc<VoiceShared>,
     /// Device counters when the pipeline started; the connection info shows what happened since.
     io_base: IoStats,
+    health: HealthHistory,
 }
 
 impl VoicePipeline {
@@ -446,6 +449,7 @@ impl VoicePipeline {
                 sounds,
                 shared: pipeline_shared,
                 io_base,
+                health: HealthHistory::new(Instant::now()),
             },
             ports.packets,
         ))
@@ -453,6 +457,20 @@ impl VoicePipeline {
 
     pub fn playback_stats(&self) -> PlaybackStats {
         self.playback.stats()
+    }
+
+    /// Worst mixing time of one frame since the previous call, in µs.
+    pub fn take_recent_mix_max_us(&self) -> u64 {
+        self.playback.take_recent_mix_max_us()
+    }
+
+    /// History of the health counters behind the audio rating.
+    pub fn health(&self) -> &HealthHistory {
+        &self.health
+    }
+
+    pub fn health_mut(&mut self) -> &mut HealthHistory {
+        &mut self.health
     }
 
     /// Device counters at the start of this pipeline.
@@ -545,9 +563,6 @@ fn capture_loop(
             continue;
         }
         let queued = source.queued_samples();
-        if queued > CAPTURE_LATE_SAMPLES {
-            shared.capture_late_frames.fetch_add(1, Ordering::Relaxed);
-        }
         let started = Instant::now();
         let target = shared.bitrate_bps.load(Ordering::Relaxed);
         if target != bitrate && encoder.set_bitrate(target as i32).is_ok() {
@@ -571,6 +586,9 @@ fn capture_loop(
 
         let gate = chain.process(&input, &mut output);
         let open = gate == Gate::Open && !shared.muted.load(Ordering::Relaxed);
+        if capture_frame_late(queued, open || sending) {
+            shared.capture_late_frames.fetch_add(1, Ordering::Relaxed);
+        }
         if open {
             sending = true;
             if let Ok(Some(len)) = encoder.push_frame(&output, &mut packet) {
@@ -598,6 +616,12 @@ fn capture_loop(
         }
     }
     source
+}
+
+/// Whether a capture frame read with `queued` samples behind it counts as late. A backlog only
+/// delays audio while it is sent; while the gate is closed nobody hears it.
+fn capture_frame_late(queued: usize, transmitting: bool) -> bool {
+    transmitting && queued > CAPTURE_LATE_SAMPLES
 }
 
 /// Real-time scheduling for a voice thread, so a loaded CPU does not delay its frames (issue
@@ -663,5 +687,16 @@ mod tests {
         assert!((meter_level(-30.0) - 0.5).abs() < 1e-6);
         assert_eq!(meter_level(0.0), 1.0);
         assert_eq!(meter_level(3.0), 1.0);
+    }
+
+    #[test]
+    fn capture_backlog_counts_only_while_sending() {
+        let backlog = CAPTURE_LATE_SAMPLES + 1;
+        assert!(capture_frame_late(backlog, true));
+        assert!(
+            !capture_frame_late(backlog, false),
+            "idle silence is not heard"
+        );
+        assert!(!capture_frame_late(CAPTURE_LATE_SAMPLES, true));
     }
 }

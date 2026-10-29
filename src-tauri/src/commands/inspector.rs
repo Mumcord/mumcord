@@ -13,6 +13,7 @@ use specta::Type;
 use tauri::{AppHandle, State};
 use tauri_specta::Event;
 
+use super::session::AudioRatingLabel;
 use super::types::{ApiError, ApiResult, ErrorCode, ServerId, SessionId, to_api_server_id};
 
 #[derive(Serialize, Deserialize, Clone, Copy, Debug, PartialEq, Eq, Type)]
@@ -77,6 +78,8 @@ pub struct VoiceCounter {
     pub server_id: ServerId,
     pub sent: u32,
     pub received: u32,
+    /// Audio rating on the server with the voice pipeline (issue #152); `null` elsewhere.
+    pub rating: Option<AudioRatingLabel>,
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Type)]
@@ -132,6 +135,10 @@ impl From<VoiceCount> for VoiceCounter {
             server_id: to_api_server_id(v.server_id),
             sent: saturate(v.sent),
             received: saturate(v.received),
+            rating: v.rating.map(|(rating, issue)| AudioRatingLabel {
+                rating: rating.into(),
+                issue: issue.map(Into::into),
+            }),
         }
     }
 }

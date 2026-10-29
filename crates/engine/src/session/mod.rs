@@ -45,6 +45,7 @@ pub use channel_password::ChannelPasswordState;
 pub use machine::MAX_RECONNECT_ATTEMPTS;
 pub use types::*;
 
+use crate::audio_rating::AudioRatingView;
 use crate::friends::FriendHub;
 use crate::people::{self, People};
 use crate::sounds::SoundHub;
@@ -280,7 +281,7 @@ impl Core {
         let io = self.audio.as_ref()?.io().stats();
         let base = pipeline.io_base();
         let playback = pipeline.playback_stats();
-        Some(AudioHealthView {
+        let mut view = AudioHealthView {
             device_xruns: io.device_xruns.saturating_sub(base.device_xruns),
             stream_restarts: io.stream_restarts.saturating_sub(base.stream_restarts),
             capture_overruns: io.capture_overruns.saturating_sub(base.capture_overruns),
@@ -297,7 +298,28 @@ impl Core {
             mix_time_avg_us: playback.mix_time_avg_us,
             mix_time_max_us: playback.mix_time_max_us,
             realtime_threads: voice.realtime_threads.load(Ordering::Relaxed),
-        })
+            received_frames: playback.received_frames,
+            rating: AudioRatingView::default(),
+        };
+        view.rating = pipeline.health().rate(Instant::now(), view.totals());
+        Some(view)
+    }
+
+    /// Adds the current counters to the rating's history; called about once a second.
+    fn sample_audio_health(&mut self, voice: &VoiceShared) {
+        let Some(totals) = self.audio_health(voice).map(|a| a.totals()) else {
+            return;
+        };
+        let Some(pipeline) = self.pipeline.as_mut() else {
+            return;
+        };
+        let processing_max_us = voice
+            .capture_time
+            .take_recent_max_us()
+            .max(pipeline.take_recent_mix_max_us());
+        pipeline
+            .health_mut()
+            .sample(Instant::now(), totals, processing_max_us);
     }
 
     fn session(&self, server_id: ServerId) -> EngineResult<&Session> {
@@ -1175,10 +1197,15 @@ impl Engine {
                 .keys()
                 .filter_map(|&server_id| {
                     let stats = core.session(server_id).ok()?.transport.as_ref()?.stats();
+                    let rating = (core.audio_server == Some(server_id))
+                        .then(|| core.audio_health(&self.inner.voice))
+                        .flatten()
+                        .map(|a| (a.rating.rating, a.rating.issue));
                     Some(crate::inspector::VoiceCount {
                         server_id,
                         sent: stats.audio_sent,
                         received: stats.audio_received,
+                        rating,
                     })
                 })
                 .collect()
@@ -1937,6 +1964,7 @@ impl Inner {
                     crate::screen_share::on_tick(&self.screen_shares, &self.mumcord, &ctx);
                     let audio = self.is_audio_server(server_id);
                     if audio {
+                        lock(&self.core).sample_audio_health(&self.voice);
                         for session in self.positional.expire(Instant::now()) {
                             ctx.events.emit(EngineEvent::PositionalSendingChanged {
                                 session,

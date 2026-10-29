@@ -106,10 +106,14 @@ pub struct MixerStats {
     /// Packets dropped because all speaker slots were busy.
     pub packets_no_slot: u64,
     pub late_packets: u64,
-    /// Lost or late 10 ms frames rebuilt by FEC or concealment.
+    /// Lost or late 10 ms frames rebuilt by FEC or concealment while a stream was active.
     pub concealed_frames: u64,
-    /// Largest jitter-buffer target delay of the speakers playing in the last mixed frame, in ms
-    /// (0 while nobody talks).
+    /// 10 ms frames decoded from received packets; with `concealed_frames` the share of
+    /// received voice that had to be rebuilt.
+    pub received_frames: u64,
+    /// Largest jitter-buffer target delay of the speakers playing, in ms. Kept from the last
+    /// stream while nobody talks, so a reading between bursts still shows the buffer in use
+    /// (0 only before anyone talked).
     pub jitter_delay_ms: u64,
 }
 
@@ -149,6 +153,7 @@ struct Speaker {
     /// Stats already folded into the mixer totals.
     counted_late: u64,
     counted_concealed: u64,
+    counted_decoded: u64,
 }
 
 pub struct Mixer {
@@ -177,6 +182,7 @@ impl Mixer {
                     released: false,
                     counted_late: 0,
                     counted_concealed: 0,
+                    counted_decoded: 0,
                 })
             })
             .collect::<Result<_, CodecError>>()?;
@@ -245,7 +251,8 @@ impl Mixer {
 
     /// Mixes the next 10 ms into `left`/`right`. `mix_in` is added unscaled to
     /// both after the speakers (notification sounds, mic-test loopback).
-    /// Talking changes are reported through `on_event`.
+    /// Talking changes are reported through `on_event`. Returns whether the frame carries sound
+    /// (a voice or mix-in), as opposed to the silence played while nobody talks.
     pub fn mix(
         &mut self,
         left: &mut Frame,
@@ -253,11 +260,12 @@ impl Mixer {
         mix_in: Option<&Frame>,
         now_ms: u64,
         on_event: &mut dyn FnMut(TalkEvent),
-    ) {
+    ) -> bool {
         left.fill(0.0);
         right.fill(0.0);
         let listener = self.listener.as_ref().and_then(|l| l.state());
-        let mut jitter_delay_ms = 0;
+        let mut jitter_delay_ms = None;
+        let mut audible = mix_in.is_some();
         for idx in 0..self.speakers.len() {
             let Some(session) = self.speakers[idx].session else {
                 continue;
@@ -279,7 +287,9 @@ impl Mixer {
             if pull == Pull::Silent {
                 speaker.spatial.silence();
             } else {
-                jitter_delay_ms = jitter_delay_ms.max(speaker.jitter.target_delay_ms());
+                audible = true;
+                let delay = speaker.jitter.target_delay_ms();
+                jitter_delay_ms = Some(jitter_delay_ms.map_or(delay, |d: u64| d.max(delay)));
                 let placement = match (&listener, speaker.position) {
                     (Some(l), Some(p)) => Placement::at(l, p),
                     _ => Placement::CENTER,
@@ -299,10 +309,14 @@ impl Mixer {
             let concealed = stats.concealed_frames + stats.fec_frames;
             self.stats.late_packets += stats.late_packets - speaker.counted_late;
             self.stats.concealed_frames += concealed - speaker.counted_concealed;
+            self.stats.received_frames += stats.decoded_frames - speaker.counted_decoded;
             speaker.counted_late = stats.late_packets;
             speaker.counted_concealed = concealed;
+            speaker.counted_decoded = stats.decoded_frames;
         }
-        self.stats.jitter_delay_ms = jitter_delay_ms;
+        if let Some(delay) = jitter_delay_ms {
+            self.stats.jitter_delay_ms = delay;
+        }
         if let Some(extra) = mix_in {
             for ((l, r), e) in left.iter_mut().zip(right.iter_mut()).zip(extra.iter()) {
                 *l += e;
@@ -310,6 +324,7 @@ impl Mixer {
             }
         }
         self.limit(left, right);
+        audible
     }
 
     fn target_gain(&self, idx: usize, session: u32) -> f32 {
@@ -372,6 +387,7 @@ impl Mixer {
         speaker.spatial.reset();
         speaker.counted_late = 0;
         speaker.counted_concealed = 0;
+        speaker.counted_decoded = 0;
         Some(idx)
     }
 
@@ -389,6 +405,7 @@ impl Mixer {
         speaker.jitter.reset();
         speaker.counted_late = 0;
         speaker.counted_concealed = 0;
+        speaker.counted_decoded = 0;
     }
 
     /// Peak limiter linked over both channels (instant attack, ramped within

@@ -1,37 +1,16 @@
 import { useEffect, useId, useRef, useState } from "react";
-import type { TFunction } from "i18next";
 import { useTranslation } from "react-i18next";
-import type { AudioHealth, ConnectionStats } from "../../bindings/commands";
+import type { ConnectionStats } from "../../bindings/commands";
+import { windowMinutes } from "./audioHealth";
+import { AudioHealthDetails } from "./AudioHealthDetails";
+import { AudioHealthRating } from "./AudioHealthRating";
 import { useConnectionStats } from "./useConnectionStats";
 import "./connection.css";
 
 const SIGNAL = "M4 20v-3M9 20v-7M14 20v-11M19 20V4";
 
-/** Rows of the local audio path's health (issue #123); rising counts point at the cause. */
-function audioRows(audio: AudioHealth, t: TFunction<"connection">, language: string) {
-  const ms = new Intl.NumberFormat(language, {
-    minimumFractionDigits: 1,
-    maximumFractionDigits: 1,
-  });
-  const rows: [string, string][] = [
-    [t("audioDropouts"), String(audio.dropouts)],
-    [t("audioLate"), String(audio.lateFrames)],
-    [t("audioConcealed"), String(audio.concealedFrames)],
-    [t("jitterBuffer"), t("latencyValue", { value: audio.jitterBufferMs })],
-    [
-      t("audioProcessing"),
-      t("audioProcessingValue", {
-        avg: ms.format(audio.processingAvgUs / 1000),
-        max: ms.format(audio.processingMaxUs / 1000),
-      }),
-    ],
-    [t("realtimeAudio"), t(audio.realtime ? "realtimeValue.on" : "realtimeValue.off")],
-  ];
-  return rows;
-}
-
 function StatsList({ stats }: { stats: ConnectionStats }) {
-  const { t, i18n } = useTranslation("connection");
+  const { t } = useTranslation("connection");
   const rows: [string, string][] = [
     [t("transport"), stats.transport ? t(`transportValue.${stats.transport}`) : t("none")],
     [
@@ -47,17 +26,28 @@ function StatsList({ stats }: { stats: ConnectionStats }) {
         : t("bitrateValue", { value: stats.serverMaxBandwidthKbps }),
     ],
     [t("packets"), t("packetsValue", { sent: stats.packetsSent, received: stats.packetsReceived })],
-    ...(stats.audio ? audioRows(stats.audio, t, i18n.language) : []),
   ];
   return (
-    <dl className="connection-info__list">
-      {rows.map(([label, value]) => (
-        <div key={label} className="connection-info__row">
-          <dt>{label}</dt>
-          <dd>{value}</dd>
-        </div>
-      ))}
-    </dl>
+    <>
+      <dl className="connection-info__list">
+        {rows.map(([label, value]) => (
+          <div key={label} className="connection-info__row">
+            <dt>{label}</dt>
+            <dd>{value}</dd>
+          </div>
+        ))}
+      </dl>
+      {stats.audio ? (
+        <>
+          <AudioHealthRating
+            rating={stats.audio.rating}
+            issue={stats.audio.issue}
+            minutes={windowMinutes(stats.audio.windowSecs)}
+          />
+          <AudioHealthDetails audio={stats.audio} />
+        </>
+      ) : null}
+    </>
   );
 }
 

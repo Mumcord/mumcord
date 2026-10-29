@@ -1,3 +1,4 @@
+export { AudioRatingBadge } from "./AudioHealthRating";
 export { ConnectionInfo } from "./ConnectionInfo";
 export { ConnectionQuality } from "./ConnectionQuality";
 export { UserStatsWatcher } from "./UserStatsWatcher";
