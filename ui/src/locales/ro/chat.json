@@ -228,5 +228,15 @@
     "open": "Deschide",
     "openLabel": "Deschide {{title}} în browser",
     "imageLink": "Imagine: {{url}}"
+  },
+  "codeBlock": {
+    "copy": "Copiază codul",
+    "copied": "Copiat",
+    "copyFailed": "Codul nu a putut fi copiat.",
+    "download": "Descarcă codul",
+    "saved": "Salvat",
+    "saveFailed": "Codul nu a putut fi salvat.",
+    "tooLarge": "Codul este prea mare pentru a fi descărcat.",
+    "fileType": "Fișier de cod"
   }
 }

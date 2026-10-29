@@ -232,5 +232,15 @@
     "open": "Otevřít",
     "openLabel": "Otevřít {{title}} v prohlížeči",
     "imageLink": "Obrázek: {{url}}"
+  },
+  "codeBlock": {
+    "copy": "Kopírovat kód",
+    "copied": "Zkopírováno",
+    "copyFailed": "Kód se nepodařilo zkopírovat.",
+    "download": "Stáhnout kód",
+    "saved": "Uloženo",
+    "saveFailed": "Kód se nepodařilo uložit.",
+    "tooLarge": "Kód je příliš velký ke stažení.",
+    "fileType": "Soubor s kódem"
   }
 }

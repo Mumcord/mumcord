@@ -110,6 +110,8 @@ export const commands = {
 	 *  already in the UI, so nothing is fetched again.
 	 */
 	saveImage: (path: string, dataUrl: string) => typedError<null, ApiError>(__TAURI_INVOKE("save_image", { path, dataUrl })),
+	/**  Writes text the UI already has to `path` (a chat code block's "Download", issue #111). */
+	saveText: (path: string, contents: string) => typedError<null, ApiError>(__TAURI_INVOKE("save_text", { path, contents })),
 	/**
 	 *  Reads an image file that was just dropped onto the window (once per drop). Fails with
 	 *  `notFound` for any other path, `messageTooLarge` above 25 MB and `invalidInput` when the
@@ -122,6 +124,12 @@ export const commands = {
 	 *  valid UTF-8 are skipped: the UI could not hand them back unchanged.
 	 */
 	clipboardFiles: () => typedError<string[], ApiError>(__TAURI_INVOKE("clipboard_files")),
+	/**
+	 *  The image data copied to the clipboard, for a paste the webview cannot hand over (issue
+	 *  #110); `null` when the clipboard holds none. Fails with `messageTooLarge` above 25 MB and
+	 *  `invalidInput` when the data is not a PNG image.
+	 */
+	clipboardImage: () => typedError<DroppedImage | null, ApiError>(__TAURI_INVOKE("clipboard_image")),
 	/**
 	 *  Keeps the full image of a picture about to be sent (the original file as a `data:` URL;
 	 *  re-encoded when larger than 512 KiB or 3840 px) and returns the reference to put into the

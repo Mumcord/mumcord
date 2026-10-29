@@ -67,22 +67,72 @@ purifier.addHook("uponSanitizeAttribute", (_node, data) => {
   if (kept.length === 0) data.keepAttr = false;
 });
 
-function highlighted(text: string): string | null {
-  const result = hljs.highlightAuto(text, SUBSET);
-  if (result.relevance < MIN_RELEVANCE) return null;
-  return purifier.sanitize(result.value, { ALLOWED_TAGS: ["span"], ALLOWED_ATTR: ["class"] });
+/** Class of the wrapper around every code block; its copy and download buttons go in there. */
+export const CODE_BLOCK_CLASS = "chat-code";
+
+/** File extensions of the highlighted languages, for downloading a block. */
+const EXTENSIONS: Record<string, string> = {
+  bash: "sh",
+  c: "c",
+  cpp: "cpp",
+  csharp: "cs",
+  css: "css",
+  diff: "diff",
+  go: "go",
+  ini: "ini",
+  java: "java",
+  javascript: "js",
+  json: "json",
+  python: "py",
+  rust: "rs",
+  sql: "sql",
+  typescript: "ts",
+  xml: "xml",
+  yaml: "yaml",
+};
+
+/** The file extension for code in `language`; `txt` when the language is unknown. */
+export function extensionFor(language: string | undefined): string {
+  return (language !== undefined && EXTENSIONS[language]) || "txt";
 }
 
-/** Adds syntax colors to every `<code>` in already sanitized message HTML. */
+interface Highlighted {
+  html: string;
+  language: string | undefined;
+}
+
+function highlighted(text: string): Highlighted | null {
+  const result = hljs.highlightAuto(text, SUBSET);
+  if (result.relevance < MIN_RELEVANCE) return null;
+  const html = purifier.sanitize(result.value, { ALLOWED_TAGS: ["span"], ALLOWED_ATTR: ["class"] });
+  return { html, language: result.language };
+}
+
+/**
+ * Adds syntax colors to every `<code>` in already sanitized message HTML and wraps every `<pre>`
+ * in a {@link CODE_BLOCK_CLASS} block. The wrapper keeps the buttons in place while the code
+ * scrolls sideways; its `data-language` (the detected language) names the downloaded file.
+ */
 export function highlightCode(sanitizedHtml: string): string {
-  if (!sanitizedHtml.includes("<code")) return sanitizedHtml;
+  if (!sanitizedHtml.includes("<code") && !sanitizedHtml.includes("<pre")) return sanitizedHtml;
   const template = document.createElement("template");
   template.innerHTML = sanitizedHtml;
+  const languages = new Map<Element, string>();
   for (const code of template.content.querySelectorAll("code")) {
-    const html = highlighted(code.textContent);
-    if (html === null) continue;
-    code.innerHTML = html;
+    const result = highlighted(code.textContent);
+    if (result === null) continue;
+    code.innerHTML = result.html;
     code.classList.add("hljs");
+    if (result.language !== undefined) languages.set(code, result.language);
+  }
+  for (const pre of template.content.querySelectorAll("pre")) {
+    const block = document.createElement("div");
+    block.className = CODE_BLOCK_CLASS;
+    const code = pre.querySelector(":scope > code");
+    const language = code === null ? undefined : languages.get(code);
+    if (language !== undefined) block.dataset["language"] = language;
+    pre.replaceWith(block);
+    block.append(pre);
   }
   return template.innerHTML;
 }

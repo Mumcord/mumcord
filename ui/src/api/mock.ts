@@ -1484,11 +1484,13 @@ export function createMockApi(options: MockOptions = {}): MockApi {
       return Promise.resolve(null);
     },
     saveImage: () => Promise.resolve(null),
+    saveText: () => Promise.resolve(null),
     // The browser has no native file drops; dropped files arrive as `File` objects instead.
     readDroppedImage: () =>
       Promise.reject(new EngineError("notFound", "no native file drops in the mock")),
     // Browsers hand pasted files to the page themselves; there is no native clipboard to read.
     clipboardFiles: () => Promise.resolve([]),
+    clipboardImage: () => Promise.resolve(null),
     // Full images (FR-1.60c): kept originals are "fetched" back at once, with one progress event.
     fullImageKeep: (dataUrl) => {
       if (!settings.offerFullImages)

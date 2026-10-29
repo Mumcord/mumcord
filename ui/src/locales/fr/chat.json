@@ -228,5 +228,15 @@
     "open": "Ouvrir",
     "openLabel": "Ouvrir {{title}} dans le navigateur",
     "imageLink": "Image : {{url}}"
+  },
+  "codeBlock": {
+    "copy": "Copier le code",
+    "copied": "Copié",
+    "copyFailed": "Impossible de copier le code.",
+    "download": "Télécharger le code",
+    "saved": "Enregistré",
+    "saveFailed": "Impossible d’enregistrer le code.",
+    "tooLarge": "Le code est trop volumineux pour être téléchargé.",
+    "fileType": "Fichier de code"
   }
 }

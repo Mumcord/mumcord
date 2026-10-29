@@ -122,6 +122,22 @@ pub async fn save_image(path: String, data_url: String) -> ApiResult<()> {
     std::fs::write(&path, bytes).map_err(|err| ApiError::new(ErrorCode::Io, err.to_string()))
 }
 
+/// Largest text `save_text` writes; matches the UI's limit for downloading a code block.
+const MAX_TEXT_BYTES: usize = 1024 * 1024;
+
+/// Writes text the UI already has to `path` (a chat code block's "Download", issue #111).
+#[tauri::command]
+#[specta::specta]
+pub fn save_text(path: String, contents: String) -> ApiResult<()> {
+    if contents.len() > MAX_TEXT_BYTES {
+        return Err(ApiError::new(
+            ErrorCode::InvalidInput,
+            "text too large to save",
+        ));
+    }
+    std::fs::write(&path, contents).map_err(|err| ApiError::new(ErrorCode::Io, err.to_string()))
+}
+
 /// The bytes of a base64 `data:image/...` URL; anything else is rejected.
 pub(crate) fn decode_image_data_url(data_url: &str) -> Result<Vec<u8>, ApiError> {
     use base64::Engine as _;
@@ -135,7 +151,7 @@ pub(crate) fn decode_image_data_url(data_url: &str) -> Result<Vec<u8>, ApiError>
 
 #[cfg(test)]
 mod tests {
-    use super::{decode_image_data_url, rfc3339};
+    use super::{MAX_TEXT_BYTES, decode_image_data_url, rfc3339, save_text};
 
     #[test]
     fn formats_rfc3339() {
@@ -153,5 +169,20 @@ mod tests {
         assert!(decode_image_data_url("data:text/html;base64,AQID").is_err());
         assert!(decode_image_data_url("https://example.com/a.png").is_err());
         assert!(decode_image_data_url("data:image/png;base64,***").is_err());
+    }
+
+    #[test]
+    fn saves_text_up_to_the_limit() {
+        let dir = std::env::temp_dir().join(format!("mumcord-save-text-{}", std::process::id()));
+        std::fs::create_dir_all(&dir).expect("temp dir");
+        let path = dir.join("snippet.sql");
+        let path_text = path.to_string_lossy().into_owned();
+        save_text(path_text.clone(), "SELECT 1;\n".into()).expect("small text is saved");
+        assert_eq!(
+            std::fs::read_to_string(&path).expect("saved file"),
+            "SELECT 1;\n"
+        );
+        assert!(save_text(path_text, "x".repeat(MAX_TEXT_BYTES + 1)).is_err());
+        std::fs::remove_dir_all(&dir).expect("remove temp dir");
     }
 }

@@ -224,5 +224,15 @@
     "open": "Megnyitás",
     "openLabel": "{{title}} megnyitása a böngészőben",
     "imageLink": "Kép: {{url}}"
+  },
+  "codeBlock": {
+    "copy": "Kód másolása",
+    "copied": "Másolva",
+    "copyFailed": "Nem sikerült a kódot másolni.",
+    "download": "Kód letöltése",
+    "saved": "Mentve",
+    "saveFailed": "Nem sikerült a kódot menteni.",
+    "tooLarge": "A kód túl nagy a letöltéshez.",
+    "fileType": "Kódfájl"
   }
 }

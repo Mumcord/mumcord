@@ -236,5 +236,15 @@
     "open": "Iftaħ",
     "openLabel": "Iftaħ {{title}} fil-browser",
     "imageLink": "Immaġni: {{url}}"
+  },
+  "codeBlock": {
+    "copy": "Ikkopja l-kodiċi",
+    "copied": "Ikkupjat",
+    "copyFailed": "Il-kodiċi ma setax jiġi kkupjat.",
+    "download": "Niżżel il-kodiċi",
+    "saved": "Issejvjat",
+    "saveFailed": "Il-kodiċi ma setax jiġi ssejvjat.",
+    "tooLarge": "Il-kodiċi huwa kbir wisq biex jitniżżel.",
+    "fileType": "Fajl tal-kodiċi"
   }
 }

@@ -224,5 +224,15 @@
     "open": "Öppna",
     "openLabel": "Öppna {{title}} i webbläsaren",
     "imageLink": "Bild: {{url}}"
+  },
+  "codeBlock": {
+    "copy": "Kopiera kod",
+    "copied": "Kopierad",
+    "copyFailed": "Koden kunde inte kopieras.",
+    "download": "Ladda ner kod",
+    "saved": "Sparad",
+    "saveFailed": "Koden kunde inte sparas.",
+    "tooLarge": "Koden är för stor för att laddas ner.",
+    "fileType": "Kodfil"
   }
 }

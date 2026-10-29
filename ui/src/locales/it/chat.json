@@ -228,5 +228,15 @@
     "open": "Apri",
     "openLabel": "Apri {{title}} nel browser",
     "imageLink": "Immagine: {{url}}"
+  },
+  "codeBlock": {
+    "copy": "Copia codice",
+    "copied": "Copiato",
+    "copyFailed": "Impossibile copiare il codice.",
+    "download": "Scarica codice",
+    "saved": "Salvato",
+    "saveFailed": "Impossibile salvare il codice.",
+    "tooLarge": "Il codice è troppo grande per essere scaricato.",
+    "fileType": "File di codice"
   }
 }

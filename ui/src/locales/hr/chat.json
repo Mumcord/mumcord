@@ -228,5 +228,15 @@
     "open": "Otvori",
     "openLabel": "Otvori {{title}} u pregledniku",
     "imageLink": "Slika: {{url}}"
+  },
+  "codeBlock": {
+    "copy": "Kopiraj kôd",
+    "copied": "Kopirano",
+    "copyFailed": "Kôd nije moguće kopirati.",
+    "download": "Preuzmi kôd",
+    "saved": "Spremljeno",
+    "saveFailed": "Kôd nije moguće spremiti.",
+    "tooLarge": "Kôd je prevelik za preuzimanje.",
+    "fileType": "Datoteka s kôdom"
   }
 }
