@@ -169,7 +169,14 @@ describe("themes (AC-2.12 – AC-2.16)", function () {
         timeoutMsg: "the share message did not reach the system clipboard",
       });
       const shared = await readClipboard("text");
-      await box.setValue(shared);
+      // setValue types key by key and loses the capital letters of the code; fill the field whole.
+      await browser.execute((text: string) => {
+        const field = document.querySelector<HTMLTextAreaElement>("textarea[aria-label^='Message']");
+        if (!field) throw new Error("no composer");
+        const setter = Object.getOwnPropertyDescriptor(HTMLTextAreaElement.prototype, "value")?.set;
+        setter?.call(field, text);
+        field.dispatchEvent(new Event("input", { bubbles: true }));
+      }, shared);
       code = shared.match(/mct1\.[A-Za-z0-9_-]+/)?.[0] ?? "";
       expect(code.length).toBeGreaterThan(20);
       expect(code.length).toBeLessThanOrEqual(2048);
