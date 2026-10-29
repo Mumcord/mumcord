@@ -1,0 +1,164 @@
+name: Post-release sync
+
+# Releases are built from the tag with the version set at build time (scripts/set-version.sh), so
+# nothing writes the released version back to main. After a release is published, this workflow
+# commits that version (manifests and lock files), the finalised CHANGELOG.md (release date, empty
+# Unreleased section; scripts/finalise-changelog.sh) and the regenerated third-party notices on the
+# pull request "chore: sync version X.Y.Z and third-party notices" from the branch
+# chore/sync-version-X.Y.Z; main is protected, so it never pushes there. It runs on "published"
+# rather than when the Release workflow succeeds: that workflow only creates a draft, and a draft
+# the maintainer discards must not change main. Pre-releases (a tag with '-') are not synced.
+#
+# A pull request opened with the workflow token starts no workflows by itself, so this workflow
+# starts CI and E2E on the branch (workflow_dispatch), like notices.yml does; their checks land on
+# the pull request's head commit, which is what the required checks look at. Opening the pull
+# request needs the repository setting "Allow GitHub Actions to create and approve pull requests";
+# without it the branch is still pushed and the run shows a warning with a link to open it by hand.
+#
+# It owns the same two notices files as notices.yml: it closes an open notices pull request (this
+# one contains fresh notices), and notices.yml skips while a sync pull request is open.
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Released version to sync, e.g. 0.4.3"
+        required: true
+        type: string
+
+# One sync at a time; a running one is never cancelled half-way through pushing.
+concurrency:
+  group: post-release
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+  pull-requests: write
+  # Starts CI and E2E on the branch.
+  actions: write
+
+jobs:
+  sync:
+    name: Sync version and notices
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    env:
+      GH_TOKEN: ${{ github.token }}
+      VERSION_INPUT: ${{ inputs.version || github.event.release.tag_name }}
+    steps:
+      - name: Check version
+        id: version
+        run: |
+          version=${VERSION_INPUT#v}
+          if [[ ! "$version" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "'$VERSION_INPUT' is not a release version like 1.2.3 (pre-releases are not synced); nothing to do."
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          echo "skip=false" >> "$GITHUB_OUTPUT"
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+
+      - uses: actions/checkout@v7
+        if: steps.version.outputs.skip == 'false'
+        with:
+          # A release event would check out the tag.
+          ref: main
+
+      - name: Skip an older release
+        id: current
+        if: steps.version.outputs.skip == 'false'
+        env:
+          VERSION: ${{ steps.version.outputs.version }}
+        run: |
+          current=$(node -p 'require("./package.json").version')
+          newest=$(printf '%s\n%s\n' "$current" "$VERSION" | sort -V | tail -n 1)
+          if [[ "$current" != "$VERSION" && "$newest" == "$current" ]]; then
+            echo "main is already at $current, newer than $VERSION; nothing to do."
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "skip=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Read tool versions
+        id: tools
+        if: steps.current.outputs.skip == 'false'
+        run: grep '^[A-Z_]*=' scripts/license-tools.env >> "$GITHUB_OUTPUT"
+
+      - uses: dtolnay/rust-toolchain@stable
+        if: steps.current.outputs.skip == 'false'
+
+      - uses: ./.github/actions/cargo-tool
+        if: steps.current.outputs.skip == 'false'
+        with:
+          crate: cargo-about
+          version: ${{ steps.tools.outputs.CARGO_ABOUT_VERSION }}
+          features: cli
+
+      - uses: actions/setup-node@v7
+        if: steps.current.outputs.skip == 'false'
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Install npm dependencies
+        if: steps.current.outputs.skip == 'false'
+        run: npm ci
+
+      - name: Set version
+        if: steps.current.outputs.skip == 'false'
+        run: scripts/set-version.sh "${{ steps.version.outputs.version }}"
+
+      # The release date is the tag's date (the tagger's for an annotated tag).
+      - name: Finalise changelog
+        if: steps.current.outputs.skip == 'false'
+        env:
+          VERSION: ${{ steps.version.outputs.version }}
+        run: |
+          git fetch --no-tags --depth=1 origin "refs/tags/v$VERSION:refs/tags/v$VERSION"
+          date=$(git for-each-ref "refs/tags/v$VERSION" --format='%(creatordate:short)')
+          scripts/finalise-changelog.sh "$VERSION" "$date"
+
+      - name: Generate notices
+        if: steps.current.outputs.skip == 'false'
+        run: scripts/generate-notices.sh
+
+      - name: Open or update the pull request
+        if: steps.current.outputs.skip == 'false'
+        env:
+          VERSION: ${{ steps.version.outputs.version }}
+        run: |
+          branch="chore/sync-version-$VERSION"
+          title="chore: sync version $VERSION and third-party notices"
+          open=$(gh pr list --head "$branch" --base main --state open --json number -q '.[0].number')
+          if git diff --quiet; then
+            echo "main already carries $VERSION and up-to-date notices."
+            if [[ -n "$open" ]]; then
+              gh pr close "$open" --delete-branch --comment "main is up to date now."
+            fi
+            exit 0
+          fi
+
+          changed=$(git diff --name-only)
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git switch -c "$branch"
+          git add -u
+          git commit -m "$title"
+          # The branch only ever holds this one commit on top of main, so each run replaces it.
+          git push --force origin "$branch"
+
+          if [[ -z "$open" ]]; then
+            body=$(printf 'Writes the released version %s into the manifests and lock files (scripts/set-version.sh), dates its CHANGELOG.md section (scripts/finalise-changelog.sh) and regenerates the third-party notices (scripts/generate-notices.sh), after the [Post-release sync workflow](%s/%s/actions/runs/%s). CI and E2E are started on this branch by the same run.\n\nChanged files:\n\n%s\n' \
+              "$VERSION" "$GITHUB_SERVER_URL" "$GITHUB_REPOSITORY" "$GITHUB_RUN_ID" "$(sed 's/.*/- `&`/' <<< "$changed")")
+            gh pr create --base main --head "$branch" --title "$title" --body "$body" \
+              || echo "::warning::Could not open the pull request (is \"Allow GitHub Actions to create and approve pull requests\" switched on?). Open it by hand: $GITHUB_SERVER_URL/$GITHUB_REPOSITORY/compare/main...$branch"
+          fi
+          gh workflow run ci.yml --ref "$branch"
+          gh workflow run e2e.yml --ref "$branch"
+
+          # This pull request contains fresh notices, so a separate notices pull request is obsolete.
+          notices=$(gh pr list --head chore/regenerate-notices --base main --state open --json number -q '.[0].number')
+          if [[ -n "$notices" ]]; then
+            gh pr close "$notices" --delete-branch --comment "Superseded by the version sync pull request for $VERSION, which regenerates the notices too."
+          fi
