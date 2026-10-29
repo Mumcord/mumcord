@@ -1,5 +1,6 @@
 import { useEffect, useId, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { getApi } from "../../../api";
 import { Group } from "../components/Section";
 import { ConfirmDialog } from "../components/ConfirmDialog";
 import { Switch } from "../components/Switch";
@@ -117,15 +118,17 @@ function OpenGlLaunchOption({ option }: { option: string }) {
   const id = useId();
   const [copy, setCopy] = useState<"idle" | "done" | "failed">("idle");
   const copyOption = () => {
-    navigator.clipboard.writeText(option).then(
-      () => {
-        setCopy("done");
-      },
-      (e: unknown) => {
-        console.error("Copying the launch option failed", e);
-        setCopy("failed");
-      },
-    );
+    getApi()
+      .copyText(option)
+      .then(
+        () => {
+          setCopy("done");
+        },
+        (e: unknown) => {
+          console.error("Copying the launch option failed", e);
+          setCopy("failed");
+        },
+      );
   };
   return (
     <div role="group" aria-labelledby={id}>
