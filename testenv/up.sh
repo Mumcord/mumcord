@@ -10,7 +10,9 @@ if [ "${1:-}" = "--cert" ]; then CERT_SET="${2:-}"; fi
 case "$CERT_SET" in A|B) ;; *) echo "cert set must be A or B" >&2; exit 2;; esac
 [ -f .env ] || { echo "missing testenv/.env - run: cp testenv/.env.example testenv/.env" >&2; exit 1; }
 command -v sqlite3 >/dev/null || { echo "sqlite3 is required on the host to seed channels" >&2; exit 1; }
-export CERT_SET PUID="$(id -u)" PGID="$(id -g)"
+PUID=$(id -u)
+PGID=$(id -g)
+export CERT_SET PUID PGID
 ./gen-certs.sh
 mkdir -p "$DATA_ROOT/$svc"
 

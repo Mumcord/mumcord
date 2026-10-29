@@ -36,6 +36,36 @@ jobs:
           GH_TOKEN: ${{ github.token }}
           PR_NUMBER: ${{ github.event.pull_request.number }}
 
+  # Always runs, outside the changes gate: workflow and script edits alone skip the build jobs, so
+  # this fast job is the only check they get. Needs no build.
+  lint:
+    name: Lint workflows and scripts
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    env:
+      ACTIONLINT_VERSION: 1.7.12
+      ACTIONLINT_SHA256: 8aca8db96f1b94770f1b0d72b6dddcb1ebb8123cb3712530b08cc387b349a3d8
+      SHELLCHECK_VERSION: 0.11.0
+      SHELLCHECK_SHA256: 8c3be12b05d5c177a04c29e3c78ce89ac86f1595681cab149b65b97c4e227198
+    steps:
+      - uses: actions/checkout@v7
+
+      # The runner's preinstalled shellcheck changes with the image, so both tools are downloaded
+      # at fixed versions and verified; actionlint runs the same shellcheck on inline run: scripts.
+      - name: Install actionlint and shellcheck
+        run: |
+          mkdir -p "$HOME/lint-bin"
+          curl -fsSL -o actionlint.tar.gz "https://github.com/rhysd/actionlint/releases/download/v${ACTIONLINT_VERSION}/actionlint_${ACTIONLINT_VERSION}_linux_amd64.tar.gz"
+          echo "$ACTIONLINT_SHA256  actionlint.tar.gz" | sha256sum -c -
+          tar -xzf actionlint.tar.gz -C "$HOME/lint-bin" actionlint
+          curl -fsSL -o shellcheck.tar.xz "https://github.com/koalaman/shellcheck/releases/download/v${SHELLCHECK_VERSION}/shellcheck-v${SHELLCHECK_VERSION}.linux.x86_64.tar.xz"
+          echo "$SHELLCHECK_SHA256  shellcheck.tar.xz" | sha256sum -c -
+          tar -xJf shellcheck.tar.xz --strip-components=1 -C "$HOME/lint-bin" "shellcheck-v${SHELLCHECK_VERSION}/shellcheck"
+          echo "$HOME/lint-bin" >> "$GITHUB_PATH"
+
+      - name: Lint
+        run: scripts/ci/lint-ci.sh
+
   build-test:
     name: Build and test (${{ matrix.os }})
     needs: changes

@@ -10,7 +10,9 @@ if [ $# -ge 1 ] && [[ "$1" != --* ]]; then svcs=("$1"); shift; else svcs=(v15 v1
 for s in "${svcs[@]}"; do
   case "$s" in v15|v14|v13|limit|v15b) ;; *) echo "usage: $0 [v15|v14|v13|limit|v15b] [--cert A|B]" >&2; exit 2;; esac
 done
-export PUID="$(id -u)" PGID="$(id -g)" SUPERUSER_PASSWORD="${SUPERUSER_PASSWORD:-x}"
+PUID=$(id -u)
+PGID=$(id -g)
+export PUID PGID SUPERUSER_PASSWORD="${SUPERUSER_PASSWORD:-x}"
 for s in "${svcs[@]}"; do
   docker compose rm -sf "$s" >/dev/null
   rm -f "$DATA_ROOT/$s"/murmur.sqlite* "$DATA_ROOT/$s"/mumble-server.sqlite* "$DATA_ROOT/$s"/.seeded

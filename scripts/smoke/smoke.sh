@@ -78,6 +78,7 @@ work=$(mktemp -d)
 export MUMCORD_BOT_DATA="$work/bot"
 app_pid=""
 
+# shellcheck disable=SC2329 # only reached through cleanup, which the EXIT trap invokes
 stop_app() {
   case $os in
     linux) [[ -n $app_pid ]] && kill "$app_pid" 2>/dev/null || true ;;
@@ -93,6 +94,7 @@ show_logs() {
   return 0
 }
 
+# shellcheck disable=SC2329 # only invoked through the EXIT trap
 cleanup() {
   stop_app
   rm -rf "$work"
