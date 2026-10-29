@@ -125,6 +125,39 @@ export const SETTINGS_INDEX: readonly SettingEntry[] = [
   {
     section: "voice",
     group: "voice.processing",
+    control: "voice.noiseSuppressionBackend",
+    terms: [
+      "voice.backendHint.nnnoiseless",
+      "voice.backendHint.rnnoise",
+      "voice.backendHint.sonora",
+      "voice.noBackendSettings",
+      "voice.detectorHint",
+      "voice.processingIndependent",
+    ],
+    // Library names are the same in every language.
+    literals: ["nnnoiseless", "rnnoise", "rnnoise-rs", "sonora", "sonora-ns", "RNNoise"],
+  },
+  {
+    section: "voice",
+    group: "voice.processing",
+    control: "voice.rnnoiseConsent",
+    terms: ["voice.rnnoiseSource", "voice.rnnoiseCost", "voice.rnnoiseInactive"],
+    literals: ["rnnoise-rs", "crates.io", "GitHub"],
+  },
+  {
+    section: "voice",
+    group: "voice.processing",
+    control: "voice.noiseSuppressionLevel",
+    terms: [
+      "voice.levels.low",
+      "voice.levels.moderate",
+      "voice.levels.high",
+      "voice.levels.veryHigh",
+    ],
+  },
+  {
+    section: "voice",
+    group: "voice.processing",
     control: "voice.echoCancellation",
     terms: ["voice.echoCancellationHint"],
   },

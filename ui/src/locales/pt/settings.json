@@ -110,6 +110,26 @@
     "processing": "Processamento de voz",
     "noiseSuppression": "Supressão de ruído",
     "noiseSuppressionHint": "Filtra o ruído de fundo, como teclados e ventoinhas.",
+    "noiseSuppressionBackend": "Backend de supressão de ruído",
+    "backendHint": {
+      "nnnoiseless": "IA leve: pouco uso de CPU, boa para ruído de fundo constante.",
+      "rnnoise": "IA moderna: rede neural mais nova, muitas vezes mais limpa; acrescenta cerca de 10 ms de atraso.",
+      "sonora": "DSP clássico: sem rede neural, pouca carga. Não tem modelo de fala, por isso a ativação por voz usa a deteção de nível."
+    },
+    "noBackendSettings": "Não há definições adicionais para este backend.",
+    "noiseSuppressionLevel": "Intensidade da supressão",
+    "levels": {
+      "low": "Baixa",
+      "moderate": "Moderada",
+      "high": "Alta",
+      "veryHigh": "Muito alta"
+    },
+    "detectorHint": "A ativação por voz deteta a fala com o modelo RNNoise; não altera o teu áudio.",
+    "rnnoiseSource": "rnnoise-rs não é publicado no crates.io. O Mumcord já o inclui na sua compilação, tirado diretamente do GitHub no commit {{commit}}, sem revisão do código.",
+    "rnnoiseCost": "Custa cerca de 3× mais CPU que o nnnoiseless e acrescenta um quadro (10 ms) de atraso.",
+    "rnnoiseConsent": "Aceito que esta biblioteca não revista trate o meu microfone.",
+    "rnnoiseInactive": "Não está ativo até que aceites.",
+    "processingIndependent": "Cancelamento de eco e Volume automático funcionam da mesma forma para qualquer backend.",
     "echoCancellation": "Cancelamento de eco",
     "echoCancellationHint": "Evita que os outros se ouçam a si próprios quando usas colunas.",
     "autoGain": "Volume automático",

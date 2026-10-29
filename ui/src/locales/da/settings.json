@@ -109,6 +109,26 @@
     "processing": "Stemmebehandling",
     "noiseSuppression": "Støjundertrykkelse",
     "noiseSuppressionHint": "Filtrerer baggrundsstøj som tastatur og blæsere fra.",
+    "noiseSuppressionBackend": "Backend til støjundertrykkelse",
+    "backendHint": {
+      "nnnoiseless": "Let AI: lav CPU-forbrug, god til jævn baggrundsstøj.",
+      "rnnoise": "Moderne AI: nyere neuronet, ofte renere; tilføjer ca. 10 ms forsinkelse.",
+      "sonora": "Klassisk DSP: intet neuronet, lav belastning. Det har ingen talemodel, så stemmeaktivering bruger niveau-detektionen."
+    },
+    "noBackendSettings": "Ingen yderligere indstillinger til dette backend.",
+    "noiseSuppressionLevel": "Styrke af undertrykkelsen",
+    "levels": {
+      "low": "Lav",
+      "moderate": "Middel",
+      "high": "Høj",
+      "veryHigh": "Meget høj"
+    },
+    "detectorHint": "Stemmeaktivering opdager tale med RNNoise-modellen; den ændrer ikke din lyd.",
+    "rnnoiseSource": "rnnoise-rs er ikke udgivet på crates.io. Mumcord har det allerede i sin build, taget direkte fra GitHub ved commit {{commit}}, uden gennemgang af koden.",
+    "rnnoiseCost": "Det koster cirka 3× så meget CPU som nnnoiseless og tilføjer en ramme (10 ms) forsinkelse.",
+    "rnnoiseConsent": "Jeg accepterer, at dette bibliotek uden kodegennemgang bruges på min mikrofon.",
+    "rnnoiseInactive": "Ikke aktiv, før du accepterer.",
+    "processingIndependent": "Ekkoundertrykkelse og Automatisk lydstyrke virker ens for alle backend.",
     "echoCancellation": "Ekkoundertrykkelse",
     "echoCancellationHint": "Forhindrer, at andre hører sig selv, når du bruger højttalere.",
     "autoGain": "Automatisk lydstyrke",

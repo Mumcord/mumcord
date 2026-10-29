@@ -109,6 +109,26 @@
     "processing": "Puheen käsittely",
     "noiseSuppression": "Kohinanvaimennus",
     "noiseSuppressionHint": "Suodattaa taustamelun, kuten näppäimistön ja tuulettimien äänet.",
+    "noiseSuppressionBackend": "Kohinanvaimennuksen menetelmä",
+    "backendHint": {
+      "nnnoiseless": "Kevyt tekoäly: vähäinen suoritin käyttö, hyvä tasaiseen taustameluun.",
+      "rnnoise": "Moderni tekoäly: uudempi neuroverkko, usein puhtaampi; lisää noin 10 ms viivettä.",
+      "sonora": "Perinteinen DSP: ei neuroverkkoa, vähäinen kuormitus. Siinä ei ole puhemallia, joten puheaktivointi käyttää tason tunnistusta."
+    },
+    "noBackendSettings": "Tälle menetelmälle ei ole lisäasetuksia.",
+    "noiseSuppressionLevel": "Vaimennuksen voimakkuus",
+    "levels": {
+      "low": "Matala",
+      "moderate": "Keski",
+      "high": "Korkea",
+      "veryHigh": "Erittäin korkea"
+    },
+    "detectorHint": "Puheaktivointi tunnistaa puheen RNNoise-mallilla; se ei muuta ääntäsi.",
+    "rnnoiseSource": "rnnoise-rs ei ole julkaistu crates.io:ssa. Mumcord sisältää sen jo käännöksessään suoraan GitHubista commitista {{commit}} ilman koodin tarkistusta.",
+    "rnnoiseCost": "Se vie noin 3× enemmän suoritin tehoa kuin nnnoiseless ja lisää yhden kehyksen (10 ms) viiveen.",
+    "rnnoiseConsent": "Hyväksyn, että tätä tarkistamatonta kirjastoa käytetään mikrofoniini.",
+    "rnnoiseInactive": "Ei ole käytössä ennen kuin hyväksyt.",
+    "processingIndependent": "Kaiunpoisto ja Automaattinen äänenvoimakkuus toimivat samalla tavalla kaikilla menetelmillä.",
     "echoCancellation": "Kaiunpoisto",
     "echoCancellationHint": "Estää muita kuulemasta itseään, kun käytät kaiuttimia.",
     "autoGain": "Automaattinen äänenvoimakkuus",

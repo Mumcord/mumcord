@@ -112,6 +112,26 @@
     "processing": "Próiseáil gutha",
     "noiseSuppression": "Cosc torainn",
     "noiseSuppressionHint": "Scagann sé torann cúlra amach, ar nós méarchláir agus fan.",
+    "noiseSuppressionBackend": "Cúlchonteasc cosc torainn",
+    "backendHint": {
+      "nnnoiseless": "AI éadrom: úsáid íseal CPU, maith do thorann cúlra seasmhach.",
+      "rnnoise": "AI nua-aimseartha: líonra neural níos nuaí, níos glaine go minic; cuireann thart ar 10 ms moille.",
+      "sonora": "DSP traidisiúnta: gan líonra neural, úsáid íseal. Níl múnla cainte aige, mar sin úsáideann an ghnáthacht gutha braiteoir leibhéil."
+    },
+    "noBackendSettings": "Níl aon socruithe breise ar fáil don chúlchonteasc seo.",
+    "noiseSuppressionLevel": "Neart an chosc",
+    "levels": {
+      "low": "Íseal",
+      "moderate": "Measartha",
+      "high": "Ard",
+      "veryHigh": "An-ard"
+    },
+    "detectorHint": "Braitheann an ghnáthacht gutha caint leis an múnla RNNoise; ní athraíonn sé an fhuaim.",
+    "rnnoiseSource": "Níl rnnoise-rs foilsithe ar crates.io. Tá sé cheana i mbuan Mumcord, tógtha go díreach ó GitHub ag commit {{commit}}, gan athbhreithniú ar an gcód.",
+    "rnnoiseCost": "Cosnóidh sé thart ar 3× níos mó CPU ná nnnoiseless agus cuireann fráma (10 ms) moille leis.",
+    "rnnoiseConsent": "Glacaim liom go bhfeidhmeoidh an leabharlann gan athbhreithniú seo ar mo mhicreafón.",
+    "rnnoiseInactive": "Níl sé gníomhach go dtí go n-aontaíonn tú.",
+    "processingIndependent": "Oibríonn Cealú macalla agus Airde fhuaime uathoibríoch ar an mbealach céanna do gach cúlchonteasc.",
     "echoCancellation": "Cealú macalla",
     "echoCancellationHint": "Cuireann sé stop le daoine eile iad féin a chloisteáil nuair a úsáideann tú callairí.",
     "autoGain": "Airde fhuaime uathoibríoch",
