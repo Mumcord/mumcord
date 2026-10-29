@@ -49,6 +49,10 @@ pub fn downmix(left: &Frame, right: &Frame, out: &mut Frame) {
     }
 }
 
+/// Setup hook of the playback thread; what it returns is kept until the thread ends (such as a
+/// real-time scheduling guard that must be dropped on the same thread).
+pub type ThreadStart = Box<dyn FnOnce() -> Box<dyn std::any::Any> + Send>;
+
 /// Far-end reference hook: called on the playback thread with every final
 /// frame (mono mix) right before it is written to the sink. Must not block or allocate.
 pub type FarEndTap = Box<dyn FnMut(&Frame) + Send>;
@@ -62,6 +66,8 @@ pub struct PlaybackConfig {
     pub listener: Option<Arc<Listener>>,
     /// Gain of watched screen shares' sound (auto-ducking, FR-2.76).
     pub share_gain: Arc<ShareGain>,
+    /// Runs first on the playback thread, e.g. to request real-time scheduling for it.
+    pub on_thread_start: Option<ThreadStart>,
 }
 
 impl Default for PlaybackConfig {
@@ -71,6 +77,7 @@ impl Default for PlaybackConfig {
             far_end_tap: None,
             listener: None,
             share_gain: Arc::default(),
+            on_thread_start: None,
         }
     }
 }
@@ -323,6 +330,7 @@ struct Worker<S> {
 
 impl<S: PlaybackSink> Worker<S> {
     fn run(mut self) {
+        let _thread_setup = self.config.on_thread_start.take().map(|start| start());
         let epoch = Instant::now();
         let target_samples = self.config.target_queue_ms as usize * SAMPLE_RATE as usize / 1000;
         let mut left = [0.0; FRAME_SAMPLES];
@@ -347,7 +355,6 @@ impl<S: PlaybackSink> Worker<S> {
                 if primed && queued < LATE_QUEUE_SAMPLES {
                     self.counters.late_wakeups.fetch_add(1, Ordering::Relaxed);
                 }
-                primed |= queued >= target_samples;
             }
 
             let mut mixed = 0;
@@ -359,6 +366,7 @@ impl<S: PlaybackSink> Worker<S> {
                     self.sink.queued_samples() < target_samples
                 };
                 if !due {
+                    primed |= !sink_refusing;
                     break;
                 }
                 let mut has_extra = self.read_mix_in(&mut extra);

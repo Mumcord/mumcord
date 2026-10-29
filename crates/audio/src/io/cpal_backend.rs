@@ -222,17 +222,18 @@ fn stream_config(supported: &SupportedStreamConfig) -> StreamConfig {
 /// Error callbacks run on the audio thread: only flag the failure, the
 /// control thread logs it and reopens the stream. `DeviceChanged` means the
 /// host already moved the stream to the new default device, so it keeps running.
+/// An xrun (the callback ran too late, e.g. under heavy CPU load) is only counted: the host has
+/// already restarted the stream, and reopening it would turn one click into a long dropout.
+/// So is a refused real-time request: the stream runs on at normal priority.
 fn error_flag(
     failed: Arc<AtomicBool>,
     counters: Arc<Counters>,
 ) -> impl FnMut(cpal::Error) + Send + 'static {
-    move |err| {
-        if err.kind() == ErrorKind::Xrun {
-            counters.device_xrun();
-        }
-        if err.kind() != ErrorKind::DeviceChanged {
-            failed.store(true, Ordering::Relaxed);
-        }
+    move |err| match err.kind() {
+        ErrorKind::Xrun => counters.device_xrun(),
+        ErrorKind::RealtimeDenied => counters.realtime_denied(),
+        ErrorKind::DeviceChanged => {}
+        _ => failed.store(true, Ordering::Relaxed),
     }
 }
 
@@ -345,4 +346,25 @@ where
 
 fn backend_err(err: impl std::fmt::Display) -> IoError {
     IoError::Backend(err.to_string())
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn only_real_failures_reopen_the_stream() {
+        let failed = Arc::new(AtomicBool::new(false));
+        let counters = Arc::new(Counters::default());
+        let mut on_error = error_flag(failed.clone(), counters.clone());
+        on_error(cpal::Error::new(ErrorKind::Xrun));
+        on_error(cpal::Error::new(ErrorKind::RealtimeDenied));
+        on_error(cpal::Error::new(ErrorKind::DeviceChanged));
+        assert!(!failed.load(Ordering::Relaxed), "the stream keeps running");
+        let stats = counters.snapshot();
+        assert_eq!((stats.device_xruns, stats.realtime_denied), (1, 1));
+
+        on_error(cpal::Error::new(ErrorKind::DeviceNotAvailable));
+        assert!(failed.load(Ordering::Relaxed), "a lost device is reopened");
+    }
 }

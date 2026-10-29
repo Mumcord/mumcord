@@ -15,7 +15,7 @@ mod tests;
 
 pub use playback::{
     FrameTime, PacketSender, Playback, PlaybackConfig, PlaybackError, PlaybackPorts, PlaybackSink,
-    PlaybackStats, downmix,
+    PlaybackStats, ThreadStart, downmix,
 };
 
 use std::sync::Arc;

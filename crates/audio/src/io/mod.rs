@@ -103,6 +103,8 @@ pub struct IoStats {
     pub device_xruns: u64,
     /// Streams reopened because the host reported them as failed.
     pub stream_restarts: u64,
+    /// Device threads the OS refused real-time scheduling (they run at normal priority).
+    pub realtime_denied: u64,
 }
 
 /// Errors from audio device I/O.

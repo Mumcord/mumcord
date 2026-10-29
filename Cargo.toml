@@ -73,7 +73,11 @@ p12-keystore = "0.4"
 rsa = { version = "0.9", default-features = false, features = ["std", "getrandom", "u64_digit"] }
 
 # Audio
-cpal = "0.18"
+# realtime-dbus: cpal asks for real-time scheduling of its device threads (rtkit over D-Bus on
+# Linux, MMCSS on Windows), so a loaded CPU does not starve them (issue #123).
+cpal = { version = "0.18", features = ["realtime-dbus"] }
+# The same request for Mumcord's own capture and playback threads.
+audio_thread_priority = { version = "0.35", default-features = false, features = ["with_dbus"] }
 # opusic-sys builds libopus statically from bundled sources.
 opus = "0.4"
 nnnoiseless = { version = "0.5", default-features = false }

@@ -254,6 +254,8 @@ pub struct AudioHealthView {
     /// Average and worst mixing time per 10 ms frame (decode, concealment), in µs.
     pub mix_time_avg_us: u64,
     pub mix_time_max_us: u64,
+    /// Voice threads (of capture and playback) that got real-time scheduling.
+    pub realtime_threads: u32,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]

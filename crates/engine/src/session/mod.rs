@@ -296,6 +296,7 @@ impl Core {
             capture_time_max_us: voice.capture_time.max_us(),
             mix_time_avg_us: playback.mix_time_avg_us,
             mix_time_max_us: playback.mix_time_max_us,
+            realtime_threads: voice.realtime_threads.load(Ordering::Relaxed),
         })
     }
 

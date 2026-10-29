@@ -162,6 +162,8 @@ impl TickThread {
         let handle = std::thread::Builder::new()
             .name(name.to_owned())
             .spawn(move || {
+                // Real device threads get real-time scheduling from cpal; so does the stand-in.
+                let _realtime = crate::rt::promote_current_thread().ok();
                 let mut tick = make_tick(thread_stop.clone());
                 let mut schedule = Schedule::new(Instant::now());
                 loop {

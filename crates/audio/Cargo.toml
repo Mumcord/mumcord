@@ -15,6 +15,7 @@ license.workspace = true
 
 [dependencies]
 mumcord-codec.workspace = true
+audio_thread_priority.workspace = true
 cpal.workspace = true
 rtrb.workspace = true
 rubato.workspace = true

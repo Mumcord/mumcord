@@ -26,6 +26,7 @@ use mumcord_audio::mixer::share::ShareGain;
 use mumcord_audio::mixer::{
     FrameTime, PacketSender, Playback, PlaybackConfig, PlaybackSink, PlaybackStats,
 };
+use mumcord_audio::rt::RtGuard;
 use mumcord_audio::{FRAME_SAMPLES, Frame, SAMPLE_RATE};
 use mumcord_protocol::{OutgoingAudio, VoiceTransport};
 use tokio::runtime::Handle as Runtime;
@@ -248,6 +249,8 @@ pub(crate) struct VoiceShared {
     pub capture_time: FrameTime,
     /// Frames the capture thread read with more than [`CAPTURE_LATE_SAMPLES`] still queued.
     pub capture_late_frames: AtomicU64,
+    /// Voice threads (capture, playback) running with real-time scheduling.
+    pub realtime_threads: AtomicU32,
     /// Listener pose and own position for positional audio.
     pub positional: Arc<PositionalShared>,
     /// Where watched screen shares' sound goes while the pipeline runs (FR-2.42).
@@ -281,6 +284,7 @@ impl Default for VoiceShared {
             packets_received: AtomicU64::new(0),
             capture_time: FrameTime::default(),
             capture_late_frames: AtomicU64::new(0),
+            realtime_threads: AtomicU32::new(0),
             positional: Arc::default(),
             share_sound: ShareSoundHub::default(),
             share_gain: Arc::default(),
@@ -343,6 +347,7 @@ impl VoicePipeline {
             .take()
             .ok_or_else(|| EngineError::internal("microphone is in use by the mic test"))?;
         let io_base = audio.io().stats();
+        shared.realtime_threads.store(0, Ordering::Relaxed);
         let (mut echo_producer, echo_consumer) = echo_reference();
         let config = PlaybackConfig {
             far_end_tap: Some(Box::new(move |frame: &Frame| {
@@ -351,6 +356,10 @@ impl VoicePipeline {
             })),
             listener: Some(shared.positional.listener.clone()),
             share_gain: shared.share_gain.clone(),
+            on_thread_start: Some({
+                let shared = shared.clone();
+                Box::new(move || Box::new(realtime("playback", &shared)))
+            }),
             ..PlaybackConfig::default()
         };
         let (playback, ports) = match Playback::start(audio.sink.clone(), config) {
@@ -510,6 +519,7 @@ fn capture_loop(
         shared.packets_sent.fetch_add(1, Ordering::Relaxed);
     };
 
+    let _realtime = realtime("capture", shared);
     // Drop audio captured before this connection started.
     while source.read_frame(&mut input) {}
     while !stop.load(Ordering::Relaxed) {
@@ -562,6 +572,22 @@ fn capture_loop(
         shared.capture_time.record(started.elapsed());
     }
     source
+}
+
+/// Real-time scheduling for a voice thread, so a loaded CPU does not delay its frames (issue
+/// #123). Refused (no rtkit, a sandbox), the thread runs at normal priority as before.
+fn realtime(thread: &'static str, shared: &VoiceShared) -> Option<RtGuard> {
+    match mumcord_audio::rt::promote_current_thread() {
+        Ok(guard) => {
+            shared.realtime_threads.fetch_add(1, Ordering::Relaxed);
+            tracing::debug!(thread, "real-time scheduling on");
+            Some(guard)
+        }
+        Err(e) => {
+            tracing::info!(thread, "{e}; running at normal priority");
+            None
+        }
+    }
 }
 
 /// Converts a received packet for the mixer; `None` if the payload is oversized.

@@ -30,6 +30,7 @@ pub(crate) struct Counters {
     playback_frames_dropped: AtomicU64,
     device_xruns: AtomicU64,
     stream_restarts: AtomicU64,
+    realtime_denied: AtomicU64,
 }
 
 impl Counters {
@@ -53,6 +54,10 @@ impl Counters {
         self.stream_restarts.fetch_add(1, Ordering::Relaxed);
     }
 
+    pub(crate) fn realtime_denied(&self) {
+        self.realtime_denied.fetch_add(1, Ordering::Relaxed);
+    }
+
     pub(crate) fn snapshot(&self) -> IoStats {
         IoStats {
             capture_overruns: self.capture_overruns.load(Ordering::Relaxed),
@@ -60,6 +65,7 @@ impl Counters {
             playback_frames_dropped: self.playback_frames_dropped.load(Ordering::Relaxed),
             device_xruns: self.device_xruns.load(Ordering::Relaxed),
             stream_restarts: self.stream_restarts.load(Ordering::Relaxed),
+            realtime_denied: self.realtime_denied.load(Ordering::Relaxed),
         }
     }
 }
@@ -185,6 +191,24 @@ mod tests {
         let mut surround = [1.0f32; 4];
         playback(&mut surround, 4, &mut consumer, &counters);
         assert_eq!(surround, [0.5, 0.25, 0.375, 0.375]);
+    }
+
+    #[test]
+    fn device_problems_are_counted() {
+        let counters = Counters::default();
+        counters.device_xrun();
+        counters.device_xrun();
+        counters.stream_restart();
+        counters.realtime_denied();
+        let stats = counters.snapshot();
+        assert_eq!(
+            (
+                stats.device_xruns,
+                stats.stream_restarts,
+                stats.realtime_denied
+            ),
+            (2, 1, 1)
+        );
     }
 
     #[test]
