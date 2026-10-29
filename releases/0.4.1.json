@@ -1,0 +1,64 @@
+{
+  "assets": [
+    {
+      "name": "Mumcord-0.4.1-1.aarch64.rpm",
+      "sha256": "f09a8c1c71fb94a2421da143dc03c4522aa27f6f552db39e830fa82dee59ba98",
+      "size": 23315674
+    },
+    {
+      "name": "Mumcord-0.4.1-1.x86_64.rpm",
+      "sha256": "8f76bb316fbf70d7a970cd2633327281d7d39f34683c063ac239b6cc47309739",
+      "size": 23301179
+    },
+    {
+      "name": "Mumcord_0.4.1_aarch64.AppImage",
+      "sha256": "4fe08cd6dc016d7f6e94ac78510f7322c7c44f7bdcb43a682b71bbda00b6a84d",
+      "size": 106859016
+    },
+    {
+      "name": "Mumcord_0.4.1_amd64.AppImage",
+      "sha256": "fcd2c33af521df23d6de18cd9ad95e3cfd8a3914a4e17b3678ffc3a53115c993",
+      "size": 109148664
+    },
+    {
+      "name": "Mumcord_0.4.1_amd64.deb",
+      "sha256": "d19e7e0ec2b87748270057174a735813f29296d63a4eb9e474fc7f5a4c7b98dd",
+      "size": 23295892
+    },
+    {
+      "name": "Mumcord_0.4.1_arm64.deb",
+      "sha256": "67e85b328506a515202d79f4921ca68dc9b293a3486e486a9e6169d9ada7b3da",
+      "size": 23314244
+    },
+    {
+      "name": "Mumcord_0.4.1_universal.dmg",
+      "sha256": "1266e35a6a8682cd8c94486c0b3766a1bd0e14b97ad79b59f9fd2f33654ea69a",
+      "size": 33868849
+    },
+    {
+      "name": "Mumcord_0.4.1_x64-setup.exe",
+      "sha256": "476e5bdf0c946531f09fd7efdf58ab15c23e4ba670198caaa2bf49b48f0e2164",
+      "size": 11222117
+    },
+    {
+      "name": "SHA256SUMS",
+      "sha256": "75c4558c06b04b237c58fb8a63a5df2f1affdaedb46354809a503209549a24d1",
+      "size": 824
+    },
+    {
+      "name": "install.sh",
+      "sha256": "2cb9a06595e410326c08140ef2fc9885adecfe1dda0fe1b6e6426cb61cd7e19c",
+      "size": 13799
+    }
+  ],
+  "commit": "4394e91c6f444936a609a61a0a3f40599a097283",
+  "crates.io": {
+    "mumcord-audio": null,
+    "mumcord-codec": null,
+    "mumcord-p2p": null,
+    "mumcord-protocol": null,
+    "mumcord-store": null
+  },
+  "sha256sums": "75c4558c06b04b237c58fb8a63a5df2f1affdaedb46354809a503209549a24d1",
+  "tag": "v0.4.1"
+}

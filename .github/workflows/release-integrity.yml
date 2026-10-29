@@ -1,0 +1,62 @@
+name: Release integrity
+
+# Checks that published releases were never changed afterwards. For every releases/<version>.json
+# (written at publish time by post-release.yml, see scripts/release-manifest.sh) it compares the
+# release's current state with the manifest: the tag's commit, every asset's name, size and SHA-256,
+# and the crates.io checksums and yanked flags. Any difference fails the run and opens one issue
+# per release ("Release integrity: vX.Y.Z changed") with the diff; an open issue gets a comment
+# instead of a duplicate. Never fix a published release in place: publish a patch version (RELEASING.md).
+on:
+  schedule:
+    - cron: "17 4 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  # Opens and comments on the issues.
+  issues: write
+
+concurrency:
+  group: release-integrity
+  cancel-in-progress: false
+
+jobs:
+  verify:
+    name: Verify published releases
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Verify manifests
+        run: |
+          status=0
+          shopt -s nullglob
+          manifests=(releases/*.json)
+          if [[ ${#manifests[@]} -eq 0 ]]; then
+            echo "::error::No release manifests found in releases/."
+            exit 1
+          fi
+          for manifest in "${manifests[@]}"; do
+            tag=$(jq -r .tag "$manifest")
+            if scripts/release-manifest.sh --verify "$manifest" > "diff.txt" 2>&1; then
+              cat diff.txt
+              continue
+            fi
+            status=1
+            cat diff.txt
+            echo "::error::Release integrity: $tag changed (see the log and the issue)."
+            title="Release integrity: $tag changed"
+            # shellcheck disable=SC2016 # backticks are literal Markdown
+            body=$(printf 'The published release %s no longer matches `%s`. A published release must never change; if this was not intended, treat it as a security incident, and publish a patch version instead of fixing it in place (RELEASING.md).\n\n[Run %s](%s/%s/actions/runs/%s)\n\n```diff\n%s\n```\n' \
+              "$tag" "$manifest" "$GITHUB_RUN_ID" "$GITHUB_SERVER_URL" "$GITHUB_REPOSITORY" "$GITHUB_RUN_ID" "$(head -c 50000 diff.txt)")
+            open=$(gh issue list --state open --search "\"$title\" in:title" --json number,title -q "[.[]|select(.title==\"$title\")][0].number")
+            if [[ -z "$open" ]]; then
+              gh issue create --title "$title" --body "$body"
+            else
+              gh issue comment "$open" --body "$body"
+            fi
+          done
+          exit "$status"
