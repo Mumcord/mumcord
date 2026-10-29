@@ -369,6 +369,8 @@
     "os": "Sistem",
     "license": "Licenca Mumcorda (AGPL-3.0)",
     "whatsNew": "Kaj je novega",
+    "whatsNewAuto": "Po posodobitvah samodejno prikaži »Novosti«",
+    "changelogFailed": "Okna »Novosti« ni bilo mogoče odpreti.",
     "support": "Podpora",
     "reportBug": "Prijavi napako",
     "requestFeature": "Predlagaj funkcijo",
@@ -601,5 +603,22 @@
       "npm": "npm",
       "native": "Domorodno"
     }
+  },
+  "changelog": {
+    "title": "Mumcord {{version}}",
+    "subtitle": "Oglejte si, kaj se je spremenilo v posamezni različici. Najnovejše najprej.",
+    "search": "Išči po vseh različicah",
+    "expandAll": "Razširi vse",
+    "collapseAll": "Strni vse",
+    "found": "Najdene različice: {{count}}",
+    "empty": "Iskanju ne ustreza noben vnos.",
+    "loadFailed": "Dnevnika sprememb ni bilo mogoče naložiti.",
+    "current": "Trenutna",
+    "inDevelopment": "V razvoju",
+    "unreleased": "Neizdana",
+    "forDevelopers": "za razvijalce",
+    "releasePage": "Stran izdaje",
+    "entries": "Vnosi: {{count}}",
+    "englishNote": "Dnevnik sprememb je napisan v angleščini."
   }
 }

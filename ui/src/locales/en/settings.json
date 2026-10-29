@@ -367,6 +367,8 @@
     "os": "System",
     "license": "Mumcord license (AGPL-3.0)",
     "whatsNew": "What's new",
+    "whatsNewAuto": "Show “What's new” automatically after updates",
+    "changelogFailed": "The “What's new” window could not be opened.",
     "support": "Support",
     "reportBug": "Report a bug",
     "requestFeature": "Request a feature",
@@ -595,5 +597,22 @@
       "npm": "npm",
       "native": "Native"
     }
+  },
+  "changelog": {
+    "title": "Mumcord {{version}}",
+    "subtitle": "See what changed in each version. Newest first.",
+    "search": "Search all versions",
+    "expandAll": "Expand all",
+    "collapseAll": "Collapse all",
+    "found": "Versions found: {{count}}",
+    "empty": "No entry matches the search.",
+    "loadFailed": "The changelog could not be loaded.",
+    "current": "Current",
+    "inDevelopment": "In development",
+    "unreleased": "Unreleased",
+    "forDevelopers": "for developers",
+    "releasePage": "Release page",
+    "entries": "Entries: {{count}}",
+    "englishNote": "The changelog is written in English."
   }
 }

@@ -367,6 +367,8 @@
     "os": "System",
     "license": "Mumcord-licens (AGPL-3.0)",
     "whatsNew": "Nyheder",
+    "whatsNewAuto": "Vis “Nyheder” automatisk efter opdateringer",
+    "changelogFailed": "Vinduet “Nyheder” kunne ikke åbnes.",
     "support": "Support",
     "reportBug": "Meld en fejl",
     "requestFeature": "Foreslå en funktion",
@@ -595,5 +597,22 @@
       "npm": "npm",
       "native": "Native"
     }
+  },
+  "changelog": {
+    "title": "Mumcord {{version}}",
+    "subtitle": "Se, hvad der er ændret i hver version. Nyeste først.",
+    "search": "Søg i alle versioner",
+    "expandAll": "Fold alle ud",
+    "collapseAll": "Fold alle sammen",
+    "found": "Fundne versioner: {{count}}",
+    "empty": "Ingen post matcher søgningen.",
+    "loadFailed": "Ændringsloggen kunne ikke indlæses.",
+    "current": "Aktuel",
+    "inDevelopment": "Under udvikling",
+    "unreleased": "Ikke udgivet",
+    "forDevelopers": "for udviklere",
+    "releasePage": "Udgivelsesside",
+    "entries": "Poster: {{count}}",
+    "englishNote": "Ændringsloggen er skrevet på engelsk."
   }
 }

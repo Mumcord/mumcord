@@ -1,0 +1,338 @@
+/* "What's new" window (issue #145). Colours come from theme tokens so every theme stays
+   readable. The page itself does not scroll: the list scrolls, so the toolbar stays in view. */
+.cl-window {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  height: 100%;
+  padding: var(--space-6);
+  box-sizing: border-box;
+}
+
+.cl-header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+}
+
+.cl-logo {
+  flex: 0 0 auto;
+  width: 3rem;
+  height: 3rem;
+  border-radius: var(--radius-md);
+}
+
+.cl-header__text {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.cl-title {
+  margin: 0;
+  font-family: var(--font-family-display);
+  font-size: var(--font-size-xl);
+  letter-spacing: var(--letter-spacing-display);
+}
+
+.cl-header .settings-hint {
+  margin: 0;
+}
+
+.cl-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2) var(--space-4);
+}
+
+.cl-search {
+  flex: 1 1 16rem;
+}
+
+.cl-count {
+  margin: 0;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+  font-variant-numeric: tabular-nums;
+}
+
+.cl-count:empty {
+  display: none;
+}
+
+.cl-list {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  gap: var(--space-3);
+  min-height: 0;
+  overflow: auto;
+}
+
+.cl-version {
+  flex: 0 0 auto;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background: var(--color-bg-elevated);
+}
+
+.cl-version--current {
+  border-color: color-mix(in srgb, var(--color-accent) 55%, var(--color-border));
+}
+
+.cl-version__heading {
+  margin: 0;
+  font-size: var(--font-size-md);
+  font-weight: normal;
+}
+
+.cl-version__toggle,
+.cl-internal__toggle {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  width: 100%;
+  border: 0;
+  background: none;
+  color: var(--color-text);
+  font: inherit;
+  text-align: start;
+  cursor: pointer;
+}
+
+.cl-version__toggle {
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-lg);
+}
+
+.cl-version__toggle:hover {
+  background: var(--color-bg-hover);
+}
+
+.cl-version__toggle:focus-visible,
+.cl-internal__toggle:focus-visible,
+.cl-link:focus-visible,
+.cl-items a:focus-visible,
+.cl-summary a:focus-visible {
+  outline: var(--focus-ring-width, 2px) solid var(--color-focus);
+  outline-offset: 2px;
+}
+
+.cl-chevron::before {
+  display: inline-block;
+  content: "▸";
+  color: var(--color-text-muted);
+  transition: transform var(--duration-fast, 0.15s) var(--ease-out, ease-out);
+}
+
+[aria-expanded="true"] > .cl-chevron::before {
+  transform: rotate(90deg);
+}
+
+.cl-version__number {
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-bold);
+  font-variant-numeric: tabular-nums;
+}
+
+.cl-badge {
+  flex: 0 0 auto;
+  padding: 0 var(--space-2);
+  border-radius: var(--radius-full);
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+}
+
+.cl-badge--current {
+  background: var(--color-accent);
+  color: var(--color-primary-text);
+}
+
+.cl-badge--dev {
+  border: 1px solid var(--color-warning);
+  color: var(--color-warning);
+}
+
+.cl-version__date {
+  flex: 0 0 auto;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+}
+
+.cl-version__summary {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.cl-version__panel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: 0 var(--space-4) var(--space-4) var(--space-6);
+  animation: cl-reveal var(--duration-normal, 0.2s) var(--ease-out, ease-out);
+}
+
+.cl-version__panel[hidden] {
+  display: none;
+}
+
+@keyframes cl-reveal {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+}
+
+.cl-summary {
+  color: var(--color-text-secondary);
+}
+
+.cl-summary p,
+.cl-items p {
+  margin: 0;
+}
+
+.cl-group__title {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin: 0;
+  font-size: var(--font-size-sm);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.cl-group__icon {
+  display: inline-grid;
+  place-items: center;
+  width: 1.5rem;
+  height: 1.5rem;
+  border-radius: var(--radius-sm);
+  background: color-mix(in srgb, currentcolor 16%, transparent);
+  font-weight: var(--font-weight-bold);
+  letter-spacing: 0;
+}
+
+.cl-group__count {
+  color: var(--color-text-secondary);
+  font-weight: normal;
+}
+
+.cl-group__hint {
+  color: var(--color-text-secondary);
+  font-weight: normal;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+.cl-group--added {
+  color: var(--color-success);
+}
+
+.cl-group--changed {
+  color: var(--color-accent);
+}
+
+.cl-group--fixed {
+  color: var(--color-warning);
+}
+
+.cl-group--removed {
+  color: var(--color-danger);
+}
+
+.cl-group--internal,
+.cl-group--other {
+  color: var(--color-text-secondary);
+}
+
+.cl-group--internal-block {
+  padding-top: var(--space-3);
+  border-top: 1px solid var(--color-border);
+}
+
+.cl-internal__toggle {
+  padding: var(--space-1) 0;
+  color: inherit;
+  letter-spacing: inherit;
+  text-transform: inherit;
+}
+
+.cl-items {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  margin: var(--space-2) 0 0;
+  padding-inline-start: var(--space-5);
+  list-style: disc;
+}
+
+.cl-items li {
+  color: var(--color-text);
+  overflow-wrap: anywhere;
+  user-select: text;
+}
+
+/* The bullet takes the group's colour; the text stays readable. */
+.cl-group--added > li::marker {
+  color: var(--color-success);
+}
+
+.cl-group--changed > li::marker {
+  color: var(--color-accent);
+}
+
+.cl-group--fixed > li::marker {
+  color: var(--color-warning);
+}
+
+.cl-group--removed > li::marker {
+  color: var(--color-danger);
+}
+
+.cl-items ul {
+  margin: var(--space-1) 0 0;
+  padding-inline-start: var(--space-5);
+}
+
+.cl-items a,
+.cl-summary a,
+.cl-link {
+  color: var(--color-accent-text);
+  font-weight: 600;
+}
+
+.cl-items code {
+  padding: 0 0.25em;
+  border-radius: var(--radius-sm);
+  background: var(--color-bg-sidebar);
+  font-size: 0.9em;
+}
+
+.cl-release {
+  margin: 0;
+}
+
+.cl-link {
+  padding: 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cl-chevron::before {
+    transition: none;
+  }
+
+  .cl-version__panel {
+    animation: none;
+  }
+}

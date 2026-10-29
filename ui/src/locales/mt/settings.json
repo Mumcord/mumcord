@@ -370,6 +370,8 @@
     "os": "Sistema",
     "license": "Liċenzja ta' Mumcord (AGPL-3.0)",
     "whatsNew": "X'hemm ġdid",
+    "whatsNewAuto": "Uri “X'hemm ġdid” awtomatikament wara l-aġġornamenti",
+    "changelogFailed": "It-tieqa “X'hemm ġdid” ma setgħetx tinfetaħ.",
     "support": "Appoġġ",
     "reportBug": "Irrapporta bug",
     "requestFeature": "Itlob funzjoni",
@@ -604,5 +606,22 @@
       "npm": "npm",
       "native": "Nattiv"
     }
+  },
+  "changelog": {
+    "title": "Mumcord {{version}}",
+    "subtitle": "Ara x'inbidel f'kull verżjoni. L-aktar riċenti l-ewwel.",
+    "search": "Fittex il-verżjonijiet kollha",
+    "expandAll": "Espandi kollox",
+    "collapseAll": "Iġbor kollox",
+    "found": "Verżjonijiet misjuba: {{count}}",
+    "empty": "L-ebda entrata ma taqbel mat-tfittxija.",
+    "loadFailed": "Ir-reġistru tal-bidliet ma setax jitgħabba.",
+    "current": "Attwali",
+    "inDevelopment": "Qed tiġi żviluppata",
+    "unreleased": "Mhux ippubblikata",
+    "forDevelopers": "għall-iżviluppaturi",
+    "releasePage": "Paġna tar-rilaxx",
+    "entries": "Entrati: {{count}}",
+    "englishNote": "Ir-reġistru tal-bidliet huwa miktub bl-Ingliż."
   }
 }

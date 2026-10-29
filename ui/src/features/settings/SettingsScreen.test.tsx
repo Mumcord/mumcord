@@ -1134,11 +1134,12 @@ describe("About section", () => {
     expect(open).toHaveBeenCalledOnce();
   });
 
-  it("opens the changelog for the shown version and the support links in the browser", async () => {
+  it("opens What's new in its own window and the support links in the browser", async () => {
+    const open = vi.spyOn(api, "changelogOpen");
     await openSection("About");
     await screen.findByText("0.0.0-mock");
     fireEvent.click(screen.getByRole("button", { name: "What's new" }));
-    expect(openInBrowser).toHaveBeenLastCalledWith("https://mumcord.app/en/changelog#v0.0.0-mock");
+    expect(open).toHaveBeenCalledOnce();
     fireEvent.click(screen.getByRole("button", { name: "Report a bug" }));
     expect(openInBrowser).toHaveBeenLastCalledWith(
       "https://github.com/Mumcord/mumcord/issues/new?template=bug_report.yml",
@@ -1149,7 +1150,7 @@ describe("About section", () => {
     );
   });
 
-  it("shows a dev build's display version and links the release it is based on", async () => {
+  it("shows a dev build's display version", async () => {
     const info = api.appInfo.bind(api);
     vi.spyOn(api, "appInfo").mockImplementation(async () => ({
       ...(await info()),
@@ -1158,16 +1159,28 @@ describe("About section", () => {
     }));
     await openSection("About");
     expect(await screen.findByText("dev~a1b2c3d")).toBeInTheDocument();
-    fireEvent.click(screen.getByRole("button", { name: "What's new" }));
-    expect(openInBrowser).toHaveBeenLastCalledWith("https://mumcord.app/en/changelog#v0.4.2");
   });
 
-  it("links the German changelog for the German UI", async () => {
-    await applyLanguage("de");
-    await openSection("Über");
-    await screen.findByText("0.0.0-mock");
-    fireEvent.click(screen.getByRole("button", { name: "Neuigkeiten" }));
-    expect(openInBrowser).toHaveBeenLastCalledWith("https://mumcord.app/changelog#v0.0.0-mock");
+  it("turns off showing What's new after updates", async () => {
+    await openSection("About");
+    const auto = screen.getByRole("switch", {
+      name: "Show “What's new” automatically after updates",
+    });
+    expect(auto).toBeChecked();
+    fireEvent.click(auto);
+    await waitFor(async () => {
+      expect((await api.settingsGet()).whatsNewAuto).toBe(false);
+    });
+  });
+
+  it("explains when the What's new window cannot be opened", async () => {
+    vi.spyOn(api, "changelogOpen").mockRejectedValue(new Error("boom"));
+    vi.spyOn(console, "error").mockImplementation(() => undefined);
+    await openSection("About");
+    fireEvent.click(screen.getByRole("button", { name: "What's new" }));
+    expect(await screen.findByRole("alert")).toHaveTextContent(
+      "The “What's new” window could not be opened.",
+    );
   });
 
   it("explains when the licences window cannot be opened", async () => {
