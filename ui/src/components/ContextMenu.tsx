@@ -29,8 +29,27 @@ export interface ContextMenuProps {
   onClose: () => void;
 }
 
+/** The ranges of the page selection, to put back after a focus change collapsed them. */
+function saveSelection(): Range[] {
+  const selection = window.getSelection();
+  if (!selection) return [];
+  return Array.from({ length: selection.rangeCount }, (_, i) =>
+    selection.getRangeAt(i).cloneRange(),
+  );
+}
+
+function restoreSelection(ranges: readonly Range[]) {
+  const selection = window.getSelection();
+  if (!selection || ranges.length === 0) return;
+  selection.removeAllRanges();
+  for (const range of ranges) selection.addRange(range);
+}
+
 export function ContextMenu({ menu, label, items, onClose }: ContextMenuProps) {
   const ref = useRef<HTMLDivElement>(null);
+  // Focusing a menu button (or the opener again on close) collapses the selection in some
+  // webviews, which made selected text look unselected while the menu was open (#135).
+  const selection = useRef<Range[]>([]);
 
   const close = (returnFocus: boolean) => {
     onClose();
@@ -61,7 +80,9 @@ export function ContextMenu({ menu, label, items, onClose }: ContextMenuProps) {
     const top = Math.max(EDGE, Math.min(menu.y, window.innerHeight - element.offsetHeight - EDGE));
     element.style.left = `${String(left)}px`;
     element.style.top = `${String(top)}px`;
+    selection.current = saveSelection();
     element.querySelector<HTMLElement>('[role="menuitem"]')?.focus();
+    restoreSelection(selection.current);
   }, [menu]);
 
   function onKeyDown(event: KeyboardEvent<HTMLDivElement>) {
@@ -112,6 +133,7 @@ export function ContextMenu({ menu, label, items, onClose }: ContextMenuProps) {
           className="server-menu__item"
           onClick={() => {
             close(true);
+            restoreSelection(selection.current);
             item.onSelect();
           }}
         >

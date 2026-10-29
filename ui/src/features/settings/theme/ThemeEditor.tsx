@@ -1,7 +1,7 @@
 import { createPortal } from "react-dom";
 import { useEffect, useId, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
-import type { Theme } from "../../../api";
+import { getApi, type Theme } from "../../../api";
 import { usePreferences } from "../../../app/preferences";
 import { Select } from "../../../components/Select";
 import { ThemePicker } from "../../../components/ThemePicker";
@@ -144,7 +144,7 @@ export function ThemeEditor({ settings, update }: SettingsSectionProps) {
   const share = async (theme: ThemeRecord) => {
     if (version === null) return;
     try {
-      await navigator.clipboard.writeText(formatShareMessage(theme, version));
+      await getApi().copyText(formatShareMessage(theme, version));
       setStatus({ kind: "success", text: t("themeEditor.shared") });
     } catch (error) {
       console.error("Copying the theme failed", error);

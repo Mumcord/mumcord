@@ -1,5 +1,14 @@
 import { act, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
-import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
+import {
+  afterEach,
+  beforeAll,
+  beforeEach,
+  describe,
+  expect,
+  it,
+  vi,
+  type MockInstance,
+} from "vitest";
 import { createMockApi, setApi, type ChatMessage, type MockApi } from "../../api";
 import { applyLanguage } from "../../i18n";
 import { axeViolations } from "../../test/axe";
@@ -51,7 +60,7 @@ function renderMessage(body: string, syncedFrom: string | null = null) {
 }
 
 let api: MockApi;
-let writeText: ReturnType<typeof vi.fn>;
+let writeText: MockInstance<MockApi["copyText"]>;
 
 beforeAll(async () => {
   await applyLanguage("en");
@@ -61,8 +70,7 @@ beforeEach(() => {
   api = createMockApi();
   setApi(api);
   dialogs.pickSavePath.mockReset();
-  writeText = vi.fn().mockResolvedValue(undefined);
-  Object.defineProperty(navigator, "clipboard", { value: { writeText }, configurable: true });
+  writeText = vi.spyOn(api, "copyText").mockResolvedValue(null);
 });
 
 afterEach(() => {
