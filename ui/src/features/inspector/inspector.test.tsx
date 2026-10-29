@@ -73,8 +73,7 @@ describe("PacketTable", () => {
   });
 
   it("expands a row to the decoded fields, the gap, raw hex and copy", async () => {
-    const writeText = vi.fn(() => Promise.resolve());
-    Object.assign(navigator, { clipboard: { writeText } });
+    const writeText = vi.spyOn(api, "copyText").mockResolvedValue(null);
     const first = packet({ id: 1 });
     const second = packet({
       id: 2,

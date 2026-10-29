@@ -61,7 +61,7 @@ export function CodeBlockActions({ block, tabIndex }: CodeBlockActionsProps) {
 
   async function copy() {
     try {
-      await navigator.clipboard.writeText(codeOf(block));
+      await getApi().copyText(codeOf(block));
       show({ kind: "copied", text: t("codeBlock.copied") });
     } catch (error) {
       console.error("Copying the code block failed", error);
