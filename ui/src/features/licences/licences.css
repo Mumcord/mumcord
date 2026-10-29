@@ -1,0 +1,169 @@
+/* Third-party licences window (issue #138). Colours come from theme tokens so every theme stays
+   readable. The page itself does not scroll: the list scrolls, so the toolbar stays in view. */
+.lic-window {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  height: 100%;
+  padding: var(--space-6);
+  box-sizing: border-box;
+}
+
+.lic-header .settings-hint {
+  margin: 0;
+}
+
+.lic-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2) var(--space-4);
+}
+
+.lic-search {
+  flex: 1 1 16rem;
+}
+
+.lic-count {
+  margin: 0;
+  font-variant-numeric: tabular-nums;
+}
+
+.lic-link {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--color-accent-text);
+  font: inherit;
+  text-decoration: underline;
+  cursor: pointer;
+  overflow-wrap: anywhere;
+}
+
+.lic-url {
+  overflow-wrap: anywhere;
+}
+
+.lic-list {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: auto;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+}
+
+.lic-list__inner {
+  position: relative;
+  width: 100%;
+}
+
+.lic-row {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.lic-row__heading {
+  margin: 0;
+  font-size: var(--font-size-sm);
+  font-weight: normal;
+}
+
+.lic-row__toggle {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-2);
+  width: 100%;
+  padding: var(--space-2) var(--space-3);
+  border: 0;
+  background: none;
+  color: var(--color-text);
+  font: inherit;
+  text-align: start;
+  cursor: pointer;
+}
+
+.lic-row__toggle:hover {
+  background: var(--color-bg-hover);
+}
+
+.lic-row__toggle:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: -2px;
+}
+
+.lic-row__chevron::before {
+  display: inline-block;
+  content: "▸";
+  color: var(--color-text-muted);
+  transition: transform 0.15s;
+}
+
+.lic-row__toggle[aria-expanded="true"] .lic-row__chevron::before {
+  transform: rotate(90deg);
+}
+
+.lic-row__name {
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+.lic-row__licence {
+  flex: 1 1 auto;
+  color: var(--color-text-secondary);
+}
+
+.lic-tag {
+  flex: 0 0 auto;
+  padding: 0 var(--space-2);
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-full);
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-xs);
+}
+
+.lic-row__panel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: 0 var(--space-3) var(--space-3) var(--space-6);
+}
+
+.lic-row__panel[hidden] {
+  display: none;
+}
+
+.lic-row__panel .settings-hint {
+  margin: 0;
+}
+
+.lic-row__actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+}
+
+.lic-text {
+  max-height: 24rem;
+  margin: 0;
+  padding: var(--space-3);
+  overflow: auto;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-bg-sidebar);
+  font-family: ui-monospace, monospace;
+  font-size: var(--font-size-xs);
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  user-select: text;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lic-row__chevron::before {
+    transition: none;
+  }
+}

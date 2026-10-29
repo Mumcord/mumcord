@@ -372,7 +372,8 @@
     "requestFeature": "Funkció kérése",
     "notices": "Harmadik féltől származó közlemények",
     "noticesHint": "A Mumcord nyílt forráskódú szoftverekre épül, többek között a Mumble projekt kódjára.",
-    "noticesFailed": "A harmadik féltől származó közleményeket nem sikerült betölteni.",
+    "showNotices": "Harmadik féltől származó licencek megjelenítése",
+    "noticesFailed": "A harmadik féltől származó licenceket nem sikerült megnyitni.",
     "loading": "Betöltés…",
     "devToolsUnlocked": "Fejlesztői eszközök feloldva: a csomagvizsgáló mostantól szerepel a beállítások listájában."
   },
@@ -570,6 +571,29 @@
       "watch": "Közös nézés állapota",
       "plugin": "Bővítményadatok",
       "mumble": "Mumble-üzenet"
+    }
+  },
+  "licences": {
+    "title": "Harmadik féltől származó licencek",
+    "own": "Maga a Mumcord szabad szoftver a GNU Affero General Public License v3 only (AGPL-3.0-only) licenc alatt.",
+    "sourceCode": "Forráskód",
+    "search": "Keresés név vagy licenc szerint",
+    "filter": "Licenc",
+    "allLicences": "Minden licenc",
+    "expandAll": "Összes kibontása",
+    "collapseAll": "Összes összecsukása",
+    "shown": "Megjelenítve: {{shown}} / {{total}}",
+    "empty": "Egyetlen összetevő sem felel meg a keresésnek.",
+    "loadFailed": "A licenclistát nem sikerült betölteni.",
+    "repository": "Tároló:",
+    "copy": "Licencszöveg másolása",
+    "copied": "Licencszöveg másolva",
+    "copyFailed": "A másolás nem sikerült",
+    "textOf": "{{name}} licencszövege",
+    "sources": {
+      "rust": "Rust",
+      "npm": "npm",
+      "native": "Natív"
     }
   }
 }

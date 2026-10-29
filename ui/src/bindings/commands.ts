@@ -349,6 +349,14 @@ export const commands = {
 	packetInspectorShare: (view: InspectorView) => typedError<null, ApiError>(__TAURI_INVOKE("packet_inspector_share", { view })),
 	/**  The view the main window shared last; `null` before it shared one. */
 	packetInspectorView: () => typedError<InspectorView | null, ApiError>(__TAURI_INVOKE("packet_inspector_view")),
+	/**  Opens the third-party licences window, or brings it to the front if it is already open. */
+	licencesOpen: () => typedError<null, ApiError>(__TAURI_INVOKE("licences_open")),
+	/**  Closes the licences window (Ctrl+W in that window). */
+	licencesClose: () => typedError<null, ApiError>(__TAURI_INVOKE("licences_close")),
+	/**  Called by the main window whenever its theme or language change. */
+	windowLookShare: (look: WindowLook) => typedError<null, ApiError>(__TAURI_INVOKE("window_look_share", { look })),
+	/**  The look the main window shared last; `null` before it shared one. */
+	windowLook: () => typedError<WindowLook | null, ApiError>(__TAURI_INVOKE("window_look")),
 	/**  Decides by window focus and the notification setting; shows the system notification itself. */
 	notifyMessage: (notice: MessageNotice) => typedError<NotifyOutcome, ApiError>(__TAURI_INVOKE("notify_message", { notice })),
 	/**  The user opened this chat: its system notification is outdated. */
@@ -513,6 +521,7 @@ export const events = {
 	userUpserted: makeEvent<UserUpserted, UserUpserted>("user-upserted"),
 	voiceServerChanged: makeEvent<VoiceServerChanged, VoiceServerChanged>("voice-server-changed"),
 	watchPartyChanged: makeEvent<WatchPartyChanged, WatchPartyChanged>("watch-party-changed"),
+	windowLookChanged: makeEvent<WindowLookChanged, WindowLookChanged>("window-look-changed"),
 };
 
 /* Types */
@@ -529,8 +538,6 @@ export type AppInfo = {
 	/**  Numeric `X.Y.Z` (the last release for dev builds), for versions other clients parse. */
 	packageVersion: string,
 	os: string,
-	/**  Contents of `THIRD_PARTY_NOTICES` for Settings → About. */
-	thirdPartyNotices: string,
 	/**  Running from an AppImage: the UI offers the app-menu entry (FR-2.55). */
 	appimage: boolean,
 	/**
@@ -1904,6 +1911,20 @@ export type WatchParty = {
 export type WatchPartyChanged = {
 	serverId: number,
 	party: WatchParty | null,
+};
+
+/**  The look of the main window's root element, for a window of its own to copy. */
+export type WindowLook = {
+	/**  `data-*` attributes of the main window's root element (theme, visual effects, hints). */
+	attributes: { [key in string]: string },
+	/**  CSS custom properties set on the main window's root element (theme colours). */
+	properties: { [key in string]: string },
+	language: string,
+};
+
+/**  The main window's look changed; sent to the licences window only. */
+export type WindowLookChanged = {
+	look: WindowLook,
 };
 
 /* Tauri Specta runtime */

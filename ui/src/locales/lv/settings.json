@@ -373,7 +373,8 @@
     "requestFeature": "Pieprasīt funkciju",
     "notices": "Trešo pušu paziņojumi",
     "noticesHint": "Mumcord ir veidots uz atvērtā koda programmatūras pamata, tostarp koda no Mumble projekta.",
-    "noticesFailed": "Trešo pušu paziņojumus neizdevās ielādēt.",
+    "showNotices": "Rādīt trešo pušu licences",
+    "noticesFailed": "Trešo pušu licences neizdevās atvērt.",
     "loading": "Ielādē…",
     "devToolsUnlocked": "Izstrādātāja rīki atbloķēti: pakešu inspektors tagad ir iestatījumu sarakstā."
   },
@@ -573,6 +574,29 @@
       "watch": "Kopīgas skatīšanās stāvoklis",
       "plugin": "Spraudņa dati",
       "mumble": "Mumble ziņojums"
+    }
+  },
+  "licences": {
+    "title": "Trešo pušu licences",
+    "own": "Mumcord pati ir brīva programmatūra ar licenci GNU Affero General Public License v3 only (AGPL-3.0-only).",
+    "sourceCode": "Pirmkods",
+    "search": "Meklēt pēc nosaukuma vai licences",
+    "filter": "Licence",
+    "allLicences": "Visas licences",
+    "expandAll": "Izvērst visu",
+    "collapseAll": "Sakļaut visu",
+    "shown": "Parādīti: {{shown}} no {{total}}",
+    "empty": "Neviens komponents neatbilst meklēšanai.",
+    "loadFailed": "Licenču sarakstu neizdevās ielādēt.",
+    "repository": "Repozitorijs:",
+    "copy": "Kopēt licences tekstu",
+    "copied": "Licences teksts nokopēts",
+    "copyFailed": "Kopēšana neizdevās",
+    "textOf": "{{name}} licences teksts",
+    "sources": {
+      "rust": "Rust",
+      "npm": "npm",
+      "native": "Vietējs"
     }
   }
 }

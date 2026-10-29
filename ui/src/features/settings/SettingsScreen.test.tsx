@@ -1121,7 +1121,8 @@ describe("Diagnostics section", () => {
 });
 
 describe("About section", () => {
-  it("shows version, system, the AGPL license and the third-party notices", async () => {
+  it("shows version, system, the AGPL license and opens the third-party licences", async () => {
+    const open = vi.spyOn(api, "licencesOpen");
     await openSection("About");
     expect(await screen.findByText("0.0.0-mock")).toBeInTheDocument();
     expect(screen.getByText("mock")).toBeInTheDocument();
@@ -1129,10 +1130,8 @@ describe("About section", () => {
     expect(license.tagName).toBe("PRE");
     expect(license).toHaveAttribute("tabindex", "0");
     expect(license).toHaveTextContent("GNU AFFERO GENERAL PUBLIC LICENSE");
-    const notices = await screen.findByLabelText("Third-party notices");
-    expect(notices).toHaveTextContent("Mumble");
-    expect(notices).toHaveTextContent("BSD-3-Clause");
-    expect(notices).toHaveAttribute("tabindex", "0");
+    fireEvent.click(screen.getByRole("button", { name: "Show third-party licences" }));
+    expect(open).toHaveBeenCalledOnce();
   });
 
   it("opens the changelog for the shown version and the support links in the browser", async () => {
@@ -1171,12 +1170,13 @@ describe("About section", () => {
     expect(openInBrowser).toHaveBeenLastCalledWith("https://mumcord.app/changelog#v0.0.0-mock");
   });
 
-  it("explains when the notices cannot be loaded", async () => {
-    vi.spyOn(api, "appInfo").mockRejectedValue(new Error("boom"));
+  it("explains when the licences window cannot be opened", async () => {
+    vi.spyOn(api, "licencesOpen").mockRejectedValue(new Error("boom"));
     vi.spyOn(console, "error").mockImplementation(() => undefined);
     await openSection("About");
+    fireEvent.click(screen.getByRole("button", { name: "Show third-party licences" }));
     expect(await screen.findByRole("alert")).toHaveTextContent(
-      "The third-party notices could not be loaded.",
+      "The third-party licences could not be opened.",
     );
   });
 });
@@ -1286,7 +1286,6 @@ describe("Overlay on macOS (QA.58)", () => {
       version: "0.0.0",
       packageVersion: "0.0.0",
       os: "macos aarch64",
-      thirdPartyNotices: "",
       appimage: false,
       distro: null,
     });
@@ -1309,7 +1308,6 @@ describe("Overlay on macOS (QA.58)", () => {
       version: "0.0.0",
       packageVersion: "0.0.0",
       os: "linux x86_64",
-      thirdPartyNotices: "",
       appimage: false,
       distro: null,
     });

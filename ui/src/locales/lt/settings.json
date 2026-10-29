@@ -374,7 +374,8 @@
     "requestFeature": "Pasiūlyti funkciją",
     "notices": "Trečiųjų šalių pranešimai",
     "noticesHint": "Mumcord sukurtas naudojant atvirojo kodo programinę įrangą, įskaitant Mumble projekto kodą.",
-    "noticesFailed": "Nepavyko įkelti trečiųjų šalių pranešimų.",
+    "showNotices": "Rodyti trečiųjų šalių licencijas",
+    "noticesFailed": "Nepavyko atverti trečiųjų šalių licencijų.",
     "loading": "Įkeliama…",
     "devToolsUnlocked": "Kūrėjo įrankiai atrakinti: paketų tikrintuvas dabar yra nustatymų sąraše."
   },
@@ -576,6 +577,29 @@
       "watch": "Bendro žiūrėjimo būsena",
       "plugin": "Papildinio duomenys",
       "mumble": "Mumble pranešimas"
+    }
+  },
+  "licences": {
+    "title": "Trečiųjų šalių licencijos",
+    "own": "Pati Mumcord yra laisva programinė įranga pagal GNU Affero General Public License v3 only (AGPL-3.0-only) licenciją.",
+    "sourceCode": "Pirminis kodas",
+    "search": "Ieškoti pagal pavadinimą ar licenciją",
+    "filter": "Licencija",
+    "allLicences": "Visos licencijos",
+    "expandAll": "Išskleisti viską",
+    "collapseAll": "Suskleisti viską",
+    "shown": "Rodoma: {{shown}} iš {{total}}",
+    "empty": "Paieškos neatitinka nė vienas komponentas.",
+    "loadFailed": "Nepavyko įkelti licencijų sąrašo.",
+    "repository": "Saugykla:",
+    "copy": "Kopijuoti licencijos tekstą",
+    "copied": "Licencijos tekstas nukopijuotas",
+    "copyFailed": "Nepavyko nukopijuoti",
+    "textOf": "{{name}} licencijos tekstas",
+    "sources": {
+      "rust": "Rust",
+      "npm": "npm",
+      "native": "Vietinis"
     }
   }
 }

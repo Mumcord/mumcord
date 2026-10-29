@@ -158,7 +158,7 @@ pub fn packet_capture_set(
 ) -> ApiResult<()> {
     engine.set_packet_capture(enabled);
     if !enabled {
-        crate::inspector_window::close(&app);
+        crate::aux_window::close(&app, &crate::aux_window::INSPECTOR);
     }
     Ok(())
 }
@@ -237,7 +237,7 @@ pub struct SharedView(Mutex<Option<InspectorView>>);
 #[specta::specta]
 pub async fn packet_inspector_open(app: AppHandle) -> ApiResult<()> {
     // Async: creating a window from a synchronous command deadlocks on Windows.
-    crate::inspector_window::open(&app).map_err(|e| {
+    crate::aux_window::open(&app, &crate::aux_window::INSPECTOR).map_err(|e| {
         tracing::warn!(error = %e, "opening the packet inspector window failed");
         ApiError::new(
             ErrorCode::Io,
@@ -250,7 +250,7 @@ pub async fn packet_inspector_open(app: AppHandle) -> ApiResult<()> {
 #[tauri::command]
 #[specta::specta]
 pub fn packet_inspector_close(app: AppHandle) -> ApiResult<()> {
-    crate::inspector_window::close(&app);
+    crate::aux_window::close(&app, &crate::aux_window::INSPECTOR);
     Ok(())
 }
 
@@ -266,7 +266,9 @@ pub fn packet_inspector_share(
         .0
         .lock()
         .unwrap_or_else(std::sync::PoisonError::into_inner) = Some(view.clone());
-    if let Err(e) = (InspectorViewChanged { view }).emit_to(&app, crate::inspector_window::LABEL) {
+    if let Err(e) =
+        (InspectorViewChanged { view }).emit_to(&app, crate::aux_window::INSPECTOR.label)
+    {
         tracing::warn!(error = %e, "updating the packet inspector window failed");
     }
     Ok(())

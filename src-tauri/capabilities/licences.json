@@ -1,0 +1,7 @@
+{
+  "$schema": "../gen/schemas/desktop-schema.json",
+  "identifier": "licences",
+  "description": "Permissions for the third-party licences window: engine events only",
+  "windows": ["licences"],
+  "permissions": ["core:event:allow-listen", "core:event:allow-unlisten"]
+}

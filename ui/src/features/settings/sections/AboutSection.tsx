@@ -16,7 +16,6 @@ const ISSUES_URL = "https://github.com/Mumcord/mumcord/issues/new";
 export function AboutSection({ settings, update }: SettingsSectionProps) {
   const { t, i18n } = useTranslation("settings");
   const [info, setInfo] = useState<AppInfo | null>(null);
-  const [notices, setNotices] = useState<string | null>(null);
   const [noticesFailed, setNoticesFailed] = useState(false);
   const [unlocked, setUnlocked] = useState(false);
   const versionClicked = useUnlockClicks(() => {
@@ -30,13 +29,10 @@ export function AboutSection({ settings, update }: SettingsSectionProps) {
       .appInfo()
       .then(
         (loaded) => {
-          if (!active) return;
-          setInfo(loaded);
-          setNotices(loaded.thirdPartyNotices);
+          if (active) setInfo(loaded);
         },
         (error: unknown) => {
           console.error("Loading app info failed", error);
-          if (active) setNoticesFailed(true);
         },
       );
     return () => {
@@ -118,12 +114,27 @@ export function AboutSection({ settings, update }: SettingsSectionProps) {
       </Group>
       <Group title={t("about.notices")}>
         <p className="settings-hint">{t("about.noticesHint")}</p>
-        {noticesFailed ? (
+        <div className="settings-group">
+          <button
+            type="button"
+            className="settings-button"
+            onClick={() => {
+              setNoticesFailed(false);
+              getApi()
+                .licencesOpen()
+                .catch((error: unknown) => {
+                  console.error("Opening the licences window failed", error);
+                  setNoticesFailed(true);
+                });
+            }}
+          >
+            {t("about.showNotices")}
+          </button>
+        </div>
+        {noticesFailed && (
           <p role="alert" className="settings-error">
             {t("about.noticesFailed")}
           </p>
-        ) : (
-          <ScrollableText label={t("about.notices")} text={notices ?? t("about.loading")} />
         )}
       </Group>
     </Section>

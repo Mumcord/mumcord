@@ -372,7 +372,8 @@
     "requestFeature": "Foreslå en funktion",
     "notices": "Tredjepartsbeskeder",
     "noticesHint": "Mumcord er bygget på open source-software, herunder kode fra Mumble-projektet.",
-    "noticesFailed": "Tredjepartsbeskederne kunne ikke indlæses.",
+    "showNotices": "Vis tredjepartslicenser",
+    "noticesFailed": "Tredjepartslicenserne kunne ikke åbnes.",
     "loading": "Indlæser…",
     "devToolsUnlocked": "Udviklerværktøjer låst op: pakkeinspektøren står nu på listen over indstillinger."
   },
@@ -570,6 +571,29 @@
       "watch": "Status for fællesfilm",
       "plugin": "Plugindata",
       "mumble": "Mumble-besked"
+    }
+  },
+  "licences": {
+    "title": "Tredjepartslicenser",
+    "own": "Mumcord er selv fri software under GNU Affero General Public License v3 only (AGPL-3.0-only).",
+    "sourceCode": "Kildekode",
+    "search": "Søg efter navn eller licens",
+    "filter": "Licens",
+    "allLicences": "Alle licenser",
+    "expandAll": "Fold alle ud",
+    "collapseAll": "Fold alle sammen",
+    "shown": "Vist: {{shown}} af {{total}}",
+    "empty": "Ingen komponent matcher søgningen.",
+    "loadFailed": "Licenslisten kunne ikke indlæses.",
+    "repository": "Repository:",
+    "copy": "Kopiér licenstekst",
+    "copied": "Licenstekst kopieret",
+    "copyFailed": "Kopiering mislykkedes",
+    "textOf": "Licenstekst for {{name}}",
+    "sources": {
+      "rust": "Rust",
+      "npm": "npm",
+      "native": "Native"
     }
   }
 }

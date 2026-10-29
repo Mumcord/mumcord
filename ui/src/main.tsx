@@ -4,6 +4,7 @@ import "./theme/global.css";
 import { initialLanguage } from "./i18n";
 import { App } from "./app/App";
 import { InspectorWindow } from "./features/inspector/InspectorWindow";
+import { LicencesWindow } from "./features/licences/LicencesWindow";
 import { installNativeMenuSuppression } from "./app/nativeContextMenu";
 import { installNativeDragGuard } from "./app/nativeDrag";
 import { applyThemeToDocument, osPrefersDark, resolveTheme } from "./theme/theme";
@@ -19,13 +20,21 @@ installNativeDragGuard();
 // Paint the OS theme right away; the stored theme setting replaces it once settings load.
 applyThemeToDocument(resolveTheme("system", osPrefersDark()));
 
-// The packet inspector's own window (issue #60) loads the same page and renders only the inspector.
-const inspectorWindow =
-  new URLSearchParams(window.location.search).get("window") === "packet-inspector";
+// The packet inspector (issue #60) and the third-party licences (issue #138) have windows of their
+// own that load the same page and render only their content.
+const windowKind = new URLSearchParams(window.location.search).get("window");
 
 // The first frame is already in the OS language; the stored setting follows once settings load.
 void initialLanguage.then(() => {
   createRoot(root).render(
-    <StrictMode>{inspectorWindow ? <InspectorWindow /> : <App />}</StrictMode>,
+    <StrictMode>
+      {windowKind === "packet-inspector" ? (
+        <InspectorWindow />
+      ) : windowKind === "licences" ? (
+        <LicencesWindow />
+      ) : (
+        <App />
+      )}
+    </StrictMode>,
   );
 });

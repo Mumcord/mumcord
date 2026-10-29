@@ -3,7 +3,7 @@
  * It follows the contract in docs/engine-api.md closely enough for UI flows, not the
  * Mumble protocol: no network, no audio.
  */
-import type { InspectorView, MessageNotice, NotifyOutcome } from "../bindings/commands";
+import type { InspectorView, MessageNotice, NotifyOutcome, WindowLook } from "../bindings/commands";
 import type {
   ApiError,
   AudioDevices,
@@ -528,6 +528,7 @@ export function createMockApi(options: MockOptions = {}): MockApi {
   const failures = new Map<CommandName, ApiError>();
   const inspector = createMockInspector();
   let inspectorView: InspectorView | null = null;
+  let windowLook: WindowLook | null = null;
   const certPrompts = new Map<number, string | null>();
 
   let identity: Identity | null = fresh ? null : { name: "Zoe", certHash: "selfhash" };
@@ -1713,6 +1714,14 @@ export function createMockApi(options: MockOptions = {}): MockApi {
       return Promise.resolve(null);
     },
     packetInspectorView: () => Promise.resolve(inspectorView),
+    licencesOpen: () => Promise.resolve(null),
+    licencesClose: () => Promise.resolve(null),
+    windowLookShare: (look) => {
+      windowLook = look;
+      emit("windowLookChanged", { look });
+      return Promise.resolve(null);
+    },
+    windowLook: () => Promise.resolve(windowLook),
 
     // diagnostics
     diagnosticsSave: () => Promise.resolve(null),
@@ -1723,8 +1732,6 @@ export function createMockApi(options: MockOptions = {}): MockApi {
               version: "0.3.0",
               packageVersion: "0.3.0",
               os: "Linux x86_64",
-              thirdPartyNotices:
-                "Mumble\nCopyright (c) The Mumble Developers\nBSD-3-Clause\n\nTauri - Apache-2.0 OR MIT\n\nReact - MIT",
               appimage: false,
               distro: null,
             }
@@ -1732,8 +1739,6 @@ export function createMockApi(options: MockOptions = {}): MockApi {
               version: "0.0.0-mock",
               packageVersion: "0.0.0-mock",
               os: "mock",
-              thirdPartyNotices:
-                "Mumble\nCopyright (c) The Mumble Developers\nBSD-3-Clause\n\nSome library - Apache-2.0",
               appimage: false,
               distro: null,
             },

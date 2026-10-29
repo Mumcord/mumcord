@@ -1,6 +1,7 @@
 //! Tauri shell: registers plugins and exposes the engine to the UI via typed commands.
 
 mod autostart;
+mod aux_window;
 mod browser;
 mod cache_dirs;
 mod commands;
@@ -11,7 +12,6 @@ mod display;
 #[cfg(target_os = "linux")]
 mod gst_fallback;
 mod ingame_overlay;
-mod inspector_window;
 mod kde;
 #[cfg(target_os = "linux")]
 mod kde_x11;
@@ -158,6 +158,10 @@ fn specta_builder() -> Builder<tauri::Wry> {
             commands::inspector::packet_inspector_close,
             commands::inspector::packet_inspector_share,
             commands::inspector::packet_inspector_view,
+            commands::licences::licences_open,
+            commands::licences::licences_close,
+            commands::licences::window_look_share,
+            commands::licences::window_look,
             notify::notify_message,
             notify::notification_dismiss,
             commands::now_playing::now_playing_status,
@@ -238,6 +242,7 @@ fn specta_builder() -> Builder<tauri::Wry> {
             commands::screen_share::ScreenSharesChanged,
             commands::updates::UpdateAvailable,
             commands::inspector::InspectorViewChanged,
+            commands::licences::WindowLookChanged,
         ])
 }
 
@@ -291,7 +296,7 @@ pub fn run() {
         .plugin(tauri_plugin_clipboard_manager::init())
         .invoke_handler(move |call| {
             let label = call.message.webview_ref().label().to_owned();
-            if !inspector_window::command_allowed(&label, call.message.command()) {
+            if !aux_window::command_allowed(&label, call.message.command()) {
                 call.resolver.reject(commands::types::ApiError::new(
                     commands::types::ErrorCode::PermissionDenied,
                     "this command is not available in this window",
@@ -301,13 +306,14 @@ pub fn run() {
             invoke(call)
         })
         .manage(dropped::DroppedFiles::default())
-        .manage(inspector_window::OpenLock::default())
+        .manage(aux_window::OpenLock::default())
         .manage(commands::inspector::SharedView::default())
+        .manage(commands::licences::SharedLook::default())
         .manage(watch_player::PlayerServer::default())
         .on_window_event(|window, event| {
             dropped::on_window_event(window, event);
             window::on_window_event(window, event);
-            inspector_window::on_window_event(window, event);
+            aux_window::on_window_event(window, event);
         })
         .setup(move |app| {
             builder.mount_events(app);

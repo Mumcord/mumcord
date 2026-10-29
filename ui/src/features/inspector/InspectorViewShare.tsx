@@ -1,24 +1,9 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import { getApi } from "../../api";
 import { useServers as useConnectedServers } from "../channels/serverStore";
 import { useServers as useSavedServers } from "../servers/store";
-import { readRootLook, sharedServers, sharedUsers, type RootLook } from "./inspectorView";
-
-/** The main window's root look, updated whenever its theme, hints or language change. */
-function useRootLook(): RootLook {
-  const [look, setLook] = useState(() => readRootLook(document.documentElement));
-  useEffect(() => {
-    const root = document.documentElement;
-    const observer = new MutationObserver(() => {
-      setLook(readRootLook(root));
-    });
-    observer.observe(root, { attributes: true });
-    return () => {
-      observer.disconnect();
-    };
-  }, []);
-  return look;
-}
+import { sharedServers, sharedUsers } from "./inspectorView";
+import { useRootLook } from "./useRootLook";
 
 /**
  * Shares the main window's theme, language and known names with the packet inspector window

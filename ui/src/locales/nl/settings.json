@@ -372,7 +372,8 @@
     "requestFeature": "Een functie aanvragen",
     "notices": "Vermeldingen van derden",
     "noticesHint": "Mumcord is gebouwd op opensourcesoftware, waaronder code van het Mumble-project.",
-    "noticesFailed": "De vermeldingen van derden konden niet worden geladen.",
+    "showNotices": "Licenties van derden tonen",
+    "noticesFailed": "De licenties van derden konden niet worden geopend.",
     "loading": "Laden…",
     "devToolsUnlocked": "Ontwikkelaarstools ontgrendeld: de pakketinspecteur staat nu in de lijst met instellingen."
   },
@@ -570,6 +571,29 @@
       "watch": "Status van kijkfeest",
       "plugin": "Plugingegevens",
       "mumble": "Mumble-bericht"
+    }
+  },
+  "licences": {
+    "title": "Licenties van derden",
+    "own": "Mumcord zelf is vrije software onder de GNU Affero General Public License v3 only (AGPL-3.0-only).",
+    "sourceCode": "Broncode",
+    "search": "Zoeken op naam of licentie",
+    "filter": "Licentie",
+    "allLicences": "Alle licenties",
+    "expandAll": "Alles uitklappen",
+    "collapseAll": "Alles inklappen",
+    "shown": "Getoond: {{shown}} van {{total}}",
+    "empty": "Geen onderdeel komt overeen met de zoekopdracht.",
+    "loadFailed": "De licentielijst kon niet worden geladen.",
+    "repository": "Repository:",
+    "copy": "Licentietekst kopiëren",
+    "copied": "Licentietekst gekopieerd",
+    "copyFailed": "Kopiëren mislukt",
+    "textOf": "Licentietekst van {{name}}",
+    "sources": {
+      "rust": "Rust",
+      "npm": "npm",
+      "native": "Native"
     }
   }
 }
