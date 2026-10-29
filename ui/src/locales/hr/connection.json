@@ -29,5 +29,35 @@
   "realtimeValue": {
     "on": "Uključeno",
     "off": "Isključeno"
+  },
+  "audioRating": "Zvuk: {{rating}}",
+  "rating": {
+    "good": "Dobar",
+    "fair": "Srednji",
+    "poor": "Loš"
+  },
+  "reason": {
+    "good_one": "Bez problema u posljednjoj {{count}} minuti",
+    "good_few": "Bez problema u posljednje {{count}} minute",
+    "good_other": "Bez problema u posljednjih {{count}} minuta",
+    "network": "Dio glasa drugih je prikriven: gubitak u mreži",
+    "cpu": "Obrada vašeg zvuka kasni: visoko opterećenje procesora",
+    "device": "Vaš zvučni uređaj imao je prekide"
+  },
+  "details": "Pojedinosti",
+  "sinceConnected": "Brojači od spajanja. Grafovi: posljednjih {{minutes}} min.",
+  "about": "O stavci {{label}}",
+  "help": {
+    "dropouts": "Praznine kad zvučni uređaj nije stizao (preljev, podljev ili ponovno pokretanje). Normalno: 0.",
+    "late": "Zvučni okviri koje je računalo obradilo prekasno, obično zbog visokog opterećenja procesora. Normalno: 0 ili blizu 0.",
+    "concealed": "Glasovni okviri drugih koji nisu stigli na vrijeme pa je klijent popunio prazninu. Uzrok: gubitak u mreži. Normalno: blizu 0.",
+    "jitter": "Kašnjenje koje izravnava glasovne pakete drugih koji stižu neravnomjerno. Normalno: 20–60 ms.",
+    "processing": "Vrijeme obrade jednog okvira od 10 ms s vašeg mikrofona. Normalno: znatno ispod 10 ms.",
+    "realtime": "Dobivaju li zvučne niti od sustava prioritet u stvarnom vremenu. Uključeno pomaže protiv prekida pod opterećenjem."
+  },
+  "recent": {
+    "perMinute": "Posljednjih {{minutes}} min: {{value}} u minuti.",
+    "concealedShare": "Posljednjih {{minutes}} min: {{value}} % primljenih okvira.",
+    "processingMax": "Posljednjih {{minutes}} min: najviše {{value}} ms od {{budget}} ms po okviru."
   }
 }

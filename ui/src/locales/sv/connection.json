@@ -29,5 +29,34 @@
   "realtimeValue": {
     "on": "På",
     "off": "Av"
+  },
+  "audioRating": "Ljud: {{rating}}",
+  "rating": {
+    "good": "Bra",
+    "fair": "Godtagbart",
+    "poor": "Dåligt"
+  },
+  "reason": {
+    "good_one": "Inga problem den senaste minuten",
+    "good_other": "Inga problem de senaste {{count}} minuterna",
+    "network": "En del av andras röst doldes: nätverksförlust",
+    "cpu": "Din ljudbehandling ligger efter: hög processorbelastning",
+    "device": "Din ljudenhet hade avbrott"
+  },
+  "details": "Detaljer",
+  "sinceConnected": "Räknare sedan anslutningen. Grafer: senaste {{minutes}} min.",
+  "about": "Om {{label}}",
+  "help": {
+    "dropouts": "Luckor när din ljudenhet inte hann med (överskridning, underskridning eller omstart). Normalt: 0.",
+    "late": "Ljudramar som datorn behandlade för sent, oftast på grund av hög processorbelastning. Normalt: 0 eller nästan 0.",
+    "concealed": "Talramar från andra som inte kom fram i tid, så klienten fyllde luckan. Orsak: nätverksförlust. Normalt: nästan 0.",
+    "jitter": "Fördröjning som jämnar ut andras talpaket som kommer ojämnt. Normalt: 20–60 ms.",
+    "processing": "Tid att behandla en ram på 10 ms från din mikrofon. Normalt: långt under 10 ms.",
+    "realtime": "Om ljudtrådarna får realtidsprioritet av systemet. På hjälper mot avbrott under belastning."
+  },
+  "recent": {
+    "perMinute": "Senaste {{minutes}} min: {{value}} per minut.",
+    "concealedShare": "Senaste {{minutes}} min: {{value}} % av mottagna ramar.",
+    "processingMax": "Senaste {{minutes}} min: max {{value}} ms av {{budget}} ms rambudget."
   }
 }

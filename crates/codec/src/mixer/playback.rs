@@ -131,6 +131,8 @@ pub struct FrameTime {
     frames: AtomicU64,
     total_us: AtomicU64,
     max_us: AtomicU64,
+    /// Worst time since the last [`take_recent_max_us`](Self::take_recent_max_us).
+    recent_max_us: AtomicU64,
 }
 
 impl FrameTime {
@@ -140,6 +142,7 @@ impl FrameTime {
         self.frames.fetch_add(1, Ordering::Relaxed);
         self.total_us.fetch_add(us, Ordering::Relaxed);
         self.max_us.fetch_max(us, Ordering::Relaxed);
+        self.recent_max_us.fetch_max(us, Ordering::Relaxed);
     }
 
     /// Average time per frame in µs (0 before the first frame).
@@ -156,10 +159,17 @@ impl FrameTime {
         self.max_us.load(Ordering::Relaxed)
     }
 
+    /// Worst time of a single frame since the previous call, in µs; for a rating over a recent
+    /// window rather than since start. Meant for a single reader.
+    pub fn take_recent_max_us(&self) -> u64 {
+        self.recent_max_us.swap(0, Ordering::Relaxed)
+    }
+
     pub fn reset(&self) {
         self.frames.store(0, Ordering::Relaxed);
         self.total_us.store(0, Ordering::Relaxed);
         self.max_us.store(0, Ordering::Relaxed);
+        self.recent_max_us.store(0, Ordering::Relaxed);
     }
 }
 
@@ -300,6 +310,12 @@ impl Playback {
             mix_time_avg_us: c.mix_time.avg_us(),
             mix_time_max_us: c.mix_time.max_us(),
         }
+    }
+
+    /// Worst mixing time of one frame since the previous call, in µs (see
+    /// [`FrameTime::take_recent_max_us`]).
+    pub fn take_recent_mix_max_us(&self) -> u64 {
+        self.counters.mix_time.take_recent_max_us()
     }
 
     /// `false` if the command queue is full (the caller may retry).

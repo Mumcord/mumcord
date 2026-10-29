@@ -129,7 +129,16 @@ export function createMockInspector() {
             count,
           };
         }),
-        voice: capturing ? [{ serverId: 1, sent: 1520, received: 3044 }] : [],
+        voice: capturing
+          ? [
+              {
+                serverId: 1,
+                sent: 1520,
+                received: 3044,
+                rating: { rating: "fair", issue: "network" },
+              },
+            ]
+          : [],
       };
     },
     clear() {

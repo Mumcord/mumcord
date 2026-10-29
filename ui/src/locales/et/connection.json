@@ -29,5 +29,34 @@
   "realtimeValue": {
     "on": "Sees",
     "off": "Väljas"
+  },
+  "audioRating": "Heli: {{rating}}",
+  "rating": {
+    "good": "Hea",
+    "fair": "Keskmine",
+    "poor": "Halb"
+  },
+  "reason": {
+    "good_one": "Viimase minuti jooksul probleeme polnud",
+    "good_other": "Viimase {{count}} minuti jooksul probleeme polnud",
+    "network": "Osa teiste kõnest varjati: võrgukadu",
+    "cpu": "Sinu helitöötlus jääb maha: suur protsessori koormus",
+    "device": "Sinu heliseadmel oli katkestusi"
+  },
+  "details": "Üksikasjad",
+  "sinceConnected": "Loendurid alates ühendamisest. Graafikud: viimased {{minutes}} min.",
+  "about": "Teave: {{label}}",
+  "help": {
+    "dropouts": "Lüngad, kui heliseade ei jõudnud järele (ületäitumine, alatäitumine või taaskäivitus). Tavaline: 0.",
+    "late": "Helikaadrid, mida arvuti töötles liiga hilja, tavaliselt suure protsessori koormuse tõttu. Tavaline: 0 või peaaegu 0.",
+    "concealed": "Teiste kõnekaadrid, mis ei jõudnud õigel ajal kohale, nii et klient täitis lünga. Põhjus: võrgukadu. Tavaline: peaaegu 0.",
+    "jitter": "Viivitus, mis ühtlustab teiste ebaühtlaselt saabuvaid kõnepakette. Tavaline: 20–60 ms.",
+    "processing": "Aeg ühe 10 ms mikrofonikaadri töötlemiseks. Tavaline: tublisti alla 10 ms.",
+    "realtime": "Kas helilõimed saavad süsteemilt reaalajaprioriteedi. Sees aitab koormuse all katkestusi vältida."
+  },
+  "recent": {
+    "perMinute": "Viimased {{minutes}} min: {{value}} minutis.",
+    "concealedShare": "Viimased {{minutes}} min: {{value}} % vastuvõetud kaadritest.",
+    "processingMax": "Viimased {{minutes}} min: max {{value}} ms {{budget}} ms kaadrieelarvest."
   }
 }

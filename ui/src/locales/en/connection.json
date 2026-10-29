@@ -29,5 +29,34 @@
   "realtimeValue": {
     "on": "On",
     "off": "Off"
+  },
+  "audioRating": "Audio: {{rating}}",
+  "rating": {
+    "good": "Good",
+    "fair": "Fair",
+    "poor": "Poor"
+  },
+  "reason": {
+    "good_one": "No problems in the last minute",
+    "good_other": "No problems in the last {{count}} minutes",
+    "network": "Some voice from others was concealed: network loss",
+    "cpu": "Your audio processing is running late: high CPU load",
+    "device": "Your audio device had dropouts"
+  },
+  "details": "Details",
+  "sinceConnected": "Counts since connected. Graphs: last {{minutes}} min.",
+  "about": "About {{label}}",
+  "help": {
+    "dropouts": "Gaps when your audio device could not keep up (overruns, underruns or restarts). Normal: 0.",
+    "late": "Audio frames your computer handled too late, usually under high CPU load. Normal: 0 or close to it.",
+    "concealed": "Voice frames from others that never arrived in time, so the client filled the gap. Caused by network loss. Normal: close to 0.",
+    "jitter": "Delay added to even out voice packets from others that arrive unevenly. Normal: 20–60 ms.",
+    "processing": "Time needed to process one 10 ms frame of your microphone audio. Normal: well below 10 ms.",
+    "realtime": "Whether the audio threads get real-time priority from the system. On helps avoid dropouts under load."
+  },
+  "recent": {
+    "perMinute": "Last {{minutes}} min: {{value}} per minute.",
+    "concealedShare": "Last {{minutes}} min: {{value}} % of received frames.",
+    "processingMax": "Last {{minutes}} min: max {{value}} ms of the {{budget}} ms frame budget."
   }
 }

@@ -29,5 +29,36 @@
   "realtimeValue": {
     "on": "Wł.",
     "off": "Wył."
+  },
+  "audioRating": "Dźwięk: {{rating}}",
+  "rating": {
+    "good": "Dobry",
+    "fair": "Średni",
+    "poor": "Słaby"
+  },
+  "reason": {
+    "good_one": "Brak problemów w ostatniej minucie",
+    "good_few": "Brak problemów w ostatnich {{count}} minutach",
+    "good_many": "Brak problemów w ostatnich {{count}} minutach",
+    "good_other": "Brak problemów w ostatnich {{count}} minutach",
+    "network": "Część głosu innych została zamaskowana: utrata pakietów w sieci",
+    "cpu": "Przetwarzanie Twojego dźwięku się opóźnia: duże obciążenie procesora",
+    "device": "Twoje urządzenie audio miało przerwy"
+  },
+  "details": "Szczegóły",
+  "sinceConnected": "Liczniki od połączenia. Wykresy: ostatnie {{minutes}} min.",
+  "about": "Informacje: {{label}}",
+  "help": {
+    "dropouts": "Przerwy, gdy urządzenie audio nie nadążało (przepełnienie, niedopełnienie lub restart). Norma: 0.",
+    "late": "Ramki dźwięku przetworzone przez komputer zbyt późno, zwykle przy dużym obciążeniu procesora. Norma: 0 lub prawie 0.",
+    "concealed": "Ramki głosu innych, które nie dotarły na czas, więc klient wypełnił lukę. Przyczyna: utrata pakietów w sieci. Norma: prawie 0.",
+    "jitter": "Opóźnienie wyrównujące nierówno docierające pakiety głosu innych. Norma: 20–60 ms.",
+    "processing": "Czas przetwarzania jednej 10-milisekundowej ramki z mikrofonu. Norma: wyraźnie poniżej 10 ms.",
+    "realtime": "Czy wątki audio dostają od systemu priorytet czasu rzeczywistego. Włączone pomaga uniknąć przerw przy obciążeniu."
+  },
+  "recent": {
+    "perMinute": "Ostatnie {{minutes}} min: {{value}} na minutę.",
+    "concealedShare": "Ostatnie {{minutes}} min: {{value}} % odebranych ramek.",
+    "processingMax": "Ostatnie {{minutes}} min: maks. {{value}} ms z budżetu {{budget}} ms na ramkę."
   }
 }

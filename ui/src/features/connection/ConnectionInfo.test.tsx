@@ -1,6 +1,7 @@
 import { act, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { createMockApi, setApi, type MockApi } from "../../api";
+import type { AudioHealth } from "../../bindings/commands";
 import "../../i18n";
 import { axeViolations } from "../../test/axe";
 import { getServerState, resetServerStore } from "../channels/serverStore";
@@ -27,10 +28,37 @@ function openPanel() {
 }
 
 function valueOf(panel: HTMLElement, label: string) {
-  return within(panel).getByText(label).nextElementSibling?.textContent;
+  return within(panel).getByText(label).closest("div")?.querySelector("dd")?.textContent;
+}
+
+/** Audio health with nothing wrong, overridden per test. */
+function audio(overrides: Partial<AudioHealth> = {}): AudioHealth {
+  return {
+    dropouts: 0,
+    lateFrames: 0,
+    concealedFrames: 0,
+    jitterBufferMs: 30,
+    processingAvgUs: 300,
+    processingMaxUs: 900,
+    realtime: true,
+    rating: "good",
+    issue: null,
+    windowSecs: 120,
+    recentDropouts: 0,
+    recentLateFrames: 0,
+    recentConcealedFrames: 0,
+    recentReceivedFrames: 0,
+    recentProcessingMaxUs: 0,
+    dropoutsHistory: Array<number>(12).fill(0),
+    lateFramesHistory: Array<number>(12).fill(0),
+    concealedHistory: Array<number>(12).fill(0),
+    processingMaxHistoryUs: Array<number>(12).fill(0),
+    ...overrides,
+  };
 }
 
 afterEach(() => {
+  vi.restoreAllMocks();
   vi.useRealTimers();
   resetServerStore();
   setApi(undefined);
@@ -53,10 +81,10 @@ describe("ConnectionInfo", () => {
     expect(valueOf(panel, "Server limit")).toBe("558 kbit/s");
   });
 
-  it("shows the health of the local audio path while voice runs", async () => {
+  it("shows the audio counters with their recent figures in the details", async () => {
     await setup();
     api.mock.setConnectionStats({
-      audio: {
+      audio: audio({
         dropouts: 2,
         lateFrames: 7,
         concealedFrames: 12,
@@ -64,16 +92,94 @@ describe("ConnectionInfo", () => {
         processingAvgUs: 350,
         processingMaxUs: 4200,
         realtime: false,
-      },
+        recentDropouts: 3,
+        recentConcealedFrames: 21,
+        recentReceivedFrames: 979,
+        recentProcessingMaxUs: 3800,
+      }),
     });
     const panel = openPanel();
-    await within(panel).findByText("Audio dropouts");
+    fireEvent.click(await within(panel).findByRole("button", { name: "Details" }));
     expect(valueOf(panel, "Audio dropouts")).toBe("2");
     expect(valueOf(panel, "Late audio frames")).toBe("7");
     expect(valueOf(panel, "Concealed audio frames")).toBe("12");
     expect(valueOf(panel, "Jitter buffer")).toBe("60 ms");
     expect(valueOf(panel, "Audio processing (avg / max)")).toBe("0.4 / 4.2 ms");
     expect(valueOf(panel, "Real-time audio")).toBe("Off");
+    expect(within(panel).getByText(/Counts since connected/u)).toBeInTheDocument();
+    const info = (label: string) => within(panel).getByRole("button", { name: `About ${label}` });
+    expect(info("Audio dropouts")).toHaveAccessibleDescription(
+      /Normal: 0\. Last 2 min: 1\.5 per minute\./u,
+    );
+    expect(info("Concealed audio frames")).toHaveAccessibleDescription(
+      /Last 2 min: 2\.1 % of received frames\./u,
+    );
+    expect(info("Audio processing (avg / max)")).toHaveAccessibleDescription(
+      /Last 2 min: max 3\.8 ms of the 10 ms frame budget\./u,
+    );
+    expect(info("Audio dropouts")).toHaveAttribute("data-tooltip");
+  });
+
+  it.each([
+    ["good", null, "Audio: Good", "No problems in the last 2 minutes"],
+    ["fair", "network", "Audio: Fair", "Some voice from others was concealed: network loss"],
+    ["poor", "cpu", "Audio: Poor", "Your audio processing is running late: high CPU load"],
+    ["poor", "device", "Audio: Poor", "Your audio device had dropouts"],
+  ] as const)(
+    "rates the audio %s (%s) with an icon and the reason",
+    async (rating, issue, title, reason) => {
+      await setup();
+      api.mock.setConnectionStats({ audio: audio({ rating, issue }) });
+      const panel = openPanel();
+      const heading = await within(panel).findByText(title);
+      const box = heading.closest(".audio-rating");
+      expect(box).toHaveAttribute("data-rating", rating);
+      expect(box?.querySelector("svg[aria-hidden='true']")).not.toBeNull();
+      expect(within(panel).getByText(reason)).toBeInTheDocument();
+    },
+  );
+
+  it("rounds the good window to whole minutes", async () => {
+    await setup();
+    api.mock.setConnectionStats({ audio: audio({ windowSecs: 50 }) });
+    const panel = openPanel();
+    expect(await within(panel).findByText("No problems in the last minute")).toBeInTheDocument();
+  });
+
+  it("keeps the details collapsed by default and remembers when they are opened", async () => {
+    localStorage.removeItem("mumcord.audioDetailsOpen");
+    await setup();
+    let panel = openPanel();
+    const toggle = await within(panel).findByRole("button", { name: "Details" });
+    expect(toggle).toHaveAttribute("aria-expanded", "false");
+    expect(within(panel).queryByText("Audio dropouts")).not.toBeVisible();
+    fireEvent.click(toggle);
+    expect(toggle).toHaveAttribute("aria-expanded", "true");
+    expect(within(panel).getByText("Audio dropouts")).toBeVisible();
+
+    fireEvent.click(screen.getByRole("button", { name: "Connection info" }));
+    panel = openPanel();
+    expect(await within(panel).findByRole("button", { name: "Details" })).toHaveAttribute(
+      "aria-expanded",
+      "true",
+    );
+    localStorage.removeItem("mumcord.audioDetailsOpen");
+  });
+
+  it("still works when the storage is unavailable", async () => {
+    vi.spyOn(console, "warn").mockImplementation(() => undefined);
+    vi.spyOn(Storage.prototype, "getItem").mockImplementation(() => {
+      throw new Error("denied");
+    });
+    vi.spyOn(Storage.prototype, "setItem").mockImplementation(() => {
+      throw new Error("denied");
+    });
+    await setup();
+    const panel = openPanel();
+    const toggle = await within(panel).findByRole("button", { name: "Details" });
+    expect(toggle).toHaveAttribute("aria-expanded", "false");
+    fireEvent.click(toggle);
+    expect(toggle).toHaveAttribute("aria-expanded", "true");
   });
 
   it("leaves the audio rows out on a server without voice", async () => {
@@ -82,6 +188,7 @@ describe("ConnectionInfo", () => {
     const panel = openPanel();
     await within(panel).findByText("Transport");
     expect(within(panel).queryByText("Audio dropouts")).toBeNull();
+    expect(within(panel).queryByText(/^Audio: /u)).toBeNull();
   });
 
   it("updates live while open, e.g. when the bitrate drops", async () => {
@@ -149,10 +256,10 @@ describe("ConnectionInfo", () => {
     ).toBeInTheDocument();
   });
 
-  it("has no axe violations when open", async () => {
+  it("has no axe violations when open, with the details shown", async () => {
     const { container } = await setup();
     const panel = openPanel();
-    await within(panel).findByText("Transport");
+    fireEvent.click(await within(panel).findByRole("button", { name: "Details" }));
     expect(await axeViolations(container)).toEqual([]);
   });
 });

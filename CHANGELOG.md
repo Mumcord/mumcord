@@ -12,6 +12,7 @@
 
 ### Changed
 
+- Connection info rates the audio as Good, Fair or Poor over the last two minutes, with an icon, a colour and a one-line reason that names the likely cause (network loss, high CPU load or the audio device). The raw counters moved into a Details section that stays collapsed until opened (remembered), with an explanation of each counter, what is normal, the figure for the last two minutes and small trend graphs. The diagnostics file and the packet inspector's voice counters show the rating and reason too. The counters no longer count normal silence: concealment only counts while someone's voice stream is running (not the end of every speech burst), late frames and playback underruns only count while sound is being sent or played, and the jitter buffer shows the last speaker's delay between bursts instead of 0 ms (#152)
 - The post-release changelog step no longer adds a second empty "Unreleased" section when the next version already has an open "X.Y.Z - Unreleased" section, and the release notes fall back to a plain "Unreleased" section
 - After a release is published, a workflow opens a pull request that writes the released version into the manifests and lock files and regenerates the third-party notices and dates the changelog section, so `main` no longer stays on the previous version and a release needs no pull request beforehand; the release notes take their "What's new" from the changelog
 

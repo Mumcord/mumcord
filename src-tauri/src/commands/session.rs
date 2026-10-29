@@ -110,7 +110,60 @@ pub struct ConnectionStats {
     pub audio: Option<AudioHealth>,
 }
 
-/// Glitch counters of the local audio path since voice started on this connection (issue #123).
+/// Overall audio rating over the recent window (issue #152).
+#[derive(Serialize, Deserialize, Clone, Copy, Debug, PartialEq, Eq, Type)]
+#[serde(rename_all = "camelCase")]
+pub enum AudioRating {
+    Good,
+    Fair,
+    Poor,
+}
+
+impl From<mumcord_engine::audio_rating::AudioRating> for AudioRating {
+    fn from(r: mumcord_engine::audio_rating::AudioRating) -> Self {
+        use mumcord_engine::audio_rating::AudioRating as R;
+        match r {
+            R::Good => Self::Good,
+            R::Fair => Self::Fair,
+            R::Poor => Self::Poor,
+        }
+    }
+}
+
+/// The most likely cause of a Fair or Poor rating.
+#[derive(Serialize, Deserialize, Clone, Copy, Debug, PartialEq, Eq, Type)]
+#[serde(rename_all = "camelCase")]
+pub enum AudioIssue {
+    /// Voice from others was concealed: packets lost or late on the way.
+    Network,
+    /// The audio threads ran late or processing was slow: high CPU load.
+    Cpu,
+    /// The audio device reported dropouts.
+    Device,
+}
+
+impl From<mumcord_engine::audio_rating::AudioIssue> for AudioIssue {
+    fn from(i: mumcord_engine::audio_rating::AudioIssue) -> Self {
+        use mumcord_engine::audio_rating::AudioIssue as I;
+        match i {
+            I::Network => Self::Network,
+            I::Cpu => Self::Cpu,
+            I::Device => Self::Device,
+        }
+    }
+}
+
+/// A rating with its cause, for compact places such as the packet inspector.
+#[derive(Serialize, Deserialize, Clone, Copy, Debug, PartialEq, Eq, Type)]
+#[serde(rename_all = "camelCase")]
+pub struct AudioRatingLabel {
+    pub rating: AudioRating,
+    /// `null` while the rating is good.
+    pub issue: Option<AudioIssue>,
+}
+
+/// Glitch counters of the local audio path since voice started on this connection (issue #123),
+/// with the rating over the recent window (issue #152).
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, Type)]
 #[serde(rename_all = "camelCase")]
 pub struct AudioHealth {
@@ -120,13 +173,29 @@ pub struct AudioHealth {
     pub late_frames: u32,
     /// Received frames rebuilt by concealment because packets came late or not at all.
     pub concealed_frames: u32,
-    /// Current jitter-buffer delay of the people talking.
+    /// Jitter-buffer delay of the people talking, or of the last one between bursts.
     pub jitter_buffer_ms: u32,
     /// Average and worst capture processing time per 10 ms frame, in µs.
     pub processing_avg_us: u32,
     pub processing_max_us: u32,
     /// Whether the voice threads run with real-time scheduling.
     pub realtime: bool,
+    pub rating: AudioRating,
+    /// `null` while the rating is good.
+    pub issue: Option<AudioIssue>,
+    /// Length of the recent window the `recent*` figures cover, in seconds.
+    pub window_secs: u32,
+    pub recent_dropouts: u32,
+    pub recent_late_frames: u32,
+    pub recent_concealed_frames: u32,
+    /// Received voice frames in the window (the base of the concealed share).
+    pub recent_received_frames: u32,
+    pub recent_processing_max_us: u32,
+    /// Per 10 s bucket over the window, oldest first, for sparklines.
+    pub dropouts_history: Vec<u32>,
+    pub late_frames_history: Vec<u32>,
+    pub concealed_history: Vec<u32>,
+    pub processing_max_history_us: Vec<u32>,
 }
 
 impl From<AudioHealthView> for AudioHealth {
@@ -142,6 +211,18 @@ impl From<AudioHealthView> for AudioHealth {
             processing_avg_us: count(a.capture_time_avg_us),
             processing_max_us: count(a.capture_time_max_us),
             realtime: a.realtime_threads > 0,
+            rating: a.rating.rating.into(),
+            issue: a.rating.issue.map(Into::into),
+            window_secs: a.rating.window_secs,
+            recent_dropouts: count(a.rating.dropouts),
+            recent_late_frames: count(a.rating.late_frames),
+            recent_concealed_frames: count(a.rating.concealed_frames),
+            recent_received_frames: count(a.rating.received_frames),
+            recent_processing_max_us: count(a.rating.processing_max_us),
+            dropouts_history: a.rating.dropouts_history.to_vec(),
+            late_frames_history: a.rating.late_frames_history.to_vec(),
+            concealed_history: a.rating.concealed_history.to_vec(),
+            processing_max_history_us: a.rating.processing_max_history_us.to_vec(),
         }
     }
 }

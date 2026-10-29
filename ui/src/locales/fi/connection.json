@@ -29,5 +29,34 @@
   "realtimeValue": {
     "on": "Päällä",
     "off": "Pois"
+  },
+  "audioRating": "Ääni: {{rating}}",
+  "rating": {
+    "good": "Hyvä",
+    "fair": "Kohtalainen",
+    "poor": "Huono"
+  },
+  "reason": {
+    "good_one": "Ei ongelmia viimeisen minuutin aikana",
+    "good_other": "Ei ongelmia viimeisten {{count}} minuutin aikana",
+    "network": "Osa muiden puheesta peitettiin: verkkohäviö",
+    "cpu": "Äänenkäsittelysi on myöhässä: korkea suorittimen kuorma",
+    "device": "Äänilaitteessasi oli katkoja"
+  },
+  "details": "Lisätiedot",
+  "sinceConnected": "Laskurit yhdistämisestä alkaen. Kaaviot: viimeiset {{minutes}} min.",
+  "about": "Tietoa: {{label}}",
+  "help": {
+    "dropouts": "Katkot, kun äänilaite ei pysynyt mukana (ylivuoto, alivuoto tai uudelleenkäynnistys). Normaali: 0.",
+    "late": "Äänikehykset, jotka tietokone käsitteli liian myöhään, yleensä korkean suoritinkuorman vuoksi. Normaali: 0 tai lähes 0.",
+    "concealed": "Muiden puhekehykset, jotka eivät ehtineet ajoissa, joten ohjelma täytti aukon. Syy: verkkohäviö. Normaali: lähes 0.",
+    "jitter": "Viive, joka tasoittaa muiden epätasaisesti saapuvia puhepaketteja. Normaali: 20–60 ms.",
+    "processing": "Aika, joka kuluu yhden 10 ms:n mikrofonikehyksen käsittelyyn. Normaali: selvästi alle 10 ms.",
+    "realtime": "Saavatko äänisäikeet järjestelmältä reaaliaikaprioriteetin. Päällä auttaa välttämään katkoja kuormassa."
+  },
+  "recent": {
+    "perMinute": "Viimeiset {{minutes}} min: {{value}} minuutissa.",
+    "concealedShare": "Viimeiset {{minutes}} min: {{value}} % vastaanotetuista kehyksistä.",
+    "processingMax": "Viimeiset {{minutes}} min: enint. {{value}} ms {{budget}} ms:n kehysbudjetista."
   }
 }

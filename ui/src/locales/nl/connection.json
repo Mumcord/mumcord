@@ -29,5 +29,34 @@
   "realtimeValue": {
     "on": "Aan",
     "off": "Uit"
+  },
+  "audioRating": "Audio: {{rating}}",
+  "rating": {
+    "good": "Goed",
+    "fair": "Matig",
+    "poor": "Slecht"
+  },
+  "reason": {
+    "good_one": "Geen problemen in de afgelopen minuut",
+    "good_other": "Geen problemen in de afgelopen {{count}} minuten",
+    "network": "Een deel van de spraak van anderen is gemaskeerd: netwerkverlies",
+    "cpu": "Je audioverwerking loopt achter: hoge CPU-belasting",
+    "device": "Je audioapparaat had haperingen"
+  },
+  "details": "Details",
+  "sinceConnected": "Tellers sinds verbinden. Grafieken: laatste {{minutes}} min.",
+  "about": "Over {{label}}",
+  "help": {
+    "dropouts": "Gaten wanneer je audioapparaat het niet bijhield (overloop, onderloop of herstart). Normaal: 0.",
+    "late": "Audioframes die je computer te laat verwerkte, meestal door hoge CPU-belasting. Normaal: 0 of bijna 0.",
+    "concealed": "Spraakframes van anderen die niet op tijd aankwamen, zodat de client het gat opvulde. Oorzaak: netwerkverlies. Normaal: bijna 0.",
+    "jitter": "Vertraging die onregelmatig binnenkomende spraakpakketten van anderen gelijktrekt. Normaal: 20–60 ms.",
+    "processing": "Tijd om één frame van 10 ms van je microfoon te verwerken. Normaal: ruim onder 10 ms.",
+    "realtime": "Of de audiothreads realtimeprioriteit van het systeem krijgen. Aan helpt haperingen onder belasting te voorkomen."
+  },
+  "recent": {
+    "perMinute": "Laatste {{minutes}} min: {{value}} per minuut.",
+    "concealedShare": "Laatste {{minutes}} min: {{value}} % van de ontvangen frames.",
+    "processingMax": "Laatste {{minutes}} min: max. {{value}} ms van {{budget}} ms framebudget."
   }
 }

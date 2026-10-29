@@ -32,6 +32,7 @@ use mumcord_protocol::{OutgoingAudio, VoiceTransport};
 use tokio::runtime::Handle as Runtime;
 use tokio::task::JoinHandle as TaskHandle;
 
+use crate::audio_rating::HealthHistory;
 use crate::positional::PositionalShared;
 use crate::screen_share::sound::ShareSoundHub;
 use crate::session::batch::TalkBatch;
@@ -333,6 +334,7 @@ pub(crate) struct VoicePipeline {
     shared: Arc<VoiceShared>,
     /// Device counters when the pipeline started; the connection info shows what happened since.
     io_base: IoStats,
+    health: HealthHistory,
 }
 
 impl VoicePipeline {
@@ -447,6 +449,7 @@ impl VoicePipeline {
                 sounds,
                 shared: pipeline_shared,
                 io_base,
+                health: HealthHistory::new(Instant::now()),
             },
             ports.packets,
         ))
@@ -454,6 +457,20 @@ impl VoicePipeline {
 
     pub fn playback_stats(&self) -> PlaybackStats {
         self.playback.stats()
+    }
+
+    /// Worst mixing time of one frame since the previous call, in µs.
+    pub fn take_recent_mix_max_us(&self) -> u64 {
+        self.playback.take_recent_mix_max_us()
+    }
+
+    /// History of the health counters behind the audio rating.
+    pub fn health(&self) -> &HealthHistory {
+        &self.health
+    }
+
+    pub fn health_mut(&mut self) -> &mut HealthHistory {
+        &mut self.health
     }
 
     /// Device counters at the start of this pipeline.

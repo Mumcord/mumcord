@@ -29,5 +29,37 @@
   "realtimeValue": {
     "on": "Ar siúl",
     "off": "As"
+  },
+  "audioRating": "Fuaim: {{rating}}",
+  "rating": {
+    "good": "Maith",
+    "fair": "Measartha",
+    "poor": "Lag"
+  },
+  "reason": {
+    "good_one": "Gan fadhb ar bith le nóiméad anuas",
+    "good_two": "Gan fadhb ar bith le {{count}} nóiméad anuas",
+    "good_few": "Gan fadhb ar bith le {{count}} nóiméad anuas",
+    "good_many": "Gan fadhb ar bith le {{count}} nóiméad anuas",
+    "good_other": "Gan fadhb ar bith le {{count}} nóiméad anuas",
+    "network": "Ceileadh cuid de ghlór daoine eile: caillteanas líonra",
+    "cpu": "Tá próiseáil do chuid fuaime ag titim siar: ualach ard LAP",
+    "device": "Bhí bearnaí i do ghléas fuaime"
+  },
+  "details": "Sonraí",
+  "sinceConnected": "Áirimh ón nascadh. Graif: na {{minutes}} nóim. is déanaí.",
+  "about": "Maidir le {{label}}",
+  "help": {
+    "dropouts": "Bearnaí nuair nach raibh do ghléas fuaime in ann coinneáil suas (róshreabhadh, tearcshreabhadh nó atosú). Gnáth: 0.",
+    "late": "Frámaí fuaime a phróiseáil do ríomhaire ródhéanach, de ghnáth faoi ualach ard LAP. Gnáth: 0 nó gar dó.",
+    "concealed": "Frámaí gutha ó dhaoine eile nár tháinig in am, agus mar sin líon an cliant an bhearna. Cúis: caillteanas líonra. Gnáth: gar do 0.",
+    "jitter": "Moill a chothromaíonn paicéid ghutha ó dhaoine eile a thagann go míchothrom. Gnáth: 20–60 ms.",
+    "processing": "An t-am chun fráma 10 ms amháin ó do mhicreafón a phróiseáil. Gnáth: i bhfad faoi 10 ms.",
+    "realtime": "Cé acu a fhaigheann na snáitheanna fuaime tosaíocht fíor-ama ón gcóras. Cuidíonn Air le bearnaí a sheachaint faoi ualach."
+  },
+  "recent": {
+    "perMinute": "Na {{minutes}} nóim. is déanaí: {{value}} sa nóiméad.",
+    "concealedShare": "Na {{minutes}} nóim. is déanaí: {{value}} % de na frámaí a fuarthas.",
+    "processingMax": "Na {{minutes}} nóim. is déanaí: uas. {{value}} ms as buiséad {{budget}} ms an fhráma."
   }
 }

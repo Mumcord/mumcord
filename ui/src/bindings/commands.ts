@@ -563,7 +563,10 @@ export type AudioDevicesChanged = {
 	devices: AudioDevices,
 };
 
-/**  Glitch counters of the local audio path since voice started on this connection (issue #123). */
+/**
+ *  Glitch counters of the local audio path since voice started on this connection (issue #123),
+ *  with the rating over the recent window (issue #152).
+ */
 export type AudioHealth = {
 	/**  Device problems: xruns, stream restarts, capture overruns and playback underruns. */
 	dropouts: number,
@@ -571,13 +574,48 @@ export type AudioHealth = {
 	lateFrames: number,
 	/**  Received frames rebuilt by concealment because packets came late or not at all. */
 	concealedFrames: number,
-	/**  Current jitter-buffer delay of the people talking. */
+	/**  Jitter-buffer delay of the people talking, or of the last one between bursts. */
 	jitterBufferMs: number,
 	/**  Average and worst capture processing time per 10 ms frame, in µs. */
 	processingAvgUs: number,
 	processingMaxUs: number,
 	/**  Whether the voice threads run with real-time scheduling. */
 	realtime: boolean,
+	rating: AudioRating,
+	/**  `null` while the rating is good. */
+	issue: AudioIssue | null,
+	/**  Length of the recent window the `recent*` figures cover, in seconds. */
+	windowSecs: number,
+	recentDropouts: number,
+	recentLateFrames: number,
+	recentConcealedFrames: number,
+	/**  Received voice frames in the window (the base of the concealed share). */
+	recentReceivedFrames: number,
+	recentProcessingMaxUs: number,
+	/**  Per 10 s bucket over the window, oldest first, for sparklines. */
+	dropoutsHistory: number[],
+	lateFramesHistory: number[],
+	concealedHistory: number[],
+	processingMaxHistoryUs: number[],
+};
+
+/**  The most likely cause of a Fair or Poor rating. */
+export type AudioIssue = 
+/**  Voice from others was concealed: packets lost or late on the way. */
+"network" | 
+/**  The audio threads ran late or processing was slow: high CPU load. */
+"cpu" | 
+/**  The audio device reported dropouts. */
+"device";
+
+/**  Overall audio rating over the recent window (issue #152). */
+export type AudioRating = "good" | "fair" | "poor";
+
+/**  A rating with its cause, for compact places such as the packet inspector. */
+export type AudioRatingLabel = {
+	rating: AudioRating,
+	/**  `null` while the rating is good. */
+	issue: AudioIssue | null,
 };
 
 /**
@@ -1864,6 +1902,8 @@ export type VoiceCounter = {
 	serverId: number,
 	sent: number,
 	received: number,
+	/**  Audio rating on the server with the voice pipeline (issue #152); `null` elsewhere. */
+	rating: AudioRatingLabel | null,
 };
 
 /**  The voice server changed (FR-2.2); `null` when no server has voice. */

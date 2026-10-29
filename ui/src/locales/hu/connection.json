@@ -29,5 +29,34 @@
   "realtimeValue": {
     "on": "Be",
     "off": "Ki"
+  },
+  "audioRating": "Hang: {{rating}}",
+  "rating": {
+    "good": "Jó",
+    "fair": "Közepes",
+    "poor": "Rossz"
+  },
+  "reason": {
+    "good_one": "Nem volt probléma az elmúlt percben",
+    "good_other": "Nem volt probléma az elmúlt {{count}} percben",
+    "network": "Mások hangjának egy részét pótolni kellett: hálózati veszteség",
+    "cpu": "A hangfeldolgozásod késik: magas processzorterhelés",
+    "device": "A hangeszközöd kihagyott"
+  },
+  "details": "Részletek",
+  "sinceConnected": "Számlálók a csatlakozás óta. Grafikonok: utolsó {{minutes}} perc.",
+  "about": "Erről: {{label}}",
+  "help": {
+    "dropouts": "Kihagyások, amikor a hangeszköz nem tudott lépést tartani (túlcsordulás, alulcsordulás vagy újraindítás). Normál: 0.",
+    "late": "Hangkeretek, amelyeket a számítógép túl későn dolgozott fel, általában magas processzorterhelés miatt. Normál: 0 vagy közel 0.",
+    "concealed": "Mások hangkeretei, amelyek nem érkeztek meg időben, ezért a kliens kitöltötte a rést. Ok: hálózati veszteség. Normál: közel 0.",
+    "jitter": "Késleltetés, amely kiegyenlíti mások egyenetlenül érkező hangcsomagjait. Normál: 20–60 ms.",
+    "processing": "Egy 10 ms-os mikrofonkeret feldolgozási ideje. Normál: jóval 10 ms alatt.",
+    "realtime": "Kapnak-e a hangszálak valós idejű prioritást a rendszertől. A Be segít elkerülni a kihagyásokat terhelés alatt."
+  },
+  "recent": {
+    "perMinute": "Utolsó {{minutes}} perc: {{value}} percenként.",
+    "concealedShare": "Utolsó {{minutes}} perc: a fogadott keretek {{value}} %-a.",
+    "processingMax": "Utolsó {{minutes}} perc: max. {{value}} ms a {{budget}} ms-os keretkeretből."
   }
 }

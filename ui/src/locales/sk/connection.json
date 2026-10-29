@@ -29,5 +29,36 @@
   "realtimeValue": {
     "on": "Zapnuté",
     "off": "Vypnuté"
+  },
+  "audioRating": "Zvuk: {{rating}}",
+  "rating": {
+    "good": "Dobrý",
+    "fair": "Priemerný",
+    "poor": "Zlý"
+  },
+  "reason": {
+    "good_one": "Žiadne problémy za poslednú minútu",
+    "good_few": "Žiadne problémy za posledné {{count}} minúty",
+    "good_many": "Žiadne problémy za posledných {{count}} minúty",
+    "good_other": "Žiadne problémy za posledných {{count}} minút",
+    "network": "Časť hlasu ostatných bola maskovaná: strata v sieti",
+    "cpu": "Spracovanie vášho zvuku mešká: vysoké zaťaženie procesora",
+    "device": "Vaše zvukové zariadenie malo výpadky"
+  },
+  "details": "Podrobnosti",
+  "sinceConnected": "Počty od pripojenia. Grafy: posledných {{minutes}} min.",
+  "about": "O položke {{label}}",
+  "help": {
+    "dropouts": "Výpadky, keď zvukové zariadenie nestíhalo (pretečenie, podtečenie alebo reštart). Normálne: 0.",
+    "late": "Zvukové rámce, ktoré počítač spracoval neskoro, zvyčajne pri vysokom zaťažení procesora. Normálne: 0 alebo takmer 0.",
+    "concealed": "Hlasové rámce od ostatných, ktoré neprišli včas, takže klient medzeru vyplnil. Príčina: strata v sieti. Normálne: takmer 0.",
+    "jitter": "Oneskorenie, ktoré vyrovnáva nepravidelne prichádzajúce hlasové pakety ostatných. Normálne: 20–60 ms.",
+    "processing": "Čas na spracovanie jedného 10 ms rámca z vášho mikrofónu. Normálne: výrazne pod 10 ms.",
+    "realtime": "Či zvukové vlákna dostávajú od systému prioritu v reálnom čase. Zapnuté pomáha proti výpadkom pri záťaži."
+  },
+  "recent": {
+    "perMinute": "Posledných {{minutes}} min: {{value}} za minútu.",
+    "concealedShare": "Posledných {{minutes}} min: {{value}} % prijatých rámcov.",
+    "processingMax": "Posledných {{minutes}} min: max. {{value}} ms z rozpočtu {{budget}} ms na rámec."
   }
 }
