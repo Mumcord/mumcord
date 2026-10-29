@@ -29,12 +29,12 @@ function message(body: string): ChatMessage {
   };
 }
 
-function renderMessage(body: string) {
+function renderMessage(body: string, syncedFrom: string | null = null) {
   return render(
     <main>
       <MessageList
         log={{
-          messages: [message(body)],
+          messages: [{ ...message(body), syncedFrom }],
           loaded: true,
           loading: false,
           hasMore: false,
@@ -173,6 +173,16 @@ describe("language label (issue #112)", () => {
   it("shows the named language in the block's corner", () => {
     const { container } = renderMessage(markdownToHtml("```sql\n" + SQL + "\n```"));
     expect(container.querySelector(".chat-code__label")?.textContent).toBe("SQL");
+  });
+
+  it("shows the label on a message that arrived through history sync", () => {
+    // The stored body as the engine hands it over after a sync or a restart (issue #122).
+    const { container } = renderMessage(
+      '<pre data-mumcord-lang="sql"><code>SELECT 1;\n</code></pre>',
+      "Bob",
+    );
+    expect(container.querySelector(".chat-code__label")?.textContent).toBe("SQL");
+    expect(container.querySelector(".chat-code .hljs-keyword")?.textContent).toBe("SELECT");
   });
 
   it("translates the plain text label", () => {
