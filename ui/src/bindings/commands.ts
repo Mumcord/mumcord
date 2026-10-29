@@ -357,6 +357,12 @@ export const commands = {
 	windowLookShare: (look: WindowLook) => typedError<null, ApiError>(__TAURI_INVOKE("window_look_share", { look })),
 	/**  The look the main window shared last; `null` before it shared one. */
 	windowLook: () => typedError<WindowLook | null, ApiError>(__TAURI_INVOKE("window_look")),
+	/**  Opens the "What's new" window, or brings it to the front if it is already open. */
+	changelogOpen: () => typedError<null, ApiError>(__TAURI_INVOKE("changelog_open")),
+	/**  Closes the "What's new" window (Ctrl+W or its Close button). */
+	changelogClose: () => typedError<null, ApiError>(__TAURI_INVOKE("changelog_close")),
+	/**  Remembers that this version's "What's new" was shown or skipped, so it opens only once. */
+	whatsNewMarkSeen: () => typedError<null, ApiError>(__TAURI_INVOKE("whats_new_mark_seen")),
 	/**  Decides by window focus and the notification setting; shows the system notification itself. */
 	notifyMessage: (notice: MessageNotice) => typedError<NotifyOutcome, ApiError>(__TAURI_INVOKE("notify_message", { notice })),
 	/**  The user opened this chat: its system notification is outdated. */
@@ -1672,6 +1678,13 @@ export type Settings = {
 	appimageMenuEntry: Consent,
 	/**  The one-time "window overlay removed" notice was shown (FR-2.33). */
 	windowOverlayNoticeShown: boolean,
+	/**  "Show automatically after updates" for the "What's new" window (default on; issue #145). */
+	whatsNewAuto: boolean,
+	/**
+	 *  The version whose "What's new" was shown or skipped last; `null` before the first start
+	 *  that knew about it.
+	 */
+	whatsNewSeen: string | null,
 };
 
 /**  Notification sound toggles per event (FR-1.27). */
@@ -1922,7 +1935,7 @@ export type WindowLook = {
 	language: string,
 };
 
-/**  The main window's look changed; sent to the licences window only. */
+/**  The main window's look changed; sent to the licences and "What's new" windows only. */
 export type WindowLookChanged = {
 	look: WindowLook,
 };

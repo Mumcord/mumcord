@@ -368,6 +368,8 @@
     "os": "Sistēma",
     "license": "Mumcord licence (AGPL-3.0)",
     "whatsNew": "Kas jauns",
+    "whatsNewAuto": "Automātiski rādīt “Jaunumi” pēc atjauninājumiem",
+    "changelogFailed": "Logu “Jaunumi” neizdevās atvērt.",
     "support": "Atbalsts",
     "reportBug": "Ziņot par kļūdu",
     "requestFeature": "Pieprasīt funkciju",
@@ -598,5 +600,22 @@
       "npm": "npm",
       "native": "Vietējs"
     }
+  },
+  "changelog": {
+    "title": "Mumcord {{version}}",
+    "subtitle": "Skatiet, kas mainījies katrā versijā. Jaunākās vispirms.",
+    "search": "Meklēt visās versijās",
+    "expandAll": "Izvērst visu",
+    "collapseAll": "Sakļaut visu",
+    "found": "Atrastās versijas: {{count}}",
+    "empty": "Neviens ieraksts neatbilst meklēšanai.",
+    "loadFailed": "Izmaiņu žurnālu neizdevās ielādēt.",
+    "current": "Pašreizējā",
+    "inDevelopment": "Izstrādē",
+    "unreleased": "Nepublicēta",
+    "forDevelopers": "izstrādātājiem",
+    "releasePage": "Laidiena lapa",
+    "entries": "Ieraksti: {{count}}",
+    "englishNote": "Izmaiņu žurnāls ir angļu valodā."
   }
 }

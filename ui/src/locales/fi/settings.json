@@ -367,6 +367,8 @@
     "os": "Järjestelmä",
     "license": "Mumcordin lisenssi (AGPL-3.0)",
     "whatsNew": "Mitä uutta",
+    "whatsNewAuto": "Näytä ”Uutta” automaattisesti päivitysten jälkeen",
+    "changelogFailed": "Ikkunaa ”Uutta” ei voitu avata.",
     "support": "Tuki",
     "reportBug": "Ilmoita virheestä",
     "requestFeature": "Ehdota ominaisuutta",
@@ -595,5 +597,22 @@
       "npm": "npm",
       "native": "Natiivi"
     }
+  },
+  "changelog": {
+    "title": "Mumcord {{version}}",
+    "subtitle": "Katso, mitä kussakin versiossa muuttui. Uusin ensin.",
+    "search": "Hae kaikista versioista",
+    "expandAll": "Laajenna kaikki",
+    "collapseAll": "Supista kaikki",
+    "found": "Löydetyt versiot: {{count}}",
+    "empty": "Mikään merkintä ei vastaa hakua.",
+    "loadFailed": "Muutoslokia ei voitu ladata.",
+    "current": "Nykyinen",
+    "inDevelopment": "Kehitteillä",
+    "unreleased": "Julkaisematon",
+    "forDevelopers": "kehittäjille",
+    "releasePage": "Julkaisusivu",
+    "entries": "Merkinnät: {{count}}",
+    "englishNote": "Muutosloki on kirjoitettu englanniksi."
   }
 }

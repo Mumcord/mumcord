@@ -368,6 +368,8 @@
     "os": "Sustav",
     "license": "Licenca Mumcorda (AGPL-3.0)",
     "whatsNew": "Što je novo",
+    "whatsNewAuto": "Automatski prikaži „Novosti” nakon ažuriranja",
+    "changelogFailed": "Prozor „Novosti” nije se mogao otvoriti.",
     "support": "Podrška",
     "reportBug": "Prijavi grešku",
     "requestFeature": "Predloži značajku",
@@ -598,5 +600,22 @@
       "npm": "npm",
       "native": "Izvorno"
     }
+  },
+  "changelog": {
+    "title": "Mumcord {{version}}",
+    "subtitle": "Pogledajte što se promijenilo u svakoj verziji. Najnovije prvo.",
+    "search": "Pretraži sve verzije",
+    "expandAll": "Proširi sve",
+    "collapseAll": "Sažmi sve",
+    "found": "Pronađene verzije: {{count}}",
+    "empty": "Nijedan unos ne odgovara pretrazi.",
+    "loadFailed": "Popis promjena nije se mogao učitati.",
+    "current": "Trenutačna",
+    "inDevelopment": "U razvoju",
+    "unreleased": "Neobjavljena",
+    "forDevelopers": "za programere",
+    "releasePage": "Stranica izdanja",
+    "entries": "Unosi: {{count}}",
+    "englishNote": "Popis promjena napisan je na engleskom."
   }
 }

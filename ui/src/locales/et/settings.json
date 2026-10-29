@@ -367,6 +367,8 @@
     "os": "Süsteem",
     "license": "Mumcordi litsents (AGPL-3.0)",
     "whatsNew": "Mis on uut",
+    "whatsNewAuto": "Näita „Mis on uut” pärast uuendusi automaatselt",
+    "changelogFailed": "Akent „Mis on uut” ei saanud avada.",
     "support": "Tugi",
     "reportBug": "Teata veast",
     "requestFeature": "Soovi funktsiooni",
@@ -595,5 +597,22 @@
       "npm": "npm",
       "native": "Natiivne"
     }
+  },
+  "changelog": {
+    "title": "Mumcord {{version}}",
+    "subtitle": "Vaata, mis igas versioonis muutus. Uusimad eespool.",
+    "search": "Otsi kõigist versioonidest",
+    "expandAll": "Laienda kõik",
+    "collapseAll": "Ahenda kõik",
+    "found": "Leitud versioone: {{count}}",
+    "empty": "Ükski kirje ei vasta otsingule.",
+    "loadFailed": "Muudatuste logi laadimine ebaõnnestus.",
+    "current": "Praegune",
+    "inDevelopment": "Arenduses",
+    "unreleased": "Avaldamata",
+    "forDevelopers": "arendajatele",
+    "releasePage": "Väljalaske leht",
+    "entries": "Kirjeid: {{count}}",
+    "englishNote": "Muudatuste logi on inglise keeles."
   }
 }

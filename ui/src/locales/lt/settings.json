@@ -369,6 +369,8 @@
     "os": "Sistema",
     "license": "Mumcord licencija (AGPL-3.0)",
     "whatsNew": "Kas naujo",
+    "whatsNewAuto": "Po atnaujinimų automatiškai rodyti „Kas naujo“",
+    "changelogFailed": "Nepavyko atidaryti lango „Kas naujo“.",
     "support": "Pagalba",
     "reportBug": "Pranešti apie klaidą",
     "requestFeature": "Pasiūlyti funkciją",
@@ -601,5 +603,22 @@
       "npm": "npm",
       "native": "Vietinis"
     }
+  },
+  "changelog": {
+    "title": "Mumcord {{version}}",
+    "subtitle": "Pažiūrėkite, kas pasikeitė kiekvienoje versijoje. Naujausios pirmiausia.",
+    "search": "Ieškoti visose versijose",
+    "expandAll": "Išskleisti viską",
+    "collapseAll": "Suskleisti viską",
+    "found": "Rasta versijų: {{count}}",
+    "empty": "Nė vienas įrašas neatitinka paieškos.",
+    "loadFailed": "Nepavyko įkelti pakeitimų žurnalo.",
+    "current": "Dabartinė",
+    "inDevelopment": "Kuriama",
+    "unreleased": "Neišleista",
+    "forDevelopers": "kūrėjams",
+    "releasePage": "Laidos puslapis",
+    "entries": "Įrašų: {{count}}",
+    "englishNote": "Pakeitimų žurnalas parašytas anglų kalba."
   }
 }

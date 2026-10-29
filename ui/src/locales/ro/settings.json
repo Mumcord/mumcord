@@ -368,6 +368,8 @@
     "os": "Sistem",
     "license": "Licența Mumcord (AGPL-3.0)",
     "whatsNew": "Noutăți",
+    "whatsNewAuto": "Afișează automat „Noutăți” după actualizări",
+    "changelogFailed": "Fereastra „Noutăți” nu a putut fi deschisă.",
     "support": "Asistență",
     "reportBug": "Raportează o eroare",
     "requestFeature": "Cere o funcție",
@@ -598,5 +600,22 @@
       "npm": "npm",
       "native": "Nativ"
     }
+  },
+  "changelog": {
+    "title": "Mumcord {{version}}",
+    "subtitle": "Vezi ce s-a schimbat în fiecare versiune. Cele mai noi primele.",
+    "search": "Caută în toate versiunile",
+    "expandAll": "Extinde tot",
+    "collapseAll": "Restrânge tot",
+    "found": "Versiuni găsite: {{count}}",
+    "empty": "Nicio intrare nu corespunde căutării.",
+    "loadFailed": "Lista de modificări nu a putut fi încărcată.",
+    "current": "Curentă",
+    "inDevelopment": "În dezvoltare",
+    "unreleased": "Nelansată",
+    "forDevelopers": "pentru dezvoltatori",
+    "releasePage": "Pagina versiunii",
+    "entries": "Intrări: {{count}}",
+    "englishNote": "Lista de modificări este scrisă în engleză."
   }
 }

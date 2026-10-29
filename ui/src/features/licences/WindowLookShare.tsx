@@ -3,8 +3,8 @@ import { getApi } from "../../api";
 import { useRootLook } from "../inspector/useRootLook";
 
 /**
- * Shares the main window's theme and language with the third-party licences window (issue
- * #138), which follows them live while it is open.
+ * Shares the main window's theme and language with the third-party licences (issue #138) and
+ * "What's new" (issue #145) windows, which follow them live while they are open.
  */
 export function WindowLookShare() {
   const look = useRootLook();
@@ -17,7 +17,7 @@ export function WindowLookShare() {
     getApi()
       .windowLookShare(look)
       .catch((error: unknown) => {
-        console.error("Sharing the look with the licences window failed", error);
+        console.error("Sharing the look with the other windows failed", error);
       });
   }, [look]);
 

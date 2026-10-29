@@ -1,0 +1,7 @@
+{
+  "$schema": "../gen/schemas/desktop-schema.json",
+  "identifier": "changelog",
+  "description": "Permissions for the \"What's new\" window: engine events only",
+  "windows": ["changelog"],
+  "permissions": ["core:event:allow-listen", "core:event:allow-unlisten"]
+}

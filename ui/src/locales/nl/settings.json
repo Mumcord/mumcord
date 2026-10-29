@@ -367,6 +367,8 @@
     "os": "Systeem",
     "license": "Mumcord-licentie (AGPL-3.0)",
     "whatsNew": "Wat is er nieuw",
+    "whatsNewAuto": "‘Wat is er nieuw’ automatisch tonen na updates",
+    "changelogFailed": "Het venster ‘Wat is er nieuw’ kon niet worden geopend.",
     "support": "Ondersteuning",
     "reportBug": "Een bug melden",
     "requestFeature": "Een functie aanvragen",
@@ -595,5 +597,22 @@
       "npm": "npm",
       "native": "Native"
     }
+  },
+  "changelog": {
+    "title": "Mumcord {{version}}",
+    "subtitle": "Bekijk wat er in elke versie is veranderd. Nieuwste eerst.",
+    "search": "Alle versies doorzoeken",
+    "expandAll": "Alles uitklappen",
+    "collapseAll": "Alles inklappen",
+    "found": "Gevonden versies: {{count}}",
+    "empty": "Geen item komt overeen met de zoekopdracht.",
+    "loadFailed": "Het wijzigingslogboek kon niet worden geladen.",
+    "current": "Huidig",
+    "inDevelopment": "In ontwikkeling",
+    "unreleased": "Niet uitgebracht",
+    "forDevelopers": "voor ontwikkelaars",
+    "releasePage": "Releasepagina",
+    "entries": "Items: {{count}}",
+    "englishNote": "Het wijzigingslogboek is in het Engels."
   }
 }

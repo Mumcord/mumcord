@@ -369,6 +369,8 @@
     "os": "Systém",
     "license": "Licence Mumcordu (AGPL-3.0)",
     "whatsNew": "Co je nového",
+    "whatsNewAuto": "Po aktualizacích automaticky zobrazit „Co je nového“",
+    "changelogFailed": "Okno „Co je nového“ se nepodařilo otevřít.",
     "support": "Podpora",
     "reportBug": "Nahlásit chybu",
     "requestFeature": "Navrhnout funkci",
@@ -601,5 +603,22 @@
       "npm": "npm",
       "native": "Nativní"
     }
+  },
+  "changelog": {
+    "title": "Mumcord {{version}}",
+    "subtitle": "Podívejte se, co se v každé verzi změnilo. Nejnovější nahoře.",
+    "search": "Hledat ve všech verzích",
+    "expandAll": "Rozbalit vše",
+    "collapseAll": "Sbalit vše",
+    "found": "Nalezené verze: {{count}}",
+    "empty": "Hledání neodpovídá žádná položka.",
+    "loadFailed": "Seznam změn se nepodařilo načíst.",
+    "current": "Aktuální",
+    "inDevelopment": "Ve vývoji",
+    "unreleased": "Nevydaná",
+    "forDevelopers": "pro vývojáře",
+    "releasePage": "Stránka vydání",
+    "entries": "Položky: {{count}}",
+    "englishNote": "Seznam změn je psán anglicky."
   }
 }

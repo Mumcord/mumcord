@@ -14,9 +14,10 @@ const ISSUES_URL = "https://github.com/Mumcord/mumcord/issues/new";
 
 /** About: version, OS, Mumcord's AGPL license and the third-party notices (AC-1.29). */
 export function AboutSection({ settings, update }: SettingsSectionProps) {
-  const { t, i18n } = useTranslation("settings");
+  const { t } = useTranslation("settings");
   const [info, setInfo] = useState<AppInfo | null>(null);
   const [noticesFailed, setNoticesFailed] = useState(false);
+  const [changelogFailed, setChangelogFailed] = useState(false);
   const [unlocked, setUnlocked] = useState(false);
   const versionClicked = useUnlockClicks(() => {
     setUnlocked(true);
@@ -40,10 +41,6 @@ export function AboutSection({ settings, update }: SettingsSectionProps) {
     };
   }, []);
 
-  const changelogBase = i18n.language.startsWith("de")
-    ? "https://mumcord.app/changelog"
-    : "https://mumcord.app/en/changelog";
-
   return (
     <Section title={t("sections.about")}>
       <dl className="settings-facts">
@@ -62,20 +59,35 @@ export function AboutSection({ settings, update }: SettingsSectionProps) {
           {t("about.devToolsUnlocked")}
         </p>
       )}
-      {info && (
-        <div className="settings-group">
-          <button
-            type="button"
-            className="settings-button"
-            onClick={() => {
-              // Dev builds have no changelog entry of their own; they open their base release.
-              openInBrowser(`${changelogBase}#v${info.packageVersion}`);
-            }}
-          >
-            {t("about.whatsNew")}
-          </button>
-        </div>
-      )}
+      <div className="settings-group">
+        <button
+          type="button"
+          className="settings-button"
+          onClick={() => {
+            setChangelogFailed(false);
+            getApi()
+              .changelogOpen()
+              .catch((error: unknown) => {
+                console.error("Opening the changelog window failed", error);
+                setChangelogFailed(true);
+              });
+          }}
+        >
+          {t("about.whatsNew")}
+        </button>
+        {changelogFailed && (
+          <p role="alert" className="settings-error">
+            {t("about.changelogFailed")}
+          </p>
+        )}
+        <Switch
+          label={t("about.whatsNewAuto")}
+          checked={settings.whatsNewAuto}
+          onChange={(on) => {
+            update({ whatsNewAuto: on });
+          }}
+        />
+      </div>
       <Group title={t("updates.title")}>
         <Switch
           label={t("updates.check")}

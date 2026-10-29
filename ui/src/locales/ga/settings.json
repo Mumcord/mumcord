@@ -370,6 +370,8 @@
     "os": "Córas",
     "license": "Ceadúnas Mumcord (AGPL-3.0)",
     "whatsNew": "Cad atá nua",
+    "whatsNewAuto": "Taispeáin “Cad atá nua” go huathoibríoch tar éis nuashonruithe",
+    "changelogFailed": "Níorbh fhéidir an fhuinneog “Cad atá nua” a oscailt.",
     "support": "Tacaíocht",
     "reportBug": "Tuairiscigh fabht",
     "requestFeature": "Iarr gné",
@@ -604,5 +606,22 @@
       "npm": "npm",
       "native": "Dúchasach"
     }
+  },
+  "changelog": {
+    "title": "Mumcord {{version}}",
+    "subtitle": "Féach cad a d'athraigh i ngach leagan. Na cinn is nuaí ar dtús.",
+    "search": "Cuardaigh gach leagan",
+    "expandAll": "Leathnaigh gach rud",
+    "collapseAll": "Laghdaigh gach rud",
+    "found": "Leaganacha aimsithe: {{count}}",
+    "empty": "Níl aon iontráil ag teacht leis an gcuardach.",
+    "loadFailed": "Níorbh fhéidir an loga athruithe a lódáil.",
+    "current": "Reatha",
+    "inDevelopment": "Á fhorbairt",
+    "unreleased": "Gan eisiúint",
+    "forDevelopers": "d'fhorbróirí",
+    "releasePage": "Leathanach an eisiúna",
+    "entries": "Iontrálacha: {{count}}",
+    "englishNote": "Tá an loga athruithe scríofa i mBéarla."
   }
 }

@@ -19,6 +19,7 @@ import { SettingsOverlay } from "./SettingsOverlay";
 import { useThemePreviewing } from "../theme/themeStore";
 import { useDevToolsCapture, useDevToolsUnlocked } from "../features/inspector/devTools";
 import { InspectorViewShare } from "../features/inspector/InspectorViewShare";
+import { WhatsNewOnStart } from "../features/changelog/WhatsNewOnStart";
 import { WindowLookShare } from "../features/licences/WindowLookShare";
 import { useServerTheme } from "./useServerTheme";
 import { useView } from "./view";
@@ -94,12 +95,22 @@ function Screens() {
   }
 }
 
+/**
+ * Work for each start once the settings have loaded. Stays mounted from the wizard to the main
+ * screen, so it runs once and sees whether this was a first start.
+ */
+function StartTasks() {
+  const { screen } = useView();
+  return screen === "wizard" || screen === "main" ? <WhatsNewOnStart /> : null;
+}
+
 /** Root component: providers, live regions and the active screen. */
 export function App() {
   return (
     <PreferencesProvider>
       <ViewProvider>
         <LiveRegions />
+        <StartTasks />
         <Screens />
         <TooltipLayer />
       </ViewProvider>

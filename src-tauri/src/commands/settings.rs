@@ -360,6 +360,11 @@ pub struct Settings {
     pub appimage_menu_entry: Consent,
     /// The one-time "window overlay removed" notice was shown (FR-2.33).
     pub window_overlay_notice_shown: bool,
+    /// "Show automatically after updates" for the "What's new" window (default on; issue #145).
+    pub whats_new_auto: bool,
+    /// The version whose "What's new" was shown or skipped last; `null` before the first start
+    /// that knew about it.
+    pub whats_new_seen: Option<String>,
 }
 
 impl Settings {
@@ -470,6 +475,8 @@ impl Settings {
             update_check: s.update_check.into(),
             appimage_menu_entry: s.appimage_menu_entry.into(),
             window_overlay_notice_shown: s.window_overlay_notice_shown,
+            whats_new_auto: s.whats_new_auto,
+            whats_new_seen: s.whats_new_seen.clone(),
         }
     }
 
@@ -574,6 +581,8 @@ impl Settings {
         s.update_check = self.update_check.into();
         s.appimage_menu_entry = self.appimage_menu_entry.into();
         s.window_overlay_notice_shown = self.window_overlay_notice_shown;
+        s.whats_new_auto = self.whats_new_auto;
+        s.whats_new_seen.clone_from(&self.whats_new_seen);
         s
     }
 }
@@ -932,6 +941,10 @@ mod tests {
         ui.allow_direct_connections = Consent::No;
         ui.update_check = Consent::Yes;
         ui.window_overlay_notice_shown = true;
+        assert!(ui.whats_new_auto);
+        assert_eq!(ui.whats_new_seen, None);
+        ui.whats_new_auto = false;
+        ui.whats_new_seen = Some("0.4.4".into());
         let stored = ui.to_store(&base);
         assert_eq!(stored.max_connected_servers, 15);
         assert_eq!(stored.app_theme_id, "mumcord-dark");
@@ -944,6 +957,8 @@ mod tests {
 
         let back = Settings::from_store(&stored);
         assert!(back.talking_first && back.window_overlay_notice_shown);
+        assert!(!back.whats_new_auto);
+        assert_eq!(back.whats_new_seen.as_deref(), Some("0.4.4"));
         assert_eq!(back.allow_direct_connections, Consent::No);
         assert_eq!(back.update_check, Consent::Yes);
         assert_eq!(back.custom_themes[0].name, "Mine");

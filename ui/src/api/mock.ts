@@ -205,6 +205,8 @@ const DEFAULT_SETTINGS: Settings = {
   updateCheck: "unset",
   appimageMenuEntry: "unset",
   windowOverlayNoticeShown: false,
+  whatsNewAuto: true,
+  whatsNewSeen: null,
 };
 
 /** Offline stand-in for the engine's link previews: a YouTube player card or a page card. */
@@ -1716,6 +1718,12 @@ export function createMockApi(options: MockOptions = {}): MockApi {
     packetInspectorView: () => Promise.resolve(inspectorView),
     licencesOpen: () => Promise.resolve(null),
     licencesClose: () => Promise.resolve(null),
+    changelogOpen: () => Promise.resolve(null),
+    changelogClose: () => Promise.resolve(null),
+    whatsNewMarkSeen: () => {
+      settings = { ...settings, whatsNewSeen: "0.0.0-mock" };
+      return Promise.resolve(null);
+    },
     windowLookShare: (look) => {
       windowLook = look;
       emit("windowLookChanged", { look });

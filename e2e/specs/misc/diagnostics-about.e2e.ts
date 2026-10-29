@@ -146,4 +146,40 @@ describe("diagnostics and about (AC-1.28, AC-1.29)", () => {
     await browser.switchToWindow(mainWindow);
     await button("Show third-party licences").waitForDisplayed();
   });
+
+  it("issue #145: About opens What's new in a window of its own", async () => {
+    await $("//button[@role='tab'][normalize-space()='About']").click();
+    const mainWindow = await browser.getWindowHandle();
+    await button("What's new").click();
+    let changelog = "";
+    await browser.waitUntil(
+      async () => {
+        changelog = (await browser.getWindowHandles()).find((h) => h !== mainWindow) ?? "";
+        return changelog !== "";
+      },
+      { timeout: 15_000, timeoutMsg: "What's new window never opened" },
+    );
+    await browser.switchToWindow(changelog);
+    await $("h1*=Mumcord").waitForDisplayed();
+    // The current version is open; the first release stays collapsed until the search finds it.
+    const current = $("//button[@aria-expanded='true'][.//span[normalize-space()='Current']]");
+    await current.waitForDisplayed();
+    const first = $("//button[@aria-expanded][.//span[normalize-space()='0.1.0']]");
+    expect(await first.getAttribute("aria-expanded")).toBe("false");
+    await $("input[type=search]").setValue("First release");
+    await browser.waitUntil(async () => (await first.getAttribute("aria-expanded")) === "true", {
+      timeout: 5_000,
+      timeoutMsg: "the search did not open the matching version",
+    });
+
+    await browser.keys(["Control", "w"]).catch((error: unknown) => {
+      console.log(`[e2e] Ctrl+W: ${String(error)}`);
+    });
+    await browser.waitUntil(async () => (await browser.getWindowHandles()).length === 1, {
+      timeout: 10_000,
+      timeoutMsg: "Ctrl+W did not close the What's new window",
+    });
+    await browser.switchToWindow(mainWindow);
+    await button("What's new").waitForDisplayed();
+  });
 });

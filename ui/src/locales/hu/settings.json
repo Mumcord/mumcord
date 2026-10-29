@@ -367,6 +367,8 @@
     "os": "Rendszer",
     "license": "Mumcord licenc (AGPL-3.0)",
     "whatsNew": "Újdonságok",
+    "whatsNewAuto": "Az „Újdonságok” automatikus megjelenítése frissítés után",
+    "changelogFailed": "Az „Újdonságok” ablakot nem sikerült megnyitni.",
     "support": "Támogatás",
     "reportBug": "Hiba bejelentése",
     "requestFeature": "Funkció kérése",
@@ -595,5 +597,22 @@
       "npm": "npm",
       "native": "Natív"
     }
+  },
+  "changelog": {
+    "title": "Mumcord {{version}}",
+    "subtitle": "Nézze meg, mi változott az egyes verziókban. A legújabb elöl.",
+    "search": "Keresés az összes verzióban",
+    "expandAll": "Összes kibontása",
+    "collapseAll": "Összes összecsukása",
+    "found": "Talált verziók: {{count}}",
+    "empty": "Egy bejegyzés sem felel meg a keresésnek.",
+    "loadFailed": "A változásnaplót nem sikerült betölteni.",
+    "current": "Jelenlegi",
+    "inDevelopment": "Fejlesztés alatt",
+    "unreleased": "Kiadatlan",
+    "forDevelopers": "fejlesztőknek",
+    "releasePage": "Kiadási oldal",
+    "entries": "Bejegyzések: {{count}}",
+    "englishNote": "A változásnapló angol nyelvű."
   }
 }

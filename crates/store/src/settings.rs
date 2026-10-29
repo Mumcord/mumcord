@@ -422,6 +422,11 @@ pub struct Settings {
     pub appimage_menu_entry: Consent,
     /// The one-time notice about the removed window overlay was shown (FR-2.33).
     pub window_overlay_notice_shown: bool,
+    /// Open the "What's new" window once after an update (issue #145). On by default.
+    pub whats_new_auto: bool,
+    /// The version whose "What's new" the user has seen; `None` before the first start that
+    /// knew about it.
+    pub whats_new_seen: Option<String>,
     /// The user had Epic 1's window overlay enabled before it was removed (FR-2.33). Derived once
     /// from the old record on first load, then persisted.
     pub legacy_window_overlay_enabled: bool,
@@ -486,6 +491,8 @@ impl Default for Settings {
             last_update_check: None,
             appimage_menu_entry: Consent::Unset,
             window_overlay_notice_shown: false,
+            whats_new_auto: true,
+            whats_new_seen: None,
             legacy_window_overlay_enabled: false,
         }
     }
@@ -622,6 +629,8 @@ mod tests {
         changed.last_update_check = Some(1_700_000_000_000);
         changed.appimage_menu_entry = Consent::Yes;
         changed.window_overlay_notice_shown = true;
+        changed.whats_new_auto = false;
+        changed.whats_new_seen = Some("0.4.4".into());
         changed.enabled_plugins = vec!["gtav".into()];
         changed.wizard_completed = true;
         changed.log_level = LogLevel::Debug;
@@ -716,6 +725,8 @@ mod tests {
         assert_eq!(loaded.appimage_menu_entry, Consent::Unset);
         assert_eq!(loaded.last_update_check, None);
         assert!(!loaded.window_overlay_notice_shown);
+        assert!(loaded.whats_new_auto);
+        assert_eq!(loaded.whats_new_seen, None);
         assert!(loaded.legacy_window_overlay_enabled);
     }
 

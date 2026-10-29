@@ -1,5 +1,5 @@
-//! Windows of their own next to the main window: the packet inspector (issue #60) and the
-//! third-party licences (issue #138). Each is opened from Settings, at most one at a time, may
+//! Windows of their own next to the main window: the packet inspector (issue #60), the
+//! third-party licences (issue #138) and "What's new" (issue #145). Each is opened from Settings, at most one at a time, may
 //! call only the few commands it needs, and remembers its size and position on this device.
 
 use std::path::PathBuf;
@@ -51,7 +51,27 @@ pub const LICENCES: Spec = Spec {
     allowed_commands: &["window_look", "licences_close", "copy_text", "open_link"],
 };
 
-const ALL: [&Spec; 2] = [&INSPECTOR, &LICENCES];
+pub const CHANGELOG: Spec = Spec {
+    label: "changelog",
+    url: "index.html?window=changelog",
+    title: "What's new — Mumcord",
+    default_size: (900.0, 760.0),
+    min_size: (480.0, 360.0),
+    geometry_file: "changelog-window.json",
+    // `app_info` for the version the window marks as current.
+    allowed_commands: &[
+        "window_look",
+        "changelog_close",
+        "copy_text",
+        "open_link",
+        "app_info",
+    ],
+};
+
+const ALL: [&Spec; 3] = [&INSPECTOR, &LICENCES, &CHANGELOG];
+
+/// The windows that follow the main window's theme and language.
+pub const FOLLOW_LOOK: [&Spec; 2] = [&LICENCES, &CHANGELOG];
 
 /// Whether the webview `label` may call `command`; only the windows above are limited.
 pub fn command_allowed(label: &str, command: &str) -> bool {
@@ -239,11 +259,29 @@ mod tests {
     }
 
     #[test]
+    fn the_changelog_window_gets_only_its_commands() {
+        let label = CHANGELOG.label;
+        assert!(command_allowed(label, "window_look"));
+        assert!(command_allowed(label, "changelog_close"));
+        assert!(command_allowed(label, "copy_text"));
+        assert!(command_allowed(label, "open_link"));
+        assert!(command_allowed(label, "app_info"));
+        assert!(!command_allowed(label, "changelog_open"));
+        assert!(!command_allowed(label, "licences_close"));
+        assert!(!command_allowed(label, "window_look_share"));
+        assert!(!command_allowed(label, "settings_get"));
+        assert!(!command_allowed(label, "settings_update"));
+    }
+
+    #[test]
     fn every_window_has_its_own_label_and_size_file() {
-        assert_ne!(INSPECTOR.label, LICENCES.label);
-        assert_ne!(INSPECTOR.geometry_file, LICENCES.geometry_file);
-        assert!(LICENCES.url.ends_with(LICENCES.label));
-        assert!(INSPECTOR.url.ends_with(INSPECTOR.label));
+        for (i, a) in ALL.iter().enumerate() {
+            assert!(a.url.ends_with(a.label));
+            for b in &ALL[i + 1..] {
+                assert_ne!(a.label, b.label);
+                assert_ne!(a.geometry_file, b.geometry_file);
+            }
+        }
     }
 
     #[test]
@@ -251,6 +289,7 @@ mod tests {
         assert!(command_allowed("main", "settings_update"));
         assert!(command_allowed("main", "packet_inspector_share"));
         assert!(command_allowed("main", "licences_open"));
+        assert!(command_allowed("main", "changelog_open"));
     }
 
     #[test]

@@ -11,7 +11,7 @@ use tauri::{AppHandle, State};
 use tauri_specta::Event;
 
 use super::types::{ApiError, ApiResult, ErrorCode};
-use crate::aux_window::LICENCES;
+use crate::aux_window::{FOLLOW_LOOK, LICENCES};
 
 /// The look of the main window's root element, for a window of its own to copy.
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, Type)]
@@ -24,14 +24,14 @@ pub struct WindowLook {
     pub language: String,
 }
 
-/// The main window's look changed; sent to the licences window only.
+/// The main window's look changed; sent to the licences and "What's new" windows only.
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, Type, Event)]
 #[serde(rename_all = "camelCase")]
 pub struct WindowLookChanged {
     pub look: WindowLook,
 }
 
-/// The look the main window shared last, for a licences window that opens later.
+/// The look the main window shared last, for a window that opens later.
 #[derive(Default)]
 pub struct SharedLook(Mutex<Option<WindowLook>>);
 
@@ -69,8 +69,10 @@ pub fn window_look_share(
         .0
         .lock()
         .unwrap_or_else(std::sync::PoisonError::into_inner) = Some(look.clone());
-    if let Err(e) = (WindowLookChanged { look }).emit_to(&app, LICENCES.label) {
-        tracing::warn!(error = %e, "updating the licences window failed");
+    for spec in FOLLOW_LOOK {
+        if let Err(e) = (WindowLookChanged { look: look.clone() }).emit_to(&app, spec.label) {
+            tracing::warn!(error = %e, window = spec.label, "updating a window's look failed");
+        }
     }
     Ok(())
 }
