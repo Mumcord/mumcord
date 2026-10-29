@@ -1359,6 +1359,7 @@
   gap: 6px;
   max-width: 400px;
   margin-top: 4px;
+  text-indent: 0;
 }
 
 .full-image-transfer__cancel {
@@ -1443,9 +1444,12 @@
   display: flex;
   gap: var(--space-3);
   align-items: stretch;
-  max-width: 28rem;
+  width: fit-content;
+  max-width: min(100%, 28rem);
   margin-top: var(--space-2);
   padding: var(--space-2);
+  /* Compact rows hang their first line with a negative text-indent; it is inherited, so the title would slide over the thumbnail. */
+  text-indent: 0;
   border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
   background: var(--color-bg-elevated);
@@ -1453,8 +1457,8 @@
 
 .theme-card__mock {
   display: flex;
-  flex: none;
-  width: 7rem;
+  flex: 0 1 7rem;
+  min-width: 4rem;
   min-height: 4.5rem;
   overflow: hidden;
   border-radius: var(--radius-sm);
@@ -1513,6 +1517,7 @@
 }
 
 .theme-card__name {
+  min-width: 0;
   margin: 0;
   font-weight: 600;
   overflow-wrap: anywhere;
@@ -1533,6 +1538,7 @@
 }
 
 .theme-card__imported {
+  overflow-wrap: anywhere;
   color: var(--color-text-muted);
   font-size: 0.85em;
 }
@@ -1786,6 +1792,8 @@
   flex-direction: column;
   gap: var(--space-2);
   margin-top: var(--space-1);
+  /* Same inherited compact-row indent as the link previews. */
+  text-indent: 0;
 }
 
 .message-card {
