@@ -15,6 +15,7 @@
 
 ### Fixed
 
+- Voice no longer crackles or drops out as easily when the computer is under heavy load: Mumcord's capture and playback threads, and the audio device threads, ask the system for real-time scheduling (rtkit on Linux, MMCSS on Windows, a time-constraint policy on macOS; without it they keep running at normal priority), and a buffer under- or overrun of the audio device no longer restarts the whole audio stream. The connection info and the diagnostic file show audio dropouts, late audio frames, concealed frames, the jitter-buffer delay, the processing time and whether real-time audio is on (#123)
 - Pasting copied image data, such as a Spectacle screenshot or "Copy image" in a browser, attaches the image again on Linux; the WebKitGTK bundled in the AppImage hands such a paste nothing, so the image is now read from the system clipboard (issue #110)
 
 ## [0.4.3] - 2026-10-28
