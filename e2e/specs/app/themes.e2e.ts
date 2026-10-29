@@ -173,8 +173,10 @@ describe("themes (AC-2.12 – AC-2.16)", function () {
       await browser.execute((text: string) => {
         const field = document.querySelector<HTMLTextAreaElement>("textarea[aria-label^='Message']");
         if (!field) throw new Error("no composer");
-        const setter = Object.getOwnPropertyDescriptor(HTMLTextAreaElement.prototype, "value")?.set;
-        setter?.call(field, text);
+        Object.getOwnPropertyDescriptor(HTMLTextAreaElement.prototype, "value")?.set?.call(
+          field,
+          text,
+        );
         field.dispatchEvent(new Event("input", { bubbles: true }));
       }, shared);
       code = shared.match(/mct1\.[A-Za-z0-9_-]+/)?.[0] ?? "";
