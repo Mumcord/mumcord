@@ -56,6 +56,7 @@ import { useSharedTheme, withoutThemeShare } from "./sharedTheme";
 import { ImageViewer, type ViewerImage } from "./ImageViewer";
 import { LinkPreviews } from "./LinkPreviewCard";
 import { linkMentions, MENTION_CLASS, mentionPeopleOf } from "./mentionChips";
+import { originalSrc } from "./displaySrc";
 import { imageName, type ImageClickHandler } from "./links";
 import { openInBrowser, openLink } from "./openLink";
 import { useIsMention } from "./ownMention";
@@ -526,7 +527,8 @@ export function MessageList({
     )) {
       if (img === clickedImage) index = images.length;
       images.push({
-        src: img.currentSrc || img.src,
+        // Inline images show a blob: URL; the viewer saves from the data: URL behind it.
+        src: originalSrc(img.currentSrc || img.src),
         url: img.dataset["imageUrl"],
         name: img.dataset["imageUrl"] ? imageName(img.dataset["imageUrl"]) : t("viewer.unnamed"),
         full: fullImageSource(img),

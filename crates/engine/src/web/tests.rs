@@ -149,6 +149,15 @@ fn route(path: &str, addr: SocketAddr) -> Vec<u8> {
             body.push_str(&"a".repeat(fetch::PAGE_LIMIT * 2));
             html(&body)
         }
+        // Giphy's stand-in for a missing rendition: 200 with a real GIF and the CDN's marker.
+        "/missing-rendition.gif" => response(
+            "200 OK",
+            &[
+                ("Content-Type", "image/gif".into()),
+                ("x-retry-not-found-metric", "1".into()),
+            ],
+            &gif(48, 27, 2),
+        ),
         "/anim.gif" => response(
             "200 OK",
             &[("Content-Type", "image/gif".into())],
@@ -516,6 +525,31 @@ async fn still_images_are_reencoded_at_display_size() {
 }
 
 #[tokio::test]
+async fn missing_renditions_fall_through_to_the_next_candidate() {
+    let server = TestServer::start().await;
+    let fetcher = fetcher(only_loopback());
+    let posted = Url::parse(&server.url("/posted")).expect("url");
+    let candidates: Vec<Url> = [
+        "/missing-rendition.gif",
+        "/nothing-here.gif",
+        "/text",
+        "/anim.gif",
+    ]
+    .iter()
+    .map(|path| Url::parse(&server.url(path)).expect("url"))
+    .collect();
+    let image = first_inline(&fetcher, &candidates, &posted)
+        .await
+        .expect("the last candidate loads");
+    assert_eq!((image.width, image.height), (64, 32));
+    assert_eq!(image.url, posted.as_str());
+
+    // Only stand-ins and failures: nothing to show, and the stand-in counts as not found.
+    let none = first_inline(&fetcher, &candidates[..1], &posted).await;
+    assert!(matches!(none, Err(FetchError::Status(404))), "{none:?}");
+}
+
+#[tokio::test]
 async fn animated_gifs_pass_through_unchanged() {
     let server = TestServer::start().await;
     let previews = LinkPreviews::new(None, only_loopback(), Timeouts::default());
@@ -674,6 +708,8 @@ async fn live_gif_hosts() {
     for url in [
         "https://media4.giphy.com/media/v1.Y2lkPTc5MGI3NjExYnBlZW9pamVneDBlZm8yZnpxYW5ieXRrNXNtdjhreTN6ZWVyOW92ZSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/1ojn1S7BTXUry8elNi/giphy.gif",
         "https://giphy.com/gifs/meme-67-kid-kids-1ojn1S7BTXUry8elNi",
+        // Its downsized renditions are Giphy's "not available" stand-in (issue #109).
+        "https://giphy.com/gifs/hacker-MM0Jrc8BHKx3y",
     ] {
         let preview = previews.preview(url).await;
         let image = previews.inline_image(url).await;
