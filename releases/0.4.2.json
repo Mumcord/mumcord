@@ -1,0 +1,77 @@
+{
+  "assets": [
+    {
+      "name": "Mumcord-0.4.2-1.aarch64.rpm",
+      "sha256": "46e40105fd36a71b53f973a22323e1db12ca8baec706ee3554f8e21b55daa596",
+      "size": 23388860
+    },
+    {
+      "name": "Mumcord-0.4.2-1.x86_64.rpm",
+      "sha256": "83333babc5f33977cd558697e307d49e2133d8b3db41dd60d2bc7a6f72f376f2",
+      "size": 23366232
+    },
+    {
+      "name": "Mumcord_0.4.2_aarch64.AppImage",
+      "sha256": "ad706727f58b5bb17a55dd390466970a78e04823559fc6ac53591f1bb0d839c8",
+      "size": 106916360
+    },
+    {
+      "name": "Mumcord_0.4.2_amd64.AppImage",
+      "sha256": "ae3329f9a0ef24da81135b191ef75efbd3a4fcb7b181a7f26cacf99b93764f1e",
+      "size": 109189624
+    },
+    {
+      "name": "Mumcord_0.4.2_amd64.deb",
+      "sha256": "0fbc3953b649a9d9b36a6ca84e82960f513a30124b302d7b51266acb7913ad17",
+      "size": 23361172
+    },
+    {
+      "name": "Mumcord_0.4.2_arm64.deb",
+      "sha256": "3955f9d13ec545e9477446c65c99e3f01e9491f4007bf362ac5e118e1207c712",
+      "size": 23386260
+    },
+    {
+      "name": "Mumcord_0.4.2_universal.dmg",
+      "sha256": "061658c961e2e934b3df58e1b785b1804fd4bbb5716a9e34c2e0631132e88d8a",
+      "size": 33988784
+    },
+    {
+      "name": "Mumcord_0.4.2_x64-setup.exe",
+      "sha256": "8ddc7e0a4f45ad312ee0888a4ee9dd2a50b6103dda00e455407876acfb700965",
+      "size": 11253785
+    },
+    {
+      "name": "SHA256SUMS",
+      "sha256": "68f39f28f05aa5d10c2ecb56e12008c26fc415db529e3c457eaa9afd4dd9925d",
+      "size": 824
+    },
+    {
+      "name": "install.sh",
+      "sha256": "2cb9a06595e410326c08140ef2fc9885adecfe1dda0fe1b6e6426cb61cd7e19c",
+      "size": 13799
+    }
+  ],
+  "changelog": {
+    "sha256": "0a44b2993fb7527b9824c47c6544b88eaf5545053b4ab4a3efb2cb4b209c16a7",
+    "text": "## [0.4.2] - 2026-10-27\n\n### Fixed\n\n- Fixed YouTube videos in watch parties showing \"This video can't be played in your browser\" in the Linux AppImage: the AppImage now ships the Opus audio parser YouTube playback needs\n- People who join a voice channel while someone is sharing their screen or a watch party is running now see it more reliably: the announcement is sent a second time in case the server dropped the first\n- Fixed a flood of keychain prompts on macOS after updating: a denied or failed keychain read is no longer repeated for every server list refresh, notification or reconnect, and the identity is read only once per session\n\n### Internal\n\n- Dependabot now checks dependencies and GitHub Actions weekly, with grouped and blocked major updates\n- Updated the `rtrb` and `x11rb` libraries and the GitHub Actions used by CI and releases\n- CI switches to another Ubuntu package mirror when apt stalls"
+  },
+  "commit": "26d831ce9154e1b15703744b25719d39806b9774",
+  "crates.io": {
+    "mumcord-audio": {
+      "cksum": "1fdcf1736a13154de45a55176f3e6aa8894829547b883ccb86e6da1d7ca3ce48",
+      "yanked": false
+    },
+    "mumcord-codec": {
+      "cksum": "9e7a9b75d0b216c93bd18eeb4fdf833dddc589a048f4482b1fc217afaffd8911",
+      "yanked": false
+    },
+    "mumcord-p2p": null,
+    "mumcord-protocol": {
+      "cksum": "33e5cac213a3f4108cabe01363d3db5518448fff1829b4813b94edbb54ca5fa9",
+      "yanked": false
+    },
+    "mumcord-store": null
+  },
+  "sha256sums": "68f39f28f05aa5d10c2ecb56e12008c26fc415db529e3c457eaa9afd4dd9925d",
+  "tag": "v0.4.2"
+}

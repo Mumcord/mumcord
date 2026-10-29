@@ -31,6 +31,10 @@ The pull request template already has a checkbox for it. Pull requests without i
 - Never include secrets or connect tests to public Mumble servers; use a local test server.
 - Do not bump versions in `package.json` or `Cargo.toml`: the version comes from the release tag at build time, and a local build shows `dev~YYYYMMDD` (see [RELEASING.md](RELEASING.md#versions)).
 
+## Changelog
+
+Add entries to the `## [Unreleased]` or `## [X.Y.Z] - Unreleased` section of `CHANGELOG.md`. Sections of released versions (a heading with a date) must never change: CI fails a pull request that edits one, and a daily check compares them with the fingerprint in `releases/`. Correct an old entry with a note in the next version instead (see `RELEASING.md`, "Release integrity").
+
 ## Linting workflows and scripts
 
 The CI job "Lint workflows and scripts" runs [actionlint](https://github.com/rhysd/actionlint) over `.github/workflows` and `.github/actions` (it also runs shellcheck on inline `run:` steps) and [shellcheck](https://www.shellcheck.net/) over every `*.sh` file. Run the same checks locally with `scripts/ci/lint-ci.sh`; it needs both tools on your `PATH`, and the CI job pins their versions. If it fails, fix the finding. Where a warning is a false positive, add a `# shellcheck disable=SCxxxx # reason` comment directly above that one command; blanket disables are not accepted.

@@ -1,0 +1,113 @@
+{
+  "assets": [
+    {
+      "name": "Mumcord-0.4.3-1.aarch64.rpm",
+      "sha256": "fa0b1e786d18851a4f9857fecf952caa654b0ec85d333487c34d61619c5879ed",
+      "size": 24301724
+    },
+    {
+      "name": "Mumcord-0.4.3-1.x86_64.rpm",
+      "sha256": "c597e84f3bddaefa9c91230dac03ded82507ec83d164481031982a15d9c553fd",
+      "size": 24179877
+    },
+    {
+      "name": "Mumcord_0.4.3_aarch64.AppImage",
+      "sha256": "413185c4a486cde42a69dba3619d9554f3932fe05841ef985e8b0c6056467655",
+      "size": 107694600
+    },
+    {
+      "name": "Mumcord_0.4.3_amd64.AppImage",
+      "sha256": "63ee9a72900ff16a4b8b3124481f445b1e604e19b8005a77d78e6c21c09b4558",
+      "size": 109922808
+    },
+    {
+      "name": "Mumcord_0.4.3_amd64.deb",
+      "sha256": "c3af0be0280698f6687d97b7122da5794c227c890ea92023fa7d63fb7cd2f907",
+      "size": 24175166
+    },
+    {
+      "name": "Mumcord_0.4.3_arm64.deb",
+      "sha256": "e4b66cbc7f3fc1a3535db9e7691bde4b70287a817809e820d6395d34939fed4d",
+      "size": 24296574
+    },
+    {
+      "name": "Mumcord_0.4.3_universal.dmg",
+      "sha256": "23186b0c1a3ff4cf748fe104ccf023ad840d23ff137282de6140ba68b4f75098",
+      "size": 34245224
+    },
+    {
+      "name": "Mumcord_0.4.3_x64-setup.exe",
+      "sha256": "84b68de7daaf3e1c1b4cd6af719636205f1f56a4170a596d869a95c9a1149aca",
+      "size": 11297344
+    },
+    {
+      "name": "SHA256SUMS",
+      "sha256": "43ad100a7b48c9540038e961be11230d67ac039a03df0d08d0b5be9c98f4a9b3",
+      "size": 1453
+    },
+    {
+      "name": "install.sh",
+      "sha256": "02f9c7658b0800b17742fd44b3c9d79338612918a3fe74424364e79654ebcb73",
+      "size": 23508
+    },
+    {
+      "name": "mumcord-0.4.3-appimage-aarch64.cdx.json",
+      "sha256": "5523e195a0d4128d7301fd8b993eff16d23d6422ca71c2c48a3053687683ed60",
+      "size": 800338
+    },
+    {
+      "name": "mumcord-0.4.3-appimage-x86_64.cdx.json",
+      "sha256": "d8146cee8cd3114ed138e7eb0fbffbb5d857834cbb8bb212ed0834acec9f01b5",
+      "size": 800263
+    },
+    {
+      "name": "mumcord-0.4.3-deb-rpm-aarch64.cdx.json",
+      "sha256": "7f367d2d6c9a14afdd8b772f136196bd8d3d2db7604569b624b16eb1beaeb1a6",
+      "size": 750387
+    },
+    {
+      "name": "mumcord-0.4.3-deb-rpm-x86_64.cdx.json",
+      "sha256": "da470765bd17714c52768901bf2886f710116c0833240542f545017d8b1f7542",
+      "size": 750312
+    },
+    {
+      "name": "mumcord-0.4.3-macos-universal.cdx.json",
+      "sha256": "e5c4cf5984c1ecc064dcd6fd697277d38d9df31626cb5e4245ff4c17bb232dbd",
+      "size": 635968
+    },
+    {
+      "name": "mumcord-0.4.3-windows-x86_64.cdx.json",
+      "sha256": "fa61e52c8f831c6e24a4509925514fcd0dbd5a7e745aa0e7e90c60c0342d1fea",
+      "size": 615988
+    }
+  ],
+  "changelog": {
+    "sha256": "0659becb37fe0186dcd5cfa38be9aefa6711916f38dbceca039d53f3f9680a3b",
+    "text": "## [0.4.3] - 2026-10-28\n\n### Added\n\n- The Mumble protocol library `mumcord-protocol` and the voice audio library `mumcord-audio` are now published on crates.io with every release, so other projects such as the bot can depend on them by version\n- The voice library is split: the new crate `mumcord-codec` holds everything that works without audio devices (Opus codec, jitter buffer, mixer, bitrate control, processing chain) and has no cpal or ALSA dependency, so headless bots can build it for static musl targets; `mumcord-audio` keeps the device I/O and re-exports the codec, and both are published on crates.io\n- Message cards: bots and people can post a compact card with a title, a status colour (info, success, warning, error, always also named in text), a built-in icon, chat-formatted text, an image and a link by writing `[card title=\"…\" color=warning icon=chart image=\"…\" url=\"…\"]text[/card]`. Official Mumble clients see the same message as readable formatted text; images load only with link previews on, through Mumcord like other previews. See `docs/message-cards.md` (#72)\n- The local storage library `mumcord-store` (database, identity certificates, OS secure storage) and the direct-connection library `mumcord-p2p` (QUIC with certificate pinning) are now published on crates.io with every release too\n- A hidden packet inspector for debugging Mumcord's plugin data (issue #60): seven clicks on the version in Settings → About unlock it, and **Open packet inspector** in Settings shows the sent and received packets in a window of its own, with filters, counters, decoded content and JSON or Markdown export. The window remembers its size and position, follows the app's theme and language, closes with Ctrl+W, and can only read the capture; capturing runs while the developer tools are unlocked, whether the window is open or not\n\n### Changed\n\n- The \"couldn't connect\" banner now hides after 60 seconds (hovering or focusing it pauses the timer) and has a dismiss button; it comes back only for a new failure, and the server icon keeps showing the failed connection. Servers without a name are shown as host and port\n- The Linux install script no longer tells you to install gst-libav (H.264 video support) when it is already installed; when it is missing it asks whether to install it right away\n- The Linux install script got a new look: a Mumcord banner, numbered steps with a download progress spinner, clear success and warning marks and a summary at the end; logs, pipes, `NO_COLOR` and `TERM=dumb` get plain text\n\n- The Linux setting for running on X11 now says \"Compatibility mode (X11)\" instead of naming other products\n\n### Fixed\n\n- Pasting an image from the clipboard into the message input works again, including images copied from screenshot tools such as Spectacle (#50)\n- Disconnecting, removing a server or quitting right after sending no longer loses the last chat message, status change or plugin data that was still waiting for the server's rate limit: the connection now sends what is queued first (at most 2 s) and quitting waits for it. `mumcord-protocol` gains `Handle::flush` and `Handle::closed` for the same guarantee in other programs (#74)\n- Pasting an image file copied in the file manager (for example right-click → Copy in Dolphin or Files) into the message input now attaches it like a dropped image, with the same preview, size limit and \"Only images can be sent\" message for other files; on Linux the webview hides the copied files from the page, so Mumcord reads them from the system clipboard itself and accepts only regular image files up to 25 MB\n\n### Internal\n\n- The repository moved to the Mumcord organisation on GitHub and all links point to `Mumcord/mumcord`\n- The test bot now lives in its own repository, `Mumcord/mumbot`, and CI uses its pinned release instead of building the bot crate; the webhook bot documentation moved there too\n- The README is rewritten, and mentions of other voice chat products are removed from the docs\n- Updated dependencies: `rubato` 5, `rusqlite` 0.41, `rustls-platform-verifier` 0.7, `sha2` 0.11, the npm and WebdriverIO test packages and the GitHub Actions used by CI\n- The version is set at build time instead of by a version-bump commit: release builds show the tag's version, CI builds `dev~<short commit>` and local builds `dev~YYYYMMDD` (plus `-dirty` with uncommitted changes) in About, the diagnostics file, the log and the update check; dev builds no longer look for updates. A release pull request now only edits `CHANGELOG.md` and, for feature releases, the release notes block in `release.yml`\n- Every release ships a software bill of materials (SBOM) per package type, `mumcord-<version>-<platform>.cdx.json` in CycloneDX format, listing the Rust crates, npm packages and bundled native libraries (libvpx, libopus and, in the AppImage, WebKitGTK, GStreamer and its plugins); the SBOMs are listed in `SHA256SUMS`, and all release files get a GitHub build provenance attestation\n- The third-party notices are generated by CI instead of by hand: each release regenerates them from the tagged commit before bundling, so About → Third-party licences is always correct, and after dependency changes on main a workflow opens a pull request with the updated files\n- Generating the notices fails when a dependency uses a licence that is not on the allowlist (`about.toml` for Rust crates, the script for npm packages), so an incompatible dependency is noticed at once; the licence and SBOM tools are pinned in `scripts/license-tools.env`\n- The AES library is updated to 0.9, which now uses the hardware-accelerated path by default on modern x86 CPUs; the voice crypto code follows the renamed API of its cipher layer\n- `bindgen` stays at 0.72: the 0.73 series needs `prettyplease` 0.3, which `prost-build` does not accept yet, so the two cannot be resolved together; Dependabot no longer proposes that bump until `prost-build` allows it\n- The D-Bus library `zbus` is updated to 6.1, which merged the `zvariant` crate into it: proxy support has to be switched on with the `proxy` feature, `Value` and `OwnedValue` are renamed to `Variant` and `OwnedVariant`, and the proxy builder no longer reports a bad name or path at the setter but when the proxy is built; the desktop notification and MPRIS code follows the new names\n- The random number library `rand` is updated to 0.10, which drops the duplicated `rand` and `rand_core` trees from the dependency graph; the network simulator now imports the trait that provides range sampling, renamed from `Rng` to `RngExt` in that version"
+  },
+  "commit": "29a5ff1bec5a112788a82be434d42780af797fe4",
+  "crates.io": {
+    "mumcord-audio": {
+      "cksum": "98391f649a2be28d87ee9c26032d3006e819821e9cadda939841f58f4a96fdb9",
+      "yanked": false
+    },
+    "mumcord-codec": {
+      "cksum": "d84d594c4bf4ebea5ad365ebbc97eab5155de7c8f3654035e27f95573cae07f4",
+      "yanked": false
+    },
+    "mumcord-p2p": {
+      "cksum": "76fe0e5559fb14a873899331bdda8b2da3abecd3261e1a1d36ed7f8bf4ca803e",
+      "yanked": false
+    },
+    "mumcord-protocol": {
+      "cksum": "927cc808b441c6093c34e1a2dc5dc8ac5f29ff036cd40247c179327bdba9cbd9",
+      "yanked": false
+    },
+    "mumcord-store": {
+      "cksum": "d36f1d872a9abdfd327c78ded3904d47e29d123fc02b74b60bbc7d9e740dc2cc",
+      "yanked": false
+    }
+  },
+  "sha256sums": "43ad100a7b48c9540038e961be11230d67ac039a03df0d08d0b5be9c98f4a9b3",
+  "tag": "v0.4.3"
+}

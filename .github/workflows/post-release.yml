@@ -15,6 +15,10 @@ name: Post-release sync
 # request needs the repository setting "Allow GitHub Actions to create and approve pull requests";
 # without it the branch is still pushed and the run shows a warning with a link to open it by hand.
 #
+# The same pull request carries releases/X.Y.Z.json, the release's fingerprint (tag commit, asset
+# hashes, crates.io checksums; scripts/release-manifest.sh) that release-integrity.yml re-checks
+# daily. An existing manifest is never rewritten. The release itself is not touched.
+#
 # It owns the same three notices files as notices.yml: it closes an open notices pull request (this
 # one contains fresh notices), and notices.yml skips while a sync pull request is open.
 on:
@@ -123,6 +127,22 @@ jobs:
         if: steps.current.outputs.skip == 'false'
         run: scripts/generate-notices.sh
 
+      # Taken from the published release, so it records what users can download right now. An
+      # existing manifest is the record to keep.
+      - name: Record release manifest
+        if: steps.current.outputs.skip == 'false'
+        env:
+          VERSION: ${{ steps.version.outputs.version }}
+        run: |
+          if [[ -e "releases/$VERSION.json" ]]; then
+            echo "releases/$VERSION.json exists; keeping it."
+            exit 0
+          fi
+          mkdir -p releases
+          scripts/release-manifest.sh "v$VERSION" > "releases/$VERSION.json"
+          # Intent-to-add, so the checks below and git add -u see the new file.
+          git add -N "releases/$VERSION.json"
+
       - name: Open or update the pull request
         if: steps.current.outputs.skip == 'false'
         env:
@@ -150,8 +170,8 @@ jobs:
 
           if [[ -z "$open" ]]; then
             # shellcheck disable=SC2001,SC2016 # sed prefixes each changed file line; backticks are literal Markdown
-            body=$(printf 'Writes the released version %s into the manifests and lock files (scripts/set-version.sh), dates its CHANGELOG.md section (scripts/finalise-changelog.sh) and regenerates the third-party notices (scripts/generate-notices.sh), after the [Post-release sync workflow](%s/%s/actions/runs/%s). CI and E2E are started on this branch by the same run.\n\nChanged files:\n\n%s\n' \
-              "$VERSION" "$GITHUB_SERVER_URL" "$GITHUB_REPOSITORY" "$GITHUB_RUN_ID" "$(sed 's/.*/- `&`/' <<< "$changed")")
+            body=$(printf 'Writes the released version %s into the manifests and lock files (scripts/set-version.sh), dates its CHANGELOG.md section (scripts/finalise-changelog.sh), regenerates the third-party notices (scripts/generate-notices.sh) and records the release fingerprint releases/%s.json (scripts/release-manifest.sh), after the [Post-release sync workflow](%s/%s/actions/runs/%s). CI and E2E are started on this branch by the same run.\n\nChanged files:\n\n%s\n' \
+              "$VERSION" "$VERSION" "$GITHUB_SERVER_URL" "$GITHUB_REPOSITORY" "$GITHUB_RUN_ID" "$(sed 's/.*/- `&`/' <<< "$changed")")
             gh pr create --base main --head "$branch" --title "$title" --body "$body" \
               || echo "::warning::Could not open the pull request (is \"Allow GitHub Actions to create and approve pull requests\" switched on?). Open it by hand: $GITHUB_SERVER_URL/$GITHUB_REPOSITORY/compare/main...$branch"
           fi
