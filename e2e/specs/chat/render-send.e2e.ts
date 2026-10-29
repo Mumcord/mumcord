@@ -9,6 +9,7 @@ import {
   messageBodies,
   pasteImage,
   composer,
+  readClipboard,
   ScriptBot,
   selectChannel,
   sendText,
@@ -239,7 +240,7 @@ describe("chat: rendering and sending (AC-1.13, AC-1.14, AC-1.43)", () => {
     });
   });
 
-  // Issue #114. The clipboard is read back by pasting into the message box with a real Ctrl+V.
+  // Issue #114. The system clipboard is read back like a pasting application does.
   it("issue #114 copies selected message text from the context menu and with Ctrl+C", async () => {
     await selectChannel("Lobby");
     await sendText("select these words please");
@@ -262,17 +263,10 @@ describe("chat: rendering and sending (AC-1.13, AC-1.14, AC-1.43)", () => {
         }
         return false;
       }, words);
-    const pasted = async () => {
-      const box = composer();
-      await box.click();
-      await box.clearValue();
-      await browser.keys(["Control", "v"]);
-      await browser.waitUntil(async () => (await box.getValue()) !== "", {
-        timeoutMsg: "nothing pasted from the clipboard",
+    const copied = async (text: string) => {
+      await browser.waitUntil(async () => (await readClipboard("text")) === text, {
+        timeoutMsg: `${JSON.stringify(text)} not on the clipboard`,
       });
-      const value = await box.getValue();
-      await box.clearValue();
-      return value;
     };
 
     expect(await selectWords("these words")).toBe(true);
@@ -292,7 +286,7 @@ describe("chat: rendering and sending (AC-1.13, AC-1.14, AC-1.43)", () => {
     expect(items[0]).toBe("Copy");
     await $('[role="menuitem"]=Copy').click();
     await $("p.chat-link-copied=Text copied").waitForExist();
-    expect(await pasted()).toBe("these words");
+    await copied("these words");
 
     await browser.execute(() => {
       const items = document.querySelectorAll<HTMLElement>(".chat-list__items > li");
@@ -301,7 +295,7 @@ describe("chat: rendering and sending (AC-1.13, AC-1.14, AC-1.43)", () => {
     // A different part, so the check can't pass on what the menu copied before.
     expect(await selectWords("words please")).toBe(true);
     await browser.keys(["Control", "c"]);
-    expect(await pasted()).toBe("words please");
+    await copied("words please");
   });
 
   it("keeps the window fixed when the chat overflows (no document scroll)", async () => {
