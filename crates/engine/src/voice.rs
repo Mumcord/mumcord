@@ -423,11 +423,11 @@ impl VoicePipeline {
                         demoted,
                         "a voice thread ran past its real-time budget; back at normal priority"
                     );
-                    let _ = shared.realtime_threads.fetch_update(
-                        Ordering::Relaxed,
-                        Ordering::Relaxed,
-                        |n| Some(n.saturating_sub(demoted)),
-                    );
+                    // Only the voice threads' start adds to the count, before any demotion.
+                    let threads = shared.realtime_threads.load(Ordering::Relaxed);
+                    shared
+                        .realtime_threads
+                        .store(threads.saturating_sub(demoted), Ordering::Relaxed);
                 }
                 let talking = controls.transmitting() && !shared.muted.load(Ordering::Relaxed);
                 batch.set(own_session, talking, now);
