@@ -164,8 +164,8 @@
     "all": "Alle servers",
     "clearAll": "Alle geschiedenis wissen…",
     "confirmTitle": "Geschiedenis wissen?",
-    "confirmServer": "Alle opgeslagen berichten van {{server}} worden van deze computer verwijderd. Dit kan niet ongedaan worden gemaakt.",
-    "confirmAll": "Alle opgeslagen berichten van elke server worden van deze computer verwijderd. Dit kan niet ongedaan worden gemaakt.",
+    "confirmServer": "Alle opgeslagen berichten van {{server}} worden van deze computer verwijderd. Anderen houden hun eigen kopieën. Hun kopieën worden niet opnieuw naar deze computer gesynchroniseerd. Dit kan niet ongedaan worden gemaakt.",
+    "confirmAll": "Alle opgeslagen berichten van elke server worden van deze computer verwijderd. Anderen houden hun eigen kopieën. Hun kopieën worden niet opnieuw naar deze computer gesynchroniseerd. Dit kan niet ongedaan worden gemaakt.",
     "confirm": "Geschiedenis wissen",
     "cleared": "Geschiedenis gewist.",
     "autoDelete": "Chatgeschiedenis verwijderen die ouder is dan",
@@ -409,6 +409,22 @@
     "never": "Nooit",
     "clearNow": "Nu wissen",
     "cleared": "Cache gewist, {{size}} vrijgemaakt."
+  },
+  "cache": {
+    "title": "Cache",
+    "hint": "Mumcord bewaart tijdelijke gegevens op deze computer zodat alles sneller laadt. Wissen is veilig; ze worden zo nodig opnieuw opgebouwd.",
+    "kind": {
+      "previews": "Linkvoorbeelden en afbeeldingen",
+      "webEngine": "Cache van de webengine",
+      "temp": "Tijdelijke bestanden"
+    },
+    "total": "Totaal: {{size}}",
+    "calculating": "Berekenen…",
+    "clear": "Cache wissen",
+    "confirmTitle": "Cache wissen?",
+    "confirm": "Alleen de geselecteerde caches worden verwijderd. Je chatgeschiedenis, instellingen, servers, certificaten, vrienden en notities blijven ongemoeid.",
+    "cleared": "Cache gewist ({{size}})",
+    "webPending": "De cache van de webengine wordt verwijderd bij de volgende start van Mumcord."
   },
   "retention": {
     "days_one": "{{count}} dag",

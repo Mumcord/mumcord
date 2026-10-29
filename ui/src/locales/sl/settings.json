@@ -166,8 +166,8 @@
     "all": "Vsi strežniki",
     "clearAll": "Počisti vso zgodovino …",
     "confirmTitle": "Počistim zgodovino?",
-    "confirmServer": "Vsa shranjena sporočila s strežnika {{server}} bodo izbrisana s tega računalnika. Tega ni mogoče razveljaviti.",
-    "confirmAll": "Vsa shranjena sporočila z vseh strežnikov bodo izbrisana s tega računalnika. Tega ni mogoče razveljaviti.",
+    "confirmServer": "Vsa shranjena sporočila s strežnika {{server}} bodo izbrisana s tega računalnika. Drugi obdržijo svoje kopije. Njihove kopije se ne bodo znova sinhronizirale na ta računalnik. Tega ni mogoče razveljaviti.",
+    "confirmAll": "Vsa shranjena sporočila z vseh strežnikov bodo izbrisana s tega računalnika. Drugi obdržijo svoje kopije. Njihove kopije se ne bodo znova sinhronizirale na ta računalnik. Tega ni mogoče razveljaviti.",
     "confirm": "Počisti zgodovino",
     "cleared": "Zgodovina počiščena.",
     "autoDelete": "Izbriši zgodovino klepeta, starejšo od",
@@ -411,6 +411,22 @@
     "never": "Nikoli",
     "clearNow": "Počisti zdaj",
     "cleared": "Predpomnilnik počiščen, sproščeno {{size}}."
+  },
+  "cache": {
+    "title": "Predpomnilnik",
+    "hint": "Mumcord na tem računalniku hrani začasne podatke, da se vse hitreje naloži. Brisanje je varno; po potrebi se znova ustvarijo.",
+    "kind": {
+      "previews": "Predogledi povezav in slike",
+      "webEngine": "Predpomnilnik spletnega jedra",
+      "temp": "Začasne datoteke"
+    },
+    "total": "Skupaj: {{size}}",
+    "calculating": "Izračunavanje …",
+    "clear": "Počisti predpomnilnik",
+    "confirmTitle": "Počistiti predpomnilnik?",
+    "confirm": "Izbrišejo se samo izbrani predpomnilniki. Zgodovina klepeta, nastavitve, strežniki, potrdila, prijatelji in zapiski ostanejo nedotaknjeni.",
+    "cleared": "Predpomnilnik počiščen ({{size}})",
+    "webPending": "Predpomnilnik spletnega jedra se odstrani ob naslednjem zagonu programa Mumcord."
   },
   "retention": {
     "days_one": "{{count}} dan",

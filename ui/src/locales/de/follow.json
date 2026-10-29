@@ -27,7 +27,7 @@
   "history": {
     "clear": "Verlauf löschen",
     "title": "Verlauf löschen?",
-    "body": "Die gespeicherten Nachrichten dieser Unterhaltung werden dauerhaft von diesem Computer gelöscht. Andere behalten ihre eigenen Kopien.",
+    "body": "Die gespeicherten Nachrichten dieser Unterhaltung werden dauerhaft von diesem Computer gelöscht. Andere behalten ihre eigenen Kopien. Deren Kopien werden nicht wieder auf diesen Computer synchronisiert.",
     "confirm": "Verlauf löschen",
     "cancel": "Abbrechen",
     "failed": "Der Verlauf konnte nicht gelöscht werden. Bitte versuche es noch einmal."

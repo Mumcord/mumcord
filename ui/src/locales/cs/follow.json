@@ -31,7 +31,7 @@
   "history": {
     "clear": "Vymazat historii",
     "title": "Vymazat historii?",
-    "body": "Tímto trvale smažeš uložené zprávy této konverzace z tohoto počítače. Ostatní si své kopie ponechají.",
+    "body": "Tímto trvale smažeš uložené zprávy této konverzace z tohoto počítače. Ostatní si své kopie ponechají. Jejich kopie se do tohoto počítače znovu nesynchronizují.",
     "confirm": "Vymazat historii",
     "cancel": "Zrušit",
     "failed": "Historii se nepodařilo vymazat. Zkus to prosím znovu."

@@ -1,0 +1,39 @@
+name: Dependency audit
+
+# Known security advisories, disallowed licences, unknown sources (cargo-deny, deny.toml) and
+# vulnerable production npm packages. Called by ci.yml for every pull request and push to main, and
+# run weekly on main so new advisories against unchanged dependencies are noticed without any
+# pull request. No build needed, a few seconds. What to do when it fails: CONTRIBUTING.md.
+on:
+  workflow_call:
+  workflow_dispatch:
+  schedule:
+    - cron: "17 6 * * 1"
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    name: Audit
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7
+
+      # The advisory database is fetched fresh on every run.
+      - name: cargo-deny (app workspace)
+        uses: EmbarkStudios/cargo-deny-action@c3bbe7e4e3f7baeee1a3dd9aec0a3b2aded580fb # v2.1.1
+        with:
+          manifest-path: Cargo.toml
+
+      - name: cargo-deny (smoke test seed tool)
+        uses: EmbarkStudios/cargo-deny-action@c3bbe7e4e3f7baeee1a3dd9aec0a3b2aded580fb # v2.1.1
+        with:
+          manifest-path: scripts/smoke/seed/Cargo.toml
+
+      # Production dependencies only; the licence check for npm lives in scripts/generate-notices.sh.
+      # npm audit has no ignore list: an accepted finding is documented in CONTRIBUTING.md and
+      # worked around here, not hidden.
+      - name: npm audit
+        run: npm audit --omit=dev --audit-level=high

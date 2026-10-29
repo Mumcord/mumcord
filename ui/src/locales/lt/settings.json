@@ -166,8 +166,8 @@
     "all": "Visi serveriai",
     "clearAll": "Išvalyti visą istoriją…",
     "confirmTitle": "Išvalyti istoriją?",
-    "confirmServer": "Visos įrašytos žinutės iš {{server}} bus ištrintos iš šio kompiuterio. To atšaukti negalima.",
-    "confirmAll": "Visos įrašytos žinutės iš visų serverių bus ištrintos iš šio kompiuterio. To atšaukti negalima.",
+    "confirmServer": "Visos įrašytos žinutės iš {{server}} bus ištrintos iš šio kompiuterio. Kiti žmonės savo kopijas pasilieka. Jų kopijos nebus vėl sinchronizuotos į šį kompiuterį. To atšaukti negalima.",
+    "confirmAll": "Visos įrašytos žinutės iš visų serverių bus ištrintos iš šio kompiuterio. Kiti žmonės savo kopijas pasilieka. Jų kopijos nebus vėl sinchronizuotos į šį kompiuterį. To atšaukti negalima.",
     "confirm": "Išvalyti istoriją",
     "cleared": "Istorija išvalyta.",
     "autoDelete": "Ištrinti pokalbių istoriją, senesnę nei",
@@ -411,6 +411,22 @@
     "never": "Niekada",
     "clearNow": "Išvalyti dabar",
     "cleared": "Talpykla išvalyta, atlaisvinta {{size}}."
+  },
+  "cache": {
+    "title": "Talpykla",
+    "hint": "„Mumcord“ šiame kompiuteryje laiko laikinus duomenis, kad viskas įsikeltų greičiau. Juos galima saugiai išvalyti; prireikus jie sukuriami iš naujo.",
+    "kind": {
+      "previews": "Nuorodų peržiūros ir paveikslėliai",
+      "webEngine": "Žiniatinklio variklio talpykla",
+      "temp": "Laikinieji failai"
+    },
+    "total": "Iš viso: {{size}}",
+    "calculating": "Skaičiuojama…",
+    "clear": "Išvalyti talpyklą",
+    "confirmTitle": "Išvalyti talpyklą?",
+    "confirm": "Ištrinamos tik pasirinktos talpyklos. Pokalbių istorija, nustatymai, serveriai, sertifikatai, draugai ir užrašai neliečiami.",
+    "cleared": "Talpykla išvalyta ({{size}})",
+    "webPending": "Žiniatinklio variklio talpykla bus pašalinta kitą kartą paleidus „Mumcord“."
   },
   "retention": {
     "days_one": "{{count}} diena",

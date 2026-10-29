@@ -20,6 +20,7 @@ import { getApi } from "../../api";
 import { BetaBadge } from "../../components/BetaBadge";
 import { pickSavePath } from "../settings/fileDialogs";
 import { removeFavorite, saveFavorite, useGifFavorites } from "./favorites";
+import { useDisplaySrc } from "./displaySrc";
 import { useFullImage, type FullImageSource } from "./fullImage";
 import { openInBrowser } from "./openLink";
 import {
@@ -98,6 +99,8 @@ export function ImageViewer({ images, index, onIndexChange, onClose }: ImageView
   const full = useFullImage(current?.full);
   // The thumbnail stays until the full image is there, and when it cannot be had.
   const shown = full.status === "done" ? full.src : current?.src;
+  // Shown through a blob: URL (see displaySrc.ts); saving keeps using `shown`.
+  const displayed = useDisplaySrc(shown);
   const favorites = useGifFavorites();
   const dialogRef = useRef<HTMLDivElement>(null);
   const stageRef = useRef<HTMLDivElement>(null);
@@ -434,7 +437,7 @@ export function ImageViewer({ images, index, onIndexChange, onClose }: ImageView
           <img
             ref={imgRef}
             className="image-viewer__img"
-            src={shown}
+            src={displayed}
             alt={current.name}
             draggable={false}
             onLoad={(event) => {

@@ -4,6 +4,7 @@ import { expect, $ } from "@wdio/globals";
 import { app, bot, testenv } from "../../helpers/index.ts";
 import {
   addFirstServer,
+  expectBlobImage,
   finishWizard,
   joinChannel,
   ScriptBot,
@@ -76,11 +77,7 @@ describe("chat: message cards (#72)", () => {
     await expect(shown.$(".message-card__status")).toHaveText(expect.stringContaining("Warning"));
     await expect(shown.$(".message-card__body b")).toHaveText("97 %");
     await expect(shown.$(".message-card__icon")).toExist();
-    await expect(shown.$("button.message-card__image img")).toHaveAttribute(
-      "src",
-      // The engine re-encodes small pictures, so the type may change.
-      expect.stringMatching(/^data:image\/(?:png|jpeg);base64,/),
-    );
+    await expectBlobImage(shown.$("button.message-card__image img"));
     expect(site.requests).toContain("/cpu.png");
     await expect(shown.$(".message-card__link a[href='https://grafana.test/d/db-1']")).toExist();
     await expect(shown.$("button.message-card__open")).toExist();

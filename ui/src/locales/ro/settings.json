@@ -165,8 +165,8 @@
     "all": "Toate serverele",
     "clearAll": "Șterge tot istoricul…",
     "confirmTitle": "Ștergi istoricul?",
-    "confirmServer": "Toate mesajele salvate de pe {{server}} vor fi șterse de pe acest computer. Acțiunea nu poate fi anulată.",
-    "confirmAll": "Toate mesajele salvate de pe toate serverele vor fi șterse de pe acest computer. Acțiunea nu poate fi anulată.",
+    "confirmServer": "Toate mesajele salvate de pe {{server}} vor fi șterse de pe acest computer. Ceilalți își păstrează copiile. Copiile lor nu vor fi sincronizate înapoi pe acest computer. Acțiunea nu poate fi anulată.",
+    "confirmAll": "Toate mesajele salvate de pe toate serverele vor fi șterse de pe acest computer. Ceilalți își păstrează copiile. Copiile lor nu vor fi sincronizate înapoi pe acest computer. Acțiunea nu poate fi anulată.",
     "confirm": "Șterge istoricul",
     "cleared": "Istoricul a fost șters.",
     "autoDelete": "Șterge istoricul chatului mai vechi de",
@@ -410,6 +410,22 @@
     "never": "Niciodată",
     "clearNow": "Golește acum",
     "cleared": "Cache golit, {{size}} eliberați."
+  },
+  "cache": {
+    "title": "Cache",
+    "hint": "Mumcord păstrează pe acest computer date temporare pentru ca totul să se încarce mai repede. Ștergerea lor este sigură; se recreează la nevoie.",
+    "kind": {
+      "previews": "Previzualizări de linkuri și imagini",
+      "webEngine": "Cache-ul motorului web",
+      "temp": "Fișiere temporare"
+    },
+    "total": "Total: {{size}}",
+    "calculating": "Se calculează…",
+    "clear": "Șterge cache-ul",
+    "confirmTitle": "Ștergi cache-ul?",
+    "confirm": "Sunt șterse doar cache-urile selectate. Istoricul conversațiilor, setările, serverele, certificatele, prietenii și notițele nu sunt afectate.",
+    "cleared": "Cache șters ({{size}})",
+    "webPending": "Cache-ul motorului web este eliminat la următoarea pornire a Mumcord."
   },
   "retention": {
     "days_one": "{{count}} zi",

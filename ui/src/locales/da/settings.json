@@ -164,8 +164,8 @@
     "all": "Alle servere",
     "clearAll": "Ryd al historik…",
     "confirmTitle": "Ryd historik?",
-    "confirmServer": "Alle gemte beskeder fra {{server}} slettes fra denne computer. Det kan ikke fortrydes.",
-    "confirmAll": "Alle gemte beskeder fra alle servere slettes fra denne computer. Det kan ikke fortrydes.",
+    "confirmServer": "Alle gemte beskeder fra {{server}} slettes fra denne computer. Andre beholder deres kopier. Deres kopier synkroniseres ikke tilbage til denne computer. Det kan ikke fortrydes.",
+    "confirmAll": "Alle gemte beskeder fra alle servere slettes fra denne computer. Andre beholder deres kopier. Deres kopier synkroniseres ikke tilbage til denne computer. Det kan ikke fortrydes.",
     "confirm": "Ryd historik",
     "cleared": "Historik ryddet.",
     "autoDelete": "Slet chathistorik, der er ældre end",
@@ -409,6 +409,22 @@
     "never": "Aldrig",
     "clearNow": "Ryd nu",
     "cleared": "Cache ryddet, {{size}} frigjort."
+  },
+  "cache": {
+    "title": "Cache",
+    "hint": "Mumcord gemmer midlertidige data på denne computer, så alt indlæses hurtigere. Det er sikkert at rydde dem; de oprettes igen efter behov.",
+    "kind": {
+      "previews": "Linkforhåndsvisninger og billeder",
+      "webEngine": "Webmotorens cache",
+      "temp": "Midlertidige filer"
+    },
+    "total": "I alt: {{size}}",
+    "calculating": "Beregner…",
+    "clear": "Ryd cache",
+    "confirmTitle": "Ryd cache?",
+    "confirm": "Kun de valgte caches slettes. Din chathistorik, dine indstillinger, servere, certifikater, venner og noter berøres ikke.",
+    "cleared": "Cache ryddet ({{size}})",
+    "webPending": "Webmotorens cache fjernes, næste gang Mumcord starter."
   },
   "retention": {
     "days_one": "{{count}} dag",

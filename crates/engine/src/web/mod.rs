@@ -200,7 +200,7 @@ impl LinkPreviews {
     pub async fn inline_image(&self, url: &str) -> Option<InlineImage> {
         let mut url = Url::parse(url.trim()).ok()?;
         url.set_fragment(None);
-        let key = url.to_string();
+        let key = rendition::cache_key(&url);
         if let Some(hit) = self.images.get(&key) {
             return hit;
         }
@@ -217,8 +217,8 @@ impl LinkPreviews {
         image
     }
 
-    /// Tries smaller renditions of known GIF hosts first (a 10 MB GIF is often a few hundred
-    /// KB as WebP), then the address itself. The result keeps the address as posted.
+    /// Tries smaller renditions of known GIF hosts first (Giphy's downsized GIF of a 10 MB
+    /// original is a fraction of its size and far cheaper to animate), then the address itself. The result keeps the address as posted.
     async fn load_inline(&self, fetcher: &Fetcher, url: &Url) -> Result<InlineImage, FetchError> {
         let mut candidates = rendition::smaller_renditions(url);
         match rendition::gif_page(url) {
@@ -236,17 +236,7 @@ impl LinkPreviews {
             Some(rendition::GifPage::Giphy(_)) => {}
             None => candidates.push(url.clone()),
         }
-        let mut last = FetchError::UnsupportedType;
-        for candidate in candidates {
-            match inline::load(fetcher, &candidate).await {
-                Ok(mut image) => {
-                    image.url = url.to_string();
-                    return Ok(image);
-                }
-                Err(e) => last = e,
-            }
-        }
-        Err(last)
+        first_inline(fetcher, &candidates, url).await
     }
 
     async fn build(&self, url: &Url) -> Result<LinkPreview, FetchError> {
@@ -495,6 +485,27 @@ struct DiskEntry<T> {
 }
 
 /// Memory cache of every result plus a small on-disk cache of successful ones.
+/// The first of `candidates` that loads as an inline image, kept under the address `url` as
+/// posted. A missing, refused or unusable rendition (404, 403, not an image) falls through to the
+/// next one; the error of the last candidate is returned when none loads.
+async fn first_inline(
+    fetcher: &Fetcher,
+    candidates: &[Url],
+    url: &Url,
+) -> Result<InlineImage, FetchError> {
+    let mut last = FetchError::UnsupportedType;
+    for candidate in candidates {
+        match inline::load(fetcher, candidate).await {
+            Ok(mut image) => {
+                image.url = url.to_string();
+                return Ok(image);
+            }
+            Err(e) => last = e,
+        }
+    }
+    Err(last)
+}
+
 struct Cache<T> {
     dir: Option<PathBuf>,
     limits: CacheLimits,

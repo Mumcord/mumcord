@@ -29,7 +29,7 @@
   "history": {
     "clear": "Cancella cronologia",
     "title": "Cancellare la cronologia?",
-    "body": "Questo elimina definitivamente da questo computer i messaggi salvati di questa conversazione. Gli altri conservano le proprie copie.",
+    "body": "Questo elimina definitivamente da questo computer i messaggi salvati di questa conversazione. Gli altri conservano le proprie copie. Le loro copie non verranno sincronizzate di nuovo su questo computer.",
     "confirm": "Cancella cronologia",
     "cancel": "Annulla",
     "failed": "Non è stato possibile cancellare la cronologia. Riprova."

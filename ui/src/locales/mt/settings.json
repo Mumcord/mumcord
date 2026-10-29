@@ -167,8 +167,8 @@
     "all": "Is-servers kollha",
     "clearAll": "Ħassar l-istorja kollha…",
     "confirmTitle": "Tħassar l-istorja?",
-    "confirmServer": "Il-messaġġi ssejvjati kollha minn {{server}} se jitħassru minn dan il-kompjuter. Dan ma jistax jiġi mreġġa' lura.",
-    "confirmAll": "Il-messaġġi ssejvjati kollha minn kull server se jitħassru minn dan il-kompjuter. Dan ma jistax jiġi mreġġa' lura.",
+    "confirmServer": "Il-messaġġi ssejvjati kollha minn {{server}} se jitħassru minn dan il-kompjuter. Il-persuni l-oħra jżommu l-kopji tagħhom. Il-kopji tagħhom mhux se jerġgħu jiġu sinkronizzati ma' dan il-kompjuter. Dan ma jistax jiġi mreġġa' lura.",
+    "confirmAll": "Il-messaġġi ssejvjati kollha minn kull server se jitħassru minn dan il-kompjuter. Il-persuni l-oħra jżommu l-kopji tagħhom. Il-kopji tagħhom mhux se jerġgħu jiġu sinkronizzati ma' dan il-kompjuter. Dan ma jistax jiġi mreġġa' lura.",
     "confirm": "Ħassar l-istorja",
     "cleared": "Storja mħassra.",
     "autoDelete": "Ħassar l-istorja taċ-chat eqdem minn",
@@ -412,6 +412,22 @@
     "never": "Qatt",
     "clearNow": "Ħassar issa",
     "cleared": "Cache imnaddfa, {{size}} meħlusa."
+  },
+  "cache": {
+    "title": "Cache",
+    "hint": "Mumcord iżomm data temporanja fuq dan il-kompjuter biex kollox jitgħabba aktar malajr. Tista' tindiffa mingħajr periklu; terġa' tinħoloq meta jkun hemm bżonn.",
+    "kind": {
+      "previews": "Previews tal-links u stampi",
+      "webEngine": "Cache tal-magna tal-web",
+      "temp": "Fajls temporanji"
+    },
+    "total": "Total: {{size}}",
+    "calculating": "Qed jiġi kkalkulat…",
+    "clear": "Ixxotta l-cache",
+    "confirmTitle": "Tixxotta l-cache?",
+    "confirm": "Jitħassru biss il-caches magħżula. L-istorja taċ-chat, is-settings, is-servers, iċ-ċertifikati, l-ħbieb u n-noti ma jintmessu.",
+    "cleared": "Cache xxuttata ({{size}})",
+    "webPending": "Il-cache tal-magna tal-web titneħħa fil-bidu li jmiss ta' Mumcord."
   },
   "retention": {
     "days_one": "{{count}} jum",

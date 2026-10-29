@@ -835,6 +835,9 @@ export function createMockApi(options: MockOptions = {}): MockApi {
 
   /** Pretend size of the preview cache, freed by `previewCacheClear`. */
   let cachedPreviewBytes = 1_468_006;
+  /** Pretend sizes of the other caches, freed by `cacheClear`. */
+  let cachedWebKib = 188_416;
+  let cachedTempKib = 352;
   // GIF favorites, most recently used first.
   let gifFavorites: string[] = [];
   /** Originals kept by `fullImageKeep`, by reference. */
@@ -1550,6 +1553,29 @@ export function createMockApi(options: MockOptions = {}): MockApi {
       const freed = cachedPreviewBytes;
       cachedPreviewBytes = 0;
       return Promise.resolve(freed);
+    },
+
+    cacheSizes: () =>
+      Promise.resolve({
+        previewsKib: Math.ceil(cachedPreviewBytes / 1024),
+        webKib: cachedWebKib,
+        tempKib: cachedTempKib,
+      }),
+    cacheClear: (kinds) => {
+      let freedKib = 0;
+      if (kinds.includes("previews")) {
+        freedKib += Math.ceil(cachedPreviewBytes / 1024);
+        cachedPreviewBytes = 0;
+      }
+      if (kinds.includes("webEngine")) {
+        freedKib += cachedWebKib;
+        cachedWebKib = 0;
+      }
+      if (kinds.includes("temp")) {
+        freedKib += cachedTempKib;
+        cachedTempKib = 0;
+      }
+      return Promise.resolve({ freedKib, webPending: kinds.includes("webEngine") });
     },
 
     // now playing: no media player in the mock; other people's tracks come from `mock.emit`.
