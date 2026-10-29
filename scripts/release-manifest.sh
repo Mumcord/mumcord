@@ -7,16 +7,17 @@
 # The manifest holds the tag and the commit it points to, every release asset (name, size, SHA-256
 # as GitHub computed it on upload), the hash of SHA256SUMS and, per library crate, the checksum
 # crates.io reports for that version and whether it is yanked ("crates.io": null = not published).
-# The SBOMs are release assets, so their hashes are in "assets". Nothing in it changes unless the
+# "changelog" holds the text of the version's CHANGELOG.md section (scripts/changelog-section.sh)
+# and its SHA-256, taken from the CHANGELOG.md of the checkout (main). The SBOMs are release assets, so their hashes are in "assets". Nothing in it changes unless the
 # release does, so a verification can compare it byte for byte after normalising.
-# Needs gh (GH_TOKEN), curl and jq; GITHUB_REPOSITORY defaults to Mumcord/mumcord.
+# Needs gh (GH_TOKEN), curl, jq and a checkout of main; GITHUB_REPOSITORY defaults to Mumcord/mumcord.
 set -euo pipefail
 
 repo=${GITHUB_REPOSITORY:-Mumcord/mumcord}
 crates=(protocol codec audio store p2p)
 
 build() {
-  local tag=$1 version=${1#v} release commit crates_json='{}' crate response
+  local tag=$1 version=${1#v} release commit changelog crates_json='{}' crate response
   release=$(gh api "repos/$repo/releases/tags/$tag")
   if [[ $(jq -r '.draft or .prerelease' <<< "$release") != false ]]; then
     echo "$tag is a draft or pre-release; only published releases have a manifest." >&2
@@ -24,6 +25,12 @@ build() {
   fi
   # The commits endpoint resolves annotated tags to the commit they point to.
   commit=$(gh api "repos/$repo/commits/$tag" -q .sha)
+
+  changelog=$("$(dirname "$0")/changelog-section.sh" "$version")
+  if [[ -z "$changelog" ]]; then
+    echo "CHANGELOG.md has no section for $version; run this from a checkout of main after the sync." >&2
+    return 1
+  fi
 
   for crate in "${crates[@]}"; do
     response=$(curl -sS --retry 3 --retry-all-errors -A "mumcord-release-integrity (https://github.com/$repo)" \
@@ -36,13 +43,15 @@ build() {
     esac
   done
 
-  jq -S --arg tag "$tag" --arg commit "$commit" --argjson crates "$crates_json" '
+  jq -S --arg tag "$tag" --arg commit "$commit" --argjson crates "$crates_json" \
+    --arg changelog "$changelog" --arg changelog_sha "$(sha256sum <<< "$changelog" | cut -d' ' -f1)" '
     (.assets | map({name, size, sha256: (.digest | ltrimstr("sha256:"))}) | sort_by(.name)) as $assets
     | {
         tag: $tag,
         commit: $commit,
         sha256sums: ($assets | map(select(.name == "SHA256SUMS").sha256) | first),
         assets: $assets,
+        changelog: {sha256: $changelog_sha, text: $changelog},
         "crates.io": $crates
       }' <<< "$release"
 }

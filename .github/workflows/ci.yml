@@ -66,6 +66,28 @@ jobs:
       - name: Lint
         run: scripts/ci/lint-ci.sh
 
+  # Released versions' CHANGELOG.md sections are part of the release and must not change
+  # (RELEASING.md, "Release integrity"). Cheap, so it runs on every pull request, outside the
+  # changes gate; it needs only CHANGELOG.md and scripts.
+  changelog:
+    name: Released changelog sections
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      # The merge commit's first parent is the current base branch.
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 2
+
+      - name: Test the check
+        run: scripts/ci/test-check-changelog-released.sh
+
+      - name: Check released sections
+        run: |
+          git show HEAD^1:CHANGELOG.md > "$RUNNER_TEMP/base-changelog.md"
+          scripts/ci/check-changelog-released.sh "$RUNNER_TEMP/base-changelog.md" CHANGELOG.md
+
   # Always runs, outside the changes gate: a pull request that only bumps a lockfile or adds a
   # crate should still be checked. The same workflow runs weekly on main (dependency-audit.yml).
   dependencies:

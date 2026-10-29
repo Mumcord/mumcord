@@ -51,6 +51,10 @@
       "size": 13799
     }
   ],
+  "changelog": {
+    "sha256": "0a44b2993fb7527b9824c47c6544b88eaf5545053b4ab4a3efb2cb4b209c16a7",
+    "text": "## [0.4.2] - 2026-10-27\n\n### Fixed\n\n- Fixed YouTube videos in watch parties showing \"This video can't be played in your browser\" in the Linux AppImage: the AppImage now ships the Opus audio parser YouTube playback needs\n- People who join a voice channel while someone is sharing their screen or a watch party is running now see it more reliably: the announcement is sent a second time in case the server dropped the first\n- Fixed a flood of keychain prompts on macOS after updating: a denied or failed keychain read is no longer repeated for every server list refresh, notification or reconnect, and the identity is read only once per session\n\n### Internal\n\n- Dependabot now checks dependencies and GitHub Actions weekly, with grouped and blocked major updates\n- Updated the `rtrb` and `x11rb` libraries and the GitHub Actions used by CI and releases\n- CI switches to another Ubuntu package mirror when apt stalls"
+  },
   "commit": "26d831ce9154e1b15703744b25719d39806b9774",
   "crates.io": {
     "mumcord-audio": {

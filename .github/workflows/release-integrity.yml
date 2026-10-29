@@ -3,7 +3,7 @@ name: Release integrity
 # Checks that published releases were never changed afterwards. For every releases/<version>.json
 # (written at publish time by post-release.yml, see scripts/release-manifest.sh) it compares the
 # release's current state with the manifest: the tag's commit, every asset's name, size and SHA-256,
-# and the crates.io checksums and yanked flags. Any difference fails the run and opens one issue
+# the text of the version's CHANGELOG.md section on main, and the crates.io checksums and yanked flags. Any difference fails the run and opens one issue
 # per release ("Release integrity: vX.Y.Z changed") with the diff; an open issue gets a comment
 # instead of a duplicate. Never fix a published release in place: publish a patch version (RELEASING.md).
 on:

@@ -51,6 +51,10 @@
       "size": 13799
     }
   ],
+  "changelog": {
+    "sha256": "f9c64584fd5ef5fdb99ec3fdabded0b2f9ec210650f8366dacb0eeb19149c9cb",
+    "text": "## [0.4.1] - 2026-10-26\n\n### macOS\n\n- Fixed connection failures: Mumcord now asks for the Local Network permission, without which macOS 15 and later blocked connections to servers in your home network\n- Clear reasons when a connection fails, in the app and in the log (for example \"No route to host\" with a pointer to System Settings → Privacy & Security → Local Network)\n- Far fewer keychain prompts: each saved secret is read only once per session and Mumcord uses fewer keychain items (items from older versions are merged on first use)\n- The microphone prompt now appears only once, when the microphone is first used, not when listing devices in the setup wizard or settings\n- The diagnostics page lists audio devices again, even when no audio is running\n- Signed and notarized builds when signing is configured; other builds get a stable signature so macOS can remember your choices\n\n### Fixes\n\n- Fixed two servers failing at the same time: their password and certificate prompts no longer collide\n\n### Internal\n\n- Faster CI builds and end-to-end tests"
+  },
   "commit": "4394e91c6f444936a609a61a0a3f40599a097283",
   "crates.io": {
     "mumcord-audio": null,
