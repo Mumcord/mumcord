@@ -196,6 +196,10 @@ jobs:
         if: runner.os == 'Linux'
         run: scripts/ci/test-set-version.sh
 
+      - name: Changelog script
+        if: runner.os == 'Linux'
+        run: scripts/ci/test-finalise-changelog.sh
+
       # Linux is covered by the E2E build job, which builds the same app.
       - name: Tauri debug build
         if: runner.os != 'Linux'
