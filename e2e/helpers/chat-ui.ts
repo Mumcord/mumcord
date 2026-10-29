@@ -3,7 +3,8 @@ import { chmodSync, mkdirSync, readFileSync, statSync, writeFileSync } from "nod
 import { join } from "node:path";
 import { browser, $, $$ } from "@wdio/globals";
 import { botInBackground, type BackgroundBot, type BotOptions } from "./bot.ts";
-import { artifactsDir } from "./paths.ts";
+import { artifactsDir, repoRoot } from "./paths.ts";
+import { run } from "./run.ts";
 import { nextToLastWizardStep } from "./wizard-util.ts";
 import { doubleClickRow, showAllPeople } from "./voice-ui.ts";
 
@@ -304,4 +305,14 @@ export class OutputWav {
 
 export function sleep(ms: number): Promise<void> {
   return new Promise((r) => setTimeout(r, ms));
+}
+
+/**
+ * What the app put on the system (X11) clipboard, read like a pasting application does: the
+ * text, or `png <bytes>` for an image; "" when the clipboard has nothing of that kind.
+ */
+export async function readClipboard(kind: "text" | "png"): Promise<string> {
+  const script = join(repoRoot, "e2e", "helpers", "x11-clipboard.py");
+  const result = await run("python3", ["-I", script, kind]);
+  return result.code === 0 ? result.stdout : "";
 }
