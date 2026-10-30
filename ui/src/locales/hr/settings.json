@@ -82,7 +82,15 @@
     "ducking": "Stišaj zvuk videa dok netko govori",
     "duckingHint": "Zvuk videa zajedničkog gledanja i dijeljenja zaslona tiši se dok netko u tvojem glasovnom kanalu govori.",
     "duckingLevel": "Smanjena glasnoća",
-    "duckingLevelValue": "{{percent}} %"
+    "duckingLevelValue": "{{percent}} %",
+    "lowLatency": "Način niske latencije",
+    "lowLatencyBeta": "Beta",
+    "lowLatencyHint": "Za zajedničko sviranje glazbe u stvarnom vremenu",
+    "lowLatencyWarningTitle": "Mijenja otpornost za brzinu",
+    "lowLatencyBandwidth": "Troši više propusnosti (paketi od 10 ms).",
+    "lowLatencyWifi": "Na Wi-Fi mreži ili opterećenoj vezi može pucketati; ako možete, koristite kabel.",
+    "lowLatencyHeadphones": "Koristite slušalice: poništavanje jeke je isključeno (kao i potiskivanje šuma i automatska glasnoća).",
+    "lowLatencyPtt": "Preporučuje se pritisni i govori ili ručni prag glasovne aktivacije."
   },
   "voice": {
     "talkMode": "Način govora",

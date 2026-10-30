@@ -65,8 +65,7 @@
     "title": "Calidad de voz",
     "status": "Ping {{latency}}, pérdida {{loss}}",
     "lowLatency": "Modo de baja latencia",
-    "lowLatencyHint": "Paquetes y búferes mínimos para tocar música juntos. Más ancho de banda, menos robusto.",
-    "lowLatencyComingSoon": "Próximamente",
+    "lowLatencyHint": "Para tocar música juntos en tiempo real. Funciona mejor con pulsar para hablar.",
     "voiceSettings": "Ajustes de voz…",
     "applies": "Se aplica al instante y se guarda como en Ajustes → Audio",
     "keys": "Esc cierra · ↑↓ mueve · ← → ajusta",
@@ -79,6 +78,17 @@
     "beta": "Beta",
     "moreInfo": "Más información: {{topic}}",
     "effectiveShort": "Enviando ahora",
-    "effectiveTip": "La tasa de bits que se envía ahora, tras adaptarse a la pérdida de paquetes."
-  }
+    "effectiveTip": "La tasa de bits que se envía ahora, tras adaptarse a la pérdida de paquetes.",
+    "musicIncluded": "Incluido mientras el modo de baja latencia está activado: la supresión de ruido y el volumen automático están desactivados, y el codificador usa su ajuste de música de baja demora.",
+    "warningBandwidth": "Usa más ancho de banda: ≈ {{on}} kbit/s en lugar de ≈ {{off}}.",
+    "warningWifi": "Puede fallar en Wi-Fi o con una conexión saturada.",
+    "warningHeadphones": "Usa auriculares: la cancelación de eco está desactivada.",
+    "warningPtt": "Funciona mejor con pulsar para hablar.",
+    "bandwidthLowLatencyWithin": "Los paquetes de 10 ms añaden sobrecarga de cabeceras; dentro del límite. Desactiva el modo para ahorrar ≈ {{value}} kbit/s.",
+    "bandwidthLowLatencyOver": "Los paquetes de 10 ms añaden sobrecarga de cabeceras; por encima del límite. Desactiva el modo para ahorrar ≈ {{value}} kbit/s.",
+    "bandwidthLowLatencyNoLimit": "Los paquetes de 10 ms añaden sobrecarga de cabeceras. Desactiva el modo para ahorrar ≈ {{value}} kbit/s."
+  },
+  "endToEnd": "Latencia total",
+  "endToEndValue": "≈ {{value}} ms (estimación)",
+  "lowLatencyMode": "Modo de baja latencia"
 }

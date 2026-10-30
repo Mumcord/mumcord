@@ -21,5 +21,19 @@
     "collapse": "Pienennä",
     "expand": "Laajenna",
     "handle": "{{name}}: nuolinäppäimet siirtävät, Vaihto+nuolinäppäimet muuttavat kokoa"
+  },
+  "latency": {
+    "summary": "≈ {{total}} ms suusta korvaan (arvio)",
+    "otherNormal": "normaalitila ≈ {{value}} ms",
+    "otherLow": "pienen viiveen tila ≈ {{value}} ms",
+    "breakdown": "Viiveen erittely",
+    "input": "Mikrofonin puskuri",
+    "encode": "Opus-kehys {{ms}} ms + enkooderin ennakointi",
+    "network": "Verkko (puolet pingistä)",
+    "notConnected": "ei yhteyttä",
+    "jitter": "Värinäpuskuri",
+    "processing": "Käsittely",
+    "output": "Kaiuttimen puskuri",
+    "value": "{{value}} ms"
   }
 }

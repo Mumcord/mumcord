@@ -1,6 +1,6 @@
 import { useId, useState } from "react";
 import { useTranslation } from "react-i18next";
-import type { AudioHealth } from "../../bindings/commands";
+import type { AudioHealth, LatencyEstimate } from "../../bindings/commands";
 import {
   FRAME_BUDGET_MS,
   concealedShare,
@@ -9,6 +9,7 @@ import {
   saveDetailsOpen,
   windowMinutes,
 } from "./audioHealth";
+import { LatencyBreakdown } from "../settings/sections/LatencyEstimate";
 
 const SPARK_WIDTH = 32;
 const SPARK_HEIGHT = 14;
@@ -159,7 +160,13 @@ function useRows(audio: AudioHealth): Row[] {
 }
 
 /** The raw counters behind the rating, behind a disclosure that remembers its state. */
-export function AudioHealthDetails({ audio }: { audio: AudioHealth }) {
+export function AudioHealthDetails({
+  audio,
+  latency,
+}: {
+  audio: AudioHealth;
+  latency: LatencyEstimate | null;
+}) {
   const { t } = useTranslation("connection");
   const [open, setOpen] = useState(loadDetailsOpen);
   const contentId = useId();
@@ -187,6 +194,7 @@ export function AudioHealthDetails({ audio }: { audio: AudioHealth }) {
             <DetailRow key={row.key} row={row} />
           ))}
         </dl>
+        {latency ? <LatencyBreakdown estimate={latency} /> : null}
         <p className="audio-details__note">
           {t("sinceConnected", { minutes: windowMinutes(audio.windowSecs) })}
         </p>

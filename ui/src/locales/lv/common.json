@@ -21,5 +21,19 @@
     "collapse": "Sakļaut",
     "expand": "Izvērst",
     "handle": "{{name}}: bultiņas pārvieto, Shift+bultiņas maina izmēru"
+  },
+  "latency": {
+    "summary": "≈ {{total}} ms no mutes līdz ausij (aplēse)",
+    "otherNormal": "parastais režīms ≈ {{value}} ms",
+    "otherLow": "zemas aizkaves režīms ≈ {{value}} ms",
+    "breakdown": "Aizkaves sadalījums",
+    "input": "Mikrofona buferis",
+    "encode": "Opus kadrs {{ms}} ms + kodētāja apsteigums",
+    "network": "Tīkls (puse no ping)",
+    "notConnected": "nav savienojuma",
+    "jitter": "Trīces buferis",
+    "processing": "Apstrāde",
+    "output": "Skaļruņa buferis",
+    "value": "{{value}} ms"
   }
 }

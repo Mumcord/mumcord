@@ -67,6 +67,19 @@ export const SETTINGS_INDEX: readonly SettingEntry[] = [
   {
     section: "audio",
     group: "audio.quality",
+    control: "audio.lowLatency",
+    terms: [
+      "audio.lowLatencyHint",
+      "audio.lowLatencyWarningTitle",
+      "audio.lowLatencyBandwidth",
+      "audio.lowLatencyWifi",
+      "audio.lowLatencyHeadphones",
+      "audio.lowLatencyPtt",
+    ],
+  },
+  {
+    section: "audio",
+    group: "audio.quality",
     control: "audio.bitrate",
     terms: ["audio.bitrateMaxKnown", "audio.bitrateMaxUnknown"],
   },

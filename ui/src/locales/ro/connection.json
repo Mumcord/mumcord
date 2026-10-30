@@ -65,8 +65,7 @@
     "title": "Calitatea vocii",
     "status": "Ping {{latency}}, pierderi {{loss}}",
     "lowLatency": "Mod cu latență redusă",
-    "lowLatencyHint": "Cele mai mici pachete și buffere pentru a cânta împreună. Mai multă lățime de bandă, mai puțin robust.",
-    "lowLatencyComingSoon": "În curând",
+    "lowLatencyHint": "Pentru a cânta împreună în timp real. Funcționează cel mai bine cu push-to-talk.",
     "voiceSettings": "Setări voce…",
     "applies": "Se aplică imediat, salvat ca în Setări → Audio",
     "keys": "Esc închide · ↑↓ mută · ← → ajustează",
@@ -79,6 +78,17 @@
     "beta": "Beta",
     "moreInfo": "Mai multe informații: {{topic}}",
     "effectiveShort": "Se trimite acum",
-    "effectiveTip": "Rata de biți trimisă acum, după adaptarea la pierderea de pachete."
-  }
+    "effectiveTip": "Rata de biți trimisă acum, după adaptarea la pierderea de pachete.",
+    "musicIncluded": "Inclus cât timp modul cu latență redusă este activ: suprimarea zgomotului și volumul automat sunt dezactivate, iar encoderul rulează în setarea sa de muzică cu întârziere redusă.",
+    "warningBandwidth": "Folosește mai multă lățime de bandă: ≈ {{on}} kbit/s în loc de ≈ {{off}}.",
+    "warningWifi": "Poate avea întreruperi pe Wi-Fi sau pe o conexiune aglomerată.",
+    "warningHeadphones": "Folosește căști: anularea ecoului este dezactivată.",
+    "warningPtt": "Funcționează cel mai bine cu push-to-talk.",
+    "bandwidthLowLatencyWithin": "Pachetele de 10 ms adaugă overhead de antet; în limită. Dezactivează modul pentru a economisi ≈ {{value}} kbit/s.",
+    "bandwidthLowLatencyOver": "Pachetele de 10 ms adaugă overhead de antet; peste limită. Dezactivează modul pentru a economisi ≈ {{value}} kbit/s.",
+    "bandwidthLowLatencyNoLimit": "Pachetele de 10 ms adaugă overhead de antet. Dezactivează modul pentru a economisi ≈ {{value}} kbit/s."
+  },
+  "endToEnd": "Latență totală",
+  "endToEndValue": "≈ {{value}} ms (estimare)",
+  "lowLatencyMode": "Mod cu latență redusă"
 }

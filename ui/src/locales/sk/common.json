@@ -21,5 +21,19 @@
     "collapse": "Zbaliť",
     "expand": "Rozbaliť",
     "handle": "{{name}}: šípky posúvajú, Shift+šípky menia veľkosť"
+  },
+  "latency": {
+    "summary": "≈ {{total}} ms od úst k uchu (odhad)",
+    "otherNormal": "bežný režim ≈ {{value}} ms",
+    "otherLow": "režim nízkej latencie ≈ {{value}} ms",
+    "breakdown": "Rozpis latencie",
+    "input": "Vyrovnávacia pamäť mikrofónu",
+    "encode": "Rámec Opus {{ms}} ms + predstih kódovača",
+    "network": "Sieť (polovica pingu)",
+    "notConnected": "nepripojené",
+    "jitter": "Vyrovnávacia pamäť jittera",
+    "processing": "Spracovanie",
+    "output": "Vyrovnávacia pamäť reproduktorov",
+    "value": "{{value}} ms"
   }
 }

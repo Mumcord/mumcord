@@ -64,8 +64,7 @@
     "title": "Äänenlaatu",
     "status": "Viive {{latency}}, hävikki {{loss}}",
     "lowLatency": "Pienen viiveen tila",
-    "lowLatencyHint": "Pienimmät paketit ja puskurit yhteissoittoon. Enemmän kaistaa, vähemmän vakaa.",
-    "lowLatencyComingSoon": "Tulossa pian",
+    "lowLatencyHint": "Yhteissoittoon reaaliajassa. Toimii parhaiten puhu painamalla -tilassa.",
     "voiceSettings": "Ääniasetukset…",
     "applies": "Tulee voimaan heti, tallentuu kuten Asetukset → Ääni",
     "keys": "Esc sulkee · ↑↓ siirtyy · ← → säätää",
@@ -78,6 +77,17 @@
     "beta": "Beta",
     "moreInfo": "Lisätietoja: {{topic}}",
     "effectiveShort": "Lähetetään nyt",
-    "effectiveTip": "Parhaillaan lähetettävä bittinopeus pakettihävikkiin sopeuttamisen jälkeen."
-  }
+    "effectiveTip": "Parhaillaan lähetettävä bittinopeus pakettihävikkiin sopeuttamisen jälkeen.",
+    "musicIncluded": "Mukana, kun pienen viiveen tila on päällä: kohinanvaimennus ja automaattinen voimakkuus ovat pois päältä, ja enkooderi käyttää pienen viiveen musiikkiasetustaan.",
+    "warningBandwidth": "Käyttää enemmän kaistaa: ≈ {{on}} kbit/s eikä ≈ {{off}}.",
+    "warningWifi": "Voi pätkiä Wi-Fi-yhteydellä tai kuormitetulla yhteydellä.",
+    "warningHeadphones": "Käytä kuulokkeita: kaiunpoisto on pois päältä.",
+    "warningPtt": "Toimii parhaiten puhu painamalla -tilassa.",
+    "bandwidthLowLatencyWithin": "10 ms:n paketit lisäävät otsikkotietojen kuormaa; rajan sisällä. Poista tila käytöstä säästääksesi ≈ {{value}} kbit/s.",
+    "bandwidthLowLatencyOver": "10 ms:n paketit lisäävät otsikkotietojen kuormaa; rajan yli. Poista tila käytöstä säästääksesi ≈ {{value}} kbit/s.",
+    "bandwidthLowLatencyNoLimit": "10 ms:n paketit lisäävät otsikkotietojen kuormaa. Poista tila käytöstä säästääksesi ≈ {{value}} kbit/s."
+  },
+  "endToEnd": "Kokonaisviive",
+  "endToEndValue": "≈ {{value}} ms (arvio)",
+  "lowLatencyMode": "Pienen viiveen tila"
 }

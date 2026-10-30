@@ -81,7 +81,15 @@
     "ducking": "Videó hangjának halkítása, amíg valaki beszél",
     "duckingHint": "A közös nézés videójának és a képernyőmegosztásnak a hangja halkabb lesz, amíg valaki beszél a hangcsatornádban.",
     "duckingLevel": "Csökkentett hangerő",
-    "duckingLevelValue": "{{percent}} %"
+    "duckingLevelValue": "{{percent}} %",
+    "lowLatency": "Alacsony késleltetésű mód",
+    "lowLatencyBeta": "Béta",
+    "lowLatencyHint": "Valós idejű közös zenélésre",
+    "lowLatencyWarningTitle": "A stabilitást cseréli sebességre",
+    "lowLatencyBandwidth": "Több sávszélességet használ (10 ms-os csomagok).",
+    "lowLatencyWifi": "Wi-Fin vagy terhelt kapcsolaton recsegni kezdhet; ha lehet, használjon kábelt.",
+    "lowLatencyHeadphones": "Használjon fejhallgatót: a visszhangszűrés ki van kapcsolva (a zajszűrés és az automatikus hangerő is).",
+    "lowLatencyPtt": "Ajánlott a nyomd-és-beszélj mód vagy a hangaktiválás kézi küszöbe."
   },
   "voice": {
     "talkMode": "Beszédmód",

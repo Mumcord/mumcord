@@ -11,6 +11,7 @@ import type {
   ChatMessage,
   ConnectionState,
   ConnectionStats,
+  LatencyEstimate,
   Conversation,
   ErrorCode,
   Friend,
@@ -178,6 +179,7 @@ const DEFAULT_SETTINGS: Settings = {
   echoCancellation: true,
   autoGain: true,
   musicQuality: false,
+  lowLatency: false,
   videoDucking: true,
   videoDuckingPercent: 30,
   bitrateKbps: 96,
@@ -304,6 +306,35 @@ const DEVICES: AudioDevices = {
   ],
 };
 
+/** The figures measured on a PipeWire machine with an 18 ms ping (issue #156), for both modes. */
+function mockLatencyEstimate(lowLatency: boolean): LatencyEstimate {
+  return lowLatency
+    ? {
+        lowLatency,
+        packetMs: 10,
+        inputBufferUs: 2667,
+        encodeUs: 12500,
+        networkUs: 9000,
+        jitterUs: 10000,
+        processingUs: 100,
+        outputBufferUs: 13667,
+        totalUs: 47934,
+        otherModeTotalUs: 107134,
+      }
+    : {
+        lowLatency,
+        packetMs: 20,
+        inputBufferUs: 10667,
+        encodeUs: 26500,
+        networkUs: 9000,
+        jitterUs: 20000,
+        processingUs: 300,
+        outputBufferUs: 40667,
+        totalUs: 107134,
+        otherModeTotalUs: 47934,
+      };
+}
+
 const DEFAULT_CONNECTION_STATS: ConnectionStats = {
   transport: "udp",
   rttMs: 24.5,
@@ -336,6 +367,7 @@ const DEFAULT_CONNECTION_STATS: ConnectionStats = {
       2900, 3100, 2800, 3300, 3000, 3600, 4800, 3900, 3500, 3200, 3700, 3400,
     ],
   },
+  latency: mockLatencyEstimate(false),
 };
 
 const allow = { enter: true, textMessage: true, listen: true, registerSelf: false };
@@ -1218,7 +1250,16 @@ export function createMockApi(options: MockOptions = {}): MockApi {
     sessionSnapshot: (serverId) => Promise.resolve(sessions.get(serverId)?.snapshot ?? null),
     connectionStats: (serverId) =>
       Promise.resolve(
-        sessions.get(serverId)?.state.state === "connected" ? { ...connectionStats } : null,
+        sessions.get(serverId)?.state.state === "connected"
+          ? {
+              ...connectionStats,
+              // Follows the setting like the engine, unless a test set its own figure.
+              latency:
+                connectionStats.latency === DEFAULT_CONNECTION_STATS.latency
+                  ? mockLatencyEstimate(settings.lowLatency)
+                  : connectionStats.latency,
+            }
+          : null,
       ),
     certTrustDecide: (serverId, _fingerprint, trust) => {
       const pending = pendingConnect;
@@ -1724,6 +1765,7 @@ export function createMockApi(options: MockOptions = {}): MockApi {
     // audio
     audioDevices: () => Promise.resolve(DEVICES),
     bitrateMax: () => Promise.resolve<number | null>(null),
+    latencyEstimate: () => Promise.resolve(mockLatencyEstimate(settings.lowLatency)),
     micTestStart: () => {
       clearInterval(micTimer);
       clearTimeout(micPhaseTimer);

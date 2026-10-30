@@ -21,5 +21,19 @@
     "collapse": "Zwiń",
     "expand": "Rozwiń",
     "handle": "{{name}}: strzałki przesuwają, Shift+strzałki zmieniają rozmiar"
+  },
+  "latency": {
+    "summary": "≈ {{total}} ms od ust do ucha (szacunek)",
+    "otherNormal": "tryb normalny ≈ {{value}} ms",
+    "otherLow": "tryb niskich opóźnień ≈ {{value}} ms",
+    "breakdown": "Podział opóźnienia",
+    "input": "Bufor mikrofonu",
+    "encode": "Ramka Opus {{ms}} ms + wyprzedzenie kodera",
+    "network": "Sieć (połowa pingu)",
+    "notConnected": "brak połączenia",
+    "jitter": "Bufor jittera",
+    "processing": "Przetwarzanie",
+    "output": "Bufor głośników",
+    "value": "{{value}} ms"
   }
 }

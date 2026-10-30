@@ -21,5 +21,19 @@
     "collapse": "Restrânge",
     "expand": "Extinde",
     "handle": "{{name}}: săgețile mută, Shift+săgeți redimensionează"
+  },
+  "latency": {
+    "summary": "≈ {{total}} ms de la gură la ureche (estimare)",
+    "otherNormal": "mod normal ≈ {{value}} ms",
+    "otherLow": "mod cu latență redusă ≈ {{value}} ms",
+    "breakdown": "Detalierea latenței",
+    "input": "Buffer microfon",
+    "encode": "Cadru Opus de {{ms}} ms + anticiparea codificatorului",
+    "network": "Rețea (jumătate din ping)",
+    "notConnected": "neconectat",
+    "jitter": "Buffer de jitter",
+    "processing": "Procesare",
+    "output": "Buffer difuzor",
+    "value": "{{value}} ms"
   }
 }

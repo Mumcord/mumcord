@@ -5,6 +5,7 @@ import { windowMinutes } from "./audioHealth";
 import { AudioHealthDetails } from "./AudioHealthDetails";
 import { ViewContext } from "../../app/view";
 import { AudioHealthRating } from "./AudioHealthRating";
+import { formatMs } from "../settings/sections/formatMs";
 import { ConnectionQuickPanel } from "./ConnectionQuickPanel";
 import { useConnectionStats } from "./useConnectionStats";
 import "./connection.css";
@@ -12,13 +13,22 @@ import "./connection.css";
 const SIGNAL = "M4 20v-3M9 20v-7M14 20v-11M19 20V4";
 
 function StatsList({ stats }: { stats: ConnectionStats }) {
-  const { t } = useTranslation("connection");
+  const { t, i18n } = useTranslation("connection");
   const rows: [string, string][] = [
     [t("transport"), stats.transport ? t(`transportValue.${stats.transport}`) : t("none")],
     [
       t("latency"),
       stats.rttMs === null ? t("none") : t("latencyValue", { value: Math.round(stats.rttMs) }),
     ],
+    ...(stats.latency
+      ? [
+          [
+            t("endToEnd"),
+            (stats.latency.lowLatency ? `${t("lowLatencyMode")} · ` : "") +
+              t("endToEndValue", { value: formatMs(stats.latency.totalUs, i18n.language) }),
+          ] as [string, string],
+        ]
+      : []),
     [t("loss"), t("lossValue", { value: stats.lossPercent })],
     [t("bitrate"), t("bitrateValue", { value: stats.sendBitrateKbps })],
     [
@@ -46,7 +56,7 @@ function StatsList({ stats }: { stats: ConnectionStats }) {
             issue={stats.audio.issue}
             minutes={windowMinutes(stats.audio.windowSecs)}
           />
-          <AudioHealthDetails audio={stats.audio} />
+          <AudioHealthDetails audio={stats.audio} latency={stats.latency} />
         </>
       ) : null}
     </>

@@ -84,7 +84,15 @@
     "ducking": "Ísligh fuaim an fhíseáin nuair a bhíonn daoine ag caint",
     "duckingHint": "Éiríonn fuaim an fhíseáin féachana le chéile agus na comhroinnte scáileáin níos ciúine fad a bhíonn duine i do chainéal gutha ag caint.",
     "duckingLevel": "Airde íslithe",
-    "duckingLevelValue": "{{percent}} %"
+    "duckingLevelValue": "{{percent}} %",
+    "lowLatency": "Mód lag-latency",
+    "lowLatencyBeta": "Béite",
+    "lowLatencyHint": "Chun ceol a sheinm le chéile i bhfíoram",
+    "lowLatencyWarningTitle": "Malartaíonn sé stóinseacht ar luas",
+    "lowLatencyBandwidth": "Úsáideann sé níos mó bandaleithead (paicéid 10 ms).",
+    "lowLatencyWifi": "D'fhéadfadh sé briseadh ar Wi-Fi nó ar nasc gnóthach; úsáid cábla más féidir leat.",
+    "lowLatencyHeadphones": "Úsáid cluasáin: tá cealú macalla múchta (agus tá cosc torainn agus airde fuaime uathoibríoch múchta freisin).",
+    "lowLatencyPtt": "Moltar brúigh-le-labhairt nó tairseach láimhe um ghníomhachtú gutha."
   },
   "voice": {
     "talkMode": "Mód cainte",

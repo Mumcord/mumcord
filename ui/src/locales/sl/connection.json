@@ -66,8 +66,7 @@
     "title": "Kakovost glasu",
     "status": "Ping {{latency}}, izguba {{loss}}",
     "lowLatency": "Način nizke zakasnitve",
-    "lowLatencyHint": "Najmanjši paketi in medpomnilniki za skupno igranje glasbe. Več pasovne širine, manj robustno.",
-    "lowLatencyComingSoon": "Kmalu",
+    "lowLatencyHint": "Za skupno igranje glasbe v realnem času. Najbolje deluje s pritiskom za govor.",
     "voiceSettings": "Nastavitve glasu…",
     "applies": "Velja takoj, shranjeno kot v Nastavitve → Zvok",
     "keys": "Esc zapre · ↑↓ premika · ← → prilagodi",
@@ -80,6 +79,17 @@
     "beta": "Beta",
     "moreInfo": "Več informacij: {{topic}}",
     "effectiveShort": "Trenutno se pošilja",
-    "effectiveTip": "Bitna hitrost, ki se trenutno pošilja, po prilagoditvi izgubi paketov."
-  }
+    "effectiveTip": "Bitna hitrost, ki se trenutno pošilja, po prilagoditvi izgubi paketov.",
+    "musicIncluded": "Vključeno, ko je način nizke zakasnitve vklopljen: dušenje šuma in samodejna glasnost sta izklopljena, kodirnik pa deluje v nastavitvi za glasbo z nizko zakasnitvijo.",
+    "warningBandwidth": "Porabi več pasovne širine: ≈ {{on}} kbit/s namesto ≈ {{off}}.",
+    "warningWifi": "Na Wi-Fi ali obremenjeni povezavi lahko zatika.",
+    "warningHeadphones": "Uporabi slušalke: odpravljanje odmeva je izklopljeno.",
+    "warningPtt": "Najbolje deluje s pritiskom za govor.",
+    "bandwidthLowLatencyWithin": "Paketi po 10 ms dodajo obremenitev glav; znotraj omejitve. Izklopi način, da prihraniš ≈ {{value}} kbit/s.",
+    "bandwidthLowLatencyOver": "Paketi po 10 ms dodajo obremenitev glav; nad omejitvijo. Izklopi način, da prihraniš ≈ {{value}} kbit/s.",
+    "bandwidthLowLatencyNoLimit": "Paketi po 10 ms dodajo obremenitev glav. Izklopi način, da prihraniš ≈ {{value}} kbit/s."
+  },
+  "endToEnd": "Skupna zakasnitev",
+  "endToEndValue": "≈ {{value}} ms (ocena)",
+  "lowLatencyMode": "Način nizke zakasnitve"
 }

@@ -21,5 +21,19 @@
     "collapse": "Ahenda",
     "expand": "Laienda",
     "handle": "{{name}}: nooleklahvid liigutavad, Shift+nooleklahvid muudavad suurust"
+  },
+  "latency": {
+    "summary": "≈ {{total}} ms suust kõrvani (hinnang)",
+    "otherNormal": "tavarežiim ≈ {{value}} ms",
+    "otherLow": "väikese viivitusega režiim ≈ {{value}} ms",
+    "breakdown": "Viivituse jaotus",
+    "input": "Mikrofoni puhver",
+    "encode": "Opuse kaader {{ms}} ms + kodeerija ettevaade",
+    "network": "Võrk (pool pingist)",
+    "notConnected": "ühendus puudub",
+    "jitter": "Värinapuhver",
+    "processing": "Töötlemine",
+    "output": "Kõlari puhver",
+    "value": "{{value}} ms"
   }
 }

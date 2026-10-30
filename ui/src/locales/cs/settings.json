@@ -83,7 +83,15 @@
     "ducking": "Ztišit zvuk videa, když někdo mluví",
     "duckingHint": "Zvuk videa ze společného sledování a sdílení obrazovky se ztiší, když někdo v tvém hlasovém kanálu mluví.",
     "duckingLevel": "Snížená hlasitost",
-    "duckingLevelValue": "{{percent}} %"
+    "duckingLevelValue": "{{percent}} %",
+    "lowLatency": "Režim nízké latence",
+    "lowLatencyBeta": "Beta",
+    "lowLatencyHint": "Pro společné hraní hudby v reálném čase",
+    "lowLatencyWarningTitle": "Obětuje odolnost ve prospěch rychlosti",
+    "lowLatencyBandwidth": "Využívá více šířky pásma (pakety po 10 ms).",
+    "lowLatencyWifi": "Na Wi-Fi nebo vytíženém připojení může vypadávat; pokud můžete, použijte kabel.",
+    "lowLatencyHeadphones": "Používejte sluchátka: potlačení ozvěny je vypnuté (potlačení šumu a automatická hlasitost také).",
+    "lowLatencyPtt": "Doporučujeme vysílání na stisk nebo ruční práh hlasové aktivace."
   },
   "voice": {
     "talkMode": "Režim mluvení",

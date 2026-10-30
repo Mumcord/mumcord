@@ -66,8 +66,7 @@
     "title": "Kvalita hlasu",
     "status": "Ping {{latency}}, ztráty {{loss}}",
     "lowLatency": "Režim nízké latence",
-    "lowLatencyHint": "Nejmenší pakety a vyrovnávací paměti pro společné hraní hudby. Více pásma, menší odolnost.",
-    "lowLatencyComingSoon": "Již brzy",
+    "lowLatencyHint": "Pro společné hraní hudby v reálném čase. Nejlépe funguje s push-to-talk.",
     "voiceSettings": "Nastavení hlasu…",
     "applies": "Platí ihned, ukládá se jako v Nastavení → Zvuk",
     "keys": "Esc zavře · ↑↓ přesouvá · ← → upravuje",
@@ -80,6 +79,17 @@
     "beta": "Beta",
     "moreInfo": "Další informace: {{topic}}",
     "effectiveShort": "Právě se odesílá",
-    "effectiveTip": "Bitrate odesílaná právě teď po přizpůsobení ztrátě paketů."
-  }
+    "effectiveTip": "Bitrate odesílaná právě teď po přizpůsobení ztrátě paketů.",
+    "musicIncluded": "Zahrnuto při zapnutém režimu nízké latence: potlačení šumu a automatická hlasitost jsou vypnuté, kodér běží v nastavení pro hudbu s nízkým zpožděním.",
+    "warningBandwidth": "Využívá více pásma: ≈ {{on}} kbit/s místo ≈ {{off}}.",
+    "warningWifi": "Na Wi-Fi nebo vytížené síti může docházet k výpadkům.",
+    "warningHeadphones": "Použij sluchátka: potlačení ozvěny je vypnuté.",
+    "warningPtt": "Nejlépe funguje s push-to-talk.",
+    "bandwidthLowLatencyWithin": "Pakety po 10 ms přidávají režii hlaviček; v limitu. Vypnutím režimu ušetříš ≈ {{value}} kbit/s.",
+    "bandwidthLowLatencyOver": "Pakety po 10 ms přidávají režii hlaviček; nad limitem. Vypnutím režimu ušetříš ≈ {{value}} kbit/s.",
+    "bandwidthLowLatencyNoLimit": "Pakety po 10 ms přidávají režii hlaviček. Vypnutím režimu ušetříš ≈ {{value}} kbit/s."
+  },
+  "endToEnd": "Celková latence",
+  "endToEndValue": "≈ {{value}} ms (odhad)",
+  "lowLatencyMode": "Režim nízké latence"
 }

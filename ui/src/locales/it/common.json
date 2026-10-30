@@ -21,5 +21,19 @@
     "collapse": "Comprimi",
     "expand": "Espandi",
     "handle": "{{name}}: le frecce spostano, Maiusc+frecce ridimensionano"
+  },
+  "latency": {
+    "summary": "≈ {{total}} ms dalla bocca all'orecchio (stima)",
+    "otherNormal": "modalità normale ≈ {{value}} ms",
+    "otherLow": "modalità a bassa latenza ≈ {{value}} ms",
+    "breakdown": "Dettaglio della latenza",
+    "input": "Buffer del microfono",
+    "encode": "Frame Opus da {{ms}} ms + anticipo del codificatore",
+    "network": "Rete (metà del ping)",
+    "notConnected": "non connesso",
+    "jitter": "Buffer di jitter",
+    "processing": "Elaborazione",
+    "output": "Buffer degli altoparlanti",
+    "value": "{{value}} ms"
   }
 }

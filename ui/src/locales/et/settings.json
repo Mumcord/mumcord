@@ -81,7 +81,15 @@
     "ducking": "Vaigista video heli, kui keegi räägib",
     "duckingHint": "Ühisvaatamise video ja ekraani jagamise heli vaibub, kui keegi sinu häälkanalis räägib.",
     "duckingLevel": "Vähendatud helitugevus",
-    "duckingLevelValue": "{{percent}} %"
+    "duckingLevelValue": "{{percent}} %",
+    "lowLatency": "Väikese viivitusega režiim",
+    "lowLatencyBeta": "Beeta",
+    "lowLatencyHint": "Koos muusika mängimiseks reaalajas",
+    "lowLatencyWarningTitle": "Vahetab töökindluse kiiruse vastu",
+    "lowLatencyBandwidth": "Kasutab rohkem ribalaiust (10 ms paketid).",
+    "lowLatencyWifi": "Wi-Fi-ga või hõivatud ühendusega võib katkeda; kasuta võimalusel kaablit.",
+    "lowLatencyHeadphones": "Kasuta kõrvaklappe: kaja summutus on välja lülitatud (ka mürasummutus ja automaatne helitugevus).",
+    "lowLatencyPtt": "Soovitatav on vajutarääkimine või käsitsi seatud häälaktivatsiooni lävi."
   },
   "voice": {
     "talkMode": "Rääkimisrežiim",

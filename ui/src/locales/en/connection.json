@@ -64,8 +64,7 @@
     "title": "Voice quality",
     "status": "Ping {{latency}}, loss {{loss}}",
     "lowLatency": "Low-latency mode",
-    "lowLatencyHint": "Smallest packets and buffers for playing music together. More bandwidth, less robust.",
-    "lowLatencyComingSoon": "Coming soon",
+    "lowLatencyHint": "For playing music together in real time. Push-to-talk works best.",
     "voiceSettings": "Voice settings…",
     "applies": "Applies at once, saved like Settings → Audio",
     "keys": "Esc closes · ↑↓ moves · ← → adjusts",
@@ -78,6 +77,17 @@
     "beta": "Beta",
     "moreInfo": "More information: {{topic}}",
     "effectiveShort": "Sending now",
-    "effectiveTip": "The bitrate being sent right now, after adapting to packet loss."
-  }
+    "effectiveTip": "The bitrate being sent right now, after adapting to packet loss.",
+    "musicIncluded": "Included while low-latency mode is on: noise suppression and automatic volume are off, the encoder runs in its low-delay music setting.",
+    "warningBandwidth": "Uses more bandwidth: ≈ {{on}} kbit/s instead of ≈ {{off}}.",
+    "warningWifi": "May glitch on Wi-Fi or a busy connection.",
+    "warningHeadphones": "Use headphones: echo cancellation is off.",
+    "warningPtt": "Push-to-talk works best.",
+    "bandwidthLowLatencyWithin": "10 ms packets add header overhead; within the limit. Turn the mode off to save ≈ {{value}} kbit/s.",
+    "bandwidthLowLatencyOver": "10 ms packets add header overhead; above the limit. Turn the mode off to save ≈ {{value}} kbit/s.",
+    "bandwidthLowLatencyNoLimit": "10 ms packets add header overhead. Turn the mode off to save ≈ {{value}} kbit/s."
+  },
+  "endToEnd": "End-to-end latency",
+  "endToEndValue": "≈ {{value}} ms (estimate)",
+  "lowLatencyMode": "Low-latency mode"
 }

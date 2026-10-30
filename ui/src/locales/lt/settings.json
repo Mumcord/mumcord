@@ -83,7 +83,15 @@
     "ducking": "Pritildyti vaizdo įrašų garsą, kai kas nors kalba",
     "duckingHint": "Bendros peržiūros vaizdo įrašo ir ekrano bendrinimo garsas tyla, kai kas nors tavo balso kanale kalba.",
     "duckingLevel": "Pritildytas garsumas",
-    "duckingLevelValue": "{{percent}} %"
+    "duckingLevelValue": "{{percent}} %",
+    "lowLatency": "Mažos delsos režimas",
+    "lowLatencyBeta": "Beta",
+    "lowLatencyHint": "Muzikai groti kartu realiuoju laiku",
+    "lowLatencyWarningTitle": "Stabilumą iškeičia į greitį",
+    "lowLatencyBandwidth": "Naudoja daugiau pralaidumo (10 ms paketai).",
+    "lowLatencyWifi": "Per „Wi-Fi“ ar apkrautą ryšį gali trūkinėti; jei galite, naudokite laidą.",
+    "lowLatencyHeadphones": "Naudokite ausines: aido slopinimas išjungtas (taip pat triukšmo slopinimas ir automatinis garsumas).",
+    "lowLatencyPtt": "Rekomenduojama spausti ir kalbėti arba rankiniu būdu nustatyta balso aktyvavimo riba."
   },
   "voice": {
     "talkMode": "Kalbėjimo režimas",

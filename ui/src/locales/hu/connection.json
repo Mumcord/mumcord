@@ -64,8 +64,7 @@
     "title": "Hangminőség",
     "status": "Ping {{latency}}, veszteség {{loss}}",
     "lowLatency": "Alacsony késleltetésű mód",
-    "lowLatencyHint": "Legkisebb csomagok és pufferek közös zenéléshez. Több sávszélesség, kevésbé robusztus.",
-    "lowLatencyComingSoon": "Hamarosan",
+    "lowLatencyHint": "Közös zenéléshez valós időben. Push-to-talk használatával működik a legjobban.",
     "voiceSettings": "Hangbeállítások…",
     "applies": "Azonnal érvénybe lép, mentése mint a Beállítások → Hang esetén",
     "keys": "Esc bezár · ↑↓ mozog · ← → állít",
@@ -78,6 +77,17 @@
     "beta": "Beta",
     "moreInfo": "További információ: {{topic}}",
     "effectiveShort": "Jelenleg küldött",
-    "effectiveTip": "A most küldött bitráta a csomagvesztéshez igazítás után."
-  }
+    "effectiveTip": "A most küldött bitráta a csomagvesztéshez igazítás után.",
+    "musicIncluded": "Az alacsony késleltetésű mód bekapcsolt állapotában ez is benne van: a zajszűrés és az automatikus hangerő ki van kapcsolva, a kódoló pedig az alacsony késleltetésű zenei beállítását használja.",
+    "warningBandwidth": "Több sávszélességet használ: ≈ {{on}} kbit/s a ≈ {{off}} helyett.",
+    "warningWifi": "Wi-Fi-n vagy terhelt kapcsolaton akadozhat.",
+    "warningHeadphones": "Használj fejhallgatót: a visszhangszűrés ki van kapcsolva.",
+    "warningPtt": "Push-to-talk használatával működik a legjobban.",
+    "bandwidthLowLatencyWithin": "A 10 ms-os csomagok fejléc-többletterhet jelentenek; a korláton belül. Kapcsold ki a módot, hogy megtakaríts ≈ {{value}} kbit/s-ot.",
+    "bandwidthLowLatencyOver": "A 10 ms-os csomagok fejléc-többletterhet jelentenek; a korlát felett. Kapcsold ki a módot, hogy megtakaríts ≈ {{value}} kbit/s-ot.",
+    "bandwidthLowLatencyNoLimit": "A 10 ms-os csomagok fejléc-többletterhet jelentenek. Kapcsold ki a módot, hogy megtakaríts ≈ {{value}} kbit/s-ot."
+  },
+  "endToEnd": "Teljes késleltetés",
+  "endToEndValue": "≈ {{value}} ms (becslés)",
+  "lowLatencyMode": "Alacsony késleltetésű mód"
 }

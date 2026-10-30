@@ -21,5 +21,19 @@
     "collapse": "Contraer",
     "expand": "Expandir",
     "handle": "{{name}}: las flechas mueven, Mayúsculas+flechas cambian el tamaño"
+  },
+  "latency": {
+    "summary": "≈ {{total}} ms de la boca al oído (estimación)",
+    "otherNormal": "modo normal ≈ {{value}} ms",
+    "otherLow": "modo de baja latencia ≈ {{value}} ms",
+    "breakdown": "Desglose de la latencia",
+    "input": "Búfer del micrófono",
+    "encode": "Trama Opus de {{ms}} ms + anticipación del codificador",
+    "network": "Red (la mitad del ping)",
+    "notConnected": "sin conexión",
+    "jitter": "Búfer de jitter",
+    "processing": "Procesamiento",
+    "output": "Búfer del altavoz",
+    "value": "{{value}} ms"
   }
 }

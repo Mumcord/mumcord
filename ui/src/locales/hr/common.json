@@ -21,5 +21,19 @@
     "collapse": "Sažmi",
     "expand": "Proširi",
     "handle": "{{name}}: strelice pomiču, Shift+strelice mijenjaju veličinu"
+  },
+  "latency": {
+    "summary": "≈ {{total}} ms od usta do uha (procjena)",
+    "otherNormal": "uobičajeni način ≈ {{value}} ms",
+    "otherLow": "način niske latencije ≈ {{value}} ms",
+    "breakdown": "Raspodjela latencije",
+    "input": "Međuspremnik mikrofona",
+    "encode": "Opus okvir od {{ms}} ms + prednost kodera",
+    "network": "Mreža (pola pinga)",
+    "notConnected": "nije povezano",
+    "jitter": "Međuspremnik jittera",
+    "processing": "Obrada",
+    "output": "Međuspremnik zvučnika",
+    "value": "{{value}} ms"
   }
 }

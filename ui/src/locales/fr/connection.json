@@ -65,8 +65,7 @@
     "title": "Qualité vocale",
     "status": "Ping {{latency}}, perte {{loss}}",
     "lowLatency": "Mode faible latence",
-    "lowLatencyHint": "Paquets et tampons minimaux pour jouer de la musique ensemble. Plus de bande passante, moins robuste.",
-    "lowLatencyComingSoon": "Bientôt disponible",
+    "lowLatencyHint": "Pour jouer de la musique ensemble en temps réel. Fonctionne mieux avec le push-to-talk.",
     "voiceSettings": "Paramètres vocaux…",
     "applies": "S'applique tout de suite, enregistré comme dans Paramètres → Audio",
     "keys": "Échap ferme · ↑↓ déplace · ← → ajuste",
@@ -79,6 +78,17 @@
     "beta": "Beta",
     "moreInfo": "Plus d'informations : {{topic}}",
     "effectiveShort": "Envoi actuel",
-    "effectiveTip": "Le débit envoyé en ce moment, après adaptation à la perte de paquets."
-  }
+    "effectiveTip": "Le débit envoyé en ce moment, après adaptation à la perte de paquets.",
+    "musicIncluded": "Inclus tant que le mode faible latence est activé : la suppression de bruit et le volume automatique sont désactivés, et l'encodeur utilise son réglage musique à faible délai.",
+    "warningBandwidth": "Consomme plus de bande passante : ≈ {{on}} kbit/s au lieu de ≈ {{off}}.",
+    "warningWifi": "Peut saccader en Wi-Fi ou sur une connexion chargée.",
+    "warningHeadphones": "Utilisez un casque : l'annulation d'écho est désactivée.",
+    "warningPtt": "Fonctionne mieux avec le push-to-talk.",
+    "bandwidthLowLatencyWithin": "Les paquets de 10 ms ajoutent de la surcharge d'en-têtes ; dans la limite. Désactivez le mode pour économiser ≈ {{value}} kbit/s.",
+    "bandwidthLowLatencyOver": "Les paquets de 10 ms ajoutent de la surcharge d'en-têtes ; au-dessus de la limite. Désactivez le mode pour économiser ≈ {{value}} kbit/s.",
+    "bandwidthLowLatencyNoLimit": "Les paquets de 10 ms ajoutent de la surcharge d'en-têtes. Désactivez le mode pour économiser ≈ {{value}} kbit/s."
+  },
+  "endToEnd": "Latence de bout en bout",
+  "endToEndValue": "≈ {{value}} ms (estimation)",
+  "lowLatencyMode": "Mode faible latence"
 }
