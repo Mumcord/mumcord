@@ -8,7 +8,10 @@
     "muted": "Mikrofon isključen",
     "unmuted": "Mikrofon uključen",
     "deafened": "Zvuk isključen. Ne čuješ druge i mikrofon ti je isključen",
-    "undeafened": "Zvuk uključen"
+    "undeafened": "Zvuk uključen",
+    "leftVoice": "Glas na poslužitelju {{server}} napušten",
+    "disconnected": "Prekinuta veza s poslužiteljem {{server}}",
+    "disconnectedAll": "Prekinuta veza sa svim poslužiteljima"
   },
   "readOnly": {
     "text": "Samo čitaš – pridruži se kanalu da razgovaraš.",
@@ -95,5 +98,20 @@
     "line": "Glas: {{channel}} · {{server}}",
     "server": "Glas: {{server}}",
     "show": "{{location}} – prikaži ovaj poslužitelj"
+  },
+  "disconnectMenu": {
+    "label": "Mogućnosti prekida veze",
+    "open": "Više mogućnosti prekida veze",
+    "leaveVoice": "Napusti glas",
+    "leaveVoiceHint": "Prestani govoriti i slušati, ostani povezan za chat",
+    "disconnectHint": "Zatvori vezu s ovim poslužiteljem",
+    "switchTo": "Prebaci glas na {{server}}",
+    "all": "Prekini vezu sa svim poslužiteljima…",
+    "allHint": "Zatvori sve veze s poslužiteljima"
+  },
+  "disconnectAll": {
+    "title": "Prekinuti vezu sa svim poslužiteljima?",
+    "message": "Prekinuti vezu sa svih {{total}} poslužitelja?",
+    "confirm": "Prekini"
   }
 }

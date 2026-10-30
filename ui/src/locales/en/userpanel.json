@@ -8,7 +8,10 @@
     "muted": "Microphone muted",
     "unmuted": "Microphone unmuted",
     "deafened": "Deafened. You cannot hear others and your microphone is muted",
-    "undeafened": "Undeafened"
+    "undeafened": "Undeafened",
+    "leftVoice": "Left voice on {{server}}",
+    "disconnected": "Disconnected from {{server}}",
+    "disconnectedAll": "Disconnected from all servers"
   },
   "readOnly": {
     "text": "Read-only – Join a channel to talk.",
@@ -95,5 +98,20 @@
     "line": "Voice: {{channel}} · {{server}}",
     "server": "Voice: {{server}}",
     "show": "{{location}} – show this server"
+  },
+  "disconnectMenu": {
+    "label": "Disconnect options",
+    "open": "More disconnect options",
+    "leaveVoice": "Leave voice",
+    "leaveVoiceHint": "Stop talking and listening, stay connected for chat",
+    "disconnectHint": "Close the connection to this server",
+    "switchTo": "Switch voice to {{server}}",
+    "all": "Disconnect from all servers…",
+    "allHint": "Close every server connection"
+  },
+  "disconnectAll": {
+    "title": "Disconnect from all servers?",
+    "message": "Disconnect from all {{total}} servers?",
+    "confirm": "Disconnect"
   }
 }
