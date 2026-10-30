@@ -1,0 +1,48 @@
+{
+  "title": "Javni poslužitelji",
+  "loading": "Učitavanje popisa…",
+  "subtitle": "Učitano jer ste otvorili ovu stranicu · prikazano {{shown}} od {{total}}",
+  "search": "Pretraži po nazivu, adresi ili državi",
+  "refresh": "Osvježi",
+  "retry": "Pokušaj ponovno",
+  "loadFailed": "Popis javnih poslužitelja nije moguće učitati. Provjerite internetsku vezu i pokušajte ponovno.",
+  "noMatch": "Nijedan poslužitelj ne odgovara pretrazi i filtrima.",
+  "saveFailed": "Poslužitelj nije moguće dodati. Pokušajte ponovno.",
+  "filters": {
+    "label": "Filtri",
+    "country": "Država",
+    "anyCountry": "Bilo koja država",
+    "ping": "Ping",
+    "anyPing": "Bilo koji ping",
+    "pingBelow": "Ispod {{ms}} ms",
+    "hideEmpty": "Sakrij prazne",
+    "hideFull": "Sakrij pune"
+  },
+  "sortedBy": "Poredak: {{column}}",
+  "columns": {
+    "name": "Naziv",
+    "country": "Država",
+    "ping": "Ping",
+    "users": "Korisnici",
+    "actions": "Radnje"
+  },
+  "badge": {
+    "empty": "Prazan",
+    "full": "Pun"
+  },
+  "users": "{{users}} / {{max}}",
+  "unknown": "Još nepoznato",
+  "measuring": "Mjerenje",
+  "noAnswer": "Nema odgovora",
+  "ms": "{{ms}} ms",
+  "connect": "Poveži",
+  "connectTo": "Poveži se s {{server}}",
+  "favourite": "Omiljeni",
+  "favouriteServer": "Dodaj {{server}} u svoje poslužitelje",
+  "saved": "Spremljeno",
+  "savedAs": "{{server}} je među vašim poslužiteljima",
+  "announce": {
+    "saved": "{{server}} dodan među vaše poslužitelje"
+  },
+  "note": "Pingaju se samo vidljivi retci, nekoliko odjednom. Ništa drugo ne šalje se poslužitelju dok se ne povežete."
+}

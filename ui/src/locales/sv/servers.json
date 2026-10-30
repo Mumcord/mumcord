@@ -12,6 +12,7 @@
   "bar": {
     "listLabel": "Sparade servrar",
     "add": "Lägg till en server",
+    "browse": "Bläddra bland offentliga servrar",
     "keyboardHint": "Enter ansluter. Alt plus uppåt- eller nedåtpil flyttar servern. Skift plus F10 öppnar fler alternativ.",
     "label": "{{server}} ({{state}})",
     "state": {

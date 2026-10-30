@@ -12,6 +12,7 @@
   "bar": {
     "listLabel": "Gemte servere",
     "add": "Tilføj en server",
+    "browse": "Gennemse offentlige servere",
     "keyboardHint": "Enter forbinder. Alt plus pil op eller ned flytter serveren. Shift plus F10 åbner flere muligheder.",
     "label": "{{server}} ({{state}})",
     "state": {

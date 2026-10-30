@@ -1,0 +1,48 @@
+{
+  "title": "Public servers",
+  "loading": "Loading the list…",
+  "subtitle": "Loaded because you opened this page · {{shown}} of {{total}} shown",
+  "search": "Search by name, address or country",
+  "refresh": "Refresh",
+  "retry": "Try again",
+  "loadFailed": "The public server list could not be loaded. Check your internet connection and try again.",
+  "noMatch": "No server matches your search and filters.",
+  "saveFailed": "The server could not be added. Please try again.",
+  "filters": {
+    "label": "Filters",
+    "country": "Country",
+    "anyCountry": "Any country",
+    "ping": "Ping",
+    "anyPing": "Any ping",
+    "pingBelow": "Under {{ms}} ms",
+    "hideEmpty": "Hide empty",
+    "hideFull": "Hide full"
+  },
+  "sortedBy": "Sort: {{column}}",
+  "columns": {
+    "name": "Name",
+    "country": "Country",
+    "ping": "Ping",
+    "users": "Users",
+    "actions": "Actions"
+  },
+  "badge": {
+    "empty": "Empty",
+    "full": "Full"
+  },
+  "users": "{{users}} / {{max}}",
+  "unknown": "Not known yet",
+  "measuring": "Measuring",
+  "noAnswer": "No answer",
+  "ms": "{{ms}} ms",
+  "connect": "Connect",
+  "connectTo": "Connect to {{server}}",
+  "favourite": "Favourite",
+  "favouriteServer": "Add {{server}} to your servers",
+  "saved": "Saved",
+  "savedAs": "{{server}} is in your servers",
+  "announce": {
+    "saved": "{{server}} added to your servers"
+  },
+  "note": "Only the rows you can see are pinged, a few at a time. Nothing else is sent to a server until you connect."
+}

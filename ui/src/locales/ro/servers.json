@@ -12,6 +12,7 @@
   "bar": {
     "listLabel": "Servere salvate",
     "add": "Adaugă un server",
+    "browse": "Răsfoiește serverele publice",
     "keyboardHint": "Enter conectează. Alt plus săgeată sus sau jos mută serverul. Shift plus F10 deschide mai multe opțiuni.",
     "label": "{{server}} ({{state}})",
     "state": {

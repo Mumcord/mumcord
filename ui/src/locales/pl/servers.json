@@ -12,6 +12,7 @@
   "bar": {
     "listLabel": "Zapisane serwery",
     "add": "Dodaj serwer",
+    "browse": "Przeglądaj serwery publiczne",
     "keyboardHint": "Enter łączy. Alt plus strzałka w górę lub w dół przesuwa serwer. Shift plus F10 otwiera więcej opcji.",
     "label": "{{server}} ({{state}})",
     "state": {

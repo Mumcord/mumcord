@@ -3,6 +3,7 @@
  * It follows the contract in docs/engine-api.md closely enough for UI flows, not the
  * Mumble protocol: no network, no audio.
  */
+import { mockPublicServerPing, mockPublicServers } from "./mockPublicServers";
 import type {
   InspectorView,
   LinkOutcome,
@@ -1194,6 +1195,10 @@ export function createMockApi(options: MockOptions = {}): MockApi {
       queryAnswers.set(url, answer);
       return Promise.resolve(answer);
     },
+    // The public server browser (issue #68): fictional servers, nothing is contacted.
+    publicServersList: () => Promise.resolve(mockPublicServers()),
+    publicServerPing: (host: string, port: number) =>
+      Promise.resolve(mockPublicServerPing(host, port)),
     mumbleLinkJoin: (url: string) => {
       const link = parseLink(url);
       const saved = servers.find((s) => s.address === link.address && s.port === link.port);

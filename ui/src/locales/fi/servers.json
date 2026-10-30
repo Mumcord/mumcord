@@ -12,6 +12,7 @@
   "bar": {
     "listLabel": "Tallennetut palvelimet",
     "add": "Lisää palvelin",
+    "browse": "Selaa julkisia palvelimia",
     "keyboardHint": "Enter yhdistää. Alt ja nuoli ylös tai alas siirtää palvelinta. Shift ja F10 avaa lisää vaihtoehtoja.",
     "label": "{{server}} ({{state}})",
     "state": {

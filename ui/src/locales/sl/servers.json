@@ -12,6 +12,7 @@
   "bar": {
     "listLabel": "Shranjeni strežniki",
     "add": "Dodaj strežnik",
+    "browse": "Brskaj po javnih strežnikih",
     "keyboardHint": "Enter vzpostavi povezavo. Alt in puščica gor ali dol premakne strežnik. Shift in F10 odpre več možnosti.",
     "label": "{{server}} ({{state}})",
     "state": {

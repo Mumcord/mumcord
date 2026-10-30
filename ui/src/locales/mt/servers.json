@@ -12,6 +12,7 @@
   "bar": {
     "listLabel": "Servers ssejvjati",
     "add": "Żid server",
+    "browse": "Ibbrawżja s-servers pubbliċi",
     "keyboardHint": "Enter jikkonnettja. Alt flimkien mal-vireg Up jew Down jmexxi s-server. Shift flimkien ma' F10 jiftaħ aktar għażliet.",
     "label": "{{server}} ({{state}})",
     "state": {
