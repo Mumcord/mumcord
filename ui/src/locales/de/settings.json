@@ -377,7 +377,8 @@
     "showNotices": "Drittanbieter-Lizenzen anzeigen",
     "noticesFailed": "Die Drittanbieter-Lizenzen konnten nicht geöffnet werden.",
     "loading": "Wird geladen…",
-    "devToolsUnlocked": "Entwicklerwerkzeuge freigeschaltet: Der Paketinspektor steht jetzt in der Einstellungsliste."
+    "devToolsUnlocked": "Entwicklerwerkzeuge freigeschaltet: Der Paketinspektor steht jetzt in der Einstellungsliste.",
+    "portable": "Portabel"
   },
   "profile": {
     "title": "Profil",

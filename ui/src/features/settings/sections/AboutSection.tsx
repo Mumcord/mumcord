@@ -50,6 +50,7 @@ export function AboutSection({ settings, update }: SettingsSectionProps) {
         {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-noninteractive-element-interactions */}
         <dd className="settings-version" onClick={versionClicked}>
           {info?.version ?? "…"}
+          {info?.portable === true && ` · ${t("about.portable")}`}
         </dd>
         <dt>{t("about.os")}</dt>
         <dd>{info?.os ?? "…"}</dd>

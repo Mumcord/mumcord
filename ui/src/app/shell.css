@@ -1,14 +1,27 @@
-/* --channels-width and --members-width are set by the shell from the resize handles (QA.29). */
+/* --channels-width and the two member widths are set by the shell (QA.29). The member column uses
+   --members-column-width, which is 0 while it is collapsed, so the chat takes the full width. */
 .shell {
   position: relative;
   display: grid;
-  grid-template-columns: var(--width-server-bar) var(--channels-width) minmax(0, 1fr) var(
-      --members-width
-    );
+  grid-template-columns:
+    var(--width-server-bar) var(--channels-width) minmax(0, 1fr)
+    var(--members-column-width);
   grid-template-rows: minmax(0, 1fr);
   height: 100%;
   overflow: hidden;
   overflow: clip;
+  transition: grid-template-columns var(--duration-normal) var(--ease-out);
+}
+
+/* Dragging the border must follow the pointer, not lag a frame behind. */
+:root[data-column-resizing] .shell {
+  transition: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .shell {
+    transition: none;
+  }
 }
 
 .shell__servers {
@@ -37,6 +50,7 @@
 }
 
 .shell__chat {
+  position: relative;
   display: flex;
   flex-direction: column;
   min-width: 0;
@@ -53,14 +67,87 @@
 }
 
 .shell__members {
+  position: relative;
+  min-width: 0;
+  overflow-x: hidden;
   overflow-y: auto;
   padding: var(--space-2);
   border-left: 1px solid var(--color-border);
   background: var(--color-bg-sidebar);
 }
 
-.shell__members-toggle {
+.shell[data-members-collapsed="true"] .shell__members {
+  padding-inline: 0;
+  border-left-color: transparent;
+}
+
+.shell[data-members-collapsed="true"] > .resize-handle[data-column="members"] {
   display: none;
+}
+
+/* Keeps the first member heading clear of the hide button above it. */
+.shell__members-content > .members-panel > .collapsible-section:first-child h2 {
+  padding-inline-end: 2.5rem;
+}
+
+/* "Show members" in the chat and "Hide members" at the top of the member column (issue #165). */
+.shell__members-toggle,
+.shell__members-hide {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-full);
+  background: var(--color-bg-elevated);
+  cursor: pointer;
+}
+
+/* Floats over the chat header, so showing and hiding never moves the chat (issue #165). */
+.shell__members-toggle {
+  position: absolute;
+  top: var(--space-1);
+  right: var(--space-4);
+  z-index: 2;
+  padding: var(--space-1) var(--space-3);
+}
+
+/* Room for the reveal button next to the chat header's own actions. */
+.shell[data-members-reveal="true"] .chat-header__actions {
+  margin-inline-end: calc(var(--members-reveal-width) + var(--space-2));
+}
+
+.shell__members-hide {
+  position: absolute;
+  top: var(--space-2);
+  right: var(--space-2);
+  z-index: 1;
+  justify-content: center;
+  width: 1.75rem;
+  height: 1.75rem;
+  padding: 0;
+}
+
+.shell__members-toggle:hover,
+.shell__members-hide:hover {
+  border-color: var(--color-text-secondary);
+  background: var(--color-bg-hover);
+}
+
+/* Points left towards the chat when shown, right towards the hidden column when hidden. */
+.shell__members-chevron {
+  width: 0.5rem;
+  height: 0.5rem;
+  border-style: solid;
+  border-width: 0 1.5px 1.5px 0;
+  border-color: currentcolor;
+}
+
+.shell__members-toggle .shell__members-chevron {
+  rotate: 135deg;
+}
+
+.shell__members-hide .shell__members-chevron {
+  rotate: -45deg;
 }
 
 .shell > .resize-handle[data-column="channels"] {
@@ -83,17 +170,6 @@
 
   .shell > .resize-handle[data-column="members"] {
     display: none;
-  }
-
-  .shell__members-toggle {
-    display: block;
-    align-self: flex-end;
-    margin: var(--space-2);
-    padding: var(--space-1) var(--space-3);
-    border: 1px solid var(--color-border-strong);
-    border-radius: var(--radius-full);
-    background: var(--color-bg-elevated);
-    cursor: pointer;
   }
 
   .shell__members {

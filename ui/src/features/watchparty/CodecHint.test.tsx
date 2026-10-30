@@ -29,6 +29,7 @@ function onSystem(os: string, distro: LinuxDistro | null) {
     packageVersion: "0.4.0",
     os,
     appimage: true,
+    portable: false,
     distro,
   });
 }

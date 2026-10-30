@@ -39,6 +39,8 @@ interface TalkModeStepProps {
   linkHandlerActive: boolean | null;
   /** Whether the in-game overlay works on this platform (FR-1.46b, QA.58); hides the choice. */
   ingameOverlaySupported: boolean;
+  /** Portable Windows build (#181): system changes such as the link handler start unticked. */
+  portable?: boolean;
   focusOnMount: boolean;
   onBack: () => void;
   /** Saves the choice and leaves the wizard; rejects when saving failed. */
@@ -55,6 +57,7 @@ export function TalkModeStep({
   mouseStatus = null,
   linkHandlerActive,
   ingameOverlaySupported,
+  portable = false,
   focusOnMount,
   onBack,
   onFinish,
@@ -71,7 +74,7 @@ export function TalkModeStep({
   const [capture, setCapture] = useState<Capture>("off");
   const [keyError, setKeyError] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [registerLink, setRegisterLink] = useState(true);
+  const [registerLink, setRegisterLink] = useState(!portable);
   const [autostart, setAutostart] = useState(settings.autostart);
   const [linkPreviews, setLinkPreviews] = useState(settings.linkPreviews);
   const [historySharing, setHistorySharing] = useState(settings.historySharing);

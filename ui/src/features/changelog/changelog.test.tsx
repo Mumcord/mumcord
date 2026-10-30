@@ -294,6 +294,7 @@ describe("WhatsNewOnStart", () => {
       packageVersion: "0.4.4",
       os: "mock",
       appimage: false,
+      portable: false,
       distro: null,
     });
     const open = vi.spyOn(api, "changelogOpen");

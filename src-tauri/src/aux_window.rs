@@ -106,13 +106,16 @@ pub fn open(app: &AppHandle, spec: &Spec) -> tauri::Result<()> {
         return window.set_focus();
     }
     // Starts hidden so the stored size and position apply before it shows up.
-    let window = WebviewWindowBuilder::new(app, spec.label, WebviewUrl::App(spec.url.into()))
+    let mut builder = WebviewWindowBuilder::new(app, spec.label, WebviewUrl::App(spec.url.into()))
         .title(spec.title)
         .inner_size(spec.default_size.0, spec.default_size.1)
         .min_inner_size(spec.min_size.0, spec.min_size.1)
         .resizable(true)
-        .visible(false)
-        .build()?;
+        .visible(false);
+    if let Some(dir) = crate::portable::webview_data_dir() {
+        builder = builder.data_directory(dir);
+    }
+    let window = builder.build()?;
     if let Some(geometry) = load_geometry(app, spec) {
         restore(&window, geometry);
     }
@@ -148,7 +151,7 @@ pub fn save_before_exit(app: &AppHandle) {
 }
 
 fn geometry_path<R: Runtime>(app: &AppHandle<R>, spec: &Spec) -> Option<PathBuf> {
-    match app.path().app_data_dir() {
+    match crate::portable::data_dir(app) {
         Ok(dir) => Some(dir.join(spec.geometry_file)),
         Err(e) => {
             tracing::warn!(error = %e, window = spec.label, "no data folder for the window size");

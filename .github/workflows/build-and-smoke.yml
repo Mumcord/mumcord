@@ -1,7 +1,7 @@
 name: Build and smoke
 
-# Reusable: builds the unsigned bundles (Linux AppImage, Windows NSIS installer, macOS universal
-# DMG), uploads them as workflow artifacts, then installs each one on a fresh runner and
+# Reusable: builds the unsigned bundles (Linux AppImage, Windows NSIS installer and portable zip,
+# macOS universal DMG), uploads them as workflow artifacts, then installs each one on a fresh runner and
 # smoke-tests it against a local Mumble server (scripts/smoke/smoke.sh). Called by
 # test-builds.yml (spec §10, AC-1.30) and release.yml (QA.12). Test builds are never signed.
 # Release builds sign and notarize the macOS DMG only when the Apple secrets exist, and sign the
@@ -60,7 +60,8 @@ jobs:
           - name: windows
             os: windows-latest
             args: --bundles nsis
-            bundle: target/release/bundle/nsis/*-setup.exe
+            # The installer and the portable zip (packaged below from the same Mumcord.exe).
+            bundle: target/release/bundle/nsis/*-setup.exe target/release/bundle/nsis/*-portable.zip
           # One DMG for Apple Silicon and Intel Macs. The smoke test on the arm64 runner
           # exercises the arm64 half.
           - name: macos
@@ -318,6 +319,31 @@ jobs:
         run: |
           npm run tauri bundle -- --bundles nsis --config "$MUMCORD_SIGNING_CONFIG"
           echo "MUMCORD_WINDOWS_SIGNED=true" >> "$GITHUB_ENV"
+
+      # Portable Windows build (#181): the Mumcord.exe the installer carries (signed in place by
+      # the step above when signing is set up), with the `portable` marker that keeps its data in
+      # MumcordData next to it, a short readme and the licences. No single-file portable exe: it
+      # could not carry the marker or the licences (docs/windows-portable.md).
+      - name: Package portable Windows zip
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          $setup = @(Get-ChildItem target/release/bundle/nsis/*-setup.exe)
+          if ($setup.Count -ne 1) { throw "expected one NSIS installer, found $($setup.Count)" }
+          $zip = $setup[0].FullName -replace '-setup\.exe$', '-portable.zip'
+          $exe = 'target/release/mumcord.exe'
+          if (-not (Test-Path $exe)) { throw "$exe not found" }
+          if ($env:MUMCORD_WINDOWS_SIGNED -eq 'true') {
+            $signature = Get-AuthenticodeSignature $exe
+            if ($signature.Status -ne 'Valid') { throw "Mumcord.exe is not signed: $($signature.Status)" }
+          }
+          $dir = "$env:RUNNER_TEMP\portable"
+          New-Item -ItemType Directory -Force $dir | Out-Null
+          Copy-Item $exe "$dir\Mumcord.exe"
+          New-Item -ItemType File "$dir\portable" | Out-Null
+          Copy-Item packaging/windows/README-portable.txt, LICENSE, NOTICE, THIRD_PARTY_NOTICES $dir
+          Compress-Archive -Path "$dir\*" -DestinationPath $zip
+          Get-Item $zip | Format-Table Name, Length
 
       # The SBOM job of release.yml runs on another runner and cannot see this host's libraries.
       - name: List bundled native libraries for the SBOM
@@ -585,6 +611,34 @@ jobs:
           powershell -NoProfile -Command "if (-not (Get-Process -Id (Get-Content '$dir\\server.pid') -ErrorAction SilentlyContinue)) { exit 1 }" \
             || { echo "server process is gone before seeding" >&2; dump; exit 1; }
           scripts/smoke/smoke.sh --app "$app" --seed target/release/mumcord-smoke-seed.exe --bot "$RUNNER_TEMP/mumbot/mumbot.exe" || { dump; exit 1; }
+          # Portable zip (#181): the same test from an unpacked folder with the marker. The
+          # installed app's profile goes first, so anything the portable app writes to the
+          # profile folders shows up.
+          appdata=$(cygpath -u "$APPDATA")/app.mumcord.client
+          localdata=$(cygpath -u "$LOCALAPPDATA")/app.mumcord.client
+          # The web view's helper processes outlive the killed app for a moment and keep its
+          # profile files open.
+          taskkill /F /IM msedgewebview2.exe >/dev/null 2>&1 || true
+          for _ in {1..30}; do
+            rm -rf "$appdata" "$localdata" 2>/dev/null && break
+            sleep 1
+          done
+          rm -rf "$appdata" "$localdata"
+          portable="$RUNNER_TEMP/mumcord-portable"
+          powershell -NoProfile -Command "Expand-Archive -Path '$(cygpath -w "$(ls build/*-portable.zip)")' -DestinationPath '$(cygpath -w "$portable")'"
+          ls -l "$portable"
+          test -f "$portable/portable" || { echo "the portable marker is missing from the zip" >&2; exit 1; }
+          scripts/smoke/smoke.sh --portable --app "$portable/Mumcord.exe" --seed target/release/mumcord-smoke-seed.exe --bot "$RUNNER_TEMP/mumbot/mumbot.exe" || { dump; exit 1; }
+          test -d "$portable/MumcordData/local/EBWebView" || { echo "no web view data in MumcordData" >&2; exit 1; }
+          compgen -G "$portable/MumcordData/logs/*" >/dev/null || { echo "no logs in MumcordData" >&2; exit 1; }
+          for dir in "$appdata" "$localdata"; do
+            if [[ -e $dir ]]; then
+              echo "portable mode wrote to $dir:" >&2
+              find "$dir" -maxdepth 2 >&2
+              exit 1
+            fi
+          done
+          echo "== portable data stayed in MumcordData"
 
       - name: Smoke test (macOS)
         if: runner.os == 'macOS'

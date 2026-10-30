@@ -31,7 +31,8 @@
   "updateHint": {
     "message": "Mumcord {{version}} huwa disponibbli.",
     "open": "Ara r-rilaxx",
-    "dismiss": "Warrab"
+    "dismiss": "Warrab",
+    "portable": "Niżżel iż-zip portabbli l-ġdid u ftaħu f'dan il-folder; id-data tiegħek f'MumcordData tibqa'."
   },
   "directConsent": {
     "title": "Tippermetti konnessjonijiet diretti?",

@@ -4,6 +4,7 @@
 
 ### Added
 
+- Windows releases also ship a portable zip (`Mumcord_<version>_x64-portable.zip`) that runs without installing: unpack it and start `Mumcord.exe`. The `portable` file next to the exe keeps the data, settings, logs and caches in `MumcordData` beside it instead of `%APPDATA%`; it registers no `mumble://` handler and no start at login unless turned on, and About, the diagnostic file and the update hint say "Portable". The identity stays in Windows Credential Manager (per Windows user). A missing WebView2 Runtime now shows a message with the download link instead of failing silently. See `docs/windows-portable.md` (#181)
 - A server info panel (server header menu > Server info) shows name and address, version and operating system, welcome text, limits and allowed codecs, your session, registration state and current-channel permissions, how many users run Mumcord, and the connection figures. The TLS certificate section shows the issuer, SHA-256 fingerprint and validity period, has a Show certificate action with the PEM and a Copy fingerprint button; Copy address and Copy diagnostics put the rest on the clipboard for bug reports. Everything comes from messages the server already sends or from local state, so standard Mumble servers need no change (#147)
 
 ## [0.4.4] - 2026-10-30
