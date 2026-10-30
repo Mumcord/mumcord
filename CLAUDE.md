@@ -18,6 +18,7 @@ Everything is in English: chat, specs, docs, code, comments, commit messages and
 - One task = small, verifiable steps. Every epic must be verifiable in the running client against a local test server (acceptance criteria of the spec).
 - One fresh agent per subtask with a self-contained brief. Never bundle several tasks into one agent. The agent ends after its final report; follow-up work gets a new agent.
 - Commit only on request (exception: `/spec` commits the finished spec). Never `git add -A`. Never push without being asked.
+- Before every push, rebase the branch onto the latest main (`git fetch origin && git rebase origin/main`) instead of merging main into it. On an already pushed feature branch, push with `--force-with-lease`; never force-push `main`.
 - Commits are small and focused: one logical change per commit, Conventional Commits style (`feat:`, `fix:`, `docs:`, `chore:` …), clear English message. Never add AI attribution: no `Co-Authored-By` trailers, no "Generated with" lines, no mention of Claude or AI.
 - Secrets never go into the repo (no passwords, signing keys or private certificates in files, docs or examples). Use only local env files that are git-ignored and CI variables.
 - Never connect to public or third-party Mumble servers for testing; use a local test server.
@@ -43,6 +44,8 @@ Don't introduce anything without a reason.
 - Stay compatible with standard Mumble servers; no private protocol extensions.
 
 **UI**
+- If the issue has a mockup, follow it as closely as possible; deviations need a reason stated in the PR.
+- Every UI change needs dark and light screenshots: committed to `docs/images/screenshots/` and embedded in the PR description.
 - Keep components small. Separate state/data access from presentation.
 - Accessibility: keyboard operable, screen-reader labels, respects system theme and scaling.
 
