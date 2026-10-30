@@ -79,5 +79,7 @@
     "moreInfo": "Mer information: {{topic}}",
     "effectiveShort": "Skickas nu",
     "effectiveTip": "Bithastigheten som skickas just nu, efter anpassning till paketförlust."
-  }
+  },
+  "identity": "Identitet",
+  "identityValue": "{{label}} ({{name}}) · {{fingerprint}}"
 }

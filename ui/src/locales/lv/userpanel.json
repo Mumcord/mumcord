@@ -55,7 +55,8 @@
     "passwordRequired": "Ievadi paroli, lai aizsargātu rezerves failu.",
     "exported": "Identitātes rezerves kopija saglabāta.",
     "confirm": "Reģistrēties",
-    "done": "Reģistrēts šajā serverī"
+    "done": "Reģistrēts šajā serverī",
+    "identity": "Reģistrētais vārds pieder identitātei {{identity}}."
   },
   "errors": {
     "tooLarge": "Tas ir pārāk liels serverim. Izvēlies mazāku attēlu vai uzraksti īsāku tekstu.",

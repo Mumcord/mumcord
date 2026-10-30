@@ -79,5 +79,7 @@
     "moreInfo": "Повече информация: {{topic}}",
     "effectiveShort": "В момента се изпраща",
     "effectiveTip": "Битрейтът, който се изпраща в момента, след адаптация към загубата на пакети."
-  }
+  },
+  "identity": "Идентичност",
+  "identityValue": "{{label}} ({{name}}) · {{fingerprint}}"
 }

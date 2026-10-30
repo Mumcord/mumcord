@@ -6,7 +6,7 @@ export type Screen = "loading" | "startupError" | "wizard" | "main";
 export type Overlay = "settings" | null;
 
 /** Settings sections other screens can lead to directly. */
-export type SettingsSection = "overlay" | "audio" | "privacy";
+export type SettingsSection = "overlay" | "audio" | "privacy" | "identity";
 
 export interface ViewState {
   screen: Screen;
@@ -51,7 +51,7 @@ export function viewReducer(state: ViewState, action: ViewAction): ViewState {
 export interface View extends ViewState {
   /** The wizard calls this after saving `wizardCompleted: true`. */
   finishWizard: () => void;
-  openSettings: () => void;
+  openSettings: (section?: SettingsSection) => void;
   /** Opens the settings on the overlay section. */
   openOverlaySettings: () => void;
   /** Opens the settings on the audio section. */

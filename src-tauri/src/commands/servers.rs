@@ -1,6 +1,6 @@
 //! Saved servers and `mumble://` link parsing (FR-1.7, FR-1.8, FR-1.11).
 
-use mumcord_engine::{Engine, PasswordChange, ServerFields, ServerView};
+use mumcord_engine::{Engine, PasswordChange, ServerFields, ServerView, TestConnectionView};
 use serde::{Deserialize, Serialize};
 use specta::Type;
 use tauri::State;
@@ -34,6 +34,8 @@ pub struct SavedServer {
     pub notifications_muted: bool,
     /// Theme shown with this server; `null` uses the app theme (FR-2.17).
     pub theme_id: Option<String>,
+    /// Identity this server connects with; `null` uses the default identity (issue #148).
+    pub identity_id: Option<u32>,
 }
 
 /// How a server edit treats the stored password.
@@ -58,6 +60,77 @@ pub struct ServerInput {
     pub port: u16,
     pub username: String,
     pub password: PasswordUpdate,
+}
+
+/// Values of the add/edit dialog for a test connection (issue #151).
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, Type)]
+#[serde(rename_all = "camelCase")]
+pub struct ServerTestInput {
+    pub address: String,
+    pub port: u16,
+    pub username: String,
+    /// `keep` uses the saved password of `serverId`; `set` uses the typed one.
+    pub password: PasswordUpdate,
+    /// Saved server the test belongs to (saved password and certificate decision).
+    pub server_id: Option<ServerId>,
+    /// Identity to try; `null` uses the default identity.
+    pub identity_id: Option<u32>,
+}
+
+/// How a tested server certificate relates to the saved trust decision.
+#[derive(Serialize, Deserialize, Clone, Copy, Debug, PartialEq, Eq, Type)]
+#[serde(rename_all = "camelCase")]
+pub enum CertificateState {
+    Trusted,
+    Unknown,
+    Changed,
+}
+
+/// Result of a test connection.
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, Type)]
+#[serde(rename_all = "camelCase")]
+pub struct TestConnection {
+    /// Round trip of a Mumble ping over the control connection.
+    pub ping_ms: u32,
+    /// Version string the server reported, e.g. "1.5.0".
+    pub version: String,
+    /// SHA-256 fingerprint of the server certificate, as shown to users.
+    pub fingerprint: String,
+    pub certificate: CertificateState,
+}
+
+impl From<mumcord_engine::CertificateState> for CertificateState {
+    fn from(state: mumcord_engine::CertificateState) -> Self {
+        match state {
+            mumcord_engine::CertificateState::Trusted => Self::Trusted,
+            mumcord_engine::CertificateState::Unknown => Self::Unknown,
+            mumcord_engine::CertificateState::Changed => Self::Changed,
+        }
+    }
+}
+
+impl From<TestConnectionView> for TestConnection {
+    fn from(v: TestConnectionView) -> Self {
+        Self {
+            ping_ms: v.ping_ms,
+            version: v.version,
+            fingerprint: v.fingerprint,
+            certificate: v.certificate.into(),
+        }
+    }
+}
+
+impl From<ServerTestInput> for mumcord_engine::ServerTestInput {
+    fn from(i: ServerTestInput) -> Self {
+        Self {
+            address: i.address,
+            port: i.port,
+            username: i.username,
+            password: i.password.into(),
+            server_id: i.server_id.map(to_engine_server_id),
+            identity_id: i.identity_id.map(super::types::to_engine_identity_id),
+        }
+    }
 }
 
 /// Parsed `mumble://[user[:password]@]host[:port]/[channel/path]` link.
@@ -118,6 +191,17 @@ impl From<ServerView> for SavedServer {
             was_voice_server_at_quit: v.was_voice_server_at_quit,
             notifications_muted: v.notifications_muted,
             theme_id: v.theme_id,
+            identity_id: v.identity_id.map(super::types::to_api_identity_id),
+        }
+    }
+}
+
+impl From<PasswordUpdate> for PasswordChange {
+    fn from(update: PasswordUpdate) -> Self {
+        match update {
+            PasswordUpdate::Keep => Self::Keep,
+            PasswordUpdate::Clear => Self::Clear,
+            PasswordUpdate::Set { value } => Self::Set(value),
         }
     }
 }
@@ -129,11 +213,7 @@ impl From<ServerInput> for ServerFields {
             address: i.address,
             port: i.port,
             username: i.username,
-            password: match i.password {
-                PasswordUpdate::Keep => PasswordChange::Keep,
-                PasswordUpdate::Clear => PasswordChange::Clear,
-                PasswordUpdate::Set { value } => PasswordChange::Set(value),
-            },
+            password: i.password.into(),
         }
     }
 }
@@ -148,6 +228,16 @@ pub async fn servers_list(engine: State<'_, Engine>) -> ApiResult<Vec<SavedServe
         .into_iter()
         .map(SavedServer::from)
         .collect())
+}
+
+/// One-shot login probe for the add/edit dialog: ping, server version and certificate state.
+#[tauri::command]
+#[specta::specta]
+pub async fn server_test_connection(
+    engine: State<'_, Engine>,
+    input: ServerTestInput,
+) -> ApiResult<TestConnection> {
+    Ok(engine.server_test_connection(input.into()).await?.into())
 }
 
 /// Adds a server at the end of the server bar.

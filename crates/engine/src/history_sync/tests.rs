@@ -92,6 +92,7 @@ impl Net {
                     port: 64738,
                     username: format!("user{session}"),
                     save_history: true,
+                    identity_id: None,
                 })
                 .expect("server")
                 .id;

@@ -62,7 +62,7 @@ async fn stats_client_and_os_of_a_person_arrive_paced() {
     )
     .expect("engine");
     engine
-        .identity_create("Stats Tester".into())
+        .identity_create("Stats Tester".into(), None)
         .await
         .expect("identity");
     let password =

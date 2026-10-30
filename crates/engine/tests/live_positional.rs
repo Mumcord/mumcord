@@ -294,7 +294,7 @@ async fn engine_sends_positions_to_its_game_and_flags_senders() {
     settings.positional.enabled = true;
     engine.update_settings(settings).await.expect("enable");
     engine
-        .identity_create(name.clone())
+        .identity_create(name.clone(), None)
         .await
         .expect("identity");
     let server = engine

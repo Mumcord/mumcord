@@ -54,7 +54,7 @@ describe("IdentityStep", () => {
     fireEvent.change(field, { target: { value: "  Tobias " } });
     fireEvent.submit(field.closest("form") as HTMLFormElement);
     await waitFor(() => {
-      expect(onDone).toHaveBeenCalledWith({ name: "Tobias", certHash: "selfhash" });
+      expect(onDone).toHaveBeenCalledWith(expect.objectContaining({ name: "Tobias" }));
     });
   });
 
@@ -87,9 +87,9 @@ describe("IdentityStep", () => {
     });
     next();
     await waitFor(() => {
-      expect(onDone).toHaveBeenCalledWith({ name: "Tobias", certHash: "importedhash" });
+      expect(onDone).toHaveBeenCalledWith(expect.objectContaining({ name: "Tobias" }));
     });
-    expect(importSpy).toHaveBeenCalledWith("/home/me/Tobias.p12", "secret");
+    expect(importSpy).toHaveBeenCalledWith("/home/me/Tobias.p12", "secret", null);
   });
 
   it("passes no password when the field is empty", async () => {
@@ -101,7 +101,7 @@ describe("IdentityStep", () => {
     await screen.findByText("Chosen file: Tobias.p12");
     next();
     await waitFor(() => {
-      expect(importSpy).toHaveBeenCalledWith("/home/me/Tobias.p12", null);
+      expect(importSpy).toHaveBeenCalledWith("/home/me/Tobias.p12", null, null);
     });
   });
 

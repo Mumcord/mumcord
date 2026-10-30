@@ -80,5 +80,7 @@
     "moreInfo": "Vairāk informācijas: {{topic}}",
     "effectiveShort": "Pašlaik tiek sūtīts",
     "effectiveTip": "Pašlaik sūtītais bitu pārraides ātrums pēc pielāgošanas pakešu zudumiem."
-  }
+  },
+  "identity": "Identitāte",
+  "identityValue": "{{label}} ({{name}}) · {{fingerprint}}"
 }

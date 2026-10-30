@@ -45,7 +45,7 @@ async fn start_engine(dir: &Path, name: &str) -> (Engine, EventReceiver) {
     )
     .expect("engine");
     engine
-        .identity_create(name.to_owned())
+        .identity_create(name.to_owned(), None)
         .await
         .expect("identity");
     (engine, rx)

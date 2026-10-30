@@ -64,7 +64,7 @@ async fn wait_channel(
 async fn connect(engine: &Engine, rx: &mut EventReceiver) -> Snapshot {
     let name = unique("mc-info");
     engine
-        .identity_create(name.clone())
+        .identity_create(name.clone(), None)
         .await
         .expect("identity");
     let server = engine

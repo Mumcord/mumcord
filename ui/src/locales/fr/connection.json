@@ -80,5 +80,7 @@
     "moreInfo": "Plus d'informations : {{topic}}",
     "effectiveShort": "Envoi actuel",
     "effectiveTip": "Le débit envoyé en ce moment, après adaptation à la perte de paquets."
-  }
+  },
+  "identity": "Identité",
+  "identityValue": "{{label}} ({{name}}) · {{fingerprint}}"
 }

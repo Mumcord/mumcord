@@ -37,7 +37,8 @@
     "alwaysConnect": "Ligar sempre ao iniciar",
     "muteNotifications": "Silenciar notificações",
     "theme": "Tema…",
-    "showWelcome": "Mostrar mensagem de boas-vindas"
+    "showWelcome": "Mostrar mensagem de boas-vindas",
+    "identity": "Identidade…"
   },
   "theme": {
     "title": "Tema para {{server}}",
@@ -67,7 +68,10 @@
       "port": "Introduz uma porta entre 1 e 65535. A maioria dos servidores usa 64738.",
       "username": "Introduz o nome que queres usar neste servidor.",
       "link": "Não foi possível ler esta ligação mumble://. Verifica se foi copiada por completo.",
-      "invalid": "Os dados do servidor não são válidos. Verifica o endereço e a porta."
+      "invalid": "Os dados do servidor não são válidos. Verifica o endereço e a porta.",
+      "addressInvalid": "Isto não parece um endereço de servidor.",
+      "portEmpty": "Introduz a porta.",
+      "labelLong": "O nome na barra de servidores pode ter até 64 caracteres."
     },
     "alwaysConnect": "Ligar sempre ao iniciar",
     "alwaysConnectHint": "O Mumcord liga este servidor só em leitura ao iniciar.",
@@ -82,7 +86,29 @@
     "renameDone": "Concluído",
     "removeChannelPassword": "Remover {{name}}",
     "remove": "Remover",
-    "channelPasswordsHint": "Guardadas quando um canal protegido as aceitou. As removidas são pedidas de novo na próxima entrada."
+    "channelPasswordsHint": "Guardadas quando um canal protegido as aceitou. As removidas são pedidas de novo na próxima entrada.",
+    "tabsLabel": "Definições do servidor",
+    "tabs": {
+      "connection": "Ligação",
+      "identity": "Identidade",
+      "passwords": "Palavras-passe",
+      "behaviour": "Comportamento",
+      "needsAttention": "{{tab}}: requer atenção"
+    },
+    "test": {
+      "button": "Testar ligação",
+      "busy": "A testar…",
+      "running": "A testar a ligação…",
+      "result": "{{address}} · Ping: {{ms}} ms · Versão do servidor: {{version}}",
+      "certTrusted": "Certificado já de confiança",
+      "certUnknown": "Certificado ainda não é de confiança – serás questionado ao ligar",
+      "certChanged": "O certificado mudou – verifica-o antes de ligar",
+      "wrongPassword": "O servidor recusou a palavra-passe.",
+      "nameInUse": "Esse nome já está em uso neste servidor.",
+      "unreachable": "Não foi possível contactar o servidor.",
+      "invalid": "Os dados não são válidos.",
+      "failed": "O teste falhou. Tenta novamente."
+    }
   },
   "errors": {
     "serverUnreachable": "Não foi possível contactar o servidor. Verifica o endereço e a porta, e se estás online.",
@@ -145,7 +171,8 @@
       "disconnect": "Falhou ao desligar. Tenta novamente.",
       "alwaysConnect": "Não foi possível guardar «Ligar sempre ao iniciar». Tenta novamente.",
       "notifications": "Não foi possível guardar a definição de notificações. Tenta novamente.",
-      "savePassword": "Não foi possível guardar a nova palavra-passe. Edita o servidor para a guardar."
+      "savePassword": "Não foi possível guardar a nova palavra-passe. Edita o servidor para a guardar.",
+      "identity": "Não foi possível guardar a identidade. Tenta novamente."
     }
   },
   "empty": {
@@ -259,5 +286,24 @@
     "permissionSelfRegister": "Register self",
     "permissionResetUserContent": "Reset user content",
     "characters": "{{value}} characters"
+  },
+  "identity": {
+    "field": "Identidade para este servidor",
+    "useDefault": "Usar a predefinida ({{identity}})",
+    "option": "{{label}} ({{name}})",
+    "hint": "Mudar a identidade reconecta este servidor. O nome registado e as permissões aqui pertencem à identidade escolhida.",
+    "manage": "Gerir identidades…",
+    "title": "Identidade para {{server}}",
+    "intro": "Escolhe a identidade que o Mumcord usa para ligar aqui. «Usar a predefinida» segue a identidade predefinida.",
+    "save": "Guardar",
+    "saveAndReconnect": "Guardar e reconectar",
+    "reconnectTitle": "Reconectar {{server}}?",
+    "reconnectMessage": "Reconectar este servidor agora com {{identity}}? Os outros servidores continuam ligados.",
+    "reconnect": "Reconectar",
+    "later": "Mais tarde",
+    "nextConnect": "Aplica-se na próxima ligação deste servidor.",
+    "badge": "Identidade: {{identity}}",
+    "badgeTitle": "Ligado com a identidade {{identity}}",
+    "missingNotice": "{{server}} ligou-se com a identidade predefinida porque a sua falta."
   }
 }

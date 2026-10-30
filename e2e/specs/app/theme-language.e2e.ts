@@ -106,8 +106,8 @@ const neutral = (t: string) =>
   // A single letter (avatar initial), the test audio backend's device name, the OS string.
   /^\p{L}$/u.test(t) ||
   /^(null|linux \S+|windows \S+|macos \S+)$/i.test(t) ||
-  // "Beta" is the same word in English, German and Spanish.
-  /^Beta$/.test(t) ||
+  // "Beta" is the same word in English, German and Spanish; "Details" is the German one.
+  /^(Beta|Details)$/.test(t) ||
   // "Apps" is also the German and Spanish word, "Bitrate" and "Updates" the German ones; preset
   // theme names are names, not translated.
   /^(Apps|Bitrate|Updates|Deep Ocean|Forest|Paper)$/.test(t) ||

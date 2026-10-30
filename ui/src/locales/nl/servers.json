@@ -37,7 +37,8 @@
     "alwaysConnect": "Altijd verbinden bij opstarten",
     "muteNotifications": "Meldingen dempen",
     "theme": "Thema…",
-    "showWelcome": "Welkomstbericht tonen"
+    "showWelcome": "Welkomstbericht tonen",
+    "identity": "Identiteit…"
   },
   "theme": {
     "title": "Thema voor {{server}}",
@@ -67,7 +68,10 @@
       "port": "Voer een poort in tussen 1 en 65535. De meeste servers gebruiken 64738.",
       "username": "Voer de naam in die je op deze server wilt gebruiken.",
       "link": "Deze mumble://-link kan niet worden gelezen. Controleer of hij volledig is gekopieerd.",
-      "invalid": "De servergegevens zijn ongeldig. Controleer het adres en de poort."
+      "invalid": "De servergegevens zijn ongeldig. Controleer het adres en de poort.",
+      "addressInvalid": "Dit lijkt geen serveradres.",
+      "portEmpty": "Voer de poort in.",
+      "labelLong": "De naam in de serverbalk mag hooguit 64 tekens hebben."
     },
     "alwaysConnect": "Altijd verbinden bij opstarten",
     "alwaysConnectHint": "Mumcord verbindt deze server bij het opstarten alleen-lezen.",
@@ -82,7 +86,29 @@
     "renameDone": "Klaar",
     "removeChannelPassword": "{{name}} verwijderen",
     "remove": "Verwijderen",
-    "channelPasswordsHint": "Opgeslagen wanneer een beveiligd kanaal ze accepteerde. Verwijderde worden bij de volgende keer betreden opnieuw gevraagd."
+    "channelPasswordsHint": "Opgeslagen wanneer een beveiligd kanaal ze accepteerde. Verwijderde worden bij de volgende keer betreden opnieuw gevraagd.",
+    "tabsLabel": "Serverinstellingen",
+    "tabs": {
+      "connection": "Verbinding",
+      "identity": "Identiteit",
+      "passwords": "Wachtwoorden",
+      "behaviour": "Gedrag",
+      "needsAttention": "{{tab}}: vraagt aandacht"
+    },
+    "test": {
+      "button": "Verbinding testen",
+      "busy": "Bezig met testen…",
+      "running": "De verbinding wordt getest…",
+      "result": "{{address}} · Ping: {{ms}} ms · Serverversie: {{version}}",
+      "certTrusted": "Certificaat al vertrouwd",
+      "certUnknown": "Certificaat nog niet vertrouwd – je wordt gevraagd bij het verbinden",
+      "certChanged": "Certificaat is gewijzigd – controleer het voor je verbindt",
+      "wrongPassword": "De server heeft het wachtwoord geweigerd.",
+      "nameInUse": "Die naam is al in gebruik op deze server.",
+      "unreachable": "De server is niet bereikbaar.",
+      "invalid": "De gegevens zijn niet geldig.",
+      "failed": "De test is mislukt. Probeer het opnieuw."
+    }
   },
   "errors": {
     "serverUnreachable": "De server is niet bereikbaar. Controleer het adres en de poort, en of je online bent.",
@@ -145,7 +171,8 @@
       "disconnect": "Verbinding verbreken is mislukt. Probeer het opnieuw.",
       "alwaysConnect": "‘Altijd verbinden bij opstarten’ kon niet worden opgeslagen. Probeer het opnieuw.",
       "notifications": "De meldingsinstelling kon niet worden opgeslagen. Probeer het opnieuw.",
-      "savePassword": "Het nieuwe wachtwoord kon niet worden opgeslagen. Bewerk de server om het op te slaan."
+      "savePassword": "Het nieuwe wachtwoord kon niet worden opgeslagen. Bewerk de server om het op te slaan.",
+      "identity": "De identiteit kon niet worden opgeslagen. Probeer het opnieuw."
     }
   },
   "empty": {
@@ -259,5 +286,24 @@
     "permissionSelfRegister": "Register self",
     "permissionResetUserContent": "Reset user content",
     "characters": "{{value}} characters"
+  },
+  "identity": {
+    "field": "Identiteit voor deze server",
+    "useDefault": "Standaard gebruiken ({{identity}})",
+    "option": "{{label}} ({{name}})",
+    "hint": "De identiteit wijzigen verbindt deze server opnieuw. De geregistreerde naam en rechten hier horen bij de gekozen identiteit.",
+    "manage": "Identiteiten beheren…",
+    "title": "Identiteit voor {{server}}",
+    "intro": "Kies welke identiteit Mumcord hier gebruikt. ‘Standaard gebruiken’ volgt de standaardidentiteit.",
+    "save": "Opslaan",
+    "saveAndReconnect": "Opslaan en opnieuw verbinden",
+    "reconnectTitle": "{{server}} opnieuw verbinden?",
+    "reconnectMessage": "Deze server nu opnieuw verbinden met {{identity}}? De andere servers blijven verbonden.",
+    "reconnect": "Opnieuw verbinden",
+    "later": "Later",
+    "nextConnect": "Geldt de volgende keer dat deze server verbindt.",
+    "badge": "Identiteit: {{identity}}",
+    "badgeTitle": "Verbonden met de identiteit {{identity}}",
+    "missingNotice": "{{server}} is verbonden met de standaardidentiteit omdat de eigen identiteit ontbreekt."
   }
 }

@@ -5,18 +5,30 @@ import * as __TAURI_EVENT from "@tauri-apps/api/event";
 
 /** Commands */
 export const commands = {
-	/**  Current identity, or `null` before the wizard created one (first start). */
+	/**  The default identity, or `null` before the wizard created one (first start). */
 	identityGet: () => typedError<Identity | null, ApiError>(__TAURI_INVOKE("identity_get")),
+	/**  Every identity: the default first, then by the date it was added. */
+	identityList: () => typedError<Identity[], ApiError>(__TAURI_INVOKE("identity_list")),
 	/**  Creates a new self-signed identity and stores it in the OS secure storage. */
-	identityCreate: (name: string) => typedError<Identity, ApiError>(__TAURI_INVOKE("identity_create", { name })),
-	/**  Imports a PKCS#12 file (e.g. exported from the official client), replacing the current identity. */
-	identityImport: (path: string, password: string | null) => typedError<Identity, ApiError>(__TAURI_INVOKE("identity_import", { path, password })),
+	identityCreate: (name: string, label: string | null) => typedError<Identity, ApiError>(__TAURI_INVOKE("identity_create", { name, label })),
+	/**  Imports a PKCS#12 file (e.g. exported from the official client) as another identity. */
+	identityImport: (path: string, password: string | null, label: string | null) => typedError<Identity, ApiError>(__TAURI_INVOKE("identity_import", { path, password, label })),
+	/**  Changes the local label of an identity; the certificate stays the same. */
+	identityRename: (id: number, label: string) => typedError<Identity, ApiError>(__TAURI_INVOKE("identity_rename", { id, label })),
 	/**  Exports the identity as a password-protected PKCS#12 file. */
-	identityExport: (path: string, password: string) => typedError<null, ApiError>(__TAURI_INVOKE("identity_export", { path, password })),
+	identityExport: (id: number, path: string, password: string) => typedError<null, ApiError>(__TAURI_INVOKE("identity_export", { id, path, password })),
+	/**  Removes an identity with its key material; the last identity cannot be removed. */
+	identityDelete: (id: number) => typedError<null, ApiError>(__TAURI_INVOKE("identity_delete", { id })),
+	/**  Makes an identity the default one; returns the new list. */
+	identitySetDefault: (id: number) => typedError<Identity[], ApiError>(__TAURI_INVOKE("identity_set_default", { id })),
+	/**  Chooses the identity a saved server connects with; `null` uses the default. */
+	serverSetIdentity: (serverId: number, identityId: number | null) => typedError<SavedServer, ApiError>(__TAURI_INVOKE("server_set_identity", { serverId, identityId })),
 	/**  Saved servers in server-bar order. */
 	serversList: () => typedError<SavedServer[], ApiError>(__TAURI_INVOKE("servers_list")),
 	/**  Adds a server at the end of the server bar. */
 	serverAdd: (input: ServerInput) => typedError<SavedServer, ApiError>(__TAURI_INVOKE("server_add", { input })),
+	/**  One-shot login probe for the add/edit dialog: ping, server version and certificate state. */
+	serverTestConnection: (input: ServerTestInput) => typedError<TestConnection, ApiError>(__TAURI_INVOKE("server_test_connection", { input })),
 	serverUpdate: (id: number, input: ServerInput) => typedError<SavedServer, ApiError>(__TAURI_INVOKE("server_update", { id, input })),
 	/**  Removes the server with its password, trust decision, follows and history. */
 	serverRemove: (id: number) => typedError<null, ApiError>(__TAURI_INVOKE("server_remove", { id })),
@@ -536,6 +548,7 @@ export const events = {
 	positionalStatusChanged: makeEvent<PositionalStatusChanged, PositionalStatusChanged>("positional-status-changed"),
 	screenSharesChanged: makeEvent<ScreenSharesChanged, ScreenSharesChanged>("screen-shares-changed"),
 	serverDenied: makeEvent<ServerDenied, ServerDenied>("server-denied"),
+	serverIdentityMissing: makeEvent<ServerIdentityMissing, ServerIdentityMissing>("server-identity-missing"),
 	serverSynced: makeEvent<ServerSynced, ServerSynced>("server-synced"),
 	syncProgress: makeEvent<SyncProgress, SyncProgress>("sync-progress"),
 	talkStateChanged: makeEvent<TalkStateChanged, TalkStateChanged>("talk-state-changed"),
@@ -702,6 +715,9 @@ export type CertTrustRequired = {
 	/**  Set when a previously trusted certificate changed (blocking warning); `null` on first use. */
 	previousFingerprint: string | null,
 };
+
+/**  How a tested server certificate relates to the saved trust decision. */
+export type CertificateState = "trusted" | "unknown" | "changed";
 
 export type ChannelInfo = {
 	id: number,
@@ -1070,12 +1086,20 @@ export type HistorySynced = {
 	messages: ChatMessage[],
 };
 
-/**  Public view of the identity; the certificate itself never leaves the engine. */
+/**  Public view of an identity; the certificate and its key never leave the engine. */
 export type Identity = {
-	/**  Default username. */
+	id: number,
+	/**  Local label the user chose; the certificate is not changed by it. */
+	label: string,
+	/**  Default username, from the certificate's common name. */
 	name: string,
 	/**  SHA-1 hash of the certificate, as Mumble servers identify it. */
 	certHash: string,
+	/**  When the identity was added to Mumcord, RFC 3339 (like message times). */
+	addedAt: string,
+	isDefault: boolean,
+	/**  Servers that use this identity directly (not through the default). */
+	serverIds: number[],
 };
 
 /**  The in-game overlay settings changed. */
@@ -1554,6 +1578,8 @@ export type SavedServer = {
 	notificationsMuted: boolean,
 	/**  Theme shown with this server; `null` uses the app theme (FR-2.17). */
 	themeId: string | null,
+	/**  Identity this server connects with; `null` uses the default identity (issue #148). */
+	identityId: number | null,
 };
 
 /**  One person sharing their screen in the voice channel. */
@@ -1587,6 +1613,11 @@ export type ServerDenied = {
 	serverId: number,
 	error: ApiError,
 	channelId: number | null,
+};
+
+/**  An identity whose key material could not be read, so a server fell back to the default. */
+export type ServerIdentityMissing = {
+	serverId: number,
 };
 
 /**  Server facts and limits learned during the handshake. */
@@ -1659,6 +1690,19 @@ export type ServerSnapshot = {
 /**  Sent once the server finished syncing (ServerSync) and after a reconnect. */
 export type ServerSynced = {
 	snapshot: ServerSnapshot,
+};
+
+/**  Values of the add/edit dialog for a test connection (issue #151). */
+export type ServerTestInput = {
+	address: string,
+	port: number,
+	username: string,
+	/**  `keep` uses the saved password of `serverId`; `set` uses the typed one. */
+	password: PasswordUpdate,
+	/**  Saved server the test belongs to (saved password and certificate decision). */
+	serverId: number | null,
+	/**  Identity to try; `null` uses the default identity. */
+	identityId: number | null,
 };
 
 export type Settings = {
@@ -1837,6 +1881,17 @@ export type TalkStateChanged = {
 	serverId: number,
 	session: number,
 	talking: boolean,
+};
+
+/**  Result of a test connection. */
+export type TestConnection = {
+	/**  Round trip of a Mumble ping over the control connection. */
+	pingMs: number,
+	/**  Version string the server reported, e.g. "1.5.0". */
+	version: string,
+	/**  SHA-256 fingerprint of the server certificate, as shown to users. */
+	fingerprint: string,
+	certificate: CertificateState,
 };
 
 export type Theme = "system" | "dark" | "light";

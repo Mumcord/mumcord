@@ -37,7 +37,8 @@
     "alwaysConnect": "Visada jungtis paleidžiant",
     "muteNotifications": "Nutildyti pranešimus",
     "theme": "Tema…",
-    "showWelcome": "Rodyti pasveikinimo žinutę"
+    "showWelcome": "Rodyti pasveikinimo žinutę",
+    "identity": "Tapatybė…"
   },
   "theme": {
     "title": "Tema serveriui {{server}}",
@@ -67,7 +68,10 @@
       "port": "Įvesk prievadą nuo 1 iki 65535. Dauguma serverių naudoja 64738.",
       "username": "Įvesk vardą, kurį nori naudoti šiame serveryje.",
       "link": "Šios mumble:// nuorodos nepavyksta nuskaityti. Patikrink, ar ji nukopijuota visa.",
-      "invalid": "Serverio duomenys netinkami. Patikrink adresą ir prievadą."
+      "invalid": "Serverio duomenys netinkami. Patikrink adresą ir prievadą.",
+      "addressInvalid": "Tai nepanašu į serverio adresą.",
+      "portEmpty": "Įvesk portą.",
+      "labelLong": "Serverių juostoje vardas gali būti iki 64 simbolių."
     },
     "alwaysConnect": "Visada jungtis paleidžiant",
     "alwaysConnectHint": "Paleidžiant Mumcord prijungia šį serverį tik skaitymui.",
@@ -82,7 +86,29 @@
     "renameDone": "Atlikta",
     "removeChannelPassword": "Pašalinti {{name}}",
     "remove": "Pašalinti",
-    "channelPasswordsHint": "Išsaugomi, kai apsaugotas kanalas juos priėmė. Pašalintų bus paklausta dar kartą kitą kartą įeinant."
+    "channelPasswordsHint": "Išsaugomi, kai apsaugotas kanalas juos priėmė. Pašalintų bus paklausta dar kartą kitą kartą įeinant.",
+    "tabsLabel": "Serverio nustatymai",
+    "tabs": {
+      "connection": "Ryšys",
+      "identity": "Tapatybė",
+      "passwords": "Slaptažodžiai",
+      "behaviour": "Elgsena",
+      "needsAttention": "{{tab}}: reikia dėmesio"
+    },
+    "test": {
+      "button": "Tikrinti ryšį",
+      "busy": "Tikrinama…",
+      "running": "Tikrinamas ryšys…",
+      "result": "{{address}} · Ping: {{ms}} ms · Serverio versija: {{version}}",
+      "certTrusted": "Sertifikatas jau patikimas",
+      "certUnknown": "Sertifikatas dar nepatikimas – prisijungiant būsite paklaustas",
+      "certChanged": "Sertifikatas pasikeitė – patikrinkite prieš prisijungdami",
+      "wrongPassword": "Serveris atmetė slaptažodį.",
+      "nameInUse": "Šis vardas šiame serveryje jau naudojamas.",
+      "unreachable": "Serveris nepasiekiamas.",
+      "invalid": "Duomenys neteisingi.",
+      "failed": "Tikrinimas nepavyko. Bandykite dar kartą."
+    }
   },
   "errors": {
     "serverUnreachable": "Serverio pasiekti nepavyksta. Patikrink adresą, prievadą ir ar esi prisijungęs (-usi) prie interneto.",
@@ -145,7 +171,8 @@
       "disconnect": "Atsijungti nepavyko. Bandyk dar kartą.",
       "alwaysConnect": "Nepavyko išsaugoti „Visada jungtis paleidžiant“. Bandyk dar kartą.",
       "notifications": "Nepavyko išsaugoti pranešimų nustatymo. Bandyk dar kartą.",
-      "savePassword": "Nepavyko išsaugoti naujo slaptažodžio. Redaguok serverį, kad jį išsaugotum."
+      "savePassword": "Nepavyko išsaugoti naujo slaptažodžio. Redaguok serverį, kad jį išsaugotum.",
+      "identity": "Tapatybės išsaugoti nepavyko. Bandyk dar kartą."
     }
   },
   "empty": {
@@ -259,5 +286,24 @@
     "permissionSelfRegister": "Register self",
     "permissionResetUserContent": "Reset user content",
     "characters": "{{value}} characters"
+  },
+  "identity": {
+    "field": "Šio serverio tapatybė",
+    "useDefault": "Naudoti numatytąją ({{identity}})",
+    "option": "{{label}} ({{name}})",
+    "hint": "Pakeitus tapatybę, šis serveris prisijungs iš naujo. Registruotas vardas ir teisės čia priklauso pasirinktai tapatybei.",
+    "manage": "Tvarkyti tapatybes…",
+    "title": "Serverio {{server}} tapatybė",
+    "intro": "Pasirink, kurią tapatybę Mumcord naudoja jungdamasis čia. „Naudoti numatytąją“ seka numatytąja tapatybe.",
+    "save": "Išsaugoti",
+    "saveAndReconnect": "Išsaugoti ir prisijungti iš naujo",
+    "reconnectTitle": "Prisijungti prie {{server}} iš naujo?",
+    "reconnectMessage": "Prisijungti prie šio serverio dabar su {{identity}}? Kiti serveriai lieka prisijungę.",
+    "reconnect": "Prisijungti iš naujo",
+    "later": "Vėliau",
+    "nextConnect": "Įsigalios kitą kartą jungiantis prie šio serverio.",
+    "badge": "Tapatybė: {{identity}}",
+    "badgeTitle": "Prisijungta su tapatybe {{identity}}",
+    "missingNotice": "{{server}} prisijungė su numatytąja tapatybe, nes jo tapatybės nėra."
   }
 }

@@ -80,5 +80,7 @@
     "moreInfo": "Maggiori informazioni: {{topic}}",
     "effectiveShort": "Invio attuale",
     "effectiveTip": "Il bitrate inviato in questo momento, dopo l'adattamento alla perdita di pacchetti."
-  }
+  },
+  "identity": "Identità",
+  "identityValue": "{{label}} ({{name}}) · {{fingerprint}}"
 }

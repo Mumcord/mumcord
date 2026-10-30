@@ -27,7 +27,7 @@ describe("Wizard", () => {
     renderInWizard(harness, <Wizard />);
     const micHeading = await createIdentity();
     await waitFor(() => expect(micHeading).toHaveFocus());
-    expect(await harness.api.identityGet()).toEqual({ name: "Tobias", certHash: "selfhash" });
+    expect(await harness.api.identityGet()).toMatchObject({ name: "Tobias", isDefault: true });
 
     fireEvent.click(screen.getByRole("button", { name: "Next" }));
     await screen.findByRole("heading", { name: "Your privacy" });
@@ -126,7 +126,7 @@ describe("Wizard", () => {
   });
 
   it("confirms an identity that already exists", async () => {
-    await harness.api.identityCreate("Ben");
+    await harness.api.identityCreate("Ben", null);
     renderInWizard(harness, <Wizard />);
     expect(await screen.findByText("Using identity Ben.")).toBeInTheDocument();
     expect(screen.queryByLabelText("Name")).not.toBeInTheDocument();

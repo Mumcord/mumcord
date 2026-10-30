@@ -149,7 +149,7 @@ async fn default_avatar_is_sent_once_per_server() {
     )
     .expect("engine");
     engine
-        .identity_create("Avatar Tester".into())
+        .identity_create("Avatar Tester".into(), None)
         .await
         .expect("identity");
     assert!(engine.settings().expect("settings").send_default_avatar);
@@ -228,7 +228,7 @@ async fn remembered_avatar_is_resent_when_the_server_keeps_none() {
     )
     .expect("engine");
     engine
-        .identity_create("Avatar Tester".into())
+        .identity_create("Avatar Tester".into(), None)
         .await
         .expect("identity");
     let source = dir.join("me.png");

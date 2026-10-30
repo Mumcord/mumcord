@@ -56,7 +56,7 @@ async fn formatted_comment_reaches_other_clients_and_oversized_one_is_refused() 
     )
     .expect("engine");
     engine
-        .identity_create(name.clone())
+        .identity_create(name.clone(), None)
         .await
         .expect("identity");
     let server = engine

@@ -408,3 +408,84 @@
   flex-shrink: 0;
   gap: 4px;
 }
+
+/* Tabs of the add/edit server dialog (issue #151). */
+.servers-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1);
+  margin-bottom: var(--space-3);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.servers-dialog:has(.servers-tabs) {
+  width: min(34rem, calc(100vw - 2 * var(--space-4)));
+}
+
+.servers-tabs__tab {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  padding: var(--space-2) var(--space-2);
+  border: none;
+  border-bottom: 2px solid transparent;
+  background: none;
+  color: var(--color-text-secondary);
+  font: inherit;
+  cursor: pointer;
+}
+
+.servers-tabs__tab[aria-selected="true"] {
+  border-bottom-color: var(--color-accent);
+  color: var(--color-text);
+}
+
+.servers-tabs__tab:hover {
+  color: var(--color-text);
+}
+
+.servers-tabs__dot {
+  display: inline-grid;
+  place-items: center;
+  width: 1rem;
+  height: 1rem;
+  border-radius: var(--radius-full);
+  background: var(--color-danger);
+  color: var(--color-bg-elevated);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-bold);
+}
+
+.servers-form__panel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.servers-form__link {
+  align-self: flex-start;
+  background: none;
+  border: none;
+  padding: 0;
+  color: var(--color-accent-text);
+  text-decoration: underline;
+  cursor: pointer;
+  font: inherit;
+}
+
+.servers-form__success {
+  margin: var(--space-1) 0;
+  font-size: var(--font-size-sm);
+  color: var(--color-success);
+}
+
+.servers-form__test {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+/* The test button keeps its own width; the result line goes underneath. */
+.servers-form__field > .button {
+  align-self: flex-start;
+}

@@ -130,6 +130,15 @@ pub fn to_engine_server_id(id: ServerId) -> mumcord_engine::ServerId {
     id.into()
 }
 
+/// Identity ids are row ids as well; `u32` keeps them out of the UI's BigInt-forbidden types.
+pub fn to_api_identity_id(id: mumcord_engine::IdentityId) -> u32 {
+    u32::try_from(id).unwrap_or(u32::MAX)
+}
+
+pub fn to_engine_identity_id(id: u32) -> mumcord_engine::IdentityId {
+    id.into()
+}
+
 /// Error of a command that is part of the contract but not built yet (on this platform).
 #[cfg(not(target_os = "linux"))]
 pub fn not_implemented(command: &str) -> ApiError {

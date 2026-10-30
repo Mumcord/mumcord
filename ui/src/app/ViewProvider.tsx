@@ -39,8 +39,10 @@ export function ViewProvider({ children }: { children: ReactNode }) {
       finishWizard: () => {
         dispatch({ type: "finishWizard" });
       },
-      openSettings: () => {
-        dispatch({ type: "openSettings" });
+      openSettings: (section) => {
+        dispatch(
+          section === undefined ? { type: "openSettings" } : { type: "openSettings", section },
+        );
       },
       openOverlaySettings: () => {
         dispatch({ type: "openSettings", section: "overlay" });

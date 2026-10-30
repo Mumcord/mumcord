@@ -79,5 +79,7 @@
     "moreInfo": "Meer informatie: {{topic}}",
     "effectiveShort": "Nu verzonden",
     "effectiveTip": "De bitrate die nu wordt verzonden, na aanpassing aan pakketverlies."
-  }
+  },
+  "identity": "Identiteit",
+  "identityValue": "{{label}} ({{name}}) · {{fingerprint}}"
 }

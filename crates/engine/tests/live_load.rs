@@ -223,7 +223,7 @@ async fn voice_stays_clean_under_load() {
     )
     .expect("engine");
     engine
-        .identity_create(name.clone())
+        .identity_create(name.clone(), None)
         .await
         .expect("identity");
     let server = engine

@@ -37,7 +37,8 @@
     "alwaysConnect": "Mindig csatlakozzon indításkor",
     "muteNotifications": "Értesítések némítása",
     "theme": "Téma…",
-    "showWelcome": "Üdvözlő üzenet megjelenítése"
+    "showWelcome": "Üdvözlő üzenet megjelenítése",
+    "identity": "Identitás…"
   },
   "theme": {
     "title": "Téma ehhez: {{server}}",
@@ -67,7 +68,10 @@
       "port": "Adj meg egy portot 1 és 65535 között. A legtöbb szerver a 64738-at használja.",
       "username": "Add meg a nevet, amelyet ezen a szerveren használni szeretnél.",
       "link": "Ez a mumble:// link nem olvasható. Ellenőrizd, hogy teljesen kimásoltad-e.",
-      "invalid": "A szerver adatai érvénytelenek. Ellenőrizd a címet és a portot."
+      "invalid": "A szerver adatai érvénytelenek. Ellenőrizd a címet és a portot.",
+      "addressInvalid": "Ez nem tűnik szervercímnek.",
+      "portEmpty": "Add meg a portot.",
+      "labelLong": "A szerver sávban legfeljebb 64 karakter lehet a név."
     },
     "alwaysConnect": "Mindig csatlakozzon indításkor",
     "alwaysConnectHint": "A Mumcord indításkor csak olvasható módban csatlakozik ehhez a szerverhez.",
@@ -82,7 +86,29 @@
     "renameDone": "Kész",
     "removeChannelPassword": "{{name}} eltávolítása",
     "remove": "Eltávolítás",
-    "channelPasswordsHint": "Akkor mentődnek, ha egy védett csatorna elfogadta őket. Az eltávolítottakat a következő belépéskor újra kérjük."
+    "channelPasswordsHint": "Akkor mentődnek, ha egy védett csatorna elfogadta őket. Az eltávolítottakat a következő belépéskor újra kérjük.",
+    "tabsLabel": "Szerverbeállítások",
+    "tabs": {
+      "connection": "Kapcsolat",
+      "identity": "Identitás",
+      "passwords": "Jelszavak",
+      "behaviour": "Viselkedés",
+      "needsAttention": "{{tab}}: figyelmet igényel"
+    },
+    "test": {
+      "button": "Kapcsolat tesztelése",
+      "busy": "Tesztelés…",
+      "running": "A kapcsolat tesztelése…",
+      "result": "{{address}} · Ping: {{ms}} ms · Szerververzió: {{version}}",
+      "certTrusted": "A tanúsítvány már megbízható",
+      "certUnknown": "A tanúsítvány még nem megbízható – csatlakozáskor kérdezünk",
+      "certChanged": "A tanúsítvány megváltozott – ellenőrizd csatlakozás előtt",
+      "wrongPassword": "A szerver elutasította a jelszót.",
+      "nameInUse": "Ez a név már használatban van ezen a szerveren.",
+      "unreachable": "A szerver nem érhető el.",
+      "invalid": "Az adatok nem érvényesek.",
+      "failed": "A teszt sikertelen. Próbáld újra."
+    }
   },
   "errors": {
     "serverUnreachable": "A szerver nem érhető el. Ellenőrizd a címet, a portot és az internetkapcsolatodat.",
@@ -145,7 +171,8 @@
       "disconnect": "A lecsatlakozás nem sikerült. Próbáld újra.",
       "alwaysConnect": "A „Mindig csatlakozzon indításkor” beállítást nem sikerült menteni. Próbáld újra.",
       "notifications": "Az értesítési beállítást nem sikerült menteni. Próbáld újra.",
-      "savePassword": "Az új jelszót nem sikerült menteni. Szerkeszd a szervert a mentéshez."
+      "savePassword": "Az új jelszót nem sikerült menteni. Szerkeszd a szervert a mentéshez.",
+      "identity": "Az identitást nem sikerült menteni. Próbáld újra."
     }
   },
   "empty": {
@@ -259,5 +286,24 @@
     "permissionSelfRegister": "Register self",
     "permissionResetUserContent": "Reset user content",
     "characters": "{{value}} characters"
+  },
+  "identity": {
+    "field": "Identitás ehhez a szerverhez",
+    "useDefault": "Alapértelmezett használata ({{identity}})",
+    "option": "{{label}} ({{name}})",
+    "hint": "Az identitás módosítása újracsatlakoztatja ezt a szervert. Az itt regisztrált név és jogosultságok a választott identitáshoz tartoznak.",
+    "manage": "Identitások kezelése…",
+    "title": "Identitás a(z) {{server}} szerverhez",
+    "intro": "Válaszd ki, melyik identitást használja a Mumcord itt. Az „Alapértelmezett használata” az alapértelmezett identitást követi.",
+    "save": "Mentés",
+    "saveAndReconnect": "Mentés és újracsatlakozás",
+    "reconnectTitle": "Újracsatlakozás: {{server}}?",
+    "reconnectMessage": "Újracsatlakoztatod most ezt a szervert a(z) {{identity}} identitással? A többi szerver csatlakozva marad.",
+    "reconnect": "Újracsatlakozás",
+    "later": "Később",
+    "nextConnect": "A következő csatlakozáskor lép életbe.",
+    "badge": "Identitás: {{identity}}",
+    "badgeTitle": "Csatlakozva a(z) {{identity}} identitással",
+    "missingNotice": "A(z) {{server}} az alapértelmezett identitással csatlakozott, mert a sajátja hiányzik."
   }
 }

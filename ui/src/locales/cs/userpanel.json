@@ -55,7 +55,8 @@
     "passwordRequired": "Zadej heslo k ochraně záložního souboru.",
     "exported": "Záloha identity uložena.",
     "confirm": "Registrovat",
-    "done": "Registrován na tomto serveru"
+    "done": "Registrován na tomto serveru",
+    "identity": "Registrovaný název patří identitě {{identity}}."
   },
   "errors": {
     "tooLarge": "To je pro server příliš velké. Vyber menší obrázek nebo napiš kratší text.",
