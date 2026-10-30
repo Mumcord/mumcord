@@ -14,6 +14,12 @@
     "dismiss": "Skaidrs",
     "openSettings": "Atvērt pārklājuma iestatījumus"
   },
+  "audioDevice": {
+    "title": "Atkārtoti izvēlieties audio ierīces",
+    "description": "Mumcord tagad katru jūsu audio ierīču ieeju un izeju rāda atsevišķi. Saglabāto ierīci neizdevās saskaņot ne ar vienu no tām, tāpēc pagaidām tiek izmantota sistēmas noklusējuma ierīce. Ierīci varat izvēlēties audio iestatījumos.",
+    "dismiss": "Skaidrs",
+    "openSettings": "Atvērt audio iestatījumus"
+  },
   "appImageMenu": {
     "title": "Pievienot Mumcord lietotņu izvēlnei?",
     "description": "Tā Mumcord parādās tavā lietotņu izvēlnē. Ikona un push-to-talk Wayland vidē darbojas pareizi, un mumble:// saites atver Mumcord. To vari vēlāk mainīt iestatījumos.",

@@ -45,6 +45,9 @@ export function ViewProvider({ children }: { children: ReactNode }) {
       openOverlaySettings: () => {
         dispatch({ type: "openSettings", section: "overlay" });
       },
+      openAudioSettings: () => {
+        dispatch({ type: "openSettings", section: "audio" });
+      },
       openPrivacySettings: () => {
         dispatch({ type: "openSettings", section: "privacy" });
       },

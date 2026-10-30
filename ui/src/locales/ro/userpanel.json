@@ -8,7 +8,10 @@
     "muted": "Microfon oprit",
     "unmuted": "Microfon pornit",
     "deafened": "Sunet oprit. Nu-i auzi pe ceilalți, iar microfonul tău e oprit",
-    "undeafened": "Sunet pornit"
+    "undeafened": "Sunet pornit",
+    "leftVoice": "Ai părăsit vocea pe {{server}}",
+    "disconnected": "Deconectat de la {{server}}",
+    "disconnectedAll": "Deconectat de la toate serverele"
   },
   "readOnly": {
     "text": "Doar citești – intră într-un canal ca să vorbești.",
@@ -95,5 +98,20 @@
     "line": "Voce: {{channel}} · {{server}}",
     "server": "Voce: {{server}}",
     "show": "{{location}} – arată acest server"
+  },
+  "disconnectMenu": {
+    "label": "Opțiuni de deconectare",
+    "open": "Mai multe opțiuni de deconectare",
+    "leaveVoice": "Părăsește vocea",
+    "leaveVoiceHint": "Nu mai vorbi și nu mai asculta, rămâi conectat pentru chat",
+    "disconnectHint": "Închide conexiunea la acest server",
+    "switchTo": "Mută vocea pe {{server}}",
+    "all": "Deconectează de la toate serverele…",
+    "allHint": "Închide toate conexiunile la servere"
+  },
+  "disconnectAll": {
+    "title": "Te deconectezi de la toate serverele?",
+    "message": "Te deconectezi de la toate cele {{total}} servere?",
+    "confirm": "Deconectează"
   }
 }

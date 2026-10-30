@@ -8,7 +8,10 @@
     "muted": "Microfoon gedempt",
     "unmuted": "Microfoon niet meer gedempt",
     "deafened": "Doof gezet. Je hoort anderen niet en je microfoon is gedempt",
-    "undeafened": "Niet meer doof gezet"
+    "undeafened": "Niet meer doof gezet",
+    "leftVoice": "Spraak verlaten op {{server}}",
+    "disconnected": "Verbinding met {{server}} verbroken",
+    "disconnectedAll": "Verbinding met alle servers verbroken"
   },
   "readOnly": {
     "text": "Je leest alleen mee – neem deel aan een kanaal om te praten.",
@@ -95,5 +98,20 @@
     "line": "Spraak: {{channel}} · {{server}}",
     "server": "Spraak: {{server}}",
     "show": "{{location}} – deze server tonen"
+  },
+  "disconnectMenu": {
+    "label": "Opties voor verbreken",
+    "open": "Meer opties voor verbreken",
+    "leaveVoice": "Spraak verlaten",
+    "leaveVoiceHint": "Stop met praten en luisteren, blijf verbonden voor de chat",
+    "disconnectHint": "De verbinding met deze server sluiten",
+    "switchTo": "Spraak overzetten naar {{server}}",
+    "all": "Verbinding met alle servers verbreken…",
+    "allHint": "Alle serververbindingen sluiten"
+  },
+  "disconnectAll": {
+    "title": "Verbinding met alle servers verbreken?",
+    "message": "Verbinding met alle {{total}} servers verbreken?",
+    "confirm": "Verbreken"
   }
 }

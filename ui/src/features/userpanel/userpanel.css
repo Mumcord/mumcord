@@ -256,6 +256,13 @@
   margin-top: var(--space-3);
 }
 
+/* The ▾ sits against the phone button as one split control. */
+.userpanel__toggle--more {
+  margin-inline-start: calc(-1 * var(--space-1));
+  padding-inline: 0;
+  min-width: 1.25rem;
+}
+
 .userpanel__toggle--hangup:hover:not(:disabled) {
   color: var(--color-danger);
 }

@@ -65,6 +65,11 @@ export const commands = {
 	/**  Enters the channel's voice; fails with `permissionDenied` if not permitted. */
 	channelJoin: (serverId: number, channelId: number) => typedError<null, ApiError>(__TAURI_INVOKE("channel_join", { serverId, channelId })),
 	/**
+	 *  Stops voice on the voice server but keeps every connection: the server turns read-only
+	 *  (self-deafened) and no server has voice until the next explicit join.
+	 */
+	voiceLeave: () => typedError<null, ApiError>(__TAURI_INVOKE("voice_leave")),
+	/**
 	 *  Retries a refused join with a channel password, which is stored for the server; the
 	 *  outcome arrives as `channelPasswordPrompt` (FR-2.78).
 	 */
@@ -262,6 +267,13 @@ export const commands = {
 	windowOverlayNoticePending: () => typedError<boolean, ApiError>(__TAURI_INVOKE("window_overlay_notice_pending")),
 	/**  Marks the notice as shown so it never comes back. */
 	windowOverlayNoticeDismiss: () => typedError<null, ApiError>(__TAURI_INVOKE("window_overlay_notice_dismiss")),
+	/**
+	 *  Whether the user still has to be told that their saved audio device was reset to the system
+	 *  default because it could not be matched to the new device list (issue #183).
+	 */
+	audioDeviceNoticePending: () => typedError<boolean, ApiError>(__TAURI_INVOKE("audio_device_notice_pending")),
+	/**  Marks the audio device notice as shown so it never comes back. */
+	audioDeviceNoticeDismiss: () => typedError<null, ApiError>(__TAURI_INVOKE("audio_device_notice_dismiss")),
 	audioDevices: () => typedError<AudioDevices, ApiError>(__TAURI_INVOKE("audio_devices")),
 	/**
 	 *  Highest bitrate in kbit/s the bitrate slider can reach (FR-2.64); `null` without a voice

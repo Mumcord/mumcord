@@ -1257,6 +1257,19 @@ export function createMockApi(options: MockOptions = {}): MockApi {
     },
 
     // channels
+    voiceLeave: () => {
+      const previous = voiceServerId;
+      if (previous === null) return Promise.resolve(null);
+      // Like the engine: the server stays connected, read-only (muted + deafened).
+      if (sessions.get(previous)?.snapshot) {
+        currentServerId = previous;
+        setSnapshot({ ...requireSnapshot(), readOnly: true, rejoinChannelId: null });
+        updateUser(SELF_SESSION, { selfMute: true, selfDeaf: true });
+      }
+      setVoiceServer(null);
+      return Promise.resolve(null);
+    },
+
     channelJoin: (serverId, channelId) => {
       requireSession(serverId);
       // Like a real server, a refused join is answered asynchronously, here with the
@@ -2023,6 +2036,8 @@ export function createMockApi(options: MockOptions = {}): MockApi {
     // Nobody has the removed window overlay switched on in the browser mock.
     windowOverlayNoticePending: () => Promise.resolve(false),
     windowOverlayNoticeDismiss: () => Promise.resolve(null),
+    audioDeviceNoticePending: () => Promise.resolve(false),
+    audioDeviceNoticeDismiss: () => Promise.resolve(null),
   };
 
   // Turns synchronous throws into rejections and applies injected failures.

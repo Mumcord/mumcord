@@ -32,6 +32,8 @@ hound.workspace = true
 
 [target.'cfg(target_os = "linux")'.dependencies]
 libc.workspace = true
+pulseaudio.workspace = true
+futures.workspace = true
 
 [target.'cfg(target_os = "linux")'.dev-dependencies]
 libc.workspace = true

@@ -34,6 +34,7 @@ export function renderInWizard(harness: Harness, ui: ReactNode) {
     finishWizard: harness.finishWizard,
     openSettings: vi.fn(),
     openOverlaySettings: vi.fn(),
+    openAudioSettings: vi.fn(),
     openPrivacySettings: vi.fn(),
     closeOverlay: vi.fn(),
     retry: vi.fn(),

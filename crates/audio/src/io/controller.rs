@@ -11,7 +11,7 @@ use rtrb::{Consumer, Producer};
 use super::cpal_backend::CpalBackend;
 use super::frames::{CaptureEndpoint, FrameSink, FrameSource, PlaybackEndpoint};
 use super::ring::Counters;
-use super::{BackendKind, DeviceEvent, DeviceInfo, Direction, IoError, IoStats};
+use super::{BackendKind, DeviceEvent, DeviceInfo, DeviceMigration, Direction, IoError, IoStats};
 
 /// How often the control thread checks for device changes and failed streams.
 const POLL_INTERVAL: Duration = Duration::from_secs(2);
@@ -39,6 +39,10 @@ pub(crate) trait Backend {
     fn devices(&self, direction: Direction) -> Result<Vec<DeviceInfo>, IoError>;
     /// Whether the device list can change at runtime and should be polled.
     fn polls_devices(&self) -> bool;
+    /// Maps a saved id from an older device list onto this one (issue #183).
+    fn migrate(&self, _direction: Direction, _saved: &str) -> Result<DeviceMigration, IoError> {
+        Ok(DeviceMigration::Keep)
+    }
     fn open_input(
         &self,
         id: Option<&str>,
@@ -88,6 +92,16 @@ impl AudioIo {
     /// stream, for callers that need the list while audio I/O is not running.
     pub fn list_devices(direction: Direction) -> Result<Vec<DeviceInfo>, IoError> {
         Self::list_devices_with(BackendKind::from_env()?, direction)
+    }
+
+    /// Maps a saved device id onto the device list of the backend chosen by
+    /// [`BackendKind::from_env`], for settings stored by an older version (issue #183).
+    pub fn migrate_device(direction: Direction, saved: &str) -> Result<DeviceMigration, IoError> {
+        // Only ids from cpal's ALSA host can be outdated; the others need no sound server query.
+        if !saved.starts_with("alsa:") {
+            return Ok(DeviceMigration::Keep);
+        }
+        make_backend(BackendKind::from_env()?).migrate(direction, saved)
     }
 
     pub fn list_devices_with(

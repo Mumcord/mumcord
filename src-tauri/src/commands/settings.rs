@@ -699,6 +699,24 @@ pub async fn window_overlay_notice_dismiss(engine: State<'_, Engine>) -> ApiResu
     Ok(())
 }
 
+/// Whether the user still has to be told that their saved audio device was reset to the system
+/// default because it could not be matched to the new device list (issue #183).
+#[tauri::command]
+#[specta::specta]
+pub fn audio_device_notice_pending(engine: State<'_, Engine>) -> ApiResult<bool> {
+    Ok(engine.settings()?.audio_device_notice)
+}
+
+/// Marks the audio device notice as shown so it never comes back.
+#[tauri::command]
+#[specta::specta]
+pub async fn audio_device_notice_dismiss(engine: State<'_, Engine>) -> ApiResult<()> {
+    let mut settings = engine.settings()?;
+    settings.audio_device_notice = false;
+    engine.update_settings(settings).await?;
+    Ok(())
+}
+
 /// Replaces the whole record and applies changes immediately; returns the stored record.
 #[tauri::command]
 #[specta::specta]
