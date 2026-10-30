@@ -1249,6 +1249,12 @@ export type MumbleLink = {
 	channelPath: string[],
 };
 
+/**  Which local noise suppression backend processes the microphone (Settings → Voice). */
+export type NoiseBackend = "nnnoiseless" | "rnnoise" | "sonora";
+
+/**  Aggressiveness of the `sonora-ns` backend; the neural backends have no settings. */
+export type NoiseSuppressionLevel = "low" | "moderate" | "high" | "veryHigh";
+
 /**
  *  The user clicked a system notification; the window is already in front. Show the server
  *  and open this chat.
@@ -1657,6 +1663,12 @@ export type Settings = {
 	inputDevice: string | null,
 	outputDevice: string | null,
 	noiseSuppression: boolean,
+	/**  Selected noise suppression backend (default nnnoiseless). */
+	noiseSuppressionBackend: NoiseBackend,
+	/**  Aggressiveness of the sonora backend only; ignored by the neural backends. */
+	noiseSuppressionLevel: NoiseSuppressionLevel,
+	/**  Acceptance of the unreviewed `rnnoise-rs` dependency (`yes` before that backend may run). */
+	noiseSuppressionRnnoiseConsent: Consent,
 	echoCancellation: boolean,
 	autoGain: boolean,
 	/**

@@ -31,9 +31,9 @@ pub use settings::{
     ChatDisplay, CloseBehaviour, Consent, DEFAULT_APP_THEME_ID, DEFAULT_INGAME_OPACITY_PERCENT,
     DEFAULT_INGAME_SIZE_PERCENT, DEFAULT_MAX_CONNECTED_SERVERS, GameKey, GameOverlayEntry,
     InGameOverlayMode, InGameOverlaySettings, LogLevel, MAX_MAX_CONNECTED_SERVERS,
-    MAX_VIDEO_DUCKING_PERCENT, MIN_MAX_CONNECTED_SERVERS, MIN_VIDEO_DUCKING_PERCENT,
-    NotificationMode, OverlayCorner, OwnVoice, PositionalSettings, Settings, SoundSettings,
-    TalkMode, Theme, ThemePreference, VoiceActivation,
+    MAX_VIDEO_DUCKING_PERCENT, MIN_MAX_CONNECTED_SERVERS, MIN_VIDEO_DUCKING_PERCENT, NoiseBackend,
+    NoiseSuppressionLevel, NotificationMode, OverlayCorner, OwnVoice, PositionalSettings, Settings,
+    SoundSettings, TalkMode, Theme, ThemePreference, VoiceActivation,
 };
 pub use social::{FollowedChannel, PersonSetting};
 pub use synced::RangeSummary;

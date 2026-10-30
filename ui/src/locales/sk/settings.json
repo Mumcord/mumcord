@@ -111,6 +111,26 @@
     "processing": "Spracovanie hlasu",
     "noiseSuppression": "Potlačenie šumu",
     "noiseSuppressionHint": "Odfiltruje hluk v pozadí, napríklad klávesnicu či ventilátory.",
+    "noiseSuppressionBackend": "Backend potlačenia šumu",
+    "backendHint": {
+      "nnnoiseless": "Ľahké AI: nízke využitie procesora, dobrý na stály šum v pozadí.",
+      "rnnoise": "Moderné AI: novšia neuronová sieť, často čistejšia; pridáva asi 10 ms oneskorenie.",
+      "sonora": "Klasické DSP: bez neuronovej siete, nízka záťaž. Nemá model reči, preto aktivácia hlasu používa detekciu úrovne."
+    },
+    "noBackendSettings": "Pre tento backend nie sú k dispozícii žiadne ďalšie nastavenia.",
+    "noiseSuppressionLevel": "Sila potlačenia",
+    "levels": {
+      "low": "Nízka",
+      "moderate": "Stredná",
+      "high": "Vysoká",
+      "veryHigh": "Veľmi vysoká"
+    },
+    "detectorHint": "Aktivácia hlasu deteguje reč modelom RNNoise; ten nemení tvoje audio.",
+    "rnnoiseSource": "rnnoise-rs nie je publikovaný na crates.io. Mumcord ho už má vo svojej kompilácii, prevzatý priamo z GitHubu na commit {{commit}}, bez kontroly kódu.",
+    "rnnoiseCost": "Stojí asi 3× viac CPU ako nnnoiseless a pridáva jeden rám (10 ms) oneskorenia.",
+    "rnnoiseConsent": "Súhlasím, že táto nepreskúmaná knižnica spracováva môj mikrofón.",
+    "rnnoiseInactive": "Nie je aktívny, kým nesúhlasíš.",
+    "processingIndependent": "Potlačenie ozveny a Automatická hlasitosť fungujú rovnako pre každý backend.",
     "echoCancellation": "Potlačenie ozveny",
     "echoCancellationHint": "Zabráni tomu, aby sa ostatní počuli, keď používaš reproduktory.",
     "autoGain": "Automatická hlasitosť",

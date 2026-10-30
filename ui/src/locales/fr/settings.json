@@ -110,6 +110,26 @@
     "processing": "Traitement de la voix",
     "noiseSuppression": "Suppression de bruit",
     "noiseSuppressionHint": "Filtre les bruits de fond comme les claviers et les ventilateurs.",
+    "noiseSuppressionBackend": "Backend de suppression de bruit",
+    "backendHint": {
+      "nnnoiseless": "IA légère : faible utilisation du processeur, adaptée au bruit de fond constant.",
+      "rnnoise": "IA moderne : réseau de neurones plus récent, souvent plus propre ; il ajoute environ 10 ms de délai.",
+      "sonora": "DSP classique : pas de réseau de neurones, faible charge. Il n'a pas de modèle de parole, donc l'activation vocale utilise la détection de niveau."
+    },
+    "noBackendSettings": "Aucun réglage supplémentaire pour ce backend.",
+    "noiseSuppressionLevel": "Intensité de la suppression",
+    "levels": {
+      "low": "Faible",
+      "moderate": "Modérée",
+      "high": "Élevée",
+      "veryHigh": "Très élevée"
+    },
+    "detectorHint": "L'activation vocale détecte la parole avec le modèle RNNoise ; il ne modifie pas votre audio.",
+    "rnnoiseSource": "rnnoise-rs n'est pas publié sur crates.io. Mumcord l'inclut déjà dans sa compilation, pris directement de GitHub au commit {{commit}}, sans revue du code.",
+    "rnnoiseCost": "Il coûte environ 3× plus de CPU que nnnoiseless et ajoute une trame (10 ms) de délai.",
+    "rnnoiseConsent": "J'accepte que cette bibliothèque non révisée traite mon microphone.",
+    "rnnoiseInactive": "Inactif tant que vous n'acceptez pas.",
+    "processingIndependent": "Annulation d’écho et Volume automatique fonctionnent de la même façon pour chaque backend.",
     "echoCancellation": "Annulation d’écho",
     "echoCancellationHint": "Évite que les autres s’entendent eux-mêmes quand vous utilisez des haut-parleurs.",
     "autoGain": "Volume automatique",

@@ -111,6 +111,26 @@
     "processing": "Obdelava glasu",
     "noiseSuppression": "Dušenje šuma",
     "noiseSuppressionHint": "Odstrani hrup iz ozadja, kot so tipkovnice in ventilatorji.",
+    "noiseSuppressionBackend": "Backend za dušenje šuma",
+    "backendHint": {
+      "nnnoiseless": "Lahki AI: majhna uporaba procesorja, dober za stalen hrup v ozadju.",
+      "rnnoise": "Moderen AI: novejša nevronska mreža, pogosto čistejša; doda približno 10 ms zamika.",
+      "sonora": "Klasični DSP: brez nevronske mreže, majhna obremenitev. Nima model govora, zato aktivacija glasa uporablja zaznavanje ravni."
+    },
+    "noBackendSettings": "Za ta backend ni dodatnih nastavitev.",
+    "noiseSuppressionLevel": "Moč dušenja",
+    "levels": {
+      "low": "Nizka",
+      "moderate": "Srednja",
+      "high": "Visoka",
+      "veryHigh": "Zelo visoka"
+    },
+    "detectorHint": "Aktivacija glasa prepozna govor z modelom RNNoise; ta ne spremeni tvojega zvoka.",
+    "rnnoiseSource": "rnnoise-rs ni objavljen na crates.io. Mumcord ga že vsebuje v svoji gradnji, prevzet neposredno iz GitHuba pri commitu {{commit}}, brez pregleda kode.",
+    "rnnoiseCost": "Stoji približno 3× več procesorja kot nnnoiseless in doda en okvir (10 ms) zamika.",
+    "rnnoiseConsent": "Sprejemam, da ta nepregledana knjižnica obdeluje moj mikrofon.",
+    "rnnoiseInactive": "Ni aktiven, dokler ne sprejmete.",
+    "processingIndependent": "Odpravljanje odmeva in Samodejna glasnost delujeta enako za vsak backend.",
     "echoCancellation": "Odpravljanje odmeva",
     "echoCancellationHint": "Prepreči, da bi drugi slišali sami sebe, ko uporabljaš zvočnike.",
     "autoGain": "Samodejna glasnost",

@@ -109,6 +109,26 @@
     "processing": "Röstbehandling",
     "noiseSuppression": "Brusreducering",
     "noiseSuppressionHint": "Filtrerar bort bakgrundsljud som tangentbord och fläktar.",
+    "noiseSuppressionBackend": "Backend för brusreducering",
+    "backendHint": {
+      "nnnoiseless": "Lätt AI: låg CPU-användning, bra för stadig bakgrundsljud.",
+      "rnnoise": "Modernt AI: nyare neuronnät, ofta renare; lägger till cirka 10 ms fördröjning.",
+      "sonora": "Traditionell DSP: inga neuronnät, låg belastning. Den har ingen talmodell, därför använder röstaktiveringen nivådetektionen."
+    },
+    "noBackendSettings": "Inga ytterligare inställningar för detta backend.",
+    "noiseSuppressionLevel": "Reduceringsstyrka",
+    "levels": {
+      "low": "Låg",
+      "moderate": "Medel",
+      "high": "Hög",
+      "veryHigh": "Mycket hög"
+    },
+    "detectorHint": "Röstaktiveringen använder RNNoise-modellen för att upptäcka tal; den ändrar inte ditt ljud.",
+    "rnnoiseSource": "rnnoise-rs är inte publicerad på crates.io. Mumcord har den redan i sitt bygge, hämtad direkt från GitHub vid commit {{commit}}, utan granskning av koden.",
+    "rnnoiseCost": "Den kostar ungefär 3× mer CPU än nnnoiseless och lägger till en ram (10 ms) fördröjning.",
+    "rnnoiseConsent": "Jag accepterar att det här ogranskade biblioteket behandlar min mikrofon.",
+    "rnnoiseInactive": "Inte aktiv förrän du accepterar.",
+    "processingIndependent": "Ekoreducering och Automatisk volym fungerar lika för alla backend.",
     "echoCancellation": "Ekoreducering",
     "echoCancellationHint": "Hindrar andra från att höra sig själva när du använder högtalare.",
     "autoGain": "Automatisk volym",

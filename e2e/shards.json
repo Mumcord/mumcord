@@ -7,7 +7,8 @@
       "specs/smoke/app.e2e.ts",
       "specs/voice/leave-voice-menu.e2e.ts",
       "specs/voice/voice.e2e.ts",
-      "specs/wizard/ac-1.3-mic-test.e2e.ts"
+      "specs/wizard/ac-1.3-mic-test.e2e.ts",
+      "specs/voice/noise-suppression-backends.e2e.ts"
     ],
     [
       "specs/app/theme-language.e2e.ts",

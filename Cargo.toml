@@ -84,6 +84,10 @@ audio_thread_priority = { version = "0.35", default-features = false, features =
 # opusic-sys builds libopus statically from bundled sources.
 opus = "0.4"
 nnnoiseless = { version = "0.5", default-features = false }
+# rnnoise-rs is not published on crates.io, so Mumcord pins its own fork (BSD-3-Clause, no
+# dependencies). The library name is `rnnoise`, and the build needs network for it. It is used by
+# the engine, because a published crate cannot carry a git dependency (issue #176).
+rnnoise-rs = { git = "https://github.com/Mumcord/rnnoise-rs", rev = "74b46b1065630f68464ee60dd542e3ce175743db" }
 sonora = "0.2"
 rtrb = "0.4"
 rubato = "5.0"
