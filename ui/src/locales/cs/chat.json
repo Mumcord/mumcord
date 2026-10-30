@@ -256,5 +256,27 @@
     "tooLarge": "Kód je příliš velký ke stažení.",
     "fileType": "Soubor s kódem",
     "plainText": "Prostý text"
+  },
+  "mumbleCard": {
+    "addServer": "Přidat do serverů",
+    "channel": "Kanál {{channel}}",
+    "copy": "Kopírovat odkaz",
+    "copyLabel": "Kopírovat odkaz na {{server}}",
+    "figures": "Ping {{ping}} ms · {{users}} z {{max}} uživatelů · server {{version}}",
+    "goToChannel": "Přejít na kanál",
+    "join": "Připojit",
+    "joinLabel": "Připojit ke serveru {{server}}",
+    "joined": "Připojeno",
+    "label": "Karta serveru {{server}}",
+    "privacyOff": "Hodnoty serveru jsou ve nastavení vypnuté",
+    "querying": "Kontrola serveru…",
+    "retry": "Zkontrolovat znovu",
+    "retryLabel": "Zkontrolovat znovu {{server}}",
+    "server": "{{server}}",
+    "unreachable": "Server není dostupný",
+    "warning_few": "{{count}} odkazy v této zprávě zobrazují přihlašovací údaje",
+    "warning_many": "{{count}} odkazů v této zprávě zobrazuje přihlašovací údaje",
+    "warning_one": "{{count}} odkaz v této zprávě zobrazuje přihlašovací údaje",
+    "warning_other": "{{count}} odkazu v této zprávě zobrazuje přihlašovací údaje"
   }
 }

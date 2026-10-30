@@ -8,6 +8,7 @@ pub mod client;
 pub mod error;
 pub mod framing;
 pub mod permissions;
+pub mod query;
 mod ratelimit;
 pub mod state;
 pub mod tap;
@@ -22,6 +23,10 @@ pub use client::{
 };
 pub use error::{
     CommandError, ConnectError, DenyKind, PermissionDenied, ProtocolError, RejectReason,
+};
+pub use query::{
+    LEGACY_ANSWER_LEN, LEGACY_QUERY_LEN, QueryAnswer, decode_answer, encode_legacy_query,
+    encode_query,
 };
 /// Certificate/key DER types used by [`ClientIdentity`] and [`ServerCert`].
 pub use rustls::pki_types;

@@ -248,5 +248,25 @@
     "tooLarge": "Koodi on liian suuri ladattavaksi.",
     "fileType": "Kooditiedosto",
     "plainText": "Pelkkä teksti"
+  },
+  "mumbleCard": {
+    "addServer": "Lisää palvelimiin",
+    "channel": "Kanava {{channel}}",
+    "copy": "Kopioi linkki",
+    "copyLabel": "Kopioi linkki palvelimeen {{server}}",
+    "figures": "Ping {{ping}} ms · {{users}}/{{max}} käyttäjää · palvelin {{version}}",
+    "goToChannel": "Siirry kanavalle",
+    "join": "Liity",
+    "joinLabel": "Liity palvelimeen {{server}}",
+    "joined": "Liitytty",
+    "label": "Palvelin kortti: {{server}}",
+    "privacyOff": "Palvelin-arvot on sulettu asetuksissa",
+    "querying": "Tarkistetaan palvelinta…",
+    "retry": "Tarkista uudelleen",
+    "retryLabel": "Tarkista uudelleen {{server}}",
+    "server": "{{server}}",
+    "unreachable": "Palvelimeen ei saada yhteyttä",
+    "warning_one": "{{count}} linkki tässä viestissä näyttää kirjautumistiedot",
+    "warning_other": "{{count}} linkkiä tässä viestissä näyttävät kirjautumistiedot"
   }
 }

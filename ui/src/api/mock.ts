@@ -3,7 +3,15 @@
  * It follows the contract in docs/engine-api.md closely enough for UI flows, not the
  * Mumble protocol: no network, no audio.
  */
-import type { InspectorView, MessageNotice, NotifyOutcome, WindowLook } from "../bindings/commands";
+import type {
+  InspectorView,
+  LinkOutcome,
+  MessageNotice,
+  MumbleLinkStats,
+  NotifyOutcome,
+  WindowLook,
+} from "../bindings/commands";
+import { parseMumbleLink } from "../features/chat/mumbleLink";
 import type {
   ApiError,
   AudioDevices,
@@ -529,26 +537,9 @@ function conversationKey(c: Conversation): string {
   }
 }
 
+/** The same rules as `parse_mumble_link` in the engine, through the UI's single parsing module. */
 function parseLink(url: string): MumbleLink {
-  let parsed: URL;
-  try {
-    parsed = new URL(url);
-  } catch {
-    return fail("invalidInput", "not a valid link");
-  }
-  if (parsed.protocol !== "mumble:" || parsed.hostname === "") {
-    return fail("invalidInput", "not a mumble:// link");
-  }
-  return {
-    address: parsed.hostname,
-    port: parsed.port === "" ? 64738 : Number(parsed.port),
-    username: parsed.username === "" ? null : decodeURIComponent(parsed.username),
-    password: parsed.password === "" ? null : decodeURIComponent(parsed.password),
-    channelPath: parsed.pathname
-      .split("/")
-      .filter((part) => part !== "")
-      .map(decodeURIComponent),
-  };
+  return parseMumbleLink(url) ?? fail("invalidInput", "not a mumble:// link");
 }
 
 /** Length of each mic-test phase (recording, playback) in the mock. */
@@ -559,6 +550,8 @@ export function createMockApi(options: MockOptions = {}): MockApi {
   const fresh = seed === "fresh" || seed === "demoFresh";
   const stress = seed === "stress";
   const demo = seed === "demo" || seed === "demoFresh" || stress;
+  /** What the mock answered for each `mumble://` link in this run (issue #175). */
+  const queryAnswers = new Map<string, MumbleLinkStats>();
   const serverVersion = options.serverVersion ?? "1.5.735";
   const maxListeners = options.maxListeners ?? 2;
   const connectDelayMs = options.connectDelayMs ?? 0;
@@ -1330,6 +1323,29 @@ export function createMockApi(options: MockOptions = {}): MockApi {
       return Promise.resolve(null);
     },
     parseMumbleLink: (url) => Promise.resolve(parseLink(url)),
+    // The mock never contacts a server. It answers with figures of its own, and says that nothing
+    // was asked while the privacy switch is off — which is what the real command does (issue #175).
+    mumbleLinkStats: (url: string, refresh: boolean): Promise<MumbleLinkStats> => {
+      parseLink(url);
+      if (!settings.linkPreviews) return Promise.resolve({ kind: "privacyOff" });
+      // Like the engine, the mock keeps the answer for the session unless the card asks again.
+      const stored = queryAnswers.get(url);
+      const answer: MumbleLinkStats =
+        refresh || stored === undefined
+          ? { kind: "answered", pingMs: 12, users: 8, maxUsers: 24, version: serverVersion }
+          : stored;
+      queryAnswers.set(url, answer);
+      return Promise.resolve(answer);
+    },
+    mumbleLinkJoin: (url: string) => {
+      const link = parseLink(url);
+      const saved = servers.find((s) => s.address === link.address && s.port === link.port);
+      const outcome: LinkOutcome = saved
+        ? { kind: "connecting", serverId: saved.id }
+        : { kind: "unknownServer" };
+      emit("deepLinkOpened", { link, outcome });
+      return Promise.resolve(outcome);
+    },
 
     // session
     connect: (serverId, channelPath, password) => {

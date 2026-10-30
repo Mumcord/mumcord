@@ -4,6 +4,7 @@
  * may run scripts or load anything from the network.
  */
 import DOMPurify from "dompurify";
+import { canonicalLink } from "./mumbleLink";
 import { FULL_ATTRIBUTE, FULL_REFERENCE } from "./fullImage";
 
 /** Marks a message card on the wire (see `cards.ts`); kept on `<div>` only. */
@@ -61,6 +62,9 @@ const ALLOWED_ATTR = ["href", "src", "alt", "title"];
 /** Link targets a click may hand to the system browser. */
 export const SAFE_LINK = /^(?:https?:|mailto:)/i;
 
+/** `mumble://` links keep their text but never a target, and never their credentials (issue #175). */
+const MUMBLE_TEXT = /mumble:\/\/[^\s<>"']+/gi;
+
 /** Inline images only; anything else would be an external load. */
 const SAFE_IMAGE = /^data:image\/(?:png|jpeg|gif|webp);base64,[a-z0-9+/=\s]+$/i;
 
@@ -93,14 +97,17 @@ purifier.addHook("afterSanitizeAttributes", (node) => {
 
 /** Returns HTML that is safe to put into the DOM. */
 export function sanitizeHtml(html: string): string {
-  return purifier.sanitize(html, {
+  const clean = purifier.sanitize(html, {
     ALLOWED_TAGS,
     ALLOWED_ATTR,
     // `rel` is set by the hook above; users cannot supply it.
     ADD_ATTR: ["rel"],
     ALLOW_DATA_ATTR: false,
-    ALLOWED_URI_REGEXP: /^(?:https?:|mailto:|data:image\/(?:png|jpeg|gif|webp);base64,)/i,
+    ALLOWED_URI_REGEXP: /^(?:https?:|mailto:|data:image\/(?:png|jpeg|gif|webp);base64,|mumble:)/i,
   });
+  // A `mumble://` link is never opened by itself, and its credentials never reach the screen
+  // (issue #175). The card under the message has the buttons.
+  return clean.replace(MUMBLE_TEXT, (match) => canonicalLink(match));
 }
 
 /** Visible text of a message, e.g. for screen-reader announcements. */

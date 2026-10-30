@@ -252,5 +252,26 @@
     "tooLarge": "Kôd je prevelik za preuzimanje.",
     "fileType": "Datoteka s kôdom",
     "plainText": "Običan tekst"
+  },
+  "mumbleCard": {
+    "addServer": "Dodaj u poslužitelje",
+    "channel": "Kanal {{channel}}",
+    "copy": "Kopiraj poveznicu",
+    "copyLabel": "Kopiraj poveznicu na {{server}}",
+    "figures": "Ping {{ping}} ms · {{users}} od {{max}} korisnika · poslužitelj {{version}}",
+    "goToChannel": "Idi na kanal",
+    "join": "Pridruži se",
+    "joinLabel": "Pridruži se poslužitelju {{server}}",
+    "joined": "Pridruženo",
+    "label": "Kartica poslužitelja {{server}}",
+    "privacyOff": "Vrijednosti poslužitelja su isključene u postavkama",
+    "querying": "Provjera poslužitelja…",
+    "retry": "Provjeri ponovno",
+    "retryLabel": "Provjeri ponovno {{server}}",
+    "server": "{{server}}",
+    "unreachable": "Poslužitelj nije dostupan",
+    "warning_few": "{{count}} poveznice u ovoj poruci prikazuju vjerodajnice",
+    "warning_one": "{{count}} poveznica u ovoj poruci prikazuje vjerodajnice",
+    "warning_other": "{{count}} poveznica u ovoj poruci prikazuje vjerodajnice"
   }
 }

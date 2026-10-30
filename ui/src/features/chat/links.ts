@@ -2,7 +2,13 @@
  * Which links of a message get a preview card, which images are shown inline, the shared
  * lookups and the rules for embedding video players (FR-1.49, FR-1.50, FR-1.55).
  */
-import { getApi, type InlineImage, type LinkPreview, type VideoEmbed } from "../../api";
+import {
+  getApi,
+  type InlineImage,
+  type LinkPreview,
+  type MumbleLinkStats,
+  type VideoEmbed,
+} from "../../api";
 
 /** More cards than this per message would bury the conversation. */
 export const MAX_PREVIEWS = 3;
@@ -123,10 +129,21 @@ export function loadInlineImage(url: string): Promise<InlineImage | null> {
   return memoized(images, url, "an inline image", () => getApi().inlineImage(url));
 }
 
-/** Forgets loaded previews and images (tests). */
+const cards = new Map<string, Promise<MumbleLinkStats | null>>();
+
+/** The figures the engine's query answers for one link, asked once per link (issue #175). */
+export function loadMumbleStats(url: string, refresh = false): Promise<MumbleLinkStats | null> {
+  if (refresh) cards.delete(url);
+  return memoized(cards, url, "the figures of a chat link", () =>
+    getApi().mumbleLinkStats(url, refresh),
+  );
+}
+
+/** Forgets loaded previews, images and query answers (tests). */
 export function clearPreviews(): void {
   previews.clear();
   images.clear();
+  cards.clear();
 }
 
 /**
