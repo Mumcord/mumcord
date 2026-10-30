@@ -354,6 +354,12 @@ pub struct Settings {
     pub video_ducking_percent: u8,
     pub sounds: SoundSettings,
     pub notifications: NotificationMode,
+    /// The Mumcord "Do Not Disturb" switch (FR-3.111): no notification sounds and no toasts or
+    /// system notifications on any server. Badges still count. Off by default.
+    pub do_not_disturb: bool,
+    /// "Follow system Do Not Disturb" (FR-3.112): the desktop's Do Not Disturb or Focus mode
+    /// also turns Do Not Disturb on. On by default.
+    pub follow_system_dnd: bool,
     pub close_behaviour: CloseBehaviour,
     pub chat_display: ChatDisplay,
     pub log_level: LogLevel,
@@ -462,6 +468,8 @@ impl Default for Settings {
             video_ducking_percent: DEFAULT_VIDEO_DUCKING_PERCENT,
             sounds: SoundSettings::default(),
             notifications: NotificationMode::default(),
+            do_not_disturb: false,
+            follow_system_dnd: true,
             close_behaviour: CloseBehaviour::default(),
             chat_display: ChatDisplay::default(),
             log_level: LogLevel::default(),
@@ -816,6 +824,23 @@ mod tests {
         };
         store.save_settings(&settings).expect("save");
         assert!(store.settings().expect("reload").music_quality);
+    }
+
+    #[test]
+    fn do_not_disturb_is_off_and_follows_the_system_by_default_and_persists() {
+        let (_dir, store) = temp_store();
+        let loaded = store.settings().expect("load");
+        assert!(!loaded.do_not_disturb);
+        assert!(loaded.follow_system_dnd);
+        let settings = Settings {
+            do_not_disturb: true,
+            follow_system_dnd: false,
+            ..Settings::default()
+        };
+        store.save_settings(&settings).expect("save");
+        let reloaded = store.settings().expect("reload");
+        assert!(reloaded.do_not_disturb);
+        assert!(!reloaded.follow_system_dnd);
     }
 
     #[test]
