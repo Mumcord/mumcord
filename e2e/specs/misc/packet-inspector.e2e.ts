@@ -150,6 +150,9 @@ describe("packet inspector (issue #60)", () => {
   it("follows new packets and stops following when scrolled up", async () => {
     const list = $(".pi-table-wrap");
     const follow = button("Follow");
+    // Expanding a row in the earlier test paused following; the toggle resumes it.
+    expect(await follow.getAttribute("aria-pressed")).toBe("false");
+    await follow.click();
     expect(await follow.getAttribute("aria-pressed")).toBe("true");
     // A short list overflows with the few packets already there; the client's own pings
     // (every few seconds) are the new packets that arrive while it is scrolled up.
