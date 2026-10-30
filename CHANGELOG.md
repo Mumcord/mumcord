@@ -30,6 +30,8 @@
 
 - The "Direct messages" list below the channel tree is gone: the private messages overview (Messages button at the top of the server bar) shows every conversation with its unread count and opens it with mouse or keyboard (#219)
 
+- A new **search button in the server bar** opens the public server browser: the list of public Mumble servers the official Mumble client shows. Search by name, address or country, filter by country and ping, hide empty or full servers, and sort by name, country, ping or users. **Connect** saves the server and connects in one click; **Favourite** adds it to your servers. For privacy the list is loaded only when you open the browser, never in the background, and only the rows on screen are pinged (with the standard Mumble ping, one every 50 ms, a few at a time). Everything in the list is treated as untrusted and shown as plain text.
+
 ### Fixed
 
 - Your own messages never play the mention sound or show a notification, even when the server or another session of yours sends them back; they also no longer count as unread (#215)
