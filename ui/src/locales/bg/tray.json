@@ -1,12 +1,23 @@
 {
-  "show": "Покажи Mumcord",
+  "show": "Отвори Mumcord",
+  "settings": "Настройки…",
   "mute": "Заглуши микрофона",
   "deafen": "Оглуши",
   "dnd": "Не безпокойте",
+  "dndSystem": "Не безпокойте (система)",
   "quit": "Изход",
   "disconnected": "Няма връзка",
   "connecting": "Свързване…",
+  "reconnecting": "Повторно свързване…",
   "connected": "Свързан",
+  "connectedIn": "Свързан · {channel}",
+  "serverState": "{server} – {state}",
   "talking": "Свързан – говори",
-  "muted": "Свързан – заглушен"
+  "muted": "Свързан – заглушен",
+  "voiceMenu": "Гласов сървър и канал",
+  "voiceServer": "Гласов сървър",
+  "channelsOf": "Канали · {server}",
+  "moreChannels": "Още канали в Mumcord…",
+  "recentChats": "Последни чатове",
+  "chatUnread": "{name} – {count} непрочетени"
 }

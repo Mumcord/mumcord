@@ -1,12 +1,23 @@
 {
-  "show": "Uri Mumcord",
+  "show": "Iftaħ Mumcord",
+  "settings": "Settings…",
   "mute": "Mutja l-mikrofonu",
   "deafen": "Itfi s-smigħ",
   "dnd": "Tiddisturbax",
+  "dndSystem": "Tiddisturbax (sistema)",
   "quit": "Oħroġ",
   "disconnected": "Mhux konness",
   "connecting": "Qed jikkonnettja…",
+  "reconnecting": "Qed jerġa' jikkonnettja…",
   "connected": "Konness",
+  "connectedIn": "Konness · {channel}",
+  "serverState": "{server} – {state}",
   "talking": "Konness – qed jitkellem",
-  "muted": "Konness – mutjat"
+  "muted": "Konness – mutjat",
+  "voiceMenu": "Server tal-vuċi u kanal",
+  "voiceServer": "Server tal-vuċi",
+  "channelsOf": "Kanali · {server}",
+  "moreChannels": "Aktar kanali f'Mumcord…",
+  "recentChats": "Chats riċenti",
+  "chatUnread": "{name} – {count} mhux moqrija"
 }

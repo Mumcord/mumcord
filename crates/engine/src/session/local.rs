@@ -146,6 +146,14 @@ impl Engine {
             .map_err(|e| EngineError::new(ErrorKind::Io, format!("writing the file failed: {e}")))
     }
 
+    /// Label of a saved server as the server bar shows it (the address when none was given).
+    pub fn server_name(&self, server_id: ServerId) -> EngineResult<Option<String>> {
+        let server = lock(&self.inner.store)
+            .server(server_id)
+            .map_err(store_error)?;
+        Ok(server.map(|s| s.label))
+    }
+
     /// Saved servers in server-bar order.
     pub async fn servers(&self) -> EngineResult<Vec<ServerView>> {
         let servers = lock(&self.inner.store).servers().map_err(store_error)?;
@@ -454,6 +462,12 @@ mod tests {
             .server_add(fields("b", "b.example", "me"))
             .await
             .expect("server");
+
+        assert_eq!(
+            engine.server_name(other.id).expect("name"),
+            Some("b".into())
+        );
+        assert_eq!(engine.server_name(other.id + 100).expect("name"), None);
 
         let view = engine
             .server_set_notifications_muted(muted.id, true)

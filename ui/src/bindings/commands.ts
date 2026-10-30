@@ -391,6 +391,8 @@ export const commands = {
 	dndSetFollowSystem: (on: boolean) => typedError<DndState, ApiError>(__TAURI_INVOKE("dnd_set_follow_system", { on })),
 	/**  The user opened this chat: its system notification is outdated. */
 	notificationDismiss: (serverId: number, conversation: Conversation) => typedError<null, ApiError>(__TAURI_INVOKE("notification_dismiss", { serverId, conversation })),
+	/**  Replaces the tray's unread summary and recent chats. */
+	trayAttentionSet: (attention: TrayAttention) => typedError<null, ApiError>(__TAURI_INVOKE("tray_attention_set", { attention })),
 	/**  Platform support and the own shared track (for the settings). */
 	nowPlayingStatus: () => typedError<NowPlayingStatus, ApiError>(__TAURI_INVOKE("now_playing_status")),
 	/**
@@ -546,6 +548,7 @@ export const events = {
 	syncProgress: makeEvent<SyncProgress, SyncProgress>("sync-progress"),
 	talkStateChanged: makeEvent<TalkStateChanged, TalkStateChanged>("talk-state-changed"),
 	transportChanged: makeEvent<TransportChanged, TransportChanged>("transport-changed"),
+	traySettingsRequested: makeEvent<TraySettingsRequested, TraySettingsRequested>("tray-settings-requested"),
 	unreadChanged: makeEvent<UnreadChanged, UnreadChanged>("unread-changed"),
 	updateAvailable: makeEvent<UpdateAvailable, UpdateAvailable>("update-available"),
 	userRemoved: makeEvent<UserRemoved, UserRemoved>("user-removed"),
@@ -1875,6 +1878,29 @@ export type TransportChanged = {
 	serverId: number,
 	transport: Transport,
 };
+
+/**
+ *  Unread messages, mentions and recent private chats across all servers, for the tray icon's
+ *  badge and menu.
+ */
+export type TrayAttention = {
+	unread: number,
+	mentions: number,
+	/**  Most recent first. */
+	chats: TrayChat[],
+};
+
+/**  A recent private chat for the tray's "Recent chats" menu. */
+export type TrayChat = {
+	serverId: number,
+	conversation: Conversation,
+	/**  Display name of the person (plain text). */
+	name: string,
+	unread: number,
+};
+
+/**  "Settings…" was chosen in the tray menu; the window is already in front. */
+export type TraySettingsRequested = Record<string, never>;
 
 export type UnreadChanged = {
 	serverId: number,

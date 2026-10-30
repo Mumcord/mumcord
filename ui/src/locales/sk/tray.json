@@ -1,12 +1,23 @@
 {
-  "show": "Zobraziť Mumcord",
+  "show": "Otvoriť Mumcord",
+  "settings": "Nastavenia…",
   "mute": "Stlmiť mikrofón",
   "deafen": "Stlmiť zvuk",
   "dnd": "Nerušiť",
+  "dndSystem": "Nerušiť (systém)",
   "quit": "Ukončiť",
   "disconnected": "Nepripojené",
   "connecting": "Pripájanie…",
+  "reconnecting": "Znova sa pripájam…",
   "connected": "Pripojené",
+  "connectedIn": "Pripojené · {channel}",
+  "serverState": "{server} – {state}",
   "talking": "Pripojené – hovorí",
-  "muted": "Pripojené – stlmené"
+  "muted": "Pripojené – stlmené",
+  "voiceMenu": "Hlasový server a kanál",
+  "voiceServer": "Hlasový server",
+  "channelsOf": "Kanály · {server}",
+  "moreChannels": "Ďalšie kanály v Mumcorde…",
+  "recentChats": "Nedávne chaty",
+  "chatUnread": "{name} – {count} neprečítané"
 }

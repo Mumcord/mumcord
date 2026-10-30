@@ -1,12 +1,23 @@
 {
-  "show": "Mumcord anzeigen",
+  "show": "Mumcord öffnen",
+  "settings": "Einstellungen…",
   "mute": "Stummschalten",
   "deafen": "Taub schalten",
   "dnd": "Nicht stören",
+  "dndSystem": "Nicht stören (System)",
   "quit": "Beenden",
   "disconnected": "Nicht verbunden",
   "connecting": "Verbinde…",
+  "reconnecting": "Verbinde erneut…",
   "connected": "Verbunden",
+  "connectedIn": "Verbunden · {channel}",
+  "serverState": "{server} – {state}",
   "talking": "Verbunden – spricht",
-  "muted": "Verbunden – stumm"
+  "muted": "Verbunden – stumm",
+  "voiceMenu": "Sprachserver und Kanal",
+  "voiceServer": "Sprachserver",
+  "channelsOf": "Kanäle · {server}",
+  "moreChannels": "Weitere Kanäle in Mumcord…",
+  "recentChats": "Letzte Chats",
+  "chatUnread": "{name} – {count} ungelesen"
 }

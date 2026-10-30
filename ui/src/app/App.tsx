@@ -3,6 +3,7 @@ import { LiveRegions } from "../a11y";
 import { TooltipLayer } from "../components/Tooltip";
 import { PersonMenuHost, ProfilePreviewHost } from "../features/members";
 import { NotificationsHost } from "../features/notifications";
+import { TraySync } from "../features/tray";
 import { AppShell } from "./AppShell";
 import {
   ChannelsMount,
@@ -26,7 +27,7 @@ import { useView } from "./view";
 import { ViewProvider } from "./ViewProvider";
 
 function MainScreen() {
-  const { overlay, closeOverlay } = useView();
+  const { overlay, closeOverlay, openSettings } = useView();
   useServerTheme();
   useDevToolsCapture();
   const devTools = useDevToolsUnlocked();
@@ -52,6 +53,7 @@ function MainScreen() {
       {overlay === null && <ProfilePreviewHost />}
       {overlay === null && <PersonMenuHost />}
       <NotificationsHost overlayOpen={overlay !== null} onOpenChat={closeOverlay} />
+      <TraySync onOpenSettings={openSettings} />
       {devTools && <InspectorViewShare />}
       <WindowLookShare />
     </>

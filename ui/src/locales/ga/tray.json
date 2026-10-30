@@ -1,12 +1,23 @@
 {
-  "show": "Taispeáin Mumcord",
+  "show": "Oscail Mumcord",
+  "settings": "Socruithe…",
   "mute": "Balbhaigh an micreafón",
   "deafen": "Bodhraigh",
   "dnd": "Ná Cuir Isteach",
+  "dndSystem": "Ná Cuir Isteach (córas)",
   "quit": "Scoir",
   "disconnected": "Gan nasc",
   "connecting": "Ag nascadh…",
+  "reconnecting": "Ag athcheangal…",
   "connected": "Nasctha",
+  "connectedIn": "Nasctha · {channel}",
+  "serverState": "{server} – {state}",
   "talking": "Nasctha – ag labhairt",
-  "muted": "Nasctha – balbhaithe"
+  "muted": "Nasctha – balbhaithe",
+  "voiceMenu": "Freastalaí gutha agus cainéal",
+  "voiceServer": "Freastalaí gutha",
+  "channelsOf": "Cainéil · {server}",
+  "moreChannels": "Tuilleadh cainéal in Mumcord…",
+  "recentChats": "Comhráite le déanaí",
+  "chatUnread": "{name} – {count} gan léamh"
 }

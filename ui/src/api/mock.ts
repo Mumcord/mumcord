@@ -1874,6 +1874,7 @@ export function createMockApi(options: MockOptions = {}): MockApi {
       return Promise.resolve(outcome);
     },
     notificationDismiss: () => Promise.resolve(null),
+    trayAttentionSet: () => Promise.resolve(null),
     dndState: () => Promise.resolve(dnd),
     dndSet: (on) => setDnd({ ...dnd, manual: on }),
     dndSetFollowSystem: (on) => setDnd({ ...dnd, followSystem: on }),

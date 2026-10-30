@@ -1,12 +1,23 @@
 {
-  "show": "Εμφάνιση του Mumcord",
+  "show": "Άνοιγμα του Mumcord",
+  "settings": "Ρυθμίσεις…",
   "mute": "Σίγαση μικροφώνου",
   "deafen": "Κλείσιμο ήχου",
   "dnd": "Μην ενοχλείτε",
+  "dndSystem": "Μην ενοχλείτε (σύστημα)",
   "quit": "Έξοδος",
   "disconnected": "Χωρίς σύνδεση",
   "connecting": "Σύνδεση…",
+  "reconnecting": "Επανασύνδεση…",
   "connected": "Συνδεδεμένος",
+  "connectedIn": "Συνδεδεμένος · {channel}",
+  "serverState": "{server} – {state}",
   "talking": "Συνδεδεμένος – μιλάει",
-  "muted": "Συνδεδεμένος – σε σίγαση"
+  "muted": "Συνδεδεμένος – σε σίγαση",
+  "voiceMenu": "Διακομιστής φωνής και κανάλι",
+  "voiceServer": "Διακομιστής φωνής",
+  "channelsOf": "Κανάλια · {server}",
+  "moreChannels": "Περισσότερα κανάλια στο Mumcord…",
+  "recentChats": "Πρόσφατες συνομιλίες",
+  "chatUnread": "{name} – {count} μη αναγνωσμένα"
 }

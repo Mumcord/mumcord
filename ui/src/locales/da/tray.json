@@ -1,12 +1,23 @@
 {
-  "show": "Vis Mumcord",
+  "show": "Åbn Mumcord",
+  "settings": "Indstillinger…",
   "mute": "Slå mikrofonen fra",
   "deafen": "Slå lyden fra",
   "dnd": "Forstyr ikke",
+  "dndSystem": "Forstyr ikke (system)",
   "quit": "Afslut",
   "disconnected": "Ikke forbundet",
   "connecting": "Forbinder…",
+  "reconnecting": "Forbinder igen…",
   "connected": "Forbundet",
+  "connectedIn": "Forbundet · {channel}",
+  "serverState": "{server} – {state}",
   "talking": "Forbundet – taler",
-  "muted": "Forbundet – mikrofon slået fra"
+  "muted": "Forbundet – mikrofon slået fra",
+  "voiceMenu": "Stemmeserver og kanal",
+  "voiceServer": "Stemmeserver",
+  "channelsOf": "Kanaler · {server}",
+  "moreChannels": "Flere kanaler i Mumcord…",
+  "recentChats": "Seneste chats",
+  "chatUnread": "{name} – {count} ulæste"
 }

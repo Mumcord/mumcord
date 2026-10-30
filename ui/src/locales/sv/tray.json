@@ -1,12 +1,23 @@
 {
-  "show": "Visa Mumcord",
+  "show": "Öppna Mumcord",
+  "settings": "Inställningar…",
   "mute": "Stäng av mikrofonen",
   "deafen": "Stäng av ljudet",
   "dnd": "Stör ej",
+  "dndSystem": "Stör ej (system)",
   "quit": "Avsluta",
   "disconnected": "Inte ansluten",
   "connecting": "Ansluter…",
+  "reconnecting": "Återansluter…",
   "connected": "Ansluten",
+  "connectedIn": "Ansluten · {channel}",
+  "serverState": "{server} – {state}",
   "talking": "Ansluten – pratar",
-  "muted": "Ansluten – mikrofon avstängd"
+  "muted": "Ansluten – mikrofon avstängd",
+  "voiceMenu": "Röstserver och kanal",
+  "voiceServer": "Röstserver",
+  "channelsOf": "Kanaler · {server}",
+  "moreChannels": "Fler kanaler i Mumcord…",
+  "recentChats": "Senaste chattar",
+  "chatUnread": "{name} – {count} olästa"
 }

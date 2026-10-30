@@ -1,0 +1,1 @@
+export { TraySync } from "./TraySync";

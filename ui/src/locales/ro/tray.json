@@ -1,12 +1,23 @@
 {
-  "show": "Arată Mumcord",
+  "show": "Deschide Mumcord",
+  "settings": "Setări…",
   "mute": "Oprește microfonul",
   "deafen": "Oprește sunetul",
   "dnd": "Nu deranja",
+  "dndSystem": "Nu deranja (sistem)",
   "quit": "Închide",
   "disconnected": "Neconectat",
   "connecting": "Se conectează…",
+  "reconnecting": "Se reconectează…",
   "connected": "Conectat",
+  "connectedIn": "Conectat · {channel}",
+  "serverState": "{server} – {state}",
   "talking": "Conectat – vorbește",
-  "muted": "Conectat – microfon oprit"
+  "muted": "Conectat – microfon oprit",
+  "voiceMenu": "Server vocal și canal",
+  "voiceServer": "Server vocal",
+  "channelsOf": "Canale · {server}",
+  "moreChannels": "Mai multe canale în Mumcord…",
+  "recentChats": "Conversații recente",
+  "chatUnread": "{name} – {count} necitite"
 }

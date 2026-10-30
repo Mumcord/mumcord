@@ -34,6 +34,7 @@ pub mod screen_share;
 pub mod servers;
 pub mod session;
 pub mod settings;
+pub mod tray;
 pub mod types;
 pub mod updates;
 pub mod user_stats;
