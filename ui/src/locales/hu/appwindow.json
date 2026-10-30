@@ -14,6 +14,12 @@
     "dismiss": "Értem",
     "openSettings": "Overlay beállításainak megnyitása"
   },
+  "audioDevice": {
+    "title": "Válaszd ki újra a hangeszközeidet",
+    "description": "A Mumcord mostantól külön mutatja a hangeszközeid minden bemenetét és kimenetét. A mentett eszközt egyikhez sem sikerült hozzárendelni, ezért egyelőre a rendszer alapértelmezése van használatban. Eszközt a hangbeállításokban választhatsz.",
+    "dismiss": "Értem",
+    "openSettings": "Hangbeállítások megnyitása"
+  },
   "appImageMenu": {
     "title": "Hozzáadod a Mumcordot az alkalmazásmenühöz?",
     "description": "Így a Mumcord megjelenik az alkalmazásmenüdben. Az ikon és a push-to-talk megfelelően működik Waylanden, és a mumble:// linkek a Mumcordot nyitják meg. Ezt később a Beállításokban módosíthatod.",

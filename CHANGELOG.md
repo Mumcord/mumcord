@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Fixed
+
+- Linux with PipeWire: the device lists show every output and input of the sound server as the desktop's sound settings do, so a multi-endpoint interface such as the RØDECaster Pro II offers "System" and "Chat" as outputs and "Microphone" and "Main" as inputs, with their friendly names, instead of one "USB Audio" entry per direction. The choice is stored by the stable PipeWire node name and the stream plays to exactly that node; hot-plugging updates the list and a missing device falls back to the system default. A device saved from the old list moves to the matching node when there is exactly one, otherwise to the system default with a one-time notice. Without PipeWire the ALSA devices are listed as before (#183)
+
 ## [0.4.4] - 2026-10-30
 
 ### Added

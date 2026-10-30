@@ -14,6 +14,12 @@
     "dismiss": "Razumem",
     "openSettings": "Odpri nastavitve prekrivnega sloja"
   },
+  "audioDevice": {
+    "title": "Znova izberite zvočne naprave",
+    "description": "Mumcord zdaj vsak vhod in izhod vaših zvočnih naprav prikaže posebej. Shranjene naprave ni bilo mogoče povezati z nobenim od njih, zato se zaenkrat uporablja privzeta sistemska naprava. Napravo lahko izberete v nastavitvah zvoka.",
+    "dismiss": "Razumem",
+    "openSettings": "Odpri nastavitve zvoka"
+  },
   "appImageMenu": {
     "title": "Želiš dodati Mumcord v meni aplikacij?",
     "description": "Tako se Mumcord pojavi v meniju aplikacij. Ikona in pritisni za govor v Waylandu delujeta pravilno, povezave mumble:// pa odprejo Mumcord. To lahko pozneje spremeniš v Nastavitvah.",

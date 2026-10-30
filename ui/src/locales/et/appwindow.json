@@ -14,6 +14,12 @@
     "dismiss": "Selge",
     "openSettings": "Ava kattekihi seaded"
   },
+  "audioDevice": {
+    "title": "Vali oma heliseadmed uuesti",
+    "description": "Mumcord näitab nüüd sinu heliseadmete iga sisendit ja väljundit eraldi. Salvestatud seadet ei õnnestunud ühegagi neist siduda, seega kasutatakse praegu süsteemi vaikeseadet. Seadme saad valida heliseadetes.",
+    "dismiss": "Selge",
+    "openSettings": "Ava heliseaded"
+  },
   "appImageMenu": {
     "title": "Kas lisada Mumcord rakenduste menüüsse?",
     "description": "Nii ilmub Mumcord sinu rakenduste menüüsse. Ikoon ja vajuta ja räägi töötavad Waylandis korralikult ning mumble:// lingid avavad Mumcordi. Saad seda hiljem seadetes muuta.",

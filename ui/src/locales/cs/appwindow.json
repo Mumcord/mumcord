@@ -14,6 +14,12 @@
     "dismiss": "Rozumím",
     "openSettings": "Otevřít nastavení overlaye"
   },
+  "audioDevice": {
+    "title": "Vyberte znovu zvuková zařízení",
+    "description": "Mumcord nyní zobrazuje každý vstup a výstup vašich zvukových zařízení zvlášť. Uložené zařízení se nepodařilo přiřadit k žádnému z nich, proto se zatím používá výchozí zařízení systému. Zařízení můžete vybrat v nastavení zvuku.",
+    "dismiss": "Rozumím",
+    "openSettings": "Otevřít nastavení zvuku"
+  },
   "appImageMenu": {
     "title": "Přidat Mumcord do nabídky aplikací?",
     "description": "Mumcord se tak objeví v nabídce aplikací. Ikona a push-to-talk budou pod Waylandem fungovat správně a odkazy mumble:// otevřou Mumcord. Později to můžeš změnit v Nastavení.",

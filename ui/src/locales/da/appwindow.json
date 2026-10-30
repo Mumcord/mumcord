@@ -14,6 +14,12 @@
     "dismiss": "Forstået",
     "openSettings": "Åbn overlay-indstillinger"
   },
+  "audioDevice": {
+    "title": "Vælg dine lydenheder igen",
+    "description": "Mumcord viser nu hver ind- og udgang på dine lydenheder for sig. Din gemte enhed kunne ikke matches med nogen af dem, så systemstandarden bruges indtil videre. Du kan vælge en enhed i lydindstillingerne.",
+    "dismiss": "Forstået",
+    "openSettings": "Åbn lydindstillinger"
+  },
   "appImageMenu": {
     "title": "Føj Mumcord til appmenuen?",
     "description": "Så kommer Mumcord i din appmenu. Ikonet og push-to-talk virker korrekt under Wayland, og mumble://-links åbner Mumcord. Du kan ændre det senere i Indstillinger.",

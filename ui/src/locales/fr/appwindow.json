@@ -14,6 +14,12 @@
     "dismiss": "Compris",
     "openSettings": "Ouvrir les paramètres de l’overlay"
   },
+  "audioDevice": {
+    "title": "Choisissez à nouveau vos appareils audio",
+    "description": "Mumcord affiche désormais séparément chaque entrée et sortie de vos appareils audio. Votre appareil enregistré n'a pu être associé à aucune d'elles ; l'appareil par défaut du système est donc utilisé pour l'instant. Vous pouvez choisir un appareil dans les paramètres audio.",
+    "dismiss": "Compris",
+    "openSettings": "Ouvrir les paramètres audio"
+  },
   "appImageMenu": {
     "title": "Ajouter Mumcord au menu des applications ?",
     "description": "Mumcord apparaîtra dans votre menu des applications. L’icône et le push-to-talk fonctionneront correctement sous Wayland, et les liens mumble:// ouvriront Mumcord. Vous pourrez modifier ce choix plus tard dans les paramètres.",

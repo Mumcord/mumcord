@@ -14,6 +14,12 @@
     "dismiss": "Razumijem",
     "openSettings": "Otvori postavke overlaya"
   },
+  "audioDevice": {
+    "title": "Ponovno odaberite audiouređaje",
+    "description": "Mumcord sada zasebno prikazuje svaki ulaz i izlaz vaših audiouređaja. Spremljeni uređaj nije bilo moguće povezati ni s jednim od njih pa se zasad koristi zadani uređaj sustava. Uređaj možete odabrati u postavkama zvuka.",
+    "dismiss": "Razumijem",
+    "openSettings": "Otvori postavke zvuka"
+  },
   "appImageMenu": {
     "title": "Dodati Mumcord u izbornik aplikacija?",
     "description": "Tako se Mumcord pojavljuje u izborniku aplikacija. Ikona i pritisni za govor ispravno rade na Waylandu, a poveznice mumble:// otvaraju Mumcord. To možeš kasnije promijeniti u Postavkama.",

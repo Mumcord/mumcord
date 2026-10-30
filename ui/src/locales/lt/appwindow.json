@@ -14,6 +14,12 @@
     "dismiss": "Supratau",
     "openSettings": "Atidaryti perdangos nustatymus"
   },
+  "audioDevice": {
+    "title": "Iš naujo pasirinkite garso įrenginius",
+    "description": "Mumcord dabar atskirai rodo kiekvieną jūsų garso įrenginių įvestį ir išvestį. Išsaugoto įrenginio nepavyko susieti nė su viena iš jų, todėl kol kas naudojamas sistemos numatytasis. Įrenginį galite pasirinkti garso nustatymuose.",
+    "dismiss": "Supratau",
+    "openSettings": "Atidaryti garso nustatymus"
+  },
   "appImageMenu": {
     "title": "Pridėti Mumcord į programų meniu?",
     "description": "Taip Mumcord atsiras tavo programų meniu. Piktograma ir „spausk ir kalbėk“ Wayland aplinkoje veiks tinkamai, o mumble:// nuorodos atidarys Mumcord. Vėliau tai gali pakeisti nustatymuose.",

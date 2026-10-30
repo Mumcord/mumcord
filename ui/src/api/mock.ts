@@ -1965,6 +1965,8 @@ export function createMockApi(options: MockOptions = {}): MockApi {
     // Nobody has the removed window overlay switched on in the browser mock.
     windowOverlayNoticePending: () => Promise.resolve(false),
     windowOverlayNoticeDismiss: () => Promise.resolve(null),
+    audioDeviceNoticePending: () => Promise.resolve(false),
+    audioDeviceNoticeDismiss: () => Promise.resolve(null),
   };
 
   // Turns synchronous throws into rejections and applies injected failures.

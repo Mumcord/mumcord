@@ -14,6 +14,12 @@
     "dismiss": "Tuigim",
     "openSettings": "Oscail socruithe an fhorleagain"
   },
+  "audioDevice": {
+    "title": "Roghnaigh do ghléasanna fuaime arís",
+    "description": "Taispeánann Mumcord gach ionchur agus aschur de do ghléasanna fuaime ar leith anois. Níorbh fhéidir do ghléas sábháilte a mheaitseáil le haon cheann acu, mar sin úsáidtear réamhshocrú an chórais faoi láthair. Is féidir leat gléas a roghnú sna socruithe fuaime.",
+    "dismiss": "Tuigim",
+    "openSettings": "Oscail socruithe fuaime"
+  },
   "appImageMenu": {
     "title": "Mumcord a chur le roghchlár na n-aipeanna?",
     "description": "Cuireann sé seo Mumcord i do roghchlár aipeanna. Oibríonn an deilbhín agus brúigh-chun-cainte i gceart ar Wayland, agus osclaíonn naisc mumble:// Mumcord. Is féidir leat é seo a athrú níos déanaí sna Socruithe.",

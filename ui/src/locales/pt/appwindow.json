@@ -14,6 +14,12 @@
     "dismiss": "Entendido",
     "openSettings": "Abrir definições do overlay"
   },
+  "audioDevice": {
+    "title": "Escolha novamente os seus dispositivos de áudio",
+    "description": "O Mumcord agora lista separadamente cada entrada e saída dos seus dispositivos de áudio. Não foi possível associar o dispositivo guardado a nenhuma delas, por isso é usado, por agora, o predefinido do sistema. Pode escolher um dispositivo nas definições de áudio.",
+    "dismiss": "Entendido",
+    "openSettings": "Abrir definições de áudio"
+  },
   "appImageMenu": {
     "title": "Adicionar o Mumcord ao menu de aplicações?",
     "description": "Assim o Mumcord aparece no teu menu de aplicações. O ícone e o push-to-talk funcionam corretamente no Wayland, e as ligações mumble:// abrem o Mumcord. Podes alterar isto mais tarde nas Definições.",

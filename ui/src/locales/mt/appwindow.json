@@ -14,6 +14,12 @@
     "dismiss": "Fhimt",
     "openSettings": "Iftaħ is-settings tal-overlay"
   },
+  "audioDevice": {
+    "title": "Erġa' agħżel it-tagħmir tal-awdjo tiegħek",
+    "description": "Mumcord issa juri kull input u output tat-tagħmir tal-awdjo tiegħek separatament. It-tagħmir issejvjat ma setax jitqabbel ma' l-ebda wieħed minnhom, għalhekk għalissa qed jintuża d-default tas-sistema. Tista' tagħżel tagħmir fis-settings tal-awdjo.",
+    "dismiss": "Fhimt",
+    "openSettings": "Iftaħ is-settings tal-awdjo"
+  },
   "appImageMenu": {
     "title": "Iżżid lil Mumcord mal-menu tal-apps?",
     "description": "B'hekk Mumcord jidher fil-menu tal-apps tiegħek. L-ikona u push-to-talk jaħdmu sew fuq Wayland, u l-links mumble:// jiftħu Mumcord. Tista' tibdel dan aktar tard fis-Settings.",

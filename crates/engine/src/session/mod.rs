@@ -30,6 +30,7 @@ use mumcord_audio::bitrate::{
     BitrateController, LinkStats as BitrateStats, Transport as BitrateTransport,
 };
 use mumcord_audio::dsp::{DspControls, MicTest, MicTestPhase as DspPhase};
+use mumcord_audio::io::{AudioIo, DeviceMigration, Direction};
 use mumcord_audio::mixer::PacketSender;
 use mumcord_protocol::pki_types::{CertificateDer, PrivateKeyDer, PrivatePkcs8KeyDer};
 use mumcord_protocol::{
@@ -204,6 +205,8 @@ struct Inner {
     /// Held while the audio devices start, so concurrent first uses open the microphone once
     /// (every open can show the OS microphone prompt).
     audio_start: tokio::sync::Mutex<()>,
+    /// Saved device choices were checked against the current device list (issue #183).
+    audio_devices_migrated: std::sync::Once,
     /// `None` until loaded from secure storage; then `Some(None)` before the wizard ran.
     identity: Mutex<Option<Option<Identity>>>,
     events: Events,
@@ -477,6 +480,7 @@ impl Engine {
             store,
             secrets: Arc::new(secrets),
             audio_start: tokio::sync::Mutex::new(()),
+            audio_devices_migrated: std::sync::Once::new(),
             identity: Mutex::new(None),
             events,
             controls,
@@ -1250,7 +1254,6 @@ impl Engine {
     /// Devices and connection counters for the diagnostic file (no names or addresses
     /// beyond device names, which the diagnostics module documents).
     pub fn diagnostic_info(&self, app_version: &str) -> crate::diag::DiagnosticInfo {
-        use mumcord_audio::io::{AudioIo, Direction};
         let mut info = crate::diag::DiagnosticInfo::new(app_version);
         for (direction, is_input) in [(Direction::Input, true), (Direction::Output, false)] {
             // Without a connection or mic test no audio runs; the list is still wanted then.
@@ -2581,12 +2584,55 @@ impl Inner {
             .ok_or_else(|| EngineError::new(ErrorKind::NotFound, "unknown person"))
     }
 
+    /// Device choices saved from the ALSA device list before issue #183 are mapped onto the
+    /// sound server's devices. Runs once per process, before the settings reach the UI or open
+    /// the devices; a choice that cannot be mapped is reset to the system default, and the
+    /// notice tells the user.
+    pub(crate) fn migrate_audio_devices(&self) {
+        self.audio_devices_migrated.call_once(|| {
+            let store = lock(&self.store);
+            let mut settings = match store.settings() {
+                Ok(settings) => settings,
+                Err(e) => {
+                    tracing::warn!(error = %e, "reading settings for the device migration failed");
+                    return;
+                }
+            };
+            let mut changed = false;
+            for (direction, saved) in [
+                (Direction::Input, &mut settings.input_device),
+                (Direction::Output, &mut settings.output_device),
+            ] {
+                let Some(id) = saved.as_deref() else { continue };
+                match AudioIo::migrate_device(direction, id) {
+                    Ok(DeviceMigration::Keep) => continue,
+                    Ok(DeviceMigration::Replace(new)) => *saved = Some(new),
+                    Ok(DeviceMigration::Default { notice }) => {
+                        *saved = None;
+                        settings.audio_device_notice |= notice;
+                    }
+                    // The id stays; a later start tries again.
+                    Err(e) => {
+                        tracing::warn!(?direction, error = %e, "migrating the saved audio device failed");
+                        continue;
+                    }
+                }
+                tracing::info!(?direction, "saved audio device migrated to the new device list");
+                changed = true;
+            }
+            if changed && let Err(e) = store.save_settings(&settings) {
+                tracing::warn!(error = %e, "saving the migrated audio devices failed");
+            }
+        });
+    }
+
     /// Starts the audio devices on first use.
     async fn ensure_audio(self: &Arc<Self>) -> EngineResult<()> {
         let _starting = self.audio_start.lock().await;
         if lock(&self.core).audio.is_some() {
             return Ok(());
         }
+        self.migrate_audio_devices();
         let settings = lock(&self.store).settings().map_err(store_error)?;
         let events = self.events.clone();
         let audio = self
