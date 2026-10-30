@@ -280,9 +280,9 @@ describe("noise suppression backends", () => {
       expect(levels.speechDb).toBeGreaterThan(off.speechDb - SPEECH_TOLERANCE_DB);
       expect(levels.gapDb).toBeLessThan(off.gapDb - MIN_REDUCTION_DB);
     }
-    // nnnoiseless measuring like the refused run shows that the refused run used the fallback, and
-    // rnnoise-rs, accepted by now, must be doing more than the fallback (the codec test measures
-    // 66 dB against nnnoiseless' 13.6 dB on this clip), so its run has to be quieter.
+    // nnnoiseless measuring like the refused run shows that the refused run used the fallback.
+    // rnnoise-rs is accepted by now and removes more than the fallback on this clip: about 22 dB
+    // against nnnoiseless' 15 dB measured offline, so its run has to be quieter.
     expect(Math.abs((sent.get("nnnoiseless") as Levels).gapDb - refused.gapDb)).toBeLessThan(
       RUN_TOLERANCE_DB,
     );
