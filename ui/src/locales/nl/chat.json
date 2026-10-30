@@ -89,12 +89,17 @@
     "hideDescription": "Kanaalbeschrijving verbergen"
   },
   "mention": {
-    "list": "Vermeldbare personen",
-    "found_one": "{{count}} persoon voorgesteld. Gebruik de pijltjestoetsen en druk op Enter om in te voegen.",
-    "found_other": "{{count}} personen voorgesteld. Gebruik de pijltjestoetsen en druk op Enter om in te voegen.",
+    "list": "Vermeldingssuggesties",
+    "found_one": "Suggesties: {{count}}. Gebruik de pijltjestoetsen en daarna Enter om in te voegen.",
+    "found_other": "Suggesties: {{count}}. Gebruik de pijltjestoetsen en daarna Enter om in te voegen.",
     "none": "Niemand gevonden",
     "mentionsYou": "Vermeldt jou",
-    "chipLabel": "{{name}}, vermelding"
+    "chipLabel": "{{name}}, vermelding",
+    "groupsHeading": "Vermeldingen",
+    "peopleHeading": "Personen",
+    "channelHint": "Iedereen in {{channel}} melden ({{count}})",
+    "allHint": "Iedereen melden die dit kanaal kan lezen ({{count}})",
+    "keys": "↑↓ kiezen · Enter invoegen · Esc sluiten"
   },
   "preview": {
     "open": "Openen in browser",

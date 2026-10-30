@@ -7,10 +7,11 @@
 import { useSyncExternalStore } from "react";
 import { getApi, type MumcordApi, type Unsubscribe } from "../../api";
 import { getServerStateOf, selfUser } from "../channels/serverStore";
-import { bodyMentions } from "../chat/mentions";
+import { bodyMentions, groupMentioned } from "../chat/mentions";
 import { conversationKey, conversationMessages } from "../chat/chatStore";
 import { repliesToOwn } from "../chat/reply";
 import type { FollowState } from "../follow/followStore";
+import { groupMentionsMuted } from "./store";
 
 type Mentions = ReadonlyMap<number, ReadonlyMap<string, number>>;
 
@@ -35,10 +36,18 @@ function bind(api: MumcordApi): void {
   mentions = new Map();
   unsubscribers = [
     api.on("messageReceived", ({ serverId, message }) => {
-      const name = selfUser(getServerStateOf(serverId))?.name;
-      if (message.own || name === undefined) return;
+      const self = selfUser(getServerStateOf(serverId));
+      if (message.own || self === undefined) return;
+      const { name, channelId } = self;
       const history = conversationMessages(message.conversation, serverId);
-      if (!bodyMentions(message.body, [name]) && !repliesToOwn(message, name, history)) return;
+      const group = { ownChannel: channelId, muted: groupMentionsMuted(serverId) };
+      if (
+        !bodyMentions(message.body, [name]) &&
+        !repliesToOwn(message, name, history) &&
+        !groupMentioned(message.body, message.conversation, group)
+      ) {
+        return;
+      }
       const key = conversationKey(message.conversation);
       update(serverId, (current) => current.set(key, (current.get(key) ?? 0) + 1));
     }),

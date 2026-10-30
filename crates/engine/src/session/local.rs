@@ -113,6 +113,7 @@ fn server_view(server: SavedServer, has_password: bool) -> ServerView {
         always_connect_at_start: server.always_connect_at_start,
         was_voice_server_at_quit: server.was_voice_server_at_quit,
         notifications_muted: server.notifications_muted,
+        group_mentions_muted: server.group_mentions_muted,
         theme_id: server.theme_id,
         identity_id: server.identity_id,
     }
@@ -589,6 +590,26 @@ impl Engine {
                 .map_err(store_error)?
                 .ok_or_else(|| EngineError::new(ErrorKind::NotFound, "unknown server"))?;
             saved.notifications_muted = muted;
+            store.update_server(&saved).map_err(store_error)?;
+            saved
+        };
+        let has_password = self.apply_password(id, PasswordChange::Keep).await?;
+        Ok(server_view(saved, has_password))
+    }
+
+    /// Turns `@all` and `@channel` mentions on this server off or back on (issue #70).
+    pub async fn server_set_group_mentions_muted(
+        &self,
+        id: ServerId,
+        muted: bool,
+    ) -> EngineResult<ServerView> {
+        let saved = {
+            let store = lock(&self.inner.store);
+            let mut saved = store
+                .server(id)
+                .map_err(store_error)?
+                .ok_or_else(|| EngineError::new(ErrorKind::NotFound, "unknown server"))?;
+            saved.group_mentions_muted = muted;
             store.update_server(&saved).map_err(store_error)?;
             saved
         };
@@ -1085,5 +1106,46 @@ mod tests {
             .await
             .expect("unmute");
         assert!(!view.notifications_muted);
+    }
+
+    #[tokio::test]
+    async fn group_mentions_mute_is_saved_per_server() {
+        let dir = tempfile::tempdir().expect("tempdir");
+        let (engine, _rx) = Engine::new(
+            dir.path(),
+            crate::SecretStore::in_memory(),
+            tokio::runtime::Handle::current(),
+        )
+        .expect("engine");
+        let muted = engine
+            .server_add(fields("a", "a.example", "me"))
+            .await
+            .expect("server");
+        let other = engine
+            .server_add(fields("b", "b.example", "me"))
+            .await
+            .expect("server");
+        assert!(!muted.group_mentions_muted);
+
+        let view = engine
+            .server_set_group_mentions_muted(muted.id, true)
+            .await
+            .expect("mute");
+        assert!(view.group_mentions_muted && !view.notifications_muted);
+        let servers = engine.servers().await.expect("servers");
+        let muted_of = |id| {
+            servers
+                .iter()
+                .find(|s| s.id == id)
+                .map(|s| s.group_mentions_muted)
+        };
+        assert_eq!(muted_of(muted.id), Some(true));
+        assert_eq!(muted_of(other.id), Some(false));
+
+        let view = engine
+            .server_set_group_mentions_muted(muted.id, false)
+            .await
+            .expect("unmute");
+        assert!(!view.group_mentions_muted);
     }
 }

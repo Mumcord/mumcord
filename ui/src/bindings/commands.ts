@@ -41,6 +41,8 @@ export const commands = {
 	serverSetAlwaysConnect: (serverId: number, enabled: boolean) => typedError<SavedServer, ApiError>(__TAURI_INVOKE("server_set_always_connect", { serverId, enabled })),
 	/**  Mutes or unmutes all notifications of the server, mentions included (FR-2.10). */
 	serverSetNotificationsMuted: (serverId: number, muted: boolean) => typedError<SavedServer, ApiError>(__TAURI_INVOKE("server_set_notifications_muted", { serverId, muted })),
+	/**  Turns `@all` and `@channel` mentions on the server off or back on (issue #70). */
+	serverSetGroupMentionsMuted: (serverId: number, muted: boolean) => typedError<SavedServer, ApiError>(__TAURI_INVOKE("server_set_group_mentions_muted", { serverId, muted })),
 	/**  Sets the theme shown with the server; `null` goes back to the app theme (FR-2.17). */
 	serverSetTheme: (serverId: number, themeId: string | null) => typedError<SavedServer, ApiError>(__TAURI_INVOKE("server_set_theme", { serverId, themeId })),
 	/**  Parses a pasted `mumble://` link; fails with `invalidInput` if malformed. */
@@ -1663,6 +1665,8 @@ export type SavedServer = {
 	wasVoiceServerAtQuit: boolean,
 	/**  No toasts or desktop notifications from this server; badges stay (FR-2.10). */
 	notificationsMuted: boolean,
+	/**  `@all` and `@channel` do not count as mentions on this server (issue #70). */
+	groupMentionsMuted: boolean,
 	/**  Theme shown with this server; `null` uses the app theme (FR-2.17). */
 	themeId: string | null,
 	/**  Identity this server connects with; `null` uses the default identity (issue #148). */

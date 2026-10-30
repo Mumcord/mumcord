@@ -89,12 +89,17 @@
     "hideDescription": "Piilota kanavan kuvaus"
   },
   "mention": {
-    "list": "Mainittavat henkilöt",
-    "found_one": "{{count}} henkilö ehdotettu. Valitse nuolinäppäimillä ja lisää Enterillä.",
-    "found_other": "{{count}} henkilöä ehdotettu. Valitse nuolinäppäimillä ja lisää Enterillä.",
+    "list": "Maininnan ehdotukset",
+    "found_one": "Ehdotuksia: {{count}}. Valitse nuolinäppäimillä ja lisää Enterillä.",
+    "found_other": "Ehdotuksia: {{count}}. Valitse nuolinäppäimillä ja lisää Enterillä.",
     "none": "Ketään ei löytynyt",
     "mentionsYou": "Mainitsee sinut",
-    "chipLabel": "{{name}}, maininta"
+    "chipLabel": "{{name}}, maininta",
+    "groupsHeading": "Maininnat",
+    "peopleHeading": "Ihmiset",
+    "channelHint": "Ilmoita kaikille kanavalla {{channel}} ({{count}})",
+    "allHint": "Ilmoita kaikille, jotka voivat lukea tätä kanavaa ({{count}})",
+    "keys": "↑↓ valitse · Enter lisää · Esc sulje"
   },
   "preview": {
     "open": "Avaa selaimessa",

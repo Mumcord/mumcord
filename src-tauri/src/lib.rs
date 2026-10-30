@@ -73,6 +73,7 @@ fn specta_builder() -> Builder<tauri::Wry> {
             servers::servers_reorder,
             servers::server_set_always_connect,
             servers::server_set_notifications_muted,
+            servers::server_set_group_mentions_muted,
             servers::server_set_theme,
             servers::parse_mumble_link,
             session::connect,

@@ -36,6 +36,7 @@
     "reconnect": "Znova pripojiť",
     "alwaysConnect": "Vždy pripojiť pri spustení",
     "muteNotifications": "Stlmiť upozornenia",
+    "muteGroupMentions": "Stlmiť @all a @channel",
     "theme": "Motív…",
     "showWelcome": "Zobraziť uvítaciu správu",
     "identity": "Identita…"

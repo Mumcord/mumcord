@@ -36,6 +36,7 @@
     "reconnect": "Ponovno se poveži",
     "alwaysConnect": "Uvijek se poveži pri pokretanju",
     "muteNotifications": "Utišaj obavijesti",
+    "muteGroupMentions": "Utišaj @all i @channel",
     "theme": "Tema…",
     "showWelcome": "Prikaži poruku dobrodošlice",
     "identity": "Identitet…"

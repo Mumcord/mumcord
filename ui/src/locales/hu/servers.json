@@ -36,6 +36,7 @@
     "reconnect": "Újracsatlakozás",
     "alwaysConnect": "Mindig csatlakozzon indításkor",
     "muteNotifications": "Értesítések némítása",
+    "muteGroupMentions": "@all és @channel némítása",
     "theme": "Téma…",
     "showWelcome": "Üdvözlő üzenet megjelenítése",
     "identity": "Identitás…"

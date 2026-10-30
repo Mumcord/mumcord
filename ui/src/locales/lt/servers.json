@@ -36,6 +36,7 @@
     "reconnect": "Prisijungti iš naujo",
     "alwaysConnect": "Visada jungtis paleidžiant",
     "muteNotifications": "Nutildyti pranešimus",
+    "muteGroupMentions": "Nutildyti @all ir @channel",
     "theme": "Tema…",
     "showWelcome": "Rodyti pasveikinimo žinutę",
     "identity": "Tapatybė…"

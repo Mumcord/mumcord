@@ -195,6 +195,10 @@ const MIGRATIONS: &[&str] = &[
     ALTER TABLE saved_server ADD COLUMN identity_id INTEGER REFERENCES identity (id)
         ON DELETE SET NULL;
     ",
+    // v15: turning off `@all` / `@channel` mentions per server (issue #70, Q1.6).
+    r"
+    ALTER TABLE saved_server ADD COLUMN group_mentions_muted INTEGER NOT NULL DEFAULT 0;
+    ",
 ];
 
 /// Handle to the local database. Not `Sync`; callers share it behind a mutex.
@@ -462,6 +466,7 @@ pub(crate) mod tests {
         let server = &store.servers().expect("servers")[0];
         assert_eq!(server.label, "Old");
         assert!(!server.always_connect_at_start && !server.notifications_muted);
+        assert!(!server.group_mentions_muted);
         assert!(!server.was_voice_server_at_quit);
         assert_eq!(
             (server.connected_at_quit, server.theme_id.as_deref()),

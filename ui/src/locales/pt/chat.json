@@ -92,13 +92,18 @@
     "hideDescription": "Ocultar descrição do canal"
   },
   "mention": {
-    "list": "Pessoas que podes mencionar",
-    "found_one": "{{count}} pessoa sugerida. Usa as setas e depois Enter para inserir.",
-    "found_many": "{{count}} pessoas sugeridas. Usa as setas e depois Enter para inserir.",
-    "found_other": "{{count}} pessoas sugeridas. Usa as setas e depois Enter para inserir.",
+    "list": "Sugestões de menções",
+    "found_one": "Sugestões: {{count}}. Use as setas e depois Enter para inserir.",
+    "found_many": "Sugestões: {{count}}. Use as setas e depois Enter para inserir.",
+    "found_other": "Sugestões: {{count}}. Use as setas e depois Enter para inserir.",
     "none": "Ninguém encontrado",
     "mentionsYou": "Menciona-te",
-    "chipLabel": "{{name}}, menção"
+    "chipLabel": "{{name}}, menção",
+    "groupsHeading": "Menções",
+    "peopleHeading": "Pessoas",
+    "channelHint": "Notificar todos em {{channel}} ({{count}})",
+    "allHint": "Notificar todos os que podem ler este canal ({{count}})",
+    "keys": "↑↓ escolher · Enter inserir · Esc fechar"
   },
   "preview": {
     "open": "Abrir no navegador",

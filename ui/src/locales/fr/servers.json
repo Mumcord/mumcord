@@ -36,6 +36,7 @@
     "reconnect": "Se reconnecter",
     "alwaysConnect": "Toujours se connecter au démarrage",
     "muteNotifications": "Couper les notifications",
+    "muteGroupMentions": "Mettre en sourdine @all et @channel",
     "theme": "Thème…",
     "showWelcome": "Afficher le message de bienvenue",
     "identity": "Identité…"

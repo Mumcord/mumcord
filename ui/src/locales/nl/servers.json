@@ -36,6 +36,7 @@
     "reconnect": "Opnieuw verbinden",
     "alwaysConnect": "Altijd verbinden bij opstarten",
     "muteNotifications": "Meldingen dempen",
+    "muteGroupMentions": "@all en @channel dempen",
     "theme": "Thema…",
     "showWelcome": "Welkomstbericht tonen",
     "identity": "Identiteit…"

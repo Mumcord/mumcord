@@ -36,6 +36,7 @@
     "reconnect": "Savienot no jauna",
     "alwaysConnect": "Vienmēr savienot palaišanas laikā",
     "muteNotifications": "Apklusināt paziņojumus",
+    "muteGroupMentions": "Apklusināt @all un @channel",
     "theme": "Motīvs…",
     "showWelcome": "Rādīt sveiciena ziņu",
     "identity": "Identitāte…"
