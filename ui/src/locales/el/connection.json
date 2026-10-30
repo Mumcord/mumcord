@@ -58,5 +58,26 @@
     "perMinute": "Τελευταία {{minutes}} λεπ.: {{value}} ανά λεπτό.",
     "concealedShare": "Τελευταία {{minutes}} λεπ.: {{value}} % των ληφθέντων πλαισίων.",
     "processingMax": "Τελευταία {{minutes}} λεπ.: μέγ. {{value}} ms από {{budget}} ms ανά πλαίσιο."
+  },
+  "quick": {
+    "open": "Ποιότητα φωνής",
+    "title": "Ποιότητα φωνής",
+    "status": "Ping {{latency}}, απώλεια {{loss}}",
+    "lowLatency": "Λειτουργία χαμηλής καθυστέρησης",
+    "lowLatencyHint": "Μικρότερα πακέτα και buffers για παιχνίδι μουσικής μαζί. Περισσότερο εύρος ζώνης, λιγότερη ανθεκτικότητα.",
+    "lowLatencyComingSoon": "Σύντομα διαθέσιμο",
+    "voiceSettings": "Ρυθμίσεις φωνής…",
+    "applies": "Εφαρμόζεται αμέσως, αποθηκεύεται όπως στις Ρυθμίσεις → Ήχος",
+    "keys": "Esc κλείνει · ↑↓ μετακινεί · ← → ρυθμίζει",
+    "bandwidthLabel": "Εκτιμώμενο εύρος ζώνης με κεφαλίδες",
+    "bandwidthValue": "≈ {{value}} από {{limit}} kbit/s",
+    "bandwidthValueNoLimit": "≈ {{value}} kbit/s",
+    "bandwidthHintWithin": "Με λειτουργία χαμηλής καθυστέρησης: ≈ {{value}} kbit/s (πακέτα 10 ms), ακόμα εντός ορίου.",
+    "bandwidthHintOver": "Με λειτουργία χαμηλής καθυστέρησης: ≈ {{value}} kbit/s (πακέτα 10 ms), πάνω από το όριο.",
+    "bandwidthHintNoLimit": "Με λειτουργία χαμηλής καθυστέρησης: ≈ {{value}} kbit/s (πακέτα 10 ms).",
+    "beta": "Beta",
+    "moreInfo": "Περισσότερες πληροφορίες: {{topic}}",
+    "effectiveShort": "Αποστολή τώρα",
+    "effectiveTip": "Ο ρυθμός bit που αποστέλλεται τώρα, μετά την προσαρμογή στην απώλεια πακέτων."
   }
 }

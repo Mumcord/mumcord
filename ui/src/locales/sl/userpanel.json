@@ -8,7 +8,10 @@
     "muted": "Mikrofon utišan",
     "unmuted": "Mikrofon vklopljen",
     "deafened": "Zvok izklopljen. Drugih ne slišiš in tvoj mikrofon je utišan",
-    "undeafened": "Zvok vklopljen"
+    "undeafened": "Zvok vklopljen",
+    "leftVoice": "Glas na strežniku {{server}} zapuščen",
+    "disconnected": "Prekinjena povezava s strežnikom {{server}}",
+    "disconnectedAll": "Prekinjena povezava z vsemi strežniki"
   },
   "readOnly": {
     "text": "Samo bereš – pridruži se kanalu, da lahko govoriš.",
@@ -95,5 +98,35 @@
     "line": "Glas: {{channel}} · {{server}}",
     "server": "Glas: {{server}}",
     "show": "{{location}} – pokaži ta strežnik"
+  },
+  "disconnectMenu": {
+    "label": "Možnosti prekinitve",
+    "open": "Več možnosti prekinitve",
+    "leaveVoice": "Zapusti glas",
+    "leaveVoiceHint": "Nehaj govoriti in poslušati, ostani povezan za klepet",
+    "disconnectHint": "Zapri povezavo s tem strežnikom",
+    "switchTo": "Premakni glas na {{server}}",
+    "all": "Prekini povezavo z vsemi strežniki …",
+    "allHint": "Zapri vse povezave s strežniki"
+  },
+  "disconnectAll": {
+    "title": "Prekiniti povezavo z vsemi strežniki?",
+    "message": "Prekiniti povezavo z vsemi {{total}} strežniki?",
+    "confirm": "Prekini"
+  },
+  "audio": {
+    "inputOptions": "Možnosti mikrofona",
+    "outputOptions": "Možnosti zvočnikov",
+    "inputDevices": "Vhodna naprava",
+    "outputDevices": "Izhodna naprava",
+    "systemDefault": "Sistemska privzeta",
+    "noDevices": "Najdena ni nobena naprava",
+    "noiseSuppression": "Zmanjševanje šuma",
+    "testSound": "Preizkusni zvok",
+    "voiceSettings": "Nastavitve glasu…",
+    "fallbackInput": "Mikrofon je bil odklopljen. Uporablja se sistemska privzeta naprava.",
+    "fallbackOutput": "Izhodna naprava je bila odklopljena. Uporablja se sistemska privzeta naprava.",
+    "volume": "Glasnost",
+    "level": "Raven"
   }
 }

@@ -1,11 +1,12 @@
 //! Channel tree, joining channels and channel passwords (FR-1.15, FR-1.16, FR-2.78).
 
-use mumcord_engine::{ChannelPasswordState, ChannelView, Engine};
+use mumcord_engine::{ChannelPasswordState, ChannelPasswordView, ChannelView, Engine};
 use serde::{Deserialize, Serialize};
 use specta::Type;
 use tauri::State;
 use tauri_specta::Event;
 
+use super::chat::rfc3339;
 use super::types::{ApiResult, ChannelId, ServerId, to_engine_server_id};
 
 /// What the server's ACL allows the own user in a channel (from PermissionQuery).
@@ -90,6 +91,46 @@ pub struct ChannelPasswordPrompt {
     pub step: ChannelPasswordStep,
 }
 
+/// A stored channel password without the password itself (FR-2.78, issue #146).
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, Type)]
+#[serde(rename_all = "camelCase")]
+pub struct SavedChannelPassword {
+    /// The user's own name; `null` shows the channels, or "Password N" without any.
+    pub label: Option<String>,
+    /// The channels the password was entered for.
+    pub channels: Vec<SavedPasswordChannel>,
+    /// RFC 3339; `null` if not used since Mumcord remembers it.
+    pub last_used_at: Option<String>,
+}
+
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, Type)]
+#[serde(rename_all = "camelCase")]
+pub struct SavedPasswordChannel {
+    pub channel_id: ChannelId,
+    /// Path below the root as the channel was named then.
+    pub path: Vec<String>,
+    /// `false` when the channel was renamed or removed; `null` while not connected.
+    pub found: Option<bool>,
+}
+
+impl From<ChannelPasswordView> for SavedChannelPassword {
+    fn from(v: ChannelPasswordView) -> Self {
+        Self {
+            label: v.label,
+            channels: v
+                .channels
+                .into_iter()
+                .map(|c| SavedPasswordChannel {
+                    channel_id: c.channel_id,
+                    path: c.path,
+                    found: c.found,
+                })
+                .collect(),
+            last_used_at: v.last_used_at.map(rfc3339),
+        }
+    }
+}
+
 impl From<ChannelView> for ChannelInfo {
     fn from(v: ChannelView) -> Self {
         Self {
@@ -120,6 +161,15 @@ pub fn channel_join(
     Ok(engine.join_channel(to_engine_server_id(server_id), channel_id)?)
 }
 
+/// Stops voice on the voice server but keeps every connection: the server turns read-only
+/// (self-deafened) and no server has voice until the next explicit join.
+#[tauri::command]
+#[specta::specta]
+pub fn voice_leave(engine: State<'_, Engine>) -> ApiResult<()> {
+    engine.leave_voice();
+    Ok(())
+}
+
 /// Retries a refused join with a channel password, which is stored for the server; the
 /// outcome arrives as `channelPasswordPrompt` (FR-2.78).
 #[tauri::command]
@@ -135,15 +185,33 @@ pub async fn channel_join_with_password(
         .await?)
 }
 
-/// Number of stored channel passwords of a server; they are never handed out.
+/// The stored channel passwords of a server, in order, with the channels they were entered
+/// for; the passwords themselves are never handed out.
 #[tauri::command]
 #[specta::specta]
-pub async fn channel_password_count(
+pub async fn channel_passwords(
     engine: State<'_, Engine>,
     server_id: ServerId,
-) -> ApiResult<u32> {
+) -> ApiResult<Vec<SavedChannelPassword>> {
     Ok(engine
-        .channel_password_count(to_engine_server_id(server_id))
+        .channel_passwords(to_engine_server_id(server_id))
+        .await?
+        .into_iter()
+        .map(Into::into)
+        .collect())
+}
+
+/// Names a stored channel password by its position; an empty label goes back to the default.
+#[tauri::command]
+#[specta::specta]
+pub async fn channel_password_rename(
+    engine: State<'_, Engine>,
+    server_id: ServerId,
+    index: u32,
+    label: String,
+) -> ApiResult<()> {
+    Ok(engine
+        .channel_password_rename(to_engine_server_id(server_id), index, label)
         .await?)
 }
 

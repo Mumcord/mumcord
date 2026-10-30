@@ -69,9 +69,12 @@ export function AudioHealthRating(props: {
 export function AudioRatingBadge({
   rating,
   issue,
+  compact = false,
 }: {
   rating: AudioRating;
   issue: AudioIssue | null;
+  /** Leaves out the likely cause (shown elsewhere with `AudioRatingReason`). */
+  compact?: boolean;
 }) {
   const { t } = useTranslation("connection");
   const reason = useRatingReason(issue);
@@ -85,7 +88,13 @@ export function AudioRatingBadge({
         </span>
         <span aria-hidden="true">{t(`rating.${rating}`)}</span>
       </span>
-      {reason !== null && <span className="audio-badge__reason">{reason}</span>}
+      {!compact && reason !== null && <span className="audio-badge__reason">{reason}</span>}
     </span>
   );
+}
+
+/** The likely cause of a poor or fair rating as a line of its own; nothing when all is well. */
+export function AudioRatingReason({ issue }: { issue: AudioIssue | null }) {
+  const reason = useRatingReason(issue);
+  return reason === null ? null : <p className="settings-hint">{reason}</p>;
 }

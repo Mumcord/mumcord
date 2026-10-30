@@ -65,12 +65,22 @@ export const commands = {
 	/**  Enters the channel's voice; fails with `permissionDenied` if not permitted. */
 	channelJoin: (serverId: number, channelId: number) => typedError<null, ApiError>(__TAURI_INVOKE("channel_join", { serverId, channelId })),
 	/**
+	 *  Stops voice on the voice server but keeps every connection: the server turns read-only
+	 *  (self-deafened) and no server has voice until the next explicit join.
+	 */
+	voiceLeave: () => typedError<null, ApiError>(__TAURI_INVOKE("voice_leave")),
+	/**
 	 *  Retries a refused join with a channel password, which is stored for the server; the
 	 *  outcome arrives as `channelPasswordPrompt` (FR-2.78).
 	 */
 	channelJoinWithPassword: (serverId: number, channelId: number, password: string) => typedError<null, ApiError>(__TAURI_INVOKE("channel_join_with_password", { serverId, channelId, password })),
-	/**  Number of stored channel passwords of a server; they are never handed out. */
-	channelPasswordCount: (serverId: number) => typedError<number, ApiError>(__TAURI_INVOKE("channel_password_count", { serverId })),
+	/**
+	 *  The stored channel passwords of a server, in order, with the channels they were entered
+	 *  for; the passwords themselves are never handed out.
+	 */
+	channelPasswords: (serverId: number) => typedError<SavedChannelPassword[], ApiError>(__TAURI_INVOKE("channel_passwords", { serverId })),
+	/**  Names a stored channel password by its position; an empty label goes back to the default. */
+	channelPasswordRename: (serverId: number, index: number, label: string) => typedError<null, ApiError>(__TAURI_INVOKE("channel_password_rename", { serverId, index, label })),
 	/**  Removes stored channel passwords by their position in the list. */
 	channelPasswordsRemove: (serverId: number, indices: number[]) => typedError<null, ApiError>(__TAURI_INVOKE("channel_passwords_remove", { serverId, indices })),
 	/**
@@ -257,6 +267,13 @@ export const commands = {
 	windowOverlayNoticePending: () => typedError<boolean, ApiError>(__TAURI_INVOKE("window_overlay_notice_pending")),
 	/**  Marks the notice as shown so it never comes back. */
 	windowOverlayNoticeDismiss: () => typedError<null, ApiError>(__TAURI_INVOKE("window_overlay_notice_dismiss")),
+	/**
+	 *  Whether the user still has to be told that their saved audio device was reset to the system
+	 *  default because it could not be matched to the new device list (issue #183).
+	 */
+	audioDeviceNoticePending: () => typedError<boolean, ApiError>(__TAURI_INVOKE("audio_device_notice_pending")),
+	/**  Marks the audio device notice as shown so it never comes back. */
+	audioDeviceNoticeDismiss: () => typedError<null, ApiError>(__TAURI_INVOKE("audio_device_notice_dismiss")),
 	audioDevices: () => typedError<AudioDevices, ApiError>(__TAURI_INVOKE("audio_devices")),
 	/**
 	 *  Highest bitrate in kbit/s the bitrate slider can reach (FR-2.64); `null` without a voice
@@ -268,6 +285,8 @@ export const commands = {
 	 *  Voice of a connected session pauses meanwhile.
 	 */
 	micTestStart: () => typedError<null, ApiError>(__TAURI_INVOKE("mic_test_start")),
+	/**  Plays a short sound on the output device ("Test sound" in the output popover). */
+	audioTestSound: () => typedError<null, ApiError>(__TAURI_INVOKE("audio_test_sound")),
 	/**  Ends the test wherever it is (recording or playback). */
 	micTestStop: () => typedError<null, ApiError>(__TAURI_INVOKE("mic_test_stop")),
 	pttAvailability: () => typedError<PttAvailability, ApiError>(__TAURI_INVOKE("ptt_availability")),
@@ -487,6 +506,7 @@ export const commands = {
 
 /** Events */
 export const events = {
+	audioDeviceFallback: makeEvent<AudioDeviceFallback, AudioDeviceFallback>("audio-device-fallback"),
 	audioDevicesChanged: makeEvent<AudioDevicesChanged, AudioDevicesChanged>("audio-devices-changed"),
 	bitrateMaxChanged: makeEvent<BitrateMaxChanged, BitrateMaxChanged>("bitrate-max-changed"),
 	certTrustRequired: makeEvent<CertTrustRequired, CertTrustRequired>("cert-trust-required"),
@@ -562,6 +582,12 @@ export type AudioDevice = {
 	id: string,
 	name: string,
 	isDefault: boolean,
+};
+
+/**  The chosen device is gone and the system default plays in its place. */
+export type AudioDeviceFallback = {
+	/**  `true` for the microphone, `false` for the speakers. */
+	input: boolean,
 };
 
 export type AudioDevices = {
@@ -1491,6 +1517,24 @@ export type PttUnavailableReason =
 /**  macOS: Mumcord lacks the Accessibility permission for the mouse event tap. */
 "mouseNeedsAccessibility";
 
+/**  A stored channel password without the password itself (FR-2.78, issue #146). */
+export type SavedChannelPassword = {
+	/**  The user's own name; `null` shows the channels, or "Password N" without any. */
+	label: string | null,
+	/**  The channels the password was entered for. */
+	channels: SavedPasswordChannel[],
+	/**  RFC 3339; `null` if not used since Mumcord remembers it. */
+	lastUsedAt: string | null,
+};
+
+export type SavedPasswordChannel = {
+	channelId: number,
+	/**  Path below the root as the channel was named then. */
+	path: string[],
+	/**  `false` when the channel was renamed or removed; `null` while not connected. */
+	found: boolean | null,
+};
+
 /**  A saved server as shown in the server bar; the list order is the bar order. */
 export type SavedServer = {
 	id: number,
@@ -1643,6 +1687,10 @@ export type Settings = {
 	noiseSuppression: boolean,
 	echoCancellation: boolean,
 	autoGain: boolean,
+	/**  Manual microphone gain in percent, 0–200 (default 100). */
+	inputGainPercent: number,
+	/**  Master volume of everything played, 0–100 (default 100). */
+	outputVolumePercent: number,
 	/**
 	 *  "Music quality" (default off; FR-1.24, QA.37): bitrate cap up to the server limit (max
 	 *  510 kbit/s), music-tuned encoder, noise suppression and automatic volume bypassed.

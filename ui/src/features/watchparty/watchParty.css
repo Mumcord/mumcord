@@ -254,3 +254,14 @@ button.watch-playlist__up-next {
   background: var(--color-bg-elevated);
   box-shadow: 0 8px 24px rgb(0 0 0 / 35%);
 }
+
+.watch-party__embeds-off {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  align-items: center;
+}
+
+.watch-party__embeds-off p {
+  margin: 0;
+}

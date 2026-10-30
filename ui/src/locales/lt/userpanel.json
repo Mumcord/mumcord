@@ -8,7 +8,10 @@
     "muted": "Mikrofonas nutildytas",
     "unmuted": "Mikrofonas įjungtas",
     "deafened": "Garsas išjungtas. Negirdi kitų, o tavo mikrofonas nutildytas",
-    "undeafened": "Garsas įjungtas"
+    "undeafened": "Garsas įjungtas",
+    "leftVoice": "Balsą serveryje {{server}} palikote",
+    "disconnected": "Atsijungta nuo {{server}}",
+    "disconnectedAll": "Atsijungta nuo visų serverių"
   },
   "readOnly": {
     "text": "Tu tik skaitai – prisijunk prie kanalo, kad kalbėtum.",
@@ -95,5 +98,35 @@
     "line": "Balsas: {{channel}} · {{server}}",
     "server": "Balsas: {{server}}",
     "show": "{{location}} – rodyti šį serverį"
+  },
+  "disconnectMenu": {
+    "label": "Atsijungimo parinktys",
+    "open": "Daugiau atsijungimo parinkčių",
+    "leaveVoice": "Palikti balsą",
+    "leaveVoiceHint": "Nustoti kalbėti ir klausyti, likti prisijungus pokalbiams",
+    "disconnectHint": "Uždaryti ryšį su šiuo serveriu",
+    "switchTo": "Perkelti balsą į {{server}}",
+    "all": "Atsijungti nuo visų serverių…",
+    "allHint": "Uždaryti visus ryšius su serveriais"
+  },
+  "disconnectAll": {
+    "title": "Atsijungti nuo visų serverių?",
+    "message": "Atsijungti nuo visų {{total}} serverių?",
+    "confirm": "Atsijungti"
+  },
+  "audio": {
+    "inputOptions": "Mikrofono parinktys",
+    "outputOptions": "Garsiakalbių parinktys",
+    "inputDevices": "Įvesties įrenginys",
+    "outputDevices": "Išvesties įrenginys",
+    "systemDefault": "Numatytasis sistemos",
+    "noDevices": "Įrenginių nerasta",
+    "noiseSuppression": "Triukšmo slopinimas",
+    "testSound": "Bandomasis garsas",
+    "voiceSettings": "Balso nustatymai…",
+    "fallbackInput": "Mikrofonas atjungtas. Naudojamas numatytasis sistemos įrenginys.",
+    "fallbackOutput": "Išvesties įrenginys atjungtas. Naudojamas numatytasis sistemos įrenginys.",
+    "volume": "Garsumas",
+    "level": "Lygis"
   }
 }

@@ -30,6 +30,7 @@ use mumcord_audio::bitrate::{
     BitrateController, LinkStats as BitrateStats, Transport as BitrateTransport,
 };
 use mumcord_audio::dsp::{DspControls, MicTest, MicTestPhase as DspPhase};
+use mumcord_audio::io::{AudioIo, DeviceMigration, Direction};
 use mumcord_audio::mixer::PacketSender;
 use mumcord_protocol::pki_types::{CertificateDer, PrivateKeyDer, PrivatePkcs8KeyDer};
 use mumcord_protocol::{
@@ -41,7 +42,7 @@ use tokio::runtime::Handle as Runtime;
 use tokio::sync::mpsc;
 use tokio::task::JoinHandle;
 
-pub use channel_password::ChannelPasswordState;
+pub use channel_password::{ChannelPasswordChannel, ChannelPasswordState, ChannelPasswordView};
 pub use machine::MAX_RECONNECT_ATTEMPTS;
 pub use types::*;
 
@@ -204,6 +205,8 @@ struct Inner {
     /// Held while the audio devices start, so concurrent first uses open the microphone once
     /// (every open can show the OS microphone prompt).
     audio_start: tokio::sync::Mutex<()>,
+    /// Saved device choices were checked against the current device list (issue #183).
+    audio_devices_migrated: std::sync::Once,
     /// `None` until loaded from secure storage; then `Some(None)` before the wizard ran.
     identity: Mutex<Option<Option<Identity>>>,
     events: Events,
@@ -479,6 +482,7 @@ impl Engine {
             store,
             secrets: Arc::new(secrets),
             audio_start: tokio::sync::Mutex::new(()),
+            audio_devices_migrated: std::sync::Once::new(),
             identity: Mutex::new(None),
             events,
             controls,
@@ -796,6 +800,13 @@ impl Engine {
             self.inner.hang_up(&mut core);
         }
         self.inner.end_slot(&mut core, server_id, None);
+    }
+
+    /// Stops voice on the voice server while keeping every connection (chat and read-along stay
+    /// live). Does nothing while no server has voice.
+    pub fn leave_voice(&self) {
+        let mut core = lock(&self.inner.core);
+        self.inner.leave_voice(&mut core);
     }
 
     /// Disconnects every server for quitting or restarting the app (FR-2.9). Unlike
@@ -1149,6 +1160,15 @@ impl Engine {
         }
     }
 
+    /// Plays a short sound on the output device, for the "Test sound" button. Only audible
+    /// while voice audio runs (the popover is only reachable then).
+    pub fn audio_test_sound(&self) {
+        self.inner
+            .events
+            .sounds()
+            .play_test(crate::sounds::Sound::Message);
+    }
+
     /// Ends the mic test wherever it is; voice of a connected session resumes.
     pub fn mic_test_stop(&self) {
         let mut core = lock(&self.inner.core);
@@ -1252,7 +1272,6 @@ impl Engine {
     /// Devices and connection counters for the diagnostic file (no names or addresses
     /// beyond device names, which the diagnostics module documents).
     pub fn diagnostic_info(&self, app_version: &str) -> crate::diag::DiagnosticInfo {
-        use mumcord_audio::io::{AudioIo, Direction};
         let mut info = crate::diag::DiagnosticInfo::new(app_version);
         for (direction, is_input) in [(Direction::Input, true), (Direction::Output, false)] {
             // Without a connection or mic test no audio runs; the list is still wanted then.
@@ -1524,22 +1543,42 @@ impl Inner {
         self.start_pipeline(core);
     }
 
+    /// Self-deafens and mutes a still connected server; the user stays in their channel.
+    fn make_read_only(core: &mut Core, server_id: ServerId) {
+        let Some(slot) = core.slots.get_mut(&server_id) else {
+            return;
+        };
+        slot.self_voice = SelfVoice::read_only();
+        // Deafening on the server mutes too.
+        if let Some(session) = &slot.session
+            && let Err(e) = session.handle.set_self_deaf(true)
+        {
+            tracing::warn!(error = %e, "making the server read-only failed");
+        }
+    }
+
+    /// Stops voice on the voice server without leaving it ("Leave voice"): the server becomes
+    /// read-only like any other connected one and no server has voice until the next explicit
+    /// join. Uses only the self-deafen flag, so it works on every standard Mumble server.
+    fn leave_voice(self: &Arc<Self>, core: &mut Core) {
+        let Some(server_id) = core.voice_server.take() else {
+            return;
+        };
+        Self::make_read_only(core, server_id);
+        // Nothing to offer for rejoining after a restart, as after a disconnect.
+        self.forget_voice_channel();
+        self.events.emit(EngineEvent::VoiceServerChanged(None));
+        self.rebind_audio(core);
+    }
+
     /// Makes `server_id` the voice server (FR-2.2). The previous voice server becomes
     /// read-only again: self-deafened and muted, the user stays in their channel.
     fn take_voice(self: &Arc<Self>, core: &mut Core, server_id: ServerId) {
         if core.voice_server == Some(server_id) {
             return;
         }
-        if let Some(previous) = core.voice_server.take()
-            && let Some(slot) = core.slots.get_mut(&previous)
-        {
-            slot.self_voice = SelfVoice::read_only();
-            // Deafening on the server mutes too.
-            if let Some(session) = &slot.session
-                && let Err(e) = session.handle.set_self_deaf(true)
-            {
-                tracing::warn!(error = %e, "making the previous voice server read-only failed");
-            }
+        if let Some(previous) = core.voice_server.take() {
+            Self::make_read_only(core, previous);
         }
         core.voice_server = Some(server_id);
         // Only the voice server's channel is offered for rejoining after a restart (FR-2.3).
@@ -2608,18 +2647,63 @@ impl Inner {
             .ok_or_else(|| EngineError::new(ErrorKind::NotFound, "unknown person"))
     }
 
+    /// Device choices saved from the ALSA device list before issue #183 are mapped onto the
+    /// sound server's devices. Runs once per process, before the settings reach the UI or open
+    /// the devices; a choice that cannot be mapped is reset to the system default, and the
+    /// notice tells the user.
+    pub(crate) fn migrate_audio_devices(&self) {
+        self.audio_devices_migrated.call_once(|| {
+            let store = lock(&self.store);
+            let mut settings = match store.settings() {
+                Ok(settings) => settings,
+                Err(e) => {
+                    tracing::warn!(error = %e, "reading settings for the device migration failed");
+                    return;
+                }
+            };
+            let mut changed = false;
+            for (direction, saved) in [
+                (Direction::Input, &mut settings.input_device),
+                (Direction::Output, &mut settings.output_device),
+            ] {
+                let Some(id) = saved.as_deref() else { continue };
+                match AudioIo::migrate_device(direction, id) {
+                    Ok(DeviceMigration::Keep) => continue,
+                    Ok(DeviceMigration::Replace(new)) => *saved = Some(new),
+                    Ok(DeviceMigration::Default { notice }) => {
+                        *saved = None;
+                        settings.audio_device_notice |= notice;
+                    }
+                    // The id stays; a later start tries again.
+                    Err(e) => {
+                        tracing::warn!(?direction, error = %e, "migrating the saved audio device failed");
+                        continue;
+                    }
+                }
+                tracing::info!(?direction, "saved audio device migrated to the new device list");
+                changed = true;
+            }
+            if changed && let Err(e) = store.save_settings(&settings) {
+                tracing::warn!(error = %e, "saving the migrated audio devices failed");
+            }
+        });
+    }
+
     /// Starts the audio devices on first use.
     async fn ensure_audio(self: &Arc<Self>) -> EngineResult<()> {
         let _starting = self.audio_start.lock().await;
         if lock(&self.core).audio.is_some() {
             return Ok(());
         }
+        self.migrate_audio_devices();
         let settings = lock(&self.store).settings().map_err(store_error)?;
         let events = self.events.clone();
         let audio = self
             .rt
             .spawn_blocking(move || {
-                Audio::start(settings.input_device, settings.output_device, events)
+                let audio = Audio::start(settings.input_device, settings.output_device, events)?;
+                audio.set_output_volume_percent(settings.output_volume_percent);
+                Ok::<_, EngineError>(audio)
             })
             .await
             .map_err(|e| EngineError::internal(e.to_string()))??;

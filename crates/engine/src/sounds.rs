@@ -476,6 +476,17 @@ impl SoundHub {
         self.play_locked(&mut state, sound, deaf);
     }
 
+    /// Plays `sound` now whatever the toggles and the deaf state say: the "Test sound" button
+    /// of the output popover must be audible so the user can judge the chosen device and volume.
+    pub fn play_test(&self, sound: Sound) {
+        let mut state = self.state();
+        if let Some(out) = state.out.as_mut()
+            && !out(&sound.mixed())
+        {
+            tracing::debug!("test sound skipped: mixer input is full");
+        }
+    }
+
     /// The user joins a channel for voice themselves (QA.23); `mute`/`deaf` is the own state
     /// the join turns on. Plays the join sound in place of the mute/deafen cues the server's
     /// echo of that change would cause. With a `target` channel to move to, the sound waits
@@ -729,6 +740,19 @@ mod tests {
             true
         }));
         (hub, log)
+    }
+
+    #[test]
+    fn test_sound_plays_even_when_deafened_and_toggles_are_off() {
+        let (hub, log) = hub_with_log(SoundSettings {
+            new_message: false,
+            ..SoundSettings::default()
+        });
+        hub.observe(&synced(vec![user(1, 10, true, true)]));
+        hub.play(Sound::Message);
+        assert!(log.lock().unwrap().is_empty());
+        hub.play_test(Sound::Message);
+        assert_eq!(log.lock().unwrap().len(), 1);
     }
 
     #[test]

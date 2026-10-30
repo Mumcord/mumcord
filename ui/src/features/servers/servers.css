@@ -174,6 +174,26 @@
   background: var(--color-bg-hover);
 }
 
+.server-menu__item:has(.server-menu__text) {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.server-menu__text {
+  display: flex;
+  flex-direction: column;
+}
+
+.server-menu__hint {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+}
+
+.server-menu__item--danger {
+  color: var(--color-danger);
+}
+
 .server-menu__item[aria-disabled="true"] {
   color: var(--color-text-muted);
   cursor: default;
@@ -373,4 +393,18 @@
   align-items: center;
   justify-content: space-between;
   gap: 8px;
+}
+
+.servers-tokens__text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.servers-tokens__actions {
+  display: flex;
+  flex-shrink: 0;
+  gap: 4px;
 }

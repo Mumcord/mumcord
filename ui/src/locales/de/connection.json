@@ -58,5 +58,26 @@
     "perMinute": "Letzte {{minutes}} min: {{value}} pro Minute.",
     "concealedShare": "Letzte {{minutes}} min: {{value}} % der empfangenen Frames.",
     "processingMax": "Letzte {{minutes}} min: max. {{value}} ms von {{budget}} ms Frame-Budget."
+  },
+  "quick": {
+    "open": "Sprachqualität",
+    "title": "Sprachqualität",
+    "status": "Ping {{latency}}, Verlust {{loss}}",
+    "lowLatency": "Modus für niedrige Latenz",
+    "lowLatencyHint": "Kleinste Pakete und Puffer zum gemeinsamen Musizieren. Mehr Bandbreite, weniger robust.",
+    "lowLatencyComingSoon": "Demnächst verfügbar",
+    "voiceSettings": "Spracheinstellungen…",
+    "applies": "Gilt sofort, gespeichert wie unter Einstellungen → Audio",
+    "keys": "Esc schließt · ↑↓ bewegt · ← → ändert",
+    "bandwidthLabel": "Geschätzte Bandbreite inkl. Header",
+    "bandwidthValue": "≈ {{value}} von {{limit}} kbit/s",
+    "bandwidthValueNoLimit": "≈ {{value}} kbit/s",
+    "bandwidthHintWithin": "Mit Modus für niedrige Latenz: ≈ {{value}} kbit/s (10-ms-Pakete), noch innerhalb des Limits.",
+    "bandwidthHintOver": "Mit Modus für niedrige Latenz: ≈ {{value}} kbit/s (10-ms-Pakete), über dem Limit.",
+    "bandwidthHintNoLimit": "Mit Modus für niedrige Latenz: ≈ {{value}} kbit/s (10-ms-Pakete).",
+    "beta": "Beta",
+    "moreInfo": "Mehr Informationen: {{topic}}",
+    "effectiveShort": "Wird gerade gesendet",
+    "effectiveTip": "Die aktuell gesendete Bitrate nach Anpassung an Paketverlust."
   }
 }

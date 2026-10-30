@@ -1,6 +1,7 @@
 import { useEffect, useId, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { getApi } from "../../../api";
+import { InfoTip } from "../../../components/InfoTip";
 import { useThrottledSend } from "../../../components/useThrottledSend";
 import type { SettingsSectionProps } from "./types";
 
@@ -14,7 +15,17 @@ export const BITRATE_THROTTLE_MS = 100;
  * Own bitrate cap (FR-2.64): from 16 kbit/s to the highest bitrate the voice server allows; the far
  * right is "Max" (the full maximum). Independent of "Music quality"; defaults to 96 kbit/s. Applied live while dragging.
  */
-export function BitrateSlider({ settings, update }: SettingsSectionProps) {
+export function BitrateSlider({
+  settings,
+  update,
+  compact = false,
+  tipLabel,
+}: SettingsSectionProps & {
+  /** Compact variant (quick panel): the hint sits behind a "?" button instead of a line of text. */
+  compact?: boolean;
+  /** Accessible name of the "?" button that carries the hint in the compact variant. */
+  tipLabel?: string;
+}) {
   const { t } = useTranslation("settings");
   const id = useId();
   const { schedule } = useThrottledSend(BITRATE_THROTTLE_MS);
@@ -50,6 +61,16 @@ export function BitrateSlider({ settings, update }: SettingsSectionProps) {
   return (
     <div className="settings-field overlay-settings__slider">
       <label htmlFor={id}>{t("audio.bitrate")}</label>
+      {compact && tipLabel !== undefined ? (
+        <InfoTip
+          label={tipLabel}
+          text={
+            serverMax === null
+              ? t("audio.bitrateMaxUnknown")
+              : t("audio.bitrateMaxKnown", { kbps: serverMax })
+          }
+        />
+      ) : null}
       <input
         id={id}
         type="range"
@@ -58,7 +79,7 @@ export function BitrateSlider({ settings, update }: SettingsSectionProps) {
         step={1}
         value={value}
         aria-valuetext={shown}
-        aria-describedby={`${id}-hint`}
+        aria-describedby={!compact ? `${id}-hint` : undefined}
         onChange={(event) => {
           const next = Number(event.target.value);
           setDragging(next);
@@ -74,11 +95,13 @@ export function BitrateSlider({ settings, update }: SettingsSectionProps) {
         }}
       />
       <output htmlFor={id}>{shown}</output>
-      <p id={`${id}-hint`} className="settings-hint">
-        {serverMax === null
-          ? t("audio.bitrateMaxUnknown")
-          : t("audio.bitrateMaxKnown", { kbps: serverMax })}
-      </p>
+      {!compact ? (
+        <p id={`${id}-hint`} className="settings-hint">
+          {serverMax === null
+            ? t("audio.bitrateMaxUnknown")
+            : t("audio.bitrateMaxKnown", { kbps: serverMax })}
+        </p>
+      ) : null}
     </div>
   );
 }

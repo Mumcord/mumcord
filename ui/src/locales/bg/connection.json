@@ -58,5 +58,26 @@
     "perMinute": "Последните {{minutes}} мин: {{value}} на минута.",
     "concealedShare": "Последните {{minutes}} мин: {{value}} % от получените кадри.",
     "processingMax": "Последните {{minutes}} мин: макс. {{value}} ms от {{budget}} ms бюджет на кадър."
+  },
+  "quick": {
+    "open": "Качество на гласа",
+    "title": "Качество на гласа",
+    "status": "Пинг {{latency}}, загуби {{loss}}",
+    "lowLatency": "Режим с ниско закъснение",
+    "lowLatencyHint": "Най-малки пакети и буфери за съвместно музициране. Повече честотна лента, по-малка устойчивост.",
+    "lowLatencyComingSoon": "Очаквайте скоро",
+    "voiceSettings": "Настройки на гласа…",
+    "applies": "Прилага се веднага, запазва се като в Настройки → Аудио",
+    "keys": "Esc затваря · ↑↓ премества · ← → променя",
+    "bandwidthLabel": "Прогнозна честотна лента с хедъри",
+    "bandwidthValue": "≈ {{value}} от {{limit}} kbit/s",
+    "bandwidthValueNoLimit": "≈ {{value}} kbit/s",
+    "bandwidthHintWithin": "С режим с ниско закъснение: ≈ {{value}} kbit/s (пакети от 10 ms), все още в лимита.",
+    "bandwidthHintOver": "С режим с ниско закъснение: ≈ {{value}} kbit/s (пакети от 10 ms), над лимита.",
+    "bandwidthHintNoLimit": "С режим с ниско закъснение: ≈ {{value}} kbit/s (пакети от 10 ms).",
+    "beta": "Beta",
+    "moreInfo": "Повече информация: {{topic}}",
+    "effectiveShort": "В момента се изпраща",
+    "effectiveTip": "Битрейтът, който се изпраща в момента, след адаптация към загубата на пакети."
   }
 }

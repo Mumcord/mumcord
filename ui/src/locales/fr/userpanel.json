@@ -8,7 +8,10 @@
     "muted": "Micro coupé",
     "unmuted": "Micro réactivé",
     "deafened": "Son coupé. Vous n’entendez pas les autres et votre micro est coupé",
-    "undeafened": "Son réactivé"
+    "undeafened": "Son réactivé",
+    "leftVoice": "Vocal quitté sur {{server}}",
+    "disconnected": "Déconnecté de {{server}}",
+    "disconnectedAll": "Déconnecté de tous les serveurs"
   },
   "readOnly": {
     "text": "Vous suivez en lecture seule – rejoignez un canal pour parler.",
@@ -95,5 +98,35 @@
     "line": "Vocal : {{channel}} · {{server}}",
     "server": "Vocal : {{server}}",
     "show": "{{location}} – afficher ce serveur"
+  },
+  "disconnectMenu": {
+    "label": "Options de déconnexion",
+    "open": "Plus d'options de déconnexion",
+    "leaveVoice": "Quitter le vocal",
+    "leaveVoiceHint": "Ne plus parler ni écouter, rester connecté pour le chat",
+    "disconnectHint": "Fermer la connexion à ce serveur",
+    "switchTo": "Passer le vocal sur {{server}}",
+    "all": "Se déconnecter de tous les serveurs…",
+    "allHint": "Fermer toutes les connexions aux serveurs"
+  },
+  "disconnectAll": {
+    "title": "Se déconnecter de tous les serveurs ?",
+    "message": "Se déconnecter des {{total}} serveurs ?",
+    "confirm": "Se déconnecter"
+  },
+  "audio": {
+    "inputOptions": "Options du microphone",
+    "outputOptions": "Options des haut-parleurs",
+    "inputDevices": "Périphérique d’entrée",
+    "outputDevices": "Périphérique de sortie",
+    "systemDefault": "Par défaut du système",
+    "noDevices": "Aucun périphérique trouvé",
+    "noiseSuppression": "Suppression du bruit",
+    "testSound": "Tester le son",
+    "voiceSettings": "Paramètres vocaux…",
+    "fallbackInput": "Microphone débranché. Le périphérique par défaut du système est utilisé.",
+    "fallbackOutput": "Périphérique de sortie débranché. Le périphérique par défaut du système est utilisé.",
+    "volume": "Volume",
+    "level": "Niveau"
   }
 }

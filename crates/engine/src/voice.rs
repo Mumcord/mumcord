@@ -70,20 +70,41 @@ pub fn meter_level(peak_dbfs: f32) -> f32 {
 /// value, so the device sink lives in this slot and is lent out. The lock is only contended
 /// while switching between voice and mic test, never by a device callback.
 #[derive(Clone)]
-struct SharedSink(Arc<Mutex<Option<FrameSink>>>);
+struct SharedSink {
+    sink: Arc<Mutex<Option<FrameSink>>>,
+    /// Master volume as `f32` bits (1.0 = unchanged); read by the playback thread, set by the UI.
+    volume: Arc<AtomicU32>,
+}
 
 impl SharedSink {
+    fn volume(&self) -> f32 {
+        f32::from_bits(self.volume.load(Ordering::Relaxed))
+    }
+
     fn with<R>(&self, f: impl FnOnce(&mut Option<FrameSink>) -> R) -> R {
-        f(&mut self.0.lock().unwrap_or_else(PoisonError::into_inner))
+        f(&mut self.sink.lock().unwrap_or_else(PoisonError::into_inner))
     }
 }
 
 impl PlaybackSink for SharedSink {
     fn write_frame(&mut self, frame: &Frame) -> bool {
+        let volume = self.volume();
+        let scaled = frame.map(|sample| sample * volume);
+        let frame = if volume == 1.0 { frame } else { &scaled };
         self.with(|sink| sink.as_mut().is_some_and(|s| s.write_frame(frame)))
     }
 
     fn write_stereo(&mut self, left: &Frame, right: &Frame) -> bool {
+        let volume = self.volume();
+        let (scaled_left, scaled_right) = (
+            left.map(|sample| sample * volume),
+            right.map(|sample| sample * volume),
+        );
+        let (left, right) = if volume == 1.0 {
+            (left, right)
+        } else {
+            (&scaled_left, &scaled_right)
+        };
         self.with(|sink| sink.as_mut().is_some_and(|s| s.write_stereo(left, right)))
     }
 
@@ -118,7 +139,10 @@ impl Audio {
         Ok(Self {
             io,
             source: Some(handles.source),
-            sink: SharedSink(Arc::new(Mutex::new(Some(handles.sink)))),
+            sink: SharedSink {
+                sink: Arc::new(Mutex::new(Some(handles.sink))),
+                volume: Arc::new(AtomicU32::new(1.0f32.to_bits())),
+            },
         })
     }
 
@@ -130,6 +154,13 @@ impl Audio {
         let err = |e| EngineError::internal(format!("audio: {e}"));
         self.io.set_input_device(input).map_err(err)?;
         self.io.set_output_device(output).map_err(err)
+    }
+
+    /// Master volume of everything played, in percent (100 = unchanged).
+    pub fn set_output_volume_percent(&self, percent: u16) {
+        self.sink
+            .volume
+            .store((f32::from(percent) / 100.0).to_bits(), Ordering::Relaxed);
     }
 
     pub fn io(&self) -> &AudioIo {
@@ -216,6 +247,8 @@ fn forward_device_events(
     io: &Weak<AudioIo>,
     events: &Events,
 ) {
+    // Whether each direction is already known to run on the fallback, so the notice is sent once.
+    let (mut input_fallback, mut output_fallback) = (false, false);
     while let Ok(event) = rx.recv() {
         match event {
             DeviceEvent::DevicesChanged => {
@@ -229,7 +262,19 @@ fn forward_device_events(
                 direction,
                 fallback,
                 ..
-            } => tracing::info!(?direction, fallback, "audio stream active"),
+            } => {
+                tracing::info!(?direction, fallback, "audio stream active");
+                let input = direction == Direction::Input;
+                let known = if input {
+                    &mut input_fallback
+                } else {
+                    &mut output_fallback
+                };
+                if fallback && !*known {
+                    events.emit(EngineEvent::AudioDeviceFallback { input });
+                }
+                *known = fallback;
+            }
             // The reason can name a device; device names stay out of logs.
             DeviceEvent::Unavailable { direction, .. } => {
                 tracing::warn!(?direction, "no audio device available");

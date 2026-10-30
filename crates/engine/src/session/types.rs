@@ -401,6 +401,11 @@ pub enum EngineEvent {
     },
     FollowedChannelsChanged(Vec<u32>),
     AudioDevicesChanged(AudioDeviceList),
+    /// The chosen device is gone and the system default plays in its place (`input` is the
+    /// microphone, otherwise the output). Sent once per switch, not on every poll.
+    AudioDeviceFallback {
+        input: bool,
+    },
     /// The highest bitrate the bitrate slider can reach changed (FR-2.64); `None` without a
     /// voice server.
     BitrateMaxChanged(Option<u32>),

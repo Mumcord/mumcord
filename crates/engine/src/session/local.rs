@@ -17,6 +17,7 @@ pub(crate) fn apply_dsp(controls: &DspControls, settings: &Settings) {
     controls.set_echo_cancellation(settings.echo_cancellation);
     controls.set_noise_suppression(settings.noise_suppression);
     controls.set_auto_gain(settings.auto_gain);
+    controls.set_input_gain_percent(settings.input_gain_percent);
     controls.set_music_quality(settings.music_quality);
     controls.set_bitrate_cap_kbps(settings.bitrate_kbps);
     controls.set_manual_threshold(settings.voice_activation == VoiceActivation::Manual);
@@ -321,12 +322,14 @@ impl Engine {
     }
 
     pub fn settings(&self) -> EngineResult<Settings> {
+        self.inner.migrate_audio_devices();
         lock(&self.inner.store).settings().map_err(store_error)
     }
 
     /// Stores the settings and applies DSP switches, talk mode and devices immediately.
     /// Log level and the push-to-talk key are applied by the app shell.
     pub async fn update_settings(&self, settings: Settings) -> EngineResult<Settings> {
+        self.inner.migrate_audio_devices();
         let previous = {
             let store = lock(&self.inner.store);
             let previous = store.settings().map_err(store_error)?;
@@ -354,6 +357,11 @@ impl Engine {
         }
         if settings.talk_mode != TalkMode::PushToTalk {
             self.inner.controls.set_ptt_pressed(false);
+        }
+        if previous.output_volume_percent != settings.output_volume_percent
+            && let Some(audio) = &lock(&self.inner.core).audio
+        {
+            audio.set_output_volume_percent(settings.output_volume_percent);
         }
         if previous.input_device != settings.input_device
             || previous.output_device != settings.output_device
