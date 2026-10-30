@@ -11,6 +11,7 @@
 ### Fixed
 
 - The watch party respects Settings > Privacy > "Show link previews and embeds": with it off, "Watch together" in the Apps menu stays listed but disabled with the reason and a link to the Privacy settings, a running party shows "A watch party is running: enable embedded players to join" with the same link instead of the banner's video title, the floating player and playlist (no player page, no thumbnails) — so nothing is requested from YouTube or Twitch (#160)
+- Linux with PipeWire: the device lists show every output and input of the sound server as the desktop's sound settings do, so a multi-endpoint interface such as the RØDECaster Pro II offers "System" and "Chat" as outputs and "Microphone" and "Main" as inputs, with their friendly names, instead of one "USB Audio" entry per direction. The choice is stored by the stable PipeWire node name and the stream plays to exactly that node; hot-plugging updates the list and a missing device falls back to the system default. A device saved from the old list moves to the matching node when there is exactly one, otherwise to the system default with a one-time notice. Without PipeWire the ALSA devices are listed as before (#183)
 
 ## [0.4.4] - 2026-10-30
 

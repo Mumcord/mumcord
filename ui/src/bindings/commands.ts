@@ -262,6 +262,13 @@ export const commands = {
 	windowOverlayNoticePending: () => typedError<boolean, ApiError>(__TAURI_INVOKE("window_overlay_notice_pending")),
 	/**  Marks the notice as shown so it never comes back. */
 	windowOverlayNoticeDismiss: () => typedError<null, ApiError>(__TAURI_INVOKE("window_overlay_notice_dismiss")),
+	/**
+	 *  Whether the user still has to be told that their saved audio device was reset to the system
+	 *  default because it could not be matched to the new device list (issue #183).
+	 */
+	audioDeviceNoticePending: () => typedError<boolean, ApiError>(__TAURI_INVOKE("audio_device_notice_pending")),
+	/**  Marks the audio device notice as shown so it never comes back. */
+	audioDeviceNoticeDismiss: () => typedError<null, ApiError>(__TAURI_INVOKE("audio_device_notice_dismiss")),
 	audioDevices: () => typedError<AudioDevices, ApiError>(__TAURI_INVOKE("audio_devices")),
 	/**
 	 *  Highest bitrate in kbit/s the bitrate slider can reach (FR-2.64); `null` without a voice

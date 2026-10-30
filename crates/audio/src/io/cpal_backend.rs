@@ -11,20 +11,85 @@ use cpal::{
 };
 use rtrb::{Consumer, Producer};
 
+#[cfg(target_os = "linux")]
+use super::DeviceMigration;
 use super::controller::{Backend, Opened, StreamGuard};
 use super::ring::{self, Counters};
+#[cfg(target_os = "linux")]
+use super::sound_server::{ID_PREFIX, SoundServer};
 use super::{DeviceInfo, Direction, IoError};
 use crate::SAMPLE_RATE;
 
 pub(crate) struct CpalBackend {
+    /// Lists and opens the devices, except on a PipeWire desktop.
     host: cpal::Host,
+    /// On a PipeWire desktop: the sound server, which lists its sinks and sources as the
+    /// devices; streams open on them through cpal's PipeWire host (issue #183).
+    #[cfg(target_os = "linux")]
+    server: Option<SoundServer>,
 }
 
 impl CpalBackend {
     pub(crate) fn new() -> Self {
+        #[cfg(target_os = "linux")]
+        {
+            // cpal's default host would be PipeWire, whose device list is a snapshot taken when
+            // the host is created; without the sound server keep the ALSA host as before.
+            let server = SoundServer::connect();
+            let host = cpal::host_from_id(cpal::HostId::Alsa).unwrap_or_else(|e| {
+                tracing::warn!("ALSA host unavailable ({e}); using cpal's default host");
+                cpal::default_host()
+            });
+            Self { host, server }
+        }
+        #[cfg(not(target_os = "linux"))]
         Self {
             host: cpal::default_host(),
         }
+    }
+
+    /// The device to open and how it is listed.
+    fn open_device(
+        &self,
+        direction: Direction,
+        id: Option<&str>,
+    ) -> Result<(Device, DeviceInfo), IoError> {
+        #[cfg(target_os = "linux")]
+        if self.server.is_some() {
+            return self.server_device(direction, id);
+        }
+        let device = self.device(direction, id)?;
+        let info = self.info(direction, &device)?;
+        Ok((device, info))
+    }
+
+    /// Opens the listed node `id` (`None`: the current default node) on a fresh PipeWire host,
+    /// since a host only knows the nodes that existed when it was created.
+    #[cfg(target_os = "linux")]
+    fn server_device(
+        &self,
+        direction: Direction,
+        id: Option<&str>,
+    ) -> Result<(Device, DeviceInfo), IoError> {
+        let listed = self.devices(direction)?;
+        let info = match id {
+            Some(id) => listed.into_iter().find(|d| d.id == id),
+            None => listed.into_iter().find(|d| d.is_default),
+        }
+        .ok_or(IoError::DeviceNotFound)?;
+        let host = cpal::host_from_id(cpal::HostId::PipeWire).map_err(backend_err)?;
+        let device = host
+            .devices()
+            .map_err(backend_err)?
+            .find(|d| {
+                let usable = match direction {
+                    Direction::Input => d.supports_input(),
+                    Direction::Output => d.supports_output(),
+                };
+                usable && d.id().is_ok_and(|node| node.to_string() == info.id)
+            })
+            .ok_or(IoError::DeviceNotFound)?;
+        Ok((device, info))
     }
 
     fn default_device(&self, direction: Direction) -> Option<Device> {
@@ -86,6 +151,15 @@ impl CpalBackend {
 
 impl Backend for CpalBackend {
     fn devices(&self, direction: Direction) -> Result<Vec<DeviceInfo>, IoError> {
+        #[cfg(target_os = "linux")]
+        if let Some(server) = &self.server {
+            let (nodes, default) = server.nodes(direction)?;
+            return Ok(super::devices::server_devices(
+                ID_PREFIX,
+                &nodes,
+                default.as_deref(),
+            ));
+        }
         let devices: Vec<Device> = match direction {
             Direction::Input => self.host.input_devices().map_err(backend_err)?.collect(),
             Direction::Output => self.host.output_devices().map_err(backend_err)?.collect(),
@@ -106,13 +180,23 @@ impl Backend for CpalBackend {
         true
     }
 
+    #[cfg(target_os = "linux")]
+    fn migrate(&self, direction: Direction, saved: &str) -> Result<DeviceMigration, IoError> {
+        match &self.server {
+            Some(server) => {
+                let (nodes, _) = server.nodes(direction)?;
+                Ok(super::devices::migrate(saved, ID_PREFIX, &nodes))
+            }
+            None => Ok(DeviceMigration::Keep),
+        }
+    }
+
     fn open_input(
         &self,
         id: Option<&str>,
         counters: &Arc<Counters>,
     ) -> Result<Opened<Consumer<f32>>, IoError> {
-        let device = self.device(Direction::Input, id)?;
-        let info = self.info(Direction::Input, &device)?;
+        let (device, info) = self.open_device(Direction::Input, id)?;
         let supported = pick_config(&device, Direction::Input)?;
         let config = stream_config(&supported);
         let (producer, consumer) = ring::ring(config.sample_rate);
@@ -142,8 +226,7 @@ impl Backend for CpalBackend {
         id: Option<&str>,
         counters: &Arc<Counters>,
     ) -> Result<Opened<Producer<f32>>, IoError> {
-        let device = self.device(Direction::Output, id)?;
-        let info = self.info(Direction::Output, &device)?;
+        let (device, info) = self.open_device(Direction::Output, id)?;
         let supported = pick_config(&device, Direction::Output)?;
         let config = stream_config(&supported);
         let (producer, consumer) = ring::stereo_ring(config.sample_rate);

@@ -36,11 +36,13 @@ mumcord-codec = "0.4"
 
 ## Building on Linux
 
-The crate links system libraries, so building needs their development packages and `pkg-config`: `libasound2-dev` (ALSA, for cpal) and `libdbus-1-dev` (D-Bus, for requesting real-time thread priority from rtkit). On Debian and Ubuntu:
+The crate links system libraries, so building needs their development packages and `pkg-config`: `libasound2-dev` (ALSA, for cpal), `libpipewire-0.3-dev` and `libclang-dev` (PipeWire, for cpal's PipeWire host; the bindings are generated with libclang) and `libdbus-1-dev` (D-Bus, for requesting real-time thread priority from rtkit). On Debian and Ubuntu:
 
 ```sh
-sudo apt install libasound2-dev libdbus-1-dev pkg-config cmake
+sudo apt install libasound2-dev libpipewire-0.3-dev libclang-dev libdbus-1-dev pkg-config cmake
 ```
+
+On a PipeWire desktop the device list shows the sound server's sinks and sources (each output and input of a multi-endpoint interface separately, named as the desktop names them, identified by their stable node names), and streams open on the chosen node. Without PipeWire and its PulseAudio protocol server (pipewire-pulse), the ALSA devices are listed as before.
 
 `cmake` is needed to build the bundled Opus sources. Other platforms need no extra packages.
 
