@@ -1,0 +1,110 @@
+{
+  "assets": [
+    {
+      "name": "Mumcord-0.4.4-1.aarch64.rpm",
+      "sha256": "7ac6a45c1849b5e5cb8df195e32b55058932702aa99287a58bd1fc79501114a5",
+      "size": 25312983
+    },
+    {
+      "name": "Mumcord-0.4.4-1.x86_64.rpm",
+      "sha256": "5e1e1bfd1cfd842a3472980e8c09d289eac210fb99135447b0cd2ce3e0cb6cc0",
+      "size": 25088079
+    },
+    {
+      "name": "Mumcord_0.4.4_aarch64.AppImage",
+      "sha256": "ec61261a7bff9dbef37870963900dc801134f2dd8daf3865ead0f6bae6850269",
+      "size": 108575240
+    },
+    {
+      "name": "Mumcord_0.4.4_amd64.AppImage",
+      "sha256": "8c6dca52a461c4a14775a00c3d77ec04658c6c40d48d346f405bf2212a7648cf",
+      "size": 110746104
+    },
+    {
+      "name": "Mumcord_0.4.4_amd64.deb",
+      "sha256": "50c2e0d04009d8b0f294d290076760fa537d77706df6b3c3d94c19d0e322e655",
+      "size": 25087302
+    },
+    {
+      "name": "Mumcord_0.4.4_arm64.deb",
+      "sha256": "faefa7ba14bb583f80ca6d395eae5ed5ce8ac8973be68f2f378fd4cbe0c19326",
+      "size": 25312650
+    },
+    {
+      "name": "Mumcord_0.4.4_universal.dmg",
+      "sha256": "6f96b06b67114aaa33a09e3f7e382d45cc9e50ccdeea4adce9010a680036d362",
+      "size": 35924429
+    },
+    {
+      "name": "Mumcord_0.4.4_x64-setup.exe",
+      "sha256": "592d7db7deb71f1741cd49ddbe73f1940ade05fd9175949b16658199eb7db0e0",
+      "size": 11696527
+    },
+    {
+      "name": "SHA256SUMS",
+      "sha256": "2a47a04d7b6548016974fc037890ef86eb4d434ef55be798f36c2c5b9be22ece",
+      "size": 1453
+    },
+    {
+      "name": "install.sh",
+      "sha256": "02f9c7658b0800b17742fd44b3c9d79338612918a3fe74424364e79654ebcb73",
+      "size": 23508
+    },
+    {
+      "name": "mumcord-0.4.4-appimage-aarch64.cdx.json",
+      "sha256": "8bd8af3ec4709640250f8e06dacd516c00fdaef7ea3461e8499003957bc329fe",
+      "size": 830604
+    },
+    {
+      "name": "mumcord-0.4.4-appimage-x86_64.cdx.json",
+      "sha256": "03d21aa639a5735662f5602072d19a4686f2d68ba1ee35efd01ca2da90f16ad3",
+      "size": 830529
+    },
+    {
+      "name": "mumcord-0.4.4-deb-rpm-aarch64.cdx.json",
+      "sha256": "cac84b88e1c867567e57bc659b50974c090da4c3b154b56eca6ec396fbae7ae7",
+      "size": 780653
+    },
+    {
+      "name": "mumcord-0.4.4-deb-rpm-x86_64.cdx.json",
+      "sha256": "d43b95b6b592a20b80d310c7283ac62ecd88c89dc5283cf736c26161cfbd7773",
+      "size": 780578
+    },
+    {
+      "name": "mumcord-0.4.4-macos-universal.cdx.json",
+      "sha256": "4c1239ba0f17479d6a5df7d641c6088f6315af29cba76c4e7b8b8420bb27e977",
+      "size": 647413
+    },
+    {
+      "name": "mumcord-0.4.4-windows-x86_64.cdx.json",
+      "sha256": "29bb90075240703d7206082829fa7f019b6651b5ce462d53b67db084a1a4f223",
+      "size": 628162
+    }
+  ],
+  "changelog": {
+    "sha256": "136c24d9b760d00fcd5ac84322d8788dfd65e72241cef7f4905ff5f78b1ecb85",
+    "text": "## [0.4.4] - 2026-10-30\n\n### Added\n\n- Settings > Privacy shows how much space the caches use (link previews and images, the web engine cache, temporary files) and has a Clear cache button with per-category checkboxes. A confirmation says that chat history, settings, servers, certificates, friends and notes are never touched. The web engine cache is removed at the next start so that the stored settings stay safe (#116)\n- Code blocks in chat messages have Copy and Download buttons in their corner, shown on hover and keyboard focus: Copy puts the plain code on the clipboard, Download saves it as `snippet.<ext>` named after the detected language (`.txt` if unknown) (#111)\n- Code blocks keep the language written after the fence (for example `sql`, `rust` or `php`) and are highlighted as exactly that language, with the language shown in the block's corner. New languages: PHP, Ruby, Kotlin, Swift, Lua, PowerShell, Windows batch (`cmd`), Dockerfile, TOML, Markdown, Makefile, nginx, plain text and hex dumps (`hex`: offset, bytes and ASCII column), plus aliases such as `sh`, `py`, `rs`, `js`, `ts`, `c++`, `bat` and `yml`. Unknown languages stay plain text with their name. The language travels as a `data-mumcord-lang` attribute that standard Mumble servers pass through; code from other clients is still detected automatically. See `docs/code-blocks.md` (#112)\n- Right-clicking an image in the chat (sent images, full-size images, inline external images, GIFs and message-card images), or pressing the menu key on it, offers **Copy image**, **Save image…**, **Copy image address** (external images) and **Open in image viewer**; the image viewer has Copy and Save buttons too. Copy puts the image on the clipboard as image data (a GIF as its first frame), Save writes the original file (the full-size version once it has arrived, a GIF with its animation) under its own name or `image-<date>.<ext>`. Both refuse images above 50 MB with a clear message, and an external image that was not loaded offers only its address, so nothing is fetched (issue #115)\n- About > Show third-party licences opens the licences in a window of their own, which remembers its size, follows the theme and language and closes with Ctrl+W: one collapsed row per component (`name version — licence`, tagged Rust, npm or native, including libvpx, Opus, SQLite and the AppImage's GStreamer and WebKitGTK) that expands by click, Enter or Space to the full licence text with a Copy button and the repository link, a search by name or licence, a licence filter and Expand all / Collapse all. The header names Mumcord's own licence (AGPL-3.0-only) with a link to the source code. The notices are generated as `ui/public/third-party-notices.json` as well, with each licence text stored once (#138)\n- About > What's new opens the changelog in a window of its own instead of the website, and it opens by itself once after an update (Settings > About > Show “What's new” automatically after updates): one collapsible section per version with its date and a one-line summary, the current version open, Added / Changed / Fixed groups in their own colours, the developer-only Internal group collapsed, search across all versions, Expand all / Collapse all, and issue numbers and release pages opening through the link menu. It remembers its size, follows the theme and language and closes with Ctrl+W; dev builds show the version in development and never open it by themselves (issue #145)\n\n### Changed\n\n- Connection info rates the audio as Good, Fair or Poor over the last two minutes, with an icon, a colour and a one-line reason that names the likely cause (network loss, high CPU load or the audio device). The raw counters moved into a Details section that stays collapsed until opened (remembered), with an explanation of each counter, what is normal, the figure for the last two minutes and small trend graphs. The diagnostics file and the packet inspector's voice counters show the rating and reason too. The counters no longer count normal silence: concealment only counts while someone's voice stream is running (not the end of every speech burst), late frames and playback underruns only count while sound is being sent or played, and the jitter buffer shows the last speaker's delay between bursts instead of 0 ms (#152)\n- The post-release changelog step no longer adds a second empty \"Unreleased\" section when the next version already has an open \"X.Y.Z - Unreleased\" section, and the release notes fall back to a plain \"Unreleased\" section\n- After a release is published, a workflow opens a pull request that writes the released version into the manifests and lock files and regenerates the third-party notices and dates the changelog section, so `main` no longer stays on the previous version and a release needs no pull request beforehand; the release notes take their \"What's new\" from the changelog\n\n### Fixed\n\n- Linux: Mumcord no longer gets killed (SIGXCPU) when a voice thread at real-time priority runs past its time budget, for example with noise suppression in a development build. An overrunning thread now drops back to normal priority and audio keeps running; the budget leaves room for bursts (half of rtkit's hard limit instead of one 10 ms frame), the capture thread rests briefly while catching up on a backlog, development builds no longer use real-time scheduling, and they build the voice processing crates optimised (#139)\n- The Copy buttons on code blocks, the packet inspector, the theme share action and the OpenGL launch option now copy through the app's own clipboard access, so they work on Linux where the web engine's clipboard fails (issue #134)\n- Selected chat text stays highlighted while its right-click menu is open and after choosing Copy, instead of looking unselected; it clears when you click elsewhere (issue #135)\n- Voice no longer crackles or drops out as easily when the computer is under heavy load: Mumcord's capture and playback threads, and the audio device threads, ask the system for real-time scheduling (rtkit on Linux, MMCSS on Windows, a time-constraint policy on macOS; without it they keep running at normal priority), and a buffer under- or overrun of the audio device no longer restarts the whole audio stream. The connection info and the diagnostic file show audio dropouts, late audio frames, concealed frames, the jitter-buffer delay, the processing time and whether real-time audio is on (#123)\n- Deleted chat history no longer comes back through history sync when you rejoin: clearing a channel, a server or all history (and the automatic deletion after N days) now also limits what is fetched from other Mumcord users' copies, and the confirmation says that others keep their copies (issue #119)\n- In the compact chat layout, the shared theme card no longer draws its title over the thumbnail, and message cards and image transfer bars no longer shift left; the theme card fits its content and shrinks cleanly on narrow windows (#121)\n- Large GIPHY GIFs no longer slow the whole app down: the chat now shows GIPHY's downsized GIF, sized for the chat box, instead of the full-size WebP, which kept the renderer about four times as busy while it played. GIFs already cached from earlier messages are fetched again in the lighter format, and moving the mouse over a large GIF no longer keeps a CPU core busy (#109)\n- Pasting copied image data, such as a Spectacle screenshot or \"Copy image\" in a browser, attaches the image again on Linux; the WebKitGTK bundled in the AppImage hands such a paste nothing, so the image is now read from the system clipboard (issue #110)\n- Selected chat text can be copied again: with text selected, the chat's right-click menu starts with **Copy**, before the message actions, and Ctrl+C copies the same plain text with its line breaks but without hidden labels, the hover time or button text. Before, the message menu replaced the webview's own menu and offered no Copy at all (issue #114)\n\n### Internal\n\n- Published releases are fingerprinted and re-checked daily: `releases/<version>.json` (tag commit, asset sizes and SHA-256, the version's changelog section, crates.io checksums) is added to the post-release sync pull request, and the new Release integrity workflow opens an issue when a tag, asset, changelog section or crate no longer matches. A pull request that edits the changelog section of an already released version fails the new \"Released changelog sections\" CI check. The manifests for v0.4.1 to v0.4.3 are backfilled (#144)\n- CI has a fast \"Lint workflows and scripts\" job that checks the GitHub workflows with actionlint and every shell script with shellcheck (pinned versions), also for pull requests that only touch workflows or scripts. `scripts/ci/lint-ci.sh` runs it locally; existing findings in the scripts are fixed (#104)\n\n- CI checks dependencies for known security advisories, disallowed licences and unknown sources with cargo-deny (`deny.toml`, same licence list as the third-party notices) and runs `npm audit` for production packages, on every pull request and weekly on `main`. Accepted advisories are listed with a reason and an issue (#103)"
+  },
+  "commit": "7123bb4786e8963372ff9cf72f49a69488de8bab",
+  "crates.io": {
+    "mumcord-audio": null,
+    "mumcord-codec": {
+      "cksum": "9c0b645e53f55160cdb62c0b8f85699deaec7fdb183561a0fdfb986fac613da7",
+      "yanked": false
+    },
+    "mumcord-p2p": {
+      "cksum": "17483cf64c7370cf6d5ff7d8a7fab69a554aef34e285f2bfa50847df0018a9ce",
+      "yanked": false
+    },
+    "mumcord-protocol": {
+      "cksum": "ff2b31a2e22ae6338f3b31efc9c504ac471f400793e767b8dff91d3bc1d891a1",
+      "yanked": false
+    },
+    "mumcord-store": {
+      "cksum": "4950a3f95db111c71cae4da6bb4fa1b222aa19c76f9bb4e65d5f92aa297d96e7",
+      "yanked": false
+    }
+  },
+  "sha256sums": "2a47a04d7b6548016974fc037890ef86eb4d434ef55be798f36c2c5b9be22ece",
+  "tag": "v0.4.4"
+}

@@ -1057,7 +1057,7 @@ checksum = "1d87ecb2933e8aeadb3e3a02b828fed80a7528047e68b4f424523a0981a3a084"
 
 [[package]]
 name = "mumcord-protocol"
-version = "0.4.3"
+version = "0.4.4"
 dependencies = [
  "aes",
  "bytes",
@@ -1084,7 +1084,7 @@ dependencies = [
 
 [[package]]
 name = "mumcord-store"
-version = "0.4.3"
+version = "0.4.4"
 dependencies = [
  "keyring",
  "p12-keystore",
