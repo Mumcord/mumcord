@@ -379,7 +379,8 @@
     "showNotices": "Zobrazit licence třetích stran",
     "noticesFailed": "Licence třetích stran se nepodařilo otevřít.",
     "loading": "Načítání…",
-    "devToolsUnlocked": "Vývojářské nástroje odemčeny: inspektor paketů je nyní v seznamu nastavení."
+    "devToolsUnlocked": "Vývojářské nástroje odemčeny: inspektor paketů je nyní v seznamu nastavení.",
+    "portable": "Přenosná"
   },
   "profile": {
     "title": "Profil",
