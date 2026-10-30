@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Added
+
+- Saved channel passwords show which channel they are for: the edit-server dialog lists each one as "Officers (Raid)" with the full channel path and when it was last used, instead of "Channel password 1". A password used for several channels lists them all, a channel renamed or removed on the server is marked "(not found)", and each password can be renamed. Only the names and channels are kept in the local database; the passwords stay in the system's secure storage. Passwords saved before keep the name "Password 1", "Password 2" … until they are entered for a channel again (#146)
+
 ## [0.4.4] - 2026-10-30
 
 ### Added
