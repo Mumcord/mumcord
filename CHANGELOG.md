@@ -1,6 +1,8 @@
 # Changelog
 
-## [0.4.4] - Unreleased
+## [Unreleased]
+
+## [0.4.4] - 2026-10-30
 
 ### Added
 
@@ -285,6 +287,7 @@ _**License change:** Mumcord is licensed under the GNU AGPL-3.0 only from this v
 
 _First release._
 
+[0.4.4]: https://github.com/Mumcord/mumcord/releases/tag/v0.4.4
 [0.4.3]: https://github.com/Mumcord/mumcord/releases/tag/v0.4.3
 [0.4.2]: https://github.com/Mumcord/mumcord/releases/tag/v0.4.2
 [0.4.1]: https://github.com/Mumcord/mumcord/releases/tag/v0.4.1
