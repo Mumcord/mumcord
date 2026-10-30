@@ -1,4 +1,4 @@
-import { act, fireEvent, render, screen } from "@testing-library/react";
+import { act, fireEvent, render as rtlRender, screen } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { MockApi, WatchParty } from "../../api";
 import { MediaWidgetsMount } from "../../app/mounts";
@@ -7,6 +7,7 @@ import { resetFloatingWidgets } from "../../components/floatingWidgetStore";
 import { getServerState, showServer } from "../channels/serverStore";
 import { connectedMock, resetAll } from "../channels/testUtils";
 import { resetWatchPartyStore } from "./watchPartyStore";
+import { renderWithEmbeds as render, withEmbeds } from "../../app/testPreferences";
 
 function party(patch: Partial<WatchParty>): WatchParty {
   return {
@@ -60,6 +61,18 @@ describe("watch party widget", () => {
     announce(party({ channelId, joined: true }));
     announce(null);
     expect(document.querySelector(".floating-widget")).toBeNull();
+  });
+
+  it("with embedded players off shows only the notice, no add button and no player", () => {
+    const playerPage = vi.spyOn(api, "embedPlayerOpen");
+    rtlRender(<MediaWidgetsMount />, { wrapper: withEmbeds(false) });
+    announce(party({ channelId, joined: true }));
+    expect(document.querySelector(".floating-widget")).toHaveAccessibleName("Watch party");
+    expect(screen.getByRole("status")).toHaveTextContent("enable embedded players to join");
+    expect(screen.queryByRole("button", { name: "Add video" })).toBeNull();
+    expect(screen.getByRole("button", { name: "Leave party" })).toBeInTheDocument();
+    expect(document.querySelector("iframe")).toBeNull();
+    expect(playerPage).not.toHaveBeenCalled();
   });
 
   it("collapses to the title with play/pause", () => {
