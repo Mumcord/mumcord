@@ -12,6 +12,7 @@
   "bar": {
     "listLabel": "Uložené servery",
     "add": "Pridať server",
+    "browse": "Prehliadať verejné servery",
     "keyboardHint": "Enter pripojí. Alt a šípka hore alebo dole presunie server. Shift a F10 otvorí ďalšie možnosti.",
     "label": "{{server}} ({{state}})",
     "state": {

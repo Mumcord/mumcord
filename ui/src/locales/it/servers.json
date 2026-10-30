@@ -12,6 +12,7 @@
   "bar": {
     "listLabel": "Server salvati",
     "add": "Aggiungi un server",
+    "browse": "Sfoglia i server pubblici",
     "keyboardHint": "Invio per connettersi. Alt più freccia su o giù sposta il server. Maiusc più F10 apre altre opzioni.",
     "label": "{{server}} ({{state}})",
     "state": {

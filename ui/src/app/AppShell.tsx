@@ -28,6 +28,8 @@ export interface ShellSlots {
   chatStatus: ReactNode;
   chat: ReactNode;
   members: ReactNode;
+  /** A page that covers everything right of the server bar (the public server browser). */
+  page?: ReactNode;
 }
 
 /** Element ids of the shell regions, used as skip-link targets. */
@@ -156,6 +158,7 @@ export function AppShell({ slots, inert = false }: { slots: ShellSlots; inert?: 
       style={style}
       data-members-collapsed={!narrow && collapsed}
       data-members-open={overlayShown}
+      data-page-open={slots.page ? true : undefined}
       inert={inert}
     >
       <MembersColumnContext value={column}>
@@ -168,6 +171,7 @@ export function AppShell({ slots, inert = false }: { slots: ShellSlots; inert?: 
         <nav ref={serverBarRef} className="shell__servers" aria-label={t("regions.servers")}>
           {slots.servers}
         </nav>
+        {slots.page ? <div className="shell__page">{slots.page}</div> : null}
         <div className="shell__channel-column">
           <nav
             id={SHELL_IDS.channels}

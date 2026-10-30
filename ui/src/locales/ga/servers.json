@@ -12,6 +12,7 @@
   "bar": {
     "listLabel": "Freastalaithe sábháilte",
     "add": "Cuir freastalaí leis",
+    "browse": "Brabhsáil freastalaithe poiblí",
     "keyboardHint": "Ceanglaíonn Enter. Bogann Alt móide an tsaighead suas nó síos an freastalaí. Osclaíonn Shift móide F10 tuilleadh roghanna.",
     "label": "{{server}} ({{state}})",
     "state": {

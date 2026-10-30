@@ -1,0 +1,274 @@
+/* Public server browser (issue #68): fills the main area next to the server bar. */
+.server-browser {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  height: 100%;
+  min-height: 0;
+  padding: var(--space-6) var(--space-6) var(--space-4);
+  overflow: hidden;
+  background: var(--color-bg-chat);
+  color: var(--color-text);
+}
+
+.server-browser__header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--space-2) var(--space-3);
+}
+
+.server-browser__header h1 {
+  margin: 0;
+  font-family: var(--font-family-display);
+  font-size: 1.75rem;
+}
+
+.server-browser__subtitle {
+  margin: 0;
+  color: var(--color-text-muted);
+}
+
+.server-browser__search-row {
+  display: flex;
+  gap: var(--space-3);
+}
+
+.server-browser__search {
+  flex: 1;
+  min-width: 0;
+  padding: var(--space-2) var(--space-4);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-bg-sidebar);
+  color: var(--color-text);
+  font-size: var(--font-size-md);
+}
+
+.server-browser__refresh {
+  flex: none;
+  font-weight: var(--font-weight-bold);
+}
+
+.server-browser__filters {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2) var(--space-3);
+}
+
+.server-browser__filters-label {
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-bold);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+/* The filter menus are pills like the toggles next to them, as in the mockup. */
+.server-browser__filter.select {
+  min-width: 0;
+}
+
+.server-browser__filter .select__button {
+  padding: var(--space-1) var(--space-4);
+  border-radius: var(--radius-full);
+  background: transparent;
+}
+
+.server-browser__toggle {
+  padding: var(--space-1) var(--space-4);
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-full);
+  background: transparent;
+  color: var(--color-text);
+  cursor: pointer;
+}
+
+.server-browser__toggle:hover {
+  background: var(--color-bg-hover);
+}
+
+.server-browser__toggle[aria-pressed="true"] {
+  border-color: var(--color-accent);
+  background: var(--color-bg-selected);
+  color: var(--color-accent-text);
+  font-weight: var(--font-weight-bold);
+}
+
+.server-browser__sort-label {
+  margin-left: auto;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+}
+
+.server-browser__error {
+  margin: 0;
+  color: var(--color-danger);
+}
+
+.server-browser__empty {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-3);
+  margin: 0;
+  color: var(--color-text-secondary);
+}
+
+.server-browser__table-wrap {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+}
+
+.server-browser__table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.server-browser__table thead th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  padding: var(--space-3) var(--space-4);
+  border-bottom: 1px solid var(--color-border);
+  background: var(--color-bg-elevated);
+  text-align: left;
+}
+
+.server-browser__sort {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-bold);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.server-browser__col--name {
+  width: 45%;
+}
+
+.server-browser__row > * {
+  padding: var(--space-3) var(--space-4);
+  border-bottom: 1px solid var(--color-border);
+  text-align: left;
+  vertical-align: middle;
+}
+
+.server-browser__row:last-child > * {
+  border-bottom: 0;
+}
+
+.server-browser__row:hover,
+.server-browser__row:focus-within {
+  background: var(--color-bg-selected);
+  box-shadow: inset 3px 0 0 var(--color-accent);
+}
+
+.server-browser__name {
+  font-weight: var(--font-weight-normal);
+}
+
+.server-browser__name-line {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.server-browser__server-name {
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-bold);
+  overflow-wrap: anywhere;
+}
+
+.server-browser__badge {
+  padding: 0 var(--space-2);
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-full);
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-bold);
+}
+
+.server-browser__host {
+  display: block;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+  overflow-wrap: anywhere;
+}
+
+.server-browser__country-code {
+  display: inline-block;
+  min-width: 2.25rem;
+  padding: 0 var(--space-2);
+  border-radius: var(--radius-sm);
+  background: var(--color-bg-elevated);
+  font-weight: var(--font-weight-bold);
+  text-align: center;
+}
+
+.server-browser__ping {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  white-space: nowrap;
+}
+
+.server-browser__ping-dot {
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: var(--radius-full);
+  background: currentcolor;
+}
+
+.server-browser__ping--good {
+  color: var(--color-success);
+}
+
+.server-browser__ping--fair {
+  color: var(--color-warning);
+}
+
+.server-browser__ping--poor {
+  color: var(--color-danger);
+}
+
+.server-browser__ping--pending,
+.server-browser__ping--none {
+  color: var(--color-text-muted);
+}
+
+.server-browser__users {
+  white-space: nowrap;
+}
+
+.server-browser__actions {
+  white-space: nowrap;
+  text-align: right;
+}
+
+.server-browser__actions .button + .button {
+  margin-left: var(--space-2);
+}
+
+/* As in the mockup, the actions show on the row under the pointer or keyboard focus; they stay
+   focusable, so Tab reaches them. Touch screens without hover always see them. */
+@media (hover: hover) {
+  .server-browser__row:not(:hover, :focus-within) .server-browser__actions .button {
+    opacity: 0;
+  }
+}
+
+.server-browser__note {
+  margin: 0;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+}

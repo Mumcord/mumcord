@@ -12,6 +12,7 @@
   "bar": {
     "listLabel": "Įrašyti serveriai",
     "add": "Pridėti serverį",
+    "browse": "Naršyti viešuosius serverius",
     "keyboardHint": "Enter jungiasi. Alt plius rodyklė aukštyn arba žemyn perkelia serverį. Shift plius F10 atidaro daugiau parinkčių.",
     "label": "{{server}} ({{state}})",
     "state": {

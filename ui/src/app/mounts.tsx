@@ -32,6 +32,7 @@ import {
 import { ScreenShareWidget } from "../features/screenshare";
 import { VideoDucking, WatchPartyWidget } from "../features/watchparty";
 import { ConnectionStatus, RejoinPrompt, ServersRoot } from "../features/servers";
+import { closeServerBrowser, useServerBrowserOpen } from "../features/serverbrowser";
 import { RequestsEntry, RequestsView, useRequestsView } from "../features/requests";
 import {
   closeMessages,
@@ -54,8 +55,13 @@ import {
 /** Server bar (B19). */
 export function ServersMount() {
   const messages = useMessagesOpen();
+  const browserOpen = useServerBrowserOpen();
   return (
-    <ServersRoot top={<MessagesButton />} topActive={messages} onServerClick={closeMessages} />
+    <ServersRoot
+      top={<MessagesButton covered={browserOpen} onOpen={closeServerBrowser} />}
+      topActive={messages}
+      onServerClick={closeMessages}
+    />
   );
 }
 
