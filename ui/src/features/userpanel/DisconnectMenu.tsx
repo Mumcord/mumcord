@@ -54,7 +54,6 @@ export function DisconnectMenu({
     label: t("disconnect", { server: serverLabel }),
     hint: t("disconnectMenu.disconnectHint"),
     icon: HANG_UP,
-    danger: true,
     onSelect: onDisconnect,
   });
   for (const target of switchTargets) {
