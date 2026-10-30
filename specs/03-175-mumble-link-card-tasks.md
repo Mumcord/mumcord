@@ -33,7 +33,7 @@ Acceptance criteria taken from the issue:
 | T10 | Mock engine + docs/engine-api.md | done | lead | T5 | simple | – | `ui/src/api/mock.ts`, `docs/engine-api.md` |
 | T11 | Tests: protocol codec, engine query against a local fake server, UI unit tests | done | lead | T6 | complex | AC-2, AC-6, AC-8, AC-10 | `crates/protocol/tests/query.rs`, `crates/engine/tests/server_query.rs`, `ui/src/features/chat/*test*` |
 | T12 | Verification: build, tests, type checks, linters | done | lead | T11 | simple | – | – |
-| T13 | Verification in the running client against the local test server | open | lead | T12 | complex | AC-1, AC-2, AC-5, AC-7, AC-12 | `e2e/specs/chat/mumble-link-card.e2e.ts` |
+| T13 | Verification in the running client against the local test server | done | lead | T12 | complex | AC-1, AC-2, AC-5, AC-7, AC-12 | `e2e/specs/chat/mumble-link-card.e2e.ts` |
 
 ## Notes
 
@@ -41,8 +41,11 @@ Acceptance criteria taken from the issue:
   responder, and by `crates/engine/tests/live_server_query.rs` against the local test server
   (`testenv/up.sh v15`, then `MUMCORD_LIVE=1 cargo test -p mumcord-engine --features test-backend
   --test live_server_query -- --ignored --test-threads=1`), which answered with its version, the
-  users online and the user limit. The client itself has not been run against the test server yet
-  (T13), so the card has not been checked on screen.
+  users online and the user limit. T13 ran the E2E spec against `testenv` v15 and v14: the card
+  shows the channel and the figures, credentials are warned about and never shown, one message
+  gets at most three cards, Join only connects after the click (including the save-and-connect
+  dialog) and the composer preview has no action buttons. Dark and light screenshots are in
+  `docs/images/screenshots/mumble-link-card-*.png`.
 - `#140` (block users) is not implemented yet, so AC-5 is prepared (the query goes through the
   same privacy gate as previews) but the "never for blocked users" rule cannot be enforced.
 - The card shows the credentials warning as a plain sentence, and the composer preview has no
