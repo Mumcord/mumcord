@@ -113,5 +113,20 @@
     "title": "Koppla från alla servrar?",
     "message": "Koppla från alla {{total}} servrar?",
     "confirm": "Koppla från"
+  },
+  "audio": {
+    "inputOptions": "Mikrofonalternativ",
+    "outputOptions": "Högtalaralternativ",
+    "inputDevices": "Ingångsenhet",
+    "outputDevices": "Utgångsenhet",
+    "systemDefault": "Systemets standard",
+    "noDevices": "Inga enheter hittades",
+    "noiseSuppression": "Brusreducering",
+    "testSound": "Testljud",
+    "voiceSettings": "Röstinställningar…",
+    "fallbackInput": "Mikrofonen kopplades ur. Systemets standard används.",
+    "fallbackOutput": "Utgångsenheten kopplades ur. Systemets standard används.",
+    "volume": "Volym",
+    "level": "Nivå"
   }
 }

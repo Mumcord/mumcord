@@ -113,5 +113,20 @@
     "title": "Afbryd forbindelsen til alle servere?",
     "message": "Afbryd forbindelsen til alle {{total}} servere?",
     "confirm": "Afbryd"
+  },
+  "audio": {
+    "inputOptions": "Mikrofonindstillinger",
+    "outputOptions": "Højttalerindstillinger",
+    "inputDevices": "Inputenhed",
+    "outputDevices": "Outputenhed",
+    "systemDefault": "Systemstandard",
+    "noDevices": "Ingen enheder fundet",
+    "noiseSuppression": "Støjreduktion",
+    "testSound": "Test lyd",
+    "voiceSettings": "Stemmeindstillinger…",
+    "fallbackInput": "Mikrofonen blev frakoblet. Systemstandarden bruges.",
+    "fallbackOutput": "Outputenheden blev frakoblet. Systemstandarden bruges.",
+    "volume": "Lydstyrke",
+    "level": "Niveau"
   }
 }

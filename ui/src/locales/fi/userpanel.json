@@ -113,5 +113,20 @@
     "title": "Katkaistaanko yhteys kaikkiin palvelimiin?",
     "message": "Katkaistaanko yhteys kaikkiin {{total}} palvelimeen?",
     "confirm": "Katkaise"
+  },
+  "audio": {
+    "inputOptions": "Mikrofonin asetukset",
+    "outputOptions": "Kaiuttimien asetukset",
+    "inputDevices": "Tulolaite",
+    "outputDevices": "Lähtölaite",
+    "systemDefault": "Järjestelmän oletus",
+    "noDevices": "Laitteita ei löytynyt",
+    "noiseSuppression": "Kohinanvaimennus",
+    "testSound": "Testiääni",
+    "voiceSettings": "Ääniasetukset…",
+    "fallbackInput": "Mikrofoni irrotettiin. Käytössä on järjestelmän oletus.",
+    "fallbackOutput": "Lähtölaite irrotettiin. Käytössä on järjestelmän oletus.",
+    "volume": "Äänenvoimakkuus",
+    "level": "Taso"
   }
 }

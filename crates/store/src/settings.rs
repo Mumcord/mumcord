@@ -338,6 +338,10 @@ pub struct Settings {
     pub noise_suppression: bool,
     pub echo_cancellation: bool,
     pub auto_gain: bool,
+    /// Manual microphone gain in percent, 0–200 (100 = unchanged); the voice-bar popover slider.
+    pub input_gain_percent: u16,
+    /// Master volume of everything played, in percent, 0–100 (100 = unchanged).
+    pub output_volume_percent: u16,
     /// "Music quality" (Settings → Audio, FR-1.24, QA.37): the bitrate cap rises from 96 kbit/s to
     /// the server limit (at most 510 kbit/s), the encoder is tuned for music and noise
     /// suppression and automatic gain are bypassed. Off by default.
@@ -456,6 +460,8 @@ impl Default for Settings {
             noise_suppression: true,
             echo_cancellation: true,
             auto_gain: true,
+            input_gain_percent: 100,
+            output_volume_percent: 100,
             music_quality: false,
             bitrate_kbps: Some(DEFAULT_BITRATE_KBPS),
             video_ducking: true,
@@ -551,6 +557,8 @@ impl Store {
                 settings.video_ducking_percent = settings
                     .video_ducking_percent
                     .clamp(MIN_VIDEO_DUCKING_PERCENT, MAX_VIDEO_DUCKING_PERCENT);
+                settings.input_gain_percent = settings.input_gain_percent.min(200);
+                settings.output_volume_percent = settings.output_volume_percent.min(100);
                 Ok(settings)
             }
             None => Ok(Settings::default()),
@@ -804,6 +812,25 @@ mod tests {
             assert!(!loaded.video_ducking);
             assert_eq!(loaded.video_ducking_percent, expected);
         }
+    }
+
+    #[test]
+    fn gain_and_volume_default_to_unchanged_and_are_clamped_on_load() {
+        let (_dir, store) = temp_store();
+        let defaults = store.settings().expect("load");
+        assert_eq!(defaults.input_gain_percent, 100);
+        assert_eq!(defaults.output_volume_percent, 100);
+        store
+            .conn
+            .execute(
+                "INSERT INTO settings (id, data) VALUES (1, ?1)
+                 ON CONFLICT (id) DO UPDATE SET data = excluded.data",
+                params![r#"{"input_gain_percent":900,"output_volume_percent":250}"#],
+            )
+            .expect("insert");
+        let loaded = store.settings().expect("load");
+        assert_eq!(loaded.input_gain_percent, 200);
+        assert_eq!(loaded.output_volume_percent, 100);
     }
 
     #[test]

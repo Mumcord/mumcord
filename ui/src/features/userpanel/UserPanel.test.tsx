@@ -492,7 +492,9 @@ describe("UserPanel", () => {
     const labels = [...row.querySelectorAll("button")].map((b) => b.getAttribute("aria-label"));
     expect(labels).toEqual([
       "Mute microphone",
+      "Microphone options",
       "Deafen",
+      "Speaker options",
       expect.stringMatching(/^Disconnect from /),
       "More disconnect options",
       "Connection info",

@@ -113,5 +113,20 @@
     "title": "An ndícheanglóidh tú ó gach freastalaí?",
     "message": "An ndícheanglóidh tú ó na {{total}} freastalaí go léir?",
     "confirm": "Dícheangail"
+  },
+  "audio": {
+    "inputOptions": "Roghanna micreafóin",
+    "outputOptions": "Roghanna callairí",
+    "inputDevices": "Gléas ionchuir",
+    "outputDevices": "Gléas aschuir",
+    "systemDefault": "Réamhshocrú an chórais",
+    "noDevices": "Níor aimsíodh aon ghléas",
+    "noiseSuppression": "Ceapadh torainn",
+    "testSound": "Tástáil fuaim",
+    "voiceSettings": "Socruithe gutha…",
+    "fallbackInput": "Díphlugáladh an micreafón. Úsáidtear réamhshocrú an chórais.",
+    "fallbackOutput": "Díphlugáladh an gléas aschuir. Úsáidtear réamhshocrú an chórais.",
+    "volume": "Toirt",
+    "level": "Leibhéal"
   }
 }

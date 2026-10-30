@@ -113,5 +113,20 @@
     "title": "Te deconectezi de la toate serverele?",
     "message": "Te deconectezi de la toate cele {{total}} servere?",
     "confirm": "Deconectează"
+  },
+  "audio": {
+    "inputOptions": "Opțiuni microfon",
+    "outputOptions": "Opțiuni difuzoare",
+    "inputDevices": "Dispozitiv de intrare",
+    "outputDevices": "Dispozitiv de ieșire",
+    "systemDefault": "Implicit al sistemului",
+    "noDevices": "Niciun dispozitiv găsit",
+    "noiseSuppression": "Suprimarea zgomotului",
+    "testSound": "Testează sunetul",
+    "voiceSettings": "Setări de voce…",
+    "fallbackInput": "Microfonul a fost deconectat. Se folosește dispozitivul implicit al sistemului.",
+    "fallbackOutput": "Dispozitivul de ieșire a fost deconectat. Se folosește dispozitivul implicit al sistemului.",
+    "volume": "Volum",
+    "level": "Nivel"
   }
 }

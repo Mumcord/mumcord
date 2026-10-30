@@ -160,6 +160,8 @@ pub struct UserView {
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct ServerInfoView {
     pub version: String,
+    pub release: Option<String>,
+    pub os: Option<String>,
     pub follow_supported: bool,
     /// Sanitized HTML.
     pub welcome_text: Option<String>,
@@ -169,6 +171,23 @@ pub struct ServerInfoView {
     pub max_message_length: u32,
     pub max_image_message_length: u32,
     pub allow_html: bool,
+    pub max_bandwidth: Option<u32>,
+    pub max_users: Option<u32>,
+    pub recording_allowed: bool,
+    pub server_label: Option<String>,
+    pub server_address: Option<String>,
+    pub server_port: Option<u16>,
+    pub tls_fingerprint: Option<String>,
+    pub users_online: u32,
+    pub session_id: Option<u32>,
+    pub registered: bool,
+    pub current_channel_permissions: Option<u32>,
+    pub mumcord_users: u32,
+    pub tls_trusted: bool,
+    pub tls_issuer: Option<String>,
+    pub tls_valid_from: Option<String>,
+    pub tls_valid_until: Option<String>,
+    pub tls_certificate_pem: Option<String>,
 }
 
 /// A conversation as the UI addresses it (channel ids are per connection).
@@ -382,6 +401,11 @@ pub enum EngineEvent {
     },
     FollowedChannelsChanged(Vec<u32>),
     AudioDevicesChanged(AudioDeviceList),
+    /// The chosen device is gone and the system default plays in its place (`input` is the
+    /// microphone, otherwise the output). Sent once per switch, not on every poll.
+    AudioDeviceFallback {
+        input: bool,
+    },
     /// The highest bitrate the bitrate slider can reach changed (FR-2.64); `None` without a
     /// voice server.
     BitrateMaxChanged(Option<u32>),

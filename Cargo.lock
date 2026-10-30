@@ -3665,6 +3665,7 @@ name = "mumcord-protocol"
 version = "0.4.4"
 dependencies = [
  "aes",
+ "base64 0.23.1",
  "bytes",
  "prost",
  "prost-build",
@@ -3677,6 +3678,7 @@ dependencies = [
  "tokio",
  "tokio-rustls",
  "tracing",
+ "x509-parser",
 ]
 
 [[package]]
