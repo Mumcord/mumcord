@@ -256,5 +256,27 @@
     "tooLarge": "Koda je prevelika za prenos.",
     "fileType": "Datoteka s kodo",
     "plainText": "Navadno besedilo"
+  },
+  "mumbleCard": {
+    "addServer": "Dodaj med strežnike",
+    "channel": "Kanal {{channel}}",
+    "copy": "Kopiraj povezavo",
+    "copyLabel": "Kopiraj povezavo do {{server}}",
+    "figures": "Ping {{ping}} ms · {{users}} od {{max}} uporabnikov · strežnik {{version}}",
+    "goToChannel": "Pojdi na kanal",
+    "join": "Pridruži se",
+    "joinLabel": "Pridruži se strežniku {{server}}",
+    "joined": "Pridruženo",
+    "label": "Kartica strežnika {{server}}",
+    "privacyOff": "Vrednosti strežnika so v nastavitvah izklopljene",
+    "querying": "Preverjanje strežnika…",
+    "retry": "Preveri znova",
+    "retryLabel": "Preveri znova {{server}}",
+    "server": "{{server}}",
+    "unreachable": "Strežnik ni dosegljiv",
+    "warning_few": "{{count}} povezave v tem sporočilu prikazujejo poverilnice",
+    "warning_one": "{{count}} povezava v tem sporočilu prikazuje poverilnice",
+    "warning_other": "{{count}} povezke v tem sporočilu prikazuje poverilnice",
+    "warning_two": "{{count}} povezavi v tem sporočilu prikazujeta poverilnice"
   }
 }

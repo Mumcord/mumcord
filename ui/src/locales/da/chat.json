@@ -248,5 +248,25 @@
     "tooLarge": "Koden er for stor til at downloade.",
     "fileType": "Kodefil",
     "plainText": "Almindelig tekst"
+  },
+  "mumbleCard": {
+    "addServer": "Tilføj til servere",
+    "channel": "Kanal {{channel}}",
+    "copy": "Kopiér link",
+    "copyLabel": "Kopiér link til {{server}}",
+    "figures": "Ping {{ping}} ms · {{users}} af {{max}} brugere · server {{version}}",
+    "goToChannel": "Gå til kanalen",
+    "join": "Tilslut",
+    "joinLabel": "Tilslut {{server}}",
+    "joined": "Tilsluttet",
+    "label": "Serverkort for {{server}}",
+    "privacyOff": "Serverværdier er slået fra i indstillingerne",
+    "querying": "Tjekker serveren…",
+    "retry": "Tjek igen",
+    "retryLabel": "Tjek igen {{server}}",
+    "server": "{{server}}",
+    "unreachable": "Serveren kan ikke nås",
+    "warning_one": "{{count}} link i denne besked viser loginoplysninger",
+    "warning_other": "{{count}} links i denne besked viser loginoplysninger"
   }
 }

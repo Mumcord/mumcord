@@ -252,5 +252,26 @@
     "tooLarge": "Codul este prea mare pentru a fi descărcat.",
     "fileType": "Fișier de cod",
     "plainText": "Text simplu"
+  },
+  "mumbleCard": {
+    "addServer": "Adaugă la servere",
+    "channel": "Canal {{channel}}",
+    "copy": "Copiaza linkul",
+    "copyLabel": "Copiaza linkul catre {{server}}",
+    "figures": "Ping {{ping}} ms · {{users}} din {{max}} utilizatori · server {{version}}",
+    "goToChannel": "Mergi la canal",
+    "join": "Intra",
+    "joinLabel": "Intra în {{server}}",
+    "joined": "Intrai",
+    "label": "Cardul serverului {{server}}",
+    "privacyOff": "Valorile serverului sunt oprite în setări",
+    "querying": "Se verifică serverul…",
+    "retry": "Verifică din nou",
+    "retryLabel": "Verifică din nou {{server}}",
+    "server": "{{server}}",
+    "unreachable": "Serverul nu poate fi contactat",
+    "warning_few": "{{count}} linkuri din acest mesaj afiseaza datele de conectare",
+    "warning_one": "{{count}} link din acest mesaj afiseaza datele de conectare",
+    "warning_other": "{{count}} linkuri din acest mesaj afiseaza datele de conectare"
   }
 }

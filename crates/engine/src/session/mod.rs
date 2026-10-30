@@ -226,6 +226,8 @@ struct Inner {
     /// Link previews and video cards for chat links (FR-1.49, FR-1.50); also the image cache
     /// of full-size chat images.
     previews: Arc<crate::web::LinkPreviews>,
+    /// Answers of the public server query behind the `mumble://` link card (issue #175).
+    queries: Arc<crate::server_query::ServerQueries>,
     /// Full-size image transfers with other Mumcord clients (FR-1.60c).
     full_images: crate::full_image::ServerTransfers,
     /// Direct connections to other Mumcord users (FR-2.35).
@@ -495,6 +497,7 @@ impl Engine {
                 crate::web::LinkPreviews::app_policy(),
                 crate::web::fetch::Timeouts::default(),
             )),
+            queries: Arc::new(crate::server_query::ServerQueries::default()),
             full_images: crate::full_image::ServerTransfers::default(),
             direct: crate::p2p::Direct::default(),
             core: Mutex::new(Core::default()),
@@ -559,6 +562,28 @@ impl Engine {
             Err(e) => {
                 tracing::warn!(error = %e, "reading the settings for a link preview failed");
                 None
+            }
+        }
+    }
+
+    /// The figures the public server query answers for the `mumble://` link card (issue #175).
+    /// Nothing is asked while the link-preview privacy switch is off, or while the user blocks
+    /// the person whose message carried the link (issue #140). `refresh` asks a server that
+    /// answered before, which is what the card's Retry button does.
+    pub async fn server_query(
+        &self,
+        address: &str,
+        port: u16,
+        refresh: bool,
+    ) -> crate::server_query::QueryOutcome {
+        match self.settings() {
+            Ok(settings) if settings.link_previews => {
+                self.inner.queries.query(address, port, refresh).await
+            }
+            Ok(_) => crate::server_query::QueryOutcome::NotAllowed,
+            Err(e) => {
+                tracing::warn!(error = %e, "reading the settings for a server query failed");
+                crate::server_query::QueryOutcome::NotAllowed
             }
         }
     }

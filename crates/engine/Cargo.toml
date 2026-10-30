@@ -94,6 +94,8 @@ mumcord-store = { workspace = true, features = ["test-util"] }
 mumcord-audio = { workspace = true, features = ["test-backend"] }
 netsim = { path = "../../tools/netsim" }
 rcgen.workspace = true
+# The link card test builds a query answer in the protobuf format, like the protocol crate does.
+prost.workspace = true
 
 [lints]
 workspace = true

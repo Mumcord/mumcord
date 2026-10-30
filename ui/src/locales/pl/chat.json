@@ -256,5 +256,27 @@
     "tooLarge": "Kod jest zbyt duży, aby go pobrać.",
     "fileType": "Plik z kodem",
     "plainText": "Zwykły tekst"
+  },
+  "mumbleCard": {
+    "addServer": "Dodaj do serwerów",
+    "channel": "Kanał {{channel}}",
+    "copy": "Kopiuj link",
+    "copyLabel": "Kopiuj link do {{server}}",
+    "figures": "Ping {{ping}} ms · {{users}} z {{max}} użytkowników · serwer {{version}}",
+    "goToChannel": "Przejdź do kanału",
+    "join": "Dołącz",
+    "joinLabel": "Dołącz do {{server}}",
+    "joined": "Dołączono",
+    "label": "Karta serwera {{server}}",
+    "privacyOff": "Wartości serwera są wyłączone w ustawieniach",
+    "querying": "Sprawdzanie serwera…",
+    "retry": "Sprawdź ponownie",
+    "retryLabel": "Sprawdź ponownie {{server}}",
+    "server": "{{server}}",
+    "unreachable": "Serwer jest niedostępny",
+    "warning_few": "{{count}} linki w tej wiadomości pokazują dane logowania",
+    "warning_many": "{{count}} linków w tej wiadomości pokazuje dane logowania",
+    "warning_one": "{{count}} link w tej wiadomości pokazuje dane logowania",
+    "warning_other": "{{count}} linku w tej wiadomości pokazuje dane logowania"
   }
 }

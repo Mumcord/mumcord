@@ -20,6 +20,7 @@ pub mod people;
 pub mod positional;
 pub mod profile;
 pub mod screen_share;
+pub mod server_query;
 pub mod session;
 pub mod sounds;
 pub mod stats;
@@ -41,6 +42,7 @@ pub use mumcord_store::{SecretStore, ServerId, Settings};
 pub use now_gaming::{GameSource, LocalGame, NowGamingView};
 pub use now_playing::{LocalTrack, NowPlayingView};
 pub use positional::PositionalStatus;
+pub use server_query::{QueryOutcome, ServerQueries, ServerQuery};
 pub use session::Engine;
 pub use session::{
     AudioDeviceList, AudioDeviceView, AudioHealthView, ChannelPasswordChannel,
