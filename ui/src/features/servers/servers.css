@@ -374,3 +374,17 @@
   justify-content: space-between;
   gap: 8px;
 }
+
+.servers-tokens__text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.servers-tokens__actions {
+  display: flex;
+  flex-shrink: 0;
+  gap: 4px;
+}

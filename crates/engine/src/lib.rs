@@ -43,11 +43,12 @@ pub use now_playing::{LocalTrack, NowPlayingView};
 pub use positional::PositionalStatus;
 pub use session::Engine;
 pub use session::{
-    AudioDeviceList, AudioDeviceView, AudioHealthView, ChannelPasswordState, ChannelPermissions,
-    ChannelView, ConnState, ConnectionStatsView, ConversationRef, EngineError, EngineEvent,
-    EngineResult, ErrorKind, EventReceiver, Events, IdentityView, MAX_RECONNECT_ATTEMPTS,
-    MicTestPhase, PasswordChange, ProfileView, ServerFields, ServerInfoView, ServerView,
-    SessionCtx, Snapshot, TaggedEvent, UnreadView, UserView, VoiceTransportKind,
+    AudioDeviceList, AudioDeviceView, AudioHealthView, ChannelPasswordChannel,
+    ChannelPasswordState, ChannelPasswordView, ChannelPermissions, ChannelView, ConnState,
+    ConnectionStatsView, ConversationRef, EngineError, EngineEvent, EngineResult, ErrorKind,
+    EventReceiver, Events, IdentityView, MAX_RECONNECT_ATTEMPTS, MicTestPhase, PasswordChange,
+    ProfileView, ServerFields, ServerInfoView, ServerView, SessionCtx, Snapshot, TaggedEvent,
+    UnreadView, UserView, VoiceTransportKind,
 };
 pub use stats::UserStatsView;
 pub use watch_party::{PLAYLIST_MAX, PlaylistEntry, WatchAction, WatchCommand, WatchPartyView};
