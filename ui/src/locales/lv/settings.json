@@ -348,6 +348,8 @@
     "selfMute": "Tu izslēdz vai ieslēdz savu mikrofonu",
     "selfDeaf": "Tu izslēdz vai ieslēdz skaņu",
     "hangUp": "Tu atvienojies no servera",
+    "kicked": "Tevi izmet no servera",
+    "banned": "Tevi nobloķē serverī",
     "messages": "Jauna ziņa kanālā, kuram seko, vai privātā čatā",
     "mention": "Skaņa, kad tevi piemin",
     "mentionNotify": "Paziņot, kad tevi piemin",

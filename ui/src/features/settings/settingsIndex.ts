@@ -312,6 +312,8 @@ export const SETTINGS_INDEX: readonly SettingEntry[] = [
   { section: "sounds", control: "sounds.shareStopped" },
   { section: "sounds", control: "sounds.viewerStarted" },
   { section: "sounds", control: "sounds.viewerStopped" },
+  { section: "sounds", control: "sounds.kicked" },
+  { section: "sounds", control: "sounds.banned" },
   {
     section: "sounds",
     group: "notifications.title",

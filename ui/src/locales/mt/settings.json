@@ -350,6 +350,8 @@
     "selfMute": "Tmutja jew tneħħi l-mute lilek innifsek",
     "selfDeaf": "Titfi jew tixgħel is-smigħ tiegħek",
     "hangUp": "Tiskonnettja minn server",
+    "kicked": "Titkeċċa minn server",
+    "banned": "Tiġi pprojbit minn server",
     "messages": "Messaġġ ġdid f'kanal segwit jew chat privat",
     "mention": "Ħoss meta tissemma",
     "mentionNotify": "Ibgħat notifika meta tissemma",

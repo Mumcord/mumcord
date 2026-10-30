@@ -347,6 +347,8 @@
     "selfMute": "Vaigistad end või lõpetad vaigistuse",
     "selfDeaf": "Kurdistad end või lõpetad kurdistuse",
     "hangUp": "Katkestad ühenduse serveriga",
+    "kicked": "Sind visatakse serverist välja",
+    "banned": "Sulle pannakse serveris keeld",
     "messages": "Uus sõnum jälgitavas kanalis või privaatvestluses",
     "mention": "Heli mainimisel",
     "mentionNotify": "Teavita mainimisel",

@@ -12,6 +12,8 @@ const EVENTS: (keyof SoundSettings)[] = [
   "selfMute",
   "selfDeaf",
   "hangUp",
+  "kicked",
+  "banned",
   "messages",
   "mention",
   "mentionNotify",

@@ -255,6 +255,8 @@ describe("SettingsScreen", () => {
             shareStopped: true,
             viewerStarted: true,
             viewerStopped: true,
+            kicked: true,
+            banned: true,
           },
         }),
       );
@@ -291,6 +293,23 @@ describe("SettingsScreen", () => {
     fireEvent.click(screen.getByRole("switch", { name: "You join a channel for voice" }));
     await waitFor(() => {
       expect(update.mock.lastCall?.[0].sounds).toMatchObject({ voiceJoin: false, hangUp: false });
+    });
+  });
+
+  it("toggles the kicked and banned sounds separately, both on by default", async () => {
+    const update = vi.spyOn(api, "settingsUpdate");
+    await openSection("Sounds & notifications");
+    const kicked = screen.getByRole("switch", { name: "You are kicked from a server" });
+    const banned = screen.getByRole("switch", { name: "You are banned from a server" });
+    expect(kicked).toBeChecked();
+    expect(banned).toBeChecked();
+    fireEvent.click(banned);
+    await waitFor(() => {
+      expect(update.mock.lastCall?.[0].sounds).toMatchObject({ kicked: true, banned: false });
+    });
+    fireEvent.click(screen.getByRole("switch", { name: "You are kicked from a server" }));
+    await waitFor(() => {
+      expect(update.mock.lastCall?.[0].sounds).toMatchObject({ kicked: false, banned: false });
     });
   });
 

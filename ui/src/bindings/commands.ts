@@ -1961,6 +1961,10 @@ export type SoundSettings = {
 	shareStopped: boolean,
 	viewerStarted: boolean,
 	viewerStopped: boolean,
+	/**  The server kicks you (#205). */
+	kicked: boolean,
+	/**  The server bans you (#205). */
+	banned: boolean,
 };
 
 /**  Channels received so far while a server is still syncing (FR-2.24). */

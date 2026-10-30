@@ -349,6 +349,8 @@
     "selfMute": "Wyciszasz się lub wyłączasz wyciszenie",
     "selfDeaf": "Ogłuszasz się lub wyłączasz ogłuszenie",
     "hangUp": "Rozłączasz się z serwerem",
+    "kicked": "Zostajesz wyrzucony z serwera",
+    "banned": "Zostajesz zbanowany na serwerze",
     "messages": "Nowa wiadomość na obserwowanym kanale lub czacie prywatnym",
     "mention": "Dźwięk przy wzmiance",
     "mentionNotify": "Powiadamiaj przy wzmiance",

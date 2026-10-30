@@ -350,6 +350,8 @@
     "selfMute": "Balbhaíonn tú nó díbhalbhaíonn tú thú féin",
     "selfDeaf": "Bodhraíonn tú nó díbhodhraíonn tú thú féin",
     "hangUp": "Dícheanglaíonn tú ó fhreastalaí",
+    "kicked": "Caitear amach thú ó fhreastalaí",
+    "banned": "Cuirtear cosc ort ó fhreastalaí",
     "messages": "Teachtaireacht nua i gcainéal leanta nó i gcomhrá príobháideach",
     "mention": "Fuaim nuair a luaitear thú",
     "mentionNotify": "Cuir fógra nuair a luaitear thú",

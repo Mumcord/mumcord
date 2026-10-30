@@ -217,6 +217,8 @@ const DEFAULT_SETTINGS: Settings = {
     shareStopped: true,
     viewerStarted: true,
     viewerStopped: true,
+    kicked: true,
+    banned: true,
   },
   closeBehaviour: "ask",
   chatDisplay: "cozy",

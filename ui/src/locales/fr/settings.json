@@ -348,6 +348,8 @@
     "selfMute": "Vous coupez ou réactivez votre micro",
     "selfDeaf": "Vous coupez ou réactivez votre son",
     "hangUp": "Vous vous déconnectez d’un serveur",
+    "kicked": "Vous êtes expulsé d’un serveur",
+    "banned": "Vous êtes banni d’un serveur",
     "messages": "Nouveau message dans un canal suivi ou une discussion privée",
     "mention": "Son lors d’une mention",
     "mentionNotify": "Notifier lors d’une mention",

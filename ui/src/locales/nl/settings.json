@@ -347,6 +347,8 @@
     "selfMute": "Je dempt jezelf of heft de demping op",
     "selfDeaf": "Je zet jezelf doof of heft het doof zetten op",
     "hangUp": "Je verbreekt de verbinding met een server",
+    "kicked": "Je wordt van een server gekickt",
+    "banned": "Je wordt van een server verbannen",
     "messages": "Nieuw bericht in een gevolgd kanaal of privéchat",
     "mention": "Geluid bij vermelding",
     "mentionNotify": "Melding bij vermelding",
