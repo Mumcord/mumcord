@@ -195,6 +195,17 @@ const MIGRATIONS: &[&str] = &[
     ALTER TABLE saved_server ADD COLUMN identity_id INTEGER REFERENCES identity (id)
         ON DELETE SET NULL;
     ",
+    // v15: accepted private conversations (issue #141). Kept per own identity, keyed by the
+    // own certificate hash, so the same person can message one identity but not another.
+    r"
+    CREATE TABLE accepted_conversation (
+        own_cert_hash TEXT    NOT NULL,
+        cert_hash     TEXT    NOT NULL,
+        name          TEXT    NOT NULL,
+        accepted_at   INTEGER NOT NULL,
+        PRIMARY KEY (own_cert_hash, cert_hash)
+    );
+    ",
 ];
 
 /// Handle to the local database. Not `Sync`; callers share it behind a mutex.

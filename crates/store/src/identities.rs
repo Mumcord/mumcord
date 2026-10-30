@@ -241,6 +241,10 @@ impl Store {
         secrets.delete_identity(id)?;
         let tx = self.conn.unchecked_transaction()?;
         tx.execute("DELETE FROM identity WHERE id = ?1", [id])?;
+        tx.execute(
+            "DELETE FROM accepted_conversation WHERE own_cert_hash = ?1",
+            [&record.cert_hash],
+        )?;
         if record.is_default
             && let Some(next) = all.iter().find(|other| other.id != id)
         {
