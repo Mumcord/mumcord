@@ -85,5 +85,18 @@
   "preview": {
     "privateMessage": "Mensaje privado",
     "fullProfile": "Perfil completo"
+  },
+  "toggle": {
+    "show": "Mostrar miembros",
+    "hide": "Ocultar miembros",
+    "showCount_one": "Mostrar miembros ({{count}})",
+    "showCount_many": "Mostrar miembros ({{count}})",
+    "showCount_other": "Mostrar miembros ({{count}})",
+    "talkingOne": "{{name}} está hablando",
+    "talkingTwo": "{{first}} y {{second}} están hablando",
+    "talkingMore_one": "{{name}} y {{count}} persona más están hablando",
+    "talkingMore_many": "{{name}} y {{count}} más están hablando",
+    "talkingMore_other": "{{name}} y {{count}} más están hablando",
+    "shortcut": "Ctrl+Mayús+M"
   }
 }

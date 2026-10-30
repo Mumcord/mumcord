@@ -11,10 +11,6 @@
     "chat": "Przejdź do czatu",
     "channels": "Przejdź do kanałów"
   },
-  "members": {
-    "show": "Pokaż członków",
-    "hide": "Ukryj członków"
-  },
   "resize": {
     "channels": "Zmień rozmiar listy kanałów",
     "members": "Zmień rozmiar listy członków"

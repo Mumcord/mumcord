@@ -83,5 +83,16 @@
   "preview": {
     "privateMessage": "Privat meddelande",
     "fullProfile": "Hela profilen"
+  },
+  "toggle": {
+    "show": "Visa medlemmar",
+    "hide": "Dölj medlemmar",
+    "showCount_one": "Visa medlemmar ({{count}})",
+    "showCount_other": "Visa medlemmar ({{count}})",
+    "talkingOne": "{{name}} pratar",
+    "talkingTwo": "{{first}} och {{second}} pratar",
+    "talkingMore_one": "{{name}} och {{count}} annan pratar",
+    "talkingMore_other": "{{name}} och {{count}} andra pratar",
+    "shortcut": "Ctrl+Skift+M"
   }
 }

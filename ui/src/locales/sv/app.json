@@ -11,10 +11,6 @@
     "chat": "Hoppa till chatten",
     "channels": "Hoppa till kanalerna"
   },
-  "members": {
-    "show": "Visa medlemmar",
-    "hide": "Dölj medlemmar"
-  },
   "resize": {
     "channels": "Ändra storlek på kanallistan",
     "members": "Ändra storlek på medlemslistan"

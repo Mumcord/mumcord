@@ -85,5 +85,18 @@
   "preview": {
     "privateMessage": "Privāta ziņa",
     "fullProfile": "Pilns profils"
+  },
+  "toggle": {
+    "show": "Rādīt dalībniekus",
+    "hide": "Slēpt dalībniekus",
+    "showCount_zero": "Rādīt dalībniekus ({{count}})",
+    "showCount_one": "Rādīt dalībniekus ({{count}})",
+    "showCount_other": "Rādīt dalībniekus ({{count}})",
+    "talkingOne": "{{name}} runā",
+    "talkingTwo": "{{first}} un {{second}} runā",
+    "talkingMore_zero": "{{name}} un vēl {{count}} runā",
+    "talkingMore_one": "{{name}} un vēl {{count}} runā",
+    "talkingMore_other": "{{name}} un vēl {{count}} runā",
+    "shortcut": "Ctrl+Shift+M"
   }
 }

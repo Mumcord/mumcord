@@ -11,10 +11,6 @@
     "chat": "Siirry chattiin",
     "channels": "Siirry kanaviin"
   },
-  "members": {
-    "show": "Näytä jäsenet",
-    "hide": "Piilota jäsenet"
-  },
   "resize": {
     "channels": "Muuta kanavalistan kokoa",
     "members": "Muuta jäsenlistan kokoa"

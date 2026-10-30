@@ -83,5 +83,16 @@
   "preview": {
     "privateMessage": "Privaatsõnum",
     "fullProfile": "Täielik profiil"
+  },
+  "toggle": {
+    "show": "Näita liikmeid",
+    "hide": "Peida liikmed",
+    "showCount_one": "Näita liikmeid ({{count}})",
+    "showCount_other": "Näita liikmeid ({{count}})",
+    "talkingOne": "{{name}} räägib",
+    "talkingTwo": "{{first}} ja {{second}} räägivad",
+    "talkingMore_one": "{{name}} ja veel {{count}} räägivad",
+    "talkingMore_other": "{{name}} ja veel {{count}} räägivad",
+    "shortcut": "Ctrl+Shift+M"
   }
 }

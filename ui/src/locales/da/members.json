@@ -83,5 +83,16 @@
   "preview": {
     "privateMessage": "Privat besked",
     "fullProfile": "Hele profilen"
+  },
+  "toggle": {
+    "show": "Vis medlemmer",
+    "hide": "Skjul medlemmer",
+    "showCount_one": "Vis medlemmer ({{count}})",
+    "showCount_other": "Vis medlemmer ({{count}})",
+    "talkingOne": "{{name}} taler",
+    "talkingTwo": "{{first}} og {{second}} taler",
+    "talkingMore_one": "{{name}} og {{count}} anden taler",
+    "talkingMore_other": "{{name}} og {{count}} andre taler",
+    "shortcut": "Ctrl+Skift+M"
   }
 }

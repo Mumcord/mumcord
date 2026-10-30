@@ -85,5 +85,18 @@
   "preview": {
     "privateMessage": "Message privé",
     "fullProfile": "Profil complet"
+  },
+  "toggle": {
+    "show": "Afficher les membres",
+    "hide": "Masquer les membres",
+    "showCount_one": "Afficher les membres ({{count}})",
+    "showCount_many": "Afficher les membres ({{count}})",
+    "showCount_other": "Afficher les membres ({{count}})",
+    "talkingOne": "{{name}} parle",
+    "talkingTwo": "{{first}} et {{second}} parlent",
+    "talkingMore_one": "{{name}} et {{count}} autre personne parlent",
+    "talkingMore_many": "{{name}} et {{count}} autres parlent",
+    "talkingMore_other": "{{name}} et {{count}} autres parlent",
+    "shortcut": "Ctrl+Maj+M"
   }
 }

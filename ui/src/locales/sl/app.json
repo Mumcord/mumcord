@@ -11,10 +11,6 @@
     "chat": "Skoči na klepet",
     "channels": "Skoči na kanale"
   },
-  "members": {
-    "show": "Pokaži člane",
-    "hide": "Skrij člane"
-  },
   "resize": {
     "channels": "Spremeni velikost seznama kanalov",
     "members": "Spremeni velikost seznama članov"
