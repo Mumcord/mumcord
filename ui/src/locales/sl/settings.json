@@ -379,7 +379,8 @@
     "showNotices": "Prikaži licence tretjih oseb",
     "noticesFailed": "Licenc tretjih oseb ni bilo mogoče odpreti.",
     "loading": "Nalaganje …",
-    "devToolsUnlocked": "Razvijalska orodja odklenjena: pregledovalnik paketov je zdaj na seznamu nastavitev."
+    "devToolsUnlocked": "Razvijalska orodja odklenjena: pregledovalnik paketov je zdaj na seznamu nastavitev.",
+    "portable": "Prenosna"
   },
   "profile": {
     "title": "Profil",

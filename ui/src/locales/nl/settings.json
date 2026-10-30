@@ -377,7 +377,8 @@
     "showNotices": "Licenties van derden tonen",
     "noticesFailed": "De licenties van derden konden niet worden geopend.",
     "loading": "Laden…",
-    "devToolsUnlocked": "Ontwikkelaarstools ontgrendeld: de pakketinspecteur staat nu in de lijst met instellingen."
+    "devToolsUnlocked": "Ontwikkelaarstools ontgrendeld: de pakketinspecteur staat nu in de lijst met instellingen.",
+    "portable": "Draagbaar"
   },
   "profile": {
     "title": "Profiel",

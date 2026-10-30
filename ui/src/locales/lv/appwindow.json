@@ -31,7 +31,8 @@
   "updateHint": {
     "message": "Pieejams Mumcord {{version}}.",
     "open": "Skatīt laidienu",
-    "dismiss": "Aizvērt"
+    "dismiss": "Aizvērt",
+    "portable": "Lejupielādējiet jauno portatīvo zip un izpakojiet to šajā mapē; jūsu dati mapē MumcordData saglabāsies."
   },
   "directConsent": {
     "title": "Atļaut tiešos savienojumus?",

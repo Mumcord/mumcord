@@ -31,7 +31,8 @@
   "updateHint": {
     "message": "Mumcord {{version}} este disponibil.",
     "open": "Vezi versiunea",
-    "dismiss": "Închide"
+    "dismiss": "Închide",
+    "portable": "Descarcă noul zip portabil și dezarhivează-l în acest dosar; datele tale din MumcordData rămân."
   },
   "directConsent": {
     "title": "Permiți conexiuni directe?",

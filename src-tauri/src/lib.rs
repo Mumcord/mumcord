@@ -18,6 +18,7 @@ mod kde_x11;
 mod notifications;
 mod now_gaming;
 mod now_playing;
+mod portable;
 mod ptt;
 mod screen_frames;
 mod tray;
@@ -26,6 +27,8 @@ mod version;
 mod watch_player;
 #[cfg(target_os = "linux")]
 mod webkit_compositing;
+#[cfg(target_os = "windows")]
+mod webview2;
 mod window;
 
 use mumcord_engine::{Engine, EngineEvent, SecretStore, diag};
@@ -256,6 +259,10 @@ fn export_bindings(builder: &Builder<tauri::Wry>) -> Result<(), specta_typescrip
 
 /// Starts the desktop app.
 pub fn run() {
+    #[cfg(target_os = "windows")]
+    if !webview2::ensure_available() {
+        std::process::exit(1);
+    }
     let context = tauri::generate_context!();
     // Before anything else starts a thread or GTK: it may switch to XWayland (FR-1.48).
     display::prepare(&context.config().identifier);
@@ -322,6 +329,7 @@ pub fn run() {
             builder.mount_events(app);
             // Before the engine: its event hook uses the notifier.
             notifications::init(app.handle());
+            create_main_window(app.handle())?;
             start_engine(app.handle())?;
             start_window_and_autostart(app.handle());
             tray::init(app.handle());
@@ -341,10 +349,29 @@ pub fn run() {
     }
 }
 
+/// Creates the main window from its entry in tauri.conf.json (`create: false` there), so that
+/// portable mode can point the web view's data at the portable folder.
+fn create_main_window(app: &AppHandle) -> tauri::Result<()> {
+    let config = app
+        .config()
+        .app
+        .windows
+        .iter()
+        .find(|w| w.label == "main")
+        .ok_or(tauri::Error::WindowNotFound)?
+        .clone();
+    let mut builder = tauri::WebviewWindowBuilder::from_config(app, &config)?;
+    if let Some(dir) = portable::webview_data_dir() {
+        builder = builder.data_directory(dir);
+    }
+    builder.build()?;
+    Ok(())
+}
+
 /// Opens the engine, starts logging and wires engine events, diagnostics and push-to-talk.
 fn start_engine(app: &AppHandle) -> Result<(), Box<dyn std::error::Error>> {
-    let data_dir = app.path().app_data_dir()?;
-    let logs_dir = app.path().app_log_dir()?;
+    let data_dir = portable::data_dir(app)?;
+    let logs_dir = portable::log_dir(app)?;
     std::fs::create_dir_all(&data_dir)?;
     std::fs::create_dir_all(&logs_dir)?;
 
@@ -354,11 +381,20 @@ fn start_engine(app: &AppHandle) -> Result<(), Box<dyn std::error::Error>> {
     if let Err(e) = diag::init(&logs_dir, settings::diag_level(stored.log_level), 7) {
         eprintln!("file logging unavailable: {e}");
     }
-    tracing::info!(version = version::DISPLAY, "Mumcord starting");
+    tracing::info!(
+        version = version::DISPLAY,
+        portable = portable::is_active(),
+        "Mumcord starting"
+    );
     mumcord_protocol::set_client_release(format!("Mumcord {}", version::DISPLAY));
 
     let info_engine = engine.clone();
-    diag::set_info_provider(move || info_engine.diagnostic_info(version::DISPLAY));
+    let diag_version = if portable::is_active() {
+        format!("{} (portable)", version::DISPLAY)
+    } else {
+        version::DISPLAY.to_owned()
+    };
+    diag::set_info_provider(move || info_engine.diagnostic_info(&diag_version));
 
     let controls = engine.dsp_controls();
     ptt::set_handler(move |pressed| controls.set_ptt_pressed(pressed));
