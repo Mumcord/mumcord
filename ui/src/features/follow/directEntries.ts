@@ -1,4 +1,4 @@
-import type { Friend } from "../../api";
+import type { Conversation, Friend, User } from "../../api";
 import type { DirectChat, FollowState } from "./followStore";
 
 export interface Entry {
@@ -50,4 +50,15 @@ export function collectEntries(
     }
   }
   return entries;
+}
+
+/** The online person a private chat is with. */
+export function person(users: ReadonlyMap<number, User>, c: Conversation): User | undefined {
+  if (c.kind === "private") return [...users.values()].find((u) => u.certHash === c.certHash);
+  if (c.kind === "privateSession") return users.get(c.session);
+  return undefined;
+}
+
+export function personName(users: ReadonlyMap<number, User>, c: Conversation): string | null {
+  return person(users, c)?.name ?? null;
 }

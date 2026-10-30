@@ -1853,6 +1853,7 @@ export function createMockApi(options: MockOptions = {}): MockApi {
       return Promise.resolve(outcome);
     },
     notificationDismiss: () => Promise.resolve(null),
+    trayAttentionSet: () => Promise.resolve(null),
 
     // Epic 2 contract, not built in the engine yet.
     serverSetAlwaysConnect: (serverId, enabled) => {
