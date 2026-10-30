@@ -34,6 +34,7 @@
     "jitter": "Vyrovnávacia pamäť jittera",
     "processing": "Spracovanie",
     "output": "Vyrovnávacia pamäť reproduktorov",
-    "value": "{{value}} ms"
+    "value": "{{value}} ms",
+    "total": "≈ {{value}} ms"
   }
 }

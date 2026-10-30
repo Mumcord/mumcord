@@ -34,6 +34,7 @@
     "jitter": "Tampon de gigue",
     "processing": "Traitement",
     "output": "Tampon des haut-parleurs",
-    "value": "{{value}} ms"
+    "value": "{{value}} ms",
+    "total": "≈ {{value}} ms"
   }
 }

@@ -34,6 +34,7 @@
     "jitter": "Buffer tal-jitter",
     "processing": "Ipproċessar",
     "output": "Buffer tal-ispiker",
-    "value": "{{value}} ms"
+    "value": "{{value}} ms",
+    "total": "≈ {{value}} ms"
   }
 }

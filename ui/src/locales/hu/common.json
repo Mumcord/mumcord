@@ -34,6 +34,7 @@
     "jitter": "Jitterpuffer",
     "processing": "Feldolgozás",
     "output": "Hangszórópuffer",
-    "value": "{{value}} ms"
+    "value": "{{value}} ms",
+    "total": "≈ {{value}} ms"
   }
 }

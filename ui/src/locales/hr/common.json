@@ -34,6 +34,7 @@
     "jitter": "Međuspremnik jittera",
     "processing": "Obrada",
     "output": "Međuspremnik zvučnika",
-    "value": "{{value}} ms"
+    "value": "{{value}} ms",
+    "total": "≈ {{value}} ms"
   }
 }

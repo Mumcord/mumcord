@@ -34,6 +34,7 @@
     "jitter": "Буфер за трептене",
     "processing": "Обработка",
     "output": "Буфер на високоговорителя",
-    "value": "{{value}} ms"
+    "value": "{{value}} ms",
+    "total": "≈ {{value}} ms"
   }
 }

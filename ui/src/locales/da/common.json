@@ -34,6 +34,7 @@
     "jitter": "Jitterbuffer",
     "processing": "Behandling",
     "output": "Højttalerbuffer",
-    "value": "{{value}} ms"
+    "value": "{{value}} ms",
+    "total": "≈ {{value}} ms"
   }
 }

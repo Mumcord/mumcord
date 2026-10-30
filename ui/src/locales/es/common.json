@@ -34,6 +34,7 @@
     "jitter": "Búfer de jitter",
     "processing": "Procesamiento",
     "output": "Búfer del altavoz",
-    "value": "{{value}} ms"
+    "value": "{{value}} ms",
+    "total": "≈ {{value}} ms"
   }
 }

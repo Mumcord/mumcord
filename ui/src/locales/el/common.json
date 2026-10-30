@@ -34,6 +34,7 @@
     "jitter": "Ενταμιευτής jitter",
     "processing": "Επεξεργασία",
     "output": "Ενταμιευτής ηχείων",
-    "value": "{{value}} ms"
+    "value": "{{value}} ms",
+    "total": "≈ {{value}} ms"
   }
 }

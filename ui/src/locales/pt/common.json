@@ -34,6 +34,7 @@
     "jitter": "Buffer de jitter",
     "processing": "Processamento",
     "output": "Buffer das colunas",
-    "value": "{{value}} ms"
+    "value": "{{value}} ms",
+    "total": "≈ {{value}} ms"
   }
 }

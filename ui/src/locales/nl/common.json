@@ -34,6 +34,7 @@
     "jitter": "Jitterbuffer",
     "processing": "Verwerking",
     "output": "Luidsprekerbuffer",
-    "value": "{{value}} ms"
+    "value": "{{value}} ms",
+    "total": "≈ {{value}} ms"
   }
 }

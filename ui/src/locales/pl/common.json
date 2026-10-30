@@ -34,6 +34,7 @@
     "jitter": "Bufor jittera",
     "processing": "Przetwarzanie",
     "output": "Bufor głośników",
-    "value": "{{value}} ms"
+    "value": "{{value}} ms",
+    "total": "≈ {{value}} ms"
   }
 }

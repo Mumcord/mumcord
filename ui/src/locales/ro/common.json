@@ -34,6 +34,7 @@
     "jitter": "Buffer de jitter",
     "processing": "Procesare",
     "output": "Buffer difuzor",
-    "value": "{{value}} ms"
+    "value": "{{value}} ms",
+    "total": "≈ {{value}} ms"
   }
 }

@@ -68,7 +68,7 @@ export function LatencyBreakdown({ estimate }: { estimate: Estimate }) {
         )}
       </div>
       <span className="latency-bar__total" aria-hidden="true">
-        ≈ {ms(estimate.totalUs)}
+        {t("latency.total", { value: formatMs(estimate.totalUs, i18n.language) })}
       </span>
     </div>
   );
