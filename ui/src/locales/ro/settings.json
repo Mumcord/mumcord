@@ -378,7 +378,8 @@
     "showNotices": "Afișează licențele terților",
     "noticesFailed": "Licențele terților nu au putut fi deschise.",
     "loading": "Se încarcă…",
-    "devToolsUnlocked": "Instrumente pentru dezvoltatori deblocate: inspectorul de pachete este acum în lista de setări."
+    "devToolsUnlocked": "Instrumente pentru dezvoltatori deblocate: inspectorul de pachete este acum în lista de setări.",
+    "portable": "Portabilă"
   },
   "profile": {
     "title": "Profil",

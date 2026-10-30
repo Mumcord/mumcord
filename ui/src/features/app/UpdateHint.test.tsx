@@ -16,7 +16,7 @@ beforeAll(async () => {
   await applyLanguage("en");
 });
 
-function fakeApi() {
+function fakeApi(portable = false) {
   let handler: ((info: UpdateInfo) => void) | null = null;
   const api: UpdateHintApi = {
     onUpdate: (h) => {
@@ -25,6 +25,7 @@ function fakeApi() {
         handler = null;
       };
     },
+    isPortable: () => Promise.resolve(portable),
   };
   return {
     api,
@@ -54,5 +55,21 @@ describe("UpdateHint", () => {
     expect(open).toHaveBeenCalledWith("https://github.com/Mumcord/mumcord/releases/tag/v0.5.0");
     fireEvent.click(screen.getByRole("button", { name: "Dismiss" }));
     expect(screen.queryByRole("status")).toBeNull();
+  });
+
+  it("asks the portable build for the new portable zip", async () => {
+    const { api, emit } = fakeApi(true);
+    render(<UpdateHint api={api} />);
+    emit({ version: "0.5.0", url: "https://github.com/Mumcord/mumcord/releases/tag/v0.5.0" });
+    expect(await screen.findByText(/Download the new portable zip/)).toBeInTheDocument();
+    expect(screen.getByRole("status")).toHaveTextContent("Mumcord 0.5.0 is available.");
+  });
+
+  it("keeps the plain hint for installed builds", async () => {
+    const { api, emit } = fakeApi(false);
+    render(<UpdateHint api={api} />);
+    emit({ version: "0.5.0", url: "https://github.com/Mumcord/mumcord/releases/tag/v0.5.0" });
+    const hint = await screen.findByRole("status");
+    expect(hint).not.toHaveTextContent("portable");
   });
 });

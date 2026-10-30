@@ -377,7 +377,8 @@
     "showNotices": "Show third-party licences",
     "noticesFailed": "The third-party licences could not be opened.",
     "loading": "Loading…",
-    "devToolsUnlocked": "Developer tools unlocked: the packet inspector is now in the settings list."
+    "devToolsUnlocked": "Developer tools unlocked: the packet inspector is now in the settings list.",
+    "portable": "Portable"
   },
   "profile": {
     "title": "Profile",
