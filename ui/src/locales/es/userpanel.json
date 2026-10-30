@@ -117,6 +117,21 @@
     "message": "¿Desconectar de los {{total}} servidores?",
     "confirm": "Desconectar"
   },
+  "audio": {
+    "inputOptions": "Opciones del micrófono",
+    "outputOptions": "Opciones de los altavoces",
+    "inputDevices": "Dispositivo de entrada",
+    "outputDevices": "Dispositivo de salida",
+    "systemDefault": "Predeterminado del sistema",
+    "noDevices": "No se encontraron dispositivos",
+    "noiseSuppression": "Supresión de ruido",
+    "testSound": "Probar sonido",
+    "voiceSettings": "Ajustes de voz…",
+    "fallbackInput": "Micrófono desconectado. Se usa el predeterminado del sistema.",
+    "fallbackOutput": "Dispositivo de salida desconectado. Se usa el predeterminado del sistema.",
+    "volume": "Volumen",
+    "level": "Nivel"
+  },
   "dnd": {
     "label": "No molestar",
     "manual": "manual",

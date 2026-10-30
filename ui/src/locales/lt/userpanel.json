@@ -117,6 +117,21 @@
     "message": "Atsijungti nuo visų {{total}} serverių?",
     "confirm": "Atsijungti"
   },
+  "audio": {
+    "inputOptions": "Mikrofono parinktys",
+    "outputOptions": "Garsiakalbių parinktys",
+    "inputDevices": "Įvesties įrenginys",
+    "outputDevices": "Išvesties įrenginys",
+    "systemDefault": "Numatytasis sistemos",
+    "noDevices": "Įrenginių nerasta",
+    "noiseSuppression": "Triukšmo slopinimas",
+    "testSound": "Bandomasis garsas",
+    "voiceSettings": "Balso nustatymai…",
+    "fallbackInput": "Mikrofonas atjungtas. Naudojamas numatytasis sistemos įrenginys.",
+    "fallbackOutput": "Išvesties įrenginys atjungtas. Naudojamas numatytasis sistemos įrenginys.",
+    "volume": "Garsumas",
+    "level": "Lygis"
+  },
   "dnd": {
     "label": "Netrukdyti",
     "manual": "rankiniu būdu",

@@ -117,6 +117,21 @@
     "message": "Se déconnecter des {{total}} serveurs ?",
     "confirm": "Se déconnecter"
   },
+  "audio": {
+    "inputOptions": "Options du microphone",
+    "outputOptions": "Options des haut-parleurs",
+    "inputDevices": "Périphérique d’entrée",
+    "outputDevices": "Périphérique de sortie",
+    "systemDefault": "Par défaut du système",
+    "noDevices": "Aucun périphérique trouvé",
+    "noiseSuppression": "Suppression du bruit",
+    "testSound": "Tester le son",
+    "voiceSettings": "Paramètres vocaux…",
+    "fallbackInput": "Microphone débranché. Le périphérique par défaut du système est utilisé.",
+    "fallbackOutput": "Périphérique de sortie débranché. Le périphérique par défaut du système est utilisé.",
+    "volume": "Volume",
+    "level": "Niveau"
+  },
   "dnd": {
     "label": "Ne pas déranger",
     "manual": "manuel",

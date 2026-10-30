@@ -117,6 +117,21 @@
     "message": "Lekapcsolódik mind a(z) {{total}} szerverről?",
     "confirm": "Lekapcsolódás"
   },
+  "audio": {
+    "inputOptions": "Mikrofon beállításai",
+    "outputOptions": "Hangszórók beállításai",
+    "inputDevices": "Bemeneti eszköz",
+    "outputDevices": "Kimeneti eszköz",
+    "systemDefault": "Rendszer alapértelmezett",
+    "noDevices": "Nem található eszköz",
+    "noiseSuppression": "Zajszűrés",
+    "testSound": "Hangpróba",
+    "voiceSettings": "Hangbeállítások…",
+    "fallbackInput": "A mikrofon le lett választva. A rendszer alapértelmezett eszköze van használatban.",
+    "fallbackOutput": "A kimeneti eszköz le lett választva. A rendszer alapértelmezett eszköze van használatban.",
+    "volume": "Hangerő",
+    "level": "Szint"
+  },
   "dnd": {
     "label": "Ne zavarjanak",
     "manual": "kézi",

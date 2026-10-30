@@ -117,6 +117,21 @@
     "message": "Odpojit od všech {{total}} serverů?",
     "confirm": "Odpojit"
   },
+  "audio": {
+    "inputOptions": "Možnosti mikrofonu",
+    "outputOptions": "Možnosti reproduktorů",
+    "inputDevices": "Vstupní zařízení",
+    "outputDevices": "Výstupní zařízení",
+    "systemDefault": "Výchozí v systému",
+    "noDevices": "Nenalezena žádná zařízení",
+    "noiseSuppression": "Potlačení šumu",
+    "testSound": "Testovací zvuk",
+    "voiceSettings": "Nastavení hlasu…",
+    "fallbackInput": "Mikrofon byl odpojen. Používá se výchozí zařízení systému.",
+    "fallbackOutput": "Výstupní zařízení bylo odpojeno. Používá se výchozí zařízení systému.",
+    "volume": "Hlasitost",
+    "level": "Úroveň"
+  },
   "dnd": {
     "label": "Nerušit",
     "manual": "ručně",

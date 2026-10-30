@@ -30,6 +30,14 @@ pub struct AudioDevicesChanged {
     pub devices: AudioDevices,
 }
 
+/// The chosen device is gone and the system default plays in its place.
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, Type, Event)]
+#[serde(rename_all = "camelCase")]
+pub struct AudioDeviceFallback {
+    /// `true` for the microphone, `false` for the speakers.
+    pub input: bool,
+}
+
 /// The highest bitrate the bitrate slider can reach changed (FR-2.64), e.g. on connecting or
 /// when the voice server changes. `null` without a voice server: show "depends on server".
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, Type, Event)]
@@ -85,6 +93,14 @@ pub fn bitrate_max(engine: State<'_, Engine>) -> ApiResult<Option<u32>> {
 #[specta::specta]
 pub async fn mic_test_start(engine: State<'_, Engine>) -> ApiResult<()> {
     Ok(engine.mic_test_start().await?)
+}
+
+/// Plays a short sound on the output device ("Test sound" in the output popover).
+#[tauri::command]
+#[specta::specta]
+pub fn audio_test_sound(engine: State<'_, Engine>) -> ApiResult<()> {
+    engine.audio_test_sound();
+    Ok(())
 }
 
 /// Ends the test wherever it is (recording or playback).

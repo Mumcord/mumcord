@@ -117,6 +117,21 @@
     "message": "Prekinuti vezu sa svih {{total}} poslužitelja?",
     "confirm": "Prekini"
   },
+  "audio": {
+    "inputOptions": "Opcije mikrofona",
+    "outputOptions": "Opcije zvučnika",
+    "inputDevices": "Ulazni uređaj",
+    "outputDevices": "Izlazni uređaj",
+    "systemDefault": "Zadano u sustavu",
+    "noDevices": "Nije pronađen nijedan uređaj",
+    "noiseSuppression": "Potiskivanje šuma",
+    "testSound": "Probni zvuk",
+    "voiceSettings": "Postavke glasa…",
+    "fallbackInput": "Mikrofon je odspojen. Koristi se zadani uređaj sustava.",
+    "fallbackOutput": "Izlazni uređaj je odspojen. Koristi se zadani uređaj sustava.",
+    "volume": "Glasnoća",
+    "level": "Razina"
+  },
   "dnd": {
     "label": "Ne ometaj",
     "manual": "ručno",

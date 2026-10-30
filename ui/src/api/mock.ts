@@ -186,6 +186,8 @@ const DEFAULT_SETTINGS: Settings = {
   noiseSuppression: true,
   echoCancellation: true,
   autoGain: true,
+  inputGainPercent: 100,
+  outputVolumePercent: 100,
   musicQuality: false,
   videoDucking: true,
   videoDuckingPercent: 30,
@@ -1761,6 +1763,7 @@ export function createMockApi(options: MockOptions = {}): MockApi {
       }, MIC_TEST_PHASE_MS);
       return Promise.resolve(null);
     },
+    audioTestSound: () => Promise.resolve(null),
     micTestStop: () => {
       clearInterval(micTimer);
       clearTimeout(micPhaseTimer);

@@ -141,6 +141,7 @@ fn specta_builder() -> Builder<tauri::Wry> {
             audio::audio_devices,
             audio::bitrate_max,
             audio::mic_test_start,
+            audio::audio_test_sound,
             audio::mic_test_stop,
             commands::ptt::ptt_availability,
             commands::ptt::ptt_capture_key,
@@ -238,6 +239,7 @@ fn specta_builder() -> Builder<tauri::Wry> {
             follow::FollowedChannelsChanged,
             follow::UnreadChanged,
             audio::AudioDevicesChanged,
+            audio::AudioDeviceFallback,
             audio::BitrateMaxChanged,
             audio::MicLevel,
             audio::MicTestPhaseChanged,
@@ -588,6 +590,9 @@ fn emit_engine_event(
             devices: devices.into(),
         }
         .emit(app),
+        EngineEvent::AudioDeviceFallback { input } => {
+            audio::AudioDeviceFallback { input }.emit(app)
+        }
         EngineEvent::BitrateMaxChanged(max_bps) => audio::BitrateMaxChanged {
             kbps: max_bps.map(|b| b / 1000),
         }

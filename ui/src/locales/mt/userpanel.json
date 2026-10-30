@@ -117,6 +117,21 @@
     "message": "Tiskonnettja mis-{{total}} servers kollha?",
     "confirm": "Skonnettja"
   },
+  "audio": {
+    "inputOptions": "Għażliet tal-mikrofonu",
+    "outputOptions": "Għażliet tal-ħoss",
+    "inputDevices": "Apparat tad-dħul",
+    "outputDevices": "Apparat tal-ħruġ",
+    "systemDefault": "Default tas-sistema",
+    "noDevices": "Ma nstab ebda apparat",
+    "noiseSuppression": "Tnaqqis tal-istorbju",
+    "testSound": "Ittesta l-ħoss",
+    "voiceSettings": "Issettjar tal-vuċi…",
+    "fallbackInput": "Il-mikrofonu ġie skonnettjat. Qed jintuża d-default tas-sistema.",
+    "fallbackOutput": "L-apparat tal-ħruġ ġie skonnettjat. Qed jintuża d-default tas-sistema.",
+    "volume": "Volum",
+    "level": "Livell"
+  },
   "dnd": {
     "label": "Tiddisturbax",
     "manual": "manwali",

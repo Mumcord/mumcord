@@ -117,6 +117,21 @@
     "message": "Rozłączyć ze wszystkimi serwerami ({{total}})?",
     "confirm": "Rozłącz"
   },
+  "audio": {
+    "inputOptions": "Opcje mikrofonu",
+    "outputOptions": "Opcje głośników",
+    "inputDevices": "Urządzenie wejściowe",
+    "outputDevices": "Urządzenie wyjściowe",
+    "systemDefault": "Domyślne systemowe",
+    "noDevices": "Nie znaleziono urządzeń",
+    "noiseSuppression": "Redukcja szumów",
+    "testSound": "Dźwięk testowy",
+    "voiceSettings": "Ustawienia głosu…",
+    "fallbackInput": "Mikrofon odłączony. Używane jest urządzenie domyślne systemu.",
+    "fallbackOutput": "Urządzenie wyjściowe odłączone. Używane jest urządzenie domyślne systemu.",
+    "volume": "Głośność",
+    "level": "Poziom"
+  },
   "dnd": {
     "label": "Nie przeszkadzać",
     "manual": "ręcznie",

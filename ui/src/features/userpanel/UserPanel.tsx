@@ -17,6 +17,8 @@ import { DndIndicator } from "../dnd/DndIndicator";
 import { joinChannel, useNoVoice } from "./readOnly";
 import { QuickSettings, type QuickSettingsState } from "./QuickSettings";
 import { RegisterDialog } from "./RegisterDialog";
+import { AudioArrow } from "./AudioArrow";
+import { useAudioPopover } from "./useAudioPopover";
 import { useMicLevelFill } from "./useMicLevelFill";
 import { usePushToTalk } from "./usePushToTalk";
 import { useUserPanel } from "./useUserPanel";
@@ -43,7 +45,7 @@ const CHEVRON = "M7 10l5 5 5-5";
 
 export function UserPanel() {
   const { t } = useTranslation("userpanel");
-  const { openSettings } = useView();
+  const { openSettings, openAudioSettings } = useView();
   const state = useUserPanel();
   const readOnly = useNoVoice();
   const { self, shownSelf, voice } = state;
@@ -59,6 +61,7 @@ export function UserPanel() {
   const settingsButton = useRef<HTMLButtonElement>(null);
   const previous = useRef<{ mute: boolean; deaf: boolean } | null>(null);
   const micButton = useRef<HTMLButtonElement>(null);
+  const audio = useAudioPopover(openAudioSettings);
 
   const mute = self?.selfMute ?? false;
   const deaf = self?.selfDeaf ?? false;
@@ -221,40 +224,48 @@ export function UserPanel() {
       </div>
       <DndIndicator />
       <div className="userpanel__row">
-        <button
-          ref={micButton}
-          type="button"
-          className="userpanel__toggle userpanel__toggle--mic"
-          data-ptt-idle={pttIdle ? "" : undefined}
-          aria-pressed={mute}
-          aria-label={t("mute")}
-          data-tooltip={micTitle}
-          disabled={!connected}
-          onClick={() => {
-            run(getApi().setSelfMute(!mute));
-          }}
-        >
-          {showLevel ? <span className="userpanel__level" aria-hidden="true" /> : null}
-          <span className="userpanel__icon">
-            <Icon d={MIC} />
-            {mute || pttIdle ? <Icon d={SLASH} /> : null}
-          </span>
-        </button>
-        <button
-          type="button"
-          className="userpanel__toggle"
-          aria-pressed={deaf}
-          aria-label={t("deafen")}
-          disabled={!connected}
-          onClick={() => {
-            run(getApi().setSelfDeaf(!deaf));
-          }}
-        >
-          <span className="userpanel__icon">
-            <Icon d={HEADPHONES} />
-            {deaf ? <Icon d={SLASH} /> : null}
-          </span>
-        </button>
+        <span className="userpanel__split">
+          <button
+            ref={micButton}
+            type="button"
+            className="userpanel__toggle userpanel__toggle--mic"
+            data-ptt-idle={pttIdle ? "" : undefined}
+            aria-pressed={mute}
+            aria-label={t("mute")}
+            data-tooltip={micTitle}
+            disabled={!connected}
+            onClick={() => {
+              run(getApi().setSelfMute(!mute));
+            }}
+            {...audio.triggers("input")}
+          >
+            {showLevel ? <span className="userpanel__level" aria-hidden="true" /> : null}
+            <span className="userpanel__icon">
+              <Icon d={MIC} />
+              {mute || pttIdle ? <Icon d={SLASH} /> : null}
+            </span>
+          </button>
+          <AudioArrow kind="input" audio={audio} disabled={!connected} />
+        </span>
+        <span className="userpanel__split">
+          <button
+            type="button"
+            className="userpanel__toggle"
+            aria-pressed={deaf}
+            aria-label={t("deafen")}
+            disabled={!connected}
+            onClick={() => {
+              run(getApi().setSelfDeaf(!deaf));
+            }}
+            {...audio.triggers("output")}
+          >
+            <span className="userpanel__icon">
+              <Icon d={HEADPHONES} />
+              {deaf ? <Icon d={SLASH} /> : null}
+            </span>
+          </button>
+          <AudioArrow kind="output" audio={audio} disabled={!connected} />
+        </span>
         {link !== null ? (
           <>
             <button
@@ -316,6 +327,7 @@ export function UserPanel() {
           <Icon d={GEAR} />
         </button>
       </div>
+      {audio.node}
       {quick ? (
         <QuickSettings
           menu={quick}
