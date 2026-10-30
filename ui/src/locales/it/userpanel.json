@@ -113,5 +113,20 @@
     "title": "Disconnettere da tutti i server?",
     "message": "Disconnettere da tutti i {{total}} server?",
     "confirm": "Disconnetti"
+  },
+  "audio": {
+    "inputOptions": "Opzioni del microfono",
+    "outputOptions": "Opzioni degli altoparlanti",
+    "inputDevices": "Dispositivo di ingresso",
+    "outputDevices": "Dispositivo di uscita",
+    "systemDefault": "Predefinito di sistema",
+    "noDevices": "Nessun dispositivo trovato",
+    "noiseSuppression": "Riduzione del rumore",
+    "testSound": "Prova suono",
+    "voiceSettings": "Impostazioni vocali…",
+    "fallbackInput": "Microfono scollegato. Viene usato il predefinito di sistema.",
+    "fallbackOutput": "Dispositivo di uscita scollegato. Viene usato il predefinito di sistema.",
+    "volume": "Volume",
+    "level": "Livello"
   }
 }

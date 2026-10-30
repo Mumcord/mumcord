@@ -172,6 +172,13 @@ impl DspChain {
             }
         }
 
+        let gain = controls.input_gain();
+        if gain != 1.0 {
+            for sample in out.iter_mut() {
+                *sample = (*sample * gain).clamp(-1.0, 1.0);
+            }
+        }
+
         // The model runs even with suppression off: its speech probability
         // drives voice activation.
         for (scaled, &sample) in self.ns_in.iter_mut().zip(out.iter()) {

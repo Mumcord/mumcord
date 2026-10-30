@@ -17,6 +17,7 @@ pub(crate) fn apply_dsp(controls: &DspControls, settings: &Settings) {
     controls.set_echo_cancellation(settings.echo_cancellation);
     controls.set_noise_suppression(settings.noise_suppression);
     controls.set_auto_gain(settings.auto_gain);
+    controls.set_input_gain_percent(settings.input_gain_percent);
     controls.set_music_quality(settings.music_quality);
     controls.set_low_latency(settings.low_latency);
     controls.set_bitrate_cap_kbps(settings.bitrate_kbps);
@@ -371,6 +372,11 @@ impl Engine {
             // Back to the safe queue at once; a lower one follows once the new device period
             // is measured.
             core.sync_queue_target(settings.low_latency);
+        }
+        if previous.output_volume_percent != settings.output_volume_percent
+            && let Some(audio) = &lock(&self.inner.core).audio
+        {
+            audio.set_output_volume_percent(settings.output_volume_percent);
         }
         if previous.input_device != settings.input_device
             || previous.output_device != settings.output_device

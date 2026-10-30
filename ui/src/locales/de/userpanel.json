@@ -113,5 +113,20 @@
     "title": "Von allen Servern trennen?",
     "message": "Von allen {{total}} Servern trennen?",
     "confirm": "Trennen"
+  },
+  "audio": {
+    "inputOptions": "Mikrofon-Optionen",
+    "outputOptions": "Lautsprecher-Optionen",
+    "inputDevices": "Eingabegerät",
+    "outputDevices": "Ausgabegerät",
+    "systemDefault": "Systemstandard",
+    "noDevices": "Keine Geräte gefunden",
+    "noiseSuppression": "Rauschunterdrückung",
+    "testSound": "Testton",
+    "voiceSettings": "Spracheinstellungen…",
+    "fallbackInput": "Mikrofon getrennt. Der Systemstandard wird verwendet.",
+    "fallbackOutput": "Ausgabegerät getrennt. Der Systemstandard wird verwendet.",
+    "volume": "Lautstärke",
+    "level": "Pegel"
   }
 }

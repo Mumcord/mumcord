@@ -42,6 +42,7 @@ pub struct DspControls {
     echo_cancellation: AtomicBool,
     noise_suppression: AtomicBool,
     auto_gain: AtomicBool,
+    input_gain: AtomicF32,
     music_quality: AtomicBool,
     low_latency: AtomicBool,
     bitrate_cap_kbps: AtomicU32,
@@ -64,6 +65,7 @@ impl Default for DspControls {
             echo_cancellation: AtomicBool::new(true),
             noise_suppression: AtomicBool::new(true),
             auto_gain: AtomicBool::new(true),
+            input_gain: AtomicF32::new(1.0),
             music_quality: AtomicBool::new(false),
             low_latency: AtomicBool::new(false),
             bitrate_cap_kbps: AtomicU32::new(0),
@@ -103,6 +105,16 @@ impl DspControls {
 
     pub fn auto_gain(&self) -> bool {
         self.auto_gain.load(Ordering::Relaxed)
+    }
+
+    /// Manual microphone gain in percent (100 = unchanged), applied before noise suppression.
+    pub fn set_input_gain_percent(&self, percent: u16) {
+        self.input_gain.store(f32::from(percent) / 100.0);
+    }
+
+    /// The manual microphone gain as a factor (1.0 = unchanged).
+    pub fn input_gain(&self) -> f32 {
+        self.input_gain.load()
     }
 
     /// "Music quality" (QA.37): the chain skips noise suppression and the speech gain control,

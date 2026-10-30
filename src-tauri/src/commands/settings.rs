@@ -283,6 +283,10 @@ pub struct Settings {
     pub noise_suppression: bool,
     pub echo_cancellation: bool,
     pub auto_gain: bool,
+    /// Manual microphone gain in percent, 0–200 (default 100).
+    pub input_gain_percent: u16,
+    /// Master volume of everything played, 0–100 (default 100).
+    pub output_volume_percent: u16,
     /// "Music quality" (default off; FR-1.24, QA.37): bitrate cap up to the server limit (max
     /// 510 kbit/s), music-tuned encoder, noise suppression and automatic volume bypassed.
     pub music_quality: bool,
@@ -399,6 +403,8 @@ impl Settings {
             noise_suppression: s.noise_suppression,
             echo_cancellation: s.echo_cancellation,
             auto_gain: s.auto_gain,
+            input_gain_percent: s.input_gain_percent,
+            output_volume_percent: s.output_volume_percent,
             music_quality: s.music_quality,
             low_latency: s.low_latency,
             bitrate_kbps: s.bitrate_kbps,
@@ -512,6 +518,8 @@ impl Settings {
         s.noise_suppression = self.noise_suppression;
         s.echo_cancellation = self.echo_cancellation;
         s.auto_gain = self.auto_gain;
+        s.input_gain_percent = self.input_gain_percent.min(200);
+        s.output_volume_percent = self.output_volume_percent.min(100);
         s.music_quality = self.music_quality;
         s.low_latency = self.low_latency;
         s.bitrate_kbps = self.bitrate_kbps;
