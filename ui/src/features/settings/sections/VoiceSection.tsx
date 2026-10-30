@@ -1,14 +1,17 @@
-import { useEffect, useRef, useState, type KeyboardEvent, type MouseEvent } from "react";
+import { useEffect, useId, useRef, useState, type KeyboardEvent, type MouseEvent } from "react";
 import { useTranslation } from "react-i18next";
 import {
   getApi,
   toEngineError,
+  type NoiseBackend,
+  type NoiseSuppressionLevel,
   type PttAvailability,
   type PttMouseStatus,
   type PttSession,
   type Settings,
 } from "../../../api";
 import { RadioGroup } from "../components/RadioGroup";
+import { Select } from "../../../components/Select";
 import { Group, Section } from "../components/Section";
 import { CompatibilityModeSwitch } from "./CompatibilityModeSwitch";
 import { Switch } from "../components/Switch";
@@ -19,6 +22,19 @@ import type { SettingsSectionProps } from "./types";
 
 /** The command that adds the user to the `input` group (FR-1.21, AC-1.37). */
 const INPUT_GROUP_COMMAND = "sudo usermod -aG input $USER";
+
+/** The three local backends; the names are the library names, so they are not translated. */
+const BACKENDS: { value: NoiseBackend; label: string }[] = [
+  { value: "nnnoiseless", label: "nnnoiseless" },
+  { value: "rnnoise", label: "rnnoise-rs" },
+  { value: "sonora", label: "sonora-ns" },
+];
+
+/** Aggressiveness of `sonora-ns`; the neural backends expose no setting at all. */
+const LEVELS: NoiseSuppressionLevel[] = ["low", "moderate", "high", "veryHigh"];
+
+/** The commit `rnnoise-rs` is pinned to in Cargo.toml; the settings text names it. */
+const RNNOISE_COMMIT = "74b46b10";
 
 /** Whether mouse buttons may be captured: natively, or on Wayland after opting in (QA.4). */
 function mouseAllowed(status: PttMouseStatus | null, settings: Settings): boolean {
@@ -198,6 +214,56 @@ export function VoiceSection({ settings, update }: SettingsSectionProps) {
             update({ noiseSuppression });
           }}
         />
+        <LabeledSelect
+          label={t("voice.noiseSuppressionBackend")}
+          value={settings.noiseSuppressionBackend}
+          options={BACKENDS.map((backend) => ({ value: backend.value, label: backend.label }))}
+          onChange={(value) => {
+            const backend = BACKENDS.find((option) => option.value === value);
+            if (backend) update({ noiseSuppressionBackend: backend.value });
+          }}
+        />
+        <p className="settings-hint">
+          {t(`voice.backendHint.${settings.noiseSuppressionBackend}`)}
+        </p>
+        <p className="settings-hint">{t("voice.processingIndependent")}</p>
+        {settings.noiseSuppressionBackend === "sonora" ? (
+          <LabeledSelect
+            label={t("voice.noiseSuppressionLevel")}
+            value={settings.noiseSuppressionLevel}
+            options={LEVELS.map((level) => ({ value: level, label: t(`voice.levels.${level}`) }))}
+            onChange={(value) => {
+              const level = LEVELS.find((option) => option === value);
+              if (level) update({ noiseSuppressionLevel: level });
+            }}
+          />
+        ) : (
+          <p className="settings-hint">{t("voice.noBackendSettings")}</p>
+        )}
+        {settings.noiseSuppressionBackend === "rnnoise" && (
+          <>
+            <p className="settings-warning" role="status">
+              {t("voice.rnnoiseSource", { commit: RNNOISE_COMMIT })}
+            </p>
+            <p className="settings-hint">{t("voice.rnnoiseCost")}</p>
+            <Switch
+              label={t("voice.rnnoiseConsent")}
+              checked={settings.noiseSuppressionRnnoiseConsent === "yes"}
+              onChange={(accept) => {
+                update({ noiseSuppressionRnnoiseConsent: accept ? "yes" : "no" });
+              }}
+            />
+            {settings.noiseSuppressionRnnoiseConsent !== "yes" && (
+              <p className="settings-warning" role="status">
+                {t("voice.rnnoiseInactive")}
+              </p>
+            )}
+          </>
+        )}
+        {settings.talkMode === "voiceActivation" &&
+          (settings.noiseSuppressionBackend === "sonora" || !settings.noiseSuppression) && (
+            <p className="settings-hint">{t("voice.detectorHint")}</p>
+          )}
         <Switch
           label={t("voice.echoCancellation")}
           description={t("voice.echoCancellationHint")}
@@ -216,6 +282,24 @@ export function VoiceSection({ settings, update }: SettingsSectionProps) {
         />
       </Group>
     </Section>
+  );
+}
+
+interface LabeledSelectProps {
+  label: string;
+  value: string;
+  options: { value: string; label: string }[];
+  onChange: (value: string) => void;
+}
+
+/** A dropdown with a visible label, as the other settings controls have. */
+function LabeledSelect({ label, value, options, onChange }: LabeledSelectProps) {
+  const id = useId();
+  return (
+    <div className="settings-control-row">
+      <label htmlFor={id}>{label}</label>
+      <Select id={id} value={value} options={options} onChange={onChange} />
+    </div>
   );
 }
 

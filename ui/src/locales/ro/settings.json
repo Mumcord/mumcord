@@ -158,6 +158,26 @@
     "processing": "Procesarea vocii",
     "noiseSuppression": "Suprimarea zgomotului",
     "noiseSuppressionHint": "Filtrează zgomotul de fundal, cum ar fi tastaturile și ventilatoarele.",
+    "noiseSuppressionBackend": "Backend de suprimare a zgomotului",
+    "backendHint": {
+      "nnnoiseless": "AI ușor: utilizare scăzută a procesorului, bun pentru zgomotul de fundal constant.",
+      "rnnoise": "AI modernă: rețea neuronală mai nouă, adesea mai curată; adaugă circa 10 ms de întârziere.",
+      "sonora": "DSP clasic: fără rețea neuronală, sarcină mică. Nu are model de vorbire, deci activarea vocală folosește detectarea nivelului."
+    },
+    "noBackendSettings": "Nu există setări suplimentare pentru acest backend.",
+    "noiseSuppressionLevel": "Intensitatea suprimării",
+    "levels": {
+      "low": "Scăzut",
+      "moderate": "Mediu",
+      "high": "Ridicat",
+      "veryHigh": "Foarte ridicat"
+    },
+    "detectorHint": "Activarea vocală detectează vorbirea cu modelul RNNoise; nu îți schimbă audio-ul.",
+    "rnnoiseSource": "rnnoise-rs nu este publicat pe crates.io. Mumcord îl include deja în buildul său, luat direct de GitHub la commitul {{commit}}, fără verificarea codului.",
+    "rnnoiseCost": "Costă aproximativ 3× mai mult CPU decât nnnoiseless și adaugă un cadru (10 ms) de întârziere.",
+    "rnnoiseConsent": "Accept că această bibliotecă neverificată îmi procesează microfonul.",
+    "rnnoiseInactive": "Nu este activ până nu accepți.",
+    "processingIndependent": "Anularea ecoului și Volum automat funcționează la fel pentru fiecare backend.",
     "echoCancellation": "Anularea ecoului",
     "echoCancellationHint": "Îi împiedică pe ceilalți să se audă pe ei înșiși când folosești difuzoare.",
     "autoGain": "Volum automat",

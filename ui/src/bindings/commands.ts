@@ -1349,6 +1349,12 @@ export type MumbleLink = {
 	channelPath: string[],
 };
 
+/**  Which local noise suppression backend processes the microphone (Settings → Voice). */
+export type NoiseBackend = "nnnoiseless" | "rnnoise" | "sonora";
+
+/**  Aggressiveness of the `sonora-ns` backend; the neural backends have no settings. */
+export type NoiseSuppressionLevel = "low" | "moderate" | "high" | "veryHigh";
+
 /**
  *  What the public server query answered for a `mumble://` link (issue #175). `privacyOff` means
  *  nothing was asked because the link-preview switch is off; `unreachable` means the server did not
@@ -1803,6 +1809,12 @@ export type Settings = {
 	inputDevice: string | null,
 	outputDevice: string | null,
 	noiseSuppression: boolean,
+	/**  Selected noise suppression backend (default nnnoiseless). */
+	noiseSuppressionBackend: NoiseBackend,
+	/**  Aggressiveness of the sonora backend only; ignored by the neural backends. */
+	noiseSuppressionLevel: NoiseSuppressionLevel,
+	/**  Acceptance of the unreviewed `rnnoise-rs` dependency (`yes` before that backend may run). */
+	noiseSuppressionRnnoiseConsent: Consent,
 	echoCancellation: boolean,
 	autoGain: boolean,
 	/**  Manual microphone gain in percent, 0–200 (default 100). */

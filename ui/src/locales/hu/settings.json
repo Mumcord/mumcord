@@ -157,6 +157,26 @@
     "processing": "Hangfeldolgozás",
     "noiseSuppression": "Zajszűrés",
     "noiseSuppressionHint": "Kiszűri a háttérzajt, például a billentyűzetet és a ventilátorokat.",
+    "noiseSuppressionBackend": "Zajszűrés backend",
+    "backendHint": {
+      "nnnoiseless": "Könnyű AI: alacsony processzorhasználat, jó az állandó háttérzajra.",
+      "rnnoise": "Modern AI: újabb neurális hálózat, gyakran tisztább; kb. 10 ms késleltetést ad hozzá.",
+      "sonora": "Hagyományos DSP: nincs neurális hálózat, kis terhelés. Nincs beszédmodellje, ezért a beszédaktiválás a szintfelismerést használja."
+    },
+    "noBackendSettings": "Nincs további beállítás ehhez a backendhez.",
+    "noiseSuppressionLevel": "A zajszűrés erőssége",
+    "levels": {
+      "low": "Alacsony",
+      "moderate": "Közepes",
+      "high": "Magas",
+      "veryHigh": "Nagyon magas"
+    },
+    "detectorHint": "A beszédaktiválás a RNNoise modellel ismeri fel a beszédet; nem módosítja a hangot.",
+    "rnnoiseSource": "Az rnnoise-rs nincs közzétéve a crates.io-n. A Mumcord már tartalmazza a buildjében, közvetlenül a GitHubról, a {{commit}} commitból, a kód ellenőrzése nélkül.",
+    "rnnoiseCost": "Kb. 3× annyi processzort igényel, mint az nnnoiseless, és egy keret (10 ms) késleltetést ad hozzá.",
+    "rnnoiseConsent": "Elfogadom, hogy ezt az ellenőrzetlen könyvtárat használja a mikrofonom.",
+    "rnnoiseInactive": "Nincs használatban, amíg el nem fogadod.",
+    "processingIndependent": "A Visszhangszűrés és a Automatikus hangerő minden backend esetén ugyanúgy működik.",
     "echoCancellation": "Visszhangszűrés",
     "echoCancellationHint": "Megakadályozza, hogy mások visszahallják magukat, ha hangszórót használsz.",
     "autoGain": "Automatikus hangerő",

@@ -1,5 +1,5 @@
 //! Send-side audio processing (spec §6):
-//! capture → echo cancellation → AI noise suppression → automatic gain
+//! capture → echo cancellation → noise suppression (selected backend) → automatic gain
 //! (with "Music quality": slow loudness leveler instead) → voice-activity detection or push-to-talk gate → (Opus encoder).
 //!
 //! # Wiring
@@ -17,22 +17,24 @@
 //!
 //! # Real-time behaviour
 //!
-//! All state is allocated in [`DspChain::new`]; `process` does not lock,
-//! log or do I/O. Echo cancellation and automatic gain use `sonora`
-//! (WebRTC APM port), noise suppression and the voice-activity probability
-//! come from `nnnoiseless` (RNNoise). Disabled stages are skipped rather
-//! than reconfigured, because reconfiguring `sonora` reallocates.
+//! All state is allocated in [`DspChain::new`]; `process` does not lock, log or do I/O. Echo
+//! cancellation and automatic gain use `sonora` (WebRTC APM port). Noise suppression runs the
+//! backend the user selected (see [`noise_suppression`]); only that one touches the audio. When it
+//! reports no speech probability, the `nnnoiseless` model is used as a detector for voice
+//! activation, and its audio output is discarded. Disabled stages are skipped rather than
+//! reconfigured, because reconfiguring `sonora` reallocates; a backend switch happens in the
+//! settings thread and the chain only adopts the finished object.
 
 mod controls;
 mod echo_ref;
 mod gate;
 mod leveler;
+mod noise_suppression;
 #[cfg(test)]
 mod tests;
 
 use std::sync::Arc;
 
-use nnnoiseless::DenoiseState;
 use sonora::config::{AdaptiveDigital, EchoCanceller, GainController2};
 use sonora::{AudioProcessing, Config, StreamConfig};
 
@@ -42,12 +44,12 @@ pub use controls::{
     DspControls, Level, THRESHOLD_DEFAULT_DBFS, THRESHOLD_MAX_DBFS, THRESHOLD_MIN_DBFS, TalkMode,
 };
 pub use echo_ref::{EchoRefConsumer, EchoRefProducer, echo_reference};
+pub use noise_suppression::{
+    Backend, BackendBuilder, Outcome, SuppressionBackend, SuppressionLevel, build_backend,
+};
 
 use gate::{PttGate, ThresholdGate, VoiceDetector};
 use leveler::Leveler;
-
-/// nnnoiseless expects samples in 16-bit integer range.
-const I16_SCALE: f32 = 32_768.0;
 
 /// Decision of the send gate for one frame.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -64,7 +66,11 @@ pub struct DspChain {
     echo_ref: EchoRefConsumer,
     aec: AudioProcessing,
     agc: AudioProcessing,
-    denoise: Box<DenoiseState<'static>>,
+    /// The selected noise suppression backend; only this one changes the audio.
+    backend: Box<dyn SuppressionBackend>,
+    /// Speech detector for voice activation. It runs only when the selected backend reports no
+    /// speech probability, and never writes to the audio.
+    detector: Box<dyn SuppressionBackend>,
     leveler: Leveler,
     /// Whether the leveler ran on the previous frame; it restarts from unity gain when it
     /// comes back, as the source may have changed meanwhile.
@@ -77,8 +83,7 @@ pub struct DspChain {
     scratch: Frame,
     render: Frame,
     render_out: Frame,
-    ns_in: Frame,
-    ns_out: Frame,
+    processed: Frame,
 }
 
 impl DspChain {
@@ -106,12 +111,17 @@ impl DspChain {
             .capture_config(stream)
             .render_config(stream)
             .build();
+        let backend = controls.take_backend().unwrap_or_else(|| {
+            controls.build(controls.noise_backend(), controls.suppression_level())
+        });
+        let detector = controls.build(Backend::Nnnoiseless, SuppressionLevel::default());
         Self {
             controls,
             echo_ref,
             aec,
             agc,
-            denoise: DenoiseState::new(),
+            backend,
+            detector,
             leveler: Leveler::default(),
             leveling: false,
             vad: VoiceDetector::default(),
@@ -121,14 +131,18 @@ impl DspChain {
             scratch: [0.0; FRAME_SAMPLES],
             render: [0.0; FRAME_SAMPLES],
             render_out: [0.0; FRAME_SAMPLES],
-            ns_in: [0.0; FRAME_SAMPLES],
-            ns_out: [0.0; FRAME_SAMPLES],
+            processed: [0.0; FRAME_SAMPLES],
         }
     }
 
     /// The shared controls of this chain.
     pub fn controls(&self) -> &Arc<DspControls> {
         &self.controls
+    }
+
+    /// The backend that is currently processing this chain's frames.
+    pub fn backend(&self) -> Backend {
+        self.backend.kind()
     }
 
     /// Keeps noise suppression on regardless of the controls (the wizard's microphone test).
@@ -141,6 +155,11 @@ impl DspChain {
     /// [`DspControls`].
     pub fn process(&mut self, input: &Frame, out: &mut Frame) -> Gate {
         let controls = &*self.controls;
+        // A backend switch is only adopted here; the settings thread built it, so nothing is
+        // allocated in the frame path.
+        if let Some(backend) = controls.take_backend() {
+            self.backend = backend;
+        }
         // Low-latency mode keeps the signal untouched: these stages change the sound and the
         // echo canceller would need the far end it can no longer track at minimal buffering.
         let bypass = controls.low_latency();
@@ -179,17 +198,23 @@ impl DspChain {
             }
         }
 
-        // The model runs even with suppression off: its speech probability
-        // drives voice activation.
-        for (scaled, &sample) in self.ns_in.iter_mut().zip(out.iter()) {
-            *scaled = sample * I16_SCALE;
-        }
-        let speech_probability = self.denoise.process_frame(&mut self.ns_out, &self.ns_in);
+        // The selected backend is the only one that changes the audio. `out` already holds the
+        // frame the backend gets, so a rejected frame passes through without an extra copy.
         let music = controls.music_quality();
+        let mut probability = None;
         if self.force_noise_suppression || (controls.noise_suppression() && !music && !bypass) {
-            for (sample, &denoised) in out.iter_mut().zip(self.ns_out.iter()) {
-                *sample = denoised / I16_SCALE;
+            let outcome = self.backend.process(out, &mut self.processed);
+            if outcome.failed {
+                controls.count_error();
+            } else {
+                *out = self.processed;
             }
+            probability = outcome.probability;
+        }
+        // The gate still needs a speech probability when suppression is off or the backend has no
+        // model of its own: the detector reads the frame and its audio output is discarded.
+        if probability.is_none() {
+            probability = self.detector.process(out, &mut self.processed).probability;
         }
 
         let auto_gain = controls.auto_gain() && !bypass;
@@ -225,7 +250,7 @@ impl DspChain {
         // Both detectors run every frame so switching modes starts from a warm state. The manual
         // threshold looks at the processed peak, the same value the settings meter draws, so the
         // line the user sets is exactly the level that opens the gate.
-        let automatic = self.vad.update(speech_probability, rms);
+        let automatic = self.vad.update(probability.unwrap_or(0.0), rms);
         let manual = self.threshold.update(
             if peak > 0.0 {
                 20.0 * peak.log10()

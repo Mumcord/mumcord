@@ -111,6 +111,8 @@ const neutral = (t: string) =>
   // "Apps" is also the German and Spanish word, "Bitrate" and "Updates" the German ones; preset
   // theme names are names, not translated.
   /^(Apps|Bitrate|Updates|Deep Ocean|Forest|Paper)$/.test(t) ||
+  // Noise suppression library names are names, not translated words.
+  /^(nnnoiseless|rnnoise-rs|sonora-ns)$/.test(t) ||
   // "Link" is also the German word; its tooltip adds the shortcut.
   /^Link( \(Ctrl\+K\))?$/.test(t) ||
   // "In <channel> (<count>)" reads the same in English and German.

@@ -552,6 +552,63 @@ describe("Voice section", () => {
     });
   });
 
+  describe("noise suppression backends", () => {
+    it("offers the three local backends with nnnoiseless selected", async () => {
+      await openSection("Voice");
+      const backend = await screen.findByRole("combobox", { name: "Noise suppression backend" });
+      expect(backend).toHaveTextContent("nnnoiseless");
+      expect(optionLabels(backend)).toEqual(["nnnoiseless", "rnnoise-rs", "sonora-ns"]);
+    });
+
+    it("shows settings only for the backend that has them and saves the choice", async () => {
+      const update = vi.spyOn(api, "settingsUpdate");
+      await openSection("Voice");
+      const backend = await screen.findByRole("combobox", { name: "Noise suppression backend" });
+      const noneText = "No additional settings available for this backend.";
+      expect(await screen.findByText(noneText)).toBeInTheDocument();
+      expect(screen.queryByRole("combobox", { name: "Suppression strength" })).toBeNull();
+
+      // sonora-ns is the only backend with a setting: its aggressiveness level.
+      chooseOption(backend, "sonora-ns");
+      await waitFor(() => {
+        expect(update).toHaveBeenLastCalledWith(
+          expect.objectContaining({ noiseSuppressionBackend: "sonora" }),
+        );
+      });
+      const level = await screen.findByRole("combobox", { name: "Suppression strength" });
+      expect(screen.queryByText(noneText)).toBeNull();
+      chooseOption(level, "High");
+      await waitFor(() => {
+        expect(update).toHaveBeenLastCalledWith(
+          expect.objectContaining({ noiseSuppressionLevel: "high" }),
+        );
+      });
+    });
+    it("warns for rnnoise-rs only and keeps that backend off until the acceptance is given", async () => {
+      const update = vi.spyOn(api, "settingsUpdate");
+      await openSection("Voice");
+      const backend = await screen.findByRole("combobox", { name: "Noise suppression backend" });
+      expect(screen.queryByText(/not published on crates\.io/)).toBeNull();
+
+      chooseOption(backend, "rnnoise-rs");
+      expect(await screen.findByText(/not published on crates\.io/)).toBeInTheDocument();
+      expect(await screen.findByText(/74b46b10/)).toBeInTheDocument();
+      const consent = await screen.findByRole("switch", {
+        name: /accept running this unreviewed library/,
+      });
+      expect(consent).not.toBeChecked();
+      expect(await screen.findByText(/Not active until you accept/)).toBeInTheDocument();
+
+      fireEvent.click(consent);
+      await waitFor(() => {
+        expect(update).toHaveBeenLastCalledWith(
+          expect.objectContaining({ noiseSuppressionRnnoiseConsent: "yes" }),
+        );
+      });
+      expect(screen.queryByText(/Not active until you accept/)).toBeNull();
+    });
+  });
+
   describe("compatibility mode (FR-1.48)", () => {
     it("is hidden outside Linux Wayland", async () => {
       await openSection("Voice");

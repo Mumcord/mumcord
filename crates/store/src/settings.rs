@@ -38,6 +38,34 @@ pub enum VoiceActivation {
     Manual,
 }
 
+/// Which local implementation suppresses the noise (Settings → Voice).
+#[derive(Debug, Clone, Copy, Default, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum NoiseBackend {
+    /// `nnnoiseless`: RNNoise in Rust, low CPU (default).
+    #[default]
+    Nnnoiseless,
+    /// `rnnoise-rs`: the current RNNoise model.
+    Rnnoise,
+    /// `sonora-ns`: classical DSP suppressor, no neural network.
+    Sonora,
+}
+
+/// Aggressiveness of the `sonora-ns` backend; the two neural backends have no settings.
+#[derive(Debug, Clone, Copy, Default, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum NoiseSuppressionLevel {
+    /// About 6 dB of reduction.
+    Low,
+    /// About 12 dB (default).
+    #[default]
+    Moderate,
+    /// About 18 dB.
+    High,
+    /// About 21 dB.
+    VeryHigh,
+}
+
 /// Default manual threshold in dBFS.
 pub const DEFAULT_VOICE_THRESHOLD_DBFS: i32 = -40;
 /// Default for `Settings::preview_cache_days` (QA.42).
@@ -336,6 +364,13 @@ pub struct Settings {
     pub input_device: Option<String>,
     pub output_device: Option<String>,
     pub noise_suppression: bool,
+    /// Noise suppression backend (Settings → Voice); only the selected one processes the mic.
+    pub noise_suppression_backend: NoiseBackend,
+    /// Aggressiveness of the `sonora-ns` backend; ignored by the neural backends.
+    pub noise_suppression_level: NoiseSuppressionLevel,
+    /// Acceptance of `rnnoise-rs`. It is not published on crates.io and reaches the client as an
+    /// unreviewed GitHub dependency, so that backend only runs after the user accepted.
+    pub noise_suppression_rnnoise_consent: Consent,
     pub echo_cancellation: bool,
     pub auto_gain: bool,
     /// Manual microphone gain in percent, 0–200 (100 = unchanged); the voice-bar popover slider.
@@ -468,6 +503,9 @@ impl Default for Settings {
             input_device: None,
             output_device: None,
             noise_suppression: true,
+            noise_suppression_backend: NoiseBackend::default(),
+            noise_suppression_level: NoiseSuppressionLevel::default(),
+            noise_suppression_rnnoise_consent: Consent::Unset,
             echo_cancellation: true,
             auto_gain: true,
             input_gain_percent: 100,
@@ -622,6 +660,15 @@ mod tests {
         let defaults = store.settings().expect("load");
         assert_eq!(defaults, Settings::default());
         assert!(defaults.noise_suppression && defaults.echo_cancellation && defaults.auto_gain);
+        assert_eq!(
+            defaults.noise_suppression_backend,
+            NoiseBackend::Nnnoiseless
+        );
+        assert_eq!(
+            defaults.noise_suppression_level,
+            NoiseSuppressionLevel::Moderate
+        );
+        assert_eq!(defaults.noise_suppression_rnnoise_consent, Consent::Unset);
         assert_eq!(defaults.talk_mode, TalkMode::VoiceActivation);
         assert_eq!(defaults.voice_activation, VoiceActivation::Automatic);
         assert_eq!(defaults.voice_threshold_dbfs, -40);
@@ -662,6 +709,9 @@ mod tests {
         changed.wizard_completed = true;
         changed.log_level = LogLevel::Debug;
         changed.ptt_compatibility_mode = true;
+        changed.noise_suppression_backend = NoiseBackend::Sonora;
+        changed.noise_suppression_level = NoiseSuppressionLevel::High;
+        changed.noise_suppression_rnnoise_consent = Consent::Yes;
         changed.notifications = NotificationMode::InApp;
         changed.connect_muted = false;
         store.save_settings(&changed).expect("save");

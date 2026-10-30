@@ -159,6 +159,26 @@
     "processing": "Przetwarzanie głosu",
     "noiseSuppression": "Tłumienie szumów",
     "noiseSuppressionHint": "Odfiltrowuje szumy w tle, np. klawiatury i wentylatory.",
+    "noiseSuppressionBackend": "Backend tłumienia szumów",
+    "backendHint": {
+      "nnnoiseless": "Lekki AI: niskie użycie procesora, dobry do stałego szumu w tle.",
+      "rnnoise": "Nowoczesny AI: nowsza sieć neuronowa, często czystsza; dodaje około 10 ms opóźnienia.",
+      "sonora": "Klasyczny DSP: bez sieci neuronowej, małe obciążenie. Nie ma modelu mowy, więc aktywacja głosu korzysta z detekcji poziomu."
+    },
+    "noBackendSettings": "Brak dodatkowych ustawień dla tego backendu.",
+    "noiseSuppressionLevel": "Siła tłumienia",
+    "levels": {
+      "low": "Niski",
+      "moderate": "Umiarkowany",
+      "high": "Wysoki",
+      "veryHigh": "Bardzo wysoki"
+    },
+    "detectorHint": "Aktywacja głosu wykrywa mowę modelem RNNoise; nie zmienia Twojego audio.",
+    "rnnoiseSource": "rnnoise-rs nie jest opublikowany w crates.io. Mumcord ma go już w swojej kompilacji, wzięty bezpośrednio z GitHub przy commicie {{commit}}, bez przeglądu kodu.",
+    "rnnoiseCost": "Kosztuje około 3× więcej CPU niż nnnoiseless i dodaje jedną ramkę (10 ms) opóźnienia.",
+    "rnnoiseConsent": "Akceptuję, że ta niesprawdzona biblioteka przetwarza mój mikrofon.",
+    "rnnoiseInactive": "Nieaktywne, dopóki nie zaakceptujesz.",
+    "processingIndependent": "Usuwanie echa i Automatyczna głośność działają tak samo dla każdego backendu.",
     "echoCancellation": "Usuwanie echa",
     "echoCancellationHint": "Zapobiega temu, by inni słyszeli siebie, gdy używasz głośników.",
     "autoGain": "Automatyczna głośność",

@@ -159,6 +159,26 @@
     "processing": "Balso apdorojimas",
     "noiseSuppression": "Triukšmo slopinimas",
     "noiseSuppressionHint": "Išfiltruoja foninį triukšmą, pavyzdžiui, klaviatūros ar ventiliatorių garsą.",
+    "noiseSuppressionBackend": "Triukšmo slopinimo backendas",
+    "backendHint": {
+      "nnnoiseless": "Lengvas AI: mažas CPU naudojimas, tinka pastoviam foniniam triukšmui.",
+      "rnnoise": "Modernus AI: naujangesnis neuroninis tinklas, dažnai švaresnis; prideda apie 10 ms delos.",
+      "sonora": "Tradicinis DSP: be neuroninio tinklo, mažai naštos. Neturi kalbos modelio, todėl balso aktyvavimas naudoja lygio aptikimą."
+    },
+    "noBackendSettings": "Šiam backendui nėra papildomų nustatymų.",
+    "noiseSuppressionLevel": "Slopinimo stiprumas",
+    "levels": {
+      "low": "Žemas",
+      "moderate": "Vidutinis",
+      "high": "Aukštas",
+      "veryHigh": "Labai aukštas"
+    },
+    "detectorHint": "Balso aktyvavimas atpažįsta kalbą su RNNoise modeliu; jis nekeičia tavo garso.",
+    "rnnoiseSource": "rnnoise-rs nepaskelbtas „crates.io“. Mumcord jį jau turi savo kompiliacijoje, paimtą tiesiai iš GitHub prie komito {{commit}}, be kodo peržiūros.",
+    "rnnoiseCost": "Jis sunaudoja apie 3× daugiau CPU nei nnnoiseless ir prideda vieną kadrą (10 ms) delos.",
+    "rnnoiseConsent": "Priimu, kad ši neperžiūrėta biblioteka apdoroja mano mikrofoną.",
+    "rnnoiseInactive": "Neaktyvus, kol nepriimi.",
+    "processingIndependent": "Aido pašalinimas ir Automatinis garsumas visiems backendams veikia taip pat.",
     "echoCancellation": "Aido pašalinimas",
     "echoCancellationHint": "Neleidžia kitiems girdėti savęs, kai naudoji garsiakalbius.",
     "autoGain": "Automatinis garsumas",
