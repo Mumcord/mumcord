@@ -10,6 +10,7 @@ import { errorText } from "../errors";
 import { BitrateSlider } from "./BitrateSlider";
 import { DuckingGroup } from "./DuckingGroup";
 import { GamePluginsGroup } from "./GamePluginsGroup";
+import { LowLatencyGroup } from "./LowLatencyGroup";
 import { PositionalGroup } from "./PositionalGroup";
 import type { SettingsSectionProps } from "./types";
 
@@ -76,6 +77,7 @@ export function AudioSection({ settings, update }: SettingsSectionProps) {
             update({ musicQuality });
           }}
         />
+        <LowLatencyGroup settings={settings} update={update} />
         <BitrateSlider settings={settings} update={update} />
       </Group>
       <DuckingGroup settings={settings} update={update} />

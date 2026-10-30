@@ -81,6 +81,7 @@ fn specta_builder() -> Builder<tauri::Wry> {
             session::voice_server_get,
             session::session_snapshot,
             session::connection_stats,
+            session::latency_estimate,
             session::cert_trust_decide,
             session::set_self_mute,
             session::set_self_deaf,

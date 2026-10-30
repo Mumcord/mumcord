@@ -38,6 +38,9 @@ impl PacketDuration {
 /// Opus voice encoder that collects 10 ms frames into packets.
 pub struct OpusEncoder {
     encoder: Encoder,
+    /// Created with the restricted low-delay application (CELT only); libopus cannot switch an
+    /// encoder into or out of it.
+    low_delay: bool,
     duration: PacketDuration,
     pending: [f32; 2 * FRAME_SAMPLES],
     pending_len: usize,
@@ -48,12 +51,28 @@ impl OpusEncoder {
     /// In-band FEC is enabled; it only costs bits once
     /// [`set_packet_loss_percent`](Self::set_packet_loss_percent) is above 0.
     pub fn new(bitrate_bps: i32, duration: PacketDuration) -> Result<Self, CodecError> {
-        let mut encoder = Encoder::new(SAMPLE_RATE, Channels::Mono, Application::Voip)?;
+        Self::with_application(Application::Voip, bitrate_bps, duration)
+    }
+
+    /// Creates a VBR encoder with the restricted low-delay application (low-latency mode, issue
+    /// #156): CELT only, about 2.5 ms look-ahead instead of about 6.5 ms. CELT has no in-band
+    /// FEC, so lost packets are only concealed. Every Opus decoder plays these packets.
+    pub fn new_low_delay(bitrate_bps: i32, duration: PacketDuration) -> Result<Self, CodecError> {
+        Self::with_application(Application::LowDelay, bitrate_bps, duration)
+    }
+
+    fn with_application(
+        application: Application,
+        bitrate_bps: i32,
+        duration: PacketDuration,
+    ) -> Result<Self, CodecError> {
+        let mut encoder = Encoder::new(SAMPLE_RATE, Channels::Mono, application)?;
         encoder.set_bitrate(Bitrate::Bits(bitrate_bps))?;
         encoder.set_vbr(true)?;
         encoder.set_inband_fec(true)?;
         Ok(Self {
             encoder,
+            low_delay: application == Application::LowDelay,
             duration,
             pending: [0.0; 2 * FRAME_SAMPLES],
             pending_len: 0,
@@ -114,22 +133,41 @@ impl OpusEncoder {
     }
 
     /// Switches between the voice tuning (VoIP, voice signal) and the music tuning (audio
-    /// application, music signal) used by "Music quality" (QA.37).
+    /// application, music signal) used by "Music quality" (QA.37). A low-delay encoder keeps its
+    /// application and only changes the signal type.
     pub fn set_music(&mut self, music: bool) -> Result<(), CodecError> {
         let (application, signal) = if music {
             (Application::Audio, Signal::Music)
         } else {
             (Application::Voip, Signal::Voice)
         };
-        self.encoder.set_application(application)?;
+        if !self.low_delay {
+            self.encoder.set_application(application)?;
+        }
         self.encoder.set_signal(signal)?;
         Ok(())
     }
 
     /// Whether the music tuning is active.
     pub fn is_music(&mut self) -> Result<bool, CodecError> {
-        Ok(self.encoder.get_application()? == Application::Audio
+        let application = self.encoder.get_application()?;
+        Ok((self.low_delay || application == Application::Audio)
             && self.encoder.get_signal()? == Signal::Music)
+    }
+
+    /// Whether this encoder uses the restricted low-delay application.
+    pub fn is_low_delay(&self) -> bool {
+        self.low_delay
+    }
+
+    /// Encoder look-ahead in samples at 48 kHz (algorithmic delay on top of the frame).
+    pub fn lookahead_samples(&mut self) -> Result<usize, CodecError> {
+        Ok(usize::try_from(self.encoder.get_lookahead()?).unwrap_or(0))
+    }
+
+    /// Whether a packet is partly collected; switching encoders is seamless only without one.
+    pub fn has_pending(&self) -> bool {
+        self.pending_len > 0
     }
 
     /// Expected packet loss (0–100); makes in-band FEC spend bits on redundancy.
@@ -168,6 +206,47 @@ mod tests {
         assert_eq!(encoder.bitrate().expect("read"), 500_000);
         encoder.set_music(false).expect("music off");
         assert!(!encoder.is_music().expect("read"));
+    }
+
+    #[test]
+    fn low_delay_encoder_has_the_short_lookahead_and_keeps_its_application() {
+        let mut normal = OpusEncoder::new(64_000, PacketDuration::Ms20).expect("encoder");
+        let mut low = OpusEncoder::new_low_delay(64_000, PacketDuration::Ms10).expect("encoder");
+        assert!(!normal.is_low_delay());
+        assert!(low.is_low_delay());
+        // 48 kHz: 2.5 ms CELT look-ahead against 6.5 ms with SILK/hybrid.
+        assert_eq!(low.lookahead_samples().expect("read"), 120);
+        assert_eq!(normal.lookahead_samples().expect("read"), 312);
+        low.set_music(true).expect("music on");
+        assert!(low.is_music().expect("read"));
+        low.set_music(false).expect("music off");
+        assert!(!low.is_music().expect("read"));
+        assert_eq!(low.lookahead_samples().expect("read"), 120);
+    }
+
+    #[test]
+    fn low_delay_packets_are_single_10ms_celt_frames() {
+        let mut encoder =
+            OpusEncoder::new_low_delay(64_000, PacketDuration::Ms10).expect("encoder");
+        let mut out = [0u8; MAX_PACKET_BYTES];
+        let frame: Frame = std::array::from_fn(|i| (i as f32 * 0.05).sin() * 0.3);
+        let len = encoder
+            .push_frame(&frame, &mut out)
+            .expect("encode")
+            .expect("one frame is one packet");
+        assert!(!encoder.has_pending());
+        let toc = out[0];
+        // TOC configs 16–31 are CELT-only; 10 ms CELT frames are configs 18, 22, 26 and 30.
+        assert!(toc >> 3 >= 16, "CELT-only, toc {toc:#x}");
+        assert_eq!((toc >> 3) % 4, 2, "10 ms frame, toc {toc:#x}");
+        assert_eq!(toc & 0b11, 0, "one frame per packet");
+        assert!(len > 1);
+        let mut decoder = crate::codec::OpusDecoder::new().expect("decoder");
+        let mut pcm = vec![0.0; crate::codec::MAX_DECODED_SAMPLES];
+        assert_eq!(
+            decoder.decode(&out[..len], &mut pcm).expect("decodes"),
+            FRAME_SAMPLES
+        );
     }
 
     /// Issue #7: music at the Opus maximum used to produce 20 ms packets of up to 1275 bytes,

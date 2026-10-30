@@ -653,3 +653,67 @@ fn playback_thread_counts_late_wakeups_and_keeps_its_setup() {
         "setup ends with the thread"
     );
 }
+
+#[test]
+fn low_latency_reaches_every_jitter_buffer() {
+    let mut mixer = Mixer::new().expect("mixer");
+    mixer.set_low_latency(true);
+    assert!(mixer.speakers.iter().all(|s| s.jitter.low_latency()));
+    mixer.set_low_latency(false);
+    assert!(mixer.speakers.iter().all(|s| !s.jitter.low_latency()));
+}
+
+/// Records the queue level the playback thread saw before each write (issue #156).
+struct QueueProbe {
+    started: Instant,
+    written: usize,
+    levels: Arc<Mutex<Vec<usize>>>,
+}
+
+impl PlaybackSink for QueueProbe {
+    fn write_frame(&mut self, _frame: &Frame) -> bool {
+        let level = self.queued_samples();
+        if let Ok(mut levels) = self.levels.lock() {
+            levels.push(level);
+        }
+        self.written += FRAME_SAMPLES;
+        true
+    }
+
+    fn queued_samples(&mut self) -> usize {
+        let played = self.started.elapsed().as_micros() as usize * 48 / 1000;
+        self.written.saturating_sub(played)
+    }
+}
+
+#[test]
+fn queue_target_can_be_lowered_while_playing() {
+    let levels = Arc::new(Mutex::new(Vec::new()));
+    let sink = QueueProbe {
+        started: Instant::now(),
+        written: 0,
+        levels: Arc::clone(&levels),
+    };
+    let (mut playback, _ports) = Playback::start(sink, PlaybackConfig::default()).expect("start");
+    std::thread::sleep(Duration::from_millis(300));
+    let before = std::mem::take(&mut *levels.lock().expect("levels"));
+    assert!(playback.set_queue_target_ms(LOW_LATENCY_QUEUE_MS));
+    // Let the command land and the queue drain to the new target.
+    std::thread::sleep(Duration::from_millis(100));
+    levels.lock().expect("levels").clear();
+    std::thread::sleep(Duration::from_millis(300));
+    let after = levels.lock().expect("levels").clone();
+    drop(playback);
+
+    let samples = |ms: u32| ms as usize * 48;
+    assert!(
+        before.iter().any(|&l| l > samples(LOW_LATENCY_QUEUE_MS)),
+        "{before:?}"
+    );
+    assert!(!after.is_empty());
+    // A frame is only written while the queue is below the target.
+    assert!(
+        after.iter().all(|&l| l < samples(LOW_LATENCY_QUEUE_MS)),
+        "{after:?}"
+    );
+}

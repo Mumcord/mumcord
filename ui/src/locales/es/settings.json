@@ -122,7 +122,15 @@
     "ducking": "Bajar el sonido del vídeo mientras alguien habla",
     "duckingHint": "El sonido del vídeo de la watch party y de la pantalla compartida baja mientras alguien de tu canal de voz habla.",
     "duckingLevel": "Volumen reducido",
-    "duckingLevelValue": "{{percent}} %"
+    "duckingLevelValue": "{{percent}} %",
+    "lowLatency": "Modo de baja latencia",
+    "lowLatencyBeta": "Beta",
+    "lowLatencyHint": "Para tocar música juntos en tiempo real",
+    "lowLatencyWarningTitle": "Cambia robustez por velocidad",
+    "lowLatencyBandwidth": "Usa más ancho de banda (paquetes de 10 ms).",
+    "lowLatencyWifi": "Puede fallar con Wi-Fi o una conexión saturada; usa un cable si puedes.",
+    "lowLatencyHeadphones": "Usa auriculares: la cancelación de eco está desactivada (la supresión de ruido y el volumen automático también).",
+    "lowLatencyPtt": "Se recomienda pulsar para hablar o un umbral manual de activación por voz."
   },
   "voice": {
     "talkMode": "Modo de habla",
