@@ -68,7 +68,6 @@
     "lowLatencyComingSoon": "Tulossa pian",
     "voiceSettings": "Ääniasetukset…",
     "applies": "Tulee voimaan heti, tallentuu kuten Asetukset → Ääni",
-    "effectiveLabel": "Lähetetään nyt (häviöihin sopeutumisen jälkeen)",
     "keys": "Esc sulkee · ↑↓ siirtyy · ← → säätää",
     "bandwidthLabel": "Arvioitu kaistanleveys otsakkeineen",
     "bandwidthValue": "≈ {{value}} / {{limit}} kbit/s",
@@ -76,6 +75,9 @@
     "bandwidthHintWithin": "Pienen viiveen tilassa: ≈ {{value}} kbit/s (10 ms:n paketit), yhä rajan sisällä.",
     "bandwidthHintOver": "Pienen viiveen tilassa: ≈ {{value}} kbit/s (10 ms:n paketit), rajan yli.",
     "bandwidthHintNoLimit": "Pienen viiveen tilassa: ≈ {{value}} kbit/s (10 ms:n paketit).",
-    "beta": "Beta"
+    "beta": "Beta",
+    "moreInfo": "Lisätietoja: {{topic}}",
+    "effectiveShort": "Lähetetään nyt",
+    "effectiveTip": "Parhaillaan lähetettävä bittinopeus pakettihävikkiin sopeuttamisen jälkeen."
   }
 }

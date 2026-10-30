@@ -68,7 +68,6 @@
     "lowLatencyComingSoon": "Hamarosan",
     "voiceSettings": "Hangbeállítások…",
     "applies": "Azonnal érvénybe lép, mentése mint a Beállítások → Hang esetén",
-    "effectiveLabel": "Jelenleg küldött (a veszteséghez igazítás után)",
     "keys": "Esc bezár · ↑↓ mozog · ← → állít",
     "bandwidthLabel": "Becsült sávszélesség fejlécekkel",
     "bandwidthValue": "≈ {{value}} / {{limit}} kbit/s",
@@ -76,6 +75,9 @@
     "bandwidthHintWithin": "Alacsony késleltetésű móddal: ≈ {{value}} kbit/s (10 ms-os csomagok), még a korláton belül.",
     "bandwidthHintOver": "Alacsony késleltetésű móddal: ≈ {{value}} kbit/s (10 ms-os csomagok), a korlát felett.",
     "bandwidthHintNoLimit": "Alacsony késleltetésű móddal: ≈ {{value}} kbit/s (10 ms-os csomagok).",
-    "beta": "Beta"
+    "beta": "Beta",
+    "moreInfo": "További információ: {{topic}}",
+    "effectiveShort": "Jelenleg küldött",
+    "effectiveTip": "A most küldött bitráta a csomagvesztéshez igazítás után."
   }
 }

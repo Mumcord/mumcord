@@ -70,7 +70,6 @@
     "lowLatencyComingSoon": "Již brzy",
     "voiceSettings": "Nastavení hlasu…",
     "applies": "Platí ihned, ukládá se jako v Nastavení → Zvuk",
-    "effectiveLabel": "Právě se odesílá (po úpravě podle ztrát)",
     "keys": "Esc zavře · ↑↓ přesouvá · ← → upravuje",
     "bandwidthLabel": "Odhadovaná šířka pásma vč. hlaviček",
     "bandwidthValue": "≈ {{value}} z {{limit}} kbit/s",
@@ -78,6 +77,9 @@
     "bandwidthHintWithin": "S režimem nízké latence: ≈ {{value}} kbit/s (pakety po 10 ms), stále v limitu.",
     "bandwidthHintOver": "S režimem nízké latence: ≈ {{value}} kbit/s (pakety po 10 ms), nad limitem.",
     "bandwidthHintNoLimit": "S režimem nízké latence: ≈ {{value}} kbit/s (pakety po 10 ms).",
-    "beta": "Beta"
+    "beta": "Beta",
+    "moreInfo": "Další informace: {{topic}}",
+    "effectiveShort": "Právě se odesílá",
+    "effectiveTip": "Bitrate odesílaná právě teď po přizpůsobení ztrátě paketů."
   }
 }

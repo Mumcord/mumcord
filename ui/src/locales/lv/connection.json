@@ -69,7 +69,6 @@
     "lowLatencyComingSoon": "Drīzumā",
     "voiceSettings": "Balss iestatījumi…",
     "applies": "Stājas spēkā uzreiz, tiek saglabāts kā sadaļā Iestatījumi → Audio",
-    "effectiveLabel": "Pašlaik tiek sūtīts (pēc pielāgošanas zudumiem)",
     "keys": "Esc aizver · ↑↓ pārvieto · ← → pielāgo",
     "bandwidthLabel": "Paredzamais joslas platums ar galvenēm",
     "bandwidthValue": "≈ {{value}} no {{limit}} kbit/s",
@@ -77,6 +76,9 @@
     "bandwidthHintWithin": "Ar zemas aizkaves režīmu: ≈ {{value}} kbit/s (10 ms pakotnes), joprojām robežās.",
     "bandwidthHintOver": "Ar zemas aizkaves režīmu: ≈ {{value}} kbit/s (10 ms pakotnes), pāri robežai.",
     "bandwidthHintNoLimit": "Ar zemas aizkaves režīmu: ≈ {{value}} kbit/s (10 ms pakotnes).",
-    "beta": "Beta"
+    "beta": "Beta",
+    "moreInfo": "Vairāk informācijas: {{topic}}",
+    "effectiveShort": "Pašlaik tiek sūtīts",
+    "effectiveTip": "Pašlaik sūtītais bitu pārraides ātrums pēc pielāgošanas pakešu zudumiem."
   }
 }

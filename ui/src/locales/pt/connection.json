@@ -69,7 +69,6 @@
     "lowLatencyComingSoon": "Em breve",
     "voiceSettings": "Definições de voz…",
     "applies": "Aplica-se de imediato, guardado como em Definições → Áudio",
-    "effectiveLabel": "A enviar agora (após adaptação às perdas)",
     "keys": "Esc fecha · ↑↓ move · ← → ajusta",
     "bandwidthLabel": "Largura de banda estimada com cabeçalhos",
     "bandwidthValue": "≈ {{value}} de {{limit}} kbit/s",
@@ -77,6 +76,9 @@
     "bandwidthHintWithin": "Com o modo de baixa latência: ≈ {{value}} kbit/s (pacotes de 10 ms), ainda dentro do limite.",
     "bandwidthHintOver": "Com o modo de baixa latência: ≈ {{value}} kbit/s (pacotes de 10 ms), acima do limite.",
     "bandwidthHintNoLimit": "Com o modo de baixa latência: ≈ {{value}} kbit/s (pacotes de 10 ms).",
-    "beta": "Beta"
+    "beta": "Beta",
+    "moreInfo": "Mais informações: {{topic}}",
+    "effectiveShort": "A enviar agora",
+    "effectiveTip": "O débito enviado neste momento, após a adaptação à perda de pacotes."
   }
 }

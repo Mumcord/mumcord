@@ -180,3 +180,19 @@
   color: var(--color-accent-text);
   font-size: var(--font-size-xs, var(--font-size-sm));
 }
+
+.connection-quick .overlay-settings__slider input[type="range"] {
+  flex: 1;
+  min-width: 0;
+}
+
+.connection-quick .overlay-settings__slider output {
+  min-width: 0;
+  color: var(--color-text);
+  font-weight: var(--font-weight-bold);
+  text-align: end;
+}
+
+.connection-quick__effective strong {
+  white-space: nowrap;
+}

@@ -69,7 +69,6 @@
     "lowLatencyComingSoon": "Próximamente",
     "voiceSettings": "Ajustes de voz…",
     "applies": "Se aplica al instante y se guarda como en Ajustes → Audio",
-    "effectiveLabel": "Enviando ahora (tras adaptarse a las pérdidas)",
     "keys": "Esc cierra · ↑↓ mueve · ← → ajusta",
     "bandwidthLabel": "Ancho de banda estimado con cabeceras",
     "bandwidthValue": "≈ {{value}} de {{limit}} kbit/s",
@@ -77,6 +76,9 @@
     "bandwidthHintWithin": "Con el modo de baja latencia: ≈ {{value}} kbit/s (paquetes de 10 ms), aún dentro del límite.",
     "bandwidthHintOver": "Con el modo de baja latencia: ≈ {{value}} kbit/s (paquetes de 10 ms), por encima del límite.",
     "bandwidthHintNoLimit": "Con el modo de baja latencia: ≈ {{value}} kbit/s (paquetes de 10 ms).",
-    "beta": "Beta"
+    "beta": "Beta",
+    "moreInfo": "Más información: {{topic}}",
+    "effectiveShort": "Enviando ahora",
+    "effectiveTip": "La tasa de bits que se envía ahora, tras adaptarse a la pérdida de paquetes."
   }
 }

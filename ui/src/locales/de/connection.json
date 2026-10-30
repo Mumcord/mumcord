@@ -68,7 +68,6 @@
     "lowLatencyComingSoon": "Demnächst verfügbar",
     "voiceSettings": "Spracheinstellungen…",
     "applies": "Gilt sofort, gespeichert wie unter Einstellungen → Audio",
-    "effectiveLabel": "Wird gerade gesendet (nach Verlustanpassung)",
     "keys": "Esc schließt · ↑↓ bewegt · ← → ändert",
     "bandwidthLabel": "Geschätzte Bandbreite inkl. Header",
     "bandwidthValue": "≈ {{value}} von {{limit}} kbit/s",
@@ -76,6 +75,9 @@
     "bandwidthHintWithin": "Mit Modus für niedrige Latenz: ≈ {{value}} kbit/s (10-ms-Pakete), noch innerhalb des Limits.",
     "bandwidthHintOver": "Mit Modus für niedrige Latenz: ≈ {{value}} kbit/s (10-ms-Pakete), über dem Limit.",
     "bandwidthHintNoLimit": "Mit Modus für niedrige Latenz: ≈ {{value}} kbit/s (10-ms-Pakete).",
-    "beta": "Beta"
+    "beta": "Beta",
+    "moreInfo": "Mehr Informationen: {{topic}}",
+    "effectiveShort": "Wird gerade gesendet",
+    "effectiveTip": "Die aktuell gesendete Bitrate nach Anpassung an Paketverlust."
   }
 }

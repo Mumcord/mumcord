@@ -68,7 +68,6 @@
     "lowLatencyComingSoon": "Kommer snart",
     "voiceSettings": "Stemmeindstillinger…",
     "applies": "Gælder med det samme, gemmes som i Indstillinger → Lyd",
-    "effectiveLabel": "Sender nu (efter tilpasning til tab)",
     "keys": "Esc lukker · ↑↓ flytter · ← → justerer",
     "bandwidthLabel": "Anslået båndbredde inkl. headere",
     "bandwidthValue": "≈ {{value}} af {{limit}} kbit/s",
@@ -76,6 +75,9 @@
     "bandwidthHintWithin": "Med tilstanden med lav latenstid: ≈ {{value}} kbit/s (pakker på 10 ms), stadig inden for grænsen.",
     "bandwidthHintOver": "Med tilstanden med lav latenstid: ≈ {{value}} kbit/s (pakker på 10 ms), over grænsen.",
     "bandwidthHintNoLimit": "Med tilstanden med lav latenstid: ≈ {{value}} kbit/s (pakker på 10 ms).",
-    "beta": "Beta"
+    "beta": "Beta",
+    "moreInfo": "Mere information: {{topic}}",
+    "effectiveShort": "Sender nu",
+    "effectiveTip": "Den bitrate, der sendes lige nu, efter tilpasning til pakketab."
   }
 }

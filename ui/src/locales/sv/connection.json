@@ -68,7 +68,6 @@
     "lowLatencyComingSoon": "Kommer snart",
     "voiceSettings": "Röstinställningar…",
     "applies": "Gäller direkt, sparas som i Inställningar → Ljud",
-    "effectiveLabel": "Skickas nu (efter anpassning till förlust)",
     "keys": "Esc stänger · ↑↓ flyttar · ← → justerar",
     "bandwidthLabel": "Uppskattad bandbredd inkl. rubriker",
     "bandwidthValue": "≈ {{value}} av {{limit}} kbit/s",
@@ -76,6 +75,9 @@
     "bandwidthHintWithin": "Med läget för låg fördröjning: ≈ {{value}} kbit/s (paket på 10 ms), fortfarande inom gränsen.",
     "bandwidthHintOver": "Med läget för låg fördröjning: ≈ {{value}} kbit/s (paket på 10 ms), över gränsen.",
     "bandwidthHintNoLimit": "Med läget för låg fördröjning: ≈ {{value}} kbit/s (paket på 10 ms).",
-    "beta": "Beta"
+    "beta": "Beta",
+    "moreInfo": "Mer information: {{topic}}",
+    "effectiveShort": "Skickas nu",
+    "effectiveTip": "Bithastigheten som skickas just nu, efter anpassning till paketförlust."
   }
 }

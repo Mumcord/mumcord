@@ -71,7 +71,6 @@
     "lowLatencyComingSoon": "Dalwaqt",
     "voiceSettings": "Settings tal-vuċi…",
     "applies": "Japplika minnufih, jinħażen bħal fis-Settings → Awdjo",
-    "effectiveLabel": "Qed jintbagħat issa (wara l-adattament għat-telf)",
     "keys": "Esc jagħlaq · ↑↓ jiċċaqlaq · ← → jaġġusta",
     "bandwidthLabel": "Bandwidth stmat bl-intestaturi",
     "bandwidthValue": "≈ {{value}} minn {{limit}} kbit/s",
@@ -79,6 +78,9 @@
     "bandwidthHintWithin": "Bil-modalità b'latenza baxxa: ≈ {{value}} kbit/s (pakketti ta' 10 ms), għadu fil-limitu.",
     "bandwidthHintOver": "Bil-modalità b'latenza baxxa: ≈ {{value}} kbit/s (pakketti ta' 10 ms),'il fuq mil-limitu.",
     "bandwidthHintNoLimit": "Bil-modalità b'latenza baxxa: ≈ {{value}} kbit/s (pakketti ta' 10 ms).",
-    "beta": "Beta"
+    "beta": "Beta",
+    "moreInfo": "Aktar informazzjoni: {{topic}}",
+    "effectiveShort": "Qed jintbagħat issa",
+    "effectiveTip": "Il-bitrate li qed jintbagħat issa, wara l-adattament għat-telf tal-pakketti."
   }
 }

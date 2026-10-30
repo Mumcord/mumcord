@@ -71,7 +71,6 @@
     "lowLatencyComingSoon": "Ag teacht go luath",
     "voiceSettings": "Socruithe gutha…",
     "applies": "Feidhmíonn sé láithreach, sábháilte mar a bhíonn i Socruithe → Fuaim",
-    "effectiveLabel": "Á sheoladh anois (tar éis oiriúnú do chaillteanas)",
     "keys": "Esc dúnann · ↑↓ bogann · ← → coigeartaíonn",
     "bandwidthLabel": "Leithead banda measta le ceanntásca",
     "bandwidthValue": "≈ {{value}} as {{limit}} kbit/s",
@@ -79,6 +78,9 @@
     "bandwidthHintWithin": "Leis an mód moill íseal: ≈ {{value}} kbit/s (paicéid 10 ms), laistigh den teorainn fós.",
     "bandwidthHintOver": "Leis an mód moill íseal: ≈ {{value}} kbit/s (paicéid 10 ms), os cionn na teorann.",
     "bandwidthHintNoLimit": "Leis an mód moill íseal: ≈ {{value}} kbit/s (paicéid 10 ms).",
-    "beta": "Beta"
+    "beta": "Beta",
+    "moreInfo": "Tuilleadh eolais: {{topic}}",
+    "effectiveShort": "Á sheoladh anois",
+    "effectiveTip": "An ráta giotán atá á sheoladh anois, tar éis oiriúnú do chaillteanas paicéad."
   }
 }

@@ -69,7 +69,6 @@
     "lowLatencyComingSoon": "În curând",
     "voiceSettings": "Setări voce…",
     "applies": "Se aplică imediat, salvat ca în Setări → Audio",
-    "effectiveLabel": "Se trimite acum (după adaptarea la pierderi)",
     "keys": "Esc închide · ↑↓ mută · ← → ajustează",
     "bandwidthLabel": "Lățime de bandă estimată cu antete",
     "bandwidthValue": "≈ {{value}} din {{limit}} kbit/s",
@@ -77,6 +76,9 @@
     "bandwidthHintWithin": "Cu modul cu latență redusă: ≈ {{value}} kbit/s (pachete de 10 ms), încă în limită.",
     "bandwidthHintOver": "Cu modul cu latență redusă: ≈ {{value}} kbit/s (pachete de 10 ms), peste limită.",
     "bandwidthHintNoLimit": "Cu modul cu latență redusă: ≈ {{value}} kbit/s (pachete de 10 ms).",
-    "beta": "Beta"
+    "beta": "Beta",
+    "moreInfo": "Mai multe informații: {{topic}}",
+    "effectiveShort": "Se trimite acum",
+    "effectiveTip": "Rata de biți trimisă acum, după adaptarea la pierderea de pachete."
   }
 }

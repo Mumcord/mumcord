@@ -68,7 +68,6 @@
     "lowLatencyComingSoon": "Tulekul",
     "voiceSettings": "Hääleseaded…",
     "applies": "Rakendub kohe, salvestub nagu Seaded → Heli",
-    "effectiveLabel": "Praegu saadetakse (pärast kaoga kohandamist)",
     "keys": "Esc sulgeb · ↑↓ liigub · ← → muudab",
     "bandwidthLabel": "Hinnanguline ribalaius päistega",
     "bandwidthValue": "≈ {{value}} / {{limit}} kbit/s",
@@ -76,6 +75,9 @@
     "bandwidthHintWithin": "Väikese viivitusega režiimis: ≈ {{value}} kbit/s (10 ms paketid), endiselt piirangu sees.",
     "bandwidthHintOver": "Väikese viivitusega režiimis: ≈ {{value}} kbit/s (10 ms paketid), üle piirangu.",
     "bandwidthHintNoLimit": "Väikese viivitusega režiimis: ≈ {{value}} kbit/s (10 ms paketid).",
-    "beta": "Beta"
+    "beta": "Beta",
+    "moreInfo": "Rohkem teavet: {{topic}}",
+    "effectiveShort": "Praegu saadetakse",
+    "effectiveTip": "Praegu saadetav bitikiirus pärast paketikaoga kohandamist."
   }
 }

@@ -69,7 +69,6 @@
     "lowLatencyComingSoon": "Uskoro",
     "voiceSettings": "Postavke glasa…",
     "applies": "Primjenjuje se odmah, sprema se kao u Postavke → Zvuk",
-    "effectiveLabel": "Trenutno se šalje (nakon prilagodbe gubitku)",
     "keys": "Esc zatvara · ↑↓ pomiče · ← → podešava",
     "bandwidthLabel": "Procijenjena propusnost sa zaglavljima",
     "bandwidthValue": "≈ {{value}} od {{limit}} kbit/s",
@@ -77,6 +76,9 @@
     "bandwidthHintWithin": "S načinom niske latencije: ≈ {{value}} kbit/s (paketi od 10 ms), još unutar ograničenja.",
     "bandwidthHintOver": "S načinom niske latencije: ≈ {{value}} kbit/s (paketi od 10 ms), iznad ograničenja.",
     "bandwidthHintNoLimit": "S načinom niske latencije: ≈ {{value}} kbit/s (paketi od 10 ms).",
-    "beta": "Beta"
+    "beta": "Beta",
+    "moreInfo": "Više informacija: {{topic}}",
+    "effectiveShort": "Trenutno se šalje",
+    "effectiveTip": "Brzina prijenosa koja se trenutno šalje, nakon prilagodbe gubitku paketa."
   }
 }

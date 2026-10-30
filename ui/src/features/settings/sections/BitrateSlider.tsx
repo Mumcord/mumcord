@@ -1,6 +1,7 @@
 import { useEffect, useId, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { getApi } from "../../../api";
+import { InfoTip } from "../../../components/InfoTip";
 import { useThrottledSend } from "../../../components/useThrottledSend";
 import type { SettingsSectionProps } from "./types";
 
@@ -18,9 +19,12 @@ export function BitrateSlider({
   settings,
   update,
   limitLabel,
+  tipLabel,
 }: SettingsSectionProps & {
   /** Compact variant (quick panel): shows the range ends as marks and keeps the hint for screen readers only. */
   limitLabel?: string;
+  /** Accessible name of the "?" button that carries the hint in the compact variant. */
+  tipLabel?: string;
 }) {
   const { t } = useTranslation("settings");
   const id = useId();
@@ -57,6 +61,16 @@ export function BitrateSlider({
   return (
     <div className="settings-field overlay-settings__slider">
       <label htmlFor={id}>{t("audio.bitrate")}</label>
+      {limitLabel !== undefined && tipLabel !== undefined ? (
+        <InfoTip
+          label={tipLabel}
+          text={
+            serverMax === null
+              ? t("audio.bitrateMaxUnknown")
+              : t("audio.bitrateMaxKnown", { kbps: serverMax })
+          }
+        />
+      ) : null}
       <input
         id={id}
         type="range"
@@ -65,7 +79,7 @@ export function BitrateSlider({
         step={1}
         value={value}
         aria-valuetext={shown}
-        aria-describedby={`${id}-hint`}
+        aria-describedby={limitLabel === undefined ? `${id}-hint` : undefined}
         onChange={(event) => {
           const next = Number(event.target.value);
           setDragging(next);
@@ -87,14 +101,13 @@ export function BitrateSlider({
           {serverMax !== null ? <span>{limitLabel}</span> : null}
         </div>
       ) : null}
-      <p
-        id={`${id}-hint`}
-        className={limitLabel !== undefined ? "settings-hint visually-hidden" : "settings-hint"}
-      >
-        {serverMax === null
-          ? t("audio.bitrateMaxUnknown")
-          : t("audio.bitrateMaxKnown", { kbps: serverMax })}
-      </p>
+      {limitLabel === undefined ? (
+        <p id={`${id}-hint`} className="settings-hint">
+          {serverMax === null
+            ? t("audio.bitrateMaxUnknown")
+            : t("audio.bitrateMaxKnown", { kbps: serverMax })}
+        </p>
+      ) : null}
     </div>
   );
 }

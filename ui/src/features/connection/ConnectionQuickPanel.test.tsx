@@ -82,9 +82,18 @@ describe("ConnectionQuickPanel", () => {
     await setup();
     const panel = await openQuick();
     const slider = within(panel).getByRole("slider");
-    await within(panel).findByText(/Maximum: 128 kbit\/s/);
+    const limitTip = await within(panel).findByRole("button", {
+      name: "More information: Bitrate",
+    });
+    await waitFor(() => {
+      expect(limitTip.dataset.tooltip).toMatch(/Maximum: 128 kbit\/s/);
+    });
+    expect(within(panel).getByText("Server limit 128")).toBeInTheDocument();
     expect(slider).toHaveAttribute("max", "128");
-    await within(panel).findByText("Sending now (after loss adaptation)");
+    await within(panel).findByText("Sending now");
+    expect(
+      within(panel).getByRole("button", { name: "More information: Sending now" }).dataset.tooltip,
+    ).toMatch(/after adapting to packet loss/);
     expect(within(panel).getByText("64 kbit/s")).toBeVisible();
     fireEvent.change(slider, { target: { value: "32" } });
     await waitFor(async () => {
@@ -110,10 +119,9 @@ describe("ConnectionQuickPanel", () => {
     await within(panel).findByText("≈ 79 of 128 kbit/s");
     expect(within(panel).getByRole("meter")).toHaveAccessibleName(/Estimated bandwidth/);
     expect(
-      within(panel).getByText(
-        /With low-latency mode: ≈ 93 kbit\/s \(10 ms packets\), still within the limit/,
-      ),
-    ).toBeVisible();
+      within(panel).getByRole("button", { name: /More information: Estimated bandwidth/ }).dataset
+        .tooltip,
+    ).toMatch(/With low-latency mode: ≈ 93 kbit\/s \(10 ms packets\), still within the limit/);
   });
 
   it("shows the low-latency mode disabled until it exists", async () => {
@@ -122,6 +130,17 @@ describe("ConnectionQuickPanel", () => {
     const row = within(panel).getByRole("switch", { name: "Low-latency mode" });
     expect(row).toBeDisabled();
     expect(within(panel).getByText("Coming soon")).toBeVisible();
+  });
+
+  it("explains the options behind ? buttons instead of lines of text", async () => {
+    await setup();
+    const panel = await openQuick();
+    await within(panel).findByRole("switch", { name: "Music quality" });
+    const music = within(panel).getByRole("button", { name: "More information: Music quality" });
+    expect(music.dataset.tooltip).toMatch(/Tunes the encoder for music/);
+    expect(within(panel).queryByText(/Tunes the encoder for music/)).toBeNull();
+    const low = within(panel).getByRole("button", { name: "More information: Low-latency mode" });
+    expect(low.dataset.tooltip).toMatch(/Smallest packets and buffers/);
   });
 
   it("keeps the audio health rating visible", async () => {

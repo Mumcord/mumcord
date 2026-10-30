@@ -4,6 +4,7 @@ import { Switch } from "../settings/components/Switch";
 import { BitrateSlider } from "../settings/sections/BitrateSlider";
 import { useSettings } from "../settings/useSettings";
 import { estimateBandwidth } from "./bandwidth";
+import { InfoTip } from "../../components/InfoTip";
 import { useServers } from "../servers";
 import { AudioRatingBadge, AudioRatingReason } from "./AudioHealthRating";
 import { useConnectionStats } from "./useConnectionStats";
@@ -27,6 +28,7 @@ export function ConnectionQuickPanel({ onOpenVoiceSettings }: { onOpenVoiceSetti
   const { settings, update } = useSettings();
   const state = useConnectionStats(true);
   const meterId = useId();
+  const more = (topic: string) => t("quick.moreInfo", { topic });
   const servers = useServers();
   const link = servers.connection.state === "disconnected" ? null : servers.connection.serverId;
   const saved = servers.servers.find((server) => server.id === link);
@@ -36,12 +38,22 @@ export function ConnectionQuickPanel({ onOpenVoiceSettings }: { onOpenVoiceSetti
   const limit = stats?.serverMaxBandwidthKbps ?? null;
   const lowLatency = lowLatencyAvailable();
   const withLowLatency = bandwidth ? bandwidth.kbps + bandwidth.lowLatencyExtraKbps : 0;
+  const bandwidthHintKey =
+    limit === null
+      ? "quick.bandwidthHintNoLimit"
+      : withLowLatency <= limit
+        ? "quick.bandwidthHintWithin"
+        : "quick.bandwidthHintOver";
+  const bandwidthHint = t(bandwidthHintKey, { value: Math.round(withLowLatency) });
 
   return (
     <div className="connection-quick">
       <header className="connection-quick__header">
         <div className="connection-quick__headline">
-          <span className="connection-quick__title">{t("quick.title")}</span>
+          <span className="connection-quick__title">
+            {t("quick.title")}
+            <InfoTip label={more(t("quick.title"))} text={t("quick.applies")} />
+          </span>
           <span className="connection-quick__summary">
             {stats?.audio ? (
               <AudioRatingBadge rating={stats.audio.rating} issue={stats.audio.issue} compact />
@@ -62,16 +74,14 @@ export function ConnectionQuickPanel({ onOpenVoiceSettings }: { onOpenVoiceSetti
         {stats?.audio?.rating !== "good" ? (
           <AudioRatingReason issue={stats?.audio?.issue ?? null} />
         ) : null}
-        <p className="settings-hint connection-quick__applies">
-          {serverName ? `${serverName} · ` : ""}
-          {t("quick.applies")}
-        </p>
+        {serverName ? <p className="settings-hint">{serverName}</p> : null}
       </header>
       {settings ? (
         <section className="connection-quick__section">
           <BitrateSlider
             settings={settings}
             update={update}
+            tipLabel={more(ts("audio.bitrate"))}
             limitLabel={
               stats?.serverMaxBandwidthKbps != null
                 ? `${t("serverLimit")} ${String(stats.serverMaxBandwidthKbps)}`
@@ -80,7 +90,10 @@ export function ConnectionQuickPanel({ onOpenVoiceSettings }: { onOpenVoiceSetti
           />
           {stats ? (
             <p className="connection-quick__effective">
-              <span>{t("quick.effectiveLabel")}</span>
+              <span>
+                {t("quick.effectiveShort")}
+                <InfoTip label={more(t("quick.effectiveShort"))} text={t("quick.effectiveTip")} />
+              </span>
               <strong>{t("bitrateValue", { value: stats.sendBitrateKbps })}</strong>
             </p>
           ) : null}
@@ -90,7 +103,7 @@ export function ConnectionQuickPanel({ onOpenVoiceSettings }: { onOpenVoiceSetti
         <section className="connection-quick__section">
           <Switch
             label={ts("audio.musicQuality")}
-            description={ts("audio.musicQualityHint")}
+            tip={{ label: more(ts("audio.musicQuality")), text: ts("audio.musicQualityHint") }}
             checked={settings.musicQuality}
             onChange={(musicQuality) => {
               update({ musicQuality });
@@ -101,7 +114,8 @@ export function ConnectionQuickPanel({ onOpenVoiceSettings }: { onOpenVoiceSetti
       <section className="connection-quick__section">
         <Switch
           label={t("quick.lowLatency")}
-          description={lowLatency ? t("quick.lowLatencyHint") : t("quick.lowLatencyComingSoon")}
+          badge={lowLatency ? t("quick.beta") : t("quick.lowLatencyComingSoon")}
+          tip={{ label: more(t("quick.lowLatency")), text: t("quick.lowLatencyHint") }}
           checked={false}
           disabled={!lowLatency}
           onChange={() => undefined}
@@ -110,7 +124,10 @@ export function ConnectionQuickPanel({ onOpenVoiceSettings }: { onOpenVoiceSetti
       {bandwidth ? (
         <section className="connection-quick__section connection-quick__bandwidth">
           <p className="connection-quick__effective">
-            <span id={meterId}>{t("quick.bandwidthLabel")}</span>
+            <span id={meterId}>
+              {t("quick.bandwidthLabel")}
+              <InfoTip label={more(t("quick.bandwidthLabel"))} text={bandwidthHint} />
+            </span>
             <strong>
               {limit === null
                 ? t("quick.bandwidthValueNoLimit", { value: Math.round(bandwidth.kbps) })
@@ -128,16 +145,6 @@ export function ConnectionQuickPanel({ onOpenVoiceSettings }: { onOpenVoiceSetti
               value={bandwidth.share}
             />
           ) : null}
-          <p className="settings-hint">
-            {t(
-              limit === null
-                ? "quick.bandwidthHintNoLimit"
-                : withLowLatency <= limit
-                  ? "quick.bandwidthHintWithin"
-                  : "quick.bandwidthHintOver",
-              { value: Math.round(withLowLatency) },
-            )}
-          </p>
         </section>
       ) : null}
       <footer className="connection-quick__footer">

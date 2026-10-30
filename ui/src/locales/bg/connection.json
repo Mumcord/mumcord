@@ -68,7 +68,6 @@
     "lowLatencyComingSoon": "Очаквайте скоро",
     "voiceSettings": "Настройки на гласа…",
     "applies": "Прилага се веднага, запазва се като в Настройки → Аудио",
-    "effectiveLabel": "В момента се изпраща (след адаптация към загубите)",
     "keys": "Esc затваря · ↑↓ премества · ← → променя",
     "bandwidthLabel": "Прогнозна честотна лента с хедъри",
     "bandwidthValue": "≈ {{value}} от {{limit}} kbit/s",
@@ -76,6 +75,9 @@
     "bandwidthHintWithin": "С режим с ниско закъснение: ≈ {{value}} kbit/s (пакети от 10 ms), все още в лимита.",
     "bandwidthHintOver": "С режим с ниско закъснение: ≈ {{value}} kbit/s (пакети от 10 ms), над лимита.",
     "bandwidthHintNoLimit": "С режим с ниско закъснение: ≈ {{value}} kbit/s (пакети от 10 ms).",
-    "beta": "Beta"
+    "beta": "Beta",
+    "moreInfo": "Повече информация: {{topic}}",
+    "effectiveShort": "В момента се изпраща",
+    "effectiveTip": "Битрейтът, който се изпраща в момента, след адаптация към загубата на пакети."
   }
 }

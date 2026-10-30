@@ -70,7 +70,6 @@
     "lowLatencyComingSoon": "Kmalu",
     "voiceSettings": "Nastavitve glasu…",
     "applies": "Velja takoj, shranjeno kot v Nastavitve → Zvok",
-    "effectiveLabel": "Trenutno se pošilja (po prilagoditvi izgubi)",
     "keys": "Esc zapre · ↑↓ premika · ← → prilagodi",
     "bandwidthLabel": "Ocenjena pasovna širina z glavami",
     "bandwidthValue": "≈ {{value}} od {{limit}} kbit/s",
@@ -78,6 +77,9 @@
     "bandwidthHintWithin": "Z načinom nizke zakasnitve: ≈ {{value}} kbit/s (paketi po 10 ms), še znotraj omejitve.",
     "bandwidthHintOver": "Z načinom nizke zakasnitve: ≈ {{value}} kbit/s (paketi po 10 ms), nad omejitvijo.",
     "bandwidthHintNoLimit": "Z načinom nizke zakasnitve: ≈ {{value}} kbit/s (paketi po 10 ms).",
-    "beta": "Beta"
+    "beta": "Beta",
+    "moreInfo": "Več informacij: {{topic}}",
+    "effectiveShort": "Trenutno se pošilja",
+    "effectiveTip": "Bitna hitrost, ki se trenutno pošilja, po prilagoditvi izgubi paketov."
   }
 }

@@ -107,6 +107,8 @@ export function ConnectionInfo({ className }: { className?: string }) {
     // Escape closes from anywhere while open, returning focus to the button.
     const onKeyDown = (event: KeyboardEvent) => {
       if (event.key !== "Escape") return;
+      // Escape first dismisses an open "?" tooltip; the panel closes with the next one.
+      if (document.querySelector('[role="tooltip"]')) return;
       event.preventDefault();
       setMode(null);
       button.current?.focus();

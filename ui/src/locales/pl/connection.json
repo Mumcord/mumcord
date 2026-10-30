@@ -70,7 +70,6 @@
     "lowLatencyComingSoon": "Wkrótce",
     "voiceSettings": "Ustawienia głosu…",
     "applies": "Działa od razu, zapisywane jak w Ustawienia → Dźwięk",
-    "effectiveLabel": "Aktualnie wysyłane (po dostosowaniu do strat)",
     "keys": "Esc zamyka · ↑↓ przesuwa · ← → reguluje",
     "bandwidthLabel": "Szacowana przepustowość z nagłówkami",
     "bandwidthValue": "≈ {{value}} z {{limit}} kbit/s",
@@ -78,6 +77,9 @@
     "bandwidthHintWithin": "Z trybem niskich opóźnień: ≈ {{value}} kbit/s (pakiety po 10 ms), nadal w limicie.",
     "bandwidthHintOver": "Z trybem niskich opóźnień: ≈ {{value}} kbit/s (pakiety po 10 ms), ponad limitem.",
     "bandwidthHintNoLimit": "Z trybem niskich opóźnień: ≈ {{value}} kbit/s (pakiety po 10 ms).",
-    "beta": "Beta"
+    "beta": "Beta",
+    "moreInfo": "Więcej informacji: {{topic}}",
+    "effectiveShort": "Aktualnie wysyłane",
+    "effectiveTip": "Szybkość transmisji wysyłana w tej chwili, po dostosowaniu do utraty pakietów."
   }
 }

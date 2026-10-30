@@ -69,7 +69,6 @@
     "lowLatencyComingSoon": "Bientôt disponible",
     "voiceSettings": "Paramètres vocaux…",
     "applies": "S'applique tout de suite, enregistré comme dans Paramètres → Audio",
-    "effectiveLabel": "Envoi actuel (après adaptation aux pertes)",
     "keys": "Échap ferme · ↑↓ déplace · ← → ajuste",
     "bandwidthLabel": "Bande passante estimée avec en-têtes",
     "bandwidthValue": "≈ {{value}} sur {{limit}} kbit/s",
@@ -77,6 +76,9 @@
     "bandwidthHintWithin": "Avec le mode faible latence : ≈ {{value}} kbit/s (paquets de 10 ms), toujours dans la limite.",
     "bandwidthHintOver": "Avec le mode faible latence : ≈ {{value}} kbit/s (paquets de 10 ms), au-dessus de la limite.",
     "bandwidthHintNoLimit": "Avec le mode faible latence : ≈ {{value}} kbit/s (paquets de 10 ms).",
-    "beta": "Beta"
+    "beta": "Beta",
+    "moreInfo": "Plus d'informations : {{topic}}",
+    "effectiveShort": "Envoi actuel",
+    "effectiveTip": "Le débit envoyé en ce moment, après adaptation à la perte de paquets."
   }
 }
