@@ -17,7 +17,7 @@ import { mkdirSync, rmSync } from "node:fs";
 import { join } from "node:path";
 import { $, $$, browser, expect } from "@wdio/globals";
 import { app, bot, repoRoot, testenv } from "../../helpers/index.ts";
-import { align, concat, readWav, silence, speechAndGap, writeWav } from "../../helpers/voice-audio.ts";
+import { align, concat, RATE, readWav, silence, speechAndGap, writeWav } from "../../helpers/voice-audio.ts";
 import { connectFromEmptyState, openSettings, waitFor, wizard } from "../app/flows.ts";
 
 const sleep = (ms: number): Promise<void> => new Promise((r) => setTimeout(r, ms));
@@ -37,8 +37,13 @@ const WINDOW = 480;
 const REF_WINDOWS = Math.floor(speech.length / WINDOW);
 /** Windows of a copy: the models need ~150 ms before their output is representative. */
 const WARM_UP = 15;
-/** Seconds of digital silence in front of a copy, so every run starts from the same quiet state. */
-const PREFIX = 4;
+/** Seconds one copy of the clip covers. */
+const CLIP_SECONDS = Math.floor(noisy.length / RATE);
+/** Seconds of digital silence in front of a copy. The app drops whatever the capture delivered
+ * before its connection, so the reconnect has to land inside this silence: if it comes later, part
+ * of the copy is gone, the alignment matches the wrong windows, and the measured levels say nothing
+ * about the suppressor. */
+const PREFIX = 15;
 
 interface Levels {
   speechDb: number;
@@ -135,25 +140,37 @@ async function reconnectApp(): Promise<void> {
 /**
  * Records `seconds` of what the app sends for `sample`, starting before the app is restarted so the
  * window always contains the clip. `during` runs while the bot is still recording. `lag` is the
- * window inside the recording where `sample` begins.
+ * window inside the recording where the copy of the clip begins; aligning against the clip itself
+ * (not against the file, whose leading silence carries no pattern) keeps that position unambiguous.
  */
 async function record(
   label: string,
   sample: Float32Array,
   seconds: number,
-  during?: () => Promise<void>,
+  during?: (elapsedMs: number) => Promise<void>,
+  botTimeout = 120,
 ): Promise<{ received: Float32Array; lag: number }> {
   writeWav(f(`${label}-in.wav`), sample);
   const recording = bot(["record", f(`${label}.wav`), "--seconds", String(seconds)], {
     name: "Measure",
-    timeout: 120,
+    timeout: botTimeout,
   });
   await app.restart({ audio: `file:${f(`${label}-in.wav`)}:${f(`${label}-out.wav`)}` });
+  const restarted = Date.now();
   await reconnectApp();
-  if (during !== undefined) await during();
+  const connected = Date.now() - restarted;
+  if (connected > PREFIX * 1000 - 1000) {
+    throw new Error(
+      `"${label}": the app connected ${String(connected)} ms after the restart, later than the ` +
+        `${String(PREFIX * 1000)} ms prefix, so the copy lost its head and this run measures nothing`,
+    );
+  }
+  if (during !== undefined) await during(connected);
   await recording;
   const received = readWav(f(`${label}.wav`));
-  return { received, lag: align(received, sample) };
+  const lag = align(received, noisy);
+  log(`${label}: copy starts at window ${String(lag)} (${String(Math.floor(lag / 100))} s), connect ${String(connected)} ms`);
+  return { received, lag };
 }
 
 /** Speech and gap levels of the copy that starts at window `offset` inside a recording. A recording
@@ -174,8 +191,8 @@ function levelsAt(received: Float32Array, offset: number, label: string): Levels
 /** Records one run with `backend` selected. */
 async function measure(label: string, backend?: string): Promise<Levels> {
   if (backend !== undefined) await selectBackend(backend);
-  const { received, lag } = await record(label, concat(silence(PREFIX), noisy, silence(14)), 40);
-  return levelsAt(received, lag + PREFIX * 100, label);
+  const { received, lag } = await record(label, concat(silence(PREFIX), noisy, silence(8)), 45);
+  return levelsAt(received, lag, label);
 }
 
 describe("noise suppression backends", () => {
@@ -300,13 +317,21 @@ describe("noise suppression backends", () => {
     const pause = 24;
     const copyWindows = Math.floor(noisy.length / WINDOW);
     const twoCopies = concat(silence(PREFIX), noisy, silence(pause), noisy, silence(8));
-    const { received, lag } = await record("switch", twoCopies, 80, async () => {
-      // The first copy is on its way; the switch has to land in the pause after it.
-      await sleep(15_000);
-      await openVoiceSettings();
-      await pick(await backendBox(), "sonora-ns");
-    });
-    const start = lag + PREFIX * 100;
+    const { received, lag } = await record(
+      "switch",
+      twoCopies,
+      70,
+      async (elapsed) => {
+        // The switch has to land in the pause after the first copy, so it happens
+        // CLIP_SECONDS + 3 s after the app started playing, not after the reconnect.
+        const wait = (PREFIX + CLIP_SECONDS + 3) * 1000 - elapsed;
+        if (wait > 0) await sleep(wait);
+        await openVoiceSettings();
+        await pick(await backendBox(), "sonora-ns");
+      },
+      150,
+    );
+    const start = lag;
     const first = levelsAt(received, start, "switch first copy");
     const second = levelsAt(received, start + copyWindows + pause * 100, "switch second copy");
     // The two copies measure like the two backends, and they are further apart than the run noise:
