@@ -141,7 +141,10 @@ impl DspChain {
     /// [`DspControls`].
     pub fn process(&mut self, input: &Frame, out: &mut Frame) -> Gate {
         let controls = &*self.controls;
-        let aec_on = controls.echo_cancellation();
+        // Low-latency mode keeps the signal untouched: these stages change the sound and the
+        // echo canceller would need the far end it can no longer track at minimal buffering.
+        let bypass = controls.low_latency();
+        let aec_on = controls.echo_cancellation() && !bypass;
 
         // Always drain the reference so it never goes stale while echo
         // cancellation is off.
@@ -176,13 +179,14 @@ impl DspChain {
         }
         let speech_probability = self.denoise.process_frame(&mut self.ns_out, &self.ns_in);
         let music = controls.music_quality();
-        if self.force_noise_suppression || (controls.noise_suppression() && !music) {
+        if self.force_noise_suppression || (controls.noise_suppression() && !music && !bypass) {
             for (sample, &denoised) in out.iter_mut().zip(self.ns_out.iter()) {
                 *sample = denoised / I16_SCALE;
             }
         }
 
-        let level_music = controls.auto_gain() && music;
+        let auto_gain = controls.auto_gain() && !bypass;
+        let level_music = auto_gain && music;
         if level_music {
             if !self.leveling {
                 self.leveler = Leveler::default();
@@ -190,7 +194,7 @@ impl DspChain {
             self.leveler.process(out);
         }
         self.leveling = level_music;
-        if controls.auto_gain() && !music {
+        if auto_gain && !music {
             self.scratch = *out;
             if self
                 .agc
