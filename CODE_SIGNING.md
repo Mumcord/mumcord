@@ -6,7 +6,7 @@ This policy applies to the Windows release builds of Mumcord published on the [G
 
 Only binaries built from this repository's source code by the release workflow (`.github/workflows/release.yml`) on GitHub-hosted runners are signed:
 
-- the Mumcord application executable (`mumcord.exe`),
+- the Mumcord application executable (`mumcord.exe`), also shipped as `Mumcord.exe` in the portable zip (`Mumcord_<version>_x64-portable.zip`),
 - its uninstaller, and
 - the Windows installer (`Mumcord_<version>_x64-setup.exe`) that contains them.
 

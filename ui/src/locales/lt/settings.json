@@ -379,7 +379,8 @@
     "showNotices": "Rodyti trečiųjų šalių licencijas",
     "noticesFailed": "Nepavyko atverti trečiųjų šalių licencijų.",
     "loading": "Įkeliama…",
-    "devToolsUnlocked": "Kūrėjo įrankiai atrakinti: paketų tikrintuvas dabar yra nustatymų sąraše."
+    "devToolsUnlocked": "Kūrėjo įrankiai atrakinti: paketų tikrintuvas dabar yra nustatymų sąraše.",
+    "portable": "Nešiojamoji"
   },
   "profile": {
     "title": "Profilis",

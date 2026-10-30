@@ -378,7 +378,8 @@
     "showNotices": "Mostrar licencias de terceros",
     "noticesFailed": "No se pudieron abrir las licencias de terceros.",
     "loading": "Cargando…",
-    "devToolsUnlocked": "Herramientas de desarrollo desbloqueadas: el inspector de paquetes ya está en la lista de ajustes."
+    "devToolsUnlocked": "Herramientas de desarrollo desbloqueadas: el inspector de paquetes ya está en la lista de ajustes.",
+    "portable": "Portátil"
   },
   "profile": {
     "title": "Perfil",

@@ -18,6 +18,9 @@ pub struct AppInfo {
     pub os: String,
     /// Running from an AppImage: the UI offers the app-menu entry (FR-2.55).
     pub appimage: bool,
+    /// Running in portable mode from a folder with the `portable` marker (Windows, #181): the
+    /// About section says so and the update hint asks for the new portable zip.
+    pub portable: bool,
     /// The Linux distribution, for the missing-codec install hint (FR-2.41a); `None` on other
     /// systems or without a readable os-release file.
     pub distro: Option<LinuxDistro>,
@@ -52,6 +55,7 @@ pub fn app_info() -> ApiResult<AppInfo> {
         package_version: crate::version::PACKAGE.to_owned(),
         os: diag::os_description(),
         appimage: appimage(),
+        portable: crate::portable::is_active(),
         distro: distro(),
     })
 }

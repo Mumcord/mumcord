@@ -31,7 +31,8 @@
   "updateHint": {
     "message": "Mumcord {{version}} is available.",
     "open": "View release",
-    "dismiss": "Dismiss"
+    "dismiss": "Dismiss",
+    "portable": "Download the new portable zip and unpack it into the folder with Mumcord.exe; your data in MumcordData stays."
   },
   "directConsent": {
     "title": "Allow direct connections?",

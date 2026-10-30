@@ -379,7 +379,8 @@
     "showNotices": "Pokaż licencje stron trzecich",
     "noticesFailed": "Nie udało się otworzyć licencji stron trzecich.",
     "loading": "Ładowanie…",
-    "devToolsUnlocked": "Narzędzia deweloperskie odblokowane: inspektor pakietów jest teraz na liście ustawień."
+    "devToolsUnlocked": "Narzędzia deweloperskie odblokowane: inspektor pakietów jest teraz na liście ustawień.",
+    "portable": "Przenośna"
   },
   "profile": {
     "title": "Profil",

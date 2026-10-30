@@ -378,7 +378,8 @@
     "showNotices": "Mostrar licenças de terceiros",
     "noticesFailed": "Não foi possível abrir as licenças de terceiros.",
     "loading": "A carregar…",
-    "devToolsUnlocked": "Ferramentas de programador desbloqueadas: o inspetor de pacotes já está na lista de definições."
+    "devToolsUnlocked": "Ferramentas de programador desbloqueadas: o inspetor de pacotes já está na lista de definições.",
+    "portable": "Portátil"
   },
   "profile": {
     "title": "Perfil",
