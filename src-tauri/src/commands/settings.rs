@@ -7,7 +7,9 @@ use serde::{Deserialize, Serialize};
 use specta::Type;
 use tauri::{AppHandle, State};
 
-use super::types::{ApiError, ApiResult, ErrorCode};
+use super::types::{
+    ApiError, ApiResult, ErrorCode, ServerId, to_api_server_id, to_engine_server_id,
+};
 
 /// Answer to a question asked once (direct connections, update check, AppImage menu entry).
 #[derive(Serialize, Deserialize, Clone, Copy, Debug, PartialEq, Eq, Type)]
@@ -254,6 +256,95 @@ pub struct PositionalSettings {
     pub max_distance: f32,
 }
 
+/// "Private messages from" (issue #141).
+#[derive(Serialize, Deserialize, Clone, Copy, Debug, PartialEq, Eq, Type)]
+#[serde(rename_all = "camelCase")]
+pub enum PmRule {
+    Everyone,
+    FriendsOnly,
+    Nobody,
+}
+
+impl From<store::PmRule> for PmRule {
+    fn from(rule: store::PmRule) -> Self {
+        match rule {
+            store::PmRule::Everyone => Self::Everyone,
+            store::PmRule::FriendsOnly => Self::FriendsOnly,
+            store::PmRule::Nobody => Self::Nobody,
+        }
+    }
+}
+
+impl From<PmRule> for store::PmRule {
+    fn from(rule: PmRule) -> Self {
+        match rule {
+            PmRule::Everyone => Self::Everyone,
+            PmRule::FriendsOnly => Self::FriendsOnly,
+            PmRule::Nobody => Self::Nobody,
+        }
+    }
+}
+
+/// A server with its own "Private messages from" rule.
+#[derive(Serialize, Deserialize, Clone, Copy, Debug, PartialEq, Eq, Type)]
+#[serde(rename_all = "camelCase")]
+pub struct ServerPmRule {
+    pub server_id: ServerId,
+    pub rule: PmRule,
+}
+
+/// Private message rule, per-server overrides and exceptions (issue #141).
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, Type)]
+#[serde(rename_all = "camelCase")]
+pub struct PrivateMessageSettings {
+    /// Default everyone.
+    pub rule: PmRule,
+    /// Servers that do not use `rule`.
+    pub server_rules: Vec<ServerPmRule>,
+    /// "People in my current channel" (default on).
+    pub allow_current_channel: bool,
+    /// "Conversations I already accepted" (default on).
+    pub allow_accepted: bool,
+    /// Keep filtered messages from standard clients as message requests (default on); off
+    /// drops them.
+    pub keep_requests: bool,
+}
+
+impl From<&store::PrivateMessageSettings> for PrivateMessageSettings {
+    fn from(p: &store::PrivateMessageSettings) -> Self {
+        Self {
+            rule: p.rule.into(),
+            server_rules: p
+                .server_rules
+                .iter()
+                .map(|(id, rule)| ServerPmRule {
+                    server_id: to_api_server_id(*id),
+                    rule: (*rule).into(),
+                })
+                .collect(),
+            allow_current_channel: p.allow_current_channel,
+            allow_accepted: p.allow_accepted,
+            keep_requests: p.keep_requests,
+        }
+    }
+}
+
+impl From<&PrivateMessageSettings> for store::PrivateMessageSettings {
+    fn from(p: &PrivateMessageSettings) -> Self {
+        Self {
+            rule: p.rule.into(),
+            server_rules: p
+                .server_rules
+                .iter()
+                .map(|r| (to_engine_server_id(r.server_id), r.rule.into()))
+                .collect(),
+            allow_current_channel: p.allow_current_channel,
+            allow_accepted: p.allow_accepted,
+            keep_requests: p.keep_requests,
+        }
+    }
+}
+
 /// Largest accepted distance in metres.
 const MAX_DISTANCE_M: f32 = 1000.0;
 
@@ -373,6 +464,8 @@ pub struct Settings {
     /// The version whose "What's new" was shown or skipped last; `null` before the first start
     /// that knew about it.
     pub whats_new_seen: Option<String>,
+    /// "Private messages from" (issue #141).
+    pub private_messages: PrivateMessageSettings,
 }
 
 impl Settings {
@@ -488,6 +581,7 @@ impl Settings {
             window_overlay_notice_shown: s.window_overlay_notice_shown,
             whats_new_auto: s.whats_new_auto,
             whats_new_seen: s.whats_new_seen.clone(),
+            private_messages: (&s.private_messages).into(),
         }
     }
 
@@ -597,6 +691,7 @@ impl Settings {
         s.window_overlay_notice_shown = self.window_overlay_notice_shown;
         s.whats_new_auto = self.whats_new_auto;
         s.whats_new_seen.clone_from(&self.whats_new_seen);
+        s.private_messages = (&self.private_messages).into();
         s
     }
 }
