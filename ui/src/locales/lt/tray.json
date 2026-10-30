@@ -1,11 +1,23 @@
 {
-  "show": "Rodyti Mumcord",
+  "show": "Atidaryti Mumcord",
+  "settings": "Nustatymai…",
   "mute": "Nutildyti mikrofoną",
   "deafen": "Išjungti garsą",
+  "dnd": "Netrukdyti",
+  "dndSystem": "Netrukdyti (sistema)",
   "quit": "Išeiti",
   "disconnected": "Neprisijungta",
   "connecting": "Jungiamasi…",
+  "reconnecting": "Jungiamasi iš naujo…",
   "connected": "Prisijungta",
+  "connectedIn": "Prisijungta · {channel}",
+  "serverState": "{server} – {state}",
   "talking": "Prisijungta – kalba",
-  "muted": "Prisijungta – nutildyta"
+  "muted": "Prisijungta – nutildyta",
+  "voiceMenu": "Balso serveris ir kanalas",
+  "voiceServer": "Balso serveris",
+  "channelsOf": "Kanalai · {server}",
+  "moreChannels": "Daugiau kanalų Mumcord…",
+  "recentChats": "Naujausi pokalbiai",
+  "chatUnread": "{name} – {count} neperskaityti"
 }

@@ -175,6 +175,7 @@ fn specta_builder() -> Builder<tauri::Wry> {
             commands::changelog::whats_new_mark_seen,
             notify::notify_message,
             notify::notification_dismiss,
+            commands::tray::tray_attention_set,
             commands::now_playing::now_playing_status,
             commands::now_playing::now_playing_cover,
             commands::now_gaming::now_gaming_status,
@@ -255,6 +256,7 @@ fn specta_builder() -> Builder<tauri::Wry> {
             commands::updates::UpdateAvailable,
             commands::inspector::InspectorViewChanged,
             commands::licences::WindowLookChanged,
+            commands::tray::TraySettingsRequested,
         ])
 }
 
@@ -494,7 +496,7 @@ fn emit_engine_event(
     server_id: commands::types::ServerId,
     event: EngineEvent,
 ) -> tauri::Result<()> {
-    tray::on_engine_event(app, &event);
+    tray::on_engine_event(app, server_id, &event);
     notifications::on_engine_event(app, server_id, &event);
     if let (Some(runtime), Some(engine)) = (
         app.try_state::<ingame_overlay::Runtime>(),
