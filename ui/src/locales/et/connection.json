@@ -79,5 +79,7 @@
     "moreInfo": "Rohkem teavet: {{topic}}",
     "effectiveShort": "Praegu saadetakse",
     "effectiveTip": "Praegu saadetav bitikiirus pärast paketikaoga kohandamist."
-  }
+  },
+  "identity": "Identiteet",
+  "identityValue": "{{label}} ({{name}}) · {{fingerprint}}"
 }

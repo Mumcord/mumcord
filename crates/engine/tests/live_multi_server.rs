@@ -95,7 +95,7 @@ async fn voice_moves_between_connected_servers_within_the_limit() {
     )
     .expect("engine");
     engine
-        .identity_create("Multi Tester".into())
+        .identity_create("Multi Tester".into(), None)
         .await
         .expect("identity");
     let name = format!("ms-{:06x}", std::process::id() & 0xff_ffff);

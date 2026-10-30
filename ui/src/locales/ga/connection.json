@@ -82,5 +82,7 @@
     "moreInfo": "Tuilleadh eolais: {{topic}}",
     "effectiveShort": "Á sheoladh anois",
     "effectiveTip": "An ráta giotán atá á sheoladh anois, tar éis oiriúnú do chaillteanas paicéad."
-  }
+  },
+  "identity": "Aitheantas",
+  "identityValue": "{{label}} ({{name}}) · {{fingerprint}}"
 }

@@ -64,7 +64,7 @@ async fn main() -> anyhow::Result<()> {
         SecretStore::in_memory(),
         tokio::runtime::Handle::current(),
     )?;
-    engine.identity_create("ScaleProbe".into()).await?;
+    engine.identity_create("ScaleProbe".into(), None).await?;
     let server = engine
         .server_add(ServerFields {
             label: "scale".into(),

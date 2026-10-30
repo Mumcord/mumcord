@@ -113,7 +113,7 @@ async fn manual_threshold_lets_only_the_loud_tone_through() {
     settings.echo_cancellation = false;
     engine.update_settings(settings).await.expect("settings");
     engine
-        .identity_create(name.clone())
+        .identity_create(name.clone(), None)
         .await
         .expect("identity");
     let server = engine

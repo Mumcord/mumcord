@@ -30,7 +30,7 @@ describe("mock engine", () => {
     expect(await api.identityGet()).toBeNull();
     expect(await api.serversList()).toEqual([]);
     expect((await api.settingsGet()).wizardCompleted).toBe(false);
-    const identity = await api.identityCreate("Tobias");
+    const identity = await api.identityCreate("Tobias", null);
     expect(identity.name).toBe("Tobias");
   });
 

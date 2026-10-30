@@ -81,5 +81,7 @@
     "moreInfo": "Več informacij: {{topic}}",
     "effectiveShort": "Trenutno se pošilja",
     "effectiveTip": "Bitna hitrost, ki se trenutno pošilja, po prilagoditvi izgubi paketov."
-  }
+  },
+  "identity": "Identiteta",
+  "identityValue": "{{label}} ({{name}}) · {{fingerprint}}"
 }

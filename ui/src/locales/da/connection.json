@@ -79,5 +79,7 @@
     "moreInfo": "Mere information: {{topic}}",
     "effectiveShort": "Sender nu",
     "effectiveTip": "Den bitrate, der sendes lige nu, efter tilpasning til pakketab."
-  }
+  },
+  "identity": "Identitet",
+  "identityValue": "{{label}} ({{name}}) · {{fingerprint}}"
 }

@@ -3,6 +3,7 @@ import { app, bot, testenv } from "../../helpers/index.ts";
 import {
   button,
   certFingerprint,
+  dialogTab,
   completeWizard,
   dialogTitle,
   fill,
@@ -85,6 +86,7 @@ describe("servers (AC-1.4, AC-1.5, AC-1.6)", function () {
     await fill("Port", String(testenv.ports.v15));
     await fill("Name in the server bar", PW_SERVER);
     await fill("Your name on this server", "Tester2");
+    await dialogTab("Passwords");
     await fill("Server password (optional)", PASSWORD);
     await button("Add server").click();
     await serverButton(PW_SERVER).waitForDisplayed();

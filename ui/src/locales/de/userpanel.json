@@ -55,7 +55,8 @@
     "passwordRequired": "Gib ein Passwort ein, um die Sicherungsdatei zu schützen.",
     "exported": "Identitätssicherung gespeichert.",
     "confirm": "Registrieren",
-    "done": "Auf diesem Server registriert"
+    "done": "Auf diesem Server registriert",
+    "identity": "Der registrierte Name gehört zur Identität {{identity}}."
   },
   "errors": {
     "tooLarge": "Das ist zu groß für den Server. Wähle ein kleineres Bild oder schreibe einen kürzeren Text.",

@@ -3,6 +3,7 @@ import { testenv } from "../../helpers/index.ts";
 import { finishWizard, trustIfAsked } from "../../helpers/chat-ui.ts";
 import {
   button,
+  dialogTab,
   dialogTitle,
   fill,
   filesContaining,
@@ -24,6 +25,7 @@ async function addServer(label: string, svc: "v15b" | "v14"): Promise<void> {
   await fill("Port", String(testenv.ports[svc]));
   await fill("Name in the server bar", label);
   await fill("Your name on this server", "Tester");
+  await dialogTab("Passwords");
   await fill("Server password (optional)", WRONG_SAVED);
   await button("Add server").click();
   await serverButton(label).waitForDisplayed();

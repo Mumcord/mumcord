@@ -122,7 +122,7 @@ async fn channel_password_is_asked_stored_and_sent_on_reconnect() {
     .expect("engine");
     let tag = format!("{:06x}", std::process::id() & 0xff_ffff);
     engine
-        .identity_create(format!("Token Tester {tag}"))
+        .identity_create(format!("Token Tester {tag}"), None)
         .await
         .expect("identity");
     let server = engine

@@ -81,5 +81,7 @@
     "moreInfo": "Ďalšie informácie: {{topic}}",
     "effectiveShort": "Práve sa odosiela",
     "effectiveTip": "Bitrate odosielaná práve teraz po prispôsobení strate paketov."
-  }
+  },
+  "identity": "Identita",
+  "identityValue": "{{label}} ({{name}}) · {{fingerprint}}"
 }

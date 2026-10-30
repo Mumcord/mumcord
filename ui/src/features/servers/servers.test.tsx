@@ -57,6 +57,11 @@ async function addServer(label: string, address: string) {
   return server;
 }
 
+/** Switches the add/edit dialog to a tab (issue #151). */
+const openTab = (name: string) => {
+  fireEvent.click(within(dialog()).getByRole("tab", { name }));
+};
+
 const serverButtons = () =>
   within(screen.getByRole("list", { name: "Saved servers" })).getAllByRole("button");
 function at<T>(items: T[], index: number): T {
@@ -217,6 +222,7 @@ describe("ServerBar", () => {
       "Connect",
       "Always connect at start",
       "Mute notifications",
+      "Identity…",
       "Theme…",
       "Edit server",
       "Move down",
@@ -365,6 +371,23 @@ describe("ServerBar with several servers (spec §5.2)", () => {
     expect(getShownServerId()).toBe(other.id);
   });
 
+  it("tells when a server fell back to the default identity", async () => {
+    setup();
+    await renderAll();
+    act(() => {
+      api.mock.emit("serverIdentityMissing", { serverId: 1 });
+    });
+    expect(
+      await screen.findByText(
+        /connected with the default identity because its own identity is missing/,
+      ),
+    ).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "Close" }));
+    await waitFor(() => {
+      expect(screen.queryByText(/connected with the default identity/)).not.toBeInTheDocument();
+    });
+  });
+
   it("switches Always connect at start and Mute notifications from the menu", async () => {
     setup();
     await renderAll();
@@ -460,6 +483,7 @@ describe("ServerBar with several servers (spec §5.2)", () => {
     expect((await api.serversList())[0]?.themeId).toBe("preset:ocean");
 
     fireEvent.click(within(openMenuOf(0)).getByRole("menuitem", { name: "Edit server" }));
+    openTab("Behaviour");
     const editThemes = within(dialog()).getByRole("group", { name: "Theme" });
     expect(
       within(editThemes).getByRole("button", { name: "Deep Ocean, theme, selected" }),
@@ -484,6 +508,7 @@ describe("ServerDialog", () => {
     expect(screen.getByLabelText("Port")).toHaveValue("64738");
     expect(screen.getByLabelText("Your name on this server")).toHaveValue("Zoe");
     fireEvent.change(screen.getByLabelText("Address"), { target: { value: "new.example.org" } });
+    openTab("Passwords");
     fireEvent.change(screen.getByLabelText("Server password (optional)"), {
       target: { value: "secret" },
     });
@@ -517,6 +542,206 @@ describe("ServerDialog", () => {
     fireEvent.click(within(dialog()).getByRole("button", { name: "Add server" }));
     expect(screen.getByLabelText("Port")).toHaveFocus();
     expect(screen.getByLabelText("Port")).toHaveAccessibleDescription(/between 1 and 65535/);
+  });
+
+  it("groups the fields in four tabs and starts on Connection", async () => {
+    setup();
+    await renderAll();
+    fireEvent.click(screen.getByRole("button", { name: "Add a server" }));
+    const tabs = within(dialog()).getAllByRole("tab");
+    expect(tabs.map((tab) => tab.textContent)).toEqual([
+      "Connection",
+      "Identity",
+      "Passwords",
+      "Behaviour",
+    ]);
+    expect(within(dialog()).getByRole("tab", { name: "Connection" })).toHaveAttribute(
+      "aria-selected",
+      "true",
+    );
+    expect(within(dialog()).getByRole("tabpanel")).toHaveAccessibleName("Connection");
+    expect(screen.getByLabelText("Address")).toBeInTheDocument();
+    expect(screen.queryByLabelText("Identity for this server")).not.toBeInTheDocument();
+  });
+
+  it("switches tabs with the arrow keys, Home and End", async () => {
+    setup();
+    await renderAll();
+    fireEvent.click(screen.getByRole("button", { name: "Add a server" }));
+    const connection = within(dialog()).getByRole("tab", { name: "Connection" });
+    connection.focus();
+    fireEvent.keyDown(connection, { key: "ArrowRight" });
+    expect(within(dialog()).getByRole("tab", { name: "Identity" })).toHaveAttribute(
+      "aria-selected",
+      "true",
+    );
+    fireEvent.keyDown(within(dialog()).getByRole("tab", { name: "Identity" }), { key: "End" });
+    expect(within(dialog()).getByRole("tab", { name: "Behaviour" })).toHaveAttribute(
+      "aria-selected",
+      "true",
+    );
+    fireEvent.keyDown(within(dialog()).getByRole("tab", { name: "Behaviour" }), {
+      key: "ArrowRight",
+    });
+    expect(within(dialog()).getByRole("tab", { name: "Connection" })).toHaveAttribute(
+      "aria-selected",
+      "true",
+    );
+    fireEvent.keyDown(within(dialog()).getByRole("tab", { name: "Connection" }), {
+      key: "ArrowLeft",
+    });
+    expect(within(dialog()).getByRole("tab", { name: "Behaviour" })).toHaveAttribute(
+      "aria-selected",
+      "true",
+    );
+    fireEvent.keyDown(within(dialog()).getByRole("tab", { name: "Behaviour" }), { key: "Home" });
+    expect(within(dialog()).getByRole("tab", { name: "Connection" })).toHaveAttribute(
+      "aria-selected",
+      "true",
+    );
+  });
+
+  it("marks the tab that needs attention", async () => {
+    setup();
+    await renderAll();
+    fireEvent.click(screen.getByRole("button", { name: "Add a server" }));
+    fireEvent.change(screen.getByLabelText("Address"), { target: { value: "a b" } });
+    fireEvent.click(within(dialog()).getByRole("button", { name: "Add server" }));
+    const connection = within(dialog()).getByRole("tab", { name: /Connection/ });
+    expect(connection).toHaveAccessibleName(/needs attention/);
+    expect(within(dialog()).getByRole("tab", { name: "Identity" })).not.toHaveTextContent("!");
+  });
+
+  it("jumps to the Connection tab when another tab was open on submit", async () => {
+    setup();
+    await renderAll();
+    fireEvent.click(screen.getByRole("button", { name: "Add a server" }));
+    openTab("Behaviour");
+    fireEvent.click(within(dialog()).getByRole("button", { name: "Add server" }));
+    expect(within(dialog()).getByRole("tab", { name: /Connection/ })).toHaveAttribute(
+      "aria-selected",
+      "true",
+    );
+    await waitFor(() => {
+      expect(screen.getByLabelText("Address")).toHaveFocus();
+    });
+  });
+
+  it("remembers the last tab of an edit and keeps the identity dropdown there", async () => {
+    sessionStorage.clear();
+    setup();
+    await renderAll();
+    fireEvent.contextMenu(serverButton(0));
+    fireEvent.click(screen.getByRole("menuitem", { name: "Edit server" }));
+    openTab("Identity");
+    expect(screen.getByLabelText("Identity for this server")).toBeInTheDocument();
+    fireEvent.click(within(dialog()).getByRole("button", { name: "Cancel" }));
+    fireEvent.contextMenu(serverButton(0));
+    fireEvent.click(screen.getByRole("menuitem", { name: "Edit server" }));
+    expect(within(dialog()).getByRole("tab", { name: "Identity" })).toHaveAttribute(
+      "aria-selected",
+      "true",
+    );
+    sessionStorage.clear();
+  });
+
+  it("saves Always connect at start and the theme for a new server", async () => {
+    setup();
+    await renderAll();
+    fireEvent.click(screen.getByRole("button", { name: "Add a server" }));
+    fireEvent.change(screen.getByLabelText("Address"), { target: { value: "new.example.org" } });
+    openTab("Behaviour");
+    fireEvent.click(within(dialog()).getByRole("checkbox", { name: "Always connect at start" }));
+    fireEvent.click(
+      within(within(dialog()).getByRole("group", { name: "Theme" })).getByRole("button", {
+        name: /^Deep Ocean, theme/,
+      }),
+    );
+    fireEvent.click(within(dialog()).getByRole("button", { name: "Add server" }));
+    await waitFor(async () => {
+      expect((await api.serversList())[1]?.alwaysConnectAtStart).toBe(true);
+    });
+    expect((await api.serversList())[1]?.themeId).toBe("preset:ocean");
+  });
+
+  it("tests the connection with the values in the form", async () => {
+    setup();
+    await renderAll();
+    fireEvent.click(screen.getByRole("button", { name: "Add a server" }));
+    fireEvent.change(screen.getByLabelText("Address"), { target: { value: "localhost" } });
+    const spy = vi.spyOn(api, "serverTestConnection");
+    fireEvent.click(screen.getByRole("button", { name: "Test connection" }));
+    const result = await screen.findByText(/Ping: 12 ms · Server version: 1.5.0/);
+    expect(result).toHaveTextContent("localhost");
+    expect(
+      screen.getByText("Certificate not trusted yet – you'll be asked when you connect"),
+    ).toBeInTheDocument();
+    expect(spy).toHaveBeenCalledWith({
+      address: "localhost",
+      port: 64738,
+      username: "Zoe",
+      password: { kind: "keep" },
+      serverId: null,
+      identityId: null,
+    });
+    // Nothing was saved.
+    expect(await api.serversList()).toHaveLength(1);
+    expect(screen.getByRole("dialog")).toHaveAccessibleName("Add a server");
+  });
+
+  it("shows a busy test and then the refusal of the server", async () => {
+    setup();
+    await renderAll();
+    fireEvent.click(screen.getByRole("button", { name: "Add a server" }));
+    fireEvent.change(screen.getByLabelText("Address"), {
+      target: { value: "unreachable.example.org" },
+    });
+    fireEvent.click(screen.getByRole("button", { name: "Test connection" }));
+    expect(await screen.findByText(/Couldn't reach the server/)).toBeInTheDocument();
+    expect(screen.getByText(/unreachable\.example\.org/)).toBeInTheDocument();
+  });
+
+  it("keeps the test button disabled while a test runs", async () => {
+    setup();
+    await renderAll();
+    fireEvent.click(screen.getByRole("button", { name: "Add a server" }));
+    fireEvent.change(screen.getByLabelText("Address"), { target: { value: "localhost" } });
+    let release: (() => void) | undefined;
+    vi.spyOn(api, "serverTestConnection").mockImplementation(
+      () =>
+        new Promise((resolve) => {
+          release = () => {
+            resolve({
+              pingMs: 5,
+              version: "1.5.0",
+              fingerprint: "AA",
+              certificate: "trusted",
+            });
+          };
+        }),
+    );
+    fireEvent.click(screen.getByRole("button", { name: "Test connection" }));
+    expect(screen.getByRole("button", { name: "Testing…" })).toBeDisabled();
+    expect(screen.getByText("Testing the connection…")).toBeInTheDocument();
+    act(() => {
+      release?.();
+    });
+    expect(await screen.findByText(/Ping: 5 ms/)).toBeInTheDocument();
+    expect(screen.getByText("Certificate already trusted")).toBeInTheDocument();
+  });
+
+  it("reports a wrong password from the test", async () => {
+    setup();
+    await renderAll();
+    fireEvent.click(screen.getByRole("button", { name: "Add a server" }));
+    fireEvent.change(screen.getByLabelText("Address"), { target: { value: "localhost" } });
+    openTab("Passwords");
+    fireEvent.change(screen.getByLabelText("Server password (optional)"), {
+      target: { value: "wrong" },
+    });
+    openTab("Connection");
+    fireEvent.click(screen.getByRole("button", { name: "Test connection" }));
+    expect(await screen.findByText(/The server refused the password/)).toBeInTheDocument();
   });
 
   it("fills the fields from a pasted mumble:// link", async () => {
@@ -558,6 +783,7 @@ describe("ServerDialog", () => {
     };
 
     edit();
+    openTab("Passwords");
     const password = screen.getByLabelText("Server password (optional)");
     expect(password).toHaveValue("");
     expect(password).toHaveAccessibleDescription(/Leave this empty to keep it/);
@@ -568,6 +794,7 @@ describe("ServerDialog", () => {
     );
 
     edit();
+    openTab("Passwords");
     fireEvent.change(screen.getByLabelText("Server password (optional)"), {
       target: { value: "new" },
     });
@@ -578,6 +805,7 @@ describe("ServerDialog", () => {
     );
 
     edit();
+    openTab("Passwords");
     fireEvent.click(screen.getByLabelText("Remove the saved password"));
     expect(screen.getByLabelText("Server password (optional)")).toBeDisabled();
     await save();
@@ -593,6 +821,7 @@ describe("ServerDialog", () => {
     await renderAll();
     fireEvent.contextMenu(serverButton(0));
     fireEvent.click(screen.getByRole("menuitem", { name: "Edit server" }));
+    openTab("Behaviour");
     const check = within(dialog()).getByRole("checkbox", { name: "Always connect at start" });
     expect(check).not.toBeChecked();
     fireEvent.click(check);
@@ -611,6 +840,7 @@ describe("ServerDialog", () => {
     await renderAll();
     fireEvent.contextMenu(serverButton(1));
     fireEvent.click(screen.getByRole("menuitem", { name: "Edit server" }));
+    openTab("Behaviour");
     fireEvent.click(within(dialog()).getByRole("checkbox", { name: "Always connect at start" }));
     fireEvent.click(within(dialog()).getByRole("button", { name: "Save" }));
     expect(await within(dialog()).findByRole("alert")).toHaveTextContent(
@@ -799,7 +1029,7 @@ describe("ConnectionStatus", () => {
 describe("empty state", () => {
   it("adds and connects from an address", async () => {
     setup({ seed: "fresh" });
-    await api.identityCreate("Tobi");
+    await api.identityCreate("Tobi", null);
     await renderAll();
     expect(screen.getByRole("heading", { name: "Add your first server" })).toBeInTheDocument();
     fireEvent.change(screen.getByLabelText("Server address or mumble:// link"), {
@@ -816,7 +1046,7 @@ describe("empty state", () => {
 
   it("pastes a mumble:// link from the clipboard, with a fallback hint", async () => {
     setup({ seed: "fresh" });
-    await api.identityCreate("Tobi");
+    await api.identityCreate("Tobi", null);
     const readText = vi.fn().mockRejectedValueOnce(new Error("denied"));
     Object.defineProperty(navigator, "clipboard", { value: { readText }, configurable: true });
     const view = await renderAll();

@@ -109,7 +109,7 @@ async fn start(dir: &Path, who: &str) -> Client {
     )
     .expect("engine");
     engine
-        .identity_create(format!("{who} Tester"))
+        .identity_create(format!("{who} Tester"), None)
         .await
         .expect("identity");
     let name = unique(who);
