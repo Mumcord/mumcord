@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Fixed
+
+- The watch party respects Settings > Privacy > "Show link previews and embeds": with it off, "Watch together" in the Apps menu stays listed but disabled with the reason and a link to the Privacy settings, a running party shows "A watch party is running: enable embedded players to join" with the same link instead of the banner's video title, the floating player and playlist (no player page, no thumbnails) — so nothing is requested from YouTube or Twitch (#160)
+
 ## [0.4.4] - 2026-10-30
 
 ### Added

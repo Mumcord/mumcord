@@ -62,6 +62,14 @@ export function useListPreferences(): Pick<Preferences, "hideEmptyChannels" | "t
   return useContext(PreferencesContext) ?? LIST_DEFAULTS;
 }
 
+/**
+ * "Show link previews and embeds" (Settings > Privacy): the one switch for everything that loads
+ * third-party content, watch party included. Off without a provider, so nothing loads by accident.
+ */
+export function useEmbedsAllowed(): boolean {
+  return (useContext(PreferencesContext) ?? { linkPreviews: false }).linkPreviews;
+}
+
 /** The weak connection switch (FR-2.26); on without a provider, like its default setting. */
 export function useShowWeakConnectionIcon(): boolean {
   return (useContext(PreferencesContext) ?? { showWeakConnectionIcon: true })

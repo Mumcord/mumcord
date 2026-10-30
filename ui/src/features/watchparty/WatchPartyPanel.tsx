@@ -9,7 +9,9 @@ import { useCallback, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { announce } from "../../a11y";
 import { getApi, type User, type WatchCommand, type WatchParty } from "../../api";
+import { useEmbedsAllowed } from "../../app/preferences";
 import { useServerStateOf } from "../channels";
+import { EmbedsOffNotice } from "./EmbedsOffNotice";
 import { PlayPause } from "./PlayPause";
 import { Playlist } from "./Playlist";
 import { playNext } from "./playlistActions";
@@ -26,6 +28,7 @@ function reportError(message: string, error: unknown): void {
 export function WatchPartyPanel({ serverId, channelId }: { serverId: number; channelId: number }) {
   const { t } = useTranslation("watchparty");
   const live = useWatchParty(serverId);
+  const embeds = useEmbedsAllowed();
   const { users, selfSession } = useServerStateOf(serverId);
   const party = live?.party ?? null;
 
@@ -60,6 +63,14 @@ export function WatchPartyPanel({ serverId, channelId }: { serverId: number; cha
         reportError(t("joinFailed"), error);
       });
   };
+
+  if (!embeds) {
+    return (
+      <section className="watch-party" aria-label={t("title")}>
+        <EmbedsOffNotice />
+      </section>
+    );
+  }
 
   return (
     <section className="watch-party" aria-label={t("title")}>
