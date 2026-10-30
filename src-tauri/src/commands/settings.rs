@@ -286,6 +286,10 @@ pub struct Settings {
     /// "Music quality" (default off; FR-1.24, QA.37): bitrate cap up to the server limit (max
     /// 510 kbit/s), music-tuned encoder, noise suppression and automatic volume bypassed.
     pub music_quality: bool,
+    /// "Low-latency mode" (default off; issue #156): 10 ms low-delay Opus packets, a minimal
+    /// jitter buffer, small device buffers and echo cancellation, noise suppression and automatic
+    /// volume bypassed, for playing music together. Applies live.
+    pub low_latency: bool,
     /// Own bitrate cap in kbit/s (FR-2.64); `null` is "Max". Range 16 to the maximum from
     /// `bitrate_max`.
     pub bitrate_kbps: Option<u32>,
@@ -396,6 +400,7 @@ impl Settings {
             echo_cancellation: s.echo_cancellation,
             auto_gain: s.auto_gain,
             music_quality: s.music_quality,
+            low_latency: s.low_latency,
             bitrate_kbps: s.bitrate_kbps,
             video_ducking: s.video_ducking,
             video_ducking_percent: s.video_ducking_percent,
@@ -508,6 +513,7 @@ impl Settings {
         s.echo_cancellation = self.echo_cancellation;
         s.auto_gain = self.auto_gain;
         s.music_quality = self.music_quality;
+        s.low_latency = self.low_latency;
         s.bitrate_kbps = self.bitrate_kbps;
         s.video_ducking = self.video_ducking;
         s.video_ducking_percent = self.video_ducking_percent.clamp(
