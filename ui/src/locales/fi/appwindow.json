@@ -37,7 +37,8 @@
   "updateHint": {
     "message": "Mumcord {{version}} on saatavilla.",
     "open": "Näytä julkaisu",
-    "dismiss": "Ohita"
+    "dismiss": "Ohita",
+    "portable": "Lataa uusi siirrettävä zip ja pura se tähän kansioon; tietosi MumcordData-kansiossa säilyvät."
   },
   "directConsent": {
     "title": "Sallitaanko suorat yhteydet?",

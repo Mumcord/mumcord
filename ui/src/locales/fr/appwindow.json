@@ -37,7 +37,8 @@
   "updateHint": {
     "message": "Mumcord {{version}} est disponible.",
     "open": "Voir la version",
-    "dismiss": "Ignorer"
+    "dismiss": "Ignorer",
+    "portable": "Téléchargez le nouveau zip portable et décompressez-le dans ce dossier ; vos données dans MumcordData sont conservées."
   },
   "directConsent": {
     "title": "Autoriser les connexions directes ?",

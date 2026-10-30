@@ -37,7 +37,8 @@
   "updateHint": {
     "message": "Mumcord {{version}} je k dispozícii.",
     "open": "Zobraziť vydanie",
-    "dismiss": "Zavrieť"
+    "dismiss": "Zavrieť",
+    "portable": "Stiahnite nový prenosný zip a rozbaľte ho do tohto priečinka; vaše údaje v MumcordData zostanú."
   },
   "directConsent": {
     "title": "Povoliť priame spojenia?",

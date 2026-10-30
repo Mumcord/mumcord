@@ -37,7 +37,8 @@
   "updateHint": {
     "message": "Mumcord {{version}} je na voljo.",
     "open": "Poglej izdajo",
-    "dismiss": "Zapri"
+    "dismiss": "Zapri",
+    "portable": "Prenesite novi prenosni zip in ga razširite v to mapo; vaši podatki v MumcordData ostanejo."
   },
   "directConsent": {
     "title": "Dovolim neposredne povezave?",

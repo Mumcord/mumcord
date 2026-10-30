@@ -37,7 +37,8 @@
   "updateHint": {
     "message": "Mumcord {{version}} on saadaval.",
     "open": "Vaata väljalaset",
-    "dismiss": "Peida"
+    "dismiss": "Peida",
+    "portable": "Laadi alla uus kaasaskantav zip ja paki see sellesse kausta lahti; sinu andmed kaustas MumcordData jäävad alles."
   },
   "directConsent": {
     "title": "Kas lubada otseühendused?",

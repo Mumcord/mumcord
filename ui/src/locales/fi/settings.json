@@ -377,7 +377,8 @@
     "showNotices": "Näytä kolmansien osapuolten lisenssit",
     "noticesFailed": "Kolmansien osapuolten lisenssejä ei voitu avata.",
     "loading": "Ladataan…",
-    "devToolsUnlocked": "Kehittäjätyökalut avattu: pakettitarkastin on nyt asetusluettelossa."
+    "devToolsUnlocked": "Kehittäjätyökalut avattu: pakettitarkastin on nyt asetusluettelossa.",
+    "portable": "Siirrettävä"
   },
   "profile": {
     "title": "Profiili",

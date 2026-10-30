@@ -37,7 +37,8 @@
   "updateHint": {
     "message": "Pasiekiama Mumcord {{version}}.",
     "open": "Žiūrėti leidimą",
-    "dismiss": "Uždaryti"
+    "dismiss": "Uždaryti",
+    "portable": "Atsisiųskite naują nešiojamąjį zip ir išskleiskite jį į šį aplanką; jūsų duomenys MumcordData išliks."
   },
   "directConsent": {
     "title": "Leisti tiesioginius ryšius?",

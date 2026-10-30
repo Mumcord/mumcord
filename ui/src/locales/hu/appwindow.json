@@ -37,7 +37,8 @@
   "updateHint": {
     "message": "Elérhető a Mumcord {{version}}.",
     "open": "Kiadás megtekintése",
-    "dismiss": "Elvetés"
+    "dismiss": "Elvetés",
+    "portable": "Töltsd le az új hordozható zipet, és csomagold ki ebbe a mappába; a MumcordData mappában lévő adataid megmaradnak."
   },
   "directConsent": {
     "title": "Engedélyezed a közvetlen kapcsolatokat?",

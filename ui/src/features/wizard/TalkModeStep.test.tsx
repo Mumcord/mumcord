@@ -23,6 +23,7 @@ function renderStep(
   linkHandlerActive: boolean | null = false,
   mouseStatus: PttMouseStatus | null = null,
   ingameOverlaySupported = true,
+  portable = false,
 ) {
   renderInWizard(
     harness,
@@ -32,6 +33,7 @@ function renderStep(
       mouseStatus={mouseStatus}
       linkHandlerActive={linkHandlerActive}
       ingameOverlaySupported={ingameOverlaySupported}
+      portable={portable}
       focusOnMount={false}
       onBack={vi.fn()}
       onFinish={onFinish}
@@ -197,6 +199,18 @@ describe("TalkModeStep", () => {
       screen.getByText(/Voice activation works without a key|Use voice activation/),
     ).toBeVisible();
     expect(screen.getByRole("radio", { name: /Voice activation/ })).toBeChecked();
+  });
+
+  it("leaves the link handler unticked in the portable build", async () => {
+    renderStep({ status: "available" }, false, null, true, true);
+    const offer = screen.getByRole("checkbox", { name: "Open mumble:// links with Mumcord" });
+    expect(offer).not.toBeChecked();
+    fireEvent.click(screen.getByRole("button", { name: "Finish" }));
+    await waitFor(() => {
+      expect(onFinish).toHaveBeenCalledWith(
+        expect.objectContaining({ registerLinkHandler: false, autostart: false }),
+      );
+    });
   });
 
   it("skips the link offer when Mumcord already handles mumble:// links", async () => {

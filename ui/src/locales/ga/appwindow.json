@@ -37,7 +37,8 @@
   "updateHint": {
     "message": "Tá Mumcord {{version}} ar fáil.",
     "open": "Féach ar an eisiúint",
-    "dismiss": "Ruaig"
+    "dismiss": "Ruaig",
+    "portable": "Íoslódáil an zip iniompartha nua agus díphacáil isteach san fhillteán seo é; fanann do shonraí in MumcordData."
   },
   "directConsent": {
     "title": "Ceangail dhíreacha a cheadú?",

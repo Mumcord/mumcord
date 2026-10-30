@@ -37,7 +37,8 @@
   "updateHint": {
     "message": "Mumcord {{version}} er tilgængelig.",
     "open": "Se udgivelse",
-    "dismiss": "Luk"
+    "dismiss": "Luk",
+    "portable": "Hent den nye bærbare zip og pak den ud i denne mappe; dine data i MumcordData bevares."
   },
   "directConsent": {
     "title": "Tillad direkte forbindelser?",

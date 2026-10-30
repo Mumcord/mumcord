@@ -37,7 +37,8 @@
   "updateHint": {
     "message": "Mumcord {{version}} finns tillgänglig.",
     "open": "Visa version",
-    "dismiss": "Stäng"
+    "dismiss": "Stäng",
+    "portable": "Ladda ner den nya portabla zip-filen och packa upp den i den här mappen; dina data i MumcordData finns kvar."
   },
   "directConsent": {
     "title": "Tillåta direktanslutningar?",

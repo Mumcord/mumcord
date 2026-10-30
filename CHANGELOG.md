@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Added
+
+- Windows releases also ship a portable zip (`Mumcord_<version>_x64-portable.zip`) that runs without installing: unpack it and start `Mumcord.exe`. The `portable` file next to the exe keeps the data, settings, logs and caches in `MumcordData` beside it instead of `%APPDATA%`; it registers no `mumble://` handler and no start at login unless turned on, and About, the diagnostic file and the update hint say "Portable". The identity stays in Windows Credential Manager (per Windows user). A missing WebView2 Runtime now shows a message with the download link instead of failing silently. See `docs/windows-portable.md` (#181)
+
 ### Fixed
 
 - Linux with PipeWire: the device lists show every output and input of the sound server as the desktop's sound settings do, so a multi-endpoint interface such as the RØDECaster Pro II offers "System" and "Chat" as outputs and "Microphone" and "Main" as inputs, with their friendly names, instead of one "USB Audio" entry per direction. The choice is stored by the stable PipeWire node name and the stream plays to exactly that node; hot-plugging updates the list and a missing device falls back to the system default. A device saved from the old list moves to the matching node when there is exactly one, otherwise to the system default with a one-time notice. Without PipeWire the ALSA devices are listed as before (#183)

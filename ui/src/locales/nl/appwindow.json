@@ -37,7 +37,8 @@
   "updateHint": {
     "message": "Mumcord {{version}} is beschikbaar.",
     "open": "Release bekijken",
-    "dismiss": "Sluiten"
+    "dismiss": "Sluiten",
+    "portable": "Download de nieuwe draagbare zip en pak hem uit in deze map; je gegevens in MumcordData blijven bewaard."
   },
   "directConsent": {
     "title": "Directe verbindingen toestaan?",

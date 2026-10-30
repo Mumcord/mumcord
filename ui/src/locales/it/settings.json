@@ -378,7 +378,8 @@
     "showNotices": "Mostra licenze di terze parti",
     "noticesFailed": "Impossibile aprire le licenze di terze parti.",
     "loading": "Caricamento…",
-    "devToolsUnlocked": "Strumenti per sviluppatori sbloccati: l’ispettore pacchetti è ora nell’elenco delle impostazioni."
+    "devToolsUnlocked": "Strumenti per sviluppatori sbloccati: l’ispettore pacchetti è ora nell’elenco delle impostazioni.",
+    "portable": "Portatile"
   },
   "profile": {
     "title": "Profilo",
