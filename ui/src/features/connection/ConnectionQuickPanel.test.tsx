@@ -61,6 +61,17 @@ describe("ConnectionQuickPanel", () => {
     expect(screen.getByRole("dialog", { name: "Voice quality" })).toBeInTheDocument();
   });
 
+  it("closes on outside click and on Escape, returning focus to the icon", async () => {
+    await setup();
+    await openQuick();
+    fireEvent.pointerDown(document.body);
+    expect(screen.queryByRole("dialog")).toBeNull();
+    await openQuick();
+    fireEvent.keyDown(document, { key: "Escape" });
+    expect(screen.queryByRole("dialog")).toBeNull();
+    expect(screen.getByRole("button", { name: "Connection info" })).toHaveFocus();
+  });
+
   it("keeps a left click on the statistics", async () => {
     await setup();
     fireEvent.click(screen.getByRole("button", { name: "Connection info" }));
@@ -73,7 +84,8 @@ describe("ConnectionQuickPanel", () => {
     const slider = within(panel).getByRole("slider");
     await within(panel).findByText(/Maximum: 128 kbit\/s/);
     expect(slider).toHaveAttribute("max", "128");
-    await within(panel).findByText("Sending now: 64 kbit/s");
+    await within(panel).findByText("Sending now (after loss adaptation)");
+    expect(within(panel).getByText("64 kbit/s")).toBeVisible();
     fireEvent.change(slider, { target: { value: "32" } });
     await waitFor(async () => {
       expect((await api.settingsGet()).bitrateKbps).toBe(32);
@@ -114,7 +126,7 @@ describe("ConnectionQuickPanel", () => {
     await setup();
     const panel = await openQuick();
     await within(panel).findByText("Ping 20 ms, loss 1 %");
-    expect(within(panel).getByText(/audio/i)).toBeVisible();
+    expect(within(panel).getByText("Audio: Fair")).toBeInTheDocument();
   });
 
   it("opens the audio settings and closes", async () => {

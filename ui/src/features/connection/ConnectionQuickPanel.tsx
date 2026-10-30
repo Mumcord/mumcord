@@ -4,8 +4,7 @@ import { Switch } from "../settings/components/Switch";
 import { BitrateSlider } from "../settings/sections/BitrateSlider";
 import { useSettings } from "../settings/useSettings";
 import { estimateBandwidth } from "./bandwidth";
-import { AudioHealthRating } from "./AudioHealthRating";
-import { windowMinutes } from "./audioHealth";
+import { AudioRatingBadge } from "./AudioHealthRating";
 import { useConnectionStats } from "./useConnectionStats";
 
 /**
@@ -34,8 +33,8 @@ export function ConnectionQuickPanel({ onOpenVoiceSettings }: { onOpenVoiceSetti
 
   return (
     <div className="connection-quick">
-      {stats ? (
-        <>
+      <header className="connection-quick__header">
+        {stats ? (
           <p className="connection-quick__status">
             {t("quick.status", {
               latency:
@@ -45,41 +44,46 @@ export function ConnectionQuickPanel({ onOpenVoiceSettings }: { onOpenVoiceSetti
               loss: t("lossValue", { value: stats.lossPercent }),
             })}
           </p>
-          {stats.audio ? (
-            <AudioHealthRating
-              rating={stats.audio.rating}
-              issue={stats.audio.issue}
-              minutes={windowMinutes(stats.audio.windowSecs)}
-            />
-          ) : null}
-        </>
-      ) : null}
+        ) : null}
+        {stats?.audio ? (
+          <AudioRatingBadge rating={stats.audio.rating} issue={stats.audio.issue} />
+        ) : null}
+        <p className="settings-hint connection-quick__applies">{t("quick.applies")}</p>
+      </header>
       {settings ? (
-        <>
+        <section className="connection-quick__section">
           <BitrateSlider settings={settings} update={update} />
           {stats ? (
-            <p className="settings-hint">
-              {t("quick.effective", { value: stats.sendBitrateKbps })}
+            <p className="connection-quick__effective">
+              <span>{t("quick.effectiveLabel")}</span>
+              <strong>{t("bitrateValue", { value: stats.sendBitrateKbps })}</strong>
             </p>
           ) : null}
+        </section>
+      ) : null}
+      {settings ? (
+        <section className="connection-quick__section">
           <Switch
             label={ts("audio.musicQuality")}
+            description={ts("audio.musicQualityHint")}
             checked={settings.musicQuality}
             onChange={(musicQuality) => {
               update({ musicQuality });
             }}
           />
-        </>
+        </section>
       ) : null}
-      <Switch
-        label={t("quick.lowLatency")}
-        description={lowLatency ? t("quick.lowLatencyHint") : t("quick.lowLatencyComingSoon")}
-        checked={false}
-        disabled={!lowLatency}
-        onChange={() => undefined}
-      />
+      <section className="connection-quick__section">
+        <Switch
+          label={t("quick.lowLatency")}
+          description={lowLatency ? t("quick.lowLatencyHint") : t("quick.lowLatencyComingSoon")}
+          checked={false}
+          disabled={!lowLatency}
+          onChange={() => undefined}
+        />
+      </section>
       {bandwidth ? (
-        <div className="connection-quick__bandwidth">
+        <section className="connection-quick__section connection-quick__bandwidth">
           <span id={meterId}>
             {t("quick.bandwidth", { value: Math.round(bandwidth.kbps) })}
             {limit === null ? "" : ` / ${t("bitrateValue", { value: limit })}`}
@@ -98,11 +102,14 @@ export function ConnectionQuickPanel({ onOpenVoiceSettings }: { onOpenVoiceSetti
           <p className="settings-hint">
             {t("quick.bandwidthHint", { value: Math.round(bandwidth.lowLatencyExtraKbps) })}
           </p>
-        </div>
+        </section>
       ) : null}
-      <button type="button" className="connection-quick__link" onClick={onOpenVoiceSettings}>
-        {t("quick.voiceSettings")}
-      </button>
+      <footer className="connection-quick__footer">
+        <button type="button" className="connection-quick__link" onClick={onOpenVoiceSettings}>
+          {t("quick.voiceSettings")}
+        </button>
+        <span className="settings-hint">{t("quick.keys")}</span>
+      </footer>
     </div>
   );
 }

@@ -65,12 +65,14 @@
     "open": "Balso kokybė",
     "title": "Balso kokybė",
     "status": "Ping {{latency}}, nuostoliai {{loss}}",
-    "effective": "Dabar siunčiama: {{value}} kbit/s",
     "lowLatency": "Mažos delsos režimas",
     "lowLatencyHint": "Siunčia trumpesnius paketus, kad delsa būtų mažesnė. Naudoja daugiau pralaidumo.",
     "lowLatencyComingSoon": "Netrukus",
     "bandwidth": "Numatomas pralaidumas: {{value}} kbit/s",
     "bandwidthHint": "Mažos delsos režimui (10 ms paketai) paketų antraštėms reikėtų maždaug {{value}} kbit/s daugiau.",
-    "voiceSettings": "Balso nustatymai…"
+    "voiceSettings": "Balso nustatymai…",
+    "applies": "Taikoma iškart, išsaugoma kaip Nustatymai → Garsas",
+    "effectiveLabel": "Dabar siunčiama (prisitaikius prie nuostolių)",
+    "keys": "Esc uždaro · ↑↓ juda · ← → keičia"
   }
 }

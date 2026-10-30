@@ -63,12 +63,14 @@
     "open": "Hääle kvaliteet",
     "title": "Hääle kvaliteet",
     "status": "Ping {{latency}}, kadu {{loss}}",
-    "effective": "Praegu saadetakse: {{value}} kbit/s",
     "lowLatency": "Väikese viivitusega režiim",
     "lowLatencyHint": "Saadab lühemaid pakette väiksema viivituse jaoks. Kasutab rohkem ribalaiust.",
     "lowLatencyComingSoon": "Tulekul",
     "bandwidth": "Hinnanguline ribalaius: {{value}} kbit/s",
     "bandwidthHint": "Väikese viivitusega režiim (10 ms paketid) vajaks paketipäisteks umbes {{value}} kbit/s rohkem.",
-    "voiceSettings": "Hääleseaded…"
+    "voiceSettings": "Hääleseaded…",
+    "applies": "Rakendub kohe, salvestub nagu Seaded → Heli",
+    "effectiveLabel": "Praegu saadetakse (pärast kaoga kohandamist)",
+    "keys": "Esc sulgeb · ↑↓ liigub · ← → muudab"
   }
 }

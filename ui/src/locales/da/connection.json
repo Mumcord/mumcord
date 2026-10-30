@@ -63,12 +63,14 @@
     "open": "Stemmekvalitet",
     "title": "Stemmekvalitet",
     "status": "Ping {{latency}}, tab {{loss}}",
-    "effective": "Sender nu: {{value}} kbit/s",
     "lowLatency": "Tilstand med lav latenstid",
     "lowLatencyHint": "Sender kortere pakker for mindre forsinkelse. Bruger mere båndbredde.",
     "lowLatencyComingSoon": "Kommer snart",
     "bandwidth": "Anslået båndbredde: {{value}} kbit/s",
     "bandwidthHint": "Tilstanden med lav latenstid (pakker på 10 ms) ville bruge ca. {{value}} kbit/s mere til pakkehoveder.",
-    "voiceSettings": "Stemmeindstillinger…"
+    "voiceSettings": "Stemmeindstillinger…",
+    "applies": "Gælder med det samme, gemmes som i Indstillinger → Lyd",
+    "effectiveLabel": "Sender nu (efter tilpasning til tab)",
+    "keys": "Esc lukker · ↑↓ flytter · ← → justerer"
   }
 }

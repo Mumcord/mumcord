@@ -65,12 +65,14 @@
     "open": "Jakość głosu",
     "title": "Jakość głosu",
     "status": "Ping {{latency}}, utrata {{loss}}",
-    "effective": "Aktualnie wysyłane: {{value}} kbit/s",
     "lowLatency": "Tryb niskich opóźnień",
     "lowLatencyHint": "Wysyła krótsze pakiety, aby zmniejszyć opóźnienie. Zużywa więcej przepustowości.",
     "lowLatencyComingSoon": "Wkrótce",
     "bandwidth": "Szacowana przepustowość: {{value}} kbit/s",
     "bandwidthHint": "Tryb niskich opóźnień (pakiety po 10 ms) potrzebowałby około {{value}} kbit/s więcej na nagłówki pakietów.",
-    "voiceSettings": "Ustawienia głosu…"
+    "voiceSettings": "Ustawienia głosu…",
+    "applies": "Działa od razu, zapisywane jak w Ustawienia → Dźwięk",
+    "effectiveLabel": "Aktualnie wysyłane (po dostosowaniu do strat)",
+    "keys": "Esc zamyka · ↑↓ przesuwa · ← → reguluje"
   }
 }

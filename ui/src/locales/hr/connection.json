@@ -64,12 +64,14 @@
     "open": "Kvaliteta glasa",
     "title": "Kvaliteta glasa",
     "status": "Ping {{latency}}, gubitak {{loss}}",
-    "effective": "Trenutno se šalje: {{value}} kbit/s",
     "lowLatency": "Način niske latencije",
     "lowLatencyHint": "Šalje kraće pakete radi manjeg kašnjenja. Troši više propusnosti.",
     "lowLatencyComingSoon": "Uskoro",
     "bandwidth": "Procijenjena propusnost: {{value}} kbit/s",
     "bandwidthHint": "Način niske latencije (paketi od 10 ms) trebao bi oko {{value}} kbit/s više za zaglavlja paketa.",
-    "voiceSettings": "Postavke glasa…"
+    "voiceSettings": "Postavke glasa…",
+    "applies": "Primjenjuje se odmah, sprema se kao u Postavke → Zvuk",
+    "effectiveLabel": "Trenutno se šalje (nakon prilagodbe gubitku)",
+    "keys": "Esc zatvara · ↑↓ pomiče · ← → podešava"
   }
 }

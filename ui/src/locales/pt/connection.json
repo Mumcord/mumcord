@@ -64,12 +64,14 @@
     "open": "Qualidade de voz",
     "title": "Qualidade de voz",
     "status": "Ping {{latency}}, perda {{loss}}",
-    "effective": "A enviar agora: {{value}} kbit/s",
     "lowLatency": "Modo de baixa latência",
     "lowLatencyHint": "Envia pacotes mais curtos para menos atraso. Usa mais largura de banda.",
     "lowLatencyComingSoon": "Em breve",
     "bandwidth": "Largura de banda estimada: {{value}} kbit/s",
     "bandwidthHint": "O modo de baixa latência (pacotes de 10 ms) precisaria de cerca de mais {{value}} kbit/s para os cabeçalhos dos pacotes.",
-    "voiceSettings": "Definições de voz…"
+    "voiceSettings": "Definições de voz…",
+    "applies": "Aplica-se de imediato, guardado como em Definições → Áudio",
+    "effectiveLabel": "A enviar agora (após adaptação às perdas)",
+    "keys": "Esc fecha · ↑↓ move · ← → ajusta"
   }
 }

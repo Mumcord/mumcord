@@ -64,12 +64,14 @@
     "open": "Qualité vocale",
     "title": "Qualité vocale",
     "status": "Ping {{latency}}, perte {{loss}}",
-    "effective": "Envoi actuel : {{value}} kbit/s",
     "lowLatency": "Mode faible latence",
     "lowLatencyHint": "Envoie des paquets plus courts pour réduire le délai. Utilise plus de bande passante.",
     "lowLatencyComingSoon": "Bientôt disponible",
     "bandwidth": "Bande passante estimée : {{value}} kbit/s",
     "bandwidthHint": "Le mode faible latence (paquets de 10 ms) nécessiterait environ {{value}} kbit/s de plus pour les en-têtes de paquets.",
-    "voiceSettings": "Paramètres vocaux…"
+    "voiceSettings": "Paramètres vocaux…",
+    "applies": "S'applique tout de suite, enregistré comme dans Paramètres → Audio",
+    "effectiveLabel": "Envoi actuel (après adaptation aux pertes)",
+    "keys": "Échap ferme · ↑↓ déplace · ← → ajuste"
   }
 }

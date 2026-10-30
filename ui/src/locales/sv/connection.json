@@ -63,12 +63,14 @@
     "open": "Röstkvalitet",
     "title": "Röstkvalitet",
     "status": "Ping {{latency}}, förlust {{loss}}",
-    "effective": "Skickas nu: {{value}} kbit/s",
     "lowLatency": "Läge för låg fördröjning",
     "lowLatencyHint": "Skickar kortare paket för mindre fördröjning. Använder mer bandbredd.",
     "lowLatencyComingSoon": "Kommer snart",
     "bandwidth": "Uppskattad bandbredd: {{value}} kbit/s",
     "bandwidthHint": "Läget för låg fördröjning (paket på 10 ms) skulle behöva ungefär {{value}} kbit/s mer för paketrubriker.",
-    "voiceSettings": "Röstinställningar…"
+    "voiceSettings": "Röstinställningar…",
+    "applies": "Gäller direkt, sparas som i Inställningar → Ljud",
+    "effectiveLabel": "Skickas nu (efter anpassning till förlust)",
+    "keys": "Esc stänger · ↑↓ flyttar · ← → justerar"
   }
 }

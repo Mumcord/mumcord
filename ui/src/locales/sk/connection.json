@@ -65,12 +65,14 @@
     "open": "Kvalita hlasu",
     "title": "Kvalita hlasu",
     "status": "Ping {{latency}}, strata {{loss}}",
-    "effective": "Práve sa odosiela: {{value}} kbit/s",
     "lowLatency": "Režim nízkej latencie",
     "lowLatencyHint": "Posiela kratšie pakety pre menšie oneskorenie. Spotrebuje viac šírky pásma.",
     "lowLatencyComingSoon": "Čoskoro",
     "bandwidth": "Odhadovaná šírka pásma: {{value}} kbit/s",
     "bandwidthHint": "Režim nízkej latencie (pakety po 10 ms) by potreboval približne o {{value}} kbit/s viac na hlavičky paketov.",
-    "voiceSettings": "Nastavenia hlasu…"
+    "voiceSettings": "Nastavenia hlasu…",
+    "applies": "Platí okamžite, ukladá sa ako v Nastaveniach → Zvuk",
+    "effectiveLabel": "Práve sa odosiela (po úprave podľa strát)",
+    "keys": "Esc zavrie · ↑↓ presúva · ← → upravuje"
   }
 }

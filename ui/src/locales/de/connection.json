@@ -63,12 +63,14 @@
     "open": "Sprachqualität",
     "title": "Sprachqualität",
     "status": "Ping {{latency}}, Verlust {{loss}}",
-    "effective": "Wird gerade gesendet: {{value}} kbit/s",
     "lowLatency": "Modus für niedrige Latenz",
     "lowLatencyHint": "Sendet kürzere Pakete für weniger Verzögerung. Braucht mehr Bandbreite.",
     "lowLatencyComingSoon": "Demnächst verfügbar",
     "bandwidth": "Geschätzte Bandbreite: {{value}} kbit/s",
     "bandwidthHint": "Der Modus für niedrige Latenz (10-ms-Pakete) bräuchte etwa {{value}} kbit/s mehr für Paketköpfe.",
-    "voiceSettings": "Spracheinstellungen…"
+    "voiceSettings": "Spracheinstellungen…",
+    "applies": "Gilt sofort, gespeichert wie unter Einstellungen → Audio",
+    "effectiveLabel": "Wird gerade gesendet (nach Verlustanpassung)",
+    "keys": "Esc schließt · ↑↓ bewegt · ← → ändert"
   }
 }

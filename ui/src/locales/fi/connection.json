@@ -63,12 +63,14 @@
     "open": "Äänenlaatu",
     "title": "Äänenlaatu",
     "status": "Viive {{latency}}, hävikki {{loss}}",
-    "effective": "Lähetetään nyt: {{value}} kbit/s",
     "lowLatency": "Pienen viiveen tila",
     "lowLatencyHint": "Lähettää lyhyempiä paketteja pienemmän viiveen vuoksi. Käyttää enemmän kaistaa.",
     "lowLatencyComingSoon": "Tulossa pian",
     "bandwidth": "Arvioitu kaistanleveys: {{value}} kbit/s",
     "bandwidthHint": "Pienen viiveen tila (10 ms:n paketit) tarvitsisi noin {{value}} kbit/s enemmän pakettien otsakkeisiin.",
-    "voiceSettings": "Ääniasetukset…"
+    "voiceSettings": "Ääniasetukset…",
+    "applies": "Tulee voimaan heti, tallentuu kuten Asetukset → Ääni",
+    "effectiveLabel": "Lähetetään nyt (häviöihin sopeutumisen jälkeen)",
+    "keys": "Esc sulkee · ↑↓ siirtyy · ← → säätää"
   }
 }

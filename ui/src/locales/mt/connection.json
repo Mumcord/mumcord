@@ -66,12 +66,14 @@
     "open": "Kwalità tal-vuċi",
     "title": "Kwalità tal-vuċi",
     "status": "Ping {{latency}}, telf {{loss}}",
-    "effective": "Qed jintbagħat issa: {{value}} kbit/s",
     "lowLatency": "Modalità b'latenza baxxa",
     "lowLatencyHint": "Jibgħat pakketti iqsar għal inqas dewmien. Juża iktar firxa tal-bandwidth.",
     "lowLatencyComingSoon": "Dalwaqt",
     "bandwidth": "Bandwidth stmat: {{value}} kbit/s",
     "bandwidthHint": "Il-modalità b'latenza baxxa (pakketti ta' 10 ms) tkun teħtieġ madwar {{value}} kbit/s aktar għall-intestaturi tal-pakketti.",
-    "voiceSettings": "Settings tal-vuċi…"
+    "voiceSettings": "Settings tal-vuċi…",
+    "applies": "Japplika minnufih, jinħażen bħal fis-Settings → Awdjo",
+    "effectiveLabel": "Qed jintbagħat issa (wara l-adattament għat-telf)",
+    "keys": "Esc jagħlaq · ↑↓ jiċċaqlaq · ← → jaġġusta"
   }
 }

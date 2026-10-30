@@ -77,6 +77,20 @@ export function ConnectionInfo({ className }: { className?: string }) {
   // "stats" is the statistics popover, "quick" the voice quality panel (right-click or menu key).
   const [mode, setMode] = useState<"stats" | "quick" | null>(null);
   const open = mode !== null;
+  // The quick panel is wider than the sidebar, which clips its children, so it is placed in
+  // viewport coordinates above the sidebar's left edge instead.
+  const [quickPlace, setQuickPlace] = useState<{ left: number; bottom: number } | null>(null);
+  const openQuick = () => {
+    const anchor = wrapper.current?.offsetParent?.getBoundingClientRect();
+    const trigger = button.current?.getBoundingClientRect();
+    if (anchor && trigger) {
+      setQuickPlace({
+        left: anchor.left + 8,
+        bottom: window.innerHeight - trigger.top + 8,
+      });
+    }
+    setMode("quick");
+  };
   const view = useContext(ViewContext);
   const panelId = useId();
   const titleId = useId();
@@ -120,14 +134,14 @@ export function ConnectionInfo({ className }: { className?: string }) {
         }}
         onContextMenu={(event) => {
           event.preventDefault();
-          setMode("quick");
+          openQuick();
         }}
         onKeyDown={(event) => {
           // The menu key and Shift+F10 normally fire a context menu event; handle them directly so
           // it works the same everywhere.
           if (event.key === "ContextMenu" || (event.shiftKey && event.key === "F10")) {
             event.preventDefault();
-            setMode("quick");
+            openQuick();
           }
         }}
       >
@@ -148,7 +162,8 @@ export function ConnectionInfo({ className }: { className?: string }) {
         aria-haspopup="dialog"
         aria-expanded={mode === "quick"}
         onClick={() => {
-          setMode((m) => (m === "quick" ? null : "quick"));
+          if (mode === "quick") setMode(null);
+          else openQuick();
         }}
       >
         <svg viewBox="0 0 24 24" width="10" height="10" aria-hidden="true" focusable="false">
@@ -162,7 +177,12 @@ export function ConnectionInfo({ className }: { className?: string }) {
           role="dialog"
           aria-labelledby={titleId}
           tabIndex={-1}
-          className="connection-info__panel"
+          style={
+            mode === "quick" && quickPlace
+              ? { left: quickPlace.left, bottom: quickPlace.bottom, right: "auto" }
+              : undefined
+          }
+          className={`connection-info__panel${mode === "quick" ? " connection-info__panel--quick" : ""}`}
         >
           <h2 id={titleId} className="connection-info__title">
             {mode === "quick" ? t("quick.title") : t("title")}
