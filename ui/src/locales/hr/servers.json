@@ -12,6 +12,7 @@
   "bar": {
     "listLabel": "Spremljeni poslužitelji",
     "add": "Dodaj poslužitelj",
+    "browse": "Pregledaj javne poslužitelje",
     "keyboardHint": "Enter povezuje. Alt i strelica gore ili dolje pomiču poslužitelj. Shift i F10 otvaraju više opcija.",
     "label": "{{server}} ({{state}})",
     "state": {

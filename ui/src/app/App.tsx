@@ -21,6 +21,7 @@ import { useDevToolsCapture, useDevToolsUnlocked } from "../features/inspector/d
 import { InspectorViewShare } from "../features/inspector/InspectorViewShare";
 import { WhatsNewOnStart } from "../features/changelog/WhatsNewOnStart";
 import { WindowLookShare } from "../features/licences/WindowLookShare";
+import { ServerBrowser, useServerBrowserOpen } from "../features/serverbrowser";
 import { useServerTheme } from "./useServerTheme";
 import { useView } from "./view";
 import { ViewProvider } from "./ViewProvider";
@@ -31,6 +32,7 @@ function MainScreen() {
   useDevToolsCapture();
   const devTools = useDevToolsUnlocked();
   const previewing = useThemePreviewing();
+  const browserOpen = useServerBrowserOpen();
   return (
     <>
       <AppShell
@@ -42,6 +44,7 @@ function MainScreen() {
           chatStatus: <ChatStatusMount />,
           chat: <ChatMount />,
           members: <MembersMount />,
+          page: browserOpen ? <ServerBrowser /> : null,
         }}
       />
       {/* Kept mounted under the settings overlay so a watched stream does not restart. */}

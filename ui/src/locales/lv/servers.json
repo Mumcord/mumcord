@@ -12,6 +12,7 @@
   "bar": {
     "listLabel": "Saglabātie serveri",
     "add": "Pievienot serveri",
+    "browse": "Pārlūkot publiskos serverus",
     "keyboardHint": "Enter izveido savienojumu. Alt plus augšupvērstā vai lejupvērstā bultiņa pārvieto serveri. Shift plus F10 atver papildu opcijas.",
     "label": "{{server}} ({{state}})",
     "state": {

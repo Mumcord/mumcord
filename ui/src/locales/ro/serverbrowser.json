@@ -1,0 +1,48 @@
+{
+  "title": "Servere publice",
+  "loading": "Se încarcă lista…",
+  "subtitle": "Încărcată pentru că ai deschis această pagină · {{shown}} din {{total}} afișate",
+  "search": "Caută după nume, adresă sau țară",
+  "refresh": "Reîmprospătează",
+  "retry": "Încearcă din nou",
+  "loadFailed": "Lista serverelor publice nu a putut fi încărcată. Verifică conexiunea la internet și încearcă din nou.",
+  "noMatch": "Niciun server nu corespunde căutării și filtrelor.",
+  "saveFailed": "Serverul nu a putut fi adăugat. Încearcă din nou.",
+  "filters": {
+    "label": "Filtre",
+    "country": "Țară",
+    "anyCountry": "Orice țară",
+    "ping": "Ping",
+    "anyPing": "Orice ping",
+    "pingBelow": "Sub {{ms}} ms",
+    "hideEmpty": "Ascunde goale",
+    "hideFull": "Ascunde pline"
+  },
+  "sortedBy": "Sortare: {{column}}",
+  "columns": {
+    "name": "Nume",
+    "country": "Țară",
+    "ping": "Ping",
+    "users": "Utilizatori",
+    "actions": "Acțiuni"
+  },
+  "badge": {
+    "empty": "Gol",
+    "full": "Plin"
+  },
+  "users": "{{users}} / {{max}}",
+  "unknown": "Încă necunoscut",
+  "measuring": "Se măsoară",
+  "noAnswer": "Niciun răspuns",
+  "ms": "{{ms}} ms",
+  "connect": "Conectează",
+  "connectTo": "Conectează-te la {{server}}",
+  "favourite": "Favorit",
+  "favouriteServer": "Adaugă {{server}} la serverele tale",
+  "saved": "Salvat",
+  "savedAs": "{{server}} este printre serverele tale",
+  "announce": {
+    "saved": "{{server}} a fost adăugat la serverele tale"
+  },
+  "note": "Doar rândurile vizibile primesc ping, câteva odată. Nimic altceva nu se trimite unui server până nu te conectezi."
+}

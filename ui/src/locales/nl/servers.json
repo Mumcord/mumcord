@@ -12,6 +12,7 @@
   "bar": {
     "listLabel": "Opgeslagen servers",
     "add": "Server toevoegen",
+    "browse": "Openbare servers bekijken",
     "keyboardHint": "Enter maakt verbinding. Alt plus pijl omhoog of omlaag verplaatst de server. Shift plus F10 opent meer opties.",
     "label": "{{server}} ({{state}})",
     "state": {

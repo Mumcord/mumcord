@@ -1,0 +1,48 @@
+{
+  "title": "Servers pubbliċi",
+  "loading": "Il-lista qed titgħabba…",
+  "subtitle": "Mgħobbija għax ftaħt din il-paġna · {{shown}} minn {{total}} murija",
+  "search": "Fittex bl-isem, l-indirizz jew il-pajjiż",
+  "refresh": "Aġġorna",
+  "retry": "Erġa’ pprova",
+  "loadFailed": "Il-lista tas-servers pubbliċi ma setgħetx titgħabba. Iċċekkja l-konnessjoni tal-internet u erġa’ pprova.",
+  "noMatch": "L-ebda server ma jaqbel mat-tfittxija u l-filtri tiegħek.",
+  "saveFailed": "Is-server ma setax jiżdied. Erġa’ pprova.",
+  "filters": {
+    "label": "Filtri",
+    "country": "Pajjiż",
+    "anyCountry": "Kwalunkwe pajjiż",
+    "ping": "Ping",
+    "anyPing": "Kwalunkwe ping",
+    "pingBelow": "Taħt {{ms}} ms",
+    "hideEmpty": "Aħbi l-vojta",
+    "hideFull": "Aħbi l-mimlija"
+  },
+  "sortedBy": "Ordni: {{column}}",
+  "columns": {
+    "name": "Isem",
+    "country": "Pajjiż",
+    "ping": "Ping",
+    "users": "Utenti",
+    "actions": "Azzjonijiet"
+  },
+  "badge": {
+    "empty": "Vojt",
+    "full": "Mimli"
+  },
+  "users": "{{users}} / {{max}}",
+  "unknown": "Għadu mhux magħruf",
+  "measuring": "Qed jitkejjel",
+  "noAnswer": "L-ebda tweġiba",
+  "ms": "{{ms}} ms",
+  "connect": "Ikkonnettja",
+  "connectTo": "Ikkonnettja ma’ {{server}}",
+  "favourite": "Favorit",
+  "favouriteServer": "Żid {{server}} mas-servers tiegħek",
+  "saved": "Issejvjat",
+  "savedAs": "{{server}} jinsab fis-servers tiegħek",
+  "announce": {
+    "saved": "{{server}} żdied mas-servers tiegħek"
+  },
+  "note": "Il-ping jintbagħat biss lir-ringieli li tara, ftit kull darba. Xejn aktar ma jintbagħat lil server sakemm tikkonnettja."
+}

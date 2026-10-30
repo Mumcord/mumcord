@@ -1,0 +1,48 @@
+{
+  "title": "Publiskie serveri",
+  "loading": "Ielādē sarakstu…",
+  "subtitle": "Ielādēts, jo atvērāt šo lapu · parādīti {{shown}} no {{total}}",
+  "search": "Meklēt pēc nosaukuma, adreses vai valsts",
+  "refresh": "Atsvaidzināt",
+  "retry": "Mēģināt vēlreiz",
+  "loadFailed": "Publisko serveru sarakstu neizdevās ielādēt. Pārbaudiet interneta savienojumu un mēģiniet vēlreiz.",
+  "noMatch": "Meklēšanai un filtriem neatbilst neviens serveris.",
+  "saveFailed": "Serveri neizdevās pievienot. Mēģiniet vēlreiz.",
+  "filters": {
+    "label": "Filtri",
+    "country": "Valsts",
+    "anyCountry": "Jebkura valsts",
+    "ping": "Ping",
+    "anyPing": "Jebkurš ping",
+    "pingBelow": "Zem {{ms}} ms",
+    "hideEmpty": "Slēpt tukšos",
+    "hideFull": "Slēpt pilnos"
+  },
+  "sortedBy": "Kārtošana: {{column}}",
+  "columns": {
+    "name": "Nosaukums",
+    "country": "Valsts",
+    "ping": "Ping",
+    "users": "Lietotāji",
+    "actions": "Darbības"
+  },
+  "badge": {
+    "empty": "Tukšs",
+    "full": "Pilns"
+  },
+  "users": "{{users}} / {{max}}",
+  "unknown": "Vēl nav zināms",
+  "measuring": "Mēra",
+  "noAnswer": "Nav atbildes",
+  "ms": "{{ms}} ms",
+  "connect": "Savienot",
+  "connectTo": "Savienot ar {{server}}",
+  "favourite": "Izlase",
+  "favouriteServer": "Pievienot {{server}} saviem serveriem",
+  "saved": "Saglabāts",
+  "savedAs": "{{server}} ir jūsu serveru sarakstā",
+  "announce": {
+    "saved": "{{server}} pievienots jūsu serveriem"
+  },
+  "note": "Ping tiek sūtīts tikai redzamajām rindām, pa dažām. Nekas cits serverim netiek sūtīts, līdz pievienojaties."
+}
