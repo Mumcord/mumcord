@@ -1147,6 +1147,15 @@ impl Engine {
         }
     }
 
+    /// Plays a short sound on the output device, for the "Test sound" button. Only audible
+    /// while voice audio runs (the popover is only reachable then).
+    pub fn audio_test_sound(&self) {
+        self.inner
+            .events
+            .sounds()
+            .play_test(crate::sounds::Sound::Message);
+    }
+
     /// Ends the mic test wherever it is; voice of a connected session resumes.
     pub fn mic_test_stop(&self) {
         let mut core = lock(&self.inner.core);
@@ -2592,7 +2601,9 @@ impl Inner {
         let audio = self
             .rt
             .spawn_blocking(move || {
-                Audio::start(settings.input_device, settings.output_device, events)
+                let audio = Audio::start(settings.input_device, settings.output_device, events)?;
+                audio.set_output_volume_percent(settings.output_volume_percent);
+                Ok::<_, EngineError>(audio)
             })
             .await
             .map_err(|e| EngineError::internal(e.to_string()))??;

@@ -559,3 +559,26 @@ fn music_leveler_never_clips_on_a_sudden_peak() {
     println!("peak after sudden loud passage: {loud_peak:.3}");
     assert!(loud_peak <= 0.9, "peak {loud_peak:.3}");
 }
+
+#[test]
+fn input_gain_scales_the_signal_and_clips_at_full_scale() {
+    let tone: Vec<f32> = (0..SAMPLE_RATE as usize)
+        .map(|i| 0.2 * (2.0 * PI * 440.0 * i as f32 / SAMPLE_RATE as f32).sin())
+        .collect();
+    let level = |percent: u16| {
+        let (mut chain, _reference) = chain_with(false, false, false);
+        chain.controls().set_input_gain_percent(percent);
+        let out = run(&mut chain, &tone);
+        (energy(last_seconds(&out, 0.5)), out)
+    };
+    let (unity, _) = level(100);
+    let (doubled, loud) = level(200);
+    let (silent, _) = level(0);
+    assert!(
+        (db(doubled / unity) - 6.0).abs() < 0.5,
+        "200 % is +6 dB, got {:.2}",
+        db(doubled / unity)
+    );
+    assert_eq!(silent, 0.0);
+    assert!(loud.iter().all(|s| s.abs() <= 1.0));
+}
