@@ -58,5 +58,26 @@
     "perMinute": "Last {{minutes}} min: {{value}} per minute.",
     "concealedShare": "Last {{minutes}} min: {{value}} % of received frames.",
     "processingMax": "Last {{minutes}} min: max {{value}} ms of the {{budget}} ms frame budget."
+  },
+  "quick": {
+    "open": "Voice quality",
+    "title": "Voice quality",
+    "status": "Ping {{latency}}, loss {{loss}}",
+    "lowLatency": "Low-latency mode",
+    "lowLatencyHint": "Smallest packets and buffers for playing music together. More bandwidth, less robust.",
+    "lowLatencyComingSoon": "Coming soon",
+    "voiceSettings": "Voice settings…",
+    "applies": "Applies at once, saved like Settings → Audio",
+    "keys": "Esc closes · ↑↓ moves · ← → adjusts",
+    "bandwidthLabel": "Estimated bandwidth",
+    "bandwidthValue": "≈ {{value}} of {{limit}} kbit/s",
+    "bandwidthValueNoLimit": "≈ {{value}} kbit/s",
+    "bandwidthHintWithin": "With low-latency mode: ≈ {{value}} kbit/s (10 ms packets), still within the limit.",
+    "bandwidthHintOver": "With low-latency mode: ≈ {{value}} kbit/s (10 ms packets), above the limit.",
+    "bandwidthHintNoLimit": "With low-latency mode: ≈ {{value}} kbit/s (10 ms packets).",
+    "beta": "Beta",
+    "moreInfo": "More information: {{topic}}",
+    "effectiveShort": "Sending now",
+    "effectiveTip": "The bitrate being sent right now, after adapting to packet loss."
   }
 }

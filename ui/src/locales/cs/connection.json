@@ -60,5 +60,26 @@
     "perMinute": "Posledních {{minutes}} min: {{value}} za minutu.",
     "concealedShare": "Posledních {{minutes}} min: {{value}} % přijatých rámců.",
     "processingMax": "Posledních {{minutes}} min: max. {{value}} ms z rozpočtu {{budget}} ms na rámec."
+  },
+  "quick": {
+    "open": "Kvalita hlasu",
+    "title": "Kvalita hlasu",
+    "status": "Ping {{latency}}, ztráty {{loss}}",
+    "lowLatency": "Režim nízké latence",
+    "lowLatencyHint": "Nejmenší pakety a vyrovnávací paměti pro společné hraní hudby. Více pásma, menší odolnost.",
+    "lowLatencyComingSoon": "Již brzy",
+    "voiceSettings": "Nastavení hlasu…",
+    "applies": "Platí ihned, ukládá se jako v Nastavení → Zvuk",
+    "keys": "Esc zavře · ↑↓ přesouvá · ← → upravuje",
+    "bandwidthLabel": "Odhadovaná šířka pásma vč. hlaviček",
+    "bandwidthValue": "≈ {{value}} z {{limit}} kbit/s",
+    "bandwidthValueNoLimit": "≈ {{value}} kbit/s",
+    "bandwidthHintWithin": "S režimem nízké latence: ≈ {{value}} kbit/s (pakety po 10 ms), stále v limitu.",
+    "bandwidthHintOver": "S režimem nízké latence: ≈ {{value}} kbit/s (pakety po 10 ms), nad limitem.",
+    "bandwidthHintNoLimit": "S režimem nízké latence: ≈ {{value}} kbit/s (pakety po 10 ms).",
+    "beta": "Beta",
+    "moreInfo": "Další informace: {{topic}}",
+    "effectiveShort": "Právě se odesílá",
+    "effectiveTip": "Bitrate odesílaná právě teď po přizpůsobení ztrátě paketů."
   }
 }

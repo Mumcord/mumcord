@@ -1,9 +1,11 @@
-import { useEffect, useId, useRef, useState } from "react";
+import { useContext, useEffect, useId, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import type { ConnectionStats } from "../../bindings/commands";
 import { windowMinutes } from "./audioHealth";
 import { AudioHealthDetails } from "./AudioHealthDetails";
+import { ViewContext } from "../../app/view";
 import { AudioHealthRating } from "./AudioHealthRating";
+import { ConnectionQuickPanel } from "./ConnectionQuickPanel";
 import { useConnectionStats } from "./useConnectionStats";
 import "./connection.css";
 
@@ -72,7 +74,24 @@ function Panel({ open }: { open: boolean }) {
  */
 export function ConnectionInfo({ className }: { className?: string }) {
   const { t } = useTranslation("connection");
-  const [open, setOpen] = useState(false);
+  // "stats" is the statistics popover, "quick" the voice quality panel (right-click or menu key).
+  const [mode, setMode] = useState<"stats" | "quick" | null>(null);
+  const open = mode !== null;
+  // The quick panel is wider than the sidebar, which clips its children, so it is placed in
+  // viewport coordinates above the sidebar's left edge instead.
+  const [quickPlace, setQuickPlace] = useState<{ left: number; bottom: number } | null>(null);
+  const openQuick = () => {
+    const anchor = wrapper.current?.offsetParent?.getBoundingClientRect();
+    const trigger = button.current?.getBoundingClientRect();
+    if (anchor && trigger) {
+      setQuickPlace({
+        left: anchor.left + 8,
+        bottom: window.innerHeight - trigger.top + 8,
+      });
+    }
+    setMode("quick");
+  };
+  const view = useContext(ViewContext);
   const panelId = useId();
   const titleId = useId();
   const wrapper = useRef<HTMLDivElement>(null);
@@ -83,13 +102,15 @@ export function ConnectionInfo({ className }: { className?: string }) {
     if (!open) return;
     panel.current?.focus();
     const onPointerDown = (event: PointerEvent) => {
-      if (event.target instanceof Node && !wrapper.current?.contains(event.target)) setOpen(false);
+      if (event.target instanceof Node && !wrapper.current?.contains(event.target)) setMode(null);
     };
     // Escape closes from anywhere while open, returning focus to the button.
     const onKeyDown = (event: KeyboardEvent) => {
       if (event.key !== "Escape") return;
+      // Escape first dismisses an open "?" tooltip; the panel closes with the next one.
+      if (document.querySelector('[role="tooltip"]')) return;
       event.preventDefault();
-      setOpen(false);
+      setMode(null);
       button.current?.focus();
     };
     document.addEventListener("pointerdown", onPointerDown);
@@ -111,7 +132,19 @@ export function ConnectionInfo({ className }: { className?: string }) {
         aria-expanded={open}
         aria-controls={open ? panelId : undefined}
         onClick={() => {
-          setOpen((o) => !o);
+          setMode((m) => (m === "stats" ? null : "stats"));
+        }}
+        onContextMenu={(event) => {
+          event.preventDefault();
+          openQuick();
+        }}
+        onKeyDown={(event) => {
+          // The menu key and Shift+F10 normally fire a context menu event; handle them directly so
+          // it works the same everywhere.
+          if (event.key === "ContextMenu" || (event.shiftKey && event.key === "F10")) {
+            event.preventDefault();
+            openQuick();
+          }
         }}
       >
         <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" focusable="false">
@@ -124,19 +157,51 @@ export function ConnectionInfo({ className }: { className?: string }) {
           />
         </svg>
       </button>
+      <button
+        type="button"
+        className={`${className ?? ""} connection-info__more`}
+        aria-label={t("quick.open")}
+        aria-haspopup="dialog"
+        aria-expanded={mode === "quick"}
+        onClick={() => {
+          if (mode === "quick") setMode(null);
+          else openQuick();
+        }}
+      >
+        <svg viewBox="0 0 24 24" width="10" height="10" aria-hidden="true" focusable="false">
+          <path d="M6 9l6 6 6-6" fill="none" stroke="currentColor" strokeWidth="3" />
+        </svg>
+      </button>
       {open ? (
         <div
           ref={panel}
           id={panelId}
           role="dialog"
-          aria-labelledby={titleId}
+          aria-labelledby={mode === "quick" ? undefined : titleId}
+          aria-label={mode === "quick" ? t("quick.title") : undefined}
           tabIndex={-1}
-          className="connection-info__panel"
+          style={
+            mode === "quick" && quickPlace
+              ? { left: quickPlace.left, bottom: quickPlace.bottom, right: "auto" }
+              : undefined
+          }
+          className={`connection-info__panel${mode === "quick" ? " connection-info__panel--quick" : ""}`}
         >
-          <h2 id={titleId} className="connection-info__title">
-            {t("title")}
-          </h2>
-          <Panel open={open} />
+          {mode === "quick" ? null : (
+            <h2 id={titleId} className="connection-info__title">
+              {t("title")}
+            </h2>
+          )}
+          {mode === "quick" ? (
+            <ConnectionQuickPanel
+              onOpenVoiceSettings={() => {
+                setMode(null);
+                view?.openAudioSettings();
+              }}
+            />
+          ) : (
+            <Panel open={open} />
+          )}
         </div>
       ) : null}
     </div>

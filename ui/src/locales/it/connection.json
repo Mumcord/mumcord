@@ -59,5 +59,26 @@
     "perMinute": "Ultimi {{minutes}} min: {{value}} al minuto.",
     "concealedShare": "Ultimi {{minutes}} min: {{value}} % dei frame ricevuti.",
     "processingMax": "Ultimi {{minutes}} min: max {{value}} ms su {{budget}} ms per frame."
+  },
+  "quick": {
+    "open": "Qualità vocale",
+    "title": "Qualità vocale",
+    "status": "Ping {{latency}}, perdita {{loss}}",
+    "lowLatency": "Modalità bassa latenza",
+    "lowLatencyHint": "Pacchetti e buffer minimi per suonare insieme. Più banda, meno robusto.",
+    "lowLatencyComingSoon": "Prossimamente",
+    "voiceSettings": "Impostazioni vocali…",
+    "applies": "Si applica subito, salvato come in Impostazioni → Audio",
+    "keys": "Esc chiude · ↑↓ sposta · ← → regola",
+    "bandwidthLabel": "Banda stimata con intestazioni",
+    "bandwidthValue": "≈ {{value}} di {{limit}} kbit/s",
+    "bandwidthValueNoLimit": "≈ {{value}} kbit/s",
+    "bandwidthHintWithin": "Con la modalità bassa latenza: ≈ {{value}} kbit/s (pacchetti da 10 ms), ancora entro il limite.",
+    "bandwidthHintOver": "Con la modalità bassa latenza: ≈ {{value}} kbit/s (pacchetti da 10 ms), oltre il limite.",
+    "bandwidthHintNoLimit": "Con la modalità bassa latenza: ≈ {{value}} kbit/s (pacchetti da 10 ms).",
+    "beta": "Beta",
+    "moreInfo": "Maggiori informazioni: {{topic}}",
+    "effectiveShort": "Invio attuale",
+    "effectiveTip": "Il bitrate inviato in questo momento, dopo l'adattamento alla perdita di pacchetti."
   }
 }

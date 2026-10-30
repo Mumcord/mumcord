@@ -61,5 +61,26 @@
     "perMinute": "Na {{minutes}} nóim. is déanaí: {{value}} sa nóiméad.",
     "concealedShare": "Na {{minutes}} nóim. is déanaí: {{value}} % de na frámaí a fuarthas.",
     "processingMax": "Na {{minutes}} nóim. is déanaí: uas. {{value}} ms as buiséad {{budget}} ms an fhráma."
+  },
+  "quick": {
+    "open": "Cáilíocht gutha",
+    "title": "Cáilíocht gutha",
+    "status": "Ping {{latency}}, caillteanas {{loss}}",
+    "lowLatency": "Mód moill íseal",
+    "lowLatencyHint": "Na paicéid agus maoláin is lú chun ceol a sheinm le chéile. Níos mó leithead banda, níos lú láidreachta.",
+    "lowLatencyComingSoon": "Ag teacht go luath",
+    "voiceSettings": "Socruithe gutha…",
+    "applies": "Feidhmíonn sé láithreach, sábháilte mar a bhíonn i Socruithe → Fuaim",
+    "keys": "Esc dúnann · ↑↓ bogann · ← → coigeartaíonn",
+    "bandwidthLabel": "Leithead banda measta le ceanntásca",
+    "bandwidthValue": "≈ {{value}} as {{limit}} kbit/s",
+    "bandwidthValueNoLimit": "≈ {{value}} kbit/s",
+    "bandwidthHintWithin": "Leis an mód moill íseal: ≈ {{value}} kbit/s (paicéid 10 ms), laistigh den teorainn fós.",
+    "bandwidthHintOver": "Leis an mód moill íseal: ≈ {{value}} kbit/s (paicéid 10 ms), os cionn na teorann.",
+    "bandwidthHintNoLimit": "Leis an mód moill íseal: ≈ {{value}} kbit/s (paicéid 10 ms).",
+    "beta": "Beta",
+    "moreInfo": "Tuilleadh eolais: {{topic}}",
+    "effectiveShort": "Á sheoladh anois",
+    "effectiveTip": "An ráta giotán atá á sheoladh anois, tar éis oiriúnú do chaillteanas paicéad."
   }
 }

@@ -59,5 +59,26 @@
     "perMinute": "Últimos {{minutes}} min: {{value}} por minuto.",
     "concealedShare": "Últimos {{minutes}} min: {{value}} % das tramas recebidas.",
     "processingMax": "Últimos {{minutes}} min: máx. {{value}} ms de {{budget}} ms por trama."
+  },
+  "quick": {
+    "open": "Qualidade de voz",
+    "title": "Qualidade de voz",
+    "status": "Ping {{latency}}, perda {{loss}}",
+    "lowLatency": "Modo de baixa latência",
+    "lowLatencyHint": "Pacotes e buffers mínimos para tocar música em conjunto. Mais largura de banda, menos robusto.",
+    "lowLatencyComingSoon": "Em breve",
+    "voiceSettings": "Definições de voz…",
+    "applies": "Aplica-se de imediato, guardado como em Definições → Áudio",
+    "keys": "Esc fecha · ↑↓ move · ← → ajusta",
+    "bandwidthLabel": "Largura de banda estimada com cabeçalhos",
+    "bandwidthValue": "≈ {{value}} de {{limit}} kbit/s",
+    "bandwidthValueNoLimit": "≈ {{value}} kbit/s",
+    "bandwidthHintWithin": "Com o modo de baixa latência: ≈ {{value}} kbit/s (pacotes de 10 ms), ainda dentro do limite.",
+    "bandwidthHintOver": "Com o modo de baixa latência: ≈ {{value}} kbit/s (pacotes de 10 ms), acima do limite.",
+    "bandwidthHintNoLimit": "Com o modo de baixa latência: ≈ {{value}} kbit/s (pacotes de 10 ms).",
+    "beta": "Beta",
+    "moreInfo": "Mais informações: {{topic}}",
+    "effectiveShort": "A enviar agora",
+    "effectiveTip": "O débito enviado neste momento, após a adaptação à perda de pacotes."
   }
 }
