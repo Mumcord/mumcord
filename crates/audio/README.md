@@ -34,6 +34,16 @@ Everything that works without devices lives in [`mumcord-codec`](https://crates.
 mumcord-codec = "0.4"
 ```
 
+## Building on Linux
+
+The crate links system libraries, so building needs their development packages and `pkg-config`: `libasound2-dev` (ALSA, for cpal) and `libdbus-1-dev` (D-Bus, for requesting real-time thread priority from rtkit). On Debian and Ubuntu:
+
+```sh
+sudo apt install libasound2-dev libdbus-1-dev pkg-config cmake
+```
+
+`cmake` is needed to build the bundled Opus sources. Other platforms need no extra packages.
+
 The `test-backend` feature adds a null/WAV-file replacement for the audio devices, for headless tests.
 
 ## Licence
