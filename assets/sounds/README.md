@@ -31,7 +31,7 @@ engine with `include_bytes!` (`crates/engine/src/sounds.rs`); regenerate with
 kicked.wav and banned.wav are not synthesized by `generate.py`:
 
 - Source: ElevenLabs sound effects (`eleven_text_to_sound_v2`), generated 2026-10-30.
-- Licence: used under the maintainer's ElevenLabs plan terms; commercial use requires a paid plan.
+- Licence: generated under a paid ElevenLabs plan; commercial use permitted, no attribution required.
   They are not CC0, unlike the other sounds here.
 - Processing: converted to 48 kHz mono 16-bit PCM and normalized to a -18 dBFS peak. The near-silent
   tail of kicked.wav was trimmed (with a 10 ms fade-out) to 227 ms. banned.wav keeps its full
