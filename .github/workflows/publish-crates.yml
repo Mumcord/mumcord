@@ -173,9 +173,11 @@ jobs:
           if [[ -z "$VERSION" && "$GITHUB_REF" == refs/tags/v* ]]; then VERSION=${GITHUB_REF_NAME#v}; fi
           scripts/set-version.sh "${VERSION:-$(scripts/latest-release-version.sh)}"
 
-      # cpal links ALSA, and cargo verifies the packaged crate by building it.
+      # cpal links ALSA, real-time scheduling talks to rtkit over D-Bus (libdbus-sys), and cargo
+      # verifies the packaged crate by building it. apt-install.sh falls back to other mirrors.
       - name: Install build dependencies
-        run: sudo apt-get update && sudo apt-get install -y --no-install-recommends libasound2-dev cmake
+        timeout-minutes: 20
+        run: scripts/ci/apt-install.sh libasound2-dev libdbus-1-dev pkg-config cmake
 
       - name: Check whether this version is already published
         id: check
