@@ -113,5 +113,20 @@
     "title": "Kas katkestada ühendus kõigi serveritega?",
     "message": "Kas katkestada ühendus kõigi {{total}} serveriga?",
     "confirm": "Katkesta"
+  },
+  "audio": {
+    "inputOptions": "Mikrofoni valikud",
+    "outputOptions": "Kõlarite valikud",
+    "inputDevices": "Sisendseade",
+    "outputDevices": "Väljundseade",
+    "systemDefault": "Süsteemi vaikeseade",
+    "noDevices": "Seadmeid ei leitud",
+    "noiseSuppression": "Müra vähendamine",
+    "testSound": "Testhelin",
+    "voiceSettings": "Hääleseaded…",
+    "fallbackInput": "Mikrofon eemaldati. Kasutusel on süsteemi vaikeseade.",
+    "fallbackOutput": "Väljundseade eemaldati. Kasutusel on süsteemi vaikeseade.",
+    "volume": "Helitugevus",
+    "level": "Tase"
   }
 }

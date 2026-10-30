@@ -285,6 +285,8 @@ export const commands = {
 	 *  Voice of a connected session pauses meanwhile.
 	 */
 	micTestStart: () => typedError<null, ApiError>(__TAURI_INVOKE("mic_test_start")),
+	/**  Plays a short sound on the output device ("Test sound" in the output popover). */
+	audioTestSound: () => typedError<null, ApiError>(__TAURI_INVOKE("audio_test_sound")),
 	/**  Ends the test wherever it is (recording or playback). */
 	micTestStop: () => typedError<null, ApiError>(__TAURI_INVOKE("mic_test_stop")),
 	pttAvailability: () => typedError<PttAvailability, ApiError>(__TAURI_INVOKE("ptt_availability")),
@@ -504,6 +506,7 @@ export const commands = {
 
 /** Events */
 export const events = {
+	audioDeviceFallback: makeEvent<AudioDeviceFallback, AudioDeviceFallback>("audio-device-fallback"),
 	audioDevicesChanged: makeEvent<AudioDevicesChanged, AudioDevicesChanged>("audio-devices-changed"),
 	bitrateMaxChanged: makeEvent<BitrateMaxChanged, BitrateMaxChanged>("bitrate-max-changed"),
 	certTrustRequired: makeEvent<CertTrustRequired, CertTrustRequired>("cert-trust-required"),
@@ -579,6 +582,12 @@ export type AudioDevice = {
 	id: string,
 	name: string,
 	isDefault: boolean,
+};
+
+/**  The chosen device is gone and the system default plays in its place. */
+export type AudioDeviceFallback = {
+	/**  `true` for the microphone, `false` for the speakers. */
+	input: boolean,
 };
 
 export type AudioDevices = {
@@ -1659,6 +1668,10 @@ export type Settings = {
 	noiseSuppression: boolean,
 	echoCancellation: boolean,
 	autoGain: boolean,
+	/**  Manual microphone gain in percent, 0–200 (default 100). */
+	inputGainPercent: number,
+	/**  Master volume of everything played, 0–100 (default 100). */
+	outputVolumePercent: number,
 	/**
 	 *  "Music quality" (default off; FR-1.24, QA.37): bitrate cap up to the server limit (max
 	 *  510 kbit/s), music-tuned encoder, noise suppression and automatic volume bypassed.

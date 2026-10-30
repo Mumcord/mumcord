@@ -113,5 +113,20 @@
     "title": "Disconnect from all servers?",
     "message": "Disconnect from all {{total}} servers?",
     "confirm": "Disconnect"
+  },
+  "audio": {
+    "inputOptions": "Microphone options",
+    "outputOptions": "Speaker options",
+    "inputDevices": "Input device",
+    "outputDevices": "Output device",
+    "systemDefault": "System default",
+    "noDevices": "No devices found",
+    "noiseSuppression": "Noise suppression",
+    "testSound": "Test sound",
+    "voiceSettings": "Voice settings…",
+    "fallbackInput": "Microphone unplugged. Using the system default.",
+    "fallbackOutput": "Output device unplugged. Using the system default.",
+    "volume": "Volume",
+    "level": "Level"
   }
 }

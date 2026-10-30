@@ -113,5 +113,20 @@
     "title": "Vai atvienoties no visiem serveriem?",
     "message": "Vai atvienoties no visiem {{total}} serveriem?",
     "confirm": "Atvienoties"
+  },
+  "audio": {
+    "inputOptions": "Mikrofona opcijas",
+    "outputOptions": "Skaļruņu opcijas",
+    "inputDevices": "Ievades ierīce",
+    "outputDevices": "Izvades ierīce",
+    "systemDefault": "Sistēmas noklusējums",
+    "noDevices": "Ierīces nav atrastas",
+    "noiseSuppression": "Trokšņu slāpēšana",
+    "testSound": "Pārbaudes skaņa",
+    "voiceSettings": "Balss iestatījumi…",
+    "fallbackInput": "Mikrofons atvienots. Tiek izmantots sistēmas noklusējums.",
+    "fallbackOutput": "Izvades ierīce atvienota. Tiek izmantots sistēmas noklusējums.",
+    "volume": "Skaļums",
+    "level": "Līmenis"
   }
 }
