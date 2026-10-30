@@ -1,4 +1,4 @@
-import { useCallback, useLayoutEffect, useRef, useState, type RefObject } from "react";
+import { useCallback, useEffect, useLayoutEffect, useRef, useState, type RefObject } from "react";
 import {
   clampWidth,
   COLUMN_DEFAULT_REM,
@@ -12,7 +12,27 @@ import {
 } from "./columnWidths";
 
 /** Same breakpoint as shell.css: below it the member list leaves the grid. */
-const NARROW_QUERY = "(max-width: 60rem)";
+export const NARROW_QUERY = "(max-width: 60rem)";
+
+/** True below the narrow breakpoint, where the member column becomes an overlay. */
+export function useNarrowWindow(): boolean {
+  const [narrow, setNarrow] = useState(
+    () => typeof window.matchMedia === "function" && window.matchMedia(NARROW_QUERY).matches,
+  );
+  useEffect(() => {
+    if (typeof window.matchMedia !== "function") return;
+    const query = window.matchMedia(NARROW_QUERY);
+    const update = () => {
+      setNarrow(query.matches);
+    };
+    update();
+    query.addEventListener("change", update);
+    return () => {
+      query.removeEventListener("change", update);
+    };
+  }, []);
+  return narrow;
+}
 
 function rootFontPx(): number {
   return parseFloat(getComputedStyle(document.documentElement).fontSize) || 16;
