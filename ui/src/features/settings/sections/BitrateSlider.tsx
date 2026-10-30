@@ -18,11 +18,11 @@ export const BITRATE_THROTTLE_MS = 100;
 export function BitrateSlider({
   settings,
   update,
-  limitLabel,
+  compact = false,
   tipLabel,
 }: SettingsSectionProps & {
-  /** Compact variant (quick panel): shows the range ends as marks and keeps the hint for screen readers only. */
-  limitLabel?: string;
+  /** Compact variant (quick panel): the hint sits behind a "?" button instead of a line of text. */
+  compact?: boolean;
   /** Accessible name of the "?" button that carries the hint in the compact variant. */
   tipLabel?: string;
 }) {
@@ -61,7 +61,7 @@ export function BitrateSlider({
   return (
     <div className="settings-field overlay-settings__slider">
       <label htmlFor={id}>{t("audio.bitrate")}</label>
-      {limitLabel !== undefined && tipLabel !== undefined ? (
+      {compact && tipLabel !== undefined ? (
         <InfoTip
           label={tipLabel}
           text={
@@ -79,7 +79,7 @@ export function BitrateSlider({
         step={1}
         value={value}
         aria-valuetext={shown}
-        aria-describedby={limitLabel === undefined ? `${id}-hint` : undefined}
+        aria-describedby={!compact ? `${id}-hint` : undefined}
         onChange={(event) => {
           const next = Number(event.target.value);
           setDragging(next);
@@ -95,13 +95,7 @@ export function BitrateSlider({
         }}
       />
       <output htmlFor={id}>{shown}</output>
-      {limitLabel !== undefined ? (
-        <div className="overlay-settings__marks" aria-hidden="true">
-          <span>{BITRATE_MIN_KBPS}</span>
-          {serverMax !== null ? <span>{limitLabel}</span> : null}
-        </div>
-      ) : null}
-      {limitLabel === undefined ? (
+      {!compact ? (
         <p id={`${id}-hint`} className="settings-hint">
           {serverMax === null
             ? t("audio.bitrateMaxUnknown")

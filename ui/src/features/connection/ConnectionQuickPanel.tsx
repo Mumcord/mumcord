@@ -82,11 +82,7 @@ export function ConnectionQuickPanel({ onOpenVoiceSettings }: { onOpenVoiceSetti
             settings={settings}
             update={update}
             tipLabel={more(ts("audio.bitrate"))}
-            limitLabel={
-              stats?.serverMaxBandwidthKbps != null
-                ? `${t("serverLimit")} ${String(stats.serverMaxBandwidthKbps)}`
-                : t("serverLimit")
-            }
+            compact
           />
           {stats ? (
             <p className="connection-quick__effective">

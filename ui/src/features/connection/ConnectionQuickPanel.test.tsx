@@ -88,7 +88,6 @@ describe("ConnectionQuickPanel", () => {
     await waitFor(() => {
       expect(limitTip.dataset.tooltip).toMatch(/Maximum: 128 kbit\/s/);
     });
-    expect(within(panel).getByText("Server limit 128")).toBeInTheDocument();
     expect(slider).toHaveAttribute("max", "128");
     await within(panel).findByText("Sending now");
     expect(
