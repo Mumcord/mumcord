@@ -3003,6 +3003,7 @@ mod declined_kind_tests {
             connected_at_quit: quit_at,
             was_voice_server_at_quit: voice,
             notifications_muted: false,
+            group_mentions_muted: false,
             theme_id: None,
             identity_id: None,
         }

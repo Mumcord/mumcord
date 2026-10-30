@@ -32,6 +32,8 @@ pub struct SavedServer {
     pub was_voice_server_at_quit: bool,
     /// No toasts or desktop notifications from this server; badges stay (FR-2.10).
     pub notifications_muted: bool,
+    /// `@all` and `@channel` do not count as mentions on this server (issue #70).
+    pub group_mentions_muted: bool,
     /// Theme shown with this server; `null` uses the app theme (FR-2.17).
     pub theme_id: Option<String>,
     /// Identity this server connects with; `null` uses the default identity (issue #148).
@@ -190,6 +192,7 @@ impl From<ServerView> for SavedServer {
             always_connect_at_start: v.always_connect_at_start,
             was_voice_server_at_quit: v.was_voice_server_at_quit,
             notifications_muted: v.notifications_muted,
+            group_mentions_muted: v.group_mentions_muted,
             theme_id: v.theme_id,
             identity_id: v.identity_id.map(super::types::to_api_identity_id),
         }
@@ -292,6 +295,20 @@ pub async fn server_set_notifications_muted(
 ) -> ApiResult<SavedServer> {
     Ok(engine
         .server_set_notifications_muted(to_engine_server_id(server_id), muted)
+        .await?
+        .into())
+}
+
+/// Turns `@all` and `@channel` mentions on the server off or back on (issue #70).
+#[tauri::command]
+#[specta::specta]
+pub async fn server_set_group_mentions_muted(
+    engine: State<'_, Engine>,
+    server_id: ServerId,
+    muted: bool,
+) -> ApiResult<SavedServer> {
+    Ok(engine
+        .server_set_group_mentions_muted(to_engine_server_id(server_id), muted)
         .await?
         .into())
 }
