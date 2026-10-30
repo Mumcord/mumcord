@@ -8,7 +8,8 @@
 // The bot starts recording before the app is restarted, so the recorded window always contains the
 // clip. Restarting first lets the recording begin in the middle of the clip: the alignment then
 // matches a shifted part of it and the measured levels say nothing about the suppressor, which is what
-// made this spec fail in CI. A run that did not record the whole copy is reported instead of measured.
+// made this spec fail in CI. A run that did not record the whole copy, or whose recorded copy sits
+// outside the window the connect time allows, is reported instead of measured.
 //
 // How much each backend removes on its own is proven in crates/codec/src/dsp/tests.rs and, for
 // rnnoise-rs, in crates/engine/src/noise_backend.rs; here the
@@ -44,6 +45,13 @@ const CLIP_SECONDS = Math.floor(noisy.length / RATE);
  * of the copy is gone, the alignment matches the wrong windows, and the measured levels say nothing
  * about the suppressor. */
 const PREFIX = 15;
+/** How far the recorded copy may sit from the window the connect time implies for it. The copy cannot
+ * start before the app connected, so the alignment may not put it earlier than that; the app buffers
+ * before its first frame goes out and a neural model shifts the frame it returns, so it can sit later.
+ * Runs that measured correctly landed 3-57 windows after the connect; the run that failed in CI was 50
+ * windows before it, which is impossible, so it matched a shifted part of the clip. */
+const ALIGN_EARLY_GRACE_WINDOWS = 2;
+const ALIGN_LATE_SLACK_WINDOWS = 100;
 
 interface Levels {
   speechDb: number;
@@ -169,6 +177,16 @@ async function record(
   await recording;
   const received = readWav(f(`${label}.wav`));
   const lag = align(received, noisy);
+  const earliest = PREFIX * 100 + Math.round(connected / 10);
+  if (lag < earliest - ALIGN_EARLY_GRACE_WINDOWS || lag > earliest + ALIGN_LATE_SLACK_WINDOWS) {
+    throw new Error(
+      `"${label}": the copy cannot start before the end of the ${String(PREFIX * 100)} windows prefix ` +
+        `and the app connected ${String(connected)} ms after the restart, so window ${String(earliest)} ` +
+        `(up to ${String(ALIGN_LATE_SLACK_WINDOWS)} windows later for the app's startup) is where it ` +
+        `has to be; the alignment put it at window ${String(lag)}, so it matched a shifted part of the ` +
+        `clip and this run measures nothing`,
+    );
+  }
   log(`${label}: copy starts at window ${String(lag)} (${String(Math.floor(lag / 100))} s), connect ${String(connected)} ms`);
   return { received, lag };
 }
