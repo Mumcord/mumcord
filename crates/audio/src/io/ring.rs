@@ -1,12 +1,13 @@
 //! Lock-free sample rings between real-time callbacks and the rest of the
 //! crate, plus the allocation-free callback bodies that fill and drain them.
 
-use std::sync::atomic::{AtomicU64, Ordering};
+use std::sync::atomic::{AtomicU32, AtomicU64, Ordering};
+use std::time::Duration;
 
 use cpal::{FromSample, Sample};
 use rtrb::{Consumer, Producer, RingBuffer};
 
-use super::IoStats;
+use super::{DevicePeriods, Direction, IoStats};
 
 /// Ring capacity in milliseconds of device-rate audio. The reader drains
 /// continuously, so this is headroom for scheduling hiccups, not latency.
@@ -31,6 +32,11 @@ pub(crate) struct Counters {
     device_xruns: AtomicU64,
     stream_restarts: AtomicU64,
     realtime_denied: AtomicU64,
+    /// Frames per device callback and device rate of the open streams; 0 while unknown.
+    input_period: AtomicU32,
+    output_period: AtomicU32,
+    input_rate: AtomicU32,
+    output_rate: AtomicU32,
 }
 
 impl Counters {
@@ -58,6 +64,28 @@ impl Counters {
         self.realtime_denied.fetch_add(1, Ordering::Relaxed);
     }
 
+    /// A stream was opened at `rate`; its period is learned from the first callback.
+    pub(crate) fn stream_opened(&self, direction: Direction, rate: u32) {
+        let (period, stored_rate) = match direction {
+            Direction::Input => (&self.input_period, &self.input_rate),
+            Direction::Output => (&self.output_period, &self.output_rate),
+        };
+        period.store(0, Ordering::Relaxed);
+        stored_rate.store(rate, Ordering::Relaxed);
+    }
+
+    pub(crate) fn periods(&self) -> DevicePeriods {
+        let duration = |frames: &AtomicU32, rate: &AtomicU32| {
+            let (frames, rate) = (frames.load(Ordering::Relaxed), rate.load(Ordering::Relaxed));
+            (frames > 0 && rate > 0)
+                .then(|| Duration::from_secs_f64(f64::from(frames) / f64::from(rate)))
+        };
+        DevicePeriods {
+            input: duration(&self.input_period, &self.input_rate),
+            output: duration(&self.output_period, &self.output_rate),
+        }
+    }
+
     pub(crate) fn snapshot(&self) -> IoStats {
         IoStats {
             capture_overruns: self.capture_overruns.load(Ordering::Relaxed),
@@ -82,6 +110,9 @@ pub(crate) fn capture<T>(
     f32: FromSample<T>,
 {
     let frames = data.len() / channels;
+    counters
+        .input_period
+        .store(u32::try_from(frames).unwrap_or(u32::MAX), Ordering::Relaxed);
     let writable = frames.min(producer.slots());
     if writable < frames {
         counters.capture_overrun();
@@ -110,6 +141,9 @@ pub(crate) fn playback<T>(
     T: Sample + FromSample<f32>,
 {
     let frames = data.len() / channels;
+    counters
+        .output_period
+        .store(u32::try_from(frames).unwrap_or(u32::MAX), Ordering::Relaxed);
     let available = consumer.slots() / 2;
     let readable = frames.min(available);
     let mut audible = false;
