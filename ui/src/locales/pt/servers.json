@@ -12,6 +12,7 @@
   "bar": {
     "listLabel": "Servidores guardados",
     "add": "Adicionar um servidor",
+    "browse": "Explorar servidores públicos",
     "keyboardHint": "Enter liga. Alt mais seta para cima ou para baixo move o servidor. Shift mais F10 abre mais opções.",
     "label": "{{server}} ({{state}})",
     "state": {

@@ -7,11 +7,15 @@ import "./messages.css";
 
 /**
  * "Messages" at the top of the server bar: opens the private messages overview. The badge counts
- * unread messages of conversations that are not muted, plus message requests.
+ * unread messages of conversations that are not muted, plus message requests. `covered` is set while
+ * another page (the public server browser) hides the overview; `onOpen` lets that page close.
  */
-export function MessagesButton() {
+export function MessagesButton({
+  covered = false,
+  onOpen,
+}: { covered?: boolean; onOpen?: () => void } = {}) {
   const { t } = useTranslation("chat");
-  const open = useMessagesOpen();
+  const open = useMessagesOpen() && !covered;
   const rows = useOverviewRows();
   const requests = useAllPmRequests();
   const count =
@@ -28,7 +32,10 @@ export function MessagesButton() {
         data-tooltip={label}
         data-tooltip-placement="right"
         data-testid="pm-button"
-        onClick={openMessages}
+        onClick={() => {
+          onOpen?.();
+          openMessages();
+        }}
       >
         <Icon path={CHAT_ICON} />
         {count > 0 && (

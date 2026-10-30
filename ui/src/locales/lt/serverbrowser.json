@@ -1,0 +1,48 @@
+{
+  "title": "Viešieji serveriai",
+  "loading": "Įkeliamas sąrašas…",
+  "subtitle": "Įkelta, nes atidarėte šį puslapį · rodoma {{shown}} iš {{total}}",
+  "search": "Ieškoti pagal pavadinimą, adresą ar šalį",
+  "refresh": "Atnaujinti",
+  "retry": "Bandyti dar kartą",
+  "loadFailed": "Nepavyko įkelti viešųjų serverių sąrašo. Patikrinkite interneto ryšį ir bandykite dar kartą.",
+  "noMatch": "Paieškos ir filtrų neatitinka joks serveris.",
+  "saveFailed": "Nepavyko pridėti serverio. Bandykite dar kartą.",
+  "filters": {
+    "label": "Filtrai",
+    "country": "Šalis",
+    "anyCountry": "Bet kuri šalis",
+    "ping": "Ping",
+    "anyPing": "Bet koks ping",
+    "pingBelow": "Mažiau nei {{ms}} ms",
+    "hideEmpty": "Slėpti tuščius",
+    "hideFull": "Slėpti pilnus"
+  },
+  "sortedBy": "Rikiavimas: {{column}}",
+  "columns": {
+    "name": "Pavadinimas",
+    "country": "Šalis",
+    "ping": "Ping",
+    "users": "Naudotojai",
+    "actions": "Veiksmai"
+  },
+  "badge": {
+    "empty": "Tuščias",
+    "full": "Pilnas"
+  },
+  "users": "{{users}} / {{max}}",
+  "unknown": "Dar nežinoma",
+  "measuring": "Matuojama",
+  "noAnswer": "Nėra atsakymo",
+  "ms": "{{ms}} ms",
+  "connect": "Prisijungti",
+  "connectTo": "Prisijungti prie {{server}}",
+  "favourite": "Mėgstamas",
+  "favouriteServer": "Pridėti {{server}} prie savo serverių",
+  "saved": "Išsaugota",
+  "savedAs": "{{server}} yra tarp jūsų serverių",
+  "announce": {
+    "saved": "{{server}} pridėtas prie jūsų serverių"
+  },
+  "note": "Ping siunčiamas tik matomoms eilutėms, po kelias. Daugiau nieko serveriui nesiunčiama, kol neprisijungiate."
+}

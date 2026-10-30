@@ -1,0 +1,48 @@
+{
+  "title": "Offentlige servere",
+  "loading": "Indlæser listen…",
+  "subtitle": "Indlæst, fordi du åbnede siden · {{shown}} af {{total}} vist",
+  "search": "Søg efter navn, adresse eller land",
+  "refresh": "Opdater",
+  "retry": "Prøv igen",
+  "loadFailed": "Listen over offentlige servere kunne ikke indlæses. Tjek din internetforbindelse, og prøv igen.",
+  "noMatch": "Ingen server matcher din søgning og dine filtre.",
+  "saveFailed": "Serveren kunne ikke tilføjes. Prøv igen.",
+  "filters": {
+    "label": "Filtre",
+    "country": "Land",
+    "anyCountry": "Alle lande",
+    "ping": "Ping",
+    "anyPing": "Alle ping",
+    "pingBelow": "Under {{ms}} ms",
+    "hideEmpty": "Skjul tomme",
+    "hideFull": "Skjul fulde"
+  },
+  "sortedBy": "Sortering: {{column}}",
+  "columns": {
+    "name": "Navn",
+    "country": "Land",
+    "ping": "Ping",
+    "users": "Brugere",
+    "actions": "Handlinger"
+  },
+  "badge": {
+    "empty": "Tom",
+    "full": "Fuld"
+  },
+  "users": "{{users}} / {{max}}",
+  "unknown": "Endnu ukendt",
+  "measuring": "Måler",
+  "noAnswer": "Intet svar",
+  "ms": "{{ms}} ms",
+  "connect": "Forbind",
+  "connectTo": "Forbind til {{server}}",
+  "favourite": "Favorit",
+  "favouriteServer": "Føj {{server}} til dine servere",
+  "saved": "Gemt",
+  "savedAs": "{{server}} er blandt dine servere",
+  "announce": {
+    "saved": "{{server}} er føjet til dine servere"
+  },
+  "note": "Kun de rækker, du kan se, bliver pinget, nogle få ad gangen. Intet andet sendes til en server, før du forbinder."
+}

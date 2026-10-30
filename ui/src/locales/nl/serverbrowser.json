@@ -1,0 +1,48 @@
+{
+  "title": "Openbare servers",
+  "loading": "Lijst laden…",
+  "subtitle": "Geladen omdat je deze pagina opende · {{shown}} van {{total}} getoond",
+  "search": "Zoeken op naam, adres of land",
+  "refresh": "Vernieuwen",
+  "retry": "Opnieuw proberen",
+  "loadFailed": "De lijst met openbare servers kon niet worden geladen. Controleer je internetverbinding en probeer het opnieuw.",
+  "noMatch": "Geen server past bij je zoekopdracht en filters.",
+  "saveFailed": "De server kon niet worden toegevoegd. Probeer het opnieuw.",
+  "filters": {
+    "label": "Filters",
+    "country": "Land",
+    "anyCountry": "Elk land",
+    "ping": "Ping",
+    "anyPing": "Elke ping",
+    "pingBelow": "Onder {{ms}} ms",
+    "hideEmpty": "Lege verbergen",
+    "hideFull": "Volle verbergen"
+  },
+  "sortedBy": "Sortering: {{column}}",
+  "columns": {
+    "name": "Naam",
+    "country": "Land",
+    "ping": "Ping",
+    "users": "Gebruikers",
+    "actions": "Acties"
+  },
+  "badge": {
+    "empty": "Leeg",
+    "full": "Vol"
+  },
+  "users": "{{users}} / {{max}}",
+  "unknown": "Nog onbekend",
+  "measuring": "Meten",
+  "noAnswer": "Geen antwoord",
+  "ms": "{{ms}} ms",
+  "connect": "Verbinden",
+  "connectTo": "Verbinden met {{server}}",
+  "favourite": "Favoriet",
+  "favouriteServer": "{{server}} aan je servers toevoegen",
+  "saved": "Opgeslagen",
+  "savedAs": "{{server}} staat in je servers",
+  "announce": {
+    "saved": "{{server}} toegevoegd aan je servers"
+  },
+  "note": "Alleen de zichtbare rijen worden gepingd, een paar tegelijk. Verder wordt niets naar een server gestuurd tot je verbindt."
+}

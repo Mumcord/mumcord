@@ -12,6 +12,7 @@
   "bar": {
     "listLabel": "Mentett szerverek",
     "add": "Szerver hozzáadása",
+    "browse": "Nyilvános szerverek böngészése",
     "keyboardHint": "Enter: csatlakozás. Alt + Fel vagy Le nyíl: a szerver áthelyezése. Shift + F10: további lehetőségek.",
     "label": "{{server}} ({{state}})",
     "state": {
