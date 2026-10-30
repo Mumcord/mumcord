@@ -5,6 +5,7 @@
 ### Added
 
 - Right-clicking the connection info button (or pressing the menu key / Shift+F10 on it, or clicking the small arrow next to it) opens a **Voice quality** quick panel: the bitrate slider with the server limit and the bitrate being sent right now, the Music quality switch (both are the same settings as in Settings > Audio and are saved at once), the estimated bandwidth including packet headers against the server limit, the audio health rating, and a **Voice settings…** link. The Low-latency mode row is shown as "Coming soon" until that mode exists (#155)
+- Windows releases also ship a portable zip (`Mumcord_<version>_x64-portable.zip`) that runs without installing: unpack it and start `Mumcord.exe`. The `portable` file next to the exe keeps the data, settings, logs and caches in `MumcordData` beside it instead of `%APPDATA%`; it registers no `mumble://` handler and no start at login unless turned on, and About, the diagnostic file and the update hint say "Portable". The identity stays in Windows Credential Manager (per Windows user). A missing WebView2 Runtime now shows a message with the download link instead of failing silently. See `docs/windows-portable.md` (#181)
 
 ## [0.4.4] - 2026-10-30
 

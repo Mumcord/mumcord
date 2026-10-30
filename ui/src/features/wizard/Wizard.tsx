@@ -24,6 +24,7 @@ interface Loaded {
   mouseStatus: PttMouseStatus | null;
   linkHandlerActive: boolean | null;
   ingameOverlaySupported: boolean;
+  portable: boolean;
 }
 
 type Load = { state: "loading" } | { state: "failed" } | ({ state: "ready" } & Loaded);
@@ -38,7 +39,7 @@ function optional<T>(promise: Promise<T>, what: string): Promise<T | null> {
 
 async function loadWizard(): Promise<Loaded> {
   const api = getApi();
-  const [settings, identity, availability, mouseStatus, linkHandlerActive, ingameOverlay] =
+  const [settings, identity, availability, mouseStatus, linkHandlerActive, ingameOverlay, info] =
     await Promise.all([
       api.settingsGet(),
       api.identityGet(),
@@ -46,6 +47,7 @@ async function loadWizard(): Promise<Loaded> {
       optional(api.pttMouseStatus(), "ptt mouse status"),
       optional(api.linkHandlerStatus(), "link handler status"),
       optional(api.ingameOverlayState(), "in-game overlay state"),
+      optional(api.appInfo(), "app info"),
     ]);
   return {
     settings,
@@ -54,6 +56,7 @@ async function loadWizard(): Promise<Loaded> {
     mouseStatus,
     linkHandlerActive,
     ingameOverlaySupported: ingameOverlay?.supported ?? false,
+    portable: info?.portable ?? false,
   };
 }
 
@@ -220,6 +223,7 @@ export function Wizard() {
           mouseStatus={load.mouseStatus}
           linkHandlerActive={load.linkHandlerActive}
           ingameOverlaySupported={load.ingameOverlaySupported}
+          portable={load.portable}
           focusOnMount={navigated}
           onBack={() => {
             goTo(4);

@@ -377,7 +377,8 @@
     "showNotices": "Näita kolmandate osapoolte litsentse",
     "noticesFailed": "Kolmandate osapoolte litsentse ei õnnestunud avada.",
     "loading": "Laadin…",
-    "devToolsUnlocked": "Arendaja tööriistad avatud: pakettide inspektor on nüüd seadete loendis."
+    "devToolsUnlocked": "Arendaja tööriistad avatud: pakettide inspektor on nüüd seadete loendis.",
+    "portable": "Kaasaskantav"
   },
   "profile": {
     "title": "Profiil",
