@@ -11,16 +11,6 @@ Everything is in English: chat, specs, docs, code, comments, commit messages and
 - Must still be understandable for a non-technical person.
 - **Applies to chat only.** Specs, brainstorming files, docs, commit messages and code comments are written fully and cleanly.
 
-## Context budget: only 200k tokens → be frugal
-
-- Search before reading (Grep/Glob). Read large files only in parts (`offset`/`limit`).
-- Never read anything twice. Don't re-read your own changes to check them.
-- Delegate broad searches across many files to a subagent (Explore) and take only its result.
-- Keep agents short: concise brief, smallest suitable model, final report ≤ 10 lines. No long-lived agents, no status pings.
-- Limit command output: `--quiet`, `| tail -n 50`, for tests print only the failures.
-- Don't copy file contents, logs or diffs into the chat.
-- Run independent tool calls in parallel. No unnecessary interim reports.
-
 ## Way of working
 
 - Specs are the truth: only build what the specification says. Unclear or contradictory → ask instead of guessing. No scope creep.
