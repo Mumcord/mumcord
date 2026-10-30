@@ -146,6 +146,17 @@ enum Backend {
     Ksni(ksni::Handle<linux::KsniTray>),
 }
 
+impl Backend {
+    /// The Tauri tray; the StatusNotifierItem runs its menu actions itself.
+    fn tauri(&self) -> Option<&TauriTray> {
+        match self {
+            Self::Tauri(handles) => Some(handles),
+            #[cfg(target_os = "linux")]
+            Self::Ksni(_) => None,
+        }
+    }
+}
+
 /// The Tauri tray icon and the menu it shows. The menu is rebuilt only when its entries change;
 /// the replaced menu is dropped with its items.
 struct TauriTray {
@@ -271,9 +282,7 @@ impl From<&DndState> for Dnd {
 
 fn on_menu_event(app: &AppHandle, event: MenuEvent) {
     let action = app.try_state::<Tray>().and_then(|tray| {
-        let Backend::Tauri(handles) = &tray.backend else {
-            return None;
-        };
+        let handles = tray.backend.tauri()?;
         let index: usize = event.id().as_ref().parse().ok()?;
         let shown = handles.menu.lock().unwrap_or_else(|e| e.into_inner());
         shown.actions.get(index).cloned()
