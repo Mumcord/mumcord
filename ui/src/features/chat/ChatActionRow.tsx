@@ -6,6 +6,8 @@
 import { useEffect, useId, useRef, useState, type KeyboardEvent } from "react";
 import { useTranslation } from "react-i18next";
 import { useSelectedConversation, useServerState, useShownServerId } from "../channels";
+import { useEmbedsAllowed } from "../../app/preferences";
+import { useOpenPrivacySettings } from "../../app/view";
 import { getApi } from "../../api";
 import { Viewers, useOwnShare, useShareActions } from "../screenshare";
 import { WatchLinkDialog, useWatchParty } from "../watchparty";
@@ -21,6 +23,8 @@ export function ChatActionRow() {
   const { conversation } = useSelectedConversation();
   const { users, selfSession, connected } = useServerState();
   const party = useWatchParty(serverId);
+  const embeds = useEmbedsAllowed();
+  const openPrivacy = useOpenPrivacySettings();
   const [open, setOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const wrapper = useRef<HTMLDivElement>(null);
@@ -54,7 +58,9 @@ export function ChatActionRow() {
     return null;
   }
 
-  const reason = !connected ? t("actions.notConnected") : null;
+  // Watch together loads YouTube, so it follows the "link previews and embeds" privacy switch.
+  const embedsOff = connected && !embeds;
+  const reason = !connected ? t("actions.notConnected") : embedsOff ? tParty("embedsOff") : null;
   const partyRunning = party?.party.channelId === ownChannel;
 
   const closeMenu = (returnFocus: boolean) => {
@@ -186,6 +192,7 @@ export function ChatActionRow() {
           {item(watchLabel, reason, () => {
             setOpen(true);
           })}
+          {embedsOff && openPrivacy !== null && item(tParty("openPrivacy"), null, openPrivacy)}
         </div>
       )}
       {shareActions.failed !== null && (

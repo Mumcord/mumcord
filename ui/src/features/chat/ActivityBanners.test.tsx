@@ -1,4 +1,4 @@
-import { act, fireEvent, render, screen } from "@testing-library/react";
+import { act, fireEvent, render as rtlRender, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import type { MockApi, ScreenShare, WatchParty } from "../../api";
 import { getServerState } from "../channels";
@@ -6,6 +6,8 @@ import { connectedMock, resetAll } from "../channels/testUtils";
 import { resetScreenShareStore, resetWatchingStore, useWatchedShare } from "../screenshare";
 import { resetWatchPartyStore } from "../watchparty";
 import { ActivityBanners } from "./ActivityBanners";
+import { clearPreviews } from "./links";
+import { withEmbeds } from "../../app/testPreferences";
 
 const SERVER = 1;
 
@@ -41,16 +43,19 @@ function Watched() {
   return <p data-testid="watched">{watched?.session ?? "none"}</p>;
 }
 
-async function setup(): Promise<{ api: MockApi; channelId: number }> {
+const openPrivacySettings = vi.fn();
+
+async function setup(embeds = true): Promise<{ api: MockApi; channelId: number }> {
   const api = await connectedMock({ bindStore: true });
   const state = getServerState();
   const self = state.users.get(state.selfSession ?? -1);
   const channelId = self?.channelId ?? 0;
-  render(
+  rtlRender(
     <>
       <ActivityBanners channelId={channelId} />
       <Watched />
     </>,
+    { wrapper: withEmbeds(embeds, { openPrivacySettings }) },
   );
   return { api, channelId };
 }
@@ -124,5 +129,32 @@ describe("activity banners", () => {
     expect(screen.getAllByRole("status")).toHaveLength(3);
     expect(channelSend).not.toHaveBeenCalled();
     expect(privateSend).not.toHaveBeenCalled();
+  });
+
+  it("with embedded players off asks to enable them and loads no title", async () => {
+    clearPreviews();
+    const { api, channelId } = await setup(false);
+    const preview = vi.spyOn(api, "linkPreview");
+    const join = vi.spyOn(api, "watchPartyJoin");
+    emitParty(api, party(), channelId);
+    expect(screen.getByRole("status")).toHaveTextContent(
+      "A watch party is running: enable embedded players to join",
+    );
+    expect(screen.queryByRole("button", { name: "Join" })).toBeNull();
+    fireEvent.click(screen.getByRole("button", { name: "Open Privacy settings" }));
+    expect(openPrivacySettings).toHaveBeenCalledTimes(1);
+    expect(join).not.toHaveBeenCalled();
+    expect(preview).not.toHaveBeenCalled();
+  });
+
+  it("with embedded players on looks the title up", async () => {
+    clearPreviews();
+    const { api, channelId } = await setup(true);
+    const preview = vi.spyOn(api, "linkPreview");
+    emitParty(api, party(), channelId);
+    await act(async () => {
+      await Promise.resolve();
+    });
+    expect(preview).toHaveBeenCalled();
   });
 });

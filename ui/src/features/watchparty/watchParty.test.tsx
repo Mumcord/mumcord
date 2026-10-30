@@ -1,4 +1,11 @@
-import { act, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
+import {
+  act,
+  fireEvent,
+  render as rtlRender,
+  screen,
+  waitFor,
+  within,
+} from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { MockApi, PlaylistEntry, WatchCommand, WatchParty } from "../../api";
 import { clearPreviews } from "../chat/links";
@@ -15,6 +22,7 @@ import { WatchTogetherButton } from "./WatchTogetherButton";
 import { positionAt, resetWatchPartyStore, type LiveParty } from "./watchPartyStore";
 import { loadCommand, parseBridgeReport, playerOrigin } from "./playerBridge";
 import { ENDED, PAUSED, PLAYING, isVideoId, videoIdOf, watchUrl } from "./youtube";
+import { renderWithEmbeds as render, withEmbeds } from "../../app/testPreferences";
 
 const VIDEO = "dQw4w9WgXcQ";
 const ANNA = 2;
@@ -317,6 +325,33 @@ describe("panel", () => {
       api.mock.emit("watchPartyChanged", { serverId: 1, party: p });
     });
   };
+
+  it("with embedded players off loads no player, thumbnail or preview and links to the privacy settings", () => {
+    const openPrivacySettings = vi.fn();
+    const preview = vi.spyOn(api, "linkPreview");
+    const playerPage = vi.spyOn(api, "embedPlayerOpen");
+    clearPreviews();
+    rtlRender(<WatchPartyPanel serverId={1} channelId={channelId} />, {
+      wrapper: withEmbeds(false, { openPrivacySettings }),
+    });
+    announce(
+      party({
+        channelId,
+        joined: true,
+        participants: [ANNA, 1],
+        playlist: [{ id: 5, videoId: "dQw4w9WgXcQ", addedBy: ANNA, addedByName: null }],
+      }),
+    );
+    expect(screen.getByRole("status")).toHaveTextContent(
+      "A watch party is running: enable embedded players to join",
+    );
+    expect(screen.queryByTitle("Watch party player")).toBeNull();
+    expect(document.querySelector("iframe, img")).toBeNull();
+    fireEvent.click(screen.getByRole("button", { name: "Open Privacy settings" }));
+    expect(openPrivacySettings).toHaveBeenCalledTimes(1);
+    expect(preview).not.toHaveBeenCalled();
+    expect(playerPage).not.toHaveBeenCalled();
+  });
 
   it("invites without playing anything until Join is clicked", async () => {
     render(<WatchPartyPanel serverId={1} channelId={channelId} />);

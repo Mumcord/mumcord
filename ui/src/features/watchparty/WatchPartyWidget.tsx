@@ -10,6 +10,7 @@ import { announce } from "../../a11y";
 import { getApi, type User } from "../../api";
 import { FloatingWidget } from "../../components/FloatingWidget";
 import type { Rect, Size } from "../../components/floatingWidgetGeometry";
+import { useEmbedsAllowed } from "../../app/preferences";
 import { useServerStateOf, useVoiceServerId } from "../channels";
 import { Avatar } from "../members/Avatar";
 import { useAvatars } from "../members/useAvatars";
@@ -39,6 +40,7 @@ export function WatchPartyWidget() {
   const { t } = useTranslation("watchparty");
   const serverId = useVoiceServerId();
   const live = useWatchParty(serverId);
+  const embeds = useEmbedsAllowed();
   const [adding, setAdding] = useState(false);
   if (serverId === null || live === null || !live.party.joined) return null;
   const { party } = live;
@@ -57,26 +59,28 @@ export function WatchPartyWidget() {
       actions={
         <>
           <LeaveParty serverId={serverId} />
-          <button
-            type="button"
-            className="button"
-            data-tooltip={t("addVideo")}
-            aria-label={t("addVideo")}
-            onClick={() => {
-              setAdding(true);
-            }}
-          >
-            +
-          </button>
+          {embeds && (
+            <button
+              type="button"
+              className="button"
+              data-tooltip={t("addVideo")}
+              aria-label={t("addVideo")}
+              onClick={() => {
+                setAdding(true);
+              }}
+            >
+              +
+            </button>
+          )}
         </>
       }
-      collapsedActions={<PlayPause serverId={serverId} live={live} />}
+      collapsedActions={embeds ? <PlayPause serverId={serverId} live={live} /> : null}
       aspect={VIDEO_ASPECT}
       extra={EXTRA}
       initialRect={initialRect}
     >
       <WatchPartyPanel serverId={serverId} channelId={live.party.channelId} />
-      {adding && (
+      {adding && embeds && (
         <WatchLinkDialog
           serverId={serverId}
           onClose={() => {
