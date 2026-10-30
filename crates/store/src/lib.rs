@@ -5,6 +5,7 @@
 //! Secrets (the identity PKCS#12 and server passwords) only ever go to the OS secure
 //! storage via [`SecretStore`]; nothing secret is written to SQLite or plain files.
 
+mod channel_tokens;
 mod db;
 mod error;
 mod favorites;
@@ -17,6 +18,7 @@ mod settings;
 mod social;
 mod synced;
 
+pub use channel_tokens::{ChannelToken, TokenChannel};
 pub use db::{DB_FILE_NAME, Store, UnixMillis};
 pub use error::{Error, Result};
 pub use favorites::{GifFavorite, MAX_GIF_FAVORITES};
