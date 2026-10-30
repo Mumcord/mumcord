@@ -92,5 +92,7 @@
   },
   "endToEnd": "Latency ó cheann go ceann",
   "endToEndValue": "≈ {{value}} ms (meastachán)",
-  "lowLatencyMode": "Mód lag-latency"
+  "lowLatencyMode": "Mód lag-latency",
+  "identity": "Aitheantas",
+  "identityValue": "{{label}} ({{name}}) · {{fingerprint}}"
 }

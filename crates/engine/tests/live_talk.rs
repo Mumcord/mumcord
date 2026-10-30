@@ -122,7 +122,7 @@ async fn only_the_speaker_is_reported_talking() {
     )
     .expect("engine");
     engine
-        .identity_create(name.clone())
+        .identity_create(name.clone(), None)
         .await
         .expect("identity");
     let server = engine

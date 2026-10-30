@@ -43,7 +43,7 @@ fn work_dir(name: &str) -> PathBuf {
 async fn connect(engine: &Engine, rx: &mut EventReceiver) -> Snapshot {
     let name = unique("mc-mod");
     engine
-        .identity_create(name.clone())
+        .identity_create(name.clone(), None)
         .await
         .expect("identity");
     let server = engine

@@ -22,7 +22,7 @@ use crate::proto;
 use crate::ratelimit::{self, LeakyBucket, Limit};
 use crate::state::{Channel, CryptSetup, ServerInfo, ServerState, User, UserChange};
 use crate::tap::{PacketTap, TapDirection, TapPacing, TappedFrame};
-use crate::tls::{self, CertVerifier, ClientIdentity};
+use crate::tls::{self, CertVerifier, ClientIdentity, ServerCert};
 use crate::version::MumbleVersion;
 use crate::voice::CryptStats;
 
@@ -158,6 +158,8 @@ pub struct Connection {
     pub handle: Handle,
     /// Unbounded so a slow consumer can never stall the reader and miss pings.
     pub events: mpsc::UnboundedReceiver<Event>,
+    /// The server certificate seen during the TLS handshake, for the server info panel.
+    pub server_cert: Option<ServerCert>,
 }
 
 enum Outgoing {
@@ -364,12 +366,14 @@ async fn connect_inner(
                         rustls::CertificateError::ApplicationVerificationFailure,
                     )),
                     Some(cert),
-                ) => ConnectError::CertificateRejected(cert),
+                ) => ConnectError::CertificateRejected(Box::new(cert)),
                 (Some(e), _) => ConnectError::Tls(e),
                 (None, _) => ConnectError::Io(err),
             });
         }
     };
+    // The verifier keeps the certificate it saw; take it for the server info panel.
+    let server_cert = seen_cert.take();
     // Version must reach the server before Authenticate: the server judges the client by the
     // version it knows when handling Authenticate (e.g. the "client does not support
     // ChannelListener" warning for clients it takes as pre-1.4). Version is a rate-limited type,
@@ -434,7 +438,11 @@ async fn connect_inner(
                 }
                 Control::Synced => {
                     tokio::spawn(read_loop(reader, buf, dispatcher, handle.tx.downgrade()));
-                    return Ok(Connection { handle, events });
+                    return Ok(Connection {
+                        handle,
+                        events,
+                        server_cert,
+                    });
                 }
                 Control::Rejected(reason, message) => {
                     handle.close();
@@ -1280,6 +1288,23 @@ impl Handle {
         let _ = self.tx.send(Outgoing::Disconnect);
     }
 
+    /// Sends a Mumble ping and waits for the server's answer: the round trip, for a one-shot
+    /// reachability check (the server handles messages in order, so the answer also proves the
+    /// connection is alive). `None` when the connection ends first.
+    pub async fn ping(&self) -> Option<Duration> {
+        let mut pong = self.shared.pong.subscribe();
+        let sent_us = self.shared.ping().now_us();
+        let frame = Frame::from_message(MessageType::Ping, &self.shared.ping().message());
+        self.queue(Outgoing::Frame(frame)).ok()?;
+        let started = Instant::now();
+        loop {
+            if *pong.borrow_and_update() > sent_us {
+                return Some(started.elapsed());
+            }
+            pong.changed().await.ok()?;
+        }
+    }
+
     /// Resolves once the connection has stopped sending: after [`Handle::disconnect`] that is
     /// when the queue is drained or its time is up, otherwise when the connection is lost.
     pub fn closed(&self) -> impl Future<Output = ()> + Send + use<> {
@@ -1497,6 +1522,29 @@ mod drain_tests {
         handle.closed().await;
         assert_eq!(server.await.expect("server"), expected(1));
         assert_eq!(started.elapsed(), DRAIN_TIMEOUT);
+    }
+
+    #[tokio::test(start_paused = true)]
+    async fn ping_returns_the_round_trip_of_the_answer() {
+        let (handle, server) = start(true);
+        assert!(handle.ping().await.is_some());
+        // A ping is queued like any other frame; the fake server sees it.
+        handle.disconnect();
+        assert_eq!(server.await.expect("server"), Vec::<String>::new());
+    }
+
+    #[tokio::test(start_paused = true)]
+    async fn ping_gives_up_when_the_server_never_answers() {
+        let (handle, _server) = start(false);
+        let waited = tokio::time::timeout(Duration::from_secs(1), handle.ping()).await;
+        assert!(waited.is_err(), "no answer means no result");
+    }
+
+    #[tokio::test(start_paused = true)]
+    async fn ping_gives_up_when_the_connection_ends() {
+        let (handle, server) = start(true);
+        drop(server);
+        let _ = handle.ping().await;
     }
 
     #[tokio::test(start_paused = true)]

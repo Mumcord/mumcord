@@ -91,5 +91,7 @@
   },
   "endToEnd": "Skupna zakasnitev",
   "endToEndValue": "≈ {{value}} ms (ocena)",
-  "lowLatencyMode": "Način nizke zakasnitve"
+  "lowLatencyMode": "Način nizke zakasnitve",
+  "identity": "Identiteta",
+  "identityValue": "{{label}} ({{name}}) · {{fingerprint}}"
 }

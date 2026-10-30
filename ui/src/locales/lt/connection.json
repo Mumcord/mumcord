@@ -91,5 +91,7 @@
   },
   "endToEnd": "Bendra delsa",
   "endToEndValue": "≈ {{value}} ms (įvertis)",
-  "lowLatencyMode": "Mažos delsos režimas"
+  "lowLatencyMode": "Mažos delsos režimas",
+  "identity": "Tapatybė",
+  "identityValue": "{{label}} ({{name}}) · {{fingerprint}}"
 }

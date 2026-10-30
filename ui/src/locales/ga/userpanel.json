@@ -55,7 +55,8 @@
     "passwordRequired": "Cuir pasfhocal isteach chun an comhad cúltaca a chosaint.",
     "exported": "Sábháladh cúltaca an aitheantais.",
     "confirm": "Cláraigh",
-    "done": "Cláraithe ar an bhfreastalaí seo"
+    "done": "Cláraithe ar an bhfreastalaí seo",
+    "identity": "Baineann an t-ainm cláraithe leis an aitheantas {{identity}}."
   },
   "errors": {
     "tooLarge": "Tá sé seo rómhór don fhreastalaí. Roghnaigh pictiúr níos lú nó scríobh téacs níos giorra.",

@@ -89,5 +89,7 @@
   },
   "endToEnd": "Total latens",
   "endToEndValue": "≈ {{value}} ms (uppskattning)",
-  "lowLatencyMode": "Läge för låg latens"
+  "lowLatencyMode": "Läge för låg latens",
+  "identity": "Identitet",
+  "identityValue": "{{label}} ({{name}}) · {{fingerprint}}"
 }

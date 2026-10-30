@@ -55,7 +55,8 @@
     "passwordRequired": "Saisissez un mot de passe pour protéger le fichier de sauvegarde.",
     "exported": "Sauvegarde de l’identité enregistrée.",
     "confirm": "S’enregistrer",
-    "done": "Enregistré sur ce serveur"
+    "done": "Enregistré sur ce serveur",
+    "identity": "Le nom enregistré appartient à l'identité {{identity}}."
   },
   "errors": {
     "tooLarge": "C’est trop volumineux pour le serveur. Choisissez une image plus petite ou écrivez un texte plus court.",

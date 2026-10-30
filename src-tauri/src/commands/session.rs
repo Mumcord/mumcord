@@ -40,6 +40,8 @@ pub enum ConnectionState {
 pub struct ServerInfo {
     /// E.g. "1.5.735".
     pub version: String,
+    pub release: Option<String>,
+    pub os: Option<String>,
     /// False on servers older than 1.4: following is hidden with a hint (FR-1.12).
     pub follow_supported: bool,
     /// Sanitized HTML.
@@ -52,6 +54,23 @@ pub struct ServerInfo {
     /// Maximum length of messages containing images in characters (0 = unlimited).
     pub max_image_message_length: u32,
     pub allow_html: bool,
+    pub max_bandwidth: Option<u32>,
+    pub max_users: Option<u32>,
+    pub recording_allowed: bool,
+    pub server_label: Option<String>,
+    pub server_address: Option<String>,
+    pub server_port: Option<u16>,
+    pub tls_fingerprint: Option<String>,
+    pub users_online: u32,
+    pub session_id: Option<u32>,
+    pub registered: bool,
+    pub current_channel_permissions: Option<u32>,
+    pub mumcord_users: u32,
+    pub tls_trusted: bool,
+    pub tls_issuer: Option<String>,
+    pub tls_valid_from: Option<String>,
+    pub tls_valid_until: Option<String>,
+    pub tls_certificate_pem: Option<String>,
 }
 
 /// Unread count of a followed channel or private chat.
@@ -368,12 +387,31 @@ impl From<ServerInfoView> for ServerInfo {
     fn from(v: ServerInfoView) -> Self {
         Self {
             version: v.version,
+            release: v.release,
+            os: v.os,
             follow_supported: v.follow_supported,
             welcome_text: v.welcome_text,
             default_channel_id: v.default_channel_id,
             max_message_length: v.max_message_length,
             max_image_message_length: v.max_image_message_length,
             allow_html: v.allow_html,
+            max_bandwidth: v.max_bandwidth,
+            max_users: v.max_users,
+            recording_allowed: v.recording_allowed,
+            server_label: v.server_label,
+            server_address: v.server_address,
+            server_port: v.server_port,
+            tls_fingerprint: v.tls_fingerprint,
+            users_online: v.users_online,
+            session_id: v.session_id,
+            registered: v.registered,
+            current_channel_permissions: v.current_channel_permissions,
+            mumcord_users: v.mumcord_users,
+            tls_trusted: v.tls_trusted,
+            tls_issuer: v.tls_issuer,
+            tls_valid_from: v.tls_valid_from,
+            tls_valid_until: v.tls_valid_until,
+            tls_certificate_pem: v.tls_certificate_pem,
         }
     }
 }

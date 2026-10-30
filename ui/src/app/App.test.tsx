@@ -16,7 +16,12 @@ vi.mock("./mounts", async (importOriginal) => {
     const { applySettings } = usePreferences();
     return (
       <>
-        <button type="button" onClick={openSettings}>
+        <button
+          type="button"
+          onClick={() => {
+            openSettings();
+          }}
+        >
           Open settings
         </button>
         <button

@@ -89,5 +89,7 @@
   },
   "endToEnd": "Samlet latenstid",
   "endToEndValue": "≈ {{value}} ms (skøn)",
-  "lowLatencyMode": "Tilstand med lav latenstid"
+  "lowLatencyMode": "Tilstand med lav latenstid",
+  "identity": "Identitet",
+  "identityValue": "{{label}} ({{name}}) · {{fingerprint}}"
 }

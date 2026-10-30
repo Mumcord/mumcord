@@ -90,5 +90,7 @@
   },
   "endToEnd": "Latență totală",
   "endToEndValue": "≈ {{value}} ms (estimare)",
-  "lowLatencyMode": "Mod cu latență redusă"
+  "lowLatencyMode": "Mod cu latență redusă",
+  "identity": "Identitate",
+  "identityValue": "{{label}} ({{name}}) · {{fingerprint}}"
 }

@@ -92,5 +92,7 @@
   },
   "endToEnd": "Latenza totali",
   "endToEndValue": "≈ {{value}} ms (stima)",
-  "lowLatencyMode": "Modalità ta' latenza baxxa"
+  "lowLatencyMode": "Modalità ta' latenza baxxa",
+  "identity": "Identità",
+  "identityValue": "{{label}} ({{name}}) · {{fingerprint}}"
 }

@@ -55,7 +55,8 @@
     "passwordRequired": "Daħħal password biex tipproteġi l-fajl tal-backup.",
     "exported": "Backup tal-identità ssejvjat.",
     "confirm": "Irreġistra",
-    "done": "Irreġistrat fuq dan is-server"
+    "done": "Irreġistrat fuq dan is-server",
+    "identity": "L-isem irreġistrat jappartjeni lill-identità {{identity}}."
   },
   "errors": {
     "tooLarge": "Dan huwa kbir wisq għas-server. Agħżel stampa iżgħar jew ikteb test iqsar.",

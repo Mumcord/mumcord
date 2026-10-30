@@ -82,6 +82,13 @@ function ServerOptions({
       onSelect: act(() => void toggleNotificationsMuted(server.id, !server.notificationsMuted)),
     },
     {
+      id: "identity",
+      label: t("menu.identity"),
+      onSelect: act(() => {
+        openDialog({ kind: "identity", serverId: server.id });
+      }),
+    },
+    {
       id: "theme",
       label: t("menu.theme"),
       onSelect: act(() => {

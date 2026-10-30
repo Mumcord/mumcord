@@ -90,5 +90,7 @@
   },
   "endToEnd": "Latencia total",
   "endToEndValue": "≈ {{value}} ms (estimación)",
-  "lowLatencyMode": "Modo de baja latencia"
+  "lowLatencyMode": "Modo de baja latencia",
+  "identity": "Identidad",
+  "identityValue": "{{label}} ({{name}}) · {{fingerprint}}"
 }

@@ -89,5 +89,7 @@
   },
   "endToEnd": "Teljes késleltetés",
   "endToEndValue": "≈ {{value}} ms (becslés)",
-  "lowLatencyMode": "Alacsony késleltetésű mód"
+  "lowLatencyMode": "Alacsony késleltetésű mód",
+  "identity": "Identitás",
+  "identityValue": "{{label}} ({{name}}) · {{fingerprint}}"
 }

@@ -89,5 +89,7 @@
   },
   "endToEnd": "Συνολική καθυστέρηση",
   "endToEndValue": "≈ {{value}} ms (εκτίμηση)",
-  "lowLatencyMode": "Λειτουργία χαμηλής καθυστέρησης"
+  "lowLatencyMode": "Λειτουργία χαμηλής καθυστέρησης",
+  "identity": "Ταυτότητα",
+  "identityValue": "{{label}} ({{name}}) · {{fingerprint}}"
 }

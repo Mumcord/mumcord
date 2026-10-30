@@ -55,7 +55,8 @@
     "passwordRequired": "Sisesta parool, et varufaili kaitsta.",
     "exported": "Identiteedi varukoopia salvestatud.",
     "confirm": "Registreeru",
-    "done": "Registreeritud sellel serveril"
+    "done": "Registreeritud sellel serveril",
+    "identity": "Registreeritud nimi kuulub identiteedile {{identity}}."
   },
   "errors": {
     "tooLarge": "See on serverile liiga suur. Vali väiksem pilt või kirjuta lühem tekst.",

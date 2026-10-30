@@ -35,9 +35,9 @@ use mumcord_audio::mixer::PacketSender;
 use mumcord_protocol::pki_types::{CertificateDer, PrivateKeyDer, PrivatePkcs8KeyDer};
 use mumcord_protocol::{
     ClientIdentity, ConnectConfig, ConnectError, Connection, DisconnectReason, Event, Handle,
-    ServerState, Transport, VoiceEvent, VoiceTransport,
+    ServerCert, ServerState, Transport, VoiceEvent, VoiceTransport,
 };
-use mumcord_store::{Identity, OwnVoice, SavedServer, SecretStore, ServerId, Store};
+use mumcord_store::{Identity, IdentityId, OwnVoice, SavedServer, SecretStore, ServerId, Store};
 use tokio::runtime::Handle as Runtime;
 use tokio::sync::mpsc;
 use tokio::task::JoinHandle;
@@ -207,8 +207,6 @@ struct Inner {
     audio_start: tokio::sync::Mutex<()>,
     /// Saved device choices were checked against the current device list (issue #183).
     audio_devices_migrated: std::sync::Once,
-    /// `None` until loaded from secure storage; then `Some(None)` before the wizard ran.
-    identity: Mutex<Option<Option<Identity>>>,
     events: Events,
     controls: Arc<DspControls>,
     meter: Arc<Meter>,
@@ -395,6 +393,8 @@ struct Session {
     /// Where the server put the user on connect, before any rejoin (FR-1.48b).
     default_channel_id: Option<u32>,
     description_requests: description::DescriptionRequests,
+    /// TLS certificate details of this connection for the server info panel (FR-1.10).
+    tls: Option<ServerCert>,
 }
 
 /// Commands to the session task.
@@ -462,7 +462,10 @@ pub(crate) fn store_error(err: mumcord_store::Error) -> EngineError {
         }
         E::Pkcs12(_) | E::Pkcs12NoIdentity | E::EmptyIdentityName => ErrorKind::InvalidInput,
         E::InvalidVolume(_) | E::InvalidPort => ErrorKind::InvalidInput,
-        E::UnknownServer(_) => ErrorKind::NotFound,
+        E::InvalidIdentityLabel { .. } | E::DuplicateIdentity | E::LastIdentity => {
+            ErrorKind::InvalidInput
+        }
+        E::UnknownServer(_) | E::UnknownIdentity(_) => ErrorKind::NotFound,
         _ => ErrorKind::Internal,
     };
     EngineError::new(kind, err.to_string())
@@ -483,6 +486,7 @@ impl Engine {
             )
         })?;
         let store = Store::open(data_dir).map_err(store_error)?;
+        local::bootstrap_identities(&store, &secrets);
         crate::profile::backfill_server_avatars(&store, data_dir);
         let settings = store.settings().map_err(store_error)?;
         let rejoin_offers = store
@@ -514,7 +518,6 @@ impl Engine {
             secrets: Arc::new(secrets),
             audio_start: tokio::sync::Mutex::new(()),
             audio_devices_migrated: std::sync::Once::new(),
-            identity: Mutex::new(None),
             events,
             controls,
             meter,
@@ -641,9 +644,13 @@ impl Engine {
         &self.inner.direct
     }
 
-    /// The identity from secure storage; `None` before the wizard created one.
+    /// The default identity from secure storage; `None` before the wizard created one.
+    /// Direct (peer-to-peer) connections always use it, whatever the servers use.
     pub(crate) async fn stored_identity(&self) -> EngineResult<Option<Identity>> {
-        self.inner.identity().await
+        let Some(id) = self.inner.default_identity_id().await? else {
+            return Ok(None);
+        };
+        self.inner.identity_by_id(id).await
     }
 
     pub(crate) fn mumcord_state(&self) -> &crate::mumcord::ServerPeers {
@@ -801,7 +808,7 @@ impl Engine {
     /// before the others, then the saved order), up to the limit. Every connect is read-only.
     /// Nothing happens before the first-run wizard created an identity.
     pub async fn connect_at_start(&self) -> EngineResult<()> {
-        if self.inner.identity().await?.is_none() {
+        if self.inner.default_identity_id().await?.is_none() {
             return Ok(());
         }
         let (servers, max) = {
@@ -1819,11 +1826,33 @@ impl Inner {
             .map_err(store_error)
             .map_err(fatal)?;
         let password = overridden.or(saved);
-        let identity = self
-            .identity()
-            .await
-            .map_err(fatal)?
-            .ok_or_else(|| fatal(EngineError::new(ErrorKind::NotFound, "no identity yet")))?;
+        // The server's own identity, or the default when it uses none or its identity is gone
+        // (issue #148).
+        let identity = match server.identity_id {
+            Some(id) => match self.identity_by_id(id).await.map_err(fatal)? {
+                Some(identity) => identity,
+                None => {
+                    tracing::warn!(
+                        server_id,
+                        "the identity chosen for this server is missing; using the default"
+                    );
+                    self.events
+                        .for_server(server_id)
+                        .emit(EngineEvent::ServerIdentityMissing { server_id });
+                    self.default_identity()
+                        .await
+                        .map_err(fatal)?
+                        .ok_or_else(|| {
+                            fatal(EngineError::new(ErrorKind::NotFound, "no identity yet"))
+                        })?
+                }
+            },
+            None => self
+                .default_identity()
+                .await
+                .map_err(fatal)?
+                .ok_or_else(|| fatal(EngineError::new(ErrorKind::NotFound, "no identity yet")))?,
+        };
 
         let expected = trusted.clone();
         let config = ConnectConfig {
@@ -1890,7 +1919,11 @@ impl Inner {
         port: u16,
         arrival: Arrival,
     ) -> Ended {
-        let Connection { handle, mut events } = connection;
+        let Connection {
+            handle,
+            mut events,
+            server_cert,
+        } = connection;
         let (transport, mut voice_rx) = match start_voice(&handle, host, port).await {
             Some((transport, rx)) => (Some(Arc::new(transport)), Some(rx)),
             None => (None, None),
@@ -1914,6 +1947,7 @@ impl Inner {
                     rejoin_offer,
                     default_channel_id,
                     description_requests: description::DescriptionRequests::default(),
+                    tls: server_cert,
                 });
                 slot.machine.synced();
             }
@@ -2496,32 +2530,52 @@ impl Inner {
         let slot = core.slots.get(&server_id)?;
         let session = slot.session.as_ref()?;
         let store = lock(&self.store);
+        let saved_server = store.server(server_id).ok().flatten();
+        let tls_fingerprint = store.trusted_cert(server_id).ok().flatten();
         session.handle.with_state(|s: &ServerState| {
+            let users: Vec<UserView> = s
+                .users
+                .values()
+                .map(|u| {
+                    let mut view =
+                        self.user_view_of(server_id, u, slot.people.setting(&store, server_id, u));
+                    // The server's echo of the mute/deafen just sent may still be on its way.
+                    if Some(u.session) == s.session {
+                        view.self_mute = slot.self_voice.mute;
+                        view.self_deaf = slot.self_voice.deaf;
+                    }
+                    view
+                })
+                .collect();
+            let mumcord_users = u32::try_from(
+                users
+                    .iter()
+                    .filter(|u| u.mumcord_features.is_some())
+                    .count(),
+            )
+            .unwrap_or(u32::MAX);
             Some(Snapshot {
                 server_id,
                 self_session: s.session?,
                 info: ServerInfoView {
                     default_channel_id: session.default_channel_id,
+                    server_label: saved_server.as_ref().map(|s| s.label.clone()),
+                    server_address: saved_server.as_ref().map(|s| s.address.clone()),
+                    server_port: saved_server.as_ref().map(|s| s.port),
+                    tls_fingerprint: session
+                        .tls
+                        .as_ref()
+                        .map(|c| format_fingerprint(&c.sha256_hex))
+                        .or(tls_fingerprint),
+                    mumcord_users,
+                    tls_issuer: session.tls.as_ref().and_then(|c| c.issuer.clone()),
+                    tls_valid_from: session.tls.as_ref().and_then(|c| c.valid_from.clone()),
+                    tls_valid_until: session.tls.as_ref().and_then(|c| c.valid_until.clone()),
+                    tls_certificate_pem: session.tls.as_ref().map(|c| c.pem.clone()),
                     ..convert::server_info_view(s)
                 },
                 channels: s.channels.values().map(|c| channel_view(s, c)).collect(),
-                users: s
-                    .users
-                    .values()
-                    .map(|u| {
-                        let mut view = self.user_view_of(
-                            server_id,
-                            u,
-                            slot.people.setting(&store, server_id, u),
-                        );
-                        // The server's echo of the mute/deafen just sent may still be on its way.
-                        if Some(u.session) == s.session {
-                            view.self_mute = slot.self_voice.mute;
-                            view.self_deaf = slot.self_voice.deaf;
-                        }
-                        view
-                    })
-                    .collect(),
+                users,
                 followed_channel_ids: followed_ids(&store, server_id, s),
                 unread: Vec::new(),
                 read_only: slot.self_voice.own().is_none(),
@@ -2862,20 +2916,31 @@ impl Inner {
         self.release_audio_if_idle(core);
     }
 
-    /// The identity from secure storage, cached after the first read.
-    async fn identity(&self) -> EngineResult<Option<Identity>> {
-        if let Some(cached) = lock(&self.identity).clone() {
-            return Ok(cached);
-        }
+    /// Identity `id` from secure storage; the secret store caches it for the session, so
+    /// several connects and reconnects cost one read (and at most one OS prompt).
+    async fn identity_by_id(&self, id: IdentityId) -> EngineResult<Option<Identity>> {
         let secrets = self.secrets.clone();
-        let loaded = self
-            .rt
-            .spawn_blocking(move || secrets.load_identity())
+        self.rt
+            .spawn_blocking(move || secrets.load_identity(id))
             .await
             .map_err(|e| EngineError::internal(e.to_string()))?
-            .map_err(store_error)?;
-        *lock(&self.identity) = Some(loaded.clone());
-        Ok(loaded)
+            .map_err(store_error)
+    }
+
+    /// Id of the default identity, or `None` before the wizard created one.
+    async fn default_identity_id(&self) -> EngineResult<Option<IdentityId>> {
+        Ok(lock(&self.store)
+            .default_identity()
+            .map_err(store_error)?
+            .map(|record| record.id))
+    }
+
+    /// The default identity itself.
+    async fn default_identity(&self) -> EngineResult<Option<Identity>> {
+        match self.default_identity_id().await? {
+            Some(id) => self.identity_by_id(id).await,
+            None => Ok(None),
+        }
     }
 }
 
@@ -2979,6 +3044,7 @@ mod declined_kind_tests {
             was_voice_server_at_quit: voice,
             notifications_muted: false,
             theme_id: None,
+            identity_id: None,
         }
     }
 
@@ -3051,7 +3117,7 @@ mod password_override_tests {
         )
         .expect("engine");
         engine
-            .identity_create("Tester".into())
+            .identity_create("Tester".into(), None)
             .await
             .expect("identity");
         let server = engine

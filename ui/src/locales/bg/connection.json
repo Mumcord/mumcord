@@ -89,5 +89,7 @@
   },
   "endToEnd": "Общо закъснение",
   "endToEndValue": "≈ {{value}} ms (оценка)",
-  "lowLatencyMode": "Режим с ниско закъснение"
+  "lowLatencyMode": "Режим с ниско закъснение",
+  "identity": "Идентичност",
+  "identityValue": "{{label}} ({{name}}) · {{fingerprint}}"
 }

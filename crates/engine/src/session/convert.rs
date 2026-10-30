@@ -119,6 +119,8 @@ pub fn server_info_view(state: &ServerState) -> ServerInfoView {
             .map(|v| v.to_string())
             .or_else(|| info.release.clone())
             .unwrap_or_default(),
+        release: info.release.clone(),
+        os: info.os.clone(),
         follow_supported: info.supports_listening(),
         welcome_text: info
             .welcome_text
@@ -129,6 +131,25 @@ pub fn server_info_view(state: &ServerState) -> ServerInfoView {
         max_message_length: info.message_length.unwrap_or(0),
         max_image_message_length: info.image_message_length.unwrap_or(0),
         allow_html: info.allow_html.unwrap_or(true),
+        max_bandwidth: info.max_bandwidth,
+        max_users: info.max_users,
+        recording_allowed: info.recording_allowed.unwrap_or(false),
+        server_label: None,
+        server_address: None,
+        server_port: None,
+        tls_fingerprint: None,
+        users_online: u32::try_from(state.users.len()).unwrap_or(u32::MAX),
+        session_id: state.session,
+        registered: state.own_user().is_some_and(|u| u.user_id.is_some()),
+        current_channel_permissions: state
+            .own_user()
+            .and_then(|u| state.permissions.get(&u.channel_id).copied()),
+        mumcord_users: 0, // Filled in by the snapshot function, which knows the Mumcord peers.
+        tls_trusted: true,
+        tls_issuer: None,
+        tls_valid_from: None,
+        tls_valid_until: None,
+        tls_certificate_pem: None,
     }
 }
 

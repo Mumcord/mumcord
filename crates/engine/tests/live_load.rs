@@ -245,7 +245,7 @@ async fn call(low_latency: bool) {
     )
     .expect("engine");
     engine
-        .identity_create(name.clone())
+        .identity_create(name.clone(), None)
         .await
         .expect("identity");
     let settings = engine.settings().expect("settings");

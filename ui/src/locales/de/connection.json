@@ -89,5 +89,7 @@
   },
   "endToEnd": "Gesamtlatenz",
   "endToEndValue": "≈ {{value}} ms (Schätzung)",
-  "lowLatencyMode": "Modus für niedrige Latenz"
+  "lowLatencyMode": "Modus für niedrige Latenz",
+  "identity": "Identität",
+  "identityValue": "{{label}} ({{name}}) · {{fingerprint}}"
 }

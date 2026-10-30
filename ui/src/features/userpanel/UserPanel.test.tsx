@@ -10,6 +10,7 @@ import "../../i18n";
 import { axeViolations } from "../../test/axe";
 import { getShownServerId, resetServerStore, showServer } from "../channels/serverStore";
 import { resetNowGamingStore } from "../nowgaming";
+import { refreshIdentities, setServerIdentity } from "../servers";
 import { resetNowPlayingStore } from "../nowplaying";
 import { addServer } from "../servers/store";
 import { UserPanel } from "./UserPanel";
@@ -319,9 +320,22 @@ describe("UserPanel", () => {
     expect(deafen()).toBeDisabled();
   });
 
+  it("shows the certificate name of the identity the shown server uses", async () => {
+    await setup(false);
+    await api.identityCreate("Zoe (Acme)", "Work");
+    await refreshIdentities();
+    const [server] = await api.serversList();
+    const id = (server ?? { id: 0 }).id;
+    showServer(id);
+    await setServerIdentity(id, 2, false);
+    await waitFor(() => {
+      expect(screen.getByText("Zoe (Acme)")).toBeInTheDocument();
+    });
+  });
+
   it("registers after explaining and exporting the identity, then hides the menu item", async () => {
     await setup();
-    await api.identityCreate("Self");
+    await api.identityCreate("Self", null);
     const exportSpy = vi.spyOn(api, "identityExport");
     files.pickSavePath.mockResolvedValue("/tmp/id.p12");
     await openMenuItem("Register on this server");
@@ -334,7 +348,7 @@ describe("UserPanel", () => {
     });
     fireEvent.click(screen.getByRole("button", { name: "Export identity" }));
     await waitFor(() => {
-      expect(exportSpy).toHaveBeenCalledWith("/tmp/id.p12", "pw");
+      expect(exportSpy).toHaveBeenCalledWith(1, "/tmp/id.p12", "pw");
     });
     fireEvent.click(screen.getByRole("button", { name: "Register" }));
     await waitFor(() => {

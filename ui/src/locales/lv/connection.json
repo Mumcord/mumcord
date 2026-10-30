@@ -90,5 +90,7 @@
   },
   "endToEnd": "Kopējā aizkave",
   "endToEndValue": "≈ {{value}} ms (aplēse)",
-  "lowLatencyMode": "Zemas aizkaves režīms"
+  "lowLatencyMode": "Zemas aizkaves režīms",
+  "identity": "Identitāte",
+  "identityValue": "{{label}} ({{name}}) · {{fingerprint}}"
 }

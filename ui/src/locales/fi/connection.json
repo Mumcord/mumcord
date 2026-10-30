@@ -89,5 +89,7 @@
   },
   "endToEnd": "Kokonaisviive",
   "endToEndValue": "≈ {{value}} ms (arvio)",
-  "lowLatencyMode": "Pienen viiveen tila"
+  "lowLatencyMode": "Pienen viiveen tila",
+  "identity": "Identiteetti",
+  "identityValue": "{{label}} ({{name}}) · {{fingerprint}}"
 }

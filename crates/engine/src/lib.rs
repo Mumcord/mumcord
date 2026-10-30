@@ -39,18 +39,18 @@ pub use latency::LatencyEstimateView;
 pub use mumcord_positional as positional_sources;
 /// Stored types (settings record etc.) as the engine hands them out.
 pub use mumcord_store as store;
-pub use mumcord_store::{SecretStore, ServerId, Settings};
+pub use mumcord_store::{IdentityId, SecretStore, ServerId, Settings};
 pub use now_gaming::{GameSource, LocalGame, NowGamingView};
 pub use now_playing::{LocalTrack, NowPlayingView};
 pub use positional::PositionalStatus;
 pub use session::Engine;
 pub use session::{
-    AudioDeviceList, AudioDeviceView, AudioHealthView, ChannelPasswordChannel,
+    AudioDeviceList, AudioDeviceView, AudioHealthView, CertificateState, ChannelPasswordChannel,
     ChannelPasswordState, ChannelPasswordView, ChannelPermissions, ChannelView, ConnState,
     ConnectionStatsView, ConversationRef, EngineError, EngineEvent, EngineResult, ErrorKind,
     EventReceiver, Events, IdentityView, MAX_RECONNECT_ATTEMPTS, MicTestPhase, PasswordChange,
-    ProfileView, ServerFields, ServerInfoView, ServerView, SessionCtx, Snapshot, TaggedEvent,
-    UnreadView, UserView, VoiceTransportKind,
+    ProfileView, ServerFields, ServerInfoView, ServerTestInput, ServerView, SessionCtx, Snapshot,
+    TaggedEvent, TestConnectionView, UnreadView, UserView, VoiceTransportKind,
 };
 pub use stats::UserStatsView;
 pub use watch_party::{PLAYLIST_MAX, PlaylistEntry, WatchAction, WatchCommand, WatchPartyView};

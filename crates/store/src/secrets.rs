@@ -2,11 +2,14 @@
 //! Manager on Windows) for the identity and server passwords.
 //!
 //! Layout under service [`KEYRING_SERVICE`]:
-//! - `identity` – number of chunks of the stored identity (decimal text)
-//! - `identity/<n>` – chunk `n` of the identity as PKCS#12 (empty password; protection
+//! - `identity/<id>/count` – number of chunks of identity `‹id›` (decimal text)
+//! - `identity/<id>/<n>` – chunk `n` of the identity as PKCS#12 (empty password; protection
 //!   comes from the OS store)
 //! - `server/<server id>` – password and channel passwords (Mumble access tokens) of a saved
 //!   server, as JSON `{"password": "…", "tokens": ["…"]}`
+//!
+//! Older versions kept exactly one identity under `identity` and `identity/<n>`; it is read
+//! once with [`SecretStore::legacy_identity`] and moved to the current layout (issue #148).
 //!
 //! Only Windows needs more than one identity chunk: Credential Manager rejects secrets larger
 //! than 2560 bytes and an RSA PKCS#12 can exceed that.
@@ -23,18 +26,20 @@
 //! should run them on a blocking thread.
 
 use std::collections::HashMap;
-use std::sync::{Mutex, MutexGuard};
+use std::sync::{Arc, Mutex, MutexGuard};
 
 use serde::{Deserialize, Serialize};
 
 use crate::error::{Error, Result};
+use crate::identities::IdentityId;
 use crate::identity::Identity;
 use crate::servers::ServerId;
 
 /// Keyring service name, derived from the app identifier `app.mumcord.client`.
 pub const KEYRING_SERVICE: &str = "app.mumcord.client";
 
-const IDENTITY_ACCOUNT: &str = "identity";
+/// Account of the single identity older versions stored; only read for the migration.
+const LEGACY_IDENTITY_ACCOUNT: &str = "identity";
 const CHUNK_SIZE: usize = if cfg!(windows) { 2048 } else { usize::MAX };
 
 trait SecretBackend: Send + Sync {
@@ -100,11 +105,14 @@ impl ServerSecrets {
 
 /// Access to secrets in the OS secure storage.
 pub struct SecretStore {
-    backend: Box<dyn SecretBackend>,
+    backend: Arc<dyn SecretBackend>,
     /// Server items read this session; a server without item is cached as empty.
     servers: Mutex<HashMap<ServerId, Cached<ServerSecrets>>>,
-    /// The identity once read this session; `None` until the first read.
-    identity: Mutex<Option<Cached<Option<Identity>>>>,
+    /// Identities read this session, so a list of identities does not read (and prompt for)
+    /// the same item twice.
+    identities: Mutex<HashMap<IdentityId, Cached<Option<Identity>>>>,
+    /// The identity of older versions once read this session.
+    legacy: Mutex<Option<Cached<Option<Identity>>>>,
 }
 
 impl SecretStore {
@@ -114,61 +122,61 @@ impl SecretStore {
     }
 
     fn os_with_service(service: &str) -> Self {
-        Self::with_backend(Box::new(KeyringBackend {
+        Self::with_backend(Arc::new(KeyringBackend {
             service: service.to_owned(),
         }))
     }
 
-    fn with_backend(backend: Box<dyn SecretBackend>) -> Self {
+    fn with_backend(backend: Arc<dyn SecretBackend>) -> Self {
         Self {
             backend,
             servers: Mutex::new(HashMap::new()),
-            identity: Mutex::new(None),
+            identities: Mutex::new(HashMap::new()),
+            legacy: Mutex::new(None),
         }
     }
 
-    /// Stores the identity, replacing any previous one.
-    pub fn save_identity(&self, identity: &Identity) -> Result<()> {
-        let mut cache = lock(&self.identity);
+    /// Stores identity `id`, replacing any previous certificate stored for it.
+    pub fn save_identity(&self, id: IdentityId, identity: &Identity) -> Result<()> {
+        // Held across the OS calls so concurrent callers wait for one write.
+        let mut cache = lock(&self.identities);
         let p12 = identity.to_pkcs12("")?;
-        let old_count = self.identity_chunk_count()?;
-        self.write_identity(&p12, old_count)?;
-        *cache = Some(Cached::Read(Some(identity.clone())));
+        let old_count = self.identity_chunk_count(id)?;
+        self.write_identity(id, &p12, old_count)?;
+        cache.insert(id, Cached::Read(Some(identity.clone())));
         Ok(())
     }
 
-    /// The stored identity, or `None` if none was saved yet (first start). Read once per
-    /// session.
-    pub fn load_identity(&self) -> Result<Option<Identity>> {
-        // Held across the OS calls so concurrent callers wait for one read.
-        let mut cache = lock(&self.identity);
-        match &*cache {
+    /// Identity `id`, or `None` if nothing is stored for it. Read once per session.
+    pub fn load_identity(&self, id: IdentityId) -> Result<Option<Identity>> {
+        let mut cache = lock(&self.identities);
+        match cache.get(&id) {
             Some(Cached::Read(identity)) => return Ok(identity.clone()),
             Some(Cached::Unavailable) => return Err(Error::SecretUnavailable),
             None => {}
         }
-        match self.read_identity() {
+        match self.read_identity(id) {
             Ok(identity) => {
-                *cache = Some(Cached::Read(identity.clone()));
+                cache.insert(id, Cached::Read(identity.clone()));
                 Ok(identity)
             }
             Err(e) => {
-                log_read_failure("the identity", &e);
-                *cache = Some(Cached::Unavailable);
+                log_read_failure("an identity", &e);
+                cache.insert(id, Cached::Unavailable);
                 Err(e)
             }
         }
     }
 
-    fn read_identity(&self) -> Result<Option<Identity>> {
-        let Some(count) = self.identity_chunk_count()? else {
+    fn read_identity(&self, id: IdentityId) -> Result<Option<Identity>> {
+        let Some(count) = self.identity_chunk_count(id)? else {
             return Ok(None);
         };
         let mut p12 = Vec::new();
         for index in 0..count {
             let chunk = self
                 .backend
-                .get(&chunk_account(index))?
+                .get(&identity_chunk_account(id, index))?
                 .ok_or(Error::CorruptStoredIdentity)?;
             p12.extend(chunk);
         }
@@ -176,19 +184,72 @@ impl SecretStore {
         if count > p12.len().div_ceil(CHUNK_SIZE) {
             // Written by a version that split the identity on every platform; one item
             // means one prompt per start instead of several.
-            if let Err(e) = self.write_identity(&p12, Some(count)) {
+            if let Err(e) = self.write_identity(id, &p12, Some(count)) {
                 tracing::warn!(error = %e, "merging the identity chunks failed");
             }
         }
         Ok(Some(identity))
     }
 
-    pub fn delete_identity(&self) -> Result<()> {
-        let mut cache = lock(&self.identity);
-        let count = self.identity_chunk_count()?;
-        self.backend.delete(IDENTITY_ACCOUNT)?;
+    /// Removes identity `id` with its key material; a missing identity is not an error.
+    pub fn delete_identity(&self, id: IdentityId) -> Result<()> {
+        let mut cache = lock(&self.identities);
+        let count = self.identity_chunk_count(id)?;
+        self.backend.delete(&identity_count_account(id))?;
         for index in 0..count.unwrap_or(0) {
-            self.backend.delete(&chunk_account(index))?;
+            self.backend.delete(&identity_chunk_account(id, index))?;
+        }
+        cache.insert(id, Cached::Read(None));
+        Ok(())
+    }
+
+    /// The single identity older versions stored, for the migration to the identity list;
+    /// `None` when there is none (new installation or already migrated). Read once per
+    /// session.
+    pub fn legacy_identity(&self) -> Result<Option<Identity>> {
+        let mut cache = lock(&self.legacy);
+        match &*cache {
+            Some(Cached::Read(identity)) => return Ok(identity.clone()),
+            Some(Cached::Unavailable) => return Err(Error::SecretUnavailable),
+            None => {}
+        }
+        match self.read_legacy_identity() {
+            Ok(identity) => {
+                *cache = Some(Cached::Read(identity.clone()));
+                Ok(identity)
+            }
+            Err(e) => {
+                log_read_failure("the identity of an older version", &e);
+                *cache = Some(Cached::Unavailable);
+                Err(e)
+            }
+        }
+    }
+
+    fn read_legacy_identity(&self) -> Result<Option<Identity>> {
+        let Some(count) = self.legacy_chunk_count()? else {
+            return Ok(None);
+        };
+        let mut p12 = Vec::new();
+        for index in 0..count {
+            let chunk = self
+                .backend
+                .get(&legacy_chunk_account(index))?
+                .ok_or(Error::CorruptStoredIdentity)?;
+            p12.extend(chunk);
+        }
+        Identity::from_pkcs12(&p12, "")
+            .map(Some)
+            .map_err(|_| Error::CorruptStoredIdentity)
+    }
+
+    /// Removes the items of the single-identity layout after a successful migration.
+    pub fn delete_legacy_identity(&self) -> Result<()> {
+        let mut cache = lock(&self.legacy);
+        let count = self.legacy_chunk_count()?;
+        self.backend.delete(LEGACY_IDENTITY_ACCOUNT)?;
+        for index in 0..count.unwrap_or(0) {
+            self.backend.delete(&legacy_chunk_account(index))?;
         }
         *cache = Some(Cached::Read(None));
         Ok(())
@@ -324,31 +385,43 @@ impl SecretStore {
         Ok(())
     }
 
-    fn write_identity(&self, p12: &[u8], old_count: Option<usize>) -> Result<()> {
+    fn write_identity(&self, id: IdentityId, p12: &[u8], old_count: Option<usize>) -> Result<()> {
         let chunks: Vec<&[u8]> = p12.chunks(CHUNK_SIZE).collect();
         for (index, chunk) in chunks.iter().enumerate() {
-            self.backend.set(&chunk_account(index), chunk)?;
+            self.backend
+                .set(&identity_chunk_account(id, index), chunk)?;
         }
         // The count is written last so a failure above never leaves a count that
         // points at chunks of two different identities.
-        self.backend
-            .set(IDENTITY_ACCOUNT, chunks.len().to_string().as_bytes())?;
+        self.backend.set(
+            &identity_count_account(id),
+            chunks.len().to_string().as_bytes(),
+        )?;
         for index in chunks.len()..old_count.unwrap_or(0) {
-            self.backend.delete(&chunk_account(index))?;
+            self.backend.delete(&identity_chunk_account(id, index))?;
         }
         Ok(())
     }
 
-    fn identity_chunk_count(&self) -> Result<Option<usize>> {
-        let Some(raw) = self.backend.get(IDENTITY_ACCOUNT)? else {
-            return Ok(None);
-        };
-        std::str::from_utf8(&raw)
-            .ok()
-            .and_then(|text| text.parse().ok())
-            .map(Some)
-            .ok_or(Error::CorruptStoredIdentity)
+    fn identity_chunk_count(&self, id: IdentityId) -> Result<Option<usize>> {
+        chunk_count(&*self.backend, &identity_count_account(id))
     }
+
+    fn legacy_chunk_count(&self) -> Result<Option<usize>> {
+        chunk_count(&*self.backend, LEGACY_IDENTITY_ACCOUNT)
+    }
+}
+
+/// Reads the number of chunks stored under `account`.
+fn chunk_count(backend: &dyn SecretBackend, account: &str) -> Result<Option<usize>> {
+    let Some(raw) = backend.get(account)? else {
+        return Ok(None);
+    };
+    std::str::from_utf8(&raw)
+        .ok()
+        .and_then(|text| text.parse().ok())
+        .map(Some)
+        .ok_or(Error::CorruptStoredIdentity)
 }
 
 fn lock<T>(mutex: &Mutex<T>) -> MutexGuard<'_, T> {
@@ -370,8 +443,16 @@ fn log_read_failure(what: &str, error: &Error) {
     }
 }
 
-fn chunk_account(index: usize) -> String {
-    format!("{IDENTITY_ACCOUNT}/{index}")
+fn identity_count_account(id: IdentityId) -> String {
+    format!("identity/{id}/count")
+}
+
+fn identity_chunk_account(id: IdentityId, index: usize) -> String {
+    format!("identity/{id}/{index}")
+}
+
+fn legacy_chunk_account(index: usize) -> String {
+    format!("{LEGACY_IDENTITY_ACCOUNT}/{index}")
 }
 
 fn server_account(server: ServerId) -> String {
@@ -468,7 +549,22 @@ mod memory {
     impl SecretStore {
         /// In-memory store for tests, so they never touch the user's OS secure storage.
         pub fn in_memory() -> Self {
-            Self::with_backend(Box::new(MemoryBackend::default()))
+            Self::with_backend(Arc::new(MemoryBackend::default()))
+        }
+
+        /// Another handle to the same in-memory items with fresh caches, like the next start
+        /// of the app. Tests that restart the engine reuse the items this way.
+        pub fn reopen(&self) -> Self {
+            Self::with_backend(self.backend.clone())
+        }
+
+        /// Writes an identity in the single-identity layout of older versions, to test the
+        /// migration to the identity list (issue #148).
+        pub fn seed_legacy_identity(&self, identity: &Identity) -> Result<()> {
+            let p12 = identity.to_pkcs12("")?;
+            self.backend.set(LEGACY_IDENTITY_ACCOUNT, b"1")?;
+            self.backend.set(&legacy_chunk_account(0), &p12)?;
+            Ok(())
         }
     }
 }
@@ -486,24 +582,25 @@ mod tests {
     fn counted() -> (SecretStore, MemoryBackend) {
         let backend = MemoryBackend::default();
         (
-            SecretStore::with_backend(Box::new(backend.clone())),
+            SecretStore::with_backend(Arc::new(backend.clone())),
             backend,
         )
     }
 
     fn exercise(store: &SecretStore) {
-        assert_eq!(store.load_identity().expect("empty"), None);
-        store.save_identity(&IDENTITY).expect("save");
+        assert_eq!(store.load_identity(1).expect("empty"), None);
+        store.save_identity(1, &IDENTITY).expect("save");
         assert_eq!(
-            store.load_identity().expect("load").as_ref(),
+            store.load_identity(1).expect("load").as_ref(),
             Some(&*IDENTITY)
         );
         // Saving again (e.g. after import) replaces cleanly.
-        store.save_identity(&IDENTITY).expect("save again");
+        store.save_identity(1, &IDENTITY).expect("save again");
         assert_eq!(
-            store.load_identity().expect("load").as_ref(),
+            store.load_identity(1).expect("load").as_ref(),
             Some(&*IDENTITY)
         );
+        assert_eq!(store.legacy_identity().expect("no legacy"), None);
 
         assert_eq!(store.server_password(7).expect("none"), None);
         store.set_server_password(7, "hunter2").expect("set");
@@ -529,8 +626,63 @@ mod tests {
         store.delete_server_secrets(9).expect("remove server");
         assert_eq!(store.server_password(9).expect("removed"), None);
 
-        store.delete_identity().expect("delete identity");
-        assert_eq!(store.load_identity().expect("gone"), None);
+        store.delete_identity(1).expect("delete identity");
+        assert_eq!(store.load_identity(1).expect("gone"), None);
+    }
+
+    #[test]
+    fn identities_are_stored_apart() {
+        let (store, backend) = counted();
+        let other = Identity::generate("Second Tester").expect("generate");
+        store.save_identity(1, &IDENTITY).expect("save 1");
+        store.save_identity(2, &other).expect("save 2");
+        assert_eq!(
+            store.load_identity(1).expect("load 1").as_ref(),
+            Some(&*IDENTITY)
+        );
+        assert_eq!(
+            store.load_identity(2).expect("load 2").as_ref(),
+            Some(&other)
+        );
+        store.delete_identity(1).expect("delete 1");
+        assert_eq!(store.load_identity(1).expect("gone"), None);
+        assert!(store.load_identity(2).expect("kept").is_some());
+        let accounts = backend.accounts();
+        assert!(!accounts.iter().any(|a| a.starts_with("identity/1")));
+        assert!(accounts.iter().any(|a| a.starts_with("identity/2")));
+    }
+
+    #[test]
+    fn the_legacy_single_identity_is_read_and_removed() {
+        let backend = MemoryBackend::default();
+        let p12 = IDENTITY.to_pkcs12("").expect("p12");
+        backend
+            .set(LEGACY_IDENTITY_ACCOUNT, b"1")
+            .expect("seed count");
+        backend
+            .set(&legacy_chunk_account(0), &p12)
+            .expect("seed chunk");
+        let store = SecretStore::with_backend(Arc::new(backend.clone()));
+        assert_eq!(
+            store.legacy_identity().expect("legacy").as_ref(),
+            Some(&*IDENTITY)
+        );
+        // The old identity is not visible under the new layout until it is migrated.
+        assert_eq!(store.load_identity(1).expect("none"), None);
+
+        store.save_identity(1, &IDENTITY).expect("migrate");
+        store.delete_legacy_identity().expect("clean up");
+        assert_eq!(store.legacy_identity().expect("gone"), None);
+        assert!(
+            backend
+                .accounts()
+                .iter()
+                .all(|a| a.starts_with("identity/1"))
+        );
+        assert_eq!(
+            store.load_identity(1).expect("load").as_ref(),
+            Some(&*IDENTITY)
+        );
     }
 
     #[test]
@@ -548,7 +700,7 @@ mod tests {
         assert_eq!(backend.accounts(), ["server/7"]);
 
         // A new session: servers list, connect, reconnect and the edit dialog all ask again.
-        let store = SecretStore::with_backend(Box::new(backend.clone()));
+        let store = SecretStore::with_backend(Arc::new(backend.clone()));
         let (reads, writes) = (backend.reads(), backend.writes());
         for _ in 0..5 {
             assert_eq!(
@@ -594,7 +746,7 @@ mod tests {
         backend
             .set(&legacy_tokens_account(4), br#"["a","b"]"#)
             .expect("seed tokens");
-        let store = SecretStore::with_backend(Box::new(backend.clone()));
+        let store = SecretStore::with_backend(Arc::new(backend.clone()));
         assert_eq!(
             store.server_password(4).expect("get").as_deref(),
             Some("hunter2")
@@ -602,7 +754,7 @@ mod tests {
         assert_eq!(store.access_tokens(4).expect("tokens"), ["a", "b"]);
         assert_eq!(backend.accounts(), ["server/4"]);
 
-        let reopened = SecretStore::with_backend(Box::new(backend.clone()));
+        let reopened = SecretStore::with_backend(Arc::new(backend.clone()));
         let reads = backend.reads();
         assert_eq!(reopened.access_tokens(4).expect("tokens"), ["a", "b"]);
         assert_eq!(backend.reads() - reads, 1);
@@ -617,7 +769,7 @@ mod tests {
         backend
             .set(&server_account(5), b"{}")
             .expect("seed current");
-        let store = SecretStore::with_backend(Box::new(backend.clone()));
+        let store = SecretStore::with_backend(Arc::new(backend.clone()));
         let reads = backend.reads();
         store.delete_server_secrets(5).expect("remove");
         assert_eq!(backend.reads(), reads);
@@ -627,11 +779,11 @@ mod tests {
     #[test]
     fn identity_chunks_fit_the_platform() {
         let (store, backend) = counted();
-        store.save_identity(&IDENTITY).expect("save");
-        let count = store.identity_chunk_count().expect("count").expect("some");
+        store.save_identity(1, &IDENTITY).expect("save");
+        let count = store.identity_chunk_count(1).expect("count").expect("some");
         if cfg!(windows) {
             for index in 0..count {
-                let chunk = backend.get(&chunk_account(index)).expect("get");
+                let chunk = backend.get(&identity_chunk_account(1, index)).expect("get");
                 assert!(chunk.expect("chunk").len() <= 2560);
             }
         } else {
@@ -645,23 +797,29 @@ mod tests {
         let p12 = IDENTITY.to_pkcs12("").expect("p12");
         let pieces: Vec<&[u8]> = p12.chunks(1024).collect();
         backend
-            .set(IDENTITY_ACCOUNT, pieces.len().to_string().as_bytes())
+            .set(
+                &identity_count_account(3),
+                pieces.len().to_string().as_bytes(),
+            )
             .expect("seed count");
         for (index, piece) in pieces.iter().enumerate() {
             backend
-                .set(&chunk_account(index), piece)
+                .set(&identity_chunk_account(3, index), piece)
                 .expect("seed chunk");
         }
-        let store = SecretStore::with_backend(Box::new(backend.clone()));
+        let store = SecretStore::with_backend(Arc::new(backend.clone()));
         assert_eq!(
-            store.load_identity().expect("load").as_ref(),
+            store.load_identity(3).expect("load").as_ref(),
             Some(&*IDENTITY)
         );
         let expected = p12.len().div_ceil(CHUNK_SIZE);
-        assert_eq!(store.identity_chunk_count().expect("count"), Some(expected));
+        assert_eq!(
+            store.identity_chunk_count(3).expect("count"),
+            Some(expected)
+        );
         assert_eq!(backend.accounts().len(), expected + 1);
         assert_eq!(
-            store.load_identity().expect("reload").as_ref(),
+            store.load_identity(3).expect("reload").as_ref(),
             Some(&*IDENTITY)
         );
     }
@@ -669,11 +827,13 @@ mod tests {
     #[test]
     fn missing_chunk_is_reported_as_corrupt() {
         let (store, backend) = counted();
-        store.save_identity(&IDENTITY).expect("save");
-        backend.delete(&chunk_account(0)).expect("drop chunk");
-        let store = SecretStore::with_backend(Box::new(backend));
+        store.save_identity(1, &IDENTITY).expect("save");
+        backend
+            .delete(&identity_chunk_account(1, 0))
+            .expect("drop chunk");
+        let store = SecretStore::with_backend(Arc::new(backend));
         assert!(matches!(
-            store.load_identity(),
+            store.load_identity(1),
             Err(Error::CorruptStoredIdentity)
         ));
     }
@@ -682,18 +842,18 @@ mod tests {
     fn identity_is_read_once_per_session() {
         let (store, backend) = counted();
         for _ in 0..3 {
-            assert_eq!(store.load_identity().expect("first start"), None);
+            assert_eq!(store.load_identity(1).expect("first start"), None);
         }
         assert_eq!(backend.reads(), 1);
-        store.save_identity(&IDENTITY).expect("save");
+        store.save_identity(1, &IDENTITY).expect("save");
 
         // A new session: start-up, every connect and reconnect and the identity settings ask.
-        let store = SecretStore::with_backend(Box::new(backend.clone()));
-        let chunks = store.identity_chunk_count().expect("count").expect("some");
+        let store = SecretStore::with_backend(Arc::new(backend.clone()));
+        let chunks = store.identity_chunk_count(1).expect("count").expect("some");
         let reads = backend.reads();
         for _ in 0..5 {
             assert_eq!(
-                store.load_identity().expect("load").as_ref(),
+                store.load_identity(1).expect("load").as_ref(),
                 Some(&*IDENTITY)
             );
         }
@@ -704,14 +864,14 @@ mod tests {
     #[test]
     fn denied_reads_are_not_repeated_until_restart() {
         let (store, backend) = counted();
-        store.save_identity(&IDENTITY).expect("save");
+        store.save_identity(1, &IDENTITY).expect("save");
         store.set_server_password(7, "hunter2").expect("set");
 
-        let store = SecretStore::with_backend(Box::new(backend.clone()));
+        let store = SecretStore::with_backend(Arc::new(backend.clone()));
         backend.deny(true);
         let reads = backend.reads();
         for _ in 0..5 {
-            assert!(store.load_identity().is_err());
+            assert!(store.load_identity(1).is_err());
             assert!(store.server_password(7).is_err());
             assert!(store.access_tokens(7).is_err());
         }
@@ -719,12 +879,12 @@ mod tests {
 
         // Allowed after a restart.
         backend.deny(false);
-        let store = SecretStore::with_backend(Box::new(backend.clone()));
+        let store = SecretStore::with_backend(Arc::new(backend.clone()));
         assert_eq!(
             store.server_password(7).expect("get").as_deref(),
             Some("hunter2")
         );
-        assert!(store.load_identity().expect("load").is_some());
+        assert!(store.load_identity(1).expect("load").is_some());
     }
 
     #[test]
@@ -733,9 +893,9 @@ mod tests {
         backend
             .set(&legacy_password_account(4), b"hunter2")
             .expect("seed password");
-        let store = SecretStore::with_backend(Box::new(backend.clone()));
+        let store = SecretStore::with_backend(Arc::new(backend.clone()));
         let failing = FailingWrites(backend.clone());
-        let store_denied_writes = SecretStore::with_backend(Box::new(failing));
+        let store_denied_writes = SecretStore::with_backend(Arc::new(failing));
         for _ in 0..3 {
             assert_eq!(
                 store_denied_writes
@@ -776,7 +936,8 @@ mod tests {
     #[ignore = "touches the real OS secure storage"]
     fn os_keyring_round_trip() {
         let store = SecretStore::os_with_service("app.mumcord.client.test");
-        store.delete_identity().expect("pre-clean identity");
+        store.delete_identity(1).expect("pre-clean identity");
+        store.delete_legacy_identity().expect("pre-clean legacy");
         store.delete_server_secrets(7).expect("pre-clean server 7");
         store.delete_server_secrets(9).expect("pre-clean server 9");
         exercise(&SecretStore::os_with_service("app.mumcord.client.test"));

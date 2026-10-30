@@ -8,6 +8,7 @@ import { displayName } from "./format";
 import { PasswordDialog } from "./PasswordDialog";
 import { ServerBar } from "./ServerBar";
 import { ServerDialog } from "./ServerDialog";
+import { ServerIdentityDialog } from "./ServerIdentityDialog";
 import { ServerThemeDialog } from "./ServerThemeDialog";
 import { closeDialog, decideTrust, removeServer, useServers, type ServersState } from "./store";
 import "./servers.css";
@@ -49,6 +50,11 @@ function ServerDialogs() {
       const server = state.servers.find((s) => s.id === dialog.serverId);
       if (!server) return null;
       return <ServerThemeDialog key={server.id} server={server} onClose={closeDialog} />;
+    }
+    case "identity": {
+      const server = state.servers.find((s) => s.id === dialog.serverId);
+      if (!server) return null;
+      return <ServerIdentityDialog key={server.id} server={server} onClose={closeDialog} />;
     }
     case "remove":
       return (

@@ -89,5 +89,7 @@
   },
   "endToEnd": "Kogu viivitus",
   "endToEndValue": "≈ {{value}} ms (hinnang)",
-  "lowLatencyMode": "Väikese viivitusega režiim"
+  "lowLatencyMode": "Väikese viivitusega režiim",
+  "identity": "Identiteet",
+  "identityValue": "{{label}} ({{name}}) · {{fingerprint}}"
 }

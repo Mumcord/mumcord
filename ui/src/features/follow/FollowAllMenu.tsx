@@ -6,6 +6,7 @@ import { shownServerId } from "../channels/serverStore";
 import { useServerState } from "../channels";
 import { useServers } from "../servers";
 import { displayName } from "../servers/format";
+import { ServerInfoPanel } from "../servers/ServerInfoPanel";
 import { ServerMenu } from "../servers/ServerMenu";
 import { describeFollowError } from "./errors";
 import { setFollowNotice, useFollowNotice } from "./notice";
@@ -27,11 +28,13 @@ type Action = "follow" | "unfollow";
  */
 export function FollowAllMenu() {
   const { t } = useTranslation("follow");
+  const { t: tServers } = useTranslation("servers");
   const server = useServerState();
   const { servers } = useServers();
   const buttonRef = useRef<HTMLButtonElement>(null);
   const [menuAt, setMenuAt] = useState<{ x: number; y: number } | null>(null);
   const [busy, setBusy] = useState(false);
+  const [serverInfoOpen, setServerInfoOpen] = useState(false);
 
   const close = useCallback((returnFocus: boolean) => {
     setMenuAt(null);
@@ -108,6 +111,14 @@ export function FollowAllMenu() {
           onClose={close}
           items={[
             {
+              id: "server-info",
+              label: tServers("serverInfo.title"),
+              onSelect: () => {
+                setMenuAt(null);
+                setServerInfoOpen(true);
+              },
+            },
+            {
               id: "follow-all",
               label: t("all.follow"),
               onSelect: () => {
@@ -122,6 +133,14 @@ export function FollowAllMenu() {
               },
             },
           ]}
+        />
+      )}
+      {serverInfoOpen && (
+        <ServerInfoPanel
+          serverState={server}
+          onClose={() => {
+            setServerInfoOpen(false);
+          }}
         />
       )}
     </div>

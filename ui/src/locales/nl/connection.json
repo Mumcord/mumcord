@@ -89,5 +89,7 @@
   },
   "endToEnd": "Totale latentie",
   "endToEndValue": "≈ {{value}} ms (schatting)",
-  "lowLatencyMode": "Modus voor lage latentie"
+  "lowLatencyMode": "Modus voor lage latentie",
+  "identity": "Identiteit",
+  "identityValue": "{{label}} ({{name}}) · {{fingerprint}}"
 }

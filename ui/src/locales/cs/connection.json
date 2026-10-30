@@ -91,5 +91,7 @@
   },
   "endToEnd": "Celková latence",
   "endToEndValue": "≈ {{value}} ms (odhad)",
-  "lowLatencyMode": "Režim nízké latence"
+  "lowLatencyMode": "Režim nízké latence",
+  "identity": "Identita",
+  "identityValue": "{{label}} ({{name}}) · {{fingerprint}}"
 }

@@ -91,5 +91,7 @@
   },
   "endToEnd": "Opóźnienie całkowite",
   "endToEndValue": "≈ {{value}} ms (szacunek)",
-  "lowLatencyMode": "Tryb niskich opóźnień"
+  "lowLatencyMode": "Tryb niskich opóźnień",
+  "identity": "Tożsamość",
+  "identityValue": "{{label}} ({{name}}) · {{fingerprint}}"
 }

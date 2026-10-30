@@ -22,7 +22,7 @@ Everything is in English: chat, specs, docs, code, comments, commit messages and
 - Commits are small and focused: one logical change per commit, Conventional Commits style (`feat:`, `fix:`, `docs:`, `chore:` …), clear English message. Never add AI attribution: no `Co-Authored-By` trailers, no "Generated with" lines, no mention of Claude or AI.
 - Secrets never go into the repo (no passwords, signing keys or private certificates in files, docs or examples). Use only local env files that are git-ignored and CI variables.
 - Never connect to public or third-party Mumble servers for testing; use a local test server.
-- **Client only.** Never build, require or modify anything on the server side (no companion services, server plugins or server config changes). Every feature must work against an unmodified standard Mumble server.
+- **Client only.** Never build, require or modify anything on the server side (no server plugins or server config changes). Optional companion services (e.g. a relay or a bot) are allowed, but only in their own repos, and Mumcord must work fully without them against an unmodified standard Mumble server. Nothing may ever be required on the server side.
 
 ## Stack
 

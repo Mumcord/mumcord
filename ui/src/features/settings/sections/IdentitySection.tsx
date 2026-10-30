@@ -2,9 +2,19 @@ import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { getApi, type Identity } from "../../../api";
 import { PasswordDialog } from "../components/PasswordDialog";
-import { Group, Section } from "../components/Section";
+import { WarningIcon } from "../components/WarningIcon";
+import { Section } from "../components/Section";
 import { errorText } from "../errors";
 import { pickOpenPath, pickSavePath } from "../fileDialogs";
+import { refreshIdentities, useServers } from "../../servers/store";
+import {
+  CreateIdentityDialog,
+  DeleteIdentityDialog,
+  IdentityDetailsDialog,
+  ImportIdentityDialog,
+  RenameIdentityDialog,
+} from "./IdentityDialogs";
+import { identityInitial, identityTone, serversFor, shortFingerprint } from "../identityFormat";
 import { DefaultAvatarGroup } from "./DefaultAvatarGroup";
 import { NowGamingGroup } from "./NowGamingGroup";
 import { NowPlayingGroup } from "./NowPlayingGroup";
@@ -12,49 +22,51 @@ import type { SettingsSectionProps } from "./types";
 
 const IDENTITY_FILTER_EXTENSIONS = ["p12", "pfx"];
 
+type Dialog =
+  | { kind: "create" }
+  | { kind: "import"; path: string; defaultLabel: string }
+  | { kind: "rename"; identity: Identity }
+  | { kind: "details"; identity: Identity }
+  | { kind: "delete"; identity: Identity }
+  | null;
+
 type Status = { kind: "success" | "error"; text: string } | null;
 
 /**
- * Identity: shows the name, offers export/import of the PKCS#12 identity (FR-1.3) and the
- * profile's default avatar (FR-1.47).
+ * The identity manager (issue #148): the list of client certificates with create, import,
+ * rename, export, details, delete and "set as default", plus the profile's default avatar.
+ * Certificates and keys stay in the OS secure storage; this list shows local metadata only.
  */
 export function IdentitySection({ settings, update }: SettingsSectionProps) {
-  const { t } = useTranslation("settings");
-  const [identity, setIdentity] = useState<Identity | null>(null);
-  const [exportPath, setExportPath] = useState<string | null>(null);
-  const [importPath, setImportPath] = useState<string | null>(null);
+  const { t, i18n } = useTranslation("settings");
+  const { identities, servers } = useServers();
+  const [dialog, setDialog] = useState<Dialog>(null);
   const [status, setStatus] = useState<Status>(null);
+  const [exportPath, setExportPath] = useState<{ id: number; path: string } | null>(null);
 
   useEffect(() => {
-    let active = true;
-    getApi()
-      .identityGet()
-      .then(
-        (loaded) => {
-          if (active) setIdentity(loaded);
-        },
-        (error: unknown) => {
-          console.error("Loading the identity failed", error);
-          if (active) setStatus({ kind: "error", text: errorText(t, error) });
-        },
-      );
-    return () => {
-      active = false;
-    };
-  }, [t]);
+    void refreshIdentities();
+  }, []);
 
-  const filter = { name: t("identity.fileType"), extensions: IDENTITY_FILTER_EXTENSIONS };
+  const done = () => {
+    setDialog(null);
+    void refreshIdentities();
+  };
 
   const describe = (error: unknown) => {
-    console.error("Identity export/import failed", error);
+    console.error("An identity action failed", error);
     return errorText(t, error);
   };
 
-  const startExport = async () => {
+  const startExport = async (identity: Identity) => {
     setStatus(null);
     try {
-      const path = await pickSavePath("mumcord-identity.p12", filter, t("identity.exportTitle"));
-      if (path !== null) setExportPath(path);
+      const path = await pickSavePath(
+        `mumcord-identity-${identity.label.replace(/[^\w.-]+/g, "-")}.p12`,
+        { name: t("identity.fileType"), extensions: IDENTITY_FILTER_EXTENSIONS },
+        t("identity.exportTitle", { identity: identity.label }),
+      );
+      if (path !== null) setExportPath({ id: identity.id, path });
     } catch (error: unknown) {
       setStatus({ kind: "error", text: describe(error) });
     }
@@ -63,73 +75,231 @@ export function IdentitySection({ settings, update }: SettingsSectionProps) {
   const startImport = async () => {
     setStatus(null);
     try {
-      const path = await pickOpenPath(filter, t("identity.importTitle"));
-      if (path !== null) setImportPath(path);
+      const path = await pickOpenPath(
+        { name: t("identity.fileType"), extensions: IDENTITY_FILTER_EXTENSIONS },
+        t("identity.importTitle"),
+      );
+      if (path === null) return;
+      const file = path.split(/[\\/]/).pop() ?? "";
+      setDialog({
+        kind: "import",
+        path,
+        defaultLabel: file.replace(/\.p12$|\.pfx$/i, "") || t("identity.importedLabel"),
+      });
     } catch (error: unknown) {
       setStatus({ kind: "error", text: describe(error) });
     }
   };
 
+  const setDefault = async (identity: Identity) => {
+    setStatus(null);
+    try {
+      await getApi().identitySetDefault(identity.id);
+      await refreshIdentities();
+      setStatus({ kind: "success", text: t("identity.defaultSet", { identity: identity.label }) });
+    } catch (error: unknown) {
+      setStatus({ kind: "error", text: describe(error) });
+    }
+  };
+
+  const created = new Intl.DateTimeFormat(i18n.language, { dateStyle: "medium" });
+
   return (
     <Section title={t("sections.identity")}>
-      <Group title={t("identity.current")}>
-        <p className="settings-value">{identity?.name ?? t("identity.none")}</p>
-        <p className="settings-hint">{t("identity.explanation")}</p>
-      </Group>
-      <Group title={t("identity.backup")}>
-        <p className="settings-hint">{t("identity.exportHint")}</p>
-        <div className="settings-actions">
-          <button type="button" className="settings-button" onClick={() => void startExport()}>
-            {t("identity.export")}
-          </button>
-          <button type="button" className="settings-button" onClick={() => void startImport()}>
-            {t("identity.import")}
-          </button>
+      <div className="settings-group identity-manager">
+        <div className="identity-manager__head">
+          <h3 className="settings-group__title">{t("identity.listTitle")}</h3>
+          <div className="settings-actions">
+            <button type="button" className="settings-button" onClick={() => void startImport()}>
+              {t("identity.import")}
+            </button>
+            <button
+              type="button"
+              className="settings-button settings-button--primary"
+              onClick={() => {
+                setDialog({ kind: "create" });
+              }}
+            >
+              {t("identity.new")}
+            </button>
+          </div>
         </div>
-      </Group>
+        <p className="settings-hint">{t("identity.intro")}</p>
+        <ul className="identity-list" aria-label={t("identity.listLabel")}>
+          {identities.map((identity) => {
+            const used = serversFor(identity, servers);
+            return (
+              <li key={identity.id} className="identity-card">
+                <span
+                  className={`identity-card__avatar ${identityTone(identity.id)}`}
+                  aria-hidden="true"
+                >
+                  {identityInitial(identity.label)}
+                </span>
+                <div className="identity-card__body">
+                  <p className="identity-card__title">
+                    <strong>{identity.label}</strong>
+                    {identity.isDefault && (
+                      <span className="identity-card__badge">{t("identity.defaultBadge")}</span>
+                    )}
+                  </p>
+                  <p className="identity-card__meta">
+                    {t("identity.createdLine", {
+                      name: identity.name,
+                      date: created.format(new Date(identity.addedAt)),
+                    })}
+                  </p>
+                </div>
+                <div className="identity-card__actions">
+                  {!identity.isDefault && (
+                    <button
+                      type="button"
+                      className="settings-button"
+                      aria-label={t("identity.setDefaultFor", { identity: identity.label })}
+                      onClick={() => void setDefault(identity)}
+                    >
+                      {t("identity.setDefault")}
+                    </button>
+                  )}
+                  <button
+                    type="button"
+                    className="settings-button"
+                    aria-label={t("identity.detailsFor", { identity: identity.label })}
+                    onClick={() => {
+                      setDialog({ kind: "details", identity });
+                    }}
+                  >
+                    {t("identity.details")}
+                  </button>
+                  <button
+                    type="button"
+                    className="settings-button"
+                    aria-label={t("identity.renameFor", { identity: identity.label })}
+                    onClick={() => {
+                      setDialog({ kind: "rename", identity });
+                    }}
+                  >
+                    {t("identity.rename")}
+                  </button>
+                  <button
+                    type="button"
+                    className="settings-button"
+                    aria-label={t("identity.exportFor", { identity: identity.label })}
+                    onClick={() => void startExport(identity)}
+                  >
+                    {t("identity.export")}
+                  </button>
+                  <button
+                    type="button"
+                    className="settings-button settings-button--danger"
+                    aria-label={t("identity.deleteFor", { identity: identity.label })}
+                    onClick={() => {
+                      setDialog({ kind: "delete", identity });
+                    }}
+                  >
+                    {t("identity.delete")}
+                  </button>
+                </div>
+                <p className="identity-card__meta identity-card__fingerprint">
+                  {t("identity.fingerprintLine", {
+                    fingerprint: shortFingerprint(identity.certHash),
+                  })}
+                  {" · "}
+                  {used.length === 0
+                    ? t("identity.notUsed")
+                    : t("identity.usedBy", {
+                        servers: used.map((server) => server.label || server.address).join(", "),
+                      })}
+                </p>
+              </li>
+            );
+          })}
+        </ul>
+        <p className="identity-warning" role="note">
+          <WarningIcon className="identity-warning__icon" />
+          {t("identity.backupWarning")}
+        </p>
+      </div>
       <DefaultAvatarGroup settings={settings} update={update} />
       <NowPlayingGroup settings={settings} update={update} />
       <NowGamingGroup settings={settings} update={update} />
       <p role="status" className={status?.kind === "error" ? "settings-error" : "settings-success"}>
         {status?.text}
       </p>
+      {dialog?.kind === "create" && (
+        <CreateIdentityDialog
+          onCancel={() => {
+            setDialog(null);
+          }}
+          onDone={done}
+        />
+      )}
+      {dialog?.kind === "import" && (
+        <ImportIdentityDialog
+          path={dialog.path}
+          defaultLabel={dialog.defaultLabel}
+          onCancel={() => {
+            setDialog(null);
+          }}
+          onDone={(imported) => {
+            done();
+            setStatus({
+              kind: "success",
+              text: t("identity.imported", { name: imported.label }),
+            });
+          }}
+        />
+      )}
+      {dialog?.kind === "rename" && (
+        <RenameIdentityDialog
+          identity={dialog.identity}
+          onCancel={() => {
+            setDialog(null);
+          }}
+          onDone={done}
+        />
+      )}
+      {dialog?.kind === "details" && (
+        <IdentityDetailsDialog
+          identity={dialog.identity}
+          servers={servers}
+          onCancel={() => {
+            setDialog(null);
+          }}
+        />
+      )}
+      {dialog?.kind === "delete" && (
+        <DeleteIdentityDialog
+          identity={dialog.identity}
+          identities={identities}
+          servers={servers}
+          onBackup={(identity) => void startExport(identity)}
+          onCancel={() => {
+            setDialog(null);
+          }}
+          onDone={() => {
+            done();
+            setStatus({ kind: "success", text: t("identity.deleted") });
+          }}
+        />
+      )}
       {exportPath !== null && (
         <PasswordDialog
-          title={t("identity.exportTitle")}
+          title={t("identity.exportTitle", {
+            identity: identities.find((i) => i.id === exportPath.id)?.label ?? "",
+          })}
           message={t("identity.exportPasswordHint")}
           passwordLabel={t("identity.password")}
           confirmLabel={t("identity.exportConfirm")}
           confirmTwice
           describeError={describe}
           onSubmit={async (password) => {
-            await getApi().identityExport(exportPath, password);
+            await getApi().identityExport(exportPath.id, exportPath.path, password);
             setExportPath(null);
             setStatus({ kind: "success", text: t("identity.exported") });
           }}
           onCancel={() => {
             setExportPath(null);
-          }}
-        />
-      )}
-      {importPath !== null && (
-        <PasswordDialog
-          title={t("identity.importTitle")}
-          message={t("identity.importWarning")}
-          passwordLabel={t("identity.importPassword")}
-          confirmLabel={t("identity.importConfirm")}
-          danger
-          describeError={describe}
-          onSubmit={async (password) => {
-            const imported = await getApi().identityImport(
-              importPath,
-              password === "" ? null : password,
-            );
-            setImportPath(null);
-            setIdentity(imported);
-            setStatus({ kind: "success", text: t("identity.imported", { name: imported.name }) });
-          }}
-          onCancel={() => {
-            setImportPath(null);
           }}
         />
       )}

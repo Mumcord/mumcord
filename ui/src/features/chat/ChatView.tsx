@@ -14,6 +14,7 @@ import { PreferencesContext } from "../../app/preferences";
 import { useSelectedConversation, useServerState } from "../channels";
 import { PrivatePresence, useFriend } from "../friends";
 import { useAvatars } from "../members/useAvatars";
+import { IdentityBadge } from "../servers/IdentityBadge";
 import { ActivityBanners } from "./ActivityBanners";
 import {
   conversationKey,
@@ -215,6 +216,7 @@ function ConversationChat({ conversation, renderHeaderActions }: ConversationCha
           </span>
           {name}
         </h2>
+        <IdentityBadge className="chat-header__identity" />
         {!info.isChannel && (
           <PrivatePresence
             className="chat-header__presence"

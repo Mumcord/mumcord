@@ -138,6 +138,7 @@ const NEW_SERVER_FLAGS = {
   wasVoiceServerAtQuit: false,
   notificationsMuted: false,
   themeId: null,
+  identityId: null,
 } satisfies Partial<SavedServer>;
 /** The one channel password the mock accepts (FR-2.78). */
 export const MOCK_CHANNEL_PASSWORD = "secret";
@@ -606,7 +607,21 @@ export function createMockApi(options: MockOptions = {}): MockApi {
   let windowLook: WindowLook | null = null;
   const certPrompts = new Map<number, string | null>();
 
-  let identity: Identity | null = fresh ? null : { name: "Zoe", certHash: "selfhash" };
+  // Identities are added one by one; the first one is the default (issue #148).
+  let identities: Identity[] = fresh
+    ? []
+    : [
+        {
+          id: 1,
+          label: "Default",
+          name: "Zoe",
+          certHash: mockCertHash("zoe"),
+          addedAt: "2026-03-12T09:00:00.000Z",
+          isDefault: true,
+          serverIds: [],
+        },
+      ];
+  let nextIdentityId = identities.length + 1;
   let settings: Settings = { ...DEFAULT_SETTINGS, wizardCompleted: !fresh };
   // One official game plugin as found in a Mumble installation; no game runs in the mock.
   let gamePlugins: GamePlugin[] = [
@@ -859,8 +874,81 @@ export function createMockApi(options: MockOptions = {}): MockApi {
     return session()?.snapshot ?? fail("notConnected", "not connected");
   }
 
-  function requireIdentity(): Identity {
-    return identity ?? fail("notFound", "no identity yet");
+  /** Deterministic 40-character certificate hash, like the engine's SHA-1. */
+  function mockCertHash(seed: string): string {
+    let hash = "";
+    for (let index = 0; hash.length < 40; index += 1) {
+      hash += (seed + String(index))
+        .split("")
+        .reduce((sum, char) => sum + char.charCodeAt(0), 0)
+        .toString(16)
+        .padStart(2, "0");
+    }
+    return hash.slice(0, 40);
+  }
+
+  function orderedIdentities(): Identity[] {
+    return [...identities].sort(
+      (a, b) =>
+        Number(b.isDefault) - Number(a.isDefault) ||
+        a.addedAt.localeCompare(b.addedAt) ||
+        a.id - b.id,
+    );
+  }
+
+  function defaultIdentity(): Identity | null {
+    return identities.find((i) => i.isDefault) ?? null;
+  }
+
+  function requireIdentity(id?: number): Identity {
+    if (id === undefined) return defaultIdentity() ?? fail("notFound", "no identity yet");
+    return identities.find((i) => i.id === id) ?? fail("notFound", `no identity ${String(id)}`);
+  }
+
+  function addIdentity(label: string, name: string, certHash: string): Identity {
+    if (certHash !== "" && identities.some((i) => i.certHash === certHash))
+      fail("invalidInput", "this identity is already in the list");
+    const identity: Identity = {
+      id: nextIdentityId++,
+      label,
+      name,
+      certHash,
+      addedAt: new Date().toISOString(),
+      isDefault: identities.length === 0,
+      serverIds: [],
+    };
+    identities = [...identities, identity];
+    return identity;
+  }
+
+  /** Removes an identity from the mock; the default passes to the oldest remaining one. */
+  function removeIdentity(id: number): void {
+    const removed = requireIdentity(id);
+    if (identities.length <= 1) fail("invalidInput", "Mumcord needs at least one identity");
+    identities = identities.filter((i) => i.id !== id);
+    if (removed.isDefault) {
+      const next = orderedIdentities()[0];
+      if (next) identities = identities.map((i) => ({ ...i, isDefault: i.id === next.id }));
+    }
+    for (const server of servers) {
+      if (server.identityId === id) setIdentityOfServer(server.id, null);
+    }
+  }
+
+  /** Stores a server's identity and keeps the identities' `serverIds` in sync. */
+  function setIdentityOfServer(serverId: number, identityId: number | null): SavedServer {
+    const server = requireServer(serverId);
+    if (identityId !== null) requireIdentity(identityId);
+    const updated: SavedServer = { ...server, identityId };
+    servers = servers.map((s) => (s.id === serverId ? updated : s));
+    identities = identities.map((i) => ({
+      ...i,
+      serverIds:
+        i.id === identityId
+          ? [...new Set([...i.serverIds, serverId])]
+          : i.serverIds.filter((s) => s !== serverId),
+    }));
+    return updated;
   }
 
   function requireChannel(id: number): ChannelInfo {
@@ -1010,7 +1098,12 @@ export function createMockApi(options: MockOptions = {}): MockApi {
     rejoinOffers.delete(serverId);
     const offer = readOnly && offerPath ? findChannelByPath(channels, offerPath) : undefined;
     const self = {
-      ...person(SELF_SESSION, requireServer(serverId).username, target?.id ?? 0, "selfhash"),
+      ...person(
+        SELF_SESSION,
+        requireServer(serverId).username,
+        target?.id ?? 0,
+        mockCertHash("zoe"),
+      ),
       ...(readOnly ? { selfMute: true, selfDeaf: true } : joinedVoice()),
     };
     if (readOnly) muteBeforeDeaf = false;
@@ -1021,27 +1114,50 @@ export function createMockApi(options: MockOptions = {}): MockApi {
       avatarHash: "a1",
     };
     const carla = { ...person(4, "Carla", 2, "carlahash"), listeningChannelIds: [1] };
+    const users = stress
+      ? stressUsers(self, channels)
+      : demo
+        ? demoUsers(self)
+        : [self, anna, person(3, "Ben", 1, null), carla];
+    const saved = requireServer(serverId);
     const info: ServerInfo = {
       version: serverVersion,
       followSupported: !serverVersion.startsWith("1.3") && !serverVersion.startsWith("1.2"),
       welcomeText: demo
-        ? `Welcome to <b>${requireServer(serverId).label}</b>. Be kind and have fun!`
+        ? `Welcome to <b>${saved.label}</b>. Be kind and have fun!`
         : "Welcome to the <b>mock</b> server.",
       defaultChannelId: target?.id ?? null,
       maxMessageLength: 5000,
       maxImageMessageLength: 131072,
       allowHtml: true,
+      release: null,
+      os: "Linux",
+      maxBandwidth: 128_000,
+      maxUsers: 100,
+      recordingAllowed: false,
+      serverLabel: saved.label,
+      serverAddress: saved.address,
+      serverPort: saved.port,
+      tlsFingerprint:
+        "9F:2C:41:7A:B3:0E:D8:65:1C:AA:4B:F0:92:3D:77:E1:5A:08:C6:2F:B9:14:6E:D3:80:47:A5:1B:F2:69:CE:30",
+      usersOnline: users.length,
+      sessionId: SELF_SESSION,
+      registered: true,
+      currentChannelPermissions: 0x1 | 0x8 | 0x100,
+      mumcordUsers: users.filter((user) => user.isMumcord).length,
+      tlsTrusted: true,
+      tlsIssuer: "CN=Example Root CA, O=Example Org",
+      tlsValidFrom: "2026-03-01",
+      tlsValidUntil: "2027-03-01",
+      tlsCertificatePem:
+        "-----BEGIN CERTIFICATE-----\nMIIBszCCAVmgAwIBAgIUExampleCertificateForTheMockServer\n-----END CERTIFICATE-----\n",
     };
     return {
       serverId,
       selfSession: SELF_SESSION,
       info,
       channels,
-      users: stress
-        ? stressUsers(self, channels)
-        : demo
-          ? demoUsers(self)
-          : [self, anna, person(3, "Ben", 1, null), carla],
+      users,
       followedChannelIds: [],
       unread: [],
       readOnly,
@@ -1057,8 +1173,8 @@ export function createMockApi(options: MockOptions = {}): MockApi {
     });
     return [
       withAvatar(self),
-      withAvatar({ ...person(2, "Maya", 1, "mayahash"), hasComment: true }),
-      withAvatar(person(5, "Jonas", 1, "jonashash")),
+      withAvatar({ ...person(2, "Maya", 1, "mayahash"), hasComment: true, isMumcord: true }),
+      withAvatar({ ...person(5, "Jonas", 1, "jonashash"), isMumcord: true }),
       withAvatar(person(7, "Priya", 1, "priyahash")),
       { ...person(3, "Ben", 1, null), selfMute: true },
       { ...person(4, "Carla", 7, "carlahash"), listeningChannelIds: [1] },
@@ -1162,21 +1278,44 @@ export function createMockApi(options: MockOptions = {}): MockApi {
 
   const commands: EngineCommands = {
     // identity
-    identityGet: () => Promise.resolve(identity),
-    identityCreate: (name) => {
+    identityGet: () => Promise.resolve(defaultIdentity()),
+    identityList: () => Promise.resolve(orderedIdentities().map((i) => ({ ...i }))),
+    identityCreate: (name, label) => {
       if (name.trim() === "") fail("invalidInput", "name is required");
-      identity = { name: name.trim(), certHash: "selfhash" };
-      return Promise.resolve(identity);
+      const id = nextIdentityId;
+      return Promise.resolve(
+        addIdentity(label ?? name.trim(), name.trim(), mockCertHash(`created-${String(id)}`)),
+      );
     },
-    identityImport: (path) => {
+    identityImport: (path, _password, label) => {
       const file = path.split(/[\\/]/).pop() ?? "Imported";
-      identity = { name: file.replace(/\.p12$|\.pfx$/i, ""), certHash: "importedhash" };
-      return Promise.resolve(identity);
+      const name = file.replace(/\.p12$|\.pfx$/i, "");
+      const id = nextIdentityId;
+      return Promise.resolve(
+        addIdentity(label ?? name, name, mockCertHash(`imported-${String(id)}`)),
+      );
     },
-    identityExport: (_path, password) => {
-      requireIdentity();
+    identityRename: (id, label) => {
+      requireIdentity(id);
+      if (label.trim() === "") fail("invalidInput", "label is required");
+      let renamed = requireIdentity(id);
+      renamed = { ...renamed, label: label.trim() };
+      identities = identities.map((i) => (i.id === id ? renamed : i));
+      return Promise.resolve(renamed);
+    },
+    identityExport: (id, _path, password) => {
+      requireIdentity(id);
       if (password === "") fail("invalidInput", "a password is required");
       return Promise.resolve(null);
+    },
+    identityDelete: (id) => {
+      removeIdentity(id);
+      return Promise.resolve(null);
+    },
+    identitySetDefault: (id) => {
+      requireIdentity(id);
+      identities = identities.map((i) => ({ ...i, isDefault: i.id === id }));
+      return Promise.resolve(orderedIdentities().map((i) => ({ ...i })));
     },
 
     // servers
@@ -1206,6 +1345,10 @@ export function createMockApi(options: MockOptions = {}): MockApi {
     serverRemove: (id) => {
       requireServer(id);
       servers = servers.filter((s) => s.id !== id);
+      identities = identities.map((i) => ({
+        ...i,
+        serverIds: i.serverIds.filter((s) => s !== id),
+      }));
       history.delete(id);
       return Promise.resolve(null);
     },
@@ -1915,6 +2058,27 @@ export function createMockApi(options: MockOptions = {}): MockApi {
       requireServer(serverId);
       servers = servers.map((s) => (s.id === serverId ? { ...s, notificationsMuted: muted } : s));
       return Promise.resolve({ ...requireServer(serverId) });
+    },
+    serverSetIdentity: (serverId, identityId) =>
+      Promise.resolve({ ...setIdentityOfServer(serverId, identityId) }),
+    serverTestConnection: (input) => {
+      if (input.address.trim() === "") fail("invalidInput", "address is required");
+      if (input.port === 0) fail("invalidInput", "port is required");
+      if (input.username.trim() === "") fail("invalidInput", "username is required");
+      const server = input.serverId === null ? null : requireServer(input.serverId);
+      // The mock knows one reachable server; anything else is unreachable.
+      if (!["localhost", "127.0.0.1"].includes(input.address.trim()))
+        fail("serverUnreachable", "unreachable in the mock");
+      if (input.password.kind === "set" && input.password.value === "wrong")
+        fail("wrongPassword", "wrong password");
+      const certificate =
+        server === null ? "unknown" : certPrompts.has(server.id) ? "changed" : "trusted";
+      return Promise.resolve({
+        pingMs: 12,
+        version: "1.5.0",
+        fingerprint: MOCK_FINGERPRINT,
+        certificate,
+      });
     },
     serverSetTheme: (serverId, themeId) => {
       requireServer(serverId);

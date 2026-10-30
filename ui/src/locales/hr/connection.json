@@ -90,5 +90,7 @@
   },
   "endToEnd": "Ukupna latencija",
   "endToEndValue": "≈ {{value}} ms (procjena)",
-  "lowLatencyMode": "Način niske latencije"
+  "lowLatencyMode": "Način niske latencije",
+  "identity": "Identitet",
+  "identityValue": "{{label}} ({{name}}) · {{fingerprint}}"
 }
