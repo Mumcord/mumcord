@@ -4,6 +4,7 @@ import { LiveRegions } from "../a11y";
 import { TooltipLayer } from "../components/Tooltip";
 import { PersonMenuHost, ProfilePreviewHost } from "../features/members";
 import { NotificationsHost } from "../features/notifications";
+import { TraySync } from "../features/tray";
 import { AppShell } from "./AppShell";
 import {
   ChannelsMount,
@@ -61,6 +62,7 @@ function MainScreen() {
       {overlay === null && <ProfilePreviewHost />}
       {overlay === null && <PersonMenuHost />}
       <NotificationsHost overlayOpen={overlay !== null} onOpenChat={closeOverlay} />
+      <TraySync onOpenSettings={openSettings} />
       {devTools && <InspectorViewShare />}
       <WindowLookShare />
     </>

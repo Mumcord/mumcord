@@ -669,5 +669,17 @@
     "releasePage": "Stránka vydání",
     "entries": "Položky: {{count}}",
     "englishNote": "Seznam změn je psán anglicky."
+  },
+  "dnd": {
+    "title": "Nerušit",
+    "label": "Nerušit",
+    "description": "Žádné zvuky ani bannery oznámení na žádném serveru. Hlas a chat dál fungují a počty nepřečtených se dál počítají.",
+    "follow": "Řídit se systémovým režimem Nerušit",
+    "followDescription": "Zapne Nerušit, kdykoli je ve vašem prostředí zapnutý režim Nerušit nebo Soustředění.",
+    "detected": "Rozpoznáno",
+    "detectedOn": "{{desktop}} · Nerušit je zapnuto (systém). Změny se projeví ihned.",
+    "detectedOff": "{{desktop}} · Nerušit je vypnuto. Změny se projeví ihned.",
+    "unavailable": "Nedostupné",
+    "unavailableText": "Mumcord zde nemůže zjistit stav režimu Nerušit vašeho systému. Funguje jen jeho vlastní přepínač."
   }
 }

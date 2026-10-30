@@ -93,7 +93,10 @@
     "offerImages": "Ponujaj slike v polni velikosti",
     "offerImagesHint": "Drugi lahko naložijo tvoje izvirne slike",
     "loadImages": "Nalagaj slike v polni velikosti",
-    "loadImagesHint": "Pridobi izvirne slike od drugih"
+    "loadImagesHint": "Pridobi izvirne slike od drugih",
+    "dnd": "Ne moti",
+    "dndHint": "Utiša zvoke in pasice obvestil",
+    "dndSystemHint": "Vklopljeno prek načina Ne moti vašega namizja"
   },
   "voice": {
     "line": "Glas: {{channel}} · {{server}}",
@@ -129,5 +132,11 @@
     "fallbackOutput": "Izhodna naprava je bila odklopljena. Uporablja se sistemska privzeta naprava.",
     "volume": "Glasnost",
     "level": "Raven"
+  },
+  "dnd": {
+    "label": "Ne moti",
+    "manual": "ročno",
+    "system": "Ne moti (sistem)",
+    "systemHint": "Izklopite ga v nastavitvah obvestil vašega namizja."
   }
 }

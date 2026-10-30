@@ -672,5 +672,17 @@
     "releasePage": "Paġna tar-rilaxx",
     "entries": "Entrati: {{count}}",
     "englishNote": "Ir-reġistru tal-bidliet huwa miktub bl-Ingliż."
+  },
+  "dnd": {
+    "title": "Tiddisturbax",
+    "label": "Tiddisturbax",
+    "description": "L-ebda ħoss jew banner tan-notifiki fuq l-ebda server. Il-vuċi u ċ-chat jibqgħu jaħdmu, u l-għadd ta' dak li mhux moqri jibqa' jgħodd.",
+    "follow": "Segwi t-Tiddisturbax tas-sistema",
+    "followDescription": "Ixgħel Tiddisturbax kull meta t-Tiddisturbax jew il-modalità Focus tad-desktop tiegħek tkun mixgħula.",
+    "detected": "Misjub",
+    "detectedOn": "{{desktop}} · Tiddisturbax huwa mixgħul (sistema). It-tibdiliet jinqabdu mill-ewwel.",
+    "detectedOff": "{{desktop}} · Tiddisturbax huwa mitfi. It-tibdiliet jinqabdu mill-ewwel.",
+    "unavailable": "Mhux disponibbli",
+    "unavailableText": "Mumcord ma jistax jaqra l-istat ta' Tiddisturbax tas-sistema tiegħek hawn. Jaħdem biss is-swiċċ tiegħu stess."
   }
 }

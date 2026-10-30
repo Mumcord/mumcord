@@ -252,6 +252,18 @@ export const SETTINGS_INDEX: readonly SettingEntry[] = [
     terms: ["language.system"],
     literals: Object.values(ENDONYMS),
   },
+  {
+    section: "sounds",
+    group: "dnd.title",
+    control: "dnd.label",
+    terms: ["dnd.description"],
+  },
+  {
+    section: "sounds",
+    group: "dnd.title",
+    control: "dnd.follow",
+    terms: ["dnd.followDescription"],
+  },
   { section: "sounds", control: "sounds.joinLeave" },
   { section: "sounds", control: "sounds.voiceJoin" },
   { section: "sounds", control: "sounds.selfMute" },

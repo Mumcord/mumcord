@@ -93,7 +93,10 @@
     "offerImages": "Piedāvāt pilna izmēra attēlus",
     "offerImagesHint": "Ļauj citiem ielādēt tavus oriģinālos attēlus",
     "loadImages": "Ielādēt pilna izmēra attēlus",
-    "loadImagesHint": "Iegūt oriģinālos attēlus no citiem"
+    "loadImagesHint": "Iegūt oriģinālos attēlus no citiem",
+    "dnd": "Netraucēt",
+    "dndHint": "Izslēdz paziņojumu skaņas un reklāmkarogus",
+    "dndSystemHint": "Ieslēgts ar darbvirsmas režīmu “Netraucēt”"
   },
   "voice": {
     "line": "Balss: {{channel}} · {{server}}",
@@ -129,5 +132,11 @@
     "fallbackOutput": "Izvades ierīce atvienota. Tiek izmantots sistēmas noklusējums.",
     "volume": "Skaļums",
     "level": "Līmenis"
+  },
+  "dnd": {
+    "label": "Netraucēt",
+    "manual": "manuāli",
+    "system": "Netraucēt (sistēma)",
+    "systemHint": "Izslēdziet to darbvirsmas paziņojumu iestatījumos."
   }
 }

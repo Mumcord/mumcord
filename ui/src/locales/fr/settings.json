@@ -666,5 +666,17 @@
     "releasePage": "Page de la version",
     "entries": "Entrées : {{count}}",
     "englishNote": "Le journal des modifications est rédigé en anglais."
+  },
+  "dnd": {
+    "title": "Ne pas déranger",
+    "label": "Ne pas déranger",
+    "description": "Aucun son ni bannière de notification, sur tous les serveurs. La voix et le chat continuent de fonctionner et les compteurs de non-lus continuent de compter.",
+    "follow": "Suivre le mode Ne pas déranger du système",
+    "followDescription": "Active Ne pas déranger dès que le mode Ne pas déranger ou Concentration de votre bureau est activé.",
+    "detected": "Détecté",
+    "detectedOn": "{{desktop}} · Ne pas déranger est activé (système). Les changements sont pris en compte en direct.",
+    "detectedOff": "{{desktop}} · Ne pas déranger est désactivé. Les changements sont pris en compte en direct.",
+    "unavailable": "Indisponible",
+    "unavailableText": "Mumcord ne peut pas lire ici l'état Ne pas déranger de votre système. Seul son propre interrupteur fonctionne."
   }
 }

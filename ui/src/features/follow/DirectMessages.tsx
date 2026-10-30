@@ -20,22 +20,12 @@ import { createMessageAnnouncer } from "../chat/messageAnnouncer";
 import { PrivatePresence, useFriends } from "../friends";
 import { previewOnFocus, releasePreview, requestPreview } from "../members/profilePreviewStore";
 import { useServers as useSavedServers } from "../servers";
-import { collectEntries, type Entry } from "./directEntries";
+import { collectEntries, person, personName, type Entry } from "./directEntries";
 import { getFollowState, rememberDirectChat, useFollowStates } from "./followStore";
 import { UnreadBadge } from "./UnreadBadge";
 import "./follow.css";
 
 const SNIPPET_CHARS = 100;
-
-function person(users: ReadonlyMap<number, User>, c: Conversation): User | undefined {
-  if (c.kind === "private") return [...users.values()].find((u) => u.certHash === c.certHash);
-  if (c.kind === "privateSession") return users.get(c.session);
-  return undefined;
-}
-
-function personName(users: ReadonlyMap<number, User>, c: Conversation): string | null {
-  return person(users, c)?.name ?? null;
-}
 
 /** Open private chats ("Direct messages") with unread badges, plus new-message notifications. */
 export function DirectMessages() {

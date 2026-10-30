@@ -669,5 +669,17 @@
     "releasePage": "Stránka vydania",
     "entries": "Položky: {{count}}",
     "englishNote": "Zoznam zmien je napísaný po anglicky."
+  },
+  "dnd": {
+    "title": "Nerušiť",
+    "label": "Nerušiť",
+    "description": "Žiadne zvuky ani bannery upozornení na žiadnom serveri. Hlas a chat ďalej fungujú a počty neprečítaných sa ďalej počítajú.",
+    "follow": "Riadiť sa systémovým režimom Nerušiť",
+    "followDescription": "Zapne Nerušiť vždy, keď je vo vašom prostredí zapnutý režim Nerušiť alebo Sústredenie.",
+    "detected": "Rozpoznané",
+    "detectedOn": "{{desktop}} · Nerušiť je zapnuté (systém). Zmeny sa prejavia hneď.",
+    "detectedOff": "{{desktop}} · Nerušiť je vypnuté. Zmeny sa prejavia hneď.",
+    "unavailable": "Nedostupné",
+    "unavailableText": "Mumcord tu nedokáže zistiť stav režimu Nerušiť vášho systému. Funguje len jeho vlastný prepínač."
   }
 }

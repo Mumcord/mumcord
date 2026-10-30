@@ -669,5 +669,17 @@
     "releasePage": "Stran izdaje",
     "entries": "Vnosi: {{count}}",
     "englishNote": "Dnevnik sprememb je napisan v angleščini."
+  },
+  "dnd": {
+    "title": "Ne moti",
+    "label": "Ne moti",
+    "description": "Brez zvokov in pasic obvestil na nobenem strežniku. Glas in klepet delujeta naprej, števci neprebranih pa štejejo naprej.",
+    "follow": "Sledi sistemskemu načinu Ne moti",
+    "followDescription": "Vklopi Ne moti, kadar je na namizju vklopljen način Ne moti ali Fokus.",
+    "detected": "Zaznano",
+    "detectedOn": "{{desktop}} · Ne moti je vklopljeno (sistem). Spremembe se upoštevajo takoj.",
+    "detectedOff": "{{desktop}} · Ne moti je izklopljeno. Spremembe se upoštevajo takoj.",
+    "unavailable": "Ni na voljo",
+    "unavailableText": "Mumcord tukaj ne more prebrati stanja načina Ne moti vašega sistema. Deluje samo njegovo lastno stikalo."
   }
 }

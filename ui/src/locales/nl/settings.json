@@ -663,5 +663,17 @@
     "releasePage": "Releasepagina",
     "entries": "Items: {{count}}",
     "englishNote": "Het wijzigingslogboek is in het Engels."
+  },
+  "dnd": {
+    "title": "Niet storen",
+    "label": "Niet storen",
+    "description": "Geen meldingsgeluiden of -banners op welke server dan ook. Spraak en chat blijven werken en ongelezen-tellers blijven tellen.",
+    "follow": "Niet storen van het systeem volgen",
+    "followDescription": "Zet Niet storen aan zodra Niet storen of de focusmodus van je bureaublad aan staat.",
+    "detected": "Gedetecteerd",
+    "detectedOn": "{{desktop}} · Niet storen staat aan (systeem). Wijzigingen worden direct opgepikt.",
+    "detectedOff": "{{desktop}} · Niet storen staat uit. Wijzigingen worden direct opgepikt.",
+    "unavailable": "Niet beschikbaar",
+    "unavailableText": "Mumcord kan de Niet storen-status van je systeem hier niet uitlezen. Alleen de eigen schakelaar werkt."
   }
 }

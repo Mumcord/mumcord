@@ -1,11 +1,23 @@
 {
-  "show": "Pokaż Mumcord",
+  "show": "Otwórz Mumcord",
+  "settings": "Ustawienia…",
   "mute": "Wycisz mikrofon",
   "deafen": "Ogłusz",
+  "dnd": "Nie przeszkadzać",
+  "dndSystem": "Nie przeszkadzać (system)",
   "quit": "Zamknij aplikację",
   "disconnected": "Brak połączenia",
   "connecting": "Łączenie…",
+  "reconnecting": "Ponowne łączenie…",
   "connected": "Połączono",
+  "connectedIn": "Połączono · {channel}",
+  "serverState": "{server} – {state}",
   "talking": "Połączono – mówi",
-  "muted": "Połączono – wyciszony"
+  "muted": "Połączono – wyciszony",
+  "voiceMenu": "Serwer głosowy i kanał",
+  "voiceServer": "Serwer głosowy",
+  "channelsOf": "Kanały · {server}",
+  "moreChannels": "Więcej kanałów w Mumcordzie…",
+  "recentChats": "Ostatnie czaty",
+  "chatUnread": "{name} – {count} nieprzeczytane"
 }

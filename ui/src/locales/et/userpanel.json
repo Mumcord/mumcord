@@ -93,7 +93,10 @@
     "offerImages": "Paku täissuuruses pilte",
     "offerImagesHint": "Luba teistel laadida sinu originaalpilte",
     "loadImages": "Laadi täissuuruses pildid",
-    "loadImagesHint": "Too teistelt originaalpildid"
+    "loadImagesHint": "Too teistelt originaalpildid",
+    "dnd": "Ära sega",
+    "dndHint": "Vaigistab teavituste helid ja bännerid",
+    "dndSystemHint": "Sees töölaua režiimi „Ära sega“ kaudu"
   },
   "voice": {
     "line": "Hääl: {{channel}} · {{server}}",
@@ -129,5 +132,11 @@
     "fallbackOutput": "Väljundseade eemaldati. Kasutusel on süsteemi vaikeseade.",
     "volume": "Helitugevus",
     "level": "Tase"
+  },
+  "dnd": {
+    "label": "Ära sega",
+    "manual": "käsitsi",
+    "system": "Ära sega (süsteem)",
+    "systemHint": "Lülita see välja töölaua teavituste seadetes."
   }
 }

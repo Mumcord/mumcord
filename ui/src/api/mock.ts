@@ -4,11 +4,13 @@
  * Mumble protocol: no network, no audio.
  */
 import type {
+  DndState,
   InspectorView,
   LinkOutcome,
   MessageNotice,
   MumbleLinkStats,
   NotifyOutcome,
+  SystemDnd,
   WindowLook,
 } from "../bindings/commands";
 import { parseMumbleLink } from "../features/chat/mumbleLink";
@@ -109,6 +111,8 @@ export interface MockControls {
   offerRejoin(serverId: number, channelPath: string[]): void;
   /** Whether the main window counts as focused for message notifications (default true). */
   setWindowFocused(focused: boolean): void;
+  /** Simulates the desktop's own Do Not Disturb (FR-3.112). */
+  setSystemDnd(system: SystemDnd): void;
   /** System notifications `notifyMessage` "showed", oldest first. */
   desktopNotices(): readonly MessageNotice[];
   /** Sounds `notifyMessage` played for incoming messages, oldest first (QA.41). */
@@ -675,6 +679,17 @@ export function createMockApi(options: MockOptions = {}): MockApi {
   // own mute/deafen choice while joined for voice, which a join restores.
   let ownVoice = { mute: false, deaf: false };
   let windowFocused = true;
+  let dnd: DndState = {
+    manual: false,
+    followSystem: true,
+    system: { desktop: "KDE Plasma", on: false },
+  };
+  const dndActive = () => dnd.manual || (dnd.followSystem && dnd.system.on === true);
+  const setDnd = (next: DndState) => {
+    dnd = next;
+    emit("dndChanged", { state: dnd });
+    return Promise.resolve(dnd);
+  };
   let ingameOverlay: InGameOverlayState = {
     supported: true,
     explanationKey: null,
@@ -2040,6 +2055,7 @@ export function createMockApi(options: MockOptions = {}): MockApi {
 
     // message notifications: same decision as the engine (src-tauri/src/notifications.rs)
     notifyMessage: (notice) => {
+      if (dndActive()) return Promise.resolve("none");
       const mode = settings.notifications;
       // Same choice as the engine: the ping replaces the message sound (gating by chat omitted).
       if (notice.mention && settings.sounds.mention) messageSounds.push("mention");
@@ -2054,6 +2070,10 @@ export function createMockApi(options: MockOptions = {}): MockApi {
       return Promise.resolve(outcome);
     },
     notificationDismiss: () => Promise.resolve(null),
+    trayAttentionSet: () => Promise.resolve(null),
+    dndState: () => Promise.resolve(dnd),
+    dndSet: (on) => setDnd({ ...dnd, manual: on }),
+    dndSetFollowSystem: (on) => setDnd({ ...dnd, followSystem: on }),
 
     // Epic 2 contract, not built in the engine yet.
     serverSetAlwaysConnect: (serverId, enabled) => {
@@ -2350,6 +2370,9 @@ export function createMockApi(options: MockOptions = {}): MockApi {
     },
     setWindowFocused: (focused) => {
       windowFocused = focused;
+    },
+    setSystemDnd: (system) => {
+      void setDnd({ ...dnd, system });
     },
     desktopNotices: () => desktopNotices,
     messageSounds: () => messageSounds,
