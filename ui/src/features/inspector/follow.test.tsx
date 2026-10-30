@@ -103,6 +103,17 @@ describe("useFollowScroll", () => {
     expect(scroller.scrollTop).toBe(100);
   });
 
+  it("ignores the scroll event of its own scrolling, even if more packets arrived since", () => {
+    const { rerender } = render(<Harness packets={list(2)} />);
+    const scroller = screen.getByTestId("scroller");
+    geometry(scroller, 0);
+    rerender(<Harness packets={list(3)} />);
+    // More content was added after the scroll, so the position is no longer the bottom.
+    Object.defineProperty(scroller, "scrollHeight", { configurable: true, value: 1400 });
+    fireEvent.scroll(scroller);
+    expect(state()).toBe("true 0");
+  });
+
   it("resumes when the user scrolls back to the bottom", () => {
     const { rerender } = render(<Harness packets={list(2)} />);
     const scroller = screen.getByTestId("scroller");
