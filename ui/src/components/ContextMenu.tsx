@@ -12,6 +12,8 @@ export interface MenuPosition {
   /** Viewport position of the pointer (or of the item for keyboard use). */
   x: number;
   y: number;
+  /** Open upwards: `y` is then the top of the anchor and the menu's bottom edge sits on it. */
+  above?: boolean;
   /** Gets the focus back when the menu closes. */
   opener: HTMLElement | null;
 }
@@ -84,7 +86,8 @@ export function ContextMenu({ menu, label, items, onClose }: ContextMenuProps) {
     const element = ref.current;
     if (!element) return;
     const left = Math.max(EDGE, Math.min(menu.x, window.innerWidth - element.offsetWidth - EDGE));
-    const top = Math.max(EDGE, Math.min(menu.y, window.innerHeight - element.offsetHeight - EDGE));
+    const wanted = menu.above ? menu.y - element.offsetHeight : menu.y;
+    const top = Math.max(EDGE, Math.min(wanted, window.innerHeight - element.offsetHeight - EDGE));
     element.style.left = `${String(left)}px`;
     element.style.top = `${String(top)}px`;
     selection.current = saveSelection();
