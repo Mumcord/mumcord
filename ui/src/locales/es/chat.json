@@ -252,5 +252,26 @@
     "tooLarge": "El código es demasiado grande para descargarlo.",
     "fileType": "Archivo de código",
     "plainText": "Texto sin formato"
+  },
+  "mumbleCard": {
+    "addServer": "Añadir a servidores",
+    "channel": "Canal {{channel}}",
+    "copy": "Copiar enlace",
+    "copyLabel": "Copiar el enlace a {{server}}",
+    "figures": "Ping {{ping}} ms · {{users}} de {{max}} usuarios · servidor {{version}}",
+    "goToChannel": "Ir al canal",
+    "join": "Unirse",
+    "joinLabel": "Unirse a {{server}}",
+    "joined": "Unido",
+    "label": "Tarjeta del servidor {{server}}",
+    "privacyOff": "Los valores del servidor están desactivados en la configuración",
+    "querying": "Comprobando el servidor…",
+    "retry": "Volver a comprobar",
+    "retryLabel": "Volver a comprobar {{server}}",
+    "server": "{{server}}",
+    "unreachable": "No se puede acceder al servidor",
+    "warning_many": "{{count}} millones de enlaces de este mensaje muestran credenciales",
+    "warning_one": "{{count}} enlace de este mensaje muestra credenciales",
+    "warning_other": "{{count}} enlaces de este mensaje muestran credenciales"
   }
 }

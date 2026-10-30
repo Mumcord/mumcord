@@ -248,5 +248,25 @@
     "tooLarge": "Der Code ist zu groß zum Herunterladen.",
     "fileType": "Code-Datei",
     "plainText": "Klartext"
+  },
+  "mumbleCard": {
+    "addServer": "Zu Server hinzufügen",
+    "channel": "Kanal {{channel}}",
+    "copy": "Link kopieren",
+    "copyLabel": "Link zu {{server}} kopieren",
+    "figures": "Ping {{ping}} ms · {{users}} von {{max}} Benutzern · Server {{version}}",
+    "goToChannel": "Kanal öffnen",
+    "join": "Beitreten",
+    "joinLabel": "{{server}} beitreten",
+    "joined": "Beigetreten",
+    "label": "Serverkarte für {{server}}",
+    "privacyOff": "Serverwerte sind in den Einstellungen ausgeschaltet",
+    "querying": "Server wird geprüft…",
+    "retry": "Erneut prüfen",
+    "retryLabel": "Erneut prüfen {{server}}",
+    "server": "{{server}}",
+    "unreachable": "Server nicht erreichbar",
+    "warning_one": "{{count}} Link in dieser Nachricht zeigt Anmeldedaten",
+    "warning_other": "{{count}} Links in dieser Nachricht zeigen Anmeldedaten"
   }
 }

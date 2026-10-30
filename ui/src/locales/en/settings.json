@@ -121,7 +121,15 @@
     "ducking": "Lower video sound while people talk",
     "duckingHint": "The watch-party video and screen-share sound get quieter while someone in your voice channel talks.",
     "duckingLevel": "Lowered volume",
-    "duckingLevelValue": "{{percent}} %"
+    "duckingLevelValue": "{{percent}} %",
+    "lowLatency": "Low-latency mode",
+    "lowLatencyBeta": "Beta",
+    "lowLatencyHint": "For playing music together in real time",
+    "lowLatencyWarningTitle": "Trades robustness for speed",
+    "lowLatencyBandwidth": "Uses more bandwidth (10 ms packets).",
+    "lowLatencyWifi": "May glitch on Wi-Fi or a busy connection; use a cable if you can.",
+    "lowLatencyHeadphones": "Use headphones: echo cancellation is off (noise suppression and automatic volume are off too).",
+    "lowLatencyPtt": "Push-to-talk or a manual voice-activation threshold is recommended."
   },
   "voice": {
     "talkMode": "Talk mode",

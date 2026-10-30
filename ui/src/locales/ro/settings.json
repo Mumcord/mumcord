@@ -122,7 +122,15 @@
     "ducking": "Coboară sunetul videoclipurilor cât timp vorbește cineva",
     "duckingHint": "Sunetul videoclipului din vizionarea comună și al partajării ecranului scade cât timp vorbește cineva pe canalul tău vocal.",
     "duckingLevel": "Volum redus",
-    "duckingLevelValue": "{{percent}} %"
+    "duckingLevelValue": "{{percent}} %",
+    "lowLatency": "Mod cu latență redusă",
+    "lowLatencyBeta": "Beta",
+    "lowLatencyHint": "Pentru a cânta împreună în timp real",
+    "lowLatencyWarningTitle": "Sacrifică robustețea pentru viteză",
+    "lowLatencyBandwidth": "Folosește mai multă lățime de bandă (pachete de 10 ms).",
+    "lowLatencyWifi": "Poate avea întreruperi pe Wi-Fi sau pe o conexiune aglomerată; folosiți un cablu dacă puteți.",
+    "lowLatencyHeadphones": "Folosiți căști: anularea ecoului este oprită (la fel și suprimarea zgomotului și volumul automat).",
+    "lowLatencyPtt": "Se recomandă apăsarea pentru a vorbi sau un prag manual de activare vocală."
   },
   "voice": {
     "talkMode": "Mod de vorbire",

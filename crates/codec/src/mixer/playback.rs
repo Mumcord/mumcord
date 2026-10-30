@@ -25,7 +25,12 @@ const POLL_INTERVAL: Duration = Duration::from_millis(2);
 /// device) cannot make the thread drain the jitter buffers faster than real time.
 const MAX_FRAMES_PER_POLL: u32 = 4;
 const FRAME_DURATION: Duration = Duration::from_millis(10);
-/// Device queue below which a wake-up counts as late (5 ms).
+/// Smallest output queue target for low-latency mode (issue #156). A 10 ms frame is written
+/// whenever the queue drops below the target, so the queue holds between it and 10 ms more;
+/// the target must also cover one device period, which only the caller knows.
+pub const LOW_LATENCY_QUEUE_MS: u32 = 5;
+/// Device queue below which a wake-up counts as late (5 ms), or below a quarter of a smaller
+/// queue target (low-latency mode), which normally dips under 5 ms between two polls.
 const LATE_QUEUE_SAMPLES: usize = FRAME_SAMPLES / 2;
 
 /// Where mixed frames go; implemented by the device `FrameSink` of `mumcord-audio` and by test doubles.
@@ -179,6 +184,8 @@ enum Command {
     Forget(u32),
     DiscardListenerAudio(bool),
     MixInGain(f32),
+    LowLatency(bool),
+    QueueTarget(u32),
 }
 
 /// Producer side of the incoming packet queue. Single producer: route UDP
@@ -240,6 +247,7 @@ impl Playback {
         let worker = Worker {
             mixer,
             sink,
+            queue_target_ms: config.target_queue_ms,
             config,
             packets: packet_rx,
             commands: command_rx,
@@ -289,6 +297,18 @@ impl Playback {
     /// Silences audio received only via channel listening (default on).
     pub fn set_discard_listener_audio(&mut self, discard: bool) -> bool {
         self.send(Command::DiscardListenerAudio(discard))
+    }
+
+    /// Low-latency mode (issue #156): minimal jitter-buffer targets. Applies to streams that
+    /// are already playing.
+    pub fn set_low_latency(&mut self, on: bool) -> bool {
+        self.send(Command::LowLatency(on))
+    }
+
+    /// Changes the output queue target set by [`PlaybackConfig::target_queue_ms`], e.g. down to
+    /// [`LOW_LATENCY_QUEUE_MS`] plus a device period in low-latency mode.
+    pub fn set_queue_target_ms(&mut self, ms: u32) -> bool {
+        self.send(Command::QueueTarget(ms.max(1)))
     }
 
     /// Gain of the mix-in input (default 1.0).
@@ -344,6 +364,7 @@ struct Worker<S> {
     events: rtrb::Producer<TalkEvent>,
     mix_in: rtrb::Consumer<f32>,
     mix_in_gain: f32,
+    queue_target_ms: u32,
     shares: ShareSlots,
     counters: Arc<Counters>,
     stop: Arc<AtomicBool>,
@@ -353,7 +374,6 @@ impl<S: PlaybackSink> Worker<S> {
     fn run(mut self) {
         let _thread_setup = self.config.on_thread_start.take().map(|start| start());
         let epoch = Instant::now();
-        let target_samples = self.config.target_queue_ms as usize * SAMPLE_RATE as usize / 1000;
         let mut left = [0.0; FRAME_SAMPLES];
         let mut right = [0.0; FRAME_SAMPLES];
         let mut mono = [0.0; FRAME_SAMPLES];
@@ -369,6 +389,7 @@ impl<S: PlaybackSink> Worker<S> {
 
         while !self.stop.load(Ordering::Relaxed) {
             self.apply_commands();
+            let target_samples = self.queue_target_ms as usize * SAMPLE_RATE as usize / 1000;
             self.shares.update();
             while let Ok(packet) = self.packets.pop() {
                 let arrival_ms = millis_since(epoch, packet.arrival);
@@ -376,7 +397,7 @@ impl<S: PlaybackSink> Worker<S> {
             }
             if !sink_refusing {
                 let queued = self.sink.queued_samples();
-                if primed && audible && queued < LATE_QUEUE_SAMPLES {
+                if primed && audible && queued < LATE_QUEUE_SAMPLES.min(target_samples / 4) {
                     self.counters.late_wakeups.fetch_add(1, Ordering::Relaxed);
                 }
             }
@@ -442,6 +463,8 @@ impl<S: PlaybackSink> Worker<S> {
                     self.mixer.set_discard_listener_audio(discard);
                 }
                 Command::MixInGain(gain) => self.mix_in_gain = gain,
+                Command::LowLatency(on) => self.mixer.set_low_latency(on),
+                Command::QueueTarget(ms) => self.queue_target_ms = ms,
             }
         }
     }

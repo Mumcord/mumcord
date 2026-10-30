@@ -21,5 +21,20 @@
     "collapse": "Ikkollassa",
     "expand": "Espandi",
     "handle": "{{name}}: il-vleġeġ iċaqilqu, Shift+vleġeġ ibiddlu d-daqs"
+  },
+  "latency": {
+    "summary": "≈ {{total}} ms mill-ħalq sal-widna (stima)",
+    "otherNormal": "modalità normali ≈ {{value}} ms",
+    "otherLow": "modalità ta' latenza baxxa ≈ {{value}} ms",
+    "breakdown": "Qasma tal-latenza",
+    "input": "Buffer tal-mikrofonu",
+    "encode": "Frame Opus ta' {{ms}} ms + antiċipazzjoni tal-enkoder",
+    "network": "Netwerk (nofs il-ping)",
+    "notConnected": "mhux konness",
+    "jitter": "Buffer tal-jitter",
+    "processing": "Ipproċessar",
+    "output": "Buffer tal-ispiker",
+    "value": "{{value}} ms",
+    "total": "≈ {{value}} ms"
   }
 }

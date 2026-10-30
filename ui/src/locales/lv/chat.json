@@ -252,5 +252,26 @@
     "tooLarge": "Kods ir pārāk liels lejupielādei.",
     "fileType": "Koda fails",
     "plainText": "Vienkāršs teksts"
+  },
+  "mumbleCard": {
+    "addServer": "Pievienot serveriem",
+    "channel": "Kanāls {{channel}}",
+    "copy": "Kopēt saiti",
+    "copyLabel": "Kopēt saiti uz {{server}}",
+    "figures": "Ping {{ping}} ms · {{users}} no {{max}} lietotājiem · serveris {{version}}",
+    "goToChannel": "Pāriet uz kanālu",
+    "join": "Pievienoties",
+    "joinLabel": "Pievienoties {{server}}",
+    "joined": "Pievienots",
+    "label": "Servera karte {{server}}",
+    "privacyOff": "Servera vērtības iestatījumos ir izslēgtas",
+    "querying": "Pārbauda serveri…",
+    "retry": "Pārbaudīt vēlreiz",
+    "retryLabel": "Pārbaudīt vēlreiz {{server}}",
+    "server": "{{server}}",
+    "unreachable": "Serveris nav sasniedzams",
+    "warning_one": "{{count}} saite šajā ziņojam parāda pieteikšanās datus",
+    "warning_other": "{{count}} saites šajā ziņojam parāda pieteikšanās datus",
+    "warning_zero": "{{count}} saites šajā ziņojam parāda pieteikšanās datus"
   }
 }

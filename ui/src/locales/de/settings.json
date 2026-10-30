@@ -121,7 +121,15 @@
     "ducking": "Videoton leiser, während jemand spricht",
     "duckingHint": "Der Ton von Watch-Party-Video und Bildschirmfreigabe wird leiser, während jemand in deinem Sprachkanal spricht.",
     "duckingLevel": "Gesenkte Lautstärke",
-    "duckingLevelValue": "{{percent}} %"
+    "duckingLevelValue": "{{percent}} %",
+    "lowLatency": "Modus für niedrige Latenz",
+    "lowLatencyBeta": "Beta",
+    "lowLatencyHint": "Zum gemeinsamen Musizieren in Echtzeit",
+    "lowLatencyWarningTitle": "Tauscht Stabilität gegen Tempo",
+    "lowLatencyBandwidth": "Braucht mehr Bandbreite (10-ms-Pakete).",
+    "lowLatencyWifi": "Kann im WLAN oder bei ausgelasteter Verbindung knacken; nutze nach Möglichkeit ein Kabel.",
+    "lowLatencyHeadphones": "Nutze Kopfhörer: Die Echounterdrückung ist aus (Rauschunterdrückung und automatische Lautstärke ebenfalls).",
+    "lowLatencyPtt": "Push-to-Talk oder eine manuelle Schwelle für die Sprachaktivierung wird empfohlen."
   },
   "voice": {
     "talkMode": "Sprechmodus",

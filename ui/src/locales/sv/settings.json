@@ -121,7 +121,15 @@
     "ducking": "Sänk videoljudet medan någon pratar",
     "duckingHint": "Ljudet från watch party-videon och skärmdelningen blir tystare medan någon i din röstkanal pratar.",
     "duckingLevel": "Sänkt volym",
-    "duckingLevelValue": "{{percent}} %"
+    "duckingLevelValue": "{{percent}} %",
+    "lowLatency": "Läge för låg latens",
+    "lowLatencyBeta": "Beta",
+    "lowLatencyHint": "För att spela musik tillsammans i realtid",
+    "lowLatencyWarningTitle": "Byter stabilitet mot snabbhet",
+    "lowLatencyBandwidth": "Använder mer bandbredd (10 ms-paket).",
+    "lowLatencyWifi": "Kan hacka på wifi eller en hårt belastad anslutning; använd kabel om du kan.",
+    "lowLatencyHeadphones": "Använd hörlurar: ekoreducering är avstängd (brusreducering och automatisk volym är också avstängda).",
+    "lowLatencyPtt": "Tryck-och-prata eller en manuell tröskel för röstaktivering rekommenderas."
   },
   "voice": {
     "talkMode": "Pratläge",

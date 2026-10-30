@@ -36,6 +36,8 @@ import {
 } from "./mentions";
 import { MentionPicker } from "./MentionPicker";
 import type { ReplyQuote } from "./reply";
+import { credentialLinks as countCredentials, mumbleLinks } from "./mumbleLink";
+import { MumbleLinkCard } from "./MumbleLinkCard";
 import { useComposer } from "./useComposer";
 
 export interface ComposerProps {
@@ -125,6 +127,9 @@ export function Composer({
 }: ComposerProps) {
   const { t } = useTranslation("chat");
   const composer = useComposer(target, limits, reply, onCancelReply);
+  // A `mumble://` link the user typed is shown as its card before sending (issue #175).
+  const previewLinks = useMemo(() => mumbleLinks(composer.text), [composer.text]);
+  const credentialLinks = useMemo(() => countCredentials(previewLinks), [previewLinks]);
   const fileInput = useRef<HTMLInputElement>(null);
   const formRef = useRef<HTMLFormElement>(null);
   const input = useRef<HTMLTextAreaElement>(null);
@@ -397,6 +402,19 @@ export function Composer({
                 <Icon d={CANCEL_ICON} />
               </button>
             ) : null}
+          </div>
+        ) : null}
+        {previewLinks.length > 0 ? (
+          <div className="chat-composer__links">
+            {previewLinks.map((url) => (
+              <MumbleLinkCard
+                key={url}
+                url={url}
+                credentialLinks={credentialLinks}
+                preview
+                tabIndex={0}
+              />
+            ))}
           </div>
         ) : null}
         <AttachmentTray items={composer.attachments} onRemove={composer.removeAttachment} />

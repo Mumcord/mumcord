@@ -7,15 +7,8 @@ import { estimateBandwidth } from "./bandwidth";
 import { InfoTip } from "../../components/InfoTip";
 import { useServers } from "../servers";
 import { AudioRatingBadge, AudioRatingReason } from "./AudioHealthRating";
+import { LatencyBreakdown, LatencySummary } from "../settings/sections/LatencyEstimate";
 import { useConnectionStats } from "./useConnectionStats";
-
-/**
- * Whether the engine has a low-latency setting yet (issue #156). Until it does, the row is shown
- * disabled so the panel layout is final.
- */
-function lowLatencyAvailable(): boolean {
-  return false;
-}
 
 /**
  * "Voice quality" quick panel: the bitrate cap and Music quality from Settings > Audio (the same
@@ -34,17 +27,40 @@ export function ConnectionQuickPanel({ onOpenVoiceSettings }: { onOpenVoiceSetti
   const saved = servers.servers.find((server) => server.id === link);
   const serverName = saved ? saved.label || saved.address : "";
   const stats = state.status === "ready" ? state.stats : null;
-  const bandwidth = stats ? estimateBandwidth(stats) : null;
+  const lowLatency = settings?.lowLatency ?? false;
+  const bandwidth = stats ? estimateBandwidth(stats, lowLatency) : null;
   const limit = stats?.serverMaxBandwidthKbps ?? null;
-  const lowLatency = lowLatencyAvailable();
   const withLowLatency = bandwidth ? bandwidth.kbps + bandwidth.lowLatencyExtraKbps : 0;
-  const bandwidthHintKey =
-    limit === null
-      ? "quick.bandwidthHintNoLimit"
-      : withLowLatency <= limit
-        ? "quick.bandwidthHintWithin"
-        : "quick.bandwidthHintOver";
-  const bandwidthHint = t(bandwidthHintKey, { value: Math.round(withLowLatency) });
+  const bandwidthHint = lowLatency
+    ? t(
+        limit === null
+          ? "quick.bandwidthLowLatencyNoLimit"
+          : (bandwidth?.kbps ?? 0) <= limit
+            ? "quick.bandwidthLowLatencyWithin"
+            : "quick.bandwidthLowLatencyOver",
+        { value: Math.round(bandwidth?.lowLatencyExtraKbps ?? 0) },
+      )
+    : t(
+        limit === null
+          ? "quick.bandwidthHintNoLimit"
+          : withLowLatency <= limit
+            ? "quick.bandwidthHintWithin"
+            : "quick.bandwidthHintOver",
+        { value: Math.round(withLowLatency) },
+      );
+  const warning = [
+    bandwidth
+      ? t("quick.warningBandwidth", {
+          on: Math.round(bandwidth.kbps),
+          off: Math.round(bandwidth.kbps - bandwidth.lowLatencyExtraKbps),
+        })
+      : null,
+    t("quick.warningWifi"),
+    t("quick.warningHeadphones"),
+    t("quick.warningPtt"),
+  ]
+    .filter((line) => line !== null)
+    .join(" ");
 
   return (
     <div className="connection-quick">
@@ -99,24 +115,39 @@ export function ConnectionQuickPanel({ onOpenVoiceSettings }: { onOpenVoiceSetti
         <section className="connection-quick__section">
           <Switch
             label={ts("audio.musicQuality")}
-            tip={{ label: more(ts("audio.musicQuality")), text: ts("audio.musicQualityHint") }}
-            checked={settings.musicQuality}
+            tip={{
+              label: more(ts("audio.musicQuality")),
+              text: lowLatency ? t("quick.musicIncluded") : ts("audio.musicQualityHint"),
+            }}
+            checked={lowLatency || settings.musicQuality}
+            disabled={lowLatency}
             onChange={(musicQuality) => {
               update({ musicQuality });
             }}
           />
         </section>
       ) : null}
-      <section className="connection-quick__section">
-        <Switch
-          label={t("quick.lowLatency")}
-          badge={lowLatency ? t("quick.beta") : t("quick.lowLatencyComingSoon")}
-          tip={{ label: more(t("quick.lowLatency")), text: t("quick.lowLatencyHint") }}
-          checked={false}
-          disabled={!lowLatency}
-          onChange={() => undefined}
-        />
-      </section>
+      {settings ? (
+        <section className="connection-quick__section">
+          <Switch
+            label={t("quick.lowLatency")}
+            badge={t("quick.beta")}
+            tip={{ label: more(t("quick.lowLatency")), text: t("quick.lowLatencyHint") }}
+            checked={settings.lowLatency}
+            onChange={(on) => {
+              update({ lowLatency: on });
+            }}
+          />
+          {stats?.latency ? <LatencySummary estimate={stats.latency} /> : null}
+          {lowLatency && stats?.latency ? <LatencyBreakdown estimate={stats.latency} /> : null}
+          {lowLatency ? (
+            <p className="connection-quick__warning">
+              {ts("audio.lowLatencyWarningTitle")}
+              <InfoTip label={more(ts("audio.lowLatencyWarningTitle"))} text={warning} />
+            </p>
+          ) : null}
+        </section>
+      ) : null}
       {bandwidth ? (
         <section className="connection-quick__section connection-quick__bandwidth">
           <p className="connection-quick__effective">

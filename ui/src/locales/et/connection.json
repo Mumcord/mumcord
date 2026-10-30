@@ -64,8 +64,7 @@
     "title": "Hääle kvaliteet",
     "status": "Ping {{latency}}, kadu {{loss}}",
     "lowLatency": "Väikese viivitusega režiim",
-    "lowLatencyHint": "Väikseimad paketid ja puhvrid koos muusika tegemiseks. Rohkem ribalaiust, vähem töökindel.",
-    "lowLatencyComingSoon": "Tulekul",
+    "lowLatencyHint": "Koos muusika tegemiseks reaalajas. Töötab kõige paremini nupuvajutusega rääkimisel.",
     "voiceSettings": "Hääleseaded…",
     "applies": "Rakendub kohe, salvestub nagu Seaded → Heli",
     "keys": "Esc sulgeb · ↑↓ liigub · ← → muudab",
@@ -78,8 +77,19 @@
     "beta": "Beta",
     "moreInfo": "Rohkem teavet: {{topic}}",
     "effectiveShort": "Praegu saadetakse",
-    "effectiveTip": "Praegu saadetav bitikiirus pärast paketikaoga kohandamist."
+    "effectiveTip": "Praegu saadetav bitikiirus pärast paketikaoga kohandamist.",
+    "musicIncluded": "Sisaldub, kui väikese viivitusega režiim on sees: müravaigistus ja automaatne helitugevus on väljas ning kodek töötab väikese viivitusega muusikaseadistuses.",
+    "warningBandwidth": "Kasutab rohkem ribalaiust: ≈ {{on}} kbit/s asemel ≈ {{off}}.",
+    "warningWifi": "Wi-Fi-ühendusel või hõivatud võrgus võib katkeda.",
+    "warningHeadphones": "Kasuta kõrvaklappe: kaja summutamine on välja lülitatud.",
+    "warningPtt": "Töötab kõige paremini nupuvajutusega rääkimisel.",
+    "bandwidthLowLatencyWithin": "10 ms paketid lisavad päiste lisakoormust; piirangu sees. Lülita režiim välja, et säästa ≈ {{value}} kbit/s.",
+    "bandwidthLowLatencyOver": "10 ms paketid lisavad päiste lisakoormust; üle piirangu. Lülita režiim välja, et säästa ≈ {{value}} kbit/s.",
+    "bandwidthLowLatencyNoLimit": "10 ms paketid lisavad päiste lisakoormust. Lülita režiim välja, et säästa ≈ {{value}} kbit/s."
   },
+  "endToEnd": "Kogu viivitus",
+  "endToEndValue": "≈ {{value}} ms (hinnang)",
+  "lowLatencyMode": "Väikese viivitusega režiim",
   "identity": "Identiteet",
   "identityValue": "{{label}} ({{name}}) · {{fingerprint}}"
 }

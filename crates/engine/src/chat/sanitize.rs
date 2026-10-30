@@ -1,5 +1,6 @@
 //! Strict HTML policy for everything a server or another person sends (FR-1.29, spec §9):
-//! basic formatting, links to http(s)/mailto, and inline images only as embedded
+//! basic formatting, links to http(s)/mailto and to `mumble://` servers (whose card the UI
+//! builds, issue #175), and inline images only as embedded
 //! `data:image/(png|jpeg|gif|webp);base64` URLs, so nothing ever loads from the network.
 //!
 //! Chat messages additionally keep absolute http(s) image sources ([`sanitize_message_html`]):
@@ -84,7 +85,8 @@ fn policy(message: bool) -> Builder<'static> {
     builder
         .tags(TAGS.iter().copied().collect())
         .tag_attributes(tag_attributes)
-        .url_schemes(HashSet::from(["http", "https", "mailto", "data"]))
+        // `mumble` stays a link so the chat can show it as the server card (issue #175).
+        .url_schemes(HashSet::from(["http", "https", "mailto", "data", "mumble"]))
         .url_relative(UrlRelative::Deny)
         .link_rel(Some("noopener noreferrer nofollow"))
         .clean_content_tags(HashSet::from(["script", "style"]))
@@ -100,6 +102,16 @@ fn policy(message: bool) -> Builder<'static> {
                     is_code_language(value).then_some(Cow::Borrowed(value))
                 }
                 ("a", "href") if value.trim_start().to_ascii_lowercase().starts_with("data:") => {
+                    None
+                }
+                ("a", "href") if is_mumble_link(value) => Some(Cow::Borrowed(value)),
+                // A mumble link without a server address is not a card, so it is not a link.
+                ("a", "href")
+                    if value
+                        .trim_start()
+                        .to_ascii_lowercase()
+                        .starts_with("mumble:") =>
+                {
                     None
                 }
                 _ => Some(Cow::Borrowed(value)),
@@ -129,6 +141,11 @@ fn is_code_language(value: &str) -> bool {
         && chars.all(|c| c.is_ascii_lowercase() || c.is_ascii_digit() || "+#._-".contains(c))
 }
 
+/// A `mumble://` link needs a server address before the chat can show its card (issue #175).
+fn is_mumble_link(value: &str) -> bool {
+    reqwest::Url::parse(value.trim()).is_ok_and(|u| u.scheme() == "mumble" && u.host().is_some())
+}
+
 fn is_external_image(src: &str) -> bool {
     reqwest::Url::parse(src.trim())
         .is_ok_and(|u| matches!(u.scheme(), "http" | "https") && u.host().is_some())
@@ -154,6 +171,15 @@ mod tests {
     use super::*;
 
     const PNG: &str = "data:image/png;base64,iVBORw0KGgo=";
+
+    #[test]
+    fn keeps_mumble_links_only_with_a_server_address() {
+        let clean =
+            sanitize_html("<a href=\"mumble://voice.example.org:64739/Raid/Officers\">join</a>");
+        assert!(clean.contains("href=\"mumble://voice.example.org:64739/Raid/Officers\""));
+        // Without a server there is nothing the card could show.
+        assert!(!sanitize_html("<a href=\"mumble:///Channel\">join</a>").contains("mumble://"));
+    }
 
     #[test]
     fn keeps_basic_formatting_links_and_embedded_images() {

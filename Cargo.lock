@@ -3590,6 +3590,7 @@ dependencies = [
  "objc2-foundation",
  "objc2-screen-capture-kit",
  "pipewire",
+ "prost",
  "rcgen",
  "reqwest",
  "rustls",

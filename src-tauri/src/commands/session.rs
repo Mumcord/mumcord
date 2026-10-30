@@ -127,6 +127,52 @@ pub struct ConnectionStats {
     pub packets_received: u32,
     /// Health of the local audio path; `null` on a server without voice.
     pub audio: Option<AudioHealth>,
+    /// Estimated mouth-to-ear latency; `null` on a server without voice.
+    pub latency: Option<LatencyEstimate>,
+}
+
+/// Estimated mouth-to-ear latency and its parts (issue #156), in microseconds (integers, as
+/// specta exports floats as nullable). Assumes the other side runs in the same mode.
+#[derive(Serialize, Deserialize, Clone, Copy, Debug, PartialEq, Eq, Type)]
+#[serde(rename_all = "camelCase")]
+pub struct LatencyEstimate {
+    pub low_latency: bool,
+    /// Audio per packet: 10 ms in low-latency mode, 20 ms otherwise.
+    pub packet_ms: u32,
+    /// Microphone device buffer.
+    pub input_buffer_us: u32,
+    /// One packet plus the encoder look-ahead.
+    pub encode_us: u32,
+    /// Half the ping to the server; `null` until measured (not connected, TCP tunnel).
+    pub network_us: Option<u32>,
+    /// Jitter-buffer target for a clean stream.
+    pub jitter_us: u32,
+    /// Measured processing: DSP and encoding out, decoding and mixing in.
+    pub processing_us: u32,
+    /// Output queue and speaker device buffer.
+    pub output_buffer_us: u32,
+    /// Sum of the parts (without the network while it is unknown).
+    pub total_us: u32,
+    /// The same estimate for the other mode.
+    pub other_mode_total_us: u32,
+}
+
+impl From<mumcord_engine::LatencyEstimateView> for LatencyEstimate {
+    fn from(v: mumcord_engine::LatencyEstimateView) -> Self {
+        let us = |ms: f32| (ms.max(0.0) * 1000.0).round() as u32;
+        Self {
+            low_latency: v.low_latency,
+            packet_ms: v.packet_ms,
+            input_buffer_us: us(v.input_buffer_ms),
+            encode_us: us(v.encode_ms),
+            network_us: v.network_ms.map(us),
+            jitter_us: us(v.jitter_ms),
+            processing_us: us(v.processing_ms),
+            output_buffer_us: us(v.output_buffer_ms),
+            total_us: us(v.total_ms),
+            other_mode_total_us: us(v.other_mode_total_ms),
+        }
+    }
 }
 
 /// Overall audio rating over the recent window (issue #152).
@@ -417,6 +463,7 @@ impl From<ConnectionStatsView> for ConnectionStats {
             packets_sent: count(v.packets_sent),
             packets_received: count(v.packets_received),
             audio: v.audio.map(AudioHealth::from),
+            latency: v.latency.map(LatencyEstimate::from),
         }
     }
 }
@@ -499,6 +546,14 @@ pub fn connection_stats(
     Ok(engine
         .connection_stats(to_engine_server_id(server_id))
         .map(ConnectionStats::from))
+}
+
+/// Estimated mouth-to-ear latency for Settings → Audio (issue #156); `null` while no audio
+/// device runs. Includes the voice server's ping while connected.
+#[tauri::command]
+#[specta::specta]
+pub fn latency_estimate(engine: State<'_, Engine>) -> ApiResult<Option<LatencyEstimate>> {
+    Ok(engine.latency_estimate().map(LatencyEstimate::from))
 }
 
 /// Answers a `CertTrustRequired`; trusting is remembered for the server.

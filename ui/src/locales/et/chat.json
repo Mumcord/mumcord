@@ -248,5 +248,25 @@
     "tooLarge": "Kood on allalaadimiseks liiga suur.",
     "fileType": "Koodifail",
     "plainText": "Lihttekst"
+  },
+  "mumbleCard": {
+    "addServer": "Lisa serveritesse",
+    "channel": "Kanal {{channel}}",
+    "copy": "Kopeeri link",
+    "copyLabel": "Kopeeri link serverile {{server}}",
+    "figures": "Ping {{ping}} ms · {{users}}/{{max}} kasutajat · server {{version}}",
+    "goToChannel": "Mine kanalisse",
+    "join": "Liitu",
+    "joinLabel": "Liitu serveriga {{server}}",
+    "joined": "Liutud",
+    "label": "Serveri kaart {{server}}",
+    "privacyOff": "Serveri väärtused on seadetes välja lülitatud",
+    "querying": "Serverit kontrollitakse…",
+    "retry": "Kontrolli uuesti",
+    "retryLabel": "Kontrolli uuesti {{server}}",
+    "server": "{{server}}",
+    "unreachable": "Server pole kättesaadav",
+    "warning_one": "{{count}} link selles sõnas näitab sisselogimisandmed",
+    "warning_other": "{{count}} link selles sõnas näitavad sisselogimisandmed"
   }
 }
