@@ -55,7 +55,8 @@
     "passwordRequired": "Unesi lozinku za zaštitu datoteke sigurnosne kopije.",
     "exported": "Sigurnosna kopija identiteta spremljena.",
     "confirm": "Registriraj se",
-    "done": "Registriran na ovom poslužitelju"
+    "done": "Registriran na ovom poslužitelju",
+    "identity": "Registrirano ime pripada identitetu {{identity}}."
   },
   "errors": {
     "tooLarge": "Ovo je preveliko za poslužitelj. Odaberi manju sliku ili napiši kraći tekst.",

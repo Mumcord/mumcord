@@ -57,11 +57,17 @@ fn specta_builder() -> Builder<tauri::Wry> {
         .disable_serde_phases()
         .commands(collect_commands![
             identity::identity_get,
+            identity::identity_list,
             identity::identity_create,
             identity::identity_import,
+            identity::identity_rename,
             identity::identity_export,
+            identity::identity_delete,
+            identity::identity_set_default,
+            identity::server_set_identity,
             servers::servers_list,
             servers::server_add,
+            servers::server_test_connection,
             servers::server_update,
             servers::server_remove,
             servers::servers_reorder,
@@ -246,6 +252,7 @@ fn specta_builder() -> Builder<tauri::Wry> {
             audio::MicTestPhaseChanged,
             app::CloseRequested,
             profile::DefaultAvatarSkipped,
+            identity::ServerIdentityMissing,
             notify::NotificationActivated,
             commands::dnd::DndChanged,
             commands::now_playing::NowPlayingChanged,
@@ -616,6 +623,10 @@ fn emit_engine_event(
         }
         .emit(app),
         EngineEvent::DefaultAvatarSkipped { server_id } => profile::DefaultAvatarSkipped {
+            server_id: commands::types::to_api_server_id(server_id),
+        }
+        .emit(app),
+        EngineEvent::ServerIdentityMissing { server_id } => identity::ServerIdentityMissing {
             server_id: commands::types::to_api_server_id(server_id),
         }
         .emit(app),

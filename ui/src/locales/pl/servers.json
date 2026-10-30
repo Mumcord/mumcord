@@ -37,7 +37,8 @@
     "alwaysConnect": "Zawsze łącz przy starcie",
     "muteNotifications": "Wycisz powiadomienia",
     "theme": "Motyw…",
-    "showWelcome": "Pokaż wiadomość powitalną"
+    "showWelcome": "Pokaż wiadomość powitalną",
+    "identity": "Tożsamość…"
   },
   "theme": {
     "title": "Motyw dla {{server}}",
@@ -67,7 +68,10 @@
       "port": "Podaj port od 1 do 65535. Większość serwerów używa 64738.",
       "username": "Podaj nazwę, której chcesz używać na tym serwerze.",
       "link": "Nie można odczytać tego linku mumble://. Sprawdź, czy został skopiowany w całości.",
-      "invalid": "Dane serwera są nieprawidłowe. Sprawdź adres i port."
+      "invalid": "Dane serwera są nieprawidłowe. Sprawdź adres i port.",
+      "addressInvalid": "To nie wygląda na adres serwera.",
+      "portEmpty": "Podaj port.",
+      "labelLong": "Nazwa w pasku serwerów może mieć maksymalnie 64 znaki."
     },
     "alwaysConnect": "Zawsze łącz przy starcie",
     "alwaysConnectHint": "Mumcord przy starcie łączy ten serwer w trybie tylko do odczytu.",
@@ -82,7 +86,29 @@
     "renameDone": "Gotowe",
     "removeChannelPassword": "Usuń {{name}}",
     "remove": "Usuń",
-    "channelPasswordsHint": "Zapisywane, gdy chroniony kanał je przyjął. O usunięte zapytamy ponownie przy następnym wejściu."
+    "channelPasswordsHint": "Zapisywane, gdy chroniony kanał je przyjął. O usunięte zapytamy ponownie przy następnym wejściu.",
+    "tabsLabel": "Ustawienia serwera",
+    "tabs": {
+      "connection": "Połączenie",
+      "identity": "Tożsamość",
+      "passwords": "Hasła",
+      "behaviour": "Zachowanie",
+      "needsAttention": "{{tab}}: wymaga uwagi"
+    },
+    "test": {
+      "button": "Testuj połączenie",
+      "busy": "Testowanie…",
+      "running": "Testowanie połączenia…",
+      "result": "{{address}} · Ping: {{ms}} ms · Wersja serwera: {{version}}",
+      "certTrusted": "Certyfikat jest już zaufany",
+      "certUnknown": "Certyfikat nie jest jeszcze zaufany – zapytamy przy łączeniu",
+      "certChanged": "Certyfikat się zmienił – sprawdź go przed połączeniem",
+      "wrongPassword": "Serwer odrzucił hasło.",
+      "nameInUse": "Ta nazwa jest już używana na tym serwerze.",
+      "unreachable": "Nie można połączyć się z serwerem.",
+      "invalid": "Dane są nieprawidłowe.",
+      "failed": "Test nie powiódł się. Spróbuj ponownie."
+    }
   },
   "errors": {
     "serverUnreachable": "Nie można połączyć się z serwerem. Sprawdź adres i port oraz czy masz dostęp do internetu.",
@@ -145,7 +171,8 @@
       "disconnect": "Rozłączanie nie powiodło się. Spróbuj ponownie.",
       "alwaysConnect": "Nie udało się zapisać „Zawsze łącz przy starcie”. Spróbuj ponownie.",
       "notifications": "Nie udało się zapisać ustawienia powiadomień. Spróbuj ponownie.",
-      "savePassword": "Nie udało się zapisać nowego hasła. Edytuj serwer, aby je zapisać."
+      "savePassword": "Nie udało się zapisać nowego hasła. Edytuj serwer, aby je zapisać.",
+      "identity": "Nie udało się zapisać tożsamości. Spróbuj ponownie."
     }
   },
   "empty": {
@@ -259,5 +286,24 @@
     "permissionSelfRegister": "Register self",
     "permissionResetUserContent": "Reset user content",
     "characters": "{{value}} characters"
+  },
+  "identity": {
+    "field": "Tożsamość dla tego serwera",
+    "useDefault": "Użyj domyślnej ({{identity}})",
+    "option": "{{label}} ({{name}})",
+    "hint": "Zmiana tożsamości ponownie połączy ten serwer. Zarejestrowana nazwa i uprawnienia tutaj należą do wybranej tożsamości.",
+    "manage": "Zarządzaj tożsamościami…",
+    "title": "Tożsamość dla {{server}}",
+    "intro": "Wybierz tożsamość, której Mumcord używa do połączenia tutaj. „Użyj domyślnej” podąża za tożsamością domyślną.",
+    "save": "Zapisz",
+    "saveAndReconnect": "Zapisz i połącz ponownie",
+    "reconnectTitle": "Połączyć ponownie {{server}}?",
+    "reconnectMessage": "Połączyć teraz ten serwer z {{identity}}? Pozostałe serwery pozostaną połączone.",
+    "reconnect": "Połącz ponownie",
+    "later": "Później",
+    "nextConnect": "Zadziała przy następnym połączeniu tego serwera.",
+    "badge": "Tożsamość: {{identity}}",
+    "badgeTitle": "Połączono z tożsamością {{identity}}",
+    "missingNotice": "{{server}} połączył się z tożsamością domyślną, ponieważ jego własnej brakuje."
   }
 }

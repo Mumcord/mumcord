@@ -80,7 +80,10 @@ async fn engine(dir: &Path, name: &str, consent: Consent) -> (Engine, EventRecei
         tokio::runtime::Handle::current(),
     )
     .expect("engine");
-    engine.identity_create(name.into()).await.expect("identity");
+    engine
+        .identity_create(name.into(), None)
+        .await
+        .expect("identity");
     let mut settings = engine.settings().expect("settings");
     settings.allow_direct_connections = consent;
     engine.update_settings(settings).await.expect("consent");

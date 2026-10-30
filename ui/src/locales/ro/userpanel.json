@@ -55,7 +55,8 @@
     "passwordRequired": "Introdu o parolă ca să protejezi fișierul de rezervă.",
     "exported": "Copia de rezervă a identității a fost salvată.",
     "confirm": "Înregistrează-te",
-    "done": "Înregistrat pe acest server"
+    "done": "Înregistrat pe acest server",
+    "identity": "Numele înregistrat aparține identității {{identity}}."
   },
   "errors": {
     "tooLarge": "E prea mare pentru server. Alege o poză mai mică sau scrie un text mai scurt.",

@@ -37,7 +37,8 @@
     "alwaysConnect": "Forbind altid ved start",
     "muteNotifications": "Slå notifikationer fra",
     "theme": "Tema…",
-    "showWelcome": "Vis velkomstbesked"
+    "showWelcome": "Vis velkomstbesked",
+    "identity": "Identitet…"
   },
   "theme": {
     "title": "Tema for {{server}}",
@@ -67,7 +68,10 @@
       "port": "Skriv en port mellem 1 og 65535. De fleste servere bruger 64738.",
       "username": "Skriv det navn, du vil bruge på denne server.",
       "link": "Dette mumble://-link kan ikke læses. Tjek, at det er kopieret helt.",
-      "invalid": "Serveroplysningerne er ikke gyldige. Tjek adressen og porten."
+      "invalid": "Serveroplysningerne er ikke gyldige. Tjek adressen og porten.",
+      "addressInvalid": "Det ligner ikke en serveradresse.",
+      "portEmpty": "Indtast porten.",
+      "labelLong": "Navnet i serverlinjen må højst være 64 tegn."
     },
     "alwaysConnect": "Forbind altid ved start",
     "alwaysConnectHint": "Mumcord forbinder denne server skrivebeskyttet ved start.",
@@ -82,7 +86,29 @@
     "renameDone": "Færdig",
     "removeChannelPassword": "Fjern {{name}}",
     "remove": "Fjern",
-    "channelPasswordsHint": "Gemt, når en beskyttet kanal har godkendt dem. Fjernede spørges der om igen næste gang, du går ind."
+    "channelPasswordsHint": "Gemt, når en beskyttet kanal har godkendt dem. Fjernede spørges der om igen næste gang, du går ind.",
+    "tabsLabel": "Serverindstillinger",
+    "tabs": {
+      "connection": "Forbindelse",
+      "identity": "Identitet",
+      "passwords": "Adgangskoder",
+      "behaviour": "Adfærd",
+      "needsAttention": "{{tab}}: kræver opmærksomhed"
+    },
+    "test": {
+      "button": "Test forbindelse",
+      "busy": "Tester…",
+      "running": "Tester forbindelsen…",
+      "result": "{{address}} · Ping: {{ms}} ms · Serverversion: {{version}}",
+      "certTrusted": "Certifikatet er allerede betroet",
+      "certUnknown": "Certifikatet er ikke betroet endnu – du bliver spurgt ved forbindelsen",
+      "certChanged": "Certifikatet er ændret – kontroller det før du forbinder",
+      "wrongPassword": "Serveren afviste adgangskoden.",
+      "nameInUse": "Navnet er allerede i brug på denne server.",
+      "unreachable": "Serveren kan ikke nås.",
+      "invalid": "Oplysningerne er ikke gyldige.",
+      "failed": "Testen mislykkedes. Prøv igen."
+    }
   },
   "errors": {
     "serverUnreachable": "Serveren kan ikke nås. Tjek adressen og porten, og at du er online.",
@@ -145,7 +171,8 @@
       "disconnect": "Det lykkedes ikke at afbryde. Prøv igen.",
       "alwaysConnect": "“Forbind altid ved start” kunne ikke gemmes. Prøv igen.",
       "notifications": "Notifikationsindstillingen kunne ikke gemmes. Prøv igen.",
-      "savePassword": "Den nye adgangskode kunne ikke gemmes. Rediger serveren for at gemme den."
+      "savePassword": "Den nye adgangskode kunne ikke gemmes. Rediger serveren for at gemme den.",
+      "identity": "Identiteten kunne ikke gemmes. Prøv igen."
     }
   },
   "empty": {
@@ -259,5 +286,24 @@
     "permissionSelfRegister": "Register self",
     "permissionResetUserContent": "Reset user content",
     "characters": "{{value}} characters"
+  },
+  "identity": {
+    "field": "Identitet til denne server",
+    "useDefault": "Brug standard ({{identity}})",
+    "option": "{{label}} ({{name}})",
+    "hint": "Når du skifter identitet, genoprettes forbindelsen til denne server. Det registrerede navn og rettighederne her hører til den valgte identitet.",
+    "manage": "Administrer identiteter…",
+    "title": "Identitet til {{server}}",
+    "intro": "Vælg den identitet, Mumcord bruger til at forbinde her. „Brug standard“ følger standardidentiteten.",
+    "save": "Gem",
+    "saveAndReconnect": "Gem og genopret forbindelse",
+    "reconnectTitle": "Genopret forbindelse til {{server}}?",
+    "reconnectMessage": "Genopret forbindelsen til denne server nu med {{identity}}? De andre servere forbliver forbundet.",
+    "reconnect": "Genopret forbindelse",
+    "later": "Senere",
+    "nextConnect": "Gælder næste gang, denne server forbinder.",
+    "badge": "Identitet: {{identity}}",
+    "badgeTitle": "Forbundet med identiteten {{identity}}",
+    "missingNotice": "{{server}} blev forbundet med standardidentiteten, fordi dens egen mangler."
   }
 }

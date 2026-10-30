@@ -37,7 +37,8 @@
     "alwaysConnect": "Uvijek se poveži pri pokretanju",
     "muteNotifications": "Utišaj obavijesti",
     "theme": "Tema…",
-    "showWelcome": "Prikaži poruku dobrodošlice"
+    "showWelcome": "Prikaži poruku dobrodošlice",
+    "identity": "Identitet…"
   },
   "theme": {
     "title": "Tema za {{server}}",
@@ -67,7 +68,10 @@
       "port": "Unesi port između 1 i 65535. Većina poslužitelja koristi 64738.",
       "username": "Unesi ime koje želiš koristiti na ovom poslužitelju.",
       "link": "Ovu mumble:// poveznicu nije moguće pročitati. Provjeri je li kopirana u cijelosti.",
-      "invalid": "Podaci o poslužitelju nisu ispravni. Provjeri adresu i port."
+      "invalid": "Podaci o poslužitelju nisu ispravni. Provjeri adresu i port.",
+      "addressInvalid": "Ovo ne izgleda kao adresa servera.",
+      "portEmpty": "Unesi port.",
+      "labelLong": "Ime u traci servera može imati najviše 64 znaka."
     },
     "alwaysConnect": "Uvijek se poveži pri pokretanju",
     "alwaysConnectHint": "Mumcord pri pokretanju povezuje ovaj poslužitelj samo za čitanje.",
@@ -82,7 +86,29 @@
     "renameDone": "Gotovo",
     "removeChannelPassword": "Ukloni {{name}}",
     "remove": "Ukloni",
-    "channelPasswordsHint": "Spremljene kad ih je zaštićeni kanal prihvatio. Za uklonjene te pitamo ponovno pri sljedećem ulasku."
+    "channelPasswordsHint": "Spremljene kad ih je zaštićeni kanal prihvatio. Za uklonjene te pitamo ponovno pri sljedećem ulasku.",
+    "tabsLabel": "Postavke servera",
+    "tabs": {
+      "connection": "Veza",
+      "identity": "Identitet",
+      "passwords": "Zaporke",
+      "behaviour": "Ponašanje",
+      "needsAttention": "{{tab}}: zahtijeva pažnju"
+    },
+    "test": {
+      "button": "Testiraj vezu",
+      "busy": "Testiranje…",
+      "running": "Testiranje veze…",
+      "result": "{{address}} · Ping: {{ms}} ms · Verzija servera: {{version}}",
+      "certTrusted": "Certifikat je već pouzdan",
+      "certUnknown": "Certifikat još nije pouzdan – pitat ćemo te pri povezivanju",
+      "certChanged": "Certifikat se promijenio – provjeri ga prije povezivanja",
+      "wrongPassword": "Server je odbio zaporku.",
+      "nameInUse": "To je ime već zauzeto na ovom serveru.",
+      "unreachable": "Server nije dostupan.",
+      "invalid": "Podaci nisu valjani.",
+      "failed": "Test nije uspio. Pokušaj ponovno."
+    }
   },
   "errors": {
     "serverUnreachable": "Poslužitelj nije dostupan. Provjeri adresu i port te jesi li na mreži.",
@@ -145,7 +171,8 @@
       "disconnect": "Odspajanje nije uspjelo. Pokušaj ponovno.",
       "alwaysConnect": "„Uvijek se poveži pri pokretanju” nije bilo moguće spremiti. Pokušaj ponovno.",
       "notifications": "Postavku obavijesti nije bilo moguće spremiti. Pokušaj ponovno.",
-      "savePassword": "Novu lozinku nije bilo moguće spremiti. Uredi poslužitelj da je spremiš."
+      "savePassword": "Novu lozinku nije bilo moguće spremiti. Uredi poslužitelj da je spremiš.",
+      "identity": "Identitet nije moguće spremiti. Pokušaj ponovno."
     }
   },
   "empty": {
@@ -259,5 +286,24 @@
     "permissionSelfRegister": "Register self",
     "permissionResetUserContent": "Reset user content",
     "characters": "{{value}} characters"
+  },
+  "identity": {
+    "field": "Identitet za ovaj server",
+    "useDefault": "Koristi zadani ({{identity}})",
+    "option": "{{label}} ({{name}})",
+    "hint": "Promjena identiteta ponovno povezuje ovaj server. Registrirano ime i dopuštenja ovdje pripadaju odabranom identitetu.",
+    "manage": "Upravljaj identitetima…",
+    "title": "Identitet za {{server}}",
+    "intro": "Odaberi koji identitet Mumcord koristi za povezivanje ovdje. „Koristi zadani” slijedi zadani identitet.",
+    "save": "Spremi",
+    "saveAndReconnect": "Spremi i ponovno poveži",
+    "reconnectTitle": "Ponovno povezati {{server}}?",
+    "reconnectMessage": "Ponovno povezati ovaj server sada s identitetom {{identity}}? Ostali serveri ostaju povezani.",
+    "reconnect": "Ponovno poveži",
+    "later": "Kasnije",
+    "nextConnect": "Primjenjuje se pri sljedećem povezivanju ovog servera.",
+    "badge": "Identitet: {{identity}}",
+    "badgeTitle": "Povezano s identitetom {{identity}}",
+    "missingNotice": "{{server}} se povezao zadanim identitetom jer njegov vlastiti nedostaje."
   }
 }

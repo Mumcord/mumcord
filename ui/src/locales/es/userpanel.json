@@ -55,7 +55,8 @@
     "passwordRequired": "Escribe una contraseña para proteger el archivo de copia.",
     "exported": "Copia de la identidad guardada.",
     "confirm": "Registrarse",
-    "done": "Registrado en este servidor"
+    "done": "Registrado en este servidor",
+    "identity": "El nombre registrado pertenece a la identidad {{identity}}."
   },
   "errors": {
     "tooLarge": "Es demasiado grande para el servidor. Elige una imagen más pequeña o escribe un texto más corto.",

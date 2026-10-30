@@ -37,7 +37,8 @@
     "alwaysConnect": "Anslut alltid vid start",
     "muteNotifications": "Stäng av aviseringar",
     "theme": "Tema…",
-    "showWelcome": "Visa välkomstmeddelande"
+    "showWelcome": "Visa välkomstmeddelande",
+    "identity": "Identitet…"
   },
   "theme": {
     "title": "Tema för {{server}}",
@@ -67,7 +68,10 @@
       "port": "Ange en port mellan 1 och 65535. De flesta servrar använder 64738.",
       "username": "Ange namnet du vill använda på den här servern.",
       "link": "Den här mumble://-länken kan inte läsas. Kontrollera att den kopierades helt.",
-      "invalid": "Serveruppgifterna är ogiltiga. Kontrollera adress och port."
+      "invalid": "Serveruppgifterna är ogiltiga. Kontrollera adress och port.",
+      "addressInvalid": "Det här ser inte ut som en serveradress.",
+      "portEmpty": "Ange porten.",
+      "labelLong": "Namnet i serverlisten får vara högst 64 tecken."
     },
     "alwaysConnect": "Anslut alltid vid start",
     "alwaysConnectHint": "Mumcord ansluter den här servern skrivskyddat vid start.",
@@ -82,7 +86,29 @@
     "renameDone": "Klar",
     "removeChannelPassword": "Ta bort {{name}}",
     "remove": "Ta bort",
-    "channelPasswordsHint": "Sparas när en skyddad kanal har godkänt dem. Borttagna efterfrågas igen nästa gång du går med."
+    "channelPasswordsHint": "Sparas när en skyddad kanal har godkänt dem. Borttagna efterfrågas igen nästa gång du går med.",
+    "tabsLabel": "Serverinställningar",
+    "tabs": {
+      "connection": "Anslutning",
+      "identity": "Identitet",
+      "passwords": "Lösenord",
+      "behaviour": "Beteende",
+      "needsAttention": "{{tab}}: behöver åtgärd"
+    },
+    "test": {
+      "button": "Testa anslutning",
+      "busy": "Testar…",
+      "running": "Testar anslutningen…",
+      "result": "{{address}} · Ping: {{ms}} ms · Serverversion: {{version}}",
+      "certTrusted": "Certifikatet är redan betrott",
+      "certUnknown": "Certifikatet är inte betrott än – du får frågan vid anslutning",
+      "certChanged": "Certifikatet har ändrats – kontrollera det innan du ansluter",
+      "wrongPassword": "Servern avvisade lösenordet.",
+      "nameInUse": "Namnet används redan på den här servern.",
+      "unreachable": "Servern kan inte nås.",
+      "invalid": "Uppgifterna är inte giltiga.",
+      "failed": "Testet misslyckades. Försök igen."
+    }
   },
   "errors": {
     "serverUnreachable": "Servern kan inte nås. Kontrollera adress och port, och att du är online.",
@@ -145,7 +171,8 @@
       "disconnect": "Det gick inte att koppla från. Försök igen.",
       "alwaysConnect": "”Anslut alltid vid start” kunde inte sparas. Försök igen.",
       "notifications": "Aviseringsinställningen kunde inte sparas. Försök igen.",
-      "savePassword": "Det nya lösenordet kunde inte sparas. Redigera servern för att spara det."
+      "savePassword": "Det nya lösenordet kunde inte sparas. Redigera servern för att spara det.",
+      "identity": "Identiteten kunde inte sparas. Försök igen."
     }
   },
   "empty": {
@@ -259,5 +286,24 @@
     "permissionSelfRegister": "Register self",
     "permissionResetUserContent": "Reset user content",
     "characters": "{{value}} characters"
+  },
+  "identity": {
+    "field": "Identitet för den här servern",
+    "useDefault": "Använd standard ({{identity}})",
+    "option": "{{label}} ({{name}})",
+    "hint": "Att byta identitet återansluter den här servern. Det registrerade namnet och behörigheterna här tillhör identiteten du väljer.",
+    "manage": "Hantera identiteter…",
+    "title": "Identitet för {{server}}",
+    "intro": "Välj vilken identitet Mumcord använder för att ansluta här. ”Använd standard” följer standardidentiteten.",
+    "save": "Spara",
+    "saveAndReconnect": "Spara och återanslut",
+    "reconnectTitle": "Återanslut {{server}}?",
+    "reconnectMessage": "Återanslut den här servern nu med {{identity}}? De andra servrarna förblir anslutna.",
+    "reconnect": "Återanslut",
+    "later": "Senare",
+    "nextConnect": "Gäller nästa gång den här servern ansluter.",
+    "badge": "Identitet: {{identity}}",
+    "badgeTitle": "Ansluten med identiteten {{identity}}",
+    "missingNotice": "{{server}} anslöts med standardidentiteten eftersom dess egen saknas."
   }
 }

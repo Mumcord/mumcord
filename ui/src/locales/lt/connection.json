@@ -81,5 +81,7 @@
     "moreInfo": "Daugiau informacijos: {{topic}}",
     "effectiveShort": "Dabar siunčiama",
     "effectiveTip": "Šiuo metu siunčiamas bitų greitis, prisitaikius prie paketų nuostolių."
-  }
+  },
+  "identity": "Tapatybė",
+  "identityValue": "{{label}} ({{name}}) · {{fingerprint}}"
 }

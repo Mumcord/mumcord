@@ -55,7 +55,8 @@
     "passwordRequired": "Voer een wachtwoord in om het back-upbestand te beveiligen.",
     "exported": "Back-up van identiteit opgeslagen.",
     "confirm": "Registreren",
-    "done": "Geregistreerd op deze server"
+    "done": "Geregistreerd op deze server",
+    "identity": "De geregistreerde naam hoort bij de identiteit {{identity}}."
   },
   "errors": {
     "tooLarge": "Dit is te groot voor de server. Kies een kleinere foto of schrijf een kortere tekst.",

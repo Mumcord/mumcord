@@ -79,5 +79,7 @@
     "moreInfo": "Lisätietoja: {{topic}}",
     "effectiveShort": "Lähetetään nyt",
     "effectiveTip": "Parhaillaan lähetettävä bittinopeus pakettihävikkiin sopeuttamisen jälkeen."
-  }
+  },
+  "identity": "Identiteetti",
+  "identityValue": "{{label}} ({{name}}) · {{fingerprint}}"
 }

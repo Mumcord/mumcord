@@ -80,5 +80,7 @@
     "moreInfo": "Mais informações: {{topic}}",
     "effectiveShort": "A enviar agora",
     "effectiveTip": "O débito enviado neste momento, após a adaptação à perda de pacotes."
-  }
+  },
+  "identity": "Identidade",
+  "identityValue": "{{label}} ({{name}}) · {{fingerprint}}"
 }

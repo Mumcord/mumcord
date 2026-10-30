@@ -37,7 +37,8 @@
     "alwaysConnect": "Conectează mereu la pornire",
     "muteNotifications": "Dezactivează notificările",
     "theme": "Temă…",
-    "showWelcome": "Arată mesajul de bun venit"
+    "showWelcome": "Arată mesajul de bun venit",
+    "identity": "Identitate…"
   },
   "theme": {
     "title": "Temă pentru {{server}}",
@@ -67,7 +68,10 @@
       "port": "Introdu un port între 1 și 65535. Majoritatea serverelor folosesc 64738.",
       "username": "Introdu numele pe care vrei să-l folosești pe acest server.",
       "link": "Acest link mumble:// nu poate fi citit. Verifică dacă a fost copiat complet.",
-      "invalid": "Datele serverului nu sunt valide. Verifică adresa și portul."
+      "invalid": "Datele serverului nu sunt valide. Verifică adresa și portul.",
+      "addressInvalid": "Asta nu arată ca o adresă de server.",
+      "portEmpty": "Introdu portul.",
+      "labelLong": "Numele din bara de servere poate avea până la 64 de caractere."
     },
     "alwaysConnect": "Conectează mereu la pornire",
     "alwaysConnectHint": "Mumcord conectează acest server doar în citire la pornire.",
@@ -82,7 +86,29 @@
     "renameDone": "Gata",
     "removeChannelPassword": "Elimină {{name}}",
     "remove": "Elimină",
-    "channelPasswordsHint": "Salvate când un canal protejat le-a acceptat. Cele eliminate sunt cerute din nou la următoarea intrare."
+    "channelPasswordsHint": "Salvate când un canal protejat le-a acceptat. Cele eliminate sunt cerute din nou la următoarea intrare.",
+    "tabsLabel": "Setările serverului",
+    "tabs": {
+      "connection": "Conexiune",
+      "identity": "Identitate",
+      "passwords": "Parole",
+      "behaviour": "Comportament",
+      "needsAttention": "{{tab}}: necesită atenție"
+    },
+    "test": {
+      "button": "Testează conexiunea",
+      "busy": "Se testează…",
+      "running": "Se testează conexiunea…",
+      "result": "{{address}} · Ping: {{ms}} ms · Versiunea serverului: {{version}}",
+      "certTrusted": "Certificatul este deja de încredere",
+      "certUnknown": "Certificatul nu este încă de încredere – vei fi întrebat la conectare",
+      "certChanged": "Certificatul s-a schimbat – verifică-l înainte de conectare",
+      "wrongPassword": "Serverul a refuzat parola.",
+      "nameInUse": "Acest nume este deja folosit pe acest server.",
+      "unreachable": "Serverul nu poate fi contactat.",
+      "invalid": "Datele nu sunt valide.",
+      "failed": "Testul a eșuat. Încearcă din nou."
+    }
   },
   "errors": {
     "serverUnreachable": "Serverul nu poate fi accesat. Verifică adresa și portul și dacă ești online.",
@@ -145,7 +171,8 @@
       "disconnect": "Deconectarea a eșuat. Încearcă din nou.",
       "alwaysConnect": "„Conectează mereu la pornire” nu a putut fi salvat. Încearcă din nou.",
       "notifications": "Setarea notificărilor nu a putut fi salvată. Încearcă din nou.",
-      "savePassword": "Parola nouă nu a putut fi salvată. Editează serverul ca să o salvezi."
+      "savePassword": "Parola nouă nu a putut fi salvată. Editează serverul ca să o salvezi.",
+      "identity": "Identitatea nu a putut fi salvată. Încearcă din nou."
     }
   },
   "empty": {
@@ -259,5 +286,24 @@
     "permissionSelfRegister": "Register self",
     "permissionResetUserContent": "Reset user content",
     "characters": "{{value}} characters"
+  },
+  "identity": {
+    "field": "Identitatea pentru acest server",
+    "useDefault": "Folosește cea implicită ({{identity}})",
+    "option": "{{label}} ({{name}})",
+    "hint": "Schimbarea identității reconectează acest server. Numele înregistrat și permisiunile de aici aparțin identității alese.",
+    "manage": "Gestionează identitățile…",
+    "title": "Identitatea pentru {{server}}",
+    "intro": "Alege ce identitate folosește Mumcord pentru conectare aici. „Folosește cea implicită” urmează identitatea implicită.",
+    "save": "Salvează",
+    "saveAndReconnect": "Salvează și reconectează",
+    "reconnectTitle": "Reconectezi {{server}}?",
+    "reconnectMessage": "Reconectezi acest server acum cu {{identity}}? Celelalte servere rămân conectate.",
+    "reconnect": "Reconectează",
+    "later": "Mai târziu",
+    "nextConnect": "Se aplică la următoarea conectare a acestui server.",
+    "badge": "Identitate: {{identity}}",
+    "badgeTitle": "Conectat cu identitatea {{identity}}",
+    "missingNotice": "{{server}} s-a conectat cu identitatea implicită pentru că a sa lipsește."
   }
 }

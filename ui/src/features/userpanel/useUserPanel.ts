@@ -1,5 +1,4 @@
-import { useEffect, useState } from "react";
-import { getApi, type ServerInfo, type User } from "../../api";
+import type { ServerInfo, User } from "../../api";
 import {
   selfUser,
   useServerState,
@@ -7,6 +6,7 @@ import {
   useShownServerId,
   useVoiceServerId,
 } from "../channels/serverStore";
+import { useServers } from "../servers";
 
 export interface UserPanelState {
   /** Own name from the identity; shown even while disconnected. */
@@ -34,22 +34,15 @@ export function useUserPanel(): UserPanelState {
   const voiceId = useVoiceServerId();
   // The voice server's state; while there is none this is the shown server's.
   const server = useServerStateOf(voiceId ?? shownId);
-  const [identityName, setIdentityName] = useState<string | null>(null);
-
-  useEffect(() => {
-    let active = true;
-    getApi()
-      .identityGet()
-      .then((identity) => {
-        if (active) setIdentityName(identity?.name ?? null);
-      })
-      .catch((error: unknown) => {
-        console.error("User panel could not load the identity", error);
-      });
-    return () => {
-      active = false;
-    };
-  }, []);
+  // The certificate name of the identity the shown server connects with (issue #148), for the
+  // name shown before a connect.
+  const identities = useServers().identities;
+  const savedServer = useServers().servers.find((s) => s.id === shownId);
+  const identityName =
+    (
+      identities.find((i) => i.id === savedServer?.identityId) ??
+      identities.find((i) => i.isDefault)
+    )?.name ?? null;
 
   const self = selfUser(server) ?? null;
   const connected = server.connection.state === "connected" && self !== null;

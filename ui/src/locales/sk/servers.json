@@ -37,7 +37,8 @@
     "alwaysConnect": "Vždy pripojiť pri spustení",
     "muteNotifications": "Stlmiť upozornenia",
     "theme": "Motív…",
-    "showWelcome": "Zobraziť uvítaciu správu"
+    "showWelcome": "Zobraziť uvítaciu správu",
+    "identity": "Identita…"
   },
   "theme": {
     "title": "Motív pre {{server}}",
@@ -67,7 +68,10 @@
       "port": "Zadaj port od 1 do 65535. Väčšina serverov používa 64738.",
       "username": "Zadaj meno, ktoré chceš na tomto serveri používať.",
       "link": "Tento odkaz mumble:// sa nedá prečítať. Skontroluj, či bol skopírovaný celý.",
-      "invalid": "Údaje servera nie sú platné. Skontroluj adresu a port."
+      "invalid": "Údaje servera nie sú platné. Skontroluj adresu a port.",
+      "addressInvalid": "Toto nevyzerá ako adresa servera.",
+      "portEmpty": "Zadajte port.",
+      "labelLong": "Názov v lište serverov môže mať najviac 64 znakov."
     },
     "alwaysConnect": "Vždy pripojiť pri spustení",
     "alwaysConnectHint": "Mumcord pri spustení pripojí tento server len na čítanie.",
@@ -82,7 +86,29 @@
     "renameDone": "Hotovo",
     "removeChannelPassword": "Odobrať {{name}}",
     "remove": "Odobrať",
-    "channelPasswordsHint": "Uložia sa, keď ich chránený kanál prijal. Na odobrané sa pri ďalšom vstupe opýtame znova."
+    "channelPasswordsHint": "Uložia sa, keď ich chránený kanál prijal. Na odobrané sa pri ďalšom vstupe opýtame znova.",
+    "tabsLabel": "Nastavenia servera",
+    "tabs": {
+      "connection": "Pripojenie",
+      "identity": "Identita",
+      "passwords": "Heslá",
+      "behaviour": "Správanie",
+      "needsAttention": "{{tab}}: vyžaduje pozornosť"
+    },
+    "test": {
+      "button": "Otestovať pripojenie",
+      "busy": "Testujem…",
+      "running": "Testujem pripojenie…",
+      "result": "{{address}} · Ping: {{ms}} ms · Verzia servera: {{version}}",
+      "certTrusted": "Certifikát je už dôveryhodný",
+      "certUnknown": "Certifikát zatiaľ nie je dôveryhodný – pri pripojení sa opýtame",
+      "certChanged": "Certifikát sa zmenil – skontrolujte ho pred pripojením",
+      "wrongPassword": "Server heslo odmietol.",
+      "nameInUse": "Tento názov je na serveri už obsadený.",
+      "unreachable": "Server je nedostupný.",
+      "invalid": "Údaje nie sú platné.",
+      "failed": "Test zlyhal. Skúste to znova."
+    }
   },
   "errors": {
     "serverUnreachable": "Server je nedostupný. Skontroluj adresu, port a či si online.",
@@ -145,7 +171,8 @@
       "disconnect": "Odpojenie zlyhalo. Skús to znova.",
       "alwaysConnect": "„Vždy pripojiť pri spustení“ sa nepodarilo uložiť. Skús to znova.",
       "notifications": "Nastavenie upozornení sa nepodarilo uložiť. Skús to znova.",
-      "savePassword": "Nové heslo sa nepodarilo uložiť. Uprav server, aby si ho uložil."
+      "savePassword": "Nové heslo sa nepodarilo uložiť. Uprav server, aby si ho uložil.",
+      "identity": "Identitu sa nepodarilo uložiť. Skúste to znova."
     }
   },
   "empty": {
@@ -259,5 +286,24 @@
     "permissionSelfRegister": "Register self",
     "permissionResetUserContent": "Reset user content",
     "characters": "{{value}} characters"
+  },
+  "identity": {
+    "field": "Identita pre tento server",
+    "useDefault": "Použiť predvolenú ({{identity}})",
+    "option": "{{label}} ({{name}})",
+    "hint": "Zmena identity znovu pripojí tento server. Registrovaný názov a oprávnenia tu patria zvolenej identite.",
+    "manage": "Spravovať identity…",
+    "title": "Identita pre {{server}}",
+    "intro": "Zvoľte, ktorú identitu Mumcord používa na pripojenie. „Použiť predvolenú“ nasleduje predvolenú identitu.",
+    "save": "Uložiť",
+    "saveAndReconnect": "Uložiť a pripojiť znova",
+    "reconnectTitle": "Znova pripojiť {{server}}?",
+    "reconnectMessage": "Pripojiť tento server teraz znova s identitou {{identity}}? Ostatné servery zostanú pripojené.",
+    "reconnect": "Pripojiť znova",
+    "later": "Neskôr",
+    "nextConnect": "Prejaví sa pri ďalšom pripojení tohto servera.",
+    "badge": "Identita: {{identity}}",
+    "badgeTitle": "Pripojené s identitou {{identity}}",
+    "missingNotice": "{{server}} sa pripojil s predvolenou identitou, pretože jeho vlastná chýba."
   }
 }

@@ -55,7 +55,8 @@
     "passwordRequired": "Anna salasana varmuuskopiotiedoston suojaamiseksi.",
     "exported": "Identiteetin varmuuskopio tallennettu.",
     "confirm": "Rekisteröidy",
-    "done": "Rekisteröitynyt tälle palvelimelle"
+    "done": "Rekisteröitynyt tälle palvelimelle",
+    "identity": "Rekisteröity nimi kuuluu identiteetille {{identity}}."
   },
   "errors": {
     "tooLarge": "Tämä on liian suuri palvelimelle. Valitse pienempi kuva tai kirjoita lyhyempi teksti.",

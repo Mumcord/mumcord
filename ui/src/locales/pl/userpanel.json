@@ -55,7 +55,8 @@
     "passwordRequired": "Podaj hasło, aby zabezpieczyć plik kopii zapasowej.",
     "exported": "Zapisano kopię zapasową tożsamości.",
     "confirm": "Zarejestruj",
-    "done": "Zarejestrowano na tym serwerze"
+    "done": "Zarejestrowano na tym serwerze",
+    "identity": "Zarejestrowana nazwa należy do tożsamości {{identity}}."
   },
   "errors": {
     "tooLarge": "To jest zbyt duże dla serwera. Wybierz mniejsze zdjęcie lub napisz krótszy tekst.",

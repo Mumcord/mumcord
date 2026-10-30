@@ -101,7 +101,7 @@ async fn own_cap_shows_in_the_connection_info_and_max_lifts_it() {
     settings.bitrate_kbps = Some(32);
     engine.update_settings(settings).await.expect("settings");
     engine
-        .identity_create("mc-bitrate".into())
+        .identity_create("mc-bitrate".into(), None)
         .await
         .expect("identity");
     let server = engine

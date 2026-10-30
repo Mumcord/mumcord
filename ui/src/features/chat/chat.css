@@ -1939,3 +1939,14 @@ a.message-card__title:hover {
 .message-card__open:hover {
   background: var(--color-bg-hover);
 }
+
+/* "Identity: ‹label›" next to the conversation title, only for non-default identities (#148). */
+.chat-header__identity {
+  flex: 0 0 auto;
+  padding: 0 var(--space-2);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-full);
+  font-size: var(--font-size-xs);
+  color: var(--color-text-secondary);
+  white-space: nowrap;
+}

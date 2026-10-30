@@ -55,7 +55,8 @@
     "passwordRequired": "Inserisci una password per proteggere il file di backup.",
     "exported": "Backup dell'identità salvato.",
     "confirm": "Registrati",
-    "done": "Registrato su questo server"
+    "done": "Registrato su questo server",
+    "identity": "Il nome registrato appartiene all'identità {{identity}}."
   },
   "errors": {
     "tooLarge": "È troppo grande per il server. Scegli un'immagine più piccola o scrivi un testo più breve.",

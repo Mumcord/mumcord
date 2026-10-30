@@ -1288,6 +1288,23 @@ impl Handle {
         let _ = self.tx.send(Outgoing::Disconnect);
     }
 
+    /// Sends a Mumble ping and waits for the server's answer: the round trip, for a one-shot
+    /// reachability check (the server handles messages in order, so the answer also proves the
+    /// connection is alive). `None` when the connection ends first.
+    pub async fn ping(&self) -> Option<Duration> {
+        let mut pong = self.shared.pong.subscribe();
+        let sent_us = self.shared.ping().now_us();
+        let frame = Frame::from_message(MessageType::Ping, &self.shared.ping().message());
+        self.queue(Outgoing::Frame(frame)).ok()?;
+        let started = Instant::now();
+        loop {
+            if *pong.borrow_and_update() > sent_us {
+                return Some(started.elapsed());
+            }
+            pong.changed().await.ok()?;
+        }
+    }
+
     /// Resolves once the connection has stopped sending: after [`Handle::disconnect`] that is
     /// when the queue is drained or its time is up, otherwise when the connection is lost.
     pub fn closed(&self) -> impl Future<Output = ()> + Send + use<> {
@@ -1505,6 +1522,29 @@ mod drain_tests {
         handle.closed().await;
         assert_eq!(server.await.expect("server"), expected(1));
         assert_eq!(started.elapsed(), DRAIN_TIMEOUT);
+    }
+
+    #[tokio::test(start_paused = true)]
+    async fn ping_returns_the_round_trip_of_the_answer() {
+        let (handle, server) = start(true);
+        assert!(handle.ping().await.is_some());
+        // A ping is queued like any other frame; the fake server sees it.
+        handle.disconnect();
+        assert_eq!(server.await.expect("server"), Vec::<String>::new());
+    }
+
+    #[tokio::test(start_paused = true)]
+    async fn ping_gives_up_when_the_server_never_answers() {
+        let (handle, _server) = start(false);
+        let waited = tokio::time::timeout(Duration::from_secs(1), handle.ping()).await;
+        assert!(waited.is_err(), "no answer means no result");
+    }
+
+    #[tokio::test(start_paused = true)]
+    async fn ping_gives_up_when_the_connection_ends() {
+        let (handle, server) = start(true);
+        drop(server);
+        let _ = handle.ping().await;
     }
 
     #[tokio::test(start_paused = true)]

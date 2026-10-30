@@ -55,7 +55,8 @@
     "passwordRequired": "Adj meg egy jelszót a biztonsági mentés fájl védelméhez.",
     "exported": "Az identitás biztonsági mentése elkészült.",
     "confirm": "Regisztráció",
-    "done": "Regisztrálva ezen a szerveren"
+    "done": "Regisztrálva ezen a szerveren",
+    "identity": "A regisztrált név a(z) {{identity}} identitáshoz tartozik."
   },
   "errors": {
     "tooLarge": "Ez túl nagy a szervernek. Válassz kisebb képet, vagy írj rövidebb szöveget.",

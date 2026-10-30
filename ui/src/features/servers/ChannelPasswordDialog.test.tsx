@@ -147,6 +147,8 @@ describe("stored channel passwords in the edit-server dialog (FR-2.78, issue #14
         <ServerDialog server={server} link={null} identityName="You" onClose={onClose} />
       </PreferencesProvider>,
     );
+    // The saved channel passwords live in the Passwords tab (issue #151).
+    fireEvent.click(screen.getByRole("tab", { name: "Passwords" }));
     return screen.findByRole("list", { name: "Channel passwords" });
   }
 

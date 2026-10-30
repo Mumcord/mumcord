@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { LiveRegions } from "../a11y";
 import { TooltipLayer } from "../components/Tooltip";
@@ -17,6 +18,7 @@ import {
 } from "./mounts";
 import { PreferencesProvider } from "./PreferencesProvider";
 import { SettingsOverlay } from "./SettingsOverlay";
+import { setSettingsOpener } from "../features/settings/settingsOpener";
 import { useThemePreviewing } from "../theme/themeStore";
 import { useDevToolsCapture, useDevToolsUnlocked } from "../features/inspector/devTools";
 import { InspectorViewShare } from "../features/inspector/InspectorViewShare";
@@ -28,6 +30,13 @@ import { ViewProvider } from "./ViewProvider";
 
 function MainScreen() {
   const { overlay, closeOverlay, openSettings } = useView();
+  // "Manage identities…" and similar links elsewhere in the app land in Settings.
+  useEffect(() => {
+    setSettingsOpener(openSettings);
+    return () => {
+      setSettingsOpener(null);
+    };
+  }, [openSettings]);
   useServerTheme();
   useDevToolsCapture();
   const devTools = useDevToolsUnlocked();

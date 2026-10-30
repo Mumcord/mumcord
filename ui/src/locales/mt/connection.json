@@ -82,5 +82,7 @@
     "moreInfo": "Aktar informazzjoni: {{topic}}",
     "effectiveShort": "Qed jintbagħat issa",
     "effectiveTip": "Il-bitrate li qed jintbagħat issa, wara l-adattament għat-telf tal-pakketti."
-  }
+  },
+  "identity": "Identità",
+  "identityValue": "{{label}} ({{name}}) · {{fingerprint}}"
 }

@@ -54,19 +54,19 @@ describe("AC-1.1 wizard creates identity", () => {
   });
 
   it("stores the certificate in the keyring, not as a plain file", async () => {
-    // Secrets are binary (PKCS#12, chunked as identity/0, identity/1, …); log only the names.
+    // Secrets are binary (PKCS#12, chunked as identity/<id>/0, identity/<id>/1, …); log only the names.
     const accounts = [...(await keyringDump()).matchAll(/attribute\.username = (\S+)/g)].map(
       (m) => m[1],
     );
     console.log(`AC-1.1 keyring accounts: ${accounts.join(", ")}`);
-    expect(accounts).toContain("identity/0");
+    expect(accounts).toContain("identity/1/0");
 
     const secret = execFileSync("secret-tool", [
       "lookup",
       "service",
       "app.mumcord.client",
       "username",
-      "identity/0",
+      "identity/1/0",
     ]);
     expect(secret.length).toBeGreaterThan(100);
     // PKCS#12 is DER: starts with a SEQUENCE tag.

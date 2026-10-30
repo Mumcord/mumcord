@@ -37,7 +37,8 @@
     "alwaysConnect": "Vienmēr savienot palaišanas laikā",
     "muteNotifications": "Apklusināt paziņojumus",
     "theme": "Motīvs…",
-    "showWelcome": "Rādīt sveiciena ziņu"
+    "showWelcome": "Rādīt sveiciena ziņu",
+    "identity": "Identitāte…"
   },
   "theme": {
     "title": "Motīvs serverim {{server}}",
@@ -67,7 +68,10 @@
       "port": "Ievadi portu no 1 līdz 65535. Lielākā daļa serveru izmanto 64738.",
       "username": "Ievadi vārdu, ko vēlies izmantot šajā serverī.",
       "link": "Šo mumble:// saiti nevar nolasīt. Pārbaudi, vai tā ir nokopēta pilnībā.",
-      "invalid": "Servera dati nav derīgi. Pārbaudi adresi un portu."
+      "invalid": "Servera dati nav derīgi. Pārbaudi adresi un portu.",
+      "addressInvalid": "Tas neizskatās pēc servera adreses.",
+      "portEmpty": "Ievadi portu.",
+      "labelLong": "Nosaukums serveru joslā var būt līdz 64 rakstzīmēm."
     },
     "alwaysConnect": "Vienmēr savienot palaišanas laikā",
     "alwaysConnectHint": "Mumcord palaišanas laikā savieno šo serveri tikai lasīšanas režīmā.",
@@ -82,7 +86,29 @@
     "renameDone": "Gatavs",
     "removeChannelPassword": "Noņemt {{name}}",
     "remove": "Noņemt",
-    "channelPasswordsHint": "Saglabātas, kad aizsargāts kanāls tās pieņēma. Noņemtās tiks prasītas atkal nākamajā ieejā."
+    "channelPasswordsHint": "Saglabātas, kad aizsargāts kanāls tās pieņēma. Noņemtās tiks prasītas atkal nākamajā ieejā.",
+    "tabsLabel": "Servera iestatījumi",
+    "tabs": {
+      "connection": "Savienojums",
+      "identity": "Identitāte",
+      "passwords": "Paroles",
+      "behaviour": "Uzvedība",
+      "needsAttention": "{{tab}}: nepieciešama uzmanība"
+    },
+    "test": {
+      "button": "Pārbaudīt savienojumu",
+      "busy": "Pārbauda…",
+      "running": "Pārbauda savienojumu…",
+      "result": "{{address}} · Ping: {{ms}} ms · Servera versija: {{version}}",
+      "certTrusted": "Sertifikāts jau ir uzticams",
+      "certUnknown": "Sertifikāts vēl nav uzticams – pievienojoties jautās",
+      "certChanged": "Sertifikāts ir mainījies – pārbaudi to pirms pievienošanās",
+      "wrongPassword": "Serveris noraidīja paroli.",
+      "nameInUse": "Šis nosaukums šajā serverī jau tiek izmantots.",
+      "unreachable": "Serveris nav sasniedzams.",
+      "invalid": "Dati nav derīgi.",
+      "failed": "Pārbaude neizdevās. Mēģini vēlreiz."
+    }
   },
   "errors": {
     "serverUnreachable": "Serveris nav sasniedzams. Pārbaudi adresi un portu un to, vai esi tiešsaistē.",
@@ -145,7 +171,8 @@
       "disconnect": "Atvienošanās neizdevās. Lūdzu, mēģini vēlreiz.",
       "alwaysConnect": "„Vienmēr savienot palaišanas laikā“ neizdevās saglabāt. Mēģini vēlreiz.",
       "notifications": "Paziņojumu iestatījumu neizdevās saglabāt. Mēģini vēlreiz.",
-      "savePassword": "Jauno paroli neizdevās saglabāt. Rediģē serveri, lai to saglabātu."
+      "savePassword": "Jauno paroli neizdevās saglabāt. Rediģē serveri, lai to saglabātu.",
+      "identity": "Identitāti neizdevās saglabāt. Mēģini vēlreiz."
     }
   },
   "empty": {
@@ -259,5 +286,24 @@
     "permissionSelfRegister": "Register self",
     "permissionResetUserContent": "Reset user content",
     "characters": "{{value}} characters"
+  },
+  "identity": {
+    "field": "Identitāte šim serverim",
+    "useDefault": "Izmantot noklusējuma ({{identity}})",
+    "option": "{{label}} ({{name}})",
+    "hint": "Identitātes maiņa atkārtoti savieno šo serveri. Reģistrētais vārds un tiesības šeit pieder izvēlētajai identitātei.",
+    "manage": "Pārvaldīt identitātes…",
+    "title": "Identitāte serverim {{server}}",
+    "intro": "Izvēlies, kuru identitāti Mumcord izmanto savienojumam šeit. “Izmantot noklusējuma” seko noklusējuma identitātei.",
+    "save": "Saglabāt",
+    "saveAndReconnect": "Saglabāt un savienot no jauna",
+    "reconnectTitle": "Savienot {{server}} no jauna?",
+    "reconnectMessage": "Savienot šo serveri tagad no jauna ar {{identity}}? Pārējie serveri paliek savienoti.",
+    "reconnect": "Savienot no jauna",
+    "later": "Vēlāk",
+    "nextConnect": "Stāsies spēkā nākamajā šī servera savienojumā.",
+    "badge": "Identitāte: {{identity}}",
+    "badgeTitle": "Savienots ar identitāti {{identity}}",
+    "missingNotice": "{{server}} savienojās ar noklusējuma identitāti, jo tā paša identitāte trūkst."
   }
 }

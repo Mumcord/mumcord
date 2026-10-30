@@ -55,7 +55,8 @@
     "passwordRequired": "Skriv en adgangskode for at beskytte sikkerhedskopien.",
     "exported": "Sikkerhedskopi af identitet gemt.",
     "confirm": "Registrér",
-    "done": "Registreret på denne server"
+    "done": "Registreret på denne server",
+    "identity": "Det registrerede navn hører til identiteten {{identity}}."
   },
   "errors": {
     "tooLarge": "Det er for stort til serveren. Vælg et mindre billede, eller skriv en kortere tekst.",

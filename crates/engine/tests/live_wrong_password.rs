@@ -83,7 +83,7 @@ async fn wrong_password_is_rejected_and_the_retry_connects() {
     )
     .expect("engine");
     engine
-        .identity_create("Password Tester".into())
+        .identity_create("Password Tester".into(), None)
         .await
         .expect("identity");
     let server = engine
