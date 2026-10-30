@@ -31,6 +31,15 @@ export async function fill(label: string, value: string): Promise<void> {
   await typeInto(await fieldId(label), value);
 }
 
+/** Switches the add/edit server dialog to one of its tabs (issue #151). */
+export async function dialogTab(name: "Connection" | "Identity" | "Passwords" | "Behaviour") {
+  const tab = browser.$(
+    `//div[@role="tablist"]//button[@role="tab" and normalize-space()="${name}"]`,
+  );
+  await tab.waitForClickable();
+  await tab.click();
+}
+
 export function dialogTitle(text: string) {
   return browser.$(
     `//h2[contains(@class,"servers-dialog__title") and normalize-space()="${text}"]`,

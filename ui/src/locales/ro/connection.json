@@ -80,5 +80,7 @@
     "moreInfo": "Mai multe informații: {{topic}}",
     "effectiveShort": "Se trimite acum",
     "effectiveTip": "Rata de biți trimisă acum, după adaptarea la pierderea de pachete."
-  }
+  },
+  "identity": "Identitate",
+  "identityValue": "{{label}} ({{name}}) · {{fingerprint}}"
 }

@@ -55,7 +55,8 @@
     "passwordRequired": "Ange ett lösenord för att skydda säkerhetskopian.",
     "exported": "Säkerhetskopian av identiteten sparades.",
     "confirm": "Registrera",
-    "done": "Registrerad på den här servern"
+    "done": "Registrerad på den här servern",
+    "identity": "Det registrerade namnet tillhör identiteten {{identity}}."
   },
   "errors": {
     "tooLarge": "Det här är för stort för servern. Välj en mindre bild eller skriv en kortare text.",

@@ -79,5 +79,7 @@
     "moreInfo": "További információ: {{topic}}",
     "effectiveShort": "Jelenleg küldött",
     "effectiveTip": "A most küldött bitráta a csomagvesztéshez igazítás után."
-  }
+  },
+  "identity": "Identitás",
+  "identityValue": "{{label}} ({{name}}) · {{fingerprint}}"
 }

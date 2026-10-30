@@ -180,6 +180,7 @@ mod tests {
                 port: 64738,
                 username: "Tester".into(),
                 save_history: true,
+                identity_id: None,
             })
             .expect("server")
             .id

@@ -37,7 +37,8 @@
     "alwaysConnect": "Conectar siempre al iniciar",
     "muteNotifications": "Silenciar notificaciones",
     "theme": "Tema…",
-    "showWelcome": "Mostrar mensaje de bienvenida"
+    "showWelcome": "Mostrar mensaje de bienvenida",
+    "identity": "Identidad…"
   },
   "theme": {
     "title": "Tema para {{server}}",
@@ -67,7 +68,10 @@
       "port": "Introduce un puerto entre 1 y 65535. La mayoría de servidores usan 64738.",
       "username": "Introduce el nombre que quieres usar en este servidor.",
       "link": "No se puede leer este enlace mumble://. Comprueba que se copió completo.",
-      "invalid": "Los datos del servidor no son válidos. Revisa la dirección y el puerto."
+      "invalid": "Los datos del servidor no son válidos. Revisa la dirección y el puerto.",
+      "addressInvalid": "Esto no parece una dirección de servidor.",
+      "portEmpty": "Introduce el puerto.",
+      "labelLong": "El nombre en la barra de servidores puede tener hasta 64 caracteres."
     },
     "alwaysConnect": "Conectar siempre al iniciar",
     "alwaysConnectHint": "Mumcord conecta este servidor en modo de solo lectura al iniciar.",
@@ -82,7 +86,29 @@
     "renameDone": "Listo",
     "removeChannelPassword": "Quitar {{name}}",
     "remove": "Quitar",
-    "channelPasswordsHint": "Se guardan cuando un canal protegido las aceptó. Las quitadas se vuelven a pedir al entrar de nuevo."
+    "channelPasswordsHint": "Se guardan cuando un canal protegido las aceptó. Las quitadas se vuelven a pedir al entrar de nuevo.",
+    "tabsLabel": "Ajustes del servidor",
+    "tabs": {
+      "connection": "Conexión",
+      "identity": "Identidad",
+      "passwords": "Contraseñas",
+      "behaviour": "Comportamiento",
+      "needsAttention": "{{tab}}: requiere atención"
+    },
+    "test": {
+      "button": "Probar conexión",
+      "busy": "Probando…",
+      "running": "Probando la conexión…",
+      "result": "{{address}} · Ping: {{ms}} ms · Versión del servidor: {{version}}",
+      "certTrusted": "Certificado ya de confianza",
+      "certUnknown": "Certificado aún no de confianza: se te preguntará al conectar",
+      "certChanged": "El certificado ha cambiado: compruébalo antes de conectar",
+      "wrongPassword": "El servidor ha rechazado la contraseña.",
+      "nameInUse": "Ese nombre ya está en uso en este servidor.",
+      "unreachable": "No se pudo contactar con el servidor.",
+      "invalid": "Los datos no son válidos.",
+      "failed": "La prueba ha fallado. Inténtalo de nuevo."
+    }
   },
   "errors": {
     "serverUnreachable": "No se puede contactar con el servidor. Revisa la dirección y el puerto, y que tienes conexión a internet.",
@@ -145,7 +171,8 @@
       "disconnect": "No se pudo desconectar. Inténtalo de nuevo.",
       "alwaysConnect": "No se pudo guardar «Conectar siempre al iniciar». Inténtalo de nuevo.",
       "notifications": "No se pudo guardar el ajuste de notificaciones. Inténtalo de nuevo.",
-      "savePassword": "No se pudo guardar la nueva contraseña. Edita el servidor para guardarla."
+      "savePassword": "No se pudo guardar la nueva contraseña. Edita el servidor para guardarla.",
+      "identity": "No se pudo guardar la identidad. Inténtalo de nuevo."
     }
   },
   "empty": {
@@ -259,5 +286,24 @@
     "permissionSelfRegister": "Register self",
     "permissionResetUserContent": "Reset user content",
     "characters": "{{value}} characters"
+  },
+  "identity": {
+    "field": "Identidad para este servidor",
+    "useDefault": "Usar la predeterminada ({{identity}})",
+    "option": "{{label}} ({{name}})",
+    "hint": "Cambiar la identidad reconecta este servidor. El nombre registrado y los permisos de aquí pertenecen a la identidad elegida.",
+    "manage": "Gestionar identidades…",
+    "title": "Identidad para {{server}}",
+    "intro": "Elige la identidad que Mumcord usa para conectarse aquí. «Usar la predeterminada» sigue la identidad predeterminada.",
+    "save": "Guardar",
+    "saveAndReconnect": "Guardar y reconectar",
+    "reconnectTitle": "¿Reconectar {{server}}?",
+    "reconnectMessage": "¿Reconectar este servidor ahora con {{identity}}? Los demás servidores siguen conectados.",
+    "reconnect": "Reconectar",
+    "later": "Más tarde",
+    "nextConnect": "Se aplica la próxima vez que este servidor se conecte.",
+    "badge": "Identidad: {{identity}}",
+    "badgeTitle": "Conectado con la identidad {{identity}}",
+    "missingNotice": "{{server}} se ha conectado con la identidad predeterminada porque falta la suya."
   }
 }

@@ -81,5 +81,7 @@
     "moreInfo": "Więcej informacji: {{topic}}",
     "effectiveShort": "Aktualnie wysyłane",
     "effectiveTip": "Szybkość transmisji wysyłana w tej chwili, po dostosowaniu do utraty pakietów."
-  }
+  },
+  "identity": "Tożsamość",
+  "identityValue": "{{label}} ({{name}}) · {{fingerprint}}"
 }

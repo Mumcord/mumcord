@@ -1031,13 +1031,61 @@ describe("Identity section", () => {
     expect(screen.queryByRole("img", { name: "Default avatar preview" })).not.toBeInTheDocument();
   });
 
+  it("lists the identities with their fingerprint and use", async () => {
+    await openSection("Identity");
+    const list = await screen.findByRole("list", { name: "Identities" });
+    expect(within(list).getByText("Default", { selector: "strong" })).toBeInTheDocument();
+    expect(within(list).getByText(/Name: Zoe · Created/)).toBeInTheDocument();
+    expect(within(list).getByText(/Fingerprint/)).toBeInTheDocument();
+    expect(within(list).getByText(/Used by: Local test server/)).toBeInTheDocument();
+    expect(within(list).getByRole("button", { name: "Export Default" })).toBeInTheDocument();
+    expect(screen.queryByText(/^identity\./)).toBeNull();
+  });
+
+  it("creates an identity with a name and a label", async () => {
+    const create = vi.spyOn(api, "identityCreate");
+    await openSection("Identity");
+    fireEvent.click(await screen.findByRole("button", { name: "New identity" }));
+    const dialog = await screen.findByRole("dialog", { name: "New identity" });
+    fireEvent.change(within(dialog).getByLabelText("Name on servers"), {
+      target: { value: "Zoe (Acme)" },
+    });
+    fireEvent.change(within(dialog).getByLabelText("Label"), { target: { value: "Work" } });
+    fireEvent.click(within(dialog).getByRole("button", { name: "Create" }));
+    await waitFor(() => {
+      expect(create).toHaveBeenCalledWith("Zoe (Acme)", "Work");
+    });
+    expect(await screen.findByText("Work")).toBeInTheDocument();
+    expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+  });
+
+  it("renames an identity without touching its certificate", async () => {
+    const rename = vi.spyOn(api, "identityRename");
+    await openSection("Identity");
+    fireEvent.click(await screen.findByRole("button", { name: "Rename Default" }));
+    const dialog = await screen.findByRole("dialog", { name: "Rename Default" });
+    fireEvent.change(within(dialog).getByLabelText("Label"), { target: { value: "Main" } });
+    fireEvent.click(within(dialog).getByRole("button", { name: "Save" }));
+    await waitFor(() => {
+      expect(rename).toHaveBeenCalledWith(1, "Main");
+    });
+    expect(await screen.findByText("Main")).toBeInTheDocument();
+  });
+
+  it("shows the full fingerprint and the servers of an identity", async () => {
+    await openSection("Identity");
+    fireEvent.click(await screen.findByRole("button", { name: "Show details of Default" }));
+    const dialog = await screen.findByRole("dialog", { name: "Identity Default" });
+    expect(within(dialog).getByText(/^[A-Z0-9]{2}(:[A-Z0-9]{2})+$/)).toBeInTheDocument();
+    expect(within(dialog).getByText("Local test server")).toBeInTheDocument();
+  });
+
   it("exports the identity with a password entered twice", async () => {
     savePath.mockResolvedValue("/home/me/id.p12");
     const exportIdentity = vi.spyOn(api, "identityExport");
     await openSection("Identity");
-    expect(await screen.findByText("Zoe")).toBeInTheDocument();
-    fireEvent.click(screen.getByRole("button", { name: "Export identity…" }));
-    const dialog = await screen.findByRole("dialog", { name: "Export identity" });
+    fireEvent.click(await screen.findByRole("button", { name: "Export Default" }));
+    const dialog = await screen.findByRole("dialog", { name: "Export identity Default" });
     const submit = within(dialog).getByRole("button", { name: "Export" });
 
     fireEvent.click(submit);
@@ -1055,7 +1103,7 @@ describe("Identity section", () => {
     });
     fireEvent.click(submit);
     await waitFor(() => {
-      expect(exportIdentity).toHaveBeenCalledWith("/home/me/id.p12", "secret");
+      expect(exportIdentity).toHaveBeenCalledWith(1, "/home/me/id.p12", "secret");
     });
     expect(await screen.findByText("Identity exported.")).toBeInTheDocument();
     expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
@@ -1064,38 +1112,94 @@ describe("Identity section", () => {
   it("does nothing when the save dialog is cancelled", async () => {
     savePath.mockResolvedValue(null);
     await openSection("Identity");
-    fireEvent.click(screen.getByRole("button", { name: "Export identity…" }));
+    fireEvent.click(await screen.findByRole("button", { name: "Export Default" }));
     await waitFor(() => {
       expect(savePath).toHaveBeenCalled();
     });
     expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
   });
 
-  it("imports an identity after confirming the replacement", async () => {
+  it("imports an identity as an additional entry", async () => {
     openPath.mockResolvedValue("/home/me/Old.p12");
     const importIdentity = vi.spyOn(api, "identityImport");
     await openSection("Identity");
-    fireEvent.click(screen.getByRole("button", { name: "Import identity…" }));
+    fireEvent.click(await screen.findByRole("button", { name: "Import…" }));
     const dialog = await screen.findByRole("dialog", { name: "Import identity" });
-    expect(dialog).toHaveTextContent("Importing replaces your current identity");
-    fireEvent.click(within(dialog).getByRole("button", { name: "Replace and import" }));
+    expect(within(dialog).getByLabelText("Label")).toHaveValue("Old");
+    fireEvent.click(within(dialog).getByRole("button", { name: "Import…" }));
     await waitFor(() => {
-      expect(importIdentity).toHaveBeenCalledWith("/home/me/Old.p12", null);
+      expect(importIdentity).toHaveBeenCalledWith("/home/me/Old.p12", null, "Old");
     });
     expect(await screen.findByText('Identity "Old" imported.')).toBeInTheDocument();
+    const list = screen.getByRole("list", { name: "Identities" });
+    expect(within(list).getAllByRole("listitem")).toHaveLength(2);
   });
 
   it("keeps the import dialog open with an explanation when the password is wrong", async () => {
     openPath.mockResolvedValue("/home/me/Old.p12");
     api.mock.failNext("identityImport", "invalidInput");
     await openSection("Identity");
-    fireEvent.click(screen.getByRole("button", { name: "Import identity…" }));
+    fireEvent.click(await screen.findByRole("button", { name: "Import…" }));
     const dialog = await screen.findByRole("dialog", { name: "Import identity" });
     fireEvent.change(within(dialog).getByLabelText(/File password/), {
       target: { value: "wrong" },
     });
-    fireEvent.click(within(dialog).getByRole("button", { name: "Replace and import" }));
+    fireEvent.click(within(dialog).getByRole("button", { name: "Import…" }));
     expect(await within(dialog).findByText(/password is not valid/)).toBeInTheDocument();
+  });
+
+  it("deletes an identity only after the label was typed", async () => {
+    const remove = vi.spyOn(api, "identityDelete");
+    await api.identityCreate("Zoe (Acme)", "Work");
+    await openSection("Identity");
+    fireEvent.click(await screen.findByRole("button", { name: "Delete Work" }));
+    const dialog = await screen.findByRole("dialog", { name: "Delete the identity Work?" });
+    const confirm = within(dialog).getByRole("button", { name: "Delete" });
+    expect(confirm).toBeDisabled();
+    fireEvent.change(within(dialog).getByLabelText("Type the identity label to confirm"), {
+      target: { value: "Wor" },
+    });
+    expect(confirm).toBeDisabled();
+    fireEvent.change(within(dialog).getByLabelText("Type the identity label to confirm"), {
+      target: { value: "Work" },
+    });
+    expect(confirm).toBeEnabled();
+    fireEvent.click(confirm);
+    await waitFor(() => {
+      expect(remove).toHaveBeenCalledWith(2);
+    });
+    expect(await screen.findByText("Identity deleted.")).toBeInTheDocument();
+  });
+
+  it("never lets the last identity be deleted", async () => {
+    await openSection("Identity");
+    fireEvent.click(await screen.findByRole("button", { name: "Delete Default" }));
+    const dialog = await screen.findByRole("dialog", { name: "Delete the identity Default?" });
+    expect(within(dialog).getByText(/at least one identity/)).toBeInTheDocument();
+    expect(within(dialog).getByRole("button", { name: "Delete" })).toBeDisabled();
+  });
+
+  it("offers a backup before deleting", async () => {
+    savePath.mockResolvedValue("/home/me/work.p12");
+    await api.identityCreate("Zoe (Acme)", "Work");
+    await openSection("Identity");
+    fireEvent.click(await screen.findByRole("button", { name: "Delete Work" }));
+    const dialog = await screen.findByRole("dialog", { name: "Delete the identity Work?" });
+    fireEvent.click(within(dialog).getByRole("button", { name: "Back up first" }));
+    expect(await screen.findByRole("dialog", { name: "Export identity Work" })).toBeInTheDocument();
+  });
+
+  it("makes another identity the default", async () => {
+    const setDefault = vi.spyOn(api, "identitySetDefault");
+    await api.identityCreate("Zoe (Acme)", "Work");
+    await openSection("Identity");
+    fireEvent.click(
+      await screen.findByRole("button", { name: "Set Work as the default identity" }),
+    );
+    await waitFor(() => {
+      expect(setDefault).toHaveBeenCalledWith(2);
+    });
+    expect(await screen.findByText("Work is now the default identity.")).toBeInTheDocument();
   });
 });
 

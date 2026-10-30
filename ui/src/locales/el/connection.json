@@ -79,5 +79,7 @@
     "moreInfo": "Περισσότερες πληροφορίες: {{topic}}",
     "effectiveShort": "Αποστολή τώρα",
     "effectiveTip": "Ο ρυθμός bit που αποστέλλεται τώρα, μετά την προσαρμογή στην απώλεια πακέτων."
-  }
+  },
+  "identity": "Ταυτότητα",
+  "identityValue": "{{label}} ({{name}}) · {{fingerprint}}"
 }

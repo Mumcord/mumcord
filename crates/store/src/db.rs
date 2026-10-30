@@ -177,6 +177,24 @@ const MIGRATIONS: &[&str] = &[
         PRIMARY KEY (server_id, position)
     );
     ",
+    // v14: several identities (issue #148). Certificates and keys stay in the OS secure
+    // storage; this table holds the local label, the certificate's common name and hash, when
+    // it was added and which one is the default. `saved_server.identity_id` NULL means "use
+    // the default identity", so existing servers keep their identity after the upgrade.
+    r"
+    CREATE TABLE identity (
+        id         INTEGER PRIMARY KEY,
+        label      TEXT    NOT NULL,
+        cert_name  TEXT    NOT NULL,
+        cert_hash  TEXT    NOT NULL UNIQUE,
+        created_at INTEGER NOT NULL,
+        is_default INTEGER NOT NULL DEFAULT 0 CHECK (is_default IN (0, 1))
+    );
+    CREATE UNIQUE INDEX identity_one_default ON identity (is_default) WHERE is_default = 1;
+
+    ALTER TABLE saved_server ADD COLUMN identity_id INTEGER REFERENCES identity (id)
+        ON DELETE SET NULL;
+    ",
 ];
 
 /// Handle to the local database. Not `Sync`; callers share it behind a mutex.

@@ -144,7 +144,7 @@ async fn tofu_voice_mute_and_reconnect() {
     )
     .expect("engine");
     engine
-        .identity_create(name.clone())
+        .identity_create(name.clone(), None)
         .await
         .expect("identity");
     let server = engine
@@ -324,7 +324,7 @@ async fn declining_the_certificate_disconnects() {
     )
     .expect("engine");
     engine
-        .identity_create(name.clone())
+        .identity_create(name.clone(), None)
         .await
         .expect("identity");
     let mut fields = server_fields(&name);
@@ -401,9 +401,9 @@ async fn join_restores_the_last_own_mute_after_a_restart() {
     let dir = work_dir("engine-live-own-voice");
     let name = unique("mc-ownvoice");
     let data = dir.join("data");
-    // The identity lives in (in-memory) secure storage, so it moves to the restarted engine
-    // through an export file; the database stays in `data`.
-    let identity = dir.join("identity.p12");
+    // The identity lives in (in-memory) secure storage; `secrets.reopen()` hands the same
+    // items to the restarted engine, like the OS store would.
+    let secrets = SecretStore::in_memory();
     let bot = Bot::connect(BotConfig {
         data_dir: Some(dir.join("bot")),
         ..BotConfig::new(&unique("mc-ownear"), common::v14())
@@ -418,14 +418,11 @@ async fn join_restores_the_last_own_mute_after_a_restart() {
     };
 
     let server = {
-        let (engine, mut rx) = Engine::new(
-            &data,
-            SecretStore::in_memory(),
-            tokio::runtime::Handle::current(),
-        )
-        .expect("engine");
+        let (engine, mut rx) =
+            Engine::new(&data, secrets.reopen(), tokio::runtime::Handle::current())
+                .expect("engine");
         engine
-            .identity_create(name.clone())
+            .identity_create(name.clone(), None)
             .await
             .expect("identity");
         let mut fields = server_fields(&name);
@@ -446,24 +443,12 @@ async fn join_restores_the_last_own_mute_after_a_restart() {
             .await
             .expect("muted");
         disconnected(&engine, &mut rx).await;
-        engine
-            .identity_export(identity.clone(), "export".into())
-            .await
-            .expect("export identity");
         server.id
     };
 
-    // App restart: a new engine on the same data directory.
-    let (engine, mut rx) = Engine::new(
-        &data,
-        SecretStore::in_memory(),
-        tokio::runtime::Handle::current(),
-    )
-    .expect("engine restart");
-    engine
-        .identity_import(identity, Some("export".into()))
-        .await
-        .expect("import identity");
+    // App restart: a new engine on the same data directory and the same secure storage.
+    let (engine, mut rx) = Engine::new(&data, secrets.reopen(), tokio::runtime::Handle::current())
+        .expect("engine restart");
     let snapshot = connect_synced(&engine, &mut rx, server).await;
     let me = snapshot
         .users
@@ -497,17 +482,9 @@ async fn join_restores_the_last_own_mute_after_a_restart() {
     disconnected(&engine, &mut rx).await;
 }
 
-async fn restarted_engine(data: &Path, identity: &Path) -> (Engine, EventReceiver) {
-    let (engine, rx) = Engine::new(
-        data,
-        SecretStore::in_memory(),
-        tokio::runtime::Handle::current(),
-    )
-    .expect("engine restart");
-    engine
-        .identity_import(identity.to_path_buf(), Some("export".into()))
-        .await
-        .expect("import identity");
+async fn restarted_engine(data: &Path, secrets: &SecretStore) -> (Engine, EventReceiver) {
+    let (engine, rx) = Engine::new(data, secrets.reopen(), tokio::runtime::Handle::current())
+        .expect("engine restart");
     (engine, rx)
 }
 
@@ -522,7 +499,7 @@ async fn quitting_while_joined_offers_a_rejoin_once_after_the_restart() {
     let dir = work_dir("engine-live-rejoin");
     let name = unique("mc-rejoin");
     let data = dir.join("data");
-    let identity = dir.join("identity.p12");
+    let secrets = SecretStore::in_memory();
     let bot = Bot::connect(BotConfig {
         data_dir: Some(dir.join("bot")),
         ..BotConfig::new(&unique("mc-rejoinear"), common::v14())
@@ -535,14 +512,11 @@ async fn quitting_while_joined_offers_a_rejoin_once_after_the_restart() {
     };
 
     let (server, raid) = {
-        let (engine, mut rx) = Engine::new(
-            &data,
-            SecretStore::in_memory(),
-            tokio::runtime::Handle::current(),
-        )
-        .expect("engine");
+        let (engine, mut rx) =
+            Engine::new(&data, secrets.reopen(), tokio::runtime::Handle::current())
+                .expect("engine");
         engine
-            .identity_create(name.clone())
+            .identity_create(name.clone(), None)
             .await
             .expect("identity");
         let mut fields = server_fields(&name);
@@ -563,14 +537,10 @@ async fn quitting_while_joined_offers_a_rejoin_once_after_the_restart() {
             _ => None,
         })
         .await;
-        engine
-            .identity_export(identity.clone(), "export".into())
-            .await
-            .expect("export identity");
         (server.id, raid)
     };
 
-    let (engine, mut rx) = restarted_engine(&data, &identity).await;
+    let (engine, mut rx) = restarted_engine(&data, &secrets).await;
     let snapshot = connect_synced(&engine, &mut rx, server).await;
     assert!(snapshot.read_only, "still read-only until Rejoin");
     assert_eq!(snapshot.rejoin_channel_id, Some(raid), "Raid offered");
@@ -596,7 +566,7 @@ async fn quitting_while_joined_offers_a_rejoin_once_after_the_restart() {
     disconnected(&engine, &mut rx).await;
     drop(engine);
 
-    let (engine, mut rx) = restarted_engine(&data, &identity).await;
+    let (engine, mut rx) = restarted_engine(&data, &secrets).await;
     let snapshot = connect_synced(&engine, &mut rx, server).await;
     assert_eq!(
         snapshot.rejoin_channel_id, None,
@@ -642,7 +612,7 @@ async fn join_after_a_server_switch_restores_the_own_mute() {
     )
     .expect("engine");
     engine
-        .identity_create(name.clone())
+        .identity_create(name.clone(), None)
         .await
         .expect("identity");
     let mut fields = server_fields(&name);

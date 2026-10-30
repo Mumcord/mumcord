@@ -83,7 +83,7 @@ async fn setting_off_connects_with_the_last_own_voice_choice() {
     )
     .expect("engine");
     engine
-        .identity_create("Connect Tester".into())
+        .identity_create("Connect Tester".into(), None)
         .await
         .expect("identity");
     let name = format!("f74-{:06x}", std::process::id() & 0xff_ffff);

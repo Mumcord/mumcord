@@ -55,7 +55,8 @@
     "passwordRequired": "Įvesk slaptažodį atsarginiam failui apsaugoti.",
     "exported": "Tapatybės atsarginė kopija įrašyta.",
     "confirm": "Registruotis",
-    "done": "Registruotas (-a) šiame serveryje"
+    "done": "Registruotas (-a) šiame serveryje",
+    "identity": "Registruotas vardas priklauso tapatybei {{identity}}."
   },
   "errors": {
     "tooLarge": "Tai per didelis serveriui. Pasirink mažesnę nuotrauką arba trumpesnį tekstą.",

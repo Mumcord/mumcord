@@ -80,5 +80,7 @@
     "moreInfo": "Más información: {{topic}}",
     "effectiveShort": "Enviando ahora",
     "effectiveTip": "La tasa de bits que se envía ahora, tras adaptarse a la pérdida de paquetes."
-  }
+  },
+  "identity": "Identidad",
+  "identityValue": "{{label}} ({{name}}) · {{fingerprint}}"
 }

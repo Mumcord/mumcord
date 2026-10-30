@@ -79,5 +79,7 @@
     "moreInfo": "More information: {{topic}}",
     "effectiveShort": "Sending now",
     "effectiveTip": "The bitrate being sent right now, after adapting to packet loss."
-  }
+  },
+  "identity": "Identity",
+  "identityValue": "{{label}} ({{name}}) · {{fingerprint}}"
 }
