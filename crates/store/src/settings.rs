@@ -422,6 +422,10 @@ pub struct Settings {
     pub appimage_menu_entry: Consent,
     /// The one-time notice about the removed window overlay was shown (FR-2.33).
     pub window_overlay_notice_shown: bool,
+    /// A device choice saved from the old ALSA device list could not be matched to one of the
+    /// sound server's devices and was reset to the system default (issue #183); the user has
+    /// not been told yet.
+    pub audio_device_notice: bool,
     /// Open the "What's new" window once after an update (issue #145). On by default.
     pub whats_new_auto: bool,
     /// The version whose "What's new" the user has seen; `None` before the first start that
@@ -491,6 +495,7 @@ impl Default for Settings {
             last_update_check: None,
             appimage_menu_entry: Consent::Unset,
             window_overlay_notice_shown: false,
+            audio_device_notice: false,
             whats_new_auto: true,
             whats_new_seen: None,
             legacy_window_overlay_enabled: false,
@@ -629,6 +634,7 @@ mod tests {
         changed.last_update_check = Some(1_700_000_000_000);
         changed.appimage_menu_entry = Consent::Yes;
         changed.window_overlay_notice_shown = true;
+        changed.audio_device_notice = true;
         changed.whats_new_auto = false;
         changed.whats_new_seen = Some("0.4.4".into());
         changed.enabled_plugins = vec!["gtav".into()];

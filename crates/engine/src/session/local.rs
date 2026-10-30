@@ -321,12 +321,14 @@ impl Engine {
     }
 
     pub fn settings(&self) -> EngineResult<Settings> {
+        self.inner.migrate_audio_devices();
         lock(&self.inner.store).settings().map_err(store_error)
     }
 
     /// Stores the settings and applies DSP switches, talk mode and devices immediately.
     /// Log level and the push-to-talk key are applied by the app shell.
     pub async fn update_settings(&self, settings: Settings) -> EngineResult<Settings> {
+        self.inner.migrate_audio_devices();
         let previous = {
             let store = lock(&self.inner.store);
             let previous = store.settings().map_err(store_error)?;

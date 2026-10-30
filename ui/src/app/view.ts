@@ -5,11 +5,14 @@ export type Screen = "loading" | "startupError" | "wizard" | "main";
 /** Full-window overlays on top of the main window. */
 export type Overlay = "settings" | null;
 
+/** Settings sections other screens can lead to directly. */
+export type SettingsSection = "overlay" | "audio" | "privacy";
+
 export interface ViewState {
   screen: Screen;
   overlay: Overlay;
   /** Settings section to show first when the settings open; null keeps the default. */
-  settingsSection: "overlay" | "audio" | "privacy" | null;
+  settingsSection: SettingsSection | null;
 }
 
 export type ViewAction =
@@ -17,7 +20,7 @@ export type ViewAction =
   | { type: "failed" }
   | { type: "retry" }
   | { type: "finishWizard" }
-  | { type: "openSettings"; section?: "overlay" | "audio" | "privacy" }
+  | { type: "openSettings"; section?: SettingsSection }
   | { type: "closeOverlay" };
 
 export const initialViewState: ViewState = {

@@ -33,6 +33,8 @@ import {
   CloseDialog,
   WindowOverlayNotice,
   type WindowOverlayNoticeApi,
+  AudioDeviceNotice,
+  type AudioDeviceNoticeApi,
 } from "../features/app";
 
 /** Server bar (B19). */
@@ -73,18 +75,26 @@ const windowOverlayNoticeApi: WindowOverlayNoticeApi = {
   },
 };
 
+const audioDeviceNoticeApi: AudioDeviceNoticeApi = {
+  pending: () => getApi().audioDeviceNoticePending(),
+  dismiss: async () => {
+    await getApi().audioDeviceNoticeDismiss();
+  },
+};
+
 /**
  * Thin status bar above the chat, e.g. "Reconnecting…" (B19), the rejoin offer (QA.9) and the
  * close question (B25). All render nothing when idle.
  */
 export function ChatStatusMount() {
-  const { openOverlaySettings } = useView();
+  const { openOverlaySettings, openAudioSettings } = useView();
   return (
     <>
       <ConnectionStatus />
       <RejoinPrompt />
       <CloseDialog />
       <WindowOverlayNotice api={windowOverlayNoticeApi} onOpenSettings={openOverlaySettings} />
+      <AudioDeviceNotice api={audioDeviceNoticeApi} onOpenSettings={openAudioSettings} />
       <UpdateHint />
       <UpdateCheckPrompt />
       <AppImageMenuPrompt />

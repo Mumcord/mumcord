@@ -14,6 +14,12 @@
     "dismiss": "Rozumiem",
     "openSettings": "Otwórz ustawienia nakładki"
   },
+  "audioDevice": {
+    "title": "Wybierz ponownie urządzenia audio",
+    "description": "Mumcord pokazuje teraz osobno każde wejście i wyjście Twoich urządzeń audio. Zapisanego urządzenia nie udało się dopasować do żadnego z nich, więc na razie używane jest domyślne urządzenie systemowe. Urządzenie możesz wybrać w ustawieniach audio.",
+    "dismiss": "Rozumiem",
+    "openSettings": "Otwórz ustawienia audio"
+  },
   "appImageMenu": {
     "title": "Dodać Mumcord do menu aplikacji?",
     "description": "Dzięki temu Mumcord pojawi się w menu aplikacji. Ikona i push-to-talk będą działać poprawnie w Wayland, a linki mumble:// otworzą Mumcord. Możesz to później zmienić w Ustawieniach.",
