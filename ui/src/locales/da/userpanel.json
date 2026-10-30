@@ -95,5 +95,22 @@
     "line": "Tale: {{channel}} · {{server}}",
     "server": "Tale: {{server}}",
     "show": "{{location}} – vis denne server"
+  },
+  "audio": {
+    "inputTitle": "Mikrofon",
+    "outputTitle": "Højttalere",
+    "inputOptions": "Mikrofonindstillinger",
+    "outputOptions": "Højttalerindstillinger",
+    "inputDevices": "Inputenhed",
+    "outputDevices": "Outputenhed",
+    "systemDefault": "Systemstandard",
+    "noDevices": "Ingen enheder fundet",
+    "inputGain": "Inputlydstyrke",
+    "outputVolume": "Outputlydstyrke",
+    "noiseSuppression": "Støjreduktion",
+    "testSound": "Test lyd",
+    "voiceSettings": "Stemmeindstillinger…",
+    "fallbackInput": "Mikrofonen blev frakoblet. Systemstandarden bruges.",
+    "fallbackOutput": "Outputenheden blev frakoblet. Systemstandarden bruges."
   }
 }

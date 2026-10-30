@@ -95,5 +95,22 @@
     "line": "Vocal : {{channel}} · {{server}}",
     "server": "Vocal : {{server}}",
     "show": "{{location}} – afficher ce serveur"
+  },
+  "audio": {
+    "inputTitle": "Microphone",
+    "outputTitle": "Haut-parleurs",
+    "inputOptions": "Options du microphone",
+    "outputOptions": "Options des haut-parleurs",
+    "inputDevices": "Périphérique d’entrée",
+    "outputDevices": "Périphérique de sortie",
+    "systemDefault": "Par défaut du système",
+    "noDevices": "Aucun périphérique trouvé",
+    "inputGain": "Volume d’entrée",
+    "outputVolume": "Volume de sortie",
+    "noiseSuppression": "Suppression du bruit",
+    "testSound": "Tester le son",
+    "voiceSettings": "Paramètres vocaux…",
+    "fallbackInput": "Microphone débranché. Le périphérique par défaut du système est utilisé.",
+    "fallbackOutput": "Périphérique de sortie débranché. Le périphérique par défaut du système est utilisé."
   }
 }

@@ -9,7 +9,7 @@ export interface ViewState {
   screen: Screen;
   overlay: Overlay;
   /** Settings section to show first when the settings open; null keeps the default. */
-  settingsSection: "overlay" | null;
+  settingsSection: "overlay" | "audio" | null;
 }
 
 export type ViewAction =
@@ -17,7 +17,7 @@ export type ViewAction =
   | { type: "failed" }
   | { type: "retry" }
   | { type: "finishWizard" }
-  | { type: "openSettings"; section?: "overlay" }
+  | { type: "openSettings"; section?: "overlay" | "audio" }
   | { type: "closeOverlay" };
 
 export const initialViewState: ViewState = {
@@ -51,6 +51,8 @@ export interface View extends ViewState {
   openSettings: () => void;
   /** Opens the settings on the overlay section. */
   openOverlaySettings: () => void;
+  /** Opens the settings on the audio section. */
+  openAudioSettings: () => void;
   closeOverlay: () => void;
   retry: () => void;
 }

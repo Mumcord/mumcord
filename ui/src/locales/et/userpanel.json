@@ -95,5 +95,22 @@
     "line": "Hääl: {{channel}} · {{server}}",
     "server": "Hääl: {{server}}",
     "show": "{{location}} – näita seda serverit"
+  },
+  "audio": {
+    "inputTitle": "Mikrofon",
+    "outputTitle": "Kõlarid",
+    "inputOptions": "Mikrofoni valikud",
+    "outputOptions": "Kõlarite valikud",
+    "inputDevices": "Sisendseade",
+    "outputDevices": "Väljundseade",
+    "systemDefault": "Süsteemi vaikeseade",
+    "noDevices": "Seadmeid ei leitud",
+    "inputGain": "Sisendi helitugevus",
+    "outputVolume": "Väljundi helitugevus",
+    "noiseSuppression": "Müra vähendamine",
+    "testSound": "Testhelin",
+    "voiceSettings": "Hääleseaded…",
+    "fallbackInput": "Mikrofon eemaldati. Kasutusel on süsteemi vaikeseade.",
+    "fallbackOutput": "Väljundseade eemaldati. Kasutusel on süsteemi vaikeseade."
   }
 }

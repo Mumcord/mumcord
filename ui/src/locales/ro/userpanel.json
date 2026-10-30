@@ -95,5 +95,22 @@
     "line": "Voce: {{channel}} · {{server}}",
     "server": "Voce: {{server}}",
     "show": "{{location}} – arată acest server"
+  },
+  "audio": {
+    "inputTitle": "Microfon",
+    "outputTitle": "Difuzoare",
+    "inputOptions": "Opțiuni microfon",
+    "outputOptions": "Opțiuni difuzoare",
+    "inputDevices": "Dispozitiv de intrare",
+    "outputDevices": "Dispozitiv de ieșire",
+    "systemDefault": "Implicit al sistemului",
+    "noDevices": "Niciun dispozitiv găsit",
+    "inputGain": "Volum de intrare",
+    "outputVolume": "Volum de ieșire",
+    "noiseSuppression": "Suprimarea zgomotului",
+    "testSound": "Testează sunetul",
+    "voiceSettings": "Setări de voce…",
+    "fallbackInput": "Microfonul a fost deconectat. Se folosește dispozitivul implicit al sistemului.",
+    "fallbackOutput": "Dispozitivul de ieșire a fost deconectat. Se folosește dispozitivul implicit al sistemului."
   }
 }

@@ -95,5 +95,22 @@
     "line": "Głos: {{channel}} · {{server}}",
     "server": "Głos: {{server}}",
     "show": "{{location}} – pokaż ten serwer"
+  },
+  "audio": {
+    "inputTitle": "Mikrofon",
+    "outputTitle": "Głośniki",
+    "inputOptions": "Opcje mikrofonu",
+    "outputOptions": "Opcje głośników",
+    "inputDevices": "Urządzenie wejściowe",
+    "outputDevices": "Urządzenie wyjściowe",
+    "systemDefault": "Domyślne systemowe",
+    "noDevices": "Nie znaleziono urządzeń",
+    "inputGain": "Głośność wejścia",
+    "outputVolume": "Głośność wyjścia",
+    "noiseSuppression": "Redukcja szumów",
+    "testSound": "Dźwięk testowy",
+    "voiceSettings": "Ustawienia głosu…",
+    "fallbackInput": "Mikrofon odłączony. Używane jest urządzenie domyślne systemu.",
+    "fallbackOutput": "Urządzenie wyjściowe odłączone. Używane jest urządzenie domyślne systemu."
   }
 }

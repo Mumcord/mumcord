@@ -95,5 +95,22 @@
     "line": "Voz: {{channel}} · {{server}}",
     "server": "Voz: {{server}}",
     "show": "{{location}} – mostrar este servidor"
+  },
+  "audio": {
+    "inputTitle": "Microfone",
+    "outputTitle": "Altifalantes",
+    "inputOptions": "Opções do microfone",
+    "outputOptions": "Opções dos altifalantes",
+    "inputDevices": "Dispositivo de entrada",
+    "outputDevices": "Dispositivo de saída",
+    "systemDefault": "Predefinição do sistema",
+    "noDevices": "Nenhum dispositivo encontrado",
+    "inputGain": "Volume de entrada",
+    "outputVolume": "Volume de saída",
+    "noiseSuppression": "Supressão de ruído",
+    "testSound": "Testar som",
+    "voiceSettings": "Definições de voz…",
+    "fallbackInput": "Microfone desligado. A usar a predefinição do sistema.",
+    "fallbackOutput": "Dispositivo de saída desligado. A usar a predefinição do sistema."
   }
 }

@@ -95,5 +95,22 @@
     "line": "Glas: {{channel}} · {{server}}",
     "server": "Glas: {{server}}",
     "show": "{{location}} – prikaži ovaj poslužitelj"
+  },
+  "audio": {
+    "inputTitle": "Mikrofon",
+    "outputTitle": "Zvučnici",
+    "inputOptions": "Opcije mikrofona",
+    "outputOptions": "Opcije zvučnika",
+    "inputDevices": "Ulazni uređaj",
+    "outputDevices": "Izlazni uređaj",
+    "systemDefault": "Zadano u sustavu",
+    "noDevices": "Nije pronađen nijedan uređaj",
+    "inputGain": "Glasnoća ulaza",
+    "outputVolume": "Glasnoća izlaza",
+    "noiseSuppression": "Potiskivanje šuma",
+    "testSound": "Probni zvuk",
+    "voiceSettings": "Postavke glasa…",
+    "fallbackInput": "Mikrofon je odspojen. Koristi se zadani uređaj sustava.",
+    "fallbackOutput": "Izlazni uređaj je odspojen. Koristi se zadani uređaj sustava."
   }
 }

@@ -314,3 +314,40 @@
   margin: 0;
   padding-left: 1.5em;
 }
+
+/* A toggle with its small options arrow beside it. */
+.userpanel__split {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+}
+
+.userpanel__arrow {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  width: 1rem;
+  height: 2rem;
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-md);
+  background: transparent;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+}
+
+.userpanel__arrow:hover:not(:disabled) {
+  background: var(--color-bg-hover);
+}
+
+.userpanel__arrow:disabled {
+  color: var(--color-text-muted);
+  cursor: default;
+}
+
+.userpanel-notice {
+  margin: var(--space-1) 0 0;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+}

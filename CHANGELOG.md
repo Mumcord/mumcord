@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Added
+
+- Right-clicking (or pressing the menu key on, or using the small arrow beside) the microphone or headphones button in the voice bar opens a quick audio popover; left-click still mutes or deafens. The microphone popover lists the input devices (current one checked, system default marked) with an input volume slider (0–200 %), a live level meter, a noise suppression switch and a link to the voice settings; the headphones popover lists the output devices with an output volume slider (0–100 %), a Test sound button and the same link. Switching applies at once without reconnecting, plugged-in devices appear live, and when a chosen device is unplugged Mumcord falls back to the system default and says so briefly (#153)
+
 ## [0.4.4] - 2026-10-30
 
 ### Added

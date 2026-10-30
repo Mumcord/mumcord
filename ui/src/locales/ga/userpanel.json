@@ -95,5 +95,22 @@
     "line": "Guth: {{channel}} · {{server}}",
     "server": "Guth: {{server}}",
     "show": "{{location}} – taispeáin an freastalaí seo"
+  },
+  "audio": {
+    "inputTitle": "Micreafón",
+    "outputTitle": "Callairí",
+    "inputOptions": "Roghanna micreafóin",
+    "outputOptions": "Roghanna callairí",
+    "inputDevices": "Gléas ionchuir",
+    "outputDevices": "Gléas aschuir",
+    "systemDefault": "Réamhshocrú an chórais",
+    "noDevices": "Níor aimsíodh aon ghléas",
+    "inputGain": "Toirt ionchuir",
+    "outputVolume": "Toirt aschuir",
+    "noiseSuppression": "Ceapadh torainn",
+    "testSound": "Tástáil fuaim",
+    "voiceSettings": "Socruithe gutha…",
+    "fallbackInput": "Díphlugáladh an micreafón. Úsáidtear réamhshocrú an chórais.",
+    "fallbackOutput": "Díphlugáladh an gléas aschuir. Úsáidtear réamhshocrú an chórais."
   }
 }

@@ -95,5 +95,22 @@
     "line": "Spraak: {{channel}} · {{server}}",
     "server": "Spraak: {{server}}",
     "show": "{{location}} – deze server tonen"
+  },
+  "audio": {
+    "inputTitle": "Microfoon",
+    "outputTitle": "Luidsprekers",
+    "inputOptions": "Microfoonopties",
+    "outputOptions": "Luidsprekeropties",
+    "inputDevices": "Invoerapparaat",
+    "outputDevices": "Uitvoerapparaat",
+    "systemDefault": "Systeemstandaard",
+    "noDevices": "Geen apparaten gevonden",
+    "inputGain": "Invoervolume",
+    "outputVolume": "Uitvoervolume",
+    "noiseSuppression": "Ruisonderdrukking",
+    "testSound": "Testgeluid",
+    "voiceSettings": "Spraakinstellingen…",
+    "fallbackInput": "Microfoon losgekoppeld. De systeemstandaard wordt gebruikt.",
+    "fallbackOutput": "Uitvoerapparaat losgekoppeld. De systeemstandaard wordt gebruikt."
   }
 }

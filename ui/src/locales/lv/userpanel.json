@@ -95,5 +95,22 @@
     "line": "Balss: {{channel}} · {{server}}",
     "server": "Balss: {{server}}",
     "show": "{{location}} – rādīt šo serveri"
+  },
+  "audio": {
+    "inputTitle": "Mikrofons",
+    "outputTitle": "Skaļruņi",
+    "inputOptions": "Mikrofona opcijas",
+    "outputOptions": "Skaļruņu opcijas",
+    "inputDevices": "Ievades ierīce",
+    "outputDevices": "Izvades ierīce",
+    "systemDefault": "Sistēmas noklusējums",
+    "noDevices": "Ierīces nav atrastas",
+    "inputGain": "Ievades skaļums",
+    "outputVolume": "Izvades skaļums",
+    "noiseSuppression": "Trokšņu slāpēšana",
+    "testSound": "Pārbaudes skaņa",
+    "voiceSettings": "Balss iestatījumi…",
+    "fallbackInput": "Mikrofons atvienots. Tiek izmantots sistēmas noklusējums.",
+    "fallbackOutput": "Izvades ierīce atvienota. Tiek izmantots sistēmas noklusējums."
   }
 }
