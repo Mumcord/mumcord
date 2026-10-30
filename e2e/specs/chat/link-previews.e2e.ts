@@ -311,4 +311,23 @@ describe("chat: link previews, player cards and inline images (AC-1.39, AC-1.40,
     await expect($$("figure.inline-image")).toBeElementsArrayOfSize(0);
     expect(site.requests.length).toBe(before);
   });
+
+  // Issue #160: the watch party loads YouTube, so it follows the same switch.
+  it("with embeds switched off Watch together is disabled and names the privacy settings", async () => {
+    const apps = $("button[aria-label='Apps']");
+    await apps.waitForClickable();
+    await apps.click();
+    const watch = $("//button[@role='menuitem'][starts-with(., 'Watch together')]");
+    await watch.waitForDisplayed();
+    await expect(watch).toHaveAttribute("aria-disabled", "true");
+    await expect(watch).toHaveText(
+      expect.stringContaining("Turn on embedded players in Privacy settings to watch together"),
+    );
+    const link = $("//button[@role='menuitem' and .='Open Privacy settings']");
+    await link.click();
+    await expect($("//button[@role='tab' and .='Privacy']")).toHaveAttribute(
+      "aria-selected",
+      "true",
+    );
+  });
 });

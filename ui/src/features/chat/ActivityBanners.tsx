@@ -4,6 +4,8 @@
  */
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { useEmbedsAllowed } from "../../app/preferences";
+import { useOpenPrivacySettings } from "../../app/view";
 import { getApi } from "../../api";
 import { announce } from "../../a11y";
 import { useServerState, useShownServerId } from "../channels";
@@ -16,6 +18,7 @@ import "./chat.css";
 
 const MAX_BANNERS = 3;
 
+/** The video title for the banner; loads nothing for `null`. */
 function useVideoTitle(videoId: string | null): string | null {
   const [loaded, setLoaded] = useState<{ videoId: string; title: string | null }>();
   useEffect(() => {
@@ -33,6 +36,9 @@ function useVideoTitle(videoId: string | null): string | null {
 
 export function ActivityBanners({ channelId }: { channelId: number }) {
   const { t } = useTranslation("chat");
+  const { t: tParty } = useTranslation("watchparty");
+  const embeds = useEmbedsAllowed();
+  const openPrivacy = useOpenPrivacySettings();
   const serverId = useShownServerId();
   const { users, selfSession } = useServerState();
   const shares = useScreenShares(serverId);
@@ -40,7 +46,8 @@ export function ActivityBanners({ channelId }: { channelId: number }) {
   const live = useWatchParty(serverId);
   const party = live?.party ?? null;
   const partyVideo = party !== null && party.channelId === channelId ? party.videoId : null;
-  const title = useVideoTitle(partyVideo);
+  // The title comes from YouTube, so with embeds off it is not even asked for.
+  const title = useVideoTitle(embeds ? partyVideo : null);
 
   const inChannel = selfSession !== null && users.get(selfSession)?.channelId === channelId;
   if (serverId === null || !inChannel) return null;
@@ -60,12 +67,23 @@ export function ActivityBanners({ channelId }: { channelId: number }) {
   // The engine lists shares oldest first, so reversing puts the newest on top.
   const banners: { key: string; text: string; action: string; run: () => void }[] = [];
   if (partyVideo !== null && party !== null && !party.joined) {
-    banners.push({
-      key: "party",
-      text: t("activity.party", { title: title ?? t("activity.videoFallback") }),
-      action: t("activity.join"),
-      run: joinParty,
-    });
+    banners.push(
+      embeds
+        ? {
+            key: "party",
+            text: t("activity.party", { title: title ?? t("activity.videoFallback") }),
+            action: t("activity.join"),
+            run: joinParty,
+          }
+        : {
+            key: "party",
+            text: tParty("embedsOffJoin"),
+            action: tParty("openPrivacy"),
+            run: () => {
+              openPrivacy?.();
+            },
+          },
+    );
   }
   for (const share of [...shares].reverse()) {
     if (share.session === selfSession) continue;

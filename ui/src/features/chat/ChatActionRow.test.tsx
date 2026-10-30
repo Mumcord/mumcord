@@ -1,4 +1,11 @@
-import { act, fireEvent, render, screen, waitFor } from "@testing-library/react";
+import {
+  act,
+  fireEvent,
+  render as rtlRender,
+  screen,
+  waitFor,
+  within,
+} from "@testing-library/react";
 import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 import type { MockApi, WatchParty } from "../../api";
 import { applyLanguage } from "../../i18n";
@@ -8,6 +15,7 @@ import { connectedMock, resetAll } from "../channels/testUtils";
 import { resetScreenShareStore } from "../screenshare";
 import { resetWatchPartyStore } from "../watchparty";
 import { ChatActionRow } from "./ChatActionRow";
+import { renderWithEmbeds as render, withEmbeds } from "../../app/testPreferences";
 
 const VIDEO = "dQw4w9WgXcQ";
 const LINK = `https://www.youtube.com/watch?v=${VIDEO}`;
@@ -219,5 +227,35 @@ describe("watch together", () => {
     });
     expect(post).not.toHaveBeenCalled();
     expect(start).not.toHaveBeenCalled();
+  });
+});
+
+describe("embedded players switched off", () => {
+  const openPrivacySettings = vi.fn();
+  const renderOff = () => {
+    rtlRender(<ChatActionRow />, { wrapper: withEmbeds(false, { openPrivacySettings }) });
+  };
+
+  it("lists Watch together disabled with the reason and a link to the privacy settings", () => {
+    renderOff();
+    const menu = openMenu();
+    const watch = within(menu).getByRole("menuitem", { name: /^Watch together/ });
+    expect(watch).toHaveAttribute("aria-disabled", "true");
+    expect(watch).toHaveTextContent(
+      "Turn on embedded players in Privacy settings to watch together",
+    );
+    fireEvent.click(watch);
+    expect(screen.queryByRole("dialog")).toBeNull();
+    fireEvent.click(within(menu).getByRole("menuitem", { name: "Open Privacy settings" }));
+    expect(openPrivacySettings).toHaveBeenCalledTimes(1);
+  });
+
+  it("starts Watch together as before when the switch is on", () => {
+    render(<ChatActionRow />);
+    const menu = openMenu();
+    const watch = within(menu).getByRole("menuitem", { name: /^Watch together/ });
+    expect(watch).not.toHaveAttribute("aria-disabled");
+    expect(within(menu).queryByRole("menuitem", { name: "Open Privacy settings" })).toBeNull();
+    expect(watch).not.toHaveTextContent("Privacy settings");
   });
 });
