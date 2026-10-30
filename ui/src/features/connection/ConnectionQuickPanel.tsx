@@ -64,7 +64,6 @@ export function ConnectionQuickPanel({ onOpenVoiceSettings }: { onOpenVoiceSetti
           ) : null}
           <Switch
             label={ts("audio.musicQuality")}
-            description={ts("audio.musicQualityHint")}
             checked={settings.musicQuality}
             onChange={(musicQuality) => {
               update({ musicQuality });
