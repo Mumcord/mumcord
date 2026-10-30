@@ -226,6 +226,8 @@ struct Inner {
     previews: Arc<crate::web::LinkPreviews>,
     /// Answers of the public server query behind the `mumble://` link card (issue #175).
     queries: Arc<crate::server_query::ServerQueries>,
+    /// The public server browser's list source and ping pacing (issue #68).
+    public_servers: crate::public_servers::PublicServers,
     /// Full-size image transfers with other Mumcord clients (FR-1.60c).
     full_images: crate::full_image::ServerTransfers,
     /// Direct connections to other Mumcord users (FR-2.35).
@@ -526,6 +528,7 @@ impl Engine {
         let meter = Arc::new(Meter::default());
         voice::spawn_meter(&rt, controls.clone(), meter.clone(), events.clone());
         let voice = Arc::new(VoiceShared::default());
+        let queries = Arc::new(crate::server_query::ServerQueries::default());
         let inner = Arc::new(Inner {
             rt,
             data_dir: data_dir.to_path_buf(),
@@ -546,7 +549,8 @@ impl Engine {
                 crate::web::LinkPreviews::app_policy(),
                 crate::web::fetch::Timeouts::default(),
             )),
-            queries: Arc::new(crate::server_query::ServerQueries::default()),
+            queries: queries.clone(),
+            public_servers: crate::public_servers::PublicServers::new(queries),
             full_images: crate::full_image::ServerTransfers::default(),
             direct: crate::p2p::Direct::default(),
             core: Mutex::new(Core::default()),
@@ -636,6 +640,26 @@ impl Engine {
                 crate::server_query::QueryOutcome::NotAllowed
             }
         }
+    }
+
+    /// The public server list (issue #68). Fetched only on this call, which the UI makes when the
+    /// user opens the server browser; `agent` names this client honestly.
+    pub async fn public_servers(
+        &self,
+        agent: &str,
+    ) -> Result<Vec<crate::public_servers::PublicServer>, crate::public_servers::PublicListError>
+    {
+        self.inner.public_servers.list(agent).await
+    }
+
+    /// Ping, users and user limit of one listed server, paced with all other browser pings;
+    /// `None` when it did not answer.
+    pub async fn public_server_ping(
+        &self,
+        host: &str,
+        port: u16,
+    ) -> Option<crate::server_query::ServerQuery> {
+        self.inner.public_servers.ping(host, port).await
     }
 
     /// An external image or image link from a message, ready to show inline (FR-1.55); `None`
