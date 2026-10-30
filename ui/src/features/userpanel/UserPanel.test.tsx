@@ -496,6 +496,7 @@ describe("UserPanel", () => {
       expect.stringMatching(/^Disconnect from /),
       "More disconnect options",
       "Connection info",
+      "Voice quality",
       "Quick settings",
     ]);
     await joinVoice();

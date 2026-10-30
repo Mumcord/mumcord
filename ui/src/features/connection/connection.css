@@ -61,3 +61,130 @@
   color: var(--color-text-muted);
   font-size: var(--font-size-sm);
 }
+
+.connection-info__more {
+  padding-inline: var(--space-1);
+}
+
+.connection-quick {
+  display: grid;
+  gap: var(--space-2);
+  font-size: var(--font-size-sm);
+}
+
+.connection-quick__status {
+  margin: 0;
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text-muted);
+}
+
+.connection-quick__bandwidth {
+  display: grid;
+  gap: var(--space-1);
+}
+
+.connection-quick__bandwidth meter {
+  width: 100%;
+}
+
+.connection-quick__link {
+  justify-self: start;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--color-accent-text);
+  font: inherit;
+  font-weight: var(--font-weight-bold);
+  cursor: pointer;
+}
+
+.connection-quick__link:focus-visible {
+  outline: 2px solid var(--color-focus);
+}
+
+/* The quick panel is a popover wider than the sidebar, anchored above the icon (issue #155 mockup). */
+.connection-info__panel--quick {
+  position: fixed;
+  right: auto;
+  width: min(24rem, calc(100vw - 2 * var(--space-2)));
+  padding: var(--space-3);
+}
+
+.connection-quick__header {
+  display: grid;
+  gap: var(--space-1);
+}
+
+.connection-quick__headline {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1) var(--space-3);
+  align-items: baseline;
+  justify-content: space-between;
+}
+
+.connection-quick__title {
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-bold);
+}
+
+.connection-quick__summary {
+  display: inline-flex;
+  gap: var(--space-2);
+  align-items: baseline;
+  color: var(--color-text-muted);
+}
+
+.connection-quick__header p {
+  margin: 0;
+}
+
+.connection-quick__section {
+  padding-top: var(--space-2);
+  border-top: 1px solid var(--color-border);
+}
+
+.connection-quick__effective {
+  display: flex;
+  justify-content: space-between;
+  margin: 0;
+  color: var(--color-text-muted);
+}
+
+.connection-quick__effective strong {
+  color: var(--color-text);
+}
+
+.connection-quick__footer {
+  display: flex;
+  gap: var(--space-3);
+  align-items: baseline;
+  justify-content: space-between;
+  padding-top: var(--space-2);
+  border-top: 1px solid var(--color-border);
+}
+
+.settings-switch__badge {
+  margin-inline-start: var(--space-2);
+  padding: 0 var(--space-2);
+  border: 1px solid var(--color-accent-text);
+  border-radius: var(--radius-md);
+  color: var(--color-accent-text);
+  font-size: var(--font-size-xs, var(--font-size-sm));
+}
+
+.connection-quick .overlay-settings__slider input[type="range"] {
+  flex: 1;
+  min-width: 0;
+}
+
+.connection-quick .overlay-settings__slider output {
+  min-width: 0;
+  color: var(--color-text);
+  font-weight: var(--font-weight-bold);
+  text-align: end;
+}
+
+.connection-quick__effective strong {
+  white-space: nowrap;
+}

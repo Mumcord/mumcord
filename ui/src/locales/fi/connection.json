@@ -58,5 +58,26 @@
     "perMinute": "Viimeiset {{minutes}} min: {{value}} minuutissa.",
     "concealedShare": "Viimeiset {{minutes}} min: {{value}} % vastaanotetuista kehyksistä.",
     "processingMax": "Viimeiset {{minutes}} min: enint. {{value}} ms {{budget}} ms:n kehysbudjetista."
+  },
+  "quick": {
+    "open": "Äänenlaatu",
+    "title": "Äänenlaatu",
+    "status": "Viive {{latency}}, hävikki {{loss}}",
+    "lowLatency": "Pienen viiveen tila",
+    "lowLatencyHint": "Pienimmät paketit ja puskurit yhteissoittoon. Enemmän kaistaa, vähemmän vakaa.",
+    "lowLatencyComingSoon": "Tulossa pian",
+    "voiceSettings": "Ääniasetukset…",
+    "applies": "Tulee voimaan heti, tallentuu kuten Asetukset → Ääni",
+    "keys": "Esc sulkee · ↑↓ siirtyy · ← → säätää",
+    "bandwidthLabel": "Arvioitu kaistanleveys otsakkeineen",
+    "bandwidthValue": "≈ {{value}} / {{limit}} kbit/s",
+    "bandwidthValueNoLimit": "≈ {{value}} kbit/s",
+    "bandwidthHintWithin": "Pienen viiveen tilassa: ≈ {{value}} kbit/s (10 ms:n paketit), yhä rajan sisällä.",
+    "bandwidthHintOver": "Pienen viiveen tilassa: ≈ {{value}} kbit/s (10 ms:n paketit), rajan yli.",
+    "bandwidthHintNoLimit": "Pienen viiveen tilassa: ≈ {{value}} kbit/s (10 ms:n paketit).",
+    "beta": "Beta",
+    "moreInfo": "Lisätietoja: {{topic}}",
+    "effectiveShort": "Lähetetään nyt",
+    "effectiveTip": "Parhaillaan lähetettävä bittinopeus pakettihävikkiin sopeuttamisen jälkeen."
   }
 }

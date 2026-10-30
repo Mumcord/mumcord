@@ -60,5 +60,26 @@
     "perMinute": "Ostatnie {{minutes}} min: {{value}} na minutę.",
     "concealedShare": "Ostatnie {{minutes}} min: {{value}} % odebranych ramek.",
     "processingMax": "Ostatnie {{minutes}} min: maks. {{value}} ms z budżetu {{budget}} ms na ramkę."
+  },
+  "quick": {
+    "open": "Jakość głosu",
+    "title": "Jakość głosu",
+    "status": "Ping {{latency}}, utrata {{loss}}",
+    "lowLatency": "Tryb niskich opóźnień",
+    "lowLatencyHint": "Najmniejsze pakiety i bufory do wspólnego grania muzyki. Więcej przepustowości, mniejsza odporność.",
+    "lowLatencyComingSoon": "Wkrótce",
+    "voiceSettings": "Ustawienia głosu…",
+    "applies": "Działa od razu, zapisywane jak w Ustawienia → Dźwięk",
+    "keys": "Esc zamyka · ↑↓ przesuwa · ← → reguluje",
+    "bandwidthLabel": "Szacowana przepustowość z nagłówkami",
+    "bandwidthValue": "≈ {{value}} z {{limit}} kbit/s",
+    "bandwidthValueNoLimit": "≈ {{value}} kbit/s",
+    "bandwidthHintWithin": "Z trybem niskich opóźnień: ≈ {{value}} kbit/s (pakiety po 10 ms), nadal w limicie.",
+    "bandwidthHintOver": "Z trybem niskich opóźnień: ≈ {{value}} kbit/s (pakiety po 10 ms), ponad limitem.",
+    "bandwidthHintNoLimit": "Z trybem niskich opóźnień: ≈ {{value}} kbit/s (pakiety po 10 ms).",
+    "beta": "Beta",
+    "moreInfo": "Więcej informacji: {{topic}}",
+    "effectiveShort": "Aktualnie wysyłane",
+    "effectiveTip": "Szybkość transmisji wysyłana w tej chwili, po dostosowaniu do utraty pakietów."
   }
 }

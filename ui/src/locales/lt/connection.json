@@ -60,5 +60,26 @@
     "perMinute": "Paskutinės {{minutes}} min: {{value}} per minutę.",
     "concealedShare": "Paskutinės {{minutes}} min: {{value}} % gautų kadrų.",
     "processingMax": "Paskutinės {{minutes}} min: daugiausia {{value}} ms iš {{budget}} ms kadro biudžeto."
+  },
+  "quick": {
+    "open": "Balso kokybė",
+    "title": "Balso kokybė",
+    "status": "Ping {{latency}}, nuostoliai {{loss}}",
+    "lowLatency": "Mažos delsos režimas",
+    "lowLatencyHint": "Mažiausi paketai ir buferiai muzikuoti kartu. Daugiau pralaidumo, mažiau patikima.",
+    "lowLatencyComingSoon": "Netrukus",
+    "voiceSettings": "Balso nustatymai…",
+    "applies": "Taikoma iškart, išsaugoma kaip Nustatymai → Garsas",
+    "keys": "Esc uždaro · ↑↓ juda · ← → keičia",
+    "bandwidthLabel": "Numatomas pralaidumas su antraštėmis",
+    "bandwidthValue": "≈ {{value}} iš {{limit}} kbit/s",
+    "bandwidthValueNoLimit": "≈ {{value}} kbit/s",
+    "bandwidthHintWithin": "Su mažos delsos režimu: ≈ {{value}} kbit/s (10 ms paketai), vis dar neviršija ribos.",
+    "bandwidthHintOver": "Su mažos delsos režimu: ≈ {{value}} kbit/s (10 ms paketai), viršija ribą.",
+    "bandwidthHintNoLimit": "Su mažos delsos režimu: ≈ {{value}} kbit/s (10 ms paketai).",
+    "beta": "Beta",
+    "moreInfo": "Daugiau informacijos: {{topic}}",
+    "effectiveShort": "Dabar siunčiama",
+    "effectiveTip": "Šiuo metu siunčiamas bitų greitis, prisitaikius prie paketų nuostolių."
   }
 }

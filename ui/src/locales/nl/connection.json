@@ -58,5 +58,26 @@
     "perMinute": "Laatste {{minutes}} min: {{value}} per minuut.",
     "concealedShare": "Laatste {{minutes}} min: {{value}} % van de ontvangen frames.",
     "processingMax": "Laatste {{minutes}} min: max. {{value}} ms van {{budget}} ms framebudget."
+  },
+  "quick": {
+    "open": "Spraakkwaliteit",
+    "title": "Spraakkwaliteit",
+    "status": "Ping {{latency}}, verlies {{loss}}",
+    "lowLatency": "Modus voor lage latentie",
+    "lowLatencyHint": "Kleinste pakketten en buffers om samen muziek te spelen. Meer bandbreedte, minder robuust.",
+    "lowLatencyComingSoon": "Binnenkort beschikbaar",
+    "voiceSettings": "Spraakinstellingen…",
+    "applies": "Geldt direct, opgeslagen zoals bij Instellingen → Audio",
+    "keys": "Esc sluit · ↑↓ verplaatst · ← → past aan",
+    "bandwidthLabel": "Geschatte bandbreedte incl. headers",
+    "bandwidthValue": "≈ {{value}} van {{limit}} kbit/s",
+    "bandwidthValueNoLimit": "≈ {{value}} kbit/s",
+    "bandwidthHintWithin": "Met modus voor lage latentie: ≈ {{value}} kbit/s (pakketten van 10 ms), nog binnen de limiet.",
+    "bandwidthHintOver": "Met modus voor lage latentie: ≈ {{value}} kbit/s (pakketten van 10 ms), boven de limiet.",
+    "bandwidthHintNoLimit": "Met modus voor lage latentie: ≈ {{value}} kbit/s (pakketten van 10 ms).",
+    "beta": "Beta",
+    "moreInfo": "Meer informatie: {{topic}}",
+    "effectiveShort": "Nu verzonden",
+    "effectiveTip": "De bitrate die nu wordt verzonden, na aanpassing aan pakketverlies."
   }
 }

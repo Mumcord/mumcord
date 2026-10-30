@@ -59,5 +59,26 @@
     "perMinute": "Últimos {{minutes}} min: {{value}} por minuto.",
     "concealedShare": "Últimos {{minutes}} min: {{value}} % de las tramas recibidas.",
     "processingMax": "Últimos {{minutes}} min: máx. {{value}} ms de {{budget}} ms por trama."
+  },
+  "quick": {
+    "open": "Calidad de voz",
+    "title": "Calidad de voz",
+    "status": "Ping {{latency}}, pérdida {{loss}}",
+    "lowLatency": "Modo de baja latencia",
+    "lowLatencyHint": "Paquetes y búferes mínimos para tocar música juntos. Más ancho de banda, menos robusto.",
+    "lowLatencyComingSoon": "Próximamente",
+    "voiceSettings": "Ajustes de voz…",
+    "applies": "Se aplica al instante y se guarda como en Ajustes → Audio",
+    "keys": "Esc cierra · ↑↓ mueve · ← → ajusta",
+    "bandwidthLabel": "Ancho de banda estimado con cabeceras",
+    "bandwidthValue": "≈ {{value}} de {{limit}} kbit/s",
+    "bandwidthValueNoLimit": "≈ {{value}} kbit/s",
+    "bandwidthHintWithin": "Con el modo de baja latencia: ≈ {{value}} kbit/s (paquetes de 10 ms), aún dentro del límite.",
+    "bandwidthHintOver": "Con el modo de baja latencia: ≈ {{value}} kbit/s (paquetes de 10 ms), por encima del límite.",
+    "bandwidthHintNoLimit": "Con el modo de baja latencia: ≈ {{value}} kbit/s (paquetes de 10 ms).",
+    "beta": "Beta",
+    "moreInfo": "Más información: {{topic}}",
+    "effectiveShort": "Enviando ahora",
+    "effectiveTip": "La tasa de bits que se envía ahora, tras adaptarse a la pérdida de paquetes."
   }
 }

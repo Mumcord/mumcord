@@ -59,5 +59,26 @@
     "perMinute": "Posljednjih {{minutes}} min: {{value}} u minuti.",
     "concealedShare": "Posljednjih {{minutes}} min: {{value}} % primljenih okvira.",
     "processingMax": "Posljednjih {{minutes}} min: najviše {{value}} ms od {{budget}} ms po okviru."
+  },
+  "quick": {
+    "open": "Kvaliteta glasa",
+    "title": "Kvaliteta glasa",
+    "status": "Ping {{latency}}, gubitak {{loss}}",
+    "lowLatency": "Način niske latencije",
+    "lowLatencyHint": "Najmanji paketi i međuspremnici za zajedničko sviranje. Više propusnosti, manje robusnosti.",
+    "lowLatencyComingSoon": "Uskoro",
+    "voiceSettings": "Postavke glasa…",
+    "applies": "Primjenjuje se odmah, sprema se kao u Postavke → Zvuk",
+    "keys": "Esc zatvara · ↑↓ pomiče · ← → podešava",
+    "bandwidthLabel": "Procijenjena propusnost sa zaglavljima",
+    "bandwidthValue": "≈ {{value}} od {{limit}} kbit/s",
+    "bandwidthValueNoLimit": "≈ {{value}} kbit/s",
+    "bandwidthHintWithin": "S načinom niske latencije: ≈ {{value}} kbit/s (paketi od 10 ms), još unutar ograničenja.",
+    "bandwidthHintOver": "S načinom niske latencije: ≈ {{value}} kbit/s (paketi od 10 ms), iznad ograničenja.",
+    "bandwidthHintNoLimit": "S načinom niske latencije: ≈ {{value}} kbit/s (paketi od 10 ms).",
+    "beta": "Beta",
+    "moreInfo": "Više informacija: {{topic}}",
+    "effectiveShort": "Trenutno se šalje",
+    "effectiveTip": "Brzina prijenosa koja se trenutno šalje, nakon prilagodbe gubitku paketa."
   }
 }

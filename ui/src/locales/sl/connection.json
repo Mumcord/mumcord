@@ -60,5 +60,26 @@
     "perMinute": "Zadnjih {{minutes}} min: {{value}} na minuto.",
     "concealedShare": "Zadnjih {{minutes}} min: {{value}} % prejetih okvirjev.",
     "processingMax": "Zadnjih {{minutes}} min: največ {{value}} ms od {{budget}} ms na okvir."
+  },
+  "quick": {
+    "open": "Kakovost glasu",
+    "title": "Kakovost glasu",
+    "status": "Ping {{latency}}, izguba {{loss}}",
+    "lowLatency": "Način nizke zakasnitve",
+    "lowLatencyHint": "Najmanjši paketi in medpomnilniki za skupno igranje glasbe. Več pasovne širine, manj robustno.",
+    "lowLatencyComingSoon": "Kmalu",
+    "voiceSettings": "Nastavitve glasu…",
+    "applies": "Velja takoj, shranjeno kot v Nastavitve → Zvok",
+    "keys": "Esc zapre · ↑↓ premika · ← → prilagodi",
+    "bandwidthLabel": "Ocenjena pasovna širina z glavami",
+    "bandwidthValue": "≈ {{value}} od {{limit}} kbit/s",
+    "bandwidthValueNoLimit": "≈ {{value}} kbit/s",
+    "bandwidthHintWithin": "Z načinom nizke zakasnitve: ≈ {{value}} kbit/s (paketi po 10 ms), še znotraj omejitve.",
+    "bandwidthHintOver": "Z načinom nizke zakasnitve: ≈ {{value}} kbit/s (paketi po 10 ms), nad omejitvijo.",
+    "bandwidthHintNoLimit": "Z načinom nizke zakasnitve: ≈ {{value}} kbit/s (paketi po 10 ms).",
+    "beta": "Beta",
+    "moreInfo": "Več informacij: {{topic}}",
+    "effectiveShort": "Trenutno se pošilja",
+    "effectiveTip": "Bitna hitrost, ki se trenutno pošilja, po prilagoditvi izgubi paketov."
   }
 }

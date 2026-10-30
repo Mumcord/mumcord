@@ -58,5 +58,26 @@
     "perMinute": "Utolsó {{minutes}} perc: {{value}} percenként.",
     "concealedShare": "Utolsó {{minutes}} perc: a fogadott keretek {{value}} %-a.",
     "processingMax": "Utolsó {{minutes}} perc: max. {{value}} ms a {{budget}} ms-os keretkeretből."
+  },
+  "quick": {
+    "open": "Hangminőség",
+    "title": "Hangminőség",
+    "status": "Ping {{latency}}, veszteség {{loss}}",
+    "lowLatency": "Alacsony késleltetésű mód",
+    "lowLatencyHint": "Legkisebb csomagok és pufferek közös zenéléshez. Több sávszélesség, kevésbé robusztus.",
+    "lowLatencyComingSoon": "Hamarosan",
+    "voiceSettings": "Hangbeállítások…",
+    "applies": "Azonnal érvénybe lép, mentése mint a Beállítások → Hang esetén",
+    "keys": "Esc bezár · ↑↓ mozog · ← → állít",
+    "bandwidthLabel": "Becsült sávszélesség fejlécekkel",
+    "bandwidthValue": "≈ {{value}} / {{limit}} kbit/s",
+    "bandwidthValueNoLimit": "≈ {{value}} kbit/s",
+    "bandwidthHintWithin": "Alacsony késleltetésű móddal: ≈ {{value}} kbit/s (10 ms-os csomagok), még a korláton belül.",
+    "bandwidthHintOver": "Alacsony késleltetésű móddal: ≈ {{value}} kbit/s (10 ms-os csomagok), a korlát felett.",
+    "bandwidthHintNoLimit": "Alacsony késleltetésű móddal: ≈ {{value}} kbit/s (10 ms-os csomagok).",
+    "beta": "Beta",
+    "moreInfo": "További információ: {{topic}}",
+    "effectiveShort": "Jelenleg küldött",
+    "effectiveTip": "A most küldött bitráta a csomagvesztéshez igazítás után."
   }
 }
