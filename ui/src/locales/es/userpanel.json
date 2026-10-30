@@ -8,7 +8,10 @@
     "muted": "Micrófono silenciado",
     "unmuted": "Micrófono activado",
     "deafened": "Ensordecido. No oyes a nadie y tu micrófono está silenciado",
-    "undeafened": "Ensordecimiento desactivado"
+    "undeafened": "Ensordecimiento desactivado",
+    "leftVoice": "Has salido de la voz en {{server}}",
+    "disconnected": "Desconectado de {{server}}",
+    "disconnectedAll": "Desconectado de todos los servidores"
   },
   "readOnly": {
     "text": "Estás leyendo sin participar: únete a un canal para hablar.",
@@ -95,5 +98,20 @@
     "line": "Voz: {{channel}} · {{server}}",
     "server": "Voz: {{server}}",
     "show": "{{location}} – mostrar este servidor"
+  },
+  "disconnectMenu": {
+    "label": "Opciones de desconexión",
+    "open": "Más opciones de desconexión",
+    "leaveVoice": "Salir de la voz",
+    "leaveVoiceHint": "Dejar de hablar y escuchar, seguir conectado para el chat",
+    "disconnectHint": "Cerrar la conexión con este servidor",
+    "switchTo": "Cambiar la voz a {{server}}",
+    "all": "Desconectar de todos los servidores…",
+    "allHint": "Cerrar todas las conexiones a servidores"
+  },
+  "disconnectAll": {
+    "title": "¿Desconectar de todos los servidores?",
+    "message": "¿Desconectar de los {{total}} servidores?",
+    "confirm": "Desconectar"
   }
 }

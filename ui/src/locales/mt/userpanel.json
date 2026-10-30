@@ -8,7 +8,10 @@
     "muted": "Mikrofonu mutat",
     "unmuted": "Mikrofonu mhux mutat",
     "deafened": "Is-smigħ mitfi. Ma tistax tisma' lill-oħrajn u l-mikrofonu tiegħek huwa mutat",
-    "undeafened": "Is-smigħ mixgħul"
+    "undeafened": "Is-smigħ mixgħul",
+    "leftVoice": "Ħriġt mill-vuċi fuq {{server}}",
+    "disconnected": "Skonnettjat minn {{server}}",
+    "disconnectedAll": "Skonnettjat mis-servers kollha"
   },
   "readOnly": {
     "text": "Qed taqra biss – ingħaqad ma' kanal biex titkellem.",
@@ -95,5 +98,20 @@
     "line": "Vuċi: {{channel}} · {{server}}",
     "server": "Vuċi: {{server}}",
     "show": "{{location}} – uri dan is-server"
+  },
+  "disconnectMenu": {
+    "label": "Għażliet ta' skonnessjoni",
+    "open": "Aktar għażliet ta' skonnessjoni",
+    "leaveVoice": "Ħalli l-vuċi",
+    "leaveVoiceHint": "Waqqaf it-tkellim u l-ismigħ, ibqa' konness għaċ-chat",
+    "disconnectHint": "Agħlaq il-konnessjoni ma' dan is-server",
+    "switchTo": "Ibdel il-vuċi għal {{server}}",
+    "all": "Skonnettja mis-servers kollha…",
+    "allHint": "Agħlaq il-konnessjonijiet kollha tas-servers"
+  },
+  "disconnectAll": {
+    "title": "Tiskonnettja mis-servers kollha?",
+    "message": "Tiskonnettja mis-{{total}} servers kollha?",
+    "confirm": "Skonnettja"
   }
 }

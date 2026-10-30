@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Added
+
+- Right-clicking the hang-up button in the voice bar, pressing the menu key on it, or clicking the small arrow next to it opens a menu: **Leave voice** (stop talking and listening but stay connected, so chat and read-along keep working; the server becomes read-only like any other connected one and joining a channel brings voice back), **Disconnect from <server>**, **Switch voice to <server>** (with several servers connected) and **Disconnect from all servers…** (asks first). A left-click still disconnects at once. Leave voice only self-deafens, so it works on every standard Mumble server (#154)
+
 ## [0.4.4] - 2026-10-30
 
 ### Added

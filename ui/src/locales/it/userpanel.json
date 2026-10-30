@@ -8,7 +8,10 @@
     "muted": "Microfono disattivato",
     "unmuted": "Microfono attivato",
     "deafened": "Audio disattivato. Non senti gli altri e il tuo microfono è disattivato",
-    "undeafened": "Audio attivato"
+    "undeafened": "Audio attivato",
+    "leftVoice": "Voce lasciata su {{server}}",
+    "disconnected": "Disconnesso da {{server}}",
+    "disconnectedAll": "Disconnesso da tutti i server"
   },
   "readOnly": {
     "text": "Stai solo leggendo – entra in un canale per parlare.",
@@ -95,5 +98,20 @@
     "line": "Voce: {{channel}} · {{server}}",
     "server": "Voce: {{server}}",
     "show": "{{location}} – mostra questo server"
+  },
+  "disconnectMenu": {
+    "label": "Opzioni di disconnessione",
+    "open": "Altre opzioni di disconnessione",
+    "leaveVoice": "Lascia la voce",
+    "leaveVoiceHint": "Smetti di parlare e ascoltare, resta connesso per la chat",
+    "disconnectHint": "Chiudi la connessione a questo server",
+    "switchTo": "Sposta la voce su {{server}}",
+    "all": "Disconnetti da tutti i server…",
+    "allHint": "Chiudi tutte le connessioni ai server"
+  },
+  "disconnectAll": {
+    "title": "Disconnettere da tutti i server?",
+    "message": "Disconnettere da tutti i {{total}} server?",
+    "confirm": "Disconnetti"
   }
 }
