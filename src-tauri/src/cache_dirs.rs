@@ -5,9 +5,11 @@
 use std::path::{Path, PathBuf};
 
 use mumcord_engine::cache::{CacheLocations, apply_pending_web_clear};
-use tauri::{AppHandle, Manager};
+use tauri::AppHandle;
 
-/// The directories Tauri derives from the app identifier.
+use crate::portable;
+
+/// The directories Tauri derives from the app identifier, or the portable ones.
 pub struct AppDirs {
     pub data: PathBuf,
     pub local_data: PathBuf,
@@ -16,18 +18,25 @@ pub struct AppDirs {
 
 /// The cache locations while the app runs.
 pub fn locations(app: &AppHandle) -> Result<CacheLocations, tauri::Error> {
-    let path = app.path();
     Ok(locations_in(&AppDirs {
-        data: path.app_data_dir()?,
-        local_data: path.app_local_data_dir()?,
-        cache: path.app_cache_dir()?,
+        data: portable::data_dir(app)?,
+        local_data: portable::local_data_dir(app)?,
+        cache: portable::cache_dir(app)?,
     }))
 }
 
 /// Deletes a web cache that the last "Clear cache" scheduled. Called before Tauri starts, so
 /// no web view has the files open.
 pub fn apply_pending(identifier: &str) {
-    if let Some(dirs) = startup_dirs(identifier) {
+    let dirs = match portable::dirs() {
+        Some(p) => Some(AppDirs {
+            data: p.data.clone(),
+            local_data: p.local_data.clone(),
+            cache: p.cache.clone(),
+        }),
+        None => startup_dirs(identifier),
+    };
+    if let Some(dirs) = dirs {
         apply_pending_web_clear(&locations_in(&dirs));
     }
 }

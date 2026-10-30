@@ -377,7 +377,8 @@
     "showNotices": "Visa licenser för tredjepart",
     "noticesFailed": "Licenserna för tredjepart kunde inte öppnas.",
     "loading": "Läser in…",
-    "devToolsUnlocked": "Utvecklarverktyg upplåsta: paketinspektören finns nu i inställningslistan."
+    "devToolsUnlocked": "Utvecklarverktyg upplåsta: paketinspektören finns nu i inställningslistan.",
+    "portable": "Portabel"
   },
   "profile": {
     "title": "Profil",

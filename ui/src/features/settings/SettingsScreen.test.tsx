@@ -1300,6 +1300,7 @@ describe("Overlay on macOS (QA.58)", () => {
       packageVersion: "0.0.0",
       os: "macos aarch64",
       appimage: false,
+      portable: false,
       distro: null,
     });
 
@@ -1322,6 +1323,7 @@ describe("Overlay on macOS (QA.58)", () => {
       packageVersion: "0.0.0",
       os: "linux x86_64",
       appimage: false,
+      portable: false,
       distro: null,
     });
     renderScreen();

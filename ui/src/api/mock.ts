@@ -1759,6 +1759,7 @@ export function createMockApi(options: MockOptions = {}): MockApi {
               packageVersion: "0.3.0",
               os: "Linux x86_64",
               appimage: false,
+              portable: false,
               distro: null,
             }
           : {
@@ -1766,6 +1767,7 @@ export function createMockApi(options: MockOptions = {}): MockApi {
               packageVersion: "0.0.0-mock",
               os: "mock",
               appimage: false,
+              portable: false,
               distro: null,
             },
       ),

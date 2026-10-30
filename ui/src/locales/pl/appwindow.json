@@ -31,7 +31,8 @@
   "updateHint": {
     "message": "Mumcord {{version}} jest dostępny.",
     "open": "Zobacz wydanie",
-    "dismiss": "Zamknij"
+    "dismiss": "Zamknij",
+    "portable": "Pobierz nowy przenośny plik zip i rozpakuj go do tego folderu; Twoje dane w MumcordData pozostaną."
   },
   "directConsent": {
     "title": "Zezwolić na połączenia bezpośrednie?",

@@ -4,6 +4,7 @@
 
 ### Added
 
+- Windows releases also ship a portable zip (`Mumcord_<version>_x64-portable.zip`) that runs without installing: unpack it and start `Mumcord.exe`. The `portable` file next to the exe keeps the data, settings, logs and caches in `MumcordData` beside it instead of `%APPDATA%`; it registers no `mumble://` handler and no start at login unless turned on, and About, the diagnostic file and the update hint say "Portable". The identity stays in Windows Credential Manager (per Windows user). A missing WebView2 Runtime now shows a message with the download link instead of failing silently. See `docs/windows-portable.md` (#181)
 - Right-clicking (or pressing the menu key on, or using the small arrow beside) the microphone or headphones button in the voice bar opens a quick audio popover; left-click still mutes or deafens. The microphone popover lists the input devices (current one checked, system default marked) with an input volume slider (0–200 %), a live level meter, a noise suppression switch and a link to the voice settings; the headphones popover lists the output devices with an output volume slider (0–100 %), a Test sound button and the same link. Switching applies at once without reconnecting, plugged-in devices appear live, and when a chosen device is unplugged Mumcord falls back to the system default and says so briefly (#153)
 
 ## [0.4.4] - 2026-10-30

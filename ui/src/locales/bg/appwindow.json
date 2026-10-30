@@ -31,7 +31,8 @@
   "updateHint": {
     "message": "Mumcord {{version}} е наличен.",
     "open": "Виж изданието",
-    "dismiss": "Затвори"
+    "dismiss": "Затвори",
+    "portable": "Изтеглете новия преносим zip и го разархивирайте в тази папка; данните ви в MumcordData остават."
   },
   "directConsent": {
     "title": "Да се разрешат ли директни връзки?",
