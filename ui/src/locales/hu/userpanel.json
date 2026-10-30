@@ -8,7 +8,10 @@
     "muted": "Mikrofon némítva",
     "unmuted": "Mikrofon némítása feloldva",
     "deafened": "Süketítve. Nem hallasz másokat, és a mikrofonod némítva van",
-    "undeafened": "Süketítés feloldva"
+    "undeafened": "Süketítés feloldva",
+    "leftVoice": "Elhagyta a hangot itt: {{server}}",
+    "disconnected": "Lekapcsolódva innen: {{server}}",
+    "disconnectedAll": "Lekapcsolódva az összes szerverről"
   },
   "readOnly": {
     "text": "Csak olvasol – lépj be egy csatornába a beszélgetéshez.",
@@ -95,6 +98,21 @@
     "line": "Hang: {{channel}} · {{server}}",
     "server": "Hang: {{server}}",
     "show": "{{location}} – szerver megjelenítése"
+  },
+  "disconnectMenu": {
+    "label": "Lekapcsolódási lehetőségek",
+    "open": "További lekapcsolódási lehetőségek",
+    "leaveVoice": "Hang elhagyása",
+    "leaveVoiceHint": "Beszéd és hallgatás leállítása, csevegéshez kapcsolatban marad",
+    "disconnectHint": "A kapcsolat bontása ezzel a szerverrel",
+    "switchTo": "Hang áthelyezése ide: {{server}}",
+    "all": "Lekapcsolódás az összes szerverről…",
+    "allHint": "Minden szerverkapcsolat bontása"
+  },
+  "disconnectAll": {
+    "title": "Lekapcsolódik az összes szerverről?",
+    "message": "Lekapcsolódik mind a(z) {{total}} szerverről?",
+    "confirm": "Lekapcsolódás"
   },
   "audio": {
     "inputOptions": "Mikrofon beállításai",

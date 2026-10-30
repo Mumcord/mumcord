@@ -8,7 +8,10 @@
     "muted": "Mikrofoni mykistetty",
     "unmuted": "Mikrofonin mykistys poistettu",
     "deafened": "Kuulokkeet mykistetty. Et kuule muita, ja mikrofonisi on mykistetty",
-    "undeafened": "Kuulokkeiden mykistys poistettu"
+    "undeafened": "Kuulokkeiden mykistys poistettu",
+    "leftVoice": "Poistuttu äänestä palvelimella {{server}}",
+    "disconnected": "Yhteys palvelimeen {{server}} katkaistu",
+    "disconnectedAll": "Yhteys kaikkiin palvelimiin katkaistu"
   },
   "readOnly": {
     "text": "Seuraat keskustelua – liity kanavalle puhuaksesi.",
@@ -95,6 +98,21 @@
     "line": "Puhe: {{channel}} · {{server}}",
     "server": "Puhe: {{server}}",
     "show": "{{location}} – näytä tämä palvelin"
+  },
+  "disconnectMenu": {
+    "label": "Katkaisuvaihtoehdot",
+    "open": "Lisää katkaisuvaihtoehtoja",
+    "leaveVoice": "Poistu äänestä",
+    "leaveVoiceHint": "Lopeta puhuminen ja kuuntelu, pysy yhteydessä chattia varten",
+    "disconnectHint": "Sulje yhteys tähän palvelimeen",
+    "switchTo": "Siirrä ääni palvelimelle {{server}}",
+    "all": "Katkaise yhteys kaikkiin palvelimiin…",
+    "allHint": "Sulje kaikki palvelinyhteydet"
+  },
+  "disconnectAll": {
+    "title": "Katkaistaanko yhteys kaikkiin palvelimiin?",
+    "message": "Katkaistaanko yhteys kaikkiin {{total}} palvelimeen?",
+    "confirm": "Katkaise"
   },
   "audio": {
     "inputOptions": "Mikrofonin asetukset",

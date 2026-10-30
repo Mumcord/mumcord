@@ -65,6 +65,11 @@ export const commands = {
 	/**  Enters the channel's voice; fails with `permissionDenied` if not permitted. */
 	channelJoin: (serverId: number, channelId: number) => typedError<null, ApiError>(__TAURI_INVOKE("channel_join", { serverId, channelId })),
 	/**
+	 *  Stops voice on the voice server but keeps every connection: the server turns read-only
+	 *  (self-deafened) and no server has voice until the next explicit join.
+	 */
+	voiceLeave: () => typedError<null, ApiError>(__TAURI_INVOKE("voice_leave")),
+	/**
 	 *  Retries a refused join with a channel password, which is stored for the server; the
 	 *  outcome arrives as `channelPasswordPrompt` (FR-2.78).
 	 */

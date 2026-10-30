@@ -8,7 +8,10 @@
     "muted": "Mikrofons izslēgts",
     "unmuted": "Mikrofons ieslēgts",
     "deafened": "Skaņa izslēgta. Tu nedzirdi citus, un tavs mikrofons ir izslēgts",
-    "undeafened": "Skaņa ieslēgta"
+    "undeafened": "Skaņa ieslēgta",
+    "leftVoice": "Balss serverī {{server}} pamesta",
+    "disconnected": "Atvienots no {{server}}",
+    "disconnectedAll": "Atvienots no visiem serveriem"
   },
   "readOnly": {
     "text": "Tu tikai lasi – pievienojies kanālam, lai runātu.",
@@ -95,6 +98,21 @@
     "line": "Balss: {{channel}} · {{server}}",
     "server": "Balss: {{server}}",
     "show": "{{location}} – rādīt šo serveri"
+  },
+  "disconnectMenu": {
+    "label": "Atvienošanas opcijas",
+    "open": "Vairāk atvienošanas opciju",
+    "leaveVoice": "Pamest balsi",
+    "leaveVoiceHint": "Pārtraukt runāt un klausīties, palikt savienotam čatam",
+    "disconnectHint": "Aizvērt savienojumu ar šo serveri",
+    "switchTo": "Pārvietot balsi uz {{server}}",
+    "all": "Atvienoties no visiem serveriem…",
+    "allHint": "Aizvērt visus savienojumus ar serveriem"
+  },
+  "disconnectAll": {
+    "title": "Vai atvienoties no visiem serveriem?",
+    "message": "Vai atvienoties no visiem {{total}} serveriem?",
+    "confirm": "Atvienoties"
   },
   "audio": {
     "inputOptions": "Mikrofona opcijas",

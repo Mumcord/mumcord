@@ -8,7 +8,10 @@
     "muted": "Mikrofon ztlumen",
     "unmuted": "Mikrofon zapnut",
     "deafened": "Zvuk ztlumen. Neslyšíš ostatní a tvůj mikrofon je ztlumený",
-    "undeafened": "Zvuk zapnut"
+    "undeafened": "Zvuk zapnut",
+    "leftVoice": "Hlas na serveru {{server}} opuštěn",
+    "disconnected": "Odpojeno od serveru {{server}}",
+    "disconnectedAll": "Odpojeno od všech serverů"
   },
   "readOnly": {
     "text": "Jen čteš – připoj se do kanálu, abys mohl mluvit.",
@@ -95,6 +98,21 @@
     "line": "Hlas: {{channel}} · {{server}}",
     "server": "Hlas: {{server}}",
     "show": "{{location}} – zobrazit tento server"
+  },
+  "disconnectMenu": {
+    "label": "Možnosti odpojení",
+    "open": "Další možnosti odpojení",
+    "leaveVoice": "Opustit hlas",
+    "leaveVoiceHint": "Přestat mluvit a poslouchat, zůstat připojen kvůli chatu",
+    "disconnectHint": "Zavřít připojení k tomuto serveru",
+    "switchTo": "Přepnout hlas na {{server}}",
+    "all": "Odpojit od všech serverů…",
+    "allHint": "Zavřít všechna připojení k serverům"
+  },
+  "disconnectAll": {
+    "title": "Odpojit od všech serverů?",
+    "message": "Odpojit od všech {{total}} serverů?",
+    "confirm": "Odpojit"
   },
   "audio": {
     "inputOptions": "Možnosti mikrofonu",

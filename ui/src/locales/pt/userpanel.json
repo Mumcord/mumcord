@@ -8,7 +8,10 @@
     "muted": "Microfone silenciado",
     "unmuted": "Microfone reativado",
     "deafened": "Áudio desativado. Não ouves os outros e o teu microfone está silenciado",
-    "undeafened": "Áudio reativado"
+    "undeafened": "Áudio reativado",
+    "leftVoice": "Saiu da voz em {{server}}",
+    "disconnected": "Desligado de {{server}}",
+    "disconnectedAll": "Desligado de todos os servidores"
   },
   "readOnly": {
     "text": "Estás só a acompanhar – entra num canal para falar.",
@@ -95,6 +98,21 @@
     "line": "Voz: {{channel}} · {{server}}",
     "server": "Voz: {{server}}",
     "show": "{{location}} – mostrar este servidor"
+  },
+  "disconnectMenu": {
+    "label": "Opções de desligar",
+    "open": "Mais opções de desligar",
+    "leaveVoice": "Sair da voz",
+    "leaveVoiceHint": "Parar de falar e ouvir, continuar ligado para o chat",
+    "disconnectHint": "Fechar a ligação a este servidor",
+    "switchTo": "Mudar a voz para {{server}}",
+    "all": "Desligar de todos os servidores…",
+    "allHint": "Fechar todas as ligações a servidores"
+  },
+  "disconnectAll": {
+    "title": "Desligar de todos os servidores?",
+    "message": "Desligar dos {{total}} servidores?",
+    "confirm": "Desligar"
   },
   "audio": {
     "inputOptions": "Opções do microfone",

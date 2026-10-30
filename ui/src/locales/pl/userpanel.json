@@ -8,7 +8,10 @@
     "muted": "Mikrofon wyciszony",
     "unmuted": "Mikrofon włączony",
     "deafened": "Ogłuszono. Nie słyszysz innych, a Twój mikrofon jest wyciszony",
-    "undeafened": "Ogłuszenie wyłączone"
+    "undeafened": "Ogłuszenie wyłączone",
+    "leftVoice": "Opuszczono głos na serwerze {{server}}",
+    "disconnected": "Rozłączono z serwerem {{server}}",
+    "disconnectedAll": "Rozłączono ze wszystkimi serwerami"
   },
   "readOnly": {
     "text": "Tylko czytasz – dołącz do kanału, aby mówić.",
@@ -95,6 +98,21 @@
     "line": "Głos: {{channel}} · {{server}}",
     "server": "Głos: {{server}}",
     "show": "{{location}} – pokaż ten serwer"
+  },
+  "disconnectMenu": {
+    "label": "Opcje rozłączania",
+    "open": "Więcej opcji rozłączania",
+    "leaveVoice": "Opuść głos",
+    "leaveVoiceHint": "Przestań mówić i słuchać, pozostań połączony dla czatu",
+    "disconnectHint": "Zamknij połączenie z tym serwerem",
+    "switchTo": "Przenieś głos na {{server}}",
+    "all": "Rozłącz ze wszystkimi serwerami…",
+    "allHint": "Zamknij wszystkie połączenia z serwerami"
+  },
+  "disconnectAll": {
+    "title": "Rozłączyć ze wszystkimi serwerami?",
+    "message": "Rozłączyć ze wszystkimi serwerami ({{total}})?",
+    "confirm": "Rozłącz"
   },
   "audio": {
     "inputOptions": "Opcje mikrofonu",

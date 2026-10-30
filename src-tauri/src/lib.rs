@@ -79,6 +79,7 @@ fn specta_builder() -> Builder<tauri::Wry> {
             session::set_self_mute,
             session::set_self_deaf,
             channels::channel_join,
+            channels::voice_leave,
             channels::channel_join_with_password,
             channels::channel_passwords,
             channels::channel_password_rename,

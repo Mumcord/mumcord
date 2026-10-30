@@ -8,7 +8,10 @@
     "muted": "Mikrofonen avstängd",
     "unmuted": "Mikrofonen påslagen",
     "deafened": "Ljudet avstängt. Du hör inte andra och din mikrofon är avstängd",
-    "undeafened": "Ljudet påslaget"
+    "undeafened": "Ljudet påslaget",
+    "leftVoice": "Lämnade rösten på {{server}}",
+    "disconnected": "Frånkopplad från {{server}}",
+    "disconnectedAll": "Frånkopplad från alla servrar"
   },
   "readOnly": {
     "text": "Du läser med – gå med i en kanal för att prata.",
@@ -95,6 +98,21 @@
     "line": "Röst: {{channel}} · {{server}}",
     "server": "Röst: {{server}}",
     "show": "{{location}} – visa den här servern"
+  },
+  "disconnectMenu": {
+    "label": "Alternativ för frånkoppling",
+    "open": "Fler alternativ för frånkoppling",
+    "leaveVoice": "Lämna röst",
+    "leaveVoiceHint": "Sluta prata och lyssna, men förbli ansluten för chatten",
+    "disconnectHint": "Stäng anslutningen till den här servern",
+    "switchTo": "Flytta rösten till {{server}}",
+    "all": "Koppla från alla servrar…",
+    "allHint": "Stäng alla serveranslutningar"
+  },
+  "disconnectAll": {
+    "title": "Koppla från alla servrar?",
+    "message": "Koppla från alla {{total}} servrar?",
+    "confirm": "Koppla från"
   },
   "audio": {
     "inputOptions": "Mikrofonalternativ",

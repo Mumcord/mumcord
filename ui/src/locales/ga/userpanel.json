@@ -8,7 +8,10 @@
     "muted": "Micreafón balbhaithe",
     "unmuted": "Micreafón díbhalbhaithe",
     "deafened": "Bodhraithe. Ní chloiseann tú daoine eile agus tá do mhicreafón balbhaithe",
-    "undeafened": "Díbhodhraithe"
+    "undeafened": "Díbhodhraithe",
+    "leftVoice": "D'fhág tú an guth ar {{server}}",
+    "disconnected": "Dícheangailte ó {{server}}",
+    "disconnectedAll": "Dícheangailte ó gach freastalaí"
   },
   "readOnly": {
     "text": "Tá tú ag léamh leat – téigh isteach i gcainéal chun labhairt.",
@@ -95,6 +98,21 @@
     "line": "Guth: {{channel}} · {{server}}",
     "server": "Guth: {{server}}",
     "show": "{{location}} – taispeáin an freastalaí seo"
+  },
+  "disconnectMenu": {
+    "label": "Roghanna dícheangail",
+    "open": "Tuilleadh roghanna dícheangail",
+    "leaveVoice": "Fág an guth",
+    "leaveVoiceHint": "Stop de bheith ag caint agus ag éisteacht, fan ceangailte don chomhrá",
+    "disconnectHint": "Dún an nasc leis an bhfreastalaí seo",
+    "switchTo": "Aistrigh an guth go {{server}}",
+    "all": "Dícheangail ó gach freastalaí…",
+    "allHint": "Dún gach nasc freastalaí"
+  },
+  "disconnectAll": {
+    "title": "An ndícheanglóidh tú ó gach freastalaí?",
+    "message": "An ndícheanglóidh tú ó na {{total}} freastalaí go léir?",
+    "confirm": "Dícheangail"
   },
   "audio": {
     "inputOptions": "Roghanna micreafóin",

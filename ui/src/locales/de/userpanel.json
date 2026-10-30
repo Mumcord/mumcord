@@ -8,7 +8,10 @@
     "muted": "Mikrofon stummgeschaltet",
     "unmuted": "Mikrofon wieder aktiv",
     "deafened": "Taubgeschaltet. Du hörst niemanden und dein Mikrofon ist stumm",
-    "undeafened": "Taubschaltung aufgehoben"
+    "undeafened": "Taubschaltung aufgehoben",
+    "leftVoice": "Sprache auf {{server}} verlassen",
+    "disconnected": "Von {{server}} getrennt",
+    "disconnectedAll": "Von allen Servern getrennt"
   },
   "readOnly": {
     "text": "Du liest nur mit – tritt einem Kanal bei, um zu sprechen.",
@@ -95,6 +98,21 @@
     "line": "Sprache: {{channel}} · {{server}}",
     "server": "Sprache: {{server}}",
     "show": "{{location}} – diesen Server anzeigen"
+  },
+  "disconnectMenu": {
+    "label": "Trennen-Optionen",
+    "open": "Weitere Trennen-Optionen",
+    "leaveVoice": "Sprache verlassen",
+    "leaveVoiceHint": "Nicht mehr sprechen und hören, für den Chat verbunden bleiben",
+    "disconnectHint": "Die Verbindung zu diesem Server schließen",
+    "switchTo": "Sprache zu {{server}} wechseln",
+    "all": "Von allen Servern trennen…",
+    "allHint": "Alle Serververbindungen schließen"
+  },
+  "disconnectAll": {
+    "title": "Von allen Servern trennen?",
+    "message": "Von allen {{total}} Servern trennen?",
+    "confirm": "Trennen"
   },
   "audio": {
     "inputOptions": "Mikrofon-Optionen",

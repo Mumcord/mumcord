@@ -8,7 +8,10 @@
     "muted": "Mikrofon slået fra",
     "unmuted": "Mikrofon slået til",
     "deafened": "Lyd slået fra. Du kan ikke høre andre, og din mikrofon er slået fra",
-    "undeafened": "Lyd slået til"
+    "undeafened": "Lyd slået til",
+    "leftVoice": "Forlod stemmen på {{server}}",
+    "disconnected": "Afbrudt fra {{server}}",
+    "disconnectedAll": "Afbrudt fra alle servere"
   },
   "readOnly": {
     "text": "Du læser kun med – join en kanal for at tale.",
@@ -95,6 +98,21 @@
     "line": "Tale: {{channel}} · {{server}}",
     "server": "Tale: {{server}}",
     "show": "{{location}} – vis denne server"
+  },
+  "disconnectMenu": {
+    "label": "Muligheder for frakobling",
+    "open": "Flere muligheder for frakobling",
+    "leaveVoice": "Forlad stemme",
+    "leaveVoiceHint": "Stop med at tale og lytte, forbliv forbundet til chatten",
+    "disconnectHint": "Luk forbindelsen til denne server",
+    "switchTo": "Flyt stemmen til {{server}}",
+    "all": "Afbryd forbindelsen til alle servere…",
+    "allHint": "Luk alle serverforbindelser"
+  },
+  "disconnectAll": {
+    "title": "Afbryd forbindelsen til alle servere?",
+    "message": "Afbryd forbindelsen til alle {{total}} servere?",
+    "confirm": "Afbryd"
   },
   "audio": {
     "inputOptions": "Mikrofonindstillinger",

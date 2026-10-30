@@ -4,11 +4,13 @@ import { announce } from "../../a11y";
 import { useView } from "../../app/view";
 import { getApi } from "../../api";
 import { ConnectionInfo } from "../connection";
-import { showServer } from "../channels";
-import { disconnect, useServers } from "../servers";
+import { showServer, useServers as useServerStates } from "../channels";
+import { ConfirmDialog, disconnect, useServers } from "../servers";
+import type { MenuPosition } from "../../components/ContextMenu";
 import { useAvatars } from "../members/useAvatars";
 import { GAMEPAD_PATH, useNowGaming } from "../nowgaming";
 import { trackLabel, useNowPlaying } from "../nowplaying";
+import { DisconnectMenu } from "./DisconnectMenu";
 import { describeError } from "./errors";
 import { ProfileDialog } from "./ProfileDialog";
 import { joinChannel, useNoVoice } from "./readOnly";
@@ -38,6 +40,7 @@ const GEAR =
   "M10.47 5.37L10.9 3.07L13.1 3.07L13.53 5.37L14.6 5.72L15.6 6.23L17.54 4.91L19.09 6.46L17.77 8.4L18.28 9.4L18.63 10.47L20.93 10.9L20.93 13.1L18.63 13.53L18.28 14.6L17.77 15.6L19.09 17.54L17.54 19.09L15.6 17.77L14.6 18.28L13.53 18.63L13.1 20.93L10.9 20.93L10.47 18.63L9.4 18.28L8.4 17.77L6.46 19.09L4.91 17.54L6.23 15.6L5.72 14.6L5.37 13.53L3.07 13.1L3.07 10.9L5.37 10.47L5.72 9.4L6.23 8.4L4.91 6.46L6.46 4.91L8.4 6.23L9.4 5.72ZM9 12a3 3 0 1 0 6 0a3 3 0 1 0-6 0";
 const HANG_UP = "M3 14c5-5 13-5 18 0l-2.5 2.5-3-1.5v-2.5a9 9 0 0 0-5 0V15l-3 1.5z";
 const SLASH = "M4 4l16 16";
+const CHEVRON = "M7 10l5 5 5-5";
 
 export function UserPanel() {
   const { t } = useTranslation("userpanel");
@@ -51,6 +54,9 @@ export function UserPanel() {
   const [dialog, setDialog] = useState<Dialog>(null);
   const [error, setError] = useState<string | null>(null);
   const servers = useServers();
+  const serverStates = useServerStates();
+  const [disconnectMenu, setDisconnectMenu] = useState<MenuPosition | null>(null);
+  const [confirmAll, setConfirmAll] = useState(false);
   const settingsButton = useRef<HTMLButtonElement>(null);
   const previous = useRef<{ mute: boolean; deaf: boolean } | null>(null);
   const micButton = useRef<HTMLButtonElement>(null);
@@ -103,6 +109,36 @@ export function UserPanel() {
     });
   };
 
+  const openDisconnectMenu = (x: number, y: number, opener: HTMLElement) => {
+    setDisconnectMenu({ x, y, opener });
+  };
+  const openDisconnectMenuBelow = (opener: HTMLElement) => {
+    const box = opener.getBoundingClientRect();
+    openDisconnectMenu(box.left, box.bottom, opener);
+  };
+
+  const leaveVoice = () => {
+    run(getApi().voiceLeave());
+    announce(t("announce.leftVoice", { server: nameOf(voice?.serverId ?? null) }));
+  };
+  const disconnectShown = () => {
+    void disconnect();
+    announce(t("announce.disconnected", { server: serverLabel }));
+  };
+  const switchVoice = (serverId: number) => {
+    const target = serverStates.get(serverId);
+    const channelId =
+      target?.selfSession == null ? undefined : target.users.get(target.selfSession)?.channelId;
+    if (channelId === undefined) return;
+    run(getApi().channelJoin(serverId, channelId));
+  };
+  const disconnectAll = async () => {
+    setConfirmAll(false);
+    const ids = connectedIds;
+    for (const id of ids) await disconnect(id);
+    announce(t("announce.disconnectedAll"));
+  };
+
   const closeDialog = () => {
     setDialog(null);
     settingsButton.current?.focus();
@@ -116,6 +152,10 @@ export function UserPanel() {
     return saved ? saved.label || saved.address : "";
   };
   const serverLabel = nameOf(link);
+  const connectedIds = [...servers.connections.keys()];
+  const switchTargets = (connectedIds.length > 1 ? connectedIds : [])
+    .filter((id) => id !== voice?.serverId && serverStates.get(id) !== undefined)
+    .map((id) => ({ serverId: id, label: nameOf(id) }));
   const connection = servers.connection.state;
   const status =
     connection === "reconnecting"
@@ -225,17 +265,39 @@ export function UserPanel() {
           <AudioArrow kind="output" audio={audio} disabled={!connected} />
         </span>
         {link !== null ? (
-          <button
-            type="button"
-            className="userpanel__toggle userpanel__toggle--hangup"
-            aria-label={t("disconnect", { server: serverLabel })}
-            data-tooltip={t("disconnect", { server: serverLabel })}
-            onClick={() => {
-              void disconnect();
-            }}
-          >
-            <Icon d={HANG_UP} />
-          </button>
+          <>
+            <button
+              type="button"
+              className="userpanel__toggle userpanel__toggle--hangup"
+              aria-label={t("disconnect", { server: serverLabel })}
+              data-tooltip={t("disconnect", { server: serverLabel })}
+              aria-haspopup="menu"
+              onClick={disconnectShown}
+              onContextMenu={(event) => {
+                event.preventDefault();
+                openDisconnectMenu(event.clientX, event.clientY, event.currentTarget);
+              }}
+              onKeyDown={(event) => {
+                if (event.key !== "ContextMenu" && !(event.key === "F10" && event.shiftKey)) return;
+                event.preventDefault();
+                openDisconnectMenuBelow(event.currentTarget);
+              }}
+            >
+              <Icon d={HANG_UP} />
+            </button>
+            <button
+              type="button"
+              className="userpanel__toggle userpanel__toggle--more"
+              aria-label={t("disconnectMenu.open")}
+              data-tooltip={t("disconnectMenu.open")}
+              aria-haspopup="menu"
+              onClick={(event) => {
+                openDisconnectMenuBelow(event.currentTarget);
+              }}
+            >
+              <Icon d={CHEVRON} />
+            </button>
+          </>
         ) : null}
         {connected ? <ConnectionInfo className="userpanel__toggle" /> : null}
         <button
@@ -281,6 +343,38 @@ export function UserPanel() {
           onOpenSettings={openSettings}
           onClose={() => {
             setQuick(null);
+          }}
+        />
+      ) : null}
+      {disconnectMenu ? (
+        <DisconnectMenu
+          menu={disconnectMenu}
+          serverLabel={serverLabel}
+          canLeaveVoice={voice !== null && voice.serverId === link}
+          switchTargets={switchTargets}
+          connectedCount={connectedIds.length}
+          onLeaveVoice={leaveVoice}
+          onDisconnect={disconnectShown}
+          onSwitchVoice={switchVoice}
+          onDisconnectAll={() => {
+            setConfirmAll(true);
+          }}
+          onClose={() => {
+            setDisconnectMenu(null);
+          }}
+        />
+      ) : null}
+      {confirmAll ? (
+        <ConfirmDialog
+          title={t("disconnectAll.title")}
+          message={t("disconnectAll.message", { total: connectedIds.length })}
+          confirmLabel={t("disconnectAll.confirm")}
+          danger
+          onConfirm={() => {
+            void disconnectAll();
+          }}
+          onClose={() => {
+            setConfirmAll(false);
           }}
         />
       ) : null}

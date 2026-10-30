@@ -800,6 +800,13 @@ impl Engine {
         self.inner.end_slot(&mut core, server_id, None);
     }
 
+    /// Stops voice on the voice server while keeping every connection (chat and read-along stay
+    /// live). Does nothing while no server has voice.
+    pub fn leave_voice(&self) {
+        let mut core = lock(&self.inner.core);
+        self.inner.leave_voice(&mut core);
+    }
+
     /// Disconnects every server for quitting or restarting the app (FR-2.9). Unlike
     /// [`Engine::disconnect`] it keeps the voice channel, so the next start offers to rejoin
     /// it (QA.9), and records which servers were connected for the next start (FR-2.7). The
@@ -1534,22 +1541,42 @@ impl Inner {
         self.start_pipeline(core);
     }
 
+    /// Self-deafens and mutes a still connected server; the user stays in their channel.
+    fn make_read_only(core: &mut Core, server_id: ServerId) {
+        let Some(slot) = core.slots.get_mut(&server_id) else {
+            return;
+        };
+        slot.self_voice = SelfVoice::read_only();
+        // Deafening on the server mutes too.
+        if let Some(session) = &slot.session
+            && let Err(e) = session.handle.set_self_deaf(true)
+        {
+            tracing::warn!(error = %e, "making the server read-only failed");
+        }
+    }
+
+    /// Stops voice on the voice server without leaving it ("Leave voice"): the server becomes
+    /// read-only like any other connected one and no server has voice until the next explicit
+    /// join. Uses only the self-deafen flag, so it works on every standard Mumble server.
+    fn leave_voice(self: &Arc<Self>, core: &mut Core) {
+        let Some(server_id) = core.voice_server.take() else {
+            return;
+        };
+        Self::make_read_only(core, server_id);
+        // Nothing to offer for rejoining after a restart, as after a disconnect.
+        self.forget_voice_channel();
+        self.events.emit(EngineEvent::VoiceServerChanged(None));
+        self.rebind_audio(core);
+    }
+
     /// Makes `server_id` the voice server (FR-2.2). The previous voice server becomes
     /// read-only again: self-deafened and muted, the user stays in their channel.
     fn take_voice(self: &Arc<Self>, core: &mut Core, server_id: ServerId) {
         if core.voice_server == Some(server_id) {
             return;
         }
-        if let Some(previous) = core.voice_server.take()
-            && let Some(slot) = core.slots.get_mut(&previous)
-        {
-            slot.self_voice = SelfVoice::read_only();
-            // Deafening on the server mutes too.
-            if let Some(session) = &slot.session
-                && let Err(e) = session.handle.set_self_deaf(true)
-            {
-                tracing::warn!(error = %e, "making the previous voice server read-only failed");
-            }
+        if let Some(previous) = core.voice_server.take() {
+            Self::make_read_only(core, previous);
         }
         core.voice_server = Some(server_id);
         // Only the voice server's channel is offered for rejoining after a restart (FR-2.3).

@@ -8,7 +8,10 @@
     "muted": "Mikrofon vaigistatud",
     "unmuted": "Mikrofoni vaigistus lõpetatud",
     "deafened": "Kurdistatud. Sa ei kuule teisi ja sinu mikrofon on vaigistatud",
-    "undeafened": "Kurdistus lõpetatud"
+    "undeafened": "Kurdistus lõpetatud",
+    "leftVoice": "Hääl serveris {{server}} maha jäetud",
+    "disconnected": "Ühendus serveriga {{server}} katkestatud",
+    "disconnectedAll": "Ühendus kõigi serveritega katkestatud"
   },
   "readOnly": {
     "text": "Sa loed kaasa – liitu kanaliga, et rääkida.",
@@ -95,6 +98,21 @@
     "line": "Hääl: {{channel}} · {{server}}",
     "server": "Hääl: {{server}}",
     "show": "{{location}} – näita seda serverit"
+  },
+  "disconnectMenu": {
+    "label": "Katkestamise valikud",
+    "open": "Rohkem katkestamise valikuid",
+    "leaveVoice": "Lahku häälest",
+    "leaveVoiceHint": "Lõpeta rääkimine ja kuulamine, jää vestluse jaoks ühendatuks",
+    "disconnectHint": "Sulge ühendus selle serveriga",
+    "switchTo": "Liiguta hääl serverisse {{server}}",
+    "all": "Katkesta ühendus kõigi serveritega…",
+    "allHint": "Sulge kõik serveriühendused"
+  },
+  "disconnectAll": {
+    "title": "Kas katkestada ühendus kõigi serveritega?",
+    "message": "Kas katkestada ühendus kõigi {{total}} serveriga?",
+    "confirm": "Katkesta"
   },
   "audio": {
     "inputOptions": "Mikrofoni valikud",
