@@ -654,7 +654,8 @@
   bottom: 100%;
   left: var(--space-4);
   z-index: 5;
-  min-width: 14rem;
+  /* Wide enough for the @channel / @all hints, which would otherwise shrink to nothing. */
+  min-width: min(24rem, calc(100% - 2 * var(--space-4)));
   max-width: calc(100% - 2 * var(--space-4));
   margin: 0 0 var(--space-1);
   padding: var(--space-1);

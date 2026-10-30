@@ -106,7 +106,7 @@ describe("chat: mentions (AC-1.41)", () => {
     await box.setValue("heads up @");
     const option = $("//*[@role='listbox']//*[@role='option' and contains(.,'@channel')]");
     await option.waitForDisplayed({ timeout: 10_000 });
-    expect(await option.getText()).toContain("Notify everyone in Lobby");
+    expect(await option.getProperty("textContent")).toContain("Notify everyone in Lobby");
     await expect(
       $("//*[@role='listbox']//*[@role='option' and contains(.,'@all')]"),
     ).toBeDisplayed();
