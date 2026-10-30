@@ -50,12 +50,12 @@ More in the wiki: [Features](https://github.com/Mumcord/mumcord/wiki/Features). 
 
 Get the latest build from the [Releases page](https://github.com/Mumcord/mumcord/releases/latest). Every release ships a `SHA256SUMS` file to check your download.
 
-| System                     | Package                         | Notes                                                                     |
-| -------------------------- | ------------------------------- | ------------------------------------------------------------------------- |
-| **Windows** 10/11          | `*-setup.exe` installer         | Not code-signed yet: SmartScreen warns, choose "More info" → "Run anyway" |
-| **macOS**                  | `.dmg`, Apple Silicon and Intel | Signed and notarized since 0.4.1                                          |
-| **Linux** x86_64 and ARM64 | `.deb`, `.rpm`, `.AppImage`     | The `.deb` and `.rpm` pull in everything they need                        |
-| **Arch Linux**             | AUR `mumcord-bin`               | `paru -S mumcord-bin` or `yay -S mumcord-bin`                             |
+| System                     | Package                                     | Notes                                                                                                                                                      |
+| -------------------------- | ------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Windows** 10/11          | `*-setup.exe` installer or `*-portable.zip` | Not code-signed yet: SmartScreen warns, choose "More info" → "Run anyway". Portable: unpack and run, no installation ([details](docs/windows-portable.md)) |
+| **macOS**                  | `.dmg`, Apple Silicon and Intel             | Signed and notarized since 0.4.1                                                                                                                           |
+| **Linux** x86_64 and ARM64 | `.deb`, `.rpm`, `.AppImage`                 | The `.deb` and `.rpm` pull in everything they need                                                                                                         |
+| **Arch Linux**             | AUR `mumcord-bin`                           | `paru -S mumcord-bin` or `yay -S mumcord-bin`                                                                                                              |
 
 **Linux one-liner** (picks the right package for your distribution, falls back to the AppImage):
 
@@ -145,11 +145,11 @@ Details: [Roadmap](https://github.com/Mumcord/mumcord/wiki/Roadmap) in the wiki.
 
 For bug reports, use **Settings → Diagnostics → Save diagnostic file**: app version, OS, audio devices, connection statistics and recent log lines, with no chat, passwords or certificates. Mumcord also has a hidden [packet inspector](docs/packet-inspector.md) for debugging plugin data (click the version in About seven times). Then [open an issue](https://github.com/Mumcord/mumcord/issues/new/choose).
 
-| System  | Log folder                                |
-| ------- | ----------------------------------------- |
-| Windows | `%LOCALAPPDATA%\app.mumcord.client\logs\` |
-| macOS   | `~/Library/Logs/app.mumcord.client/`      |
-| Linux   | `~/.local/share/app.mumcord.client/logs/` |
+| System  | Log folder                                                                                      |
+| ------- | ----------------------------------------------------------------------------------------------- |
+| Windows | `%LOCALAPPDATA%\app.mumcord.client\logs\` (portable: `MumcordData\logs\` next to `Mumcord.exe`) |
+| macOS   | `~/Library/Logs/app.mumcord.client/`                                                            |
+| Linux   | `~/.local/share/app.mumcord.client/logs/`                                                       |
 
 Logs contain no chat, names or audio. Known problems and fixes: [Troubleshooting](https://github.com/Mumcord/mumcord/wiki/Troubleshooting) and [docs/troubleshooting.md](docs/troubleshooting.md).
 
