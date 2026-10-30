@@ -10,7 +10,8 @@
 // matches a shifted part of it and the measured levels say nothing about the suppressor, which is what
 // made this spec fail in CI. A run that did not record the whole copy is reported instead of measured.
 //
-// How much each backend removes on its own is proven in crates/codec/src/dsp/tests.rs; here the
+// How much each backend removes on its own is proven in crates/codec/src/dsp/tests.rs and, for
+// rnnoise-rs, in crates/engine/src/noise_backend.rs; here the
 // encoder limits what the network path can show, so the checks stay modest.
 import { mkdirSync, rmSync } from "node:fs";
 import { join } from "node:path";

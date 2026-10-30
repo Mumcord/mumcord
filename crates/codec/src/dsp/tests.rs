@@ -421,7 +421,7 @@ fn processing_latency_within_budget() {
     // The syllabic envelope, not the harmonic structure, marks the delay: a pure glide correlates
     // at every period, and a model that turns the voice down would hide the delay.
     let input = speech_like(4 * SAMPLE_RATE as usize, 0.3);
-    for backend in [Backend::Nnnoiseless, Backend::Rnnoise, Backend::Sonora] {
+    for backend in [Backend::Nnnoiseless, Backend::Sonora] {
         let (mut chain, _) = chain_with_backend(backend, true, true, true);
         let out = run(&mut chain, &input);
         let frames = input.len() / FRAME_SAMPLES;
@@ -468,7 +468,7 @@ fn per_frame_processing_time() {
     let noise = fan_noise(speech.len(), 0.05);
     let input: Vec<f32> = speech.iter().zip(noise).map(|(s, n)| s + n).collect();
     let far = fan_noise(input.len(), 0.1);
-    for backend in [Backend::Nnnoiseless, Backend::Rnnoise, Backend::Sonora] {
+    for backend in [Backend::Nnnoiseless, Backend::Sonora] {
         let (mut chain, mut reference) = chain_with_backend(backend, true, true, true);
         let mut out = [0.0; FRAME_SAMPLES];
         let mut times: Vec<Duration> = Vec::with_capacity(input.len() / FRAME_SAMPLES);
@@ -682,20 +682,6 @@ fn nnnoiseless_reduces_noise_and_keeps_speech() {
 }
 
 #[test]
-fn rnnoise_reduces_noise_and_keeps_speech() {
-    let (reduction, speech_loss) = backend_quality(Backend::Rnnoise, SuppressionLevel::High);
-    println!("rnnoise-rs: noise {reduction:.1} dB down, speech {speech_loss:.1} dB down");
-    assert!(
-        reduction >= 10.0,
-        "rnnoise-rs only reduced {reduction:.1} dB"
-    );
-    assert!(
-        speech_loss <= 6.0,
-        "rnnoise-rs took {speech_loss:.1} dB of speech"
-    );
-}
-
-#[test]
 fn sonora_reduces_noise_and_keeps_speech() {
     let (reduction, speech_loss) = backend_quality(Backend::Sonora, SuppressionLevel::High);
     println!("sonora-ns: noise {reduction:.1} dB down, speech {speech_loss:.1} dB down");
@@ -718,7 +704,7 @@ fn speech_probability_comes_from_the_backend_or_the_detector() {
     let frame: Frame = speech[FRAME_SAMPLES * 50..FRAME_SAMPLES * 51]
         .try_into()
         .expect("480 samples");
-    for backend in [Backend::Nnnoiseless, Backend::Rnnoise] {
+    for backend in [Backend::Nnnoiseless] {
         let (mut chain, _) = chain_with_backend(backend, false, true, false);
         let mut out = [0.0; FRAME_SAMPLES];
         for _ in 0..40 {
@@ -747,18 +733,59 @@ fn speech_probability_comes_from_the_backend_or_the_detector() {
 }
 
 /// Adoption must not build anything: the settings thread already created the backend.
+/// `Backend::Rnnoise` is the backend a caller supplies, so the test registers a stub.
 #[test]
 fn adopting_a_backend_allocates_nothing_in_the_frame_path() {
-    let (mut chain, _) = chain_with_backend(Backend::Nnnoiseless, false, true, false);
+    #[derive(Debug)]
+    struct StubBackend {
+        /// Its own state, so building it allocates like a real backend does.
+        state: [f32; FRAME_SAMPLES],
+    }
+
+    impl SuppressionBackend for StubBackend {
+        fn kind(&self) -> Backend {
+            Backend::Rnnoise
+        }
+
+        // A probability, so the chain does not run the detector for it: the detector builds its
+        // buffers on its first frame and would show up as an allocation here.
+        fn process(&mut self, input: &Frame, output: &mut Frame) -> Outcome {
+            for (slot, &sample) in self.state.iter_mut().zip(input.iter()) {
+                *slot = sample;
+            }
+            output.copy_from_slice(&self.state);
+            Outcome {
+                probability: Some(0.5),
+                failed: false,
+            }
+        }
+    }
+
+    fn stub(level: SuppressionLevel) -> Box<dyn SuppressionBackend> {
+        let _ = level;
+        Box::new(StubBackend {
+            state: [0.0; FRAME_SAMPLES],
+        })
+    }
+
+    let controls = Arc::new(DspControls::default());
+    // Only the adoption is measured, so the stages that allocate internally are switched off.
+    controls.set_echo_cancellation(false);
+    controls.set_auto_gain(false);
+    let (_producer, consumer) = echo_reference();
+    let mut chain = DspChain::new(controls.clone(), consumer);
     let speech = formant_speech(FRAME_SAMPLES, 0.3);
     let frame: Frame = speech.as_slice().try_into().expect("480 samples");
     let mut out = [0.0; FRAME_SAMPLES];
-    let before = allocations();
-    chain
-        .controls()
-        .set_noise_backend(Backend::Rnnoise, SuppressionLevel::Moderate);
-    let built = allocations() - before;
-    assert!(built > 0, "the settings thread did not build the backend");
+
+    controls.register_backend(Backend::Rnnoise, stub);
+    let before_build = allocations();
+    controls.set_noise_backend(Backend::Rnnoise, SuppressionLevel::High);
+    assert!(
+        allocations() - before_build > 0,
+        "the settings thread did not build the backend"
+    );
+
     let before_adopt = allocations();
     chain.process(&frame, &mut out);
     assert_eq!(
@@ -808,14 +835,14 @@ fn backend_switches_while_the_chain_runs() {
     assert_eq!(chain.backend(), Backend::Nnnoiseless);
 
     // The settings thread prepares the new backend; the chain takes it on the next frame.
-    controls.set_noise_backend(Backend::Rnnoise, SuppressionLevel::Moderate);
+    controls.set_noise_backend(Backend::Sonora, SuppressionLevel::Moderate);
     chain.process(&first, &mut out);
-    assert_eq!(chain.backend(), Backend::Rnnoise);
+    assert_eq!(chain.backend(), Backend::Sonora);
 
     // A switch that changes nothing prepares nothing, so the chain keeps its instance.
-    controls.set_noise_backend(Backend::Rnnoise, SuppressionLevel::Moderate);
+    controls.set_noise_backend(Backend::Sonora, SuppressionLevel::Moderate);
     chain.process(&first, &mut out);
-    assert_eq!(chain.backend(), Backend::Rnnoise);
+    assert_eq!(chain.backend(), Backend::Sonora);
 }
 
 /// With suppression off the microphone path must be untouched, even while the speech detector runs
@@ -823,7 +850,7 @@ fn backend_switches_while_the_chain_runs() {
 #[test]
 fn disabled_suppression_leaves_the_audio_bit_exact() {
     let input = fan_noise(FRAME_SAMPLES * 20, 0.2);
-    for backend in [Backend::Nnnoiseless, Backend::Rnnoise, Backend::Sonora] {
+    for backend in [Backend::Nnnoiseless, Backend::Sonora] {
         let (mut chain, _) = chain_with_backend(backend, false, false, false);
         let out = run(&mut chain, &input);
         assert_eq!(out, input, "{backend:?} changed the audio while disabled");
@@ -873,12 +900,14 @@ fn a_failing_backend_passes_the_frame_through() {
     assert_eq!(chain.backend(), Backend::Sonora);
 }
 
-/// The neural backends must not allocate per frame (same rule as the rest of the chain).
+/// The neural backend must not allocate per frame (same rule as the rest of the chain).
+/// `rnnoise-rs` is measured in the engine, where its implementation lives.
 #[test]
-fn neural_backends_do_not_allocate_per_frame() {
-    for backend in [Backend::Nnnoiseless, Backend::Rnnoise] {
-        assert_eq!(allocations_per_frame(backend, false, true, false), 0.0);
-    }
+fn neural_backend_does_not_allocate_per_frame() {
+    assert_eq!(
+        allocations_per_frame(Backend::Nnnoiseless, false, true, false),
+        0.0
+    );
     println!(
         "sonora noise suppression allocates {:.1} per frame",
         allocations_per_frame(Backend::Sonora, false, true, false)

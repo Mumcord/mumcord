@@ -1,12 +1,15 @@
 //! Noise suppression backends for Settings → Voice.
 //!
-//! Three local implementations, all offline:
+//! Two local implementations, both offline:
 //!
 //! - [`Backend::Nnnoiseless`] — `nnnoiseless`, the RNNoise model in Rust. Cheap, the default.
-//! - [`Backend::Rnnoise`] — `rnnoise-rs`, a port of the current RNNoise architecture
-//!   (convolution + GRU network), heavier per band but usually a little cleaner.
 //! - [`Backend::Sonora`] — `sonora-ns`, the classical WebRTC noise suppressor (quantile noise
 //!   estimation + Wiener filter), no neural network.
+//!
+//! [`Backend::Rnnoise`] (the current RNNoise architecture, convolution + GRU network) is not
+//! part of this crate: `rnnoise-rs` is a git source, and a published crate cannot carry one, so
+//! the engine supplies the implementation through [`BackendBuilder`] (issue #176). A consumer
+//! that selects `Backend::Rnnoise` without a registered builder gets nnnoiseless.
 //!
 //! Only the selected backend processes the microphone. Every frame is 48 kHz mono, 10 ms
 //! ([`FRAME_SAMPLES`] samples); the neural backends expect samples in the 16-bit integer range,
@@ -16,7 +19,7 @@
 //!
 //! `nnnoiseless` and `rnnoise-rs` expose no runtime parameters (`process_frame` only), so the UI
 //! shows nothing for them. `sonora-ns` has the aggressiveness level ([`SuppressionLevel`]), the
-//! only real option.
+//! only real option. A builder receives it even when the implementation has no use for it.
 //!
 //! # Speech detection
 //!
@@ -27,14 +30,12 @@
 //!
 //! # Real-time behaviour
 //!
-//! Backends are created in [`build_backend`] (allocating), which the settings thread calls; the
-//! processing thread adopts the result through the pending slot in [`super::DspControls`], so a
-//! switch never builds inside the frame path. After creation, `process` allocates nothing for the
-//! neural backends; `sonora` keeps small internal temporaries (known library behaviour, measured
-//! in the tests).
+//! Backends are created by the settings thread, never in the frame path, and the processing thread
+//! adopts the result through the pending slot in [`super::DspControls`]. After creation, `process`
+//! allocates nothing for the neural backends; `sonora` keeps small internal temporaries (known
+//! library behaviour, measured in the tests).
 
 use nnnoiseless::DenoiseState;
-use rnnoise::DenoiseState as RnnoiseState;
 use sonora::config::{NoiseSuppression, NoiseSuppressionLevel};
 use sonora::{AudioProcessing, Config, StreamConfig};
 
@@ -145,12 +146,15 @@ pub trait SuppressionBackend: std::fmt::Debug + Send {
     fn process(&mut self, input: &Frame, output: &mut Frame) -> Outcome;
 }
 
-/// Builds a backend. Called by the settings thread, not by the audio path: the neural backends
-/// are small, `sonora` allocates its buffers here.
+/// An implementation of a backend this crate cannot carry, called by the settings thread.
+pub type BackendBuilder = fn(SuppressionLevel) -> Box<dyn SuppressionBackend>;
+
+/// Builds one of the backends `mumcord-codec` carries itself. Called by the settings thread, not by
+/// the audio path: the neural model is small, `sonora` allocates its buffers here.
 pub fn build_backend(kind: Backend, level: SuppressionLevel) -> Box<dyn SuppressionBackend> {
     match kind {
-        Backend::Nnnoiseless => Box::new(NnnoiselessBackend::new()),
-        Backend::Rnnoise => Box::new(RnnoiseBackend::new()),
+        // Without a registered builder, rnnoise falls back to the backend this crate has.
+        Backend::Nnnoiseless | Backend::Rnnoise => Box::new(NnnoiselessBackend::new()),
         Backend::Sonora => Box::new(SonoraBackend::new(level)),
     }
 }
@@ -173,38 +177,6 @@ impl NnnoiselessBackend {
 impl SuppressionBackend for NnnoiselessBackend {
     fn kind(&self) -> Backend {
         Backend::Nnnoiseless
-    }
-
-    fn process(&mut self, input: &Frame, output: &mut Frame) -> Outcome {
-        scale(input, &mut self.scaled);
-        let probability = self.state.process_frame(output, &self.scaled);
-        unscale(output);
-        Outcome {
-            probability: Some(probability),
-            failed: false,
-        }
-    }
-}
-
-/// rnnoise-rs: the current RNNoise model. It keeps a 50 % overlap window, so the frame it
-/// returns is the one it read on the previous call — 10 ms of algorithmic delay.
-pub struct RnnoiseBackend {
-    state: RnnoiseState,
-    scaled: Frame,
-}
-
-impl RnnoiseBackend {
-    pub fn new() -> Self {
-        Self {
-            state: RnnoiseState::new(),
-            scaled: [0.0; FRAME_SAMPLES],
-        }
-    }
-}
-
-impl SuppressionBackend for RnnoiseBackend {
-    fn kind(&self) -> Backend {
-        Backend::Rnnoise
     }
 
     fn process(&mut self, input: &Frame, output: &mut Frame) -> Outcome {
@@ -280,12 +252,6 @@ impl std::fmt::Debug for NnnoiselessBackend {
     }
 }
 
-impl std::fmt::Debug for RnnoiseBackend {
-    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
-        f.write_str("RnnoiseBackend")
-    }
-}
-
 impl std::fmt::Debug for SonoraBackend {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         f.debug_struct("SonoraBackend")
@@ -331,6 +297,16 @@ mod tests {
         assert_eq!(SuppressionLevel::default(), SuppressionLevel::Moderate);
     }
 
+    /// What `mumcord-codec` cannot carry is what the caller registered; without one the backend
+    /// falls back to the implementation this crate has.
+    #[test]
+    fn a_registered_builder_builds_the_backend() {
+        assert_eq!(
+            build_backend(Backend::Rnnoise, SuppressionLevel::High).kind(),
+            Backend::Nnnoiseless
+        );
+    }
+
     #[test]
     fn only_sonora_has_a_user_setting() {
         assert!(!Backend::Nnnoiseless.supports_level());
@@ -352,7 +328,7 @@ mod tests {
             .collect::<Vec<f32>>()
             .try_into()
             .expect("480 samples");
-        for kind in [Backend::Nnnoiseless, Backend::Rnnoise, Backend::Sonora] {
+        for kind in [Backend::Nnnoiseless, Backend::Sonora] {
             let mut backend = build_backend(kind, SuppressionLevel::High);
             let mut out = [0.0; FRAME_SAMPLES];
             // Warm up (the neural models need a first frame, sonora a few analysis frames).

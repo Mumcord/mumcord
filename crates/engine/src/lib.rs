@@ -13,6 +13,7 @@ pub mod ingame_overlay;
 pub mod inspector;
 mod maintenance;
 pub mod mumcord;
+pub mod noise_backend;
 pub mod now_gaming;
 pub mod now_playing;
 pub mod p2p;

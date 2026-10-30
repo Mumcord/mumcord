@@ -16,7 +16,6 @@ license.workspace = true
 [dependencies]
 opus.workspace = true
 nnnoiseless.workspace = true
-rnnoise-rs.workspace = true
 sonora.workspace = true
 rtrb.workspace = true
 thiserror.workspace = true

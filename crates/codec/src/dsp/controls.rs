@@ -1,10 +1,13 @@
 //! Lock-free settings and read-outs shared between UI, hotkey handling and
 //! the processing thread.
 
+use std::collections::HashMap;
 use std::sync::Mutex;
 use std::sync::atomic::{AtomicBool, AtomicU32, Ordering};
 
-use super::noise_suppression::{Backend, SuppressionBackend, SuppressionLevel, build_backend};
+use super::noise_suppression::{
+    Backend, BackendBuilder, SuppressionBackend, SuppressionLevel, build_backend,
+};
 
 /// Lowest and highest manual voice-activation threshold, in dBFS.
 pub const THRESHOLD_MIN_DBFS: f32 = -60.0;
@@ -50,6 +53,9 @@ pub struct DspControls {
     /// only reads `backend_pending`; the mutex is entered on a switch, never per frame.
     backend_pending: AtomicBool,
     backend_slot: Mutex<Option<Box<dyn SuppressionBackend>>>,
+    /// Implementations for backends `mumcord-codec` cannot carry, keyed by `Backend::code`. Entered
+    /// on the settings thread, never in the frame path.
+    builders: Mutex<HashMap<u32, BackendBuilder>>,
     auto_gain: AtomicBool,
     music_quality: AtomicBool,
     bitrate_cap_kbps: AtomicU32,
@@ -75,6 +81,7 @@ impl Default for DspControls {
             suppression_level: AtomicU32::new(SuppressionLevel::default().code()),
             backend_pending: AtomicBool::new(false),
             backend_slot: Mutex::new(None),
+            builders: Mutex::new(HashMap::new()),
             auto_gain: AtomicBool::new(true),
             music_quality: AtomicBool::new(false),
             bitrate_cap_kbps: AtomicU32::new(0),
@@ -118,8 +125,31 @@ impl DspControls {
             .store(level.code(), Ordering::Relaxed);
         if changed {
             let mut slot = self.backend_slot.lock().expect("backend slot");
-            *slot = Some(build_backend(kind, level));
+            *slot = Some(self.build(kind, level));
             self.backend_pending.store(true, Ordering::Release);
+        }
+    }
+
+    /// Registers the implementation used for a backend this crate does not carry.
+    pub fn register_backend(&self, kind: Backend, builder: BackendBuilder) {
+        self.builders
+            .lock()
+            .expect("backend registry")
+            .insert(kind.code(), builder);
+    }
+
+    /// Builds `kind` on the settings thread: the registered implementation when there is one, else
+    /// the backend `mumcord-codec` carries itself.
+    pub fn build(&self, kind: Backend, level: SuppressionLevel) -> Box<dyn SuppressionBackend> {
+        let registered = self
+            .builders
+            .lock()
+            .expect("backend registry")
+            .get(&kind.code())
+            .copied();
+        match registered {
+            Some(builder) => builder(level),
+            None => build_backend(kind, level),
         }
     }
 

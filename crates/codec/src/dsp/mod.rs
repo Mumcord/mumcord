@@ -45,7 +45,7 @@ pub use controls::{
 };
 pub use echo_ref::{EchoRefConsumer, EchoRefProducer, echo_reference};
 pub use noise_suppression::{
-    Backend, Outcome, SuppressionBackend, SuppressionLevel, build_backend,
+    Backend, BackendBuilder, Outcome, SuppressionBackend, SuppressionLevel, build_backend,
 };
 
 use gate::{PttGate, ThresholdGate, VoiceDetector};
@@ -112,15 +112,16 @@ impl DspChain {
             .render_config(stream)
             .build();
         let backend = controls.take_backend().unwrap_or_else(|| {
-            build_backend(controls.noise_backend(), controls.suppression_level())
+            controls.build(controls.noise_backend(), controls.suppression_level())
         });
+        let detector = controls.build(Backend::Nnnoiseless, SuppressionLevel::default());
         Self {
             controls,
             echo_ref,
             aec,
             agc,
             backend,
-            detector: build_backend(Backend::Nnnoiseless, SuppressionLevel::default()),
+            detector,
             leveler: Leveler::default(),
             leveling: false,
             vad: VoiceDetector::default(),
