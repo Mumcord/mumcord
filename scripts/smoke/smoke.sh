@@ -10,6 +10,8 @@
 #   --port  test server port (default 64738)
 #   --start-only  no server available: only check that the app starts and keeps running
 #                 (no --seed/--bot needed; the connect part then belongs on the manual checklist)
+#   --portable    Windows: the app is the portable Mumcord.exe (with the `portable` marker), so
+#                 its data and logs are in MumcordData next to it (issue #181)
 #
 # Steps: seed a profile (identity in the OS secure storage, wizard done, saved server with its
 # certificate trusted) → start the app with a mumble:// link to that server → pass when the app
@@ -21,7 +23,7 @@
 set -euo pipefail
 
 port=64738
-app="" seed="" bot="" allow_overwrite="" start_only=""
+app="" seed="" bot="" allow_overwrite="" start_only="" portable=""
 while [[ $# -gt 0 ]]; do
   case "$1" in
     --app) app=$2; shift 2 ;;
@@ -30,6 +32,7 @@ while [[ $# -gt 0 ]]; do
     --port) port=$2; shift 2 ;;
     --allow-identity-overwrite) allow_overwrite=1; shift ;;
     --start-only) start_only=1; shift ;;
+    --portable) portable=1; shift ;;
     *) echo "unknown argument: $1" >&2; exit 2 ;;
   esac
 done
@@ -64,6 +67,11 @@ case "$(uname -s)" in
     ;;
   *) echo "unsupported OS: $(uname -s)" >&2; exit 2 ;;
 esac
+if [[ -n $portable ]]; then
+  [[ $os == windows ]] || { echo "--portable is Windows only" >&2; exit 2; }
+  data_dir="$(dirname "$app")/MumcordData/data"
+  log_dir="$(dirname "$app")/MumcordData/logs"
+fi
 
 native_path() {
   if [[ $os == windows ]]; then cygpath -m "$1"; else printf '%s' "$1"; fi

@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Added
+
+- Windows releases also ship a portable zip (`Mumcord_<version>_x64-portable.zip`) that runs without installing: unpack it and start `Mumcord.exe`. The `portable` file next to the exe keeps the data, settings, logs and caches in `MumcordData` beside it instead of `%APPDATA%`; it registers no `mumble://` handler and no start at login unless turned on, and About, the diagnostic file and the update hint say "Portable". The identity stays in Windows Credential Manager (per Windows user). A missing WebView2 Runtime now shows a message with the download link instead of failing silently. See `docs/windows-portable.md` (#181)
+
 ### Fixed
 
 - The watch party respects Settings > Privacy > "Show link previews and embeds": with it off, "Watch together" in the Apps menu stays listed but disabled with the reason and a link to the Privacy settings, a running party shows "A watch party is running: enable embedded players to join" with the same link instead of the banner's video title, the floating player and playlist (no player page, no thumbnails) — so nothing is requested from YouTube or Twitch (#160)
