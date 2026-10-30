@@ -8,7 +8,10 @@
     "muted": "Mikrofonas nutildytas",
     "unmuted": "Mikrofonas įjungtas",
     "deafened": "Garsas išjungtas. Negirdi kitų, o tavo mikrofonas nutildytas",
-    "undeafened": "Garsas įjungtas"
+    "undeafened": "Garsas įjungtas",
+    "leftVoice": "Balsą serveryje {{server}} palikote",
+    "disconnected": "Atsijungta nuo {{server}}",
+    "disconnectedAll": "Atsijungta nuo visų serverių"
   },
   "readOnly": {
     "text": "Tu tik skaitai – prisijunk prie kanalo, kad kalbėtum.",
@@ -95,5 +98,20 @@
     "line": "Balsas: {{channel}} · {{server}}",
     "server": "Balsas: {{server}}",
     "show": "{{location}} – rodyti šį serverį"
+  },
+  "disconnectMenu": {
+    "label": "Atsijungimo parinktys",
+    "open": "Daugiau atsijungimo parinkčių",
+    "leaveVoice": "Palikti balsą",
+    "leaveVoiceHint": "Nustoti kalbėti ir klausyti, likti prisijungus pokalbiams",
+    "disconnectHint": "Uždaryti ryšį su šiuo serveriu",
+    "switchTo": "Perkelti balsą į {{server}}",
+    "all": "Atsijungti nuo visų serverių…",
+    "allHint": "Uždaryti visus ryšius su serveriais"
+  },
+  "disconnectAll": {
+    "title": "Atsijungti nuo visų serverių?",
+    "message": "Atsijungti nuo visų {{total}} serverių?",
+    "confirm": "Atsijungti"
   }
 }
