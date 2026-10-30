@@ -65,13 +65,18 @@
     "title": "Calitatea vocii",
     "status": "Ping {{latency}}, pierderi {{loss}}",
     "lowLatency": "Mod cu latență redusă",
-    "lowLatencyHint": "Trimite pachete mai scurte pentru o întârziere mai mică. Folosește mai multă lățime de bandă.",
+    "lowLatencyHint": "Cele mai mici pachete și buffere pentru a cânta împreună. Mai multă lățime de bandă, mai puțin robust.",
     "lowLatencyComingSoon": "În curând",
-    "bandwidth": "Lățime de bandă estimată: {{value}} kbit/s",
-    "bandwidthHint": "Modul cu latență redusă (pachete de 10 ms) ar necesita cu aproximativ {{value}} kbit/s mai mult pentru antetele pachetelor.",
     "voiceSettings": "Setări voce…",
     "applies": "Se aplică imediat, salvat ca în Setări → Audio",
     "effectiveLabel": "Se trimite acum (după adaptarea la pierderi)",
-    "keys": "Esc închide · ↑↓ mută · ← → ajustează"
+    "keys": "Esc închide · ↑↓ mută · ← → ajustează",
+    "bandwidthLabel": "Lățime de bandă estimată cu antete",
+    "bandwidthValue": "≈ {{value}} din {{limit}} kbit/s",
+    "bandwidthValueNoLimit": "≈ {{value}} kbit/s",
+    "bandwidthHintWithin": "Cu modul cu latență redusă: ≈ {{value}} kbit/s (pachete de 10 ms), încă în limită.",
+    "bandwidthHintOver": "Cu modul cu latență redusă: ≈ {{value}} kbit/s (pachete de 10 ms), peste limită.",
+    "bandwidthHintNoLimit": "Cu modul cu latență redusă: ≈ {{value}} kbit/s (pachete de 10 ms).",
+    "beta": "Beta"
   }
 }

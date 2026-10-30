@@ -64,13 +64,18 @@
     "title": "Stemmekvalitet",
     "status": "Ping {{latency}}, tab {{loss}}",
     "lowLatency": "Tilstand med lav latenstid",
-    "lowLatencyHint": "Sender kortere pakker for mindre forsinkelse. Bruger mere båndbredde.",
+    "lowLatencyHint": "Mindste pakker og buffere til at spille musik sammen. Mere båndbredde, mindre robust.",
     "lowLatencyComingSoon": "Kommer snart",
-    "bandwidth": "Anslået båndbredde: {{value}} kbit/s",
-    "bandwidthHint": "Tilstanden med lav latenstid (pakker på 10 ms) ville bruge ca. {{value}} kbit/s mere til pakkehoveder.",
     "voiceSettings": "Stemmeindstillinger…",
     "applies": "Gælder med det samme, gemmes som i Indstillinger → Lyd",
     "effectiveLabel": "Sender nu (efter tilpasning til tab)",
-    "keys": "Esc lukker · ↑↓ flytter · ← → justerer"
+    "keys": "Esc lukker · ↑↓ flytter · ← → justerer",
+    "bandwidthLabel": "Anslået båndbredde inkl. headere",
+    "bandwidthValue": "≈ {{value}} af {{limit}} kbit/s",
+    "bandwidthValueNoLimit": "≈ {{value}} kbit/s",
+    "bandwidthHintWithin": "Med tilstanden med lav latenstid: ≈ {{value}} kbit/s (pakker på 10 ms), stadig inden for grænsen.",
+    "bandwidthHintOver": "Med tilstanden med lav latenstid: ≈ {{value}} kbit/s (pakker på 10 ms), over grænsen.",
+    "bandwidthHintNoLimit": "Med tilstanden med lav latenstid: ≈ {{value}} kbit/s (pakker på 10 ms).",
+    "beta": "Beta"
   }
 }

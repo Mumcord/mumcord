@@ -66,13 +66,18 @@
     "title": "Jakość głosu",
     "status": "Ping {{latency}}, utrata {{loss}}",
     "lowLatency": "Tryb niskich opóźnień",
-    "lowLatencyHint": "Wysyła krótsze pakiety, aby zmniejszyć opóźnienie. Zużywa więcej przepustowości.",
+    "lowLatencyHint": "Najmniejsze pakiety i bufory do wspólnego grania muzyki. Więcej przepustowości, mniejsza odporność.",
     "lowLatencyComingSoon": "Wkrótce",
-    "bandwidth": "Szacowana przepustowość: {{value}} kbit/s",
-    "bandwidthHint": "Tryb niskich opóźnień (pakiety po 10 ms) potrzebowałby około {{value}} kbit/s więcej na nagłówki pakietów.",
     "voiceSettings": "Ustawienia głosu…",
     "applies": "Działa od razu, zapisywane jak w Ustawienia → Dźwięk",
     "effectiveLabel": "Aktualnie wysyłane (po dostosowaniu do strat)",
-    "keys": "Esc zamyka · ↑↓ przesuwa · ← → reguluje"
+    "keys": "Esc zamyka · ↑↓ przesuwa · ← → reguluje",
+    "bandwidthLabel": "Szacowana przepustowość z nagłówkami",
+    "bandwidthValue": "≈ {{value}} z {{limit}} kbit/s",
+    "bandwidthValueNoLimit": "≈ {{value}} kbit/s",
+    "bandwidthHintWithin": "Z trybem niskich opóźnień: ≈ {{value}} kbit/s (pakiety po 10 ms), nadal w limicie.",
+    "bandwidthHintOver": "Z trybem niskich opóźnień: ≈ {{value}} kbit/s (pakiety po 10 ms), ponad limitem.",
+    "bandwidthHintNoLimit": "Z trybem niskich opóźnień: ≈ {{value}} kbit/s (pakiety po 10 ms).",
+    "beta": "Beta"
   }
 }

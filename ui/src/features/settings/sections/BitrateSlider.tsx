@@ -14,7 +14,14 @@ export const BITRATE_THROTTLE_MS = 100;
  * Own bitrate cap (FR-2.64): from 16 kbit/s to the highest bitrate the voice server allows; the far
  * right is "Max" (the full maximum). Independent of "Music quality"; defaults to 96 kbit/s. Applied live while dragging.
  */
-export function BitrateSlider({ settings, update }: SettingsSectionProps) {
+export function BitrateSlider({
+  settings,
+  update,
+  limitLabel,
+}: SettingsSectionProps & {
+  /** Compact variant (quick panel): shows the range ends as marks and keeps the hint for screen readers only. */
+  limitLabel?: string;
+}) {
   const { t } = useTranslation("settings");
   const id = useId();
   const { schedule } = useThrottledSend(BITRATE_THROTTLE_MS);
@@ -74,7 +81,16 @@ export function BitrateSlider({ settings, update }: SettingsSectionProps) {
         }}
       />
       <output htmlFor={id}>{shown}</output>
-      <p id={`${id}-hint`} className="settings-hint">
+      {limitLabel !== undefined ? (
+        <div className="overlay-settings__marks" aria-hidden="true">
+          <span>{BITRATE_MIN_KBPS}</span>
+          {serverMax !== null ? <span>{limitLabel}</span> : null}
+        </div>
+      ) : null}
+      <p
+        id={`${id}-hint`}
+        className={limitLabel !== undefined ? "settings-hint visually-hidden" : "settings-hint"}
+      >
         {serverMax === null
           ? t("audio.bitrateMaxUnknown")
           : t("audio.bitrateMaxKnown", { kbps: serverMax })}

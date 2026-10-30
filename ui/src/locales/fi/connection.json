@@ -64,13 +64,18 @@
     "title": "Äänenlaatu",
     "status": "Viive {{latency}}, hävikki {{loss}}",
     "lowLatency": "Pienen viiveen tila",
-    "lowLatencyHint": "Lähettää lyhyempiä paketteja pienemmän viiveen vuoksi. Käyttää enemmän kaistaa.",
+    "lowLatencyHint": "Pienimmät paketit ja puskurit yhteissoittoon. Enemmän kaistaa, vähemmän vakaa.",
     "lowLatencyComingSoon": "Tulossa pian",
-    "bandwidth": "Arvioitu kaistanleveys: {{value}} kbit/s",
-    "bandwidthHint": "Pienen viiveen tila (10 ms:n paketit) tarvitsisi noin {{value}} kbit/s enemmän pakettien otsakkeisiin.",
     "voiceSettings": "Ääniasetukset…",
     "applies": "Tulee voimaan heti, tallentuu kuten Asetukset → Ääni",
     "effectiveLabel": "Lähetetään nyt (häviöihin sopeutumisen jälkeen)",
-    "keys": "Esc sulkee · ↑↓ siirtyy · ← → säätää"
+    "keys": "Esc sulkee · ↑↓ siirtyy · ← → säätää",
+    "bandwidthLabel": "Arvioitu kaistanleveys otsakkeineen",
+    "bandwidthValue": "≈ {{value}} / {{limit}} kbit/s",
+    "bandwidthValueNoLimit": "≈ {{value}} kbit/s",
+    "bandwidthHintWithin": "Pienen viiveen tilassa: ≈ {{value}} kbit/s (10 ms:n paketit), yhä rajan sisällä.",
+    "bandwidthHintOver": "Pienen viiveen tilassa: ≈ {{value}} kbit/s (10 ms:n paketit), rajan yli.",
+    "bandwidthHintNoLimit": "Pienen viiveen tilassa: ≈ {{value}} kbit/s (10 ms:n paketit).",
+    "beta": "Beta"
   }
 }

@@ -66,13 +66,18 @@
     "title": "Kakovost glasu",
     "status": "Ping {{latency}}, izguba {{loss}}",
     "lowLatency": "Način nizke zakasnitve",
-    "lowLatencyHint": "Pošilja krajše pakete za manjšo zakasnitev. Porabi več pasovne širine.",
+    "lowLatencyHint": "Najmanjši paketi in medpomnilniki za skupno igranje glasbe. Več pasovne širine, manj robustno.",
     "lowLatencyComingSoon": "Kmalu",
-    "bandwidth": "Ocenjena pasovna širina: {{value}} kbit/s",
-    "bandwidthHint": "Način nizke zakasnitve (paketi po 10 ms) bi za glave paketov potreboval približno {{value}} kbit/s več.",
     "voiceSettings": "Nastavitve glasu…",
     "applies": "Velja takoj, shranjeno kot v Nastavitve → Zvok",
     "effectiveLabel": "Trenutno se pošilja (po prilagoditvi izgubi)",
-    "keys": "Esc zapre · ↑↓ premika · ← → prilagodi"
+    "keys": "Esc zapre · ↑↓ premika · ← → prilagodi",
+    "bandwidthLabel": "Ocenjena pasovna širina z glavami",
+    "bandwidthValue": "≈ {{value}} od {{limit}} kbit/s",
+    "bandwidthValueNoLimit": "≈ {{value}} kbit/s",
+    "bandwidthHintWithin": "Z načinom nizke zakasnitve: ≈ {{value}} kbit/s (paketi po 10 ms), še znotraj omejitve.",
+    "bandwidthHintOver": "Z načinom nizke zakasnitve: ≈ {{value}} kbit/s (paketi po 10 ms), nad omejitvijo.",
+    "bandwidthHintNoLimit": "Z načinom nizke zakasnitve: ≈ {{value}} kbit/s (paketi po 10 ms).",
+    "beta": "Beta"
   }
 }

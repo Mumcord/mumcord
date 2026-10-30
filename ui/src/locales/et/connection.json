@@ -64,13 +64,18 @@
     "title": "Hääle kvaliteet",
     "status": "Ping {{latency}}, kadu {{loss}}",
     "lowLatency": "Väikese viivitusega režiim",
-    "lowLatencyHint": "Saadab lühemaid pakette väiksema viivituse jaoks. Kasutab rohkem ribalaiust.",
+    "lowLatencyHint": "Väikseimad paketid ja puhvrid koos muusika tegemiseks. Rohkem ribalaiust, vähem töökindel.",
     "lowLatencyComingSoon": "Tulekul",
-    "bandwidth": "Hinnanguline ribalaius: {{value}} kbit/s",
-    "bandwidthHint": "Väikese viivitusega režiim (10 ms paketid) vajaks paketipäisteks umbes {{value}} kbit/s rohkem.",
     "voiceSettings": "Hääleseaded…",
     "applies": "Rakendub kohe, salvestub nagu Seaded → Heli",
     "effectiveLabel": "Praegu saadetakse (pärast kaoga kohandamist)",
-    "keys": "Esc sulgeb · ↑↓ liigub · ← → muudab"
+    "keys": "Esc sulgeb · ↑↓ liigub · ← → muudab",
+    "bandwidthLabel": "Hinnanguline ribalaius päistega",
+    "bandwidthValue": "≈ {{value}} / {{limit}} kbit/s",
+    "bandwidthValueNoLimit": "≈ {{value}} kbit/s",
+    "bandwidthHintWithin": "Väikese viivitusega režiimis: ≈ {{value}} kbit/s (10 ms paketid), endiselt piirangu sees.",
+    "bandwidthHintOver": "Väikese viivitusega režiimis: ≈ {{value}} kbit/s (10 ms paketid), üle piirangu.",
+    "bandwidthHintNoLimit": "Väikese viivitusega režiimis: ≈ {{value}} kbit/s (10 ms paketid).",
+    "beta": "Beta"
   }
 }

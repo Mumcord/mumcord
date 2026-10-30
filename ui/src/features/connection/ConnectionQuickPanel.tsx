@@ -4,7 +4,8 @@ import { Switch } from "../settings/components/Switch";
 import { BitrateSlider } from "../settings/sections/BitrateSlider";
 import { useSettings } from "../settings/useSettings";
 import { estimateBandwidth } from "./bandwidth";
-import { AudioRatingBadge } from "./AudioHealthRating";
+import { useServers } from "../servers";
+import { AudioRatingBadge, AudioRatingReason } from "./AudioHealthRating";
 import { useConnectionStats } from "./useConnectionStats";
 
 /**
@@ -26,33 +27,57 @@ export function ConnectionQuickPanel({ onOpenVoiceSettings }: { onOpenVoiceSetti
   const { settings, update } = useSettings();
   const state = useConnectionStats(true);
   const meterId = useId();
+  const servers = useServers();
+  const link = servers.connection.state === "disconnected" ? null : servers.connection.serverId;
+  const saved = servers.servers.find((server) => server.id === link);
+  const serverName = saved ? saved.label || saved.address : "";
   const stats = state.status === "ready" ? state.stats : null;
   const bandwidth = stats ? estimateBandwidth(stats) : null;
   const limit = stats?.serverMaxBandwidthKbps ?? null;
   const lowLatency = lowLatencyAvailable();
+  const withLowLatency = bandwidth ? bandwidth.kbps + bandwidth.lowLatencyExtraKbps : 0;
 
   return (
     <div className="connection-quick">
       <header className="connection-quick__header">
-        {stats ? (
-          <p className="connection-quick__status">
-            {t("quick.status", {
-              latency:
-                stats.rttMs === null
-                  ? t("none")
-                  : t("latencyValue", { value: Math.round(stats.rttMs) }),
-              loss: t("lossValue", { value: stats.lossPercent }),
-            })}
-          </p>
+        <div className="connection-quick__headline">
+          <span className="connection-quick__title">{t("quick.title")}</span>
+          <span className="connection-quick__summary">
+            {stats?.audio ? (
+              <AudioRatingBadge rating={stats.audio.rating} issue={stats.audio.issue} compact />
+            ) : null}
+            {stats ? (
+              <span>
+                {t("quick.status", {
+                  latency:
+                    stats.rttMs === null
+                      ? t("none")
+                      : t("latencyValue", { value: Math.round(stats.rttMs) }),
+                  loss: t("lossValue", { value: stats.lossPercent }),
+                })}
+              </span>
+            ) : null}
+          </span>
+        </div>
+        {stats?.audio?.rating !== "good" ? (
+          <AudioRatingReason issue={stats?.audio?.issue ?? null} />
         ) : null}
-        {stats?.audio ? (
-          <AudioRatingBadge rating={stats.audio.rating} issue={stats.audio.issue} />
-        ) : null}
-        <p className="settings-hint connection-quick__applies">{t("quick.applies")}</p>
+        <p className="settings-hint connection-quick__applies">
+          {serverName ? `${serverName} · ` : ""}
+          {t("quick.applies")}
+        </p>
       </header>
       {settings ? (
         <section className="connection-quick__section">
-          <BitrateSlider settings={settings} update={update} />
+          <BitrateSlider
+            settings={settings}
+            update={update}
+            limitLabel={
+              stats?.serverMaxBandwidthKbps != null
+                ? `${t("serverLimit")} ${String(stats.serverMaxBandwidthKbps)}`
+                : t("serverLimit")
+            }
+          />
           {stats ? (
             <p className="connection-quick__effective">
               <span>{t("quick.effectiveLabel")}</span>
@@ -84,10 +109,14 @@ export function ConnectionQuickPanel({ onOpenVoiceSettings }: { onOpenVoiceSetti
       </section>
       {bandwidth ? (
         <section className="connection-quick__section connection-quick__bandwidth">
-          <span id={meterId}>
-            {t("quick.bandwidth", { value: Math.round(bandwidth.kbps) })}
-            {limit === null ? "" : ` / ${t("bitrateValue", { value: limit })}`}
-          </span>
+          <p className="connection-quick__effective">
+            <span id={meterId}>{t("quick.bandwidthLabel")}</span>
+            <strong>
+              {limit === null
+                ? t("quick.bandwidthValueNoLimit", { value: Math.round(bandwidth.kbps) })
+                : t("quick.bandwidthValue", { value: Math.round(bandwidth.kbps), limit })}
+            </strong>
+          </p>
           {bandwidth.share !== null ? (
             <meter
               aria-labelledby={meterId}
@@ -100,7 +129,14 @@ export function ConnectionQuickPanel({ onOpenVoiceSettings }: { onOpenVoiceSetti
             />
           ) : null}
           <p className="settings-hint">
-            {t("quick.bandwidthHint", { value: Math.round(bandwidth.lowLatencyExtraKbps) })}
+            {t(
+              limit === null
+                ? "quick.bandwidthHintNoLimit"
+                : withLowLatency <= limit
+                  ? "quick.bandwidthHintWithin"
+                  : "quick.bandwidthHintOver",
+              { value: Math.round(withLowLatency) },
+            )}
           </p>
         </section>
       ) : null}

@@ -67,13 +67,18 @@
     "title": "Kwalità tal-vuċi",
     "status": "Ping {{latency}}, telf {{loss}}",
     "lowLatency": "Modalità b'latenza baxxa",
-    "lowLatencyHint": "Jibgħat pakketti iqsar għal inqas dewmien. Juża iktar firxa tal-bandwidth.",
+    "lowLatencyHint": "L-iżgħar pakketti u buffers biex tidgħu mużika flimkien. Aktar bandwidth, inqas robust.",
     "lowLatencyComingSoon": "Dalwaqt",
-    "bandwidth": "Bandwidth stmat: {{value}} kbit/s",
-    "bandwidthHint": "Il-modalità b'latenza baxxa (pakketti ta' 10 ms) tkun teħtieġ madwar {{value}} kbit/s aktar għall-intestaturi tal-pakketti.",
     "voiceSettings": "Settings tal-vuċi…",
     "applies": "Japplika minnufih, jinħażen bħal fis-Settings → Awdjo",
     "effectiveLabel": "Qed jintbagħat issa (wara l-adattament għat-telf)",
-    "keys": "Esc jagħlaq · ↑↓ jiċċaqlaq · ← → jaġġusta"
+    "keys": "Esc jagħlaq · ↑↓ jiċċaqlaq · ← → jaġġusta",
+    "bandwidthLabel": "Bandwidth stmat bl-intestaturi",
+    "bandwidthValue": "≈ {{value}} minn {{limit}} kbit/s",
+    "bandwidthValueNoLimit": "≈ {{value}} kbit/s",
+    "bandwidthHintWithin": "Bil-modalità b'latenza baxxa: ≈ {{value}} kbit/s (pakketti ta' 10 ms), għadu fil-limitu.",
+    "bandwidthHintOver": "Bil-modalità b'latenza baxxa: ≈ {{value}} kbit/s (pakketti ta' 10 ms),'il fuq mil-limitu.",
+    "bandwidthHintNoLimit": "Bil-modalità b'latenza baxxa: ≈ {{value}} kbit/s (pakketti ta' 10 ms).",
+    "beta": "Beta"
   }
 }

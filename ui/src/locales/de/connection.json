@@ -64,13 +64,18 @@
     "title": "Sprachqualität",
     "status": "Ping {{latency}}, Verlust {{loss}}",
     "lowLatency": "Modus für niedrige Latenz",
-    "lowLatencyHint": "Sendet kürzere Pakete für weniger Verzögerung. Braucht mehr Bandbreite.",
+    "lowLatencyHint": "Kleinste Pakete und Puffer zum gemeinsamen Musizieren. Mehr Bandbreite, weniger robust.",
     "lowLatencyComingSoon": "Demnächst verfügbar",
-    "bandwidth": "Geschätzte Bandbreite: {{value}} kbit/s",
-    "bandwidthHint": "Der Modus für niedrige Latenz (10-ms-Pakete) bräuchte etwa {{value}} kbit/s mehr für Paketköpfe.",
     "voiceSettings": "Spracheinstellungen…",
     "applies": "Gilt sofort, gespeichert wie unter Einstellungen → Audio",
     "effectiveLabel": "Wird gerade gesendet (nach Verlustanpassung)",
-    "keys": "Esc schließt · ↑↓ bewegt · ← → ändert"
+    "keys": "Esc schließt · ↑↓ bewegt · ← → ändert",
+    "bandwidthLabel": "Geschätzte Bandbreite inkl. Header",
+    "bandwidthValue": "≈ {{value}} von {{limit}} kbit/s",
+    "bandwidthValueNoLimit": "≈ {{value}} kbit/s",
+    "bandwidthHintWithin": "Mit Modus für niedrige Latenz: ≈ {{value}} kbit/s (10-ms-Pakete), noch innerhalb des Limits.",
+    "bandwidthHintOver": "Mit Modus für niedrige Latenz: ≈ {{value}} kbit/s (10-ms-Pakete), über dem Limit.",
+    "bandwidthHintNoLimit": "Mit Modus für niedrige Latenz: ≈ {{value}} kbit/s (10-ms-Pakete).",
+    "beta": "Beta"
   }
 }

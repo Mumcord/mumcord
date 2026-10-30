@@ -65,13 +65,18 @@
     "title": "Balss kvalitāte",
     "status": "Ping {{latency}}, zudumi {{loss}}",
     "lowLatency": "Zemas aizkaves režīms",
-    "lowLatencyHint": "Sūta īsākas pakotnes, lai aizkave būtu mazāka. Izmanto vairāk joslas platuma.",
+    "lowLatencyHint": "Mazākās pakotnes un buferi kopīgai mūzicēšanai. Vairāk joslas platuma, mazāk noturīgs.",
     "lowLatencyComingSoon": "Drīzumā",
-    "bandwidth": "Paredzamais joslas platums: {{value}} kbit/s",
-    "bandwidthHint": "Zemas aizkaves režīmam (10 ms pakotnes) pakotņu galvenēm vajadzētu aptuveni par {{value}} kbit/s vairāk.",
     "voiceSettings": "Balss iestatījumi…",
     "applies": "Stājas spēkā uzreiz, tiek saglabāts kā sadaļā Iestatījumi → Audio",
     "effectiveLabel": "Pašlaik tiek sūtīts (pēc pielāgošanas zudumiem)",
-    "keys": "Esc aizver · ↑↓ pārvieto · ← → pielāgo"
+    "keys": "Esc aizver · ↑↓ pārvieto · ← → pielāgo",
+    "bandwidthLabel": "Paredzamais joslas platums ar galvenēm",
+    "bandwidthValue": "≈ {{value}} no {{limit}} kbit/s",
+    "bandwidthValueNoLimit": "≈ {{value}} kbit/s",
+    "bandwidthHintWithin": "Ar zemas aizkaves režīmu: ≈ {{value}} kbit/s (10 ms pakotnes), joprojām robežās.",
+    "bandwidthHintOver": "Ar zemas aizkaves režīmu: ≈ {{value}} kbit/s (10 ms pakotnes), pāri robežai.",
+    "bandwidthHintNoLimit": "Ar zemas aizkaves režīmu: ≈ {{value}} kbit/s (10 ms pakotnes).",
+    "beta": "Beta"
   }
 }

@@ -175,7 +175,8 @@ export function ConnectionInfo({ className }: { className?: string }) {
           ref={panel}
           id={panelId}
           role="dialog"
-          aria-labelledby={titleId}
+          aria-labelledby={mode === "quick" ? undefined : titleId}
+          aria-label={mode === "quick" ? t("quick.title") : undefined}
           tabIndex={-1}
           style={
             mode === "quick" && quickPlace
@@ -184,9 +185,11 @@ export function ConnectionInfo({ className }: { className?: string }) {
           }
           className={`connection-info__panel${mode === "quick" ? " connection-info__panel--quick" : ""}`}
         >
-          <h2 id={titleId} className="connection-info__title">
-            {mode === "quick" ? t("quick.title") : t("title")}
-          </h2>
+          {mode === "quick" ? null : (
+            <h2 id={titleId} className="connection-info__title">
+              {t("title")}
+            </h2>
+          )}
           {mode === "quick" ? (
             <ConnectionQuickPanel
               onOpenVoiceSettings={() => {

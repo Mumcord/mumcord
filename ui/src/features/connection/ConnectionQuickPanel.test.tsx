@@ -107,10 +107,12 @@ describe("ConnectionQuickPanel", () => {
     await setup();
     const panel = await openQuick();
     // 64 kbit/s voice plus 14.8 kbit/s of headers for 20 ms packets.
-    await within(panel).findByText("Estimated bandwidth: 79 kbit/s / 128 kbit/s");
+    await within(panel).findByText("≈ 79 of 128 kbit/s");
     expect(within(panel).getByRole("meter")).toHaveAccessibleName(/Estimated bandwidth/);
     expect(
-      within(panel).getByText(/10 ms packets\) would need about 14 kbit\/s more/),
+      within(panel).getByText(
+        /With low-latency mode: ≈ 93 kbit\/s \(10 ms packets\), still within the limit/,
+      ),
     ).toBeVisible();
   });
 

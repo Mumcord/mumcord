@@ -66,13 +66,18 @@
     "title": "Kvalita hlasu",
     "status": "Ping {{latency}}, ztráty {{loss}}",
     "lowLatency": "Režim nízké latence",
-    "lowLatencyHint": "Posílá kratší pakety pro menší zpoždění. Spotřebuje více pásma.",
+    "lowLatencyHint": "Nejmenší pakety a vyrovnávací paměti pro společné hraní hudby. Více pásma, menší odolnost.",
     "lowLatencyComingSoon": "Již brzy",
-    "bandwidth": "Odhadovaná šířka pásma: {{value}} kbit/s",
-    "bandwidthHint": "Režim nízké latence (pakety po 10 ms) by potřeboval asi o {{value}} kbit/s více na hlavičky paketů.",
     "voiceSettings": "Nastavení hlasu…",
     "applies": "Platí ihned, ukládá se jako v Nastavení → Zvuk",
     "effectiveLabel": "Právě se odesílá (po úpravě podle ztrát)",
-    "keys": "Esc zavře · ↑↓ přesouvá · ← → upravuje"
+    "keys": "Esc zavře · ↑↓ přesouvá · ← → upravuje",
+    "bandwidthLabel": "Odhadovaná šířka pásma vč. hlaviček",
+    "bandwidthValue": "≈ {{value}} z {{limit}} kbit/s",
+    "bandwidthValueNoLimit": "≈ {{value}} kbit/s",
+    "bandwidthHintWithin": "S režimem nízké latence: ≈ {{value}} kbit/s (pakety po 10 ms), stále v limitu.",
+    "bandwidthHintOver": "S režimem nízké latence: ≈ {{value}} kbit/s (pakety po 10 ms), nad limitem.",
+    "bandwidthHintNoLimit": "S režimem nízké latence: ≈ {{value}} kbit/s (pakety po 10 ms).",
+    "beta": "Beta"
   }
 }

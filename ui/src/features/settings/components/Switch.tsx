@@ -6,6 +6,8 @@ interface SwitchProps {
   onChange: (checked: boolean) => void;
   description?: string;
   disabled?: boolean;
+  /** Short tag next to the label, e.g. "Beta". */
+  badge?: string;
   /** Lets the caller focus the switch, e.g. when another section links to it. */
   inputRef?: Ref<HTMLInputElement>;
 }
@@ -17,6 +19,7 @@ export function Switch({
   onChange,
   description,
   disabled = false,
+  badge,
   inputRef,
 }: SwitchProps) {
   const id = useId();
@@ -25,6 +28,7 @@ export function Switch({
     <div className="settings-switch">
       <div className="settings-switch__text">
         <label htmlFor={id}>{label}</label>
+        {badge !== undefined && <span className="settings-switch__badge">{badge}</span>}
         {description !== undefined && (
           <p id={descriptionId} className="settings-hint">
             {description}

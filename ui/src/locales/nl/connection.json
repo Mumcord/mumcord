@@ -64,13 +64,18 @@
     "title": "Spraakkwaliteit",
     "status": "Ping {{latency}}, verlies {{loss}}",
     "lowLatency": "Modus voor lage latentie",
-    "lowLatencyHint": "Verstuurt kortere pakketten voor minder vertraging. Gebruikt meer bandbreedte.",
+    "lowLatencyHint": "Kleinste pakketten en buffers om samen muziek te spelen. Meer bandbreedte, minder robuust.",
     "lowLatencyComingSoon": "Binnenkort beschikbaar",
-    "bandwidth": "Geschatte bandbreedte: {{value}} kbit/s",
-    "bandwidthHint": "De modus voor lage latentie (pakketten van 10 ms) zou ongeveer {{value}} kbit/s meer nodig hebben voor pakketkoppen.",
     "voiceSettings": "Spraakinstellingen…",
     "applies": "Geldt direct, opgeslagen zoals bij Instellingen → Audio",
     "effectiveLabel": "Nu verzonden (na aanpassing aan verlies)",
-    "keys": "Esc sluit · ↑↓ verplaatst · ← → past aan"
+    "keys": "Esc sluit · ↑↓ verplaatst · ← → past aan",
+    "bandwidthLabel": "Geschatte bandbreedte incl. headers",
+    "bandwidthValue": "≈ {{value}} van {{limit}} kbit/s",
+    "bandwidthValueNoLimit": "≈ {{value}} kbit/s",
+    "bandwidthHintWithin": "Met modus voor lage latentie: ≈ {{value}} kbit/s (pakketten van 10 ms), nog binnen de limiet.",
+    "bandwidthHintOver": "Met modus voor lage latentie: ≈ {{value}} kbit/s (pakketten van 10 ms), boven de limiet.",
+    "bandwidthHintNoLimit": "Met modus voor lage latentie: ≈ {{value}} kbit/s (pakketten van 10 ms).",
+    "beta": "Beta"
   }
 }
