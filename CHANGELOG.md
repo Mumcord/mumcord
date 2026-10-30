@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Added
+
+- A server info panel (server header menu > Server info) shows name and address, version and operating system, welcome text, limits and allowed codecs, your session, registration state and current-channel permissions, how many users run Mumcord, and the connection figures. The TLS certificate section shows the issuer, SHA-256 fingerprint and validity period, has a Show certificate action with the PEM and a Copy fingerprint button; Copy address and Copy diagnostics put the rest on the clipboard for bug reports. Everything comes from messages the server already sends or from local state, so standard Mumble servers need no change (#147)
+
 ## [0.4.4] - 2026-10-30
 
 ### Added

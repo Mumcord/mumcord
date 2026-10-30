@@ -34,7 +34,7 @@ use mumcord_audio::mixer::PacketSender;
 use mumcord_protocol::pki_types::{CertificateDer, PrivateKeyDer, PrivatePkcs8KeyDer};
 use mumcord_protocol::{
     ClientIdentity, ConnectConfig, ConnectError, Connection, DisconnectReason, Event, Handle,
-    ServerState, Transport, VoiceEvent, VoiceTransport,
+    ServerCert, ServerState, Transport, VoiceEvent, VoiceTransport,
 };
 use mumcord_store::{Identity, OwnVoice, SavedServer, SecretStore, ServerId, Store};
 use tokio::runtime::Handle as Runtime;
@@ -359,6 +359,8 @@ struct Session {
     /// Where the server put the user on connect, before any rejoin (FR-1.48b).
     default_channel_id: Option<u32>,
     description_requests: description::DescriptionRequests,
+    /// TLS certificate details of this connection for the server info panel (FR-1.10).
+    tls: Option<ServerCert>,
 }
 
 /// Commands to the session task.
@@ -1795,7 +1797,11 @@ impl Inner {
         port: u16,
         arrival: Arrival,
     ) -> Ended {
-        let Connection { handle, mut events } = connection;
+        let Connection {
+            handle,
+            mut events,
+            server_cert,
+        } = connection;
         let (transport, mut voice_rx) = match start_voice(&handle, host, port).await {
             Some((transport, rx)) => (Some(Arc::new(transport)), Some(rx)),
             None => (None, None),
@@ -1819,6 +1825,7 @@ impl Inner {
                     rejoin_offer,
                     default_channel_id,
                     description_requests: description::DescriptionRequests::default(),
+                    tls: server_cert,
                 });
                 slot.machine.synced();
             }
@@ -2396,32 +2403,52 @@ impl Inner {
         let slot = core.slots.get(&server_id)?;
         let session = slot.session.as_ref()?;
         let store = lock(&self.store);
+        let saved_server = store.server(server_id).ok().flatten();
+        let tls_fingerprint = store.trusted_cert(server_id).ok().flatten();
         session.handle.with_state(|s: &ServerState| {
+            let users: Vec<UserView> = s
+                .users
+                .values()
+                .map(|u| {
+                    let mut view =
+                        self.user_view_of(server_id, u, slot.people.setting(&store, server_id, u));
+                    // The server's echo of the mute/deafen just sent may still be on its way.
+                    if Some(u.session) == s.session {
+                        view.self_mute = slot.self_voice.mute;
+                        view.self_deaf = slot.self_voice.deaf;
+                    }
+                    view
+                })
+                .collect();
+            let mumcord_users = u32::try_from(
+                users
+                    .iter()
+                    .filter(|u| u.mumcord_features.is_some())
+                    .count(),
+            )
+            .unwrap_or(u32::MAX);
             Some(Snapshot {
                 server_id,
                 self_session: s.session?,
                 info: ServerInfoView {
                     default_channel_id: session.default_channel_id,
+                    server_label: saved_server.as_ref().map(|s| s.label.clone()),
+                    server_address: saved_server.as_ref().map(|s| s.address.clone()),
+                    server_port: saved_server.as_ref().map(|s| s.port),
+                    tls_fingerprint: session
+                        .tls
+                        .as_ref()
+                        .map(|c| format_fingerprint(&c.sha256_hex))
+                        .or(tls_fingerprint),
+                    mumcord_users,
+                    tls_issuer: session.tls.as_ref().and_then(|c| c.issuer.clone()),
+                    tls_valid_from: session.tls.as_ref().and_then(|c| c.valid_from.clone()),
+                    tls_valid_until: session.tls.as_ref().and_then(|c| c.valid_until.clone()),
+                    tls_certificate_pem: session.tls.as_ref().map(|c| c.pem.clone()),
                     ..convert::server_info_view(s)
                 },
                 channels: s.channels.values().map(|c| channel_view(s, c)).collect(),
-                users: s
-                    .users
-                    .values()
-                    .map(|u| {
-                        let mut view = self.user_view_of(
-                            server_id,
-                            u,
-                            slot.people.setting(&store, server_id, u),
-                        );
-                        // The server's echo of the mute/deafen just sent may still be on its way.
-                        if Some(u.session) == s.session {
-                            view.self_mute = slot.self_voice.mute;
-                            view.self_deaf = slot.self_voice.deaf;
-                        }
-                        view
-                    })
-                    .collect(),
+                users,
                 followed_channel_ids: followed_ids(&store, server_id, s),
                 unread: Vec::new(),
                 read_only: slot.self_voice.own().is_none(),

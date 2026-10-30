@@ -63,6 +63,10 @@ protoc-bin-vendored = "3.3"
 
 # Crypto & certificates
 aes = "0.9"
+# X.509 parsing for the TLS certificate details in the server info panel (FR-1.10).
+x509-parser = "0.18"
+# PEM for the "Show certificate" action in the server info panel.
+base64 = "0.23"
 rand = "0.10"
 sha1 = "0.10"
 # Content hash of full-size images shared between Mumcord clients (FR-1.60c).
