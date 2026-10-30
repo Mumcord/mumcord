@@ -6,7 +6,7 @@ export type Screen = "loading" | "startupError" | "wizard" | "main";
 export type Overlay = "settings" | null;
 
 /** Settings sections other screens can lead to directly. */
-export type SettingsSection = "overlay" | "audio";
+export type SettingsSection = "overlay" | "audio" | "privacy";
 
 export interface ViewState {
   screen: Screen;
@@ -56,11 +56,18 @@ export interface View extends ViewState {
   openOverlaySettings: () => void;
   /** Opens the settings on the audio section. */
   openAudioSettings: () => void;
+  /** Opens the settings on the privacy section. */
+  openPrivacySettings: () => void;
   closeOverlay: () => void;
   retry: () => void;
 }
 
 export const ViewContext = createContext<View | null>(null);
+
+/** Opens the privacy settings; `null` without a view provider (tests), where there is nothing to open. */
+export function useOpenPrivacySettings(): (() => void) | null {
+  return useContext(ViewContext)?.openPrivacySettings ?? null;
+}
 
 export function useView(): View {
   const view = useContext(ViewContext);

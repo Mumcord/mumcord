@@ -4,10 +4,12 @@
 
 ### Added
 
+- Saved channel passwords show which channel they are for: the edit-server dialog lists each one as "Officers (Raid)" with the full channel path and when it was last used, instead of "Channel password 1". A password used for several channels lists them all, a channel renamed or removed on the server is marked "(not found)", and each password can be renamed. Only the names and channels are kept in the local database; the passwords stay in the system's secure storage. Passwords saved before keep the name "Password 1", "Password 2" … until they are entered for a channel again (#146)
 - Windows releases also ship a portable zip (`Mumcord_<version>_x64-portable.zip`) that runs without installing: unpack it and start `Mumcord.exe`. The `portable` file next to the exe keeps the data, settings, logs and caches in `MumcordData` beside it instead of `%APPDATA%`; it registers no `mumble://` handler and no start at login unless turned on, and About, the diagnostic file and the update hint say "Portable". The identity stays in Windows Credential Manager (per Windows user). A missing WebView2 Runtime now shows a message with the download link instead of failing silently. See `docs/windows-portable.md` (#181)
 
 ### Fixed
 
+- The watch party respects Settings > Privacy > "Show link previews and embeds": with it off, "Watch together" in the Apps menu stays listed but disabled with the reason and a link to the Privacy settings, a running party shows "A watch party is running: enable embedded players to join" with the same link instead of the banner's video title, the floating player and playlist (no player page, no thumbnails) — so nothing is requested from YouTube or Twitch (#160)
 - Linux with PipeWire: the device lists show every output and input of the sound server as the desktop's sound settings do, so a multi-endpoint interface such as the RØDECaster Pro II offers "System" and "Chat" as outputs and "Microphone" and "Main" as inputs, with their friendly names, instead of one "USB Audio" entry per direction. The choice is stored by the stable PipeWire node name and the stream plays to exactly that node; hot-plugging updates the list and a missing device falls back to the system default. A device saved from the old list moves to the matching node when there is exactly one, otherwise to the system default with a one-time notice. Without PipeWire the ALSA devices are listed as before (#183)
 
 ## [0.4.4] - 2026-10-30

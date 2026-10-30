@@ -164,6 +164,19 @@ const MIGRATIONS: &[&str] = &[
         cleared_at  INTEGER NOT NULL
     );
     ",
+    // v13: non-secret details of the saved channel passwords (issue #146), by the token's
+    // position in the server's token list in secure storage. `channels` is a JSON array of
+    // `{channel_id, path}`. Tokens saved before have no row and keep their default name.
+    r"
+    CREATE TABLE channel_token (
+        server_id    INTEGER NOT NULL REFERENCES saved_server (id) ON DELETE CASCADE,
+        position     INTEGER NOT NULL,
+        label        TEXT,
+        channels     TEXT    NOT NULL DEFAULT '[]',
+        last_used_at INTEGER,
+        PRIMARY KEY (server_id, position)
+    );
+    ",
 ];
 
 /// Handle to the local database. Not `Sync`; callers share it behind a mutex.

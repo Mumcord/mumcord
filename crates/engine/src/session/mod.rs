@@ -42,7 +42,7 @@ use tokio::runtime::Handle as Runtime;
 use tokio::sync::mpsc;
 use tokio::task::JoinHandle;
 
-pub use channel_password::ChannelPasswordState;
+pub use channel_password::{ChannelPasswordChannel, ChannelPasswordState, ChannelPasswordView};
 pub use machine::MAX_RECONNECT_ATTEMPTS;
 pub use types::*;
 

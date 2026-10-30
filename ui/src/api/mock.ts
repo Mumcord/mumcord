@@ -110,6 +110,10 @@ export interface MockControls {
   upsertUser(user: User): void;
   /** Takes away the Enter permission of a channel; `MOCK_CHANNEL_PASSWORD` opens it (FR-2.78). */
   lockChannel(channelId: number): void;
+  /** Renames a channel, like an admin on the server would. */
+  renameChannel(channelId: number, name: string): void;
+  /** Stores a channel password without any details, like one saved before issue #146. */
+  addBareChannelPassword(serverId: number, password: string): void;
   /**
    * Which connected server the controls above act on (e.g. `receiveMessage`); by default the
    * server that connected last.
@@ -136,6 +140,26 @@ const NEW_SERVER_FLAGS = {
 } satisfies Partial<SavedServer>;
 /** The one channel password the mock accepts (FR-2.78). */
 export const MOCK_CHANNEL_PASSWORD = "secret";
+
+/** A stored channel password with what the engine remembers about it (issue #146). */
+interface MockChannelToken {
+  token: string;
+  label: string | null;
+  channels: { channelId: number; path: string[] }[];
+  lastUsedAt: string | null;
+}
+
+/** Channel path below the root, like the engine's. */
+function mockChannelPath(channels: readonly ChannelInfo[], id: number): string[] {
+  const path: string[] = [];
+  let current = channels.find((c) => c.id === id);
+  while (current?.parentId != null) {
+    path.unshift(current.name);
+    const parentId = current.parentId;
+    current = channels.find((c) => c.id === parentId);
+  }
+  return path;
+}
 const MOCK_FINGERPRINT = "AA:BB:CC:DD:EE:FF:00:11:22:33:44:55:66:77:88:99";
 
 const DEFAULT_SETTINGS: Settings = {
@@ -602,7 +626,7 @@ export function createMockApi(options: MockOptions = {}): MockApi {
   let micPhaseTimer: ReturnType<typeof setTimeout> | undefined;
   const requiredPasswords = new Map<number, string>();
   const savedPasswords = new Map<number, string>();
-  const channelTokens = new Map<number, string[]>();
+  const channelTokens = new Map<number, MockChannelToken[]>();
   let pendingConnect: { serverId: number; channelPath: string[] | null } | null = null;
   let muteBeforeDeaf = false;
   // Like the engine (QA.7): the forced read-only state of a fresh connect, and the user's last
@@ -1256,7 +1280,13 @@ export function createMockApi(options: MockOptions = {}): MockApi {
         return Promise.resolve(null);
       }
       const tokens = channelTokens.get(serverId) ?? [];
-      if (!tokens.includes(password)) channelTokens.set(serverId, [...tokens, password]);
+      const saved = { channelId, path: mockChannelPath(requireSnapshot().channels, channelId) };
+      const known = tokens.find((t) => t.token === password);
+      const lastUsedAt = new Date().toISOString();
+      const token = known ?? { token: password, label: null, channels: [], lastUsedAt };
+      token.channels = [...token.channels.filter((c) => c.channelId !== channelId), saved];
+      token.lastUsedAt = lastUsedAt;
+      if (!known) channelTokens.set(serverId, [...tokens, token]);
       const unlocked = { ...channel, permissions: { ...channel.permissions, enter: true } };
       const snap = requireSnapshot();
       snap.channels = snap.channels.map((c) => (c.id === channelId ? unlocked : c));
@@ -1267,7 +1297,29 @@ export function createMockApi(options: MockOptions = {}): MockApi {
       return Promise.resolve(null);
     },
 
-    channelPasswordCount: (serverId) => Promise.resolve(channelTokens.get(serverId)?.length ?? 0),
+    channelPasswords: (serverId) => {
+      const channels = sessions.get(serverId)?.snapshot?.channels;
+      return Promise.resolve(
+        (channelTokens.get(serverId) ?? []).map((t) => ({
+          label: t.label,
+          lastUsedAt: t.lastUsedAt,
+          channels: t.channels.map((c) => ({
+            ...c,
+            found:
+              channels === undefined
+                ? null
+                : mockChannelPath(channels, c.channelId).join("/") === c.path.join("/"),
+          })),
+        })),
+      );
+    },
+
+    channelPasswordRename: (serverId, index, label) => {
+      const token = channelTokens.get(serverId)?.[index];
+      if (token === undefined) fail("invalidInput", "no channel password at this index");
+      token.label = label.trim() === "" ? null : label.trim();
+      return Promise.resolve(null);
+    },
 
     channelPasswordsRemove: (serverId, indices) => {
       const tokens = channelTokens.get(serverId) ?? [];
@@ -2082,6 +2134,17 @@ export function createMockApi(options: MockOptions = {}): MockApi {
       const locked = { ...channel, permissions: { ...channel.permissions, enter: false } };
       snap.channels = snap.channels.map((c) => (c.id === channelId ? locked : c));
       emitServer("channelUpserted", { channel: locked });
+    },
+    renameChannel: (channelId, name) => {
+      focused();
+      const snap = requireSnapshot();
+      const renamed = { ...requireChannel(channelId), name };
+      snap.channels = snap.channels.map((c) => (c.id === channelId ? renamed : c));
+      emitServer("channelUpserted", { channel: renamed });
+    },
+    addBareChannelPassword: (serverId, password) => {
+      const token = { token: password, label: null, channels: [], lastUsedAt: null };
+      channelTokens.set(serverId, [...(channelTokens.get(serverId) ?? []), token]);
     },
     focusServer: (serverId) => {
       focusedServerId = serverId;
