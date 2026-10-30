@@ -13,6 +13,7 @@ import { trackLabel, useNowPlaying } from "../nowplaying";
 import { DisconnectMenu } from "./DisconnectMenu";
 import { describeError } from "./errors";
 import { ProfileDialog } from "./ProfileDialog";
+import { DndIndicator } from "../dnd/DndIndicator";
 import { joinChannel, useNoVoice } from "./readOnly";
 import { QuickSettings, type QuickSettingsState } from "./QuickSettings";
 import { RegisterDialog } from "./RegisterDialog";
@@ -221,6 +222,7 @@ export function UserPanel() {
           </span>
         </div>
       </div>
+      <DndIndicator />
       <div className="userpanel__row">
         <span className="userpanel__split">
           <button

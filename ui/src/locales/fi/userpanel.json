@@ -92,7 +92,10 @@
     "offerImages": "Tarjoa täysikokoiset kuvat",
     "offerImagesHint": "Anna muiden ladata alkuperäiset kuvasi",
     "loadImages": "Lataa täysikokoiset kuvat",
-    "loadImagesHint": "Hae alkuperäiset kuvat muilta"
+    "loadImagesHint": "Hae alkuperäiset kuvat muilta",
+    "dnd": "Älä häiritse",
+    "dndHint": "Mykistää ilmoitusäänet ja -bannerit",
+    "dndSystemHint": "Päällä työpöydän Älä häiritse -tilan kautta"
   },
   "voice": {
     "line": "Puhe: {{channel}} · {{server}}",
@@ -128,5 +131,11 @@
     "fallbackOutput": "Lähtölaite irrotettiin. Käytössä on järjestelmän oletus.",
     "volume": "Äänenvoimakkuus",
     "level": "Taso"
+  },
+  "dnd": {
+    "label": "Älä häiritse",
+    "manual": "käsin",
+    "system": "Älä häiritse (järjestelmä)",
+    "systemHint": "Poista se käytöstä työpöydän ilmoitusasetuksista."
   }
 }

@@ -92,7 +92,10 @@
     "offerImages": "Erbjud bilder i full storlek",
     "offerImagesHint": "Låt andra läsa in dina originalbilder",
     "loadImages": "Läs in bilder i full storlek",
-    "loadImagesHint": "Hämta originalbilder från andra"
+    "loadImagesHint": "Hämta originalbilder från andra",
+    "dnd": "Stör ej",
+    "dndHint": "Tystar ljud och banderoller för aviseringar",
+    "dndSystemHint": "På via skrivbordets Stör ej"
   },
   "voice": {
     "line": "Röst: {{channel}} · {{server}}",
@@ -128,5 +131,11 @@
     "fallbackOutput": "Utgångsenheten kopplades ur. Systemets standard används.",
     "volume": "Volym",
     "level": "Nivå"
+  },
+  "dnd": {
+    "label": "Stör ej",
+    "manual": "manuellt",
+    "system": "Stör ej (system)",
+    "systemHint": "Stäng av det i skrivbordets aviseringsinställningar."
   }
 }

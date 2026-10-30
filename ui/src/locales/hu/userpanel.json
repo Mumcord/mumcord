@@ -92,7 +92,10 @@
     "offerImages": "Teljes méretű képek felkínálása",
     "offerImagesHint": "Mások betölthetik az eredeti képeidet",
     "loadImages": "Teljes méretű képek betöltése",
-    "loadImagesHint": "Eredeti képek lekérése másoktól"
+    "loadImagesHint": "Eredeti képek lekérése másoktól",
+    "dnd": "Ne zavarjanak",
+    "dndHint": "Elnémítja az értesítési hangokat és szalagokat",
+    "dndSystemHint": "Bekapcsolva az asztali környezet Ne zavarjanak módja miatt"
   },
   "voice": {
     "line": "Hang: {{channel}} · {{server}}",
@@ -128,5 +131,11 @@
     "fallbackOutput": "A kimeneti eszköz le lett választva. A rendszer alapértelmezett eszköze van használatban.",
     "volume": "Hangerő",
     "level": "Szint"
+  },
+  "dnd": {
+    "label": "Ne zavarjanak",
+    "manual": "kézi",
+    "system": "Ne zavarjanak (rendszer)",
+    "systemHint": "Kapcsold ki az asztali környezet értesítési beállításaiban."
   }
 }

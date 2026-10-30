@@ -92,7 +92,10 @@
     "offerImages": "Offri stampi b'daqs sħiħ",
     "offerImagesHint": "Ħalli lill-oħrajn iniżżlu l-istampi oriġinali tiegħek",
     "loadImages": "Tgħabbi stampi b'daqs sħiħ",
-    "loadImagesHint": "Ġib l-istampi oriġinali mingħand l-oħrajn"
+    "loadImagesHint": "Ġib l-istampi oriġinali mingħand l-oħrajn",
+    "dnd": "Tiddisturbax",
+    "dndHint": "Isikket il-ħsejjes u l-banners tan-notifiki",
+    "dndSystemHint": "Mixgħul permezz ta' Tiddisturbax tad-desktop tiegħek"
   },
   "voice": {
     "line": "Vuċi: {{channel}} · {{server}}",
@@ -128,5 +131,11 @@
     "fallbackOutput": "L-apparat tal-ħruġ ġie skonnettjat. Qed jintuża d-default tas-sistema.",
     "volume": "Volum",
     "level": "Livell"
+  },
+  "dnd": {
+    "label": "Tiddisturbax",
+    "manual": "manwali",
+    "system": "Tiddisturbax (sistema)",
+    "systemHint": "Itfih fis-settings tan-notifiki tad-desktop tiegħek."
   }
 }

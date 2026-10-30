@@ -384,6 +384,11 @@ export const commands = {
 	whatsNewMarkSeen: () => typedError<null, ApiError>(__TAURI_INVOKE("whats_new_mark_seen")),
 	/**  Decides by window focus and the notification setting; shows the system notification itself. */
 	notifyMessage: (notice: MessageNotice) => typedError<NotifyOutcome, ApiError>(__TAURI_INVOKE("notify_message", { notice })),
+	dndState: () => typedError<DndState, ApiError>(__TAURI_INVOKE("dnd_state")),
+	/**  Turns the Mumcord switch on or off; it is saved and applies to all servers at once. */
+	dndSet: (on: boolean) => typedError<DndState, ApiError>(__TAURI_INVOKE("dnd_set", { on })),
+	/**  "Follow system Do Not Disturb". */
+	dndSetFollowSystem: (on: boolean) => typedError<DndState, ApiError>(__TAURI_INVOKE("dnd_set_follow_system", { on })),
 	/**  The user opened this chat: its system notification is outdated. */
 	notificationDismiss: (serverId: number, conversation: Conversation) => typedError<null, ApiError>(__TAURI_INVOKE("notification_dismiss", { serverId, conversation })),
 	/**  Replaces the tray's unread summary and recent chats. */
@@ -521,6 +526,7 @@ export const events = {
 	deepLinkOpened: makeEvent<DeepLinkOpened, DeepLinkOpened>("deep-link-opened"),
 	defaultAvatarSkipped: makeEvent<DefaultAvatarSkipped, DefaultAvatarSkipped>("default-avatar-skipped"),
 	directConsentRequired: makeEvent<DirectConsentRequired, DirectConsentRequired>("direct-consent-required"),
+	dndChanged: makeEvent<DndChanged, DndChanged>("dnd-changed"),
 	followedChannelsChanged: makeEvent<FollowedChannelsChanged, FollowedChannelsChanged>("followed-channels-changed"),
 	friendsChanged: makeEvent<FriendsChanged, FriendsChanged>("friends-changed"),
 	fullImageProgress: makeEvent<FullImageProgress, FullImageProgress>("full-image-progress"),
@@ -871,6 +877,20 @@ export type DefaultAvatarSkipped = {
  */
 export type DirectConsentRequired = {
 	serverId: number,
+};
+
+/**  The switch, the follow setting or the system state changed (also from the tray). */
+export type DndChanged = {
+	state: DndState,
+};
+
+/**  Everything the UI shows about Do Not Disturb. */
+export type DndState = {
+	/**  The Mumcord switch (quick settings, settings, tray). */
+	manual: boolean,
+	/**  "Follow system Do Not Disturb". */
+	followSystem: boolean,
+	system: SystemDnd,
 };
 
 /**  A dropped image file, ready to go into the attachment tray. */
@@ -1808,6 +1828,14 @@ export type SoundSettings = {
 export type SyncProgress = {
 	serverId: number,
 	channels: number,
+};
+
+/**  The desktop's own Do Not Disturb or Focus mode as far as Mumcord can read it. */
+export type SystemDnd = {
+	/**  The desktop whose state is read, e.g. "KDE Plasma"; `null` when none can be read. */
+	desktop: string | null,
+	/**  Whether the system's Do Not Disturb is on; `null` when it can't be read. */
+	on: boolean | null,
 };
 
 export type TalkMode = "voiceActivation" | "pushToTalk";

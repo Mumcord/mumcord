@@ -618,5 +618,17 @@
     "releasePage": "Pagina versiunii",
     "entries": "Intrări: {{count}}",
     "englishNote": "Lista de modificări este scrisă în engleză."
+  },
+  "dnd": {
+    "title": "Nu deranja",
+    "label": "Nu deranja",
+    "description": "Fără sunete sau bannere de notificare pe niciun server. Vocea și chatul funcționează în continuare, iar contoarele de necitite continuă să numere.",
+    "follow": "Urmează modul Nu deranja al sistemului",
+    "followDescription": "Activează Nu deranja ori de câte ori modul Nu deranja sau Concentrare al desktopului este activ.",
+    "detected": "Detectat",
+    "detectedOn": "{{desktop}} · Nu deranja este activat (sistem). Modificările sunt preluate imediat.",
+    "detectedOff": "{{desktop}} · Nu deranja este dezactivat. Modificările sunt preluate imediat.",
+    "unavailable": "Indisponibil",
+    "unavailableText": "Mumcord nu poate citi aici starea Nu deranja a sistemului. Funcționează doar propriul său comutator."
   }
 }

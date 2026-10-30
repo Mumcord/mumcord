@@ -615,5 +615,17 @@
     "releasePage": "Udgivelsesside",
     "entries": "Poster: {{count}}",
     "englishNote": "Ændringsloggen er skrevet på engelsk."
+  },
+  "dnd": {
+    "title": "Forstyr ikke",
+    "label": "Forstyr ikke",
+    "description": "Ingen lyde eller bannere for notifikationer på nogen server. Tale og chat virker stadig, og ulæst-tællere tæller fortsat.",
+    "follow": "Følg systemets Forstyr ikke",
+    "followDescription": "Slår Forstyr ikke til, når skrivebordets Forstyr ikke eller fokustilstand er slået til.",
+    "detected": "Registreret",
+    "detectedOn": "{{desktop}} · Forstyr ikke er slået til (system). Ændringer opfanges med det samme.",
+    "detectedOff": "{{desktop}} · Forstyr ikke er slået fra. Ændringer opfanges med det samme.",
+    "unavailable": "Ikke tilgængelig",
+    "unavailableText": "Mumcord kan ikke læse systemets Forstyr ikke-tilstand her. Kun Mumcords egen kontakt virker."
   }
 }

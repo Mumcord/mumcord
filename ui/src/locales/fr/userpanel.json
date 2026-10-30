@@ -92,7 +92,10 @@
     "offerImages": "Proposer les images en taille réelle",
     "offerImagesHint": "Permet aux autres de charger vos images originales",
     "loadImages": "Charger les images en taille réelle",
-    "loadImagesHint": "Récupère les images originales des autres"
+    "loadImagesHint": "Récupère les images originales des autres",
+    "dnd": "Ne pas déranger",
+    "dndHint": "Coupe les sons et bannières de notification",
+    "dndSystemHint": "Activé par le mode Ne pas déranger de votre bureau"
   },
   "voice": {
     "line": "Vocal : {{channel}} · {{server}}",
@@ -128,5 +131,11 @@
     "fallbackOutput": "Périphérique de sortie débranché. Le périphérique par défaut du système est utilisé.",
     "volume": "Volume",
     "level": "Niveau"
+  },
+  "dnd": {
+    "label": "Ne pas déranger",
+    "manual": "manuel",
+    "system": "Ne pas déranger (système)",
+    "systemHint": "Désactivez-le dans les réglages de notification de votre bureau."
   }
 }

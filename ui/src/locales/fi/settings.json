@@ -615,5 +615,17 @@
     "releasePage": "Julkaisusivu",
     "entries": "Merkinnät: {{count}}",
     "englishNote": "Muutosloki on kirjoitettu englanniksi."
+  },
+  "dnd": {
+    "title": "Älä häiritse",
+    "label": "Älä häiritse",
+    "description": "Ei ilmoitusääniä eikä -bannereita millään palvelimella. Puhe ja chat toimivat edelleen, ja lukemattomien laskurit laskevat edelleen.",
+    "follow": "Seuraa järjestelmän Älä häiritse -tilaa",
+    "followDescription": "Ottaa Älä häiritse -tilan käyttöön aina, kun työpöydän Älä häiritse- tai keskittymistila on päällä.",
+    "detected": "Tunnistettu",
+    "detectedOn": "{{desktop}} · Älä häiritse on päällä (järjestelmä). Muutokset huomataan heti.",
+    "detectedOff": "{{desktop}} · Älä häiritse on pois päältä. Muutokset huomataan heti.",
+    "unavailable": "Ei käytettävissä",
+    "unavailableText": "Mumcord ei voi lukea järjestelmän Älä häiritse -tilaa täällä. Vain sen oma kytkin toimii."
   }
 }

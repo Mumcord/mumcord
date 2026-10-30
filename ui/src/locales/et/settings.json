@@ -615,5 +615,17 @@
     "releasePage": "Väljalaske leht",
     "entries": "Kirjeid: {{count}}",
     "englishNote": "Muudatuste logi on inglise keeles."
+  },
+  "dnd": {
+    "title": "Ära sega",
+    "label": "Ära sega",
+    "description": "Ühelgi serveril pole teavituste helisid ega bännereid. Hääl ja vestlus töötavad edasi ning lugemata loendurid loevad edasi.",
+    "follow": "Järgi süsteemi režiimi „Ära sega“",
+    "followDescription": "Lülitab „Ära sega“ sisse alati, kui töölaua „Ära sega“ või keskendumisrežiim on sees.",
+    "detected": "Tuvastatud",
+    "detectedOn": "{{desktop}} · „Ära sega“ on sees (süsteem). Muudatused rakenduvad kohe.",
+    "detectedOff": "{{desktop}} · „Ära sega“ on väljas. Muudatused rakenduvad kohe.",
+    "unavailable": "Pole saadaval",
+    "unavailableText": "Mumcord ei saa siin süsteemi „Ära sega“ olekut lugeda. Töötab ainult tema enda lüliti."
   }
 }

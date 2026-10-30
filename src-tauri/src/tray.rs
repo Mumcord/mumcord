@@ -17,6 +17,7 @@ use tauri::tray::{TrayIcon, TrayIconBuilder};
 use tauri::{AppHandle, Manager, Wry};
 use tauri_specta::Event;
 
+use crate::commands::dnd::DndState;
 use crate::commands::notifications::NotificationActivated;
 use crate::commands::tray::{TrayAttention, TraySettingsRequested};
 use crate::commands::types::{ServerId, to_engine_server_id};
@@ -173,7 +174,7 @@ pub fn init(app: &AppHandle) {
                 app.manage(Tray {
                     backend: Backend::Ksni(handle),
                     base: base_icon(&app),
-                    state: Mutex::new(TrayState::default()),
+                    state: Mutex::new(initial_state(&app)),
                 });
                 refresh(&app, Change::Menu);
             }
@@ -240,8 +241,32 @@ fn build(app: &AppHandle) -> tauri::Result<Tray> {
             menu: Mutex::new(Shown::default()),
         })),
         base,
-        state: Mutex::new(TrayState::default()),
+        state: Mutex::new(initial_state(app)),
     })
+}
+
+/// A new tray starts disconnected, with the current Do Not Disturb state.
+fn initial_state(app: &AppHandle) -> TrayState {
+    let dnd = match app.state::<Engine>().settings() {
+        Ok(settings) => Dnd::from(&crate::dnd::state_from(&settings, crate::dnd::system(app))),
+        Err(e) => {
+            tracing::warn!(error = %e, "reading the Do Not Disturb setting for the tray failed");
+            Dnd::default()
+        }
+    };
+    TrayState {
+        dnd,
+        ..TrayState::default()
+    }
+}
+
+impl From<&DndState> for Dnd {
+    fn from(state: &DndState) -> Self {
+        Self {
+            manual: state.manual,
+            system: state.follow_system && state.system.on == Some(true),
+        }
+    }
 }
 
 fn on_menu_event(app: &AppHandle, event: MenuEvent) {
@@ -277,7 +302,15 @@ fn perform(app: &AppHandle, action: Action) {
         }
         Action::Mute => engine.set_self_mute(!target.is_some_and(|s| s.muted)),
         Action::Deafen => engine.set_self_deaf(!target.is_some_and(|s| s.deafened)),
-        Action::Dnd => Ok(()), // DND-PENDING
+        Action::Dnd => {
+            let (app, on) = (app.clone(), !state.dnd.manual);
+            tauri::async_runtime::spawn(async move {
+                if let Err(e) = crate::dnd::set(&app, |s| s.do_not_disturb = on).await {
+                    tracing::warn!(error = %e, "switching Do Not Disturb from the tray failed");
+                }
+            });
+            Ok(())
+        }
         Action::VoiceServer(server_id) => match state
             .connected()
             .find(|s| s.id == server_id)
@@ -368,7 +401,8 @@ pub fn attention_changed(app: &AppHandle, attention: TrayAttention) {
 }
 
 /// Do Not Disturb was switched, or the system's state changed.
-pub fn dnd_changed(app: &AppHandle, dnd: Dnd) {
+pub fn dnd_changed(app: &AppHandle, state: &DndState) {
+    let dnd = Dnd::from(state);
     if let Some(tray) = app.try_state::<Tray>() {
         let mut state = lock(&tray.state);
         if state.dnd == dnd {

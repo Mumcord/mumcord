@@ -334,6 +334,12 @@ impl Engine {
         lock(&self.inner.store).settings().map_err(store_error)
     }
 
+    /// Do Not Disturb is in effect or not (FR-3.111): notification sounds stay silent while it
+    /// is. The app shell combines the switch with the followed system state.
+    pub fn set_do_not_disturb(&self, on: bool) {
+        self.inner.events.sounds().set_do_not_disturb(on);
+    }
+
     /// Stores the settings and applies DSP switches, talk mode and devices immediately.
     /// Log level and the push-to-talk key are applied by the app shell.
     pub async fn update_settings(&self, settings: Settings) -> EngineResult<Settings> {

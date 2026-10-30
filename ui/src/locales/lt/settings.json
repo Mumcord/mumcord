@@ -621,5 +621,17 @@
     "releasePage": "Laidos puslapis",
     "entries": "Įrašų: {{count}}",
     "englishNote": "Pakeitimų žurnalas parašytas anglų kalba."
+  },
+  "dnd": {
+    "title": "Netrukdyti",
+    "label": "Netrukdyti",
+    "description": "Jokių pranešimų garsų ar reklamjuosčių jokiame serveryje. Balsas ir pokalbiai veikia toliau, o neskaitytų skaitikliai skaičiuoja toliau.",
+    "follow": "Sekti sistemos režimą „Netrukdyti“",
+    "followDescription": "Įjungia „Netrukdyti“, kai darbalaukyje įjungtas „Netrukdyti“ arba susitelkimo režimas.",
+    "detected": "Aptikta",
+    "detectedOn": "{{desktop}} · „Netrukdyti“ įjungta (sistema). Pakeitimai pritaikomi iš karto.",
+    "detectedOff": "{{desktop}} · „Netrukdyti“ išjungta. Pakeitimai pritaikomi iš karto.",
+    "unavailable": "Nepasiekiama",
+    "unavailableText": "Mumcord čia negali nuskaityti sistemos režimo „Netrukdyti“ būsenos. Veikia tik jo paties jungiklis."
   }
 }
