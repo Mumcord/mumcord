@@ -19,6 +19,7 @@ pub mod p2p;
 pub mod people;
 pub mod positional;
 pub mod profile;
+pub mod public_servers;
 pub mod screen_share;
 pub mod server_query;
 pub mod session;

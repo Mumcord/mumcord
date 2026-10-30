@@ -193,6 +193,16 @@ export const commands = {
 	 */
 	mumbleLinkJoin: (url: string) => typedError<LinkOutcome, ApiError>(__TAURI_INVOKE("mumble_link_join", { url })),
 	/**
+	 *  Downloads the public server list. The UI calls this only when the user opens the browser or
+	 *  presses Refresh (FR-3.92); nothing is fetched in the background.
+	 */
+	publicServersList: () => typedError<PublicServer[], ApiError>(__TAURI_INVOKE("public_servers_list")),
+	/**
+	 *  Pings one listed server; `null` when it did not answer. The engine paces all pings (one every
+	 *  50 ms, a few in flight), whatever the UI asks for.
+	 */
+	publicServerPing: (host: string, port: number) => typedError<PublicServerPing | null, ApiError>(__TAURI_INVOKE("public_server_ping", { host, port })),
+	/**
 	 *  An external image (`<img src>` in a message) or direct image link, ready to show inline;
 	 *  `null` when previews are switched off in the settings (then nothing is fetched) or the
 	 *  image cannot be shown (blocked address, too large, unsupported format).
@@ -1534,6 +1544,24 @@ export type PttUnavailableReason =
 "mouseNeedsInputGroup" | 
 /**  macOS: Mumcord lacks the Accessibility permission for the mouse event tap. */
 "mouseNeedsAccessibility";
+
+/**  One listed server. Untrusted list data, already cleaned by the engine; shown as plain text. */
+export type PublicServer = {
+	name: string,
+	host: string,
+	port: number,
+	/**  Country name from the list; may be empty. */
+	country: string,
+	/**  Upper-case ISO 3166 alpha-2 code, or empty. */
+	countryCode: string,
+};
+
+/**  What a listed server answered to the ping. Untrusted server data. */
+export type PublicServerPing = {
+	pingMs: number,
+	users: number,
+	maxUsers: number,
+};
 
 /**  A stored channel password without the password itself (FR-2.78, issue #146). */
 export type SavedChannelPassword = {
