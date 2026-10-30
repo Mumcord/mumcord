@@ -97,20 +97,18 @@
     "show": "{{location}} – mostra questo server"
   },
   "audio": {
-    "inputTitle": "Microfono",
-    "outputTitle": "Altoparlanti",
     "inputOptions": "Opzioni del microfono",
     "outputOptions": "Opzioni degli altoparlanti",
     "inputDevices": "Dispositivo di ingresso",
     "outputDevices": "Dispositivo di uscita",
     "systemDefault": "Predefinito di sistema",
     "noDevices": "Nessun dispositivo trovato",
-    "inputGain": "Volume di ingresso",
-    "outputVolume": "Volume di uscita",
     "noiseSuppression": "Riduzione del rumore",
     "testSound": "Prova suono",
     "voiceSettings": "Impostazioni vocali…",
     "fallbackInput": "Microfono scollegato. Viene usato il predefinito di sistema.",
-    "fallbackOutput": "Dispositivo di uscita scollegato. Viene usato il predefinito di sistema."
+    "fallbackOutput": "Dispositivo di uscita scollegato. Viene usato il predefinito di sistema.",
+    "volume": "Volume",
+    "level": "Livello"
   }
 }

@@ -97,20 +97,18 @@
     "show": "{{location}} – rodyti šį serverį"
   },
   "audio": {
-    "inputTitle": "Mikrofonas",
-    "outputTitle": "Garsiakalbiai",
     "inputOptions": "Mikrofono parinktys",
     "outputOptions": "Garsiakalbių parinktys",
     "inputDevices": "Įvesties įrenginys",
     "outputDevices": "Išvesties įrenginys",
     "systemDefault": "Numatytasis sistemos",
     "noDevices": "Įrenginių nerasta",
-    "inputGain": "Įvesties garsumas",
-    "outputVolume": "Išvesties garsumas",
     "noiseSuppression": "Triukšmo slopinimas",
     "testSound": "Bandomasis garsas",
     "voiceSettings": "Balso nustatymai…",
     "fallbackInput": "Mikrofonas atjungtas. Naudojamas numatytasis sistemos įrenginys.",
-    "fallbackOutput": "Išvesties įrenginys atjungtas. Naudojamas numatytasis sistemos įrenginys."
+    "fallbackOutput": "Išvesties įrenginys atjungtas. Naudojamas numatytasis sistemos įrenginys.",
+    "volume": "Garsumas",
+    "level": "Lygis"
   }
 }

@@ -97,20 +97,18 @@
     "show": "{{location}} – show this server"
   },
   "audio": {
-    "inputTitle": "Microphone",
-    "outputTitle": "Speakers",
     "inputOptions": "Microphone options",
     "outputOptions": "Speaker options",
     "inputDevices": "Input device",
     "outputDevices": "Output device",
     "systemDefault": "System default",
     "noDevices": "No devices found",
-    "inputGain": "Input volume",
-    "outputVolume": "Output volume",
     "noiseSuppression": "Noise suppression",
     "testSound": "Test sound",
     "voiceSettings": "Voice settings…",
     "fallbackInput": "Microphone unplugged. Using the system default.",
-    "fallbackOutput": "Output device unplugged. Using the system default."
+    "fallbackOutput": "Output device unplugged. Using the system default.",
+    "volume": "Volume",
+    "level": "Level"
   }
 }

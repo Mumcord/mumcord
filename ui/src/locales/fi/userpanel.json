@@ -97,20 +97,18 @@
     "show": "{{location}} – näytä tämä palvelin"
   },
   "audio": {
-    "inputTitle": "Mikrofoni",
-    "outputTitle": "Kaiuttimet",
     "inputOptions": "Mikrofonin asetukset",
     "outputOptions": "Kaiuttimien asetukset",
     "inputDevices": "Tulolaite",
     "outputDevices": "Lähtölaite",
     "systemDefault": "Järjestelmän oletus",
     "noDevices": "Laitteita ei löytynyt",
-    "inputGain": "Tulon äänenvoimakkuus",
-    "outputVolume": "Lähdön äänenvoimakkuus",
     "noiseSuppression": "Kohinanvaimennus",
     "testSound": "Testiääni",
     "voiceSettings": "Ääniasetukset…",
     "fallbackInput": "Mikrofoni irrotettiin. Käytössä on järjestelmän oletus.",
-    "fallbackOutput": "Lähtölaite irrotettiin. Käytössä on järjestelmän oletus."
+    "fallbackOutput": "Lähtölaite irrotettiin. Käytössä on järjestelmän oletus.",
+    "volume": "Äänenvoimakkuus",
+    "level": "Taso"
   }
 }

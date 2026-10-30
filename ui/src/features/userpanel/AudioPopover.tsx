@@ -19,7 +19,7 @@ import type { MenuPosition } from "../../components/ContextMenu";
 import { useThrottledSend } from "../../components/useThrottledSend";
 import { readableDeviceName } from "../settings/deviceNames";
 import { useSettings } from "../settings/useSettings";
-import { selectedDeviceId } from "./selectedDevice";
+import { SYSTEM_DEFAULT, selectedDeviceId } from "./selectedDevice";
 import { useAudioDevices } from "./useAudioDevices";
 import { useLevelBar } from "./useLevelBar";
 import "./audiopopover.css";
@@ -54,7 +54,7 @@ export function AudioPopover({ kind, anchor, onClose, onVoiceSettings }: AudioPo
   const list = (input ? devices?.inputs : devices?.outputs) ?? [];
   const chosen = settings ? (input ? settings.inputDevice : settings.outputDevice) : null;
   const selected = selectedDeviceId(list, chosen);
-  const title = input ? t("audio.inputTitle") : t("audio.outputTitle");
+  const title = input ? t("audio.inputDevices") : t("audio.outputDevices");
 
   const close = useCallback(
     (returnFocus: boolean) => {
@@ -118,9 +118,8 @@ export function AudioPopover({ kind, anchor, onClose, onVoiceSettings }: AudioPo
   }
 
   const choose = (id: string) => {
-    // The system default device is stored as "follow the default" (null), not pinned by id.
-    const device = list.find((d) => d.id === id);
-    const value = device?.isDefault === true ? null : id;
+    // "System default" is stored as "follow the system default" (null).
+    const value = id === SYSTEM_DEFAULT ? null : id;
     update(input ? { inputDevice: value } : { outputDevice: value });
   };
 
@@ -137,7 +136,7 @@ export function AudioPopover({ kind, anchor, onClose, onVoiceSettings }: AudioPo
     >
       <p className="audio-popover__title">{title}</p>
       <DeviceList
-        label={input ? t("audio.inputDevices") : t("audio.outputDevices")}
+        label={title}
         devices={list}
         selected={selected}
         loaded={devices !== null}
@@ -159,6 +158,7 @@ export function AudioPopover({ kind, anchor, onClose, onVoiceSettings }: AudioPo
         }}
       >
         {t("audio.voiceSettings")}
+        <span aria-hidden="true">→</span>
       </button>
     </div>,
     document.body,
@@ -168,10 +168,13 @@ export function AudioPopover({ kind, anchor, onClose, onVoiceSettings }: AudioPo
 interface DeviceListProps {
   label: string;
   devices: readonly AudioDevice[];
-  selected: string | null;
+  selected: string;
   loaded: boolean;
   onChoose: (id: string) => void;
 }
+
+const readableName = (device: AudioDevice | undefined) =>
+  device ? readableDeviceName(device.name) : null;
 
 function DeviceList({ label, devices, selected, loaded, onChoose }: DeviceListProps) {
   const { t } = useTranslation("userpanel");
@@ -202,6 +205,19 @@ function DeviceList({ label, devices, selected, loaded, onChoose }: DeviceListPr
     event.preventDefault();
   }
 
+  // The system default row comes last and names the device it currently stands for.
+  const rows = [
+    ...devices.map((device) => ({
+      id: device.id,
+      name: readableDeviceName(device.name),
+      hint: null as string | null,
+    })),
+    {
+      id: SYSTEM_DEFAULT,
+      name: t("audio.systemDefault"),
+      hint: readableName(devices.find((device) => device.isDefault)),
+    },
+  ];
   if (loaded && devices.length === 0) {
     return <p className="audio-popover__empty">{t("audio.noDevices")}</p>;
   }
@@ -214,31 +230,29 @@ function DeviceList({ label, devices, selected, loaded, onChoose }: DeviceListPr
       aria-label={label}
       onKeyDown={onKeyDown}
     >
-      {devices.map((device) => {
-        const checked = device.id === selected;
+      {rows.map((row) => {
+        const checked = row.id === selected;
         return (
           <div
-            key={device.id}
+            key={row.id}
             role="option"
             aria-selected={checked}
-            tabIndex={checked || (selected === null && device === devices[0]) ? 0 : -1}
+            tabIndex={checked ? 0 : -1}
             className="audio-popover__device"
             onClick={() => {
-              onChoose(device.id);
+              onChoose(row.id);
             }}
             onKeyDown={(event) => {
               if (event.key !== "Enter" && event.key !== " ") return;
               event.preventDefault();
-              onChoose(device.id);
+              onChoose(row.id);
             }}
           >
             <span className="audio-popover__check" aria-hidden="true">
               {checked ? "✓" : ""}
             </span>
-            <span className="audio-popover__name">{readableDeviceName(device.name)}</span>
-            {device.isDefault ? (
-              <span className="audio-popover__badge">{t("audio.systemDefault")}</span>
-            ) : null}
+            <span className="audio-popover__name">{row.name}</span>
+            {row.hint !== null ? <span className="audio-popover__badge">{row.hint}</span> : null}
           </div>
         );
       })}
@@ -258,7 +272,7 @@ function InputControls({ settings, update }: ControlsProps) {
   return (
     <>
       <PercentSlider
-        label={t("audio.inputGain")}
+        label={t("audio.volume")}
         value={settings.inputGainPercent}
         max={INPUT_GAIN_MAX}
         onChange={(inputGainPercent) => {
@@ -266,8 +280,11 @@ function InputControls({ settings, update }: ControlsProps) {
         }}
       />
       {/* Decoration only: the level is not announced to screen readers. */}
-      <div className="audio-popover__meter" aria-hidden="true">
-        <div ref={levelRef} className="audio-popover__meter-fill" />
+      <div className="audio-popover__level" aria-hidden="true">
+        <span>{t("audio.level")}</span>
+        <div className="audio-popover__meter">
+          <div ref={levelRef} className="audio-popover__meter-fill" />
+        </div>
       </div>
       <div className="audio-popover__switch">
         <label htmlFor={switchId}>{t("audio.noiseSuppression")}</label>
@@ -290,7 +307,7 @@ function OutputControls({ settings, update }: ControlsProps) {
   return (
     <>
       <PercentSlider
-        label={t("audio.outputVolume")}
+        label={t("audio.volume")}
         value={settings.outputVolumePercent}
         max={OUTPUT_VOLUME_MAX}
         onChange={(outputVolumePercent) => {
@@ -309,6 +326,7 @@ function OutputControls({ settings, update }: ControlsProps) {
         }}
       >
         {t("audio.testSound")}
+        <span aria-hidden="true">▶</span>
       </button>
     </>
   );

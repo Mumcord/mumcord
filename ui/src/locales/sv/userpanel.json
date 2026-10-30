@@ -97,20 +97,18 @@
     "show": "{{location}} – visa den här servern"
   },
   "audio": {
-    "inputTitle": "Mikrofon",
-    "outputTitle": "Högtalare",
     "inputOptions": "Mikrofonalternativ",
     "outputOptions": "Högtalaralternativ",
     "inputDevices": "Ingångsenhet",
     "outputDevices": "Utgångsenhet",
     "systemDefault": "Systemets standard",
     "noDevices": "Inga enheter hittades",
-    "inputGain": "Ingångsvolym",
-    "outputVolume": "Utgångsvolym",
     "noiseSuppression": "Brusreducering",
     "testSound": "Testljud",
     "voiceSettings": "Röstinställningar…",
     "fallbackInput": "Mikrofonen kopplades ur. Systemets standard används.",
-    "fallbackOutput": "Utgångsenheten kopplades ur. Systemets standard används."
+    "fallbackOutput": "Utgångsenheten kopplades ur. Systemets standard används.",
+    "volume": "Volym",
+    "level": "Nivå"
   }
 }

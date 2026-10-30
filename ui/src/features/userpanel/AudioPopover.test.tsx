@@ -61,12 +61,12 @@ const deafen = () => screen.getByRole("button", { name: "Deafen" });
 
 async function openInput() {
   fireEvent.contextMenu(mute());
-  return screen.findByRole("dialog", { name: "Microphone" });
+  return screen.findByRole("dialog", { name: "Input device" });
 }
 
 async function openOutput() {
   fireEvent.contextMenu(deafen());
-  return screen.findByRole("dialog", { name: "Speakers" });
+  return screen.findByRole("dialog", { name: "Output device" });
 }
 
 describe("audio popovers", () => {
@@ -75,7 +75,7 @@ describe("audio popovers", () => {
     const muted = vi.spyOn(api, "setSelfMute");
     const dialog = await openInput();
     await waitFor(() => {
-      expect(within(dialog).getAllByRole("option")[0]).toHaveFocus();
+      expect(within(dialog).getAllByRole("option")[2]).toHaveFocus();
     });
     expect(muted).not.toHaveBeenCalled();
     fireEvent.keyDown(screen.getByRole("dialog"), { key: "Escape" });
@@ -83,11 +83,11 @@ describe("audio popovers", () => {
     expect(mute()).toHaveFocus();
 
     fireEvent.keyDown(deafen(), { key: "ContextMenu" });
-    await screen.findByRole("dialog", { name: "Speakers" });
+    await screen.findByRole("dialog", { name: "Output device" });
     fireEvent.keyDown(screen.getByRole("dialog"), { key: "Escape" });
 
     fireEvent.click(screen.getByRole("button", { name: "Microphone options" }));
-    await screen.findByRole("dialog", { name: "Microphone" });
+    await screen.findByRole("dialog", { name: "Input device" });
     fireEvent.keyDown(screen.getByRole("dialog"), { key: "Escape" });
 
     fireEvent.click(mute());
@@ -100,13 +100,11 @@ describe("audio popovers", () => {
     const list = within(dialog).getByRole("listbox", { name: "Input device" });
     const options = within(list).getAllByRole("option");
     expect(options.map((o) => o.textContent)).toEqual([
-      expect.stringContaining("Built-in Microphone"),
-      expect.stringContaining("USB Headset"),
+      "Built-in Microphone",
+      "USB Headset",
+      "✓System defaultBuilt-in Microphone",
     ]);
-    expect(options[0]).toHaveTextContent("System default");
-    expect(options[1]).not.toHaveTextContent("System default");
-    expect(options[0]).toHaveAttribute("aria-selected", "true");
-    expect(options[1]).toHaveAttribute("aria-selected", "false");
+    expect(options.map((o) => o.getAttribute("aria-selected"))).toEqual(["false", "false", "true"]);
   });
 
   it("switches the input device at once and back to following the system default", async () => {
@@ -120,7 +118,7 @@ describe("audio popovers", () => {
       "aria-selected",
       "true",
     );
-    fireEvent.click(within(dialog).getByRole("option", { name: /Built-in Microphone/ }));
+    fireEvent.click(within(dialog).getByRole("option", { name: /System default/ }));
     await waitFor(async () => {
       expect((await api.settingsGet()).inputDevice).toBeNull();
     });
@@ -129,10 +127,12 @@ describe("audio popovers", () => {
   it("selects a device with the keyboard", async () => {
     await setup();
     const dialog = await openInput();
-    const [first, second] = within(dialog).getAllByRole("option");
+    const [first, second, systemDefault] = within(dialog).getAllByRole("option");
     await waitFor(() => {
-      expect(first).toHaveFocus();
+      expect(systemDefault).toHaveFocus();
     });
+    fireEvent.keyDown(systemDefault as HTMLElement, { key: "ArrowDown" });
+    expect(first).toHaveFocus();
     fireEvent.keyDown(first as HTMLElement, { key: "ArrowDown" });
     expect(second).toHaveFocus();
     fireEvent.keyDown(second as HTMLElement, { key: "Enter" });
@@ -145,7 +145,7 @@ describe("audio popovers", () => {
     await setup();
     await api.settingsUpdate({ ...(await api.settingsGet()), inputDevice: "unplugged" });
     const dialog = await openInput();
-    expect(within(dialog).getByRole("option", { name: /Built-in Microphone/ })).toHaveAttribute(
+    expect(within(dialog).getByRole("option", { name: /System default/ })).toHaveAttribute(
       "aria-selected",
       "true",
     );
@@ -171,7 +171,7 @@ describe("audio popovers", () => {
   it("binds the input slider to the setting and the noise suppression switch too", async () => {
     await setup();
     const dialog = await openInput();
-    const slider = within(dialog).getByRole("slider", { name: "Input volume" });
+    const slider = within(dialog).getByRole("slider", { name: "Volume" });
     expect(slider).toHaveValue("100");
     fireEvent.change(slider, { target: { value: "150" } });
     expect(slider).toHaveValue("150");
@@ -189,7 +189,7 @@ describe("audio popovers", () => {
   it("throttles the saves while the slider is dragged but keeps the last value", async () => {
     await setup();
     const dialog = await openOutput();
-    const slider = within(dialog).getByRole("slider", { name: "Output volume" });
+    const slider = within(dialog).getByRole("slider", { name: "Volume" });
     const update = vi.spyOn(api, "settingsUpdate");
     vi.useFakeTimers();
     fireEvent.change(slider, { target: { value: "80" } });
@@ -219,7 +219,7 @@ describe("audio popovers", () => {
   it("hides the level meter from screen readers and has no output-only controls on the input", async () => {
     await setup();
     const dialog = await openInput();
-    expect(dialog.querySelector(".audio-popover__meter")).toHaveAttribute("aria-hidden", "true");
+    expect(dialog.querySelector(".audio-popover__level")).toHaveAttribute("aria-hidden", "true");
     expect(within(dialog).queryByRole("button", { name: "Test sound" })).not.toBeInTheDocument();
     expect(await axeViolations(dialog)).toEqual([]);
   });

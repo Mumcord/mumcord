@@ -97,20 +97,18 @@
     "show": "{{location}} – pokaži ta strežnik"
   },
   "audio": {
-    "inputTitle": "Mikrofon",
-    "outputTitle": "Zvočniki",
     "inputOptions": "Možnosti mikrofona",
     "outputOptions": "Možnosti zvočnikov",
     "inputDevices": "Vhodna naprava",
     "outputDevices": "Izhodna naprava",
     "systemDefault": "Sistemska privzeta",
     "noDevices": "Najdena ni nobena naprava",
-    "inputGain": "Glasnost vhoda",
-    "outputVolume": "Glasnost izhoda",
     "noiseSuppression": "Zmanjševanje šuma",
     "testSound": "Preizkusni zvok",
     "voiceSettings": "Nastavitve glasu…",
     "fallbackInput": "Mikrofon je bil odklopljen. Uporablja se sistemska privzeta naprava.",
-    "fallbackOutput": "Izhodna naprava je bila odklopljena. Uporablja se sistemska privzeta naprava."
+    "fallbackOutput": "Izhodna naprava je bila odklopljena. Uporablja se sistemska privzeta naprava.",
+    "volume": "Glasnost",
+    "level": "Raven"
   }
 }

@@ -97,20 +97,18 @@
     "show": "{{location}} – diesen Server anzeigen"
   },
   "audio": {
-    "inputTitle": "Mikrofon",
-    "outputTitle": "Lautsprecher",
     "inputOptions": "Mikrofon-Optionen",
     "outputOptions": "Lautsprecher-Optionen",
     "inputDevices": "Eingabegerät",
     "outputDevices": "Ausgabegerät",
     "systemDefault": "Systemstandard",
     "noDevices": "Keine Geräte gefunden",
-    "inputGain": "Eingangslautstärke",
-    "outputVolume": "Ausgabelautstärke",
     "noiseSuppression": "Rauschunterdrückung",
     "testSound": "Testton",
     "voiceSettings": "Spracheinstellungen…",
     "fallbackInput": "Mikrofon getrennt. Der Systemstandard wird verwendet.",
-    "fallbackOutput": "Ausgabegerät getrennt. Der Systemstandard wird verwendet."
+    "fallbackOutput": "Ausgabegerät getrennt. Der Systemstandard wird verwendet.",
+    "volume": "Lautstärke",
+    "level": "Pegel"
   }
 }
