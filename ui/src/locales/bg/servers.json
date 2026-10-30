@@ -36,6 +36,7 @@
     "reconnect": "Свържи се отново",
     "alwaysConnect": "Винаги свързвай при стартиране",
     "muteNotifications": "Заглуши известията",
+    "muteGroupMentions": "Заглуши @all и @channel",
     "theme": "Тема…",
     "showWelcome": "Покажи приветственото съобщение",
     "identity": "Идентичност…"

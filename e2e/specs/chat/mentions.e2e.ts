@@ -13,7 +13,8 @@ import {
 
 // FR-1.51 / AC-1.41: a mention highlights the message and notifies even while another chat is
 // open; typing @ offers the people on the server and the sent text stays plain "@Name". A reply to
-// the user's message counts as a mention too (FR-2.67).
+// the user's message counts as a mention too (FR-2.67). `@all` and `@channel` count as mentions
+// unless the user turned them off for the server (issue #70, Q1.6).
 describe("chat: mentions (AC-1.41)", () => {
   let mentionBot: ScriptBot;
 
@@ -96,5 +97,60 @@ describe("chat: mentions (AC-1.41)", () => {
     await browser.keys(["Enter"]);
     const got = await mentionBot.run(`expect message --from ${USER} --contains "@MentionBot"`);
     expect(got).toContain("@MentionBot");
+  });
+
+  it("offers @channel and @all after @ in a channel and sends them as plain text", async () => {
+    await selectChannel("Lobby");
+    const box = composer();
+    await box.waitForEnabled();
+    await box.setValue("heads up @");
+    const option = $("//*[@role='listbox']//*[@role='option' and contains(.,'@channel')]");
+    await option.waitForDisplayed({ timeout: 10_000 });
+    expect(await option.getText()).toContain("Notify everyone in Lobby");
+    await expect(
+      $("//*[@role='listbox']//*[@role='option' and contains(.,'@all')]"),
+    ).toBeDisplayed();
+    await browser.keys(["Enter"]);
+    expect(await box.getValue()).toBe("heads up @channel ");
+    await browser.keys(["Enter"]);
+    const got = await mentionBot.run(`expect message --from ${USER} --contains "@channel"`);
+    expect(got).toContain("heads up @channel");
+  });
+
+  it("notifies for @channel and @all like a personal mention and highlights them", async () => {
+    await selectChannel("Raid");
+    await mentionBot.run(`say --channel Lobby "@channel raid starts soon"`);
+    await $(
+      "//section[@aria-label='Notifications']//button[contains(@class,'toast__open') and contains(.,'raid starts soon')]",
+    ).waitForExist({ timeout: 15_000 });
+    await mentionBot.run(`say --channel Lobby "@all restart at ten"`);
+    const toast = $(
+      "//section[@aria-label='Notifications']//button[contains(@class,'toast__open') and contains(.,'restart at ten')]",
+    );
+    await toast.waitForExist({ timeout: 15_000 });
+    expect(await toast.getProperty("textContent")).toContain("mentioned you");
+    await toast.click();
+    await waitMessage("restart at ten");
+    for (const text of ["raid starts soon", "restart at ten"]) {
+      await expect(
+        $(`//li[contains(@class,'chat-message--mention') and contains(.,'${text}')]`),
+      ).toBeExisting();
+    }
+    await expect(
+      $("//li[contains(.,'restart at ten')]//span[@class='chat-mention-group' and .='@all']"),
+    ).toBeExisting();
+  });
+
+  it("stops treating @all as a mention once the user turns it off for the server", async () => {
+    await $("//button[contains(@aria-label,'(connected)')]").click({ button: "right" });
+    const mute = $("//*[@role='menuitemcheckbox'][contains(normalize-space(),'Mute @all and @channel')]");
+    await mute.waitForClickable();
+    await mute.click();
+    await mentionBot.run(`say --channel Lobby "@all after opting out"`);
+    await waitMessage("after opting out");
+    await expect($("//li[contains(.,'after opting out')]")).toBeExisting();
+    await expect(
+      $("//li[contains(@class,'chat-message--mention') and contains(.,'after opting out')]"),
+    ).not.toBeExisting();
   });
 });

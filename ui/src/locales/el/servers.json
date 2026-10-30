@@ -36,6 +36,7 @@
     "reconnect": "Επανασύνδεση",
     "alwaysConnect": "Πάντα σύνδεση κατά την εκκίνηση",
     "muteNotifications": "Σίγαση ειδοποιήσεων",
+    "muteGroupMentions": "Σίγαση @all και @channel",
     "theme": "Θέμα…",
     "showWelcome": "Εμφάνιση μηνύματος καλωσορίσματος",
     "identity": "Ταυτότητα…"

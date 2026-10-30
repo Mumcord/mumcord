@@ -89,12 +89,17 @@
     "hideDescription": "Kanalbeschreibung ausblenden"
   },
   "mention": {
-    "list": "Erwähnbare Personen",
-    "found_one": "{{count}} Person vorgeschlagen. Mit den Pfeiltasten wählen, mit Enter einfügen.",
-    "found_other": "{{count}} Personen vorgeschlagen. Mit den Pfeiltasten wählen, mit Enter einfügen.",
+    "list": "Erwähnungsvorschläge",
+    "found_one": "Vorschläge: {{count}}. Mit den Pfeiltasten wählen, mit Enter einfügen.",
+    "found_other": "Vorschläge: {{count}}. Mit den Pfeiltasten wählen, mit Enter einfügen.",
     "none": "Niemand gefunden",
     "mentionsYou": "Erwähnt dich",
-    "chipLabel": "{{name}}, Erwähnung"
+    "chipLabel": "{{name}}, Erwähnung",
+    "groupsHeading": "Erwähnungen",
+    "peopleHeading": "Personen",
+    "channelHint": "Alle in {{channel}} benachrichtigen ({{count}})",
+    "allHint": "Alle benachrichtigen, die diesen Kanal lesen können ({{count}})",
+    "keys": "↑↓ wählen · Enter einfügen · Esc schließen"
   },
   "preview": {
     "open": "Im Browser öffnen",

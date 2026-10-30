@@ -144,6 +144,7 @@ const NEW_SERVER_FLAGS = {
   alwaysConnectAtStart: false,
   wasVoiceServerAtQuit: false,
   notificationsMuted: false,
+  groupMentionsMuted: false,
   themeId: null,
   identityId: null,
 } satisfies Partial<SavedServer>;
@@ -2031,6 +2032,11 @@ export function createMockApi(options: MockOptions = {}): MockApi {
     serverSetNotificationsMuted: (serverId, muted) => {
       requireServer(serverId);
       servers = servers.map((s) => (s.id === serverId ? { ...s, notificationsMuted: muted } : s));
+      return Promise.resolve({ ...requireServer(serverId) });
+    },
+    serverSetGroupMentionsMuted: (serverId, muted) => {
+      requireServer(serverId);
+      servers = servers.map((s) => (s.id === serverId ? { ...s, groupMentionsMuted: muted } : s));
       return Promise.resolve({ ...requireServer(serverId) });
     },
     serverSetIdentity: (serverId, identityId) =>
