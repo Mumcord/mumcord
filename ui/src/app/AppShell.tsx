@@ -1,8 +1,17 @@
-import { useRef, useState, type CSSProperties, type ReactNode } from "react";
+import {
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+  type CSSProperties,
+  type ReactNode,
+} from "react";
 import { useTranslation } from "react-i18next";
 import { SkipLinks } from "../a11y";
 import { ResizeHandle } from "./ResizeHandle";
-import { useColumnWidths } from "./useColumnWidths";
+import { isMembersShortcut, loadMembersCollapsed, saveMembersCollapsed } from "./membersCollapse";
+import { useColumnWidths, useNarrowWindow } from "./useColumnWidths";
 import "./shell.css";
 
 export interface ShellSlots {
@@ -15,23 +24,104 @@ export interface ShellSlots {
 }
 
 /** Element ids of the shell regions, used as skip-link targets. */
-const SHELL_IDS = { channels: "channels", chat: "chat", members: "members" } as const;
+const SHELL_IDS = {
+  channels: "channels",
+  chat: "chat",
+  members: "members",
+  membersContent: "members-content",
+} as const;
 
 /**
  * Four-column main window frame (server bar, channels + user panel, chat, members). Purely
- * presentational: features fill the slots. Narrow windows hide the member column behind a toggle.
- * The channel and member columns are resizable by their inner border (QA.29).
+ * presentational: features fill the slots. The member column can be collapsed to give the chat the
+ * full width (issue #165); its state is remembered across restarts. Narrow windows always show it
+ * as an overlay instead, opened from a button in the chat. The channel and member columns are
+ * resizable by their inner border (QA.29).
  */
 export function AppShell({ slots, inert = false }: { slots: ShellSlots; inert?: boolean }) {
   const { t } = useTranslation("app");
-  const [membersOpen, setMembersOpen] = useState(false);
+  const [collapsed, setCollapsed] = useState(loadMembersCollapsed);
+  const [overlayOpen, setOverlayOpen] = useState(false);
+  const narrow = useNarrowWindow();
+  const [wasNarrow, setWasNarrow] = useState(narrow);
+  // A window narrowed below the breakpoint starts with the overlay closed (auto-collapse).
+  if (wasNarrow !== narrow) {
+    setWasNarrow(narrow);
+    if (narrow) setOverlayOpen(false);
+  }
+  const membersShown = narrow ? overlayOpen : !collapsed;
   const shellRef = useRef<HTMLDivElement>(null);
   const serverBarRef = useRef<HTMLElement>(null);
+  const membersRef = useRef<HTMLElement>(null);
+  const revealRef = useRef<HTMLButtonElement>(null);
+  const restoreFocus = useRef(false);
+  const [revealWidth, setRevealWidth] = useState(0);
   const widths = useColumnWidths(shellRef, serverBarRef);
+
+  const toggleMembers = useCallback(() => {
+    // Remember to move the focus before the focused element leaves with the column.
+    if (membersShown && membersRef.current?.contains(document.activeElement)) {
+      restoreFocus.current = true;
+    }
+    if (narrow) {
+      setOverlayOpen((open) => !open);
+      return;
+    }
+    setCollapsed((value) => {
+      const next = !value;
+      saveMembersCollapsed(next);
+      return next;
+    });
+  }, [narrow, membersShown]);
+
+  useEffect(() => {
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (inert || event.defaultPrevented || !isMembersShortcut(event)) return;
+      event.preventDefault();
+      toggleMembers();
+    };
+    window.addEventListener("keydown", onKeyDown);
+    return () => {
+      window.removeEventListener("keydown", onKeyDown);
+    };
+  }, [inert, toggleMembers]);
+
+  // Collapsing takes the focused element with it: the reveal button takes the focus instead.
+  const wasShown = useRef(membersShown);
+  useEffect(() => {
+    const focusedInside = membersRef.current?.contains(document.activeElement) ?? false;
+    if (wasShown.current && !membersShown && (restoreFocus.current || focusedInside)) {
+      revealRef.current?.focus();
+    }
+    restoreFocus.current = false;
+    wasShown.current = membersShown;
+  }, [membersShown]);
+
+  // The chat header leaves room for the reveal button whatever its language's text is wide.
+  useLayoutEffect(() => {
+    const button = revealRef.current;
+    if (!button) {
+      setRevealWidth(0);
+      return;
+    }
+    const measure = () => {
+      setRevealWidth(button.offsetWidth);
+    };
+    measure();
+    if (typeof ResizeObserver !== "function") return;
+    const observer = new ResizeObserver(measure);
+    observer.observe(button);
+    return () => {
+      observer.disconnect();
+    };
+  }, [membersShown]);
+
   // Custom properties are not part of React's style type.
   const style = {
     "--channels-width": `${String(widths.shown.channels)}rem`,
     "--members-width": `${String(widths.shown.members)}rem`,
+    "--members-column-width": `${String(collapsed ? 0 : widths.shown.members)}rem`,
+    "--members-reveal-width": `${String(revealWidth)}px`,
   } as CSSProperties;
 
   return (
@@ -39,7 +129,9 @@ export function AppShell({ slots, inert = false }: { slots: ShellSlots; inert?: 
       ref={shellRef}
       className="shell"
       style={style}
-      data-members-open={membersOpen}
+      data-members-collapsed={collapsed}
+      data-members-open={overlayOpen}
+      data-members-reveal={!membersShown}
       inert={inert}
     >
       <SkipLinks
@@ -84,17 +176,20 @@ export function AppShell({ slots, inert = false }: { slots: ShellSlots; inert?: 
         aria-label={t("regions.chat")}
         tabIndex={-1}
       >
-        <button
-          type="button"
-          className="shell__members-toggle"
-          aria-expanded={membersOpen}
-          aria-controls={SHELL_IDS.members}
-          onClick={() => {
-            setMembersOpen((open) => !open);
-          }}
-        >
-          {membersOpen ? t("members.hide") : t("members.show")}
-        </button>
+        {!membersShown && (
+          <button
+            ref={revealRef}
+            type="button"
+            className="shell__members-toggle"
+            aria-expanded={false}
+            aria-controls={SHELL_IDS.membersContent}
+            aria-keyshortcuts="Control+Shift+M Meta+Shift+M"
+            onClick={toggleMembers}
+          >
+            <span className="shell__members-chevron" aria-hidden="true" />
+            {t("members.show")}
+          </button>
+        )}
         {slots.chatStatus}
         <div className="shell__chat-body">{slots.chat}</div>
       </main>
@@ -112,8 +207,30 @@ export function AppShell({ slots, inert = false }: { slots: ShellSlots; inert?: 
           widths.reset("members");
         }}
       />
-      <aside id={SHELL_IDS.members} className="shell__members" aria-label={t("regions.members")}>
-        {slots.members}
+      <aside
+        ref={membersRef}
+        id={SHELL_IDS.members}
+        className="shell__members"
+        aria-label={t("regions.members")}
+        inert={!membersShown}
+      >
+        {membersShown && (
+          <button
+            type="button"
+            className="shell__members-hide"
+            aria-expanded
+            aria-controls={SHELL_IDS.membersContent}
+            aria-keyshortcuts="Control+Shift+M Meta+Shift+M"
+            aria-label={t("members.hide")}
+            data-tooltip={t("members.hide")}
+            onClick={toggleMembers}
+          >
+            <span className="shell__members-chevron" aria-hidden="true" />
+          </button>
+        )}
+        <div id={SHELL_IDS.membersContent} className="shell__members-content">
+          {slots.members}
+        </div>
       </aside>
     </div>
   );
