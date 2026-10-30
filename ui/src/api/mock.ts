@@ -989,27 +989,50 @@ export function createMockApi(options: MockOptions = {}): MockApi {
       avatarHash: "a1",
     };
     const carla = { ...person(4, "Carla", 2, "carlahash"), listeningChannelIds: [1] };
+    const users = stress
+      ? stressUsers(self, channels)
+      : demo
+        ? demoUsers(self)
+        : [self, anna, person(3, "Ben", 1, null), carla];
+    const saved = requireServer(serverId);
     const info: ServerInfo = {
       version: serverVersion,
       followSupported: !serverVersion.startsWith("1.3") && !serverVersion.startsWith("1.2"),
       welcomeText: demo
-        ? `Welcome to <b>${requireServer(serverId).label}</b>. Be kind and have fun!`
+        ? `Welcome to <b>${saved.label}</b>. Be kind and have fun!`
         : "Welcome to the <b>mock</b> server.",
       defaultChannelId: target?.id ?? null,
       maxMessageLength: 5000,
       maxImageMessageLength: 131072,
       allowHtml: true,
+      release: null,
+      os: "Linux",
+      maxBandwidth: 128_000,
+      maxUsers: 100,
+      recordingAllowed: false,
+      serverLabel: saved.label,
+      serverAddress: saved.address,
+      serverPort: saved.port,
+      tlsFingerprint:
+        "9F:2C:41:7A:B3:0E:D8:65:1C:AA:4B:F0:92:3D:77:E1:5A:08:C6:2F:B9:14:6E:D3:80:47:A5:1B:F2:69:CE:30",
+      usersOnline: users.length,
+      sessionId: SELF_SESSION,
+      registered: true,
+      currentChannelPermissions: 0x1 | 0x8 | 0x100,
+      mumcordUsers: users.filter((user) => user.isMumcord).length,
+      tlsTrusted: true,
+      tlsIssuer: "CN=Example Root CA, O=Example Org",
+      tlsValidFrom: "2026-03-01",
+      tlsValidUntil: "2027-03-01",
+      tlsCertificatePem:
+        "-----BEGIN CERTIFICATE-----\nMIIBszCCAVmgAwIBAgIUExampleCertificateForTheMockServer\n-----END CERTIFICATE-----\n",
     };
     return {
       serverId,
       selfSession: SELF_SESSION,
       info,
       channels,
-      users: stress
-        ? stressUsers(self, channels)
-        : demo
-          ? demoUsers(self)
-          : [self, anna, person(3, "Ben", 1, null), carla],
+      users,
       followedChannelIds: [],
       unread: [],
       readOnly,
@@ -1025,8 +1048,8 @@ export function createMockApi(options: MockOptions = {}): MockApi {
     });
     return [
       withAvatar(self),
-      withAvatar({ ...person(2, "Maya", 1, "mayahash"), hasComment: true }),
-      withAvatar(person(5, "Jonas", 1, "jonashash")),
+      withAvatar({ ...person(2, "Maya", 1, "mayahash"), hasComment: true, isMumcord: true }),
+      withAvatar({ ...person(5, "Jonas", 1, "jonashash"), isMumcord: true }),
       withAvatar(person(7, "Priya", 1, "priyahash")),
       { ...person(3, "Ben", 1, null), selfMute: true },
       { ...person(4, "Carla", 7, "carlahash"), listeningChannelIds: [1] },

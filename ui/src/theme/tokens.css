@@ -9,6 +9,7 @@
   --font-family:
     "Instrument Sans Variable", "Segoe UI", system-ui, -apple-system, "Noto Sans", Arial, sans-serif;
   --font-family-display: "Bricolage Grotesque Variable", var(--font-family);
+  --font-family-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
   --letter-spacing-display: -0.01em;
   --font-size-xs: 0.75rem;
   --font-size-sm: 0.875rem;

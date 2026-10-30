@@ -1593,6 +1593,8 @@ export type ServerDenied = {
 export type ServerInfo = {
 	/**  E.g. "1.5.735". */
 	version: string,
+	release: string | null,
+	os: string | null,
 	/**  False on servers older than 1.4: following is hidden with a hint (FR-1.12). */
 	followSupported: boolean,
 	/**  Sanitized HTML. */
@@ -1607,6 +1609,23 @@ export type ServerInfo = {
 	/**  Maximum length of messages containing images in characters (0 = unlimited). */
 	maxImageMessageLength: number,
 	allowHtml: boolean,
+	maxBandwidth: number | null,
+	maxUsers: number | null,
+	recordingAllowed: boolean,
+	serverLabel: string | null,
+	serverAddress: string | null,
+	serverPort: number | null,
+	tlsFingerprint: string | null,
+	usersOnline: number,
+	sessionId: number | null,
+	registered: boolean,
+	currentChannelPermissions: number | null,
+	mumcordUsers: number,
+	tlsTrusted: boolean,
+	tlsIssuer: string | null,
+	tlsValidFrom: string | null,
+	tlsValidUntil: string | null,
+	tlsCertificatePem: string | null,
 };
 
 /**  Fields for adding or editing a saved server. */

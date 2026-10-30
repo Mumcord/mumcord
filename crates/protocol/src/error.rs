@@ -66,7 +66,7 @@ pub enum ConnectError {
     /// The caller's certificate check said no. Carries the certificate so the caller can ask the
     /// user and reconnect (trust on first use, or a changed certificate).
     #[error("server certificate not trusted (SHA-1 {})", .0.sha1_hex)]
-    CertificateRejected(ServerCert),
+    CertificateRejected(Box<ServerCert>),
     #[error("TLS error: {0}")]
     Tls(#[from] rustls::Error),
     #[error("server rejected the login ({reason:?}): {message}")]
