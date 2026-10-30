@@ -110,12 +110,10 @@ export function UserPanel() {
     });
   };
 
-  const openDisconnectMenu = (x: number, y: number, opener: HTMLElement) => {
-    setDisconnectMenu({ x, y, opener });
-  };
-  const openDisconnectMenuBelow = (opener: HTMLElement) => {
+  // The voice bar sits at the bottom of the window, so the menu opens upwards from the button.
+  const openDisconnectMenu = (opener: HTMLElement) => {
     const box = opener.getBoundingClientRect();
-    openDisconnectMenu(box.left, box.bottom, opener);
+    setDisconnectMenu({ x: box.left, y: box.top, above: true, opener });
   };
 
   const leaveVoice = () => {
@@ -349,12 +347,12 @@ export function UserPanel() {
               onClick={disconnectShown}
               onContextMenu={(event) => {
                 event.preventDefault();
-                openDisconnectMenu(event.clientX, event.clientY, event.currentTarget);
+                openDisconnectMenu(event.currentTarget);
               }}
               onKeyDown={(event) => {
                 if (event.key !== "ContextMenu" && !(event.key === "F10" && event.shiftKey)) return;
                 event.preventDefault();
-                openDisconnectMenuBelow(event.currentTarget);
+                openDisconnectMenu(event.currentTarget);
               }}
             >
               <Icon d={HANG_UP} />
@@ -366,7 +364,7 @@ export function UserPanel() {
               data-tooltip={t("disconnectMenu.open")}
               aria-haspopup="menu"
               onClick={(event) => {
-                openDisconnectMenuBelow(event.currentTarget);
+                openDisconnectMenu(event.currentTarget);
               }}
             >
               <ArrowIcon />
