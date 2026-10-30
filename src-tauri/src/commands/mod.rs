@@ -11,6 +11,7 @@ pub mod changelog;
 pub mod channels;
 pub mod chat;
 pub mod diagnostics;
+pub mod dnd;
 pub mod dropped;
 pub mod follow;
 pub mod friends;

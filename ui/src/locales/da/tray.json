@@ -2,6 +2,7 @@
   "show": "Vis Mumcord",
   "mute": "Slå mikrofonen fra",
   "deafen": "Slå lyden fra",
+  "dnd": "Forstyr ikke",
   "quit": "Afslut",
   "disconnected": "Ikke forbundet",
   "connecting": "Forbinder…",

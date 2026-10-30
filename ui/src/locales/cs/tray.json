@@ -2,6 +2,7 @@
   "show": "Zobrazit Mumcord",
   "mute": "Ztlumit mikrofon",
   "deafen": "Ztlumit zvuk",
+  "dnd": "Nerušit",
   "quit": "Ukončit",
   "disconnected": "Nepřipojeno",
   "connecting": "Připojování…",

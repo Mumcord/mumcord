@@ -2,6 +2,7 @@
   "show": "Afficher Mumcord",
   "mute": "Couper le micro",
   "deafen": "Couper le son",
+  "dnd": "Ne pas déranger",
   "quit": "Quitter",
   "disconnected": "Non connecté",
   "connecting": "Connexion…",

@@ -1,5 +1,5 @@
-//! Tray icon showing connection and talk state, with Show / Mute / Deafen / Overlay / Quit
-//! (FR-1.37, FR-1.45). On Linux it is our own StatusNotifierItem (see `linux`), with the Tauri
+//! Tray icon showing connection and talk state, with Show / Mute / Deafen / Do Not Disturb /
+//! Quit (FR-1.37, FR-1.45, FR-3.111). On Linux it is our own StatusNotifierItem (see `linux`), with the Tauri
 //! tray as fallback when no StatusNotifierWatcher runs.
 
 use std::sync::Mutex;
@@ -19,6 +19,7 @@ mod linux;
 const SHOW: &str = "show";
 const MUTE: &str = "mute";
 const DEAFEN: &str = "deafen";
+const DND: &str = "dnd";
 const QUIT: &str = "quit";
 
 /// Side length of the generated tray images; trays render at 16–32 px.
@@ -40,6 +41,8 @@ struct TrayState {
     talking: bool,
     muted: bool,
     deafened: bool,
+    /// The Mumcord Do Not Disturb switch; independent of the connection.
+    dnd: bool,
 }
 
 /// The state shown by the icon's status dot.
@@ -66,6 +69,7 @@ impl TrayState {
                 if self.conn != Conn::Connected {
                     *self = Self {
                         conn: self.conn,
+                        dnd: self.dnd,
                         ..Self::default()
                     };
                 }
@@ -116,6 +120,7 @@ struct Labels {
     show: String,
     mute: String,
     deafen: String,
+    dnd: String,
     quit: String,
     disconnected: String,
     connecting: String,
@@ -189,6 +194,7 @@ enum Action {
     Show,
     Mute,
     Deafen,
+    Dnd,
     Quit,
 }
 
@@ -198,6 +204,7 @@ impl Action {
             SHOW => Some(Self::Show),
             MUTE => Some(Self::Mute),
             DEAFEN => Some(Self::Deafen),
+            DND => Some(Self::Dnd),
             QUIT => Some(Self::Quit),
             _ => None,
         }
@@ -221,7 +228,7 @@ enum Entry {
     },
 }
 
-/// The tray menu for `state`: status, Show, Mute, Deafen, Quit.
+/// The tray menu for `state`: status, Show, Mute, Deafen, Do Not Disturb, Quit.
 #[cfg(target_os = "linux")]
 fn menu_model(state: TrayState, labels: &Labels) -> Vec<Entry> {
     let connected = state.conn == Conn::Connected;
@@ -240,6 +247,12 @@ fn menu_model(state: TrayState, labels: &Labels) -> Vec<Entry> {
             label: labels.deafen.clone(),
             enabled: connected,
             checked: state.deafened,
+        },
+        Entry::Toggle {
+            action: Action::Dnd,
+            label: labels.dnd.clone(),
+            enabled: true,
+            checked: state.dnd,
         },
         Entry::Separator,
         Entry::Button(Action::Quit, labels.quit.clone()),
@@ -267,6 +280,7 @@ struct TauriTray {
     show: MenuItem<Wry>,
     mute: CheckMenuItem<Wry>,
     deafen: CheckMenuItem<Wry>,
+    dnd: CheckMenuItem<Wry>,
     quit: MenuItem<Wry>,
 }
 
@@ -284,7 +298,7 @@ pub fn init(app: &AppHandle) {
                 app.manage(Tray {
                     backend: Backend::Ksni(handle),
                     base: base_icon(&app),
-                    state: Mutex::new(TrayState::default()),
+                    state: Mutex::new(initial_state(&app)),
                 });
                 refresh(&app, true);
             }
@@ -325,15 +339,17 @@ fn build(app: &AppHandle) -> tauri::Result<Tray> {
     let show = MenuItem::with_id(app, SHOW, "", true, None::<&str>)?;
     let mute = CheckMenuItem::with_id(app, MUTE, "", false, false, None::<&str>)?;
     let deafen = CheckMenuItem::with_id(app, DEAFEN, "", false, false, None::<&str>)?;
+    let dnd = CheckMenuItem::with_id(app, DND, "", true, false, None::<&str>)?;
     let quit = MenuItem::with_id(app, QUIT, "", true, None::<&str>)?;
     let separator = PredefinedMenuItem::separator(app)?;
     let separator2 = PredefinedMenuItem::separator(app)?;
-    let items: [&dyn IsMenuItem<Wry>; 7] = [
+    let items: [&dyn IsMenuItem<Wry>; 8] = [
         &status,
         &separator,
         &show,
         &mute,
         &deafen,
+        &dnd,
         &separator2,
         &quit,
     ];
@@ -363,10 +379,11 @@ fn build(app: &AppHandle) -> tauri::Result<Tray> {
             show,
             mute,
             deafen,
+            dnd,
             quit,
         })),
         base,
-        state: Mutex::new(TrayState::default()),
+        state: Mutex::new(initial_state(app)),
     })
 }
 
@@ -391,6 +408,15 @@ fn perform(app: &AppHandle, action: Action) {
         }
         Action::Mute => engine.set_self_mute(!state.muted),
         Action::Deafen => engine.set_self_deaf(!state.deafened),
+        Action::Dnd => {
+            let app = app.clone();
+            tauri::async_runtime::spawn(async move {
+                if let Err(e) = crate::dnd::set(&app, |s| s.do_not_disturb = !state.dnd).await {
+                    tracing::warn!(error = %e, "switching Do Not Disturb from the tray failed");
+                }
+            });
+            Ok(())
+        }
         Action::Quit => {
             window::quit(app);
             Ok(())
@@ -398,6 +424,32 @@ fn perform(app: &AppHandle, action: Action) {
     };
     if let Err(e) = result {
         tracing::warn!(error = %e, "tray action failed");
+    }
+}
+
+/// A new tray starts disconnected, with the stored Do Not Disturb switch.
+fn initial_state(app: &AppHandle) -> TrayState {
+    let dnd = app
+        .state::<Engine>()
+        .settings()
+        .is_ok_and(|s| s.do_not_disturb);
+    TrayState {
+        dnd,
+        ..TrayState::default()
+    }
+}
+
+/// The Do Not Disturb switch changed (anywhere): the check mark follows it.
+pub fn dnd_changed(app: &AppHandle, on: bool) {
+    let Some(tray) = app.try_state::<Tray>() else {
+        return;
+    };
+    let changed = {
+        let mut state = tray.state.lock().unwrap_or_else(|e| e.into_inner());
+        std::mem::replace(&mut state.dnd, on) != on
+    };
+    if changed {
+        refresh(app, false);
     }
 }
 
@@ -468,12 +520,14 @@ fn refresh_tauri(app: &AppHandle, tray: &Tray, handles: &TauriTray, texts: bool)
         .and_then(|()| handles.mute.set_enabled(connected))
         .and_then(|()| handles.mute.set_checked(state.muted))
         .and_then(|()| handles.deafen.set_enabled(connected))
-        .and_then(|()| handles.deafen.set_checked(state.deafened));
+        .and_then(|()| handles.deafen.set_checked(state.deafened))
+        .and_then(|()| handles.dnd.set_checked(state.dnd));
     if texts {
         result = result
             .and_then(|()| handles.show.set_text(&labels.show))
             .and_then(|()| handles.mute.set_text(&labels.mute))
             .and_then(|()| handles.deafen.set_text(&labels.deafen))
+            .and_then(|()| handles.dnd.set_text(&labels.dnd))
             .and_then(|()| handles.quit.set_text(&labels.quit));
     }
     if let Some(base) = &tray.base {
@@ -638,12 +692,20 @@ mod tests {
             talking: true,
             muted: true,
             deafened: false,
+            dnd: true,
         };
         assert_eq!(state.look(), Look::Muted);
         state.apply(&EngineEvent::StateChanged(ConnState::Disconnected {
             error: None,
         }));
-        assert_eq!(state, TrayState::default());
+        assert_eq!(
+            state,
+            TrayState {
+                dnd: true,
+                ..TrayState::default()
+            },
+            "Do Not Disturb survives the disconnect"
+        );
         assert_eq!(state.look(), Look::Disconnected);
     }
 
@@ -738,10 +800,22 @@ mod tests {
     fn menu_follows_connection_and_voice_state() {
         let labels = labels(Some("en"), None);
         let offline = menu_model(TrayState::default(), &labels);
-        assert_eq!(offline.len(), 7);
+        assert_eq!(offline.len(), 8);
         assert_eq!(offline[0], Entry::Status(labels.disconnected.clone()));
         assert_eq!(offline[2], Entry::Button(Action::Show, labels.show.clone()));
-        assert_eq!(offline[6], Entry::Button(Action::Quit, labels.quit.clone()));
+        assert_eq!(offline[7], Entry::Button(Action::Quit, labels.quit.clone()));
+        assert!(
+            matches!(
+                offline[5],
+                Entry::Toggle {
+                    action: Action::Dnd,
+                    enabled: true,
+                    checked: false,
+                    ..
+                }
+            ),
+            "Do Not Disturb works without a connection"
+        );
         assert!(matches!(
             offline[3],
             Entry::Toggle {
@@ -757,8 +831,17 @@ mod tests {
             talking: false,
             muted: true,
             deafened: false,
+            dnd: true,
         };
         let online = menu_model(muted, &labels);
+        assert!(matches!(
+            online[5],
+            Entry::Toggle {
+                action: Action::Dnd,
+                checked: true,
+                ..
+            }
+        ));
         assert_eq!(online[0], Entry::Status(labels.muted.clone()));
         assert!(matches!(
             online[3],
@@ -783,6 +866,7 @@ mod tests {
     #[test]
     fn menu_ids_map_to_actions() {
         assert_eq!(Action::from_id(MUTE), Some(Action::Mute));
+        assert_eq!(Action::from_id(DND), Some(Action::Dnd));
         assert_eq!(Action::from_id(QUIT), Some(Action::Quit));
         assert_eq!(Action::from_id("status"), None);
     }

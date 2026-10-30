@@ -161,6 +161,7 @@ mod tests {
         assert!(
             matches!(&items[3], MenuItem::Checkmark(c) if !c.enabled && c.label == labels.mute)
         );
-        assert!(matches!(&items[6], MenuItem::Standard(s) if s.enabled && s.label == labels.quit));
+        assert!(matches!(&items[5], MenuItem::Checkmark(c) if c.enabled && c.label == labels.dnd));
+        assert!(matches!(&items[7], MenuItem::Standard(s) if s.enabled && s.label == labels.quit));
     }
 }

@@ -9,6 +9,7 @@ mod deeplink;
 #[cfg(target_os = "linux")]
 mod desktop_entry;
 mod display;
+mod dnd;
 #[cfg(target_os = "linux")]
 mod gst_fallback;
 mod ingame_overlay;
@@ -173,6 +174,9 @@ fn specta_builder() -> Builder<tauri::Wry> {
             commands::changelog::changelog_close,
             commands::changelog::whats_new_mark_seen,
             notify::notify_message,
+            commands::dnd::dnd_state,
+            commands::dnd::dnd_set,
+            commands::dnd::dnd_set_follow_system,
             notify::notification_dismiss,
             commands::now_playing::now_playing_status,
             commands::now_playing::now_playing_cover,
@@ -240,6 +244,7 @@ fn specta_builder() -> Builder<tauri::Wry> {
             app::CloseRequested,
             profile::DefaultAvatarSkipped,
             notify::NotificationActivated,
+            commands::dnd::DndChanged,
             commands::now_playing::NowPlayingChanged,
             commands::now_gaming::NowGamingChanged,
             commands::positional::PositionalStatusChanged,
@@ -337,6 +342,7 @@ pub fn run() {
             start_engine(app.handle())?;
             start_window_and_autostart(app.handle());
             tray::init(app.handle());
+            dnd::init(app.handle());
             ingame_overlay_init(app.handle());
             deeplink::init(app.handle());
             #[cfg(target_os = "linux")]

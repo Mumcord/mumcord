@@ -2,6 +2,7 @@
   "show": "Näytä Mumcord",
   "mute": "Mykistä mikrofoni",
   "deafen": "Mykistä kuulokkeet",
+  "dnd": "Älä häiritse",
   "quit": "Lopeta",
   "disconnected": "Ei yhteyttä",
   "connecting": "Yhdistetään…",

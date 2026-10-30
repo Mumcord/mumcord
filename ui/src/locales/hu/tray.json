@@ -2,6 +2,7 @@
   "show": "Mumcord megjelenítése",
   "mute": "Mikrofon némítása",
   "deafen": "Süketítés",
+  "dnd": "Ne zavarjanak",
   "quit": "Kilépés",
   "disconnected": "Nincs kapcsolat",
   "connecting": "Csatlakozás…",

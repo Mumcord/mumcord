@@ -2,6 +2,7 @@
   "show": "Visa Mumcord",
   "mute": "Stäng av mikrofonen",
   "deafen": "Stäng av ljudet",
+  "dnd": "Stör ej",
   "quit": "Avsluta",
   "disconnected": "Inte ansluten",
   "connecting": "Ansluter…",

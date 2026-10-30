@@ -2,6 +2,7 @@
   "show": "Pokaži Mumcord",
   "mute": "Utišaj mikrofon",
   "deafen": "Izklopi zvok",
+  "dnd": "Ne moti",
   "quit": "Zapri",
   "disconnected": "Ni povezave",
   "connecting": "Povezovanje…",
