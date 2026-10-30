@@ -92,7 +92,10 @@
     "offerImages": "Nudi slike pune veličine",
     "offerImagesHint": "Dopusti drugima da učitaju tvoje originalne slike",
     "loadImages": "Učitavaj slike pune veličine",
-    "loadImagesHint": "Dohvaćaj originalne slike od drugih"
+    "loadImagesHint": "Dohvaćaj originalne slike od drugih",
+    "dnd": "Ne ometaj",
+    "dndHint": "Utišava zvukove i natpise obavijesti",
+    "dndSystemHint": "Uključeno putem načina Ne ometaj vaše radne površine"
   },
   "voice": {
     "line": "Glas: {{channel}} · {{server}}",
@@ -113,5 +116,11 @@
     "title": "Prekinuti vezu sa svim poslužiteljima?",
     "message": "Prekinuti vezu sa svih {{total}} poslužitelja?",
     "confirm": "Prekini"
+  },
+  "dnd": {
+    "label": "Ne ometaj",
+    "manual": "ručno",
+    "system": "Ne ometaj (sustav)",
+    "systemHint": "Isključite ga u postavkama obavijesti radne površine."
   }
 }

@@ -92,7 +92,10 @@
     "offerImages": "Offri immagini a dimensione intera",
     "offerImagesHint": "Permetti agli altri di caricare le tue immagini originali",
     "loadImages": "Carica immagini a dimensione intera",
-    "loadImagesHint": "Scarica le immagini originali degli altri"
+    "loadImagesHint": "Scarica le immagini originali degli altri",
+    "dnd": "Non disturbare",
+    "dndHint": "Silenzia suoni e banner delle notifiche",
+    "dndSystemHint": "Attivo tramite il Non disturbare del desktop"
   },
   "voice": {
     "line": "Voce: {{channel}} · {{server}}",
@@ -113,5 +116,11 @@
     "title": "Disconnettere da tutti i server?",
     "message": "Disconnettere da tutti i {{total}} server?",
     "confirm": "Disconnetti"
+  },
+  "dnd": {
+    "label": "Non disturbare",
+    "manual": "manuale",
+    "system": "Non disturbare (sistema)",
+    "systemHint": "Disattivalo nelle impostazioni delle notifiche del desktop."
   }
 }

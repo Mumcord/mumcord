@@ -618,5 +618,17 @@
     "releasePage": "Pagina della versione",
     "entries": "Voci: {{count}}",
     "englishNote": "L'elenco delle modifiche è scritto in inglese."
+  },
+  "dnd": {
+    "title": "Non disturbare",
+    "label": "Non disturbare",
+    "description": "Nessun suono o banner di notifica su nessun server. Voce e chat continuano a funzionare e i contatori dei non letti continuano a contare.",
+    "follow": "Segui il Non disturbare del sistema",
+    "followDescription": "Attiva Non disturbare ogni volta che il Non disturbare o la modalità Concentrazione del desktop è attiva.",
+    "detected": "Rilevato",
+    "detectedOn": "{{desktop}} · Non disturbare è attivo (sistema). Le modifiche vengono applicate subito.",
+    "detectedOff": "{{desktop}} · Non disturbare è disattivato. Le modifiche vengono applicate subito.",
+    "unavailable": "Non disponibile",
+    "unavailableText": "Mumcord non può leggere qui lo stato Non disturbare del sistema. Funziona solo il suo interruttore."
   }
 }

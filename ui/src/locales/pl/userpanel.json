@@ -92,7 +92,10 @@
     "offerImages": "Udostępniaj obrazy w pełnym rozmiarze",
     "offerImagesHint": "Pozwól innym pobierać Twoje oryginalne obrazy",
     "loadImages": "Wczytuj obrazy w pełnym rozmiarze",
-    "loadImagesHint": "Pobieraj oryginalne obrazy od innych"
+    "loadImagesHint": "Pobieraj oryginalne obrazy od innych",
+    "dnd": "Nie przeszkadzać",
+    "dndHint": "Wycisza dźwięki i banery powiadomień",
+    "dndSystemHint": "Włączone przez tryb Nie przeszkadzać pulpitu"
   },
   "voice": {
     "line": "Głos: {{channel}} · {{server}}",
@@ -113,5 +116,11 @@
     "title": "Rozłączyć ze wszystkimi serwerami?",
     "message": "Rozłączyć ze wszystkimi serwerami ({{total}})?",
     "confirm": "Rozłącz"
+  },
+  "dnd": {
+    "label": "Nie przeszkadzać",
+    "manual": "ręcznie",
+    "system": "Nie przeszkadzać (system)",
+    "systemHint": "Wyłącz go w ustawieniach powiadomień pulpitu."
   }
 }

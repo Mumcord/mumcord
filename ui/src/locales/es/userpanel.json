@@ -92,7 +92,10 @@
     "offerImages": "Ofrecer imágenes originales",
     "offerImagesHint": "Otros pueden cargar tus imágenes originales",
     "loadImages": "Cargar imágenes originales",
-    "loadImagesHint": "Obtener las imágenes originales de otros"
+    "loadImagesHint": "Obtener las imágenes originales de otros",
+    "dnd": "No molestar",
+    "dndHint": "Silencia los sonidos y avisos de notificación",
+    "dndSystemHint": "Activado por el modo No molestar de tu escritorio"
   },
   "voice": {
     "line": "Voz: {{channel}} · {{server}}",
@@ -113,5 +116,11 @@
     "title": "¿Desconectar de todos los servidores?",
     "message": "¿Desconectar de los {{total}} servidores?",
     "confirm": "Desconectar"
+  },
+  "dnd": {
+    "label": "No molestar",
+    "manual": "manual",
+    "system": "No molestar (sistema)",
+    "systemHint": "Desactívalo en los ajustes de notificaciones de tu escritorio."
   }
 }

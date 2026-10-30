@@ -92,7 +92,10 @@
     "offerImages": "Afbeeldingen op volledige grootte aanbieden",
     "offerImagesHint": "Laat anderen je originele afbeeldingen laden",
     "loadImages": "Afbeeldingen op volledige grootte laden",
-    "loadImagesHint": "Originele afbeeldingen van anderen ophalen"
+    "loadImagesHint": "Originele afbeeldingen van anderen ophalen",
+    "dnd": "Niet storen",
+    "dndHint": "Dempt meldingsgeluiden en -banners",
+    "dndSystemHint": "Aan via Niet storen van je bureaublad"
   },
   "voice": {
     "line": "Spraak: {{channel}} · {{server}}",
@@ -113,5 +116,11 @@
     "title": "Verbinding met alle servers verbreken?",
     "message": "Verbinding met alle {{total}} servers verbreken?",
     "confirm": "Verbreken"
+  },
+  "dnd": {
+    "label": "Niet storen",
+    "manual": "handmatig",
+    "system": "Niet storen (systeem)",
+    "systemHint": "Zet het uit in de meldingsinstellingen van je bureaublad."
   }
 }

@@ -92,7 +92,10 @@
     "offerImages": "Offer full-size images",
     "offerImagesHint": "Let others load your original images",
     "loadImages": "Load full-size images",
-    "loadImagesHint": "Fetch original images from others"
+    "loadImagesHint": "Fetch original images from others",
+    "dnd": "Do Not Disturb",
+    "dndHint": "Silences notification sounds and banners",
+    "dndSystemHint": "On through your desktop's Do Not Disturb"
   },
   "voice": {
     "line": "Voice: {{channel}} · {{server}}",
@@ -113,5 +116,11 @@
     "title": "Disconnect from all servers?",
     "message": "Disconnect from all {{total}} servers?",
     "confirm": "Disconnect"
+  },
+  "dnd": {
+    "label": "Do Not Disturb",
+    "manual": "manual",
+    "system": "Do Not Disturb (system)",
+    "systemHint": "Turn it off in your desktop's notification settings."
   }
 }

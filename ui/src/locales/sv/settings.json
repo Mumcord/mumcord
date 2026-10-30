@@ -615,5 +615,17 @@
     "releasePage": "Versionssida",
     "entries": "Poster: {{count}}",
     "englishNote": "Ändringsloggen är skriven på engelska."
+  },
+  "dnd": {
+    "title": "Stör ej",
+    "label": "Stör ej",
+    "description": "Inga ljud eller banderoller för aviseringar på någon server. Röst och chatt fortsätter att fungera och olästräknarna fortsätter att räkna.",
+    "follow": "Följ systemets Stör ej",
+    "followDescription": "Slår på Stör ej när skrivbordets Stör ej eller fokusläge är på.",
+    "detected": "Identifierat",
+    "detectedOn": "{{desktop}} · Stör ej är på (system). Ändringar fångas upp direkt.",
+    "detectedOff": "{{desktop}} · Stör ej är av. Ändringar fångas upp direkt.",
+    "unavailable": "Inte tillgängligt",
+    "unavailableText": "Mumcord kan inte läsa systemets Stör ej-läge här. Bara dess egen brytare fungerar."
   }
 }

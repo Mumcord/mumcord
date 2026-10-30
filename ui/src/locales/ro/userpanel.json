@@ -92,7 +92,10 @@
     "offerImages": "Oferă imagini la dimensiune completă",
     "offerImagesHint": "Lasă-i pe ceilalți să-ți încarce imaginile originale",
     "loadImages": "Încarcă imagini la dimensiune completă",
-    "loadImagesHint": "Preia imaginile originale de la ceilalți"
+    "loadImagesHint": "Preia imaginile originale de la ceilalți",
+    "dnd": "Nu deranja",
+    "dndHint": "Dezactivează sunetele și bannerele de notificare",
+    "dndSystemHint": "Activat prin modul Nu deranja al desktopului"
   },
   "voice": {
     "line": "Voce: {{channel}} · {{server}}",
@@ -113,5 +116,11 @@
     "title": "Te deconectezi de la toate serverele?",
     "message": "Te deconectezi de la toate cele {{total}} servere?",
     "confirm": "Deconectează"
+  },
+  "dnd": {
+    "label": "Nu deranja",
+    "manual": "manual",
+    "system": "Nu deranja (sistem)",
+    "systemHint": "Dezactivează-l în setările de notificări ale desktopului."
   }
 }

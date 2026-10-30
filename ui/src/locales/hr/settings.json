@@ -618,5 +618,17 @@
     "releasePage": "Stranica izdanja",
     "entries": "Unosi: {{count}}",
     "englishNote": "Popis promjena napisan je na engleskom."
+  },
+  "dnd": {
+    "title": "Ne ometaj",
+    "label": "Ne ometaj",
+    "description": "Bez zvukova i natpisa obavijesti ni na jednom poslužitelju. Glas i chat i dalje rade, a brojači nepročitanih i dalje broje.",
+    "follow": "Prati sustavski način Ne ometaj",
+    "followDescription": "Uključuje Ne ometaj kad god je na radnoj površini uključen način Ne ometaj ili Fokus.",
+    "detected": "Prepoznato",
+    "detectedOn": "{{desktop}} · Ne ometaj je uključeno (sustav). Promjene se primjenjuju odmah.",
+    "detectedOff": "{{desktop}} · Ne ometaj je isključeno. Promjene se primjenjuju odmah.",
+    "unavailable": "Nedostupno",
+    "unavailableText": "Mumcord ovdje ne može pročitati stanje načina Ne ometaj vašeg sustava. Radi samo njegov vlastiti prekidač."
   }
 }

@@ -92,7 +92,10 @@
     "offerImages": "Originalbilder anbieten",
     "offerImagesHint": "Andere dürfen deine Originalbilder laden",
     "loadImages": "Originalbilder laden",
-    "loadImagesHint": "Originalbilder von anderen abrufen"
+    "loadImagesHint": "Originalbilder von anderen abrufen",
+    "dnd": "Nicht stören",
+    "dndHint": "Stellt Benachrichtigungstöne und -banner stumm",
+    "dndSystemHint": "An über „Nicht stören“ deines Desktops"
   },
   "voice": {
     "line": "Sprache: {{channel}} · {{server}}",
@@ -113,5 +116,11 @@
     "title": "Von allen Servern trennen?",
     "message": "Von allen {{total}} Servern trennen?",
     "confirm": "Trennen"
+  },
+  "dnd": {
+    "label": "Nicht stören",
+    "manual": "manuell",
+    "system": "Nicht stören (System)",
+    "systemHint": "Schalte es in den Benachrichtigungseinstellungen deines Desktops aus."
   }
 }

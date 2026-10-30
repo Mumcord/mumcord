@@ -92,7 +92,10 @@
     "offerImages": "Oferecer imagens em tamanho original",
     "offerImagesHint": "Permite que os outros carreguem as tuas imagens originais",
     "loadImages": "Carregar imagens em tamanho original",
-    "loadImagesHint": "Obter imagens originais dos outros"
+    "loadImagesHint": "Obter imagens originais dos outros",
+    "dnd": "Não incomodar",
+    "dndHint": "Silencia sons e faixas de notificação",
+    "dndSystemHint": "Ativado pelo Não incomodar do ambiente de trabalho"
   },
   "voice": {
     "line": "Voz: {{channel}} · {{server}}",
@@ -113,5 +116,11 @@
     "title": "Desligar de todos os servidores?",
     "message": "Desligar dos {{total}} servidores?",
     "confirm": "Desligar"
+  },
+  "dnd": {
+    "label": "Não incomodar",
+    "manual": "manual",
+    "system": "Não incomodar (sistema)",
+    "systemHint": "Desative-o nas definições de notificações do ambiente de trabalho."
   }
 }

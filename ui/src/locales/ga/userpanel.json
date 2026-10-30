@@ -92,7 +92,10 @@
     "offerImages": "Tairg íomhánna ar a méid iomlán",
     "offerImagesHint": "Lig do dhaoine eile do bhuníomhánna a luchtú",
     "loadImages": "Luchtaigh íomhánna ar a méid iomlán",
-    "loadImagesHint": "Faigh buníomhánna ó dhaoine eile"
+    "loadImagesHint": "Faigh buníomhánna ó dhaoine eile",
+    "dnd": "Ná Cuir Isteach",
+    "dndHint": "Múchann sé fuaimeanna agus meirgí fógraí",
+    "dndSystemHint": "Ar siúl trí Ná Cuir Isteach do dheisce"
   },
   "voice": {
     "line": "Guth: {{channel}} · {{server}}",
@@ -113,5 +116,11 @@
     "title": "An ndícheanglóidh tú ó gach freastalaí?",
     "message": "An ndícheanglóidh tú ó na {{total}} freastalaí go léir?",
     "confirm": "Dícheangail"
+  },
+  "dnd": {
+    "label": "Ná Cuir Isteach",
+    "manual": "de láimh",
+    "system": "Ná Cuir Isteach (córas)",
+    "systemHint": "Múch é i socruithe fógraí do dheisce."
   }
 }
