@@ -1383,6 +1383,24 @@ impl Inner {
         }
     }
 
+    /// Stops the voice pipeline of a connection that ended. A kick or ban plays its sound
+    /// (#205) on its own short-lived player, like the hang-up sound, so the teardown cannot
+    /// cut it off.
+    fn stop_pipeline_after_removal(&self, core: &mut Core, reason: &DisconnectReason) {
+        let samples = match reason {
+            DisconnectReason::Kicked { actor, ban, .. } => {
+                self.events.sounds().removed(*actor, *ban)
+            }
+            _ => None,
+        };
+        self.stop_pipeline(core);
+        if let Some(samples) = samples
+            && let Some(audio) = core.audio.as_ref()
+        {
+            audio.play_tail(&self.rt, &samples);
+        }
+    }
+
     /// Devices are open only while a server is in a slot or the mic test runs.
     fn release_audio_if_idle(&self, core: &mut Core) {
         if core.slots.is_empty() && core.mic_test.is_none() && core.pipeline.is_none() {
@@ -2065,7 +2083,7 @@ impl Inner {
             return Ended::Stale;
         }
         if core.audio_server == Some(server_id) {
-            self.stop_pipeline(&mut core);
+            self.stop_pipeline_after_removal(&mut core, &reason);
         }
         if let Some(slot) = core.slots.get_mut(&server_id) {
             slot.session = None;

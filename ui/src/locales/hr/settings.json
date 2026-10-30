@@ -280,6 +280,8 @@
     "selfMute": "Isključiš ili uključiš svoj mikrofon",
     "selfDeaf": "Isključiš ili uključiš svoj zvuk",
     "hangUp": "Odspojiš se s poslužitelja",
+    "kicked": "Izbačen si s poslužitelja",
+    "banned": "Zabranjen ti je pristup poslužitelju",
     "messages": "Nova poruka u praćenom kanalu ili privatnom chatu",
     "mention": "Zvuk kad te netko spomene",
     "mentionNotify": "Obavijest kad te netko spomene",

@@ -279,6 +279,8 @@
     "selfMute": "Du slår din mikrofon fra eller til",
     "selfDeaf": "Du slår din lyd fra eller til",
     "hangUp": "Du afbryder fra en server",
+    "kicked": "Du bliver smidt ud af en server",
+    "banned": "Du bliver udelukket fra en server",
     "messages": "Ny besked i en fulgt kanal eller privat chat",
     "mention": "Lyd ved omtale",
     "mentionNotify": "Giv besked ved omtale",

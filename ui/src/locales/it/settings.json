@@ -280,6 +280,8 @@
     "selfMute": "Attivi o disattivi il tuo microfono",
     "selfDeaf": "Attivi o disattivi il tuo audio",
     "hangUp": "Ti disconnetti da un server",
+    "kicked": "Vieni espulso da un server",
+    "banned": "Vieni bannato da un server",
     "messages": "Nuovo messaggio in un canale seguito o in una chat privata",
     "mention": "Suono quando vieni menzionato",
     "mentionNotify": "Notifica quando vieni menzionato",
