@@ -260,5 +260,28 @@
     "tooLarge": "Tá an cód rómhór le híoslódáil.",
     "fileType": "Comhad cóid",
     "plainText": "Gnáth-théacs"
+  },
+  "mumbleCard": {
+    "addServer": "Cuir leis na freastalaithe",
+    "channel": "Cainéal {{channel}}",
+    "copy": "Copy link",
+    "copyLabel": "Copy the link to {{server}}",
+    "figures": "Ping {{ping}} ms · {{users}} as {{max}} úsáideoir · freastalaí {{version}}",
+    "goToChannel": "Téigh go cainéal",
+    "join": "Join",
+    "joinLabel": "Join {{server}}",
+    "joined": "Joined",
+    "label": "Cárta freastalaí do {{server}}",
+    "privacyOff": "Tá luachanna an fhreastalaí múchta sna socruithe",
+    "querying": "Seiceáil an fhreastalaí…",
+    "retry": "Seiceáil arís",
+    "retryLabel": "Seiceáil arís {{server}}",
+    "server": "{{server}}",
+    "unreachable": "Níodar truy sa freastalaí",
+    "warning_few": "Taisceann {{count}} nasc sa teachtaireacht seo na credentiais",
+    "warning_many": "Taisceann {{count}} nasc sa teachtaireacht seo na credentiais",
+    "warning_one": "Taisceann {{count}} nasc sa teachtaireacht seo na credentiais",
+    "warning_other": "Taisceann {{count}} nasc sa teachtaireacht seo na credentiais",
+    "warning_two": "Taisceann {{count}} nasc sa teachtaireacht seo na credentiais"
   }
 }

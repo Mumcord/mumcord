@@ -313,16 +313,15 @@ function Body({ message, tabIndex, previews, onImageClick, clickablePeople, onJu
       />
       <FullImageBars html={cleaned} />
       <ThemeCard html={cleaned} tabIndex={tabIndex} />
-      {previews ? (
-        <LinkPreviews
-          messageId={message.id}
-          dismissed={message.dismissedPreviews}
-          html={cleaned}
-          body={html}
-          tabIndex={tabIndex}
-          onImageClick={onImageClick}
-        />
-      ) : null}
+      <LinkPreviews
+        messageId={message.id}
+        dismissed={message.dismissedPreviews}
+        html={cleaned}
+        body={html}
+        linkPreviews={previews}
+        tabIndex={tabIndex}
+        onImageClick={onImageClick}
+      />
     </>
   );
 }

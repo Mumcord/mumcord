@@ -14,10 +14,14 @@ import {
   isImageLink,
   cardPlayer,
   loadPreview,
+  MAX_PREVIEWS,
   previewableLinks,
   safeImage,
   type ImageClickHandler,
 } from "./links";
+import { credentialLinks, mumbleLinks } from "./mumbleLink";
+
+import { MumbleLinkCard } from "./MumbleLinkCard";
 import { openInBrowser } from "./openLink";
 import { DismissButton, OpenButton } from "./cardButtons";
 import { InlineImageCard } from "./InlineImageCard";
@@ -33,6 +37,8 @@ interface LinkPreviewsProps {
   html: string;
   /** Message HTML as the engine delivered it; still holds external `<img src>` URLs. */
   body: string;
+  /** "Link previews in chat": without it only the `mumble://` card is shown, without figures. */
+  linkPreviews: boolean;
   /** Roving tab stop of the message the cards belong to. */
   tabIndex: number;
   /** Click on an inline image; without it the image opens in the browser. */
@@ -48,20 +54,38 @@ export function LinkPreviews({
   dismissed,
   html,
   body,
+  linkPreviews,
   tabIndex,
   onImageClick,
 }: LinkPreviewsProps) {
   const links = useMemo(() => previewableLinks(html), [html]);
   const images = useMemo(() => externalImages(body), [body]);
+  const mumble = useMemo(() => mumbleLinks(body), [body]);
   const hidden = useDismissedPreviews(messageId, dismissed);
-  const shown = [...images, ...links.filter((url) => !images.includes(url))].filter(
-    (url) => !hidden.has(url),
-  );
+  // A `mumble://` link always gets its card, because the card is the message's own content; the
+  // web previews need the setting (issue #175).
+  const shown = [
+    ...mumble,
+    ...(linkPreviews ? [...images, ...links.filter((url) => !images.includes(url))] : []),
+  ]
+    .filter((url) => !hidden.has(url))
+    .slice(0, MAX_PREVIEWS);
   if (shown.length === 0) return null;
+  const credentials = credentialLinks(mumble);
   return (
     <div className="link-previews">
       {shown.map((url) =>
-        images.includes(url) || isImageLink(url) ? (
+        mumble.includes(url) ? (
+          <MumbleLinkCard
+            key={url}
+            url={url}
+            credentialLinks={credentials}
+            tabIndex={tabIndex}
+            onDismiss={() => {
+              dismissPreview(messageId, url);
+            }}
+          />
+        ) : images.includes(url) || isImageLink(url) ? (
           <InlineImageCard
             key={url}
             url={url}

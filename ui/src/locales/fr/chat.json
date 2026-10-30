@@ -252,5 +252,26 @@
     "tooLarge": "Le code est trop volumineux pour être téléchargé.",
     "fileType": "Fichier de code",
     "plainText": "Texte brut"
+  },
+  "mumbleCard": {
+    "addServer": "Ajouter aux serveurs",
+    "channel": "Canal {{channel}}",
+    "copy": "Copier le lien",
+    "copyLabel": "Copier le lien vers {{server}}",
+    "figures": "Ping {{ping}} ms · {{users}} sur {{max}} utilisateurs · serveur {{version}}",
+    "goToChannel": "Aller au canal",
+    "join": "Rejoindre",
+    "joinLabel": "Rejoindre {{server}}",
+    "joined": "Rejoint",
+    "label": "Carte du serveur {{server}}",
+    "privacyOff": "Les valeurs du serveur sont désactivées dans les paramètres",
+    "querying": "Vérification du serveur…",
+    "retry": "Vérifier à nouveau",
+    "retryLabel": "Vérifier à nouveau {{server}}",
+    "server": "{{server}}",
+    "unreachable": "Serveur injoignable",
+    "warning_many": "{{count}} millions de liens dans ce message affichent des identifiants",
+    "warning_one": "{{count}} lien dans ce message affiche des identifiants",
+    "warning_other": "{{count}} liens dans ce message affichent des identifiants"
   }
 }
