@@ -1,9 +1,11 @@
-import { useEffect, useId, useRef, useState } from "react";
+import { useContext, useEffect, useId, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import type { ConnectionStats } from "../../bindings/commands";
 import { windowMinutes } from "./audioHealth";
 import { AudioHealthDetails } from "./AudioHealthDetails";
+import { ViewContext } from "../../app/view";
 import { AudioHealthRating } from "./AudioHealthRating";
+import { ConnectionQuickPanel } from "./ConnectionQuickPanel";
 import { useConnectionStats } from "./useConnectionStats";
 import "./connection.css";
 
@@ -72,7 +74,10 @@ function Panel({ open }: { open: boolean }) {
  */
 export function ConnectionInfo({ className }: { className?: string }) {
   const { t } = useTranslation("connection");
-  const [open, setOpen] = useState(false);
+  // "stats" is the statistics popover, "quick" the voice quality panel (right-click or menu key).
+  const [mode, setMode] = useState<"stats" | "quick" | null>(null);
+  const open = mode !== null;
+  const view = useContext(ViewContext);
   const panelId = useId();
   const titleId = useId();
   const wrapper = useRef<HTMLDivElement>(null);
@@ -83,13 +88,13 @@ export function ConnectionInfo({ className }: { className?: string }) {
     if (!open) return;
     panel.current?.focus();
     const onPointerDown = (event: PointerEvent) => {
-      if (event.target instanceof Node && !wrapper.current?.contains(event.target)) setOpen(false);
+      if (event.target instanceof Node && !wrapper.current?.contains(event.target)) setMode(null);
     };
     // Escape closes from anywhere while open, returning focus to the button.
     const onKeyDown = (event: KeyboardEvent) => {
       if (event.key !== "Escape") return;
       event.preventDefault();
-      setOpen(false);
+      setMode(null);
       button.current?.focus();
     };
     document.addEventListener("pointerdown", onPointerDown);
@@ -111,7 +116,19 @@ export function ConnectionInfo({ className }: { className?: string }) {
         aria-expanded={open}
         aria-controls={open ? panelId : undefined}
         onClick={() => {
-          setOpen((o) => !o);
+          setMode((m) => (m === "stats" ? null : "stats"));
+        }}
+        onContextMenu={(event) => {
+          event.preventDefault();
+          setMode("quick");
+        }}
+        onKeyDown={(event) => {
+          // The menu key and Shift+F10 normally fire a context menu event; handle them directly so
+          // it works the same everywhere.
+          if (event.key === "ContextMenu" || (event.shiftKey && event.key === "F10")) {
+            event.preventDefault();
+            setMode("quick");
+          }
         }}
       >
         <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" focusable="false">
@@ -124,6 +141,20 @@ export function ConnectionInfo({ className }: { className?: string }) {
           />
         </svg>
       </button>
+      <button
+        type="button"
+        className={`${className ?? ""} connection-info__more`}
+        aria-label={t("quick.open")}
+        aria-haspopup="dialog"
+        aria-expanded={mode === "quick"}
+        onClick={() => {
+          setMode((m) => (m === "quick" ? null : "quick"));
+        }}
+      >
+        <svg viewBox="0 0 24 24" width="10" height="10" aria-hidden="true" focusable="false">
+          <path d="M6 9l6 6 6-6" fill="none" stroke="currentColor" strokeWidth="3" />
+        </svg>
+      </button>
       {open ? (
         <div
           ref={panel}
@@ -134,9 +165,18 @@ export function ConnectionInfo({ className }: { className?: string }) {
           className="connection-info__panel"
         >
           <h2 id={titleId} className="connection-info__title">
-            {t("title")}
+            {mode === "quick" ? t("quick.title") : t("title")}
           </h2>
-          <Panel open={open} />
+          {mode === "quick" ? (
+            <ConnectionQuickPanel
+              onOpenVoiceSettings={() => {
+                setMode(null);
+                view?.openAudioSettings();
+              }}
+            />
+          ) : (
+            <Panel open={open} />
+          )}
         </div>
       ) : null}
     </div>

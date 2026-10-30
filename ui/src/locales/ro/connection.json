@@ -59,5 +59,17 @@
     "perMinute": "Ultimele {{minutes}} min: {{value}} pe minut.",
     "concealedShare": "Ultimele {{minutes}} min: {{value}} % din cadrele primite.",
     "processingMax": "Ultimele {{minutes}} min: max. {{value}} ms din bugetul de {{budget}} ms pe cadru."
+  },
+  "quick": {
+    "open": "Calitatea vocii",
+    "title": "Calitatea vocii",
+    "status": "Ping {{latency}}, pierderi {{loss}}",
+    "effective": "Se trimite acum: {{value}} kbit/s",
+    "lowLatency": "Mod cu latență redusă",
+    "lowLatencyHint": "Trimite pachete mai scurte pentru o întârziere mai mică. Folosește mai multă lățime de bandă.",
+    "lowLatencyComingSoon": "În curând",
+    "bandwidth": "Lățime de bandă estimată: {{value}} kbit/s",
+    "bandwidthHint": "Modul cu latență redusă (pachete de 10 ms) ar necesita cu aproximativ {{value}} kbit/s mai mult pentru antetele pachetelor.",
+    "voiceSettings": "Setări voce…"
   }
 }

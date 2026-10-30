@@ -61,5 +61,17 @@
     "perMinute": "Na {{minutes}} nóim. is déanaí: {{value}} sa nóiméad.",
     "concealedShare": "Na {{minutes}} nóim. is déanaí: {{value}} % de na frámaí a fuarthas.",
     "processingMax": "Na {{minutes}} nóim. is déanaí: uas. {{value}} ms as buiséad {{budget}} ms an fhráma."
+  },
+  "quick": {
+    "open": "Cáilíocht gutha",
+    "title": "Cáilíocht gutha",
+    "status": "Ping {{latency}}, caillteanas {{loss}}",
+    "effective": "Á sheoladh anois: {{value}} kbit/s",
+    "lowLatency": "Mód moill íseal",
+    "lowLatencyHint": "Seolann sé paicéid níos giorra le haghaidh moille níos lú. Úsáideann sé níos mó leithead banda.",
+    "lowLatencyComingSoon": "Ag teacht go luath",
+    "bandwidth": "Leithead banda measta: {{value}} kbit/s",
+    "bandwidthHint": "Bheadh thart ar {{value}} kbit/s breise ag teastáil ón mód moill íseal (paicéid 10 ms) do cheanntásca paicéad.",
+    "voiceSettings": "Socruithe gutha…"
   }
 }

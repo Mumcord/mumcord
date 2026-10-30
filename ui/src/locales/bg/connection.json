@@ -58,5 +58,17 @@
     "perMinute": "Последните {{minutes}} мин: {{value}} на минута.",
     "concealedShare": "Последните {{minutes}} мин: {{value}} % от получените кадри.",
     "processingMax": "Последните {{minutes}} мин: макс. {{value}} ms от {{budget}} ms бюджет на кадър."
+  },
+  "quick": {
+    "open": "Качество на гласа",
+    "title": "Качество на гласа",
+    "status": "Пинг {{latency}}, загуби {{loss}}",
+    "effective": "В момента се изпраща: {{value}} kbit/s",
+    "lowLatency": "Режим с ниско закъснение",
+    "lowLatencyHint": "Изпраща по-къси пакети за по-малко закъснение. Използва повече честотна лента.",
+    "lowLatencyComingSoon": "Очаквайте скоро",
+    "bandwidth": "Прогнозна честотна лента: {{value}} kbit/s",
+    "bandwidthHint": "Режимът с ниско закъснение (пакети от 10 ms) би изисквал около {{value}} kbit/s повече за заглавията на пакетите.",
+    "voiceSettings": "Настройки на гласа…"
   }
 }

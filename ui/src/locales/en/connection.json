@@ -58,5 +58,17 @@
     "perMinute": "Last {{minutes}} min: {{value}} per minute.",
     "concealedShare": "Last {{minutes}} min: {{value}} % of received frames.",
     "processingMax": "Last {{minutes}} min: max {{value}} ms of the {{budget}} ms frame budget."
+  },
+  "quick": {
+    "open": "Voice quality",
+    "title": "Voice quality",
+    "status": "Ping {{latency}}, loss {{loss}}",
+    "effective": "Sending now: {{value}} kbit/s",
+    "lowLatency": "Low-latency mode",
+    "lowLatencyHint": "Sends shorter packets for less delay. Uses more bandwidth.",
+    "lowLatencyComingSoon": "Coming soon",
+    "bandwidth": "Estimated bandwidth: {{value}} kbit/s",
+    "bandwidthHint": "Low-latency mode (10 ms packets) would need about {{value}} kbit/s more for packet headers.",
+    "voiceSettings": "Voice settings…"
   }
 }

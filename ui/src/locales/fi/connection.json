@@ -58,5 +58,17 @@
     "perMinute": "Viimeiset {{minutes}} min: {{value}} minuutissa.",
     "concealedShare": "Viimeiset {{minutes}} min: {{value}} % vastaanotetuista kehyksistä.",
     "processingMax": "Viimeiset {{minutes}} min: enint. {{value}} ms {{budget}} ms:n kehysbudjetista."
+  },
+  "quick": {
+    "open": "Äänenlaatu",
+    "title": "Äänenlaatu",
+    "status": "Viive {{latency}}, hävikki {{loss}}",
+    "effective": "Lähetetään nyt: {{value}} kbit/s",
+    "lowLatency": "Pienen viiveen tila",
+    "lowLatencyHint": "Lähettää lyhyempiä paketteja pienemmän viiveen vuoksi. Käyttää enemmän kaistaa.",
+    "lowLatencyComingSoon": "Tulossa pian",
+    "bandwidth": "Arvioitu kaistanleveys: {{value}} kbit/s",
+    "bandwidthHint": "Pienen viiveen tila (10 ms:n paketit) tarvitsisi noin {{value}} kbit/s enemmän pakettien otsakkeisiin.",
+    "voiceSettings": "Ääniasetukset…"
   }
 }

@@ -61,3 +61,42 @@
   color: var(--color-text-muted);
   font-size: var(--font-size-sm);
 }
+
+.connection-info__more {
+  padding-inline: var(--space-1);
+}
+
+.connection-quick {
+  display: grid;
+  gap: var(--space-2);
+  font-size: var(--font-size-sm);
+}
+
+.connection-quick__status {
+  margin: 0;
+  color: var(--color-text-muted);
+}
+
+.connection-quick__bandwidth {
+  display: grid;
+  gap: var(--space-1);
+}
+
+.connection-quick__bandwidth meter {
+  width: 100%;
+}
+
+.connection-quick__link {
+  justify-self: start;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--color-accent-text);
+  font: inherit;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.connection-quick__link:focus-visible {
+  outline: 2px solid var(--color-focus);
+}

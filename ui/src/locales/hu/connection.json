@@ -58,5 +58,17 @@
     "perMinute": "Utolsó {{minutes}} perc: {{value}} percenként.",
     "concealedShare": "Utolsó {{minutes}} perc: a fogadott keretek {{value}} %-a.",
     "processingMax": "Utolsó {{minutes}} perc: max. {{value}} ms a {{budget}} ms-os keretkeretből."
+  },
+  "quick": {
+    "open": "Hangminőség",
+    "title": "Hangminőség",
+    "status": "Ping {{latency}}, veszteség {{loss}}",
+    "effective": "Jelenleg küldött: {{value}} kbit/s",
+    "lowLatency": "Alacsony késleltetésű mód",
+    "lowLatencyHint": "Rövidebb csomagokat küld a kisebb késleltetésért. Több sávszélességet használ.",
+    "lowLatencyComingSoon": "Hamarosan",
+    "bandwidth": "Becsült sávszélesség: {{value}} kbit/s",
+    "bandwidthHint": "Az alacsony késleltetésű mód (10 ms-os csomagok) körülbelül {{value}} kbit/s-mal többet igényelne a csomagfejlécekre.",
+    "voiceSettings": "Hangbeállítások…"
   }
 }

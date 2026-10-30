@@ -59,5 +59,17 @@
     "perMinute": "Pēdējās {{minutes}} min: {{value}} minūtē.",
     "concealedShare": "Pēdējās {{minutes}} min: {{value}} % no saņemtajiem kadriem.",
     "processingMax": "Pēdējās {{minutes}} min: maks. {{value}} ms no {{budget}} ms kadra budžeta."
+  },
+  "quick": {
+    "open": "Balss kvalitāte",
+    "title": "Balss kvalitāte",
+    "status": "Ping {{latency}}, zudumi {{loss}}",
+    "effective": "Pašlaik tiek sūtīts: {{value}} kbit/s",
+    "lowLatency": "Zemas aizkaves režīms",
+    "lowLatencyHint": "Sūta īsākas pakotnes, lai aizkave būtu mazāka. Izmanto vairāk joslas platuma.",
+    "lowLatencyComingSoon": "Drīzumā",
+    "bandwidth": "Paredzamais joslas platums: {{value}} kbit/s",
+    "bandwidthHint": "Zemas aizkaves režīmam (10 ms pakotnes) pakotņu galvenēm vajadzētu aptuveni par {{value}} kbit/s vairāk.",
+    "voiceSettings": "Balss iestatījumi…"
   }
 }

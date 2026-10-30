@@ -58,5 +58,17 @@
     "perMinute": "Viimased {{minutes}} min: {{value}} minutis.",
     "concealedShare": "Viimased {{minutes}} min: {{value}} % vastuvõetud kaadritest.",
     "processingMax": "Viimased {{minutes}} min: max {{value}} ms {{budget}} ms kaadrieelarvest."
+  },
+  "quick": {
+    "open": "Hääle kvaliteet",
+    "title": "Hääle kvaliteet",
+    "status": "Ping {{latency}}, kadu {{loss}}",
+    "effective": "Praegu saadetakse: {{value}} kbit/s",
+    "lowLatency": "Väikese viivitusega režiim",
+    "lowLatencyHint": "Saadab lühemaid pakette väiksema viivituse jaoks. Kasutab rohkem ribalaiust.",
+    "lowLatencyComingSoon": "Tulekul",
+    "bandwidth": "Hinnanguline ribalaius: {{value}} kbit/s",
+    "bandwidthHint": "Väikese viivitusega režiim (10 ms paketid) vajaks paketipäisteks umbes {{value}} kbit/s rohkem.",
+    "voiceSettings": "Hääleseaded…"
   }
 }

@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Added
+
+- Right-clicking the connection info button (or pressing the menu key / Shift+F10 on it, or clicking the small arrow next to it) opens a **Voice quality** quick panel: the bitrate slider with the server limit and the bitrate being sent right now, the Music quality switch (both are the same settings as in Settings > Audio and are saved at once), the estimated bandwidth including packet headers against the server limit, the audio health rating, and a **Voice settings…** link. The Low-latency mode row is shown as "Coming soon" until that mode exists (#155)
+
 ## [0.4.4] - 2026-10-30
 
 ### Added

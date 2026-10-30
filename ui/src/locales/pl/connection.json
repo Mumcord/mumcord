@@ -60,5 +60,17 @@
     "perMinute": "Ostatnie {{minutes}} min: {{value}} na minutę.",
     "concealedShare": "Ostatnie {{minutes}} min: {{value}} % odebranych ramek.",
     "processingMax": "Ostatnie {{minutes}} min: maks. {{value}} ms z budżetu {{budget}} ms na ramkę."
+  },
+  "quick": {
+    "open": "Jakość głosu",
+    "title": "Jakość głosu",
+    "status": "Ping {{latency}}, utrata {{loss}}",
+    "effective": "Aktualnie wysyłane: {{value}} kbit/s",
+    "lowLatency": "Tryb niskich opóźnień",
+    "lowLatencyHint": "Wysyła krótsze pakiety, aby zmniejszyć opóźnienie. Zużywa więcej przepustowości.",
+    "lowLatencyComingSoon": "Wkrótce",
+    "bandwidth": "Szacowana przepustowość: {{value}} kbit/s",
+    "bandwidthHint": "Tryb niskich opóźnień (pakiety po 10 ms) potrzebowałby około {{value}} kbit/s więcej na nagłówki pakietów.",
+    "voiceSettings": "Ustawienia głosu…"
   }
 }

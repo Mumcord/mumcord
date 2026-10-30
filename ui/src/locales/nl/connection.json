@@ -58,5 +58,17 @@
     "perMinute": "Laatste {{minutes}} min: {{value}} per minuut.",
     "concealedShare": "Laatste {{minutes}} min: {{value}} % van de ontvangen frames.",
     "processingMax": "Laatste {{minutes}} min: max. {{value}} ms van {{budget}} ms framebudget."
+  },
+  "quick": {
+    "open": "Spraakkwaliteit",
+    "title": "Spraakkwaliteit",
+    "status": "Ping {{latency}}, verlies {{loss}}",
+    "effective": "Nu verzonden: {{value}} kbit/s",
+    "lowLatency": "Modus voor lage latentie",
+    "lowLatencyHint": "Verstuurt kortere pakketten voor minder vertraging. Gebruikt meer bandbreedte.",
+    "lowLatencyComingSoon": "Binnenkort beschikbaar",
+    "bandwidth": "Geschatte bandbreedte: {{value}} kbit/s",
+    "bandwidthHint": "De modus voor lage latentie (pakketten van 10 ms) zou ongeveer {{value}} kbit/s meer nodig hebben voor pakketkoppen.",
+    "voiceSettings": "Spraakinstellingen…"
   }
 }

@@ -58,5 +58,17 @@
     "perMinute": "Senaste {{minutes}} min: {{value}} per minut.",
     "concealedShare": "Senaste {{minutes}} min: {{value}} % av mottagna ramar.",
     "processingMax": "Senaste {{minutes}} min: max {{value}} ms av {{budget}} ms rambudget."
+  },
+  "quick": {
+    "open": "Röstkvalitet",
+    "title": "Röstkvalitet",
+    "status": "Ping {{latency}}, förlust {{loss}}",
+    "effective": "Skickas nu: {{value}} kbit/s",
+    "lowLatency": "Läge för låg fördröjning",
+    "lowLatencyHint": "Skickar kortare paket för mindre fördröjning. Använder mer bandbredd.",
+    "lowLatencyComingSoon": "Kommer snart",
+    "bandwidth": "Uppskattad bandbredd: {{value}} kbit/s",
+    "bandwidthHint": "Läget för låg fördröjning (paket på 10 ms) skulle behöva ungefär {{value}} kbit/s mer för paketrubriker.",
+    "voiceSettings": "Röstinställningar…"
   }
 }

@@ -60,5 +60,17 @@
     "perMinute": "Zadnjih {{minutes}} min: {{value}} na minuto.",
     "concealedShare": "Zadnjih {{minutes}} min: {{value}} % prejetih okvirjev.",
     "processingMax": "Zadnjih {{minutes}} min: največ {{value}} ms od {{budget}} ms na okvir."
+  },
+  "quick": {
+    "open": "Kakovost glasu",
+    "title": "Kakovost glasu",
+    "status": "Ping {{latency}}, izguba {{loss}}",
+    "effective": "Trenutno se pošilja: {{value}} kbit/s",
+    "lowLatency": "Način nizke zakasnitve",
+    "lowLatencyHint": "Pošilja krajše pakete za manjšo zakasnitev. Porabi več pasovne širine.",
+    "lowLatencyComingSoon": "Kmalu",
+    "bandwidth": "Ocenjena pasovna širina: {{value}} kbit/s",
+    "bandwidthHint": "Način nizke zakasnitve (paketi po 10 ms) bi za glave paketov potreboval približno {{value}} kbit/s več.",
+    "voiceSettings": "Nastavitve glasu…"
   }
 }

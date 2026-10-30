@@ -60,5 +60,17 @@
     "perMinute": "Posledných {{minutes}} min: {{value}} za minútu.",
     "concealedShare": "Posledných {{minutes}} min: {{value}} % prijatých rámcov.",
     "processingMax": "Posledných {{minutes}} min: max. {{value}} ms z rozpočtu {{budget}} ms na rámec."
+  },
+  "quick": {
+    "open": "Kvalita hlasu",
+    "title": "Kvalita hlasu",
+    "status": "Ping {{latency}}, strata {{loss}}",
+    "effective": "Práve sa odosiela: {{value}} kbit/s",
+    "lowLatency": "Režim nízkej latencie",
+    "lowLatencyHint": "Posiela kratšie pakety pre menšie oneskorenie. Spotrebuje viac šírky pásma.",
+    "lowLatencyComingSoon": "Čoskoro",
+    "bandwidth": "Odhadovaná šírka pásma: {{value}} kbit/s",
+    "bandwidthHint": "Režim nízkej latencie (pakety po 10 ms) by potreboval približne o {{value}} kbit/s viac na hlavičky paketov.",
+    "voiceSettings": "Nastavenia hlasu…"
   }
 }
