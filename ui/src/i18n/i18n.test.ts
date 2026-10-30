@@ -68,6 +68,42 @@ describe("translation files", () => {
       expect(empty).toEqual([]);
     }
   });
+
+  // The server info dialog shipped with English text copied into every language (#207).
+  // Keys that are legitimately the same in some languages (units, symbols, loanwords) are exempt.
+  const SAME_IN_SOME_LANGUAGES = new Set([
+    "none",
+    "sha256",
+    "ping",
+    "versionOnly",
+    "name",
+    "no",
+    "tlsValid",
+    "version",
+    "release",
+    "codecs",
+    "transport",
+    "tlsStatus",
+    "serverSection",
+    "usersOf",
+    "mumcordUsersOf",
+    "validRange",
+    "permissionBan",
+    "permissionMove",
+    "permissionKick",
+    "permissionListen",
+  ]);
+  it.each(SUPPORTED_LANGUAGES.filter((language) => language !== "en"))(
+    "%s translates the server info dialog",
+    (language) => {
+      const info = (bundles.en.servers as { serverInfo: Record<string, string> }).serverInfo;
+      const own = (bundles[language].servers as { serverInfo: Record<string, string> }).serverInfo;
+      const untranslated = Object.keys(info).filter(
+        (key) => own[key] === info[key] && !SAME_IN_SOME_LANGUAGES.has(key),
+      );
+      expect(untranslated).toEqual([]);
+    },
+  );
 });
 
 describe("language selection", () => {
