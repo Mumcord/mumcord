@@ -34,6 +34,25 @@ beforeAll(async () => {
   await applyLanguage("en");
 });
 
+describe("Composer link preview", () => {
+  it("shows the card of a `mumble://` link before it is sent, without its credentials", async () => {
+    const { input } = renderComposer();
+    type(input, "join mumble://Maya:secret@voice.example.org:64739/Raid", 0);
+    const card = await screen.findByRole("article", { name: "Server card for voice.example.org" });
+    expect(card).toHaveTextContent("Channel Raid");
+    expect(card.textContent).not.toContain("secret");
+    // Nothing is joined from the preview: the card in the composer has no buttons.
+    expect(within(card).queryByRole("button")).toBeNull();
+  });
+
+  it("shows no card for a link that is not a server link", async () => {
+    const { input } = renderComposer();
+    type(input, "mumble:///Channel", 0);
+    await new Promise((resolve) => setTimeout(resolve, 50));
+    expect(screen.queryByRole("article", { name: /Server card/ })).toBeNull();
+  });
+});
+
 describe("Composer formatting", () => {
   it("wraps the selection in bold with Ctrl+B and keeps it selected", () => {
     const { input } = renderComposer();

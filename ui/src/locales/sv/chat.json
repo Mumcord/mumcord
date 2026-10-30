@@ -248,5 +248,25 @@
     "tooLarge": "Koden är för stor för att laddas ner.",
     "fileType": "Kodfil",
     "plainText": "Ren text"
+  },
+  "mumbleCard": {
+    "addServer": "Lägg till servrar",
+    "channel": "Kanal {{channel}}",
+    "copy": "Kopiera link",
+    "copyLabel": "Kopiera linken till {{server}}",
+    "figures": "Ping {{ping}} ms · {{users}} av {{max}} användare · server {{version}}",
+    "goToChannel": "Gå till kanalen",
+    "join": "Gå med",
+    "joinLabel": "Gå med i {{server}}",
+    "joined": "Ansluten",
+    "label": "Serverkort för {{server}}",
+    "privacyOff": "Servervärden är avslagna i inställningarna",
+    "querying": "Kontrollerar servern…",
+    "retry": "Kontrollera igen",
+    "retryLabel": "Kontrollera igen {{server}}",
+    "server": "{{server}}",
+    "unreachable": "Servern kan inte nås",
+    "warning_one": "{{count}} link i det här meddelandet visar inlogguppgifter",
+    "warning_other": "{{count}} länkar i det här meddelandet visar inlogguppgifter"
   }
 }

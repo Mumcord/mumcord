@@ -248,5 +248,25 @@
     "tooLarge": "A kód túl nagy a letöltéshez.",
     "fileType": "Kódfájl",
     "plainText": "Egyszerű szöveg"
+  },
+  "mumbleCard": {
+    "addServer": "Hozzáadás a kiszolgálókhoz",
+    "channel": "Csatorna: {{channel}}",
+    "copy": "Link másolása",
+    "copyLabel": "Link másolása: {{server}}",
+    "figures": "Ping {{ping}} ms · {{users}}/{{max}} felhasználó · kiszolgáló {{version}}",
+    "goToChannel": "Ugrás a csatornához",
+    "join": "Csatlakozás",
+    "joinLabel": "Csatlakozás: {{server}}",
+    "joined": "Csatlakoztál",
+    "label": "Kiszolgálókártya: {{server}}",
+    "privacyOff": "A kiszolgáló értékei ki vannak kapcsolva a beállításokban",
+    "querying": "Kiszolgáló ellenőrzése…",
+    "retry": "Ellenőrizd újra",
+    "retryLabel": "Ellenőrizd újra {{server}}",
+    "server": "{{server}}",
+    "unreachable": "A kiszolgáló nem érhető el",
+    "warning_one": "{{count}} link az üzenetben megjeleníti a hitelesítési adatokat",
+    "warning_other": "{{count}} link az üzenetben megjeleníti a hitelesítési adatokat"
   }
 }

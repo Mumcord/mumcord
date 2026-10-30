@@ -256,5 +256,27 @@
     "tooLarge": "Kodas per didelis atsisiųsti.",
     "fileType": "Kodo failas",
     "plainText": "Paprastas tekstas"
+  },
+  "mumbleCard": {
+    "addServer": "Pridėti prie serverių",
+    "channel": "Kanalas {{channel}}",
+    "copy": "Kopijuoti nuorodą",
+    "copyLabel": "Kopijuoti nuorodą į {{server}}",
+    "figures": "Ping {{ping}} ms · {{users}} iš {{max}} naudotojų · serveris {{version}}",
+    "goToChannel": "Eiti į kanalą",
+    "join": "Prisijungti",
+    "joinLabel": "Prisijungti prie {{server}}",
+    "joined": "Prisijungta",
+    "label": "Serverio kortelė {{server}}",
+    "privacyOff": "Serverio reikšmės išjungtos nustatymuose",
+    "querying": "Tikrinamas serveris…",
+    "retry": "Tikrinti dar kartą",
+    "retryLabel": "Tikrinti dar kartą {{server}}",
+    "server": "{{server}}",
+    "unreachable": "Serveris nepasiekiamas",
+    "warning_few": "{{count}} nuorodos šiame pranešime rodo prisijungimo duomenis",
+    "warning_many": "{{count}} nurodų šiame pranešime rodo prisijungimo duomenis",
+    "warning_one": "{{count}} nuoroda šiame pranešime rodo prisijungimo duomenis",
+    "warning_other": "{{count}} nuoroda šiame pranešime rodo prisijungimo duomenis"
   }
 }

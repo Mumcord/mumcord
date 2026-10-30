@@ -107,7 +107,7 @@ fn open(app: &AppHandle, link: MumbleLink) {
 }
 
 /// Connects or joins as FR-2.13 says; the connection itself enforces the limit again.
-async fn resolve(engine: &Engine, link: &MumbleLink) -> LinkOutcome {
+pub(crate) async fn resolve(engine: &Engine, link: &MumbleLink) -> LinkOutcome {
     let (saved, max) = match (engine.servers().await, engine.settings()) {
         (Ok(servers), Ok(settings)) => (
             servers
@@ -148,7 +148,7 @@ async fn resolve(engine: &Engine, link: &MumbleLink) -> LinkOutcome {
     }
 }
 
-fn deliver(app: &AppHandle, opened: DeepLinkOpened) {
+pub(crate) fn deliver(app: &AppHandle, opened: DeepLinkOpened) {
     let state = app.state::<PendingLinks>();
     let ready = state
         .0

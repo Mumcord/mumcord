@@ -112,6 +112,8 @@ fn specta_builder() -> Builder<tauri::Wry> {
             commands::full_image::full_image_cancel,
             links::link_preview,
             links::open_link,
+            links::mumble_link_stats,
+            links::mumble_link_join,
             links::inline_image,
             links::preview_dismiss,
             links::embed_player_open,

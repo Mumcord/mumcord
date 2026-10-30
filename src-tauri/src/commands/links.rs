@@ -1,11 +1,12 @@
 //! Link previews, video player cards and inline images for links and images in messages
 //! (FR-1.49, FR-1.50, FR-1.55).
 
-use mumcord_engine::{Engine, VideoProvider};
+use mumcord_engine::{Engine, QueryOutcome, VideoProvider};
 use serde::{Deserialize, Serialize};
 use specta::Type;
-use tauri::State;
+use tauri::{AppHandle, Manager, State};
 
+use super::servers::{DeepLinkOpened, LinkOutcome, parse_link};
 use super::types::{ApiError, ApiResult, ErrorCode};
 use crate::watch_player::PlayerServer;
 
@@ -85,6 +86,69 @@ pub async fn link_preview(
     url: String,
 ) -> ApiResult<Option<LinkPreview>> {
     Ok(engine.link_preview(&url).await.map(Into::into))
+}
+
+/// What the public server query answered for a `mumble://` link (issue #175). `privacyOff` means
+/// nothing was asked because the link-preview switch is off; `unreachable` means the server did not
+/// answer within the query timeout. The figures are untrusted server data, shown as plain text.
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, Type)]
+#[serde(
+    tag = "kind",
+    rename_all = "camelCase",
+    rename_all_fields = "camelCase"
+)]
+pub enum MumbleLinkStats {
+    PrivacyOff,
+    Unreachable,
+    Answered {
+        ping_ms: u32,
+        users: u32,
+        max_users: u32,
+        version: String,
+    },
+}
+
+/// Live figures for the card of a `mumble://` link. Only the engine contacts the network, the
+/// query never connects, and nothing is asked while the link-preview switch is off (issue #175).
+#[tauri::command]
+#[specta::specta]
+pub async fn mumble_link_stats(
+    engine: State<'_, Engine>,
+    url: String,
+    refresh: bool,
+) -> ApiResult<MumbleLinkStats> {
+    let link = parse_link(&url)?;
+    Ok(
+        match engine.server_query(&link.address, link.port, refresh).await {
+            QueryOutcome::Answered(query) => MumbleLinkStats::Answered {
+                ping_ms: query.ping_ms,
+                users: query.users,
+                max_users: query.max_users,
+                version: query.version.to_string(),
+            },
+            QueryOutcome::NotAllowed => MumbleLinkStats::PrivacyOff,
+            QueryOutcome::Unreachable => MumbleLinkStats::Unreachable,
+        },
+    )
+}
+
+/// A card's Join: the same handling as a `mumble://` link that came from outside (FR-2.13), so the
+/// server bar shows the server, a running connection joins the channel and an unknown server is
+/// offered for saving. Only a click on the card gets here.
+#[tauri::command]
+#[specta::specta]
+pub async fn mumble_link_join(app: AppHandle, url: String) -> ApiResult<LinkOutcome> {
+    let link = parse_link(&url)?;
+    let engine = app.state::<Engine>();
+    let outcome = crate::deeplink::resolve(&engine, &link).await;
+    crate::deeplink::deliver(
+        &app,
+        DeepLinkOpened {
+            link: link.clone(),
+            outcome: outcome.clone(),
+        },
+    );
+    Ok(outcome)
 }
 
 /// An external image (`<img src>` in a message) or direct image link, ready to show inline;
