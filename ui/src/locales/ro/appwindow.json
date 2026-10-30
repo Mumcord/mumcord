@@ -14,6 +14,12 @@
     "dismiss": "Am înțeles",
     "openSettings": "Deschide setările overlay-ului"
   },
+  "audioDevice": {
+    "title": "Alege din nou dispozitivele audio",
+    "description": "Mumcord afișează acum separat fiecare intrare și ieșire a dispozitivelor tale audio. Dispozitivul salvat nu a putut fi asociat cu niciuna dintre ele, așa că deocamdată se folosește dispozitivul implicit al sistemului. Poți alege un dispozitiv în setările audio.",
+    "dismiss": "Am înțeles",
+    "openSettings": "Deschide setările audio"
+  },
   "appImageMenu": {
     "title": "Adaugi Mumcord în meniul de aplicații?",
     "description": "Astfel Mumcord apare în meniul de aplicații. Pictograma și push-to-talk funcționează corect pe Wayland, iar linkurile mumble:// deschid Mumcord. Poți schimba asta mai târziu din Setări.",

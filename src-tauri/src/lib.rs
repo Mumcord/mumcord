@@ -134,6 +134,8 @@ fn specta_builder() -> Builder<tauri::Wry> {
             settings::settings_update,
             settings::window_overlay_notice_pending,
             settings::window_overlay_notice_dismiss,
+            settings::audio_device_notice_pending,
+            settings::audio_device_notice_dismiss,
             audio::audio_devices,
             audio::bitrate_max,
             audio::mic_test_start,

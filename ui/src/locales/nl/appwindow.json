@@ -14,6 +14,12 @@
     "dismiss": "Begrepen",
     "openSettings": "Overlay-instellingen openen"
   },
+  "audioDevice": {
+    "title": "Kies je audioapparaten opnieuw",
+    "description": "Mumcord toont nu elke in- en uitgang van je audioapparaten apart. Je opgeslagen apparaat kon aan geen ervan worden gekoppeld, dus voorlopig wordt de systeemstandaard gebruikt. Je kunt een apparaat kiezen in de audio-instellingen.",
+    "dismiss": "Begrepen",
+    "openSettings": "Audio-instellingen openen"
+  },
   "appImageMenu": {
     "title": "Mumcord aan het appmenu toevoegen?",
     "description": "Hiermee komt Mumcord in je appmenu. Het pictogram en push-to-talk werken dan goed onder Wayland, en mumble://-links openen Mumcord. Je kunt dit later wijzigen in Instellingen.",

@@ -38,6 +38,8 @@ mod devices;
 mod frames;
 mod resample;
 mod ring;
+#[cfg(target_os = "linux")]
+mod sound_server;
 #[cfg(any(test, feature = "test-backend"))]
 mod test_backend;
 
@@ -70,6 +72,18 @@ pub struct DeviceInfo {
 }
 
 /// Notifications from the control thread, for UI and diagnostics.
+/// What happens to a saved device id when the device list changed its kind of ids (issue #183:
+/// ALSA PCM names on Linux became PipeWire node names). See [`AudioIo::migrate_device`].
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum DeviceMigration {
+    /// The id is still valid (or the backend did not change).
+    Keep,
+    /// The device it meant, under its new id.
+    Replace(String),
+    /// Use the system default; `notice` when the user should be told their choice was reset.
+    Default { notice: bool },
+}
+
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum DeviceEvent {
     /// Devices were plugged in or removed; re-query [`AudioIo::devices`].
