@@ -81,6 +81,7 @@ export function ServerDialog({ server, link, identityName, onClose }: ServerDial
   const [formError, setFormError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [removedTokens, setRemovedTokens] = useState<number[]>([]);
+  const [renamedTokens, setRenamedTokens] = useState<ReadonlyMap<number, string>>(new Map());
   const connectAfter = link !== null;
 
   const set = (patch: Partial<Fields>) => {
@@ -154,6 +155,14 @@ export function ServerDialog({ server, link, identityName, onClose }: ServerDial
       }
       if (server && fields.themeId !== server.themeId) {
         await saveServerTheme(server.id, fields.themeId);
+      }
+      // Renames go first: removing moves the later passwords up.
+      if (server) {
+        for (const [index, label] of renamedTokens) {
+          if (!removedTokens.includes(index)) {
+            await getApi().channelPasswordRename(server.id, index, label);
+          }
+        }
       }
       if (server && removedTokens.length > 0) {
         await getApi().channelPasswordsRemove(server.id, removedTokens);
@@ -302,6 +311,10 @@ export function ServerDialog({ server, link, identityName, onClose }: ServerDial
             removed={removedTokens}
             onRemove={(index) => {
               setRemovedTokens((current) => [...current, index]);
+            }}
+            renamed={renamedTokens}
+            onRename={(index, label) => {
+              setRenamedTokens((current) => new Map(current).set(index, label));
             }}
           />
         )}

@@ -9,7 +9,7 @@ export interface ViewState {
   screen: Screen;
   overlay: Overlay;
   /** Settings section to show first when the settings open; null keeps the default. */
-  settingsSection: "overlay" | "audio" | null;
+  settingsSection: "overlay" | "audio" | "privacy" | null;
 }
 
 export type ViewAction =
@@ -17,7 +17,7 @@ export type ViewAction =
   | { type: "failed" }
   | { type: "retry" }
   | { type: "finishWizard" }
-  | { type: "openSettings"; section?: "overlay" | "audio" }
+  | { type: "openSettings"; section?: "overlay" | "audio" | "privacy" }
   | { type: "closeOverlay" };
 
 export const initialViewState: ViewState = {
@@ -53,11 +53,18 @@ export interface View extends ViewState {
   openOverlaySettings: () => void;
   /** Opens the settings on the audio section. */
   openAudioSettings: () => void;
+  /** Opens the settings on the privacy section. */
+  openPrivacySettings: () => void;
   closeOverlay: () => void;
   retry: () => void;
 }
 
 export const ViewContext = createContext<View | null>(null);
+
+/** Opens the privacy settings; `null` without a view provider (tests), where there is nothing to open. */
+export function useOpenPrivacySettings(): (() => void) | null {
+  return useContext(ViewContext)?.openPrivacySettings ?? null;
+}
 
 export function useView(): View {
   const view = useContext(ViewContext);

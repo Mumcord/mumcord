@@ -616,6 +616,13 @@ jobs:
           # profile folders shows up.
           appdata=$(cygpath -u "$APPDATA")/app.mumcord.client
           localdata=$(cygpath -u "$LOCALAPPDATA")/app.mumcord.client
+          # The web view's helper processes outlive the killed app for a moment and keep its
+          # profile files open.
+          taskkill /F /IM msedgewebview2.exe >/dev/null 2>&1 || true
+          for _ in {1..30}; do
+            rm -rf "$appdata" "$localdata" 2>/dev/null && break
+            sleep 1
+          done
           rm -rf "$appdata" "$localdata"
           portable="$RUNNER_TEMP/mumcord-portable"
           powershell -NoProfile -Command "Expand-Archive -Path '$(cygpath -w "$(ls build/*-portable.zip)")' -DestinationPath '$(cygpath -w "$portable")'"
