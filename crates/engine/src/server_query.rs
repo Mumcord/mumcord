@@ -219,8 +219,7 @@ mod tests {
             let mut buffer = [0u8; 64];
             while let Ok((n, from)) = socket.recv_from(&mut buffer).await {
                 let incoming = &buffer[..n];
-                let echo = if incoming.len() == LEGACY_QUERY_LEN && &incoming[..4] == &[0, 0, 0, 0]
-                {
+                let echo = if incoming.len() == LEGACY_QUERY_LEN && incoming[..4] == [0, 0, 0, 0] {
                     u64::from_be_bytes(incoming[4..12].try_into().expect("echo"))
                 } else if legacy_only {
                     continue;
