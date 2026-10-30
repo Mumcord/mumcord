@@ -69,8 +69,13 @@ export const commands = {
 	 *  outcome arrives as `channelPasswordPrompt` (FR-2.78).
 	 */
 	channelJoinWithPassword: (serverId: number, channelId: number, password: string) => typedError<null, ApiError>(__TAURI_INVOKE("channel_join_with_password", { serverId, channelId, password })),
-	/**  Number of stored channel passwords of a server; they are never handed out. */
-	channelPasswordCount: (serverId: number) => typedError<number, ApiError>(__TAURI_INVOKE("channel_password_count", { serverId })),
+	/**
+	 *  The stored channel passwords of a server, in order, with the channels they were entered
+	 *  for; the passwords themselves are never handed out.
+	 */
+	channelPasswords: (serverId: number) => typedError<SavedChannelPassword[], ApiError>(__TAURI_INVOKE("channel_passwords", { serverId })),
+	/**  Names a stored channel password by its position; an empty label goes back to the default. */
+	channelPasswordRename: (serverId: number, index: number, label: string) => typedError<null, ApiError>(__TAURI_INVOKE("channel_password_rename", { serverId, index, label })),
 	/**  Removes stored channel passwords by their position in the list. */
 	channelPasswordsRemove: (serverId: number, indices: number[]) => typedError<null, ApiError>(__TAURI_INVOKE("channel_passwords_remove", { serverId, indices })),
 	/**
@@ -1485,6 +1490,24 @@ export type PttUnavailableReason =
 "mouseNeedsInputGroup" | 
 /**  macOS: Mumcord lacks the Accessibility permission for the mouse event tap. */
 "mouseNeedsAccessibility";
+
+/**  A stored channel password without the password itself (FR-2.78, issue #146). */
+export type SavedChannelPassword = {
+	/**  The user's own name; `null` shows the channels, or "Password N" without any. */
+	label: string | null,
+	/**  The channels the password was entered for. */
+	channels: SavedPasswordChannel[],
+	/**  RFC 3339; `null` if not used since Mumcord remembers it. */
+	lastUsedAt: string | null,
+};
+
+export type SavedPasswordChannel = {
+	channelId: number,
+	/**  Path below the root as the channel was named then. */
+	path: string[],
+	/**  `false` when the channel was renamed or removed; `null` while not connected. */
+	found: boolean | null,
+};
 
 /**  A saved server as shown in the server bar; the list order is the bar order. */
 export type SavedServer = {

@@ -87,10 +87,10 @@ fn own_channel(engine: &Engine, server: ServerId) -> (u32, u32) {
 }
 
 /// The token removal after a refusal runs in the background; give it a moment.
-async fn count_becomes(engine: &Engine, server: ServerId, expected: u32) {
+async fn count_becomes(engine: &Engine, server: ServerId, expected: usize) {
     let deadline = tokio::time::Instant::now() + WAIT;
     loop {
-        let count = engine.channel_password_count(server).await.expect("count");
+        let count = engine.channel_passwords(server).await.expect("list").len();
         if count == expected {
             return;
         }
@@ -198,6 +198,48 @@ async fn channel_password_is_asked_stored_and_sent_on_reconnect() {
     );
     assert_eq!(own_channel(&engine, server).1, room_id, "moved in");
     count_becomes(&engine, server, 1).await;
+
+    // The password remembers the channel it was entered for (issue #146); saving it runs in
+    // the background.
+    let deadline = tokio::time::Instant::now() + WAIT;
+    loop {
+        let saved = engine.channel_passwords(server).await.expect("list");
+        if let Some(channel) = saved[0].channels.first() {
+            assert_eq!(channel.channel_id, room_id);
+            assert_eq!(channel.path, std::slice::from_ref(&room));
+            assert_eq!(channel.found, Some(true));
+            assert!(saved[0].last_used_at.is_some(), "last use");
+            break;
+        }
+        assert!(
+            tokio::time::Instant::now() < deadline,
+            "the channel was not saved with the password"
+        );
+        tokio::time::sleep(Duration::from_millis(100)).await;
+    }
+
+    // Renamed on the server: the password keeps the old name and shows it as not found.
+    admin
+        .handle()
+        .send_channel_state(proto::ChannelState {
+            channel_id: Some(room_id),
+            name: Some(format!("{room}-renamed")),
+            ..Default::default()
+        })
+        .expect("rename channel");
+    let deadline = tokio::time::Instant::now() + WAIT;
+    loop {
+        let saved = engine.channel_passwords(server).await.expect("list");
+        if saved[0].channels[0].found == Some(false) {
+            assert_eq!(saved[0].channels[0].path, std::slice::from_ref(&room));
+            break;
+        }
+        assert!(
+            tokio::time::Instant::now() < deadline,
+            "the renamed channel still counts as found"
+        );
+        tokio::time::sleep(Duration::from_millis(100)).await;
+    }
 
     // Reconnect: the stored token goes out with the login, so joining works without asking.
     engine.join_channel(server, start).expect("leave");

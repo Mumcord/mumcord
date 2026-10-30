@@ -2,13 +2,17 @@
 //! grants Enter to a group named `#<token>`, and a client belongs to that group while its
 //! Authenticate access-token list holds the token. Mumcord keeps the tokens per server in
 //! secure storage, sends them on every connect, and asks for one when a join is refused.
+//! The server never says which token opened which channel, so Mumcord remembers the channel
+//! a password was entered for itself (issue #146), as non-secret details in the database.
 
 use std::collections::HashMap;
 
 use mumcord_protocol::{DenyKind, Handle, PermissionDenied, permissions};
-use mumcord_store::ServerId;
+use mumcord_store::{ChannelToken, ServerId, TokenChannel, UnixMillis};
 
+use super::convert::channel_path;
 use super::{Engine, EngineError, EngineEvent, EngineResult, Inner, SessionCtx, lock};
+use crate::chat::now_millis;
 
 /// What the channel-password dialog shows (FR-2.78).
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -65,16 +69,18 @@ impl Attempts {
         })
     }
 
-    /// The own user arrived in `channel_id`: true if that ends an attempt.
-    fn on_own_moved(&mut self, server_id: ServerId, channel_id: u32) -> bool {
+    /// The own user arrived in `channel_id`: the token that let them in, if that ends an
+    /// attempt.
+    fn on_own_moved(&mut self, server_id: ServerId, channel_id: u32) -> Option<String> {
         let done = self
             .0
             .get(&server_id)
             .is_some_and(|a| a.channel_id == channel_id);
         if done {
-            self.0.remove(&server_id);
+            self.0.remove(&server_id).map(|a| a.token)
+        } else {
+            None
         }
-        done
     }
 
     fn forget(&mut self, server_id: ServerId) {
@@ -108,12 +114,51 @@ impl Inner {
     }
 
     pub(super) fn on_own_channel(&self, ctx: &SessionCtx, channel_id: u32) {
-        if lock(&self.password_attempts).on_own_moved(ctx.server_id, channel_id) {
+        if let Err(e) =
+            lock(&self.store).touch_token_channel(ctx.server_id, channel_id, now_millis())
+        {
+            tracing::warn!(error = %e, "noting the use of a channel password failed");
+        }
+        if let Some(token) = lock(&self.password_attempts).on_own_moved(ctx.server_id, channel_id) {
+            self.attach_channel(ctx, token, channel_id);
             ctx.events.emit(EngineEvent::ChannelPassword {
                 channel_id,
                 state: ChannelPasswordState::Ended,
             });
         }
+    }
+
+    /// Remembers that `token` let the user into `channel_id`, so the settings can name it.
+    fn attach_channel(&self, ctx: &SessionCtx, token: String, channel_id: u32) {
+        let Some(path) = ctx.handle.with_state(|s| channel_path(s, channel_id)) else {
+            return;
+        };
+        let channel = TokenChannel { channel_id, path };
+        let secrets = self.secrets.clone();
+        let store = self.store.clone();
+        let server_id = ctx.server_id;
+        let rt = self.rt.clone();
+        self.rt.spawn(async move {
+            let attached = rt
+                .spawn_blocking(move || {
+                    let tokens = secrets.access_tokens(server_id)?;
+                    // Gone when the user removed it meanwhile: nothing to name then.
+                    let Some(position) = tokens.iter().position(|t| *t == token) else {
+                        return Ok(());
+                    };
+                    lock(&store).attach_token_channel(server_id, position, channel, now_millis())
+                })
+                .await;
+            match attached {
+                Ok(Ok(())) => {}
+                Ok(Err(e)) => {
+                    tracing::warn!(server_id, error = %e, "saving a channel password's channel failed");
+                }
+                Err(e) => {
+                    tracing::warn!(server_id, error = %e, "saving a channel password's channel failed");
+                }
+            }
+        });
     }
 
     pub(super) fn forget_password_attempt(&self, server_id: ServerId) {
@@ -125,13 +170,21 @@ impl Inner {
         let secrets = self.secrets.clone();
         let handle = ctx.handle.clone();
         let server_id = ctx.server_id;
+        let store = self.store.clone();
         let rt = self.rt.clone();
         self.rt.spawn(async move {
             let removed = rt
                 .spawn_blocking(move || {
                     let mut tokens = secrets.access_tokens(server_id)?;
+                    let positions: Vec<usize> = tokens
+                        .iter()
+                        .enumerate()
+                        .filter(|(_, t)| **t == token)
+                        .map(|(i, _)| i)
+                        .collect();
                     tokens.retain(|t| *t != token);
                     secrets.set_access_tokens(server_id, &tokens)?;
+                    lock(&store).remove_channel_tokens(server_id, &positions)?;
                     Ok::<_, mumcord_store::Error>(tokens)
                 })
                 .await;
@@ -175,6 +228,7 @@ impl Engine {
         }
         let ctx = self.session_ctx_for(server_id)?;
         let secrets = self.inner.secrets.clone();
+        let store = self.inner.store.clone();
         let token = password.clone();
         let tokens = self
             .inner
@@ -182,6 +236,7 @@ impl Engine {
             .spawn_blocking(move || {
                 let mut tokens = secrets.access_tokens(server_id)?;
                 if !tokens.contains(&token) {
+                    lock(&store).truncate_channel_tokens(server_id, tokens.len())?;
                     tokens.push(token);
                     secrets.set_access_tokens(server_id, &tokens)?;
                 }
@@ -197,18 +252,73 @@ impl Engine {
         })
     }
 
-    /// How many channel passwords are stored for a server (the edit-server dialog lists them
-    /// masked, FR-2.78).
-    pub async fn channel_password_count(&self, server_id: ServerId) -> EngineResult<u32> {
+    /// The stored channel passwords of a server with what Mumcord knows about each, in token
+    /// order (the edit-server dialog lists them masked, FR-2.78, issue #146). The passwords
+    /// themselves are never handed out. Whether a remembered channel still exists is only
+    /// known while the server is connected.
+    pub async fn channel_passwords(
+        &self,
+        server_id: ServerId,
+    ) -> EngineResult<Vec<ChannelPasswordView>> {
         let secrets = self.inner.secrets.clone();
+        let store = self.inner.store.clone();
         let tokens = self
             .inner
             .rt
-            .spawn_blocking(move || secrets.access_tokens(server_id))
+            .spawn_blocking(move || {
+                let count = secrets.access_tokens(server_id)?.len();
+                lock(&store).channel_tokens(server_id, count)
+            })
             .await
             .map_err(|e| EngineError::internal(e.to_string()))?
             .map_err(super::store_error)?;
-        Ok(u32::try_from(tokens.len()).unwrap_or(u32::MAX))
+        let session = self.session_ctx_for(server_id).ok();
+        Ok(tokens
+            .into_iter()
+            .map(|token| {
+                let found = |channel: &TokenChannel| {
+                    session.as_ref().map(|ctx| {
+                        ctx.handle.with_state(|s| {
+                            channel_path(s, channel.channel_id).as_ref() == Some(&channel.path)
+                        })
+                    })
+                };
+                ChannelPasswordView::new(token, found)
+            })
+            .collect())
+    }
+
+    /// Gives a stored channel password the user's own name; an empty one goes back to the
+    /// default (the channels it was entered for, or "Password N").
+    pub async fn channel_password_rename(
+        &self,
+        server_id: ServerId,
+        index: u32,
+        label: String,
+    ) -> EngineResult<()> {
+        let position =
+            usize::try_from(index).map_err(|_| EngineError::invalid("index out of range"))?;
+        let secrets = self.inner.secrets.clone();
+        let store = self.inner.store.clone();
+        self.inner
+            .rt
+            .spawn_blocking(move || {
+                if position >= secrets.access_tokens(server_id)?.len() {
+                    return Ok(false);
+                }
+                let label = label.trim();
+                lock(&store).rename_channel_token(
+                    server_id,
+                    position,
+                    (!label.is_empty()).then_some(label),
+                )?;
+                Ok(true)
+            })
+            .await
+            .map_err(|e| EngineError::internal(e.to_string()))?
+            .map_err(super::store_error)?
+            .then_some(())
+            .ok_or_else(|| EngineError::invalid("no channel password at this index"))
     }
 
     /// Removes stored channel passwords by their position in the list; a connected server gets
@@ -219,6 +329,7 @@ impl Engine {
         indices: Vec<u32>,
     ) -> EngineResult<()> {
         let secrets = self.inner.secrets.clone();
+        let store = self.inner.store.clone();
         let tokens = self
             .inner
             .rt
@@ -226,6 +337,11 @@ impl Engine {
                 let tokens = secrets.access_tokens(server_id)?;
                 let kept: Vec<String> = without_indices(tokens, &indices);
                 secrets.set_access_tokens(server_id, &kept)?;
+                let positions: Vec<usize> = indices
+                    .iter()
+                    .filter_map(|i| usize::try_from(*i).ok())
+                    .collect();
+                lock(&store).remove_channel_tokens(server_id, &positions)?;
                 Ok(kept)
             })
             .await
@@ -235,6 +351,43 @@ impl Engine {
             send_tokens(&ctx.handle, tokens);
         }
         Ok(())
+    }
+}
+
+/// A stored channel password as the settings show it (issue #146).
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct ChannelPasswordView {
+    /// The user's own name; `None` shows the channels, or "Password N" without any.
+    pub label: Option<String>,
+    pub channels: Vec<ChannelPasswordChannel>,
+    pub last_used_at: Option<UnixMillis>,
+}
+
+/// A channel a password was entered for.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct ChannelPasswordChannel {
+    pub channel_id: u32,
+    /// Path below the root as the channel was named then.
+    pub path: Vec<String>,
+    /// Whether the channel still exists under that path; `None` while not connected.
+    pub found: Option<bool>,
+}
+
+impl ChannelPasswordView {
+    fn new(token: ChannelToken, found: impl Fn(&TokenChannel) -> Option<bool>) -> Self {
+        Self {
+            label: token.label,
+            channels: token
+                .channels
+                .into_iter()
+                .map(|channel| ChannelPasswordChannel {
+                    found: found(&channel),
+                    channel_id: channel.channel_id,
+                    path: channel.path,
+                })
+                .collect(),
+            last_used_at: token.last_used_at,
+        }
     }
 }
 
@@ -316,10 +469,10 @@ mod tests {
     fn arriving_in_the_channel_ends_the_attempt() {
         let mut attempts = Attempts::default();
         attempts.start(1, 3, "secret".into());
-        assert!(!attempts.on_own_moved(2, 3), "another server");
-        assert!(!attempts.on_own_moved(1, 4), "another channel");
-        assert!(attempts.on_own_moved(1, 3));
-        assert!(!attempts.on_own_moved(1, 3), "only once");
+        assert_eq!(attempts.on_own_moved(2, 3), None, "another server");
+        assert_eq!(attempts.on_own_moved(1, 4), None, "another channel");
+        assert_eq!(attempts.on_own_moved(1, 3).as_deref(), Some("secret"));
+        assert_eq!(attempts.on_own_moved(1, 3), None, "only once");
     }
 
     #[test]
@@ -341,7 +494,117 @@ mod tests {
             attempts.on_denied(1, &enter_refused(), Some(OWN)),
             Some((3, ChannelPasswordState::Required, None))
         );
-        assert!(attempts.on_own_moved(1, 4));
+        assert!(attempts.on_own_moved(1, 4).is_some());
+    }
+
+    async fn engine_with_tokens(dir: &std::path::Path, tokens: &[&str]) -> (Engine, ServerId) {
+        let (engine, _rx) = Engine::new(
+            dir,
+            crate::SecretStore::in_memory(),
+            tokio::runtime::Handle::current(),
+        )
+        .expect("engine");
+        let server = engine
+            .server_add(crate::ServerFields {
+                label: "a".into(),
+                address: "a.example".into(),
+                port: 64738,
+                username: "me".into(),
+                password: crate::PasswordChange::Keep,
+            })
+            .await
+            .expect("server")
+            .id;
+        let tokens: Vec<String> = tokens.iter().map(|t| (*t).to_owned()).collect();
+        engine
+            .inner
+            .secrets
+            .set_access_tokens(server, &tokens)
+            .expect("tokens");
+        (engine, server)
+    }
+
+    fn officers() -> TokenChannel {
+        TokenChannel {
+            channel_id: 5,
+            path: vec!["Raid".into(), "Officers".into()],
+        }
+    }
+
+    #[tokio::test]
+    async fn tokens_saved_before_are_kept_and_listed_unnamed() {
+        let dir = tempfile::tempdir().expect("tempdir");
+        let (engine, server) = engine_with_tokens(dir.path(), &["one", "two"]).await;
+        let listed = engine.channel_passwords(server).await.expect("list");
+        assert_eq!(listed.len(), 2);
+        assert!(
+            listed
+                .iter()
+                .all(|p| p.label.is_none() && p.channels.is_empty() && p.last_used_at.is_none())
+        );
+        assert_eq!(
+            engine.inner.secrets.access_tokens(server).expect("tokens"),
+            ["one", "two"]
+        );
+    }
+
+    #[tokio::test]
+    async fn a_saved_channel_is_listed_and_unknown_while_offline() {
+        let dir = tempfile::tempdir().expect("tempdir");
+        let (engine, server) = engine_with_tokens(dir.path(), &["one", "two"]).await;
+        lock(&engine.inner.store)
+            .attach_token_channel(server, 1, officers(), 42)
+            .expect("attach");
+        let listed = engine.channel_passwords(server).await.expect("list");
+        assert!(listed[0].channels.is_empty());
+        assert_eq!(
+            listed[1].channels,
+            [ChannelPasswordChannel {
+                channel_id: 5,
+                path: vec!["Raid".into(), "Officers".into()],
+                found: None,
+            }]
+        );
+        assert_eq!(listed[1].last_used_at, Some(42));
+    }
+
+    #[tokio::test]
+    async fn renaming_and_removing_keep_the_details_with_their_token() {
+        let dir = tempfile::tempdir().expect("tempdir");
+        let (engine, server) = engine_with_tokens(dir.path(), &["one", "two", "three"]).await;
+        lock(&engine.inner.store)
+            .attach_token_channel(server, 2, officers(), 1)
+            .expect("attach");
+        engine
+            .channel_password_rename(server, 1, "  Raid password ".into())
+            .await
+            .expect("rename");
+        assert!(
+            engine
+                .channel_password_rename(server, 3, "nothing there".into())
+                .await
+                .is_err()
+        );
+        engine
+            .channel_passwords_remove(server, vec![0])
+            .await
+            .expect("remove");
+        assert_eq!(
+            engine.inner.secrets.access_tokens(server).expect("tokens"),
+            ["two", "three"]
+        );
+        let listed = engine.channel_passwords(server).await.expect("list");
+        assert_eq!(listed[0].label.as_deref(), Some("Raid password"));
+        assert_eq!(listed[1].channels[0].channel_id, 5);
+
+        engine
+            .channel_password_rename(server, 0, " ".into())
+            .await
+            .expect("back to default");
+        assert_eq!(
+            engine.channel_passwords(server).await.expect("list")[0].label,
+            None
+        );
     }
 
     #[test]
