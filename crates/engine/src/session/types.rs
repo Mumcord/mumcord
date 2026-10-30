@@ -225,6 +225,9 @@ pub struct ConnectionStatsView {
     pub packets_received: u64,
     /// Health of the local audio path; `None` on a server without the voice pipeline.
     pub audio: Option<AudioHealthView>,
+    /// Estimated mouth-to-ear latency (issue #156); `None` on a server without the voice
+    /// pipeline.
+    pub latency: Option<crate::latency::LatencyEstimateView>,
 }
 
 /// Glitch counters of the local audio path since the voice pipeline started (issue #123). A

@@ -18,6 +18,7 @@ pub(crate) fn apply_dsp(controls: &DspControls, settings: &Settings) {
     controls.set_noise_suppression(settings.noise_suppression);
     controls.set_auto_gain(settings.auto_gain);
     controls.set_music_quality(settings.music_quality);
+    controls.set_low_latency(settings.low_latency);
     controls.set_bitrate_cap_kbps(settings.bitrate_kbps);
     controls.set_manual_threshold(settings.voice_activation == VoiceActivation::Manual);
     controls.set_threshold_dbfs(settings.voice_threshold_dbfs as f32);
@@ -356,6 +357,20 @@ impl Engine {
         }
         if settings.talk_mode != TalkMode::PushToTalk {
             self.inner.controls.set_ptt_pressed(false);
+        }
+        if previous.low_latency != settings.low_latency {
+            // Live, without reconnecting (issue #156): the capture thread follows the controls
+            // set above; devices and the receive side are switched here.
+            let mut core = lock(&self.inner.core);
+            if let Some(audio) = &core.audio {
+                audio.set_low_latency(settings.low_latency);
+            }
+            if let Some(pipeline) = core.pipeline.as_mut() {
+                pipeline.set_low_latency(settings.low_latency);
+            }
+            // Back to the safe queue at once; a lower one follows once the new device period
+            // is measured.
+            core.sync_queue_target(settings.low_latency);
         }
         if previous.input_device != settings.input_device
             || previous.output_device != settings.output_device

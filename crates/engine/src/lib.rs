@@ -11,6 +11,7 @@ pub mod full_image;
 pub mod history_sync;
 pub mod ingame_overlay;
 pub mod inspector;
+pub mod latency;
 mod maintenance;
 pub mod mumcord;
 pub mod now_gaming;
@@ -33,6 +34,7 @@ pub use friends::{FriendPresence, FriendView};
 pub use ingame_overlay::{
     BlockedGame, Blocklist, OverlayDecision, blocklist, decide as decide_overlay,
 };
+pub use latency::LatencyEstimateView;
 /// Position sources (Mumble Link, plugin host) as the engine uses them.
 pub use mumcord_positional as positional_sources;
 /// Stored types (settings record etc.) as the engine hands them out.

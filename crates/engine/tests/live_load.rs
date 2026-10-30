@@ -28,8 +28,6 @@ const TONE_HZ: f32 = 440.0;
 const TONE_AMPLITUDE: f32 = 0.2;
 /// Samples per 10 ms block of the glitch analysis.
 const BLOCK: usize = SAMPLE_RATE / 100;
-/// Mumble packets carry 20 ms (two 10 ms sequence steps) with the engine's encoder settings.
-const SEQ_PER_PACKET: u64 = 2;
 
 fn live() -> bool {
     let on = std::env::var("MUMCORD_LIVE").is_ok_and(|v| v == "1");
@@ -111,13 +109,15 @@ struct SendGaps {
     packets: usize,
     /// Packets missing inside a talk spurt (sequence jumps).
     missing: u64,
-    /// Arrivals more than 40 ms after the previous packet of the spurt (one 20 ms packet late).
+    /// Arrivals more than two packets after the previous packet of the spurt (one packet late).
     late: usize,
     max_gap: Duration,
 }
 
-/// `(arrival, seq, is_last)` of every packet in arrival order.
-fn send_gaps(packets: &[(Instant, u64, bool)]) -> SendGaps {
+/// `(arrival, seq, is_last)` of every packet in arrival order; a packet spans `seq_per_packet`
+/// 10 ms sequence steps (2 normally, 1 in low-latency mode).
+fn send_gaps(packets: &[(Instant, u64, bool)], seq_per_packet: u64) -> SendGaps {
+    let late_after = Duration::from_millis(20 * seq_per_packet);
     let mut gaps = SendGaps {
         packets: packets.len(),
         ..SendGaps::default()
@@ -125,12 +125,12 @@ fn send_gaps(packets: &[(Instant, u64, bool)]) -> SendGaps {
     for pair in packets.windows(2) {
         let ((at, seq, last), (next_at, next_seq, _)) = (pair[0], pair[1]);
         // A new spurt starts after the last packet or after a pause in the speech.
-        if last || next_seq <= seq || next_seq - seq > 50 * SEQ_PER_PACKET {
+        if last || next_seq <= seq || next_seq - seq > 50 * seq_per_packet {
             continue;
         }
-        gaps.missing += (next_seq - seq) / SEQ_PER_PACKET - 1;
+        gaps.missing += (next_seq - seq) / seq_per_packet - 1;
         let gap = next_at.saturating_duration_since(at);
-        if gap > Duration::from_millis(40) {
+        if gap > late_after {
             gaps.late += 1;
         }
         gaps.max_gap = gaps.max_gap.max(gap);
@@ -160,13 +160,16 @@ fn glitch_analysis_finds_gaps_and_jumps() {
 
     let t0 = Instant::now();
     let at = |ms: u64| t0 + Duration::from_millis(ms);
-    let gaps = send_gaps(&[
-        (at(0), 10, false),
-        (at(20), 12, false),
-        (at(70), 16, false),
-        (at(90), 18, true),
-        (at(900), 100, false),
-    ]);
+    let gaps = send_gaps(
+        &[
+            (at(0), 10, false),
+            (at(20), 12, false),
+            (at(70), 16, false),
+            (at(90), 18, true),
+            (at(900), 100, false),
+        ],
+        2,
+    );
     assert_eq!((gaps.packets, gaps.missing, gaps.late), (5, 1, 1));
     assert_eq!(gaps.max_gap, Duration::from_millis(50));
 }
@@ -177,7 +180,26 @@ async fn voice_stays_clean_under_load() {
     if !live() {
         return;
     }
-    let dir = work_dir("engine-live-load");
+    call(false).await;
+}
+
+/// The same call in low-latency mode (issue #156): 10 ms packets, minimal buffering. Run it
+/// next to the normal test to compare the printed latency estimate and glitch counts.
+#[tokio::test(flavor = "multi_thread", worker_threads = 4)]
+#[ignore = "needs testenv v15 (MUMCORD_LIVE=1)"]
+async fn low_latency_call_stays_clean() {
+    if !live() {
+        return;
+    }
+    call(true).await;
+}
+
+async fn call(low_latency: bool) {
+    let dir = work_dir(if low_latency {
+        "engine-live-load-low-latency"
+    } else {
+        "engine-live-load"
+    });
     let name = unique("mc-me");
     let (input, output) = (dir.join("in.wav"), dir.join("out.wav"));
     let speech =
@@ -226,6 +248,14 @@ async fn voice_stays_clean_under_load() {
         .identity_create(name.clone())
         .await
         .expect("identity");
+    let settings = engine.settings().expect("settings");
+    engine
+        .update_settings(mumcord_engine::Settings {
+            low_latency,
+            ..settings
+        })
+        .await
+        .expect("low-latency setting");
     let server = engine
         .server_add(ServerFields {
             label: "v15".into(),
@@ -297,10 +327,11 @@ async fn voice_stays_clean_under_load() {
         )
         .await;
     played.expect("peer plays");
-    let health = engine
+    let stats = engine
         .connection_stats(server.id)
-        .and_then(|s| s.audio)
-        .expect("audio health while connected");
+        .expect("stats while connected");
+    let health = stats.audio.expect("audio health while connected");
+    let latency = stats.latency.expect("latency estimate while connected");
     let packets = collect.await.expect("packet collector");
     engine.disconnect(server.id);
     drop(engine);
@@ -317,10 +348,11 @@ async fn voice_stays_clean_under_load() {
     let window = &recording[(start + SAMPLE_RATE).min(recording.len())
         ..(start + MEASURE.as_secs() as usize * SAMPLE_RATE).min(recording.len())];
     let playback = tone_glitches(window);
-    let sending = send_gaps(&packets);
+    let sending = send_gaps(&packets, if low_latency { 1 } else { 2 });
     eprintln!("playback (tone from the peer): {playback:?}");
     eprintln!("sending (speech to the peer): {sending:?}");
     eprintln!("audio health: {health:?}");
+    eprintln!("latency estimate (low-latency {low_latency}): {latency:?}");
     eprintln!(
         "rating under the call: {:?} {:?}",
         health.rating.rating, health.rating.issue
@@ -328,6 +360,10 @@ async fn voice_stays_clean_under_load() {
 
     assert!(playback.blocks > 1500, "tone recorded: {playback:?}");
     assert!(sending.packets > 200, "speech received: {sending:?}");
+    // Packets of the expected size: a 20 ms packet read as 10 ms would count as one missing.
+    assert!(sending.missing * 20 < sending.packets as u64, "{sending:?}");
+    assert_eq!(latency.low_latency, low_latency);
+    assert_eq!(latency.packet_ms, if low_latency { 10 } else { 20 });
     // The test machine may be busy, so only gross breakage fails the test; compare the printed
     // figures between a quiet and a loaded run.
     assert!(

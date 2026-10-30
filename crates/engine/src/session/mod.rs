@@ -308,6 +308,39 @@ impl Core {
         Some(view)
     }
 
+    /// The latency estimate from the running devices and voice pipeline.
+    fn latency(
+        &self,
+        voice: &VoiceShared,
+        controls: &DspControls,
+        rtt_ms: Option<f32>,
+    ) -> Option<crate::latency::LatencyEstimateView> {
+        let audio = self.audio.as_ref()?;
+        let mix_time_avg_us = self
+            .pipeline
+            .as_ref()
+            .map_or(0, |p| p.playback_stats().mix_time_avg_us);
+        Some(crate::latency::estimate(&crate::latency::LatencyInputs {
+            low_latency: controls.low_latency(),
+            periods: audio.io().device_periods(),
+            rtt_ms,
+            capture_time_avg_us: voice.capture_time.avg_us(),
+            mix_time_avg_us,
+        }))
+    }
+
+    /// Keeps the output queue of the playback thread at the target for the current mode and
+    /// device period; called about once a second, as the period is only known once the device
+    /// stream runs.
+    fn sync_queue_target(&mut self, low_latency: bool) {
+        let Some(output) = self.audio.as_ref().map(|a| a.io().device_periods().output) else {
+            return;
+        };
+        if let Some(pipeline) = self.pipeline.as_mut() {
+            pipeline.set_queue_target_ms(crate::latency::queue_target_ms(low_latency, output));
+        }
+    }
+
     /// Adds the current counters to the rating's history; called about once a second.
     fn sample_audio_health(&mut self, voice: &VoiceShared) {
         let Some(totals) = self.audio_health(voice).map(|a| a.totals()) else {
@@ -1255,7 +1288,30 @@ impl Engine {
             packets_sent: count(&voice.packets_sent),
             packets_received: count(&voice.packets_received),
             audio: on_voice.then(|| core.audio_health(voice)).flatten(),
+            latency: on_voice
+                .then(|| {
+                    core.latency(
+                        voice,
+                        &self.inner.controls,
+                        link.and_then(|l| l.rtt).map(|d| d.as_secs_f32() * 1000.0),
+                    )
+                })
+                .flatten(),
         })
+    }
+
+    /// Estimated mouth-to-ear latency for Settings → Audio (issue #156): with the ping of the
+    /// voice server while connected, without the network part otherwise. `None` while no audio
+    /// device runs (nothing is measured yet).
+    pub fn latency_estimate(&self) -> Option<crate::latency::LatencyEstimateView> {
+        let core = lock(&self.inner.core);
+        let rtt_ms = core
+            .audio_server
+            .and_then(|id| core.session(id).ok())
+            .and_then(|s| s.transport.as_ref())
+            .and_then(|t| t.stats().rtt)
+            .map(|d| d.as_secs_f32() * 1000.0);
+        core.latency(&self.inner.voice, &self.inner.controls, rtt_ms)
     }
 
     /// Devices and connection counters for the diagnostic file (no names or addresses
@@ -1994,7 +2050,10 @@ impl Inner {
                     crate::screen_share::on_tick(&self.screen_shares, &self.mumcord, &ctx);
                     let audio = self.is_audio_server(server_id);
                     if audio {
-                        lock(&self.core).sample_audio_health(&self.voice);
+                        let mut core = lock(&self.core);
+                        core.sample_audio_health(&self.voice);
+                        core.sync_queue_target(self.controls.low_latency());
+                        drop(core);
                         for session in self.positional.expire(Instant::now()) {
                             ctx.events.emit(EngineEvent::PositionalSendingChanged {
                                 session,
@@ -2003,6 +2062,8 @@ impl Inner {
                         }
                     }
                                 bitrate.set_user_cap(self.user_cap_bps());
+                    // Low-latency mode sends 10 ms packets: twice the header overhead.
+                    bitrate.set_frames_per_packet(if self.controls.low_latency() { 1 } else { 2 });
                     if audio {
                         self.publish_bitrate_max(Some(bitrate.max_possible()));
                     }
@@ -2671,6 +2732,10 @@ impl Inner {
             .map_err(|e| EngineError::internal(e.to_string()))??;
         let mut core = lock(&self.core);
         if core.audio.is_none() {
+            // Under the core lock, so a settings change cannot slip in between.
+            if self.controls.low_latency() {
+                audio.set_low_latency(true);
+            }
             core.audio = Some(audio);
         }
         self.start_pipeline(&mut core);
