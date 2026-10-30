@@ -120,6 +120,15 @@ pub fn channel_join(
     Ok(engine.join_channel(to_engine_server_id(server_id), channel_id)?)
 }
 
+/// Stops voice on the voice server but keeps every connection: the server turns read-only
+/// (self-deafened) and no server has voice until the next explicit join.
+#[tauri::command]
+#[specta::specta]
+pub fn voice_leave(engine: State<'_, Engine>) -> ApiResult<()> {
+    engine.leave_voice();
+    Ok(())
+}
+
 /// Retries a refused join with a channel password, which is stored for the server; the
 /// outcome arrives as `channelPasswordPrompt` (FR-2.78).
 #[tauri::command]
