@@ -21,6 +21,7 @@
       "specs/overlay/overlay-ingame.e2e.ts",
       "specs/servers/multi-server.e2e.ts",
       "specs/servers/password-modal.e2e.ts",
+      "specs/servers/public-server-browser.e2e.ts",
       "specs/servers/servers.e2e.ts"
     ],
     [
