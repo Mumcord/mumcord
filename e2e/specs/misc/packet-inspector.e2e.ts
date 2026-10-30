@@ -93,6 +93,17 @@ describe("packet inspector (issue #60)", () => {
     await browser.keys(["Escape"]);
   });
 
+  it("opens the inspector before connecting, because capture runs only while it is open", async () => {
+    mainWindow = await browser.getWindowHandle();
+    await openSettings("Packet inspector");
+    expect(await $("table").isExisting()).toBe(false);
+    await button("Open packet inspector").click();
+    await switchToInspector();
+    await $("//main[h1[normalize-space()='Packet inspector']]").waitForDisplayed();
+    await browser.switchToWindow(mainWindow);
+    await browser.keys(["Escape"]);
+  });
+
   it("captures the Mumcord hello sent to a user already on the server", async () => {
     peer = botInBackground(["script"], { name: BOT_NAME, timeout: 60 });
     peer.send("sleep 55");
@@ -105,12 +116,8 @@ describe("packet inspector (issue #60)", () => {
     await button("Trust and connect").click();
     await waitConnected();
 
-    mainWindow = await browser.getWindowHandle();
     await openSettings("Packet inspector");
-    expect(await $("table").isExisting()).toBe(false);
-    await button("Open packet inspector").click();
     await switchToInspector();
-    await $("//main[h1[normalize-space()='Packet inspector']]").waitForDisplayed();
     const row = $("//tr[contains(@class,'pi-row-sent')][.//code[normalize-space()='mumcord.hello']]");
     await row.waitForDisplayed({ timeout: 15_000, timeoutMsg: "no sent hello row" });
     expect(await row.getText()).toContain("Mumcord hello");
