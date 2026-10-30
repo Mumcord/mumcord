@@ -369,6 +369,18 @@ mod tests {
     }
 
     #[test]
+    fn nothing_is_captured_until_capture_is_switched_on() {
+        let inspector = Arc::new(Inspector::default());
+        let tap = inspector.tap(1);
+        assert!(!inspector.is_enabled());
+        assert!(!tap.enabled(), "the connection's tap is told not to run");
+        let poll = inspector.poll(None, Vec::new());
+        assert!(!poll.capturing);
+        assert!(poll.packets.is_empty());
+        assert!(poll.counts.is_empty());
+    }
+
+    #[test]
     fn the_ring_buffer_keeps_the_newest_packets_and_counts_all() {
         let inspector = enabled();
         for _ in 0..CAPACITY + 5 {

@@ -18,7 +18,9 @@
 }
 
 .pi-table-wrap {
-  overflow-x: auto;
+  /* The list scrolls on its own so follow mode can keep the newest packet in view. */
+  overflow: auto;
+  max-height: max(16rem, calc(100vh - 26rem));
   border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
 }
@@ -186,4 +188,10 @@
   padding: 0;
   list-style: none;
   font-size: var(--font-size-sm);
+}
+
+/* Under the packet list while follow mode is paused. */
+.pi-jump {
+  display: block;
+  margin: var(--space-2) auto 0;
 }

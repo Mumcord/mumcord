@@ -169,6 +169,7 @@ fn specta_builder() -> Builder<tauri::Wry> {
             diagnostics::diagnostics_save,
             diagnostics::app_info,
             commands::inspector::packet_capture_set,
+            commands::inspector::packet_capture_background,
             commands::inspector::packet_capture_poll,
             commands::inspector::packet_capture_clear,
             commands::inspector::packet_capture_export,
@@ -341,12 +342,14 @@ pub fn run() {
         .manage(dropped::DroppedFiles::default())
         .manage(aux_window::OpenLock::default())
         .manage(commands::inspector::SharedView::default())
+        .manage(commands::inspector::CaptureMode::default())
         .manage(commands::licences::SharedLook::default())
         .manage(watch_player::PlayerServer::default())
         .on_window_event(|window, event| {
             dropped::on_window_event(window, event);
             window::on_window_event(window, event);
             aux_window::on_window_event(window, event);
+            commands::inspector::on_window_event(window, event);
         })
         .setup(move |app| {
             builder.mount_events(app);
