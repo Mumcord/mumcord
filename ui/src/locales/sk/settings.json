@@ -379,7 +379,8 @@
     "showNotices": "Zobraziť licencie tretích strán",
     "noticesFailed": "Licencie tretích strán sa nepodarilo otvoriť.",
     "loading": "Načítava sa…",
-    "devToolsUnlocked": "Vývojárske nástroje odomknuté: inšpektor paketov je teraz v zozname nastavení."
+    "devToolsUnlocked": "Vývojárske nástroje odomknuté: inšpektor paketov je teraz v zozname nastavení.",
+    "portable": "Prenosná"
   },
   "profile": {
     "title": "Profil",

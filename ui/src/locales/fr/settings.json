@@ -378,7 +378,8 @@
     "showNotices": "Afficher les licences tierces",
     "noticesFailed": "Impossible d’ouvrir les licences tierces.",
     "loading": "Chargement…",
-    "devToolsUnlocked": "Outils de développement déverrouillés : l’inspecteur de paquets figure maintenant dans la liste des paramètres."
+    "devToolsUnlocked": "Outils de développement déverrouillés : l’inspecteur de paquets figure maintenant dans la liste des paramètres.",
+    "portable": "Portable"
   },
   "profile": {
     "title": "Profil",

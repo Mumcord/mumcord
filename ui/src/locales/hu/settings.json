@@ -377,7 +377,8 @@
     "showNotices": "Harmadik féltől származó licencek megjelenítése",
     "noticesFailed": "A harmadik féltől származó licenceket nem sikerült megnyitni.",
     "loading": "Betöltés…",
-    "devToolsUnlocked": "Fejlesztői eszközök feloldva: a csomagvizsgáló mostantól szerepel a beállítások listájában."
+    "devToolsUnlocked": "Fejlesztői eszközök feloldva: a csomagvizsgáló mostantól szerepel a beállítások listájában.",
+    "portable": "Hordozható"
   },
   "profile": {
     "title": "Profil",

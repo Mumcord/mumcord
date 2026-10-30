@@ -377,7 +377,8 @@
     "showNotices": "Vis tredjepartslicenser",
     "noticesFailed": "Tredjepartslicenserne kunne ikke åbnes.",
     "loading": "Indlæser…",
-    "devToolsUnlocked": "Udviklerværktøjer låst op: pakkeinspektøren står nu på listen over indstillinger."
+    "devToolsUnlocked": "Udviklerværktøjer låst op: pakkeinspektøren står nu på listen over indstillinger.",
+    "portable": "Bærbar"
   },
   "profile": {
     "title": "Profil",

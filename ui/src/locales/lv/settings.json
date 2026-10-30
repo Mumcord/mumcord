@@ -378,7 +378,8 @@
     "showNotices": "Rādīt trešo pušu licences",
     "noticesFailed": "Trešo pušu licences neizdevās atvērt.",
     "loading": "Ielādē…",
-    "devToolsUnlocked": "Izstrādātāja rīki atbloķēti: pakešu inspektors tagad ir iestatījumu sarakstā."
+    "devToolsUnlocked": "Izstrādātāja rīki atbloķēti: pakešu inspektors tagad ir iestatījumu sarakstā.",
+    "portable": "Portatīvā"
   },
   "profile": {
     "title": "Profils",

@@ -380,7 +380,8 @@
     "showNotices": "Taispeáin ceadúnais tríú páirtí",
     "noticesFailed": "Níorbh fhéidir na ceadúnais tríú páirtí a oscailt.",
     "loading": "Ag luchtú…",
-    "devToolsUnlocked": "Díghlasáladh uirlisí forbróra: tá an cigire paicéad anois sa liosta socruithe."
+    "devToolsUnlocked": "Díghlasáladh uirlisí forbróra: tá an cigire paicéad anois sa liosta socruithe.",
+    "portable": "Iniompartha"
   },
   "profile": {
     "title": "Próifíl",

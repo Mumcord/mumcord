@@ -380,7 +380,8 @@
     "showNotices": "Uri l-liċenzji ta’ partijiet terzi",
     "noticesFailed": "Il-liċenzji ta’ partijiet terzi ma setgħux jinfetħu.",
     "loading": "Qed jitgħabba…",
-    "devToolsUnlocked": "L-għodod tal-iżviluppatur infetħu: l-ispettur tal-pakketti issa jinsab fil-lista tas-settings."
+    "devToolsUnlocked": "L-għodod tal-iżviluppatur infetħu: l-ispettur tal-pakketti issa jinsab fil-lista tas-settings.",
+    "portable": "Portabbli"
   },
   "profile": {
     "title": "Profil",

@@ -378,7 +378,8 @@
     "showNotices": "Prikaži licence trećih strana",
     "noticesFailed": "Licence trećih strana nije moguće otvoriti.",
     "loading": "Učitavanje…",
-    "devToolsUnlocked": "Alati za razvojne programere otključani: inspektor paketa sada je na popisu postavki."
+    "devToolsUnlocked": "Alati za razvojne programere otključani: inspektor paketa sada je na popisu postavki.",
+    "portable": "Prijenosna"
   },
   "profile": {
     "title": "Profil",
