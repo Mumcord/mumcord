@@ -546,6 +546,21 @@
     "weakConnection": "Mostrar icono de conexión débil",
     "weakConnectionHint": "Un pequeño icono de señal junto a las personas con mala conexión."
   },
+  "p2p": {
+    "title": "Peer-to-peer (compartir pantalla, imágenes a tamaño completo)",
+    "modeLabel": "Modo peer-to-peer",
+    "recommended": "Recomendado",
+    "explanation": "Directa muestra tu dirección IP a la otra persona. El relé se la oculta; el operador del relé (la comunidad de este servidor) sí puede verla. Ambos están cifrados de extremo a extremo.",
+    "useGlobal": "Usar ajuste global",
+    "overrideHint": "Solo para este servidor. «Usar ajuste global» sigue Ajustes → Privacidad.",
+    "mode": {
+      "directRelay": "Directa + relé (primero directa)",
+      "relayFirst": "Directa + relé (siempre relé, oculta mi IP)",
+      "directOnly": "Solo directa",
+      "relayOnly": "Solo relé",
+      "off": "Desactivado"
+    }
+  },
   "privacyDirect": {
     "title": "Conexiones directas",
     "allow": "Permitir conexiones directas con otros usuarios de Mumcord",
@@ -636,7 +651,8 @@
       "screen": "Señal de pantalla compartida",
       "watch": "Estado de la sesión de visionado",
       "plugin": "Datos de plugin",
-      "mumble": "Mensaje de Mumble"
+      "mumble": "Mensaje de Mumble",
+      "peer": "Configuración del relé"
     }
   },
   "licences": {

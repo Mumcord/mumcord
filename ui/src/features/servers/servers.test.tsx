@@ -506,6 +506,32 @@ describe("ServerBar with several servers (spec §5.2)", () => {
     });
     expect((await api.serversList())[0]?.themeId).toBeNull();
   });
+
+  it("stores a per-server peer-to-peer mode and goes back to the global setting", async () => {
+    setup();
+    await renderAll();
+    fireEvent.click(within(openMenuOf(0)).getByRole("menuitem", { name: "Edit server" }));
+    openTab("Behaviour");
+    const modes = within(dialog()).getByRole("group", { name: "Peer-to-peer mode" });
+    expect(within(modes).getByRole("radio", { name: "Use global setting" })).toBeChecked();
+    fireEvent.click(within(modes).getByRole("radio", { name: "Relay only" }));
+    fireEvent.click(within(dialog()).getByRole("button", { name: "Save" }));
+    await waitFor(() => {
+      expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+    });
+    expect((await api.serversList())[0]?.p2pModeOverride).toBe("relayOnly");
+
+    fireEvent.click(within(openMenuOf(0)).getByRole("menuitem", { name: "Edit server" }));
+    openTab("Behaviour");
+    const editModes = within(dialog()).getByRole("group", { name: "Peer-to-peer mode" });
+    expect(within(editModes).getByRole("radio", { name: "Relay only" })).toBeChecked();
+    fireEvent.click(within(editModes).getByRole("radio", { name: "Use global setting" }));
+    fireEvent.click(within(dialog()).getByRole("button", { name: "Save" }));
+    await waitFor(() => {
+      expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+    });
+    expect((await api.serversList())[0]?.p2pModeOverride).toBeNull();
+  });
 });
 
 describe("ServerDialog", () => {

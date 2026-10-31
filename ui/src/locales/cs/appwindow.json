@@ -42,7 +42,7 @@
   },
   "directConsent": {
     "title": "Povolit přímá spojení?",
-    "description": "Přímá spojení jsou rychlejší, ale druhá osoba uvidí vaši IP adresu. Mumcord je používá pro obrázky v plné velikosti a sdílení obrazovky s ostatními uživateli Mumcordu a může pro ně otevřít port na vašem routeru. Pokud odmítnete, obrázky dorazí přes server a sdílení obrazovky nebude dostupné. Později to můžete změnit v Nastavení → Soukromí.",
+    "description": "Přímá spojení jsou rychlejší, ale druhá osoba uvidí vaši IP adresu. Mumcord je používá pro obrázky v plné velikosti a sdílení obrazovky s ostatními uživateli Mumcordu a může pro ně otevřít port na vašem routeru. Pokud odmítnete, obrázky dorazí přes server a sdílení obrazovky nebude dostupné. Později to můžete změnit v Nastavení → Soukromí. Pokud tento server nabízí relay, Mumcord může použít místo toho; druhá osoba pak tvou IP adresu neuvidí.",
     "no": "Ne",
     "yes": "Ano",
     "failed": "Nepovedlo se. Zkus to znovu."

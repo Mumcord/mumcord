@@ -544,6 +544,21 @@
     "weakConnection": "Näita nõrga ühenduse ikooni",
     "weakConnectionHint": "Väike signaaliikoon halva ühendusega inimeste kõrval."
   },
+  "p2p": {
+    "title": "Peer-to-peer (ekraani jagamine, täissuuruses pildid)",
+    "modeLabel": "Peer-to-peer-režiim",
+    "recommended": "Soovitatav",
+    "explanation": "Otseühendus näitab sinu IP-aadressi teisele inimesele. Releeserver peidab selle tema eest; releeserveri haldaja (selle serveri kogukond) näeb seda. Mõlemad on otspunktkrüpteeritud.",
+    "useGlobal": "Kasuta üldseadet",
+    "overrideHint": "Ainult selle serveri jaoks. „Kasuta üldseadet“ järgib jaotist Seaded → Privaatsus.",
+    "mode": {
+      "directRelay": "Otse + releeserver (kõigepealt otse)",
+      "relayFirst": "Otse + releeserver (alati releeserver, peidab mu IP)",
+      "directOnly": "Ainult otse",
+      "relayOnly": "Ainult releeserver",
+      "off": "Väljas"
+    }
+  },
   "privacyDirect": {
     "title": "Otseühendused",
     "allow": "Luba otseühendused teiste Mumcordi kasutajatega",
@@ -633,7 +648,8 @@
       "screen": "Ekraanijagamise signaal",
       "watch": "Ühisvaatamise olek",
       "plugin": "Plugina andmed",
-      "mumble": "Mumble’i sõnum"
+      "mumble": "Mumble’i sõnum",
+      "peer": "Releeserveri seadistus"
     }
   },
   "licences": {

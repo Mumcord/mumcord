@@ -5,6 +5,8 @@
  */
 import { useRef } from "react";
 import { useTranslation } from "react-i18next";
+import { p2pBlockText } from "../p2p/relayReason";
+import { useScreenShareOf } from "./sharesStore";
 import { useScreenWatch } from "./useScreenWatch";
 import { stopWatching } from "./watching";
 
@@ -17,11 +19,17 @@ export interface ScreenStageProps {
 
 export function ScreenStage({ serverId, session, name, paused }: ScreenStageProps) {
   const { t } = useTranslation("screenviewer");
+  const { t: tP2p } = useTranslation("p2p");
+  const relayReason = useScreenShareOf(serverId, session)?.relayReason ?? null;
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const { status, retry } = useScreenWatch(serverId, session, canvasRef, paused);
 
   let message: string | null = null;
-  if (status.state === "failed") message = t(status.reason, { name });
+  if (status.state === "failed")
+    message =
+      status.reason === "p2pOff" || status.reason === "relayUnavailable"
+        ? p2pBlockText(tP2p, status.reason, relayReason)
+        : t(status.reason, { name });
   else if (paused) message = t("paused", { name });
   else if (status.state === "starting") message = t("starting", { name });
 

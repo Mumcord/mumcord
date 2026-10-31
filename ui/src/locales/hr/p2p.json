@@ -1,0 +1,54 @@
+{
+  "link": {
+    "label": "Peer-to-peer",
+    "direct": "Izravno",
+    "relayUdp": "Preko releja (UDP)",
+    "relayTcp": "Preko releja (TCP 443)",
+    "ipHidden": "IP skrivena",
+    "ipVisible": "IP vidljiva",
+    "ipHiddenHint": "Druga osoba vidi adresu releja, a ne tvoju."
+  },
+  "relay": {
+    "mumbot": "Mumbot",
+    "relay": "Mumpeer relej",
+    "yes": "Da",
+    "yesNamed": "Da ({{names}})",
+    "no": "Ne",
+    "available": "Dostupno",
+    "availableAt": "Dostupno · {{host}}",
+    "unavailable": "Nedostupno: {{reason}}",
+    "untrusted": "Promijenjeno, nije pouzdano",
+    "changed": "Relej ovog poslužitelja se promijenio.",
+    "trustNew": "Vjeruj novom releju",
+    "keepBlocked": "Zadrži blokirano",
+    "forget": "Zaboravi relej",
+    "actionFailed": "Nije uspjelo. Pokušaj ponovno."
+  },
+  "reason": {
+    "p2pOff": "Peer-to-peer je isključen.",
+    "noRelay": "Ovaj poslužitelj nema relej.",
+    "notConnected": "Nisi povezan s ovim poslužiteljem.",
+    "untrusted": "Relej ovog poslužitelja se promijenio i nije pouzdan.",
+    "conflict": "Na ovom poslužitelju najavljena su dva releja; nijedan se ne koristi.",
+    "botLeft": "Bot releja napustio je poslužitelj.",
+    "relayDown": "Relej trenutačno nije dostupan (javio bot releja).",
+    "botNoAnswer": "Bot releja nije odgovorio.",
+    "refused": "Relej je odbio vezu: {{reason}}",
+    "unreachable": "Relej nije bilo moguće dosegnuti ni preko UDP-a ni preko TCP 443.",
+    "peerCannotRelay": "Druga osoba ne može koristiti relej (stariji Mumcord ili isključen relej).",
+    "denied": "Bot releja odbio je zahtjev.",
+    "peerGone": "Druga osoba napustila je poslužitelj.",
+    "rateLimited": "Previše zahtjeva za relej. Pokušaj ponovno za minutu."
+  },
+  "refusal": {
+    "unknownToken": "nepoznat pristupni token",
+    "expired": "pristupni token je istekao",
+    "notAllowed": "nije dopušteno",
+    "botGone": "bot releja je nestao",
+    "relayFull": "relej je pun",
+    "peerLimit": "previše veza",
+    "rateLimited": "previše pokušaja",
+    "version": "nepodržana verzija",
+    "badRequest": "neispravan zahtjev"
+  }
+}

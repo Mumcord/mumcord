@@ -1,0 +1,54 @@
+{
+  "link": {
+    "label": "Peer-to-peer",
+    "direct": "Directa",
+    "relayUdp": "Mediante relé (UDP)",
+    "relayTcp": "Mediante relé (TCP 443)",
+    "ipHidden": "IP oculta",
+    "ipVisible": "IP visible",
+    "ipHiddenHint": "La otra persona ve la dirección del relé, no la tuya."
+  },
+  "relay": {
+    "mumbot": "Mumbot",
+    "relay": "Relé Mumpeer",
+    "yes": "Sí",
+    "yesNamed": "Sí ({{names}})",
+    "no": "No",
+    "available": "Disponible",
+    "availableAt": "Disponible · {{host}}",
+    "unavailable": "No disponible: {{reason}}",
+    "untrusted": "Cambiado, sin confianza",
+    "changed": "El relé de este servidor ha cambiado.",
+    "trustNew": "Confiar en el nuevo relé",
+    "keepBlocked": "Mantener bloqueado",
+    "forget": "Olvidar relé",
+    "actionFailed": "No ha funcionado. Inténtalo de nuevo."
+  },
+  "reason": {
+    "p2pOff": "Peer-to-peer está desactivado.",
+    "noRelay": "Este servidor no tiene relé.",
+    "notConnected": "Sin conexión con este servidor.",
+    "untrusted": "El relé de este servidor ha cambiado y no es de confianza.",
+    "conflict": "Hay dos relés anunciados en este servidor; no se usa ninguno.",
+    "botLeft": "El bot del relé salió del servidor.",
+    "relayDown": "El relé no está accesible ahora mismo (informado por el bot del relé).",
+    "botNoAnswer": "El bot del relé no respondió.",
+    "refused": "El relé rechazó la conexión: {{reason}}",
+    "unreachable": "No se pudo acceder al relé por UDP ni por TCP 443.",
+    "peerCannotRelay": "La otra persona no puede usar el relé (Mumcord antiguo o relé desactivado).",
+    "denied": "El bot del relé rechazó la solicitud.",
+    "peerGone": "La otra persona salió del servidor.",
+    "rateLimited": "Demasiadas solicitudes al relé. Inténtalo de nuevo en un minuto."
+  },
+  "refusal": {
+    "unknownToken": "token de acceso desconocido",
+    "expired": "token de acceso caducado",
+    "notAllowed": "no permitido",
+    "botGone": "el bot del relé ya no está",
+    "relayFull": "relé lleno",
+    "peerLimit": "demasiadas conexiones",
+    "rateLimited": "demasiados intentos",
+    "version": "versión no compatible",
+    "badRequest": "solicitud no válida"
+  }
+}

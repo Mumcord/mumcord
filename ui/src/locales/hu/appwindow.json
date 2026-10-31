@@ -42,7 +42,7 @@
   },
   "directConsent": {
     "title": "Engedélyezed a közvetlen kapcsolatokat?",
-    "description": "A közvetlen kapcsolatok gyorsabbak, de a másik személy láthatja az IP-címedet. A Mumcord ezeket teljes méretű képekhez és képernyőmegosztáshoz használja más Mumcord-felhasználókkal, és ehhez portot nyithat a routereden. Ha nemet mondasz, a képek továbbra is a szerveren keresztül érkeznek, a képernyőmegosztás pedig nem érhető el. Ezt később módosíthatod a Beállítások → Adatvédelem alatt.",
+    "description": "A közvetlen kapcsolatok gyorsabbak, de a másik személy láthatja az IP-címedet. A Mumcord ezeket teljes méretű képekhez és képernyőmegosztáshoz használja más Mumcord-felhasználókkal, és ehhez portot nyithat a routereden. Ha nemet mondasz, a képek továbbra is a szerveren keresztül érkeznek, a képernyőmegosztás pedig nem érhető el. Ezt később módosíthatod a Beállítások → Adatvédelem alatt. Ha ez a szerver átjátszót kínál, a Mumcord használhatja helyette; ilyenkor a másik fél nem látja az IP-címedet.",
     "no": "Nem",
     "yes": "Igen",
     "failed": "Ez nem sikerült. Próbáld újra."

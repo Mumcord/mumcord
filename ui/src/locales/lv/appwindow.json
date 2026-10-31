@@ -42,7 +42,7 @@
   },
   "directConsent": {
     "title": "Atļaut tiešos savienojumus?",
-    "description": "Tiešie savienojumi ir ātrāki, bet otra persona var redzēt jūsu IP adresi. Mumcord tos izmanto pilna izmēra attēliem un ekrāna kopīgošanai ar citiem Mumcord lietotājiem un var to dēļ atvērt portu jūsu maršrutētājā. Ja atteiksiet, attēli joprojām pienāks caur serveri, bet ekrāna kopīgošana nebūs pieejama. To varat mainīt vēlāk sadaļā Iestatījumi → Privātums.",
+    "description": "Tiešie savienojumi ir ātrāki, bet otra persona var redzēt jūsu IP adresi. Mumcord tos izmanto pilna izmēra attēliem un ekrāna kopīgošanai ar citiem Mumcord lietotājiem un var to dēļ atvērt portu jūsu maršrutētājā. Ja atteiksiet, attēli joprojām pienāks caur serveri, bet ekrāna kopīgošana nebūs pieejama. To varat mainīt vēlāk sadaļā Iestatījumi → Privātums. Ja šis serveris piedāvā releju, Mumcord var izmantot to; tad otra persona neredz tavu IP adresi.",
     "no": "Nē",
     "yes": "Jā",
     "failed": "Neizdevās. Mēģini vēlreiz."

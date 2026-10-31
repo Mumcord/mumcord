@@ -317,6 +317,18 @@ export const SETTINGS_INDEX: readonly SettingEntry[] = [
   { section: "privacy", group: "acceptedConversations.title" },
   {
     section: "privacy",
+    group: "p2p.title",
+    terms: [
+      "p2p.modeLabel",
+      "p2p.explanation",
+      "p2p.mode.directRelay",
+      "p2p.mode.relayFirst",
+      "p2p.mode.directOnly",
+      "p2p.mode.relayOnly",
+    ],
+  },
+  {
+    section: "privacy",
     group: "privacyDirect.title",
     control: "privacyDirect.allow",
     terms: ["privacyDirect.hint"],

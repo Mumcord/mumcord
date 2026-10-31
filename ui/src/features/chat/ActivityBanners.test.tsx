@@ -102,6 +102,32 @@ describe("activity banners", () => {
     expect(screen.queryByRole("status")).toBeNull();
   });
 
+  it.each([
+    [{ blocked: "p2pOff", relayReason: null }, "Peer-to-peer is off."],
+    [
+      { blocked: "relayUnavailable", relayReason: { kind: "noRelay" } },
+      "This server has no relay.",
+    ],
+    [
+      { blocked: "relayUnavailable", relayReason: { kind: "refused", refusal: "relayFull" } },
+      "The relay refused the connection: relay full",
+    ],
+  ] as const)("disables Watch with the reason %o", async (block, reason) => {
+    const { api } = await setup();
+    act(() => {
+      api.mock.emit("screenSharesChanged", {
+        serverId: SERVER,
+        shares: [{ ...share(2), ...block }],
+      });
+    });
+    const watch = screen.getByRole("button", { name: "Watch" });
+    expect(watch).toHaveAttribute("aria-disabled", "true");
+    expect(watch).toHaveAttribute("data-tooltip", reason);
+    expect(watch).toHaveAccessibleDescription(reason);
+    fireEvent.click(watch);
+    expect(screen.getByTestId("watched")).toHaveTextContent("none");
+  });
+
   it("shows a party banner, Join joins, and it returns after leaving", async () => {
     const { api, channelId } = await setup();
     const join = vi

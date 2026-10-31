@@ -548,6 +548,21 @@
     "weakConnection": "Pokaži ikono šibke povezave",
     "weakConnectionHint": "Majhna ikona signala ob osebah s slabo povezavo."
   },
+  "p2p": {
+    "title": "Peer-to-peer (deljenje zaslona, slike v polni velikosti)",
+    "modeLabel": "Način peer-to-peer",
+    "recommended": "Priporočeno",
+    "explanation": "Neposredno drugi osebi pokaže tvoj naslov IP. Relej ga pred njo skrije; upravljavec releja (skupnost tega strežnika) ga lahko vidi. Oboje je šifrirano od konca do konca.",
+    "useGlobal": "Uporabi splošno nastavitev",
+    "overrideHint": "Samo za ta strežnik. »Uporabi splošno nastavitev« sledi Nastavitve → Zasebnost.",
+    "mode": {
+      "directRelay": "Neposredno + relej (najprej neposredno)",
+      "relayFirst": "Neposredno + relej (vedno relej, skrije moj IP)",
+      "directOnly": "Samo neposredno",
+      "relayOnly": "Samo relej",
+      "off": "Izklopljeno"
+    }
+  },
   "privacyDirect": {
     "title": "Neposredne povezave",
     "allow": "Dovoli neposredne povezave z drugimi uporabniki Mumcorda",
@@ -639,7 +654,8 @@
       "screen": "Signal deljenja zaslona",
       "watch": "Stanje skupnega gledanja",
       "plugin": "Podatki vtičnika",
-      "mumble": "Sporočilo Mumble"
+      "mumble": "Sporočilo Mumble",
+      "peer": "Nastavitev releja"
     }
   },
   "licences": {

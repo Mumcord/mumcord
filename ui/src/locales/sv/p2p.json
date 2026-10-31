@@ -1,0 +1,54 @@
+{
+  "link": {
+    "label": "Peer-to-peer",
+    "direct": "Direkt",
+    "relayUdp": "Via relä (UDP)",
+    "relayTcp": "Via relä (TCP 443)",
+    "ipHidden": "IP dold",
+    "ipVisible": "IP synlig",
+    "ipHiddenHint": "Den andra personen ser reläets adress, inte din."
+  },
+  "relay": {
+    "mumbot": "Mumbot",
+    "relay": "Mumpeer-relä",
+    "yes": "Ja",
+    "yesNamed": "Ja ({{names}})",
+    "no": "Nej",
+    "available": "Tillgängligt",
+    "availableAt": "Tillgängligt · {{host}}",
+    "unavailable": "Inte tillgängligt: {{reason}}",
+    "untrusted": "Ändrat, inte betrott",
+    "changed": "Den här serverns relä har ändrats.",
+    "trustNew": "Lita på nya reläet",
+    "keepBlocked": "Behåll blockerat",
+    "forget": "Glöm relä",
+    "actionFailed": "Det fungerade inte. Försök igen."
+  },
+  "reason": {
+    "p2pOff": "Peer-to-peer är avstängt.",
+    "noRelay": "Den här servern har inget relä.",
+    "notConnected": "Inte ansluten till den här servern.",
+    "untrusted": "Den här serverns relä har ändrats och betros inte.",
+    "conflict": "Två relän är annonserade på den här servern; inget av dem används.",
+    "botLeft": "Relä-boten lämnade servern.",
+    "relayDown": "Reläet kan inte nås just nu (rapporterat av relä-boten).",
+    "botNoAnswer": "Relä-boten svarade inte.",
+    "refused": "Reläet avvisade anslutningen: {{reason}}",
+    "unreachable": "Reläet kunde inte nås varken via UDP eller TCP 443.",
+    "peerCannotRelay": "Den andra personen kan inte använda reläet (äldre Mumcord eller relä avstängt).",
+    "denied": "Relä-boten avvisade begäran.",
+    "peerGone": "Den andra personen lämnade servern.",
+    "rateLimited": "För många relä-begäranden. Försök igen om en minut."
+  },
+  "refusal": {
+    "unknownToken": "okänd åtkomsttoken",
+    "expired": "åtkomsttoken har gått ut",
+    "notAllowed": "inte tillåtet",
+    "botGone": "relä-boten är borta",
+    "relayFull": "reläet är fullt",
+    "peerLimit": "för många anslutningar",
+    "rateLimited": "för många försök",
+    "version": "version stöds inte",
+    "badRequest": "ogiltig begäran"
+  }
+}

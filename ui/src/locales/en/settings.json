@@ -544,6 +544,21 @@
     "weakConnection": "Show weak connection icon",
     "weakConnectionHint": "A small signal icon next to people whose connection is poor."
   },
+  "p2p": {
+    "title": "Peer-to-peer (screen sharing, full-size images)",
+    "modeLabel": "Peer-to-peer mode",
+    "recommended": "Recommended",
+    "explanation": "Direct shows your IP address to the other person. The relay hides it from them; the relay's operator (this server's community) can see it. Both are end-to-end encrypted.",
+    "useGlobal": "Use global setting",
+    "overrideHint": "Only for this server. \"Use global setting\" follows Settings → Privacy.",
+    "mode": {
+      "directRelay": "Direct + relay (direct first)",
+      "relayFirst": "Direct + relay (always relay, hides my IP)",
+      "directOnly": "Direct only",
+      "relayOnly": "Relay only",
+      "off": "Off"
+    }
+  },
   "privacyDirect": {
     "title": "Direct connections",
     "allow": "Allow direct connections to other Mumcord users",
@@ -633,7 +648,8 @@
       "screen": "Screen share signal",
       "watch": "Watch party state",
       "plugin": "Plugin data",
-      "mumble": "Mumble message"
+      "mumble": "Mumble message",
+      "peer": "Relay setup"
     }
   },
   "licences": {

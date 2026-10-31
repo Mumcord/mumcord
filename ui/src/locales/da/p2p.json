@@ -1,0 +1,54 @@
+{
+  "link": {
+    "label": "Peer-to-peer",
+    "direct": "Direkte",
+    "relayUdp": "Via relæ (UDP)",
+    "relayTcp": "Via relæ (TCP 443)",
+    "ipHidden": "IP skjult",
+    "ipVisible": "IP synlig",
+    "ipHiddenHint": "Den anden person ser relæets adresse, ikke din."
+  },
+  "relay": {
+    "mumbot": "Mumbot",
+    "relay": "Mumpeer-relæ",
+    "yes": "Ja",
+    "yesNamed": "Ja ({{names}})",
+    "no": "Nej",
+    "available": "Tilgængeligt",
+    "availableAt": "Tilgængeligt · {{host}}",
+    "unavailable": "Ikke tilgængeligt: {{reason}}",
+    "untrusted": "Ændret, ikke betroet",
+    "changed": "Denne servers relæ er ændret.",
+    "trustNew": "Stol på nyt relæ",
+    "keepBlocked": "Behold blokeret",
+    "forget": "Glem relæ",
+    "actionFailed": "Det virkede ikke. Prøv igen."
+  },
+  "reason": {
+    "p2pOff": "Peer-to-peer er slået fra.",
+    "noRelay": "Denne server har intet relæ.",
+    "notConnected": "Ikke forbundet til denne server.",
+    "untrusted": "Denne servers relæ er ændret og er ikke betroet.",
+    "conflict": "To relæer er annonceret på denne server; ingen af dem bruges.",
+    "botLeft": "Relæ-botten forlod serveren.",
+    "relayDown": "Relæet kan ikke nås lige nu (rapporteret af relæ-botten).",
+    "botNoAnswer": "Relæ-botten svarede ikke.",
+    "refused": "Relæet afviste forbindelsen: {{reason}}",
+    "unreachable": "Relæet kunne ikke nås via UDP eller TCP 443.",
+    "peerCannotRelay": "Den anden person kan ikke bruge relæet (ældre Mumcord eller relæ slået fra).",
+    "denied": "Relæ-botten afviste anmodningen.",
+    "peerGone": "Den anden person forlod serveren.",
+    "rateLimited": "For mange relæanmodninger. Prøv igen om et minut."
+  },
+  "refusal": {
+    "unknownToken": "ukendt adgangstoken",
+    "expired": "adgangstoken udløbet",
+    "notAllowed": "ikke tilladt",
+    "botGone": "relæ-botten er væk",
+    "relayFull": "relæet er fuldt",
+    "peerLimit": "for mange forbindelser",
+    "rateLimited": "for mange forsøg",
+    "version": "version understøttes ikke",
+    "badRequest": "ugyldig anmodning"
+  }
+}

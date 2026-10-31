@@ -1,0 +1,54 @@
+{
+  "link": {
+    "label": "Peer-to-peer",
+    "direct": "Direct",
+    "relayUdp": "Via relay (UDP)",
+    "relayTcp": "Via relay (TCP 443)",
+    "ipHidden": "IP verborgen",
+    "ipVisible": "IP zichtbaar",
+    "ipHiddenHint": "De ander ziet het adres van de relay, niet het jouwe."
+  },
+  "relay": {
+    "mumbot": "Mumbot",
+    "relay": "Mumpeer-relay",
+    "yes": "Ja",
+    "yesNamed": "Ja ({{names}})",
+    "no": "Nee",
+    "available": "Beschikbaar",
+    "availableAt": "Beschikbaar · {{host}}",
+    "unavailable": "Niet beschikbaar: {{reason}}",
+    "untrusted": "Gewijzigd, niet vertrouwd",
+    "changed": "De relay van deze server is gewijzigd.",
+    "trustNew": "Nieuwe relay vertrouwen",
+    "keepBlocked": "Geblokkeerd houden",
+    "forget": "Relay vergeten",
+    "actionFailed": "Dat is niet gelukt. Probeer het opnieuw."
+  },
+  "reason": {
+    "p2pOff": "Peer-to-peer staat uit.",
+    "noRelay": "Deze server heeft geen relay.",
+    "notConnected": "Niet verbonden met deze server.",
+    "untrusted": "De relay van deze server is gewijzigd en wordt niet vertrouwd.",
+    "conflict": "Op deze server zijn twee relays aangekondigd; geen van beide wordt gebruikt.",
+    "botLeft": "De relaybot heeft de server verlaten.",
+    "relayDown": "De relay is nu niet bereikbaar (gemeld door de relaybot).",
+    "botNoAnswer": "De relaybot gaf geen antwoord.",
+    "refused": "De relay heeft de verbinding geweigerd: {{reason}}",
+    "unreachable": "De relay was niet bereikbaar via UDP of TCP 443.",
+    "peerCannotRelay": "De ander kan de relay niet gebruiken (oudere Mumcord of relay uitgeschakeld).",
+    "denied": "De relaybot heeft het verzoek geweigerd.",
+    "peerGone": "De ander heeft de server verlaten.",
+    "rateLimited": "Te veel relayverzoeken. Probeer het over een minuut opnieuw."
+  },
+  "refusal": {
+    "unknownToken": "onbekend toegangstoken",
+    "expired": "toegangstoken verlopen",
+    "notAllowed": "niet toegestaan",
+    "botGone": "relaybot weg",
+    "relayFull": "relay vol",
+    "peerLimit": "te veel verbindingen",
+    "rateLimited": "te veel pogingen",
+    "version": "niet-ondersteunde versie",
+    "badRequest": "ongeldig verzoek"
+  }
+}

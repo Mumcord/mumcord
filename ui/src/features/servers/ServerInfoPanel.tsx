@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import { getApi } from "../../api";
 import type { ServerState } from "../channels/serverStore";
 import { useConnectionStats, type StatsState } from "../connection/useConnectionStats";
+import { RelayRows } from "../p2p/RelayRows";
 import { Dialog } from "./Dialog";
 import { initials } from "./format";
 import "./server-info-panel.css";
@@ -283,6 +284,7 @@ export function ServerInfoPanel({ serverState, onClose }: ServerInfoPanelProps) 
               {formatLimit(info.maxImageMessageLength)}
             </Row>
             <Row label={t("serverInfo.codecs")}>Opus</Row>
+            <RelayRows serverId={serverState.serverId} Row={Row} />
           </dl>
         </section>
 

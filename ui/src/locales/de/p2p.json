@@ -1,0 +1,54 @@
+{
+  "link": {
+    "label": "Peer-to-Peer",
+    "direct": "Direkt",
+    "relayUdp": "Über Relay (UDP)",
+    "relayTcp": "Über Relay (TCP 443)",
+    "ipHidden": "IP verborgen",
+    "ipVisible": "IP sichtbar",
+    "ipHiddenHint": "Die andere Person sieht die Adresse des Relays, nicht deine."
+  },
+  "relay": {
+    "mumbot": "Mumbot",
+    "relay": "Mumpeer-Relay",
+    "yes": "Ja",
+    "yesNamed": "Ja ({{names}})",
+    "no": "Nein",
+    "available": "Verfügbar",
+    "availableAt": "Verfügbar · {{host}}",
+    "unavailable": "Nicht verfügbar: {{reason}}",
+    "untrusted": "Geändert, nicht vertraut",
+    "changed": "Das Relay dieses Servers hat sich geändert.",
+    "trustNew": "Neuem Relay vertrauen",
+    "keepBlocked": "Gesperrt lassen",
+    "forget": "Relay vergessen",
+    "actionFailed": "Das hat nicht geklappt. Bitte versuche es erneut."
+  },
+  "reason": {
+    "p2pOff": "Peer-to-Peer ist aus.",
+    "noRelay": "Dieser Server hat kein Relay.",
+    "notConnected": "Nicht mit diesem Server verbunden.",
+    "untrusted": "Das Relay dieses Servers hat sich geändert und wird nicht vertraut.",
+    "conflict": "Auf diesem Server sind zwei Relays angekündigt; keines wird verwendet.",
+    "botLeft": "Der Relay-Bot hat den Server verlassen.",
+    "relayDown": "Das Relay ist gerade nicht erreichbar (gemeldet vom Relay-Bot).",
+    "botNoAnswer": "Der Relay-Bot hat nicht geantwortet.",
+    "refused": "Das Relay hat die Verbindung abgelehnt: {{reason}}",
+    "unreachable": "Das Relay war weder per UDP noch per TCP 443 erreichbar.",
+    "peerCannotRelay": "Die andere Person kann das Relay nicht nutzen (älteres Mumcord oder Relay ausgeschaltet).",
+    "denied": "Der Relay-Bot hat die Anfrage abgelehnt.",
+    "peerGone": "Die andere Person hat den Server verlassen.",
+    "rateLimited": "Zu viele Relay-Anfragen. Versuche es in einer Minute erneut."
+  },
+  "refusal": {
+    "unknownToken": "unbekanntes Zugriffstoken",
+    "expired": "Zugriffstoken abgelaufen",
+    "notAllowed": "nicht erlaubt",
+    "botGone": "Relay-Bot weg",
+    "relayFull": "Relay voll",
+    "peerLimit": "zu viele Verbindungen",
+    "rateLimited": "zu viele Versuche",
+    "version": "nicht unterstützte Version",
+    "badRequest": "ungültige Anfrage"
+  }
+}

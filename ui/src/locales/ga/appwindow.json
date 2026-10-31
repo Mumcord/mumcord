@@ -42,7 +42,7 @@
   },
   "directConsent": {
     "title": "Ceangail dhíreacha a cheadú?",
-    "description": "Bíonn ceangail dhíreacha níos tapúla, ach feicfidh an duine eile do sheoladh IP. Úsáideann Mumcord iad le haghaidh íomhánna lánmhéide agus comhroinnt scáileáin le húsáideoirí eile Mumcord, agus d’fhéadfadh sé port a oscailt ar do ródaire dóibh. Má deir tú nach ea, tiocfaidh íomhánna tríd an bhfreastalaí fós agus ní bheidh comhroinnt scáileáin ar fáil. Is féidir leat é seo a athrú níos déanaí i Socruithe → Príobháideacht.",
+    "description": "Bíonn ceangail dhíreacha níos tapúla, ach feicfidh an duine eile do sheoladh IP. Úsáideann Mumcord iad le haghaidh íomhánna lánmhéide agus comhroinnt scáileáin le húsáideoirí eile Mumcord, agus d’fhéadfadh sé port a oscailt ar do ródaire dóibh. Má deir tú nach ea, tiocfaidh íomhánna tríd an bhfreastalaí fós agus ní bheidh comhroinnt scáileáin ar fáil. Is féidir leat é seo a athrú níos déanaí i Socruithe → Príobháideacht. Má thairgeann an freastalaí seo athsheachadán, is féidir le Mumcord é a úsáid ina ionad; ansin ní fheiceann an duine eile do sheoladh IP.",
     "no": "Níl",
     "yes": "Tá",
     "failed": "Níor oibrigh sé sin. Bain triail eile as."

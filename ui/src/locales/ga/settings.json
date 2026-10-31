@@ -550,6 +550,21 @@
     "weakConnection": "Taispeáin deilbhín ceangail laig",
     "weakConnectionHint": "Deilbhín beag comhartha in aice le daoine a bhfuil droch-cheangal acu."
   },
+  "p2p": {
+    "title": "Piarbhrearthóireacht (comhroinnt scáileáin, íomhánna lán-mhéide)",
+    "modeLabel": "Mód piarbhrearthóireachta",
+    "recommended": "Molta",
+    "explanation": "Taispeánann Díreach do sheoladh IP don duine eile. Folaíonn an t-athsheachadán uaidh é; is féidir le hoibreoir an athsheachadáin (pobal an fhreastalaí seo) é a fheiceáil. Tá an dá rogha criptithe ó cheann ceann.",
+    "useGlobal": "Úsáid an socrú domhanda",
+    "overrideHint": "Don fhreastalaí seo amháin. Leanann “Úsáid an socrú domhanda” Socruithe → Príobháideacht.",
+    "mode": {
+      "directRelay": "Díreach + athsheachadán (díreach ar dtús)",
+      "relayFirst": "Díreach + athsheachadán (athsheachadán i gcónaí, folaíonn mo IP)",
+      "directOnly": "Díreach amháin",
+      "relayOnly": "Athsheachadán amháin",
+      "off": "Múchta"
+    }
+  },
   "privacyDirect": {
     "title": "Ceangail dhíreacha",
     "allow": "Ceadaigh ceangail dhíreacha le húsáideoirí eile Mumcord",
@@ -642,7 +657,8 @@
       "screen": "Comhartha comhroinnte scáileáin",
       "watch": "Staid an tseisiúin féachana",
       "plugin": "Sonraí breiseáin",
-      "mumble": "Teachtaireacht Mumble"
+      "mumble": "Teachtaireacht Mumble",
+      "peer": "Socrú athsheachadáin"
     }
   },
   "licences": {

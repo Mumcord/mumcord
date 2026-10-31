@@ -1,0 +1,54 @@
+{
+  "link": {
+    "label": "Peer-to-peer",
+    "direct": "Priamo",
+    "relayUdp": "Cez relay (UDP)",
+    "relayTcp": "Cez relay (TCP 443)",
+    "ipHidden": "IP skrytá",
+    "ipVisible": "IP viditeľná",
+    "ipHiddenHint": "Druhá osoba vidí adresu relay, nie tvoju."
+  },
+  "relay": {
+    "mumbot": "Mumbot",
+    "relay": "Relay Mumpeer",
+    "yes": "Áno",
+    "yesNamed": "Áno ({{names}})",
+    "no": "Nie",
+    "available": "Dostupné",
+    "availableAt": "Dostupné · {{host}}",
+    "unavailable": "Nedostupné: {{reason}}",
+    "untrusted": "Zmenené, nedôveryhodné",
+    "changed": "Relay tohto servera sa zmenilo.",
+    "trustNew": "Dôverovať novému relay",
+    "keepBlocked": "Ponechať zablokované",
+    "forget": "Zabudnúť relay",
+    "actionFailed": "Nepodarilo sa. Skús to znova."
+  },
+  "reason": {
+    "p2pOff": "Peer-to-peer je vypnuté.",
+    "noRelay": "Tento server nemá relay.",
+    "notConnected": "Nie si pripojený k tomuto serveru.",
+    "untrusted": "Relay tohto servera sa zmenilo a nie je dôveryhodné.",
+    "conflict": "Na tomto serveri sú oznámené dve relay; žiadne sa nepoužije.",
+    "botLeft": "Bot relay opustil server.",
+    "relayDown": "Relay momentálne nie je dostupné (hlási bot relay).",
+    "botNoAnswer": "Bot relay neodpovedal.",
+    "refused": "Relay odmietlo spojenie: {{reason}}",
+    "unreachable": "Relay sa nepodarilo zastihnúť cez UDP ani TCP 443.",
+    "peerCannotRelay": "Druhá osoba nemôže relay použiť (staršie Mumcord alebo vypnuté relay).",
+    "denied": "Bot relay požiadavku odmietol.",
+    "peerGone": "Druhá osoba opustila server.",
+    "rateLimited": "Príliš veľa požiadaviek na relay. Skús to o minútu."
+  },
+  "refusal": {
+    "unknownToken": "neznámy prístupový token",
+    "expired": "prístupový token vypršal",
+    "notAllowed": "nepovolené",
+    "botGone": "bot relay je preč",
+    "relayFull": "relay je plné",
+    "peerLimit": "príliš veľa spojení",
+    "rateLimited": "príliš veľa pokusov",
+    "version": "nepodporovaná verzia",
+    "badRequest": "neplatná požiadavka"
+  }
+}

@@ -546,6 +546,21 @@
     "weakConnection": "Mostrar ícone de ligação fraca",
     "weakConnectionHint": "Um pequeno ícone de sinal junto das pessoas com ligação fraca."
   },
+  "p2p": {
+    "title": "Peer-to-peer (partilha de ecrã, imagens em tamanho original)",
+    "modeLabel": "Modo peer-to-peer",
+    "recommended": "Recomendado",
+    "explanation": "O modo direto mostra o teu endereço IP à outra pessoa. O retransmissor oculta-o dela; o operador do retransmissor (a comunidade deste servidor) pode vê-lo. Ambos são cifrados de ponta a ponta.",
+    "useGlobal": "Usar definição global",
+    "overrideHint": "Apenas para este servidor. «Usar definição global» segue Definições → Privacidade.",
+    "mode": {
+      "directRelay": "Direta + retransmissor (primeiro direta)",
+      "relayFirst": "Direta + retransmissor (sempre retransmissor, oculta o meu IP)",
+      "directOnly": "Apenas direta",
+      "relayOnly": "Apenas retransmissor",
+      "off": "Desativado"
+    }
+  },
   "privacyDirect": {
     "title": "Ligações diretas",
     "allow": "Permitir ligações diretas a outros utilizadores do Mumcord",
@@ -636,7 +651,8 @@
       "screen": "Sinal de partilha de ecrã",
       "watch": "Estado da sessão de visualização",
       "plugin": "Dados do plugin",
-      "mumble": "Mensagem Mumble"
+      "mumble": "Mensagem Mumble",
+      "peer": "Configuração do retransmissor"
     }
   },
   "licences": {

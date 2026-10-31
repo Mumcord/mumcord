@@ -1,0 +1,54 @@
+{
+  "link": {
+    "label": "Peer-to-peer",
+    "direct": "Suora",
+    "relayUdp": "Releen kautta (UDP)",
+    "relayTcp": "Releen kautta (TCP 443)",
+    "ipHidden": "IP piilotettu",
+    "ipVisible": "IP näkyvissä",
+    "ipHiddenHint": "Toinen henkilö näkee releen osoitteen, ei omaasi."
+  },
+  "relay": {
+    "mumbot": "Mumbot",
+    "relay": "Mumpeer-rele",
+    "yes": "Kyllä",
+    "yesNamed": "Kyllä ({{names}})",
+    "no": "Ei",
+    "available": "Saatavilla",
+    "availableAt": "Saatavilla · {{host}}",
+    "unavailable": "Ei saatavilla: {{reason}}",
+    "untrusted": "Muuttunut, ei luotettu",
+    "changed": "Tämän palvelimen rele on muuttunut.",
+    "trustNew": "Luota uuteen releeseen",
+    "keepBlocked": "Pidä estettynä",
+    "forget": "Unohda rele",
+    "actionFailed": "Se ei onnistunut. Yritä uudelleen."
+  },
+  "reason": {
+    "p2pOff": "Peer-to-peer on pois päältä.",
+    "noRelay": "Tällä palvelimella ei ole relettä.",
+    "notConnected": "Ei yhteyttä tähän palvelimeen.",
+    "untrusted": "Tämän palvelimen rele on muuttunut, eikä siihen luoteta.",
+    "conflict": "Tällä palvelimella on ilmoitettu kaksi relettä; kumpaakaan ei käytetä.",
+    "botLeft": "Rele-botti poistui palvelimelta.",
+    "relayDown": "Rele ei ole tavoitettavissa juuri nyt (rele-botin ilmoittama).",
+    "botNoAnswer": "Rele-botti ei vastannut.",
+    "refused": "Rele hylkäsi yhteyden: {{reason}}",
+    "unreachable": "Relettä ei tavoitettu UDP:llä eikä TCP 443:lla.",
+    "peerCannotRelay": "Toinen henkilö ei voi käyttää relettä (vanhempi Mumcord tai rele pois päältä).",
+    "denied": "Rele-botti hylkäsi pyynnön.",
+    "peerGone": "Toinen henkilö poistui palvelimelta.",
+    "rateLimited": "Liian monta relepyyntöä. Yritä minuutin kuluttua uudelleen."
+  },
+  "refusal": {
+    "unknownToken": "tuntematon käyttöoikeustunniste",
+    "expired": "käyttöoikeustunniste vanhentui",
+    "notAllowed": "ei sallittu",
+    "botGone": "rele-botti on poissa",
+    "relayFull": "rele on täynnä",
+    "peerLimit": "liian monta yhteyttä",
+    "rateLimited": "liian monta yritystä",
+    "version": "versiota ei tueta",
+    "badRequest": "virheellinen pyyntö"
+  }
+}

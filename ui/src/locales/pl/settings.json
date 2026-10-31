@@ -548,6 +548,21 @@
     "weakConnection": "Pokazuj ikonę słabego połączenia",
     "weakConnectionHint": "Mała ikona sygnału przy osobach ze słabym połączeniem."
   },
+  "p2p": {
+    "title": "Peer-to-peer (udostępnianie ekranu, obrazy w pełnym rozmiarze)",
+    "modeLabel": "Tryb peer-to-peer",
+    "recommended": "Zalecane",
+    "explanation": "Połączenie bezpośrednie pokazuje twój adres IP drugiej osobie. Przekaźnik ukrywa go przed nią; operator przekaźnika (społeczność tego serwera) może go zobaczyć. Oba warianty są szyfrowane od końca do końca.",
+    "useGlobal": "Użyj ustawienia globalnego",
+    "overrideHint": "Tylko dla tego serwera. „Użyj ustawienia globalnego” podąża za Ustawienia → Prywatność.",
+    "mode": {
+      "directRelay": "Bezpośrednio + przekaźnik (najpierw bezpośrednio)",
+      "relayFirst": "Bezpośrednio + przekaźnik (zawsze przekaźnik, ukrywa mój IP)",
+      "directOnly": "Tylko bezpośrednio",
+      "relayOnly": "Tylko przekaźnik",
+      "off": "Wyłączone"
+    }
+  },
   "privacyDirect": {
     "title": "Połączenia bezpośrednie",
     "allow": "Zezwalaj na połączenia bezpośrednie z innymi użytkownikami Mumcord",
@@ -639,7 +654,8 @@
       "screen": "Sygnał udostępniania ekranu",
       "watch": "Stan wspólnego oglądania",
       "plugin": "Dane wtyczki",
-      "mumble": "Wiadomość Mumble"
+      "mumble": "Wiadomość Mumble",
+      "peer": "Konfiguracja przekaźnika"
     }
   },
   "licences": {

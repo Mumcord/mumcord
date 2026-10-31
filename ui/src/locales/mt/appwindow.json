@@ -42,7 +42,7 @@
   },
   "directConsent": {
     "title": "Tippermetti konnessjonijiet diretti?",
-    "description": "Il-konnessjonijiet diretti huma aktar mgħaġġla, iżda l-persuna l-oħra tista’ tara l-indirizz IP tiegħek. Mumcord jużahom għal stampi f’daqs sħiħ u għall-qsim tal-iskrin ma’ utenti oħra ta’ Mumcord u jista’ jiftaħ port fuq ir-router tiegħek għalihom. Jekk tgħid le, l-istampi xorta jaslu permezz tas-server u l-qsim tal-iskrin ma jkunx disponibbli. Tista’ tibdel dan aktar tard f’Settings → Privatezza.",
+    "description": "Il-konnessjonijiet diretti huma aktar mgħaġġla, iżda l-persuna l-oħra tista’ tara l-indirizz IP tiegħek. Mumcord jużahom għal stampi f’daqs sħiħ u għall-qsim tal-iskrin ma’ utenti oħra ta’ Mumcord u jista’ jiftaħ port fuq ir-router tiegħek għalihom. Jekk tgħid le, l-istampi xorta jaslu permezz tas-server u l-qsim tal-iskrin ma jkunx disponibbli. Tista’ tibdel dan aktar tard f’Settings → Privatezza. Jekk dan is-server joffri relay, Mumcord jista' jużah minflok; allura l-persuna l-oħra ma tarax l-indirizz IP tiegħek.",
     "no": "Le",
     "yes": "Iva",
     "failed": "Ma ħadimx. Erġa' pprova."

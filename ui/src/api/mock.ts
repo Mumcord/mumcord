@@ -46,6 +46,7 @@ import type {
   PmRequests,
   PttAvailability,
   PttMouseStatus,
+  RelayInfo,
   SavedServer,
   ServerInfo,
   ServerInput,
@@ -170,6 +171,16 @@ interface MockSession {
 }
 
 const SELF_SESSION = 1;
+
+const NO_RELAY: RelayInfo = { bots: [], host: null, status: { kind: "none" }, firstSeen: null };
+
+/** A relay announced by a bot and trusted since the first visit (spec 04, FR-4.20). */
+const MOCK_RELAY: RelayInfo = {
+  bots: ["RelayBot"],
+  host: "relay.example.org",
+  status: { kind: "available" },
+  firstSeen: "2026-09-01T18:00:00Z",
+};
 
 /** Per-server switches of a server that was just added. */
 const NEW_SERVER_FLAGS = {
@@ -919,6 +930,27 @@ export function createMockApi(options: MockOptions = {}): MockApi {
     if (next === shownFriends) return;
     shownFriends = next;
     dispatch("friendsChanged", { friends: JSON.parse(next) as Friend[] });
+  }
+
+  // The first server announces a trusted relay; in the demo the second one's relay changed.
+  const relays = new Map<number, RelayInfo>(
+    fresh
+      ? []
+      : [
+          [1, MOCK_RELAY],
+          ...(demo
+            ? [[2, { ...MOCK_RELAY, status: { kind: "untrusted", keptBlocked: false } }] as const]
+            : []),
+        ],
+  );
+
+  function relayOf(serverId: number): RelayInfo {
+    return relays.get(serverId) ?? NO_RELAY;
+  }
+
+  function setRelay(serverId: number, info: RelayInfo): void {
+    relays.set(serverId, info);
+    emit("relayChanged", { serverId, info });
   }
 
   function emit<K extends EventName>(event: K, payload: EventPayloads[K]): void {
@@ -2565,14 +2597,34 @@ export function createMockApi(options: MockOptions = {}): MockApi {
       settings = { ...settings, allowDirectConnections: allow ? "yes" : "no" };
       return Promise.resolve(null);
     },
-    // The mock has no peer-to-peer connections.
-    p2pLink: () => Promise.resolve(null),
-    // The mock servers announce no relay.
-    relayInfo: () =>
-      Promise.resolve({ bots: [], host: null, status: { kind: "none" }, firstSeen: null }),
-    relayTrustNew: () => Promise.resolve(null),
-    relayKeepBlocked: () => Promise.resolve(null),
-    relayForget: () => Promise.resolve(null),
+    // Demo only, for screenshots: Maya (session 2) is reached through the relay, Jonas
+    // (session 5) directly.
+    p2pLink: (_serverId, session) =>
+      Promise.resolve(
+        !demo
+          ? null
+          : session === 2
+            ? { path: "relayTcp", ipHidden: true }
+            : session === 5
+              ? { path: "direct", ipHidden: false }
+              : null,
+      ),
+    relayInfo: (serverId) => Promise.resolve(relayOf(serverId)),
+    relayTrustNew: (serverId) => {
+      setRelay(serverId, { ...relayOf(serverId), status: { kind: "available" } });
+      return Promise.resolve(null);
+    },
+    relayKeepBlocked: (serverId) => {
+      setRelay(serverId, {
+        ...relayOf(serverId),
+        status: { kind: "untrusted", keptBlocked: true },
+      });
+      return Promise.resolve(null);
+    },
+    relayForget: (serverId) => {
+      setRelay(serverId, NO_RELAY);
+      return Promise.resolve(null);
+    },
     // watch party: only the user's own party; other people's actions come from `mock.emit`.
     watchPartyStart: (serverId, videoId) => {
       const party: WatchParty = {

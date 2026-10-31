@@ -42,7 +42,7 @@
   },
   "directConsent": {
     "title": "Allow direct connections?",
-    "description": "Direct connections are faster, but the other person can see your IP address. Mumcord uses them for full-size images and screen sharing with other Mumcord users and may open a port on your router for them. If you say no, images still arrive through the server and screen sharing is unavailable. You can change this later in Settings → Privacy.",
+    "description": "Direct connections are faster, but the other person can see your IP address. Mumcord uses them for full-size images and screen sharing with other Mumcord users and may open a port on your router for them. If you say no, images still arrive through the server and screen sharing is unavailable. You can change this later in Settings → Privacy. If this server offers a relay, Mumcord can use it instead; then the other person doesn't see your IP address.",
     "no": "No",
     "yes": "Yes",
     "failed": "That did not work. Please try again."

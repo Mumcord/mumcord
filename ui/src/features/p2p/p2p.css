@@ -1,0 +1,57 @@
+.p2p-modes {
+  margin: 0 0 var(--space-3);
+  padding: 0;
+  border: none;
+}
+
+.p2p-modes__legend {
+  margin-bottom: var(--space-2);
+  font-weight: 600;
+}
+
+.p2p-modes__option {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-1) 0;
+  cursor: pointer;
+}
+
+.p2p-modes__badge {
+  padding: 0 var(--space-2);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-full);
+  font-size: var(--font-size-xs);
+  color: var(--color-text-secondary);
+}
+
+.p2p-modes__explanation {
+  margin: var(--space-2) 0 0;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+}
+
+.relay-rows__note {
+  display: block;
+  margin-top: var(--space-1);
+  color: var(--color-text-secondary);
+}
+
+.relay-rows__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin-top: var(--space-2);
+}
+
+.relay-rows__error {
+  display: block;
+  margin: var(--space-1) 0 0;
+  color: var(--color-danger);
+}
+
+/* Words, not figures: the connection details otherwise use the mono font for numbers. */
+.p2p-link {
+  font-family: var(--font-family);
+}
