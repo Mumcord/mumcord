@@ -1,0 +1,53 @@
+{
+  "copied": "Връзката е копирана",
+  "copyFailed": "Връзката не можа да се копира",
+  "menu": {
+    "label": "Опции на канала {{channel}}",
+    "follow": "Следвай канала",
+    "unfollow": "Спри следването на канала",
+    "following": "Следваш",
+    "copyLink": "Копирай връзката към канала",
+    "password": "Парола на канала…",
+    "info": "Информация за канала",
+    "clear": "Изчисти историята на чата…"
+  },
+  "info": {
+    "title": "Информация за канала: {{channel}}",
+    "noDescription": "Този канал няма описание.",
+    "descriptionLoading": "Описанието се зарежда…",
+    "users": "Потребители",
+    "usersCount_one": "{{count}} човек",
+    "usersCount_other": "{{count}} души",
+    "usersOfMax_one": "{{count}} от макс. {{max}}",
+    "usersOfMax_other": "{{count}} от макс. {{max}}",
+    "type": "Тип",
+    "permanent": "Постоянен",
+    "temporary": "Временен",
+    "access": "Достъп",
+    "accessOpen": "Отворен",
+    "accessRestricted": "Ограничен (парола или група)",
+    "accessSaved": "Защитен, запазена парола го отключва",
+    "links": "Свързани канали",
+    "none": "Няма",
+    "permissions": "Моите права",
+    "denied": "без {{permission}}",
+    "permission": {
+      "enter": "Влизане",
+      "speak": "Говорене",
+      "textMessage": "Текст",
+      "whisper": "Шепот",
+      "listen": "Слушане",
+      "write": "Писане на ACL"
+    },
+    "quality": "Ограничение на качеството",
+    "qualityLimit": "Opus, до {{kbps}} kbit/s",
+    "following": "Следваш",
+    "yes": "Да",
+    "no": "Не",
+    "cleared": "Историята е изчистена за последно",
+    "never": "Никога",
+    "copyLink": "Копирай връзката",
+    "copied": "Копирано",
+    "close": "Затвори"
+  }
+}

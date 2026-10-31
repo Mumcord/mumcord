@@ -58,5 +58,9 @@
     "dismiss": "Dispensar",
     "unfollowFailed": "Não foi possível deixar de seguir todos os canais. Tenta novamente."
   },
-  "mention": "inclui uma menção a ti"
+  "mention": "inclui uma menção a ti",
+  "header": {
+    "follow": "Seguir canal",
+    "unfollow": "A seguir, clique para deixar de seguir"
+  }
 }

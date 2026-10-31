@@ -66,5 +66,9 @@
     "dismiss": "Dún",
     "unfollowFailed": "Níor oibrigh sé scor de gach cainéal a leanúint. Bain triail eile as."
   },
-  "mention": "luann sé thú"
+  "mention": "luann sé thú",
+  "header": {
+    "follow": "Lean an cainéal",
+    "unfollow": "Ag leanúint, cliceáil chun éirí as"
+  }
 }

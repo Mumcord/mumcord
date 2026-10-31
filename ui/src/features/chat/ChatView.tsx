@@ -42,9 +42,11 @@ const ANNOUNCE_CHARS = 200;
 export interface ChatViewProps {
   /** Extra header controls for the conversation, e.g. the Follow toggle (B22). */
   renderHeaderActions?: (conversation: Conversation) => ReactNode;
+  /** Replaces the plain title of a channel chat, e.g. with the channel-name menu (#170). */
+  renderChannelTitle?: (channelId: number) => ReactNode;
 }
 
-export function ChatView({ renderHeaderActions }: ChatViewProps) {
+export function ChatView({ renderHeaderActions, renderChannelTitle }: ChatViewProps) {
   const { t } = useTranslation("chat");
   const { conversation } = useSelectedConversation();
   if (conversation === null) {
@@ -59,6 +61,7 @@ export function ChatView({ renderHeaderActions }: ChatViewProps) {
       key={conversationKey(conversation)}
       conversation={conversation}
       renderHeaderActions={renderHeaderActions}
+      renderChannelTitle={renderChannelTitle}
     />
   );
 }
@@ -66,9 +69,14 @@ export function ChatView({ renderHeaderActions }: ChatViewProps) {
 interface ConversationChatProps {
   conversation: Conversation;
   renderHeaderActions: ChatViewProps["renderHeaderActions"];
+  renderChannelTitle: ChatViewProps["renderChannelTitle"];
 }
 
-function ConversationChat({ conversation, renderHeaderActions }: ConversationChatProps) {
+function ConversationChat({
+  conversation,
+  renderHeaderActions,
+  renderChannelTitle,
+}: ConversationChatProps) {
   const { t } = useTranslation("chat");
   const server = useServerState();
   const log = useConversationLog(conversation);
@@ -205,17 +213,21 @@ function ConversationChat({ conversation, renderHeaderActions }: ConversationCha
   return (
     <div className="chat">
       <header className="chat-header">
-        <h2 className="chat-header__title">
-          {info.isChannel ? (
-            <span className="chat-header__hash" aria-hidden="true">
-              #
+        {conversation.kind === "channel" && renderChannelTitle ? (
+          renderChannelTitle(conversation.channelId)
+        ) : (
+          <h2 className="chat-header__title">
+            {info.isChannel ? (
+              <span className="chat-header__hash" aria-hidden="true">
+                #
+              </span>
+            ) : null}
+            <span className="visually-hidden">
+              {info.isChannel ? t("header.channelPrefix") : t("header.privatePrefix")}
             </span>
-          ) : null}
-          <span className="visually-hidden">
-            {info.isChannel ? t("header.channelPrefix") : t("header.privatePrefix")}
-          </span>
-          {name}
-        </h2>
+            {name}
+          </h2>
+        )}
         <IdentityBadge className="chat-header__identity" />
         {!info.isChannel && (
           <PrivatePresence

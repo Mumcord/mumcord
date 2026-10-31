@@ -1,0 +1,53 @@
+{
+  "copied": "Link gekopieerd",
+  "copyFailed": "Link kopiëren mislukt",
+  "menu": {
+    "label": "Kanaalopties voor {{channel}}",
+    "follow": "Kanaal volgen",
+    "unfollow": "Kanaal niet meer volgen",
+    "following": "Volgend",
+    "copyLink": "Kanaallink kopiëren",
+    "password": "Kanaalwachtwoord…",
+    "info": "Kanaalinfo",
+    "clear": "Chatgeschiedenis wissen…"
+  },
+  "info": {
+    "title": "Kanaalinfo: {{channel}}",
+    "noDescription": "Dit kanaal heeft geen beschrijving.",
+    "descriptionLoading": "Beschrijving laden…",
+    "users": "Gebruikers",
+    "usersCount_one": "{{count}} persoon",
+    "usersCount_other": "{{count}} personen",
+    "usersOfMax_one": "{{count}} van max. {{max}}",
+    "usersOfMax_other": "{{count}} van max. {{max}}",
+    "type": "Type",
+    "permanent": "Permanent",
+    "temporary": "Tijdelijk",
+    "access": "Toegang",
+    "accessOpen": "Open",
+    "accessRestricted": "Beperkt (wachtwoord of groep)",
+    "accessSaved": "Beveiligd, een opgeslagen wachtwoord ontgrendelt het",
+    "links": "Gekoppelde kanalen",
+    "none": "Geen",
+    "permissions": "Mijn rechten",
+    "denied": "geen {{permission}}",
+    "permission": {
+      "enter": "Betreden",
+      "speak": "Spreken",
+      "textMessage": "Tekst",
+      "whisper": "Fluisteren",
+      "listen": "Luisteren",
+      "write": "ACL schrijven"
+    },
+    "quality": "Kwaliteitslimiet",
+    "qualityLimit": "Opus, tot {{kbps}} kbit/s",
+    "following": "Volgend",
+    "yes": "Ja",
+    "no": "Nee",
+    "cleared": "Geschiedenis laatst gewist",
+    "never": "Nooit",
+    "copyLink": "Link kopiëren",
+    "copied": "Gekopieerd",
+    "close": "Sluiten"
+  }
+}

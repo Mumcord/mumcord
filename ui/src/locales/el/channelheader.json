@@ -1,0 +1,53 @@
+{
+  "copied": "Ο σύνδεσμος αντιγράφηκε",
+  "copyFailed": "Δεν ήταν δυνατή η αντιγραφή του συνδέσμου",
+  "menu": {
+    "label": "Επιλογές καναλιού για {{channel}}",
+    "follow": "Ακολούθηση καναλιού",
+    "unfollow": "Διακοπή ακολούθησης καναλιού",
+    "following": "Ακολουθείς",
+    "copyLink": "Αντιγραφή συνδέσμου καναλιού",
+    "password": "Κωδικός καναλιού…",
+    "info": "Πληροφορίες καναλιού",
+    "clear": "Εκκαθάριση ιστορικού συνομιλίας…"
+  },
+  "info": {
+    "title": "Πληροφορίες καναλιού: {{channel}}",
+    "noDescription": "Αυτό το κανάλι δεν έχει περιγραφή.",
+    "descriptionLoading": "Φόρτωση περιγραφής…",
+    "users": "Χρήστες",
+    "usersCount_one": "{{count}} άτομο",
+    "usersCount_other": "{{count}} άτομα",
+    "usersOfMax_one": "{{count}} από max {{max}}",
+    "usersOfMax_other": "{{count}} από max {{max}}",
+    "type": "Τύπος",
+    "permanent": "Μόνιμο",
+    "temporary": "Προσωρινό",
+    "access": "Πρόσβαση",
+    "accessOpen": "Ανοιχτό",
+    "accessRestricted": "Περιορισμένο (κωδικός ή ομάδα)",
+    "accessSaved": "Προστατευμένο, ένας αποθηκευμένος κωδικός το ξεκλειδώνει",
+    "links": "Συνδεδεμένα κανάλια",
+    "none": "Κανένα",
+    "permissions": "Τα δικαιώματά μου",
+    "denied": "χωρίς {{permission}}",
+    "permission": {
+      "enter": "Είσοδος",
+      "speak": "Ομιλία",
+      "textMessage": "Κείμενο",
+      "whisper": "Ψίθυρος",
+      "listen": "Ακρόαση",
+      "write": "Εγγραφή ACL"
+    },
+    "quality": "Όριο ποιότητας",
+    "qualityLimit": "Opus, έως {{kbps}} kbit/s",
+    "following": "Ακολουθείς",
+    "yes": "Ναι",
+    "no": "Όχι",
+    "cleared": "Τελευταία εκκαθάριση ιστορικού",
+    "never": "Ποτέ",
+    "copyLink": "Αντιγραφή συνδέσμου",
+    "copied": "Αντιγράφηκε",
+    "close": "Κλείσιμο"
+  }
+}

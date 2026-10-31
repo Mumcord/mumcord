@@ -1,0 +1,53 @@
+{
+  "copied": "Link kopeeritud",
+  "copyFailed": "Linki ei õnnestunud kopeerida",
+  "menu": {
+    "label": "Kanali {{channel}} valikud",
+    "follow": "Jälgi kanalit",
+    "unfollow": "Lõpeta kanali jälgimine",
+    "following": "Jälgin",
+    "copyLink": "Kopeeri kanali link",
+    "password": "Kanali parool…",
+    "info": "Kanali info",
+    "clear": "Tühjenda vestluse ajalugu…"
+  },
+  "info": {
+    "title": "Kanali info: {{channel}}",
+    "noDescription": "Sellel kanalil pole kirjeldust.",
+    "descriptionLoading": "Kirjeldust laaditakse…",
+    "users": "Kasutajad",
+    "usersCount_one": "{{count}} inimene",
+    "usersCount_other": "{{count}} inimest",
+    "usersOfMax_one": "{{count}} / max {{max}}",
+    "usersOfMax_other": "{{count}} / max {{max}}",
+    "type": "Tüüp",
+    "permanent": "Püsiv",
+    "temporary": "Ajutine",
+    "access": "Ligipääs",
+    "accessOpen": "Avatud",
+    "accessRestricted": "Piiratud (parool või rühm)",
+    "accessSaved": "Kaitstud, salvestatud parool avab selle",
+    "links": "Seotud kanalid",
+    "none": "Puuduvad",
+    "permissions": "Minu õigused",
+    "denied": "puudub: {{permission}}",
+    "permission": {
+      "enter": "Sisenemine",
+      "speak": "Rääkimine",
+      "textMessage": "Tekst",
+      "whisper": "Sosistamine",
+      "listen": "Kuulamine",
+      "write": "ACL-i kirjutamine"
+    },
+    "quality": "Kvaliteedipiirang",
+    "qualityLimit": "Opus, kuni {{kbps}} kbit/s",
+    "following": "Jälgin",
+    "yes": "Jah",
+    "no": "Ei",
+    "cleared": "Ajalugu tühjendati viimati",
+    "never": "Mitte kunagi",
+    "copyLink": "Kopeeri link",
+    "copied": "Kopeeritud",
+    "close": "Sulge"
+  }
+}

@@ -54,5 +54,9 @@
     "dismiss": "Avfärda",
     "unfollowFailed": "Det gick inte att sluta följa alla kanaler. Försök igen."
   },
-  "mention": "innehåller en omnämning av dig"
+  "mention": "innehåller en omnämning av dig",
+  "header": {
+    "follow": "Följ kanal",
+    "unfollow": "Följer, klicka för att sluta följa"
+  }
 }

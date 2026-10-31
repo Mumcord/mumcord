@@ -1,0 +1,53 @@
+{
+  "copied": "Link kopieret",
+  "copyFailed": "Linket kunne ikke kopieres",
+  "menu": {
+    "label": "Kanalindstillinger for {{channel}}",
+    "follow": "Følg kanal",
+    "unfollow": "Følg ikke kanalen længere",
+    "following": "Følger",
+    "copyLink": "Kopiér kanallink",
+    "password": "Kanaladgangskode…",
+    "info": "Kanalinfo",
+    "clear": "Ryd chathistorik…"
+  },
+  "info": {
+    "title": "Kanalinfo: {{channel}}",
+    "noDescription": "Denne kanal har ingen beskrivelse.",
+    "descriptionLoading": "Henter beskrivelsen…",
+    "users": "Brugere",
+    "usersCount_one": "{{count}} person",
+    "usersCount_other": "{{count}} personer",
+    "usersOfMax_one": "{{count}} af maks. {{max}}",
+    "usersOfMax_other": "{{count}} af maks. {{max}}",
+    "type": "Type",
+    "permanent": "Permanent",
+    "temporary": "Midlertidig",
+    "access": "Adgang",
+    "accessOpen": "Åben",
+    "accessRestricted": "Begrænset (adgangskode eller gruppe)",
+    "accessSaved": "Beskyttet, en gemt adgangskode låser op",
+    "links": "Forbundne kanaler",
+    "none": "Ingen",
+    "permissions": "Mine rettigheder",
+    "denied": "ingen {{permission}}",
+    "permission": {
+      "enter": "Gå ind",
+      "speak": "Tale",
+      "textMessage": "Tekst",
+      "whisper": "Hvisken",
+      "listen": "Lytte",
+      "write": "Skrive ACL"
+    },
+    "quality": "Kvalitetsgrænse",
+    "qualityLimit": "Opus, op til {{kbps}} kbit/s",
+    "following": "Følger",
+    "yes": "Ja",
+    "no": "Nej",
+    "cleared": "Historik sidst ryddet",
+    "never": "Aldrig",
+    "copyLink": "Kopiér link",
+    "copied": "Kopieret",
+    "close": "Luk"
+  }
+}

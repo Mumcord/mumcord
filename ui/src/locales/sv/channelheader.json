@@ -1,0 +1,53 @@
+{
+  "copied": "Länken kopierad",
+  "copyFailed": "Det gick inte att kopiera länken",
+  "menu": {
+    "label": "Kanalalternativ för {{channel}}",
+    "follow": "Följ kanal",
+    "unfollow": "Sluta följa kanalen",
+    "following": "Följer",
+    "copyLink": "Kopiera kanallänk",
+    "password": "Kanallösenord…",
+    "info": "Kanalinfo",
+    "clear": "Rensa chatthistorik…"
+  },
+  "info": {
+    "title": "Kanalinfo: {{channel}}",
+    "noDescription": "Den här kanalen har ingen beskrivning.",
+    "descriptionLoading": "Läser in beskrivningen…",
+    "users": "Användare",
+    "usersCount_one": "{{count}} person",
+    "usersCount_other": "{{count}} personer",
+    "usersOfMax_one": "{{count}} av max {{max}}",
+    "usersOfMax_other": "{{count}} av max {{max}}",
+    "type": "Typ",
+    "permanent": "Permanent",
+    "temporary": "Tillfällig",
+    "access": "Åtkomst",
+    "accessOpen": "Öppen",
+    "accessRestricted": "Begränsad (lösenord eller grupp)",
+    "accessSaved": "Skyddad, ett sparat lösenord låser upp den",
+    "links": "Länkade kanaler",
+    "none": "Inga",
+    "permissions": "Mina behörigheter",
+    "denied": "ingen {{permission}}",
+    "permission": {
+      "enter": "Gå in",
+      "speak": "Tala",
+      "textMessage": "Text",
+      "whisper": "Viska",
+      "listen": "Lyssna",
+      "write": "Skriva ACL"
+    },
+    "quality": "Kvalitetsgräns",
+    "qualityLimit": "Opus, upp till {{kbps}} kbit/s",
+    "following": "Följer",
+    "yes": "Ja",
+    "no": "Nej",
+    "cleared": "Historiken senast rensad",
+    "never": "Aldrig",
+    "copyLink": "Kopiera länk",
+    "copied": "Kopierad",
+    "close": "Stäng"
+  }
+}

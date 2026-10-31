@@ -1,0 +1,163 @@
+/* Channel header (issue #170): follow eye, name menu button, path and description line. */
+
+.channel-header {
+  display: flex;
+  flex: 1;
+  gap: var(--space-2);
+  align-items: center;
+  min-width: 0;
+}
+
+/* Also a .chat-header__title (E2E helpers find the chat by it); it only shrinks, the line grows. */
+.chat-header__title.channel-header__title {
+  flex: 0 1 auto;
+  max-width: 60%;
+  overflow: visible;
+}
+
+.channel-header__name {
+  display: inline-flex;
+  gap: var(--space-1);
+  align-items: center;
+  max-width: 100%;
+  padding: var(--space-1) var(--space-2);
+  border: 1px solid transparent;
+  border-radius: var(--radius-md);
+  background: transparent;
+  color: var(--color-text);
+  font: inherit;
+  cursor: pointer;
+}
+
+.channel-header__name:hover,
+.channel-header__name[aria-expanded="true"] {
+  border-color: var(--color-border-strong);
+  background: var(--color-bg-hover);
+}
+
+.channel-header__name .chat-header__hash {
+  margin-right: 0;
+}
+
+.channel-header__text {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.channel-header__chevron {
+  flex: none;
+  color: var(--color-text-muted);
+}
+
+.channel-header__subtitle {
+  flex: 1;
+  min-width: 0;
+  margin: 0;
+  overflow: hidden;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.channel-header__status {
+  flex: none;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-xs);
+}
+
+.channel-header__status:empty {
+  display: none;
+}
+
+/* Channel info dialog, in the card style of server info (#147). */
+
+.servers-dialog.channel-info {
+  width: min(38rem, calc(100vw - 2 * var(--space-4)));
+}
+
+.channel-info > .servers-dialog__title {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.channel-info__header {
+  margin-bottom: var(--space-3);
+}
+
+.channel-info__name {
+  margin: 0;
+  overflow-wrap: anywhere;
+  font-family: var(--font-family-display);
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-bold);
+}
+
+.channel-info__hash {
+  margin-right: var(--space-1);
+  color: var(--color-text-muted);
+}
+
+.channel-info__path {
+  margin: 0;
+  overflow-wrap: anywhere;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+}
+
+.channel-info__description {
+  max-height: 12rem;
+  margin: 0 0 var(--space-3);
+  padding: var(--space-3);
+  overflow-y: auto;
+  overflow-wrap: anywhere;
+  border-radius: var(--radius-lg);
+  background: var(--color-bg-elevated);
+}
+
+.channel-info__description--empty {
+  color: var(--color-text-muted);
+}
+
+.channel-info__list {
+  margin: 0;
+  padding: 0;
+}
+
+.channel-info__row {
+  display: grid;
+  grid-template-columns: minmax(8rem, auto) 1fr;
+  gap: var(--space-3);
+  padding: var(--space-2) 0;
+  border-top: 1px solid var(--color-border);
+}
+
+.channel-info__row dt {
+  color: var(--color-text-muted);
+}
+
+.channel-info__row dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+  text-align: end;
+}
+
+.channel-info__denied {
+  color: var(--color-text-muted);
+}
+
+.channel-info__ok {
+  color: var(--color-success);
+}
+
+.channel-info__footer {
+  display: flex;
+  gap: var(--space-2);
+  margin-top: var(--space-3);
+}

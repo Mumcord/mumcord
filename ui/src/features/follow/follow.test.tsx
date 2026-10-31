@@ -5,12 +5,14 @@ import { axeViolations } from "../../test/axe";
 import { ChannelsPanel, selectConversation, getSelectedConversation } from "../channels";
 import { connectedMock, resetAll, stubDialog } from "../channels/testUtils";
 import { getShownServerId, resetServerStore } from "../channels/serverStore";
+import { ChannelHeader } from "../channelheader";
 import { ChatView } from "../chat";
 import { resetChatStore } from "../chat/chatStore";
 import { privateConversation, ProfilePreviewHost } from "../members";
 import { ChannelUnreadBadge, DirectMessages, FollowHeaderActions, resetFollowStore } from ".";
 
 const RAID = { kind: "channel", channelId: 2 } as const;
+const FOLLOWING = "Following, click to unfollow";
 let api: MockApi;
 
 async function setup() {
@@ -26,7 +28,10 @@ async function setup() {
       </nav>
       <ProfilePreviewHost />
       <main>
-        <ChatView renderHeaderActions={(c) => <FollowHeaderActions conversation={c} />} />
+        <ChatView
+          renderChannelTitle={(id) => <ChannelHeader channelId={id} />}
+          renderHeaderActions={(c) => <FollowHeaderActions conversation={c} />}
+        />
       </main>
     </>,
   );
@@ -49,19 +54,19 @@ describe("follow", () => {
     act(() => {
       selectConversation(RAID);
     });
-    const button = await screen.findByRole("button", { name: /Follow/ });
+    const button = await screen.findByRole("button", { name: "Follow channel" });
     expect(button).toHaveAttribute("aria-pressed", "false");
     fireEvent.click(button);
     await waitFor(() =>
-      expect(screen.getByRole("button", { name: /Following/ })).toHaveAttribute(
+      expect(screen.getByRole("button", { name: FOLLOWING })).toHaveAttribute(
         "aria-pressed",
         "true",
       ),
     );
     expect(await axeViolations(view.container)).toEqual([]);
-    fireEvent.click(screen.getByRole("button", { name: /Following/ }));
+    fireEvent.click(screen.getByRole("button", { name: FOLLOWING }));
     await waitFor(() =>
-      expect(screen.getByRole("button", { name: /Follow$/ })).toHaveAttribute(
+      expect(screen.getByRole("button", { name: "Follow channel" })).toHaveAttribute(
         "aria-pressed",
         "false",
       ),
@@ -73,12 +78,12 @@ describe("follow", () => {
     act(() => {
       selectConversation(RAID);
     });
-    const button = await screen.findByRole("button", { name: /Follow/ });
+    const button = await screen.findByRole("button", { name: "Follow channel" });
     api.mock.failNext("channelFollow", "permissionDenied");
     fireEvent.click(button);
     expect(await screen.findByRole("alert")).toHaveTextContent(/doesn't allow you/);
     api.mock.failNext("channelFollow", "listenerLimitReached");
-    fireEvent.click(screen.getByRole("button", { name: /Follow/ }));
+    fireEvent.click(screen.getByRole("button", { name: "Follow channel" }));
     await waitFor(() => expect(screen.getByRole("alert")).toHaveTextContent(/more channels/));
   });
 
@@ -90,9 +95,14 @@ describe("follow", () => {
     const old = createMockApi({ serverVersion: "1.3.4" });
     setApi(old);
     await old.connect(1, null, null);
-    render(<ChatView renderHeaderActions={(c) => <FollowHeaderActions conversation={c} />} />);
+    render(
+      <ChatView
+        renderChannelTitle={(id) => <ChannelHeader channelId={id} />}
+        renderHeaderActions={(c) => <FollowHeaderActions conversation={c} />}
+      />,
+    );
     expect(await screen.findByText(/needs a server running version 1.4/)).toBeInTheDocument();
-    expect(screen.queryByRole("button", { name: /Follow/ })).toBeNull();
+    expect(screen.queryByRole("button", { name: "Follow channel" })).toBeNull();
   });
 
   it("shows unread badges for followed channels and marks read when viewed", async () => {

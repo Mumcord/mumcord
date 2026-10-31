@@ -1,4 +1,4 @@
-.follow-toggle[aria-pressed="true"] {
+.follow-toggle.follow-toggle--eye[aria-pressed="true"] {
   color: var(--color-accent-text);
 }
 
@@ -113,14 +113,33 @@
 }
 
 .follow-star[data-followed="true"] .follow-eye__pupil,
-.follow-toggle[aria-pressed="true"] .follow-eye__pupil {
+.follow-toggle.follow-toggle--eye[aria-pressed="true"] .follow-eye__pupil {
   fill: currentColor;
 }
 
-.follow-toggle {
+.follow-toggle.follow-toggle--eye {
   display: inline-flex;
+  flex: none;
   align-items: center;
-  gap: var(--space-1);
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-full);
+  background: transparent;
+  color: var(--color-text-muted);
+  cursor: pointer;
+}
+
+.follow-toggle.follow-toggle--eye:hover {
+  background: var(--color-bg-hover);
+  color: var(--color-accent-text);
+}
+
+.follow-toggle.follow-toggle--eye .follow-eye {
+  width: 18px;
+  height: 18px;
 }
 
 /* Only opacity changes, so showing the eye never moves anything in the row. */

@@ -54,5 +54,9 @@
     "dismiss": "Afvis",
     "unfollowFailed": "Det lykkedes ikke at stoppe med at følge alle kanaler. Prøv igen."
   },
-  "mention": "indeholder en omtale af dig"
+  "mention": "indeholder en omtale af dig",
+  "header": {
+    "follow": "Følg kanal",
+    "unfollow": "Følger, klik for at stoppe"
+  }
 }

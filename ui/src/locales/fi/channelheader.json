@@ -1,0 +1,53 @@
+{
+  "copied": "Linkki kopioitu",
+  "copyFailed": "Linkkiä ei voitu kopioida",
+  "menu": {
+    "label": "Kanavan {{channel}} asetukset",
+    "follow": "Seuraa kanavaa",
+    "unfollow": "Lopeta kanavan seuraaminen",
+    "following": "Seurataan",
+    "copyLink": "Kopioi kanavan linkki",
+    "password": "Kanavan salasana…",
+    "info": "Kanavan tiedot",
+    "clear": "Tyhjennä keskusteluhistoria…"
+  },
+  "info": {
+    "title": "Kanavan tiedot: {{channel}}",
+    "noDescription": "Tällä kanavalla ei ole kuvausta.",
+    "descriptionLoading": "Ladataan kuvausta…",
+    "users": "Käyttäjät",
+    "usersCount_one": "{{count}} henkilö",
+    "usersCount_other": "{{count}} henkilöä",
+    "usersOfMax_one": "{{count}} / enintään {{max}}",
+    "usersOfMax_other": "{{count}} / enintään {{max}}",
+    "type": "Tyyppi",
+    "permanent": "Pysyvä",
+    "temporary": "Väliaikainen",
+    "access": "Pääsy",
+    "accessOpen": "Avoin",
+    "accessRestricted": "Rajoitettu (salasana tai ryhmä)",
+    "accessSaved": "Suojattu, tallennettu salasana avaa sen",
+    "links": "Linkitetyt kanavat",
+    "none": "Ei mitään",
+    "permissions": "Omat oikeuteni",
+    "denied": "ei oikeutta: {{permission}}",
+    "permission": {
+      "enter": "Liittyminen",
+      "speak": "Puhuminen",
+      "textMessage": "Teksti",
+      "whisper": "Kuiskaus",
+      "listen": "Kuuntelu",
+      "write": "ACL:n kirjoitus"
+    },
+    "quality": "Laaturaja",
+    "qualityLimit": "Opus, enintään {{kbps}} kbit/s",
+    "following": "Seurataan",
+    "yes": "Kyllä",
+    "no": "Ei",
+    "cleared": "Historia tyhjennetty viimeksi",
+    "never": "Ei koskaan",
+    "copyLink": "Kopioi linkki",
+    "copied": "Kopioitu",
+    "close": "Sulje"
+  }
+}

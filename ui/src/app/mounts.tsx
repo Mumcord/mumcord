@@ -20,6 +20,7 @@ import {
   FollowNoticeLine,
   FollowStar,
 } from "../features/follow";
+import { ChannelHeader } from "../features/channelheader";
 import { ChatView } from "../features/chat";
 import { UserStatsWatcher } from "../features/connection";
 import { FriendsList } from "../features/friends";
@@ -114,6 +115,7 @@ export function ChatStatusMount() {
 export function ChatMount() {
   return (
     <ChatView
+      renderChannelTitle={(channelId) => <ChannelHeader channelId={channelId} />}
       renderHeaderActions={(conv) => (
         <>
           <FollowHeaderActions conversation={conv} />

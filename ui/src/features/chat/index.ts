@@ -1,7 +1,8 @@
 /**
  * Chat feature (B21). Stable contracts for other features:
  * - `<ChatView renderHeaderActions={(conversation) => …} />`: slot in the chat header for the
- *   Follow toggle (B22). Sender names open B20's profile card.
+ *   Follow toggle (B22). Sender names open B20's profile card. `renderChannelTitle(channelId)`
+ *   replaces a channel's title with the channel-name menu (#170).
  * - Message store (one per app, cleared on every `serverSynced` and on disconnect):
  *   `useConversationMessages(conversation)` / `useConversationLog(conversation)` (messages plus
  *   loading state), `loadOlder(conversation)`, `clearConversation(conversation)` (call after

@@ -58,5 +58,9 @@
     "dismiss": "Aizvērt",
     "unfollowFailed": "Sekošanas pārtraukšana visiem kanāliem neizdevās. Lūdzu, mēģini vēlreiz."
   },
-  "mention": "ietver tavu pieminējumu"
+  "mention": "ietver tavu pieminējumu",
+  "header": {
+    "follow": "Sekot kanālam",
+    "unfollow": "Seko, noklikšķini, lai pārtrauktu"
+  }
 }

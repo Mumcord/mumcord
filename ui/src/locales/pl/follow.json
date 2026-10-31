@@ -62,5 +62,9 @@
     "dismiss": "Odrzuć",
     "unfollowFailed": "Nie udało się przestać obserwować wszystkich kanałów. Spróbuj ponownie."
   },
-  "mention": "zawiera wzmiankę o Tobie"
+  "mention": "zawiera wzmiankę o Tobie",
+  "header": {
+    "follow": "Obserwuj kanał",
+    "unfollow": "Obserwujesz, kliknij, aby przestać"
+  }
 }

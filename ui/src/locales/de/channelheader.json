@@ -1,0 +1,53 @@
+{
+  "copied": "Link kopiert",
+  "copyFailed": "Link konnte nicht kopiert werden",
+  "menu": {
+    "label": "Kanaloptionen für {{channel}}",
+    "follow": "Kanal folgen",
+    "unfollow": "Kanal nicht mehr folgen",
+    "following": "Folge ich",
+    "copyLink": "Kanallink kopieren",
+    "password": "Kanalpasswort…",
+    "info": "Kanalinfo",
+    "clear": "Chatverlauf löschen…"
+  },
+  "info": {
+    "title": "Kanalinfo: {{channel}}",
+    "noDescription": "Dieser Kanal hat keine Beschreibung.",
+    "descriptionLoading": "Beschreibung wird geladen…",
+    "users": "Nutzer",
+    "usersCount_one": "{{count}} Person",
+    "usersCount_other": "{{count}} Personen",
+    "usersOfMax_one": "{{count}} von max. {{max}}",
+    "usersOfMax_other": "{{count}} von max. {{max}}",
+    "type": "Typ",
+    "permanent": "Dauerhaft",
+    "temporary": "Temporär",
+    "access": "Zugriff",
+    "accessOpen": "Offen",
+    "accessRestricted": "Eingeschränkt (Passwort oder Gruppe)",
+    "accessSaved": "Geschützt, ein gespeichertes Passwort schaltet ihn frei",
+    "links": "Verknüpfte Kanäle",
+    "none": "Keine",
+    "permissions": "Meine Berechtigungen",
+    "denied": "kein {{permission}}",
+    "permission": {
+      "enter": "Betreten",
+      "speak": "Sprechen",
+      "textMessage": "Text",
+      "whisper": "Flüstern",
+      "listen": "Zuhören",
+      "write": "ACL schreiben"
+    },
+    "quality": "Qualitätslimit",
+    "qualityLimit": "Opus, bis zu {{kbps}} kbit/s",
+    "following": "Folge ich",
+    "yes": "Ja",
+    "no": "Nein",
+    "cleared": "Verlauf zuletzt gelöscht",
+    "never": "Nie",
+    "copyLink": "Link kopieren",
+    "copied": "Kopiert",
+    "close": "Schließen"
+  }
+}

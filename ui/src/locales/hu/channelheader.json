@@ -1,0 +1,53 @@
+{
+  "copied": "Hivatkozás másolva",
+  "copyFailed": "A hivatkozást nem sikerült másolni",
+  "menu": {
+    "label": "{{channel}} csatorna beállításai",
+    "follow": "Csatorna követése",
+    "unfollow": "Csatorna követésének leállítása",
+    "following": "Követed",
+    "copyLink": "Csatornahivatkozás másolása",
+    "password": "Csatorna jelszava…",
+    "info": "Csatorna adatai",
+    "clear": "Csevegési előzmények törlése…"
+  },
+  "info": {
+    "title": "Csatorna adatai: {{channel}}",
+    "noDescription": "Ennek a csatornának nincs leírása.",
+    "descriptionLoading": "Leírás betöltése…",
+    "users": "Felhasználók",
+    "usersCount_one": "{{count}} fő",
+    "usersCount_other": "{{count}} fő",
+    "usersOfMax_one": "{{count}} / legfeljebb {{max}}",
+    "usersOfMax_other": "{{count}} / legfeljebb {{max}}",
+    "type": "Típus",
+    "permanent": "Állandó",
+    "temporary": "Ideiglenes",
+    "access": "Hozzáférés",
+    "accessOpen": "Nyitott",
+    "accessRestricted": "Korlátozott (jelszó vagy csoport)",
+    "accessSaved": "Védett, egy mentett jelszó feloldja",
+    "links": "Összekapcsolt csatornák",
+    "none": "Nincs",
+    "permissions": "Jogosultságaim",
+    "denied": "nincs: {{permission}}",
+    "permission": {
+      "enter": "Belépés",
+      "speak": "Beszéd",
+      "textMessage": "Szöveg",
+      "whisper": "Suttogás",
+      "listen": "Hallgatás",
+      "write": "ACL írása"
+    },
+    "quality": "Minőségi korlát",
+    "qualityLimit": "Opus, legfeljebb {{kbps}} kbit/s",
+    "following": "Követed",
+    "yes": "Igen",
+    "no": "Nem",
+    "cleared": "Az előzmények utolsó törlése",
+    "never": "Soha",
+    "copyLink": "Hivatkozás másolása",
+    "copied": "Másolva",
+    "close": "Bezárás"
+  }
+}

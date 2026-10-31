@@ -199,6 +199,35 @@
   cursor: default;
 }
 
+.server-menu__item:has(.server-menu__icon) {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.server-menu__icon {
+  display: inline-flex;
+  flex: none;
+  color: var(--color-text-muted);
+}
+
+.server-menu__item--danger .server-menu__icon {
+  color: inherit;
+}
+
+.server-menu__end {
+  margin-inline-start: auto;
+  padding-inline-start: var(--space-4);
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+}
+
+.server-menu__separator {
+  height: 1px;
+  margin: var(--space-1) var(--space-2);
+  background: var(--color-border);
+}
+
 .server-menu__check {
   display: inline-block;
   width: 1.25em;

@@ -1,0 +1,53 @@
+{
+  "copied": "Link copied",
+  "copyFailed": "Couldn't copy the link",
+  "menu": {
+    "label": "Channel options for {{channel}}",
+    "follow": "Follow channel",
+    "unfollow": "Unfollow channel",
+    "following": "Following",
+    "copyLink": "Copy channel link",
+    "password": "Channel password…",
+    "info": "Channel info",
+    "clear": "Clear chat history…"
+  },
+  "info": {
+    "title": "Channel info: {{channel}}",
+    "noDescription": "This channel has no description.",
+    "descriptionLoading": "Loading the description…",
+    "users": "Users",
+    "usersCount_one": "{{count}} person",
+    "usersCount_other": "{{count}} people",
+    "usersOfMax_one": "{{count}} of {{max}} max",
+    "usersOfMax_other": "{{count}} of {{max}} max",
+    "type": "Type",
+    "permanent": "Permanent",
+    "temporary": "Temporary",
+    "access": "Access",
+    "accessOpen": "Open",
+    "accessRestricted": "Restricted (password or group)",
+    "accessSaved": "Protected, a saved password unlocks it",
+    "links": "Linked channels",
+    "none": "None",
+    "permissions": "My permissions",
+    "denied": "no {{permission}}",
+    "permission": {
+      "enter": "Enter",
+      "speak": "Speak",
+      "textMessage": "Text",
+      "whisper": "Whisper",
+      "listen": "Listen",
+      "write": "Write ACL"
+    },
+    "quality": "Quality limit",
+    "qualityLimit": "Opus, up to {{kbps}} kbit/s",
+    "following": "Following",
+    "yes": "Yes",
+    "no": "No",
+    "cleared": "History last cleared",
+    "never": "Never",
+    "copyLink": "Copy link",
+    "copied": "Copied",
+    "close": "Close"
+  }
+}
