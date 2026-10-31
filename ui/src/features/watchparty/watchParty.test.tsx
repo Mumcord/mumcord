@@ -565,7 +565,9 @@ describe("playlist", () => {
         description: null,
         image: "data:image/png;base64,AAAA",
         video: null,
+        music: null,
         isImage: false,
+        isAudio: false,
       });
     });
   });

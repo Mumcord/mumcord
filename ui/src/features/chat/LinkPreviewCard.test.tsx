@@ -23,7 +23,9 @@ const PAGE: LinkPreview = {
   description: "What happened today.",
   image: IMAGE,
   video: null,
+  music: null,
   isImage: false,
+  isAudio: false,
 };
 
 const YOUTUBE: VideoEmbed = {
@@ -38,12 +40,15 @@ const SPOTIFY: LinkPreview = {
   title: "Some Song",
   description: "Some Artist · Some Album · Song · 2020",
   image: IMAGE,
-  video: {
-    site: "spotify",
+  video: null,
+  music: {
+    service: "spotify",
+    kind: "track",
     playerUrl: "https://open.spotify.com/embed/track/4uLU6hMCjMI75M1A2tKUQC",
-    channel: "track",
+    artist: null,
   },
   isImage: false,
+  isAudio: false,
 };
 
 const VIDEO: LinkPreview = {
@@ -53,7 +58,9 @@ const VIDEO: LinkPreview = {
   description: null,
   image: IMAGE,
   video: YOUTUBE,
+  music: null,
   isImage: false,
+  isAudio: false,
 };
 
 function message(body: string, dismissedPreviews: string[] = []): ChatMessage {
@@ -133,20 +140,15 @@ const TWITCH = {
 };
 
 describe("cardPlayer", () => {
-  it("runs YouTube and Twitch in the loopback page and Spotify directly", () => {
+  it("runs YouTube and Twitch in the loopback page", () => {
     expect(cardPlayer(YOUTUBE)).toEqual({ via: "page", url: YOUTUBE.playerUrl });
     expect(cardPlayer(TWITCH)).toEqual({ via: "page", url: TWITCH.playerUrl });
-    const spotify = SPOTIFY.video as VideoEmbed;
-    expect(cardPlayer(spotify)).toEqual({ via: "direct", url: spotify.playerUrl });
   });
 
   it("refuses URLs that are not a known player", () => {
-    const spotify = SPOTIFY.video as VideoEmbed;
-    const notEmbed = {
-      ...spotify,
-      playerUrl: "https://open.spotify.com/track/4uLU6hMCjMI75M1A2tKUQC",
-    };
-    expect(cardPlayer(notEmbed)).toBeNull();
+    expect(
+      cardPlayer({ ...YOUTUBE, playerUrl: "https://open.spotify.com/embed/track/4uLU6hMCjMI75" }),
+    ).toBeNull();
     expect(cardPlayer({ ...YOUTUBE, playerUrl: "https://evil.example/embed" })).toBeNull();
     expect(cardPlayer({ ...YOUTUBE, playerUrl: "not a url" })).toBeNull();
   });
@@ -245,20 +247,36 @@ describe("link preview cards", () => {
     expect(screen.getByRole("button", { name: "Play Never gonna" })).toBeInTheDocument();
   });
 
-  it("shows a Spotify card with type and artist and loads the player only after a click", async () => {
+  it("shows a music card for a music link and loads the player only after a click", async () => {
     vi.spyOn(api, "linkPreview").mockResolvedValue(SPOTIFY);
     const { container } = renderMessage(`<a href="${SPOTIFY.url}">song</a>`, true);
-    const card = await screen.findByRole("article", { name: "Link preview: Some Song" });
-    expect(card).toHaveTextContent("Spotify");
-    expect(card).toHaveTextContent("Track");
-    expect(card).toHaveTextContent("Some Artist");
-    expect(card.querySelector("img")?.getAttribute("src")).toBe(IMAGE);
+    const card = await screen.findByRole("article", { name: "Spotify: Some Song" });
+    expect(card).toHaveTextContent("Some Artist · Some Album · Song · 2020");
     expect(container.querySelector("iframe")).toBeNull();
 
-    fireEvent.click(screen.getByRole("button", { name: "Play Some Song" }));
+    fireEvent.click(screen.getByRole("button", { name: "Play Some Song on Spotify" }));
     const frame = await screen.findByTitle("Spotify player: Some Song");
-    expect(frame.getAttribute("src")).toBe(SPOTIFY.video?.playerUrl);
-    expect(screen.getByRole("button", { name: "Open Some Song in browser" })).toBeVisible();
+    expect(frame.getAttribute("src")).toBe(SPOTIFY.music?.playerUrl);
+  });
+
+  it("shows the audio player for a direct audio link without asking for a preview", async () => {
+    const url = "https://files.example.org/demos/night-drive.mp3";
+    const preview = vi.spyOn(api, "linkPreview");
+    const info = vi.spyOn(api, "audioInfo");
+    const file = vi.spyOn(api, "audioFile");
+    renderMessage(`<a href="${url}">${url}</a>`, true);
+    await screen.findByRole("article", { name: "Audio file: night-drive.mp3" });
+    expect(info).toHaveBeenCalledWith(url);
+    expect(preview).not.toHaveBeenCalled();
+    expect(file).not.toHaveBeenCalled();
+  });
+
+  it("shows the audio player for links that serve audio (by content type)", async () => {
+    const url = "https://radio.example/stream?id=3";
+    vi.spyOn(api, "linkPreview").mockResolvedValue({ ...PAGE, url, isAudio: true });
+    vi.spyOn(api, "audioInfo").mockResolvedValue({ url, format: "ogg", size: null });
+    renderMessage(`<a href="${url}">${url}</a>`, true);
+    await screen.findByRole("article", { name: "Audio file: stream" });
   });
 
   it("shows plain links and requests nothing when previews are off", async () => {
@@ -267,6 +285,17 @@ describe("link preview cards", () => {
     expect(screen.getByRole("link", { name: "story" })).toBeVisible();
     await new Promise((resolve) => setTimeout(resolve, 20));
     expect(lookup).not.toHaveBeenCalled();
+    expect(screen.queryByRole("article")).toBeNull();
+  });
+
+  it("fetches nothing for audio and music links when previews are off", async () => {
+    const lookup = vi.spyOn(api, "linkPreview");
+    const info = vi.spyOn(api, "audioInfo");
+    const audio = "https://files.example.org/night-drive.mp3";
+    renderMessage(`<a href="${audio}">a</a> <a href="${SPOTIFY.url}">b</a>`, false);
+    await new Promise((resolve) => setTimeout(resolve, 20));
+    expect(lookup).not.toHaveBeenCalled();
+    expect(info).not.toHaveBeenCalled();
     expect(screen.queryByRole("article")).toBeNull();
   });
 
