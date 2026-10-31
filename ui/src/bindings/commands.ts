@@ -23,6 +23,15 @@ export const commands = {
 	identitySetDefault: (id: number) => typedError<Identity[], ApiError>(__TAURI_INVOKE("identity_set_default", { id })),
 	/**  Chooses the identity a saved server connects with; `null` uses the default. */
 	serverSetIdentity: (serverId: number, identityId: number | null) => typedError<SavedServer, ApiError>(__TAURI_INVOKE("server_set_identity", { serverId, identityId })),
+	/**  Looks for an installed official Mumble client; `null` when there is none. */
+	mumbleImportScan: () => typedError<MumbleImportFound | null, ApiError>(__TAURI_INVOKE("mumble_import_scan")),
+	/**
+	 *  Imports the chosen favourites, passwords and certificate into Mumcord. Settings are saved
+	 *  by the UI with `settings_update`.
+	 */
+	mumbleImportApply: (request: MumbleImportRequest) => typedError<MumbleImportDone, ApiError>(__TAURI_INVOKE("mumble_import_apply", { request })),
+	/**  Removes the servers and the identity the last import added. */
+	mumbleImportUndo: () => typedError<null, ApiError>(__TAURI_INVOKE("mumble_import_undo")),
 	/**  Saved servers in server-bar order. */
 	serversList: () => typedError<SavedServer[], ApiError>(__TAURI_INVOKE("servers_list")),
 	/**  Adds a server at the end of the server bar. */
@@ -1497,6 +1506,66 @@ export type MicTestPhaseChanged = {
 	phase: MicTestPhase,
 };
 
+export type MumbleCertificate = {
+	/**  Common name; empty while locked by a password. */
+	name: string,
+	/**  End of validity, RFC 3339. */
+	validUntil: string | null,
+	needsPassword: boolean,
+	alreadyImported: boolean,
+};
+
+export type MumbleDevice = {
+	id: string,
+	name: string,
+};
+
+export type MumbleFavourite = {
+	label: string,
+	host: string,
+	port: number,
+	username: string,
+	hasPassword: boolean,
+	/**  Already in Mumcord; skipped by the import. */
+	duplicate: boolean,
+};
+
+export type MumbleImportDone = {
+	added: SavedServer[],
+	/**  Labels of chosen servers that were already in Mumcord. */
+	skipped: string[],
+	passwordsSaved: number,
+	identity: Identity | null,
+	identitySkipped: boolean,
+	/**  End of validity of the imported certificate, RFC 3339. */
+	identityValidUntil: string | null,
+};
+
+/**  What an installed official client offers for import. */
+export type MumbleImportFound = {
+	format: MumbleSettingsFormat,
+	favourites: MumbleFavourite[],
+	favouritesFailed: boolean,
+	certificate: MumbleCertificate | null,
+	inputDevice: MumbleDevice | null,
+	outputDevice: MumbleDevice | null,
+	devicesMissing: boolean,
+	/**  In the `pttKey` settings format. */
+	pttKey: string | null,
+	pttIssue: MumblePttIssue | null,
+	talkMode: TalkMode | null,
+	outputVolumePercent: number | null,
+};
+
+/**  No `Debug`: it carries the certificate password. */
+export type MumbleImportRequest = {
+	favourites: MumbleServerKey[],
+	passwords: boolean,
+	certificate: boolean,
+	/**  Only for a certificate that needs one. */
+	certificatePassword: string | null,
+};
+
 /**  Parsed `mumble://[user[:password]@]host[:port]/[channel/path]` link. */
 export type MumbleLink = {
 	address: string,
@@ -1513,6 +1582,24 @@ export type MumbleLink = {
  *  answer within the query timeout. The figures are untrusted server data, shown as plain text.
  */
 export type MumbleLinkStats = { kind: "privacyOff" } | { kind: "unreachable" } | { kind: "answered"; pingMs: number; users: number; maxUsers: number; version: string };
+
+/**  Why Mumble's push-to-talk shortcut cannot be used in Mumcord. */
+export type MumblePttIssue = "modifierOnly" | "tooManyKeys" | "unknown";
+
+/**  A favourite chosen in the preview, by host and port. */
+export type MumbleServerKey = {
+	host: string,
+	port: number,
+};
+
+/**  Which settings format of the official client was found. */
+export type MumbleSettingsFormat = 
+/**  `mumble_settings.json`, Mumble 1.5 and later. */
+"json" | 
+/**  Mumble 1.4 and earlier (INI file, property list or registry). */
+"legacy" | 
+/**  Only the favourites database was found. */
+"databaseOnly";
 
 /**
  *  The user clicked a system notification; the window is already in front. Show the server
