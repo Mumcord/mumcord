@@ -11,6 +11,7 @@ members = [
     "crates/overlay-layer",
     "crates/p2p",
     "crates/screenshare",
+    "crates/plugins",
     "tools/netsim",
     "src-tauri",
 ]
@@ -34,6 +35,7 @@ mumcord-positional = { path = "crates/positional" }
 mumcord-overlay-ipc = { path = "crates/overlay-ipc" }
 mumcord-p2p = { path = "crates/p2p" }
 mumcord-screenshare = { path = "crates/screenshare" }
+mumcord-plugins = { path = "crates/plugins" }
 
 # Async, networking, TLS
 tokio = { version = "1.54", features = ["full"] }
@@ -124,6 +126,11 @@ objc2-core-media = { version = "0.3", default-features = false, features = ["std
 objc2-core-video = { version = "0.3", default-features = false, features = ["std"] }
 objc2-core-graphics = { version = "0.3", default-features = false, features = ["std"] }
 objc2-core-audio-types = { version = "0.3", default-features = false, features = ["std"] }
+
+# Plugin packages (#269): `.mcplugin` zips, stored or deflate only.
+zip = { version = "9", default-features = false, features = ["deflate-flate2-zlib-rs"] }
+# Plugin and host API version ranges (#269).
+semver = "1"
 
 # Storage & secrets
 rusqlite = { version = "0.41", features = ["bundled"] }

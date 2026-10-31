@@ -1,0 +1,22 @@
+[package]
+name = "mumcord-plugins"
+description = "Plugin host for Mumcord: sandboxed WebAssembly runtime, manifest and package handling"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+# Part of the app, not a library for others: the plugin API is the WIT package, not this crate.
+publish = false
+
+[dependencies]
+zip.workspace = true
+semver.workspace = true
+sha2.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+thiserror.workspace = true
+tracing.workspace = true
+tempfile.workspace = true
+
+[lints]
+workspace = true

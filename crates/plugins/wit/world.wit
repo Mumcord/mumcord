@@ -1,0 +1,21 @@
+/// The Mumcord plugin API.
+///
+/// A plugin is a WebAssembly component that targets this world. It gets no WASI: no files,
+/// sockets, clocks or randomness exist unless an interface below provides them.
+///
+/// Later waves of Epic 3.1 add the imports `ui`, `peers`, `storage`, `timers`, `clock`, `notify`
+/// and `theme`, and the export `on-event`.
+package mumcord:plugin@1.0.0;
+
+world plugin {
+  use types.{start-info};
+
+  import log;
+
+  /// Called once after the plugin is enabled. An error keeps the plugin off and is shown to the
+  /// user.
+  export start: func(info: start-info) -> result<_, string>;
+
+  /// Called before the plugin is disabled or unloaded.
+  export stop: func();
+}
