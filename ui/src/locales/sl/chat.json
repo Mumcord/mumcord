@@ -368,5 +368,16 @@
       "deleteHistory": "Izbriši zgodovino",
       "deleteHint": "Samo ta naprava · {{name}} obdrži svojo kopijo"
     }
+  },
+  "embedHint": {
+    "image": "Slika je skrita, ker so predogledi povezav in vdelave izklopljeni v <settings>Nastavitve > Zasebnost</settings>.",
+    "gif": "GIF je skrit, ker so predogledi povezav in vdelave izklopljeni v <settings>Nastavitve > Zasebnost</settings>.",
+    "video": "Video predvajalnik je skrit, ker so predogledi povezav in vdelave izklopljeni v <settings>Nastavitve > Zasebnost</settings>.",
+    "audio": "Zvočni predvajalnik je skrit, ker so predogledi povezav in vdelave izklopljeni v <settings>Nastavitve > Zasebnost</settings>.",
+    "link": "Predogled povezave je skrit, ker so predogledi povezav in vdelave izklopljeni v <settings>Nastavitve > Zasebnost</settings>.",
+    "several_one": "{{count}} predogled je skrit, ker so predogledi povezav in vdelave izklopljeni v <settings>Nastavitve > Zasebnost</settings>.",
+    "several_two": "{{count}} predogleda sta skrita, ker so predogledi povezav in vdelave izklopljeni v <settings>Nastavitve > Zasebnost</settings>.",
+    "several_few": "{{count}} predogledi so skriti, ker so predogledi povezav in vdelave izklopljeni v <settings>Nastavitve > Zasebnost</settings>.",
+    "several_other": "{{count}} predogledov je skritih, ker so predogledi povezav in vdelave izklopljeni v <settings>Nastavitve > Zasebnost</settings>."
   }
 }

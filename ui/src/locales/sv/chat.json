@@ -352,5 +352,14 @@
       "deleteHistory": "Ta bort historik",
       "deleteHint": "Bara den här enheten · {{name}} behåller sin kopia"
     }
+  },
+  "embedHint": {
+    "image": "Bild dold, eftersom länkförhandsvisningar och inbäddningar är avstängda i <settings>Inställningar > Integritet</settings>.",
+    "gif": "GIF dold, eftersom länkförhandsvisningar och inbäddningar är avstängda i <settings>Inställningar > Integritet</settings>.",
+    "video": "Videospelare dold, eftersom länkförhandsvisningar och inbäddningar är avstängda i <settings>Inställningar > Integritet</settings>.",
+    "audio": "Ljudspelare dold, eftersom länkförhandsvisningar och inbäddningar är avstängda i <settings>Inställningar > Integritet</settings>.",
+    "link": "Länkförhandsvisning dold, eftersom länkförhandsvisningar och inbäddningar är avstängda i <settings>Inställningar > Integritet</settings>.",
+    "several_one": "{{count}} förhandsvisning dold, eftersom länkförhandsvisningar och inbäddningar är avstängda i <settings>Inställningar > Integritet</settings>.",
+    "several_other": "{{count}} förhandsvisningar dolda, eftersom länkförhandsvisningar och inbäddningar är avstängda i <settings>Inställningar > Integritet</settings>."
   }
 }

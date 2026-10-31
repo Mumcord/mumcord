@@ -368,5 +368,16 @@
       "deleteHistory": "Ištrinti istoriją",
       "deleteHint": "Tik šis įrenginys · {{name}} pasilieka savo kopiją"
     }
+  },
+  "embedHint": {
+    "image": "Paveikslėlis paslėptas, nes nuorodų peržiūros ir įterpiniai išjungti skiltyje <settings>Nustatymai > Privatumas</settings>.",
+    "gif": "GIF paslėptas, nes nuorodų peržiūros ir įterpiniai išjungti skiltyje <settings>Nustatymai > Privatumas</settings>.",
+    "video": "Vaizdo grotuvas paslėptas, nes nuorodų peržiūros ir įterpiniai išjungti skiltyje <settings>Nustatymai > Privatumas</settings>.",
+    "audio": "Garso grotuvas paslėptas, nes nuorodų peržiūros ir įterpiniai išjungti skiltyje <settings>Nustatymai > Privatumas</settings>.",
+    "link": "Nuorodos peržiūra paslėpta, nes nuorodų peržiūros ir įterpiniai išjungti skiltyje <settings>Nustatymai > Privatumas</settings>.",
+    "several_one": "Paslėpta {{count}} peržiūra, nes nuorodų peržiūros ir įterpiniai išjungti skiltyje <settings>Nustatymai > Privatumas</settings>.",
+    "several_few": "Paslėptos {{count}} peržiūros, nes nuorodų peržiūros ir įterpiniai išjungti skiltyje <settings>Nustatymai > Privatumas</settings>.",
+    "several_many": "Paslėpta {{count}} peržiūros, nes nuorodų peržiūros ir įterpiniai išjungti skiltyje <settings>Nustatymai > Privatumas</settings>.",
+    "several_other": "Paslėpta {{count}} peržiūrų, nes nuorodų peržiūros ir įterpiniai išjungti skiltyje <settings>Nustatymai > Privatumas</settings>."
   }
 }

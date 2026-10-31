@@ -747,6 +747,33 @@
   display: none;
 }
 
+/* Quiet line naming the embeds hidden by the privacy switch (issue #261). */
+.embed-hint {
+  display: flex;
+  gap: var(--space-2);
+  align-items: flex-start;
+  margin: 0;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+  overflow-wrap: anywhere;
+}
+
+.embed-hint__icon {
+  flex: none;
+  /* Centres the icon on the first line when a long translation wraps. */
+  margin-top: 0.15em;
+}
+
+.embed-hint__link {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--color-accent-text);
+  font: inherit;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
 /** Card under a message for a `mumble://` link (issue #175). */
 .mumble-card {
   position: relative;

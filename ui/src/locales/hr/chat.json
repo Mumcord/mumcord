@@ -360,5 +360,15 @@
       "deleteHistory": "Izbriši povijest",
       "deleteHint": "Samo ovaj uređaj · {{name}} zadržava svoju kopiju"
     }
+  },
+  "embedHint": {
+    "image": "Slika je skrivena, jer su pregledi i ugradnje poveznica isključeni u <settings>Postavke > Privatnost</settings>.",
+    "gif": "GIF je skriven, jer su pregledi i ugradnje poveznica isključeni u <settings>Postavke > Privatnost</settings>.",
+    "video": "Videoplayer je skriven, jer su pregledi i ugradnje poveznica isključeni u <settings>Postavke > Privatnost</settings>.",
+    "audio": "Audioplayer je skriven, jer su pregledi i ugradnje poveznica isključeni u <settings>Postavke > Privatnost</settings>.",
+    "link": "Pregled poveznice je skriven, jer su pregledi i ugradnje poveznica isključeni u <settings>Postavke > Privatnost</settings>.",
+    "several_one": "{{count}} pregled je skriven, jer su pregledi i ugradnje poveznica isključeni u <settings>Postavke > Privatnost</settings>.",
+    "several_few": "{{count}} pregleda su skrivena, jer su pregledi i ugradnje poveznica isključeni u <settings>Postavke > Privatnost</settings>.",
+    "several_other": "{{count}} pregleda je skriveno, jer su pregledi i ugradnje poveznica isključeni u <settings>Postavke > Privatnost</settings>."
   }
 }
