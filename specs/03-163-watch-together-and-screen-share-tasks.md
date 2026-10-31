@@ -50,7 +50,7 @@ Acceptance criteria (from the issue, verified in the running client against the 
 | T13 | Translations: 24 locales | done (needs a human pass) | lead | T7–T12 | simple | AC-7 | `ui/src/locales/*/watchparty.json`, `*/screenviewer.json`, `*/screenshare.json` |
 | T14 | Tests: engine, player bridge, UI units | done (units) | lead | T2–T12 | complex | AC-2, AC-3, AC-4 | `crates/engine/src/*/tests`, `ui/src/features/**` |
 | T15 | Verification: build, tests, type checks, linters | done | lead | T14 | simple | – | – |
-| T16 | Verification in the running client against the local test server + dark/light screenshots | open | lead | T15 | complex | AC-1–AC-6 | `e2e/specs/media/`, `docs/images/screenshots/` |
+| T16 | Verification in the running client against the local test server + dark/light screenshots | partly: protocol verified live (2026-11-01); UI run + screenshots open | lead | T15 | complex | AC-1–AC-6 | `e2e/specs/media/`, `docs/images/screenshots/` |
 | T17 | Report `specs/03-163-watch-together-and-screen-share-implementation.md` | done | lead | T16 | simple | – | – |
 
 ## Notes
