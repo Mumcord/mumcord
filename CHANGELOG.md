@@ -32,6 +32,7 @@
 
 ### Fixed
 
+- Your own messages never play the mention sound or show a notification, even when the server or another session of yours sends them back; they also no longer count as unread (#215)
 - When the desktop has Do Not Disturb on, the user panel no longer shows the long "Turn it off in your desktop's notification settings." line under "Do Not Disturb (system)": a small "?" next to it shows the hint on hover and keyboard focus, like the other explanations in the panels (#217)
 - The server info dialog is now translated in all 24 languages: its labels, permission names, trust status and limits were English everywhere because the English text had been copied into every language file (#207)
 - The watch party respects Settings > Privacy > "Show link previews and embeds": with it off, "Watch together" in the Apps menu stays listed but disabled with the reason and a link to the Privacy settings, a running party shows "A watch party is running: enable embedded players to join" with the same link instead of the banner's video title, the floating player and playlist (no player page, no thumbnails) — so nothing is requested from YouTube or Twitch (#160)
