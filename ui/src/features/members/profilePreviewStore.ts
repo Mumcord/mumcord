@@ -157,19 +157,27 @@ export function pointerDownOnPerson(session: number | null, name?: string): void
 /**
  * A single click on a person: pins their card (converting the hover preview if it is open).
  * `delayed` waits for a possible second click, see `PIN_DELAY_MS`; keyboard use pins at once.
+ * `serverId` names the person's server when it is not the shown one.
  */
 export function pinPreview(
   session: number | null,
   anchor: HTMLElement,
   name: string | undefined,
   delayed: boolean,
+  serverId?: number,
 ): void {
   clearPinTimer();
   const pin = () => {
     pinTimer = undefined;
     clearTimer();
-    if (current?.pinned && current.session === session && current.name === name) return;
-    set({ session, name, anchor, described: anchor, pinned: true, opener: anchor });
+    if (
+      current?.pinned &&
+      current.session === session &&
+      current.name === name &&
+      current.serverId === serverId
+    )
+      return;
+    set({ session, name, serverId, anchor, described: anchor, pinned: true, opener: anchor });
   };
   if (delayed) pinTimer = setTimeout(pin, PIN_DELAY_MS);
   else pin();

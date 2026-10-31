@@ -129,6 +129,11 @@ export function usePmRequests(serverId: number | null): PmRequests {
   return (serverId === null ? undefined : all.get(serverId)) ?? NO_REQUESTS;
 }
 
+/** Held incoming and sent requests of every connected server, by server id. */
+export function useAllPmRequests(): ReadonlyMap<number, PmRequests> {
+  return useSyncExternalStore(subscribe, getRequestsSnapshot);
+}
+
 /** Conversations the user accepted, for every own identity. */
 export function useAcceptedConversations(): readonly AcceptedConversation[] {
   return useSyncExternalStore(subscribe, getAcceptedSnapshot);

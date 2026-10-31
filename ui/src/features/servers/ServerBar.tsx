@@ -6,6 +6,7 @@ import {
   useState,
   type DragEvent,
   type KeyboardEvent,
+  type ReactNode,
 } from "react";
 import { useTranslation } from "react-i18next";
 import type { SavedServer } from "../../api";
@@ -160,7 +161,16 @@ function ServerOptions({
  * voice server, unread, mentions; spec §5.2), "+" to add. The shown server is marked.
  * One Tab stop with arrow-key navigation; Alt+Up/Down or drag and drop reorders.
  */
-export function ServerBar() {
+export interface ServerBarProps {
+  /** Shown above the servers, e.g. the private messages button (issue #173). */
+  top?: ReactNode;
+  /** Something from `top` fills the channel column: no server is marked as shown. */
+  topActive?: boolean;
+  /** A server was clicked (to leave what `top` opened). */
+  onServerClick?: () => void;
+}
+
+export function ServerBar({ top, topActive = false, onServerClick }: ServerBarProps = {}) {
   const { t } = useTranslation("servers");
   const state = useServers();
   const shownId = useShownServerId();
@@ -250,6 +260,7 @@ export function ServerBar() {
       <p id={hintId} className="visually-hidden">
         {t("bar.keyboardHint")}
       </p>
+      {top}
       <ul className="server-bar__list" aria-label={t("bar.listLabel")}>
         {servers.map((server, index) => {
           const badges = badgesOf(server.id);
@@ -257,7 +268,11 @@ export function ServerBar() {
           const name = displayName(server);
           const label = serverLabel(t, name, badges);
           const shown =
-            shownId === server.id && status !== null && status !== "error" && status !== "failed";
+            !topActive &&
+            shownId === server.id &&
+            status !== null &&
+            status !== "error" &&
+            status !== "failed";
           return (
             <li
               key={server.id}
@@ -298,6 +313,7 @@ export function ServerBar() {
                   setFocusIndex(index);
                 }}
                 onClick={() => {
+                  onServerClick?.();
                   requestConnect(server.id);
                 }}
                 onContextMenu={(event) => {

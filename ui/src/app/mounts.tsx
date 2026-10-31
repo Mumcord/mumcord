@@ -34,6 +34,12 @@ import { VideoDucking, WatchPartyWidget } from "../features/watchparty";
 import { ConnectionStatus, RejoinPrompt, ServersRoot } from "../features/servers";
 import { RequestsEntry, RequestsView, useRequestsView } from "../features/requests";
 import {
+  closeMessages,
+  MessagesButton,
+  MessagesOverview,
+  useMessagesOpen,
+} from "../features/messages";
+import {
   AppImageMenuPrompt,
   DirectConsentPrompt,
   UpdateCheckPrompt,
@@ -47,11 +53,24 @@ import {
 
 /** Server bar (B19). */
 export function ServersMount() {
-  return <ServersRoot />;
+  const messages = useMessagesOpen();
+  return (
+    <ServersRoot top={<MessagesButton />} topActive={messages} onServerClick={closeMessages} />
+  );
 }
 
-/** Channel tree (B20). */
+/** Channel tree (B20), or the private messages overview while it is open (#173). */
 export function ChannelsMount() {
+  const messages = useMessagesOpen();
+  if (messages) {
+    return (
+      <>
+        <MessagesOverview />
+        <UserStatsWatcher />
+        <DirectMessages listHidden />
+      </>
+    );
+  }
   return (
     <>
       <ChannelsPanel

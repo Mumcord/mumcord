@@ -5,7 +5,8 @@
  * - Message store (one per app, cleared on every `serverSynced` and on disconnect):
  *   `useConversationMessages(conversation)` / `useConversationLog(conversation)` (messages plus
  *   loading state), `loadOlder(conversation)`, `clearConversation(conversation)` (call after
- *   clearing its history), `subscribeIncoming(fn)` for every incoming message.
+ *   clearing its history), `subscribeIncoming(fn)` for every incoming message, `subscribeSent(fn)` for every
+ *   confirmed own message.
  * - `sanitizeHtml(html)` for any other server-provided HTML.
  */
 export { ChatView, type ChatViewProps } from "./ChatView";
@@ -14,6 +15,7 @@ export {
   conversationKey,
   loadOlder,
   subscribeIncoming,
+  subscribeSent,
   useConversationLog,
   useConversationMessages,
   type ConversationLog,

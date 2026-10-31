@@ -19,6 +19,7 @@ import { htmlToText } from "../chat/sanitize";
 import { createMessageAnnouncer } from "../chat/messageAnnouncer";
 import { PrivatePresence, useFriends } from "../friends";
 import { previewOnFocus, releasePreview, requestPreview } from "../members/profilePreviewStore";
+import { isConversationMuted } from "../messages/conversationsStore";
 import { useServers as useSavedServers } from "../servers";
 import { collectEntries, type Entry } from "./directEntries";
 import { getFollowState, rememberDirectChat, useFollowStates } from "./followStore";
@@ -37,8 +38,11 @@ function personName(users: ReadonlyMap<number, User>, c: Conversation): string |
   return person(users, c)?.name ?? null;
 }
 
-/** Open private chats ("Direct messages") with unread badges, plus new-message notifications. */
-export function DirectMessages() {
+/**
+ * Open private chats ("Direct messages") with unread badges, plus new-message notifications.
+ * `listHidden` keeps only the notifications, while the private messages overview shows the chats.
+ */
+export function DirectMessages({ listHidden = false }: { listHidden?: boolean }) {
   const { t } = useTranslation("follow");
   const states = useFollowStates();
   const connected = useConnectedServers();
@@ -90,7 +94,7 @@ export function DirectMessages() {
     const unsubscribe = subscribeIncoming((message, serverId) => {
       if (message.own) return;
       const saved = live.current.servers.find((s) => s.id === serverId);
-      if (saved?.notificationsMuted) return;
+      if (saved?.notificationsMuted || isConversationMuted(serverId, message.conversation)) return;
       const onShown = serverId === getShownServerId();
       if (onShown && sameConversation(getSelectedConversation(), message.conversation)) return;
       const server = saved ? saved.label || saved.address : "";
@@ -117,7 +121,7 @@ export function DirectMessages() {
     servers.map((s) => s.id),
     friends,
   );
-  if (entries.length === 0) return null;
+  if (listHidden || entries.length === 0) return null;
   return (
     <section className="direct-messages" aria-labelledby="dm-title">
       <h2 id="dm-title">{t("dm.title")}</h2>

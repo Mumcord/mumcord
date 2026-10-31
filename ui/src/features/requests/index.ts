@@ -15,5 +15,6 @@ export {
   revokeAccepted,
   sendChatRequest,
   useAcceptedConversations,
+  useAllPmRequests,
   usePmRequests,
 } from "./requestsStore";
