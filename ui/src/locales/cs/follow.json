@@ -14,9 +14,7 @@
     "generic": "Sledování tohoto kanálu se nepovedlo. Zkus to prosím znovu."
   },
   "dm": {
-    "title": "Přímé zprávy",
-    "unknown": "Neznámá osoba",
-    "withServer": "{{name}}, na {{server}}"
+    "unknown": "Neznámá osoba"
   },
   "notify": {
     "channel": "{{name}} v {{channel}}: {{text}}",

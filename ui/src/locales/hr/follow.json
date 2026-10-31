@@ -13,9 +13,7 @@
     "generic": "Praćenje ovog kanala nije uspjelo. Pokušaj ponovno."
   },
   "dm": {
-    "title": "Izravne poruke",
-    "unknown": "Nepoznata osoba",
-    "withServer": "{{name}}, na {{server}}"
+    "unknown": "Nepoznata osoba"
   },
   "notify": {
     "channel": "{{name}} u {{channel}}: {{text}}",

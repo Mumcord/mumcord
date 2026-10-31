@@ -65,6 +65,27 @@ function channelRow(name: string): string {
   return `//span[contains(@class,'tree-channel__name') and normalize-space(.)='${name}']/ancestor::div[contains(@class,'tree-channel__row')][1]`;
 }
 
+/** Opens the private messages overview (#173) from the server bar. */
+export async function openMessagesOverview(): Promise<void> {
+  const button = $("[data-testid='pm-button']");
+  await button.waitForClickable({ timeout: 15_000 });
+  await button.click();
+  await $("[data-testid='pm-overview']").waitForDisplayed();
+}
+
+/** Back from the private messages overview to the channel tree of the first server. */
+export async function closeMessagesOverview(): Promise<void> {
+  await $(
+    "(//ul[contains(@class,'server-bar__list')]//button[contains(@class,'server-bar__server')])[1]",
+  ).click();
+  await $("[data-testid='pm-overview']").waitForExist({ reverse: true });
+}
+
+/** The conversation row of `name` in the private messages overview. */
+export function pmRow(name: string) {
+  return $(`//button[@data-testid='pm-row'][starts-with(@aria-label,'${name},')]`);
+}
+
 /** Shows the channel's chat (single click). */
 export async function selectChannel(name: string): Promise<void> {
   const header = $(

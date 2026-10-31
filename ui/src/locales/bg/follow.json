@@ -12,9 +12,7 @@
     "generic": "Следването на този канал не се получи. Опитай отново."
   },
   "dm": {
-    "title": "Лични съобщения",
-    "unknown": "Непознат човек",
-    "withServer": "{{name}}, на {{server}}"
+    "unknown": "Непознат човек"
   },
   "notify": {
     "channel": "{{name}} в {{channel}}: {{text}}",

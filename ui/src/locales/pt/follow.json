@@ -13,9 +13,7 @@
     "generic": "Não foi possível seguir este canal. Tenta novamente."
   },
   "dm": {
-    "title": "Mensagens diretas",
-    "unknown": "Pessoa desconhecida",
-    "withServer": "{{name}}, em {{server}}"
+    "unknown": "Pessoa desconhecida"
   },
   "notify": {
     "channel": "{{name}} em {{channel}}: {{text}}",

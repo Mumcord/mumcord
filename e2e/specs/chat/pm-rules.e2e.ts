@@ -2,8 +2,11 @@ import { browser, expect, $ } from "@wdio/globals";
 import { testenv } from "../../helpers/index.ts";
 import {
   addFirstServer,
+  closeMessagesOverview,
   finishWizard,
   joinChannel,
+  openMessagesOverview,
+  pmRow,
   ScriptBot,
   selectChannel,
   USER,
@@ -12,8 +15,12 @@ import {
 
 const BOT = "StrangerBot";
 
-function dmItem() {
-  return $(`//section[contains(@class,'direct-messages')]//button[contains(.,'${BOT}')]`);
+/** Whether the private messages overview lists a conversation with the bot. */
+async function hasConversation(): Promise<boolean> {
+  await openMessagesOverview();
+  const exists = await pmRow(BOT).isExisting();
+  await closeMessagesOverview();
+  return exists;
 }
 
 function privateHeader() {
@@ -76,7 +83,8 @@ describe("chat: private message rules and message requests (#141)", () => {
     await stranger.run(`pm ${USER} "held hello"`);
     await requestsEntry().waitForDisplayed({ timeout: 15_000 });
     await expect(requestsEntry().$(".requests-entry__count")).toHaveText("1");
-    expect(await dmItem().isExisting()).toBe(false);
+    expect(await hasConversation()).toBe(false);
+    await requestsEntry().waitForClickable();
     await requestsEntry().click();
     const card = $(".request-card--messages");
     await card.waitForDisplayed();
@@ -90,7 +98,7 @@ describe("chat: private message rules and message requests (#141)", () => {
     await selectChannel("Lobby");
     await stranger.run('say --channel Lobby "open channel hello"');
     await waitMessage("open channel hello");
-    expect(await dmItem().isExisting()).toBe(false);
+    expect(await hasConversation()).toBe(false);
   });
 
   it("Accept delivers the held message; the next private message shows directly", async () => {
@@ -105,7 +113,9 @@ describe("chat: private message rules and message requests (#141)", () => {
     await stranger.run(`pm ${USER} "direct hello"`);
     await waitMessage("direct hello");
     await expect(privateHeader()).toBeDisplayed();
-    await dmItem().waitForDisplayed();
     expect(await requestsEntry().isExisting()).toBe(false);
+    await openMessagesOverview();
+    await pmRow(BOT).waitForDisplayed();
+    await closeMessagesOverview();
   });
 });
