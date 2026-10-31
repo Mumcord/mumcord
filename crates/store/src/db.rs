@@ -222,8 +222,24 @@ const MIGRATIONS: &[&str] = &[
         PRIMARY KEY (server_id, cert_hash)
     );
     ",
-    // v18: blocked users (issue #140), kept per own identity (FR-3.79). Lands after #218's
-    // channel_audio migration. A certificate block (`cert_hash` set) covers every server of
+    // v18: audio profiles per channel (issue #171): overrides of Music quality, low-latency mode
+    // and the bitrate cap; NULL keeps the global setting. Keyed by channel id, with the channel
+    // path kept so a renamed or recreated channel still matches. v17 is `pm_conversation`
+    // (issue #173), which lands first; until then this entry is the 17th.
+    r"
+    CREATE TABLE channel_audio_profile (
+        server_id     INTEGER NOT NULL REFERENCES saved_server (id) ON DELETE CASCADE,
+        channel_id    INTEGER NOT NULL,
+        channel_path  TEXT    NOT NULL,
+        music_quality INTEGER CHECK (music_quality IN (0, 1)),
+        low_latency   INTEGER CHECK (low_latency IN (0, 1)),
+        bitrate_kbps  INTEGER CHECK (bitrate_kbps > 0),
+        PRIMARY KEY (server_id, channel_id)
+    );
+    ",
+    // v19: blocked users (issue #140), kept per own identity (FR-3.79). Lands after #218,
+    // whose `channel_audio_profile` (v18, above) is carried here unchanged so the version
+    // numbers match. A certificate block (`cert_hash` set) covers every server of
     // that identity (Q1.4); a name block (`cert_hash` NULL) is for people without a
     // certificate and only applies on `server_id`. `server_label` keeps where the block was
     // set readable after the server is removed.
@@ -298,6 +314,15 @@ pub(crate) mod tests {
         let dir = tempfile::tempdir().expect("tempdir");
         let store = Store::open(dir.path()).expect("open store");
         (dir, store)
+    }
+
+    /// Testers' local databases already have #218's `channel_audio_profile` as v18, so
+    /// `blocked_user` must stay v19.
+    #[test]
+    fn blocked_user_is_v19_after_channel_audio_profile() {
+        assert_eq!(MIGRATIONS.len(), 19);
+        assert!(MIGRATIONS[17].contains("CREATE TABLE channel_audio_profile"));
+        assert!(MIGRATIONS[18].contains("CREATE TABLE blocked_user"));
     }
 
     #[test]
