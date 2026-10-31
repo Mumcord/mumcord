@@ -55,6 +55,7 @@ pub use types::*;
 
 use crate::audio_rating::AudioRatingView;
 use crate::friends::FriendHub;
+use crate::noise_backend;
 use crate::people::{self, People};
 use crate::sounds::SoundHub;
 use crate::voice::{self, Audio, Meter, VoicePipeline, VoiceShared};
@@ -539,6 +540,9 @@ impl Engine {
             server: None,
         };
         let controls = Arc::new(DspControls::default());
+        // `mumcord-codec` cannot carry the rnnoise-rs git dependency, so the engine supplies the
+        // implementation for that backend.
+        noise_backend::register(&controls);
         local::apply_dsp(&controls, &settings);
         let meter = Arc::new(Meter::default());
         voice::spawn_meter(&rt, controls.clone(), meter.clone(), events.clone());

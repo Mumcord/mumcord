@@ -1,7 +1,13 @@
 //! Lock-free settings and read-outs shared between UI, hotkey handling and
 //! the processing thread.
 
+use std::collections::HashMap;
+use std::sync::Mutex;
 use std::sync::atomic::{AtomicBool, AtomicU32, Ordering};
+
+use super::noise_suppression::{
+    Backend, BackendBuilder, SuppressionBackend, SuppressionLevel, build_backend,
+};
 
 /// Lowest and highest manual voice-activation threshold, in dBFS.
 pub const THRESHOLD_MIN_DBFS: f32 = -60.0;
@@ -41,6 +47,16 @@ impl Level {
 pub struct DspControls {
     echo_cancellation: AtomicBool,
     noise_suppression: AtomicBool,
+    noise_backend: AtomicU32,
+    suppression_level: AtomicU32,
+    /// Backend built by the settings thread and waiting for the processing thread; after a switch
+    /// it holds the backend the chain handed back, so that one is freed off the frame path. The
+    /// frame path reads `backend_pending` and only ever tries the mutex, it never waits for it.
+    backend_pending: AtomicBool,
+    backend_slot: Mutex<Option<Box<dyn SuppressionBackend>>>,
+    /// Implementations for backends `mumcord-codec` cannot carry, keyed by `Backend::code`. Entered
+    /// on the settings thread, never in the frame path.
+    builders: Mutex<HashMap<u32, BackendBuilder>>,
     auto_gain: AtomicBool,
     input_gain: AtomicF32,
     music_quality: AtomicBool,
@@ -64,6 +80,11 @@ impl Default for DspControls {
         Self {
             echo_cancellation: AtomicBool::new(true),
             noise_suppression: AtomicBool::new(true),
+            noise_backend: AtomicU32::new(Backend::default().code()),
+            suppression_level: AtomicU32::new(SuppressionLevel::default().code()),
+            backend_pending: AtomicBool::new(false),
+            backend_slot: Mutex::new(None),
+            builders: Mutex::new(HashMap::new()),
             auto_gain: AtomicBool::new(true),
             input_gain: AtomicF32::new(1.0),
             music_quality: AtomicBool::new(false),
@@ -97,6 +118,87 @@ impl DspControls {
 
     pub fn noise_suppression(&self) -> bool {
         self.noise_suppression.load(Ordering::Relaxed)
+    }
+
+    /// Selects the backend and its level, and prepares the implementation for the processing
+    /// thread. Nothing is built when nothing changed, so saving unchanged settings costs nothing.
+    pub fn set_noise_backend(&self, kind: Backend, level: SuppressionLevel) {
+        let changed = kind != self.noise_backend()
+            || (kind.supports_level() && level != self.suppression_level());
+        self.noise_backend.store(kind.code(), Ordering::Relaxed);
+        self.suppression_level
+            .store(level.code(), Ordering::Relaxed);
+        if changed {
+            // Built before the slot is entered, so the processing thread never finds it held for
+            // the length of a model allocation.
+            let backend = self.build(kind, level);
+            let previous = {
+                let mut slot = self.backend_slot.lock().expect("backend slot");
+                self.backend_pending.store(true, Ordering::Release);
+                slot.replace(backend)
+            };
+            // A backend the chain handed back (or one it never took) is freed here, on the
+            // settings thread.
+            drop(previous);
+        }
+    }
+
+    /// Registers the implementation used for a backend this crate does not carry.
+    pub fn register_backend(&self, kind: Backend, builder: BackendBuilder) {
+        self.builders
+            .lock()
+            .expect("backend registry")
+            .insert(kind.code(), builder);
+    }
+
+    /// Builds `kind` on the settings thread: the registered implementation when there is one, else
+    /// the backend `mumcord-codec` carries itself.
+    pub fn build(&self, kind: Backend, level: SuppressionLevel) -> Box<dyn SuppressionBackend> {
+        let registered = self
+            .builders
+            .lock()
+            .expect("backend registry")
+            .get(&kind.code())
+            .copied();
+        match registered {
+            Some(builder) => builder(level),
+            None => build_backend(kind, level),
+        }
+    }
+
+    pub fn noise_backend(&self) -> Backend {
+        Backend::from_code(self.noise_backend.load(Ordering::Relaxed))
+    }
+
+    /// Puts a backend in the slot without building one (test only, so a failing implementation can
+    /// be handed to the chain).
+    #[cfg(test)]
+    pub(super) fn hand_over_backend(&self, backend: Box<dyn SuppressionBackend>) {
+        *self.backend_slot.lock().expect("backend slot") = Some(backend);
+        self.backend_pending.store(true, Ordering::Release);
+    }
+
+    pub fn suppression_level(&self) -> SuppressionLevel {
+        SuppressionLevel::from_code(self.suppression_level.load(Ordering::Relaxed))
+    }
+
+    /// Swaps the backend prepared by `set_noise_backend` into `current`, if one is waiting, and
+    /// tells whether it did. Called by the processing thread once per frame: it never waits for
+    /// the lock (a busy slot means the switch happens on a later frame) and never frees memory,
+    /// because the replaced backend stays in the slot for the settings thread to drop.
+    pub fn exchange_backend(&self, current: &mut Box<dyn SuppressionBackend>) -> bool {
+        if !self.backend_pending.load(Ordering::Acquire) {
+            return false;
+        }
+        let Ok(mut slot) = self.backend_slot.try_lock() else {
+            return false;
+        };
+        let Some(next) = slot.as_mut() else {
+            return false;
+        };
+        std::mem::swap(current, next);
+        self.backend_pending.store(false, Ordering::Release);
+        true
     }
 
     pub fn set_auto_gain(&self, on: bool) {

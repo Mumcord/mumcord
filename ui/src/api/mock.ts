@@ -234,6 +234,7 @@ const DEFAULT_SETTINGS: Settings = {
   inputDevice: null,
   outputDevice: null,
   noiseSuppression: true,
+  noiseSuppressionBackend: "standard",
   echoCancellation: true,
   autoGain: true,
   inputGainPercent: 100,

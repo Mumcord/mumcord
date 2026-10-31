@@ -158,6 +158,20 @@
     "processing": "Processamento de voz",
     "noiseSuppression": "Supressão de ruído",
     "noiseSuppressionHint": "Filtra o ruído de fundo, como teclados e ventoinhas.",
+    "noiseChoice": {
+      "light": "Leve",
+      "standard": "Padrão",
+      "advanced": "Avançado (IA)",
+      "off": "Desligado"
+    },
+    "noiseChoiceHint": {
+      "light": "Filtro clássico para ruído constante, como ventoinhas ou zumbido. O menor uso de CPU.",
+      "standard": "Filtro com IA para ruído do dia a dia, como teclados e ventoinhas. Pouco uso de CPU.",
+      "advanced": "Modelo de IA mais recente que também remove ruído variável. Cerca de três vezes a CPU do Padrão e 10 ms a mais de atraso."
+    },
+    "noiseChoiceBeta": "Beta",
+    "noiseChoiceTipLabel": "Sobre {{choice}}",
+    "detectorHint": "A ativação por voz deteta a fala com o modelo RNNoise; não altera o teu áudio.",
     "echoCancellation": "Cancelamento de eco",
     "echoCancellationHint": "Evita que os outros se ouçam a si próprios quando usas colunas.",
     "autoGain": "Volume automático",

@@ -14,6 +14,7 @@ struct CountingAlloc;
 
 thread_local! {
     static ALLOCATIONS: Cell<usize> = const { Cell::new(0) };
+    static DEALLOCATIONS: Cell<usize> = const { Cell::new(0) };
 }
 
 // SAFETY: delegates to the system allocator; the counter is a const-initialised
@@ -26,6 +27,7 @@ unsafe impl GlobalAlloc for CountingAlloc {
     }
 
     unsafe fn dealloc(&self, ptr: *mut u8, layout: Layout) {
+        DEALLOCATIONS.with(|a| a.set(a.get() + 1));
         // SAFETY: same contract as the caller's.
         unsafe { System.dealloc(ptr, layout) }
     }
@@ -42,6 +44,10 @@ static GLOBAL: CountingAlloc = CountingAlloc;
 
 fn allocations() -> usize {
     ALLOCATIONS.with(Cell::get)
+}
+
+fn deallocations() -> usize {
+    DEALLOCATIONS.with(Cell::get)
 }
 
 /// Deterministic white noise in [-1, 1].
@@ -73,6 +79,49 @@ fn speech_like(len: usize, amplitude: f32) -> Vec<f32> {
         .collect()
 }
 
+/// Voiced speech the models recognise: harmonic glottal source through three formant
+/// band-pass filters, syllabic envelope (the same shape as `testenv/audio/speech.wav`).
+fn formant_speech(len: usize, amplitude: f32) -> Vec<f32> {
+    let source: Vec<f32> = (0..len)
+        .map(|i| {
+            let t = i as f32 / SAMPLE_RATE as f32;
+            let f0 = 130.0 * (1.0 + 0.12 * (PI * t).sin());
+            let phase = 2.0 * PI * f0 * t;
+            (1..30)
+                .map(|h| (h as f32 * phase).sin() / h as f32)
+                .sum::<f32>()
+        })
+        .collect();
+    let mut out = vec![0.0; len];
+    for (formant, gain) in [(700.0, 1.0), (1200.0, 0.7), (2600.0, 0.35)] {
+        for (index, &sample) in band_pass(&source, formant, 8.0).iter().enumerate() {
+            out[index] += gain * sample;
+        }
+    }
+    for (index, sample) in out.iter_mut().enumerate() {
+        let t = index as f32 / SAMPLE_RATE as f32;
+        *sample *= amplitude * (PI * t).sin().max(0.0).powf(1.5);
+    }
+    out
+}
+
+/// RBJ constant-0 dB peak band-pass, as in `testenv/audio/gen_clips.py`.
+fn band_pass(input: &[f32], centre_hz: f32, quality: f32) -> Vec<f32> {
+    let w = 2.0 * PI * centre_hz / SAMPLE_RATE as f32;
+    let alpha = w.sin() / (2.0 * quality);
+    let (b0, b2, a1, a2) = (alpha, -alpha, -2.0 * w.cos(), 1.0 - alpha);
+    let (mut x1, mut x2, mut y1, mut y2) = (0.0f32, 0.0f32, 0.0f32, 0.0f32);
+    let mut out = Vec::with_capacity(input.len());
+    for &sample in input {
+        let y = (b0 * sample + b2 * x2 - a1 * y1 - a2 * y2) / (1.0 + alpha);
+        x2 = x1;
+        x1 = sample;
+        y2 = y1;
+        y1 = y;
+        out.push(y);
+    }
+    out
+}
 /// Fan-like noise: low-passed white noise plus a little mains hum.
 fn fan_noise(len: usize, amplitude: f32) -> Vec<f32> {
     let mut noise = Noise(7);
@@ -95,7 +144,18 @@ fn db(ratio: f32) -> f32 {
 }
 
 fn chain_with(aec: bool, ns: bool, agc: bool) -> (DspChain, EchoRefProducer) {
+    chain_with_backend(Backend::Nnnoiseless, aec, ns, agc)
+}
+
+/// Chain with one backend selected and the given stages on.
+fn chain_with_backend(
+    backend: Backend,
+    aec: bool,
+    ns: bool,
+    agc: bool,
+) -> (DspChain, EchoRefProducer) {
     let controls = Arc::new(DspControls::default());
+    controls.set_noise_backend(backend, SuppressionLevel::High);
     controls.set_echo_cancellation(aec);
     controls.set_noise_suppression(ns);
     controls.set_auto_gain(agc);
@@ -322,9 +382,9 @@ fn level_meter_reports_peak_and_rms() {
     assert!((level.rms_dbfs - -6.02).abs() < 0.01, "{level:?}");
 }
 
-/// Steady-state allocations per frame with the given stages on.
-fn allocations_per_frame(aec: bool, ns: bool, agc: bool) -> f32 {
-    let (mut chain, mut reference) = chain_with(aec, ns, agc);
+/// Steady-state allocations per frame with the given backend and stages on.
+fn allocations_per_frame(backend: Backend, aec: bool, ns: bool, agc: bool) -> f32 {
+    let (mut chain, mut reference) = chain_with_backend(backend, aec, ns, agc);
     let speech = speech_like(4 * SAMPLE_RATE as usize, 0.3);
     let mut out = [0.0; FRAME_SAMPLES];
     let mut before = 0;
@@ -345,12 +405,18 @@ fn allocations_per_frame(aec: bool, ns: bool, agc: bool) -> f32 {
 /// is measured and printed here as a known library limitation.
 #[test]
 fn processing_does_not_allocate() {
-    assert_eq!(allocations_per_frame(false, false, false), 0.0);
-    assert_eq!(allocations_per_frame(false, true, false), 0.0);
+    assert_eq!(
+        allocations_per_frame(Backend::Nnnoiseless, false, false, false),
+        0.0
+    );
+    assert_eq!(
+        allocations_per_frame(Backend::Nnnoiseless, false, true, false),
+        0.0
+    );
     println!(
         "sonora allocations per frame: echo cancellation {:.1}, auto gain {:.1}",
-        allocations_per_frame(true, false, false),
-        allocations_per_frame(false, false, true)
+        allocations_per_frame(Backend::Nnnoiseless, true, false, false),
+        allocations_per_frame(Backend::Nnnoiseless, false, false, true)
     );
 }
 
@@ -358,22 +424,42 @@ fn processing_does_not_allocate() {
 /// input. Must stay within the ≤ 30 ms processing budget (spec §9).
 #[test]
 fn processing_latency_within_budget() {
-    let input = speech_like(2 * SAMPLE_RATE as usize, 0.3);
-    let (mut chain, _) = chain_with(true, true, true);
-    let out = run(&mut chain, &input);
-    let window = &input[SAMPLE_RATE as usize..SAMPLE_RATE as usize + 9600];
-    let best_lag = (0..2400)
-        .max_by(|&a, &b| {
-            let corr = |lag: usize| -> f32 {
-                let shifted = &out[SAMPLE_RATE as usize + lag..SAMPLE_RATE as usize + lag + 9600];
-                window.iter().zip(shifted).map(|(x, y)| x * y).sum()
-            };
-            corr(a).total_cmp(&corr(b))
-        })
-        .expect("lag");
-    let ms = best_lag as f32 * 1000.0 / SAMPLE_RATE as f32;
-    println!("processing delay: {ms:.1} ms ({best_lag} samples)");
-    assert!(ms <= 30.0, "processing delay {ms:.1} ms");
+    // The syllabic envelope, not the harmonic structure, marks the delay: a pure glide correlates
+    // at every period, and a model that turns the voice down would hide the delay.
+    let input = speech_like(4 * SAMPLE_RATE as usize, 0.3);
+    for backend in [Backend::Nnnoiseless, Backend::Sonora] {
+        let (mut chain, _) = chain_with_backend(backend, true, true, true);
+        let out = run(&mut chain, &input);
+        let frames = input.len() / FRAME_SAMPLES;
+        let envelope = |samples: &[f32]| -> Vec<f32> {
+            (0..frames)
+                .map(|frame| {
+                    let start = frame * FRAME_SAMPLES;
+                    samples[start..start + FRAME_SAMPLES]
+                        .iter()
+                        .map(|s| s * s)
+                        .sum::<f32>()
+                        .sqrt()
+                })
+                .collect()
+        };
+        let in_envelope = envelope(&input);
+        let out_envelope = envelope(&out);
+        // The first second is warm-up, so the correlation starts after it.
+        let best_lag = (0..frames - 300)
+            .max_by(|&a, &b| {
+                let correlation = |lag: usize| -> f32 {
+                    (100..300)
+                        .map(|frame| in_envelope[frame] * out_envelope[frame + lag])
+                        .sum::<f32>()
+                };
+                correlation(a).total_cmp(&correlation(b))
+            })
+            .expect("lag");
+        let ms = best_lag as f32 * 10.0;
+        println!("{backend:?}: processing delay {ms:.1} ms ({best_lag} frames)");
+        assert!(ms <= 30.0, "{backend:?} processing delay {ms:.1} ms");
+    }
 }
 
 /// Benchmark: per-frame cost of the full chain on speech plus noise.
@@ -384,36 +470,41 @@ fn processing_latency_within_budget() {
 #[test]
 #[ignore = "benchmark; run in release with --ignored"]
 fn per_frame_processing_time() {
-    let mut input = speech_like(10 * SAMPLE_RATE as usize, 0.3);
-    let noise = fan_noise(input.len(), 0.05);
-    for (s, n) in input.iter_mut().zip(noise) {
-        *s += n;
-    }
-    let (mut chain, mut reference) = chain_with(true, true, true);
+    let speech = formant_speech(10 * SAMPLE_RATE as usize, 0.3);
+    let noise = fan_noise(speech.len(), 0.05);
+    let input: Vec<f32> = speech.iter().zip(noise).map(|(s, n)| s + n).collect();
     let far = fan_noise(input.len(), 0.1);
-    let mut out = [0.0; FRAME_SAMPLES];
-    let mut times: Vec<Duration> = Vec::with_capacity(input.len() / FRAME_SAMPLES);
-    for (chunk, far) in input
-        .as_chunks::<FRAME_SAMPLES>()
-        .0
-        .iter()
-        .zip(far.as_chunks::<FRAME_SAMPLES>().0)
-    {
-        reference.push(far);
-        let start = Instant::now();
-        chain.process(chunk, &mut out);
-        times.push(start.elapsed());
-    }
-    times.sort();
-    let mean = times.iter().sum::<Duration>() / times.len() as u32;
-    let p99 = times[times.len() * 99 / 100];
-    let max = times[times.len() - 1];
-    let cpu = mean.as_secs_f64() / 0.010 * 100.0;
-    println!("per frame: mean {mean:?}, p99 {p99:?}, max {max:?} → {cpu:.2} % of one core");
-    // A 10 ms frame must never take anywhere near 10 ms; in release the
-    // chain needs well under 1 ms. The bound only holds for optimized builds.
-    if !cfg!(debug_assertions) {
-        assert!(mean < Duration::from_millis(5), "mean {mean:?}");
+    for backend in [Backend::Nnnoiseless, Backend::Sonora] {
+        let (mut chain, mut reference) = chain_with_backend(backend, true, true, true);
+        let mut out = [0.0; FRAME_SAMPLES];
+        let mut times: Vec<Duration> = Vec::with_capacity(input.len() / FRAME_SAMPLES);
+        for (chunk, far_frame) in input
+            .as_chunks::<FRAME_SAMPLES>()
+            .0
+            .iter()
+            .zip(far.as_chunks::<FRAME_SAMPLES>().0)
+        {
+            reference.push(far_frame);
+            let start = Instant::now();
+            chain.process(chunk, &mut out);
+            times.push(start.elapsed());
+        }
+        times.sort();
+        let mean = times.iter().sum::<Duration>() / times.len() as u32;
+        let p99 = times[times.len() * 99 / 100];
+        let max = times[times.len() - 1];
+        let cpu = mean.as_secs_f64() / 0.010 * 100.0;
+        println!(
+            "{backend:?}: per frame mean {mean:?}, p99 {p99:?}, max {max:?} → {cpu:.2} % of one core"
+        );
+        // A 10 ms frame must never take anywhere near 10 ms; in release the
+        // chain needs well under 1 ms. The bound only holds for optimized builds.
+        if !cfg!(debug_assertions) {
+            assert!(
+                mean < Duration::from_millis(5),
+                "mean {mean:?} for {backend:?}"
+            );
+        }
     }
 }
 
@@ -558,6 +649,355 @@ fn music_leveler_never_clips_on_a_sudden_peak() {
     let loud_peak = peak(last_seconds(&out, 2.0));
     println!("peak after sudden loud passage: {loud_peak:.3}");
     assert!(loud_peak <= 0.9, "peak {loud_peak:.3}");
+}
+
+// --- noise suppression backends ------------------------------------------------
+
+/// Noise reduction (dB) and speech loss (dB) of one backend, measured on the project test clips.
+fn backend_quality(backend: Backend, level: SuppressionLevel) -> (f32, f32) {
+    // Only the suppression stage: echo cancellation and automatic volume would move the numbers.
+    let controls = Arc::new(DspControls::default());
+    controls.set_echo_cancellation(false);
+    controls.set_auto_gain(false);
+    controls.set_noise_backend(backend, level);
+    let (_producer, consumer) = echo_reference();
+    let mut chain = DspChain::new(controls, consumer);
+
+    let noise = fan_noise(3 * SAMPLE_RATE as usize, 0.1);
+    let out = run(&mut chain, &noise);
+    let reduction = db(energy(last_seconds(&noise, 2.0)) / energy(last_seconds(&out, 2.0)));
+
+    let speech = formant_speech(3 * SAMPLE_RATE as usize, 0.3);
+    let out = run(&mut chain, &speech);
+    let speech_loss = db(energy(last_seconds(&speech, 2.0)) / energy(last_seconds(&out, 2.0)));
+    (reduction, speech_loss)
+}
+
+#[test]
+fn nnnoiseless_reduces_noise_and_keeps_speech() {
+    let (reduction, speech_loss) = backend_quality(Backend::Nnnoiseless, SuppressionLevel::High);
+    println!("nnnoiseless: noise {reduction:.1} dB down, speech {speech_loss:.1} dB down");
+    assert!(
+        reduction >= 10.0,
+        "nnnoiseless only reduced {reduction:.1} dB"
+    );
+    assert!(
+        speech_loss <= 6.0,
+        "nnnoiseless took {speech_loss:.1} dB of speech"
+    );
+}
+
+#[test]
+fn sonora_reduces_noise_and_keeps_speech() {
+    let (reduction, speech_loss) = backend_quality(Backend::Sonora, SuppressionLevel::High);
+    println!("sonora-ns: noise {reduction:.1} dB down, speech {speech_loss:.1} dB down");
+    assert!(
+        reduction >= 10.0,
+        "sonora-ns only reduced {reduction:.1} dB"
+    );
+    assert!(
+        speech_loss <= 6.0,
+        "sonora-ns took {speech_loss:.1} dB of speech"
+    );
+}
+
+/// The neural backends give the gate a speech probability; `sonora-ns` keeps its estimate private,
+/// so the chain uses the detector model and its audio output is discarded.
+#[test]
+fn speech_probability_comes_from_the_backend_or_the_detector() {
+    // A frame inside the syllable, not the first one where the envelope is still zero.
+    let speech = formant_speech(FRAME_SAMPLES * 200, 0.3);
+    let frame: Frame = speech[FRAME_SAMPLES * 50..FRAME_SAMPLES * 51]
+        .try_into()
+        .expect("480 samples");
+    for backend in [Backend::Nnnoiseless] {
+        let (mut chain, _) = chain_with_backend(backend, false, true, false);
+        let mut out = [0.0; FRAME_SAMPLES];
+        for _ in 0..40 {
+            chain.process(&frame, &mut out);
+        }
+        assert!(
+            chain.controls().voice_active(),
+            "{backend:?} never detected speech"
+        );
+    }
+
+    // Sonora alone: the detector is what opens the gate.
+    let controls = Arc::new(DspControls::default());
+    controls.set_noise_backend(Backend::Sonora, SuppressionLevel::Moderate);
+    let (_producer, consumer) = echo_reference();
+    let mut chain = DspChain::new(controls.clone(), consumer);
+    let mut out = [0.0; FRAME_SAMPLES];
+    for _ in 0..40 {
+        chain.process(&frame, &mut out);
+    }
+    assert_eq!(chain.backend(), Backend::Sonora);
+    assert!(
+        chain.controls().voice_active(),
+        "sonora-ns detected no speech"
+    );
+}
+
+/// Adoption must not build anything: the settings thread already created the backend.
+/// `Backend::Rnnoise` is the backend a caller supplies, so the test registers a stub.
+#[test]
+fn adopting_a_backend_allocates_nothing_in_the_frame_path() {
+    #[derive(Debug)]
+    struct StubBackend {
+        /// Its own state, so building it allocates like a real backend does.
+        state: [f32; FRAME_SAMPLES],
+    }
+
+    impl SuppressionBackend for StubBackend {
+        fn kind(&self) -> Backend {
+            Backend::Rnnoise
+        }
+
+        // A probability, so the chain does not run the detector for it: the detector builds its
+        // buffers on its first frame and would show up as an allocation here.
+        fn process(&mut self, input: &Frame, output: &mut Frame) -> Outcome {
+            for (slot, &sample) in self.state.iter_mut().zip(input.iter()) {
+                *slot = sample;
+            }
+            output.copy_from_slice(&self.state);
+            Outcome {
+                probability: Some(0.5),
+                failed: false,
+            }
+        }
+    }
+
+    fn stub(level: SuppressionLevel) -> Box<dyn SuppressionBackend> {
+        let _ = level;
+        Box::new(StubBackend {
+            state: [0.0; FRAME_SAMPLES],
+        })
+    }
+
+    let controls = Arc::new(DspControls::default());
+    // Only the adoption is measured, so the stages that allocate internally are switched off.
+    controls.set_echo_cancellation(false);
+    controls.set_auto_gain(false);
+    let (_producer, consumer) = echo_reference();
+    let mut chain = DspChain::new(controls.clone(), consumer);
+    let speech = formant_speech(FRAME_SAMPLES, 0.3);
+    let frame: Frame = speech.as_slice().try_into().expect("480 samples");
+    let mut out = [0.0; FRAME_SAMPLES];
+
+    controls.register_backend(Backend::Rnnoise, stub);
+    let before_build = allocations();
+    controls.set_noise_backend(Backend::Rnnoise, SuppressionLevel::High);
+    assert!(
+        allocations() - before_build > 0,
+        "the settings thread did not build the backend"
+    );
+
+    let before_adopt = allocations();
+    let freed_before_adopt = deallocations();
+    chain.process(&frame, &mut out);
+    assert_eq!(
+        allocations() - before_adopt,
+        0,
+        "adoption allocated in the frame path"
+    );
+    assert_eq!(
+        deallocations() - freed_before_adopt,
+        0,
+        "adoption freed the replaced backend in the frame path"
+    );
+    assert_eq!(chain.backend(), Backend::Rnnoise);
+
+    // The replaced backend went back to the slot; the next switch frees it on the settings thread.
+    let freed_before_switch = deallocations();
+    controls.set_noise_backend(Backend::Nnnoiseless, SuppressionLevel::High);
+    assert!(
+        deallocations() - freed_before_switch > 0,
+        "the settings thread did not free the replaced backend"
+    );
+}
+
+/// Only the sonora level is a real setting; its effect must be measurable.
+#[test]
+fn sonora_level_changes_the_reduction() {
+    let noise = fan_noise(3 * SAMPLE_RATE as usize, 0.1);
+    let quiet_at = |level: SuppressionLevel| {
+        let controls = Arc::new(DspControls::default());
+        controls.set_noise_backend(Backend::Sonora, level);
+        let (_producer, consumer) = echo_reference();
+        let mut chain = DspChain::new(controls, consumer);
+        let out = run(&mut chain, &noise);
+        db(energy(last_seconds(&noise, 2.0)) / energy(last_seconds(&out, 2.0)))
+    };
+    let low = quiet_at(SuppressionLevel::Low);
+    let high = quiet_at(SuppressionLevel::High);
+    println!("sonora level: low {low:.1} dB, high {high:.1} dB");
+    assert!(
+        high > low,
+        "high level ({high:.1} dB) is not stronger than low ({low:.1} dB)"
+    );
+}
+
+/// Switching while capturing: the settings thread prepares the backend, the chain takes it on the
+/// next frame without building anything itself.
+#[test]
+fn backend_switches_while_the_chain_runs() {
+    let controls = Arc::new(DspControls::default());
+    let (_producer, consumer) = echo_reference();
+    let mut chain = DspChain::new(controls.clone(), consumer);
+    assert_eq!(chain.backend(), Backend::Nnnoiseless);
+
+    let speech = speech_like(FRAME_SAMPLES * 30, 0.3);
+    let first: Frame = speech[..FRAME_SAMPLES].try_into().expect("480 samples");
+    let mut out = [0.0; FRAME_SAMPLES];
+    for frame in speech.as_chunks::<FRAME_SAMPLES>().0 {
+        chain.process(frame, &mut out);
+    }
+    assert_eq!(chain.backend(), Backend::Nnnoiseless);
+
+    // The settings thread prepares the new backend; the chain takes it on the next frame.
+    controls.set_noise_backend(Backend::Sonora, SuppressionLevel::Moderate);
+    chain.process(&first, &mut out);
+    assert_eq!(chain.backend(), Backend::Sonora);
+
+    // A switch that changes nothing prepares nothing, so the chain keeps its instance.
+    controls.set_noise_backend(Backend::Sonora, SuppressionLevel::Moderate);
+    chain.process(&first, &mut out);
+    assert_eq!(chain.backend(), Backend::Sonora);
+}
+
+/// With suppression off the microphone path must be untouched, even while the speech detector runs
+/// for voice activation.
+#[test]
+fn disabled_suppression_leaves_the_audio_bit_exact() {
+    let input = fan_noise(FRAME_SAMPLES * 20, 0.2);
+    for backend in [Backend::Nnnoiseless, Backend::Sonora] {
+        let (mut chain, _) = chain_with_backend(backend, false, false, false);
+        let out = run(&mut chain, &input);
+        assert_eq!(out, input, "{backend:?} changed the audio while disabled");
+    }
+}
+
+/// A backend that rejects a frame must not break the microphone: the frame passes through and the
+/// error is counted instead of logged.
+#[derive(Debug)]
+struct FailingBackend;
+
+impl SuppressionBackend for FailingBackend {
+    fn kind(&self) -> Backend {
+        Backend::Sonora
+    }
+
+    fn process(&mut self, _input: &Frame, _output: &mut Frame) -> Outcome {
+        Outcome {
+            probability: None,
+            failed: true,
+        }
+    }
+}
+
+#[test]
+fn a_failing_backend_passes_the_frame_through() {
+    let controls = Arc::new(DspControls::default());
+    controls.set_echo_cancellation(false);
+    controls.set_auto_gain(false);
+    let (_producer, consumer) = echo_reference();
+    let mut chain = DspChain::new(controls.clone(), consumer);
+    controls.hand_over_backend(Box::new(FailingBackend));
+
+    let noise = fan_noise(FRAME_SAMPLES, 0.2);
+    let input: Frame = noise.as_slice().try_into().expect("480 samples");
+    let mut out = [0.0; FRAME_SAMPLES];
+    chain.process(&input, &mut out);
+    println!(
+        "adopted before: {:?} errors: {} out140={:.5} in140={:.5}",
+        chain.backend(),
+        controls.processing_errors(),
+        out[140],
+        input[140]
+    );
+    assert_eq!(out, input, "frame was not passed through");
+    assert_eq!(controls.processing_errors(), 1);
+    assert_eq!(chain.backend(), Backend::Sonora);
+}
+
+/// The neural backend must not allocate per frame (same rule as the rest of the chain).
+/// `rnnoise-rs` is measured in the engine, where its implementation lives.
+#[test]
+fn neural_backend_does_not_allocate_per_frame() {
+    assert_eq!(
+        allocations_per_frame(Backend::Nnnoiseless, false, true, false),
+        0.0
+    );
+    println!(
+        "sonora noise suppression allocates {:.1} per frame",
+        allocations_per_frame(Backend::Sonora, false, true, false)
+    );
+}
+
+/// The speech detector runs without a suppression backend: voice activation keeps working when
+/// suppression is off.
+#[test]
+fn voice_activation_works_with_suppression_off() {
+    let controls = Arc::new(DspControls::default());
+    controls.set_echo_cancellation(false);
+    controls.set_auto_gain(false);
+    controls.set_noise_backend(Backend::Sonora, SuppressionLevel::Moderate);
+    controls.set_noise_suppression(false);
+    let (_producer, consumer) = echo_reference();
+    let mut chain = DspChain::new(controls.clone(), consumer);
+
+    let mut noise = Noise(11);
+    let quiet: Frame = std::array::from_fn(|_| 0.0005 * noise.next());
+    for _ in 0..50 {
+        chain.process(&quiet, &mut [0.0; FRAME_SAMPLES]);
+    }
+    assert!(
+        !chain.controls().voice_active(),
+        "quiet input opened the gate"
+    );
+
+    let speech = speech_like(FRAME_SAMPLES * 20, 0.3);
+    let mut opened = 0;
+    for frame in speech.as_chunks::<FRAME_SAMPLES>().0 {
+        if chain.process(frame, &mut [0.0; FRAME_SAMPLES]) == Gate::Open {
+            opened += 1;
+        }
+    }
+    assert!(
+        opened > 0,
+        "voice activation never opened with the detector alone"
+    );
+}
+
+/// The strength setting has to change what the client sends, not only what the library can do.
+/// The gate is forced open (push to talk), so the chain output is what the encoder would get.
+#[test]
+fn strength_setting_changes_what_the_chain_sends() {
+    let noise = fan_noise(4 * SAMPLE_RATE as usize, 0.1);
+    let sent = |level: SuppressionLevel| {
+        let controls = Arc::new(DspControls::default());
+        controls.set_noise_backend(Backend::Sonora, level);
+        controls.set_mode(TalkMode::PushToTalk);
+        controls.set_ptt_pressed(true);
+        let (_producer, consumer) = echo_reference();
+        let mut chain = DspChain::new(controls, consumer);
+        let out = run(&mut chain, &noise);
+        db(energy(last_seconds(&noise, 3.0)) / energy(last_seconds(&out, 3.0)))
+    };
+    let low = sent(SuppressionLevel::Low);
+    let moderate = sent(SuppressionLevel::Moderate);
+    let very_high = sent(SuppressionLevel::VeryHigh);
+    println!(
+        "chain with the gate open: low {low:.1} dB, moderate {moderate:.1} dB, very high {very_high:.1} dB"
+    );
+    assert!(
+        moderate > low,
+        "moderate ({moderate:.1}) is not stronger than low ({low:.1})"
+    );
+    assert!(
+        very_high > moderate,
+        "very high ({very_high:.1}) is not stronger than moderate ({moderate:.1})"
+    );
 }
 
 /// Issue #156: low-latency mode sends the microphone signal untouched, even with echo

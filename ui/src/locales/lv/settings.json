@@ -158,6 +158,20 @@
     "processing": "Balss apstrāde",
     "noiseSuppression": "Trokšņu slāpēšana",
     "noiseSuppressionHint": "Filtrē fona troksni, piemēram, tastatūras un ventilatorus.",
+    "noiseChoice": {
+      "light": "Vāja",
+      "standard": "Standarta",
+      "advanced": "Paplašināta (MI)",
+      "off": "Izslēgta"
+    },
+    "noiseChoiceHint": {
+      "light": "Klasisks filtrs vienmērīgam troksnim, piemēram, ventilatoriem vai dūkoņai. Mazākā procesora slodze.",
+      "standard": "MI filtrs ikdienas troksnim, piemēram, tastatūrām un ventilatoriem. Neliela procesora slodze.",
+      "advanced": "Jaunāks MI modelis, kas noņem arī mainīgu troksni. Aptuveni trīs reizes vairāk procesora nekā Standarta un par 10 ms lielāka aizkave."
+    },
+    "noiseChoiceBeta": "Beta",
+    "noiseChoiceTipLabel": "Par {{choice}}",
+    "detectorHint": "Balsa aktivizēšana atpazīst runu ar RNNoise modeli; tas nemaina tavu audio.",
     "echoCancellation": "Atbalss slāpēšana",
     "echoCancellationHint": "Neļauj citiem dzirdēt sevi, kad izmanto skaļruņus.",
     "autoGain": "Automātiskais skaļums",
