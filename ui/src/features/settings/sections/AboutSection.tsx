@@ -1,25 +1,23 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import licenseText from "../../../../../LICENSE?raw";
 import { announce } from "../../../a11y";
-import { getApi, type AppInfo } from "../../../api";
+import { getApi } from "../../../api";
 import { useUnlockClicks } from "../../inspector/devTools";
 import { openInBrowser } from "../../chat/openLink";
 import { useView } from "../../../app/view";
 import { openSettingsSection } from "../settingsOpener";
-import { Group, Section } from "../components/Section";
+import { Group } from "../components/Section";
 import { Switch } from "../components/Switch";
-import { AppImageMenuEntrySwitch } from "./AppImageMenuEntrySwitch";
+import { useAppInfo } from "../useAppInfo";
 import type { SettingsSectionProps } from "./types";
 
 const ISSUES_URL = "https://github.com/Mumcord/mumcord/issues/new";
 
-/** About: version, OS, Mumcord's AGPL license and the third-party notices (AC-1.29). */
-export function AboutSection({ settings, update }: SettingsSectionProps) {
+/** Version, OS, What's new and Mumcord's AGPL license (AC-1.29). */
+export function VersionCard({ settings, update }: SettingsSectionProps) {
   const { t } = useTranslation("settings");
-  const { openRerunWizard } = useView();
-  const [info, setInfo] = useState<AppInfo | null>(null);
-  const [noticesFailed, setNoticesFailed] = useState(false);
+  const info = useAppInfo();
   const [changelogFailed, setChangelogFailed] = useState(false);
   const [unlocked, setUnlocked] = useState(false);
   const versionClicked = useUnlockClicks(() => {
@@ -27,25 +25,8 @@ export function AboutSection({ settings, update }: SettingsSectionProps) {
     announce(t("about.devToolsUnlocked"));
   });
 
-  useEffect(() => {
-    let active = true;
-    getApi()
-      .appInfo()
-      .then(
-        (loaded) => {
-          if (active) setInfo(loaded);
-        },
-        (error: unknown) => {
-          console.error("Loading app info failed", error);
-        },
-      );
-    return () => {
-      active = false;
-    };
-  }, []);
-
   return (
-    <Section title={t("sections.about")}>
+    <Group title={t("about.versionTitle")} icon="info" wide>
       <dl className="settings-facts">
         <dt>{t("about.version")}</dt>
         {/* Clicking the version seven times unlocks the developer tools (issue #60); the
@@ -63,27 +44,7 @@ export function AboutSection({ settings, update }: SettingsSectionProps) {
           {t("about.devToolsUnlocked")}
         </p>
       )}
-      <Group title={t("about.setup")}>
-        <p className="settings-hint">{t("about.setupWizardHint")}</p>
-        <div className="settings-actions">
-          <button type="button" className="settings-button" onClick={openRerunWizard}>
-            {t("about.setupWizardRun")}
-          </button>
-        </div>
-        <p className="settings-hint">
-          {t("about.setupWizardIdentityNote")}{" "}
-          <button
-            type="button"
-            className="settings-link"
-            onClick={() => {
-              openSettingsSection("identity");
-            }}
-          >
-            {t("about.setupWizardIdentityLink")}
-          </button>
-        </p>
-      </Group>
-      <div className="settings-group">
+      <div className="settings-actions">
         <button
           type="button"
           className="settings-button"
@@ -99,81 +60,126 @@ export function AboutSection({ settings, update }: SettingsSectionProps) {
         >
           {t("about.whatsNew")}
         </button>
-        {changelogFailed && (
-          <p role="alert" className="settings-error">
-            {t("about.changelogFailed")}
-          </p>
-        )}
-        <Switch
-          label={t("about.whatsNewAuto")}
-          checked={settings.whatsNewAuto}
-          onChange={(on) => {
-            update({ whatsNewAuto: on });
-          }}
-        />
       </div>
-      <Group title={t("updates.title")}>
-        <Switch
-          label={t("updates.check")}
-          description={t("updates.hint")}
-          checked={settings.updateCheck === "yes"}
-          onChange={(on) => {
-            update({ updateCheck: on ? "yes" : "no" });
+      {changelogFailed && (
+        <p role="alert" className="settings-error">
+          {t("about.changelogFailed")}
+        </p>
+      )}
+      <Switch
+        label={t("about.whatsNewAuto")}
+        checked={settings.whatsNewAuto}
+        onChange={(on) => {
+          update({ whatsNewAuto: on });
+        }}
+      />
+      <ScrollableText label={t("about.license")} text={licenseText} />
+    </Group>
+  );
+}
+
+/** Running the setup wizard again (#149); identities are managed in Account & Identity. */
+export function SetupCard() {
+  const { t } = useTranslation("settings");
+  const { openRerunWizard } = useView();
+  return (
+    <Group title={t("about.setup")} icon="star" info={t("about.setupWizardHint")}>
+      <div className="settings-actions">
+        <button type="button" className="settings-button" onClick={openRerunWizard}>
+          {t("about.setupWizardRun")}
+        </button>
+      </div>
+      <p className="settings-hint">
+        {t("about.setupWizardIdentityNote")}{" "}
+        <button
+          type="button"
+          className="settings-link"
+          onClick={() => {
+            openSettingsSection("account");
           }}
-        />
-        {info?.appimage === true && <AppImageMenuEntrySwitch />}
-      </Group>
-      <Group title={t("about.support")}>
-        <div className="settings-actions">
-          <button
-            type="button"
-            className="settings-button"
-            onClick={() => {
-              openInBrowser(`${ISSUES_URL}?template=bug_report.yml`);
-            }}
-          >
-            {t("about.reportBug")}
-          </button>
-          <button
-            type="button"
-            className="settings-button"
-            onClick={() => {
-              openInBrowser(`${ISSUES_URL}?template=feature_request.yml`);
-            }}
-          >
-            {t("about.requestFeature")}
-          </button>
-        </div>
-      </Group>
-      <Group title={t("about.license")}>
-        <ScrollableText label={t("about.license")} text={licenseText} />
-      </Group>
-      <Group title={t("about.notices")}>
-        <p className="settings-hint">{t("about.noticesHint")}</p>
-        <div className="settings-group">
-          <button
-            type="button"
-            className="settings-button"
-            onClick={() => {
-              setNoticesFailed(false);
-              getApi()
-                .licencesOpen()
-                .catch((error: unknown) => {
-                  console.error("Opening the licences window failed", error);
-                  setNoticesFailed(true);
-                });
-            }}
-          >
-            {t("about.showNotices")}
-          </button>
-        </div>
-        {noticesFailed && (
-          <p role="alert" className="settings-error">
-            {t("about.noticesFailed")}
-          </p>
-        )}
-      </Group>
-    </Section>
+        >
+          {t("about.setupWizardIdentityLink")}
+        </button>
+      </p>
+    </Group>
+  );
+}
+
+/** Bug reports and feature requests on GitHub. */
+export function SupportCard() {
+  const { t } = useTranslation("settings");
+  return (
+    <Group title={t("about.support")} icon="lifeBuoy">
+      <div className="settings-actions">
+        <button
+          type="button"
+          className="settings-button"
+          onClick={() => {
+            openInBrowser(`${ISSUES_URL}?template=bug_report.yml`);
+          }}
+        >
+          {t("about.reportBug")}
+        </button>
+        <button
+          type="button"
+          className="settings-button"
+          onClick={() => {
+            openInBrowser(`${ISSUES_URL}?template=feature_request.yml`);
+          }}
+        >
+          {t("about.requestFeature")}
+        </button>
+      </div>
+    </Group>
+  );
+}
+
+/** Checking GitHub for a newer version. */
+export function UpdatesCard({ settings, update }: SettingsSectionProps) {
+  const { t } = useTranslation("settings");
+  return (
+    <Group title={t("updates.title")} icon="refresh">
+      <Switch
+        label={t("updates.check")}
+        description={t("updates.hint")}
+        checked={settings.updateCheck === "yes"}
+        onChange={(on) => {
+          update({ updateCheck: on ? "yes" : "no" });
+        }}
+      />
+    </Group>
+  );
+}
+
+/** The third-party licences window (#138). */
+export function LicencesCard() {
+  const { t } = useTranslation("settings");
+  const [failed, setFailed] = useState(false);
+  return (
+    <Group title={t("about.notices")} icon="file" info={t("about.noticesHint")}>
+      <div className="settings-actions">
+        <button
+          type="button"
+          className="settings-button"
+          onClick={() => {
+            setFailed(false);
+            getApi()
+              .licencesOpen()
+              .catch((error: unknown) => {
+                console.error("Opening the licences window failed", error);
+                setFailed(true);
+              });
+          }}
+        >
+          {t("about.showNotices")}
+        </button>
+      </div>
+      {failed && (
+        <p role="alert" className="settings-error">
+          {t("about.noticesFailed")}
+        </p>
+      )}
+    </Group>
   );
 }
 

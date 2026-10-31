@@ -20,14 +20,16 @@ afterEach(() => {
 });
 
 describe("NowPlayingGroup", () => {
-  it("is off by default and turns sharing on", async () => {
+  it("is off by default and turns sharing on", () => {
     const update = vi.fn();
     render(<NowPlayingGroup settings={settings} update={update} />);
     const toggle = screen.getByRole("switch", { name: "Share what I'm listening to" });
     expect(toggle).not.toBeChecked();
     fireEvent.click(toggle);
     expect(update).toHaveBeenCalledWith({ nowPlaying: true });
-    expect(await screen.findByText(/official Mumble clients see/)).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: "More information: Share what I'm listening to" }),
+    ).toHaveAttribute("data-tooltip", expect.stringMatching(/official Mumble clients see/));
   });
 
   it("shows the detected track while on", async () => {

@@ -1,7 +1,7 @@
 /**
  * Finds the on-screen control for a search hit inside the settings panel. Controls are found by
- * their visible label (inside their group, because labels like "Position" repeat), so the
- * section components need no extra wiring.
+ * their visible label (inside their card, because labels like "Position" repeat), so the
+ * cards need no extra wiring.
  */
 export interface JumpTarget {
   /** Receives keyboard focus. */
@@ -14,10 +14,10 @@ const FOCUSABLE = "input:not([disabled]), select:not([disabled]), button:not([di
 
 const sameText = (element: Element, text: string) => element.textContent.trim() === text.trim();
 
+/** The section card titled `title`; matched on its plain title, as the heading may hold badges. */
 export function findGroup(panel: HTMLElement, title: string): HTMLElement | null {
-  for (const group of panel.querySelectorAll<HTMLElement>(".settings-group")) {
-    const heading = group.querySelector(":scope > .settings-group__title");
-    if (heading && sameText(heading, title)) return group;
+  for (const group of panel.querySelectorAll<HTMLElement>(".settings-group[data-title]")) {
+    if (group.dataset.title?.trim() === title.trim()) return group;
   }
   return null;
 }
@@ -48,10 +48,10 @@ function controlTarget(scope: HTMLElement, label: string): JumpTarget | null {
 /** The control, or for a group-only entry the group's first control; null while not rendered. */
 export function findTarget(
   panel: HTMLElement,
-  group: string | undefined,
+  group: string,
   control: string | undefined,
 ): JumpTarget | null {
-  const scope = group === undefined ? panel : findGroup(panel, group);
+  const scope = findGroup(panel, group);
   if (!scope) return null;
   if (control !== undefined) return controlTarget(scope, control);
   const first = scope.querySelector<HTMLElement>(FOCUSABLE);

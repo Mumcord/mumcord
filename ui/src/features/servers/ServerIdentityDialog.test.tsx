@@ -128,7 +128,7 @@ describe("ServerIdentityDialog", () => {
     setSettingsOpener(open);
     renderDialog(server);
     fireEvent.click(await screen.findByRole("button", { name: "Manage identities…" }));
-    expect(open).toHaveBeenCalledWith("identity");
+    expect(open).toHaveBeenCalledWith("account");
   });
 });
 

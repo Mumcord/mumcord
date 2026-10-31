@@ -3,21 +3,15 @@ import { useTranslation } from "react-i18next";
 import { getApi, type AudioDevice, type AudioDevices } from "../../../api";
 import { Select } from "../../../components/Select";
 import { LevelMeter } from "../components/LevelMeter";
-import { Group, Section } from "../components/Section";
-import { Switch } from "../components/Switch";
+import { Group } from "../components/Section";
 import { readableDeviceName } from "../deviceNames";
 import { errorText } from "../errors";
-import { BitrateSlider } from "./BitrateSlider";
-import { DuckingGroup } from "./DuckingGroup";
-import { GamePluginsGroup } from "./GamePluginsGroup";
-import { LowLatencyGroup } from "./LowLatencyGroup";
-import { PositionalGroup } from "./PositionalGroup";
 import type { SettingsSectionProps } from "./types";
 
 type MicTestPhaseName = "recording" | "playing" | "done" | "failed";
 
-/** Audio: input/output device, level meter and record-then-play-back test. */
-export function AudioSection({ settings, update }: SettingsSectionProps) {
+/** Microphone and speakers; follows devices that are plugged in or out. */
+export function DevicesCard({ settings, update }: SettingsSectionProps) {
   const { t } = useTranslation("settings");
   const [devices, setDevices] = useState<AudioDevices | null>(null);
   const [problem, setProblem] = useState<string | null>(null);
@@ -44,47 +38,29 @@ export function AudioSection({ settings, update }: SettingsSectionProps) {
   }, [t]);
 
   return (
-    <Section title={t("sections.audio")}>
-      <Group title={t("audio.devices")}>
-        <DeviceSelect
-          label={t("audio.input")}
-          devices={devices?.inputs ?? []}
-          value={settings.inputDevice}
-          onChange={(inputDevice) => {
-            update({ inputDevice });
-          }}
-        />
-        <DeviceSelect
-          label={t("audio.output")}
-          devices={devices?.outputs ?? []}
-          value={settings.outputDevice}
-          onChange={(outputDevice) => {
-            update({ outputDevice });
-          }}
-        />
-        {problem !== null && (
-          <p role="alert" className="settings-error">
-            {problem}
-          </p>
-        )}
-      </Group>
-      <Group title={t("audio.quality")}>
-        <Switch
-          label={t("audio.musicQuality")}
-          description={t("audio.musicQualityHint")}
-          checked={settings.musicQuality}
-          onChange={(musicQuality) => {
-            update({ musicQuality });
-          }}
-        />
-        <LowLatencyGroup settings={settings} update={update} />
-        <BitrateSlider settings={settings} update={update} />
-      </Group>
-      <DuckingGroup settings={settings} update={update} />
-      <PositionalGroup settings={settings} update={update} />
-      <GamePluginsGroup />
-      <MicTest />
-    </Section>
+    <Group title={t("audio.devices")} icon="headphones" wide>
+      <DeviceSelect
+        label={t("audio.input")}
+        devices={devices?.inputs ?? []}
+        value={settings.inputDevice}
+        onChange={(inputDevice) => {
+          update({ inputDevice });
+        }}
+      />
+      <DeviceSelect
+        label={t("audio.output")}
+        devices={devices?.outputs ?? []}
+        value={settings.outputDevice}
+        onChange={(outputDevice) => {
+          update({ outputDevice });
+        }}
+      />
+      {problem !== null && (
+        <p role="alert" className="settings-error">
+          {problem}
+        </p>
+      )}
+    </Group>
   );
 }
 
@@ -123,7 +99,8 @@ function DeviceSelect({ label, devices, value, onChange }: DeviceSelectProps) {
   );
 }
 
-function MicTest() {
+/** Level meter and the record-then-play-back test. */
+export function MicTestCard() {
   const { t } = useTranslation("settings");
   const [running, setRunning] = useState(false);
   const [level, setLevel] = useState(0);
@@ -165,7 +142,7 @@ function MicTest() {
     [],
   );
 
-  // Leaving the section ends a running test.
+  // Leaving the page ends a running test.
   useEffect(() => {
     mounted.current = true;
     return () => {
@@ -192,8 +169,7 @@ function MicTest() {
   };
 
   return (
-    <Group title={t("audio.test")}>
-      <p className="settings-hint">{t("audio.testHint")}</p>
+    <Group title={t("audio.test")} icon="waveform" info={t("audio.testHint")}>
       <LevelMeter label={t("audio.level")} level={level} />
       <div className="settings-actions">
         {running ? (

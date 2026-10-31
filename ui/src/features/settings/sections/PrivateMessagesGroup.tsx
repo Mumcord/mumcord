@@ -22,7 +22,7 @@ export function PrivateMessagesGroup({ settings, update }: SettingsSectionProps)
   };
   return (
     <>
-      <Group title={t("privateMessages.title")}>
+      <Group title={t("privateMessages.title")} icon="mail">
         <RuleCards
           value={pm.rule}
           onChange={(rule) => {
@@ -44,7 +44,7 @@ export function PrivateMessagesGroup({ settings, update }: SettingsSectionProps)
           change({ serverRules });
         }}
       />
-      <Group title={t("privateMessages.alwaysTitle")}>
+      <Group title={t("privateMessages.alwaysTitle")} icon="user">
         <Switch
           label={t("privateMessages.currentChannel")}
           description={t("privateMessages.currentChannelHint")}
@@ -127,7 +127,7 @@ function ServerOverrides({
     onChange(rule === undefined ? others : [...others, { serverId, rule }]);
   };
   return (
-    <Group title={t("privateMessages.overrideTitle")}>
+    <Group title={t("privateMessages.overrideTitle")} icon="server">
       {servers.length === 0 ? (
         <p className="settings-hint">{t("privateMessages.noServers")}</p>
       ) : (

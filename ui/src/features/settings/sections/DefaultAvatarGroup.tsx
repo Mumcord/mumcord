@@ -59,7 +59,7 @@ export function DefaultAvatarGroup({ settings, update }: SettingsSectionProps) {
   };
 
   return (
-    <Group title={t("profile.title")}>
+    <Group title={t("profile.title")} icon="image">
       <p className="settings-value">{t("profile.defaultAvatar")}</p>
       <div className="settings-avatar">
         {avatar !== null ? (

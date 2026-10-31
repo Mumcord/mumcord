@@ -1,16 +1,20 @@
-import { useId, type Ref } from "react";
+import { useId, type ReactNode, type Ref } from "react";
+import { useTranslation } from "react-i18next";
 import { InfoTip } from "../../../components/InfoTip";
 
 interface SwitchProps {
   label: string;
   checked: boolean;
   onChange: (checked: boolean) => void;
+  /** Explains the switch behind a "?" next to the label, so the rows stay one line high. */
   description?: string;
+  /** Accessible name of the "?" button; defaults to "More information: <label>". */
+  descriptionLabel?: string;
+  /** Current state worth seeing at a glance (e.g. "Not compatible"), shown under the label. */
+  status?: string;
   disabled?: boolean;
-  /** Short tag next to the label, e.g. "Beta". */
-  badge?: string;
-  /** Explains the switch behind a "?" button instead of a line of text. */
-  tip?: { label: string; text: string };
+  /** Tag next to the label: a short text, or a ready badge such as `<BetaBadge />`. */
+  badge?: ReactNode;
   /** Lets the caller focus the switch, e.g. when another section links to it. */
   inputRef?: Ref<HTMLInputElement>;
 }
@@ -21,22 +25,30 @@ export function Switch({
   checked,
   onChange,
   description,
+  descriptionLabel,
+  status,
   disabled = false,
   badge,
-  tip,
   inputRef,
 }: SwitchProps) {
+  const { t } = useTranslation("settings");
   const id = useId();
-  const descriptionId = `${id}-description`;
+  const statusId = `${id}-status`;
   return (
     <div className="settings-switch">
       <div className="settings-switch__text">
         <label htmlFor={id}>{label}</label>
-        {badge !== undefined && <span className="settings-switch__badge">{badge}</span>}
-        {tip !== undefined && <InfoTip label={tip.label} text={tip.text} />}
+        {typeof badge === "string" ? (
+          <span className="settings-switch__badge">{badge}</span>
+        ) : (
+          badge
+        )}
         {description !== undefined && (
-          <p id={descriptionId} className="settings-hint">
-            {description}
+          <InfoTip label={descriptionLabel ?? t("moreInfo", { topic: label })} text={description} />
+        )}
+        {status !== undefined && (
+          <p id={statusId} className="settings-switch__status settings-hint">
+            {status}
           </p>
         )}
       </div>
@@ -48,7 +60,7 @@ export function Switch({
         className="settings-switch__input"
         checked={checked}
         disabled={disabled}
-        aria-describedby={description !== undefined ? descriptionId : undefined}
+        aria-describedby={status !== undefined ? statusId : undefined}
         onChange={(event) => {
           onChange(event.target.checked);
         }}

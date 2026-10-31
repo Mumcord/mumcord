@@ -4,6 +4,8 @@ import en from "../../locales/en/settings.json";
 import es from "../../locales/es/settings.json";
 import { SECTION_IDS } from "./sectionIds";
 import {
+  groupResults,
+  matchRanges,
   normalizeSearch,
   searchSettings,
   SETTINGS_INDEX,
@@ -29,16 +31,15 @@ const labels = (results: SearchResult[]) =>
   );
 
 describe("settings search index", () => {
-  it("only uses keys that exist in every language", () => {
+  // English is the source; other languages fall back to it until they are translated.
+  it("only uses keys that exist in English", () => {
     const keys = SETTINGS_INDEX.flatMap((entry) => [
       entry.group,
       entry.control,
       ...(entry.terms ?? []),
     ]).filter((key): key is string => key !== undefined);
-    keys.push(...SECTION_IDS.map((id) => `sections.${id}`));
-    for (const tree of [en, de, es] as Tree[]) {
-      expect(keys.filter((key) => lookup(tree, key) === undefined)).toEqual([]);
-    }
+    keys.push(...SECTION_IDS.flatMap((id) => [`sections.${id}`, `sectionDescriptions.${id}`]));
+    expect(keys.filter((key) => lookup(en as Tree, key) === undefined)).toEqual([]);
   });
 
   it("finds the language picker by any language's own name", () => {
@@ -52,7 +53,7 @@ describe("settings search index", () => {
   });
 
   it("finds sections by name and settings by label, group or hint", () => {
-    expect(labels(searchSettings("voice", t))).toContain("voice");
+    expect(labels(searchSettings("voice", t))).toContain("voiceAudio");
     expect(labels(searchSettings("noise", t))).toEqual(
       expect.arrayContaining(["voice.noiseSuppression"]),
     );
@@ -89,8 +90,52 @@ describe("settings search index", () => {
   });
 
   it("matches the current language without accents", () => {
-    const results = labels(searchSettings("barrierefreiheit", translator(de)));
-    expect(results).toContain("accessibility");
+    expect(labels(searchSettings("sprunglinks", translator(de)))).toEqual([
+      "accessibility.skipLinks",
+    ]);
     expect(labels(searchSettings("musica", translator(es)))).toContain("audio.musicQuality");
+  });
+
+  it("finds settings by synonyms", () => {
+    expect(labels(searchSettings("p2p", t))).toEqual(
+      expect.arrayContaining(["p2p.title", "privacyDirect.allow"]),
+    );
+    expect(labels(searchSettings("hide my ip", t))).toContain("p2p.title");
+    expect(labels(searchSettings("relay", t))).toContain("p2p.title");
+  });
+
+  it("files every setting under its new group", () => {
+    const sectionOf = (control: string) =>
+      SETTINGS_INDEX.find((entry) => entry.control === control)?.section;
+    expect(sectionOf("voice.noiseSuppression")).toBe("voiceAudio");
+    expect(sectionOf("audio.bitrate")).toBe("voiceAudio");
+    expect(sectionOf("privacyDirect.allow")).toBe("privacy");
+    expect(sectionOf("history.clearAll")).toBe("chatNotifications");
+    expect(sectionOf("appearance.autostart")).toBe("general");
+    expect(sectionOf("positional.switch")).toBe("gaming");
+    expect(sectionOf("cache.clear")).toBe("advanced");
+    expect(sectionOf("updates.check")).toBe("general");
+  });
+
+  it("leaves out the entries of hidden cards", () => {
+    expect(labels(searchSettings("in-game overlay", t))).toContain("overlay.inGame.title");
+    expect(labels(searchSettings("in-game overlay", t, ["overlay.inGame.title"]))).toEqual([]);
+  });
+
+  it("buckets results by group in the order of the side list", () => {
+    const groups = groupResults(searchSettings("history", t)).map((group) => group.section);
+    expect(groups).toEqual([...SECTION_IDS].filter((id) => groups.includes(id)));
+    expect(groups).toEqual(expect.arrayContaining(["chatNotifications", "privacy", "servers"]));
+  });
+
+  it("marks matches ignoring case and accents", () => {
+    expect(matchRanges("Noise suppression", "noise")).toEqual([[0, 5]]);
+    expect(matchRanges("Gerät wählen", "gerat")).toEqual([[0, 5]]);
+    expect(matchRanges("Echo cancellation", "can ella")).toEqual([
+      [5, 8],
+      [9, 13],
+    ]);
+    expect(matchRanges("Echo cancellation", "cance ancel")).toEqual([[5, 11]]);
+    expect(matchRanges("Echo", "zz")).toEqual([]);
   });
 });

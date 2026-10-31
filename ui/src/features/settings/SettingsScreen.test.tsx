@@ -78,6 +78,23 @@ function renderScreen() {
   );
 }
 
+/** The explanation behind the "?" next to a control (#155). */
+function expectTip(control: HTMLElement, text: string | RegExp) {
+  const row = control.closest<HTMLElement>(".settings-switch, .settings-control-row");
+  const tip = row?.querySelector(".info-tip");
+  expect(tip?.getAttribute("data-tooltip")).toEqual(
+    typeof text === "string" ? text : expect.stringMatching(text),
+  );
+}
+
+/** Switches to another group in the screen that is already rendered. */
+async function switchSection(name: string) {
+  fireEvent.click(screen.getByRole("tab", { name }));
+  await waitFor(() => {
+    expect(screen.queryByText("Loading settings…")).not.toBeInTheDocument();
+  });
+}
+
 async function openSection(name: string) {
   renderScreen();
   fireEvent.click(await screen.findByRole("tab", { name }));
@@ -87,22 +104,42 @@ async function openSection(name: string) {
   });
 }
 
+const GROUPS = [
+  "General",
+  "Account & Identity",
+  "Voice & Audio",
+  "Chat & Notifications",
+  "Privacy & Connections",
+  "Appearance",
+  "Servers",
+  "Gaming & Overlay",
+  "Advanced & Developer",
+  "About",
+];
+
 describe("SettingsScreen", () => {
-  it("lists the sections as a vertical tab list operated with the arrow keys", () => {
+  it("lists the groups as a vertical tab list operated with the arrow keys", () => {
     renderScreen();
-    const list = screen.getByRole("tablist", { name: "Settings sections" });
+    const list = screen.getByRole("tablist", { name: "Settings groups" });
     expect(list).toHaveAttribute("aria-orientation", "vertical");
-    const tabs = within(list).getAllByRole("tab");
-    expect(tabs).toHaveLength(13);
-    const identity = screen.getByRole("tab", { name: "Identity" });
+    expect(
+      within(list)
+        .getAllByRole("tab")
+        .map((tab) => tab.textContent),
+    ).toEqual(GROUPS);
+    const identity = screen.getByRole("tab", { name: "General" });
     expect(identity).toHaveAttribute("aria-selected", "true");
     expect(identity).toHaveAttribute("tabindex", "0");
+    expect(screen.getByRole("heading", { level: 2, name: "General" })).toBeInTheDocument();
 
     fireEvent.keyDown(identity, { key: "ArrowDown" });
-    const servers = screen.getByRole("tab", { name: "Servers" });
+    const servers = screen.getByRole("tab", { name: "Account & Identity" });
     expect(servers).toHaveFocus();
     expect(servers).toHaveAttribute("aria-selected", "true");
-    expect(screen.getByRole("tabpanel", { name: "Servers" })).toBeInTheDocument();
+    expect(screen.getByRole("tabpanel", { name: "Account & Identity" })).toBeInTheDocument();
+    expect(
+      screen.getByRole("heading", { level: 2, name: "Account & Identity" }),
+    ).toBeInTheDocument();
 
     fireEvent.keyDown(servers, { key: "End" });
     expect(screen.getByRole("tab", { name: "About" })).toHaveFocus();
@@ -117,7 +154,7 @@ describe("SettingsScreen", () => {
   it.each(["dark", "light"] as const)("has no axe violations in the %s theme", async (theme) => {
     await setup(theme);
     const { container } = renderScreen();
-    for (const name of ["Identity", "Audio", "Voice", "Chat & history", "Appearance", "About"]) {
+    for (const name of GROUPS) {
       fireEvent.click(screen.getByRole("tab", { name }));
       await waitFor(() => {
         expect(screen.queryByText("Loading settings…")).not.toBeInTheDocument();
@@ -137,6 +174,7 @@ describe("SettingsScreen", () => {
     });
     expect(update).toHaveBeenCalledWith(expect.objectContaining(light));
 
+    await switchSection("General");
     fireEvent.click(screen.getByRole("radio", { name: "Minimize to the tray" }));
     await waitFor(() => {
       expect(update).toHaveBeenLastCalledWith(
@@ -161,13 +199,14 @@ describe("SettingsScreen", () => {
 
   it("offers start at login with start minimized enabled only while it is on", async () => {
     const update = vi.spyOn(api, "settingsUpdate");
-    await openSection("Appearance");
+    await openSection("General");
     const autostart = screen.getByRole("switch", { name: "Start Mumcord when I log in" });
     const minimized = screen.getByRole("switch", { name: "Start minimized" });
     expect(autostart).not.toBeChecked();
     expect(minimized).toBeChecked();
     expect(minimized).toBeDisabled();
-    expect(minimized).toHaveAccessibleDescription(
+    expectTip(
+      minimized,
       "When Mumcord starts at login, it waits in the tray instead of opening the window.",
     );
 
@@ -186,7 +225,7 @@ describe("SettingsScreen", () => {
 
   it("lets the user turn off the read-only connect", async () => {
     const update = vi.spyOn(api, "settingsUpdate");
-    await openSection("Voice");
+    await openSection("Voice & Audio");
     const toggle = screen.getByRole("switch", { name: "Connect muted until I join a channel" });
     expect(toggle).toBeChecked();
     fireEvent.click(toggle);
@@ -197,10 +236,10 @@ describe("SettingsScreen", () => {
 
   it("switches link previews off and applies it to the chat right away", async () => {
     const update = vi.spyOn(api, "settingsUpdate");
-    await openSection("Chat & history");
+    await openSection("Privacy & Connections");
     const toggle = screen.getByRole("switch", { name: "Show link previews and embeds" });
     expect(toggle).toBeChecked();
-    expect(toggle).toHaveAccessibleDescription(/see your IP address/);
+    expectTip(toggle, /see your IP address/);
     fireEvent.click(toggle);
     await waitFor(() => {
       expect(update).toHaveBeenLastCalledWith(expect.objectContaining({ linkPreviews: false }));
@@ -213,7 +252,7 @@ describe("SettingsScreen", () => {
   });
 
   it("rolls a failed save back and explains it", async () => {
-    await openSection("Language");
+    await openSection("General");
     api.mock.failNext("settingsUpdate", "io");
     fireEvent.click(screen.getByRole("radio", { name: "Deutsch" }));
     expect(await screen.findByRole("alert")).toHaveTextContent(
@@ -232,7 +271,7 @@ describe("SettingsScreen", () => {
   it("stores null for the system language", async () => {
     await api.settingsUpdate({ ...(await api.settingsGet()), language: "de" });
     const update = vi.spyOn(api, "settingsUpdate");
-    await openSection("Language");
+    await openSection("General");
     fireEvent.click(screen.getByRole("radio", { name: "Follow system" }));
     await waitFor(() => {
       expect(update).toHaveBeenCalledWith(expect.objectContaining({ language: null }));
@@ -241,7 +280,7 @@ describe("SettingsScreen", () => {
 
   it("toggles notification sounds", async () => {
     const update = vi.spyOn(api, "settingsUpdate");
-    await openSection("Sounds & notifications");
+    await openSection("Voice & Audio");
     const toggle = screen.getByRole("switch", { name: "You mute or unmute yourself" });
     fireEvent.click(toggle);
     await waitFor(() => {
@@ -273,7 +312,7 @@ describe("SettingsScreen", () => {
 
   it("has separate mention sound and notification switches, both on by default", async () => {
     const update = vi.spyOn(api, "settingsUpdate");
-    await openSection("Sounds & notifications");
+    await openSection("Voice & Audio");
     const sound = screen.getByRole("switch", { name: "Sound when mentioned" });
     const notify = screen.getByRole("switch", { name: "Notify when mentioned" });
     expect(sound).toBeChecked();
@@ -289,7 +328,7 @@ describe("SettingsScreen", () => {
 
   it("toggles the own join and hang-up sounds separately", async () => {
     const update = vi.spyOn(api, "settingsUpdate");
-    await openSection("Sounds & notifications");
+    await openSection("Voice & Audio");
     const join = screen.getByRole("switch", { name: "You join a channel for voice" });
     const hangUp = screen.getByRole("switch", { name: "You disconnect from a server" });
     expect(join).toBeChecked();
@@ -306,7 +345,7 @@ describe("SettingsScreen", () => {
 
   it("toggles the kicked and banned sounds separately, both on by default", async () => {
     const update = vi.spyOn(api, "settingsUpdate");
-    await openSection("Sounds & notifications");
+    await openSection("Voice & Audio");
     const kicked = screen.getByRole("switch", { name: "You are kicked from a server" });
     const banned = screen.getByRole("switch", { name: "You are banned from a server" });
     expect(kicked).toBeChecked();
@@ -323,7 +362,7 @@ describe("SettingsScreen", () => {
 
   it("chooses how message notifications are shown", async () => {
     const update = vi.spyOn(api, "settingsUpdate");
-    await openSection("Sounds & notifications");
+    await openSection("Chat & Notifications");
     const group = screen.getByRole("group", { name: "Notifications for new messages" });
     expect(within(group).getByRole("radio", { name: /^Both/ })).toBeChecked();
     fireEvent.click(within(group).getByRole("radio", { name: "Off" }));
@@ -337,13 +376,13 @@ describe("SettingsScreen", () => {
   });
 
   it("shows the overlay section", async () => {
-    await openSection("Overlay");
+    await openSection("Gaming & Overlay");
     expect(await screen.findByRole("heading", { name: "In-game overlay" })).toBeInTheDocument();
   });
 
   it("offers the in-game overlay through the engine", async () => {
     const setMode = vi.spyOn(api, "ingameOverlaySetMode");
-    await openSection("Overlay");
+    await openSection("Gaming & Overlay");
     fireEvent.click(await screen.findByRole("radio", { name: "On" }));
     expect(setMode).toHaveBeenCalledWith("on");
     expect(screen.queryByText(/not available on this system/)).not.toBeInTheDocument();
@@ -364,7 +403,7 @@ describe("Audio section", () => {
       outputs: [],
     });
     const update = vi.spyOn(api, "settingsUpdate");
-    await openSection("Audio");
+    await openSection("Voice & Audio");
     const mic = await screen.findByRole("combobox", { name: "Microphone" });
     await waitFor(() => {
       expect(optionLabels(mic)).toContain("Default ALSA Input");
@@ -381,7 +420,7 @@ describe("Audio section", () => {
   });
 
   it("follows hot-plugged devices", async () => {
-    await openSection("Audio");
+    await openSection("Voice & Audio");
     const mic = await screen.findByRole("combobox", { name: "Microphone" });
     await waitFor(() => {
       expect(optionLabels(mic)).toContain("USB Headset");
@@ -397,21 +436,23 @@ describe("Audio section", () => {
   it("runs the microphone test through the engine's phases with a level meter", async () => {
     const start = vi.spyOn(api, "micTestStart").mockResolvedValue(null);
     const stop = vi.spyOn(api, "micTestStop");
-    await openSection("Audio");
+    await openSection("Voice & Audio");
     vi.useFakeTimers();
     await act(async () => {
       fireEvent.click(screen.getByRole("button", { name: "Start test" }));
       await Promise.resolve();
     });
     expect(start).toHaveBeenCalled();
-    expect(screen.getByText(/played back to you/)).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: "More information: Microphone test" }).dataset.tooltip,
+    ).toMatch(/played back to you/);
     act(() => {
       api.mock.emit("micLevel", { level: 0.5 });
     });
-    expect(screen.getByRole("meter", { name: "Microphone level" })).toHaveAttribute(
-      "aria-valuenow",
-      "50",
-    );
+    // The microphone test card on the same page shows the same level.
+    for (const meter of screen.getAllByRole("meter", { name: "Microphone level" })) {
+      expect(meter).toHaveAttribute("aria-valuenow", "50");
+    }
     act(() => {
       api.mock.emit("micTestPhaseChanged", { phase: "playing" });
     });
@@ -426,17 +467,17 @@ describe("Audio section", () => {
   it("stops the microphone test when leaving the section", async () => {
     vi.spyOn(api, "micTestStart").mockResolvedValue(null);
     const stop = vi.spyOn(api, "micTestStop");
-    await openSection("Audio");
+    await openSection("Voice & Audio");
     fireEvent.click(screen.getByRole("button", { name: "Start test" }));
     await screen.findByRole("button", { name: "Stop recording" });
-    fireEvent.click(screen.getByRole("tab", { name: "Voice" }));
+    fireEvent.click(screen.getByRole("tab", { name: "General" }));
     expect(stop).toHaveBeenCalledTimes(1);
   });
 });
 
 describe("Voice section", () => {
   async function openPushToTalk() {
-    await openSection("Voice");
+    await openSection("Voice & Audio");
     fireEvent.click(await screen.findByRole("radio", { name: /Push-to-talk/ }));
     return screen.findByRole("button", { name: "Set key" });
   }
@@ -510,7 +551,7 @@ describe("Voice section", () => {
       reason: "waylandNoPortal",
     });
     vi.spyOn(api, "pttMouseStatus").mockResolvedValue({ support: "evdev", state: "ready" });
-    await openSection("Voice");
+    await openSection("Voice & Audio");
     expect(await screen.findByText(/does not offer global shortcuts/)).toBeInTheDocument();
     expect(screen.getByRole("radio", { name: /Push-to-talk/ })).toBeDisabled();
   });
@@ -547,7 +588,7 @@ describe("Voice section", () => {
       const button = await openPushToTalk();
       const toggle = screen.getByRole("switch", { name: /Allow mouse buttons/ });
       expect(toggle).not.toBeChecked();
-      expect(toggle).toHaveAccessibleDescription(/read all input devices, including your keyboard/);
+      expectTip(toggle, /read all input devices, including your keyboard/);
       expect(screen.queryByText("sudo usermod -aG input $USER")).not.toBeInTheDocument();
       fireEvent.click(button);
       fireEvent.mouseDown(button, { button: 4 });
@@ -562,7 +603,7 @@ describe("Voice section", () => {
 
     it("shows the input group command when permission is missing", async () => {
       await api.settingsUpdate({ ...(await api.settingsGet()), allowMouseButtons: true });
-      await openSection("Voice");
+      await openSection("Voice & Audio");
       expect(await screen.findByText("sudo usermod -aG input $USER")).toBeInTheDocument();
       expect(screen.getByText(/log out and back in/)).toBeInTheDocument();
     });
@@ -573,7 +614,7 @@ describe("Voice section", () => {
         reason: "waylandNoPortal",
       });
       await api.settingsUpdate({ ...(await api.settingsGet()), allowMouseButtons: true });
-      await openSection("Voice");
+      await openSection("Voice & Audio");
       await screen.findByText(/does not offer global shortcuts/);
       expect(screen.getByRole("radio", { name: /Push-to-talk/ })).toBeEnabled();
     });
@@ -581,7 +622,7 @@ describe("Voice section", () => {
 
   describe("compatibility mode (FR-1.48)", () => {
     it("is hidden outside Linux Wayland", async () => {
-      await openSection("Voice");
+      await openSection("Voice & Audio");
       await screen.findByRole("switch", { name: /Noise suppression/ });
       expect(screen.queryByRole("switch", { name: /Compatibility mode/ })).not.toBeInTheDocument();
     });
@@ -595,10 +636,10 @@ describe("Voice section", () => {
       vi.spyOn(api, "pttMouseStatus").mockResolvedValue({ support: "evdev", state: "ready" });
       const update = vi.spyOn(api, "settingsUpdate");
       const restart = vi.spyOn(api, "appRestart");
-      await openSection("Voice");
+      await openSection("Voice & Audio");
       const toggle = await screen.findByRole("switch", { name: /Compatibility mode/ });
       expect(toggle).not.toBeChecked();
-      expect(toggle).toHaveAccessibleDescription(/Legacy X11 App Support/);
+      expectTip(toggle, /Legacy X11 App Support/);
       expect(screen.queryByRole("button", { name: "Restart now" })).not.toBeInTheDocument();
       fireEvent.click(toggle);
       await waitFor(() => {
@@ -618,7 +659,7 @@ describe("Voice section", () => {
       });
       vi.spyOn(api, "pttMouseStatus").mockResolvedValue({ support: "evdev", state: "ready" });
       await api.settingsUpdate({ ...(await api.settingsGet()), pttCompatibilityMode: true });
-      await openSection("Voice");
+      await openSection("Voice & Audio");
       expect(await screen.findByRole("switch", { name: /Compatibility mode/ })).toBeChecked();
       expect(screen.getByText(/Compatibility mode is on/)).toBeInTheDocument();
       expect(screen.queryByRole("switch", { name: /Allow mouse buttons/ })).not.toBeInTheDocument();
@@ -632,7 +673,7 @@ describe("Voice section", () => {
         kde: true,
       });
       const open = vi.spyOn(api, "pttOpenKdeX11Settings");
-      await openSection("Voice");
+      await openSection("Voice & Audio");
       const button = await screen.findByRole("button", { name: "Open KDE X11 settings" });
       fireEvent.click(button);
       expect(open).toHaveBeenCalledOnce();
@@ -650,7 +691,7 @@ describe("Voice section", () => {
       });
       const allow = vi.spyOn(api, "pttKdeX11AllowMouse");
       const undo = vi.spyOn(api, "pttKdeX11Undo");
-      await openSection("Voice");
+      await openSection("Voice & Audio");
       fireEvent.click(await screen.findByRole("button", { name: "Allow mouse buttons" }));
       expect(allow).not.toHaveBeenCalled();
       fireEvent.click(await screen.findByRole("button", { name: "Cancel" }));
@@ -676,7 +717,7 @@ describe("Voice section", () => {
         kde: true,
       });
       vi.spyOn(api, "pttKdeX11Access").mockResolvedValue({ allowed: true, undoAvailable: false });
-      await openSection("Voice");
+      await openSection("Voice & Audio");
       expect(await screen.findByText(/already allows mouse buttons/)).toBeInTheDocument();
       expect(screen.queryByRole("button", { name: "Allow mouse buttons" })).toBeNull();
       expect(screen.queryByRole("button", { name: "Undo" })).toBeNull();
@@ -689,7 +730,7 @@ describe("Voice section", () => {
         kde: true,
       });
       vi.spyOn(console, "error").mockImplementation(() => undefined);
-      await openSection("Voice");
+      await openSection("Voice & Audio");
       fireEvent.click(await screen.findByRole("button", { name: "Allow mouse buttons" }));
       api.mock.failNext("pttKdeX11AllowMouse", "io");
       fireEvent.click(await screen.findByRole("button", { name: "Allow" }));
@@ -702,7 +743,7 @@ describe("Voice section", () => {
         compatibilityActive: true,
         kde: false,
       });
-      await openSection("Voice");
+      await openSection("Voice & Audio");
       await screen.findByRole("switch", { name: /Compatibility mode/ });
       expect(screen.queryByRole("button", { name: "Open KDE X11 settings" })).toBeNull();
     });
@@ -715,7 +756,7 @@ describe("Voice section", () => {
       });
       api.mock.failNext("appRestart", "internal");
       // Running in compatibility mode with the setting off: switching back is pending.
-      await openSection("Voice");
+      await openSection("Voice & Audio");
       vi.spyOn(console, "error").mockImplementation(() => undefined);
       fireEvent.click(await screen.findByRole("button", { name: "Restart now" }));
       expect(await screen.findByText(/could not restart/)).toBeInTheDocument();
@@ -727,14 +768,15 @@ describe("Voice section", () => {
       support: "native",
       state: "accessibilityMissing",
     });
-    await openSection("Voice");
+    await openSection("Voice & Audio");
     expect(await screen.findByText(/Privacy & Security → Accessibility/)).toBeInTheDocument();
   });
 
   it("offers a manual voice threshold as a slider over the live level meter", async () => {
     const update = vi.spyOn(api, "settingsUpdate");
-    await openSection("Voice");
-    expect(screen.queryByRole("slider")).not.toBeInTheDocument();
+    await openSection("Voice & Audio");
+    const threshold = () => screen.queryByRole("slider", { name: "Voice activation threshold" });
+    expect(threshold()).not.toBeInTheDocument();
     fireEvent.click(screen.getByRole("radio", { name: /Manual threshold/ }));
     const slider = await screen.findByRole("slider", { name: "Voice activation threshold" });
     expect(slider).toHaveValue("-40");
@@ -742,10 +784,10 @@ describe("Voice section", () => {
     act(() => {
       api.mock.emit("micLevel", { level: 0.5 });
     });
-    expect(screen.getByRole("meter", { name: "Microphone level" })).toHaveAttribute(
-      "aria-valuenow",
-      "50",
-    );
+    // The microphone test card on the same page shows the same level.
+    for (const meter of screen.getAllByRole("meter", { name: "Microphone level" })) {
+      expect(meter).toHaveAttribute("aria-valuenow", "50");
+    }
     fireEvent.change(slider, { target: { value: "-30" } });
     await waitFor(() => {
       expect(update).toHaveBeenLastCalledWith(
@@ -755,12 +797,12 @@ describe("Voice section", () => {
     expect(await screen.findByText("-30 dBFS")).toBeInTheDocument();
     fireEvent.click(screen.getByRole("radio", { name: /Automatic/ }));
     await waitFor(() => {
-      expect(screen.queryByRole("slider")).not.toBeInTheDocument();
+      expect(threshold()).not.toBeInTheDocument();
     });
   });
 
   it("hides the threshold in push-to-talk mode", async () => {
-    await openSection("Voice");
+    await openSection("Voice & Audio");
     fireEvent.click(screen.getByRole("radio", { name: /Push-to-talk/ }));
     await screen.findByRole("button", { name: "Set key" });
     expect(screen.queryByRole("radio", { name: /Manual threshold/ })).not.toBeInTheDocument();
@@ -768,7 +810,7 @@ describe("Voice section", () => {
 
   it("saves the voice processing switches", async () => {
     const update = vi.spyOn(api, "settingsUpdate");
-    await openSection("Voice");
+    await openSection("Voice & Audio");
     fireEvent.click(screen.getByRole("switch", { name: "Noise suppression" }));
     fireEvent.click(screen.getByRole("switch", { name: "Echo cancellation" }));
     fireEvent.click(screen.getByRole("switch", { name: "Automatic volume" }));
@@ -787,7 +829,7 @@ describe("Voice section", () => {
 describe("Audio section music quality", () => {
   it("is off by default and saves the switch", async () => {
     const update = vi.spyOn(api, "settingsUpdate");
-    await openSection("Audio");
+    await openSection("Voice & Audio");
     const toggle = screen.getByRole("switch", { name: "Music quality" });
     expect(toggle).not.toBeChecked();
     fireEvent.click(toggle);
@@ -800,7 +842,7 @@ describe("Audio section music quality", () => {
 describe("Audio section video ducking (FR-2.76)", () => {
   it("is on at 30 % by default and saves the switch and the slider", async () => {
     const update = vi.spyOn(api, "settingsUpdate");
-    await openSection("Audio");
+    await openSection("Voice & Audio");
     const toggle = screen.getByRole("switch", { name: "Lower video sound while people talk" });
     expect(toggle).toBeChecked();
     const slider = screen.getByRole("slider", { name: "Lowered volume" });
@@ -819,7 +861,7 @@ describe("Audio section video ducking (FR-2.76)", () => {
 
 describe("Audio section bitrate slider", () => {
   it("defaults to 96 kbit/s, says the maximum depends on the server while not connected", async () => {
-    await openSection("Audio");
+    await openSection("Voice & Audio");
     const slider = screen.getByRole("slider", { name: "Bitrate" });
     expect(slider).toHaveAttribute("aria-valuetext", "96 kbit/s");
     expect(slider).toHaveAttribute("min", "16");
@@ -829,7 +871,7 @@ describe("Audio section bitrate slider", () => {
   it("shows the server maximum, follows changes and saves a lower value live", async () => {
     vi.spyOn(api, "bitrateMax").mockResolvedValue(96);
     const update = vi.spyOn(api, "settingsUpdate");
-    await openSection("Audio");
+    await openSection("Voice & Audio");
     const slider = await screen.findByRole("slider", { name: "Bitrate" });
     await screen.findByText(/Maximum: 96 kbit\/s/);
     expect(slider).toHaveAttribute("max", "96");
@@ -856,7 +898,7 @@ describe("Audio section bitrate slider", () => {
 describe("Chat & history section", () => {
   it("offers the preview cache age with 7 days as the default and saves a change", async () => {
     const update = vi.spyOn(api, "settingsUpdate");
-    await openSection("Chat & history");
+    await openSection("Privacy & Connections");
     const select = screen.getByRole("combobox", { name: "Delete cached previews after" });
     expect(select).toHaveTextContent("7 days");
     expect(optionLabels(select)).toEqual(["1 day", "7 days", "30 days", "Never"]);
@@ -872,7 +914,7 @@ describe("Chat & history section", () => {
 
   it("clears the preview cache now and says how much space it freed", async () => {
     const clear = vi.spyOn(api, "previewCacheClear").mockResolvedValue(1_468_006);
-    await openSection("Chat & history");
+    await openSection("Privacy & Connections");
     fireEvent.click(screen.getByRole("button", { name: "Clear now" }));
     expect(await screen.findByText("Cache cleared, 1.4 MB freed.")).toBeVisible();
     expect(clear).toHaveBeenCalledOnce();
@@ -884,7 +926,7 @@ describe("Chat & history section", () => {
       webKib: 2048,
       tempKib: 512,
     });
-    await openSection("Privacy");
+    await openSection("Advanced & Developer");
     expect(
       await screen.findByRole("switch", { name: "Link previews and images (1.0 MB)" }),
     ).toBeChecked();
@@ -897,7 +939,7 @@ describe("Chat & history section", () => {
     const clear = vi
       .spyOn(api, "cacheClear")
       .mockResolvedValue({ freedKib: 1024, webPending: false });
-    await openSection("Privacy");
+    await openSection("Advanced & Developer");
     fireEvent.click(await screen.findByRole("switch", { name: /^Web engine cache/ }));
     fireEvent.click(screen.getByRole("button", { name: "Clear cache" }));
     expect(clear).not.toHaveBeenCalled();
@@ -912,7 +954,7 @@ describe("Chat & history section", () => {
 
   it("does not clear anything when the confirmation is cancelled or nothing is selected", async () => {
     const clear = vi.spyOn(api, "cacheClear");
-    await openSection("Privacy");
+    await openSection("Advanced & Developer");
     fireEvent.click(await screen.findByRole("button", { name: "Clear cache" }));
     fireEvent.click(
       within(await screen.findByRole("dialog")).getByRole("button", { name: "Cancel" }),
@@ -926,7 +968,7 @@ describe("Chat & history section", () => {
 
   it("says when the web engine cache goes at the next start", async () => {
     vi.spyOn(api, "cacheClear").mockResolvedValue({ freedKib: 2048, webPending: true });
-    await openSection("Privacy");
+    await openSection("Advanced & Developer");
     fireEvent.click(await screen.findByRole("button", { name: "Clear cache" }));
     fireEvent.click(
       within(await screen.findByRole("dialog")).getByRole("button", { name: "Clear cache" }),
@@ -937,7 +979,7 @@ describe("Chat & history section", () => {
   it("reports a failed cache clean-up", async () => {
     vi.spyOn(api, "previewCacheClear").mockRejectedValue({ kind: "io", message: "x" });
     vi.spyOn(console, "error").mockImplementation(() => undefined);
-    await openSection("Chat & history");
+    await openSection("Privacy & Connections");
     fireEvent.click(screen.getByRole("button", { name: "Clear now" }));
     await waitFor(() => {
       expect(screen.getByRole("status")).not.toBeEmptyDOMElement();
@@ -947,7 +989,7 @@ describe("Chat & history section", () => {
 
   it("deletes old history automatically only when asked: off by default, no confirmation", async () => {
     const update = vi.spyOn(api, "settingsUpdate");
-    await openSection("Chat & history");
+    await openSection("Chat & Notifications");
     const select = screen.getByRole("combobox", { name: "Delete chat history older than" });
     expect(select).toHaveTextContent("Never (keep everything)");
     expect(optionLabels(select)).toEqual([
@@ -957,9 +999,7 @@ describe("Chat & history section", () => {
       "365 days",
       "Never (keep everything)",
     ]);
-    expect(
-      screen.getByText(/deleted from this computer automatically, without asking/),
-    ).toBeVisible();
+    expectTip(select, /deleted from this computer automatically, without asking/);
     chooseOption(select, "90 days");
     await waitFor(() => {
       expect(update).toHaveBeenLastCalledWith(expect.objectContaining({ historyMaxAgeDays: 90 }));
@@ -969,7 +1009,7 @@ describe("Chat & history section", () => {
 
   it("switches history saving per server", async () => {
     const setSaving = vi.spyOn(api, "historySetSaving");
-    await openSection("Chat & history");
+    await openSection("Servers");
     fireEvent.click(
       await screen.findByRole("switch", { name: "Save history on Local test server" }),
     );
@@ -983,7 +1023,7 @@ describe("Chat & history section", () => {
 
   it("clears one server's history after confirmation", async () => {
     const clear = vi.spyOn(api, "historyClear");
-    await openSection("Chat & history");
+    await openSection("Servers");
     const opener = await screen.findByRole("button", {
       name: "Clear history of Local test server…",
     });
@@ -1006,7 +1046,7 @@ describe("Chat & history section", () => {
     const onDocumentKey = vi.fn();
     document.addEventListener("keydown", onDocumentKey);
     const clear = vi.spyOn(api, "historyClear");
-    await openSection("Chat & history");
+    await openSection("Chat & Notifications");
     fireEvent.click(screen.getByRole("button", { name: "Clear all history…" }));
     const dialog = screen.getByRole("dialog", { name: "Clear history?" });
     expect(within(dialog).getByRole("button", { name: "Cancel" })).toHaveFocus();
@@ -1028,7 +1068,7 @@ describe("Identity section", () => {
   it("sets, previews and clears the default avatar and toggles automatic sending", async () => {
     openPath.mockResolvedValue("/home/me/me.png");
     const setDefault = vi.spyOn(api, "defaultAvatarSet");
-    await openSection("Identity");
+    await openSection("Account & Identity");
     expect(await screen.findByText("No default avatar set.")).toBeInTheDocument();
     const clear = screen.getByRole("button", { name: "Clear" });
     expect(clear).toBeDisabled();
@@ -1052,14 +1092,14 @@ describe("Identity section", () => {
   it("shows a plain error when the default avatar is not an image", async () => {
     openPath.mockResolvedValue("/home/me/notes.txt");
     api.mock.failNext("defaultAvatarSet", "invalidInput", "not an image");
-    await openSection("Identity");
+    await openSection("Account & Identity");
     fireEvent.click(await screen.findByRole("button", { name: "Choose…" }));
     expect(await screen.findByRole("alert")).toBeInTheDocument();
     expect(screen.queryByRole("img", { name: "Default avatar preview" })).not.toBeInTheDocument();
   });
 
   it("lists the identities with their fingerprint and use", async () => {
-    await openSection("Identity");
+    await openSection("Account & Identity");
     const list = await screen.findByRole("list", { name: "Identities" });
     expect(within(list).getByText("Default", { selector: "strong" })).toBeInTheDocument();
     expect(within(list).getByText(/Name: Zoe · Created/)).toBeInTheDocument();
@@ -1071,7 +1111,7 @@ describe("Identity section", () => {
 
   it("creates an identity with a name and a label", async () => {
     const create = vi.spyOn(api, "identityCreate");
-    await openSection("Identity");
+    await openSection("Account & Identity");
     fireEvent.click(await screen.findByRole("button", { name: "New identity" }));
     const dialog = await screen.findByRole("dialog", { name: "New identity" });
     fireEvent.change(within(dialog).getByLabelText("Name on servers"), {
@@ -1088,7 +1128,7 @@ describe("Identity section", () => {
 
   it("renames an identity without touching its certificate", async () => {
     const rename = vi.spyOn(api, "identityRename");
-    await openSection("Identity");
+    await openSection("Account & Identity");
     fireEvent.click(await screen.findByRole("button", { name: "Rename Default" }));
     const dialog = await screen.findByRole("dialog", { name: "Rename Default" });
     fireEvent.change(within(dialog).getByLabelText("Label"), { target: { value: "Main" } });
@@ -1100,7 +1140,7 @@ describe("Identity section", () => {
   });
 
   it("shows the full fingerprint and the servers of an identity", async () => {
-    await openSection("Identity");
+    await openSection("Account & Identity");
     fireEvent.click(await screen.findByRole("button", { name: "Show details of Default" }));
     const dialog = await screen.findByRole("dialog", { name: "Identity Default" });
     expect(within(dialog).getByText(/^[A-Z0-9]{2}(:[A-Z0-9]{2})+$/)).toBeInTheDocument();
@@ -1110,7 +1150,7 @@ describe("Identity section", () => {
   it("exports the identity with a password entered twice", async () => {
     savePath.mockResolvedValue("/home/me/id.p12");
     const exportIdentity = vi.spyOn(api, "identityExport");
-    await openSection("Identity");
+    await openSection("Account & Identity");
     fireEvent.click(await screen.findByRole("button", { name: "Export Default" }));
     const dialog = await screen.findByRole("dialog", { name: "Export identity Default" });
     const submit = within(dialog).getByRole("button", { name: "Export" });
@@ -1138,7 +1178,7 @@ describe("Identity section", () => {
 
   it("does nothing when the save dialog is cancelled", async () => {
     savePath.mockResolvedValue(null);
-    await openSection("Identity");
+    await openSection("Account & Identity");
     fireEvent.click(await screen.findByRole("button", { name: "Export Default" }));
     await waitFor(() => {
       expect(savePath).toHaveBeenCalled();
@@ -1149,7 +1189,7 @@ describe("Identity section", () => {
   it("imports an identity as an additional entry", async () => {
     openPath.mockResolvedValue("/home/me/Old.p12");
     const importIdentity = vi.spyOn(api, "identityImport");
-    await openSection("Identity");
+    await openSection("Account & Identity");
     fireEvent.click(await screen.findByRole("button", { name: "Import…" }));
     const dialog = await screen.findByRole("dialog", { name: "Import identity" });
     expect(within(dialog).getByLabelText("Label")).toHaveValue("Old");
@@ -1165,7 +1205,7 @@ describe("Identity section", () => {
   it("keeps the import dialog open with an explanation when the password is wrong", async () => {
     openPath.mockResolvedValue("/home/me/Old.p12");
     api.mock.failNext("identityImport", "invalidInput");
-    await openSection("Identity");
+    await openSection("Account & Identity");
     fireEvent.click(await screen.findByRole("button", { name: "Import…" }));
     const dialog = await screen.findByRole("dialog", { name: "Import identity" });
     fireEvent.change(within(dialog).getByLabelText(/File password/), {
@@ -1178,7 +1218,7 @@ describe("Identity section", () => {
   it("deletes an identity only after the label was typed", async () => {
     const remove = vi.spyOn(api, "identityDelete");
     await api.identityCreate("Zoe (Acme)", "Work");
-    await openSection("Identity");
+    await openSection("Account & Identity");
     fireEvent.click(await screen.findByRole("button", { name: "Delete Work" }));
     const dialog = await screen.findByRole("dialog", { name: "Delete the identity Work?" });
     const confirm = within(dialog).getByRole("button", { name: "Delete" });
@@ -1199,7 +1239,7 @@ describe("Identity section", () => {
   });
 
   it("never lets the last identity be deleted", async () => {
-    await openSection("Identity");
+    await openSection("Account & Identity");
     fireEvent.click(await screen.findByRole("button", { name: "Delete Default" }));
     const dialog = await screen.findByRole("dialog", { name: "Delete the identity Default?" });
     expect(within(dialog).getByText(/at least one identity/)).toBeInTheDocument();
@@ -1209,7 +1249,7 @@ describe("Identity section", () => {
   it("offers a backup before deleting", async () => {
     savePath.mockResolvedValue("/home/me/work.p12");
     await api.identityCreate("Zoe (Acme)", "Work");
-    await openSection("Identity");
+    await openSection("Account & Identity");
     fireEvent.click(await screen.findByRole("button", { name: "Delete Work" }));
     const dialog = await screen.findByRole("dialog", { name: "Delete the identity Work?" });
     fireEvent.click(within(dialog).getByRole("button", { name: "Back up first" }));
@@ -1219,7 +1259,7 @@ describe("Identity section", () => {
   it("makes another identity the default", async () => {
     const setDefault = vi.spyOn(api, "identitySetDefault");
     await api.identityCreate("Zoe (Acme)", "Work");
-    await openSection("Identity");
+    await openSection("Account & Identity");
     fireEvent.click(
       await screen.findByRole("button", { name: "Set Work as the default identity" }),
     );
@@ -1235,7 +1275,7 @@ describe("Diagnostics section", () => {
     savePath.mockResolvedValue("/home/me/diag.txt");
     const update = vi.spyOn(api, "settingsUpdate");
     const save = vi.spyOn(api, "diagnosticsSave");
-    await openSection("Diagnostics");
+    await openSection("Advanced & Developer");
     chooseOption(
       screen.getByRole("combobox", { name: "Log detail" }),
       "Detailed (for troubleshooting)",
@@ -1261,6 +1301,7 @@ describe("About section", () => {
     expect(license.tagName).toBe("PRE");
     expect(license).toHaveAttribute("tabindex", "0");
     expect(license).toHaveTextContent("GNU AFFERO GENERAL PUBLIC LICENSE");
+    await switchSection("Advanced & Developer");
     fireEvent.click(screen.getByRole("button", { name: "Show third-party licences" }));
     expect(open).toHaveBeenCalledOnce();
   });
@@ -1270,14 +1311,16 @@ describe("About section", () => {
     setSettingsOpener(opener);
     await openSection("About");
     await screen.findByText("0.0.0-mock");
-    expect(screen.getByText(/Your current choices are filled in/)).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "More information: Setup" }).dataset.tooltip).toMatch(
+      /Your current choices are filled in/,
+    );
     fireEvent.click(screen.getByRole("button", { name: "Run setup wizard again" }));
     expect(view.openRerunWizard).toHaveBeenCalledOnce();
     expect(
       screen.getByText(/Your certificate, and with it your registered name/),
     ).toBeInTheDocument();
     fireEvent.click(screen.getByRole("button", { name: "Manage it in Identity" }));
-    expect(opener).toHaveBeenCalledWith("identity");
+    expect(opener).toHaveBeenCalledWith("account");
     setSettingsOpener(null);
   });
 
@@ -1333,7 +1376,7 @@ describe("About section", () => {
   it("explains when the licences window cannot be opened", async () => {
     vi.spyOn(api, "licencesOpen").mockRejectedValue(new Error("boom"));
     vi.spyOn(console, "error").mockImplementation(() => undefined);
-    await openSection("About");
+    await openSection("Advanced & Developer");
     fireEvent.click(screen.getByRole("button", { name: "Show third-party licences" }));
     expect(await screen.findByRole("alert")).toHaveTextContent(
       "The third-party licences could not be opened.",
@@ -1344,19 +1387,32 @@ describe("About section", () => {
 describe("Settings search", () => {
   const search = () => screen.getByRole("searchbox", { name: "Search settings" });
 
-  it("lists matching settings as Section › Setting and jumps to the control", async () => {
+  it("lists matching settings by group with counts and highlights, and jumps to the control", async () => {
     renderScreen();
     fireEvent.change(search(), { target: { value: "noise" } });
     expect(screen.getByRole("tablist", { hidden: true })).not.toBeVisible();
-    const results = screen.getByRole("list", { name: "Search results" });
-    fireEvent.click(within(results).getByRole("button", { name: "Voice › Noise suppression" }));
+    const results = screen.getByRole("group", { name: "Search results" });
+    const voice = within(results).getByRole("region", { name: /^Voice & Audio/ });
+    const count = within(voice).getAllByRole("button").length;
+    expect(count).toBeGreaterThan(1);
+    expect(within(voice).getByRole("heading")).toHaveTextContent(
+      `Voice & Audio ${String(count)} results`,
+    );
+    const result = within(voice).getByRole("button", {
+      name: /^Noise suppression,\s*Processing & quality$/,
+    });
+    expect(result.querySelector("mark")).toHaveTextContent("Noise");
+    fireEvent.click(result);
     const toggle = await screen.findByRole("switch", { name: "Noise suppression" });
     await waitFor(() => {
       expect(toggle).toHaveFocus();
     });
     expect(toggle.closest(".settings-switch")).toHaveClass("settings-highlight");
     expect(search()).toHaveValue("");
-    expect(screen.getByRole("tab", { name: "Voice" })).toHaveAttribute("aria-selected", "true");
+    expect(screen.getByRole("tab", { name: "Voice & Audio" })).toHaveAttribute(
+      "aria-selected",
+      "true",
+    );
   });
 
   it("finds settings by their hint, ignoring accents", async () => {
@@ -1364,21 +1420,17 @@ describe("Settings search", () => {
     renderScreen();
     const field = screen.getByRole("searchbox", { name: "Einstellungen durchsuchen" });
     fireEvent.change(field, { target: { value: "sprunglinks" } });
-    expect(
-      screen.getByRole("button", { name: "Barrierefreiheit › Sprunglinks" }),
-    ).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /^Sprunglinks/ })).toBeInTheDocument();
     fireEvent.change(field, { target: { value: "screenreader ansagen" } });
-    expect(
-      screen.getByRole("button", { name: "Barrierefreiheit › Screenreader-Ansagen" }),
-    ).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /^Screenreader-Ansagen/ })).toBeInTheDocument();
   });
 
   it("opens a matching section and focuses its tab", async () => {
     renderScreen();
-    fireEvent.change(search(), { target: { value: "sounds" } });
-    fireEvent.click(screen.getByRole("button", { name: "Sounds & notifications" }));
+    fireEvent.change(search(), { target: { value: "notifications" } });
+    fireEvent.click(screen.getByRole("button", { name: "Chat & Notifications" }));
     await waitFor(() => {
-      expect(screen.getByRole("tab", { name: "Sounds & notifications" })).toHaveFocus();
+      expect(screen.getByRole("tab", { name: "Chat & Notifications" })).toHaveFocus();
     });
   });
 
@@ -1399,7 +1451,7 @@ describe("Settings search", () => {
     renderScreen();
     const outside = vi.fn((event: KeyboardEvent) => event.defaultPrevented);
     window.addEventListener("keydown", outside);
-    fireEvent.keyDown(screen.getByRole("tab", { name: "Identity" }), { key: "f", ctrlKey: true });
+    fireEvent.keyDown(screen.getByRole("tab", { name: "General" }), { key: "f", ctrlKey: true });
     expect(search()).toHaveFocus();
     // The channel search behind the overlay sees the key as handled.
     expect(outside).toHaveReturnedWith(true);
@@ -1429,7 +1481,7 @@ describe("Accessibility section", () => {
   });
 
   it("offers the three hint switches, all on by default, and applies a change at once", async () => {
-    await openSection("Accessibility");
+    await openSection("General");
     const names = ["Show keyboard hints", "Screen reader announcements", "Skip links"];
     for (const name of names) {
       expect(screen.getByRole("switch", { name })).toBeChecked();
@@ -1439,6 +1491,8 @@ describe("Accessibility section", () => {
     expect(hintPreferences().skipLinks).toBe(false);
   });
 });
+
+const OVERLAY_CARD = "In-game overlay";
 
 describe("Overlay on macOS (QA.58)", () => {
   const onMacos = () =>
@@ -1451,20 +1505,21 @@ describe("Overlay on macOS (QA.58)", () => {
       distro: null,
     });
 
-  it("hides the Overlay section and its search entries", async () => {
+  it("hides the in-game overlay card and its search entries", async () => {
     onMacos();
     renderScreen();
+    await switchSection("Gaming & Overlay");
+    await screen.findAllByRole("heading", { name: /Positional audio/ });
     await waitFor(() => {
-      expect(screen.queryByRole("tab", { name: "Overlay" })).toBeNull();
+      expect(screen.queryByRole("region", { name: OVERLAY_CARD })).toBeNull();
     });
-    expect(screen.getAllByRole("tab")).toHaveLength(12);
     fireEvent.change(screen.getByRole("searchbox", { name: "Search settings" }), {
-      target: { value: "overlay" },
+      target: { value: OVERLAY_CARD },
     });
-    expect(screen.queryByRole("list", { name: "Search results" })).toBeNull();
+    expect(screen.queryByRole("group", { name: "Search results" })).toBeNull();
   });
 
-  it("keeps the Overlay section and its search entries on Linux", async () => {
+  it("keeps the in-game overlay card and its search entries on Linux", async () => {
     vi.spyOn(api, "appInfo").mockResolvedValue({
       version: "0.0.0",
       packageVersion: "0.0.0",
@@ -1474,10 +1529,11 @@ describe("Overlay on macOS (QA.58)", () => {
       distro: null,
     });
     renderScreen();
-    expect(await screen.findByRole("tab", { name: "Overlay" })).toBeInTheDocument();
+    await switchSection("Gaming & Overlay");
+    expect(await screen.findByRole("region", { name: OVERLAY_CARD })).toBeInTheDocument();
     fireEvent.change(screen.getByRole("searchbox", { name: "Search settings" }), {
-      target: { value: "overlay" },
+      target: { value: OVERLAY_CARD },
     });
-    expect(screen.getByRole("list", { name: "Search results" })).toBeInTheDocument();
+    expect(screen.getByRole("group", { name: "Search results" })).toBeInTheDocument();
   });
 });

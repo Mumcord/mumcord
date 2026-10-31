@@ -1,12 +1,13 @@
 import { createContext, useContext } from "react";
+import type { SectionId } from "../features/settings/sectionIds";
 
 /** Top-level screen: wizard on first start, otherwise the main window. */
 export type Screen = "loading" | "startupError" | "wizard" | "main";
 /** Full-window overlays on top of the main window. */
 export type Overlay = "settings" | null;
 
-/** Settings sections other screens can lead to directly. */
-export type SettingsSection = "overlay" | "audio" | "privacy" | "identity" | "sounds" | "voice";
+/** Settings groups other screens can lead to directly. */
+export type SettingsSection = SectionId;
 
 export interface ViewState {
   screen: Screen;
@@ -65,11 +66,11 @@ export interface View extends ViewState {
   /** The wizard calls this after saving `wizardCompleted: true`. */
   finishWizard: () => void;
   openSettings: (section?: SettingsSection) => void;
-  /** Opens the settings on the overlay section. */
+  /** Opens the settings on the Gaming & Overlay group. */
   openOverlaySettings: () => void;
-  /** Opens the settings on the audio section. */
+  /** Opens the settings on the Voice & Audio group. */
   openAudioSettings: () => void;
-  /** Opens the settings on the privacy section. */
+  /** Opens the settings on the Privacy & Connections group. */
   openPrivacySettings: () => void;
   /** Opens the setup wizard again from Settings (#149). */
   openRerunWizard: () => void;

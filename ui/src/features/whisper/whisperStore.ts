@@ -167,7 +167,7 @@ export async function stopWhisper(): Promise<void> {
 export function createWhisperTarget(draft: WhisperDraft): void {
   ensureBound();
   set({ draft });
-  openSettingsSection("voice");
+  openSettingsSection("voiceAudio");
 }
 
 /** The settings editor took over the draft. */

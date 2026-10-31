@@ -1,30 +1,58 @@
 {
-  "sectionList": "Settings sections",
+  "sectionList": "Settings groups",
   "loading": "Loading settings…",
   "loadFailed": "Your settings could not be loaded. Close the settings and try again.",
   "saveFailed": "The last change could not be saved. Please try again.",
   "sections": {
-    "identity": "Identity",
-    "audio": "Audio",
-    "voice": "Voice",
-    "chatHistory": "Chat & history",
+    "general": "General",
+    "account": "Account & Identity",
+    "voiceAudio": "Voice & Audio",
+    "chatNotifications": "Chat & Notifications",
+    "privacy": "Privacy & Connections",
     "appearance": "Appearance",
-    "accessibility": "Accessibility",
-    "language": "Language",
-    "sounds": "Sounds & notifications",
-    "overlay": "Overlay",
-    "diagnostics": "Diagnostics",
-    "about": "About",
     "servers": "Servers",
-    "privacy": "Privacy",
+    "gaming": "Gaming & Overlay",
+    "advanced": "Advanced & Developer",
+    "about": "About",
     "packetInspector": "Packet inspector"
+  },
+  "sectionDescriptions": {
+    "general": "Startup, language, updates and accessibility.",
+    "account": "Your identities, profile and what you share.",
+    "voiceAudio": "Microphone, speakers, how you talk and how you sound.",
+    "chatNotifications": "Notifications, private messages, blocked people and message history.",
+    "privacy": "How you connect to other people and what Mumcord loads from outside.",
+    "appearance": "Theme, layout and the channel list.",
+    "servers": "Connections to several servers and settings per server.",
+    "gaming": "The in-game overlay, positional audio and game plugins.",
+    "advanced": "Developer tools, diagnostics, storage and licences.",
+    "about": "Version, support and the setup wizard."
+  },
+  "breadcrumb": "Settings / {{section}}",
+  "moreInfo": "More information: {{topic}}",
+  "searchTerms": {
+    "devices": "input output headset speaker sound card",
+    "talkMode": "PTT VAD voice activity hotkey",
+    "noiseSuppression": "background noise denoise",
+    "p2p": "P2P relay direct connections hide my IP address",
+    "theme": "dark mode light mode colours colors",
+    "startup": "autostart boot login tray",
+    "language": "translation locale",
+    "updates": "new version upgrade",
+    "storage": "disk space clear cache",
+    "blocked": "ignore block mute people",
+    "notifications": "alerts pop-ups",
+    "externalContent": "embeds images previews"
   },
   "search": {
     "label": "Search settings",
     "results": "Search results",
     "empty": "No settings match “{{query}}”.",
     "count_one": "{{count}} setting found",
-    "count_other": "{{count}} settings found"
+    "count_other": "{{count}} settings found",
+    "shortcut": "Ctrl F",
+    "groupCount_one": "{{count}} result",
+    "groupCount_other": "{{count}} results"
   },
   "errors": {
     "secureStorage": "Your system's secure storage is not available or access was refused.",
@@ -109,7 +137,6 @@
     "testStop": "Stop recording",
     "testRecording": "Recording… speak now.",
     "testPlaying": "Playing back your voice…",
-    "quality": "Quality",
     "musicQuality": "Music quality",
     "musicQualityHint": "Tunes the encoder for music and turns off noise suppression and automatic volume; for music. Push-to-talk works best.",
     "bitrate": "Bitrate",
@@ -154,7 +181,7 @@
     "keyMissing": "Set a key, otherwise nobody can hear you.",
     "keyRejected": "That key cannot be used. Try another key, optionally with Ctrl, Alt or Shift.",
     "keyNotConfirmed": "The desktop didn't confirm the shortcut. Try again and accept the system dialog, or assign the key in the desktop's shortcut settings.",
-    "processing": "Voice processing",
+    "processing": "Processing & quality",
     "noiseSuppression": "Noise suppression",
     "noiseSuppressionHint": "Filters out background noise like keyboards and fans.",
     "echoCancellation": "Echo cancellation",
@@ -244,12 +271,12 @@
     }
   },
   "history": {
+    "title": "Message history",
     "explanation": "Chat messages are saved only on this computer.",
-    "perServer": "Servers",
+    "perServer": "Per-server overrides",
     "noServers": "No saved servers yet.",
     "save": "Save history on {{server}}",
     "clearServer": "Clear history of {{server}}…",
-    "all": "All servers",
     "clearAll": "Clear all history…",
     "confirmTitle": "Clear history?",
     "confirmServer": "All saved messages from {{server}} will be deleted from this computer. Other people keep their copies. Their copies won't be synced back to this computer. This cannot be undone.",
@@ -261,7 +288,6 @@
     "autoDeleteHint": "Older messages are deleted from this computer automatically, without asking. This only affects the history saved here, not the server."
   },
   "fullImages": {
-    "title": "Full-size images",
     "offer": "Offer my full-size images",
     "offerHint": "Other Mumcord users can open my pictures in full size. Off: only the small preview is sent, no original is kept and none is shared.",
     "load": "Load full-size images from others",
@@ -283,14 +309,15 @@
     "system": "Follow system",
     "dark": "Dark",
     "light": "Light",
-    "behaviour": "Behaviour",
+    "behaviour": "Startup & window",
     "closeLegend": "When you close the window while connected",
     "closeAsk": "Ask every time",
     "closeTray": "Minimize to the tray",
     "closeQuit": "Quit Mumcord",
     "autostart": "Start Mumcord when I log in",
     "startMinimized": "Start minimized",
-    "startMinimizedHint": "When Mumcord starts at login, it waits in the tray instead of opening the window."
+    "startMinimizedHint": "When Mumcord starts at login, it waits in the tray instead of opening the window.",
+    "look": "Look & layout"
   },
   "themeEditor": {
     "name": "Theme name",
@@ -348,7 +375,7 @@
     "deleteConfirm": "Delete"
   },
   "accessibility": {
-    "hints": "Hints",
+    "hints": "Accessibility",
     "keyboardHints": "Show keyboard hints",
     "keyboardHintsHint": "Short on-screen tips like “Arrow keys: move” below the channel list and in the GIF favorites. Screen readers still read them when this is off.",
     "announcements": "Screen reader announcements",
@@ -357,11 +384,13 @@
     "skipLinksHint": "Links at the start of the window that jump straight to the chat or the channel list when you press Tab."
   },
   "language": {
+    "title": "Language",
     "legend": "Display language",
     "system": "Follow system"
   },
   "sounds": {
-    "explanation": "Short sounds for these events:",
+    "title": "Sounds",
+    "explanation": "Short sounds that play for these events.",
     "joinLeave": "Someone joins or leaves your channel",
     "voiceJoin": "You join a channel for voice",
     "selfMute": "You mute or unmute yourself",
@@ -438,7 +467,7 @@
     }
   },
   "diagnostics": {
-    "logging": "Logging",
+    "title": "Diagnostics",
     "logLevel": "Log detail",
     "levels": {
       "error": "Errors only",
@@ -473,7 +502,8 @@
     "setupWizardHint": "Go through the first-start setup again to review your microphone, privacy choices, update check and talk mode. Your current choices are filled in.",
     "setupWizardRun": "Run setup wizard again",
     "setupWizardIdentityNote": "Your identity is not part of this. Your certificate, and with it your registered name and permissions on servers, stays exactly as it is.",
-    "setupWizardIdentityLink": "Manage it in Identity"
+    "setupWizardIdentityLink": "Manage it in Identity",
+    "versionTitle": "Version and licence"
   },
   "profile": {
     "title": "Profile",
@@ -489,7 +519,6 @@
     "skipped": "Your default avatar was not sent: it is too large for this server."
   },
   "linkPreviews": {
-    "title": "Link previews",
     "switch": "Show link previews and embeds",
     "hint": "Mumcord loads linked pages to show previews and video players; those sites see your IP address."
   },
@@ -510,7 +539,7 @@
     "cleared": "Cache cleared, {{size}} freed."
   },
   "cache": {
-    "title": "Cache",
+    "title": "Storage",
     "hint": "Mumcord keeps temporary data on this computer so things load faster. Clearing it is safe; it is rebuilt when needed.",
     "kind": {
       "previews": "Link previews and images",
@@ -550,7 +579,7 @@
     "betaHint": "Results depend on the game and its plugin support."
   },
   "gamePlugins": {
-    "title": "Positional audio: sources",
+    "title": "Game plugins",
     "explanation": "Games tell Mumcord where you are through Mumble Link or through official Mumble game plugins. Mumcord finds the plugins in its own plugin folder and in an existing Mumble installation. Turn on only the plugins for games you play.",
     "antiCheat": "Game plugins read the game's memory. Some anti-cheat systems may flag this; turn plugins off for games with strict anti-cheat.",
     "loading": "Looking for game plugins…",
@@ -573,7 +602,6 @@
     "limitInvalid": "Enter a whole number from 1 to 15."
   },
   "appearanceEffects": {
-    "title": "Effects",
     "visualEffects": "Visual effects (glass, grain)",
     "visualEffectsHint": "Frosted-glass menus and a subtle film grain. Turned off automatically when your system asks for reduced transparency or motion."
   },
@@ -600,7 +628,6 @@
     }
   },
   "privacyDirect": {
-    "title": "Direct connections",
     "allow": "Allow direct connections to other Mumcord users",
     "hint": "Direct connections are faster, but the other person can see your IP address. Until you decide, Mumcord asks the first time one would be used.",
     "notUsed": "Not used in the chosen peer-to-peer mode: Mumcord never connects directly to other people."
@@ -616,6 +643,7 @@
     "failed": "That did not work. Please try again."
   },
   "inspector": {
+    "title": "Developer tools",
     "intro": "Shows the packets Mumcord sends and receives, mainly Mumcord plugin data, for debugging. Only the last 2,000 packets are kept, in memory on this device; nothing is logged or sent anywhere.",
     "devTools": "Developer tools",
     "devToolsHint": "Turn off to hide the packet inspector again and stop capturing.",
@@ -791,5 +819,11 @@
     "collapseHint": "Shows “Message from a blocked user” with a Show button.",
     "hide": "Hide them completely",
     "hideHint": "Nothing is shown in the chat."
+  },
+  "externalContent": {
+    "title": "External content"
+  },
+  "privacyConnections": {
+    "title": "Connections"
   }
 }

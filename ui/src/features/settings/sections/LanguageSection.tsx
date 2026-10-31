@@ -2,7 +2,7 @@ import { useTranslation } from "react-i18next";
 import type { Language } from "../../../api";
 import { ENDONYMS, SUPPORTED_LANGUAGES } from "../../../i18n/resources";
 import { RadioGroup } from "../components/RadioGroup";
-import { Section } from "../components/Section";
+import { Group } from "../components/Section";
 import type { SettingsSectionProps } from "./types";
 
 const SYSTEM = "system";
@@ -15,11 +15,11 @@ const LANGUAGES = [...SUPPORTED_LANGUAGES].sort((a, b) =>
   collator.compare(ENDONYMS[a], ENDONYMS[b]),
 );
 
-/** Language: follow the OS or pick one of the 24 official EU languages (FR-1.36). */
-export function LanguageSection({ settings, update }: SettingsSectionProps) {
+/** Follow the OS or pick one of the 24 official EU languages (FR-1.36). */
+export function LanguageCard({ settings, update }: SettingsSectionProps) {
   const { t } = useTranslation("settings");
   return (
-    <Section title={t("sections.language")}>
+    <Group title={t("language.title")} icon="globe">
       <RadioGroup<Choice>
         legend={t("language.legend")}
         value={settings.language ?? SYSTEM}
@@ -31,6 +31,6 @@ export function LanguageSection({ settings, update }: SettingsSectionProps) {
           update({ language: choice === SYSTEM ? null : choice });
         }}
       />
-    </Section>
+    </Group>
   );
 }

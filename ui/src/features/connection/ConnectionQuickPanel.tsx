@@ -141,10 +141,8 @@ export function ConnectionQuickPanel({ onOpenVoiceSettings }: { onOpenVoiceSetti
         <section className="connection-quick__section">
           <Switch
             label={source(ts("audio.musicQuality"), "musicQuality")}
-            tip={{
-              label: more(ts("audio.musicQuality")),
-              text: lowLatency ? t("quick.musicIncluded") : ts("audio.musicQualityHint"),
-            }}
+            description={lowLatency ? t("quick.musicIncluded") : ts("audio.musicQualityHint")}
+            descriptionLabel={more(ts("audio.musicQuality"))}
             checked={lowLatency || settings.musicQuality}
             disabled={lowLatency}
             onChange={(musicQuality) => {
@@ -158,7 +156,8 @@ export function ConnectionQuickPanel({ onOpenVoiceSettings }: { onOpenVoiceSetti
           <Switch
             label={source(t("quick.lowLatency"), "lowLatency")}
             badge={t("quick.beta")}
-            tip={{ label: more(t("quick.lowLatency")), text: t("quick.lowLatencyHint") }}
+            description={t("quick.lowLatencyHint")}
+            descriptionLabel={more(t("quick.lowLatency"))}
             checked={settings.lowLatency}
             onChange={(on) => {
               update({ lowLatency: on });

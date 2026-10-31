@@ -22,8 +22,7 @@ export function BlockedUsersGroup() {
   const identityLabel = (certHash: string) =>
     identities.length > 1 ? identities.find((i) => i.certHash === certHash)?.label : undefined;
   return (
-    <Group title={t("blocked.title")}>
-      <p className="settings-hint">{t("blocked.hint")}</p>
+    <Group title={t("blocked.title")} icon="ban" info={t("blocked.hint")} wide>
       {users.length === 0 ? (
         <p className="settings-hint" data-testid="blocked-empty">
           {t("blocked.empty")}
@@ -100,7 +99,7 @@ export function BlockedMessagesGroup({ settings, update }: SettingsSectionProps)
   const { t } = useTranslation("settings");
   const id = useId();
   return (
-    <Group title={t("blocked.messagesTitle")}>
+    <Group title={t("blocked.messagesTitle")} icon="eyeOff">
       <fieldset className="pm-rules">
         <legend className="visually-hidden">{t("blocked.messagesTitle")}</legend>
         {MODES.map((mode) => {

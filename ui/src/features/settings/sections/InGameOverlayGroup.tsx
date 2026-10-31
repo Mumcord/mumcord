@@ -196,7 +196,7 @@ export function InGameOverlayGroup({ api }: { api: InGameOverlayApi }) {
 
   if (state === null) {
     return (
-      <Group title={t("overlay.inGame.title")}>
+      <Group title={t("overlay.inGame.title")} icon="monitor">
         <p className="settings-hint" role={failed ? "alert" : undefined}>
           {failed ? t("overlay.inGame.loadFailed") : t("loading")}
         </p>
@@ -205,7 +205,7 @@ export function InGameOverlayGroup({ api }: { api: InGameOverlayApi }) {
   }
   if (!state.supported) {
     return (
-      <Group title={t("overlay.inGame.title")}>
+      <Group title={t("overlay.inGame.title")} icon="monitor">
         <p className="settings-hint" role="note">
           {t(state.explanationKey ?? "overlay.inGame.unsupported")}
         </p>
@@ -218,8 +218,12 @@ export function InGameOverlayGroup({ api }: { api: InGameOverlayApi }) {
   // separate window and never touches the game).
   const hasBlocklist = state.games.some((game) => game.blocked !== null);
   return (
-    <Group title={t("overlay.inGame.title")}>
-      <p className="settings-hint">{t("overlay.inGame.explanation")}</p>
+    <Group
+      title={t("overlay.inGame.title")}
+      icon="monitor"
+      info={t("overlay.inGame.explanation")}
+      wide
+    >
       <div
         role="radiogroup"
         aria-label={t("overlay.inGame.mode")}

@@ -7,49 +7,52 @@ import { SECTION_IDS, type SectionId } from "./sectionIds";
  */
 export interface SettingEntry {
   section: SectionId;
-  /** Title of the group that holds the control; also used to find the control on screen. */
-  group?: string;
+  /** Title of the card that holds the control; also used to find the control on screen. */
+  group: string;
   /** Visible label of the control (label, legend or button text). Without it, the entry is the group. */
   control?: string;
-  /** Further texts that should find the entry (hints, option names); never shown in the results. */
+  /**
+   * Further texts that should find the entry (hints, option names, synonyms such as "P2P");
+   * never shown in the results.
+   */
   terms?: string[];
   /** Texts matched as they are, not translated: language names are the same in every UI language. */
   literals?: string[];
 }
 
-/** Static index of the settings screen; keep it in step with the section components. */
+/** Static index of the settings screen; keep it in step with `SettingsPageCards`. */
 export const SETTINGS_INDEX: readonly SettingEntry[] = [
   {
-    section: "identity",
+    section: "account",
     group: "identity.listTitle",
     terms: ["identity.intro", "identity.backupWarning"],
   },
-  { section: "identity", group: "identity.listTitle", control: "identity.new" },
+  { section: "account", group: "identity.listTitle", control: "identity.new" },
   {
-    section: "identity",
+    section: "account",
     group: "identity.listTitle",
     control: "identity.import",
     terms: ["identity.importTitle"],
   },
   {
-    section: "identity",
+    section: "account",
     group: "profile.title",
     terms: ["profile.defaultAvatar", "profile.choose"],
   },
   {
-    section: "identity",
+    section: "account",
     group: "profile.title",
     control: "profile.sendToNew",
     terms: ["profile.sendToNewHint"],
   },
   {
-    section: "identity",
+    section: "account",
     group: "nowPlaying.title",
     control: "nowPlaying.switch",
     terms: ["nowPlaying.hint"],
   },
   {
-    section: "identity",
+    section: "account",
     group: "nowGaming.title",
     control: "nowGaming.switch",
     terms: ["nowGaming.hint"],
@@ -60,17 +63,27 @@ export const SETTINGS_INDEX: readonly SettingEntry[] = [
     control: "servers.limit",
     terms: ["servers.limitHint"],
   },
-  { section: "audio", group: "audio.devices", control: "audio.input" },
-  { section: "audio", group: "audio.devices", control: "audio.output" },
   {
-    section: "audio",
-    group: "audio.quality",
+    section: "voiceAudio",
+    group: "audio.devices",
+    control: "audio.input",
+    terms: ["searchTerms.devices"],
+  },
+  {
+    section: "voiceAudio",
+    group: "audio.devices",
+    control: "audio.output",
+    terms: ["searchTerms.devices"],
+  },
+  {
+    section: "voiceAudio",
+    group: "voice.processing",
     control: "audio.musicQuality",
     terms: ["audio.musicQualityHint"],
   },
   {
-    section: "audio",
-    group: "audio.quality",
+    section: "voiceAudio",
+    group: "voice.processing",
     control: "audio.lowLatency",
     terms: [
       "audio.lowLatencyHint",
@@ -82,53 +95,58 @@ export const SETTINGS_INDEX: readonly SettingEntry[] = [
     ],
   },
   {
-    section: "audio",
-    group: "audio.quality",
+    section: "voiceAudio",
+    group: "voice.processing",
     control: "audio.bitrate",
     terms: ["audio.bitrateMaxKnown", "audio.bitrateMaxUnknown"],
   },
   {
-    section: "audio",
+    section: "voiceAudio",
     group: "audio.videoSound",
     control: "audio.ducking",
     terms: ["audio.duckingHint"],
   },
-  { section: "audio", group: "audio.videoSound", control: "audio.duckingLevel" },
+  { section: "voiceAudio", group: "audio.videoSound", control: "audio.duckingLevel" },
   {
-    section: "audio",
+    section: "gaming",
     group: "positional.title",
     control: "positional.switch",
     terms: ["positional.hint"],
   },
-  { section: "audio", group: "positional.title", control: "positional.minDistance" },
-  { section: "audio", group: "positional.title", control: "positional.maxDistance" },
-  { section: "audio", group: "audio.test", terms: ["audio.testHint", "audio.testStart"] },
+  { section: "gaming", group: "positional.title", control: "positional.minDistance" },
+  { section: "gaming", group: "positional.title", control: "positional.maxDistance" },
+  { section: "voiceAudio", group: "audio.test", terms: ["audio.testHint", "audio.testStart"] },
   {
-    section: "voice",
+    section: "voiceAudio",
     group: "voice.talkMode",
     control: "voice.talkModeLegend",
-    terms: ["voice.voiceActivation", "voice.pushToTalk", "voice.keyCurrent"],
+    terms: [
+      "searchTerms.talkMode",
+      "voice.voiceActivation",
+      "voice.pushToTalk",
+      "voice.keyCurrent",
+    ],
   },
   {
-    section: "voice",
+    section: "voiceAudio",
     group: "voice.talkMode",
     control: "voice.sensitivityLegend",
     terms: ["voice.automatic", "voice.manual", "voice.threshold"],
   },
   {
-    section: "voice",
+    section: "voiceAudio",
     group: "voice.talkMode",
     control: "voice.compatMode",
     terms: ["voice.compatModeHint"],
   },
   {
-    section: "voice",
+    section: "voiceAudio",
     group: "voice.talkMode",
     control: "voice.mouseToggle",
     terms: ["voice.mouseToggleWarning"],
   },
   {
-    section: "voice",
+    section: "voiceAudio",
     group: "voice.whisper.title",
     terms: [
       "voice.whisper.hint",
@@ -138,95 +156,104 @@ export const SETTINGS_INDEX: readonly SettingEntry[] = [
     ],
   },
   {
-    section: "voice",
+    section: "voiceAudio",
     group: "voice.connecting",
     control: "voice.connectMuted",
     terms: ["voice.connectMutedHint"],
   },
   {
-    section: "voice",
+    section: "voiceAudio",
     group: "voice.processing",
     control: "voice.noiseSuppression",
-    terms: ["voice.noiseSuppressionHint"],
+    terms: ["searchTerms.noiseSuppression", "voice.noiseSuppressionHint"],
   },
   {
-    section: "voice",
+    section: "voiceAudio",
     group: "voice.processing",
     control: "voice.echoCancellation",
     terms: ["voice.echoCancellationHint"],
   },
   {
-    section: "voice",
+    section: "voiceAudio",
     group: "voice.processing",
     control: "voice.autoGain",
     terms: ["voice.autoGainHint"],
   },
   {
-    section: "chatHistory",
-    group: "linkPreviews.title",
+    section: "privacy",
+    group: "externalContent.title",
     control: "linkPreviews.switch",
-    terms: ["linkPreviews.hint"],
+    terms: ["searchTerms.externalContent", "linkPreviews.hint"],
   },
   {
-    section: "chatHistory",
-    group: "linkPreviews.title",
+    section: "privacy",
+    group: "externalContent.title",
     control: "previewCache.after",
     terms: ["previewCache.hint"],
   },
-  { section: "chatHistory", group: "history.perServer", terms: ["history.explanation"] },
   {
-    section: "chatHistory",
-    group: "fullImages.title",
+    section: "servers",
+    group: "history.perServer",
+    terms: ["history.title", "history.explanation"],
+  },
+  {
+    section: "privacy",
+    group: "externalContent.title",
     control: "fullImages.offer",
     terms: ["fullImages.offerHint"],
   },
   {
-    section: "chatHistory",
-    group: "fullImages.title",
+    section: "privacy",
+    group: "externalContent.title",
     control: "fullImages.load",
     terms: ["fullImages.loadHint"],
   },
   {
-    section: "chatHistory",
+    section: "privacy",
     group: "historySharing.title",
     control: "historySharing.switch",
     terms: ["historySharing.hint"],
   },
   {
-    section: "chatHistory",
-    group: "history.autoDelete",
+    section: "chatNotifications",
+    group: "history.title",
     control: "history.autoDelete",
     terms: ["history.autoDeleteHint"],
   },
-  { section: "chatHistory", group: "history.all", control: "history.clearAll" },
+  { section: "chatNotifications", group: "history.title", control: "history.clearAll" },
   {
     section: "appearance",
     group: "appearance.theme",
     control: "appearance.themeLegend",
-    terms: ["appearance.theme", "appearance.dark", "appearance.light"],
+    terms: ["searchTerms.theme", "appearance.theme", "appearance.dark", "appearance.light"],
   },
   {
     section: "appearance",
-    group: "appearance.messageDisplay",
+    group: "appearance.look",
     control: "appearance.messageDisplayLegend",
     terms: ["appearance.messageDisplay", "appearance.cozy", "appearance.compact"],
   },
   {
-    section: "appearance",
+    section: "general",
     group: "appearance.behaviour",
     control: "appearance.closeLegend",
     terms: ["appearance.closeTray", "appearance.closeQuit"],
   },
-  { section: "appearance", group: "appearance.behaviour", control: "appearance.autostart" },
   {
-    section: "appearance",
+    section: "general",
+    group: "appearance.behaviour",
+    control: "appearance.autostart",
+    terms: ["searchTerms.startup"],
+  },
+  {
+    section: "general",
     group: "appearance.behaviour",
     control: "appearance.startMinimized",
     terms: ["appearance.startMinimizedHint"],
   },
   {
     section: "appearance",
-    group: "appearanceEffects.title",
+    group: "appearance.look",
     control: "appearanceEffects.visualEffects",
     terms: ["appearanceEffects.visualEffectsHint"],
   },
@@ -239,82 +266,87 @@ export const SETTINGS_INDEX: readonly SettingEntry[] = [
     terms: ["channelList.weakConnectionHint"],
   },
   {
-    section: "accessibility",
+    section: "general",
     group: "accessibility.hints",
     control: "accessibility.keyboardHints",
     terms: ["accessibility.keyboardHintsHint"],
   },
   {
-    section: "accessibility",
+    section: "general",
     group: "accessibility.hints",
     control: "accessibility.announcements",
     terms: ["accessibility.announcementsHint"],
   },
   {
-    section: "accessibility",
+    section: "general",
     group: "accessibility.hints",
     control: "accessibility.skipLinks",
     terms: ["accessibility.skipLinksHint"],
   },
   {
-    section: "language",
+    section: "general",
+    group: "language.title",
     control: "language.legend",
-    terms: ["language.system"],
+    terms: ["searchTerms.language", "language.system"],
     literals: Object.values(ENDONYMS),
   },
   {
-    section: "sounds",
+    section: "chatNotifications",
     group: "dnd.title",
     control: "dnd.label",
     terms: ["dnd.description"],
   },
   {
-    section: "sounds",
+    section: "chatNotifications",
     group: "dnd.title",
     control: "dnd.follow",
     terms: ["dnd.followDescription"],
   },
-  { section: "sounds", control: "sounds.joinLeave" },
-  { section: "sounds", control: "sounds.voiceJoin" },
-  { section: "sounds", control: "sounds.selfMute" },
-  { section: "sounds", control: "sounds.selfDeaf" },
-  { section: "sounds", control: "sounds.hangUp" },
-  { section: "sounds", control: "sounds.messages" },
-  { section: "sounds", control: "sounds.mention" },
-  { section: "sounds", control: "sounds.mentionNotify" },
-  { section: "sounds", control: "sounds.partyStarted" },
-  { section: "sounds", control: "sounds.partyJoined" },
-  { section: "sounds", control: "sounds.partyLeft" },
-  { section: "sounds", control: "sounds.shareStarted" },
-  { section: "sounds", control: "sounds.shareStopped" },
-  { section: "sounds", control: "sounds.viewerStarted" },
-  { section: "sounds", control: "sounds.viewerStopped" },
-  { section: "sounds", control: "sounds.kicked" },
-  { section: "sounds", control: "sounds.banned" },
+  { section: "voiceAudio", group: "sounds.title", control: "sounds.joinLeave" },
+  { section: "voiceAudio", group: "sounds.title", control: "sounds.voiceJoin" },
+  { section: "voiceAudio", group: "sounds.title", control: "sounds.selfMute" },
+  { section: "voiceAudio", group: "sounds.title", control: "sounds.selfDeaf" },
+  { section: "voiceAudio", group: "sounds.title", control: "sounds.hangUp" },
+  { section: "voiceAudio", group: "sounds.title", control: "sounds.messages" },
+  { section: "voiceAudio", group: "sounds.title", control: "sounds.mention" },
+  { section: "voiceAudio", group: "sounds.title", control: "sounds.mentionNotify" },
+  { section: "voiceAudio", group: "sounds.title", control: "sounds.partyStarted" },
+  { section: "voiceAudio", group: "sounds.title", control: "sounds.partyJoined" },
+  { section: "voiceAudio", group: "sounds.title", control: "sounds.partyLeft" },
+  { section: "voiceAudio", group: "sounds.title", control: "sounds.shareStarted" },
+  { section: "voiceAudio", group: "sounds.title", control: "sounds.shareStopped" },
+  { section: "voiceAudio", group: "sounds.title", control: "sounds.viewerStarted" },
+  { section: "voiceAudio", group: "sounds.title", control: "sounds.viewerStopped" },
+  { section: "voiceAudio", group: "sounds.title", control: "sounds.kicked" },
+  { section: "voiceAudio", group: "sounds.title", control: "sounds.banned" },
   {
-    section: "sounds",
+    section: "chatNotifications",
     group: "notifications.title",
     control: "notifications.legend",
-    terms: ["notifications.explanation"],
+    terms: ["searchTerms.notifications", "notifications.explanation"],
   },
   {
-    section: "overlay",
+    section: "gaming",
     group: "overlay.inGame.title",
     terms: ["overlay.inGame.explanation", "overlay.inGame.games"],
   },
   {
-    section: "audio",
+    section: "gaming",
     group: "gamePlugins.title",
     terms: ["gamePlugins.explanation", "gamePlugins.antiCheat"],
   },
-  { section: "privacy", group: "blocked.title", terms: ["blocked.hint"] },
   {
-    section: "privacy",
+    section: "chatNotifications",
+    group: "blocked.title",
+    terms: ["searchTerms.blocked", "blocked.hint"],
+  },
+  {
+    section: "chatNotifications",
     group: "blocked.messagesTitle",
     terms: ["blocked.collapse", "blocked.hide"],
   },
   {
-    section: "privacy",
+    section: "chatNotifications",
     group: "privateMessages.title",
     control: "privateMessages.legend",
     terms: [
@@ -324,17 +356,19 @@ export const SETTINGS_INDEX: readonly SettingEntry[] = [
       "privateMessages.keepRequests",
     ],
   },
-  { section: "privacy", group: "privateMessages.overrideTitle" },
+  { section: "chatNotifications", group: "privateMessages.overrideTitle" },
   {
-    section: "privacy",
+    section: "chatNotifications",
     group: "privateMessages.alwaysTitle",
     terms: ["privateMessages.currentChannel", "privateMessages.accepted"],
   },
-  { section: "privacy", group: "acceptedConversations.title" },
+  { section: "chatNotifications", group: "acceptedConversations.title" },
   {
     section: "privacy",
-    group: "p2p.title",
+    group: "privacyConnections.title",
+    control: "p2p.title",
     terms: [
+      "searchTerms.p2p",
       "p2p.modeLabel",
       "p2p.explanation",
       "p2p.mode.directRelay",
@@ -345,24 +379,56 @@ export const SETTINGS_INDEX: readonly SettingEntry[] = [
   },
   {
     section: "privacy",
-    group: "privacyDirect.title",
+    group: "privacyConnections.title",
     control: "privacyDirect.allow",
-    terms: ["privacyDirect.hint"],
+    terms: ["searchTerms.p2p", "privacyDirect.hint"],
   },
-  { section: "privacy", group: "cache.title", control: "cache.clear", terms: ["cache.hint"] },
-  { section: "diagnostics", group: "diagnostics.logging", control: "diagnostics.logLevel" },
-  { section: "diagnostics", group: "diagnostics.file", terms: ["diagnostics.fileHint"] },
-  { section: "about", group: "updates.title", control: "updates.check", terms: ["updates.hint"] },
-  { section: "about", group: "about.license" },
+  {
+    section: "advanced",
+    group: "cache.title",
+    control: "cache.clear",
+    terms: ["searchTerms.storage", "cache.hint"],
+  },
+  { section: "advanced", group: "diagnostics.title", control: "diagnostics.logLevel" },
+  {
+    section: "advanced",
+    group: "diagnostics.title",
+    terms: ["diagnostics.file", "diagnostics.fileHint"],
+  },
+  {
+    section: "general",
+    group: "updates.title",
+    control: "updates.check",
+    terms: ["searchTerms.updates", "updates.hint"],
+  },
+  { section: "about", group: "about.versionTitle", terms: ["about.license"] },
   {
     section: "about",
     group: "about.support",
-    terms: ["about.whatsNew", "about.reportBug", "about.requestFeature"],
+    terms: ["about.reportBug", "about.requestFeature"],
   },
-  { section: "about", group: "about.notices", terms: ["about.noticesHint"] },
+  { section: "advanced", group: "about.notices", terms: ["about.noticesHint"] },
+  {
+    section: "about",
+    group: "about.versionTitle",
+    control: "about.whatsNewAuto",
+    terms: ["about.whatsNew"],
+  },
+  {
+    section: "about",
+    group: "about.setup",
+    control: "about.setupWizardRun",
+    terms: ["about.setupWizardHint"],
+  },
+  {
+    section: "advanced",
+    group: "inspector.title",
+    control: "inspector.devTools",
+    terms: ["inspector.intro", "inspector.open", "inspector.devToolsHint"],
+  },
 ];
 
-/** A search hit: a whole section, or one setting inside it. */
+/** A search hit: a whole group, or one setting inside it. */
 export type SearchResult =
   { kind: "section"; section: SectionId } | { kind: "setting"; entry: SettingEntry };
 
@@ -377,38 +443,91 @@ export function normalizeSearch(text: string): string {
     .trim();
 }
 
+const queryWords = (query: string) => normalizeSearch(query).split(/\s+/).filter(Boolean);
+
 export function entryLabel(entry: SettingEntry, t: Translate): string {
-  const key = entry.control ?? entry.group;
-  return key === undefined ? t(`sections.${entry.section}`) : t(key);
+  return t(entry.control ?? entry.group);
 }
 
+export const resultSection = (result: SearchResult): SectionId =>
+  result.kind === "section" ? result.section : result.entry.section;
+
 /**
- * Sections whose name matches, then the settings whose label, group or hints contain every
- * word of the query.
+ * Groups whose name matches, then the settings whose label, card or hints contain every word of
+ * the query. Entries of cards in `hiddenCards` (title keys) are left out, as those cards are not
+ * offered on this system.
  */
 export function searchSettings(
   query: string,
   t: Translate,
-  hidden: readonly SectionId[] = [],
+  hiddenCards: readonly string[] = [],
 ): SearchResult[] {
-  const words = normalizeSearch(query).split(/\s+/).filter(Boolean);
+  const words = queryWords(query);
   if (words.length === 0) return [];
   const matches = (texts: string[]) => {
     const haystack = normalizeSearch(texts.join(" "));
     return words.every((word) => haystack.includes(word));
   };
-  const sections: SearchResult[] = SECTION_IDS.filter((section) => !hidden.includes(section))
-    .filter((section) => matches([t(`sections.${section}`)]))
-    .map((section) => ({ kind: "section", section }));
-  const settings: SearchResult[] = SETTINGS_INDEX.filter((entry) => !hidden.includes(entry.section))
+  const sections: SearchResult[] = SECTION_IDS.filter((section) =>
+    matches([t(`sections.${section}`)]),
+  ).map((section) => ({ kind: "section", section }));
+  const settings: SearchResult[] = SETTINGS_INDEX.filter(
+    (entry) => !hiddenCards.includes(entry.group),
+  )
     .filter((entry) =>
       matches([
         entryLabel(entry, t),
-        ...(entry.group === undefined ? [] : [t(entry.group)]),
+        t(entry.group),
         ...(entry.terms ?? []).map(t),
         ...(entry.literals ?? []),
       ]),
     )
     .map((entry) => ({ kind: "setting", entry }));
   return [...sections, ...settings];
+}
+
+/** Results bucketed by group, in the order of the side list. */
+export function groupResults(
+  results: readonly SearchResult[],
+): { section: SectionId; results: SearchResult[] }[] {
+  return SECTION_IDS.map((section) => ({
+    section,
+    results: results.filter((result) => resultSection(result) === section),
+  })).filter((group) => group.results.length > 0);
+}
+
+/**
+ * Where the query's words occur in `text`, as [start, end) ranges into the original text, ignoring
+ * case and accents like the search itself. Overlapping hits are merged.
+ */
+export function matchRanges(text: string, query: string): [number, number][] {
+  const words = queryWords(query);
+  // Normalized text plus, per normalized character, the index of the original character.
+  let folded = "";
+  const origin: number[] = [];
+  let index = 0;
+  for (const char of text) {
+    const normal = char
+      .normalize("NFD")
+      .replace(/\p{Diacritic}/gu, "")
+      .toLocaleLowerCase();
+    for (let i = 0; i < normal.length; i++) origin.push(index);
+    folded += normal;
+    index += char.length;
+  }
+  origin.push(index);
+  const ranges: [number, number][] = [];
+  for (const word of words) {
+    for (let at = folded.indexOf(word); at !== -1; at = folded.indexOf(word, at + 1)) {
+      ranges.push([origin[at] ?? 0, origin[at + word.length] ?? text.length]);
+    }
+  }
+  ranges.sort((a, b) => a[0] - b[0]);
+  const merged: [number, number][] = [];
+  for (const range of ranges) {
+    const last = merged.at(-1);
+    if (last && range[0] <= last[1]) last[1] = Math.max(last[1], range[1]);
+    else merged.push(range);
+  }
+  return merged;
 }

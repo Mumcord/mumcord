@@ -75,7 +75,7 @@ export function ServerIdentityDialog({ server, onClose }: ServerIdentityDialogPr
           className="button servers-form__link"
           onClick={() => {
             onClose();
-            openSettingsSection("identity");
+            openSettingsSection("account");
           }}
         >
           {t("identity.manage")}

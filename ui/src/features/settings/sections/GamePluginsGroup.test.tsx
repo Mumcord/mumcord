@@ -21,7 +21,10 @@ describe("GamePluginsGroup", () => {
   it("lists the plugins with the anti-cheat notice and switches one on", async () => {
     const setEnabled = vi.spyOn(api, "pluginSetEnabled");
     render(<GamePluginsGroup />);
-    expect(screen.getByText(/anti-cheat/)).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "More information: Game plugins" })).toHaveAttribute(
+      "data-tooltip",
+      expect.stringMatching(/anti-cheat/),
+    );
     const toggle = await screen.findByRole("switch", { name: "Grand Theft Auto V" });
     expect(toggle).not.toBeChecked();
     fireEvent.click(toggle);
@@ -90,7 +93,7 @@ describe("GamePluginsGroup", () => {
 
   it("marks the group as beta", () => {
     render(<GamePluginsGroup />);
-    const heading = screen.getByRole("heading", { name: /Positional audio: sources/u });
+    const heading = screen.getByRole("heading", { name: /Game plugins/u });
     expect(within(heading).getByText("Beta")).toBeInTheDocument();
   });
 });

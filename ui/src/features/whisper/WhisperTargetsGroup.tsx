@@ -112,7 +112,7 @@ export function WhisperTargetsGroup() {
 
   return (
     <div ref={groupRef}>
-      <Group title={t("voice.whisper.title")}>
+      <Group title={t("voice.whisper.title")} icon="mic">
         <div className="whisper-setup">
           <div className="whisper-setup__list">
             <h4 className="whisper-setup__heading" id="whisper-saved">

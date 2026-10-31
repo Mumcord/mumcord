@@ -47,7 +47,7 @@ export function NowPlayingGroup({ settings, update }: SettingsSectionProps) {
 
   const supported = status?.supported ?? true;
   return (
-    <Group title={t("nowPlaying.title")}>
+    <Group title={t("nowPlaying.title")} icon="music">
       <Switch
         label={t("nowPlaying.switch")}
         description={t("nowPlaying.hint")}

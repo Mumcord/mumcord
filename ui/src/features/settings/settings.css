@@ -11,7 +11,7 @@
   flex-direction: column;
   gap: var(--space-3);
   flex: 0 0 auto;
-  width: 13rem;
+  width: 15rem;
   min-height: 0;
   overflow-y: auto;
   padding: var(--space-4) var(--space-2);
@@ -34,10 +34,14 @@
   gap: var(--space-2);
 }
 
+.settings-search__field {
+  position: relative;
+}
+
 .settings-search__input {
   width: 100%;
   min-width: 0;
-  padding: var(--space-1) var(--space-2);
+  padding: var(--space-2) 3.5rem var(--space-2) var(--space-2);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-sm);
   background: var(--color-bg-servers);
@@ -54,7 +58,44 @@
   outline-offset: -1px;
 }
 
+/* Ctrl F / ⌘F hint inside the field; hidden while the field holds text. */
+.settings-search__shortcut {
+  position: absolute;
+  top: 50%;
+  right: var(--space-2);
+  transform: translateY(-50%);
+  padding: 0 var(--space-1);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  color: var(--color-text-muted);
+  font-family: inherit;
+  font-size: var(--font-size-xs);
+  pointer-events: none;
+}
+
 .settings-search__results {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.settings-search__group {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-2);
+  margin: 0 0 var(--space-1);
+  padding: 0 var(--space-3);
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-xs);
+  text-transform: uppercase;
+}
+
+.settings-search__count {
+  font-weight: normal;
+  text-transform: none;
+}
+
+.settings-search__list {
   display: flex;
   flex-direction: column;
   gap: var(--space-1);
@@ -64,6 +105,8 @@
 }
 
 .settings-search__result {
+  display: flex;
+  flex-direction: column;
   width: 100%;
   padding: var(--space-2) var(--space-3);
   border: none;
@@ -78,8 +121,16 @@
   background: var(--color-bg-hover);
 }
 
-.settings-search__section {
+.settings-search__card {
   color: var(--color-text-secondary);
+  font-size: var(--font-size-xs);
+}
+
+.settings-search__match {
+  border-radius: 2px;
+  background: var(--color-bg-selected);
+  color: inherit;
+  font-weight: var(--font-weight-bold);
 }
 
 .settings-search__empty {
@@ -97,6 +148,9 @@
 }
 
 .settings__tab {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
   padding: var(--space-2) var(--space-3);
   border: none;
   border-radius: var(--radius-md);
@@ -119,6 +173,29 @@
   font-weight: var(--font-weight-bold);
 }
 
+.settings-icon {
+  flex: 0 0 auto;
+}
+
+/* Advanced & Developer and About sit apart below a divider (#161). */
+.settings__tab--apart {
+  position: relative;
+  margin-top: var(--space-4);
+}
+
+.settings__tab--apart::before {
+  content: "";
+  position: absolute;
+  top: calc(-1 * var(--space-2) - 1px);
+  right: var(--space-2);
+  left: var(--space-2);
+  border-top: 1px solid var(--color-border);
+}
+
+.settings__sidebar-footer {
+  margin-top: auto;
+}
+
 .settings__panel {
   flex: 1;
   min-width: 0;
@@ -129,7 +206,7 @@
 
 /* The width limit sits on the content, so the panel's scrollbar stays at the window edge. */
 .settings__panel > * {
-  max-width: calc(48rem - 2 * var(--space-6));
+  max-width: 64rem;
 }
 
 .settings-section__title {
@@ -137,17 +214,98 @@
   font-size: var(--font-size-xl);
 }
 
-.settings-group {
+.settings-page__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-4);
   margin-bottom: var(--space-5);
-  padding-bottom: var(--space-4);
-  border-bottom: 1px solid var(--color-border);
+}
+
+.settings-page__breadcrumb,
+.settings-page__description {
+  margin: 0;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+}
+
+.settings-page__title {
+  margin: var(--space-1) 0;
+  font-size: var(--font-size-xl);
+}
+
+.settings-page__actions {
+  display: flex;
+  flex: 0 0 auto;
+  gap: var(--space-2);
+}
+
+/* Two cards side by side where there is room, one column otherwise. */
+.settings-page__cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 22rem), 1fr));
+  align-items: start;
+  gap: var(--space-4);
+}
+
+.settings-group {
+  container-type: inline-size;
+  min-width: 0;
+  padding: var(--space-4);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background: var(--color-bg-elevated);
+}
+
+.settings-group--wide {
+  grid-column: 1 / -1;
+}
+
+.settings-group__head {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin-bottom: var(--space-3);
+}
+
+.settings-group__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  border-radius: var(--radius-md);
+  background: var(--color-bg-hover);
+  color: var(--color-accent-text);
 }
 
 .settings-group__title {
-  margin: 0 0 var(--space-3);
-  font-size: var(--font-size-sm);
-  color: var(--color-text-secondary);
-  text-transform: uppercase;
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin: 0;
+  font-size: var(--font-size-md);
+}
+
+.settings-group__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin-left: auto;
+}
+
+/* Rows inside a card are separated by a hairline, as in the mockup. */
+.settings-group .settings-switch + .settings-switch,
+.settings-group .settings-control-row + .settings-control-row {
+  border-top: 1px solid var(--color-border);
+}
+
+/* Narrow cards stack the control under its label. */
+@container (max-width: 18rem) {
+  .settings-control-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
 }
 
 .settings-hint {
@@ -187,7 +345,7 @@
 
 .settings-switch {
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   justify-content: space-between;
   gap: var(--space-4);
   padding: var(--space-2) 0;
@@ -269,8 +427,24 @@
   padding: var(--space-1) 0;
 }
 
-.settings-control-row > label {
+.settings-control-row > label,
+.settings-control-row__label {
   flex: 1 1 auto;
+}
+
+/* The status line takes its own line under the label. */
+.settings-switch__status {
+  flex-basis: 100%;
+  margin: 0;
+}
+
+/* A label with its "?" tip. */
+.settings-control-row__label,
+.settings-switch__text {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
 }
 
 .settings-control-row > .select,
@@ -581,18 +755,6 @@
 }
 
 /* Identity manager (issue #148): one card per identity with its actions on the right. */
-.identity-manager__head {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--space-3);
-  margin-bottom: var(--space-3);
-}
-
-.identity-manager__head .settings-group__title {
-  margin: 0;
-}
-
 .identity-list {
   display: flex;
   flex-direction: column;

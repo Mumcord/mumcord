@@ -111,7 +111,10 @@ describe("PositionalGroup", () => {
     const heading = screen.getByRole("heading", { name: /Positional audio/u });
     expect(within(heading).getByText("Beta")).toBeInTheDocument();
     expect(within(heading).getByText("Beta feature")).toBeInTheDocument();
-    expect(screen.getByText(/depend on the game/u)).toBeInTheDocument();
+    const head = heading.parentElement as HTMLElement;
+    expect(
+      within(head).getByRole("button", { name: "More information: Positional audio" }),
+    ).toHaveAttribute("data-tooltip", expect.stringMatching(/depend on the game/u));
   });
 
   it("puts the quick settings row in the collapsed Beta group", async () => {

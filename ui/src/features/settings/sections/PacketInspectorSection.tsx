@@ -2,12 +2,12 @@ import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { getApi } from "../../../api";
 import { setDevToolsUnlocked } from "../../inspector/devTools";
-import { Section } from "../components/Section";
+import { Group } from "../components/Section";
 import { Switch } from "../components/Switch";
 import { errorText } from "../errors";
 
 /** Hidden developer tools (issue #60): the switch that hides them and the inspector window. */
-export function PacketInspectorSection() {
+export function DeveloperToolsCard() {
   const { t } = useTranslation("settings");
   const [error, setError] = useState<string | null>(null);
 
@@ -22,8 +22,7 @@ export function PacketInspectorSection() {
   };
 
   return (
-    <Section title={t("sections.packetInspector")}>
-      <p className="settings-hint">{t("inspector.intro")}</p>
+    <Group title={t("inspector.title")} icon="code" info={t("inspector.intro")}>
       <Switch
         label={t("inspector.devTools")}
         description={t("inspector.devToolsHint")}
@@ -40,6 +39,6 @@ export function PacketInspectorSection() {
       <p role="status" className="settings-error">
         {error}
       </p>
-    </Section>
+    </Group>
   );
 }
