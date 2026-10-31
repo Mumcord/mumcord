@@ -275,6 +275,23 @@ export const commands = {
 	 */
 	inlineImage: (url: string) => typedError<InlineImage | null, ApiError>(__TAURI_INVOKE("inline_image", { url })),
 	/**
+	 *  Format and size of a direct audio link (issue #260), read from the start of the file;
+	 *  `null` when previews are switched off in the settings (then nothing is fetched) or the link
+	 *  is not a playable audio file (blocked address, too large, unsupported format).
+	 */
+	audioInfo: (url: string) => typedError<AudioInfo | null, ApiError>(__TAURI_INVOKE("audio_info", { url })),
+	/**
+	 *  The audio file of a direct audio link as a `data:` URL of its sniffed type, fetched by the
+	 *  engine after the user clicked play (issue #260); `null` when previews are switched off or
+	 *  the file cannot be played.
+	 */
+	audioFile: (url: string) => typedError<string | null, ApiError>(__TAURI_INVOKE("audio_file", { url })),
+	/**
+	 *  Saves the audio file of a direct audio link to `path`, which the user picked in a save
+	 *  dialog (issue #260). The engine fetches it again with the same checks as for playing.
+	 */
+	audioSave: (url: string, path: string) => typedError<null, ApiError>(__TAURI_INVOKE("audio_save", { url, path })),
+	/**
 	 *  Hides the preview card of `url` under a message for good (QA.42). Messages that were not
 	 *  stored (history saving off) keep nothing; the UI hides the card for the session.
 	 */
@@ -755,6 +772,8 @@ export type AudioDevicesChanged = {
 	devices: AudioDevices,
 };
 
+export type AudioFormat = "mp3" | "ogg" | "aac" | "mp4" | "wav" | "flac" | "webm";
+
 /**
  *  Glitch counters of the local audio path since voice started on this connection (issue #123),
  *  with the rating over the recent window (issue #152).
@@ -789,6 +808,16 @@ export type AudioHealth = {
 	lateFramesHistory: number[],
 	concealedHistory: number[],
 	processingMaxHistoryUs: number[],
+};
+
+/**  A direct audio link before the click (issue #260). */
+export type AudioInfo = {
+	/**  The link as posted, without fragment. */
+	url: string,
+	/**  Sniffed from the file's first bytes. */
+	format: AudioFormat,
+	/**  File size in bytes, when the server said (capped at 4 GB; larger files are refused). */
+	size: number | null,
 };
 
 /**  The most likely cause of a Fair or Poor rating. */
@@ -1468,10 +1497,14 @@ export type LinkPreview = {
 	description: string | null,
 	/**  Preview image as a `data:` URL (fetched and re-encoded by the engine). */
 	image: string | null,
-	/**  Set for YouTube, Twitch and Spotify links: show a player card. */
+	/**  Set for YouTube and Twitch links: show a player card. */
 	video: VideoEmbed | null,
+	/**  Set for music service links and music pages: show a music card (issue #262). */
+	music: MusicEmbed | null,
 	/**  The link serves an image: show it inline (`inline_image`) instead of a card. */
 	isImage: boolean,
+	/**  The link serves an audio file: show the audio player (`audio_info`) instead of a card. */
+	isAudio: boolean,
 };
 
 /**  `ID` and `ID_LIKE` from os-release, e.g. `linuxmint` like `ubuntu debian`. */
@@ -1640,6 +1673,24 @@ export type MumbleSettingsFormat =
 "legacy" | 
 /**  Only the favourites database was found. */
 "databaseOnly";
+
+export type MusicEmbed = {
+	service: MusicService,
+	kind: MusicKind,
+	/**
+	 *  The service's official embed; load it only after the user clicks play. `null`: the
+	 *  service has no usable embed, the card only links to it.
+	 */
+	playerUrl: string | null,
+	/**  Artist or uploader, when the service names one. */
+	artist: string | null,
+};
+
+export type MusicKind = "track" | "album" | "playlist" | "artist" | "episode" | "show";
+
+export type MusicService = "spotify" | "soundcloud" | "youtubeMusic" | "appleMusic" | "tidal" | "deezer" | "bandcamp" | 
+/**  Another page that says it is music. */
+"other";
 
 /**
  *  The user clicked a system notification; the window is already in front. Show the server
@@ -2526,14 +2577,11 @@ export type VideoEmbed = {
 	 *  `&parent=<host of the page>` appended.
 	 */
 	playerUrl: string,
-	/**
-	 *  Channel or uploader name; for Spotify the kind of item (`track`, `album`, `playlist`,
-	 *  `artist`, `episode`, `show`).
-	 */
+	/**  Channel or uploader name. */
 	channel: string | null,
 };
 
-export type VideoSite = "youtube" | "twitch" | "spotify";
+export type VideoSite = "youtube" | "twitch";
 
 export type VoiceActivation = "automatic" | "manual";
 

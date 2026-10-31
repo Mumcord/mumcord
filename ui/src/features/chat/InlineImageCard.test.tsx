@@ -173,7 +173,9 @@ describe("inline images", () => {
       description: null,
       image: null,
       video: null,
+      music: null,
       isImage: true,
+      isAudio: false,
     };
     vi.spyOn(api, "linkPreview").mockResolvedValue(flagged);
     vi.spyOn(api, "inlineImage").mockResolvedValue({ ...GIF, url });

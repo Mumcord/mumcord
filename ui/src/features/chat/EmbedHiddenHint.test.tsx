@@ -90,8 +90,11 @@ describe("hiddenEmbedKind", () => {
     expect(hiddenEmbedKind("https://youtu.be/dQw4w9WgXcQ", [])).toBe("video");
     expect(hiddenEmbedKind("https://www.twitch.tv/somechannel", [])).toBe("video");
     expect(hiddenEmbedKind("https://open.spotify.com/track/4uLU6hMCjMI75M1A2tKUQC", [])).toBe(
-      "audio",
+      "music",
     );
+    expect(hiddenEmbedKind("https://music.youtube.com/watch?v=dQw4w9WgXcQ", [])).toBe("music");
+    expect(hiddenEmbedKind("https://artist.bandcamp.com/album/harbor", [])).toBe("music");
+    expect(hiddenEmbedKind("https://files.example/a/song.mp3", [])).toBe("audio");
     expect(hiddenEmbedKind("https://blog.example/posts/low-latency", [])).toBe("link");
   });
 });
@@ -102,6 +105,7 @@ describe("EmbedHiddenHint", () => {
     ["gif", "GIF"],
     ["video", "Video player"],
     ["audio", "Audio player"],
+    ["music", "Music player"],
     ["link", "Link preview"],
   ] as const)("names a hidden %s", (kind, label) => {
     const { container } = render(<EmbedHiddenHint kinds={[kind]} />);

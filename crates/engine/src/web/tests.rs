@@ -127,6 +127,32 @@ fn route(path: &str, addr: SocketAddr) -> Vec<u8> {
             <meta property="og:site_name" content="Test Site">
             <meta property="og:image" content="/cover.png"></head><body>x</body></html>"#,
         ),
+        "/music-page" => html(
+            r#"<html><head>
+            <meta property="og:type" content="music.song">
+            <meta property="og:title" content="Midnight &lt;b&gt;Signals&lt;/b&gt;">
+            <meta property="og:description" content="Lumen Park · Single">
+            <meta property="og:image" content="/cover.png"></head><body>x</body></html>"#,
+        ),
+        "/night-drive.mp3" => {
+            let mut body = b"ID3\x04\x00\x00\x00\x00\x00\x00".to_vec();
+            body.resize(64 * 1024, 0);
+            response("200 OK", &[("Content-Type", "audio/mpeg".into())], &body)
+        }
+        "/stream" => response(
+            "200 OK",
+            &[("Content-Type", "audio/ogg".into())],
+            b"OggS\x00\x02 rest of an ogg file",
+        ),
+        "/huge.flac" => response(
+            "200 OK",
+            &[
+                ("Content-Type", "audio/flac".into()),
+                ("Content-Length", (audio::AUDIO_LIMIT + 1).to_string()),
+            ],
+            b"fLaC",
+        ),
+        "/page.mp3" => html("<html><head><title>Not audio</title></head></html>"),
         "/notitle" => html("<html><head></head><body>no metadata</body></html>"),
         "/cover.png" => response(
             "200 OK",
@@ -719,4 +745,94 @@ async fn live_gif_hosts() {
             image.map(|i| (i.width, i.height, i.animated, i.data_url.len()))
         );
     }
+}
+
+#[tokio::test]
+async fn music_pages_get_a_music_card_without_a_player() {
+    let server = TestServer::start().await;
+    let previews = LinkPreviews::new(None, only_loopback(), Timeouts::default());
+    let preview = previews
+        .preview(&server.url("/music-page"))
+        .await
+        .expect("preview");
+    assert_eq!(preview.title.as_deref(), Some("Midnight <b>Signals</b>"));
+    assert_eq!(preview.description.as_deref(), Some("Lumen Park · Single"));
+    assert!(preview.image.is_some());
+    assert_eq!(
+        preview.music,
+        Some(MusicEmbed {
+            service: MusicService::Other,
+            kind: MusicKind::Track,
+            player_url: None,
+            artist: None,
+        })
+    );
+    let page = previews.preview(&server.url("/page")).await.expect("page");
+    assert_eq!(page.music, None);
+}
+
+#[tokio::test]
+async fn audio_links_are_probed_without_downloading_the_file() {
+    let server = TestServer::start().await;
+    let previews = LinkPreviews::new(None, only_loopback(), Timeouts::default());
+    let url = server.url("/night-drive.mp3");
+    let info = previews.audio_info(&url).await.expect("audio info");
+    assert_eq!(info.format, AudioFormat::Mp3);
+    assert_eq!(info.size, Some(64 * 1024));
+    assert_eq!(info.url, url);
+    let file = previews.audio_file(&url).await.expect("audio file");
+    assert_eq!(file.format, AudioFormat::Mp3);
+    assert!(file.data_url().starts_with("data:audio/mpeg;base64,SUQz"));
+}
+
+#[tokio::test]
+async fn audio_links_check_size_and_bytes() {
+    let server = TestServer::start().await;
+    let previews = LinkPreviews::new(None, only_loopback(), Timeouts::default());
+    assert_eq!(previews.audio_info(&server.url("/huge.flac")).await, None);
+    assert_eq!(previews.audio_info(&server.url("/page.mp3")).await, None);
+    assert_eq!(previews.audio_file(&server.url("/page.mp3")).await, None);
+    assert_eq!(previews.audio_info(&server.url("/missing.mp3")).await, None);
+}
+
+#[tokio::test]
+async fn audio_links_never_come_from_local_addresses() {
+    let server = TestServer::start().await;
+    let previews = LinkPreviews::new(None, AddressPolicy::PublicOnly, Timeouts::default());
+    assert_eq!(
+        previews.audio_info(&server.url("/night-drive.mp3")).await,
+        None
+    );
+    assert_eq!(
+        previews.audio_file(&server.url("/night-drive.mp3")).await,
+        None
+    );
+    assert_eq!(server.hits(), 0);
+}
+
+#[tokio::test]
+async fn links_serving_audio_are_flagged_instead_of_carded() {
+    let server = TestServer::start().await;
+    let previews = LinkPreviews::new(None, only_loopback(), Timeouts::default());
+    let preview = previews
+        .preview(&server.url("/stream"))
+        .await
+        .expect("an audio link yields a flagged preview");
+    assert!(preview.audio_link);
+    assert_eq!(preview.title, None);
+}
+
+#[test]
+fn parses_soundcloud_oembed() {
+    let body = br#"{"version":1.0,"type":"rich","provider_name":"SoundCloud",
+        "title":"Midnight Signals by Lumen Park","author_name":"Lumen  Park",
+        "thumbnail_url":"https://i1.sndcdn.com/artworks-000-t500x500.jpg",
+        "html":"<iframe src=\"https://w.soundcloud.com/player/\"></iframe>"}"#;
+    let o = parse_oembed(body).expect("oembed");
+    assert_eq!(o.title.as_deref(), Some("Midnight Signals by Lumen Park"));
+    assert_eq!(o.author.as_deref(), Some("Lumen Park"));
+    assert_eq!(
+        o.thumbnail.map(String::from).as_deref(),
+        Some("https://i1.sndcdn.com/artworks-000-t500x500.jpg")
+    );
 }

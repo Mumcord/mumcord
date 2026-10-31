@@ -692,6 +692,36 @@ impl Engine {
         }
     }
 
+    /// Format and size of a direct audio link for its player card (issue #260); `None` when
+    /// previews are switched off in the settings (then nothing is fetched) or the link is not a
+    /// playable audio file.
+    pub async fn audio_info(&self, url: &str) -> Option<crate::web::AudioInfo> {
+        if !self.previews_allowed("audio info") {
+            return None;
+        }
+        self.inner.previews.audio_info(url).await
+    }
+
+    /// The audio file of a direct audio link, fetched after the user clicked play (issue
+    /// #260); `None` when previews are switched off or the file cannot be played.
+    pub async fn audio_file(&self, url: &str) -> Option<crate::web::AudioFile> {
+        if !self.previews_allowed("an audio file") {
+            return None;
+        }
+        self.inner.previews.audio_file(url).await
+    }
+
+    /// Whether the link-preview privacy switch allows fetching `what`.
+    fn previews_allowed(&self, what: &str) -> bool {
+        match self.settings() {
+            Ok(settings) => settings.link_previews,
+            Err(e) => {
+                tracing::warn!(error = %e, "reading the settings for {what} failed");
+                false
+            }
+        }
+    }
+
     /// The app data directory given to `Engine::new`.
     pub(crate) fn data_dir(&self) -> &Path {
         &self.inner.data_dir
