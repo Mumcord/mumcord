@@ -2,12 +2,10 @@
   "serverOverview": "Serveroverzicht",
   "tree": {
     "label": "Kanalen",
-    "hint": "Enter: chat tonen · Shift+Enter of dubbelklik: deelnemen · Pijltjestoetsen: bewegen, uitklappen, inklappen",
+    "hint": "Enter: chat tonen · Shift+Enter of dubbelklik: deelnemen · Pijltjestoetsen: bewegen, uitklappen, inklappen · Menutoets: kanaalopties",
     "join": "Deelnemen",
-    "menuLabel": "Opties voor {{channel}}",
-    "showDescription": "Kanaalbeschrijving tonen",
     "you": "(jij)",
-    "voiceHere": "je bent hier (voice)",
+    "youAreHere": "je bent hier",
     "people_one": "{{count}} persoon",
     "people_other": "{{count}} personen",
     "stack": {
@@ -19,7 +17,13 @@
     "showAll": "Alles tonen ({{total}})",
     "showFewer": "Minder tonen",
     "jump": "Naar mijn kanaal",
-    "locked": "vergrendeld"
+    "locked": "vergrendeld",
+    "temporary": "tijdelijk",
+    "linked": "gekoppeld",
+    "full": "Kanaal vol",
+    "fullPlaces": "Kanaal vol, {{places}}",
+    "places_one": "{{taken}} van {{count}} plaats bezet",
+    "places_other": "{{taken}} van {{count}} plaatsen bezet"
   },
   "status": {
     "listening": "alleen luisteren",
@@ -56,7 +60,8 @@
   "errors": {
     "joinDenied": "Je mag dit kanaal niet betreden.",
     "joinFailed": "Deelnemen aan het kanaal is mislukt. Probeer het opnieuw.",
-    "notConnected": "Niet verbonden met een server."
+    "notConnected": "Niet verbonden met een server.",
+    "moveFailed": "Deze persoon kon niet worden verplaatst."
   },
   "empty": {
     "disconnected": "Niet verbonden. Kies een server om de kanalen te zien.",

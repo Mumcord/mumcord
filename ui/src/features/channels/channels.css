@@ -112,7 +112,8 @@
 }
 
 /* Pill after the name (icon + number); the name truncates first, pills never shrink. */
-.tree-channel__lock {
+.tree-channel__lock,
+.tree-channel__status {
   display: inline-flex;
   flex: none;
   align-items: center;
@@ -353,4 +354,47 @@
   margin: var(--space-2) 0 0;
   color: var(--color-text-secondary);
   font-size: var(--font-size-sm);
+}
+
+/* User limit after the name (FR-3.85), generated for the same reason as the count. */
+.tree-channel__limit {
+  flex: none;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+  font-variant-numeric: tabular-nums;
+}
+
+.tree-channel__limit::before {
+  content: attr(data-limit);
+}
+
+.tree-channel__limit[data-full="true"] {
+  color: var(--color-warning);
+  font-weight: var(--font-weight-bold);
+}
+
+/* A full channel is dimmed; its count keeps the warning colour at full strength. */
+.tree-channel[data-full] .tree-channel__name,
+.tree-channel[data-full] .tree-channel__status,
+.tree-channel[data-full] .tree-channel__lock {
+  opacity: 0.6;
+}
+
+/* "you are here" on the own voice channel, at the row's end like the mockup. */
+.tree-channel__here {
+  flex: none;
+  margin-left: auto;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-normal);
+}
+
+/* A channel a dragged person can be dropped on (issue #172). */
+.tree-channel__row[data-drop="true"] {
+  outline: 2px dashed var(--color-accent);
+  outline-offset: -2px;
+}
+
+.tree-person[draggable="true"] {
+  cursor: grab;
 }

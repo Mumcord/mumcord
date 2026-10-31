@@ -2,12 +2,10 @@
   "serverOverview": "Prezentare generală a serverului",
   "tree": {
     "label": "Canale",
-    "hint": "Enter: arată chatul · Shift+Enter sau dublu clic: intră · Săgeți: mută, extinde, restrânge",
+    "hint": "Enter: arată chatul · Shift+Enter sau dublu clic: intră · Săgeți: mută, extinde, restrânge · Tasta meniu: opțiunile canalului",
     "join": "Intră",
-    "menuLabel": "Opțiuni pentru {{channel}}",
-    "showDescription": "Arată descrierea canalului",
     "you": "(tu)",
-    "voiceHere": "ești aici (voice)",
+    "youAreHere": "ești aici",
     "people_one": "{{count}} persoană",
     "people_few": "{{count}} persoane",
     "people_other": "{{count}} de persoane",
@@ -21,7 +19,14 @@
     "showAll": "Arată tot ({{total}})",
     "showFewer": "Arată mai puține",
     "jump": "Salt la canalul meu",
-    "locked": "blocat"
+    "locked": "blocat",
+    "temporary": "temporar",
+    "linked": "legat",
+    "full": "Canal plin",
+    "fullPlaces": "Canal plin, {{places}}",
+    "places_one": "{{taken}} din {{count}} loc ocupat",
+    "places_few": "{{taken}} din {{count}} locuri ocupate",
+    "places_other": "{{taken}} din {{count}} de locuri ocupate"
   },
   "status": {
     "listening": "doar ascultă",
@@ -58,7 +63,8 @@
   "errors": {
     "joinDenied": "Nu ai voie să intri în acest canal.",
     "joinFailed": "Nu s-a putut intra în canal. Încearcă din nou.",
-    "notConnected": "Nu ești conectat la un server."
+    "notConnected": "Nu ești conectat la un server.",
+    "moveFailed": "Această persoană nu a putut fi mutată."
   },
   "empty": {
     "disconnected": "Nu ești conectat. Alege un server ca să-i vezi canalele.",

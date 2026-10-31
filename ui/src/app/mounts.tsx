@@ -21,7 +21,7 @@ import {
   FollowStar,
 } from "../features/follow";
 import { ChannelAudioHost } from "../features/channelaudio";
-import { ChannelHeader } from "../features/channelheader";
+import { ChannelHeader, ChannelTreeMenu } from "../features/channelheader";
 import { ChatView } from "../features/chat";
 import { UserStatsWatcher } from "../features/connection";
 import { FriendsList } from "../features/friends";
@@ -61,6 +61,7 @@ export function ChannelsMount() {
         aboveTree={<RequestsEntry />}
         channelBadge={(channelId) => <ChannelUnreadBadge channelId={channelId} />}
         channelAction={(channel) => <FollowStar {...channel} />}
+        channelMenu={(menu) => <ChannelTreeMenu key={menu.channelId} {...menu} />}
       />
       <FollowNoticeLine />
       <UserStatsWatcher />

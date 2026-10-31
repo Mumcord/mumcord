@@ -2,12 +2,10 @@
   "serverOverview": "Serveroversigt",
   "tree": {
     "label": "Kanaler",
-    "hint": "Enter: vis chat · Shift+Enter eller dobbeltklik: join · Piletaster: flyt, udvid, skjul",
+    "hint": "Enter: vis chat · Shift+Enter eller dobbeltklik: join · Piletaster: flyt, udvid, skjul · Menutast: kanalindstillinger",
     "join": "Deltag",
-    "menuLabel": "Indstillinger for {{channel}}",
-    "showDescription": "Vis kanalbeskrivelse",
     "you": "(dig)",
-    "voiceHere": "du er her (voice)",
+    "youAreHere": "du er her",
     "people_one": "{{count}} person",
     "people_other": "{{count}} personer",
     "stack": {
@@ -19,7 +17,13 @@
     "showAll": "Vis alle ({{total}})",
     "showFewer": "Vis færre",
     "jump": "Hop til min kanal",
-    "locked": "låst"
+    "locked": "låst",
+    "temporary": "midlertidig",
+    "linked": "forbundet",
+    "full": "Kanalen er fuld",
+    "fullPlaces": "Kanalen er fuld, {{places}}",
+    "places_one": "{{taken}} af {{count}} plads optaget",
+    "places_other": "{{taken}} af {{count}} pladser optaget"
   },
   "status": {
     "listening": "lytter kun",
@@ -56,7 +60,8 @@
   "errors": {
     "joinDenied": "Du har ikke adgang til denne kanal.",
     "joinFailed": "Kunne ikke joine kanalen. Prøv igen.",
-    "notConnected": "Ikke forbundet til en server."
+    "notConnected": "Ikke forbundet til en server.",
+    "moveFailed": "Personen kunne ikke flyttes."
   },
   "empty": {
     "disconnected": "Ikke forbundet. Vælg en server for at se dens kanaler.",

@@ -2,12 +2,10 @@
   "serverOverview": "Serveröversikt",
   "tree": {
     "label": "Kanaler",
-    "hint": "Enter: visa chatt · Skift+Enter eller dubbelklick: gå med · Piltangenter: flytta, expandera, fäll ihop",
+    "hint": "Enter: visa chatt · Skift+Enter eller dubbelklick: gå med · Piltangenter: flytta, expandera, fäll ihop · Menytangent: kanalalternativ",
     "join": "Gå med",
-    "menuLabel": "Alternativ för {{channel}}",
-    "showDescription": "Visa kanalbeskrivning",
     "you": "(du)",
-    "voiceHere": "du är här (röst)",
+    "youAreHere": "du är här",
     "people_one": "{{count}} person",
     "people_other": "{{count}} personer",
     "stack": {
@@ -19,7 +17,13 @@
     "showAll": "Visa alla ({{total}})",
     "showFewer": "Visa färre",
     "jump": "Hoppa till min kanal",
-    "locked": "låst"
+    "locked": "låst",
+    "temporary": "tillfällig",
+    "linked": "länkad",
+    "full": "Kanalen är full",
+    "fullPlaces": "Kanalen är full, {{places}}",
+    "places_one": "{{taken}} av {{count}} plats upptagen",
+    "places_other": "{{taken}} av {{count}} platser upptagna"
   },
   "status": {
     "listening": "lyssnar bara",
@@ -56,7 +60,8 @@
   "errors": {
     "joinDenied": "Du får inte gå in i den här kanalen.",
     "joinFailed": "Det gick inte att gå med i kanalen. Försök igen.",
-    "notConnected": "Inte ansluten till någon server."
+    "notConnected": "Inte ansluten till någon server.",
+    "moveFailed": "Personen kunde inte flyttas."
   },
   "empty": {
     "disconnected": "Inte ansluten. Välj en server för att se dess kanaler.",

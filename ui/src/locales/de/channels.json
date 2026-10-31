@@ -2,12 +2,10 @@
   "serverOverview": "Serverübersicht",
   "tree": {
     "label": "Kanäle",
-    "hint": "Enter: Chat anzeigen · Umschalt+Enter oder Doppelklick: beitreten · Pfeiltasten: bewegen, auf- und zuklappen",
+    "hint": "Enter: Chat anzeigen · Umschalt+Enter oder Doppelklick: beitreten · Pfeiltasten: bewegen, auf- und zuklappen · Menütaste: Kanaloptionen",
     "join": "Beitreten",
-    "menuLabel": "Optionen für {{channel}}",
-    "showDescription": "Kanalbeschreibung anzeigen",
     "you": "(du)",
-    "voiceHere": "du bist hier (Sprache)",
+    "youAreHere": "du bist hier",
     "people_one": "{{count}} Person",
     "people_other": "{{count}} Personen",
     "stack": {
@@ -19,7 +17,13 @@
     "showAll": "Alle anzeigen ({{total}})",
     "showFewer": "Weniger anzeigen",
     "jump": "Zu meinem Kanal springen",
-    "locked": "gesperrt"
+    "locked": "gesperrt",
+    "temporary": "temporär",
+    "linked": "verknüpft",
+    "full": "Kanal voll",
+    "fullPlaces": "Kanal voll, {{places}}",
+    "places_one": "{{taken}} von {{count}} Platz belegt",
+    "places_other": "{{taken}} von {{count}} Plätzen belegt"
   },
   "status": {
     "listening": "nur zuhörend",
@@ -56,7 +60,8 @@
   "errors": {
     "joinDenied": "Du darfst diesen Kanal nicht betreten.",
     "joinFailed": "Beitreten fehlgeschlagen. Bitte versuche es erneut.",
-    "notConnected": "Nicht mit einem Server verbunden."
+    "notConnected": "Nicht mit einem Server verbunden.",
+    "moveFailed": "Diese Person konnte nicht verschoben werden."
   },
   "empty": {
     "disconnected": "Nicht verbunden. Wähle einen Server, um seine Kanäle zu sehen.",

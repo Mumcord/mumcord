@@ -5,19 +5,12 @@ import { createMockApi, setApi, type MockApi } from "../../api";
 import { applyLanguage } from "../../i18n";
 import { axeViolations } from "../../test/axe";
 import { applyThemeToDocument } from "../../theme/theme";
-import { descriptionKey, hideInfo, resetHiddenInfo } from "../chat/hiddenInfo";
 import { ProfilePreviewHost } from "../members/ProfilePreview";
 import { PIN_DELAY_MS } from "../members/profilePreviewStore";
 import { AnnouncementLimiter, GLOBAL_INTERVAL_MS, TALK_INTERVAL_MS } from "./announcements";
 import { ChannelsPanel } from "./ChannelsPanel";
 import { getSelectedConversation } from "./selection";
-import {
-  getServerState,
-  getServerStateOf,
-  resetServerStore,
-  showServer,
-  shownServerId,
-} from "./serverStore";
+import { getServerState, getServerStateOf, resetServerStore, showServer } from "./serverStore";
 import { connectedMock, resetAll, stubDialog } from "./testUtils";
 
 let api: MockApi;
@@ -42,28 +35,6 @@ afterEach(() => {
   resetAll();
 });
 
-describe("channel description menu (FR-2.66)", () => {
-  afterEach(() => {
-    localStorage.clear();
-    resetHiddenInfo();
-  });
-
-  it("offers Show channel description only on a channel whose description is hidden", async () => {
-    await renderPanel();
-    fireEvent.contextMenu(item(/^Lobby/));
-    expect(screen.queryByRole("menu")).toBeNull();
-    act(() => {
-      hideInfo(descriptionKey(shownServerId(), 1), "About");
-    });
-    fireEvent.contextMenu(item(/^Raid/));
-    expect(screen.queryByRole("menu")).toBeNull();
-    fireEvent.contextMenu(item(/^Lobby/));
-    fireEvent.click(screen.getByRole("menuitem", { name: "Show channel description" }));
-    expect(localStorage.getItem(`mumcord.hidden.${descriptionKey(shownServerId(), 1)}`)).toBeNull();
-    expect(screen.queryByRole("menu")).toBeNull();
-  });
-});
-
 describe("ChannelsPanel", () => {
   it("shows an empty state when not connected", async () => {
     api = await connectedMock();
@@ -79,7 +50,7 @@ describe("ChannelsPanel", () => {
     expect(lobby).toHaveAttribute("aria-expanded", "true");
     expect(lobby).toHaveAttribute("aria-selected", "true");
     expect(lobby).toHaveAttribute("aria-keyshortcuts", "Shift+Enter");
-    expect(lobby).toHaveAccessibleName(/you are here \(voice\), 3 people/);
+    expect(lobby).toHaveAccessibleName(/3 people, you are here/);
     expect(item(/^Ben/)).toHaveAccessibleName(/not registered/);
     expect(screen.getByText(/Shift\+Enter or double-click: join/)).toBeInTheDocument();
   });
@@ -212,7 +183,7 @@ describe("ChannelsPanel", () => {
       await renderPanel();
       await act(() => api.channelJoin(1, 1));
       expect(voiceRows()).toEqual(["Lobby"]);
-      expect(item(/^Lobby/)).toHaveAccessibleName(/you are here \(voice\)/);
+      expect(item(/^Lobby/)).toHaveAccessibleName(/you are here/);
       expect(item(/^Raid/)).not.toHaveAccessibleName(/you are here/);
       fireEvent.click(item(/^Raid/));
       expect(voiceRows()).toEqual(["Lobby"]);
@@ -225,7 +196,7 @@ describe("ChannelsPanel", () => {
       await act(() => api.channelJoin(1, 2));
       expect(voiceRows()).toEqual(["Raid"]);
       expect(item(/^Lobby/)).not.toHaveAccessibleName(/you are here/);
-      expect(item(/^Raid/)).toHaveAccessibleName(/you are here \(voice\)/);
+      expect(item(/^Raid/)).toHaveAccessibleName(/you are here/);
     });
 
     it("shows nothing while reading along", async () => {

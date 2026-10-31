@@ -2,12 +2,10 @@
   "serverOverview": "Vue d'ensemble du serveur",
   "tree": {
     "label": "Canaux",
-    "hint": "Entrée : afficher la discussion · Maj+Entrée ou double-clic : rejoindre · Flèches : se déplacer, développer, réduire",
+    "hint": "Entrée : afficher la discussion · Maj+Entrée ou double-clic : rejoindre · Flèches : se déplacer, développer, réduire · Touche Menu : options du canal",
     "join": "Rejoindre",
-    "menuLabel": "Options pour {{channel}}",
-    "showDescription": "Afficher la description du canal",
     "you": "(vous)",
-    "voiceHere": "vous êtes ici (vocal)",
+    "youAreHere": "vous êtes ici",
     "people_one": "{{count}} personne",
     "people_many": "{{count}} personnes",
     "people_other": "{{count}} personnes",
@@ -21,7 +19,14 @@
     "showAll": "Tout afficher ({{total}})",
     "showFewer": "Afficher moins",
     "jump": "Aller à mon canal",
-    "locked": "verrouillé"
+    "locked": "verrouillé",
+    "temporary": "temporaire",
+    "linked": "lié",
+    "full": "Canal plein",
+    "fullPlaces": "Canal plein, {{places}}",
+    "places_one": "{{taken}} place occupée sur {{count}}",
+    "places_many": "{{taken}} places occupées sur {{count}}",
+    "places_other": "{{taken}} places occupées sur {{count}}"
   },
   "status": {
     "listening": "écoute seulement",
@@ -58,7 +63,8 @@
   "errors": {
     "joinDenied": "Vous n’avez pas le droit d’entrer dans ce canal.",
     "joinFailed": "Impossible de rejoindre le canal. Veuillez réessayer.",
-    "notConnected": "Non connecté à un serveur."
+    "notConnected": "Non connecté à un serveur.",
+    "moveFailed": "Impossible de déplacer cette personne."
   },
   "empty": {
     "disconnected": "Non connecté. Choisissez un serveur pour voir ses canaux.",

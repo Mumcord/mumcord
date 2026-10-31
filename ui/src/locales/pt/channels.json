@@ -2,12 +2,10 @@
   "serverOverview": "Visão geral do servidor",
   "tree": {
     "label": "Canais",
-    "hint": "Enter: mostrar chat · Shift+Enter ou duplo clique: entrar · Setas: mover, expandir, recolher",
+    "hint": "Enter: mostrar chat · Shift+Enter ou duplo clique: entrar · Setas: mover, expandir, recolher · Tecla de menu: opções do canal",
     "join": "Entrar",
-    "menuLabel": "Opções de {{channel}}",
-    "showDescription": "Mostrar descrição do canal",
     "you": "(tu)",
-    "voiceHere": "estás aqui (voz)",
+    "youAreHere": "estás aqui",
     "people_one": "{{count}} pessoa",
     "people_many": "{{count}} pessoas",
     "people_other": "{{count}} pessoas",
@@ -21,7 +19,14 @@
     "showAll": "Mostrar tudo ({{total}})",
     "showFewer": "Mostrar menos",
     "jump": "Ir para o meu canal",
-    "locked": "bloqueado"
+    "locked": "bloqueado",
+    "temporary": "temporário",
+    "linked": "ligado",
+    "full": "Canal cheio",
+    "fullPlaces": "Canal cheio, {{places}}",
+    "places_one": "{{taken}} de {{count}} lugar ocupado",
+    "places_many": "{{taken}} de {{count}} lugares ocupados",
+    "places_other": "{{taken}} de {{count}} lugares ocupados"
   },
   "status": {
     "listening": "apenas a ouvir",
@@ -58,7 +63,8 @@
   "errors": {
     "joinDenied": "Não tens permissão para entrar neste canal.",
     "joinFailed": "Não foi possível entrar no canal. Tenta novamente.",
-    "notConnected": "Sem ligação a um servidor."
+    "notConnected": "Sem ligação a um servidor.",
+    "moveFailed": "Não foi possível mover esta pessoa."
   },
   "empty": {
     "disconnected": "Sem ligação. Escolhe um servidor para ver os respetivos canais.",

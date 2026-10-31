@@ -2,12 +2,10 @@
   "serverOverview": "Panoramica del server",
   "tree": {
     "label": "Canali",
-    "hint": "Invio: mostra la chat · Maiusc+Invio o doppio clic: entra · Frecce: sposta, espandi, comprimi",
+    "hint": "Invio: mostra la chat · Maiusc+Invio o doppio clic: entra · Frecce: sposta, espandi, comprimi · Tasto Menu: opzioni del canale",
     "join": "Entra",
-    "menuLabel": "Opzioni per {{channel}}",
-    "showDescription": "Mostra descrizione del canale",
     "you": "(tu)",
-    "voiceHere": "sei qui (vocale)",
+    "youAreHere": "sei qui",
     "people_one": "{{count}} persona",
     "people_many": "{{count}} persone",
     "people_other": "{{count}} persone",
@@ -21,7 +19,14 @@
     "showAll": "Mostra tutti ({{total}})",
     "showFewer": "Mostra meno",
     "jump": "Vai al mio canale",
-    "locked": "bloccato"
+    "locked": "bloccato",
+    "temporary": "temporaneo",
+    "linked": "collegato",
+    "full": "Canale pieno",
+    "fullPlaces": "Canale pieno, {{places}}",
+    "places_one": "{{taken}} posto occupato su {{count}}",
+    "places_many": "{{taken}} posti occupati su {{count}}",
+    "places_other": "{{taken}} posti occupati su {{count}}"
   },
   "status": {
     "listening": "solo ascolto",
@@ -58,7 +63,8 @@
   "errors": {
     "joinDenied": "Non hai il permesso di entrare in questo canale.",
     "joinFailed": "Impossibile entrare nel canale. Riprova.",
-    "notConnected": "Non sei connesso a un server."
+    "notConnected": "Non sei connesso a un server.",
+    "moveFailed": "Impossibile spostare questa persona."
   },
   "empty": {
     "disconnected": "Non connesso. Scegli un server per vederne i canali.",

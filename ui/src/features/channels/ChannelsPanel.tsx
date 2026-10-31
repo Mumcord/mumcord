@@ -1,13 +1,18 @@
 /** Channel column content: the channel tree of the connected server, or an empty state. */
 import { useCallback, useEffect, useRef, useState, type ReactNode } from "react";
 import { useTranslation } from "react-i18next";
-import { toEngineError } from "../../api";
+import { getApi, toEngineError } from "../../api";
 import { pinPerson } from "../members/personClick";
 import { joinChannel, useReadOnly } from "../userpanel/readOnly";
 import { useServerAnnouncements } from "./announcements";
 import { BigServerGate } from "./BigServerGate";
 import { ChannelSearch } from "./ChannelSearch";
-import { ChannelTree, type ChannelAction, type ChannelTreeHandle } from "./ChannelTree";
+import {
+  ChannelTree,
+  type ChannelAction,
+  type ChannelMenuRequest,
+  type ChannelTreeHandle,
+} from "./ChannelTree";
 import { JumpToChannelButton } from "./JumpToChannelButton";
 import { useSelectedConversation } from "./selection";
 import { selfUser, useServerState } from "./serverStore";
@@ -24,6 +29,8 @@ export interface ChannelsPanelProps {
   header?: ReactNode;
   /** Entry between the search and the tree, e.g. "Message requests" (issue #141). */
   aboveTree?: ReactNode;
+  /** A channel's right-click menu (issue #172). */
+  channelMenu?: ((menu: ChannelMenuRequest) => ReactNode) | undefined;
 }
 
 export function ChannelsPanel({
@@ -31,6 +38,7 @@ export function ChannelsPanel({
   channelAction,
   header,
   aboveTree,
+  channelMenu,
 }: ChannelsPanelProps) {
   const { t } = useTranslation("channels");
   const readOnly = useReadOnly();
@@ -85,6 +93,22 @@ export function ChannelsPanel({
       });
     },
     [t],
+  );
+
+  const serverId = state.serverId;
+  const movePerson = useCallback(
+    (session: number, channelId: number) => {
+      if (serverId === null) return;
+      setJoinError(null);
+      getApi()
+        .personMove(serverId, session, channelId)
+        .catch((cause: unknown) => {
+          const { code } = toEngineError(cause);
+          console.error("Moving a person failed", code);
+          setJoinError(t("errors.moveFailed"));
+        });
+    },
+    [serverId, t],
   );
 
   if (state.serverId === null) {
@@ -153,6 +177,8 @@ export function ChannelsPanel({
           }}
           channelBadge={channelBadge}
           channelAction={channelAction}
+          channelMenu={channelMenu}
+          onMovePerson={movePerson}
           filter={filter}
         />
       </BigServerGate>

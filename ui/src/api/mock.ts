@@ -128,6 +128,8 @@ export interface MockControls {
   upsertUser(user: User): void;
   /** Takes away the Enter permission of a channel; `MOCK_CHANNEL_PASSWORD` opens it (FR-2.78). */
   lockChannel(channelId: number): void;
+  /** Changes a channel as a server update would, e.g. its user limit or permissions. */
+  updateChannel(channelId: number, patch: Partial<Omit<ChannelInfo, "id">>): void;
   /** Renames a channel, like an admin on the server would. */
   renameChannel(channelId: number, name: string): void;
   /** Stores a channel password without any details, like one saved before issue #146. */
@@ -2666,6 +2668,13 @@ export function createMockApi(options: MockOptions = {}): MockApi {
       };
       snap.channels = snap.channels.map((c) => (c.id === channelId ? locked : c));
       emitServer("channelUpserted", { channel: locked });
+    },
+    updateChannel: (channelId, patch) => {
+      focused();
+      const snap = requireSnapshot();
+      const updated = { ...requireChannel(channelId), ...patch };
+      snap.channels = snap.channels.map((c) => (c.id === channelId ? updated : c));
+      emitServer("channelUpserted", { channel: updated });
     },
     renameChannel: (channelId, name) => {
       focused();

@@ -2,12 +2,10 @@
   "serverOverview": "Servera pārskats",
   "tree": {
     "label": "Kanāli",
-    "hint": "Enter: rādīt čatu · Shift+Enter vai dubultklikšķis: pievienoties · Bulttaustiņi: pārvietoties, izvērst, sakļaut",
+    "hint": "Enter: rādīt čatu · Shift+Enter vai dubultklikšķis: pievienoties · Bulttaustiņi: pārvietoties, izvērst, sakļaut · Izvēlnes taustiņš: kanāla opcijas",
     "join": "Pievienoties",
-    "menuLabel": "{{channel}} opcijas",
-    "showDescription": "Rādīt kanāla aprakstu",
     "you": "(tu)",
-    "voiceHere": "tu esi šeit (balss)",
+    "youAreHere": "tu esi šeit",
     "people_zero": "{{count}} cilvēku",
     "people_one": "{{count}} cilvēks",
     "people_other": "{{count}} cilvēki",
@@ -21,7 +19,14 @@
     "showAll": "Rādīt visus ({{total}})",
     "showFewer": "Rādīt mazāk",
     "jump": "Pāriet uz manu kanālu",
-    "locked": "slēgts"
+    "locked": "slēgts",
+    "temporary": "pagaidu",
+    "linked": "saistīts",
+    "full": "Kanāls ir pilns",
+    "fullPlaces": "Kanāls ir pilns, {{places}}",
+    "places_zero": "aizņemtas {{taken}} no {{count}} vietām",
+    "places_one": "aizņemtas {{taken}} no {{count}} vietas",
+    "places_other": "aizņemtas {{taken}} no {{count}} vietām"
   },
   "status": {
     "listening": "tikai klausās",
@@ -58,7 +63,8 @@
   "errors": {
     "joinDenied": "Tev nav atļaujas ieiet šajā kanālā.",
     "joinFailed": "Neizdevās pievienoties kanālam. Lūdzu, mēģini vēlreiz.",
-    "notConnected": "Nav savienojuma ar serveri."
+    "notConnected": "Nav savienojuma ar serveri.",
+    "moveFailed": "Šo personu neizdevās pārvietot."
   },
   "empty": {
     "disconnected": "Nav savienots. Izvēlies serveri, lai redzētu tā kanālus.",
