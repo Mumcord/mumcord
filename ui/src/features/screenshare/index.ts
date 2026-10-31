@@ -4,6 +4,8 @@ export { ShareScreenButton } from "./ShareScreenButton";
 export { useOwnShare, type OwnShareState } from "./useOwnShare";
 export { resetScreenShareStore, useIsLive, useScreenShareOf, useScreenShares } from "./sharesStore";
 export { ScreenShareWidget } from "./ScreenShareViewer";
+export { ScreenShareView } from "./ScreenShareView";
+export { ViewerPanel } from "./ViewerPanel";
 export { resetWatchingStore, startWatching, stopWatching, useWatchedShare } from "./watching";
 export { SharingBar } from "./SharingBar";
 export { Viewers } from "./SharerControls";

@@ -10,7 +10,7 @@ import { useTranslation } from "react-i18next";
 import { useServerStateOf } from "../channels";
 import { ScreenStage } from "./ScreenStage";
 import { useScreenShareOf } from "./sharesStore";
-import { useFullscreen } from "./useFullscreen";
+import { useFullscreen } from "../media/useFullscreen";
 import { stopWatching, useWatchedShare, type WatchedShare } from "./watching";
 import "./screenViewer.css";
 
