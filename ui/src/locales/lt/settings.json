@@ -159,6 +159,20 @@
     "processing": "Balso apdorojimas",
     "noiseSuppression": "Triukšmo slopinimas",
     "noiseSuppressionHint": "Išfiltruoja foninį triukšmą, pavyzdžiui, klaviatūros ar ventiliatorių garsą.",
+    "noiseChoice": {
+      "light": "Silpnas",
+      "standard": "Standartinis",
+      "advanced": "Išplėstinis (DI)",
+      "off": "Išjungta"
+    },
+    "noiseChoiceHint": {
+      "light": "Klasikinis filtras pastoviam triukšmui, pvz., ventiliatoriams ar ūžesiui. Mažiausia procesoriaus apkrova.",
+      "standard": "DI filtras kasdieniam triukšmui, pvz., klaviatūroms ir ventiliatoriams. Maža procesoriaus apkrova.",
+      "advanced": "Naujesnis DI modelis, šalinantis ir kintantį triukšmą. Maždaug tris kartus daugiau procesoriaus nei Standartinis ir 10 ms didesnė delsa."
+    },
+    "noiseChoiceBeta": "Beta",
+    "noiseChoiceTipLabel": "Apie {{choice}}",
+    "detectorHint": "Balso aktyvavimas atpažįsta kalbą su RNNoise modeliu; jis nekeičia tavo garso.",
     "echoCancellation": "Aido pašalinimas",
     "echoCancellationHint": "Neleidžia kitiems girdėti savęs, kai naudoji garsiakalbius.",
     "autoGain": "Automatinis garsumas",

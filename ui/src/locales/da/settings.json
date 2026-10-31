@@ -157,6 +157,20 @@
     "processing": "Stemmebehandling",
     "noiseSuppression": "Støjundertrykkelse",
     "noiseSuppressionHint": "Filtrerer baggrundsstøj som tastatur og blæsere fra.",
+    "noiseChoice": {
+      "light": "Let",
+      "standard": "Standard",
+      "advanced": "Avanceret (AI)",
+      "off": "Fra"
+    },
+    "noiseChoiceHint": {
+      "light": "Klassisk filter til jævn støj som blæsere eller brum. Laveste CPU-forbrug.",
+      "standard": "AI-filter til hverdagsstøj som tastaturer og blæsere. Lavt CPU-forbrug.",
+      "advanced": "Nyere AI-model, der også fjerner skiftende støj. Cirka tre gange så meget CPU som Standard og 10 ms mere forsinkelse."
+    },
+    "noiseChoiceBeta": "Beta",
+    "noiseChoiceTipLabel": "Om {{choice}}",
+    "detectorHint": "Stemmeaktivering opdager tale med RNNoise-modellen; den ændrer ikke din lyd.",
     "echoCancellation": "Ekkoundertrykkelse",
     "echoCancellationHint": "Forhindrer, at andre hører sig selv, når du bruger højttalere.",
     "autoGain": "Automatisk lydstyrke",
