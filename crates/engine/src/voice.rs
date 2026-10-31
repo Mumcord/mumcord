@@ -488,7 +488,8 @@ impl VoicePipeline {
                         .realtime_threads
                         .store(threads.saturating_sub(demoted), Ordering::Relaxed);
                 }
-                let talking = controls.transmitting() && !shared.muted.load(Ordering::Relaxed);
+                let talking = (controls.transmitting() || controls.voice_target() != 0)
+                    && !shared.muted.load(Ordering::Relaxed);
                 batch.set(own_session, talking, now);
                 for (session, talking) in batch.take_due(now) {
                     events.emit(EngineEvent::TalkStateChanged { session, talking });
@@ -619,9 +620,13 @@ fn capture_loop(
     let silence: Frame = [0.0; FRAME_SAMPLES];
     let mut packet = [0u8; MAX_PACKET_BYTES];
     let mut sending = false;
-    let send = |len: usize, packet: &[u8], frames: u8, is_last: bool| {
+    // Voice target of the current transmission; a whisper (issue #67) keeps its target until
+    // its terminator went out, so no audio meant for the target leaks into the channel.
+    let mut burst_target = 0u8;
+    let send = |len: usize, packet: &[u8], frames: u8, is_last: bool, target: u8| {
         transport.send_audio(
             OutgoingAudio::new(Bytes::copy_from_slice(&packet[..len]), frames, is_last)
+                .to_target(target)
                 .with_position(shared.positional.own_position()),
         );
         shared.packets_sent.fetch_add(1, Ordering::Relaxed);
@@ -664,27 +669,34 @@ fn capture_loop(
         }
 
         let gate = chain.process(&input, &mut output);
-        let open = gate == Gate::Open && !shared.muted.load(Ordering::Relaxed);
+        // Holding a whisper target transmits like push-to-talk, in either talk mode.
+        let target = controls.voice_target();
+        let open = (gate == Gate::Open || target != 0) && !shared.muted.load(Ordering::Relaxed);
         if capture_frame_late(queued, open || sending) {
             shared.capture_late_frames.fetch_add(1, Ordering::Relaxed);
         }
         let frames = encoders.frames_per_packet();
         let encoder = encoders.active();
-        if open {
-            sending = true;
-            if let Ok(Some(len)) = encoder.push_frame(&output, &mut packet) {
-                send(len, &packet, frames, false);
-            }
-        } else if sending {
-            // End of transmission: pad with silence so the final packet carries the
-            // terminator flag, as receivers use it to end the talking indicator promptly.
+        // End of transmission (or a switch to another target): pad with silence so the final
+        // packet carries the terminator flag, as receivers use it to end the talking indicator
+        // promptly.
+        if sending && (!open || target != burst_target) {
             sending = false;
             let last = match encoder.push_frame(&silence, &mut packet) {
                 Ok(Some(len)) => Some(len),
                 _ => encoder.flush(&mut packet).ok().flatten(),
             };
             if let Some(len) = last {
-                send(len, &packet, frames, true);
+                send(len, &packet, frames, true, burst_target);
+            }
+        }
+        if open {
+            if !sending {
+                sending = true;
+                burst_target = target;
+            }
+            if let Ok(Some(len)) = encoder.push_frame(&output, &mut packet) {
+                send(len, &packet, frames, false, burst_target);
             }
         }
         shared.capture_time.record(started.elapsed());
