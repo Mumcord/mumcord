@@ -447,7 +447,23 @@ fn refresh(app: &AppHandle, change: Change) {
     };
     let view = view(app, &tray, change);
     match &tray.backend {
-        Backend::Tauri(handles) => refresh_tauri(app, handles, view),
+        // Tauri's tray and menu calls wait for the main thread. Made from the engine event task
+        // while holding the menu lock, they deadlock with a refresh the main thread makes itself
+        // (a sync command or a menu click), freezing the window and all engine events. On the
+        // main thread they run directly (and right away when already there).
+        Backend::Tauri(_) => {
+            let main = app.clone();
+            let result = app.run_on_main_thread(move || {
+                if let Some(tray) = main.try_state::<Tray>()
+                    && let Some(handles) = tray.backend.tauri()
+                {
+                    refresh_tauri(&main, handles, view);
+                }
+            });
+            if let Err(e) = result {
+                tracing::warn!(error = %e, "updating the tray icon failed");
+            }
+        }
         #[cfg(target_os = "linux")]
         Backend::Ksni(handle) => {
             let handle = handle.clone();
