@@ -20,6 +20,8 @@ import {
   PeopleIcon,
 } from "./icons";
 import { MoveUsersDialog } from "./MoveUsersDialog";
+import { WhisperKindIcon } from "../whisper/WhisperKindIcon";
+import { createWhisperTarget } from "../whisper/whisperStore";
 
 /** Where the menu opens: the channel name in the chat header, or a channel row in the tree. */
 export type ChannelActionsContext = "header" | "tree";
@@ -58,6 +60,7 @@ export function useChannelActions(
   { context, closeMenu, restoreFocus, onStatus, join }: ChannelActionsOptions,
 ): ChannelActions {
   const { t } = useTranslation("channelheader");
+  const { t: tWhisper } = useTranslation("whisper");
   const server = useServerState();
   const follow = useFollowControl(channelId);
   const audioKind = profileKind(useChannelAudioProfile(server.serverId, channelId));
@@ -137,6 +140,29 @@ export function useChannelActions(
         },
       }
     : null;
+  // Shouting needs the Whisper permission in the channel (the server checks it, too); like the
+  // other actions, the item is hidden without it.
+  const whisperItem: MenuItem | null =
+    connected && channel && channel.parentId !== null && channel.permissions.whisper
+      ? {
+          id: "whisper",
+          label: tWhisper("menu.whisper"),
+          icon: <WhisperKindIcon kind="shout" />,
+          onSelect: () => {
+            closeMenu(false);
+            createWhisperTarget({
+              name,
+              receivers: {
+                kind: "channel",
+                path: channelPath(server.channels, channelId),
+                children: false,
+                links: false,
+                group: null,
+              },
+            });
+          },
+        }
+      : null;
   const copyItem: MenuItem | null =
     link !== null
       ? {
@@ -200,6 +226,7 @@ export function useChannelActions(
     joinItem,
     followItem,
     audioItem,
+    whisperItem,
     copyItem,
     passwordItem,
     infoItem,

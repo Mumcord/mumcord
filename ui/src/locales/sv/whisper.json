@@ -1,0 +1,44 @@
+{
+  "menu": {
+    "whisper": "Viska till…",
+    "noPermission": "Servern tillåter inte att viska här"
+  },
+  "banner": {
+    "whisper": "Viskar till {{target}}",
+    "shout": "Ropar till {{target}}",
+    "releaseKey": "Bara personerna där hör dig. Släpp <key>{{key}}</key> för att prata i {{channel}} igen.",
+    "stopToReturn": "Bara personerna där hör dig. Stoppa för att prata i {{channel}} igen.",
+    "onlyThere": "Bara personerna där hör dig.",
+    "stop": "Stoppa"
+  },
+  "denied": {
+    "title": "Kunde inte viska till {{target}}",
+    "noVoiceServer": "Gå med i en kanal först: viskningar går via servern du pratar på.",
+    "muted": "Slå på mikrofonen för att viska.",
+    "serverMuted": "Servern har tystat dig och vidarebefordrar därför inte din röst.",
+    "nobodyHere": "Ingen av dessa personer är på servern just nu.",
+    "channelNotFound": "Kanalen finns inte på den här servern.",
+    "noPermission": "Servern tillåter inte att du viskar till {{channel}}.",
+    "unknownTarget": "Det här målet finns inte längre.",
+    "dismiss": "Stäng"
+  },
+  "badge": {
+    "whisper": "viskar",
+    "shout": "ropar",
+    "whisperLabel": "Viskar till dig",
+    "shoutLabel": "Ropar till din kanal",
+    "ownWhisper": "viskar",
+    "ownShout": "ropar",
+    "ownWhisperLabel": "Du viskar",
+    "ownShoutLabel": "Du ropar"
+  },
+  "panel": {
+    "open": "Viska eller ropa",
+    "menu": "Mål för viskning och rop",
+    "manage": "Hantera mål…",
+    "none": "Inga mål ännu",
+    "indicatorWhisper": "Viskar till {{target}}",
+    "indicatorShout": "Ropar till {{target}}",
+    "stop": "Stoppa"
+  }
+}

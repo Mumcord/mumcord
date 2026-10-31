@@ -1,0 +1,44 @@
+{
+  "menu": {
+    "whisper": "Čukstēt…",
+    "noPermission": "Serveris šeit neļauj čukstēt"
+  },
+  "banner": {
+    "whisper": "Čukstat: {{target}}",
+    "shout": "Kliedzat: {{target}}",
+    "releaseKey": "Jūs dzird tikai cilvēki tur. Atlaidiet <key>{{key}}</key>, lai atkal runātu kanālā {{channel}}.",
+    "stopToReturn": "Jūs dzird tikai cilvēki tur. Apturiet, lai atkal runātu kanālā {{channel}}.",
+    "onlyThere": "Jūs dzird tikai cilvēki tur.",
+    "stop": "Apturēt"
+  },
+  "denied": {
+    "title": "Neizdevās pačukstēt: {{target}}",
+    "noVoiceServer": "Vispirms pievienojieties kanālam: čuksti iet caur serveri, kurā runājat.",
+    "muted": "Ieslēdziet mikrofonu, lai čukstētu.",
+    "serverMuted": "Serveris jūs ir apklusinājis, tāpēc nepārraida jūsu balsi.",
+    "nobodyHere": "Neviena no šīm personām pašlaik nav šajā serverī.",
+    "channelNotFound": "Šī kanāla šajā serverī nav.",
+    "noPermission": "Serveris neļauj jums čukstēt kanālā {{channel}}.",
+    "unknownTarget": "Šī mērķa vairs nav.",
+    "dismiss": "Aizvērt"
+  },
+  "badge": {
+    "whisper": "čukst",
+    "shout": "kliedz",
+    "whisperLabel": "Jums čukst",
+    "shoutLabel": "Kliedz jūsu kanālam",
+    "ownWhisper": "čukstat",
+    "ownShout": "kliedzat",
+    "ownWhisperLabel": "Jūs čukstat",
+    "ownShoutLabel": "Jūs kliedzat"
+  },
+  "panel": {
+    "open": "Čukstēt vai kliegt",
+    "menu": "Čukstu un kliedzienu mērķi",
+    "manage": "Pārvaldīt mērķus…",
+    "none": "Mērķu vēl nav",
+    "indicatorWhisper": "Čukstat: {{target}}",
+    "indicatorShout": "Kliedzat: {{target}}",
+    "stop": "Apturēt"
+  }
+}

@@ -1,0 +1,44 @@
+{
+  "menu": {
+    "whisper": "Šepni…",
+    "noPermission": "Strežnik tu ne dovoljuje šepetanja"
+  },
+  "banner": {
+    "whisper": "Šepetaš: {{target}}",
+    "shout": "Kričiš: {{target}}",
+    "releaseKey": "Slišijo te samo ljudje tam. Spusti <key>{{key}}</key>, da spet govoriš v kanalu {{channel}}.",
+    "stopToReturn": "Slišijo te samo ljudje tam. Ustavi, da spet govoriš v kanalu {{channel}}.",
+    "onlyThere": "Slišijo te samo ljudje tam.",
+    "stop": "Ustavi"
+  },
+  "denied": {
+    "title": "Šepetanje ni uspelo: {{target}}",
+    "noVoiceServer": "Najprej se pridruži kanalu: šepet gre prek strežnika, na katerem govoriš.",
+    "muted": "Vklopi mikrofon, da lahko šepetaš.",
+    "serverMuted": "Strežnik te je utišal, zato ne posreduje tvojega glasu.",
+    "nobodyHere": "Nikogar od teh trenutno ni na tem strežniku.",
+    "channelNotFound": "Tega kanala na tem strežniku ni.",
+    "noPermission": "Strežnik ti ne dovoli šepetati v kanalu {{channel}}.",
+    "unknownTarget": "Tega cilja ni več.",
+    "dismiss": "Opusti"
+  },
+  "badge": {
+    "whisper": "šepeta",
+    "shout": "kriči",
+    "whisperLabel": "Šepeta ti",
+    "shoutLabel": "Kriči na tvoj kanal",
+    "ownWhisper": "šepetaš",
+    "ownShout": "kričiš",
+    "ownWhisperLabel": "Šepetaš",
+    "ownShoutLabel": "Kričiš"
+  },
+  "panel": {
+    "open": "Šepetaj ali kriči",
+    "menu": "Cilji šepeta in krika",
+    "manage": "Upravljaj cilje…",
+    "none": "Še ni ciljev",
+    "indicatorWhisper": "Šepetaš: {{target}}",
+    "indicatorShout": "Kričiš: {{target}}",
+    "stop": "Ustavi"
+  }
+}

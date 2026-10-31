@@ -1,5 +1,5 @@
 /** Settings sections another feature may open directly. */
-export type SettingsJumpSection = "identity" | "sounds";
+export type SettingsJumpSection = "identity" | "sounds" | "voice";
 
 let opener: ((section: SettingsJumpSection) => void) | null = null;
 

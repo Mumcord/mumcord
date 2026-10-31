@@ -1,0 +1,44 @@
+{
+  "menu": {
+    "whisper": "Flüstern an …",
+    "noPermission": "Der Server erlaubt hier kein Flüstern"
+  },
+  "banner": {
+    "whisper": "Flüstert an {{target}}",
+    "shout": "Ruft in {{target}}",
+    "releaseKey": "Nur die Leute dort hören dich. Lass <key>{{key}}</key> los, um wieder in {{channel}} zu sprechen.",
+    "stopToReturn": "Nur die Leute dort hören dich. Beende es, um wieder in {{channel}} zu sprechen.",
+    "onlyThere": "Nur die Leute dort hören dich.",
+    "stop": "Beenden"
+  },
+  "denied": {
+    "title": "Flüstern an {{target}} nicht möglich",
+    "noVoiceServer": "Betritt zuerst einen Kanal: Flüstern läuft über den Server, auf dem du sprichst.",
+    "muted": "Schalte dein Mikrofon ein, um zu flüstern.",
+    "serverMuted": "Der Server hat dich stummgeschaltet und gibt deine Stimme nicht weiter.",
+    "nobodyHere": "Niemand von ihnen ist gerade auf diesem Server.",
+    "channelNotFound": "Diesen Kanal gibt es auf diesem Server nicht.",
+    "noPermission": "Der Server erlaubt dir nicht, in {{channel}} zu flüstern.",
+    "unknownTarget": "Dieses Ziel gibt es nicht mehr.",
+    "dismiss": "Schließen"
+  },
+  "badge": {
+    "whisper": "flüstert",
+    "shout": "ruft",
+    "whisperLabel": "Flüstert dir zu",
+    "shoutLabel": "Ruft in deinen Kanal",
+    "ownWhisper": "flüsterst",
+    "ownShout": "rufst",
+    "ownWhisperLabel": "Du flüsterst",
+    "ownShoutLabel": "Du rufst"
+  },
+  "panel": {
+    "open": "Flüstern oder rufen",
+    "menu": "Flüster- und Rufziele",
+    "manage": "Ziele verwalten …",
+    "none": "Noch keine Ziele",
+    "indicatorWhisper": "Flüstert an {{target}}",
+    "indicatorShout": "Ruft in {{target}}",
+    "stop": "Beenden"
+  }
+}
