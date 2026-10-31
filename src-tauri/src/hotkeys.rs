@@ -42,6 +42,8 @@ pub struct Binding {
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
 pub enum Group {
     Actions,
+    /// Hold-to-talk keys of whisper targets (#67), see [`crate::ptt::whisper`].
+    Whisper,
 }
 
 impl Group {
@@ -49,6 +51,7 @@ impl Group {
     fn prefix(self) -> &'static str {
         match self {
             Self::Actions => "hotkey",
+            Self::Whisper => "whisper",
         }
     }
 }
@@ -126,6 +129,22 @@ pub fn check(
             .map(|(i, _)| HotkeyConflict::Hotkey { index: index_of(i) })
     };
     Ok((key, conflict))
+}
+
+/// The whisper target (#67) whose hold-to-talk key is `key` (canonical), if any.
+pub fn whisper_conflict(key: &str, settings: &store::Settings) -> Option<HotkeyConflict> {
+    settings
+        .whisper_targets
+        .iter()
+        .find(|t| {
+            t.hotkey
+                .as_deref()
+                .is_some_and(|k| normalize_key(k).is_ok_and(|k| k == key))
+        })
+        .map(|t| HotkeyConflict::Whisper {
+            target_id: t.id.clone(),
+            name: t.name.clone(),
+        })
 }
 
 fn index_of(i: usize) -> u32 {
@@ -456,6 +475,29 @@ mod tests {
         );
         assert!(check("Mouse4", HotkeySlot::New, &[], None).is_err());
         assert_eq!(check("", HotkeySlot::New, &[], None), Err(KeyError::Empty));
+    }
+
+    #[test]
+    fn whisper_keys_conflict_with_hotkeys() {
+        let settings = store::Settings {
+            whisper_targets: vec![store::WhisperTarget {
+                id: "t1".into(),
+                name: "Raid leads".into(),
+                receivers: store::WhisperReceivers::People {
+                    names: vec!["Maya".into()],
+                },
+                hotkey: Some("control+KeyQ".into()),
+            }],
+            ..Default::default()
+        };
+        assert_eq!(
+            whisper_conflict("Ctrl+Q", &settings),
+            Some(HotkeyConflict::Whisper {
+                target_id: "t1".into(),
+                name: "Raid leads".into()
+            })
+        );
+        assert_eq!(whisper_conflict("Ctrl+R", &settings), None);
     }
 
     #[test]

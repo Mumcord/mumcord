@@ -1414,6 +1414,8 @@ export type HotkeyCheck = {
 export type HotkeyConflict = 
 /**  The hotkey at `index` in `hotkeys`. */
 { kind: "hotkey"; index: number } | { kind: "pushToTalk" } | 
+/**  The hold-to-talk key of a whisper target (#67), named by the user. */
+{ kind: "whisper"; targetId: string; name: string } | 
 /**  One of Mumcord's own shortcuts; cannot be cleared. */
 { kind: "inApp"; shortcut: InAppShortcut };
 
@@ -2892,8 +2894,8 @@ export type WhisperDeniedReason = "noVoiceServer" | "muted" | "serverMuted" | "n
 /**  Why whisper keys cannot work in this session. */
 export type WhisperKeysUnavailable = 
 /**
- *  Native Wayland: global keys go through the desktop portal, which whisper keys do not use
- *  yet (#64); the X11 compatibility mode offers them.
+ *  Native Wayland without the global-shortcuts portal; the X11 compatibility mode offers
+ *  the keys.
  */
 "waylandPortal";
 

@@ -242,7 +242,7 @@
       "keyRemove": "Neħħi ċ-ċavetta",
       "keyTaken": "Din iċ-ċavetta ma tistax tintuża: mhijiex ċavetta waħda b’modifikaturi mhux obbligatorji, jew diġà hija l-push-to-talk jew iċ-ċavetta ta’ mira oħra.",
       "keyFailed": "Din iċ-ċavetta qed iżommha app oħra, għalhekk ma taħdimx bħalissa.",
-      "keysWayland": "Iċ-ċwievet tal-bisbisa mhumiex disponibbli f’din is-sessjoni Wayland: il-portal tax-shortcuts globali tad-desktop iżomm biss iċ-ċavetta push-to-talk. Ixgħel il-modalità ta’ kompatibbiltà biex tużahom, jew ibda ibbisbes mill-pannell tal-utent.",
+      "keysWayland": "Iċ-ċwievet tal-bisbisa mhumiex disponibbli f’din is-sessjoni Wayland: id-desktop tiegħek ma joffrix shortcuts globali. Ixgħel il-modalità ta’ kompatibbiltà biex tużahom, jew ibda ibbisbes mill-pannell tal-utent.",
       "save": "Issejvja",
       "delete": "Ħassar il-mira",
       "savedStatus": "Issejvjat.",

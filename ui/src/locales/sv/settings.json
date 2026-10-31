@@ -236,7 +236,7 @@
       "keyRemove": "Ta bort tangent",
       "keyTaken": "Den här tangenten kan inte användas: den är inte en enskild tangent med valfria modifierare, eller så är den redan push-to-talk eller ett annat måls tangent.",
       "keyFailed": "Tangenten hålls av en annan app och fungerar därför inte just nu.",
-      "keysWayland": "Viskningstangenter är inte tillgängliga i den här Wayland-sessionen: skrivbordets portal för globala genvägar håller bara push-to-talk-tangenten. Slå på kompatibilitetsläget för att använda dem, eller börja viska från användarpanelen.",
+      "keysWayland": "Viskningstangenter är inte tillgängliga i den här Wayland-sessionen: ditt skrivbord erbjuder inga globala kortkommandon. Slå på kompatibilitetsläget för att använda dem, eller börja viska från användarpanelen.",
       "save": "Spara",
       "delete": "Ta bort mål",
       "savedStatus": "Sparat.",

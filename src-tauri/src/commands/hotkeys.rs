@@ -126,7 +126,7 @@ pub enum InAppShortcut {
 }
 
 /// What already uses a key.
-#[derive(Serialize, Deserialize, Clone, Copy, Debug, PartialEq, Eq, Type)]
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, Type)]
 #[serde(tag = "kind", rename_all = "camelCase")]
 pub enum HotkeyConflict {
     /// The hotkey at `index` in `hotkeys`.
@@ -134,6 +134,12 @@ pub enum HotkeyConflict {
         index: u32,
     },
     PushToTalk,
+    /// The hold-to-talk key of a whisper target (#67), named by the user.
+    #[serde(rename_all = "camelCase")]
+    Whisper {
+        target_id: String,
+        name: String,
+    },
     /// One of Mumcord's own shortcuts; cannot be cleared.
     InApp {
         shortcut: InAppShortcut,
@@ -188,6 +194,11 @@ pub fn hotkey_check(
     let settings = engine.settings()?;
     let (key, conflict) =
         crate::hotkeys::check(&key, slot, &settings.hotkeys, settings.ptt_key.as_deref())
+            .map(|(key, conflict)| {
+                let conflict =
+                    conflict.or_else(|| crate::hotkeys::whisper_conflict(&key, &settings));
+                (key, conflict)
+            })
             .map_err(|err| ApiError::new(ErrorCode::InvalidInput, err.to_string()))?;
     Ok(HotkeyCheck { key, conflict })
 }

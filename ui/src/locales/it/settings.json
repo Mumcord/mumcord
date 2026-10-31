@@ -238,7 +238,7 @@
       "keyRemove": "Rimuovi tasto",
       "keyTaken": "Questo tasto non può essere usato: non è un tasto singolo con modificatori facoltativi, oppure è già il push-to-talk o il tasto di un altro destinatario.",
       "keyFailed": "Questo tasto è occupato da un’altra app, quindi ora non funziona.",
-      "keysWayland": "I tasti di sussurro non sono disponibili in questa sessione Wayland: il portale delle scorciatoie globali del desktop gestisce solo il tasto push-to-talk. Attiva la modalità compatibilità per usarli, oppure inizia a sussurrare dal pannello utente.",
+      "keysWayland": "I tasti di sussurro non sono disponibili in questa sessione Wayland: il tuo desktop non offre scorciatoie globali. Attiva la modalità compatibilità per usarli, oppure inizia a sussurrare dal pannello utente.",
       "save": "Salva",
       "delete": "Elimina destinatario",
       "savedStatus": "Salvato.",

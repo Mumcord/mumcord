@@ -40,6 +40,14 @@ const AFTER_CHANNELS: readonly FixedKind[] = [
   "openMumcord",
 ];
 
+/** Takes the key from a whisper target (#67); the target itself stays. */
+async function clearWhisperKey(targetId: string): Promise<void> {
+  const { targets } = await getApi().whisperSetup();
+  await getApi().whisperTargetsSave(
+    targets.map((t) => (t.id === targetId ? { ...t, hotkey: null } : t)),
+  );
+}
+
 /** Settings → Hotkeys (issue #64, FR-3.72, FR-3.73): every action with its global key. */
 export function HotkeysSection({ settings, update }: SettingsSectionProps) {
   const { t } = useTranslation("settings");
@@ -89,6 +97,8 @@ export function HotkeysSection({ settings, update }: SettingsSectionProps) {
         const other = hotkeys[conflict.index];
         return other === undefined ? null : actionName(other.action);
       }
+      case "whisper":
+        return conflict.name;
       case "inApp":
         return null;
     }
@@ -121,23 +131,30 @@ export function HotkeysSection({ settings, update }: SettingsSectionProps) {
     };
   };
 
-  /** Without the key's other owner: that hotkey goes, push-to-talk loses its key. */
-  const freed = (conflict: HotkeyConflict | null) => ({
-    hotkeys: conflict?.kind === "hotkey" ? hotkeys.filter((_, i) => i !== conflict.index) : hotkeys,
-    clearPtt: conflict?.kind === "pushToTalk",
-  });
-
-  const assignAction = (action: HotkeyAction) => (key: string, conflict: HotkeyConflict | null) => {
-    const rest = freed(conflict);
-    const at = rest.hotkeys.findIndex((h) => sameAction(h.action, action));
-    const next: Hotkey[] =
-      at >= 0
-        ? rest.hotkeys.map((h, i) => (i === at ? { key, action } : h))
-        : [...rest.hotkeys, { key, action }];
-    update(rest.clearPtt ? { hotkeys: next, pttKey: null } : { hotkeys: next });
-    setAdding(null);
-    return Promise.resolve();
+  /**
+   * Without the key's other owner: that hotkey goes, push-to-talk loses its key, a whisper target
+   * keeps working from the user panel without one.
+   */
+  const freed = async (conflict: HotkeyConflict | null) => {
+    if (conflict?.kind === "whisper") await clearWhisperKey(conflict.targetId);
+    return {
+      hotkeys:
+        conflict?.kind === "hotkey" ? hotkeys.filter((_, i) => i !== conflict.index) : hotkeys,
+      clearPtt: conflict?.kind === "pushToTalk",
+    };
   };
+
+  const assignAction =
+    (action: HotkeyAction) => async (key: string, conflict: HotkeyConflict | null) => {
+      const rest = await freed(conflict);
+      const at = rest.hotkeys.findIndex((h) => sameAction(h.action, action));
+      const next: Hotkey[] =
+        at >= 0
+          ? rest.hotkeys.map((h, i) => (i === at ? { key, action } : h))
+          : [...rest.hotkeys, { key, action }];
+      update(rest.clearPtt ? { hotkeys: next, pttKey: null } : { hotkeys: next });
+      setAdding(null);
+    };
 
   const assignPtt = async (key: string, conflict: HotkeyConflict | null) => {
     let pttKey;
@@ -151,7 +168,7 @@ export function HotkeysSection({ settings, update }: SettingsSectionProps) {
         code === "shortcutNotConfirmed" ? t("voice.keyNotConfirmed") : t("voice.keyRejected"),
       );
     }
-    update({ pttKey, hotkeys: freed(conflict).hotkeys });
+    update({ pttKey, hotkeys: (await freed(conflict)).hotkeys });
   };
 
   const assignPending = (

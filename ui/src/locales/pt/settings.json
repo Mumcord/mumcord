@@ -238,7 +238,7 @@
       "keyRemove": "Remover tecla",
       "keyTaken": "Esta tecla não pode ser usada: não é uma única tecla com modificadores opcionais, ou já é o push-to-talk ou a tecla de outro destino.",
       "keyFailed": "Esta tecla está a ser usada por outra aplicação, por isso não funciona neste momento.",
-      "keysWayland": "As teclas de sussurro não estão disponíveis nesta sessão Wayland: o portal de atalhos globais do ambiente de trabalho só guarda a tecla push-to-talk. Ativa o modo de compatibilidade para as usares, ou começa a sussurrar a partir do painel do utilizador.",
+      "keysWayland": "As teclas de sussurro não estão disponíveis nesta sessão Wayland: o teu ambiente de trabalho não oferece atalhos globais. Ativa o modo de compatibilidade para as usares, ou começa a sussurrar a partir do painel do utilizador.",
       "save": "Guardar",
       "delete": "Eliminar destino",
       "savedStatus": "Guardado.",

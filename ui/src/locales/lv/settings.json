@@ -238,7 +238,7 @@
       "keyRemove": "Noņemt taustiņu",
       "keyTaken": "Šo taustiņu nevar izmantot: tas nav viens taustiņš ar neobligātiem modifikatoriem vai arī tas jau ir push-to-talk vai cita mērķa taustiņš.",
       "keyFailed": "Šo taustiņu tur cita lietotne, tāpēc tas pašlaik nedarbojas.",
-      "keysWayland": "Čukstu taustiņi šajā Wayland sesijā nav pieejami: darbvirsmas globālo īsinājumtaustiņu portāls tur tikai push-to-talk taustiņu. Ieslēdziet saderības režīmu, lai tos izmantotu, vai sāciet čukstēt no lietotāja paneļa.",
+      "keysWayland": "Čukstu taustiņi šajā Wayland sesijā nav pieejami: tava darbvirsma nepiedāvā globālos īsceļus. Ieslēdziet saderības režīmu, lai tos izmantotu, vai sāciet čukstēt no lietotāja paneļa.",
       "save": "Saglabāt",
       "delete": "Dzēst mērķi",
       "savedStatus": "Saglabāts.",

@@ -240,7 +240,7 @@
       "keyRemove": "Odebrat klávesu",
       "keyTaken": "Tuto klávesu nelze použít: není to jedna klávesa s volitelnými modifikátory, nebo už je to push-to-talk či klávesa jiného cíle.",
       "keyFailed": "Tuto klávesu drží jiná aplikace, takže teď nefunguje.",
-      "keysWayland": "Klávesy pro šeptání nejsou v této relaci Wayland dostupné: portál globálních zkratek pracovní plochy drží jen klávesu push-to-talk. Zapni režim kompatibility, nebo začni šeptat z panelu uživatele.",
+      "keysWayland": "Klávesy pro šeptání nejsou v této relaci Wayland dostupné: tvůj desktop nenabízí globální zkratky. Zapni režim kompatibility, nebo začni šeptat z panelu uživatele.",
       "save": "Uložit",
       "delete": "Smazat cíl",
       "savedStatus": "Uloženo.",

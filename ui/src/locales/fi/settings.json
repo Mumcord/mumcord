@@ -236,7 +236,7 @@
       "keyRemove": "Poista näppäin",
       "keyTaken": "Tätä näppäintä ei voi käyttää: se ei ole yksittäinen näppäin valinnaisilla muuntonäppäimillä tai se on jo push-to-talk tai toisen kohteen näppäin.",
       "keyFailed": "Toinen sovellus pitää tätä näppäintä, joten se ei toimi nyt.",
-      "keysWayland": "Kuiskausnäppäimet eivät ole käytettävissä tässä Wayland-istunnossa: työpöydän yleisten pikanäppäinten portaali pitää hallussaan vain push-to-talk-näppäintä. Ota käyttöön yhteensopivuustila käyttääksesi niitä tai aloita kuiskaus käyttäjäpaneelista.",
+      "keysWayland": "Kuiskausnäppäimet eivät ole käytettävissä tässä Wayland-istunnossa: työpöytäsi ei tarjoa yleisiä pikanäppäimiä. Ota käyttöön yhteensopivuustila käyttääksesi niitä tai aloita kuiskaus käyttäjäpaneelista.",
       "save": "Tallenna",
       "delete": "Poista kohde",
       "savedStatus": "Tallennettu.",

@@ -240,7 +240,7 @@
       "keyRemove": "Usuń klawisz",
       "keyTaken": "Tego klawisza nie można użyć: to nie jest pojedynczy klawisz z opcjonalnymi modyfikatorami albo jest już klawiszem push-to-talk lub innego celu.",
       "keyFailed": "Ten klawisz jest zajęty przez inną aplikację, więc teraz nie działa.",
-      "keysWayland": "Klawisze szeptu nie są dostępne w tej sesji Wayland: portal globalnych skrótów pulpitu obsługuje tylko klawisz push-to-talk. Włącz tryb zgodności, aby ich używać, albo zacznij szeptać z panelu użytkownika.",
+      "keysWayland": "Klawisze szeptu nie są dostępne w tej sesji Wayland: Twój pulpit nie obsługuje skrótów globalnych. Włącz tryb zgodności, aby ich używać, albo zacznij szeptać z panelu użytkownika.",
       "save": "Zapisz",
       "delete": "Usuń cel",
       "savedStatus": "Zapisano.",

@@ -240,7 +240,7 @@
       "keyRemove": "Odstrani tipko",
       "keyTaken": "Te tipke ni mogoče uporabiti: ni ena sama tipka z neobveznimi spremenilkami ali pa je že push-to-talk oziroma tipka drugega cilja.",
       "keyFailed": "To tipko drži druga aplikacija, zato trenutno ne deluje.",
-      "keysWayland": "Tipke za šepet v tej seji Wayland niso na voljo: portal globalnih bližnjic namizja drži samo tipko push-to-talk. Vklopi način združljivosti, da jih uporabljaš, ali začni šepetati iz uporabniške plošče.",
+      "keysWayland": "Tipke za šepet v tej seji Wayland niso na voljo: tvoje namizje ne ponuja globalnih bližnjic. Vklopi način združljivosti, da jih uporabljaš, ali začni šepetati iz uporabniške plošče.",
       "save": "Shrani",
       "delete": "Izbriši cilj",
       "savedStatus": "Shranjeno.",

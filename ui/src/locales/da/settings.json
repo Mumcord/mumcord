@@ -236,7 +236,7 @@
       "keyRemove": "Fjern tast",
       "keyTaken": "Denne tast kan ikke bruges: det er ikke en enkelt tast med valgfrie modifikatorer, eller den bruges allerede til push-to-talk eller et andet mål.",
       "keyFailed": "Tasten holdes af en anden app og virker derfor ikke lige nu.",
-      "keysWayland": "Hviskentaster er ikke tilgængelige i denne Wayland-session: skrivebordets portal til globale genveje holder kun push-to-talk-tasten. Slå kompatibilitetstilstand til for at bruge dem, eller begynd at hviske fra brugerpanelet.",
+      "keysWayland": "Hviskentaster er ikke tilgængelige i denne Wayland-session: dit skrivebord tilbyder ikke globale genveje. Slå kompatibilitetstilstand til for at bruge dem, eller begynd at hviske fra brugerpanelet.",
       "save": "Gem",
       "delete": "Slet mål",
       "savedStatus": "Gemt.",

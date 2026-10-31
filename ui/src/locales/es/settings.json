@@ -238,7 +238,7 @@
       "keyRemove": "Quitar tecla",
       "keyTaken": "No se puede usar esta tecla: no es una sola tecla con modificadores opcionales, o ya es la de pulsar para hablar o la de otro destino.",
       "keyFailed": "Esta tecla la tiene otra aplicación, así que ahora no funciona.",
-      "keysWayland": "Las teclas de susurro no están disponibles en esta sesión de Wayland: el portal de atajos globales del escritorio solo mantiene la tecla de pulsar para hablar. Activa el modo de compatibilidad para usarlas o empieza a susurrar desde el panel de usuario.",
+      "keysWayland": "Las teclas de susurro no están disponibles en esta sesión de Wayland: tu escritorio no ofrece atajos globales. Activa el modo de compatibilidad para usarlas o empieza a susurrar desde el panel de usuario.",
       "save": "Guardar",
       "delete": "Eliminar destino",
       "savedStatus": "Guardado.",

@@ -236,7 +236,7 @@
       "keyRemove": "Toets verwijderen",
       "keyTaken": "Deze toets kan niet worden gebruikt: het is geen enkele toets met optionele modifiers, of het is al push-to-talk of de toets van een ander doel.",
       "keyFailed": "Deze toets wordt door een andere app vastgehouden en werkt nu niet.",
-      "keysWayland": "Fluistertoetsen zijn niet beschikbaar in deze Wayland-sessie: de portal voor globale sneltoetsen van het bureaublad houdt alleen de push-to-talk-toets vast. Zet de compatibiliteitsmodus aan om ze te gebruiken, of begin met fluisteren vanuit het gebruikerspaneel.",
+      "keysWayland": "Fluistertoetsen zijn niet beschikbaar in deze Wayland-sessie: je desktop biedt geen globale sneltoetsen. Zet de compatibiliteitsmodus aan om ze te gebruiken, of begin met fluisteren vanuit het gebruikerspaneel.",
       "save": "Opslaan",
       "delete": "Doel verwijderen",
       "savedStatus": "Opgeslagen.",

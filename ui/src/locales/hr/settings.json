@@ -238,7 +238,7 @@
       "keyRemove": "Ukloni tipku",
       "keyTaken": "Ova se tipka ne može koristiti: nije jedna tipka s neobveznim modifikatorima ili je već push-to-talk ili tipka drugog cilja.",
       "keyFailed": "Ovu tipku drži druga aplikacija pa trenutačno ne radi.",
-      "keysWayland": "Tipke za šaptanje nisu dostupne u ovoj Wayland sesiji: portal globalnih prečaca radne površine drži samo push-to-talk tipku. Uključi način kompatibilnosti da ih koristiš ili počni šaptati s korisničke ploče.",
+      "keysWayland": "Tipke za šaptanje nisu dostupne u ovoj Wayland sesiji: tvoj desktop ne nudi globalne prečace. Uključi način kompatibilnosti da ih koristiš ili počni šaptati s korisničke ploče.",
       "save": "Spremi",
       "delete": "Izbriši cilj",
       "savedStatus": "Spremljeno.",

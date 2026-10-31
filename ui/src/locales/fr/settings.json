@@ -238,7 +238,7 @@
       "keyRemove": "Retirer la touche",
       "keyTaken": "Cette touche est inutilisable : ce n’est pas une touche unique avec modificateurs facultatifs, ou c’est déjà le push-to-talk ou la touche d’une autre cible.",
       "keyFailed": "Cette touche est utilisée par une autre application, elle ne fonctionne donc pas pour l’instant.",
-      "keysWayland": "Les touches de chuchotement ne sont pas disponibles dans cette session Wayland : le portail de raccourcis globaux du bureau ne gère que la touche push-to-talk. Activez le mode de compatibilité pour les utiliser, ou commencez à chuchoter depuis le panneau de l’utilisateur.",
+      "keysWayland": "Les touches de chuchotement ne sont pas disponibles dans cette session Wayland : votre bureau ne propose pas de raccourcis globaux. Activez le mode de compatibilité pour les utiliser, ou commencez à chuchoter depuis le panneau de l’utilisateur.",
       "save": "Enregistrer",
       "delete": "Supprimer la cible",
       "savedStatus": "Enregistré.",

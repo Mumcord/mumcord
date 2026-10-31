@@ -236,7 +236,7 @@
       "keyRemove": "Eemalda klahv",
       "keyTaken": "Seda klahvi ei saa kasutada: see pole üksik klahv valikuliste muutjatega või on juba push-to-talk või teise sihtmärgi klahv.",
       "keyFailed": "Seda klahvi hoiab teine rakendus, seega ei tööta see praegu.",
-      "keysWayland": "Sosinaklahvid pole selles Wayland'i seansis saadaval: töölaua globaalsete otseteede portaal hoiab ainult push-to-talk klahvi. Nende kasutamiseks lülita sisse ühilduvusrežiim või alusta sosistamist kasutajapaneelilt.",
+      "keysWayland": "Sosinaklahvid pole selles Wayland'i seansis saadaval: sinu töölaud ei paku globaalseid kiirklahve. Nende kasutamiseks lülita sisse ühilduvusrežiim või alusta sosistamist kasutajapaneelilt.",
       "save": "Salvesta",
       "delete": "Kustuta sihtmärk",
       "savedStatus": "Salvestatud.",

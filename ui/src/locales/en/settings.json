@@ -236,7 +236,7 @@
       "keyRemove": "Remove key",
       "keyTaken": "This key cannot be used: it is not a single key with optional modifiers, or it is already push-to-talk or another target's key.",
       "keyFailed": "This key is held by another app, so it does not work right now.",
-      "keysWayland": "Whisper keys are not available in this Wayland session: the desktop's global shortcut portal only holds the push-to-talk key. Turn on the compatibility mode to use them, or start whispering from the user panel.",
+      "keysWayland": "Whisper keys are not available in this Wayland session: your desktop does not offer global shortcuts. Turn on the compatibility mode to use them, or start whispering from the user panel.",
       "save": "Save",
       "delete": "Delete target",
       "savedStatus": "Saved.",

@@ -242,7 +242,7 @@
       "keyRemove": "Bain an eochair",
       "keyTaken": "Ní féidir an eochair seo a úsáid: ní eochair aonair í le módhnóirí roghnacha, nó is eochair push-to-talk nó sprioc eile í cheana.",
       "keyFailed": "Tá an eochair seo á coinneáil ag aip eile, mar sin ní oibríonn sí faoi láthair.",
-      "keysWayland": "Níl eochracha cogarnaigh ar fáil sa seisiún Wayland seo: ní choinníonn tairseach aicearraí domhanda an deisce ach an eochair push-to-talk. Cuir an mód comhoiriúnachta ar siúl chun iad a úsáid, nó tosaigh ag cogarnach ón bpainéal úsáideora.",
+      "keysWayland": "Níl eochracha cogarnaigh ar fáil sa seisiún Wayland seo: ní thairgeann do dheasc aicearraí domhanda. Cuir an mód comhoiriúnachta ar siúl chun iad a úsáid, nó tosaigh ag cogarnach ón bpainéal úsáideora.",
       "save": "Sábháil",
       "delete": "Scrios an sprioc",
       "savedStatus": "Sábháilte.",

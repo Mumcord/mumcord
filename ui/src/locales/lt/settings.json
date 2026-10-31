@@ -240,7 +240,7 @@
       "keyRemove": "Pašalinti klavišą",
       "keyTaken": "Šio klavišo naudoti negalima: tai ne vienas klavišas su nebūtinais modifikatoriais arba jis jau yra push-to-talk ar kito tikslo klavišas.",
       "keyFailed": "Šį klavišą laiko kita programa, todėl dabar jis neveikia.",
-      "keysWayland": "Šnabždesio klavišai šioje Wayland sesijoje nepasiekiami: darbalaukio visuotinių spartųjų klavišų portalas laiko tik push-to-talk klavišą. Įjunk suderinamumo režimą, kad juos naudotum, arba pradėk šnibždėti iš naudotojo skydelio.",
+      "keysWayland": "Šnabždesio klavišai šioje Wayland sesijoje nepasiekiami: tavo darbalaukis nesiūlo visuotinių sparčiųjų klavišų. Įjunk suderinamumo režimą, kad juos naudotum, arba pradėk šnibždėti iš naudotojo skydelio.",
       "save": "Išsaugoti",
       "delete": "Ištrinti tikslą",
       "savedStatus": "Išsaugota.",

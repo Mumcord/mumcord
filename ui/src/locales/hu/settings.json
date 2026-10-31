@@ -236,7 +236,7 @@
       "keyRemove": "Billentyű eltávolítása",
       "keyTaken": "Ez a billentyű nem használható: nem egyetlen billentyű opcionális módosítókkal, vagy már a push-to-talk vagy egy másik cél billentyűje.",
       "keyFailed": "Ezt a billentyűt egy másik alkalmazás tartja lefoglalva, ezért most nem működik.",
-      "keysWayland": "A súgóbillentyűk ebben a Wayland-munkamenetben nem érhetők el: az asztal globális billentyűparancs-portálja csak a push-to-talk billentyűt tartja. Kapcsold be a kompatibilitási módot a használatukhoz, vagy kezdj súgni a felhasználói panelről.",
+      "keysWayland": "A súgóbillentyűk ebben a Wayland-munkamenetben nem érhetők el: az asztali környezeted nem kínál globális gyorsbillentyűket. Kapcsold be a kompatibilitási módot a használatukhoz, vagy kezdj súgni a felhasználói panelről.",
       "save": "Mentés",
       "delete": "Cél törlése",
       "savedStatus": "Mentve.",
