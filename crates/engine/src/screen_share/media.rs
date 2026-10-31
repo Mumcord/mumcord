@@ -19,11 +19,12 @@ use mumcord_audio::codec::MAX_PACKET_BYTES;
 use mumcord_audio::mixer::share::share_encoder;
 use mumcord_audio::{FRAME_SAMPLES, SAMPLE_RATE};
 use mumcord_p2p::quinn::{RecvStream, SendStream};
-use mumcord_screenshare::{EncodedFrame, Encoder, EncoderConfig};
+use mumcord_screenshare::{EncodedFrame, Encoder, EncoderConfig, I420Frame};
 use tokio::task::JoinHandle;
 
 use super::capture::{CaptureSource, SoundSource};
 use super::fanout::{RateLimit, ViewerQueue};
+use super::thumbnail::ShareThumbnail;
 use super::wire::{self, Frame, FrameHeader, FrameKind};
 use crate::session::lock;
 
@@ -243,6 +244,8 @@ struct Hub {
     /// One upload limit for all viewers together (test hook).
     limit: Mutex<Option<RateLimit>>,
     stats: Mutex<ScreenMediaStats>,
+    /// The last keyframe the encoder took, for the picture in the sharer's bar (issue #163).
+    thumbnail: Mutex<Option<I420Frame>>,
 }
 
 impl Hub {
@@ -281,6 +284,7 @@ impl Media {
             viewers: Mutex::new(BTreeMap::new()),
             limit: Mutex::new(None),
             stats: Mutex::new(ScreenMediaStats::default()),
+            thumbnail: Mutex::new(None),
         });
         let thread_hub = hub.clone();
         let spawned = thread::Builder::new()
@@ -345,6 +349,11 @@ impl Media {
             session,
             tasks: [writer, requests],
         }
+    }
+
+    /// The last keyframe as the small picture the sharer's bar shows (issue #163).
+    pub fn thumbnail(&self) -> Option<ShareThumbnail> {
+        lock(&self.hub.thumbnail).as_ref().and_then(super::thumbnail::thumbnail)
     }
 
     pub fn stats(&self) -> ScreenMediaStats {
@@ -548,6 +557,9 @@ fn encode_loop(hub: &Hub, mut capture: Box<dyn CaptureSource>) {
                 keyframes.sent(now);
                 hub.keyframe_requested.store(false, Ordering::Relaxed);
                 lock(&hub.stats).keyframes += 1;
+                // The bar shows the last keyframe, so the picture is only the size the encoder was
+                // given; the sharer's own client does not decode anything for it.
+                lock(&hub.thumbnail).replace(picture.clone());
             }
             fan_out(hub, to_frame(out, size), now);
         }

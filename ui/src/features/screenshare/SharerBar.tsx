@@ -1,14 +1,15 @@
 /**
  * The sharer's control bar (issue #163, FR-3.127): a compact row at the top of the chat while the
- * user shares — LIVE, how long it runs, what is shared and the quality it sends, with Pause, Sound,
- * Change window, Viewers (each viewer's frame rate and path, and the hint when quality is lowered for
- * one of them) and Stop. It replaces the red bar in the sidebar and the controls in the user panel.
+ * user shares — the live picture of what is shared, LIVE, how long it runs, what is shared and the
+ * quality it sends, with Pause, Sound, Change window, Viewers (each viewer's frame rate and path, and
+ * the hint when quality is lowered for one of them) and Stop. It replaces the red bar in the sidebar
+ * and the controls in the user panel.
  */
 import { useEffect, useState, type ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 import { announce } from "../../a11y";
 import { SharePanel } from "./SharePanel";
-import { getApi, type ShareQuality, type User } from "../../api";
+import { getApi, type ShareQuality, type ShareThumbnail, type User } from "../../api";
 import { useServerStateOf } from "../channels";
 import { Avatar } from "../members/Avatar";
 import { useAvatars } from "../members/useAvatars";
@@ -34,6 +35,7 @@ export function SharerBar(): ReactNode {
   const people: User[] = [...users.values()];
   const avatarOf = useAvatars(people, serverId ?? undefined);
   const [quality, setQuality] = useState<ShareQuality | null>(null);
+  const [thumb, setThumb] = useState<ShareThumbnail | null>(null);
   const [open, setOpen] = useState(false);
   useTick(POLL_MS);
 
@@ -49,6 +51,14 @@ export function SharerBar(): ReactNode {
         })
         .catch((error: unknown) => {
           console.warn("screen share quality failed", error);
+        });
+      api
+        .screenShareThumbnail(serverId)
+        .then((picture) => {
+          if (current) setThumb(picture);
+        })
+        .catch((error: unknown) => {
+          console.warn("screen share thumbnail failed", error);
         });
     };
     read();
@@ -92,6 +102,16 @@ export function SharerBar(): ReactNode {
 
   return (
     <div className="sharer-bar" role="status" aria-label={t("controls")}>
+      {thumb !== null && (
+        <span className="sharer-bar__thumb">
+          <img
+            src={thumb.dataUrl}
+            alt={t("sharingBar")}
+            width={thumb.width}
+            height={thumb.height}
+          />
+        </span>
+      )}
       <span className="live-badge">{t("live")}</span>
       <span className="sharer-bar__time">
         {t("elapsed", { minutes: String(Math.max(1, Math.round(own.elapsedMs / 60000))) })}

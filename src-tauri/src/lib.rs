@@ -272,6 +272,7 @@ fn specta_builder() -> Builder<tauri::Wry> {
             commands::screen_share::screen_share_list,
             commands::screen_share::screen_share_block,
             commands::screen_share::screen_share_quality,
+            commands::screen_share::screen_share_thumbnail,
             commands::screen_share::screen_share_watch_stats,
             commands::updates::update_status,
             commands::updates::update_check_now,

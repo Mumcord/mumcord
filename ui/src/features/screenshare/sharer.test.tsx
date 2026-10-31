@@ -84,6 +84,15 @@ describe("sharer control bar", () => {
     });
   });
 
+  it("shows the live picture of what the user shares", async () => {
+    render(<SharerBar />);
+    await api.screenShareStart(1, false);
+    await vi.waitFor(() => {
+      const picture = screen.getByRole("img", { name: "You are sharing your screen" });
+      expect(picture).toHaveAttribute("src", expect.stringMatching(/^data:image\/webp;base64,/));
+    });
+  });
+
   it("pause reaches the engine and shows the share as paused", async () => {
     render(<SharerBar />);
     await api.screenShareStart(1, false);

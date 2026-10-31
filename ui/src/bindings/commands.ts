@@ -673,6 +673,7 @@ export const commands = {
 	screenShareList: (serverId: number) => typedError<ScreenShare[], ApiError>(__TAURI_INVOKE("screen_share_list", { serverId })),
 	/**  How the own share is sent right now, for the sharer's bar and the viewers popover (issue #163). */
 	screenShareQuality: (serverId: number) => typedError<ShareQuality | null, ApiError>(__TAURI_INVOKE("screen_share_quality", { serverId })),
+	screenShareThumbnail: (serverId: number) => typedError<ShareThumbnail | null, ApiError>(__TAURI_INVOKE("screen_share_thumbnail", { serverId })),
 	/**
 	 *  What the user's own watch of `session`'s share looks like (issue #163); the picture figures are
 	 *  counted in the UI from the frames. `None` while not watching.
@@ -2698,6 +2699,13 @@ export type ShareKind = "window" | "screen";
 export type SharePath = "direct";
 
 /**  How the own share is sent right now, for the sharer's bar and the viewers popover (issue #163). */
+export type ShareThumbnail = {
+	width: number,
+	height: number,
+	/**  The last keyframe, scaled down, as a `data:` URL the UI shows as it is. */
+	dataUrl: string,
+};
+
 export type ShareQuality = {
 	width: number,
 	height: number,

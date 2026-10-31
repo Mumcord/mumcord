@@ -3122,6 +3122,11 @@ export function createMockApi(options: MockOptions = {}): MockApi {
     // No loopback server in the browser: the page URLs only let the player frames mount.
     watchPartyReport: () => Promise.resolve(null),
     screenShareQuality: () => Promise.resolve(null),
+    // The mock has no capture, so the bar shows its own placeholder picture.
+    screenShareThumbnail: (serverId) => {
+      if (!ownShares.has(serverId)) return Promise.resolve(null);
+      return Promise.resolve({ width: 320, height: 180, dataUrl: DEMO_PHOTO });
+    },
     screenShareWatchStats: () => Promise.resolve(null),
     watchPartyPlayerUrl: () =>
       Promise.resolve("http://localhost:43215/0123456789abcdef0123456789abcdef/player.html"),

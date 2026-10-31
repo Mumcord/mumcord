@@ -63,6 +63,16 @@ pub enum ShareKind {
     Screen,
 }
 
+/// The live picture of the own share for the sharer's bar (issue #163, FR-3.127).
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, Type)]
+#[serde(rename_all = "camelCase")]
+pub struct ShareThumbnail {
+    pub width: u32,
+    pub height: u32,
+    /// The last keyframe, scaled down, as a `data:` URL the UI shows as it is.
+    pub data_url: String,
+}
+
 /// How the own share is sent right now, for the sharer's bar and the viewers popover (issue #163).
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, Type)]
 #[serde(rename_all = "camelCase")]
@@ -318,6 +328,22 @@ pub fn screen_share_block(
         }))
 }
 
+/// The picture the sharer's bar shows: the last keyframe the encoder took (issue #163).
+#[tauri::command]
+#[specta::specta]
+pub fn screen_share_thumbnail(
+    engine: State<'_, Engine>,
+    server_id: ServerId,
+) -> ApiResult<Option<ShareThumbnail>> {
+    Ok(engine
+        .screen_share_thumbnail(to_engine_server_id(server_id))
+        .map(|t| ShareThumbnail {
+            width: t.width,
+            height: t.height,
+            data_url: t.data_url,
+        }))
+}
+
 /// How the own share is sent right now, for the sharer's bar and the viewers popover (issue #163).
 #[tauri::command]
 #[specta::specta]
@@ -358,6 +384,5 @@ pub fn screen_share_watch_stats(
         .map(|stats| WatchStats {
             path: SharePath::Direct,
             rms: stats.rms,
->>>>>>> 4a64bb1d (feat(api): the sync figures and the share figures reach the UI)
         }))
 }

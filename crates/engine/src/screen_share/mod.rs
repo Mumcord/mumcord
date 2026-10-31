@@ -31,6 +31,7 @@ pub mod sound_macos;
 #[cfg(windows)]
 mod sound_windows;
 mod start;
+mod thumbnail;
 mod state;
 mod watch;
 mod windows_rules;
@@ -61,6 +62,7 @@ pub use mumcord_audio::mixer::share::ShareSoundStats;
 pub use mumcord_screenshare::I420Frame;
 pub use signal::ShareKind;
 pub use start::StartOutcome;
+pub use thumbnail::ShareThumbnail;
 pub use watch::ScreenFrameSink;
 
 /// How long a watch request waits for the sharer's answer.
@@ -948,6 +950,16 @@ impl Engine {
             .and_then(|s| s.own.as_ref())
             .and_then(|own| own.media.as_ref())
             .map(media::Media::stats)
+    }
+
+    /// The picture the sharer's control bar shows for the own share (issue #163, FR-3.127).
+    pub fn screen_share_thumbnail(&self, server_id: ServerId) -> Option<ShareThumbnail> {
+        lock(self.screen_share_state())
+            .servers
+            .get(&server_id)
+            .and_then(|s| s.own.as_ref())
+            .and_then(|own| own.media.as_ref())
+            .and_then(media::Media::thumbnail)
     }
 
     /// Throttles the own share's upload in-process, to `viewer` or (with `None`) to all viewers
