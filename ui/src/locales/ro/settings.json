@@ -673,5 +673,35 @@
     "releasePage": "Pagina versiunii",
     "entries": "Intrări: {{count}}",
     "englishNote": "Lista de modificări este scrisă în engleză."
+  },
+  "privateMessages": {
+    "title": "Mesaje private",
+    "legend": "Mesaje private de la",
+    "everyone": "Oricine",
+    "everyoneHint": "Oricine de pe un server îți poate scrie.",
+    "friendsOnly": "Doar prieteni",
+    "friendsOnlyHint": "Alți utilizatori Mumcord îți pot trimite în schimb o cerere de chat. Mesajele de la clienții standard ajung la „Cereri de mesaje”.",
+    "nobody": "Nimeni",
+    "nobodyHint": "Nu se afișează mesaje private și nici cereri de chat. Expeditorii nu sunt înștiințați.",
+    "keepRequests": "Păstrează mesajele de la clienții standard ca cereri de mesaje",
+    "keepRequestsHint": "Se folosește doar cu „Doar prieteni”. Când este dezactivată, aceste mesaje sunt ignorate.",
+    "overrideTitle": "Excepție pe server",
+    "overrideLabel": "Mesaje private de la pe {{server}}",
+    "useDefault": "Folosește valoarea implicită ({{rule}})",
+    "noServers": "Încă nu există servere salvate.",
+    "alwaysTitle": "Mereu permise",
+    "currentChannel": "Persoanele din canalul meu curent",
+    "currentChannelHint": "Are prioritate față de „Doar prieteni” și „Nimeni” cât timp suntem în același canal.",
+    "accepted": "Conversații pe care le-am acceptat deja",
+    "acceptedHint": "Persoanele a căror cerere de chat ai acceptat-o pot continua să-ți scrie."
+  },
+  "acceptedConversations": {
+    "title": "Conversații acceptate",
+    "empty": "Încă nu există conversații acceptate.",
+    "acceptedAt": "Acceptată la {{date}}",
+    "identity": "Identitate: {{label}}",
+    "revoke": "Revocă",
+    "revokeLabel": "Revocă conversația acceptată cu {{name}}",
+    "revokeFailed": "Revocarea a eșuat. Încearcă din nou."
   }
 }

@@ -93,7 +93,11 @@
     "offerImages": "Paku täissuuruses pilte",
     "offerImagesHint": "Luba teistel laadida sinu originaalpilte",
     "loadImages": "Laadi täissuuruses pildid",
-    "loadImagesHint": "Too teistelt originaalpildid"
+    "loadImagesHint": "Too teistelt originaalpildid",
+    "privateMessages": "Privaatsõnumid kasutajatelt",
+    "pm_everyone": "Kõigilt",
+    "pm_friendsOnly": "Sõbrad",
+    "pm_nobody": "Mitte keegi"
   },
   "voice": {
     "line": "Hääl: {{channel}} · {{server}}",

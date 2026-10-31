@@ -37,7 +37,7 @@ use tauri_specta::{Builder, Event, collect_commands, collect_events};
 
 use commands::{
     app, audio, channels, chat, diagnostics, dropped, follow, friends, history, identity, links,
-    notifications as notify, people, profile, servers, session, settings,
+    notifications as notify, people, pm_rules, profile, servers, session, settings,
 };
 
 /// Path of the generated TypeScript bindings, relative to this crate.
@@ -100,6 +100,12 @@ fn specta_builder() -> Builder<tauri::Wry> {
             friends::friends_list,
             friends::friend_add,
             friends::friend_remove,
+            pm_rules::pm_requests,
+            pm_rules::pm_request_accept,
+            pm_rules::pm_request_decline,
+            pm_rules::chat_request_send,
+            pm_rules::accepted_conversations,
+            pm_rules::accepted_conversation_revoke,
             chat::send_channel_message,
             chat::send_private_message,
             chat::save_image,
@@ -239,6 +245,8 @@ fn specta_builder() -> Builder<tauri::Wry> {
             people::UserRemoved,
             people::TalkStateChanged,
             friends::FriendsChanged,
+            pm_rules::PmRequestsChanged,
+            pm_rules::AcceptedConversationsChanged,
             chat::MessageReceived,
             history::HistorySynced,
             history::HistorySyncStatus,
@@ -665,6 +673,15 @@ fn emit_engine_event(
         .emit(app),
         EngineEvent::FriendsChanged(list) => friends::FriendsChanged {
             friends: friends::to_api_friends(list),
+        }
+        .emit(app),
+        EngineEvent::PmRequestsChanged(requests) => pm_rules::PmRequestsChanged {
+            server_id,
+            requests: requests.into(),
+        }
+        .emit(app),
+        EngineEvent::AcceptedConversationsChanged(list) => pm_rules::AcceptedConversationsChanged {
+            conversations: pm_rules::to_api_accepted(list),
         }
         .emit(app),
         EngineEvent::DirectConsentRequired => {

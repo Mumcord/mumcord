@@ -278,5 +278,30 @@
     "warning_few": "{{count}} linkuri din acest mesaj afiseaza datele de conectare",
     "warning_one": "{{count}} link din acest mesaj afiseaza datele de conectare",
     "warning_other": "{{count}} linkuri din acest mesaj afiseaza datele de conectare"
+  },
+  "requests": {
+    "entry": "Cereri de mesaje",
+    "entryCount_one": "{{count}} cerere",
+    "entryCount_few": "{{count}} cereri",
+    "entryCount_other": "{{count}} de cereri",
+    "title": "Cereri de mesaje",
+    "listLabel": "Cereri",
+    "chatRequestTag": "Cerere de chat",
+    "messageRequestTag": "Cerere de mesaj",
+    "wantsToChat": "{{name}} vrea să discute cu tine",
+    "metaMumcord": "Utilizator Mumcord · {{server}} · {{time}}",
+    "metaStandard": "{{server}} · {{time}}",
+    "noteFrom": "Notă de la {{name}}",
+    "explain": "Ai setat mesajele private la „Doar prieteni”. Dacă accepți, {{name}} îți va putea scrie. Refuzul este discret: {{name}} vede doar „în așteptare”. Cererile sunt șterse când închizi Mumcord.",
+    "sentMessages_one": "{{name}} ți-a trimis {{count}} mesaj",
+    "sentMessages_few": "{{name}} ți-a trimis {{count}} mesaje",
+    "sentMessages_other": "{{name}} ți-a trimis {{count}} de mesaje",
+    "messagesLabel": "Mesaje de la {{name}}",
+    "accept": "Acceptă",
+    "decline": "Refuză",
+    "addFriend": "Adaugă prieten",
+    "replyBlocked": "Acceptă cererea ca să-i poți răspunde lui {{name}}.",
+    "empty": "Nicio cerere de mesaje.",
+    "failed": "Nu a mers. Încearcă din nou."
   }
 }

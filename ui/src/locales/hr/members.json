@@ -59,7 +59,9 @@
     "join": "Pridruži se kanalu {{channel}}",
     "joinDenied": "Nemate dopuštenje za ulazak u ovaj kanal.",
     "mute": "Utišaj za mene",
-    "connectionInfo": "Informacije o vezi…"
+    "connectionInfo": "Informacije o vezi…",
+    "chatRequest": "Pošalji zahtjev za razgovor…",
+    "chatRequestPending": "Zahtjev za razgovor na čekanju"
   },
   "nowPlaying": {
     "label": "Trenutno svira",
@@ -85,6 +87,14 @@
   "preview": {
     "privateMessage": "Privatna poruka",
     "fullProfile": "Cijeli profil"
+  },
+  "chatRequest": {
+    "title": "Zahtjev za razgovor korisniku {{name}}",
+    "note": "Bilješka (neobavezno)",
+    "counter": "{{count}} / {{max}}",
+    "counterLabel": "Iskorišteno {{count}} od {{max}} znakova",
+    "send": "Pošalji",
+    "failed": "Zahtjev za razgovor nije bilo moguće poslati. Pokušaj ponovno."
   },
   "toggle": {
     "show": "Prikaži članove",

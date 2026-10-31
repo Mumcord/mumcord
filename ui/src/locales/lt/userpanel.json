@@ -93,7 +93,11 @@
     "offerImages": "Siūlyti pilno dydžio paveikslėlius",
     "offerImagesHint": "Leisti kitiems įkelti tavo originalius paveikslėlius",
     "loadImages": "Įkelti pilno dydžio paveikslėlius",
-    "loadImagesHint": "Gauti originalius paveikslėlius iš kitų"
+    "loadImagesHint": "Gauti originalius paveikslėlius iš kitų",
+    "privateMessages": "Privačios žinutės iš",
+    "pm_everyone": "Visų",
+    "pm_friendsOnly": "Draugų",
+    "pm_nobody": "Niekieno"
   },
   "voice": {
     "line": "Balsas: {{channel}} · {{server}}",

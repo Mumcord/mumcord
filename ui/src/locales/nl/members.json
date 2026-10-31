@@ -58,7 +58,9 @@
     "join": "Naar {{channel}} gaan",
     "joinDenied": "Je mag dit kanaal niet betreden.",
     "mute": "Voor mij dempen",
-    "connectionInfo": "Verbindingsinfo…"
+    "connectionInfo": "Verbindingsinfo…",
+    "chatRequest": "Chatverzoek sturen…",
+    "chatRequestPending": "Chatverzoek in behandeling"
   },
   "nowPlaying": {
     "label": "Speelt nu",
@@ -83,6 +85,14 @@
   "preview": {
     "privateMessage": "Privébericht",
     "fullProfile": "Volledig profiel"
+  },
+  "chatRequest": {
+    "title": "Chatverzoek aan {{name}}",
+    "note": "Notitie (optioneel)",
+    "counter": "{{count}} / {{max}}",
+    "counterLabel": "{{count}} van {{max}} tekens gebruikt",
+    "send": "Verzenden",
+    "failed": "Het chatverzoek kon niet worden verzonden. Probeer het opnieuw."
   },
   "toggle": {
     "show": "Leden tonen",

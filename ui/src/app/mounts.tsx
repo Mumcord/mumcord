@@ -32,6 +32,7 @@ import {
 import { ScreenShareWidget } from "../features/screenshare";
 import { VideoDucking, WatchPartyWidget } from "../features/watchparty";
 import { ConnectionStatus, RejoinPrompt, ServersRoot } from "../features/servers";
+import { RequestsEntry, RequestsView, useRequestsView } from "../features/requests";
 import {
   AppImageMenuPrompt,
   DirectConsentPrompt,
@@ -55,6 +56,7 @@ export function ChannelsMount() {
     <>
       <ChannelsPanel
         header={<FollowAllMenu />}
+        aboveTree={<RequestsEntry />}
         channelBadge={(channelId) => <ChannelUnreadBadge channelId={channelId} />}
         channelAction={(channel) => <FollowStar {...channel} />}
       />
@@ -110,8 +112,11 @@ export function ChatStatusMount() {
   );
 }
 
-/** Chat header, message list and input (B21). */
+/** Chat header, message list and input (B21), or the message requests while they are open (#141). */
 export function ChatMount() {
+  const requests = useRequestsView();
+  if (requests)
+    return <RequestsView serverId={requests.serverId} selectedId={requests.selectedId} />;
   return (
     <ChatView
       renderHeaderActions={(conv) => (

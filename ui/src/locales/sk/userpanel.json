@@ -93,7 +93,11 @@
     "offerImages": "Ponúkať obrázky v plnej veľkosti",
     "offerImagesHint": "Ostatní si môžu načítať tvoje originálne obrázky",
     "loadImages": "Načítavať obrázky v plnej veľkosti",
-    "loadImagesHint": "Sťahovať originálne obrázky od ostatných"
+    "loadImagesHint": "Sťahovať originálne obrázky od ostatných",
+    "privateMessages": "Súkromné správy od",
+    "pm_everyone": "Všetci",
+    "pm_friendsOnly": "Priatelia",
+    "pm_nobody": "Nikto"
   },
   "voice": {
     "line": "Hlas: {{channel}} · {{server}}",

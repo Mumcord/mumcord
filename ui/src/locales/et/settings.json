@@ -670,5 +670,35 @@
     "releasePage": "Väljalaske leht",
     "entries": "Kirjeid: {{count}}",
     "englishNote": "Muudatuste logi on inglise keeles."
+  },
+  "privateMessages": {
+    "title": "Privaatsõnumid",
+    "legend": "Privaatsõnumid kasutajatelt",
+    "everyone": "Kõigilt",
+    "everyoneHint": "Igaüks serveris võib sulle kirjutada.",
+    "friendsOnly": "Ainult sõbrad",
+    "friendsOnlyHint": "Teised Mumcordi kasutajad saavad selle asemel saata vestlustaotluse. Tavaklientide sõnumid lähevad jaotisse „Sõnumitaotlused“.",
+    "nobody": "Mitte keegi",
+    "nobodyHint": "Privaatsõnumeid ega vestlustaotlusi ei kuvata. Saatjaid ei teavitata.",
+    "keepRequests": "Hoia tavaklientide sõnumeid sõnumitaotlustena",
+    "keepRequestsHint": "Kasutusel ainult valikuga „Ainult sõbrad“. Kui see on väljas, jäetakse need sõnumid kõrvale.",
+    "overrideTitle": "Erand serveri kohta",
+    "overrideLabel": "Privaatsõnumid serveris {{server}}",
+    "useDefault": "Kasuta vaikeväärtust ({{rule}})",
+    "noServers": "Salvestatud servereid pole veel.",
+    "alwaysTitle": "Alati lubatud",
+    "currentChannel": "Inimesed minu praeguses kanalis",
+    "currentChannelHint": "Eelistatud valikutele „Ainult sõbrad“ ja „Mitte keegi“, kuni oleme samas kanalis.",
+    "accepted": "Vestlused, mille olen juba vastu võtnud",
+    "acceptedHint": "Inimesed, kelle vestlustaotluse oled vastu võtnud, võivad sulle edasi kirjutada."
+  },
+  "acceptedConversations": {
+    "title": "Vastuvõetud vestlused",
+    "empty": "Vastuvõetud vestlusi pole veel.",
+    "acceptedAt": "Vastu võetud {{date}}",
+    "identity": "Identiteet: {{label}}",
+    "revoke": "Tühista",
+    "revokeLabel": "Tühista vastuvõetud vestlus kasutajaga {{name}}",
+    "revokeFailed": "Tühistamine ebaõnnestus. Proovi palun uuesti."
   }
 }

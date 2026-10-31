@@ -679,5 +679,35 @@
     "releasePage": "Paġna tar-rilaxx",
     "entries": "Entrati: {{count}}",
     "englishNote": "Ir-reġistru tal-bidliet huwa miktub bl-Ingliż."
+  },
+  "privateMessages": {
+    "title": "Messaġġi privati",
+    "legend": "Messaġġi privati minn",
+    "everyone": "Kulħadd",
+    "everyoneHint": "Kull persuna fuq server tista' tikteb lilek.",
+    "friendsOnly": "Ħbieb biss",
+    "friendsOnlyHint": "Utenti oħra ta' Mumcord jistgħu jibagħtu talba għal chat minflok. Il-messaġġi minn klijenti standard imorru f'“Talbiet għal messaġġi”.",
+    "nobody": "Ħadd",
+    "nobodyHint": "Ma jintwerew l-ebda messaġġi privati jew talbiet għal chat. Min jibgħat ma jiġix infurmat.",
+    "keepRequests": "Żomm il-messaġġi minn klijenti standard bħala talbiet għal messaġġi",
+    "keepRequestsHint": "Użat biss ma' “Ħbieb biss”. Meta jkun mitfi, dawn il-messaġġi jitwaqqgħu.",
+    "overrideTitle": "Eċċezzjoni għal kull server",
+    "overrideLabel": "Messaġġi privati minn fuq {{server}}",
+    "useDefault": "Uża l-impostazzjoni awtomatika ({{rule}})",
+    "noServers": "Għad m'hemm l-ebda server salvat.",
+    "alwaysTitle": "Dejjem permessi",
+    "currentChannel": "Nies fil-kanal kurrenti tiegħi",
+    "currentChannelHint": "Jegħleb “Ħbieb biss” u “Ħadd” sakemm inkunu fl-istess kanal.",
+    "accepted": "Konversazzjonijiet li diġà aċċettajt",
+    "acceptedHint": "In-nies li aċċettajt it-talba tagħhom għal chat jistgħu jkomplu jiktbu lilek."
+  },
+  "acceptedConversations": {
+    "title": "Konversazzjonijiet aċċettati",
+    "empty": "Għad m'hemm l-ebda konversazzjoni aċċettata.",
+    "acceptedAt": "Aċċettata fi {{date}}",
+    "identity": "Identità: {{label}}",
+    "revoke": "Irrevoka",
+    "revokeLabel": "Irrevoka l-konversazzjoni aċċettata ma' {{name}}",
+    "revokeFailed": "L-irrevokar falla. Erġa' pprova."
   }
 }

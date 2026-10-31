@@ -287,6 +287,24 @@ export const SETTINGS_INDEX: readonly SettingEntry[] = [
   },
   {
     section: "privacy",
+    group: "privateMessages.title",
+    control: "privateMessages.legend",
+    terms: [
+      "privateMessages.everyone",
+      "privateMessages.friendsOnly",
+      "privateMessages.nobody",
+      "privateMessages.keepRequests",
+    ],
+  },
+  { section: "privacy", group: "privateMessages.overrideTitle" },
+  {
+    section: "privacy",
+    group: "privateMessages.alwaysTitle",
+    terms: ["privateMessages.currentChannel", "privateMessages.accepted"],
+  },
+  { section: "privacy", group: "acceptedConversations.title" },
+  {
+    section: "privacy",
     group: "privacyDirect.title",
     control: "privacyDirect.allow",
     terms: ["privacyDirect.hint"],

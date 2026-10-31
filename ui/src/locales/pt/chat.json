@@ -278,5 +278,30 @@
     "warning_many": "{{count}} milhões de ligações nesta mensagem mostram credenciais",
     "warning_one": "{{count}} ligação nesta mensagem mostra credenciais",
     "warning_other": "{{count}} ligações nesta mensagem mostram credenciais"
+  },
+  "requests": {
+    "entry": "Pedidos de mensagem",
+    "entryCount_one": "{{count}} pedido",
+    "entryCount_many": "{{count}} de pedidos",
+    "entryCount_other": "{{count}} pedidos",
+    "title": "Pedidos de mensagem",
+    "listLabel": "Pedidos",
+    "chatRequestTag": "Pedido de chat",
+    "messageRequestTag": "Pedido de mensagem",
+    "wantsToChat": "{{name}} quer conversar contigo",
+    "metaMumcord": "Utilizador do Mumcord · {{server}} · {{time}}",
+    "metaStandard": "{{server}} · {{time}}",
+    "noteFrom": "Nota de {{name}}",
+    "explain": "Definiste as mensagens privadas como «Só amigos». Se aceitares, {{name}} poderá escrever-te. Recusar é silencioso: {{name}} só vê «pendente». Os pedidos são apagados quando fechas o Mumcord.",
+    "sentMessages_one": "{{name}} enviou-te {{count}} mensagem",
+    "sentMessages_many": "{{name}} enviou-te {{count}} de mensagens",
+    "sentMessages_other": "{{name}} enviou-te {{count}} mensagens",
+    "messagesLabel": "Mensagens de {{name}}",
+    "accept": "Aceitar",
+    "decline": "Recusar",
+    "addFriend": "Adicionar amigo",
+    "replyBlocked": "Aceita o pedido para responder a {{name}}.",
+    "empty": "Sem pedidos de mensagem.",
+    "failed": "Não funcionou. Tenta novamente."
   }
 }

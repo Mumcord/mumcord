@@ -93,7 +93,11 @@
     "offerImages": "Offer full-size images",
     "offerImagesHint": "Let others load your original images",
     "loadImages": "Load full-size images",
-    "loadImagesHint": "Fetch original images from others"
+    "loadImagesHint": "Fetch original images from others",
+    "privateMessages": "Private messages from",
+    "pm_everyone": "Everyone",
+    "pm_friendsOnly": "Friends",
+    "pm_nobody": "Nobody"
   },
   "voice": {
     "line": "Voice: {{channel}} · {{server}}",

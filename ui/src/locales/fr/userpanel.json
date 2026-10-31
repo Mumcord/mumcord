@@ -93,7 +93,11 @@
     "offerImages": "Proposer les images en taille réelle",
     "offerImagesHint": "Permet aux autres de charger vos images originales",
     "loadImages": "Charger les images en taille réelle",
-    "loadImagesHint": "Récupère les images originales des autres"
+    "loadImagesHint": "Récupère les images originales des autres",
+    "privateMessages": "Messages privés de",
+    "pm_everyone": "Tout le monde",
+    "pm_friendsOnly": "Amis",
+    "pm_nobody": "Personne"
   },
   "voice": {
     "line": "Vocal : {{channel}} · {{server}}",

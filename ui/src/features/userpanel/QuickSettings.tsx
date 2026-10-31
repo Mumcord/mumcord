@@ -14,7 +14,7 @@ import {
 } from "react";
 import { createPortal } from "react-dom";
 import { useTranslation } from "react-i18next";
-import { getApi, type Theme } from "../../api";
+import { getApi, type PmRule, type Theme } from "../../api";
 import { useSettings } from "../settings/useSettings";
 import "./quicksettings.css";
 
@@ -44,6 +44,8 @@ const ITEM =
   '[role="menuitemcheckbox"]:not([aria-disabled]), [role="menuitemradio"], [role="menuitem"]:not([aria-disabled])';
 
 const THEMES: readonly Theme[] = ["system", "dark", "light"];
+
+const PM_RULES: readonly PmRule[] = ["everyone", "friendsOnly", "nobody"];
 
 const ICON = {
   link: "M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1",
@@ -206,10 +208,14 @@ export function QuickSettings({
         break;
       case "ArrowRight":
       case "ArrowLeft": {
-        // Inside the theme control the horizontal arrows step through the options.
+        // Inside a segmented control the horizontal arrows step through its own options.
         const current = items[index];
         if (current?.getAttribute("role") !== "menuitemradio") return;
-        const radios = items.filter((item) => item.getAttribute("role") === "menuitemradio");
+        const radios = items.filter(
+          (item) =>
+            item.getAttribute("role") === "menuitemradio" &&
+            item.parentElement === current.parentElement,
+        );
         const at = radios.indexOf(current);
         const step = event.key === "ArrowRight" ? 1 : -1;
         radios[(at + step + radios.length) % radios.length]?.focus();
@@ -400,6 +406,31 @@ export function QuickSettings({
                 >
                   <Glyph d={ICON[theme]} />
                   {t(`quickSettings.theme_${theme}`)}
+                </button>
+              ))}
+            </div>
+          </div>
+          <div className="quick-settings__theme">
+            <span className="quick-settings__label">{t("quickSettings.privateMessages")}</span>
+            <div
+              role="group"
+              aria-label={t("quickSettings.privateMessages")}
+              className="quick-settings__segments"
+            >
+              {PM_RULES.map((rule) => (
+                <button
+                  key={rule}
+                  type="button"
+                  role="menuitemradio"
+                  aria-checked={settings.privateMessages.rule === rule}
+                  tabIndex={-1}
+                  className="quick-settings__segment"
+                  data-testid={`quick-pm-${rule}`}
+                  onClick={() => {
+                    update({ privateMessages: { ...settings.privateMessages, rule } });
+                  }}
+                >
+                  {t(`quickSettings.pm_${rule}`)}
                 </button>
               ))}
             </div>

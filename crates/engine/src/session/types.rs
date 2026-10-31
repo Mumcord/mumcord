@@ -514,6 +514,10 @@ pub enum EngineEvent {
     /// The friends list changed: a friend was added or removed, came online, moved, was
     /// renamed or went offline (FR-1.64). Online friends first.
     FriendsChanged(Vec<crate::friends::FriendView>),
+    /// Held chat and message requests or sent chat requests of the server changed (issue #141).
+    PmRequestsChanged(crate::pm_rules::PmRequestsView),
+    /// The accepted private conversations of any own identity changed (issue #141).
+    AcceptedConversationsChanged(Vec<mumcord_store::AcceptedConversation>),
     /// Positional audio was switched, or the game delivering positions changed (FR-1.43).
     PositionalStatusChanged(crate::positional::PositionalStatus),
     /// A person (or the user, with the own session) started or stopped sending positions

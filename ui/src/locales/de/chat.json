@@ -273,5 +273,28 @@
     "unreachable": "Server nicht erreichbar",
     "warning_one": "{{count}} Link in dieser Nachricht zeigt Anmeldedaten",
     "warning_other": "{{count}} Links in dieser Nachricht zeigen Anmeldedaten"
+  },
+  "requests": {
+    "entry": "Nachrichtenanfragen",
+    "entryCount_one": "{{count}} Anfrage",
+    "entryCount_other": "{{count}} Anfragen",
+    "title": "Nachrichtenanfragen",
+    "listLabel": "Anfragen",
+    "chatRequestTag": "Chatanfrage",
+    "messageRequestTag": "Nachrichtenanfrage",
+    "wantsToChat": "{{name}} möchte mit dir chatten",
+    "metaMumcord": "Mumcord-Nutzer · {{server}} · {{time}}",
+    "metaStandard": "{{server}} · {{time}}",
+    "noteFrom": "Notiz von {{name}}",
+    "explain": "Du hast private Nachrichten auf „Nur Freunde“ gestellt. Wenn du annimmst, kann {{name}} dir schreiben. Ablehnen geschieht still: {{name}} sieht nur „Ausstehend“. Anfragen werden gelöscht, wenn du Mumcord beendest.",
+    "sentMessages_one": "{{name}} hat dir {{count}} Nachricht geschickt",
+    "sentMessages_other": "{{name}} hat dir {{count}} Nachrichten geschickt",
+    "messagesLabel": "Nachrichten von {{name}}",
+    "accept": "Annehmen",
+    "decline": "Ablehnen",
+    "addFriend": "Als Freund hinzufügen",
+    "replyBlocked": "Nimm die Anfrage an, um {{name}} zu antworten.",
+    "empty": "Keine Nachrichtenanfragen.",
+    "failed": "Das hat nicht geklappt. Bitte versuche es erneut."
   }
 }

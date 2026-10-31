@@ -13,6 +13,7 @@ import type {
 } from "../bindings/commands";
 import { parseMumbleLink } from "../features/chat/mumbleLink";
 import type {
+  AcceptedConversation,
   ApiError,
   AudioDevices,
   ChannelInfo,
@@ -27,11 +28,13 @@ import type {
   Identity,
   InlineImage,
   LinkPreview,
+  MessageRequest,
   MumbleLink,
   GameKey,
   GameOverlayEntry,
   GamePlugin,
   InGameOverlayState,
+  PmRequests,
   PttAvailability,
   PttMouseStatus,
   SavedServer,
@@ -123,6 +126,14 @@ export interface MockControls {
   renameChannel(channelId: number, name: string): void;
   /** Stores a channel password without any details, like one saved before issue #146. */
   addBareChannelPassword(serverId: number, password: string): void;
+  /**
+   * Holds a chat request (with `note`) or a message request (with `messages`) from `senderSession`
+   * on the focused server, like the engine does under "Friends only" (issue #141).
+   */
+  receivePmRequest(
+    senderSession: number,
+    request: Pick<MessageRequest, "chatRequest" | "note"> & { messages?: string[] },
+  ): MessageRequest;
   /**
    * Which connected server the controls above act on (e.g. `receiveMessage`); by default the
    * server that connected last.
@@ -247,6 +258,13 @@ const DEFAULT_SETTINGS: Settings = {
   windowOverlayNoticeShown: false,
   whatsNewAuto: true,
   whatsNewSeen: null,
+  privateMessages: {
+    rule: "everyone",
+    serverRules: [],
+    allowCurrentChannel: true,
+    allowAccepted: true,
+    keepRequests: true,
+  },
 };
 
 /** Offline stand-in for the engine's link previews: a YouTube player card or a page card. */
@@ -597,6 +615,10 @@ export function createMockApi(options: MockOptions = {}): MockApi {
   /** Friends by certificate hash (FR-1.64); online state is derived from the snapshot. */
   const friends = new Map<string, { name: string; addedAt: string; lastSeenAt: string | null }>();
   let shownFriends = "[]";
+  /** Held and sent requests per server (issue #141); memory only, dropped on disconnect. */
+  const pmRequestsByServer = new Map<number, PmRequests>();
+  let nextPmRequestId = 1;
+  let acceptedConversations: AcceptedConversation[] = [];
   const failures = new Map<CommandName, ApiError>();
   const inspector = createMockInspector();
   let inspectorView: InspectorView | null = null;
@@ -815,12 +837,38 @@ export function createMockApi(options: MockOptions = {}): MockApi {
   function setState(next: ConnectionState): void {
     if (next.state === "disconnected") {
       sessions.delete(currentServerId);
+      pmRequestsByServer.delete(currentServerId);
       if (pendingConnect?.serverId === currentServerId) pendingConnect = null;
       if (voiceServerId === currentServerId) setVoiceServer(null);
     } else {
       sessions.set(currentServerId, { snapshot: session()?.snapshot ?? null, state: next });
     }
     emitServer("connectionStateChanged", { state: next });
+  }
+
+  function pmRequestsOf(serverId: number): PmRequests {
+    return pmRequestsByServer.get(serverId) ?? { incoming: [], sent: [] };
+  }
+
+  function setPmRequests(serverId: number, requests: PmRequests): void {
+    pmRequestsByServer.set(serverId, requests);
+    emit("pmRequestsChanged", { serverId, requests });
+  }
+
+  /** The mock connects every server with the default identity. */
+  function ownCertHash(): string {
+    return identities.find((identity) => identity.isDefault)?.certHash ?? "";
+  }
+
+  function acceptConversation(name: string, certHash: string | null): void {
+    const own = ownCertHash();
+    if (certHash === null) return;
+    if (acceptedConversations.some((c) => c.ownCertHash === own && c.certHash === certHash)) return;
+    acceptedConversations = [
+      ...acceptedConversations,
+      { ownCertHash: own, certHash, name, acceptedAt: new Date().toISOString() },
+    ];
+    emit("acceptedConversationsChanged", { conversations: acceptedConversations });
   }
 
   function setSnapshot(snapshot: ServerSnapshot): void {
@@ -1599,6 +1647,62 @@ export function createMockApi(options: MockOptions = {}): MockApi {
       refreshFriends();
       return Promise.resolve(null);
     },
+    pmRequests: (serverId) => Promise.resolve(pmRequestsOf(serverId)),
+    pmRequestAccept: (serverId, id) => {
+      requireSession(serverId);
+      const requests = pmRequestsOf(serverId);
+      const request = requests.incoming.find((r) => r.id === id);
+      if (!request) fail("notFound", "no such request");
+      acceptConversation(request.name, request.certHash);
+      setPmRequests(serverId, {
+        ...requests,
+        incoming: requests.incoming.filter((r) => r.id !== id),
+      });
+      for (const message of request.messages) {
+        store(message);
+        emitServer("messageReceived", { message });
+      }
+      return Promise.resolve(null);
+    },
+    pmRequestDecline: (serverId, id) => {
+      requireSession(serverId);
+      const requests = pmRequestsOf(serverId);
+      if (!requests.incoming.some((r) => r.id === id)) fail("notFound", "no such request");
+      setPmRequests(serverId, {
+        ...requests,
+        incoming: requests.incoming.filter((r) => r.id !== id),
+      });
+      return Promise.resolve(null);
+    },
+    chatRequestSend: (serverId, session, note) => {
+      requireSession(serverId);
+      const user = requireUser(session);
+      if (!user.isMumcord || !user.mumcordFeatures.includes("chat-request")) {
+        fail("invalidInput", "this person cannot receive chat requests");
+      }
+      const requests = pmRequestsOf(serverId);
+      if (requests.sent.some((r) => r.session === session && !r.accepted)) {
+        fail("invalidInput", "a chat request is already pending");
+      }
+      if (note !== null && Array.from(note).length > 200) fail("invalidInput", "note is too long");
+      acceptConversation(user.name, user.certHash);
+      setPmRequests(serverId, {
+        ...requests,
+        sent: [
+          ...requests.sent.filter((r) => r.session !== session),
+          { session, name: user.name, certHash: user.certHash, accepted: false },
+        ],
+      });
+      return Promise.resolve(null);
+    },
+    acceptedConversations: () => Promise.resolve(acceptedConversations),
+    acceptedConversationRevoke: (ownCertHash, certHash) => {
+      acceptedConversations = acceptedConversations.filter(
+        (c) => c.ownCertHash !== ownCertHash || c.certHash !== certHash,
+      );
+      emit("acceptedConversationsChanged", { conversations: acceptedConversations });
+      return Promise.resolve(null);
+    },
     friendRemove: (certHash) => {
       friends.delete(certHash);
       refreshFriends();
@@ -2302,6 +2406,37 @@ export function createMockApi(options: MockOptions = {}): MockApi {
     },
     offerHistory: (channelId, holderName, lines) => {
       offeredHistory.set(channelId, { holderName, lines });
+    },
+    receivePmRequest: (senderSession, { chatRequest, note, messages = [] }) => {
+      focused();
+      const sender = requireUser(senderSession);
+      const request: MessageRequest = {
+        id: nextPmRequestId++,
+        session: senderSession,
+        name: sender.name,
+        certHash: sender.certHash,
+        chatRequest,
+        note,
+        messages: messages.map((body): ChatMessage => ({
+          id: String(nextMessageId++),
+          conversation:
+            sender.certHash === null
+              ? { kind: "privateSession", session: senderSession }
+              : { kind: "private", certHash: sender.certHash },
+          senderName: sender.name,
+          senderCertHash: sender.certHash,
+          senderSession,
+          own: false,
+          sentAt: new Date().toISOString(),
+          body,
+          dismissedPreviews: [],
+          syncedFrom: null,
+        })),
+        receivedAt: new Date().toISOString(),
+      };
+      const requests = pmRequestsOf(currentServerId);
+      setPmRequests(currentServerId, { ...requests, incoming: [...requests.incoming, request] });
+      return request;
     },
     receiveMessage: (conversation, body, senderSession) => {
       focused();

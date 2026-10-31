@@ -278,5 +278,30 @@
     "warning_many": "{{count}} milioni di collegamenti in questo messaggio mostrano le credenziali",
     "warning_one": "{{count}} collegamento in questo messaggio mostra le credenziali",
     "warning_other": "{{count}} collegamenti in questo messaggio mostrano le credenziali"
+  },
+  "requests": {
+    "entry": "Richieste di messaggi",
+    "entryCount_one": "{{count}} richiesta",
+    "entryCount_many": "{{count}} di richieste",
+    "entryCount_other": "{{count}} richieste",
+    "title": "Richieste di messaggi",
+    "listLabel": "Richieste",
+    "chatRequestTag": "Richiesta di chat",
+    "messageRequestTag": "Richiesta di messaggio",
+    "wantsToChat": "{{name}} vuole chattare con te",
+    "metaMumcord": "Utente Mumcord · {{server}} · {{time}}",
+    "metaStandard": "{{server}} · {{time}}",
+    "noteFrom": "Nota di {{name}}",
+    "explain": "Hai impostato i messaggi privati su «Solo amici». Se accetti, {{name}} potrà scriverti. Il rifiuto è silenzioso: {{name}} vede solo «in sospeso». Le richieste vengono eliminate quando chiudi Mumcord.",
+    "sentMessages_one": "{{name}} ti ha inviato {{count}} messaggio",
+    "sentMessages_many": "{{name}} ti ha inviato {{count}} di messaggi",
+    "sentMessages_other": "{{name}} ti ha inviato {{count}} messaggi",
+    "messagesLabel": "Messaggi di {{name}}",
+    "accept": "Accetta",
+    "decline": "Rifiuta",
+    "addFriend": "Aggiungi amico",
+    "replyBlocked": "Accetta la richiesta per rispondere a {{name}}.",
+    "empty": "Nessuna richiesta di messaggi.",
+    "failed": "Non ha funzionato. Riprova."
   }
 }
