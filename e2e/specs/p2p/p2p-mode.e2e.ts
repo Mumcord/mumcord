@@ -13,6 +13,7 @@ import { join } from "node:path";
 import { browser, $, expect } from "@wdio/globals";
 import { app, repoRoot, testenv } from "../../helpers/index.ts";
 import { trustIfAsked } from "../../helpers/chat-ui.ts";
+import { channelName, doubleClickRow, ownChannel } from "../../helpers/voice-ui.ts";
 import { dialogTab, dialogTitle, fill, serverButton, waitServerStatus } from "../../helpers/servers-ui.ts";
 import { button, waitForText } from "../../helpers/wizard-util.ts";
 import { chooseRadio, focus, pressUntil, tabTo, wizard } from "../app/flows.ts";
@@ -117,6 +118,15 @@ async function joinVoice(): Promise<void> {
   if (!(await join.isDisplayed())) return;
   await join.click();
   await $(".userpanel-readonly").waitForExist({ reverse: true, timeout: 15_000 });
+}
+
+/**
+ * Moves voice to the shown server. The read-only notice's Join button only appears while no server
+ * has voice; with voice on another server, double-clicking the own channel takes it over.
+ */
+async function takeVoiceHere(): Promise<void> {
+  await browser.waitUntil(async () => (await ownChannel()) !== "", { timeout: 15_000 });
+  await doubleClickRow(channelName(await ownChannel()));
 }
 
 /**
@@ -275,11 +285,13 @@ describe("spec 04 peer-to-peer mode without a relay (AC-4.1, 4.8–4.10, 4.23, 4
     await serverButton(ALPHA).click();
     await joinVoice();
     await shareReason("This server has no relay.");
+    // Connecting Bravo leaves voice on Alpha; the share reason follows the voice server.
     await connect(BRAVO);
+    await takeVoiceHere();
     await shareReason(null);
     // Back on the overridden server, still the relay rule.
     await serverButton(ALPHA).click();
-    await joinVoice();
+    await takeVoiceHere();
     await shareReason("This server has no relay.");
   });
 
