@@ -12,7 +12,7 @@ import { P2pLinkText } from "../p2p/P2pLinkText";
 import { useP2pLink } from "../p2p/useP2pLink";
 import { ScreenStage } from "./ScreenStage";
 import { useScreenShareOf } from "./sharesStore";
-import { useFullscreen } from "./useFullscreen";
+import { useFullscreen } from "../media/useFullscreen";
 import { stopWatching, useWatchedShare, type WatchedShare } from "./watching";
 import "./screenViewer.css";
 

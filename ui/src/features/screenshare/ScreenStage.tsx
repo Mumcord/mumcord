@@ -8,6 +8,7 @@ import { useTranslation } from "react-i18next";
 import { p2pBlockText } from "../p2p/relayReason";
 import { useScreenShareOf } from "./sharesStore";
 import { useScreenWatch } from "./useScreenWatch";
+import type { StreamMeter } from "./streamStats";
 import { stopWatching } from "./watching";
 
 export interface ScreenStageProps {
@@ -15,14 +16,16 @@ export interface ScreenStageProps {
   session: number;
   name: string;
   paused: boolean;
+  /** Counts the frames for the chips and the stream details (issue #163). */
+  meter?: StreamMeter;
 }
 
-export function ScreenStage({ serverId, session, name, paused }: ScreenStageProps) {
+export function ScreenStage({ serverId, session, name, paused, meter }: ScreenStageProps) {
   const { t } = useTranslation("screenviewer");
   const { t: tP2p } = useTranslation("p2p");
   const relayReason = useScreenShareOf(serverId, session)?.relayReason ?? null;
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const { status, retry } = useScreenWatch(serverId, session, canvasRef, paused);
+  const { status, retry } = useScreenWatch(serverId, session, canvasRef, paused, meter);
 
   let message: string | null = null;
   if (status.state === "failed")
