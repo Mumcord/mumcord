@@ -112,6 +112,9 @@ const neutral = (t: string) =>
   // "Apps" is also the German and Spanish word, "Bitrate" and "Updates" the German ones; preset
   // theme names are names, not translated.
   /^(Apps|Bitrate|Updates|Deep Ocean|Forest|Paper)$/.test(t) ||
+  // "Standard" is the German default-identity badge ("Default"), which only matches the English
+  // noise suppression level by chance.
+  /^Standard$/.test(t) ||
   // "Link" is also the German word; its tooltip adds the shortcut.
   /^Link( \(Ctrl\+K\))?$/.test(t) ||
   // "In <channel> (<count>)" reads the same in English and German.
