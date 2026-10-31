@@ -1,0 +1,14 @@
+/// Types shared by the host and every plugin.
+///
+/// Later API versions add events, UI trees and messages here. Additions are minor versions
+/// (`mumcord:plugin@1.x`); changing an existing type is a new major version.
+interface types {
+  /// What the host tells a plugin when it starts.
+  record start-info {
+    /// The host API version, e.g. "1.0.0".
+    api-version: string,
+    /// The version that was installed before an update, so the plugin can migrate its own data.
+    /// None on a fresh install or when the version did not change.
+    previous-version: option<string>,
+  }
+}

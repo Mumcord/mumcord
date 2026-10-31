@@ -56,6 +56,7 @@
 
 ### Internal
 
+- Plugin manifest and package format (Epic 3.1, #269): `manifest.json` is parsed strictly as untrusted input (size and length caps, known permissions and categories only, safe relative paths, caret ranges on the plugin API), with a published JSON schema in `crates/plugins/schema/`. `.mcplugin` zips are checked before anything touches the disk (at most 5 MiB, 200 files and 8 MiB unpacked, no symlinks, encryption or `..` paths, image-only assets), verified against the sha256 and size from the index, and installed atomically. Translated plugin names follow the app language with English fallback; sideloaded packages cannot take an official or reserved id. Not visible in the app yet.
 - The member-column E2E spec now hovers the members button from outside it and re-hovers until the tooltip opens, and keeps the test bot talking long enough that the checks cannot run after the short sample audio ended. The tooltip layer only reacts when the pointer enters a trigger, and a click keeps that trigger's tooltip away until the pointer leaves it, so a single `moveTo()` could wait forever — the flake in CI (#216). Two unit tests pin that behaviour (click and leave, page scroll).
 
 ## [0.4.4] - 2026-10-30

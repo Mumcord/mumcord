@@ -1,0 +1,287 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/Mumcord/mumcord/blob/main/crates/plugins/schema/manifest.schema.json",
+  "title": "Mumcord plugin manifest",
+  "description": "manifest.json at the root of a .mcplugin package (format 1, plugin API 1.x). Unknown fields are ignored by the app; the app's parser in crates/plugins is the reference.",
+  "type": "object",
+  "required": [
+    "manifest",
+    "id",
+    "name",
+    "version",
+    "api",
+    "author",
+    "category",
+    "license",
+    "entry",
+    "i18n"
+  ],
+  "properties": {
+    "manifest": {
+      "const": 1,
+      "description": "Manifest format version."
+    },
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9-]{2,31}$",
+      "description": "Unique plugin id. The prefixes mumcord- and core- are reserved for Mumcord."
+    },
+    "name": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 32,
+      "pattern": "^[^\\u0000-\\u001f\\u007f]*$",
+      "description": "Display name; translated by the i18n key manifest.name."
+    },
+    "version": {
+      "type": "string",
+      "pattern": "^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)(-[0-9A-Za-z.-]+)?(\\+[0-9A-Za-z.-]+)?$",
+      "description": "Plugin version, semantic versioning 2.0."
+    },
+    "api": {
+      "type": "string",
+      "pattern": "^\\^[1-9]\\d*\\.(0|[1-9]\\d*)(\\.(0|[1-9]\\d*))?$",
+      "description": "Caret range on the host API mumcord:plugin, e.g. ^1.0."
+    },
+    "mumcord": {
+      "type": "string",
+      "maxLength": 64,
+      "description": "Optional range of Mumcord app versions, e.g. >=0.7.0."
+    },
+    "author": {
+      "type": "object",
+      "required": [
+        "name"
+      ],
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 64,
+          "pattern": "^[^\\u0000-\\u001f\\u007f]*$"
+        },
+        "url": {
+          "$ref": "#/$defs/url"
+        }
+      }
+    },
+    "description": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 140,
+      "pattern": "^[^\\u0000-\\u001f\\u007f]*$",
+      "description": "Short description; translated by the i18n key manifest.description."
+    },
+    "category": {
+      "enum": [
+        "fun",
+        "games",
+        "chat",
+        "voice",
+        "accessibility",
+        "looks",
+        "tools"
+      ]
+    },
+    "license": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 64,
+      "pattern": "^[^\\u0000-\\u001f\\u007f]*$",
+      "description": "SPDX licence expression, e.g. MIT or Apache-2.0 WITH LLVM-exception."
+    },
+    "source": {
+      "$ref": "#/$defs/url"
+    },
+    "entry": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/path"
+        },
+        {
+          "pattern": "\\.wasm$"
+        }
+      ],
+      "description": "The WebAssembly component inside the package."
+    },
+    "icons": {
+      "type": "object",
+      "propertyNames": {
+        "enum": [
+          "16",
+          "32",
+          "48",
+          "64",
+          "128",
+          "256",
+          "512"
+        ]
+      },
+      "additionalProperties": {
+        "$ref": "#/$defs/asset"
+      }
+    },
+    "screenshots": {
+      "type": "array",
+      "maxItems": 8,
+      "items": {
+        "$ref": "#/$defs/asset"
+      }
+    },
+    "i18n": {
+      "type": "object",
+      "required": [
+        "default",
+        "available"
+      ],
+      "properties": {
+        "default": {
+          "$ref": "#/$defs/language"
+        },
+        "available": {
+          "type": "array",
+          "maxItems": 64,
+          "items": {
+            "$ref": "#/$defs/language"
+          },
+          "contains": {
+            "const": "en"
+          }
+        }
+      },
+      "description": "Languages with a file i18n/<tag>.json; en is required and default must be listed."
+    },
+    "permissions": {
+      "type": "object",
+      "properties": {
+        "required": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/permission"
+          }
+        },
+        "optional": {
+          "type": "array",
+          "items": {
+            "oneOf": [
+              {
+                "$ref": "#/$defs/permission"
+              },
+              {
+                "type": "object",
+                "required": [
+                  "id"
+                ],
+                "properties": {
+                  "id": {
+                    "$ref": "#/$defs/permission"
+                  },
+                  "suggested": {
+                    "type": "boolean",
+                    "description": "Switched on by default in the install prompt."
+                  }
+                }
+              }
+            ]
+          }
+        }
+      },
+      "description": "A permission may appear only once across required and optional."
+    },
+    "storage": {
+      "type": "object",
+      "required": [
+        "scope"
+      ],
+      "properties": {
+        "scope": {
+          "enum": [
+            "identity",
+            "global"
+          ]
+        },
+        "quota_kib": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 1024,
+          "default": 256
+        }
+      }
+    },
+    "messaging": {
+      "type": "object",
+      "required": [
+        "max_payload"
+      ],
+      "properties": {
+        "max_payload": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 997
+        },
+        "default_visibility": {
+          "enum": [
+            "everyone",
+            "friends",
+            "nobody"
+          ]
+        }
+      }
+    },
+    "limits": {
+      "type": "object",
+      "properties": {
+        "memory_mib": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 32,
+          "default": 32
+        }
+      }
+    }
+  },
+  "$defs": {
+    "path": {
+      "type": "string",
+      "maxLength": 128,
+      "pattern": "^[A-Za-z0-9._-]+(/[A-Za-z0-9._-]+)*$",
+      "not": {
+        "pattern": "(^|/)\\.\\.?(/|$)"
+      }
+    },
+    "asset": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/path"
+        },
+        {
+          "pattern": "^assets/.*\\.(png|webp|svg)$"
+        }
+      ]
+    },
+    "url": {
+      "type": "string",
+      "maxLength": 256,
+      "pattern": "^https://[^/\\s][^\\s]*$"
+    },
+    "language": {
+      "type": "string",
+      "pattern": "^[a-z]{2,3}(-[A-Z]{2})?$"
+    },
+    "permission": {
+      "enum": [
+        "ui.panel",
+        "ui.member-badge",
+        "ui.profile-card",
+        "ui.chat-card",
+        "events.self",
+        "events.voice",
+        "events.presence",
+        "events.chat-activity",
+        "peers.messages",
+        "notify"
+      ]
+    }
+  }
+}
