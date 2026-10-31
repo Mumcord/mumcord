@@ -1,7 +1,10 @@
 //! Link previews, video player cards and inline images for links and images in messages
 //! (FR-1.49, FR-1.50, FR-1.55).
 
-use mumcord_engine::{Engine, QueryOutcome, VideoProvider};
+use mumcord_engine::{
+    AudioFormat as EngineAudioFormat, Engine, MusicKind as EngineMusicKind,
+    MusicService as EngineMusicService, QueryOutcome, VideoProvider,
+};
 use serde::{Deserialize, Serialize};
 use specta::Type;
 use tauri::{AppHandle, Manager, State};
@@ -21,10 +24,14 @@ pub struct LinkPreview {
     pub description: Option<String>,
     /// Preview image as a `data:` URL (fetched and re-encoded by the engine).
     pub image: Option<String>,
-    /// Set for YouTube, Twitch and Spotify links: show a player card.
+    /// Set for YouTube and Twitch links: show a player card.
     pub video: Option<VideoEmbed>,
+    /// Set for music service links and music pages: show a music card (issue #262).
+    pub music: Option<MusicEmbed>,
     /// The link serves an image: show it inline (`inline_image`) instead of a card.
     pub is_image: bool,
+    /// The link serves an audio file: show the audio player (`audio_info`) instead of a card.
+    pub is_audio: bool,
 }
 
 /// An external image or image link, ready to show inline (FR-1.55).
@@ -47,7 +54,6 @@ pub struct InlineImage {
 pub enum VideoSite {
     Youtube,
     Twitch,
-    Spotify,
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, Type)]
@@ -57,9 +63,69 @@ pub struct VideoEmbed {
     /// Embedded player URL; load it only after the user clicks play. Twitch needs
     /// `&parent=<host of the page>` appended.
     pub player_url: String,
-    /// Channel or uploader name; for Spotify the kind of item (`track`, `album`, `playlist`,
-    /// `artist`, `episode`, `show`).
+    /// Channel or uploader name.
     pub channel: Option<String>,
+}
+
+#[derive(Serialize, Deserialize, Clone, Copy, Debug, PartialEq, Eq, Type)]
+#[serde(rename_all = "camelCase")]
+pub enum MusicService {
+    Spotify,
+    Soundcloud,
+    YoutubeMusic,
+    AppleMusic,
+    Tidal,
+    Deezer,
+    Bandcamp,
+    /// Another page that says it is music.
+    Other,
+}
+
+#[derive(Serialize, Deserialize, Clone, Copy, Debug, PartialEq, Eq, Type)]
+#[serde(rename_all = "camelCase")]
+pub enum MusicKind {
+    Track,
+    Album,
+    Playlist,
+    Artist,
+    Episode,
+    Show,
+}
+
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, Type)]
+#[serde(rename_all = "camelCase")]
+pub struct MusicEmbed {
+    pub service: MusicService,
+    pub kind: MusicKind,
+    /// The service's official embed; load it only after the user clicks play. `null`: the
+    /// service has no usable embed, the card only links to it.
+    pub player_url: Option<String>,
+    /// Artist or uploader, when the service names one.
+    pub artist: Option<String>,
+}
+
+#[derive(Serialize, Deserialize, Clone, Copy, Debug, PartialEq, Eq, Type)]
+#[serde(rename_all = "camelCase")]
+pub enum AudioFormat {
+    Mp3,
+    Ogg,
+    Aac,
+    Mp4,
+    Wav,
+    Flac,
+    Webm,
+}
+
+/// A direct audio link before the click (issue #260).
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, Type)]
+#[serde(rename_all = "camelCase")]
+pub struct AudioInfo {
+    /// The link as posted, without fragment.
+    pub url: String,
+    /// Sniffed from the file's first bytes.
+    pub format: AudioFormat,
+    /// File size in bytes, when the server said (capped at 4 GB; larger files are refused).
+    pub size: Option<u32>,
 }
 
 /// Opens a link from a message in the system browser after the user clicked it. Only
@@ -202,12 +268,60 @@ impl From<mumcord_engine::LinkPreview> for LinkPreview {
                 site: match v.provider {
                     VideoProvider::Youtube => VideoSite::Youtube,
                     VideoProvider::Twitch => VideoSite::Twitch,
-                    VideoProvider::Spotify => VideoSite::Spotify,
                 },
                 player_url: v.player_url,
                 channel: v.channel,
             }),
+            music: p.music.map(|m| MusicEmbed {
+                service: m.service.into(),
+                kind: m.kind.into(),
+                player_url: m.player_url,
+                artist: m.artist,
+            }),
             is_image: p.image_link,
+            is_audio: p.audio_link,
+        }
+    }
+}
+
+impl From<EngineMusicService> for MusicService {
+    fn from(s: EngineMusicService) -> Self {
+        match s {
+            EngineMusicService::Spotify => Self::Spotify,
+            EngineMusicService::Soundcloud => Self::Soundcloud,
+            EngineMusicService::YoutubeMusic => Self::YoutubeMusic,
+            EngineMusicService::AppleMusic => Self::AppleMusic,
+            EngineMusicService::Tidal => Self::Tidal,
+            EngineMusicService::Deezer => Self::Deezer,
+            EngineMusicService::Bandcamp => Self::Bandcamp,
+            EngineMusicService::Other => Self::Other,
+        }
+    }
+}
+
+impl From<EngineMusicKind> for MusicKind {
+    fn from(k: EngineMusicKind) -> Self {
+        match k {
+            EngineMusicKind::Track => Self::Track,
+            EngineMusicKind::Album => Self::Album,
+            EngineMusicKind::Playlist => Self::Playlist,
+            EngineMusicKind::Artist => Self::Artist,
+            EngineMusicKind::Episode => Self::Episode,
+            EngineMusicKind::Show => Self::Show,
+        }
+    }
+}
+
+impl From<EngineAudioFormat> for AudioFormat {
+    fn from(f: EngineAudioFormat) -> Self {
+        match f {
+            EngineAudioFormat::Mp3 => Self::Mp3,
+            EngineAudioFormat::Ogg => Self::Ogg,
+            EngineAudioFormat::Aac => Self::Aac,
+            EngineAudioFormat::Mp4 => Self::Mp4,
+            EngineAudioFormat::Wav => Self::Wav,
+            EngineAudioFormat::Flac => Self::Flac,
+            EngineAudioFormat::Webm => Self::Webm,
         }
     }
 }

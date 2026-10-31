@@ -115,8 +115,6 @@
     "play": "Predvajaj {{title}}",
     "player": "Predvajalnik videa: {{title}}",
     "videoTitle": "Video {{site}}",
-    "spotifyTitle": "Povezava {{site}}",
-    "audioPlayer": "Predvajalnik Spotify: {{title}}",
     "kind": {
       "track": "Skladba",
       "album": "Album",
@@ -369,5 +367,45 @@
       "deleteHistory": "Izbriši zgodovino",
       "deleteHint": "Samo ta naprava · {{name}} obdrži svojo kopijo"
     }
+  },
+  "audio": {
+    "card": "Zvočna datoteka: {{name}}",
+    "file": "Zvočna datoteka",
+    "playing": "Predvaja se",
+    "loading": "Nalaganje…",
+    "play": "Predvajaj {{name}}",
+    "pause": "Zaustavi {{name}}",
+    "playShort": "Predvajaj",
+    "pauseShort": "Premor",
+    "seek": "Položaj",
+    "position": "{{time}} od {{length}}",
+    "volume": "Glasnost",
+    "mute": "Izklopi zvok",
+    "open": "Odpri {{name}} v brskalniku",
+    "save": "Shrani {{name}}",
+    "saveShort": "Shrani datoteko",
+    "saveTitle": "Shrani zvočno datoteko",
+    "fileType": "Zvočna datoteka",
+    "saveFailed": "Datoteke ni bilo mogoče shraniti.",
+    "errorTitle": "Te datoteke ni mogoče predvajati",
+    "errorText": "Datoteka manjka, je prevelika ali v zapisu, ki ga Mumcord ne more predvajati.",
+    "retry": "Poskusi znova"
+  },
+  "music": {
+    "card": "{{service}}: {{title}}",
+    "title": "Povezava {{service}}",
+    "other": "Glasbena povezava",
+    "thirdParty": "Vsebina tretje osebe z {{host}}",
+    "thirdPartyShort": "Vsebina tretje osebe",
+    "embedded": "Vdelani predvajalnik · {{service}} · {{host}}",
+    "player": "Predvajalnik {{service}}: {{title}}",
+    "play": "Predvajaj",
+    "playLabel": "Predvajaj {{title}} v storitvi {{service}}",
+    "stop": "Ustavi",
+    "stopLabel": "Ustavi {{title}}",
+    "openIn": "Odpri v storitvi {{service}}",
+    "limits": "Omejitve predvajanja določa storitev",
+    "noPlayer": "Za to storitev predvajalnik ni na voljo",
+    "output": "Predvaja se na izhodni napravi, ne v mikrofon"
   }
 }

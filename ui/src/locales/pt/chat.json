@@ -111,8 +111,6 @@
     "play": "Reproduzir {{title}}",
     "player": "Leitor de vídeo: {{title}}",
     "videoTitle": "Vídeo de {{site}}",
-    "spotifyTitle": "Ligação de {{site}}",
-    "audioPlayer": "Leitor do Spotify: {{title}}",
     "kind": {
       "track": "Faixa",
       "album": "Álbum",
@@ -361,5 +359,45 @@
       "deleteHistory": "Eliminar histórico",
       "deleteHint": "Apenas este dispositivo · {{name}} mantém a sua cópia"
     }
+  },
+  "audio": {
+    "card": "Ficheiro de áudio: {{name}}",
+    "file": "Ficheiro de áudio",
+    "playing": "A reproduzir",
+    "loading": "A carregar…",
+    "play": "Reproduzir {{name}}",
+    "pause": "Pausar {{name}}",
+    "playShort": "Reproduzir",
+    "pauseShort": "Pausa",
+    "seek": "Posição",
+    "position": "{{time}} de {{length}}",
+    "volume": "Volume",
+    "mute": "Silenciar",
+    "open": "Abrir {{name}} no navegador",
+    "save": "Guardar {{name}}",
+    "saveShort": "Guardar ficheiro",
+    "saveTitle": "Guardar ficheiro de áudio",
+    "fileType": "Ficheiro de áudio",
+    "saveFailed": "Não foi possível guardar o ficheiro.",
+    "errorTitle": "Não é possível reproduzir este ficheiro",
+    "errorText": "O ficheiro não existe, é demasiado grande ou tem um formato que o Mumcord não consegue reproduzir.",
+    "retry": "Tentar novamente"
+  },
+  "music": {
+    "card": "{{service}}: {{title}}",
+    "title": "Ligação do {{service}}",
+    "other": "Ligação de música",
+    "thirdParty": "Conteúdo de terceiros de {{host}}",
+    "thirdPartyShort": "Conteúdo de terceiros",
+    "embedded": "Leitor incorporado · {{service}} · {{host}}",
+    "player": "Leitor do {{service}}: {{title}}",
+    "play": "Reproduzir",
+    "playLabel": "Reproduzir {{title}} no {{service}}",
+    "stop": "Parar",
+    "stopLabel": "Parar {{title}}",
+    "openIn": "Abrir no {{service}}",
+    "limits": "Os limites de reprodução são definidos pelo serviço",
+    "noPlayer": "Nenhum leitor disponível para este serviço",
+    "output": "A reproduzir no dispositivo de saída, não no microfone"
   }
 }

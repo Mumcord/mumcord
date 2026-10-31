@@ -14,6 +14,7 @@ use reqwest::Url;
 const MAX_SITE: usize = 80;
 const MAX_TITLE: usize = 200;
 const MAX_DESCRIPTION: usize = 300;
+const MAX_KIND: usize = 40;
 
 /// What a page says about itself; all text is plain and trimmed.
 #[derive(Debug, Default, Clone, PartialEq, Eq)]
@@ -23,6 +24,8 @@ pub struct PageMeta {
     pub description: Option<String>,
     /// Absolute http(s) URL of the preview image.
     pub image: Option<Url>,
+    /// OpenGraph type in lower case, e.g. `music.song` or `website`.
+    pub kind: Option<String>,
 }
 
 #[derive(Default)]
@@ -36,6 +39,7 @@ struct Found {
     site_name: Option<String>,
     og_image: Option<String>,
     twitter_image: Option<String>,
+    og_type: Option<String>,
 }
 
 #[derive(Default)]
@@ -119,6 +123,7 @@ fn record(found: &mut Found, key: &str, content: String) {
         "og:site_name" => &mut found.site_name,
         "og:image" | "og:image:url" | "og:image:secure_url" => &mut found.og_image,
         "twitter:image" | "twitter:image:src" => &mut found.twitter_image,
+        "og:type" => &mut found.og_type,
         _ => return,
     };
     if slot.is_none() {
@@ -164,6 +169,10 @@ pub fn parse(html: &[u8], base: &Url) -> PageMeta {
         .flatten()
         .find_map(|d| clean(&d, MAX_DESCRIPTION)),
         image,
+        kind: found
+            .og_type
+            .and_then(|k| clean(&k, MAX_KIND))
+            .map(|k| k.to_ascii_lowercase()),
     }
 }
 
@@ -222,6 +231,7 @@ mod tests {
                description">
             <meta property="og:site_name" content="Example News">
             <meta property="og:image" content="/img/cover.png">
+            <meta property="og:type" content="Music.Song">
             <meta name="twitter:title" content="Twitter title">
             </head><body><meta property="og:title" content="ignored"></body></html>"#;
         let meta = parse(html, &base());
@@ -232,6 +242,7 @@ mod tests {
                 title: Some("OG & title".into()),
                 description: Some("OG description".into()),
                 image: Some(Url::parse("https://www.example.com/img/cover.png").expect("url")),
+                kind: Some("music.song".into()),
             }
         );
     }

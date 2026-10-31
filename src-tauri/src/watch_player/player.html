@@ -40,6 +40,7 @@
         ]);
         const EMBED = window.location.pathname.endsWith("/embed.html");
         const VIDEO_ID = /^[A-Za-z0-9_-]{11}$/;
+        const PLAYLIST_ID = /^[A-Za-z0-9_-]{10,64}$/;
         const ENDED = 0;
         /** The player only starts reporting after it heard "listening"; repeat until it does. */
         const LISTEN_INTERVAL_MS = 250;
@@ -151,6 +152,9 @@
           }
           if (url.origin === YOUTUBE) {
             const id = /^\/embed\/([^/]+)$/.exec(url.pathname)?.[1] ?? "";
+            // YouTube Music playlists (issue #262) play as a video series.
+            if (id === "videoseries")
+              return PLAYLIST_ID.test(url.searchParams.get("list") ?? "") ? url : null;
             return VIDEO_ID.test(id) ? url : null;
           }
           if (TWITCH_PLAYERS.get(url.origin) !== url.pathname) return null;

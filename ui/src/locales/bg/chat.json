@@ -107,8 +107,6 @@
     "play": "Пусни {{title}}",
     "player": "Видеоплейър: {{title}}",
     "videoTitle": "Видео от {{site}}",
-    "spotifyTitle": "Връзка към {{site}}",
-    "audioPlayer": "Плейър на Spotify: {{title}}",
     "kind": {
       "track": "Песен",
       "album": "Албум",
@@ -353,5 +351,45 @@
       "deleteHistory": "Изтриване на историята",
       "deleteHint": "Само това устройство · {{name}} запазва своето копие"
     }
+  },
+  "audio": {
+    "card": "Аудиофайл: {{name}}",
+    "file": "Аудиофайл",
+    "playing": "Възпроизвежда се",
+    "loading": "Зареждане…",
+    "play": "Пусни {{name}}",
+    "pause": "Паузирай {{name}}",
+    "playShort": "Пусни",
+    "pauseShort": "Пауза",
+    "seek": "Позиция",
+    "position": "{{time}} от {{length}}",
+    "volume": "Сила на звука",
+    "mute": "Заглуши",
+    "open": "Отвори {{name}} в браузъра",
+    "save": "Запази {{name}}",
+    "saveShort": "Запази файла",
+    "saveTitle": "Запазване на аудиофайл",
+    "fileType": "Аудиофайл",
+    "saveFailed": "Файлът не можа да бъде запазен.",
+    "errorTitle": "Файлът не може да се пусне",
+    "errorText": "Файлът липсва, е твърде голям или във формат, който Mumcord не може да пусне.",
+    "retry": "Опитай отново"
+  },
+  "music": {
+    "card": "{{service}}: {{title}}",
+    "title": "Връзка към {{service}}",
+    "other": "Музикална връзка",
+    "thirdParty": "Съдържание от трета страна от {{host}}",
+    "thirdPartyShort": "Съдържание от трета страна",
+    "embedded": "Вграден плейър · {{service}} · {{host}}",
+    "player": "Плейър на {{service}}: {{title}}",
+    "play": "Пусни",
+    "playLabel": "Пусни {{title}} в {{service}}",
+    "stop": "Спри",
+    "stopLabel": "Спри {{title}}",
+    "openIn": "Отвори в {{service}}",
+    "limits": "Ограниченията за възпроизвеждане се определят от услугата",
+    "noPlayer": "Няма наличен плейър за тази услуга",
+    "output": "Възпроизвежда се на изходното ви устройство, не в микрофона ви"
   }
 }

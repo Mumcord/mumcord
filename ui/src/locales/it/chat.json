@@ -111,8 +111,6 @@
     "play": "Riproduci {{title}}",
     "player": "Lettore video: {{title}}",
     "videoTitle": "Video di {{site}}",
-    "spotifyTitle": "Link di {{site}}",
-    "audioPlayer": "Lettore Spotify: {{title}}",
     "kind": {
       "track": "Brano",
       "album": "Album",
@@ -361,5 +359,45 @@
       "deleteHistory": "Elimina cronologia",
       "deleteHint": "Solo questo dispositivo · {{name}} conserva la sua copia"
     }
+  },
+  "audio": {
+    "card": "File audio: {{name}}",
+    "file": "File audio",
+    "playing": "In riproduzione",
+    "loading": "Caricamento…",
+    "play": "Riproduci {{name}}",
+    "pause": "Metti in pausa {{name}}",
+    "playShort": "Riproduci",
+    "pauseShort": "Pausa",
+    "seek": "Posizione",
+    "position": "{{time}} di {{length}}",
+    "volume": "Volume",
+    "mute": "Disattiva audio",
+    "open": "Apri {{name}} nel browser",
+    "save": "Salva {{name}}",
+    "saveShort": "Salva file",
+    "saveTitle": "Salva file audio",
+    "fileType": "File audio",
+    "saveFailed": "Impossibile salvare il file.",
+    "errorTitle": "Impossibile riprodurre questo file",
+    "errorText": "Il file manca, è troppo grande o ha un formato che Mumcord non può riprodurre.",
+    "retry": "Riprova"
+  },
+  "music": {
+    "card": "{{service}}: {{title}}",
+    "title": "Link {{service}}",
+    "other": "Link musicale",
+    "thirdParty": "Contenuto di terze parti da {{host}}",
+    "thirdPartyShort": "Contenuto di terze parti",
+    "embedded": "Player incorporato · {{service}} · {{host}}",
+    "player": "Player {{service}}: {{title}}",
+    "play": "Riproduci",
+    "playLabel": "Riproduci {{title}} su {{service}}",
+    "stop": "Interrompi",
+    "stopLabel": "Interrompi {{title}}",
+    "openIn": "Apri in {{service}}",
+    "limits": "I limiti di riproduzione sono stabiliti dal servizio",
+    "noPlayer": "Nessun player disponibile per questo servizio",
+    "output": "Riprodotto sul tuo dispositivo di uscita, non nel microfono"
   }
 }

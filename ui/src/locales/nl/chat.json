@@ -107,8 +107,6 @@
     "play": "{{title}} afspelen",
     "player": "Videospeler: {{title}}",
     "videoTitle": "{{site}}-video",
-    "spotifyTitle": "{{site}}-link",
-    "audioPlayer": "Spotify-speler: {{title}}",
     "kind": {
       "track": "Nummer",
       "album": "Album",
@@ -353,5 +351,45 @@
       "deleteHistory": "Geschiedenis verwijderen",
       "deleteHint": "Alleen dit apparaat · {{name}} houdt een eigen kopie"
     }
+  },
+  "audio": {
+    "card": "Audiobestand: {{name}}",
+    "file": "Audiobestand",
+    "playing": "Wordt afgespeeld",
+    "loading": "Laden…",
+    "play": "{{name}} afspelen",
+    "pause": "{{name}} onderbreken",
+    "playShort": "Afspelen",
+    "pauseShort": "Pauze",
+    "seek": "Positie",
+    "position": "{{time}} van {{length}}",
+    "volume": "Volume",
+    "mute": "Dempen",
+    "open": "{{name}} openen in browser",
+    "save": "{{name}} opslaan",
+    "saveShort": "Bestand opslaan",
+    "saveTitle": "Audiobestand opslaan",
+    "fileType": "Audiobestand",
+    "saveFailed": "Het bestand kon niet worden opgeslagen.",
+    "errorTitle": "Dit bestand kan niet worden afgespeeld",
+    "errorText": "Het bestand ontbreekt, is te groot of heeft een indeling die Mumcord niet kan afspelen.",
+    "retry": "Opnieuw proberen"
+  },
+  "music": {
+    "card": "{{service}}: {{title}}",
+    "title": "{{service}}-link",
+    "other": "Muzieklink",
+    "thirdParty": "Content van derden van {{host}}",
+    "thirdPartyShort": "Content van derden",
+    "embedded": "Ingesloten speler · {{service}} · {{host}}",
+    "player": "{{service}}-speler: {{title}}",
+    "play": "Afspelen",
+    "playLabel": "{{title}} afspelen op {{service}}",
+    "stop": "Stoppen",
+    "stopLabel": "{{title}} stoppen",
+    "openIn": "Openen in {{service}}",
+    "limits": "De dienst bepaalt de afspeellimieten",
+    "noPlayer": "Geen speler beschikbaar voor deze dienst",
+    "output": "Wordt afgespeeld op je uitvoerapparaat, niet in je microfoon"
   }
 }

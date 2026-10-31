@@ -1428,10 +1428,14 @@ export type LinkPreview = {
 	description: string | null,
 	/**  Preview image as a `data:` URL (fetched and re-encoded by the engine). */
 	image: string | null,
-	/**  Set for YouTube, Twitch and Spotify links: show a player card. */
+	/**  Set for YouTube and Twitch links: show a player card. */
 	video: VideoEmbed | null,
+	/**  Set for music service links and music pages: show a music card (issue #262). */
+	music: MusicEmbed | null,
 	/**  The link serves an image: show it inline (`inline_image`) instead of a card. */
 	isImage: boolean,
+	/**  The link serves an audio file: show the audio player (`audio_info`) instead of a card. */
+	isAudio: boolean,
 };
 
 /**  `ID` and `ID_LIKE` from os-release, e.g. `linuxmint` like `ubuntu debian`. */
@@ -1628,6 +1632,24 @@ export type NotifyOutcome =
 "toast" | 
 /**  A system notification was shown. */
 "desktop";
+
+export type MusicEmbed = {
+	service: MusicService,
+	kind: MusicKind,
+	/**
+	 *  The service's official embed; load it only after the user clicks play. `null`: the
+	 *  service has no usable embed, the card only links to it.
+	 */
+	playerUrl: string | null,
+	/**  Artist or uploader, when the service names one. */
+	artist: string | null,
+};
+
+export type MusicKind = "track" | "album" | "playlist" | "artist" | "episode" | "show";
+
+export type MusicService = "spotify" | "soundcloud" | "youtubeMusic" | "appleMusic" | "tidal" | "deezer" | "bandcamp" | 
+/**  Another page that says it is music. */
+"other";
 
 /**
  *  A game someone plays. `name` is plain text, never HTML. `playedMs` is the play time when the
@@ -2484,14 +2506,11 @@ export type VideoEmbed = {
 	 *  `&parent=<host of the page>` appended.
 	 */
 	playerUrl: string,
-	/**
-	 *  Channel or uploader name; for Spotify the kind of item (`track`, `album`, `playlist`,
-	 *  `artist`, `episode`, `show`).
-	 */
+	/**  Channel or uploader name. */
 	channel: string | null,
 };
 
-export type VideoSite = "youtube" | "twitch" | "spotify";
+export type VideoSite = "youtube" | "twitch";
 
 export type VoiceActivation = "automatic" | "manual";
 

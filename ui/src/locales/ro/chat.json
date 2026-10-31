@@ -111,8 +111,6 @@
     "play": "Redă {{title}}",
     "player": "Player video: {{title}}",
     "videoTitle": "Videoclip {{site}}",
-    "spotifyTitle": "Link {{site}}",
-    "audioPlayer": "Player Spotify: {{title}}",
     "kind": {
       "track": "Piesă",
       "album": "Album",
@@ -361,5 +359,45 @@
       "deleteHistory": "Șterge istoricul",
       "deleteHint": "Doar acest dispozitiv · {{name}} își păstrează copia"
     }
+  },
+  "audio": {
+    "card": "Fișier audio: {{name}}",
+    "file": "Fișier audio",
+    "playing": "Se redă",
+    "loading": "Se încarcă…",
+    "play": "Redă {{name}}",
+    "pause": "Pune pe pauză {{name}}",
+    "playShort": "Redă",
+    "pauseShort": "Pauză",
+    "seek": "Poziție",
+    "position": "{{time}} din {{length}}",
+    "volume": "Volum",
+    "mute": "Dezactivează sunetul",
+    "open": "Deschide {{name}} în browser",
+    "save": "Salvează {{name}}",
+    "saveShort": "Salvează fișierul",
+    "saveTitle": "Salvează fișierul audio",
+    "fileType": "Fișier audio",
+    "saveFailed": "Fișierul nu a putut fi salvat.",
+    "errorTitle": "Acest fișier nu poate fi redat",
+    "errorText": "Fișierul lipsește, este prea mare sau are un format pe care Mumcord nu îl poate reda.",
+    "retry": "Încearcă din nou"
+  },
+  "music": {
+    "card": "{{service}}: {{title}}",
+    "title": "Link {{service}}",
+    "other": "Link muzical",
+    "thirdParty": "Conținut de la terți de la {{host}}",
+    "thirdPartyShort": "Conținut de la terți",
+    "embedded": "Player încorporat · {{service}} · {{host}}",
+    "player": "Player {{service}}: {{title}}",
+    "play": "Redă",
+    "playLabel": "Redă {{title}} pe {{service}}",
+    "stop": "Oprește",
+    "stopLabel": "Oprește {{title}}",
+    "openIn": "Deschide în {{service}}",
+    "limits": "Limitele de redare sunt stabilite de serviciu",
+    "noPlayer": "Niciun player disponibil pentru acest serviciu",
+    "output": "Se redă pe dispozitivul de ieșire, nu în microfon"
   }
 }

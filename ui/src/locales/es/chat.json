@@ -111,8 +111,6 @@
     "play": "Reproducir {{title}}",
     "player": "Reproductor de vídeo: {{title}}",
     "videoTitle": "Vídeo de {{site}}",
-    "spotifyTitle": "Enlace de {{site}}",
-    "audioPlayer": "Reproductor de Spotify: {{title}}",
     "kind": {
       "track": "Canción",
       "album": "Álbum",
@@ -361,5 +359,45 @@
       "deleteHistory": "Eliminar historial",
       "deleteHint": "Solo este dispositivo · {{name}} conserva su copia"
     }
+  },
+  "audio": {
+    "card": "Archivo de audio: {{name}}",
+    "file": "Archivo de audio",
+    "playing": "Reproduciendo",
+    "loading": "Cargando…",
+    "play": "Reproducir {{name}}",
+    "pause": "Pausar {{name}}",
+    "playShort": "Reproducir",
+    "pauseShort": "Pausa",
+    "seek": "Posición",
+    "position": "{{time}} de {{length}}",
+    "volume": "Volumen",
+    "mute": "Silenciar",
+    "open": "Abrir {{name}} en el navegador",
+    "save": "Guardar {{name}}",
+    "saveShort": "Guardar archivo",
+    "saveTitle": "Guardar archivo de audio",
+    "fileType": "Archivo de audio",
+    "saveFailed": "No se pudo guardar el archivo.",
+    "errorTitle": "No se puede reproducir este archivo",
+    "errorText": "Falta el archivo, es demasiado grande o tiene un formato que Mumcord no puede reproducir.",
+    "retry": "Reintentar"
+  },
+  "music": {
+    "card": "{{service}}: {{title}}",
+    "title": "Enlace de {{service}}",
+    "other": "Enlace de música",
+    "thirdParty": "Contenido de terceros de {{host}}",
+    "thirdPartyShort": "Contenido de terceros",
+    "embedded": "Reproductor incrustado · {{service}} · {{host}}",
+    "player": "Reproductor de {{service}}: {{title}}",
+    "play": "Reproducir",
+    "playLabel": "Reproducir {{title}} en {{service}}",
+    "stop": "Detener",
+    "stopLabel": "Detener {{title}}",
+    "openIn": "Abrir en {{service}}",
+    "limits": "Los límites de reproducción los define el servicio",
+    "noPlayer": "No hay reproductor disponible para este servicio",
+    "output": "Se reproduce en tu dispositivo de salida, no en tu micrófono"
   }
 }
