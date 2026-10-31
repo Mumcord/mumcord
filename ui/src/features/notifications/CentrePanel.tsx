@@ -105,19 +105,23 @@ export function CentrePanel() {
       if (panel.contains(target) || bell?.contains(target)) return;
       close(false);
     };
-    // Escape and the arrow keys, wherever the focus is inside the panel.
+    // The arrow keys, wherever the focus is inside the panel.
     const onKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "Escape") {
-        event.preventDefault();
-        close(true);
-      } else if (moveFocus(panel, event.key)) {
-        event.preventDefault();
-      }
+      if (moveFocus(panel, event.key)) event.preventDefault();
+    };
+    // Escape on the document: "Mark all as read" disables the focused button, which drops the
+    // focus to the page body, outside the panel.
+    const onEscape = (event: KeyboardEvent) => {
+      if (event.key !== "Escape" || event.defaultPrevented) return;
+      event.preventDefault();
+      close(true);
     };
     document.addEventListener("pointerdown", onPointerDown);
+    document.addEventListener("keydown", onEscape);
     panel.addEventListener("keydown", onKeyDown);
     return () => {
       document.removeEventListener("pointerdown", onPointerDown);
+      document.removeEventListener("keydown", onEscape);
       panel.removeEventListener("keydown", onKeyDown);
     };
   }, []);
