@@ -24,6 +24,7 @@
 //! after the user allowed direct connections.
 
 mod gather;
+mod peer;
 mod signal;
 mod tls;
 
@@ -37,6 +38,10 @@ use quinn::{Connection, Endpoint, EndpointConfig, TokioRuntime, TransportConfig,
 use tokio::sync::mpsc;
 use tokio::task::JoinSet;
 
+pub use peer::{
+    MAX_PEER_BYTES, PEER_DATA_ID, PEER_VERSION, PeerError, PeerMessage, RelayAnnouncement,
+    RelayState, RelayToken, RequestId, TokenErrorReason,
+};
 pub use quinn;
 pub use signal::{
     DATA_ID, DeclineReason, MAX_CANDIDATES, MAX_SIGNAL_BYTES, SessionId, Signal, SignalError,
@@ -120,6 +125,7 @@ impl P2p {
             signal: Signal::Offer {
                 session,
                 candidates: attempt.candidates.clone(),
+                relay: false,
             },
             attempt,
             session,
@@ -132,6 +138,7 @@ impl P2p {
         let Signal::Offer {
             session,
             candidates,
+            ..
         } = offer
         else {
             return Err(SignalError::Unexpected.into());
@@ -141,6 +148,7 @@ impl P2p {
             signal: Signal::Answer {
                 session: *session,
                 candidates: attempt.candidates.clone(),
+                relay: false,
             },
             targets: candidates.clone(),
             attempt,

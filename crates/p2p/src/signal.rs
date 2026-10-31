@@ -4,6 +4,10 @@
 //! on; this module only encodes and decodes them, the caller moves the bytes. Small versioned
 //! JSON: `{"v":1,"t":"offer","s":"<16 hex>","c":["203.0.113.5:40000","[2001:db8::1]:40000"]}`,
 //! `"t":"answer"` with the same fields, or `{"v":1,"t":"decline","s":…,"r":"declined"}`.
+//! Offer and answer carry `"rl":1` when the sender can use the relay announced on the server
+//! (spec 04, FR-4.13). A sender that hides its address sends no candidates and `"rl":1`. The
+//! field is not called `r` because `r` is the decline reason string and released clients would
+//! reject a number there.
 //! Received messages come from another client and are untrusted: the decoder checks the size
 //! before parsing, caps the candidate list and rejects addresses that can never be a peer.
 
@@ -49,11 +53,15 @@ pub enum Signal {
     Offer {
         session: SessionId,
         candidates: Vec<SocketAddr>,
+        /// The sender can use the relay announced on this server.
+        relay: bool,
     },
     /// Reply to an offer: where the answering side can be reached.
     Answer {
         session: SessionId,
         candidates: Vec<SocketAddr>,
+        /// The sender can use the relay announced on this server.
+        relay: bool,
     },
     /// Reply to an offer: no connection.
     Decline {
@@ -93,6 +101,8 @@ struct Wire {
     c: Vec<String>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     r: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    rl: Option<u8>,
 }
 
 impl Signal {
@@ -107,10 +117,16 @@ impl Signal {
     /// Encodes the message for plugin data. Fails only when the message would not fit, which
     /// cannot happen for messages built by this crate (at most [`MAX_CANDIDATES`] addresses).
     pub fn encode(&self) -> Result<Vec<u8>, SignalError> {
-        let (t, candidates, r) = match self {
-            Self::Offer { candidates, .. } => ("offer", candidates.as_slice(), None),
-            Self::Answer { candidates, .. } => ("answer", candidates.as_slice(), None),
-            Self::Decline { reason, .. } => ("decline", [].as_slice(), Some(reason_str(*reason))),
+        let (t, candidates, r, relay) = match self {
+            Self::Offer {
+                candidates, relay, ..
+            } => ("offer", candidates.as_slice(), None, *relay),
+            Self::Answer {
+                candidates, relay, ..
+            } => ("answer", candidates.as_slice(), None, *relay),
+            Self::Decline { reason, .. } => {
+                ("decline", [].as_slice(), Some(reason_str(*reason)), false)
+            }
         };
         if candidates.len() > MAX_CANDIDATES {
             return Err(SignalError::TooManyCandidates);
@@ -121,6 +137,7 @@ impl Signal {
             s: format!("{:016x}", self.session().0),
             c: candidates.iter().map(SocketAddr::to_string).collect(),
             r: r.map(str::to_owned),
+            rl: relay.then_some(1),
         };
         let bytes = serde_json::to_vec(&wire).map_err(|_| SignalError::Malformed)?;
         if bytes.len() > MAX_SIGNAL_BYTES {
@@ -147,14 +164,18 @@ impl Signal {
             .iter()
             .map(|c| parse_candidate(c))
             .collect::<Result<Vec<_>, _>>()?;
+        // Any other value is a future meaning this client does not know, so not "can relay".
+        let relay = wire.rl == Some(1);
         match wire.t.as_str() {
             "offer" => Ok(Self::Offer {
                 session,
                 candidates,
+                relay,
             }),
             "answer" => Ok(Self::Answer {
                 session,
                 candidates,
+                relay,
             }),
             "decline" => {
                 let reason = match wire.r.as_deref() {
@@ -222,6 +243,7 @@ mod tests {
                 "203.0.113.5:40000".parse().expect("addr"),
                 "[2001:db8::1]:40001".parse().expect("addr"),
             ],
+            relay: false,
         }
     }
 
@@ -234,8 +256,14 @@ mod tests {
         let answer = Signal::Answer {
             session: SessionId(u64::MAX),
             candidates: vec![],
+            relay: true,
         };
-        for signal in [offer(), answer, decline] {
+        let relay_offer = Signal::Offer {
+            session: SessionId(9),
+            candidates: vec!["203.0.113.5:40000".parse().expect("addr")],
+            relay: true,
+        };
+        for signal in [offer(), answer, decline, relay_offer] {
             let bytes = signal.encode().expect("encode");
             assert_eq!(Signal::decode(&bytes).expect("decode"), signal);
         }
@@ -253,6 +281,7 @@ mod tests {
         let signal = Signal::Offer {
             session: SessionId(u64::MAX),
             candidates,
+            relay: true,
         };
         assert!(signal.encode().expect("encode").len() <= MAX_SIGNAL_BYTES);
     }
@@ -272,8 +301,27 @@ mod tests {
             Ok(Signal::Offer {
                 session: SessionId(1),
                 candidates: vec!["203.0.113.5:40000".parse().expect("addr")],
+                relay: false,
             })
         );
+    }
+
+    #[test]
+    fn relay_flag_is_rl_and_absent_when_false() {
+        let hidden = Signal::Offer {
+            session: SessionId(1),
+            candidates: vec![],
+            relay: true,
+        };
+        let json = String::from_utf8(hidden.encode().expect("encode")).expect("utf8");
+        assert_eq!(json, r#"{"v":1,"t":"offer","s":"0000000000000001","rl":1}"#);
+        let json = String::from_utf8(offer().encode().expect("encode")).expect("utf8");
+        assert!(!json.contains("rl"), "{json}");
+        let unknown = r#"{"v":1,"t":"answer","s":"0000000000000001","rl":2}"#;
+        assert!(matches!(
+            Signal::decode(unknown.as_bytes()),
+            Ok(Signal::Answer { relay: false, .. })
+        ));
     }
 
     #[test]

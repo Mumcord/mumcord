@@ -126,6 +126,7 @@ async fn unreachable_peer_gives_no_direct_path_in_time() {
     let reply = Signal::Answer {
         session: offer.signal().session(),
         candidates: vec!["192.0.2.1:9".parse().expect("addr")],
+        relay: false,
     };
     let started = Instant::now();
     let result = offer.complete(&reply).await;
@@ -158,6 +159,7 @@ async fn decline_and_foreign_replies_end_the_attempt() {
     let other_session = Signal::Answer {
         session: SessionId(offer.signal().session().0.wrapping_add(1)),
         candidates: vec![],
+        relay: false,
     };
     let result = offer.complete(&other_session).await;
     assert!(matches!(
@@ -168,6 +170,7 @@ async fn decline_and_foreign_replies_end_the_attempt() {
     let not_an_offer = Signal::Answer {
         session: SessionId(1),
         candidates: vec![],
+        relay: false,
     };
     let result = node.answer(&not_an_offer, &bob_hash).await;
     assert!(matches!(
