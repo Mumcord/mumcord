@@ -436,6 +436,11 @@ pub struct Settings {
     /// Linux Wayland: "Compatibility mode (X11)", runs through XWayland with the X11
     /// push-to-talk path (default off, FR-1.48). Takes effect after `app_restart`.
     pub ptt_compatibility_mode: bool,
+    /// Global hotkeys also work while Mumcord is in the background (issue #64); off, only
+    /// while its window has the focus.
+    pub global_hotkeys: bool,
+    /// Global hotkeys; none by default (Q1.7).
+    pub hotkeys: Vec<super::hotkeys::Hotkey>,
     /// Device ids from `audio_devices`; `null` uses the OS default.
     pub input_device: Option<String>,
     pub output_device: Option<String>,
@@ -564,6 +569,8 @@ impl Settings {
             ptt_key: s.ptt_key.clone(),
             allow_mouse_buttons: s.allow_mouse_buttons,
             ptt_compatibility_mode: s.ptt_compatibility_mode,
+            global_hotkeys: s.global_hotkeys,
+            hotkeys: s.hotkeys.iter().cloned().map(Into::into).collect(),
             input_device: s.input_device.clone(),
             output_device: s.output_device.clone(),
             noise_suppression: s.noise_suppression,
@@ -684,6 +691,8 @@ impl Settings {
         s.ptt_key = self.ptt_key.clone().filter(|k| !k.is_empty());
         s.allow_mouse_buttons = self.allow_mouse_buttons;
         s.ptt_compatibility_mode = self.ptt_compatibility_mode;
+        s.global_hotkeys = self.global_hotkeys;
+        s.hotkeys = self.hotkeys.iter().cloned().map(Into::into).collect();
         s.input_device = self.input_device.clone().filter(|d| !d.is_empty());
         s.output_device = self.output_device.clone().filter(|d| !d.is_empty());
         s.noise_suppression = self.noise_suppression;
@@ -936,6 +945,9 @@ pub async fn settings_update(
     }
     if mouse_changed || key != active_ptt_key(&previous) {
         configure_ptt(&app, key);
+    }
+    if stored.hotkeys != previous.hotkeys || stored.global_hotkeys != previous.global_hotkeys {
+        super::hotkeys::configure(&app, &stored);
     }
     if stored.language != previous.language {
         crate::tray::language_changed(&app);
