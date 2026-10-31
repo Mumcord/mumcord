@@ -97,10 +97,14 @@
     "dnd": "Nu deranja",
     "dndHint": "Dezactivează sunetele și bannerele de notificare",
     "dndSystemHint": "Activat prin modul Nu deranja al desktopului",
-    "privateMessages": "Mesaje private de la",
+    "privateMessages": "Mesaje de la",
     "pm_everyone": "Oricine",
     "pm_friendsOnly": "Prieteni",
-    "pm_nobody": "Nimeni"
+    "pm_nobody": "Nimeni",
+    "notifications": "Notificări",
+    "sharing": "Partajare",
+    "appearance": "Aspect",
+    "account": "Cont"
   },
   "voice": {
     "line": "Voce: {{channel}} · {{server}}",

@@ -97,10 +97,14 @@
     "dnd": "Stör ej",
     "dndHint": "Tystar ljud och banderoller för aviseringar",
     "dndSystemHint": "På via skrivbordets Stör ej",
-    "privateMessages": "Privata meddelanden från",
+    "privateMessages": "Meddelanden från",
     "pm_everyone": "Alla",
     "pm_friendsOnly": "Vänner",
-    "pm_nobody": "Ingen"
+    "pm_nobody": "Ingen",
+    "notifications": "Aviseringar",
+    "sharing": "Delning",
+    "appearance": "Utseende",
+    "account": "Konto"
   },
   "voice": {
     "line": "Röst: {{channel}} · {{server}}",

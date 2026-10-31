@@ -38,6 +38,8 @@
 
 ### Changed
 
+- The quick settings popover (gear button in the user panel) is calm and easy to scan: one row per setting with its switch or segmented control on the right, grouped under **Notifications**, **Sharing**, **Appearance** and **Account**, and the explanations no longer sit under every row but behind a small **?** button that shows them on hover or keyboard focus and reads them out as the control's description; unsupported rows keep their "Not available on …" text there. The Beta group starts collapsed every time and shows how many settings it holds, so it can no longer be left open by accident, and the popover is slightly wider so labels and controls fit on one line (#234)
+
 - The "Direct messages" list below the channel tree is gone: the private messages overview (Messages button at the top of the server bar) shows every conversation with its unread count and opens it with mouse or keyboard (#219)
 
 - A new **search button in the server bar** opens the public server browser: the list of public Mumble servers the official Mumble client shows. Search by name, address or country, filter by country and ping, hide empty or full servers, and sort by name, country, ping or users. **Connect** saves the server and connects in one click; **Favourite** adds it to your servers. For privacy the list is loaded only when you open the browser, never in the background, and only the rows on screen are pinged (with the standard Mumble ping, one every 50 ms, a few at a time). Everything in the list is treated as untrusted and shown as plain text.

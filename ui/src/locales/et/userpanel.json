@@ -97,10 +97,14 @@
     "dnd": "Ära sega",
     "dndHint": "Vaigistab teavituste helid ja bännerid",
     "dndSystemHint": "Sees töölaua režiimi „Ära sega“ kaudu",
-    "privateMessages": "Privaatsõnumid kasutajatelt",
+    "privateMessages": "Sõnumid",
     "pm_everyone": "Kõigilt",
     "pm_friendsOnly": "Sõbrad",
-    "pm_nobody": "Mitte keegi"
+    "pm_nobody": "Mitte keegi",
+    "notifications": "Teavitused",
+    "sharing": "Jagamine",
+    "appearance": "Välimus",
+    "account": "Konto"
   },
   "voice": {
     "line": "Hääl: {{channel}} · {{server}}",
