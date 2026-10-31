@@ -440,7 +440,11 @@ pub(crate) mod tests {
         favourites::tests::write_db(&db, &[("B", "b.example", 1, "", Some("pw"))]);
         std::fs::write(
             config.join("Mumble.conf"),
-            format!("[General]\ndatabaselocation={}\n", db.display()),
+            // QSettings escapes backslashes in INI values (Windows paths).
+            format!(
+                "[General]\ndatabaselocation={}\n",
+                db.display().to_string().replace('\\', "\\\\")
+            ),
         )
         .expect("write");
         let found = read(&env).expect("found");
