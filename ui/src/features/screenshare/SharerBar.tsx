@@ -7,6 +7,7 @@
 import { useEffect, useState, type ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 import { announce } from "../../a11y";
+import { SharePanel } from "./SharePanel";
 import { getApi, type ShareQuality, type User } from "../../api";
 import { useServerStateOf } from "../channels";
 import { Avatar } from "../members/Avatar";
@@ -58,7 +59,15 @@ export function SharerBar(): ReactNode {
     };
   }, [serverId, own]);
 
-  if (serverId === null || own === null) return null;
+  // Nothing shared yet: the bar is the entry point, with the reason if sharing is not possible.
+  if (own === null) {
+    return (
+      <div className="sharer-bar" role="status" aria-label={t("controls")}>
+        <SharePanel />
+      </div>
+    );
+  }
+  if (serverId === null) return null;
   const nameOf = (session: number) => users.get(session)?.name ?? t("someone");
   const srcOf = (session: number) => {
     const user = users.get(session);
@@ -173,7 +182,6 @@ export function SharerBar(): ReactNode {
       <button
         type="button"
         className="button button--danger"
-        aria-label={t("barEndLabel")}
         onClick={stop}
       >
         {t("stop")}
