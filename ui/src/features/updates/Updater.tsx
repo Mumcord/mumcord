@@ -4,7 +4,8 @@ import { announce } from "../../a11y";
 import { getApi } from "../../api";
 import { useServers as useConnectedServers } from "../channels";
 import { openInBrowser } from "../chat/openLink";
-import { onUpdateDialogRequest } from "./dialogRequests";
+import { clearUpdateReady, recordUpdateReady } from "../notifications/centreSources";
+import { onUpdateDialogRequest, onUpdateRestartRequest, restartOrAsk } from "./dialogRequests";
 import { UpdateDialog, type UpdateActions } from "./UpdateDialog";
 import { UpdateToast } from "./UpdateToast";
 import { useUpdateStatus } from "./useUpdateStatus";
@@ -29,7 +30,8 @@ const engineActions: UpdateActions = {
 
 /**
  * The in-app updater's main-window UI (FR-3.145): the update dialog when the engine asks for it
- * or the user opens it, and a toast while an installed update waits for a restart.
+ * or the user opens it, and a toast and a notification centre entry while an installed update
+ * waits for a restart.
  */
 export function Updater({ actions = engineActions }: { actions?: UpdateActions }) {
   const { t } = useTranslation("appwindow");
@@ -44,10 +46,31 @@ export function Updater({ actions = engineActions }: { actions?: UpdateActions }
   const connectedServers = useConnectedServers().size;
   useEffect(() => onUpdateDialogRequest(showDialog), [showDialog]);
 
-  const readyVersion = status?.phase === "ready" ? (status.offer?.version ?? null) : null;
+  const restartNow = useCallback(() => {
+    actions.restart().catch((error: unknown) => {
+      console.error("Restarting for the update failed", error);
+      announce(t("updater.actionFailed"), "assertive");
+    });
+  }, [actions, t]);
+  useEffect(
+    () =>
+      onUpdateRestartRequest(() => {
+        restartOrAsk(connectedServers, restartNow, showDialog);
+      }),
+    [connectedServers, restartNow, showDialog],
+  );
+
+  const ready = status?.phase === "ready" ? status.offer : null;
+  const readyVersion = ready?.version ?? null;
+  const readyUrl = ready?.url ?? null;
   useEffect(() => {
     if (readyVersion !== null) announce(t("updater.ready.announce", { version: readyVersion }));
   }, [readyVersion, t]);
+  // One entry in the notification centre while the update waits; gone once it no longer does.
+  useEffect(() => {
+    if (readyVersion === null || readyUrl === null) clearUpdateReady();
+    else recordUpdateReady(readyVersion, readyUrl);
+  }, [readyVersion, readyUrl]);
 
   if (status?.offer == null) return null;
   if (dialogOpen) {
@@ -68,12 +91,7 @@ export function Updater({ actions = engineActions }: { actions?: UpdateActions }
     <UpdateToast
       version={readyVersion}
       connectedServers={connectedServers}
-      onRestart={() => {
-        actions.restart().catch((error: unknown) => {
-          console.error("Restarting for the update failed", error);
-          announce(t("updater.actionFailed"), "assertive");
-        });
-      }}
+      onRestart={restartNow}
       onShowDialog={showDialog}
       onLater={() => {
         setToastHidden(true);

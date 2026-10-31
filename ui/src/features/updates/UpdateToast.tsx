@@ -1,5 +1,6 @@
 import { useId } from "react";
 import { useTranslation } from "react-i18next";
+import { restartOrAsk } from "./dialogRequests";
 import "./updates.css";
 
 export interface UpdateToastProps {
@@ -14,7 +15,7 @@ export interface UpdateToastProps {
 
 /**
  * Small note that a downloaded update waits for a restart. Restarting while connected first
- * shows the dialog: Mumcord never ends a call without asking.
+ * shows the dialog (`restartOrAsk`).
  */
 export function UpdateToast(props: UpdateToastProps) {
   const { t } = useTranslation("appwindow");
@@ -31,7 +32,9 @@ export function UpdateToast(props: UpdateToastProps) {
           <button
             type="button"
             className="button button--primary"
-            onClick={props.connectedServers > 0 ? props.onShowDialog : props.onRestart}
+            onClick={() => {
+              restartOrAsk(props.connectedServers, props.onRestart, props.onShowDialog);
+            }}
           >
             {t("updater.toast.restart")}
           </button>

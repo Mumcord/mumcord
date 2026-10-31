@@ -55,7 +55,8 @@
       "messageRequest": "Zahtjev za poruku",
       "invite": "Pozivnica",
       "private": "Privatna poruka",
-      "connection": "Veza"
+      "connection": "Veza",
+      "update": "Ažuriranje"
     },
     "accept": "Prihvati",
     "decline": "Odbij",
@@ -65,6 +66,12 @@
     "dismiss": "Odbaci",
     "dismissItem": "Odbaci: {{title}}",
     "failed": "To nije uspjelo. Pokušaj ponovno.",
-    "block": "Blokiraj"
+    "block": "Blokiraj",
+    "update": {
+      "title": "Mumcord {{version}} je spreman",
+      "body": "Ponovno pokrenite za ažuriranje",
+      "restart": "Ponovno pokreni i ažuriraj",
+      "whatsNew": "Što je novo"
+    }
   }
 }
