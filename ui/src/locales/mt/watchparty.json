@@ -30,6 +30,8 @@
     "title": "Li jmiss",
     "empty": "Xejn ma jmiss. Żid links ta' YouTube b'“Żid mal-playlist”.",
     "skip": "Aqbeż",
+    "previous": "Ta' qabel",
+    "previousFailed": "Ma stajtx terġa' lura għall-video ta' qabel.",
     "moveHint": "Alt+Up u Alt+Down iċaqilqu l-video; tista' wkoll tkaxkru.",
     "moved": "Imċaqlaq għall-pożizzjoni {{position}}",
     "videoTitle": "Video ta' YouTube",

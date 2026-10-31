@@ -23,7 +23,7 @@ import { CodecHint } from "./CodecHint";
 import { PlayPause } from "./PlayPause";
 import { SyncPill } from "./SyncPill";
 import { loadCommand, playerOrigin } from "./playerBridge";
-import { playNext } from "./playlistActions";
+import { playNext, playPrevious } from "./playlistActions";
 import { reportPosition } from "./reportPosition";
 import { syncState, type SyncState } from "./syncState";
 import { useVideoPreview } from "./useVideoPreview";
@@ -241,6 +241,14 @@ export function Cinema({
       }
       controls={
         <>
+          <Icon
+            label={t("playlist.previous")}
+            glyph="⏮"
+            onClick={() => {
+              playPrevious(serverId, t("playlist.previousFailed"));
+            }}
+            disabled={party.history.length === 0}
+          />
           <PlayPause serverId={serverId} live={live} />
           <Icon
             label={tc("media.next")}

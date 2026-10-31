@@ -30,6 +30,8 @@
     "title": "A seguire",
     "empty": "Niente a seguire. Aggiungi link YouTube con «Aggiungi alla playlist».",
     "skip": "Salta",
+    "previous": "Precedente",
+    "previousFailed": "Impossibile tornare al video precedente.",
     "moveHint": "Alt+Su e Alt+Giù spostano il video; puoi anche trascinarlo.",
     "moved": "Spostato in posizione {{position}}",
     "videoTitle": "Video YouTube",

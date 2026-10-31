@@ -30,6 +30,8 @@
     "title": "Up next",
     "empty": "Nothing up next. Add YouTube links with “Add to playlist”.",
     "skip": "Skip",
+    "previous": "Previous",
+    "previousFailed": "Could not go back to the previous video.",
     "moveHint": "Alt+Up and Alt+Down move the video; you can also drag it.",
     "moved": "Moved to position {{position}}",
     "videoTitle": "YouTube video",

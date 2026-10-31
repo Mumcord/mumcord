@@ -30,6 +30,8 @@
     "title": "A continuación",
     "empty": "No hay nada a continuación. Añade enlaces de YouTube con «Añadir a la lista».",
     "skip": "Saltar",
+    "previous": "Anterior",
+    "previousFailed": "No se pudo volver al vídeo anterior.",
     "moveHint": "Alt+Arriba y Alt+Abajo mueven el vídeo; también puedes arrastrarlo.",
     "moved": "Movido a la posición {{position}}",
     "videoTitle": "Vídeo de YouTube",

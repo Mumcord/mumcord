@@ -3015,6 +3015,7 @@ export function createMockApi(options: MockOptions = {}): MockApi {
         skippedBy: null,
         positions: [],
         host: SELF_SESSION,
+        history: [],
       };
       watchParties.set(serverId, party);
       emit("watchPartyChanged", { serverId, party });
@@ -3080,6 +3081,7 @@ export function createMockApi(options: MockOptions = {}): MockApi {
       changeParty(serverId, { ...current, playlist });
       return Promise.resolve(null);
     },
+    // The past the mock keeps for itself, the same ten entries the engine remembers (issue #163).
     watchPartyNext: (serverId, from, skip) => {
       const current = watchParties.get(serverId);
       if (!current?.joined) fail("notFound", "no watch party in this channel");
@@ -3094,6 +3096,26 @@ export function createMockApi(options: MockOptions = {}): MockApi {
         lastAction: null,
         skippedBy: skip ? SELF_SESSION : null,
         playlist: rest,
+        history: [...current.history, { id: from, videoId: current.videoId }].slice(-10),
+      });
+      return Promise.resolve(null);
+    },
+    watchPartyPrevious: (serverId) => {
+      const current = watchParties.get(serverId);
+      if (!current?.joined) fail("notFound", "no watch party in this channel");
+      if (current.history.length === 0) fail("invalidInput", "nothing has played yet");
+      const history = [...current.history];
+      const item = history.pop();
+      if (item === undefined) fail("invalidInput", "nothing has played yet");
+      changeParty(serverId, {
+        ...current,
+        videoId: item.videoId,
+        currentEntry: item.id,
+        playing: true,
+        positionMs: 0,
+        lastAction: null,
+        skippedBy: null,
+        history,
       });
       return Promise.resolve(null);
     },

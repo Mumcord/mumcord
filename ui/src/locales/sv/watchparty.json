@@ -30,6 +30,8 @@
     "title": "Näst på tur",
     "empty": "Inget näst på tur. Lägg till YouTube-länkar med ”Lägg till i spellistan”.",
     "skip": "Hoppa över",
+    "previous": "Föregående",
+    "previousFailed": "Det gick inte att gå tillbaka till föregående video.",
     "moveHint": "Alt+Upp och Alt+Ned flyttar videon; du kan också dra den.",
     "moved": "Flyttad till position {{position}}",
     "videoTitle": "YouTube-video",

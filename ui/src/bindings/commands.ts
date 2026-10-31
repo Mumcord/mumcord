@@ -635,6 +635,7 @@ export const commands = {
 	 *  or at once with `skip`.
 	 */
 	watchPartyNext: (serverId: number, from: number, skip: boolean) => typedError<null, ApiError>(__TAURI_INVOKE("watch_party_next", { serverId, from, skip })),
+	watchPartyPrevious: (serverId: number) => typedError<null, ApiError>(__TAURI_INVOKE("watch_party_previous", { serverId })),
 	/**
 	 *  URL of the loopback page that hosts the party's YouTube player (FR-2.41a); starts its server
 	 *  on first use. It stops by itself once the user is in no party and no chat embed plays.
@@ -3033,6 +3034,11 @@ export type WatchBlock =
 export type WatchCommand = { kind: "play"; positionMs: number } | { kind: "pause"; positionMs: number } | { kind: "seek"; positionMs: number };
 
 /**  The running party in the voice channel. */
+export type HistoryItem = {
+	id: number,
+	videoId: string,
+};
+
 export type WatchParty = {
 	channelId: number,
 	videoId: string,
@@ -3052,6 +3058,8 @@ export type WatchParty = {
 	positions: ParticipantPosition[],
 	/**  Who started the party (the crown in the watching list, issue #163). */
 	host: number,
+	/**  What played before the current video, oldest first (issue #163). */
+	history: HistoryItem[],
 };
 
 /**  The party on the server started, changed or ended (`party` is `null`). */

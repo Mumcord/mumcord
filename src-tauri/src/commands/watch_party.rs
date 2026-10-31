@@ -42,6 +42,14 @@ pub struct PlaylistEntry {
     pub added_by_name: Option<String>,
 }
 
+/// One video that already played, for the previous button (issue #163).
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, Type)]
+#[serde(rename_all = "camelCase")]
+pub struct HistoryItem {
+    pub id: u32,
+    pub video_id: String,
+}
+
 /// Where one participant's player last said it is (issue #163).
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, Type)]
 #[serde(rename_all = "camelCase")]
@@ -77,6 +85,8 @@ pub struct WatchParty {
     pub positions: Vec<ParticipantPosition>,
     /// Who started the party (the crown in the watching list, issue #163).
     pub host: SessionId,
+    /// What played before the current video, oldest first (issue #163).
+    pub history: Vec<HistoryItem>,
 }
 
 /// The party on the server started, changed or ended (`party` is `null`).
@@ -145,6 +155,14 @@ impl From<mumcord_engine::WatchPartyView> for WatchParty {
                 })
                 .collect(),
             host: v.host,
+            history: v
+                .history
+                .into_iter()
+                .map(|h| HistoryItem {
+                    id: h.id,
+                    video_id: h.v,
+                })
+                .collect(),
         }
     }
 }
@@ -265,6 +283,13 @@ pub fn watch_party_next(
     skip: bool,
 ) -> ApiResult<()> {
     Ok(engine.watch_party_next(to_engine_server_id(server_id), from, skip)?)
+}
+
+/// Goes back to the video that played before the current one for everyone (issue #163).
+#[tauri::command]
+#[specta::specta]
+pub fn watch_party_previous(engine: State<'_, Engine>, server_id: ServerId) -> ApiResult<()> {
+    Ok(engine.watch_party_previous(to_engine_server_id(server_id))?)
 }
 
 /// URL of the loopback page that hosts the party's YouTube player (FR-2.41a); starts its server

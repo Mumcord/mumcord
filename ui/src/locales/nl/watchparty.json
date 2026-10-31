@@ -30,6 +30,8 @@
     "title": "Hierna",
     "empty": "Niets hierna. Voeg YouTube-links toe met ‘Aan afspeellijst toevoegen’.",
     "skip": "Overslaan",
+    "previous": "Vorige",
+    "previousFailed": "Terug naar de vorige video lukte niet.",
     "moveHint": "Alt+Omhoog en Alt+Omlaag verplaatsen de video; je kunt hem ook slepen.",
     "moved": "Verplaatst naar positie {{position}}",
     "videoTitle": "YouTube-video",

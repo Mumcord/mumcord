@@ -95,6 +95,17 @@ pub struct WatchAction {
     pub command: WatchCommand,
 }
 
+/// One video that already played, for the previous button (issue #163). `id` is 0 for the video
+/// the party started with.
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct HistoryItem {
+    pub id: u32,
+    pub v: String,
+}
+
+/// How much of the past one party keeps.
+pub const HISTORY_MAX: usize = 10;
+
 /// The party in the user's channel as the UI shows it. `position_ms` is the position when the
 /// view was made; while `playing`, the player runs on from there.
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -118,6 +129,8 @@ pub struct WatchPartyView {
     pub positions: Vec<ParticipantPosition>,
     /// Who started the party (the crown in the watching list, issue #163).
     pub host: u32,
+    /// What played before the current video, oldest first, at most [`HISTORY_MAX`] (issue #163).
+    pub history: Vec<HistoryItem>,
 }
 
 /// What travels over plugin data.
@@ -155,6 +168,14 @@ enum Msg {
         /// Who skipped to it (version 2).
         #[serde(default, skip_serializing_if = "Option::is_none")]
         skip: Option<u32>,
+        /// What played before `cur`, oldest first (version 3, issue #163).
+        #[serde(default)]
+        hist: Vec<HistoryItem>,
+    },
+    /// The sender went back to the already played entry `id` (version 3, issue #163).
+    Prev {
+        id: u32,
+        v: String,
     },
     /// Playlist edits, bundled (version 2).
     Pl {
@@ -232,6 +253,8 @@ pub(crate) struct Party {
     announced: BTreeMap<u32, Option<Instant>>,
     /// What each participant last said about its own player (issue #163).
     reports: BTreeMap<u32, Report>,
+    /// What played before the current video, oldest first (issue #163).
+    history: Vec<HistoryItem>,
 }
 
 /// What one player last said about itself.
@@ -261,6 +284,7 @@ impl Party {
             ended: false,
             announced: BTreeMap::new(),
             reports: BTreeMap::new(),
+            history: Vec::new(),
         }
     }
 
@@ -303,6 +327,18 @@ impl Party {
         );
     }
 
+    /// Remembers that `id` played, so the previous button can go back to it. A repeated message
+    /// cannot put the same video in the past twice.
+    fn remember(&mut self, id: u32, video: &str) {
+        if self.history.len() >= HISTORY_MAX || self.history.iter().any(|h| h.id == id) {
+            return;
+        }
+        self.history.push(HistoryItem {
+            id,
+            v: video.to_string(),
+        });
+    }
+
     /// Goes on to entry `id`, playing from the start; `skipped_by` names who skipped.
     fn advance(&mut self, id: u32, video: String, skipped_by: Option<u32>) {
         self.current = id;
@@ -315,11 +351,24 @@ impl Party {
         self.ended = false;
     }
 
+    /// Goes back to the last video of the past; that entry leaves the past, so the next press
+    /// gives the video before it. `None` when nothing played yet.
+    fn previous(&mut self) -> Option<Msg> {
+        let item = self.history.pop()?;
+        self.advance(item.id, item.v.clone(), None);
+        Some(Msg::Prev {
+            id: item.id,
+            v: item.v.clone(),
+        })
+    }
+
     /// Goes on to the first playlist entry; the message tells the others. `None` when the
     /// playlist is empty.
     fn go_on(&mut self, skipped_by: Option<u32>) -> Option<Msg> {
         let from = self.current;
         let (id, video) = self.playlist.pop_front()?;
+        let left = self.video_id.clone();
+        self.remember(from, &left);
         self.advance(id, video.clone(), skipped_by);
         Some(Msg::Next {
             from,
@@ -403,6 +452,7 @@ impl Party {
             skipped_by: self.skipped_by,
             positions: self.positions(),
             host: self.starter,
+            history: self.history.clone(),
         }
     }
 
@@ -435,6 +485,7 @@ impl Party {
             }),
             cur: self.current,
             skip: self.skipped_by,
+            hist: self.history.clone(),
         }
     }
 }
@@ -564,6 +615,7 @@ pub(crate) fn on_plugin_data(state: &ServerParties, ctx: &SessionCtx, data: &Plu
             last,
             cur,
             skip,
+            hist,
         } => {
             // A state only fills in a party this client does not know yet; a second one is the
             // answerer repeating its announcement.
@@ -588,6 +640,11 @@ pub(crate) fn on_plugin_data(state: &ServerParties, ctx: &SessionCtx, data: &Plu
                 });
             party.current = cur;
             party.skipped_by = skip.filter(|s| *s == here.own || here.others.contains(s));
+            party.history = hist
+                .into_iter()
+                .take(HISTORY_MAX)
+                .filter(|h| valid_video_id(&h.v))
+                .collect();
             servers.insert(ctx.server_id, party);
             true
         }
@@ -635,8 +692,24 @@ pub(crate) fn on_plugin_data(state: &ServerParties, ctx: &SessionCtx, data: &Plu
                     && id != from
                     && valid_video_id(&video) =>
             {
+                let left = party.video_id.clone();
+                party.remember(from, &left);
                 party.playlist.consumed(id);
                 party.advance(id, video, skip.then_some(sender));
+                true
+            }
+            _ => false,
+        },
+        Msg::Prev { id, v } => match servers.get_mut(&ctx.server_id) {
+            // Going back only works for a video this client already has in its past, so a forged
+            // or out-of-order message changes nothing.
+            Some(party)
+                if party.participants.contains(&sender)
+                    && valid_video_id(&v)
+                    && party.history.iter().any(|h| h.id == id) =>
+            {
+                party.history.retain(|h| h.id != id);
+                party.advance(id, v, None);
                 true
             }
             _ => false,
@@ -1012,6 +1085,31 @@ impl Engine {
         Ok(())
     }
 
+    /// Goes back to the video that played before the current one (issue #163) and tells the
+    /// others. The party plays it from the start; the entry leaves the past, so pressing previous
+    /// again gives the video before it.
+    pub fn watch_party_previous(&self, server_id: ServerId) -> EngineResult<()> {
+        let ctx = self.session_ctx_for(server_id)?;
+        let here = here(&ctx.handle).ok_or_else(EngineError::not_connected)?;
+        let (msg, view) = {
+            let mut servers = lock(self.watch_party_state());
+            let party = servers
+                .get_mut(&server_id)
+                .filter(|p| p.joined)
+                .ok_or_else(no_party)?;
+            let msg = party.previous().ok_or_else(|| {
+                EngineError::invalid("nothing has played yet in this party")
+            })?;
+            (Some(msg), party.view())
+        };
+        if let Some(msg) = msg {
+            let receivers = capable(self.mumcord_state(), server_id, &here.others);
+            send(&ctx.handle, &receivers, msg);
+        }
+        ctx.events.emit(EngineEvent::WatchPartyChanged(Some(view)));
+        Ok(())
+    }
+
     /// Runs a playlist edit on the joined party; the edit leaves with the next bundle.
     fn playlist_edit<T>(
         &self,
@@ -1133,6 +1231,7 @@ mod tests {
                 }),
                 cur: u32::MAX,
                 skip: Some(u32::MAX),
+                hist: Vec::new(),
             },
             Msg::Next {
                 from: u32::MAX,
@@ -1185,6 +1284,33 @@ mod tests {
             std::str::from_utf8(&data).expect("utf-8"),
             r#"{"v":3,"t":"pl","ops":[{"o":"add","id":7,"v":"dQw4w9WgXcQ","k":1.5,"c":3}]}"#
         );
+    }
+
+    #[test]
+    fn the_past_keeps_what_played_and_previous_goes_back_to_it() {
+        let mut party = Party::new(1, "dQw4w9WgXcQ".into(), 5);
+        let first = party.playlist.add(5, None, "aaaaaaaaaaa").expect("added");
+        party.go_on(Some(5)).expect("went on");
+        assert_eq!(party.view().current_entry, first);
+        assert_eq!(
+            party.view().history,
+            [HistoryItem {
+                id: 0,
+                v: "dQw4w9WgXcQ".into(),
+            }],
+            "the video the party started with is in the past"
+        );
+        assert_eq!(
+            party.previous(),
+            Some(Msg::Prev {
+                id: 0,
+                v: "dQw4w9WgXcQ".into(),
+            })
+        );
+        assert_eq!(party.view().current_entry, 0);
+        assert!(party.view().history.is_empty(), "the past loses what plays again");
+        // With nothing played yet there is nothing to go back to.
+        assert_eq!(party.previous(), None);
     }
 
     #[test]

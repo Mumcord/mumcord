@@ -30,6 +30,8 @@
     "title": "Urmează",
     "empty": "Nu urmează nimic. Adaugă linkuri YouTube cu „Adaugă în playlist”.",
     "skip": "Sari peste",
+    "previous": "Anterior",
+    "previousFailed": "Nu s-a putut reveni la videoul anterior.",
     "moveHint": "Alt+Sus și Alt+Jos mută videoclipul; îl poți și trage.",
     "moved": "Mutat pe poziția {{position}}",
     "videoTitle": "Videoclip YouTube",

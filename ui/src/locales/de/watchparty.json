@@ -30,6 +30,8 @@
     "title": "Als Nächstes",
     "empty": "Nichts als Nächstes. Füge YouTube-Links mit „Zur Playlist hinzufügen“ hinzu.",
     "skip": "Überspringen",
+    "previous": "Zurück",
+    "previousFailed": "Zurück zum vorherigen Video fehlgeschlagen.",
     "moveHint": "Alt+Pfeil hoch und Alt+Pfeil runter verschieben das Video; du kannst es auch ziehen.",
     "moved": "An Position {{position}} verschoben",
     "videoTitle": "YouTube-Video",

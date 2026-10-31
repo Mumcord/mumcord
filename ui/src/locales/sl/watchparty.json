@@ -30,6 +30,8 @@
     "title": "Naslednje",
     "empty": "Nič ni na vrsti. Dodaj povezave YouTube z »Dodaj na seznam predvajanja«.",
     "skip": "Preskoči",
+    "previous": "Prejšnji",
+    "previousFailed": "Vrnitev na prejšnji video ni uspela.",
     "moveHint": "Alt+Gor in Alt+Dol premakneta video; lahko ga tudi povlečeš.",
     "moved": "Premaknjeno na mesto {{position}}",
     "videoTitle": "Video z YouTuba",

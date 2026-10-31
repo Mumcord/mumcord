@@ -12,6 +12,7 @@ import { clearPreviews } from "../chat/links";
 import { flushServerUpdates, getServerState } from "../channels/serverStore";
 import { selectConversation } from "../channels/selection";
 import { connectedMock, resetAll } from "../channels/testUtils";
+import { openMedia, resetMediaView } from "../media/mediaView";
 import { PartySync } from "./partySync";
 import { ducker, RELEASE_DELAY_MS } from "./ducking";
 import { VideoDucking } from "./VideoDucking";
@@ -46,6 +47,7 @@ function party(patch: Partial<WatchParty> = {}): WatchParty {
     positions: [],
 
     host: 0,
+    history: [],
     ...patch,
   };
 }
@@ -581,6 +583,7 @@ describe("playlist", () => {
     vi.restoreAllMocks();
     clearPreviews();
     resetWatchPartyStore();
+    resetMediaView();
     resetAll();
   });
 
@@ -712,6 +715,23 @@ describe("playlist", () => {
     expect(screen.queryByRole("list")).toBeNull();
     fireEvent.click(line);
     expect(screen.getAllByRole("listitem")).toHaveLength(2);
+  });
+
+  it("goes back to the video that played before, with nothing to go back to at first", async () => {
+    const previous = vi.spyOn(api, "watchPartyPrevious").mockResolvedValue(null);
+    resetMediaView();
+    openMedia("watch");
+    render(<WatchTogetherView serverId={1} />);
+    show({ currentEntry: 3, playlist: [entry(4, VIDEO_B)] });
+    const back = screen.getByRole("button", { name: "Previous" });
+    expect(back).toBeDisabled();
+    fireEvent.click(back);
+    expect(previous).not.toHaveBeenCalled();
+
+    show({ currentEntry: 4, playlist: [], history: [{ id: 0, videoId: VIDEO }] });
+    expect(back).not.toBeDisabled();
+    fireEvent.click(back);
+    expect(previous).toHaveBeenCalledWith(1);
   });
 
   it("skips for everyone and says who skipped", async () => {

@@ -30,6 +30,8 @@
     "title": "A seguir",
     "empty": "Nada a seguir. Adiciona ligações do YouTube com «Adicionar à playlist».",
     "skip": "Saltar",
+    "previous": "Anterior",
+    "previousFailed": "Não foi possível voltar ao vídeo anterior.",
     "moveHint": "Alt+Cima e Alt+Baixo movem o vídeo; também podes arrastá-lo.",
     "moved": "Movido para a posição {{position}}",
     "videoTitle": "Vídeo do YouTube",

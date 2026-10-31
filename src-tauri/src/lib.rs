@@ -257,6 +257,7 @@ fn specta_builder() -> Builder<tauri::Wry> {
             commands::watch_party::watch_party_add,
             commands::watch_party::watch_party_remove,
             commands::watch_party::watch_party_move,
+            commands::watch_party::watch_party_previous,
             commands::watch_party::watch_party_next,
             commands::watch_party::watch_party_player_url,
             commands::screen_share::screen_share_start,

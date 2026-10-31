@@ -1209,6 +1209,7 @@ mod tests {
             skipped_by: None,
             positions: Vec::new(),
             host: 1,
+            history: Vec::new(),
         }))
     }
 

@@ -41,6 +41,7 @@ function party(patch: Partial<WatchParty> = {}): WatchParty {
     positions: [],
 
     host: 0,
+    history: [],
     ...patch,
   };
 }

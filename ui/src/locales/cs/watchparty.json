@@ -30,6 +30,8 @@
     "title": "Následuje",
     "empty": "Nic dalšího nenásleduje. Přidej odkazy na YouTube přes „Přidat do playlistu“.",
     "skip": "Přeskočit",
+    "previous": "Předchozí",
+    "previousFailed": "Nepodařilo se vrátit na předchozí video.",
     "moveHint": "Alt+Nahoru a Alt+Dolů přesouvají video; můžeš ho také přetáhnout.",
     "moved": "Přesunuto na pozici {{position}}",
     "videoTitle": "Video na YouTube",

@@ -30,6 +30,8 @@
     "title": "Ar aghaidh",
     "empty": "Níl aon rud le teacht. Cuir naisc YouTube leis le “Cuir leis an seinmliosta”.",
     "skip": "Scipeáil",
+    "previous": "Roimhe",
+    "previousFailed": "Níorbh fhéidir filleadh ar an bhfíseán roimhe.",
     "moveHint": "Bogann Alt+Suas agus Alt+Síos an físeán; is féidir leat é a tharraingt freisin.",
     "moved": "Bogtha go suíomh {{position}}",
     "videoTitle": "Físeán YouTube",

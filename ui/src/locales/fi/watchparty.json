@@ -30,6 +30,8 @@
     "title": "Seuraavaksi",
     "empty": "Ei mitään seuraavaksi. Lisää YouTube-linkkejä valinnalla ”Lisää soittolistaan”.",
     "skip": "Ohita",
+    "previous": "Edellinen",
+    "previousFailed": "Edelliseen videoon ei voitu palata.",
     "moveHint": "Alt+Ylös ja Alt+Alas siirtävät videota; voit myös vetää sitä.",
     "moved": "Siirretty sijaan {{position}}",
     "videoTitle": "YouTube-video",
