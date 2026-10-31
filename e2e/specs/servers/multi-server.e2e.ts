@@ -5,6 +5,8 @@ import {
   channelName,
   finishWizard,
   joinChannel,
+  openMessagesOverview,
+  pmRow,
   ScriptBot,
   selectChannel,
   sendText,
@@ -197,14 +199,11 @@ describe("multiple servers (AC-2.1–2.10)", function () {
   it("AC-2.9: a private message from a client on B arrives while viewing A", async () => {
     await show(ALPHA);
     await bravoBot.run(`pm ${USER} "psst from bravo"`);
-    await browser.waitUntil(
-      async () =>
-        (await browser.$$("//*[contains(@aria-label,'on Bravo')]").length) > 0 ||
-        (await pageText()).includes("BravoBot"),
-      { timeout: 15_000, timeoutMsg: "no direct message entry naming Bravo" },
-    );
-    const entry = $("//*[contains(@aria-label,'BravoBot') and contains(@aria-label,'Bravo')]");
-    await entry.waitForDisplayed({ timeout: 5_000 });
+    // The private messages overview lists conversations of every connected server (#173).
+    await openMessagesOverview();
+    const entry = pmRow("BravoBot");
+    await entry.waitForDisplayed({ timeout: 15_000 });
+    expect(await entry.getAttribute("aria-label")).toContain("Bravo");
     await entry.click();
     await waitMessage("psst from bravo");
   });
