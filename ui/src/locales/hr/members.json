@@ -116,5 +116,28 @@
     "message": "{{name}} morat će ponovno poslati zahtjev za poruku prije nego što ti poruke opet stignu. Povijest chata ostaje.",
     "confirm": "Opozovi",
     "failed": "Opoziv pristanka na chat nije uspio. Pokušaj ponovno."
+  },
+  "block": {
+    "menu": "Blokiraj…",
+    "unblock": "Odblokiraj",
+    "title": "Blokirati korisnika {{name}}?",
+    "onServer": "na poslužitelju {{server}}",
+    "whatHappens": "Što se događa",
+    "private": "Privatne poruke korisnika {{name}} ne prikazuju se i ne šalju ti obavijest.",
+    "channelCollapsed": "Poruke korisnika {{name}} u kanalu su sažete. I dalje ih možeš otvoriti.",
+    "channelHidden": "Poruke korisnika {{name}} u kanalu su skrivene.",
+    "voice": "Korisnik {{name}} je za tebe utišan u glasovnom razgovoru, uključujući šaptanje.",
+    "data": "Nema sinkronizacije povijesti, pozivnica ni drugih Mumcord podataka od korisnika {{name}}.",
+    "followsCert": "Blokada prati certifikat korisnika {{name}}, pa je novo ime ne zaobilazi.",
+    "nameOnly": "Korisnik {{name}} nema certifikat, pa se blokada odnosi samo na ovo ime na poslužitelju {{server}}.",
+    "warning": "Korisnik {{name}} i dalje te vidi i može čitati tvoje poruke. Mumble nema način da to spriječi samo s tvoje strane. Korisnik {{name}} ne dobiva obavijest o blokadi.",
+    "cancel": "Odustani",
+    "confirm": "Blokiraj korisnika {{name}}",
+    "done": "Korisnik {{name}} je blokiran.",
+    "failed": "Blokiranje korisnika {{name}} nije uspjelo. Pokušaj ponovno.",
+    "badge": "Blokiran",
+    "collapsed": "Poruka blokiranog korisnika",
+    "show": "Prikaži",
+    "showLabel": "Prikaži poruku blokiranog korisnika"
   }
 }

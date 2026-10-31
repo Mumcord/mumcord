@@ -311,7 +311,6 @@
     "requestMetaMessages": "{{server}} · üzeneteket küldött neked · {{time}}",
     "quote": "„{{text}}”",
     "block": "Letiltás",
-    "blockLater": "A letiltás még nem érhető el.",
     "showMore_one": "Még {{count}} kérés megjelenítése",
     "showMore_other": "Még {{count}} kérés megjelenítése",
     "showFewer": "Kevesebb kérés megjelenítése",

@@ -717,5 +717,22 @@
     "revoke": "Visszavonás",
     "revokeLabel": "Az elfogadott beszélgetés visszavonása vele: {{name}}",
     "revokeFailed": "A visszavonás nem sikerült. Próbáld újra."
+  },
+  "blocked": {
+    "title": "Letiltott felhasználók",
+    "hint": "A letiltások csak ezen a számítógépen tárolódnak. A letiltott felhasználók némítva vannak nálad, üzeneteiket és Mumcord-adataikat figyelmen kívül hagyjuk.",
+    "empty": "Nem tiltottál le senkit.",
+    "user": "Felhasználó",
+    "server": "Szerver",
+    "since": "Letiltva ez óta",
+    "actions": "Műveletek",
+    "unblock": "Letiltás feloldása",
+    "unblockLabel": "{{name}} letiltásának feloldása",
+    "unblockFailed": "A letiltás feloldása nem sikerült. Próbáld újra.",
+    "messagesTitle": "Letiltott üzenetek a csatorna csevegésében",
+    "collapse": "Összecsukás",
+    "collapseHint": "Az „Üzenet egy letiltott felhasználótól” szöveget mutatja egy Megjelenítés gombbal.",
+    "hide": "Teljes elrejtés",
+    "hideHint": "A csevegésben semmi sem jelenik meg."
   }
 }

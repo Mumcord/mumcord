@@ -5,6 +5,7 @@ import { TooltipLayer } from "../components/Tooltip";
 import { PersonMenuHost, ProfilePreviewHost } from "../features/members";
 import { NotificationsHost } from "../features/notifications";
 import { ChatRequestDialogHost, RevokeConsentDialogHost } from "../features/requests";
+import { BlockDialogHost } from "../features/blocking";
 import { WizardRerunOverlay } from "../features/wizard";
 import { TraySync } from "../features/tray";
 import { AppShell } from "./AppShell";
@@ -77,6 +78,7 @@ function MainScreen() {
       {overlay === null && <PersonMenuHost />}
       {overlay === null && <ChatRequestDialogHost />}
       {overlay === null && <RevokeConsentDialogHost />}
+      {overlay === null && <BlockDialogHost />}
       <NotificationsHost overlayOpen={overlay !== null} onOpenChat={closeOverlay} />
       <TraySync onOpenSettings={openSettings} />
       {devTools && <InspectorViewShare />}

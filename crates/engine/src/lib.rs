@@ -2,6 +2,7 @@
 //! (`src-tauri`) talks only to [`Engine`] and converts its types into command/event types.
 
 pub mod audio_rating;
+mod blocking;
 pub mod cache;
 pub mod chat;
 pub mod diag;

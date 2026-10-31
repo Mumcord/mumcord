@@ -332,7 +332,6 @@
     "requestMetaMessages": "{{server}} · bagħtilek messaġġi · {{time}}",
     "quote": "“{{text}}”",
     "block": "Imblokka",
-    "blockLater": "Il-imblukkar għadu mhux disponibbli.",
     "showMore_one": "Uri talba oħra {{count}}",
     "showMore_two": "Uri {{count}} talbiet oħra",
     "showMore_few": "Uri {{count}} talbiet oħra",

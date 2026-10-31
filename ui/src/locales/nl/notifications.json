@@ -11,5 +11,56 @@
   "open": "Chat openen",
   "close": "Melding sluiten",
   "mentionLine": "{{sender}} heeft je vermeld: {{preview}}",
-  "withServer": "{{server}} · {{what}}"
+  "withServer": "{{server}} · {{what}}",
+  "centre": {
+    "title": "Meldingen",
+    "bellUnread_one": "Meldingen, {{count}} ongelezen",
+    "bellUnread_other": "Meldingen, {{count}} ongelezen",
+    "shortcut": "Ctrl+Shift+N",
+    "markAllRead": "Alles als gelezen markeren",
+    "filterLabel": "Meldingen tonen",
+    "filter": {
+      "all": "Alles",
+      "mentions": "Vermeldingen",
+      "requests": "Verzoeken",
+      "invites": "Uitnodigingen"
+    },
+    "empty": "Je bent helemaal bij.",
+    "unread": "Ongelezen",
+    "dndOn": "Niet storen staat aan",
+    "dndOff": "Niet storen staat uit",
+    "settings": "Meldingsinstellingen",
+    "someone": "Iemand",
+    "quoted": "“{{text}}”",
+    "mention": "{{name}} heeft je vermeld",
+    "mentionGroup": "{{name}} heeft iedereen vermeld",
+    "reply": "{{name}} heeft op je bericht gereageerd",
+    "chatRequest": "{{name}} wil met je chatten",
+    "messageRequest": "Berichtverzoek van {{name}}",
+    "messageRequestBody_one": "{{count}} bericht van een standaard Mumble-client",
+    "messageRequestBody_other": "{{count}} berichten van een standaard Mumble-client",
+    "invite": {
+      "watchParty": "{{name}} heeft je uitgenodigd voor een watchparty",
+      "screenShare": "{{name}} deelt zijn of haar scherm",
+      "card": "{{name}} heeft je een kaart gestuurd",
+      "theme": "{{name}} heeft een thema met je gedeeld"
+    },
+    "connection": "{{server}} is onbereikbaar",
+    "type": {
+      "chatRequest": "Chatverzoek",
+      "messageRequest": "Berichtverzoek",
+      "invite": "Uitnodiging",
+      "private": "Privébericht",
+      "connection": "Verbinding"
+    },
+    "accept": "Accepteren",
+    "decline": "Weigeren",
+    "join": "Deelnemen",
+    "watch": "Kijken",
+    "open": "Openen",
+    "dismiss": "Sluiten",
+    "dismissItem": "Sluiten: {{title}}",
+    "failed": "Dat is niet gelukt. Probeer het opnieuw.",
+    "block": "Blokkeren"
+  }
 }

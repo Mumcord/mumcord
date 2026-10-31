@@ -22,6 +22,8 @@ import { setFriend, useFriend } from "../friends";
 import { openChatRequestDialog } from "../requests/chatRequestDialogStore";
 import { openRevokeConsentDialog } from "../requests/revokeConsentStore";
 import { useAcceptedConsent, usePmRequests } from "../requests/requestsStore";
+import { blockTargetFor, openBlockDialog, unblock, useBlock } from "../blocking";
+import { BLOCK_PATH } from "../blocking/BlockIcon";
 import "../userpanel/quicksettings.css";
 import "./members.css";
 import { joinTarget } from "./joinTarget";
@@ -97,6 +99,7 @@ function PersonMenu({
   const friend = useFriend(user?.certHash ?? null);
   const { sent } = usePmRequests(state.serverId);
   const consent = useAcceptedConsent(state.serverId, user?.certHash ?? null);
+  const block = useBlock(state.serverId, user?.certHash ?? null, user?.name ?? "");
   const ref = useRef<HTMLDivElement>(null);
   // The menu closes once the join succeeds; a failure keeps it open to show why.
   const [joinError, setJoinError] = useState<string | null>(null);
@@ -387,6 +390,41 @@ function PersonMenu({
             </MenuIcon>
             <VolumeSlider user={user} onError={report} />
           </div>
+          <div role="separator" className="person-menu__separator" />
+          {/* Last, apart from the rest: the label and icon say it is drastic, not only the colour. */}
+          <button
+            type="button"
+            role="menuitem"
+            tabIndex={-1}
+            className="server-menu__item server-menu__item--danger person-menu__item"
+            data-testid={block ? "person-unblock" : "person-block"}
+            onClick={() => {
+              closePersonMenu();
+              if (block) {
+                unblock(block.id).catch((cause: unknown) => {
+                  console.error("Unblocking failed", toEngineError(cause).code);
+                });
+                open.opener?.focus();
+                return;
+              }
+              const target =
+                state.serverId === null
+                  ? null
+                  : blockTargetFor(
+                      state.serverId,
+                      user.name,
+                      user.certHash,
+                      user.session,
+                      open.opener,
+                    );
+              if (target) openBlockDialog(target);
+            }}
+          >
+            <MenuIcon>
+              <path d={BLOCK_PATH} />
+            </MenuIcon>
+            {block ? t("block.unblock") : t("block.menu")}
+          </button>
         </>
       )}
     </div>

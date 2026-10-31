@@ -318,7 +318,6 @@
     "requestMetaMessages": "{{server}} · ți-a trimis mesaje · {{time}}",
     "quote": "„{{text}}”",
     "block": "Blochează",
-    "blockLater": "Blocarea nu este încă disponibilă.",
     "showMore_one": "Afișează încă {{count}} solicitare",
     "showMore_few": "Afișează încă {{count}} solicitări",
     "showMore_other": "Afișează încă {{count}} de solicitări",

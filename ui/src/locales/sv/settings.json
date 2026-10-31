@@ -717,5 +717,22 @@
     "revoke": "Återkalla",
     "revokeLabel": "Återkalla den accepterade konversationen med {{name}}",
     "revokeFailed": "Återkallningen misslyckades. Försök igen."
+  },
+  "blocked": {
+    "title": "Blockerade användare",
+    "hint": "Blockeringar sparas bara på den här datorn. Blockerade användare är ljudavstängda för dig, och deras meddelanden och Mumcord-data ignoreras.",
+    "empty": "Du har inte blockerat någon.",
+    "user": "Användare",
+    "server": "Server",
+    "since": "Blockerad sedan",
+    "actions": "Åtgärder",
+    "unblock": "Avblockera",
+    "unblockLabel": "Avblockera {{name}}",
+    "unblockFailed": "Det gick inte att avblockera. Försök igen.",
+    "messagesTitle": "Blockerade meddelanden i kanalchatten",
+    "collapse": "Fäll ihop dem",
+    "collapseHint": "Visar ”Meddelande från en blockerad användare” med en knapp som heter Visa.",
+    "hide": "Dölj dem helt",
+    "hideHint": "Inget visas i chatten."
   }
 }

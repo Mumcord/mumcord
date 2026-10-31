@@ -112,5 +112,28 @@
     "message": "{{name}} moet opnieuw een berichtverzoek sturen voordat de berichten je weer bereiken. Je chatgeschiedenis blijft bewaard.",
     "confirm": "Intrekken",
     "failed": "Het intrekken van de chattoestemming is mislukt. Probeer het opnieuw."
+  },
+  "block": {
+    "menu": "Blokkeren…",
+    "unblock": "Deblokkeren",
+    "title": "{{name}} blokkeren?",
+    "onServer": "op {{server}}",
+    "whatHappens": "Wat er gebeurt",
+    "private": "Privéberichten van {{name}} worden niet getoond en geven geen melding.",
+    "channelCollapsed": "Kanaalberichten van {{name}} zijn ingeklapt. Je kunt ze nog steeds openen.",
+    "channelHidden": "Kanaalberichten van {{name}} worden verborgen.",
+    "voice": "{{name}} is voor jou gedempt in spraak, inclusief gefluister.",
+    "data": "Geen geschiedenissynchronisatie, uitnodigingen of andere Mumcord-gegevens van {{name}}.",
+    "followsCert": "De blokkade volgt het certificaat van {{name}}, dus een nieuwe naam omzeilt hem niet.",
+    "nameOnly": "{{name}} heeft geen certificaat, dus de blokkade geldt alleen voor deze naam op {{server}}.",
+    "warning": "{{name}} kan je nog steeds zien en je berichten lezen. Mumble biedt geen manier om dat alleen aan jouw kant te voorkomen. {{name}} krijgt geen melding van de blokkade.",
+    "cancel": "Annuleren",
+    "confirm": "{{name}} blokkeren",
+    "done": "{{name}} is geblokkeerd.",
+    "failed": "{{name}} blokkeren is mislukt. Probeer het opnieuw.",
+    "badge": "Geblokkeerd",
+    "collapsed": "Bericht van een geblokkeerde gebruiker",
+    "show": "Tonen",
+    "showLabel": "Bericht van een geblokkeerde gebruiker tonen"
   }
 }

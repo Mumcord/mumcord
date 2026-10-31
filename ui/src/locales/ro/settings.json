@@ -720,5 +720,22 @@
     "revoke": "Revocă",
     "revokeLabel": "Revocă conversația acceptată cu {{name}}",
     "revokeFailed": "Revocarea a eșuat. Încearcă din nou."
+  },
+  "blocked": {
+    "title": "Utilizatori blocați",
+    "hint": "Blocările sunt păstrate doar pe acest computer. Utilizatorii blocați sunt reduși la tăcere pentru tine, iar mesajele și datele lor Mumcord sunt ignorate.",
+    "empty": "Nu ai blocat pe nimeni.",
+    "user": "Utilizator",
+    "server": "Server",
+    "since": "Blocat din",
+    "actions": "Acțiuni",
+    "unblock": "Deblochează",
+    "unblockLabel": "Deblochează-l pe {{name}}",
+    "unblockFailed": "Deblocarea a eșuat. Încearcă din nou.",
+    "messagesTitle": "Mesaje blocate în chatul canalului",
+    "collapse": "Restrânge-le",
+    "collapseHint": "Afișează „Mesaj de la un utilizator blocat” cu un buton „Afișează”.",
+    "hide": "Ascunde-le complet",
+    "hideHint": "În chat nu se afișează nimic."
   }
 }

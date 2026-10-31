@@ -112,5 +112,28 @@
     "message": "{{name}} skal sende en ny beskedanmodning, før beskederne når frem til dig igen. Din chathistorik bevares.",
     "confirm": "Tilbagekald",
     "failed": "Tilbagekaldelsen af chatsamtykket mislykkedes. Prøv igen."
+  },
+  "block": {
+    "menu": "Bloker…",
+    "unblock": "Fjern blokering",
+    "title": "Vil du blokere {{name}}?",
+    "onServer": "på {{server}}",
+    "whatHappens": "Hvad sker der",
+    "private": "Private beskeder fra {{name}} vises ikke og giver dig ingen notifikationer.",
+    "channelCollapsed": "{{name}}s kanalbeskeder er foldet sammen. Du kan stadig åbne dem.",
+    "channelHidden": "{{name}}s kanalbeskeder er skjult.",
+    "voice": "{{name}} er slået fra for dig i tale, også hviskninger.",
+    "data": "Ingen historiksynkronisering, invitationer eller andre Mumcord-data fra {{name}}.",
+    "followsCert": "Blokeringen følger {{name}}s certifikat, så et nyt navn omgår den ikke.",
+    "nameOnly": "{{name}} har intet certifikat, så blokeringen gælder kun dette navn på {{server}}.",
+    "warning": "{{name}} kan stadig se dig og læse dine beskeder. Mumble har ingen måde at stoppe det på kun fra din side. {{name}} får ikke besked om blokeringen.",
+    "cancel": "Annuller",
+    "confirm": "Bloker {{name}}",
+    "done": "{{name}} er blokeret.",
+    "failed": "Det lykkedes ikke at blokere {{name}}. Prøv igen.",
+    "badge": "Blokeret",
+    "collapsed": "Besked fra en blokeret bruger",
+    "show": "Vis",
+    "showLabel": "Vis besked fra en blokeret bruger"
   }
 }

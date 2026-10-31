@@ -153,6 +153,17 @@ export const commands = {
 	acceptedConversations: () => typedError<AcceptedConversation[], ApiError>(__TAURI_INVOKE("accepted_conversations")),
 	/**  Revokes an accepted conversation of one own identity. */
 	acceptedConversationRevoke: (ownCertHash: string, certHash: string) => typedError<null, ApiError>(__TAURI_INVOKE("accepted_conversation_revoke", { ownCertHash, certHash })),
+	/**  Blocked users of every own identity, by name. */
+	blockedUsers: () => typedError<BlockedUser[], ApiError>(__TAURI_INVOKE("blocked_users")),
+	/**
+	 *  Blocks a person on a connected server: by certificate, or by name on this server when
+	 *  they have none.
+	 */
+	blockUser: (serverId: number, session: number) => typedError<null, ApiError>(__TAURI_INVOKE("block_user", { serverId, session })),
+	/**  Blocks a person by certificate who need not be online, for the identity `serverId` uses. */
+	blockCert: (serverId: number, certHash: string, name: string) => typedError<null, ApiError>(__TAURI_INVOKE("block_cert", { serverId, certHash, name })),
+	/**  Removes a block. */
+	unblock: (id: number) => typedError<null, ApiError>(__TAURI_INVOKE("unblock", { id })),
 	/**  The newest stored message of every private conversation on a connected server, newest first. */
 	privateConversations: (serverId: number) => typedError<PrivateConversation[], ApiError>(__TAURI_INVOKE("private_conversations", { serverId })),
 	/**  Pin and mute state of every private conversation that has any. */
@@ -634,6 +645,7 @@ export const events = {
 	audioDeviceFallback: makeEvent<AudioDeviceFallback, AudioDeviceFallback>("audio-device-fallback"),
 	audioDevicesChanged: makeEvent<AudioDevicesChanged, AudioDevicesChanged>("audio-devices-changed"),
 	bitrateMaxChanged: makeEvent<BitrateMaxChanged, BitrateMaxChanged>("bitrate-max-changed"),
+	blockedUsersChanged: makeEvent<BlockedUsersChanged, BlockedUsersChanged>("blocked-users-changed"),
 	certTrustRequired: makeEvent<CertTrustRequired, CertTrustRequired>("cert-trust-required"),
 	channelAudioProfilesChanged: makeEvent<ChannelAudioProfilesChanged, ChannelAudioProfilesChanged>("channel-audio-profiles-changed"),
 	channelPasswordPrompt: makeEvent<ChannelPasswordPrompt, ChannelPasswordPrompt>("channel-password-prompt"),
@@ -833,6 +845,34 @@ export type AudioRatingLabel = {
  */
 export type BitrateMaxChanged = {
 	kbps: number | null,
+};
+
+/**  Channel messages of blocked users (issue #140). */
+export type BlockedMessages = "collapse" | "hide";
+
+/**  A person one own identity blocked. */
+export type BlockedUser = {
+	/**  Id for `unblock`. */
+	id: number,
+	/**  Certificate hash of the own identity that set the block. */
+	ownCertHash: string,
+	/**
+	 *  `null` for a name block: then only `name` on `serverId` is blocked. With a certificate
+	 *  the block covers every server.
+	 */
+	certHash: string | null,
+	/**  The name when blocked. Untrusted: render as plain text. */
+	name: string,
+	/**  The server the block was set on; `null` once that server was removed. */
+	serverId: number | null,
+	/**  Label of that server when the block was set. */
+	serverLabel: string,
+	/**  RFC 3339. */
+	blockedAt: string,
+};
+
+export type BlockedUsersChanged = {
+	users: BlockedUser[],
 };
 
 /**  A game on the bundled blocklist (QA.56), shown read-only in the settings. */
@@ -2313,6 +2353,8 @@ export type Settings = {
 	whatsNewSeen: string | null,
 	/**  "Private messages from" (issue #141). */
 	privateMessages: PrivateMessageSettings,
+	/**  Channel messages of blocked users: collapsed (default) or hidden (issue #140). */
+	blockedMessages: BlockedMessages,
 };
 
 /**  Notification sound toggles per event (FR-1.27). */

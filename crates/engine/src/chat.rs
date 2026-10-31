@@ -277,13 +277,14 @@ pub(crate) fn transient_id() -> String {
     )
 }
 
-/// Incoming text message: route, sanitize, apply the private message rule (issue #141), then
-/// store, emit and count unread (hook from the session).
+/// Incoming text message: route, sanitize, apply blocks (issue #140) and the private message
+/// rule (issue #141), then store, emit and count unread (hook from the session).
 pub(crate) fn on_text(
     ctx: &SessionCtx,
     msg: &TextMessage,
     peers: &crate::mumcord::ServerPeers,
     requests: &crate::pm_rules::ServerRequests,
+    block_list: &crate::blocking::BlockList,
 ) {
     let routed = ctx.handle.with_state(|s| {
         let route = route(s, msg)?;
@@ -319,6 +320,14 @@ pub(crate) fn on_text(
         dismissed_previews: Vec::new(),
         synced_from: None,
     };
+    let blocked = msg
+        .actor
+        .is_some_and(|a| crate::blocking::is_blocked(ctx, block_list, a));
+    let private = matches!(route, Route::Private { .. });
+    let verdict = crate::blocking::text_verdict(private, blocked);
+    if verdict == crate::blocking::TextVerdict::Drop {
+        return;
+    }
     if let Route::Private { session } = route {
         match crate::pm_rules::screen(ctx, peers, requests, session) {
             crate::pm_rules::Verdict::Show => {}
@@ -331,7 +340,9 @@ pub(crate) fn on_text(
     }
     // Own messages never count as unread, even when a server or another session of the user
     // sends them back.
-    let counts_unread = !own && ctx.handle.with_state(|s| counts_unread(s, route));
+    let counts_unread = !own
+        && verdict == crate::blocking::TextVerdict::Normal
+        && ctx.handle.with_state(|s| counts_unread(s, route));
     deliver(ctx, message, counts_unread);
 }
 

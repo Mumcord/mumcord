@@ -124,5 +124,28 @@
     "message": "Beidh ar {{name}} iarratas teachtaireachta nua a sheoladh sula sroichfidh a t(h)eachtaireachtaí thú arís. Fanfaidh do stair chomhrá.",
     "confirm": "Cúlghair",
     "failed": "Theip ar chúlghairm an toilithe comhrá. Bain triail eile as."
+  },
+  "block": {
+    "menu": "Bac…",
+    "unblock": "Díbhac",
+    "title": "An bhfuil tú ag iarraidh {{name}} a bhacadh?",
+    "onServer": "ar {{server}}",
+    "whatHappens": "Céard a tharlaíonn",
+    "private": "Ní thaispeántar teachtaireachtaí príobháideacha ó {{name}} agus ní chuireann siad fógra ort.",
+    "channelCollapsed": "Tá teachtaireachtaí cainéil {{name}} fillte. Is féidir leat iad a oscailt fós.",
+    "channelHidden": "Tá teachtaireachtaí cainéil {{name}} i bhfolach.",
+    "voice": "Tá {{name}} balbhaithe duit sa ghuth, cogaíocha san áireamh.",
+    "data": "Gan sioncrónú staire, cuireadh ná sonraí eile Mumcord ó {{name}}.",
+    "followsCert": "Leanann an bac teastas {{name}}, mar sin ní sheachnaíonn ainm nua é.",
+    "nameOnly": "Níl teastas ag {{name}}, mar sin ní bhaineann an bac ach leis an ainm seo ar {{server}}.",
+    "warning": "Is féidir le {{name}} tú a fheiceáil agus do theachtaireachtaí a léamh fós. Níl aon bhealach ag Mumble é sin a stopadh ar do thaobh féin amháin. Ní chuirtear in iúl do {{name}} go bhfuil sé bactha.",
+    "cancel": "Cealaigh",
+    "confirm": "Bac {{name}}",
+    "done": "Tá {{name}} bactha.",
+    "failed": "Theip ar {{name}} a bhacadh. Bain triail eile as.",
+    "badge": "Bactha",
+    "collapsed": "Teachtaireacht ó úsáideoir bactha",
+    "show": "Taispeáin",
+    "showLabel": "Taispeáin teachtaireacht ó úsáideoir bactha"
   }
 }

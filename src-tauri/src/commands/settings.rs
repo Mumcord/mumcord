@@ -260,6 +260,32 @@ pub struct PositionalSettings {
     pub max_distance: f32,
 }
 
+/// Channel messages of blocked users (issue #140).
+#[derive(Serialize, Deserialize, Clone, Copy, Debug, PartialEq, Eq, Type)]
+#[serde(rename_all = "camelCase")]
+pub enum BlockedMessages {
+    Collapse,
+    Hide,
+}
+
+impl From<store::BlockedMessages> for BlockedMessages {
+    fn from(b: store::BlockedMessages) -> Self {
+        match b {
+            store::BlockedMessages::Collapse => Self::Collapse,
+            store::BlockedMessages::Hide => Self::Hide,
+        }
+    }
+}
+
+impl From<BlockedMessages> for store::BlockedMessages {
+    fn from(b: BlockedMessages) -> Self {
+        match b {
+            BlockedMessages::Collapse => Self::Collapse,
+            BlockedMessages::Hide => Self::Hide,
+        }
+    }
+}
+
 /// "Private messages from" (issue #141).
 #[derive(Serialize, Deserialize, Clone, Copy, Debug, PartialEq, Eq, Type)]
 #[serde(rename_all = "camelCase")]
@@ -470,6 +496,8 @@ pub struct Settings {
     pub whats_new_seen: Option<String>,
     /// "Private messages from" (issue #141).
     pub private_messages: PrivateMessageSettings,
+    /// Channel messages of blocked users: collapsed (default) or hidden (issue #140).
+    pub blocked_messages: BlockedMessages,
 }
 
 impl Settings {
@@ -588,6 +616,7 @@ impl Settings {
             whats_new_auto: s.whats_new_auto,
             whats_new_seen: s.whats_new_seen.clone(),
             private_messages: (&s.private_messages).into(),
+            blocked_messages: s.blocked_messages.into(),
         }
     }
 
@@ -700,6 +729,7 @@ impl Settings {
         s.whats_new_auto = self.whats_new_auto;
         s.whats_new_seen.clone_from(&self.whats_new_seen);
         s.private_messages = (&self.private_messages).into();
+        s.blocked_messages = self.blocked_messages.into();
         s
     }
 }

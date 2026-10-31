@@ -113,10 +113,10 @@ describe("private messages overview", () => {
     await waitFor(() => {
       expect(screen.getByTestId("pm-button")).toHaveAccessibleName("Messages");
     });
-    expect(within(openMenu(row(0))).getByRole("menuitem", { name: /Block Anna/ })).toHaveAttribute(
-      "aria-disabled",
-      "true",
-    );
+    // Blocking (#140) works from here, by certificate even while Anna is offline.
+    expect(
+      within(openMenu(row(0))).getByRole("menuitem", { name: /Block Anna/ }),
+    ).not.toHaveAttribute("aria-disabled", "true");
   });
 
   it("filters unread conversations and searches", async () => {

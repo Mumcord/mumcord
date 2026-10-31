@@ -17,6 +17,7 @@ import { useT } from "../../i18n/useT";
 import type { User } from "../../api";
 import { StatusIcons } from "../channels/PersonStatus";
 import { MumcordBadge } from "../channels/MumcordBadge";
+import { BlockedBadge } from "../blocking/BlockedBadge";
 import { LiveAvatar, LiveBadge } from "../screenshare/LiveBadge";
 import { useStatusText } from "../channels/statusText";
 import { useSelectedConversation } from "../channels/selection";
@@ -290,6 +291,7 @@ const MemberRow = memo(function MemberRow({
           <span className="member__name" data-local-muted={user.localMute}>
             {user.name}
             <MumcordBadge user={user} />
+            {!self && <BlockedBadge user={user} />}
             <LiveBadge session={user.session} />
             {self && <span className="member__you"> {t("you")}</span>}
             {status !== "" && <span className="visually-hidden">, {status}</span>}

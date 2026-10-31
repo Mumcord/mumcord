@@ -325,7 +325,6 @@
     "requestMetaMessages": "{{server}} · wysłał(a) Ci wiadomości · {{time}}",
     "quote": "„{{text}}”",
     "block": "Zablokuj",
-    "blockLater": "Blokowanie nie jest jeszcze dostępne.",
     "showMore_one": "Pokaż jeszcze {{count}} prośbę",
     "showMore_few": "Pokaż jeszcze {{count}} prośby",
     "showMore_many": "Pokaż jeszcze {{count}} próśb",

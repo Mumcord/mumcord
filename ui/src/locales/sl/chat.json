@@ -325,7 +325,6 @@
     "requestMetaMessages": "{{server}} · ti je poslal(a) sporočila · {{time}}",
     "quote": "„{{text}}“",
     "block": "Blokiraj",
-    "blockLater": "Blokiranje še ni na voljo.",
     "showMore_one": "Pokaži še {{count}} zahtevo",
     "showMore_two": "Pokaži še {{count}} zahtevi",
     "showMore_few": "Pokaži še {{count}} zahteve",

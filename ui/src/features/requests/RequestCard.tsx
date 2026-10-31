@@ -1,4 +1,4 @@
-import { useEffect, useId, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { toEngineError, type MessageRequest, type User } from "../../api";
 import { useServerStateOf } from "../channels";
@@ -12,6 +12,7 @@ import { displayName, initials } from "../servers/format";
 import { useServers } from "../servers/store";
 import { relativeTime } from "./relativeTime";
 import { acceptRequest, declineRequest } from "./requestsStore";
+import { BlockIcon, blockTargetFor, openBlockDialog } from "../blocking";
 
 /** The held messages never page or sync: they are all there is until the request is accepted. */
 function heldLog(request: MessageRequest): ConversationLog {
@@ -73,7 +74,9 @@ export function RequestCard({
   const serverName = saved ? displayName(saved) : "";
   const time = relativeTime(request.receivedAt, useNow(), i18n.language);
   const name = request.name;
-  const blockHintId = useId();
+  // Sessions are reused: only the sender still here is blocked by session.
+  const blockTarget = (opener: HTMLElement) =>
+    blockTargetFor(serverId, name, request.certHash, sender?.session ?? null, opener);
 
   const run = (action: () => Promise<unknown>, opensChat: boolean) => {
     setBusy(true);
@@ -102,6 +105,22 @@ export function RequestCard({
       await acceptRequest(serverId, request.id);
     }, true);
   };
+
+  const blockButton = (
+    <button
+      type="button"
+      className="button request-card__block"
+      disabled={busy}
+      data-testid="request-block"
+      onClick={(event) => {
+        const target = blockTarget(event.currentTarget);
+        if (target) openBlockDialog(target);
+      }}
+    >
+      <BlockIcon />
+      {t("overview.block")}
+    </button>
+  );
 
   const actions = (
     <div className="request-card__actions">
@@ -136,6 +155,7 @@ export function RequestCard({
           {t("requests.addFriend")}
         </button>
       )}
+      {blockButton}
     </div>
   );
   const error = failed && (
@@ -205,19 +225,7 @@ export function RequestCard({
           >
             {t("requests.decline")}
           </button>
-          {/* Blocking (#140) is not built yet: shown as in the design, but not available. */}
-          <button
-            type="button"
-            className="button request-card__block"
-            aria-disabled="true"
-            aria-describedby={blockHintId}
-            data-tooltip={t("overview.blockLater")}
-          >
-            {t("overview.block")}
-          </button>
-          <span id={blockHintId} className="visually-hidden">
-            {t("overview.blockLater")}
-          </span>
+          {blockButton}
         </div>
         {error}
       </section>

@@ -7,6 +7,7 @@ import { clearConversation } from "../chat";
 import { forgetDirectChat } from "../follow/followStore";
 import { pinPreview } from "../members/profilePreviewStore";
 import { openRevokeConsentDialog, useAcceptedConsent } from "../requests";
+import { blockTargetFor, openBlockDialog } from "../blocking";
 import { ConfirmDialog } from "../servers";
 import { forgetConversation } from "./conversationsStore";
 import {
@@ -39,8 +40,8 @@ export interface ConversationMenuProps {
 
 /**
  * Right-click (Menu key, Shift+F10) menu of a conversation: mark as read, pin, mute (a second
- * menu with the lengths), view profile, revoke chat consent, block (not available yet) and delete history on this
- * device after a confirmation.
+ * menu with the lengths), view profile, revoke chat consent, block (issue #140) and delete history on this device after
+ * a confirmation.
  */
 export function ConversationMenu({ row, menu, onClose, onError }: ConversationMenuProps) {
   const { t } = useTranslation("chat");
@@ -121,13 +122,24 @@ export function ConversationMenu({ row, menu, onClose, onError }: ConversationMe
         },
       }
     : null;
+  // By certificate even while they are offline; a chat bound to a session needs them online.
+  const blockTarget = blockTargetFor(
+    serverId,
+    row.name,
+    certHash,
+    certHash === null && conversation.kind === "privateSession" && row.online
+      ? conversation.session
+      : null,
+    menu.opener,
+  );
   const block: MenuItem = {
     label: t("overview.menu.block", { name: row.name }),
-    hint: t("overview.blockLater"),
     icon: BLOCK_ICON,
     danger: true,
-    disabled: true,
-    onSelect: close,
+    disabled: blockTarget === null,
+    onSelect: () => {
+      if (blockTarget) openBlockDialog(blockTarget);
+    },
   };
   const deleteHistory: MenuItem = {
     label: t("overview.menu.deleteHistory"),

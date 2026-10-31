@@ -1,0 +1,153 @@
+/* Blocking users (issue #140). */
+
+/* Avatar left of the title and the server line; the rest spans the full width. */
+.block-dialog {
+  width: min(34rem, calc(100vw - 2 * var(--space-4)));
+  display: grid;
+  grid-template-columns: auto 1fr;
+  column-gap: var(--space-3);
+  align-items: center;
+}
+
+.block-dialog > * {
+  grid-column: 1 / -1;
+}
+
+.block-dialog .block-dialog__avatar {
+  grid-column: 1;
+  grid-row: 1 / span 2;
+}
+
+.block-dialog .servers-dialog__title {
+  grid-column: 2;
+  grid-row: 1;
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.block-dialog .block-dialog__server {
+  grid-column: 2;
+  grid-row: 2;
+  margin: 0;
+  color: var(--color-text-secondary);
+  overflow-wrap: anywhere;
+}
+
+.block-dialog__heading {
+  margin: var(--space-4) 0 var(--space-2);
+  font-size: var(--font-size-sm);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--color-text-secondary);
+}
+
+.block-dialog__list {
+  margin: 0;
+  padding-left: var(--space-5);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  overflow-wrap: anywhere;
+}
+
+.block-dialog__warning {
+  margin: var(--space-4) 0 0;
+  padding: var(--space-3);
+  border: 1px solid var(--color-warning);
+  border-radius: var(--radius-md);
+  background: color-mix(in srgb, var(--color-warning) 12%, transparent);
+  overflow-wrap: anywhere;
+}
+
+/* Doubled class: shell.css loads later and its `.button` background would win otherwise. */
+.button.block-dialog__confirm,
+.button.block-dialog__confirm:hover:not(:disabled) {
+  border-color: var(--color-danger);
+  background: var(--color-danger);
+  color: var(--color-bg-chat);
+  font-weight: var(--font-weight-bold);
+}
+
+.button.block-dialog__confirm:hover:not(:disabled) {
+  filter: brightness(1.1);
+}
+
+/* "Blocked" mark next to a name in the member list and channel tree. */
+.blocked-badge {
+  display: inline-flex;
+  vertical-align: middle;
+  color: var(--color-danger);
+}
+
+/* A collapsed channel message of a blocked user. */
+.blocked-message {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  border: 1px dashed var(--color-border-strong, var(--color-border));
+  border-radius: var(--radius-md);
+  color: var(--color-text-muted);
+}
+
+.blocked-message__icon {
+  flex: none;
+  color: var(--color-danger);
+}
+
+.blocked-message__text {
+  flex: 1;
+  min-width: 0;
+}
+
+.blocked-message__show {
+  padding: 0;
+  border: none;
+  background: none;
+  color: var(--color-accent-text);
+  text-decoration: underline;
+  cursor: pointer;
+  font: inherit;
+}
+
+.blocked-message__show:focus-visible {
+  outline: var(--focus-ring-width) solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+/* Settings → Privacy → Blocked users. */
+.blocked-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.blocked-table th {
+  padding: var(--space-2) var(--space-2);
+  border-bottom: 1px solid var(--color-border);
+  text-align: start;
+  font-size: var(--font-size-sm);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--color-text-secondary);
+}
+
+.blocked-table td {
+  padding: var(--space-2);
+  border-bottom: 1px solid var(--color-border);
+  vertical-align: middle;
+  overflow-wrap: anywhere;
+}
+
+.blocked-table__user {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.blocked-table__since {
+  color: var(--color-text-secondary);
+}
+
+.blocked-table__action {
+  text-align: end;
+}
