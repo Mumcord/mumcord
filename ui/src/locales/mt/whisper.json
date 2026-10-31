@@ -1,0 +1,44 @@
+{
+  "menu": {
+    "whisper": "Ibbisbes lil…",
+    "noPermission": "Is-server ma jippermettix il-bisbisa hawn"
+  },
+  "banner": {
+    "whisper": "Qed tibbisbes lil {{target}}",
+    "shout": "Qed tgħajjat lil {{target}}",
+    "releaseKey": "Il-persuni hemmhekk biss jisimgħuk. Ħalli <key>{{key}}</key> biex terġa’ titkellem f’{{channel}}.",
+    "stopToReturn": "Il-persuni hemmhekk biss jisimgħuk. Waqqaf biex terġa’ titkellem f’{{channel}}.",
+    "onlyThere": "Il-persuni hemmhekk biss jisimgħuk.",
+    "stop": "Waqqaf"
+  },
+  "denied": {
+    "title": "Ma setgħetx tibbisbes lil {{target}}",
+    "noVoiceServer": "Idħol f’kanal l-ewwel: il-bisbisiet jgħaddu mis-server li fih qed titkellem.",
+    "muted": "Ħoll il-mikrofonu tiegħek biex tibbisbes.",
+    "serverMuted": "Is-server għamlek mutu, għalhekk ma jgħaddix leħnek.",
+    "nobodyHere": "L-ebda wieħed minn dawn il-persuni mhu fuq dan is-server issa.",
+    "channelNotFound": "Dan il-kanal ma jeżistix fuq dan is-server.",
+    "noPermission": "Is-server ma jippermettilekx tibbisbes f’{{channel}}.",
+    "unknownTarget": "Dan il-mira ma għadhiex teżisti.",
+    "dismiss": "Ichda"
+  },
+  "badge": {
+    "whisper": "jibbisbes",
+    "shout": "jgħajjat",
+    "whisperLabel": "Qed jibbisbes lilek",
+    "shoutLabel": "Qed jgħajjat lill-kanal tiegħek",
+    "ownWhisper": "qed tibbisbes",
+    "ownShout": "qed tgħajjat",
+    "ownWhisperLabel": "Qed tibbisbes",
+    "ownShoutLabel": "Qed tgħajjat"
+  },
+  "panel": {
+    "open": "Ibbisbes jew għajjat",
+    "menu": "Miri tal-bisbisa u tal-għajjat",
+    "manage": "Immaniġġja l-miri…",
+    "none": "Għad m’hemmx miri",
+    "indicatorWhisper": "Qed tibbisbes lil {{target}}",
+    "indicatorShout": "Qed tgħajjat lil {{target}}",
+    "stop": "Waqqaf"
+  }
+}

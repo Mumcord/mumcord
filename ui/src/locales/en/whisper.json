@@ -1,0 +1,44 @@
+{
+  "menu": {
+    "whisper": "Whisper to…",
+    "noPermission": "The server does not allow whispering here"
+  },
+  "banner": {
+    "whisper": "Whispering to {{target}}",
+    "shout": "Shouting to {{target}}",
+    "releaseKey": "Only people there can hear you. Release <key>{{key}}</key> to talk to {{channel}} again.",
+    "stopToReturn": "Only people there can hear you. Stop to talk to {{channel}} again.",
+    "onlyThere": "Only people there can hear you.",
+    "stop": "Stop"
+  },
+  "denied": {
+    "title": "Could not whisper to {{target}}",
+    "noVoiceServer": "Join a channel first: whispers go through the server you talk on.",
+    "muted": "Unmute your microphone to whisper.",
+    "serverMuted": "The server has muted you, so it does not pass on your voice.",
+    "nobodyHere": "None of these people are on this server right now.",
+    "channelNotFound": "This channel does not exist on this server.",
+    "noPermission": "The server does not allow you to whisper to {{channel}}.",
+    "unknownTarget": "This target no longer exists.",
+    "dismiss": "Dismiss"
+  },
+  "badge": {
+    "whisper": "whispers",
+    "shout": "shouts",
+    "whisperLabel": "Whispers to you",
+    "shoutLabel": "Shouts to your channel",
+    "ownWhisper": "whispering",
+    "ownShout": "shouting",
+    "ownWhisperLabel": "You are whispering",
+    "ownShoutLabel": "You are shouting"
+  },
+  "panel": {
+    "open": "Whisper or shout",
+    "menu": "Whisper and shout targets",
+    "manage": "Manage targets…",
+    "none": "No targets yet",
+    "indicatorWhisper": "Whispering to {{target}}",
+    "indicatorShout": "Shouting to {{target}}",
+    "stop": "Stop"
+  }
+}

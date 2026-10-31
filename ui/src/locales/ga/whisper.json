@@ -1,0 +1,44 @@
+{
+  "menu": {
+    "whisper": "Cogar le…",
+    "noPermission": "Ní cheadaíonn an freastalaí cogarnach anseo"
+  },
+  "banner": {
+    "whisper": "Ag cogarnach le {{target}}",
+    "shout": "Ag béiceadh le {{target}}",
+    "releaseKey": "Ní chloiseann ach na daoine ansin thú. Scaoil <key>{{key}}</key> chun labhairt in {{channel}} arís.",
+    "stopToReturn": "Ní chloiseann ach na daoine ansin thú. Stop chun labhairt in {{channel}} arís.",
+    "onlyThere": "Ní chloiseann ach na daoine ansin thú.",
+    "stop": "Stop"
+  },
+  "denied": {
+    "title": "Níorbh fhéidir cogarnach le {{target}}",
+    "noVoiceServer": "Téigh isteach i gcainéal ar dtús: téann cogarnaigh tríd an bhfreastalaí a bhfuil tú ag labhairt air.",
+    "muted": "Díbhalbhaigh do mhicreafón chun cogarnach.",
+    "serverMuted": "Chuir an freastalaí balbh thú, mar sin ní sheolann sé do ghuth ar aghaidh.",
+    "nobodyHere": "Níl aon duine acu seo ar an bhfreastalaí seo faoi láthair.",
+    "channelNotFound": "Níl an cainéal seo ann ar an bhfreastalaí seo.",
+    "noPermission": "Ní cheadaíonn an freastalaí duit cogarnach in {{channel}}.",
+    "unknownTarget": "Níl an sprioc seo ann a thuilleadh.",
+    "dismiss": "Cuir i leataobh"
+  },
+  "badge": {
+    "whisper": "ag cogarnach",
+    "shout": "ag béiceadh",
+    "whisperLabel": "Ag cogarnach leat",
+    "shoutLabel": "Ag béiceadh le do chainéal",
+    "ownWhisper": "ag cogarnach",
+    "ownShout": "ag béiceadh",
+    "ownWhisperLabel": "Tá tú ag cogarnach",
+    "ownShoutLabel": "Tá tú ag béiceadh"
+  },
+  "panel": {
+    "open": "Cogar nó béic",
+    "menu": "Spriocanna cogarnaigh agus béicíola",
+    "manage": "Bainistigh spriocanna…",
+    "none": "Gan spriocanna fós",
+    "indicatorWhisper": "Ag cogarnach le {{target}}",
+    "indicatorShout": "Ag béiceadh le {{target}}",
+    "stop": "Stop"
+  }
+}

@@ -84,6 +84,7 @@ describe("shared channel actions (issue #172)", () => {
     expect(header).toEqual([
       "Follow channel",
       "Audio for this channel…",
+      "Whisper to…",
       "Copy channel link",
       "Channel info",
       "Clear chat history…",

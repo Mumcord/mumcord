@@ -1,0 +1,44 @@
+{
+  "menu": {
+    "whisper": "Pošeptat…",
+    "noPermission": "Server tady šeptání nepovoluje"
+  },
+  "banner": {
+    "whisper": "Šeptáš: {{target}}",
+    "shout": "Voláš na: {{target}}",
+    "releaseKey": "Slyší tě jen lidé tam. Pusť <key>{{key}}</key> a znovu mluvíš do {{channel}}.",
+    "stopToReturn": "Slyší tě jen lidé tam. Zastav a znovu mluvíš do {{channel}}.",
+    "onlyThere": "Slyší tě jen lidé tam.",
+    "stop": "Zastavit"
+  },
+  "denied": {
+    "title": "Nelze pošeptat: {{target}}",
+    "noVoiceServer": "Nejdřív vstup do kanálu: šepot jde přes server, na kterém mluvíš.",
+    "muted": "Pro šeptání zapni mikrofon.",
+    "serverMuted": "Server tě ztlumil, proto tvůj hlas nepředává.",
+    "nobodyHere": "Nikdo z těchto lidí teď na serveru není.",
+    "channelNotFound": "Tento kanál na serveru neexistuje.",
+    "noPermission": "Server ti nedovoluje šeptat do kanálu {{channel}}.",
+    "unknownTarget": "Tento cíl už neexistuje.",
+    "dismiss": "Zavřít"
+  },
+  "badge": {
+    "whisper": "šeptá",
+    "shout": "volá",
+    "whisperLabel": "Šeptá ti",
+    "shoutLabel": "Volá na tvůj kanál",
+    "ownWhisper": "šeptáš",
+    "ownShout": "voláš",
+    "ownWhisperLabel": "Šeptáš",
+    "ownShoutLabel": "Voláš na kanál"
+  },
+  "panel": {
+    "open": "Šeptat nebo volat",
+    "menu": "Cíle šeptání a volání",
+    "manage": "Spravovat cíle…",
+    "none": "Zatím žádné cíle",
+    "indicatorWhisper": "Šeptáš: {{target}}",
+    "indicatorShout": "Voláš na: {{target}}",
+    "stop": "Zastavit"
+  }
+}
