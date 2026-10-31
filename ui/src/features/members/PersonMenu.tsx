@@ -1,6 +1,7 @@
 /**
  * Context menu on a person (FR-1.18, QA.32): send message (#141 chat request when needed), join
- * their channel, add or remove friend (FR-1.64), view profile, local mute and volume slider. Reuses the profile card's volume slider and local-mute action, so both
+ * their channel, add or remove friend (FR-1.64), view profile, revoke chat consent, local mute and
+ * volume slider. Reuses the profile card's volume slider and local-mute action, so both
  * places store the same per-certificate settings. Yourself only gets "View profile".
  */
 import {
@@ -19,9 +20,8 @@ import { shownServerId, useServerState } from "../channels/serverStore";
 import { hasMumcordFeature } from "../channels/mumcord";
 import { setFriend, useFriend } from "../friends";
 import { openChatRequestDialog } from "../requests/chatRequestDialogStore";
-import { ownCertHash } from "../requests/ownIdentity";
-import { useAcceptedConversations, usePmRequests } from "../requests/requestsStore";
-import { useServers } from "../servers/store";
+import { openRevokeConsentDialog } from "../requests/revokeConsentStore";
+import { useAcceptedConsent, usePmRequests } from "../requests/requestsStore";
 import "../userpanel/quicksettings.css";
 import "./members.css";
 import { joinTarget } from "./joinTarget";
@@ -96,8 +96,7 @@ function PersonMenu({
   const user = findPerson(state.users, open.session, open.name);
   const friend = useFriend(user?.certHash ?? null);
   const { sent } = usePmRequests(state.serverId);
-  const acceptedConversations = useAcceptedConversations();
-  const { servers, identities } = useServers();
+  const consent = useAcceptedConsent(state.serverId, user?.certHash ?? null);
   const ref = useRef<HTMLDivElement>(null);
   // The menu closes once the join succeeds; a failure keeps it open to show why.
   const [joinError, setJoinError] = useState<string | null>(null);
@@ -161,11 +160,7 @@ function PersonMenu({
   // Chat requests (issue #141) reach Mumcord users who announced them, and only make sense for
   // people who may not write yet: not friends, no accepted conversation, no accepted request.
   const sentRequest = user ? sent.find((r) => r.session === user.session) : undefined;
-  const own = state.serverId === null ? null : ownCertHash(servers, identities, state.serverId);
-  const alreadyAccepted =
-    sentRequest?.accepted === true ||
-    (user?.certHash != null &&
-      acceptedConversations.some((c) => c.ownCertHash === own && c.certHash === user.certHash));
+  const alreadyAccepted = sentRequest?.accepted === true || consent !== undefined;
   const chatRequest =
     user && !isSelf && friend === undefined && !alreadyAccepted
       ? hasMumcordFeature(user, "chat-request")
@@ -356,6 +351,12 @@ function PersonMenu({
           requestConnectionExpanded();
           onViewProfile(user.session, open.opener, true);
         })}
+      {consent &&
+        !isSelf &&
+        item("revokeConsent", <RevokeIcon />, t("menu.revokeConsent"), () => {
+          closePersonMenu();
+          openRevokeConsentDialog({ conversation: consent, opener: open.opener });
+        })}
       {user && !isSelf && (
         <>
           <div role="separator" className="person-menu__separator" />
@@ -434,6 +435,12 @@ function IdentityCardIcon() {
 
 function ChatBubbleIcon() {
   return <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />;
+}
+
+function RevokeIcon() {
+  return (
+    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2zM9 7l6 6M15 7l-6 6" />
+  );
 }
 
 function HeartIcon() {

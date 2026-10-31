@@ -63,7 +63,8 @@
     "joinLocked": "Nie możesz wejść na ten kanał albo wymaga on hasła.",
     "mute": "Wycisz dla mnie",
     "connectionInfo": "Informacje o połączeniu…",
-    "chatRequestPending": "Prośba o czat oczekuje"
+    "chatRequestPending": "Prośba o czat oczekuje",
+    "revokeConsent": "Cofnij zgodę na czat…"
   },
   "nowPlaying": {
     "label": "Teraz gra",
@@ -113,5 +114,11 @@
     "talkingMore_many": "{{name}} i {{count}} innych osób mówi",
     "talkingMore_other": "{{name}} i {{count}} innych osób mówi",
     "shortcut": "Ctrl+Shift+M"
+  },
+  "revokeConsent": {
+    "title": "Cofnąć zgodę na czat dla {{name}}?",
+    "message": "{{name}} będzie musiał(a) ponownie wysłać prośbę o wiadomość, zanim jego/jej wiadomości znów do ciebie dotrą. Historia czatu zostaje.",
+    "confirm": "Cofnij",
+    "failed": "Nie udało się cofnąć zgody na czat. Spróbuj ponownie."
   }
 }

@@ -1,9 +1,9 @@
 import { act, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
-import { afterEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { MockApi, Settings } from "../../api";
 import { chooseOption } from "../../components/SelectTestUtils";
 import { getServerState, shownServerId } from "../channels/serverStore";
-import { connectedMock, resetAll } from "../channels/testUtils";
+import { connectedMock, resetAll, stubDialog } from "../channels/testUtils";
 import { resetFriendsStore } from "../friends";
 import { PersonMenuHost } from "../members/PersonMenu";
 import { closePersonMenu, openPersonMenu } from "../members/personMenuStore";
@@ -11,7 +11,11 @@ import { AcceptedConversationsGroup } from "../settings/sections/AcceptedConvers
 import { PrivateMessagesGroup } from "../settings/sections/PrivateMessagesGroup";
 import { ChatRequestDialogHost } from "./ChatRequestDialog";
 import { closeChatRequestDialog } from "./chatRequestDialogStore";
+import { MessagesOverview } from "../messages/MessagesOverview";
+import { resetConversationsStore } from "../messages/conversationsStore";
 import { RequestsEntry } from "./RequestsEntry";
+import { RevokeConsentDialogHost } from "./RevokeConsentDialog";
+import { closeRevokeConsentDialog } from "./revokeConsentStore";
 import { RequestsView } from "./RequestsView";
 import { resetRequestsStore, usePmRequests } from "./requestsStore";
 import { resetRequestsView, useRequestsView } from "./useRequestsView";
@@ -37,6 +41,8 @@ function annaAcceptsChatRequests() {
 afterEach(() => {
   act(closePersonMenu);
   act(closeChatRequestDialog);
+  act(closeRevokeConsentDialog);
+  resetConversationsStore();
   resetRequestsView();
   resetRequestsStore();
   resetFriendsStore();
@@ -274,5 +280,81 @@ describe("private message settings", () => {
     expect(update).toHaveBeenLastCalledWith({
       privateMessages: { ...DEFAULTS, allowCurrentChannel: false },
     });
+  });
+});
+
+describe("revoke chat consent", () => {
+  beforeEach(stubDialog);
+
+  async function acceptedAnna() {
+    await connected();
+    annaAcceptsChatRequests();
+    await act(async () => {
+      await api.chatRequestSend(shownServerId(), 2, null);
+    });
+  }
+
+  it("is only offered in the person menu for an accepted conversation", async () => {
+    await connected();
+    render(<PersonMenuHost />);
+    act(() => {
+      openPersonMenu({ session: 2, x: 10, y: 10, opener: null });
+    });
+    expect(screen.queryByRole("menuitem", { name: "Revoke chat consent…" })).toBeNull();
+  });
+
+  it("revokes from the person menu after a confirmation", async () => {
+    await acceptedAnna();
+    const revoke = vi.spyOn(api, "acceptedConversationRevoke");
+    render(
+      <>
+        <PersonMenuHost />
+        <RevokeConsentDialogHost />
+      </>,
+    );
+    act(() => {
+      openPersonMenu({ session: 2, x: 10, y: 10, opener: null });
+    });
+    fireEvent.click(await screen.findByRole("menuitem", { name: "Revoke chat consent…" }));
+    expect(screen.queryByRole("menu")).toBeNull();
+    const dialog = screen.getByRole("dialog", { name: "Revoke chat consent for Anna?" });
+    fireEvent.click(within(dialog).getByRole("button", { name: "Cancel" }));
+    expect(revoke).not.toHaveBeenCalled();
+    await waitFor(() => {
+      expect(screen.queryByRole("dialog")).toBeNull();
+    });
+    act(() => {
+      openPersonMenu({ session: 2, x: 10, y: 10, opener: null });
+    });
+    // The saved identities load again for the fresh menu.
+    fireEvent.click(await screen.findByRole("menuitem", { name: "Revoke chat consent…" }));
+    fireEvent.click(within(screen.getByRole("dialog")).getByRole("button", { name: "Revoke" }));
+    expect(revoke).toHaveBeenCalledWith(expect.any(String), "annahash");
+    await waitFor(() => {
+      expect(screen.queryByRole("dialog")).toBeNull();
+    });
+    expect(await api.acceptedConversations()).toEqual([]);
+  });
+
+  it("revokes from the conversation menu of the messages overview", async () => {
+    await acceptedAnna();
+    const revoke = vi.spyOn(api, "acceptedConversationRevoke");
+    render(
+      <>
+        <MessagesOverview />
+        <RevokeConsentDialogHost />
+      </>,
+    );
+    act(() => {
+      api.mock.receiveMessage({ kind: "private", certHash: "annahash" }, "hi", 2);
+    });
+    const row = await screen.findByTestId("pm-row");
+    fireEvent.keyDown(row, { key: "F10", shiftKey: true });
+    fireEvent.click(
+      within(screen.getByRole("menu")).getByRole("menuitem", { name: "Revoke chat consent…" }),
+    );
+    const dialog = screen.getByRole("dialog", { name: "Revoke chat consent for Anna?" });
+    fireEvent.click(within(dialog).getByRole("button", { name: "Revoke" }));
+    expect(revoke).toHaveBeenCalledWith(expect.any(String), "annahash");
   });
 });

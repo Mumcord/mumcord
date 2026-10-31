@@ -62,7 +62,8 @@
     "joinLocked": "Tev nav atļauts ieiet šajā kanālā, vai tam vajag paroli.",
     "mute": "Izslēgt man",
     "connectionInfo": "Savienojuma informācija…",
-    "chatRequestPending": "Tērzēšanas pieprasījums gaida"
+    "chatRequestPending": "Tērzēšanas pieprasījums gaida",
+    "revokeConsent": "Atsaukt tērzēšanas piekrišanu…"
   },
   "nowPlaying": {
     "label": "Tagad skan",
@@ -109,5 +110,11 @@
     "talkingMore_one": "{{name}} un vēl {{count}} runā",
     "talkingMore_other": "{{name}} un vēl {{count}} runā",
     "shortcut": "Ctrl+Shift+M"
+  },
+  "revokeConsent": {
+    "title": "Atsaukt tērzēšanas piekrišanu lietotājam {{name}}?",
+    "message": "{{name}} būs jānosūta jauns ziņas pieprasījums, pirms ziņas atkal sasniegs tevi. Tērzēšanas vēsture paliek.",
+    "confirm": "Atsaukt",
+    "failed": "Neizdevās atsaukt tērzēšanas piekrišanu. Mēģini vēlreiz."
   }
 }

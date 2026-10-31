@@ -61,7 +61,8 @@
     "joinLocked": "Je mag dit kanaal niet betreden, of het vraagt om een wachtwoord.",
     "mute": "Voor mij dempen",
     "connectionInfo": "Verbindingsinfo…",
-    "chatRequestPending": "Chatverzoek in behandeling"
+    "chatRequestPending": "Chatverzoek in behandeling",
+    "revokeConsent": "Chattoestemming intrekken…"
   },
   "nowPlaying": {
     "label": "Speelt nu",
@@ -105,5 +106,11 @@
     "talkingMore_one": "{{name}} en {{count}} ander praten",
     "talkingMore_other": "{{name}} en {{count}} anderen praten",
     "shortcut": "Ctrl+Shift+M"
+  },
+  "revokeConsent": {
+    "title": "Chattoestemming voor {{name}} intrekken?",
+    "message": "{{name}} moet opnieuw een berichtverzoek sturen voordat de berichten je weer bereiken. Je chatgeschiedenis blijft bewaard.",
+    "confirm": "Intrekken",
+    "failed": "Het intrekken van de chattoestemming is mislukt. Probeer het opnieuw."
   }
 }

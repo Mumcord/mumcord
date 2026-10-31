@@ -4,7 +4,7 @@ import { LiveRegions } from "../a11y";
 import { TooltipLayer } from "../components/Tooltip";
 import { PersonMenuHost, ProfilePreviewHost } from "../features/members";
 import { NotificationsHost } from "../features/notifications";
-import { ChatRequestDialogHost } from "../features/requests";
+import { ChatRequestDialogHost, RevokeConsentDialogHost } from "../features/requests";
 import { TraySync } from "../features/tray";
 import { AppShell } from "./AppShell";
 import {
@@ -63,6 +63,7 @@ function MainScreen() {
       {overlay === null && <ProfilePreviewHost />}
       {overlay === null && <PersonMenuHost />}
       {overlay === null && <ChatRequestDialogHost />}
+      {overlay === null && <RevokeConsentDialogHost />}
       <NotificationsHost overlayOpen={overlay !== null} onOpenChat={closeOverlay} />
       <TraySync onOpenSettings={openSettings} />
       {devTools && <InspectorViewShare />}

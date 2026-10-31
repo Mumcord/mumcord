@@ -61,7 +61,8 @@
     "joinLocked": "You may not enter this channel, or it needs a password.",
     "mute": "Mute for me",
     "connectionInfo": "Connection info…",
-    "chatRequestPending": "Chat request pending"
+    "chatRequestPending": "Chat request pending",
+    "revokeConsent": "Revoke chat consent…"
   },
   "nowPlaying": {
     "label": "Now playing",
@@ -105,5 +106,11 @@
     "talkingMore_one": "{{name}} and {{count}} other are talking",
     "talkingMore_other": "{{name}} and {{count}} others are talking",
     "shortcut": "Ctrl+Shift+M"
+  },
+  "revokeConsent": {
+    "title": "Revoke chat consent for {{name}}?",
+    "message": "{{name}} will need to send a new message request before their messages reach you again. Your chat history stays.",
+    "confirm": "Revoke",
+    "failed": "Revoking the chat consent failed. Please try again."
   }
 }

@@ -61,7 +61,8 @@
     "joinLocked": "Sa ei tohi sellesse kanalisse siseneda või see vajab parooli.",
     "mute": "Vaigista minu jaoks",
     "connectionInfo": "Ühenduse teave…",
-    "chatRequestPending": "Vestlustaotlus ootel"
+    "chatRequestPending": "Vestlustaotlus ootel",
+    "revokeConsent": "Võta vestlusnõusolek tagasi…"
   },
   "nowPlaying": {
     "label": "Praegu mängib",
@@ -105,5 +106,11 @@
     "talkingMore_one": "{{name}} ja veel {{count}} räägivad",
     "talkingMore_other": "{{name}} ja veel {{count}} räägivad",
     "shortcut": "Ctrl+Shift+M"
+  },
+  "revokeConsent": {
+    "title": "Kas võtta vestlusnõusolek kasutajalt {{name}} tagasi?",
+    "message": "{{name}} peab saatma uue sõnumitaotluse, enne kui tema sõnumid sinuni jõuavad. Vestluse ajalugu jääb alles.",
+    "confirm": "Võta tagasi",
+    "failed": "Vestlusnõusoleku tagasivõtmine ebaõnnestus. Proovi uuesti."
   }
 }

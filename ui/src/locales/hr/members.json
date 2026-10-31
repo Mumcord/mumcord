@@ -62,7 +62,8 @@
     "joinLocked": "Ne smiješ ući u ovaj kanal ili je potrebna lozinka.",
     "mute": "Utišaj za mene",
     "connectionInfo": "Informacije o vezi…",
-    "chatRequestPending": "Zahtjev za razgovor na čekanju"
+    "chatRequestPending": "Zahtjev za razgovor na čekanju",
+    "revokeConsent": "Opozovi pristanak na chat…"
   },
   "nowPlaying": {
     "label": "Trenutno svira",
@@ -109,5 +110,11 @@
     "talkingMore_few": "{{name}} i još {{count}} govore",
     "talkingMore_other": "{{name}} i još {{count}} govore",
     "shortcut": "Ctrl+Shift+M"
+  },
+  "revokeConsent": {
+    "title": "Opozvati pristanak na chat za {{name}}?",
+    "message": "{{name}} morat će ponovno poslati zahtjev za poruku prije nego što ti poruke opet stignu. Povijest chata ostaje.",
+    "confirm": "Opozovi",
+    "failed": "Opoziv pristanka na chat nije uspio. Pokušaj ponovno."
   }
 }

@@ -61,7 +61,8 @@
     "joinLocked": "Du darfst diesen Kanal nicht betreten, oder er braucht ein Passwort.",
     "mute": "Für mich stummschalten",
     "connectionInfo": "Verbindungsinfo …",
-    "chatRequestPending": "Chatanfrage ausstehend"
+    "chatRequestPending": "Chatanfrage ausstehend",
+    "revokeConsent": "Chat-Zustimmung widerrufen …"
   },
   "nowPlaying": {
     "label": "Läuft gerade",
@@ -105,5 +106,11 @@
     "talkingMore_one": "{{name}} und {{count}} weitere sprechen",
     "talkingMore_other": "{{name}} und {{count}} weitere sprechen",
     "shortcut": "Strg+Umschalt+M"
+  },
+  "revokeConsent": {
+    "title": "Chat-Zustimmung für {{name}} widerrufen?",
+    "message": "{{name}} muss wieder eine Nachrichtenanfrage senden, bevor Nachrichten bei dir ankommen. Dein Chatverlauf bleibt erhalten.",
+    "confirm": "Widerrufen",
+    "failed": "Das Widerrufen der Chat-Zustimmung hat nicht geklappt. Bitte versuche es noch einmal."
   }
 }

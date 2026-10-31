@@ -64,7 +64,8 @@
     "joinLocked": "M’għandekx permess tidħol f’dan il-kanal, jew jeħtieġ password.",
     "mute": "Mutja għalija",
     "connectionInfo": "Informazzjoni dwar il-konnessjoni…",
-    "chatRequestPending": "Talba għal chat pendenti"
+    "chatRequestPending": "Talba għal chat pendenti",
+    "revokeConsent": "Irtira l-kunsens għaċ-chat…"
   },
   "nowPlaying": {
     "label": "Qed jindaqq issa",
@@ -117,5 +118,11 @@
     "talkingMore_many": "{{name}} u {{count}} oħrajn qed jitkellmu",
     "talkingMore_other": "{{name}} u {{count}} oħrajn qed jitkellmu",
     "shortcut": "Ctrl+Shift+M"
+  },
+  "revokeConsent": {
+    "title": "Tirtira l-kunsens għaċ-chat għal {{name}}?",
+    "message": "{{name}} se jkollu jibgħat talba ġdida għal messaġġ qabel ma l-messaġġi jerġgħu jaslulek. L-istorja taċ-chat tibqa’.",
+    "confirm": "Irtira",
+    "failed": "L-irtirar tal-kunsens għaċ-chat ma rnexxiex. Erġa’ pprova."
   }
 }

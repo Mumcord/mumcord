@@ -63,7 +63,8 @@
     "joinLocked": "Do tohoto kanálu nesmíš vstoupit, nebo vyžaduje heslo.",
     "mute": "Ztlumit pro mě",
     "connectionInfo": "Informace o připojení…",
-    "chatRequestPending": "Žádost o chat čeká na vyřízení"
+    "chatRequestPending": "Žádost o chat čeká na vyřízení",
+    "revokeConsent": "Odvolat souhlas s chatem…"
   },
   "nowPlaying": {
     "label": "Právě hraje",
@@ -113,5 +114,11 @@
     "talkingMore_many": "{{name}} a {{count}} dalších mluví",
     "talkingMore_other": "{{name}} a {{count}} dalších mluví",
     "shortcut": "Ctrl+Shift+M"
+  },
+  "revokeConsent": {
+    "title": "Odvolat souhlas s chatem pro {{name}}?",
+    "message": "{{name}} bude muset znovu poslat žádost o zprávu, než se k tobě jeho zprávy dostanou. Historie chatu zůstane.",
+    "confirm": "Odvolat",
+    "failed": "Odvolání souhlasu s chatem se nezdařilo. Zkus to prosím znovu."
   }
 }

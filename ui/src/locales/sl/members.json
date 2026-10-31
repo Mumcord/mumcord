@@ -63,7 +63,8 @@
     "joinLocked": "V ta kanal ne smeš vstopiti ali pa zahteva geslo.",
     "mute": "Utišaj zame",
     "connectionInfo": "Podatki o povezavi…",
-    "chatRequestPending": "Prošnja za klepet čaka"
+    "chatRequestPending": "Prošnja za klepet čaka",
+    "revokeConsent": "Prekliči soglasje za klepet…"
   },
   "nowPlaying": {
     "label": "Zdaj se predvaja",
@@ -113,5 +114,11 @@
     "talkingMore_few": "{{name}} in še {{count}} govorijo",
     "talkingMore_other": "{{name}} in še {{count}} govorijo",
     "shortcut": "Ctrl+Shift+M"
+  },
+  "revokeConsent": {
+    "title": "Prekličem soglasje za klepet za {{name}}?",
+    "message": "{{name}} bo moral(a) znova poslati prošnjo za sporočilo, preden te bodo sporočila spet dosegla. Zgodovina klepeta ostane.",
+    "confirm": "Prekliči",
+    "failed": "Preklic soglasja za klepet ni uspel. Poskusi znova."
   }
 }

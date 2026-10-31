@@ -61,7 +61,8 @@
     "joinLocked": "Nem léphetsz be ebbe a csatornába, vagy jelszó kell hozzá.",
     "mute": "Némítás nálam",
     "connectionInfo": "Kapcsolati adatok…",
-    "chatRequestPending": "Csevegési kérés függőben"
+    "chatRequestPending": "Csevegési kérés függőben",
+    "revokeConsent": "Csevegési hozzájárulás visszavonása…"
   },
   "nowPlaying": {
     "label": "Most szól",
@@ -105,5 +106,11 @@
     "talkingMore_one": "{{name}} és még {{count}} fő beszél",
     "talkingMore_other": "{{name}} és még {{count}} fő beszél",
     "shortcut": "Ctrl+Shift+M"
+  },
+  "revokeConsent": {
+    "title": "Visszavonod a csevegési hozzájárulást {{name}} számára?",
+    "message": "{{name}} új üzenetkérelmet kell küldjön, mielőtt az üzenetei újra eljutnak hozzád. A csevegési előzmények megmaradnak.",
+    "confirm": "Visszavonás",
+    "failed": "A csevegési hozzájárulás visszavonása nem sikerült. Próbáld újra."
   }
 }

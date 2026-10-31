@@ -61,7 +61,8 @@
     "joinLocked": "Du må ikke gå ind i denne kanal, eller den kræver en adgangskode.",
     "mute": "Slå lyden fra for mig",
     "connectionInfo": "Forbindelsesinfo…",
-    "chatRequestPending": "Chatanmodning afventer"
+    "chatRequestPending": "Chatanmodning afventer",
+    "revokeConsent": "Tilbagekald chatsamtykke …"
   },
   "nowPlaying": {
     "label": "Spiller nu",
@@ -105,5 +106,11 @@
     "talkingMore_one": "{{name}} og {{count}} anden taler",
     "talkingMore_other": "{{name}} og {{count}} andre taler",
     "shortcut": "Ctrl+Skift+M"
+  },
+  "revokeConsent": {
+    "title": "Tilbagekald chatsamtykke for {{name}}?",
+    "message": "{{name}} skal sende en ny beskedanmodning, før beskederne når frem til dig igen. Din chathistorik bevares.",
+    "confirm": "Tilbagekald",
+    "failed": "Tilbagekaldelsen af chatsamtykket mislykkedes. Prøv igen."
   }
 }
