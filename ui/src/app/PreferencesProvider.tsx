@@ -6,6 +6,7 @@ import { applyShownTheme, resolveShownTheme } from "../theme/appTheme";
 import { osPrefersDark, resolveTheme, watchOsTheme } from "../theme/theme";
 import { setAppThemes, useThemeChoice } from "../theme/themeStore";
 import { ducker } from "../features/watchparty/ducking";
+import { setHotkeySettings } from "../features/hotkeys";
 import { PreferencesContext, type Preferences } from "./preferences";
 
 interface StoredPreferences {
@@ -75,10 +76,13 @@ export function PreferencesProvider({ children }: { children: ReactNode }) {
         | "customThemes"
         | "videoDucking"
         | "videoDuckingPercent"
+        | "globalHotkeys"
+        | "hotkeys"
         | HintPreference
       >,
     ) => {
       applyHintPreferences(settings);
+      setHotkeySettings(settings);
       setAppThemes(settings.appThemeId, settings.customThemes);
       ducker.setSettings(settings);
       setStored({

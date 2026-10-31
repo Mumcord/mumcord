@@ -17,7 +17,8 @@
     "about": "O aplikaciji",
     "servers": "Strežniki",
     "privacy": "Zasebnost",
-    "packetInspector": "Pregledovalnik paketov"
+    "packetInspector": "Pregledovalnik paketov",
+    "hotkeys": "Bližnjice"
   },
   "search": {
     "label": "Išči nastavitve",
@@ -799,5 +800,57 @@
     "collapseHint": "Prikaže „Sporočilo blokiranega uporabnika“ z gumbom Prikaži.",
     "hide": "Povsem jih skrij",
     "hideHint": "V klepetu se ne prikaže nič."
+  },
+  "hotkeys": {
+    "global": "Globalne bližnjice",
+    "background": "Delovanje, ko je Mumcord v ozadju",
+    "backgroundHint": "Bližnjice delujejo povsod, tudi v igrah. Privzeto ni nastavljena nobena.",
+    "foregroundOnly": "Bližnjice delujejo samo, ko je okno Mumcorda v ospredju.",
+    "portal": "Tvoje namizje (Wayland) te bo enkrat prosilo za odobritev globalnih bližnjic.",
+    "noPortal": "Tvoje namizje ne ponuja globalnih bližnjic, zato delujejo samo, ko je okno Mumcorda v ospredju.",
+    "compatLink": "Uporabi združljivostni način (X11),",
+    "compatSuffix": "če to ni na voljo.",
+    "actions": "Dejanja",
+    "action": {
+      "pushToTalk": "Pritisni za govor",
+      "toggleMute": "Izklopi / vklopi mikrofon",
+      "toggleDeafen": "Utišaj / vklopi zvok",
+      "toggleDnd": "Preklopi Ne moti",
+      "joinLeaveVoice": "Pridruži se glasu / zapusti glas",
+      "switchVoiceServer": "Zamenjaj glasovni strežnik",
+      "switchChannel": "Preklopi na kanal …",
+      "previousChannel": "Nazaj na prejšnji kanal",
+      "toggleMemberColumn": "Pokaži / skrij stolpec članov",
+      "openQuickSettings": "Odpri hitre nastavitve",
+      "openMumcord": "Odpri Mumcord"
+    },
+    "pushToTalkHint": "Pošilja, medtem ko držiš tipke",
+    "pushToTalkOff": "Uporablja se, kadar je način govora v Glasu pritisni za govor",
+    "channelPlace": "{{channel}} · {{server}}",
+    "rootChannel": "Korenski kanal",
+    "notSet": "Ni nastavljeno",
+    "recording": "Pritisni kombinacijo tipk …",
+    "recordingHint": "Pritisni <esc>Esc</esc> za preklic, <back>Backspace</back> za izbris. Snemanje se ustavi po 5 sekundah.",
+    "clear": "Izbriši",
+    "clearLabel": "Izbriši {{action}}",
+    "cancel": "Prekliči",
+    "conflictTitle": "Navzkrižje.",
+    "conflict": "To kombinacijo že uporablja »{{other}}«. Izberi drugo ali jo dodeli tukaj in izbriši drugo.",
+    "inApp": "Ta kombinacija je Mumcordova lastna bližnjica za {{shortcut}}. Izberi drugo.",
+    "inAppShortcut": {
+      "memberColumn": "prikaz in skrivanje stolpca članov",
+      "notificationCentre": "središče za obvestila",
+      "search": "iskanje",
+      "closeWindow": "zapiranje okna"
+    },
+    "assignHere": "Dodeli tukaj",
+    "rejected": "Ta tipka ne more biti globalna bližnjica. Pritisni tipko, ki ni Ctrl, Alt, Shift ali Super, z njimi ali brez njih.",
+    "failed": "Te bližnjice ni bilo mogoče registrirati. Morda jo že uporablja druga aplikacija ali tvoje namizje.",
+    "add": "Dodaj bližnjico »preklopi na kanal« …",
+    "addChannel": "Kanal",
+    "addNone": "Poveži se s strežnikom, da izbereš enega od njegovih kanalov.",
+    "addConfirm": "Dodaj",
+    "reset": "Ponastavi vse bližnjice",
+    "resetHint": "Odstrani vse bližnjice razen pritisni za govor; privzeto ni nastavljena nobena."
   }
 }

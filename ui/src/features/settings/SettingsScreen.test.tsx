@@ -93,7 +93,7 @@ describe("SettingsScreen", () => {
     const list = screen.getByRole("tablist", { name: "Settings sections" });
     expect(list).toHaveAttribute("aria-orientation", "vertical");
     const tabs = within(list).getAllByRole("tab");
-    expect(tabs).toHaveLength(13);
+    expect(tabs).toHaveLength(14);
     const identity = screen.getByRole("tab", { name: "Identity" });
     expect(identity).toHaveAttribute("aria-selected", "true");
     expect(identity).toHaveAttribute("tabindex", "0");
@@ -1457,7 +1457,7 @@ describe("Overlay on macOS (QA.58)", () => {
     await waitFor(() => {
       expect(screen.queryByRole("tab", { name: "Overlay" })).toBeNull();
     });
-    expect(screen.getAllByRole("tab")).toHaveLength(12);
+    expect(screen.getAllByRole("tab")).toHaveLength(13);
     fireEvent.change(screen.getByRole("searchbox", { name: "Search settings" }), {
       target: { value: "overlay" },
     });

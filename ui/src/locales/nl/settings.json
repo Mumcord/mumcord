@@ -17,7 +17,8 @@
     "about": "Over",
     "servers": "Servers",
     "privacy": "Privacy",
-    "packetInspector": "Pakketinspecteur"
+    "packetInspector": "Pakketinspecteur",
+    "hotkeys": "Sneltoetsen"
   },
   "search": {
     "label": "Instellingen zoeken",
@@ -791,5 +792,57 @@
     "collapseHint": "Toont ‘Bericht van een geblokkeerde gebruiker’ met een knop ‘Tonen’.",
     "hide": "Helemaal verbergen",
     "hideHint": "Er wordt niets in de chat getoond."
+  },
+  "hotkeys": {
+    "global": "Globale sneltoetsen",
+    "background": "Werken terwijl Mumcord op de achtergrond draait",
+    "backgroundHint": "Sneltoetsen werken overal, ook in games. Standaard is er niets ingesteld.",
+    "foregroundOnly": "Sneltoetsen werken alleen als het Mumcord-venster op de voorgrond staat.",
+    "portal": "Je bureaublad (Wayland) vraagt je eenmalig om globale sneltoetsen goed te keuren.",
+    "noPortal": "Je bureaublad biedt geen globale sneltoetsen aan, dus ze werken alleen als het Mumcord-venster op de voorgrond staat.",
+    "compatLink": "Gebruik de compatibiliteitsmodus (X11)",
+    "compatSuffix": "als dat niet beschikbaar is.",
+    "actions": "Acties",
+    "action": {
+      "pushToTalk": "Push-to-talk",
+      "toggleMute": "Microfoon dempen / dempen opheffen",
+      "toggleDeafen": "Geluid uit / aan",
+      "toggleDnd": "Niet storen aan- of uitzetten",
+      "joinLeaveVoice": "Spraak betreden / verlaten",
+      "switchVoiceServer": "Spraakserver wisselen",
+      "switchChannel": "Naar kanaal gaan…",
+      "previousChannel": "Terug naar vorig kanaal",
+      "toggleMemberColumn": "Ledenkolom tonen / verbergen",
+      "openQuickSettings": "Snelle instellingen openen",
+      "openMumcord": "Mumcord openen"
+    },
+    "pushToTalkHint": "Verzendt zolang de toetsen ingedrukt zijn",
+    "pushToTalkOff": "Wordt gebruikt als de spreekmodus bij Spraak push-to-talk is",
+    "channelPlace": "{{channel}} · {{server}}",
+    "rootChannel": "Hoofdkanaal",
+    "notSet": "Niet ingesteld",
+    "recording": "Druk op een toetscombinatie…",
+    "recordingHint": "Druk op <esc>Esc</esc> om te annuleren, <back>Backspace</back> om te wissen. Opnemen stopt na 5 seconden.",
+    "clear": "Wissen",
+    "clearLabel": "{{action}} wissen",
+    "cancel": "Annuleren",
+    "conflictTitle": "Conflict.",
+    "conflict": "Deze combinatie wordt al gebruikt door „{{other}}”. Kies een andere, of wijs haar hier toe en wis de andere.",
+    "inApp": "Deze combinatie is de eigen sneltoets van Mumcord voor {{shortcut}}. Kies een andere.",
+    "inAppShortcut": {
+      "memberColumn": "het tonen en verbergen van de ledenkolom",
+      "notificationCentre": "het meldingencentrum",
+      "search": "zoeken",
+      "closeWindow": "het sluiten van een venster"
+    },
+    "assignHere": "Hier toewijzen",
+    "rejected": "Deze toets kan geen globale sneltoets zijn. Druk op een andere toets dan Ctrl, Alt, Shift of Super, met of zonder die toetsen.",
+    "failed": "Deze sneltoets kon niet worden geregistreerd. Misschien gebruikt een andere app of je bureaublad hem al.",
+    "add": "Sneltoets „naar kanaal gaan” toevoegen…",
+    "addChannel": "Kanaal",
+    "addNone": "Maak verbinding met een server om een van de kanalen te kiezen.",
+    "addConfirm": "Toevoegen",
+    "reset": "Alle sneltoetsen resetten",
+    "resetHint": "Verwijdert alle sneltoetsen behalve push-to-talk; standaard is er niets ingesteld."
   }
 }

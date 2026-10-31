@@ -17,7 +17,8 @@
     "about": "O aplikacji",
     "servers": "Serwery",
     "privacy": "Prywatność",
-    "packetInspector": "Inspektor pakietów"
+    "packetInspector": "Inspektor pakietów",
+    "hotkeys": "Skróty klawiszowe"
   },
   "search": {
     "label": "Szukaj w ustawieniach",
@@ -799,5 +800,57 @@
     "collapseHint": "Wyświetla „Wiadomość od zablokowanego użytkownika” z przyciskiem Pokaż.",
     "hide": "Ukryj je całkowicie",
     "hideHint": "Na czacie nic się nie wyświetla."
+  },
+  "hotkeys": {
+    "global": "Skróty globalne",
+    "background": "Działaj, gdy Mumcord jest w tle",
+    "backgroundHint": "Skróty działają wszędzie, także w grach. Domyślnie nic nie jest ustawione.",
+    "foregroundOnly": "Skróty działają tylko wtedy, gdy okno Mumcorda jest na wierzchu.",
+    "portal": "Twój pulpit (Wayland) poprosi raz o zatwierdzenie skrótów globalnych.",
+    "noPortal": "Twój pulpit nie oferuje skrótów globalnych, więc działają one tylko wtedy, gdy okno Mumcorda jest na wierzchu.",
+    "compatLink": "Użyj trybu zgodności (X11),",
+    "compatSuffix": "jeśli to niedostępne.",
+    "actions": "Akcje",
+    "action": {
+      "pushToTalk": "Push-to-talk",
+      "toggleMute": "Wycisz / włącz mikrofon",
+      "toggleDeafen": "Wyłącz / włącz dźwięk",
+      "toggleDnd": "Przełącz Nie przeszkadzać",
+      "joinLeaveVoice": "Dołącz do głosu / opuść głos",
+      "switchVoiceServer": "Zmień serwer głosowy",
+      "switchChannel": "Przejdź do kanału…",
+      "previousChannel": "Wróć do poprzedniego kanału",
+      "toggleMemberColumn": "Pokaż / ukryj kolumnę członków",
+      "openQuickSettings": "Otwórz szybkie ustawienia",
+      "openMumcord": "Otwórz Mumcord"
+    },
+    "pushToTalkHint": "Nadaje, gdy klawisze są wciśnięte",
+    "pushToTalkOff": "Używane, gdy tryb mówienia w sekcji Głos to push-to-talk",
+    "channelPlace": "{{channel}} · {{server}}",
+    "rootChannel": "Kanał główny",
+    "notSet": "Nie ustawiono",
+    "recording": "Naciśnij kombinację klawiszy…",
+    "recordingHint": "Naciśnij <esc>Esc</esc>, aby anulować, <back>Backspace</back>, aby wyczyścić. Nagrywanie kończy się po 5 sekundach.",
+    "clear": "Wyczyść",
+    "clearLabel": "Wyczyść: {{action}}",
+    "cancel": "Anuluj",
+    "conflictTitle": "Konflikt.",
+    "conflict": "Ta kombinacja jest już używana przez „{{other}}”. Wybierz inną albo przypisz ją tutaj i wyczyść drugą.",
+    "inApp": "Ta kombinacja to własny skrót Mumcorda: {{shortcut}}. Wybierz inną.",
+    "inAppShortcut": {
+      "memberColumn": "pokazywanie i ukrywanie kolumny członków",
+      "notificationCentre": "centrum powiadomień",
+      "search": "wyszukiwanie",
+      "closeWindow": "zamykanie okna"
+    },
+    "assignHere": "Przypisz tutaj",
+    "rejected": "Ten klawisz nie może być skrótem globalnym. Naciśnij klawisz inny niż Ctrl, Alt, Shift lub Super, z nimi lub bez nich.",
+    "failed": "Nie udało się zarejestrować tego skrótu. Być może używa go już inna aplikacja lub Twój pulpit.",
+    "add": "Dodaj skrót „przejdź do kanału”…",
+    "addChannel": "Kanał",
+    "addNone": "Połącz się z serwerem, aby wybrać jeden z jego kanałów.",
+    "addConfirm": "Dodaj",
+    "reset": "Zresetuj wszystkie skróty",
+    "resetHint": "Usuwa wszystkie skróty oprócz push-to-talk; domyślnie nic nie jest ustawione."
   }
 }

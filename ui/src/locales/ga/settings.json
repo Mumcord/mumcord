@@ -17,7 +17,8 @@
     "about": "Maidir le",
     "servers": "Freastalaithe",
     "privacy": "Príobháideachas",
-    "packetInspector": "Cigire paicéad"
+    "packetInspector": "Cigire paicéad",
+    "hotkeys": "Aicearraí"
   },
   "search": {
     "label": "Cuardaigh socruithe",
@@ -803,5 +804,57 @@
     "collapseHint": "Taispeánann sé “Teachtaireacht ó úsáideoir bactha” le cnaipe Taispeáin.",
     "hide": "Folaigh go hiomlán iad",
     "hideHint": "Ní thaispeántar aon rud sa chomhrá."
+  },
+  "hotkeys": {
+    "global": "Aicearraí domhanda",
+    "background": "Oibrigh agus Mumcord sa chúlra",
+    "backgroundHint": "Oibríonn na haicearraí i ngach áit, fiú i gcluichí. Níl aon cheann socraithe de réir réamhshocraithe.",
+    "foregroundOnly": "Ní oibríonn na haicearraí ach nuair atá fuinneog Mumcord chun tosaigh.",
+    "portal": "Iarrfaidh do dheasc (Wayland) ort aicearraí domhanda a cheadú uair amháin.",
+    "noPortal": "Ní chuireann do dheasc aicearraí domhanda ar fáil, mar sin ní oibríonn siad ach nuair atá fuinneog Mumcord chun tosaigh.",
+    "compatLink": "Úsáid mód comhoiriúnachta (X11)",
+    "compatSuffix": "mura bhfuil sin ar fáil.",
+    "actions": "Gníomhartha",
+    "action": {
+      "pushToTalk": "Brúigh-chun-cainte",
+      "toggleMute": "Balbhaigh / díbhalbhaigh an micreafón",
+      "toggleDeafen": "Bodhraigh / díbhodhraigh",
+      "toggleDnd": "Scoránaigh Ná Cuir Isteach",
+      "joinLeaveVoice": "Téigh isteach sa ghuth / fág an guth",
+      "switchVoiceServer": "Athraigh freastalaí gutha",
+      "switchChannel": "Athraigh go cainéal…",
+      "previousChannel": "Ar ais go dtí an cainéal roimhe seo",
+      "toggleMemberColumn": "Taispeáin / folaigh colún na mball",
+      "openQuickSettings": "Oscail na socruithe tapa",
+      "openMumcord": "Oscail Mumcord"
+    },
+    "pushToTalkHint": "Seolann sé fad a choinnítear na heochracha",
+    "pushToTalkOff": "Úsáidtear é nuair is brúigh-chun-cainte an mód cainte faoi Guth",
+    "channelPlace": "{{channel}} · {{server}}",
+    "rootChannel": "Cainéal fréimhe",
+    "notSet": "Gan socrú",
+    "recording": "Brúigh teaglaim eochracha…",
+    "recordingHint": "Brúigh <esc>Esc</esc> chun cealú, <back>Backspace</back> chun glanadh. Stopann an taifeadadh tar éis 5 shoicind.",
+    "clear": "Glan",
+    "clearLabel": "Glan {{action}}",
+    "cancel": "Cealaigh",
+    "conflictTitle": "Coinbhleacht.",
+    "conflict": "Úsáideann “{{other}}” an teaglaim seo cheana. Roghnaigh ceann eile, nó sann anseo í agus glan an ceann eile.",
+    "inApp": "Is aicearra de chuid Mumcord féin í an teaglaim seo le haghaidh {{shortcut}}. Roghnaigh ceann eile.",
+    "inAppShortcut": {
+      "memberColumn": "colún na mball a thaispeáint agus a fholú",
+      "notificationCentre": "an t-ionad fógraí",
+      "search": "cuardach",
+      "closeWindow": "fuinneog a dhúnadh"
+    },
+    "assignHere": "Sann anseo",
+    "rejected": "Ní féidir leis an eochair seo a bheith ina haicearra domhanda. Brúigh eochair seachas Ctrl, Alt, Shift nó Super, leo nó gan iad.",
+    "failed": "Níorbh fhéidir an t-aicearra seo a chlárú. B'fhéidir go n-úsáideann aip eile nó do dheasc é cheana.",
+    "add": "Cuir aicearra “athraigh go cainéal” leis…",
+    "addChannel": "Cainéal",
+    "addNone": "Ceangail le freastalaí chun ceann dá chainéil a roghnú.",
+    "addConfirm": "Cuir leis",
+    "reset": "Athshocraigh gach aicearra",
+    "resetHint": "Baintear gach aicearra seachas brúigh-chun-cainte; níl aon cheann socraithe de réir réamhshocraithe."
   }
 }

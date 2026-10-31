@@ -17,7 +17,8 @@
     "about": "Teave",
     "servers": "Serverid",
     "privacy": "Privaatsus",
-    "packetInspector": "Pakettide inspektor"
+    "packetInspector": "Pakettide inspektor",
+    "hotkeys": "Kiirklahvid"
   },
   "search": {
     "label": "Otsi seadeid",
@@ -791,5 +792,57 @@
     "collapseHint": "Näitab teadet „Sõnum blokeeritud kasutajalt“ ja nuppu „Näita“.",
     "hide": "Peida need täielikult",
     "hideHint": "Vestluses ei näidata midagi."
+  },
+  "hotkeys": {
+    "global": "Globaalsed kiirklahvid",
+    "background": "Töötamine, kui Mumcord on taustal",
+    "backgroundHint": "Kiirklahvid toimivad kõikjal, ka mängudes. Vaikimisi pole midagi seatud.",
+    "foregroundOnly": "Kiirklahvid toimivad ainult siis, kui Mumcordi aken on esiplaanil.",
+    "portal": "Sinu töölaud (Wayland) palub globaalsed kiirklahvid üks kord heaks kiita.",
+    "noPortal": "Sinu töölaud ei paku globaalseid kiirklahve, seega toimivad need ainult siis, kui Mumcordi aken on esiplaanil.",
+    "compatLink": "Kasuta ühilduvusrežiimi (X11),",
+    "compatSuffix": "kui see pole saadaval.",
+    "actions": "Toimingud",
+    "action": {
+      "pushToTalk": "Vajuta ja räägi",
+      "toggleMute": "Vaigista / lülita mikrofon sisse",
+      "toggleDeafen": "Summuta / lõpeta summutamine",
+      "toggleDnd": "Lülita Ära sega sisse/välja",
+      "joinLeaveVoice": "Liitu häälega / lahku hääleruumist",
+      "switchVoiceServer": "Vaheta häälserverit",
+      "switchChannel": "Vaheta kanalit…",
+      "previousChannel": "Tagasi eelmisele kanalile",
+      "toggleMemberColumn": "Näita / peida liikmete veerg",
+      "openQuickSettings": "Ava kiirseaded",
+      "openMumcord": "Ava Mumcord"
+    },
+    "pushToTalkHint": "Saadab, kuni klahve all hoiad",
+    "pushToTalkOff": "Kasutatakse, kui jaotises Hääl on rääkimisrežiim vajuta ja räägi",
+    "channelPlace": "{{channel}} · {{server}}",
+    "rootChannel": "Juurkanal",
+    "notSet": "Seadmata",
+    "recording": "Vajuta klahvikombinatsiooni…",
+    "recordingHint": "Vajuta tühistamiseks <esc>Esc</esc>, tühjendamiseks <back>Backspace</back>. Salvestamine peatub 5 sekundi pärast.",
+    "clear": "Tühjenda",
+    "clearLabel": "Tühjenda {{action}}",
+    "cancel": "Tühista",
+    "conflictTitle": "Konflikt.",
+    "conflict": "Seda kombinatsiooni kasutab juba „{{other}}“. Vali mõni teine või määra see siia ja tühjenda teine.",
+    "inApp": "See kombinatsioon on Mumcordi enda kiirklahv: {{shortcut}}. Vali mõni teine.",
+    "inAppShortcut": {
+      "memberColumn": "liikmete veeru näitamine ja peitmine",
+      "notificationCentre": "teavituskeskus",
+      "search": "otsing",
+      "closeWindow": "akna sulgemine"
+    },
+    "assignHere": "Määra siia",
+    "rejected": "See klahv ei saa olla globaalne kiirklahv. Vajuta mõnda muud klahvi peale Ctrl, Alt, Shift või Super, nendega või ilma.",
+    "failed": "Seda kiirklahvi ei õnnestunud registreerida. Võib-olla kasutab seda juba mõni teine rakendus või sinu töölaud.",
+    "add": "Lisa kiirklahv „vaheta kanalit“…",
+    "addChannel": "Kanal",
+    "addNone": "Ühendu serveriga, et valida selle kanalite hulgast.",
+    "addConfirm": "Lisa",
+    "reset": "Lähtesta kõik kiirklahvid",
+    "resetHint": "Eemaldab kõik kiirklahvid peale vajuta-ja-räägi; vaikimisi pole midagi seatud."
   }
 }

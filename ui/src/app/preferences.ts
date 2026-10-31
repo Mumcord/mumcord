@@ -42,6 +42,8 @@ export interface Preferences {
       | "customThemes"
       | "videoDucking"
       | "videoDuckingPercent"
+      | "globalHotkeys"
+      | "hotkeys"
       | HintPreference
     >,
   ) => void;

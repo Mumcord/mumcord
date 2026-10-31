@@ -17,7 +17,8 @@
     "about": "À propos",
     "servers": "Serveurs",
     "privacy": "Confidentialité",
-    "packetInspector": "Inspecteur de paquets"
+    "packetInspector": "Inspecteur de paquets",
+    "hotkeys": "Raccourcis"
   },
   "search": {
     "label": "Rechercher dans les paramètres",
@@ -795,5 +796,57 @@
     "collapseHint": "Affiche « Message d’un utilisateur bloqué » avec un bouton « Afficher ».",
     "hide": "Les masquer complètement",
     "hideHint": "Rien n’est affiché dans le chat."
+  },
+  "hotkeys": {
+    "global": "Raccourcis globaux",
+    "background": "Fonctionner quand Mumcord est en arrière-plan",
+    "backgroundHint": "Les raccourcis fonctionnent partout, même dans les jeux. Aucun n'est défini par défaut.",
+    "foregroundOnly": "Les raccourcis ne fonctionnent que lorsque la fenêtre de Mumcord est au premier plan.",
+    "portal": "Votre bureau (Wayland) vous demande d'approuver une fois les raccourcis globaux.",
+    "noPortal": "Votre bureau ne propose pas de raccourcis globaux : ils ne fonctionnent donc que lorsque la fenêtre de Mumcord est au premier plan.",
+    "compatLink": "Utiliser le mode de compatibilité (X11)",
+    "compatSuffix": "si ce n'est pas disponible.",
+    "actions": "Actions",
+    "action": {
+      "pushToTalk": "Push-to-talk",
+      "toggleMute": "Couper / réactiver le micro",
+      "toggleDeafen": "Mettre en sourdine / réactiver le son",
+      "toggleDnd": "Activer / désactiver Ne pas déranger",
+      "joinLeaveVoice": "Rejoindre / quitter le vocal",
+      "switchVoiceServer": "Changer de serveur vocal",
+      "switchChannel": "Aller au salon…",
+      "previousChannel": "Retour au salon précédent",
+      "toggleMemberColumn": "Afficher / masquer la colonne des membres",
+      "openQuickSettings": "Ouvrir les réglages rapides",
+      "openMumcord": "Ouvrir Mumcord"
+    },
+    "pushToTalkHint": "Transmet tant que les touches sont maintenues",
+    "pushToTalkOff": "Utilisé quand le mode de parole dans Voix est push-to-talk",
+    "channelPlace": "{{channel}} · {{server}}",
+    "rootChannel": "Salon racine",
+    "notSet": "Non défini",
+    "recording": "Appuyez sur une combinaison de touches…",
+    "recordingHint": "Appuyez sur <esc>Esc</esc> pour annuler, <back>Backspace</back> pour effacer. L'enregistrement s'arrête après 5 secondes.",
+    "clear": "Effacer",
+    "clearLabel": "Effacer {{action}}",
+    "cancel": "Annuler",
+    "conflictTitle": "Conflit.",
+    "conflict": "Cette combinaison est déjà utilisée par « {{other}} ». Choisissez-en une autre, ou attribuez-la ici et effacez l'autre.",
+    "inApp": "Cette combinaison est le raccourci propre à Mumcord pour {{shortcut}}. Choisissez-en une autre.",
+    "inAppShortcut": {
+      "memberColumn": "afficher et masquer la colonne des membres",
+      "notificationCentre": "le centre de notifications",
+      "search": "la recherche",
+      "closeWindow": "fermer une fenêtre"
+    },
+    "assignHere": "Attribuer ici",
+    "rejected": "Cette touche ne peut pas être un raccourci global. Appuyez sur une touche autre que Ctrl, Alt, Shift ou Super, avec ou sans celles-ci.",
+    "failed": "Ce raccourci n'a pas pu être enregistré. Une autre application ou votre bureau l'utilise peut-être déjà.",
+    "add": "Ajouter un raccourci « aller au salon »…",
+    "addChannel": "Salon",
+    "addNone": "Connectez-vous à un serveur pour choisir l'un de ses salons.",
+    "addConfirm": "Ajouter",
+    "reset": "Réinitialiser tous les raccourcis",
+    "resetHint": "Supprime tous les raccourcis sauf le push-to-talk ; aucun n'est défini par défaut."
   }
 }

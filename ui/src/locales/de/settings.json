@@ -17,7 +17,8 @@
     "about": "Über",
     "servers": "Server",
     "privacy": "Datenschutz",
-    "packetInspector": "Paketinspektor"
+    "packetInspector": "Paketinspektor",
+    "hotkeys": "Tastenkürzel"
   },
   "search": {
     "label": "Einstellungen durchsuchen",
@@ -791,5 +792,57 @@
     "collapseHint": "Zeigt „Nachricht eines blockierten Nutzers“ mit einer Schaltfläche „Anzeigen“.",
     "hide": "Komplett ausblenden",
     "hideHint": "Im Chat wird nichts angezeigt."
+  },
+  "hotkeys": {
+    "global": "Globale Tastenkürzel",
+    "background": "Auch im Hintergrund arbeiten",
+    "backgroundHint": "Die Tastenkürzel gelten überall, auch in Spielen. Standardmäßig ist nichts festgelegt.",
+    "foregroundOnly": "Die Tastenkürzel funktionieren nur, solange das Mumcord-Fenster im Vordergrund ist.",
+    "portal": "Dein Desktop (Wayland) bittet dich einmalig, globale Tastenkürzel zu genehmigen.",
+    "noPortal": "Dein Desktop bietet keine globalen Tastenkürzel an, daher funktionieren sie nur, solange das Mumcord-Fenster im Vordergrund ist.",
+    "compatLink": "Kompatibilitätsmodus (X11) verwenden,",
+    "compatSuffix": "falls das nicht verfügbar ist.",
+    "actions": "Aktionen",
+    "action": {
+      "pushToTalk": "Push-to-Talk",
+      "toggleMute": "Mikrofon stummschalten / aktivieren",
+      "toggleDeafen": "Ton aus / an (Taubschalten)",
+      "toggleDnd": "Nicht stören umschalten",
+      "joinLeaveVoice": "Sprachkanal beitreten / verlassen",
+      "switchVoiceServer": "Sprachserver wechseln",
+      "switchChannel": "Zu Kanal wechseln…",
+      "previousChannel": "Zurück zum vorherigen Kanal",
+      "toggleMemberColumn": "Mitgliederspalte ein- / ausblenden",
+      "openQuickSettings": "Schnelleinstellungen öffnen",
+      "openMumcord": "Mumcord öffnen"
+    },
+    "pushToTalkHint": "Sendet, solange die Tasten gehalten werden",
+    "pushToTalkOff": "Wird verwendet, wenn der Sprechmodus unter Stimme auf Push-to-Talk steht",
+    "channelPlace": "{{channel}} · {{server}}",
+    "rootChannel": "Stammkanal",
+    "notSet": "Nicht festgelegt",
+    "recording": "Tastenkombination drücken…",
+    "recordingHint": "Mit <esc>Esc</esc> abbrechen, mit <back>Backspace</back> löschen. Die Aufnahme endet nach 5 Sekunden.",
+    "clear": "Löschen",
+    "clearLabel": "{{action}} löschen",
+    "cancel": "Abbrechen",
+    "conflictTitle": "Konflikt.",
+    "conflict": "Diese Kombination wird bereits für „{{other}}“ verwendet. Wähle eine andere oder weise sie hier zu und lösche die andere.",
+    "inApp": "Diese Kombination ist Mumcords eigenes Tastenkürzel für {{shortcut}}. Wähle eine andere.",
+    "inAppShortcut": {
+      "memberColumn": "das Ein- und Ausblenden der Mitgliederspalte",
+      "notificationCentre": "das Benachrichtigungscenter",
+      "search": "die Suche",
+      "closeWindow": "das Schließen eines Fensters"
+    },
+    "assignHere": "Hier zuweisen",
+    "rejected": "Diese Taste kann kein globales Tastenkürzel sein. Drücke eine andere Taste als Ctrl, Alt, Shift oder Super, mit oder ohne diese.",
+    "failed": "Dieses Tastenkürzel konnte nicht registriert werden. Möglicherweise nutzt es schon eine andere App oder dein Desktop.",
+    "add": "Tastenkürzel „Zu Kanal wechseln“ hinzufügen…",
+    "addChannel": "Kanal",
+    "addNone": "Verbinde dich mit einem Server, um einen seiner Kanäle auszuwählen.",
+    "addConfirm": "Hinzufügen",
+    "reset": "Alle Tastenkürzel zurücksetzen",
+    "resetHint": "Entfernt alle Tastenkürzel außer Push-to-Talk; standardmäßig ist nichts festgelegt."
   }
 }

@@ -17,7 +17,8 @@
     "about": "Dwar",
     "servers": "Servers",
     "privacy": "Privatezza",
-    "packetInspector": "Ispettur tal-pakketti"
+    "packetInspector": "Ispettur tal-pakketti",
+    "hotkeys": "Shortcuts"
   },
   "search": {
     "label": "Fittex fis-settings",
@@ -803,5 +804,57 @@
     "collapseHint": "Juri “Messaġġ minn utent imblokkat” b'buttuna Uri.",
     "hide": "Aħbihom għalkollox",
     "hideHint": "Xejn ma jintwera fiċ-chat."
+  },
+  "hotkeys": {
+    "global": "Shortcuts globali",
+    "background": "Ahdem waqt li Mumcord ikun fl-isfond",
+    "backgroundHint": "Is-shortcuts jaħdmu kullimkien, anki fil-logħob. B'mod awtomatiku ma hemm xejn issettjat.",
+    "foregroundOnly": "Is-shortcuts jaħdmu biss waqt li t-tieqa ta' Mumcord tkun quddiem.",
+    "portal": "Id-desktop tiegħek (Wayland) se jitlob li tapprova s-shortcuts globali darba.",
+    "noPortal": "Id-desktop tiegħek ma joffrix shortcuts globali, għalhekk jaħdmu biss waqt li t-tieqa ta' Mumcord tkun quddiem.",
+    "compatLink": "Uża l-modalità ta' kompatibilità (X11)",
+    "compatSuffix": "jekk dan ma jkunx disponibbli.",
+    "actions": "Azzjonijiet",
+    "action": {
+      "pushToTalk": "Push-to-talk",
+      "toggleMute": "Mutja / ixgħel il-mikrofonu",
+      "toggleDeafen": "Agħlaq / erġa' ixgħel il-ħoss",
+      "toggleDnd": "Biddel Tiddisturbax",
+      "joinLeaveVoice": "Ingħaqad mal-vuċi / ħalli l-vuċi",
+      "switchVoiceServer": "Biddel is-server tal-vuċi",
+      "switchChannel": "Mur fil-kanal…",
+      "previousChannel": "Lura għall-kanal ta' qabel",
+      "toggleMemberColumn": "Uri / aħbi l-kolonna tal-membri",
+      "openQuickSettings": "Iftaħ is-settings rapidi",
+      "openMumcord": "Iftaħ Mumcord"
+    },
+    "pushToTalkHint": "Jibgħat waqt li żżomm il-buttuni",
+    "pushToTalkOff": "Jintuża meta l-modalità tal-kliem f'Vuċi tkun push-to-talk",
+    "channelPlace": "{{channel}} · {{server}}",
+    "rootChannel": "Kanal ewlieni",
+    "notSet": "Mhux issettjat",
+    "recording": "Agħfas kombinazzjoni ta' buttuni…",
+    "recordingHint": "Agħfas <esc>Esc</esc> biex tikkanċella, <back>Backspace</back> biex tneħħi. Ir-reġistrazzjoni tieqaf wara 5 sekondi.",
+    "clear": "Neħħi",
+    "clearLabel": "Neħħi {{action}}",
+    "cancel": "Ikkanċella",
+    "conflictTitle": "Kunflitt.",
+    "conflict": "Din il-kombinazzjoni diġà tintuża minn \"{{other}}\". Agħżel oħra, jew assenjaha hawn u neħħi l-oħra.",
+    "inApp": "Din il-kombinazzjoni hija shortcut ta' Mumcord stess għal {{shortcut}}. Agħżel oħra.",
+    "inAppShortcut": {
+      "memberColumn": "turi u taħbi l-kolonna tal-membri",
+      "notificationCentre": "iċ-ċentru tan-notifiki",
+      "search": "tfittxija",
+      "closeWindow": "magħlaq ta' tieqa"
+    },
+    "assignHere": "Assenja hawn",
+    "rejected": "Dan il-buttuna ma tistax tkun shortcut globali. Agħfas buttuna għajr Ctrl, Alt, Shift jew Super, magħhom jew mingħajrhom.",
+    "failed": "Din ix-shortcut ma setgħetx tiġi rreġistrata. Jista' jkun li app oħra jew id-desktop tiegħek diġà qed jużawha.",
+    "add": "Żid shortcut \"mur fil-kanal\"…",
+    "addChannel": "Kanal",
+    "addNone": "Qabbad ma' server biex tagħżel wieħed mill-kanali tiegħu.",
+    "addConfirm": "Żid",
+    "reset": "Irrisettja s-shortcuts kollha",
+    "resetHint": "Ineħħi s-shortcuts kollha ħlief push-to-talk; b'mod awtomatiku ma hemm xejn issettjat."
   }
 }

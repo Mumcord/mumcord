@@ -17,7 +17,8 @@
     "about": "Informazioni",
     "servers": "Server",
     "privacy": "Privacy",
-    "packetInspector": "Ispettore pacchetti"
+    "packetInspector": "Ispettore pacchetti",
+    "hotkeys": "Scorciatoie"
   },
   "search": {
     "label": "Cerca nelle impostazioni",
@@ -795,5 +796,57 @@
     "collapseHint": "Mostra «Messaggio di un utente bloccato» con un pulsante «Mostra».",
     "hide": "Nascondili completamente",
     "hideHint": "Nella chat non viene mostrato nulla."
+  },
+  "hotkeys": {
+    "global": "Scorciatoie globali",
+    "background": "Funziona con Mumcord in background",
+    "backgroundHint": "Le scorciatoie funzionano ovunque, anche nei giochi. Per impostazione predefinita non ne è impostata nessuna.",
+    "foregroundOnly": "Le scorciatoie funzionano solo quando la finestra di Mumcord è in primo piano.",
+    "portal": "Il tuo desktop (Wayland) ti chiederà una volta di approvare le scorciatoie globali.",
+    "noPortal": "Il tuo desktop non offre scorciatoie globali, quindi funzionano solo quando la finestra di Mumcord è in primo piano.",
+    "compatLink": "Usa la modalità compatibilità (X11)",
+    "compatSuffix": "se non è disponibile.",
+    "actions": "Azioni",
+    "action": {
+      "pushToTalk": "Push-to-talk",
+      "toggleMute": "Silenzia / riattiva il microfono",
+      "toggleDeafen": "Disattiva / riattiva l'audio",
+      "toggleDnd": "Attiva / disattiva Non disturbare",
+      "joinLeaveVoice": "Entra / esci dalla voce",
+      "switchVoiceServer": "Cambia server vocale",
+      "switchChannel": "Passa al canale…",
+      "previousChannel": "Torna al canale precedente",
+      "toggleMemberColumn": "Mostra / nascondi la colonna dei membri",
+      "openQuickSettings": "Apri le impostazioni rapide",
+      "openMumcord": "Apri Mumcord"
+    },
+    "pushToTalkHint": "Trasmette mentre tieni premuti i tasti",
+    "pushToTalkOff": "Usato quando la modalità di conversazione in Voce è push-to-talk",
+    "channelPlace": "{{channel}} · {{server}}",
+    "rootChannel": "Canale radice",
+    "notSet": "Non impostato",
+    "recording": "Premi una combinazione di tasti…",
+    "recordingHint": "Premi <esc>Esc</esc> per annullare, <back>Backspace</back> per cancellare. La registrazione si interrompe dopo 5 secondi.",
+    "clear": "Cancella",
+    "clearLabel": "Cancella {{action}}",
+    "cancel": "Annulla",
+    "conflictTitle": "Conflitto.",
+    "conflict": "Questa combinazione è già usata da «{{other}}». Scegline un'altra, oppure assegnala qui e cancella l'altra.",
+    "inApp": "Questa combinazione è la scorciatoia di Mumcord per {{shortcut}}. Scegline un'altra.",
+    "inAppShortcut": {
+      "memberColumn": "mostrare e nascondere la colonna dei membri",
+      "notificationCentre": "il centro notifiche",
+      "search": "la ricerca",
+      "closeWindow": "la chiusura di una finestra"
+    },
+    "assignHere": "Assegna qui",
+    "rejected": "Questo tasto non può essere una scorciatoia globale. Premi un tasto diverso da Ctrl, Alt, Shift o Super, con o senza di essi.",
+    "failed": "Impossibile registrare questa scorciatoia. Forse un'altra app o il tuo desktop la usa già.",
+    "add": "Aggiungi scorciatoia «passa al canale»…",
+    "addChannel": "Canale",
+    "addNone": "Connettiti a un server per scegliere uno dei suoi canali.",
+    "addConfirm": "Aggiungi",
+    "reset": "Ripristina tutte le scorciatoie",
+    "resetHint": "Rimuove tutte le scorciatoie tranne il push-to-talk; per impostazione predefinita non ne è impostata nessuna."
   }
 }

@@ -17,7 +17,8 @@
     "about": "About",
     "servers": "Servers",
     "privacy": "Privacy",
-    "packetInspector": "Packet inspector"
+    "packetInspector": "Packet inspector",
+    "hotkeys": "Hotkeys"
   },
   "search": {
     "label": "Search settings",
@@ -791,5 +792,57 @@
     "collapseHint": "Shows “Message from a blocked user” with a Show button.",
     "hide": "Hide them completely",
     "hideHint": "Nothing is shown in the chat."
+  },
+  "hotkeys": {
+    "global": "Global shortcuts",
+    "background": "Work while Mumcord is in the background",
+    "backgroundHint": "Shortcuts are active everywhere, also in games. Nothing is set by default.",
+    "foregroundOnly": "Shortcuts only work while the Mumcord window is in front.",
+    "portal": "Your desktop (Wayland) asks you to approve global shortcuts once.",
+    "noPortal": "Your desktop does not offer global shortcuts, so they only work while the Mumcord window is in front.",
+    "compatLink": "Use compatibility mode (X11)",
+    "compatSuffix": "if that is not available.",
+    "actions": "Actions",
+    "action": {
+      "pushToTalk": "Push-to-talk",
+      "toggleMute": "Mute / unmute microphone",
+      "toggleDeafen": "Deafen / undeafen",
+      "toggleDnd": "Toggle Do Not Disturb",
+      "joinLeaveVoice": "Join / leave voice",
+      "switchVoiceServer": "Switch voice server",
+      "switchChannel": "Switch to channel…",
+      "previousChannel": "Back to previous channel",
+      "toggleMemberColumn": "Show / hide member column",
+      "openQuickSettings": "Open quick settings",
+      "openMumcord": "Open Mumcord"
+    },
+    "pushToTalkHint": "Send while the keys are held",
+    "pushToTalkOff": "Used when the talk mode in Voice is push-to-talk",
+    "channelPlace": "{{channel}} · {{server}}",
+    "rootChannel": "Root channel",
+    "notSet": "Not set",
+    "recording": "Press a key combination…",
+    "recordingHint": "Press <esc>Esc</esc> to cancel, <back>Backspace</back> to clear. Recording stops after 5 seconds.",
+    "clear": "Clear",
+    "clearLabel": "Clear {{action}}",
+    "cancel": "Cancel",
+    "conflictTitle": "Conflict.",
+    "conflict": "This combination is already used by \"{{other}}\". Choose another one, or assign it here and clear the other.",
+    "inApp": "This combination is Mumcord's own shortcut for {{shortcut}}. Choose another one.",
+    "inAppShortcut": {
+      "memberColumn": "showing and hiding the member column",
+      "notificationCentre": "the notification centre",
+      "search": "search",
+      "closeWindow": "closing a window"
+    },
+    "assignHere": "Assign here",
+    "rejected": "This key cannot be a global shortcut. Press a key other than Ctrl, Alt, Shift or Super, with or without them.",
+    "failed": "This shortcut could not be registered. Another app or your desktop may already use it.",
+    "add": "Add \"switch to channel\" shortcut…",
+    "addChannel": "Channel",
+    "addNone": "Connect to a server to choose one of its channels.",
+    "addConfirm": "Add",
+    "reset": "Reset all hotkeys",
+    "resetHint": "Removes every hotkey except push-to-talk; nothing is set by default."
   }
 }

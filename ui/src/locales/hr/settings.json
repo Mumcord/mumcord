@@ -17,7 +17,8 @@
     "about": "O aplikaciji",
     "servers": "Poslužitelji",
     "privacy": "Privatnost",
-    "packetInspector": "Inspektor paketa"
+    "packetInspector": "Inspektor paketa",
+    "hotkeys": "Prečaci"
   },
   "search": {
     "label": "Pretraži postavke",
@@ -795,5 +796,57 @@
     "collapseHint": "Prikazuje „Poruka blokiranog korisnika“ s gumbom Prikaži.",
     "hide": "Potpuno ih sakrij",
     "hideHint": "U chatu se ništa ne prikazuje."
+  },
+  "hotkeys": {
+    "global": "Globalni prečaci",
+    "background": "Radi dok je Mumcord u pozadini",
+    "backgroundHint": "Prečaci rade posvuda, i u igrama. Prema zadanim postavkama ništa nije postavljeno.",
+    "foregroundOnly": "Prečaci rade samo dok je prozor Mumcorda u prvom planu.",
+    "portal": "Tvoje radno okruženje (Wayland) tražit će da jednom odobriš globalne prečace.",
+    "noPortal": "Tvoje radno okruženje ne nudi globalne prečace, pa rade samo dok je prozor Mumcorda u prvom planu.",
+    "compatLink": "Koristi način kompatibilnosti (X11)",
+    "compatSuffix": "ako to nije dostupno.",
+    "actions": "Radnje",
+    "action": {
+      "pushToTalk": "Pritisni za govor",
+      "toggleMute": "Isključi / uključi mikrofon",
+      "toggleDeafen": "Utišaj / ukloni utišavanje zvuka",
+      "toggleDnd": "Uključi / isključi Ne ometaj",
+      "joinLeaveVoice": "Uđi u glas / napusti glas",
+      "switchVoiceServer": "Promijeni glasovni poslužitelj",
+      "switchChannel": "Prebaci na kanal…",
+      "previousChannel": "Natrag na prethodni kanal",
+      "toggleMemberColumn": "Prikaži / sakrij stupac članova",
+      "openQuickSettings": "Otvori brze postavke",
+      "openMumcord": "Otvori Mumcord"
+    },
+    "pushToTalkHint": "Šalje dok držiš tipke",
+    "pushToTalkOff": "Koristi se kad je način govora u Glasu postavljen na pritisni za govor",
+    "channelPlace": "{{channel}} · {{server}}",
+    "rootChannel": "Korijenski kanal",
+    "notSet": "Nije postavljeno",
+    "recording": "Pritisni kombinaciju tipki…",
+    "recordingHint": "Pritisni <esc>Esc</esc> za odustajanje, <back>Backspace</back> za brisanje. Snimanje staje nakon 5 sekundi.",
+    "clear": "Očisti",
+    "clearLabel": "Očisti {{action}}",
+    "cancel": "Odustani",
+    "conflictTitle": "Sukob.",
+    "conflict": "Ovu kombinaciju već koristi „{{other}}“. Odaberi drugu ili je dodijeli ovdje i očisti drugu.",
+    "inApp": "Ova kombinacija je Mumcordov vlastiti prečac za {{shortcut}}. Odaberi drugu.",
+    "inAppShortcut": {
+      "memberColumn": "prikaz i skrivanje stupca članova",
+      "notificationCentre": "centar obavijesti",
+      "search": "pretraživanje",
+      "closeWindow": "zatvaranje prozora"
+    },
+    "assignHere": "Dodijeli ovdje",
+    "rejected": "Ova tipka ne može biti globalni prečac. Pritisni tipku koja nije Ctrl, Alt, Shift ili Super, sa ili bez njih.",
+    "failed": "Ovaj prečac nije bilo moguće registrirati. Možda ga već koristi druga aplikacija ili tvoje radno okruženje.",
+    "add": "Dodaj prečac „prebaci na kanal“…",
+    "addChannel": "Kanal",
+    "addNone": "Spoji se na poslužitelj da odabereš jedan od njegovih kanala.",
+    "addConfirm": "Dodaj",
+    "reset": "Vrati sve prečace na zadano",
+    "resetHint": "Uklanja sve prečace osim pritisni za govor; prema zadanim postavkama ništa nije postavljeno."
   }
 }

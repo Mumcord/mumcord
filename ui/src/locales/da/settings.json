@@ -17,7 +17,8 @@
     "about": "Om",
     "servers": "Servere",
     "privacy": "Privatliv",
-    "packetInspector": "Pakkeinspektør"
+    "packetInspector": "Pakkeinspektør",
+    "hotkeys": "Genveje"
   },
   "search": {
     "label": "Søg i indstillinger",
@@ -791,5 +792,57 @@
     "collapseHint": "Viser »Besked fra en blokeret bruger« med en knap, der hedder Vis.",
     "hide": "Skjul dem helt",
     "hideHint": "Intet vises i chatten."
+  },
+  "hotkeys": {
+    "global": "Globale genveje",
+    "background": "Virk, mens Mumcord er i baggrunden",
+    "backgroundHint": "Genvejene virker overalt, også i spil. Som standard er intet indstillet.",
+    "foregroundOnly": "Genvejene virker kun, mens Mumcord-vinduet er forrest.",
+    "portal": "Dit skrivebord (Wayland) beder dig godkende globale genveje én gang.",
+    "noPortal": "Dit skrivebord tilbyder ikke globale genveje, så de virker kun, mens Mumcord-vinduet er forrest.",
+    "compatLink": "Brug kompatibilitetstilstand (X11),",
+    "compatSuffix": "hvis det ikke er tilgængeligt.",
+    "actions": "Handlinger",
+    "action": {
+      "pushToTalk": "Push-to-talk",
+      "toggleMute": "Slå mikrofon fra / til",
+      "toggleDeafen": "Slå lyd fra / til",
+      "toggleDnd": "Skift Forstyr ikke",
+      "joinLeaveVoice": "Deltag i / forlad tale",
+      "switchVoiceServer": "Skift stemmeserver",
+      "switchChannel": "Skift til kanal…",
+      "previousChannel": "Tilbage til forrige kanal",
+      "toggleMemberColumn": "Vis / skjul medlemskolonne",
+      "openQuickSettings": "Åbn hurtige indstillinger",
+      "openMumcord": "Åbn Mumcord"
+    },
+    "pushToTalkHint": "Sender, mens tasterne holdes nede",
+    "pushToTalkOff": "Bruges, når taletilstanden under Stemme er push-to-talk",
+    "channelPlace": "{{channel}} · {{server}}",
+    "rootChannel": "Rodkanal",
+    "notSet": "Ikke indstillet",
+    "recording": "Tryk en tastekombination…",
+    "recordingHint": "Tryk <esc>Esc</esc> for at annullere, <back>Backspace</back> for at rydde. Optagelsen stopper efter 5 sekunder.",
+    "clear": "Ryd",
+    "clearLabel": "Ryd {{action}}",
+    "cancel": "Annuller",
+    "conflictTitle": "Konflikt.",
+    "conflict": "Denne kombination bruges allerede af „{{other}}“. Vælg en anden, eller tildel den her og ryd den anden.",
+    "inApp": "Denne kombination er Mumcords egen genvej til {{shortcut}}. Vælg en anden.",
+    "inAppShortcut": {
+      "memberColumn": "at vise og skjule medlemskolonnen",
+      "notificationCentre": "notifikationscenteret",
+      "search": "søgning",
+      "closeWindow": "at lukke et vindue"
+    },
+    "assignHere": "Tildel her",
+    "rejected": "Denne tast kan ikke være en global genvej. Tryk på en anden tast end Ctrl, Alt, Shift eller Super, med eller uden dem.",
+    "failed": "Genvejen kunne ikke registreres. En anden app eller dit skrivebord bruger den måske allerede.",
+    "add": "Tilføj genvej til „skift til kanal“…",
+    "addChannel": "Kanal",
+    "addNone": "Opret forbindelse til en server for at vælge en af dens kanaler.",
+    "addConfirm": "Tilføj",
+    "reset": "Nulstil alle genveje",
+    "resetHint": "Fjerner alle genveje undtagen push-to-talk; som standard er intet indstillet."
   }
 }

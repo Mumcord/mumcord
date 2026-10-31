@@ -534,6 +534,12 @@ export function getServerState(): ServerState {
   return state;
 }
 
+/** Non-React read of every connected server's state by id, in the order they connected. */
+export function getAllServerStates(): ReadonlyMap<number, ServerState> {
+  flushServerUpdates();
+  return getServers();
+}
+
 /** Non-React read of one server's state; empty while it is not connected. */
 export function getServerStateOf(serverId: number): ServerState {
   ensureBound();

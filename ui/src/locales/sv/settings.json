@@ -17,7 +17,8 @@
     "about": "Om",
     "servers": "Servrar",
     "privacy": "Integritet",
-    "packetInspector": "Paketinspektör"
+    "packetInspector": "Paketinspektör",
+    "hotkeys": "Kortkommandon"
   },
   "search": {
     "label": "Sök i inställningar",
@@ -791,5 +792,57 @@
     "collapseHint": "Visar ”Meddelande från en blockerad användare” med en knapp som heter Visa.",
     "hide": "Dölj dem helt",
     "hideHint": "Inget visas i chatten."
+  },
+  "hotkeys": {
+    "global": "Globala kortkommandon",
+    "background": "Fungera när Mumcord ligger i bakgrunden",
+    "backgroundHint": "Kortkommandona fungerar överallt, även i spel. Som standard är inget inställt.",
+    "foregroundOnly": "Kortkommandona fungerar bara när Mumcord-fönstret är i förgrunden.",
+    "portal": "Ditt skrivbord (Wayland) ber dig godkänna globala kortkommandon en gång.",
+    "noPortal": "Ditt skrivbord erbjuder inte globala kortkommandon, så de fungerar bara när Mumcord-fönstret är i förgrunden.",
+    "compatLink": "Använd kompatibilitetsläge (X11)",
+    "compatSuffix": "om det inte är tillgängligt.",
+    "actions": "Åtgärder",
+    "action": {
+      "pushToTalk": "Push-to-talk",
+      "toggleMute": "Stäng av / slå på mikrofonen",
+      "toggleDeafen": "Stäng av / slå på ljudet",
+      "toggleDnd": "Växla Stör ej",
+      "joinLeaveVoice": "Gå med i / lämna röst",
+      "switchVoiceServer": "Byt röstserver",
+      "switchChannel": "Byt till kanal…",
+      "previousChannel": "Tillbaka till föregående kanal",
+      "toggleMemberColumn": "Visa / dölj medlemskolumnen",
+      "openQuickSettings": "Öppna snabbinställningar",
+      "openMumcord": "Öppna Mumcord"
+    },
+    "pushToTalkHint": "Skickar medan tangenterna hålls nere",
+    "pushToTalkOff": "Används när talläget under Röst är push-to-talk",
+    "channelPlace": "{{channel}} · {{server}}",
+    "rootChannel": "Rotkanal",
+    "notSet": "Inte inställt",
+    "recording": "Tryck en tangentkombination…",
+    "recordingHint": "Tryck <esc>Esc</esc> för att avbryta, <back>Backspace</back> för att rensa. Inspelningen avslutas efter 5 sekunder.",
+    "clear": "Rensa",
+    "clearLabel": "Rensa {{action}}",
+    "cancel": "Avbryt",
+    "conflictTitle": "Konflikt.",
+    "conflict": "Den här kombinationen används redan av ”{{other}}”. Välj en annan, eller tilldela den här och rensa den andra.",
+    "inApp": "Den här kombinationen är Mumcords eget kortkommando för {{shortcut}}. Välj en annan.",
+    "inAppShortcut": {
+      "memberColumn": "att visa och dölja medlemskolumnen",
+      "notificationCentre": "aviseringscentret",
+      "search": "sökning",
+      "closeWindow": "att stänga ett fönster"
+    },
+    "assignHere": "Tilldela här",
+    "rejected": "Den här tangenten kan inte vara ett globalt kortkommando. Tryck på en annan tangent än Ctrl, Alt, Shift eller Super, med eller utan dem.",
+    "failed": "Kortkommandot kunde inte registreras. Det kan redan användas av en annan app eller ditt skrivbord.",
+    "add": "Lägg till kortkommando för ”byt till kanal”…",
+    "addChannel": "Kanal",
+    "addNone": "Anslut till en server för att välja en av dess kanaler.",
+    "addConfirm": "Lägg till",
+    "reset": "Återställ alla kortkommandon",
+    "resetHint": "Tar bort alla kortkommandon utom push-to-talk; som standard är inget inställt."
   }
 }
