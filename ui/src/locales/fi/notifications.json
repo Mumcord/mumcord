@@ -11,5 +11,55 @@
   "open": "Avaa chat",
   "close": "Hylkää ilmoitus",
   "mentionLine": "{{sender}} mainitsi sinut: {{preview}}",
-  "withServer": "{{server}} · {{what}}"
+  "withServer": "{{server}} · {{what}}",
+  "centre": {
+    "title": "Ilmoitukset",
+    "bellUnread_one": "Ilmoitukset, {{count}} lukematon",
+    "bellUnread_other": "Ilmoitukset, {{count}} lukematonta",
+    "shortcut": "Ctrl+Vaihto+N",
+    "markAllRead": "Merkitse kaikki luetuiksi",
+    "filterLabel": "Näytä ilmoitukset",
+    "filter": {
+      "all": "Kaikki",
+      "mentions": "Maininnat",
+      "requests": "Pyynnöt",
+      "invites": "Kutsut"
+    },
+    "empty": "Kaikki on luettu.",
+    "unread": "Lukemattomat",
+    "dndOn": "Älä häiritse on päällä",
+    "dndOff": "Älä häiritse on pois päältä",
+    "settings": "Ilmoitusasetukset",
+    "someone": "Joku",
+    "quoted": "”{{text}}”",
+    "mention": "{{name}} mainitsi sinut",
+    "mentionGroup": "{{name}} mainitsi kaikki",
+    "reply": "{{name}} vastasi viestiisi",
+    "chatRequest": "{{name}} haluaa keskustella kanssasi",
+    "messageRequest": "Viestipyyntö käyttäjältä {{name}}",
+    "messageRequestBody_one": "{{count}} viesti tavallisesta Mumble-asiakkaasta",
+    "messageRequestBody_other": "{{count}} viestiä tavallisesta Mumble-asiakkaasta",
+    "invite": {
+      "watchParty": "{{name}} kutsui sinut yhteiskatseluun",
+      "screenShare": "{{name}} jakaa näyttöään",
+      "card": "{{name}} lähetti sinulle kortin",
+      "theme": "{{name}} jakoi kanssasi teeman"
+    },
+    "connection": "{{server}} ei ole tavoitettavissa",
+    "type": {
+      "chatRequest": "Keskustelupyyntö",
+      "messageRequest": "Viestipyyntö",
+      "invite": "Kutsu",
+      "private": "Yksityisviesti",
+      "connection": "Yhteys"
+    },
+    "accept": "Hyväksy",
+    "decline": "Hylkää",
+    "join": "Liity",
+    "watch": "Katso",
+    "open": "Avaa",
+    "dismiss": "Ohita",
+    "dismissItem": "Ohita: {{title}}",
+    "failed": "Se ei onnistunut. Yritä uudelleen."
+  }
 }

@@ -13,5 +13,57 @@
   "open": "Ouvrir la discussion",
   "close": "Ignorer la notification",
   "mentionLine": "{{sender}} vous a mentionné : {{preview}}",
-  "withServer": "{{server}} · {{what}}"
+  "withServer": "{{server}} · {{what}}",
+  "centre": {
+    "title": "Notifications",
+    "bellUnread_one": "Notifications, {{count}} non lue",
+    "bellUnread_many": "Notifications, {{count}} non lues",
+    "bellUnread_other": "Notifications, {{count}} non lues",
+    "shortcut": "Ctrl+Maj+N",
+    "markAllRead": "Tout marquer comme lu",
+    "filterLabel": "Afficher les notifications",
+    "filter": {
+      "all": "Tout",
+      "mentions": "Mentions",
+      "requests": "Demandes",
+      "invites": "Invitations"
+    },
+    "empty": "Vous êtes à jour.",
+    "unread": "Non lues",
+    "dndOn": "Ne pas déranger est activé",
+    "dndOff": "Ne pas déranger est désactivé",
+    "settings": "Paramètres des notifications",
+    "someone": "Quelqu’un",
+    "quoted": "« {{text}} »",
+    "mention": "{{name}} vous a mentionné",
+    "mentionGroup": "{{name}} a mentionné tout le monde",
+    "reply": "{{name}} a répondu à votre message",
+    "chatRequest": "{{name}} souhaite discuter avec vous",
+    "messageRequest": "Demande de message de {{name}}",
+    "messageRequestBody_one": "{{count}} message d’un client Mumble standard",
+    "messageRequestBody_many": "{{count}} de messages d’un client Mumble standard",
+    "messageRequestBody_other": "{{count}} messages d’un client Mumble standard",
+    "invite": {
+      "watchParty": "{{name}} vous a invité à une watch party",
+      "screenShare": "{{name}} partage son écran",
+      "card": "{{name}} vous a envoyé une carte",
+      "theme": "{{name}} a partagé un thème avec vous"
+    },
+    "connection": "{{server}} est injoignable",
+    "type": {
+      "chatRequest": "Demande de chat",
+      "messageRequest": "Demande de message",
+      "invite": "Invitation",
+      "private": "Message privé",
+      "connection": "Connexion"
+    },
+    "accept": "Accepter",
+    "decline": "Refuser",
+    "join": "Rejoindre",
+    "watch": "Regarder",
+    "open": "Ouvrir",
+    "dismiss": "Ignorer",
+    "dismissItem": "Ignorer : {{title}}",
+    "failed": "Cela n’a pas fonctionné. Veuillez réessayer."
+  }
 }

@@ -9,6 +9,7 @@ import { useView } from "./view";
 import { useMembersColumn } from "./membersCollapse";
 import { SettingsScreen } from "../features/settings/SettingsScreen";
 import { Wizard } from "../features/wizard";
+import { NotificationBell } from "../features/notifications";
 import { SharingBar } from "../features/screenshare";
 import { UserPanel } from "../features/userpanel";
 import { ChannelsPanel } from "../features/channels";
@@ -142,6 +143,7 @@ export function ChatMount() {
         <>
           <FollowHeaderActions conversation={conv} />
           <MembersToggleMount />
+          <NotificationBell />
         </>
       )}
     />

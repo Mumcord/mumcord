@@ -1,5 +1,5 @@
 /** Settings sections another feature may open directly. */
-export type SettingsJumpSection = "identity";
+export type SettingsJumpSection = "identity" | "sounds";
 
 let opener: ((section: SettingsJumpSection) => void) | null = null;
 
@@ -11,7 +11,10 @@ export function setSettingsOpener(fn: ((section: SettingsJumpSection) => void) |
   opener = fn;
 }
 
-/** Opens Settings on `section`, e.g. "Manage identities…" in the server identity dialog. */
+/**
+ * Opens Settings on `section`, e.g. "Manage identities…" in the server identity dialog or
+ * "Notification settings" in the notification centre.
+ */
 export function openSettingsSection(section: SettingsJumpSection): void {
   if (opener === null) {
     console.warn("Settings could not be opened: the app shell is not mounted");

@@ -12,6 +12,7 @@ import {
   sameConversation,
 } from "../channels";
 import { conversationKey, isMention } from "../chat";
+import { recordIncoming } from "./centreSources";
 import { bumpCount, markMention, markSeen, noticeKey, showToast } from "./notificationStore";
 import { hasImage, plainPreview } from "./preview";
 
@@ -80,10 +81,14 @@ export async function handleIncoming(
   serverId: number,
   context: IncomingContext,
 ): Promise<void> {
-  if (message.own || context.muted(serverId, message.conversation)) return;
+  if (message.own) return;
   const { conversation } = message;
-  const key = noticeKey(serverId, conversationKey(conversation));
   const onScreen = isOnScreen(serverId, conversation, context.overlayOpen);
+  if (context.muted(serverId, conversation)) return;
+  // Before the engine decides about sound and toast: the centre also collects during Do Not
+  // Disturb (Q1.5).
+  recordIncoming(message, serverId, onScreen);
+  const key = noticeKey(serverId, conversationKey(conversation));
   const count = bumpCount(key);
   // A mention notifies like a private message: the setting decides how, the chat does not matter.
   // The ping (engine, in `notifyMessage`) follows the mention itself; only the highlighting of

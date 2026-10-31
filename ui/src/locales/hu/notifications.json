@@ -11,5 +11,55 @@
   "open": "Chat megnyitása",
   "close": "Értesítés elvetése",
   "mentionLine": "{{sender}} megemlített: {{preview}}",
-  "withServer": "{{server}} · {{what}}"
+  "withServer": "{{server}} · {{what}}",
+  "centre": {
+    "title": "Értesítések",
+    "bellUnread_one": "Értesítések, {{count}} olvasatlan",
+    "bellUnread_other": "Értesítések, {{count}} olvasatlan",
+    "shortcut": "Ctrl+Shift+N",
+    "markAllRead": "Összes megjelölése olvasottként",
+    "filterLabel": "Értesítések megjelenítése",
+    "filter": {
+      "all": "Mind",
+      "mentions": "Említések",
+      "requests": "Kérések",
+      "invites": "Meghívások"
+    },
+    "empty": "Mindent elolvastál.",
+    "unread": "Olvasatlan",
+    "dndOn": "A Ne zavarjanak be van kapcsolva",
+    "dndOff": "A Ne zavarjanak ki van kapcsolva",
+    "settings": "Értesítési beállítások",
+    "someone": "Valaki",
+    "quoted": "„{{text}}”",
+    "mention": "{{name}} megemlített",
+    "mentionGroup": "{{name}} mindenkit megemlített",
+    "reply": "{{name}} válaszolt az üzenetedre",
+    "chatRequest": "{{name}} csevegni szeretne veled",
+    "messageRequest": "Üzenetkérés tőle: {{name}}",
+    "messageRequestBody_one": "{{count}} üzenet egy szabványos Mumble-klienstől",
+    "messageRequestBody_other": "{{count}} üzenet egy szabványos Mumble-klienstől",
+    "invite": {
+      "watchParty": "{{name}} meghívott egy közös nézésre",
+      "screenShare": "{{name}} megosztja a képernyőjét",
+      "card": "{{name}} kártyát küldött neked",
+      "theme": "{{name}} megosztott veled egy témát"
+    },
+    "connection": "{{server}} nem érhető el",
+    "type": {
+      "chatRequest": "Csevegési kérés",
+      "messageRequest": "Üzenetkérés",
+      "invite": "Meghívás",
+      "private": "Privát üzenet",
+      "connection": "Kapcsolat"
+    },
+    "accept": "Elfogadás",
+    "decline": "Elutasítás",
+    "join": "Csatlakozás",
+    "watch": "Megnézés",
+    "open": "Megnyitás",
+    "dismiss": "Elvetés",
+    "dismissItem": "Elvetés: {{title}}",
+    "failed": "Ez nem sikerült. Próbáld újra."
+  }
 }

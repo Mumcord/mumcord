@@ -13,5 +13,57 @@
   "open": "Atvērt čatu",
   "close": "Aizvērt paziņojumu",
   "mentionLine": "{{sender}} tevi pieminēja: {{preview}}",
-  "withServer": "{{server}} · {{what}}"
+  "withServer": "{{server}} · {{what}}",
+  "centre": {
+    "title": "Paziņojumi",
+    "bellUnread_zero": "Paziņojumi, {{count}} nelasītu",
+    "bellUnread_one": "Paziņojumi, {{count}} nelasīts",
+    "bellUnread_other": "Paziņojumi, {{count}} nelasīti",
+    "shortcut": "Ctrl+Shift+N",
+    "markAllRead": "Atzīmēt visus kā lasītus",
+    "filterLabel": "Rādīt paziņojumus",
+    "filter": {
+      "all": "Visi",
+      "mentions": "Pieminējumi",
+      "requests": "Pieprasījumi",
+      "invites": "Ielūgumi"
+    },
+    "empty": "Viss ir izlasīts.",
+    "unread": "Nelasīti",
+    "dndOn": "Režīms Netraucēt ir ieslēgts",
+    "dndOff": "Režīms Netraucēt ir izslēgts",
+    "settings": "Paziņojumu iestatījumi",
+    "someone": "Kāds",
+    "quoted": "„{{text}}“",
+    "mention": "{{name}} tevi pieminēja",
+    "mentionGroup": "{{name}} pieminēja visus",
+    "reply": "{{name}} atbildēja uz tavu ziņu",
+    "chatRequest": "{{name}} vēlas tērzēt ar tevi",
+    "messageRequest": "Ziņas pieprasījums no {{name}}",
+    "messageRequestBody_zero": "{{count}} ziņu no standarta Mumble klienta",
+    "messageRequestBody_one": "{{count}} ziņa no standarta Mumble klienta",
+    "messageRequestBody_other": "{{count}} ziņas no standarta Mumble klienta",
+    "invite": {
+      "watchParty": "{{name}} uzaicināja tevi uz kopīgu skatīšanos",
+      "screenShare": "{{name}} kopīgo savu ekrānu",
+      "card": "{{name}} nosūtīja tev kartīti",
+      "theme": "{{name}} kopīgoja ar tevi motīvu"
+    },
+    "connection": "{{server}} nav sasniedzams",
+    "type": {
+      "chatRequest": "Tērzēšanas pieprasījums",
+      "messageRequest": "Ziņas pieprasījums",
+      "invite": "Ielūgums",
+      "private": "Privāta ziņa",
+      "connection": "Savienojums"
+    },
+    "accept": "Pieņemt",
+    "decline": "Noraidīt",
+    "join": "Pievienoties",
+    "watch": "Skatīties",
+    "open": "Atvērt",
+    "dismiss": "Aizvērt",
+    "dismissItem": "Aizvērt: {{title}}",
+    "failed": "Neizdevās. Mēģini vēlreiz."
+  }
 }

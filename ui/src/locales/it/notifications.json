@@ -13,5 +13,57 @@
   "open": "Apri chat",
   "close": "Ignora notifica",
   "mentionLine": "{{sender}} ti ha menzionato: {{preview}}",
-  "withServer": "{{server}} · {{what}}"
+  "withServer": "{{server}} · {{what}}",
+  "centre": {
+    "title": "Notifiche",
+    "bellUnread_one": "Notifiche, {{count}} non letta",
+    "bellUnread_many": "Notifiche, {{count}} non lette",
+    "bellUnread_other": "Notifiche, {{count}} non lette",
+    "shortcut": "Ctrl+Maiusc+N",
+    "markAllRead": "Segna tutte come lette",
+    "filterLabel": "Mostra notifiche",
+    "filter": {
+      "all": "Tutte",
+      "mentions": "Menzioni",
+      "requests": "Richieste",
+      "invites": "Inviti"
+    },
+    "empty": "Sei in pari.",
+    "unread": "Non lette",
+    "dndOn": "Non disturbare è attivo",
+    "dndOff": "Non disturbare è disattivato",
+    "settings": "Impostazioni notifiche",
+    "someone": "Qualcuno",
+    "quoted": "«{{text}}»",
+    "mention": "{{name}} ti ha menzionato",
+    "mentionGroup": "{{name}} ha menzionato tutti",
+    "reply": "{{name}} ha risposto al tuo messaggio",
+    "chatRequest": "{{name}} vuole chattare con te",
+    "messageRequest": "Richiesta di messaggio da {{name}}",
+    "messageRequestBody_one": "{{count}} messaggio da un client Mumble standard",
+    "messageRequestBody_many": "{{count}} di messaggi da un client Mumble standard",
+    "messageRequestBody_other": "{{count}} messaggi da un client Mumble standard",
+    "invite": {
+      "watchParty": "{{name}} ti ha invitato a un watch party",
+      "screenShare": "{{name}} sta condividendo lo schermo",
+      "card": "{{name}} ti ha inviato una card",
+      "theme": "{{name}} ha condiviso un tema con te"
+    },
+    "connection": "{{server}} non raggiungibile",
+    "type": {
+      "chatRequest": "Richiesta di chat",
+      "messageRequest": "Richiesta di messaggio",
+      "invite": "Invito",
+      "private": "Messaggio privato",
+      "connection": "Connessione"
+    },
+    "accept": "Accetta",
+    "decline": "Rifiuta",
+    "join": "Partecipa",
+    "watch": "Guarda",
+    "open": "Apri",
+    "dismiss": "Ignora",
+    "dismissItem": "Ignora: {{title}}",
+    "failed": "Non ha funzionato. Riprova."
+  }
 }

@@ -1,0 +1,313 @@
+/* Notification centre (#143): the bell in the chat header and its panel. Theme tokens only. */
+.centre-bell {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  padding: 0;
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-full);
+  background: transparent;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  transition:
+    background-color var(--duration-fast) var(--ease-out),
+    border-color var(--duration-fast) var(--ease-out);
+}
+
+.centre-bell:hover {
+  border-color: var(--color-text-secondary);
+  background: var(--color-bg-hover);
+}
+
+.centre-bell[aria-expanded="true"] {
+  border-color: var(--color-accent);
+  background: color-mix(in srgb, var(--color-accent) 22%, transparent);
+  color: var(--color-text);
+}
+
+.centre-bell__badge {
+  position: absolute;
+  top: -0.375rem;
+  right: -0.375rem;
+  min-width: 1.25rem;
+  padding: 0 var(--space-1);
+  border-radius: var(--radius-full);
+  background: var(--color-danger);
+  color: var(--color-on-accent);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-bold);
+  line-height: 1.25rem;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+
+.centre {
+  position: fixed;
+  z-index: 40;
+  top: 3.5rem;
+  right: var(--space-4);
+  display: flex;
+  flex-direction: column;
+  width: min(30rem, calc(100vw - 2 * var(--space-4)));
+  max-height: min(42rem, calc(100vh - 5rem));
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background: var(--color-bg-elevated);
+  box-shadow: var(--shadow-raised);
+  color: var(--color-text);
+  overflow: hidden;
+}
+
+.centre:focus-visible {
+  outline: var(--focus-ring-width) solid var(--color-accent);
+}
+
+.centre__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding: var(--space-4) var(--space-4) var(--space-2);
+}
+
+.centre__title {
+  margin: 0;
+  font-family: var(--font-family-display);
+  font-size: var(--font-size-lg);
+  letter-spacing: var(--letter-spacing-display);
+}
+
+.centre__mark-all,
+.centre__settings {
+  padding: var(--space-1);
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  font-family: inherit;
+  font-size: var(--font-size-sm);
+  cursor: pointer;
+}
+
+.centre__mark-all {
+  color: var(--color-accent-text);
+}
+
+.centre__mark-all:disabled {
+  color: var(--color-text-muted);
+  cursor: default;
+}
+
+.centre__settings {
+  color: var(--color-text-secondary);
+}
+
+.centre__mark-all:not(:disabled):hover,
+.centre__settings:hover {
+  text-decoration: underline;
+}
+
+.centre__filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  padding: 0 var(--space-4) var(--space-3);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.centre__filter {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  padding: var(--space-1) var(--space-3);
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-full);
+  background: transparent;
+  color: var(--color-text);
+  font-family: inherit;
+  font-size: var(--font-size-sm);
+  cursor: pointer;
+}
+
+.centre__filter:hover {
+  background: var(--color-bg-hover);
+}
+
+.centre__filter[aria-pressed="true"] {
+  border-color: var(--color-accent);
+  background: var(--color-accent);
+  color: var(--color-on-accent);
+}
+
+.centre__filter-count {
+  font-variant-numeric: tabular-nums;
+}
+
+.centre__list {
+  flex: 1 1 auto;
+  min-height: 0;
+  margin: 0;
+  padding: 0;
+  overflow-y: auto;
+  list-style: none;
+}
+
+.centre__empty {
+  margin: 0;
+  padding: var(--space-6) var(--space-4);
+  color: var(--color-text-muted);
+  text-align: center;
+}
+
+.centre__foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding: var(--space-2) var(--space-4);
+  border-top: 1px solid var(--color-border);
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+}
+
+.centre__dnd[data-on] {
+  color: var(--color-warning);
+}
+
+.centre-entry {
+  position: relative;
+  display: flex;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.centre-entry[data-unread] {
+  background: color-mix(in srgb, var(--color-accent) 8%, transparent);
+}
+
+.centre-entry__content {
+  display: flex;
+  flex: 1 1 auto;
+  min-width: 0;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.centre-entry__main {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  min-width: 0;
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  text-align: start;
+  cursor: pointer;
+}
+
+.centre-entry__head {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-2);
+}
+
+.centre-entry__title {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.centre-entry[data-unread] .centre-entry__title {
+  font-weight: var(--font-weight-bold);
+}
+
+.centre-entry__time {
+  flex: none;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+}
+
+.centre-entry__dot {
+  flex: none;
+  align-self: center;
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: var(--radius-full);
+  background: var(--color-accent);
+}
+
+.centre-entry__body {
+  color: var(--color-text-secondary);
+  overflow-wrap: anywhere;
+}
+
+.centre-entry__chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.centre-chip {
+  padding: 0 var(--space-2);
+  border-radius: var(--radius-sm);
+  background: var(--color-bg-hover);
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-xs);
+  line-height: 1.5rem;
+}
+
+.centre-entry__actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.centre-entry__action {
+  border-radius: var(--radius-full);
+}
+
+.centre-entry__error {
+  color: var(--color-danger);
+  font-size: var(--font-size-sm);
+}
+
+/* Shown on hover or keyboard focus only, so the quiet list stays as in the mockup. */
+.centre-entry__dismiss {
+  position: absolute;
+  right: var(--space-3);
+  bottom: var(--space-3);
+  width: 1.75rem;
+  height: 1.75rem;
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-full);
+  background: var(--color-bg-hover);
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  opacity: 0;
+}
+
+.centre-entry:hover .centre-entry__dismiss,
+.centre-entry:focus-within .centre-entry__dismiss {
+  opacity: 1;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .centre {
+    animation: centre-in var(--duration-normal) var(--ease-out);
+  }
+}
+
+@keyframes centre-in {
+  from {
+    opacity: 0;
+    transform: translateY(-0.25rem);
+  }
+}

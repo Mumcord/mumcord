@@ -13,5 +13,57 @@
   "open": "Abrir chat",
   "close": "Dispensar notificação",
   "mentionLine": "{{sender}} mencionou-te: {{preview}}",
-  "withServer": "{{server}} · {{what}}"
+  "withServer": "{{server}} · {{what}}",
+  "centre": {
+    "title": "Notificações",
+    "bellUnread_one": "Notificações, {{count}} por ler",
+    "bellUnread_many": "Notificações, {{count}} por ler",
+    "bellUnread_other": "Notificações, {{count}} por ler",
+    "shortcut": "Ctrl+Shift+N",
+    "markAllRead": "Marcar tudo como lido",
+    "filterLabel": "Mostrar notificações",
+    "filter": {
+      "all": "Tudo",
+      "mentions": "Menções",
+      "requests": "Pedidos",
+      "invites": "Convites"
+    },
+    "empty": "Está tudo em dia.",
+    "unread": "Por ler",
+    "dndOn": "Não incomodar está ativado",
+    "dndOff": "Não incomodar está desativado",
+    "settings": "Definições de notificações",
+    "someone": "Alguém",
+    "quoted": "«{{text}}»",
+    "mention": "{{name}} mencionou-te",
+    "mentionGroup": "{{name}} mencionou todos",
+    "reply": "{{name}} respondeu à tua mensagem",
+    "chatRequest": "{{name}} quer conversar contigo",
+    "messageRequest": "Pedido de mensagem de {{name}}",
+    "messageRequestBody_one": "{{count}} mensagem de um cliente Mumble padrão",
+    "messageRequestBody_many": "{{count}} de mensagens de um cliente Mumble padrão",
+    "messageRequestBody_other": "{{count}} mensagens de um cliente Mumble padrão",
+    "invite": {
+      "watchParty": "{{name}} convidou-te para uma watch party",
+      "screenShare": "{{name}} está a partilhar o ecrã",
+      "card": "{{name}} enviou-te um cartão",
+      "theme": "{{name}} partilhou um tema contigo"
+    },
+    "connection": "{{server}} está inacessível",
+    "type": {
+      "chatRequest": "Pedido de chat",
+      "messageRequest": "Pedido de mensagem",
+      "invite": "Convite",
+      "private": "Mensagem privada",
+      "connection": "Ligação"
+    },
+    "accept": "Aceitar",
+    "decline": "Recusar",
+    "join": "Entrar",
+    "watch": "Ver",
+    "open": "Abrir",
+    "dismiss": "Dispensar",
+    "dismissItem": "Dispensar: {{title}}",
+    "failed": "Não funcionou. Tenta novamente."
+  }
 }

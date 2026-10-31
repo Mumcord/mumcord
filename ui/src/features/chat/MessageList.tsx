@@ -66,6 +66,7 @@ import { findOriginal, parseReply, quoteFor, replyOf, type ReplyQuote } from "./
 import { SAFE_LINK, sanitizeHtml } from "./sanitize";
 import { ImageMenu, type ImageMenuState } from "./ImageMenu";
 import { selectedText } from "./selectionText";
+import { revealDone, usePendingReveal } from "./reveal";
 
 /** Within this distance of the top, older history is loaded; of the bottom, new messages scroll. */
 const EDGE_PX = 48;
@@ -761,6 +762,16 @@ export function MessageList({
   useEffect(() => {
     latest.current = { reply, openMenu, jumpTo, openViewer };
   });
+
+  // Another feature asked to show a message (notification centre, #143): jump once it is here.
+  const reveal = usePendingReveal();
+  useEffect(() => {
+    if (reveal === null) return;
+    const index = messages.findIndex((message) => message.id === reveal);
+    if (index < 0) return;
+    latest.current.jumpTo(index);
+    revealDone(reveal);
+  }, [reveal, messages]);
   const itemActions = useMemo<MessageItemActions>(
     () => ({
       setRef: (index, element) => {

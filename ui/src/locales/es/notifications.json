@@ -13,5 +13,57 @@
   "open": "Abrir chat",
   "close": "Descartar notificación",
   "mentionLine": "{{sender}} te mencionó: {{preview}}",
-  "withServer": "{{server}} · {{what}}"
+  "withServer": "{{server}} · {{what}}",
+  "centre": {
+    "title": "Notificaciones",
+    "bellUnread_one": "Notificaciones, {{count}} sin leer",
+    "bellUnread_many": "Notificaciones, {{count}} sin leer",
+    "bellUnread_other": "Notificaciones, {{count}} sin leer",
+    "shortcut": "Ctrl+Mayús+N",
+    "markAllRead": "Marcar todo como leído",
+    "filterLabel": "Mostrar notificaciones",
+    "filter": {
+      "all": "Todas",
+      "mentions": "Menciones",
+      "requests": "Solicitudes",
+      "invites": "Invitaciones"
+    },
+    "empty": "Estás al día.",
+    "unread": "Sin leer",
+    "dndOn": "No molestar está activado",
+    "dndOff": "No molestar está desactivado",
+    "settings": "Ajustes de notificaciones",
+    "someone": "Alguien",
+    "quoted": "«{{text}}»",
+    "mention": "{{name}} te mencionó",
+    "mentionGroup": "{{name}} mencionó a todos",
+    "reply": "{{name}} respondió a tu mensaje",
+    "chatRequest": "{{name}} quiere chatear contigo",
+    "messageRequest": "Solicitud de mensaje de {{name}}",
+    "messageRequestBody_one": "{{count}} mensaje de un cliente de Mumble estándar",
+    "messageRequestBody_many": "{{count}} de mensajes de un cliente de Mumble estándar",
+    "messageRequestBody_other": "{{count}} mensajes de un cliente de Mumble estándar",
+    "invite": {
+      "watchParty": "{{name}} te invitó a una watch party",
+      "screenShare": "{{name}} está compartiendo su pantalla",
+      "card": "{{name}} te envió una tarjeta",
+      "theme": "{{name}} compartió un tema contigo"
+    },
+    "connection": "{{server}} no está disponible",
+    "type": {
+      "chatRequest": "Solicitud de chat",
+      "messageRequest": "Solicitud de mensaje",
+      "invite": "Invitación",
+      "private": "Mensaje privado",
+      "connection": "Conexión"
+    },
+    "accept": "Aceptar",
+    "decline": "Rechazar",
+    "join": "Unirse",
+    "watch": "Ver",
+    "open": "Abrir",
+    "dismiss": "Descartar",
+    "dismissItem": "Descartar: {{title}}",
+    "failed": "No ha funcionado. Inténtalo de nuevo."
+  }
 }

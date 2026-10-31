@@ -11,5 +11,55 @@
   "open": "Отвори чата",
   "close": "Затвори известието",
   "mentionLine": "{{sender}} те спомена: {{preview}}",
-  "withServer": "{{server}} · {{what}}"
+  "withServer": "{{server}} · {{what}}",
+  "centre": {
+    "title": "Известия",
+    "bellUnread_one": "Известия, {{count}} непрочетено",
+    "bellUnread_other": "Известия, {{count}} непрочетени",
+    "shortcut": "Ctrl+Shift+N",
+    "markAllRead": "Маркирай всички като прочетени",
+    "filterLabel": "Показване на известия",
+    "filter": {
+      "all": "Всички",
+      "mentions": "Споменавания",
+      "requests": "Заявки",
+      "invites": "Покани"
+    },
+    "empty": "Всичко е прочетено.",
+    "unread": "Непрочетени",
+    "dndOn": "„Не безпокойте“ е включено",
+    "dndOff": "„Не безпокойте“ е изключено",
+    "settings": "Настройки на известията",
+    "someone": "Някой",
+    "quoted": "„{{text}}“",
+    "mention": "{{name}} те спомена",
+    "mentionGroup": "{{name}} спомена всички",
+    "reply": "{{name}} отговори на съобщението ти",
+    "chatRequest": "{{name}} иска да чати с теб",
+    "messageRequest": "Заявка за съобщение от {{name}}",
+    "messageRequestBody_one": "{{count}} съобщение от стандартен Mumble клиент",
+    "messageRequestBody_other": "{{count}} съобщения от стандартен Mumble клиент",
+    "invite": {
+      "watchParty": "{{name}} те покани на общо гледане",
+      "screenShare": "{{name}} споделя екрана си",
+      "card": "{{name}} ти изпрати карта",
+      "theme": "{{name}} сподели тема с теб"
+    },
+    "connection": "{{server}} е недостъпен",
+    "type": {
+      "chatRequest": "Заявка за чат",
+      "messageRequest": "Заявка за съобщение",
+      "invite": "Покана",
+      "private": "Лично съобщение",
+      "connection": "Връзка"
+    },
+    "accept": "Приеми",
+    "decline": "Откажи",
+    "join": "Влез",
+    "watch": "Гледай",
+    "open": "Отвори",
+    "dismiss": "Отхвърли",
+    "dismissItem": "Отхвърли: {{title}}",
+    "failed": "Не се получи. Опитай отново."
+  }
 }
