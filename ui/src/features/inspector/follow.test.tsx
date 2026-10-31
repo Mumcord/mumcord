@@ -1,5 +1,5 @@
 import { act, fireEvent, render, screen } from "@testing-library/react";
-import { describe, expect, it } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { countUnseen, isAtBottom, useFollowScroll } from "./follow";
 import type { Packet } from "./packets";
 
@@ -150,5 +150,50 @@ describe("useFollowScroll", () => {
       fireEvent.click(screen.getByText("pause"));
     });
     expect(state()).toBe("false 0");
+  });
+
+  describe("when the list gets shorter", () => {
+    let resize: (() => void) | null = null;
+    beforeEach(() => {
+      vi.stubGlobal(
+        "ResizeObserver",
+        class {
+          constructor(callback: ResizeObserverCallback) {
+            resize = () => {
+              callback([], this);
+            };
+          }
+          observe() {}
+          unobserve() {}
+          disconnect() {
+            resize = null;
+          }
+        },
+      );
+    });
+    afterEach(() => {
+      resize = null;
+      vi.unstubAllGlobals();
+    });
+
+    it("scrolls back to the newest packet while following", () => {
+      render(<Harness packets={list(2)} />);
+      const scroller = screen.getByTestId("scroller");
+      geometry(scroller, 0);
+      resize?.();
+      expect(scroller.scrollTop).toBe(1000);
+      // The scroll event of that scrolling does not pause following.
+      fireEvent.scroll(scroller);
+      expect(state()).toBe("true 0");
+    });
+
+    it("stays where it is while paused", () => {
+      render(<Harness packets={list(2)} />);
+      fireEvent.click(screen.getByText("toggle"));
+      const scroller = screen.getByTestId("scroller");
+      geometry(scroller, 100);
+      expect(resize).toBeNull();
+      expect(scroller.scrollTop).toBe(100);
+    });
   });
 });

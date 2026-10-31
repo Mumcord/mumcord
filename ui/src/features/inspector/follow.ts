@@ -2,7 +2,7 @@
  * Follow mode of the packet list: it scrolls to new packets like a log viewer, pauses when the
  * user scrolls up and counts what arrives meanwhile. Separate from pausing the capture.
  */
-import { useLayoutEffect, useRef, useState, type UIEvent } from "react";
+import { useEffect, useLayoutEffect, useRef, useState, type UIEvent } from "react";
 import type { Packet } from "./packets";
 
 /** How far from the end still counts as "at the bottom" (fractional scroll positions). */
@@ -58,6 +58,19 @@ export function useFollowScroll(packets: readonly Packet[]): FollowScroll {
   useLayoutEffect(() => {
     if (follow && scroller) ownScroll.current = scrollToEnd(scroller);
   }, [follow, newestId, scroller]);
+
+  // A list that gets shorter (a smaller window) keeps its scroll position, which would leave the
+  // newest packet out of view until the next one arrives.
+  useEffect(() => {
+    if (!follow || !scroller || typeof ResizeObserver === "undefined") return;
+    const observer = new ResizeObserver(() => {
+      ownScroll.current = scrollToEnd(scroller);
+    });
+    observer.observe(scroller);
+    return () => {
+      observer.disconnect();
+    };
+  }, [follow, scroller]);
 
   const setFollow = (on: boolean) => {
     if (!on) setSeenId(newestId);
