@@ -1,4 +1,6 @@
 import { useTranslation } from "react-i18next";
+import type { P2pMode } from "../../api";
+import { P2pModeRadios } from "../p2p/P2pModeRadios";
 import { openInBrowser } from "../chat/openLink";
 import { StepFrame } from "./StepFrame";
 
@@ -8,6 +10,9 @@ interface PrivacyStepProps {
   /** 1-based step number and step count of this wizard pass (#149 rerun: 2 of 4). */
   step: number;
   total: number;
+  /** The peer-to-peer mode chosen so far (spec 04, FR-4.1); saved with the final step. */
+  p2pMode: P2pMode;
+  onP2pModeChange: (mode: P2pMode) => void;
   focusOnMount: boolean;
   onBack: () => void;
   onNext: () => void;
@@ -15,10 +20,15 @@ interface PrivacyStepProps {
   onCancel?: (() => void) | undefined;
 }
 
-/** Step 3 on first start, step 2 in the rerun: what Mumcord does with the network and with data, before the link-preview choice (QA.78). */
+/**
+ * Step 3 on first start, step 2 in the rerun: what Mumcord does with the network and with data,
+ * before the link-preview choice (QA.78), and the peer-to-peer mode (spec 04, FR-4.1).
+ */
 export function PrivacyStep({
   step,
   total,
+  p2pMode,
+  onP2pModeChange,
   focusOnMount,
   onBack,
   onNext,
@@ -44,6 +54,13 @@ export function PrivacyStep({
         <li>{t("privacy.mumcordUsers")}</li>
         <li>{t("privacy.local")}</li>
       </ul>
+      <P2pModeRadios
+        value={p2pMode}
+        onChange={(mode) => {
+          // Without `allowGlobal` the radios never offer "Use global setting".
+          if (mode !== null) onP2pModeChange(mode);
+        }}
+      />
       <div className="wizard-row">
         <button
           type="button"
