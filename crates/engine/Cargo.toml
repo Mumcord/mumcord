@@ -99,6 +99,8 @@ test-backend = ["mumcord-audio/test-backend"]
 
 [dev-dependencies]
 tempfile.workspace = true
+# Paused time for the relay timeouts.
+tokio = { workspace = true, features = ["test-util"] }
 # Live tests drive scripted bots through the mumbot library; same tag as scripts/mumbot.env.
 mumbot = { git = "https://github.com/Mumcord/mumbot", tag = "v0.1.1" }
 mumcord-store = { workspace = true, features = ["test-util"] }

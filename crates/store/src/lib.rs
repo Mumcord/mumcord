@@ -17,6 +17,7 @@ mod history;
 mod identities;
 mod identity;
 mod pm_overview;
+mod relay_pin;
 mod secrets;
 mod servers;
 mod settings;
@@ -35,6 +36,7 @@ pub use history::{ChatMessage, Conversation, NewChatMessage};
 pub use identities::{IdentityId, IdentityRecord, MAX_IDENTITY_LABEL, NewIdentity};
 pub use identity::{Identity, cert_hash};
 pub use pm_overview::{MUTED_FOREVER, PmConversationPrefs, PrivateConversationSummary};
+pub use relay_pin::RelayPin;
 pub use secrets::{KEYRING_SERVICE, SecretStore};
 pub use servers::{DEFAULT_PORT, NewServer, SavedServer, ServerId};
 pub use settings::{
@@ -42,8 +44,8 @@ pub use settings::{
     DEFAULT_INGAME_OPACITY_PERCENT, DEFAULT_INGAME_SIZE_PERCENT, DEFAULT_MAX_CONNECTED_SERVERS,
     GameKey, GameOverlayEntry, InGameOverlayMode, InGameOverlaySettings, LogLevel,
     MAX_MAX_CONNECTED_SERVERS, MAX_VIDEO_DUCKING_PERCENT, MIN_MAX_CONNECTED_SERVERS,
-    MIN_VIDEO_DUCKING_PERCENT, NoiseBackend, NotificationMode, OverlayCorner, OwnVoice, PmRule,
-    PositionalSettings, PrivateMessageSettings, Settings, SoundSettings, TalkMode, Theme,
+    MIN_VIDEO_DUCKING_PERCENT, NoiseBackend, NotificationMode, OverlayCorner, OwnVoice, P2pMode,
+    PmRule, PositionalSettings, PrivateMessageSettings, Settings, SoundSettings, TalkMode, Theme,
     ThemePreference, VoiceActivation,
 };
 pub use social::{FollowedChannel, PersonSetting};

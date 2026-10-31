@@ -4,10 +4,12 @@ import { useTranslation } from "react-i18next";
 import {
   getApi,
   type MumbleLink,
+  type P2pMode,
   type PasswordUpdate,
   type SavedServer,
   type TestConnection,
 } from "../../api";
+import { P2pModeRadios } from "../p2p/P2pModeRadios";
 import { openSettingsSection } from "../settings/settingsOpener";
 import { ChannelPasswordList } from "./ChannelPasswordList";
 import { Dialog } from "./Dialog";
@@ -21,6 +23,7 @@ import {
   refreshIdentities,
   requestConnect,
   saveAlwaysConnect,
+  saveP2pModeOverride,
   saveServerTheme,
   toApiError,
   updateServer,
@@ -47,6 +50,8 @@ interface Fields {
   themeId: string | null;
   /** Identity to connect with; `null` uses the default (issue #148). */
   identityId: number | null;
+  /** P2P mode on this server; `null` is "Use global setting" (FR-4.2). */
+  p2pModeOverride: P2pMode | null;
 }
 
 type Tab = "connection" | "identity" | "passwords" | "behaviour";
@@ -96,6 +101,7 @@ function initialFields(
       alwaysConnect: server.alwaysConnectAtStart,
       themeId: server.themeId,
       identityId: server.identityId,
+      p2pModeOverride: server.p2pModeOverride,
     };
   }
   return {
@@ -108,6 +114,7 @@ function initialFields(
     alwaysConnect: false,
     themeId: null,
     identityId: null,
+    p2pModeOverride: null,
   };
 }
 
@@ -261,6 +268,9 @@ export function ServerDialog({ server, link, identityName, onClose }: ServerDial
       }
       if (fields.themeId !== (server?.themeId ?? null)) {
         await saveServerTheme(saved.id, fields.themeId);
+      }
+      if (fields.p2pModeOverride !== (server?.p2pModeOverride ?? null)) {
+        await saveP2pModeOverride(saved.id, fields.p2pModeOverride);
       }
       // Renames go first: removing moves the later passwords up.
       if (server) {
@@ -612,6 +622,15 @@ export function ServerDialog({ server, link, identityName, onClose }: ServerDial
                 }}
               />
               <p className="servers-form__hint">{t("theme.hint")}</p>
+            </div>
+            <div className="servers-form__field">
+              <P2pModeRadios
+                value={fields.p2pModeOverride}
+                allowGlobal
+                onChange={(p2pModeOverride) => {
+                  set({ p2pModeOverride });
+                }}
+              />
             </div>
           </div>
         )}

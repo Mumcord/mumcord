@@ -561,10 +561,26 @@
     "weakConnection": "Uri l-ikona ta' konnessjoni dgħajfa",
     "weakConnectionHint": "Ikona żgħira tas-sinjal ħdejn persuni b'konnessjoni ħażina."
   },
+  "p2p": {
+    "title": "Peer-to-peer (qsim tal-iskrin, immaġini bid-daqs sħiħ)",
+    "modeLabel": "Modalità peer-to-peer",
+    "recommended": "Rakkomandat",
+    "explanation": "Dirett juri l-indirizz IP tiegħek lill-persuna l-oħra. Ir-relay jaħbiħulha; l-operatur tar-relay (il-komunità ta' dan is-server) jista' jarah. It-tnejn huma kriptati minn tarf sa tarf.",
+    "useGlobal": "Uża s-setting globali",
+    "overrideHint": "Għal dan is-server biss. \"Uża s-setting globali\" isegwi Settings → Privatezza.",
+    "mode": {
+      "directRelay": "Dirett + relay (l-ewwel dirett)",
+      "relayFirst": "Dirett + relay (dejjem relay, jaħbi l-IP tiegħi)",
+      "directOnly": "Dirett biss",
+      "relayOnly": "Relay biss",
+      "off": "Mitfi"
+    }
+  },
   "privacyDirect": {
     "title": "Konnessjonijiet diretti",
     "allow": "Ippermetti konnessjonijiet diretti ma' utenti oħra ta' Mumcord",
-    "hint": "Il-konnessjonijiet diretti huma aktar mgħaġġla, imma l-persuna l-oħra tista' tara l-indirizz IP tiegħek. Sakemm tiddeċiedi, Mumcord jistaqsi l-ewwel darba li tkun se tintuża waħda."
+    "hint": "Il-konnessjonijiet diretti huma aktar mgħaġġla, imma l-persuna l-oħra tista' tara l-indirizz IP tiegħek. Sakemm tiddeċiedi, Mumcord jistaqsi l-ewwel darba li tkun se tintuża waħda.",
+    "notUsed": "Mhux użat fil-modalità peer-to-peer magħżula: Mumcord qatt ma jikkonnettja direttament ma' nies oħra."
   },
   "updates": {
     "title": "Aġġornamenti",
@@ -653,7 +669,8 @@
       "screen": "Sinjal tal-qsim tal-iskrin",
       "watch": "Stat tas-sessjoni ta’ ħarsa flimkien",
       "plugin": "Data tal-plugin",
-      "mumble": "Messaġġ ta’ Mumble"
+      "mumble": "Messaġġ ta’ Mumble",
+      "peer": "Konfigurazzjoni tar-relay"
     }
   },
   "licences": {

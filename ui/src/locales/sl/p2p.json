@@ -1,0 +1,54 @@
+{
+  "link": {
+    "label": "Peer-to-peer",
+    "direct": "Neposredno",
+    "relayUdp": "Prek releja (UDP)",
+    "relayTcp": "Prek releja (TCP 443)",
+    "ipHidden": "IP skrit",
+    "ipVisible": "IP viden",
+    "ipHiddenHint": "Druga oseba vidi naslov releja, ne tvojega."
+  },
+  "relay": {
+    "mumbot": "Mumbot",
+    "relay": "Relej Mumpeer",
+    "yes": "Da",
+    "yesNamed": "Da ({{names}})",
+    "no": "Ne",
+    "available": "Na voljo",
+    "availableAt": "Na voljo · {{host}}",
+    "unavailable": "Ni na voljo: {{reason}}",
+    "untrusted": "Spremenjeno, ni zaupanja vredno",
+    "changed": "Relej tega strežnika se je spremenil.",
+    "trustNew": "Zaupaj novemu releju",
+    "keepBlocked": "Ohrani blokiranega",
+    "forget": "Pozabi relej",
+    "actionFailed": "Ni uspelo. Poskusi znova."
+  },
+  "reason": {
+    "p2pOff": "Peer-to-peer je izklopljen.",
+    "noRelay": "Ta strežnik nima releja.",
+    "notConnected": "Nisi povezan s tem strežnikom.",
+    "untrusted": "Relej tega strežnika se je spremenil in ni zaupanja vreden.",
+    "conflict": "Na tem strežniku sta objavljena dva releja; nobeden se ne uporablja.",
+    "botLeft": "Bot releja je zapustil strežnik.",
+    "relayDown": "Relej trenutno ni dosegljiv (sporoča bot releja).",
+    "botNoAnswer": "Bot releja ni odgovoril.",
+    "refused": "Relej je zavrnil povezavo: {{reason}}",
+    "unreachable": "Releja ni bilo mogoče doseči ne prek UDP ne prek TCP 443.",
+    "peerCannotRelay": "Druga oseba ne more uporabljati releja (starejši Mumcord ali izklopljen relej).",
+    "denied": "Bot releja je zavrnil zahtevo.",
+    "peerGone": "Druga oseba je zapustila strežnik.",
+    "rateLimited": "Preveč zahtev za relej. Poskusi znova čez minuto."
+  },
+  "refusal": {
+    "unknownToken": "neznan dostopni žeton",
+    "expired": "dostopni žeton je potekel",
+    "notAllowed": "ni dovoljeno",
+    "botGone": "bot releja je izginil",
+    "relayFull": "relej je poln",
+    "peerLimit": "preveč povezav",
+    "rateLimited": "preveč poskusov",
+    "version": "nepodprta različica",
+    "badRequest": "neveljavna zahteva"
+  }
+}

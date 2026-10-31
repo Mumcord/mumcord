@@ -97,10 +97,14 @@
     "dnd": "Μην ενοχλείτε",
     "dndHint": "Σιγεί τους ήχους και τα πλαίσια ειδοποιήσεων",
     "dndSystemHint": "Ενεργό μέσω του «Μην ενοχλείτε» της επιφάνειας εργασίας",
-    "privateMessages": "Ιδιωτικά μηνύματα από",
+    "privateMessages": "Μηνύματα από",
     "pm_everyone": "Όλοι",
     "pm_friendsOnly": "Φίλοι",
-    "pm_nobody": "Κανείς"
+    "pm_nobody": "Κανείς",
+    "notifications": "Ειδοποιήσεις",
+    "sharing": "Κοινή χρήση",
+    "appearance": "Εμφάνιση",
+    "account": "Λογαριασμός"
   },
   "voice": {
     "line": "Φωνή: {{channel}} · {{server}}",

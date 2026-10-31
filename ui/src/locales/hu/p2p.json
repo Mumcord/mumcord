@@ -1,0 +1,54 @@
+{
+  "link": {
+    "label": "Peer-to-peer",
+    "direct": "Közvetlen",
+    "relayUdp": "Átjátszón keresztül (UDP)",
+    "relayTcp": "Átjátszón keresztül (TCP 443)",
+    "ipHidden": "IP elrejtve",
+    "ipVisible": "IP látható",
+    "ipHiddenHint": "A másik fél az átjátszó címét látja, nem a tiédet."
+  },
+  "relay": {
+    "mumbot": "Mumbot",
+    "relay": "Mumpeer átjátszó",
+    "yes": "Igen",
+    "yesNamed": "Igen ({{names}})",
+    "no": "Nem",
+    "available": "Elérhető",
+    "availableAt": "Elérhető · {{host}}",
+    "unavailable": "Nem elérhető: {{reason}}",
+    "untrusted": "Megváltozott, nem megbízható",
+    "changed": "A szerver átjátszója megváltozott.",
+    "trustNew": "Bízz az új átjátszóban",
+    "keepBlocked": "Maradjon letiltva",
+    "forget": "Átjátszó elfelejtése",
+    "actionFailed": "Ez nem sikerült. Próbáld újra."
+  },
+  "reason": {
+    "p2pOff": "A peer-to-peer ki van kapcsolva.",
+    "noRelay": "Ennek a szervernek nincs átjátszója.",
+    "notConnected": "Nincs kapcsolat ezzel a szerverrel.",
+    "untrusted": "A szerver átjátszója megváltozott, és nem megbízható.",
+    "conflict": "Ezen a szerveren két átjátszót hirdettek meg; egyiket sem használja.",
+    "botLeft": "Az átjátszó botja elhagyta a szervert.",
+    "relayDown": "Az átjátszó jelenleg nem érhető el (az átjátszó botja jelezte).",
+    "botNoAnswer": "Az átjátszó botja nem válaszolt.",
+    "refused": "Az átjátszó elutasította a kapcsolatot: {{reason}}",
+    "unreachable": "Az átjátszó UDP-n és TCP 443-on sem volt elérhető.",
+    "peerCannotRelay": "A másik fél nem tudja használni az átjátszót (régebbi Mumcord vagy kikapcsolt átjátszó).",
+    "denied": "Az átjátszó botja elutasította a kérést.",
+    "peerGone": "A másik fél elhagyta a szervert.",
+    "rateLimited": "Túl sok átjátszókérés. Próbáld újra egy perc múlva."
+  },
+  "refusal": {
+    "unknownToken": "ismeretlen hozzáférési token",
+    "expired": "a hozzáférési token lejárt",
+    "notAllowed": "nem engedélyezett",
+    "botGone": "az átjátszó botja eltűnt",
+    "relayFull": "az átjátszó megtelt",
+    "peerLimit": "túl sok kapcsolat",
+    "rateLimited": "túl sok próbálkozás",
+    "version": "nem támogatott verzió",
+    "badRequest": "érvénytelen kérés"
+  }
+}

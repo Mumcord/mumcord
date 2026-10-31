@@ -11,14 +11,19 @@ use tauri_specta::Event;
 
 use crate::screen_frames::{FrameChannel, ScreenFrames};
 
+use super::p2p::RelayUnavailable;
 use super::types::{ApiResult, ServerId, SessionId, to_engine_server_id};
 
 /// Why "Watch" is disabled (FR-2.46).
 #[derive(Serialize, Deserialize, Clone, Copy, Debug, PartialEq, Eq, Type)]
 #[serde(rename_all = "camelCase")]
 pub enum WatchBlock {
-    /// The user said no to direct connections.
+    /// "Peer-to-peer is off" for this server.
+    P2pOff,
+    /// The user said no to direct connections and the relay cannot be used either.
     ConsentOff,
+    /// The relay was needed but cannot be used; the reason is in `relayReason`.
+    RelayUnavailable,
     /// The sharer's client cannot or does not want to take direct connections.
     PeerUnsupported,
     /// No direct path was found (there is no relay, e.g. behind CGNAT).
@@ -39,6 +44,8 @@ pub struct ScreenShare {
     pub viewers: Vec<SessionId>,
     /// Why the user cannot watch; always `null` for the own share.
     pub blocked: Option<WatchBlock>,
+    /// Why the relay cannot be used, when `blocked` is `relayUnavailable`.
+    pub relay_reason: Option<RelayUnavailable>,
 }
 
 /// The screen shares on the server changed; carries the full list.
@@ -52,7 +59,9 @@ pub struct ScreenSharesChanged {
 impl From<EngineWatchBlock> for WatchBlock {
     fn from(b: EngineWatchBlock) -> Self {
         match b {
+            EngineWatchBlock::P2pOff => Self::P2pOff,
             EngineWatchBlock::ConsentOff => Self::ConsentOff,
+            EngineWatchBlock::Relay(_) => Self::RelayUnavailable,
             EngineWatchBlock::PeerUnsupported => Self::PeerUnsupported,
             EngineWatchBlock::NoDirectPath => Self::NoDirectPath,
         }
@@ -68,6 +77,10 @@ impl From<ScreenShareView> for ScreenShare {
             sound_available: v.sound_available,
             viewers: v.viewers,
             blocked: v.blocked.map(Into::into),
+            relay_reason: match v.blocked {
+                Some(EngineWatchBlock::Relay(reason)) => Some(reason.into()),
+                _ => None,
+            },
         }
     }
 }
@@ -214,4 +227,32 @@ pub fn screen_share_list(
         .into_iter()
         .map(Into::into)
         .collect())
+}
+
+/// Why the user cannot start a share on the server: nobody could watch it (FR-4.3 – FR-4.5).
+#[derive(Serialize, Deserialize, Clone, Copy, Debug, PartialEq, Eq, Type)]
+#[serde(rename_all = "camelCase")]
+pub struct ShareStartBlock {
+    pub blocked: WatchBlock,
+    /// Why the relay cannot be used, when `blocked` is `relayUnavailable`.
+    pub relay_reason: Option<RelayUnavailable>,
+}
+
+/// What blocks starting a share on the server right now; `null` when sharing is possible. The
+/// settings and the relay change without an event, so the UI asks again before starting.
+#[tauri::command]
+#[specta::specta]
+pub fn screen_share_block(
+    engine: State<'_, Engine>,
+    server_id: ServerId,
+) -> ApiResult<Option<ShareStartBlock>> {
+    Ok(engine
+        .screen_share_block(to_engine_server_id(server_id))
+        .map(|block| ShareStartBlock {
+            blocked: block.into(),
+            relay_reason: match block {
+                EngineWatchBlock::Relay(reason) => Some(reason.into()),
+                _ => None,
+            },
+        }))
 }

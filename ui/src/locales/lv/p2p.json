@@ -1,0 +1,54 @@
+{
+  "link": {
+    "label": "Peer-to-peer",
+    "direct": "Tieši",
+    "relayUdp": "Caur releju (UDP)",
+    "relayTcp": "Caur releju (TCP 443)",
+    "ipHidden": "IP slēpta",
+    "ipVisible": "IP redzama",
+    "ipHiddenHint": "Otra persona redz releja adresi, nevis tavējo."
+  },
+  "relay": {
+    "mumbot": "Mumbot",
+    "relay": "Mumpeer relejs",
+    "yes": "Jā",
+    "yesNamed": "Jā ({{names}})",
+    "no": "Nē",
+    "available": "Pieejams",
+    "availableAt": "Pieejams · {{host}}",
+    "unavailable": "Nav pieejams: {{reason}}",
+    "untrusted": "Mainīts, neuzticams",
+    "changed": "Šī servera relejs ir mainījies.",
+    "trustNew": "Uzticēties jaunajam relejam",
+    "keepBlocked": "Atstāt bloķētu",
+    "forget": "Aizmirst releju",
+    "actionFailed": "Neizdevās. Mēģini vēlreiz."
+  },
+  "reason": {
+    "p2pOff": "Peer-to-peer ir izslēgts.",
+    "noRelay": "Šim serverim nav releja.",
+    "notConnected": "Nav savienojuma ar šo serveri.",
+    "untrusted": "Šī servera relejs ir mainījies un tam neuzticas.",
+    "conflict": "Šajā serverī ir paziņoti divi releji; neviens netiek izmantots.",
+    "botLeft": "Releja bots atstāja serveri.",
+    "relayDown": "Relejs pašlaik nav sasniedzams (ziņoja releja bots).",
+    "botNoAnswer": "Releja bots neatbildēja.",
+    "refused": "Relejs noraidīja savienojumu: {{reason}}",
+    "unreachable": "Releju neizdevās sasniegt ne pa UDP, ne pa TCP 443.",
+    "peerCannotRelay": "Otra persona nevar izmantot releju (vecāks Mumcord vai relejs izslēgts).",
+    "denied": "Releja bots noraidīja pieprasījumu.",
+    "peerGone": "Otra persona atstāja serveri.",
+    "rateLimited": "Pārāk daudz releja pieprasījumu. Mēģini vēlreiz pēc minūtes."
+  },
+  "refusal": {
+    "unknownToken": "nezināms piekļuves marķieris",
+    "expired": "piekļuves marķiera derīgums beidzies",
+    "notAllowed": "nav atļauts",
+    "botGone": "releja bots ir prom",
+    "relayFull": "relejs ir pilns",
+    "peerLimit": "pārāk daudz savienojumu",
+    "rateLimited": "pārāk daudz mēģinājumu",
+    "version": "neatbalstīta versija",
+    "badRequest": "nederīgs pieprasījums"
+  }
+}

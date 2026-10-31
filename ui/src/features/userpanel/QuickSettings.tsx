@@ -1,7 +1,8 @@
 /**
  * Quick-settings menu on the settings (gear) button: the few switches people flip often, applied
  * and saved right away like in the full settings (FR-1.66, QA.47). Same look and keys as the
- * other context menus.
+ * other context menus. Rows are grouped and one line high; every explanation sits behind a "?"
+ * button (#234).
  */
 import {
   useEffect,
@@ -15,38 +16,25 @@ import {
 import { createPortal } from "react-dom";
 import { useTranslation } from "react-i18next";
 import { getApi, type PmRule, type Theme } from "../../api";
+import { InfoTip } from "../../components/InfoTip";
 import { dndSource, useDnd } from "../dnd/useDnd";
 import { useSettings } from "../settings/useSettings";
 import "./quicksettings.css";
 
-const BETA_OPEN_KEY = "mumcord.quickSettings.betaOpen";
-
-/** Remembered per viewer; a UI convenience, so storage failures just fall back to collapsed. */
-function readBetaOpen(): boolean {
-  try {
-    return localStorage.getItem(BETA_OPEN_KEY) === "1";
-  } catch {
-    return false;
-  }
-}
-
-function writeBetaOpen(open: boolean): void {
-  try {
-    localStorage.setItem(BETA_OPEN_KEY, open ? "1" : "0");
-  } catch (error) {
-    console.error("Saving the Beta group state failed", error);
-  }
-}
-
 /** Gap kept between the menu and the window edge. */
 const EDGE = 8;
 
-const ITEM =
-  '[role="menuitemcheckbox"]:not([aria-disabled]), [role="menuitemradio"], [role="menuitem"]:not([aria-disabled])';
+/** One menu row; the "?" buttons in a row are reached with the horizontal arrows. */
+const ROW = ".quick-settings__row";
+const ITEM = '[role="menuitemcheckbox"], [role="menuitemradio"], [role="menuitem"]';
+const TIP = "button.info-tip";
 
 const THEMES: readonly Theme[] = ["system", "dark", "light"];
 
 const PM_RULES: readonly PmRule[] = ["everyone", "friendsOnly", "nobody"];
+
+/** The switches inside the collapsible Beta group. */
+const BETA_COUNT = 3;
 
 const ICON = {
   link: "M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1",
@@ -86,6 +74,19 @@ function Glyph({ d }: { d: string }) {
   );
 }
 
+/** A named block of rows, so screen readers hear which group a row belongs to. */
+function Section({ title, children }: { title: string; children: ReactNode }) {
+  const id = useId();
+  return (
+    <div className="quick-settings__section" role="group" aria-labelledby={id}>
+      <div id={id} className="quick-settings__group-title">
+        {title}
+      </div>
+      {children}
+    </div>
+  );
+}
+
 export interface QuickSettingsState {
   /** Viewport position of the pointer (or of the button for keyboard use). */
   x: number;
@@ -104,6 +105,16 @@ export interface QuickSettingsAccount {
   onRegister: () => void;
 }
 
+interface Choice {
+  value: string;
+  label: string;
+  checked: boolean;
+  /** SVG path drawn before the label, e.g. the three theme modes. */
+  icon?: string;
+  testId?: string;
+  onSelect: () => void;
+}
+
 export function QuickSettings({
   menu,
   account,
@@ -116,11 +127,14 @@ export function QuickSettings({
   onOpenSettings: () => void;
 }) {
   const { t } = useTranslation("userpanel");
+  // The "About …" wording of the shared "?" buttons is translated once, in the connection bundle.
+  const { t: tc } = useTranslation("connection");
   const { settings, update } = useSettings();
   const dnd = useDnd();
   const [supported, setSupported] = useState(true);
   const [gamingSupported, setGamingSupported] = useState(true);
-  const [betaOpen, setBetaOpen] = useState(readBetaOpen);
+  // The Beta group starts collapsed on every open; the state lives only while the menu is open.
+  const [betaOpen, setBetaOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
   const titleId = useId();
   const betaId = useId();
@@ -130,6 +144,8 @@ export function QuickSettings({
     onClose();
     if (returnFocus && menu.opener?.isConnected) menu.opener.focus();
   };
+
+  const about = (topic: string) => tc("about", { label: topic });
 
   useEffect(() => {
     let active = true;
@@ -190,40 +206,60 @@ export function QuickSettings({
   }, [ready]);
 
   function onKeyDown(event: KeyboardEvent<HTMLDivElement>) {
-    const items = [...(ref.current?.querySelectorAll<HTMLElement>(ITEM) ?? [])];
-    const index = items.findIndex((item) => item === document.activeElement);
-    const focusAt = (next: number) => {
-      items[(next + items.length) % items.length]?.focus();
+    const root = ref.current;
+    if (root === null) return;
+    const rows = [...root.querySelectorAll<HTMLElement>(ROW)];
+    const itemOf = (row: HTMLElement | null) =>
+      row === null ? null : row.matches(ITEM) ? row : row.querySelector<HTMLElement>(ITEM);
+    const active = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+    const row = active?.closest<HTMLElement>(ROW) ?? null;
+    const index = row === null ? -1 : rows.indexOf(row);
+    const focusRow = (next: number) => {
+      itemOf(rows[(next + rows.length) % rows.length] ?? null)?.focus();
     };
+    const onTip = active?.matches(TIP) === true;
     switch (event.key) {
       case "ArrowDown":
-        focusAt(index + 1);
+        focusRow(index + 1);
         break;
       case "ArrowUp":
-        focusAt(index - 1);
+        focusRow(index - 1);
         break;
       case "Home":
-        focusAt(0);
+        focusRow(0);
         break;
       case "End":
-        focusAt(items.length - 1);
+        focusRow(rows.length - 1);
         break;
       case "ArrowRight":
       case "ArrowLeft": {
+        if (onTip) {
+          // Left returns to the row; there is nothing further right than a tip.
+          if (event.key === "ArrowLeft") itemOf(row)?.focus();
+          else return;
+          break;
+        }
         // Inside a segmented control the horizontal arrows step through its own options.
-        const current = items[index];
-        if (current?.getAttribute("role") !== "menuitemradio") return;
-        const radios = items.filter(
-          (item) =>
-            item.getAttribute("role") === "menuitemradio" &&
-            item.parentElement === current.parentElement,
-        );
-        const at = radios.indexOf(current);
-        const step = event.key === "ArrowRight" ? 1 : -1;
-        radios[(at + step + radios.length) % radios.length]?.focus();
+        if (active?.getAttribute("role") === "menuitemradio") {
+          const radios = [
+            ...(active.parentElement?.querySelectorAll<HTMLElement>('[role="menuitemradio"]') ??
+              []),
+          ];
+          const at = radios.indexOf(active);
+          const step = event.key === "ArrowRight" ? 1 : -1;
+          radios[(at + step + radios.length) % radios.length]?.focus();
+          break;
+        }
+        // Right moves from a row to its "?" button.
+        if (event.key === "ArrowRight") row?.querySelector<HTMLElement>(TIP)?.focus();
+        else return;
         break;
       }
       case "Escape":
+        // The shared tooltip closes first (TooltipLayer); Escape again closes the popover.
+        if (document.querySelector('[role="tooltip"]') !== null) return;
+        close(true);
+        break;
       case "Tab":
         close(true);
         break;
@@ -234,61 +270,89 @@ export function QuickSettings({
     event.stopPropagation();
   }
 
-  const row = (
+  const switchRow = (
     icon: string,
     label: string,
-    hint: string,
+    tip: string,
     checked: boolean,
     onToggle: () => void,
     disabled = false,
   ): ReactNode => (
-    <button
-      type="button"
-      role="menuitemcheckbox"
-      aria-checked={checked}
-      aria-disabled={disabled || undefined}
-      tabIndex={-1}
-      className="quick-settings__row"
-      onClick={disabled ? undefined : onToggle}
-    >
-      <Glyph d={icon} />
-      <span className="quick-settings__text">
+    <div className="quick-settings__row">
+      <button
+        type="button"
+        role="menuitemcheckbox"
+        aria-checked={checked}
+        aria-disabled={disabled || undefined}
+        tabIndex={-1}
+        className="quick-settings__item"
+        onClick={disabled ? undefined : onToggle}
+      >
+        <Glyph d={icon} />
         <span className="quick-settings__label">{label}</span>
-        <span className="quick-settings__hint">{hint}</span>
-      </span>
+      </button>
+      <InfoTip label={about(label)} text={tip} tabIndex={-1} role="menuitem" placement="bottom" />
       <span className="quick-settings__switch" aria-hidden="true" />
-    </button>
+    </div>
   );
 
-  const action = (
+  const actionRow = (
     icon: string,
     label: string,
-    hint: string,
+    tip: string,
     onActivate: () => void,
     disabled = false,
   ): ReactNode => (
-    <button
-      type="button"
-      role="menuitem"
-      aria-disabled={disabled || undefined}
-      tabIndex={-1}
-      className="quick-settings__row"
-      onClick={
-        disabled
-          ? undefined
-          : () => {
-              onClose();
-              onActivate();
-            }
-      }
-    >
-      <Glyph d={icon} />
-      <span className="quick-settings__text">
+    <div className="quick-settings__row">
+      <button
+        type="button"
+        role="menuitem"
+        aria-disabled={disabled || undefined}
+        tabIndex={-1}
+        className="quick-settings__item"
+        onClick={
+          disabled
+            ? undefined
+            : () => {
+                onClose();
+                onActivate();
+              }
+        }
+      >
+        <Glyph d={icon} />
         <span className="quick-settings__label">{label}</span>
-        <span className="quick-settings__hint">{hint}</span>
-      </span>
-      {disabled ? null : <Glyph d={ICON.chevron} />}
-    </button>
+      </button>
+      <InfoTip label={about(label)} text={tip} tabIndex={-1} role="menuitem" placement="bottom" />
+      {disabled ? null : (
+        <span className="quick-settings__end">
+          <Glyph d={ICON.chevron} />
+        </span>
+      )}
+    </div>
+  );
+
+  // A segmented control is one focus stop; its options are reached with the horizontal arrows.
+  const choiceRow = (label: string, choices: readonly Choice[]): ReactNode => (
+    <div className="quick-settings__row">
+      <span className="quick-settings__label">{label}</span>
+      <div role="group" aria-label={label} className="quick-settings__segments">
+        {choices.map((choice) => (
+          <button
+            key={choice.value}
+            type="button"
+            role="menuitemradio"
+            aria-checked={choice.checked}
+            tabIndex={-1}
+            className="quick-settings__segment"
+            data-testid={choice.testId}
+            onClick={choice.onSelect}
+          >
+            {choice.icon === undefined ? null : <Glyph d={choice.icon} />}
+            {choice.label}
+          </button>
+        ))}
+      </div>
+    </div>
   );
 
   const registerHint = t("quickSettings.registerHint");
@@ -307,46 +371,103 @@ export function QuickSettings({
       </div>
       {settings && dnd.state ? (
         <>
-          {row(
-            ICON.dark,
-            t("quickSettings.dnd"),
-            dndSource(dnd.state) === "system"
-              ? t("quickSettings.dndSystemHint")
-              : t("quickSettings.dndHint"),
-            dnd.state.manual,
-            () => {
-              dnd.setManual(!dnd.state?.manual);
-            },
-          )}
-          {row(
-            ICON.link,
-            t("quickSettings.linkPreviews"),
-            t("quickSettings.linkPreviewsHint"),
-            settings.linkPreviews,
-            () => {
-              update({ linkPreviews: !settings.linkPreviews });
-            },
-          )}
-          {row(
-            ICON.music,
-            t("quickSettings.nowPlaying"),
-            supported ? t("quickSettings.nowPlayingHint") : t("quickSettings.unsupported"),
-            supported && settings.nowPlaying,
-            () => {
-              update({ nowPlaying: !settings.nowPlaying });
-            },
-            !supported,
-          )}
-          {row(
-            ICON.game,
-            t("quickSettings.nowGaming"),
-            gamingSupported ? t("quickSettings.nowGamingHint") : t("quickSettings.unavailable"),
-            gamingSupported && settings.nowGaming,
-            () => {
-              update({ nowGaming: !settings.nowGaming });
-            },
-            !gamingSupported,
-          )}
+          <Section title={t("quickSettings.notifications")}>
+            {switchRow(
+              ICON.dark,
+              t("quickSettings.dnd"),
+              dndSource(dnd.state) === "system"
+                ? t("quickSettings.dndSystemHint")
+                : t("quickSettings.dndHint"),
+              dnd.state.manual,
+              () => {
+                dnd.setManual(!dnd.state?.manual);
+              },
+            )}
+            {choiceRow(
+              t("quickSettings.privateMessages"),
+              PM_RULES.map((rule) => ({
+                value: rule,
+                label: t(`quickSettings.pm_${rule}`),
+                checked: settings.privateMessages.rule === rule,
+                testId: `quick-pm-${rule}`,
+                onSelect: () => {
+                  update({ privateMessages: { ...settings.privateMessages, rule } });
+                },
+              })),
+            )}
+          </Section>
+          <Section title={t("quickSettings.sharing")}>
+            {switchRow(
+              ICON.link,
+              t("quickSettings.linkPreviews"),
+              t("quickSettings.linkPreviewsHint"),
+              settings.linkPreviews,
+              () => {
+                update({ linkPreviews: !settings.linkPreviews });
+              },
+            )}
+            {switchRow(
+              ICON.music,
+              t("quickSettings.nowPlaying"),
+              supported ? t("quickSettings.nowPlayingHint") : t("quickSettings.unsupported"),
+              supported && settings.nowPlaying,
+              () => {
+                update({ nowPlaying: !settings.nowPlaying });
+              },
+              !supported,
+            )}
+            {switchRow(
+              ICON.game,
+              t("quickSettings.nowGaming"),
+              gamingSupported ? t("quickSettings.nowGamingHint") : t("quickSettings.unavailable"),
+              gamingSupported && settings.nowGaming,
+              () => {
+                update({ nowGaming: !settings.nowGaming });
+              },
+              !gamingSupported,
+            )}
+          </Section>
+          <Section title={t("quickSettings.appearance")}>
+            {choiceRow(
+              t("quickSettings.theme"),
+              THEMES.map((theme) => ({
+                value: theme,
+                label: t(`quickSettings.theme_${theme}`),
+                icon: ICON[theme],
+                checked: settings.theme === theme,
+                onSelect: () => {
+                  update({ theme });
+                },
+              })),
+            )}
+          </Section>
+          {account.connected ? (
+            <Section title={t("quickSettings.account")}>
+              {actionRow(
+                ICON.profile,
+                t("quickSettings.editProfile"),
+                t("quickSettings.editProfileHint"),
+                account.onEditProfile,
+              )}
+              {account.canRegister
+                ? actionRow(
+                    ICON.register,
+                    t("quickSettings.register"),
+                    registerHint,
+                    account.onRegister,
+                  )
+                : null}
+              {account.registered
+                ? actionRow(
+                    ICON.register,
+                    t("quickSettings.registered"),
+                    registerHint,
+                    account.onRegister,
+                    true,
+                  )
+                : null}
+            </Section>
+          ) : null}
           <button
             type="button"
             role="menuitem"
@@ -355,122 +476,57 @@ export function QuickSettings({
             tabIndex={-1}
             className="quick-settings__row quick-settings__group"
             onClick={() => {
-              const next = !betaOpen;
-              setBetaOpen(next);
-              writeBetaOpen(next);
+              setBetaOpen(!betaOpen);
             }}
           >
             <span className="quick-settings__chevron" aria-hidden="true">
               <Glyph d={ICON.chevron} />
             </span>
             <span className="quick-settings__label">{t("beta", { ns: "common" })}</span>
+            <span className="quick-settings__count" aria-hidden="true">
+              {BETA_COUNT}
+            </span>
           </button>
           {betaOpen && (
             <div id={betaId} role="group" aria-label={t("beta", { ns: "common" })}>
-              {row(
-                ICON.positional,
-                t("quickSettings.positional"),
-                t("quickSettings.positionalHint"),
-                settings.positional.enabled,
-                () => {
-                  update({
-                    positional: { ...settings.positional, enabled: !settings.positional.enabled },
-                  });
-                },
-              )}
-              {row(
-                ICON.image,
-                t("quickSettings.offerImages"),
-                t("quickSettings.offerImagesHint"),
-                settings.offerFullImages,
-                () => {
-                  update({ offerFullImages: !settings.offerFullImages });
-                },
-              )}
-              {row(
-                ICON.image,
-                t("quickSettings.loadImages"),
-                t("quickSettings.loadImagesHint"),
-                settings.loadFullImages,
-                () => {
-                  update({ loadFullImages: !settings.loadFullImages });
-                },
-              )}
+              <div className="quick-settings__beta">
+                {switchRow(
+                  ICON.positional,
+                  t("quickSettings.positional"),
+                  t("quickSettings.positionalHint"),
+                  settings.positional.enabled,
+                  () => {
+                    update({
+                      positional: { ...settings.positional, enabled: !settings.positional.enabled },
+                    });
+                  },
+                )}
+                {switchRow(
+                  ICON.image,
+                  t("quickSettings.offerImages"),
+                  t("quickSettings.offerImagesHint"),
+                  settings.offerFullImages,
+                  () => {
+                    update({ offerFullImages: !settings.offerFullImages });
+                  },
+                )}
+                {switchRow(
+                  ICON.image,
+                  t("quickSettings.loadImages"),
+                  t("quickSettings.loadImagesHint"),
+                  settings.loadFullImages,
+                  () => {
+                    update({ loadFullImages: !settings.loadFullImages });
+                  },
+                )}
+              </div>
             </div>
           )}
-          <div className="quick-settings__theme">
-            <span className="quick-settings__label">{t("quickSettings.theme")}</span>
-            <div
-              role="group"
-              aria-label={t("quickSettings.theme")}
-              className="quick-settings__segments"
-            >
-              {THEMES.map((theme) => (
-                <button
-                  key={theme}
-                  type="button"
-                  role="menuitemradio"
-                  aria-checked={settings.theme === theme}
-                  tabIndex={-1}
-                  className="quick-settings__segment"
-                  onClick={() => {
-                    update({ theme });
-                  }}
-                >
-                  <Glyph d={ICON[theme]} />
-                  {t(`quickSettings.theme_${theme}`)}
-                </button>
-              ))}
-            </div>
-          </div>
-          <div className="quick-settings__theme">
-            <span className="quick-settings__label">{t("quickSettings.privateMessages")}</span>
-            <div
-              role="group"
-              aria-label={t("quickSettings.privateMessages")}
-              className="quick-settings__segments"
-            >
-              {PM_RULES.map((rule) => (
-                <button
-                  key={rule}
-                  type="button"
-                  role="menuitemradio"
-                  aria-checked={settings.privateMessages.rule === rule}
-                  tabIndex={-1}
-                  className="quick-settings__segment"
-                  data-testid={`quick-pm-${rule}`}
-                  onClick={() => {
-                    update({ privateMessages: { ...settings.privateMessages, rule } });
-                  }}
-                >
-                  {t(`quickSettings.pm_${rule}`)}
-                </button>
-              ))}
-            </div>
-          </div>
-          {account.connected &&
-            action(
-              ICON.profile,
-              t("quickSettings.editProfile"),
-              t("quickSettings.editProfileHint"),
-              account.onEditProfile,
-            )}
-          {account.canRegister &&
-            action(ICON.register, t("quickSettings.register"), registerHint, account.onRegister)}
-          {account.connected &&
-            account.registered &&
-            action(
-              ICON.register,
-              t("quickSettings.registered"),
-              registerHint,
-              account.onRegister,
-              true,
-            )}
           <button
             type="button"
             role="menuitem"
             tabIndex={-1}
-            className="quick-settings__footer"
+            className="quick-settings__row quick-settings__footer"
             onClick={() => {
               onClose();
               onOpenSettings();

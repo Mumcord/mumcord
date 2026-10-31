@@ -42,7 +42,7 @@
   },
   "directConsent": {
     "title": "Zezwolić na połączenia bezpośrednie?",
-    "description": "Połączenia bezpośrednie są szybsze, ale druga osoba może zobaczyć Twój adres IP. Mumcord używa ich do obrazów w pełnym rozmiarze i udostępniania ekranu innym użytkownikom Mumcorda i może w tym celu otworzyć port na Twoim routerze. Jeśli odmówisz, obrazy nadal dotrą przez serwer, a udostępnianie ekranu będzie niedostępne. Możesz to później zmienić w Ustawienia → Prywatność.",
+    "description": "Połączenia bezpośrednie są szybsze, ale druga osoba może zobaczyć Twój adres IP. Mumcord używa ich do obrazów w pełnym rozmiarze i udostępniania ekranu innym użytkownikom Mumcorda i może w tym celu otworzyć port na Twoim routerze. Jeśli odmówisz, obrazy nadal dotrą przez serwer, a udostępnianie ekranu będzie niedostępne. Możesz to później zmienić w Ustawienia → Prywatność. Jeśli ten serwer oferuje przekaźnik, Mumcord może go użyć zamiast tego; wtedy druga osoba nie widzi twojego adresu IP.",
     "no": "Nie",
     "yes": "Tak",
     "failed": "Nie udało się. Spróbuj ponownie."

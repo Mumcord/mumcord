@@ -1,0 +1,54 @@
+{
+  "link": {
+    "label": "Peer-to-peer",
+    "direct": "Direta",
+    "relayUdp": "Via retransmissor (UDP)",
+    "relayTcp": "Via retransmissor (TCP 443)",
+    "ipHidden": "IP oculto",
+    "ipVisible": "IP visível",
+    "ipHiddenHint": "A outra pessoa vê o endereço do retransmissor, não o teu."
+  },
+  "relay": {
+    "mumbot": "Mumbot",
+    "relay": "Retransmissor Mumpeer",
+    "yes": "Sim",
+    "yesNamed": "Sim ({{names}})",
+    "no": "Não",
+    "available": "Disponível",
+    "availableAt": "Disponível · {{host}}",
+    "unavailable": "Indisponível: {{reason}}",
+    "untrusted": "Alterado, sem confiança",
+    "changed": "O retransmissor deste servidor foi alterado.",
+    "trustNew": "Confiar no novo retransmissor",
+    "keepBlocked": "Manter bloqueado",
+    "forget": "Esquecer retransmissor",
+    "actionFailed": "Não funcionou. Tenta novamente."
+  },
+  "reason": {
+    "p2pOff": "O peer-to-peer está desativado.",
+    "noRelay": "Este servidor não tem retransmissor.",
+    "notConnected": "Sem ligação a este servidor.",
+    "untrusted": "O retransmissor deste servidor foi alterado e não é de confiança.",
+    "conflict": "Estão anunciados dois retransmissores neste servidor; nenhum é usado.",
+    "botLeft": "O bot do retransmissor saiu do servidor.",
+    "relayDown": "O retransmissor não está acessível neste momento (indicado pelo bot do retransmissor).",
+    "botNoAnswer": "O bot do retransmissor não respondeu.",
+    "refused": "O retransmissor recusou a ligação: {{reason}}",
+    "unreachable": "Não foi possível contactar o retransmissor por UDP nem por TCP 443.",
+    "peerCannotRelay": "A outra pessoa não pode usar o retransmissor (Mumcord mais antigo ou retransmissor desativado).",
+    "denied": "O bot do retransmissor recusou o pedido.",
+    "peerGone": "A outra pessoa saiu do servidor.",
+    "rateLimited": "Demasiados pedidos ao retransmissor. Tenta novamente dentro de um minuto."
+  },
+  "refusal": {
+    "unknownToken": "token de acesso desconhecido",
+    "expired": "token de acesso expirado",
+    "notAllowed": "não permitido",
+    "botGone": "bot do retransmissor desapareceu",
+    "relayFull": "retransmissor cheio",
+    "peerLimit": "demasiadas ligações",
+    "rateLimited": "demasiadas tentativas",
+    "version": "versão não suportada",
+    "badRequest": "pedido inválido"
+  }
+}

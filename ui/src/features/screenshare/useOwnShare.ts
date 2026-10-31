@@ -3,7 +3,7 @@ import type { ScreenShare } from "../../api";
 import { useServerStateOf, useVoiceServerId } from "../channels";
 import {
   shareBlock,
-  useDirectConsent,
+  useP2pShareBlock,
   useSharePlatform,
   type ShareBlock,
   type SharePlatform,
@@ -16,7 +16,7 @@ export interface OwnShareState {
   own: ScreenShare | null;
   block: ShareBlock | null;
   platform: SharePlatform | null;
-  /** Reads the consent again; resolves with the block that applies now. */
+  /** Asks the engine again; resolves with the block that applies now. */
   recheck: () => Promise<ShareBlock | null>;
 }
 
@@ -25,9 +25,9 @@ export function useOwnShare(): OwnShareState {
   const { connected, selfSession, users } = useServerStateOf(serverId);
   const own = useScreenShareOf(serverId, selfSession);
   const platform = useSharePlatform();
-  const { consent, refresh } = useDirectConsent();
+  const { p2p, refresh } = useP2pShareBlock(serverId);
   const inChannel = connected && selfSession !== null && users.has(selfSession);
-  const block = shareBlock({ inChannel, consent, platform });
-  const recheck = async () => shareBlock({ inChannel, consent: await refresh(), platform });
+  const block = shareBlock({ inChannel, p2p, platform });
+  const recheck = async () => shareBlock({ inChannel, p2p: await refresh(), platform });
   return { serverId, own, block, platform, recheck };
 }

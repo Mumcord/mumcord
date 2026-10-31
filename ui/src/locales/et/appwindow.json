@@ -42,7 +42,7 @@
   },
   "directConsent": {
     "title": "Kas lubada otseühendused?",
-    "description": "Otseühendused on kiiremad, kuid teine inimene näeb sinu IP-aadressi. Mumcord kasutab neid täissuuruses piltide ja ekraani jagamise jaoks teiste Mumcordi kasutajatega ning võib nende jaoks avada pordi sinu ruuteris. Kui ütled ei, jõuavad pildid ikkagi serveri kaudu ja ekraani jagamine pole saadaval. Saad seda hiljem muuta jaotises Seaded → Privaatsus.",
+    "description": "Otseühendused on kiiremad, kuid teine inimene näeb sinu IP-aadressi. Mumcord kasutab neid täissuuruses piltide ja ekraani jagamise jaoks teiste Mumcordi kasutajatega ning võib nende jaoks avada pordi sinu ruuteris. Kui ütled ei, jõuavad pildid ikkagi serveri kaudu ja ekraani jagamine pole saadaval. Saad seda hiljem muuta jaotises Seaded → Privaatsus. Kui see server pakub releeserverit, võib Mumcord seda kasutada; siis ei näe teine inimene sinu IP-aadressi.",
     "no": "Ei",
     "yes": "Jah",
     "failed": "See ei õnnestunud. Proovi uuesti."

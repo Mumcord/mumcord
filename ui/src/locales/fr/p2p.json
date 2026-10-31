@@ -1,0 +1,54 @@
+{
+  "link": {
+    "label": "Pair à pair",
+    "direct": "Directe",
+    "relayUdp": "Via relais (UDP)",
+    "relayTcp": "Via relais (TCP 443)",
+    "ipHidden": "IP masquée",
+    "ipVisible": "IP visible",
+    "ipHiddenHint": "L’autre personne voit l’adresse du relais, pas la vôtre."
+  },
+  "relay": {
+    "mumbot": "Mumbot",
+    "relay": "Relais Mumpeer",
+    "yes": "Oui",
+    "yesNamed": "Oui ({{names}})",
+    "no": "Non",
+    "available": "Disponible",
+    "availableAt": "Disponible · {{host}}",
+    "unavailable": "Indisponible : {{reason}}",
+    "untrusted": "Modifié, non approuvé",
+    "changed": "Le relais de ce serveur a changé.",
+    "trustNew": "Approuver le nouveau relais",
+    "keepBlocked": "Garder bloqué",
+    "forget": "Oublier le relais",
+    "actionFailed": "Cela n’a pas fonctionné. Veuillez réessayer."
+  },
+  "reason": {
+    "p2pOff": "Le pair à pair est désactivé.",
+    "noRelay": "Ce serveur n’a pas de relais.",
+    "notConnected": "Non connecté à ce serveur.",
+    "untrusted": "Le relais de ce serveur a changé et n’est pas approuvé.",
+    "conflict": "Deux relais sont annoncés sur ce serveur ; aucun n’est utilisé.",
+    "botLeft": "Le bot du relais a quitté le serveur.",
+    "relayDown": "Le relais est injoignable pour le moment (signalé par le bot du relais).",
+    "botNoAnswer": "Le bot du relais n’a pas répondu.",
+    "refused": "Le relais a refusé la connexion : {{reason}}",
+    "unreachable": "Le relais est injoignable en UDP comme en TCP 443.",
+    "peerCannotRelay": "L’autre personne ne peut pas utiliser le relais (Mumcord plus ancien ou relais désactivé).",
+    "denied": "Le bot du relais a refusé la demande.",
+    "peerGone": "L’autre personne a quitté le serveur.",
+    "rateLimited": "Trop de demandes de relais. Réessayez dans une minute."
+  },
+  "refusal": {
+    "unknownToken": "jeton d’accès inconnu",
+    "expired": "jeton d’accès expiré",
+    "notAllowed": "non autorisé",
+    "botGone": "bot du relais absent",
+    "relayFull": "relais saturé",
+    "peerLimit": "trop de connexions",
+    "rateLimited": "trop de tentatives",
+    "version": "version non prise en charge",
+    "badRequest": "demande invalide"
+  }
+}

@@ -25,6 +25,7 @@ export const PLUGIN_KINDS: Readonly<Record<string, string>> = {
   "mumcord.nowgaming": "nowgaming",
   "mumcord.nowplaying": "nowplaying",
   "mumcord.p2p": "p2p",
+  "mumcord.peer": "peer",
   "mumcord.screen": "screen",
   "mumcord.watch": "watch",
 };

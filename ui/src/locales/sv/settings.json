@@ -555,10 +555,26 @@
     "weakConnection": "Visa ikon för svag anslutning",
     "weakConnectionHint": "En liten signalikon bredvid personer med dålig anslutning."
   },
+  "p2p": {
+    "title": "Peer-to-peer (skärmdelning, bilder i full storlek)",
+    "modeLabel": "Peer-to-peer-läge",
+    "recommended": "Rekommenderas",
+    "explanation": "Direkt visar din IP-adress för den andra personen. Reläet döljer den för dem; reläets operatör (den här serverns community) kan se den. Båda är end-to-end-krypterade.",
+    "useGlobal": "Använd global inställning",
+    "overrideHint": "Endast för den här servern. ”Använd global inställning” följer Inställningar → Integritet.",
+    "mode": {
+      "directRelay": "Direkt + relä (direkt först)",
+      "relayFirst": "Direkt + relä (alltid relä, döljer min IP)",
+      "directOnly": "Endast direkt",
+      "relayOnly": "Endast relä",
+      "off": "Av"
+    }
+  },
   "privacyDirect": {
     "title": "Direktanslutningar",
     "allow": "Tillåt direktanslutningar till andra Mumcord-användare",
-    "hint": "Direktanslutningar är snabbare, men den andra personen kan se din IP-adress. Tills du bestämmer dig frågar Mumcord första gången en skulle användas."
+    "hint": "Direktanslutningar är snabbare, men den andra personen kan se din IP-adress. Tills du bestämmer dig frågar Mumcord första gången en skulle användas.",
+    "notUsed": "Används inte i det valda peer-to-peer-läget: Mumcord ansluter aldrig direkt till andra."
   },
   "updates": {
     "title": "Uppdateringar",
@@ -644,7 +660,8 @@
       "screen": "Signal för skärmdelning",
       "watch": "Status för tittarkväll",
       "plugin": "Plugindata",
-      "mumble": "Mumble-meddelande"
+      "mumble": "Mumble-meddelande",
+      "peer": "Reläinställning"
     }
   },
   "licences": {

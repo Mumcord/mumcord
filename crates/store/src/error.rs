@@ -38,6 +38,8 @@ pub enum Error {
     InvalidVolume(u16),
     #[error("port 0 is not valid")]
     InvalidPort,
+    #[error("relay pin needs a 40-digit hex bot hash and a 64-digit hex relay fingerprint")]
+    InvalidRelayPin,
     #[error("server {0} does not exist")]
     UnknownServer(i64),
 }

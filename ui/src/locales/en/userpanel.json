@@ -97,10 +97,14 @@
     "dnd": "Do Not Disturb",
     "dndHint": "Silences notification sounds and banners",
     "dndSystemHint": "On through your desktop's Do Not Disturb",
-    "privateMessages": "Private messages from",
+    "privateMessages": "Messages from",
     "pm_everyone": "Everyone",
     "pm_friendsOnly": "Friends",
-    "pm_nobody": "Nobody"
+    "pm_nobody": "Nobody",
+    "notifications": "Notifications",
+    "sharing": "Sharing",
+    "appearance": "Appearance",
+    "account": "Account"
   },
   "voice": {
     "line": "Voice: {{channel}} · {{server}}",

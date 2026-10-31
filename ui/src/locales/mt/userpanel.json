@@ -97,10 +97,14 @@
     "dnd": "Tiddisturbax",
     "dndHint": "Isikket il-ħsejjes u l-banners tan-notifiki",
     "dndSystemHint": "Mixgħul permezz ta' Tiddisturbax tad-desktop tiegħek",
-    "privateMessages": "Messaġġi privati minn",
+    "privateMessages": "Messaġġi minn",
     "pm_everyone": "Kulħadd",
     "pm_friendsOnly": "Ħbieb",
-    "pm_nobody": "Ħadd"
+    "pm_nobody": "Ħadd",
+    "notifications": "Notifiki",
+    "sharing": "Qsim",
+    "appearance": "Dehra",
+    "account": "Kont"
   },
   "voice": {
     "line": "Vuċi: {{channel}} · {{server}}",

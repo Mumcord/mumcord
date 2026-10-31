@@ -8,6 +8,8 @@ describe("watch failure reasons", () => {
     ["directUnavailable", "noDirectPath", "unreachable"],
     ["directUnavailable", "peerUnsupported", "tooOld"],
     ["directUnavailable", "consentOff", "consentOff"],
+    ["directUnavailable", "p2pOff", "p2pOff"],
+    ["directUnavailable", "relayUnavailable", "relayUnavailable"],
     ["notFound", "the sharer did not answer", "unreachable"],
     ["notConnected", "not connected", "failed"],
     ["internal", "boom", "failed"],

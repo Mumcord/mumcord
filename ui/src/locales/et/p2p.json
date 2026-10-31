@@ -1,0 +1,54 @@
+{
+  "link": {
+    "label": "Peer-to-peer",
+    "direct": "Otse",
+    "relayUdp": "Releeserveri kaudu (UDP)",
+    "relayTcp": "Releeserveri kaudu (TCP 443)",
+    "ipHidden": "IP peidetud",
+    "ipVisible": "IP nähtav",
+    "ipHiddenHint": "Teine inimene näeb releeserveri aadressi, mitte sinu oma."
+  },
+  "relay": {
+    "mumbot": "Mumbot",
+    "relay": "Mumpeeri releeserver",
+    "yes": "Jah",
+    "yesNamed": "Jah ({{names}})",
+    "no": "Ei",
+    "available": "Saadaval",
+    "availableAt": "Saadaval · {{host}}",
+    "unavailable": "Pole saadaval: {{reason}}",
+    "untrusted": "Muutunud, ei usaldata",
+    "changed": "Selle serveri releeserver on muutunud.",
+    "trustNew": "Usalda uut releeserverit",
+    "keepBlocked": "Hoia blokeerituna",
+    "forget": "Unusta releeserver",
+    "actionFailed": "See ei õnnestunud. Proovi uuesti."
+  },
+  "reason": {
+    "p2pOff": "Peer-to-peer on välja lülitatud.",
+    "noRelay": "Sellel serveril pole releeserverit.",
+    "notConnected": "Selle serveriga pole ühendatud.",
+    "untrusted": "Selle serveri releeserver on muutunud ja seda ei usaldata.",
+    "conflict": "Sellel serveril on teatatud kaks releeserverit; ühtegi ei kasutata.",
+    "botLeft": "Releebot lahkus serverist.",
+    "relayDown": "Releeserver pole praegu kättesaadav (teatas releebot).",
+    "botNoAnswer": "Releebot ei vastanud.",
+    "refused": "Releeserver keeldus ühendusest: {{reason}}",
+    "unreachable": "Releeserverit ei saanud kätte ei UDP ega TCP 443 kaudu.",
+    "peerCannotRelay": "Teine inimene ei saa releeserverit kasutada (vanem Mumcord või releeserver välja lülitatud).",
+    "denied": "Releebot keeldus päringust.",
+    "peerGone": "Teine inimene lahkus serverist.",
+    "rateLimited": "Liiga palju releepäringuid. Proovi minuti pärast uuesti."
+  },
+  "refusal": {
+    "unknownToken": "tundmatu pääsutõend",
+    "expired": "pääsutõend aegus",
+    "notAllowed": "pole lubatud",
+    "botGone": "releebot on kadunud",
+    "relayFull": "releeserver on täis",
+    "peerLimit": "liiga palju ühendusi",
+    "rateLimited": "liiga palju katseid",
+    "version": "toetamata versioon",
+    "badRequest": "vigane päring"
+  }
+}

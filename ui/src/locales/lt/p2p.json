@@ -1,0 +1,54 @@
+{
+  "link": {
+    "label": "Peer-to-peer",
+    "direct": "Tiesiogiai",
+    "relayUdp": "Per perdavimo mazgą (UDP)",
+    "relayTcp": "Per perdavimo mazgą (TCP 443)",
+    "ipHidden": "IP paslėptas",
+    "ipVisible": "IP matomas",
+    "ipHiddenHint": "Kitas asmuo mato perdavimo mazgo adresą, o ne tavo."
+  },
+  "relay": {
+    "mumbot": "Mumbot",
+    "relay": "Mumpeer perdavimo mazgas",
+    "yes": "Taip",
+    "yesNamed": "Taip ({{names}})",
+    "no": "Ne",
+    "available": "Pasiekiamas",
+    "availableAt": "Pasiekiamas · {{host}}",
+    "unavailable": "Nepasiekiamas: {{reason}}",
+    "untrusted": "Pasikeitė, nepatikimas",
+    "changed": "Šio serverio perdavimo mazgas pasikeitė.",
+    "trustNew": "Pasitikėti nauju perdavimo mazgu",
+    "keepBlocked": "Palikti užblokuotą",
+    "forget": "Pamiršti perdavimo mazgą",
+    "actionFailed": "Nepavyko. Bandyk dar kartą."
+  },
+  "reason": {
+    "p2pOff": "Peer-to-peer išjungtas.",
+    "noRelay": "Šis serveris neturi perdavimo mazgo.",
+    "notConnected": "Neprisijungta prie šio serverio.",
+    "untrusted": "Šio serverio perdavimo mazgas pasikeitė ir juo nepasitikima.",
+    "conflict": "Šiame serveryje paskelbti du perdavimo mazgai; nė vienas nenaudojamas.",
+    "botLeft": "Perdavimo mazgo botas paliko serverį.",
+    "relayDown": "Perdavimo mazgas šiuo metu nepasiekiamas (pranešė perdavimo mazgo botas).",
+    "botNoAnswer": "Perdavimo mazgo botas neatsakė.",
+    "refused": "Perdavimo mazgas atmetė ryšį: {{reason}}",
+    "unreachable": "Perdavimo mazgo nepavyko pasiekti nei per UDP, nei per TCP 443.",
+    "peerCannotRelay": "Kitas asmuo negali naudoti perdavimo mazgo (senesnis Mumcord arba perdavimo mazgas išjungtas).",
+    "denied": "Perdavimo mazgo botas atmetė užklausą.",
+    "peerGone": "Kitas asmuo paliko serverį.",
+    "rateLimited": "Per daug perdavimo mazgo užklausų. Bandyk dar kartą po minutės."
+  },
+  "refusal": {
+    "unknownToken": "nežinomas prieigos raktas",
+    "expired": "prieigos rakto galiojimas baigėsi",
+    "notAllowed": "neleidžiama",
+    "botGone": "perdavimo mazgo botas dingo",
+    "relayFull": "perdavimo mazgas pilnas",
+    "peerLimit": "per daug ryšių",
+    "rateLimited": "per daug bandymų",
+    "version": "nepalaikoma versija",
+    "badRequest": "netinkama užklausa"
+  }
+}

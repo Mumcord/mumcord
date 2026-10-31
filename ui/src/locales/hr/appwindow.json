@@ -42,7 +42,7 @@
   },
   "directConsent": {
     "title": "Dopustiti izravne veze?",
-    "description": "Izravne veze su brže, ali druga osoba može vidjeti vašu IP adresu. Mumcord ih koristi za slike pune veličine i dijeljenje zaslona s drugim korisnicima Mumcorda te za njih može otvoriti port na vašem usmjerivaču. Ako odbijete, slike i dalje stižu preko poslužitelja, a dijeljenje zaslona nije dostupno. To možete promijeniti kasnije u Postavke → Privatnost.",
+    "description": "Izravne veze su brže, ali druga osoba može vidjeti vašu IP adresu. Mumcord ih koristi za slike pune veličine i dijeljenje zaslona s drugim korisnicima Mumcorda te za njih može otvoriti port na vašem usmjerivaču. Ako odbijete, slike i dalje stižu preko poslužitelja, a dijeljenje zaslona nije dostupno. To možete promijeniti kasnije u Postavke → Privatnost. Ako ovaj poslužitelj nudi relej, Mumcord ga može koristiti umjesto toga; tada druga osoba ne vidi tvoju IP adresu.",
     "no": "Ne",
     "yes": "Da",
     "failed": "Nije uspjelo. Pokušaj ponovno."

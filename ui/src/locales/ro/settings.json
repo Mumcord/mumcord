@@ -557,10 +557,26 @@
     "weakConnection": "Arată pictograma de conexiune slabă",
     "weakConnectionHint": "O mică pictogramă de semnal lângă persoanele cu conexiune slabă."
   },
+  "p2p": {
+    "title": "Peer-to-peer (partajarea ecranului, imagini la dimensiune completă)",
+    "modeLabel": "Mod peer-to-peer",
+    "recommended": "Recomandat",
+    "explanation": "Direct îi arată celeilalte persoane adresa ta IP. Releul o ascunde de ea; operatorul releului (comunitatea acestui server) o poate vedea. Ambele sunt criptate end-to-end.",
+    "useGlobal": "Folosește setarea globală",
+    "overrideHint": "Doar pentru acest server. „Folosește setarea globală” urmează Setări → Confidențialitate.",
+    "mode": {
+      "directRelay": "Direct + releu (întâi direct)",
+      "relayFirst": "Direct + releu (mereu releu, îmi ascunde IP-ul)",
+      "directOnly": "Doar direct",
+      "relayOnly": "Doar releu",
+      "off": "Dezactivat"
+    }
+  },
   "privacyDirect": {
     "title": "Conexiuni directe",
     "allow": "Permite conexiuni directe cu alți utilizatori Mumcord",
-    "hint": "Conexiunile directe sunt mai rapide, dar cealaltă persoană îți poate vedea adresa IP. Până decizi, Mumcord întreabă prima dată când ar fi folosită una."
+    "hint": "Conexiunile directe sunt mai rapide, dar cealaltă persoană îți poate vedea adresa IP. Până decizi, Mumcord întreabă prima dată când ar fi folosită una.",
+    "notUsed": "Nu se folosește în modul peer-to-peer ales: Mumcord nu se conectează niciodată direct la alte persoane."
   },
   "updates": {
     "title": "Actualizări",
@@ -647,7 +663,8 @@
       "screen": "Semnal de partajare a ecranului",
       "watch": "Starea sesiunii de vizionare",
       "plugin": "Date plugin",
-      "mumble": "Mesaj Mumble"
+      "mumble": "Mesaj Mumble",
+      "peer": "Configurarea releului"
     }
   },
   "licences": {

@@ -1,0 +1,54 @@
+{
+  "link": {
+    "label": "Peer-to-peer",
+    "direct": "Direct",
+    "relayUdp": "Via relay (UDP)",
+    "relayTcp": "Via relay (TCP 443)",
+    "ipHidden": "IP hidden",
+    "ipVisible": "IP visible",
+    "ipHiddenHint": "The other person sees the relay's address, not yours."
+  },
+  "relay": {
+    "mumbot": "Mumbot",
+    "relay": "Mumpeer relay",
+    "yes": "Yes",
+    "yesNamed": "Yes ({{names}})",
+    "no": "No",
+    "available": "Available",
+    "availableAt": "Available · {{host}}",
+    "unavailable": "Unavailable: {{reason}}",
+    "untrusted": "Changed, not trusted",
+    "changed": "The relay of this server changed.",
+    "trustNew": "Trust new relay",
+    "keepBlocked": "Keep blocked",
+    "forget": "Forget relay",
+    "actionFailed": "That did not work. Please try again."
+  },
+  "reason": {
+    "p2pOff": "Peer-to-peer is off.",
+    "noRelay": "This server has no relay.",
+    "notConnected": "Not connected to this server.",
+    "untrusted": "The relay of this server changed and is not trusted.",
+    "conflict": "Two relays are announced on this server; none is used.",
+    "botLeft": "The relay bot left the server.",
+    "relayDown": "The relay is not reachable right now (reported by the relay bot).",
+    "botNoAnswer": "The relay bot did not answer.",
+    "refused": "The relay refused the connection: {{reason}}",
+    "unreachable": "The relay could not be reached over UDP or TCP 443.",
+    "peerCannotRelay": "The other person can't use the relay (older Mumcord or relay turned off).",
+    "denied": "The relay bot refused the request.",
+    "peerGone": "The other person left the server.",
+    "rateLimited": "Too many relay requests. Try again in a minute."
+  },
+  "refusal": {
+    "unknownToken": "unknown access token",
+    "expired": "access token expired",
+    "notAllowed": "not allowed",
+    "botGone": "relay bot gone",
+    "relayFull": "relay full",
+    "peerLimit": "too many connections",
+    "rateLimited": "too many attempts",
+    "version": "unsupported version",
+    "badRequest": "invalid request"
+  }
+}

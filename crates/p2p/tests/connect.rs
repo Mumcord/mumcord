@@ -3,7 +3,9 @@
 
 use std::time::{Duration, Instant};
 
-use mumcord_p2p::{DeclineReason, P2p, P2pConfig, P2pError, SessionId, Signal, SignalError};
+use mumcord_p2p::{
+    DeclineReason, P2p, P2pConfig, P2pError, Reveal, SessionId, Signal, SignalError,
+};
 use mumcord_protocol::pki_types::{CertificateDer, PrivateKeyDer, PrivatePkcs8KeyDer};
 use mumcord_protocol::{ClientIdentity, cert_hash};
 
@@ -126,6 +128,7 @@ async fn unreachable_peer_gives_no_direct_path_in_time() {
     let reply = Signal::Answer {
         session: offer.signal().session(),
         candidates: vec!["192.0.2.1:9".parse().expect("addr")],
+        relay: false,
     };
     let started = Instant::now();
     let result = offer.complete(&reply).await;
@@ -158,6 +161,7 @@ async fn decline_and_foreign_replies_end_the_attempt() {
     let other_session = Signal::Answer {
         session: SessionId(offer.signal().session().0.wrapping_add(1)),
         candidates: vec![],
+        relay: false,
     };
     let result = offer.complete(&other_session).await;
     assert!(matches!(
@@ -168,12 +172,49 @@ async fn decline_and_foreign_replies_end_the_attempt() {
     let not_an_offer = Signal::Answer {
         session: SessionId(1),
         candidates: vec![],
+        relay: false,
     };
     let result = node.answer(&not_an_offer, &bob_hash).await;
     assert!(matches!(
         result,
         Err(P2pError::BadSignal(SignalError::Unexpected))
     ));
+}
+
+#[tokio::test]
+async fn hidden_offer_and_answer_send_no_addresses_and_have_no_direct_path() {
+    let (alice, alice_hash) = identity();
+    let (bob, bob_hash) = identity();
+    let hidden = Reveal {
+        direct: false,
+        relay: true,
+    };
+
+    let offer = p2p(&alice)
+        .offer_with(&bob_hash, hidden)
+        .await
+        .expect("offer");
+    let sent = carry(offer.signal());
+    assert!(matches!(
+        &sent,
+        Signal::Offer { candidates, relay: true, .. } if candidates.is_empty()
+    ));
+
+    let answer = p2p(&bob)
+        .answer_with(&sent, &alice_hash, hidden)
+        .await
+        .expect("answer");
+    let reply = carry(answer.signal());
+    assert!(matches!(
+        &reply,
+        Signal::Answer { candidates, relay: true, .. } if candidates.is_empty()
+    ));
+
+    let started = Instant::now();
+    let (a, b) = tokio::join!(offer.complete(&reply), answer.connect());
+    assert!(matches!(a, Err(P2pError::NoDirectPath)));
+    assert!(matches!(b, Err(P2pError::NoDirectPath)));
+    assert!(started.elapsed() < TIMEOUT, "no waiting without addresses");
 }
 
 #[tokio::test]

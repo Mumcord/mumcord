@@ -5,6 +5,7 @@ import {
   getApi,
   type Identity,
   type MumbleImportFound,
+  type P2pMode,
   type PttAvailability,
   type PttMouseStatus,
   type Settings,
@@ -122,6 +123,8 @@ export function Wizard({ mode = "firstStart", onClose, onManageIdentities }: Wiz
   // Saved settings plus the rerun's not yet saved devices (#149).
   const [draft, setDraft] = useState<Settings | null>(null);
   const [updateCheck, setUpdateCheck] = useState(false);
+  // The privacy step's peer-to-peer mode (spec 04, FR-4.1), saved with the final step.
+  const [p2pMode, setP2pMode] = useState<P2pMode>("directRelay");
   // The talk mode step's current choices, for the "would Cancel drop something?" question.
   const [startOptions, setStartOptions] = useState<TalkChoice | null>(null);
   const [cancelAsked, setCancelAsked] = useState(false);
@@ -139,6 +142,7 @@ export function Wizard({ mode = "firstStart", onClose, onManageIdentities }: Wiz
         if (loaded.mumble !== null) setStep(0);
         setDraft(loaded.settings);
         setUpdateCheck(loaded.settings.updateCheck === "yes");
+        setP2pMode(loaded.settings.p2pMode);
       })
       .catch((cause: unknown) => {
         console.error("loading the wizard failed", cause);
@@ -219,6 +223,7 @@ export function Wizard({ mode = "firstStart", onClose, onManageIdentities }: Wiz
       linkPreviews: choice.linkPreviews,
       historySharing: choice.historySharing,
       updateCheck: updateCheck ? "yes" : "no",
+      p2pMode,
       wizardCompleted: true,
     });
     if (choice.autostart !== saved.autostart) {
@@ -251,6 +256,7 @@ export function Wizard({ mode = "firstStart", onClose, onManageIdentities }: Wiz
       inputDevice: settings.inputDevice,
       outputDevice: settings.outputDevice,
       updateCheck: updateCheck ? "yes" : "no",
+      p2pMode,
       talkMode: choice.talkMode,
       pttKey: choice.pttKey,
       linkPreviews: choice.linkPreviews,
@@ -261,6 +267,7 @@ export function Wizard({ mode = "firstStart", onClose, onManageIdentities }: Wiz
       next.inputDevice !== current.inputDevice ||
       next.outputDevice !== current.outputDevice ||
       next.updateCheck !== current.updateCheck ||
+      next.p2pMode !== current.p2pMode ||
       next.talkMode !== current.talkMode ||
       next.pttKey !== current.pttKey ||
       next.linkPreviews !== current.linkPreviews ||
@@ -292,6 +299,7 @@ export function Wizard({ mode = "firstStart", onClose, onManageIdentities }: Wiz
       ? settings.inputDevice !== saved.inputDevice ||
         settings.outputDevice !== saved.outputDevice ||
         updateCheck !== (saved.updateCheck === "yes") ||
+        p2pMode !== saved.p2pMode ||
         (startOptions !== null && startOptionsChanged(startOptions, saved, ingameOverlayOn))
       : false;
     if (pending) {
@@ -332,6 +340,8 @@ export function Wizard({ mode = "firstStart", onClose, onManageIdentities }: Wiz
       <PrivacyStep
         step={number + shift}
         total={total}
+        p2pMode={p2pMode}
+        onP2pModeChange={setP2pMode}
         focusOnMount={focusOnMount}
         onBack={() => {
           goTo(number - 1);

@@ -14,6 +14,7 @@ use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::{Arc, Mutex};
 use std::time::{SystemTime, UNIX_EPOCH};
 
+use mumcord_p2p::PEER_DATA_ID;
 pub use mumcord_protocol::TapDirection;
 use mumcord_protocol::framing::MessageType;
 use mumcord_protocol::{PacketTap, TappedFrame};
@@ -21,6 +22,9 @@ use mumcord_store::ServerId;
 use serde_json::{Value, json};
 
 use crate::session::lock;
+
+/// Field of a `mumcord.peer` token message holding the token.
+const TOKEN_FIELD: &str = "tok";
 
 /// Packets kept; the oldest go first.
 pub const CAPACITY: usize = 2000;
@@ -187,6 +191,19 @@ impl Inspector {
         });
     }
 
+    /// Counts a received plugin-data message the engine dropped, e.g. a relay announcement of
+    /// an unregistered user (FR-4.8), under `"{data_id} (ignored: {reason})"`.
+    pub(crate) fn count_ignored(&self, server_id: ServerId, data_id: &str, reason: &str) {
+        if !self.is_enabled() {
+            return;
+        }
+        let kind = format!("{data_id} (ignored: {reason})");
+        *lock(&self.buffer)
+            .counts
+            .entry((server_id, kind, Direction::Received))
+            .or_default() += 1;
+    }
+
     /// Packets with an id above `after` (all with `None`) plus the counters.
     pub(crate) fn poll(&self, after: Option<u64>, voice: Vec<VoiceCount>) -> InspectorPoll {
         let buffer = lock(&self.buffer);
@@ -258,8 +275,18 @@ fn view(p: &Captured) -> PacketView {
         decoded: data
             .and_then(|d| decode(&d.data_id, &d.data))
             .and_then(|v| serde_json::to_string_pretty(&v).ok()),
-        raw_hex: data.map(|d| hex(&d.data)).unwrap_or_default(),
+        raw_hex: data
+            .filter(|d| !carries_token(&d.data_id, &d.data))
+            .map(|d| hex(&d.data))
+            .unwrap_or_default(),
     }
+}
+
+/// Relay tokens are credentials: their messages show neither the token nor the raw bytes
+/// (FR-4.21).
+fn carries_token(data_id: &str, data: &[u8]) -> bool {
+    data_id == PEER_DATA_ID
+        && serde_json::from_slice::<Value>(data).map_or(true, |v| v.get(TOKEN_FIELD).is_some())
 }
 
 fn hex(bytes: &[u8]) -> String {
@@ -278,6 +305,9 @@ fn decode(data_id: &str, data: &[u8]) -> Option<Value> {
     if data_id == crate::full_image::wire::DATA_ID {
         return crate::full_image::wire::Msg::decode(data).map(|m| image_json(&m));
     }
+    if data_id == PEER_DATA_ID {
+        return serde_json::from_slice::<Value>(data).ok().map(mask_token);
+    }
     if let Ok(value) = serde_json::from_slice::<Value>(data) {
         return Some(value);
     }
@@ -289,6 +319,13 @@ fn decode(data_id: &str, data: &[u8]) -> Option<Value> {
     std::str::from_utf8(data)
         .ok()
         .map(|text| Value::String(text.to_owned()))
+}
+
+fn mask_token(mut value: Value) -> Value {
+    if let Some(token) = value.get_mut(TOKEN_FIELD) {
+        *token = Value::String("•••".to_owned());
+    }
+    value
 }
 
 fn image_json(m: &crate::full_image::wire::Msg) -> Value {
@@ -465,6 +502,58 @@ mod tests {
                 ("mumcord.watch".to_owned(), TapDirection::Sent),
             ]
         );
+    }
+
+    #[test]
+    fn relay_tokens_are_masked_in_both_directions() {
+        let inspector = enabled();
+        let token = "A".repeat(43);
+        let message = format!(
+            r#"{{"v":1,"t":"token","rid":"00000000000000aa","a":1,"b":2,"tok":"{token}","ttl":30}}"#
+        );
+        inspector.capture(
+            2,
+            plugin(TapDirection::Received, PEER_DATA_ID, message.as_bytes()),
+        );
+        inspector.capture(
+            2,
+            plugin(TapDirection::Sent, PEER_DATA_ID, message.as_bytes()),
+        );
+        let request = br#"{"v":1,"t":"token-req","rid":"00000000000000aa","peer":2}"#;
+        inspector.capture(2, plugin(TapDirection::Sent, PEER_DATA_ID, request));
+        let poll = inspector.poll(None, Vec::new());
+        for packet in &poll.packets[..2] {
+            let decoded = packet.decoded.as_deref().expect("decoded");
+            assert!(!decoded.contains(&token));
+            assert!(decoded.contains("\"tok\": \"•••\""));
+            assert!(decoded.contains("\"rid\": \"00000000000000aa\""));
+            assert_eq!(packet.raw_hex, "");
+        }
+        let request_view = &poll.packets[2];
+        assert!(
+            request_view
+                .decoded
+                .as_deref()
+                .is_some_and(|d| d.contains("token-req"))
+        );
+        assert_eq!(request_view.raw_hex, hex(request));
+    }
+
+    #[test]
+    fn ignored_messages_are_counted_while_capturing() {
+        let inspector = Arc::new(Inspector::default());
+        inspector.count_ignored(2, PEER_DATA_ID, "sender not registered");
+        assert!(inspector.poll(None, Vec::new()).counts.is_empty());
+        inspector.set_enabled(true);
+        inspector.count_ignored(2, PEER_DATA_ID, "sender not registered");
+        let counts = inspector.poll(None, Vec::new()).counts;
+        assert_eq!(counts.len(), 1);
+        assert_eq!(
+            counts[0].kind,
+            "mumcord.peer (ignored: sender not registered)"
+        );
+        assert_eq!(counts[0].direction, TapDirection::Received);
+        assert_eq!(counts[0].count, 1);
     }
 
     #[test]

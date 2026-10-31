@@ -559,10 +559,26 @@
     "weakConnection": "Zobraziť ikonu slabého pripojenia",
     "weakConnectionHint": "Malá ikona signálu vedľa ľudí so zlým pripojením."
   },
+  "p2p": {
+    "title": "Peer-to-peer (zdieľanie obrazovky, obrázky v plnej veľkosti)",
+    "modeLabel": "Režim peer-to-peer",
+    "recommended": "Odporúčané",
+    "explanation": "Priame spojenie ukáže druhej osobe tvoju IP adresu. Relay ju pred ňou skryje; prevádzkovateľ relay (komunita tohto servera) ju vidí. Oboje je koncovo šifrované.",
+    "useGlobal": "Použiť globálne nastavenie",
+    "overrideHint": "Iba pre tento server. „Použiť globálne nastavenie“ sa riadi voľbou Nastavenia → Súkromie.",
+    "mode": {
+      "directRelay": "Priamo + relay (najprv priamo)",
+      "relayFirst": "Priamo + relay (vždy relay, skryje moju IP)",
+      "directOnly": "Iba priamo",
+      "relayOnly": "Iba relay",
+      "off": "Vypnuté"
+    }
+  },
   "privacyDirect": {
     "title": "Priame pripojenia",
     "allow": "Povoliť priame pripojenia k ostatným používateľom Mumcordu",
-    "hint": "Priame pripojenia sú rýchlejšie, ale druhá osoba uvidí tvoju IP adresu. Kým sa nerozhodneš, Mumcord sa opýta, keď by sa nejaké prvýkrát použilo."
+    "hint": "Priame pripojenia sú rýchlejšie, ale druhá osoba uvidí tvoju IP adresu. Kým sa nerozhodneš, Mumcord sa opýta, keď by sa nejaké prvýkrát použilo.",
+    "notUsed": "Vo zvolenom režime peer-to-peer sa nepoužíva: Mumcord sa nikdy nepripája priamo k ostatným."
   },
   "updates": {
     "title": "Aktualizácie",
@@ -650,7 +666,8 @@
       "screen": "Signál zdieľania obrazovky",
       "watch": "Stav spoločného sledovania",
       "plugin": "Dáta pluginu",
-      "mumble": "Správa Mumble"
+      "mumble": "Správa Mumble",
+      "peer": "Nastavenie relay"
     }
   },
   "licences": {

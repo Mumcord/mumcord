@@ -20,6 +20,7 @@ pub mod noise_backend;
 pub mod now_gaming;
 pub mod now_playing;
 pub mod p2p;
+pub mod peer;
 pub mod people;
 pub mod pm_overview;
 pub mod pm_rules;

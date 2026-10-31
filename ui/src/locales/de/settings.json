@@ -555,10 +555,26 @@
     "weakConnection": "Symbol für schwache Verbindung anzeigen",
     "weakConnectionHint": "Ein kleines Signalsymbol neben Personen mit schlechter Verbindung."
   },
+  "p2p": {
+    "title": "Peer-to-Peer (Bildschirmfreigabe, Bilder in voller Größe)",
+    "modeLabel": "Peer-to-Peer-Modus",
+    "recommended": "Empfohlen",
+    "explanation": "Bei „Direkt“ sieht die andere Person deine IP-Adresse. Das Relay verbirgt sie vor ihr; der Betreiber des Relays (die Community dieses Servers) kann sie sehen. Beides ist Ende-zu-Ende-verschlüsselt.",
+    "useGlobal": "Globale Einstellung verwenden",
+    "overrideHint": "Nur für diesen Server. „Globale Einstellung verwenden“ folgt Einstellungen → Datenschutz.",
+    "mode": {
+      "directRelay": "Direkt + Relay (zuerst direkt)",
+      "relayFirst": "Direkt + Relay (immer Relay, verbirgt meine IP)",
+      "directOnly": "Nur direkt",
+      "relayOnly": "Nur Relay",
+      "off": "Aus"
+    }
+  },
   "privacyDirect": {
     "title": "Direkte Verbindungen",
     "allow": "Direkte Verbindungen zu anderen Mumcord-Nutzern erlauben",
-    "hint": "Direkte Verbindungen sind schneller, aber die andere Person kann deine IP-Adresse sehen. Bis du dich entscheidest, fragt Mumcord beim ersten Mal, wenn eine genutzt würde."
+    "hint": "Direkte Verbindungen sind schneller, aber die andere Person kann deine IP-Adresse sehen. Bis du dich entscheidest, fragt Mumcord beim ersten Mal, wenn eine genutzt würde.",
+    "notUsed": "Im gewählten Peer-to-Peer-Modus nicht verwendet: Mumcord verbindet sich nie direkt mit anderen."
   },
   "updates": {
     "title": "Updates",
@@ -644,7 +660,8 @@
       "screen": "Signal zur Bildschirmfreigabe",
       "watch": "Status der Watch-Party",
       "plugin": "Plugin-Daten",
-      "mumble": "Mumble-Nachricht"
+      "mumble": "Mumble-Nachricht",
+      "peer": "Relay-Einrichtung"
     }
   },
   "licences": {

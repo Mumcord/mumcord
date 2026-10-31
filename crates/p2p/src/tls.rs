@@ -13,10 +13,13 @@ use rustls::crypto::{CryptoProvider, verify_tls12_signature, verify_tls13_signat
 use rustls::pki_types::{CertificateDer, PrivateKeyDer, ServerName, UnixTime};
 use rustls::server::danger::{ClientCertVerified, ClientCertVerifier};
 use rustls::{DigitallySignedStruct, DistinguishedName, SignatureScheme};
+use sha2::{Digest, Sha256};
 use tokio::sync::Notify;
 
 /// ALPN of the direct connection protocol; a QUIC peer speaking anything else is refused.
 const ALPN: &[u8] = b"mumcord-p2p/1";
+/// ALPN of the relay handshake (spec 04 section 6.5), on QUIC and on TLS over TCP alike.
+const RELAY_ALPN: &[u8] = b"mumpeer/1";
 
 /// Accepts exactly one certificate, identified by its Mumble hash. Remembers a mismatch so the
 /// caller can tell "wrong person" apart from "no path", and wakes [`Self::mismatched`] so the
@@ -167,6 +170,103 @@ impl ClientCertVerifier for PinnedPeer {
     fn supported_verify_schemes(&self) -> Vec<SignatureScheme> {
         self.schemes()
     }
+}
+
+/// Accepts exactly the relay certificate whose SHA-256 the relay bot announced. The relay has no
+/// CA-signed certificate and may be reached by IP, so neither WebPKI nor the name is checked.
+#[derive(Debug)]
+pub(crate) struct RelayPin {
+    fingerprint: [u8; 32],
+    provider: Arc<CryptoProvider>,
+    mismatch: AtomicBool,
+}
+
+impl RelayPin {
+    pub(crate) fn new(fingerprint: [u8; 32]) -> Arc<Self> {
+        Arc::new(Self {
+            fingerprint,
+            provider: Arc::new(rustls::crypto::ring::default_provider()),
+            mismatch: AtomicBool::new(false),
+        })
+    }
+
+    /// Whether a relay presented a different certificate than the announced one, so a failed
+    /// attempt can be told apart from an unreachable relay.
+    pub(crate) fn saw_mismatch(&self) -> bool {
+        self.mismatch.load(Ordering::Relaxed)
+    }
+}
+
+impl ServerCertVerifier for RelayPin {
+    fn verify_server_cert(
+        &self,
+        end_entity: &CertificateDer<'_>,
+        _intermediates: &[CertificateDer<'_>],
+        _server_name: &ServerName<'_>,
+        _ocsp_response: &[u8],
+        _now: UnixTime,
+    ) -> Result<ServerCertVerified, rustls::Error> {
+        if Sha256::digest(end_entity.as_ref()).as_slice() == self.fingerprint {
+            Ok(ServerCertVerified::assertion())
+        } else {
+            self.mismatch.store(true, Ordering::Relaxed);
+            Err(rustls::Error::InvalidCertificate(
+                rustls::CertificateError::ApplicationVerificationFailure,
+            ))
+        }
+    }
+
+    fn verify_tls12_signature(
+        &self,
+        message: &[u8],
+        cert: &CertificateDer<'_>,
+        dss: &DigitallySignedStruct,
+    ) -> Result<HandshakeSignatureValid, rustls::Error> {
+        verify_tls12_signature(
+            message,
+            cert,
+            dss,
+            &self.provider.signature_verification_algorithms,
+        )
+    }
+
+    fn verify_tls13_signature(
+        &self,
+        message: &[u8],
+        cert: &CertificateDer<'_>,
+        dss: &DigitallySignedStruct,
+    ) -> Result<HandshakeSignatureValid, rustls::Error> {
+        verify_tls13_signature(
+            message,
+            cert,
+            dss,
+            &self.provider.signature_verification_algorithms,
+        )
+    }
+
+    fn supported_verify_schemes(&self) -> Vec<SignatureScheme> {
+        self.provider
+            .signature_verification_algorithms
+            .supported_schemes()
+    }
+}
+
+/// TLS 1.3 client config for the outer relay link (QUIC and TCP): the user's Mumble certificate
+/// as client certificate, because the relay admits only the hashes of the token's pair.
+pub(crate) fn relay_client_config(
+    chain: &[CertificateDer<'static>],
+    key: &PrivateKeyDer<'static>,
+    pin: &Arc<RelayPin>,
+) -> Result<Arc<rustls::ClientConfig>, rustls::Error> {
+    let mut config = rustls::ClientConfig::builder_with_provider(Arc::new(
+        rustls::crypto::ring::default_provider(),
+    ))
+    .with_protocol_versions(&[&rustls::version::TLS13])?
+    .dangerous()
+    .with_custom_certificate_verifier(pin.clone())
+    .with_client_auth_cert(chain.to_vec(), key.clone_key())?;
+    config.alpn_protocols = vec![RELAY_ALPN.to_vec()];
+    Ok(Arc::new(config))
 }
 
 /// QUIC client and server configs for one connection attempt, both pinned to `peer`.

@@ -555,10 +555,26 @@
     "weakConnection": "Näytä heikon yhteyden kuvake",
     "weakConnectionHint": "Pieni signaalikuvake henkilöiden vieressä, joilla on heikko yhteys."
   },
+  "p2p": {
+    "title": "Peer-to-peer (näytön jakaminen, täysikokoiset kuvat)",
+    "modeLabel": "Peer-to-peer-tila",
+    "recommended": "Suositus",
+    "explanation": "Suora yhteys näyttää IP-osoitteesi toiselle henkilölle. Rele piilottaa sen häneltä; releen ylläpitäjä (tämän palvelimen yhteisö) voi nähdä sen. Molemmat ovat päästä päähän salattuja.",
+    "useGlobal": "Käytä yleisasetusta",
+    "overrideHint": "Vain tälle palvelimelle. ”Käytä yleisasetusta” noudattaa kohtaa Asetukset → Yksityisyys.",
+    "mode": {
+      "directRelay": "Suora + rele (suora ensin)",
+      "relayFirst": "Suora + rele (aina rele, piilottaa IP:ni)",
+      "directOnly": "Vain suora",
+      "relayOnly": "Vain rele",
+      "off": "Pois"
+    }
+  },
   "privacyDirect": {
     "title": "Suorat yhteydet",
     "allow": "Salli suorat yhteydet muihin Mumcord-käyttäjiin",
-    "hint": "Suorat yhteydet ovat nopeampia, mutta toinen henkilö näkee IP-osoitteesi. Kunnes päätät, Mumcord kysyy, kun sellaista käytettäisiin ensimmäisen kerran."
+    "hint": "Suorat yhteydet ovat nopeampia, mutta toinen henkilö näkee IP-osoitteesi. Kunnes päätät, Mumcord kysyy, kun sellaista käytettäisiin ensimmäisen kerran.",
+    "notUsed": "Ei käytössä valitussa peer-to-peer-tilassa: Mumcord ei koskaan yhdistä suoraan muihin."
   },
   "updates": {
     "title": "Päivitykset",
@@ -644,7 +660,8 @@
       "screen": "Näytönjaon signaali",
       "watch": "Yhteiskatselun tila",
       "plugin": "Lisäosan tiedot",
-      "mumble": "Mumble-viesti"
+      "mumble": "Mumble-viesti",
+      "peer": "Releen käyttöönotto"
     }
   },
   "licences": {

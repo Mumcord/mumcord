@@ -97,10 +97,14 @@
     "dnd": "Forstyr ikke",
     "dndHint": "Slår lyde og bannere for notifikationer fra",
     "dndSystemHint": "Slået til via skrivebordets Forstyr ikke",
-    "privateMessages": "Private beskeder fra",
+    "privateMessages": "Beskeder fra",
     "pm_everyone": "Alle",
     "pm_friendsOnly": "Venner",
-    "pm_nobody": "Ingen"
+    "pm_nobody": "Ingen",
+    "notifications": "Notifikationer",
+    "sharing": "Deling",
+    "appearance": "Udseende",
+    "account": "Konto"
   },
   "voice": {
     "line": "Tale: {{channel}} · {{server}}",

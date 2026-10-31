@@ -42,7 +42,7 @@
   },
   "directConsent": {
     "title": "Leisti tiesioginius ryšius?",
-    "description": "Tiesioginiai ryšiai greitesni, bet kitas asmuo gali matyti jūsų IP adresą. Mumcord juos naudoja viso dydžio paveikslėliams ir ekrano bendrinimui su kitais Mumcord naudotojais ir gali tam atidaryti prievadą jūsų maršruto parinktuve. Jei atsisakysite, paveikslėliai vis tiek atkeliaus per serverį, o ekrano bendrinimas nebus pasiekiamas. Tai galite pakeisti vėliau skiltyje Nustatymai → Privatumas.",
+    "description": "Tiesioginiai ryšiai greitesni, bet kitas asmuo gali matyti jūsų IP adresą. Mumcord juos naudoja viso dydžio paveikslėliams ir ekrano bendrinimui su kitais Mumcord naudotojais ir gali tam atidaryti prievadą jūsų maršruto parinktuve. Jei atsisakysite, paveikslėliai vis tiek atkeliaus per serverį, o ekrano bendrinimas nebus pasiekiamas. Tai galite pakeisti vėliau skiltyje Nustatymai → Privatumas. Jei šis serveris siūlo perdavimo mazgą, Mumcord gali naudoti jį; tada kitas asmuo nemato tavo IP adreso.",
     "no": "Ne",
     "yes": "Taip",
     "failed": "Nepavyko. Bandyk dar kartą."

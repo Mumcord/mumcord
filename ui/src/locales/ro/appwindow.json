@@ -42,7 +42,7 @@
   },
   "directConsent": {
     "title": "Permiți conexiuni directe?",
-    "description": "Conexiunile directe sunt mai rapide, dar cealaltă persoană îți poate vedea adresa IP. Mumcord le folosește pentru imagini la dimensiune completă și partajarea ecranului cu alți utilizatori Mumcord și poate deschide un port pe routerul tău pentru ele. Dacă spui nu, imaginile ajung în continuare prin server, iar partajarea ecranului nu este disponibilă. Poți schimba asta mai târziu în Setări → Confidențialitate.",
+    "description": "Conexiunile directe sunt mai rapide, dar cealaltă persoană îți poate vedea adresa IP. Mumcord le folosește pentru imagini la dimensiune completă și partajarea ecranului cu alți utilizatori Mumcord și poate deschide un port pe routerul tău pentru ele. Dacă spui nu, imaginile ajung în continuare prin server, iar partajarea ecranului nu este disponibilă. Poți schimba asta mai târziu în Setări → Confidențialitate. Dacă acest server oferă un releu, Mumcord îl poate folosi în loc; atunci cealaltă persoană nu îți vede adresa IP.",
     "no": "Nu",
     "yes": "Da",
     "failed": "Nu a funcționat. Încearcă din nou."

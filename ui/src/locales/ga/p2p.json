@@ -1,0 +1,54 @@
+{
+  "link": {
+    "label": "Piarbhrearthóireacht",
+    "direct": "Díreach",
+    "relayUdp": "Trí athsheachadán (UDP)",
+    "relayTcp": "Trí athsheachadán (TCP 443)",
+    "ipHidden": "IP folaithe",
+    "ipVisible": "IP le feiceáil",
+    "ipHiddenHint": "Feiceann an duine eile seoladh an athsheachadáin, ní do sheoladh-sa."
+  },
+  "relay": {
+    "mumbot": "Mumbot",
+    "relay": "Athsheachadán Mumpeer",
+    "yes": "Tá",
+    "yesNamed": "Tá ({{names}})",
+    "no": "Níl",
+    "available": "Ar fáil",
+    "availableAt": "Ar fáil · {{host}}",
+    "unavailable": "Ní ar fáil: {{reason}}",
+    "untrusted": "Athraithe, gan iontaoibh",
+    "changed": "Tá athsheachadán an fhreastalaí seo athraithe.",
+    "trustNew": "Iontaobh an t-athsheachadán nua",
+    "keepBlocked": "Coinnigh blocáilte",
+    "forget": "Déan dearmad ar an athsheachadán",
+    "actionFailed": "Níor oibrigh sé sin. Bain triail eile as."
+  },
+  "reason": {
+    "p2pOff": "Tá piarbhrearthóireacht múchta.",
+    "noRelay": "Níl athsheachadán ag an bhfreastalaí seo.",
+    "notConnected": "Gan nasc leis an bhfreastalaí seo.",
+    "untrusted": "Tá athsheachadán an fhreastalaí seo athraithe agus níl iontaoibh ann.",
+    "conflict": "Fógraítear dhá athsheachadán ar an bhfreastalaí seo; ní úsáidtear ceachtar acu.",
+    "botLeft": "D’fhág bot an athsheachadáin an freastalaí.",
+    "relayDown": "Níl an t-athsheachadán inrochtana faoi láthair (arna thuairisciú ag bot an athsheachadáin).",
+    "botNoAnswer": "Níor fhreagair bot an athsheachadáin.",
+    "refused": "Dhiúltaigh an t-athsheachadán don nasc: {{reason}}",
+    "unreachable": "Níorbh fhéidir teacht ar an athsheachadán thar UDP ná TCP 443.",
+    "peerCannotRelay": "Ní féidir leis an duine eile an t-athsheachadán a úsáid (Mumcord níos sine nó athsheachadán múchta).",
+    "denied": "Dhiúltaigh bot an athsheachadáin don iarratas.",
+    "peerGone": "D’fhág an duine eile an freastalaí.",
+    "rateLimited": "An iomarca iarratas athsheachadáin. Bain triail eile as i gceann nóiméid."
+  },
+  "refusal": {
+    "unknownToken": "comhartha rochtana anaithnid",
+    "expired": "comhartha rochtana imithe in éag",
+    "notAllowed": "ní cheadaítear",
+    "botGone": "bot an athsheachadáin imithe",
+    "relayFull": "athsheachadán lán",
+    "peerLimit": "an iomarca naisc",
+    "rateLimited": "an iomarca iarrachtaí",
+    "version": "leagan gan tacaíocht",
+    "badRequest": "iarratas neamhbhailí"
+  }
+}

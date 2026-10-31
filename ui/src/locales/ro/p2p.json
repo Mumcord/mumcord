@@ -1,0 +1,54 @@
+{
+  "link": {
+    "label": "Peer-to-peer",
+    "direct": "Direct",
+    "relayUdp": "Prin releu (UDP)",
+    "relayTcp": "Prin releu (TCP 443)",
+    "ipHidden": "IP ascuns",
+    "ipVisible": "IP vizibil",
+    "ipHiddenHint": "Cealaltă persoană vede adresa releului, nu pe a ta."
+  },
+  "relay": {
+    "mumbot": "Mumbot",
+    "relay": "Releu Mumpeer",
+    "yes": "Da",
+    "yesNamed": "Da ({{names}})",
+    "no": "Nu",
+    "available": "Disponibil",
+    "availableAt": "Disponibil · {{host}}",
+    "unavailable": "Indisponibil: {{reason}}",
+    "untrusted": "Schimbat, neîncrezut",
+    "changed": "Releul acestui server s-a schimbat.",
+    "trustNew": "Ai încredere în noul releu",
+    "keepBlocked": "Păstrează blocat",
+    "forget": "Uită releul",
+    "actionFailed": "Nu a funcționat. Încearcă din nou."
+  },
+  "reason": {
+    "p2pOff": "Peer-to-peer este dezactivat.",
+    "noRelay": "Acest server nu are releu.",
+    "notConnected": "Nu ești conectat la acest server.",
+    "untrusted": "Releul acestui server s-a schimbat și nu este de încredere.",
+    "conflict": "Pe acest server sunt anunțate două relee; niciunul nu este folosit.",
+    "botLeft": "Botul releului a părăsit serverul.",
+    "relayDown": "Releul nu este accesibil momentan (raportat de botul releului).",
+    "botNoAnswer": "Botul releului nu a răspuns.",
+    "refused": "Releul a refuzat conexiunea: {{reason}}",
+    "unreachable": "Releul nu a putut fi contactat nici prin UDP, nici prin TCP 443.",
+    "peerCannotRelay": "Cealaltă persoană nu poate folosi releul (Mumcord mai vechi sau releu dezactivat).",
+    "denied": "Botul releului a refuzat cererea.",
+    "peerGone": "Cealaltă persoană a părăsit serverul.",
+    "rateLimited": "Prea multe cereri către releu. Încearcă din nou peste un minut."
+  },
+  "refusal": {
+    "unknownToken": "token de acces necunoscut",
+    "expired": "tokenul de acces a expirat",
+    "notAllowed": "nepermis",
+    "botGone": "botul releului a dispărut",
+    "relayFull": "releu plin",
+    "peerLimit": "prea multe conexiuni",
+    "rateLimited": "prea multe încercări",
+    "version": "versiune neacceptată",
+    "badRequest": "cerere invalidă"
+  }
+}
