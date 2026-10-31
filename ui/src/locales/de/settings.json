@@ -327,6 +327,8 @@
     "selfMute": "Du schaltest dich stumm oder wieder laut",
     "selfDeaf": "Du schaltest den Ton aus oder wieder ein",
     "hangUp": "Du trennst die Verbindung zu einem Server",
+    "kicked": "Du wirst von einem Server gekickt",
+    "banned": "Du wirst von einem Server gebannt",
     "messages": "Neue Nachricht in einem gefolgten Kanal oder Privatchat",
     "mention": "Ton bei Erwähnung",
     "mentionNotify": "Benachrichtigen bei Erwähnung",

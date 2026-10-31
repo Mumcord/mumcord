@@ -121,6 +121,10 @@ pub struct SoundSettings {
     pub viewer_started: bool,
     /// Someone stops watching your screen share (FR-2.77).
     pub viewer_stopped: bool,
+    /// The server kicks you (#205).
+    pub kicked: bool,
+    /// The server bans you (#205).
+    pub banned: bool,
 }
 
 impl Default for SoundSettings {
@@ -142,6 +146,8 @@ impl Default for SoundSettings {
             share_stopped: true,
             viewer_started: true,
             viewer_stopped: true,
+            kicked: true,
+            banned: true,
         }
     }
 }
@@ -946,6 +952,10 @@ mod tests {
         assert!(
             parsed.sounds.party_started && parsed.sounds.viewer_stopped,
             "activity sounds are on for older settings"
+        );
+        assert!(
+            parsed.sounds.kicked && parsed.sounds.banned,
+            "kick and ban sounds are on for older settings"
         );
         assert!(parsed.noise_suppression);
         assert!(
