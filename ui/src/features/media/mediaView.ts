@@ -13,7 +13,7 @@ export type MediaKind = "watch" | "share";
 /** How the shared picture is shown (issue #163). */
 export type FitMode = "fit" | "fill" | "oneToOne";
 /** Panel tab; each feature has its own, so a switch does not surprise the other one. */
-export type MediaTab = "playlist" | "watching" | "viewers" | "chat";
+export type MediaTab = "playlist" | "watching" | "viewers";
 
 export interface MediaView {
   /** Which feature owns the main column; `null` shows the chat alone. */

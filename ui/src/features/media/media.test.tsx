@@ -69,7 +69,7 @@ describe("media view", () => {
     expect(mediaView().cinema).toBe("share");
     closeMedia("share");
     expect(mediaView().cinema).toBeNull();
-    setTab("chat");
-    expect(mediaView().tab).toBe("chat");
+    setTab("viewers");
+    expect(mediaView().tab).toBe("viewers");
   });
 });
