@@ -23,7 +23,10 @@ afterEach(() => {
 });
 
 function renderStep() {
-  renderInWizard(harness, <IdentityStep identity={null} focusOnMount={false} onDone={onDone} />);
+  renderInWizard(
+    harness,
+    <IdentityStep step={1} total={5} identity={null} focusOnMount={false} onDone={onDone} />,
+  );
 }
 
 function next() {

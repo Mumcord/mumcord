@@ -429,7 +429,12 @@
     "noticesFailed": "No se pudieron abrir las licencias de terceros.",
     "loading": "Cargando…",
     "devToolsUnlocked": "Herramientas de desarrollo desbloqueadas: el inspector de paquetes ya está en la lista de ajustes.",
-    "portable": "Portátil"
+    "portable": "Portátil",
+    "setup": "Configuración",
+    "setupWizardHint": "Repasa la configuración inicial para revisar tu micrófono, tus opciones de privacidad, la búsqueda de actualizaciones y el modo de voz. Tus valores actuales vienen rellenados.",
+    "setupWizardRun": "Repetir el asistente de configuración",
+    "setupWizardIdentityNote": "Tu identidad no forma parte de esto. Tu certificado, y con él tu nombre registrado y tus permisos en los servidores, se queda exactamente como está.",
+    "setupWizardIdentityLink": "Gestiónala en Identidad"
   },
   "profile": {
     "title": "Perfil",

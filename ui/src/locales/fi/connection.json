@@ -91,5 +91,14 @@
   "endToEndValue": "≈ {{value}} ms (arvio)",
   "lowLatencyMode": "Pienen viiveen tila",
   "identity": "Identiteetti",
-  "identityValue": "{{label}} ({{name}}) · {{fingerprint}}"
+  "identityValue": "{{label}} ({{name}}) · {{fingerprint}}",
+  "profileSource": "{{label}} (kanavaprofiili)",
+  "profile": {
+    "row": "Ääniprofiili",
+    "musicOn": "Musiikkilaatu",
+    "musicOff": "Musiikkilaatu pois",
+    "lowLatencyOn": "Pienen viiveen tila",
+    "lowLatencyOff": "Pienen viiveen tila pois",
+    "defaults": "Oletukset"
+  }
 }

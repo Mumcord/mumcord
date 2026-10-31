@@ -91,5 +91,14 @@
   "endToEndValue": "≈ {{value}} ms (оценка)",
   "lowLatencyMode": "Режим с ниско закъснение",
   "identity": "Идентичност",
-  "identityValue": "{{label}} ({{name}}) · {{fingerprint}}"
+  "identityValue": "{{label}} ({{name}}) · {{fingerprint}}",
+  "profileSource": "{{label}} (профил на канала)",
+  "profile": {
+    "row": "Аудиопрофил",
+    "musicOn": "Качество за музика",
+    "musicOff": "Качество за музика изкл.",
+    "lowLatencyOn": "Режим с ниско закъснение",
+    "lowLatencyOff": "Режим с ниско закъснение изкл.",
+    "defaults": "По подразбиране"
+  }
 }

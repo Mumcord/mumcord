@@ -14,6 +14,7 @@ use mumcord_store::{
     ServerId, Settings, TalkMode, UnixMillis, VoiceActivation,
 };
 
+use super::channel_audio::effective_settings;
 use super::machine::{CertCheck, Failure, check_cert, format_fingerprint};
 use super::{
     CertificateState, IdentityView, PasswordChange, ServerFields, ServerTestInput, ServerView,
@@ -207,6 +208,17 @@ impl Engine {
         let data = tokio::fs::read(&path).await.map_err(|e| {
             EngineError::new(ErrorKind::Io, format!("reading the file failed: {e}"))
         })?;
+        self.identity_import_data(data, password, label).await
+    }
+
+    /// Imports PKCS#12 data as an additional identity; shared by the file import and the
+    /// import from the official client (issue #66).
+    pub(crate) async fn identity_import_data(
+        &self,
+        data: Vec<u8>,
+        password: Option<String>,
+        label: Option<String>,
+    ) -> EngineResult<IdentityView> {
         let store = self.inner.store.clone();
         let record = self
             .blocking(move |secrets| {
@@ -227,6 +239,18 @@ impl Engine {
             .await?;
         tracing::info!(identity = record.id, "identity imported");
         Ok(identity_view(record, Vec::new()))
+    }
+
+    /// Takes back an identity the import from the official client just added (issue #66).
+    /// Unlike [`Engine::identity_delete`] this may remove the last identity: the user
+    /// undoes the import, e.g. in the first-start wizard before any identity existed.
+    pub(crate) async fn identity_undo_import(&self, id: IdentityId) -> EngineResult<()> {
+        let store = self.inner.store.clone();
+        self.blocking(move |secrets| {
+            secrets.delete_identity(id)?;
+            lock(&store).discard_identity(id)
+        })
+        .await
     }
 
     /// Changes the local label of an identity; the certificate is untouched (issue #148).
@@ -651,7 +675,17 @@ impl Engine {
             store.save_settings(&settings).map_err(store_error)?;
             previous
         };
-        apply_dsp(&self.inner.controls, &settings);
+        {
+            // A channel audio profile in effect keeps overriding its values (issue #171).
+            let mut core = lock(&self.inner.core);
+            let profile = core.channel_audio.map(|a| a.profile);
+            let before = effective_settings(&previous, profile.as_ref());
+            let after = effective_settings(&settings, profile.as_ref());
+            apply_dsp(&self.inner.controls, &after);
+            if before.low_latency != after.low_latency {
+                core.set_low_latency(after.low_latency);
+            }
+        }
         if previous.preview_cache_days != settings.preview_cache_days
             || previous.history_max_age_days != settings.history_max_age_days
         {
@@ -672,20 +706,6 @@ impl Engine {
         }
         if settings.talk_mode != TalkMode::PushToTalk {
             self.inner.controls.set_ptt_pressed(false);
-        }
-        if previous.low_latency != settings.low_latency {
-            // Live, without reconnecting (issue #156): the capture thread follows the controls
-            // set above; devices and the receive side are switched here.
-            let mut core = lock(&self.inner.core);
-            if let Some(audio) = &core.audio {
-                audio.set_low_latency(settings.low_latency);
-            }
-            if let Some(pipeline) = core.pipeline.as_mut() {
-                pipeline.set_low_latency(settings.low_latency);
-            }
-            // Back to the safe queue at once; a lower one follows once the new device period
-            // is measured.
-            core.sync_queue_target(settings.low_latency);
         }
         if previous.output_volume_percent != settings.output_volume_percent
             && let Some(audio) = &lock(&self.inner.core).audio

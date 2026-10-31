@@ -429,7 +429,12 @@
     "noticesFailed": "Não foi possível abrir as licenças de terceiros.",
     "loading": "A carregar…",
     "devToolsUnlocked": "Ferramentas de programador desbloqueadas: o inspetor de pacotes já está na lista de definições.",
-    "portable": "Portátil"
+    "portable": "Portátil",
+    "setup": "Configuração",
+    "setupWizardHint": "Percorra outra vez a configuração inicial para rever o microfone, as opções de privacidade, a verificação de atualizações e o modo de fala. Os seus valores atuais estão preenchidos.",
+    "setupWizardRun": "Repetir o assistente de configuração",
+    "setupWizardIdentityNote": "A sua identidade não faz parte disto. O seu certificado, e com ele o nome registado e as permissões nos servidores, fica exatamente como está.",
+    "setupWizardIdentityLink": "Gerir em Identidade"
   },
   "profile": {
     "title": "Perfil",

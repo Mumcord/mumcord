@@ -7,6 +7,8 @@ import { PrivacySection } from "./PrivacySection";
 import { ServersSection } from "./ServersSection";
 import { createMockApi, setApi, type Settings } from "../../../api";
 import { PreferencesProvider } from "../../../app/PreferencesProvider";
+import { fakeView } from "../../../app/testView";
+import { ViewContext } from "../../../app/view";
 import { applyLanguage } from "../../../i18n";
 import type { SettingsSectionProps } from "./types";
 
@@ -26,12 +28,14 @@ function Stateful({
 }) {
   const [settings, setSettings] = useState(initial);
   return (
-    <Section
-      settings={settings}
-      update={(patch) => {
-        setSettings((previous) => ({ ...previous, ...patch }));
-      }}
-    />
+    <ViewContext.Provider value={fakeView()}>
+      <Section
+        settings={settings}
+        update={(patch) => {
+          setSettings((previous) => ({ ...previous, ...patch }));
+        }}
+      />
+    </ViewContext.Provider>
   );
 }
 

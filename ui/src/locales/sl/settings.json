@@ -430,7 +430,12 @@
     "noticesFailed": "Licenc tretjih oseb ni bilo mogoče odpreti.",
     "loading": "Nalaganje …",
     "devToolsUnlocked": "Razvijalska orodja odklenjena: pregledovalnik paketov je zdaj na seznamu nastavitev.",
-    "portable": "Prenosna"
+    "portable": "Prenosna",
+    "setup": "Nastavitev",
+    "setupWizardHint": "Znova pojdi skozi prvo nastavitev in preglej mikrofon, izbire zasebnosti, preverjanje posodobitev in način govora. Tvoje trenutne izbire so že izpolnjene.",
+    "setupWizardRun": "Znova zaženi čarovnika za nastavitev",
+    "setupWizardIdentityNote": "Tvoja identiteta ni del tega. Tvoje potrdilo in z njim registrirano ime ter dovoljenja na strežnikih ostanejo natanko takšni, kot so.",
+    "setupWizardIdentityLink": "Upravljaj jo v Identiteti"
   },
   "profile": {
     "title": "Profil",

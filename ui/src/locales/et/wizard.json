@@ -1,5 +1,24 @@
 {
   "progress": "Samm {{current}} / {{total}}",
+  "rerun": {
+    "title": "Seadistusviisard",
+    "note": "Sa läbid seadistust uuesti. Sinu identiteet ei muutu.",
+    "manageIdentities": "Halda identiteete",
+    "stepsLabel": "Seadistuse sammud",
+    "stepsSkipped": "(vahele jäetud, identiteet ei kuulu selle juurde)",
+    "steps": {
+      "identity": "Identiteet",
+      "mic": "Mikrofon",
+      "privacy": "Privaatsus",
+      "updates": "Värskendused",
+      "talk": "Rääkimisrežiim"
+    },
+    "footer": "Tühistamine jätab kõik nii, nagu on. Lõpus salvestatakse ainult muudetud sammud.",
+    "discardTitle": "Kas hüljata muudatused?",
+    "discardBody": "Enne lõpetamist ei salvestata midagi. Kui tühistad nüüd, jääb kõik nii, nagu on.",
+    "discardKeep": "Jätka muutmist",
+    "discardConfirm": "Hülga muudatused"
+  },
   "loadFailed": "Seadistust ei õnnestunud laadida.",
   "finish": "Lõpeta",
   "errors": {

@@ -1,13 +1,10 @@
 {
-  "serverOverview": "Forbhreathnú ar an bhfreastalaí",
   "tree": {
     "label": "Cainéil",
-    "hint": "Enter: taispeáin an comhrá · Shift+Enter nó dúbailt-chliceáil: téigh isteach · Eochracha saigheada: bog, leathnaigh, laghdaigh",
+    "hint": "Enter: taispeáin an comhrá · Shift+Enter nó dúbailt-chliceáil: téigh isteach · Eochracha saigheada: bog, leathnaigh, laghdaigh · Eochair roghchláir: roghanna an chainéil",
     "join": "Téigh isteach",
-    "menuLabel": "Roghanna do {{channel}}",
-    "showDescription": "Taispeáin cur síos an chainéil",
     "you": "(tusa)",
-    "voiceHere": "tá tú anseo (guth)",
+    "youAreHere": "tá tú anseo",
     "people_one": "{{count}} duine",
     "people_two": "{{count}} dhuine",
     "people_few": "{{count}} dhuine",
@@ -25,7 +22,16 @@
     "showAll": "Taispeáin gach ceann ({{total}})",
     "showFewer": "Taispeáin níos lú",
     "jump": "Léim go dtí mo chainéal",
-    "locked": "faoi ghlas"
+    "locked": "faoi ghlas",
+    "temporary": "sealadach",
+    "linked": "nasctha",
+    "full": "Tá an cainéal lán",
+    "fullPlaces": "Tá an cainéal lán, {{places}}",
+    "places_one": "{{taken}} as {{count}} áit tógtha",
+    "places_two": "{{taken}} as {{count}} áit tógtha",
+    "places_few": "{{taken}} as {{count}} áit tógtha",
+    "places_many": "{{taken}} as {{count}} n-áit tógtha",
+    "places_other": "{{taken}} as {{count}} áit tógtha"
   },
   "status": {
     "listening": "ag éisteacht amháin",
@@ -62,7 +68,8 @@
   "errors": {
     "joinDenied": "Níl cead agat dul isteach sa chainéal seo.",
     "joinFailed": "Níorbh fhéidir dul isteach sa chainéal. Bain triail eile as.",
-    "notConnected": "Gan ceangal le freastalaí."
+    "notConnected": "Gan ceangal le freastalaí.",
+    "moveFailed": "Níorbh fhéidir an duine seo a bhogadh."
   },
   "empty": {
     "disconnected": "Gan ceangal. Roghnaigh freastalaí chun a chainéil a fheiceáil.",
@@ -83,6 +90,17 @@
     "people_two": "{{count}} dhuine",
     "people_few": "{{count}} dhuine",
     "people_many": "{{count}} nduine",
-    "people_other": "{{count}} duine"
+    "people_other": "{{count}} duine",
+    "shortcut": "Ctrl K"
+  },
+  "section": {
+    "state": {
+      "connected": "Ceangailte",
+      "connecting": "Ag ceangal",
+      "reconnecting": "Ag athcheangal…",
+      "disconnected": "Dícheangailte"
+    },
+    "online": "{{count}} ar líne",
+    "onlinePing": "{{count}} ar líne · {{ping}} ms"
   }
 }

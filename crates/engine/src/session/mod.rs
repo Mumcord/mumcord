@@ -11,12 +11,14 @@
 //! Lock order: `core` before `store`. Neither lock is held across an `.await`.
 
 pub(crate) mod batch;
+mod channel_audio;
 mod channel_password;
 pub mod convert;
 mod description;
 pub mod extension;
 mod local;
 mod machine;
+mod mumble_import;
 mod types;
 
 use std::cmp::Reverse;
@@ -42,8 +44,13 @@ use tokio::runtime::Handle as Runtime;
 use tokio::sync::mpsc;
 use tokio::task::JoinHandle;
 
+pub use channel_audio::{ActiveAudioProfile, ChannelAudioView};
 pub use channel_password::{ChannelPasswordChannel, ChannelPasswordState, ChannelPasswordView};
 pub use machine::MAX_RECONNECT_ATTEMPTS;
+pub use mumble_import::{
+    ImportDevice, ImportFavouriteView, ImportIdentityView, MumbleImportChoice, MumbleImportPreview,
+    MumbleImportResult,
+};
 pub use types::*;
 
 use crate::audio_rating::AudioRatingView;
@@ -226,6 +233,8 @@ struct Inner {
     previews: Arc<crate::web::LinkPreviews>,
     /// Answers of the public server query behind the `mumble://` link card (issue #175).
     queries: Arc<crate::server_query::ServerQueries>,
+    /// The public server browser's list source and ping pacing (issue #68).
+    public_servers: crate::public_servers::PublicServers,
     /// Full-size image transfers with other Mumcord clients (FR-1.60c).
     full_images: crate::full_image::ServerTransfers,
     /// Direct connections to other Mumcord users (FR-2.35).
@@ -243,6 +252,8 @@ struct Inner {
     blocked: crate::blocking::BlockList,
     /// History sync with other Mumcord users (FR-1.60).
     history_sync: Arc<Mutex<crate::history_sync::HistorySync>>,
+    /// What the last import from the official Mumble client added, for its undo (issue #66).
+    mumble_import: Mutex<Option<mumble_import::LastImport>>,
     /// Positional audio (FR-1.41).
     positional: crate::positional::Positional,
     /// Watch parties in the user's channels (FR-2.39).
@@ -268,6 +279,19 @@ struct Core {
     audio: Option<Audio>,
     pipeline: Option<VoicePipeline>,
     mic_test: Option<MicTest>,
+    /// The channel audio profile in effect (issue #171); `None` runs on the global settings.
+    channel_audio: Option<ActiveAudioProfile>,
+    /// Devices to switch back to once the running mic test ends, when it ran on devices the
+    /// caller did not save (wizard rerun, #149).
+    mic_test_restore: Option<(Option<String>, Option<String>)>,
+}
+
+/// Devices a microphone test runs on instead of the stored ones (wizard rerun, #149).
+/// They are never saved; the test switches to them and back to the stored ones.
+#[derive(Clone, Debug, Default, PartialEq, Eq)]
+pub struct MicTestDevices {
+    pub input: Option<String>,
+    pub output: Option<String>,
 }
 
 /// One server's connection.
@@ -518,6 +542,7 @@ impl Engine {
         voice::spawn_meter(&rt, controls.clone(), meter.clone(), events.clone());
         let voice = Arc::new(VoiceShared::default());
         let blocked = crate::blocking::load(&lock(&store));
+        let queries = Arc::new(crate::server_query::ServerQueries::default());
         let inner = Arc::new(Inner {
             rt,
             data_dir: data_dir.to_path_buf(),
@@ -538,7 +563,8 @@ impl Engine {
                 crate::web::LinkPreviews::app_policy(),
                 crate::web::fetch::Timeouts::default(),
             )),
-            queries: Arc::new(crate::server_query::ServerQueries::default()),
+            queries: queries.clone(),
+            public_servers: crate::public_servers::PublicServers::new(queries),
             full_images: crate::full_image::ServerTransfers::default(),
             direct: crate::p2p::Direct::default(),
             core: Mutex::new(Core::default()),
@@ -549,6 +575,7 @@ impl Engine {
             pm_requests: Mutex::default(),
             blocked: Mutex::new(blocked),
             history_sync: Arc::default(),
+            mumble_import: Mutex::default(),
             watch_parties: Mutex::default(),
             screen_shares: Mutex::default(),
             inspector: Arc::default(),
@@ -629,6 +656,26 @@ impl Engine {
                 crate::server_query::QueryOutcome::NotAllowed
             }
         }
+    }
+
+    /// The public server list (issue #68). Fetched only on this call, which the UI makes when the
+    /// user opens the server browser; `agent` names this client honestly.
+    pub async fn public_servers(
+        &self,
+        agent: &str,
+    ) -> Result<Vec<crate::public_servers::PublicServer>, crate::public_servers::PublicListError>
+    {
+        self.inner.public_servers.list(agent).await
+    }
+
+    /// Ping, users and user limit of one listed server, paced with all other browser pings;
+    /// `None` when it did not answer.
+    pub async fn public_server_ping(
+        &self,
+        host: &str,
+        port: u16,
+    ) -> Option<crate::server_query::ServerQuery> {
+        self.inner.public_servers.ping(host, port).await
     }
 
     /// An external image or image link from a message, ready to show inline (FR-1.55); `None`
@@ -1083,6 +1130,32 @@ impl Engine {
         Ok(())
     }
 
+    /// Moves a person to another channel (drag in the tree, "Move users here…"). The server
+    /// enforces the move permission; the result arrives as the person's `UserUpserted`.
+    pub fn person_move(
+        &self,
+        server_id: ServerId,
+        session: u32,
+        channel_id: u32,
+    ) -> EngineResult<()> {
+        let ctx = self.session_ctx_for(server_id)?;
+        let (channel_known, user_known) = ctx.handle.with_state(|s| {
+            (
+                s.channels.contains_key(&channel_id),
+                s.users.contains_key(&session),
+            )
+        });
+        if !channel_known {
+            return Err(EngineError::new(ErrorKind::NotFound, "unknown channel"));
+        }
+        if !user_known {
+            return Err(EngineError::new(ErrorKind::NotFound, "unknown person"));
+        }
+        ctx.handle
+            .move_user(session, channel_id)
+            .map_err(convert::command_error)
+    }
+
     pub fn person_set_volume(
         &self,
         server_id: ServerId,
@@ -1239,20 +1312,42 @@ impl Engine {
     }
 
     /// Microphone test: record up to 5 s, then play back (FR-1.4). Voice pauses meanwhile.
-    pub async fn mic_test_start(&self) -> EngineResult<()> {
+    /// `devices` lets the test run on devices the caller has not saved yet (wizard rerun, #149).
+    pub async fn mic_test_start(&self, devices: Option<MicTestDevices>) -> EngineResult<()> {
         self.inner.ensure_audio().await?;
+        if lock(&self.inner.core).mic_test.is_some() {
+            return Ok(());
+        }
+        // Unsaved devices are switched on the open streams for the test and switched back when it
+        // ends, so a cancelled wizard leaves the engine on the stored devices.
+        let restore = match devices {
+            Some(devices) => {
+                let saved = lock(&self.inner.store).settings().map_err(store_error)?;
+                let restore = (saved.input_device, saved.output_device);
+                self.inner
+                    .switch_audio_devices(devices.input, devices.output)
+                    .await?;
+                Some(restore)
+            }
+            None => None,
+        };
         let mut core = lock(&self.inner.core);
         if core.mic_test.is_some() {
+            // A concurrent start won the race; its test ends on the stored devices again.
+            drop(core);
+            self.inner.restore_audio_devices(restore);
             return Ok(());
         }
         self.inner.stop_pipeline(&mut core);
-        let audio = core
-            .audio
-            .as_mut()
-            .ok_or_else(|| EngineError::internal("audio not running"))?;
-        let test = match voice::start_mic_test(audio, self.inner.controls.clone()) {
+        let started = match core.audio.as_mut() {
+            Some(audio) => voice::start_mic_test(audio, self.inner.controls.clone()),
+            None => Err(EngineError::internal("audio not running")),
+        };
+        let test = match started {
             Ok(test) => test,
             Err(error) => {
+                drop(core);
+                self.inner.restore_audio_devices(restore);
                 self.inner.events.emit(EngineEvent::MicTestPhaseChanged(
                     types::MicTestPhase::Failed,
                 ));
@@ -1260,6 +1355,7 @@ impl Engine {
             }
         };
         core.mic_test = Some(test);
+        core.mic_test_restore = restore;
         self.inner.events.emit(EngineEvent::MicTestPhaseChanged(
             types::MicTestPhase::Recording,
         ));
@@ -1701,6 +1797,7 @@ impl Inner {
             }
         }
         self.start_pipeline(core);
+        self.sync_channel_audio(core);
     }
 
     /// Self-deafens and mutes a still connected server; the user stays in their channel.
@@ -2086,6 +2183,7 @@ impl Inner {
             ctx.events
                 .emit(EngineEvent::ServerSynced(Box::new(snapshot)));
         }
+        self.sync_channel_audio(&mut lock(&self.core));
         // A link naming a channel is an explicit join (QA.23); after `ServerSynced`, which
         // resets the sound hub's view of the own state.
         if link_join
@@ -2433,6 +2531,7 @@ impl Inner {
                 if own && change.moved_from.is_some() {
                     self.remember_channel(ctx, user.channel_id);
                     self.on_own_channel(ctx, user.channel_id);
+                    self.sync_channel_audio(&mut lock(&self.core));
                 }
                 if let Some(setting) = setting {
                     ctx.events.emit(EngineEvent::UserUpserted(
@@ -2941,6 +3040,45 @@ impl Inner {
         Ok(())
     }
 
+    /// Switches the open device streams without saving anything (a mic test on devices the user
+    /// has not committed to yet, #149). Does nothing while no stream is open: the next start
+    /// opens the stored devices.
+    async fn switch_audio_devices(
+        self: &Arc<Self>,
+        input: Option<String>,
+        output: Option<String>,
+    ) -> EngineResult<()> {
+        let inner = self.clone();
+        self.rt
+            .spawn_blocking(move || {
+                let core = lock(&inner.core);
+                match &core.audio {
+                    Some(audio) => audio.set_devices(input, output),
+                    None => Ok(()),
+                }
+            })
+            .await
+            .map_err(|e| EngineError::internal(e.to_string()))??;
+        Ok(())
+    }
+
+    /// Switches back to `devices` in the background; the caller holds no lock, so a running
+    /// stream reopen never stalls it.
+    fn restore_audio_devices(self: &Arc<Self>, devices: Option<(Option<String>, Option<String>)>) {
+        let Some((input, output)) = devices else {
+            return;
+        };
+        let inner = self.clone();
+        self.rt.spawn_blocking(move || {
+            let core = lock(&inner.core);
+            if let Some(audio) = &core.audio
+                && let Err(e) = audio.set_devices(input, output)
+            {
+                tracing::warn!(error = %e, "switching the audio devices back failed");
+            }
+        });
+    }
+
     /// Starts voice for the pipeline's server if devices are free; otherwise it starts once
     /// the devices are up or the mic test is over.
     fn start_pipeline(self: &Arc<Self>, core: &mut Core) {
@@ -3045,7 +3183,9 @@ impl Inner {
     }
 
     fn finish_mic_test(self: &Arc<Self>, core: &mut Core) {
+        let restore = core.mic_test_restore.take();
         let Some(test) = core.mic_test.take() else {
+            self.restore_audio_devices(restore);
             return;
         };
         self.events
@@ -3057,6 +3197,7 @@ impl Inner {
         }
         self.start_pipeline(core);
         self.release_audio_if_idle(core);
+        self.restore_audio_devices(restore);
     }
 
     /// Identity `id` from secure storage; the secret store caches it for the session, so

@@ -1,0 +1,94 @@
+{
+  "title": "Neem je Mumble-instellingen mee",
+  "intro": "We hebben de officiële Mumble-client op deze computer gevonden. Kies wat je wilt kopiëren. Er wordt niets aangepast in Mumble en er verlaat niets je computer.",
+  "optional": "{{progress}} · optioneel",
+  "listLabel": "Wat uit Mumble te kopiëren",
+  "favourites": {
+    "title": "Serverfavorieten",
+    "found_one": "{{count}} gevonden",
+    "found_other": "{{count}} gevonden",
+    "duplicates_one": "{{count}} al in Mumcord (overgeslagen)",
+    "duplicates_other": "{{count}} al in Mumcord (overgeslagen)",
+    "failed": "De serverlijst van Mumble kon niet worden gelezen.",
+    "review": "Lijst bekijken",
+    "hide": "Lijst verbergen",
+    "listLabel": "Te kopiëren servers",
+    "duplicate": "Al in Mumcord"
+  },
+  "passwords": {
+    "title": "Opgeslagen wachtwoorden",
+    "count_one": "{{count}} van de favorieten heeft een opgeslagen wachtwoord",
+    "count_other": "{{count}} van de favorieten hebben een opgeslagen wachtwoord",
+    "keychain": "Opgeslagen in de sleutelhanger van het systeem"
+  },
+  "identity": {
+    "title": "Identiteit (clientcertificaat)",
+    "keeps": "Behoudt je geregistreerde naam en rechten",
+    "locked": "beveiligd met een wachtwoord in Mumble",
+    "named": "Certificaat voor “{{name}}”",
+    "validUntil": "geldig tot {{date}}",
+    "passwordNeeded": "Wachtwoord nodig",
+    "already": "Al in Mumcord",
+    "password": "Certificaatwachtwoord uit Mumble",
+    "passwordRequired": "Voer het certificaatwachtwoord in.",
+    "wrongPassword": "Dit wachtwoord opent het certificaat niet. Probeer het opnieuw."
+  },
+  "devices": {
+    "title": "Audioapparaten",
+    "input": "Microfoon: {{name}}",
+    "output": "Uitvoer: {{name}}",
+    "missing": "De apparaten van Mumble zijn niet aangesloten op deze computer."
+  },
+  "ptt": {
+    "title": "Push-to-talk-toets",
+    "modifierOnly": "De toets in Mumble is alleen een modifier-toets, die Mumcord niet kan gebruiken. Je kunt later een toets kiezen.",
+    "tooManyKeys": "De sneltoets in Mumble bestaat uit meer dan één toets, wat Mumcord niet kan gebruiken. Je kunt later een toets kiezen.",
+    "unknown": "De sneltoets in Mumble gebruikt een toets of apparaat dat Mumcord niet kent. Je kunt later een toets kiezen."
+  },
+  "volume": {
+    "title": "Volume en spraakinstellingen",
+    "hint": "Mumble en Mumcord gebruiken andere schalen, dus de waarden zouden niet overeenkomen",
+    "notRecommended": "Niet aanbevolen"
+  },
+  "selected_one": "{{count}} item geselecteerd",
+  "selected_other": "{{count}} items geselecteerd",
+  "import": "Importeren",
+  "importing": "Bezig met importeren…",
+  "skip": "Nu overslaan",
+  "cancel": "Annuleren",
+  "failed": "De import kon niet worden voltooid. Probeer het opnieuw.",
+  "secureStorage": "Mumcord heeft geen toegang tot de beveiligde opslag van je systeem. Ontgrendel je sleutelhanger of wachtwoordmanager en probeer het opnieuw.",
+  "settingsFailed": "Je servers zijn gekopieerd, maar de instellingen konden niet worden opgeslagen.",
+  "summary": {
+    "title": "Import voltooid",
+    "intro": "Je Mumble-gegevens zijn gekopieerd. Bekijk wat er is gebeurd.",
+    "added_one": "{{count}} server toegevoegd aan favorieten",
+    "added_other": "{{count}} servers toegevoegd aan favorieten",
+    "skipped_one": "{{count}} server overgeslagen",
+    "skipped_other": "{{count}} servers overgeslagen",
+    "skippedDetail_one": "{{names}} staat al in je lijst",
+    "skippedDetail_other": "{{names}} staan al in je lijst",
+    "duplicate": "Dubbel",
+    "passwords_one": "{{count}} wachtwoord opgeslagen",
+    "passwords_other": "{{count}} wachtwoorden opgeslagen",
+    "passwordsDetail": "Opgeslagen in de sleutelhanger van het systeem, niet in een bestand",
+    "identity": "Identiteit geïmporteerd",
+    "identityDefault": "Mumcord gebruikt deze nu",
+    "identityServers": "Gebruikt voor de gekopieerde servers",
+    "identitySkipped": "Identiteit al in Mumcord",
+    "identitySkippedDetail": "Dit certificaat is al een van je identiteiten",
+    "devicesAndPtt": "Audioapparaten en push-to-talk-toets",
+    "done": "Klaar",
+    "undo": "Import ongedaan maken",
+    "undone": "De import is ongedaan gemaakt.",
+    "undoFailed": "De import kon niet volledig ongedaan worden gemaakt. Controleer je servers en identiteiten."
+  },
+  "settings": {
+    "title": "Importeren uit Mumble",
+    "hint": "Kopieer serverfavorieten, opgeslagen wachtwoorden, je certificaat en audio-instellingen uit de officiële Mumble-client.",
+    "button": "Importeren uit Mumble…",
+    "searching": "Zoeken naar Mumble…",
+    "notFound": "De officiële Mumble-client is niet gevonden op deze computer.",
+    "breadcrumb": "Instellingen · Servers · Importeren uit Mumble"
+  }
+}

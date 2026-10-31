@@ -21,6 +21,8 @@ import {
   FollowStar,
   MessageNotifications,
 } from "../features/follow";
+import { ChannelAudioHost } from "../features/channelaudio";
+import { ChannelHeader, ChannelTreeMenu } from "../features/channelheader";
 import { ChatView } from "../features/chat";
 import { UserStatsWatcher } from "../features/connection";
 import { FriendsList } from "../features/friends";
@@ -33,6 +35,7 @@ import {
 import { ScreenShareWidget } from "../features/screenshare";
 import { VideoDucking, WatchPartyWidget } from "../features/watchparty";
 import { ConnectionStatus, RejoinPrompt, ServersRoot } from "../features/servers";
+import { closeServerBrowser, useServerBrowserOpen } from "../features/serverbrowser";
 import { RequestsEntry, RequestsView, useRequestsView } from "../features/requests";
 import {
   closeMessages,
@@ -55,8 +58,13 @@ import {
 /** Server bar (B19). */
 export function ServersMount() {
   const messages = useMessagesOpen();
+  const browserOpen = useServerBrowserOpen();
   return (
-    <ServersRoot top={<MessagesButton />} topActive={messages} onServerClick={closeMessages} />
+    <ServersRoot
+      top={<MessagesButton covered={browserOpen} onOpen={closeServerBrowser} />}
+      topActive={messages}
+      onServerClick={closeMessages}
+    />
   );
 }
 
@@ -79,6 +87,7 @@ export function ChannelsMount() {
         aboveTree={<RequestsEntry />}
         channelBadge={(channelId) => <ChannelUnreadBadge channelId={channelId} />}
         channelAction={(channel) => <FollowStar {...channel} />}
+        channelMenu={(menu) => <ChannelTreeMenu key={menu.channelId} {...menu} />}
       />
       <FollowNoticeLine />
       <UserStatsWatcher />
@@ -122,6 +131,7 @@ export function ChatStatusMount() {
       <ConnectionStatus />
       <RejoinPrompt />
       <CloseDialog />
+      <ChannelAudioHost />
       <WindowOverlayNotice api={windowOverlayNoticeApi} onOpenSettings={openOverlaySettings} />
       <AudioDeviceNotice api={audioDeviceNoticeApi} onOpenSettings={openAudioSettings} />
       <UpdateHint />
@@ -139,6 +149,7 @@ export function ChatMount() {
     return <RequestsView serverId={requests.serverId} selectedId={requests.selectedId} />;
   return (
     <ChatView
+      renderChannelTitle={(channelId) => <ChannelHeader channelId={channelId} />}
       renderHeaderActions={(conv) => (
         <>
           <FollowHeaderActions conversation={conv} />
@@ -206,6 +217,14 @@ export function WizardMount() {
 
 /** Settings content inside the settings overlay (B24). */
 export function SettingsMount() {
-  const { settingsSection } = useView();
-  return <SettingsScreen {...(settingsSection ? { initialSection: settingsSection } : {})} />;
+  const { settingsSection, settingsRevision } = useView();
+  // A section requested while the settings are already open (e.g. "Manage identities" in the
+  // About page or the wizard rerun, #149) remounts the screen there.
+  return (
+    <SettingsScreen
+      key={settingsSection ?? "default"}
+      settingsRevision={settingsRevision}
+      {...(settingsSection ? { initialSection: settingsSection } : {})}
+    />
+  );
 }

@@ -25,13 +25,18 @@
   color: var(--color-accent-text);
 }
 
-.dnd-indicator__source,
-.dnd-indicator__hint {
-  color: var(--color-text-secondary);
+/* The label wraps rather than pushing the "?" out of the narrow user panel. */
+.dnd-indicator__badge > strong {
+  min-width: 0;
 }
 
-.dnd-indicator__hint {
-  margin: var(--space-1) 0 0;
+.dnd-indicator__badge > .info-tip {
+  flex: none;
+  margin-inline-start: auto;
+}
+
+.dnd-indicator__source {
+  color: var(--color-text-secondary);
 }
 
 .dnd-status {

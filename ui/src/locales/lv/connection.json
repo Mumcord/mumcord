@@ -92,5 +92,14 @@
   "endToEndValue": "≈ {{value}} ms (aplēse)",
   "lowLatencyMode": "Zemas aizkaves režīms",
   "identity": "Identitāte",
-  "identityValue": "{{label}} ({{name}}) · {{fingerprint}}"
+  "identityValue": "{{label}} ({{name}}) · {{fingerprint}}",
+  "profileSource": "{{label}} (kanāla profils)",
+  "profile": {
+    "row": "Audio profils",
+    "musicOn": "Mūzikas kvalitāte",
+    "musicOff": "Mūzikas kvalitāte izslēgta",
+    "lowLatencyOn": "Zemas aizkaves režīms",
+    "lowLatencyOff": "Zemas aizkaves režīms izslēgts",
+    "defaults": "Noklusējums"
+  }
 }

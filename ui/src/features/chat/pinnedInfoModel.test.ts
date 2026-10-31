@@ -3,7 +3,16 @@ import type { ChannelInfo, ServerInfo } from "../../api";
 import { getServerState, resetServerStore, type ServerState } from "../channels/serverStore";
 import { pinnedInfo } from "./pinnedInfoModel";
 
-const allow = { enter: true, textMessage: true, listen: true, registerSelf: false };
+const allow = {
+  enter: true,
+  textMessage: true,
+  listen: true,
+  registerSelf: false,
+  speak: true,
+  whisper: true,
+  write: false,
+  moveUsers: false,
+};
 
 function channel(id: number, patch: Partial<ChannelInfo> = {}): ChannelInfo {
   return {
@@ -15,6 +24,9 @@ function channel(id: number, patch: Partial<ChannelInfo> = {}): ChannelInfo {
     description: null,
     hasDescription: false,
     maxUsers: null,
+    temporary: false,
+    links: [],
+    enterRestricted: false,
     ...patch,
   };
 }

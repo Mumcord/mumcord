@@ -224,8 +224,7 @@ const MIGRATIONS: &[&str] = &[
     ",
     // v18: audio profiles per channel (issue #171): overrides of Music quality, low-latency mode
     // and the bitrate cap; NULL keeps the global setting. Keyed by channel id, with the channel
-    // path kept so a renamed or recreated channel still matches. v17 is `pm_conversation`
-    // (issue #173), which lands first; until then this entry is the 17th.
+    // path kept so a renamed or recreated channel still matches.
     r"
     CREATE TABLE channel_audio_profile (
         server_id     INTEGER NOT NULL REFERENCES saved_server (id) ON DELETE CASCADE,
@@ -238,7 +237,7 @@ const MIGRATIONS: &[&str] = &[
     );
     ",
     // v19: blocked users (issue #140), kept per own identity (FR-3.79). Lands after #218,
-    // whose `channel_audio_profile` (v18, above) is carried here unchanged so the version
+    // whose `channel_audio_profile` (v18, above) keeps its version number so the version
     // numbers match. A certificate block (`cert_hash` set) covers every server of
     // that identity (Q1.4); a name block (`cert_hash` NULL) is for people without a
     // certificate and only applies on `server_id`. `server_label` keeps where the block was
@@ -321,6 +320,7 @@ pub(crate) mod tests {
     #[test]
     fn blocked_user_is_v19_after_channel_audio_profile() {
         assert_eq!(MIGRATIONS.len(), 19);
+        assert!(MIGRATIONS[16].contains("CREATE TABLE pm_conversation"));
         assert!(MIGRATIONS[17].contains("CREATE TABLE channel_audio_profile"));
         assert!(MIGRATIONS[18].contains("CREATE TABLE blocked_user"));
     }

@@ -1,7 +1,9 @@
-import { fireEvent, screen, waitFor } from "@testing-library/react";
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { fireEvent, screen, waitFor, within } from "@testing-library/react";
+import { afterEach, beforeEach, describe, expect, it, vi, type Mock } from "vitest";
 import { setApi } from "../../api";
 import { subscribeAnnouncements } from "../../a11y/announcer";
+import { stubDialog } from "../channels/testUtils";
+import { chooseOption, optionLabels } from "../../components/SelectTestUtils";
 import { axeViolations } from "../../test/axe";
 import { renderInWizard, setupWizardTest, type Harness } from "./testUtils";
 import { Wizard } from "./Wizard";
@@ -326,5 +328,270 @@ describe("Wizard", () => {
       expect(harness.finishWizard).toHaveBeenCalledOnce();
     });
     expect((await harness.api.settingsGet()).updateCheck).toBe("yes");
+  });
+});
+
+describe("Wizard rerun from Settings (#149)", () => {
+  let onClose: Mock<() => void>;
+  let onManageIdentities: Mock<() => void>;
+
+  beforeEach(async () => {
+    stubDialog();
+    harness = await setupWizardTest("dark", "ready");
+    onClose = vi.fn<() => void>();
+    onManageIdentities = vi.fn<() => void>();
+  });
+
+  function renderRerun() {
+    return renderInWizard(
+      harness,
+      <Wizard mode="rerun" onClose={onClose} onManageIdentities={onManageIdentities} />,
+    );
+  }
+
+  function next() {
+    fireEvent.click(screen.getByRole("button", { name: "Next" }));
+  }
+
+  async function toTalkStep() {
+    next();
+    await screen.findByRole("heading", { name: "Your privacy" });
+    next();
+    await screen.findByRole("heading", { name: "New versions" });
+    next();
+    return screen.findByRole("heading", { name: "How do you want to talk?" });
+  }
+
+  it("starts at the microphone, counts four steps and leaves out the identity", async () => {
+    const identityCreate = vi.spyOn(harness.api, "identityCreate");
+    const identityImport = vi.spyOn(harness.api, "identityImport");
+    renderRerun();
+    const heading = await screen.findByRole("heading", { name: "Microphone" });
+    await waitFor(() => expect(heading).toHaveFocus());
+    expect(heading).toHaveAccessibleDescription("Step 1 of 4");
+    expect(screen.queryByRole("heading", { name: "Your identity" })).not.toBeInTheDocument();
+    expect(identityCreate).not.toHaveBeenCalled();
+    expect(identityImport).not.toHaveBeenCalled();
+  });
+
+  it("lists the steps with the identity marked as skipped", async () => {
+    renderRerun();
+    const steps = await screen.findByRole("list", { name: "Setup steps" });
+    expect(within(steps).getAllByRole("listitem")).toHaveLength(5);
+    expect(within(steps).getByText("Identity")).toBeInTheDocument();
+    expect(within(steps).getAllByText(/skipped/)).toHaveLength(1);
+    expect(within(steps).getByText("Microphone").closest("li")).toHaveAttribute(
+      "aria-current",
+      "step",
+    );
+  });
+
+  it("says the identity is not changed and links to the identity manager", async () => {
+    renderRerun();
+    await screen.findByRole("heading", { name: "Microphone" });
+    expect(screen.getByText(/Your identity is not changed/)).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "Manage identities" }));
+    expect(onManageIdentities).toHaveBeenCalledOnce();
+  });
+
+  it("prefills the saved values", async () => {
+    const saved = await harness.api.settingsGet();
+    await harness.api.settingsUpdate({
+      ...saved,
+      inputDevice: "mic-usb",
+      talkMode: "pushToTalk",
+      pttKey: "F8",
+      updateCheck: "yes",
+      linkPreviews: false,
+      historySharing: false,
+    });
+    renderRerun();
+    const mic = await screen.findByRole("combobox", { name: "Microphone" });
+    await waitFor(() => {
+      expect(optionLabels(mic)).toContain("USB Headset");
+    });
+    expect(mic).toHaveTextContent("USB Headset");
+    next();
+    await screen.findByRole("heading", { name: "Your privacy" });
+    next();
+    await screen.findByRole("heading", { name: "New versions" });
+    expect(screen.getByRole("checkbox", { name: "Check for new versions" })).toBeChecked();
+    next();
+    await screen.findByRole("heading", { name: "How do you want to talk?" });
+    expect(screen.getByRole("radio", { name: /Push to talk/ })).toBeChecked();
+    expect(screen.getByText("Key: F8")).toBeInTheDocument();
+    expect(
+      screen.getByRole("checkbox", { name: "Show link previews and embeds" }),
+    ).not.toBeChecked();
+    expect(screen.getByRole("checkbox", { name: "Share my channel history" })).not.toBeChecked();
+  });
+
+  it("writes nothing before Finish and only the changed microphone at Finish", async () => {
+    const settingsUpdate = vi.spyOn(harness.api, "settingsUpdate");
+    renderRerun();
+    const mic = await screen.findByRole("combobox", { name: "Microphone" });
+    await waitFor(() => {
+      expect(optionLabels(mic)).toContain("USB Headset");
+    });
+    chooseOption(mic, "USB Headset");
+    await waitFor(() => {
+      expect(mic).toHaveTextContent("USB Headset");
+    });
+    expect(settingsUpdate).not.toHaveBeenCalled();
+    expect((await harness.api.settingsGet()).inputDevice).toBeNull();
+
+    await toTalkStep();
+    fireEvent.click(screen.getByRole("button", { name: "Finish" }));
+    await waitFor(() => {
+      expect(onClose).toHaveBeenCalledOnce();
+    });
+    expect(harness.finishWizard).not.toHaveBeenCalled();
+    const saved = await harness.api.settingsGet();
+    expect(saved).toMatchObject({
+      inputDevice: "mic-usb",
+      talkMode: "voiceActivation",
+      autostart: false,
+      linkPreviews: true,
+      historySharing: true,
+      // Passing the step answers the question, so "unset" becomes a plain "no".
+      updateCheck: "no",
+      wizardCompleted: true,
+    });
+    expect(settingsUpdate).toHaveBeenCalledTimes(1);
+    expect(harness.applySettings).toHaveBeenCalledWith(saved);
+  });
+
+  it("tests unsaved devices without saving them", async () => {
+    const micTestStart = vi.spyOn(harness.api, "micTestStart");
+    renderRerun();
+    const mic = await screen.findByRole("combobox", { name: "Microphone" });
+    await waitFor(() => {
+      expect(optionLabels(mic)).toContain("USB Headset");
+    });
+    chooseOption(mic, "USB Headset");
+    fireEvent.click(screen.getByRole("button", { name: "Test" }));
+    await waitFor(() => {
+      expect(micTestStart).toHaveBeenCalledWith({ inputDevice: "mic-usb", outputDevice: null });
+    });
+  });
+
+  it("closes without asking when Cancel drops nothing", async () => {
+    renderRerun();
+    await screen.findByRole("heading", { name: "Microphone" });
+    fireEvent.click(screen.getByRole("button", { name: "Cancel" }));
+    expect(onClose).toHaveBeenCalledOnce();
+    expect(screen.queryByRole("alertdialog")).not.toBeInTheDocument();
+  });
+
+  it("closes without asking when Cancel on the last step drops nothing", async () => {
+    renderRerun();
+    await screen.findByRole("heading", { name: "Microphone" });
+    next();
+    await screen.findByRole("heading", { name: "Your privacy" });
+    next();
+    await screen.findByRole("heading", { name: "New versions" });
+    next();
+    await screen.findByRole("heading", { name: "How do you want to talk?" });
+    fireEvent.click(screen.getByRole("button", { name: "Cancel" }));
+    expect(onClose).toHaveBeenCalledOnce();
+    expect(screen.queryByRole("alertdialog")).not.toBeInTheDocument();
+  });
+
+  it("asks before Cancel drops a changed update check", async () => {
+    renderRerun();
+    await screen.findByRole("heading", { name: "Microphone" });
+    next();
+    await screen.findByRole("heading", { name: "Your privacy" });
+    next();
+    await screen.findByRole("heading", { name: "New versions" });
+    const check = screen.getByRole("checkbox", { name: "Check for new versions" });
+    expect(check).not.toBeChecked();
+    fireEvent.click(check);
+    fireEvent.click(screen.getByRole("button", { name: "Cancel" }));
+    expect(await screen.findByRole("alertdialog")).toBeInTheDocument();
+  });
+
+  it("saves a changed update check on Finish", async () => {
+    renderRerun();
+    await screen.findByRole("heading", { name: "Microphone" });
+    next();
+    await screen.findByRole("heading", { name: "Your privacy" });
+    next();
+    await screen.findByRole("heading", { name: "New versions" });
+    fireEvent.click(screen.getByRole("checkbox", { name: "Check for new versions" }));
+    next();
+    await screen.findByRole("heading", { name: "How do you want to talk?" });
+    fireEvent.click(screen.getByRole("button", { name: "Finish" }));
+    await waitFor(() => {
+      expect(onClose).toHaveBeenCalledOnce();
+    });
+    expect((await harness.api.settingsGet()).updateCheck).toBe("yes");
+  });
+
+  it("asks before Cancel drops a changed microphone, and keeps everything on discard", async () => {
+    renderRerun();
+    const mic = await screen.findByRole("combobox", { name: "Microphone" });
+    await waitFor(() => {
+      expect(optionLabels(mic)).toContain("USB Headset");
+    });
+    chooseOption(mic, "USB Headset");
+    fireEvent.click(screen.getByRole("button", { name: "Cancel" }));
+    const question = await screen.findByRole("alertdialog", { name: "Discard your changes?" });
+    expect(within(question).getByRole("button", { name: "Keep editing" })).toHaveFocus();
+    fireEvent.click(within(question).getByRole("button", { name: "Keep editing" }));
+    expect(onClose).not.toHaveBeenCalled();
+    expect(mic).toHaveTextContent("USB Headset");
+
+    fireEvent.click(screen.getByRole("button", { name: "Cancel" }));
+    fireEvent.click(
+      within(await screen.findByRole("alertdialog")).getByRole("button", {
+        name: "Discard changes",
+      }),
+    );
+    expect(onClose).toHaveBeenCalledOnce();
+    expect((await harness.api.settingsGet()).inputDevice).toBeNull();
+  });
+
+  it("writes only the changed start options at Finish and leaves the overlay alone", async () => {
+    const saved = await harness.api.settingsGet();
+    await harness.api.settingsUpdate({ ...saved, autostart: true });
+    const overlaySetMode = vi.spyOn(harness.api, "ingameOverlaySetMode");
+    const settingsUpdate = vi.spyOn(harness.api, "settingsUpdate");
+    renderRerun();
+    await screen.findByRole("heading", { name: "Microphone" });
+    await toTalkStep();
+    const autostart = screen.getByRole("checkbox", { name: "Start Mumcord when I log in" });
+    expect(autostart).toBeChecked();
+    fireEvent.click(autostart);
+    fireEvent.click(screen.getByRole("button", { name: "Finish" }));
+    await waitFor(() => {
+      expect(onClose).toHaveBeenCalledOnce();
+    });
+    expect(settingsUpdate).toHaveBeenCalledTimes(1);
+    expect((await harness.api.settingsGet()).autostart).toBe(false);
+    expect(overlaySetMode).not.toHaveBeenCalled();
+  });
+
+  it("keeps the wizard open when saving fails", async () => {
+    renderRerun();
+    const mic = await screen.findByRole("combobox", { name: "Microphone" });
+    await waitFor(() => {
+      expect(optionLabels(mic)).toContain("USB Headset");
+    });
+    chooseOption(mic, "USB Headset");
+    await toTalkStep();
+    harness.api.mock.failNext("settingsUpdate", "internal");
+    fireEvent.click(screen.getByRole("button", { name: "Finish" }));
+    expect(await screen.findByRole("alert")).toHaveTextContent("could not be saved");
+    expect(onClose).not.toHaveBeenCalled();
+  });
+
+  it.each(["dark", "light"] as const)("has no axe violations (%s)", async (theme) => {
+    harness = await setupWizardTest(theme, "ready");
+    const { container } = renderRerun();
+    await screen.findByRole("heading", { name: "Microphone" });
+    expect(await axeViolations(container)).toEqual([]);
+    fireEvent.click(screen.getByRole("button", { name: "Cancel" }));
+    expect(await axeViolations(container)).toEqual([]);
   });
 });

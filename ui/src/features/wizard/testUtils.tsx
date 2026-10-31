@@ -13,11 +13,17 @@ export interface Harness {
   applySettings: Mock<Preferences["applySettings"]>;
 }
 
-/** Fresh mock engine (first start) plus the view/preferences contexts the wizard needs. */
-export async function setupWizardTest(theme: "dark" | "light" = "dark"): Promise<Harness> {
+/**
+ * Mock engine plus the view/preferences contexts the wizard needs. "fresh" is a first start,
+ * "ready" a finished setup like the one the rerun from Settings starts from (#149).
+ */
+export async function setupWizardTest(
+  theme: "dark" | "light" = "dark",
+  seed: "fresh" | "ready" = "fresh",
+): Promise<Harness> {
   await applyLanguage("en");
   applyThemeToDocument(theme);
-  const api = createMockApi({ seed: "fresh" });
+  const api = createMockApi({ seed });
   setApi(api);
   return {
     api,
@@ -36,6 +42,10 @@ export function renderInWizard(harness: Harness, ui: ReactNode) {
     openOverlaySettings: vi.fn(),
     openAudioSettings: vi.fn(),
     openPrivacySettings: vi.fn(),
+    openRerunWizard: vi.fn(),
+    closeRerunWizard: vi.fn(),
+    rerunWizard: false,
+    settingsRevision: 0,
     closeOverlay: vi.fn(),
     retry: vi.fn(),
   };

@@ -37,9 +37,9 @@ use tauri::{AppHandle, Manager};
 use tauri_specta::{Builder, Event, collect_commands, collect_events};
 
 use commands::{
-    app, audio, blocking, channels, chat, diagnostics, dropped, follow, friends, history, identity,
-    links, notifications as notify, people, pm_overview, pm_rules, profile, servers, session,
-    settings,
+    app, audio, blocking, channel_audio, channels, chat, diagnostics, dropped, follow, friends,
+    history, identity, links, mumble_import, notifications as notify, people, pm_overview,
+    pm_rules, profile, servers, session, settings,
 };
 
 /// Path of the generated TypeScript bindings, relative to this crate.
@@ -66,6 +66,9 @@ fn specta_builder() -> Builder<tauri::Wry> {
             identity::identity_delete,
             identity::identity_set_default,
             identity::server_set_identity,
+            mumble_import::mumble_import_scan,
+            mumble_import::mumble_import_apply,
+            mumble_import::mumble_import_undo,
             servers::servers_list,
             servers::server_add,
             servers::server_test_connection,
@@ -95,6 +98,7 @@ fn specta_builder() -> Builder<tauri::Wry> {
             channels::channel_password_rename,
             channels::channel_passwords_remove,
             channels::channel_description_request,
+            people::person_move,
             people::person_set_volume,
             people::person_set_local_mute,
             people::person_set_note,
@@ -133,6 +137,8 @@ fn specta_builder() -> Builder<tauri::Wry> {
             links::open_link,
             links::mumble_link_stats,
             links::mumble_link_join,
+            commands::public_servers::public_servers_list,
+            commands::public_servers::public_server_ping,
             links::inline_image,
             links::preview_dismiss,
             links::embed_player_open,
@@ -151,6 +157,7 @@ fn specta_builder() -> Builder<tauri::Wry> {
             follow::conversation_mark_read,
             history::history_load,
             history::history_clear,
+            history::history_cleared_at,
             history::history_set_saving,
             history::history_sync_request,
             profile::set_own_avatar,
@@ -166,6 +173,9 @@ fn specta_builder() -> Builder<tauri::Wry> {
             settings::audio_device_notice_dismiss,
             audio::audio_devices,
             audio::bitrate_max,
+            channel_audio::channel_audio_profiles,
+            channel_audio::channel_audio_profile_set,
+            channel_audio::active_audio_profile,
             audio::mic_test_start,
             audio::audio_test_sound,
             audio::mic_test_stop,
@@ -273,6 +283,8 @@ fn specta_builder() -> Builder<tauri::Wry> {
             audio::AudioDevicesChanged,
             audio::AudioDeviceFallback,
             audio::BitrateMaxChanged,
+            channel_audio::ChannelAudioProfilesChanged,
+            channel_audio::ActiveAudioProfileChanged,
             audio::MicLevel,
             audio::MicTestPhaseChanged,
             app::CloseRequested,
@@ -633,6 +645,19 @@ fn emit_engine_event(
             kbps: max_bps.map(|b| b / 1000),
         }
         .emit(app),
+        EngineEvent::ChannelAudioProfilesChanged(profiles) => {
+            channel_audio::ChannelAudioProfilesChanged {
+                server_id,
+                profiles: profiles.into_iter().map(Into::into).collect(),
+            }
+            .emit(app)
+        }
+        EngineEvent::ActiveAudioProfileChanged(active) => {
+            channel_audio::ActiveAudioProfileChanged {
+                active: active.map(Into::into),
+            }
+            .emit(app)
+        }
         EngineEvent::MicLevel(level) => audio::MicLevel { level }.emit(app),
         EngineEvent::MicTestPhaseChanged(phase) => audio::MicTestPhaseChanged {
             phase: phase.into(),

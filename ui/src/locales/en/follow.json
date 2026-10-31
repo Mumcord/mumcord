@@ -52,5 +52,9 @@
     "dismiss": "Dismiss",
     "unfollowFailed": "Unfollowing all channels didn't work. Please try again."
   },
-  "mention": "includes a mention of you"
+  "mention": "includes a mention of you",
+  "header": {
+    "follow": "Follow channel",
+    "unfollow": "Following, click to unfollow"
+  }
 }

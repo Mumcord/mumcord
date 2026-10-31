@@ -3,11 +3,14 @@
  * It follows the contract in docs/engine-api.md closely enough for UI flows, not the
  * Mumble protocol: no network, no audio.
  */
+import { mockPublicServerPing, mockPublicServers } from "./mockPublicServers";
 import type {
   DndState,
   InspectorView,
   LinkOutcome,
   MessageNotice,
+  MumbleImportDone,
+  MumbleImportFound,
   MumbleLinkStats,
   NotifyOutcome,
   SystemDnd,
@@ -17,10 +20,12 @@ import { parseMumbleLink } from "../features/chat/mumbleLink";
 import type {
   AcceptedConversation,
   BlockedUser,
+  ActiveAudioProfile,
   PmConversationPrefs,
   PrivateConversation,
   ApiError,
   AudioDevices,
+  ChannelAudioProfile,
   ChannelInfo,
   ChatMessage,
   ConnectionState,
@@ -78,6 +83,11 @@ export interface MockOptions {
   maxListeners?: number;
   /** Delay before connection events fire; 0 emits them synchronously (handy in tests). */
   connectDelayMs?: number;
+  /**
+   * What the import from the official Mumble client finds (issue #66); `null` = not installed.
+   * Defaults to fictional data in the demo seeds and to `null` otherwise.
+   */
+  mumble?: MumbleImportFound | null;
 }
 
 /** Test and dev controls on top of the normal API. */
@@ -129,6 +139,8 @@ export interface MockControls {
   upsertUser(user: User): void;
   /** Takes away the Enter permission of a channel; `MOCK_CHANNEL_PASSWORD` opens it (FR-2.78). */
   lockChannel(channelId: number): void;
+  /** Changes a channel as a server update would, e.g. its user limit or permissions. */
+  updateChannel(channelId: number, patch: Partial<Omit<ChannelInfo, "id">>): void;
   /** Renames a channel, like an admin on the server would. */
   renameChannel(channelId: number, name: string): void;
   /** Sets a channel's user limit, like an admin on the server would. */
@@ -412,7 +424,16 @@ const DEFAULT_CONNECTION_STATS: ConnectionStats = {
   latency: mockLatencyEstimate(false),
 };
 
-const allow = { enter: true, textMessage: true, listen: true, registerSelf: false };
+const allow = {
+  enter: true,
+  textMessage: true,
+  listen: true,
+  registerSelf: false,
+  speak: true,
+  whisper: true,
+  write: false,
+  moveUsers: false,
+};
 
 function seedChannels(): ChannelInfo[] {
   return [
@@ -423,6 +444,10 @@ function seedChannels(): ChannelInfo[] {
       position: 0,
       permissions: { ...allow, registerSelf: true },
       ...noDescription,
+      maxUsers: null,
+      temporary: false,
+      links: [],
+      enterRestricted: false,
     },
     {
       id: 1,
@@ -433,6 +458,9 @@ function seedChannels(): ChannelInfo[] {
       description: MOCK_LOBBY_DESCRIPTION,
       hasDescription: true,
       maxUsers: null,
+      temporary: false,
+      links: [],
+      enterRestricted: false,
     },
     // Like a long description on a real server: only announced, fetched on request.
     {
@@ -444,6 +472,9 @@ function seedChannels(): ChannelInfo[] {
       description: null,
       hasDescription: true,
       maxUsers: null,
+      temporary: false,
+      links: [],
+      enterRestricted: false,
     },
     {
       id: 3,
@@ -452,9 +483,50 @@ function seedChannels(): ChannelInfo[] {
       position: 2,
       permissions: { ...allow, textMessage: false },
       ...noDescription,
+      maxUsers: null,
+      temporary: false,
+      links: [],
+      enterRestricted: false,
     },
   ];
 }
+
+/** A fictional official Mumble client for screenshots (issue #66); "Book Club" is a duplicate. */
+export const DEMO_MUMBLE: MumbleImportFound = {
+  format: "json",
+  favourites: [
+    ["Nordic Gamers", "nordic.example.org", true],
+    ["Retro LAN", "retro.example.net", true],
+    ["Coffee Club", "coffee.example.com", false],
+    ["Pixel Harbor", "pixel.example.org", true],
+    ["Silent Orbit", "orbit.example.net", false],
+    ["Book Club", "books.example.com", false],
+  ].map(([label, host, hasPassword]) => ({
+    label: label as string,
+    host: host as string,
+    port: 64738,
+    username: "Zoe",
+    hasPassword: hasPassword as boolean,
+    duplicate: false,
+  })),
+  favouritesFailed: false,
+  certificate: {
+    name: "",
+    validUntil: null,
+    needsPassword: true,
+    alreadyImported: false,
+  },
+  inputDevice: { id: "pipewire:usb-headset", name: "USB Headset" },
+  outputDevice: { id: "pipewire:speakers", name: "Speakers" },
+  devicesMissing: false,
+  pttKey: "Ctrl+Space",
+  pttIssue: null,
+  talkMode: "pushToTalk",
+  outputVolumePercent: 80,
+};
+
+/** Password of the locked certificate in {@link DEMO_MUMBLE}. */
+export const DEMO_MUMBLE_CERT_PASSWORD = "mumble";
 
 /** Fictional demo data for screenshots (seed "demo"); example.org addresses only. */
 const DEMO_SERVERS: [string, string][] = [
@@ -470,18 +542,24 @@ function demoChannels(serverName: string): ChannelInfo[] {
     parentId,
     name,
     position,
-    permissions: { ...allow },
+    // The demo user moderates, so the tree shows "Move users here…" and dragging (#172).
+    permissions: { ...allow, moveUsers: true },
     description: DEMO_DESCRIPTIONS.get(id) ?? null,
     hasDescription: DEMO_DESCRIPTIONS.has(id),
     maxUsers: null,
+    temporary: false,
+    links: [],
+    enterRestricted: false,
   });
   return [
     { ...channel(0, 0, serverName, 0), parentId: null },
     channel(1, 0, "Lobby", 0),
     channel(2, 0, "Gaming", 1),
-    channel(4, 2, "Squad A", 0),
-    channel(5, 2, "Squad B", 1),
-    channel(6, 0, "Music Room", 2),
+    // A user limit and a link between the squads, for the channel info screenshots (#170).
+    { ...channel(4, 2, "Squad A", 0), maxUsers: 5, links: [5] },
+    { ...channel(5, 2, "Squad B", 1), links: [4] },
+    // Full: six people in, for the user-limit screenshots (#172).
+    { ...channel(6, 0, "Music Room", 2), maxUsers: 6 },
     channel(7, 0, "Study Hall", 3),
     { ...channel(3, 0, "AFK", 4), permissions: { ...allow, textMessage: false } },
   ];
@@ -730,6 +808,9 @@ export function createMockApi(options: MockOptions = {}): MockApi {
   const requiredPasswords = new Map<number, string>();
   const savedPasswords = new Map<number, string>();
   const channelTokens = new Map<number, MockChannelToken[]>();
+  // Channel audio profiles (issue #171) by server, then channel id; and the one in effect.
+  const channelAudio = new Map<number, Map<number, ChannelAudioProfile>>();
+  let activeAudio: ActiveAudioProfile | null = null;
   let pendingConnect: { serverId: number; channelPath: string[] | null } | null = null;
   let muteBeforeDeaf = false;
   // Like the engine (QA.7): the forced read-only state of a fresh connect, and the user's last
@@ -782,6 +863,10 @@ export function createMockApi(options: MockOptions = {}): MockApi {
       ? [[1, new Map([[conversationKey({ kind: "channel", channelId: 1 }), demoHistory()]])]]
       : [],
   );
+  // When "Clear history" last ran (issue #119): per server and channel, per server, or for all.
+  const clearedAt = new Map<string, string>();
+  const clearedKey = (serverId: number | null, channelId: number | null) =>
+    `${String(serverId)}:${String(channelId)}`;
 
   function dispatch<K extends EventName>(event: K, payload: EventPayloads[K]): void {
     const set = listeners.get(event);
@@ -891,6 +976,7 @@ export function createMockApi(options: MockOptions = {}): MockApi {
       sessions.set(currentServerId, { snapshot: session()?.snapshot ?? null, state: next });
     }
     emitServer("connectionStateChanged", { state: next });
+    syncActiveAudio();
   }
 
   function pmRequestsOf(serverId: number): PmRequests {
@@ -971,6 +1057,35 @@ export function createMockApi(options: MockOptions = {}): MockApi {
     if (voiceServerId === serverId) return;
     voiceServerId = serverId;
     emit("voiceServerChanged", { serverId });
+    syncActiveAudio();
+  }
+
+  /**
+   * Like the engine: the profile of the own channel is in effect on the server with the voice
+   * pipeline, the voice server or else the earliest connected one.
+   */
+  function syncActiveAudio(): void {
+    const serverId =
+      voiceServerId ??
+      [...sessions].find(([, s]) => s.state.state === "connected" && s.snapshot)?.[0] ??
+      null;
+    const snap = serverId === null ? null : sessions.get(serverId)?.snapshot;
+    const self = snap?.users.find((u) => u.session === snap.selfSession);
+    const profile =
+      serverId !== null && self ? channelAudio.get(serverId)?.get(self.channelId) : undefined;
+    const next =
+      serverId !== null && self && profile
+        ? { serverId, channelId: self.channelId, profile }
+        : null;
+    if (JSON.stringify(next) === JSON.stringify(activeAudio)) return;
+    activeAudio = next;
+    emit("activeAudioProfileChanged", { active: next });
+  }
+
+  function channelAudioEntries(serverId: number) {
+    return [...(channelAudio.get(serverId) ?? new Map<number, ChannelAudioProfile>())]
+      .sort(([a], [b]) => a - b)
+      .map(([channelId, profile]) => ({ channelId, profile }));
   }
 
   /**
@@ -1125,6 +1240,7 @@ export function createMockApi(options: MockOptions = {}): MockApi {
     const updated = { ...requireUser(session), ...patch };
     snap.users = snap.users.map((u) => (u.session === session ? updated : u));
     emitServer("userUpserted", { user: updated });
+    if (session === SELF_SESSION) syncActiveAudio();
     return updated;
   }
 
@@ -1411,6 +1527,83 @@ export function createMockApi(options: MockOptions = {}): MockApi {
     return message;
   }
 
+  // Import from the official Mumble client (issue #66).
+  const mumble = options.mumble !== undefined ? options.mumble : demo ? DEMO_MUMBLE : null;
+  let lastMumbleImport: { servers: number[]; identity: number | null } | null = null;
+
+  function mumbleScan(): MumbleImportFound | null {
+    if (mumble === null) return null;
+    const known = new Set(servers.map((s) => `${s.address.toLowerCase()}:${String(s.port)}`));
+    return {
+      ...mumble,
+      favourites: mumble.favourites.map((f) => ({
+        ...f,
+        duplicate: known.has(`${f.host.toLowerCase()}:${String(f.port)}`),
+      })),
+    };
+  }
+
+  function mumbleApply(
+    request: Parameters<EngineCommands["mumbleImportApply"]>[0],
+  ): MumbleImportDone {
+    const found = mumbleScan();
+    if (found === null) fail("notFound", "Mumble data not found");
+    const cert = found.certificate;
+    if (request.certificate && cert?.needsPassword === true) {
+      if (request.certificatePassword !== DEMO_MUMBLE_CERT_PASSWORD)
+        fail("wrongPassword", "the certificate could not be opened");
+    }
+    const done: MumbleImportDone = {
+      added: [],
+      skipped: [],
+      passwordsSaved: 0,
+      identity: null,
+      identitySkipped: false,
+      identityValidUntil: null,
+    };
+    if (request.certificate && cert) {
+      if (cert.alreadyImported) done.identitySkipped = true;
+      else {
+        done.identity = addIdentity("Zoe", "Zoe", mockCertHash("mumble-import"));
+        done.identityValidUntil = "2029-03-14T00:00:00Z";
+      }
+    }
+    for (const f of found.favourites) {
+      if (!request.favourites.some((k) => k.host === f.host && k.port === f.port)) continue;
+      if (f.duplicate) {
+        done.skipped.push(f.label);
+        continue;
+      }
+      const hasPassword = request.passwords && f.hasPassword;
+      const server: SavedServer = {
+        id: nextServerId++,
+        label: f.label,
+        address: f.host,
+        port: f.port,
+        username: f.username,
+        hasPassword,
+        saveHistory: true,
+        ...NEW_SERVER_FLAGS,
+      };
+      if (hasPassword) done.passwordsSaved += 1;
+      servers = [...servers, server];
+      done.added.push({ ...server });
+    }
+    lastMumbleImport = {
+      servers: done.added.map((s) => s.id),
+      identity: done.identity?.id ?? null,
+    };
+    return done;
+  }
+
+  function mumbleUndo(): void {
+    const last = lastMumbleImport;
+    if (last === null) fail("notFound", "nothing to undo");
+    lastMumbleImport = null;
+    servers = servers.filter((s) => !last.servers.includes(s.id));
+    if (last.identity !== null) identities = identities.filter((i) => i.id !== last.identity);
+  }
+
   const commands: EngineCommands = {
     // identity
     identityGet: () => Promise.resolve(defaultIdentity()),
@@ -1451,6 +1644,13 @@ export function createMockApi(options: MockOptions = {}): MockApi {
       requireIdentity(id);
       identities = identities.map((i) => ({ ...i, isDefault: i.id === id }));
       return Promise.resolve(orderedIdentities().map((i) => ({ ...i })));
+    },
+
+    mumbleImportScan: () => Promise.resolve(mumbleScan()),
+    mumbleImportApply: (request) => Promise.resolve(mumbleApply(request)),
+    mumbleImportUndo: () => {
+      mumbleUndo();
+      return Promise.resolve(null);
     },
 
     // servers
@@ -1511,6 +1711,10 @@ export function createMockApi(options: MockOptions = {}): MockApi {
       queryAnswers.set(url, answer);
       return Promise.resolve(answer);
     },
+    // The public server browser (issue #68): fictional servers, nothing is contacted.
+    publicServersList: () => Promise.resolve(mockPublicServers()),
+    publicServerPing: (host: string, port: number) =>
+      Promise.resolve(mockPublicServerPing(host, port)),
     mumbleLinkJoin: (url: string) => {
       const link = parseLink(url);
       const saved = servers.find((s) => s.address === link.address && s.port === link.port);
@@ -1559,7 +1763,7 @@ export function createMockApi(options: MockOptions = {}): MockApi {
               // Follows the setting like the engine, unless a test set its own figure.
               latency:
                 connectionStats.latency === DEFAULT_CONNECTION_STATS.latency
-                  ? mockLatencyEstimate(settings.lowLatency)
+                  ? mockLatencyEstimate(activeAudio?.profile.lowLatency ?? settings.lowLatency)
                   : connectionStats.latency,
             }
           : null,
@@ -1707,6 +1911,14 @@ export function createMockApi(options: MockOptions = {}): MockApi {
         fail("invalidInput", "volume must be between 0 and 200");
       }
       updateUser(session, { volume });
+      return Promise.resolve(null);
+    },
+    personMove: (serverId, session, channelId) => {
+      requireSession(serverId);
+      requireUser(session);
+      // Like a real server, a refused move only answers with a denial; nobody moves.
+      if (!requireChannel(channelId).permissions.moveUsers) return Promise.resolve(null);
+      updateUser(session, { channelId });
       return Promise.resolve(null);
     },
     personSetLocalMute: (serverId, session, muted) => {
@@ -1956,10 +2168,29 @@ export function createMockApi(options: MockOptions = {}): MockApi {
       return Promise.resolve(all.slice(Math.max(0, stop - limit), stop));
     },
     historyClear: (scope: HistoryScope) => {
-      if (scope.kind === "all") history.clear();
-      else if (scope.kind === "server") history.delete(scope.serverId);
-      else serverHistory(scope.serverId).delete(conversationKey(scope.conversation));
+      const now = new Date().toISOString();
+      if (scope.kind === "all") {
+        history.clear();
+        clearedAt.set(clearedKey(null, null), now);
+      } else if (scope.kind === "server") {
+        history.delete(scope.serverId);
+        clearedAt.set(clearedKey(scope.serverId, null), now);
+      } else {
+        serverHistory(scope.serverId).delete(conversationKey(scope.conversation));
+        if (scope.conversation.kind === "channel") {
+          clearedAt.set(clearedKey(scope.serverId, scope.conversation.channelId), now);
+        }
+      }
       return Promise.resolve(null);
+    },
+    historyClearedAt: (serverId, channelId) => {
+      requireSession(serverId);
+      const marks = [
+        clearedAt.get(clearedKey(serverId, channelId)),
+        clearedAt.get(clearedKey(serverId, null)),
+        clearedAt.get(clearedKey(null, null)),
+      ].filter((at) => at !== undefined);
+      return Promise.resolve(marks.sort().at(-1) ?? null);
     },
     historySetSaving: (serverId, enabled) => {
       requireServer(serverId);
@@ -2176,7 +2407,28 @@ export function createMockApi(options: MockOptions = {}): MockApi {
     // audio
     audioDevices: () => Promise.resolve(DEVICES),
     bitrateMax: () => Promise.resolve<number | null>(null),
-    latencyEstimate: () => Promise.resolve(mockLatencyEstimate(settings.lowLatency)),
+    latencyEstimate: () =>
+      Promise.resolve(mockLatencyEstimate(activeAudio?.profile.lowLatency ?? settings.lowLatency)),
+    channelAudioProfiles: (serverId) => {
+      requireSession(serverId);
+      return Promise.resolve(channelAudioEntries(serverId));
+    },
+    channelAudioProfileSet: (serverId, channelId, profile) => {
+      requireSession(serverId);
+      requireChannel(channelId);
+      const kbps = profile?.bitrateKbps;
+      if (kbps != null && (kbps < 16 || kbps > 510)) {
+        fail("invalidInput", "bitrate must be 16–510 kbit/s");
+      }
+      const saved = channelAudio.get(serverId) ?? new Map<number, ChannelAudioProfile>();
+      if (profile) saved.set(channelId, { ...profile });
+      else saved.delete(channelId);
+      channelAudio.set(serverId, saved);
+      emitServer("channelAudioProfilesChanged", { profiles: channelAudioEntries(serverId) });
+      syncActiveAudio();
+      return Promise.resolve(null);
+    },
+    activeAudioProfile: () => Promise.resolve(activeAudio),
     micTestStart: () => {
       clearInterval(micTimer);
       clearTimeout(micPhaseTimer);
@@ -2672,9 +2924,20 @@ export function createMockApi(options: MockOptions = {}): MockApi {
       focused();
       const snap = requireSnapshot();
       const channel = requireChannel(channelId);
-      const locked = { ...channel, permissions: { ...channel.permissions, enter: false } };
+      const locked = {
+        ...channel,
+        enterRestricted: true,
+        permissions: { ...channel.permissions, enter: false },
+      };
       snap.channels = snap.channels.map((c) => (c.id === channelId ? locked : c));
       emitServer("channelUpserted", { channel: locked });
+    },
+    updateChannel: (channelId, patch) => {
+      focused();
+      const snap = requireSnapshot();
+      const updated = { ...requireChannel(channelId), ...patch };
+      snap.channels = snap.channels.map((c) => (c.id === channelId ? updated : c));
+      emitServer("channelUpserted", { channel: updated });
     },
     renameChannel: (channelId, name) => {
       focused();
@@ -2726,4 +2989,5 @@ const DEMO_DESCRIPTIONS = new Map<number, string>([
     "<p><b>Gaming</b>: find your squad below.</p><p>Push-to-talk in Squad channels, " +
       "and keep it friendly. Event nights are on Fridays at 20:00.</p>",
   ],
+  [4, "<p>Ranked queue for <b>Squad A</b>. Strategy notes are pinned in #Gaming.</p>"],
 ]);

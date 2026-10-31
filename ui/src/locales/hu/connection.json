@@ -91,5 +91,14 @@
   "endToEndValue": "≈ {{value}} ms (becslés)",
   "lowLatencyMode": "Alacsony késleltetésű mód",
   "identity": "Identitás",
-  "identityValue": "{{label}} ({{name}}) · {{fingerprint}}"
+  "identityValue": "{{label}} ({{name}}) · {{fingerprint}}",
+  "profileSource": "{{label}} (csatornaprofil)",
+  "profile": {
+    "row": "Hangprofil",
+    "musicOn": "Zenei minőség",
+    "musicOff": "Zenei minőség ki",
+    "lowLatencyOn": "Alacsony késleltetésű mód",
+    "lowLatencyOff": "Alacsony késleltetésű mód ki",
+    "defaults": "Alapértelmezett"
+  }
 }

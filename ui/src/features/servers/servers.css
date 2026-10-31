@@ -139,6 +139,14 @@
   background: var(--color-text);
 }
 
+/* Beats the muted colour of icons without a connection state. */
+.server-bar__item .server-bar__browse[aria-pressed="true"] {
+  border-radius: var(--radius-tile);
+  background: var(--gradient-accent) border-box;
+  color: var(--color-on-accent);
+  box-shadow: var(--shadow-glow);
+}
+
 .server-bar__add {
   color: var(--color-success);
   font-size: var(--font-size-xl);
@@ -174,6 +182,12 @@
   background: var(--color-bg-hover);
 }
 
+/* Keyboard focus also gets the focus-coloured ring of the #172 mockup. */
+.server-menu__item:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: -2px;
+}
+
 .server-menu__item:has(.server-menu__text) {
   display: flex;
   align-items: center;
@@ -197,6 +211,54 @@
 .server-menu__item[aria-disabled="true"] {
   color: var(--color-text-muted);
   cursor: default;
+}
+
+.server-menu__item:has(.server-menu__icon) {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.server-menu__icon {
+  display: inline-flex;
+  flex: none;
+  color: inherit;
+}
+
+.server-menu__icon svg {
+  width: 18px;
+  height: 18px;
+}
+
+/* Menus with icons (channel menus, #170/#172) follow the mockups: roomier panel, body-size text. */
+.server-menu:has(.server-menu__icon) {
+  min-width: 18rem;
+  padding: var(--space-2);
+  border-radius: var(--radius-lg);
+}
+
+.server-menu:has(.server-menu__icon) .server-menu__item {
+  min-height: 2.5rem;
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-md);
+}
+
+.server-menu__item--danger .server-menu__icon {
+  color: inherit;
+}
+
+.server-menu__end {
+  margin-inline-start: auto;
+  padding-inline-start: var(--space-4);
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+}
+
+.server-menu__separator {
+  height: 1px;
+  margin: var(--space-1) var(--space-2);
+  background: var(--color-border);
 }
 
 .server-menu__check {

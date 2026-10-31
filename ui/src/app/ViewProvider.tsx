@@ -53,6 +53,12 @@ export function ViewProvider({ children }: { children: ReactNode }) {
       openPrivacySettings: () => {
         dispatch({ type: "openSettings", section: "privacy" });
       },
+      openRerunWizard: () => {
+        dispatch({ type: "openRerunWizard" });
+      },
+      closeRerunWizard: () => {
+        dispatch({ type: "closeRerunWizard" });
+      },
       closeOverlay: () => {
         dispatch({ type: "closeOverlay" });
       },

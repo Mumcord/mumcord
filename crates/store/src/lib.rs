@@ -7,6 +7,7 @@
 
 mod accepted;
 mod blocked;
+mod channel_audio;
 mod channel_tokens;
 mod db;
 mod error;
@@ -24,6 +25,7 @@ mod synced;
 
 pub use accepted::AcceptedConversation;
 pub use blocked::BlockedUser;
+pub use channel_audio::{ChannelAudioProfile, SavedChannelAudio, resolve_channel_audio};
 pub use channel_tokens::{ChannelToken, TokenChannel};
 pub use db::{DB_FILE_NAME, Store, UnixMillis};
 pub use error::{Error, Result};

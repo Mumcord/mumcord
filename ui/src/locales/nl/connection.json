@@ -91,5 +91,14 @@
   "endToEndValue": "≈ {{value}} ms (schatting)",
   "lowLatencyMode": "Modus voor lage latentie",
   "identity": "Identiteit",
-  "identityValue": "{{label}} ({{name}}) · {{fingerprint}}"
+  "identityValue": "{{label}} ({{name}}) · {{fingerprint}}",
+  "profileSource": "{{label}} (kanaalprofiel)",
+  "profile": {
+    "row": "Audioprofiel",
+    "musicOn": "Muziekkwaliteit",
+    "musicOff": "Muziekkwaliteit uit",
+    "lowLatencyOn": "Modus voor lage latentie",
+    "lowLatencyOff": "Modus voor lage latentie uit",
+    "defaults": "Standaard"
+  }
 }

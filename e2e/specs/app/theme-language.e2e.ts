@@ -54,9 +54,10 @@ async function chooseMode(label: string): Promise<void> {
 async function uiTexts(): Promise<string[]> {
   return browser.execute(() => {
     // User/server content, not UI text. Also skipped: license texts (legal originals, shown
-    // verbatim) and the live regions (transient announcements made before the switch).
+    // verbatim), the live regions (transient announcements made before the switch), key chips
+    // and the server name and figures ("1 online · 25 ms" reads the same in many languages).
     const skip =
-      ".chat-message__body,.chat-message__sender,.tree-person__name,.tree-channel__name,code,time,.server-bar__server,.chat-header__title,.profile-card__name,.member__name,pre.settings-text,[data-testid^='live-']";
+      ".chat-message__body,.chat-message__sender,.tree-person__name,.tree-channel__name,code,time,.server-bar__server,.chat-header__title,.profile-card__name,.member__name,pre.settings-text,[data-testid^='live-'],kbd,.server-section__name,.server-section__meta";
     const out = new Set<string>();
     const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
     for (let n = walker.nextNode(); n; n = walker.nextNode()) {

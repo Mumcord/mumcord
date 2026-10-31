@@ -1,0 +1,94 @@
+{
+  "title": "Nimm dein Mumble-Setup mit",
+  "intro": "Wir haben den offiziellen Mumble-Client auf diesem Computer gefunden. Wähle aus, was kopiert werden soll. In Mumble wird nichts verändert, und nichts verlässt deinen Computer.",
+  "optional": "{{progress}} · optional",
+  "listLabel": "Was aus Mumble kopiert werden soll",
+  "favourites": {
+    "title": "Server-Favoriten",
+    "found_one": "{{count}} gefunden",
+    "found_other": "{{count}} gefunden",
+    "duplicates_one": "{{count}} bereits in Mumcord (übersprungen)",
+    "duplicates_other": "{{count}} bereits in Mumcord (übersprungen)",
+    "failed": "Die Serverliste von Mumble konnte nicht gelesen werden.",
+    "review": "Liste ansehen",
+    "hide": "Liste ausblenden",
+    "listLabel": "Zu kopierende Server",
+    "duplicate": "Bereits in Mumcord"
+  },
+  "passwords": {
+    "title": "Gespeicherte Passwörter",
+    "count_one": "Für {{count}} Favorit ist ein Passwort gespeichert",
+    "count_other": "Für {{count}} Favoriten sind Passwörter gespeichert",
+    "keychain": "Im Schlüsselbund des Systems gespeichert"
+  },
+  "identity": {
+    "title": "Identität (Client-Zertifikat)",
+    "keeps": "Behält deinen registrierten Namen und deine Rechte",
+    "locked": "in Mumble durch ein Passwort geschützt",
+    "named": "Zertifikat für „{{name}}“",
+    "validUntil": "gültig bis {{date}}",
+    "passwordNeeded": "Passwort erforderlich",
+    "already": "Bereits in Mumcord",
+    "password": "Zertifikatspasswort aus Mumble",
+    "passwordRequired": "Bitte gib das Zertifikatspasswort ein.",
+    "wrongPassword": "Mit diesem Passwort lässt sich das Zertifikat nicht öffnen. Bitte versuche es erneut."
+  },
+  "devices": {
+    "title": "Audiogeräte",
+    "input": "Mikrofon: {{name}}",
+    "output": "Ausgabe: {{name}}",
+    "missing": "Die Geräte aus Mumble sind nicht an diesen Computer angeschlossen."
+  },
+  "ptt": {
+    "title": "Push-to-talk-Taste",
+    "modifierOnly": "Die Taste in Mumble ist nur eine Sondertaste, die Mumcord nicht nutzen kann. Du kannst später eine Taste wählen.",
+    "tooManyKeys": "Das Tastenkürzel in Mumble hat mehr als eine Taste, was Mumcord nicht nutzen kann. Du kannst später eine Taste wählen.",
+    "unknown": "Das Tastenkürzel in Mumble nutzt eine Taste oder ein Gerät, das Mumcord nicht kennt. Du kannst später eine Taste wählen."
+  },
+  "volume": {
+    "title": "Lautstärke und Spracheinstellungen",
+    "hint": "Mumble und Mumcord nutzen unterschiedliche Skalen, deshalb würden die Werte nicht zusammenpassen",
+    "notRecommended": "Nicht empfohlen"
+  },
+  "selected_one": "{{count}} Element ausgewählt",
+  "selected_other": "{{count}} Elemente ausgewählt",
+  "import": "Importieren",
+  "importing": "Wird importiert …",
+  "skip": "Vorerst überspringen",
+  "cancel": "Abbrechen",
+  "failed": "Der Import konnte nicht abgeschlossen werden. Bitte versuche es erneut.",
+  "secureStorage": "Mumcord erreicht den sicheren Speicher deines Systems nicht. Entsperre deinen Schlüsselbund oder Passwortmanager und versuche es erneut.",
+  "settingsFailed": "Deine Server wurden kopiert, aber die Einstellungen konnten nicht gespeichert werden.",
+  "summary": {
+    "title": "Import abgeschlossen",
+    "intro": "Deine Mumble-Daten wurden kopiert. Sieh dir an, was passiert ist.",
+    "added_one": "{{count}} Server zu den Favoriten hinzugefügt",
+    "added_other": "{{count}} Server zu den Favoriten hinzugefügt",
+    "skipped_one": "{{count}} Server übersprungen",
+    "skipped_other": "{{count}} Server übersprungen",
+    "skippedDetail_one": "{{names}} ist schon in deiner Liste",
+    "skippedDetail_other": "{{names}} sind schon in deiner Liste",
+    "duplicate": "Duplikat",
+    "passwords_one": "{{count}} Passwort gespeichert",
+    "passwords_other": "{{count}} Passwörter gespeichert",
+    "passwordsDetail": "Im Schlüsselbund des Systems gespeichert, nicht in einer Datei",
+    "identity": "Identität importiert",
+    "identityDefault": "Mumcord nutzt sie jetzt",
+    "identityServers": "Wird für die kopierten Server verwendet",
+    "identitySkipped": "Identität bereits in Mumcord",
+    "identitySkippedDetail": "Dieses Zertifikat gehört bereits zu deinen Identitäten",
+    "devicesAndPtt": "Audiogeräte und Push-to-talk-Taste",
+    "done": "Fertig",
+    "undo": "Import rückgängig machen",
+    "undone": "Der Import wurde rückgängig gemacht.",
+    "undoFailed": "Der Import konnte nicht vollständig rückgängig gemacht werden. Bitte prüfe deine Server und Identitäten."
+  },
+  "settings": {
+    "title": "Aus Mumble importieren",
+    "hint": "Kopiere Server-Favoriten, gespeicherte Passwörter, dein Zertifikat und Audioeinstellungen aus dem offiziellen Mumble-Client.",
+    "button": "Aus Mumble importieren …",
+    "searching": "Suche nach Mumble …",
+    "notFound": "Der offizielle Mumble-Client wurde auf diesem Computer nicht gefunden.",
+    "breadcrumb": "Einstellungen · Server · Aus Mumble importieren"
+  }
+}

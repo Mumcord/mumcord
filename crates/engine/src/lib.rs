@@ -14,6 +14,7 @@ pub mod ingame_overlay;
 pub mod inspector;
 pub mod latency;
 mod maintenance;
+pub mod mumble_import;
 pub mod mumcord;
 pub mod now_gaming;
 pub mod now_playing;
@@ -23,6 +24,7 @@ pub mod pm_overview;
 pub mod pm_rules;
 pub mod positional;
 pub mod profile;
+pub mod public_servers;
 pub mod screen_share;
 pub mod server_query;
 pub mod session;
@@ -52,13 +54,15 @@ pub use positional::PositionalStatus;
 pub use server_query::{QueryOutcome, ServerQueries, ServerQuery};
 pub use session::Engine;
 pub use session::{
-    AudioDeviceList, AudioDeviceView, AudioHealthView, CertificateState, ChannelPasswordChannel,
-    ChannelPasswordState, ChannelPasswordView, ChannelPermissions, ChannelView, ConnState,
-    ConnectionStatsView, ConversationRef, EngineError, EngineEvent, EngineResult, ErrorKind,
-    EventReceiver, Events, IdentityView, MAX_RECONNECT_ATTEMPTS, MicTestPhase, PasswordChange,
-    ProfileView, ServerFields, ServerInfoView, ServerTestInput, ServerView, SessionCtx, Snapshot,
-    TaggedEvent, TestConnectionView, UnreadView, UserView, VoiceTransportKind,
+    ActiveAudioProfile, AudioDeviceList, AudioDeviceView, AudioHealthView, CertificateState,
+    ChannelAudioView, ChannelPasswordChannel, ChannelPasswordState, ChannelPasswordView,
+    ChannelPermissions, ChannelView, ConnState, ConnectionStatsView, ConversationRef, EngineError,
+    EngineEvent, EngineResult, ErrorKind, EventReceiver, Events, IdentityView,
+    MAX_RECONNECT_ATTEMPTS, MicTestDevices, MicTestPhase, PasswordChange, ProfileView,
+    ServerFields, ServerInfoView, ServerTestInput, ServerView, SessionCtx, Snapshot, TaggedEvent,
+    TestConnectionView, UnreadView, UserView, VoiceTransportKind,
 };
+pub use session::{MumbleImportChoice, MumbleImportPreview, MumbleImportResult};
 pub use stats::UserStatsView;
 pub use watch_party::{PLAYLIST_MAX, PlaylistEntry, WatchAction, WatchCommand, WatchPartyView};
 pub use web::{InlineImage, LinkPreview, VideoEmbed, VideoProvider};

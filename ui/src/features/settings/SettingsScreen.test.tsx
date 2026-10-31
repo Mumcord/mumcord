@@ -3,6 +3,9 @@ import { afterEach, beforeEach, describe, expect, it, vi, type Mock } from "vite
 import { hintPreferences, setHintPreference } from "../../a11y/hintPreferences";
 import { createMockApi, setApi, type MockApi } from "../../api";
 import { PreferencesContext, type Preferences } from "../../app/preferences";
+import { fakeView } from "../../app/testView";
+import { ViewContext, type View } from "../../app/view";
+import { setSettingsOpener } from "./settingsOpener";
 import { applyLanguage } from "../../i18n";
 import { openInBrowser } from "../chat/openLink";
 import { chooseOption, optionLabels } from "../../components/SelectTestUtils";
@@ -22,6 +25,7 @@ const openPath = vi.mocked(pickOpenPath);
 
 let api: MockApi;
 let applySettings: Mock<Preferences["applySettings"]>;
+let view: View;
 
 async function setup(theme: "dark" | "light" = "dark") {
   await applyLanguage("en");
@@ -29,6 +33,7 @@ async function setup(theme: "dark" | "light" = "dark") {
   api = createMockApi();
   setApi(api);
   applySettings = vi.fn<Preferences["applySettings"]>();
+  view = fakeView();
 }
 
 beforeEach(async () => {
@@ -62,10 +67,12 @@ function renderScreen() {
   };
   return render(
     <PreferencesContext.Provider value={preferences}>
-      <main aria-label="Settings test">
-        <h1>Settings</h1>
-        <SettingsScreen />
-      </main>
+      <ViewContext.Provider value={view}>
+        <main aria-label="Settings test">
+          <h1>Settings</h1>
+          <SettingsScreen />
+        </main>
+      </ViewContext.Provider>
     </PreferencesContext.Provider>,
   );
 }
@@ -1255,6 +1262,22 @@ describe("About section", () => {
     expect(license).toHaveTextContent("GNU AFFERO GENERAL PUBLIC LICENSE");
     fireEvent.click(screen.getByRole("button", { name: "Show third-party licences" }));
     expect(open).toHaveBeenCalledOnce();
+  });
+
+  it("offers running the setup wizard again without the identity step", async () => {
+    const opener = vi.fn();
+    setSettingsOpener(opener);
+    await openSection("About");
+    await screen.findByText("0.0.0-mock");
+    expect(screen.getByText(/Your current choices are filled in/)).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "Run setup wizard again" }));
+    expect(view.openRerunWizard).toHaveBeenCalledOnce();
+    expect(
+      screen.getByText(/Your certificate, and with it your registered name/),
+    ).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "Manage it in Identity" }));
+    expect(opener).toHaveBeenCalledWith("identity");
+    setSettingsOpener(null);
   });
 
   it("opens What's new in its own window and the support links in the browser", async () => {

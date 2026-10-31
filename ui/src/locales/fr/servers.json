@@ -12,6 +12,7 @@
   "bar": {
     "listLabel": "Serveurs enregistrés",
     "add": "Ajouter un serveur",
+    "browse": "Parcourir les serveurs publics",
     "keyboardHint": "Entrée pour se connecter. Alt plus flèche haut ou bas pour déplacer le serveur. Maj plus F10 pour ouvrir plus d’options.",
     "label": "{{server}} ({{state}})",
     "state": {

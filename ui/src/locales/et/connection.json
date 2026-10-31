@@ -91,5 +91,14 @@
   "endToEndValue": "≈ {{value}} ms (hinnang)",
   "lowLatencyMode": "Väikese viivitusega režiim",
   "identity": "Identiteet",
-  "identityValue": "{{label}} ({{name}}) · {{fingerprint}}"
+  "identityValue": "{{label}} ({{name}}) · {{fingerprint}}",
+  "profileSource": "{{label}} (kanali profiil)",
+  "profile": {
+    "row": "Heliprofiil",
+    "musicOn": "Muusikakvaliteet",
+    "musicOff": "Muusikakvaliteet väljas",
+    "lowLatencyOn": "Väikese viivitusega režiim",
+    "lowLatencyOff": "Väikese viivitusega režiim väljas",
+    "defaults": "Vaikeseaded"
+  }
 }

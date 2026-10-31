@@ -429,7 +429,12 @@
     "noticesFailed": "Trešo pušu licences neizdevās atvērt.",
     "loading": "Ielādē…",
     "devToolsUnlocked": "Izstrādātāja rīki atbloķēti: pakešu inspektors tagad ir iestatījumu sarakstā.",
-    "portable": "Portatīvā"
+    "portable": "Portatīvā",
+    "setup": "Iestatīšana",
+    "setupWizardHint": "Vēlreiz izej pirmreizējo iestatīšanu, lai pārskatītu mikrofonu, privātuma izvēles, atjauninājumu pārbaudi un runāšanas režīmu. Tavas pašreizējās izvēles jau ir aizpildītas.",
+    "setupWizardRun": "Palaist iestatīšanas vedni vēlreiz",
+    "setupWizardIdentityNote": "Tava identitāte tam nepieder. Tavs sertifikāts un līdz ar to reģistrētais vārds un atļaujas serveros paliek tieši tādi, kādi tie ir.",
+    "setupWizardIdentityLink": "Pārvaldi to sadaļā Identitāte"
   },
   "profile": {
     "title": "Profils",

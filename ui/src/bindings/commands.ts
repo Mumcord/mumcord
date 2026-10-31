@@ -23,6 +23,15 @@ export const commands = {
 	identitySetDefault: (id: number) => typedError<Identity[], ApiError>(__TAURI_INVOKE("identity_set_default", { id })),
 	/**  Chooses the identity a saved server connects with; `null` uses the default. */
 	serverSetIdentity: (serverId: number, identityId: number | null) => typedError<SavedServer, ApiError>(__TAURI_INVOKE("server_set_identity", { serverId, identityId })),
+	/**  Looks for an installed official Mumble client; `null` when there is none. */
+	mumbleImportScan: () => typedError<MumbleImportFound | null, ApiError>(__TAURI_INVOKE("mumble_import_scan")),
+	/**
+	 *  Imports the chosen favourites, passwords and certificate into Mumcord. Settings are saved
+	 *  by the UI with `settings_update`.
+	 */
+	mumbleImportApply: (request: MumbleImportRequest) => typedError<MumbleImportDone, ApiError>(__TAURI_INVOKE("mumble_import_apply", { request })),
+	/**  Removes the servers and the identity the last import added. */
+	mumbleImportUndo: () => typedError<null, ApiError>(__TAURI_INVOKE("mumble_import_undo")),
 	/**  Saved servers in server-bar order. */
 	serversList: () => typedError<SavedServer[], ApiError>(__TAURI_INVOKE("servers_list")),
 	/**  Adds a server at the end of the server bar. */
@@ -107,6 +116,11 @@ export const commands = {
 	 *  as `ChannelUpserted`; repeated calls for the same description send nothing.
 	 */
 	channelDescriptionRequest: (serverId: number, channelId: number) => typedError<null, ApiError>(__TAURI_INVOKE("channel_description_request", { serverId, channelId })),
+	/**
+	 *  Moves a person to another channel; the server checks the move permission and the result
+	 *  arrives as `userUpserted` (issue #172).
+	 */
+	personMove: (serverId: number, session: number, channelId: number) => typedError<null, ApiError>(__TAURI_INVOKE("person_move", { serverId, session, channelId })),
 	/**  Sets local volume (0–200 %); remembered by certificate hash per server. */
 	personSetVolume: (serverId: number, session: number, volume: number) => typedError<null, ApiError>(__TAURI_INVOKE("person_set_volume", { serverId, session, volume })),
 	/**  Mutes a person locally; remembered by certificate hash per server. */
@@ -245,6 +259,16 @@ export const commands = {
 	 */
 	mumbleLinkJoin: (url: string) => typedError<LinkOutcome, ApiError>(__TAURI_INVOKE("mumble_link_join", { url })),
 	/**
+	 *  Downloads the public server list. The UI calls this only when the user opens the browser or
+	 *  presses Refresh (FR-3.92); nothing is fetched in the background.
+	 */
+	publicServersList: () => typedError<PublicServer[], ApiError>(__TAURI_INVOKE("public_servers_list")),
+	/**
+	 *  Pings one listed server; `null` when it did not answer. The engine paces all pings (one every
+	 *  50 ms, a few in flight), whatever the UI asks for.
+	 */
+	publicServerPing: (host: string, port: number) => typedError<PublicServerPing | null, ApiError>(__TAURI_INVOKE("public_server_ping", { host, port })),
+	/**
 	 *  An external image (`<img src>` in a message) or direct image link, ready to show inline;
 	 *  `null` when previews are switched off in the settings (then nothing is fetched) or the
 	 *  image cannot be shown (blocked address, too large, unsupported format).
@@ -301,6 +325,11 @@ export const commands = {
 	 */
 	historyLoad: (serverId: number, conversation: Conversation, before: string | null, limit: number) => typedError<ChatMessage[], ApiError>(__TAURI_INVOKE("history_load", { serverId, conversation, before, limit })),
 	historyClear: (scope: HistoryScope) => typedError<null, ApiError>(__TAURI_INVOKE("history_clear", { scope })),
+	/**
+	 *  When the user last cleared the history of a channel (RFC 3339), for channel info (issue
+	 *  #170); `null` if never.
+	 */
+	historyClearedAt: (serverId: number, channelId: number) => typedError<string | null, ApiError>(__TAURI_INVOKE("history_cleared_at", { serverId, channelId })),
 	/**  "Save history" switch per server (default on). */
 	historySetSaving: (serverId: number, enabled: boolean) => typedError<null, ApiError>(__TAURI_INVOKE("history_set_saving", { serverId, enabled })),
 	/**
@@ -343,11 +372,24 @@ export const commands = {
 	 *  server. Follow `BitrateMaxChanged` afterwards.
 	 */
 	bitrateMax: () => typedError<number | null, ApiError>(__TAURI_INVOKE("bitrate_max")),
+	/**  The channels of a connected server that have an audio profile. */
+	channelAudioProfiles: (serverId: number) => typedError<ChannelAudioEntry[], ApiError>(__TAURI_INVOKE("channel_audio_profiles", { serverId })),
+	/**
+	 *  Saves the audio profile of a channel, or removes it with `null` ("Remove profile"). Applies
+	 *  at once when the user is in that channel.
+	 */
+	channelAudioProfileSet: (serverId: number, channelId: number, profile: ChannelAudioProfile | null) => typedError<null, ApiError>(__TAURI_INVOKE("channel_audio_profile_set", { serverId, channelId, profile })),
+	/**
+	 *  The channel profile in effect now; `null` runs on the global settings. Follow
+	 *  `ActiveAudioProfileChanged` afterwards.
+	 */
+	activeAudioProfile: () => typedError<ActiveAudioProfile | null, ApiError>(__TAURI_INVOKE("active_audio_profile")),
 	/**
 	 *  Records up to 5 s of processed own voice with level metering, then plays it back.
-	 *  Voice of a connected session pauses meanwhile.
+	 *  Voice of a connected session pauses meanwhile. `devices` tests devices that are not saved
+	 *  yet, e.g. a microphone picked in the wizard rerun (#149).
 	 */
-	micTestStart: () => typedError<null, ApiError>(__TAURI_INVOKE("mic_test_start")),
+	micTestStart: (devices: MicTestDevices | null) => typedError<null, ApiError>(__TAURI_INVOKE("mic_test_start", { devices })),
 	/**  Plays a short sound on the output device ("Test sound" in the output popover). */
 	audioTestSound: () => typedError<null, ApiError>(__TAURI_INVOKE("audio_test_sound")),
 	/**  Ends the test wherever it is (recording or playback). */
@@ -582,11 +624,13 @@ export const commands = {
 /** Events */
 export const events = {
 	acceptedConversationsChanged: makeEvent<AcceptedConversationsChanged, AcceptedConversationsChanged>("accepted-conversations-changed"),
+	activeAudioProfileChanged: makeEvent<ActiveAudioProfileChanged, ActiveAudioProfileChanged>("active-audio-profile-changed"),
 	audioDeviceFallback: makeEvent<AudioDeviceFallback, AudioDeviceFallback>("audio-device-fallback"),
 	audioDevicesChanged: makeEvent<AudioDevicesChanged, AudioDevicesChanged>("audio-devices-changed"),
 	bitrateMaxChanged: makeEvent<BitrateMaxChanged, BitrateMaxChanged>("bitrate-max-changed"),
 	blockedUsersChanged: makeEvent<BlockedUsersChanged, BlockedUsersChanged>("blocked-users-changed"),
 	certTrustRequired: makeEvent<CertTrustRequired, CertTrustRequired>("cert-trust-required"),
+	channelAudioProfilesChanged: makeEvent<ChannelAudioProfilesChanged, ChannelAudioProfilesChanged>("channel-audio-profiles-changed"),
 	channelPasswordPrompt: makeEvent<ChannelPasswordPrompt, ChannelPasswordPrompt>("channel-password-prompt"),
 	channelRemoved: makeEvent<ChannelRemoved, ChannelRemoved>("channel-removed"),
 	channelUpserted: makeEvent<ChannelUpserted, ChannelUpserted>("channel-upserted"),
@@ -645,6 +689,21 @@ export type AcceptedConversation = {
 
 export type AcceptedConversationsChanged = {
 	conversations: AcceptedConversation[],
+};
+
+/**  The profile in effect: the own channel's on the server that carries voice. */
+export type ActiveAudioProfile = {
+	serverId: number,
+	channelId: number,
+	profile: ChannelAudioProfile,
+};
+
+/**
+ *  The channel profile in effect changed: the user joined or left a channel with a profile, or
+ *  its profile was edited. `null` runs on the global settings.
+ */
+export type ActiveAudioProfileChanged = {
+	active: ActiveAudioProfile | null,
 };
 
 /**  Error returned by every failing command. */
@@ -830,6 +889,26 @@ export type CertTrustRequired = {
 /**  How a tested server certificate relates to the saved trust decision. */
 export type CertificateState = "trusted" | "unknown" | "changed";
 
+/**  A channel of the server that has a profile. */
+export type ChannelAudioEntry = {
+	channelId: number,
+	profile: ChannelAudioProfile,
+};
+
+/**  The overrides of a channel audio profile; `null` keeps the global setting ("default"). */
+export type ChannelAudioProfile = {
+	musicQuality: boolean | null,
+	lowLatency: boolean | null,
+	/**  Own bitrate cap in kbit/s, 16 to 510; the server's limit still wins. */
+	bitrateKbps: number | null,
+};
+
+/**  The audio profiles of a server's channels changed. */
+export type ChannelAudioProfilesChanged = {
+	serverId: number,
+	profiles: ChannelAudioEntry[],
+};
+
 export type ChannelInfo = {
 	id: number,
 	/**  `null` for the root channel. */
@@ -845,8 +924,13 @@ export type ChannelInfo = {
 	 *  `channel_description_request` fetches the text (FR-1.48b).
 	 */
 	hasDescription: boolean,
-	/**  The channel's user limit; `null` when it has none. */
+	/**  User limit; `null` when the channel has none (the server's limit still applies). */
 	maxUsers: number | null,
+	temporary: boolean,
+	/**  Channels linked to this one, sorted by id. */
+	links: number[],
+	/**  Entering needs a password (access token) or group membership. */
+	enterRestricted: boolean,
 };
 
 export type ChannelPasswordPrompt = {
@@ -871,6 +955,15 @@ export type ChannelPermissions = {
 	listen: boolean,
 	/**  Only meaningful on the root channel: "Register self" (FR-1.34). */
 	registerSelf: boolean,
+	speak: boolean,
+	whisper: boolean,
+	/**  Edit the channel's ACL; only true once the server confirmed it. */
+	write: boolean,
+	/**
+	 *  Move other people out of this channel (drag a person, "Move users here…"); only true
+	 *  once the server confirmed it.
+	 */
+	moveUsers: boolean,
 };
 
 export type ChannelRemoved = {
@@ -1434,6 +1527,15 @@ export type MicLevel = {
 };
 
 /**
+ *  Devices a microphone test runs on instead of the stored ones (wizard rerun, #149).
+ *  They are not saved.
+ */
+export type MicTestDevices = {
+	inputDevice: string | null,
+	outputDevice: string | null,
+};
+
+/**
  *  Phase of the mic test: `recording`, then `playing` the recording back, then `done`;
  *  `failed` when the test could not start.
  */
@@ -1442,6 +1544,66 @@ export type MicTestPhase = "recording" | "playing" | "done" | "failed";
 /**  The mic test changed phase. */
 export type MicTestPhaseChanged = {
 	phase: MicTestPhase,
+};
+
+export type MumbleCertificate = {
+	/**  Common name; empty while locked by a password. */
+	name: string,
+	/**  End of validity, RFC 3339. */
+	validUntil: string | null,
+	needsPassword: boolean,
+	alreadyImported: boolean,
+};
+
+export type MumbleDevice = {
+	id: string,
+	name: string,
+};
+
+export type MumbleFavourite = {
+	label: string,
+	host: string,
+	port: number,
+	username: string,
+	hasPassword: boolean,
+	/**  Already in Mumcord; skipped by the import. */
+	duplicate: boolean,
+};
+
+export type MumbleImportDone = {
+	added: SavedServer[],
+	/**  Labels of chosen servers that were already in Mumcord. */
+	skipped: string[],
+	passwordsSaved: number,
+	identity: Identity | null,
+	identitySkipped: boolean,
+	/**  End of validity of the imported certificate, RFC 3339. */
+	identityValidUntil: string | null,
+};
+
+/**  What an installed official client offers for import. */
+export type MumbleImportFound = {
+	format: MumbleSettingsFormat,
+	favourites: MumbleFavourite[],
+	favouritesFailed: boolean,
+	certificate: MumbleCertificate | null,
+	inputDevice: MumbleDevice | null,
+	outputDevice: MumbleDevice | null,
+	devicesMissing: boolean,
+	/**  In the `pttKey` settings format. */
+	pttKey: string | null,
+	pttIssue: MumblePttIssue | null,
+	talkMode: TalkMode | null,
+	outputVolumePercent: number | null,
+};
+
+/**  No `Debug`: it carries the certificate password. */
+export type MumbleImportRequest = {
+	favourites: MumbleServerKey[],
+	passwords: boolean,
+	certificate: boolean,
+	/**  Only for a certificate that needs one. */
+	certificatePassword: string | null,
 };
 
 /**  Parsed `mumble://[user[:password]@]host[:port]/[channel/path]` link. */
@@ -1460,6 +1622,24 @@ export type MumbleLink = {
  *  answer within the query timeout. The figures are untrusted server data, shown as plain text.
  */
 export type MumbleLinkStats = { kind: "privacyOff" } | { kind: "unreachable" } | { kind: "answered"; pingMs: number; users: number; maxUsers: number; version: string };
+
+/**  Why Mumble's push-to-talk shortcut cannot be used in Mumcord. */
+export type MumblePttIssue = "modifierOnly" | "tooManyKeys" | "unknown";
+
+/**  A favourite chosen in the preview, by host and port. */
+export type MumbleServerKey = {
+	host: string,
+	port: number,
+};
+
+/**  Which settings format of the official client was found. */
+export type MumbleSettingsFormat = 
+/**  `mumble_settings.json`, Mumble 1.5 and later. */
+"json" | 
+/**  Mumble 1.4 and earlier (INI file, property list or registry). */
+"legacy" | 
+/**  Only the favourites database was found. */
+"databaseOnly";
 
 /**
  *  The user clicked a system notification; the window is already in front. Show the server
@@ -1781,6 +1961,24 @@ export type PttUnavailableReason =
 "mouseNeedsInputGroup" | 
 /**  macOS: Mumcord lacks the Accessibility permission for the mouse event tap. */
 "mouseNeedsAccessibility";
+
+/**  One listed server. Untrusted list data, already cleaned by the engine; shown as plain text. */
+export type PublicServer = {
+	name: string,
+	host: string,
+	port: number,
+	/**  Country name from the list; may be empty. */
+	country: string,
+	/**  Upper-case ISO 3166 alpha-2 code, or empty. */
+	countryCode: string,
+};
+
+/**  What a listed server answered to the ping. Untrusted server data. */
+export type PublicServerPing = {
+	pingMs: number,
+	users: number,
+	maxUsers: number,
+};
 
 /**  A stored channel password without the password itself (FR-2.78, issue #146). */
 export type SavedChannelPassword = {

@@ -64,5 +64,9 @@
     "dismiss": "Ormi",
     "unfollowFailed": "It-twaqqif tas-segwiment tal-kanali kollha ma ħadimx. Erġa' pprova."
   },
-  "mention": "jinkludi semmija tiegħek"
+  "mention": "jinkludi semmija tiegħek",
+  "header": {
+    "follow": "Segwi l-kanal",
+    "unfollow": "Qed issegwi, ikklikkja biex twaqqaf"
+  }
 }

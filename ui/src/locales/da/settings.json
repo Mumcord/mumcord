@@ -428,7 +428,12 @@
     "noticesFailed": "Tredjepartslicenserne kunne ikke åbnes.",
     "loading": "Indlæser…",
     "devToolsUnlocked": "Udviklerværktøjer låst op: pakkeinspektøren står nu på listen over indstillinger.",
-    "portable": "Bærbar"
+    "portable": "Bærbar",
+    "setup": "Opsætning",
+    "setupWizardHint": "Gennemgå den første opsætning igen for at se mikrofon, privatlivsvalg, opdateringstjek og taletilstand efter. Dine nuværende valg er udfyldt på forhånd.",
+    "setupWizardRun": "Kør opsætningsguiden igen",
+    "setupWizardIdentityNote": "Din identitet er ikke en del af det. Dit certifikat og dermed dit registrerede navn og dine tilladelser på servere forbliver præcis, som de er.",
+    "setupWizardIdentityLink": "Administrér den under Identitet"
   },
   "profile": {
     "title": "Profil",

@@ -13,6 +13,10 @@ export interface ViewState {
   overlay: Overlay;
   /** Settings section to show first when the settings open; null keeps the default. */
   settingsSection: SettingsSection | null;
+  /** The setup wizard is open again on top of the settings (#149); it saves only on Finish. */
+  rerunWizard: boolean;
+  /** Bumped when something outside the settings wrote them, so the open screen reloads. */
+  settingsRevision: number;
 }
 
 export type ViewAction =
@@ -21,30 +25,39 @@ export type ViewAction =
   | { type: "retry" }
   | { type: "finishWizard" }
   | { type: "openSettings"; section?: SettingsSection }
+  | { type: "openRerunWizard" }
+  | { type: "closeRerunWizard" }
   | { type: "closeOverlay" };
 
 export const initialViewState: ViewState = {
   screen: "loading",
   overlay: null,
   settingsSection: null,
+  rerunWizard: false,
+  settingsRevision: 0,
 };
 
 export function viewReducer(state: ViewState, action: ViewAction): ViewState {
   switch (action.type) {
     case "loaded":
-      return { screen: action.screen, overlay: null, settingsSection: null };
+      return { ...initialViewState, screen: action.screen };
     case "failed":
-      return { screen: "startupError", overlay: null, settingsSection: null };
+      return { ...initialViewState, screen: "startupError" };
     case "retry":
       return initialViewState;
     case "finishWizard":
-      return { screen: "main", overlay: null, settingsSection: null };
+      return { ...initialViewState, screen: "main" };
     case "openSettings":
       return state.screen === "main"
         ? { ...state, overlay: "settings", settingsSection: action.section ?? null }
         : state;
+    case "openRerunWizard":
+      return state.overlay === "settings" ? { ...state, rerunWizard: true } : state;
+    case "closeRerunWizard":
+      // Finish may have written settings behind the open settings screen (#149).
+      return { ...state, rerunWizard: false, settingsRevision: state.settingsRevision + 1 };
     case "closeOverlay":
-      return { ...state, overlay: null };
+      return { ...state, overlay: null, rerunWizard: false };
   }
 }
 
@@ -58,6 +71,9 @@ export interface View extends ViewState {
   openAudioSettings: () => void;
   /** Opens the settings on the privacy section. */
   openPrivacySettings: () => void;
+  /** Opens the setup wizard again from Settings (#149). */
+  openRerunWizard: () => void;
+  closeRerunWizard: () => void;
   closeOverlay: () => void;
   retry: () => void;
 }

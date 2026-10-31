@@ -430,7 +430,12 @@
     "noticesFailed": "Licence třetích stran se nepodařilo otevřít.",
     "loading": "Načítání…",
     "devToolsUnlocked": "Vývojářské nástroje odemčeny: inspektor paketů je nyní v seznamu nastavení.",
-    "portable": "Přenosná"
+    "portable": "Přenosná",
+    "setup": "Nastavení",
+    "setupWizardHint": "Projdi znovu počáteční nastavení a zkontroluj mikrofon, volby soukromí, kontrolu aktualizací a režim mluvení. Tvoje současné volby jsou předvyplněné.",
+    "setupWizardRun": "Spustit průvodce nastavením znovu",
+    "setupWizardIdentityNote": "Tvoje identita do toho nepatří. Tvůj certifikát a s ním registrované jméno a oprávnění na serverech zůstávají přesně tak, jak jsou.",
+    "setupWizardIdentityLink": "Spravuj ji v části Identita"
   },
   "profile": {
     "title": "Profil",

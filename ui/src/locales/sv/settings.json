@@ -428,7 +428,12 @@
     "noticesFailed": "Licenserna för tredjepart kunde inte öppnas.",
     "loading": "Läser in…",
     "devToolsUnlocked": "Utvecklarverktyg upplåsta: paketinspektören finns nu i inställningslistan.",
-    "portable": "Portabel"
+    "portable": "Portabel",
+    "setup": "Installation",
+    "setupWizardHint": "Gå igenom den första installationen igen för att se över mikrofon, integritetsval, uppdateringskontroll och talläge. Dina nuvarande val är förifyllda.",
+    "setupWizardRun": "Kör installationsguiden igen",
+    "setupWizardIdentityNote": "Din identitet är inte en del av detta. Ditt certifikat, och med det ditt registrerade namn och dina behörigheter på servrar, förblir precis som det är.",
+    "setupWizardIdentityLink": "Hantera den under Identitet"
   },
   "profile": {
     "title": "Profil",

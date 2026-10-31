@@ -1,5 +1,6 @@
 import { useEffect, useId, useRef } from "react";
 import { useTranslation } from "react-i18next";
+import { useIsMacos } from "../../api/useIsMacos";
 
 export interface ChannelSearchProps {
   value: string;
@@ -22,6 +23,7 @@ export function ChannelSearch({ value, onChange, onClear, onSubmit }: ChannelSea
   const id = useId();
   const inputRef = useRef<HTMLInputElement>(null);
   const label = t("search.label");
+  const macos = useIsMacos();
 
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
@@ -42,6 +44,21 @@ export function ChannelSearch({ value, onChange, onClear, onSubmit }: ChannelSea
       <label htmlFor={id} className="visually-hidden">
         {label}
       </label>
+      <svg
+        className="channel-search__icon"
+        viewBox="0 0 24 24"
+        width="16"
+        height="16"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        aria-hidden="true"
+        focusable="false"
+      >
+        <circle cx="11" cy="11" r="7" />
+        <path d="m20 20-3.5-3.5" />
+      </svg>
       <input
         ref={inputRef}
         id={id}
@@ -66,6 +83,12 @@ export function ChannelSearch({ value, onChange, onClear, onSubmit }: ChannelSea
           }
         }}
       />
+      {value === "" && (
+        // The shortcut is announced through aria-keyshortcuts; the chip is only a visual hint.
+        <kbd className="channel-search__key" aria-hidden="true">
+          {macos ? "⌘K" : t("search.shortcut")}
+        </kbd>
+      )}
       {value !== "" && (
         <button
           type="button"

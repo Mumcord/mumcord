@@ -60,5 +60,9 @@
     "dismiss": "Zavrieť",
     "unfollowFailed": "Zrušenie sledovania všetkých kanálov sa nepodarilo. Skús to znova."
   },
-  "mention": "obsahuje zmienku o tebe"
+  "mention": "obsahuje zmienku o tebe",
+  "header": {
+    "follow": "Sledovať kanál",
+    "unfollow": "Sleduješ, kliknutím zrušíš"
+  }
 }

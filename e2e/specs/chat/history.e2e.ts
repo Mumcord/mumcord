@@ -2,7 +2,6 @@ import { browser, expect, $ } from "@wdio/globals";
 import { app, bot, testenv } from "../../helpers/index.ts";
 import {
   addFirstServer,
-  clickButton,
   finishWizard,
   joinChannel,
   messageTexts,
@@ -48,7 +47,9 @@ describe("chat: local history (AC-1.17)", () => {
   });
 
   it("Clear history removes the channel's messages (also after restart)", async () => {
-    await clickButton("Clear history");
+    // Channel actions sit behind the channel name (issue #170).
+    await $("//h2[contains(@class,'chat-header__title')]//button[@aria-haspopup='menu']").click();
+    await $("//button[@role='menuitem'][contains(., 'Clear chat history')]").click();
     await $("//div[@role='alertdialog']//button[.='Clear history']").click();
     await browser.waitUntil(async () => (await messageTexts()).length === 0, {
       timeoutMsg: "messages still shown after clearing",

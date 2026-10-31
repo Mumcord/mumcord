@@ -94,5 +94,14 @@
   "endToEndValue": "≈ {{value}} ms (meastachán)",
   "lowLatencyMode": "Mód lag-latency",
   "identity": "Aitheantas",
-  "identityValue": "{{label}} ({{name}}) · {{fingerprint}}"
+  "identityValue": "{{label}} ({{name}}) · {{fingerprint}}",
+  "profileSource": "{{label}} (próifíl chainéil)",
+  "profile": {
+    "row": "Próifíl fuaime",
+    "musicOn": "Cáilíocht cheoil",
+    "musicOff": "Cáilíocht cheoil as",
+    "lowLatencyOn": "Mód moill íseal",
+    "lowLatencyOff": "Mód moill íseal as",
+    "defaults": "Réamhshocruithe"
+  }
 }

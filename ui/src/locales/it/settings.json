@@ -429,7 +429,12 @@
     "noticesFailed": "Impossibile aprire le licenze di terze parti.",
     "loading": "Caricamento…",
     "devToolsUnlocked": "Strumenti per sviluppatori sbloccati: l’ispettore pacchetti è ora nell’elenco delle impostazioni.",
-    "portable": "Portatile"
+    "portable": "Portatile",
+    "setup": "Configurazione",
+    "setupWizardHint": "Rifai la configurazione iniziale per rivedere microfono, scelte sulla privacy, controllo aggiornamenti e modalità di conversazione. I valori attuali sono già inseriti.",
+    "setupWizardRun": "Ripeti la procedura guidata",
+    "setupWizardIdentityNote": "La tua identità non ne fa parte. Il tuo certificato, e con esso il nome registrato e i permessi sui server, resta esattamente com'è.",
+    "setupWizardIdentityLink": "Gestiscila in Identità"
   },
   "profile": {
     "title": "Profilo",

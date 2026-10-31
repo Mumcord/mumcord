@@ -428,7 +428,12 @@
     "noticesFailed": "De licenties van derden konden niet worden geopend.",
     "loading": "Laden…",
     "devToolsUnlocked": "Ontwikkelaarstools ontgrendeld: de pakketinspecteur staat nu in de lijst met instellingen.",
-    "portable": "Draagbaar"
+    "portable": "Draagbaar",
+    "setup": "Installatie",
+    "setupWizardHint": "Doorloop de eerste installatie opnieuw om je microfoon, privacykeuzes, updatecontrole en spraakmodus te bekijken. Je huidige keuzes zijn al ingevuld.",
+    "setupWizardRun": "Installatiewizard opnieuw uitvoeren",
+    "setupWizardIdentityNote": "Je identiteit hoort hier niet bij. Je certificaat, en daarmee je geregistreerde naam en rechten op servers, blijft precies zoals het is.",
+    "setupWizardIdentityLink": "Beheer die bij Identiteit"
   },
   "profile": {
     "title": "Profiel",

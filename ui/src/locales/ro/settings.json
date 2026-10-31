@@ -429,7 +429,12 @@
     "noticesFailed": "Licențele terților nu au putut fi deschise.",
     "loading": "Se încarcă…",
     "devToolsUnlocked": "Instrumente pentru dezvoltatori deblocate: inspectorul de pachete este acum în lista de setări.",
-    "portable": "Portabilă"
+    "portable": "Portabilă",
+    "setup": "Configurare",
+    "setupWizardHint": "Parcurge din nou configurarea inițială pentru a verifica microfonul, opțiunile de confidențialitate, verificarea actualizărilor și modul de vorbire. Valorile actuale sunt deja completate.",
+    "setupWizardRun": "Rulează din nou asistentul de configurare",
+    "setupWizardIdentityNote": "Identitatea ta nu face parte din asta. Certificatul tău, împreună cu numele înregistrat și permisiunile pe servere, rămâne exact așa cum este.",
+    "setupWizardIdentityLink": "Gestioneaz-o în Identitate"
   },
   "profile": {
     "title": "Profil",

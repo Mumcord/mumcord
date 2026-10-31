@@ -1,0 +1,94 @@
+{
+  "title": "Too oma Mumble'i seadistus kaasa",
+  "intro": "Leidsime sellest arvutist ametliku Mumble'i kliendi. Vali, mida kopeerida. Mumble'is ei muudeta midagi ja miski ei lahku sinu arvutist.",
+  "optional": "{{progress}} · valikuline",
+  "listLabel": "Mida Mumble'ist kopeerida",
+  "favourites": {
+    "title": "Lemmikserverid",
+    "found_one": "{{count}} leitud",
+    "found_other": "{{count}} leitud",
+    "duplicates_one": "{{count}} on juba Mumcordis (vahele jäetud)",
+    "duplicates_other": "{{count}} on juba Mumcordis (vahele jäetud)",
+    "failed": "Mumble'i serverite loendit ei õnnestunud lugeda.",
+    "review": "Vaata loend üle",
+    "hide": "Peida loend",
+    "listLabel": "Kopeeritavad serverid",
+    "duplicate": "Juba Mumcordis"
+  },
+  "passwords": {
+    "title": "Salvestatud paroolid",
+    "count_one": "{{count}} lemmikul on salvestatud parool",
+    "count_other": "{{count}} lemmikul on salvestatud parool",
+    "keychain": "Salvestatud süsteemi võtmehoidjasse"
+  },
+  "identity": {
+    "title": "Identiteet (kliendisertifikaat)",
+    "keeps": "Säilitab sinu registreeritud nime ja õigused",
+    "locked": "kaitstud Mumble'is parooliga",
+    "named": "Kasutaja „{{name}}“ sertifikaat",
+    "validUntil": "kehtib kuni {{date}}",
+    "passwordNeeded": "Vaja on parooli",
+    "already": "Juba Mumcordis",
+    "password": "Sertifikaadi parool Mumble'ist",
+    "passwordRequired": "Sisesta sertifikaadi parool.",
+    "wrongPassword": "See parool ei ava sertifikaati. Proovi uuesti."
+  },
+  "devices": {
+    "title": "Heliseadmed",
+    "input": "Mikrofon: {{name}}",
+    "output": "Väljund: {{name}}",
+    "missing": "Mumble'i seadmed pole sellesse arvutisse ühendatud."
+  },
+  "ptt": {
+    "title": "Push-to-talk-klahv",
+    "modifierOnly": "Mumble'i klahv on ainult muuteklahv, mida Mumcord ei saa kasutada. Klahvi saad valida hiljem.",
+    "tooManyKeys": "Mumble'i kiirklahvil on rohkem kui üks klahv, mida Mumcord ei saa kasutada. Klahvi saad valida hiljem.",
+    "unknown": "Mumble'i kiirklahv kasutab klahvi või seadet, mida Mumcord ei tunne. Klahvi saad valida hiljem."
+  },
+  "volume": {
+    "title": "Helitugevus ja hääleseaded",
+    "hint": "Mumble ja Mumcord kasutavad erinevaid skaalasid, seega väärtused ei klapiks",
+    "notRecommended": "Pole soovitatav"
+  },
+  "selected_one": "{{count}} üksus valitud",
+  "selected_other": "{{count}} üksust valitud",
+  "import": "Impordi",
+  "importing": "Importimine…",
+  "skip": "Jäta praegu vahele",
+  "cancel": "Tühista",
+  "failed": "Importi ei õnnestunud lõpule viia. Proovi uuesti.",
+  "secureStorage": "Mumcord ei pääse ligi su süsteemi turvalisele salvestusele. Ava oma võtmehoidja või paroolihaldur ja proovi uuesti.",
+  "settingsFailed": "Serverid kopeeriti, aga seadeid ei õnnestunud salvestada.",
+  "summary": {
+    "title": "Import on valmis",
+    "intro": "Sinu Mumble'i andmed kopeeriti. Vaata, mis juhtus.",
+    "added_one": "{{count}} server lisati lemmikutesse",
+    "added_other": "{{count}} serverit lisati lemmikutesse",
+    "skipped_one": "{{count}} server jäeti vahele",
+    "skipped_other": "{{count}} serverit jäeti vahele",
+    "skippedDetail_one": "{{names}} on sinu loendis juba olemas",
+    "skippedDetail_other": "{{names}} on sinu loendis juba olemas",
+    "duplicate": "Duplikaat",
+    "passwords_one": "{{count}} parool salvestatud",
+    "passwords_other": "{{count}} parooli salvestatud",
+    "passwordsDetail": "Salvestatud süsteemi võtmehoidjasse, mitte faili",
+    "identity": "Identiteet imporditud",
+    "identityDefault": "Mumcord kasutab seda nüüd",
+    "identityServers": "Kasutusel kopeeritud serverite jaoks",
+    "identitySkipped": "Identiteet on juba Mumcordis",
+    "identitySkippedDetail": "See sertifikaat on juba üks sinu identiteetidest",
+    "devicesAndPtt": "Heliseadmed ja push-to-talk-klahv",
+    "done": "Valmis",
+    "undo": "Võta import tagasi",
+    "undone": "Import võeti tagasi.",
+    "undoFailed": "Importi ei õnnestunud täielikult tagasi võtta. Kontrolli oma servereid ja identiteete."
+  },
+  "settings": {
+    "title": "Impordi Mumble'ist",
+    "hint": "Kopeeri ametlikust Mumble'i kliendist lemmikserverid, salvestatud paroolid, oma sertifikaat ja heliseaded.",
+    "button": "Impordi Mumble'ist…",
+    "searching": "Mumble'it otsitakse…",
+    "notFound": "Ametlikku Mumble'i klienti ei leitud sellest arvutist.",
+    "breadcrumb": "Seaded · Serverid · Impordi Mumble'ist"
+  }
+}

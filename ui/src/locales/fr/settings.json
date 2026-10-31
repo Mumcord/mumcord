@@ -429,7 +429,12 @@
     "noticesFailed": "Impossible d’ouvrir les licences tierces.",
     "loading": "Chargement…",
     "devToolsUnlocked": "Outils de développement déverrouillés : l’inspecteur de paquets figure maintenant dans la liste des paramètres.",
-    "portable": "Portable"
+    "portable": "Portable",
+    "setup": "Configuration",
+    "setupWizardHint": "Refaites la configuration initiale pour revoir votre microphone, vos choix de confidentialité, la recherche de mises à jour et le mode de parole. Vos choix actuels sont préremplis.",
+    "setupWizardRun": "Relancer l'assistant de configuration",
+    "setupWizardIdentityNote": "Votre identité n'en fait pas partie. Votre certificat, et avec lui votre nom enregistré et vos permissions sur les serveurs, reste exactement tel qu'il est.",
+    "setupWizardIdentityLink": "Gérez-la dans Identité"
   },
   "profile": {
     "title": "Profil",

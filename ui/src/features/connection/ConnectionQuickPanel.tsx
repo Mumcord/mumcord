@@ -2,7 +2,15 @@ import { useId } from "react";
 import { useTranslation } from "react-i18next";
 import { Switch } from "../settings/components/Switch";
 import { BitrateSlider } from "../settings/sections/BitrateSlider";
-import { useSettings } from "../settings/useSettings";
+import { useSettings, type UpdateSettings } from "../settings/useSettings";
+import {
+  applyProfile,
+  overrides,
+  routePatch,
+  saveChannelAudioProfile,
+  useActiveAudioProfile,
+  type ProfileField,
+} from "../channelaudio";
 import { estimateBandwidth } from "./bandwidth";
 import { InfoTip } from "../../components/InfoTip";
 import { useServers } from "../servers";
@@ -13,12 +21,29 @@ import { useConnectionStats } from "./useConnectionStats";
 /**
  * "Voice quality" quick panel: the bitrate cap and Music quality from Settings > Audio (the same
  * stored values, saved at once), the bandwidth estimate and a way into the full audio settings.
- * The audio health rating stays visible at the top.
+ * The audio health rating stays visible at the top. While a channel audio profile is in effect
+ * (issue #171) its values are shown and edited instead, marked "(channel profile)".
  */
 export function ConnectionQuickPanel({ onOpenVoiceSettings }: { onOpenVoiceSettings: () => void }) {
   const { t } = useTranslation("connection");
   const { t: ts } = useTranslation("settings");
-  const { settings, update } = useSettings();
+  const { settings: stored, update: updateStored } = useSettings();
+  const active = useActiveAudioProfile();
+  const profile = active?.profile ?? null;
+  const settings = stored ? applyProfile(stored, profile) : null;
+  const update: UpdateSettings = (patch) => {
+    const routed = routePatch(patch, profile);
+    if (Object.keys(routed.global).length > 0) updateStored(routed.global);
+    if (routed.profile && active) {
+      saveChannelAudioProfile(active.serverId, active.channelId, routed.profile).catch(
+        (error: unknown) => {
+          console.error("Saving the channel audio profile failed", error);
+        },
+      );
+    }
+  };
+  const source = (label: string, field: ProfileField) =>
+    overrides(profile, field) ? t("profileSource", { label }) : label;
   const state = useConnectionStats(true);
   const meterId = useId();
   const more = (topic: string) => t("quick.moreInfo", { topic });
@@ -98,6 +123,7 @@ export function ConnectionQuickPanel({ onOpenVoiceSettings }: { onOpenVoiceSetti
             settings={settings}
             update={update}
             tipLabel={more(ts("audio.bitrate"))}
+            label={source(ts("audio.bitrate"), "bitrateKbps")}
             compact
           />
           {stats ? (
@@ -114,7 +140,7 @@ export function ConnectionQuickPanel({ onOpenVoiceSettings }: { onOpenVoiceSetti
       {settings ? (
         <section className="connection-quick__section">
           <Switch
-            label={ts("audio.musicQuality")}
+            label={source(ts("audio.musicQuality"), "musicQuality")}
             tip={{
               label: more(ts("audio.musicQuality")),
               text: lowLatency ? t("quick.musicIncluded") : ts("audio.musicQualityHint"),
@@ -130,7 +156,7 @@ export function ConnectionQuickPanel({ onOpenVoiceSettings }: { onOpenVoiceSetti
       {settings ? (
         <section className="connection-quick__section">
           <Switch
-            label={t("quick.lowLatency")}
+            label={source(t("quick.lowLatency"), "lowLatency")}
             badge={t("quick.beta")}
             tip={{ label: more(t("quick.lowLatency")), text: t("quick.lowLatencyHint") }}
             checked={settings.lowLatency}

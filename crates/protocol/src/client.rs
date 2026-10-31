@@ -1061,6 +1061,17 @@ impl Handle {
         })
     }
 
+    /// Moves another person to a channel. The server checks the move permission and answers
+    /// a refusal with `PermissionDenied`.
+    pub fn move_user(&self, session: u32, channel_id: u32) -> Result<(), CommandError> {
+        let m = proto::UserState {
+            session: Some(session),
+            channel_id: Some(channel_id),
+            ..Default::default()
+        };
+        self.send(Frame::from_message(MessageType::UserState, &m))
+    }
+
     pub fn set_self_mute(&self, mute: bool) -> Result<(), CommandError> {
         self.send_user_state(proto::UserState {
             self_mute: Some(mute),

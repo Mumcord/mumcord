@@ -12,6 +12,7 @@
   "bar": {
     "listLabel": "Servidores guardados",
     "add": "Añadir un servidor",
+    "browse": "Explorar servidores públicos",
     "keyboardHint": "Intro conecta. Alt más flecha arriba o abajo mueve el servidor. Mayúsculas más F10 abre más opciones.",
     "label": "{{server}} ({{state}})",
     "state": {

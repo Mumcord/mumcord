@@ -428,7 +428,12 @@
     "noticesFailed": "Kolmandate osapoolte litsentse ei õnnestunud avada.",
     "loading": "Laadin…",
     "devToolsUnlocked": "Arendaja tööriistad avatud: pakettide inspektor on nüüd seadete loendis.",
-    "portable": "Kaasaskantav"
+    "portable": "Kaasaskantav",
+    "setup": "Seadistus",
+    "setupWizardHint": "Käi esmane seadistus uuesti läbi, et vaadata üle mikrofon, privaatsusvalikud, värskenduste kontroll ja rääkimisrežiim. Sinu praegused valikud on eelnevalt täidetud.",
+    "setupWizardRun": "Käivita seadistusviisard uuesti",
+    "setupWizardIdentityNote": "Sinu identiteet ei kuulu selle juurde. Sinu sertifikaat ja koos sellega registreeritud nimi ning õigused serverites jäävad täpselt selliseks, nagu need on.",
+    "setupWizardIdentityLink": "Halda seda jaotises Identiteet"
   },
   "profile": {
     "title": "Profiil",

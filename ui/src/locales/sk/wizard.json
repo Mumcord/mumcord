@@ -1,5 +1,24 @@
 {
   "progress": "Krok {{current}} z {{total}}",
+  "rerun": {
+    "title": "Sprievodca nastavením",
+    "note": "Prechádzaš nastavením znova. Tvoja identita sa nemení.",
+    "manageIdentities": "Spravovať identity",
+    "stepsLabel": "Kroky nastavenia",
+    "stepsSkipped": "(preskočené, identita do toho nepatrí)",
+    "steps": {
+      "identity": "Identita",
+      "mic": "Mikrofón",
+      "privacy": "Súkromie",
+      "updates": "Aktualizácie",
+      "talk": "Režim rozprávania"
+    },
+    "footer": "Zrušenie nechá všetko tak, ako to je. Na konci sa uložia len zmenené kroky.",
+    "discardTitle": "Zahodiť zmeny?",
+    "discardBody": "Nič sa neukladá pred dokončením. Ak teraz zrušíš, všetko zostane tak, ako to je.",
+    "discardKeep": "Pokračovať v úpravách",
+    "discardConfirm": "Zahodiť zmeny"
+  },
   "loadFailed": "Nastavenie sa nepodarilo načítať.",
   "finish": "Dokončiť",
   "errors": {

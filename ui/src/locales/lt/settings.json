@@ -430,7 +430,12 @@
     "noticesFailed": "Nepavyko atverti trečiųjų šalių licencijų.",
     "loading": "Įkeliama…",
     "devToolsUnlocked": "Kūrėjo įrankiai atrakinti: paketų tikrintuvas dabar yra nustatymų sąraše.",
-    "portable": "Nešiojamoji"
+    "portable": "Nešiojamoji",
+    "setup": "Sąranka",
+    "setupWizardHint": "Dar kartą pereikite pradinę sąranką ir peržiūrėkite mikrofoną, privatumo pasirinkimus, atnaujinimų tikrinimą ir kalbėjimo režimą. Dabartiniai pasirinkimai jau įrašyti.",
+    "setupWizardRun": "Vėl paleisti sąrankos vediklį",
+    "setupWizardIdentityNote": "Jūsų tapatybė tam nepriklauso. Jūsų sertifikatas, o su juo ir registruotas vardas bei teisės serveriuose, lieka tiksliai tokie, kokie yra.",
+    "setupWizardIdentityLink": "Tvarkykite ją skiltyje Tapatybė"
   },
   "profile": {
     "title": "Profilis",

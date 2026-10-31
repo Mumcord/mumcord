@@ -12,6 +12,7 @@
   "bar": {
     "listLabel": "Gespeicherte Server",
     "add": "Server hinzufügen",
+    "browse": "Öffentliche Server durchsuchen",
     "keyboardHint": "Eingabe verbindet. Alt plus Pfeil hoch oder runter verschiebt den Server. Umschalt plus F10 öffnet weitere Optionen.",
     "label": "{{server}} ({{state}})",
     "state": {

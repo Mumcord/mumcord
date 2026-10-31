@@ -1,5 +1,24 @@
 {
   "progress": "Stap {{current}} van {{total}}",
+  "rerun": {
+    "title": "Installatiewizard",
+    "note": "Je doorloopt de installatie opnieuw. Je identiteit wordt niet gewijzigd.",
+    "manageIdentities": "Identiteiten beheren",
+    "stepsLabel": "Stappen van de installatie",
+    "stepsSkipped": "(overgeslagen, de identiteit hoort er niet bij)",
+    "steps": {
+      "identity": "Identiteit",
+      "mic": "Microfoon",
+      "privacy": "Privacy",
+      "updates": "Updates",
+      "talk": "Spraakmodus"
+    },
+    "footer": "Annuleren laat alles zoals het is. Alleen gewijzigde stappen worden aan het eind opgeslagen.",
+    "discardTitle": "Wijzigingen weggooien?",
+    "discardBody": "Er wordt niets opgeslagen voordat je klaar bent. Als je nu annuleert, blijft alles zoals het is.",
+    "discardKeep": "Verder bewerken",
+    "discardConfirm": "Wijzigingen weggooien"
+  },
   "loadFailed": "De installatie kon niet worden geladen.",
   "finish": "Voltooien",
   "errors": {

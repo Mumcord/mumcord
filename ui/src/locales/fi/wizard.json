@@ -1,5 +1,24 @@
 {
   "progress": "Vaihe {{current}}/{{total}}",
+  "rerun": {
+    "title": "Asennusvelho",
+    "note": "Käyt asetusta uudelleen läpi. Identiteettisi ei muutu.",
+    "manageIdentities": "Hallitse identiteettejä",
+    "stepsLabel": "Asetuksen vaiheet",
+    "stepsSkipped": "(ohitettu, identiteetti ei kuulu tähän)",
+    "steps": {
+      "identity": "Identiteetti",
+      "mic": "Mikrofoni",
+      "privacy": "Yksityisyys",
+      "updates": "Päivitykset",
+      "talk": "Puhumistila"
+    },
+    "footer": "Peruutus jättää kaiken ennalleen. Vain muuttuneet vaiheet tallennetaan lopussa.",
+    "discardTitle": "Hylätäänkö muutokset?",
+    "discardBody": "Mitään ei tallenneta ennen lopetusta. Jos peruutat nyt, kaikki pysyy ennallaan.",
+    "discardKeep": "Jatka muokkaamista",
+    "discardConfirm": "Hylkää muutokset"
+  },
   "loadFailed": "Käyttöönottoa ei voitu ladata.",
   "finish": "Valmis",
   "errors": {
