@@ -126,6 +126,53 @@ describe("themed tooltip", () => {
     expect(screen.getByRole("tooltip")).toBeInTheDocument();
   });
 
+  it("hides when the page scrolls, so the spec has to hover again to see it", () => {
+    setup(
+      <button type="button" aria-label="Send" data-tooltip="Send message">
+        x
+      </button>,
+    );
+    const button = screen.getByRole("button", { name: "Send" });
+    fireEvent.pointerOver(button);
+    wait(TOOLTIP_DELAY_MS);
+    expect(screen.getByRole("tooltip")).toBeInTheDocument();
+    // A scroll anywhere moves the page under the tooltip, so the layer drops it: it only comes
+    // back when the pointer enters the trigger again.
+    fireEvent.scroll(document);
+    expect(screen.queryByRole("tooltip")).toBeNull();
+    fireEvent.pointerOver(button);
+    wait(TOOLTIP_DELAY_MS);
+    expect(screen.getByRole("tooltip")).toBeInTheDocument();
+  });
+
+  it("stays away after a click on the trigger until the pointer enters it again", () => {
+    setup(
+      <button
+        type="button"
+        aria-label="Show members"
+        data-tooltip="Show members"
+        data-tooltip-detail="Freya is talking"
+      >
+        x
+      </button>,
+    );
+    const button = screen.getByRole("button", { name: "Show members" });
+    // What the E2E spec (#216) has to do: a click dismisses this trigger, and the pointer must
+    // leave and enter again before the tooltip – with the talking detail – comes back.
+    fireEvent.pointerOver(button);
+    fireEvent.pointerDown(button);
+    wait(TOOLTIP_DELAY_MS);
+    expect(screen.queryByRole("tooltip")).toBeNull();
+    fireEvent.pointerOver(button);
+    wait(TOOLTIP_DELAY_MS);
+    expect(screen.queryByRole("tooltip")).toBeNull();
+    fireEvent.pointerOut(button, { relatedTarget: document.body });
+    fireEvent.pointerOver(button);
+    wait(TOOLTIP_DELAY_MS);
+    const tip = screen.getByRole("tooltip");
+    expect(tip.querySelector(".tooltip__detail")).toHaveTextContent("Freya is talking");
+  });
+
   it("does not show for a click before the delay ran out", () => {
     setup(
       <button type="button" aria-label="Send" data-tooltip="Send message">
