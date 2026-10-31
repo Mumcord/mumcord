@@ -126,6 +126,25 @@ describe("themed tooltip", () => {
     expect(screen.getByRole("tooltip")).toBeInTheDocument();
   });
 
+  it("hides when the page scrolls, so the spec has to hover again to see it", () => {
+    setup(
+      <button type="button" aria-label="Send" data-tooltip="Send message">
+        x
+      </button>,
+    );
+    const button = screen.getByRole("button", { name: "Send" });
+    fireEvent.pointerOver(button);
+    wait(TOOLTIP_DELAY_MS);
+    expect(screen.getByRole("tooltip")).toBeInTheDocument();
+    // A scroll anywhere moves the page under the tooltip, so the layer drops it: it only comes
+    // back when the pointer enters the trigger again.
+    fireEvent.scroll(document);
+    expect(screen.queryByRole("tooltip")).toBeNull();
+    fireEvent.pointerOver(button);
+    wait(TOOLTIP_DELAY_MS);
+    expect(screen.getByRole("tooltip")).toBeInTheDocument();
+  });
+
   it("stays away after a click on the trigger until the pointer enters it again", () => {
     setup(
       <button
