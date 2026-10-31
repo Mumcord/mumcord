@@ -107,8 +107,6 @@
     "play": "{{title}} abspielen",
     "player": "Videoplayer: {{title}}",
     "videoTitle": "{{site}}-Video",
-    "spotifyTitle": "{{site}}-Link",
-    "audioPlayer": "Spotify-Player: {{title}}",
     "kind": {
       "track": "Titel",
       "album": "Album",
@@ -313,7 +311,6 @@
     "requestMetaMessages": "{{server}} · hat dir Nachrichten gesendet · {{time}}",
     "quote": "„{{text}}“",
     "block": "Blockieren",
-    "blockLater": "Blockieren ist noch nicht verfügbar.",
     "showMore_one": "{{count}} weitere Anfrage anzeigen",
     "showMore_other": "{{count}} weitere Anfragen anzeigen",
     "showFewer": "Weniger Anfragen anzeigen",
@@ -353,5 +350,55 @@
       "deleteHistory": "Verlauf löschen",
       "deleteHint": "Nur dieses Gerät · {{name}} behält die eigene Kopie"
     }
+  },
+  "audio": {
+    "card": "Audiodatei: {{name}}",
+    "file": "Audiodatei",
+    "playing": "Wird abgespielt",
+    "loading": "Wird geladen…",
+    "play": "{{name}} abspielen",
+    "pause": "{{name}} pausieren",
+    "playShort": "Abspielen",
+    "pauseShort": "Pause",
+    "seek": "Position",
+    "position": "{{time}} von {{length}}",
+    "volume": "Lautstärke",
+    "mute": "Stummschalten",
+    "open": "{{name}} im Browser öffnen",
+    "save": "{{name}} speichern",
+    "saveShort": "Datei speichern",
+    "saveTitle": "Audiodatei speichern",
+    "fileType": "Audiodatei",
+    "saveFailed": "Die Datei konnte nicht gespeichert werden.",
+    "errorTitle": "Datei kann nicht abgespielt werden",
+    "errorText": "Die Datei fehlt, ist zu groß oder hat ein Format, das Mumcord nicht abspielen kann.",
+    "retry": "Erneut versuchen"
+  },
+  "music": {
+    "card": "{{service}}: {{title}}",
+    "title": "{{service}}-Link",
+    "other": "Musiklink",
+    "thirdParty": "Inhalt von Drittanbietern von {{host}}",
+    "thirdPartyShort": "Inhalt von Drittanbietern",
+    "embedded": "Eingebetteter Player · {{service}} · {{host}}",
+    "player": "{{service}}-Player: {{title}}",
+    "play": "Abspielen",
+    "playLabel": "{{title}} auf {{service}} abspielen",
+    "stop": "Stopp",
+    "stopLabel": "{{title}} stoppen",
+    "openIn": "In {{service}} öffnen",
+    "limits": "Wiedergabegrenzen legt der Dienst fest",
+    "noPlayer": "Für diesen Dienst ist kein Player verfügbar",
+    "output": "Wird auf deinem Ausgabegerät abgespielt, nicht in dein Mikrofon"
+  },
+  "embedHint": {
+    "image": "Bild ausgeblendet, weil Linkvorschauen und Einbettungen in <settings>Einstellungen > Datenschutz</settings> ausgeschaltet sind.",
+    "gif": "GIF ausgeblendet, weil Linkvorschauen und Einbettungen in <settings>Einstellungen > Datenschutz</settings> ausgeschaltet sind.",
+    "video": "Videoplayer ausgeblendet, weil Linkvorschauen und Einbettungen in <settings>Einstellungen > Datenschutz</settings> ausgeschaltet sind.",
+    "audio": "Audioplayer ausgeblendet, weil Linkvorschauen und Einbettungen in <settings>Einstellungen > Datenschutz</settings> ausgeschaltet sind.",
+    "music": "Musikplayer ausgeblendet, weil Linkvorschauen und Einbettungen in <settings>Einstellungen > Datenschutz</settings> ausgeschaltet sind.",
+    "link": "Linkvorschau ausgeblendet, weil Linkvorschauen und Einbettungen in <settings>Einstellungen > Datenschutz</settings> ausgeschaltet sind.",
+    "several_one": "{{count}} Vorschau ausgeblendet, weil Linkvorschauen und Einbettungen in <settings>Einstellungen > Datenschutz</settings> ausgeschaltet sind.",
+    "several_other": "{{count}} Vorschauen ausgeblendet, weil Linkvorschauen und Einbettungen in <settings>Einstellungen > Datenschutz</settings> ausgeschaltet sind."
   }
 }

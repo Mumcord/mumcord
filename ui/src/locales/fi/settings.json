@@ -734,5 +734,22 @@
     "revoke": "Peruuta",
     "revokeLabel": "Peruuta hyväksytty keskustelu käyttäjän {{name}} kanssa",
     "revokeFailed": "Peruuttaminen epäonnistui. Yritä uudelleen."
+  },
+  "blocked": {
+    "title": "Estetyt käyttäjät",
+    "hint": "Estot tallennetaan vain tälle tietokoneelle. Estetyt käyttäjät on mykistetty sinulta, ja heidän viestinsä ja Mumcord-datansa ohitetaan.",
+    "empty": "Et ole estänyt ketään.",
+    "user": "Käyttäjä",
+    "server": "Palvelin",
+    "since": "Estetty alkaen",
+    "actions": "Toiminnot",
+    "unblock": "Poista esto",
+    "unblockLabel": "Poista käyttäjän {{name}} esto",
+    "unblockFailed": "Eston poistaminen epäonnistui. Yritä uudelleen.",
+    "messagesTitle": "Estetyt viestit kanavan keskustelussa",
+    "collapse": "Tiivistä ne",
+    "collapseHint": "Näyttää tekstin ”Viesti estetyltä käyttäjältä” ja Näytä-painikkeen.",
+    "hide": "Piilota kokonaan",
+    "hideHint": "Keskustelussa ei näytetä mitään."
   }
 }

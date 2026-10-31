@@ -116,5 +116,28 @@
     "message": "{{name}} būs jānosūta jauns ziņas pieprasījums, pirms ziņas atkal sasniegs tevi. Tērzēšanas vēsture paliek.",
     "confirm": "Atsaukt",
     "failed": "Neizdevās atsaukt tērzēšanas piekrišanu. Mēģini vēlreiz."
+  },
+  "block": {
+    "menu": "Bloķēt…",
+    "unblock": "Atbloķēt",
+    "title": "Vai bloķēt {{name}}?",
+    "onServer": "serverī {{server}}",
+    "whatHappens": "Kas notiek",
+    "private": "{{name}} privātās ziņas netiek rādītas un tev nepaziņo.",
+    "channelCollapsed": "{{name}} kanāla ziņas ir sakļautas. Tu tās joprojām vari atvērt.",
+    "channelHidden": "{{name}} kanāla ziņas ir paslēptas.",
+    "voice": "{{name}} tev ir apklusināts balsī, ieskaitot čukstus.",
+    "data": "Nekādas vēstures sinhronizācijas, uzaicinājumu vai citu Mumcord datu no {{name}}.",
+    "followsCert": "Bloķēšana seko {{name}} sertifikātam, tāpēc jauns vārds to neapiet.",
+    "nameOnly": "{{name}} nav sertifikāta, tāpēc bloķēšana attiecas tikai uz šo vārdu serverī {{server}}.",
+    "warning": "{{name}} joprojām var tevi redzēt un lasīt tavas ziņas. Mumble nevar to apturēt tikai tavā pusē. {{name}} par bloķēšanu netiek paziņots.",
+    "cancel": "Atcelt",
+    "confirm": "Bloķēt {{name}}",
+    "done": "{{name}} ir bloķēts.",
+    "failed": "Neizdevās bloķēt {{name}}. Mēģini vēlreiz.",
+    "badge": "Bloķēts",
+    "collapsed": "Ziņa no bloķēta lietotāja",
+    "show": "Rādīt",
+    "showLabel": "Rādīt ziņu no bloķēta lietotāja"
   }
 }

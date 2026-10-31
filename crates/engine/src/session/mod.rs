@@ -250,6 +250,8 @@ struct Inner {
     mumcord: crate::mumcord::ServerPeers,
     /// Chat and message requests per server (issue #141).
     pm_requests: crate::pm_rules::ServerRequests,
+    /// Blocked users of every own identity (issue #140).
+    blocked: crate::blocking::BlockList,
     /// History sync with other Mumcord users (FR-1.60).
     history_sync: Arc<Mutex<crate::history_sync::HistorySync>>,
     /// What the last import from the official Mumble client added, for its undo (issue #66).
@@ -541,6 +543,7 @@ impl Engine {
         let meter = Arc::new(Meter::default());
         voice::spawn_meter(&rt, controls.clone(), meter.clone(), events.clone());
         let voice = Arc::new(VoiceShared::default());
+        let blocked = crate::blocking::load(&lock(&store));
         let queries = Arc::new(crate::server_query::ServerQueries::default());
         let inner = Arc::new(Inner {
             rt,
@@ -573,6 +576,7 @@ impl Engine {
             user_stats: Mutex::default(),
             mumcord: Mutex::default(),
             pm_requests: Mutex::default(),
+            blocked: Mutex::new(blocked),
             history_sync: Arc::default(),
             mumble_import: Mutex::default(),
             watch_parties: Mutex::default(),
@@ -693,6 +697,36 @@ impl Engine {
         }
     }
 
+    /// Format and size of a direct audio link for its player card (issue #260); `None` when
+    /// previews are switched off in the settings (then nothing is fetched) or the link is not a
+    /// playable audio file.
+    pub async fn audio_info(&self, url: &str) -> Option<crate::web::AudioInfo> {
+        if !self.previews_allowed("audio info") {
+            return None;
+        }
+        self.inner.previews.audio_info(url).await
+    }
+
+    /// The audio file of a direct audio link, fetched after the user clicked play (issue
+    /// #260); `None` when previews are switched off or the file cannot be played.
+    pub async fn audio_file(&self, url: &str) -> Option<crate::web::AudioFile> {
+        if !self.previews_allowed("an audio file") {
+            return None;
+        }
+        self.inner.previews.audio_file(url).await
+    }
+
+    /// Whether the link-preview privacy switch allows fetching `what`.
+    fn previews_allowed(&self, what: &str) -> bool {
+        match self.settings() {
+            Ok(settings) => settings.link_previews,
+            Err(e) => {
+                tracing::warn!(error = %e, "reading the settings for {what} failed");
+                false
+            }
+        }
+    }
+
     /// The app data directory given to `Engine::new`.
     pub(crate) fn data_dir(&self) -> &Path {
         &self.inner.data_dir
@@ -743,6 +777,50 @@ impl Engine {
 
     pub(crate) fn pm_requests_state(&self) -> &crate::pm_rules::ServerRequests {
         &self.inner.pm_requests
+    }
+
+    pub(crate) fn blocked_state(&self) -> &crate::blocking::BlockList {
+        &self.inner.blocked
+    }
+
+    /// Mutes or unmutes the voice of people whose block changed (issue #140); their own
+    /// "Mute for me" stays as it is.
+    pub(crate) fn apply_block_mutes(
+        &self,
+        before: &[mumcord_store::BlockedUser],
+        after: &[mumcord_store::BlockedUser],
+    ) {
+        let mut core = lock(&self.inner.core);
+        let Some(server_id) = core.audio_server else {
+            return;
+        };
+        let Some((changed, users)) = core.session(server_id).ok().map(|s| {
+            s.handle.with_state(|st| {
+                let changed = crate::blocking::changed_sessions(before, after, st, server_id);
+                let users: Vec<_> = changed
+                    .iter()
+                    .filter_map(|(session, _)| st.users.get(session).cloned())
+                    .collect();
+                (changed, users)
+            })
+        }) else {
+            return;
+        };
+        let store = lock(&self.inner.store);
+        let Core {
+            slots, pipeline, ..
+        } = &mut *core;
+        let (Some(slot), Some(pipeline)) = (slots.get(&server_id), pipeline.as_mut()) else {
+            return;
+        };
+        for ((session, blocked), user) in changed.into_iter().zip(&users) {
+            let setting = slot.people.setting(&store, server_id, user);
+            pipeline.apply_person(
+                session,
+                setting.volume,
+                crate::blocking::voice_muted(setting.local_mute, blocked),
+            );
+        }
     }
 
     pub(crate) fn watch_party_state(&self) -> &crate::watch_party::ServerParties {
@@ -2458,6 +2536,7 @@ impl Inner {
             }
             Event::UserUpdated(change) => {
                 let user = &change.user;
+                let blocked = change.joined && self.user_blocked(ctx, user);
                 let mut core = lock(&self.core);
                 let audio = core.audio_server == Some(server_id);
                 let setting = core
@@ -2466,10 +2545,14 @@ impl Inner {
                     .map(|slot| slot.people.setting(&lock(&self.store), server_id, user));
                 if change.joined
                     && audio
-                    && let Some(setting) = setting.filter(|s| !people::is_default(*s))
+                    && let Some(setting) = setting.filter(|s| blocked || !people::is_default(*s))
                     && let Some(pipeline) = core.pipeline.as_mut()
                 {
-                    pipeline.apply_person(user.session, setting.volume, setting.local_mute);
+                    pipeline.apply_person(
+                        user.session,
+                        setting.volume,
+                        crate::blocking::voice_muted(setting.local_mute, blocked),
+                    );
                 }
                 drop(core);
                 let own = ctx.handle.with_state(|s| s.session) == Some(user.session);
@@ -2556,6 +2639,9 @@ impl Inner {
                     t.on_tunnel(packet.clone());
                 }
             }
+            // Nothing a blocked person sends reaches any feature (issue #140).
+            Event::PluginData(data)
+                if crate::blocking::sent_by_blocked(ctx, &self.blocked, data) => {}
             Event::PluginData(data) => {
                 crate::now_playing::on_plugin_data(&self.now_playing, ctx, data);
                 crate::now_gaming::on_plugin_data(&self.now_gaming, ctx, data);
@@ -2586,11 +2672,24 @@ impl Inner {
             // Here rather than in the extension hooks: the private message rule needs to know
             // who runs Mumcord (issue #141).
             Event::TextMessage(message) => {
-                crate::chat::on_text(ctx, message, &self.mumcord, &self.pm_requests);
+                crate::chat::on_text(
+                    ctx,
+                    message,
+                    &self.mumcord,
+                    &self.pm_requests,
+                    &self.blocked,
+                );
             }
             Event::ServerConfigUpdated(_) | Event::Disconnected(_) => {}
         }
         extension::on_event(ctx, &event);
+    }
+
+    /// Whether `user` on the server of `ctx` is blocked (issue #140).
+    fn user_blocked(&self, ctx: &SessionCtx, user: &mumcord_protocol::User) -> bool {
+        let blocks = lock(&self.blocked);
+        ctx.handle
+            .with_state(|s| crate::blocking::user_blocked(&blocks, s, ctx.server_id, user))
     }
 
     /// The person as the UI shows them, with the Mumcord features they announced there.
@@ -2875,6 +2974,9 @@ impl Inner {
     ) -> EngineResult<()> {
         let mut core = lock(&self.core);
         let user = Self::person_in_session(&core, server_id, session)?;
+        let blocked = core
+            .session(server_id)
+            .is_ok_and(|s| self.user_blocked(&self.ctx(s), &user));
         let setting = {
             let store = lock(&self.store);
             let slot = core
@@ -2889,7 +2991,11 @@ impl Inner {
         if core.audio_server == Some(server_id)
             && let Some(pipeline) = core.pipeline.as_mut()
         {
-            pipeline.apply_person(session, setting.volume, setting.local_mute);
+            pipeline.apply_person(
+                session,
+                setting.volume,
+                crate::blocking::voice_muted(setting.local_mute, blocked),
+            );
         }
         drop(core);
         self.events
@@ -3069,12 +3175,21 @@ impl Inner {
                 let users = session
                     .handle
                     .with_state(|s| s.users.values().cloned().collect::<Vec<_>>());
+                let blocks = lock(&self.blocked);
                 for user in users {
                     let setting = slot.people.setting(&store, server_id, &user);
-                    if !people::is_default(setting) {
-                        pipeline.apply_person(user.session, setting.volume, setting.local_mute);
+                    let blocked = session.handle.with_state(|s| {
+                        crate::blocking::user_blocked(&blocks, s, server_id, &user)
+                    });
+                    if blocked || !people::is_default(setting) {
+                        pipeline.apply_person(
+                            user.session,
+                            setting.volume,
+                            crate::blocking::voice_muted(setting.local_mute, blocked),
+                        );
                     }
                 }
+                drop(blocks);
                 drop(store);
                 core.pipeline = Some(pipeline);
                 self.meter.voice.store(true, Ordering::Relaxed);

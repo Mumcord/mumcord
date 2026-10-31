@@ -734,5 +734,22 @@
     "revoke": "Revoke",
     "revokeLabel": "Revoke the accepted conversation with {{name}}",
     "revokeFailed": "Revoking failed. Please try again."
+  },
+  "blocked": {
+    "title": "Blocked users",
+    "hint": "Blocks are kept on this computer only. Blocked users are muted for you and their messages and Mumcord data are ignored.",
+    "empty": "You haven't blocked anyone.",
+    "user": "User",
+    "server": "Server",
+    "since": "Blocked since",
+    "actions": "Actions",
+    "unblock": "Unblock",
+    "unblockLabel": "Unblock {{name}}",
+    "unblockFailed": "Unblocking failed. Please try again.",
+    "messagesTitle": "Blocked messages in channel chat",
+    "collapse": "Collapse them",
+    "collapseHint": "Shows “Message from a blocked user” with a Show button.",
+    "hide": "Hide them completely",
+    "hideHint": "Nothing is shown in the chat."
   }
 }

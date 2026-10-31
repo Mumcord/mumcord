@@ -734,5 +734,22 @@
     "revoke": "Widerrufen",
     "revokeLabel": "Angenommene Unterhaltung mit {{name}} widerrufen",
     "revokeFailed": "Widerrufen fehlgeschlagen. Bitte versuche es erneut."
+  },
+  "blocked": {
+    "title": "Blockierte Nutzer",
+    "hint": "Blockierungen werden nur auf diesem Computer gespeichert. Blockierte Nutzer sind für dich stummgeschaltet, ihre Nachrichten und Mumcord-Daten werden ignoriert.",
+    "empty": "Du hast niemanden blockiert.",
+    "user": "Nutzer",
+    "server": "Server",
+    "since": "Blockiert seit",
+    "actions": "Aktionen",
+    "unblock": "Blockierung aufheben",
+    "unblockLabel": "Blockierung von {{name}} aufheben",
+    "unblockFailed": "Die Blockierung konnte nicht aufgehoben werden. Bitte versuche es erneut.",
+    "messagesTitle": "Blockierte Nachrichten im Kanalchat",
+    "collapse": "Einklappen",
+    "collapseHint": "Zeigt „Nachricht eines blockierten Nutzers“ mit einer Schaltfläche „Anzeigen“.",
+    "hide": "Komplett ausblenden",
+    "hideHint": "Im Chat wird nichts angezeigt."
   }
 }

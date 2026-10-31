@@ -107,8 +107,6 @@
     "play": "Toista {{title}}",
     "player": "Videosoitin: {{title}}",
     "videoTitle": "{{site}}-video",
-    "spotifyTitle": "{{site}}-linkki",
-    "audioPlayer": "Spotify-soitin: {{title}}",
     "kind": {
       "track": "Kappale",
       "album": "Albumi",
@@ -313,7 +311,6 @@
     "requestMetaMessages": "{{server}} · lähetti sinulle viestejä · {{time}}",
     "quote": "”{{text}}”",
     "block": "Estä",
-    "blockLater": "Estäminen ei ole vielä käytettävissä.",
     "showMore_one": "Näytä {{count}} pyyntö lisää",
     "showMore_other": "Näytä {{count}} pyyntöä lisää",
     "showFewer": "Näytä vähemmän pyyntöjä",
@@ -353,5 +350,55 @@
       "deleteHistory": "Poista historia",
       "deleteHint": "Vain tämä laite · {{name}} säilyttää oman kopionsa"
     }
+  },
+  "audio": {
+    "card": "Äänitiedosto: {{name}}",
+    "file": "Äänitiedosto",
+    "playing": "Toistetaan",
+    "loading": "Ladataan…",
+    "play": "Toista {{name}}",
+    "pause": "Keskeytä {{name}}",
+    "playShort": "Toista",
+    "pauseShort": "Tauko",
+    "seek": "Kohta",
+    "position": "{{time}} / {{length}}",
+    "volume": "Äänenvoimakkuus",
+    "mute": "Mykistä",
+    "open": "Avaa {{name}} selaimessa",
+    "save": "Tallenna {{name}}",
+    "saveShort": "Tallenna tiedosto",
+    "saveTitle": "Tallenna äänitiedosto",
+    "fileType": "Äänitiedosto",
+    "saveFailed": "Tiedostoa ei voitu tallentaa.",
+    "errorTitle": "Tiedostoa ei voi toistaa",
+    "errorText": "Tiedosto puuttuu, on liian suuri tai sen muotoa Mumcord ei osaa toistaa.",
+    "retry": "Yritä uudelleen"
+  },
+  "music": {
+    "card": "{{service}}: {{title}}",
+    "title": "{{service}}-linkki",
+    "other": "Musiikkilinkki",
+    "thirdParty": "Kolmannen osapuolen sisältöä palvelimelta {{host}}",
+    "thirdPartyShort": "Kolmannen osapuolen sisältöä",
+    "embedded": "Upotettu soitin · {{service}} · {{host}}",
+    "player": "{{service}}-soitin: {{title}}",
+    "play": "Toista",
+    "playLabel": "Toista {{title}} palvelussa {{service}}",
+    "stop": "Pysäytä",
+    "stopLabel": "Pysäytä {{title}}",
+    "openIn": "Avaa palvelussa {{service}}",
+    "limits": "Palvelu määrittää toiston rajoitukset",
+    "noPlayer": "Tälle palvelulle ei ole soitinta",
+    "output": "Toistetaan lähtölaitteellasi, ei mikrofoniisi"
+  },
+  "embedHint": {
+    "image": "Kuva piilotettu, koska linkkien esikatselut ja upotukset ovat pois päältä kohdassa <settings>Asetukset > Yksityisyys</settings>.",
+    "gif": "GIF piilotettu, koska linkkien esikatselut ja upotukset ovat pois päältä kohdassa <settings>Asetukset > Yksityisyys</settings>.",
+    "video": "Videosoitin piilotettu, koska linkkien esikatselut ja upotukset ovat pois päältä kohdassa <settings>Asetukset > Yksityisyys</settings>.",
+    "audio": "Äänisoitin piilotettu, koska linkkien esikatselut ja upotukset ovat pois päältä kohdassa <settings>Asetukset > Yksityisyys</settings>.",
+    "music": "Musiikkisoitin piilotettu, koska linkkien esikatselut ja upotukset ovat pois päältä kohdassa <settings>Asetukset > Yksityisyys</settings>.",
+    "link": "Linkin esikatselu piilotettu, koska linkkien esikatselut ja upotukset ovat pois päältä kohdassa <settings>Asetukset > Yksityisyys</settings>.",
+    "several_one": "{{count}} esikatselu piilotettu, koska linkkien esikatselut ja upotukset ovat pois päältä kohdassa <settings>Asetukset > Yksityisyys</settings>.",
+    "several_other": "{{count}} esikatselua piilotettu, koska linkkien esikatselut ja upotukset ovat pois päältä kohdassa <settings>Asetukset > Yksityisyys</settings>."
   }
 }

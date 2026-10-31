@@ -387,6 +387,10 @@
   color: var(--color-text-secondary);
 }
 
+.server-menu__item--danger .person-menu__icon {
+  color: inherit;
+}
+
 .person-menu__separator {
   height: 1px;
   margin: var(--space-2) var(--space-3);

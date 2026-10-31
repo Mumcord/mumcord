@@ -15,5 +15,60 @@
   "open": "Odpri klepet",
   "close": "Opusti obvestilo",
   "mentionLine": "{{sender}} te je omenil: {{preview}}",
-  "withServer": "{{server}} · {{what}}"
+  "withServer": "{{server}} · {{what}}",
+  "centre": {
+    "title": "Obvestila",
+    "bellUnread_one": "Obvestila, {{count}} neprebrano",
+    "bellUnread_two": "Obvestila, {{count}} neprebrani",
+    "bellUnread_few": "Obvestila, {{count}} neprebrana",
+    "bellUnread_other": "Obvestila, {{count}} neprebranih",
+    "shortcut": "Ctrl+Shift+N",
+    "markAllRead": "Označi vse kot prebrano",
+    "filterLabel": "Pokaži obvestila",
+    "filter": {
+      "all": "Vse",
+      "mentions": "Omembe",
+      "requests": "Prošnje",
+      "invites": "Povabila"
+    },
+    "empty": "Vse je prebrano.",
+    "unread": "Neprebrano",
+    "dndOn": "Ne moti je vklopljeno",
+    "dndOff": "Ne moti je izklopljeno",
+    "settings": "Nastavitve obvestil",
+    "someone": "Nekdo",
+    "quoted": "„{{text}}“",
+    "mention": "{{name}} te je omenil(a)",
+    "mentionGroup": "{{name}} je omenil(a) vse",
+    "reply": "{{name}} je odgovoril(a) na tvoje sporočilo",
+    "chatRequest": "{{name}} se želi pogovarjati s tabo",
+    "messageRequest": "Prošnja za sporočilo od {{name}}",
+    "messageRequestBody_one": "{{count}} sporočilo iz običajnega odjemalca Mumble",
+    "messageRequestBody_two": "{{count}} sporočili iz običajnega odjemalca Mumble",
+    "messageRequestBody_few": "{{count}} sporočila iz običajnega odjemalca Mumble",
+    "messageRequestBody_other": "{{count}} sporočil iz običajnega odjemalca Mumble",
+    "invite": {
+      "watchParty": "{{name}} te je povabil(a) na skupno gledanje",
+      "screenShare": "{{name}} deli svoj zaslon",
+      "card": "{{name}} ti je poslal(a) kartico",
+      "theme": "{{name}} je s tabo delil(a) temo"
+    },
+    "connection": "{{server}} ni dosegljiv",
+    "type": {
+      "chatRequest": "Prošnja za klepet",
+      "messageRequest": "Prošnja za sporočilo",
+      "invite": "Povabilo",
+      "private": "Zasebno sporočilo",
+      "connection": "Povezava"
+    },
+    "accept": "Sprejmi",
+    "decline": "Zavrni",
+    "join": "Pridruži se",
+    "watch": "Glej",
+    "open": "Odpri",
+    "dismiss": "Opusti",
+    "dismissItem": "Opusti: {{title}}",
+    "failed": "To ni uspelo. Poskusi znova.",
+    "block": "Blokiraj"
+  }
 }

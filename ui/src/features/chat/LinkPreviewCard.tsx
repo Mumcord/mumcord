@@ -1,16 +1,18 @@
 /**
- * Cards under a message (FR-1.49, FR-1.50, FR-1.55): a page card with site, title, description
- * and image, a player card for YouTube, Twitch and Spotify whose player loads only after a click, or
- * the image itself for external images and image links. All text arrives as plain text and is
+ * Cards under a message (FR-1.49, FR-1.50, FR-1.55, issues #260 and #262): a page card with site,
+ * title, description and image, a player card for YouTube and Twitch or a music card whose player
+ * loads only after a click, an audio player for direct audio links, or the image itself for
+ * external images and image links. All text arrives as plain text and is
  * rendered as such; images are `data:` URLs from the engine, so the webview never contacts the
  * linked site.
  */
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import type { LinkPreview, VideoEmbed } from "../../api";
 import { dismissPreview, useDismissedPreviews } from "./dismissedPreviews";
 import {
   externalImages,
+  isAudioLink,
   isImageLink,
   cardPlayer,
   loadPreview,
@@ -24,7 +26,12 @@ import { credentialLinks, mumbleLinks } from "./mumbleLink";
 import { MumbleLinkCard } from "./MumbleLinkCard";
 import { openInBrowser } from "./openLink";
 import { DismissButton, OpenButton } from "./cardButtons";
+import { EmbedHiddenHint } from "./EmbedHiddenHint";
+import { hiddenEmbedKind } from "./embedHint";
 import { InlineImageCard } from "./InlineImageCard";
+import { AudioCard } from "./AudioCard";
+import { MusicCard } from "./MusicCard";
+import { useExclusivePlayback } from "./playback";
 import { PagePlayer } from "./PagePlayer";
 import { WatchTogetherButton } from "../watchparty";
 
@@ -37,7 +44,8 @@ interface LinkPreviewsProps {
   html: string;
   /** Message HTML as the engine delivered it; still holds external `<img src>` URLs. */
   body: string;
-  /** "Link previews in chat": without it only the `mumble://` card is shown, without figures. */
+  /** "Link previews in chat": without it only the `mumble://` card is shown, without figures,
+   * plus a hint naming what was hidden. */
   linkPreviews: boolean;
   /** Roving tab stop of the message the cards belong to. */
   tabIndex: number;
@@ -64,16 +72,19 @@ export function LinkPreviews({
   const hidden = useDismissedPreviews(messageId, dismissed);
   // A `mumble://` link always gets its card, because the card is the message's own content; the
   // web previews need the setting (issue #175).
-  const shown = [
-    ...mumble,
-    ...(linkPreviews ? [...images, ...links.filter((url) => !images.includes(url))] : []),
-  ]
+  const wanted = [...mumble, ...images, ...links.filter((url) => !images.includes(url))]
     .filter((url) => !hidden.has(url))
     .slice(0, MAX_PREVIEWS);
-  if (shown.length === 0) return null;
+  const shown = linkPreviews ? wanted : wanted.filter((url) => mumble.includes(url));
+  // What the switch hides gets one combined hint instead of vanishing silently (issue #261).
+  const withheld = wanted
+    .filter((url) => !shown.includes(url))
+    .map((url) => hiddenEmbedKind(url, images));
+  if (shown.length === 0 && withheld.length === 0) return null;
   const credentials = credentialLinks(mumble);
   return (
     <div className="link-previews">
+      <EmbedHiddenHint kinds={withheld} tabIndex={tabIndex} />
       {shown.map((url) =>
         mumble.includes(url) ? (
           <MumbleLinkCard
@@ -92,6 +103,15 @@ export function LinkPreviews({
             messageId={messageId}
             tabIndex={tabIndex}
             onImageClick={onImageClick}
+          />
+        ) : isAudioLink(url) ? (
+          <AudioCard
+            key={url}
+            url={url}
+            tabIndex={tabIndex}
+            onDismiss={() => {
+              dismissPreview(messageId, url);
+            }}
           />
         ) : (
           <LinkPreviewCard
@@ -139,6 +159,13 @@ function LinkPreviewCard({ url, messageId, tabIndex, onImageClick }: CardProps) 
   const dismiss = () => {
     dismissPreview(messageId, url);
   };
+  // The link turned out to serve audio (by content type or bytes): show the player.
+  if (preview.isAudio) return <AudioCard url={url} tabIndex={tabIndex} onDismiss={dismiss} />;
+  if (preview.music) {
+    return (
+      <MusicCard preview={preview} music={preview.music} tabIndex={tabIndex} onDismiss={dismiss} />
+    );
+  }
   return preview.video ? (
     <VideoCard preview={preview} video={preview.video} tabIndex={tabIndex} onDismiss={dismiss} />
   ) : (
@@ -175,14 +202,7 @@ function PageCard({ preview, tabIndex, onDismiss }: PageCardProps) {
 const SITE_NAMES: Record<VideoEmbed["site"], string> = {
   youtube: "YouTube",
   twitch: "Twitch",
-  spotify: "Spotify",
 };
-
-const SPOTIFY_KINDS = ["track", "album", "playlist", "artist", "episode", "show"] as const;
-
-function spotifyKind(kind: string): (typeof SPOTIFY_KINDS)[number] | null {
-  return SPOTIFY_KINDS.find((k) => k === kind) ?? null;
-}
 
 interface VideoCardProps {
   preview: LinkPreview;
@@ -194,28 +214,22 @@ interface VideoCardProps {
 function VideoCard({ preview, video, tabIndex, onDismiss }: VideoCardProps) {
   const { t } = useTranslation("chat");
   const [playing, setPlaying] = useState(false);
+  const stop = useCallback(() => {
+    setPlaying(false);
+  }, []);
+  useExclusivePlayback(playing, stop);
   const player = cardPlayer(video);
-  const spotify = video.site === "spotify";
   const site = preview.siteName ?? SITE_NAMES[video.site];
-  const title =
-    preview.title ?? t(spotify ? "preview.spotifyTitle" : "preview.videoTitle", { site });
-  // Spotify: the channel field holds the kind of item, e.g. "track".
-  const kind = spotify && video.channel !== null ? spotifyKind(video.channel) : null;
+  const title = preview.title ?? t("preview.videoTitle", { site });
   const thumbnail = safeImage(preview.image);
   return (
     <article className="link-card link-card--video" aria-label={t("preview.card", { title })}>
       <div className="link-card__text">
         <p className="link-card__site">{site}</p>
         <p className="link-card__title">{title}</p>
-        {kind !== null && <p className="link-card__description">{t(`preview.kind.${kind}`)}</p>}
-        {spotify && preview.description !== null && (
-          <p className="link-card__description">{preview.description}</p>
-        )}
-        {!spotify && video.channel !== null && (
-          <p className="link-card__description">{video.channel}</p>
-        )}
+        {video.channel !== null && <p className="link-card__description">{video.channel}</p>}
       </div>
-      {playing && player?.via === "page" ? (
+      {playing && player !== null ? (
         <PagePlayer
           playerUrl={player.url}
           title={t("preview.player", { title })}
@@ -223,16 +237,6 @@ function VideoCard({ preview, video, tabIndex, onDismiss }: VideoCardProps) {
             setPlaying(false);
             openInBrowser(preview.url);
           }}
-        />
-      ) : playing && player !== null ? (
-        <iframe
-          className={`link-card__player${spotify ? " link-card__player--audio" : ""}`}
-          src={player.url}
-          title={t(spotify ? "preview.audioPlayer" : "preview.player", { title })}
-          allow="autoplay; encrypted-media; fullscreen; picture-in-picture"
-          allowFullScreen
-          referrerPolicy="strict-origin-when-cross-origin"
-          sandbox="allow-scripts allow-same-origin allow-presentation"
         />
       ) : (
         <button

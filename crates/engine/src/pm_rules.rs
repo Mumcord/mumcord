@@ -229,6 +229,13 @@ impl Requests {
         Some(self.incoming.remove(index))
     }
 
+    /// Removes the incoming requests matching `pred`; whether any was removed.
+    fn drop_incoming(&mut self, pred: impl Fn(&Incoming) -> bool) -> bool {
+        let before = self.incoming.len();
+        self.incoming.retain(|r| !pred(r));
+        before != self.incoming.len()
+    }
+
     fn new_id(&mut self) -> u64 {
         self.next_id += 1;
         self.next_id
@@ -432,6 +439,21 @@ pub(crate) fn on_user_removed(ctx: &SessionCtx, requests: &ServerRequests, sessi
         server.sent.retain(|s| s.person != gone);
         before != server.incoming.len() + server.sent.len()
     };
+    if changed {
+        publish(ctx, requests);
+    }
+}
+
+/// Blocking someone (issue #140) removes their open requests; `blocked` gets the certificate
+/// hash and name of each sender.
+pub(crate) fn drop_blocked(
+    ctx: &SessionCtx,
+    requests: &ServerRequests,
+    blocked: impl Fn(Option<&str>, &str) -> bool,
+) {
+    let changed = lock(requests)
+        .get_mut(&ctx.server_id)
+        .is_some_and(|server| server.drop_incoming(|r| blocked(r.cert_hash.as_deref(), &r.name)));
     if changed {
         publish(ctx, requests);
     }
@@ -743,6 +765,34 @@ mod tests {
         assert_eq!(decode(blank), Some(Wire::Request { note: None }));
         assert_eq!(decode(b"<b>hi</b>"), None);
         assert_eq!(decode(&vec![b' '; PLUGIN_DATA_MAX + 1]), None);
+    }
+
+    #[test]
+    fn blocking_drops_only_the_blocked_requests() {
+        let mut requests = Requests::default();
+        for (name, cert_hash) in [
+            ("Bob", Some("bob")),
+            ("Guest", None),
+            ("Carol", Some("carol")),
+        ] {
+            let id = requests.new_id();
+            requests.incoming.push(Incoming {
+                id,
+                person: Person::of(id as u32, cert_hash),
+                session: id as u32,
+                name: name.into(),
+                cert_hash: cert_hash.map(Into::into),
+                chat_request: true,
+                note: None,
+                messages: Vec::new(),
+                received_at: 0,
+            });
+        }
+        let blocked = |r: &Incoming| r.cert_hash.as_deref() == Some("bob") || r.name == "Guest";
+        assert!(requests.drop_incoming(blocked));
+        assert_eq!(requests.view().incoming.len(), 1);
+        assert_eq!(requests.view().incoming[0].name, "Carol");
+        assert!(!requests.drop_incoming(blocked));
     }
 
     #[test]

@@ -17,5 +17,62 @@
   "open": "Oscail an comhrá",
   "close": "Díbir an fógra",
   "mentionLine": "Luaigh {{sender}} thú: {{preview}}",
-  "withServer": "{{server}} · {{what}}"
+  "withServer": "{{server}} · {{what}}",
+  "centre": {
+    "title": "Fógraí",
+    "bellUnread_one": "Fógraí, {{count}} gan léamh",
+    "bellUnread_two": "Fógraí, {{count}} gan léamh",
+    "bellUnread_few": "Fógraí, {{count}} gan léamh",
+    "bellUnread_many": "Fógraí, {{count}} gan léamh",
+    "bellUnread_other": "Fógraí, {{count}} gan léamh",
+    "shortcut": "Ctrl+Shift+N",
+    "markAllRead": "Marcáil gach ceann mar léite",
+    "filterLabel": "Taispeáin fógraí",
+    "filter": {
+      "all": "Gach ceann",
+      "mentions": "Luanna",
+      "requests": "Iarratais",
+      "invites": "Cuirí"
+    },
+    "empty": "Tá tú ar an eolas.",
+    "unread": "Gan léamh",
+    "dndOn": "Tá Ná Cuir Isteach ar siúl",
+    "dndOff": "Tá Ná Cuir Isteach as",
+    "settings": "Socruithe fógraí",
+    "someone": "Duine éigin",
+    "quoted": "“{{text}}”",
+    "mention": "Luaigh {{name}} thú",
+    "mentionGroup": "Luaigh {{name}} gach duine",
+    "reply": "D’fhreagair {{name}} do theachtaireacht",
+    "chatRequest": "Ba mhaith le {{name}} comhrá leat",
+    "messageRequest": "Iarratas teachtaireachta ó {{name}}",
+    "messageRequestBody_one": "{{count}} teachtaireacht ó chliant Mumble caighdeánach",
+    "messageRequestBody_two": "{{count}} theachtaireacht ó chliant Mumble caighdeánach",
+    "messageRequestBody_few": "{{count}} theachtaireacht ó chliant Mumble caighdeánach",
+    "messageRequestBody_many": "{{count}} dteachtaireacht ó chliant Mumble caighdeánach",
+    "messageRequestBody_other": "{{count}} teachtaireacht ó chliant Mumble caighdeánach",
+    "invite": {
+      "watchParty": "Thug {{name}} cuireadh duit chuig féachaint le chéile",
+      "screenShare": "Tá {{name}} ag roinnt a scáileáin",
+      "card": "Sheol {{name}} cárta chugat",
+      "theme": "Roinn {{name}} téama leat"
+    },
+    "connection": "Níl {{server}} inrochtana",
+    "type": {
+      "chatRequest": "Iarratas comhrá",
+      "messageRequest": "Iarratas teachtaireachta",
+      "invite": "Cuireadh",
+      "private": "Teachtaireacht phríobháideach",
+      "connection": "Nasc"
+    },
+    "accept": "Glac leis",
+    "decline": "Diúltaigh",
+    "join": "Bí páirteach",
+    "watch": "Féach",
+    "open": "Oscail",
+    "dismiss": "Cuir ar leataobh",
+    "dismissItem": "Cuir ar leataobh: {{title}}",
+    "failed": "Níor oibrigh sé sin. Bain triail eile as.",
+    "block": "Bac"
+  }
 }

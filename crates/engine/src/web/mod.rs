@@ -6,12 +6,15 @@
 //! (default 7 days, QA.42). Preview images are stored inside the cached previews. Fetching is guarded by
 //! [`fetch::Fetcher`] (limits and SSRF protection), which also loads inline images in messages
 //! ([`inline`], FR-1.55); those are cached the same way and cleaned up with the previews, as are
-//! full-size chat images (sent and received, FR-1.60c).
+//! full-size chat images (sent and received, FR-1.60c). Music service links get a music card
+//! ([`music`], issue #262) and direct audio links an inline player ([`audio`], issue #260).
 
+pub mod audio;
 pub mod embed;
 pub mod fetch;
 pub mod inline;
 pub mod meta;
+pub mod music;
 pub mod rendition;
 
 use std::collections::HashMap;
@@ -28,9 +31,11 @@ use serde::de::DeserializeOwned;
 use serde::{Deserialize, Serialize};
 use sha1::{Digest, Sha1};
 
+pub use audio::{AudioFile, AudioFormat, AudioInfo};
 pub use embed::VideoProvider;
 use fetch::{AddressPolicy, FetchError, FetchedImage, Fetcher, Timeouts};
 pub use inline::InlineImage;
+pub use music::{MusicKind, MusicService};
 
 use crate::session::lock;
 
@@ -71,12 +76,19 @@ pub struct LinkPreview {
     pub description: Option<String>,
     /// Preview image as a `data:` URL.
     pub image: Option<String>,
-    /// Set for YouTube, Twitch and Spotify links.
+    /// Set for YouTube and Twitch links.
     pub video: Option<VideoEmbed>,
+    /// Set for music service links and pages that say they are music.
+    #[serde(default)]
+    pub music: Option<MusicEmbed>,
     /// The link itself serves an image: show it inline ([`LinkPreviews::inline_image`])
     /// instead of a card.
     #[serde(default)]
     pub image_link: bool,
+    /// The link itself serves an audio file: show the audio player
+    /// ([`LinkPreviews::audio_info`]) instead of a card.
+    #[serde(default)]
+    pub audio_link: bool,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
@@ -84,8 +96,20 @@ pub struct VideoEmbed {
     pub provider: VideoProvider,
     /// Embedded player, loaded only after a click; Twitch needs `parent` appended.
     pub player_url: String,
-    /// Channel or uploader name; for Spotify the kind of item (`track`, `album`, …).
+    /// Channel or uploader name.
     pub channel: Option<String>,
+}
+
+/// What a music card needs beyond title, description and cover.
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct MusicEmbed {
+    pub service: MusicService,
+    pub kind: MusicKind,
+    /// The service's official embed, loaded only after a click; `None` means a card without
+    /// a player.
+    pub player_url: Option<String>,
+    /// Artist or uploader, when the service names one.
+    pub artist: Option<String>,
 }
 
 /// Fetches and caches link previews.
@@ -217,6 +241,38 @@ impl LinkPreviews {
         image
     }
 
+    /// Format and size of the audio file at `url` for the player card (issue #260), without
+    /// downloading it; `None` when it is not a playable audio file (not http(s), blocked
+    /// address, too large, unsupported format).
+    pub async fn audio_info(&self, url: &str) -> Option<AudioInfo> {
+        let mut url = Url::parse(url.trim()).ok()?;
+        url.set_fragment(None);
+        let result = match self.fetcher() {
+            Ok(fetcher) => audio::probe(fetcher, &url).await,
+            Err(e) => Err(e),
+        };
+        if let Err(e) = &result {
+            // Never the URL: links are chat content.
+            tracing::debug!(error = %e, "no audio info");
+        }
+        result.ok()
+    }
+
+    /// The audio file at `url`, fetched after the user clicked play (issue #260); `None` when
+    /// it cannot be played.
+    pub async fn audio_file(&self, url: &str) -> Option<AudioFile> {
+        let mut url = Url::parse(url.trim()).ok()?;
+        url.set_fragment(None);
+        let result = match self.fetcher() {
+            Ok(fetcher) => audio::fetch(fetcher, &url).await,
+            Err(e) => Err(e),
+        };
+        if let Err(e) = &result {
+            tracing::debug!(error = %e, "no audio file");
+        }
+        result.ok()
+    }
+
     /// Tries smaller renditions of known GIF hosts first (Giphy's downsized GIF of a 10 MB
     /// original is a fraction of its size and far cheaper to animate), then the address itself. The result keeps the address as posted.
     async fn load_inline(&self, fetcher: &Fetcher, url: &Url) -> Result<InlineImage, FetchError> {
@@ -250,90 +306,86 @@ impl LinkPreviews {
             description: None,
             image: None,
             video: None,
+            music: None,
             image_link: false,
+            audio_link: false,
         };
         if rendition::gif_page(url).is_some() {
             // The page is only a wrapper around a GIF: the UI shows the GIF (`inline_image`).
             preview.image_link = true;
             return Ok(preview);
         }
-        let image_url = match &video {
-            Some(link) if link.provider == VideoProvider::Youtube => {
-                preview.site_name = Some("YouTube".into());
-                // The card works without a title; the player is what matters.
-                match youtube_oembed(fetcher, url).await {
-                    Ok(o) => {
-                        preview.title = o.title;
-                        preview.video = Some(embed_of(link, o.author));
-                        o.thumbnail
-                    }
-                    Err(e) => {
-                        tracing::debug!(error = %e, "no YouTube details");
-                        preview.video = Some(embed_of(link, None));
-                        None
-                    }
-                }
-            }
-            Some(link) if link.provider == VideoProvider::Spotify => {
-                preview.site_name = Some("Spotify".into());
-                preview.video = Some(embed_of(link, link.channel.clone()));
-                // oEmbed has title and cover; the page's OpenGraph description names the
-                // artist or owner. Either may fail, the card still works.
-                let oembed = spotify_oembed(fetcher, url).await;
-                if let Err(e) = &oembed {
-                    tracing::debug!(error = %e, "no Spotify oEmbed details");
-                }
-                let oembed = oembed.ok();
-                let page = match page_meta(fetcher, url).await {
-                    Ok(m) => Some(m),
-                    Err(e) => {
-                        tracing::debug!(error = %e, "no Spotify page details");
-                        None
-                    }
-                };
-                preview.description = page.as_ref().and_then(|m| m.description.clone());
-                preview.title = oembed
-                    .as_ref()
-                    .and_then(|o| o.title.clone())
-                    .or_else(|| page.as_ref().and_then(|m| m.title.clone()));
-                oembed
-                    .and_then(|o| o.thumbnail)
-                    .or_else(|| page.and_then(|m| m.image))
-            }
-            Some(link) => {
-                preview.site_name = Some("Twitch".into());
-                preview.video = Some(embed_of(link, link.channel.clone()));
-                match page_meta(fetcher, url).await {
-                    Ok(m) => {
-                        preview.title = m.title;
-                        preview.description = m.description;
-                        m.image
-                    }
-                    Err(e) => {
-                        tracing::debug!(error = %e, "no Twitch details");
-                        None
+        let image_url = if let Some(link) = music::recognise(url) {
+            music_preview(fetcher, &mut preview, link).await
+        } else {
+            match &video {
+                Some(link) if link.provider == VideoProvider::Youtube => {
+                    preview.site_name = Some("YouTube".into());
+                    // The card works without a title; the player is what matters.
+                    match youtube_oembed(fetcher, url).await {
+                        Ok(o) => {
+                            preview.title = o.title;
+                            preview.video = Some(embed_of(link, o.author));
+                            o.thumbnail
+                        }
+                        Err(e) => {
+                            tracing::debug!(error = %e, "no YouTube details");
+                            preview.video = Some(embed_of(link, None));
+                            None
+                        }
                     }
                 }
-            }
-            None => {
-                let page = fetcher
-                    .get(url.as_str(), PAGE_OR_IMAGE_ACCEPT, fetch::PAGE_LIMIT, true)
-                    .await?;
-                if page.media_type.starts_with("image/") {
-                    preview.image_link = true;
-                    return Ok(preview);
+                Some(link) => {
+                    preview.site_name = Some("Twitch".into());
+                    preview.video = Some(embed_of(link, link.channel.clone()));
+                    match page_meta(fetcher, url).await {
+                        Ok(m) => {
+                            preview.title = m.title;
+                            preview.description = m.description;
+                            m.image
+                        }
+                        Err(e) => {
+                            tracing::debug!(error = %e, "no Twitch details");
+                            None
+                        }
+                    }
                 }
-                if !fetch::is_html(&page.media_type) {
-                    return Err(FetchError::UnsupportedType);
+                None => {
+                    let page = fetcher
+                        .get(url.as_str(), PAGE_OR_IMAGE_ACCEPT, fetch::PAGE_LIMIT, true)
+                        .await?;
+                    if page.media_type.starts_with("image/") {
+                        preview.image_link = true;
+                        return Ok(preview);
+                    }
+                    if audio::is_audio_type(&page.media_type)
+                        || AudioFormat::sniff(&page.body).is_some()
+                    {
+                        preview.audio_link = true;
+                        return Ok(preview);
+                    }
+                    if !fetch::is_html(&page.media_type) {
+                        return Err(FetchError::UnsupportedType);
+                    }
+                    let m = meta::parse(&page.body, &page.url);
+                    if m.title.is_none() {
+                        return Err(FetchError::UnsupportedType);
+                    }
+                    preview.music =
+                        m.kind
+                            .as_deref()
+                            .and_then(MusicKind::from_og_type)
+                            .map(|kind| MusicEmbed {
+                                service: MusicService::Other,
+                                kind,
+                                player_url: None,
+                                artist: None,
+                            });
+                    preview.site_name = m.site_name;
+                    preview.title = m.title;
+                    preview.description = m.description;
+                    m.image
                 }
-                let m = meta::parse(&page.body, &page.url);
-                if m.title.is_none() {
-                    return Err(FetchError::UnsupportedType);
-                }
-                preview.site_name = m.site_name;
-                preview.title = m.title;
-                preview.description = m.description;
-                m.image
             }
         };
         if let Some(image_url) = image_url {
@@ -344,6 +396,52 @@ impl LinkPreviews {
         }
         Ok(preview)
     }
+}
+
+/// Fills in a music card: title, artist and cover from the service's oEmbed where it has one,
+/// otherwise (and for Spotify, whose page description names the artist) from the page's
+/// OpenGraph tags. Either may fail; the card still works. Returns the cover's address.
+async fn music_preview(
+    fetcher: &Fetcher,
+    preview: &mut LinkPreview,
+    link: music::MusicLink,
+) -> Option<Url> {
+    let oembed = match music::oembed_endpoint(link.service) {
+        Some(endpoint) => match oembed(fetcher, endpoint, &link.meta_url).await {
+            Ok(o) => Some(o),
+            Err(e) => {
+                tracing::debug!(error = %e, "no music oEmbed details");
+                None
+            }
+        },
+        None => None,
+    };
+    let page = if oembed.is_none() || link.service == MusicService::Spotify {
+        match page_meta(fetcher, &link.meta_url).await {
+            Ok(m) => Some(m),
+            Err(e) => {
+                tracing::debug!(error = %e, "no music page details");
+                None
+            }
+        }
+    } else {
+        None
+    };
+    let (title, artist, thumbnail) = match oembed {
+        Some(o) => (o.title, o.author, o.thumbnail),
+        None => (None, None, None),
+    };
+    let page = page.unwrap_or_default();
+    preview.site_name = page.site_name;
+    preview.title = title.or(page.title);
+    preview.description = page.description;
+    preview.music = Some(MusicEmbed {
+        service: link.service,
+        kind: link.kind,
+        player_url: link.player_url,
+        artist,
+    });
+    thumbnail.or(page.image)
 }
 
 fn embed_of(link: &embed::VideoLink, channel: Option<String>) -> VideoEmbed {
@@ -368,11 +466,6 @@ struct OEmbed {
 /// Title, uploader and thumbnail from YouTube's public oEmbed endpoint.
 async fn youtube_oembed(fetcher: &Fetcher, url: &Url) -> Result<OEmbed, FetchError> {
     oembed(fetcher, "https://www.youtube.com/oembed", url).await
-}
-
-/// Title and cover from Spotify's public oEmbed endpoint (no key needed).
-async fn spotify_oembed(fetcher: &Fetcher, url: &Url) -> Result<OEmbed, FetchError> {
-    oembed(fetcher, "https://open.spotify.com/oembed", url).await
 }
 
 async fn oembed(fetcher: &Fetcher, endpoint: &str, url: &Url) -> Result<OEmbed, FetchError> {

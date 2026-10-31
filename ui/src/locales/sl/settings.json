@@ -740,5 +740,22 @@
     "revoke": "Prekliči",
     "revokeLabel": "Prekliči sprejeti pogovor z uporabnikom {{name}}",
     "revokeFailed": "Preklic ni uspel. Poskusi znova."
+  },
+  "blocked": {
+    "title": "Blokirani uporabniki",
+    "hint": "Blokade se hranijo samo v tem računalniku. Blokirani uporabniki so zate utišani, njihova sporočila in podatki Mumcord pa se prezrejo.",
+    "empty": "Nisi blokiral nikogar.",
+    "user": "Uporabnik",
+    "server": "Strežnik",
+    "since": "Blokiran od",
+    "actions": "Dejanja",
+    "unblock": "Odblokiraj",
+    "unblockLabel": "Odblokiraj uporabnika {{name}}",
+    "unblockFailed": "Odblokiranje ni uspelo. Poskusi znova.",
+    "messagesTitle": "Blokirana sporočila v klepetu kanala",
+    "collapse": "Strni jih",
+    "collapseHint": "Prikaže „Sporočilo blokiranega uporabnika“ z gumbom Prikaži.",
+    "hide": "Povsem jih skrij",
+    "hideHint": "V klepetu se ne prikaže nič."
   }
 }

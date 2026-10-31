@@ -21,6 +21,7 @@
       "specs/chat/link-previews.e2e.ts",
       "specs/chat/mentions.e2e.ts",
       "specs/chat/message-cards.e2e.ts",
+      "specs/chat/notification-centre.e2e.ts",
       "specs/overlay/overlay-ingame.e2e.ts",
       "specs/p2p/relay-live.e2e.ts",
       "specs/servers/multi-server.e2e.ts",
@@ -31,6 +32,7 @@
     ],
     [
       "specs/app/member-column.e2e.ts",
+      "specs/chat/audio-music-embeds.e2e.ts",
       "specs/chat/follow-limit.e2e.ts",
       "specs/chat/follow-pm.e2e.ts",
       "specs/chat/history.e2e.ts",
@@ -38,7 +40,8 @@
       "specs/p2p/p2p-mode.e2e.ts",
       "specs/positional/positional.e2e.ts",
       "specs/voice/rejoin-prompt.e2e.ts",
-      "specs/wizard/ac-1.2-import-identity.e2e.ts"
+      "specs/wizard/ac-1.2-import-identity.e2e.ts",
+      "specs/chat/block.e2e.ts"
     ],
     [
       "specs/app/keyboard-a11y.e2e.ts",

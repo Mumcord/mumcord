@@ -11,5 +11,56 @@
   "open": "Öppna chatten",
   "close": "Avfärda avisering",
   "mentionLine": "{{sender}} omnämnde dig: {{preview}}",
-  "withServer": "{{server}} · {{what}}"
+  "withServer": "{{server}} · {{what}}",
+  "centre": {
+    "title": "Aviseringar",
+    "bellUnread_one": "Aviseringar, {{count}} oläst",
+    "bellUnread_other": "Aviseringar, {{count}} olästa",
+    "shortcut": "Ctrl+Skift+N",
+    "markAllRead": "Markera alla som lästa",
+    "filterLabel": "Visa aviseringar",
+    "filter": {
+      "all": "Alla",
+      "mentions": "Omnämnanden",
+      "requests": "Förfrågningar",
+      "invites": "Inbjudningar"
+    },
+    "empty": "Du är ikapp.",
+    "unread": "Olästa",
+    "dndOn": "Stör ej är på",
+    "dndOff": "Stör ej är av",
+    "settings": "Aviseringsinställningar",
+    "someone": "Någon",
+    "quoted": "”{{text}}”",
+    "mention": "{{name}} omnämnde dig",
+    "mentionGroup": "{{name}} omnämnde alla",
+    "reply": "{{name}} svarade på ditt meddelande",
+    "chatRequest": "{{name}} vill chatta med dig",
+    "messageRequest": "Meddelandeförfrågan från {{name}}",
+    "messageRequestBody_one": "{{count}} meddelande från en vanlig Mumble-klient",
+    "messageRequestBody_other": "{{count}} meddelanden från en vanlig Mumble-klient",
+    "invite": {
+      "watchParty": "{{name}} bjöd in dig till en watch party",
+      "screenShare": "{{name}} delar sin skärm",
+      "card": "{{name}} skickade ett kort till dig",
+      "theme": "{{name}} delade ett tema med dig"
+    },
+    "connection": "{{server}} går inte att nå",
+    "type": {
+      "chatRequest": "Chattförfrågan",
+      "messageRequest": "Meddelandeförfrågan",
+      "invite": "Inbjudan",
+      "private": "Privat meddelande",
+      "connection": "Anslutning"
+    },
+    "accept": "Acceptera",
+    "decline": "Avböj",
+    "join": "Gå med",
+    "watch": "Titta",
+    "open": "Öppna",
+    "dismiss": "Avfärda",
+    "dismissItem": "Avfärda: {{title}}",
+    "failed": "Det fungerade inte. Försök igen.",
+    "block": "Blockera"
+  }
 }

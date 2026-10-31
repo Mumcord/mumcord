@@ -111,8 +111,6 @@
     "play": "Reproduciraj {{title}}",
     "player": "Videoplayer: {{title}}",
     "videoTitle": "Video s {{site}}",
-    "spotifyTitle": "Poveznica na {{site}}",
-    "audioPlayer": "Spotify player: {{title}}",
     "kind": {
       "track": "Pjesma",
       "album": "Album",
@@ -320,7 +318,6 @@
     "requestMetaMessages": "{{server}} · poslao/la ti je poruke · {{time}}",
     "quote": "„{{text}}“",
     "block": "Blokiraj",
-    "blockLater": "Blokiranje još nije dostupno.",
     "showMore_one": "Prikaži još {{count}} zahtjev",
     "showMore_few": "Prikaži još {{count}} zahtjeva",
     "showMore_other": "Prikaži još {{count}} zahtjeva",
@@ -361,5 +358,56 @@
       "deleteHistory": "Izbriši povijest",
       "deleteHint": "Samo ovaj uređaj · {{name}} zadržava svoju kopiju"
     }
+  },
+  "audio": {
+    "card": "Audiodatoteka: {{name}}",
+    "file": "Audiodatoteka",
+    "playing": "Reproducira se",
+    "loading": "Učitavanje…",
+    "play": "Reproduciraj {{name}}",
+    "pause": "Pauziraj {{name}}",
+    "playShort": "Reproduciraj",
+    "pauseShort": "Pauza",
+    "seek": "Pozicija",
+    "position": "{{time}} od {{length}}",
+    "volume": "Glasnoća",
+    "mute": "Isključi zvuk",
+    "open": "Otvori {{name}} u pregledniku",
+    "save": "Spremi {{name}}",
+    "saveShort": "Spremi datoteku",
+    "saveTitle": "Spremi audiodatoteku",
+    "fileType": "Audiodatoteka",
+    "saveFailed": "Datoteku nije bilo moguće spremiti.",
+    "errorTitle": "Ova se datoteka ne može reproducirati",
+    "errorText": "Datoteka nedostaje, prevelika je ili je u formatu koji Mumcord ne može reproducirati.",
+    "retry": "Pokušaj ponovno"
+  },
+  "music": {
+    "card": "{{service}}: {{title}}",
+    "title": "{{service}} poveznica",
+    "other": "Glazbena poveznica",
+    "thirdParty": "Sadržaj treće strane s poslužitelja {{host}}",
+    "thirdPartyShort": "Sadržaj treće strane",
+    "embedded": "Ugrađeni player · {{service}} · {{host}}",
+    "player": "{{service}} player: {{title}}",
+    "play": "Reproduciraj",
+    "playLabel": "Reproduciraj {{title}} na usluzi {{service}}",
+    "stop": "Zaustavi",
+    "stopLabel": "Zaustavi {{title}}",
+    "openIn": "Otvori u usluzi {{service}}",
+    "limits": "Ograničenja reprodukcije određuje usluga",
+    "noPlayer": "Za ovu uslugu nije dostupan player",
+    "output": "Reproducira se na izlaznom uređaju, a ne u mikrofon"
+  },
+  "embedHint": {
+    "image": "Slika je skrivena, jer su pregledi i ugradnje poveznica isključeni u <settings>Postavke > Privatnost</settings>.",
+    "gif": "GIF je skriven, jer su pregledi i ugradnje poveznica isključeni u <settings>Postavke > Privatnost</settings>.",
+    "video": "Videoplayer je skriven, jer su pregledi i ugradnje poveznica isključeni u <settings>Postavke > Privatnost</settings>.",
+    "audio": "Audioplayer je skriven, jer su pregledi i ugradnje poveznica isključeni u <settings>Postavke > Privatnost</settings>.",
+    "music": "Glazbeni player je skriven, jer su pregledi i ugradnje poveznica isključeni u <settings>Postavke > Privatnost</settings>.",
+    "link": "Pregled poveznice je skriven, jer su pregledi i ugradnje poveznica isključeni u <settings>Postavke > Privatnost</settings>.",
+    "several_one": "{{count}} pregled je skriven, jer su pregledi i ugradnje poveznica isključeni u <settings>Postavke > Privatnost</settings>.",
+    "several_few": "{{count}} pregleda su skrivena, jer su pregledi i ugradnje poveznica isključeni u <settings>Postavke > Privatnost</settings>.",
+    "several_other": "{{count}} pregleda je skriveno, jer su pregledi i ugradnje poveznica isključeni u <settings>Postavke > Privatnost</settings>."
   }
 }

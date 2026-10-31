@@ -734,5 +734,22 @@
     "revoke": "Tühista",
     "revokeLabel": "Tühista vastuvõetud vestlus kasutajaga {{name}}",
     "revokeFailed": "Tühistamine ebaõnnestus. Proovi palun uuesti."
+  },
+  "blocked": {
+    "title": "Blokeeritud kasutajad",
+    "hint": "Blokeeringuid hoitakse ainult sellel arvutil. Blokeeritud kasutajad on sinu jaoks vaigistatud ning nende sõnumeid ja Mumcordi andmeid ignoreeritakse.",
+    "empty": "Sa pole kedagi blokeerinud.",
+    "user": "Kasutaja",
+    "server": "Server",
+    "since": "Blokeeritud alates",
+    "actions": "Toimingud",
+    "unblock": "Eemalda blokeering",
+    "unblockLabel": "Eemalda kasutaja {{name}} blokeering",
+    "unblockFailed": "Blokeeringu eemaldamine ebaõnnestus. Proovi uuesti.",
+    "messagesTitle": "Blokeeritud sõnumid kanalivestluses",
+    "collapse": "Voldi need kokku",
+    "collapseHint": "Näitab teadet „Sõnum blokeeritud kasutajalt“ ja nuppu „Näita“.",
+    "hide": "Peida need täielikult",
+    "hideHint": "Vestluses ei näidata midagi."
   }
 }

@@ -107,8 +107,6 @@
     "play": "Afspil {{title}}",
     "player": "Videoafspiller: {{title}}",
     "videoTitle": "{{site}}-video",
-    "spotifyTitle": "{{site}}-link",
-    "audioPlayer": "Spotify-afspiller: {{title}}",
     "kind": {
       "track": "Nummer",
       "album": "Album",
@@ -313,7 +311,6 @@
     "requestMetaMessages": "{{server}} · har sendt dig beskeder · {{time}}",
     "quote": "»{{text}}«",
     "block": "Bloker",
-    "blockLater": "Blokering er ikke tilgængelig endnu.",
     "showMore_one": "Vis {{count}} anmodning mere",
     "showMore_other": "Vis {{count}} anmodninger mere",
     "showFewer": "Vis færre anmodninger",
@@ -353,5 +350,55 @@
       "deleteHistory": "Slet historik",
       "deleteHint": "Kun denne enhed · {{name}} beholder sin kopi"
     }
+  },
+  "audio": {
+    "card": "Lydfil: {{name}}",
+    "file": "Lydfil",
+    "playing": "Afspiller",
+    "loading": "Indlæser…",
+    "play": "Afspil {{name}}",
+    "pause": "Sæt {{name}} på pause",
+    "playShort": "Afspil",
+    "pauseShort": "Pause",
+    "seek": "Position",
+    "position": "{{time}} af {{length}}",
+    "volume": "Lydstyrke",
+    "mute": "Slå lyden fra",
+    "open": "Åbn {{name}} i browseren",
+    "save": "Gem {{name}}",
+    "saveShort": "Gem fil",
+    "saveTitle": "Gem lydfil",
+    "fileType": "Lydfil",
+    "saveFailed": "Filen kunne ikke gemmes.",
+    "errorTitle": "Filen kan ikke afspilles",
+    "errorText": "Filen mangler, er for stor eller har et format, Mumcord ikke kan afspille.",
+    "retry": "Prøv igen"
+  },
+  "music": {
+    "card": "{{service}}: {{title}}",
+    "title": "{{service}}-link",
+    "other": "Musiklink",
+    "thirdParty": "Tredjepartsindhold fra {{host}}",
+    "thirdPartyShort": "Tredjepartsindhold",
+    "embedded": "Indlejret afspiller · {{service}} · {{host}}",
+    "player": "{{service}}-afspiller: {{title}}",
+    "play": "Afspil",
+    "playLabel": "Afspil {{title}} på {{service}}",
+    "stop": "Stop",
+    "stopLabel": "Stop {{title}}",
+    "openIn": "Åbn i {{service}}",
+    "limits": "Afspilningsgrænser fastsættes af tjenesten",
+    "noPlayer": "Ingen afspiller tilgængelig for denne tjeneste",
+    "output": "Afspilles på din udgangsenhed, ikke ind i din mikrofon"
+  },
+  "embedHint": {
+    "image": "Billede skjult, fordi linkvisninger og indlejringer er slået fra i <settings>Indstillinger > Privatliv</settings>.",
+    "gif": "GIF skjult, fordi linkvisninger og indlejringer er slået fra i <settings>Indstillinger > Privatliv</settings>.",
+    "video": "Videoafspiller skjult, fordi linkvisninger og indlejringer er slået fra i <settings>Indstillinger > Privatliv</settings>.",
+    "audio": "Lydafspiller skjult, fordi linkvisninger og indlejringer er slået fra i <settings>Indstillinger > Privatliv</settings>.",
+    "music": "Musikafspiller skjult, fordi linkvisninger og indlejringer er slået fra i <settings>Indstillinger > Privatliv</settings>.",
+    "link": "Linkvisning skjult, fordi linkvisninger og indlejringer er slået fra i <settings>Indstillinger > Privatliv</settings>.",
+    "several_one": "{{count}} visning skjult, fordi linkvisninger og indlejringer er slået fra i <settings>Indstillinger > Privatliv</settings>.",
+    "several_other": "{{count}} visninger skjult, fordi linkvisninger og indlejringer er slået fra i <settings>Indstillinger > Privatliv</settings>."
   }
 }

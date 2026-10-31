@@ -129,6 +129,9 @@ pub struct Fetched {
     pub url: Url,
     /// Lower-case media type without parameters, e.g. `text/html`.
     pub media_type: String,
+    /// Size of the whole body as the server declared it (`Content-Length`), also when only
+    /// a part was read.
+    pub size: Option<u64>,
     pub body: Vec<u8>,
 }
 
@@ -232,11 +235,38 @@ impl Fetcher {
         limit: usize,
         truncate: bool,
     ) -> Result<Fetched, FetchError> {
+        self.fetch(url, agent, accept, limit, truncate, None).await
+    }
+
+    /// Like [`Fetcher::get`] without truncation and with its own total `timeout`, for files
+    /// far larger than a page (audio links, issue #260).
+    pub async fn get_large(
+        &self,
+        url: &str,
+        accept: &'static str,
+        limit: usize,
+        timeout: Duration,
+    ) -> Result<Fetched, FetchError> {
+        self.fetch(url, AGENT, accept, limit, false, Some(timeout))
+            .await
+    }
+
+    async fn fetch(
+        &self,
+        url: &str,
+        agent: &str,
+        accept: &'static str,
+        limit: usize,
+        truncate: bool,
+        timeout: Option<Duration>,
+    ) -> Result<Fetched, FetchError> {
         let url = Url::parse(url).map_err(|_| FetchError::InvalidUrl)?;
         check_url(&url, &self.policy)?;
-        let mut response = self
-            .client
-            .get(url)
+        let mut request = self.client.get(url);
+        if let Some(timeout) = timeout {
+            request = request.timeout(timeout);
+        }
+        let mut response = request
             .header(
                 USER_AGENT,
                 HeaderValue::from_str(agent).map_err(|_| FetchError::InvalidUrl)?,
@@ -291,6 +321,7 @@ impl Fetcher {
         Ok(Fetched {
             url: final_url,
             media_type,
+            size: declared,
             body,
         })
     }

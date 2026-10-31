@@ -297,6 +297,12 @@ export const SETTINGS_INDEX: readonly SettingEntry[] = [
     group: "gamePlugins.title",
     terms: ["gamePlugins.explanation", "gamePlugins.antiCheat"],
   },
+  { section: "privacy", group: "blocked.title", terms: ["blocked.hint"] },
+  {
+    section: "privacy",
+    group: "blocked.messagesTitle",
+    terms: ["blocked.collapse", "blocked.hide"],
+  },
   {
     section: "privacy",
     group: "privateMessages.title",

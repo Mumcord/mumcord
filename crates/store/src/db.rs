@@ -237,7 +237,7 @@ const MIGRATIONS: &[&str] = &[
     );
     ",
     // v19: blocked users (issue #140), kept per own identity (FR-3.79). Lands after #218,
-    // whose `channel_audio_profile` (v18, above) is carried here unchanged so the version
+    // whose `channel_audio_profile` (v18, above) keeps its version number so the version
     // numbers match. A certificate block (`cert_hash` set) covers every server of
     // that identity (Q1.4); a name block (`cert_hash` NULL) is for people without a
     // certificate and only applies on `server_id`. `server_label` keeps where the block was
@@ -259,7 +259,7 @@ const MIGRATIONS: &[&str] = &[
         WHERE cert_hash IS NULL;
     ",
     // v20: mumpeer relay (spec 04). Lands after #218 (v18 `channel_audio_profile`) and #224
-    // (v19 `blocked_user`), both carried above unchanged so the version numbers match testers'
+    // (v19 `blocked_user`), both on main above, so the version numbers match testers.
     // databases. `saved_server.p2p_mode_override` holds a `P2pMode` in snake_case, NULL
     // uses the global setting (FR-4.2). `relay_pin` is the trust-on-first-use pin of a server's
     // relay per server entry and own identity (FR-4.9, §7.1): the bot's certificate hash
@@ -332,6 +332,15 @@ pub(crate) mod tests {
         let dir = tempfile::tempdir().expect("tempdir");
         let store = Store::open(dir.path()).expect("open store");
         (dir, store)
+    }
+
+    /// Testers' local databases already have #218's `channel_audio_profile` as v18, so
+    /// `blocked_user` must stay v19.
+    #[test]
+    fn blocked_user_is_v19_after_channel_audio_profile() {
+        assert!(MIGRATIONS[16].contains("CREATE TABLE pm_conversation"));
+        assert!(MIGRATIONS[17].contains("CREATE TABLE channel_audio_profile"));
+        assert!(MIGRATIONS[18].contains("CREATE TABLE blocked_user"));
     }
 
     #[test]

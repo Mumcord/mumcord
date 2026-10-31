@@ -124,5 +124,28 @@
     "message": "{{name}} se jkollu jibgħat talba ġdida għal messaġġ qabel ma l-messaġġi jerġgħu jaslulek. L-istorja taċ-chat tibqa’.",
     "confirm": "Irtira",
     "failed": "L-irtirar tal-kunsens għaċ-chat ma rnexxiex. Erġa’ pprova."
+  },
+  "block": {
+    "menu": "Imblokka…",
+    "unblock": "Neħħi l-blokk",
+    "title": "Timblokka lil {{name}}?",
+    "onServer": "fuq {{server}}",
+    "whatHappens": "X'jiġri",
+    "private": "Il-messaġġi privati minn {{name}} ma jintwerewx u ma jinnotifikawk.",
+    "channelCollapsed": "Il-messaġġi tal-kanal ta' {{name}} huma mitwija. Xorta tista' tiftaħhom.",
+    "channelHidden": "Il-messaġġi tal-kanal ta' {{name}} huma moħbija.",
+    "voice": "{{name}} huwa mutjat għalik fil-vuċi, inklużi l-ħsejjes baxxi.",
+    "data": "L-ebda sinkronizzazzjoni tal-istorja, stediniet jew data oħra ta' Mumcord minn {{name}}.",
+    "followsCert": "Il-blokk isegwi ċ-ċertifikat ta' {{name}}, għalhekk isem ġdid ma jevitahx.",
+    "nameOnly": "{{name}} m'għandux ċertifikat, għalhekk il-blokk japplika biss għal dan l-isem fuq {{server}}.",
+    "warning": "{{name}} xorta jista' jarak u jaqra l-messaġġi tiegħek. Mumble m'għandux mod kif iwaqqaf dan fuq in-naħa tiegħek biss. {{name}} ma jiġix infurmat bil-blokk.",
+    "cancel": "Ikkanċella",
+    "confirm": "Imblokka lil {{name}}",
+    "done": "{{name}} huwa mblokkat.",
+    "failed": "Il-blokk ta' {{name}} falla. Erġa' pprova.",
+    "badge": "Imblokkat",
+    "collapsed": "Messaġġ minn utent imblokkat",
+    "show": "Uri",
+    "showLabel": "Uri messaġġ minn utent imblokkat"
   }
 }

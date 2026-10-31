@@ -19,6 +19,7 @@ import type {
 import { parseMumbleLink } from "../features/chat/mumbleLink";
 import type {
   AcceptedConversation,
+  BlockedUser,
   ActiveAudioProfile,
   PmConversationPrefs,
   PrivateConversation,
@@ -35,8 +36,10 @@ import type {
   Friend,
   HistoryScope,
   Identity,
+  AudioInfo,
   InlineImage,
   LinkPreview,
+  MusicEmbed,
   MessageRequest,
   MumbleLink,
   GameKey,
@@ -300,6 +303,7 @@ const DEFAULT_SETTINGS: Settings = {
     allowAccepted: true,
     keepRequests: true,
   },
+  blockedMessages: "collapse",
 };
 
 /** Offline stand-in for the engine's link previews: a YouTube player card or a page card. */
@@ -314,6 +318,20 @@ function mockLinkPreview(url: string, demo: boolean): LinkPreview | null {
   const youtube = /^(?:www\.)?youtu(?:\.be|be\.com)$/.test(parsed.hostname)
     ? (parsed.searchParams.get("v") ?? parsed.pathname.split("/").pop() ?? "")
     : "";
+  const music = mockMusic(parsed);
+  if (music !== null) {
+    return {
+      url,
+      siteName: null,
+      title: MOCK_MUSIC_TITLES[music.kind] ?? "Midnight Signals",
+      description: music.artist === null ? "Lumen Park · Single · 2025" : null,
+      image: demoCover(music.service === "appleMusic" ? 20 : 330),
+      video: null,
+      music,
+      isImage: false,
+      isAudio: false,
+    };
+  }
   if (/^[\w-]{11}$/.test(youtube)) {
     return {
       url,
@@ -326,7 +344,9 @@ function mockLinkPreview(url: string, demo: boolean): LinkPreview | null {
         playerUrl: `https://www.youtube-nocookie.com/embed/${youtube}?autoplay=1`,
         channel: "Demo channel",
       },
+      music: null,
       isImage: false,
+      isAudio: false,
     };
   }
   if (demo) {
@@ -337,7 +357,9 @@ function mockLinkPreview(url: string, demo: boolean): LinkPreview | null {
       description: "Fictional notes from last week's session.",
       image: demoPicture(),
       video: null,
+      music: null,
       isImage: false,
+      isAudio: false,
     };
   }
   return {
@@ -347,8 +369,120 @@ function mockLinkPreview(url: string, demo: boolean): LinkPreview | null {
     description: "Link previews come from the engine; this is mock data.",
     image: null,
     video: null,
+    music: null,
     isImage: false,
+    isAudio: false,
   };
+}
+
+const MOCK_MUSIC_TITLES: Partial<Record<MusicEmbed["kind"], string>> = {
+  album: "Glass Harbour",
+  playlist: "Night Drive Mix",
+};
+
+/** Offline stand-in for the engine's music link recognition (issue #262), by host only. */
+function mockMusic(url: URL): MusicEmbed | null {
+  const kind = /\/(album|playlist)\//.test(url.pathname)
+    ? url.pathname.includes("/album/")
+      ? "album"
+      : "playlist"
+    : "track";
+  const id = url.pathname.split("/").pop() ?? "";
+  switch (url.hostname) {
+    case "open.spotify.com":
+      return {
+        service: "spotify",
+        kind,
+        playerUrl: `https://open.spotify.com/embed/${kind}/${id}`,
+        artist: null,
+      };
+    case "soundcloud.com":
+      return {
+        service: "soundcloud",
+        kind,
+        playerUrl: `https://w.soundcloud.com/player/?url=${encodeURIComponent(url.href)}`,
+        artist: "Lumen Park",
+      };
+    case "music.apple.com":
+      return { service: "appleMusic", kind, playerUrl: null, artist: "Nora Vale" };
+    case "tidal.com":
+      return { service: "tidal", kind, playerUrl: null, artist: "Lumen Park" };
+    case "tunes.example":
+      return { service: "other", kind, playerUrl: null, artist: null };
+    default:
+      return null;
+  }
+}
+
+/** A gradient cover with a ring, drawn in the browser; `null` without a canvas (tests). */
+function demoCover(hue: number): string | null {
+  const canvas = document.createElement("canvas");
+  canvas.width = 96;
+  canvas.height = 96;
+  const context = canvas.getContext("2d");
+  if (context === null) return null;
+  const gradient = context.createLinearGradient(0, 0, 96, 96);
+  gradient.addColorStop(0, `hsl(${String(hue)} 90% 70%)`);
+  gradient.addColorStop(1, `hsl(${String(hue + 60)} 80% 55%)`);
+  context.fillStyle = gradient;
+  context.fillRect(0, 0, 96, 96);
+  context.strokeStyle = "rgb(255 255 255 / 75%)";
+  context.lineWidth = 4;
+  context.beginPath();
+  context.arc(48, 48, 22, 0, 2 * Math.PI);
+  context.stroke();
+  return canvas.toDataURL("image/png");
+}
+
+/** Offline stand-in for the engine's audio probe (issue #260); links with "broken" fail. */
+function mockAudioInfo(url: string): AudioInfo | null {
+  const ext = /\.([a-z0-9]+)$/i.exec(new URL(url).pathname)?.[1]?.toLowerCase();
+  if (ext === undefined || url.includes("broken")) return null;
+  const formats: Record<string, AudioInfo["format"]> = {
+    mp3: "mp3",
+    ogg: "ogg",
+    opus: "ogg",
+    m4a: "mp4",
+    aac: "aac",
+    wav: "wav",
+    flac: "flac",
+    webm: "webm",
+  };
+  const format = formats[ext];
+  return format === undefined ? null : { url, format, size: 4_200_000 };
+}
+
+/** A few seconds of a soft chord as a WAV `data:` URL, standing in for any audio file. */
+function mockAudioFile(): string {
+  const rate = 8000;
+  const samples = rate * 6;
+  const bytes = new Uint8Array(44 + samples * 2);
+  const view = new DataView(bytes.buffer);
+  const text = (offset: number, value: string) => {
+    for (let i = 0; i < value.length; i++) bytes[offset + i] = value.charCodeAt(i);
+  };
+  text(0, "RIFF");
+  view.setUint32(4, 36 + samples * 2, true);
+  text(8, "WAVEfmt ");
+  view.setUint32(16, 16, true);
+  view.setUint16(20, 1, true);
+  view.setUint16(22, 1, true);
+  view.setUint32(24, rate, true);
+  view.setUint32(28, rate * 2, true);
+  view.setUint16(32, 2, true);
+  view.setUint16(34, 16, true);
+  text(36, "data");
+  view.setUint32(40, samples * 2, true);
+  for (let i = 0; i < samples; i++) {
+    const t = i / rate;
+    const envelope = 0.5 + 0.5 * Math.sin(2 * Math.PI * 0.7 * t);
+    const value =
+      envelope * (Math.sin(2 * Math.PI * 220 * t) + 0.5 * Math.sin(2 * Math.PI * 330 * t));
+    view.setInt16(44 + i * 2, Math.round(value * 6000), true);
+  }
+  let binary = "";
+  for (const byte of bytes) binary += String.fromCharCode(byte);
+  return `data:audio/wav;base64,${btoa(binary)}`;
 }
 
 /** Offline stand-in for the engine's inline images: the same small picture for every http(s) URL. */
@@ -723,6 +857,9 @@ export function createMockApi(options: MockOptions = {}): MockApi {
   const pmRequestsByServer = new Map<number, PmRequests>();
   let nextPmRequestId = 1;
   let acceptedConversations: AcceptedConversation[] = [];
+  /** Blocked users of every own identity (issue #140). */
+  let blockedUsers: BlockedUser[] = [];
+  let nextBlockId = 1;
   let pmPrefs: PmConversationPrefs[] = [];
 
   function setPmPrefs(
@@ -1061,6 +1198,50 @@ export function createMockApi(options: MockOptions = {}): MockApi {
       { ownCertHash: own, certHash, name, acceptedAt: new Date().toISOString() },
     ];
     emit("acceptedConversationsChanged", { conversations: acceptedConversations });
+  }
+
+  /** Whether a block of the mock's identity covers `user` on `serverId`, like the engine. */
+  function isBlocked(serverId: number, user: Pick<User, "name" | "certHash">): boolean {
+    const own = ownCertHash();
+    return blockedUsers.some(
+      (b) =>
+        b.ownCertHash === own &&
+        (b.certHash === null
+          ? b.serverId === serverId && b.name.toLowerCase() === user.name.toLowerCase()
+          : b.certHash === user.certHash),
+    );
+  }
+
+  function addBlock(serverId: number, name: string, certHash: string | null): void {
+    const own = ownCertHash();
+    const same = (b: BlockedUser) =>
+      b.ownCertHash === own &&
+      (certHash === null
+        ? b.certHash === null &&
+          b.serverId === serverId &&
+          b.name.toLowerCase() === name.toLowerCase()
+        : b.certHash === certHash);
+    if (!blockedUsers.some(same)) {
+      const serverLabel = servers.find((s) => s.id === serverId)?.label ?? "";
+      blockedUsers = [
+        ...blockedUsers,
+        {
+          id: nextBlockId++,
+          ownCertHash: own,
+          certHash,
+          name,
+          serverId,
+          serverLabel,
+          blockedAt: new Date().toISOString(),
+        },
+      ].sort((a, b) => a.name.localeCompare(b.name));
+    }
+    for (const [id, requests] of pmRequestsByServer) {
+      const incoming = requests.incoming.filter((r) => !isBlocked(id, r));
+      if (incoming.length !== requests.incoming.length)
+        setPmRequests(id, { ...requests, incoming });
+    }
+    emit("blockedUsersChanged", { users: blockedUsers });
   }
 
   function setSnapshot(snapshot: ServerSnapshot): void {
@@ -2048,6 +2229,23 @@ export function createMockApi(options: MockOptions = {}): MockApi {
       setPmPrefs(serverId, certHash, { mutedUntil: null, mutedForever: false });
       return Promise.resolve(null);
     },
+    blockedUsers: () => Promise.resolve(blockedUsers),
+    blockUser: (serverId, session) => {
+      requireSession(serverId);
+      const user = requireUser(session);
+      addBlock(serverId, user.name, user.certHash);
+      return Promise.resolve(null);
+    },
+    blockCert: (serverId, certHash, name) => {
+      if (certHash === "") return fail("invalidInput", "a certificate hash is needed");
+      addBlock(serverId, name, certHash);
+      return Promise.resolve(null);
+    },
+    unblock: (id) => {
+      blockedUsers = blockedUsers.filter((b) => b.id !== id);
+      emit("blockedUsersChanged", { users: blockedUsers });
+      return Promise.resolve(null);
+    },
     acceptedConversations: () => Promise.resolve(acceptedConversations),
     acceptedConversationRevoke: (ownCertHash, certHash) => {
       acceptedConversations = acceptedConversations.filter(
@@ -2234,6 +2432,12 @@ export function createMockApi(options: MockOptions = {}): MockApi {
       Promise.resolve(settings.linkPreviews ? mockLinkPreview(url, demo) : null),
     inlineImage: (url) =>
       Promise.resolve(settings.linkPreviews ? mockInlineImage(url, demo) : null),
+    audioInfo: (url) => Promise.resolve(settings.linkPreviews ? mockAudioInfo(url) : null),
+    audioFile: (url) =>
+      Promise.resolve(
+        settings.linkPreviews && mockAudioInfo(url) !== null ? mockAudioFile() : null,
+      ),
+    audioSave: () => Promise.resolve(null),
     previewDismiss: (messageId, url) => {
       for (const conversations of history.values()) {
         for (const messages of conversations.values()) {
@@ -2874,6 +3078,9 @@ export function createMockApi(options: MockOptions = {}): MockApi {
     receiveMessage: (conversation, body, senderSession) => {
       focused();
       const sender = requireUser(senderSession);
+      // Like the engine (issue #140): private messages of blocked people are dropped, their
+      // channel messages arrive without unread count.
+      const blocked = isBlocked(currentServerId, sender);
       const message: ChatMessage = {
         id: String(nextMessageId++),
         conversation,
@@ -2886,8 +3093,10 @@ export function createMockApi(options: MockOptions = {}): MockApi {
         dismissedPreviews: [],
         syncedFrom: null,
       };
+      if (blocked && conversation.kind !== "channel") return message;
       store(message);
       emitServer("messageReceived", { message });
+      if (blocked) return message;
       const snap = requireSnapshot();
       const followed =
         conversation.kind === "channel" && snap.followedChannelIds.includes(conversation.channelId);

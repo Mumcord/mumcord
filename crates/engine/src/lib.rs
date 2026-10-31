@@ -2,6 +2,7 @@
 //! (`src-tauri`) talks only to [`Engine`] and converts its types into command/event types.
 
 pub mod audio_rating;
+mod blocking;
 pub mod cache;
 pub mod chat;
 pub mod diag;
@@ -65,4 +66,7 @@ pub use session::{
 pub use session::{MumbleImportChoice, MumbleImportPreview, MumbleImportResult};
 pub use stats::UserStatsView;
 pub use watch_party::{PLAYLIST_MAX, PlaylistEntry, WatchAction, WatchCommand, WatchPartyView};
-pub use web::{InlineImage, LinkPreview, VideoEmbed, VideoProvider};
+pub use web::{
+    AudioFile, AudioFormat, AudioInfo, InlineImage, LinkPreview, MusicEmbed, MusicKind,
+    MusicService, VideoEmbed, VideoProvider,
+};

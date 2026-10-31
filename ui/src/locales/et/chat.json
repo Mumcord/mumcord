@@ -107,8 +107,6 @@
     "play": "Esita {{title}}",
     "player": "Videopleier: {{title}}",
     "videoTitle": "{{site}} video",
-    "spotifyTitle": "{{site}} link",
-    "audioPlayer": "Spotify pleier: {{title}}",
     "kind": {
       "track": "Lugu",
       "album": "Album",
@@ -313,7 +311,6 @@
     "requestMetaMessages": "{{server}} · saatis sulle sõnumeid · {{time}}",
     "quote": "„{{text}}“",
     "block": "Blokeeri",
-    "blockLater": "Blokeerimine ei ole veel saadaval.",
     "showMore_one": "Kuva veel {{count}} taotlus",
     "showMore_other": "Kuva veel {{count}} taotlust",
     "showFewer": "Kuva vähem taotlusi",
@@ -353,5 +350,55 @@
       "deleteHistory": "Kustuta vestluslugu",
       "deleteHint": "Ainult see seade · {{name}} säilitab oma koopia"
     }
+  },
+  "audio": {
+    "card": "Helifail: {{name}}",
+    "file": "Helifail",
+    "playing": "Esitatakse",
+    "loading": "Laadimine…",
+    "play": "Esita {{name}}",
+    "pause": "Peata {{name}}",
+    "playShort": "Esita",
+    "pauseShort": "Paus",
+    "seek": "Asukoht",
+    "position": "{{time}} / {{length}}",
+    "volume": "Helitugevus",
+    "mute": "Vaigista",
+    "open": "Ava {{name}} brauseris",
+    "save": "Salvesta {{name}}",
+    "saveShort": "Salvesta fail",
+    "saveTitle": "Salvesta helifail",
+    "fileType": "Helifail",
+    "saveFailed": "Faili ei õnnestunud salvestada.",
+    "errorTitle": "Seda faili ei saa esitada",
+    "errorText": "Fail puudub, on liiga suur või on vormingus, mida Mumcord ei oska esitada.",
+    "retry": "Proovi uuesti"
+  },
+  "music": {
+    "card": "{{service}}: {{title}}",
+    "title": "{{service}} link",
+    "other": "Muusikalink",
+    "thirdParty": "Kolmanda osapoole sisu hostilt {{host}}",
+    "thirdPartyShort": "Kolmanda osapoole sisu",
+    "embedded": "Põimitud pleier · {{service}} · {{host}}",
+    "player": "{{service}} pleier: {{title}}",
+    "play": "Esita",
+    "playLabel": "Esita {{title}} teenuses {{service}}",
+    "stop": "Peata",
+    "stopLabel": "Peata {{title}}",
+    "openIn": "Ava teenuses {{service}}",
+    "limits": "Esituse piirangud määrab teenus",
+    "noPlayer": "Selle teenuse jaoks pole pleierit saadaval",
+    "output": "Esitatakse sinu väljundseadmes, mitte mikrofoni"
+  },
+  "embedHint": {
+    "image": "Pilt on peidetud, sest linkide eelvaated ja manused on välja lülitatud jaotises <settings>Seaded > Privaatsus</settings>.",
+    "gif": "GIF on peidetud, sest linkide eelvaated ja manused on välja lülitatud jaotises <settings>Seaded > Privaatsus</settings>.",
+    "video": "Videopleier on peidetud, sest linkide eelvaated ja manused on välja lülitatud jaotises <settings>Seaded > Privaatsus</settings>.",
+    "audio": "Helipleier on peidetud, sest linkide eelvaated ja manused on välja lülitatud jaotises <settings>Seaded > Privaatsus</settings>.",
+    "music": "Muusikapleier on peidetud, sest linkide eelvaated ja manused on välja lülitatud jaotises <settings>Seaded > Privaatsus</settings>.",
+    "link": "Lingi eelvaade on peidetud, sest linkide eelvaated ja manused on välja lülitatud jaotises <settings>Seaded > Privaatsus</settings>.",
+    "several_one": "{{count}} eelvaade on peidetud, sest linkide eelvaated ja manused on välja lülitatud jaotises <settings>Seaded > Privaatsus</settings>.",
+    "several_other": "{{count}} eelvaadet on peidetud, sest linkide eelvaated ja manused on välja lülitatud jaotises <settings>Seaded > Privaatsus</settings>."
   }
 }

@@ -155,6 +155,17 @@ export const commands = {
 	acceptedConversations: () => typedError<AcceptedConversation[], ApiError>(__TAURI_INVOKE("accepted_conversations")),
 	/**  Revokes an accepted conversation of one own identity. */
 	acceptedConversationRevoke: (ownCertHash: string, certHash: string) => typedError<null, ApiError>(__TAURI_INVOKE("accepted_conversation_revoke", { ownCertHash, certHash })),
+	/**  Blocked users of every own identity, by name. */
+	blockedUsers: () => typedError<BlockedUser[], ApiError>(__TAURI_INVOKE("blocked_users")),
+	/**
+	 *  Blocks a person on a connected server: by certificate, or by name on this server when
+	 *  they have none.
+	 */
+	blockUser: (serverId: number, session: number) => typedError<null, ApiError>(__TAURI_INVOKE("block_user", { serverId, session })),
+	/**  Blocks a person by certificate who need not be online, for the identity `serverId` uses. */
+	blockCert: (serverId: number, certHash: string, name: string) => typedError<null, ApiError>(__TAURI_INVOKE("block_cert", { serverId, certHash, name })),
+	/**  Removes a block. */
+	unblock: (id: number) => typedError<null, ApiError>(__TAURI_INVOKE("unblock", { id })),
 	/**  The newest stored message of every private conversation on a connected server, newest first. */
 	privateConversations: (serverId: number) => typedError<PrivateConversation[], ApiError>(__TAURI_INVOKE("private_conversations", { serverId })),
 	/**  Pin and mute state of every private conversation that has any. */
@@ -265,6 +276,23 @@ export const commands = {
 	 *  image cannot be shown (blocked address, too large, unsupported format).
 	 */
 	inlineImage: (url: string) => typedError<InlineImage | null, ApiError>(__TAURI_INVOKE("inline_image", { url })),
+	/**
+	 *  Format and size of a direct audio link (issue #260), read from the start of the file;
+	 *  `null` when previews are switched off in the settings (then nothing is fetched) or the link
+	 *  is not a playable audio file (blocked address, too large, unsupported format).
+	 */
+	audioInfo: (url: string) => typedError<AudioInfo | null, ApiError>(__TAURI_INVOKE("audio_info", { url })),
+	/**
+	 *  The audio file of a direct audio link as a `data:` URL of its sniffed type, fetched by the
+	 *  engine after the user clicked play (issue #260); `null` when previews are switched off or
+	 *  the file cannot be played.
+	 */
+	audioFile: (url: string) => typedError<string | null, ApiError>(__TAURI_INVOKE("audio_file", { url })),
+	/**
+	 *  Saves the audio file of a direct audio link to `path`, which the user picked in a save
+	 *  dialog (issue #260). The engine fetches it again with the same checks as for playing.
+	 */
+	audioSave: (url: string, path: string) => typedError<null, ApiError>(__TAURI_INVOKE("audio_save", { url, path })),
 	/**
 	 *  Hides the preview card of `url` under a message for good (QA.42). Messages that were not
 	 *  stored (history saving off) keep nothing; the UI hides the card for the session.
@@ -637,6 +665,7 @@ export const events = {
 	audioDeviceFallback: makeEvent<AudioDeviceFallback, AudioDeviceFallback>("audio-device-fallback"),
 	audioDevicesChanged: makeEvent<AudioDevicesChanged, AudioDevicesChanged>("audio-devices-changed"),
 	bitrateMaxChanged: makeEvent<BitrateMaxChanged, BitrateMaxChanged>("bitrate-max-changed"),
+	blockedUsersChanged: makeEvent<BlockedUsersChanged, BlockedUsersChanged>("blocked-users-changed"),
 	certTrustRequired: makeEvent<CertTrustRequired, CertTrustRequired>("cert-trust-required"),
 	channelAudioProfilesChanged: makeEvent<ChannelAudioProfilesChanged, ChannelAudioProfilesChanged>("channel-audio-profiles-changed"),
 	channelPasswordPrompt: makeEvent<ChannelPasswordPrompt, ChannelPasswordPrompt>("channel-password-prompt"),
@@ -765,6 +794,8 @@ export type AudioDevicesChanged = {
 	devices: AudioDevices,
 };
 
+export type AudioFormat = "mp3" | "ogg" | "aac" | "mp4" | "wav" | "flac" | "webm";
+
 /**
  *  Glitch counters of the local audio path since voice started on this connection (issue #123),
  *  with the rating over the recent window (issue #152).
@@ -801,6 +832,16 @@ export type AudioHealth = {
 	processingMaxHistoryUs: number[],
 };
 
+/**  A direct audio link before the click (issue #260). */
+export type AudioInfo = {
+	/**  The link as posted, without fragment. */
+	url: string,
+	/**  Sniffed from the file's first bytes. */
+	format: AudioFormat,
+	/**  File size in bytes, when the server said (capped at 4 GB; larger files are refused). */
+	size: number | null,
+};
+
 /**  The most likely cause of a Fair or Poor rating. */
 export type AudioIssue = 
 /**  Voice from others was concealed: packets lost or late on the way. */
@@ -826,6 +867,34 @@ export type AudioRatingLabel = {
  */
 export type BitrateMaxChanged = {
 	kbps: number | null,
+};
+
+/**  Channel messages of blocked users (issue #140). */
+export type BlockedMessages = "collapse" | "hide";
+
+/**  A person one own identity blocked. */
+export type BlockedUser = {
+	/**  Id for `unblock`. */
+	id: number,
+	/**  Certificate hash of the own identity that set the block. */
+	ownCertHash: string,
+	/**
+	 *  `null` for a name block: then only `name` on `serverId` is blocked. With a certificate
+	 *  the block covers every server.
+	 */
+	certHash: string | null,
+	/**  The name when blocked. Untrusted: render as plain text. */
+	name: string,
+	/**  The server the block was set on; `null` once that server was removed. */
+	serverId: number | null,
+	/**  Label of that server when the block was set. */
+	serverLabel: string,
+	/**  RFC 3339. */
+	blockedAt: string,
+};
+
+export type BlockedUsersChanged = {
+	users: BlockedUser[],
 };
 
 /**  A game on the bundled blocklist (QA.56), shown read-only in the settings. */
@@ -1450,10 +1519,14 @@ export type LinkPreview = {
 	description: string | null,
 	/**  Preview image as a `data:` URL (fetched and re-encoded by the engine). */
 	image: string | null,
-	/**  Set for YouTube, Twitch and Spotify links: show a player card. */
+	/**  Set for YouTube and Twitch links: show a player card. */
 	video: VideoEmbed | null,
+	/**  Set for music service links and music pages: show a music card (issue #262). */
+	music: MusicEmbed | null,
 	/**  The link serves an image: show it inline (`inline_image`) instead of a card. */
 	isImage: boolean,
+	/**  The link serves an audio file: show the audio player (`audio_info`) instead of a card. */
+	isAudio: boolean,
 };
 
 /**  `ID` and `ID_LIKE` from os-release, e.g. `linuxmint` like `ubuntu debian`. */
@@ -1622,6 +1695,24 @@ export type MumbleSettingsFormat =
 "legacy" | 
 /**  Only the favourites database was found. */
 "databaseOnly";
+
+export type MusicEmbed = {
+	service: MusicService,
+	kind: MusicKind,
+	/**
+	 *  The service's official embed; load it only after the user clicks play. `null`: the
+	 *  service has no usable embed, the card only links to it.
+	 */
+	playerUrl: string | null,
+	/**  Artist or uploader, when the service names one. */
+	artist: string | null,
+};
+
+export type MusicKind = "track" | "album" | "playlist" | "artist" | "episode" | "show";
+
+export type MusicService = "spotify" | "soundcloud" | "youtubeMusic" | "appleMusic" | "tidal" | "deezer" | "bandcamp" | 
+/**  Another page that says it is music. */
+"other";
 
 /**
  *  The user clicked a system notification; the window is already in front. Show the server
@@ -2382,6 +2473,8 @@ export type Settings = {
 	whatsNewSeen: string | null,
 	/**  "Private messages from" (issue #141). */
 	privateMessages: PrivateMessageSettings,
+	/**  Channel messages of blocked users: collapsed (default) or hidden (issue #140). */
+	blockedMessages: BlockedMessages,
 };
 
 /**  Why the user cannot start a share on the server: nobody could watch it (FR-4.3 – FR-4.5). */
@@ -2611,14 +2704,11 @@ export type VideoEmbed = {
 	 *  `&parent=<host of the page>` appended.
 	 */
 	playerUrl: string,
-	/**
-	 *  Channel or uploader name; for Spotify the kind of item (`track`, `album`, `playlist`,
-	 *  `artist`, `episode`, `show`).
-	 */
+	/**  Channel or uploader name. */
 	channel: string | null,
 };
 
-export type VideoSite = "youtube" | "twitch" | "spotify";
+export type VideoSite = "youtube" | "twitch";
 
 export type VoiceActivation = "automatic" | "manual";
 

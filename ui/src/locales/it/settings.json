@@ -737,5 +737,22 @@
     "revoke": "Revoca",
     "revokeLabel": "Revoca la conversazione accettata con {{name}}",
     "revokeFailed": "Revoca non riuscita. Riprova."
+  },
+  "blocked": {
+    "title": "Utenti bloccati",
+    "hint": "I blocchi sono conservati solo su questo computer. Gli utenti bloccati sono silenziati per te e i loro messaggi e dati Mumcord vengono ignorati.",
+    "empty": "Non hai bloccato nessuno.",
+    "user": "Utente",
+    "server": "Server",
+    "since": "Bloccato dal",
+    "actions": "Azioni",
+    "unblock": "Sblocca",
+    "unblockLabel": "Sblocca {{name}}",
+    "unblockFailed": "Impossibile sbloccare. Riprova.",
+    "messagesTitle": "Messaggi bloccati nella chat del canale",
+    "collapse": "Comprimili",
+    "collapseHint": "Mostra «Messaggio di un utente bloccato» con un pulsante «Mostra».",
+    "hide": "Nascondili completamente",
+    "hideHint": "Nella chat non viene mostrato nulla."
   }
 }

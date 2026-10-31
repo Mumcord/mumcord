@@ -13,5 +13,58 @@
   "open": "Otvori chat",
   "close": "Odbaci obavijest",
   "mentionLine": "{{sender}} te spomenuo: {{preview}}",
-  "withServer": "{{server}} · {{what}}"
+  "withServer": "{{server}} · {{what}}",
+  "centre": {
+    "title": "Obavijesti",
+    "bellUnread_one": "Obavijesti, {{count}} nepročitana",
+    "bellUnread_few": "Obavijesti, {{count}} nepročitane",
+    "bellUnread_other": "Obavijesti, {{count}} nepročitanih",
+    "shortcut": "Ctrl+Shift+N",
+    "markAllRead": "Označi sve kao pročitano",
+    "filterLabel": "Prikaži obavijesti",
+    "filter": {
+      "all": "Sve",
+      "mentions": "Spominjanja",
+      "requests": "Zahtjevi",
+      "invites": "Pozivnice"
+    },
+    "empty": "Sve je pročitano.",
+    "unread": "Nepročitano",
+    "dndOn": "Ne ometaj je uključeno",
+    "dndOff": "Ne ometaj je isključeno",
+    "settings": "Postavke obavijesti",
+    "someone": "Netko",
+    "quoted": "„{{text}}“",
+    "mention": "{{name}} te spomenuo/la",
+    "mentionGroup": "{{name}} je spomenuo/la sve",
+    "reply": "{{name}} je odgovorio/la na tvoju poruku",
+    "chatRequest": "{{name}} želi razgovarati s tobom",
+    "messageRequest": "Zahtjev za poruku od {{name}}",
+    "messageRequestBody_one": "{{count}} poruka iz standardnog Mumble klijenta",
+    "messageRequestBody_few": "{{count}} poruke iz standardnog Mumble klijenta",
+    "messageRequestBody_other": "{{count}} poruka iz standardnog Mumble klijenta",
+    "invite": {
+      "watchParty": "{{name}} te pozvao/la na zajedničko gledanje",
+      "screenShare": "{{name}} dijeli svoj zaslon",
+      "card": "{{name}} ti je poslao/la karticu",
+      "theme": "{{name}} je podijelio/la temu s tobom"
+    },
+    "connection": "{{server}} nije dostupan",
+    "type": {
+      "chatRequest": "Zahtjev za razgovor",
+      "messageRequest": "Zahtjev za poruku",
+      "invite": "Pozivnica",
+      "private": "Privatna poruka",
+      "connection": "Veza"
+    },
+    "accept": "Prihvati",
+    "decline": "Odbij",
+    "join": "Pridruži se",
+    "watch": "Gledaj",
+    "open": "Otvori",
+    "dismiss": "Odbaci",
+    "dismissItem": "Odbaci: {{title}}",
+    "failed": "To nije uspjelo. Pokušaj ponovno.",
+    "block": "Blokiraj"
+  }
 }
