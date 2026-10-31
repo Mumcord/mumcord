@@ -92,13 +92,18 @@
     "hideDescription": "Sakrij opis kanala"
   },
   "mention": {
-    "list": "Osobe koje možeš spomenuti",
-    "found_one": "Predložena je {{count}} osoba. Koristi strelice, zatim Enter za umetanje.",
-    "found_few": "Predložene su {{count}} osobe. Koristi strelice, zatim Enter za umetanje.",
-    "found_other": "Predloženo je {{count}} osoba. Koristi strelice, zatim Enter za umetanje.",
+    "list": "Prijedlozi spominjanja",
+    "found_one": "Prijedlozi: {{count}}. Koristite strelice, zatim Enter za umetanje.",
+    "found_few": "Prijedlozi: {{count}}. Koristite strelice, zatim Enter za umetanje.",
+    "found_other": "Prijedlozi: {{count}}. Koristite strelice, zatim Enter za umetanje.",
     "none": "Nitko nije pronađen",
     "mentionsYou": "Spominje te",
-    "chipLabel": "{{name}}, spominjanje"
+    "chipLabel": "{{name}}, spominjanje",
+    "groupsHeading": "Spominjanja",
+    "peopleHeading": "Osobe",
+    "channelHint": "Obavijesti sve u {{channel}} ({{count}})",
+    "allHint": "Obavijesti sve koji mogu čitati ovaj kanal ({{count}})",
+    "keys": "↑↓ odaberi · Enter umetni · Esc zatvori"
   },
   "preview": {
     "open": "Otvori u pregledniku",

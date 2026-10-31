@@ -92,13 +92,18 @@
     "hideDescription": "Masquer la description du canal"
   },
   "mention": {
-    "list": "Personnes mentionnables",
-    "found_one": "{{count}} personne suggérée. Utilisez les flèches, puis Entrée pour insérer.",
-    "found_many": "{{count}} personnes suggérées. Utilisez les flèches, puis Entrée pour insérer.",
-    "found_other": "{{count}} personnes suggérées. Utilisez les flèches, puis Entrée pour insérer.",
+    "list": "Suggestions de mentions",
+    "found_one": "Suggestions : {{count}}. Utilisez les flèches, puis Entrée pour insérer.",
+    "found_many": "Suggestions : {{count}}. Utilisez les flèches, puis Entrée pour insérer.",
+    "found_other": "Suggestions : {{count}}. Utilisez les flèches, puis Entrée pour insérer.",
     "none": "Aucune personne trouvée",
     "mentionsYou": "Vous mentionne",
-    "chipLabel": "{{name}}, mention"
+    "chipLabel": "{{name}}, mention",
+    "groupsHeading": "Mentions",
+    "peopleHeading": "Personnes",
+    "channelHint": "Notifier tout le monde dans {{channel}} ({{count}})",
+    "allHint": "Notifier tous ceux qui peuvent lire ce salon ({{count}})",
+    "keys": "↑↓ choisir · Entrée insérer · Échap fermer"
   },
   "preview": {
     "open": "Ouvrir dans le navigateur",

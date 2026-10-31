@@ -328,6 +328,8 @@
     "selfMute": "Îți oprești sau pornești microfonul",
     "selfDeaf": "Îți oprești sau pornești sunetul",
     "hangUp": "Te deconectezi de la un server",
+    "kicked": "Ești dat afară de pe un server",
+    "banned": "Ești interzis pe un server",
     "messages": "Mesaj nou într-un canal urmărit sau într-un chat privat",
     "mention": "Sunet când ești menționat",
     "mentionNotify": "Notificare când ești menționat",

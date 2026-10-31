@@ -38,6 +38,19 @@ describe("linkMentions", () => {
     );
   });
 
+  it("highlights @all and @channel as plain group chips, also with nobody to link (#70)", () => {
+    const html = linkMentions(
+      "<p>@ALL and @channel, not @allison or me@all.example</p>",
+      [],
+      label,
+    );
+    const doc = new DOMParser().parseFromString(html, "text/html");
+    const groups = [...doc.querySelectorAll<HTMLElement>(".chat-mention-group")];
+    expect(groups.map((c) => c.textContent)).toEqual(["@ALL", "@channel"]);
+    expect(groups[0]?.getAttribute("role")).toBeNull();
+    expect(doc.body.textContent).toBe("@ALL and @channel, not @allison or me@all.example");
+  });
+
   it("never turns message text into markup", () => {
     const html = linkMentions("<p>@Anna &lt;img src=x onerror=1&gt;</p>", people, label);
     expect(new DOMParser().parseFromString(html, "text/html").querySelector("img")).toBeNull();

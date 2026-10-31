@@ -95,14 +95,19 @@
     "hideDescription": "Skryť popis kanála"
   },
   "mention": {
-    "list": "Ľudia, ktorých môžeš spomenúť",
-    "found_one": "Navrhnutá {{count}} osoba. Vyber šípkami a vlož klávesom Enter.",
-    "found_few": "Navrhnuté {{count}} osoby. Vyber šípkami a vlož klávesom Enter.",
-    "found_many": "Navrhnutej {{count}} osoby. Vyber šípkami a vlož klávesom Enter.",
-    "found_other": "Navrhnutých {{count}} osôb. Vyber šípkami a vlož klávesom Enter.",
+    "list": "Návrhy zmienok",
+    "found_one": "Návrhy: {{count}}. Vyberte šípkami a vložte klávesom Enter.",
+    "found_few": "Návrhy: {{count}}. Vyberte šípkami a vložte klávesom Enter.",
+    "found_many": "Návrhy: {{count}}. Vyberte šípkami a vložte klávesom Enter.",
+    "found_other": "Návrhy: {{count}}. Vyberte šípkami a vložte klávesom Enter.",
     "none": "Nikto sa nenašiel",
     "mentionsYou": "Spomína ťa",
-    "chipLabel": "{{name}}, zmienka"
+    "chipLabel": "{{name}}, zmienka",
+    "groupsHeading": "Zmienky",
+    "peopleHeading": "Ľudia",
+    "channelHint": "Upozorniť všetkých v {{channel}} ({{count}})",
+    "allHint": "Upozorniť všetkých, ktorí môžu čítať tento kanál ({{count}})",
+    "keys": "↑↓ vybrať · Enter vložiť · Esc zavrieť"
   },
   "preview": {
     "open": "Otvoriť v prehliadači",

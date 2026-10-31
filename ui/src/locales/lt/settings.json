@@ -329,6 +329,8 @@
     "selfMute": "Tu nutildai arba vėl įjungi savo mikrofoną",
     "selfDeaf": "Tu išjungi arba vėl įjungi garsą",
     "hangUp": "Tu atsijungi nuo serverio",
+    "kicked": "Tave išmeta iš serverio",
+    "banned": "Tave užblokuoja serveryje",
     "messages": "Nauja žinutė sekamame kanale ar privačiame pokalbyje",
     "mention": "Garsas, kai paminima",
     "mentionNotify": "Pranešti, kai paminima",

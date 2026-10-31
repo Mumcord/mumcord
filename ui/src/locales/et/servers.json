@@ -36,6 +36,7 @@
     "reconnect": "Ühenda uuesti",
     "alwaysConnect": "Ühenda alati käivitamisel",
     "muteNotifications": "Vaigista teavitused",
+    "muteGroupMentions": "Vaigista @all ja @channel",
     "theme": "Teema…",
     "showWelcome": "Näita tervitussõnumit",
     "identity": "Identiteet…"

@@ -95,14 +95,19 @@
     "hideDescription": "Ukryj opis kanału"
   },
   "mention": {
-    "list": "Osoby do wspomnienia",
-    "found_one": "Zaproponowano {{count}} osobę. Użyj strzałek, a potem Enter, aby wstawić.",
-    "found_few": "Zaproponowano {{count}} osoby. Użyj strzałek, a potem Enter, aby wstawić.",
-    "found_many": "Zaproponowano {{count}} osób. Użyj strzałek, a potem Enter, aby wstawić.",
-    "found_other": "Zaproponowano {{count}} osoby. Użyj strzałek, a potem Enter, aby wstawić.",
+    "list": "Sugestie wzmianek",
+    "found_one": "Sugestie: {{count}}. Użyj strzałek, a potem Enter, aby wstawić.",
+    "found_few": "Sugestie: {{count}}. Użyj strzałek, a potem Enter, aby wstawić.",
+    "found_many": "Sugestie: {{count}}. Użyj strzałek, a potem Enter, aby wstawić.",
+    "found_other": "Sugestie: {{count}}. Użyj strzałek, a potem Enter, aby wstawić.",
     "none": "Nikogo nie znaleziono",
     "mentionsYou": "Wspomina o Tobie",
-    "chipLabel": "{{name}}, wzmianka"
+    "chipLabel": "{{name}}, wzmianka",
+    "groupsHeading": "Wzmianki",
+    "peopleHeading": "Osoby",
+    "channelHint": "Powiadom wszystkich w {{channel}} ({{count}})",
+    "allHint": "Powiadom wszystkich, którzy mogą czytać ten kanał ({{count}})",
+    "keys": "↑↓ wybierz · Enter wstaw · Esc zamknij"
   },
   "preview": {
     "open": "Otwórz w przeglądarce",

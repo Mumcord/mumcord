@@ -98,15 +98,20 @@
     "hideDescription": "Aħbi d-deskrizzjoni tal-kanal"
   },
   "mention": {
-    "list": "Persuni li tista' tsemmi",
-    "found_one": "{{count}} persuna suġġerita. Uża l-vireg, imbagħad Enter biex iddaħħal.",
-    "found_two": "{{count}} persuni suġġeriti. Uża l-vireg, imbagħad Enter biex iddaħħal.",
-    "found_few": "{{count}} persuni suġġeriti. Uża l-vireg, imbagħad Enter biex iddaħħal.",
-    "found_many": "{{count}} persuna suġġeriti. Uża l-vireg, imbagħad Enter biex iddaħħal.",
-    "found_other": "{{count}} persuna suġġeriti. Uża l-vireg, imbagħad Enter biex iddaħħal.",
+    "list": "Suġġerimenti ta' referenzi",
+    "found_one": "Suġġerimenti: {{count}}. Uża l-vleġeġ, imbagħad Enter biex iddaħħal.",
+    "found_two": "Suġġerimenti: {{count}}. Uża l-vleġeġ, imbagħad Enter biex iddaħħal.",
+    "found_few": "Suġġerimenti: {{count}}. Uża l-vleġeġ, imbagħad Enter biex iddaħħal.",
+    "found_many": "Suġġerimenti: {{count}}. Uża l-vleġeġ, imbagħad Enter biex iddaħħal.",
+    "found_other": "Suġġerimenti: {{count}}. Uża l-vleġeġ, imbagħad Enter biex iddaħħal.",
     "none": "Ma nstab ħadd",
     "mentionsYou": "Isemmik",
-    "chipLabel": "{{name}}, semmija"
+    "chipLabel": "{{name}}, semmija",
+    "groupsHeading": "Referenzi",
+    "peopleHeading": "Nies",
+    "channelHint": "Avża lil kulħadd f'{{channel}} ({{count}})",
+    "allHint": "Avża lil kull min jista' jaqra dan il-kanal ({{count}})",
+    "keys": "↑↓ agħżel · Enter daħħal · Esc agħlaq"
   },
   "preview": {
     "open": "Iftaħ fil-browser",

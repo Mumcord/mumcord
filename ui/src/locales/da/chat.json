@@ -89,12 +89,17 @@
     "hideDescription": "Skjul kanalbeskrivelse"
   },
   "mention": {
-    "list": "Personer, der kan omtales",
-    "found_one": "{{count}} person foreslået. Brug piletasterne, og tryk derefter på Enter for at indsætte.",
-    "found_other": "{{count}} personer foreslået. Brug piletasterne, og tryk derefter på Enter for at indsætte.",
+    "list": "Forslag til omtaler",
+    "found_one": "Forslag: {{count}}. Brug piletasterne, og tryk Enter for at indsætte.",
+    "found_other": "Forslag: {{count}}. Brug piletasterne, og tryk Enter for at indsætte.",
     "none": "Ingen fundet",
     "mentionsYou": "Omtaler dig",
-    "chipLabel": "{{name}}, omtale"
+    "chipLabel": "{{name}}, omtale",
+    "groupsHeading": "Omtaler",
+    "peopleHeading": "Personer",
+    "channelHint": "Giv besked til alle i {{channel}} ({{count}})",
+    "allHint": "Giv besked til alle, der kan læse denne kanal ({{count}})",
+    "keys": "↑↓ vælg · Enter indsæt · Esc luk"
   },
   "preview": {
     "open": "Åbn i browser",

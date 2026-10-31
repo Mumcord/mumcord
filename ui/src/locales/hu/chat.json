@@ -89,12 +89,17 @@
     "hideDescription": "Csatornaleírás elrejtése"
   },
   "mention": {
-    "list": "Megemlíthető személyek",
-    "found_one": "{{count}} javasolt személy. Használd a nyílbillentyűket, majd az Entert a beszúráshoz.",
-    "found_other": "{{count}} javasolt személy. Használd a nyílbillentyűket, majd az Entert a beszúráshoz.",
+    "list": "Említési javaslatok",
+    "found_one": "Javaslatok: {{count}}. Válassz a nyilakkal, majd az Enterrel szúrd be.",
+    "found_other": "Javaslatok: {{count}}. Válassz a nyilakkal, majd az Enterrel szúrd be.",
     "none": "Nincs találat",
     "mentionsYou": "Megemlít téged",
-    "chipLabel": "{{name}}, említés"
+    "chipLabel": "{{name}}, említés",
+    "groupsHeading": "Említések",
+    "peopleHeading": "Személyek",
+    "channelHint": "Mindenki értesítése itt: {{channel}} ({{count}})",
+    "allHint": "Mindenki értesítése, aki olvashatja ezt a csatornát ({{count}})",
+    "keys": "↑↓ választás · Enter beszúrás · Esc bezárás"
   },
   "preview": {
     "open": "Megnyitás böngészőben",

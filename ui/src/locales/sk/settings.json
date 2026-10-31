@@ -329,6 +329,8 @@
     "selfMute": "Stlmíš alebo zapneš svoj mikrofón",
     "selfDeaf": "Stlmíš alebo zapneš svoj zvuk",
     "hangUp": "Odpojíš sa od servera",
+    "kicked": "Si vyhodený zo servera",
+    "banned": "Si zablokovaný na serveri",
     "messages": "Nová správa v sledovanom kanáli alebo súkromnom chate",
     "mention": "Zvuk pri zmienke",
     "mentionNotify": "Upozorniť pri zmienke",

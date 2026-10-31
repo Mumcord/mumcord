@@ -1,7 +1,7 @@
 /**
  * Whether a message mentions the user: by the current name, or by a name they had earlier in this
- * session (renaming must not hide mentions that were meant for them), or by replying to one of
- * their messages (FR-2.67).
+ * session (renaming must not hide mentions that were meant for them), by replying to one of
+ * their messages (FR-2.67), or by `@all` / `@channel` unless turned off for the server (#70).
  */
 import { useMemo } from "react";
 import type { ChatMessage } from "../../api";
@@ -14,8 +14,9 @@ import {
   useServerSelector,
   type ServerState,
 } from "../channels";
+import { groupMentionsMuted, useServers } from "../servers/store";
 import { conversationMessages, useConversationMessages } from "./chatStore";
-import { bodyMentions } from "./mentions";
+import { bodyMentions, groupMentioned } from "./mentions";
 import { repliesToOwn } from "./reply";
 
 let previousNames = new Set<string>();
@@ -57,13 +58,25 @@ export function isReplyMention(message: ChatMessage, serverId: number): boolean 
   );
 }
 
+/** True when `message` on `serverId` reaches the user through `@all` or `@channel`. */
+export function isGroupMention(message: ChatMessage, serverId: number): boolean {
+  return groupMentioned(message.body, message.conversation, {
+    ownChannel: selfUser(getServerStateOf(serverId))?.channelId ?? null,
+    muted: groupMentionsMuted(serverId),
+  });
+}
+
 /**
- * True when `message` is from someone else and mentions the user. Replies are checked on
- * `serverId` (default: the shown server).
+ * True when `message` is from someone else and mentions the user. Replies and group mentions
+ * are checked on `serverId` (default: the shown server).
  */
 export function isMention(message: ChatMessage, serverId = shownServerId()): boolean {
   if (message.own) return false;
-  return bodyMentions(message.body, ownMentionNames()) || isReplyMention(message, serverId);
+  return (
+    bodyMentions(message.body, ownMentionNames()) ||
+    isReplyMention(message, serverId) ||
+    isGroupMention(message, serverId)
+  );
 }
 
 /**
@@ -73,14 +86,22 @@ export function isMention(message: ChatMessage, serverId = shownServerId()): boo
  */
 export function useIsMention(message: ChatMessage): boolean {
   const name = useServerSelector(selfName);
+  const ownChannel = useServerSelector(selfChannel);
   const history = useConversationMessages(message.conversation);
+  const shown = shownServerId();
+  const muted = useServers().servers.find((s) => s.id === shown)?.groupMentionsMuted ?? false;
   return useMemo(() => {
     if (message.own) return false;
     return (
       bodyMentions(message.body, mentionNames(name)) ||
-      (name !== undefined && repliesToOwn(message, name, history))
+      (name !== undefined && repliesToOwn(message, name, history)) ||
+      groupMentioned(message.body, message.conversation, { ownChannel, muted })
     );
-  }, [message, name, history]);
+  }, [message, name, history, ownChannel, muted]);
+}
+
+function selfChannel(state: ServerState): number | null {
+  return selfUser(state)?.channelId ?? null;
 }
 
 function selfName(state: ServerState): string | undefined {

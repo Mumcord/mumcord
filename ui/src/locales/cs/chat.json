@@ -95,14 +95,19 @@
     "hideDescription": "Skrýt popis kanálu"
   },
   "mention": {
-    "list": "Lidé, které lze zmínit",
-    "found_one": "Navržena {{count}} osoba. Vyber šipkami a vlož klávesou Enter.",
-    "found_few": "Navrženy {{count}} osoby. Vyber šipkami a vlož klávesou Enter.",
-    "found_many": "Navrženo {{count}} osob. Vyber šipkami a vlož klávesou Enter.",
-    "found_other": "Navrženo {{count}} osob. Vyber šipkami a vlož klávesou Enter.",
+    "list": "Návrhy zmínek",
+    "found_one": "Návrhy: {{count}}. Vyberte šipkami a vložte klávesou Enter.",
+    "found_few": "Návrhy: {{count}}. Vyberte šipkami a vložte klávesou Enter.",
+    "found_many": "Návrhy: {{count}}. Vyberte šipkami a vložte klávesou Enter.",
+    "found_other": "Návrhy: {{count}}. Vyberte šipkami a vložte klávesou Enter.",
     "none": "Nikdo nenalezen",
     "mentionsYou": "Zmiňuje tě",
-    "chipLabel": "{{name}}, zmínka"
+    "chipLabel": "{{name}}, zmínka",
+    "groupsHeading": "Zmínky",
+    "peopleHeading": "Lidé",
+    "channelHint": "Upozornit všechny v {{channel}} ({{count}})",
+    "allHint": "Upozornit všechny, kdo mohou číst tento kanál ({{count}})",
+    "keys": "↑↓ vybrat · Enter vložit · Esc zavřít"
   },
   "preview": {
     "open": "Otevřít v prohlížeči",

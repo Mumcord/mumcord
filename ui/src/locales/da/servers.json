@@ -36,6 +36,7 @@
     "reconnect": "Forbind igen",
     "alwaysConnect": "Forbind altid ved start",
     "muteNotifications": "Slå notifikationer fra",
+    "muteGroupMentions": "Slå @all og @channel fra",
     "theme": "Tema…",
     "showWelcome": "Vis velkomstbesked",
     "identity": "Identitet…"

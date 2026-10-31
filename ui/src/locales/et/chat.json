@@ -89,12 +89,17 @@
     "hideDescription": "Peida kanali kirjeldus"
   },
   "mention": {
-    "list": "Mainitavad inimesed",
-    "found_one": "Pakuti {{count}} inimest. Kasuta nooleklahve ja lisamiseks vajuta Enter.",
-    "found_other": "Pakuti {{count}} inimest. Kasuta nooleklahve ja lisamiseks vajuta Enter.",
+    "list": "Mainimise soovitused",
+    "found_one": "Soovitusi: {{count}}. Kasuta nooleklahve, siis Enter sisestamiseks.",
+    "found_other": "Soovitusi: {{count}}. Kasuta nooleklahve, siis Enter sisestamiseks.",
     "none": "Kedagi ei leitud",
     "mentionsYou": "Mainib sind",
-    "chipLabel": "{{name}}, mainimine"
+    "chipLabel": "{{name}}, mainimine",
+    "groupsHeading": "Mainimised",
+    "peopleHeading": "Inimesed",
+    "channelHint": "Teavita kõiki kanalis {{channel}} ({{count}})",
+    "allHint": "Teavita kõiki, kes saavad seda kanalit lugeda ({{count}})",
+    "keys": "↑↓ vali · Enter sisesta · Esc sulge"
   },
   "preview": {
     "open": "Ava brauseris",

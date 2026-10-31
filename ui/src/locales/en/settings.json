@@ -327,6 +327,8 @@
     "selfMute": "You mute or unmute yourself",
     "selfDeaf": "You deafen or undeafen yourself",
     "hangUp": "You disconnect from a server",
+    "kicked": "You are kicked from a server",
+    "banned": "You are banned from a server",
     "messages": "New message in a followed channel or private chat",
     "mention": "Sound when mentioned",
     "mentionNotify": "Notify when mentioned",

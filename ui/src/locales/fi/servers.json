@@ -36,6 +36,7 @@
     "reconnect": "Yhdistä uudelleen",
     "alwaysConnect": "Yhdistä aina käynnistettäessä",
     "muteNotifications": "Mykistä ilmoitukset",
+    "muteGroupMentions": "Mykistä @all ja @channel",
     "theme": "Teema…",
     "showWelcome": "Näytä tervetuloviesti",
     "identity": "Identiteetti…"

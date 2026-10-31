@@ -654,7 +654,8 @@
   bottom: 100%;
   left: var(--space-4);
   z-index: 5;
-  min-width: 14rem;
+  /* Wide enough for the @channel / @all hints, which would otherwise shrink to nothing. */
+  min-width: min(24rem, calc(100% - 2 * var(--space-4)));
   max-width: calc(100% - 2 * var(--space-4));
   margin: 0 0 var(--space-1);
   padding: var(--space-1);
@@ -664,8 +665,43 @@
   box-shadow:
     inset 0 0 0 1px var(--color-border),
     0 4px 16px rgb(0 0 0 / 0.25);
+}
+
+.mention-picker__list {
   max-height: 16rem;
   overflow-y: auto;
+}
+
+.mention-picker__section {
+  padding: var(--space-2) var(--space-2) var(--space-1);
+  font-size: var(--font-size-xs, 0.75rem);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+}
+
+.mention-picker__keyword {
+  flex: none;
+  padding: 0 var(--space-1);
+  border-radius: var(--radius-sm);
+  background: color-mix(in srgb, var(--color-accent) 22%, transparent);
+  font-weight: 600;
+}
+
+.mention-picker__hint {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--color-text-muted);
+}
+
+.mention-picker__keys {
+  margin: var(--space-1) 0 0;
+  padding: var(--space-1) var(--space-2) 0;
+  border-top: 1px solid var(--color-border);
+  font-size: var(--font-size-xs, 0.75rem);
+  color: var(--color-text-muted);
 }
 
 .mention-picker__option {
@@ -1325,6 +1361,13 @@
   border-radius: var(--radius-sm, 4px);
   background: color-mix(in srgb, var(--color-accent) 22%, transparent);
   cursor: pointer;
+}
+
+.chat-mention-group {
+  padding: 0 var(--space-1);
+  border-radius: var(--radius-sm, 4px);
+  background: color-mix(in srgb, var(--color-accent) 22%, transparent);
+  font-weight: 600;
 }
 
 .chat-mention:hover,
