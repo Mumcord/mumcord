@@ -475,6 +475,11 @@ pub enum EngineEvent {
     /// The highest bitrate the bitrate slider can reach changed (FR-2.64); `None` without a
     /// voice server.
     BitrateMaxChanged(Option<u32>),
+    /// The channel audio profile in effect changed (issue #171); `None` runs on the global
+    /// settings.
+    ActiveAudioProfileChanged(Option<super::ActiveAudioProfile>),
+    /// The audio profiles of the server's channels changed (issue #171).
+    ChannelAudioProfilesChanged(Vec<super::ChannelAudioView>),
     /// Microphone level 0.0–1.0.
     MicLevel(f32),
     /// The mic test moved to a new phase (FR-1.4).

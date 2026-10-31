@@ -11,6 +11,7 @@
 //! Lock order: `core` before `store`. Neither lock is held across an `.await`.
 
 pub(crate) mod batch;
+mod channel_audio;
 mod channel_password;
 pub mod convert;
 mod description;
@@ -42,6 +43,7 @@ use tokio::runtime::Handle as Runtime;
 use tokio::sync::mpsc;
 use tokio::task::JoinHandle;
 
+pub use channel_audio::{ActiveAudioProfile, ChannelAudioView};
 pub use channel_password::{ChannelPasswordChannel, ChannelPasswordState, ChannelPasswordView};
 pub use machine::MAX_RECONNECT_ATTEMPTS;
 pub use types::*;
@@ -266,6 +268,8 @@ struct Core {
     audio: Option<Audio>,
     pipeline: Option<VoicePipeline>,
     mic_test: Option<MicTest>,
+    /// The channel audio profile in effect (issue #171); `None` runs on the global settings.
+    channel_audio: Option<ActiveAudioProfile>,
 }
 
 /// One server's connection.
@@ -1653,6 +1657,7 @@ impl Inner {
             }
         }
         self.start_pipeline(core);
+        self.sync_channel_audio(core);
     }
 
     /// Self-deafens and mutes a still connected server; the user stays in their channel.
@@ -2038,6 +2043,7 @@ impl Inner {
             ctx.events
                 .emit(EngineEvent::ServerSynced(Box::new(snapshot)));
         }
+        self.sync_channel_audio(&mut lock(&self.core));
         // A link naming a channel is an explicit join (QA.23); after `ServerSynced`, which
         // resets the sound hub's view of the own state.
         if link_join
@@ -2380,6 +2386,7 @@ impl Inner {
                 if own && change.moved_from.is_some() {
                     self.remember_channel(ctx, user.channel_id);
                     self.on_own_channel(ctx, user.channel_id);
+                    self.sync_channel_audio(&mut lock(&self.core));
                 }
                 if let Some(setting) = setting {
                     ctx.events.emit(EngineEvent::UserUpserted(

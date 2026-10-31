@@ -327,6 +327,18 @@ export const commands = {
 	 *  server. Follow `BitrateMaxChanged` afterwards.
 	 */
 	bitrateMax: () => typedError<number | null, ApiError>(__TAURI_INVOKE("bitrate_max")),
+	/**  The channels of a connected server that have an audio profile. */
+	channelAudioProfiles: (serverId: number) => typedError<ChannelAudioEntry[], ApiError>(__TAURI_INVOKE("channel_audio_profiles", { serverId })),
+	/**
+	 *  Saves the audio profile of a channel, or removes it with `null` ("Remove profile"). Applies
+	 *  at once when the user is in that channel.
+	 */
+	channelAudioProfileSet: (serverId: number, channelId: number, profile: ChannelAudioProfile | null) => typedError<null, ApiError>(__TAURI_INVOKE("channel_audio_profile_set", { serverId, channelId, profile })),
+	/**
+	 *  The channel profile in effect now; `null` runs on the global settings. Follow
+	 *  `ActiveAudioProfileChanged` afterwards.
+	 */
+	activeAudioProfile: () => typedError<ActiveAudioProfile | null, ApiError>(__TAURI_INVOKE("active_audio_profile")),
 	/**
 	 *  Records up to 5 s of processed own voice with level metering, then plays it back.
 	 *  Voice of a connected session pauses meanwhile.
@@ -559,10 +571,12 @@ export const commands = {
 /** Events */
 export const events = {
 	acceptedConversationsChanged: makeEvent<AcceptedConversationsChanged, AcceptedConversationsChanged>("accepted-conversations-changed"),
+	activeAudioProfileChanged: makeEvent<ActiveAudioProfileChanged, ActiveAudioProfileChanged>("active-audio-profile-changed"),
 	audioDeviceFallback: makeEvent<AudioDeviceFallback, AudioDeviceFallback>("audio-device-fallback"),
 	audioDevicesChanged: makeEvent<AudioDevicesChanged, AudioDevicesChanged>("audio-devices-changed"),
 	bitrateMaxChanged: makeEvent<BitrateMaxChanged, BitrateMaxChanged>("bitrate-max-changed"),
 	certTrustRequired: makeEvent<CertTrustRequired, CertTrustRequired>("cert-trust-required"),
+	channelAudioProfilesChanged: makeEvent<ChannelAudioProfilesChanged, ChannelAudioProfilesChanged>("channel-audio-profiles-changed"),
 	channelPasswordPrompt: makeEvent<ChannelPasswordPrompt, ChannelPasswordPrompt>("channel-password-prompt"),
 	channelRemoved: makeEvent<ChannelRemoved, ChannelRemoved>("channel-removed"),
 	channelUpserted: makeEvent<ChannelUpserted, ChannelUpserted>("channel-upserted"),
@@ -618,6 +632,21 @@ export type AcceptedConversation = {
 
 export type AcceptedConversationsChanged = {
 	conversations: AcceptedConversation[],
+};
+
+/**  The profile in effect: the own channel's on the server that carries voice. */
+export type ActiveAudioProfile = {
+	serverId: number,
+	channelId: number,
+	profile: ChannelAudioProfile,
+};
+
+/**
+ *  The channel profile in effect changed: the user joined or left a channel with a profile, or
+ *  its profile was edited. `null` runs on the global settings.
+ */
+export type ActiveAudioProfileChanged = {
+	active: ActiveAudioProfile | null,
 };
 
 /**  Error returned by every failing command. */
@@ -774,6 +803,26 @@ export type CertTrustRequired = {
 
 /**  How a tested server certificate relates to the saved trust decision. */
 export type CertificateState = "trusted" | "unknown" | "changed";
+
+/**  A channel of the server that has a profile. */
+export type ChannelAudioEntry = {
+	channelId: number,
+	profile: ChannelAudioProfile,
+};
+
+/**  The overrides of a channel audio profile; `null` keeps the global setting ("default"). */
+export type ChannelAudioProfile = {
+	musicQuality: boolean | null,
+	lowLatency: boolean | null,
+	/**  Own bitrate cap in kbit/s, 16 to 510; the server's limit still wins. */
+	bitrateKbps: number | null,
+};
+
+/**  The audio profiles of a server's channels changed. */
+export type ChannelAudioProfilesChanged = {
+	serverId: number,
+	profiles: ChannelAudioEntry[],
+};
 
 export type ChannelInfo = {
 	id: number,
