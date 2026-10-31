@@ -152,7 +152,11 @@
   height: 0.5rem;
   appearance: none;
   border-radius: var(--radius-full);
-  background: linear-gradient(to right, var(--color-accent) var(--played), var(--color-bg-hover) var(--played));
+  background: linear-gradient(
+    to right,
+    var(--color-accent) var(--played),
+    var(--color-bg-hover) var(--played)
+  );
 }
 
 .volume__meter {
@@ -290,4 +294,14 @@
 
 .watch-list__state--buffering {
   color: var(--color-warning);
+}
+
+/* The share mini bar has no picture of its own: a small screen shape stands for it. */
+.mini-bar__screen {
+  display: inline-block;
+  width: 26px;
+  height: 16px;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  background: var(--surface-2);
 }

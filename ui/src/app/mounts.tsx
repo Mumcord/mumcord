@@ -31,12 +31,7 @@ import {
   openPrivateConversation,
   useChannelPresence,
 } from "../features/members";
-import {
-  ScreenShareWidget,
-  ScreenShareView,
-  SharerBar,
-  ViewerPanel,
-} from "../features/screenshare";
+import { ShareMiniBar, ScreenShareView, SharerBar, ViewerPanel } from "../features/screenshare";
 import {
   VideoDucking,
   WatchMiniBar,
@@ -186,6 +181,7 @@ export function ChatMount() {
     <>
       <SharerBar />
       {view.mini.watch && <WatchMiniBar serverId={serverId} />}
+      {view.mini.share && <ShareMiniBar serverId={serverId} />}
       {chat}
     </>
   );
@@ -216,7 +212,6 @@ function MembersToggleMount() {
 export function MediaWidgetsMount() {
   return (
     <>
-      <ScreenShareWidget />
       <VideoDucking />
     </>
   );

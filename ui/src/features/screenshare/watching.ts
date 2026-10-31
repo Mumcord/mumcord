@@ -4,6 +4,7 @@
  * and when the connection it belongs to drops or resyncs.
  */
 import { useSyncExternalStore } from "react";
+import { closeMedia, openMedia } from "../media/mediaView";
 import { getApi, type MumcordApi, type Unsubscribe } from "../../api";
 
 export interface WatchedShare {
@@ -69,10 +70,13 @@ export function startWatching(serverId: number, session: number): void {
   ensureBound();
   if (watched?.serverId === serverId && watched.session === session) return;
   set({ serverId, session });
+  // Issue #163: a watched share opens as the picture in the main column.
+  openMedia("share");
 }
 
 /** Closes the viewer ("Stop watching"); the viewer then tells the engine. */
 export function stopWatching(): void {
+  closeMedia("share");
   set(null);
 }
 

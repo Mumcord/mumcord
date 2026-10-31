@@ -8,7 +8,13 @@ describe("stream meter", () => {
   it("counts the frames and the bytes of the last second", () => {
     const meter = new StreamMeter();
     for (let i = 0; i < 5; i += 1) {
-      meter.frame({ atMs: BASE + i * 200, timestampUs: (i * 200) * 1000, bytes: 1000, width: 1920, height: 1080 });
+      meter.frame({
+        atMs: BASE + i * 200,
+        timestampUs: i * 200 * 1000,
+        bytes: 1000,
+        width: 1920,
+        height: 1080,
+      });
     }
     const stats = meter.snapshot();
     expect(stats.fps).toBe(5);
