@@ -11,5 +11,55 @@
   "open": "Åbn chat",
   "close": "Afvis notifikation",
   "mentionLine": "{{sender}} omtalte dig: {{preview}}",
-  "withServer": "{{server}} · {{what}}"
+  "withServer": "{{server}} · {{what}}",
+  "centre": {
+    "title": "Notifikationer",
+    "bellUnread_one": "Notifikationer, {{count}} ulæst",
+    "bellUnread_other": "Notifikationer, {{count}} ulæste",
+    "shortcut": "Ctrl+Skift+N",
+    "markAllRead": "Markér alle som læst",
+    "filterLabel": "Vis notifikationer",
+    "filter": {
+      "all": "Alle",
+      "mentions": "Omtaler",
+      "requests": "Anmodninger",
+      "invites": "Invitationer"
+    },
+    "empty": "Du er helt opdateret.",
+    "unread": "Ulæste",
+    "dndOn": "Forstyr ikke er slået til",
+    "dndOff": "Forstyr ikke er slået fra",
+    "settings": "Notifikationsindstillinger",
+    "someone": "Nogen",
+    "quoted": "»{{text}}«",
+    "mention": "{{name}} omtalte dig",
+    "mentionGroup": "{{name}} omtalte alle",
+    "reply": "{{name}} svarede på din besked",
+    "chatRequest": "{{name}} vil chatte med dig",
+    "messageRequest": "Beskedanmodning fra {{name}}",
+    "messageRequestBody_one": "{{count}} besked fra en almindelig Mumble-klient",
+    "messageRequestBody_other": "{{count}} beskeder fra en almindelig Mumble-klient",
+    "invite": {
+      "watchParty": "{{name}} inviterede dig til en watch party",
+      "screenShare": "{{name}} deler sin skærm",
+      "card": "{{name}} sendte dig et kort",
+      "theme": "{{name}} delte et tema med dig"
+    },
+    "connection": "{{server}} er utilgængelig",
+    "type": {
+      "chatRequest": "Chatanmodning",
+      "messageRequest": "Beskedanmodning",
+      "invite": "Invitation",
+      "private": "Privat besked",
+      "connection": "Forbindelse"
+    },
+    "accept": "Accepter",
+    "decline": "Afvis",
+    "join": "Deltag",
+    "watch": "Se med",
+    "open": "Åbn",
+    "dismiss": "Luk",
+    "dismissItem": "Luk: {{title}}",
+    "failed": "Det virkede ikke. Prøv igen."
+  }
 }

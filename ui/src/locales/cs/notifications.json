@@ -15,5 +15,59 @@
   "open": "Otevřít chat",
   "close": "Zavřít oznámení",
   "mentionLine": "{{sender}} tě zmínil(a): {{preview}}",
-  "withServer": "{{server}} · {{what}}"
+  "withServer": "{{server}} · {{what}}",
+  "centre": {
+    "title": "Oznámení",
+    "bellUnread_one": "Oznámení, {{count}} nepřečtené",
+    "bellUnread_few": "Oznámení, {{count}} nepřečtená",
+    "bellUnread_many": "Oznámení, {{count}} nepřečtených",
+    "bellUnread_other": "Oznámení, {{count}} nepřečtených",
+    "shortcut": "Ctrl+Shift+N",
+    "markAllRead": "Označit vše jako přečtené",
+    "filterLabel": "Zobrazit oznámení",
+    "filter": {
+      "all": "Vše",
+      "mentions": "Zmínky",
+      "requests": "Žádosti",
+      "invites": "Pozvánky"
+    },
+    "empty": "Vše je přečteno.",
+    "unread": "Nepřečtené",
+    "dndOn": "Režim Nerušit je zapnutý",
+    "dndOff": "Režim Nerušit je vypnutý",
+    "settings": "Nastavení oznámení",
+    "someone": "Někdo",
+    "quoted": "„{{text}}“",
+    "mention": "{{name}} tě zmínil(a)",
+    "mentionGroup": "{{name}} zmínil(a) všechny",
+    "reply": "{{name}} odpověděl(a) na tvou zprávu",
+    "chatRequest": "{{name}} si s tebou chce psát",
+    "messageRequest": "Žádost o zprávu od {{name}}",
+    "messageRequestBody_one": "{{count}} zpráva ze standardního klienta Mumble",
+    "messageRequestBody_few": "{{count}} zprávy ze standardního klienta Mumble",
+    "messageRequestBody_many": "{{count}} zprávy ze standardního klienta Mumble",
+    "messageRequestBody_other": "{{count}} zpráv ze standardního klienta Mumble",
+    "invite": {
+      "watchParty": "{{name}} tě pozval(a) na společné sledování",
+      "screenShare": "{{name}} sdílí obrazovku",
+      "card": "{{name}} ti poslal(a) kartu",
+      "theme": "{{name}} s tebou sdílel(a) motiv"
+    },
+    "connection": "{{server}} je nedostupný",
+    "type": {
+      "chatRequest": "Žádost o chat",
+      "messageRequest": "Žádost o zprávu",
+      "invite": "Pozvánka",
+      "private": "Soukromá zpráva",
+      "connection": "Připojení"
+    },
+    "accept": "Přijmout",
+    "decline": "Odmítnout",
+    "join": "Připojit se",
+    "watch": "Sledovat",
+    "open": "Otevřít",
+    "dismiss": "Zavřít",
+    "dismissItem": "Zavřít: {{title}}",
+    "failed": "To se nepodařilo. Zkus to znovu."
+  }
 }

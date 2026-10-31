@@ -11,5 +11,55 @@
   "open": "Άνοιγμα συνομιλίας",
   "close": "Απόρριψη ειδοποίησης",
   "mentionLine": "Ο/Η {{sender}} σε ανέφερε: {{preview}}",
-  "withServer": "{{server}} · {{what}}"
+  "withServer": "{{server}} · {{what}}",
+  "centre": {
+    "title": "Ειδοποιήσεις",
+    "bellUnread_one": "Ειδοποιήσεις, {{count}} μη αναγνωσμένη",
+    "bellUnread_other": "Ειδοποιήσεις, {{count}} μη αναγνωσμένες",
+    "shortcut": "Ctrl+Shift+N",
+    "markAllRead": "Επισήμανση όλων ως αναγνωσμένων",
+    "filterLabel": "Εμφάνιση ειδοποιήσεων",
+    "filter": {
+      "all": "Όλες",
+      "mentions": "Αναφορές",
+      "requests": "Αιτήματα",
+      "invites": "Προσκλήσεις"
+    },
+    "empty": "Δεν υπάρχει τίποτα νέο.",
+    "unread": "Μη αναγνωσμένες",
+    "dndOn": "Το «Μην ενοχλείτε» είναι ενεργό",
+    "dndOff": "Το «Μην ενοχλείτε» είναι ανενεργό",
+    "settings": "Ρυθμίσεις ειδοποιήσεων",
+    "someone": "Κάποιος",
+    "quoted": "«{{text}}»",
+    "mention": "Ο/Η {{name}} σε ανέφερε",
+    "mentionGroup": "Ο/Η {{name}} ανέφερε όλους",
+    "reply": "Ο/Η {{name}} απάντησε στο μήνυμά σου",
+    "chatRequest": "Ο/Η {{name}} θέλει να συνομιλήσει μαζί σου",
+    "messageRequest": "Αίτημα μηνύματος από {{name}}",
+    "messageRequestBody_one": "{{count}} μήνυμα από τυπικό πελάτη Mumble",
+    "messageRequestBody_other": "{{count}} μηνύματα από τυπικό πελάτη Mumble",
+    "invite": {
+      "watchParty": "Ο/Η {{name}} σε προσκάλεσε σε κοινή προβολή",
+      "screenShare": "Ο/Η {{name}} μοιράζεται την οθόνη του/της",
+      "card": "Ο/Η {{name}} σού έστειλε μια κάρτα",
+      "theme": "Ο/Η {{name}} μοιράστηκε ένα θέμα μαζί σου"
+    },
+    "connection": "Το {{server}} δεν είναι προσβάσιμο",
+    "type": {
+      "chatRequest": "Αίτημα συνομιλίας",
+      "messageRequest": "Αίτημα μηνύματος",
+      "invite": "Πρόσκληση",
+      "private": "Ιδιωτικό μήνυμα",
+      "connection": "Σύνδεση"
+    },
+    "accept": "Αποδοχή",
+    "decline": "Απόρριψη",
+    "join": "Συμμετοχή",
+    "watch": "Παρακολούθηση",
+    "open": "Άνοιγμα",
+    "dismiss": "Παράβλεψη",
+    "dismissItem": "Παράβλεψη: {{title}}",
+    "failed": "Δεν λειτούργησε. Δοκίμασε ξανά."
+  }
 }

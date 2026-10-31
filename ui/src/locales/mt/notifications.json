@@ -17,5 +17,61 @@
   "open": "Iftaħ iċ-chat",
   "close": "Ormi n-notifika",
   "mentionLine": "{{sender}} semmielek: {{preview}}",
-  "withServer": "{{server}} · {{what}}"
+  "withServer": "{{server}} · {{what}}",
+  "centre": {
+    "title": "Notifiki",
+    "bellUnread_one": "Notifiki, {{count}} mhux moqri",
+    "bellUnread_two": "Notifiki, {{count}} mhux moqrijin",
+    "bellUnread_few": "Notifiki, {{count}} mhux moqrijin",
+    "bellUnread_many": "Notifiki, {{count}} mhux moqrijin",
+    "bellUnread_other": "Notifiki, {{count}} mhux moqrijin",
+    "shortcut": "Ctrl+Shift+N",
+    "markAllRead": "Immarka kollha bħala moqrija",
+    "filterLabel": "Uri n-notifiki",
+    "filter": {
+      "all": "Kollha",
+      "mentions": "Referenzi",
+      "requests": "Talbiet",
+      "invites": "Stediniet"
+    },
+    "empty": "Qrajt kollox.",
+    "unread": "Mhux moqrija",
+    "dndOn": "Tiddisturbax huwa mixgħul",
+    "dndOff": "Tiddisturbax huwa mitfi",
+    "settings": "Settings tan-notifiki",
+    "someone": "Xi ħadd",
+    "quoted": "“{{text}}”",
+    "mention": "{{name}} semmiek",
+    "mentionGroup": "{{name}} semma lil kulħadd",
+    "reply": "{{name}} wieġeb il-messaġġ tiegħek",
+    "chatRequest": "{{name}} irid jitkellem miegħek",
+    "messageRequest": "Talba għal messaġġ minn {{name}}",
+    "messageRequestBody_one": "{{count}} messaġġ minn klijent standard ta’ Mumble",
+    "messageRequestBody_two": "{{count}} messaġġi minn klijent standard ta’ Mumble",
+    "messageRequestBody_few": "{{count}} messaġġi minn klijent standard ta’ Mumble",
+    "messageRequestBody_many": "{{count}} messaġġ minn klijent standard ta’ Mumble",
+    "messageRequestBody_other": "{{count}} messaġġ minn klijent standard ta’ Mumble",
+    "invite": {
+      "watchParty": "{{name}} stiednek għal watch party",
+      "screenShare": "{{name}} qed jaqsam l-iskrin tiegħu",
+      "card": "{{name}} bagħtlek karta",
+      "theme": "{{name}} qasam tema miegħek"
+    },
+    "connection": "{{server}} mhux disponibbli",
+    "type": {
+      "chatRequest": "Talba għal chat",
+      "messageRequest": "Talba għal messaġġ",
+      "invite": "Stedina",
+      "private": "Messaġġ privat",
+      "connection": "Konnessjoni"
+    },
+    "accept": "Aċċetta",
+    "decline": "Irrifjuta",
+    "join": "Ingħaqad",
+    "watch": "Ara",
+    "open": "Iftaħ",
+    "dismiss": "Neħħi",
+    "dismissItem": "Neħħi: {{title}}",
+    "failed": "Ma ħadimx. Erġa’ pprova."
+  }
 }
