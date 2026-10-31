@@ -944,6 +944,14 @@ pub fn settings_get(engine: State<'_, Engine>) -> ApiResult<Settings> {
     Ok(Settings::from_store(&engine.settings()?))
 }
 
+/// The values a fresh install starts with. Settings marks what differs from them as changed and
+/// "Reset section" goes back to them (#161).
+#[tauri::command]
+#[specta::specta]
+pub fn settings_default() -> Settings {
+    Settings::from_store(&store::Settings::default())
+}
+
 /// The one-time "window overlay is gone" notice is due for users who had it switched on.
 fn window_overlay_notice_due(settings: &store::Settings) -> bool {
     settings.legacy_window_overlay_enabled && !settings.window_overlay_notice_shown
@@ -1023,6 +1031,14 @@ pub async fn settings_update(
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn default_settings_match_a_fresh_store() {
+        let defaults = settings_default();
+        assert!(!defaults.wizard_completed);
+        assert_eq!(defaults.setup_preset, None);
+        assert!(defaults.link_previews);
+    }
 
     #[test]
     fn every_language_code_round_trips_through_the_store() {

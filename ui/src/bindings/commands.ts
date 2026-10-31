@@ -374,6 +374,11 @@ export const commands = {
 	settingsGet: () => typedError<Settings, ApiError>(__TAURI_INVOKE("settings_get")),
 	/**  Replaces the whole record and applies changes immediately; returns the stored record. */
 	settingsUpdate: (settings: Settings) => typedError<Settings, ApiError>(__TAURI_INVOKE("settings_update", { settings })),
+	/**
+	 *  The values a fresh install starts with. Settings marks what differs from them as changed and
+	 *  "Reset section" goes back to them (#161).
+	 */
+	settingsDefault: () => __TAURI_INVOKE<Settings>("settings_default"),
 	/**  Whether the one-time notice about the removed window overlay still has to be shown. */
 	windowOverlayNoticePending: () => typedError<boolean, ApiError>(__TAURI_INVOKE("window_overlay_notice_pending")),
 	/**  Marks the notice as shown so it never comes back. */

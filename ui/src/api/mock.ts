@@ -2664,6 +2664,7 @@ export function createMockApi(options: MockOptions = {}): MockApi {
 
     // settings
     settingsGet: () => Promise.resolve({ ...settings }),
+    settingsDefault: () => Promise.resolve({ ...DEFAULT_SETTINGS }),
     settingsUpdate: (next) => {
       const positionalSwitched = next.positional.enabled !== settings.positional.enabled;
       settings = { ...next };
