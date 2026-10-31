@@ -34,6 +34,19 @@ describe("mock engine", () => {
     expect(identity.name).toBe("Tobias");
   });
 
+  it("shows its fictional media data in the demo seeds", async () => {
+    const api = createMockApi({ seed: "demo" });
+    expect(await api.screenShareList(1)).toEqual([api.mediaDemo.share]);
+    expect(await api.watchPartyGet(1)).toBe(api.mediaDemo.party);
+    expect(await api.screenShareQuality(1)).toBe(api.mediaDemo.quality);
+    expect(await api.screenShareWatchStats(1, 7)).toEqual({ path: "direct", rms: 0.42 });
+    expect(await api.screenShareWatch(1, 7, undefined as never)).toBeNull();
+    expect(api.mediaDemo.picture).toMatch(/^data:image\/webp;base64,/);
+    const plain = createMockApi();
+    expect(plain.mediaDemo.picture).toBe("");
+    await expectCode(plain.screenShareWatch(1, 7, undefined as never), "notImplemented");
+  });
+
   it("connects through connecting → connected and sends a snapshot", async () => {
     const api = createMockApi();
     const states = record(api, "connectionStateChanged");
