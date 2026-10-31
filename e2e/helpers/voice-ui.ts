@@ -212,3 +212,26 @@ export async function talkingOnTimes(name: string): Promise<number[]> {
     name,
   );
 }
+
+/**
+ * The user panel's layout (#246): its height, and whether any of its rows is wider than the panel
+ * or taller than one line (a wrapped row). The panel must keep the same height in every state.
+ */
+export async function userPanelLayout(): Promise<{ height: number; overflows: boolean }> {
+  return browser.execute(() => {
+    const panel = document.querySelector<HTMLElement>(".userpanel");
+    if (!panel) throw new Error("user panel missing");
+    const rows = [
+      ...panel.querySelectorAll<HTMLElement>(
+        ".userpanel__identity, .userpanel-strip, .userpanel__row",
+      ),
+    ];
+    const overflows =
+      rows.length !== 3 ||
+      panel.scrollWidth > panel.clientWidth + 1 ||
+      rows.some(
+        (row) => row.scrollWidth > row.clientWidth + 1 || row.scrollHeight > row.clientHeight + 1,
+      );
+    return { height: panel.getBoundingClientRect().height, overflows };
+  });
+}

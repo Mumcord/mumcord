@@ -11,7 +11,8 @@ const quickSwitch = (label: string) =>
   $(`//div[@role='dialog' and @aria-label='Voice quality']//label[.='${label}']`);
 
 async function openQuickPanel(): Promise<void> {
-  await $("//button[@aria-label='Voice quality']").click();
+  // The quality chip in the user panel's strip opens the panel with a right-click (#246).
+  await $("//button[@aria-label='Connection info']").click({ button: "right" });
   await quickPanel().waitForDisplayed();
 }
 

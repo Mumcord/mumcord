@@ -31,6 +31,7 @@ import {
   reconnect,
   talkingOnTimes,
   watchTalking,
+  userPanelLayout,
 } from "../../helpers/voice-ui.ts";
 
 const dir = join(repoRoot, "e2e", "artifacts", "voice");
@@ -324,8 +325,12 @@ describe("voice (AC-1.7 – AC-1.12)", () => {
     const out = f("mute-out.wav");
     await app.restart({ audio: `file:${f("mute-in.wav")}:${out}` });
     await reconnect();
+    // #246: muting and deafening never change the user panel's height or wrap a row.
+    const idle = await userPanelLayout();
+    expect(idle.overflows).toBe(false);
     await $("button[aria-label='Mute microphone']").click();
     await main.do("expect user Tester --muted true");
+    expect(await userPanelLayout()).toEqual(idle);
     await main.do(`record ${f("mute-rec.wav")} --seconds 8`, 20_000);
     const muted = readWav(f("mute-rec.wav"));
     log(`mute: Bot sees muted; recorded max ${fmt(maxDb(muted))} dB while input speech plays`);
@@ -338,6 +343,7 @@ describe("voice (AC-1.7 – AC-1.12)", () => {
     await $("button[aria-label='Deafen']").click();
     await expect($("button[aria-label='Deafen']")).toHaveAttribute("aria-pressed", "true");
     await main.do("expect user Tester --deaf true");
+    expect(await userPanelLayout()).toEqual(idle);
     await sleep(1000);
     const deaf = await playAndCapture(main, out);
     log(`deafen: Bot sees deaf; app output during Bot speech max ${fmt(maxDb(deaf))} dB (${fmt(deaf.length / 48000)} s)`);
