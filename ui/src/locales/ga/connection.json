@@ -67,8 +67,7 @@
     "title": "Cáilíocht gutha",
     "status": "Ping {{latency}}, caillteanas {{loss}}",
     "lowLatency": "Mód moill íseal",
-    "lowLatencyHint": "Na paicéid agus maoláin is lú chun ceol a sheinm le chéile. Níos mó leithead banda, níos lú láidreachta.",
-    "lowLatencyComingSoon": "Ag teacht go luath",
+    "lowLatencyHint": "Chun ceol a sheinm le chéile i bhfíor-am. Oibríonn sé is fearr le brúigh-chun-cainte.",
     "voiceSettings": "Socruithe gutha…",
     "applies": "Feidhmíonn sé láithreach, sábháilte mar a bhíonn i Socruithe → Fuaim",
     "keys": "Esc dúnann · ↑↓ bogann · ← → coigeartaíonn",
@@ -81,8 +80,19 @@
     "beta": "Beta",
     "moreInfo": "Tuilleadh eolais: {{topic}}",
     "effectiveShort": "Á sheoladh anois",
-    "effectiveTip": "An ráta giotán atá á sheoladh anois, tar éis oiriúnú do chaillteanas paicéad."
+    "effectiveTip": "An ráta giotán atá á sheoladh anois, tar éis oiriúnú do chaillteanas paicéad.",
+    "musicIncluded": "San áireamh agus an mód moill íseal ar siúl: tá cosc torainn agus airde fuaime uathoibríoch múchta, agus úsáideann an t-ionchódóir a shuíomh ceoil le moill íseal.",
+    "warningBandwidth": "Úsáideann sé níos mó leithead banda: ≈ {{on}} kbit/s in ionad ≈ {{off}}.",
+    "warningWifi": "D'fhéadfadh sé stad is tosú ar Wi-Fi nó ar nasc gnóthach.",
+    "warningHeadphones": "Úsáid cluaisíní: tá cealú macalla múchta.",
+    "warningPtt": "Oibríonn brúigh-chun-cainte is fearr.",
+    "bandwidthLowLatencyWithin": "Cuireann paicéid 10 ms forchostais cheanntásca leis; laistigh den teorainn. Múch an mód chun ≈ {{value}} kbit/s a shábháil.",
+    "bandwidthLowLatencyOver": "Cuireann paicéid 10 ms forchostais cheanntásca leis; os cionn na teorann. Múch an mód chun ≈ {{value}} kbit/s a shábháil.",
+    "bandwidthLowLatencyNoLimit": "Cuireann paicéid 10 ms forchostais cheanntásca leis. Múch an mód chun ≈ {{value}} kbit/s a shábháil."
   },
+  "endToEnd": "Latency ó cheann go ceann",
+  "endToEndValue": "≈ {{value}} ms (meastachán)",
+  "lowLatencyMode": "Mód lag-latency",
   "identity": "Aitheantas",
   "identityValue": "{{label}} ({{name}}) · {{fingerprint}}"
 }

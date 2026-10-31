@@ -69,6 +69,7 @@ impl Backend for TestBackend {
         &self,
         _id: Option<&str>,
         counters: &Arc<Counters>,
+        _low_latency: bool,
     ) -> Result<Opened<Consumer<f32>>, IoError> {
         INPUT_OPENS.fetch_add(1, Ordering::Relaxed);
         // The WAV is streamed from the capture thread instead of being decoded here: a long
@@ -103,6 +104,7 @@ impl Backend for TestBackend {
         &self,
         _id: Option<&str>,
         counters: &Arc<Counters>,
+        _low_latency: bool,
     ) -> Result<Opened<Producer<f32>>, IoError> {
         let (mut writer, channels) = match self {
             TestBackend::Null => (None, 1),

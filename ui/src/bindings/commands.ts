@@ -70,6 +70,11 @@ export const commands = {
 	sessionSnapshot: (serverId: number) => typedError<ServerSnapshot | null, ApiError>(__TAURI_INVOKE("session_snapshot", { serverId })),
 	/**  Live link figures of the server, or `null` when it is not connected (AC-1.23). */
 	connectionStats: (serverId: number) => typedError<ConnectionStats | null, ApiError>(__TAURI_INVOKE("connection_stats", { serverId })),
+	/**
+	 *  Estimated mouth-to-ear latency for Settings → Audio (issue #156); `null` while no audio
+	 *  device runs. Includes the voice server's ping while connected.
+	 */
+	latencyEstimate: () => typedError<LatencyEstimate | null, ApiError>(__TAURI_INVOKE("latency_estimate")),
 	/**  Answers a `CertTrustRequired`; trusting is remembered for the server. */
 	certTrustDecide: (serverId: number, fingerprint: string, trust: boolean) => typedError<null, ApiError>(__TAURI_INVOKE("cert_trust_decide", { serverId, fingerprint, trust })),
 	/**  Unmuting while deafened also undeafens. */
@@ -860,6 +865,8 @@ export type ConnectionStats = {
 	packetsReceived: number,
 	/**  Health of the local audio path; `null` on a server without voice. */
 	audio: AudioHealth | null,
+	/**  Estimated mouth-to-ear latency; `null` on a server without voice. */
+	latency: LatencyEstimate | null,
 };
 
 /**  Answer to a question asked once (direct connections, update check, AppImage menu entry). */
@@ -1207,6 +1214,32 @@ export type KnownGame = {
 
 /**  UI languages: the 24 official EU languages (FR-1.36), serialised as ISO 639-1 codes. */
 export type Language = "bg" | "cs" | "da" | "de" | "el" | "en" | "es" | "et" | "fi" | "fr" | "ga" | "hr" | "hu" | "it" | "lt" | "lv" | "mt" | "nl" | "pl" | "pt" | "ro" | "sk" | "sl" | "sv";
+
+/**
+ *  Estimated mouth-to-ear latency and its parts (issue #156), in microseconds (integers, as
+ *  specta exports floats as nullable). Assumes the other side runs in the same mode.
+ */
+export type LatencyEstimate = {
+	lowLatency: boolean,
+	/**  Audio per packet: 10 ms in low-latency mode, 20 ms otherwise. */
+	packetMs: number,
+	/**  Microphone device buffer. */
+	inputBufferUs: number,
+	/**  One packet plus the encoder look-ahead. */
+	encodeUs: number,
+	/**  Half the ping to the server; `null` until measured (not connected, TCP tunnel). */
+	networkUs: number | null,
+	/**  Jitter-buffer target for a clean stream. */
+	jitterUs: number,
+	/**  Measured processing: DSP and encoding out, decoding and mixing in. */
+	processingUs: number,
+	/**  Output queue and speaker device buffer. */
+	outputBufferUs: number,
+	/**  Sum of the parts (without the network while it is unknown). */
+	totalUs: number,
+	/**  The same estimate for the other mode. */
+	otherModeTotalUs: number,
+};
 
 /**
  *  What Mumcord did with a `mumble://` link (FR-2.13). The UI brings the named server into
@@ -1762,6 +1795,12 @@ export type Settings = {
 	 *  510 kbit/s), music-tuned encoder, noise suppression and automatic volume bypassed.
 	 */
 	musicQuality: boolean,
+	/**
+	 *  "Low-latency mode" (default off; issue #156): 10 ms low-delay Opus packets, a minimal
+	 *  jitter buffer, small device buffers and echo cancellation, noise suppression and automatic
+	 *  volume bypassed, for playing music together. Applies live.
+	 */
+	lowLatency: boolean,
 	/**
 	 *  Own bitrate cap in kbit/s (FR-2.64); `null` is "Max". Range 16 to the maximum from
 	 *  `bitrate_max`.

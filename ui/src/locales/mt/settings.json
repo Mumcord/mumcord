@@ -124,7 +124,15 @@
     "ducking": "Baxxi l-ħoss tal-video waqt li xi ħadd ikun qed jitkellem",
     "duckingHint": "Il-ħoss tal-video tal-watch party u tal-qsim tal-iskrin jitbaxxa waqt li xi ħadd fil-kanal tal-vuċi tiegħek ikun qed jitkellem.",
     "duckingLevel": "Volum imbaxxi",
-    "duckingLevelValue": "{{percent}} %"
+    "duckingLevelValue": "{{percent}} %",
+    "lowLatency": "Modalità ta' latenza baxxa",
+    "lowLatencyBeta": "Beta",
+    "lowLatencyHint": "Biex tkun tista' ddoqq il-mużika flimkien f'ħin reali",
+    "lowLatencyWarningTitle": "Tbiddel is-saħħa bil-veloċità",
+    "lowLatencyBandwidth": "Juża aktar bandwidth (pakketti ta' 10 ms).",
+    "lowLatencyWifi": "Jista' jaqta' fuq il-Wi-Fi jew konnessjoni mżaħħma; uża kejbil jekk tista'.",
+    "lowLatencyHeadphones": "Uża headphones: it-tneħħija tal-eku mhijiex attiva (u lanqas it-tneħħija tal-istorbju u l-volum awtomatiku).",
+    "lowLatencyPtt": "Huwa rakkomandat push-to-talk jew limitu manwali għall-attivazzjoni bil-vuċi."
   },
   "voice": {
     "talkMode": "Mod tat-tkellim",

@@ -21,5 +21,20 @@
     "collapse": "Összecsukás",
     "expand": "Kibontás",
     "handle": "{{name}}: a nyilak mozgatnak, a Shift+nyilak átméreteznek"
+  },
+  "latency": {
+    "summary": "≈ {{total}} ms szájtól fülig (becslés)",
+    "otherNormal": "normál mód ≈ {{value}} ms",
+    "otherLow": "alacsony késleltetésű mód ≈ {{value}} ms",
+    "breakdown": "A késleltetés felbontása",
+    "input": "Mikrofonpuffer",
+    "encode": "{{ms}} ms-os Opus-keret + kódoló előretekintése",
+    "network": "Hálózat (a ping fele)",
+    "notConnected": "nincs kapcsolat",
+    "jitter": "Jitterpuffer",
+    "processing": "Feldolgozás",
+    "output": "Hangszórópuffer",
+    "value": "{{value}} ms",
+    "total": "≈ {{value}} ms"
   }
 }

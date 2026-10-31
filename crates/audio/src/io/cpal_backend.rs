@@ -7,7 +7,7 @@ use std::sync::atomic::{AtomicBool, Ordering};
 use cpal::traits::{DeviceTrait, HostTrait, StreamTrait};
 use cpal::{
     BufferSize, Device, DeviceId, ErrorKind, FromSample, SampleFormat, SizedSample, StreamConfig,
-    SupportedStreamConfig,
+    SupportedBufferSize, SupportedStreamConfig,
 };
 use rtrb::{Consumer, Producer};
 
@@ -17,7 +17,7 @@ use super::controller::{Backend, Opened, StreamGuard};
 use super::ring::{self, Counters};
 #[cfg(target_os = "linux")]
 use super::sound_server::{ID_PREFIX, SoundServer};
-use super::{DeviceInfo, Direction, IoError};
+use super::{DeviceInfo, Direction, IoError, LOW_LATENCY_BUFFER_FRAMES};
 use crate::SAMPLE_RATE;
 
 pub(crate) struct CpalBackend {
@@ -195,20 +195,57 @@ impl Backend for CpalBackend {
         &self,
         id: Option<&str>,
         counters: &Arc<Counters>,
+        low_latency: bool,
     ) -> Result<Opened<Consumer<f32>>, IoError> {
         let (device, info) = self.open_device(Direction::Input, id)?;
         let supported = pick_config(&device, Direction::Input)?;
-        let config = stream_config(&supported);
-        let (producer, consumer) = ring::ring(config.sample_rate);
+        let mut config = stream_config(&supported);
         let failed = Arc::new(AtomicBool::new(false));
-        let stream = build_input(
-            &device,
-            &supported,
-            config,
-            producer,
-            counters.clone(),
-            failed.clone(),
-        )?;
+        let small = low_latency
+            .then(|| low_latency_buffer(&supported))
+            .flatten();
+        let mut stream = None;
+        if let Some(frames) = small {
+            let (producer, consumer) = ring::ring(config.sample_rate);
+            let small_config = StreamConfig {
+                buffer_size: BufferSize::Fixed(frames),
+                ..config
+            };
+            match build_input(
+                &device,
+                &supported,
+                small_config,
+                producer,
+                counters.clone(),
+                failed.clone(),
+            ) {
+                Ok(built) => {
+                    config = small_config;
+                    stream = Some((built, consumer));
+                }
+                Err(e) => tracing::warn!(
+                    frames,
+                    "input device refused the low-latency buffer ({e}); using its default"
+                ),
+            }
+        } else if low_latency {
+            tracing::info!("input device reports no buffer range; using its default buffer");
+        }
+        let (stream, consumer) = match stream {
+            Some(opened) => opened,
+            None => {
+                let (producer, consumer) = ring::ring(config.sample_rate);
+                let built = build_input(
+                    &device,
+                    &supported,
+                    config,
+                    producer,
+                    counters.clone(),
+                    failed.clone(),
+                )?;
+                (built, consumer)
+            }
+        };
         stream.play().map_err(backend_err)?;
         Ok(Opened {
             guard: Box::new(CpalStream {
@@ -225,20 +262,57 @@ impl Backend for CpalBackend {
         &self,
         id: Option<&str>,
         counters: &Arc<Counters>,
+        low_latency: bool,
     ) -> Result<Opened<Producer<f32>>, IoError> {
         let (device, info) = self.open_device(Direction::Output, id)?;
         let supported = pick_config(&device, Direction::Output)?;
-        let config = stream_config(&supported);
-        let (producer, consumer) = ring::stereo_ring(config.sample_rate);
+        let mut config = stream_config(&supported);
         let failed = Arc::new(AtomicBool::new(false));
-        let stream = build_output(
-            &device,
-            &supported,
-            config,
-            consumer,
-            counters.clone(),
-            failed.clone(),
-        )?;
+        let small = low_latency
+            .then(|| low_latency_buffer(&supported))
+            .flatten();
+        let mut stream = None;
+        if let Some(frames) = small {
+            let (producer, consumer) = ring::stereo_ring(config.sample_rate);
+            let small_config = StreamConfig {
+                buffer_size: BufferSize::Fixed(frames),
+                ..config
+            };
+            match build_output(
+                &device,
+                &supported,
+                small_config,
+                consumer,
+                counters.clone(),
+                failed.clone(),
+            ) {
+                Ok(built) => {
+                    config = small_config;
+                    stream = Some((built, producer));
+                }
+                Err(e) => tracing::warn!(
+                    frames,
+                    "output device refused the low-latency buffer ({e}); using its default"
+                ),
+            }
+        } else if low_latency {
+            tracing::info!("output device reports no buffer range; using its default buffer");
+        }
+        let (stream, producer) = match stream {
+            Some(opened) => opened,
+            None => {
+                let (producer, consumer) = ring::stereo_ring(config.sample_rate);
+                let built = build_output(
+                    &device,
+                    &supported,
+                    config,
+                    consumer,
+                    counters.clone(),
+                    failed.clone(),
+                )?;
+                (built, producer)
+            }
+        };
         stream.play().map_err(backend_err)?;
         Ok(Opened {
             guard: Box::new(CpalStream {
@@ -291,6 +365,25 @@ fn pick_config(device: &Device, direction: Direction) -> Result<SupportedStreamC
         .filter_map(|r| r.try_with_sample_rate(SAMPLE_RATE))
         .min_by_key(|c| c.channels().abs_diff(default.channels()));
     Ok(at_48k.unwrap_or(default))
+}
+
+/// The low-latency buffer (issue #156) in device frames, or `None` when the device does not
+/// report a range: forcing a size it may not support could fail late or glitch, so such
+/// devices keep the host default. Hosts that map the period to their own graph (PipeWire via
+/// ALSA, CoreAudio's buffer frame size, WASAPI) take the request as a quantum hint.
+fn low_latency_buffer(supported: &SupportedStreamConfig) -> Option<u32> {
+    match *supported.buffer_size() {
+        SupportedBufferSize::Range { min, max } if min <= max => {
+            Some(low_latency_frames(supported.sample_rate(), min, max))
+        }
+        _ => None,
+    }
+}
+
+/// [`LOW_LATENCY_BUFFER_FRAMES`] at 48 kHz, scaled to `rate` and clamped to `min..=max`.
+fn low_latency_frames(rate: u32, min: u32, max: u32) -> u32 {
+    let wanted = u64::from(LOW_LATENCY_BUFFER_FRAMES) * u64::from(rate) / u64::from(SAMPLE_RATE);
+    u32::try_from(wanted).unwrap_or(u32::MAX).clamp(min, max)
 }
 
 fn stream_config(supported: &SupportedStreamConfig) -> StreamConfig {
@@ -453,5 +546,15 @@ mod tests {
 
         on_error(cpal::Error::new(ErrorKind::DeviceNotAvailable));
         assert!(failed.load(Ordering::Relaxed), "a lost device is reopened");
+    }
+
+    #[test]
+    fn low_latency_buffer_scales_and_clamps_to_the_device_range() {
+        assert_eq!(low_latency_frames(48_000, 16, 8192), 128);
+        assert_eq!(low_latency_frames(96_000, 16, 8192), 256);
+        assert_eq!(low_latency_frames(44_100, 16, 8192), 117);
+        // A device that cannot go that low gets its smallest buffer, never less.
+        assert_eq!(low_latency_frames(48_000, 256, 8192), 256);
+        assert_eq!(low_latency_frames(48_000, 16, 64), 64);
     }
 }

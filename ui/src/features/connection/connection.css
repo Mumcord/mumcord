@@ -188,3 +188,14 @@
 .connection-quick__effective strong {
   white-space: nowrap;
 }
+
+/* A switch another setting already covers (Music quality while low-latency mode is on). */
+.connection-quick .settings-switch:has(.settings-switch__input:disabled) .settings-switch__text {
+  opacity: 0.6;
+}
+
+.connection-quick__warning {
+  margin: var(--space-1) 0 0;
+  color: var(--color-warning);
+  font-weight: var(--font-weight-bold);
+}

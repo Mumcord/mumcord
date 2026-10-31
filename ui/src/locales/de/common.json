@@ -21,5 +21,20 @@
     "collapse": "Einklappen",
     "expand": "Ausklappen",
     "handle": "{{name}}: Pfeiltasten verschieben, Umschalt+Pfeiltasten ändern die Größe"
+  },
+  "latency": {
+    "summary": "≈ {{total}} ms vom Mund zum Ohr (Schätzung)",
+    "otherNormal": "Normalmodus ≈ {{value}} ms",
+    "otherLow": "Modus für niedrige Latenz ≈ {{value}} ms",
+    "breakdown": "Aufschlüsselung der Latenz",
+    "input": "Mikrofonpuffer",
+    "encode": "Opus-Frame {{ms}} ms + Encoder-Vorlauf",
+    "network": "Netzwerk (halbe Ping-Zeit)",
+    "notConnected": "nicht verbunden",
+    "jitter": "Jitter-Puffer",
+    "processing": "Verarbeitung",
+    "output": "Lautsprecherpuffer",
+    "value": "{{value}} ms",
+    "total": "≈ {{value}} ms"
   }
 }

@@ -21,5 +21,20 @@
     "collapse": "Sutraukti",
     "expand": "Išskleisti",
     "handle": "{{name}}: rodyklės perkelia, Shift+rodyklės keičia dydį"
+  },
+  "latency": {
+    "summary": "≈ {{total}} ms nuo burnos iki ausies (įvertis)",
+    "otherNormal": "įprastas režimas ≈ {{value}} ms",
+    "otherLow": "mažos delsos režimas ≈ {{value}} ms",
+    "breakdown": "Delsos išskaidymas",
+    "input": "Mikrofono buferis",
+    "encode": "„Opus“ kadras {{ms}} ms + kodavimo užuomina",
+    "network": "Tinklas (pusė ping)",
+    "notConnected": "neprisijungta",
+    "jitter": "Jitter buferis",
+    "processing": "Apdorojimas",
+    "output": "Garsiakalbio buferis",
+    "value": "{{value}} ms",
+    "total": "≈ {{value}} ms"
   }
 }

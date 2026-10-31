@@ -16,7 +16,7 @@ use std::time::{Duration, Instant};
 
 use bytes::Bytes;
 use mumcord_audio::codec::{
-    MAX_PACKET_BYTES, MAX_VOICE_PAYLOAD_BYTES, OpusEncoder, PacketDuration,
+    CodecError, MAX_PACKET_BYTES, MAX_VOICE_PAYLOAD_BYTES, OpusEncoder, PacketDuration,
 };
 use mumcord_audio::dsp::{DspChain, DspControls, EchoRefConsumer, Gate, MicTest, echo_reference};
 use mumcord_audio::io::{
@@ -154,6 +154,13 @@ impl Audio {
         let err = |e| EngineError::internal(format!("audio: {e}"));
         self.io.set_input_device(input).map_err(err)?;
         self.io.set_output_device(output).map_err(err)
+    }
+
+    /// Smallest safe device buffers in low-latency mode (issue #156); reopens the streams.
+    pub fn set_low_latency(&self, on: bool) {
+        if let Err(e) = self.io.set_low_latency(on) {
+            tracing::warn!(error = %e, "switching the device buffers failed");
+        }
     }
 
     /// Master volume of everything played, in percent (100 = unchanged).
@@ -380,6 +387,9 @@ pub(crate) struct VoicePipeline {
     /// Device counters when the pipeline started; the connection info shows what happened since.
     io_base: IoStats,
     health: HealthHistory,
+    /// Low-latency mode of the playback side, as last sent to the mixer thread.
+    low_latency: bool,
+    queue_target_ms: u32,
 }
 
 impl VoicePipeline {
@@ -414,13 +424,15 @@ impl VoicePipeline {
             }),
             ..PlaybackConfig::default()
         };
-        let (playback, ports) = match Playback::start(audio.sink.clone(), config) {
+        let (mut playback, ports) = match Playback::start(audio.sink.clone(), config) {
             Ok(started) => started,
             Err(e) => {
                 audio.source = Some(source);
                 return Err(EngineError::internal(format!("playback: {e}")));
             }
         };
+        // A fresh command queue has room; a refusal would only mean normal buffering.
+        let low_latency = controls.low_latency() && playback.set_low_latency(true);
 
         let stop = Arc::new(AtomicBool::new(false));
         let capture = {
@@ -437,7 +449,6 @@ impl VoicePipeline {
 
         // Notification sounds (B26) go through the mixer's mix-in port while this pipeline lives.
         let sounds = events.sounds().clone();
-        let mut playback = playback;
         let _ = playback.set_mix_in_gain(crate::sounds::SOUND_GAIN);
         let mut mix_in = ports.mix_in;
         sounds.attach(Box::new(move |samples| {
@@ -495,6 +506,8 @@ impl VoicePipeline {
                 shared: pipeline_shared,
                 io_base,
                 health: HealthHistory::new(Instant::now()),
+                low_latency,
+                queue_target_ms: PlaybackConfig::default().target_queue_ms,
             },
             ports.packets,
         ))
@@ -521,6 +534,26 @@ impl VoicePipeline {
     /// Device counters at the start of this pipeline.
     pub fn io_base(&self) -> IoStats {
         self.io_base
+    }
+
+    /// Switches the receive side to low-latency mode (issue #156) while it plays; the capture
+    /// thread follows the shared controls on its own.
+    pub fn set_low_latency(&mut self, on: bool) {
+        if on == self.low_latency {
+            return;
+        }
+        if self.playback.set_low_latency(on) {
+            self.low_latency = on;
+        } else {
+            tracing::warn!("playback command queue full; low-latency mode not applied");
+        }
+    }
+
+    /// Output queue target of the playback thread; only sends a command when it changes.
+    pub fn set_queue_target_ms(&mut self, ms: u32) {
+        if ms != self.queue_target_ms && self.playback.set_queue_target_ms(ms) {
+            self.queue_target_ms = ms;
+        }
     }
 
     /// Local volume (0–200 %) and mute of a person.
@@ -572,14 +605,13 @@ fn capture_loop(
 ) -> FrameSource {
     let mut bitrate = shared.bitrate_bps.load(Ordering::Relaxed);
     let mut loss = shared.loss_percent.load(Ordering::Relaxed);
-    let mut encoder = match OpusEncoder::new(bitrate as i32, PacketDuration::Ms20) {
-        Ok(encoder) => encoder,
+    let mut encoders = match SendEncoders::new(bitrate as i32) {
+        Ok(encoders) => encoders,
         Err(e) => {
             tracing::error!(error = %e, "creating the Opus encoder failed; not sending voice");
             return source;
         }
     };
-    let frames_per_packet = encoder.packet_duration().frames() as u8;
     let mut music = false;
     let mut chain = DspChain::new(controls.clone(), echo);
     let mut input: Frame = [0.0; FRAME_SAMPLES];
@@ -587,14 +619,10 @@ fn capture_loop(
     let silence: Frame = [0.0; FRAME_SAMPLES];
     let mut packet = [0u8; MAX_PACKET_BYTES];
     let mut sending = false;
-    let send = |len: usize, packet: &[u8], is_last: bool| {
+    let send = |len: usize, packet: &[u8], frames: u8, is_last: bool| {
         transport.send_audio(
-            OutgoingAudio::new(
-                Bytes::copy_from_slice(&packet[..len]),
-                frames_per_packet,
-                is_last,
-            )
-            .with_position(shared.positional.own_position()),
+            OutgoingAudio::new(Bytes::copy_from_slice(&packet[..len]), frames, is_last)
+                .with_position(shared.positional.own_position()),
         );
         shared.packets_sent.fetch_add(1, Ordering::Relaxed);
     };
@@ -610,10 +638,17 @@ fn capture_loop(
         let queued = source.queued_samples();
         let started = Instant::now();
         let target = shared.bitrate_bps.load(Ordering::Relaxed);
+        let target_loss = shared.loss_percent.load(Ordering::Relaxed);
+        // Switches only between packets, so no collected audio is lost.
+        if let Err(e) = encoders.switch(controls.low_latency(), target, target_loss, music) {
+            tracing::warn!(error = %e, "switching the encoder for low-latency mode failed");
+        }
+        let encoder = encoders.active();
         if target != bitrate && encoder.set_bitrate(target as i32).is_ok() {
             bitrate = target;
         }
-        let want_music = controls.music_quality();
+        // Low-latency mode is for music: it always uses the music tuning (issue #156).
+        let want_music = controls.music_quality() || controls.low_latency();
         if want_music != music {
             match encoder.set_music(want_music) {
                 Ok(()) => music = want_music,
@@ -624,7 +659,6 @@ fn capture_loop(
                 }
             }
         }
-        let target_loss = shared.loss_percent.load(Ordering::Relaxed);
         if target_loss != loss && encoder.set_packet_loss_percent(target_loss as i32).is_ok() {
             loss = target_loss;
         }
@@ -634,10 +668,12 @@ fn capture_loop(
         if capture_frame_late(queued, open || sending) {
             shared.capture_late_frames.fetch_add(1, Ordering::Relaxed);
         }
+        let frames = encoders.frames_per_packet();
+        let encoder = encoders.active();
         if open {
             sending = true;
             if let Ok(Some(len)) = encoder.push_frame(&output, &mut packet) {
-                send(len, &packet, false);
+                send(len, &packet, frames, false);
             }
         } else if sending {
             // End of transmission: pad with silence so the final packet carries the
@@ -648,7 +684,7 @@ fn capture_loop(
                 _ => encoder.flush(&mut packet).ok().flatten(),
             };
             if let Some(len) = last {
-                send(len, &packet, true);
+                send(len, &packet, frames, true);
             }
         }
         shared.capture_time.record(started.elapsed());
@@ -661,6 +697,63 @@ fn capture_loop(
         }
     }
     source
+}
+
+/// The send encoders of both modes (issue #156): 20 ms VoIP packets normally, 10 ms
+/// restricted-low-delay packets in low-latency mode. Both exist from the start because libopus
+/// cannot switch an encoder into the low-delay application, and creating one allocates, which
+/// the capture thread must not do.
+struct SendEncoders {
+    normal: OpusEncoder,
+    low_delay: OpusEncoder,
+    low_latency: bool,
+}
+
+impl SendEncoders {
+    fn new(bitrate_bps: i32) -> Result<Self, CodecError> {
+        Ok(Self {
+            normal: OpusEncoder::new(bitrate_bps, PacketDuration::Ms20)?,
+            low_delay: OpusEncoder::new_low_delay(bitrate_bps, PacketDuration::Ms10)?,
+            low_latency: false,
+        })
+    }
+
+    fn active(&mut self) -> &mut OpusEncoder {
+        if self.low_latency {
+            &mut self.low_delay
+        } else {
+            &mut self.normal
+        }
+    }
+
+    fn frames_per_packet(&self) -> u8 {
+        let encoder = if self.low_latency {
+            &self.low_delay
+        } else {
+            &self.normal
+        };
+        encoder.packet_duration().frames() as u8
+    }
+
+    /// Moves to the encoder of `low_latency` at a packet boundary and hands it the current
+    /// bitrate, loss hint and tuning. Does nothing while a packet is half collected.
+    fn switch(
+        &mut self,
+        low_latency: bool,
+        bitrate_bps: u32,
+        loss_percent: u32,
+        music: bool,
+    ) -> Result<(), CodecError> {
+        if low_latency == self.low_latency || self.active().has_pending() {
+            return Ok(());
+        }
+        self.low_latency = low_latency;
+        let encoder = self.active();
+        encoder.reset()?;
+        encoder.set_bitrate(bitrate_bps as i32)?;
+        encoder.set_packet_loss_percent(loss_percent as i32)?;
+        encoder.set_music(music)
+    }
 }
 
 /// Whether a capture frame read with `queued` samples behind it counts as late. A backlog only
@@ -724,6 +817,56 @@ pub(crate) fn start_mic_test(
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    /// Issue #156: the send encoder switches to 10 ms low-delay packets only between packets
+    /// and carries the bitrate over.
+    #[test]
+    fn send_encoders_switch_at_packet_boundaries() {
+        let mut encoders = SendEncoders::new(48_000).expect("encoders");
+        let frame: Frame = std::array::from_fn(|i| (i as f32 * 0.05).sin() * 0.3);
+        let mut packet = [0u8; MAX_PACKET_BYTES];
+        assert_eq!(encoders.frames_per_packet(), 2);
+        assert!(!encoders.active().is_low_delay());
+
+        // Half a 20 ms packet is collected: the switch waits.
+        assert_eq!(
+            encoders
+                .active()
+                .push_frame(&frame, &mut packet)
+                .expect("encode"),
+            None
+        );
+        encoders.switch(true, 96_000, 5, false).expect("switch");
+        assert_eq!(encoders.frames_per_packet(), 2);
+        assert!(
+            encoders
+                .active()
+                .push_frame(&frame, &mut packet)
+                .expect("encode")
+                .is_some()
+        );
+
+        encoders.switch(true, 96_000, 5, false).expect("switch");
+        assert_eq!(encoders.frames_per_packet(), 1);
+        let encoder = encoders.active();
+        assert!(encoder.is_low_delay());
+        assert_eq!(encoder.bitrate().expect("bitrate"), 96_000);
+        assert!(
+            encoder
+                .push_frame(&frame, &mut packet)
+                .expect("encode")
+                .is_some()
+        );
+
+        encoders
+            .switch(false, 64_000, 0, true)
+            .expect("switch back");
+        assert_eq!(encoders.frames_per_packet(), 2);
+        let encoder = encoders.active();
+        assert!(!encoder.is_low_delay());
+        assert!(encoder.is_music().expect("tuning"));
+        assert_eq!(encoder.bitrate().expect("bitrate"), 64_000);
+    }
 
     #[test]
     fn meter_scale() {

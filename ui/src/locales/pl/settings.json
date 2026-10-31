@@ -123,7 +123,15 @@
     "ducking": "Ściszaj dźwięk wideo, gdy ktoś mówi",
     "duckingHint": "Dźwięk filmu ze wspólnego oglądania i udostępniania ekranu cichnie, gdy ktoś na twoim kanale głosowym mówi.",
     "duckingLevel": "Obniżona głośność",
-    "duckingLevelValue": "{{percent}} %"
+    "duckingLevelValue": "{{percent}} %",
+    "lowLatency": "Tryb niskich opóźnień",
+    "lowLatencyBeta": "Beta",
+    "lowLatencyHint": "Do wspólnego grania muzyki w czasie rzeczywistym",
+    "lowLatencyWarningTitle": "Wymienia niezawodność na szybkość",
+    "lowLatencyBandwidth": "Zużywa więcej przepustowości (pakiety po 10 ms).",
+    "lowLatencyWifi": "Może trzeszczeć przy Wi-Fi lub obciążonym łączu; jeśli możesz, użyj kabla.",
+    "lowLatencyHeadphones": "Użyj słuchawek: usuwanie echa jest wyłączone (tłumienie szumów i automatyczna głośność również).",
+    "lowLatencyPtt": "Zalecane jest nadawanie po naciśnięciu lub ręczny próg aktywacji głosowej."
   },
   "voice": {
     "talkMode": "Tryb mówienia",

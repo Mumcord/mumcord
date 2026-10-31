@@ -64,8 +64,7 @@
     "title": "Stemmekvalitet",
     "status": "Ping {{latency}}, tab {{loss}}",
     "lowLatency": "Tilstand med lav latenstid",
-    "lowLatencyHint": "Mindste pakker og buffere til at spille musik sammen. Mere båndbredde, mindre robust.",
-    "lowLatencyComingSoon": "Kommer snart",
+    "lowLatencyHint": "Til at spille musik sammen i realtid. Fungerer bedst med push-to-talk.",
     "voiceSettings": "Stemmeindstillinger…",
     "applies": "Gælder med det samme, gemmes som i Indstillinger → Lyd",
     "keys": "Esc lukker · ↑↓ flytter · ← → justerer",
@@ -78,8 +77,19 @@
     "beta": "Beta",
     "moreInfo": "Mere information: {{topic}}",
     "effectiveShort": "Sender nu",
-    "effectiveTip": "Den bitrate, der sendes lige nu, efter tilpasning til pakketab."
+    "effectiveTip": "Den bitrate, der sendes lige nu, efter tilpasning til pakketab.",
+    "musicIncluded": "Inkluderet, mens tilstanden med lav latenstid er slået til: støjundertrykkelse og automatisk lydstyrke er slået fra, og encoderen kører i sin musikindstilling med lav forsinkelse.",
+    "warningBandwidth": "Bruger mere båndbredde: ≈ {{on}} kbit/s i stedet for ≈ {{off}}.",
+    "warningWifi": "Kan hakke på Wi-Fi eller en travl forbindelse.",
+    "warningHeadphones": "Brug hovedtelefoner: ekkokancellering er slået fra.",
+    "warningPtt": "Fungerer bedst med push-to-talk.",
+    "bandwidthLowLatencyWithin": "Pakker på 10 ms giver ekstra header-overhead; inden for grænsen. Slå tilstanden fra for at spare ≈ {{value}} kbit/s.",
+    "bandwidthLowLatencyOver": "Pakker på 10 ms giver ekstra header-overhead; over grænsen. Slå tilstanden fra for at spare ≈ {{value}} kbit/s.",
+    "bandwidthLowLatencyNoLimit": "Pakker på 10 ms giver ekstra header-overhead. Slå tilstanden fra for at spare ≈ {{value}} kbit/s."
   },
+  "endToEnd": "Samlet latenstid",
+  "endToEndValue": "≈ {{value}} ms (skøn)",
+  "lowLatencyMode": "Tilstand med lav latenstid",
   "identity": "Identitet",
   "identityValue": "{{label}} ({{name}}) · {{fingerprint}}"
 }

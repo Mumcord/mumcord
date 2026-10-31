@@ -21,5 +21,20 @@
     "collapse": "Collapse",
     "expand": "Expand",
     "handle": "{{name}}: arrow keys move, Shift+arrow keys resize"
+  },
+  "latency": {
+    "summary": "≈ {{total}} ms mouth to ear (estimate)",
+    "otherNormal": "normal mode ≈ {{value}} ms",
+    "otherLow": "low-latency mode ≈ {{value}} ms",
+    "breakdown": "Latency breakdown",
+    "input": "Microphone buffer",
+    "encode": "Opus frame {{ms}} ms + encoder look-ahead",
+    "network": "Network (half of the ping)",
+    "notConnected": "not connected",
+    "jitter": "Jitter buffer",
+    "processing": "Processing",
+    "output": "Speaker buffer",
+    "value": "{{value}} ms",
+    "total": "≈ {{value}} ms"
   }
 }
