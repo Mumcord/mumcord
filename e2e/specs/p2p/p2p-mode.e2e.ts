@@ -62,11 +62,16 @@ async function checkedMode(): Promise<string> {
   return (await p2pOptions()).find((o) => o.checked)?.value ?? "";
 }
 
-/** Tabs into the P2P radio group and moves to `value` with the arrow keys only. */
+/**
+ * Tabs into the P2P radio group and moves to `value` with the arrow keys only, in its direction:
+ * WebKit does not wrap from the last option to the first.
+ */
 async function chooseP2pByKeyboard(value: string): Promise<void> {
   const inGroup = () => browser.execute(() => Boolean(document.activeElement?.closest("fieldset.p2p-modes")));
-  await tabTo(async (f) => f.tag === "input" && f.type === "radio" && (await inGroup()), "peer-to-peer radio group");
-  await pressUntil("ArrowDown", (f) => f.value === value, `peer-to-peer option ${value}`, 10);
+  const start = await tabTo(async (f) => f.tag === "input" && f.type === "radio" && (await inGroup()), "peer-to-peer radio group");
+  const values = (await p2pOptions()).map((o) => o.value);
+  const key = values.indexOf(value) < values.indexOf(start.value) ? "ArrowUp" : "ArrowDown";
+  await pressUntil(key, (f) => f.value === value, `peer-to-peer option ${value}`, 10);
   expect((await focus()).checked).toBe(true);
 }
 
@@ -100,6 +105,18 @@ async function connect(label: string): Promise<void> {
   await serverButton(label).click();
   await trustIfAsked();
   await waitServerStatus(label, "connected");
+  await joinVoice();
+}
+
+/**
+ * Servers connect read-only; sharing needs the voice server, so join the shown server's channel
+ * when its read-only notice offers it.
+ */
+async function joinVoice(): Promise<void> {
+  const join = $(".userpanel-readonly__join");
+  if (!(await join.isDisplayed())) return;
+  await join.click();
+  await $(".userpanel-readonly").waitForExist({ reverse: true, timeout: 15_000 });
 }
 
 /**
@@ -254,13 +271,15 @@ describe("spec 04 peer-to-peer mode without a relay (AC-4.1, 4.8–4.10, 4.23, 4
   });
 
   it("AC-4.10: the override wins on its server; the other server follows the global Direct only", async () => {
+    // Still connected and the voice server: its label then reads "Alpha (connected), voice server".
     await serverButton(ALPHA).click();
-    await waitServerStatus(ALPHA, "connected");
+    await joinVoice();
     await shareReason("This server has no relay.");
     await connect(BRAVO);
     await shareReason(null);
     // Back on the overridden server, still the relay rule.
     await serverButton(ALPHA).click();
+    await joinVoice();
     await shareReason("This server has no relay.");
   });
 
