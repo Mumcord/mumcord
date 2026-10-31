@@ -5,6 +5,7 @@ import { TooltipLayer } from "../components/Tooltip";
 import { PersonMenuHost, ProfilePreviewHost } from "../features/members";
 import { NotificationsHost } from "../features/notifications";
 import { ChatRequestDialogHost } from "../features/requests";
+import { TraySync } from "../features/tray";
 import { AppShell } from "./AppShell";
 import {
   ChannelsMount,
@@ -63,6 +64,7 @@ function MainScreen() {
       {overlay === null && <PersonMenuHost />}
       {overlay === null && <ChatRequestDialogHost />}
       <NotificationsHost overlayOpen={overlay !== null} onOpenChat={closeOverlay} />
+      <TraySync onOpenSettings={openSettings} />
       {devTools && <InspectorViewShare />}
       <WindowLookShare />
     </>

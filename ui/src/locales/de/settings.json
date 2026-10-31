@@ -671,6 +671,18 @@
     "entries": "Einträge: {{count}}",
     "englishNote": "Die Änderungsliste ist auf Englisch."
   },
+  "dnd": {
+    "title": "Nicht stören",
+    "label": "Nicht stören",
+    "description": "Keine Benachrichtigungstöne oder -banner auf allen Servern. Sprache und Chat funktionieren weiter, Ungelesen-Zähler zählen weiter.",
+    "follow": "„Nicht stören“ des Systems folgen",
+    "followDescription": "Schaltet „Nicht stören“ ein, sobald „Nicht stören“ oder der Fokus-Modus deines Desktops an ist.",
+    "detected": "Erkannt",
+    "detectedOn": "{{desktop}} · „Nicht stören“ ist an (System). Änderungen werden live übernommen.",
+    "detectedOff": "{{desktop}} · „Nicht stören“ ist aus. Änderungen werden live übernommen.",
+    "unavailable": "Nicht verfügbar",
+    "unavailableText": "Mumcord kann den „Nicht stören“-Status deines Systems hier nicht lesen. Nur der eigene Schalter wirkt."
+  },
   "privateMessages": {
     "title": "Private Nachrichten",
     "legend": "Private Nachrichten von",

@@ -25,6 +25,7 @@
 //! A plain disconnect or a server shutdown removes nobody and stays silent.
 
 use std::collections::{BTreeSet, HashMap};
+use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::{Arc, Mutex, PoisonError};
 use std::time::{Duration, Instant};
 
@@ -151,6 +152,24 @@ impl Sound {
     /// Samples with the mix-in gain applied.
     fn mixed(self) -> Vec<f32> {
         self.samples().into_iter().map(|s| s * SOUND_GAIN).collect()
+    }
+
+    /// A notification about messages or activity, which Do Not Disturb silences (FR-3.111).
+    /// Voice presence (people joining or leaving) and feedback for the user's own actions
+    /// keep playing: voice keeps working during Do Not Disturb.
+    fn notification(self) -> bool {
+        matches!(
+            self,
+            Self::Message
+                | Self::Mention
+                | Self::PartyStarted
+                | Self::PartyJoined
+                | Self::PartyLeft
+                | Self::ShareStarted
+                | Self::ShareStopped
+                | Self::ViewerStarted
+                | Self::ViewerStopped
+        )
     }
 
     /// Feedback for the user's own action, so it plays even while deafened.
@@ -414,6 +433,8 @@ struct State {
 pub struct SoundHub {
     settings: Box<dyn Fn() -> SoundSettings + Send + Sync>,
     state: Mutex<State>,
+    /// Do Not Disturb is in effect (manual switch or the followed system state).
+    do_not_disturb: AtomicBool,
 }
 
 impl SoundHub {
@@ -428,6 +449,7 @@ impl SoundHub {
                 awaiting_move: None,
                 last_burst: None,
             }),
+            do_not_disturb: AtomicBool::new(false),
         })
     }
 
@@ -448,6 +470,15 @@ impl SoundHub {
 
     fn state(&self) -> std::sync::MutexGuard<'_, State> {
         self.state.lock().unwrap_or_else(PoisonError::into_inner)
+    }
+
+    /// Do Not Disturb turned on or off: notification sounds stay silent while it is on.
+    pub fn set_do_not_disturb(&self, on: bool) {
+        self.do_not_disturb.store(on, Ordering::Relaxed);
+    }
+
+    fn silenced(&self, sound: Sound) -> bool {
+        sound.notification() && self.do_not_disturb.load(Ordering::Relaxed)
     }
 
     /// Audio is open: sounds go to `out` from now on.
@@ -559,7 +590,7 @@ impl SoundHub {
     /// Whether a rate-limited `sound` is not too close to the last one. A sound that would
     /// stay silent anyway does not use up the gap.
     fn burst_allowed(&self, state: &mut State, sound: Sound) -> bool {
-        if !sound.enabled(&(self.settings)()) || state.tracker.own_deaf() {
+        if !sound.enabled(&(self.settings)()) || state.tracker.own_deaf() || self.silenced(sound) {
             return true;
         }
         let now = Instant::now();
@@ -577,7 +608,7 @@ impl SoundHub {
         if was_deaf && !sound.own_action() {
             return;
         }
-        if !sound.enabled(&(self.settings)()) {
+        if !sound.enabled(&(self.settings)()) || self.silenced(sound) {
             return;
         }
         if let Some(out) = state.out.as_mut()
@@ -812,6 +843,24 @@ mod tests {
         assert_eq!(log.lock().unwrap().len(), 2, "undeafen plays");
         hub.play(Sound::Message);
         assert_eq!(log.lock().unwrap().len(), 3);
+    }
+
+    #[test]
+    fn do_not_disturb_silences_notifications_but_not_voice_or_own_actions() {
+        let (hub, log) = hub_with_log(SoundSettings::default());
+        hub.set_do_not_disturb(true);
+        for sound in ALL {
+            log.lock().unwrap().clear();
+            hub.play(sound);
+            let played = !log.lock().unwrap().is_empty();
+            assert_eq!(played, !sound.notification(), "{sound:?}");
+        }
+        assert!(!Sound::UserJoined.notification() && !Sound::Mute.notification());
+        assert!(Sound::Mention.notification() && Sound::ShareStarted.notification());
+        log.lock().unwrap().clear();
+        hub.set_do_not_disturb(false);
+        hub.play(Sound::Mention);
+        assert_eq!(log.lock().unwrap().len(), 1, "plays again once it is off");
     }
 
     #[test]

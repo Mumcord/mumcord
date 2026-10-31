@@ -1,11 +1,23 @@
 {
-  "show": "Afficher Mumcord",
+  "show": "Ouvrir Mumcord",
+  "settings": "Paramètres…",
   "mute": "Couper le micro",
   "deafen": "Couper le son",
+  "dnd": "Ne pas déranger",
+  "dndSystem": "Ne pas déranger (système)",
   "quit": "Quitter",
   "disconnected": "Non connecté",
   "connecting": "Connexion…",
+  "reconnecting": "Reconnexion…",
   "connected": "Connecté",
+  "connectedIn": "Connecté · {channel}",
+  "serverState": "{server} – {state}",
   "talking": "Connecté – parle",
-  "muted": "Connecté – micro coupé"
+  "muted": "Connecté – micro coupé",
+  "voiceMenu": "Serveur vocal et salon",
+  "voiceServer": "Serveur vocal",
+  "channelsOf": "Salons · {server}",
+  "moreChannels": "Plus de salons dans Mumcord…",
+  "recentChats": "Discussions récentes",
+  "chatUnread": "{name} – {count} non lus"
 }

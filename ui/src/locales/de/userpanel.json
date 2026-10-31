@@ -94,6 +94,9 @@
     "offerImagesHint": "Andere dürfen deine Originalbilder laden",
     "loadImages": "Originalbilder laden",
     "loadImagesHint": "Originalbilder von anderen abrufen",
+    "dnd": "Nicht stören",
+    "dndHint": "Stellt Benachrichtigungstöne und -banner stumm",
+    "dndSystemHint": "An über „Nicht stören“ deines Desktops",
     "privateMessages": "Private Nachrichten von",
     "pm_everyone": "Alle",
     "pm_friendsOnly": "Freunde",
@@ -133,5 +136,11 @@
     "fallbackOutput": "Ausgabegerät getrennt. Der Systemstandard wird verwendet.",
     "volume": "Lautstärke",
     "level": "Pegel"
+  },
+  "dnd": {
+    "label": "Nicht stören",
+    "manual": "manuell",
+    "system": "Nicht stören (System)",
+    "systemHint": "Schalte es in den Benachrichtigungseinstellungen deines Desktops aus."
   }
 }

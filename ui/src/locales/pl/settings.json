@@ -677,6 +677,18 @@
     "entries": "Wpisy: {{count}}",
     "englishNote": "Lista zmian jest napisana po angielsku."
   },
+  "dnd": {
+    "title": "Nie przeszkadzać",
+    "label": "Nie przeszkadzać",
+    "description": "Bez dźwięków i banerów powiadomień na żadnym serwerze. Głos i czat działają dalej, a liczniki nieprzeczytanych liczą dalej.",
+    "follow": "Podążaj za systemowym trybem Nie przeszkadzać",
+    "followDescription": "Włącza Nie przeszkadzać, gdy na pulpicie włączony jest tryb Nie przeszkadzać lub tryb skupienia.",
+    "detected": "Wykryto",
+    "detectedOn": "{{desktop}} · Nie przeszkadzać jest włączone (system). Zmiany są uwzględniane na bieżąco.",
+    "detectedOff": "{{desktop}} · Nie przeszkadzać jest wyłączone. Zmiany są uwzględniane na bieżąco.",
+    "unavailable": "Niedostępne",
+    "unavailableText": "Mumcord nie może tu odczytać stanu trybu Nie przeszkadzać systemu. Działa tylko jego własny przełącznik."
+  },
   "privateMessages": {
     "title": "Wiadomości prywatne",
     "legend": "Wiadomości prywatne od",

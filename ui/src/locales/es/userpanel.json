@@ -94,6 +94,9 @@
     "offerImagesHint": "Otros pueden cargar tus imágenes originales",
     "loadImages": "Cargar imágenes originales",
     "loadImagesHint": "Obtener las imágenes originales de otros",
+    "dnd": "No molestar",
+    "dndHint": "Silencia los sonidos y avisos de notificación",
+    "dndSystemHint": "Activado por el modo No molestar de tu escritorio",
     "privateMessages": "Mensajes privados de",
     "pm_everyone": "Todos",
     "pm_friendsOnly": "Amigos",
@@ -133,5 +136,11 @@
     "fallbackOutput": "Dispositivo de salida desconectado. Se usa el predeterminado del sistema.",
     "volume": "Volumen",
     "level": "Nivel"
+  },
+  "dnd": {
+    "label": "No molestar",
+    "manual": "manual",
+    "system": "No molestar (sistema)",
+    "systemHint": "Desactívalo en los ajustes de notificaciones de tu escritorio."
   }
 }
