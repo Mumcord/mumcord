@@ -267,6 +267,7 @@ mod tests {
         assert_eq!(
             features,
             [
+                "chat-request",
                 "full-image",
                 "now-gaming",
                 "now-playing",
