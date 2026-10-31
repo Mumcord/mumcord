@@ -12,6 +12,7 @@ import type { LinkPreview, VideoEmbed } from "../../api";
 import { dismissPreview, useDismissedPreviews } from "./dismissedPreviews";
 import {
   externalImages,
+  isAudioLink,
   isImageLink,
   cardPlayer,
   loadPreview,
@@ -96,6 +97,15 @@ export function LinkPreviews({
             messageId={messageId}
             tabIndex={tabIndex}
             onImageClick={onImageClick}
+          />
+        ) : isAudioLink(url) ? (
+          <AudioCard
+            key={url}
+            url={url}
+            tabIndex={tabIndex}
+            onDismiss={() => {
+              dismissPreview(messageId, url);
+            }}
           />
         ) : (
           <LinkPreviewCard

@@ -31,6 +31,7 @@ use serde::de::DeserializeOwned;
 use serde::{Deserialize, Serialize};
 use sha1::{Digest, Sha1};
 
+pub use audio::{AudioFile, AudioFormat, AudioInfo};
 pub use embed::VideoProvider;
 use fetch::{AddressPolicy, FetchError, FetchedImage, Fetcher, Timeouts};
 pub use inline::InlineImage;
@@ -84,6 +85,10 @@ pub struct LinkPreview {
     /// instead of a card.
     #[serde(default)]
     pub image_link: bool,
+    /// The link itself serves an audio file: show the audio player
+    /// ([`LinkPreviews::audio_info`]) instead of a card.
+    #[serde(default)]
+    pub audio_link: bool,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
@@ -234,6 +239,38 @@ impl LinkPreviews {
         let image = result.ok();
         self.images.put(&key, image.clone());
         image
+    }
+
+    /// Format and size of the audio file at `url` for the player card (issue #260), without
+    /// downloading it; `None` when it is not a playable audio file (not http(s), blocked
+    /// address, too large, unsupported format).
+    pub async fn audio_info(&self, url: &str) -> Option<AudioInfo> {
+        let mut url = Url::parse(url.trim()).ok()?;
+        url.set_fragment(None);
+        let result = match self.fetcher() {
+            Ok(fetcher) => audio::probe(fetcher, &url).await,
+            Err(e) => Err(e),
+        };
+        if let Err(e) = &result {
+            // Never the URL: links are chat content.
+            tracing::debug!(error = %e, "no audio info");
+        }
+        result.ok()
+    }
+
+    /// The audio file at `url`, fetched after the user clicked play (issue #260); `None` when
+    /// it cannot be played.
+    pub async fn audio_file(&self, url: &str) -> Option<AudioFile> {
+        let mut url = Url::parse(url.trim()).ok()?;
+        url.set_fragment(None);
+        let result = match self.fetcher() {
+            Ok(fetcher) => audio::fetch(fetcher, &url).await,
+            Err(e) => Err(e),
+        };
+        if let Err(e) = &result {
+            tracing::debug!(error = %e, "no audio file");
+        }
+        result.ok()
     }
 
     /// Tries smaller renditions of known GIF hosts first (Giphy's downsized GIF of a 10 MB

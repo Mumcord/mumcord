@@ -5,6 +5,7 @@
  */
 import {
   getApi,
+  type AudioInfo,
   type InlineImage,
   type LinkPreview,
   type MumbleLinkStats,
@@ -69,6 +70,15 @@ export function externalImages(html: string): string[] {
   return images;
 }
 
+/** Direct audio links: the path ends in an audio file extension (issue #260). */
+export function isAudioLink(url: string): boolean {
+  try {
+    return /\.(?:mp3|ogg|oga|opus|m4a|aac|wav|flac|weba|webm)$/i.test(new URL(url).pathname);
+  } catch {
+    return false;
+  }
+}
+
 /** File name of the image link for labels, or its host when the path has none. */
 export function imageName(url: string): string {
   try {
@@ -120,6 +130,7 @@ function memoized<T>(
 
 const previews = new Map<string, Promise<LinkPreview | null>>();
 const images = new Map<string, Promise<InlineImage | null>>();
+const audio = new Map<string, Promise<AudioInfo | null>>();
 
 /** Only images the engine produced; anything else would make the webview load from the web. */
 export function safeImage(src: string | null): string | null {
@@ -136,6 +147,26 @@ export function loadInlineImage(url: string): Promise<InlineImage | null> {
   return memoized(images, url, "an inline image", () => getApi().inlineImage(url));
 }
 
+/**
+ * Format and size of a direct audio link, asked once per app run; `refresh` asks again (the
+ * card's Try again). The file itself is only fetched on play ({@link loadAudioFile}).
+ */
+export function loadAudioInfo(url: string, refresh = false): Promise<AudioInfo | null> {
+  if (refresh) audio.delete(url);
+  return memoized(audio, url, "audio file details", () => getApi().audioInfo(url));
+}
+
+/** The audio file as a `data:` URL, fetched by the engine; not kept, it can be large. */
+export async function loadAudioFile(url: string): Promise<string | null> {
+  try {
+    const dataUrl = await getApi().audioFile(url);
+    return dataUrl !== null && /^data:audio\/[a-z0-9.+-]+;base64,/.test(dataUrl) ? dataUrl : null;
+  } catch (error: unknown) {
+    console.error("Loading an audio file failed", error);
+    return null;
+  }
+}
+
 const cards = new Map<string, Promise<MumbleLinkStats | null>>();
 
 /** The figures the engine's query answers for one link, asked once per link (issue #175). */
@@ -150,6 +181,7 @@ export function loadMumbleStats(url: string, refresh = false): Promise<MumbleLin
 export function clearPreviews(): void {
   previews.clear();
   images.clear();
+  audio.clear();
   cards.clear();
 }
 

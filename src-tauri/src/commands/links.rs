@@ -235,6 +235,40 @@ pub async fn inline_image(
     }))
 }
 
+/// Format and size of a direct audio link (issue #260), read from the start of the file;
+/// `null` when previews are switched off in the settings (then nothing is fetched) or the link
+/// is not a playable audio file (blocked address, too large, unsupported format).
+#[tauri::command]
+#[specta::specta]
+pub async fn audio_info(engine: State<'_, Engine>, url: String) -> ApiResult<Option<AudioInfo>> {
+    Ok(engine.audio_info(&url).await.map(|i| AudioInfo {
+        url: i.url,
+        format: i.format.into(),
+        size: i.size.map(|n| u32::try_from(n).unwrap_or(u32::MAX)),
+    }))
+}
+
+/// The audio file of a direct audio link as a `data:` URL of its sniffed type, fetched by the
+/// engine after the user clicked play (issue #260); `null` when previews are switched off or
+/// the file cannot be played.
+#[tauri::command]
+#[specta::specta]
+pub async fn audio_file(engine: State<'_, Engine>, url: String) -> ApiResult<Option<String>> {
+    Ok(engine.audio_file(&url).await.map(|f| f.data_url()))
+}
+
+/// Saves the audio file of a direct audio link to `path`, which the user picked in a save
+/// dialog (issue #260). The engine fetches it again with the same checks as for playing.
+#[tauri::command]
+#[specta::specta]
+pub async fn audio_save(engine: State<'_, Engine>, url: String, path: String) -> ApiResult<()> {
+    let file = engine
+        .audio_file(&url)
+        .await
+        .ok_or_else(|| ApiError::new(ErrorCode::InvalidInput, "not a playable audio file"))?;
+    std::fs::write(&path, file.bytes).map_err(|err| ApiError::new(ErrorCode::Io, err.to_string()))
+}
+
 /// Hides the preview card of `url` under a message for good (QA.42). Messages that were not
 /// stored (history saving off) keep nothing; the UI hides the card for the session.
 #[tauri::command]

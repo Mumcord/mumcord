@@ -2302,6 +2302,12 @@ export function createMockApi(options: MockOptions = {}): MockApi {
       Promise.resolve(settings.linkPreviews ? mockLinkPreview(url, demo) : null),
     inlineImage: (url) =>
       Promise.resolve(settings.linkPreviews ? mockInlineImage(url, demo) : null),
+    audioInfo: (url) => Promise.resolve(settings.linkPreviews ? mockAudioInfo(url) : null),
+    audioFile: (url) =>
+      Promise.resolve(
+        settings.linkPreviews && mockAudioInfo(url) !== null ? mockAudioFile() : null,
+      ),
+    audioSave: () => Promise.resolve(null),
     previewDismiss: (messageId, url) => {
       for (const conversations of history.values()) {
         for (const messages of conversations.values()) {
