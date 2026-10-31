@@ -8,7 +8,7 @@ use tokio::sync::oneshot;
 use super::media::{Media, ViewerLink};
 use super::signal::MAX_VIEWERS;
 use super::watch::WatchLink;
-use super::{ScreenShareView, WatchBlock};
+use super::{ScreenShareView, ShareKind, WatchBlock};
 
 /// When a newcomer gets the own share a second time. The server silently drops plugin data over
 /// its rate limit, and a join sets off a burst from everyone in the channel, so the first may be
@@ -37,6 +37,10 @@ pub(crate) struct OwnShare {
     pub sound_available: bool,
     /// Accepted viewers, with their stream once they opened it.
     pub viewers: BTreeMap<u32, Option<ViewerLink>>,
+    /// What the user picked in the system picker (issue #163).
+    pub kind: Option<ShareKind>,
+    /// When the share started, for the "since" line (issue #163).
+    pub started_at: Instant,
     /// Capture and encoding; `None` only in tests of the bookkeeping.
     pub media: Option<Media>,
     /// Newcomers to the channel that get the share once more, and when.
@@ -50,6 +54,8 @@ impl OwnShare {
             sound: sound && sound_available,
             sound_available,
             viewers: BTreeMap::new(),
+            kind: None,
+            started_at: Instant::now(),
             media: None,
             reannounce: BTreeMap::new(),
         }
@@ -89,6 +95,24 @@ impl OwnShare {
     pub fn viewer_list(&self) -> Vec<u32> {
         self.viewers.keys().copied().collect()
     }
+
+    /// How long the share has been running (issue #163).
+    pub fn elapsed_ms(&self) -> u32 {
+        Instant::now()
+            .saturating_duration_since(self.started_at)
+            .as_millis()
+            .try_into()
+            .unwrap_or(u32::MAX)
+    }
+}
+
+/// What a sharer says about its own share (issue #163: also what it picked and since when).
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub(crate) struct Announced {
+    pub paused: bool,
+    pub sound: bool,
+    pub kind: Option<ShareKind>,
+    pub elapsed_ms: u32,
 }
 
 /// Someone else's share as they announced it.
@@ -97,6 +121,11 @@ pub(crate) struct OtherShare {
     pub paused: bool,
     pub sound: bool,
     pub viewers: Vec<u32>,
+    pub kind: Option<ShareKind>,
+    /// What they said about their own elapsed time, and when that arrived: the UI adds the time
+    /// since, so no clock of another machine is trusted.
+    pub elapsed_ms: u32,
+    pub seen_at: Instant,
 }
 
 /// The user watching someone's share.
@@ -136,21 +165,29 @@ impl Shares {
     }
 
     /// `sharer` announced a live share; true when it is new or changed.
-    pub fn share_live(&mut self, sharer: u32, paused: bool, sound: bool) -> bool {
+    pub fn share_live(&mut self, sharer: u32, announced: &Announced, now: Instant) -> bool {
         match self.others.get_mut(&sharer) {
-            Some(share) if share.paused == paused && share.sound == sound => false,
+            Some(share) if share.paused == announced.paused && share.sound == announced.sound => {
+                false
+            }
             Some(share) => {
-                share.paused = paused;
-                share.sound = sound;
+                share.paused = announced.paused;
+                share.sound = announced.sound;
+                share.kind = announced.kind;
+                share.elapsed_ms = announced.elapsed_ms;
+                share.seen_at = now;
                 true
             }
             None => {
                 self.others.insert(
                     sharer,
                     OtherShare {
-                        paused,
-                        sound,
+                        paused: announced.paused,
+                        sound: announced.sound,
                         viewers: Vec::new(),
+                        kind: announced.kind,
+                        elapsed_ms: announced.elapsed_ms,
+                        seen_at: now,
                     },
                 );
                 true
@@ -248,6 +285,7 @@ impl Shares {
     /// Every share in the channel, the user's own first. `blocked` only carries the remembered
     /// failures; the caller adds what it knows up front.
     pub fn views(&self, own: u32) -> Vec<ScreenShareView> {
+        let now = Instant::now();
         let own_view = self.own.as_ref().map(|share| ScreenShareView {
             session: own,
             paused: share.paused,
@@ -255,6 +293,8 @@ impl Shares {
             sound_available: share.sound_available,
             viewers: share.viewer_list(),
             blocked: None,
+            kind: share.kind,
+            elapsed_ms: elapsed(share.started_at, now),
         });
         let others = self.others.iter().map(|(session, share)| ScreenShareView {
             session: *session,
@@ -263,9 +303,20 @@ impl Shares {
             sound_available: false,
             viewers: share.viewers.clone(),
             blocked: self.failed.get(session).copied(),
+            kind: share.kind,
+            // Their own elapsed time at the moment they signalled, plus the time since.
+            elapsed_ms: share.elapsed_ms + elapsed(share.seen_at, now),
         });
         own_view.into_iter().chain(others).collect()
     }
+}
+
+/// Milliseconds from `then` to `now`.
+fn elapsed(then: Instant, now: Instant) -> u32 {
+    now.saturating_duration_since(then)
+        .as_millis()
+        .try_into()
+        .unwrap_or(u32::MAX)
 }
 
 #[cfg(test)]
@@ -299,12 +350,22 @@ mod tests {
         assert_eq!(own.admit(100), Admit::New, "a free place is taken again");
     }
 
+    fn announced(paused: bool, sound: bool) -> Announced {
+        Announced {
+            paused,
+            sound,
+            kind: Some(ShareKind::Window),
+            elapsed_ms: 1000,
+        }
+    }
+
     #[test]
     fn share_updates_report_changes_only() {
         let mut shares = Shares::default();
-        assert!(shares.share_live(5, false, true));
-        assert!(!shares.share_live(5, false, true));
-        assert!(shares.share_live(5, true, true));
+        let now = Instant::now();
+        assert!(shares.share_live(5, &announced(false, true), now));
+        assert!(!shares.share_live(5, &announced(false, true), now));
+        assert!(shares.share_live(5, &announced(true, true), now));
         assert!(shares.set_viewers(5, vec![1, 2]));
         assert!(!shares.set_viewers(5, vec![1, 2]));
         assert!(!shares.set_viewers(6, vec![1]), "no share, no viewers");
@@ -365,7 +426,7 @@ mod tests {
         let mut own = OwnShare::new(true, true);
         own.admit(7);
         shares.own = Some(own);
-        shares.share_live(5, false, false);
+        shares.share_live(5, &announced(false, false), Instant::now());
         shares.set_viewers(5, vec![1, 7]);
         shares.watching.insert(5, Watching::Opening(1));
         shares.failed.insert(5, WatchBlock::NoDirectPath);
@@ -418,7 +479,7 @@ mod tests {
     #[test]
     fn views_put_the_own_share_first() {
         let mut shares = Shares::default();
-        shares.share_live(2, true, false);
+        shares.share_live(2, &announced(true, false), Instant::now());
         shares.failed.insert(2, WatchBlock::NoDirectPath);
         shares.own = Some(OwnShare::new(true, true));
         let views = shares.views(9);
@@ -427,5 +488,10 @@ mod tests {
         assert_eq!(views[1].session, 2);
         assert!(views[1].paused);
         assert_eq!(views[1].blocked, Some(WatchBlock::NoDirectPath));
+        assert_eq!(
+            views[1].kind,
+            Some(ShareKind::Window),
+            "what they picked travels with the announcement (issue #163)"
+        );
     }
 }

@@ -12,6 +12,8 @@ use std::time::{Duration, Instant};
 use mumcord_audio::{Frame, SAMPLE_RATE};
 use mumcord_screenshare::I420Frame;
 
+use super::signal::ShareKind;
+
 /// A source of pictures for the own share.
 pub trait CaptureSource: Send {
     /// The latest picture, scaled to fit into `max_width` × `max_height` with its aspect ratio
@@ -23,6 +25,12 @@ pub trait CaptureSource: Send {
     /// no more pictures come and the share should stop.
     fn ended(&self) -> bool {
         false
+    }
+
+    /// What the user picked in the system picker (issue #163); `None` where the platform cannot
+    /// tell a window from the whole screen.
+    fn kind(&self) -> Option<ShareKind> {
+        None
     }
 
     /// The picked app's own sound, taken once when the share starts; `None` where the OS cannot
