@@ -52,6 +52,9 @@ const PREFIX = 15;
  * windows before it, which is impossible, so it matched a shifted part of the clip. */
 const ALIGN_EARLY_GRACE_WINDOWS = 2;
 const ALIGN_LATE_SLACK_WINDOWS = 100;
+/** How far the second copy of the switch run may sit from where the first copy puts it: the neural
+ * backend returns its frame one window late, anything more means audio was lost or held up. */
+const SWITCH_SHIFT_WINDOWS = 3;
 
 interface Levels {
   speechDb: number;
@@ -306,12 +309,23 @@ describe("noise suppression backends", () => {
       },
       150,
     );
+    // The second copy has to arrive exactly one copy and one pause after the first: a capture that
+    // stalled or dropped frames during the switch would pull it earlier or push it later.
+    const expected = lag + copyWindows + pause * 100;
+    const afterFirst = lag + copyWindows;
+    const found = afterFirst + align(received.subarray(afterFirst * WINDOW), noisy);
+    log(`switch: second copy at window ${String(found)}, expected ${String(expected)}`);
+    expect(Math.abs(found - expected)).toBeLessThanOrEqual(SWITCH_SHIFT_WINDOWS);
     const first = levelsAt(received, lag, "switch first copy");
-    const second = levelsAt(received, lag + copyWindows + pause * 100, "switch second copy");
+    const second = levelsAt(received, found, "switch second copy");
+    const advanced = sent.get(ADVANCED);
+    if (advanced === undefined) {
+      throw new Error("the Advanced (AI) run of the previous test did not finish, so there is nothing to compare with");
+    }
     // The two copies measure like the off run and the Advanced run, and the second is quieter:
     // only a chain that changed while it was running can do that.
     expect(Math.abs(first.gapDb - off.gapDb)).toBeLessThan(RUN_TOLERANCE_DB);
-    expect(Math.abs(second.gapDb - (sent.get(ADVANCED) as Levels).gapDb)).toBeLessThan(RUN_TOLERANCE_DB);
+    expect(Math.abs(second.gapDb - advanced.gapDb)).toBeLessThan(RUN_TOLERANCE_DB);
     expect(second.gapDb).toBeLessThan(first.gapDb);
     await openVoiceSettings();
     expect(await choiceValue()).toContain(ADVANCED);
