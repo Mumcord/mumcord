@@ -51,7 +51,8 @@
       "messageRequest": "Sõnumitaotlus",
       "invite": "Kutse",
       "private": "Privaatsõnum",
-      "connection": "Ühendus"
+      "connection": "Ühendus",
+      "update": "Värskendus"
     },
     "accept": "Nõustu",
     "decline": "Keeldu",
@@ -61,6 +62,12 @@
     "dismiss": "Sulge",
     "dismissItem": "Sulge: {{title}}",
     "failed": "See ei õnnestunud. Proovi uuesti.",
-    "block": "Blokeeri"
+    "block": "Blokeeri",
+    "update": {
+      "title": "Mumcord {{version}} on valmis",
+      "body": "Värskendamiseks taaskäivita",
+      "restart": "Taaskäivita ja värskenda",
+      "whatsNew": "Mis on uut"
+    }
   }
 }

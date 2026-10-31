@@ -59,6 +59,39 @@ impl From<P2pMode> for store::P2pMode {
     }
 }
 
+/// The setup style chosen in the setup wizard (issue #159): one of the three presets or Custom.
+#[derive(Serialize, Deserialize, Clone, Copy, Debug, PartialEq, Eq, Type)]
+#[serde(rename_all = "camelCase")]
+pub enum SetupPreset {
+    EverythingOn,
+    /// "Balanced (Recommended)".
+    Balanced,
+    MaximumPrivacy,
+    Custom,
+}
+
+impl From<store::SetupPreset> for SetupPreset {
+    fn from(preset: store::SetupPreset) -> Self {
+        match preset {
+            store::SetupPreset::EverythingOn => Self::EverythingOn,
+            store::SetupPreset::Balanced => Self::Balanced,
+            store::SetupPreset::MaximumPrivacy => Self::MaximumPrivacy,
+            store::SetupPreset::Custom => Self::Custom,
+        }
+    }
+}
+
+impl From<SetupPreset> for store::SetupPreset {
+    fn from(preset: SetupPreset) -> Self {
+        match preset {
+            SetupPreset::EverythingOn => Self::EverythingOn,
+            SetupPreset::Balanced => Self::Balanced,
+            SetupPreset::MaximumPrivacy => Self::MaximumPrivacy,
+            SetupPreset::Custom => Self::Custom,
+        }
+    }
+}
+
 /// A custom or imported colour theme (FR-2.14 – FR-2.16) with a dark and a light version. Each
 /// colour map holds the key colours (background, surface, text, accent, talking, warning, error)
 /// as `#rrggbb`; values that are not such a colour are dropped on save. Built-in presets live in
@@ -194,6 +227,18 @@ pub enum TalkMode {
 pub enum VoiceActivation {
     Automatic,
     Manual,
+}
+
+/// Which noise suppression runs while it is on (Settings → Voice, FR-3.65).
+#[derive(Serialize, Deserialize, Clone, Copy, Debug, PartialEq, Eq, Type)]
+#[serde(rename_all = "camelCase")]
+pub enum NoiseBackend {
+    /// "Light".
+    Light,
+    /// "Standard", the default.
+    Standard,
+    /// "Advanced (AI)", Beta.
+    Advanced,
 }
 
 #[derive(Serialize, Deserialize, Clone, Copy, Debug, PartialEq, Eq, Type)]
@@ -440,6 +485,8 @@ pub struct Settings {
     pub input_device: Option<String>,
     pub output_device: Option<String>,
     pub noise_suppression: bool,
+    /// Selected noise suppression (default Standard).
+    pub noise_suppression_backend: NoiseBackend,
     pub echo_cancellation: bool,
     pub auto_gain: bool,
     /// Manual microphone gain in percent, 0–200 (default 100).
@@ -524,8 +571,14 @@ pub struct Settings {
     pub allow_direct_connections: Consent,
     /// Global P2P mode (FR-4.1).
     pub p2p_mode: P2pMode,
-    /// "Check for new versions" (FR-2.56).
+    /// "Check for new versions" (FR-2.56); `no` is the updater's "Off" (FR-3.146).
     pub update_check: Consent,
+    /// "Download automatically" instead of "Notify only" (FR-3.146).
+    pub update_auto_download: bool,
+    /// Hours between two update checks, 1–168 (FR-3.144).
+    pub update_interval_hours: u32,
+    /// The version the user skipped; `null` when none is (FR-3.144).
+    pub update_skipped: Option<String>,
     /// AppImage only: the one-time "Add Mumcord to the app menu" offer (FR-2.55).
     pub appimage_menu_entry: Consent,
     /// The one-time "window overlay removed" notice was shown (FR-2.33).
@@ -535,6 +588,9 @@ pub struct Settings {
     /// The version whose "What's new" was shown or skipped last; `null` before the first start
     /// that knew about it.
     pub whats_new_seen: Option<String>,
+    /// The setup style chosen in the wizard (issue #159); `null` until the wizard stored one.
+    /// Settings compares it with the current values ("Balanced, customised").
+    pub setup_preset: Option<SetupPreset>,
     /// "Private messages from" (issue #141).
     pub private_messages: PrivateMessageSettings,
     /// Channel messages of blocked users: collapsed (default) or hidden (issue #140).
@@ -567,6 +623,11 @@ impl Settings {
             input_device: s.input_device.clone(),
             output_device: s.output_device.clone(),
             noise_suppression: s.noise_suppression,
+            noise_suppression_backend: match s.noise_suppression_backend {
+                store::NoiseBackend::Light => NoiseBackend::Light,
+                store::NoiseBackend::Standard => NoiseBackend::Standard,
+                store::NoiseBackend::Advanced => NoiseBackend::Advanced,
+            },
             echo_cancellation: s.echo_cancellation,
             auto_gain: s.auto_gain,
             input_gain_percent: s.input_gain_percent,
@@ -653,10 +714,14 @@ impl Settings {
             allow_direct_connections: s.allow_direct_connections.into(),
             p2p_mode: s.p2p_mode.into(),
             update_check: s.update_check.into(),
+            update_auto_download: s.update_auto_download,
+            update_interval_hours: s.update_interval_hours,
+            update_skipped: s.update_skipped.clone(),
             appimage_menu_entry: s.appimage_menu_entry.into(),
             window_overlay_notice_shown: s.window_overlay_notice_shown,
             whats_new_auto: s.whats_new_auto,
             whats_new_seen: s.whats_new_seen.clone(),
+            setup_preset: s.setup_preset.map(Into::into),
             private_messages: (&s.private_messages).into(),
             blocked_messages: s.blocked_messages.into(),
         }
@@ -687,6 +752,11 @@ impl Settings {
         s.input_device = self.input_device.clone().filter(|d| !d.is_empty());
         s.output_device = self.output_device.clone().filter(|d| !d.is_empty());
         s.noise_suppression = self.noise_suppression;
+        s.noise_suppression_backend = match self.noise_suppression_backend {
+            NoiseBackend::Light => store::NoiseBackend::Light,
+            NoiseBackend::Standard => store::NoiseBackend::Standard,
+            NoiseBackend::Advanced => store::NoiseBackend::Advanced,
+        };
         s.echo_cancellation = self.echo_cancellation;
         s.auto_gain = self.auto_gain;
         s.input_gain_percent = self.input_gain_percent.min(200);
@@ -767,10 +837,17 @@ impl Settings {
         s.allow_direct_connections = self.allow_direct_connections.into();
         s.p2p_mode = self.p2p_mode.into();
         s.update_check = self.update_check.into();
+        s.update_auto_download = self.update_auto_download;
+        s.update_interval_hours = self.update_interval_hours.clamp(
+            store::MIN_UPDATE_INTERVAL_HOURS,
+            store::MAX_UPDATE_INTERVAL_HOURS,
+        );
+        s.update_skipped.clone_from(&self.update_skipped);
         s.appimage_menu_entry = self.appimage_menu_entry.into();
         s.window_overlay_notice_shown = self.window_overlay_notice_shown;
         s.whats_new_auto = self.whats_new_auto;
         s.whats_new_seen.clone_from(&self.whats_new_seen);
+        s.setup_preset = self.setup_preset.map(Into::into);
         s.private_messages = (&self.private_messages).into();
         s.blocked_messages = self.blocked_messages.into();
         s
@@ -1155,8 +1232,10 @@ mod tests {
         ui.window_overlay_notice_shown = true;
         assert!(ui.whats_new_auto);
         assert_eq!(ui.whats_new_seen, None);
+        assert_eq!(ui.setup_preset, None);
         ui.whats_new_auto = false;
         ui.whats_new_seen = Some("0.4.4".into());
+        ui.setup_preset = Some(SetupPreset::Balanced);
         let stored = ui.to_store(&base);
         assert_eq!(stored.max_connected_servers, 15);
         assert_eq!(stored.app_theme_id, "mumcord-dark");
@@ -1171,6 +1250,8 @@ mod tests {
         assert!(back.talking_first && back.window_overlay_notice_shown);
         assert!(!back.whats_new_auto);
         assert_eq!(back.whats_new_seen.as_deref(), Some("0.4.4"));
+        assert_eq!(stored.setup_preset, Some(store::SetupPreset::Balanced));
+        assert_eq!(back.setup_preset, Some(SetupPreset::Balanced));
         assert_eq!(back.allow_direct_connections, Consent::No);
         assert_eq!(stored.p2p_mode, store::P2pMode::RelayFirst);
         assert_eq!(back.p2p_mode, P2pMode::RelayFirst);

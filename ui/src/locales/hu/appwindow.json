@@ -29,16 +29,10 @@
   },
   "updateCheck": {
     "title": "Keressen új verziókat?",
-    "description": "A Mumcord naponta egyszer megkérdezheti a GitHubot, van-e újabb verzió, és egy linkkel ellátott tippet mutathat. Semmi nem töltődik le és nem települ, és a kérésen, valamint az alkalmazás nevén és verzióján kívül semmi nem kerül elküldésre. Ezt később a Beállításokban módosíthatod.",
+    "description": "A Mumcord rendszeresen megkérdezheti a GitHubtól, hogy létezik-e újabb verzió, és értesíthet róla. A kérdésed nélkül semmi nem töltődik le vagy települ, és a kérésen, valamint az alkalmazás nevén és verzióján kívül semmi nem kerül elküldésre. Ezt később a Beállításokban módosíthatod.",
     "no": "Nem",
     "yes": "Igen",
     "failed": "Ez nem sikerült. Próbáld újra."
-  },
-  "updateHint": {
-    "message": "Elérhető a Mumcord {{version}}.",
-    "open": "Kiadás megtekintése",
-    "dismiss": "Elvetés",
-    "portable": "Töltsd le az új hordozható zipet, és csomagold ki ebbe a mappába; a MumcordData mappában lévő adataid megmaradnak."
   },
   "directConsent": {
     "title": "Engedélyezed a közvetlen kapcsolatokat?",
@@ -46,5 +40,82 @@
     "no": "Nem",
     "yes": "Igen",
     "failed": "Ez nem sikerült. Próbáld újra."
+  },
+  "updater": {
+    "stable": "Stabil",
+    "available": {
+      "title": "Frissítés érhető el",
+      "subtitle": "A Mumcord {{version}} készen áll a letöltésre. A jelenlegi verziód: {{current}}.",
+      "subtitleManual": "Megjelent a Mumcord {{version}}. A jelenlegi verziód: {{current}}.",
+      "whatsNew": "Újdonságok a(z) {{current}} óta",
+      "trust": "Csak a github.com oldalról töltődik le HTTPS-en keresztül, és telepítés előtt ellenőrzi az aláírását és az ellenőrző összegét.",
+      "skip": "Verzió kihagyása",
+      "later": "Emlékeztess később",
+      "download": "Letöltés és telepítés",
+      "openReleasePage": "Kiadási oldal megnyitása",
+      "manual": "Töltsd le az új verziót a kiadási oldalról.",
+      "manualPackage": "Töltsd le a csomagot a kiadási oldalról, majd telepítsd ezzel:",
+      "manualAur": "Frissítsd az AUR-segédeddel:"
+    },
+    "tags": {
+      "added": "Hozzáadva",
+      "changed": "Módosítva",
+      "fixed": "Javítva",
+      "removed": "Eltávolítva"
+    },
+    "noNotes": "Ehhez a verzióhoz nincsenek megjegyzések.",
+    "steps": {
+      "download": "Letöltés",
+      "verify": "Aláírás és ellenőrző összeg ellenőrzése",
+      "install": "Telepítés",
+      "done": "kész",
+      "current": "folyamatban",
+      "pending": "még nem indult el"
+    },
+    "progress": {
+      "title": "A Mumcord {{version}} letöltése",
+      "subtitle": "Eközben tovább használhatod a Mumcordot.",
+      "label": "A frissítés előrehaladása",
+      "unknown": "A méret még nem ismert",
+      "size": "{{received}} / {{total}} MB",
+      "received": "{{received}} MB",
+      "secondsLeft_one": "még kb. {{count}} másodperc",
+      "secondsLeft_other": "még kb. {{count}} másodperc",
+      "minutesLeft_one": "még kb. {{count}} perc",
+      "minutesLeft_other": "még kb. {{count}} perc",
+      "cancel": "Mégse"
+    },
+    "ready": {
+      "title": "A Mumcord {{version}} készen áll",
+      "subtitle": "A frissítés befejezéséhez indítsd újra.",
+      "verified": "Ellenőrizve",
+      "downloaded": "Letöltve",
+      "checked": "Az aláírás és az ellenőrző összeg ellenőrizve",
+      "installed": "Telepítve",
+      "installsOnRestart": "A Mumcord újraindításakor települ",
+      "connected_one": "{{count}} szerverhez vagy csatlakozva. Az újraindítás után a Mumcord újra csatlakozik, és visszalép a csatornáidba.",
+      "connected_other": "{{count}} szerverhez vagy csatlakozva. Az újraindítás után a Mumcord újra csatlakozik, és visszalép a csatornáidba.",
+      "later": "Később",
+      "restart": "Újraindítás a frissítéshez",
+      "announce": "A Mumcord {{version}} készen áll. Indítsd újra a frissítéshez."
+    },
+    "failed": {
+      "title": "A frissítés nem sikerült",
+      "subtitle": "A Mumcord {{version}} nem települt. A jelenlegi verziód tovább működik.",
+      "network": "A Mumcord nem érte el a GitHubot. Ellenőrizd az internetkapcsolatodat, és próbáld újra.",
+      "manifest": "A GitHubon lévő frissítési információk hiányosak vagy hibásak, ezért semmi nem települt.",
+      "signature": "A letöltés aláírása nem egyezett, ezért a letöltést elvetettük.",
+      "checksum": "A letöltés nem egyezett az ellenőrző összegével, ezért elvetettük.",
+      "install": "A frissítés telepítése nem sikerült. A telepített verziód változatlan.",
+      "retry": "Újra",
+      "close": "Bezárás"
+    },
+    "actionFailed": "Ez nem sikerült. Próbáld újra.",
+    "toast": {
+      "title": "A Mumcord {{version}} készen áll",
+      "body": "Indítsd újra a frissítéshez.",
+      "restart": "Újraindítás",
+      "later": "Később"
+    }
   }
 }

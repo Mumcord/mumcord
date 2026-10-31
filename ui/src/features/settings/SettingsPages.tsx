@@ -1,12 +1,6 @@
 import { SettingsImport } from "../mumbleImport/SettingsImport";
 import { WhisperTargetsGroup } from "../whisper/WhisperTargetsGroup";
-import {
-  LicencesCard,
-  SetupCard,
-  SupportCard,
-  UpdatesCard,
-  VersionCard,
-} from "./sections/AboutSection";
+import { LicencesCard, SetupCard, SupportCard, VersionCard } from "./sections/AboutSection";
 import { AccessibilityCard } from "./sections/AccessibilitySection";
 import { AcceptedConversationsGroup } from "./sections/AcceptedConversationsGroup";
 import { ChannelListCard, LookCard, StartupCard, ThemeCard } from "./sections/AppearanceSection";
@@ -36,6 +30,7 @@ import { PrivateMessagesGroup } from "./sections/PrivateMessagesGroup";
 import { ServerConnectionsCard } from "./sections/ServersSection";
 import { NotificationsCard, SoundsCard } from "./sections/SoundsSection";
 import type { SettingsSectionProps } from "./sections/types";
+import { UpdatesCard } from "./sections/UpdatesSection";
 import { ConnectingCard, ProcessingCard, TalkModeCard } from "./sections/VoiceSection";
 import type { SectionId } from "./sectionIds";
 

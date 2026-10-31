@@ -5,7 +5,14 @@ import { dndSource, useDnd } from "../dnd/useDnd";
 import { displayName } from "../servers/format";
 import { useServers } from "../servers/store";
 import { CentreEntry } from "./CentreEntry";
-import { FILTERS, filterCounts, visibleItems, type CentreFilter } from "./centreModel";
+import {
+  FILTERS,
+  filterCounts,
+  serverOf,
+  visibleItems,
+  type CentreFilter,
+  type CentreItem,
+} from "./centreModel";
 import { CENTRE_PANEL_ID, focusBell } from "./centreShortcut";
 import { markAllRead, pruneItems, setCentreOpen } from "./centreStore";
 import { useCentreItems } from "./useCentreItems";
@@ -88,7 +95,8 @@ export function CentrePanel() {
   const placement = usePlacement();
   const counts = filterCounts(items);
   const shown = visibleItems(items, filter);
-  const nameOf = (serverId: number) => {
+  const serverName = (item: CentreItem) => {
+    const serverId = serverOf(item);
     const saved = servers.find((s) => s.id === serverId);
     return saved ? displayName(saved) : "";
   };
@@ -178,7 +186,7 @@ export function CentrePanel() {
       ) : (
         <ul className="centre__list" aria-labelledby={titleId}>
           {shown.map((item) => (
-            <CentreEntry key={item.id} item={item} now={now} serverName={nameOf(item.serverId)} />
+            <CentreEntry key={item.id} item={item} now={now} serverName={serverName(item)} />
           ))}
         </ul>
       )}

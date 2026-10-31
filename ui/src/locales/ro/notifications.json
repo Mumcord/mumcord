@@ -55,7 +55,8 @@
       "messageRequest": "Cerere de mesaj",
       "invite": "Invitație",
       "private": "Mesaj privat",
-      "connection": "Conexiune"
+      "connection": "Conexiune",
+      "update": "Actualizare"
     },
     "accept": "Acceptă",
     "decline": "Refuză",
@@ -65,6 +66,12 @@
     "dismiss": "Închide",
     "dismissItem": "Închide: {{title}}",
     "failed": "Nu a funcționat. Încearcă din nou.",
-    "block": "Blochează"
+    "block": "Blochează",
+    "update": {
+      "title": "Mumcord {{version}} este gata",
+      "body": "Reporniți pentru a actualiza",
+      "restart": "Repornește pentru actualizare",
+      "whatsNew": "Ce este nou"
+    }
   }
 }

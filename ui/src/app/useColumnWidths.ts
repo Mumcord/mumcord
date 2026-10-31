@@ -123,7 +123,7 @@ export function useColumnWidths(
 
   const reset = useCallback(
     (column: ResizableColumn) => {
-      resize(column, COLUMN_DEFAULT_REM);
+      resize(column, COLUMN_DEFAULT_REM[column]);
       commit();
     },
     [resize, commit],

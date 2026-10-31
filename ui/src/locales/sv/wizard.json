@@ -1,24 +1,5 @@
 {
   "progress": "Steg {{current}} av {{total}}",
-  "rerun": {
-    "title": "Installationsguiden",
-    "note": "Du går igenom installationen igen. Din identitet ändras inte.",
-    "manageIdentities": "Hantera identiteter",
-    "stepsLabel": "Installationens steg",
-    "stepsSkipped": "(överhoppat, identiteten är inte en del av det)",
-    "steps": {
-      "identity": "Identitet",
-      "mic": "Mikrofon",
-      "privacy": "Integritet",
-      "updates": "Uppdateringar",
-      "talk": "Talläge"
-    },
-    "footer": "Avbryt lämnar allt som det är. Bara de steg du ändrade sparas i slutet.",
-    "discardTitle": "Kasta ändringarna?",
-    "discardBody": "Inget sparas innan du är klar. Avbryter du nu förblir allt som det är.",
-    "discardKeep": "Fortsätt redigera",
-    "discardConfirm": "Kasta ändringarna"
-  },
   "loadFailed": "Konfigurationen kunde inte läsas in.",
   "finish": "Slutför",
   "errors": {
@@ -72,6 +53,17 @@
     "local": "Allt som Mumcord sparar stannar på din dator.",
     "statement": "Fullständigt integritetsmeddelande"
   },
+  "updates": {
+    "title": "Nya versioner",
+    "choice": "När en ny version finns",
+    "auto": "Ladda ned automatiskt",
+    "autoHint": "Mumcord laddar ned och verifierar uppdateringen i bakgrunden och frågar dig innan det startar om.",
+    "notify": "Endast avisera",
+    "notifyHint": "Mumcord berättar om en ny version och visar vad som har ändrats. Inget laddas ned förrän du säger till.",
+    "off": "Av",
+    "offHint": "Mumcord frågar aldrig GitHub efter nya versioner. Du uppdaterar själv.",
+    "privacy": "Vid kontrollen skickas bara själva förfrågan samt appens namn och version till GitHub. Du kan ändra detta senare i Inställningar."
+  },
   "talk": {
     "title": "Hur vill du prata?",
     "mode": "Pratläge",
@@ -118,9 +110,23 @@
     "ingameOverlayWarning": "Vissa spel med anti-cheat kan flagga eller blockera overlayer i spel. Mumcord håller kända riskspel (som Valorant eller League of Legends) avstängda som standard. Slå bara på det för spel du litar på.",
     "ingameOverlayAlt": "Exempel på overlayen i spel som visar vem som pratar"
   },
-  "updates": {
-    "title": "Nya versioner",
-    "check": "Sök efter nya versioner",
-    "hint": "Mumcord kan fråga GitHub en gång om dagen om det finns en nyare version och visa en hint med en länk. Inget laddas ner eller installeras, och inget skickas utom själva förfrågan samt appens namn och version. Du kan ändra det senare i Inställningar."
+  "rerun": {
+    "title": "Installationsguiden",
+    "note": "Du går igenom installationen igen. Din identitet ändras inte.",
+    "manageIdentities": "Hantera identiteter",
+    "stepsLabel": "Installationens steg",
+    "stepsSkipped": "(överhoppat, identiteten är inte en del av det)",
+    "steps": {
+      "identity": "Identitet",
+      "mic": "Mikrofon",
+      "privacy": "Integritet",
+      "updates": "Uppdateringar",
+      "talk": "Talläge"
+    },
+    "footer": "Avbryt lämnar allt som det är. Bara de steg du ändrade sparas i slutet.",
+    "discardTitle": "Kasta ändringarna?",
+    "discardBody": "Inget sparas innan du är klar. Avbryter du nu förblir allt som det är.",
+    "discardKeep": "Fortsätt redigera",
+    "discardConfirm": "Kasta ändringarna"
   }
 }

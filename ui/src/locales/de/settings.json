@@ -8,6 +8,7 @@
     "about": "Über",
     "servers": "Server",
     "privacy": "Datenschutz",
+    "updates": "Updates",
     "packetInspector": "Paketinspektor"
   },
   "search": {
@@ -147,6 +148,20 @@
     "processing": "Sprachverarbeitung",
     "noiseSuppression": "Rauschunterdrückung",
     "noiseSuppressionHint": "Filtert Hintergrundgeräusche wie Tastaturen und Lüfter heraus.",
+    "noiseChoice": {
+      "light": "Schwach",
+      "standard": "Mittel",
+      "advanced": "Erweitert (KI)",
+      "off": "Aus"
+    },
+    "noiseChoiceHint": {
+      "light": "Klassischer Filter für gleichmäßige Geräusche wie Lüfter oder Brummen. Geringste CPU-Last.",
+      "standard": "KI-Filter für alltägliche Geräusche wie Tastaturen und Lüfter. Geringe CPU-Last.",
+      "advanced": "Neueres KI-Modell, das auch wechselnde Geräusche entfernt. Etwa dreimal so viel CPU wie Mittel und 10 ms mehr Verzögerung."
+    },
+    "noiseChoiceBeta": "Beta",
+    "noiseChoiceTipLabel": "Mehr zu {{choice}}",
+    "detectorHint": "Die Sprachaktivierung erkennt Sprache mit dem RNNoise-Modell; es ändert dein Audio nicht.",
     "echoCancellation": "Echounterdrückung",
     "echoCancellationHint": "Verhindert, dass andere sich selbst hören, wenn du Lautsprecher nutzt.",
     "autoGain": "Automatische Lautstärke",
@@ -407,14 +422,6 @@
       "unsupported": "Das In-Game-Overlay ist auf diesem System nicht verfügbar. Stattdessen wird das Fenster-Overlay oben genutzt.",
       "loadFailed": "Die In-Game-Overlay-Einstellungen konnten nicht geladen werden.",
       "saveFailed": "Die In-Game-Overlay-Änderung konnte nicht angewendet werden.",
-      "confirmTitle": "Overlay für {{game}} aktivieren?",
-      "confirmMessage": "Warnung: {{game}} nutzt Anti-Cheat-Schutz ({{reason}}). Overlays können als Betrug erkannt werden und dein Account kann gesperrt werden. Mumcord haftet dafür nicht. Fahre nur fort, wenn du dieses Risiko akzeptierst.",
-      "confirmEnable": "Trotzdem aktivieren",
-      "limits": {
-        "libraryMissing": "Das In-Game-Overlay ist nicht verfügbar: Seine Overlay-Bibliothek (libmumcord_overlay_layer.so) wurde neben Mumcord nicht gefunden. Installiere Mumcord neu, um sie wiederherzustellen. Stattdessen wird das Fenster-Overlay oben genutzt.",
-        "windowsFullscreen": "Nutze im Spiel randlosen Vollbild- oder Fenstermodus.",
-        "macos": "macOS unterstützt keine In-Game-Overlays. Stattdessen wird das Fenster-Overlay oben genutzt."
-      },
       "opengl": {
         "title": "OpenGL-Spiele",
         "explanation": "Nur für OpenGL-Spiele nötig: in die Steam-Startoptionen des Spiels einfügen.",
@@ -422,6 +429,14 @@
         "copy": "Kopieren",
         "copied": "Kopiert",
         "copyFailed": "Kopieren fehlgeschlagen. Markiere den Text und kopiere ihn von Hand."
+      },
+      "confirmTitle": "Overlay für {{game}} aktivieren?",
+      "confirmMessage": "Warnung: {{game}} nutzt Anti-Cheat-Schutz ({{reason}}). Overlays können als Betrug erkannt werden und dein Account kann gesperrt werden. Mumcord haftet dafür nicht. Fahre nur fort, wenn du dieses Risiko akzeptierst.",
+      "confirmEnable": "Trotzdem aktivieren",
+      "limits": {
+        "libraryMissing": "Das In-Game-Overlay ist nicht verfügbar: Seine Overlay-Bibliothek (libmumcord_overlay_layer.so) wurde neben Mumcord nicht gefunden. Installiere Mumcord neu, um sie wiederherzustellen. Stattdessen wird das Fenster-Overlay oben genutzt.",
+        "windowsFullscreen": "Nutze im Spiel randlosen Vollbild- oder Fenstermodus.",
+        "macos": "macOS unterstützt keine In-Game-Overlays. Stattdessen wird das Fenster-Overlay oben genutzt."
       }
     }
   },
@@ -588,11 +603,6 @@
     "allow": "Direkte Verbindungen zu anderen Mumcord-Nutzern erlauben",
     "hint": "Direkte Verbindungen sind schneller, aber die andere Person kann deine IP-Adresse sehen. Bis du dich entscheidest, fragt Mumcord beim ersten Mal, wenn eine genutzt würde.",
     "notUsed": "Im gewählten Peer-to-Peer-Modus nicht verwendet: Mumcord verbindet sich nie direkt mit anderen."
-  },
-  "updates": {
-    "title": "Updates",
-    "check": "Nach neuen Versionen suchen",
-    "hint": "Einmal am Tag fragt Mumcord bei GitHub nach dem neuesten Release. Sonst wird nichts gesendet."
   },
   "appImageMenu": {
     "label": "Mumcord zum App-Menü hinzufügen",
@@ -775,5 +785,61 @@
     "collapseHint": "Zeigt „Nachricht eines blockierten Nutzers“ mit einer Schaltfläche „Anzeigen“.",
     "hide": "Komplett ausblenden",
     "hideHint": "Im Chat wird nichts angezeigt."
+  },
+  "updates": {
+    "installedFrom": "Mumcord {{version}} · installiert über {{source}}",
+    "install": {
+      "appImage": "das AppImage",
+      "appImageReadOnly": "ein AppImage in einem schreibgeschützten Ordner",
+      "windowsInstaller": "das Windows-Installationsprogramm",
+      "windowsPortable": "das portable Windows-Zip",
+      "macApp": "die macOS-App",
+      "otherMac": "eine macOS-Kopie außerhalb eines App-Pakets",
+      "deb": "das .deb-Paket",
+      "rpm": "das .rpm-Paket",
+      "aur": "das AUR",
+      "otherLinux": "ein Linux-Paket"
+    },
+    "checking": "Prüfung läuft",
+    "mode": "Wenn ein Update gefunden wird",
+    "modeHint": "Updates werden immer geprüft und verifiziert, bevor sie installiert werden.",
+    "modeAuto": "Automatisch herunterladen",
+    "modeNotify": "Nur benachrichtigen",
+    "modeOff": "Aus",
+    "autoUnavailable": "Diese Kopie kann sich nicht selbst aktualisieren, deshalb weist Mumcord dich nur auf neue Versionen hin.",
+    "interval": "Nach Updates suchen",
+    "intervalHint_one": "Beim Start und jede Stunde",
+    "intervalHint_other": "Beim Start und alle {{count}} Stunden",
+    "intervalWeekHint": "Beim Start und einmal pro Woche",
+    "intervalHours_one": "Jede Stunde",
+    "intervalHours_other": "Alle {{count}} Stunden",
+    "intervalWeek": "Einmal pro Woche",
+    "status": "Status",
+    "state": {
+      "idle": "Noch nicht geprüft",
+      "off": "Update-Prüfung ist aus",
+      "checking": "Suche nach Updates…",
+      "upToDate": "Mumcord ist auf dem neuesten Stand",
+      "available": "Mumcord {{version}} ist verfügbar",
+      "downloading": "Mumcord {{version}} wird heruntergeladen…",
+      "verifying": "Download von Mumcord {{version}} wird geprüft…",
+      "installing": "Mumcord {{version}} wird installiert…",
+      "ready": "Mumcord {{version}} ist bereit. Starte neu, um zu aktualisieren.",
+      "failed": "Das letzte Update hat nicht geklappt",
+      "offline": "GitHub war nicht erreichbar. Mumcord versucht es später erneut."
+    },
+    "devBuild": "Entwicklungsversion: Updates sind aus",
+    "lastCheckedToday": "Zuletzt heute um {{time}} geprüft",
+    "lastCheckedYesterday": "Zuletzt gestern um {{time}} geprüft",
+    "lastCheckedOn": "Zuletzt am {{date}} um {{time}} geprüft",
+    "checkNow": "Jetzt prüfen",
+    "showUpdate": "Update anzeigen",
+    "checkFailed": "Die Prüfung konnte nicht gestartet werden. Bitte versuche es erneut.",
+    "skipped": "Übersprungene Version",
+    "skippedHint": "{{version}} wird übersprungen und nicht mehr angeboten.",
+    "stopSkipping": "Nicht mehr überspringen",
+    "whatsNew": "Was ist neu",
+    "whatsNewHint": "Sieh dir die Änderungen jeder Version an.",
+    "openChangelog": "Änderungsprotokoll öffnen"
   }
 }

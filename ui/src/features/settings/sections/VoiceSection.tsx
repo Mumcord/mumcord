@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import {
   getApi,
   toEngineError,
+  type NoiseBackend,
   type PttAvailability,
   type PttMouseStatus,
   type PttSession,
@@ -21,6 +22,10 @@ import type { SettingsSectionProps } from "./types";
 
 /** The command that adds the user to the `input` group (FR-1.21, AC-1.37). */
 const INPUT_GROUP_COMMAND = "sudo usermod -aG input $USER";
+
+/** The noise suppression choices of FR-3.65 (Q1.13), weakest first: one of the backends, or off. */
+type NoiseChoice = NoiseBackend | "off";
+const NOISE_CHOICES: NoiseChoice[] = ["light", "standard", "advanced", "off"];
 
 /** Whether mouse buttons may be captured: natively, or on Wayland after opting in (QA.4). */
 function mouseAllowed(status: PttMouseStatus | null, settings: Settings): boolean {
@@ -202,16 +207,41 @@ export function ConnectingCard({ settings, update }: SettingsSectionProps) {
 /** Voice processing switches plus the quality options: music quality, low latency, bitrate. */
 export function ProcessingCard({ settings, update }: SettingsSectionProps) {
   const { t } = useTranslation("settings");
+  const noiseChoice: NoiseChoice = settings.noiseSuppression
+    ? settings.noiseSuppressionBackend
+    : "off";
   return (
     <Group title={t("voice.processing")} icon="sliders">
-      <Switch
-        label={t("voice.noiseSuppression")}
-        description={t("voice.noiseSuppressionHint")}
-        checked={settings.noiseSuppression}
-        onChange={(noiseSuppression) => {
-          update({ noiseSuppression });
+      <RadioGroup
+        legend={t("voice.noiseSuppression")}
+        info={{
+          label: t("moreInfo", { topic: t("voice.noiseSuppression") }),
+          text: t("voice.noiseSuppressionHint"),
+        }}
+        value={noiseChoice}
+        options={NOISE_CHOICES.map((choice) => ({
+          value: choice,
+          label: t(`voice.noiseChoice.${choice}`),
+          badge: choice === "advanced" ? t("voice.noiseChoiceBeta") : undefined,
+          tip:
+            choice === "off"
+              ? undefined
+              : {
+                  label: t("voice.noiseChoiceTipLabel", {
+                    choice: t(`voice.noiseChoice.${choice}`),
+                  }),
+                  text: t(`voice.noiseChoiceHint.${choice}`),
+                },
+        }))}
+        onChange={(choice) => {
+          if (choice === "off") update({ noiseSuppression: false });
+          else update({ noiseSuppression: true, noiseSuppressionBackend: choice });
         }}
       />
+      {settings.talkMode === "voiceActivation" &&
+        (settings.noiseSuppressionBackend === "light" || !settings.noiseSuppression) && (
+          <p className="settings-hint">{t("voice.detectorHint")}</p>
+        )}
       <Switch
         label={t("voice.echoCancellation")}
         description={t("voice.echoCancellationHint")}

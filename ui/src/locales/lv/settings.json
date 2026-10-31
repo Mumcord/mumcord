@@ -8,6 +8,7 @@
     "about": "Par lietotni",
     "servers": "Serveri",
     "privacy": "Privātums",
+    "updates": "Atjauninājumi",
     "packetInspector": "Pakešu inspektors"
   },
   "search": {
@@ -148,6 +149,20 @@
     "processing": "Balss apstrāde",
     "noiseSuppression": "Trokšņu slāpēšana",
     "noiseSuppressionHint": "Filtrē fona troksni, piemēram, tastatūras un ventilatorus.",
+    "noiseChoice": {
+      "light": "Vāja",
+      "standard": "Standarta",
+      "advanced": "Paplašināta (MI)",
+      "off": "Izslēgta"
+    },
+    "noiseChoiceHint": {
+      "light": "Klasisks filtrs vienmērīgam troksnim, piemēram, ventilatoriem vai dūkoņai. Mazākā procesora slodze.",
+      "standard": "MI filtrs ikdienas troksnim, piemēram, tastatūrām un ventilatoriem. Neliela procesora slodze.",
+      "advanced": "Jaunāks MI modelis, kas noņem arī mainīgu troksni. Aptuveni trīs reizes vairāk procesora nekā Standarta un par 10 ms lielāka aizkave."
+    },
+    "noiseChoiceBeta": "Beta",
+    "noiseChoiceTipLabel": "Par {{choice}}",
+    "detectorHint": "Balsa aktivizēšana atpazīst runu ar RNNoise modeli; tas nemaina tavu audio.",
     "echoCancellation": "Atbalss slāpēšana",
     "echoCancellationHint": "Neļauj citiem dzirdēt sevi, kad izmanto skaļruņus.",
     "autoGain": "Automātiskais skaļums",
@@ -409,14 +424,6 @@
       "unsupported": "Pārklājums spēlē šajā sistēmā nav pieejams. Tā vietā tiek izmantots loga pārklājums augstāk.",
       "loadFailed": "Pārklājuma spēlē iestatījumus neizdevās ielādēt.",
       "saveFailed": "Pārklājuma spēlē izmaiņu neizdevās pielietot.",
-      "confirmTitle": "Ieslēgt pārklājumu spēlei {{game}}?",
-      "confirmMessage": "Brīdinājums: {{game}} izmanto pretkrāpšanās aizsardzību ({{reason}}). Pārklājumus var atpazīt kā krāpšanos, un tavu kontu var bloķēt. Mumcord par to neatbild. Turpini tikai tad, ja pieņem šo risku.",
-      "confirmEnable": "Tomēr ieslēgt",
-      "limits": {
-        "libraryMissing": "Pārklājums spēlē nav pieejams: tā pārklājuma bibliotēka (libmumcord_overlay_layer.so) netika atrasta blakus Mumcord. Pārinstalē Mumcord, lai to atjaunotu. Tā vietā tiek izmantots loga pārklājums augstāk.",
-        "windowsFullscreen": "Spēlē izmantojiet pilnekrāna režīmu bez apmales vai logā.",
-        "macos": "macOS neatbalsta pārklājumus spēlēs. Tā vietā tiek izmantots loga pārklājums augstāk."
-      },
       "opengl": {
         "title": "OpenGL spēles",
         "explanation": "Vajadzīgs tikai OpenGL spēlēm: ielīmē spēles Steam palaišanas opcijās.",
@@ -424,6 +431,14 @@
         "copy": "Kopēt",
         "copied": "Nokopēts",
         "copyFailed": "Kopēšana neizdevās. Atlasi tekstu un nokopē to manuāli."
+      },
+      "confirmTitle": "Ieslēgt pārklājumu spēlei {{game}}?",
+      "confirmMessage": "Brīdinājums: {{game}} izmanto pretkrāpšanās aizsardzību ({{reason}}). Pārklājumus var atpazīt kā krāpšanos, un tavu kontu var bloķēt. Mumcord par to neatbild. Turpini tikai tad, ja pieņem šo risku.",
+      "confirmEnable": "Tomēr ieslēgt",
+      "limits": {
+        "libraryMissing": "Pārklājums spēlē nav pieejams: tā pārklājuma bibliotēka (libmumcord_overlay_layer.so) netika atrasta blakus Mumcord. Pārinstalē Mumcord, lai to atjaunotu. Tā vietā tiek izmantots loga pārklājums augstāk.",
+        "windowsFullscreen": "Spēlē izmantojiet pilnekrāna režīmu bez apmales vai logā.",
+        "macos": "macOS neatbalsta pārklājumus spēlēs. Tā vietā tiek izmantots loga pārklājums augstāk."
       }
     }
   },
@@ -591,11 +606,6 @@
     "allow": "Atļaut tiešos savienojumus ar citiem Mumcord lietotājiem",
     "hint": "Tiešie savienojumi ir ātrāki, bet otra persona var redzēt tavu IP adresi. Kamēr neesi izlēmis, Mumcord jautā pirmajā reizē, kad tāds tiktu izmantots.",
     "notUsed": "Izvēlētajā peer-to-peer režīmā netiek izmantots: Mumcord nekad neveido tiešu savienojumu ar citiem."
-  },
-  "updates": {
-    "title": "Atjauninājumi",
-    "check": "Meklēt jaunas versijas",
-    "hint": "Reizi dienā Mumcord pajautā GitHub par jaunāko laidienu. Nekas cits netiek sūtīts."
   },
   "appImageMenu": {
     "label": "Pievienot Mumcord lietotņu izvēlnei",
@@ -779,5 +789,63 @@
     "collapseHint": "Rāda „Ziņa no bloķēta lietotāja” ar pogu „Rādīt”.",
     "hide": "Paslēpt pilnībā",
     "hideHint": "Tērzēšanā nekas netiek rādīts."
+  },
+  "updates": {
+    "installedFrom": "Mumcord {{version}} · instalēts no: {{source}}",
+    "install": {
+      "appImage": "AppImage",
+      "appImageReadOnly": "AppImage mapē, kas paredzēta tikai lasīšanai",
+      "windowsInstaller": "Windows instalētājs",
+      "windowsPortable": "pārnēsājamais Windows zip",
+      "macApp": "macOS lietotne",
+      "otherMac": "macOS kopija ārpus lietotnes pakotnes",
+      "deb": ".deb pakotne",
+      "rpm": ".rpm pakotne",
+      "aur": "AUR",
+      "otherLinux": "Linux pakotne"
+    },
+    "checking": "Pārbauda",
+    "mode": "Kad atrasts atjauninājums",
+    "modeHint": "Atjauninājumi vienmēr tiek pārbaudīti un apstiprināti pirms instalēšanas.",
+    "modeAuto": "Lejupielādēt automātiski",
+    "modeNotify": "Tikai paziņot",
+    "modeOff": "Izslēgts",
+    "autoUnavailable": "Šī kopija nevar atjaunināt pati sevi, tāpēc Mumcord tikai paziņo par jaunām versijām.",
+    "interval": "Pārbaudīt atjauninājumus",
+    "intervalHint_zero": "Startējot un ik pēc {{count}} stundām",
+    "intervalHint_one": "Startējot un ik pēc {{count}} stundas",
+    "intervalHint_other": "Startējot un ik pēc {{count}} stundām",
+    "intervalWeekHint": "Startējot un reizi nedēļā",
+    "intervalHours_zero": "Ik pēc {{count}} stundām",
+    "intervalHours_one": "Ik pēc {{count}} stundas",
+    "intervalHours_other": "Ik pēc {{count}} stundām",
+    "intervalWeek": "Reizi nedēļā",
+    "status": "Statuss",
+    "state": {
+      "idle": "Vēl nav pārbaudīts",
+      "off": "Atjauninājumu pārbaude ir izslēgta",
+      "checking": "Pārbauda atjauninājumus…",
+      "upToDate": "Mumcord ir atjaunināts",
+      "available": "Pieejams Mumcord {{version}}",
+      "downloading": "Lejupielādē Mumcord {{version}}…",
+      "verifying": "Pārbauda Mumcord {{version}} lejupielādi…",
+      "installing": "Instalē Mumcord {{version}}…",
+      "ready": "Mumcord {{version}} ir gatavs. Restartē, lai atjauninātu.",
+      "failed": "Pēdējais atjauninājums neizdevās",
+      "offline": "GitHub nebija sasniedzams. Mumcord mēģinās vēlāk vēlreiz."
+    },
+    "devBuild": "Izstrādes versija: atjauninājumi ir izslēgti",
+    "lastCheckedToday": "Pēdējā pārbaude šodien plkst. {{time}}",
+    "lastCheckedYesterday": "Pēdējā pārbaude vakar plkst. {{time}}",
+    "lastCheckedOn": "Pēdējā pārbaude {{date}} plkst. {{time}}",
+    "checkNow": "Pārbaudīt tagad",
+    "showUpdate": "Rādīt atjauninājumu",
+    "checkFailed": "Pārbaudi neizdevās sākt. Mēģini vēlreiz.",
+    "skipped": "Izlaistā versija",
+    "skippedHint": "{{version}} tiek izlaista un vairs netiks piedāvāta.",
+    "stopSkipping": "Beigt izlaist",
+    "whatsNew": "Kas jauns",
+    "whatsNewHint": "Skati izmaiņas katrā versijā.",
+    "openChangelog": "Atvērt izmaiņu žurnālu"
   }
 }

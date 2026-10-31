@@ -366,6 +366,12 @@ jobs:
         run: |
           mkdir out
           cp ${{ matrix.bundle }} out/
+          # The in-app updater swaps the whole app from this archive (issue #168); the release job
+          # signs it. COPYFILE_DISABLE keeps macOS metadata files out of the archive.
+          if [[ "${{ matrix.name }}" == "macos" && "${{ inputs.release }}" == "true" ]]; then
+            COPYFILE_DISABLE=1 tar -czf "out/Mumcord_${{ inputs.version }}_universal.app.tar.gz" \
+              -C target/universal-apple-darwin/release/bundle/macos Mumcord.app
+          fi
           # Tells the release job to describe the DMG as signed and notarized.
           if [[ "${MUMCORD_MACOS_SIGNED:-}" == "true" ]]; then touch out/MACOS-SIGNED; fi
           if [[ "${MUMCORD_WINDOWS_SIGNED:-}" == "true" ]]; then touch out/WINDOWS-SIGNED; fi

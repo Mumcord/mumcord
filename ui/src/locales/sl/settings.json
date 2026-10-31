@@ -8,6 +8,7 @@
     "about": "O aplikaciji",
     "servers": "Strežniki",
     "privacy": "Zasebnost",
+    "updates": "Posodobitve",
     "packetInspector": "Pregledovalnik paketov"
   },
   "search": {
@@ -149,6 +150,20 @@
     "processing": "Obdelava glasu",
     "noiseSuppression": "Dušenje šuma",
     "noiseSuppressionHint": "Odstrani hrup iz ozadja, kot so tipkovnice in ventilatorji.",
+    "noiseChoice": {
+      "light": "Šibko",
+      "standard": "Standardno",
+      "advanced": "Napredno (UI)",
+      "off": "Izklopljeno"
+    },
+    "noiseChoiceHint": {
+      "light": "Klasičen filter za stalen hrup, kot so ventilatorji ali brnenje. Najmanjša obremenitev procesorja.",
+      "standard": "Filter UI za vsakdanji hrup, kot so tipkovnice in ventilatorji. Majhna obremenitev procesorja.",
+      "advanced": "Novejši model UI, ki odstrani tudi spremenljiv hrup. Približno trikrat več procesorja kot Standardno in 10 ms več zakasnitve."
+    },
+    "noiseChoiceBeta": "Beta",
+    "noiseChoiceTipLabel": "O možnosti {{choice}}",
+    "detectorHint": "Aktivacija glasa prepozna govor z modelom RNNoise; ta ne spremeni tvojega zvoka.",
     "echoCancellation": "Odpravljanje odmeva",
     "echoCancellationHint": "Prepreči, da bi drugi slišali sami sebe, ko uporabljaš zvočnike.",
     "autoGain": "Samodejna glasnost",
@@ -411,14 +426,6 @@
       "unsupported": "Prekrivni sloj v igri v tem sistemu ni na voljo. Namesto njega se uporablja prekrivni sloj v oknu zgoraj.",
       "loadFailed": "Nastavitev prekrivnega sloja v igri ni bilo mogoče naložiti.",
       "saveFailed": "Spremembe prekrivnega sloja v igri ni bilo mogoče uveljaviti.",
-      "confirmTitle": "Vklopim prekrivni sloj za {{game}}?",
-      "confirmMessage": "Opozorilo: {{game}} uporablja protigoljufijsko zaščito ({{reason}}). Prekrivni sloji so lahko zaznani kot goljufanje in tvoj račun je lahko prepovedan. Mumcord za to ne odgovarja. Nadaljuj samo, če sprejmeš to tveganje.",
-      "confirmEnable": "Vseeno vklopi",
-      "limits": {
-        "libraryMissing": "Prekrivni sloj v igri ni na voljo: njegove knjižnice (libmumcord_overlay_layer.so) ni bilo mogoče najti poleg Mumcorda. Znova namesti Mumcord, da jo obnoviš. Namesto njega se uporablja prekrivni sloj v oknu zgoraj.",
-        "windowsFullscreen": "V igri uporabite celozaslonski način brez obrobe ali v oknu.",
-        "macos": "macOS ne podpira prekrivnih slojev v igrah. Namesto njih se uporablja prekrivni sloj v oknu zgoraj."
-      },
       "opengl": {
         "title": "Igre OpenGL",
         "explanation": "Potrebno samo za igre OpenGL: prilepi v možnosti zagona igre v Steamu.",
@@ -426,6 +433,14 @@
         "copy": "Kopiraj",
         "copied": "Kopirano",
         "copyFailed": "Kopiranje ni uspelo. Označi besedilo in ga kopiraj ročno."
+      },
+      "confirmTitle": "Vklopim prekrivni sloj za {{game}}?",
+      "confirmMessage": "Opozorilo: {{game}} uporablja protigoljufijsko zaščito ({{reason}}). Prekrivni sloji so lahko zaznani kot goljufanje in tvoj račun je lahko prepovedan. Mumcord za to ne odgovarja. Nadaljuj samo, če sprejmeš to tveganje.",
+      "confirmEnable": "Vseeno vklopi",
+      "limits": {
+        "libraryMissing": "Prekrivni sloj v igri ni na voljo: njegove knjižnice (libmumcord_overlay_layer.so) ni bilo mogoče najti poleg Mumcorda. Znova namesti Mumcord, da jo obnoviš. Namesto njega se uporablja prekrivni sloj v oknu zgoraj.",
+        "windowsFullscreen": "V igri uporabite celozaslonski način brez obrobe ali v oknu.",
+        "macos": "macOS ne podpira prekrivnih slojev v igrah. Namesto njih se uporablja prekrivni sloj v oknu zgoraj."
       }
     }
   },
@@ -594,11 +609,6 @@
     "allow": "Dovoli neposredne povezave z drugimi uporabniki Mumcorda",
     "hint": "Neposredne povezave so hitrejše, vendar druga oseba vidi tvoj naslov IP. Dokler se ne odločiš, Mumcord vpraša, ko bi bila prvič uporabljena.",
     "notUsed": "V izbranem načinu peer-to-peer se ne uporablja: Mumcord se nikoli ne poveže neposredno z drugimi."
-  },
-  "updates": {
-    "title": "Posodobitve",
-    "check": "Preverjaj nove različice",
-    "hint": "Enkrat na dan Mumcord vpraša GitHub za najnovejšo izdajo. Nič drugega se ne pošlje."
   },
   "appImageMenu": {
     "label": "Dodaj Mumcord v meni aplikacij",
@@ -783,5 +793,65 @@
     "collapseHint": "Prikaže „Sporočilo blokiranega uporabnika“ z gumbom Prikaži.",
     "hide": "Povsem jih skrij",
     "hideHint": "V klepetu se ne prikaže nič."
+  },
+  "updates": {
+    "installedFrom": "Mumcord {{version}} · nameščeno iz: {{source}}",
+    "install": {
+      "appImage": "AppImage",
+      "appImageReadOnly": "AppImage v mapi samo za branje",
+      "windowsInstaller": "namestitveni program za Windows",
+      "windowsPortable": "prenosni zip za Windows",
+      "macApp": "aplikacija za macOS",
+      "otherMac": "kopija za macOS zunaj paketa aplikacije",
+      "deb": "paket .deb",
+      "rpm": "paket .rpm",
+      "aur": "AUR",
+      "otherLinux": "paket za Linux"
+    },
+    "checking": "Preverjanje",
+    "mode": "Ko je najdena posodobitev",
+    "modeHint": "Posodobitve se pred namestitvijo vedno preverijo in potrdijo.",
+    "modeAuto": "Samodejno prenesi",
+    "modeNotify": "Samo obvesti",
+    "modeOff": "Izključeno",
+    "autoUnavailable": "Ta kopija se ne more posodobiti sama, zato te Mumcord le obvesti o novih različicah.",
+    "interval": "Preveri posodobitve",
+    "intervalHint_one": "Ob zagonu in vsako uro",
+    "intervalHint_two": "Ob zagonu in vsaki {{count}} uri",
+    "intervalHint_few": "Ob zagonu in vsake {{count}} ure",
+    "intervalHint_other": "Ob zagonu in vsakih {{count}} ur",
+    "intervalWeekHint": "Ob zagonu in enkrat na teden",
+    "intervalHours_one": "Vsako uro",
+    "intervalHours_two": "Vsaki {{count}} uri",
+    "intervalHours_few": "Vsake {{count}} ure",
+    "intervalHours_other": "Vsakih {{count}} ur",
+    "intervalWeek": "Enkrat na teden",
+    "status": "Stanje",
+    "state": {
+      "idle": "Še ni preverjeno",
+      "off": "Preverjanje posodobitev je izključeno",
+      "checking": "Preverjanje posodobitev…",
+      "upToDate": "Mumcord je posodobljen",
+      "available": "Na voljo je Mumcord {{version}}",
+      "downloading": "Prenašanje Mumcorda {{version}}…",
+      "verifying": "Preverjanje prenosa Mumcorda {{version}}…",
+      "installing": "Nameščanje Mumcorda {{version}}…",
+      "ready": "Mumcord {{version}} je pripravljen. Znova zaženi za posodobitev.",
+      "failed": "Zadnja posodobitev ni uspela",
+      "offline": "GitHuba ni bilo mogoče doseči. Mumcord bo poskusil znova pozneje."
+    },
+    "devBuild": "Razvojna različica: posodobitve so izključene",
+    "lastCheckedToday": "Nazadnje preverjeno danes ob {{time}}",
+    "lastCheckedYesterday": "Nazadnje preverjeno včeraj ob {{time}}",
+    "lastCheckedOn": "Nazadnje preverjeno {{date}} ob {{time}}",
+    "checkNow": "Preveri zdaj",
+    "showUpdate": "Pokaži posodobitev",
+    "checkFailed": "Preverjanja ni bilo mogoče zagnati. Poskusi znova.",
+    "skipped": "Preskočena različica",
+    "skippedHint": "{{version}} se preskoči in ne bo več ponujena.",
+    "stopSkipping": "Nehaj preskakovati",
+    "whatsNew": "Kaj je novega",
+    "whatsNewHint": "Oglej si spremembe v vsaki različici.",
+    "openChangelog": "Odpri dnevnik sprememb"
   }
 }

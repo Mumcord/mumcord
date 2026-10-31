@@ -51,7 +51,8 @@
       "messageRequest": "Nachrichtenanfrage",
       "invite": "Einladung",
       "private": "Private Nachricht",
-      "connection": "Verbindung"
+      "connection": "Verbindung",
+      "update": "Update"
     },
     "accept": "Annehmen",
     "decline": "Ablehnen",
@@ -61,6 +62,12 @@
     "dismiss": "Verwerfen",
     "dismissItem": "Verwerfen: {{title}}",
     "failed": "Das hat nicht geklappt. Bitte versuche es erneut.",
-    "block": "Blockieren"
+    "block": "Blockieren",
+    "update": {
+      "title": "Mumcord {{version}} ist bereit",
+      "body": "Zum Aktualisieren neu starten",
+      "restart": "Neu starten und aktualisieren",
+      "whatsNew": "Was ist neu"
+    }
   }
 }

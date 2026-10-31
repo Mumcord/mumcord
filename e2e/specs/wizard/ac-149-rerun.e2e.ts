@@ -24,17 +24,33 @@ function wizardControl(xpath: string) {
 async function openAbout(): Promise<void> {
   await $("button[aria-label='Quick settings']").click();
   await $("//button[@role='menuitem'][contains(., 'All settings')]").click();
+  await aboutTab();
+}
+
+async function aboutTab(): Promise<void> {
   await $("//button[@role='tab' and .='About']").click();
   await button("Run setup wizard again").waitForClickable({ timeout: 15_000 });
 }
 
-/** About's "Check for new versions" switch (Settings > About, also the update hint choice). */
-function aboutUpdateSwitch() {
-  return $("//input[@role='switch'][@id=//label[.='Check for new versions']/@for]");
+/**
+ * The saved update choice as Settings > Updates shows it ("Download automatically", "Notify
+ * only" or "Off"). Leaves the Updates tab open.
+ */
+async function savedUpdateMode(): Promise<string> {
+  await $("//button[@role='tab' and .='Updates']").click();
+  const group = $("//*[@role='radiogroup'][@aria-labelledby=//p[.='When an update is found']/@id]");
+  await group.waitForExist({ timeout: 10_000 });
+  return browser.execute(() => {
+    const input = document.querySelector<HTMLInputElement>(
+      "[role='tabpanel']:not([hidden]) [role='radiogroup'] input[type='radio']:checked",
+    );
+    return input?.closest("label")?.textContent.trim() ?? "";
+  });
 }
 
-function wizardUpdateCheckbox() {
-  return wizardControl(".//label[normalize-space(.)='Check for new versions']//input");
+/** One of the wizard's update choices ("Download automatically", "Notify only", "Off"). */
+function wizardUpdateRadio(choice: string) {
+  return wizardControl(`.//label[normalize-space(.)='${choice}']//input[@type='radio']`);
 }
 
 async function startRerun(): Promise<void> {
@@ -60,6 +76,9 @@ describe("#149 run the setup wizard again", () => {
     keyringBefore = await keyringDump();
     expect(keyringBefore).toContain("app.mumcord.client");
     await openAbout();
+    // The update check starts off from the finished setup.
+    expect(await savedUpdateMode()).toBe("Off");
+    await aboutTab();
   });
 
   it("opens without the identity step, prefilled and four steps long", async () => {
@@ -75,11 +94,11 @@ describe("#149 run the setup wizard again", () => {
   });
 
   it("keeps everything on Cancel, including a change the user made", async () => {
-    // The update check starts off from the finished setup.
-    await expect(aboutUpdateSwitch()).not.toBeChecked();
     await toUpdateStep();
-    await wizardUpdateCheckbox().click();
-    await expect(wizardUpdateCheckbox()).toBeChecked();
+    // Prefilled with the saved choice.
+    await expect(wizardUpdateRadio("Off")).toBeChecked();
+    await wizardUpdateRadio("Notify only").click();
+    await expect(wizardUpdateRadio("Notify only")).toBeChecked();
 
     await wizardControl(".//button[normalize-space(.)='Cancel']").click();
     const question = $("//*[@role='alertdialog'][contains(., 'Discard your changes?')]");
@@ -88,28 +107,29 @@ describe("#149 run the setup wizard again", () => {
 
     await button("Run setup wizard again").waitForClickable({ timeout: 10_000 });
     await expect(wizard()).not.toExist();
-    // Nothing was written: the About switch still shows the saved answer.
-    await expect(aboutUpdateSwitch()).not.toBeChecked();
+    // Nothing was written: Settings > Updates still shows the saved answer.
+    expect(await savedUpdateMode()).toBe("Off");
     expect(await keyringDump()).toBe(keyringBefore);
+    await aboutTab();
   });
 
   it("saves the changed update check on Finish and leaves the identity alone", async () => {
     await startRerun();
     await toUpdateStep();
-    await wizardUpdateCheckbox().click();
+    await wizardUpdateRadio("Notify only").click();
     await button("Next").click();
     await waitForText("Step 4 of 4");
     await button("Finish").click();
 
     await button("Run setup wizard again").waitForClickable({ timeout: 15_000 });
     await expect(wizard()).not.toExist();
-    await expect(aboutUpdateSwitch()).toBeChecked();
-    expect(await keyringDump()).toBe(keyringBefore);
     // Focus comes back to the button that opened the wizard, so the keyboard stays where it was.
     const focused = await browser.execute(() => {
       const active = document.activeElement;
       return active instanceof HTMLElement ? active.textContent.trim() : "";
     });
     expect(focused).toBe("Run setup wizard again");
+    expect(await savedUpdateMode()).toBe("Notify only");
+    expect(await keyringDump()).toBe(keyringBefore);
   });
 });

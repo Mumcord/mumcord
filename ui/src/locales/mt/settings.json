@@ -8,6 +8,7 @@
     "about": "Dwar",
     "servers": "Servers",
     "privacy": "Privatezza",
+    "updates": "Aġġornamenti",
     "packetInspector": "Ispettur tal-pakketti"
   },
   "search": {
@@ -150,6 +151,20 @@
     "processing": "Ipproċessar tal-vuċi",
     "noiseSuppression": "Tneħħija tal-istorbju",
     "noiseSuppressionHint": "Jiffiltra l-istorbju fl-isfond bħal tastieri u fannijiet.",
+    "noiseChoice": {
+      "light": "Ħafif",
+      "standard": "Standard",
+      "advanced": "Avvanzat (AI)",
+      "off": "Mitfi"
+    },
+    "noiseChoiceHint": {
+      "light": "Filtru klassiku għal storbju kostanti bħal fannijiet jew żanżin. L-inqas użu tas-CPU.",
+      "standard": "Filtru AI għall-istorbju ta' kuljum bħal tastieri u fannijiet. Użu baxx tas-CPU.",
+      "advanced": "Mudell AI aktar ġdid li jneħħi wkoll storbju li jinbidel. Madwar tliet darbiet is-CPU ta' Standard u 10 ms aktar dewmien."
+    },
+    "noiseChoiceBeta": "Beta",
+    "noiseChoiceTipLabel": "Dwar {{choice}}",
+    "detectorHint": "Il-attivazzjoni tal-vuċi ssib il-kliem bil-mudell RNNoise; ma jbiddilx l-awdjo tiegħek.",
     "echoCancellation": "Tneħħija tal-eku",
     "echoCancellationHint": "Iwaqqaf lill-oħrajn milli jisimgħu lilhom infushom meta tuża l-ispikers.",
     "autoGain": "Volum awtomatiku",
@@ -413,14 +428,6 @@
       "unsupported": "L-overlay fil-logħba mhuwiex disponibbli fuq din is-sistema. Minfloku jintuża l-overlay tat-tieqa hawn fuq.",
       "loadFailed": "Is-settings tal-overlay fil-logħba ma setgħux jitgħabbew.",
       "saveFailed": "Il-bidla fl-overlay fil-logħba ma setgħetx tiġi applikata.",
-      "confirmTitle": "Tixgħel l-overlay għal {{game}}?",
-      "confirmMessage": "Twissija: {{game}} juża protezzjoni anti-cheat ({{reason}}). L-overlays jistgħu jinqabdu bħala qerq u l-kont tiegħek jista' jiġi bbanjat. Mumcord mhuwiex responsabbli għal dan. Kompli biss jekk taċċetta dan ir-riskju.",
-      "confirmEnable": "Ixgħel xorta waħda",
-      "limits": {
-        "libraryMissing": "L-overlay fil-logħba mhuwiex disponibbli: il-librerija tiegħu (libmumcord_overlay_layer.so) ma nstabitx ħdejn Mumcord. Erġa' installa Mumcord biex terġa' ddaħħalha. Minfloku jintuża l-overlay tat-tieqa hawn fuq.",
-        "windowsFullscreen": "Uża skrin sħiħ mingħajr bordura jew f'tieqa fil-logħba.",
-        "macos": "macOS ma jappoġġjax overlays fil-logħob. Minfloku jintuża l-overlay tat-tieqa hawn fuq."
-      },
       "opengl": {
         "title": "Logħob OpenGL",
         "explanation": "Meħtieġ biss għal-logħob OpenGL: waħħlu fl-għażliet tat-tnedija ta' Steam tal-logħba.",
@@ -428,6 +435,14 @@
         "copy": "Ikkopja",
         "copied": "Ikkupjat",
         "copyFailed": "L-ikkupjar ma rnexxiex. Agħżel it-test u kkopjah bl-idejn."
+      },
+      "confirmTitle": "Tixgħel l-overlay għal {{game}}?",
+      "confirmMessage": "Twissija: {{game}} juża protezzjoni anti-cheat ({{reason}}). L-overlays jistgħu jinqabdu bħala qerq u l-kont tiegħek jista' jiġi bbanjat. Mumcord mhuwiex responsabbli għal dan. Kompli biss jekk taċċetta dan ir-riskju.",
+      "confirmEnable": "Ixgħel xorta waħda",
+      "limits": {
+        "libraryMissing": "L-overlay fil-logħba mhuwiex disponibbli: il-librerija tiegħu (libmumcord_overlay_layer.so) ma nstabitx ħdejn Mumcord. Erġa' installa Mumcord biex terġa' ddaħħalha. Minfloku jintuża l-overlay tat-tieqa hawn fuq.",
+        "windowsFullscreen": "Uża skrin sħiħ mingħajr bordura jew f'tieqa fil-logħba.",
+        "macos": "macOS ma jappoġġjax overlays fil-logħob. Minfloku jintuża l-overlay tat-tieqa hawn fuq."
       }
     }
   },
@@ -597,11 +612,6 @@
     "allow": "Ippermetti konnessjonijiet diretti ma' utenti oħra ta' Mumcord",
     "hint": "Il-konnessjonijiet diretti huma aktar mgħaġġla, imma l-persuna l-oħra tista' tara l-indirizz IP tiegħek. Sakemm tiddeċiedi, Mumcord jistaqsi l-ewwel darba li tkun se tintuża waħda.",
     "notUsed": "Mhux użat fil-modalità peer-to-peer magħżula: Mumcord qatt ma jikkonnettja direttament ma' nies oħra."
-  },
-  "updates": {
-    "title": "Aġġornamenti",
-    "check": "Fittex verżjonijiet ġodda",
-    "hint": "Darba kuljum Mumcord jistaqsi lil GitHub għall-aħħar rilaxx. Xejn iktar ma jintbagħat."
   },
   "appImageMenu": {
     "label": "Żid lil Mumcord mal-menu tal-apps",
@@ -787,5 +797,67 @@
     "collapseHint": "Juri “Messaġġ minn utent imblokkat” b'buttuna Uri.",
     "hide": "Aħbihom għalkollox",
     "hideHint": "Xejn ma jintwera fiċ-chat."
+  },
+  "updates": {
+    "installedFrom": "Mumcord {{version}} · installat minn {{source}}",
+    "install": {
+      "appImage": "l-AppImage",
+      "appImageReadOnly": "AppImage f'folder għall-qari biss",
+      "windowsInstaller": "l-installatur tal-Windows",
+      "windowsPortable": "iz-zip portabbli tal-Windows",
+      "macApp": "l-app tal-macOS",
+      "otherMac": "kopja tal-macOS barra minn pakkett tal-app",
+      "deb": "il-pakkett .deb",
+      "rpm": "il-pakkett .rpm",
+      "aur": "l-AUR",
+      "otherLinux": "pakkett tal-Linux"
+    },
+    "checking": "Qed jiċċekkja",
+    "mode": "Meta jinstab aġġornament",
+    "modeHint": "L-aġġornamenti dejjem jiġu ċċekkjati u vverifikati qabel jiġu installati.",
+    "modeAuto": "Niżżel awtomatikament",
+    "modeNotify": "Ibgħat notifika biss",
+    "modeOff": "Mitfi",
+    "autoUnavailable": "Din il-kopja ma tistax taġġorna lilha nnifisha, għalhekk Mumcord jgħarrfek biss dwar verżjonijiet ġodda.",
+    "interval": "Iċċekkja għall-aġġornamenti",
+    "intervalHint_one": "Fil-bidu u kull siegħa",
+    "intervalHint_two": "Fil-bidu u kull {{count}} siegħat",
+    "intervalHint_few": "Fil-bidu u kull {{count}} siegħat",
+    "intervalHint_many": "Fil-bidu u kull {{count}} siegħa",
+    "intervalHint_other": "Fil-bidu u kull {{count}} siegħa",
+    "intervalWeekHint": "Fil-bidu u darba fil-ġimgħa",
+    "intervalHours_one": "Kull siegħa",
+    "intervalHours_two": "Kull {{count}} siegħat",
+    "intervalHours_few": "Kull {{count}} siegħat",
+    "intervalHours_many": "Kull {{count}} siegħa",
+    "intervalHours_other": "Kull {{count}} siegħa",
+    "intervalWeek": "Darba fil-ġimgħa",
+    "status": "Status",
+    "state": {
+      "idle": "Għadu ma ġiex iċċekkjat",
+      "off": "Iċ-ċekkjar tal-aġġornamenti huwa mitfi",
+      "checking": "Qed jiġu ċċekkjati l-aġġornamenti…",
+      "upToDate": "Mumcord huwa aġġornat",
+      "available": "Mumcord {{version}} huwa disponibbli",
+      "downloading": "Qed jitniżżel Mumcord {{version}}…",
+      "verifying": "Qed jiġi ċċekkjat it-tniżżil ta' Mumcord {{version}}…",
+      "installing": "Qed jiġi installat Mumcord {{version}}…",
+      "ready": "Mumcord {{version}} huwa lest. Erġa' ibda biex taġġorna.",
+      "failed": "L-aħħar aġġornament ma ħadimx",
+      "offline": "Ma setax jinstab GitHub. Mumcord se jipprova mill-ġdid aktar tard."
+    },
+    "devBuild": "Verżjoni tal-iżvilupp: l-aġġornamenti huma mitfija",
+    "lastCheckedToday": "Miċċekkjat l-aħħar illum fil-{{time}}",
+    "lastCheckedYesterday": "Miċċekkjat l-aħħar il-bieraħ fil-{{time}}",
+    "lastCheckedOn": "Miċċekkjat l-aħħar fil-{{date}} fil-{{time}}",
+    "checkNow": "Iċċekkja issa",
+    "showUpdate": "Uri l-aġġornament",
+    "checkFailed": "Ma setax jinbeda ċ-ċekk. Erġa' pprova.",
+    "skipped": "Verżjoni maqbuża",
+    "skippedHint": "{{version}} hija maqbuża u mhux se tiġi offruta mill-ġdid.",
+    "stopSkipping": "Waqqaf il-qbiż",
+    "whatsNew": "X'hemm ġdid",
+    "whatsNewHint": "Ara l-bidliet f'kull verżjoni.",
+    "openChangelog": "Iftaħ il-log tal-bidliet"
   }
 }

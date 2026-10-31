@@ -8,18 +8,25 @@ import { Avatar } from "../members/Avatar";
 import { openPrivateConversation } from "../members/privateMessage";
 import { acceptRequest, declineRequest } from "../requests/requestsStore";
 import { relativeTime } from "../requests/relativeTime";
-import { joinWatchParty, openItem, watchShare } from "./centreActions";
-import type { CentreItem, InviteItem, RequestItem } from "./centreModel";
+import {
+  joinWatchParty,
+  openItem,
+  restartForUpdate,
+  showWhatsNew,
+  watchShare,
+} from "./centreActions";
+import type { CentreItem, InviteItem, RequestItem, UpdateItem } from "./centreModel";
 import { dismissItem, setCentreOpen } from "./centreStore";
 
 type T = TFunction<"notifications">;
 
-/** Who the entry is about; untrusted plain text. Empty for connection events. */
+/** Who the entry is about; untrusted plain text. Empty for connection events and updates. */
 function senderOf(item: CentreItem): string {
   switch (item.kind) {
     case "request":
       return item.request.name;
     case "connection":
+    case "update":
       return "";
     default:
       return item.sender;
@@ -41,6 +48,8 @@ function titleOf(item: CentreItem, t: T, server: string): string {
       return t(`centre.invite.${item.invite}`, { name });
     case "connection":
       return t("centre.connection", { server });
+    case "update":
+      return t("centre.update.title", { version: item.version });
   }
 }
 
@@ -53,6 +62,8 @@ function bodyOf(item: CentreItem, t: T): string {
       return t("centre.messageRequestBody", { count: item.request.messages.length });
     case "connection":
       return item.text;
+    case "update":
+      return t("centre.update.body");
     case "invite":
       if (item.invite === "watchParty" || item.invite === "screenShare") return "";
       return item.excerpt ? t("centre.quoted", { text: item.excerpt }) : "";
@@ -69,6 +80,7 @@ function whereOf(item: CentreItem, t: T): string {
       : t("centre.type.messageRequest");
   }
   if (item.kind === "connection") return t("centre.type.connection");
+  if (item.kind === "update") return t("centre.type.update");
   if (item.kind === "invite") return t("centre.type.invite");
   if (item.conversation.kind !== "channel") return t("centre.type.private");
   const channel = getServerStateOf(item.serverId).channels.get(item.conversation.channelId);
@@ -214,6 +226,33 @@ function InviteActions({ item }: { item: InviteItem }) {
   );
 }
 
+/** "Restart to update" (same rule as the update toast) and "What's new" (#168). */
+function UpdateActions({ item }: { item: UpdateItem }) {
+  const { t } = useTranslation("notifications");
+  return (
+    <>
+      <button
+        type="button"
+        className="button button--primary centre-entry__action"
+        onClick={() => {
+          restartForUpdate(item.id);
+        }}
+      >
+        {t("centre.update.restart")}
+      </button>
+      <button
+        type="button"
+        className="button centre-entry__action"
+        onClick={() => {
+          showWhatsNew(item);
+        }}
+      >
+        {t("centre.update.whatsNew")}
+      </button>
+    </>
+  );
+}
+
 /**
  * One entry: avatar, bold title and a dot while unread, time, excerpt and chips for server and
  * channel or kind. The whole text is one button that opens the entry; answers sit below it.
@@ -231,10 +270,13 @@ export function CentreEntry({
   const title = titleOf(item, t, serverName);
   const body = bodyOf(item, t);
   const time = relativeTime(new Date(item.at).toISOString(), now, i18n.language);
-  const avatarName = senderOf(item) || serverName;
+  const avatarName = senderOf(item) || serverName || "Mumcord";
   return (
     <li className="centre-entry" data-unread={!item.read || undefined} data-kind={item.kind}>
-      <Avatar name={avatarName} />
+      <Avatar
+        name={avatarName}
+        src={item.kind === "update" ? `${import.meta.env.BASE_URL}favicon.png` : null}
+      />
       <div className="centre-entry__content">
         <button
           type="button"
@@ -267,6 +309,11 @@ export function CentreEntry({
         {item.kind === "invite" && (
           <div className="centre-entry__actions">
             <InviteActions item={item} />
+          </div>
+        )}
+        {item.kind === "update" && (
+          <div className="centre-entry__actions">
+            <UpdateActions item={item} />
           </div>
         )}
       </div>

@@ -12,7 +12,13 @@ export interface JumpTarget {
 
 const FOCUSABLE = "input:not([disabled]), select:not([disabled]), button:not([disabled]), textarea";
 
-const sameText = (element: Element, text: string) => element.textContent.trim() === text.trim();
+/** Compares the label's own text, without a "?" button inside it (a radio group's legend). */
+function sameText(element: Element, text: string): boolean {
+  let own = element.textContent;
+  for (const button of element.querySelectorAll("button"))
+    own = own.replace(button.textContent, "");
+  return own.trim() === text.trim();
+}
 
 /** The section card titled `title`; matched on its plain title, as the heading may hold badges. */
 export function findGroup(panel: HTMLElement, title: string): HTMLElement | null {

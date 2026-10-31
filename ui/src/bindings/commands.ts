@@ -666,11 +666,25 @@ export const commands = {
 	 *  settings and the relay change without an event, so the UI asks again before starting.
 	 */
 	screenShareBlock: (serverId: number) => typedError<ShareStartBlock | null, ApiError>(__TAURI_INVOKE("screen_share_block", { serverId })),
+	/**  The updater's current state. */
+	updateStatus: () => __TAURI_INVOKE<UpdateStatus>("update_status"),
 	/**
-	 *  Asks GitHub for the latest release now (only when `updateCheck` is `yes`); `null` when
-	 *  this version is current, the user did not consent or the check failed (logged only).
+	 *  "Check now": asks GitHub right away, unless updates are off or this is a development build
+	 *  (then nothing is contacted). Failures show in the returned status.
 	 */
-	updateCheckNow: () => typedError<UpdateInfo | null, ApiError>(__TAURI_INVOKE("update_check_now")),
+	updateCheckNow: () => typedError<UpdateStatus, ApiError>(__TAURI_INVOKE("update_check_now")),
+	/**
+	 *  "Download and install": downloads, verifies and installs the offered version in the
+	 *  background. Progress arrives as `UpdateStatusChanged`.
+	 */
+	updateDownload: () => typedError<null, ApiError>(__TAURI_INVOKE("update_download")),
+	/**  "Cancel": stops the download; nothing is kept. */
+	updateCancel: () => __TAURI_INVOKE<void>("update_cancel"),
+	/**
+	 *  "Restart to update": the user agreed to restart. Disconnects cleanly (the next start
+	 *  reconnects and rejoins), finishes the install where it waits for the restart, and restarts.
+	 */
+	updateRestart: () => typedError<null, ApiError>(__TAURI_INVOKE("update_restart")),
 	/**
 	 *  AppImage only: adds Mumcord to the app menu (desktop entry and icon). The UI calls this
 	 *  after the user said yes and then stores the choice in `appimageMenuEntry`.
@@ -727,7 +741,7 @@ export const events = {
 	transportChanged: makeEvent<TransportChanged, TransportChanged>("transport-changed"),
 	traySettingsRequested: makeEvent<TraySettingsRequested, TraySettingsRequested>("tray-settings-requested"),
 	unreadChanged: makeEvent<UnreadChanged, UnreadChanged>("unread-changed"),
-	updateAvailable: makeEvent<UpdateAvailable, UpdateAvailable>("update-available"),
+	updateStatusChanged: makeEvent<UpdateStatusChanged, UpdateStatusChanged>("update-status-changed"),
 	userRemoved: makeEvent<UserRemoved, UserRemoved>("user-removed"),
 	userStatsChanged: makeEvent<UserStatsChanged, UserStatsChanged>("user-stats-changed"),
 	userUpserted: makeEvent<UserUpserted, UserUpserted>("user-upserted"),
@@ -1485,6 +1499,23 @@ export type InspectorViewChanged = {
 	view: InspectorView,
 };
 
+/**  How this copy was installed, which decides how it is updated (FR-3.147). */
+export type InstallKind = 
+/**  Replaces itself. */
+"appImage" | 
+/**  The AppImage or its folder cannot be written: download by hand. */
+"appImageReadOnly" | 
+/**  The NSIS installer: runs the new installer silently for this user. */
+"windowsInstaller" | 
+/**  The portable zip (#181): notify only, a new zip is unpacked by hand. */
+"windowsPortable" | 
+/**  Swaps the signed `.app` in place. */
+"macApp" | 
+/**  A Mac app outside an `.app` bundle (a development run). */
+"otherMac" | 
+/**  Packages: the package manager updates them. */
+"deb" | "rpm" | "aur" | "otherLinux";
+
 /**  KDE only: whether X11 apps may see mouse buttons now, and whether Mumcord can undo its change. */
 export type KdeX11Access = {
 	allowed: boolean,
@@ -1748,6 +1779,15 @@ export type MusicKind = "track" | "album" | "playlist" | "artist" | "episode" | 
 export type MusicService = "spotify" | "soundcloud" | "youtubeMusic" | "appleMusic" | "tidal" | "deezer" | "bandcamp" | 
 /**  Another page that says it is music. */
 "other";
+
+/**  Which noise suppression runs while it is on (Settings → Voice, FR-3.65). */
+export type NoiseBackend = 
+/**  "Light". */
+"light" | 
+/**  "Standard", the default. */
+"standard" | 
+/**  "Advanced (AI)", Beta. */
+"advanced";
 
 /**
  *  The user clicked a system notification; the window is already in front. Show the server
@@ -2177,6 +2217,15 @@ export type RelayUnavailable =
 /**  "The other person can't use the relay (older Mumcord or relay turned off)." */
 { kind: "peerCannotRelay" } | { kind: "denied" } | { kind: "peerGone" } | { kind: "rateLimited" } | { kind: "relayFull" };
 
+/**  The changes of one release between the installed and the offered version. */
+export type ReleaseNote = {
+	version: string,
+	/**  `YYYY-MM-DD` of publication. */
+	date: string | null,
+	/**  The release's CHANGELOG section (`### Added` …) as Markdown, English only; untrusted. */
+	changes: string,
+};
+
 /**  A stored channel password without the password itself (FR-2.78, issue #146). */
 export type SavedChannelPassword = {
 	/**  The user's own name; `null` shows the channels, or "Password N" without any. */
@@ -2385,6 +2434,8 @@ export type Settings = {
 	inputDevice: string | null,
 	outputDevice: string | null,
 	noiseSuppression: boolean,
+	/**  Selected noise suppression (default Standard). */
+	noiseSuppressionBackend: NoiseBackend,
 	echoCancellation: boolean,
 	autoGain: boolean,
 	/**  Manual microphone gain in percent, 0–200 (default 100). */
@@ -2493,8 +2544,14 @@ export type Settings = {
 	allowDirectConnections: Consent,
 	/**  Global P2P mode (FR-4.1). */
 	p2pMode: P2pMode,
-	/**  "Check for new versions" (FR-2.56). */
+	/**  "Check for new versions" (FR-2.56); `no` is the updater's "Off" (FR-3.146). */
 	updateCheck: Consent,
+	/**  "Download automatically" instead of "Notify only" (FR-3.146). */
+	updateAutoDownload: boolean,
+	/**  Hours between two update checks, 1–168 (FR-3.144). */
+	updateIntervalHours: number,
+	/**  The version the user skipped; `null` when none is (FR-3.144). */
+	updateSkipped: string | null,
 	/**  AppImage only: the one-time "Add Mumcord to the app menu" offer (FR-2.55). */
 	appimageMenuEntry: Consent,
 	/**  The one-time "window overlay removed" notice was shown (FR-2.33). */
@@ -2506,11 +2563,21 @@ export type Settings = {
 	 *  that knew about it.
 	 */
 	whatsNewSeen: string | null,
+	/**
+	 *  The setup style chosen in the wizard (issue #159); `null` until the wizard stored one.
+	 *  Settings compares it with the current values ("Balanced, customised").
+	 */
+	setupPreset: SetupPreset | null,
 	/**  "Private messages from" (issue #141). */
 	privateMessages: PrivateMessageSettings,
 	/**  Channel messages of blocked users: collapsed (default) or hidden (issue #140). */
 	blockedMessages: BlockedMessages,
 };
+
+/**  The setup style chosen in the setup wizard (issue #159): one of the three presets or Custom. */
+export type SetupPreset = "everythingOn" | 
+/**  "Balanced (Recommended)". */
+"balanced" | "maximumPrivacy" | "custom";
 
 /**  Why the user cannot start a share on the server: nobody could watch it (FR-4.3 – FR-4.5). */
 export type ShareStartBlock = {
@@ -2647,16 +2714,68 @@ export type UnreadCount = {
 	count: number,
 };
 
-/**  The daily check found a newer release. */
-export type UpdateAvailable = {
-	info: UpdateInfo,
+/**  Why the last step failed. Offline checks are not shown as errors, only in Settings. */
+export type UpdateError = 
+/**  GitHub could not be reached or answered with an error. */
+"network" | 
+/**  The update manifest is missing, broken or points outside the release. */
+"manifest" | 
+/**  The signature does not match the updater key: the download was discarded. */
+"signature" | 
+/**  The download does not match `SHA256SUMS`: it was discarded. */
+"checksum" | 
+/**  Replacing the app failed; the installed version is unchanged. */
+"install";
+
+/**  A newer release than the installed one. */
+export type UpdateOffer = {
+	version: string,
+	/**  Newest first: every release since the installed one. */
+	notes: ReleaseNote[],
+	/**  The release page, built from the version (never taken from the response). */
+	url: string,
 };
 
-/**  A newer Mumcord release on GitHub. */
-export type UpdateInfo = {
-	version: string,
-	/**  The release page with the update instructions. */
-	url: string,
+/**  Where the updater is (FR-3.144, FR-3.145). */
+export type UpdatePhase = 
+/**  No check ran yet (or updates are off). */
+"idle" | "checking" | "upToDate" | "available" | "downloading" | 
+/**  Checking the signature and `SHA256SUMS`. */
+"verifying" | "installing" | 
+/**  Installed (Windows: verified, installs on restart); waits for "Restart to update". */
+"ready" | 
+/**  The download or a check of it failed; see `error`. The offer stays. */
+"failed";
+
+/**  Bytes received of the bundle, and its size when the server announced it. */
+export type UpdateProgress = {
+	received: number | null,
+	total: number | null,
+};
+
+/**  Everything the update UI shows. */
+export type UpdateStatus = {
+	currentVersion: string,
+	install: InstallKind,
+	/**  The updater can download and install by itself (otherwise: notify only). */
+	canInstall: boolean,
+	/**  A development build: it never checks for updates. */
+	devBuild: boolean,
+	phase: UpdatePhase,
+	offer: UpdateOffer | null,
+	progress: UpdateProgress | null,
+	error: UpdateError | null,
+	/**  When the last check ran, in milliseconds since the Unix epoch. */
+	lastCheckMs: number | null,
+};
+
+/**
+ *  The updater's state changed. `prompt` asks the UI to open the "Update available" or "ready"
+ *  dialog (a scheduled or manual check found something new, or a download finished).
+ */
+export type UpdateStatusChanged = {
+	status: UpdateStatus,
+	prompt: boolean,
 };
 
 export type User = {

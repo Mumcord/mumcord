@@ -8,6 +8,7 @@
     "about": "Om",
     "servers": "Servrar",
     "privacy": "Integritet",
+    "updates": "Uppdateringar",
     "packetInspector": "Paketinspektör"
   },
   "search": {
@@ -147,6 +148,20 @@
     "processing": "Röstbehandling",
     "noiseSuppression": "Brusreducering",
     "noiseSuppressionHint": "Filtrerar bort bakgrundsljud som tangentbord och fläktar.",
+    "noiseChoice": {
+      "light": "Lätt",
+      "standard": "Standard",
+      "advanced": "Avancerad (AI)",
+      "off": "Av"
+    },
+    "noiseChoiceHint": {
+      "light": "Klassiskt filter för jämnt brus som fläktar eller brum. Lägst CPU-användning.",
+      "standard": "AI-filter för vardagsljud som tangentbord och fläktar. Låg CPU-användning.",
+      "advanced": "Nyare AI-modell som även tar bort växlande brus. Ungefär tre gånger så mycket CPU som Standard och 10 ms mer fördröjning."
+    },
+    "noiseChoiceBeta": "Beta",
+    "noiseChoiceTipLabel": "Om {{choice}}",
+    "detectorHint": "Röstaktiveringen använder RNNoise-modellen för att upptäcka tal; den ändrar inte ditt ljud.",
     "echoCancellation": "Ekoreducering",
     "echoCancellationHint": "Hindrar andra från att höra sig själva när du använder högtalare.",
     "autoGain": "Automatisk volym",
@@ -407,14 +422,6 @@
       "unsupported": "Overlay i spel är inte tillgänglig på det här systemet. Fönsteroverlayen ovan används i stället.",
       "loadFailed": "Inställningarna för overlay i spel kunde inte läsas in.",
       "saveFailed": "Ändringen av overlay i spel kunde inte tillämpas.",
-      "confirmTitle": "Slå på overlayen för {{game}}?",
-      "confirmMessage": "Varning: {{game}} använder anti-cheat-skydd ({{reason}}). Overlayer kan upptäckas som fusk och ditt konto kan bli bannat. Mumcord ansvarar inte för det. Fortsätt bara om du accepterar risken.",
-      "confirmEnable": "Slå på ändå",
-      "limits": {
-        "libraryMissing": "Overlay i spel är inte tillgänglig: dess overlaybibliotek (libmumcord_overlay_layer.so) hittades inte bredvid Mumcord. Installera om Mumcord för att återställa det. Fönsteroverlayen ovan används i stället.",
-        "windowsFullscreen": "Använd kantlös eller fönsterbaserad helskärm i spelet.",
-        "macos": "macOS stöder inte overlayer i spel. Fönsteroverlayen ovan används i stället."
-      },
       "opengl": {
         "title": "OpenGL-spel",
         "explanation": "Behövs bara för OpenGL-spel: klistra in i spelets startalternativ i Steam.",
@@ -422,6 +429,14 @@
         "copy": "Kopiera",
         "copied": "Kopierat",
         "copyFailed": "Kopieringen misslyckades. Markera texten och kopiera den för hand."
+      },
+      "confirmTitle": "Slå på overlayen för {{game}}?",
+      "confirmMessage": "Varning: {{game}} använder anti-cheat-skydd ({{reason}}). Overlayer kan upptäckas som fusk och ditt konto kan bli bannat. Mumcord ansvarar inte för det. Fortsätt bara om du accepterar risken.",
+      "confirmEnable": "Slå på ändå",
+      "limits": {
+        "libraryMissing": "Overlay i spel är inte tillgänglig: dess overlaybibliotek (libmumcord_overlay_layer.so) hittades inte bredvid Mumcord. Installera om Mumcord för att återställa det. Fönsteroverlayen ovan används i stället.",
+        "windowsFullscreen": "Använd kantlös eller fönsterbaserad helskärm i spelet.",
+        "macos": "macOS stöder inte overlayer i spel. Fönsteroverlayen ovan används i stället."
       }
     }
   },
@@ -588,11 +603,6 @@
     "allow": "Tillåt direktanslutningar till andra Mumcord-användare",
     "hint": "Direktanslutningar är snabbare, men den andra personen kan se din IP-adress. Tills du bestämmer dig frågar Mumcord första gången en skulle användas.",
     "notUsed": "Används inte i det valda peer-to-peer-läget: Mumcord ansluter aldrig direkt till andra."
-  },
-  "updates": {
-    "title": "Uppdateringar",
-    "check": "Sök efter nya versioner",
-    "hint": "En gång om dagen frågar Mumcord GitHub efter den senaste versionen. Inget annat skickas."
   },
   "appImageMenu": {
     "label": "Lägg till Mumcord i appmenyn",
@@ -775,5 +785,61 @@
     "collapseHint": "Visar ”Meddelande från en blockerad användare” med en knapp som heter Visa.",
     "hide": "Dölj dem helt",
     "hideHint": "Inget visas i chatten."
+  },
+  "updates": {
+    "installedFrom": "Mumcord {{version}} · installerad från {{source}}",
+    "install": {
+      "appImage": "AppImage",
+      "appImageReadOnly": "en AppImage i en skrivskyddad mapp",
+      "windowsInstaller": "Windows-installationsprogrammet",
+      "windowsPortable": "den portabla Windows-zippen",
+      "macApp": "macOS-appen",
+      "otherMac": "en macOS-kopia utanför ett appaket",
+      "deb": ".deb-paketet",
+      "rpm": ".rpm-paketet",
+      "aur": "AUR",
+      "otherLinux": "ett Linux-paket"
+    },
+    "checking": "Kontrollerar",
+    "mode": "När en uppdatering hittas",
+    "modeHint": "Uppdateringar kontrolleras och verifieras alltid innan de installeras.",
+    "modeAuto": "Ladda ned automatiskt",
+    "modeNotify": "Endast avisera",
+    "modeOff": "Av",
+    "autoUnavailable": "Den här kopian kan inte uppdatera sig själv, så Mumcord berättar bara om nya versioner.",
+    "interval": "Sök efter uppdateringar",
+    "intervalHint_one": "Vid start och varje timme",
+    "intervalHint_other": "Vid start och var {{count}}:e timme",
+    "intervalWeekHint": "Vid start och en gång i veckan",
+    "intervalHours_one": "Varje timme",
+    "intervalHours_other": "Var {{count}}:e timme",
+    "intervalWeek": "En gång i veckan",
+    "status": "Status",
+    "state": {
+      "idle": "Inte kontrollerat än",
+      "off": "Uppdateringskontroll är av",
+      "checking": "Söker efter uppdateringar…",
+      "upToDate": "Mumcord är uppdaterat",
+      "available": "Mumcord {{version}} är tillgänglig",
+      "downloading": "Laddar ned Mumcord {{version}}…",
+      "verifying": "Kontrollerar nedladdningen av Mumcord {{version}}…",
+      "installing": "Installerar Mumcord {{version}}…",
+      "ready": "Mumcord {{version}} är redo. Starta om för att uppdatera.",
+      "failed": "Den senaste uppdateringen fungerade inte",
+      "offline": "GitHub kunde inte nås. Mumcord försöker igen senare."
+    },
+    "devBuild": "Utvecklingsversion: uppdateringar är av",
+    "lastCheckedToday": "Senast kontrollerad i dag kl. {{time}}",
+    "lastCheckedYesterday": "Senast kontrollerad i går kl. {{time}}",
+    "lastCheckedOn": "Senast kontrollerad {{date}} kl. {{time}}",
+    "checkNow": "Kontrollera nu",
+    "showUpdate": "Visa uppdatering",
+    "checkFailed": "Kontrollen kunde inte startas. Försök igen.",
+    "skipped": "Överhoppad version",
+    "skippedHint": "{{version}} hoppas över och erbjuds inte igen.",
+    "stopSkipping": "Sluta hoppa över",
+    "whatsNew": "Nyheter",
+    "whatsNewHint": "Se ändringarna i varje version.",
+    "openChangelog": "Öppna ändringsloggen"
   }
 }

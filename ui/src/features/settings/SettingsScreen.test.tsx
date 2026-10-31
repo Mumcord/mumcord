@@ -620,10 +620,58 @@ describe("Voice section", () => {
     });
   });
 
+  describe("noise suppression (FR-3.65)", () => {
+    it("offers Light, Standard, Advanced (AI) with a Beta badge and Off, Standard selected", async () => {
+      await openSection("Voice & Audio");
+      const group = await screen.findByRole("group", { name: "Noise suppression" });
+      const radios = within(group).getAllByRole("radio");
+      expect(radios.map((radio) => radio.closest("label")?.textContent)).toEqual([
+        "Light",
+        "Standard",
+        "Advanced (AI) Beta",
+        "Off",
+      ]);
+      expect(within(group).getByRole("radio", { name: "Standard" })).toBeChecked();
+    });
+
+    it("explains each level behind a ? and saves the choice", async () => {
+      const update = vi.spyOn(api, "settingsUpdate");
+      await openSection("Voice & Audio");
+      const group = await screen.findByRole("group", { name: "Noise suppression" });
+      expect(within(group).getByRole("button", { name: "About Advanced (AI)" })).toHaveAttribute(
+        "data-tooltip",
+        expect.stringMatching(/three times the CPU/),
+      );
+      expect(within(group).getByRole("button", { name: "About Light" })).toHaveAttribute(
+        "data-tooltip",
+        expect.stringMatching(/Lowest CPU/),
+      );
+
+      fireEvent.click(within(group).getByRole("radio", { name: /Advanced/ }));
+      await waitFor(() => {
+        expect(update).toHaveBeenLastCalledWith(
+          expect.objectContaining({ noiseSuppression: true, noiseSuppressionBackend: "advanced" }),
+        );
+      });
+      fireEvent.click(within(group).getByRole("radio", { name: "Light" }));
+      await waitFor(() => {
+        expect(update).toHaveBeenLastCalledWith(
+          expect.objectContaining({ noiseSuppression: true, noiseSuppressionBackend: "light" }),
+        );
+      });
+      fireEvent.click(within(group).getByRole("radio", { name: "Off" }));
+      await waitFor(() => {
+        expect(update).toHaveBeenLastCalledWith(
+          expect.objectContaining({ noiseSuppression: false, noiseSuppressionBackend: "light" }),
+        );
+      });
+    });
+  });
+
   describe("compatibility mode (FR-1.48)", () => {
     it("is hidden outside Linux Wayland", async () => {
       await openSection("Voice & Audio");
-      await screen.findByRole("switch", { name: /Noise suppression/ });
+      await screen.findByRole("group", { name: "Noise suppression" });
       expect(screen.queryByRole("switch", { name: /Compatibility mode/ })).not.toBeInTheDocument();
     });
 
@@ -811,13 +859,11 @@ describe("Voice section", () => {
   it("saves the voice processing switches", async () => {
     const update = vi.spyOn(api, "settingsUpdate");
     await openSection("Voice & Audio");
-    fireEvent.click(screen.getByRole("switch", { name: "Noise suppression" }));
     fireEvent.click(screen.getByRole("switch", { name: "Echo cancellation" }));
     fireEvent.click(screen.getByRole("switch", { name: "Automatic volume" }));
     await waitFor(() => {
       expect(update).toHaveBeenLastCalledWith(
         expect.objectContaining({
-          noiseSuppression: false,
           echoCancellation: false,
           autoGain: false,
         }),
@@ -1403,11 +1449,11 @@ describe("Settings search", () => {
     });
     expect(result.querySelector("mark")).toHaveTextContent("Noise");
     fireEvent.click(result);
-    const toggle = await screen.findByRole("switch", { name: "Noise suppression" });
+    const choice = await screen.findByRole("radio", { name: "Standard" });
     await waitFor(() => {
-      expect(toggle).toHaveFocus();
+      expect(choice).toHaveFocus();
     });
-    expect(toggle.closest(".settings-switch")).toHaveClass("settings-highlight");
+    expect(choice.closest("fieldset")).toHaveClass("settings-highlight");
     expect(search()).toHaveValue("");
     expect(screen.getByRole("tab", { name: "Voice & Audio" })).toHaveAttribute(
       "aria-selected",

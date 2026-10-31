@@ -8,6 +8,7 @@
     "about": "Om",
     "servers": "Servere",
     "privacy": "Privatliv",
+    "updates": "Opdateringer",
     "packetInspector": "Pakkeinspektør"
   },
   "search": {
@@ -147,6 +148,20 @@
     "processing": "Stemmebehandling",
     "noiseSuppression": "Støjundertrykkelse",
     "noiseSuppressionHint": "Filtrerer baggrundsstøj som tastatur og blæsere fra.",
+    "noiseChoice": {
+      "light": "Let",
+      "standard": "Standard",
+      "advanced": "Avanceret (AI)",
+      "off": "Fra"
+    },
+    "noiseChoiceHint": {
+      "light": "Klassisk filter til jævn støj som blæsere eller brum. Laveste CPU-forbrug.",
+      "standard": "AI-filter til hverdagsstøj som tastaturer og blæsere. Lavt CPU-forbrug.",
+      "advanced": "Nyere AI-model, der også fjerner skiftende støj. Cirka tre gange så meget CPU som Standard og 10 ms mere forsinkelse."
+    },
+    "noiseChoiceBeta": "Beta",
+    "noiseChoiceTipLabel": "Om {{choice}}",
+    "detectorHint": "Stemmeaktivering opdager tale med RNNoise-modellen; den ændrer ikke din lyd.",
     "echoCancellation": "Ekkoundertrykkelse",
     "echoCancellationHint": "Forhindrer, at andre hører sig selv, når du bruger højttalere.",
     "autoGain": "Automatisk lydstyrke",
@@ -407,14 +422,6 @@
       "unsupported": "Overlay i spil er ikke tilgængeligt på dette system. Vinduesoverlayet ovenfor bruges i stedet.",
       "loadFailed": "Indstillingerne for overlay i spil kunne ikke indlæses.",
       "saveFailed": "Ændringen af overlay i spil kunne ikke anvendes.",
-      "confirmTitle": "Slå overlayet til for {{game}}?",
-      "confirmMessage": "Advarsel: {{game}} bruger anti-cheat-beskyttelse ({{reason}}). Overlays kan blive opdaget som snyd, og din konto kan blive udelukket. Mumcord er ikke ansvarlig for det. Fortsæt kun, hvis du accepterer risikoen.",
-      "confirmEnable": "Slå til alligevel",
-      "limits": {
-        "libraryMissing": "Overlay i spil er ikke tilgængeligt: dets overlaybibliotek (libmumcord_overlay_layer.so) blev ikke fundet ved siden af Mumcord. Geninstallér Mumcord for at gendanne det. Vinduesoverlayet ovenfor bruges i stedet.",
-        "windowsFullscreen": "Brug kantløs eller vinduesbaseret fuldskærm i spillet.",
-        "macos": "macOS understøtter ikke overlays i spil. Vinduesoverlayet ovenfor bruges i stedet."
-      },
       "opengl": {
         "title": "OpenGL-spil",
         "explanation": "Kun nødvendigt for OpenGL-spil: indsæt i spillets startindstillinger i Steam.",
@@ -422,6 +429,14 @@
         "copy": "Kopiér",
         "copied": "Kopieret",
         "copyFailed": "Kopiering mislykkedes. Markér teksten, og kopiér den manuelt."
+      },
+      "confirmTitle": "Slå overlayet til for {{game}}?",
+      "confirmMessage": "Advarsel: {{game}} bruger anti-cheat-beskyttelse ({{reason}}). Overlays kan blive opdaget som snyd, og din konto kan blive udelukket. Mumcord er ikke ansvarlig for det. Fortsæt kun, hvis du accepterer risikoen.",
+      "confirmEnable": "Slå til alligevel",
+      "limits": {
+        "libraryMissing": "Overlay i spil er ikke tilgængeligt: dets overlaybibliotek (libmumcord_overlay_layer.so) blev ikke fundet ved siden af Mumcord. Geninstallér Mumcord for at gendanne det. Vinduesoverlayet ovenfor bruges i stedet.",
+        "windowsFullscreen": "Brug kantløs eller vinduesbaseret fuldskærm i spillet.",
+        "macos": "macOS understøtter ikke overlays i spil. Vinduesoverlayet ovenfor bruges i stedet."
       }
     }
   },
@@ -588,11 +603,6 @@
     "allow": "Tillad direkte forbindelser til andre Mumcord-brugere",
     "hint": "Direkte forbindelser er hurtigere, men den anden person kan se din IP-adresse. Indtil du beslutter dig, spørger Mumcord første gang, en ville blive brugt.",
     "notUsed": "Bruges ikke i den valgte peer-to-peer-tilstand: Mumcord forbinder aldrig direkte til andre."
-  },
-  "updates": {
-    "title": "Opdateringer",
-    "check": "Søg efter nye versioner",
-    "hint": "En gang om dagen spørger Mumcord GitHub om den nyeste udgivelse. Intet andet sendes."
   },
   "appImageMenu": {
     "label": "Føj Mumcord til appmenuen",
@@ -775,5 +785,61 @@
     "collapseHint": "Viser »Besked fra en blokeret bruger« med en knap, der hedder Vis.",
     "hide": "Skjul dem helt",
     "hideHint": "Intet vises i chatten."
+  },
+  "updates": {
+    "installedFrom": "Mumcord {{version}} · installeret fra {{source}}",
+    "install": {
+      "appImage": "AppImage",
+      "appImageReadOnly": "en AppImage i en skrivebeskyttet mappe",
+      "windowsInstaller": "Windows-installationsprogrammet",
+      "windowsPortable": "den bærbare Windows-zip",
+      "macApp": "macOS-appen",
+      "otherMac": "en macOS-kopi uden for en appbundle",
+      "deb": ".deb-pakken",
+      "rpm": ".rpm-pakken",
+      "aur": "AUR",
+      "otherLinux": "en Linux-pakke"
+    },
+    "checking": "Tjekker",
+    "mode": "Når en opdatering er fundet",
+    "modeHint": "Opdateringer tjekkes og bekræftes altid, før de installeres.",
+    "modeAuto": "Hent automatisk",
+    "modeNotify": "Giv kun besked",
+    "modeOff": "Fra",
+    "autoUnavailable": "Denne kopi kan ikke opdatere sig selv, så Mumcord fortæller dig kun om nye versioner.",
+    "interval": "Søg efter opdateringer",
+    "intervalHint_one": "Ved start og hver time",
+    "intervalHint_other": "Ved start og hver {{count}}. time",
+    "intervalWeekHint": "Ved start og en gang om ugen",
+    "intervalHours_one": "Hver time",
+    "intervalHours_other": "Hver {{count}}. time",
+    "intervalWeek": "En gang om ugen",
+    "status": "Status",
+    "state": {
+      "idle": "Endnu ikke tjekket",
+      "off": "Opdateringstjek er slået fra",
+      "checking": "Søger efter opdateringer…",
+      "upToDate": "Mumcord er opdateret",
+      "available": "Mumcord {{version}} er tilgængelig",
+      "downloading": "Henter Mumcord {{version}}…",
+      "verifying": "Kontrollerer download af Mumcord {{version}}…",
+      "installing": "Installerer Mumcord {{version}}…",
+      "ready": "Mumcord {{version}} er klar. Genstart for at opdatere.",
+      "failed": "Den seneste opdatering virkede ikke",
+      "offline": "GitHub kunne ikke nås. Mumcord prøver igen senere."
+    },
+    "devBuild": "Udviklingsversion: opdateringer er slået fra",
+    "lastCheckedToday": "Sidst tjekket i dag kl. {{time}}",
+    "lastCheckedYesterday": "Sidst tjekket i går kl. {{time}}",
+    "lastCheckedOn": "Sidst tjekket den {{date}} kl. {{time}}",
+    "checkNow": "Tjek nu",
+    "showUpdate": "Vis opdatering",
+    "checkFailed": "Tjekket kunne ikke startes. Prøv igen.",
+    "skipped": "Version sprunget over",
+    "skippedHint": "{{version}} springes over og tilbydes ikke igen.",
+    "stopSkipping": "Stop med at springe over",
+    "whatsNew": "Nyheder",
+    "whatsNewHint": "Se ændringerne i hver version.",
+    "openChangelog": "Åbn ændringsloggen"
   }
 }

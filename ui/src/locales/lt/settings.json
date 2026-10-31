@@ -8,6 +8,7 @@
     "about": "Apie",
     "servers": "Serveriai",
     "privacy": "Privatumas",
+    "updates": "Atnaujinimai",
     "packetInspector": "Paketų tikrintuvas"
   },
   "search": {
@@ -149,6 +150,20 @@
     "processing": "Balso apdorojimas",
     "noiseSuppression": "Triukšmo slopinimas",
     "noiseSuppressionHint": "Išfiltruoja foninį triukšmą, pavyzdžiui, klaviatūros ar ventiliatorių garsą.",
+    "noiseChoice": {
+      "light": "Silpnas",
+      "standard": "Standartinis",
+      "advanced": "Išplėstinis (DI)",
+      "off": "Išjungta"
+    },
+    "noiseChoiceHint": {
+      "light": "Klasikinis filtras pastoviam triukšmui, pvz., ventiliatoriams ar ūžesiui. Mažiausia procesoriaus apkrova.",
+      "standard": "DI filtras kasdieniam triukšmui, pvz., klaviatūroms ir ventiliatoriams. Maža procesoriaus apkrova.",
+      "advanced": "Naujesnis DI modelis, šalinantis ir kintantį triukšmą. Maždaug tris kartus daugiau procesoriaus nei Standartinis ir 10 ms didesnė delsa."
+    },
+    "noiseChoiceBeta": "Beta",
+    "noiseChoiceTipLabel": "Apie {{choice}}",
+    "detectorHint": "Balso aktyvavimas atpažįsta kalbą su RNNoise modeliu; jis nekeičia tavo garso.",
     "echoCancellation": "Aido pašalinimas",
     "echoCancellationHint": "Neleidžia kitiems girdėti savęs, kai naudoji garsiakalbius.",
     "autoGain": "Automatinis garsumas",
@@ -411,14 +426,6 @@
       "unsupported": "Perdanga žaidime šioje sistemoje nepasiekiama. Vietoj jos naudojama aukščiau esanti lango perdanga.",
       "loadFailed": "Nepavyko įkelti perdangos žaidime nustatymų.",
       "saveFailed": "Nepavyko pritaikyti perdangos žaidime pakeitimo.",
-      "confirmTitle": "Įjungti perdangą žaidimui {{game}}?",
-      "confirmMessage": "Įspėjimas: {{game}} naudoja apsaugą nuo sukčiavimo ({{reason}}). Perdangos gali būti palaikytos sukčiavimu, o tavo paskyra gali būti užblokuota. Mumcord už tai neatsako. Tęsk tik jei sutinki su šia rizika.",
-      "confirmEnable": "Vis tiek įjungti",
-      "limits": {
-        "libraryMissing": "Perdanga žaidime nepasiekiama: jos bibliotekos (libmumcord_overlay_layer.so) šalia Mumcord nerasta. Iš naujo įdiek Mumcord, kad ją atkurtum. Vietoj jos naudojama aukščiau esanti lango perdanga.",
-        "windowsFullscreen": "Žaidime naudokite viso ekrano režimą be rėmelio arba lange.",
-        "macos": "macOS nepalaiko perdangų žaidimuose. Vietoj jos naudojama aukščiau esanti lango perdanga."
-      },
       "opengl": {
         "title": "OpenGL žaidimai",
         "explanation": "Reikia tik OpenGL žaidimams: įklijuok į žaidimo Steam paleidimo parinktis.",
@@ -426,6 +433,14 @@
         "copy": "Kopijuoti",
         "copied": "Nukopijuota",
         "copyFailed": "Kopijuoti nepavyko. Pažymėk tekstą ir nukopijuok jį rankiniu būdu."
+      },
+      "confirmTitle": "Įjungti perdangą žaidimui {{game}}?",
+      "confirmMessage": "Įspėjimas: {{game}} naudoja apsaugą nuo sukčiavimo ({{reason}}). Perdangos gali būti palaikytos sukčiavimu, o tavo paskyra gali būti užblokuota. Mumcord už tai neatsako. Tęsk tik jei sutinki su šia rizika.",
+      "confirmEnable": "Vis tiek įjungti",
+      "limits": {
+        "libraryMissing": "Perdanga žaidime nepasiekiama: jos bibliotekos (libmumcord_overlay_layer.so) šalia Mumcord nerasta. Iš naujo įdiek Mumcord, kad ją atkurtum. Vietoj jos naudojama aukščiau esanti lango perdanga.",
+        "windowsFullscreen": "Žaidime naudokite viso ekrano režimą be rėmelio arba lange.",
+        "macos": "macOS nepalaiko perdangų žaidimuose. Vietoj jos naudojama aukščiau esanti lango perdanga."
       }
     }
   },
@@ -594,11 +609,6 @@
     "allow": "Leisti tiesioginius ryšius su kitais Mumcord naudotojais",
     "hint": "Tiesioginiai ryšiai greitesni, bet kitas asmuo gali matyti tavo IP adresą. Kol nenusprendei, Mumcord paklausia pirmą kartą, kai toks būtų naudojamas.",
     "notUsed": "Pasirinktame peer-to-peer režime nenaudojama: Mumcord niekada nesijungia tiesiogiai prie kitų."
-  },
-  "updates": {
-    "title": "Atnaujinimai",
-    "check": "Ieškoti naujų versijų",
-    "hint": "Kartą per dieną Mumcord paklausia GitHub apie naujausią leidimą. Daugiau nieko nesiunčiama."
   },
   "appImageMenu": {
     "label": "Pridėti Mumcord į programų meniu",
@@ -783,5 +793,65 @@
     "collapseHint": "Rodo „Žinutė nuo užblokuoto naudotojo“ su mygtuku „Rodyti“.",
     "hide": "Visiškai paslėpti",
     "hideHint": "Pokalbyje nieko nerodoma."
+  },
+  "updates": {
+    "installedFrom": "Mumcord {{version}} · įdiegta iš: {{source}}",
+    "install": {
+      "appImage": "AppImage",
+      "appImageReadOnly": "AppImage aplanke, skirtame tik skaitymui",
+      "windowsInstaller": "Windows diegimo programa",
+      "windowsPortable": "nešiojamasis Windows zip",
+      "macApp": "macOS programa",
+      "otherMac": "macOS kopija už programos paketo ribų",
+      "deb": ".deb paketas",
+      "rpm": ".rpm paketas",
+      "aur": "AUR",
+      "otherLinux": "Linux paketas"
+    },
+    "checking": "Tikrinama",
+    "mode": "Kai randamas naujinimas",
+    "modeHint": "Naujinimai visada patikrinami ir patvirtinami prieš įdiegiant.",
+    "modeAuto": "Atsisiųsti automatiškai",
+    "modeNotify": "Tik pranešti",
+    "modeOff": "Išjungta",
+    "autoUnavailable": "Ši kopija negali pati atsinaujinti, todėl Mumcord tik praneša apie naujas versijas.",
+    "interval": "Tikrinti naujinimus",
+    "intervalHint_one": "Paleidžiant ir kas valandą",
+    "intervalHint_few": "Paleidžiant ir kas {{count}} valandas",
+    "intervalHint_many": "Paleidžiant ir kas {{count}} valandos",
+    "intervalHint_other": "Paleidžiant ir kas {{count}} valandų",
+    "intervalWeekHint": "Paleidžiant ir kartą per savaitę",
+    "intervalHours_one": "Kas valandą",
+    "intervalHours_few": "Kas {{count}} valandas",
+    "intervalHours_many": "Kas {{count}} valandos",
+    "intervalHours_other": "Kas {{count}} valandų",
+    "intervalWeek": "Kartą per savaitę",
+    "status": "Būsena",
+    "state": {
+      "idle": "Dar netikrinta",
+      "off": "Naujinimų tikrinimas išjungtas",
+      "checking": "Tikrinami naujinimai…",
+      "upToDate": "Mumcord yra naujausias",
+      "available": "Yra Mumcord {{version}}",
+      "downloading": "Atsisiunčiama Mumcord {{version}}…",
+      "verifying": "Tikrinamas Mumcord {{version}} atsisiuntimas…",
+      "installing": "Įdiegiama Mumcord {{version}}…",
+      "ready": "Mumcord {{version}} paruoštas. Paleisk iš naujo, kad atnaujintum.",
+      "failed": "Paskutinis naujinimas nepavyko",
+      "offline": "Nepavyko pasiekti GitHub. Mumcord pabandys vėliau."
+    },
+    "devBuild": "Kūrimo versija: naujinimai išjungti",
+    "lastCheckedToday": "Paskutinį kartą tikrinta šiandien {{time}}",
+    "lastCheckedYesterday": "Paskutinį kartą tikrinta vakar {{time}}",
+    "lastCheckedOn": "Paskutinį kartą tikrinta {{date}} {{time}}",
+    "checkNow": "Tikrinti dabar",
+    "showUpdate": "Rodyti naujinimą",
+    "checkFailed": "Nepavyko paleisti tikrinimo. Bandyk dar kartą.",
+    "skipped": "Praleista versija",
+    "skippedHint": "{{version}} praleidžiama ir daugiau nebus siūloma.",
+    "stopSkipping": "Nebepraleisti",
+    "whatsNew": "Kas nauja",
+    "whatsNewHint": "Peržiūrėk kiekvienos versijos pakeitimus.",
+    "openChangelog": "Atidaryti pakeitimų žurnalą"
   }
 }

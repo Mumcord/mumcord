@@ -1,4 +1,5 @@
 import { useId } from "react";
+import { InfoTip } from "../../../components/InfoTip";
 
 interface RadioOption<T extends string> {
   value: T;
@@ -6,10 +7,16 @@ interface RadioOption<T extends string> {
   disabled?: boolean;
   /** Language of the label when it differs from the UI, so screen readers pronounce it right. */
   lang?: string;
+  /** Small marker after the label, such as "Beta". */
+  badge?: string | undefined;
+  /** A "?" next to the option that explains it. */
+  tip?: { label: string; text: string } | undefined;
 }
 
 interface RadioGroupProps<T extends string> {
   legend: string;
+  /** Explains the whole choice behind a "?" next to the legend. */
+  info?: { label: string; text: string } | undefined;
   value: T;
   options: RadioOption<T>[];
   onChange: (value: T) => void;
@@ -18,28 +25,47 @@ interface RadioGroupProps<T extends string> {
 /** Native radio buttons in a fieldset (arrow keys move between options). */
 export function RadioGroup<T extends string>({
   legend,
+  info,
   value,
   options,
   onChange,
 }: RadioGroupProps<T>) {
   const name = useId();
   return (
-    <fieldset className="settings-radios">
-      <legend>{legend}</legend>
+    // Named by the legend text alone, so the "?" button does not end up in the group's name.
+    <fieldset className="settings-radios" aria-labelledby={`${name}-legend`}>
+      <legend className="settings-radios__legend">
+        <span id={`${name}-legend`}>{legend}</span>
+        {info !== undefined && <InfoTip label={info.label} text={info.text} />}
+      </legend>
       {options.map((option) => (
-        <label key={option.value} className="settings-radios__option" lang={option.lang}>
-          <input
-            type="radio"
-            name={name}
-            value={option.value}
-            checked={option.value === value}
-            disabled={option.disabled ?? false}
-            onChange={() => {
-              onChange(option.value);
-            }}
-          />
-          {option.label}
-        </label>
+        <div key={option.value} className="settings-radios__row">
+          <label className="settings-radios__option" lang={option.lang}>
+            <input
+              type="radio"
+              name={name}
+              value={option.value}
+              checked={option.value === value}
+              disabled={option.disabled ?? false}
+              onChange={() => {
+                onChange(option.value);
+              }}
+            />
+            {option.label}
+            {/* The space keeps label and badge apart in the radio's accessible name. */}
+            {option.badge !== undefined && (
+              <>
+                {" "}
+                <span className="settings-switch__badge">{option.badge}</span>
+              </>
+            )}
+          </label>
+          {/* Outside the label, so the "?" is its own control and does not pick the option; to the
+              right, so the tip does not cover the neighbouring options. */}
+          {option.tip !== undefined && (
+            <InfoTip label={option.tip.label} text={option.tip.text} placement="right" />
+          )}
+        </div>
       ))}
     </fieldset>
   );

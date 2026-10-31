@@ -40,6 +40,24 @@ pub enum VoiceActivation {
     Manual,
 }
 
+/// Which noise suppression runs while `Settings::noise_suppression` is on (Settings → Voice,
+/// FR-3.65). The names are the product names, not the libraries behind them; the aliases read rows
+/// written by development builds of PR #126, which stored the library names.
+#[derive(Debug, Clone, Copy, Default, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum NoiseBackend {
+    /// "Light": `sonora-ns`, WebRTC's classical suppressor at one fixed strength, lowest CPU.
+    #[serde(alias = "sonora")]
+    Light,
+    /// "Standard": `nnnoiseless`, the 2018 RNNoise model (default).
+    #[default]
+    #[serde(alias = "nnnoiseless")]
+    Standard,
+    /// "Advanced (AI)", Beta: `rnnoise-rs`, the 2024 RNNoise model, more CPU (issue #176).
+    #[serde(alias = "rnnoise")]
+    Advanced,
+}
+
 /// Default manual threshold in dBFS.
 pub const DEFAULT_VOICE_THRESHOLD_DBFS: i32 = -40;
 /// Default for `Settings::preview_cache_days` (QA.42).
@@ -358,6 +376,17 @@ pub enum P2pMode {
     Off,
 }
 
+/// The setup style chosen in the setup wizard (issue #159). Settings shows it as "Balanced" or
+/// "Balanced, customised" and counts the differences from the preset.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum SetupPreset {
+    EverythingOn,
+    Balanced,
+    MaximumPrivacy,
+    Custom,
+}
+
 impl P2pMode {
     /// The snake_case name, as in the settings JSON; stored for per-server overrides.
     pub fn as_str(self) -> &'static str {
@@ -484,6 +513,8 @@ pub struct Settings {
     pub input_device: Option<String>,
     pub output_device: Option<String>,
     pub noise_suppression: bool,
+    /// Noise suppression backend (Settings → Voice); only the selected one processes the mic.
+    pub noise_suppression_backend: NoiseBackend,
     pub echo_cancellation: bool,
     pub auto_gain: bool,
     /// Manual microphone gain in percent, 0–200 (100 = unchanged); the voice-bar popover slider.
@@ -578,8 +609,16 @@ pub struct Settings {
     pub allow_direct_connections: Consent,
     /// Global P2P mode (FR-4.1); a server entry may override it (FR-4.2).
     pub p2p_mode: P2pMode,
-    /// Daily check for a new version (FR-2.56); `Unset` asks.
+    /// Check for new versions (FR-2.56, FR-3.146); `Unset` asks, `No` is "Off": nothing is
+    /// contacted.
     pub update_check: Consent,
+    /// "Download automatically" instead of "Notify only" (FR-3.146); only used while
+    /// `update_check` is `Yes`. A restart is always asked for.
+    pub update_auto_download: bool,
+    /// Hours between two update checks (FR-3.144). Clamped on load.
+    pub update_interval_hours: u32,
+    /// "Skip this version": this version is never offered again (FR-3.144).
+    pub update_skipped: Option<String>,
     /// When the last update check ran, in milliseconds since the Unix epoch.
     pub last_update_check: Option<i64>,
     /// AppImage only: the user's answer to "Add Mumcord to the app menu" (FR-2.55). The menu
@@ -596,6 +635,8 @@ pub struct Settings {
     /// The version whose "What's new" the user has seen; `None` before the first start that
     /// knew about it.
     pub whats_new_seen: Option<String>,
+    /// The setup style chosen in the wizard (issue #159); `None` until the wizard stored one.
+    pub setup_preset: Option<SetupPreset>,
     /// The user had Epic 1's window overlay enabled before it was removed (FR-2.33). Derived once
     /// from the old record on first load, then persisted.
     pub legacy_window_overlay_enabled: bool,
@@ -604,6 +645,12 @@ pub struct Settings {
     /// Channel messages of blocked users: collapsed or hidden (issue #140).
     pub blocked_messages: BlockedMessages,
 }
+
+/// Default hours between two update checks (FR-3.144).
+pub const DEFAULT_UPDATE_INTERVAL_HOURS: u32 = 12;
+/// Bounds of the update check interval: hourly up to weekly.
+pub const MIN_UPDATE_INTERVAL_HOURS: u32 = 1;
+pub const MAX_UPDATE_INTERVAL_HOURS: u32 = 168;
 
 /// Default own bitrate cap in kbit/s: today's speech cap (FR-2.64).
 pub const DEFAULT_BITRATE_KBPS: u32 = 96;
@@ -624,6 +671,7 @@ impl Default for Settings {
             input_device: None,
             output_device: None,
             noise_suppression: true,
+            noise_suppression_backend: NoiseBackend::default(),
             echo_cancellation: true,
             auto_gain: true,
             input_gain_percent: 100,
@@ -668,12 +716,16 @@ impl Default for Settings {
             allow_direct_connections: Consent::Unset,
             p2p_mode: P2pMode::DirectRelay,
             update_check: Consent::Unset,
+            update_auto_download: false,
+            update_interval_hours: DEFAULT_UPDATE_INTERVAL_HOURS,
+            update_skipped: None,
             last_update_check: None,
             appimage_menu_entry: Consent::Unset,
             window_overlay_notice_shown: false,
             audio_device_notice: false,
             whats_new_auto: true,
             whats_new_seen: None,
+            setup_preset: None,
             legacy_window_overlay_enabled: false,
             private_messages: PrivateMessageSettings::default(),
             blocked_messages: BlockedMessages::default(),
@@ -734,6 +786,9 @@ impl Store {
                 settings.video_ducking_percent = settings
                     .video_ducking_percent
                     .clamp(MIN_VIDEO_DUCKING_PERCENT, MAX_VIDEO_DUCKING_PERCENT);
+                settings.update_interval_hours = settings
+                    .update_interval_hours
+                    .clamp(MIN_UPDATE_INTERVAL_HOURS, MAX_UPDATE_INTERVAL_HOURS);
                 settings.input_gain_percent = settings.input_gain_percent.min(200);
                 settings.output_volume_percent = settings.output_volume_percent.min(100);
                 Ok(settings)
@@ -786,6 +841,7 @@ mod tests {
         let defaults = store.settings().expect("load");
         assert_eq!(defaults, Settings::default());
         assert!(defaults.noise_suppression && defaults.echo_cancellation && defaults.auto_gain);
+        assert_eq!(defaults.noise_suppression_backend, NoiseBackend::Standard);
         assert_eq!(defaults.talk_mode, TalkMode::VoiceActivation);
         assert_eq!(defaults.voice_activation, VoiceActivation::Automatic);
         assert_eq!(defaults.voice_threshold_dbfs, -40);
@@ -822,10 +878,12 @@ mod tests {
         changed.audio_device_notice = true;
         changed.whats_new_auto = false;
         changed.whats_new_seen = Some("0.4.4".into());
+        changed.setup_preset = Some(SetupPreset::MaximumPrivacy);
         changed.enabled_plugins = vec!["gtav".into()];
         changed.wizard_completed = true;
         changed.log_level = LogLevel::Debug;
         changed.ptt_compatibility_mode = true;
+        changed.noise_suppression_backend = NoiseBackend::Advanced;
         changed.notifications = NotificationMode::InApp;
         changed.connect_muted = false;
         store.save_settings(&changed).expect("save");
@@ -964,9 +1022,13 @@ mod tests {
         assert_eq!(loaded.update_check, Consent::Unset);
         assert_eq!(loaded.appimage_menu_entry, Consent::Unset);
         assert_eq!(loaded.last_update_check, None);
+        assert!(!loaded.update_auto_download);
+        assert_eq!(loaded.update_interval_hours, DEFAULT_UPDATE_INTERVAL_HOURS);
+        assert_eq!(loaded.update_skipped, None);
         assert!(!loaded.window_overlay_notice_shown);
         assert!(loaded.whats_new_auto);
         assert_eq!(loaded.whats_new_seen, None);
+        assert_eq!(loaded.setup_preset, None);
         assert!(loaded.legacy_window_overlay_enabled);
     }
 
@@ -1063,6 +1125,25 @@ mod tests {
                     .settings()
                     .expect("reload")
                     .legacy_window_overlay_enabled,
+                expected
+            );
+        }
+    }
+
+    #[test]
+    fn update_interval_is_clamped_on_load() {
+        let (_dir, store) = temp_store();
+        for (stored, expected) in [(0, 1), (12, 12), (10_000, 168)] {
+            store
+                .conn
+                .execute(
+                    "INSERT INTO settings (id, data) VALUES (1, ?1)
+                     ON CONFLICT (id) DO UPDATE SET data = excluded.data",
+                    params![format!(r#"{{"update_interval_hours":{stored}}}"#)],
+                )
+                .expect("write");
+            assert_eq!(
+                store.settings().expect("load").update_interval_hours,
                 expected
             );
         }
@@ -1236,6 +1317,25 @@ mod tests {
         assert_eq!(store.settings().expect("chosen").bitrate_kbps, Some(64));
         save_raw(r#"{"music_quality":false,"bitrate_kbps":null}"#);
         assert_eq!(store.settings().expect("max").bitrate_kbps, None);
+    }
+
+    /// Development builds of PR #126 stored the library names; those rows load as the choice
+    /// that runs the same library, and the extra fields they carried are ignored.
+    #[test]
+    fn library_names_of_old_rows_load_as_choices() {
+        for (stored, choice) in [
+            ("sonora", NoiseBackend::Light),
+            ("nnnoiseless", NoiseBackend::Standard),
+            ("rnnoise", NoiseBackend::Advanced),
+            ("light", NoiseBackend::Light),
+            ("advanced", NoiseBackend::Advanced),
+        ] {
+            let json = format!(
+                r#"{{"noise_suppression_backend":"{stored}","noise_suppression_level":"very_high","noise_suppression_rnnoise_consent":"yes"}}"#
+            );
+            let parsed: Settings = serde_json::from_str(&json).expect("parse");
+            assert_eq!(parsed.noise_suppression_backend, choice, "{stored}");
+        }
     }
 
     #[test]

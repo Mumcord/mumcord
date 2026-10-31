@@ -165,7 +165,19 @@ export const SETTINGS_INDEX: readonly SettingEntry[] = [
     section: "voiceAudio",
     group: "voice.processing",
     control: "voice.noiseSuppression",
-    terms: ["searchTerms.noiseSuppression", "voice.noiseSuppressionHint"],
+    terms: [
+      "searchTerms.noiseSuppression",
+      "voice.noiseSuppressionHint",
+      "voice.noiseChoice.light",
+      "voice.noiseChoice.standard",
+      "voice.noiseChoice.advanced",
+      "voice.noiseChoiceHint.light",
+      "voice.noiseChoiceHint.standard",
+      "voice.noiseChoiceHint.advanced",
+      "voice.detectorHint",
+    ],
+    // Library names are the same in every language.
+    literals: ["nnnoiseless", "rnnoise", "RNNoise", "sonora"],
   },
   {
     section: "voiceAudio",
@@ -398,8 +410,16 @@ export const SETTINGS_INDEX: readonly SettingEntry[] = [
   {
     section: "general",
     group: "updates.title",
-    control: "updates.check",
-    terms: ["searchTerms.updates", "updates.hint"],
+    control: "updates.mode",
+    terms: ["searchTerms.updates", "updates.modeHint", "updates.modeAuto", "updates.modeNotify"],
+  },
+  { section: "general", group: "updates.title", control: "updates.interval" },
+  { section: "general", group: "updates.title", control: "updates.checkNow" },
+  {
+    section: "general",
+    group: "updates.title",
+    control: "updates.openChangelog",
+    terms: ["updates.whatsNew"],
   },
   { section: "about", group: "about.versionTitle", terms: ["about.license"] },
   {

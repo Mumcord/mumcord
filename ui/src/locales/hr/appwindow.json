@@ -29,16 +29,10 @@
   },
   "updateCheck": {
     "title": "Provjeravati nove verzije?",
-    "description": "Mumcord može jednom dnevno pitati GitHub postoji li novija verzija i prikazati savjet s poveznicom. Ništa se ne preuzima ni instalira, i ništa se ne šalje osim samog upita te naziva i verzije aplikacije. To možeš kasnije promijeniti u Postavkama.",
+    "description": "Mumcord može redovito pitati GitHub postoji li novija verzija i obavijestiti te o tome. Ništa se ne preuzima niti instalira bez tvog pristanka, a ne šalje se ništa osim samog upita te naziva i verzije aplikacije. To možeš kasnije promijeniti u Postavkama.",
     "no": "Ne",
     "yes": "Da",
     "failed": "Nije uspjelo. Pokušaj ponovno."
-  },
-  "updateHint": {
-    "message": "Mumcord {{version}} je dostupan.",
-    "open": "Pogledaj izdanje",
-    "dismiss": "Zatvori",
-    "portable": "Preuzmite novi prijenosni zip i raspakirajte ga u ovu mapu; vaši podaci u MumcordData ostaju."
   },
   "directConsent": {
     "title": "Dopustiti izravne veze?",
@@ -46,5 +40,85 @@
     "no": "Ne",
     "yes": "Da",
     "failed": "Nije uspjelo. Pokušaj ponovno."
+  },
+  "updater": {
+    "stable": "Stabilna",
+    "available": {
+      "title": "Dostupno je ažuriranje",
+      "subtitle": "Mumcord {{version}} spreman je za preuzimanje. Imaš {{current}}.",
+      "subtitleManual": "Izašao je Mumcord {{version}}. Imaš {{current}}.",
+      "whatsNew": "Što je novo od {{current}}",
+      "trust": "Preuzima se samo s github.com putem HTTPS-a i prije instalacije provjerava se potpis i kontrolni zbroj.",
+      "skip": "Preskoči ovu verziju",
+      "later": "Podsjeti me kasnije",
+      "download": "Preuzmi i instaliraj",
+      "openReleasePage": "Otvori stranicu izdanja",
+      "manual": "Preuzmi novu verziju sa stranice izdanja.",
+      "manualPackage": "Preuzmi paket sa stranice izdanja, a zatim ga instaliraj naredbom:",
+      "manualAur": "Ažuriraj ga svojim AUR pomoćnikom:"
+    },
+    "tags": {
+      "added": "Dodano",
+      "changed": "Promijenjeno",
+      "fixed": "Ispravljeno",
+      "removed": "Uklonjeno"
+    },
+    "noNotes": "Nema bilješki za ovu verziju.",
+    "steps": {
+      "download": "Preuzimanje",
+      "verify": "Provjera potpisa i kontrolnog zbroja",
+      "install": "Instalacija",
+      "done": "gotovo",
+      "current": "u tijeku",
+      "pending": "još nije počelo"
+    },
+    "progress": {
+      "title": "Preuzima se Mumcord {{version}}",
+      "subtitle": "Možeš nastaviti koristiti Mumcord dok ovo traje.",
+      "label": "Napredak ažuriranja",
+      "unknown": "Veličina još nije poznata",
+      "size": "{{received}} od {{total}} MB",
+      "received": "{{received}} MB",
+      "secondsLeft_one": "preostala je otprilike {{count}} sekunda",
+      "secondsLeft_few": "preostale su otprilike {{count}} sekunde",
+      "secondsLeft_other": "preostalo je otprilike {{count}} sekundi",
+      "minutesLeft_one": "preostala je otprilike {{count}} minuta",
+      "minutesLeft_few": "preostale su otprilike {{count}} minute",
+      "minutesLeft_other": "preostalo je otprilike {{count}} minuta",
+      "cancel": "Odustani"
+    },
+    "ready": {
+      "title": "Mumcord {{version}} je spreman",
+      "subtitle": "Ponovno pokreni za dovršetak ažuriranja.",
+      "verified": "Provjereno",
+      "downloaded": "Preuzeto",
+      "checked": "Potpis i kontrolni zbroj provjereni",
+      "installed": "Instalirano",
+      "installsOnRestart": "Instalira se kad se Mumcord ponovno pokrene",
+      "connected_one": "Povezan si s {{count}} poslužiteljem. Nakon ponovnog pokretanja Mumcord će se ponovno povezati i vratiti u tvoje kanale.",
+      "connected_few": "Povezan si s {{count}} poslužitelja. Nakon ponovnog pokretanja Mumcord će se ponovno povezati i vratiti u tvoje kanale.",
+      "connected_other": "Povezan si s {{count}} poslužitelja. Nakon ponovnog pokretanja Mumcord će se ponovno povezati i vratiti u tvoje kanale.",
+      "later": "Kasnije",
+      "restart": "Ponovno pokreni za ažuriranje",
+      "announce": "Mumcord {{version}} je spreman. Ponovno pokreni za ažuriranje."
+    },
+    "failed": {
+      "title": "Ažuriranje nije uspjelo",
+      "subtitle": "Mumcord {{version}} nije instaliran. Tvoja trenutna verzija i dalje radi.",
+      "network": "Mumcord nije mogao doći do GitHuba. Provjeri internetsku vezu i pokušaj ponovno.",
+      "manifest": "Podaci o ažuriranju na GitHubu nepotpuni su ili oštećeni, pa ništa nije instalirano.",
+      "signature": "Potpis preuzimanja nije se podudarao, pa je preuzimanje odbačeno.",
+      "checksum": "Preuzimanje se nije podudaralo sa svojim kontrolnim zbrojem, pa je odbačeno.",
+      "install": "Instalacija ažuriranja nije uspjela. Tvoja instalirana verzija nije promijenjena.",
+      "retry": "Pokušaj ponovno",
+      "close": "Zatvori"
+    },
+    "actionFailed": "To nije uspjelo. Pokušaj ponovno.",
+    "toast": {
+      "title": "Mumcord {{version}} je spreman",
+      "body": "Ponovno pokreni za ažuriranje.",
+      "restart": "Ponovno pokreni",
+      "later": "Kasnije"
+    }
   }
 }

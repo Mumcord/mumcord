@@ -55,7 +55,8 @@
       "messageRequest": "Ziņas pieprasījums",
       "invite": "Ielūgums",
       "private": "Privāta ziņa",
-      "connection": "Savienojums"
+      "connection": "Savienojums",
+      "update": "Atjauninājums"
     },
     "accept": "Pieņemt",
     "decline": "Noraidīt",
@@ -65,6 +66,12 @@
     "dismiss": "Aizvērt",
     "dismissItem": "Aizvērt: {{title}}",
     "failed": "Neizdevās. Mēģini vēlreiz.",
-    "block": "Bloķēt"
+    "block": "Bloķēt",
+    "update": {
+      "title": "Mumcord {{version}} ir gatavs",
+      "body": "Restartējiet, lai atjauninātu",
+      "restart": "Restartēt un atjaunināt",
+      "whatsNew": "Jaunumi"
+    }
   }
 }

@@ -134,23 +134,6 @@ export function SupportCard() {
   );
 }
 
-/** Checking GitHub for a newer version. */
-export function UpdatesCard({ settings, update }: SettingsSectionProps) {
-  const { t } = useTranslation("settings");
-  return (
-    <Group title={t("updates.title")} icon="refresh">
-      <Switch
-        label={t("updates.check")}
-        description={t("updates.hint")}
-        checked={settings.updateCheck === "yes"}
-        onChange={(on) => {
-          update({ updateCheck: on ? "yes" : "no" });
-        }}
-      />
-    </Group>
-  );
-}
-
 /** The third-party licences window (#138). */
 export function LicencesCard() {
   const { t } = useTranslation("settings");

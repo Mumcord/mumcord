@@ -29,16 +29,10 @@
   },
   "updateCheck": {
     "title": "Tfittex verżjonijiet ġodda?",
-    "description": "Mumcord jista' jistaqsi lil GitHub darba kuljum jekk hemmx verżjoni aktar ġdida u juri ħjiel b'link. Xejn ma jitniżżel jew jiġi installat, u xejn ma jintbagħat ħlief it-talba nfisha u l-isem u l-verżjoni tal-app. Tista' tibdel dan aktar tard fis-Settings.",
+    "description": "Mumcord jista' jistaqsi lil GitHub regolarment jekk hemmx verżjoni aktar ġdida u jgħarrfek biha. Xejn ma jitniżżel jew jiġi installat mingħajr il-permess tiegħek, u xejn ma jintbagħat ħlief it-talba nfisha u l-isem u l-verżjoni tal-app. Tista' tibdel dan aktar tard fis-Settings.",
     "no": "Le",
     "yes": "Iva",
     "failed": "Ma ħadimx. Erġa' pprova."
-  },
-  "updateHint": {
-    "message": "Mumcord {{version}} huwa disponibbli.",
-    "open": "Ara r-rilaxx",
-    "dismiss": "Warrab",
-    "portable": "Niżżel iż-zip portabbli l-ġdid u ftaħu f'dan il-folder; id-data tiegħek f'MumcordData tibqa'."
   },
   "directConsent": {
     "title": "Tippermetti konnessjonijiet diretti?",
@@ -46,5 +40,91 @@
     "no": "Le",
     "yes": "Iva",
     "failed": "Ma ħadimx. Erġa' pprova."
+  },
+  "updater": {
+    "stable": "Stabbli",
+    "available": {
+      "title": "Aġġornament disponibbli",
+      "subtitle": "Mumcord {{version}} huwa lest biex jitniżżel. Inti għandek {{current}}.",
+      "subtitleManual": "Ħareġ Mumcord {{version}}. Inti għandek {{current}}.",
+      "whatsNew": "X'hemm ġdid mill-{{current}}",
+      "trust": "Jitniżżel biss minn github.com permezz ta' HTTPS u jiġi vverifikat bil-firma u s-somma ta' kontroll qabel jiġi installat.",
+      "skip": "Aqbeż din il-verżjoni",
+      "later": "Fakkarni aktar tard",
+      "download": "Niżżel u installa",
+      "openReleasePage": "Iftaħ il-paġna tal-ħruġ",
+      "manual": "Niżżel il-verżjoni l-ġdida mill-paġna tal-ħruġ.",
+      "manualPackage": "Niżżel il-pakkett mill-paġna tal-ħruġ, imbagħad installah b'dan:",
+      "manualAur": "Aġġornah bl-għajnuna tal-AUR tiegħek:"
+    },
+    "tags": {
+      "added": "Miżjud",
+      "changed": "Mibdul",
+      "fixed": "Iffissat",
+      "removed": "Imneħħi"
+    },
+    "noNotes": "M'hemm l-ebda noti għal din il-verżjoni.",
+    "steps": {
+      "download": "Niżżel",
+      "verify": "Iċċekkja l-firma u s-somma ta' kontroll",
+      "install": "Installa",
+      "done": "lest",
+      "current": "għaddej",
+      "pending": "għadu ma bediex"
+    },
+    "progress": {
+      "title": "Qed jitniżżel Mumcord {{version}}",
+      "subtitle": "Tista' tkompli tuża Mumcord waqt li dan jaħdem.",
+      "label": "Progress tal-aġġornament",
+      "unknown": "Id-daqs għadu mhux magħruf",
+      "size": "{{received}} minn {{total}} MB",
+      "received": "{{received}} MB",
+      "secondsLeft_one": "fadal madwar {{count}} sekonda",
+      "secondsLeft_two": "fadal madwar {{count}} sekondi",
+      "secondsLeft_few": "fadal madwar {{count}} sekondi",
+      "secondsLeft_many": "fadal madwar {{count}} sekonda",
+      "secondsLeft_other": "fadal madwar {{count}} sekonda",
+      "minutesLeft_one": "fadal madwar {{count}} minuta",
+      "minutesLeft_two": "fadal madwar {{count}} minuti",
+      "minutesLeft_few": "fadal madwar {{count}} minuti",
+      "minutesLeft_many": "fadal madwar {{count}} minuta",
+      "minutesLeft_other": "fadal madwar {{count}} minuta",
+      "cancel": "Ikkanċella"
+    },
+    "ready": {
+      "title": "Mumcord {{version}} huwa lest",
+      "subtitle": "Erġa' ibda biex tlesti l-aġġornament.",
+      "verified": "Ivverifikat",
+      "downloaded": "Imniżżel",
+      "checked": "Firma u somma ta' kontroll ivverifikati",
+      "installed": "Installat",
+      "installsOnRestart": "Jiġi installat meta Mumcord jerġa' jibda",
+      "connected_one": "Inti konness ma' {{count}} server. Wara r-restart, Mumcord se jerġa' jkun konness u jerġa' jidħol fil-kanali tiegħek.",
+      "connected_two": "Inti konness ma' {{count}} servers. Wara r-restart, Mumcord se jerġa' jkun konness u jerġa' jidħol fil-kanali tiegħek.",
+      "connected_few": "Inti konness ma' {{count}} servers. Wara r-restart, Mumcord se jerġa' jkun konness u jerġa' jidħol fil-kanali tiegħek.",
+      "connected_many": "Inti konness ma' {{count}} server. Wara r-restart, Mumcord se jerġa' jkun konness u jerġa' jidħol fil-kanali tiegħek.",
+      "connected_other": "Inti konness ma' {{count}} server. Wara r-restart, Mumcord se jerġa' jkun konness u jerġa' jidħol fil-kanali tiegħek.",
+      "later": "Aktar tard",
+      "restart": "Erġa' ibda biex taġġorna",
+      "announce": "Mumcord {{version}} huwa lest. Erġa' ibda biex taġġorna."
+    },
+    "failed": {
+      "title": "L-aġġornament ma ħadimx",
+      "subtitle": "Mumcord {{version}} ma ġiex installat. Il-verżjoni attwali tiegħek tkompli taħdem.",
+      "network": "Mumcord ma setax jaċċessa lil GitHub. Iċċekkja l-konnessjoni tal-internet tiegħek u erġa' pprova.",
+      "manifest": "L-informazzjoni dwar l-aġġornament fuq GitHub hija mhux kompluta jew mikissra, għalhekk ma ġie installat xejn.",
+      "signature": "Il-firma tat-tniżżil ma qablitx, għalhekk it-tniżżil ġie skartat.",
+      "checksum": "It-tniżżil ma qabilx mas-somma ta' kontroll tiegħu, għalhekk ġie skartat.",
+      "install": "L-installazzjoni tal-aġġornament falliet. Il-verżjoni installata tiegħek ma nbidlitx.",
+      "retry": "Erġa' pprova",
+      "close": "Agħlaq"
+    },
+    "actionFailed": "Dan ma ħadimx. Erġa' pprova.",
+    "toast": {
+      "title": "Mumcord {{version}} huwa lest",
+      "body": "Erġa' ibda biex taġġorna.",
+      "restart": "Erġa' ibda",
+      "later": "Aktar tard"
+    }
   }
 }

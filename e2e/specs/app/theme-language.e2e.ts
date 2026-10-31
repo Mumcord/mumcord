@@ -103,15 +103,18 @@ const gameTitles = new Set(
 
 const neutral = (t: string) =>
   gameTitles.has(t) ||
-  /^[\d\s.,:%/#()+–\-·…★☆×▾▸○]*$/.test(t) ||
+  /^[\d\s.,:%/#()+–\-·…★☆×▾▸○?]*$/.test(t) ||
   // A single letter (avatar initial), the test audio backend's device name, the OS string.
   /^\p{L}$/u.test(t) ||
   /^(null|linux \S+|windows \S+|macos \S+)$/i.test(t) ||
   // "Beta" is the same word in English, German and Spanish; "Details" is the German one.
   /^(Beta|Details)$/.test(t) ||
-  // "Apps" is also the German and Spanish word, "Bitrate" and "Updates" the German ones; preset
-  // theme names are names, not translated.
-  /^(Apps|Bitrate|Updates|Deep Ocean|Forest|Paper)$/.test(t) ||
+  // "Apps" is also the German and Spanish word, "Bitrate", "Status" and "Updates" the German ones;
+  // preset theme names are names, not translated.
+  /^(Apps|Bitrate|Status|Updates|Deep Ocean|Forest|Paper)$/.test(t) ||
+  // "Standard" is the German default-identity badge ("Default"), which only matches the English
+  // noise suppression level by chance.
+  /^Standard$/.test(t) ||
   // "Link" is also the German word; its tooltip adds the shortcut.
   /^Link( \(Ctrl\+K\))?$/.test(t) ||
   // "In <channel> (<count>)" reads the same in English and German.

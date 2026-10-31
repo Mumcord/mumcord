@@ -71,7 +71,8 @@ describe("settings search index", () => {
       "appearanceEffects.visualEffects",
     ]);
     expect(labels(searchSettings("allow direct connections", t))).toContain("privacyDirect.allow");
-    expect(labels(searchSettings("github", t))).toEqual(["updates.check"]);
+    expect(labels(searchSettings("download automatically", t))).toEqual(["updates.mode"]);
+    expect(labels(searchSettings("advanced (ai)", t))).toEqual(["voice.noiseSuppression"]);
   });
 
   it("finds the history sharing switch (FR-1.60)", () => {
@@ -114,7 +115,8 @@ describe("settings search index", () => {
     expect(sectionOf("appearance.autostart")).toBe("general");
     expect(sectionOf("positional.switch")).toBe("gaming");
     expect(sectionOf("cache.clear")).toBe("advanced");
-    expect(sectionOf("updates.check")).toBe("general");
+    expect(sectionOf("updates.mode")).toBe("general");
+    expect(sectionOf("updates.checkNow")).toBe("general");
   });
 
   it("leaves out the entries of hidden cards", () => {

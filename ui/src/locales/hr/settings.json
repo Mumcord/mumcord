@@ -8,6 +8,7 @@
     "about": "O aplikaciji",
     "servers": "Poslužitelji",
     "privacy": "Privatnost",
+    "updates": "Ažuriranja",
     "packetInspector": "Inspektor paketa"
   },
   "search": {
@@ -148,6 +149,20 @@
     "processing": "Obrada glasa",
     "noiseSuppression": "Suzbijanje šuma",
     "noiseSuppressionHint": "Filtrira pozadinsku buku poput tipkovnice i ventilatora.",
+    "noiseChoice": {
+      "light": "Slabo",
+      "standard": "Standardno",
+      "advanced": "Napredno (AI)",
+      "off": "Isključeno"
+    },
+    "noiseChoiceHint": {
+      "light": "Klasični filtar za stalnu buku poput ventilatora ili zujanja. Najmanje opterećenje procesora.",
+      "standard": "AI filtar za svakodnevnu buku poput tipkovnica i ventilatora. Malo opterećenje procesora.",
+      "advanced": "Noviji AI model koji uklanja i promjenjivu buku. Oko tri puta više procesora od Standardnog i 10 ms više kašnjenja."
+    },
+    "noiseChoiceBeta": "Beta",
+    "noiseChoiceTipLabel": "O opciji {{choice}}",
+    "detectorHint": "Aktivacija glasa prepoznaje govor modelom RNNoise; on ne mijenja tvoj zvuk.",
     "echoCancellation": "Poništavanje jeke",
     "echoCancellationHint": "Sprječava da drugi čuju sami sebe kad koristiš zvučnike.",
     "autoGain": "Automatska glasnoća",
@@ -409,14 +424,6 @@
       "unsupported": "Overlay u igri nije dostupan na ovom sustavu. Umjesto njega koristi se gornji overlay u prozoru.",
       "loadFailed": "Postavke overlaya u igri nije bilo moguće učitati.",
       "saveFailed": "Promjenu overlaya u igri nije bilo moguće primijeniti.",
-      "confirmTitle": "Uključiti overlay za {{game}}?",
-      "confirmMessage": "Upozorenje: {{game}} koristi zaštitu protiv varanja ({{reason}}). Overlay može biti prepoznat kao varanje i tvoj račun može biti blokiran. Mumcord za to nije odgovoran. Nastavi samo ako prihvaćaš taj rizik.",
-      "confirmEnable": "Svejedno uključi",
-      "limits": {
-        "libraryMissing": "Overlay u igri nije dostupan: njegova biblioteka (libmumcord_overlay_layer.so) nije pronađena pored Mumcorda. Ponovno instaliraj Mumcord da je vratiš. Umjesto njega koristi se gornji overlay u prozoru.",
-        "windowsFullscreen": "U igri koristite cijeli zaslon bez obruba ili u prozoru.",
-        "macos": "macOS ne podržava overlay u igri. Umjesto njega koristi se gornji overlay u prozoru."
-      },
       "opengl": {
         "title": "OpenGL igre",
         "explanation": "Potrebno samo za OpenGL igre: zalijepi u Steam opcije pokretanja igre.",
@@ -424,6 +431,14 @@
         "copy": "Kopiraj",
         "copied": "Kopirano",
         "copyFailed": "Kopiranje nije uspjelo. Označi tekst i kopiraj ga ručno."
+      },
+      "confirmTitle": "Uključiti overlay za {{game}}?",
+      "confirmMessage": "Upozorenje: {{game}} koristi zaštitu protiv varanja ({{reason}}). Overlay može biti prepoznat kao varanje i tvoj račun može biti blokiran. Mumcord za to nije odgovoran. Nastavi samo ako prihvaćaš taj rizik.",
+      "confirmEnable": "Svejedno uključi",
+      "limits": {
+        "libraryMissing": "Overlay u igri nije dostupan: njegova biblioteka (libmumcord_overlay_layer.so) nije pronađena pored Mumcorda. Ponovno instaliraj Mumcord da je vratiš. Umjesto njega koristi se gornji overlay u prozoru.",
+        "windowsFullscreen": "U igri koristite cijeli zaslon bez obruba ili u prozoru.",
+        "macos": "macOS ne podržava overlay u igri. Umjesto njega koristi se gornji overlay u prozoru."
       }
     }
   },
@@ -591,11 +606,6 @@
     "allow": "Dopusti izravne veze s drugim korisnicima Mumcorda",
     "hint": "Izravne veze su brže, ali druga osoba može vidjeti tvoju IP adresu. Dok ne odlučiš, Mumcord pita kad bi se veza prvi put koristila.",
     "notUsed": "Ne koristi se u odabranom peer-to-peer načinu: Mumcord se nikad ne povezuje izravno s drugima."
-  },
-  "updates": {
-    "title": "Ažuriranja",
-    "check": "Provjeravaj nove verzije",
-    "hint": "Jednom dnevno Mumcord pita GitHub za najnovije izdanje. Ništa drugo se ne šalje."
   },
   "appImageMenu": {
     "label": "Dodaj Mumcord u izbornik aplikacija",
@@ -779,5 +789,63 @@
     "collapseHint": "Prikazuje „Poruka blokiranog korisnika“ s gumbom Prikaži.",
     "hide": "Potpuno ih sakrij",
     "hideHint": "U chatu se ništa ne prikazuje."
+  },
+  "updates": {
+    "installedFrom": "Mumcord {{version}} · instalirano iz izvora: {{source}}",
+    "install": {
+      "appImage": "AppImage",
+      "appImageReadOnly": "AppImage u mapi samo za čitanje",
+      "windowsInstaller": "Windows instalacijski program",
+      "windowsPortable": "prijenosni Windows zip",
+      "macApp": "macOS aplikacija",
+      "otherMac": "macOS kopija izvan paketa aplikacije",
+      "deb": ".deb paket",
+      "rpm": ".rpm paket",
+      "aur": "AUR",
+      "otherLinux": "Linux paket"
+    },
+    "checking": "Provjera",
+    "mode": "Kad se pronađe ažuriranje",
+    "modeHint": "Ažuriranja se uvijek provjeravaju i potvrđuju prije instalacije.",
+    "modeAuto": "Preuzmi automatski",
+    "modeNotify": "Samo obavijesti",
+    "modeOff": "Isključeno",
+    "autoUnavailable": "Ova kopija ne može sama sebe ažurirati, pa te Mumcord samo obavještava o novim verzijama.",
+    "interval": "Provjeri ažuriranja",
+    "intervalHint_one": "Pri pokretanju i svaki sat",
+    "intervalHint_few": "Pri pokretanju i svaka {{count}} sata",
+    "intervalHint_other": "Pri pokretanju i svakih {{count}} sati",
+    "intervalWeekHint": "Pri pokretanju i jednom tjedno",
+    "intervalHours_one": "Svaki sat",
+    "intervalHours_few": "Svaka {{count}} sata",
+    "intervalHours_other": "Svakih {{count}} sati",
+    "intervalWeek": "Jednom tjedno",
+    "status": "Stanje",
+    "state": {
+      "idle": "Još nije provjereno",
+      "off": "Provjera ažuriranja je isključena",
+      "checking": "Provjeravaju se ažuriranja…",
+      "upToDate": "Mumcord je ažuran",
+      "available": "Dostupan je Mumcord {{version}}",
+      "downloading": "Preuzima se Mumcord {{version}}…",
+      "verifying": "Provjerava se preuzimanje Mumcorda {{version}}…",
+      "installing": "Instalira se Mumcord {{version}}…",
+      "ready": "Mumcord {{version}} je spreman. Ponovno pokreni za ažuriranje.",
+      "failed": "Zadnje ažuriranje nije uspjelo",
+      "offline": "GitHub nije bio dostupan. Mumcord će pokušati ponovno kasnije."
+    },
+    "devBuild": "Razvojna verzija: ažuriranja su isključena",
+    "lastCheckedToday": "Zadnja provjera danas u {{time}}",
+    "lastCheckedYesterday": "Zadnja provjera jučer u {{time}}",
+    "lastCheckedOn": "Zadnja provjera {{date}} u {{time}}",
+    "checkNow": "Provjeri sada",
+    "showUpdate": "Prikaži ažuriranje",
+    "checkFailed": "Provjera se nije mogla pokrenuti. Pokušaj ponovno.",
+    "skipped": "Preskočena verzija",
+    "skippedHint": "{{version}} se preskače i neće se ponuditi ponovno.",
+    "stopSkipping": "Prestani preskakati",
+    "whatsNew": "Što je novo",
+    "whatsNewHint": "Pogledaj promjene u svakoj verziji.",
+    "openChangelog": "Otvori popis promjena"
   }
 }

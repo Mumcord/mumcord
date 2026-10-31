@@ -1,10 +1,10 @@
 import { fireEvent, render, screen } from "@testing-library/react";
 import { useState, type ComponentType } from "react";
 import { describe, expect, it } from "vitest";
-import { UpdatesCard } from "./AboutSection";
 import { ChannelListCard, LookCard } from "./AppearanceSection";
 import { ConnectionsCard } from "./PrivacySection";
 import { ServerConnectionsCard } from "./ServersSection";
+import { UpdatesCard } from "./UpdatesSection";
 import { createMockApi, setApi, type Settings } from "../../../api";
 import { PreferencesProvider } from "../../../app/PreferencesProvider";
 import { fakeView } from "../../../app/testView";
@@ -79,7 +79,7 @@ describe("Epic 2 settings rows", () => {
     expect(screen.getByRole("switch", { name: "Show weak connection icon" })).toBeChecked();
   });
 
-  it("asks for direct connections consent in Privacy and for the update check in General", async () => {
+  it("asks for direct connections consent in Privacy and for the update mode in General", async () => {
     const current = await settings();
     render(<Stateful initial={current} Section={ConnectionsCard} />);
     const direct = screen.getByRole("switch", {
@@ -89,9 +89,9 @@ describe("Epic 2 settings rows", () => {
     fireEvent.click(direct);
     expect(direct).toBeChecked();
     render(<Stateful initial={current} Section={UpdatesCard} />);
-    const check = screen.getByRole("switch", { name: "Check for new versions" });
-    fireEvent.click(check);
-    expect(check).toBeChecked();
+    const notify = screen.getByRole("radio", { name: "Notify only" });
+    fireEvent.click(notify);
+    expect(notify).toBeChecked();
   });
 
   it("disables the direct-connection consent in modes that never connect directly", async () => {

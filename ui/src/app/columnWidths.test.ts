@@ -70,7 +70,10 @@ describe("fitWidths", () => {
   });
 
   it("stops at the minimum widths on very small windows", () => {
-    expect(fitWidths({ channels: 28, members: 28 }, room(40))).toEqual(DEFAULT_COLUMN_WIDTHS);
+    expect(fitWidths({ channels: 28, members: 28 }, room(40))).toEqual({
+      channels: 15,
+      members: 15,
+    });
   });
 
   it("ignores the member list when it is an overlay on narrow windows", () => {
