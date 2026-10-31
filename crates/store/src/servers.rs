@@ -58,6 +58,8 @@ pub struct SavedServer {
     pub was_voice_server_at_quit: bool,
     /// No notifications from this server (FR-2.10).
     pub notifications_muted: bool,
+    /// `@all` and `@channel` do not count as mentions on this server (issue #70).
+    pub group_mentions_muted: bool,
     /// Theme for this server; `None` uses the app theme (FR-2.17).
     pub theme_id: Option<String>,
     /// Identity to connect with; `None` uses the default identity (issue #148).
@@ -66,7 +68,7 @@ pub struct SavedServer {
 
 const SERVER_COLUMNS: &str = "id, label, address, port, username, last_channel, save_history, \
      sort_order, always_connect_at_start, connected_at_quit, was_voice_server_at_quit, \
-     notifications_muted, theme_id, identity_id";
+     notifications_muted, theme_id, identity_id, group_mentions_muted";
 
 fn server_from_row(row: &Row<'_>) -> rusqlite::Result<SavedServer> {
     Ok(SavedServer {
@@ -84,6 +86,7 @@ fn server_from_row(row: &Row<'_>) -> rusqlite::Result<SavedServer> {
         notifications_muted: row.get(11)?,
         theme_id: row.get(12)?,
         identity_id: row.get(13)?,
+        group_mentions_muted: row.get(14)?,
     })
 }
 
@@ -148,7 +151,7 @@ impl Store {
             "UPDATE saved_server
              SET label = ?2, address = ?3, port = ?4, username = ?5, last_channel = ?6,
                  save_history = ?7, always_connect_at_start = ?8, notifications_muted = ?9,
-                 theme_id = ?10, identity_id = ?11
+                 theme_id = ?10, identity_id = ?11, group_mentions_muted = ?12
              WHERE id = ?1",
             params![
                 server.id,
@@ -161,7 +164,8 @@ impl Store {
                 server.always_connect_at_start,
                 server.notifications_muted,
                 server.theme_id,
-                server.identity_id
+                server.identity_id,
+                server.group_mentions_muted
             ],
         )?;
         expect_one(changed, server.id)
@@ -379,6 +383,7 @@ mod tests {
             .add_server(&NewServer::new("A", "localhost", "Tester"))
             .expect("add");
         assert!(!added.always_connect_at_start && !added.notifications_muted);
+        assert!(!added.group_mentions_muted);
         assert!(!added.was_voice_server_at_quit);
         assert_eq!(
             (added.connected_at_quit, added.theme_id.clone()),
@@ -388,6 +393,7 @@ mod tests {
         let mut edited = added.clone();
         edited.always_connect_at_start = true;
         edited.notifications_muted = true;
+        edited.group_mentions_muted = true;
         edited.theme_id = Some("forest".into());
         store.update_server(&edited).expect("update");
         assert_eq!(store.server(added.id).expect("get"), Some(edited.clone()));

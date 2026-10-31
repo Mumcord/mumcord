@@ -239,6 +239,10 @@ pub struct SoundSettings {
     pub share_stopped: bool,
     pub viewer_started: bool,
     pub viewer_stopped: bool,
+    /// The server kicks you (#205).
+    pub kicked: bool,
+    /// The server bans you (#205).
+    pub banned: bool,
 }
 
 /// Positional audio (FR-1.41): voices of people in the same game placed in 3D.
@@ -426,6 +430,8 @@ impl Settings {
                 share_stopped: s.sounds.share_stopped,
                 viewer_started: s.sounds.viewer_started,
                 viewer_stopped: s.sounds.viewer_stopped,
+                kicked: s.sounds.kicked,
+                banned: s.sounds.banned,
             },
             notifications: s.notifications.into(),
             close_behaviour: match s.close_behaviour {
@@ -544,6 +550,8 @@ impl Settings {
         s.sounds.share_stopped = self.sounds.share_stopped;
         s.sounds.viewer_started = self.sounds.viewer_started;
         s.sounds.viewer_stopped = self.sounds.viewer_stopped;
+        s.sounds.kicked = self.sounds.kicked;
+        s.sounds.banned = self.sounds.banned;
         s.notifications = self.notifications.into();
         s.close_behaviour = match self.close_behaviour {
             CloseBehaviour::Ask => store::CloseBehaviour::Ask,
@@ -810,6 +818,7 @@ mod tests {
         ui.sounds.join_leave = false;
         ui.sounds.hang_up = false;
         ui.sounds.share_stopped = false;
+        ui.sounds.banned = false;
         ui.log_level = LogLevel::Debug;
         ui.input_device = Some(String::new());
         ui.send_default_avatar = false;
@@ -858,6 +867,7 @@ mod tests {
         assert!(!stored.sounds.user_joined && !stored.sounds.user_left);
         assert!(!stored.sounds.hang_up && stored.sounds.voice_join);
         assert!(!stored.sounds.share_stopped && stored.sounds.party_started);
+        assert!(!stored.sounds.banned && stored.sounds.kicked);
         assert_eq!(stored.log_level, store::LogLevel::Debug);
         assert_eq!(
             stored.input_device, None,

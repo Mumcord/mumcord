@@ -95,14 +95,19 @@
     "hideDescription": "Slėpti kanalo aprašymą"
   },
   "mention": {
-    "list": "Paminimi žmonės",
-    "found_one": "Pasiūlytas {{count}} žmogus. Naudok rodyklių klavišus, tada Enter, kad įterptum.",
-    "found_few": "Pasiūlyti {{count}} žmonės. Naudok rodyklių klavišus, tada Enter, kad įterptum.",
-    "found_many": "Pasiūlyta {{count}} žmogaus. Naudok rodyklių klavišus, tada Enter, kad įterptum.",
-    "found_other": "Pasiūlyta {{count}} žmonių. Naudok rodyklių klavišus, tada Enter, kad įterptum.",
+    "list": "Paminėjimų pasiūlymai",
+    "found_one": "Pasiūlymai: {{count}}. Naudokite rodykles, tada Enter, kad įterptumėte.",
+    "found_few": "Pasiūlymai: {{count}}. Naudokite rodykles, tada Enter, kad įterptumėte.",
+    "found_many": "Pasiūlymai: {{count}}. Naudokite rodykles, tada Enter, kad įterptumėte.",
+    "found_other": "Pasiūlymai: {{count}}. Naudokite rodykles, tada Enter, kad įterptumėte.",
     "none": "Nieko nerasta",
     "mentionsYou": "Mini tave",
-    "chipLabel": "{{name}}, paminėjimas"
+    "chipLabel": "{{name}}, paminėjimas",
+    "groupsHeading": "Paminėjimai",
+    "peopleHeading": "Žmonės",
+    "channelHint": "Pranešti visiems kanale {{channel}} ({{count}})",
+    "allHint": "Pranešti visiems, kurie gali skaityti šį kanalą ({{count}})",
+    "keys": "↑↓ rinktis · Enter įterpti · Esc uždaryti"
   },
   "preview": {
     "open": "Atidaryti naršyklėje",

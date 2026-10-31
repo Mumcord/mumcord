@@ -36,6 +36,7 @@
     "reconnect": "Połącz ponownie",
     "alwaysConnect": "Zawsze łącz przy starcie",
     "muteNotifications": "Wycisz powiadomienia",
+    "muteGroupMentions": "Wycisz @all i @channel",
     "theme": "Motyw…",
     "showWelcome": "Pokaż wiadomość powitalną",
     "identity": "Tożsamość…"

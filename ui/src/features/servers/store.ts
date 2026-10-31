@@ -359,6 +359,11 @@ export function useServers(): ServersState {
   return useSyncExternalStore(subscribe, getSnapshot);
 }
 
+/** The user turned `@all` and `@channel` off for this server (issue #70). */
+export function groupMentionsMuted(serverId: number): boolean {
+  return getSnapshot().servers.find((s) => s.id === serverId)?.groupMentionsMuted ?? false;
+}
+
 /** The limit read with the last `serverLimitReached` refusal, `null` if unknown. */
 export function getServerLimit(): number | null {
   return getSnapshot().serverLimit;
@@ -591,6 +596,17 @@ export async function toggleNotificationsMuted(serverId: number, muted: boolean)
   setState({ actionError: null });
   try {
     replaceServer(await api.serverSetNotificationsMuted(serverId, muted));
+  } catch (error) {
+    setState({ actionError: { context: "notifications", error: toApiError(error) } });
+  }
+}
+
+/** The menu's "Mute @all and @channel" switch (issue #70, Q1.6). */
+export async function toggleGroupMentionsMuted(serverId: number, muted: boolean): Promise<void> {
+  const { api } = ensure();
+  setState({ actionError: null });
+  try {
+    replaceServer(await api.serverSetGroupMentionsMuted(serverId, muted));
   } catch (error) {
     setState({ actionError: { context: "notifications", error: toApiError(error) } });
   }

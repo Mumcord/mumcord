@@ -4,20 +4,16 @@ import { applyLanguage } from "../../i18n";
 import { axeViolations } from "../../test/axe";
 import { ChannelSearch } from "../channels/ChannelSearch";
 import { connectedMock, resetAll } from "../channels/testUtils";
+import type { SendTarget } from "./conversationInfo";
 import { Composer } from "./Composer";
 
 const LIMITS = { text: 5000, image: 100_000, allowHtml: true };
 
-function renderComposer() {
+function renderComposer(target: SendTarget = { kind: "channel", channelId: 1 }) {
   const { container } = render(
     <main>
       <ChannelSearch value="" onChange={() => {}} onClear={() => {}} onSubmit={() => {}} />
-      <Composer
-        target={{ kind: "channel", channelId: 1 }}
-        limits={LIMITS}
-        label="Message #Lobby"
-        blockedReason={null}
-      />
+      <Composer target={target} limits={LIMITS} label="Message #Lobby" blockedReason={null} />
     </main>,
   );
   const input = screen.getByRole<HTMLTextAreaElement>("textbox", { name: "Message #Lobby" });
@@ -122,9 +118,9 @@ describe("Composer mentions", () => {
     resetAll();
   });
 
-  async function setup() {
+  async function setup(target?: SendTarget) {
     await connectedMock();
-    const view = renderComposer();
+    const view = renderComposer(target);
     await waitFor(() => {
       expect(view.input).toBeEnabled();
     });
@@ -136,7 +132,7 @@ describe("Composer mentions", () => {
   function names() {
     return within(screen.getByRole("listbox"))
       .getAllByRole("option")
-      .map((o) => o.textContent);
+      .map((o) => o.querySelector(".mention-picker__name, .mention-picker__keyword")?.textContent);
   }
 
   it("lists people on typing @, people of the current channel first", async () => {
@@ -145,18 +141,38 @@ describe("Composer mentions", () => {
     expect(await screen.findByRole("listbox")).toBeInTheDocument();
     expect(input).toHaveAttribute("role", "combobox");
     expect(input).toHaveAttribute("aria-expanded", "true");
-    expect(names()).toEqual(["Anna", "Ben", "Carla"]);
+    expect(names()).toEqual(["@channel", "@all", "Anna", "Ben", "Carla"]);
     type(input, "@c", 2);
-    expect(names()).toEqual(["Carla"]);
+    expect(names()).toEqual(["@channel", "Carla"]);
+  });
+
+  it("offers @channel and @all in a channel with what they reach, and inserts the keyword", async () => {
+    const { input } = await setup();
+    type(input, "Heads up @", 10);
+    await screen.findByRole("listbox");
+    expect(screen.getByRole("group", { name: "Mentions" })).toBeInTheDocument();
+    expect(screen.getByRole("group", { name: "People" })).toBeInTheDocument();
+    expect(screen.getAllByRole("option")[0]).toHaveTextContent(/^@channelNotify everyone in /u);
+    fireEvent.keyDown(input, { key: "ArrowDown" });
+    fireEvent.keyDown(input, { key: "Enter" });
+    expect(input.value).toBe("Heads up @all ");
+  });
+
+  it("offers no @channel or @all in a private chat", async () => {
+    const { input } = await setup({ kind: "private", session: 2 });
+    type(input, "@", 1);
+    await screen.findByRole("listbox");
+    expect(names()).toEqual(["Anna", "Ben", "Carla"]);
+    expect(screen.queryByRole("group")).toBeNull();
   });
 
   it("selects with arrow keys and Enter, inserting plain @Name without sending", async () => {
     const { input } = await setup();
     type(input, "hi @", 4);
     await screen.findByRole("listbox");
-    fireEvent.keyDown(input, { key: "ArrowDown" });
-    expect(screen.getAllByRole("option")[1]).toHaveAttribute("aria-selected", "true");
-    expect(input.getAttribute("aria-activedescendant")).toBe(screen.getAllByRole("option")[1]?.id);
+    for (let i = 0; i < 3; i += 1) fireEvent.keyDown(input, { key: "ArrowDown" });
+    expect(screen.getAllByRole("option")[3]).toHaveAttribute("aria-selected", "true");
+    expect(input.getAttribute("aria-activedescendant")).toBe(screen.getAllByRole("option")[3]?.id);
     fireEvent.keyDown(input, { key: "Enter" });
     expect(input.value).toBe("hi @Ben ");
     expect([input.selectionStart, input.selectionEnd]).toEqual([8, 8]);
@@ -165,7 +181,7 @@ describe("Composer mentions", () => {
 
   it("selects with Tab, closes with Escape and picks with the mouse", async () => {
     const { input } = await setup();
-    type(input, "@a", 2);
+    type(input, "@an", 3);
     await screen.findByRole("listbox");
     fireEvent.keyDown(input, { key: "Tab" });
     expect(input.value).toBe("@Anna ");

@@ -98,15 +98,20 @@
     "hideDescription": "Folaigh cur síos an chainéil"
   },
   "mention": {
-    "list": "Daoine ar féidir iad a lua",
-    "found_one": "Moladh {{count}} duine. Úsáid na heochracha saigheada, ansin Enter chun é a chur isteach.",
-    "found_two": "Moladh {{count}} dhuine. Úsáid na heochracha saigheada, ansin Enter chun iad a chur isteach.",
-    "found_few": "Moladh {{count}} dhuine. Úsáid na heochracha saigheada, ansin Enter chun iad a chur isteach.",
-    "found_many": "Moladh {{count}} nduine. Úsáid na heochracha saigheada, ansin Enter chun iad a chur isteach.",
-    "found_other": "Moladh {{count}} duine. Úsáid na heochracha saigheada, ansin Enter chun iad a chur isteach.",
+    "list": "Moltaí luaite",
+    "found_one": "Moltaí: {{count}}. Úsáid na saigheadeochracha, ansin Enter le cur isteach.",
+    "found_two": "Moltaí: {{count}}. Úsáid na saigheadeochracha, ansin Enter le cur isteach.",
+    "found_few": "Moltaí: {{count}}. Úsáid na saigheadeochracha, ansin Enter le cur isteach.",
+    "found_many": "Moltaí: {{count}}. Úsáid na saigheadeochracha, ansin Enter le cur isteach.",
+    "found_other": "Moltaí: {{count}}. Úsáid na saigheadeochracha, ansin Enter le cur isteach.",
     "none": "Níor aimsíodh aon duine",
     "mentionsYou": "Luann sé thú",
-    "chipLabel": "{{name}}, lua"
+    "chipLabel": "{{name}}, lua",
+    "groupsHeading": "Luanna",
+    "peopleHeading": "Daoine",
+    "channelHint": "Cuir gach duine in {{channel}} ar an eolas ({{count}})",
+    "allHint": "Cuir gach duine atá in ann an cainéal seo a léamh ar an eolas ({{count}})",
+    "keys": "↑↓ roghnaigh · Enter cuir isteach · Esc dún"
   },
   "preview": {
     "open": "Oscail sa bhrabhsálaí",

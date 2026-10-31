@@ -36,6 +36,7 @@
     "reconnect": "Återanslut",
     "alwaysConnect": "Anslut alltid vid start",
     "muteNotifications": "Stäng av aviseringar",
+    "muteGroupMentions": "Tysta @all och @channel",
     "theme": "Tema…",
     "showWelcome": "Visa välkomstmeddelande",
     "identity": "Identitet…"

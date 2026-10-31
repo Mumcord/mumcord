@@ -36,6 +36,7 @@
     "reconnect": "Athcheangail",
     "alwaysConnect": "Ceangail i gcónaí ag an tús",
     "muteNotifications": "Balbhaigh fógraí",
+    "muteGroupMentions": "Balbhaigh @all agus @channel",
     "theme": "Téama…",
     "showWelcome": "Taispeáin an teachtaireacht fáilte",
     "identity": "Aitheantas…"

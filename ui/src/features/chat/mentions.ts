@@ -3,7 +3,7 @@
  * inserting the chosen name, and detecting whether a received message mentions the user.
  * A mention is plain `@Name` text, so other Mumble clients just see that text.
  */
-import type { User } from "../../api";
+import type { Conversation, User } from "../../api";
 
 /** DOM id of option `index` of the suggestion list `listId`. */
 export function optionId(listId: string, index: number): string {
@@ -125,4 +125,41 @@ export function bodyMentions(html: string, names: readonly string[]): boolean {
   if (!html.includes("@")) return false;
   const text = bodyText(html);
   return names.some((name) => mentionsName(text, name));
+}
+
+/**
+ * Group mentions (issue #70): `@channel` for everyone in the channel, `@all` for everyone who
+ * gets the channel's messages (people listening to it included). Plain text like `@Name`.
+ */
+export const GROUP_MENTIONS = ["channel", "all"] as const;
+export type GroupMention = (typeof GROUP_MENTIONS)[number];
+
+/** Group mentions whose keyword starts with the query, in the order of `GROUP_MENTIONS`. */
+export function rankGroupMentions(query: string): GroupMention[] {
+  const wanted = foldName(query);
+  return GROUP_MENTIONS.filter((group) => group.startsWith(wanted));
+}
+
+export interface GroupMentionContext {
+  /** The channel the user is in on the message's server, `null` if unknown. */
+  ownChannel: number | null;
+  /** The user turned `@all` and `@channel` off for the message's server (Q1.6). */
+  muted: boolean;
+}
+
+/**
+ * True when a received message reaches the user through `@all` or `@channel`. Only channel
+ * messages count; `@channel` only for people in the channel, not for those who just listen to it.
+ */
+export function groupMentioned(
+  html: string,
+  conversation: Conversation,
+  { ownChannel, muted }: GroupMentionContext,
+): boolean {
+  if (muted || conversation.kind !== "channel" || !html.includes("@")) return false;
+  const text = bodyText(html);
+  return (
+    mentionsName(text, "all") ||
+    (conversation.channelId === ownChannel && mentionsName(text, "channel"))
+  );
 }
