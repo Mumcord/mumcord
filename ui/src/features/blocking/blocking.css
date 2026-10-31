@@ -59,11 +59,17 @@
   overflow-wrap: anywhere;
 }
 
-.block-dialog__confirm {
+/* Doubled class: shell.css loads later and its `.button` background would win otherwise. */
+.button.block-dialog__confirm,
+.button.block-dialog__confirm:hover:not(:disabled) {
   border-color: var(--color-danger);
   background: var(--color-danger);
   color: var(--color-bg-chat);
   font-weight: var(--font-weight-bold);
+}
+
+.button.block-dialog__confirm:hover:not(:disabled) {
+  filter: brightness(1.1);
 }
 
 /* "Blocked" mark next to a name in the member list and channel tree. */
