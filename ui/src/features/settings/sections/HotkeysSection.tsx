@@ -9,6 +9,8 @@ import {
   type HotkeySlot,
   type HotkeysStatus,
   type PttSession,
+  type WhisperSetup,
+  type WhisperTarget,
 } from "../../../api";
 import { Select } from "../../../components/Select";
 import { useServers as useConnectedServers } from "../../channels/serverStore";
@@ -54,6 +56,7 @@ export function HotkeysSection({ settings, update }: SettingsSectionProps) {
   const [status, setStatus] = useState<HotkeysStatus | null>(null);
   const [session, setSession] = useState<PttSession | null>(null);
   const [adding, setAdding] = useState<HotkeyAction | null>(null);
+  const [whisper, setWhisper] = useState<WhisperSetup | null>(null);
   const navigation = useSettingsNavigation();
   /** Conflicts waiting for "Assign here", by key. */
   const [pending] = useState(() => new Map<string, HotkeyConflict>());
@@ -182,6 +185,61 @@ export function HotkeysSection({ settings, update }: SettingsSectionProps) {
     });
   };
 
+  // Whisper targets (#67) are set up in Voice; their keys are listed here too.
+  useEffect(() => {
+    getApi()
+      .whisperSetup()
+      .then(setWhisper, (error: unknown) => {
+        console.error("Reading the whisper targets failed", error);
+      });
+  }, []);
+
+  const assignWhisper =
+    (targetId: string) => async (key: string | null, conflict: HotkeyConflict | null) => {
+      const rest = await freed(conflict);
+      const { targets } = await getApi().whisperSetup();
+      setWhisper(
+        await getApi().whisperTargetsSave(
+          targets.map((t) => (t.id === targetId ? { ...t, hotkey: key } : t)),
+        ),
+      );
+      if (rest.hotkeys !== hotkeys || rest.clearPtt) {
+        update(rest.clearPtt ? { hotkeys: rest.hotkeys, pttKey: null } : { hotkeys: rest.hotkeys });
+      }
+    };
+
+  const whisperSummary = (target: WhisperTarget) =>
+    target.receivers.kind === "people"
+      ? t("voice.whisper.summaryPeople", { count: target.receivers.names.length })
+      : target.receivers.children
+        ? t("voice.whisper.summaryChannelTree")
+        : t("voice.whisper.summaryChannel");
+
+  const whisperRow = (target: WhisperTarget) => {
+    const assign = assignWhisper(target.id);
+    const report = (error: unknown) => {
+      console.error("Saving the whisper key failed", error);
+    };
+    return (
+      <HotkeyRow
+        key={`whisper-${target.id}`}
+        label={target.name}
+        description={whisperSummary(target)}
+        value={target.hotkey}
+        warning={
+          whisper?.failedKeys.includes(target.id) === true ? t("voice.whisper.keyFailed") : null
+        }
+        onCapture={(combo) => capture(combo, { kind: "whisper", targetId: target.id }, assign)}
+        onAssign={(conflict) => {
+          assignPending(assign, conflict);
+        }}
+        onClear={() => {
+          assign(null, null).catch(report);
+        }}
+      />
+    );
+  };
+
   const failedWarning = (index: number) =>
     status?.failed.includes(index) === true && globalHotkeys ? t("hotkeys.failed") : null;
 
@@ -304,6 +362,7 @@ export function HotkeysSection({ settings, update }: SettingsSectionProps) {
           />
         )}
         {AFTER_CHANNELS.map((kind) => actionRow({ kind }))}
+        {whisper?.targets.map(whisperRow)}
         <AddChannelHotkey
           taken={channelRows}
           onPick={(action) => {

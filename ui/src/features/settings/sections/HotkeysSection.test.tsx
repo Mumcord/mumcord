@@ -176,6 +176,27 @@ describe("Settings → Hotkeys (#64)", () => {
     });
   });
 
+  it("lists whisper target keys and changes them (#67)", async () => {
+    await api.whisperTargetsSave([
+      {
+        id: "t1",
+        name: "Raid leads",
+        receivers: { kind: "people", names: ["Maya", "Priya"] },
+        hotkey: "F9",
+      },
+    ]);
+    const save = vi.spyOn(api, "whisperTargetsSave");
+    await openHotkeys();
+    const row = await screen.findByRole("button", { name: /^Raid leads/ });
+    expect(row).toHaveAccessibleName("Raid leads F9");
+    expect(screen.getByText("2 people · whisper")).toBeVisible();
+    fireEvent.click(row);
+    fireEvent.keyDown(row, { code: "F10", key: "F10" });
+    await waitFor(() => {
+      expect(save).toHaveBeenLastCalledWith([expect.objectContaining({ id: "t1", hotkey: "F10" })]);
+    });
+  });
+
   it("explains the foreground-only mode when switched off", async () => {
     await openHotkeys();
     fireEvent.click(

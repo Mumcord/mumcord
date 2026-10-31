@@ -102,12 +102,19 @@ impl From<Hotkey> for store::Hotkey {
     }
 }
 
-/// The key being set: push-to-talk, an existing hotkey (index into `hotkeys`), or a new one.
-#[derive(Serialize, Deserialize, Clone, Copy, Debug, PartialEq, Eq, Type)]
+/// The key being set: push-to-talk, an existing hotkey (index into `hotkeys`), a whisper
+/// target's key (#67), or a new hotkey.
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, Type)]
 #[serde(tag = "kind", rename_all = "camelCase")]
 pub enum HotkeySlot {
     PushToTalk,
-    Hotkey { index: u32 },
+    Hotkey {
+        index: u32,
+    },
+    #[serde(rename_all = "camelCase")]
+    Whisper {
+        target_id: String,
+    },
     New,
 }
 
@@ -192,11 +199,16 @@ pub fn hotkey_check(
     slot: HotkeySlot,
 ) -> ApiResult<HotkeyCheck> {
     let settings = engine.settings()?;
+    let own_target = match &slot {
+        HotkeySlot::Whisper { target_id } => Some(target_id.clone()),
+        _ => None,
+    };
     let (key, conflict) =
         crate::hotkeys::check(&key, slot, &settings.hotkeys, settings.ptt_key.as_deref())
             .map(|(key, conflict)| {
-                let conflict =
-                    conflict.or_else(|| crate::hotkeys::whisper_conflict(&key, &settings));
+                let conflict = conflict.or_else(|| {
+                    crate::hotkeys::whisper_conflict(&key, &settings, own_target.as_deref())
+                });
                 (key, conflict)
             })
             .map_err(|err| ApiError::new(ErrorCode::InvalidInput, err.to_string()))?;

@@ -131,11 +131,16 @@ pub fn check(
     Ok((key, conflict))
 }
 
-/// The whisper target (#67) whose hold-to-talk key is `key` (canonical), if any.
-pub fn whisper_conflict(key: &str, settings: &store::Settings) -> Option<HotkeyConflict> {
+/// The whisper target (#67) other than `except` whose hold-to-talk key is `key` (canonical).
+pub fn whisper_conflict(
+    key: &str,
+    settings: &store::Settings,
+    except: Option<&str>,
+) -> Option<HotkeyConflict> {
     settings
         .whisper_targets
         .iter()
+        .filter(|t| Some(t.id.as_str()) != except)
         .find(|t| {
             t.hotkey
                 .as_deref()
@@ -491,13 +496,18 @@ mod tests {
             ..Default::default()
         };
         assert_eq!(
-            whisper_conflict("Ctrl+Q", &settings),
+            whisper_conflict("Ctrl+Q", &settings, None),
             Some(HotkeyConflict::Whisper {
                 target_id: "t1".into(),
                 name: "Raid leads".into()
             })
         );
-        assert_eq!(whisper_conflict("Ctrl+R", &settings), None);
+        assert_eq!(whisper_conflict("Ctrl+R", &settings, None), None);
+        assert_eq!(
+            whisper_conflict("Ctrl+Q", &settings, Some("t1")),
+            None,
+            "a target's own key is no conflict"
+        );
     }
 
     #[test]

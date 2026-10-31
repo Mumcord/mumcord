@@ -1424,8 +1424,11 @@ export type HotkeyPressed = {
 	action: HotkeyAction,
 };
 
-/**  The key being set: push-to-talk, an existing hotkey (index into `hotkeys`), or a new one. */
-export type HotkeySlot = { kind: "pushToTalk" } | { kind: "hotkey"; index: number } | { kind: "new" };
+/**
+ *  The key being set: push-to-talk, an existing hotkey (index into `hotkeys`), a whisper
+ *  target's key (#67), or a new hotkey.
+ */
+export type HotkeySlot = { kind: "pushToTalk" } | { kind: "hotkey"; index: number } | { kind: "whisper"; targetId: string } | { kind: "new" };
 
 /**  How hotkeys reach Mumcord in this session. */
 export type HotkeysMode = 
