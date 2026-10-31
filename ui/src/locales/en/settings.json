@@ -157,6 +157,20 @@
     "processing": "Voice processing",
     "noiseSuppression": "Noise suppression",
     "noiseSuppressionHint": "Filters out background noise like keyboards and fans.",
+    "noiseChoice": {
+      "light": "Light",
+      "standard": "Standard",
+      "advanced": "Advanced (AI)",
+      "off": "Off"
+    },
+    "noiseChoiceHint": {
+      "light": "Classic filter for steady noise such as fans or hum. Lowest CPU use.",
+      "standard": "AI filter for everyday noise such as keyboards and fans. Low CPU use.",
+      "advanced": "Newer AI model that also removes changing noise. About three times the CPU of Standard and 10 ms more delay."
+    },
+    "noiseChoiceBeta": "Beta",
+    "noiseChoiceTipLabel": "About {{choice}}",
+    "detectorHint": "Voice activation detects speech with the RNNoise model; it does not change your audio.",
     "echoCancellation": "Echo cancellation",
     "echoCancellationHint": "Stops others from hearing themselves when you use speakers.",
     "autoGain": "Automatic volume",

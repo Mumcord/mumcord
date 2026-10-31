@@ -160,6 +160,20 @@
     "processing": "Ipproċessar tal-vuċi",
     "noiseSuppression": "Tneħħija tal-istorbju",
     "noiseSuppressionHint": "Jiffiltra l-istorbju fl-isfond bħal tastieri u fannijiet.",
+    "noiseChoice": {
+      "light": "Ħafif",
+      "standard": "Standard",
+      "advanced": "Avvanzat (AI)",
+      "off": "Mitfi"
+    },
+    "noiseChoiceHint": {
+      "light": "Filtru klassiku għal storbju kostanti bħal fannijiet jew żanżin. L-inqas użu tas-CPU.",
+      "standard": "Filtru AI għall-istorbju ta' kuljum bħal tastieri u fannijiet. Użu baxx tas-CPU.",
+      "advanced": "Mudell AI aktar ġdid li jneħħi wkoll storbju li jinbidel. Madwar tliet darbiet is-CPU ta' Standard u 10 ms aktar dewmien."
+    },
+    "noiseChoiceBeta": "Beta",
+    "noiseChoiceTipLabel": "Dwar {{choice}}",
+    "detectorHint": "Il-attivazzjoni tal-vuċi ssib il-kliem bil-mudell RNNoise; ma jbiddilx l-awdjo tiegħek.",
     "echoCancellation": "Tneħħija tal-eku",
     "echoCancellationHint": "Iwaqqaf lill-oħrajn milli jisimgħu lilhom infushom meta tuża l-ispikers.",
     "autoGain": "Volum awtomatiku",

@@ -158,6 +158,20 @@
     "processing": "Elaborazione della voce",
     "noiseSuppression": "Soppressione del rumore",
     "noiseSuppressionHint": "Filtra i rumori di fondo come tastiere e ventole.",
+    "noiseChoice": {
+      "light": "Leggera",
+      "standard": "Standard",
+      "advanced": "Avanzata (IA)",
+      "off": "Disattivata"
+    },
+    "noiseChoiceHint": {
+      "light": "Filtro classico per rumore costante, come ventole o ronzio. Il minor uso della CPU.",
+      "standard": "Filtro IA per il rumore di tutti i giorni, come tastiere e ventole. Basso uso della CPU.",
+      "advanced": "Modello IA più recente che rimuove anche il rumore variabile. Circa il triplo della CPU di Standard e 10 ms di ritardo in più."
+    },
+    "noiseChoiceBeta": "Beta",
+    "noiseChoiceTipLabel": "Informazioni su {{choice}}",
+    "detectorHint": "L'attivazione vocale riconosce il parlato con il modello RNNoise; non cambia il tuo audio.",
     "echoCancellation": "Cancellazione dell'eco",
     "echoCancellationHint": "Evita che gli altri sentano sé stessi quando usi gli altoparlanti.",
     "autoGain": "Volume automatico",
