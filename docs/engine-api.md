@@ -370,6 +370,14 @@ Issue #141. Settings → Privacy: **Private messages from** Everyone (default) /
 - **Requests (memory only, FR-3.103):** `pm_requests(serverId)` returns the held `incoming` requests and the `sent` chat requests; `PmRequestsChanged` follows every change. They are dropped on disconnect and on quit; held messages play no sound, raise no toast and count no unread. A message request holds up to 20 messages; at most 50 requests per server are held. `pm_request_accept` delivers the held messages as if they just arrived and, for a chat request, tells the sender. `pm_request_decline` is silent; new chat requests from that person are ignored for 10 minutes.
 - **Chat requests:** `chat_request_send(serverId, session, note)` works only towards Mumcord users whose hello announced `chat-request` (`invalidInput` otherwise, or while a request to them is pending for less than 10 minutes). Transport: plugin data id `mumcord.chatreq`, JSON `{"t":"request","note":…}` or `{"t":"accepted"}`, sent only to that one person. The note is plain text: control characters removed, whitespace collapsed, at most 200 characters; render it as text. An `accepted` from someone without a pending request is ignored.
 
+## Private messages overview
+
+Issue #173. The overview lists the private conversations of every connected server; the UI merges them with the live chats and unread counts it already has.
+
+- **Newest messages:** `private_conversations(serverId)` returns, for a connected server, the newest stored message of every private conversation (newest first) plus `peerName`, the name the other person last wrote under (`null` when only own messages are stored). Conversations with people without a certificate are not stored and only appear while they are open.
+- **Pin and mute:** `pm_conversation_set_pinned(serverId, certHash, pinned)`, `pm_conversation_mute(serverId, certHash, minutes)` (`null` minutes: until turned back on) and `pm_conversation_unmute(serverId, certHash)`; `pm_conversation_prefs()` lists them and `PmConversationPrefsChanged` carries the full list after every change. Stored in SQLite (`pm_conversation`, migration v17) per server and certificate hash; removing a server removes its rows. `mutedUntil` is RFC 3339; a time in the past means the mute is over. The engine only stores this state: the UI sorts pinned conversations first, shows a grey count and skips toasts and sounds for muted ones.
+- **Delete history:** the overview uses `history_clear` with a conversation scope (this device only).
+
 ## Connection statistics
 
 `connection_stats(serverId)` returns `ConnectionStats` of the own connection to that server:

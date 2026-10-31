@@ -14,6 +14,8 @@ import type {
 import { parseMumbleLink } from "../features/chat/mumbleLink";
 import type {
   AcceptedConversation,
+  PmConversationPrefs,
+  PrivateConversation,
   ApiError,
   AudioDevices,
   ChannelInfo,
@@ -619,6 +621,26 @@ export function createMockApi(options: MockOptions = {}): MockApi {
   const pmRequestsByServer = new Map<number, PmRequests>();
   let nextPmRequestId = 1;
   let acceptedConversations: AcceptedConversation[] = [];
+  let pmPrefs: PmConversationPrefs[] = [];
+
+  function setPmPrefs(
+    serverId: number,
+    certHash: string,
+    change: Partial<Omit<PmConversationPrefs, "serverId" | "certHash">>,
+  ): void {
+    const same = (p: PmConversationPrefs) => p.serverId === serverId && p.certHash === certHash;
+    const old = pmPrefs.find(same) ?? {
+      serverId,
+      certHash,
+      pinned: false,
+      mutedUntil: null,
+      mutedForever: false,
+    };
+    const next = { ...old, ...change };
+    const kept = next.pinned || next.mutedUntil !== null || next.mutedForever;
+    pmPrefs = [...pmPrefs.filter((p) => !same(p)), ...(kept ? [next] : [])];
+    emit("pmConversationPrefsChanged", { prefs: pmPrefs });
+  }
   const failures = new Map<CommandName, ApiError>();
   const inspector = createMockInspector();
   let inspectorView: InspectorView | null = null;
@@ -1693,6 +1715,41 @@ export function createMockApi(options: MockOptions = {}): MockApi {
           { session, name: user.name, certHash: user.certHash, accepted: false },
         ],
       });
+      return Promise.resolve(null);
+    },
+    privateConversations: (serverId) => {
+      requireSession(serverId);
+      const list: PrivateConversation[] = [];
+      for (const messages of serverHistory(serverId).values()) {
+        const last = messages.at(-1);
+        if (last?.conversation.kind !== "private") continue;
+        const { certHash } = last.conversation;
+        const peer = [...messages].reverse().find((m) => m.senderCertHash === certHash);
+        list.push({ last, peerName: peer?.senderName ?? null });
+      }
+      list.sort((a, b) => Date.parse(b.last.sentAt) - Date.parse(a.last.sentAt));
+      return Promise.resolve(list);
+    },
+    pmConversationPrefs: () => Promise.resolve(pmPrefs),
+    pmConversationSetPinned: (serverId, certHash, pinned) => {
+      setPmPrefs(serverId, certHash, { pinned });
+      return Promise.resolve(null);
+    },
+    pmConversationMute: (serverId, certHash, minutes) => {
+      setPmPrefs(
+        serverId,
+        certHash,
+        minutes === null
+          ? { mutedUntil: null, mutedForever: true }
+          : {
+              mutedUntil: new Date(Date.now() + minutes * 60_000).toISOString(),
+              mutedForever: false,
+            },
+      );
+      return Promise.resolve(null);
+    },
+    pmConversationUnmute: (serverId, certHash) => {
+      setPmPrefs(serverId, certHash, { mutedUntil: null, mutedForever: false });
       return Promise.resolve(null);
     },
     acceptedConversations: () => Promise.resolve(acceptedConversations),
