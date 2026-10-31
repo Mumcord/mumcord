@@ -366,6 +366,7 @@ describe("hide empty channels and talking people first (FR-2.23)", () => {
       hideEmptyChannels: true,
       talkingFirst: false,
       showWeakConnectionIcon: true,
+      lowLatency: false,
       applySettings: noop,
     };
     render(

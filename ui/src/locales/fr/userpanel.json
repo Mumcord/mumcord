@@ -145,6 +145,8 @@
     "label": "Ne pas déranger",
     "manual": "manuel",
     "system": "Ne pas déranger (système)",
-    "systemHint": "Désactivez-le dans les réglages de notification de votre bureau."
-  }
+    "systemHint": "Désactivez-le dans les réglages de notification de votre bureau.",
+    "short": "Ne pas déranger"
+  },
+  "dismissError": "Fermer"
 }

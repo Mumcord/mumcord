@@ -145,6 +145,8 @@
     "label": "Non disturbare",
     "manual": "manuale",
     "system": "Non disturbare (sistema)",
-    "systemHint": "Disattivalo nelle impostazioni delle notifiche del desktop."
-  }
+    "systemHint": "Disattivalo nelle impostazioni delle notifiche del desktop.",
+    "short": "Non disturbare"
+  },
+  "dismissError": "Chiudi"
 }

@@ -145,6 +145,8 @@
     "label": "Stör ej",
     "manual": "manuellt",
     "system": "Stör ej (system)",
-    "systemHint": "Stäng av det i skrivbordets aviseringsinställningar."
-  }
+    "systemHint": "Stäng av det i skrivbordets aviseringsinställningar.",
+    "short": "Stör ej"
+  },
+  "dismissError": "Stäng"
 }

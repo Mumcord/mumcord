@@ -39,7 +39,7 @@ describe("dndSource", () => {
 });
 
 describe("DndIndicator", () => {
-  it("shows nothing while off, the manual source and then the system source live", async () => {
+  it("shows nothing while off, then a compact chip naming the manual or system source", async () => {
     const { container } = render(<DndIndicator />);
     await act(async () => {
       await api.dndState();
@@ -49,22 +49,20 @@ describe("DndIndicator", () => {
     await act(async () => {
       await api.dndSet(true);
     });
-    expect(screen.getByRole("status")).toHaveTextContent("Do Not Disturb · manual");
+    // Short text in the strip; the full source is the chip's name and tooltip (#246).
+    const manual = screen.getByRole("button", { name: "Do Not Disturb · manual" });
+    expect(manual).toHaveTextContent("DND");
+    expect(manual).toHaveAttribute("data-tooltip", "Do Not Disturb · manual");
 
     await act(async () => {
       await api.dndSet(false);
       api.mock.setSystemDnd({ desktop: "KDE Plasma", on: true });
     });
-    expect(screen.getByRole("status")).toHaveTextContent("Do Not Disturb (system)");
-    // The hint sits behind a "?" (tooltip on hover and focus), not as permanent text (#217).
-    expect(screen.queryByText("Turn it off in your desktop's notification settings.")).toBeNull();
-    const tip = screen.getByRole("button", {
-      name: "More information: Do Not Disturb (system)",
+    const system = screen.getByRole("button", {
+      name: "Do Not Disturb (system). Turn it off in your desktop's notification settings.",
     });
-    expect(tip).toHaveAttribute(
-      "data-tooltip",
-      "Turn it off in your desktop's notification settings.",
-    );
+    expect(system).toHaveAttribute("data-source", "system");
+    expect(system).toHaveTextContent("DND");
   });
 });
 

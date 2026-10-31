@@ -25,16 +25,23 @@ export function AudioArrow({ kind, audio, disabled }: AudioArrowProps) {
         audio.openFrom(kind, event.currentTarget);
       }}
     >
-      <svg viewBox="0 0 24 24" width="10" height="10" aria-hidden="true" focusable="false">
-        <path
-          d="M6 9l6 6l6-6"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="3"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        />
-      </svg>
+      <ArrowIcon />
     </button>
+  );
+}
+
+/** The chevron of the split controls' small popover arrows. */
+export function ArrowIcon() {
+  return (
+    <svg viewBox="0 0 24 24" width="10" height="10" aria-hidden="true" focusable="false">
+      <path
+        d="M6 9l6 6l6-6"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="3"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
   );
 }

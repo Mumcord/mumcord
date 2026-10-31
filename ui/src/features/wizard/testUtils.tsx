@@ -58,6 +58,7 @@ export function renderInWizard(harness: Harness, ui: ReactNode) {
     hideEmptyChannels: false,
     talkingFirst: false,
     showWeakConnectionIcon: true,
+    lowLatency: false,
     applySettings: harness.applySettings,
   };
   return render(

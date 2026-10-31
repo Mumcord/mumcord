@@ -145,6 +145,8 @@
     "label": "Não incomodar",
     "manual": "manual",
     "system": "Não incomodar (sistema)",
-    "systemHint": "Desative-o nas definições de notificações do ambiente de trabalho."
-  }
+    "systemHint": "Desative-o nas definições de notificações do ambiente de trabalho.",
+    "short": "Não incomodar"
+  },
+  "dismissError": "Dispensar"
 }

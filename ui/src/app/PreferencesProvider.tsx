@@ -17,6 +17,7 @@ interface StoredPreferences {
   talkingFirst: boolean;
   showWeakConnectionIcon: boolean;
   visualEffects: boolean;
+  lowLatency: boolean;
 }
 
 /** Keeps the document theme (app, shown server or editor preview), UI language, chat layout and link previews in sync with the settings record and the OS. */
@@ -31,6 +32,7 @@ export function PreferencesProvider({ children }: { children: ReactNode }) {
     talkingFirst: false,
     showWeakConnectionIcon: true,
     visualEffects: true,
+    lowLatency: false,
   });
   const [prefersDark, setPrefersDark] = useState(osPrefersDark);
 
@@ -67,6 +69,7 @@ export function PreferencesProvider({ children }: { children: ReactNode }) {
         | "hideEmptyChannels"
         | "talkingFirst"
         | "showWeakConnectionIcon"
+        | "lowLatency"
         | "visualEffects"
         | "appThemeId"
         | "customThemes"
@@ -87,6 +90,7 @@ export function PreferencesProvider({ children }: { children: ReactNode }) {
         talkingFirst: settings.talkingFirst,
         showWeakConnectionIcon: settings.showWeakConnectionIcon,
         visualEffects: settings.visualEffects,
+        lowLatency: settings.lowLatency,
       });
     },
     [],
@@ -102,6 +106,7 @@ export function PreferencesProvider({ children }: { children: ReactNode }) {
       hideEmptyChannels: stored.hideEmptyChannels,
       talkingFirst: stored.talkingFirst,
       showWeakConnectionIcon: stored.showWeakConnectionIcon,
+      lowLatency: stored.lowLatency,
       applySettings,
     }),
     [
@@ -113,6 +118,7 @@ export function PreferencesProvider({ children }: { children: ReactNode }) {
       stored.hideEmptyChannels,
       stored.talkingFirst,
       stored.showWeakConnectionIcon,
+      stored.lowLatency,
       applySettings,
     ],
   );

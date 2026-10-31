@@ -46,7 +46,8 @@ describe("disconnect button menu (#154)", () => {
     await item("Leave voice").waitForDisplayed({ timeout: 5_000 });
     await item("Leave voice").click();
     await notice().waitForDisplayed({ timeout: 15_000 });
-    expect(await notice().getText()).toContain("Read-only");
+    // WebKit's getText skips ellipsized spans, so read the DOM text.
+    expect(await notice().getProperty("textContent")).toContain("Read-only");
     // Still connected: the hang-up button stays and the server shows the user deafened.
     await hangUp().waitForDisplayed();
     await bot(["expect", "user", ME, "--deaf", "true"], WATCH);
