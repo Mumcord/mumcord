@@ -5,8 +5,10 @@
 //! Mumble server reports for the user (`UserState.hash`); anything else drops the connection.
 //!
 //! Paths: IPv6 and LAN addresses of the network interfaces and a router port mapping (PCP,
-//! NAT-PMP, UPnP). There is no STUN, TURN or relay server, by design (client-only rule, QA.90):
-//! when no path works the attempt ends with [`P2pError::NoDirectPath`].
+//! NAT-PMP, UPnP). When no direct path works the attempt ends with [`P2pError::NoDirectPath`];
+//! the caller may then use an optional community relay announced on the Mumble server
+//! ([`P2p::connect_via_relay`]). The relay only forwards the same end-to-end encrypted QUIC
+//! packets and cannot read them; Mumcord works fully without one.
 //!
 //! Signalling is transport-agnostic: [`Signal`] messages are encoded here and carried by the
 //! caller as Mumble plugin data with the id [`DATA_ID`].
@@ -18,6 +20,10 @@
 //!    [`Signal::Decline`].
 //! 3. Offering side: [`PendingOffer::complete`] with the received answer.
 //!
+//! Relay: both sides get the same [`RelayToken`] from the relay bot and call
+//! [`P2p::connect_via_relay`]; the offering side dials the inner connection, the answering side
+//! accepts it. [`PeerConnection::path`] tells how a connection travels.
+//!
 //! Consent (FR-2.36) is the caller's job: an offer or answer reveals this machine's addresses
 //! (it also opens a router port mapping), and [`PendingOffer::complete`] and
 //! [`PendingAnswer::connect`] are the only calls that dial the peer. Call `offer`/`answer` only
@@ -25,6 +31,7 @@
 
 mod gather;
 mod peer;
+mod relay;
 mod signal;
 mod tls;
 
@@ -43,6 +50,7 @@ pub use peer::{
     RelayState, RelayToken, RequestId, TokenErrorReason,
 };
 pub use quinn;
+pub use relay::{RelayRefusal, RelayTransport};
 pub use signal::{
     DATA_ID, DeclineReason, MAX_CANDIDATES, MAX_SIGNAL_BYTES, SessionId, Signal, SignalError,
     VERSION,
@@ -59,6 +67,7 @@ const NOMINATE: u8 = 1;
 /// Application close codes.
 const CLOSE_UNUSED: u32 = 1;
 const CLOSE_DONE: u32 = 2;
+const CLOSE_RELAY_LOST: u32 = 3;
 
 #[derive(Debug, Clone)]
 pub struct P2pConfig {
@@ -82,7 +91,7 @@ impl Default for P2pConfig {
 
 #[derive(Debug, thiserror::Error)]
 pub enum P2pError {
-    /// No address of the other side could be reached in time; there is no relay to fall back to.
+    /// No address of the other side could be reached in time.
     #[error("no direct connection possible")]
     NoDirectPath,
     #[error("the other side's certificate does not match the one the server reported")]
@@ -98,6 +107,34 @@ pub enum P2pError {
     Tls(#[from] rustls::Error),
     #[error("network error: {0}")]
     Io(#[from] std::io::Error),
+    /// Neither QUIC on the relay's UDP port nor TLS on its TCP port connected in time.
+    #[error("the relay could not be reached over UDP or TCP")]
+    RelayUnreachable,
+    /// The relay presented another certificate than the announced fingerprint.
+    #[error("the relay's certificate does not match the announced one")]
+    RelayCertMismatch,
+    #[error("the relay refused the connection: {0}")]
+    RelayRefused(RelayRefusal),
+    /// The relay broke the handshake, closed the link, or the other side did not get through
+    /// it in time.
+    #[error("the relay connection failed")]
+    RelayFailed,
+}
+
+/// Which side of the signalling a relay connection is for.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum Side {
+    /// Sent the offer; dials the inner connection.
+    Offering,
+    /// Sent the answer; accepts the inner connection.
+    Answering,
+}
+
+/// How a [`PeerConnection`] reaches the other side.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum ConnectionPath {
+    Direct,
+    Relay(RelayTransport),
 }
 
 /// Sets up direct connections with the user's Mumble identity.
@@ -159,11 +196,7 @@ impl P2p {
         let peer_hash = normalize_hash(peer_hash)?;
         let peer = PinnedPeer::new(peer_hash.clone());
         let (client, mut server) = tls::quic_configs(&self.chain, &self.key, &peer)?;
-        let mut transport = TransportConfig::default();
-        transport
-            .max_idle_timeout(Some(VarInt::from_u32(30_000).into()))
-            .keep_alive_interval(Some(Duration::from_secs(10)));
-        let transport = Arc::new(transport);
+        let transport = Arc::new(transport_config());
         server.transport_config(transport.clone());
         let mut client = client;
         client.transport_config(transport);
@@ -193,6 +226,106 @@ impl P2p {
             config: self.config.clone(),
         })
     }
+
+    /// Connects to the user with certificate hash `peer_hash` through `relay`, using the pair
+    /// `token` both sides received from the relay bot. The inner connection is the same mutual
+    /// TLS QUIC connection as a direct one, so the relay cannot read or alter it. Call only
+    /// after the user allowed P2P connections; this reveals this machine's address to the
+    /// relay, not to the peer.
+    pub async fn connect_via_relay(
+        &self,
+        relay: &RelayAnnouncement,
+        token: &RelayToken,
+        peer_hash: &str,
+        side: Side,
+    ) -> Result<PeerConnection, P2pError> {
+        let peer_hash = normalize_hash(peer_hash)?;
+        let peer = PinnedPeer::new(peer_hash.clone());
+        let (mut client, mut server) = tls::quic_configs(&self.chain, &self.key, &peer)?;
+        let mut transport = transport_config();
+        // The relay link fixes the packet size (spec 04 section 6.5); probing for more would
+        // only lose packets.
+        transport
+            .initial_mtu(relay::INNER_MTU)
+            .min_mtu(relay::INNER_MTU)
+            .mtu_discovery_config(None);
+        let transport = Arc::new(transport);
+        client.transport_config(transport.clone());
+        server.transport_config(transport);
+
+        let socket = relay::connect(
+            relay,
+            token,
+            &self.chain,
+            &self.key,
+            self.config.connect_timeout,
+        )
+        .await?;
+        let path = ConnectionPath::Relay(socket.transport());
+        let (remote, lost) = (socket.remote(), socket.lost());
+        let mut endpoint = Endpoint::new_with_abstract_socket(
+            EndpointConfig::default(),
+            (side == Side::Answering).then_some(server),
+            socket,
+            Arc::new(TokioRuntime),
+        )?;
+        endpoint.set_default_client_config(client);
+
+        let handshake = async {
+            let connecting = match side {
+                Side::Offering => endpoint.connect(remote, SERVER_NAME).map_err(|e| {
+                    tracing::debug!("inner connection over the relay not started: {e}");
+                })?,
+                Side::Answering => endpoint.accept().await.ok_or(())?.accept().map_err(|e| {
+                    tracing::debug!("inner connection over the relay not accepted: {e}");
+                })?,
+            };
+            connecting.await.map_err(|e| {
+                note_refusal(&peer, &e);
+                tracing::debug!("inner connection over the relay failed: {e}");
+            })
+        };
+        let connection = tokio::select! {
+            result = tokio::time::timeout(self.config.connect_timeout, handshake) => {
+                result.ok().and_then(Result::ok)
+            }
+            () = peer.mismatched() => None,
+        };
+        let Some(connection) = connection else {
+            return Err(if peer.saw_mismatch() {
+                P2pError::CertMismatch
+            } else {
+                P2pError::RelayFailed
+            });
+        };
+
+        // The inner keep-alive would only notice a dead relay after the idle timeout.
+        let watched = connection.clone();
+        tokio::spawn(async move {
+            tokio::select! {
+                () = lost.notified() => {
+                    watched.close(VarInt::from_u32(CLOSE_RELAY_LOST), b"relay lost");
+                }
+                _ = watched.closed() => {}
+            }
+        });
+        Ok(PeerConnection {
+            connection,
+            peer_hash,
+            path,
+            _endpoint: endpoint,
+            _mapping: None,
+        })
+    }
+}
+
+/// Transport settings shared by direct and relayed connections.
+fn transport_config() -> TransportConfig {
+    let mut transport = TransportConfig::default();
+    transport
+        .max_idle_timeout(Some(VarInt::from_u32(30_000).into()))
+        .keep_alive_interval(Some(Duration::from_secs(10)));
+    transport
 }
 
 /// An offer waiting for the peer's answer.
@@ -245,12 +378,13 @@ impl PendingAnswer {
     }
 }
 
-/// An authenticated direct connection. Streams and datagrams are used through
-/// [`PeerConnection::connection`]; dropping this closes the connection and removes the router
-/// port mapping.
+/// An authenticated connection, direct or through a relay. Streams and datagrams are used
+/// through [`PeerConnection::connection`]; dropping this closes the connection and removes the
+/// router port mapping.
 pub struct PeerConnection {
     connection: Connection,
     peer_hash: String,
+    path: ConnectionPath,
     // Kept alive for the connection's lifetime.
     _endpoint: Endpoint,
     _mapping: Option<MappingGuard>,
@@ -266,6 +400,12 @@ impl PeerConnection {
         &self.peer_hash
     }
 
+    /// Whether the connection is direct or goes through a relay, and over which transport.
+    pub fn path(&self) -> ConnectionPath {
+        self.path
+    }
+
+    /// The other side's address, or the relay's for a relayed connection.
     pub fn remote_address(&self) -> SocketAddr {
         self.connection.remote_address()
     }
@@ -318,6 +458,7 @@ impl Attempt {
             Some(connection) => Ok(PeerConnection {
                 connection,
                 peer_hash: self.peer_hash,
+                path: ConnectionPath::Direct,
                 _endpoint: self.endpoint,
                 _mapping: self.mapping,
             }),
