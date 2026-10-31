@@ -126,7 +126,7 @@ export const commands = {
 	/**  Removes a friend by certificate hash. */
 	friendRemove: (certHash: string) => typedError<null, ApiError>(__TAURI_INVOKE("friend_remove", { certHash })),
 	/**  Held and sent requests of a connected server. */
-	pmRequests: (serverId: number) => __TAURI_INVOKE<PmRequests>("pm_requests", { serverId }),
+	pmRequests: (serverId: number) => typedError<PmRequests, ApiError>(__TAURI_INVOKE("pm_requests", { serverId })),
 	/**  Accepts a request: held messages are shown and the sender may keep messaging. */
 	pmRequestAccept: (serverId: number, id: number) => typedError<null, ApiError>(__TAURI_INVOKE("pm_request_accept", { serverId, id })),
 	/**  Declines a request silently. */

@@ -121,8 +121,8 @@ pub fn to_api_accepted(list: Vec<StoredAcceptedConversation>) -> Vec<AcceptedCon
 /// Held and sent requests of a connected server.
 #[tauri::command]
 #[specta::specta]
-pub fn pm_requests(engine: State<'_, Engine>, server_id: ServerId) -> PmRequests {
-    engine.pm_requests(to_engine_server_id(server_id)).into()
+pub fn pm_requests(engine: State<'_, Engine>, server_id: ServerId) -> ApiResult<PmRequests> {
+    Ok(engine.pm_requests(to_engine_server_id(server_id)).into())
 }
 
 /// Accepts a request: held messages are shown and the sender may keep messaging.
