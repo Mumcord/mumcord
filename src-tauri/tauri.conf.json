@@ -53,6 +53,12 @@
     }
   },
   "plugins": {
+    "updater": {
+      "pubkey": "",
+      "windows": {
+        "installMode": "quiet"
+      }
+    },
     "deep-link": {
       "desktop": {
         "schemes": ["mumble"]

@@ -44,6 +44,10 @@ tracing.workspace = true
 [target.'cfg(any(target_os = "linux", target_os = "windows", target_os = "macos"))'.dependencies]
 tauri-plugin-single-instance.workspace = true
 tauri-plugin-global-shortcut.workspace = true
+# In-app updater (#168): download, minisign signature check, install and relaunch.
+tauri-plugin-updater.workspace = true
+minisign-verify = "0.3"
+sha2.workspace = true
 
 [target.'cfg(target_os = "linux")'.dependencies]
 ashpd = { workspace = true, features = ["global_shortcuts"] }
@@ -91,6 +95,8 @@ core-foundation.workspace = true
 # `tauri::test` mock app for the X11 push-to-talk check.
 tauri = { version = "2.12", features = ["test"] }
 tempfile.workspace = true
+# Signs throwaway update bundles in the updater tests (issue #168); never used to ship.
+minisign = "0.10"
 
 [lints]
 workspace = true
