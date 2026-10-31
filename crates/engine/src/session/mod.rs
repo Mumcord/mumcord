@@ -37,7 +37,7 @@ use mumcord_protocol::{
     ClientIdentity, ConnectConfig, ConnectError, Connection, DisconnectReason, Event, Handle,
     ServerCert, ServerState, Transport, VoiceEvent, VoiceTransport,
 };
-use mumcord_store::{Identity, OwnVoice, SavedServer, SecretStore, ServerId, Store};
+use mumcord_store::{Identity, IdentityId, OwnVoice, SavedServer, SecretStore, ServerId, Store};
 use tokio::runtime::Handle as Runtime;
 use tokio::sync::mpsc;
 use tokio::task::JoinHandle;
@@ -207,8 +207,6 @@ struct Inner {
     audio_start: tokio::sync::Mutex<()>,
     /// Saved device choices were checked against the current device list (issue #183).
     audio_devices_migrated: std::sync::Once,
-    /// `None` until loaded from secure storage; then `Some(None)` before the wizard ran.
-    identity: Mutex<Option<Option<Identity>>>,
     events: Events,
     controls: Arc<DspControls>,
     meter: Arc<Meter>,
@@ -226,6 +224,8 @@ struct Inner {
     /// Link previews and video cards for chat links (FR-1.49, FR-1.50); also the image cache
     /// of full-size chat images.
     previews: Arc<crate::web::LinkPreviews>,
+    /// Answers of the public server query behind the `mumble://` link card (issue #175).
+    queries: Arc<crate::server_query::ServerQueries>,
     /// Full-size image transfers with other Mumcord clients (FR-1.60c).
     full_images: crate::full_image::ServerTransfers,
     /// Direct connections to other Mumcord users (FR-2.35).
@@ -306,6 +306,39 @@ impl Core {
         };
         view.rating = pipeline.health().rate(Instant::now(), view.totals());
         Some(view)
+    }
+
+    /// The latency estimate from the running devices and voice pipeline.
+    fn latency(
+        &self,
+        voice: &VoiceShared,
+        controls: &DspControls,
+        rtt_ms: Option<f32>,
+    ) -> Option<crate::latency::LatencyEstimateView> {
+        let audio = self.audio.as_ref()?;
+        let mix_time_avg_us = self
+            .pipeline
+            .as_ref()
+            .map_or(0, |p| p.playback_stats().mix_time_avg_us);
+        Some(crate::latency::estimate(&crate::latency::LatencyInputs {
+            low_latency: controls.low_latency(),
+            periods: audio.io().device_periods(),
+            rtt_ms,
+            capture_time_avg_us: voice.capture_time.avg_us(),
+            mix_time_avg_us,
+        }))
+    }
+
+    /// Keeps the output queue of the playback thread at the target for the current mode and
+    /// device period; called about once a second, as the period is only known once the device
+    /// stream runs.
+    fn sync_queue_target(&mut self, low_latency: bool) {
+        let Some(output) = self.audio.as_ref().map(|a| a.io().device_periods().output) else {
+            return;
+        };
+        if let Some(pipeline) = self.pipeline.as_mut() {
+            pipeline.set_queue_target_ms(crate::latency::queue_target_ms(low_latency, output));
+        }
     }
 
     /// Adds the current counters to the rating's history; called about once a second.
@@ -431,7 +464,10 @@ pub(crate) fn store_error(err: mumcord_store::Error) -> EngineError {
         }
         E::Pkcs12(_) | E::Pkcs12NoIdentity | E::EmptyIdentityName => ErrorKind::InvalidInput,
         E::InvalidVolume(_) | E::InvalidPort => ErrorKind::InvalidInput,
-        E::UnknownServer(_) => ErrorKind::NotFound,
+        E::InvalidIdentityLabel { .. } | E::DuplicateIdentity | E::LastIdentity => {
+            ErrorKind::InvalidInput
+        }
+        E::UnknownServer(_) | E::UnknownIdentity(_) => ErrorKind::NotFound,
         _ => ErrorKind::Internal,
     };
     EngineError::new(kind, err.to_string())
@@ -452,6 +488,7 @@ impl Engine {
             )
         })?;
         let store = Store::open(data_dir).map_err(store_error)?;
+        local::bootstrap_identities(&store, &secrets);
         crate::profile::backfill_server_avatars(&store, data_dir);
         let settings = store.settings().map_err(store_error)?;
         let rejoin_offers = store
@@ -483,7 +520,6 @@ impl Engine {
             secrets: Arc::new(secrets),
             audio_start: tokio::sync::Mutex::new(()),
             audio_devices_migrated: std::sync::Once::new(),
-            identity: Mutex::new(None),
             events,
             controls,
             meter,
@@ -497,6 +533,7 @@ impl Engine {
                 crate::web::LinkPreviews::app_policy(),
                 crate::web::fetch::Timeouts::default(),
             )),
+            queries: Arc::new(crate::server_query::ServerQueries::default()),
             full_images: crate::full_image::ServerTransfers::default(),
             direct: crate::p2p::Direct::default(),
             core: Mutex::new(Core::default()),
@@ -565,6 +602,28 @@ impl Engine {
         }
     }
 
+    /// The figures the public server query answers for the `mumble://` link card (issue #175).
+    /// Nothing is asked while the link-preview privacy switch is off, or while the user blocks
+    /// the person whose message carried the link (issue #140). `refresh` asks a server that
+    /// answered before, which is what the card's Retry button does.
+    pub async fn server_query(
+        &self,
+        address: &str,
+        port: u16,
+        refresh: bool,
+    ) -> crate::server_query::QueryOutcome {
+        match self.settings() {
+            Ok(settings) if settings.link_previews => {
+                self.inner.queries.query(address, port, refresh).await
+            }
+            Ok(_) => crate::server_query::QueryOutcome::NotAllowed,
+            Err(e) => {
+                tracing::warn!(error = %e, "reading the settings for a server query failed");
+                crate::server_query::QueryOutcome::NotAllowed
+            }
+        }
+    }
+
     /// An external image or image link from a message, ready to show inline (FR-1.55); `None`
     /// when previews are switched off in the settings (then nothing is fetched) or the image
     /// cannot be shown.
@@ -610,9 +669,13 @@ impl Engine {
         &self.inner.direct
     }
 
-    /// The identity from secure storage; `None` before the wizard created one.
+    /// The default identity from secure storage; `None` before the wizard created one.
+    /// Direct (peer-to-peer) connections always use it, whatever the servers use.
     pub(crate) async fn stored_identity(&self) -> EngineResult<Option<Identity>> {
-        self.inner.identity().await
+        let Some(id) = self.inner.default_identity_id().await? else {
+            return Ok(None);
+        };
+        self.inner.identity_by_id(id).await
     }
 
     pub(crate) fn mumcord_state(&self) -> &crate::mumcord::ServerPeers {
@@ -770,7 +833,7 @@ impl Engine {
     /// before the others, then the saved order), up to the limit. Every connect is read-only.
     /// Nothing happens before the first-run wizard created an identity.
     pub async fn connect_at_start(&self) -> EngineResult<()> {
-        if self.inner.identity().await?.is_none() {
+        if self.inner.default_identity_id().await?.is_none() {
             return Ok(());
         }
         let (servers, max) = {
@@ -1266,7 +1329,30 @@ impl Engine {
             packets_sent: count(&voice.packets_sent),
             packets_received: count(&voice.packets_received),
             audio: on_voice.then(|| core.audio_health(voice)).flatten(),
+            latency: on_voice
+                .then(|| {
+                    core.latency(
+                        voice,
+                        &self.inner.controls,
+                        link.and_then(|l| l.rtt).map(|d| d.as_secs_f32() * 1000.0),
+                    )
+                })
+                .flatten(),
         })
+    }
+
+    /// Estimated mouth-to-ear latency for Settings → Audio (issue #156): with the ping of the
+    /// voice server while connected, without the network part otherwise. `None` while no audio
+    /// device runs (nothing is measured yet).
+    pub fn latency_estimate(&self) -> Option<crate::latency::LatencyEstimateView> {
+        let core = lock(&self.inner.core);
+        let rtt_ms = core
+            .audio_server
+            .and_then(|id| core.session(id).ok())
+            .and_then(|s| s.transport.as_ref())
+            .and_then(|t| t.stats().rtt)
+            .map(|d| d.as_secs_f32() * 1000.0);
+        core.latency(&self.inner.voice, &self.inner.controls, rtt_ms)
     }
 
     /// Devices and connection counters for the diagnostic file (no names or addresses
@@ -1379,6 +1465,24 @@ impl Inner {
         };
         self.stop_pipeline(core);
         if let Some(audio) = core.audio.as_ref() {
+            audio.play_tail(&self.rt, &samples);
+        }
+    }
+
+    /// Stops the voice pipeline of a connection that ended. A kick or ban plays its sound
+    /// (#205) on its own short-lived player, like the hang-up sound, so the teardown cannot
+    /// cut it off.
+    fn stop_pipeline_after_removal(&self, core: &mut Core, reason: &DisconnectReason) {
+        let samples = match reason {
+            DisconnectReason::Kicked { actor, ban, .. } => {
+                self.events.sounds().removed(*actor, *ban)
+            }
+            _ => None,
+        };
+        self.stop_pipeline(core);
+        if let Some(samples) = samples
+            && let Some(audio) = core.audio.as_ref()
+        {
             audio.play_tail(&self.rt, &samples);
         }
     }
@@ -1765,11 +1869,33 @@ impl Inner {
             .map_err(store_error)
             .map_err(fatal)?;
         let password = overridden.or(saved);
-        let identity = self
-            .identity()
-            .await
-            .map_err(fatal)?
-            .ok_or_else(|| fatal(EngineError::new(ErrorKind::NotFound, "no identity yet")))?;
+        // The server's own identity, or the default when it uses none or its identity is gone
+        // (issue #148).
+        let identity = match server.identity_id {
+            Some(id) => match self.identity_by_id(id).await.map_err(fatal)? {
+                Some(identity) => identity,
+                None => {
+                    tracing::warn!(
+                        server_id,
+                        "the identity chosen for this server is missing; using the default"
+                    );
+                    self.events
+                        .for_server(server_id)
+                        .emit(EngineEvent::ServerIdentityMissing { server_id });
+                    self.default_identity()
+                        .await
+                        .map_err(fatal)?
+                        .ok_or_else(|| {
+                            fatal(EngineError::new(ErrorKind::NotFound, "no identity yet"))
+                        })?
+                }
+            },
+            None => self
+                .default_identity()
+                .await
+                .map_err(fatal)?
+                .ok_or_else(|| fatal(EngineError::new(ErrorKind::NotFound, "no identity yet")))?,
+        };
 
         let expected = trusted.clone();
         let config = ConnectConfig {
@@ -2010,7 +2136,10 @@ impl Inner {
                     crate::screen_share::on_tick(&self.screen_shares, &self.mumcord, &ctx);
                     let audio = self.is_audio_server(server_id);
                     if audio {
-                        lock(&self.core).sample_audio_health(&self.voice);
+                        let mut core = lock(&self.core);
+                        core.sample_audio_health(&self.voice);
+                        core.sync_queue_target(self.controls.low_latency());
+                        drop(core);
                         for session in self.positional.expire(Instant::now()) {
                             ctx.events.emit(EngineEvent::PositionalSendingChanged {
                                 session,
@@ -2019,6 +2148,8 @@ impl Inner {
                         }
                     }
                                 bitrate.set_user_cap(self.user_cap_bps());
+                    // Low-latency mode sends 10 ms packets: twice the header overhead.
+                    bitrate.set_frames_per_packet(if self.controls.low_latency() { 1 } else { 2 });
                     if audio {
                         self.publish_bitrate_max(Some(bitrate.max_possible()));
                     }
@@ -2065,7 +2196,7 @@ impl Inner {
             return Ended::Stale;
         }
         if core.audio_server == Some(server_id) {
-            self.stop_pipeline(&mut core);
+            self.stop_pipeline_after_removal(&mut core, &reason);
         }
         if let Some(slot) = core.slots.get_mut(&server_id) {
             slot.session = None;
@@ -2709,6 +2840,10 @@ impl Inner {
             .map_err(|e| EngineError::internal(e.to_string()))??;
         let mut core = lock(&self.core);
         if core.audio.is_none() {
+            // Under the core lock, so a settings change cannot slip in between.
+            if self.controls.low_latency() {
+                audio.set_low_latency(true);
+            }
             core.audio = Some(audio);
         }
         self.start_pipeline(&mut core);
@@ -2824,20 +2959,31 @@ impl Inner {
         self.release_audio_if_idle(core);
     }
 
-    /// The identity from secure storage, cached after the first read.
-    async fn identity(&self) -> EngineResult<Option<Identity>> {
-        if let Some(cached) = lock(&self.identity).clone() {
-            return Ok(cached);
-        }
+    /// Identity `id` from secure storage; the secret store caches it for the session, so
+    /// several connects and reconnects cost one read (and at most one OS prompt).
+    async fn identity_by_id(&self, id: IdentityId) -> EngineResult<Option<Identity>> {
         let secrets = self.secrets.clone();
-        let loaded = self
-            .rt
-            .spawn_blocking(move || secrets.load_identity())
+        self.rt
+            .spawn_blocking(move || secrets.load_identity(id))
             .await
             .map_err(|e| EngineError::internal(e.to_string()))?
-            .map_err(store_error)?;
-        *lock(&self.identity) = Some(loaded.clone());
-        Ok(loaded)
+            .map_err(store_error)
+    }
+
+    /// Id of the default identity, or `None` before the wizard created one.
+    async fn default_identity_id(&self) -> EngineResult<Option<IdentityId>> {
+        Ok(lock(&self.store)
+            .default_identity()
+            .map_err(store_error)?
+            .map(|record| record.id))
+    }
+
+    /// The default identity itself.
+    async fn default_identity(&self) -> EngineResult<Option<Identity>> {
+        match self.default_identity_id().await? {
+            Some(id) => self.identity_by_id(id).await,
+            None => Ok(None),
+        }
     }
 }
 
@@ -2940,7 +3086,9 @@ mod declined_kind_tests {
             connected_at_quit: quit_at,
             was_voice_server_at_quit: voice,
             notifications_muted: false,
+            group_mentions_muted: false,
             theme_id: None,
+            identity_id: None,
         }
     }
 
@@ -3013,7 +3161,7 @@ mod password_override_tests {
         )
         .expect("engine");
         engine
-            .identity_create("Tester".into())
+            .identity_create("Tester".into(), None)
             .await
             .expect("identity");
         let server = engine

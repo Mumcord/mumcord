@@ -1,6 +1,6 @@
-//! Local persistence for Mumcord: the SQLite database (servers, trust decisions,
-//! followed channels, chat history, per-person settings, app settings), the user's
-//! identity certificate and the OS secure storage for secrets.
+//! Local persistence for Mumcord: the SQLite database (servers, identities, trust decisions,
+//! followed channels, chat history, per-person settings, app settings), the user's identity
+//! certificates and the OS secure storage for secrets.
 //!
 //! Secrets (the identity PKCS#12 and server passwords) only ever go to the OS secure
 //! storage via [`SecretStore`]; nothing secret is written to SQLite or plain files.
@@ -11,6 +11,7 @@ mod error;
 mod favorites;
 mod friends;
 mod history;
+mod identities;
 mod identity;
 mod secrets;
 mod servers;
@@ -24,6 +25,7 @@ pub use error::{Error, Result};
 pub use favorites::{GifFavorite, MAX_GIF_FAVORITES};
 pub use friends::Friend;
 pub use history::{ChatMessage, Conversation, NewChatMessage};
+pub use identities::{IdentityId, IdentityRecord, MAX_IDENTITY_LABEL, NewIdentity};
 pub use identity::{Identity, cert_hash};
 pub use secrets::{KEYRING_SERVICE, SecretStore};
 pub use servers::{DEFAULT_PORT, NewServer, SavedServer, ServerId};

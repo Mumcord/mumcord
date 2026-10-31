@@ -92,13 +92,18 @@
     "hideDescription": "Ocultar descrição do canal"
   },
   "mention": {
-    "list": "Pessoas que podes mencionar",
-    "found_one": "{{count}} pessoa sugerida. Usa as setas e depois Enter para inserir.",
-    "found_many": "{{count}} pessoas sugeridas. Usa as setas e depois Enter para inserir.",
-    "found_other": "{{count}} pessoas sugeridas. Usa as setas e depois Enter para inserir.",
+    "list": "Sugestões de menções",
+    "found_one": "Sugestões: {{count}}. Use as setas e depois Enter para inserir.",
+    "found_many": "Sugestões: {{count}}. Use as setas e depois Enter para inserir.",
+    "found_other": "Sugestões: {{count}}. Use as setas e depois Enter para inserir.",
     "none": "Ninguém encontrado",
     "mentionsYou": "Menciona-te",
-    "chipLabel": "{{name}}, menção"
+    "chipLabel": "{{name}}, menção",
+    "groupsHeading": "Menções",
+    "peopleHeading": "Pessoas",
+    "channelHint": "Notificar todos em {{channel}} ({{count}})",
+    "allHint": "Notificar todos os que podem ler este canal ({{count}})",
+    "keys": "↑↓ escolher · Enter inserir · Esc fechar"
   },
   "preview": {
     "open": "Abrir no navegador",
@@ -252,5 +257,26 @@
     "tooLarge": "O código é demasiado grande para transferir.",
     "fileType": "Ficheiro de código",
     "plainText": "Texto simples"
+  },
+  "mumbleCard": {
+    "addServer": "Adicionar aos servidores",
+    "channel": "Canal {{channel}}",
+    "copy": "Copiar ligação",
+    "copyLabel": "Copiar a ligação para {{server}}",
+    "figures": "Ping {{ping}} ms · {{users}} de {{max}} utilizadores · servidor {{version}}",
+    "goToChannel": "Ir para o canal",
+    "join": "Participar",
+    "joinLabel": "Participar em {{server}}",
+    "joined": "Participou",
+    "label": "Cartão do servidor {{server}}",
+    "privacyOff": "Os valores do servidor estão desativados nas definições",
+    "querying": "A verificar o servidor…",
+    "retry": "Verificar novamente",
+    "retryLabel": "Verificar novamente {{server}}",
+    "server": "{{server}}",
+    "unreachable": "Servidor não acessível",
+    "warning_many": "{{count}} milhões de ligações nesta mensagem mostram credenciais",
+    "warning_one": "{{count}} ligação nesta mensagem mostra credenciais",
+    "warning_other": "{{count}} ligações nesta mensagem mostram credenciais"
   }
 }

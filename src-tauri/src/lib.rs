@@ -56,16 +56,23 @@ fn specta_builder() -> Builder<tauri::Wry> {
         .disable_serde_phases()
         .commands(collect_commands![
             identity::identity_get,
+            identity::identity_list,
             identity::identity_create,
             identity::identity_import,
+            identity::identity_rename,
             identity::identity_export,
+            identity::identity_delete,
+            identity::identity_set_default,
+            identity::server_set_identity,
             servers::servers_list,
             servers::server_add,
+            servers::server_test_connection,
             servers::server_update,
             servers::server_remove,
             servers::servers_reorder,
             servers::server_set_always_connect,
             servers::server_set_notifications_muted,
+            servers::server_set_group_mentions_muted,
             servers::server_set_theme,
             servers::parse_mumble_link,
             session::connect,
@@ -75,6 +82,7 @@ fn specta_builder() -> Builder<tauri::Wry> {
             session::voice_server_get,
             session::session_snapshot,
             session::connection_stats,
+            session::latency_estimate,
             session::cert_trust_decide,
             session::set_self_mute,
             session::set_self_deaf,
@@ -106,6 +114,8 @@ fn specta_builder() -> Builder<tauri::Wry> {
             commands::full_image::full_image_cancel,
             links::link_preview,
             links::open_link,
+            links::mumble_link_stats,
+            links::mumble_link_join,
             links::inline_image,
             links::preview_dismiss,
             links::embed_player_open,
@@ -242,6 +252,7 @@ fn specta_builder() -> Builder<tauri::Wry> {
             audio::MicTestPhaseChanged,
             app::CloseRequested,
             profile::DefaultAvatarSkipped,
+            identity::ServerIdentityMissing,
             notify::NotificationActivated,
             commands::now_playing::NowPlayingChanged,
             commands::now_gaming::NowGamingChanged,
@@ -611,6 +622,10 @@ fn emit_engine_event(
         }
         .emit(app),
         EngineEvent::DefaultAvatarSkipped { server_id } => profile::DefaultAvatarSkipped {
+            server_id: commands::types::to_api_server_id(server_id),
+        }
+        .emit(app),
+        EngineEvent::ServerIdentityMissing { server_id } => identity::ServerIdentityMissing {
             server_id: commands::types::to_api_server_id(server_id),
         }
         .emit(app),

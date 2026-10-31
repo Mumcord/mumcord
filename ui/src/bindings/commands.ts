@@ -5,18 +5,30 @@ import * as __TAURI_EVENT from "@tauri-apps/api/event";
 
 /** Commands */
 export const commands = {
-	/**  Current identity, or `null` before the wizard created one (first start). */
+	/**  The default identity, or `null` before the wizard created one (first start). */
 	identityGet: () => typedError<Identity | null, ApiError>(__TAURI_INVOKE("identity_get")),
+	/**  Every identity: the default first, then by the date it was added. */
+	identityList: () => typedError<Identity[], ApiError>(__TAURI_INVOKE("identity_list")),
 	/**  Creates a new self-signed identity and stores it in the OS secure storage. */
-	identityCreate: (name: string) => typedError<Identity, ApiError>(__TAURI_INVOKE("identity_create", { name })),
-	/**  Imports a PKCS#12 file (e.g. exported from the official client), replacing the current identity. */
-	identityImport: (path: string, password: string | null) => typedError<Identity, ApiError>(__TAURI_INVOKE("identity_import", { path, password })),
+	identityCreate: (name: string, label: string | null) => typedError<Identity, ApiError>(__TAURI_INVOKE("identity_create", { name, label })),
+	/**  Imports a PKCS#12 file (e.g. exported from the official client) as another identity. */
+	identityImport: (path: string, password: string | null, label: string | null) => typedError<Identity, ApiError>(__TAURI_INVOKE("identity_import", { path, password, label })),
+	/**  Changes the local label of an identity; the certificate stays the same. */
+	identityRename: (id: number, label: string) => typedError<Identity, ApiError>(__TAURI_INVOKE("identity_rename", { id, label })),
 	/**  Exports the identity as a password-protected PKCS#12 file. */
-	identityExport: (path: string, password: string) => typedError<null, ApiError>(__TAURI_INVOKE("identity_export", { path, password })),
+	identityExport: (id: number, path: string, password: string) => typedError<null, ApiError>(__TAURI_INVOKE("identity_export", { id, path, password })),
+	/**  Removes an identity with its key material; the last identity cannot be removed. */
+	identityDelete: (id: number) => typedError<null, ApiError>(__TAURI_INVOKE("identity_delete", { id })),
+	/**  Makes an identity the default one; returns the new list. */
+	identitySetDefault: (id: number) => typedError<Identity[], ApiError>(__TAURI_INVOKE("identity_set_default", { id })),
+	/**  Chooses the identity a saved server connects with; `null` uses the default. */
+	serverSetIdentity: (serverId: number, identityId: number | null) => typedError<SavedServer, ApiError>(__TAURI_INVOKE("server_set_identity", { serverId, identityId })),
 	/**  Saved servers in server-bar order. */
 	serversList: () => typedError<SavedServer[], ApiError>(__TAURI_INVOKE("servers_list")),
 	/**  Adds a server at the end of the server bar. */
 	serverAdd: (input: ServerInput) => typedError<SavedServer, ApiError>(__TAURI_INVOKE("server_add", { input })),
+	/**  One-shot login probe for the add/edit dialog: ping, server version and certificate state. */
+	serverTestConnection: (input: ServerTestInput) => typedError<TestConnection, ApiError>(__TAURI_INVOKE("server_test_connection", { input })),
 	serverUpdate: (id: number, input: ServerInput) => typedError<SavedServer, ApiError>(__TAURI_INVOKE("server_update", { id, input })),
 	/**  Removes the server with its password, trust decision, follows and history. */
 	serverRemove: (id: number) => typedError<null, ApiError>(__TAURI_INVOKE("server_remove", { id })),
@@ -29,6 +41,8 @@ export const commands = {
 	serverSetAlwaysConnect: (serverId: number, enabled: boolean) => typedError<SavedServer, ApiError>(__TAURI_INVOKE("server_set_always_connect", { serverId, enabled })),
 	/**  Mutes or unmutes all notifications of the server, mentions included (FR-2.10). */
 	serverSetNotificationsMuted: (serverId: number, muted: boolean) => typedError<SavedServer, ApiError>(__TAURI_INVOKE("server_set_notifications_muted", { serverId, muted })),
+	/**  Turns `@all` and `@channel` mentions on the server off or back on (issue #70). */
+	serverSetGroupMentionsMuted: (serverId: number, muted: boolean) => typedError<SavedServer, ApiError>(__TAURI_INVOKE("server_set_group_mentions_muted", { serverId, muted })),
 	/**  Sets the theme shown with the server; `null` goes back to the app theme (FR-2.17). */
 	serverSetTheme: (serverId: number, themeId: string | null) => typedError<SavedServer, ApiError>(__TAURI_INVOKE("server_set_theme", { serverId, themeId })),
 	/**  Parses a pasted `mumble://` link; fails with `invalidInput` if malformed. */
@@ -56,6 +70,11 @@ export const commands = {
 	sessionSnapshot: (serverId: number) => typedError<ServerSnapshot | null, ApiError>(__TAURI_INVOKE("session_snapshot", { serverId })),
 	/**  Live link figures of the server, or `null` when it is not connected (AC-1.23). */
 	connectionStats: (serverId: number) => typedError<ConnectionStats | null, ApiError>(__TAURI_INVOKE("connection_stats", { serverId })),
+	/**
+	 *  Estimated mouth-to-ear latency for Settings → Audio (issue #156); `null` while no audio
+	 *  device runs. Includes the voice server's ping while connected.
+	 */
+	latencyEstimate: () => typedError<LatencyEstimate | null, ApiError>(__TAURI_INVOKE("latency_estimate")),
 	/**  Answers a `CertTrustRequired`; trusting is remembered for the server. */
 	certTrustDecide: (serverId: number, fingerprint: string, trust: boolean) => typedError<null, ApiError>(__TAURI_INVOKE("cert_trust_decide", { serverId, fingerprint, trust })),
 	/**  Unmuting while deafened also undeafens. */
@@ -181,6 +200,17 @@ export const commands = {
 	 *  http(s) and mailto links open.
 	 */
 	openLink: (url: string) => typedError<null, ApiError>(__TAURI_INVOKE("open_link", { url })),
+	/**
+	 *  Live figures for the card of a `mumble://` link. Only the engine contacts the network, the
+	 *  query never connects, and nothing is asked while the link-preview switch is off (issue #175).
+	 */
+	mumbleLinkStats: (url: string, refresh: boolean) => typedError<MumbleLinkStats, ApiError>(__TAURI_INVOKE("mumble_link_stats", { url, refresh })),
+	/**
+	 *  A card's Join: the same handling as a `mumble://` link that came from outside (FR-2.13), so the
+	 *  server bar shows the server, a running connection joins the channel and an unknown server is
+	 *  offered for saving. Only a click on the card gets here.
+	 */
+	mumbleLinkJoin: (url: string) => typedError<LinkOutcome, ApiError>(__TAURI_INVOKE("mumble_link_join", { url })),
 	/**
 	 *  An external image (`<img src>` in a message) or direct image link, ready to show inline;
 	 *  `null` when previews are switched off in the settings (then nothing is fetched) or the
@@ -541,6 +571,7 @@ export const events = {
 	positionalStatusChanged: makeEvent<PositionalStatusChanged, PositionalStatusChanged>("positional-status-changed"),
 	screenSharesChanged: makeEvent<ScreenSharesChanged, ScreenSharesChanged>("screen-shares-changed"),
 	serverDenied: makeEvent<ServerDenied, ServerDenied>("server-denied"),
+	serverIdentityMissing: makeEvent<ServerIdentityMissing, ServerIdentityMissing>("server-identity-missing"),
 	serverSynced: makeEvent<ServerSynced, ServerSynced>("server-synced"),
 	syncProgress: makeEvent<SyncProgress, SyncProgress>("sync-progress"),
 	talkStateChanged: makeEvent<TalkStateChanged, TalkStateChanged>("talk-state-changed"),
@@ -708,6 +739,9 @@ export type CertTrustRequired = {
 	previousFingerprint: string | null,
 };
 
+/**  How a tested server certificate relates to the saved trust decision. */
+export type CertificateState = "trusted" | "unknown" | "changed";
+
 export type ChannelInfo = {
 	id: number,
 	/**  `null` for the root channel. */
@@ -836,6 +870,8 @@ export type ConnectionStats = {
 	packetsReceived: number,
 	/**  Health of the local audio path; `null` on a server without voice. */
 	audio: AudioHealth | null,
+	/**  Estimated mouth-to-ear latency; `null` on a server without voice. */
+	latency: LatencyEstimate | null,
 };
 
 /**  Answer to a question asked once (direct connections, update check, AppImage menu entry). */
@@ -1075,12 +1111,20 @@ export type HistorySynced = {
 	messages: ChatMessage[],
 };
 
-/**  Public view of the identity; the certificate itself never leaves the engine. */
+/**  Public view of an identity; the certificate and its key never leave the engine. */
 export type Identity = {
-	/**  Default username. */
+	id: number,
+	/**  Local label the user chose; the certificate is not changed by it. */
+	label: string,
+	/**  Default username, from the certificate's common name. */
 	name: string,
 	/**  SHA-1 hash of the certificate, as Mumble servers identify it. */
 	certHash: string,
+	/**  When the identity was added to Mumcord, RFC 3339 (like message times). */
+	addedAt: string,
+	isDefault: boolean,
+	/**  Servers that use this identity directly (not through the default). */
+	serverIds: number[],
 };
 
 /**  The in-game overlay settings changed. */
@@ -1177,6 +1221,32 @@ export type KnownGame = {
 export type Language = "bg" | "cs" | "da" | "de" | "el" | "en" | "es" | "et" | "fi" | "fr" | "ga" | "hr" | "hu" | "it" | "lt" | "lv" | "mt" | "nl" | "pl" | "pt" | "ro" | "sk" | "sl" | "sv";
 
 /**
+ *  Estimated mouth-to-ear latency and its parts (issue #156), in microseconds (integers, as
+ *  specta exports floats as nullable). Assumes the other side runs in the same mode.
+ */
+export type LatencyEstimate = {
+	lowLatency: boolean,
+	/**  Audio per packet: 10 ms in low-latency mode, 20 ms otherwise. */
+	packetMs: number,
+	/**  Microphone device buffer. */
+	inputBufferUs: number,
+	/**  One packet plus the encoder look-ahead. */
+	encodeUs: number,
+	/**  Half the ping to the server; `null` until measured (not connected, TCP tunnel). */
+	networkUs: number | null,
+	/**  Jitter-buffer target for a clean stream. */
+	jitterUs: number,
+	/**  Measured processing: DSP and encoding out, decoding and mixing in. */
+	processingUs: number,
+	/**  Output queue and speaker device buffer. */
+	outputBufferUs: number,
+	/**  Sum of the parts (without the network while it is unknown). */
+	totalUs: number,
+	/**  The same estimate for the other mode. */
+	otherModeTotalUs: number,
+};
+
+/**
  *  What Mumcord did with a `mumble://` link (FR-2.13). The UI brings the named server into
  *  view and, for `unknownServer`, offers to save it (FR-1.11).
  */
@@ -1262,6 +1332,13 @@ export type MumbleLink = {
 	/**  Channel names from the root down; empty for no channel. */
 	channelPath: string[],
 };
+
+/**
+ *  What the public server query answered for a `mumble://` link (issue #175). `privacyOff` means
+ *  nothing was asked because the link-preview switch is off; `unreachable` means the server did not
+ *  answer within the query timeout. The figures are untrusted server data, shown as plain text.
+ */
+export type MumbleLinkStats = { kind: "privacyOff" } | { kind: "unreachable" } | { kind: "answered"; pingMs: number; users: number; maxUsers: number; version: string };
 
 /**
  *  The user clicked a system notification; the window is already in front. Show the server
@@ -1559,8 +1636,12 @@ export type SavedServer = {
 	wasVoiceServerAtQuit: boolean,
 	/**  No toasts or desktop notifications from this server; badges stay (FR-2.10). */
 	notificationsMuted: boolean,
+	/**  `@all` and `@channel` do not count as mentions on this server (issue #70). */
+	groupMentionsMuted: boolean,
 	/**  Theme shown with this server; `null` uses the app theme (FR-2.17). */
 	themeId: string | null,
+	/**  Identity this server connects with; `null` uses the default identity (issue #148). */
+	identityId: number | null,
 };
 
 /**  One person sharing their screen in the voice channel. */
@@ -1594,6 +1675,11 @@ export type ServerDenied = {
 	serverId: number,
 	error: ApiError,
 	channelId: number | null,
+};
+
+/**  An identity whose key material could not be read, so a server fell back to the default. */
+export type ServerIdentityMissing = {
+	serverId: number,
 };
 
 /**  Server facts and limits learned during the handshake. */
@@ -1668,6 +1754,19 @@ export type ServerSynced = {
 	snapshot: ServerSnapshot,
 };
 
+/**  Values of the add/edit dialog for a test connection (issue #151). */
+export type ServerTestInput = {
+	address: string,
+	port: number,
+	username: string,
+	/**  `keep` uses the saved password of `serverId`; `set` uses the typed one. */
+	password: PasswordUpdate,
+	/**  Saved server the test belongs to (saved password and certificate decision). */
+	serverId: number | null,
+	/**  Identity to try; `null` uses the default identity. */
+	identityId: number | null,
+};
+
 export type Settings = {
 	/**  False until the first-start wizard was finished. */
 	wizardCompleted: boolean,
@@ -1703,6 +1802,12 @@ export type Settings = {
 	 *  510 kbit/s), music-tuned encoder, noise suppression and automatic volume bypassed.
 	 */
 	musicQuality: boolean,
+	/**
+	 *  "Low-latency mode" (default off; issue #156): 10 ms low-delay Opus packets, a minimal
+	 *  jitter buffer, small device buffers and echo cancellation, noise suppression and automatic
+	 *  volume bypassed, for playing music together. Applies live.
+	 */
+	lowLatency: boolean,
 	/**
 	 *  Own bitrate cap in kbit/s (FR-2.64); `null` is "Max". Range 16 to the maximum from
 	 *  `bitrate_max`.
@@ -1825,6 +1930,10 @@ export type SoundSettings = {
 	shareStopped: boolean,
 	viewerStarted: boolean,
 	viewerStopped: boolean,
+	/**  The server kicks you (#205). */
+	kicked: boolean,
+	/**  The server bans you (#205). */
+	banned: boolean,
 };
 
 /**  Channels received so far while a server is still syncing (FR-2.24). */
@@ -1840,6 +1949,17 @@ export type TalkStateChanged = {
 	serverId: number,
 	session: number,
 	talking: boolean,
+};
+
+/**  Result of a test connection. */
+export type TestConnection = {
+	/**  Round trip of a Mumble ping over the control connection. */
+	pingMs: number,
+	/**  Version string the server reported, e.g. "1.5.0". */
+	version: string,
+	/**  SHA-256 fingerprint of the server certificate, as shown to users. */
+	fingerprint: string,
+	certificate: CertificateState,
 };
 
 export type Theme = "system" | "dark" | "light";

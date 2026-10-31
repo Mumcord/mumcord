@@ -21,6 +21,7 @@ import {
   openDialog,
   requestConnect,
   toggleAlwaysConnect,
+  toggleGroupMentionsMuted,
   toggleNotificationsMuted,
   useServers,
 } from "./store";
@@ -80,6 +81,19 @@ function ServerOptions({
       label: t("menu.muteNotifications"),
       checked: server.notificationsMuted,
       onSelect: act(() => void toggleNotificationsMuted(server.id, !server.notificationsMuted)),
+    },
+    {
+      id: "muteGroupMentions",
+      label: t("menu.muteGroupMentions"),
+      checked: server.groupMentionsMuted,
+      onSelect: act(() => void toggleGroupMentionsMuted(server.id, !server.groupMentionsMuted)),
+    },
+    {
+      id: "identity",
+      label: t("menu.identity"),
+      onSelect: act(() => {
+        openDialog({ kind: "identity", serverId: server.id });
+      }),
     },
     {
       id: "theme",

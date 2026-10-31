@@ -4,7 +4,7 @@
 use std::fmt;
 
 use crate::audio_rating::HealthTotals;
-use mumcord_store::ServerId;
+use mumcord_store::{IdentityId, ServerId, UnixMillis};
 
 /// Error category; mirrors the command contract's `ErrorCode` (docs/engine-api.md).
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -244,6 +244,9 @@ pub struct ConnectionStatsView {
     pub packets_received: u64,
     /// Health of the local audio path; `None` on a server without the voice pipeline.
     pub audio: Option<AudioHealthView>,
+    /// Estimated mouth-to-ear latency (issue #156); `None` on a server without the voice
+    /// pipeline.
+    pub latency: Option<crate::latency::LatencyEstimateView>,
 }
 
 /// Glitch counters of the local audio path since the voice pipeline started (issue #123). A
@@ -310,11 +313,20 @@ pub struct AudioDeviceList {
     pub outputs: Vec<AudioDeviceView>,
 }
 
-/// Public view of the identity.
+/// Public view of one identity; the certificate and its key stay in the engine.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct IdentityView {
+    pub id: IdentityId,
+    /// Local label the user chose; the certificate is not changed by it.
+    pub label: String,
+    /// Common name inside the certificate (the default user name on servers).
     pub name: String,
     pub cert_hash: String,
+    /// When the identity was added to Mumcord.
+    pub added_at: UnixMillis,
+    pub is_default: bool,
+    /// Servers that use this identity directly (not through the default).
+    pub server_ids: Vec<ServerId>,
 }
 
 /// A saved server as the UI sees it (the password itself never leaves the engine).
@@ -333,8 +345,12 @@ pub struct ServerView {
     pub was_voice_server_at_quit: bool,
     /// No notifications from this server (FR-2.10).
     pub notifications_muted: bool,
+    /// `@all` and `@channel` do not count as mentions on this server (issue #70).
+    pub group_mentions_muted: bool,
     /// Theme for this server; `None` uses the app theme (FR-2.17).
     pub theme_id: Option<String>,
+    /// Identity to connect with; `None` uses the default identity (issue #148).
+    pub identity_id: Option<IdentityId>,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -342,6 +358,45 @@ pub enum PasswordChange {
     Keep,
     Clear,
     Set(String),
+}
+
+/// What the add/edit dialog sends for a "Test connection" (issue #151): the values as they are
+/// in the form, so nothing has to be saved first.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct ServerTestInput {
+    pub address: String,
+    pub port: u16,
+    pub username: String,
+    /// `Keep` uses the saved password of `server_id`; `Set` uses the typed one.
+    pub password: PasswordChange,
+    /// Saved server the test belongs to; gives the saved password and the certificate decision.
+    pub server_id: Option<ServerId>,
+    /// Identity to try; `None` uses the default identity.
+    pub identity_id: Option<IdentityId>,
+}
+
+/// Result of a test connection.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct TestConnectionView {
+    /// Round trip of a Mumble ping over the control connection.
+    pub ping_ms: u32,
+    /// Version string the server reported, e.g. "1.5.0".
+    pub version: String,
+    /// SHA-256 fingerprint of the server certificate, as shown to users.
+    pub fingerprint: String,
+    /// How that certificate relates to the saved trust decision.
+    pub certificate: CertificateState,
+}
+
+/// Trust state of a server certificate during a test connection.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum CertificateState {
+    /// Matches the saved decision of the server.
+    Trusted,
+    /// No decision yet (also every new server).
+    Unknown,
+    /// Differs from the saved decision.
+    Changed,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -473,6 +528,11 @@ pub enum EngineEvent {
     WatchPartyChanged(Option<crate::watch_party::WatchPartyView>),
     /// The screen shares in the user's channel changed; the full list (FR-2.42 – FR-2.46).
     ScreenSharesChanged(Vec<crate::screen_share::ScreenShareView>),
+    /// The identity chosen for this server is gone, so the connect uses the default one
+    /// (issue #148).
+    ServerIdentityMissing {
+        server_id: ServerId,
+    },
 }
 
 /// Phase of the mic test: record, play back, finished or failed to start.

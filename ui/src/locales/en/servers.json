@@ -36,8 +36,10 @@
     "reconnect": "Reconnect",
     "alwaysConnect": "Always connect at start",
     "muteNotifications": "Mute notifications",
+    "muteGroupMentions": "Mute @all and @channel",
     "theme": "Theme…",
-    "showWelcome": "Show welcome message"
+    "showWelcome": "Show welcome message",
+    "identity": "Identity…"
   },
   "theme": {
     "title": "Theme for {{server}}",
@@ -67,7 +69,10 @@
       "port": "Enter a port between 1 and 65535. Most servers use 64738.",
       "username": "Enter the name you want to use on this server.",
       "link": "This mumble:// link can't be read. Check that it was copied completely.",
-      "invalid": "The server details aren't valid. Check the address and port."
+      "invalid": "The server details aren't valid. Check the address and port.",
+      "addressInvalid": "This doesn't look like a server address.",
+      "portEmpty": "Enter the port.",
+      "labelLong": "The name in the server bar can be up to 64 characters."
     },
     "alwaysConnect": "Always connect at start",
     "alwaysConnectHint": "Mumcord connects this server read-only when it starts.",
@@ -82,7 +87,29 @@
     "renameDone": "Done",
     "removeChannelPassword": "Remove {{name}}",
     "remove": "Remove",
-    "channelPasswordsHint": "Saved when a protected channel accepted them. Removed ones are asked for again on the next join."
+    "channelPasswordsHint": "Saved when a protected channel accepted them. Removed ones are asked for again on the next join.",
+    "tabsLabel": "Server settings",
+    "tabs": {
+      "connection": "Connection",
+      "identity": "Identity",
+      "passwords": "Passwords",
+      "behaviour": "Behaviour",
+      "needsAttention": "{{tab}}: needs attention"
+    },
+    "test": {
+      "button": "Test connection",
+      "busy": "Testing…",
+      "running": "Testing the connection…",
+      "result": "{{address}} · Ping: {{ms}} ms · Server version: {{version}}",
+      "certTrusted": "Certificate already trusted",
+      "certUnknown": "Certificate not trusted yet – you'll be asked when you connect",
+      "certChanged": "Certificate has changed – check it before you connect",
+      "wrongPassword": "The server refused the password.",
+      "nameInUse": "The name is already in use on this server.",
+      "unreachable": "Couldn't reach the server.",
+      "invalid": "The details aren't valid.",
+      "failed": "The test failed. Please try again."
+    }
   },
   "errors": {
     "serverUnreachable": "The server can't be reached. Check the address and port, and that you are online.",
@@ -145,7 +172,8 @@
       "disconnect": "Disconnecting failed. Please try again.",
       "alwaysConnect": "“Always connect at start” couldn't be saved. Please try again.",
       "notifications": "The notification setting couldn't be saved. Please try again.",
-      "savePassword": "The new password couldn't be saved. Edit the server to save it."
+      "savePassword": "The new password couldn't be saved. Edit the server to save it.",
+      "identity": "The identity couldn't be saved. Please try again."
     }
   },
   "empty": {
@@ -259,5 +287,24 @@
     "permissionSelfRegister": "Register self",
     "permissionResetUserContent": "Reset user content",
     "characters": "{{value}} characters"
+  },
+  "identity": {
+    "field": "Identity for this server",
+    "useDefault": "Use default ({{identity}})",
+    "option": "{{label}} ({{name}})",
+    "hint": "Changing the identity reconnects this server. The registered name and permissions here belong to the identity you pick.",
+    "manage": "Manage identities…",
+    "title": "Identity for {{server}}",
+    "intro": "Choose the identity Mumcord uses to connect here. \"Use default\" follows the default identity.",
+    "save": "Save",
+    "saveAndReconnect": "Save and reconnect",
+    "reconnectTitle": "Reconnect {{server}}?",
+    "reconnectMessage": "Reconnect this server now with {{identity}}? The other servers stay connected.",
+    "reconnect": "Reconnect",
+    "later": "Later",
+    "nextConnect": "Takes effect the next time this server connects.",
+    "badge": "Identity: {{identity}}",
+    "badgeTitle": "Connected with the identity {{identity}}",
+    "missingNotice": "{{server}} connected with the default identity because its own identity is missing."
   }
 }

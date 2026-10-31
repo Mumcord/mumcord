@@ -21,5 +21,20 @@
     "collapse": "Réduire",
     "expand": "Développer",
     "handle": "{{name}} : les flèches déplacent, Maj+flèches redimensionnent"
+  },
+  "latency": {
+    "summary": "≈ {{total}} ms de la bouche à l'oreille (estimation)",
+    "otherNormal": "mode normal ≈ {{value}} ms",
+    "otherLow": "mode faible latence ≈ {{value}} ms",
+    "breakdown": "Détail de la latence",
+    "input": "Tampon du microphone",
+    "encode": "Trame Opus de {{ms}} ms + anticipation de l'encodeur",
+    "network": "Réseau (moitié du ping)",
+    "notConnected": "non connecté",
+    "jitter": "Tampon de gigue",
+    "processing": "Traitement",
+    "output": "Tampon des haut-parleurs",
+    "value": "{{value}} ms",
+    "total": "≈ {{value}} ms"
   }
 }

@@ -92,13 +92,18 @@
     "hideDescription": "Ascunde descrierea canalului"
   },
   "mention": {
-    "list": "Persoane care pot fi menționate",
-    "found_one": "{{count}} persoană sugerată. Folosește săgețile, apoi Enter ca să inserezi.",
-    "found_few": "{{count}} persoane sugerate. Folosește săgețile, apoi Enter ca să inserezi.",
-    "found_other": "{{count}} de persoane sugerate. Folosește săgețile, apoi Enter ca să inserezi.",
+    "list": "Sugestii de mențiuni",
+    "found_one": "Sugestii: {{count}}. Folosește săgețile, apoi Enter pentru a insera.",
+    "found_few": "Sugestii: {{count}}. Folosește săgețile, apoi Enter pentru a insera.",
+    "found_other": "Sugestii: {{count}}. Folosește săgețile, apoi Enter pentru a insera.",
     "none": "Nu s-a găsit nimeni",
     "mentionsYou": "Te menționează",
-    "chipLabel": "{{name}}, mențiune"
+    "chipLabel": "{{name}}, mențiune",
+    "groupsHeading": "Mențiuni",
+    "peopleHeading": "Persoane",
+    "channelHint": "Anunță pe toți din {{channel}} ({{count}})",
+    "allHint": "Anunță pe toți cei care pot citi acest canal ({{count}})",
+    "keys": "↑↓ alege · Enter inserează · Esc închide"
   },
   "preview": {
     "open": "Deschide în browser",
@@ -252,5 +257,26 @@
     "tooLarge": "Codul este prea mare pentru a fi descărcat.",
     "fileType": "Fișier de cod",
     "plainText": "Text simplu"
+  },
+  "mumbleCard": {
+    "addServer": "Adaugă la servere",
+    "channel": "Canal {{channel}}",
+    "copy": "Copiaza linkul",
+    "copyLabel": "Copiaza linkul catre {{server}}",
+    "figures": "Ping {{ping}} ms · {{users}} din {{max}} utilizatori · server {{version}}",
+    "goToChannel": "Mergi la canal",
+    "join": "Intra",
+    "joinLabel": "Intra în {{server}}",
+    "joined": "Intrai",
+    "label": "Cardul serverului {{server}}",
+    "privacyOff": "Valorile serverului sunt oprite în setări",
+    "querying": "Se verifică serverul…",
+    "retry": "Verifică din nou",
+    "retryLabel": "Verifică din nou {{server}}",
+    "server": "{{server}}",
+    "unreachable": "Serverul nu poate fi contactat",
+    "warning_few": "{{count}} linkuri din acest mesaj afiseaza datele de conectare",
+    "warning_one": "{{count}} link din acest mesaj afiseaza datele de conectare",
+    "warning_other": "{{count}} linkuri din acest mesaj afiseaza datele de conectare"
   }
 }

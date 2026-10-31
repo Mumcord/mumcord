@@ -21,5 +21,20 @@
     "collapse": "Laghdaigh",
     "expand": "Leathnaigh",
     "handle": "{{name}}: bogann na saigheada é, athraíonn Shift+saigheada an méid"
+  },
+  "latency": {
+    "summary": "≈ {{total}} ms ón bhéal go dtí an cluas (meastachán)",
+    "otherNormal": "gnáthmhód ≈ {{value}} ms",
+    "otherLow": "mód lag-latency ≈ {{value}} ms",
+    "breakdown": "Miondealú ar an latency",
+    "input": "Maolán micreafóin",
+    "encode": "Fráma Opus {{ms}} ms + réamhfhéachaint an ionchódóra",
+    "network": "Líonra (leath den phing)",
+    "notConnected": "gan nasc",
+    "jitter": "Maolán jitter",
+    "processing": "Próiseáil",
+    "output": "Maolán callaire",
+    "value": "{{value}} ms",
+    "total": "≈ {{value}} ms"
   }
 }

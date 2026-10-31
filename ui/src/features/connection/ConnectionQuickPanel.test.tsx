@@ -123,12 +123,40 @@ describe("ConnectionQuickPanel", () => {
     ).toMatch(/With low-latency mode: ≈ 93 kbit\/s \(10 ms packets\), still within the limit/);
   });
 
-  it("shows the low-latency mode disabled until it exists", async () => {
+  it("switches low-latency mode and counts its 10 ms packets in the bandwidth", async () => {
     await setup();
     const panel = await openQuick();
-    const row = within(panel).getByRole("switch", { name: "Low-latency mode" });
-    expect(row).toBeDisabled();
-    expect(within(panel).getByText("Coming soon")).toBeVisible();
+    await within(panel).findByText("≈ 79 of 128 kbit/s");
+    const row = within(panel).getByRole("switch", { name: /Low-latency mode/ });
+    expect(row).not.toBeChecked();
+    fireEvent.click(row);
+    await waitFor(async () => {
+      expect((await api.settingsGet()).lowLatency).toBe(true);
+    });
+    await within(panel).findByText("≈ 93 of 128 kbit/s");
+    expect(within(panel).queryByText(/With low-latency mode/)).toBeNull();
+    const tip = (topic: string) =>
+      within(panel).getByRole("button", { name: `More information: ${topic}` }).dataset.tooltip;
+    expect(tip("Estimated bandwidth")).toMatch(/Turn the mode off to save ≈ 14 kbit\/s/);
+    const warning = tip("Trades robustness for speed");
+    expect(warning).toMatch(/Uses more bandwidth: ≈ 93 kbit\/s instead of ≈ 79\./);
+    expect(warning).toMatch(/Use headphones: echo cancellation is off\./);
+    expect(within(panel).queryByText(/Use headphones/)).toBeNull();
+    const music = within(panel).getByRole("switch", { name: "Music quality" });
+    expect(music).toBeDisabled();
+    expect(music).toBeChecked();
+    expect(tip("Music quality")).toMatch(/Included while low-latency mode is on/);
+    await within(panel).findByText(/normal mode ≈ 107\.1 ms/);
+    expect(within(panel).getByRole("group", { name: /latency/i })).toBeVisible();
+  });
+
+  it("previews the latency of the other mode while off", async () => {
+    await setup();
+    const panel = await openQuick();
+    await within(panel).findByText(/mouth to ear/);
+    expect(within(panel).getByText(/low-latency mode ≈/)).toBeVisible();
+    expect(within(panel).queryByText("Trades robustness for speed")).toBeNull();
+    expect(within(panel).queryByRole("group", { name: /latency/i })).toBeNull();
   });
 
   it("explains the options behind ? buttons instead of lines of text", async () => {
@@ -139,7 +167,7 @@ describe("ConnectionQuickPanel", () => {
     expect(music.dataset.tooltip).toMatch(/Tunes the encoder for music/);
     expect(within(panel).queryByText(/Tunes the encoder for music/)).toBeNull();
     const low = within(panel).getByRole("button", { name: "More information: Low-latency mode" });
-    expect(low.dataset.tooltip).toMatch(/Smallest packets and buffers/);
+    expect(low.dataset.tooltip).toMatch(/For playing music together in real time/);
   });
 
   it("keeps the audio health rating visible", async () => {

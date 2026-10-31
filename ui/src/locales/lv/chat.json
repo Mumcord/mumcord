@@ -92,13 +92,18 @@
     "hideDescription": "Paslēpt kanāla aprakstu"
   },
   "mention": {
-    "list": "Pieminamie cilvēki",
-    "found_zero": "Ieteikti {{count}} cilvēku. Izmanto bulttaustiņus, pēc tam Enter, lai ievietotu.",
-    "found_one": "Ieteikts {{count}} cilvēks. Izmanto bulttaustiņus, pēc tam Enter, lai ievietotu.",
-    "found_other": "Ieteikti {{count}} cilvēki. Izmanto bulttaustiņus, pēc tam Enter, lai ievietotu.",
+    "list": "Pieminējumu ieteikumi",
+    "found_zero": "Ieteikumi: {{count}}. Izmanto bultiņas, pēc tam Enter, lai ievietotu.",
+    "found_one": "Ieteikumi: {{count}}. Izmanto bultiņas, pēc tam Enter, lai ievietotu.",
+    "found_other": "Ieteikumi: {{count}}. Izmanto bultiņas, pēc tam Enter, lai ievietotu.",
     "none": "Neviens nav atrasts",
     "mentionsYou": "Piemin tevi",
-    "chipLabel": "{{name}}, pieminējums"
+    "chipLabel": "{{name}}, pieminējums",
+    "groupsHeading": "Pieminējumi",
+    "peopleHeading": "Cilvēki",
+    "channelHint": "Paziņot visiem kanālā {{channel}} ({{count}})",
+    "allHint": "Paziņot visiem, kas var lasīt šo kanālu ({{count}})",
+    "keys": "↑↓ izvēlēties · Enter ievietot · Esc aizvērt"
   },
   "preview": {
     "open": "Atvērt pārlūkā",
@@ -252,5 +257,26 @@
     "tooLarge": "Kods ir pārāk liels lejupielādei.",
     "fileType": "Koda fails",
     "plainText": "Vienkāršs teksts"
+  },
+  "mumbleCard": {
+    "addServer": "Pievienot serveriem",
+    "channel": "Kanāls {{channel}}",
+    "copy": "Kopēt saiti",
+    "copyLabel": "Kopēt saiti uz {{server}}",
+    "figures": "Ping {{ping}} ms · {{users}} no {{max}} lietotājiem · serveris {{version}}",
+    "goToChannel": "Pāriet uz kanālu",
+    "join": "Pievienoties",
+    "joinLabel": "Pievienoties {{server}}",
+    "joined": "Pievienots",
+    "label": "Servera karte {{server}}",
+    "privacyOff": "Servera vērtības iestatījumos ir izslēgtas",
+    "querying": "Pārbauda serveri…",
+    "retry": "Pārbaudīt vēlreiz",
+    "retryLabel": "Pārbaudīt vēlreiz {{server}}",
+    "server": "{{server}}",
+    "unreachable": "Serveris nav sasniedzams",
+    "warning_one": "{{count}} saite šajā ziņojam parāda pieteikšanās datus",
+    "warning_other": "{{count}} saites šajā ziņojam parāda pieteikšanās datus",
+    "warning_zero": "{{count}} saites šajā ziņojam parāda pieteikšanās datus"
   }
 }

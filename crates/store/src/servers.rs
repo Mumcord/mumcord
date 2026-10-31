@@ -2,6 +2,7 @@ use rusqlite::{OptionalExtension, Row, params};
 
 use crate::db::{Store, UnixMillis};
 use crate::error::{Error, Result};
+use crate::identities::IdentityId;
 use crate::secrets::SecretStore;
 
 /// Mumble's default server port.
@@ -19,10 +20,12 @@ pub struct NewServer {
     pub port: u16,
     pub username: String,
     pub save_history: bool,
+    /// Identity to connect with; `None` uses the default identity (issue #148).
+    pub identity_id: Option<IdentityId>,
 }
 
 impl NewServer {
-    /// Server with the default port and history saving on.
+    /// Server with the default port, history saving on and the default identity.
     pub fn new(label: &str, address: &str, username: &str) -> Self {
         Self {
             label: label.to_owned(),
@@ -30,6 +33,7 @@ impl NewServer {
             port: DEFAULT_PORT,
             username: username.to_owned(),
             save_history: true,
+            identity_id: None,
         }
     }
 }
@@ -54,13 +58,17 @@ pub struct SavedServer {
     pub was_voice_server_at_quit: bool,
     /// No notifications from this server (FR-2.10).
     pub notifications_muted: bool,
+    /// `@all` and `@channel` do not count as mentions on this server (issue #70).
+    pub group_mentions_muted: bool,
     /// Theme for this server; `None` uses the app theme (FR-2.17).
     pub theme_id: Option<String>,
+    /// Identity to connect with; `None` uses the default identity (issue #148).
+    pub identity_id: Option<IdentityId>,
 }
 
 const SERVER_COLUMNS: &str = "id, label, address, port, username, last_channel, save_history, \
      sort_order, always_connect_at_start, connected_at_quit, was_voice_server_at_quit, \
-     notifications_muted, theme_id";
+     notifications_muted, theme_id, identity_id, group_mentions_muted";
 
 fn server_from_row(row: &Row<'_>) -> rusqlite::Result<SavedServer> {
     Ok(SavedServer {
@@ -77,6 +85,8 @@ fn server_from_row(row: &Row<'_>) -> rusqlite::Result<SavedServer> {
         was_voice_server_at_quit: row.get(10)?,
         notifications_muted: row.get(11)?,
         theme_id: row.get(12)?,
+        identity_id: row.get(13)?,
+        group_mentions_muted: row.get(14)?,
     })
 }
 
@@ -86,16 +96,23 @@ impl Store {
         if server.port == 0 {
             return Err(Error::InvalidPort);
         }
+        if let Some(identity) = server.identity_id
+            && self.identity(identity)?.is_none()
+        {
+            return Err(Error::UnknownIdentity(identity));
+        }
         self.conn.execute(
-            "INSERT INTO saved_server (label, address, port, username, save_history, sort_order)
-             VALUES (?1, ?2, ?3, ?4, ?5,
+            "INSERT INTO saved_server (label, address, port, username, save_history, identity_id,
+                                      sort_order)
+             VALUES (?1, ?2, ?3, ?4, ?5, ?6,
                      (SELECT COALESCE(MAX(sort_order), -1) + 1 FROM saved_server))",
             params![
                 server.label,
                 server.address,
                 server.port,
                 server.username,
-                server.save_history
+                server.save_history,
+                server.identity_id
             ],
         )?;
         let id = self.conn.last_insert_rowid();
@@ -122,9 +139,10 @@ impl Store {
             .optional()?)
     }
 
-    /// Updates label, address, port, username, last channel, the save-history switch and the
-    /// multi-server settings (always connect, muted notifications, theme). The order is changed
-    /// with [`Store::reorder_servers`], the quit state with [`Store::set_quit_state`].
+    /// Updates label, address, port, username, last channel, the save-history switch, the
+    /// multi-server settings (always connect, muted notifications, theme) and the identity.
+    /// The order is changed with [`Store::reorder_servers`], the quit state with
+    /// [`Store::set_quit_state`].
     pub fn update_server(&self, server: &SavedServer) -> Result<()> {
         if server.port == 0 {
             return Err(Error::InvalidPort);
@@ -133,7 +151,7 @@ impl Store {
             "UPDATE saved_server
              SET label = ?2, address = ?3, port = ?4, username = ?5, last_channel = ?6,
                  save_history = ?7, always_connect_at_start = ?8, notifications_muted = ?9,
-                 theme_id = ?10
+                 theme_id = ?10, identity_id = ?11, group_mentions_muted = ?12
              WHERE id = ?1",
             params![
                 server.id,
@@ -145,7 +163,9 @@ impl Store {
                 server.save_history,
                 server.always_connect_at_start,
                 server.notifications_muted,
-                server.theme_id
+                server.theme_id,
+                server.identity_id,
+                server.group_mentions_muted
             ],
         )?;
         expect_one(changed, server.id)
@@ -363,6 +383,7 @@ mod tests {
             .add_server(&NewServer::new("A", "localhost", "Tester"))
             .expect("add");
         assert!(!added.always_connect_at_start && !added.notifications_muted);
+        assert!(!added.group_mentions_muted);
         assert!(!added.was_voice_server_at_quit);
         assert_eq!(
             (added.connected_at_quit, added.theme_id.clone()),
@@ -372,6 +393,7 @@ mod tests {
         let mut edited = added.clone();
         edited.always_connect_at_start = true;
         edited.notifications_muted = true;
+        edited.group_mentions_muted = true;
         edited.theme_id = Some("forest".into());
         store.update_server(&edited).expect("update");
         assert_eq!(store.server(added.id).expect("get"), Some(edited.clone()));

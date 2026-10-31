@@ -5,6 +5,7 @@ import {
   cancelReconnect,
   disconnect,
   dismissActionError,
+  dismissIdentityNotice,
   openDialog,
   requestConnect,
   useServers,
@@ -175,12 +176,13 @@ const ACTION_KEYS: Record<ActionContext, string> = {
   alwaysConnect: "status.actionFailed.alwaysConnect",
   notifications: "status.actionFailed.notifications",
   savePassword: "status.actionFailed.savePassword",
+  identity: "status.actionFailed.identity",
 };
 
 /** Thin bar above the chat (spec §5.2). Shows nothing while connected normally or idle. */
 function StatusBar({ state }: { state: ServersState }) {
   const { t } = useTranslation(["servers", "common"]);
-  const { connection, ended, actionError } = state;
+  const { connection, ended, actionError, identityNotice } = state;
 
   if (actionError) {
     return (
@@ -193,6 +195,18 @@ function StatusBar({ state }: { state: ServersState }) {
         }
       >
         <button type="button" className="button" onClick={dismissActionError}>
+          {t("common:close")}
+        </button>
+      </Bar>
+    );
+  }
+  if (identityNotice !== null) {
+    return (
+      <Bar
+        tone="warning"
+        text={t("identity.missingNotice", { server: nameOf(state, identityNotice) })}
+      >
+        <button type="button" className="button" onClick={dismissIdentityNotice}>
           {t("common:close")}
         </button>
       </Bar>

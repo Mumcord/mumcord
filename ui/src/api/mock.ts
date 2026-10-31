@@ -3,7 +3,15 @@
  * It follows the contract in docs/engine-api.md closely enough for UI flows, not the
  * Mumble protocol: no network, no audio.
  */
-import type { InspectorView, MessageNotice, NotifyOutcome, WindowLook } from "../bindings/commands";
+import type {
+  InspectorView,
+  LinkOutcome,
+  MessageNotice,
+  MumbleLinkStats,
+  NotifyOutcome,
+  WindowLook,
+} from "../bindings/commands";
+import { parseMumbleLink } from "../features/chat/mumbleLink";
 import type {
   ApiError,
   AudioDevices,
@@ -11,6 +19,7 @@ import type {
   ChatMessage,
   ConnectionState,
   ConnectionStats,
+  LatencyEstimate,
   Conversation,
   ErrorCode,
   Friend,
@@ -136,7 +145,9 @@ const NEW_SERVER_FLAGS = {
   alwaysConnectAtStart: false,
   wasVoiceServerAtQuit: false,
   notificationsMuted: false,
+  groupMentionsMuted: false,
   themeId: null,
+  identityId: null,
 } satisfies Partial<SavedServer>;
 /** The one channel password the mock accepts (FR-2.78). */
 export const MOCK_CHANNEL_PASSWORD = "secret";
@@ -180,6 +191,7 @@ const DEFAULT_SETTINGS: Settings = {
   inputGainPercent: 100,
   outputVolumePercent: 100,
   musicQuality: false,
+  lowLatency: false,
   videoDucking: true,
   videoDuckingPercent: 30,
   bitrateKbps: 96,
@@ -199,6 +211,8 @@ const DEFAULT_SETTINGS: Settings = {
     shareStopped: true,
     viewerStarted: true,
     viewerStopped: true,
+    kicked: true,
+    banned: true,
   },
   closeBehaviour: "ask",
   chatDisplay: "cozy",
@@ -306,6 +320,35 @@ const DEVICES: AudioDevices = {
   ],
 };
 
+/** The figures measured on a PipeWire machine with an 18 ms ping (issue #156), for both modes. */
+function mockLatencyEstimate(lowLatency: boolean): LatencyEstimate {
+  return lowLatency
+    ? {
+        lowLatency,
+        packetMs: 10,
+        inputBufferUs: 2667,
+        encodeUs: 12500,
+        networkUs: 9000,
+        jitterUs: 10000,
+        processingUs: 100,
+        outputBufferUs: 13667,
+        totalUs: 47934,
+        otherModeTotalUs: 107134,
+      }
+    : {
+        lowLatency,
+        packetMs: 20,
+        inputBufferUs: 10667,
+        encodeUs: 26500,
+        networkUs: 9000,
+        jitterUs: 20000,
+        processingUs: 300,
+        outputBufferUs: 40667,
+        totalUs: 107134,
+        otherModeTotalUs: 47934,
+      };
+}
+
 const DEFAULT_CONNECTION_STATS: ConnectionStats = {
   transport: "udp",
   rttMs: 24.5,
@@ -338,6 +381,7 @@ const DEFAULT_CONNECTION_STATS: ConnectionStats = {
       2900, 3100, 2800, 3300, 3000, 3600, 4800, 3900, 3500, 3200, 3700, 3400,
     ],
   },
+  latency: mockLatencyEstimate(false),
 };
 
 const allow = { enter: true, textMessage: true, listen: true, registerSelf: false };
@@ -528,26 +572,9 @@ function conversationKey(c: Conversation): string {
   }
 }
 
+/** The same rules as `parse_mumble_link` in the engine, through the UI's single parsing module. */
 function parseLink(url: string): MumbleLink {
-  let parsed: URL;
-  try {
-    parsed = new URL(url);
-  } catch {
-    return fail("invalidInput", "not a valid link");
-  }
-  if (parsed.protocol !== "mumble:" || parsed.hostname === "") {
-    return fail("invalidInput", "not a mumble:// link");
-  }
-  return {
-    address: parsed.hostname,
-    port: parsed.port === "" ? 64738 : Number(parsed.port),
-    username: parsed.username === "" ? null : decodeURIComponent(parsed.username),
-    password: parsed.password === "" ? null : decodeURIComponent(parsed.password),
-    channelPath: parsed.pathname
-      .split("/")
-      .filter((part) => part !== "")
-      .map(decodeURIComponent),
-  };
+  return parseMumbleLink(url) ?? fail("invalidInput", "not a mumble:// link");
 }
 
 /** Length of each mic-test phase (recording, playback) in the mock. */
@@ -558,6 +585,8 @@ export function createMockApi(options: MockOptions = {}): MockApi {
   const fresh = seed === "fresh" || seed === "demoFresh";
   const stress = seed === "stress";
   const demo = seed === "demo" || seed === "demoFresh" || stress;
+  /** What the mock answered for each `mumble://` link in this run (issue #175). */
+  const queryAnswers = new Map<string, MumbleLinkStats>();
   const serverVersion = options.serverVersion ?? "1.5.735";
   const maxListeners = options.maxListeners ?? 2;
   const connectDelayMs = options.connectDelayMs ?? 0;
@@ -574,7 +603,21 @@ export function createMockApi(options: MockOptions = {}): MockApi {
   let windowLook: WindowLook | null = null;
   const certPrompts = new Map<number, string | null>();
 
-  let identity: Identity | null = fresh ? null : { name: "Zoe", certHash: "selfhash" };
+  // Identities are added one by one; the first one is the default (issue #148).
+  let identities: Identity[] = fresh
+    ? []
+    : [
+        {
+          id: 1,
+          label: "Default",
+          name: "Zoe",
+          certHash: mockCertHash("zoe"),
+          addedAt: "2026-03-12T09:00:00.000Z",
+          isDefault: true,
+          serverIds: [],
+        },
+      ];
+  let nextIdentityId = identities.length + 1;
   let settings: Settings = { ...DEFAULT_SETTINGS, wizardCompleted: !fresh };
   // One official game plugin as found in a Mumble installation; no game runs in the mock.
   let gamePlugins: GamePlugin[] = [
@@ -827,8 +870,81 @@ export function createMockApi(options: MockOptions = {}): MockApi {
     return session()?.snapshot ?? fail("notConnected", "not connected");
   }
 
-  function requireIdentity(): Identity {
-    return identity ?? fail("notFound", "no identity yet");
+  /** Deterministic 40-character certificate hash, like the engine's SHA-1. */
+  function mockCertHash(seed: string): string {
+    let hash = "";
+    for (let index = 0; hash.length < 40; index += 1) {
+      hash += (seed + String(index))
+        .split("")
+        .reduce((sum, char) => sum + char.charCodeAt(0), 0)
+        .toString(16)
+        .padStart(2, "0");
+    }
+    return hash.slice(0, 40);
+  }
+
+  function orderedIdentities(): Identity[] {
+    return [...identities].sort(
+      (a, b) =>
+        Number(b.isDefault) - Number(a.isDefault) ||
+        a.addedAt.localeCompare(b.addedAt) ||
+        a.id - b.id,
+    );
+  }
+
+  function defaultIdentity(): Identity | null {
+    return identities.find((i) => i.isDefault) ?? null;
+  }
+
+  function requireIdentity(id?: number): Identity {
+    if (id === undefined) return defaultIdentity() ?? fail("notFound", "no identity yet");
+    return identities.find((i) => i.id === id) ?? fail("notFound", `no identity ${String(id)}`);
+  }
+
+  function addIdentity(label: string, name: string, certHash: string): Identity {
+    if (certHash !== "" && identities.some((i) => i.certHash === certHash))
+      fail("invalidInput", "this identity is already in the list");
+    const identity: Identity = {
+      id: nextIdentityId++,
+      label,
+      name,
+      certHash,
+      addedAt: new Date().toISOString(),
+      isDefault: identities.length === 0,
+      serverIds: [],
+    };
+    identities = [...identities, identity];
+    return identity;
+  }
+
+  /** Removes an identity from the mock; the default passes to the oldest remaining one. */
+  function removeIdentity(id: number): void {
+    const removed = requireIdentity(id);
+    if (identities.length <= 1) fail("invalidInput", "Mumcord needs at least one identity");
+    identities = identities.filter((i) => i.id !== id);
+    if (removed.isDefault) {
+      const next = orderedIdentities()[0];
+      if (next) identities = identities.map((i) => ({ ...i, isDefault: i.id === next.id }));
+    }
+    for (const server of servers) {
+      if (server.identityId === id) setIdentityOfServer(server.id, null);
+    }
+  }
+
+  /** Stores a server's identity and keeps the identities' `serverIds` in sync. */
+  function setIdentityOfServer(serverId: number, identityId: number | null): SavedServer {
+    const server = requireServer(serverId);
+    if (identityId !== null) requireIdentity(identityId);
+    const updated: SavedServer = { ...server, identityId };
+    servers = servers.map((s) => (s.id === serverId ? updated : s));
+    identities = identities.map((i) => ({
+      ...i,
+      serverIds:
+        i.id === identityId
+          ? [...new Set([...i.serverIds, serverId])]
+          : i.serverIds.filter((s) => s !== serverId),
+    }));
+    return updated;
   }
 
   function requireChannel(id: number): ChannelInfo {
@@ -978,7 +1094,12 @@ export function createMockApi(options: MockOptions = {}): MockApi {
     rejoinOffers.delete(serverId);
     const offer = readOnly && offerPath ? findChannelByPath(channels, offerPath) : undefined;
     const self = {
-      ...person(SELF_SESSION, requireServer(serverId).username, target?.id ?? 0, "selfhash"),
+      ...person(
+        SELF_SESSION,
+        requireServer(serverId).username,
+        target?.id ?? 0,
+        mockCertHash("zoe"),
+      ),
       ...(readOnly ? { selfMute: true, selfDeaf: true } : joinedVoice()),
     };
     if (readOnly) muteBeforeDeaf = false;
@@ -1153,21 +1274,44 @@ export function createMockApi(options: MockOptions = {}): MockApi {
 
   const commands: EngineCommands = {
     // identity
-    identityGet: () => Promise.resolve(identity),
-    identityCreate: (name) => {
+    identityGet: () => Promise.resolve(defaultIdentity()),
+    identityList: () => Promise.resolve(orderedIdentities().map((i) => ({ ...i }))),
+    identityCreate: (name, label) => {
       if (name.trim() === "") fail("invalidInput", "name is required");
-      identity = { name: name.trim(), certHash: "selfhash" };
-      return Promise.resolve(identity);
+      const id = nextIdentityId;
+      return Promise.resolve(
+        addIdentity(label ?? name.trim(), name.trim(), mockCertHash(`created-${String(id)}`)),
+      );
     },
-    identityImport: (path) => {
+    identityImport: (path, _password, label) => {
       const file = path.split(/[\\/]/).pop() ?? "Imported";
-      identity = { name: file.replace(/\.p12$|\.pfx$/i, ""), certHash: "importedhash" };
-      return Promise.resolve(identity);
+      const name = file.replace(/\.p12$|\.pfx$/i, "");
+      const id = nextIdentityId;
+      return Promise.resolve(
+        addIdentity(label ?? name, name, mockCertHash(`imported-${String(id)}`)),
+      );
     },
-    identityExport: (_path, password) => {
-      requireIdentity();
+    identityRename: (id, label) => {
+      requireIdentity(id);
+      if (label.trim() === "") fail("invalidInput", "label is required");
+      let renamed = requireIdentity(id);
+      renamed = { ...renamed, label: label.trim() };
+      identities = identities.map((i) => (i.id === id ? renamed : i));
+      return Promise.resolve(renamed);
+    },
+    identityExport: (id, _path, password) => {
+      requireIdentity(id);
       if (password === "") fail("invalidInput", "a password is required");
       return Promise.resolve(null);
+    },
+    identityDelete: (id) => {
+      removeIdentity(id);
+      return Promise.resolve(null);
+    },
+    identitySetDefault: (id) => {
+      requireIdentity(id);
+      identities = identities.map((i) => ({ ...i, isDefault: i.id === id }));
+      return Promise.resolve(orderedIdentities().map((i) => ({ ...i })));
     },
 
     // servers
@@ -1197,6 +1341,10 @@ export function createMockApi(options: MockOptions = {}): MockApi {
     serverRemove: (id) => {
       requireServer(id);
       servers = servers.filter((s) => s.id !== id);
+      identities = identities.map((i) => ({
+        ...i,
+        serverIds: i.serverIds.filter((s) => s !== id),
+      }));
       history.delete(id);
       return Promise.resolve(null);
     },
@@ -1210,6 +1358,29 @@ export function createMockApi(options: MockOptions = {}): MockApi {
       return Promise.resolve(null);
     },
     parseMumbleLink: (url) => Promise.resolve(parseLink(url)),
+    // The mock never contacts a server. It answers with figures of its own, and says that nothing
+    // was asked while the privacy switch is off — which is what the real command does (issue #175).
+    mumbleLinkStats: (url: string, refresh: boolean): Promise<MumbleLinkStats> => {
+      parseLink(url);
+      if (!settings.linkPreviews) return Promise.resolve({ kind: "privacyOff" });
+      // Like the engine, the mock keeps the answer for the session unless the card asks again.
+      const stored = queryAnswers.get(url);
+      const answer: MumbleLinkStats =
+        refresh || stored === undefined
+          ? { kind: "answered", pingMs: 12, users: 8, maxUsers: 24, version: serverVersion }
+          : stored;
+      queryAnswers.set(url, answer);
+      return Promise.resolve(answer);
+    },
+    mumbleLinkJoin: (url: string) => {
+      const link = parseLink(url);
+      const saved = servers.find((s) => s.address === link.address && s.port === link.port);
+      const outcome: LinkOutcome = saved
+        ? { kind: "connecting", serverId: saved.id }
+        : { kind: "unknownServer" };
+      emit("deepLinkOpened", { link, outcome });
+      return Promise.resolve(outcome);
+    },
 
     // session
     connect: (serverId, channelPath, password) => {
@@ -1243,7 +1414,16 @@ export function createMockApi(options: MockOptions = {}): MockApi {
     sessionSnapshot: (serverId) => Promise.resolve(sessions.get(serverId)?.snapshot ?? null),
     connectionStats: (serverId) =>
       Promise.resolve(
-        sessions.get(serverId)?.state.state === "connected" ? { ...connectionStats } : null,
+        sessions.get(serverId)?.state.state === "connected"
+          ? {
+              ...connectionStats,
+              // Follows the setting like the engine, unless a test set its own figure.
+              latency:
+                connectionStats.latency === DEFAULT_CONNECTION_STATS.latency
+                  ? mockLatencyEstimate(settings.lowLatency)
+                  : connectionStats.latency,
+            }
+          : null,
       ),
     certTrustDecide: (serverId, _fingerprint, trust) => {
       const pending = pendingConnect;
@@ -1749,6 +1929,7 @@ export function createMockApi(options: MockOptions = {}): MockApi {
     // audio
     audioDevices: () => Promise.resolve(DEVICES),
     bitrateMax: () => Promise.resolve<number | null>(null),
+    latencyEstimate: () => Promise.resolve(mockLatencyEstimate(settings.lowLatency)),
     micTestStart: () => {
       clearInterval(micTimer);
       clearTimeout(micPhaseTimer);
@@ -1900,6 +2081,32 @@ export function createMockApi(options: MockOptions = {}): MockApi {
       requireServer(serverId);
       servers = servers.map((s) => (s.id === serverId ? { ...s, notificationsMuted: muted } : s));
       return Promise.resolve({ ...requireServer(serverId) });
+    },
+    serverSetGroupMentionsMuted: (serverId, muted) => {
+      requireServer(serverId);
+      servers = servers.map((s) => (s.id === serverId ? { ...s, groupMentionsMuted: muted } : s));
+      return Promise.resolve({ ...requireServer(serverId) });
+    },
+    serverSetIdentity: (serverId, identityId) =>
+      Promise.resolve({ ...setIdentityOfServer(serverId, identityId) }),
+    serverTestConnection: (input) => {
+      if (input.address.trim() === "") fail("invalidInput", "address is required");
+      if (input.port === 0) fail("invalidInput", "port is required");
+      if (input.username.trim() === "") fail("invalidInput", "username is required");
+      const server = input.serverId === null ? null : requireServer(input.serverId);
+      // The mock knows one reachable server; anything else is unreachable.
+      if (!["localhost", "127.0.0.1"].includes(input.address.trim()))
+        fail("serverUnreachable", "unreachable in the mock");
+      if (input.password.kind === "set" && input.password.value === "wrong")
+        fail("wrongPassword", "wrong password");
+      const certificate =
+        server === null ? "unknown" : certPrompts.has(server.id) ? "changed" : "trusted";
+      return Promise.resolve({
+        pingMs: 12,
+        version: "1.5.0",
+        fingerprint: MOCK_FINGERPRINT,
+        certificate,
+      });
     },
     serverSetTheme: (serverId, themeId) => {
       requireServer(serverId);

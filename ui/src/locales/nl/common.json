@@ -21,5 +21,20 @@
     "collapse": "Inklappen",
     "expand": "Uitklappen",
     "handle": "{{name}}: pijltjestoetsen verplaatsen, Shift+pijltjestoetsen wijzigen de grootte"
+  },
+  "latency": {
+    "summary": "≈ {{total}} ms van mond tot oor (schatting)",
+    "otherNormal": "normale modus ≈ {{value}} ms",
+    "otherLow": "modus voor lage latentie ≈ {{value}} ms",
+    "breakdown": "Opbouw van de latentie",
+    "input": "Microfoonbuffer",
+    "encode": "Opus-frame van {{ms}} ms + vooruitblik van de encoder",
+    "network": "Netwerk (helft van de ping)",
+    "notConnected": "niet verbonden",
+    "jitter": "Jitterbuffer",
+    "processing": "Verwerking",
+    "output": "Luidsprekerbuffer",
+    "value": "{{value}} ms",
+    "total": "≈ {{value}} ms"
   }
 }

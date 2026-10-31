@@ -67,8 +67,7 @@
     "title": "Kwalità tal-vuċi",
     "status": "Ping {{latency}}, telf {{loss}}",
     "lowLatency": "Modalità b'latenza baxxa",
-    "lowLatencyHint": "L-iżgħar pakketti u buffers biex tidgħu mużika flimkien. Aktar bandwidth, inqas robust.",
-    "lowLatencyComingSoon": "Dalwaqt",
+    "lowLatencyHint": "Biex tidgħu mużika flimkien f'ħin reali. Jaħdem l-aħjar bil-push-to-talk.",
     "voiceSettings": "Settings tal-vuċi…",
     "applies": "Japplika minnufih, jinħażen bħal fis-Settings → Awdjo",
     "keys": "Esc jagħlaq · ↑↓ jiċċaqlaq · ← → jaġġusta",
@@ -81,6 +80,19 @@
     "beta": "Beta",
     "moreInfo": "Aktar informazzjoni: {{topic}}",
     "effectiveShort": "Qed jintbagħat issa",
-    "effectiveTip": "Il-bitrate li qed jintbagħat issa, wara l-adattament għat-telf tal-pakketti."
-  }
+    "effectiveTip": "Il-bitrate li qed jintbagħat issa, wara l-adattament għat-telf tal-pakketti.",
+    "musicIncluded": "Inkluż waqt li l-modalità b'latenza baxxa tkun mixgħula: it-tneħħija tal-istorbju u l-volum awtomatiku huma mitfija, u l-encoder jaħdem bis-setting tiegħu tal-mużika b'dewmien baxx.",
+    "warningBandwidth": "Juża aktar bandwidth: ≈ {{on}} kbit/s minflok ≈ {{off}}.",
+    "warningWifi": "Jista' jaqta' fuq Wi-Fi jew fuq konnessjoni mqabbda.",
+    "warningHeadphones": "Uża headphones: it-tneħħija tal-eku hija mitfija.",
+    "warningPtt": "Jaħdem l-aħjar bil-push-to-talk.",
+    "bandwidthLowLatencyWithin": "Pakketti ta' 10 ms iżidu overhead tal-headers; fil-limitu. Itfi l-modalità biex tiffranka ≈ {{value}} kbit/s.",
+    "bandwidthLowLatencyOver": "Pakketti ta' 10 ms iżidu overhead tal-headers; 'il fuq mil-limitu. Itfi l-modalità biex tiffranka ≈ {{value}} kbit/s.",
+    "bandwidthLowLatencyNoLimit": "Pakketti ta' 10 ms iżidu overhead tal-headers. Itfi l-modalità biex tiffranka ≈ {{value}} kbit/s."
+  },
+  "endToEnd": "Latenza totali",
+  "endToEndValue": "≈ {{value}} ms (stima)",
+  "lowLatencyMode": "Modalità ta' latenza baxxa",
+  "identity": "Identità",
+  "identityValue": "{{label}} ({{name}}) · {{fingerprint}}"
 }

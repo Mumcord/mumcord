@@ -89,12 +89,17 @@
     "hideDescription": "Kanaalbeschrijving verbergen"
   },
   "mention": {
-    "list": "Vermeldbare personen",
-    "found_one": "{{count}} persoon voorgesteld. Gebruik de pijltjestoetsen en druk op Enter om in te voegen.",
-    "found_other": "{{count}} personen voorgesteld. Gebruik de pijltjestoetsen en druk op Enter om in te voegen.",
+    "list": "Vermeldingssuggesties",
+    "found_one": "Suggesties: {{count}}. Gebruik de pijltjestoetsen en daarna Enter om in te voegen.",
+    "found_other": "Suggesties: {{count}}. Gebruik de pijltjestoetsen en daarna Enter om in te voegen.",
     "none": "Niemand gevonden",
     "mentionsYou": "Vermeldt jou",
-    "chipLabel": "{{name}}, vermelding"
+    "chipLabel": "{{name}}, vermelding",
+    "groupsHeading": "Vermeldingen",
+    "peopleHeading": "Personen",
+    "channelHint": "Iedereen in {{channel}} melden ({{count}})",
+    "allHint": "Iedereen melden die dit kanaal kan lezen ({{count}})",
+    "keys": "↑↓ kiezen · Enter invoegen · Esc sluiten"
   },
   "preview": {
     "open": "Openen in browser",
@@ -248,5 +253,25 @@
     "tooLarge": "De code is te groot om te downloaden.",
     "fileType": "Codebestand",
     "plainText": "Platte tekst"
+  },
+  "mumbleCard": {
+    "addServer": "Toevoegen aan servers",
+    "channel": "Kanaal {{channel}}",
+    "copy": "Link kopiëren",
+    "copyLabel": "Link naar {{server}} kopiëren",
+    "figures": "Ping {{ping}} ms · {{users}} van {{max}} gebruikers · server {{version}}",
+    "goToChannel": "Ga naar kanaal",
+    "join": "Deelnemen",
+    "joinLabel": "Deelnemen aan {{server}}",
+    "joined": "Deelgenomen",
+    "label": "Serverkaart voor {{server}}",
+    "privacyOff": "Serverwaarden staan uit in de instellingen",
+    "querying": "Server controleren…",
+    "retry": "Opnieuw controleren",
+    "retryLabel": "Opnieuw controleren {{server}}",
+    "server": "{{server}}",
+    "unreachable": "Server niet bereikbaar",
+    "warning_one": "{{count}} link in dit bericht toont inloggegevens",
+    "warning_other": "{{count}} links in dit bericht tonen inloggegevens"
   }
 }

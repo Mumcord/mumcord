@@ -21,5 +21,20 @@
     "collapse": "Fold sammen",
     "expand": "Fold ud",
     "handle": "{{name}}: piletaster flytter, Shift+piletaster ændrer størrelse"
+  },
+  "latency": {
+    "summary": "≈ {{total}} ms fra mund til øre (skøn)",
+    "otherNormal": "normal tilstand ≈ {{value}} ms",
+    "otherLow": "tilstand med lav latenstid ≈ {{value}} ms",
+    "breakdown": "Fordeling af latenstiden",
+    "input": "Mikrofonbuffer",
+    "encode": "Opus-ramme på {{ms}} ms + koderens forudsigelse",
+    "network": "Netværk (halvdelen af ping)",
+    "notConnected": "ikke forbundet",
+    "jitter": "Jitterbuffer",
+    "processing": "Behandling",
+    "output": "Højttalerbuffer",
+    "value": "{{value}} ms",
+    "total": "≈ {{value}} ms"
   }
 }

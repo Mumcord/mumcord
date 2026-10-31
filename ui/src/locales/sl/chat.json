@@ -95,14 +95,19 @@
     "hideDescription": "Skrij opis kanala"
   },
   "mention": {
-    "list": "Osebe, ki jih lahko omeniš",
-    "found_one": "Predlagana je {{count}} oseba. Uporabi puščice, nato Enter za vstavljanje.",
-    "found_two": "Predlagani sta {{count}} osebi. Uporabi puščice, nato Enter za vstavljanje.",
-    "found_few": "Predlagane so {{count}} osebe. Uporabi puščice, nato Enter za vstavljanje.",
-    "found_other": "Predlaganih je {{count}} oseb. Uporabi puščice, nato Enter za vstavljanje.",
+    "list": "Predlogi omemb",
+    "found_one": "Predlogi: {{count}}. Uporabite puščice, nato Enter za vstavljanje.",
+    "found_two": "Predlogi: {{count}}. Uporabite puščice, nato Enter za vstavljanje.",
+    "found_few": "Predlogi: {{count}}. Uporabite puščice, nato Enter za vstavljanje.",
+    "found_other": "Predlogi: {{count}}. Uporabite puščice, nato Enter za vstavljanje.",
     "none": "Nihče ni najden",
     "mentionsYou": "Omenja te",
-    "chipLabel": "{{name}}, omemba"
+    "chipLabel": "{{name}}, omemba",
+    "groupsHeading": "Omembe",
+    "peopleHeading": "Osebe",
+    "channelHint": "Obvesti vse v {{channel}} ({{count}})",
+    "allHint": "Obvesti vse, ki lahko berejo ta kanal ({{count}})",
+    "keys": "↑↓ izberi · Enter vstavi · Esc zapri"
   },
   "preview": {
     "open": "Odpri v brskalniku",
@@ -256,5 +261,27 @@
     "tooLarge": "Koda je prevelika za prenos.",
     "fileType": "Datoteka s kodo",
     "plainText": "Navadno besedilo"
+  },
+  "mumbleCard": {
+    "addServer": "Dodaj med strežnike",
+    "channel": "Kanal {{channel}}",
+    "copy": "Kopiraj povezavo",
+    "copyLabel": "Kopiraj povezavo do {{server}}",
+    "figures": "Ping {{ping}} ms · {{users}} od {{max}} uporabnikov · strežnik {{version}}",
+    "goToChannel": "Pojdi na kanal",
+    "join": "Pridruži se",
+    "joinLabel": "Pridruži se strežniku {{server}}",
+    "joined": "Pridruženo",
+    "label": "Kartica strežnika {{server}}",
+    "privacyOff": "Vrednosti strežnika so v nastavitvah izklopljene",
+    "querying": "Preverjanje strežnika…",
+    "retry": "Preveri znova",
+    "retryLabel": "Preveri znova {{server}}",
+    "server": "{{server}}",
+    "unreachable": "Strežnik ni dosegljiv",
+    "warning_few": "{{count}} povezave v tem sporočilu prikazujejo poverilnice",
+    "warning_one": "{{count}} povezava v tem sporočilu prikazuje poverilnice",
+    "warning_other": "{{count}} povezke v tem sporočilu prikazuje poverilnice",
+    "warning_two": "{{count}} povezavi v tem sporočilu prikazujeta poverilnice"
   }
 }

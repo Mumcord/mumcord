@@ -55,7 +55,8 @@
     "passwordRequired": "Vpiši geslo za zaščito datoteke varnostne kopije.",
     "exported": "Varnostna kopija identitete shranjena.",
     "confirm": "Registriraj se",
-    "done": "Registriran na tem strežniku"
+    "done": "Registriran na tem strežniku",
+    "identity": "Registrirano ime pripada identiteti {{identity}}."
   },
   "errors": {
     "tooLarge": "To je preveliko za strežnik. Izberi manjšo sliko ali napiši krajše besedilo.",

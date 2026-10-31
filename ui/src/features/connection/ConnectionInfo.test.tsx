@@ -65,6 +65,18 @@ afterEach(() => {
 });
 
 describe("ConnectionInfo", () => {
+  it("shows the identity the shown server connects with", async () => {
+    await setup();
+    await api.identityCreate("Zoe (Acme)", "Work");
+    const [server] = await api.serversList();
+    await api.serverSetIdentity((server ?? { id: 0 }).id, 2);
+    const panel = openPanel();
+    expect(await within(panel).findByText("Identity")).toBeInTheDocument();
+    expect(valueOf(panel, "Identity")).toMatch(
+      /^Work \(Zoe \(Acme\)\) · [A-Z0-9]{2}:[A-Z0-9]{2}:[A-Z0-9]{2}:[A-Z0-9]{2}$/,
+    );
+  });
+
   it("shows transport, latency, loss and bitrate", async () => {
     await setup();
     api.mock.setConnectionStats({ rttMs: 31.6, lossPercent: 2, sendBitrateKbps: 64 });
@@ -84,6 +96,7 @@ describe("ConnectionInfo", () => {
   it("shows the audio counters with their recent figures in the details", async () => {
     await setup();
     api.mock.setConnectionStats({
+      latency: null,
       audio: audio({
         dropouts: 2,
         lateFrames: 7,
@@ -204,6 +217,37 @@ describe("ConnectionInfo", () => {
     expect(valueOf(panel, "Send bitrate")).toBe("40 kbit/s");
     expect(valueOf(panel, "Transport")).toBe("TCP (tunnelled)");
     expect(valueOf(panel, "Latency")).toBe("–");
+  });
+
+  it("shows the end-to-end latency estimate with its breakdown", async () => {
+    await setup();
+    const panel = openPanel();
+    await within(panel).findByText("End-to-end latency");
+    expect(valueOf(panel, "End-to-end latency")).toBe("≈ 107.1 ms (estimate)");
+    expect(within(panel).queryByText("Low-latency mode")).toBeNull();
+    expect(
+      within(panel).getByRole("group", {
+        name: /^Latency breakdown: .*Jitter buffer 20 ms/,
+        hidden: true,
+      }),
+    ).toBeInTheDocument();
+  });
+
+  it("marks low-latency mode and tolerates a missing estimate", async () => {
+    await setup();
+    const low = await api.latencyEstimate();
+    api.mock.setConnectionStats({ latency: low && { ...low, lowLatency: true, totalUs: 38000 } });
+    const panel = openPanel();
+    await within(panel).findByText("End-to-end latency");
+    expect(valueOf(panel, "End-to-end latency")).toBe("Low-latency mode · ≈ 38 ms (estimate)");
+  });
+
+  it("leaves the estimate out when there is none", async () => {
+    await setup();
+    api.mock.setConnectionStats({ latency: null });
+    const panel = openPanel();
+    await within(panel).findByText("Transport");
+    expect(within(panel).queryByText("End-to-end latency")).toBeNull();
   });
 
   it("stops polling when closed", async () => {

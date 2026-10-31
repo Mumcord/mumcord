@@ -560,6 +560,28 @@ fn music_leveler_never_clips_on_a_sudden_peak() {
     assert!(loud_peak <= 0.9, "peak {loud_peak:.3}");
 }
 
+/// Issue #156: low-latency mode sends the microphone signal untouched, even with echo
+/// cancellation, noise suppression and automatic gain switched on.
+#[test]
+fn low_latency_bypasses_echo_cancellation_noise_suppression_and_gain() {
+    let input = music_like(48_000 * 2, 0.05);
+    let (mut chain, _echo) = chain_with(true, true, true);
+    chain.controls().set_low_latency(true);
+    let out = run(&mut chain, &input);
+    assert_eq!(out.len(), input.len());
+    assert!(
+        out.iter().zip(&input).all(|(o, i)| o == i),
+        "low-latency output differs from the input"
+    );
+
+    chain.controls().set_low_latency(false);
+    let out = run(&mut chain, &input);
+    assert!(
+        out.iter().zip(&input).any(|(o, i)| (o - i).abs() > 1e-3),
+        "the stages are back once the mode is off"
+    );
+}
+
 #[test]
 fn input_gain_scales_the_signal_and_clips_at_full_scale() {
     let tone: Vec<f32> = (0..SAMPLE_RATE as usize)

@@ -92,13 +92,18 @@
     "hideDescription": "Sakrij opis kanala"
   },
   "mention": {
-    "list": "Osobe koje možeš spomenuti",
-    "found_one": "Predložena je {{count}} osoba. Koristi strelice, zatim Enter za umetanje.",
-    "found_few": "Predložene su {{count}} osobe. Koristi strelice, zatim Enter za umetanje.",
-    "found_other": "Predloženo je {{count}} osoba. Koristi strelice, zatim Enter za umetanje.",
+    "list": "Prijedlozi spominjanja",
+    "found_one": "Prijedlozi: {{count}}. Koristite strelice, zatim Enter za umetanje.",
+    "found_few": "Prijedlozi: {{count}}. Koristite strelice, zatim Enter za umetanje.",
+    "found_other": "Prijedlozi: {{count}}. Koristite strelice, zatim Enter za umetanje.",
     "none": "Nitko nije pronađen",
     "mentionsYou": "Spominje te",
-    "chipLabel": "{{name}}, spominjanje"
+    "chipLabel": "{{name}}, spominjanje",
+    "groupsHeading": "Spominjanja",
+    "peopleHeading": "Osobe",
+    "channelHint": "Obavijesti sve u {{channel}} ({{count}})",
+    "allHint": "Obavijesti sve koji mogu čitati ovaj kanal ({{count}})",
+    "keys": "↑↓ odaberi · Enter umetni · Esc zatvori"
   },
   "preview": {
     "open": "Otvori u pregledniku",
@@ -252,5 +257,26 @@
     "tooLarge": "Kôd je prevelik za preuzimanje.",
     "fileType": "Datoteka s kôdom",
     "plainText": "Običan tekst"
+  },
+  "mumbleCard": {
+    "addServer": "Dodaj u poslužitelje",
+    "channel": "Kanal {{channel}}",
+    "copy": "Kopiraj poveznicu",
+    "copyLabel": "Kopiraj poveznicu na {{server}}",
+    "figures": "Ping {{ping}} ms · {{users}} od {{max}} korisnika · poslužitelj {{version}}",
+    "goToChannel": "Idi na kanal",
+    "join": "Pridruži se",
+    "joinLabel": "Pridruži se poslužitelju {{server}}",
+    "joined": "Pridruženo",
+    "label": "Kartica poslužitelja {{server}}",
+    "privacyOff": "Vrijednosti poslužitelja su isključene u postavkama",
+    "querying": "Provjera poslužitelja…",
+    "retry": "Provjeri ponovno",
+    "retryLabel": "Provjeri ponovno {{server}}",
+    "server": "{{server}}",
+    "unreachable": "Poslužitelj nije dostupan",
+    "warning_few": "{{count}} poveznice u ovoj poruci prikazuju vjerodajnice",
+    "warning_one": "{{count}} poveznica u ovoj poruci prikazuje vjerodajnice",
+    "warning_other": "{{count}} poveznica u ovoj poruci prikazuje vjerodajnice"
   }
 }

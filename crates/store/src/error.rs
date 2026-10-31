@@ -22,6 +22,14 @@ pub enum Error {
     Pkcs12NoIdentity,
     #[error("identity name must not be empty")]
     EmptyIdentityName,
+    #[error("identity label must be 1 to {max} characters")]
+    InvalidIdentityLabel { max: usize },
+    #[error("identity {0} does not exist")]
+    UnknownIdentity(i64),
+    #[error("this identity is already in the list")]
+    DuplicateIdentity,
+    #[error("Mumcord needs at least one identity")]
+    LastIdentity,
     #[error("certificate error: {0}")]
     Certificate(#[from] rcgen::Error),
     #[error("key generation failed: {0}")]

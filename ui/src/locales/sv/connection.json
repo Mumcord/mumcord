@@ -64,8 +64,7 @@
     "title": "Röstkvalitet",
     "status": "Ping {{latency}}, förlust {{loss}}",
     "lowLatency": "Läge för låg fördröjning",
-    "lowLatencyHint": "Minsta paket och buffertar för att spela musik tillsammans. Mer bandbredd, mindre robust.",
-    "lowLatencyComingSoon": "Kommer snart",
+    "lowLatencyHint": "För att spela musik tillsammans i realtid. Fungerar bäst med push-to-talk.",
     "voiceSettings": "Röstinställningar…",
     "applies": "Gäller direkt, sparas som i Inställningar → Ljud",
     "keys": "Esc stänger · ↑↓ flyttar · ← → justerar",
@@ -78,6 +77,19 @@
     "beta": "Beta",
     "moreInfo": "Mer information: {{topic}}",
     "effectiveShort": "Skickas nu",
-    "effectiveTip": "Bithastigheten som skickas just nu, efter anpassning till paketförlust."
-  }
+    "effectiveTip": "Bithastigheten som skickas just nu, efter anpassning till paketförlust.",
+    "musicIncluded": "Ingår medan läget för låg fördröjning är på: brusreducering och automatisk volym är av, och kodaren körs i sin musikinställning med låg fördröjning.",
+    "warningBandwidth": "Använder mer bandbredd: ≈ {{on}} kbit/s i stället för ≈ {{off}}.",
+    "warningWifi": "Kan hacka på Wi-Fi eller en belastad anslutning.",
+    "warningHeadphones": "Använd hörlurar: ekoreducering är av.",
+    "warningPtt": "Fungerar bäst med push-to-talk.",
+    "bandwidthLowLatencyWithin": "Paket på 10 ms ger extra header-overhead; inom gränsen. Stäng av läget för att spara ≈ {{value}} kbit/s.",
+    "bandwidthLowLatencyOver": "Paket på 10 ms ger extra header-overhead; över gränsen. Stäng av läget för att spara ≈ {{value}} kbit/s.",
+    "bandwidthLowLatencyNoLimit": "Paket på 10 ms ger extra header-overhead. Stäng av läget för att spara ≈ {{value}} kbit/s."
+  },
+  "endToEnd": "Total latens",
+  "endToEndValue": "≈ {{value}} ms (uppskattning)",
+  "lowLatencyMode": "Läge för låg latens",
+  "identity": "Identitet",
+  "identityValue": "{{label}} ({{name}}) · {{fingerprint}}"
 }

@@ -59,6 +59,8 @@ struct Run {
     pulls: Vec<Pull>,
     /// Target delay sampled every pull.
     targets: Vec<u64>,
+    /// Buffered audio sampled every pull.
+    buffered: Vec<u64>,
 }
 
 impl Run {
@@ -94,6 +96,7 @@ fn simulate(jb: &mut JitterBuffer, packets: &[(Option<u64>, &TestPacket)], end_m
         }
         run.pulls.push(jb.pull(&mut frame, now));
         run.targets.push(jb.target_delay_ms());
+        run.buffered.push(jb.buffered_ms());
         now += FRAME_MS;
     }
     run
@@ -283,4 +286,112 @@ fn late_packet_after_a_bridge_counts_the_bridge() {
     let mut jb = JitterBuffer::new().expect("jitter buffer");
     simulate(&mut jb, &schedule, 1_500);
     assert!(jb.stats().concealed_frames >= 1, "{:?}", jb.stats());
+}
+
+/// `count` 10 ms low-delay packets of a 440 Hz tone, as low-latency mode sends them (issue #156).
+fn low_delay_tone_packets(count: usize) -> Vec<TestPacket> {
+    let mut encoder = OpusEncoder::new_low_delay(64_000, PacketDuration::Ms10).expect("encoder");
+    let mut out = [0u8; MAX_PACKET_BYTES];
+    let mut frame = [0.0; FRAME_SAMPLES];
+    let mut packets: Vec<TestPacket> = (0..count as u64)
+        .map(|seq| {
+            for (i, s) in frame.iter_mut().enumerate() {
+                let t = seq as usize * FRAME_SAMPLES + i;
+                *s = 0.4
+                    * (2.0 * std::f32::consts::PI * 440.0 * t as f32 / SAMPLE_RATE as f32).sin();
+            }
+            let len = encoder
+                .push_frame(&frame, &mut out)
+                .expect("encode")
+                .expect("one packet per frame");
+            TestPacket {
+                seq,
+                payload: out[..len].to_vec(),
+                is_last: false,
+            }
+        })
+        .collect();
+    if let Some(last) = packets.last_mut() {
+        last.is_last = true;
+    }
+    packets
+}
+
+#[test]
+fn low_latency_clean_stream_waits_one_10ms_packet() {
+    let packets = low_delay_tone_packets(200);
+    let mut jb = JitterBuffer::new().expect("jitter buffer");
+    jb.set_low_latency(true);
+    let run = simulate(&mut jb, &clean_schedule(&packets, 3), 2_500);
+
+    assert_eq!(run.first_audio_ms(), Some(10));
+    // Before the first packet the buffer assumes 20 ms packets.
+    assert_eq!(run.targets[1..].iter().max(), Some(&10));
+    assert_eq!(run.count(Pull::Concealed), 0);
+    assert_eq!(run.count(Pull::Audio), 200);
+}
+
+#[test]
+fn low_latency_caps_the_target_and_recovers_from_a_stall() {
+    let packets = low_delay_tone_packets(400);
+    // A clean stream with one 80 ms network stall: packets 100–108 all arrive at 1090 ms.
+    let schedule: Vec<_> = packets
+        .iter()
+        .map(|p| {
+            let base = p.seq * FRAME_MS + 3;
+            let arrival = if (100..=108).contains(&p.seq) {
+                1_090
+            } else {
+                base
+            };
+            (Some(arrival), p)
+        })
+        .collect();
+    let mut normal = JitterBuffer::new().expect("jitter buffer");
+    let normal_run = simulate(&mut normal, &schedule, 4_000);
+    let mut low = JitterBuffer::new().expect("jitter buffer");
+    low.set_low_latency(true);
+    let low_run = simulate(&mut low, &schedule, 4_000);
+
+    assert!(
+        normal_run.targets[150] >= 80,
+        "normal mode grows with the stall"
+    );
+    assert!(
+        low_run.targets[1..]
+            .iter()
+            .all(|&t| t <= 10 + LOW_LATENCY_MAX_EXTRA_MS),
+        "low-latency target stays at one packet plus the cap"
+    );
+    // One second after the stall normal mode still plays the music late; low-latency mode has
+    // dropped frames to get back to its target.
+    let (normal_ms, low_ms) = (normal_run.buffered[210], low_run.buffered[210]);
+    assert!(normal_ms >= 60, "normal mode buffers {normal_ms} ms");
+    assert!(low_ms <= 20, "low-latency mode buffers {low_ms} ms");
+    assert!(low.stats().dropped_frames > normal.stats().dropped_frames);
+    // Concealment stays on and the stream keeps playing.
+    assert!(low.stats().concealed_frames > 0);
+    assert!(low_run.count(Pull::Audio) > 350);
+}
+
+#[test]
+fn switching_low_latency_on_applies_to_a_running_stream() {
+    let packets = tone_packets(400, 0);
+    let mut rng = Lcg(3);
+    let schedule: Vec<_> = packets
+        .iter()
+        .map(|p| (Some(p.seq * FRAME_MS + 3 + rng.next(31)), p))
+        .collect();
+    let mut jb = JitterBuffer::new().expect("jitter buffer");
+    let first = simulate(&mut jb, &schedule[..100], 2_000);
+    assert!(first.targets.iter().any(|&t| t > 30));
+    jb.set_low_latency(true);
+    assert!(jb.low_latency());
+    // 20 ms packets from a normal-mode sender: one packet plus the cap.
+    assert_eq!(jb.target_delay_ms(), 20 + LOW_LATENCY_MAX_EXTRA_MS);
+    jb.reset();
+    assert!(
+        jb.low_latency(),
+        "a mode survives handing the buffer to another speaker"
+    );
 }

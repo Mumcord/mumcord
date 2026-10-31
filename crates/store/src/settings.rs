@@ -121,6 +121,10 @@ pub struct SoundSettings {
     pub viewer_started: bool,
     /// Someone stops watching your screen share (FR-2.77).
     pub viewer_stopped: bool,
+    /// The server kicks you (#205).
+    pub kicked: bool,
+    /// The server bans you (#205).
+    pub banned: bool,
 }
 
 impl Default for SoundSettings {
@@ -142,6 +146,8 @@ impl Default for SoundSettings {
             share_stopped: true,
             viewer_started: true,
             viewer_stopped: true,
+            kicked: true,
+            banned: true,
         }
     }
 }
@@ -346,6 +352,10 @@ pub struct Settings {
     /// the server limit (at most 510 kbit/s), the encoder is tuned for music and noise
     /// suppression and automatic gain are bypassed. Off by default.
     pub music_quality: bool,
+    /// "Low-latency mode" (Settings → Audio, issue #156) for playing music together: 10 ms
+    /// low-delay Opus packets, a minimal jitter buffer, small device buffers, and echo
+    /// cancellation, noise suppression and automatic gain bypassed. Off by default.
+    pub low_latency: bool,
     /// Own bitrate cap in kbit/s (Settings → Audio, FR-2.64), independent of `music_quality`;
     /// `None` is "Max": the highest bitrate the server and the packet size allow. Defaults to
     /// 96 kbit/s (lower if the server allows less). Automatic lowering on packet loss works below it.
@@ -463,6 +473,7 @@ impl Default for Settings {
             input_gain_percent: 100,
             output_volume_percent: 100,
             music_quality: false,
+            low_latency: false,
             bitrate_kbps: Some(DEFAULT_BITRATE_KBPS),
             video_ducking: true,
             video_ducking_percent: DEFAULT_VIDEO_DUCKING_PERCENT,
@@ -815,6 +826,18 @@ mod tests {
     }
 
     #[test]
+    fn low_latency_is_off_by_default_and_persists() {
+        let (_dir, store) = temp_store();
+        assert!(!store.settings().expect("load").low_latency);
+        let settings = Settings {
+            low_latency: true,
+            ..Settings::default()
+        };
+        store.save_settings(&settings).expect("save");
+        assert!(store.settings().expect("reload").low_latency);
+    }
+
+    #[test]
     fn gain_and_volume_default_to_unchanged_and_are_clamped_on_load() {
         let (_dir, store) = temp_store();
         let defaults = store.settings().expect("load");
@@ -929,6 +952,10 @@ mod tests {
         assert!(
             parsed.sounds.party_started && parsed.sounds.viewer_stopped,
             "activity sounds are on for older settings"
+        );
+        assert!(
+            parsed.sounds.kicked && parsed.sounds.banned,
+            "kick and ban sounds are on for older settings"
         );
         assert!(parsed.noise_suppression);
         assert!(

@@ -5,6 +5,7 @@ import { axeViolations } from "../../test/axe";
 import { getSelectedConversation, selectConversation, shownServerId } from "../channels";
 import { connectedMock, resetAll } from "../channels/testUtils";
 import { resetChatStore } from "../chat/chatStore";
+import { toggleGroupMentionsMuted } from "../servers/store";
 import { MAX_PREVIEW, plainPreview } from "./preview";
 import { TOAST_MS } from "./Toasts";
 import { NotificationsHost, resetNotifications } from ".";
@@ -277,6 +278,32 @@ describe("mentions", () => {
     await act(() => Promise.resolve());
     expect(within(toastRegion()).queryByRole("button")).toBeNull();
     expect(api.mock.messageSounds()).toEqual([]);
+  });
+
+  it("treats @all as a mention and @channel only in the user's own channel (#70)", async () => {
+    await setup();
+    receive(AFK, "<p>@channel raid in 10</p>");
+    const plain = await within(toastRegion()).findByRole("button", { name: /#AFK/ });
+    expect(plain).toHaveTextContent("Anna: @channel raid in 10");
+    receive(RAID, "<p>@all restart at 22:00</p>");
+    const all = await within(toastRegion()).findByRole("button", { name: /#Raid/ });
+    expect(all).toHaveTextContent("Anna mentioned you: @all restart at 22:00");
+    receive(LOBBY, "<p>@channel heads up</p>");
+    await waitFor(() => {
+      expect([...api.mock.messageSounds()].sort()).toEqual(["mention", "mention", "message"]);
+    });
+  });
+
+  it("ignores @all and @channel on a server where the user turned them off (Q1.6)", async () => {
+    await setup();
+    await act(() => toggleGroupMentionsMuted(1, true));
+    receive(RAID, "<p>@all restart at 22:00</p>");
+    const toast = await within(toastRegion()).findByRole("button", { name: /#Raid/ });
+    expect(toast).toHaveTextContent("Anna: @all restart at 22:00");
+    receive(LOBBY, "<p>hi @zoe</p>");
+    await waitFor(() => {
+      expect([...api.mock.messageSounds()].sort()).toEqual(["mention", "message"]);
+    });
   });
 
   it("does not treat an email address as a mention", async () => {

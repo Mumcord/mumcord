@@ -65,8 +65,7 @@
     "title": "Qualità vocale",
     "status": "Ping {{latency}}, perdita {{loss}}",
     "lowLatency": "Modalità bassa latenza",
-    "lowLatencyHint": "Pacchetti e buffer minimi per suonare insieme. Più banda, meno robusto.",
-    "lowLatencyComingSoon": "Prossimamente",
+    "lowLatencyHint": "Per suonare insieme in tempo reale. Funziona meglio con il push-to-talk.",
     "voiceSettings": "Impostazioni vocali…",
     "applies": "Si applica subito, salvato come in Impostazioni → Audio",
     "keys": "Esc chiude · ↑↓ sposta · ← → regola",
@@ -79,6 +78,19 @@
     "beta": "Beta",
     "moreInfo": "Maggiori informazioni: {{topic}}",
     "effectiveShort": "Invio attuale",
-    "effectiveTip": "Il bitrate inviato in questo momento, dopo l'adattamento alla perdita di pacchetti."
-  }
+    "effectiveTip": "Il bitrate inviato in questo momento, dopo l'adattamento alla perdita di pacchetti.",
+    "musicIncluded": "Incluso mentre la modalità bassa latenza è attiva: la soppressione del rumore e il volume automatico sono disattivati e l'encoder usa la sua impostazione musicale a basso ritardo.",
+    "warningBandwidth": "Usa più banda: ≈ {{on}} kbit/s invece di ≈ {{off}}.",
+    "warningWifi": "Può avere interruzioni con il Wi-Fi o una connessione trafficata.",
+    "warningHeadphones": "Usa le cuffie: la cancellazione dell'eco è disattivata.",
+    "warningPtt": "Funziona meglio con il push-to-talk.",
+    "bandwidthLowLatencyWithin": "I pacchetti da 10 ms aggiungono overhead di intestazione; entro il limite. Disattiva la modalità per risparmiare ≈ {{value}} kbit/s.",
+    "bandwidthLowLatencyOver": "I pacchetti da 10 ms aggiungono overhead di intestazione; oltre il limite. Disattiva la modalità per risparmiare ≈ {{value}} kbit/s.",
+    "bandwidthLowLatencyNoLimit": "I pacchetti da 10 ms aggiungono overhead di intestazione. Disattiva la modalità per risparmiare ≈ {{value}} kbit/s."
+  },
+  "endToEnd": "Latenza end-to-end",
+  "endToEndValue": "≈ {{value}} ms (stima)",
+  "lowLatencyMode": "Modalità a bassa latenza",
+  "identity": "Identità",
+  "identityValue": "{{label}} ({{name}}) · {{fingerprint}}"
 }

@@ -64,8 +64,7 @@
     "title": "Spraakkwaliteit",
     "status": "Ping {{latency}}, verlies {{loss}}",
     "lowLatency": "Modus voor lage latentie",
-    "lowLatencyHint": "Kleinste pakketten en buffers om samen muziek te spelen. Meer bandbreedte, minder robuust.",
-    "lowLatencyComingSoon": "Binnenkort beschikbaar",
+    "lowLatencyHint": "Om samen muziek te spelen in realtime. Werkt het best met push-to-talk.",
     "voiceSettings": "Spraakinstellingen…",
     "applies": "Geldt direct, opgeslagen zoals bij Instellingen → Audio",
     "keys": "Esc sluit · ↑↓ verplaatst · ← → past aan",
@@ -78,6 +77,19 @@
     "beta": "Beta",
     "moreInfo": "Meer informatie: {{topic}}",
     "effectiveShort": "Nu verzonden",
-    "effectiveTip": "De bitrate die nu wordt verzonden, na aanpassing aan pakketverlies."
-  }
+    "effectiveTip": "De bitrate die nu wordt verzonden, na aanpassing aan pakketverlies.",
+    "musicIncluded": "Inbegrepen zolang de modus voor lage latentie aan staat: ruisonderdrukking en automatisch volume staan uit, en de encoder gebruikt zijn muziekinstelling met lage vertraging.",
+    "warningBandwidth": "Gebruikt meer bandbreedte: ≈ {{on}} kbit/s in plaats van ≈ {{off}}.",
+    "warningWifi": "Kan haperen bij wifi of een drukke verbinding.",
+    "warningHeadphones": "Gebruik een koptelefoon: echo-onderdrukking staat uit.",
+    "warningPtt": "Werkt het best met push-to-talk.",
+    "bandwidthLowLatencyWithin": "Pakketten van 10 ms geven extra header-overhead; binnen de limiet. Zet de modus uit om ≈ {{value}} kbit/s te besparen.",
+    "bandwidthLowLatencyOver": "Pakketten van 10 ms geven extra header-overhead; boven de limiet. Zet de modus uit om ≈ {{value}} kbit/s te besparen.",
+    "bandwidthLowLatencyNoLimit": "Pakketten van 10 ms geven extra header-overhead. Zet de modus uit om ≈ {{value}} kbit/s te besparen."
+  },
+  "endToEnd": "Totale latentie",
+  "endToEndValue": "≈ {{value}} ms (schatting)",
+  "lowLatencyMode": "Modus voor lage latentie",
+  "identity": "Identiteit",
+  "identityValue": "{{label}} ({{name}}) · {{fingerprint}}"
 }

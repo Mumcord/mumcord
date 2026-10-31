@@ -19,14 +19,18 @@ export interface SettingEntry {
 
 /** Static index of the settings screen; keep it in step with the section components. */
 export const SETTINGS_INDEX: readonly SettingEntry[] = [
-  { section: "identity", group: "identity.current", terms: ["identity.explanation"] },
   {
     section: "identity",
-    group: "identity.backup",
-    control: "identity.export",
-    terms: ["identity.exportHint"],
+    group: "identity.listTitle",
+    terms: ["identity.intro", "identity.backupWarning"],
   },
-  { section: "identity", group: "identity.backup", control: "identity.import" },
+  { section: "identity", group: "identity.listTitle", control: "identity.new" },
+  {
+    section: "identity",
+    group: "identity.listTitle",
+    control: "identity.import",
+    terms: ["identity.importTitle"],
+  },
   {
     section: "identity",
     group: "profile.title",
@@ -63,6 +67,19 @@ export const SETTINGS_INDEX: readonly SettingEntry[] = [
     group: "audio.quality",
     control: "audio.musicQuality",
     terms: ["audio.musicQualityHint"],
+  },
+  {
+    section: "audio",
+    group: "audio.quality",
+    control: "audio.lowLatency",
+    terms: [
+      "audio.lowLatencyHint",
+      "audio.lowLatencyWarningTitle",
+      "audio.lowLatencyBandwidth",
+      "audio.lowLatencyWifi",
+      "audio.lowLatencyHeadphones",
+      "audio.lowLatencyPtt",
+    ],
   },
   {
     section: "audio",
@@ -250,6 +267,8 @@ export const SETTINGS_INDEX: readonly SettingEntry[] = [
   { section: "sounds", control: "sounds.shareStopped" },
   { section: "sounds", control: "sounds.viewerStarted" },
   { section: "sounds", control: "sounds.viewerStopped" },
+  { section: "sounds", control: "sounds.kicked" },
+  { section: "sounds", control: "sounds.banned" },
   {
     section: "sounds",
     group: "notifications.title",

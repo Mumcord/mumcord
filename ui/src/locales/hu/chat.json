@@ -89,12 +89,17 @@
     "hideDescription": "Csatornaleírás elrejtése"
   },
   "mention": {
-    "list": "Megemlíthető személyek",
-    "found_one": "{{count}} javasolt személy. Használd a nyílbillentyűket, majd az Entert a beszúráshoz.",
-    "found_other": "{{count}} javasolt személy. Használd a nyílbillentyűket, majd az Entert a beszúráshoz.",
+    "list": "Említési javaslatok",
+    "found_one": "Javaslatok: {{count}}. Válassz a nyilakkal, majd az Enterrel szúrd be.",
+    "found_other": "Javaslatok: {{count}}. Válassz a nyilakkal, majd az Enterrel szúrd be.",
     "none": "Nincs találat",
     "mentionsYou": "Megemlít téged",
-    "chipLabel": "{{name}}, említés"
+    "chipLabel": "{{name}}, említés",
+    "groupsHeading": "Említések",
+    "peopleHeading": "Személyek",
+    "channelHint": "Mindenki értesítése itt: {{channel}} ({{count}})",
+    "allHint": "Mindenki értesítése, aki olvashatja ezt a csatornát ({{count}})",
+    "keys": "↑↓ választás · Enter beszúrás · Esc bezárás"
   },
   "preview": {
     "open": "Megnyitás böngészőben",
@@ -248,5 +253,25 @@
     "tooLarge": "A kód túl nagy a letöltéshez.",
     "fileType": "Kódfájl",
     "plainText": "Egyszerű szöveg"
+  },
+  "mumbleCard": {
+    "addServer": "Hozzáadás a kiszolgálókhoz",
+    "channel": "Csatorna: {{channel}}",
+    "copy": "Link másolása",
+    "copyLabel": "Link másolása: {{server}}",
+    "figures": "Ping {{ping}} ms · {{users}}/{{max}} felhasználó · kiszolgáló {{version}}",
+    "goToChannel": "Ugrás a csatornához",
+    "join": "Csatlakozás",
+    "joinLabel": "Csatlakozás: {{server}}",
+    "joined": "Csatlakoztál",
+    "label": "Kiszolgálókártya: {{server}}",
+    "privacyOff": "A kiszolgáló értékei ki vannak kapcsolva a beállításokban",
+    "querying": "Kiszolgáló ellenőrzése…",
+    "retry": "Ellenőrizd újra",
+    "retryLabel": "Ellenőrizd újra {{server}}",
+    "server": "{{server}}",
+    "unreachable": "A kiszolgáló nem érhető el",
+    "warning_one": "{{count}} link az üzenetben megjeleníti a hitelesítési adatokat",
+    "warning_other": "{{count}} link az üzenetben megjeleníti a hitelesítési adatokat"
   }
 }

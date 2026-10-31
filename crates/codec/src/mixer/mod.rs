@@ -14,8 +14,8 @@ pub mod share;
 mod tests;
 
 pub use playback::{
-    FrameTime, PacketSender, Playback, PlaybackConfig, PlaybackError, PlaybackPorts, PlaybackSink,
-    PlaybackStats, ThreadStart, downmix,
+    FrameTime, LOW_LATENCY_QUEUE_MS, PacketSender, Playback, PlaybackConfig, PlaybackError,
+    PlaybackPorts, PlaybackSink, PlaybackStats, ThreadStart, downmix,
 };
 
 use std::sync::Arc;
@@ -238,6 +238,13 @@ impl Mixer {
     /// (default on: followed channels are muted locally, FR-1.31).
     pub fn set_discard_listener_audio(&mut self, discard: bool) {
         self.discard_listener_audio = discard;
+    }
+
+    /// Low-latency mode (issue #156) for every speaker's jitter buffer, current and future.
+    pub fn set_low_latency(&mut self, on: bool) {
+        for speaker in &mut self.speakers {
+            speaker.jitter.set_low_latency(on);
+        }
     }
 
     /// The listener voices are placed around (positional audio).

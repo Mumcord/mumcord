@@ -65,8 +65,8 @@ export function IdentityStep({ identity, focusOnMount, onDone }: IdentityStepPro
     try {
       const created =
         mode === "create"
-          ? await getApi().identityCreate(name.trim())
-          : await getApi().identityImport(path ?? "", password === "" ? null : password);
+          ? await getApi().identityCreate(name.trim(), null)
+          : await getApi().identityImport(path ?? "", password === "" ? null : password, null);
       onDone(created);
     } catch (cause: unknown) {
       setBusy(false);
