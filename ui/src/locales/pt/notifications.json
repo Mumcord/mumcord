@@ -64,6 +64,7 @@
     "open": "Abrir",
     "dismiss": "Dispensar",
     "dismissItem": "Dispensar: {{title}}",
-    "failed": "Não funcionou. Tenta novamente."
+    "failed": "Não funcionou. Tenta novamente.",
+    "block": "Bloquear"
   }
 }

@@ -64,6 +64,7 @@
     "open": "Deschide",
     "dismiss": "Închide",
     "dismissItem": "Închide: {{title}}",
-    "failed": "Nu a funcționat. Încearcă din nou."
+    "failed": "Nu a funcționat. Încearcă din nou.",
+    "block": "Blochează"
   }
 }

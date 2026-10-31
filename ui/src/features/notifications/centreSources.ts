@@ -5,6 +5,7 @@
  * store directly (see `centreModel`).
  */
 import type { ChatMessage, MumcordApi, Unsubscribe, WatchParty } from "../../api";
+import { isBlocked } from "../blocking/blockedStore";
 import { getServerStateOf, selfUser } from "../channels";
 import { extractCards } from "../chat/cards";
 import { isGroupMention, isMention, isReplyMention } from "../chat/ownMention";
@@ -37,6 +38,8 @@ function timeOf(message: ChatMessage): number {
  */
 export function recordIncoming(message: ChatMessage, serverId: number, onScreen: boolean): void {
   if (message.own) return;
+  // Nothing from people the user blocked (issue #140), not even mentions.
+  if (isBlocked(serverId, message.senderCertHash, message.senderName)) return;
   const base = {
     id: messageItemId(message.id),
     serverId,
@@ -45,6 +48,7 @@ export function recordIncoming(message: ChatMessage, serverId: number, onScreen:
     conversation: message.conversation,
     messageId: message.id,
     sender: message.senderName,
+    senderCertHash: message.senderCertHash,
   };
   if (isReplyMention(message, serverId)) {
     addItem({ ...base, kind: "reply", excerpt: capped(messageText(message)) });
@@ -69,9 +73,13 @@ export function recordIncoming(message: ChatMessage, serverId: number, onScreen:
   }
 }
 
-function nameOf(serverId: number, session: number | undefined): string {
-  if (session === undefined) return "";
-  return getServerStateOf(serverId).users.get(session)?.name ?? "";
+/** Name and certificate of a person in the server, for invites they started. */
+function senderOf(
+  serverId: number,
+  session: number | undefined,
+): { sender: string; senderCertHash: string | null } {
+  const user = session === undefined ? undefined : getServerStateOf(serverId).users.get(session);
+  return { sender: user?.name ?? "", senderCertHash: user?.certHash ?? null };
 }
 
 /**
@@ -97,6 +105,8 @@ export function bindCentreSources(api: MumcordApi): Unsubscribe {
     parties.add(serverId);
     const state = getServerStateOf(serverId);
     if (selfUser(state)?.channelId !== party.channelId || hasItem(id)) return;
+    const from = senderOf(serverId, party.participants[0]);
+    if (isBlocked(serverId, from.senderCertHash, from.sender)) return;
     addItem({
       kind: "invite",
       invite: "watchParty",
@@ -104,7 +114,7 @@ export function bindCentreSources(api: MumcordApi): Unsubscribe {
       serverId,
       at: Date.now(),
       read: false,
-      sender: nameOf(serverId, party.participants[0]),
+      ...from,
       channelId: party.channelId,
     });
   }
@@ -116,6 +126,8 @@ export function bindCentreSources(api: MumcordApi): Unsubscribe {
     const self = getServerStateOf(serverId).selfSession;
     for (const session of now) {
       if (before.has(session) || session === self) continue;
+      const from = senderOf(serverId, session);
+      if (isBlocked(serverId, from.senderCertHash, from.sender)) continue;
       addItem({
         kind: "invite",
         invite: "screenShare",
@@ -123,7 +135,7 @@ export function bindCentreSources(api: MumcordApi): Unsubscribe {
         serverId,
         at: Date.now(),
         read: false,
-        sender: nameOf(serverId, session),
+        ...from,
         session,
       });
     }

@@ -60,6 +60,7 @@
     "open": "Öppna",
     "dismiss": "Avfärda",
     "dismissItem": "Avfärda: {{title}}",
-    "failed": "Det fungerade inte. Försök igen."
+    "failed": "Det fungerade inte. Försök igen.",
+    "block": "Blockera"
   }
 }

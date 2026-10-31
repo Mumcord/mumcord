@@ -313,7 +313,6 @@
     "requestMetaMessages": "{{server}} · hat dir Nachrichten gesendet · {{time}}",
     "quote": "„{{text}}“",
     "block": "Blockieren",
-    "blockLater": "Blockieren ist noch nicht verfügbar.",
     "showMore_one": "{{count}} weitere Anfrage anzeigen",
     "showMore_other": "{{count}} weitere Anfragen anzeigen",
     "showFewer": "Weniger Anfragen anzeigen",

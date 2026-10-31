@@ -313,7 +313,6 @@
     "requestMetaMessages": "{{server}} · heeft je berichten gestuurd · {{time}}",
     "quote": "„{{text}}”",
     "block": "Blokkeren",
-    "blockLater": "Blokkeren is nog niet beschikbaar.",
     "showMore_one": "Nog {{count}} verzoek tonen",
     "showMore_other": "Nog {{count}} verzoeken tonen",
     "showFewer": "Minder verzoeken tonen",

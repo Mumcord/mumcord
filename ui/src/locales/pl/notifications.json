@@ -68,6 +68,7 @@
     "open": "Otwórz",
     "dismiss": "Zamknij",
     "dismissItem": "Zamknij: {{title}}",
-    "failed": "Nie udało się. Spróbuj ponownie."
+    "failed": "Nie udało się. Spróbuj ponownie.",
+    "block": "Zablokuj"
   }
 }

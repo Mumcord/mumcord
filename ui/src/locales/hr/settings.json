@@ -715,5 +715,22 @@
     "revoke": "Opozovi",
     "revokeLabel": "Opozovi prihvaćeni razgovor s korisnikom {{name}}",
     "revokeFailed": "Opoziv nije uspio. Pokušaj ponovno."
+  },
+  "blocked": {
+    "title": "Blokirani korisnici",
+    "hint": "Blokade se čuvaju samo na ovom računalu. Blokirani korisnici su za tebe utišani, a njihove poruke i Mumcord podaci se ignoriraju.",
+    "empty": "Nisi blokirao nikoga.",
+    "user": "Korisnik",
+    "server": "Poslužitelj",
+    "since": "Blokiran od",
+    "actions": "Radnje",
+    "unblock": "Odblokiraj",
+    "unblockLabel": "Odblokiraj korisnika {{name}}",
+    "unblockFailed": "Odblokiranje nije uspjelo. Pokušaj ponovno.",
+    "messagesTitle": "Blokirane poruke u chatu kanala",
+    "collapse": "Sažmi ih",
+    "collapseHint": "Prikazuje „Poruka blokiranog korisnika“ s gumbom Prikaži.",
+    "hide": "Potpuno ih sakrij",
+    "hideHint": "U chatu se ništa ne prikazuje."
   }
 }

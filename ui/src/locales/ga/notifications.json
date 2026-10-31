@@ -72,6 +72,7 @@
     "open": "Oscail",
     "dismiss": "Cuir ar leataobh",
     "dismissItem": "Cuir ar leataobh: {{title}}",
-    "failed": "Níor oibrigh sé sin. Bain triail eile as."
+    "failed": "Níor oibrigh sé sin. Bain triail eile as.",
+    "block": "Bac"
   }
 }

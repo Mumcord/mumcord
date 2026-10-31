@@ -313,7 +313,6 @@
     "requestMetaMessages": "{{server}} · har sendt dig beskeder · {{time}}",
     "quote": "»{{text}}«",
     "block": "Bloker",
-    "blockLater": "Blokering er ikke tilgængelig endnu.",
     "showMore_one": "Vis {{count}} anmodning mere",
     "showMore_other": "Vis {{count}} anmodninger mere",
     "showFewer": "Vis færre anmodninger",

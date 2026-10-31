@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import type { TFunction } from "i18next";
 import { toEngineError } from "../../api";
 import { getServerStateOf, useServerStateOf } from "../channels";
+import { BlockIcon, blockTargetFor, openBlockDialog } from "../blocking";
 import { Avatar } from "../members/Avatar";
 import { openPrivateConversation } from "../members/privateMessage";
 import { acceptRequest, declineRequest } from "../requests/requestsStore";
@@ -128,7 +129,26 @@ function RequestActions({ item }: { item: RequestItem }) {
       >
         {t("centre.decline")}
       </button>
-      {/* The Block button (#140) goes here, after Decline. */}
+      <button
+        type="button"
+        className="button centre-entry__action centre-entry__block"
+        disabled={busy}
+        data-testid="centre-block"
+        onClick={(event) => {
+          // Sessions are reused: only the sender still here is blocked by session.
+          const target = blockTargetFor(
+            serverId,
+            request.name,
+            request.certHash,
+            sender?.session ?? null,
+            event.currentTarget,
+          );
+          if (target) openBlockDialog(target);
+        }}
+      >
+        <BlockIcon />
+        {t("centre.block")}
+      </button>
       {failed && (
         <span className="centre-entry__error" role="alert">
           {t("centre.failed")}

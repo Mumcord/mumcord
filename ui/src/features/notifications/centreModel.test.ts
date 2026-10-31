@@ -134,3 +134,15 @@ describe("notification centre model", () => {
     expect(prune(fresh, NOW)).toBe(fresh);
   });
 });
+
+describe("blocked people (#140)", () => {
+  it("leaves out stored entries and requests of blocked senders", () => {
+    const requests = new Map<number, PmRequests>([
+      [1, { incoming: [request(7, "2026-10-31T11:00:00Z")], sent: [] }],
+    ]);
+    const blocked = (_serverId: number, _certHash: string | null, name: string) =>
+      name === "Anna" || name === requests.get(1)?.incoming[0]?.name;
+    const items = buildItems(state([mention("m", NOW), reply]), requests, blocked);
+    expect(items.map((item) => item.id)).toEqual(["r"]);
+  });
+});

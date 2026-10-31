@@ -4,6 +4,7 @@ import { useServers as useConnectedServers } from "../channels";
 import { person } from "../follow/directEntries";
 import { useFollowStates } from "../follow/followStore";
 import { useFriends } from "../friends";
+import { useIsBlocked } from "../blocking";
 import { displayName } from "../servers/format";
 import { useServers as useSavedServers } from "../servers/store";
 import { useConversationsState } from "./conversationsStore";
@@ -25,7 +26,7 @@ export function useNow(): number {
   return now;
 }
 
-/** Every private conversation of every connected server, as overview rows. */
+/** Every private conversation of every connected server except blocked people's, as rows. */
 export function useOverviewRows(): Row[] {
   const { t } = useTranslation("chat");
   const follow = useFollowStates();
@@ -34,6 +35,7 @@ export function useOverviewRows(): Row[] {
   const friends = useFriends();
   const { last, prefs } = useConversationsState();
   const now = useNow();
+  const isBlocked = useIsBlocked();
 
   return useMemo(() => {
     const chats: OpenChat[] = [];
@@ -47,7 +49,7 @@ export function useOverviewRows(): Row[] {
         });
       }
     }
-    return buildRows({
+    const rows = buildRows({
       chats,
       last,
       prefs,
@@ -63,5 +65,7 @@ export function useOverviewRows(): Row[] {
       unknownName: t("overview.unknown"),
       now,
     });
-  }, [follow, connected, servers, friends, last, prefs, now, t]);
+    // Conversations with blocked people are not shown (issue #140); unblocking brings them back.
+    return rows.filter((row) => !isBlocked(row.serverId, row.certHash, row.name));
+  }, [follow, connected, servers, friends, last, prefs, now, t, isBlocked]);
 }

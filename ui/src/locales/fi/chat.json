@@ -313,7 +313,6 @@
     "requestMetaMessages": "{{server}} · lähetti sinulle viestejä · {{time}}",
     "quote": "”{{text}}”",
     "block": "Estä",
-    "blockLater": "Estäminen ei ole vielä käytettävissä.",
     "showMore_one": "Näytä {{count}} pyyntö lisää",
     "showMore_other": "Näytä {{count}} pyyntöä lisää",
     "showFewer": "Näytä vähemmän pyyntöjä",

@@ -60,6 +60,7 @@
     "open": "Åbn",
     "dismiss": "Luk",
     "dismissItem": "Luk: {{title}}",
-    "failed": "Det virkede ikke. Prøv igen."
+    "failed": "Det virkede ikke. Prøv igen.",
+    "block": "Bloker"
   }
 }

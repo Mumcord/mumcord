@@ -116,5 +116,28 @@
     "message": "{{name}} terá de enviar um novo pedido de mensagem antes de as mensagens voltarem a chegar-te. O teu histórico de chat mantém-se.",
     "confirm": "Revogar",
     "failed": "Não foi possível revogar o consentimento de chat. Tenta novamente."
+  },
+  "block": {
+    "menu": "Bloquear…",
+    "unblock": "Desbloquear",
+    "title": "Bloquear {{name}}?",
+    "onServer": "em {{server}}",
+    "whatHappens": "O que acontece",
+    "private": "As mensagens privadas de {{name}} não são mostradas e não te notificam.",
+    "channelCollapsed": "As mensagens de canal de {{name}} estão recolhidas. Podes continuar a abri-las.",
+    "channelHidden": "As mensagens de canal de {{name}} estão ocultas.",
+    "voice": "{{name}} está silenciado para ti na voz, incluindo sussurros.",
+    "data": "Sem sincronização do histórico, convites ou outros dados do Mumcord de {{name}}.",
+    "followsCert": "O bloqueio segue o certificado de {{name}}, por isso um nome novo não o contorna.",
+    "nameOnly": "{{name}} não tem certificado, por isso o bloqueio aplica-se apenas a este nome em {{server}}.",
+    "warning": "{{name}} ainda pode ver-te e ler as tuas mensagens. O Mumble não tem forma de impedir isso só do teu lado. {{name}} não é avisado do bloqueio.",
+    "cancel": "Cancelar",
+    "confirm": "Bloquear {{name}}",
+    "done": "{{name}} está bloqueado.",
+    "failed": "Não foi possível bloquear {{name}}. Tenta novamente.",
+    "badge": "Bloqueado",
+    "collapsed": "Mensagem de um utilizador bloqueado",
+    "show": "Mostrar",
+    "showLabel": "Mostrar mensagem de um utilizador bloqueado"
   }
 }

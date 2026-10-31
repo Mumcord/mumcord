@@ -68,6 +68,7 @@
     "open": "Otvoriť",
     "dismiss": "Zavrieť",
     "dismissItem": "Zavrieť: {{title}}",
-    "failed": "Nepodarilo sa. Skús to znova."
+    "failed": "Nepodarilo sa. Skús to znova.",
+    "block": "Blokovať"
   }
 }

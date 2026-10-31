@@ -334,7 +334,6 @@
     "requestMetaMessages": "{{server}} · chuir sé teachtaireachtaí chugat · {{time}}",
     "quote": "“{{text}}”",
     "block": "Bac",
-    "blockLater": "Níl bacadh ar fáil go fóill.",
     "showMore_one": "Taispeáin {{count}} iarratas eile",
     "showMore_two": "Taispeáin {{count}} iarratas eile",
     "showMore_few": "Taispeáin {{count}} iarratas eile",

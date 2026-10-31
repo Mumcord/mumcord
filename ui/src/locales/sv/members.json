@@ -112,5 +112,28 @@
     "message": "{{name}} måste skicka en ny meddelandeförfrågan innan meddelandena når dig igen. Din chatthistorik finns kvar.",
     "confirm": "Återkalla",
     "failed": "Det gick inte att återkalla chattsamtycket. Försök igen."
+  },
+  "block": {
+    "menu": "Blockera…",
+    "unblock": "Avblockera",
+    "title": "Blockera {{name}}?",
+    "onServer": "på {{server}}",
+    "whatHappens": "Vad som händer",
+    "private": "Privata meddelanden från {{name}} visas inte och aviserar dig inte.",
+    "channelCollapsed": "{{name}}s kanalmeddelanden är hopfällda. Du kan fortfarande öppna dem.",
+    "channelHidden": "{{name}}s kanalmeddelanden är dolda.",
+    "voice": "{{name}} är ljudavstängd för dig i tal, även viskningar.",
+    "data": "Ingen historiksynkronisering, inbjudningar eller andra Mumcord-data från {{name}}.",
+    "followsCert": "Blockeringen följer {{name}}s certifikat, så ett nytt namn kringgår den inte.",
+    "nameOnly": "{{name}} har inget certifikat, så blockeringen gäller bara det här namnet på {{server}}.",
+    "warning": "{{name}} kan fortfarande se dig och läsa dina meddelanden. Mumble har inget sätt att stoppa det bara på din sida. {{name}} får inte veta om blockeringen.",
+    "cancel": "Avbryt",
+    "confirm": "Blockera {{name}}",
+    "done": "{{name}} är blockerad.",
+    "failed": "Det gick inte att blockera {{name}}. Försök igen.",
+    "badge": "Blockerad",
+    "collapsed": "Meddelande från en blockerad användare",
+    "show": "Visa",
+    "showLabel": "Visa meddelande från en blockerad användare"
   }
 }

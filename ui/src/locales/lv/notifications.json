@@ -64,6 +64,7 @@
     "open": "Atvērt",
     "dismiss": "Aizvērt",
     "dismissItem": "Aizvērt: {{title}}",
-    "failed": "Neizdevās. Mēģini vēlreiz."
+    "failed": "Neizdevās. Mēģini vēlreiz.",
+    "block": "Bloķēt"
   }
 }

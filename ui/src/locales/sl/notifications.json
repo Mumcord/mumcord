@@ -68,6 +68,7 @@
     "open": "Odpri",
     "dismiss": "Opusti",
     "dismissItem": "Opusti: {{title}}",
-    "failed": "To ni uspelo. Poskusi znova."
+    "failed": "To ni uspelo. Poskusi znova.",
+    "block": "Blokiraj"
   }
 }

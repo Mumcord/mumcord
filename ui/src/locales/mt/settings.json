@@ -721,5 +721,22 @@
     "revoke": "Irrevoka",
     "revokeLabel": "Irrevoka l-konversazzjoni aċċettata ma' {{name}}",
     "revokeFailed": "L-irrevokar falla. Erġa' pprova."
+  },
+  "blocked": {
+    "title": "Utenti mblokkati",
+    "hint": "Il-blokki jinżammu fuq dan il-kompjuter biss. L-utenti mblokkati huma mutjati għalik u l-messaġġi u d-data ta' Mumcord tagħhom jiġu injorati.",
+    "empty": "Ma blokkajt lil ħadd.",
+    "user": "Utent",
+    "server": "Server",
+    "since": "Imblokkat minn",
+    "actions": "Azzjonijiet",
+    "unblock": "Neħħi l-blokk",
+    "unblockLabel": "Neħħi l-blokk ta' {{name}}",
+    "unblockFailed": "It-tneħħija tal-blokk falliet. Erġa' pprova.",
+    "messagesTitle": "Messaġġi mblokkati fiċ-chat tal-kanal",
+    "collapse": "Itwi huma",
+    "collapseHint": "Juri “Messaġġ minn utent imblokkat” b'buttuna Uri.",
+    "hide": "Aħbihom għalkollox",
+    "hideHint": "Xejn ma jintwera fiċ-chat."
   }
 }

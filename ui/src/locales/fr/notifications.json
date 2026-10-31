@@ -64,6 +64,7 @@
     "open": "Ouvrir",
     "dismiss": "Ignorer",
     "dismissItem": "Ignorer : {{title}}",
-    "failed": "Cela n’a pas fonctionné. Veuillez réessayer."
+    "failed": "Cela n’a pas fonctionné. Veuillez réessayer.",
+    "block": "Bloquer"
   }
 }

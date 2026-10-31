@@ -120,5 +120,28 @@
     "message": "{{name}} bude musieť znova poslať žiadosť o správu, kým sa k tebe jeho správy dostanú. História četu zostane.",
     "confirm": "Odvolať",
     "failed": "Odvolanie súhlasu s četom sa nepodarilo. Skús to znova."
+  },
+  "block": {
+    "menu": "Blokovať…",
+    "unblock": "Odblokovať",
+    "title": "Blokovať používateľa {{name}}?",
+    "onServer": "na serveri {{server}}",
+    "whatHappens": "Čo sa stane",
+    "private": "Súkromné správy od používateľa {{name}} sa nezobrazujú a neupozorňujú ťa.",
+    "channelCollapsed": "Správy používateľa {{name}} v kanáli sú zbalené. Stále ich môžeš otvoriť.",
+    "channelHidden": "Správy používateľa {{name}} v kanáli sú skryté.",
+    "voice": "Používateľ {{name}} je pre teba v hlasovom chate stlmený, vrátane šepkania.",
+    "data": "Žiadna synchronizácia histórie, pozvánky ani iné dáta z Mumcordu od používateľa {{name}}.",
+    "followsCert": "Blokovanie sa riadi certifikátom používateľa {{name}}, takže zmena mena ho neobíde.",
+    "nameOnly": "Používateľ {{name}} nemá certifikát, takže sa blokovanie vzťahuje iba na toto meno na serveri {{server}}.",
+    "warning": "Používateľ {{name}} ťa stále vidí a môže čítať tvoje správy. Mumble to nedokáže zastaviť iba na tvojej strane. Používateľ {{name}} sa o blokovaní nedozvie.",
+    "cancel": "Zrušiť",
+    "confirm": "Blokovať používateľa {{name}}",
+    "done": "Používateľ {{name}} je zablokovaný.",
+    "failed": "Blokovanie používateľa {{name}} zlyhalo. Skús to znova.",
+    "badge": "Zablokovaný",
+    "collapsed": "Správa od zablokovaného používateľa",
+    "show": "Zobraziť",
+    "showLabel": "Zobraziť správu od zablokovaného používateľa"
   }
 }

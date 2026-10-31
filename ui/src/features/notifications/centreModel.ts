@@ -31,6 +31,8 @@ interface MessageRef {
   messageId: string;
   /** Name the sender wrote under; untrusted plain text. */
   sender: string;
+  /** The sender's certificate, so blocking them (issue #140) removes the entry. */
+  senderCertHash?: string | null;
   /** Plain-text excerpt; untrusted. */
   excerpt: string;
 }
@@ -56,6 +58,7 @@ export type WatchPartyInviteItem = Base & {
   kind: "invite";
   invite: "watchParty";
   sender: string;
+  senderCertHash?: string | null;
   channelId: number;
 };
 
@@ -64,6 +67,7 @@ export type ScreenShareInviteItem = Base & {
   kind: "invite";
   invite: "screenShare";
   sender: string;
+  senderCertHash?: string | null;
   session: number;
 };
 
@@ -129,16 +133,30 @@ export function hasMessage(item: CentreItem): item is MentionItem | ReplyItem | 
   return "messageId" in item;
 }
 
-/** Stored entries and the open requests of every server, newest first. */
+/** Whether the user blocked this person on that server (issue #140). */
+export type BlockCheck = (serverId: number, certHash: string | null, name: string) => boolean;
+
+const NOBODY_BLOCKED: BlockCheck = () => false;
+
+/**
+ * Stored entries and the open requests of every server, newest first. Entries from people the user
+ * blocked are left out, also those that arrived before the block.
+ */
 export function buildItems(
   state: CentreState,
   requests: ReadonlyMap<number, PmRequests>,
+  isBlocked: BlockCheck = NOBODY_BLOCKED,
 ): CentreItem[] {
-  const all: CentreItem[] = [...state.items];
+  const all: CentreItem[] = state.items.filter(
+    (item) =>
+      item.kind === "connection" ||
+      !isBlocked(item.serverId, item.senderCertHash ?? null, item.sender),
+  );
   for (const [serverId, { incoming }] of requests) {
     for (const request of incoming) {
       const id = requestItemId(serverId, request.id);
       if (state.dismissedRequests.has(id)) continue;
+      if (isBlocked(serverId, request.certHash, request.name)) continue;
       const at = Date.parse(request.receivedAt);
       all.push({
         kind: "request",

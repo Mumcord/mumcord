@@ -64,6 +64,7 @@
     "open": "Abrir",
     "dismiss": "Descartar",
     "dismissItem": "Descartar: {{title}}",
-    "failed": "No ha funcionado. Inténtalo de nuevo."
+    "failed": "No ha funcionado. Inténtalo de nuevo.",
+    "block": "Bloquear"
   }
 }

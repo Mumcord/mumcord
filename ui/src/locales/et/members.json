@@ -112,5 +112,28 @@
     "message": "{{name}} peab saatma uue sõnumitaotluse, enne kui tema sõnumid sinuni jõuavad. Vestluse ajalugu jääb alles.",
     "confirm": "Võta tagasi",
     "failed": "Vestlusnõusoleku tagasivõtmine ebaõnnestus. Proovi uuesti."
+  },
+  "block": {
+    "menu": "Blokeeri…",
+    "unblock": "Eemalda blokeering",
+    "title": "Kas blokeerida {{name}}?",
+    "onServer": "serveris {{server}}",
+    "whatHappens": "Mis juhtub",
+    "private": "Kasutaja {{name}} privaatsõnumeid ei näidata ja need ei anna sulle märguannet.",
+    "channelCollapsed": "Kasutaja {{name}} kanalisõnumid on kokku volditud. Saad neid ikka avada.",
+    "channelHidden": "Kasutaja {{name}} kanalisõnumid on peidetud.",
+    "voice": "{{name}} on sinu jaoks häälvestluses vaigistatud, sealhulgas sosistamine.",
+    "data": "Kasutajalt {{name}} ei tule ajaloo sünkroonimist, kutseid ega muid Mumcordi andmeid.",
+    "followsCert": "Blokeering järgib kasutaja {{name}} sertifikaati, nii et uus nimi seda ei kõrvalda.",
+    "nameOnly": "Kasutajal {{name}} pole sertifikaati, seega kehtib blokeering ainult sellele nimele serveris {{server}}.",
+    "warning": "{{name}} näeb sind endiselt ja saab sinu sõnumeid lugeda. Mumble ei võimalda seda takistada ainult sinu poolel. {{name}} ei saa blokeeringust teada.",
+    "cancel": "Tühista",
+    "confirm": "Blokeeri {{name}}",
+    "done": "{{name}} on blokeeritud.",
+    "failed": "Kasutaja {{name}} blokeerimine ebaõnnestus. Proovi uuesti.",
+    "badge": "Blokeeritud",
+    "collapsed": "Sõnum blokeeritud kasutajalt",
+    "show": "Näita",
+    "showLabel": "Näita blokeeritud kasutaja sõnumit"
   }
 }

@@ -12,6 +12,7 @@ import {
   sameConversation,
 } from "../channels";
 import { conversationKey, isMention } from "../chat";
+import { isBlocked } from "../blocking/blockedStore";
 import { recordIncoming } from "./centreSources";
 import { bumpCount, markMention, markSeen, noticeKey, showToast } from "./notificationStore";
 import { hasImage, plainPreview } from "./preview";
@@ -82,6 +83,9 @@ export async function handleIncoming(
   context: IncomingContext,
 ): Promise<void> {
   if (message.own) return;
+  // Blocked users (issue #140): no sound, toast, mention or centre entry. The engine already
+  // drops their private messages; channel messages still arrive for the chat to collapse.
+  if (isBlocked(serverId, message.senderCertHash, message.senderName)) return;
   const { conversation } = message;
   const onScreen = isOnScreen(serverId, conversation, context.overlayOpen);
   if (context.muted(serverId, conversation)) return;

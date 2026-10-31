@@ -712,5 +712,22 @@
     "revoke": "Intrekken",
     "revokeLabel": "Het geaccepteerde gesprek met {{name}} intrekken",
     "revokeFailed": "Intrekken mislukt. Probeer het opnieuw."
+  },
+  "blocked": {
+    "title": "Geblokkeerde gebruikers",
+    "hint": "Blokkades worden alleen op deze computer bewaard. Geblokkeerde gebruikers zijn voor jou gedempt en hun berichten en Mumcord-gegevens worden genegeerd.",
+    "empty": "Je hebt niemand geblokkeerd.",
+    "user": "Gebruiker",
+    "server": "Server",
+    "since": "Geblokkeerd sinds",
+    "actions": "Acties",
+    "unblock": "Deblokkeren",
+    "unblockLabel": "{{name}} deblokkeren",
+    "unblockFailed": "Deblokkeren is mislukt. Probeer het opnieuw.",
+    "messagesTitle": "Geblokkeerde berichten in de kanaalchat",
+    "collapse": "Inklappen",
+    "collapseHint": "Toont ‘Bericht van een geblokkeerde gebruiker’ met een knop ‘Tonen’.",
+    "hide": "Helemaal verbergen",
+    "hideHint": "Er wordt niets in de chat getoond."
   }
 }

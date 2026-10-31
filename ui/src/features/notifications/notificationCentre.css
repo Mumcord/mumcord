@@ -273,6 +273,15 @@
   border-radius: var(--radius-full);
 }
 
+/* Blocking (#140): outlined in the danger colour; the icon and label carry the meaning too. */
+.centre-entry__block {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  border-color: var(--color-danger);
+  color: var(--color-danger);
+}
+
 .centre-entry__error {
   color: var(--color-danger);
   font-size: var(--font-size-sm);

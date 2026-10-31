@@ -72,6 +72,7 @@
     "open": "Iftaħ",
     "dismiss": "Neħħi",
     "dismissItem": "Neħħi: {{title}}",
-    "failed": "Ma ħadimx. Erġa’ pprova."
+    "failed": "Ma ħadimx. Erġa’ pprova.",
+    "block": "Imblokka"
   }
 }

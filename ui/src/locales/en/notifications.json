@@ -60,6 +60,7 @@
     "open": "Open",
     "dismiss": "Dismiss",
     "dismissItem": "Dismiss: {{title}}",
-    "failed": "That did not work. Please try again."
+    "failed": "That did not work. Please try again.",
+    "block": "Block"
   }
 }

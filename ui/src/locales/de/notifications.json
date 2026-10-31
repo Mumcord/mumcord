@@ -60,6 +60,7 @@
     "open": "Öffnen",
     "dismiss": "Verwerfen",
     "dismissItem": "Verwerfen: {{title}}",
-    "failed": "Das hat nicht geklappt. Bitte versuche es erneut."
+    "failed": "Das hat nicht geklappt. Bitte versuche es erneut.",
+    "block": "Blockieren"
   }
 }

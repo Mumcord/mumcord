@@ -68,6 +68,7 @@
     "open": "Atidaryti",
     "dismiss": "Paslėpti",
     "dismissItem": "Paslėpti: {{title}}",
-    "failed": "Nepavyko. Bandyk dar kartą."
+    "failed": "Nepavyko. Bandyk dar kartą.",
+    "block": "Blokuoti"
   }
 }

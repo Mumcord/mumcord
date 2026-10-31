@@ -60,6 +60,7 @@
     "open": "Openen",
     "dismiss": "Sluiten",
     "dismissItem": "Sluiten: {{title}}",
-    "failed": "Dat is niet gelukt. Probeer het opnieuw."
+    "failed": "Dat is niet gelukt. Probeer het opnieuw.",
+    "block": "Blokkeren"
   }
 }

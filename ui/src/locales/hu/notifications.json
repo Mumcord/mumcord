@@ -60,6 +60,7 @@
     "open": "Megnyitás",
     "dismiss": "Elvetés",
     "dismissItem": "Elvetés: {{title}}",
-    "failed": "Ez nem sikerült. Próbáld újra."
+    "failed": "Ez nem sikerült. Próbáld újra.",
+    "block": "Letiltás"
   }
 }

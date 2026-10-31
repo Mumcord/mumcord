@@ -60,6 +60,7 @@
     "open": "Avaa",
     "dismiss": "Ohita",
     "dismissItem": "Ohita: {{title}}",
-    "failed": "Se ei onnistunut. Yritä uudelleen."
+    "failed": "Se ei onnistunut. Yritä uudelleen.",
+    "block": "Estä"
   }
 }

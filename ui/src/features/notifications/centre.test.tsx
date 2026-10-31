@@ -3,9 +3,10 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import type { Conversation, MockApi, MumcordApi, WatchParty } from "../../api";
 import { axeViolations } from "../../test/axe";
 import { getSelectedConversation } from "../channels";
-import { connectedMock, resetAll } from "../channels/testUtils";
+import { connectedMock, resetAll, stubDialog } from "../channels/testUtils";
 import { resetChatStore } from "../chat/chatStore";
 import { resetRequestsStore } from "../requests/requestsStore";
+import { BlockDialogHost, closeBlockDialog, resetBlockedStore } from "../blocking";
 import { getCentreState, resetCentre } from "./centreStore";
 import { bindCentreSources } from "./centreSources";
 import { NotificationBell, NotificationsHost, resetNotifications } from ".";
@@ -57,10 +58,45 @@ afterEach(() => {
   resetNotifications();
   resetCentre();
   resetRequestsStore();
+  resetBlockedStore();
   resetAll();
 });
 
 describe("notification centre", () => {
+  it("drops entries of a newly blocked person and collects nothing from them (#140)", async () => {
+    await setup();
+    receive(RAID, "@Zoe hi");
+    await waitFor(() => {
+      expect(bell()).toHaveAccessibleName("Notifications, 1 unread");
+    });
+    await act(async () => {
+      await api.blockUser(1, ANNA);
+    });
+    await waitFor(() => {
+      expect(bell()).toHaveAccessibleName("Notifications");
+    });
+    receive(RAID, "@Zoe still there?");
+    await new Promise((resolve) => setTimeout(resolve, 20));
+    expect(bell()).toHaveAccessibleName("Notifications");
+    // Only the entry from before the block is stored; it stays hidden while the block lasts.
+    expect(getCentreState().items).toHaveLength(1);
+  });
+
+  it("offers Block on a request, which opens the confirmation (#140)", async () => {
+    stubDialog();
+    await setup();
+    render(<BlockDialogHost />);
+    act(() => {
+      api.mock.receivePmRequest(ANNA, { chatRequest: true, note: "hi" });
+    });
+    const centre = openPanel();
+    const block = await within(centre).findByTestId("centre-block");
+    expect(block).toHaveTextContent("Block");
+    fireEvent.click(block);
+    expect(screen.getByRole("dialog", { name: "Block Anna?" })).toBeInTheDocument();
+    act(closeBlockDialog);
+  });
+
   it("collects a mention with server and channel; clicking it opens the chat and reads it", async () => {
     const view = await setup();
     expect(bell()).toHaveAccessibleName("Notifications");

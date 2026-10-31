@@ -320,7 +320,6 @@
     "requestMetaMessages": "{{server}} · poslao/la ti je poruke · {{time}}",
     "quote": "„{{text}}“",
     "block": "Blokiraj",
-    "blockLater": "Blokiranje još nije dostupno.",
     "showMore_one": "Prikaži još {{count}} zahtjev",
     "showMore_few": "Prikaži još {{count}} zahtjeva",
     "showMore_other": "Prikaži još {{count}} zahtjeva",
