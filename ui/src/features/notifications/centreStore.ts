@@ -90,8 +90,8 @@ export function markConversationRead(serverId: number, conversation: Conversatio
   const key = conversationKey(conversation);
   markItems(
     (item) =>
-      item.serverId === serverId &&
       "conversation" in item &&
+      item.serverId === serverId &&
       conversationKey(item.conversation) === key,
   );
 }

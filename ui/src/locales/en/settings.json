@@ -17,6 +17,7 @@
     "about": "About",
     "servers": "Servers",
     "privacy": "Privacy",
+    "updates": "Updates",
     "packetInspector": "Packet inspector",
     "hotkeys": "Hotkeys"
   },
@@ -620,11 +621,6 @@
     "hint": "Direct connections are faster, but the other person can see your IP address. Until you decide, Mumcord asks the first time one would be used.",
     "notUsed": "Not used in the chosen peer-to-peer mode: Mumcord never connects directly to other people."
   },
-  "updates": {
-    "title": "Updates",
-    "check": "Check for new versions",
-    "hint": "Once a day Mumcord asks GitHub for the latest release. Nothing else is sent."
-  },
   "appImageMenu": {
     "label": "Add Mumcord to the app menu",
     "hint": "Makes the icon and push-to-talk work properly on Wayland and lets mumble:// links open Mumcord. Only for the AppImage.",
@@ -806,6 +802,62 @@
     "collapseHint": "Shows “Message from a blocked user” with a Show button.",
     "hide": "Hide them completely",
     "hideHint": "Nothing is shown in the chat."
+  },
+  "updates": {
+    "installedFrom": "Mumcord {{version}} · installed from {{source}}",
+    "install": {
+      "appImage": "the AppImage",
+      "appImageReadOnly": "an AppImage in a read-only folder",
+      "windowsInstaller": "the Windows installer",
+      "windowsPortable": "the portable Windows zip",
+      "macApp": "the macOS app",
+      "otherMac": "a macOS copy outside an app bundle",
+      "deb": "the .deb package",
+      "rpm": "the .rpm package",
+      "aur": "the AUR",
+      "otherLinux": "a Linux package"
+    },
+    "checking": "Checking",
+    "mode": "When an update is found",
+    "modeHint": "Updates are always checked and verified before they are installed.",
+    "modeAuto": "Download automatically",
+    "modeNotify": "Notify only",
+    "modeOff": "Off",
+    "autoUnavailable": "This copy cannot update itself, so Mumcord only tells you about new versions.",
+    "interval": "Check for updates",
+    "intervalHint_one": "On start and every hour",
+    "intervalHint_other": "On start and every {{count}} hours",
+    "intervalWeekHint": "On start and once a week",
+    "intervalHours_one": "Every hour",
+    "intervalHours_other": "Every {{count}} hours",
+    "intervalWeek": "Once a week",
+    "status": "Status",
+    "state": {
+      "idle": "Not checked yet",
+      "off": "Update checks are off",
+      "checking": "Checking for updates…",
+      "upToDate": "Mumcord is up to date",
+      "available": "Mumcord {{version}} is available",
+      "downloading": "Downloading Mumcord {{version}}…",
+      "verifying": "Checking the download of Mumcord {{version}}…",
+      "installing": "Installing Mumcord {{version}}…",
+      "ready": "Mumcord {{version}} is ready. Restart to update.",
+      "failed": "The last update did not work",
+      "offline": "GitHub could not be reached. Mumcord tries again later."
+    },
+    "devBuild": "Development build: updates are off",
+    "lastCheckedToday": "Last checked today at {{time}}",
+    "lastCheckedYesterday": "Last checked yesterday at {{time}}",
+    "lastCheckedOn": "Last checked on {{date}} at {{time}}",
+    "checkNow": "Check now",
+    "showUpdate": "Show update",
+    "checkFailed": "The check could not be started. Please try again.",
+    "skipped": "Skipped version",
+    "skippedHint": "{{version}} is skipped and will not be offered again.",
+    "stopSkipping": "Stop skipping",
+    "whatsNew": "What's new",
+    "whatsNewHint": "See the changes in every version.",
+    "openChangelog": "Open changelog"
   },
   "hotkeys": {
     "global": "Global shortcuts",

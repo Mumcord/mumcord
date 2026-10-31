@@ -29,16 +29,10 @@
   },
   "updateCheck": {
     "title": "Cauți versiuni noi?",
-    "description": "Mumcord poate întreba GitHub o dată pe zi dacă există o versiune mai nouă și poate afișa un indiciu cu un link. Nu se descarcă și nu se instalează nimic și nu se trimite nimic în afară de cererea în sine și de numele și versiunea aplicației. Poți schimba asta mai târziu din Setări.",
+    "description": "Mumcord poate întreba periodic GitHub dacă există o versiune mai nouă și te poate anunța. Nimic nu se descarcă și nu se instalează fără acordul tău și nu se trimite nimic în afară de cererea în sine și de numele și versiunea aplicației. Poți schimba asta mai târziu din Setări.",
     "no": "Nu",
     "yes": "Da",
     "failed": "Nu a funcționat. Încearcă din nou."
-  },
-  "updateHint": {
-    "message": "Mumcord {{version}} este disponibil.",
-    "open": "Vezi versiunea",
-    "dismiss": "Închide",
-    "portable": "Descarcă noul zip portabil și dezarhivează-l în acest dosar; datele tale din MumcordData rămân."
   },
   "directConsent": {
     "title": "Permiți conexiuni directe?",
@@ -46,5 +40,85 @@
     "no": "Nu",
     "yes": "Da",
     "failed": "Nu a funcționat. Încearcă din nou."
+  },
+  "updater": {
+    "stable": "Stabilă",
+    "available": {
+      "title": "Actualizare disponibilă",
+      "subtitle": "Mumcord {{version}} este gata de descărcat. Ai versiunea {{current}}.",
+      "subtitleManual": "A apărut Mumcord {{version}}. Ai versiunea {{current}}.",
+      "whatsNew": "Ce e nou de la {{current}}",
+      "trust": "Se descarcă doar de pe github.com prin HTTPS și este verificată cu semnătura și suma de control înainte de a fi instalată.",
+      "skip": "Omite această versiune",
+      "later": "Reamintește-mi mai târziu",
+      "download": "Descarcă și instalează",
+      "openReleasePage": "Deschide pagina versiunii",
+      "manual": "Descarcă noua versiune de pe pagina versiunii.",
+      "manualPackage": "Descarcă pachetul de pe pagina versiunii, apoi instalează-l cu:",
+      "manualAur": "Actualizează-l cu asistentul tău AUR:"
+    },
+    "tags": {
+      "added": "Adăugat",
+      "changed": "Modificat",
+      "fixed": "Remediat",
+      "removed": "Eliminat"
+    },
+    "noNotes": "Nu există note pentru această versiune.",
+    "steps": {
+      "download": "Descărcare",
+      "verify": "Verificarea semnăturii și a sumei de control",
+      "install": "Instalare",
+      "done": "gata",
+      "current": "în curs",
+      "pending": "nu a început încă"
+    },
+    "progress": {
+      "title": "Se descarcă Mumcord {{version}}",
+      "subtitle": "Poți continua să folosești Mumcord cât timp rulează.",
+      "label": "Progresul actualizării",
+      "unknown": "Dimensiunea nu este încă cunoscută",
+      "size": "{{received}} din {{total}} MB",
+      "received": "{{received}} MB",
+      "secondsLeft_one": "mai durează circa {{count}} secundă",
+      "secondsLeft_few": "mai durează circa {{count}} secunde",
+      "secondsLeft_other": "mai durează circa {{count}} de secunde",
+      "minutesLeft_one": "mai durează circa {{count}} minut",
+      "minutesLeft_few": "mai durează circa {{count}} minute",
+      "minutesLeft_other": "mai durează circa {{count}} de minute",
+      "cancel": "Anulează"
+    },
+    "ready": {
+      "title": "Mumcord {{version}} este gata",
+      "subtitle": "Repornește pentru a finaliza actualizarea.",
+      "verified": "Verificată",
+      "downloaded": "Descărcată",
+      "checked": "Semnătura și suma de control au fost verificate",
+      "installed": "Instalată",
+      "installsOnRestart": "Se instalează când Mumcord repornește",
+      "connected_one": "Ești conectat la {{count}} server. După repornire, Mumcord se va reconecta și va intra din nou în canalele tale.",
+      "connected_few": "Ești conectat la {{count}} servere. După repornire, Mumcord se va reconecta și va intra din nou în canalele tale.",
+      "connected_other": "Ești conectat la {{count}} de servere. După repornire, Mumcord se va reconecta și va intra din nou în canalele tale.",
+      "later": "Mai târziu",
+      "restart": "Repornește pentru a actualiza",
+      "announce": "Mumcord {{version}} este gata. Repornește pentru a actualiza."
+    },
+    "failed": {
+      "title": "Actualizarea nu a reușit",
+      "subtitle": "Mumcord {{version}} nu a fost instalat. Versiunea ta curentă funcționează în continuare.",
+      "network": "Mumcord nu a putut contacta GitHub. Verifică conexiunea la internet și încearcă din nou.",
+      "manifest": "Informațiile despre actualizare de pe GitHub sunt incomplete sau corupte, așa că nu s-a instalat nimic.",
+      "signature": "Semnătura descărcării nu s-a potrivit, așa că descărcarea a fost eliminată.",
+      "checksum": "Descărcarea nu s-a potrivit cu suma ei de control, așa că a fost eliminată.",
+      "install": "Instalarea actualizării a eșuat. Versiunea ta instalată nu s-a schimbat.",
+      "retry": "Încearcă din nou",
+      "close": "Închide"
+    },
+    "actionFailed": "Nu a funcționat. Încearcă din nou.",
+    "toast": {
+      "title": "Mumcord {{version}} este gata",
+      "body": "Repornește pentru a actualiza.",
+      "restart": "Repornește",
+      "later": "Mai târziu"
+    }
   }
 }

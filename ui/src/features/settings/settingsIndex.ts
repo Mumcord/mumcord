@@ -386,9 +386,21 @@ export const SETTINGS_INDEX: readonly SettingEntry[] = [
     terms: ["privacyDirect.hint"],
   },
   { section: "privacy", group: "cache.title", control: "cache.clear", terms: ["cache.hint"] },
+  {
+    section: "updates",
+    group: "updates.checking",
+    terms: ["updates.mode", "updates.modeHint", "updates.modeAuto", "updates.modeNotify"],
+  },
+  { section: "updates", group: "updates.checking", control: "updates.interval" },
+  { section: "updates", group: "updates.status", control: "updates.checkNow" },
+  {
+    section: "updates",
+    group: "updates.status",
+    control: "updates.openChangelog",
+    terms: ["updates.whatsNew"],
+  },
   { section: "diagnostics", group: "diagnostics.logging", control: "diagnostics.logLevel" },
   { section: "diagnostics", group: "diagnostics.file", terms: ["diagnostics.fileHint"] },
-  { section: "about", group: "updates.title", control: "updates.check", terms: ["updates.hint"] },
   { section: "about", group: "about.license" },
   {
     section: "about",

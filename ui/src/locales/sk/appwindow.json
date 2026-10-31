@@ -29,16 +29,10 @@
   },
   "updateCheck": {
     "title": "Kontrolovať nové verzie?",
-    "description": "Mumcord sa môže raz denne opýtať GitHubu, či existuje novšia verzia, a zobraziť tip s odkazom. Nič sa nesťahuje ani neinštaluje a nič sa neodosiela okrem samotnej požiadavky a názvu a verzie aplikácie. Neskôr to môžeš zmeniť v Nastaveniach.",
+    "description": "Mumcord sa môže pravidelne pýtať GitHubu, či existuje novšia verzia, a dať ti vedieť. Nič sa nesťahuje ani neinštaluje bez tvojho súhlasu a neodosiela sa nič okrem samotnej požiadavky a názvu a verzie aplikácie. Neskôr to môžeš zmeniť v Nastaveniach.",
     "no": "Nie",
     "yes": "Áno",
     "failed": "Nepodarilo sa. Skús to znova."
-  },
-  "updateHint": {
-    "message": "Mumcord {{version}} je k dispozícii.",
-    "open": "Zobraziť vydanie",
-    "dismiss": "Zavrieť",
-    "portable": "Stiahnite nový prenosný zip a rozbaľte ho do tohto priečinka; vaše údaje v MumcordData zostanú."
   },
   "directConsent": {
     "title": "Povoliť priame spojenia?",
@@ -46,5 +40,88 @@
     "no": "Nie",
     "yes": "Áno",
     "failed": "Nepodarilo sa. Skús to znova."
+  },
+  "updater": {
+    "stable": "Stabilná",
+    "available": {
+      "title": "Aktualizácia je k dispozícii",
+      "subtitle": "Mumcord {{version}} je pripravený na stiahnutie. Máš verziu {{current}}.",
+      "subtitleManual": "Vyšiel Mumcord {{version}}. Máš verziu {{current}}.",
+      "whatsNew": "Čo je nové od verzie {{current}}",
+      "trust": "Sťahuje sa iba z github.com cez HTTPS a pred inštaláciou sa overí podľa podpisu a kontrolného súčtu.",
+      "skip": "Preskočiť túto verziu",
+      "later": "Pripomenúť neskôr",
+      "download": "Stiahnuť a nainštalovať",
+      "openReleasePage": "Otvoriť stránku vydania",
+      "manual": "Stiahni si novú verziu zo stránky vydania.",
+      "manualPackage": "Stiahni si balík zo stránky vydania a potom ho nainštaluj príkazom:",
+      "manualAur": "Aktualizuj ho pomocou svojho pomocníka pre AUR:"
+    },
+    "tags": {
+      "added": "Pridané",
+      "changed": "Zmenené",
+      "fixed": "Opravené",
+      "removed": "Odstránené"
+    },
+    "noNotes": "K tejto verzii nie sú žiadne poznámky.",
+    "steps": {
+      "download": "Stiahnutie",
+      "verify": "Overenie podpisu a kontrolného súčtu",
+      "install": "Inštalácia",
+      "done": "hotovo",
+      "current": "prebieha",
+      "pending": "ešte sa nezačalo"
+    },
+    "progress": {
+      "title": "Sťahuje sa Mumcord {{version}}",
+      "subtitle": "Počas sťahovania môžeš Mumcord ďalej používať.",
+      "label": "Priebeh aktualizácie",
+      "unknown": "Veľkosť zatiaľ nie je známa",
+      "size": "{{received}} z {{total}} MB",
+      "received": "{{received}} MB",
+      "secondsLeft_one": "zostáva asi {{count}} sekunda",
+      "secondsLeft_few": "zostávajú asi {{count}} sekundy",
+      "secondsLeft_many": "zostáva asi {{count}} sekundy",
+      "secondsLeft_other": "zostáva asi {{count}} sekúnd",
+      "minutesLeft_one": "zostáva asi {{count}} minúta",
+      "minutesLeft_few": "zostávajú asi {{count}} minúty",
+      "minutesLeft_many": "zostáva asi {{count}} minúty",
+      "minutesLeft_other": "zostáva asi {{count}} minút",
+      "cancel": "Zrušiť"
+    },
+    "ready": {
+      "title": "Mumcord {{version}} je pripravený",
+      "subtitle": "Reštartuj a dokonči aktualizáciu.",
+      "verified": "Overené",
+      "downloaded": "Stiahnuté",
+      "checked": "Podpis a kontrolný súčet boli overené",
+      "installed": "Nainštalované",
+      "installsOnRestart": "Nainštaluje sa pri reštarte Mumcordu",
+      "connected_one": "Si pripojený k {{count}} serveru. Po reštarte sa Mumcord znova pripojí a vráti sa do tvojich kanálov.",
+      "connected_few": "Si pripojený k {{count}} serverom. Po reštarte sa Mumcord znova pripojí a vráti sa do tvojich kanálov.",
+      "connected_many": "Si pripojený k {{count}} serveru. Po reštarte sa Mumcord znova pripojí a vráti sa do tvojich kanálov.",
+      "connected_other": "Si pripojený k {{count}} serverom. Po reštarte sa Mumcord znova pripojí a vráti sa do tvojich kanálov.",
+      "later": "Neskôr",
+      "restart": "Reštartovať a aktualizovať",
+      "announce": "Mumcord {{version}} je pripravený. Reštartuj a aktualizuj."
+    },
+    "failed": {
+      "title": "Aktualizácia sa nepodarila",
+      "subtitle": "Mumcord {{version}} sa nenainštaloval. Tvoja súčasná verzia naďalej funguje.",
+      "network": "Mumcord sa nemohol spojiť s GitHubom. Skontroluj pripojenie k internetu a skús to znova.",
+      "manifest": "Informácie o aktualizácii na GitHube sú neúplné alebo poškodené, takže sa nič nenainštalovalo.",
+      "signature": "Podpis stiahnutých dát nesedel, preto boli dáta zahodené.",
+      "checksum": "Stiahnuté dáta nesedeli s kontrolným súčtom, preto boli zahodené.",
+      "install": "Inštalácia aktualizácie zlyhala. Tvoja nainštalovaná verzia zostala bez zmeny.",
+      "retry": "Skúsiť znova",
+      "close": "Zavrieť"
+    },
+    "actionFailed": "To sa nepodarilo. Skús to znova.",
+    "toast": {
+      "title": "Mumcord {{version}} je pripravený",
+      "body": "Reštartuj a aktualizuj.",
+      "restart": "Reštartovať",
+      "later": "Neskôr"
+    }
   }
 }

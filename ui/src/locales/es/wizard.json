@@ -1,24 +1,5 @@
 {
   "progress": "Paso {{current}} de {{total}}",
-  "rerun": {
-    "title": "Asistente de configuración",
-    "note": "Vas a repetir la configuración. Tu identidad no cambia.",
-    "manageIdentities": "Gestionar identidades",
-    "stepsLabel": "Pasos de la configuración",
-    "stepsSkipped": "(omitido, la identidad no forma parte)",
-    "steps": {
-      "identity": "Identidad",
-      "mic": "Micrófono",
-      "privacy": "Privacidad",
-      "updates": "Actualizaciones",
-      "talk": "Modo de voz"
-    },
-    "footer": "Cancelar lo deja todo como está. Solo se guardan al final los pasos que cambiaste.",
-    "discardTitle": "¿Descartar los cambios?",
-    "discardBody": "Nada se guarda antes de terminar. Si cancelas ahora, todo queda como está.",
-    "discardKeep": "Seguir editando",
-    "discardConfirm": "Descartar cambios"
-  },
   "loadFailed": "No se pudo cargar la configuración inicial.",
   "finish": "Terminar",
   "errors": {
@@ -72,6 +53,17 @@
     "local": "Todo lo que Mumcord guarda permanece en tu ordenador.",
     "statement": "Declaración de privacidad completa"
   },
+  "updates": {
+    "title": "Nuevas versiones",
+    "choice": "Cuando haya una versión nueva",
+    "auto": "Descargar automáticamente",
+    "autoHint": "Mumcord descarga y verifica la actualización en segundo plano y te pregunta antes de reiniciarse.",
+    "notify": "Solo avisar",
+    "notifyHint": "Mumcord te avisa de una versión nueva y muestra qué ha cambiado. No se descarga nada hasta que lo digas.",
+    "off": "Desactivado",
+    "offHint": "Mumcord nunca pregunta a GitHub por versiones nuevas. Actualizas tú mismo.",
+    "privacy": "La comprobación solo envía a GitHub la propia solicitud y el nombre y la versión de la aplicación. Puedes cambiarlo más tarde en Ajustes."
+  },
   "talk": {
     "title": "¿Cómo quieres hablar?",
     "mode": "Modo de voz",
@@ -118,9 +110,23 @@
     "ingameOverlayWarning": "Algunos juegos con anti-trampas pueden marcar o bloquear las superposiciones dentro del juego. Mumcord mantiene desactivados por defecto los juegos de riesgo conocido (como Valorant o League of Legends). Actívala solo en juegos de confianza.",
     "ingameOverlayAlt": "Ejemplo de la superposición dentro del juego mostrando quién habla"
   },
-  "updates": {
-    "title": "Nuevas versiones",
-    "check": "Buscar nuevas versiones",
-    "hint": "Mumcord puede preguntar a GitHub una vez al día si hay una versión más reciente y mostrar un aviso con un enlace. No se descarga ni instala nada, y no se envía nada salvo la propia consulta y el nombre y la versión de la app. Puedes cambiarlo más tarde en Ajustes."
+  "rerun": {
+    "title": "Asistente de configuración",
+    "note": "Vas a repetir la configuración. Tu identidad no cambia.",
+    "manageIdentities": "Gestionar identidades",
+    "stepsLabel": "Pasos de la configuración",
+    "stepsSkipped": "(omitido, la identidad no forma parte)",
+    "steps": {
+      "identity": "Identidad",
+      "mic": "Micrófono",
+      "privacy": "Privacidad",
+      "updates": "Actualizaciones",
+      "talk": "Modo de voz"
+    },
+    "footer": "Cancelar lo deja todo como está. Solo se guardan al final los pasos que cambiaste.",
+    "discardTitle": "¿Descartar los cambios?",
+    "discardBody": "Nada se guarda antes de terminar. Si cancelas ahora, todo queda como está.",
+    "discardKeep": "Seguir editando",
+    "discardConfirm": "Descartar cambios"
   }
 }

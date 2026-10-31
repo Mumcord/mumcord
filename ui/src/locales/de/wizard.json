@@ -1,24 +1,5 @@
 {
   "progress": "Schritt {{current}} von {{total}}",
-  "rerun": {
-    "title": "Einrichtungsassistent",
-    "note": "Du führst die Einrichtung erneut aus. Deine Identität wird nicht verändert.",
-    "manageIdentities": "Identitäten verwalten",
-    "stepsLabel": "Schritte der Einrichtung",
-    "stepsSkipped": "(übersprungen, die Identität gehört nicht dazu)",
-    "steps": {
-      "identity": "Identität",
-      "mic": "Mikrofon",
-      "privacy": "Privatsphäre",
-      "updates": "Updates",
-      "talk": "Sprechmodus"
-    },
-    "footer": "Abbrechen lässt alles, wie es ist. Nur geänderte Schritte werden am Ende gespeichert.",
-    "discardTitle": "Änderungen verwerfen?",
-    "discardBody": "Nichts wird vor dem Abschluss gespeichert. Wenn du jetzt abbrichst, bleibt alles, wie es ist.",
-    "discardKeep": "Weiter bearbeiten",
-    "discardConfirm": "Änderungen verwerfen"
-  },
   "loadFailed": "Die Einrichtung konnte nicht geladen werden.",
   "finish": "Fertig",
   "errors": {
@@ -72,6 +53,17 @@
     "local": "Alles, was Mumcord speichert, bleibt auf deinem Computer.",
     "statement": "Vollständige Datenschutzerklärung"
   },
+  "updates": {
+    "title": "Neue Versionen",
+    "choice": "Wenn eine neue Version erscheint",
+    "auto": "Automatisch herunterladen",
+    "autoHint": "Mumcord lädt das Update im Hintergrund herunter, prüft es und fragt dich, bevor es neu startet.",
+    "notify": "Nur benachrichtigen",
+    "notifyHint": "Mumcord weist dich auf eine neue Version hin und zeigt, was sich geändert hat. Heruntergeladen wird erst, wenn du es willst.",
+    "off": "Aus",
+    "offHint": "Mumcord fragt GitHub nie nach neuen Versionen. Du aktualisierst selbst.",
+    "privacy": "Bei der Prüfung werden nur die Anfrage selbst sowie App-Name und Version an GitHub gesendet. Du kannst das später in den Einstellungen ändern."
+  },
   "talk": {
     "title": "Wie möchtest du sprechen?",
     "mode": "Sprechmodus",
@@ -118,9 +110,23 @@
     "ingameOverlayWarning": "Manche Spiele mit Anti-Cheat können In-Game-Overlays melden oder blockieren. Mumcord lässt bekannt riskante Spiele (etwa Valorant oder League of Legends) standardmäßig aus. Aktiviere es nur für Spiele, denen du vertraust.",
     "ingameOverlayAlt": "Beispiel des In-Game-Overlays, das zeigt, wer spricht"
   },
-  "updates": {
-    "title": "Neue Versionen",
-    "check": "Nach neuen Versionen suchen",
-    "hint": "Mumcord kann einmal am Tag bei GitHub nachfragen, ob es eine neuere Version gibt, und einen Hinweis mit Link zeigen. Es wird nichts heruntergeladen oder installiert, und außer der Anfrage selbst sowie App-Name und Version wird nichts gesendet. Du kannst das später in den Einstellungen ändern."
+  "rerun": {
+    "title": "Einrichtungsassistent",
+    "note": "Du führst die Einrichtung erneut aus. Deine Identität wird nicht verändert.",
+    "manageIdentities": "Identitäten verwalten",
+    "stepsLabel": "Schritte der Einrichtung",
+    "stepsSkipped": "(übersprungen, die Identität gehört nicht dazu)",
+    "steps": {
+      "identity": "Identität",
+      "mic": "Mikrofon",
+      "privacy": "Privatsphäre",
+      "updates": "Updates",
+      "talk": "Sprechmodus"
+    },
+    "footer": "Abbrechen lässt alles, wie es ist. Nur geänderte Schritte werden am Ende gespeichert.",
+    "discardTitle": "Änderungen verwerfen?",
+    "discardBody": "Nichts wird vor dem Abschluss gespeichert. Wenn du jetzt abbrichst, bleibt alles, wie es ist.",
+    "discardKeep": "Weiter bearbeiten",
+    "discardConfirm": "Änderungen verwerfen"
   }
 }

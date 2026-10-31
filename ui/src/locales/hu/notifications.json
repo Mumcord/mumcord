@@ -51,7 +51,8 @@
       "messageRequest": "Üzenetkérés",
       "invite": "Meghívás",
       "private": "Privát üzenet",
-      "connection": "Kapcsolat"
+      "connection": "Kapcsolat",
+      "update": "Frissítés"
     },
     "accept": "Elfogadás",
     "decline": "Elutasítás",
@@ -61,6 +62,12 @@
     "dismiss": "Elvetés",
     "dismissItem": "Elvetés: {{title}}",
     "failed": "Ez nem sikerült. Próbáld újra.",
-    "block": "Letiltás"
+    "block": "Letiltás",
+    "update": {
+      "title": "A Mumcord {{version}} készen áll",
+      "body": "Indítsa újra a frissítéshez",
+      "restart": "Újraindítás és frissítés",
+      "whatsNew": "Újdonságok"
+    }
   }
 }

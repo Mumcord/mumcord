@@ -24,7 +24,7 @@ mod portable;
 mod ptt;
 mod screen_frames;
 mod tray;
-mod update_check;
+mod updater;
 mod version;
 mod watch_player;
 #[cfg(target_os = "linux")]
@@ -269,7 +269,11 @@ fn specta_builder() -> Builder<tauri::Wry> {
             commands::screen_share::screen_share_request_keyframe,
             commands::screen_share::screen_share_list,
             commands::screen_share::screen_share_block,
+            commands::updates::update_status,
             commands::updates::update_check_now,
+            commands::updates::update_download,
+            commands::updates::update_cancel,
+            commands::updates::update_restart,
             commands::updates::appimage_menu_entry_add,
         ])
         .events(collect_events![
@@ -324,7 +328,7 @@ fn specta_builder() -> Builder<tauri::Wry> {
             commands::p2p::P2pLinkChanged,
             commands::watch_party::WatchPartyChanged,
             commands::screen_share::ScreenSharesChanged,
-            commands::updates::UpdateAvailable,
+            commands::updates::UpdateStatusChanged,
             commands::inspector::InspectorViewChanged,
             commands::licences::WindowLookChanged,
             commands::tray::TraySettingsRequested,
@@ -384,6 +388,7 @@ pub fn run() {
         .plugin(tauri_plugin_global_shortcut::Builder::new().build())
         .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_clipboard_manager::init())
+        .plugin(tauri_plugin_updater::Builder::new().build())
         .invoke_handler(move |call| {
             let label = call.message.webview_ref().label().to_owned();
             if !aux_window::command_allowed(&label, call.message.command()) {
@@ -500,7 +505,9 @@ fn start_engine(app: &AppHandle) -> Result<(), Box<dyn std::error::Error>> {
             tracing::warn!(error = %e, "connecting the servers at start failed");
         }
     });
-    update_check::start(app.clone(), engine);
+    let updater = updater::Updater::new(app.clone(), engine);
+    app.manage(updater.clone());
+    updater.start();
 
     let handle = app.clone();
     tauri::async_runtime::spawn(async move {

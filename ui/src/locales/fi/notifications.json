@@ -51,7 +51,8 @@
       "messageRequest": "Viestipyyntö",
       "invite": "Kutsu",
       "private": "Yksityisviesti",
-      "connection": "Yhteys"
+      "connection": "Yhteys",
+      "update": "Päivitys"
     },
     "accept": "Hyväksy",
     "decline": "Hylkää",
@@ -61,6 +62,12 @@
     "dismiss": "Ohita",
     "dismissItem": "Ohita: {{title}}",
     "failed": "Se ei onnistunut. Yritä uudelleen.",
-    "block": "Estä"
+    "block": "Estä",
+    "update": {
+      "title": "Mumcord {{version}} on valmis",
+      "body": "Päivitä käynnistämällä uudelleen",
+      "restart": "Käynnistä uudelleen ja päivitä",
+      "whatsNew": "Uutta"
+    }
   }
 }

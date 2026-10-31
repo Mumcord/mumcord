@@ -12,8 +12,14 @@ import { isGroupMention, isMention, isReplyMention } from "../chat/ownMention";
 import { messageText } from "../chat/reply";
 import { subscribeEndedHidden } from "../servers/endedEvents";
 import { findThemeCode } from "../../theme/shareCodec";
-import { messageItemId, screenShareItemId, watchPartyItemId, type StoredItem } from "./centreModel";
-import { addItem, hasItem, removeItems } from "./centreStore";
+import {
+  messageItemId,
+  screenShareItemId,
+  UPDATE_ITEM_ID,
+  watchPartyItemId,
+  type StoredItem,
+} from "./centreModel";
+import { addItem, getCentreState, hasItem, removeItems } from "./centreStore";
 import { MAX_PREVIEW, plainPreview } from "./preview";
 
 function capped(text: string): string {
@@ -71,6 +77,21 @@ export function recordIncoming(message: ChatMessage, serverId: number, onScreen:
   } else if (findThemeCode(message.body) !== null) {
     addItem({ ...base, kind: "invite", invite: "theme", excerpt: "" });
   }
+}
+
+/**
+ * An installed update waits for a restart (#168). Replaces the entry of an older version; the
+ * same version again keeps the entry as it is, read or unread.
+ */
+export function recordUpdateReady(version: string, url: string): void {
+  const current = getCentreState().items.find((item) => item.id === UPDATE_ITEM_ID);
+  if (current?.kind === "update" && current.version === version) return;
+  addItem({ kind: "update", id: UPDATE_ITEM_ID, at: Date.now(), read: false, version, url });
+}
+
+/** The updater left the "ready" phase, e.g. a newer download failed: the entry no longer holds. */
+export function clearUpdateReady(): void {
+  removeItems((item) => item.kind === "update");
 }
 
 /** Name and certificate of a person in the server, for invites they started. */
@@ -154,8 +175,8 @@ export function bindCentreSources(api: MumcordApi): Unsubscribe {
   // Live invites belong to one connection; messages and connection events stay.
   function isLive(item: StoredItem, serverId: number): boolean {
     return (
-      item.serverId === serverId &&
       item.kind === "invite" &&
+      item.serverId === serverId &&
       (item.invite === "watchParty" || item.invite === "screenShare")
     );
   }

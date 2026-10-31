@@ -59,7 +59,8 @@
       "messageRequest": "Prośba o wiadomość",
       "invite": "Zaproszenie",
       "private": "Wiadomość prywatna",
-      "connection": "Połączenie"
+      "connection": "Połączenie",
+      "update": "Aktualizacja"
     },
     "accept": "Akceptuj",
     "decline": "Odrzuć",
@@ -69,6 +70,12 @@
     "dismiss": "Zamknij",
     "dismissItem": "Zamknij: {{title}}",
     "failed": "Nie udało się. Spróbuj ponownie.",
-    "block": "Zablokuj"
+    "block": "Zablokuj",
+    "update": {
+      "title": "Mumcord {{version}} jest gotowy",
+      "body": "Uruchom ponownie, aby zaktualizować",
+      "restart": "Uruchom ponownie i zaktualizuj",
+      "whatsNew": "Co nowego"
+    }
   }
 }

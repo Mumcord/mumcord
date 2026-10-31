@@ -29,16 +29,10 @@
   },
   "updateCheck": {
     "title": "Rechercher les nouvelles versions ?",
-    "description": "Mumcord peut demander une fois par jour à GitHub si une version plus récente existe et afficher un avis avec un lien. Rien n’est téléchargé ni installé, et rien n’est envoyé à part la requête elle-même, le nom et la version de l’application. Vous pourrez modifier ce choix plus tard dans les paramètres.",
+    "description": "Mumcord peut demander régulièrement à GitHub s'il existe une version plus récente et vous en informer. Rien n'est téléchargé ni installé sans votre accord, et rien n'est envoyé hormis la requête elle-même, le nom de l'application et sa version. Vous pouvez modifier cela plus tard dans les Paramètres.",
     "no": "Non",
     "yes": "Oui",
     "failed": "Cela n’a pas fonctionné. Veuillez réessayer."
-  },
-  "updateHint": {
-    "message": "Mumcord {{version}} est disponible.",
-    "open": "Voir la version",
-    "dismiss": "Ignorer",
-    "portable": "Téléchargez le nouveau zip portable et décompressez-le dans ce dossier ; vos données dans MumcordData sont conservées."
   },
   "directConsent": {
     "title": "Autoriser les connexions directes ?",
@@ -46,5 +40,85 @@
     "no": "Non",
     "yes": "Oui",
     "failed": "Cela n’a pas fonctionné. Veuillez réessayer."
+  },
+  "updater": {
+    "stable": "Stable",
+    "available": {
+      "title": "Mise à jour disponible",
+      "subtitle": "Mumcord {{version}} est prêt à être téléchargé. Vous avez la {{current}}.",
+      "subtitleManual": "Mumcord {{version}} est sorti. Vous avez la {{current}}.",
+      "whatsNew": "Nouveautés depuis la {{current}}",
+      "trust": "Téléchargée uniquement depuis github.com via HTTPS, puis vérifiée par sa signature et sa somme de contrôle avant d'être installée.",
+      "skip": "Ignorer cette version",
+      "later": "Me le rappeler plus tard",
+      "download": "Télécharger et installer",
+      "openReleasePage": "Ouvrir la page de la version",
+      "manual": "Téléchargez la nouvelle version depuis la page de la version.",
+      "manualPackage": "Téléchargez le paquet depuis la page de la version, puis installez-le avec :",
+      "manualAur": "Mettez-le à jour avec votre assistant AUR :"
+    },
+    "tags": {
+      "added": "Ajouté",
+      "changed": "Modifié",
+      "fixed": "Corrigé",
+      "removed": "Supprimé"
+    },
+    "noNotes": "Aucune note pour cette version.",
+    "steps": {
+      "download": "Téléchargement",
+      "verify": "Vérification de la signature et de la somme de contrôle",
+      "install": "Installation",
+      "done": "terminé",
+      "current": "en cours",
+      "pending": "pas encore commencé"
+    },
+    "progress": {
+      "title": "Téléchargement de Mumcord {{version}}",
+      "subtitle": "Vous pouvez continuer à utiliser Mumcord pendant ce temps.",
+      "label": "Progression de la mise à jour",
+      "unknown": "Taille pas encore connue",
+      "size": "{{received}} sur {{total}} Mo",
+      "received": "{{received}} Mo",
+      "secondsLeft_one": "environ {{count}} seconde restante",
+      "secondsLeft_many": "environ {{count}} de secondes restantes",
+      "secondsLeft_other": "environ {{count}} secondes restantes",
+      "minutesLeft_one": "environ {{count}} minute restante",
+      "minutesLeft_many": "environ {{count}} de minutes restantes",
+      "minutesLeft_other": "environ {{count}} minutes restantes",
+      "cancel": "Annuler"
+    },
+    "ready": {
+      "title": "Mumcord {{version}} est prêt",
+      "subtitle": "Redémarrez pour terminer la mise à jour.",
+      "verified": "Vérifiée",
+      "downloaded": "Téléchargée",
+      "checked": "Signature et somme de contrôle vérifiées",
+      "installed": "Installée",
+      "installsOnRestart": "S'installe au redémarrage de Mumcord",
+      "connected_one": "Vous êtes connecté à {{count}} serveur. Après le redémarrage, Mumcord se reconnectera et rejoindra de nouveau vos canaux.",
+      "connected_many": "Vous êtes connecté à {{count}} de serveurs. Après le redémarrage, Mumcord se reconnectera et rejoindra de nouveau vos canaux.",
+      "connected_other": "Vous êtes connecté à {{count}} serveurs. Après le redémarrage, Mumcord se reconnectera et rejoindra de nouveau vos canaux.",
+      "later": "Plus tard",
+      "restart": "Redémarrer pour mettre à jour",
+      "announce": "Mumcord {{version}} est prêt. Redémarrez pour mettre à jour."
+    },
+    "failed": {
+      "title": "La mise à jour a échoué",
+      "subtitle": "Mumcord {{version}} n'a pas été installé. Votre version actuelle continue de fonctionner.",
+      "network": "Mumcord n'a pas pu joindre GitHub. Vérifiez votre connexion internet et réessayez.",
+      "manifest": "Les informations de mise à jour sur GitHub sont incomplètes ou corrompues, donc rien n'a été installé.",
+      "signature": "La signature du téléchargement ne correspondait pas, il a donc été supprimé.",
+      "checksum": "Le téléchargement ne correspondait pas à sa somme de contrôle, il a donc été supprimé.",
+      "install": "L'installation de la mise à jour a échoué. Votre version installée est inchangée.",
+      "retry": "Réessayer",
+      "close": "Fermer"
+    },
+    "actionFailed": "Cela n'a pas fonctionné. Veuillez réessayer.",
+    "toast": {
+      "title": "Mumcord {{version}} est prêt",
+      "body": "Redémarrez pour mettre à jour.",
+      "restart": "Redémarrer",
+      "later": "Plus tard"
+    }
   }
 }

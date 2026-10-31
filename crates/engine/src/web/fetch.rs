@@ -235,7 +235,30 @@ impl Fetcher {
         limit: usize,
         truncate: bool,
     ) -> Result<Fetched, FetchError> {
-        self.fetch(url, agent, accept, limit, truncate, None).await
+        self.fetch(url, agent, accept, limit, truncate, None, &mut |_, _| {})
+            .await
+    }
+
+    /// Like [`Fetcher::get_large`] with the app's `User-Agent`, reporting the bytes received so
+    /// far and the announced size after every chunk (the updater's progress bar, issue #168).
+    pub async fn download(
+        &self,
+        url: &str,
+        agent: &str,
+        limit: usize,
+        timeout: Duration,
+        on_progress: &mut (dyn FnMut(u64, Option<u64>) + Send),
+    ) -> Result<Fetched, FetchError> {
+        self.fetch(
+            url,
+            agent,
+            "application/octet-stream",
+            limit,
+            false,
+            Some(timeout),
+            on_progress,
+        )
+        .await
     }
 
     /// Like [`Fetcher::get`] without truncation and with its own total `timeout`, for files
@@ -247,10 +270,22 @@ impl Fetcher {
         limit: usize,
         timeout: Duration,
     ) -> Result<Fetched, FetchError> {
-        self.fetch(url, AGENT, accept, limit, false, Some(timeout))
-            .await
+        self.fetch(
+            url,
+            AGENT,
+            accept,
+            limit,
+            false,
+            Some(timeout),
+            &mut |_, _| {},
+        )
+        .await
     }
 
+    #[expect(
+        clippy::too_many_arguments,
+        reason = "private helper behind the public getters"
+    )]
     async fn fetch(
         &self,
         url: &str,
@@ -259,6 +294,7 @@ impl Fetcher {
         limit: usize,
         truncate: bool,
         timeout: Option<Duration>,
+        on_progress: &mut (dyn FnMut(u64, Option<u64>) + Send),
     ) -> Result<Fetched, FetchError> {
         let url = Url::parse(url).map_err(|_| FetchError::InvalidUrl)?;
         check_url(&url, &self.policy)?;
@@ -317,6 +353,7 @@ impl Fetcher {
                 break;
             }
             body.extend_from_slice(&chunk);
+            on_progress(body.len() as u64, declared);
         }
         Ok(Fetched {
             url: final_url,

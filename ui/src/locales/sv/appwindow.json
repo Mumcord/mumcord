@@ -29,16 +29,10 @@
   },
   "updateCheck": {
     "title": "Söka efter nya versioner?",
-    "description": "Mumcord kan fråga GitHub en gång om dagen om det finns en nyare version och visa en hint med en länk. Inget laddas ner eller installeras, och inget skickas utom själva förfrågan samt appens namn och version. Du kan ändra det senare i Inställningar.",
+    "description": "Mumcord kan regelbundet fråga GitHub om det finns en nyare version och berätta det för dig. Inget laddas ned eller installeras utan att du godkänner det, och inget skickas förutom själva förfrågan samt appens namn och version. Du kan ändra detta senare i Inställningar.",
     "no": "Nej",
     "yes": "Ja",
     "failed": "Det fungerade inte. Försök igen."
-  },
-  "updateHint": {
-    "message": "Mumcord {{version}} finns tillgänglig.",
-    "open": "Visa version",
-    "dismiss": "Stäng",
-    "portable": "Ladda ner den nya portabla zip-filen och packa upp den i den här mappen; dina data i MumcordData finns kvar."
   },
   "directConsent": {
     "title": "Tillåta direktanslutningar?",
@@ -46,5 +40,82 @@
     "no": "Nej",
     "yes": "Ja",
     "failed": "Det fungerade inte. Försök igen."
+  },
+  "updater": {
+    "stable": "Stabil",
+    "available": {
+      "title": "Uppdatering tillgänglig",
+      "subtitle": "Mumcord {{version}} är redo att laddas ned. Du har {{current}}.",
+      "subtitleManual": "Mumcord {{version}} har släppts. Du har {{current}}.",
+      "whatsNew": "Nyheter sedan {{current}}",
+      "trust": "Laddas bara ned från github.com via HTTPS och kontrolleras mot signatur och kontrollsumma innan den installeras.",
+      "skip": "Hoppa över den här versionen",
+      "later": "Påminn mig senare",
+      "download": "Ladda ned och installera",
+      "openReleasePage": "Öppna utgivningssidan",
+      "manual": "Ladda ned den nya versionen från utgivningssidan.",
+      "manualPackage": "Ladda ned paketet från utgivningssidan och installera det sedan med:",
+      "manualAur": "Uppdatera med din AUR-hjälpare:"
+    },
+    "tags": {
+      "added": "Tillagt",
+      "changed": "Ändrat",
+      "fixed": "Åtgärdat",
+      "removed": "Borttaget"
+    },
+    "noNotes": "Inga anteckningar för den här versionen.",
+    "steps": {
+      "download": "Ladda ned",
+      "verify": "Kontrollera signatur och kontrollsumma",
+      "install": "Installera",
+      "done": "klart",
+      "current": "pågår",
+      "pending": "inte påbörjat än"
+    },
+    "progress": {
+      "title": "Laddar ned Mumcord {{version}}",
+      "subtitle": "Du kan fortsätta använda Mumcord medan detta pågår.",
+      "label": "Uppdateringens förlopp",
+      "unknown": "Storleken är inte känd än",
+      "size": "{{received}} av {{total}} MB",
+      "received": "{{received}} MB",
+      "secondsLeft_one": "ungefär {{count}} sekund kvar",
+      "secondsLeft_other": "ungefär {{count}} sekunder kvar",
+      "minutesLeft_one": "ungefär {{count}} minut kvar",
+      "minutesLeft_other": "ungefär {{count}} minuter kvar",
+      "cancel": "Avbryt"
+    },
+    "ready": {
+      "title": "Mumcord {{version}} är redo",
+      "subtitle": "Starta om för att slutföra uppdateringen.",
+      "verified": "Verifierad",
+      "downloaded": "Nedladdad",
+      "checked": "Signatur och kontrollsumma verifierade",
+      "installed": "Installerad",
+      "installsOnRestart": "Installeras när Mumcord startar om",
+      "connected_one": "Du är ansluten till {{count}} server. Efter omstarten ansluter Mumcord igen och går med i dina kanaler på nytt.",
+      "connected_other": "Du är ansluten till {{count}} servrar. Efter omstarten ansluter Mumcord igen och går med i dina kanaler på nytt.",
+      "later": "Senare",
+      "restart": "Starta om för att uppdatera",
+      "announce": "Mumcord {{version}} är redo. Starta om för att uppdatera."
+    },
+    "failed": {
+      "title": "Uppdateringen fungerade inte",
+      "subtitle": "Mumcord {{version}} installerades inte. Din nuvarande version fungerar som vanligt.",
+      "network": "Mumcord kunde inte nå GitHub. Kontrollera din internetanslutning och försök igen.",
+      "manifest": "Uppdateringsinformationen på GitHub är ofullständig eller trasig, så inget installerades.",
+      "signature": "Nedladdningens signatur stämde inte, så nedladdningen kasserades.",
+      "checksum": "Nedladdningen stämde inte med sin kontrollsumma, så den kasserades.",
+      "install": "Det gick inte att installera uppdateringen. Din installerade version är oförändrad.",
+      "retry": "Försök igen",
+      "close": "Stäng"
+    },
+    "actionFailed": "Det fungerade inte. Försök igen.",
+    "toast": {
+      "title": "Mumcord {{version}} är redo",
+      "body": "Starta om för att uppdatera.",
+      "restart": "Starta om",
+      "later": "Senare"
+    }
   }
 }

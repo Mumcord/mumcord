@@ -17,6 +17,7 @@
     "about": "Over",
     "servers": "Servers",
     "privacy": "Privacy",
+    "updates": "Updates",
     "packetInspector": "Pakketinspecteur",
     "hotkeys": "Sneltoetsen"
   },
@@ -434,14 +435,6 @@
       "unsupported": "De overlay in games is niet beschikbaar op dit systeem. In plaats daarvan wordt de vensteroverlay hierboven gebruikt.",
       "loadFailed": "De instellingen voor de overlay in games konden niet worden geladen.",
       "saveFailed": "De wijziging van de overlay in games kon niet worden toegepast.",
-      "confirmTitle": "De overlay inschakelen voor {{game}}?",
-      "confirmMessage": "Waarschuwing: {{game}} gebruikt anticheatbescherming ({{reason}}). Overlays kunnen als valsspelen worden gedetecteerd en je account kan worden gebanned. Mumcord is daar niet verantwoordelijk voor. Ga alleen verder als je dit risico accepteert.",
-      "confirmEnable": "Toch inschakelen",
-      "limits": {
-        "libraryMissing": "De overlay in games is niet beschikbaar: de overlaybibliotheek (libmumcord_overlay_layer.so) is niet naast Mumcord gevonden. Installeer Mumcord opnieuw om hem te herstellen. In plaats daarvan wordt de vensteroverlay hierboven gebruikt.",
-        "windowsFullscreen": "Gebruik in de game randloos of venster-volledig scherm.",
-        "macos": "macOS ondersteunt geen overlays in games. In plaats daarvan wordt de vensteroverlay hierboven gebruikt."
-      },
       "opengl": {
         "title": "OpenGL-games",
         "explanation": "Alleen nodig voor OpenGL-games: plak in de Steam-startopties van de game.",
@@ -449,6 +442,14 @@
         "copy": "Kopiëren",
         "copied": "Gekopieerd",
         "copyFailed": "Kopiëren mislukt. Selecteer de tekst en kopieer die handmatig."
+      },
+      "confirmTitle": "De overlay inschakelen voor {{game}}?",
+      "confirmMessage": "Waarschuwing: {{game}} gebruikt anticheatbescherming ({{reason}}). Overlays kunnen als valsspelen worden gedetecteerd en je account kan worden gebanned. Mumcord is daar niet verantwoordelijk voor. Ga alleen verder als je dit risico accepteert.",
+      "confirmEnable": "Toch inschakelen",
+      "limits": {
+        "libraryMissing": "De overlay in games is niet beschikbaar: de overlaybibliotheek (libmumcord_overlay_layer.so) is niet naast Mumcord gevonden. Installeer Mumcord opnieuw om hem te herstellen. In plaats daarvan wordt de vensteroverlay hierboven gebruikt.",
+        "windowsFullscreen": "Gebruik in de game randloos of venster-volledig scherm.",
+        "macos": "macOS ondersteunt geen overlays in games. In plaats daarvan wordt de vensteroverlay hierboven gebruikt."
       }
     }
   },
@@ -619,11 +620,6 @@
     "allow": "Directe verbindingen met andere Mumcord-gebruikers toestaan",
     "hint": "Directe verbindingen zijn sneller, maar de ander kan je IP-adres zien. Totdat je beslist, vraagt Mumcord het de eerste keer dat er een gebruikt zou worden.",
     "notUsed": "Niet gebruikt in de gekozen peer-to-peer-modus: Mumcord maakt nooit rechtstreeks verbinding met anderen."
-  },
-  "updates": {
-    "title": "Updates",
-    "check": "Zoeken naar nieuwe versies",
-    "hint": "Eén keer per dag vraagt Mumcord GitHub naar de nieuwste release. Verder wordt er niets verstuurd."
   },
   "appImageMenu": {
     "label": "Mumcord aan het appmenu toevoegen",
@@ -806,6 +802,62 @@
     "collapseHint": "Toont ‘Bericht van een geblokkeerde gebruiker’ met een knop ‘Tonen’.",
     "hide": "Helemaal verbergen",
     "hideHint": "Er wordt niets in de chat getoond."
+  },
+  "updates": {
+    "installedFrom": "Mumcord {{version}} · geïnstalleerd via {{source}}",
+    "install": {
+      "appImage": "de AppImage",
+      "appImageReadOnly": "een AppImage in een alleen-lezen map",
+      "windowsInstaller": "het Windows-installatieprogramma",
+      "windowsPortable": "de draagbare Windows-zip",
+      "macApp": "de macOS-app",
+      "otherMac": "een macOS-kopie buiten een app-bundel",
+      "deb": "het .deb-pakket",
+      "rpm": "het .rpm-pakket",
+      "aur": "de AUR",
+      "otherLinux": "een Linux-pakket"
+    },
+    "checking": "Controleren",
+    "mode": "Als er een update wordt gevonden",
+    "modeHint": "Updates worden altijd gecontroleerd en geverifieerd voordat ze worden geïnstalleerd.",
+    "modeAuto": "Automatisch downloaden",
+    "modeNotify": "Alleen melden",
+    "modeOff": "Uit",
+    "autoUnavailable": "Deze kopie kan zichzelf niet bijwerken, dus Mumcord meldt alleen nieuwe versies.",
+    "interval": "Op updates controleren",
+    "intervalHint_one": "Bij het starten en elk uur",
+    "intervalHint_other": "Bij het starten en elke {{count}} uur",
+    "intervalWeekHint": "Bij het starten en eenmaal per week",
+    "intervalHours_one": "Elk uur",
+    "intervalHours_other": "Elke {{count}} uur",
+    "intervalWeek": "Eenmaal per week",
+    "status": "Status",
+    "state": {
+      "idle": "Nog niet gecontroleerd",
+      "off": "Updatecontrole staat uit",
+      "checking": "Controleren op updates…",
+      "upToDate": "Mumcord is up-to-date",
+      "available": "Mumcord {{version}} is beschikbaar",
+      "downloading": "Mumcord {{version}} wordt gedownload…",
+      "verifying": "Download van Mumcord {{version}} wordt gecontroleerd…",
+      "installing": "Mumcord {{version}} wordt geïnstalleerd…",
+      "ready": "Mumcord {{version}} is klaar. Start opnieuw op om bij te werken.",
+      "failed": "De laatste update is mislukt",
+      "offline": "GitHub was niet bereikbaar. Mumcord probeert het later opnieuw."
+    },
+    "devBuild": "Ontwikkelversie: updates staan uit",
+    "lastCheckedToday": "Laatst gecontroleerd vandaag om {{time}}",
+    "lastCheckedYesterday": "Laatst gecontroleerd gisteren om {{time}}",
+    "lastCheckedOn": "Laatst gecontroleerd op {{date}} om {{time}}",
+    "checkNow": "Nu controleren",
+    "showUpdate": "Update tonen",
+    "checkFailed": "De controle kon niet worden gestart. Probeer het opnieuw.",
+    "skipped": "Overgeslagen versie",
+    "skippedHint": "{{version}} wordt overgeslagen en niet meer aangeboden.",
+    "stopSkipping": "Niet meer overslaan",
+    "whatsNew": "Wat is er nieuw",
+    "whatsNewHint": "Bekijk de wijzigingen in elke versie.",
+    "openChangelog": "Wijzigingenlogboek openen"
   },
   "hotkeys": {
     "global": "Globale sneltoetsen",

@@ -17,6 +17,7 @@
     "about": "Tietoja",
     "servers": "Palvelimet",
     "privacy": "Yksityisyys",
+    "updates": "Päivitykset",
     "packetInspector": "Pakettitarkastin",
     "hotkeys": "Pikanäppäimet"
   },
@@ -434,14 +435,6 @@
       "unsupported": "Pelinsisäinen peittokuva ei ole käytettävissä tässä järjestelmässä. Sen sijaan käytetään yllä olevaa ikkunapeittokuvaa.",
       "loadFailed": "Pelinsisäisen peittokuvan asetuksia ei voitu ladata.",
       "saveFailed": "Pelinsisäisen peittokuvan muutosta ei voitu ottaa käyttöön.",
-      "confirmTitle": "Otetaanko peittokuva käyttöön pelissä {{game}}?",
-      "confirmMessage": "Varoitus: {{game}} käyttää huijauksenestoa ({{reason}}). Peittokuvat voidaan tunnistaa huijaamiseksi, ja tilisi voidaan estää. Mumcord ei ole siitä vastuussa. Jatka vain, jos hyväksyt tämän riskin.",
-      "confirmEnable": "Ota käyttöön silti",
-      "limits": {
-        "libraryMissing": "Pelinsisäinen peittokuva ei ole käytettävissä: sen kirjastoa (libmumcord_overlay_layer.so) ei löytynyt Mumcordin vierestä. Palauta se asentamalla Mumcord uudelleen. Sen sijaan käytetään yllä olevaa ikkunapeittokuvaa.",
-        "windowsFullscreen": "Käytä pelissä reunatonta tai ikkunoitua koko näyttöä.",
-        "macos": "macOS ei tue pelinsisäisiä peittokuvia. Sen sijaan käytetään yllä olevaa ikkunapeittokuvaa."
-      },
       "opengl": {
         "title": "OpenGL-pelit",
         "explanation": "Tarvitaan vain OpenGL-peleissä: liitä pelin Steam-käynnistysasetuksiin.",
@@ -449,6 +442,14 @@
         "copy": "Kopioi",
         "copied": "Kopioitu",
         "copyFailed": "Kopiointi epäonnistui. Valitse teksti ja kopioi se käsin."
+      },
+      "confirmTitle": "Otetaanko peittokuva käyttöön pelissä {{game}}?",
+      "confirmMessage": "Varoitus: {{game}} käyttää huijauksenestoa ({{reason}}). Peittokuvat voidaan tunnistaa huijaamiseksi, ja tilisi voidaan estää. Mumcord ei ole siitä vastuussa. Jatka vain, jos hyväksyt tämän riskin.",
+      "confirmEnable": "Ota käyttöön silti",
+      "limits": {
+        "libraryMissing": "Pelinsisäinen peittokuva ei ole käytettävissä: sen kirjastoa (libmumcord_overlay_layer.so) ei löytynyt Mumcordin vierestä. Palauta se asentamalla Mumcord uudelleen. Sen sijaan käytetään yllä olevaa ikkunapeittokuvaa.",
+        "windowsFullscreen": "Käytä pelissä reunatonta tai ikkunoitua koko näyttöä.",
+        "macos": "macOS ei tue pelinsisäisiä peittokuvia. Sen sijaan käytetään yllä olevaa ikkunapeittokuvaa."
       }
     }
   },
@@ -619,11 +620,6 @@
     "allow": "Salli suorat yhteydet muihin Mumcord-käyttäjiin",
     "hint": "Suorat yhteydet ovat nopeampia, mutta toinen henkilö näkee IP-osoitteesi. Kunnes päätät, Mumcord kysyy, kun sellaista käytettäisiin ensimmäisen kerran.",
     "notUsed": "Ei käytössä valitussa peer-to-peer-tilassa: Mumcord ei koskaan yhdistä suoraan muihin."
-  },
-  "updates": {
-    "title": "Päivitykset",
-    "check": "Etsi uusia versioita",
-    "hint": "Kerran päivässä Mumcord kysyy GitHubilta uusinta julkaisua. Mitään muuta ei lähetetä."
   },
   "appImageMenu": {
     "label": "Lisää Mumcord sovellusvalikkoon",
@@ -806,6 +802,62 @@
     "collapseHint": "Näyttää tekstin ”Viesti estetyltä käyttäjältä” ja Näytä-painikkeen.",
     "hide": "Piilota kokonaan",
     "hideHint": "Keskustelussa ei näytetä mitään."
+  },
+  "updates": {
+    "installedFrom": "Mumcord {{version}} · asennettu lähteestä: {{source}}",
+    "install": {
+      "appImage": "AppImage",
+      "appImageReadOnly": "AppImage vain luku -kansiossa",
+      "windowsInstaller": "Windowsin asennusohjelma",
+      "windowsPortable": "kannettava Windowsin zip",
+      "macApp": "macOS-sovellus",
+      "otherMac": "macOS-kopio sovelluspaketin ulkopuolella",
+      "deb": ".deb-paketti",
+      "rpm": ".rpm-paketti",
+      "aur": "AUR",
+      "otherLinux": "Linux-paketti"
+    },
+    "checking": "Tarkistetaan",
+    "mode": "Kun päivitys löytyy",
+    "modeHint": "Päivitykset tarkistetaan ja varmennetaan aina ennen asennusta.",
+    "modeAuto": "Lataa automaattisesti",
+    "modeNotify": "Vain ilmoita",
+    "modeOff": "Pois",
+    "autoUnavailable": "Tämä kopio ei voi päivittää itseään, joten Mumcord vain kertoo uusista versioista.",
+    "interval": "Tarkista päivitykset",
+    "intervalHint_one": "Käynnistyksessä ja joka tunti",
+    "intervalHint_other": "Käynnistyksessä ja {{count}} tunnin välein",
+    "intervalWeekHint": "Käynnistyksessä ja kerran viikossa",
+    "intervalHours_one": "Joka tunti",
+    "intervalHours_other": "{{count}} tunnin välein",
+    "intervalWeek": "Kerran viikossa",
+    "status": "Tila",
+    "state": {
+      "idle": "Ei vielä tarkistettu",
+      "off": "Päivitysten tarkistus on pois päältä",
+      "checking": "Tarkistetaan päivityksiä…",
+      "upToDate": "Mumcord on ajan tasalla",
+      "available": "Mumcord {{version}} on saatavilla",
+      "downloading": "Ladataan Mumcord {{version}}…",
+      "verifying": "Tarkistetaan Mumcord {{version}} -lataus…",
+      "installing": "Asennetaan Mumcord {{version}}…",
+      "ready": "Mumcord {{version}} on valmis. Päivitä käynnistämällä uudelleen.",
+      "failed": "Viimeisin päivitys ei onnistunut",
+      "offline": "GitHubiin ei saatu yhteyttä. Mumcord yrittää myöhemmin uudelleen."
+    },
+    "devBuild": "Kehitysversio: päivitykset ovat pois päältä",
+    "lastCheckedToday": "Tarkistettu viimeksi tänään klo {{time}}",
+    "lastCheckedYesterday": "Tarkistettu viimeksi eilen klo {{time}}",
+    "lastCheckedOn": "Tarkistettu viimeksi {{date}} klo {{time}}",
+    "checkNow": "Tarkista nyt",
+    "showUpdate": "Näytä päivitys",
+    "checkFailed": "Tarkistusta ei voitu käynnistää. Yritä uudelleen.",
+    "skipped": "Ohitettu versio",
+    "skippedHint": "Versio {{version}} ohitetaan, eikä sitä tarjota uudelleen.",
+    "stopSkipping": "Lopeta ohittaminen",
+    "whatsNew": "Mikä on uutta",
+    "whatsNewHint": "Katso muutokset jokaisessa versiossa.",
+    "openChangelog": "Avaa muutosloki"
   },
   "hotkeys": {
     "global": "Yleiset pikanäppäimet",

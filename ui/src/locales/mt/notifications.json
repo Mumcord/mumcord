@@ -63,7 +63,8 @@
       "messageRequest": "Talba għal messaġġ",
       "invite": "Stedina",
       "private": "Messaġġ privat",
-      "connection": "Konnessjoni"
+      "connection": "Konnessjoni",
+      "update": "Aġġornament"
     },
     "accept": "Aċċetta",
     "decline": "Irrifjuta",
@@ -73,6 +74,12 @@
     "dismiss": "Neħħi",
     "dismissItem": "Neħħi: {{title}}",
     "failed": "Ma ħadimx. Erġa’ pprova.",
-    "block": "Imblokka"
+    "block": "Imblokka",
+    "update": {
+      "title": "Mumcord {{version}} huwa lest",
+      "body": "Erġa' ibda biex taġġorna",
+      "restart": "Erġa' ibda biex taġġorna",
+      "whatsNew": "X'hemm ġdid"
+    }
   }
 }
