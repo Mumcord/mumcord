@@ -1,6 +1,9 @@
 //! Audio devices and the microphone test (FR-1.4, §6).
 
-use mumcord_engine::{AudioDeviceList, AudioDeviceView, Engine, MicTestPhase as EnginePhase};
+use mumcord_engine::{
+    AudioDeviceList, AudioDeviceView, Engine, MicTestDevices as EngineMicTestDevices,
+    MicTestPhase as EnginePhase,
+};
 use serde::{Deserialize, Serialize};
 use specta::Type;
 use tauri::State;
@@ -87,12 +90,34 @@ pub fn bitrate_max(engine: State<'_, Engine>) -> ApiResult<Option<u32>> {
     Ok(engine.bitrate_max().map(|b| b / 1000))
 }
 
+/// Devices a microphone test runs on instead of the stored ones (wizard rerun, #149).
+/// They are not saved.
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, Type)]
+#[serde(rename_all = "camelCase")]
+pub struct MicTestDevices {
+    pub input_device: Option<String>,
+    pub output_device: Option<String>,
+}
+
+impl From<MicTestDevices> for EngineMicTestDevices {
+    fn from(devices: MicTestDevices) -> Self {
+        Self {
+            input: devices.input_device,
+            output: devices.output_device,
+        }
+    }
+}
+
 /// Records up to 5 s of processed own voice with level metering, then plays it back.
-/// Voice of a connected session pauses meanwhile.
+/// Voice of a connected session pauses meanwhile. `devices` tests devices that are not saved
+/// yet, e.g. a microphone picked in the wizard rerun (#149).
 #[tauri::command]
 #[specta::specta]
-pub async fn mic_test_start(engine: State<'_, Engine>) -> ApiResult<()> {
-    Ok(engine.mic_test_start().await?)
+pub async fn mic_test_start(
+    engine: State<'_, Engine>,
+    devices: Option<MicTestDevices>,
+) -> ApiResult<()> {
+    Ok(engine.mic_test_start(devices.map(Into::into)).await?)
 }
 
 /// Plays a short sound on the output device ("Test sound" in the output popover).

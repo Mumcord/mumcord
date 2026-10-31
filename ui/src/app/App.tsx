@@ -5,6 +5,7 @@ import { TooltipLayer } from "../components/Tooltip";
 import { PersonMenuHost, ProfilePreviewHost } from "../features/members";
 import { NotificationsHost } from "../features/notifications";
 import { ChatRequestDialogHost, RevokeConsentDialogHost } from "../features/requests";
+import { WizardRerunOverlay } from "../features/wizard";
 import { TraySync } from "../features/tray";
 import { AppShell } from "./AppShell";
 import {
@@ -30,7 +31,7 @@ import { useView } from "./view";
 import { ViewProvider } from "./ViewProvider";
 
 function MainScreen() {
-  const { overlay, closeOverlay, openSettings } = useView();
+  const { overlay, closeOverlay, openSettings, rerunWizard, closeRerunWizard } = useView();
   // "Manage identities…" and similar links elsewhere in the app land in Settings.
   useEffect(() => {
     setSettingsOpener(openSettings);
@@ -59,7 +60,16 @@ function MainScreen() {
       <div inert={overlay !== null && !previewing}>
         <MediaWidgetsMount />
       </div>
-      {overlay === "settings" && <SettingsOverlay onClose={closeOverlay} />}
+      {overlay === "settings" && <SettingsOverlay onClose={closeOverlay} blocked={rerunWizard} />}
+      {rerunWizard && (
+        <WizardRerunOverlay
+          onClose={closeRerunWizard}
+          onManageIdentities={() => {
+            closeRerunWizard();
+            openSettings("identity");
+          }}
+        />
+      )}
       {overlay === null && <ProfilePreviewHost />}
       {overlay === null && <PersonMenuHost />}
       {overlay === null && <ChatRequestDialogHost />}

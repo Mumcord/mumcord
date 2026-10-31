@@ -429,7 +429,12 @@
     "noticesFailed": "Licence trećih strana nije moguće otvoriti.",
     "loading": "Učitavanje…",
     "devToolsUnlocked": "Alati za razvojne programere otključani: inspektor paketa sada je na popisu postavki.",
-    "portable": "Prijenosna"
+    "portable": "Prijenosna",
+    "setup": "Postavljanje",
+    "setupWizardHint": "Ponovno prođi kroz početno postavljanje da pregledaš mikrofon, izbore privatnosti, provjeru ažuriranja i način govora. Tvoji trenutni izbori su već upisani.",
+    "setupWizardRun": "Ponovno pokreni čarobnjak za postavljanje",
+    "setupWizardIdentityNote": "Tvoj identitet nije dio ovoga. Tvoj certifikat, a s njim i registrirano ime i dopuštenja na poslužiteljima, ostaje točno onakav kakav jest.",
+    "setupWizardIdentityLink": "Upravljaj njime u Identitetu"
   },
   "profile": {
     "title": "Profil",

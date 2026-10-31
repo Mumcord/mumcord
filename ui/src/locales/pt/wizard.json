@@ -1,5 +1,24 @@
 {
   "progress": "Passo {{current}} de {{total}}",
+  "rerun": {
+    "title": "Assistente de configuração",
+    "note": "Está a repetir a configuração. A sua identidade não é alterada.",
+    "manageIdentities": "Gerir identidades",
+    "stepsLabel": "Passos da configuração",
+    "stepsSkipped": "(ignorado, a identidade não faz parte)",
+    "steps": {
+      "identity": "Identidade",
+      "mic": "Microfone",
+      "privacy": "Privacidade",
+      "updates": "Atualizações",
+      "talk": "Modo de fala"
+    },
+    "footer": "Cancelar mantém tudo como está. Só os passos alterados são guardados no fim.",
+    "discardTitle": "Descartar as alterações?",
+    "discardBody": "Nada é guardado antes de terminar. Se cancelar agora, tudo fica como está.",
+    "discardKeep": "Continuar a editar",
+    "discardConfirm": "Descartar alterações"
+  },
   "loadFailed": "Não foi possível carregar a configuração.",
   "finish": "Concluir",
   "errors": {

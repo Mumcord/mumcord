@@ -1,5 +1,24 @@
 {
   "progress": "{{current}}. solis no {{total}}",
+  "rerun": {
+    "title": "Iestatīšanas vednis",
+    "note": "Tu atkārto iestatīšanu. Tava identitāte netiek mainīta.",
+    "manageIdentities": "Pārvaldīt identitātes",
+    "stepsLabel": "Iestatīšanas soļi",
+    "stepsSkipped": "(izlaists, identitāte tam nepieder)",
+    "steps": {
+      "identity": "Identitāte",
+      "mic": "Mikrofons",
+      "privacy": "Privātums",
+      "updates": "Atjauninājumi",
+      "talk": "Runāšanas režīms"
+    },
+    "footer": "Atcelšana visu atstāj kā ir. Beigās saglabā tikai mainītos soļus.",
+    "discardTitle": "Atmest izmaiņas?",
+    "discardBody": "Nekas netiek saglabāts pirms pabeigšanas. Ja tagad atcelsi, viss paliks kā ir.",
+    "discardKeep": "Turpināt rediģēt",
+    "discardConfirm": "Atmest izmaiņas"
+  },
   "loadFailed": "Iestatīšanu neizdevās ielādēt.",
   "finish": "Pabeigt",
   "errors": {

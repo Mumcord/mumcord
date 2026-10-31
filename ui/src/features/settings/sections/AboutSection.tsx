@@ -5,6 +5,8 @@ import { announce } from "../../../a11y";
 import { getApi, type AppInfo } from "../../../api";
 import { useUnlockClicks } from "../../inspector/devTools";
 import { openInBrowser } from "../../chat/openLink";
+import { useView } from "../../../app/view";
+import { openSettingsSection } from "../settingsOpener";
 import { Group, Section } from "../components/Section";
 import { Switch } from "../components/Switch";
 import { AppImageMenuEntrySwitch } from "./AppImageMenuEntrySwitch";
@@ -15,6 +17,7 @@ const ISSUES_URL = "https://github.com/Mumcord/mumcord/issues/new";
 /** About: version, OS, Mumcord's AGPL license and the third-party notices (AC-1.29). */
 export function AboutSection({ settings, update }: SettingsSectionProps) {
   const { t } = useTranslation("settings");
+  const { openRerunWizard } = useView();
   const [info, setInfo] = useState<AppInfo | null>(null);
   const [noticesFailed, setNoticesFailed] = useState(false);
   const [changelogFailed, setChangelogFailed] = useState(false);
@@ -60,6 +63,26 @@ export function AboutSection({ settings, update }: SettingsSectionProps) {
           {t("about.devToolsUnlocked")}
         </p>
       )}
+      <Group title={t("about.setup")}>
+        <p className="settings-hint">{t("about.setupWizardHint")}</p>
+        <div className="settings-actions">
+          <button type="button" className="settings-button" onClick={openRerunWizard}>
+            {t("about.setupWizardRun")}
+          </button>
+        </div>
+        <p className="settings-hint">
+          {t("about.setupWizardIdentityNote")}{" "}
+          <button
+            type="button"
+            className="settings-link"
+            onClick={() => {
+              openSettingsSection("identity");
+            }}
+          >
+            {t("about.setupWizardIdentityLink")}
+          </button>
+        </p>
+      </Group>
       <div className="settings-group">
         <button
           type="button"

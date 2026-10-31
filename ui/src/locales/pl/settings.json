@@ -430,7 +430,12 @@
     "noticesFailed": "Nie udało się otworzyć licencji stron trzecich.",
     "loading": "Ładowanie…",
     "devToolsUnlocked": "Narzędzia deweloperskie odblokowane: inspektor pakietów jest teraz na liście ustawień.",
-    "portable": "Przenośna"
+    "portable": "Przenośna",
+    "setup": "Konfiguracja",
+    "setupWizardHint": "Przejdź ponownie pierwszą konfigurację, aby sprawdzić mikrofon, ustawienia prywatności, sprawdzanie aktualizacji i tryb mówienia. Twoje obecne ustawienia są wypełnione.",
+    "setupWizardRun": "Uruchom kreator konfiguracji ponownie",
+    "setupWizardIdentityNote": "Twoja tożsamość nie jest tego częścią. Twój certyfikat, a z nim zarejestrowana nazwa i uprawnienia na serwerach, pozostaje dokładnie taki, jaki jest.",
+    "setupWizardIdentityLink": "Zarządzaj nią w sekcji Tożsamość"
   },
   "profile": {
     "title": "Profil",

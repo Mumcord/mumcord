@@ -20,7 +20,7 @@ describe("PrivacyStep", () => {
   it("lists the privacy facts under a heading", async () => {
     renderInWizard(
       await setupWizardTest(),
-      <PrivacyStep focusOnMount={false} onBack={vi.fn()} onNext={vi.fn()} />,
+      <PrivacyStep step={3} total={5} focusOnMount={false} onBack={vi.fn()} onNext={vi.fn()} />,
     );
     expect(screen.getByRole("heading", { name: "Your privacy" })).toBeInTheDocument();
     expect(screen.getAllByRole("listitem")).toHaveLength(5);
@@ -31,7 +31,7 @@ describe("PrivacyStep", () => {
   it("opens the full privacy statement in the browser", async () => {
     renderInWizard(
       await setupWizardTest(),
-      <PrivacyStep focusOnMount={false} onBack={vi.fn()} onNext={vi.fn()} />,
+      <PrivacyStep step={3} total={5} focusOnMount={false} onBack={vi.fn()} onNext={vi.fn()} />,
     );
     fireEvent.click(screen.getByRole("button", { name: "Full privacy statement" }));
     expect(openInBrowser).toHaveBeenCalledWith(

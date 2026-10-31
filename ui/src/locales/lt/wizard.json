@@ -1,5 +1,24 @@
 {
   "progress": "{{current}} žingsnis iš {{total}}",
+  "rerun": {
+    "title": "Sąrankos vediklis",
+    "note": "Vėl atliekate sąranką. Jūsų tapatybė nekeičiama.",
+    "manageIdentities": "Tvarkyti tapatybes",
+    "stepsLabel": "Sąrankos žingsniai",
+    "stepsSkipped": "(praleista, tapatybė tam nepriklauso)",
+    "steps": {
+      "identity": "Tapatybė",
+      "mic": "Mikrofonas",
+      "privacy": "Privatumas",
+      "updates": "Atnaujinimai",
+      "talk": "Kalbėjimo režimas"
+    },
+    "footer": "Atšaukimas viską palieka taip, kaip yra. Pabaigoje išsaugomi tik pakeisti žingsniai.",
+    "discardTitle": "Atmesti pakeitimus?",
+    "discardBody": "Niekas neišsaugoma prieš baigiant. Jei dabar atšauksite, viskas liks taip, kaip yra.",
+    "discardKeep": "Tęsti redagavimą",
+    "discardConfirm": "Atmesti pakeitimus"
+  },
   "loadFailed": "Nepavyko įkelti sąrankos.",
   "finish": "Baigti",
   "errors": {

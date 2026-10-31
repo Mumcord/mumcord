@@ -428,7 +428,12 @@
     "noticesFailed": "Die Drittanbieter-Lizenzen konnten nicht geöffnet werden.",
     "loading": "Wird geladen…",
     "devToolsUnlocked": "Entwicklerwerkzeuge freigeschaltet: Der Paketinspektor steht jetzt in der Einstellungsliste.",
-    "portable": "Portabel"
+    "portable": "Portabel",
+    "setup": "Einrichtung",
+    "setupWizardHint": "Gehe die Ersteinrichtung erneut durch, um Mikrofon, Datenschutz, Update-Prüfung und Sprechmodus zu prüfen. Deine aktuellen Einstellungen sind vorausgefüllt.",
+    "setupWizardRun": "Einrichtung erneut ausführen",
+    "setupWizardIdentityNote": "Deine Identität gehört nicht dazu. Dein Zertifikat und damit dein registrierter Name und deine Rechte auf Servern bleiben genau, wie sie sind.",
+    "setupWizardIdentityLink": "Verwalte sie unter Identität"
   },
   "profile": {
     "title": "Profil",
