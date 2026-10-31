@@ -58,7 +58,9 @@
     "join": "Join {{channel}}",
     "joinDenied": "You are not allowed to enter this channel.",
     "mute": "Mute for me",
-    "connectionInfo": "Connection info…"
+    "connectionInfo": "Connection info…",
+    "chatRequest": "Send chat request…",
+    "chatRequestPending": "Chat request pending"
   },
   "nowPlaying": {
     "label": "Now playing",
@@ -83,6 +85,14 @@
   "preview": {
     "privateMessage": "Private message",
     "fullProfile": "Full profile"
+  },
+  "chatRequest": {
+    "title": "Chat request to {{name}}",
+    "note": "Note (optional)",
+    "counter": "{{count}} / {{max}}",
+    "counterLabel": "{{count}} of {{max}} characters used",
+    "send": "Send",
+    "failed": "The chat request could not be sent. Please try again."
   },
   "toggle": {
     "show": "Show members",

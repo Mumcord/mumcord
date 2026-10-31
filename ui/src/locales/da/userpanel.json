@@ -93,7 +93,11 @@
     "offerImages": "Tilbyd billeder i fuld størrelse",
     "offerImagesHint": "Lad andre indlæse dine originale billeder",
     "loadImages": "Indlæs billeder i fuld størrelse",
-    "loadImagesHint": "Hent originale billeder fra andre"
+    "loadImagesHint": "Hent originale billeder fra andre",
+    "privateMessages": "Private beskeder fra",
+    "pm_everyone": "Alle",
+    "pm_friendsOnly": "Venner",
+    "pm_nobody": "Ingen"
   },
   "voice": {
     "line": "Tale: {{channel}} · {{server}}",

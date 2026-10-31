@@ -93,7 +93,11 @@
     "offerImages": "Παροχή εικόνων πλήρους μεγέθους",
     "offerImagesHint": "Άφησε τους άλλους να φορτώνουν τις αρχικές εικόνες σου",
     "loadImages": "Φόρτωση εικόνων πλήρους μεγέθους",
-    "loadImagesHint": "Λήψη αρχικών εικόνων από τους άλλους"
+    "loadImagesHint": "Λήψη αρχικών εικόνων από τους άλλους",
+    "privateMessages": "Ιδιωτικά μηνύματα από",
+    "pm_everyone": "Όλοι",
+    "pm_friendsOnly": "Φίλοι",
+    "pm_nobody": "Κανείς"
   },
   "voice": {
     "line": "Φωνή: {{channel}} · {{server}}",

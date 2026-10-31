@@ -283,5 +283,32 @@
     "warning_many": "{{count}} odkazů v této zprávě zobrazuje přihlašovací údaje",
     "warning_one": "{{count}} odkaz v této zprávě zobrazuje přihlašovací údaje",
     "warning_other": "{{count}} odkazu v této zprávě zobrazuje přihlašovací údaje"
+  },
+  "requests": {
+    "entry": "Žádosti o zprávy",
+    "entryCount_one": "{{count}} žádost",
+    "entryCount_few": "{{count}} žádosti",
+    "entryCount_many": "{{count}} žádosti",
+    "entryCount_other": "{{count}} žádostí",
+    "title": "Žádosti o zprávy",
+    "listLabel": "Žádosti",
+    "chatRequestTag": "Žádost o chat",
+    "messageRequestTag": "Žádost o zprávu",
+    "wantsToChat": "{{name}} si s tebou chce psát",
+    "metaMumcord": "Uživatel Mumcordu · {{server}} · {{time}}",
+    "metaStandard": "{{server}} · {{time}}",
+    "noteFrom": "Poznámka od {{name}}",
+    "explain": "Soukromé zprávy máš nastavené na „Jen přátelé“. Po přijetí ti bude moci {{name}} psát. Odmítnutí je tiché: {{name}} uvidí jen „čeká se“. Žádosti se smažou, když ukončíš Mumcord.",
+    "sentMessages_one": "{{name}} ti poslal(a) {{count}} zprávu",
+    "sentMessages_few": "{{name}} ti poslal(a) {{count}} zprávy",
+    "sentMessages_many": "{{name}} ti poslal(a) {{count}} zprávy",
+    "sentMessages_other": "{{name}} ti poslal(a) {{count}} zpráv",
+    "messagesLabel": "Zprávy od {{name}}",
+    "accept": "Přijmout",
+    "decline": "Odmítnout",
+    "addFriend": "Přidat přítele",
+    "replyBlocked": "Chceš-li odpovědět uživateli {{name}}, přijmi žádost.",
+    "empty": "Žádné žádosti o zprávy.",
+    "failed": "Nepodařilo se. Zkus to prosím znovu."
   }
 }

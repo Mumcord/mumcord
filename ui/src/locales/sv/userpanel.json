@@ -93,7 +93,11 @@
     "offerImages": "Erbjud bilder i full storlek",
     "offerImagesHint": "Låt andra läsa in dina originalbilder",
     "loadImages": "Läs in bilder i full storlek",
-    "loadImagesHint": "Hämta originalbilder från andra"
+    "loadImagesHint": "Hämta originalbilder från andra",
+    "privateMessages": "Privata meddelanden från",
+    "pm_everyone": "Alla",
+    "pm_friendsOnly": "Vänner",
+    "pm_nobody": "Ingen"
   },
   "voice": {
     "line": "Röst: {{channel}} · {{server}}",

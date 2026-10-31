@@ -11,10 +11,8 @@ use crate::{chat, follow};
 
 /// Every protocol event of the connected session, after the engine handled it.
 pub(crate) fn on_event(ctx: &SessionCtx, event: &Event) {
-    match event {
-        Event::TextMessage(message) => chat::on_text(ctx, message),
-        Event::PermissionDenied(denied) => follow::publish_denial(ctx.server_id, denied),
-        _ => {}
+    if let Event::PermissionDenied(denied) = event {
+        follow::publish_denial(ctx.server_id, denied);
     }
 }
 

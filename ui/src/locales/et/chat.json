@@ -273,5 +273,28 @@
     "unreachable": "Server pole kättesaadav",
     "warning_one": "{{count}} link selles sõnas näitab sisselogimisandmed",
     "warning_other": "{{count}} link selles sõnas näitavad sisselogimisandmed"
+  },
+  "requests": {
+    "entry": "Sõnumitaotlused",
+    "entryCount_one": "{{count}} taotlus",
+    "entryCount_other": "{{count}} taotlust",
+    "title": "Sõnumitaotlused",
+    "listLabel": "Taotlused",
+    "chatRequestTag": "Vestlustaotlus",
+    "messageRequestTag": "Sõnumitaotlus",
+    "wantsToChat": "{{name}} soovib sinuga vestelda",
+    "metaMumcord": "Mumcordi kasutaja · {{server}} · {{time}}",
+    "metaStandard": "{{server}} · {{time}}",
+    "noteFrom": "{{name}} märge",
+    "explain": "Oled seadnud privaatsõnumid väärtusele „Ainult sõbrad“. Vastuvõtmisel saab {{name}} sulle kirjutada. Keeldumine on vaikne: {{name}} näeb ainult „ootel“. Taotlused kustutatakse, kui sa Mumcordi sulged.",
+    "sentMessages_one": "{{name}} saatis sulle {{count}} sõnumi",
+    "sentMessages_other": "{{name}} saatis sulle {{count}} sõnumit",
+    "messagesLabel": "Sõnumid kasutajalt {{name}}",
+    "accept": "Võta vastu",
+    "decline": "Keeldu",
+    "addFriend": "Lisa sõber",
+    "replyBlocked": "Kasutajale {{name}} vastamiseks võta taotlus vastu.",
+    "empty": "Sõnumitaotlusi pole.",
+    "failed": "See ei õnnestunud. Proovi palun uuesti."
   }
 }

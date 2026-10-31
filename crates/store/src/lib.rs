@@ -5,6 +5,7 @@
 //! Secrets (the identity PKCS#12 and server passwords) only ever go to the OS secure
 //! storage via [`SecretStore`]; nothing secret is written to SQLite or plain files.
 
+mod accepted;
 mod channel_tokens;
 mod db;
 mod error;
@@ -19,6 +20,7 @@ mod settings;
 mod social;
 mod synced;
 
+pub use accepted::AcceptedConversation;
 pub use channel_tokens::{ChannelToken, TokenChannel};
 pub use db::{DB_FILE_NAME, Store, UnixMillis};
 pub use error::{Error, Result};
@@ -34,8 +36,8 @@ pub use settings::{
     DEFAULT_INGAME_SIZE_PERCENT, DEFAULT_MAX_CONNECTED_SERVERS, GameKey, GameOverlayEntry,
     InGameOverlayMode, InGameOverlaySettings, LogLevel, MAX_MAX_CONNECTED_SERVERS,
     MAX_VIDEO_DUCKING_PERCENT, MIN_MAX_CONNECTED_SERVERS, MIN_VIDEO_DUCKING_PERCENT,
-    NotificationMode, OverlayCorner, OwnVoice, PositionalSettings, Settings, SoundSettings,
-    TalkMode, Theme, ThemePreference, VoiceActivation,
+    NotificationMode, OverlayCorner, OwnVoice, PmRule, PositionalSettings, PrivateMessageSettings,
+    Settings, SoundSettings, TalkMode, Theme, ThemePreference, VoiceActivation,
 };
 pub use social::{FollowedChannel, PersonSetting};
 pub use synced::RangeSummary;

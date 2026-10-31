@@ -93,7 +93,11 @@
     "offerImages": "Afbeeldingen op volledige grootte aanbieden",
     "offerImagesHint": "Laat anderen je originele afbeeldingen laden",
     "loadImages": "Afbeeldingen op volledige grootte laden",
-    "loadImagesHint": "Originele afbeeldingen van anderen ophalen"
+    "loadImagesHint": "Originele afbeeldingen van anderen ophalen",
+    "privateMessages": "Privéberichten van",
+    "pm_everyone": "Iedereen",
+    "pm_friendsOnly": "Vrienden",
+    "pm_nobody": "Niemand"
   },
   "voice": {
     "line": "Spraak: {{channel}} · {{server}}",

@@ -670,5 +670,35 @@
     "releasePage": "Versionssida",
     "entries": "Poster: {{count}}",
     "englishNote": "Ändringsloggen är skriven på engelska."
+  },
+  "privateMessages": {
+    "title": "Privata meddelanden",
+    "legend": "Privata meddelanden från",
+    "everyone": "Alla",
+    "everyoneHint": "Vem som helst på en server kan skriva till dig.",
+    "friendsOnly": "Bara vänner",
+    "friendsOnlyHint": "Andra Mumcord-användare kan skicka en chattförfrågan i stället. Meddelanden från standardklienter hamnar i ”Meddelandeförfrågningar”.",
+    "nobody": "Ingen",
+    "nobodyHint": "Inga privata meddelanden och inga chattförfrågningar visas. Avsändare får inget veta.",
+    "keepRequests": "Behåll meddelanden från standardklienter som meddelandeförfrågningar",
+    "keepRequestsHint": "Används bara med ”Bara vänner”. När den är av släpps dessa meddelanden.",
+    "overrideTitle": "Undantag per server",
+    "overrideLabel": "Privata meddelanden från på {{server}}",
+    "useDefault": "Använd standard ({{rule}})",
+    "noServers": "Inga sparade servrar ännu.",
+    "alwaysTitle": "Alltid tillåtna",
+    "currentChannel": "Personer i min nuvarande kanal",
+    "currentChannelHint": "Gäller före ”Bara vänner” och ”Ingen” så länge vi är i samma kanal.",
+    "accepted": "Konversationer jag redan har accepterat",
+    "acceptedHint": "Personer vars chattförfrågan du har accepterat kan fortsätta skriva till dig."
+  },
+  "acceptedConversations": {
+    "title": "Accepterade konversationer",
+    "empty": "Inga accepterade konversationer ännu.",
+    "acceptedAt": "Accepterad {{date}}",
+    "identity": "Identitet: {{label}}",
+    "revoke": "Återkalla",
+    "revokeLabel": "Återkalla den accepterade konversationen med {{name}}",
+    "revokeFailed": "Återkallningen misslyckades. Försök igen."
   }
 }

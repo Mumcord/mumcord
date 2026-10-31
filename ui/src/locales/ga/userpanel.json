@@ -93,7 +93,11 @@
     "offerImages": "Tairg íomhánna ar a méid iomlán",
     "offerImagesHint": "Lig do dhaoine eile do bhuníomhánna a luchtú",
     "loadImages": "Luchtaigh íomhánna ar a méid iomlán",
-    "loadImagesHint": "Faigh buníomhánna ó dhaoine eile"
+    "loadImagesHint": "Faigh buníomhánna ó dhaoine eile",
+    "privateMessages": "Teachtaireachtaí príobháideacha ó",
+    "pm_everyone": "Gach duine",
+    "pm_friendsOnly": "Cairde",
+    "pm_nobody": "Duine ar bith"
   },
   "voice": {
     "line": "Guth: {{channel}} · {{server}}",

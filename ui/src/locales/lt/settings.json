@@ -676,5 +676,35 @@
     "releasePage": "Laidos puslapis",
     "entries": "Įrašų: {{count}}",
     "englishNote": "Pakeitimų žurnalas parašytas anglų kalba."
+  },
+  "privateMessages": {
+    "title": "Privačios žinutės",
+    "legend": "Privačios žinutės iš",
+    "everyone": "Visų",
+    "everyoneHint": "Serveryje bet kas gali tau rašyti.",
+    "friendsOnly": "Tik draugų",
+    "friendsOnlyHint": "Kiti „Mumcord“ naudotojai vietoj to gali atsiųsti pokalbio prašymą. Standartinių klientų žinutės patenka į „Žinučių prašymus“.",
+    "nobody": "Niekieno",
+    "nobodyHint": "Privačios žinutės ir pokalbio prašymai nerodomi. Siuntėjai neinformuojami.",
+    "keepRequests": "Standartinių klientų žinutes laikyti kaip žinučių prašymus",
+    "keepRequestsHint": "Naudojama tik su „Tik draugų“. Kai išjungta, šios žinutės atmetamos.",
+    "overrideTitle": "Išimtis pagal serverį",
+    "overrideLabel": "Privačios žinutės iš serveryje {{server}}",
+    "useDefault": "Naudoti numatytąjį ({{rule}})",
+    "noServers": "Išsaugotų serverių dar nėra.",
+    "alwaysTitle": "Visada leidžiama",
+    "currentChannel": "Žmonės mano dabartiniame kanale",
+    "currentChannelHint": "Viršesnis už „Tik draugų“ ir „Niekieno“, kol esame tame pačiame kanale.",
+    "accepted": "Pokalbiai, kuriuos jau priėmiau",
+    "acceptedHint": "Žmonės, kurių pokalbio prašymą priėmei, gali toliau tau rašyti."
+  },
+  "acceptedConversations": {
+    "title": "Priimti pokalbiai",
+    "empty": "Priimtų pokalbių dar nėra.",
+    "acceptedAt": "Priimta {{date}}",
+    "identity": "Tapatybė: {{label}}",
+    "revoke": "Atšaukti",
+    "revokeLabel": "Atšaukti priimtą pokalbį su {{name}}",
+    "revokeFailed": "Atšaukti nepavyko. Bandyk dar kartą."
   }
 }

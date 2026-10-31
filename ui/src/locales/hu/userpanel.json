@@ -93,7 +93,11 @@
     "offerImages": "Teljes méretű képek felkínálása",
     "offerImagesHint": "Mások betölthetik az eredeti képeidet",
     "loadImages": "Teljes méretű képek betöltése",
-    "loadImagesHint": "Eredeti képek lekérése másoktól"
+    "loadImagesHint": "Eredeti képek lekérése másoktól",
+    "privateMessages": "Privát üzenetek tőle",
+    "pm_everyone": "Bárki",
+    "pm_friendsOnly": "Barátok",
+    "pm_nobody": "Senki"
   },
   "voice": {
     "line": "Hang: {{channel}} · {{server}}",

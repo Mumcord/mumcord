@@ -93,7 +93,11 @@
     "offerImages": "Tarjoa täysikokoiset kuvat",
     "offerImagesHint": "Anna muiden ladata alkuperäiset kuvasi",
     "loadImages": "Lataa täysikokoiset kuvat",
-    "loadImagesHint": "Hae alkuperäiset kuvat muilta"
+    "loadImagesHint": "Hae alkuperäiset kuvat muilta",
+    "privateMessages": "Yksityisviestit keneltä",
+    "pm_everyone": "Kaikilta",
+    "pm_friendsOnly": "Kaverit",
+    "pm_nobody": "Ei keneltäkään"
   },
   "voice": {
     "line": "Puhe: {{channel}} · {{server}}",

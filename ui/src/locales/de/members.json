@@ -58,7 +58,9 @@
     "join": "{{channel}} beitreten",
     "joinDenied": "Du darfst diesen Kanal nicht betreten.",
     "mute": "Für mich stummschalten",
-    "connectionInfo": "Verbindungsinfo …"
+    "connectionInfo": "Verbindungsinfo …",
+    "chatRequest": "Chatanfrage senden …",
+    "chatRequestPending": "Chatanfrage ausstehend"
   },
   "nowPlaying": {
     "label": "Läuft gerade",
@@ -83,6 +85,14 @@
   "preview": {
     "privateMessage": "Private Nachricht",
     "fullProfile": "Vollständiges Profil"
+  },
+  "chatRequest": {
+    "title": "Chatanfrage an {{name}}",
+    "note": "Notiz (optional)",
+    "counter": "{{count}} / {{max}}",
+    "counterLabel": "{{count}} von {{max}} Zeichen verwendet",
+    "send": "Senden",
+    "failed": "Die Chatanfrage konnte nicht gesendet werden. Bitte versuche es erneut."
   },
   "toggle": {
     "show": "Mitglieder anzeigen",

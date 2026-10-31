@@ -93,7 +93,11 @@
     "offerImages": "Udostępniaj obrazy w pełnym rozmiarze",
     "offerImagesHint": "Pozwól innym pobierać Twoje oryginalne obrazy",
     "loadImages": "Wczytuj obrazy w pełnym rozmiarze",
-    "loadImagesHint": "Pobieraj oryginalne obrazy od innych"
+    "loadImagesHint": "Pobieraj oryginalne obrazy od innych",
+    "privateMessages": "Wiadomości prywatne od",
+    "pm_everyone": "Wszystkich",
+    "pm_friendsOnly": "Znajomych",
+    "pm_nobody": "Nikogo"
   },
   "voice": {
     "line": "Głos: {{channel}} · {{server}}",

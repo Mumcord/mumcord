@@ -237,6 +237,8 @@ struct Inner {
     user_stats: Mutex<crate::stats::UserStatsHub>,
     /// Other Mumcord users on each server (FR-1.61).
     mumcord: crate::mumcord::ServerPeers,
+    /// Chat and message requests per server (issue #141).
+    pm_requests: crate::pm_rules::ServerRequests,
     /// History sync with other Mumcord users (FR-1.60).
     history_sync: Arc<Mutex<crate::history_sync::HistorySync>>,
     /// Positional audio (FR-1.41).
@@ -541,6 +543,7 @@ impl Engine {
             now_gaming: Mutex::new(crate::now_gaming::NowGaming::new(settings.now_gaming)),
             user_stats: Mutex::default(),
             mumcord: Mutex::default(),
+            pm_requests: Mutex::default(),
             history_sync: Arc::default(),
             watch_parties: Mutex::default(),
             screen_shares: Mutex::default(),
@@ -680,6 +683,10 @@ impl Engine {
 
     pub(crate) fn mumcord_state(&self) -> &crate::mumcord::ServerPeers {
         &self.inner.mumcord
+    }
+
+    pub(crate) fn pm_requests_state(&self) -> &crate::pm_rules::ServerRequests {
+        &self.inner.pm_requests
     }
 
     pub(crate) fn watch_party_state(&self) -> &crate::watch_party::ServerParties {
@@ -1575,6 +1582,7 @@ impl Inner {
             crate::now_playing::on_disconnect(&self.now_playing, server_id, &session.handle);
             crate::now_gaming::on_disconnect(&self.now_gaming, server_id, &session.handle);
             crate::mumcord::on_disconnect(&self.mumcord, server_id);
+            crate::pm_rules::on_disconnect(&self.pm_requests, server_id);
             crate::history_sync::on_disconnect(&self.history_sync, server_id);
             self.forget_password_attempt(server_id);
             self.full_images.reset(server_id);
@@ -2394,6 +2402,7 @@ impl Inner {
                 crate::now_playing::on_user_removed(&self.now_playing, server_id, user.session);
                 crate::now_gaming::on_user_removed(&self.now_gaming, server_id, user.session);
                 crate::mumcord::on_user_removed(&self.mumcord, server_id, user.session);
+                crate::pm_rules::on_user_removed(ctx, &self.pm_requests, user.session);
                 crate::history_sync::on_user_removed(&self.history_sync, server_id, user.session);
                 crate::watch_party::on_user_removed(&self.watch_parties, ctx, user.session);
                 crate::screen_share::on_user_removed(
@@ -2450,11 +2459,17 @@ impl Inner {
                 crate::watch_party::on_plugin_data(&self.watch_parties, ctx, data);
                 crate::screen_share::on_plugin_data(&self.screen_shares, &self.mumcord, ctx, data);
                 crate::history_sync::on_plugin_data(&self.history_sync, ctx, data);
+                crate::pm_rules::on_plugin_data(ctx, &self.pm_requests, data);
                 crate::full_image::on_plugin_data(&self.full_images, &self.previews, ctx, data);
                 self.direct.on_plugin_data(ctx, data);
             }
             Event::UserStats(stats) => crate::stats::on_stats(&self.user_stats, ctx, stats),
-            Event::TextMessage(_) | Event::ServerConfigUpdated(_) | Event::Disconnected(_) => {}
+            // Here rather than in the extension hooks: the private message rule needs to know
+            // who runs Mumcord (issue #141).
+            Event::TextMessage(message) => {
+                crate::chat::on_text(ctx, message, &self.mumcord, &self.pm_requests);
+            }
+            Event::ServerConfigUpdated(_) | Event::Disconnected(_) => {}
         }
         extension::on_event(ctx, &event);
     }

@@ -93,7 +93,11 @@
     "offerImages": "Piedāvāt pilna izmēra attēlus",
     "offerImagesHint": "Ļauj citiem ielādēt tavus oriģinālos attēlus",
     "loadImages": "Ielādēt pilna izmēra attēlus",
-    "loadImagesHint": "Iegūt oriģinālos attēlus no citiem"
+    "loadImagesHint": "Iegūt oriģinālos attēlus no citiem",
+    "privateMessages": "Privātās ziņas no",
+    "pm_everyone": "Visiem",
+    "pm_friendsOnly": "Draugi",
+    "pm_nobody": "Nevienam"
   },
   "voice": {
     "line": "Balss: {{channel}} · {{server}}",

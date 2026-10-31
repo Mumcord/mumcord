@@ -676,5 +676,35 @@
     "releasePage": "Strona wydania",
     "entries": "Wpisy: {{count}}",
     "englishNote": "Lista zmian jest napisana po angielsku."
+  },
+  "privateMessages": {
+    "title": "Wiadomości prywatne",
+    "legend": "Wiadomości prywatne od",
+    "everyone": "Wszystkich",
+    "everyoneHint": "Każdy na serwerze może do Ciebie pisać.",
+    "friendsOnly": "Tylko znajomych",
+    "friendsOnlyHint": "Inni użytkownicy Mumcorda mogą zamiast tego wysłać prośbę o czat. Wiadomości od standardowych klientów trafiają do „Próśb o wiadomości”.",
+    "nobody": "Nikogo",
+    "nobodyHint": "Wiadomości prywatne i prośby o czat nie są wyświetlane. Nadawcy nie są o tym informowani.",
+    "keepRequests": "Zachowuj wiadomości od standardowych klientów jako prośby o wiadomości",
+    "keepRequestsHint": "Używane tylko przy ustawieniu „Tylko znajomych”. Gdy wyłączone, te wiadomości są odrzucane.",
+    "overrideTitle": "Wyjątek dla serwera",
+    "overrideLabel": "Wiadomości prywatne od na serwerze {{server}}",
+    "useDefault": "Użyj domyślnego ({{rule}})",
+    "noServers": "Brak zapisanych serwerów.",
+    "alwaysTitle": "Zawsze dozwolone",
+    "currentChannel": "Osoby w moim bieżącym kanale",
+    "currentChannelHint": "Ma pierwszeństwo przed „Tylko znajomych” i „Nikogo”, dopóki jesteśmy na tym samym kanale.",
+    "accepted": "Rozmowy, które już zaakceptowałem(-am)",
+    "acceptedHint": "Osoby, których prośbę o czat zaakceptowano, mogą dalej do Ciebie pisać."
+  },
+  "acceptedConversations": {
+    "title": "Zaakceptowane rozmowy",
+    "empty": "Brak zaakceptowanych rozmów.",
+    "acceptedAt": "Zaakceptowano {{date}}",
+    "identity": "Tożsamość: {{label}}",
+    "revoke": "Cofnij",
+    "revokeLabel": "Cofnij zaakceptowaną rozmowę z {{name}}",
+    "revokeFailed": "Cofnięcie nie powiodło się. Spróbuj ponownie."
   }
 }

@@ -277,20 +277,24 @@ pub(crate) fn transient_id() -> String {
     )
 }
 
-/// Incoming text message: route, sanitize, store, emit, count unread (hook from the session).
-pub(crate) fn on_text(ctx: &SessionCtx, msg: &TextMessage) {
+/// Incoming text message: route, sanitize, apply the private message rule (issue #141), then
+/// store, emit and count unread (hook from the session).
+pub(crate) fn on_text(
+    ctx: &SessionCtx,
+    msg: &TextMessage,
+    peers: &crate::mumcord::ServerPeers,
+    requests: &crate::pm_rules::ServerRequests,
+) {
     let routed = ctx.handle.with_state(|s| {
         let route = route(s, msg)?;
         let sender = msg.actor.and_then(|a| s.users.get(&a));
-        let unread = counts_unread(s, route);
         Some((
             route,
             sender.map(|u| u.name.clone()).unwrap_or_default(),
             sender.and_then(|u| u.cert_hash.clone()),
-            unread,
         ))
     });
-    let Some((route, sender_name, sender_cert_hash, counts_unread)) = routed else {
+    let Some((route, sender_name, sender_cert_hash)) = routed else {
         return;
     };
     let conversation = match route {
@@ -302,12 +306,9 @@ pub(crate) fn on_text(ctx: &SessionCtx, msg: &TextMessage) {
             None => ConversationRef::PrivateSession { session },
         },
     };
-    let Ok(key) = unread_key(ctx, &conversation) else {
-        return;
-    };
-    let mut message = ChatMessageView {
+    let message = ChatMessageView {
         id: String::new(),
-        conversation: conversation.clone(),
+        conversation,
         sender_name,
         sender_cert_hash,
         sender_session: msg.actor,
@@ -316,6 +317,27 @@ pub(crate) fn on_text(ctx: &SessionCtx, msg: &TextMessage) {
         body: sanitize_message_html(&msg.message),
         dismissed_previews: Vec::new(),
         synced_from: None,
+    };
+    if let Route::Private { session } = route {
+        match crate::pm_rules::screen(ctx, peers, requests, session) {
+            crate::pm_rules::Verdict::Show => {}
+            crate::pm_rules::Verdict::Hold => {
+                crate::pm_rules::hold(ctx, requests, session, message);
+                return;
+            }
+            crate::pm_rules::Verdict::Drop => return,
+        }
+    }
+    let counts_unread = ctx.handle.with_state(|s| counts_unread(s, route));
+    deliver(ctx, message, counts_unread);
+}
+
+/// Stores, emits and counts an incoming message; also used for held message requests once
+/// they are accepted (issue #141).
+pub(crate) fn deliver(ctx: &SessionCtx, mut message: ChatMessageView, counts_unread: bool) {
+    let conversation = message.conversation.clone();
+    let Ok(key) = unread_key(ctx, &conversation) else {
+        return;
     };
     let stored = match &key {
         UnreadKey::Stored(c) => Some(c.clone()),
@@ -515,6 +537,7 @@ impl Engine {
             .send_text(&TextTarget::user(session), html)
             .map_err(command_error)?;
         await_refusal(&ctx, denials, None).await?;
+        crate::pm_rules::on_own_private_message(&ctx, self.pm_requests_state(), session);
         let conversation = match recipient {
             Some(cert_hash) => ConversationRef::Private { cert_hash },
             None => ConversationRef::PrivateSession { session },

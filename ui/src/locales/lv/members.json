@@ -59,7 +59,9 @@
     "join": "Pievienoties kanālam {{channel}}",
     "joinDenied": "Jums nav atļaujas ieiet šajā kanālā.",
     "mute": "Izslēgt man",
-    "connectionInfo": "Savienojuma informācija…"
+    "connectionInfo": "Savienojuma informācija…",
+    "chatRequest": "Sūtīt tērzēšanas pieprasījumu…",
+    "chatRequestPending": "Tērzēšanas pieprasījums gaida"
   },
   "nowPlaying": {
     "label": "Tagad skan",
@@ -85,6 +87,14 @@
   "preview": {
     "privateMessage": "Privāta ziņa",
     "fullProfile": "Pilns profils"
+  },
+  "chatRequest": {
+    "title": "Tērzēšanas pieprasījums lietotājam {{name}}",
+    "note": "Piezīme (neobligāta)",
+    "counter": "{{count}} / {{max}}",
+    "counterLabel": "Izmantotas {{count}} no {{max}} rakstzīmēm",
+    "send": "Sūtīt",
+    "failed": "Tērzēšanas pieprasījumu neizdevās nosūtīt. Lūdzu, mēģini vēlreiz."
   },
   "toggle": {
     "show": "Rādīt dalībniekus",
