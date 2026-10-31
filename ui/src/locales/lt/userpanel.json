@@ -97,10 +97,14 @@
     "dnd": "Netrukdyti",
     "dndHint": "Nutildo pranešimų garsus ir reklamjuostes",
     "dndSystemHint": "Įjungta per darbalaukio režimą „Netrukdyti“",
-    "privateMessages": "Privačios žinutės iš",
+    "privateMessages": "Žinutės iš",
     "pm_everyone": "Visų",
     "pm_friendsOnly": "Draugų",
-    "pm_nobody": "Niekieno"
+    "pm_nobody": "Niekieno",
+    "notifications": "Pranešimai",
+    "sharing": "Bendrinimas",
+    "appearance": "Išvaizda",
+    "account": "Paskyra"
   },
   "voice": {
     "line": "Balsas: {{channel}} · {{server}}",

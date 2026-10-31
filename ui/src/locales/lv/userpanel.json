@@ -97,10 +97,14 @@
     "dnd": "Netraucēt",
     "dndHint": "Izslēdz paziņojumu skaņas un reklāmkarogus",
     "dndSystemHint": "Ieslēgts ar darbvirsmas režīmu “Netraucēt”",
-    "privateMessages": "Privātās ziņas no",
+    "privateMessages": "Ziņas no",
     "pm_everyone": "Visiem",
     "pm_friendsOnly": "Draugi",
-    "pm_nobody": "Nevienam"
+    "pm_nobody": "Nevienam",
+    "notifications": "Paziņojumi",
+    "sharing": "Koplietošana",
+    "appearance": "Izskats",
+    "account": "Konts"
   },
   "voice": {
     "line": "Balss: {{channel}} · {{server}}",

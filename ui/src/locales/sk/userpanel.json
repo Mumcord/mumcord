@@ -97,10 +97,14 @@
     "dnd": "Nerušiť",
     "dndHint": "Stlmí zvuky a bannery upozornení",
     "dndSystemHint": "Zapnuté cez režim Nerušiť vášho prostredia",
-    "privateMessages": "Súkromné správy od",
+    "privateMessages": "Správy od",
     "pm_everyone": "Všetci",
     "pm_friendsOnly": "Priatelia",
-    "pm_nobody": "Nikto"
+    "pm_nobody": "Nikto",
+    "notifications": "Upozornenia",
+    "sharing": "Zdieľanie",
+    "appearance": "Vzhľad",
+    "account": "Účet"
   },
   "voice": {
     "line": "Hlas: {{channel}} · {{server}}",
