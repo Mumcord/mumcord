@@ -361,5 +361,15 @@
       "deleteHistory": "Elimina cronologia",
       "deleteHint": "Solo questo dispositivo · {{name}} conserva la sua copia"
     }
+  },
+  "embedHint": {
+    "image": "Immagine nascosta, perché le anteprime e gli incorporamenti dei link sono disattivati in <settings>Impostazioni > Privacy</settings>.",
+    "gif": "GIF nascosta, perché le anteprime e gli incorporamenti dei link sono disattivati in <settings>Impostazioni > Privacy</settings>.",
+    "video": "Lettore video nascosto, perché le anteprime e gli incorporamenti dei link sono disattivati in <settings>Impostazioni > Privacy</settings>.",
+    "audio": "Lettore audio nascosto, perché le anteprime e gli incorporamenti dei link sono disattivati in <settings>Impostazioni > Privacy</settings>.",
+    "link": "Anteprima del link nascosta, perché le anteprime e gli incorporamenti dei link sono disattivati in <settings>Impostazioni > Privacy</settings>.",
+    "several_one": "{{count}} anteprima nascosta, perché le anteprime e gli incorporamenti dei link sono disattivati in <settings>Impostazioni > Privacy</settings>.",
+    "several_many": "{{count}} anteprime nascoste, perché le anteprime e gli incorporamenti dei link sono disattivati in <settings>Impostazioni > Privacy</settings>.",
+    "several_other": "{{count}} anteprime nascoste, perché le anteprime e gli incorporamenti dei link sono disattivati in <settings>Impostazioni > Privacy</settings>."
   }
 }

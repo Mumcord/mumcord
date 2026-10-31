@@ -24,6 +24,8 @@ import { credentialLinks, mumbleLinks } from "./mumbleLink";
 import { MumbleLinkCard } from "./MumbleLinkCard";
 import { openInBrowser } from "./openLink";
 import { DismissButton, OpenButton } from "./cardButtons";
+import { EmbedHiddenHint } from "./EmbedHiddenHint";
+import { hiddenEmbedKind } from "./embedHint";
 import { InlineImageCard } from "./InlineImageCard";
 import { PagePlayer } from "./PagePlayer";
 import { WatchTogetherButton } from "../watchparty";
@@ -37,7 +39,8 @@ interface LinkPreviewsProps {
   html: string;
   /** Message HTML as the engine delivered it; still holds external `<img src>` URLs. */
   body: string;
-  /** "Link previews in chat": without it only the `mumble://` card is shown, without figures. */
+  /** "Link previews in chat": without it only the `mumble://` card is shown, without figures,
+   * plus a hint naming what was hidden. */
   linkPreviews: boolean;
   /** Roving tab stop of the message the cards belong to. */
   tabIndex: number;
@@ -64,16 +67,19 @@ export function LinkPreviews({
   const hidden = useDismissedPreviews(messageId, dismissed);
   // A `mumble://` link always gets its card, because the card is the message's own content; the
   // web previews need the setting (issue #175).
-  const shown = [
-    ...mumble,
-    ...(linkPreviews ? [...images, ...links.filter((url) => !images.includes(url))] : []),
-  ]
+  const wanted = [...mumble, ...images, ...links.filter((url) => !images.includes(url))]
     .filter((url) => !hidden.has(url))
     .slice(0, MAX_PREVIEWS);
-  if (shown.length === 0) return null;
+  const shown = linkPreviews ? wanted : wanted.filter((url) => mumble.includes(url));
+  // What the switch hides gets one combined hint instead of vanishing silently (issue #261).
+  const withheld = wanted
+    .filter((url) => !shown.includes(url))
+    .map((url) => hiddenEmbedKind(url, images));
+  if (shown.length === 0 && withheld.length === 0) return null;
   const credentials = credentialLinks(mumble);
   return (
     <div className="link-previews">
+      <EmbedHiddenHint kinds={withheld} tabIndex={tabIndex} />
       {shown.map((url) =>
         mumble.includes(url) ? (
           <MumbleLinkCard

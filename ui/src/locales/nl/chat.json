@@ -353,5 +353,14 @@
       "deleteHistory": "Geschiedenis verwijderen",
       "deleteHint": "Alleen dit apparaat · {{name}} houdt een eigen kopie"
     }
+  },
+  "embedHint": {
+    "image": "Afbeelding verborgen, omdat linkvoorbeelden en insluitingen uit staan in <settings>Instellingen > Privacy</settings>.",
+    "gif": "GIF verborgen, omdat linkvoorbeelden en insluitingen uit staan in <settings>Instellingen > Privacy</settings>.",
+    "video": "Videospeler verborgen, omdat linkvoorbeelden en insluitingen uit staan in <settings>Instellingen > Privacy</settings>.",
+    "audio": "Audiospeler verborgen, omdat linkvoorbeelden en insluitingen uit staan in <settings>Instellingen > Privacy</settings>.",
+    "link": "Linkvoorbeeld verborgen, omdat linkvoorbeelden en insluitingen uit staan in <settings>Instellingen > Privacy</settings>.",
+    "several_one": "{{count}} voorbeeld verborgen, omdat linkvoorbeelden en insluitingen uit staan in <settings>Instellingen > Privacy</settings>.",
+    "several_other": "{{count}} voorbeelden verborgen, omdat linkvoorbeelden en insluitingen uit staan in <settings>Instellingen > Privacy</settings>."
   }
 }

@@ -353,5 +353,14 @@
       "deleteHistory": "Delete history",
       "deleteHint": "This device only · {{name}} keeps their copy"
     }
+  },
+  "embedHint": {
+    "image": "Image hidden because link previews and embeds are off in <settings>Settings > Privacy</settings>.",
+    "gif": "GIF hidden because link previews and embeds are off in <settings>Settings > Privacy</settings>.",
+    "video": "Video player hidden because link previews and embeds are off in <settings>Settings > Privacy</settings>.",
+    "audio": "Audio player hidden because link previews and embeds are off in <settings>Settings > Privacy</settings>.",
+    "link": "Link preview hidden because link previews and embeds are off in <settings>Settings > Privacy</settings>.",
+    "several_one": "{{count}} preview hidden because link previews and embeds are off in <settings>Settings > Privacy</settings>.",
+    "several_other": "{{count}} previews hidden because link previews and embeds are off in <settings>Settings > Privacy</settings>."
   }
 }

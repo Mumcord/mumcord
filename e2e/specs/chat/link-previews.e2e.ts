@@ -310,6 +310,20 @@ describe("chat: link previews, player cards and inline images (AC-1.39, AC-1.40,
     await expect($$("article.link-card")).toBeElementsArrayOfSize(0);
     await expect($$("figure.inline-image")).toBeElementsArrayOfSize(0);
     expect(site.requests.length).toBe(before);
+
+    // Issue #261: each message names what was hidden in one hint that leads to the switch.
+    const tail = "hidden because link previews and embeds are off in Settings > Privacy.";
+    const hint = (text: string) =>
+      $(`//li[contains(@class,'chat-message')][contains(., '${text}')]//p[@class='embed-hint']`);
+    await expect(hint("plain")).toHaveText(`Link preview ${tail}`);
+    await expect(hint("no pictures")).toHaveText(`2 previews ${tail}`);
+    await hint("no pictures").$("button=Settings > Privacy").click();
+    await expect($("//button[@role='tab' and .='Privacy']")).toHaveAttribute(
+      "aria-selected",
+      "true",
+    );
+    await browser.keys("Escape");
+    await $(".overlay__dialog").waitForExist({ reverse: true, timeout: 5000 });
   });
 
   // Issue #160: the watch party loads YouTube, so it follows the same switch.

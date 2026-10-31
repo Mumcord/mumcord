@@ -353,5 +353,14 @@
       "deleteHistory": "Kustuta vestluslugu",
       "deleteHint": "Ainult see seade · {{name}} säilitab oma koopia"
     }
+  },
+  "embedHint": {
+    "image": "Pilt on peidetud, sest linkide eelvaated ja manused on välja lülitatud jaotises <settings>Seaded > Privaatsus</settings>.",
+    "gif": "GIF on peidetud, sest linkide eelvaated ja manused on välja lülitatud jaotises <settings>Seaded > Privaatsus</settings>.",
+    "video": "Videopleier on peidetud, sest linkide eelvaated ja manused on välja lülitatud jaotises <settings>Seaded > Privaatsus</settings>.",
+    "audio": "Helipleier on peidetud, sest linkide eelvaated ja manused on välja lülitatud jaotises <settings>Seaded > Privaatsus</settings>.",
+    "link": "Lingi eelvaade on peidetud, sest linkide eelvaated ja manused on välja lülitatud jaotises <settings>Seaded > Privaatsus</settings>.",
+    "several_one": "{{count}} eelvaade on peidetud, sest linkide eelvaated ja manused on välja lülitatud jaotises <settings>Seaded > Privaatsus</settings>.",
+    "several_other": "{{count}} eelvaadet on peidetud, sest linkide eelvaated ja manused on välja lülitatud jaotises <settings>Seaded > Privaatsus</settings>."
   }
 }

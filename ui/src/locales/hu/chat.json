@@ -353,5 +353,14 @@
       "deleteHistory": "Előzmények törlése",
       "deleteHint": "Csak ez az eszköz · {{name}} megtartja a saját másolatát"
     }
+  },
+  "embedHint": {
+    "image": "Kép elrejtve, mert a linkelőnézetek és beágyazások ki vannak kapcsolva itt: <settings>Beállítások > Adatvédelem</settings>.",
+    "gif": "GIF elrejtve, mert a linkelőnézetek és beágyazások ki vannak kapcsolva itt: <settings>Beállítások > Adatvédelem</settings>.",
+    "video": "Videolejátszó elrejtve, mert a linkelőnézetek és beágyazások ki vannak kapcsolva itt: <settings>Beállítások > Adatvédelem</settings>.",
+    "audio": "Hanglejátszó elrejtve, mert a linkelőnézetek és beágyazások ki vannak kapcsolva itt: <settings>Beállítások > Adatvédelem</settings>.",
+    "link": "Linkelőnézet elrejtve, mert a linkelőnézetek és beágyazások ki vannak kapcsolva itt: <settings>Beállítások > Adatvédelem</settings>.",
+    "several_one": "{{count}} előnézet elrejtve, mert a linkelőnézetek és beágyazások ki vannak kapcsolva itt: <settings>Beállítások > Adatvédelem</settings>.",
+    "several_other": "{{count}} előnézet elrejtve, mert a linkelőnézetek és beágyazások ki vannak kapcsolva itt: <settings>Beállítások > Adatvédelem</settings>."
   }
 }

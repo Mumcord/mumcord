@@ -369,5 +369,16 @@
       "deleteHistory": "Odstrániť históriu",
       "deleteHint": "Iba toto zariadenie · {{name}} si ponechá svoju kópiu"
     }
+  },
+  "embedHint": {
+    "image": "Obrázok je skrytý, pretože náhľady odkazov a vložený obsah sú vypnuté v <settings>Nastavenia > Súkromie</settings>.",
+    "gif": "GIF je skrytý, pretože náhľady odkazov a vložený obsah sú vypnuté v <settings>Nastavenia > Súkromie</settings>.",
+    "video": "Videoprehrávač je skrytý, pretože náhľady odkazov a vložený obsah sú vypnuté v <settings>Nastavenia > Súkromie</settings>.",
+    "audio": "Audioprehrávač je skrytý, pretože náhľady odkazov a vložený obsah sú vypnuté v <settings>Nastavenia > Súkromie</settings>.",
+    "link": "Náhľad odkazu je skrytý, pretože náhľady odkazov a vložený obsah sú vypnuté v <settings>Nastavenia > Súkromie</settings>.",
+    "several_one": "{{count}} náhľad je skrytý, pretože náhľady odkazov a vložený obsah sú vypnuté v <settings>Nastavenia > Súkromie</settings>.",
+    "several_few": "{{count}} náhľady sú skryté, pretože náhľady odkazov a vložený obsah sú vypnuté v <settings>Nastavenia > Súkromie</settings>.",
+    "several_many": "{{count}} náhľadu je skrytých, pretože náhľady odkazov a vložený obsah sú vypnuté v <settings>Nastavenia > Súkromie</settings>.",
+    "several_other": "{{count}} náhľadov je skrytých, pretože náhľady odkazov a vložený obsah sú vypnuté v <settings>Nastavenia > Súkromie</settings>."
   }
 }

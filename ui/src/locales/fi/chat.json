@@ -353,5 +353,14 @@
       "deleteHistory": "Poista historia",
       "deleteHint": "Vain tämä laite · {{name}} säilyttää oman kopionsa"
     }
+  },
+  "embedHint": {
+    "image": "Kuva piilotettu, koska linkkien esikatselut ja upotukset ovat pois päältä kohdassa <settings>Asetukset > Yksityisyys</settings>.",
+    "gif": "GIF piilotettu, koska linkkien esikatselut ja upotukset ovat pois päältä kohdassa <settings>Asetukset > Yksityisyys</settings>.",
+    "video": "Videosoitin piilotettu, koska linkkien esikatselut ja upotukset ovat pois päältä kohdassa <settings>Asetukset > Yksityisyys</settings>.",
+    "audio": "Äänisoitin piilotettu, koska linkkien esikatselut ja upotukset ovat pois päältä kohdassa <settings>Asetukset > Yksityisyys</settings>.",
+    "link": "Linkin esikatselu piilotettu, koska linkkien esikatselut ja upotukset ovat pois päältä kohdassa <settings>Asetukset > Yksityisyys</settings>.",
+    "several_one": "{{count}} esikatselu piilotettu, koska linkkien esikatselut ja upotukset ovat pois päältä kohdassa <settings>Asetukset > Yksityisyys</settings>.",
+    "several_other": "{{count}} esikatselua piilotettu, koska linkkien esikatselut ja upotukset ovat pois päältä kohdassa <settings>Asetukset > Yksityisyys</settings>."
   }
 }
