@@ -23,6 +23,7 @@ function channel(id: number, parentId: number | null, name: string): ChannelInfo
       speak: true,
       whisper: true,
       write: false,
+      moveUsers: false,
     },
     description: null,
     hasDescription: false,

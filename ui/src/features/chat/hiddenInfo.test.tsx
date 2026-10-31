@@ -61,6 +61,7 @@ function serverWith(welcomeText: string): ServerState {
             speak: true,
             whisper: true,
             write: false,
+            moveUsers: false,
           },
           description: null,
           hasDescription: false,

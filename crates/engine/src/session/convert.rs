@@ -72,6 +72,12 @@ pub fn channel_view(state: &ServerState, channel: &Channel) -> ChannelView {
             speak: has(permissions::SPEAK),
             whisper: has(permissions::WHISPER),
             write: bits.is_some_and(|b| b & permissions::WRITE != 0),
+            // Servers answer permission queries only for channels the client asked about; the
+            // root channel's answer (sent at sync) stands in for the rest, as ACLs inherit
+            // downwards. The server still checks every move.
+            move_users: bits
+                .or_else(|| state.permissions.get(&ROOT_CHANNEL).copied())
+                .is_some_and(|b| b & permissions::MOVE != 0),
         },
         description: channel
             .description
@@ -349,6 +355,19 @@ mod tests {
         state.permissions.insert(0, permissions::SELF_REGISTER);
         let root = state.channels[&0].clone();
         assert!(channel_view(&state, &root).permissions.register_self);
+    }
+
+    #[test]
+    fn move_permission_falls_back_to_the_root_answer() {
+        let mut state = tree();
+        let raid = state.channels[&2].clone();
+        assert!(!channel_view(&state, &raid).permissions.move_users);
+
+        state.permissions.insert(0, permissions::MOVE);
+        assert!(channel_view(&state, &raid).permissions.move_users);
+
+        state.permissions.insert(2, permissions::ENTER);
+        assert!(!channel_view(&state, &raid).permissions.move_users);
     }
 
     #[test]

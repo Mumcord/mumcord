@@ -95,6 +95,7 @@ fn specta_builder() -> Builder<tauri::Wry> {
             channels::channel_password_rename,
             channels::channel_passwords_remove,
             channels::channel_description_request,
+            people::person_move,
             people::person_set_volume,
             people::person_set_local_mute,
             people::person_set_note,

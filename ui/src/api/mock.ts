@@ -416,6 +416,7 @@ const allow = {
   speak: true,
   whisper: true,
   write: false,
+  moveUsers: false,
 };
 
 function seedChannels(): ChannelInfo[] {
@@ -488,7 +489,8 @@ function demoChannels(serverName: string): ChannelInfo[] {
     parentId,
     name,
     position,
-    permissions: { ...allow },
+    // The demo user moderates, so the tree shows "Move users here…" and dragging (#172).
+    permissions: { ...allow, moveUsers: true },
     description: DEMO_DESCRIPTIONS.get(id) ?? null,
     hasDescription: DEMO_DESCRIPTIONS.has(id),
     maxUsers: null,
@@ -503,7 +505,8 @@ function demoChannels(serverName: string): ChannelInfo[] {
     // A user limit and a link between the squads, for the channel info screenshots (#170).
     { ...channel(4, 2, "Squad A", 0), maxUsers: 5, links: [5] },
     { ...channel(5, 2, "Squad B", 1), links: [4] },
-    channel(6, 0, "Music Room", 2),
+    // Full: six people in, for the user-limit screenshots (#172).
+    { ...channel(6, 0, "Music Room", 2), maxUsers: 6 },
     channel(7, 0, "Study Hall", 3),
     { ...channel(3, 0, "AFK", 4), permissions: { ...allow, textMessage: false } },
   ];
@@ -1700,6 +1703,14 @@ export function createMockApi(options: MockOptions = {}): MockApi {
         fail("invalidInput", "volume must be between 0 and 200");
       }
       updateUser(session, { volume });
+      return Promise.resolve(null);
+    },
+    personMove: (serverId, session, channelId) => {
+      requireSession(serverId);
+      requireUser(session);
+      // Like a real server, a refused move only answers with a denial; nobody moves.
+      if (!requireChannel(channelId).permissions.moveUsers) return Promise.resolve(null);
+      updateUser(session, { channelId });
       return Promise.resolve(null);
     },
     personSetLocalMute: (serverId, session, muted) => {

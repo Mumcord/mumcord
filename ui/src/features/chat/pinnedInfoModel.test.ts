@@ -11,6 +11,7 @@ const allow = {
   speak: true,
   whisper: true,
   write: false,
+  moveUsers: false,
 };
 
 function channel(id: number, patch: Partial<ChannelInfo> = {}): ChannelInfo {

@@ -1039,6 +1039,32 @@ impl Engine {
         Ok(())
     }
 
+    /// Moves a person to another channel (drag in the tree, "Move users here…"). The server
+    /// enforces the move permission; the result arrives as the person's `UserUpserted`.
+    pub fn person_move(
+        &self,
+        server_id: ServerId,
+        session: u32,
+        channel_id: u32,
+    ) -> EngineResult<()> {
+        let ctx = self.session_ctx_for(server_id)?;
+        let (channel_known, user_known) = ctx.handle.with_state(|s| {
+            (
+                s.channels.contains_key(&channel_id),
+                s.users.contains_key(&session),
+            )
+        });
+        if !channel_known {
+            return Err(EngineError::new(ErrorKind::NotFound, "unknown channel"));
+        }
+        if !user_known {
+            return Err(EngineError::new(ErrorKind::NotFound, "unknown person"));
+        }
+        ctx.handle
+            .move_user(session, channel_id)
+            .map_err(convert::command_error)
+    }
+
     pub fn person_set_volume(
         &self,
         server_id: ServerId,

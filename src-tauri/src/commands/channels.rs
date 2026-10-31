@@ -22,6 +22,9 @@ pub struct ChannelPermissions {
     pub whisper: bool,
     /// Edit the channel's ACL; only true once the server confirmed it.
     pub write: bool,
+    /// Move other people out of this channel (drag a person, "Move users here…"); only true
+    /// once the server confirmed it.
+    pub move_users: bool,
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, Type)]
@@ -157,6 +160,7 @@ impl From<ChannelView> for ChannelInfo {
                 speak: v.permissions.speak,
                 whisper: v.permissions.whisper,
                 write: v.permissions.write,
+                move_users: v.permissions.move_users,
             },
             description: v.description,
             has_description: v.has_description,

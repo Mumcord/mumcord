@@ -107,6 +107,11 @@ export const commands = {
 	 *  as `ChannelUpserted`; repeated calls for the same description send nothing.
 	 */
 	channelDescriptionRequest: (serverId: number, channelId: number) => typedError<null, ApiError>(__TAURI_INVOKE("channel_description_request", { serverId, channelId })),
+	/**
+	 *  Moves a person to another channel; the server checks the move permission and the result
+	 *  arrives as `userUpserted` (issue #172).
+	 */
+	personMove: (serverId: number, session: number, channelId: number) => typedError<null, ApiError>(__TAURI_INVOKE("person_move", { serverId, session, channelId })),
 	/**  Sets local volume (0–200 %); remembered by certificate hash per server. */
 	personSetVolume: (serverId: number, session: number, volume: number) => typedError<null, ApiError>(__TAURI_INVOKE("person_set_volume", { serverId, session, volume })),
 	/**  Mutes a person locally; remembered by certificate hash per server. */
@@ -883,6 +888,11 @@ export type ChannelPermissions = {
 	whisper: boolean,
 	/**  Edit the channel's ACL; only true once the server confirmed it. */
 	write: boolean,
+	/**
+	 *  Move other people out of this channel (drag a person, "Move users here…"); only true
+	 *  once the server confirmed it.
+	 */
+	moveUsers: boolean,
 };
 
 export type ChannelRemoved = {

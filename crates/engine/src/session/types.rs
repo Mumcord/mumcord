@@ -119,6 +119,8 @@ pub struct ChannelPermissions {
     pub whisper: bool,
     /// Edit the channel's ACL; only true once the server confirmed it.
     pub write: bool,
+    /// Move other people out of this channel; only true once the server confirmed it.
+    pub move_users: bool,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]

@@ -74,6 +74,7 @@ const allow = {
   speak: true,
   whisper: true,
   write: false,
+  moveUsers: false,
 };
 
 /** Channel the own user lands in: "Starfall › Squads › Squad 2 › Team Blue" (level 5). */

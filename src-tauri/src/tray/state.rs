@@ -350,6 +350,7 @@ pub mod fixtures {
                 speak: true,
                 whisper: true,
                 write: false,
+                move_users: false,
             },
             description: None,
             has_description: false,
