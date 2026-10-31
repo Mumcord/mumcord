@@ -273,6 +273,14 @@ impl Engine {
             .map_err(|e| EngineError::new(ErrorKind::Io, format!("writing the file failed: {e}")))
     }
 
+    /// Label of a saved server as the server bar shows it (the address when none was given).
+    pub fn server_name(&self, server_id: ServerId) -> EngineResult<Option<String>> {
+        let server = lock(&self.inner.store)
+            .server(server_id)
+            .map_err(store_error)?;
+        Ok(server.map(|s| s.label))
+    }
+
     /// Removes an identity with its key material. Servers that used it go back to the default;
     /// a connected one is disconnected first. The last identity cannot be removed.
     pub async fn identity_delete(&self, id: IdentityId) -> EngineResult<()> {
@@ -626,6 +634,12 @@ impl Engine {
     pub fn settings(&self) -> EngineResult<Settings> {
         self.inner.migrate_audio_devices();
         lock(&self.inner.store).settings().map_err(store_error)
+    }
+
+    /// Do Not Disturb is in effect or not (FR-3.111): notification sounds stay silent while it
+    /// is. The app shell combines the switch with the followed system state.
+    pub fn set_do_not_disturb(&self, on: bool) {
+        self.inner.events.sounds().set_do_not_disturb(on);
     }
 
     /// Stores the settings and applies DSP switches, talk mode and devices immediately.
@@ -1019,6 +1033,12 @@ mod tests {
             .server_add(fields("b", "b.example", "me"))
             .await
             .expect("server");
+
+        assert_eq!(
+            engine.server_name(other.id).expect("name"),
+            Some("b".into())
+        );
+        assert_eq!(engine.server_name(other.id + 100).expect("name"), None);
 
         let view = engine
             .server_set_notifications_muted(muted.id, true)

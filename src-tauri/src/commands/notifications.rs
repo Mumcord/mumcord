@@ -57,7 +57,8 @@ pub async fn notify_message(
     engine: State<'_, Engine>,
     notice: MessageNotice,
 ) -> ApiResult<NotifyOutcome> {
-    if notifications::server_muted(&app, notice.server_id).await {
+    // Do Not Disturb (FR-3.111): no sound, toast or system notification; the badges count on.
+    if crate::dnd::active(&app) || notifications::server_muted(&app, notice.server_id).await {
         return Ok(NotifyOutcome::None);
     }
     let mode = engine.settings()?.notifications;

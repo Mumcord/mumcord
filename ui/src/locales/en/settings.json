@@ -671,6 +671,18 @@
     "entries": "Entries: {{count}}",
     "englishNote": "The changelog is written in English."
   },
+  "dnd": {
+    "title": "Do Not Disturb",
+    "label": "Do Not Disturb",
+    "description": "No notification sounds or banners on any server. Voice and chat keep working, and unread badges keep counting.",
+    "follow": "Follow system Do Not Disturb",
+    "followDescription": "Turns Do Not Disturb on whenever your desktop's Do Not Disturb or Focus mode is on.",
+    "detected": "Detected",
+    "detectedOn": "{{desktop}} · Do Not Disturb is on (system). Changes are picked up live.",
+    "detectedOff": "{{desktop}} · Do Not Disturb is off. Changes are picked up live.",
+    "unavailable": "Unavailable",
+    "unavailableText": "Mumcord can't read your system's Do Not Disturb state here. Only its own switch works."
+  },
   "privateMessages": {
     "title": "Private messages",
     "legend": "Private messages from",

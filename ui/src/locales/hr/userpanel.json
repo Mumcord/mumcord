@@ -94,6 +94,9 @@
     "offerImagesHint": "Dopusti drugima da učitaju tvoje originalne slike",
     "loadImages": "Učitavaj slike pune veličine",
     "loadImagesHint": "Dohvaćaj originalne slike od drugih",
+    "dnd": "Ne ometaj",
+    "dndHint": "Utišava zvukove i natpise obavijesti",
+    "dndSystemHint": "Uključeno putem načina Ne ometaj vaše radne površine",
     "privateMessages": "Privatne poruke od",
     "pm_everyone": "Svi",
     "pm_friendsOnly": "Prijatelji",
@@ -133,5 +136,11 @@
     "fallbackOutput": "Izlazni uređaj je odspojen. Koristi se zadani uređaj sustava.",
     "volume": "Glasnoća",
     "level": "Razina"
+  },
+  "dnd": {
+    "label": "Ne ometaj",
+    "manual": "ručno",
+    "system": "Ne ometaj (sustav)",
+    "systemHint": "Isključite ga u postavkama obavijesti radne površine."
   }
 }

@@ -94,6 +94,9 @@
     "offerImagesHint": "Laat anderen je originele afbeeldingen laden",
     "loadImages": "Afbeeldingen op volledige grootte laden",
     "loadImagesHint": "Originele afbeeldingen van anderen ophalen",
+    "dnd": "Niet storen",
+    "dndHint": "Dempt meldingsgeluiden en -banners",
+    "dndSystemHint": "Aan via Niet storen van je bureaublad",
     "privateMessages": "Privéberichten van",
     "pm_everyone": "Iedereen",
     "pm_friendsOnly": "Vrienden",
@@ -133,5 +136,11 @@
     "fallbackOutput": "Uitvoerapparaat losgekoppeld. De systeemstandaard wordt gebruikt.",
     "volume": "Volume",
     "level": "Niveau"
+  },
+  "dnd": {
+    "label": "Niet storen",
+    "manual": "handmatig",
+    "system": "Niet storen (systeem)",
+    "systemHint": "Zet het uit in de meldingsinstellingen van je bureaublad."
   }
 }

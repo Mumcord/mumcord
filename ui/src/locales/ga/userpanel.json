@@ -94,6 +94,9 @@
     "offerImagesHint": "Lig do dhaoine eile do bhuníomhánna a luchtú",
     "loadImages": "Luchtaigh íomhánna ar a méid iomlán",
     "loadImagesHint": "Faigh buníomhánna ó dhaoine eile",
+    "dnd": "Ná Cuir Isteach",
+    "dndHint": "Múchann sé fuaimeanna agus meirgí fógraí",
+    "dndSystemHint": "Ar siúl trí Ná Cuir Isteach do dheisce",
     "privateMessages": "Teachtaireachtaí príobháideacha ó",
     "pm_everyone": "Gach duine",
     "pm_friendsOnly": "Cairde",
@@ -133,5 +136,11 @@
     "fallbackOutput": "Díphlugáladh an gléas aschuir. Úsáidtear réamhshocrú an chórais.",
     "volume": "Toirt",
     "level": "Leibhéal"
+  },
+  "dnd": {
+    "label": "Ná Cuir Isteach",
+    "manual": "de láimh",
+    "system": "Ná Cuir Isteach (córas)",
+    "systemHint": "Múch é i socruithe fógraí do dheisce."
   }
 }

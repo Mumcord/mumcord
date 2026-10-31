@@ -674,6 +674,18 @@
     "entries": "Entradas: {{count}}",
     "englishNote": "El registro de cambios está escrito en inglés."
   },
+  "dnd": {
+    "title": "No molestar",
+    "label": "No molestar",
+    "description": "Sin sonidos ni avisos de notificación en ningún servidor. La voz y el chat siguen funcionando y los contadores de no leídos siguen contando.",
+    "follow": "Seguir el No molestar del sistema",
+    "followDescription": "Activa No molestar siempre que el No molestar o el modo de concentración de tu escritorio esté activado.",
+    "detected": "Detectado",
+    "detectedOn": "{{desktop}} · No molestar está activado (sistema). Los cambios se aplican al momento.",
+    "detectedOff": "{{desktop}} · No molestar está desactivado. Los cambios se aplican al momento.",
+    "unavailable": "No disponible",
+    "unavailableText": "Mumcord no puede leer aquí el estado de No molestar de tu sistema. Solo funciona su propio interruptor."
+  },
   "privateMessages": {
     "title": "Mensajes privados",
     "legend": "Mensajes privados de",

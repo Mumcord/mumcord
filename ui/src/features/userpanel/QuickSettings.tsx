@@ -15,6 +15,7 @@ import {
 import { createPortal } from "react-dom";
 import { useTranslation } from "react-i18next";
 import { getApi, type PmRule, type Theme } from "../../api";
+import { dndSource, useDnd } from "../dnd/useDnd";
 import { useSettings } from "../settings/useSettings";
 import "./quicksettings.css";
 
@@ -116,13 +117,14 @@ export function QuickSettings({
 }) {
   const { t } = useTranslation("userpanel");
   const { settings, update } = useSettings();
+  const dnd = useDnd();
   const [supported, setSupported] = useState(true);
   const [gamingSupported, setGamingSupported] = useState(true);
   const [betaOpen, setBetaOpen] = useState(readBetaOpen);
   const ref = useRef<HTMLDivElement>(null);
   const titleId = useId();
   const betaId = useId();
-  const ready = settings !== null;
+  const ready = settings !== null && dnd.state !== null;
 
   const close = (returnFocus: boolean) => {
     onClose();
@@ -303,8 +305,19 @@ export function QuickSettings({
       <div id={titleId} className="quick-settings__title">
         {t("quickSettings.label")}
       </div>
-      {settings ? (
+      {settings && dnd.state ? (
         <>
+          {row(
+            ICON.dark,
+            t("quickSettings.dnd"),
+            dndSource(dnd.state) === "system"
+              ? t("quickSettings.dndSystemHint")
+              : t("quickSettings.dndHint"),
+            dnd.state.manual,
+            () => {
+              dnd.setManual(!dnd.state?.manual);
+            },
+          )}
           {row(
             ICON.link,
             t("quickSettings.linkPreviews"),

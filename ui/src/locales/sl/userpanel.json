@@ -94,6 +94,9 @@
     "offerImagesHint": "Drugi lahko naložijo tvoje izvirne slike",
     "loadImages": "Nalagaj slike v polni velikosti",
     "loadImagesHint": "Pridobi izvirne slike od drugih",
+    "dnd": "Ne moti",
+    "dndHint": "Utiša zvoke in pasice obvestil",
+    "dndSystemHint": "Vklopljeno prek načina Ne moti vašega namizja",
     "privateMessages": "Zasebna sporočila od",
     "pm_everyone": "Vsi",
     "pm_friendsOnly": "Prijatelji",
@@ -133,5 +136,11 @@
     "fallbackOutput": "Izhodna naprava je bila odklopljena. Uporablja se sistemska privzeta naprava.",
     "volume": "Glasnost",
     "level": "Raven"
+  },
+  "dnd": {
+    "label": "Ne moti",
+    "manual": "ročno",
+    "system": "Ne moti (sistem)",
+    "systemHint": "Izklopite ga v nastavitvah obvestil vašega namizja."
   }
 }

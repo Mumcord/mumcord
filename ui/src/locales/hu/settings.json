@@ -671,6 +671,18 @@
     "entries": "Bejegyzések: {{count}}",
     "englishNote": "A változásnapló angol nyelvű."
   },
+  "dnd": {
+    "title": "Ne zavarjanak",
+    "label": "Ne zavarjanak",
+    "description": "Egyik szerveren sincs értesítési hang vagy szalag. A hang és a csevegés tovább működik, az olvasatlan-számlálók tovább számolnak.",
+    "follow": "A rendszer Ne zavarjanak módjának követése",
+    "followDescription": "Bekapcsolja a Ne zavarjanak módot, amikor az asztali környezet Ne zavarjanak vagy Fókusz módja be van kapcsolva.",
+    "detected": "Észlelve",
+    "detectedOn": "{{desktop}} · A Ne zavarjanak be van kapcsolva (rendszer). A változások azonnal érvényesülnek.",
+    "detectedOff": "{{desktop}} · A Ne zavarjanak ki van kapcsolva. A változások azonnal érvényesülnek.",
+    "unavailable": "Nem elérhető",
+    "unavailableText": "A Mumcord itt nem tudja kiolvasni a rendszer Ne zavarjanak állapotát. Csak a saját kapcsolója működik."
+  },
   "privateMessages": {
     "title": "Privát üzenetek",
     "legend": "Privát üzenetek tőle",

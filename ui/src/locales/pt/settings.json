@@ -674,6 +674,18 @@
     "entries": "Entradas: {{count}}",
     "englishNote": "O registo de alterações está escrito em inglês."
   },
+  "dnd": {
+    "title": "Não incomodar",
+    "label": "Não incomodar",
+    "description": "Sem sons nem faixas de notificação em nenhum servidor. A voz e o chat continuam a funcionar e os contadores de não lidas continuam a contar.",
+    "follow": "Seguir o Não incomodar do sistema",
+    "followDescription": "Ativa o Não incomodar sempre que o Não incomodar ou o modo de foco do ambiente de trabalho estiver ativo.",
+    "detected": "Detetado",
+    "detectedOn": "{{desktop}} · Não incomodar está ativado (sistema). As alterações são aplicadas de imediato.",
+    "detectedOff": "{{desktop}} · Não incomodar está desativado. As alterações são aplicadas de imediato.",
+    "unavailable": "Indisponível",
+    "unavailableText": "O Mumcord não consegue ler aqui o estado Não incomodar do sistema. Só funciona o seu próprio interruptor."
+  },
   "privateMessages": {
     "title": "Mensagens privadas",
     "legend": "Mensagens privadas de",

@@ -94,6 +94,9 @@
     "offerImagesHint": "Leisti kitiems įkelti tavo originalius paveikslėlius",
     "loadImages": "Įkelti pilno dydžio paveikslėlius",
     "loadImagesHint": "Gauti originalius paveikslėlius iš kitų",
+    "dnd": "Netrukdyti",
+    "dndHint": "Nutildo pranešimų garsus ir reklamjuostes",
+    "dndSystemHint": "Įjungta per darbalaukio režimą „Netrukdyti“",
     "privateMessages": "Privačios žinutės iš",
     "pm_everyone": "Visų",
     "pm_friendsOnly": "Draugų",
@@ -133,5 +136,11 @@
     "fallbackOutput": "Išvesties įrenginys atjungtas. Naudojamas numatytasis sistemos įrenginys.",
     "volume": "Garsumas",
     "level": "Lygis"
+  },
+  "dnd": {
+    "label": "Netrukdyti",
+    "manual": "rankiniu būdu",
+    "system": "Netrukdyti (sistema)",
+    "systemHint": "Išjunkite jį darbalaukio pranešimų nustatymuose."
   }
 }

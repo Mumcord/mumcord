@@ -1,11 +1,23 @@
 {
-  "show": "Mumcord tonen",
+  "show": "Mumcord openen",
+  "settings": "Instellingen…",
   "mute": "Microfoon dempen",
   "deafen": "Doof zetten",
+  "dnd": "Niet storen",
+  "dndSystem": "Niet storen (systeem)",
   "quit": "Afsluiten",
   "disconnected": "Niet verbonden",
   "connecting": "Verbinden…",
+  "reconnecting": "Opnieuw verbinden…",
   "connected": "Verbonden",
+  "connectedIn": "Verbonden · {channel}",
+  "serverState": "{server} – {state}",
   "talking": "Verbonden – praat",
-  "muted": "Verbonden – gedempt"
+  "muted": "Verbonden – gedempt",
+  "voiceMenu": "Spraakserver en kanaal",
+  "voiceServer": "Spraakserver",
+  "channelsOf": "Kanalen · {server}",
+  "moreChannels": "Meer kanalen in Mumcord…",
+  "recentChats": "Recente chats",
+  "chatUnread": "{name} – {count} ongelezen"
 }
