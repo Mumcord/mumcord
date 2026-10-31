@@ -8,3 +8,4 @@ export { resetWatchingStore, startWatching, stopWatching, useWatchedShare } from
 export { SharingBar } from "./SharingBar";
 export { Viewers } from "./SharerControls";
 export { useShareActions } from "./useShareActions";
+export { shareBlockText } from "./availability";

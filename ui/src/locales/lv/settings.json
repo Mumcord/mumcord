@@ -546,10 +546,26 @@
     "weakConnection": "Rādīt vāja savienojuma ikonu",
     "weakConnectionHint": "Maza signāla ikona blakus cilvēkiem ar vāju savienojumu."
   },
+  "p2p": {
+    "title": "Peer-to-peer (ekrāna kopīgošana, pilna izmēra attēli)",
+    "modeLabel": "Peer-to-peer režīms",
+    "recommended": "Ieteicams",
+    "explanation": "Tiešais savienojums parāda tavu IP adresi otrai personai. Relejs to no viņas slēpj; releja operators (šī servera kopiena) to redz. Abi veidi ir šifrēti no gala līdz galam.",
+    "useGlobal": "Izmantot globālo iestatījumu",
+    "overrideHint": "Tikai šim serverim. „Izmantot globālo iestatījumu“ seko sadaļai Iestatījumi → Privātums.",
+    "mode": {
+      "directRelay": "Tieši + relejs (vispirms tieši)",
+      "relayFirst": "Tieši + relejs (vienmēr relejs, slēpj manu IP)",
+      "directOnly": "Tikai tieši",
+      "relayOnly": "Tikai relejs",
+      "off": "Izslēgts"
+    }
+  },
   "privacyDirect": {
     "title": "Tiešie savienojumi",
     "allow": "Atļaut tiešos savienojumus ar citiem Mumcord lietotājiem",
-    "hint": "Tiešie savienojumi ir ātrāki, bet otra persona var redzēt tavu IP adresi. Kamēr neesi izlēmis, Mumcord jautā pirmajā reizē, kad tāds tiktu izmantots."
+    "hint": "Tiešie savienojumi ir ātrāki, bet otra persona var redzēt tavu IP adresi. Kamēr neesi izlēmis, Mumcord jautā pirmajā reizē, kad tāds tiktu izmantots.",
+    "notUsed": "Izvēlētajā peer-to-peer režīmā netiek izmantots: Mumcord nekad neveido tiešu savienojumu ar citiem."
   },
   "updates": {
     "title": "Atjauninājumi",
@@ -636,7 +652,8 @@
       "screen": "Ekrāna kopīgošanas signāls",
       "watch": "Kopīgas skatīšanās stāvoklis",
       "plugin": "Spraudņa dati",
-      "mumble": "Mumble ziņojums"
+      "mumble": "Mumble ziņojums",
+      "peer": "Releja iestatīšana"
     }
   },
   "licences": {

@@ -42,7 +42,7 @@
   },
   "directConsent": {
     "title": "Dovolim neposredne povezave?",
-    "description": "Neposredne povezave so hitrejše, vendar lahko druga oseba vidi vaš naslov IP. Mumcord jih uporablja za slike v polni velikosti in deljenje zaslona z drugimi uporabniki Mumcorda ter lahko zanje odpre vrata na vašem usmerjevalniku. Če odklonite, slike še vedno prispejo prek strežnika, deljenje zaslona pa ni na voljo. To lahko pozneje spremenite v Nastavitve → Zasebnost.",
+    "description": "Neposredne povezave so hitrejše, vendar lahko druga oseba vidi vaš naslov IP. Mumcord jih uporablja za slike v polni velikosti in deljenje zaslona z drugimi uporabniki Mumcorda ter lahko zanje odpre vrata na vašem usmerjevalniku. Če odklonite, slike še vedno prispejo prek strežnika, deljenje zaslona pa ni na voljo. To lahko pozneje spremenite v Nastavitve → Zasebnost. Če ta strežnik ponuja relej, ga lahko Mumcord uporabi namesto tega; potem druga oseba ne vidi tvojega naslova IP.",
     "no": "Ne",
     "yes": "Da",
     "failed": "Ni uspelo. Poskusi znova."

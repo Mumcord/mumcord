@@ -544,10 +544,26 @@
     "weakConnection": "Pictogram voor zwakke verbinding tonen",
     "weakConnectionHint": "Een klein signaalpictogram naast mensen met een slechte verbinding."
   },
+  "p2p": {
+    "title": "Peer-to-peer (schermdelen, afbeeldingen op volledige grootte)",
+    "modeLabel": "Peer-to-peer-modus",
+    "recommended": "Aanbevolen",
+    "explanation": "Bij direct ziet de ander je IP-adres. De relay verbergt het voor hem of haar; de beheerder van de relay (de community van deze server) kan het zien. Beide zijn end-to-end versleuteld.",
+    "useGlobal": "Globale instelling gebruiken",
+    "overrideHint": "Alleen voor deze server. \"Globale instelling gebruiken\" volgt Instellingen → Privacy.",
+    "mode": {
+      "directRelay": "Direct + relay (eerst direct)",
+      "relayFirst": "Direct + relay (altijd relay, verbergt mijn IP)",
+      "directOnly": "Alleen direct",
+      "relayOnly": "Alleen relay",
+      "off": "Uit"
+    }
+  },
   "privacyDirect": {
     "title": "Directe verbindingen",
     "allow": "Directe verbindingen met andere Mumcord-gebruikers toestaan",
-    "hint": "Directe verbindingen zijn sneller, maar de ander kan je IP-adres zien. Totdat je beslist, vraagt Mumcord het de eerste keer dat er een gebruikt zou worden."
+    "hint": "Directe verbindingen zijn sneller, maar de ander kan je IP-adres zien. Totdat je beslist, vraagt Mumcord het de eerste keer dat er een gebruikt zou worden.",
+    "notUsed": "Niet gebruikt in de gekozen peer-to-peer-modus: Mumcord maakt nooit rechtstreeks verbinding met anderen."
   },
   "updates": {
     "title": "Updates",
@@ -633,7 +649,8 @@
       "screen": "Signaal voor schermdelen",
       "watch": "Status van kijkfeest",
       "plugin": "Plugingegevens",
-      "mumble": "Mumble-bericht"
+      "mumble": "Mumble-bericht",
+      "peer": "Relay instellen"
     }
   },
   "licences": {

@@ -4,7 +4,7 @@
 use std::fmt;
 
 use crate::audio_rating::HealthTotals;
-use mumcord_store::{IdentityId, ServerId, UnixMillis};
+use mumcord_store::{IdentityId, P2pMode, ServerId, UnixMillis};
 
 /// Error category; mirrors the command contract's `ErrorCode` (docs/engine-api.md).
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -364,6 +364,8 @@ pub struct ServerView {
     pub theme_id: Option<String>,
     /// Identity to connect with; `None` uses the default identity (issue #148).
     pub identity_id: Option<IdentityId>,
+    /// P2P mode for this server; `None` uses the global setting (spec 04, FR-4.2).
+    pub p2p_mode_override: Option<P2pMode>,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -554,6 +556,14 @@ pub enum EngineEvent {
     WatchPartyChanged(Option<crate::watch_party::WatchPartyView>),
     /// The screen shares in the user's channel changed; the full list (FR-2.42 – FR-2.46).
     ScreenSharesChanged(Vec<crate::screen_share::ScreenShareView>),
+    /// What the server info panel shows about the server's relay changed (FR-4.20).
+    RelayChanged(crate::peer::RelayInfo),
+    /// A P2P connection to `session` opened (`Some`, with how it travels) or closed (`None`)
+    /// (FR-4.19).
+    P2pLinkChanged {
+        session: u32,
+        link: Option<crate::p2p::P2pLink>,
+    },
     /// The identity chosen for this server is gone, so the connect uses the default one
     /// (issue #148).
     ServerIdentityMissing {

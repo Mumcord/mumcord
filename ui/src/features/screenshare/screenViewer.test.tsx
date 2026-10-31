@@ -408,6 +408,7 @@ describe("screen share viewer", () => {
               soundAvailable: false,
               viewers: [],
               blocked: null,
+              relayReason: null,
             },
           ],
         });
@@ -455,6 +456,7 @@ describe("screen share viewer", () => {
             soundAvailable: false,
             viewers: [1],
             blocked: null,
+            relayReason: null,
           },
         ],
       });

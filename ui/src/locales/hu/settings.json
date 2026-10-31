@@ -544,10 +544,26 @@
     "weakConnection": "Gyenge kapcsolat ikon megjelenítése",
     "weakConnectionHint": "Kis jelerősség-ikon a gyenge kapcsolatú személyek mellett."
   },
+  "p2p": {
+    "title": "Peer-to-peer (képernyőmegosztás, teljes méretű képek)",
+    "modeLabel": "Peer-to-peer mód",
+    "recommended": "Ajánlott",
+    "explanation": "A közvetlen kapcsolat megmutatja az IP-címedet a másik félnek. Az átjátszó elrejti előle; az átjátszó üzemeltetője (a szerver közössége) láthatja. Mindkettő végpontok közötti titkosítású.",
+    "useGlobal": "Globális beállítás használata",
+    "overrideHint": "Csak ennél a szervernél. A „Globális beállítás használata” a Beállítások → Adatvédelem értékét követi.",
+    "mode": {
+      "directRelay": "Közvetlen + átjátszó (előbb közvetlen)",
+      "relayFirst": "Közvetlen + átjátszó (mindig átjátszó, elrejti az IP-met)",
+      "directOnly": "Csak közvetlen",
+      "relayOnly": "Csak átjátszó",
+      "off": "Ki"
+    }
+  },
   "privacyDirect": {
     "title": "Közvetlen kapcsolatok",
     "allow": "Közvetlen kapcsolatok engedélyezése más Mumcord-felhasználókkal",
-    "hint": "A közvetlen kapcsolatok gyorsabbak, de a másik fél láthatja az IP-címedet. Amíg nem döntesz, a Mumcord rákérdez, amikor először használna egyet."
+    "hint": "A közvetlen kapcsolatok gyorsabbak, de a másik fél láthatja az IP-címedet. Amíg nem döntesz, a Mumcord rákérdez, amikor először használna egyet.",
+    "notUsed": "A választott peer-to-peer módban nincs használatban: a Mumcord sosem kapcsolódik közvetlenül másokhoz."
   },
   "updates": {
     "title": "Frissítések",
@@ -633,7 +649,8 @@
       "screen": "Képernyőmegosztási jelzés",
       "watch": "Közös nézés állapota",
       "plugin": "Bővítményadatok",
-      "mumble": "Mumble-üzenet"
+      "mumble": "Mumble-üzenet",
+      "peer": "Átjátszó beállítása"
     }
   },
   "licences": {

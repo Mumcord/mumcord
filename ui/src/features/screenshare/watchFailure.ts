@@ -12,6 +12,10 @@ export type WatchFailure =
   | "tooOld"
   /** The user turned direct connections off. */
   | "consentOff"
+  /** The peer-to-peer mode is "Off" (FR-4.3). */
+  | "p2pOff"
+  /** The relay was needed but can't be used; the share's `relayReason` says why (FR-4.11). */
+  | "relayUnavailable"
   /** The sharer already has the most viewers. */
   | "full"
   /** Anything else; the engine's message is logged. */
@@ -27,6 +31,8 @@ export function watchFailure(error: EngineError): WatchFailure {
     case "directUnavailable":
       if (error.message === "peerUnsupported") return "tooOld";
       if (error.message === "consentOff") return "consentOff";
+      if (error.message === "p2pOff") return "p2pOff";
+      if (error.message === "relayUnavailable") return "relayUnavailable";
       return "unreachable";
     // The sharer's client did not answer the watch request in time. The other `notFound`, an
     // ended share, closes the viewer anyway.

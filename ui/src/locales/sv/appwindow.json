@@ -42,7 +42,7 @@
   },
   "directConsent": {
     "title": "Tillåta direktanslutningar?",
-    "description": "Direktanslutningar är snabbare, men den andra personen kan se din IP-adress. Mumcord använder dem för bilder i full storlek och skärmdelning med andra Mumcord-användare och kan öppna en port i din router för dem. Om du säger nej kommer bilder fortfarande via servern och skärmdelning är inte tillgänglig. Du kan ändra detta senare under Inställningar → Integritet.",
+    "description": "Direktanslutningar är snabbare, men den andra personen kan se din IP-adress. Mumcord använder dem för bilder i full storlek och skärmdelning med andra Mumcord-användare och kan öppna en port i din router för dem. Om du säger nej kommer bilder fortfarande via servern och skärmdelning är inte tillgänglig. Du kan ändra detta senare under Inställningar → Integritet. Om den här servern erbjuder ett relä kan Mumcord använda det i stället; då ser den andra personen inte din IP-adress.",
     "no": "Nej",
     "yes": "Ja",
     "failed": "Det fungerade inte. Försök igen."

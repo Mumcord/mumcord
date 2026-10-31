@@ -1,7 +1,10 @@
 import "./connectionQuality.css";
 import { useTranslation } from "react-i18next";
 import type { UserStats } from "../../bindings/commands";
-import { useEffect, useId, useState } from "react";
+import { useEffect, useId, useState, type ReactNode } from "react";
+import { useShownServerId } from "../channels/serverStore";
+import { P2pLinkText } from "../p2p/P2pLinkText";
+import { useP2pLink } from "../p2p/useP2pLink";
 import { peekConnectionExpandedRequest, takeConnectionExpandedRequest } from "./connectionExpanded";
 import { connectionLevel, useUserStats } from "./userStatsStore";
 
@@ -23,8 +26,8 @@ function osText(stats: UserStats): string | null {
 
 /**
  * Connection section of a person (FR-2.25b): one row with the quality level, expanding to ping,
- * packet loss, bandwidth, UDP/TCP, client and OS (FR-2.25). Fields the server did not return are
- * left out.
+ * packet loss, bandwidth, UDP/TCP, client and OS (FR-2.25), plus how an open peer-to-peer
+ * connection runs (FR-4.19). Fields the server did not return are left out.
  */
 export function ConnectionQuality({
   session,
@@ -34,14 +37,17 @@ export function ConnectionQuality({
   serverId?: number | undefined;
 }) {
   const { t } = useTranslation("members");
+  const { t: tp } = useTranslation("p2p");
   const stats = useUserStats(session, serverId);
+  const shown = useShownServerId();
+  const link = useP2pLink(serverId ?? shown, session);
   const [expanded, setExpanded] = useState(peekConnectionExpandedRequest);
   useEffect(() => {
     takeConnectionExpandedRequest();
   }, []);
   const detailsId = useId();
   const level = connectionLevel(stats);
-  const rows: [string, string][] = [];
+  const rows: [string, ReactNode][] = [];
   if (stats) {
     if (stats.pingMs !== null)
       rows.push([t("quality.ping"), t("quality.ms", { value: Math.round(stats.pingMs) })]);
@@ -58,6 +64,7 @@ export function ConnectionQuality({
     const os = osText(stats);
     if (os) rows.push([t("quality.os"), os]);
   }
+  if (link) rows.push([tp("link.label"), <P2pLinkText link={link} />]);
   const open = expanded && rows.length > 0;
   return (
     <div className="connection-quality" data-level={level}>

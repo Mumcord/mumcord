@@ -546,10 +546,26 @@
     "weakConnection": "Afficher l’icône de connexion faible",
     "weakConnectionHint": "Une petite icône de signal à côté des personnes dont la connexion est mauvaise."
   },
+  "p2p": {
+    "title": "Pair à pair (partage d’écran, images en taille réelle)",
+    "modeLabel": "Mode pair à pair",
+    "recommended": "Recommandé",
+    "explanation": "Le mode direct montre votre adresse IP à l’autre personne. Le relais la lui cache ; l’opérateur du relais (la communauté de ce serveur) peut la voir. Les deux sont chiffrés de bout en bout.",
+    "useGlobal": "Utiliser le réglage global",
+    "overrideHint": "Uniquement pour ce serveur. « Utiliser le réglage global » suit Paramètres → Confidentialité.",
+    "mode": {
+      "directRelay": "Direct + relais (direct d’abord)",
+      "relayFirst": "Direct + relais (toujours le relais, masque mon IP)",
+      "directOnly": "Direct uniquement",
+      "relayOnly": "Relais uniquement",
+      "off": "Désactivé"
+    }
+  },
   "privacyDirect": {
     "title": "Connexions directes",
     "allow": "Autoriser les connexions directes avec d’autres utilisateurs de Mumcord",
-    "hint": "Les connexions directes sont plus rapides, mais l’autre personne peut voir votre adresse IP. Tant que vous n’avez pas décidé, Mumcord demande la première fois qu’une connexion directe serait utilisée."
+    "hint": "Les connexions directes sont plus rapides, mais l’autre personne peut voir votre adresse IP. Tant que vous n’avez pas décidé, Mumcord demande la première fois qu’une connexion directe serait utilisée.",
+    "notUsed": "Non utilisé dans le mode pair à pair choisi : Mumcord ne se connecte jamais directement aux autres personnes."
   },
   "updates": {
     "title": "Mises à jour",
@@ -636,7 +652,8 @@
       "screen": "Signal de partage d’écran",
       "watch": "État de la soirée de visionnage",
       "plugin": "Données de plugin",
-      "mumble": "Message Mumble"
+      "mumble": "Message Mumble",
+      "peer": "Configuration du relais"
     }
   },
   "licences": {

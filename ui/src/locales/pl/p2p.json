@@ -1,0 +1,54 @@
+{
+  "link": {
+    "label": "Peer-to-peer",
+    "direct": "Bezpośrednio",
+    "relayUdp": "Przez przekaźnik (UDP)",
+    "relayTcp": "Przez przekaźnik (TCP 443)",
+    "ipHidden": "IP ukryte",
+    "ipVisible": "IP widoczne",
+    "ipHiddenHint": "Druga osoba widzi adres przekaźnika, a nie twój."
+  },
+  "relay": {
+    "mumbot": "Mumbot",
+    "relay": "Przekaźnik Mumpeer",
+    "yes": "Tak",
+    "yesNamed": "Tak ({{names}})",
+    "no": "Nie",
+    "available": "Dostępny",
+    "availableAt": "Dostępny · {{host}}",
+    "unavailable": "Niedostępny: {{reason}}",
+    "untrusted": "Zmieniony, niezaufany",
+    "changed": "Przekaźnik tego serwera został zmieniony.",
+    "trustNew": "Zaufaj nowemu przekaźnikowi",
+    "keepBlocked": "Zostaw zablokowany",
+    "forget": "Zapomnij przekaźnik",
+    "actionFailed": "Nie udało się. Spróbuj ponownie."
+  },
+  "reason": {
+    "p2pOff": "Peer-to-peer jest wyłączone.",
+    "noRelay": "Ten serwer nie ma przekaźnika.",
+    "notConnected": "Brak połączenia z tym serwerem.",
+    "untrusted": "Przekaźnik tego serwera został zmieniony i nie jest zaufany.",
+    "conflict": "Na tym serwerze ogłoszono dwa przekaźniki; żaden nie jest używany.",
+    "botLeft": "Bot przekaźnika opuścił serwer.",
+    "relayDown": "Przekaźnik jest teraz nieosiągalny (zgłosił bot przekaźnika).",
+    "botNoAnswer": "Bot przekaźnika nie odpowiedział.",
+    "refused": "Przekaźnik odrzucił połączenie: {{reason}}",
+    "unreachable": "Nie udało się połączyć z przekaźnikiem ani przez UDP, ani przez TCP 443.",
+    "peerCannotRelay": "Druga osoba nie może użyć przekaźnika (starszy Mumcord lub wyłączony przekaźnik).",
+    "denied": "Bot przekaźnika odrzucił prośbę.",
+    "peerGone": "Druga osoba opuściła serwer.",
+    "rateLimited": "Zbyt wiele próśb do przekaźnika. Spróbuj ponownie za minutę."
+  },
+  "refusal": {
+    "unknownToken": "nieznany token dostępu",
+    "expired": "token dostępu wygasł",
+    "notAllowed": "niedozwolone",
+    "botGone": "bot przekaźnika zniknął",
+    "relayFull": "przekaźnik jest pełny",
+    "peerLimit": "zbyt wiele połączeń",
+    "rateLimited": "zbyt wiele prób",
+    "version": "nieobsługiwana wersja",
+    "badRequest": "nieprawidłowe żądanie"
+  }
+}

@@ -8,6 +8,8 @@ import { FloatingWidget } from "../../components/FloatingWidget";
 import type { Rect, Size } from "../../components/floatingWidgetGeometry";
 import { useTranslation } from "react-i18next";
 import { useServerStateOf } from "../channels";
+import { P2pLinkText } from "../p2p/P2pLinkText";
+import { useP2pLink } from "../p2p/useP2pLink";
 import { ScreenStage } from "./ScreenStage";
 import { useScreenShareOf } from "./sharesStore";
 import { useFullscreen } from "./useFullscreen";
@@ -43,6 +45,7 @@ export function ScreenShareViewer({ share }: ScreenShareViewerProps) {
   const { serverId, session } = share;
   const paused = useScreenShareOf(serverId, session)?.paused ?? false;
   const name = useServerStateOf(serverId).users.get(session)?.name ?? t("someone");
+  const link = useP2pLink(serverId, session);
   const viewerRef = useRef<HTMLElement>(null);
   const { fullscreen, toggle, exit } = useFullscreen(viewerRef);
 
@@ -75,6 +78,11 @@ export function ScreenShareViewer({ share }: ScreenShareViewerProps) {
         <>
           {t("title", { name })}
           <span className="screen-viewer__beta">{t("beta")}</span>
+          {link && (
+            <span className="screen-viewer__link">
+              <P2pLinkText link={link} />
+            </span>
+          )}
         </>
       }
       collapsedTitle={

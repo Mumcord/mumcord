@@ -78,6 +78,7 @@ fn specta_builder() -> Builder<tauri::Wry> {
             servers::server_set_always_connect,
             servers::server_set_notifications_muted,
             servers::server_set_group_mentions_muted,
+            servers::server_set_p2p_mode_override,
             servers::server_set_theme,
             servers::parse_mumble_link,
             session::connect,
@@ -234,6 +235,11 @@ fn specta_builder() -> Builder<tauri::Wry> {
             commands::ingame_overlay::ingame_overlay_remove_game,
             commands::user_stats::user_stats_watch,
             commands::p2p::p2p_consent_decide,
+            commands::p2p::relay_info,
+            commands::p2p::p2p_link,
+            commands::p2p::relay_trust_new,
+            commands::p2p::relay_keep_blocked,
+            commands::p2p::relay_forget,
             commands::watch_party::watch_party_start,
             commands::watch_party::watch_party_command,
             commands::watch_party::watch_party_join,
@@ -254,6 +260,7 @@ fn specta_builder() -> Builder<tauri::Wry> {
             commands::screen_share::screen_share_set_decode_fallback,
             commands::screen_share::screen_share_request_keyframe,
             commands::screen_share::screen_share_list,
+            commands::screen_share::screen_share_block,
             commands::updates::update_check_now,
             commands::updates::appimage_menu_entry_add,
         ])
@@ -303,6 +310,8 @@ fn specta_builder() -> Builder<tauri::Wry> {
             session::VoiceServerChanged,
             commands::user_stats::UserStatsChanged,
             commands::p2p::DirectConsentRequired,
+            commands::p2p::RelayChanged,
+            commands::p2p::P2pLinkChanged,
             commands::watch_party::WatchPartyChanged,
             commands::screen_share::ScreenSharesChanged,
             commands::updates::UpdateAvailable,
@@ -784,6 +793,17 @@ fn emit_engine_event(
             }
             .emit(app)
         }
+        EngineEvent::RelayChanged(info) => commands::p2p::RelayChanged {
+            server_id,
+            info: info.into(),
+        }
+        .emit(app),
+        EngineEvent::P2pLinkChanged { session, link } => commands::p2p::P2pLinkChanged {
+            server_id,
+            session,
+            link: link.map(Into::into),
+        }
+        .emit(app),
         EngineEvent::ScreenSharesChanged(shares) => {
             let sharers: Vec<u32> = shares.iter().map(|s| s.session).collect();
             app.state::<std::sync::Arc<screen_frames::ScreenFrames>>()

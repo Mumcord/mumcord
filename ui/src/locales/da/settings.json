@@ -544,10 +544,26 @@
     "weakConnection": "Vis ikon for svag forbindelse",
     "weakConnectionHint": "Et lille signalikon ved personer med dårlig forbindelse."
   },
+  "p2p": {
+    "title": "Peer-to-peer (skærmdeling, billeder i fuld størrelse)",
+    "modeLabel": "Peer-to-peer-tilstand",
+    "recommended": "Anbefalet",
+    "explanation": "Direkte viser din IP-adresse for den anden person. Relæet skjuler den for dem; relæets operatør (denne servers fællesskab) kan se den. Begge er end-to-end-krypteret.",
+    "useGlobal": "Brug global indstilling",
+    "overrideHint": "Kun for denne server. \"Brug global indstilling\" følger Indstillinger → Privatliv.",
+    "mode": {
+      "directRelay": "Direkte + relæ (direkte først)",
+      "relayFirst": "Direkte + relæ (altid relæ, skjuler min IP)",
+      "directOnly": "Kun direkte",
+      "relayOnly": "Kun relæ",
+      "off": "Fra"
+    }
+  },
   "privacyDirect": {
     "title": "Direkte forbindelser",
     "allow": "Tillad direkte forbindelser til andre Mumcord-brugere",
-    "hint": "Direkte forbindelser er hurtigere, men den anden person kan se din IP-adresse. Indtil du beslutter dig, spørger Mumcord første gang, en ville blive brugt."
+    "hint": "Direkte forbindelser er hurtigere, men den anden person kan se din IP-adresse. Indtil du beslutter dig, spørger Mumcord første gang, en ville blive brugt.",
+    "notUsed": "Bruges ikke i den valgte peer-to-peer-tilstand: Mumcord forbinder aldrig direkte til andre."
   },
   "updates": {
     "title": "Opdateringer",
@@ -633,7 +649,8 @@
       "screen": "Signal for skærmdeling",
       "watch": "Status for fællesfilm",
       "plugin": "Plugindata",
-      "mumble": "Mumble-besked"
+      "mumble": "Mumble-besked",
+      "peer": "Opsætning af relæ"
     }
   },
   "licences": {

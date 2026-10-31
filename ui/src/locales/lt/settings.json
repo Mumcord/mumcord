@@ -548,10 +548,26 @@
     "weakConnection": "Rodyti silpno ryšio piktogramą",
     "weakConnectionHint": "Maža signalo piktograma šalia žmonių, kurių ryšys prastas."
   },
+  "p2p": {
+    "title": "Peer-to-peer (ekrano bendrinimas, viso dydžio vaizdai)",
+    "modeLabel": "Peer-to-peer režimas",
+    "recommended": "Rekomenduojama",
+    "explanation": "Tiesioginis ryšys parodo tavo IP adresą kitam asmeniui. Perdavimo mazgas jį nuo jo paslepia; mazgo operatorius (šio serverio bendruomenė) jį mato. Abu variantai šifruojami nuo galo iki galo.",
+    "useGlobal": "Naudoti bendrą nustatymą",
+    "overrideHint": "Tik šiam serveriui. „Naudoti bendrą nustatymą“ seka Nustatymai → Privatumas.",
+    "mode": {
+      "directRelay": "Tiesiogiai + perdavimo mazgas (pirma tiesiogiai)",
+      "relayFirst": "Tiesiogiai + perdavimo mazgas (visada mazgas, slepia mano IP)",
+      "directOnly": "Tik tiesiogiai",
+      "relayOnly": "Tik perdavimo mazgas",
+      "off": "Išjungta"
+    }
+  },
   "privacyDirect": {
     "title": "Tiesioginiai ryšiai",
     "allow": "Leisti tiesioginius ryšius su kitais Mumcord naudotojais",
-    "hint": "Tiesioginiai ryšiai greitesni, bet kitas asmuo gali matyti tavo IP adresą. Kol nenusprendei, Mumcord paklausia pirmą kartą, kai toks būtų naudojamas."
+    "hint": "Tiesioginiai ryšiai greitesni, bet kitas asmuo gali matyti tavo IP adresą. Kol nenusprendei, Mumcord paklausia pirmą kartą, kai toks būtų naudojamas.",
+    "notUsed": "Pasirinktame peer-to-peer režime nenaudojama: Mumcord niekada nesijungia tiesiogiai prie kitų."
   },
   "updates": {
     "title": "Atnaujinimai",
@@ -639,7 +655,8 @@
       "screen": "Ekrano bendrinimo signalas",
       "watch": "Bendro žiūrėjimo būsena",
       "plugin": "Papildinio duomenys",
-      "mumble": "Mumble pranešimas"
+      "mumble": "Mumble pranešimas",
+      "peer": "Perdavimo mazgo sąranka"
     }
   },
   "licences": {

@@ -1,0 +1,54 @@
+{
+  "link": {
+    "label": "Peer-to-peer",
+    "direct": "Diretta",
+    "relayUdp": "Tramite relay (UDP)",
+    "relayTcp": "Tramite relay (TCP 443)",
+    "ipHidden": "IP nascosto",
+    "ipVisible": "IP visibile",
+    "ipHiddenHint": "L'altra persona vede l'indirizzo del relay, non il tuo."
+  },
+  "relay": {
+    "mumbot": "Mumbot",
+    "relay": "Relay Mumpeer",
+    "yes": "Sì",
+    "yesNamed": "Sì ({{names}})",
+    "no": "No",
+    "available": "Disponibile",
+    "availableAt": "Disponibile · {{host}}",
+    "unavailable": "Non disponibile: {{reason}}",
+    "untrusted": "Modificato, non attendibile",
+    "changed": "Il relay di questo server è cambiato.",
+    "trustNew": "Considera attendibile il nuovo relay",
+    "keepBlocked": "Mantieni bloccato",
+    "forget": "Dimentica il relay",
+    "actionFailed": "Non ha funzionato. Riprova."
+  },
+  "reason": {
+    "p2pOff": "Il peer-to-peer è disattivato.",
+    "noRelay": "Questo server non ha un relay.",
+    "notConnected": "Non connesso a questo server.",
+    "untrusted": "Il relay di questo server è cambiato e non è attendibile.",
+    "conflict": "Su questo server sono annunciati due relay; nessuno viene usato.",
+    "botLeft": "Il bot del relay ha lasciato il server.",
+    "relayDown": "Il relay al momento non è raggiungibile (segnalato dal bot del relay).",
+    "botNoAnswer": "Il bot del relay non ha risposto.",
+    "refused": "Il relay ha rifiutato la connessione: {{reason}}",
+    "unreachable": "Impossibile raggiungere il relay né via UDP né via TCP 443.",
+    "peerCannotRelay": "L'altra persona non può usare il relay (Mumcord meno recente o relay disattivato).",
+    "denied": "Il bot del relay ha rifiutato la richiesta.",
+    "peerGone": "L'altra persona ha lasciato il server.",
+    "rateLimited": "Troppe richieste al relay. Riprova tra un minuto."
+  },
+  "refusal": {
+    "unknownToken": "token di accesso sconosciuto",
+    "expired": "token di accesso scaduto",
+    "notAllowed": "non consentito",
+    "botGone": "bot del relay scomparso",
+    "relayFull": "relay pieno",
+    "peerLimit": "troppe connessioni",
+    "rateLimited": "troppi tentativi",
+    "version": "versione non supportata",
+    "badRequest": "richiesta non valida"
+  }
+}

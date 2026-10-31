@@ -6,6 +6,7 @@ use specta::Type;
 use tauri::State;
 use tauri_specta::Event;
 
+use super::settings::P2pMode;
 use super::types::{
     ApiError, ApiResult, ErrorCode, ServerId, to_api_server_id, to_engine_server_id,
 };
@@ -38,6 +39,8 @@ pub struct SavedServer {
     pub theme_id: Option<String>,
     /// Identity this server connects with; `null` uses the default identity (issue #148).
     pub identity_id: Option<u32>,
+    /// P2P mode on this server; `null` is "Use global setting" (spec 04, FR-4.2).
+    pub p2p_mode_override: Option<P2pMode>,
 }
 
 /// How a server edit treats the stored password.
@@ -195,6 +198,7 @@ impl From<ServerView> for SavedServer {
             group_mentions_muted: v.group_mentions_muted,
             theme_id: v.theme_id,
             identity_id: v.identity_id.map(super::types::to_api_identity_id),
+            p2p_mode_override: v.p2p_mode_override.map(P2pMode::from),
         }
     }
 }
@@ -309,6 +313,20 @@ pub async fn server_set_group_mentions_muted(
 ) -> ApiResult<SavedServer> {
     Ok(engine
         .server_set_group_mentions_muted(to_engine_server_id(server_id), muted)
+        .await?
+        .into())
+}
+
+/// Sets the P2P mode of the server; `null` goes back to the global setting (spec 04, FR-4.2).
+#[tauri::command]
+#[specta::specta]
+pub async fn server_set_p2p_mode_override(
+    engine: State<'_, Engine>,
+    server_id: ServerId,
+    mode: Option<P2pMode>,
+) -> ApiResult<SavedServer> {
+    Ok(engine
+        .server_set_p2p_mode_override(to_engine_server_id(server_id), mode.map(Into::into))
         .await?
         .into())
 }

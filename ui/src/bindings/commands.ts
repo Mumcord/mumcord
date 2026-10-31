@@ -52,6 +52,8 @@ export const commands = {
 	serverSetNotificationsMuted: (serverId: number, muted: boolean) => typedError<SavedServer, ApiError>(__TAURI_INVOKE("server_set_notifications_muted", { serverId, muted })),
 	/**  Turns `@all` and `@channel` mentions on the server off or back on (issue #70). */
 	serverSetGroupMentionsMuted: (serverId: number, muted: boolean) => typedError<SavedServer, ApiError>(__TAURI_INVOKE("server_set_group_mentions_muted", { serverId, muted })),
+	/**  Sets the P2P mode of the server; `null` goes back to the global setting (spec 04, FR-4.2). */
+	serverSetP2pModeOverride: (serverId: number, mode: P2pMode | null) => typedError<SavedServer, ApiError>(__TAURI_INVOKE("server_set_p2p_mode_override", { serverId, mode })),
 	/**  Sets the theme shown with the server; `null` goes back to the app theme (FR-2.17). */
 	serverSetTheme: (serverId: number, themeId: string | null) => typedError<SavedServer, ApiError>(__TAURI_INVOKE("server_set_theme", { serverId, themeId })),
 	/**  Parses a pasted `mumble://` link; fails with `invalidInput` if malformed. */
@@ -570,6 +572,19 @@ export const commands = {
 	 *  drops the waiting direct connection.
 	 */
 	p2pConsentDecide: (allow: boolean) => typedError<null, ApiError>(__TAURI_INVOKE("p2p_consent_decide", { allow })),
+	/**  The relay of a server for the server info panel; "no relay" when not connected. */
+	relayInfo: (serverId: number) => typedError<RelayInfo, ApiError>(__TAURI_INVOKE("relay_info", { serverId })),
+	/**
+	 *  The open P2P connection to `session`, or `null` without one; changes arrive as
+	 *  `p2pLinkChanged`.
+	 */
+	p2pLink: (serverId: number, session: number) => typedError<P2pLink | null, ApiError>(__TAURI_INVOKE("p2p_link", { serverId, session })),
+	/**  "Trust new relay": pins the changed relay of a connected server. */
+	relayTrustNew: (serverId: number) => typedError<null, ApiError>(__TAURI_INVOKE("relay_trust_new", { serverId })),
+	/**  "Keep blocked": the changed relay stays unused. */
+	relayKeepBlocked: (serverId: number) => typedError<null, ApiError>(__TAURI_INVOKE("relay_keep_blocked", { serverId })),
+	/**  "Forget relay": removes the relay pin of a server. */
+	relayForget: (serverId: number) => typedError<null, ApiError>(__TAURI_INVOKE("relay_forget", { serverId })),
 	/**  Starts a party for the YouTube video and invites the Mumcord users in the user's channel. */
 	watchPartyStart: (serverId: number, videoId: string) => typedError<WatchParty, ApiError>(__TAURI_INVOKE("watch_party_start", { serverId, videoId })),
 	/**  Sends a playback command to everyone in the party. */
@@ -627,6 +642,11 @@ export const commands = {
 	/**  The shares in the user's channel (for a view opened after the last event). */
 	screenShareList: (serverId: number) => typedError<ScreenShare[], ApiError>(__TAURI_INVOKE("screen_share_list", { serverId })),
 	/**
+	 *  What blocks starting a share on the server right now; `null` when sharing is possible. The
+	 *  settings and the relay change without an event, so the UI asks again before starting.
+	 */
+	screenShareBlock: (serverId: number) => typedError<ShareStartBlock | null, ApiError>(__TAURI_INVOKE("screen_share_block", { serverId })),
+	/**
 	 *  Asks GitHub for the latest release now (only when `updateCheck` is `yes`); `null` when
 	 *  this version is current, the user did not consent or the check failed (logged only).
 	 */
@@ -671,10 +691,12 @@ export const events = {
 	notificationActivated: makeEvent<NotificationActivated, NotificationActivated>("notification-activated"),
 	nowGamingChanged: makeEvent<NowGamingChanged, NowGamingChanged>("now-gaming-changed"),
 	nowPlayingChanged: makeEvent<NowPlayingChanged, NowPlayingChanged>("now-playing-changed"),
+	p2pLinkChanged: makeEvent<P2pLinkChanged, P2pLinkChanged>("p2p-link-changed"),
 	pmConversationPrefsChanged: makeEvent<PmConversationPrefsChanged, PmConversationPrefsChanged>("pm-conversation-prefs-changed"),
 	pmRequestsChanged: makeEvent<PmRequestsChanged, PmRequestsChanged>("pm-requests-changed"),
 	positionalSendingChanged: makeEvent<PositionalSendingChanged, PositionalSendingChanged>("positional-sending-changed"),
 	positionalStatusChanged: makeEvent<PositionalStatusChanged, PositionalStatusChanged>("positional-status-changed"),
+	relayChanged: makeEvent<RelayChanged, RelayChanged>("relay-changed"),
 	screenSharesChanged: makeEvent<ScreenSharesChanged, ScreenSharesChanged>("screen-shares-changed"),
 	serverDenied: makeEvent<ServerDenied, ServerDenied>("server-denied"),
 	serverIdentityMissing: makeEvent<ServerIdentityMissing, ServerIdentityMissing>("server-identity-missing"),
@@ -1788,6 +1810,42 @@ export type NowPlayingStatus = {
 };
 
 /**
+ *  The open P2P connection to a person, for the connection info in the user info and the
+ *  screen share viewer header (FR-4.19).
+ */
+export type P2pLink = {
+	path: P2pPath,
+	/**
+	 *  "IP hidden" when true, else "IP visible": this client sent no addresses and the
+	 *  connection goes through the relay.
+	 */
+	ipHidden: boolean,
+};
+
+/**  A P2P connection to `session` opened or changed (`link` set) or closed (`null`). */
+export type P2pLinkChanged = {
+	serverId: number,
+	session: number,
+	link: P2pLink | null,
+};
+
+/**
+ *  How peer-to-peer features reach another Mumcord user (spec 04, FR-4.1). Also the value of
+ *  a server's override (FR-4.2), where `null` means "Use global setting".
+ */
+export type P2pMode = 
+/**  "Direct + relay (direct first)"; the default. */
+"directRelay" | 
+/**  "Direct + relay (always relay, hides my IP)". */
+"relayFirst" | "directOnly" | "relayOnly" | "off";
+
+/**
+ *  How a P2P connection travels (FR-4.19): "Direct", "Via relay (UDP)" or
+ *  "Via relay (TCP 443)".
+ */
+export type P2pPath = "direct" | "relayUdp" | "relayTcp";
+
+/**
  *  One captured control-channel packet. Everything except `id`, `atMs`, `direction`, `size`
  *  and the pacer fields comes from the server or other clients: render it as plain text only.
  */
@@ -2031,6 +2089,59 @@ export type PublicServerPing = {
 	maxUsers: number,
 };
 
+/**  The relay of a server changed (FR-4.20). */
+export type RelayChanged = {
+	serverId: number,
+	info: RelayInfo,
+};
+
+/**  The relay of a connected server as the server info panel shows it (FR-4.20). */
+export type RelayInfo = {
+	/**  User names of the announcing relay bots ("Mumbot: Yes"); empty for "No". */
+	bots: string[],
+	/**  Host of the announced relay. */
+	host: string | null,
+	status: RelayStatus,
+	/**  When the pinned relay was first accepted (RFC 3339). */
+	firstSeen: string | null,
+};
+
+/**  Why the relay refused a connection (spec 04 section 6.5). */
+export type RelayRefusal = "unknownToken" | "expired" | "notAllowed" | "botGone" | "relayFull" | "peerLimit" | "rateLimited" | "version" | "badRequest";
+
+/**  State of the server's relay in the server info panel (FR-4.20). */
+export type RelayStatus = 
+/**  No relay announced: "Mumpeer relay: No". */
+{ kind: "none" } | { kind: "available" } | { kind: "unavailable"; reason: RelayUnavailable } | 
+/**
+ *  "The relay of this server changed" with "Trust new relay" / "Keep blocked";
+ *  `keptBlocked` once the user chose to keep it blocked.
+ */
+{ kind: "untrusted"; keptBlocked: boolean } | 
+/**  "Two relays are announced on this server; none is used." */
+{ kind: "conflict" };
+
+/**  Why the relay cannot be used; the UI shows the text of FR-4.4, FR-4.11 or FR-4.14. */
+export type RelayUnavailable = 
+/**  "This server has no relay". */
+{ kind: "noRelay" } | { kind: "notConnected" } | 
+/**  The announced relay changed and is not trusted. */
+{ kind: "untrusted" } | 
+/**  Two relays are announced. */
+{ kind: "conflict" } | 
+/**  "The relay bot left the server." */
+{ kind: "botLeft" } | 
+/**  "The relay is not reachable right now (reported by the relay bot)." */
+{ kind: "relayDown" } | 
+/**  "The relay bot did not answer." */
+{ kind: "botNoAnswer" } | 
+/**  "The relay refused the connection: {reason}". */
+{ kind: "refused"; refusal: RelayRefusal } | 
+/**  "The relay could not be reached over UDP or TCP 443." */
+{ kind: "unreachable" } | 
+/**  "The other person can't use the relay (older Mumcord or relay turned off)." */
+{ kind: "peerCannotRelay" } | { kind: "denied" } | { kind: "peerGone" } | { kind: "rateLimited" } | { kind: "relayFull" };
+
 /**  A stored channel password without the password itself (FR-2.78, issue #146). */
 export type SavedChannelPassword = {
 	/**  The user's own name; `null` shows the channels, or "Password N" without any. */
@@ -2072,6 +2183,8 @@ export type SavedServer = {
 	themeId: string | null,
 	/**  Identity this server connects with; `null` uses the default identity (issue #148). */
 	identityId: number | null,
+	/**  P2P mode on this server; `null` is "Use global setting" (spec 04, FR-4.2). */
+	p2pModeOverride: P2pMode | null,
 };
 
 /**  One person sharing their screen in the voice channel. */
@@ -2086,6 +2199,8 @@ export type ScreenShare = {
 	viewers: number[],
 	/**  Why the user cannot watch; always `null` for the own share. */
 	blocked: WatchBlock | null,
+	/**  Why the relay cannot be used, when `blocked` is `relayUnavailable`. */
+	relayReason: RelayUnavailable | null,
 };
 
 /**  The screen shares on the server changed; carries the full list. */
@@ -2336,8 +2451,13 @@ export type Settings = {
 	talkingFirst: boolean,
 	/**  Default on (FR-2.26). */
 	showWeakConnectionIcon: boolean,
-	/**  "Allow direct connections to other Mumcord users" (FR-2.36). */
+	/**
+	 *  "Allow direct connections to other Mumcord users" (FR-2.36); the answer to the consent
+	 *  question before the first direct connection (FR-4.5).
+	 */
 	allowDirectConnections: Consent,
+	/**  Global P2P mode (FR-4.1). */
+	p2pMode: P2pMode,
 	/**  "Check for new versions" (FR-2.56). */
 	updateCheck: Consent,
 	/**  AppImage only: the one-time "Add Mumcord to the app menu" offer (FR-2.55). */
@@ -2355,6 +2475,13 @@ export type Settings = {
 	privateMessages: PrivateMessageSettings,
 	/**  Channel messages of blocked users: collapsed (default) or hidden (issue #140). */
 	blockedMessages: BlockedMessages,
+};
+
+/**  Why the user cannot start a share on the server: nobody could watch it (FR-4.3 – FR-4.5). */
+export type ShareStartBlock = {
+	blocked: WatchBlock,
+	/**  Why the relay cannot be used, when `blocked` is `relayUnavailable`. */
+	relayReason: RelayUnavailable | null,
 };
 
 /**  Notification sound toggles per event (FR-1.27). */
@@ -2607,8 +2734,12 @@ export type WatchAction = {
 
 /**  Why "Watch" is disabled (FR-2.46). */
 export type WatchBlock = 
-/**  The user said no to direct connections. */
+/**  "Peer-to-peer is off" for this server. */
+"p2pOff" | 
+/**  The user said no to direct connections and the relay cannot be used either. */
 "consentOff" | 
+/**  The relay was needed but cannot be used; the reason is in `relayReason`. */
+"relayUnavailable" | 
 /**  The sharer's client cannot or does not want to take direct connections. */
 "peerUnsupported" | 
 /**  No direct path was found (there is no relay, e.g. behind CGNAT). */

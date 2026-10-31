@@ -42,7 +42,7 @@
   },
   "directConsent": {
     "title": "¿Permitir conexiones directas?",
-    "description": "Las conexiones directas son más rápidas, pero la otra persona puede ver tu dirección IP. Mumcord las usa para imágenes a tamaño completo y para compartir pantalla con otros usuarios de Mumcord, y puede abrir un puerto en tu router para ellas. Si dices que no, las imágenes siguen llegando a través del servidor y compartir pantalla no está disponible. Puedes cambiarlo más tarde en Ajustes → Privacidad.",
+    "description": "Las conexiones directas son más rápidas, pero la otra persona puede ver tu dirección IP. Mumcord las usa para imágenes a tamaño completo y para compartir pantalla con otros usuarios de Mumcord, y puede abrir un puerto en tu router para ellas. Si dices que no, las imágenes siguen llegando a través del servidor y compartir pantalla no está disponible. Puedes cambiarlo más tarde en Ajustes → Privacidad. Si este servidor ofrece un relé, Mumcord puede usarlo en su lugar; entonces la otra persona no ve tu dirección IP.",
     "no": "No",
     "yes": "Sí",
     "failed": "No ha funcionado. Inténtalo de nuevo."

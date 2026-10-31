@@ -42,7 +42,7 @@
   },
   "directConsent": {
     "title": "Sallitaanko suorat yhteydet?",
-    "description": "Suorat yhteydet ovat nopeampia, mutta toinen henkilö näkee IP-osoitteesi. Mumcord käyttää niitä täysikokoisiin kuviin ja näytön jakamiseen muiden Mumcord-käyttäjien kanssa ja voi avata niitä varten portin reitittimeesi. Jos vastaat ei, kuvat tulevat edelleen palvelimen kautta eikä näytön jakaminen ole käytettävissä. Voit muuttaa tätä myöhemmin kohdassa Asetukset → Yksityisyys.",
+    "description": "Suorat yhteydet ovat nopeampia, mutta toinen henkilö näkee IP-osoitteesi. Mumcord käyttää niitä täysikokoisiin kuviin ja näytön jakamiseen muiden Mumcord-käyttäjien kanssa ja voi avata niitä varten portin reitittimeesi. Jos vastaat ei, kuvat tulevat edelleen palvelimen kautta eikä näytön jakaminen ole käytettävissä. Voit muuttaa tätä myöhemmin kohdassa Asetukset → Yksityisyys. Jos tämä palvelin tarjoaa releen, Mumcord voi käyttää sitä; silloin toinen henkilö ei näe IP-osoitettasi.",
     "no": "Ei",
     "yes": "Kyllä",
     "failed": "Se ei onnistunut. Yritä uudelleen."

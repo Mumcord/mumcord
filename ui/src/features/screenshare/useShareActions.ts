@@ -3,6 +3,7 @@ import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { announce } from "../../a11y";
 import { getApi, toEngineError } from "../../api";
+import { shareBlockText } from "./availability";
 import type { OwnShareState } from "./useOwnShare";
 
 export type ShareFailure =
@@ -21,6 +22,7 @@ export function startFailure(error: unknown): ShareFailure {
 
 export function useShareActions({ serverId, block, platform, recheck }: OwnShareState) {
   const { t } = useTranslation("screenshare");
+  const { t: tP2p } = useTranslation("p2p");
   const [starting, setStarting] = useState(false);
   const [failed, setFailed] = useState<ShareFailure | null>(null);
 
@@ -31,7 +33,7 @@ export function useShareActions({ serverId, block, platform, recheck }: OwnShare
     setFailed(null);
     const now = await recheck();
     if (now !== null) {
-      announce(t(`blocked.${now}`), "assertive");
+      announce(shareBlockText(t, tP2p, now), "assertive");
       return;
     }
     setStarting(true);

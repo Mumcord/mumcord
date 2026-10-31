@@ -1,0 +1,54 @@
+{
+  "link": {
+    "label": "Peer-to-peer",
+    "direct": "Dirett",
+    "relayUdp": "Permezz ta' relay (UDP)",
+    "relayTcp": "Permezz ta' relay (TCP 443)",
+    "ipHidden": "IP moħbi",
+    "ipVisible": "IP viżibbli",
+    "ipHiddenHint": "Il-persuna l-oħra tara l-indirizz tar-relay, mhux tiegħek."
+  },
+  "relay": {
+    "mumbot": "Mumbot",
+    "relay": "Relay Mumpeer",
+    "yes": "Iva",
+    "yesNamed": "Iva ({{names}})",
+    "no": "Le",
+    "available": "Disponibbli",
+    "availableAt": "Disponibbli · {{host}}",
+    "unavailable": "Mhux disponibbli: {{reason}}",
+    "untrusted": "Inbidel, mhux fdat",
+    "changed": "Ir-relay ta' dan is-server inbidel.",
+    "trustNew": "Afda r-relay il-ġdid",
+    "keepBlocked": "Żommu bblokkat",
+    "forget": "Aqta' r-relay",
+    "actionFailed": "Ma ħadimx. Erġa' pprova."
+  },
+  "reason": {
+    "p2pOff": "Il-peer-to-peer mitfi.",
+    "noRelay": "Dan is-server m'għandux relay.",
+    "notConnected": "Mhux konness ma' dan is-server.",
+    "untrusted": "Ir-relay ta' dan is-server inbidel u mhuwiex fdat.",
+    "conflict": "Fuq dan is-server hemm żewġ relays imħabbra; ebda wieħed ma jintuża.",
+    "botLeft": "Il-bot tar-relay ħalla s-server.",
+    "relayDown": "Ir-relay mhuwiex jintlaħaq bħalissa (irrappurtat mill-bot tar-relay).",
+    "botNoAnswer": "Il-bot tar-relay ma wieġebx.",
+    "refused": "Ir-relay irrifjuta l-konnessjoni: {{reason}}",
+    "unreachable": "Ir-relay ma setax jintlaħaq la permezz ta' UDP u lanqas ta' TCP 443.",
+    "peerCannotRelay": "Il-persuna l-oħra ma tistax tuża r-relay (Mumcord eqdem jew relay mitfi).",
+    "denied": "Il-bot tar-relay irrifjuta t-talba.",
+    "peerGone": "Il-persuna l-oħra ħalliet is-server.",
+    "rateLimited": "Wisq talbiet tar-relay. Erġa' pprova fi ftit minuti."
+  },
+  "refusal": {
+    "unknownToken": "token ta' aċċess mhux magħruf",
+    "expired": "it-token ta' aċċess skada",
+    "notAllowed": "mhux permess",
+    "botGone": "il-bot tar-relay mar",
+    "relayFull": "ir-relay mimli",
+    "peerLimit": "wisq konnessjonijiet",
+    "rateLimited": "wisq tentattivi",
+    "version": "verżjoni mhux appoġġjata",
+    "badRequest": "talba invalida"
+  }
+}

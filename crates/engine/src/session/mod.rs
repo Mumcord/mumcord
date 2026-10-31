@@ -127,7 +127,7 @@ impl Events {
     }
 
     /// The same output, tagging its events with `server_id`.
-    fn for_server(&self, server_id: ServerId) -> Self {
+    pub(crate) fn for_server(&self, server_id: ServerId) -> Self {
         Self {
             server: Some(server_id),
             ..self.clone()
@@ -239,6 +239,8 @@ struct Inner {
     full_images: crate::full_image::ServerTransfers,
     /// Direct connections to other Mumcord users (FR-2.35).
     direct: crate::p2p::Direct,
+    /// Relays announced on the servers (spec 04).
+    relays: crate::peer::Relays,
     /// Shared "now playing" status (FR-1.58).
     now_playing: Mutex<crate::now_playing::NowPlaying>,
     /// Shared "now gaming" status (FR-1.59).
@@ -567,6 +569,7 @@ impl Engine {
             public_servers: crate::public_servers::PublicServers::new(queries),
             full_images: crate::full_image::ServerTransfers::default(),
             direct: crate::p2p::Direct::default(),
+            relays: crate::peer::Relays::default(),
             core: Mutex::new(Core::default()),
             now_playing: Mutex::new(crate::now_playing::NowPlaying::new(settings.now_playing)),
             now_gaming: Mutex::new(crate::now_gaming::NowGaming::new(settings.now_gaming)),
@@ -586,6 +589,8 @@ impl Engine {
         });
         let engine = Self { inner };
         engine.inner.direct.bind(engine.downgrade());
+        engine.inner.relays.bind(engine.downgrade());
+        lock(&engine.inner.screen_shares).engine = Some(engine.downgrade());
         engine.positional_poll_restart();
         engine
             .link_previews()
@@ -751,6 +756,10 @@ impl Engine {
 
     pub(crate) fn direct(&self) -> &crate::p2p::Direct {
         &self.inner.direct
+    }
+
+    pub(crate) fn relays(&self) -> &crate::peer::Relays {
+        &self.inner.relays
     }
 
     /// The default identity from secure storage; `None` before the wizard created one.
@@ -1761,6 +1770,11 @@ impl Inner {
             self.forget_password_attempt(server_id);
             self.full_images.reset(server_id);
             self.direct.reset(server_id);
+            if self.relays.reset(server_id) {
+                self.events
+                    .for_server(server_id)
+                    .emit(EngineEvent::RelayChanged(crate::peer::RelayInfo::default()));
+            }
             if crate::watch_party::reset(&self.watch_parties, server_id) {
                 self.events
                     .for_server(server_id)
@@ -1785,6 +1799,10 @@ impl Inner {
         crate::history_sync::on_synced(&self.history_sync, ctx, &self.rt);
         self.full_images.reset(ctx.server_id);
         self.direct.reset(ctx.server_id);
+        if self.relays.reset(ctx.server_id) {
+            ctx.events
+                .emit(EngineEvent::RelayChanged(crate::peer::RelayInfo::default()));
+        }
         if crate::watch_party::reset(&self.watch_parties, ctx.server_id) {
             ctx.events.emit(EngineEvent::WatchPartyChanged(None));
         }
@@ -2595,6 +2613,7 @@ impl Inner {
                 );
                 self.full_images.forget(server_id, user.session);
                 self.direct.forget(server_id, user.session);
+                self.relays.on_user_removed(ctx, user.session);
                 if audio {
                     self.positional.on_user_removed(user.session);
                 }
@@ -2647,6 +2666,7 @@ impl Inner {
                 crate::pm_rules::on_plugin_data(ctx, &self.pm_requests, data);
                 crate::full_image::on_plugin_data(&self.full_images, &self.previews, ctx, data);
                 self.direct.on_plugin_data(ctx, data);
+                self.relays.on_plugin_data(ctx, data, &self.inspector);
             }
             Event::UserStats(stats) => crate::stats::on_stats(&self.user_stats, ctx, stats),
             // Here rather than in the extension hooks: the private message rule needs to know
@@ -3360,6 +3380,7 @@ mod declined_kind_tests {
             group_mentions_muted: false,
             theme_id: None,
             identity_id: None,
+            p2p_mode_override: None,
         }
     }
 

@@ -1,0 +1,54 @@
+{
+  "link": {
+    "label": "Peer-to-peer",
+    "direct": "Přímo",
+    "relayUdp": "Přes relay (UDP)",
+    "relayTcp": "Přes relay (TCP 443)",
+    "ipHidden": "IP skryta",
+    "ipVisible": "IP viditelná",
+    "ipHiddenHint": "Druhá osoba vidí adresu relay, ne tvou."
+  },
+  "relay": {
+    "mumbot": "Mumbot",
+    "relay": "Relay Mumpeer",
+    "yes": "Ano",
+    "yesNamed": "Ano ({{names}})",
+    "no": "Ne",
+    "available": "Dostupné",
+    "availableAt": "Dostupné · {{host}}",
+    "unavailable": "Nedostupné: {{reason}}",
+    "untrusted": "Změněno, nedůvěryhodné",
+    "changed": "Relay tohoto serveru se změnilo.",
+    "trustNew": "Důvěřovat novému relay",
+    "keepBlocked": "Ponechat zablokované",
+    "forget": "Zapomenout relay",
+    "actionFailed": "Nepovedlo se. Zkus to znovu."
+  },
+  "reason": {
+    "p2pOff": "Peer-to-peer je vypnuto.",
+    "noRelay": "Tento server nemá relay.",
+    "notConnected": "Nejsi připojen k tomuto serveru.",
+    "untrusted": "Relay tohoto serveru se změnilo a není důvěryhodné.",
+    "conflict": "Na tomto serveru jsou oznámena dvě relay; žádné se nepoužije.",
+    "botLeft": "Bot relay opustil server.",
+    "relayDown": "Relay momentálně není dostupné (hlásí bot relay).",
+    "botNoAnswer": "Bot relay neodpověděl.",
+    "refused": "Relay odmítlo spojení: {{reason}}",
+    "unreachable": "Relay se nepodařilo zastihnout přes UDP ani TCP 443.",
+    "peerCannotRelay": "Druhá osoba relay použít nemůže (starší Mumcord nebo vypnuté relay).",
+    "denied": "Bot relay požadavek odmítl.",
+    "peerGone": "Druhá osoba opustila server.",
+    "rateLimited": "Příliš mnoho požadavků na relay. Zkus to za minutu."
+  },
+  "refusal": {
+    "unknownToken": "neznámý přístupový token",
+    "expired": "přístupový token vypršel",
+    "notAllowed": "nepovoleno",
+    "botGone": "bot relay je pryč",
+    "relayFull": "relay je plné",
+    "peerLimit": "příliš mnoho spojení",
+    "rateLimited": "příliš mnoho pokusů",
+    "version": "nepodporovaná verze",
+    "badRequest": "neplatný požadavek"
+  }
+}

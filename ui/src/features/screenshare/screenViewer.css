@@ -8,6 +8,13 @@
   font-weight: normal;
 }
 
+.screen-viewer__link {
+  margin-left: var(--space-2);
+  font-size: var(--font-size-xs);
+  font-weight: normal;
+  color: var(--color-text-secondary);
+}
+
 .screen-viewer__live {
   margin-left: var(--space-1);
   padding: 0 var(--space-1);

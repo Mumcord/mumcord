@@ -16,6 +16,7 @@ import {
   type Identity,
   type MumbleLink,
   type MumcordApi,
+  type P2pMode,
   type SavedServer,
   type ServerInput,
   type Unsubscribe,
@@ -593,6 +594,12 @@ export async function toggleAlwaysConnect(serverId: number, enabled: boolean): P
 export async function saveServerTheme(serverId: number, themeId: string | null): Promise<void> {
   const { api } = ensure();
   replaceServer(await api.serverSetTheme(serverId, themeId));
+}
+
+/** The server's own peer-to-peer mode; `null` follows the global setting (spec 04, FR-4.2). */
+export async function saveP2pModeOverride(serverId: number, mode: P2pMode | null): Promise<void> {
+  const { api } = ensure();
+  replaceServer(await api.serverSetP2pModeOverride(serverId, mode));
 }
 
 /** The menu's "Mute notifications" switch (FR-2.10); badges keep updating. */

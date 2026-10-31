@@ -42,7 +42,7 @@
   },
   "directConsent": {
     "title": "Permitir ligações diretas?",
-    "description": "As ligações diretas são mais rápidas, mas a outra pessoa pode ver o seu endereço IP. O Mumcord usa-as para imagens em tamanho real e partilha de ecrã com outros utilizadores do Mumcord e pode abrir uma porta no seu router para elas. Se disser que não, as imagens continuam a chegar através do servidor e a partilha de ecrã fica indisponível. Pode alterar isto mais tarde em Definições → Privacidade.",
+    "description": "As ligações diretas são mais rápidas, mas a outra pessoa pode ver o seu endereço IP. O Mumcord usa-as para imagens em tamanho real e partilha de ecrã com outros utilizadores do Mumcord e pode abrir uma porta no seu router para elas. Se disser que não, as imagens continuam a chegar através do servidor e a partilha de ecrã fica indisponível. Pode alterar isto mais tarde em Definições → Privacidade. Se este servidor oferecer um retransmissor, o Mumcord pode usá-lo em vez disso; assim a outra pessoa não vê o teu endereço IP.",
     "no": "Não",
     "yes": "Sim",
     "failed": "Não funcionou. Tenta novamente."

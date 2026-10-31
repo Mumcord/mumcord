@@ -546,10 +546,26 @@
     "weakConnection": "Prikaži ikonu slabe veze",
     "weakConnectionHint": "Mala ikona signala pored osoba sa slabom vezom."
   },
+  "p2p": {
+    "title": "Peer-to-peer (dijeljenje zaslona, slike u punoj veličini)",
+    "modeLabel": "Peer-to-peer način",
+    "recommended": "Preporučeno",
+    "explanation": "Izravno drugoj osobi pokazuje tvoju IP adresu. Relej je skriva od nje; operater releja (zajednica ovog poslužitelja) može je vidjeti. Oboje je end-to-end šifrirano.",
+    "useGlobal": "Koristi globalnu postavku",
+    "overrideHint": "Samo za ovaj poslužitelj. „Koristi globalnu postavku“ prati Postavke → Privatnost.",
+    "mode": {
+      "directRelay": "Izravno + relej (prvo izravno)",
+      "relayFirst": "Izravno + relej (uvijek relej, skriva moju IP)",
+      "directOnly": "Samo izravno",
+      "relayOnly": "Samo relej",
+      "off": "Isključeno"
+    }
+  },
   "privacyDirect": {
     "title": "Izravne veze",
     "allow": "Dopusti izravne veze s drugim korisnicima Mumcorda",
-    "hint": "Izravne veze su brže, ali druga osoba može vidjeti tvoju IP adresu. Dok ne odlučiš, Mumcord pita kad bi se veza prvi put koristila."
+    "hint": "Izravne veze su brže, ali druga osoba može vidjeti tvoju IP adresu. Dok ne odlučiš, Mumcord pita kad bi se veza prvi put koristila.",
+    "notUsed": "Ne koristi se u odabranom peer-to-peer načinu: Mumcord se nikad ne povezuje izravno s drugima."
   },
   "updates": {
     "title": "Ažuriranja",
@@ -636,7 +652,8 @@
       "screen": "Signal dijeljenja zaslona",
       "watch": "Stanje zajedničkog gledanja",
       "plugin": "Podaci dodatka",
-      "mumble": "Mumble poruka"
+      "mumble": "Mumble poruka",
+      "peer": "Postavljanje releja"
     }
   },
   "licences": {

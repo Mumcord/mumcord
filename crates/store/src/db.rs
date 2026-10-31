@@ -258,6 +258,25 @@ const MIGRATIONS: &[&str] = &[
         ON blocked_user (own_cert_hash, server_id, name COLLATE NOCASE)
         WHERE cert_hash IS NULL;
     ",
+    // v20: mumpeer relay (spec 04). Lands after #218 (v18 `channel_audio_profile`) and #224
+    // (v19 `blocked_user`), both on main above, so the version numbers match testers.
+    // databases. `saved_server.p2p_mode_override` holds a `P2pMode` in snake_case, NULL
+    // uses the global setting (FR-4.2). `relay_pin` is the trust-on-first-use pin of a server's
+    // relay per server entry and own identity (FR-4.9, §7.1): the bot's certificate hash
+    // (40 hex), the relay's certificate fingerprint (64 hex) and when it was first accepted.
+    r"
+    ALTER TABLE saved_server ADD COLUMN p2p_mode_override TEXT CHECK (p2p_mode_override IN
+        ('direct_relay', 'relay_first', 'direct_only', 'relay_only', 'off'));
+
+    CREATE TABLE relay_pin (
+        server_id     INTEGER NOT NULL REFERENCES saved_server (id) ON DELETE CASCADE,
+        identity_id   INTEGER NOT NULL REFERENCES identity (id) ON DELETE CASCADE,
+        bot_cert_hash TEXT    NOT NULL,
+        relay_fp      TEXT    NOT NULL,
+        first_seen    INTEGER NOT NULL,
+        PRIMARY KEY (server_id, identity_id)
+    );
+    ",
 ];
 
 /// Handle to the local database. Not `Sync`; callers share it behind a mutex.
@@ -319,7 +338,6 @@ pub(crate) mod tests {
     /// `blocked_user` must stay v19.
     #[test]
     fn blocked_user_is_v19_after_channel_audio_profile() {
-        assert_eq!(MIGRATIONS.len(), 19);
         assert!(MIGRATIONS[16].contains("CREATE TABLE pm_conversation"));
         assert!(MIGRATIONS[17].contains("CREATE TABLE channel_audio_profile"));
         assert!(MIGRATIONS[18].contains("CREATE TABLE blocked_user"));
@@ -541,6 +559,46 @@ pub(crate) mod tests {
             (server.connected_at_quit, server.theme_id.as_deref()),
             (None, None)
         );
+    }
+
+    /// Testers' databases already have #218's v18 and #224's v19; the relay migration must
+    /// stay v20 after them.
+    #[test]
+    fn relay_migration_is_v20_after_audio_profile_and_blocked_user() {
+        assert_eq!(MIGRATIONS.len(), 20);
+        assert!(MIGRATIONS[16].contains("CREATE TABLE pm_conversation"));
+        assert!(MIGRATIONS[17].contains("CREATE TABLE channel_audio_profile"));
+        assert!(MIGRATIONS[18].contains("CREATE TABLE blocked_user"));
+        assert!(MIGRATIONS[19].contains("CREATE TABLE relay_pin"));
+    }
+
+    #[test]
+    fn version_19_database_upgrades_with_no_override_and_no_relay_pins() {
+        let dir = tempfile::tempdir().expect("tempdir");
+        {
+            let mut conn = Connection::open(dir.path().join(DB_FILE_NAME)).expect("open");
+            let tx = conn.transaction().expect("tx");
+            for sql in &MIGRATIONS[..19] {
+                tx.execute_batch(sql).expect("migration");
+            }
+            tx.pragma_update(None, "user_version", 19).expect("pragma");
+            tx.execute(
+                "INSERT INTO saved_server (label, address, username, sort_order)
+                 VALUES ('Old', 'localhost', 'Tester', 0)",
+                [],
+            )
+            .expect("insert");
+            tx.commit().expect("commit");
+        }
+        let store = Store::open(dir.path()).expect("upgrade");
+        let server = &store.servers().expect("servers")[0];
+        assert_eq!(server.label, "Old");
+        assert_eq!(server.p2p_mode_override, None);
+        let pins: i64 = store
+            .conn
+            .query_row("SELECT COUNT(*) FROM relay_pin", [], |r| r.get(0))
+            .expect("count");
+        assert_eq!(pins, 0);
     }
 
     #[test]

@@ -49,10 +49,13 @@ import type {
   PmRequests,
   PttAvailability,
   PttMouseStatus,
+  RelayInfo,
+  RelayUnavailable,
   SavedServer,
   ServerInfo,
   ServerInput,
   ScreenShare,
+  ShareStartBlock,
   ServerSnapshot,
   Settings,
   User,
@@ -174,6 +177,16 @@ interface MockSession {
 
 const SELF_SESSION = 1;
 
+const NO_RELAY: RelayInfo = { bots: [], host: null, status: { kind: "none" }, firstSeen: null };
+
+/** A relay announced by a bot and trusted since the first visit (spec 04, FR-4.20). */
+const MOCK_RELAY: RelayInfo = {
+  bots: ["RelayBot"],
+  host: "relay.example.org",
+  status: { kind: "available" },
+  firstSeen: "2026-09-01T18:00:00Z",
+};
+
 /** Per-server switches of a server that was just added. */
 const NEW_SERVER_FLAGS = {
   alwaysConnectAtStart: false,
@@ -182,6 +195,7 @@ const NEW_SERVER_FLAGS = {
   groupMentionsMuted: false,
   themeId: null,
   identityId: null,
+  p2pModeOverride: null,
 } satisfies Partial<SavedServer>;
 /** The one channel password the mock accepts (FR-2.78). */
 export const MOCK_CHANNEL_PASSWORD = "secret";
@@ -276,6 +290,7 @@ const DEFAULT_SETTINGS: Settings = {
   talkingFirst: false,
   showWeakConnectionIcon: true,
   allowDirectConnections: "unset",
+  p2pMode: "directRelay",
   updateCheck: "unset",
   appimageMenuEntry: "unset",
   windowOverlayNoticeShown: false,
@@ -1054,6 +1069,55 @@ export function createMockApi(options: MockOptions = {}): MockApi {
     if (next === shownFriends) return;
     shownFriends = next;
     dispatch("friendsChanged", { friends: JSON.parse(next) as Friend[] });
+  }
+
+  // The first server announces a trusted relay; in the demo the second one's relay changed.
+  const relays = new Map<number, RelayInfo>(
+    fresh
+      ? []
+      : [
+          [1, MOCK_RELAY],
+          ...(demo
+            ? [[2, { ...MOCK_RELAY, status: { kind: "untrusted", keptBlocked: false } }] as const]
+            : []),
+        ],
+  );
+
+  function relayOf(serverId: number): RelayInfo {
+    return relays.get(serverId) ?? NO_RELAY;
+  }
+
+  /** Why the relay can't be used on the server, `null` when it can (as the engine decides). */
+  function relayUnavailable(serverId: number): RelayUnavailable | null {
+    const status = relayOf(serverId).status;
+    switch (status.kind) {
+      case "available":
+        return null;
+      case "none":
+        return { kind: "noRelay" };
+      case "unavailable":
+        return status.reason;
+      default:
+        return { kind: status.kind };
+    }
+  }
+
+  /** What blocks P2P features on the server, like the engine's plan (spec 04, FR-4.3 – FR-4.5). */
+  function shareStartBlock(serverId: number): ShareStartBlock | null {
+    const mode = requireServer(serverId).p2pModeOverride ?? settings.p2pMode;
+    const relayReason = relayUnavailable(serverId);
+    const direct = mode !== "relayOnly" && settings.allowDirectConnections !== "no";
+    const relay = mode !== "directOnly" && relayReason === null;
+    if (mode === "off") return { blocked: "p2pOff", relayReason: null };
+    if (mode === "relayOnly" && relayReason !== null) {
+      return { blocked: "relayUnavailable", relayReason };
+    }
+    return direct || relay ? null : { blocked: "consentOff", relayReason: null };
+  }
+
+  function setRelay(serverId: number, info: RelayInfo): void {
+    relays.set(serverId, info);
+    emit("relayChanged", { serverId, info });
   }
 
   function emit<K extends EventName>(event: K, payload: EventPayloads[K]): void {
@@ -2729,6 +2793,11 @@ export function createMockApi(options: MockOptions = {}): MockApi {
       servers = servers.map((s) => (s.id === serverId ? { ...s, groupMentionsMuted: muted } : s));
       return Promise.resolve({ ...requireServer(serverId) });
     },
+    serverSetP2pModeOverride: (serverId, mode) => {
+      requireServer(serverId);
+      servers = servers.map((s) => (s.id === serverId ? { ...s, p2pModeOverride: mode } : s));
+      return Promise.resolve({ ...requireServer(serverId) });
+    },
     serverSetIdentity: (serverId, identityId) =>
       Promise.resolve({ ...setIdentityOfServer(serverId, identityId) }),
     serverTestConnection: (input) => {
@@ -2760,6 +2829,34 @@ export function createMockApi(options: MockOptions = {}): MockApi {
     userStatsWatch: () => Promise.resolve(null),
     p2pConsentDecide: (allow) => {
       settings = { ...settings, allowDirectConnections: allow ? "yes" : "no" };
+      return Promise.resolve(null);
+    },
+    // Demo only, for screenshots: Maya (session 2) is reached through the relay, Jonas
+    // (session 5) directly.
+    p2pLink: (_serverId, session) =>
+      Promise.resolve(
+        !demo
+          ? null
+          : session === 2
+            ? { path: "relayTcp", ipHidden: true }
+            : session === 5
+              ? { path: "direct", ipHidden: false }
+              : null,
+      ),
+    relayInfo: (serverId) => Promise.resolve(relayOf(serverId)),
+    relayTrustNew: (serverId) => {
+      setRelay(serverId, { ...relayOf(serverId), status: { kind: "available" } });
+      return Promise.resolve(null);
+    },
+    relayKeepBlocked: (serverId) => {
+      setRelay(serverId, {
+        ...relayOf(serverId),
+        status: { kind: "untrusted", keptBlocked: true },
+      });
+      return Promise.resolve(null);
+    },
+    relayForget: (serverId) => {
+      setRelay(serverId, NO_RELAY);
       return Promise.resolve(null);
     },
     // watch party: only the user's own party; other people's actions come from `mock.emit`.
@@ -2878,6 +2975,7 @@ export function createMockApi(options: MockOptions = {}): MockApi {
         soundAvailable: withSound,
         viewers: [],
         blocked: null,
+        relayReason: null,
       });
       return Promise.resolve(null);
     },
@@ -2902,6 +3000,7 @@ export function createMockApi(options: MockOptions = {}): MockApi {
       const own = ownShares.get(serverId);
       return Promise.resolve(own ? [own] : []);
     },
+    screenShareBlock: (serverId) => Promise.resolve(shareStartBlock(serverId)),
     screenShareWatch: () => notImplemented("screenShareWatch"),
     screenShareUnwatch: () => notImplemented("screenShareUnwatch"),
     screenShareSetDecodeFallback: () => notImplemented("screenShareSetDecodeFallback"),

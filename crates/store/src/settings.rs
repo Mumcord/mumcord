@@ -3,6 +3,7 @@
 
 use std::collections::BTreeMap;
 
+use rusqlite::types::{FromSql, FromSqlError, FromSqlResult, ToSql, ToSqlOutput, ValueRef};
 use rusqlite::{OptionalExtension, params};
 use serde::{Deserialize, Serialize};
 
@@ -342,6 +343,55 @@ pub enum Consent {
     No,
 }
 
+/// How peer-to-peer features (screen share, full-size images) reach another Mumcord user
+/// (spec 04, FR-4.1): directly, through the server's mumpeer relay, or not at all.
+#[derive(Debug, Clone, Copy, Default, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum P2pMode {
+    /// Direct first, relay when direct fails.
+    #[default]
+    DirectRelay,
+    /// Always the relay when one is announced, so the other person never sees this IP address.
+    RelayFirst,
+    DirectOnly,
+    RelayOnly,
+    Off,
+}
+
+impl P2pMode {
+    /// The snake_case name, as in the settings JSON; stored for per-server overrides.
+    pub fn as_str(self) -> &'static str {
+        match self {
+            Self::DirectRelay => "direct_relay",
+            Self::RelayFirst => "relay_first",
+            Self::DirectOnly => "direct_only",
+            Self::RelayOnly => "relay_only",
+            Self::Off => "off",
+        }
+    }
+}
+
+impl ToSql for P2pMode {
+    fn to_sql(&self) -> rusqlite::Result<ToSqlOutput<'_>> {
+        Ok(self.as_str().into())
+    }
+}
+
+impl FromSql for P2pMode {
+    fn column_result(value: ValueRef<'_>) -> FromSqlResult<Self> {
+        match value.as_str()? {
+            "direct_relay" => Ok(Self::DirectRelay),
+            "relay_first" => Ok(Self::RelayFirst),
+            "direct_only" => Ok(Self::DirectOnly),
+            "relay_only" => Ok(Self::RelayOnly),
+            "off" => Ok(Self::Off),
+            other => Err(FromSqlError::Other(
+                format!("unknown p2p mode {other:?}").into(),
+            )),
+        }
+    }
+}
+
 /// A custom colour theme (FR-2.14, FR-2.15) with a dark and a light version. Each colour map
 /// holds the seven keys background, surface, text, accent, talking, warning and error as
 /// lowercase `#rrggbb`; the UI validates them and generates a missing version, so the store only
@@ -489,8 +539,11 @@ pub struct Settings {
     pub hide_empty_channels: bool,
     pub talking_first: bool,
     pub show_weak_connection_icon: bool,
-    /// Direct connections to other Mumcord users (FR-2.36); `Unset` asks on first use.
+    /// Direct connections to other Mumcord users (FR-2.36); `Unset` asks on first use. Stays the
+    /// answer to the consent question before the first direct connection (FR-4.5).
     pub allow_direct_connections: Consent,
+    /// Global P2P mode (FR-4.1); a server entry may override it (FR-4.2).
+    pub p2p_mode: P2pMode,
     /// Daily check for a new version (FR-2.56); `Unset` asks.
     pub update_check: Consent,
     /// When the last update check ran, in milliseconds since the Unix epoch.
@@ -578,6 +631,7 @@ impl Default for Settings {
             talking_first: false,
             show_weak_connection_icon: true,
             allow_direct_connections: Consent::Unset,
+            p2p_mode: P2pMode::DirectRelay,
             update_check: Consent::Unset,
             last_update_check: None,
             appimage_menu_entry: Consent::Unset,
@@ -630,6 +684,11 @@ impl Store {
             Some(json) => {
                 let mut settings: Settings = serde_json::from_str(&json)?;
                 settings.legacy_window_overlay_enabled |= legacy_window_overlay_enabled(&json);
+                if !has_key(&json, "p2p_mode") && settings.allow_direct_connections == Consent::No {
+                    // FR-4.6: whoever refused direct connections before the relay existed keeps
+                    // their IP address hidden; `yes` and unset stay on the default.
+                    settings.p2p_mode = P2pMode::RelayOnly;
+                }
                 if settings.music_quality && !has_key(&json, "bitrate_kbps") {
                     // Music quality used to lift the cap; keep those users at "Max".
                     settings.bitrate_kbps = None;
@@ -842,6 +901,76 @@ mod tests {
         assert!(loaded.whats_new_auto);
         assert_eq!(loaded.whats_new_seen, None);
         assert!(loaded.legacy_window_overlay_enabled);
+    }
+
+    #[test]
+    fn p2p_mode_defaults_to_direct_relay_and_round_trips() {
+        let (_dir, store) = temp_store();
+        assert_eq!(
+            store.settings().expect("load").p2p_mode,
+            P2pMode::DirectRelay
+        );
+        for mode in [
+            P2pMode::DirectRelay,
+            P2pMode::RelayFirst,
+            P2pMode::DirectOnly,
+            P2pMode::RelayOnly,
+            P2pMode::Off,
+        ] {
+            let settings = Settings {
+                p2p_mode: mode,
+                ..Settings::default()
+            };
+            store.save_settings(&settings).expect("save");
+            assert_eq!(store.settings().expect("load").p2p_mode, mode);
+            // The database column of the per-server override uses the same names.
+            assert_eq!(
+                serde_json::to_string(&mode).expect("serialise"),
+                format!("\"{}\"", mode.as_str())
+            );
+        }
+        assert_eq!(
+            serde_json::to_string(&P2pMode::RelayFirst).expect("serialise"),
+            r#""relay_first""#
+        );
+    }
+
+    fn load_raw(json: &str) -> Settings {
+        let (_dir, store) = temp_store();
+        store
+            .conn
+            .execute(
+                "INSERT INTO settings (id, data) VALUES (1, ?1)",
+                params![json],
+            )
+            .expect("insert");
+        store.settings().expect("load")
+    }
+
+    #[test]
+    fn refused_direct_connections_open_as_relay_only() {
+        // AC-4.24
+        let loaded = load_raw(r#"{"allow_direct_connections":"no"}"#);
+        assert_eq!(loaded.p2p_mode, P2pMode::RelayOnly);
+        assert_eq!(loaded.allow_direct_connections, Consent::No);
+    }
+
+    #[test]
+    fn allowed_or_unasked_direct_connections_open_as_direct_relay() {
+        let yes = load_raw(r#"{"allow_direct_connections":"yes"}"#);
+        assert_eq!(yes.p2p_mode, P2pMode::DirectRelay);
+        let unset = load_raw(r#"{"allow_direct_connections":"unset"}"#);
+        assert_eq!(unset.p2p_mode, P2pMode::DirectRelay);
+        assert_eq!(unset.allow_direct_connections, Consent::Unset);
+        assert_eq!(load_raw("{}").p2p_mode, P2pMode::DirectRelay);
+    }
+
+    #[test]
+    fn explicit_p2p_mode_is_not_migrated() {
+        let loaded = load_raw(r#"{"allow_direct_connections":"no","p2p_mode":"direct_only"}"#);
+        assert_eq!(loaded.p2p_mode, P2pMode::DirectOnly);
+        let loaded = load_raw(r#"{"allow_direct_connections":"no","p2p_mode":"direct_relay"}"#);
+        assert_eq!(loaded.p2p_mode, P2pMode::DirectRelay);
     }
 
     #[test]
