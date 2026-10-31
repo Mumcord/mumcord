@@ -2702,7 +2702,8 @@ impl Inner {
                     &self.blocked,
                 );
             }
-            Event::ServerConfigUpdated(_) | Event::Disconnected(_) => {}
+            // ACL replies are only requested by the ACL editor (Epic 4, #252), which is not built yet.
+            Event::ServerConfigUpdated(_) | Event::Acl(_) | Event::Disconnected(_) => {}
         }
         extension::on_event(ctx, &event);
     }

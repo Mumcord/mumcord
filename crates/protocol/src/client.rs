@@ -149,6 +149,10 @@ pub enum Event {
     /// Connection figures of a person, the answer to [`Handle::request_user_stats`]. Which
     /// fields are set depends on the own permissions; text fields are untrusted.
     UserStats(Box<proto::UserStats>),
+    /// A channel's groups, ACL entries and inheritance, the answer to [`Handle::query_acl`],
+    /// passed through as received (`query` is unset in replies). Names are untrusted. Without
+    /// the Write permission the server answers with [`Event::PermissionDenied`] instead.
+    Acl(Box<proto::Acl>),
     /// Final event; the handle stops working afterwards.
     Disconnected(DisconnectReason),
 }
@@ -945,6 +949,10 @@ impl Dispatcher {
                 let m: proto::UserStats = decode("UserStats", payload)?;
                 self.emit(Event::UserStats(Box::new(m)));
             }
+            MessageType::Acl => {
+                let m: proto::Acl = decode("Acl", payload)?;
+                self.emit(Event::Acl(Box::new(m)));
+            }
             MessageType::PermissionDenied => {
                 let m: proto::PermissionDenied = decode("PermissionDenied", payload)?;
                 self.emit(Event::PermissionDenied(m.into()));
@@ -1246,6 +1254,19 @@ impl Handle {
         self.send(Frame::from_message(MessageType::PermissionQuery, &m))
     }
 
+    /// Asks the server for a channel's groups and ACL; the answer arrives as [`Event::Acl`].
+    /// Needs the Write permission in that channel: otherwise the server answers with
+    /// [`Event::PermissionDenied`] (kind [`crate::DenyKind::Permission`], `channel_id` set and
+    /// `permission` = [`crate::permissions::WRITE`]).
+    pub fn query_acl(&self, channel_id: u32) -> Result<(), CommandError> {
+        let m = proto::Acl {
+            channel_id,
+            query: Some(true),
+            ..Default::default()
+        };
+        self.send(Frame::from_message(MessageType::Acl, &m))
+    }
+
     /// Replaces a channel's ACL and groups (admin tooling such as test bots; needs the Write
     /// permission, e.g. as SuperUser). Unset groups/ACL entries are removed by the server.
     pub fn send_acl(&self, acl: proto::Acl) -> Result<(), CommandError> {
@@ -1389,6 +1410,75 @@ mod tests {
         };
         assert_eq!(frame.kind, MessageType::Acl as u16);
         assert_eq!(proto::Acl::decode(frame.payload).expect("decode"), acl);
+    }
+
+    fn test_shared() -> Arc<Shared> {
+        Arc::new(Shared {
+            state: Mutex::new(ServerState::default()),
+            shutdown: Notify::new(),
+            closing: AtomicBool::new(false),
+            pong: watch::Sender::new(0),
+            reason: Mutex::new(None),
+            connected: AtomicBool::new(true),
+            ping: Mutex::default(),
+            tap: None,
+        })
+    }
+
+    #[test]
+    fn query_acl_queues_an_acl_query_frame() {
+        let (tx, mut rx) = mpsc::unbounded_channel();
+        let handle = Handle {
+            tx,
+            shared: test_shared(),
+        };
+        handle.query_acl(5).expect("queued");
+        let Ok(Outgoing::Frame(frame)) = rx.try_recv() else {
+            panic!("expected a frame");
+        };
+        assert_eq!(frame.kind, MessageType::Acl as u16);
+        let m = proto::Acl::decode(frame.payload).expect("decode");
+        assert_eq!(m.channel_id, 5);
+        assert_eq!(m.query, Some(true));
+        assert!(m.groups.is_empty() && m.acls.is_empty());
+    }
+
+    #[test]
+    fn acl_reply_and_denial_are_emitted_as_events() {
+        let (events, mut rx) = mpsc::unbounded_channel();
+        let mut dispatcher = Dispatcher {
+            shared: test_shared(),
+            events,
+            synced: true,
+        };
+        let reply = proto::Acl {
+            channel_id: 2,
+            inherit_acls: Some(true),
+            groups: vec![proto::acl::ChanGroup {
+                name: "admin".into(),
+                inherited: Some(false),
+                add: vec![7],
+                ..Default::default()
+            }],
+            query: Some(false),
+            ..Default::default()
+        };
+        dispatcher.handle(Frame::from_message(MessageType::Acl, &reply));
+        assert_eq!(rx.try_recv().ok(), Some(Event::Acl(Box::new(reply))));
+
+        let denied = proto::PermissionDenied {
+            permission: Some(crate::permissions::WRITE),
+            channel_id: Some(2),
+            r#type: Some(proto::permission_denied::DenyType::Permission as i32),
+            ..Default::default()
+        };
+        dispatcher.handle(Frame::from_message(MessageType::PermissionDenied, &denied));
+        let Ok(Event::PermissionDenied(d)) = rx.try_recv() else {
+            panic!("expected a denial");
+        };
+        assert_eq!(d.kind, crate::DenyKind::Permission);
+        assert_eq!(d.permission, Some(crate::permissions::WRITE));
+        assert_eq!(d.channel_id, Some(2));
     }
 
     #[test]

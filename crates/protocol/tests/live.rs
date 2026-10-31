@@ -10,7 +10,7 @@ use std::time::Duration;
 use mumcord_protocol::pki_types::{CertificateDer, PrivateKeyDer, PrivatePkcs8KeyDer};
 use mumcord_protocol::{
     ClientIdentity, CommandError, ConnectConfig, ConnectError, Connection, DenyKind,
-    DisconnectReason, Event, TextTarget, connect,
+    DisconnectReason, Event, TextTarget, connect, proto,
 };
 use tokio::sync::mpsc::UnboundedReceiver;
 
@@ -326,4 +326,79 @@ async fn v15_sees_client_version_before_authenticate() {
 #[ignore = "needs testenv/up.sh v14"]
 async fn v14_sees_client_version_before_authenticate() {
     no_old_client_warning(V14).await;
+}
+
+/// SuperUser password for the local test server: `SUPERUSER_PASSWORD` in the environment or in
+/// `testenv/.env` (never committed).
+fn superuser_password() -> String {
+    if let Ok(p) = std::env::var("SUPERUSER_PASSWORD") {
+        return p;
+    }
+    let env_file = std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("../../testenv/.env");
+    std::fs::read_to_string(env_file)
+        .ok()
+        .and_then(|text| {
+            text.lines()
+                .find_map(|l| l.strip_prefix("SUPERUSER_PASSWORD=").map(str::to_owned))
+        })
+        .expect("SUPERUSER_PASSWORD in the environment or testenv/.env")
+}
+
+#[tokio::test]
+#[ignore = "needs testenv/up.sh v15 and SUPERUSER_PASSWORD"]
+async fn acl_query_returns_the_reply_for_an_admin_and_a_denial_for_others() {
+    let mut admin_config = config(V15, "SuperUser", true);
+    admin_config.password = Some(superuser_password());
+    let mut admin = connect(admin_config).await.expect("SuperUser login");
+    let root = channel_id(&admin, "Raid");
+    let group = unique("g").to_lowercase();
+    admin
+        .handle
+        .send_acl(proto::Acl {
+            channel_id: root,
+            inherit_acls: Some(true),
+            groups: vec![proto::acl::ChanGroup {
+                name: group.clone(),
+                inherited: Some(false),
+                ..Default::default()
+            }],
+            query: Some(false),
+            ..Default::default()
+        })
+        .expect("set group");
+    admin.handle.query_acl(root).expect("send");
+    let reply = wait_for(&mut admin.events, "ACL reply", |e| match e {
+        Event::Acl(acl) if acl.query != Some(true) => Some(acl.clone()),
+        _ => None,
+    })
+    .await;
+    assert_eq!(reply.channel_id, root);
+    assert!(reply.groups.iter().any(|g| g.name == group), "{reply:?}");
+    // Remove the test group again so the shared test server stays as it was.
+    admin
+        .handle
+        .send_acl(proto::Acl {
+            channel_id: root,
+            inherit_acls: Some(true),
+            query: Some(false),
+            ..Default::default()
+        })
+        .expect("clean up");
+    admin.handle.flush().await.expect("flush");
+    admin.handle.disconnect();
+
+    let mut user = login(V15, "plain").await;
+    user.handle.query_acl(root).expect("send");
+    let denied = wait_for(&mut user.events, "ACL denial", |e| match e {
+        Event::PermissionDenied(d) => Some(d.clone()),
+        _ => None,
+    })
+    .await;
+    assert_eq!(denied.kind, DenyKind::Permission, "{denied:?}");
+    assert_eq!(denied.channel_id, Some(root));
+    assert_eq!(
+        denied.permission,
+        Some(mumcord_protocol::permissions::WRITE)
+    );
+    user.handle.disconnect();
 }

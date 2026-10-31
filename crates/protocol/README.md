@@ -33,6 +33,10 @@ async fn main() {
 }
 ```
 
+## Querying a channel's ACL
+
+`Handle::query_acl(channel_id)` asks the server for a channel's groups and ACL entries. The answer arrives as `Event::Acl(Box<proto::Acl>)`, passed through as the server sent it (groups with members and inherited flags, ACL entries, `inherit_acls`). The server only answers users with the Write permission in that channel; everyone else gets `Event::PermissionDenied` with `kind == DenyKind::Permission`, the `channel_id` and `permission == permissions::WRITE`. Names in the reply come from the server and are untrusted. Added in a minor release; nothing existing changed.
+
 ## Rate limits and disconnecting
 
 Standard servers drop messages that arrive faster than their rate limit allows, so the client paces chat, own user state, channel, ACL and plugin data messages: a short burst goes out at once, the rest waits in a queue. `Handle::disconnect` sends what is still queued first, at the allowed pace, and closes once the server has confirmed it (a ping answered after the last message), or after 2 s at the latest; anything left over is logged by message kind and count. If the connection is lost instead, the queue is dropped.
