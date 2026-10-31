@@ -26,6 +26,8 @@ pub enum ErrorKind {
     ServerLimitReached,
     MessageTooLarge,
     InvalidInput,
+    /// An identity with this certificate hash is already in the list (issue #148, AC-3.3).
+    DuplicateIdentity,
     NotFound,
     /// The screen share already has the maximum of viewers (FR-2.43).
     ShareFull,
