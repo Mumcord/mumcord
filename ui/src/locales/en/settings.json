@@ -663,5 +663,37 @@
     "releasePage": "Release page",
     "entries": "Entries: {{count}}",
     "englishNote": "The changelog is written in English."
+  },
+  "privateMessages": {
+    "title": "Private messages",
+    "legend": "Private messages from",
+    "everyone": "Everyone",
+    "everyoneHint": "Anyone on a server can message you.",
+    "friendsOnly": "Friends only",
+    "friendsOnlyHint": "Other Mumcord users can send a chat request instead. Messages from standard clients go to “Message requests”.",
+    "nobody": "Nobody",
+    "nobodyHint": "No private messages and no chat requests are shown. Senders are not told.",
+    "keepRequests": "Keep messages from standard clients as message requests",
+    "keepRequestsHint": "Only used with “Friends only”. When off, these messages are dropped.",
+    "overrideTitle": "Per-server override",
+    "overrideServer": "Server",
+    "overrideRule": "Private messages from",
+    "overrideLabel": "Private messages from on {{server}}",
+    "useDefault": "Use default ({{rule}})",
+    "noServers": "No saved servers yet.",
+    "alwaysTitle": "Always allowed",
+    "currentChannel": "People in my current channel",
+    "currentChannelHint": "Overrides “Friends only” and “Nobody” while we are in the same channel.",
+    "accepted": "Conversations I already accepted",
+    "acceptedHint": "People whose chat request you accepted can keep writing to you."
+  },
+  "acceptedConversations": {
+    "title": "Accepted conversations",
+    "empty": "No accepted conversations yet.",
+    "acceptedAt": "Accepted {{date}}",
+    "identity": "Identity: {{label}}",
+    "revoke": "Revoke",
+    "revokeLabel": "Revoke the accepted conversation with {{name}}",
+    "revokeFailed": "Revoking failed. Please try again."
   }
 }

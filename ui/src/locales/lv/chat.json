@@ -273,5 +273,30 @@
     "warning_one": "{{count}} saite šajā ziņojam parāda pieteikšanās datus",
     "warning_other": "{{count}} saites šajā ziņojam parāda pieteikšanās datus",
     "warning_zero": "{{count}} saites šajā ziņojam parāda pieteikšanās datus"
+  },
+  "requests": {
+    "entry": "Ziņu pieprasījumi",
+    "entryCount_zero": "{{count}} pieprasījumu",
+    "entryCount_one": "{{count}} pieprasījums",
+    "entryCount_other": "{{count}} pieprasījumi",
+    "title": "Ziņu pieprasījumi",
+    "listLabel": "Pieprasījumi",
+    "chatRequestTag": "Tērzēšanas pieprasījums",
+    "messageRequestTag": "Ziņas pieprasījums",
+    "wantsToChat": "{{name}} vēlas ar tevi tērzēt",
+    "metaMumcord": "Mumcord lietotājs · {{server}} · {{time}}",
+    "metaStandard": "{{server}} · {{time}}",
+    "noteFrom": "{{name}} piezīme",
+    "explain": "Tu esi iestatījis privātās ziņas uz “Tikai draugi”. Ja pieņemsi, {{name}} varēs tev rakstīt. Noraidīšana ir kluša: {{name}} redz tikai “gaida”. Pieprasījumi tiek dzēsti, kad aizver Mumcord.",
+    "sentMessages_zero": "{{name}} tev nosūtīja {{count}} ziņu",
+    "sentMessages_one": "{{name}} tev nosūtīja {{count}} ziņu",
+    "sentMessages_other": "{{name}} tev nosūtīja {{count}} ziņas",
+    "messagesLabel": "{{name}} ziņas",
+    "accept": "Pieņemt",
+    "decline": "Noraidīt",
+    "addFriend": "Pievienot draugu",
+    "replyBlocked": "Pieņem pieprasījumu, lai atbildētu lietotājam {{name}}.",
+    "empty": "Nav ziņu pieprasījumu.",
+    "failed": "Tas neizdevās. Lūdzu, mēģini vēlreiz."
   }
 }

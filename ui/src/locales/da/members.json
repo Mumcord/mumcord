@@ -58,7 +58,9 @@
     "join": "Gå til {{channel}}",
     "joinDenied": "Du har ikke adgang til denne kanal.",
     "mute": "Slå lyden fra for mig",
-    "connectionInfo": "Forbindelsesinfo…"
+    "connectionInfo": "Forbindelsesinfo…",
+    "chatRequest": "Send chatanmodning…",
+    "chatRequestPending": "Chatanmodning afventer"
   },
   "nowPlaying": {
     "label": "Spiller nu",
@@ -83,5 +85,13 @@
   "preview": {
     "privateMessage": "Privat besked",
     "fullProfile": "Hele profilen"
+  },
+  "chatRequest": {
+    "title": "Chatanmodning til {{name}}",
+    "note": "Note (valgfri)",
+    "counter": "{{count}} / {{max}}",
+    "counterLabel": "{{count}} af {{max}} tegn brugt",
+    "send": "Send",
+    "failed": "Chatanmodningen kunne ikke sendes. Prøv igen."
   }
 }

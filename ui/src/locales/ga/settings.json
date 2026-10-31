@@ -672,5 +672,37 @@
     "releasePage": "Leathanach an eisiúna",
     "entries": "Iontrálacha: {{count}}",
     "englishNote": "Tá an loga athruithe scríofa i mBéarla."
+  },
+  "privateMessages": {
+    "title": "Teachtaireachtaí príobháideacha",
+    "legend": "Teachtaireachtaí príobháideacha ó",
+    "everyone": "Gach duine",
+    "everyoneHint": "Is féidir le aon duine ar fhreastalaí scríobh chugat.",
+    "friendsOnly": "Cairde amháin",
+    "friendsOnlyHint": "Is féidir le húsáideoirí eile Mumcord iarratas comhrá a sheoladh ina ionad. Téann teachtaireachtaí ó chliaint chaighdeánacha chuig “Iarratais teachtaireachta”.",
+    "nobody": "Duine ar bith",
+    "nobodyHint": "Ní thaispeántar teachtaireachtaí príobháideacha ná iarratais comhrá. Ní chuirtear in iúl do sheoltóirí.",
+    "keepRequests": "Coinnigh teachtaireachtaí ó chliaint chaighdeánacha mar iarratais teachtaireachta",
+    "keepRequestsHint": "Ní úsáidtear é ach le “Cairde amháin”. Nuair a bhíonn sé múchta, déantar na teachtaireachtaí seo a thitim.",
+    "overrideTitle": "Sáruithe in aghaidh an fhreastalaí",
+    "overrideServer": "Freastalaí",
+    "overrideRule": "Teachtaireachtaí príobháideacha ó",
+    "overrideLabel": "Teachtaireachtaí príobháideacha ó ar {{server}}",
+    "useDefault": "Úsáid an réamhshocrú ({{rule}})",
+    "noServers": "Gan aon fhreastalaí sábháilte go fóill.",
+    "alwaysTitle": "Ceadaithe i gcónaí",
+    "currentChannel": "Daoine i mo chainéal reatha",
+    "currentChannelHint": "Sáraíonn sé “Cairde amháin” agus “Duine ar bith” fad is atáimid sa chainéal céanna.",
+    "accepted": "Comhráite a ghlac mé leo cheana",
+    "acceptedHint": "Is féidir leis na daoine a nglac tú lena n-iarratas comhrá leanúint ag scríobh chugat."
+  },
+  "acceptedConversations": {
+    "title": "Comhráite glactha",
+    "empty": "Gan aon chomhrá glactha go fóill.",
+    "acceptedAt": "Glacadh leis {{date}}",
+    "identity": "Féiniúlacht: {{label}}",
+    "revoke": "Cealaigh",
+    "revokeLabel": "Cealaigh an comhrá glactha le {{name}}",
+    "revokeFailed": "Theip ar an gcealú. Bain triail eile as."
   }
 }

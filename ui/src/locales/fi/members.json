@@ -58,7 +58,9 @@
     "join": "Liity kanavalle {{channel}}",
     "joinDenied": "Sinulla ei ole oikeutta liittyä tälle kanavalle.",
     "mute": "Mykistä minulta",
-    "connectionInfo": "Yhteyden tiedot…"
+    "connectionInfo": "Yhteyden tiedot…",
+    "chatRequest": "Lähetä keskustelupyyntö…",
+    "chatRequestPending": "Keskustelupyyntö odottaa"
   },
   "nowPlaying": {
     "label": "Nyt soi",
@@ -83,5 +85,13 @@
   "preview": {
     "privateMessage": "Yksityisviesti",
     "fullProfile": "Koko profiili"
+  },
+  "chatRequest": {
+    "title": "Keskustelupyyntö käyttäjälle {{name}}",
+    "note": "Viesti (valinnainen)",
+    "counter": "{{count}} / {{max}}",
+    "counterLabel": "{{count}} / {{max}} merkkiä käytetty",
+    "send": "Lähetä",
+    "failed": "Keskustelupyyntöä ei voitu lähettää. Yritä uudelleen."
   }
 }

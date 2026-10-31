@@ -268,5 +268,28 @@
     "unreachable": "Сървърът не е достижим",
     "warning_one": "{{count}} връзка в това съобщение показва данни за вход",
     "warning_other": "{{count}} връзки в това съобщение показват данни за вход"
+  },
+  "requests": {
+    "entry": "Заявки за съобщения",
+    "entryCount_one": "{{count}} заявка",
+    "entryCount_other": "{{count}} заявки",
+    "title": "Заявки за съобщения",
+    "listLabel": "Заявки",
+    "chatRequestTag": "Заявка за чат",
+    "messageRequestTag": "Заявка за съобщение",
+    "wantsToChat": "{{name}} иска да чати с теб",
+    "metaMumcord": "Потребител на Mumcord · {{server}} · {{time}}",
+    "metaStandard": "{{server}} · {{time}}",
+    "noteFrom": "Бележка от {{name}}",
+    "explain": "Зададе личните съобщения на „Само приятели“. Ако приемеш, {{name}} ще може да ти пише. Отказът е безшумен: {{name}} вижда само „в изчакване“. Заявките се изчистват, когато затвориш Mumcord.",
+    "sentMessages_one": "{{name}} ти изпрати {{count}} съобщение",
+    "sentMessages_other": "{{name}} ти изпрати {{count}} съобщения",
+    "messagesLabel": "Съобщения от {{name}}",
+    "accept": "Приеми",
+    "decline": "Откажи",
+    "addFriend": "Добави приятел",
+    "replyBlocked": "Приеми заявката, за да отговориш на {{name}}.",
+    "empty": "Няма заявки за съобщения.",
+    "failed": "Това не успя. Опитай отново."
   }
 }

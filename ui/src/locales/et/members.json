@@ -58,7 +58,9 @@
     "join": "Liitu kanaliga {{channel}}",
     "joinDenied": "Sul pole luba sellesse kanalisse siseneda.",
     "mute": "Vaigista minu jaoks",
-    "connectionInfo": "Ühenduse teave…"
+    "connectionInfo": "Ühenduse teave…",
+    "chatRequest": "Saada vestlustaotlus…",
+    "chatRequestPending": "Vestlustaotlus ootel"
   },
   "nowPlaying": {
     "label": "Praegu mängib",
@@ -83,5 +85,13 @@
   "preview": {
     "privateMessage": "Privaatsõnum",
     "fullProfile": "Täielik profiil"
+  },
+  "chatRequest": {
+    "title": "Vestlustaotlus kasutajale {{name}}",
+    "note": "Märge (valikuline)",
+    "counter": "{{count}} / {{max}}",
+    "counterLabel": "Kasutatud {{count}} / {{max}} tähemärki",
+    "send": "Saada",
+    "failed": "Vestlustaotlust ei õnnestunud saata. Proovi palun uuesti."
   }
 }

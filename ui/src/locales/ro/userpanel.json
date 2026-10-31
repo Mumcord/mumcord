@@ -93,7 +93,11 @@
     "offerImages": "Oferă imagini la dimensiune completă",
     "offerImagesHint": "Lasă-i pe ceilalți să-ți încarce imaginile originale",
     "loadImages": "Încarcă imagini la dimensiune completă",
-    "loadImagesHint": "Preia imaginile originale de la ceilalți"
+    "loadImagesHint": "Preia imaginile originale de la ceilalți",
+    "privateMessages": "Mesaje private de la",
+    "pm_everyone": "Oricine",
+    "pm_friendsOnly": "Prieteni",
+    "pm_nobody": "Nimeni"
   },
   "voice": {
     "line": "Voce: {{channel}} · {{server}}",

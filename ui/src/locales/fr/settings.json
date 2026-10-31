@@ -666,5 +666,37 @@
     "releasePage": "Page de la version",
     "entries": "Entrées : {{count}}",
     "englishNote": "Le journal des modifications est rédigé en anglais."
+  },
+  "privateMessages": {
+    "title": "Messages privés",
+    "legend": "Messages privés de",
+    "everyone": "Tout le monde",
+    "everyoneHint": "Toute personne sur un serveur peut t’écrire.",
+    "friendsOnly": "Amis uniquement",
+    "friendsOnlyHint": "Les autres utilisateurs de Mumcord peuvent t’envoyer une demande de chat. Les messages des clients standard vont dans « Demandes de message ».",
+    "nobody": "Personne",
+    "nobodyHint": "Aucun message privé ni aucune demande de chat n’est affiché. Les expéditeurs ne sont pas prévenus.",
+    "keepRequests": "Conserver les messages des clients standard comme demandes de message",
+    "keepRequestsHint": "Utilisé uniquement avec « Amis uniquement ». Si désactivé, ces messages sont ignorés.",
+    "overrideTitle": "Exception par serveur",
+    "overrideServer": "Serveur",
+    "overrideRule": "Messages privés de",
+    "overrideLabel": "Messages privés de sur {{server}}",
+    "useDefault": "Utiliser la valeur par défaut ({{rule}})",
+    "noServers": "Aucun serveur enregistré pour l’instant.",
+    "alwaysTitle": "Toujours autorisés",
+    "currentChannel": "Personnes de mon canal actuel",
+    "currentChannelHint": "Prime sur « Amis uniquement » et « Personne » tant que nous sommes dans le même canal.",
+    "accepted": "Conversations déjà acceptées",
+    "acceptedHint": "Les personnes dont tu as accepté la demande de chat peuvent continuer à t’écrire."
+  },
+  "acceptedConversations": {
+    "title": "Conversations acceptées",
+    "empty": "Aucune conversation acceptée pour l’instant.",
+    "acceptedAt": "Acceptée le {{date}}",
+    "identity": "Identité : {{label}}",
+    "revoke": "Révoquer",
+    "revokeLabel": "Révoquer la conversation acceptée avec {{name}}",
+    "revokeFailed": "La révocation a échoué. Réessaie."
   }
 }

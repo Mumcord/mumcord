@@ -93,7 +93,11 @@
     "offerImages": "Oferecer imagens em tamanho original",
     "offerImagesHint": "Permite que os outros carreguem as tuas imagens originais",
     "loadImages": "Carregar imagens em tamanho original",
-    "loadImagesHint": "Obter imagens originais dos outros"
+    "loadImagesHint": "Obter imagens originais dos outros",
+    "privateMessages": "Mensagens privadas de",
+    "pm_everyone": "Todos",
+    "pm_friendsOnly": "Amigos",
+    "pm_nobody": "Ninguém"
   },
   "voice": {
     "line": "Voz: {{channel}} · {{server}}",

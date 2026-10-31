@@ -1,0 +1,115 @@
+/* "Private messages from" (issue #141): radio cards, per-server table, accepted list. */
+.pm-rules {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin: 0 0 var(--space-3);
+  padding: 0;
+  border: none;
+}
+
+.pm-rules__legend {
+  margin-bottom: var(--space-2);
+  padding: 0;
+  font-weight: var(--font-weight-bold);
+}
+
+.pm-rules__card {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+}
+
+.pm-rules__card:hover {
+  background: var(--color-bg-hover);
+}
+
+.pm-rules__card:has(input:checked) {
+  border-color: var(--color-accent);
+  background: var(--color-bg-selected);
+}
+
+.pm-rules__card:has(input:focus-visible) {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 2px;
+}
+
+.pm-rules__card input {
+  margin-top: 0.2em;
+  accent-color: var(--color-accent);
+}
+
+.pm-rules__text {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.pm-rules__title {
+  font-weight: var(--font-weight-bold);
+}
+
+.pm-rules__hint {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+}
+
+.pm-overrides {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.pm-overrides th,
+.pm-overrides td {
+  padding: var(--space-1) var(--space-2);
+  border-bottom: 1px solid var(--color-border);
+  text-align: start;
+}
+
+.pm-overrides thead th {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+  text-transform: uppercase;
+}
+
+.pm-overrides tbody th {
+  font-weight: var(--font-weight-normal);
+  overflow-wrap: anywhere;
+}
+
+.pm-overrides td {
+  width: 55%;
+}
+
+.pm-overrides .select {
+  width: 100%;
+}
+
+.pm-accepted {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.pm-accepted__row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding: var(--space-2) 0;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.pm-accepted__text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.pm-accepted__name {
+  overflow-wrap: anywhere;
+}

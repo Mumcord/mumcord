@@ -59,7 +59,9 @@
     "join": "Unirse a {{channel}}",
     "joinDenied": "No tienes permiso para entrar en este canal.",
     "mute": "Silenciar para mí",
-    "connectionInfo": "Info de conexión…"
+    "connectionInfo": "Info de conexión…",
+    "chatRequest": "Enviar solicitud de chat…",
+    "chatRequestPending": "Solicitud de chat pendiente"
   },
   "nowPlaying": {
     "label": "Reproduciendo",
@@ -85,5 +87,13 @@
   "preview": {
     "privateMessage": "Mensaje privado",
     "fullProfile": "Perfil completo"
+  },
+  "chatRequest": {
+    "title": "Solicitud de chat para {{name}}",
+    "note": "Nota (opcional)",
+    "counter": "{{count}} / {{max}}",
+    "counterLabel": "{{count}} de {{max}} caracteres usados",
+    "send": "Enviar",
+    "failed": "No se pudo enviar la solicitud de chat. Inténtalo de nuevo."
   }
 }

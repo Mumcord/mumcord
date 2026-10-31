@@ -60,7 +60,9 @@
     "join": "Pridruži se kanalu {{channel}}",
     "joinDenied": "Nimate dovoljenja za vstop v ta kanal.",
     "mute": "Utišaj zame",
-    "connectionInfo": "Podatki o povezavi…"
+    "connectionInfo": "Podatki o povezavi…",
+    "chatRequest": "Pošlji prošnjo za klepet…",
+    "chatRequestPending": "Prošnja za klepet čaka"
   },
   "nowPlaying": {
     "label": "Zdaj se predvaja",
@@ -87,5 +89,13 @@
   "preview": {
     "privateMessage": "Zasebno sporočilo",
     "fullProfile": "Celoten profil"
+  },
+  "chatRequest": {
+    "title": "Prošnja za klepet za {{name}}",
+    "note": "Opomba (neobvezno)",
+    "counter": "{{count}} / {{max}}",
+    "counterLabel": "Porabljeno {{count}} od {{max}} znakov",
+    "send": "Pošlji",
+    "failed": "Prošnje za klepet ni bilo mogoče poslati. Poskusi znova."
   }
 }

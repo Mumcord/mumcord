@@ -666,5 +666,37 @@
     "releasePage": "Stranica izdanja",
     "entries": "Unosi: {{count}}",
     "englishNote": "Popis promjena napisan je na engleskom."
+  },
+  "privateMessages": {
+    "title": "Privatne poruke",
+    "legend": "Privatne poruke od",
+    "everyone": "Svi",
+    "everyoneHint": "Svatko na poslužitelju može ti pisati.",
+    "friendsOnly": "Samo prijatelji",
+    "friendsOnlyHint": "Ostali korisnici Mumcorda mogu ti umjesto toga poslati zahtjev za razgovor. Poruke standardnih klijenata idu u „Zahtjevi za poruke”.",
+    "nobody": "Nitko",
+    "nobodyHint": "Privatne poruke i zahtjevi za razgovor ne prikazuju se. Pošiljatelji o tome nisu obaviješteni.",
+    "keepRequests": "Zadrži poruke standardnih klijenata kao zahtjeve za poruke",
+    "keepRequestsHint": "Koristi se samo uz „Samo prijatelji”. Kad je isključeno, te se poruke odbacuju.",
+    "overrideTitle": "Iznimka po poslužitelju",
+    "overrideServer": "Poslužitelj",
+    "overrideRule": "Privatne poruke od",
+    "overrideLabel": "Privatne poruke od na poslužitelju {{server}}",
+    "useDefault": "Koristi zadano ({{rule}})",
+    "noServers": "Još nema spremljenih poslužitelja.",
+    "alwaysTitle": "Uvijek dopušteno",
+    "currentChannel": "Osobe u mom trenutnom kanalu",
+    "currentChannelHint": "Nadjačava „Samo prijatelji” i „Nitko” dok smo u istom kanalu.",
+    "accepted": "Razgovori koje sam već prihvatio/la",
+    "acceptedHint": "Osobe čiji si zahtjev za razgovor prihvatio/la mogu ti nastaviti pisati."
+  },
+  "acceptedConversations": {
+    "title": "Prihvaćeni razgovori",
+    "empty": "Još nema prihvaćenih razgovora.",
+    "acceptedAt": "Prihvaćeno {{date}}",
+    "identity": "Identitet: {{label}}",
+    "revoke": "Opozovi",
+    "revokeLabel": "Opozovi prihvaćeni razgovor s korisnikom {{name}}",
+    "revokeFailed": "Opoziv nije uspio. Pokušaj ponovno."
   }
 }

@@ -268,5 +268,28 @@
     "unreachable": "Server not reachable",
     "warning_one": "{{count}} link in this message shows credentials",
     "warning_other": "{{count}} links in this message show credentials"
+  },
+  "requests": {
+    "entry": "Message requests",
+    "entryCount_one": "{{count}} request",
+    "entryCount_other": "{{count}} requests",
+    "title": "Message requests",
+    "listLabel": "Requests",
+    "chatRequestTag": "Chat request",
+    "messageRequestTag": "Message request",
+    "wantsToChat": "{{name}} wants to chat with you",
+    "metaMumcord": "Mumcord user · {{server}} · {{time}}",
+    "metaStandard": "{{server}} · {{time}}",
+    "noteFrom": "Note from {{name}}",
+    "explain": "You set private messages to “Friends only”. Accepting lets {{name}} message you. Decline is silent: {{name}} only sees “pending”. Requests are cleared when you quit Mumcord.",
+    "sentMessages_one": "{{name}} sent you {{count}} message",
+    "sentMessages_other": "{{name}} sent you {{count}} messages",
+    "messagesLabel": "Messages from {{name}}",
+    "accept": "Accept",
+    "decline": "Decline",
+    "addFriend": "Add friend",
+    "replyBlocked": "Accept the request to reply to {{name}}.",
+    "empty": "No message requests.",
+    "failed": "That did not work. Please try again."
   }
 }

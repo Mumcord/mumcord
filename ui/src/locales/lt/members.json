@@ -60,7 +60,9 @@
     "join": "Prisijungti prie {{channel}}",
     "joinDenied": "Neturite teisės įeiti į šį kanalą.",
     "mute": "Nutildyti man",
-    "connectionInfo": "Ryšio informacija…"
+    "connectionInfo": "Ryšio informacija…",
+    "chatRequest": "Siųsti pokalbio prašymą…",
+    "chatRequestPending": "Pokalbio prašymas laukia"
   },
   "nowPlaying": {
     "label": "Dabar groja",
@@ -87,5 +89,13 @@
   "preview": {
     "privateMessage": "Privati žinutė",
     "fullProfile": "Visas profilis"
+  },
+  "chatRequest": {
+    "title": "Pokalbio prašymas naudotojui {{name}}",
+    "note": "Pastaba (nebūtina)",
+    "counter": "{{count}} / {{max}}",
+    "counterLabel": "Panaudota {{count}} iš {{max}} simbolių",
+    "send": "Siųsti",
+    "failed": "Nepavyko išsiųsti pokalbio prašymo. Bandyk dar kartą."
   }
 }

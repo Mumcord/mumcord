@@ -273,5 +273,30 @@
     "warning_few": "{{count}} poveznice u ovoj poruci prikazuju vjerodajnice",
     "warning_one": "{{count}} poveznica u ovoj poruci prikazuje vjerodajnice",
     "warning_other": "{{count}} poveznica u ovoj poruci prikazuje vjerodajnice"
+  },
+  "requests": {
+    "entry": "Zahtjevi za poruke",
+    "entryCount_one": "{{count}} zahtjev",
+    "entryCount_few": "{{count}} zahtjeva",
+    "entryCount_other": "{{count}} zahtjeva",
+    "title": "Zahtjevi za poruke",
+    "listLabel": "Zahtjevi",
+    "chatRequestTag": "Zahtjev za razgovor",
+    "messageRequestTag": "Zahtjev za poruku",
+    "wantsToChat": "{{name}} želi razgovarati s tobom",
+    "metaMumcord": "Korisnik Mumcorda · {{server}} · {{time}}",
+    "metaStandard": "{{server}} · {{time}}",
+    "noteFrom": "Bilješka od {{name}}",
+    "explain": "Privatne poruke postavio si na „Samo prijatelji”. Ako prihvatiš, {{name}} će ti moći pisati. Odbijanje je tiho: {{name}} vidi samo „na čekanju”. Zahtjevi se brišu kad zatvoriš Mumcord.",
+    "sentMessages_one": "{{name}} ti je poslao/la {{count}} poruku",
+    "sentMessages_few": "{{name}} ti je poslao/la {{count}} poruke",
+    "sentMessages_other": "{{name}} ti je poslao/la {{count}} poruka",
+    "messagesLabel": "Poruke od {{name}}",
+    "accept": "Prihvati",
+    "decline": "Odbij",
+    "addFriend": "Dodaj prijatelja",
+    "replyBlocked": "Prihvati zahtjev da bi odgovorio/la korisniku {{name}}.",
+    "empty": "Nema zahtjeva za poruke.",
+    "failed": "To nije uspjelo. Pokušaj ponovno."
   }
 }

@@ -61,7 +61,9 @@
     "join": "Téigh isteach i {{channel}}",
     "joinDenied": "Níl cead agat dul isteach sa chainéal seo.",
     "mute": "Balbhaigh dom",
-    "connectionInfo": "Faisnéis cheangail…"
+    "connectionInfo": "Faisnéis cheangail…",
+    "chatRequest": "Seol iarratas comhrá…",
+    "chatRequestPending": "Iarratas comhrá ar feitheamh"
   },
   "nowPlaying": {
     "label": "Ag seinm anois",
@@ -89,5 +91,13 @@
   "preview": {
     "privateMessage": "Teachtaireacht phríobháideach",
     "fullProfile": "An phróifíl iomlán"
+  },
+  "chatRequest": {
+    "title": "Iarratas comhrá chuig {{name}}",
+    "note": "Nóta (roghnach)",
+    "counter": "{{count}} / {{max}}",
+    "counterLabel": "{{count}} as {{max}} carachtar in úsáid",
+    "send": "Seol",
+    "failed": "Níorbh fhéidir an t-iarratas comhrá a sheoladh. Bain triail eile as."
   }
 }

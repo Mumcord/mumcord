@@ -268,5 +268,28 @@
     "unreachable": "Palvelimeen ei saada yhteyttä",
     "warning_one": "{{count}} linkki tässä viestissä näyttää kirjautumistiedot",
     "warning_other": "{{count}} linkkiä tässä viestissä näyttävät kirjautumistiedot"
+  },
+  "requests": {
+    "entry": "Viestipyynnöt",
+    "entryCount_one": "{{count}} pyyntö",
+    "entryCount_other": "{{count}} pyyntöä",
+    "title": "Viestipyynnöt",
+    "listLabel": "Pyynnöt",
+    "chatRequestTag": "Keskustelupyyntö",
+    "messageRequestTag": "Viestipyyntö",
+    "wantsToChat": "{{name}} haluaa keskustella kanssasi",
+    "metaMumcord": "Mumcord-käyttäjä · {{server}} · {{time}}",
+    "metaStandard": "{{server}} · {{time}}",
+    "noteFrom": "Viesti käyttäjältä {{name}}",
+    "explain": "Olet asettanut yksityisviestit tilaan ”Vain kaverit”. Hyväksyessäsi {{name}} voi lähettää sinulle viestejä. Hylkääminen on äänetön: {{name}} näkee vain ”odottaa”. Pyynnöt tyhjennetään, kun suljet Mumcordin.",
+    "sentMessages_one": "{{name}} lähetti sinulle {{count}} viestin",
+    "sentMessages_other": "{{name}} lähetti sinulle {{count}} viestiä",
+    "messagesLabel": "Viestit käyttäjältä {{name}}",
+    "accept": "Hyväksy",
+    "decline": "Hylkää",
+    "addFriend": "Lisää kaveri",
+    "replyBlocked": "Hyväksy pyyntö vastataksesi käyttäjälle {{name}}.",
+    "empty": "Ei viestipyyntöjä.",
+    "failed": "Se ei onnistunut. Yritä uudelleen."
   }
 }

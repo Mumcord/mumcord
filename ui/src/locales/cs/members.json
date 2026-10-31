@@ -60,7 +60,9 @@
     "join": "Připojit se k {{channel}}",
     "joinDenied": "Do tohoto kanálu nemáte přístup.",
     "mute": "Ztlumit pro mě",
-    "connectionInfo": "Informace o připojení…"
+    "connectionInfo": "Informace o připojení…",
+    "chatRequest": "Poslat žádost o chat…",
+    "chatRequestPending": "Žádost o chat čeká na vyřízení"
   },
   "nowPlaying": {
     "label": "Právě hraje",
@@ -87,5 +89,13 @@
   "preview": {
     "privateMessage": "Soukromá zpráva",
     "fullProfile": "Celý profil"
+  },
+  "chatRequest": {
+    "title": "Žádost o chat pro {{name}}",
+    "note": "Poznámka (volitelné)",
+    "counter": "{{count}} / {{max}}",
+    "counterLabel": "Využito {{count}} z {{max}} znaků",
+    "send": "Odeslat",
+    "failed": "Žádost o chat se nepodařilo odeslat. Zkus to prosím znovu."
   }
 }

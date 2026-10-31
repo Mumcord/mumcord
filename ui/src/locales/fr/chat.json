@@ -273,5 +273,30 @@
     "warning_many": "{{count}} millions de liens dans ce message affichent des identifiants",
     "warning_one": "{{count}} lien dans ce message affiche des identifiants",
     "warning_other": "{{count}} liens dans ce message affichent des identifiants"
+  },
+  "requests": {
+    "entry": "Demandes de message",
+    "entryCount_one": "{{count}} demande",
+    "entryCount_many": "{{count}} de demandes",
+    "entryCount_other": "{{count}} demandes",
+    "title": "Demandes de message",
+    "listLabel": "Demandes",
+    "chatRequestTag": "Demande de chat",
+    "messageRequestTag": "Demande de message",
+    "wantsToChat": "{{name}} veut discuter avec toi",
+    "metaMumcord": "Utilisateur Mumcord · {{server}} · {{time}}",
+    "metaStandard": "{{server}} · {{time}}",
+    "noteFrom": "Note de {{name}}",
+    "explain": "Tu as réglé les messages privés sur « Amis uniquement ». En acceptant, tu permets à {{name}} de t’écrire. Le refus est silencieux : {{name}} voit seulement « en attente ». Les demandes sont effacées quand tu quittes Mumcord.",
+    "sentMessages_one": "{{name}} t’a envoyé {{count}} message",
+    "sentMessages_many": "{{name}} t’a envoyé {{count}} de messages",
+    "sentMessages_other": "{{name}} t’a envoyé {{count}} messages",
+    "messagesLabel": "Messages de {{name}}",
+    "accept": "Accepter",
+    "decline": "Refuser",
+    "addFriend": "Ajouter en ami",
+    "replyBlocked": "Accepte la demande pour répondre à {{name}}.",
+    "empty": "Aucune demande de message.",
+    "failed": "Cela n’a pas fonctionné. Réessaie."
   }
 }

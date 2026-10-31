@@ -669,5 +669,37 @@
     "releasePage": "Stránka vydania",
     "entries": "Položky: {{count}}",
     "englishNote": "Zoznam zmien je napísaný po anglicky."
+  },
+  "privateMessages": {
+    "title": "Súkromné správy",
+    "legend": "Súkromné správy od",
+    "everyone": "Všetci",
+    "everyoneHint": "Správu ti môže poslať ktokoľvek na serveri.",
+    "friendsOnly": "Len priatelia",
+    "friendsOnlyHint": "Iní používatelia Mumcordu ti namiesto toho môžu poslať žiadosť o chat. Správy zo štandardných klientov idú do „Žiadostí o správy“.",
+    "nobody": "Nikto",
+    "nobodyHint": "Súkromné správy ani žiadosti o chat sa nezobrazujú. Odosielatelia sa to nedozvedia.",
+    "keepRequests": "Správy zo štandardných klientov ukladať ako žiadosti o správy",
+    "keepRequestsHint": "Platí len pri „Len priatelia“. Keď je vypnuté, tieto správy sa zahodia.",
+    "overrideTitle": "Výnimka pre server",
+    "overrideServer": "Server",
+    "overrideRule": "Súkromné správy od",
+    "overrideLabel": "Súkromné správy od na serveri {{server}}",
+    "useDefault": "Použiť predvolené ({{rule}})",
+    "noServers": "Zatiaľ žiadne uložené servery.",
+    "alwaysTitle": "Vždy povolené",
+    "currentChannel": "Ľudia v mojom aktuálnom kanáli",
+    "currentChannelHint": "Má prednosť pred „Len priatelia“ a „Nikto“, kým sme v rovnakom kanáli.",
+    "accepted": "Konverzácie, ktoré som už prijal(a)",
+    "acceptedHint": "Ľudia, ktorých žiadosť o chat si prijal(a), ti môžu naďalej písať."
+  },
+  "acceptedConversations": {
+    "title": "Prijaté konverzácie",
+    "empty": "Zatiaľ žiadne prijaté konverzácie.",
+    "acceptedAt": "Prijaté {{date}}",
+    "identity": "Identita: {{label}}",
+    "revoke": "Odvolať",
+    "revokeLabel": "Odvolať prijatú konverzáciu s používateľom {{name}}",
+    "revokeFailed": "Odvolanie sa nepodarilo. Skús to znova."
   }
 }

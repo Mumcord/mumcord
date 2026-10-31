@@ -268,5 +268,28 @@
     "unreachable": "Serveren kan ikke nås",
     "warning_one": "{{count}} link i denne besked viser loginoplysninger",
     "warning_other": "{{count}} links i denne besked viser loginoplysninger"
+  },
+  "requests": {
+    "entry": "Beskedanmodninger",
+    "entryCount_one": "{{count}} anmodning",
+    "entryCount_other": "{{count}} anmodninger",
+    "title": "Beskedanmodninger",
+    "listLabel": "Anmodninger",
+    "chatRequestTag": "Chatanmodning",
+    "messageRequestTag": "Beskedanmodning",
+    "wantsToChat": "{{name}} vil chatte med dig",
+    "metaMumcord": "Mumcord-bruger · {{server}} · {{time}}",
+    "metaStandard": "{{server}} · {{time}}",
+    "noteFrom": "Note fra {{name}}",
+    "explain": "Du har sat private beskeder til »Kun venner«. Hvis du accepterer, kan {{name}} skrive til dig. Afvisning sker uden besked: {{name}} ser kun »afventer«. Anmodninger ryddes, når du afslutter Mumcord.",
+    "sentMessages_one": "{{name}} har sendt dig {{count}} besked",
+    "sentMessages_other": "{{name}} har sendt dig {{count}} beskeder",
+    "messagesLabel": "Beskeder fra {{name}}",
+    "accept": "Accepter",
+    "decline": "Afvis",
+    "addFriend": "Tilføj ven",
+    "replyBlocked": "Accepter anmodningen for at svare {{name}}.",
+    "empty": "Ingen beskedanmodninger.",
+    "failed": "Det virkede ikke. Prøv igen."
   }
 }

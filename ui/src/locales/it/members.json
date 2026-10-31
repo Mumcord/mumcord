@@ -59,7 +59,9 @@
     "join": "Entra in {{channel}}",
     "joinDenied": "Non hai il permesso di entrare in questo canale.",
     "mute": "Silenzia per me",
-    "connectionInfo": "Info connessione…"
+    "connectionInfo": "Info connessione…",
+    "chatRequest": "Invia richiesta di chat…",
+    "chatRequestPending": "Richiesta di chat in sospeso"
   },
   "nowPlaying": {
     "label": "In riproduzione",
@@ -85,5 +87,13 @@
   "preview": {
     "privateMessage": "Messaggio privato",
     "fullProfile": "Profilo completo"
+  },
+  "chatRequest": {
+    "title": "Richiesta di chat a {{name}}",
+    "note": "Nota (facoltativa)",
+    "counter": "{{count}} / {{max}}",
+    "counterLabel": "{{count}} di {{max}} caratteri usati",
+    "send": "Invia",
+    "failed": "Impossibile inviare la richiesta di chat. Riprova."
   }
 }

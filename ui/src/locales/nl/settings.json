@@ -663,5 +663,37 @@
     "releasePage": "Releasepagina",
     "entries": "Items: {{count}}",
     "englishNote": "Het wijzigingslogboek is in het Engels."
+  },
+  "privateMessages": {
+    "title": "Privéberichten",
+    "legend": "Privéberichten van",
+    "everyone": "Iedereen",
+    "everyoneHint": "Iedereen op een server kan je berichten sturen.",
+    "friendsOnly": "Alleen vrienden",
+    "friendsOnlyHint": "Andere Mumcord-gebruikers kunnen in plaats daarvan een chatverzoek sturen. Berichten van standaardclients komen onder ‘Berichtverzoeken’.",
+    "nobody": "Niemand",
+    "nobodyHint": "Er worden geen privéberichten en geen chatverzoeken getoond. Afzenders krijgen hier niets van te horen.",
+    "keepRequests": "Berichten van standaardclients bewaren als berichtverzoeken",
+    "keepRequestsHint": "Alleen gebruikt bij ‘Alleen vrienden’. Als dit uit staat, worden deze berichten genegeerd.",
+    "overrideTitle": "Uitzondering per server",
+    "overrideServer": "Server",
+    "overrideRule": "Privéberichten van",
+    "overrideLabel": "Privéberichten van op {{server}}",
+    "useDefault": "Standaard gebruiken ({{rule}})",
+    "noServers": "Nog geen opgeslagen servers.",
+    "alwaysTitle": "Altijd toegestaan",
+    "currentChannel": "Mensen in mijn huidige kanaal",
+    "currentChannelHint": "Gaat vóór ‘Alleen vrienden’ en ‘Niemand’ zolang we in hetzelfde kanaal zitten.",
+    "accepted": "Gesprekken die ik al heb geaccepteerd",
+    "acceptedHint": "Mensen van wie je het chatverzoek hebt geaccepteerd, mogen je blijven schrijven."
+  },
+  "acceptedConversations": {
+    "title": "Geaccepteerde gesprekken",
+    "empty": "Nog geen geaccepteerde gesprekken.",
+    "acceptedAt": "Geaccepteerd op {{date}}",
+    "identity": "Identiteit: {{label}}",
+    "revoke": "Intrekken",
+    "revokeLabel": "Het geaccepteerde gesprek met {{name}} intrekken",
+    "revokeFailed": "Intrekken mislukt. Probeer het opnieuw."
   }
 }

@@ -278,5 +278,32 @@
     "warning_many": "{{count}} linków w tej wiadomości pokazuje dane logowania",
     "warning_one": "{{count}} link w tej wiadomości pokazuje dane logowania",
     "warning_other": "{{count}} linku w tej wiadomości pokazuje dane logowania"
+  },
+  "requests": {
+    "entry": "Prośby o wiadomości",
+    "entryCount_one": "{{count}} prośba",
+    "entryCount_few": "{{count}} prośby",
+    "entryCount_many": "{{count}} próśb",
+    "entryCount_other": "{{count}} prośby",
+    "title": "Prośby o wiadomości",
+    "listLabel": "Prośby",
+    "chatRequestTag": "Prośba o czat",
+    "messageRequestTag": "Prośba o wiadomość",
+    "wantsToChat": "{{name}} chce z Tobą porozmawiać",
+    "metaMumcord": "Użytkownik Mumcord · {{server}} · {{time}}",
+    "metaStandard": "{{server}} · {{time}}",
+    "noteFrom": "Notatka od {{name}}",
+    "explain": "Wiadomości prywatne ustawiono na „Tylko znajomi”. Po zaakceptowaniu {{name}} będzie mógł(-a) do Ciebie pisać. Odrzucenie jest ciche: {{name}} widzi tylko „oczekuje”. Prośby są usuwane po zamknięciu Mumcorda.",
+    "sentMessages_one": "{{name}} wysłał(a) Ci {{count}} wiadomość",
+    "sentMessages_few": "{{name}} wysłał(a) Ci {{count}} wiadomości",
+    "sentMessages_many": "{{name}} wysłał(a) Ci {{count}} wiadomości",
+    "sentMessages_other": "{{name}} wysłał(a) Ci {{count}} wiadomości",
+    "messagesLabel": "Wiadomości od {{name}}",
+    "accept": "Zaakceptuj",
+    "decline": "Odrzuć",
+    "addFriend": "Dodaj do znajomych",
+    "replyBlocked": "Zaakceptuj prośbę, aby odpowiedzieć użytkownikowi {{name}}.",
+    "empty": "Brak próśb o wiadomości.",
+    "failed": "Nie udało się. Spróbuj ponownie."
   }
 }

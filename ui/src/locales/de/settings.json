@@ -663,5 +663,37 @@
     "releasePage": "Release-Seite",
     "entries": "Einträge: {{count}}",
     "englishNote": "Die Änderungsliste ist auf Englisch."
+  },
+  "privateMessages": {
+    "title": "Private Nachrichten",
+    "legend": "Private Nachrichten von",
+    "everyone": "Alle",
+    "everyoneHint": "Jeder auf einem Server kann dir schreiben.",
+    "friendsOnly": "Nur Freunde",
+    "friendsOnlyHint": "Andere Mumcord-Nutzer können stattdessen eine Chatanfrage senden. Nachrichten von Standard-Clients landen unter „Nachrichtenanfragen“.",
+    "nobody": "Niemand",
+    "nobodyHint": "Es werden keine privaten Nachrichten und keine Chatanfragen angezeigt. Absender erfahren davon nichts.",
+    "keepRequests": "Nachrichten von Standard-Clients als Nachrichtenanfragen behalten",
+    "keepRequestsHint": "Wird nur bei „Nur Freunde“ verwendet. Ist die Option aus, werden diese Nachrichten verworfen.",
+    "overrideTitle": "Ausnahme pro Server",
+    "overrideServer": "Server",
+    "overrideRule": "Private Nachrichten von",
+    "overrideLabel": "Private Nachrichten von auf {{server}}",
+    "useDefault": "Standard verwenden ({{rule}})",
+    "noServers": "Noch keine gespeicherten Server.",
+    "alwaysTitle": "Immer erlaubt",
+    "currentChannel": "Personen in meinem aktuellen Kanal",
+    "currentChannelHint": "Hat Vorrang vor „Nur Freunde“ und „Niemand“, solange wir im selben Kanal sind.",
+    "accepted": "Unterhaltungen, die ich bereits angenommen habe",
+    "acceptedHint": "Personen, deren Chatanfrage du angenommen hast, dürfen dir weiter schreiben."
+  },
+  "acceptedConversations": {
+    "title": "Angenommene Unterhaltungen",
+    "empty": "Noch keine angenommenen Unterhaltungen.",
+    "acceptedAt": "Angenommen am {{date}}",
+    "identity": "Identität: {{label}}",
+    "revoke": "Widerrufen",
+    "revokeLabel": "Angenommene Unterhaltung mit {{name}} widerrufen",
+    "revokeFailed": "Widerrufen fehlgeschlagen. Bitte versuche es erneut."
   }
 }

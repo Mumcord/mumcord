@@ -268,5 +268,28 @@
     "unreachable": "Servern kan inte nås",
     "warning_one": "{{count}} link i det här meddelandet visar inlogguppgifter",
     "warning_other": "{{count}} länkar i det här meddelandet visar inlogguppgifter"
+  },
+  "requests": {
+    "entry": "Meddelandeförfrågningar",
+    "entryCount_one": "{{count}} förfrågan",
+    "entryCount_other": "{{count}} förfrågningar",
+    "title": "Meddelandeförfrågningar",
+    "listLabel": "Förfrågningar",
+    "chatRequestTag": "Chattförfrågan",
+    "messageRequestTag": "Meddelandeförfrågan",
+    "wantsToChat": "{{name}} vill chatta med dig",
+    "metaMumcord": "Mumcord-användare · {{server}} · {{time}}",
+    "metaStandard": "{{server}} · {{time}}",
+    "noteFrom": "Anteckning från {{name}}",
+    "explain": "Du har ställt in privata meddelanden på ”Bara vänner”. Om du accepterar kan {{name}} skriva till dig. Att avböja sker tyst: {{name}} ser bara ”väntar”. Förfrågningar rensas när du avslutar Mumcord.",
+    "sentMessages_one": "{{name}} har skickat {{count}} meddelande till dig",
+    "sentMessages_other": "{{name}} har skickat {{count}} meddelanden till dig",
+    "messagesLabel": "Meddelanden från {{name}}",
+    "accept": "Acceptera",
+    "decline": "Avböj",
+    "addFriend": "Lägg till vän",
+    "replyBlocked": "Acceptera förfrågan för att svara {{name}}.",
+    "empty": "Inga meddelandeförfrågningar.",
+    "failed": "Det fungerade inte. Försök igen."
   }
 }

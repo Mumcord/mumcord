@@ -93,7 +93,11 @@
     "offerImages": "Offri stampi b'daqs sħiħ",
     "offerImagesHint": "Ħalli lill-oħrajn iniżżlu l-istampi oriġinali tiegħek",
     "loadImages": "Tgħabbi stampi b'daqs sħiħ",
-    "loadImagesHint": "Ġib l-istampi oriġinali mingħand l-oħrajn"
+    "loadImagesHint": "Ġib l-istampi oriġinali mingħand l-oħrajn",
+    "privateMessages": "Messaġġi privati minn",
+    "pm_everyone": "Kulħadd",
+    "pm_friendsOnly": "Ħbieb",
+    "pm_nobody": "Ħadd"
   },
   "voice": {
     "line": "Vuċi: {{channel}} · {{server}}",

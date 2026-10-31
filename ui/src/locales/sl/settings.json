@@ -669,5 +669,37 @@
     "releasePage": "Stran izdaje",
     "entries": "Vnosi: {{count}}",
     "englishNote": "Dnevnik sprememb je napisan v angleščini."
+  },
+  "privateMessages": {
+    "title": "Zasebna sporočila",
+    "legend": "Zasebna sporočila od",
+    "everyone": "Vsi",
+    "everyoneHint": "Vsakdo na strežniku ti lahko piše.",
+    "friendsOnly": "Samo prijatelji",
+    "friendsOnlyHint": "Drugi uporabniki Mumcorda ti lahko namesto tega pošljejo prošnjo za klepet. Sporočila standardnih odjemalcev gredo v »Prošnje za sporočila«.",
+    "nobody": "Nihče",
+    "nobodyHint": "Zasebna sporočila in prošnje za klepet se ne prikazujejo. Pošiljatelji niso obveščeni.",
+    "keepRequests": "Sporočila standardnih odjemalcev shrani kot prošnje za sporočila",
+    "keepRequestsHint": "Uporablja se samo pri »Samo prijatelji«. Če je izklopljeno, se ta sporočila zavržejo.",
+    "overrideTitle": "Izjema za strežnik",
+    "overrideServer": "Strežnik",
+    "overrideRule": "Zasebna sporočila od",
+    "overrideLabel": "Zasebna sporočila od na strežniku {{server}}",
+    "useDefault": "Uporabi privzeto ({{rule}})",
+    "noServers": "Shranjenih strežnikov še ni.",
+    "alwaysTitle": "Vedno dovoljeno",
+    "currentChannel": "Ljudje v mojem trenutnem kanalu",
+    "currentChannelHint": "Prevlada nad »Samo prijatelji« in »Nihče«, dokler smo v istem kanalu.",
+    "accepted": "Pogovori, ki sem jih že sprejel/a",
+    "acceptedHint": "Ljudje, katerih prošnjo za klepet si sprejel/a, ti lahko še naprej pišejo."
+  },
+  "acceptedConversations": {
+    "title": "Sprejeti pogovori",
+    "empty": "Sprejetih pogovorov še ni.",
+    "acceptedAt": "Sprejeto {{date}}",
+    "identity": "Identiteta: {{label}}",
+    "revoke": "Prekliči",
+    "revokeLabel": "Prekliči sprejeti pogovor z uporabnikom {{name}}",
+    "revokeFailed": "Preklic ni uspel. Poskusi znova."
   }
 }

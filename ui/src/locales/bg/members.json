@@ -58,7 +58,9 @@
     "join": "Влизане в {{channel}}",
     "joinDenied": "Нямате право да влезете в този канал.",
     "mute": "Заглуши за мен",
-    "connectionInfo": "Информация за връзката…"
+    "connectionInfo": "Информация за връзката…",
+    "chatRequest": "Изпрати заявка за чат…",
+    "chatRequestPending": "Заявката за чат е в изчакване"
   },
   "nowPlaying": {
     "label": "Слуша сега",
@@ -83,5 +85,13 @@
   "preview": {
     "privateMessage": "Лично съобщение",
     "fullProfile": "Пълен профил"
+  },
+  "chatRequest": {
+    "title": "Заявка за чат до {{name}}",
+    "note": "Бележка (по избор)",
+    "counter": "{{count}} / {{max}}",
+    "counterLabel": "Използвани {{count}} от {{max}} знака",
+    "send": "Изпрати",
+    "failed": "Заявката за чат не можа да бъде изпратена. Опитай отново."
   }
 }

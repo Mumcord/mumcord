@@ -268,5 +268,28 @@
     "unreachable": "Server niet bereikbaar",
     "warning_one": "{{count}} link in dit bericht toont inloggegevens",
     "warning_other": "{{count}} links in dit bericht tonen inloggegevens"
+  },
+  "requests": {
+    "entry": "Berichtverzoeken",
+    "entryCount_one": "{{count}} verzoek",
+    "entryCount_other": "{{count}} verzoeken",
+    "title": "Berichtverzoeken",
+    "listLabel": "Verzoeken",
+    "chatRequestTag": "Chatverzoek",
+    "messageRequestTag": "Berichtverzoek",
+    "wantsToChat": "{{name}} wil met je chatten",
+    "metaMumcord": "Mumcord-gebruiker · {{server}} · {{time}}",
+    "metaStandard": "{{server}} · {{time}}",
+    "noteFrom": "Notitie van {{name}}",
+    "explain": "Je hebt privéberichten ingesteld op ‘Alleen vrienden’. Als je accepteert, kan {{name}} je berichten sturen. Weigeren gebeurt stilletjes: {{name}} ziet alleen ‘in behandeling’. Verzoeken worden gewist als je Mumcord afsluit.",
+    "sentMessages_one": "{{name}} heeft je {{count}} bericht gestuurd",
+    "sentMessages_other": "{{name}} heeft je {{count}} berichten gestuurd",
+    "messagesLabel": "Berichten van {{name}}",
+    "accept": "Accepteren",
+    "decline": "Weigeren",
+    "addFriend": "Vriend toevoegen",
+    "replyBlocked": "Accepteer het verzoek om {{name}} te antwoorden.",
+    "empty": "Geen berichtverzoeken.",
+    "failed": "Dat is niet gelukt. Probeer het opnieuw."
   }
 }

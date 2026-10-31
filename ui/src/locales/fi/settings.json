@@ -663,5 +663,37 @@
     "releasePage": "Julkaisusivu",
     "entries": "Merkinnät: {{count}}",
     "englishNote": "Muutosloki on kirjoitettu englanniksi."
+  },
+  "privateMessages": {
+    "title": "Yksityisviestit",
+    "legend": "Yksityisviestit keneltä",
+    "everyone": "Kaikilta",
+    "everyoneHint": "Kuka tahansa palvelimella voi lähettää sinulle viestin.",
+    "friendsOnly": "Vain kaverit",
+    "friendsOnlyHint": "Muut Mumcord-käyttäjät voivat lähettää keskustelupyynnön. Tavallisten asiakasohjelmien viestit menevät kohtaan ”Viestipyynnöt”.",
+    "nobody": "Ei keneltäkään",
+    "nobodyHint": "Yksityisviestejä tai keskustelupyyntöjä ei näytetä. Lähettäjille ei kerrota.",
+    "keepRequests": "Säilytä tavallisten asiakasohjelmien viestit viestipyyntöinä",
+    "keepRequestsHint": "Käytössä vain asetuksella ”Vain kaverit”. Kun asetus on pois päältä, nämä viestit hylätään.",
+    "overrideTitle": "Palvelinkohtainen poikkeus",
+    "overrideServer": "Palvelin",
+    "overrideRule": "Yksityisviestit keneltä",
+    "overrideLabel": "Yksityisviestit keneltä palvelimella {{server}}",
+    "useDefault": "Käytä oletusta ({{rule}})",
+    "noServers": "Tallennettuja palvelimia ei vielä ole.",
+    "alwaysTitle": "Aina sallittu",
+    "currentChannel": "Nykyisen kanavani jäsenet",
+    "currentChannelHint": "Ohittaa asetukset ”Vain kaverit” ja ”Ei keneltäkään”, kun olemme samalla kanavalla.",
+    "accepted": "Keskustelut, jotka olen jo hyväksynyt",
+    "acceptedHint": "Ihmiset, joiden keskustelupyynnön hyväksyit, voivat jatkaa viestien lähettämistä sinulle."
+  },
+  "acceptedConversations": {
+    "title": "Hyväksytyt keskustelut",
+    "empty": "Hyväksyttyjä keskusteluja ei vielä ole.",
+    "acceptedAt": "Hyväksytty {{date}}",
+    "identity": "Identiteetti: {{label}}",
+    "revoke": "Peruuta",
+    "revokeLabel": "Peruuta hyväksytty keskustelu käyttäjän {{name}} kanssa",
+    "revokeFailed": "Peruuttaminen epäonnistui. Yritä uudelleen."
   }
 }

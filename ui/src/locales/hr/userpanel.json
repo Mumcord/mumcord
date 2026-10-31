@@ -93,7 +93,11 @@
     "offerImages": "Nudi slike pune veličine",
     "offerImagesHint": "Dopusti drugima da učitaju tvoje originalne slike",
     "loadImages": "Učitavaj slike pune veličine",
-    "loadImagesHint": "Dohvaćaj originalne slike od drugih"
+    "loadImagesHint": "Dohvaćaj originalne slike od drugih",
+    "privateMessages": "Privatne poruke od",
+    "pm_everyone": "Svi",
+    "pm_friendsOnly": "Prijatelji",
+    "pm_nobody": "Nitko"
   },
   "voice": {
     "line": "Glas: {{channel}} · {{server}}",
