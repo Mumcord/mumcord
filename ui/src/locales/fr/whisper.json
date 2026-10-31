@@ -1,0 +1,44 @@
+{
+  "menu": {
+    "whisper": "Chuchoter à…",
+    "noPermission": "Le serveur n’autorise pas les chuchotements ici"
+  },
+  "banner": {
+    "whisper": "Chuchote à {{target}}",
+    "shout": "Crie à {{target}}",
+    "releaseKey": "Seules les personnes de là-bas vous entendent. Relâchez <key>{{key}}</key> pour reparler dans {{channel}}.",
+    "stopToReturn": "Seules les personnes de là-bas vous entendent. Arrêtez pour reparler dans {{channel}}.",
+    "onlyThere": "Seules les personnes de là-bas vous entendent.",
+    "stop": "Arrêter"
+  },
+  "denied": {
+    "title": "Impossible de chuchoter à {{target}}",
+    "noVoiceServer": "Rejoignez d’abord un canal : les chuchotements passent par le serveur sur lequel vous parlez.",
+    "muted": "Réactivez votre micro pour chuchoter.",
+    "serverMuted": "Le serveur vous a rendu muet, il ne transmet donc pas votre voix.",
+    "nobodyHere": "Aucune de ces personnes n’est sur ce serveur pour le moment.",
+    "channelNotFound": "Ce canal n’existe pas sur ce serveur.",
+    "noPermission": "Le serveur ne vous autorise pas à chuchoter à {{channel}}.",
+    "unknownTarget": "Cette cible n’existe plus.",
+    "dismiss": "Ignorer"
+  },
+  "badge": {
+    "whisper": "chuchote",
+    "shout": "crie",
+    "whisperLabel": "Vous chuchote",
+    "shoutLabel": "Crie à votre canal",
+    "ownWhisper": "chuchotez",
+    "ownShout": "criez",
+    "ownWhisperLabel": "Vous chuchotez",
+    "ownShoutLabel": "Vous criez"
+  },
+  "panel": {
+    "open": "Chuchoter ou crier",
+    "menu": "Cibles de chuchotement et de cri",
+    "manage": "Gérer les cibles…",
+    "none": "Aucune cible pour l’instant",
+    "indicatorWhisper": "Chuchote à {{target}}",
+    "indicatorShout": "Crie à {{target}}",
+    "stop": "Arrêter"
+  }
+}

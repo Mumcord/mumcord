@@ -413,6 +413,26 @@ export const commands = {
 	audioTestSound: () => typedError<null, ApiError>(__TAURI_INVOKE("audio_test_sound")),
 	/**  Ends the test wherever it is (recording or playback). */
 	micTestStop: () => typedError<null, ApiError>(__TAURI_INVOKE("mic_test_stop")),
+	/**  The saved whisper targets and whether their keys work here. */
+	whisperSetup: () => typedError<WhisperSetup, ApiError>(__TAURI_INVOKE("whisper_setup")),
+	/**
+	 *  Replaces the saved targets (in the given order) and re-registers their keys. A key equal to
+	 *  the push-to-talk key or another target's key is `invalidInput`.
+	 */
+	whisperTargetsSave: (targets: WhisperTarget[]) => typedError<WhisperSetup, ApiError>(__TAURI_INVOKE("whisper_targets_save", { targets })),
+	/**
+	 *  Checks a key captured for a whisper target and returns its canonical form; `invalidInput`
+	 *  if it is not a usable keyboard shortcut or is already the push-to-talk or another
+	 *  target's key.
+	 */
+	whisperKeyCheck: (targetId: string, key: string) => typedError<string, ApiError>(__TAURI_INVOKE("whisper_key_check", { targetId, key })),
+	/**
+	 *  Starts whispering or shouting to a saved target from the UI; it lasts until
+	 *  [`whisper_stop`]. A refusal comes back as `denied` with the reason.
+	 */
+	whisperStart: (targetId: string) => typedError<WhisperState, ApiError>(__TAURI_INVOKE("whisper_start", { targetId })),
+	/**  Ends the own whisper or shout; talking goes back to the own channel. */
+	whisperStop: () => typedError<null, ApiError>(__TAURI_INVOKE("whisper_stop")),
 	pttAvailability: () => typedError<PttAvailability, ApiError>(__TAURI_INVOKE("ptt_availability")),
 	/**
 	 *  Validates a key the UI captured (`KeyboardEvent.code` plus modifiers, e.g. "Ctrl+KeyA",
@@ -684,6 +704,7 @@ export const events = {
 	historySyncStatus: makeEvent<HistorySyncStatus, HistorySyncStatus>("history-sync-status"),
 	historySynced: makeEvent<HistorySynced, HistorySynced>("history-synced"),
 	inGameOverlayChanged: makeEvent<InGameOverlayChanged, InGameOverlayChanged>("in-game-overlay-changed"),
+	incomingWhisperChanged: makeEvent<IncomingWhisperChanged, IncomingWhisperChanged>("incoming-whisper-changed"),
 	inspectorViewChanged: makeEvent<InspectorViewChanged, InspectorViewChanged>("inspector-view-changed"),
 	messageReceived: makeEvent<MessageReceived, MessageReceived>("message-received"),
 	micLevel: makeEvent<MicLevel, MicLevel>("mic-level"),
@@ -712,6 +733,7 @@ export const events = {
 	userUpserted: makeEvent<UserUpserted, UserUpserted>("user-upserted"),
 	voiceServerChanged: makeEvent<VoiceServerChanged, VoiceServerChanged>("voice-server-changed"),
 	watchPartyChanged: makeEvent<WatchPartyChanged, WatchPartyChanged>("watch-party-changed"),
+	whisperStateChanged: makeEvent<WhisperStateChanged, WhisperStateChanged>("whisper-state-changed"),
 	windowLookChanged: makeEvent<WindowLookChanged, WindowLookChanged>("window-look-changed"),
 };
 
@@ -1402,6 +1424,19 @@ export type InGameOverlayState = {
 	/**  Keys of every game running right now, configured or not. */
 	running: GameKey[],
 };
+
+/**  A person started (`kind`) or stopped (`null`) whispering or shouting to us. */
+export type IncomingWhisperChanged = {
+	serverId: number,
+	session: number,
+	kind: IncomingWhisperKind | null,
+};
+
+export type IncomingWhisperKind = 
+/**  The speaker's target names us. */
+"whisper" | 
+/**  The speaker's target is a channel we are in. */
+"shout";
 
 /**  An external image or image link, ready to show inline (FR-1.55). */
 export type InlineImage = {
@@ -2770,6 +2805,54 @@ export type WatchParty = {
 export type WatchPartyChanged = {
 	serverId: number,
 	party: WatchParty | null,
+};
+
+export type WhisperDeniedReason = "noVoiceServer" | "muted" | "serverMuted" | "nobodyHere" | "channelNotFound" | "noPermission" | "unknownTarget";
+
+/**  Why whisper keys cannot work in this session. */
+export type WhisperKeysUnavailable = 
+/**
+ *  Native Wayland: global keys go through the desktop portal, which whisper keys do not use
+ *  yet (#64); the X11 compatibility mode offers them.
+ */
+"waylandPortal";
+
+export type WhisperReceivers = 
+/**  People by name: a whisper. */
+{ kind: "people"; names: string[] } | 
+/**  Everyone in the channel at `path` below the root: a shout. */
+{ kind: "channel"; path: string[]; children: boolean; links: boolean; 
+/**  Only members of this ACL group. */
+group: string | null };
+
+/**  The saved targets and whether their keys work. */
+export type WhisperSetup = {
+	targets: WhisperTarget[],
+	/**  Set when no whisper key can work in this session. */
+	keysUnavailable: WhisperKeysUnavailable | null,
+	/**  Targets whose key could not be registered (e.g. another app holds it). */
+	failedKeys: string[],
+};
+
+/**  The own whisper or shout. */
+export type WhisperState = { state: "idle" } | 
+/**  `held`: started by holding the target's key (released, it ends), else from the UI. */
+{ state: "active"; targetId: string; held: boolean } | 
+/**  The last start failed; `channel` names the channel without the Whisper permission. */
+{ state: "denied"; targetId: string; reason: WhisperDeniedReason; channel: string | null };
+
+/**  The own whisper started, stopped or was refused (also when started by its key). */
+export type WhisperStateChanged = {
+	state: WhisperState,
+};
+
+export type WhisperTarget = {
+	id: string,
+	/**  Plain text, chosen by the user. */
+	name: string,
+	receivers: WhisperReceivers,
+	/**  Hold-to-talk key in the push-to-talk key format, e.g. `"F9"` or `"Ctrl+W"`. */
+	hotkey: string | null,
 };
 
 /**  The look of the main window's root element, for a window of its own to copy. */

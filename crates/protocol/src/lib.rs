@@ -35,8 +35,8 @@ pub use tap::{PacketTap, TapDirection, TapPacing, TapPluginData, TappedFrame};
 pub use tls::{CertVerifier, ClientIdentity, ServerCert, cert_hash};
 pub use version::MumbleVersion;
 pub use voice::{
-    CryptStats, LinkStats, MAX_VOICE_PAYLOAD, OutgoingAudio, Transport, VoiceEvent, VoicePacket,
-    VoiceTransport,
+    CryptStats, LinkStats, MAX_VOICE_PAYLOAD, OutgoingAudio, Transport, VOICE_TARGET_MAX,
+    VoiceEvent, VoicePacket, VoiceTransport, WhisperKind,
 };
 
 /// Control-channel messages generated from the vendored `Mumble.proto`.

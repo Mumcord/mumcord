@@ -1,0 +1,44 @@
+{
+  "menu": {
+    "whisper": "Sussurrar a…",
+    "noPermission": "O servidor não permite sussurrar aqui"
+  },
+  "banner": {
+    "whisper": "A sussurrar a {{target}}",
+    "shout": "A gritar a {{target}}",
+    "releaseKey": "Só as pessoas aí te ouvem. Solta <key>{{key}}</key> para voltares a falar em {{channel}}.",
+    "stopToReturn": "Só as pessoas aí te ouvem. Pára para voltares a falar em {{channel}}.",
+    "onlyThere": "Só as pessoas aí te ouvem.",
+    "stop": "Parar"
+  },
+  "denied": {
+    "title": "Não foi possível sussurrar a {{target}}",
+    "noVoiceServer": "Entra primeiro num canal: os sussurros passam pelo servidor em que falas.",
+    "muted": "Ativa o microfone para sussurrar.",
+    "serverMuted": "O servidor silenciou-te, por isso não transmite a tua voz.",
+    "nobodyHere": "Nenhuma destas pessoas está neste servidor neste momento.",
+    "channelNotFound": "Este canal não existe neste servidor.",
+    "noPermission": "O servidor não te permite sussurrar a {{channel}}.",
+    "unknownTarget": "Este destino já não existe.",
+    "dismiss": "Dispensar"
+  },
+  "badge": {
+    "whisper": "sussurra",
+    "shout": "grita",
+    "whisperLabel": "Sussurra-te",
+    "shoutLabel": "Grita ao teu canal",
+    "ownWhisper": "a sussurrar",
+    "ownShout": "a gritar",
+    "ownWhisperLabel": "Estás a sussurrar",
+    "ownShoutLabel": "Estás a gritar"
+  },
+  "panel": {
+    "open": "Sussurrar ou gritar",
+    "menu": "Destinos de sussurro e grito",
+    "manage": "Gerir destinos…",
+    "none": "Ainda sem destinos",
+    "indicatorWhisper": "A sussurrar a {{target}}",
+    "indicatorShout": "A gritar a {{target}}",
+    "stop": "Parar"
+  }
+}

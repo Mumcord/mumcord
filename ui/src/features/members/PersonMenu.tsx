@@ -17,6 +17,8 @@ import { createPortal } from "react-dom";
 import { useTranslation } from "react-i18next";
 import { getApi, toEngineError } from "../../api";
 import { shownServerId, useServerState } from "../channels/serverStore";
+import { WHISPER_ICON_PATHS } from "../whisper/whisperIcons";
+import { createWhisperTarget } from "../whisper/whisperStore";
 import { hasMumcordFeature } from "../channels/mumcord";
 import { setFriend, useFriend } from "../friends";
 import { openChatRequestDialog } from "../requests/chatRequestDialogStore";
@@ -94,6 +96,7 @@ function PersonMenu({
   const { t } = useTranslation("members");
   const { t: tFriends } = useTranslation("friends");
   const { t: tChannels } = useTranslation("channels");
+  const { t: tWhisper } = useTranslation("whisper");
   const state = useServerState();
   const user = findPerson(state.users, open.session, open.name);
   const friend = useFriend(user?.certHash ?? null);
@@ -354,6 +357,27 @@ function PersonMenu({
           requestConnectionExpanded();
           onViewProfile(user.session, open.opener, true);
         })}
+      {user &&
+        !isSelf &&
+        (state.channels.get(user.channelId)?.permissions.whisper === false
+          ? disabledItem(
+              "whisper",
+              <path d={WHISPER_ICON_PATHS.whisper} />,
+              tWhisper("menu.whisper"),
+              tWhisper("menu.noPermission"),
+            )
+          : item(
+              "whisper",
+              <path d={WHISPER_ICON_PATHS.whisper} />,
+              tWhisper("menu.whisper"),
+              () => {
+                closePersonMenu();
+                createWhisperTarget({
+                  name: user.name,
+                  receivers: { kind: "people", names: [user.name] },
+                });
+              },
+            ))}
       {consent &&
         !isSelf &&
         item("revokeConsent", <RevokeIcon />, t("menu.revokeConsent"), () => {

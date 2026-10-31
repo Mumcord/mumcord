@@ -14,6 +14,9 @@ import type {
   MumbleLinkStats,
   NotifyOutcome,
   SystemDnd,
+  WhisperSetup,
+  WhisperState,
+  WhisperTarget,
   WindowLook,
 } from "../bindings/commands";
 import { parseMumbleLink } from "../features/chat/mumbleLink";
@@ -79,8 +82,8 @@ export interface MockOptions {
    * "fresh" simulates the first start (no identity, no servers, wizard pending); "demo" fills
    * the "ready" state with richer fictional data for screenshots, "demoFresh" is the first start
    * with demo behaviour. "stress" is "demo" on a big server (~300 channels, 1000 people) for
-   * scale measurements; it also exposes the API as `window.__mumcordMock` for the measuring
-   * script. Defaults to `VITE_MUMCORD_MOCK_SEED`, then "ready".
+   * scale measurements. The demo seeds expose the API as `window.__mumcordMock` for the measuring
+   * and screenshot scripts. Defaults to `VITE_MUMCORD_MOCK_SEED`, then "ready".
    */
   seed?: "fresh" | "ready" | "demo" | "demoFresh" | "stress";
   /** Simulated server: protocol version and listener limit. */
@@ -123,6 +126,10 @@ export interface MockControls {
   /** Ends a reconnect attempt successfully. */
   completeReconnect(): void;
   setTalking(session: number, talking: boolean): void;
+  /** Simulates a person starting (`kind`) or stopping (`null`) to whisper or shout to the user. */
+  setIncomingWhisper(session: number, kind: "whisper" | "shout" | null): void;
+  /** Makes whisper keys unavailable, like a native Wayland session. */
+  setWhisperKeysUnavailable(unavailable: boolean): void;
   /** Changes what `connectionStats` reports while connected (e.g. a lower bitrate). */
   setConnectionStats(stats: Partial<ConnectionStats>): void;
   /**
@@ -902,6 +909,47 @@ export function createMockApi(options: MockOptions = {}): MockApi {
       ];
   let nextIdentityId = identities.length + 1;
   let settings: Settings = { ...DEFAULT_SETTINGS, wizardCompleted: !fresh };
+  // The demo shows the targets of the whisper mockup (issue #67); tests start without any.
+  let whisperTargets: WhisperTarget[] = demo
+    ? [
+        {
+          id: "demo-gaming",
+          name: "Gaming + sub-channels",
+          receivers: {
+            kind: "channel",
+            path: ["Gaming"],
+            children: true,
+            links: false,
+            group: null,
+          },
+          hotkey: "F9",
+        },
+        {
+          id: "demo-people",
+          name: "Maya and Priya",
+          receivers: { kind: "people", names: ["Maya", "Priya"] },
+          hotkey: "F10",
+        },
+        {
+          id: "demo-music",
+          name: "Music Room",
+          receivers: {
+            kind: "channel",
+            path: ["Music Room"],
+            children: false,
+            links: false,
+            group: null,
+          },
+          hotkey: null,
+        },
+      ]
+    : [];
+  let whisperKeysUnavailable = false;
+  const whisperSetup = (): WhisperSetup => ({
+    targets: whisperTargets,
+    keysUnavailable: whisperKeysUnavailable ? "waylandPortal" : null,
+    failedKeys: [],
+  });
   // One official game plugin as found in a Mumble installation; no game runs in the mock.
   let gamePlugins: GamePlugin[] = [
     {
@@ -2656,6 +2704,36 @@ export function createMockApi(options: MockOptions = {}): MockApi {
       return Promise.resolve(null);
     },
 
+    // whisper and shout
+    whisperSetup: () => Promise.resolve(whisperSetup()),
+    whisperTargetsSave: (targets) => {
+      const keys = targets.flatMap((target) => (target.hotkey === null ? [] : [target.hotkey]));
+      if (new Set(keys).size !== keys.length || keys.includes(settings.pttKey ?? "")) {
+        return Promise.reject(new EngineError("invalidInput", "whisper key already in use"));
+      }
+      whisperTargets = targets;
+      return Promise.resolve(whisperSetup());
+    },
+    whisperKeyCheck: (targetId, key) => {
+      const taken =
+        key === settings.pttKey ||
+        whisperTargets.some((target) => target.id !== targetId && target.hotkey === key);
+      return taken
+        ? Promise.reject(new EngineError("invalidInput", "whisper key already in use"))
+        : Promise.resolve(key.replace(/^Key|(?<=\+)Key/g, ""));
+    },
+    whisperStart: (targetId) => {
+      const state: WhisperState = whisperTargets.some((target) => target.id === targetId)
+        ? { state: "active", targetId, held: false }
+        : { state: "denied", targetId, reason: "unknownTarget", channel: null };
+      emit("whisperStateChanged", { state });
+      return Promise.resolve(state);
+    },
+    whisperStop: () => {
+      emit("whisperStateChanged", { state: { state: "idle" } });
+      return Promise.resolve(null);
+    },
+
     // push-to-talk
     pttAvailability: () => Promise.resolve<PttAvailability>({ status: "available" }),
     // Mouse buttons come back unchanged (no desktop dialog), keyboard keys as "F13" (the demo
@@ -3127,6 +3205,12 @@ export function createMockApi(options: MockOptions = {}): MockApi {
       setState({ state: "connected", serverId: snap.serverId });
       emit("serverSynced", { snapshot: snap });
     },
+    setWhisperKeysUnavailable: (unavailable) => {
+      whisperKeysUnavailable = unavailable;
+    },
+    setIncomingWhisper: (session, kind) => {
+      emitServer("incomingWhisperChanged", { session, kind });
+    },
     setTalking: (session, talking) => {
       focused();
       emitServer("talkStateChanged", { session, talking });
@@ -3200,7 +3284,7 @@ export function createMockApi(options: MockOptions = {}): MockApi {
   };
 
   const api: MockApi = { ...guarded, kind: "mock", on, mock };
-  if (stress) window.__mumcordMock = api;
+  if (demo) window.__mumcordMock = api;
   return api;
 }
 

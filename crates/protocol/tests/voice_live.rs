@@ -10,16 +10,23 @@ use std::time::Duration;
 
 use bytes::Bytes;
 use mumcord_protocol::pki_types::{CertificateDer, PrivateKeyDer, PrivatePkcs8KeyDer};
+use mumcord_protocol::proto::{self, voice_target};
 use mumcord_protocol::{
     ClientIdentity, ConnectConfig, Event, Handle, OutgoingAudio, Transport, VoiceEvent,
-    VoicePacket, VoiceTransport, connect,
+    VoicePacket, VoiceTransport, WhisperKind, connect,
 };
 use tokio::io::{AsyncBufReadExt, AsyncWriteExt, BufReader};
 use tokio::net::TcpStream;
 use tokio::sync::mpsc::UnboundedReceiver;
 
-const V15: u16 = 64738;
-const V14: u16 = 64739;
+/// Ports of the v15 / v14 servers; `MUMCORD_PORT_BASE` moves them like `testenv/up.sh` does.
+fn port(offset: u16) -> u16 {
+    std::env::var("MUMCORD_PORT_BASE")
+        .ok()
+        .and_then(|b| b.parse().ok())
+        .unwrap_or(64738)
+        + offset
+}
 const WAIT: Duration = Duration::from_secs(10);
 
 fn live() -> bool {
@@ -110,12 +117,33 @@ impl Client {
 
     /// Sends a burst of `n` packets (20 ms each) whose payload encodes `tag` and the index.
     async fn talk(&self, tag: u8, n: u8) {
+        self.talk_to(0, tag, n).await;
+    }
+
+    /// [`Client::talk`] to voice target `target`.
+    async fn talk_to(&self, target: u8, tag: u8, n: u8) {
         for i in 0..n {
             let payload = Bytes::from(vec![tag, i, 0xAB, 0xCD]);
             self.voice
-                .send_audio(OutgoingAudio::new(payload, 2, i + 1 == n));
+                .send_audio(OutgoingAudio::new(payload, 2, i + 1 == n).to_target(target));
             tokio::time::sleep(Duration::from_millis(20)).await;
         }
+    }
+
+    /// Whether any packet of `tag` from `from` arrives within a second.
+    async fn hears_anything(&mut self, from: u32, tag: u8) -> bool {
+        tokio::time::timeout(Duration::from_secs(1), async {
+            loop {
+                if let VoiceEvent::Packet(p) = self.events.recv().await.expect("voice stopped")
+                    && p.session == from
+                    && p.payload.first() == Some(&tag)
+                {
+                    return;
+                }
+            }
+        })
+        .await
+        .is_ok()
     }
 
     /// Collects the packets of `tag` from `from` until the terminator or a timeout.
@@ -236,6 +264,92 @@ async fn listener(port: u16) {
     check_burst(&got, 20, Transport::Udp, false);
 }
 
+/// Waits until `client` sees `session` in channel `channel`.
+async fn wait_in_channel(client: &Client, session: u32, channel: u32) {
+    tokio::time::timeout(WAIT, async {
+        while !client.handle.with_state(|s| {
+            s.users
+                .get(&session)
+                .is_some_and(|u| u.channel_id == channel)
+        }) {
+            tokio::time::sleep(Duration::from_millis(50)).await;
+        }
+    })
+    .await
+    .expect("move applied");
+}
+
+/// Issue #67: a whisper to a person reaches only that person, a shout to a channel only the
+/// people in it, each marked as such; a third client in the sender's channel hears neither.
+async fn whisper(port: u16) {
+    let mut a = client(port, "wa").await;
+    let mut b = client(port, "wb").await;
+    let mut c = client(port, "wc").await;
+    let root = a
+        .handle
+        .with_state(|s| s.own_user().map(|u| u.channel_id))
+        .expect("own");
+    c.handle.join_channel(root).expect("join");
+    b.handle.join_channel(root).expect("join");
+    wait_in_channel(&a, b.session, root).await;
+    wait_in_channel(&a, c.session, root).await;
+    for client in [&mut a, &mut b, &mut c] {
+        client.wait_transport(Transport::Udp, WAIT).await;
+    }
+
+    a.handle
+        .send_voice_target(&proto::VoiceTarget {
+            id: Some(1),
+            targets: vec![voice_target::Target {
+                session: vec![b.session],
+                ..Default::default()
+            }],
+        })
+        .expect("voice target");
+    a.handle.flush().await.expect("flush");
+    b.drain();
+    c.drain();
+    a.talk_to(1, 10, 20).await;
+    let got = b.hear(a.session, 10).await;
+    check_burst(&got, 20, Transport::Udp, false);
+    assert!(got.iter().all(|p| p.whisper == Some(WhisperKind::Whisper)));
+    assert!(
+        !c.hears_anything(a.session, 10).await,
+        "c heard the whisper"
+    );
+
+    let lobby = a
+        .handle
+        .with_state(|s| s.child_by_name(0, "Lobby").map(|ch| ch.id))
+        .expect("Lobby");
+    b.handle.join_channel(lobby).expect("join");
+    wait_in_channel(&a, b.session, lobby).await;
+    a.handle
+        .send_voice_target(&proto::VoiceTarget {
+            id: Some(2),
+            targets: vec![voice_target::Target {
+                channel_id: Some(lobby),
+                ..Default::default()
+            }],
+        })
+        .expect("voice target");
+    a.handle.flush().await.expect("flush");
+    b.drain();
+    c.drain();
+    a.talk_to(2, 11, 20).await;
+    let got = b.hear(a.session, 11).await;
+    check_burst(&got, 20, Transport::Udp, false);
+    assert!(got.iter().all(|p| p.whisper == Some(WhisperKind::Shout)));
+    assert!(!c.hears_anything(a.session, 11).await, "c heard the shout");
+
+    // Back to normal talking: c, in the same channel, hears it unmarked.
+    c.drain();
+    a.talk(12, 20).await;
+    let got = c.hear(a.session, 12).await;
+    check_burst(&got, 20, Transport::Udp, false);
+    assert!(got.iter().all(|p| p.whisper.is_none()));
+}
+
 /// The netsim proxy as a child process; killed on drop.
 struct Netsim {
     child: Child,
@@ -323,7 +437,7 @@ async fn fallback(port: u16, proxy: u16, control: u16) {
 #[ignore = "needs testenv v15 and MUMCORD_LIVE=1"]
 async fn v15_udp_audio() {
     if live() {
-        udp_audio(V15).await;
+        udp_audio(port(0)).await;
     }
 }
 
@@ -331,7 +445,7 @@ async fn v15_udp_audio() {
 #[ignore = "needs testenv v14 and MUMCORD_LIVE=1"]
 async fn v14_udp_audio() {
     if live() {
-        udp_audio(V14).await;
+        udp_audio(port(1)).await;
     }
 }
 
@@ -339,7 +453,7 @@ async fn v14_udp_audio() {
 #[ignore = "needs testenv v15 and MUMCORD_LIVE=1"]
 async fn v15_listener() {
     if live() {
-        listener(V15).await;
+        listener(port(0)).await;
     }
 }
 
@@ -347,7 +461,23 @@ async fn v15_listener() {
 #[ignore = "needs testenv v14 and MUMCORD_LIVE=1"]
 async fn v14_listener() {
     if live() {
-        listener(V14).await;
+        listener(port(1)).await;
+    }
+}
+
+#[tokio::test]
+#[ignore = "needs testenv v15 and MUMCORD_LIVE=1"]
+async fn v15_whisper_and_shout() {
+    if live() {
+        whisper(port(0)).await;
+    }
+}
+
+#[tokio::test]
+#[ignore = "needs testenv v14 and MUMCORD_LIVE=1"]
+async fn v14_whisper_and_shout() {
+    if live() {
+        whisper(port(1)).await;
     }
 }
 
@@ -355,7 +485,7 @@ async fn v14_listener() {
 #[ignore = "needs testenv v15, MUMCORD_LIVE=1 and tools/netsim"]
 async fn v15_fallback_to_tcp_and_back() {
     if live() {
-        fallback(V15, 64800, 64801).await;
+        fallback(port(0), 64800, 64801).await;
     }
 }
 
@@ -363,6 +493,6 @@ async fn v15_fallback_to_tcp_and_back() {
 #[ignore = "needs testenv v14, MUMCORD_LIVE=1 and tools/netsim"]
 async fn v14_fallback_to_tcp_and_back() {
     if live() {
-        fallback(V14, 64802, 64803).await;
+        fallback(port(1), 64802, 64803).await;
     }
 }

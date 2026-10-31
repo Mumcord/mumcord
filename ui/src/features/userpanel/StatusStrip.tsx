@@ -5,6 +5,7 @@ import { useActiveAudioProfile } from "../channelaudio";
 import { ConnectionInfo } from "../connection";
 import { DndIndicator } from "../dnd/DndIndicator";
 import type { StripMessage } from "./stripMessage";
+import { WhisperButton } from "../whisper/WhisperPanel";
 
 const ALERT = "M12 4l9 16H3zM12 10v4M12 17v.01";
 const SPINNER = "M12 3a9 9 0 1 0 9 9";
@@ -83,6 +84,9 @@ export function StatusStrip(props: StatusStripProps) {
             </button>
           ) : null}
         </span>
+        {connected ? (
+          <WhisperButton className="userpanel-chip" iconClassName="userpanel-chip--icon" />
+        ) : null}
         {connected ? (
           <ConnectionInfo className="userpanel-chip userpanel-chip--icon" compact />
         ) : null}

@@ -16,6 +16,7 @@ import { useTranslation } from "react-i18next";
 import { useT } from "../../i18n/useT";
 import type { User } from "../../api";
 import { StatusIcons } from "../channels/PersonStatus";
+import { WhisperBadge } from "../whisper/WhisperBadge";
 import { MumcordBadge } from "../channels/MumcordBadge";
 import { BlockedBadge } from "../blocking/BlockedBadge";
 import { LiveAvatar, LiveBadge } from "../screenshare/LiveBadge";
@@ -293,6 +294,7 @@ const MemberRow = memo(function MemberRow({
             <MumcordBadge user={user} />
             {!self && <BlockedBadge user={user} />}
             <LiveBadge session={user.session} />
+            <WhisperBadge session={user.session} self={self} />
             {self && <span className="member__you"> {t("you")}</span>}
             {status !== "" && <span className="visually-hidden">, {status}</span>}
           </span>
